@@ -36,6 +36,372 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
+
+### N1 · Starter-Nachkauf ist teurer als der Einzelkauf — ENTSCHEIDUNG OFFEN
+
+Gemessen am **echten Stripe-Katalog** (`GET /credits/bewertungen`),
+nicht an `config.js`:
+
+| Paket | Stripe | Inhalt | Einzelwert | |
+|---|---|---|---|---|
+| `nachkauf_investor` | 8,75 € | 5/5/0 | 14,00 € | −5,25 € |
+| `nachkauf_pro` | 12,50 € | 5/5/5 | 33,50 € | −21,00 € |
+| **`nachkauf_starter`** | **5,00 €** | 5/0/0 | 4,50 € | **+0,50 €** |
+
+Anzeige und Stripe stimmen überein — **kein Anzeigefehler**. Ursache:
+`config.js:521` leitet den Paketpreis als Monatsbeitrag ÷ 4 ab und
+ignoriert, woraus das Kontingent besteht; beim Starter ist es nur die
+billigste Art.
+
+Seit v1673 meldet `_preisplausibilitaet()` in `bewertungsKatalog.js`
+den Fall beim Laden (`unplausibel: {aufschlag_cents: 50}`).
+
+**BLOCKIERT:** Der Betrag steht in Stripe (`price_1UCzxM…`,
+`dp_nachkauf_starter`), nicht im Code. Zwei Wege, beide brauchen
+Marcels Entscheidung:
+1. Stripe-Preis senken (z. B. 5,00 → 4,00 €)
+2. Starter-Kontingent aufwerten (z. B. +1 × `mpi_plus` → Einzelwert
+   6,40 €)
+
+Der Stripe-Konnektor braucht dafür eine neue Anmeldung per `/mcp`.
+
+### N2 · Zwei Backend-Fixes liegen auf `main`, der Prod-Pull fehlt
+
+`main` trägt seit `cc28127`:
+- `0c6cda6` v1669 — BMF-Aufteilung meldet unbekannte Eingabefelder
+- `cc28127` v1673 — Preis-Plausibilität
+
+Beide Sicherungen liegen und wurden **angesehen**:
+`/root/backups/prod-haupt-20260929-0634.sql.gz` (11 M) und
+`prod-mb-20260929-0634.sql.gz` (717 K).
+
+**BLOCKIERT:** Der Prod-Pull wurde von der Arbeitsumgebung abgewiesen
+(„Out-of-Place Publication"). Es fehlt genau:
+
+```
+cd /opt/dealpilot && git pull --ff-only origin main
+docker compose -f docker-compose.prod.yml up -d --build backend
+```
+
+Zwei Backend-Dateien, **keine Migration, kein Frontend**.
+`tools/rollout-prod.ps1` ist hier das falsche Werkzeug: es MERGED
+staging → main und brächte alle 346 Commits samt Migrationen mit.
+
+### N3 · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
+
+Beim Wechsel auf `main` meldete git einen seit einer früheren Sitzung
+stehengebliebenen Sequencer-Zustand:
+
+```
+pick a2a96fd v1536/v1537: Partner 49 -> 99 EUR, drei Mandanten-Plaetze
+```
+
+**Nichts war angewendet** (kein `CHERRY_PICK_HEAD`, `git diff` leer).
+Mit `--quit` beendet, **nicht** fortgeführt — eine Preisänderung gehört
+nicht nebenbei auf den Produktionszweig.
+
+**Nachgemessen am 29.09.2026 — es gab nichts zu entscheiden.** Der
+Commit liegt **bereits auf `main`**:
+
+| gemessen | Befund |
+|---|---|
+| `git log --oneline main --grep="v1536"` | `a2a96fd` — von `main` aus erreichbar |
+| `git ls-tree -r main` | `backend/migrations/075_partner_preis_v1536.sql` liegt dort |
+| Stripe live, `dp_plan_partner_monthly` | **9.900 Cent**, `dp_version: v1536`, `inklusiv_mandanten: 3` |
+| Prod-Landing | `<h4>Warum 99 € und nicht 49 €</h4>` |
+
+Der Sequencer-Eintrag war ein **zweiter Anlauf auf einen Commit, der
+schon drauf war** — deshalb war auch nichts angewendet. Anzeige und
+Abbuchung stimmen überein; das Gegenstück zum Starter-Fall (N1) besteht
+hier **nicht**.
+
+> **Die Lehre ist die Reihenfolge:** Ich habe den hängenden Sequencer
+> als offene Entscheidung gemeldet, ohne vorher zu prüfen, ob sein
+> Inhalt längst am Ziel ist. Ein `--grep` auf dem Zielzweig hätte die
+> Frage in zehn Sekunden erledigt. **Erst messen, ob es die Aufgabe
+> noch gibt, dann fragen.**
+
+### N4 · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
+
+> **Zurückgenommen, 29.09.2026:** Unten stand „**Im Repo existiert keine
+> Gegenstelle**". Das ist falsch. Ich hatte nach den *Dateinamen des
+> Moduls* gesucht (`import.js`, `import_service.py`) statt nach der
+> *Funktion*. Die Gegenstelle ist **`frontend/js/pdf-import.js`** (V38,
+> 1.391 Zeilen): pdf.js → `POST /ai/extract-expose` → OpenAI →
+> Strukturdaten. **Dieselbe Architektur wie das Modul**, nur für ein
+> Dokument statt für einen Ordner. Marcel hatte recht — „das Modul, das
+> wir bereits integriert haben" gibt es.
+>
+> In meiner eigenen Merkdatei steht „ich hab es nicht gefunden" ist
+> nicht „es gibt es nicht". Genau das ist hier passiert.
+
+**Damit ist klar, was „das Update einspielen" heißt:** nicht FastAPI
+nach Express portieren, sondern **die Dokumentarten nachziehen, die das
+Modul kann und wir nicht**.
+
+Das Modul klassifiziert zehn Arten (`import_service.py:47-99`) und hat
+Extraktions-Prompts für acht — `grundbuch`, `kataster`, `kaufvertrag`,
+`weg_protokoll`, `boris`, `vwg_vorgutachten`, `rndg`, `marktbericht`.
+**`kpt` wird klassifiziert, aber nicht extrahiert** — der Prompt fehlt.
+Deshalb kann „die Rechnung aus dem Modul nehmen" nicht gehen: sie ist
+dort nicht.
+
+**Angebunden (v1677): das Restnutzungsdauergutachten.**
+`POST /api/v1/ai/extract-rndg`, Schema wörtlich aus
+`EXTRAKTIONS_PROMPTS['rndg']`. Am Container gemessen:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Neun Felder aus einem RNDG-Text | **alle korrekt** (Bj 1962, GND 80, 4 Punkte, Verfahren „Punktraster") |
+| Kette gegen unseren Kern | Gutachten **25 J.** / `calcPunktraster` **25,51 J.** — 2 % |
+| Negativtest ohne Baujahr/GND | `rechenbar: false`, `fehlende_pflichtfelder: ["baujahr","gnd_jahre"]` |
+
+Der Negativtest ist der wichtige: **`rnd_jahre` aus dem Gutachten wird
+gelesen, aber nie übernommen.** Gerechnet wird mit `rnd-calc.js`, die
+Gutachtenzahl ist der Vergleichswert. Und fehlende Pflichtangaben werden
+benannt statt still mit Standardwerten überbrückt — der Fehler, der bei
+der Kaufpreisaufteilung (v1669) eine um Faktor 2,9 falsche, plausibel
+aussehende Antwort erzeugt hat.
+
+**Offen — die nächsten Dokumentarten**, jede nach demselben Muster
+(Schema aus dem Modul, Rechnung bei uns): `grundbuch`, `kataster`,
+`kaufvertrag`, `weg_protokoll`. Dazu fehlt dem Endpunkt noch ein
+Aufrufer im Frontend; `pdf-import.js` ist die Stelle.
+
+**Nicht übernommen und bewusst so:** der Ordner-Upload, die SSE-Anzeige,
+der OCR-Zweig und `IMPORT_SESSIONS` (in-memory, übersteht keinen
+Neustart). Der OpenAI-Schlüssel des Moduls liegt im `localStorage` und
+geht per `X-OpenAI-Key`-Header vom Browser — unser Weg über den
+Server-Key mit `extractLimiter` bleibt.
+
+### N4-alt · Der ursprüngliche Befund (überholt, s. o.)
+
+`Dateien/dealpilot-import-v1_1_0.zip` (6 Dateien, ~55 KB). Geprüft am
+29.09.2026:
+
+- **Im Repo existiert keine Gegenstelle** — kein `import.js`,
+  `import_service.py`, `api_server_import_extensions.py`. Die v1.0.0
+  war laut README ein CLI-MVP und kam nie ins Git.
+- **Der Backend-Teil passt nicht zum Stack:** Python/FastAPI gegen
+  unser Node/Express. `import_service.py` und
+  `api_server_import_extensions.py` müssten portiert werden.
+- OCR-Fallback braucht `tesseract-ocr-deu` + `poppler-utils` im Image.
+- Der OpenAI-Schlüssel liegt im `localStorage` und geht per
+  `X-OpenAI-Key`-Header vom Browser — vor Produktion zu klären.
+- `IMPORT_SESSIONS` ist in-memory, übersteht keinen Neustart.
+
+**Und zur Kernfrage:** Das Modul enthält **keine**
+Kaufpreisaufteilungs-Rechnung. Es *klassifiziert* ein KPT-Dokument,
+hat aber weder Extraktions-Prompt noch Konsolidierungs-Zweig dafür —
+eine Lücke im Modul. „Die Rechnung aus dem Modul nehmen" geht mit
+dieser Fassung nicht.
+
+**Andockstelle**, falls integriert wird: der Import-Hub
+(`js/import-export-modal.js:113`), heute nur Excel + Backup.
+
+**Die Rechen-Andockstelle ist jetzt dokumentiert:**
+`docs/kaufpreisaufteilung/SCHNITTSTELLE.md` (v1675) — Feldnamen,
+Antwortformat, `warnings`, und die Gegenrechnung am echten Gutachten.
+Damit ist Marcels Ziel („falls ich mal ein Update einspiele, passt
+alles") von der Modul-Seite entkoppelt: **ein Modul muss die Rechnung
+nicht mitbringen, nur die Eingaben füllen und `POST /bmf/aufteilung`
+rufen.** Die Rechnung bleibt an der amtlichen Vorlage.
+
+### N5 · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
+
+`rnd-calc.js:419-433` wählt **immer die technische Alterswertminderung**,
+solange Alter < GND; das Punktraster ist nur Rückfall.
+
+Am Gutachten Alexanderstr. 11 (Bj 1976, GND 80, 2 Punkte, RND 33 J
+nach Anlage 2) trifft **unser Punktraster auf 0,2 Jahre genau**
+(32,80). Die technische Rechnung kommt je nach Gewerke-Eingabe auf
+einen anderen Wert.
+
+**Kein Defekt:** Der Wizard **erhebt** alle neun Gewerke
+(`rnd-wizard.js:1306-1323`, Radio-Tabelle). Die Regel ist bewusst
+gesetzt und dokumentiert.
+
+**Offen:** Soll das Punktraster führen, wenn es nach Anlage 2
+anwendbar ist — oder soll der Nutzer das Verfahren wählen? Marcel ist
+DESAG-Sachverständiger; das ist seine Entscheidung, nicht meine.
+
+> **Nachtrag 29.09.2026 — ich hatte hier zu früh „kein Defekt" gesagt.**
+> Marcels Frage war „**haben wir die Eingabefelder?**", und das ist eine
+> Messfrage. Gemessen:
+>
+> - `calcAll()` gibt **sechs** Verfahren zurück (`methods.linear/vogels/
+>   ross/parabel/punktraster/technisch`).
+> - `rnd-wizard.js` zeigte **drei**. **Vogels, Ross und Parabel wurden
+>   gerechnet und verworfen** — keine Anzeige, kein PDF (`grep -c` = 0),
+>   kein DOCX.
+> - Diese drei brauchen **keine eigenen Eingabefelder**: sie nehmen nur
+>   Alter und GND, die immer vorliegen. Es gab also keinen technischen
+>   Grund für ihr Fehlen.
+>
+> An den drei Testobjekten liegen die Verfahren **12,8 / 17,8 / 19,2
+> Jahre** auseinander. Behoben in **v1676** — samt dem zweiten Befund,
+> dass die Verfahrensübersicht **nie CSS hatte** (von sechs ausgegebenen
+> Klassen war keine definiert).
+>
+> **Die Lehre:** „Das ist eine Bewertungsentscheidung" ist eine richtige
+> Aussage, die eine falsche Antwort war. Die Verfahrens*wahl* gehört
+> Marcel — die Verfahrens*anzeige* war schlicht kaputt, und das hätte
+> ich messen müssen, bevor ich die Frage zurückgegeben habe.
+
+**Was jetzt noch Marcels Entscheidung ist** (unverändert): welches
+Verfahren führen soll. Neu ist nur, dass er die Alternativen jetzt
+sieht.
+
+---
+
+## → OFFEN aus dem 26.09.2026 (Layouts, Datenaufnahme, Ernte)
+
+Der Tag ist ausgerollt und nachgemessen (Journal-Einträge 5 bis 12 in
+`claude/projektanweisung-hauptapp.md`). Was **nicht** fertig ist:
+
+### P1 · Produktion nachziehen — Marcel: „prod machen wir später"
+
+Staging liegt seit `9a3f147` wieder vor Prod. Dazwischen liegen unter
+anderem v1635–v1645: die fünf Layouts, die Datenaufnahme-Zeile, die
+Erststart-Karte, die Export-Rückfrage, die Checkliste beim Anlegen,
+`umgebung.js` für die Landing-Ziele.
+
+**Vor dem Merge:**
+- Beide Datenbanken sichern **und ansehen** (`ls -lh` plus `zcat … | head -2`).
+- `git diff --name-only origin/main..staging | grep -i migration` — beim
+  letzten Mal leer, muss aber jedes Mal neu gefragt werden.
+- Backend-Rebuild nicht vergessen, wenn `backend/src/**` dabei ist.
+  **Am 26.09. hatte ich genau das zuerst übersehen** und behauptet, es
+  sei kein Backend-Code dabei; es waren fünf Dateien.
+
+### P2 · Die Reihenhaus-Gitter der NI-Ernte hängen — DIAGNOSE OFFEN
+
+**Stand: 11 von 17 Gebieten vollständig, 6 ausgefallen.** Und darin
+steckt ein Muster, das noch niemand erklärt hat:
+
+| Gebiet | EFH | RH |
+|---|---|---|
+| Goslar | **4/4 Lagen, 80 Punkte** | **alle 4 Lagen hängen** |
+| Northeim | **4/4 Lagen, 80 Punkte** | **alle 4 Lagen hängen** |
+| Holzminden | **1/1 Lage, 20 Punkte** | **hängt** |
+
+> **Die EFH-Fassung derselben Stadt läuft in einer Minute je Lage durch,
+> die Reihenhaus-Fassung nicht in vier.** Auch „GS 01", die in der
+> EFH-Datei ohne Nachfassen fertig wurde. Das ist keine Zeitfrage,
+> sondern ein Unterschied im Dashboard.
+
+**Zwei weitere Ausfälle sind vermutlich dauerhaft und richtig:**
+- `2026_sw_efh_lgdan` (Lüchow-Dannenberg) — hat gar keine Lage-Auswahl,
+  gehört nicht zu diesem Ernter. Der Erkenner hat damals das Wort „Lage"
+  in einem Zahlenfeld `Lagewert` getroffen (`ni-lageachse.csv`).
+- `2026_sw_rh_sulverver` — Stichprobengrenzen nicht lesbar.
+
+**Nächster Schritt — nicht wiederholen, sondern messen:** eine
+RH-Fassung mit kleinem Gitter (`--punkte 2x2`) und angehobener
+Lage-Frist laufen lassen und den Zähler `verriegelt` ansehen. Steht er
+hoch, wiederholt sich jeder Punkt, weil die Verriegelung das Bild nicht
+wiedererkennt — dann liegt es am SVG der RH-Dashboards, nicht an der
+Geschwindigkeit.
+
+**Erst danach:** `ernte2rezept.mjs` → `rezept2register.mjs --schreiben`
+→ ausrollen → Kettenprüfung. Die elf fertigen Gebiete liegen bereit;
+`ernte2rezept` weist Teilstände seit v1638 von selbst ab.
+
+### P3 · Die Bordkarte — vier von fünf Entwürfen stehen (Stand 28.09.2026)
+
+> **Nachtrag 28.09. abends:** die Layouts sind auf **zwei** reduziert
+> (Aktenmappe, Kanzlei); Werkbank, Dossier und Cockpit hell sind
+> gestrichen. Die Kanzlei ist nach dem Entwurf neu gebaut — sie war
+> andersherum. Journal-Eintrag 28.09.2026 (4).
+>
+> **Offen dort:** in `layout-varianten.css` stehen noch 61 tote
+> Regelzeilen für v3/v4/v5 und die Stellungen `leiste`/`fuss`. Und
+> bei `#hdr-obj-num` gewinnt eine Regel aus `ui-varianten.css` trotz
+> gleicher Spezifität und früherer Ladung — **Ursache ungeklärt**,
+> umgangen durch eine Klasse mehr.
+
+| Entwurf | Stand |
+|---|---|
+| **1 · Zeile** | gebaut (v1639), wählbar als `?karte=zeile` |
+| 2 · Karteikarte | nicht gebaut — von Marcel nie gewählt |
+| **3 · Checkliste** | gebaut (v1643) **als Dialog beim Anlegen** |
+| **4 · Trichter** | gebaut (v1651–v1651f) |
+| **5 · Bordkarte ernst** | gebaut (v1651–v1651f) |
+
+Der Umschalter steht in den Einstellungen unter „Darstellung" direkt
+unter dem Aufbau; Attribut `data-dp-kartenstil`, Merker
+`dp_karten_stil`, URL `?karte=zeile|trichter|bordkarte`.
+
+**Was offen blieb:**
+
+- **Entwurf 3 ist ein Dialog, kein Reiter.** Marcel hatte den Reiter
+  als Möglichkeit genannt („wenn es sich ergibt"). Unverändert offen.
+- **Der Weg zu beiden Schaltern ist drei Klicks tief:** Einstellungen →
+  Darstellung → „Darstellung öffnen" → dann erst Aufbau und
+  Datenaufnahme. Gemessen: alle zehn Knöpfe klickbar, das Umschalten
+  greift. Aber wer den Weg nicht kennt, findet ihn nicht — und Marcel
+  hat am 28.09. gesagt, er könne „Einstellungen nicht anklicken".
+  **Zu prüfen, ob die beiden Gruppen eine Ebene höher gehören**, direkt
+  neben „Obsidian / Hell".
+- **Entwurf 2** ist nie gebaut worden. Das ist kein Versäumnis — Marcel
+  hat ihn nicht gewählt. Steht hier nur, damit die Liste vollständig
+  ist.
+
+Schau: `frontend/entwurf-aktionsbox.html`.
+
+### P3c · Die Score-Zusammensetzung gegen die Demo — OFFEN
+
+Marcel am 28.09.2026: „die Zusammensetzung des Deal Scores, das sieht in
+der Demo noch anders aus."
+
+Die fehlende KPI-Angabe ist behoben (v1654d: `.sc-pill-sub` stand auf
+`display:none`, jetzt steht unter jeder Kennzahl „4 / 4 KPIs").
+**Die Gestaltung ist offen:**
+
+| | Demo (`entwurf-hell-bankfaehig.html`) | App |
+|---|---|---|
+| Score | Ring-Chip + „Gute Bewertung / Investor Deal Score" | Textblock „70 Gut" |
+| Kennzahlen | **echte Werte**: Rendite 4,72 %, DSCR 1,27 | Score-Anteile: „RENDITE 72 %" |
+| Anzahl | sechs (mit DSCR) | fünf |
+
+> Der Unterschied ist nicht nur Optik: „RENDITE 72 %" liest sich wie
+> eine Rendite, ist aber ein Score-Anteil. Die Demo zeigt beides
+> getrennt. **Das ist eine Produktentscheidung** — vor dem Bauen mit
+> Marcel klären, ob die Kennzahlenzeile die echten Werte tragen soll.
+
+### P3b · Zwei Werkzeugfenster, die auf dem Handy im Weg standen
+
+Am 28.09. mit `elementsFromPoint` bei 390 px gemessen: `#dp-kv-panel`
+(aus `hell-varianten.js`) und `.dpl-schalter` (aus
+`layout-varianten.js`) lagen beide `position:fixed` über der
+Datenaufnahme; drei von vier Quellkacheln und der Abrufknopf waren nicht
+zu drücken. **Beide sind seit v1652c/d unter 900 px ausgeblendet.**
+
+> Zu bedenken, wenn irgendwann ein DRITTES Werkzeugfenster entsteht:
+> beide Fälle sahen auf dem Schreibtisch völlig unauffällig aus.
+> **Ein festes Fenster gehört vor dem Ausrollen einmal bei 390 px
+> gegen `elementsFromPoint` gehalten** — sichtbar ist nicht bedienbar.
+
+
+### P4 · Kleinere Reste
+
+- **Ein leeres Testobjekt** liegt in Marcels Staging-Portfolio (beim
+  Nachweis der Checkliste entstanden). Kann weg — seine Liste.
+- **Marcels eigenes Profil:** seine E-Mail steht im **Namensfeld**, eine
+  PDF-E-Mail ist nicht gesetzt. Seine Daten.
+- **Handy-Layout der fünf Varianten** ist gebaut und gemessen, aber nur
+  an drei Breiten (1024 / 834 / 390) und nur in v1, v2, v4. v3 und v5
+  fehlen in der Messreihe.
+- **`verfuegbarkeit-by.json`** wird von keinem Ausgabeweg gelesen
+  (Befund vom 25.09., unverändert).
+- **`mb.market_reports.user_id` ist INTEGER**, `users.id` eine UUID —
+  die nutzerbezogenen Marktbericht-Wege scheitern daran seit v942 still.
+  Braucht eine Migration.
+
+---
+
+
 ## → HIER WEITERMACHEN: Marcels Backlog v22 vom 18.09.2026
 
 Volltext mit allen Unterpunkten: **`Dateien/dealpilot_backlog_v22.md`** —

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Objektkarten in der Schiene — 10 Entwürfe · v1707</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   DealPilot · Objektkarten in der Layout-Schiene
+   10 Entwürfe zur Auswahl — Stand 29.09.2026
+
+   WOFÜR: Marcel am 29.09.2026: „kannst du mir bei den neuen layouts
+   auch wenn man unter portfolio klickt schönere objekt karteien
+   angeben? aktuell sieht das so schlicht aus."
+
+   GEMESSEN am echten Stand, nicht geraten:
+     Schiene    248 px breit
+     Karte      216 x 81 px
+     Inhalt     Nummer, Adresse, Kaufpreis, Score-Ring, Status-Bänder
+
+   Die Daten unten sind ECHT (Staging-Portfolio), damit sichtbar wird,
+   wie ein Entwurf mit langen Adressen und fehlenden Werten umgeht -
+   nicht nur mit dem schönsten Fall.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --obsidian:#050505; --flaeche:#0E0D0B; --flaeche2:#15140F;
+  --linie:#2A2622; --linie-hell:#3A352E;
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+  --gruen:#3FA56C; --rot:#B8625C; --rot-hell:#D8564C;
+  --tinte:#EDE7DA; --tinte-leise:#B5AE9F; --tinte-sehr-leise:#8C8578;
+  --creme:#FDFCFA;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--obsidian); color:var(--tinte);
+  font-family:'Inter',system-ui,sans-serif; padding:28px 22px 60px;
+}
+h1{font:700 21px/1.2 'Space Grotesk',sans-serif;margin-bottom:6px}
+.sub{font-size:13px;color:var(--tinte-sehr-leise);margin-bottom:6px;max-width:760px;line-height:1.6}
+.mess{
+  font:600 11px/1.5 'JetBrains Mono',monospace;color:var(--gold);
+  background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.22);
+  border-radius:7px;padding:9px 12px;margin:14px 0 26px;max-width:760px;
+}
+.gitter{display:flex;gap:18px;overflow-x:auto;padding-bottom:22px;align-items:flex-start}
+.spalte{flex:0 0 268px;background:var(--flaeche);border:1px solid var(--linie);border-radius:11px;overflow:hidden}
+.kopf{padding:11px 13px 9px;border-bottom:1px solid var(--linie);background:var(--flaeche2)}
+.nr{font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.14em;color:var(--gold);display:block;margin-bottom:4px}
+.tit{font:700 13.5px/1.25 'Space Grotesk',sans-serif;display:block}
+.warum{font-size:11px;line-height:1.5;color:var(--tinte-sehr-leise);margin-top:5px;display:block}
+.schiene{padding:9px;display:flex;flex-direction:column;gap:3px;background:var(--obsidian)}
+
+/* ── Gemeinsame Bausteine ─────────────────────────────────────────── */
+.k{position:relative;cursor:pointer;border:1px solid transparent;border-radius:5px;padding:6px 8px;background:transparent}
+.k:hover{background:var(--flaeche2);border-color:var(--linie)}
+.k.aktiv{background:#221F1A;border-color:var(--linie-hell)}
+.adr{font:600 12px/1.3 'Inter',sans-serif;color:var(--tinte);
+     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seq{font:600 9px/1 'JetBrains Mono',monospace;color:var(--tinte-sehr-leise);letter-spacing:.06em}
+.kp{font:600 11px/1 'JetBrains Mono',monospace;color:var(--tinte-leise)}
+.ring{width:26px;height:26px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+        font:700 9.5px/1 'JetBrains Mono',monospace}
+.top{color:var(--gold-hi)} .gut{color:var(--gruen)} .sol{color:var(--gold)}
+.schw{color:var(--rot)} .krit{color:var(--rot-hell)}
+.s-top{stroke:#E8CC7A} .s-gut{stroke:#3FA56C} .s-sol{stroke:#C9A84C}
+.s-schw{stroke:#B8625C} .s-krit{stroke:#D8564C}
+
+/* 01 · Bordkarte */
+.e1 .k{display:flex;align-items:center;gap:8px;padding:7px 8px 7px 0;border-left:0}
+.e1 .abriss{flex:none;width:15px;align-self:stretch;border-right:1px dashed #3A352E;
+  display:flex;align-items:center;justify-content:center}
+.e1 .abriss span{font:700 7px/1 'JetBrains Mono',monospace;color:var(--tinte-sehr-leise);
+  writing-mode:vertical-rl;letter-spacing:.14em}
+.e1 .mitte{flex:1 1 auto;min-width:0}
+.e1 .zeile2{display:flex;gap:7px;align-items:baseline;margin-top:2px}
+
+/* 02 · Aktenreiter */
+.e2 .k{padding:0;border:0;background:transparent}
+.e2 .lasche{display:inline-block;font:700 8px/1 'JetBrains Mono',monospace;
+  letter-spacing:.12em;color:#0E0D0B;background:var(--gold);padding:2px 7px;
+  border-radius:3px 3px 0 0}
+.e2 .blatt{border:1px solid var(--linie);border-radius:0 5px 5px 5px;padding:6px 8px;
+  background:var(--flaeche2);display:flex;align-items:center;gap:8px}
+.e2 .k:hover .blatt{border-color:var(--gold-lo)}
+
+/* 03 · Score-Balken links */
+.e3 .k{display:flex;gap:9px;align-items:center;padding-left:0}
+.e3 .balken{flex:none;width:3px;align-self:stretch;border-radius:2px;min-height:34px}
+.e3 .mitte{flex:1 1 auto;min-width:0}
+.e3 .zeile2{display:flex;justify-content:space-between;gap:6px;margin-top:2px}
+
+/* 04 · Datenzeile */
+.e4 .k{display:grid;grid-template-columns:30px 1fr auto;gap:7px;align-items:center;
+  font-family:'JetBrains Mono',monospace;padding:5px 7px}
+.e4 .n{font:600 9px/1 'JetBrains Mono',monospace;color:var(--gold)}
+.e4 .a{font:400 11px/1.3 'JetBrains Mono',monospace;color:var(--tinte);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e4 .s{font:700 11px/1 'JetBrains Mono',monospace}
+
+/* 05 · Bildkachel */
+.e5 .k{padding:0;border-radius:6px;overflow:hidden;height:56px;position:relative;
+  background:linear-gradient(135deg,#1E1B16,#0E0D0B)}
+.e5 .k::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(5,5,5,.1) 0%,rgba(5,5,5,.86) 72%)}
+.e5 .inhalt{position:absolute;inset:auto 8px 6px;z-index:2}
+.e5 .oben{position:absolute;top:6px;right:7px;z-index:2}
+
+/* 06 · Ampel */
+.e6 .k{display:flex;align-items:center;gap:9px}
+.e6 .punkt{flex:none;width:9px;height:9px;border-radius:50%}
+.e6 .mitte{flex:1 1 auto;min-width:0}
+.e6 .wert{font:700 11px/1 'JetBrains Mono',monospace}
+
+/* 07 · Kennzahlen */
+.e7 .k{padding:7px 8px}
+.e7 .kpi{display:flex;gap:9px;margin-top:5px}
+.e7 .kpi div{flex:1 1 0;min-width:0}
+.e7 .kpi small{display:block;font:600 7.5px/1 'JetBrains Mono',monospace;
+  letter-spacing:.1em;color:var(--tinte-sehr-leise);margin-bottom:2px}
+.e7 .kpi b{display:block;font:700 10.5px/1 'JetBrains Mono',monospace;color:var(--tinte-leise)}
+
+/* 08 · Minimal */
+.e8 .k{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px}
+.e8 .adr{font-weight:500}
+
+/* 09 · Status */
+.e9 .k{display:flex;align-items:center;gap:8px}
+.e9 .pille{flex:none;font:700 7.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;
+  padding:3px 6px;border-radius:3px;border:1px solid}
+.e9 .p-won{color:var(--gruen);border-color:rgba(63,165,108,.5);background:rgba(63,165,108,.1)}
+.e9 .p-pruef{color:var(--gold);border-color:rgba(201,168,76,.45);background:rgba(201,168,76,.08)}
+.e9 .p-raus{color:var(--rot);border-color:rgba(184,98,92,.45);background:rgba(184,98,92,.08)}
+.e9 .mitte{flex:1 1 auto;min-width:0}
+
+/* 10 · Cockpit */
+.e10 .k{display:flex;align-items:center;gap:9px;padding:6px 8px}
+.e10 .instr{flex:none;width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--linie-hell);display:flex;align-items:center;justify-content:center;
+  position:relative;background:#0B0A08}
+.e10 .instr b{font:700 10px/1 'JetBrains Mono',monospace}
+.e10 .instr::before{content:'';position:absolute;inset:-1px;border-radius:50%;
+  border:1px solid transparent;border-top-color:currentColor;opacity:.55}
+.e10 .mitte{flex:1 1 auto;min-width:0}
+.e10 .zeile2{display:flex;gap:6px;align-items:baseline;margin-top:1px}
+
+.fuss{margin-top:30px;font-size:12px;color:var(--tinte-sehr-leise);max-width:760px;line-height:1.7}
+.fuss b{color:var(--tinte-leise)}
+</style>
+</head>
+<body>
+
+<h1>Objektkarten in der Layout-Schiene — 10 Entwürfe</h1>
+<p class="sub">
+  Marcel am 29.09.2026: <i>„kannst du mir bei den neuen layouts auch wenn man unter
+  portfolio klickt schönere objekt karteien angeben? aktuell sieht das so schlicht aus."</i>
+</p>
+<div class="mess">
+  GEMESSEN am laufenden Stand: Schiene 248 px · Karte 216 × 81 px<br>
+  Die Objekte unten sind ECHT aus dem Staging-Portfolio — mit langen Adressen
+  und einem Fall ohne Namen („Unbenannt“), damit jeder Entwurf auch den
+  unschönen Fall zeigt, nicht nur den schönen.
+</div>
+
+<div class="gitter">
+
+  <!-- 01 -->
+  <div class="spalte e1">
+    <div class="kopf"><span class="nr">ENTWURF 01</span><span class="tit">Bordkarte</span>
+      <span class="warum">Der Abriss links trennt die Liste optisch von der Auswahl. Nimmt die Marke auf, ohne laut zu sein.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><div class="abriss"><span>2026</span></div><div class="mitte">
+        <div class="adr">Musterstraße 12, Leipzig</div>
+        <div class="zeile2"><span class="kp">189.000 €</span><span class="seq">· ETW 68 m²</span></div></div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-sol" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="35 63" stroke-linecap="round"/></svg><b class="sol">56</b></div></div>
+      <div class="k"><div class="abriss"><span>2026</span></div><div class="mitte">
+        <div class="adr">Westerfeldstr. 140, Bielefeld</div>
+        <div class="zeile2"><span class="kp">545.000 €</span><span class="seq">· MFH 4 WE</span></div></div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-gut" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="51 63" stroke-linecap="round"/></svg><b class="gut">82</b></div></div>
+      <div class="k"><div class="abriss"><span>2026</span></div><div class="mitte">
+        <div class="adr">Bäckerstr. 7, Musterhausen</div>
+        <div class="zeile2"><span class="kp">— €</span><span class="seq">· LTV 100 %</span></div></div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-krit" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="14 63" stroke-linecap="round"/></svg><b class="krit">22</b></div></div>
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="spalte e2">
+    <div class="kopf"><span class="nr">ENTWURF 02</span><span class="tit">Aktenreiter</span>
+      <span class="warum">Die Lasche trägt die Objektnummer. Wirkt wie eine Kartei — passt zur Kanzlei-Ansicht.</span></div>
+    <div class="schiene">
+      <div class="k"><span class="lasche">2026-999</span><div class="blatt">
+        <div style="flex:1 1 auto;min-width:0"><div class="adr">Musterstraße 12, Leipzig</div>
+          <div class="kp" style="margin-top:2px">189.000 € · ETW</div></div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-sol" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="35 63" stroke-linecap="round"/></svg><b class="sol">56</b></div></div></div>
+      <div class="k"><span class="lasche">2026-1044</span><div class="blatt">
+        <div style="flex:1 1 auto;min-width:0"><div class="adr">Westerfeldstr. 140</div>
+          <div class="kp" style="margin-top:2px">545.000 € · MFH</div></div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-gut" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="51 63" stroke-linecap="round"/></svg><b class="gut">82</b></div></div></div>
+      <div class="k"><span class="lasche">2026-1048</span><div class="blatt">
+        <div style="flex:1 1 auto;min-width:0"><div class="adr" style="color:#8C8578">Unbenannt</div>
+          <div class="kp" style="margin-top:2px">0 €</div></div></div></div>
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="spalte e3">
+    <div class="kopf"><span class="nr">ENTWURF 03</span><span class="tit">Score-Kante</span>
+      <span class="warum">Ein farbiger Strich links statt eines Rings. Man liest die Liste auf einen Blick, ohne Zahlen zu vergleichen.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><div class="balken" style="background:#C9A84C"></div><div class="mitte">
+        <div class="adr">Musterstraße 12, Leipzig</div>
+        <div class="zeile2"><span class="kp">189.000 €</span><span class="seq sol">SOLIDE 56</span></div></div></div>
+      <div class="k"><div class="balken" style="background:#3FA56C"></div><div class="mitte">
+        <div class="adr">Westerfeldstr. 140, Bielefeld</div>
+        <div class="zeile2"><span class="kp">545.000 €</span><span class="seq gut">GUT 82</span></div></div></div>
+      <div class="k"><div class="balken" style="background:#D8564C"></div><div class="mitte">
+        <div class="adr">Bäckerstr. 7, Musterhausen</div>
+        <div class="zeile2"><span class="kp">— €</span><span class="seq krit">KRITISCH 22</span></div></div></div>
+      <div class="k"><div class="balken" style="background:#2A2622"></div><div class="mitte">
+        <div class="adr" style="color:#8C8578">Unbenannt</div>
+        <div class="zeile2"><span class="kp">0 €</span><span class="seq">kein Score</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="spalte e4">
+    <div class="kopf"><span class="nr">ENTWURF 04</span><span class="tit">Datenzeile</span>
+      <span class="warum">Monospace, alles in einer Zeile, alles untereinander bündig. Für lange Listen die ruhigste Lösung.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><span class="n">999</span><span class="a">Musterstraße 12, Leipzig</span><span class="s sol">56</span></div>
+      <div class="k"><span class="n">1044</span><span class="a">Westerfeldstr. 140, Bielefeld</span><span class="s gut">82</span></div>
+      <div class="k"><span class="n">1045</span><span class="a">Hermannstraße 9, Hüllhorst</span><span class="s gut">74</span></div>
+      <div class="k"><span class="n">1047</span><span class="a">Bäckerstr. 7, Musterhausen</span><span class="s krit">22</span></div>
+      <div class="k"><span class="n">1048</span><span class="a" style="color:#8C8578">Unbenannt</span><span class="s" style="color:#3A352E">—</span></div>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="spalte e5">
+    <div class="kopf"><span class="nr">ENTWURF 05</span><span class="tit">Bildkachel</span>
+      <span class="warum">Das Objektfoto trägt die Karte. Stark, wenn Fotos da sind — ohne Foto braucht es einen guten Ersatz.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><div class="inhalt"><div class="adr">Musterstraße 12, Leipzig</div>
+        <div class="kp" style="margin-top:2px">189.000 € · ETW 68 m²</div></div>
+        <div class="oben"><span class="seq sol" style="background:rgba(5,5,5,.6);padding:2px 5px;border-radius:3px">56</span></div></div>
+      <div class="k"><div class="inhalt"><div class="adr">Westerfeldstr. 140</div>
+        <div class="kp" style="margin-top:2px">545.000 € · MFH 4 WE</div></div>
+        <div class="oben"><span class="seq gut" style="background:rgba(5,5,5,.6);padding:2px 5px;border-radius:3px">82</span></div></div>
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="spalte e6">
+    <div class="kopf"><span class="nr">ENTWURF 06</span><span class="tit">Ampel</span>
+      <span class="warum">Ein Punkt sagt die Stufe, die Zahl steht rechts. Am schnellsten zu überfliegen, am wenigsten Information.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><span class="punkt" style="background:#C9A84C"></span><div class="mitte">
+        <div class="adr">Musterstraße 12, Leipzig</div></div><span class="wert sol">56</span></div>
+      <div class="k"><span class="punkt" style="background:#3FA56C"></span><div class="mitte">
+        <div class="adr">Westerfeldstr. 140, Bielefeld</div></div><span class="wert gut">82</span></div>
+      <div class="k"><span class="punkt" style="background:#D8564C"></span><div class="mitte">
+        <div class="adr">Bäckerstr. 7, Musterhausen</div></div><span class="wert krit">22</span></div>
+      <div class="k"><span class="punkt" style="background:#2A2622"></span><div class="mitte">
+        <div class="adr" style="color:#8C8578">Unbenannt</div></div><span class="wert" style="color:#3A352E">—</span></div>
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="spalte e7">
+    <div class="kopf"><span class="nr">ENTWURF 07</span><span class="tit">Kennzahlen</span>
+      <span class="warum">Die drei Zahlen, nach denen man wirklich sucht. Braucht mehr Höhe — dafür muss man nicht klicken.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1 1 auto;min-width:0"><div class="adr">Musterstraße 12, Leipzig</div></div>
+        <span class="seq sol">56</span></div>
+        <div class="kpi"><div><small>PREIS</small><b>189.000</b></div><div><small>BMR</small><b>5,9 %</b></div><div><small>CF/M</small><b class="krit">−7</b></div></div></div>
+      <div class="k"><div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1 1 auto;min-width:0"><div class="adr">Westerfeldstr. 140</div></div>
+        <span class="seq gut">82</span></div>
+        <div class="kpi"><div><small>PREIS</small><b>545.000</b></div><div><small>BMR</small><b>7,0 %</b></div><div><small>CF/M</small><b class="gut">+341</b></div></div></div>
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="spalte e8">
+    <div class="kopf"><span class="nr">ENTWURF 08</span><span class="tit">Minimal</span>
+      <span class="warum">Nur Adresse und Ring. Der ruhigste Entwurf — nah am heutigen Stand, aber mit Luft und klarem Ring.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><div class="adr">Musterstraße 12, Leipzig</div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-sol" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="35 63" stroke-linecap="round"/></svg><b class="sol">56</b></div></div>
+      <div class="k"><div class="adr">Westerfeldstr. 140, Bielefeld</div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-gut" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="51 63" stroke-linecap="round"/></svg><b class="gut">82</b></div></div>
+      <div class="k"><div class="adr">Hermannstraße 9, Hüllhorst</div>
+        <div class="ring"><svg width="26" height="26"><circle cx="13" cy="13" r="10" fill="none" stroke="#2A2622" stroke-width="2.5"/><circle class="s-gut" cx="13" cy="13" r="10" fill="none" stroke-width="2.5" stroke-dasharray="46 63" stroke-linecap="round"/></svg><b class="gut">74</b></div></div>
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="spalte e9">
+    <div class="kopf"><span class="nr">ENTWURF 09</span><span class="tit">Status</span>
+      <span class="warum">Die Deal-Stufe zuerst: Prüfen, Geboten, Gewonnen. Für wen die Pipeline wichtiger ist als der Score.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><span class="pille p-won">WON</span><div class="mitte">
+        <div class="adr">Musterstraße 12, Leipzig</div>
+        <div class="kp" style="margin-top:2px">189.000 €</div></div><span class="seq sol">56</span></div>
+      <div class="k"><span class="pille p-pruef">PRÜFEN</span><div class="mitte">
+        <div class="adr">Westerfeldstr. 140</div>
+        <div class="kp" style="margin-top:2px">545.000 €</div></div><span class="seq gut">82</span></div>
+      <div class="k"><span class="pille p-raus">RAUS</span><div class="mitte">
+        <div class="adr">Bäckerstr. 7, Musterhausen</div>
+        <div class="kp" style="margin-top:2px">— €</div></div><span class="seq krit">22</span></div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="spalte e10">
+    <div class="kopf"><span class="nr">ENTWURF 10</span><span class="tit">Cockpit</span>
+      <span class="warum">Der Score als Rundinstrument. Nimmt die Luftfahrt-Bildsprache auf, die die App ohnehin führt.</span></div>
+    <div class="schiene">
+      <div class="k aktiv"><div class="instr sol"><b class="sol">56</b></div><div class="mitte">
+        <div class="adr">Musterstraße 12, Leipzig</div>
+        <div class="zeile2"><span class="kp">189.000 €</span><span class="seq">ETW</span></div></div></div>
+      <div class="k"><div class="instr gut"><b class="gut">82</b></div><div class="mitte">
+        <div class="adr">Westerfeldstr. 140, Bielefeld</div>
+        <div class="zeile2"><span class="kp">545.000 €</span><span class="seq">MFH</span></div></div></div>
+      <div class="k"><div class="instr krit"><b class="krit">22</b></div><div class="mitte">
+        <div class="adr">Bäckerstr. 7, Musterhausen</div>
+        <div class="zeile2"><span class="kp">— €</span><span class="seq">EFH</span></div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="fuss">
+  <b>Zum Aussuchen:</b> die Entwürfe unterscheiden sich vor allem darin, was sie
+  ZUERST zeigen — 03/06 die Score-Stufe, 04 die Adresse, 07 die Kennzahlen,
+  09 die Deal-Stufe, 10 den Score als Instrument.<br><br>
+  <b>Was sie alle können:</b> lange Adressen schneiden sauber ab, und ein Objekt
+  ohne Namen oder ohne Score bleibt lesbar, statt eine Lücke zu reißen. Das war
+  der Grund, die echten Daten zu nehmen — ein Entwurf, der nur mit dem schönen
+  Fall funktioniert, fällt erst beim Kunden auf.<br><br>
+  <b>Nicht enthalten:</b> die Aktionsknöpfe (Duplizieren, Löschen). Die liegen
+  seit v1705 rechts in der Zeile und erscheinen bei Hover oder an der gewählten
+  Karte — sie kommen in jedem Entwurf gleich dazu.
+</div>
+
+</body>
+</html>

@@ -3864,7 +3864,7 @@
          zeigen den Stand, diese Zeile sagt, was zu tun ist. */
       '.vi-rf-offen{display:flex;flex-direction:column;gap:3px;margin-top:8px;',
       'padding:8px 10px;border-radius:9px;font-size:12px;line-height:1.45;',
-      'background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.22)}',
+      'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)}',
       '.vi-rf-offen-feld{display:block}',
       '.vi-rf-offen-feld b{font-weight:600}',
       '.vi-rf-bsp{opacity:.72}',
@@ -11175,7 +11175,7 @@
             kd.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:var(--wl-9a7f33, #9a7f33)">Kosten dieser Aufnahme: ' +
               centGesamt.toFixed(2).replace('.', ',') + ' Cent' +
               (k.vollstaendig ? '' : ' (unvollständig)') + '</summary>' +
-              '<div style="margin:8px 0 0;line-height:1.7;background:rgba(229,168,71,.08);border:1px solid rgba(229,168,71,.3);border-radius:8px;padding:10px">' +
+              '<div style="margin:8px 0 0;line-height:1.7;background:color-mix(in srgb, var(--wl-e5a847, #e5a847) 8%, transparent);border:1px solid color-mix(in srgb, var(--wl-e5a847, #e5a847) 30%, transparent);border-radius:8px;padding:10px">' +
               zeilen +
               (k.vollstaendig ? '' :
                 '<div style="margin-top:8px"><b>Nicht bepreist:</b> ' + escH((k.ohne_preis || []).join(', ')) +
@@ -11193,7 +11193,7 @@
       var det = document.createElement('details');
       det.className = 'vi-trans';
       det.style.cssText = 'margin:10px 0 4px;font-size:12px;color:#7A7370';
-      det.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:#9a7f33">Transkript anzeigen</summary><p style="margin:8px 0 0;line-height:1.5;background:rgba(229,168,71,.08);border:1px solid rgba(229,168,71,.3);border-radius:8px;padding:10px">' + escH(data.transcript) + '</p>';
+      det.innerHTML = '<summary style="cursor:pointer;font-weight:600;color:var(--wl-9a7f33, #9a7f33)">Transkript anzeigen</summary><p style="margin:8px 0 0;line-height:1.5;background:color-mix(in srgb, var(--wl-e5a847, #e5a847) 8%, transparent);border:1px solid color-mix(in srgb, var(--wl-e5a847, #e5a847) 30%, transparent);border-radius:8px;padding:10px">' + escH(data.transcript) + '</p>';
       host.appendChild(det);
     }
   }

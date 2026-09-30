@@ -1332,6 +1332,11 @@
   window._v361Enrich = _v361Enrich;
 
   window.PdfImport = window.PdfImport || {}; window.PdfImport.extractImages = _extractPdfImages; /* v402-expose: Bild-Extraktion fuer Objekt-Tab-Import wiederverwenden */
+  /* v1678: Textextraktion und pdf.js-Nachladen freigeben, damit der
+     Dokument-Import sie nicht ein zweites Mal baut. Zwei Fassungen
+     derselben Funktion laufen irgendwann auseinander.               */
+  window.PdfImport.extractText = _extractPdfText;
+  window.PdfImport.ensurePdfJs = _loadPdfJs;
   window.showPdfImport         = showPdfImport;
   window.closePdfImport        = closePdfImport;
   window.pdfImportApply        = pdfImportApply;

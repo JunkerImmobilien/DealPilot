@@ -180,21 +180,25 @@ window.DealPilotWorkflow = (function() {
       pctEl.textContent = label;
     }
 
-    // V75: Status-Badge in der Tab-Bar (rechts) befüllen
-    var statusFill = document.getElementById('tabs-status-fill');
-    var statusText = document.getElementById('tabs-status-text');
-    var statusBadge = document.getElementById('tabs-status-badge');
-    if (statusFill) statusFill.style.width = pct + '%';
-    if (statusText) {
-      // V75: kompakter Text — passt in die Tab-Bar
-      statusText.textContent = status.complete + ' / ' + status.total + ' · ' + pct + ' %';
-    }
-    if (statusBadge) {
-      statusBadge.classList.toggle('tabs-status-done', pct >= 100);
-      statusBadge.title = pct >= 100
-        ? 'Alle ' + status.total + ' Bereiche vollständig — einfache Bewertung möglich'
-        : status.complete + ' von ' + status.total + ' Bereichen vollständig (' + pct + ' %)';
-    }
+    /* == v1708 - EINE ANZEIGE STATT ZWEI =============================
+       Marcel am 29.09.2026: "in der Tabbar einmal diese alle sechs
+       Bereiche vollstaendig, einfache Bewertung moeglich und oben im
+       Header haben wir nochmal 24 von 24 Felder fuer den Investor Deal
+       Score ... dann kann man sich eine Anzeige sparen und es wird
+       etwas uebersichtlicher."
+
+       GEMESSEN an der Westerfeldstr. 140, beide gleichzeitig sichtbar:
+         #tabs-status-badge   "6 / 6 - 100 %"    (sechs Bereiche)
+         #hdr-completeness    "21 / 24 Felder"   (Investor Deal Score)
+
+       > Zwei Fortschrittsanzeigen nebeneinander beantworten nicht zwei
+       > Fragen. Sie stellen eine dritte: welche gilt jetzt?
+
+       Hier wird nur noch der Zustand gemerkt; das Schreiben macht
+       `_dpFortschritt()` weiter unten - es braucht BEIDE Quellen und
+       kann deshalb nicht hier stehen. */
+    window._dpWfStatus = { complete: status.complete, total: status.total, pct: pct };
+    try { if (typeof window._dpFortschritt === 'function') window._dpFortschritt(); } catch (e) {}
 
     // V75: Häkchen direkt an die Tabs hängen (statt separate Workflow-Steps).
     // Mapping per data-wf-key (im HTML gesetzt): objekt/investition/miete/steuer/finanzierung/bewirtschaftung
@@ -469,4 +473,67 @@ window.DealPilotWorkflow = (function() {
     // DOM schon ready — direkt initialisieren
     setTimeout(_initWorkflowAutoUpdate, 50);
   }
+
+  /* == v1708 - DIE EINE FORTSCHRITTSANZEIGE =========================
+     Liest BEIDE Quellen und entscheidet, welche Stufe gerade dran ist.
+     Sie steht hier am Modulende und nicht in `updateProgress()`, weil
+     sie auch von `calc.js` gerufen wird - die 24 Felder rechnet dort
+     jemand anderes aus, und wer zuerst fertig ist, steht nicht fest.
+
+     Geschrieben wird in das VORHANDENE Badge. Es wird kein zweites
+     gebaut - sonst haetten wir am Ende drei statt einer.
+
+     DIE STUFEN sind Marcels:
+       1. einfache Bewertung unvollstaendig  -> "N / 6 Bereiche"
+       2. vollstaendig UND Plan traegt IDS   -> "N / 24 Felder"
+       3. sonst                              -> "Vollstaendig"
+
+     `hasFullFeature`, nicht `hasFeature`: der Free-Plan traegt
+     `deal_score_v2` als "demo" (calc.js:130, Absicht). Eine Demo ist
+     kein Anspruch auf 24 Felder - wer den Score nicht hat, soll nicht
+     den Rest eines Features sehen, das er nicht bekommt. */
+  window._dpFortschritt = function () {
+    var sechs = window._dpWfStatus;
+    if (!sechs || !sechs.total) return;
+    var felder = window._dpKpiComp || null;
+
+    var hatIds = false;
+    try {
+      hatIds = !!(window.DealPilotConfig && window.DealPilotConfig.pricing
+                  && window.DealPilotConfig.pricing.hasFullFeature('deal_score_v2'));
+    } catch (e) { hatIds = false; }
+
+    var text, titel, pct, fertig = false;
+
+    if (sechs.complete < sechs.total) {
+      var offen = sechs.total - sechs.complete;
+      pct = sechs.pct;
+      text = sechs.complete + ' / ' + sechs.total + ' Bereiche';
+      titel = 'Noch ' + offen + (offen === 1 ? ' Bereich' : ' Bereiche')
+            + ' bis zur einfachen Bewertung.';
+    } else if (hatIds && felder && felder.total && felder.filled < felder.total) {
+      var fehlt = felder.total - felder.filled;
+      pct = felder.percent;
+      text = felder.filled + ' / ' + felder.total + ' Felder';
+      titel = 'Einfache Bewertung steht. Noch ' + fehlt
+            + (fehlt === 1 ? ' Feld' : ' Felder')
+            + ' bis zum vollen Investor Deal Score.';
+    } else if (hatIds && felder && felder.total) {
+      pct = 100; fertig = true;
+      text = 'Vollst\u00e4ndig';
+      titel = 'Alle ' + felder.total + ' Felder des Investor Deal Score sind da.';
+    } else {
+      pct = 100; fertig = true;
+      text = 'Vollst\u00e4ndig';
+      titel = 'Alle ' + sechs.total + ' Bereiche vollst\u00e4ndig \u2014 einfache Bewertung m\u00f6glich.';
+    }
+
+    var f = document.getElementById('tabs-status-fill');
+    var t = document.getElementById('tabs-status-text');
+    var bg = document.getElementById('tabs-status-badge');
+    if (f) f.style.width = pct + '%';
+    if (t && t.textContent !== text) t.textContent = text;
+    if (bg) { bg.classList.toggle('tabs-status-done', fertig); bg.title = titel; }
+  };
+
 })();

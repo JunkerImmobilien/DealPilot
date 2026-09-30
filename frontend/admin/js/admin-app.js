@@ -538,7 +538,13 @@
     }
     try {
       const m = await API.marktberichtCosts();
-      const labels = { qc: 'QuickCheck (2 L)', objekt: 'Objekt-Tab (2 L)', voll: 'Vollbericht (5 L)' };
+      /* v1664: Die Liter-Angaben im Kopf dieser Tabelle waren die
+         letzte SICHTBARE Stelle der abgeschafften Waehrung im Repo -
+         alle anderen Fundstellen stehen in Kommentaren. Die Spalte
+         `liters` daneben kommt weiter vom Server und ist eine
+         Verbrauchszahl, kein Preis; sie bleibt, bis der Server sie
+         umbenennt. */
+      const labels = { qc: 'QuickCheck', objekt: 'Objekt-Tab', voll: 'Vollbericht' };
       const bk = document.getElementById('mbcost-bykind');
       if (bk) bk.innerHTML = (m.by_kind && m.by_kind.length)
         ? m.by_kind.map(function (r) { return '<tr><td>' + (labels[r.kind] || r.kind) + '</td><td>' + r.n + '</td><td>' + r.liters + '</td><td>' + eur(r.geomap_eur) + '</td><td>' + eur(r.openai_eur) + '</td></tr>'; }).join('')

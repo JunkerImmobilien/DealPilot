@@ -15,6 +15,7 @@
  */
 
 const config = require('../config');
+const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 
@@ -124,6 +125,52 @@ function buildPrompt(payload) {
     '   Tilgung und Zins sind komfortabel gedeckt, ausreichender Puffer vorhanden.',
     '   Banken-Standard. Ab 1,5 gilt als sehr solide.',
     '',
+    /* ── v1700 · DIE STUFEN DES GESAMT-SCORES ──────────────────────────
+       Marcel: „Investor-Deal-Score 82, Deal-Score 88 — der sagt mir aber
+       immer noch ‚Prüfen' in Gelb. Diese Grenzen passen nicht."
+
+       Er hat recht, und die Ursache war eine Lücke: die Skala oben deckt
+       LTV und DSCR ab, den GESAMT-Score aber nicht. Die KI bekam die
+       Zahl („DealScore: 88 / 100", Z. 219) ohne jede Bedeutung und hat
+       frei geraten.
+
+       Die Schwellen stehen in CLAUDE.md und gelten überall in der App
+       (`js/dashboard.js:390`). Dass die Analyse sie nicht kannte, hat
+       zwei widersprüchliche Aussagen auf denselben Bildschirm gebracht.
+
+       > Eine Zahl ohne Maßstab ist keine Aussage. Wer sie weitergibt,
+       > muss den Maßstab mitgeben — sonst erfindet der Empfänger einen.
+
+       Die Empfehlung ist an die Stufe gebunden, aber nicht daran
+       gefesselt: Abweichen ist erlaubt und muss benannt werden. Sonst
+       wäre die KI ein Papagei des Scores, und man könnte sie sparen. */
+    '## DEAL-SCORE — DIE STUFEN (verbindlich)',
+    'Der DealScore steht unten als Zahl von 0 bis 100. Er bedeutet:',
+    '',
+    '🟢 TOP — 85 und mehr',
+    '🟢 GUT — 70 bis 84',
+    '🟡 SOLIDE — 50 bis 69',
+    '🟠 SCHWACH — 35 bis 49',
+    '🔴 KRITISCH — unter 35',
+    '',
+    'Dieselben Schwellen gelten für den Investor Deal Score.',
+    '',
+    'BINDUNG DER EMPFEHLUNG:',
+    '- TOP oder GUT (70+)  → "Kaufen"',
+    '- SOLIDE (50–69)      → "Prüfen"',
+    '- SCHWACH oder KRITISCH (unter 50) → "Nicht kaufen"',
+    '',
+    'Du DARFST davon abweichen, wenn ein konkreter, benennbarer Umstand',
+    'dagegen spricht — etwa ein DSCR unter 1,0, ein LTV über 100 %, ein',
+    'erkennbarer Sanierungsstau oder eine Lage mit fallender Nachfrage.',
+    'Dann MUSST du diesen Umstand im ersten Satz der Begründung nennen',
+    'und sagen, dass du deshalb von der Score-Stufe abweichst.',
+    '',
+    'Ohne einen solchen Grund ist eine Empfehlung, die unter der',
+    'Score-Stufe liegt, FALSCH. Ein Objekt mit 88 Punkten ist TOP — dort',
+    '"Prüfen" zu schreiben, widerspricht der eigenen Bewertung und',
+    'verwirrt den Nutzer, der beide Angaben nebeneinander sieht.',
+    '',
     'WICHTIGE INSTRUKTIONEN:',
     '- Verwende die Begriffe „SOLIDE", „ERHÖHT", „KRITISCH" / „KNAPP" exakt wie oben.',
     '- Formuliere positiv-konkret: Ein LTV von 84 % ist SOLIDE und gehört in den',
@@ -154,7 +201,82 @@ function buildPrompt(payload) {
     '## OBJEKT-DATEN',
     ortLine ? '- Adresse: ' + ortLine : '',
     o.objart ? '- Objektart: ' + o.objart : '',
-    o.wfl ? '- Wohnfläche: ' + o.wfl + ' m²' : '',
+    /* ── v1700 · GESAMTFLAECHE IST KEINE WOHNUNGSGROESSE ──────────────
+       Marcel: „er sagt mir, die Wohnungsgroesse sei mit 390 m² zu gross,
+       obwohl sich die auf acht Wohnungen verteilt."
+
+       Die Zahl allein laesst beides zu. Ohne die Einheiten liest jeder
+       Leser — auch ein Modell — eine Wohnung daraus und vergleicht sie
+       mit einem Mietspiegel, der fuer Wohnungen gilt.
+
+       Steht die Einheitenzahl fest, wird die Flaeche ausdruecklich als
+       SUMME benannt und die Durchschnittsgroesse danebengestellt. Fehlt
+       sie, wird bei einem Mehrfamilienhaus wenigstens gewarnt — eine
+       ungewisse Angabe ist besser als eine falsche Gewissheit. */
+    o.wfl
+      ? (o.einheiten && o.einheiten.anzahl > 1
+          ? '- Wohnfläche: ' + o.wfl + ' m² — das ist die GESAMTFLÄCHE über '
+            + o.einheiten.anzahl + ' Einheiten'
+            + (o.einheiten.flaeche_schnitt
+                ? ', im Schnitt ' + o.einheiten.flaeche_schnitt + ' m² je Einheit'
+                : '')
+          : '- Wohnfläche: ' + o.wfl + ' m²')
+      : '',
+    /* v1700c: je Einheit auch Art und Status — eine leerstehende
+       Gewerbeeinheit ist etwas anderes als eine vermietete Wohnung, und
+       ohne diese Angabe sieht beides gleich aus. Der Leerstand ist fuer
+       die Bewertung oft wichtiger als die Flaeche. */
+    (o.einheiten && o.einheiten.anzahl > 1)
+      ? '- Einheiten: ' + o.einheiten.anzahl
+        + (o.einheiten.je_einheit && o.einheiten.je_einheit.length
+            ? '\n' + o.einheiten.je_einheit.filter(function (e) { return e.wfl || e.miete; })
+                .map(function (e) {
+                  return '  · ' + (e.nr ? 'Nr. ' + e.nr + ': ' : '')
+                    + (e.wfl ? e.wfl + ' m²' : 'Fläche offen')
+                    + (e.miete ? ', ' + e.miete + ' € Ist-Kaltmiete' : '')
+                    + (e.art ? ', ' + e.art : '')
+                    + (e.status ? ', ' + e.status : '')
+                    + (e.lage ? ', ' + e.lage : '');
+                }).join('\n')
+            : '')
+      : '',
+    /* Leerstand ausdruecklich benennen: er steht in den Einheiten, wird
+       aber leicht ueberlesen, wenn man nur die Summe sieht. */
+    (function () {
+      var e = o.einheiten;
+      if (!e || !Array.isArray(e.je_einheit) || !e.je_einheit.length) return '';
+      var leer = e.je_einheit.filter(function (x) { return /leer/i.test(String(x.status || '')); });
+      if (!leer.length) return '- Leerstand: keiner laut Einheitenliste';
+      var flL = leer.reduce(function (a, x) { return a + (Number(x.wfl) || 0); }, 0);
+      return '- Leerstand: ' + leer.length + ' von ' + e.anzahl + ' Einheiten'
+        + (flL ? ' (' + Math.round(flL) + ' m²)' : '')
+        + ' — das ist Potenzial UND Risiko zugleich, bitte beides benennen.';
+    })(),
+    (o.einheiten && o.einheiten.aufgeteilt != null)
+      ? '- Aufteilung nach WEG: ' + (o.einheiten.aufgeteilt
+          ? 'JA — die Einheiten sind einzeln verkäuflich (Aufteilungsgewinn möglich)'
+          : 'NEIN — das Haus ist ungeteilt')
+      : '',
+    (o.einheiten && o.einheiten.gnd)
+      ? '- Gesamtnutzungsdauer laut Konfigurator: ' + o.einheiten.gnd + ' Jahre'
+      : '',
+    (o.einheiten && o.einheiten.modernisierung && Object.keys(o.einheiten.modernisierung).length)
+      ? '- Modernisierungsstand (Anlage 2 ImmoWertV): '
+        + Object.keys(o.einheiten.modernisierung).map(function (k) {
+            return k + '=' + o.einheiten.modernisierung[k];
+          }).join(', ')
+      : '',
+    (o.einheiten && o.einheiten.anzahl > 1)
+      ? '  ACHTUNG: Vergleiche Mietspiegel und ortsübliche Größen mit der '
+        + 'Fläche JE EINHEIT, niemals mit der Gesamtfläche. Eine '
+        + 'Gesamtfläche von ' + o.wfl + ' m² ist bei ' + o.einheiten.anzahl
+        + ' Einheiten normal und KEIN Auffälligkeitsgrund.'
+      : (/mehrfamilien|mfh|wohnhaus|zinshaus/i.test(String(o.objart || ''))
+          ? '  ACHTUNG: Dies ist ein Mehrfamilienhaus. Die Wohnfläche ist die '
+            + 'SUMME aller Einheiten, nicht die Größe einer Wohnung. Die Zahl der '
+            + 'Einheiten liegt nicht vor — nenne deshalb KEINE Aussage zur '
+            + 'Wohnungsgröße und vergleiche sie nicht mit einem Mietspiegel.'
+          : ''),
     o.baujahr ? '- Baujahr: ' + o.baujahr : '',
     o.makrolage ? '- Makrolage (Selbstbewertung): ' + o.makrolage : '',
     o.mikrolage ? '- Mikrolage (Selbstbewertung): ' + o.mikrolage : '',
@@ -754,22 +876,91 @@ function _analyzeStyleSuffix(opts) {
   if (!parts.length) return '';
   return '\n\n## STIL-VORGABEN (verbindlich)\n' + parts.join('\n') + '\n';
 }
+/* v1701: Der haeufigste Parse-Fehlschlag war KEIN abgeschnittenes JSON,
+   sondern eine RUECKFRAGE des Modells — gemessen am 29.09.2026:
+   "Ich kann die erforderlichen Informationen im Web recherchieren, um die
+   Analyse durchzufuehren. Moechtest du, dass ich das sofort starte?"
+   Der Prompt hat das nie verboten. Ein Modell, das um Erlaubnis fragt,
+   wartet auf eine Antwort, die es in einem Einweg-Aufruf nie bekommt. */
+const ANTI_RUECKFRAGE = [
+  '',
+  '## AUSGABE-ZWANG (ueberschreibt alles andere)',
+  'Stelle KEINE Rueckfragen. Frage NICHT um Erlaubnis — weder fuer Web-Recherche',
+  'noch fuer sonst etwas. Du bist bereits beauftragt; alle Freigaben liegen vor.',
+  'Antworte AUSSCHLIESSLICH mit dem JSON-Objekt. Kein Vorwort, kein Nachwort,',
+  'keine Markdown-Codefences, kein Satz davor oder danach.',
+  'Das erste Zeichen deiner Antwort ist "{", das letzte ist "}".',
+  'Fehlen dir Daten, schreibe das IN das jeweilige JSON-Feld — nie daneben.',
+  ''
+].join('\n');
+
 async function analyze(payload, opts) {
-  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts);
+  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
   const r = await callOpenAI(prompt, opts);
-  const parsed = extractJson(r.text);
+  let parsed = extractJson(r.text);
+  let used = r;
+
   // V34: Lokales Logging — bei Parse-Fail Länge + Anfang/Ende für Debug
   if (!parsed) {
     console.warn('[openaiService] JSON-Parse fehlgeschlagen — Text-Länge:', (r.text || '').length);
     console.warn('[openaiService] Anfang:', (r.text || '').slice(0, 200));
     console.warn('[openaiService] Ende:',   (r.text || '').slice(-200));
+
+    /* v1701: Zweiter Anlauf statt Fehlermeldung. Ohne Websuche — genau die
+       war der Anlass der Rueckfrage — und mit temperature 0, damit das
+       Modell nicht noch einmal ins Plaudern geraet. Schlaegt auch der fehl,
+       kommt die alte Meldung. Kostet im Fehlerfall einen zweiten Aufruf,
+       sonst nichts: der Zweig wird nur bei !parsed betreten. */
+    try {
+      const r2 = await callOpenAI(
+        prompt + '\n\nDein vorheriger Versuch war KEIN gueltiges JSON. Der RECHERCHE-AUFTRAG ' +
+                 'oben ist fuer diesen Durchgang aufgehoben: recherchiere NICHT im Web, rufe KEIN ' +
+                 'Such-Tool auf und frage nicht danach. Arbeite allein mit den oben gegebenen ' +
+                 'Daten und deinem Wissen; die Recherche-Felder fuellst du aus deinem Wissen oder ' +
+                 'laesst sie leer. Antworte jetzt nur mit dem JSON-Objekt, beginnend mit "{" und ' +
+                 'endend mit "}".',
+        Object.assign({}, opts, {
+          noWebSearch: true,
+          aiOptions: Object.assign({}, (opts && opts.aiOptions) || {}, { temperature: 0 })
+        })
+      );
+      const p2 = extractJson(r2.text);
+      if (p2) {
+        console.warn('[openaiService] Zweiter Anlauf hat geliefert (ohne Websuche).');
+        parsed = p2; used = r2;
+      } else {
+        console.warn('[openaiService] Zweiter Anlauf ebenfalls ohne JSON:', (r2.text || '').slice(0, 200));
+      }
+    } catch (e) {
+      console.warn('[openaiService] Zweiter Anlauf fehlgeschlagen:', e.message);
+    }
   }
+
   return {
     success: true,
-    model: r.model,
-    analysis: parsed,
-    raw_text: parsed ? null : r.text  // bei Parse-Fail Text zurückgeben für Debug
+    model: used.model,
+    /* v1704d: auch hier. `ui.js:_urlSauber` saeubert nur die
+       strukturierten Quellenfelder - die LANGTEXTE
+       (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
+       Fliesstext und kamen dort nie an. */
+    analysis: _analyseUrlsSaeubern(parsed),
+    raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
+}
+
+/* Geht rekursiv durch die Analyse und saeubert jeden String. Zahlen,
+   Wahrheitswerte und null bleiben unangetastet - eine Saeuberung, die
+   Typen verbiegt, waere schlimmer als der Zaehlparameter. */
+function _analyseUrlsSaeubern(a) {
+  if (a == null) return a;
+  if (typeof a === 'string') return _urlsSaeubern(a);
+  if (Array.isArray(a)) return a.map(_analyseUrlsSaeubern);
+  if (typeof a === 'object') {
+    const out = {};
+    for (const k of Object.keys(a)) out[k] = _analyseUrlsSaeubern(a[k]);
+    return out;
+  }
+  return a;
 }
 
 /**
@@ -1757,6 +1948,51 @@ async function enrichMarketFields(text, fields, context, opts) {
  * KEIN Kerosin-Abzug (Aufrufer zieht nichts ab) — server-seitig rate-limited.
  * Modell: COPILOT_MODEL (.env) oder Default gpt-4.1-mini.
  */
+/* ── v1704d · ZAEHLPARAMETER AUS DEN LINKS ───────────────────────────
+   Marcel hatte das am 29.09.2026 an der Pilot-Analyse gemeldet: „Da steht
+   auch hinten irgendwie UTM Unterstrich Source gleich OpenAI." Behoben
+   wurde es damals in `ui.js` (`_urlSauber`) - aber nur fuer die
+   STRUKTURIERTEN Quellenfelder der JSON-Analyse.
+
+   Gemessen am Portfolio-Piloten, direkt nach dem Bau:
+     ([miete-aktuell.de](https://www.miete-aktuell.de/...?utm_source=openai))
+
+   Im Chat stehen die Links im Fliesstext, dort kam die Saeuberung nie an.
+
+   > Ein Fehler, der an einer Stelle behoben ist, ist nicht behoben. Er
+   > ist an EINER Stelle behoben - und die anderen Wege sehen aus wie
+   > neue Fehler, obwohl es derselbe ist.
+
+   Deshalb sitzt es jetzt im Backend, hinter `copilotChat`: damit gilt es
+   fuer den Co-Pilot im Tab Objekt, den Hilfe-Assistenten und den
+   Portfolio-Piloten auf einmal - drei Aufrufer, eine Saeuberung.
+
+   Entfernt werden nur Zaehl- und Herkunftsparameter. Ein Parameter, der
+   den INHALT bestimmt, bliebe sonst auf der Strecke und der Link liefe
+   ins Leere. */
+const _ZAEHLPARAM = /^(utm_[a-z_]+|gclid|fbclid|msclkid|igshid|mc_cid|mc_eid|ref|referrer|source)$/i;
+
+function _urlsSaeubern(text) {
+  if (!text || typeof text !== 'string') return text;
+  return text.replace(/https?:\/\/[^\s<>()\[\]"']+/gi, function (roh) {
+    /* Satzzeichen am Ende gehoeren zum Satz, nicht zur Adresse. */
+    var schwanz = '';
+    var m = roh.match(/[.,;:!?]+$/);
+    if (m) { schwanz = m[0]; roh = roh.slice(0, -schwanz.length); }
+    try {
+      var u = new URL(roh);
+      var weg = [];
+      u.searchParams.forEach(function (_v, k) { if (_ZAEHLPARAM.test(k)) weg.push(k); });
+      if (!weg.length) return roh + schwanz;
+      weg.forEach(function (k) { u.searchParams.delete(k); });
+      var s = u.toString();
+      /* Ein leer gewordenes `?` sieht aus wie ein Tippfehler. */
+      if (s.slice(-1) === '?') s = s.slice(0, -1);
+      return s + schwanz;
+    } catch (e) { return roh + schwanz; }
+  });
+}
+
 async function copilotChat(payload, opts) {
   opts = opts || {};
   payload = payload || {};
@@ -1765,17 +2001,65 @@ async function copilotChat(payload, opts) {
   const message = String(payload.message || '').trim();
   const allowWeb = payload.allowWeb === true;
 
+  /* v1704: derselbe Endpunkt traegt jetzt zwei Kontexte - ein Einzelobjekt
+     und das ganze Portfolio. Der Diskriminator steht VOR dem Systemtext,
+     weil der Systemtext ihn braucht. */
+  const istPortfolio = payload.kontextArt === 'portfolio'
+    || (ctx && ctx.art === 'portfolio');
+
   const sys = [
-    'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
+    istPortfolio
+      ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
+      : 'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
     'Antworte praezise, auf Deutsch, in du-Form, ohne Floskeln und ohne Markdown-Ueberschriften.',
     'Nutze die bereitgestellten Objekt- und Kennzahlendaten als PRIMAERE Quelle. Rechne wo sinnvoll mit den',
     'gegebenen Zahlen (DSCR, LTV, Cashflow, Renditen, Kaufpreis). Erfinde keine Werte; fehlt etwas, sag es klar.',
     allowWeb
       ? 'Web-Recherche ist FREIGEGEBEN: nutze das web_search-Tool nur, wenn die Frage aktuelle externe Marktdaten erfordert, die nicht in den Objektdaten stehen. Nenne keine internen Anbieter-Namen.'
-      : 'Web-Recherche ist NICHT freigegeben: recherchiere NICHT im Web und rufe KEIN Such-Tool auf. Wenn die Frage externe oder aktuelle Marktdaten braucht, die nicht in den Daten stehen, erklaere in 1-2 Saetzen was dir fehlt und bitte den Nutzer, oben den Schalter \u201eWeb-Recherche\u201c zu aktivieren.'
-  ].join('\n');
+      : 'Web-Recherche ist NICHT freigegeben: recherchiere NICHT im Web und rufe KEIN Such-Tool auf. Wenn die Frage externe oder aktuelle Marktdaten braucht, die nicht in den Daten stehen, erklaere in 1-2 Saetzen was dir fehlt und bitte den Nutzer, oben den Schalter \u201eWeb-Recherche\u201c zu aktivieren.',
+    /* v1703: der Nutzer kann jetzt im Chat eine Marktpreis-Indikation
+       abrufen (Knopf \u201eMarktpreis \u00b7 1 Abruf"). Steht sie im Kontext, ist
+       sie die beste Zahl, die es gibt - sie kommt von einem
+       Bewertungspartner, nicht aus einem Formularfeld.
 
-  const ctxBlock = 'AKTUELLES OBJEKT (Kontext, JSON):\n' + JSON.stringify(ctx, null, 2);
+       ANBIETER-NEUTRALITAET: CLAUDE.md sagt \u201eSprengnetter und
+       PriceHubble nie namentlich nach aussen". */
+    'MARKTPREIS-INDIKATION: Steht im Kontext ein Feld "marktpreis_indikation", dann wurde sie soeben bei einem',
+    'unabhaengigen Bewertungspartner abgerufen. Nutze sie als VORRANGIGEN Vergleichsanker fuer Kaufpreis-Einordnung,',
+    'Miete und Verhandlung - vor allgemeinen Annahmen. Nenne sie immer als "Indikation", NIE als Verkehrswert oder',
+    'Gutachten, und nenne die Spanne mit. Nenne NIEMALS einen Anbieternamen: die Quelle heisst "unabhaengiger',
+    'Bewertungspartner". Ist das Feld nicht da und die Frage braucht einen Marktpreis, weise in EINEM Satz auf den',
+    'Knopf \u201eMarktpreis \u00b7 1 Abruf\u201c oben hin - und rate keine Zahl.',
+    /* v1704: die Regeln, die nur fuer das Portfolio gelten. Sie stehen
+       hier und nicht im Frontend-Auftrag, weil sie auch fuer jede
+       Rueckfrage danach gelten muessen - nicht nur fuer die Analyse. */
+    istPortfolio
+      ? [
+          '',
+          'PORTFOLIO-REGELN (verbindlich):',
+          '- "vermoegensbilanz" ist die Summe ueber ALLE Objekte, bereits ausgerechnet. Rechne sie NICHT nach und',
+          '  stelle ihr keine eigene Summe gegenueber - du wuerdest gegen dieselben Zahlen anders rechnen.',
+          '- "objekte" ist die Einzelaufstellung. Sprich Objekte mit ihrem "name" an, nie mit ihrer Nummer allein.',
+          '- Steht "objekte_im_payload" unter "anzahl_objekte", hast du NICHT alle Objekte vor dir: die',
+          '  Vermoegensbilanz umfasst dann mehr als deine Liste. Sage das, bevor du Einzelobjekte gegen die Summe',
+          '  stellst - sonst behauptest du eine Vollstaendigkeit, die du nicht hast.',
+          '- "projektion" ist eine Modellfortschreibung, keine Prognose: sie unterstellt gleichbleibende Miete,',
+          '  Zins und Tilgung. Nenne sie so, wenn du sie verwendest.',
+          '- Die Einheit steht IM Feldnamen (_eur, _eur_jahr, _prozent, _qm). Lies sie dort ab, rate sie nicht.',
+          '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.'
+        ].join('\n')
+      : ''
+  ].filter(Boolean).join('\n');
+
+  /* v1704: ohne den Diskriminator stuende „AKTUELLES OBJEKT" ueber einer
+     Vermoegensbilanz - und das Modell antwortet auf die Ueberschrift.
+
+     > Eine Beschriftung ist kein Schmuck. Sie sagt dem Modell, was es vor
+     > sich hat, und eine falsche belegt es mit einer Annahme, die durch
+     > keine Zahl im Datensatz widerlegt wird. */
+  const ctxBlock = (istPortfolio
+    ? 'GESAMTES PORTFOLIO DES NUTZERS (Kontext, JSON):\n'
+    : 'AKTUELLES OBJEKT (Kontext, JSON):\n') + JSON.stringify(ctx, null, 2);
 
   let convo = '';
   for (const m of history) {
@@ -1793,7 +2077,7 @@ async function copilotChat(payload, opts) {
     model: model,
     aiOptions: { temperature: 0.4 }
   });
-  return { reply: res.text, model: res.model, allowWeb: allowWeb };
+  return { reply: _urlsSaeubern(res.text), model: res.model, allowWeb: allowWeb };
 }
 /* v585-copilot END */
 
@@ -1994,6 +2278,154 @@ async function extractBeleg(images, opts) {
 }
 
 
+/**
+ * v1678 — extractDokument: eine beliebige Dokumentart einlesen.
+ *
+ * Löst den Einzelfall `extractRndg` (v1677) ab und bedient alle neun
+ * Arten aus `dokumentSchemas.js`. Die Schemata stammen aus dem
+ * Import-Modul v1.1.0; kommt eine neue Modulfassung, wird nur dort
+ * nachgezogen — diese Funktion bleibt unverändert.
+ *
+ * Zwei Regeln sind hier eingebaut, beide teuer bezahlt:
+ *
+ * 1. **Zahlen werden geprüft, nicht übernommen.** `Number(null)` ist 0
+ *    und besteht `Number.isFinite` — erst auf Abwesenheit prüfen. Jedes
+ *    Schema führt seine Grenzen; ein Bodenrichtwert von 4 Mio €/m² ist
+ *    ein Lesefehler, keine Lage.
+ * 2. **Fehlende Pflichtangaben werden benannt, nicht überbrückt.** Genau
+ *    das hat bei der Kaufpreisaufteilung (v1669) eine um Faktor 2,9
+ *    falsche Antwort erzeugt, die plausibel aussah.
+ */
+async function extractDokument(text, typ, opts) {
+  const prompt = dokumentSchemas.baueprompt(typ, text);
+  if (!prompt) {
+    return { success: false, error: 'Unbekannte Dokumentart: ' + typ };
+  }
+  const spec = dokumentSchemas.SCHEMATA[typ];
+
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1400 }, opts || {}));
+  const parsed = extractJson(r.text);
+  if (!parsed) {
+    return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
+  }
+  const ext = parsed.extracted || parsed;
+
+  /* Zahlenfelder gegen die Grenzen des Schemas prüfen. Was durchfällt,
+     wird null UND gemeldet — stillschweigend verworfene Werte sind der
+     Fehler, den wir gerade erst behoben haben.                       */
+  const verworfen = [];
+  const grenzen = spec.zahlen || {};
+  Object.keys(grenzen).forEach(function (feld) {
+    if (!(feld in ext)) return;
+    const roh = ext[feld];
+    if (roh === null || roh === undefined || roh === '') { ext[feld] = null; return; }
+    const n = Number(roh);
+    const g = grenzen[feld];
+    if (!Number.isFinite(n) || n < g[0] || n > g[1]) {
+      verworfen.push({ feld: feld, wert: roh, erwartet: g[0] + ' bis ' + g[1] });
+      ext[feld] = null;
+    } else {
+      ext[feld] = n;
+    }
+  });
+
+  const fehlend = (spec.pflicht || []).filter(function (f) {
+    return ext[f] === null || ext[f] === undefined || ext[f] === '';
+  });
+
+  return {
+    success: true,
+    model: r.model,
+    typ: typ,
+    label: (dokumentSchemas.DOKUMENT_TYPEN[typ] || {}).label || typ,
+    extracted: ext,
+    rechenbar: fehlend.length === 0,
+    fehlende_pflichtfelder: fehlend,
+    verworfene_werte: verworfen
+  };
+}
+
+/**
+ * v1677 — extractRndg: Restnutzungsdauergutachten einlesen.
+ * Bleibt als eigener Weg bestehen, weil der RND-Assistent ihn ruft.
+ *
+ * Das Schema stammt WÖRTLICH aus dem Import-Modul v1.1.0
+ * (`import_service.py`, `EXTRAKTIONS_PROMPTS['rndg']`). Damit ist die
+ * Brücke gebaut, um die es ging: das Modul liefert die EXTRAKTION,
+ * DealPilot rechnet. Kommt eine neue Modulfassung, muss nur dieses
+ * Schema nachgezogen werden — die Rechnung bleibt, wo sie hingehört.
+ *
+ * `rnd_jahre` wird mitgelesen, obwohl wir sie selbst rechnen: nur so
+ * lässt sich die eigene Rechnung gegen das Gutachten halten. Eine
+ * übernommene Zahl, die niemand gegenprüft, ist eine Behauptung.
+ */
+async function extractRndg(text, opts) {
+  const prompt = [
+    'Aus dem folgenden deutschen Restnutzungsdauergutachten extrahiere die',
+    'Kernzahlen als JSON. Wenn ein Feld nicht auffindbar ist: null.',
+    '',
+    'Schema:',
+    '{',
+    '  "gutachten_nr": string,',
+    '  "objekt_adresse": string,',
+    '  "baujahr": number,',
+    '  "bewertungsstichtag": string im Format DD.MM.JJJJ,',
+    '  "gnd_jahre": number (Gesamtnutzungsdauer),',
+    '  "rnd_jahre": number (Restnutzungsdauer laut Gutachten),',
+    '  "modernisierungspunkte": number (0 bis 20, Anlage 2 ImmoWertV),',
+    '  "verfahren_gewaehlt": string, einer von "Linear"/"Punktraster"/"Technisch",',
+    '  "ausstattung": {"veraltet_pct": number, "standard_pct": number, "gehoben_pct": number}',
+    '}',
+    '',
+    'Antworte NUR mit JSON.',
+    '',
+    'RNDG:',
+    text
+  ].join('\n');
+
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 900 }, opts || {}));
+  const parsed = extractJson(r.text);
+  if (!parsed) {
+    return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
+  }
+  const ext = parsed.extracted || parsed;
+
+  /* Number(null) ist 0 und besteht Number.isFinite — deshalb erst auf
+     Abwesenheit prüfen, dann rechnen. Steht so in CLAUDE.md.          */
+  function zahl(v, min, max) {
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    if (min != null && n < min) return null;
+    if (max != null && n > max) return null;
+    return n;
+  }
+
+  const out = {
+    gutachten_nr:          ext.gutachten_nr || null,
+    objekt_adresse:        ext.objekt_adresse || null,
+    bewertungsstichtag:    ext.bewertungsstichtag || null,
+    verfahren_gewaehlt:    ext.verfahren_gewaehlt || null,
+    baujahr:               zahl(ext.baujahr, 1500, 2100),
+    gnd_jahre:             zahl(ext.gnd_jahre, 10, 120),
+    rnd_jahre:             zahl(ext.rnd_jahre, 0, 120),
+    modernisierungspunkte: zahl(ext.modernisierungspunkte, 0, 20),
+    ausstattung:           (ext.ausstattung && typeof ext.ausstattung === 'object') ? ext.ausstattung : null
+  };
+
+  /* Was fehlt, damit der Kern rechnen kann — benannt, nicht geraten.
+     Ein Import, der stillschweigend mit Standardwerten weiterrechnet,
+     liefert kein falsches Ergebnis, sondern ein richtig aussehendes
+     (derselbe Fehler wie bei der Kaufpreisaufteilung, v1669).        */
+  const fehlend = [];
+  if (out.baujahr == null) fehlend.push('baujahr');
+  if (out.gnd_jahre == null) fehlend.push('gnd_jahre');
+  out.rechenbar = fehlend.length === 0;
+  out.fehlende_pflichtfelder = fehlend;
+
+  return { success: true, model: r.model, extracted: out };
+}
+
 module.exports = {
   copilotChat,  /* v585 */
   analyze,
@@ -2006,5 +2438,7 @@ module.exports = {
   buildPrompt,
   callOpenAI,
   extractBeleg,
+  extractRndg,       /* v1677 */
+  extractDokument,   /* v1678 */
   extractJson
 };

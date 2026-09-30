@@ -113,6 +113,21 @@
       '  opacity:0;visibility:hidden;transform:translateY(-4px);',
       '  transition:opacity .14s ease,transform .14s ease,visibility .14s;',
       '  font-family:Inter,system-ui,sans-serif;text-align:left;pointer-events:none}',
+      /* v1728: auf dem Handy ragte das Blatt links aus dem Bild.
+         Gemessen bei 387 px Viewport: Panel 385 px breit, Kasten von
+         -15 bis 370 - der linke Rand war abgeschnitten. Ursache ist
+         min-width:270px plus Inhalt an einer rechtsbuendigen Pille:
+         die Breite wuchs ueber den Schirm hinaus, und right:0 haelt
+         nur die rechte Kante fest.
+
+         > Eine Mindestbreite ist ein Versprechen an den Inhalt. Auf
+         > einem schmalen Schirm wird daraus ein Anspruch, den der
+         > Schirm nicht einloesen kann - und das Blatt waechst nach
+         > links aus dem Bild.
+
+         Die Hoechstbreite laesst es schmaler werden statt ueberlaufen;
+         die Ausrichtung und die Einblendung bleiben unberuehrt. */
+      '@media (max-width:700px){.dp-kg-panel{min-width:0;max-width:calc(100vw - 24px)}}',
       '.dp-kg-pill:hover .dp-kg-panel,.dp-kg-pill:focus-within .dp-kg-panel{',
       '  opacity:1;visibility:visible;transform:translateY(0)}',
       '.dp-kg-h{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:9.5px;',
@@ -216,11 +231,28 @@
     if (alt) alt.parentNode.removeChild(alt);
     pill.insertAdjacentHTML('beforeend', _panelHtml(s));
 
-    /* Der Browser-Tooltip bleibt als Rueckfall fuer Touch und Screenreader,
-       wo :hover nicht greift. */
-    pill.title = 'Dein Kontingent\n' + ARTEN.map(function (a) {
-      return '  ' + a.name + ': ' + _rest(s, a.key);
-    }).join('\n') + '\nZurücksetzung am ' + _datum(s.period_reset_at);
+    /* ── v1654 · EIN TOOLTIP, NICHT ZWEI ──────────────────────────────
+       Hier stand `pill.title = …` mit der Begruendung „Rueckfall fuer
+       Touch und Screenreader, wo :hover nicht greift."
+
+       Die Absicht war richtig, das Ergebnis nicht: **auf dem Schreib-
+       tisch erschienen beide** - das eigene Panel `.dp-kg-panel`
+       (385x155) UND der native Browser-Tooltip mit demselben Inhalt.
+       Marcel am 28.09.2026: „wenn ich bei dem Kontingent drueberfahre,
+       oeffnen sich zwei Felder-Menues."
+
+       > Ein `title` ist kein stiller Zusatz. Der Browser zeigt ihn,
+       > ob man will oder nicht, und er laesst sich nicht abschalten.
+
+       `aria-label` leistet dasselbe fuer Screenreader und erzeugt
+       keinen zweiten Kasten. Touch bleibt versorgt: das Panel oeffnet
+       ueber `:focus-within` (Zeile 116), und ein Tippen fokussiert die
+       Pille. */
+    var text = 'Dein Kontingent. ' + ARTEN.map(function (a) {
+      return a.name + ': ' + _rest(s, a.key);
+    }).join(', ') + '. Zurücksetzung am ' + _datum(s.period_reset_at);
+    pill.setAttribute('aria-label', text);
+    pill.removeAttribute('title');
   }
 
   // Render der Kontingent-Box im Einstellungen-Reiter „Plan"

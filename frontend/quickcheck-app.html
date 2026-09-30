@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="qc-app"><!-- v1642c · verlaessliche Marke fuer dieses Dokument: qc-embedded setzt erst die Bruecke, steht also beim Einzelaufruf NICHT da -->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -3287,7 +3287,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 })();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body><!-- qb-rename-v699 -->
+<body class="dp-neue-karte"><!-- qb-rename-v699 · v1645: die Marke fest - dieses Dokument ist IMMER hell -->
 
 <canvas id="particle-canvas"></canvas>
 
@@ -3390,7 +3390,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     <!-- Multi-Select: Abruf-Quellen frei kombinieren -->
     <span class="qc7-sources dp-pfbar" id="qc7-sources"><!-- v570-qcpf -->
       <span class="dp-pf-stripe"></span>
-      <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
+      <div class="dp-pf-lead"><span class="bp">QUICKBOARDING PASS</span><span class="k"><span class="k-heute">PRE-FLIGHT</span><span class="k-neu">Datenaufnahme</span></span><span class="s">DealPilot · Quickboarding</span></div><span class="dp-pf-perf"></span><!-- v597-qcpf -->
       <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row"><!-- v833-chip-order: DealPilot zuerst -->
         <label class="qc7-src dp-pf-tile" data-src="dpmb" title="Marktpreisbewertung">
           <input type="checkbox" value="dpmb" onchange="QcApp.toggleSource(this)" style="display:none">
@@ -3406,16 +3406,20 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         </label>
       </div></div>
       <div class="dp-pf-sep"></div>
-      <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">
+      <div class="dp-pf-seg"><span class="dp-pf-grouplbl"><span class="k-heute">Daten einlesen</span><span class="k-neu">Daten übernehmen aus</span></span><div class="dp-pf-row">
         <label class="qc7-src dp-pf-tile tool" data-src="expose">
           <input type="checkbox" value="expose" onchange="QcApp.toggleSource(this)" style="display:none">
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></span><span class="dp-pf-lbl">Exposé / Marktbericht</span><span class="dp-pf-led"></span>
         </label>
-        <label class="qc7-src dp-pf-tile tool" data-src="voice" title="Objekt frei einsprechen — 1 L Kerosin">
+        <label class="qc7-src dp-pf-tile tool" data-src="voice" title="Objekt frei einsprechen — im Plan enthalten">
           <input type="checkbox" value="voice" onchange="QcApp.toggleSource(this)" style="display:none">
           <span class="dp-pf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span><span class="dp-pf-lbl">Sprachaufzeichnung</span><span class="dp-pf-led"></span>
         </label>
       </div></div>
+      <!-- v1670: der QR der Quellenleiste. Er haengt an DERSELBEN Quelle wie
+           der QR des Boarding-Passes (renderQR/_shareUrl) - eine Auskunft,
+           zwei Anzeigen, kein zweiter Weg. -->
+      <a class="dp-pf-qr" id="qc7-qr" target="_blank" rel="noopener" title="Pass teilen"></a>
       <span class="dp-pf-rz"><span class="dp-pf-bc"></span><button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn -->Abrufen<!-- v1430: Flugzeug-Symbol entfernt (Backlog v22 Punkt 14) --></button></span>
     </span>
 
@@ -5681,14 +5685,37 @@ function renderTransferList() {
     var inputs = QcEngine.getInputs();
     var hasKp = !!QcEngine.num(inputs.kp);
     var parts = [];
-    /* v505-kerosin-hint: Liter-Saetze gemaess Backend (avm.js COST + ai.js extract-voice) */
-    if (sel.indexOf('voice') !== -1) parts.push('<b>1\u00a0L</b> Sprachauswertung');
-    if (sel.indexOf('ph')  !== -1) parts.push('<b>40\u00a0L</b> PriceHubble');
-    if (sel.indexOf('spr') !== -1) parts.push('<b>20\u00a0L</b> Sprengnetter');
-    if (sel.indexOf('dpmb') !== -1) parts.push('<b>2\u00a0L</b> DealPilot');
+    /* \u2500\u2500 v1664 \u00b7 DER HINWEIS RECHNETE HIER NOCH IN LITERN \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+       Marcel: \u201eda steht auch noch, wenn ich Sprache auswaehle, dass ein
+       Liter Kerosin verbraucht wird. Das haben wir gar nicht mehr."
+
+       Genau derselbe Befund wie in v1194 im Objekt-Tab - nur stand er
+       hier im iframe und ist damals nicht mitgekommen. Hier stand:
+
+         voice  1 L    ph  40 L    spr  20 L    dpmb  2 L
+
+       DREI Fehler in vier Zeilen:
+
+         \u00b7 Die Einheit gibt es seit v1183 nicht mehr.
+         \u00b7 Die Sprachauswertung kostet UEBERHAUPT nichts mehr
+           (`ai.js:514` bucht ueber `logExtract`, \u201eim Plan enthalten").
+           Fuer etwas Kostenloses ein Preisschild zu zeigen ist derselbe
+           Fehler wie eine abgeschaffte Waehrung, nur andersherum.
+         \u00b7 Die Zahlen 40 und 20 waren der alte Litertarif; der Server
+           zieht je Anbieter genau EINEN Abruf (`routes/avm.js:236`,
+           `required: 1`).
+
+       Und ein vierter, der nicht im Kerosin steckt: **die Zeilen nannten
+       die Bewertungspartner beim Namen.** CLAUDE.md sagt dazu
+       \u201eSprengnetter und PriceHubble nie namentlich nach aussen". Der
+       Objekt-Tab tat es bis v1664 ebenfalls. */
+    if (sel.indexOf('ph')  !== -1) parts.push('<b>1 Marktwert-Abruf</b>');
+    if (sel.indexOf('spr') !== -1) parts.push('<b>1 Marktwert-Abruf</b>');
+    if (sel.indexOf('dpmb') !== -1) parts.push('<b>1 Bewertung</b>');
     if (!parts.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var n = parts.length;
-    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ') + ' Kerosin verbraucht.';
+    var txt = 'Beim <b>Abrufen</b> ' + (n > 1 ? 'werden ' : 'wird ') + parts.join(' + ')
+            + ' aus deinem Kontingent verbraucht.';
     var demo = false;
     try { demo = !!(window._qcAvmHealth && window._qcAvmHealth.mode === 'stub'); } catch (e) {}
     if (demo) txt += ' <span style="opacity:.75">Im Demo-Modus aktuell kostenlos.</span>';
@@ -6348,6 +6375,116 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
 @media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;flex-wrap:wrap;gap:14px;border-top:2px dashed color-mix(in srgb, var(--gold, #C9A84C) 40%, transparent)} }
 </style>
+
+<!-- ── v1663f · DIE QUICKBOARDING-KARTE BEKOMMT DIE FORM DER DEALSCORE-KARTE ──
+     Marcel: „dass du das Quickboarding, dass du die Karte so umbaust wie den
+     DealScore und dass der QR-Code quasi unten in der Leiste dann angezeigt
+     wird. Auf der Landing-Page haben wir ja so eine DealScore-Karte
+     abgebildet und da haben wir unten so einen Streifen."
+
+     Die Vorlage ist `landing/index.html:117` `.idscard`, gemessen in
+     `landing/dp2-hero.css:87-158`. Sie ist eine SPALTE:
+
+       Goldband  .ids-band   -> hier .ghead, gibt es schon
+       Kopf      .ids-head
+       Koerper   .ids-body   -> hier .mbody (Ring + Balken)
+       Zahlen    .ids-stats  -> hier .kt
+       Abriss    .ids-tear   height:15px, Grund #0c0b09, 2px gestrichelt
+                             Gold 40%, zwei 15-px-Ausstanzungen links/rechts
+       STREIFEN  .ids-foot   Grund #0c0b09, Polster 0 18px 13px,
+                             links/mittig je ein Beschriftungspaar
+                             (8 px Mono #9a8f6a ueber 12 px #E8CC7A),
+                             rechts .ids-qr weiss mit 4 px Polster
+
+     Bisher war `#qb-bp` eine ZEILE mit weissem Abriss RECHTS - 208 px, die
+     der Karte quer weggenommen wurden. Der Abriss wird zur Fusszeile.
+
+     > Ein Abriss rechts halbiert die Karte, ein Abriss unten schliesst sie
+     > ab. Beides ist dieselbe Metapher - nur die eine kostet ein Sechstel
+     > der Breite und die andere 60 px Hoehe.
+
+     Umgebaut wird NUR mit CSS: die Teile `.bp`, `.no`, `.cap`, `.lnk` und
+     `.qrlink` sind alle schon da, sie stehen nur untereinander statt
+     nebeneinander. Ein Raster mit drei Spalten stellt sie so, wie die
+     Vorlage sie zeigt - ohne einen fremden Baum umzuhaengen. -->
+<style id="qb-dealscore-stil">
+#qb-bp{ flex-direction:column !important; }
+
+/* Der Abriss: aus der senkrechten Perforation wird eine waagerechte.
+   Die beiden Ausstanzungen kann die Vorlage als eigene Elemente fuehren
+   (.nl/.nr) - hier gibt es sie nicht, also uebernehmen zwei
+   Radialverlaeufe im Grund ihre Rolle. */
+#qb-bp .qb-tear{
+  width:auto !important; height:15px !important; flex:none !important;
+  border-left:0 !important; position:relative;
+  background:
+    radial-gradient(circle 8px at 0 50%, #050505 98%, transparent 100%),
+    radial-gradient(circle 8px at 100% 50%, #050505 98%, transparent 100%),
+    #0c0b09;
+}
+#qb-bp .qb-tear::before{
+  content:""; position:absolute; left:16px; right:16px; top:50%;
+  width:auto !important; height:0 !important; border-radius:0 !important;
+  background:none !important; transform:none !important;
+  border-top:2px dashed color-mix(in srgb, var(--gold, #C9A84C) 40%, transparent);
+}
+#qb-bp .qb-tear::after{ display:none !important; }
+
+/* Der Streifen. Drei Spalten wie in der Vorlage: zwei
+   Beschriftungspaare, dann der QR ganz rechts. */
+#qb-bp .qb-stub{
+  display:grid !important;
+  grid-template-columns:auto auto 1fr !important;
+  grid-template-rows:auto auto !important;
+  align-items:center !important; justify-content:start !important;
+  column-gap:30px !important; row-gap:1px !important;
+  width:auto !important; flex:none !important;
+  padding:11px 18px 13px !important;
+  background:#0c0b09 !important;
+}
+#qb-bp .qb-stub .bp{ grid-column:1; grid-row:1; color:#9a8f6a !important; }
+#qb-bp .qb-stub .no{
+  grid-column:1; grid-row:2;
+  color:var(--gold-hi, #E8CC7A) !important; font-size:12px !important;
+}
+#qb-bp .qb-stub .cap{ grid-column:2; grid-row:1; color:#9a8f6a !important; }
+#qb-bp .qb-stub .lnk{
+  grid-column:2; grid-row:2;
+  color:var(--gold-hi, #E8CC7A) !important; font-size:10px !important;
+  border-bottom-color:color-mix(in srgb, var(--gold, #C9A84C) 45%, transparent) !important;
+}
+#qb-bp .qb-stub .qrlink{
+  grid-column:3; grid-row:1 / span 2; justify-self:end;
+  border-radius:0 !important;
+}
+/* Der QR wie in der Vorlage: weisses Feld, 4 px Polster, keine Rundung -
+   und klein genug, dass der Streifen ein Streifen bleibt. */
+#qb-bp .qb-stub .qrtile{
+  width:auto !important; height:auto !important;
+  padding:4px !important; border:0 !important; border-radius:0 !important;
+  background:#fff !important;
+}
+#qb-bp .qb-stub .qrtile img,
+#qb-bp .qb-stub .qrtile canvas,
+#qb-bp .qb-stub .qrtile svg{
+  width:60px !important; height:60px !important; border-radius:0 !important;
+}
+#qb-bp .qb-stub .qrtile .ph{ color:#8d846d !important; }
+
+/* Auf schmalen Schirmen faellt der QR unter die Beschriftungen, statt
+   sie zu quetschen. */
+@media(max-width:560px){
+  #qb-bp .qb-tear{ display:block !important; }
+  #qb-bp .qb-stub{
+    grid-template-columns:auto 1fr !important;
+    grid-template-rows:auto auto auto !important;
+    border-top:0 !important;
+  }
+  #qb-bp .qb-stub .qrlink{ grid-column:2; grid-row:1 / span 3; }
+  #qb-bp .qb-stub .cap{ grid-column:1; grid-row:3; }
+  #qb-bp .qb-stub .lnk{ grid-column:1; grid-row:3; justify-self:end; }
+}
+</style>
 <script id="qb-reskin4-js">
 (function(){
   'use strict';
@@ -6399,6 +6536,19 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     if(!tile) return;
     if(!window.QRCode){ if(tries<20) return void setTimeout(function(){renderQR(url,code,tries+1);},250); return; }
     if(_shareUrl){ tile.innerHTML=''; try{ new window.QRCode(tile,{text:_shareUrl,width:116,height:116,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M}); }catch(e){} }
+    /* v1670: derselbe Link auch in die Quellenleiste. Eigene Groesse,
+       damit er in die 42-px-Reihe passt; ohne Link bleibt er leer und
+       nimmt keinen Platz - ein QR ohne Ziel ist ein Bild, kein Weg. */
+    try{
+      var qa=document.getElementById('qc7-qr');
+      if(qa){
+        if(_shareUrl){
+          qa.href=_shareUrl; qa.innerHTML='';
+          new window.QRCode(qa,{text:_shareUrl,width:40,height:40,colorDark:'#141210',colorLight:'#fff',correctLevel:window.QRCode.CorrectLevel.M});
+          qa.setAttribute('data-hat-ziel','1');
+        } else { qa.innerHTML=''; qa.removeAttribute('data-hat-ziel'); }
+      }
+    }catch(e){}
   }
   window.addEventListener('message',function(ev){ var d=ev.data; if(!d||d.source!=='dp-app') return; if(d.type==='qc-autopass-code') renderQR(d.url,d.code,0); });
 
@@ -6497,7 +6647,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var bar=document.getElementById('qc7-sources'); if(!bar) return false;
     if(!document.getElementById('qc-pf-lead')){
       var lead=document.createElement('div'); lead.id='qc-pf-lead'; lead.className='qc-pf-lead';
-      lead.innerHTML='<span class="qc-pf-lead-txt"><b>PRE-FLIGHT</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>'+
+      lead.innerHTML='<span class="qc-pf-lead-txt"><b>Datenaufnahme</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>'+
         '<span class="qc-pf-lead-cnt"><b>0</b> aktiv</span>';
       bar.parentNode.insertBefore(lead, bar);
       bar.addEventListener('change', update, true);
@@ -6583,5 +6733,187 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   };
 })();
 </script>
+  <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
+       Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
+       Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1694">
+<!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
+     Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
+     wie im Tab Objekt."
+
+     **Ruecknahme von v1665d/f.** Ich hatte die drei Stellen, an denen
+     diese Seite ihre Werkzeugkacheln dunkel faerbt, an der Quelle hell
+     gemacht. Dann gemessen, was der Objekt-Tab OHNE Layout tut:
+
+       Objekt-Tab, Zustand „Heute"   Kachel .tool  rgb(10,10,10), r 9px
+       QuickBoarding nach v1665d     Kachel .tool  #FFFFFF, r 2px
+
+     > Wer eine Sonderbehandlung an der Quelle entfernt, gleicht nicht
+     > an — er dreht den Unterschied um. Der Auslieferungszustand ist
+     > hier DUNKEL, in beiden Ansichten; hell werden die Kacheln erst
+     > durch die Kartei.
+
+     Deshalb haengt die Angleichung an der Marke `data-dp-kartenstil`,
+     die `karten-stil.js` seit v1665 zuverlaessig ins iframe traegt —
+     und sie steht HIER statt in `datenaufnahme.css`, weil die dortigen
+     Regeln gegen die vier `!important`-Schichten dieser Seite nicht
+     durchkamen. Drei Gegentests, einer davon mit zwei IDs, blieben
+     wirkungslos; die Ursache habe ich nicht gefunden.
+
+     **Das ist ein offener Punkt, kein geloester:** die Kartei-Regeln in
+     `datenaufnahme.css` sollten hier greifen und tun es nicht. Bis das
+     geklaert ist, steht die Angleichung an der Stelle, an der sie
+     nachweislich wirkt.
+
+     Masse aus dem Objekt-Tab gemessen: Kachel 42 px, Radius 2 px,
+     Grund #FFFFFF, Rahmen #E6E1D6, Polster 0/13. -->
+<style id="qc-kartei-angleich">
+html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile,
+html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.tool{
+  background:#ffffff !important;
+  color:#1A1A18 !important;
+  border:1px solid #E6E1D6 !important;
+  border-radius:2px !important;
+  min-height:42px !important;
+  padding:0 13px !important;
+}
+html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.tool .dp-pf-ic,
+html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile .dp-pf-lbl{
+  color:#1A1A18 !important;
+}
+html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile:has(input:checked),
+html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
+  border-color:var(--wl-c9a84c, #C9A84C) !important;
+  background:#FFFDF8 !important;
+}
+
+/* ── v1682 · DER ABRUF-KNOPF HAELT SEINEN PLATZ SELBST ──────────────
+   Gemessen gegen den Objekt-Tab:
+
+                        Tab Objekt        hier
+     QR-Inhalt          6.109 Zeichen     0  (leer)
+     Abrufen sitzt bei  x = 1585          x = 650
+
+   **Der Knopf ist nicht verrutscht — ihm fehlt der Nachbar.** Der QR
+   wird hier nie gefuellt: sein Ziel kommt per `qc-autopass-code` aus
+   der Haupt-App, und ohne Pass gibt es keins. Die Regel
+   `#qc7-qr:not([data-hat-ziel])` klappt ihn dann ein und nimmt den
+   Platz gleich mit.
+
+   Ein Schutz, der Platz wegnimmt, verschiebt alles daneben.
+
+   Die gleichlautenden Regeln stehen auch in `datenaufnahme.css` —
+   HIER stehen sie noch einmal, weil die dortigen Regeln gegen die
+   `!important`-Schichten dieser Seite nachweislich nicht durchkommen
+   (siehe den Vermerk ueber diesem Block, weiterhin ungeloest). */
+#qc7-sources.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
+  border-bottom:0 !important;
+}
+
+/* ── v1685 · BEI „HEUTE" ZEIGT DAS QUICKBOARDING DASSELBE ───────────
+   Gemessen bei Layout „Heute", beide Leisten nebeneinander:
+
+                     Tab Objekt   QuickBoarding
+     Hoehe           78 px        55 px
+     Goldstreifen    sichtbar     AUS
+     Kopfzeile       sichtbar     AUS
+     Trenner         sichtbar     AUS
+
+   Ursache ist `body.dp-neue-karte`, die in DIESEM Dokument fest steht
+   (Z. 3290, „immer hell") und nebenbei diese drei ausblendet. Die
+   Haupt-App traegt sie bei „Heute" NICHT — also sah dasselbe Bauteil
+   auf beiden Seiten anders aus.
+
+   `karten-stil.js` spiegelt seit v1685 `data-dp-heute` herein. Steht
+   es, zeigt die Leiste wieder, was der Objekt-Tab zeigt. Die Klasse
+   `dp-neue-karte` bleibt unangetastet — sie traegt die Helligkeit,
+   und die soll bleiben. */
+/* ── v1692b · BEI „HEUTE" DIE BORDKARTE, NICHT DIE KARTEI ───────────
+   Gemessen, beide Leisten bei Layout „Heute":
+
+     Tab Objekt   background-image: linear-gradient(110deg,
+                    rgb(213,187,115), rgb(201,168,76) 55%, …)  RUNWAY
+     QuickCheck   background-color: rgb(255,255,255)           WEISS
+
+   Nach v1692 stimmten Hoehe (78 px), Kopfzeile, Streifen und Barcode —
+   nur der Grund fehlte. Das QC-Dokument bringt seine eigene
+   `.dp-pfbar`-Regel mit und faerbt weiss; die Runway-Fassung aus
+   `style.css:32634` kommt hier nie an.
+
+   Dieselben Token wie im Original (`--gold-hi`, `--gold`,
+   `--wl-bd9a3e`), damit der Verlauf beim Mandanten mitfaerbt statt
+   golden stehenzubleiben. */
+/* ── v1693 · DIESELBEN QUELLEN WIE IM TAB OBJEKT ────────────────────
+   Marcel: Sprengnetter und PriceHubble sollen raus, so wie auf der
+   Tab-Objekt-Seite.
+
+   Gemessen, beide Leisten nebeneinander:
+     Tab Objekt   dealpilot · import · voice · immometrica   (4)
+     QuickCheck   dpmb · spr · ph · expose · voice · immometrica (6)
+
+   Im Tab Objekt stehen die beiden gar nicht im DOM. Hier werden sie
+   fest ausgegeben (Z. 3399/3403). Sie verschwinden deshalb per Regel —
+   das Markup bleibt unangetastet, damit ein spaeteres Freischalten nur
+   diese Zeilen kostet.
+
+   Dazu passt die Doktrin: die beiden werden nach aussen ohnehin nie
+   namentlich genannt. Wer sie zeigt, nennt sie. */
+#qc7-sources .qc7-src[data-src="spr"],
+#qc7-sources .qc7-src[data-src="ph"]{ display:none !important; }
+
+html[data-dp-heute] #qc7-sources.dp-pfbar,
+html[data-dp-heute] body #qc7-sources.dp-pfbar{
+  background:linear-gradient(110deg,
+    var(--gold-hi, #E8CC7A),
+    var(--gold, #C9A84C) 55%,
+    var(--wl-bd9a3e, #bd9a3e)) !important;
+  border-radius:16px !important;
+  box-shadow:0 18px 44px -24px rgba(150,110,0,.7) !important;
+}
+html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-stripe{ display:block !important; }
+html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-lead{ display:flex !important; }
+html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !important; }
+
+/* v1686 — Ohne QR keine Luecke. Gemessen bei „Heute": im Objekt-Tab
+   fuellt der QR 289 px vor dem Abruf-Knopf, hier gibt es keinen Pass
+   und damit keinen QR — `margin-left:auto` liess 255 px weisse Flaeche
+   stehen. `:has(.dp-pf-qr[data-hat-ziel])` fragt nach dem ZIEL, nicht
+   nach dem Element: sobald ein Pass entsteht, setzt `renderQR()` das
+   Attribut und der Knopf rueckt von selbst wieder nach rechts. */
+/* v1694 — ZURUECKGENOMMEN: hier stand margin-left:18px.
+   Marcel: der Abruf-Knopf und der Barcode sollen im QuickCheck AUCH ans
+   Ende, wie im Tab Objekt.
+
+   Die 18 px stammen aus v1686. Damals stand der Knopf am rechten Rand
+   und liess 255 px weisse Flaeche hinter der letzten Kachel — das war
+   die Beschwerde. Die Luecke kam aber nicht von der Ausrichtung,
+   sondern von den 95 px Rand eines leeren QR (v1686c). Der Grund ist
+   behoben, die Notloesung nicht mehr noetig.
+
+   > Eine Abhilfe, die den Anlass ueberlebt, wird zum naechsten Anlass. */
+#qc7-sources.dp-pfbar .dp-pf-rz{
+  margin-left:auto !important;
+}
+/* v1686c — nachgerechnet: letztes Segment endet 927, QR sitzt mit
+   47,5 px Rand links UND rechts bei 975 (Breite 0), Abrufen beginnt
+   1040. 47,5+47,5+18 = 113, genau die gemessene Luecke. Die 18 waren
+   richtig; die 95 kamen von den Raendern eines Elements, das nichts
+   anzeigt. Ein QR ohne Ziel ist kein Bild, kein Weg, kein Abstand. */
+/* v1694: margin-LEFT bleibt auto, damit der leere QR den freien Platz
+   schluckt und Barcode wie Abruf-Knopf mit ans Ende nimmt. Weg muessen
+   nur margin-RIGHT und padding — die 47,5 px rechts waren es, die die
+   Luecke VOR dem Knopf aufrissen. Den freien Rest zu schlucken ist kein
+   Abstand, sondern Ausrichtung. */
+#qc7-sources.dp-pfbar .dp-pf-qr:not([data-hat-ziel]){
+  margin-left:auto !important; margin-right:0 !important; padding:0 !important;
+}
+/* v1686b: nur MIT Ziel den Platz beanspruchen - ein leerer QR
+   schob sich sonst selbst nach rechts und riss die Luecke wieder auf,
+   die v1686 gerade geschlossen hatte (gemessen: 113 px statt 18). */
+#qc7-sources.dp-pfbar .dp-pf-qr[data-hat-ziel]{ margin-left:auto !important; }
+#qc7-sources.dp-pfbar .dp-pf-qr + .dp-pf-rz{ margin-left:14px !important; }
+</style>
+
 </body>
 </html>

@@ -742,28 +742,99 @@ function showSettings(initialTab) {
            API anwenden. Wer es einzeln will, geht wie bisher ins Panel. */
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Aussehen</h3>' +
+        /* ── v1697 · DIE LAYOUTS STEHEN HIER, NICHT HINTER EINEM KNOPF ──
+           Marcel dreimal: „die Layouts sollten direkt unter Einstellungen
+           → Darstellung und dann unter Aussehen waehlbar sein."
+
+           Sie standen im Darstellungs-Panel, das erst ueber „Darstellung
+           oeffnen" erscheint — eine Klickebene zu tief. Der Abschnitt
+           hier heisst bereits „Aussehen"; er ist der Ort, den Marcel
+           beschreibt.
+
+           Die Liste kommt aus `DealPilotLayout.layouts`, nicht aus einer
+           zweiten Pflege: eine hier gefuehrte Liste waere beim naechsten
+           Layout schon falsch. Der Wahlknopf ruft `setze()` — denselben
+           Weg wie das Panel, damit es nicht zwei Zustaende gibt.
+
+           Die Reihenfolge ist Absicht: erst WO die Dinge liegen, dann
+           WIE hell es ist, dann alles Einzelne hinter „Darstellung
+           oeffnen". Von grob nach fein.                               */
+        '<div id="dp-layout-wahl-host" style="margin-bottom:12px"></div>' +
+        /* v1715: die Objektkarten-Wahl direkt unter der Layout-Wahl.
+           Marcel: "bitte arbeite unter Darstellung auch den wechsel der
+           Karten ein." Die Reihenfolge ist Absicht: erst WO die Dinge
+           liegen, dann WIE die Objektkarten darin aussehen. */
+        '<div id="dp-objkarte-wahl-host" style="margin-bottom:12px"></div>' +
+        /* ── v1719 · DER WEG INS PANEL STEHT BEI DEM, WAS ER FEINER MACHT
+           Marcel: „Darstellung oeffnen moechte ich bitte auch in den
+           Einstellungen weiter oben bei der Layout auswahl haben."
+
+           v1706 hatte den Knopf aus diesem Block genommen und nur den
+           unten stehen lassen. Das war die halbe Bewegung: oben wird
+           GROB gewaehlt (Layout, Objektkarten), das Feine liegt im
+           Panel — der Weg dorthin gehoert also hierher, nicht ans Ende
+           einer langen Seite. Der untere Abschnitt faellt dafuer weg,
+           damit es bei EINEM Weg bleibt.
+
+           GESPERRT AB PLAN: Marcel: „Erst ab Pro ist das Darstellung
+           oeffnen moeglich." Gemessen an der laufenden App, dass genau
+           das schon im Datenmodell steht:
+
+             free (fehlt) · starter (fehlt) · investor (fehlt)
+             pro  true    · partner true       <- features.theme_palette
+
+           Der Schluessel wird also nicht erfunden, sondern der
+           vorhandene benutzt — ein neuer waere fuer JEDEN false
+           (auch fuer Pro) und haette die Funktion still abgeschaltet.
+           Geprueft wird mit `Plan.full()`, nicht `Plan.can()`: gemessen
+           gibt `can('theme_palette')` auch im Partner-Plan false,
+           `full()` und `mode()` sagen beide 'full'. */
+        (function(){
+          var frei = true;
+          try { if (window.Plan && typeof Plan.full === 'function') frei = !!Plan.full('theme_palette'); } catch(e){}
+          if (frei) {
+            return '<button type="button" class="btn" style="margin-bottom:12px" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>';
+          }
+          /* Sichtbar, aber zu — wer nicht weiss, dass es das gibt, fragt
+             auch nicht danach. Der Grund steht daneben, nicht im Tooltip. */
+          return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
+                   '<button type="button" class="btn" disabled style="opacity:.5;cursor:not-allowed">Darstellung \u00f6ffnen</button>' +
+                   '<span class="hint" style="margin:0">Feineinstellungen (Vorlagen, Farben, Schrift) ab <strong>Pro</strong></span>' +
+                 '</div>';
+        })() +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
-          '<div id="dp-profil-wahl" style="display:flex;gap:11px">' +
-            '<button type="button" class="dp-profil" data-profil="obsidian" onclick="_dpProfil(\'obsidian\')" ' +
-              'style="flex:1 1 0;min-height:44px;text-align:left;padding:11px 12px;border-radius:9px;' +
-              'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">' +
-              '<span style="display:block;height:34px;border-radius:6px;margin-bottom:8px;' +
-                'background:linear-gradient(#141414,#040404);box-shadow:inset 0 0 0 1px rgba(201,168,76,.35)"></span>' +
-              '<span style="display:block;font-weight:600">Obsidian</span>' +
-              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:1px">Auslieferungszustand</span>' +
-            '</button>' +
-            '<button type="button" class="dp-profil" data-profil="hell" onclick="_dpProfil(\'hell\')" ' +
-              'style="flex:1 1 0;min-height:44px;text-align:left;padding:11px 12px;border-radius:9px;' +
-              'border:1px solid rgba(0,0,0,.12);background:#fff;cursor:pointer;font:inherit">' +
-              '<span style="display:block;height:34px;border-radius:6px;margin-bottom:8px;' +
-                'background:#FBFAF7;box-shadow:inset 0 0 0 1px #E8E4DC"></span>' +
-              '<span style="display:block;font-weight:600">Hell</span>' +
-              '<span style="display:block;font-size:11.5px;color:var(--muted,#5F5E5A);margin-top:1px">Warm, mit Serife</span>' +
-            '</button>' +
-          '</div>' +
-          '<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">' +
-            '<span style="font-size:11.5px;color:var(--muted,#5F5E5A)">Einzeln einstellen — Vorlage, Karten, Form, Schrift, Farben</span>' +
-            '<button type="button" class="btn btn-sm btn-ghost" onclick="try{DealPilotUiVarianten.open()}catch(e){}">Darstellung öffnen</button>' +
+          /* v1706: HIER STAND DIE WAHL OBSIDIAN / HELL UND DER KNOPF
+             DARSTELLUNG OEFFNEN.
+
+             Marcel: "unter Einstellungen, Darstellung hast du immer noch
+             die Auswahl zwischen Obsidian und Hell. Die kannst du
+             rausnehmen. Ich moechte aber, dass wir das zuruecksetzen. Das
+             darf gerne bleiben. Und das Darstellung oeffnen darf oben
+             unter dem Aussehen darf das raus."
+
+             Die Layout-Wahl darueber (#dp-layout-wahl-host) bleibt - sie
+             ist das, was hier wirklich entschieden wird. Das Feine steht
+             weiter im Darstellungs-Panel; erreichbar bleibt es ueber den
+             Knopf weiter unten in den Einstellungen.
+
+             > Zwei Wege zum selben Panel in einer Ansicht sind keine
+             > Bequemlichkeit, sondern eine Frage, die sich der Nutzer
+             > stellen muss: ob es derselbe ist. */
+          /* ── v1698 · ZURUECKSETZEN ──────────────────────────────────
+             Marcel: „auch sollte es dort die Moeglichkeit geben, die
+             Einstellungen zurueckzusetzen."
+
+             Drei Achsen auf einmal, weil sie zusammen den Eindruck
+             machen: Seitenaufteilung, Darstellung (Vorlage, Karten,
+             Form, Schrift) und die Marke. Einzeln zurueckzusetzen
+             hiesse, dreimal an drei Orten zu suchen.
+
+             `setze('')` raeumt Attribute, Merker und Schienen ab;
+             `DealPilotWhitelabel.reset()` nimmt Partnerfarbe und -logo
+             zurueck. Beides sind die vorhandenen Wege, kein zweiter. */
+          '<div style="margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:10px">' +
+            '<span style="font-size:11.5px;color:var(--muted,#5F5E5A)">Alles auf den Auslieferungszustand — Aufteilung, Darstellung und Marke</span>' +
+            '<button type="button" class="btn btn-sm btn-ghost" onclick="_dpAussehenZuruecksetzen()">Zurücksetzen</button>' +
           '</div>' +
         '</div>' +
         /* === V213 collapse-toggle profilanzeige START === */
@@ -845,11 +916,11 @@ function showSettings(initialTab) {
           '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='dark'?' active':'') + '" data-mbth="dark" onclick="_setMbThemeDark()">Dunkel<span class="dp-tt-mode-btn-label">Obsidian/Gold</span></button>' +
         '</div>' +
         /* === v648-mb-theme END === */
-        /* === v931-disp-button === */
-        '<hr class="dvd">' +
-        '<h2 class="set-section-h2">Darstellung</h2>' +
-        '<p class="hint" style="margin-bottom:12px">Farben, Schrift und Modus stellst du im Darstellungs-Men\u00fc direkt in der App ein \u2014 so siehst du jede \u00c4nderung sofort.</p>' +
-        '<button type="button" class="btn" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>' +
+        /* v1719: der zweite Knopf DARSTELLUNG OEFFNEN stand hier. Er ist
+           nach oben zur Layout-Wahl gewandert (siehe dort). Zwei Wege zum
+           selben Panel in einer Ansicht sind keine Bequemlichkeit, sondern
+           eine Frage, die sich der Nutzer stellen muss: ob es derselbe
+           ist. (Dieselbe Begruendung stand schon in v1706.) */
       '</div>' +
       '</div>' +    // pane-wrap Ende
       '<div class="settings-footer save-row">' +
@@ -3810,6 +3881,44 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
   var HELL_VORLAGE = 'kanzlei';   /* aus design/mockups/hell.png, am CSS geprueft */
 
   function laden() { try { return JSON.parse(localStorage.getItem(LSK) || '{}') || {}; } catch (e) { return {}; } }
+
+  /* ── v1698 · Zuruecksetzen ──────────────────────────────────────────
+     Drei Achsen auf einmal. Jede ueber IHREN vorhandenen Weg, keiner
+     nachgebaut:
+       Aufteilung  ->  DealPilotLayout.setze('')   (raeumt selbst ab)
+       Darstellung ->  die Ablage dieses Moduls leeren + anwenden lassen
+       Marke       ->  DealPilotWhitelabel.reset()
+
+     Mit Rueckfrage, weil es mehr wegnimmt, als der Knopf verspricht:
+     wer nur die Farbe zuruecksetzen wollte, verliert auch sein Layout. */
+  window._dpAussehenZuruecksetzen = function () {
+    var frage = 'Aufteilung, Darstellung und Marke auf den '
+              + 'Auslieferungszustand zurücksetzen?';
+    if (!window.confirm(frage)) return;
+    try { if (window.DealPilotLayout && window.DealPilotLayout.setze) window.DealPilotLayout.setze(''); } catch (e) {}
+    /* v1699b: `dp_chrome_hell` MIT abraeumen. Ohne ihn blieb die
+       Oberflaeche hell, auch nachdem v1699 den Zwang aus den Layouts
+       genommen hat — der Merker ueberlebt und stellt sie beim naechsten
+       Start wieder hell. Gemessen: `dp_chrome_hell: "1"` stand noch da,
+       obwohl nichts mehr danach fragte.
+
+       Und `dp_karten_variante`/`dp_layout_variante`, weil sonst der
+       Kartenstil einer abgeraeumten Aufteilung weiterlebt — genau der
+       Fehler, der „Heute" schon einmal hell gelassen hat. */
+    try {
+      localStorage.removeItem(LSK);
+      localStorage.removeItem('dp_chrome_hell');
+      localStorage.removeItem('dp_karten_variante');
+      localStorage.removeItem('dp_layout_variante');
+      localStorage.removeItem('dp_layout_seiten');
+    } catch (e) {}
+    try { if (document.body) document.body.classList.remove('dp-chrome-hell'); } catch (e) {}
+    try { if (typeof window._dpDispSkin === 'function') window._dpDispSkin('obsidian'); } catch (e) {}
+    try { if (window.DealPilotUiVarianten && window.DealPilotUiVarianten.apply) window.DealPilotUiVarianten.apply(); } catch (e) {}
+    try { if (window.DealPilotWhitelabel && window.DealPilotWhitelabel.reset) window.DealPilotWhitelabel.reset(); } catch (e) {}
+    try { if (typeof window._dpProfilMarkieren === 'function') window._dpProfilMarkieren(); } catch (e) {}
+    if (typeof window.toast === 'function') window.toast('Aussehen zurückgesetzt.');
+  };
 
   window._dpProfilAktiv = function () {
     var s = laden();

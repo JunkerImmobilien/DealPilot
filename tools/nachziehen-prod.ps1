@@ -172,8 +172,12 @@ $roll += "git pull --ff-only origin $ZWEIG"
 if ($brauchtBackend) {
   $roll += 'docker compose -f docker-compose.prod.yml up -d --build backend'
 }
-$roll += 'git rev-parse HEAD'
-$befehle = ($roll -join "`n")
+$befehle = ($roll -join "`n") + "`n"
+# Der abschliessende Zeilenumbruch ist noetig: ohne ihn haengt bash den
+# letzten Befehl an das Dateiende und meldete "ambiguous argument 'HEAD?'".
+# Das Nachmessen in Schritt 7 lief trotzdem - der Fehler war nur laut,
+# nicht schaedlich. Trotzdem: eine Fehlermeldung, die man ignoriert,
+# gewoehnt einem das Hinsehen ab.
 
 $erg = $befehle | ssh -o ConnectTimeout=30 $PROD_HOST "bash -s"
 $erg | Select-Object -Last 12 | ForEach-Object { Write-Host "     $_" }

@@ -27,6 +27,23 @@
   var AVM_PREFLIGHT_SOON = (typeof window !== 'undefined' && window.DP_AVM_PREFLIGHT_SOON != null)
     ? !!window.DP_AVM_PREFLIGHT_SOON
     : !/staging/i.test(String((typeof location !== 'undefined' && location.hostname) || ''));
+  /* ═══ v1637 · DIE BEIDEN BEWERTUNGSPARTNER SIND UNSICHTBAR ═══════════
+     Marcel: „wir lassen die Programmierung im Hintergrund, dass wir
+     später die Buttons wieder einfügen können."
+
+     Zugleich die Hausregel: **namentlich nie nach aussen**. Bis heute
+     standen beide Namen als Logokacheln auf der Bordkarte und in zwei
+     Hinweiszeilen darunter.
+
+     EIN Schalter statt sechs Löschungen. Auf `true` gesetzt, ist alles
+     wieder da - der Abrufweg (`avmFetch`, `_oabApplyExternal`, die
+     Reihenfolge in `order`) wurde NICHT angefasst.
+
+     > Ein auskommentierter Knopf ist eine Leiche. Ein Knopf hinter
+     > einem benannten Schalter ist eine Entscheidung. */
+  var PARTNER_AVM_SICHTBAR = (typeof window !== 'undefined' && window.DP_PARTNER_AVM != null)
+    ? !!window.DP_PARTNER_AVM : false;
+
   function provComingSoon(p) {
     if ((p === 'pricehubble' || p === 'sprengnetter') && AVM_PREFLIGHT_SOON) return true; /* v895h-avm-soon */
     if (p === 'pricehubble' && PH_COMING_SOON) return true;
@@ -298,14 +315,31 @@
     mount.innerHTML =
       '<div class="dp-pf-scroll"><div class="dp-pfbar" id="oab-bar">' +
         '<span class="dp-pf-stripe"></span>' +
-        '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span><span class="k">PRE-FLIGHT</span><span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
+        /* v1687: BEIDE Beschriftungen, eine je Zustand. Marcel wollte
+           \u201eDatenaufnahme" fuer die neuen Ansichten und \u201ePRE-FLIGHT"
+           zurueck, sobald \u201eHeute" gewaehlt ist (\u201edas muss wieder so
+           sein wie vorher"). Auf Prod steht bis heute PRE-FLIGHT.
+           Welche gilt, entscheidet das CSS am Kartenstil \u2014 so bleibt
+           es eine Quelle und nicht zwei Staende derselben Karte. */
+        '<div class="dp-pf-lead"><span class="bp">BOARDING PASS</span>'
+          + '<span class="k"><span class="k-heute">PRE-FLIGHT</span>'
+          + '<span class="k-neu">Datenaufnahme</span></span>'
+          + '<span class="s">DealPilot \u00b7 Boarding</span></div><span class="dp-pf-perf"></span>' + /* v572-leadtext */
         '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row">' +
           /* v752-order */ pfTileLogo('dealpilot', _dpInner, false, 'Marktpreisbewertung') +
+          /* v1637 · unsichtbar, nicht geloescht - siehe PARTNER_AVM_SICHTBAR */
+          (PARTNER_AVM_SICHTBAR ? (
           pfTileLogo('sprengnetter', _snInner, (avmOff || provComingSoon('sprengnetter')), provComingSoon('sprengnetter') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'Sprengnetter'), provComingSoon('sprengnetter') ? 'dp-pf-soon-on' : '') + /* v895h-avm-soon */
-          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '') +
+          pfTileLogo('pricehubble', _phInner, (avmOff || provComingSoon('pricehubble')), provComingSoon('pricehubble') ? 'Coming soon' : (avmOff ? 'Marktradar derzeit deaktiviert' : 'PriceHubble'), provComingSoon('pricehubble') ? 'dp-pf-soon-on' : '')
+          ) : '') +
         '</div></div>' +
         '<div class="dp-pf-sep"></div>' +
-        '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">Daten einlesen</span><div class="dp-pf-row">' +
+        /* v1687: dieselbe Zwei-Wege-Beschriftung wie in der Kopfzeile \u2014
+           Prod sagt \u201eDaten einlesen", die neuen Ansichten \u201eDaten
+           uebernehmen aus". */
+        '<div class="dp-pf-seg"><span class="dp-pf-grouplbl">'
+          + '<span class="k-heute">Daten einlesen</span>'
+          + '<span class="k-neu">Daten \u00fcbernehmen aus</span></span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
@@ -313,8 +347,8 @@
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
-      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Marktradar (PriceHubble/Sprengnetter) ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
-      ((!avmOff && (provComingSoon('sprengnetter') || provComingSoon('pricehubble'))) ? '<div class="oab-note" style="margin:-6px 0 12px">Marktbewertung aktuell \u00fcber die DealPilot-Markteinsch\u00e4tzung \u2014 Sprengnetter &amp; PriceHubble folgen in K\u00fcrze.</div>' : '') + /* v895h-avm-soon */
+      (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Die externe Marktbewertung ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
+      /* v1637 · Hier stand ein Hinweis, der die beiden Partner NAMENTLICH nannte. Er erschien nur zu den 'coming soon'-Kacheln, und die gibt es nicht mehr. */ '' +
       '<div class="oab-prog" id="oab-prog" style="display:none"></div>' +
       '<div class="oab-results" id="oab-results"></div>';
     // v570-pf: initial .on synchronisieren (DealPilot default aktiv) + LED-Kopplung sicherstellen
@@ -408,8 +442,17 @@
     var billed = sel.filter(function (s) { return KOSTET[s] != null; });
     if (!billed.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
     var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
+    /* v1664 · Anbieter-Neutralitaet. v1194 hat hier die Waehrung
+       aufgeraeumt und die Namen stehen lassen - CLAUDE.md sagt aber
+       „Sprengnetter und PriceHubble nie namentlich nach aussen,
+       unabhaengige Bewertungspartner". DealPilot ist die eigene Marke
+       und darf stehen; ImmoMetrica duerfte es auch.
+
+       > Eine Neutralitaetsregel, die nur fuer Werbetexte gilt, ist
+       > keine. Sie gilt genau dort, wo der Kunde hinsieht - und das ist
+       > der Kostenhinweis ueber dem Knopf. */
     var parts = billed.map(function (s) {
-      var nm = s === 'pricehubble' ? 'PriceHubble' : (s === 'dealpilot' ? 'DealPilot' : 'Sprengnetter');
+      var nm = s === 'dealpilot' ? 'DealPilot' : 'unabhängiger Bewertungspartner';
       return '<b>' + KOSTET[s] + '</b> (' + nm + ')';
     }).join(' + ');
     var txt = 'Beim <b>Abrufen</b> ' + (billed.length > 1 ? 'werden ' : 'wird ') + parts + ' aus deinem Kontingent verbraucht.';
@@ -439,6 +482,85 @@
       '.v754-go{background:#0c0b09;color:var(--wl-e8cc7a, #E8CC7A)}';
     document.head.appendChild(st);
   }
+  /* ── v1703 · DIE ABRUF-FRAGE WIRD NACH AUSSEN GEGEBEN ───────────────
+     Marcel will die Marktpreis-Indikation auch aus dem Co-Piloten heraus
+     anfordern koennen: „Kann man ja vorher sagen, dass das einen Abruf
+     kosten wuerde."
+
+     Genau diese Frage steht hier seit v754 - mit Bordkarten-Optik,
+     Anbieter-Neutralitaet (v1664), der Einheit „Abruf" statt Liter und
+     dem Merker „Nicht mehr fragen". Sie ein zweites Mal zu bauen hiesse,
+     zwei Wortlaute fuer dieselbe Belastung zu fuehren - und genau daran
+     ist v1664 schon einmal aufgefallen:
+
+     > „Zwei Stellen, die dasselbe ankuendigen, und nur eine wurde
+     > umgestellt."
+
+     Deshalb wird der Bau des Modals hier herausgeloest und nach aussen
+     gegeben. `_v754ConfirmRun()` unten ruft ihn genauso wie der
+     Co-Pilot - eine Quelle, zwei Aufrufer.
+
+     opts: { posten: [{n: <Anzahl>, was: '<Bezeichnung>'}], titel, frage,
+             knopf, los: function(){}, merker: '<localStorage-Schluessel>' } */
+  function abrufFrage(opts) {
+    opts = opts || {};
+    var los = typeof opts.los === 'function' ? opts.los : function () {};
+    var merker = opts.merker || 'dp_skip_kerosin_confirm';
+    try { if (localStorage.getItem(merker) === '1') { los(); return; } } catch (e) {}
+    _v754Style();
+
+    var posten = Array.isArray(opts.posten) ? opts.posten : [];
+    if (!posten.length) { los(); return; }
+    var parts = posten.map(function (p) {
+      return '<b>' + (p.n != null ? p.n : 1) + '</b> ' + _esc(p.was || 'Abruf');
+    }).join(' + ');
+
+    var ov = document.createElement('div'); ov.className = 'v754-ov';
+    ov.innerHTML =
+      '<div class="v754-modal" role="dialog" aria-modal="true">' +
+        '<div class="v754-hero"><span class="bp">BOARDING PASS · DEALPILOT</span><h3>'
+          + _esc(opts.titel || 'Abruf bestätigen') + '</h3></div>' +
+        '<div class="v754-body">' + _esc(opts.frage || 'Für diesen Abruf wird dein Kontingent belastet:') +
+          '<div class="v754-cost">' + parts + '</div>' +
+          'Möchtest du fortfahren?' +
+          '<label style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;color:#6b6660;cursor:pointer">' +
+            '<input type="checkbox" id="v754-skip" style="accent-color:var(--wl-c9a84c, #C9A84C)"> Nicht mehr fragen' +
+          '</label></div>' +
+        '<div class="v754-foot">' +
+          '<button type="button" class="v754-btn v754-cancel" id="v754-cancel">Abbrechen</button>' +
+          '<button type="button" class="v754-btn v754-go" id="v754-go">' + _esc(opts.knopf || 'Abrufen') + '</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    /* v1703: Abbruch meldet zurueck. Ein Aufrufer, der auf die Antwort
+       wartet (der Co-Pilot tut das), haengt sonst ewig an einem
+       Versprechen, das sich nie aufloest.
+
+       > Eine Frage ohne Nein-Rueckweg ist keine Frage. */
+    var beantwortet = false;
+    var ab = typeof opts.ab === 'function' ? opts.ab : function () {};
+    function close(genommen) {
+      if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+      document.removeEventListener('keydown', esc);
+      if (!beantwortet) { beantwortet = true; if (!genommen) { try { ab(); } catch (e) {} } }
+    }
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    var c = document.getElementById('v754-cancel'); if (c) c.addEventListener('click', function () { close(); });
+    var g = document.getElementById('v754-go'); if (g) g.addEventListener('click', function () {
+      try { var sk = document.getElementById('v754-skip'); if (sk && sk.checked) localStorage.setItem(merker, '1'); } catch (e) {}
+      close(true); try { los(); } catch (e) {} });
+    var esc = function (e) { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', esc);
+  }
+
+  /* Kleiner Schutz fuer die Texte oben. Die Bezeichnungen kommen aus dem
+     eigenen Code, aber eine Bezeichnung, die spaeter aus einer Antwort
+     stammt, soll hier nicht als Markup landen. */
+  function _esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
   function _v754ConfirmRun() {
     /* v782-skip-confirm: 'nicht mehr fragen' respektieren */
     try { if (localStorage.getItem('dp_skip_kerosin_confirm') === '1') { runSelected(); return; } } catch (e) {}
@@ -459,7 +581,22 @@
        und stuende mit "0 L" im Kasten. Wer nur die Sprachaufzeichnung
        waehlt, sieht jetzt gar kein Modal (costing ist leer -> direkt los).
        Fuer die AVM-Abrufe bleibt die Frage: die kosten wirklich. */
-    var KL = { pricehubble: 40, sprengnetter: 20, dealpilot: 2 };
+    /* ── v1664 · DAS MODAL RECHNETE WEITER IN LITERN ─────────────────────
+       Marcel: „geh das auch im Tab Objekt noch mal durch."
+
+       v1194 hat den HINWEIS unter der Leiste (`updateCreditHint`) von
+       Litern auf Abrufe umgestellt - dieses Modal daneben nicht. Es zeigte
+       weiter „40 L PriceHubble + 20 L Sprengnetter" und einen Knopf
+       „Abrufen (60 L)".
+
+       > Zwei Stellen, die dasselbe ankuendigen, und nur eine wurde
+       > umgestellt: der Nutzer liest erst „1 Marktwert-Abruf" und
+       > bestaetigt dann „60 L". Eine halbe Abschaffung ist schlimmer als
+       > keine - sie sieht aus wie ein Rechenfehler.
+
+       Die Zahlen bleiben als MENGE erhalten (ein Abruf je Anbieter,
+       `routes/avm.js:236`), nur ohne Einheit und ohne Anbieternamen. */
+    var KL = { pricehubble: 1, sprengnetter: 1, dealpilot: 1 };
     var demo = !!(typeof _avmHealth !== 'undefined' && _avmHealth && _avmHealth.mode === 'stub');
     var billed = sel.filter(function (x) { return KL[x] != null; });
     /* v1259: Im Demo-/Stub-Modus kostet kein AVM-Abruf etwas — und die
@@ -467,33 +604,17 @@
        kostet jetzt nirgends mehr. Also faellt das Modal im Demo ganz weg. */
     var costing = demo ? [] : billed;
     if (!costing.length) { try { runSelected(); } catch (e) {} return; }
-    var NM = { pricehubble: 'PriceHubble', sprengnetter: 'Sprengnetter', dealpilot: 'DealPilot' };  /* v1259: voice raus */
-    var total = costing.reduce(function (a, x) { return a + KL[x]; }, 0);
-    var parts = costing.map(function (x) { return '<b>' + KL[x] + '\u00a0L</b> ' + NM[x]; }).join(' + ');
-    var ov = document.createElement('div'); ov.className = 'v754-ov';
-    ov.innerHTML =
-      '<div class="v754-modal" role="dialog" aria-modal="true">' +
-        '<div class="v754-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Abruf best\u00e4tigen</h3></div>' +
-        '<div class="v754-body">Für diesen Abruf wird dein Kontingent belastet:' +
-          '<div class="v754-cost">' + parts + (costing.length > 1 ? ' &nbsp;=&nbsp; <b>' + total + '\u00a0L</b> gesamt' : '') + '</div>' +
-          'M\u00f6chtest du fortfahren?' +
-          '<label style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:12.5px;color:#6b6660;cursor:pointer">' +
-            '<input type="checkbox" id="v754-skip" style="accent-color:var(--wl-c9a84c, #C9A84C)"> Nicht mehr fragen' +
-          '</label></div>' +
-        '<div class="v754-foot">' +
-          '<button type="button" class="v754-btn v754-cancel" id="v754-cancel">Abbrechen</button>' +
-          '<button type="button" class="v754-btn v754-go" id="v754-go">Abrufen (' + total + '\u00a0L)</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(ov);
-    function close() { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }
-    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
-    var c = document.getElementById('v754-cancel'); if (c) c.addEventListener('click', close);
-    var g = document.getElementById('v754-go'); if (g) g.addEventListener('click', function () {
-      try { var sk = document.getElementById('v754-skip'); if (sk && sk.checked) localStorage.setItem('dp_skip_kerosin_confirm','1'); } catch (e) {}
-      close(); try { runSelected(); } catch (e) {} });
-    var esc = function (e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } };
-    document.addEventListener('keydown', esc);
+    /* v1664: Anbieter-Neutralitaet - CLAUDE.md sagt "Sprengnetter und
+       PriceHubble nie namentlich nach aussen". DealPilot ist die eigene
+       Marke und darf stehen. */
+    var NM = { pricehubble: 'Marktwert-Abruf', sprengnetter: 'Marktwert-Abruf', dealpilot: 'Bewertung DealPilot' };
+    /* v1703: der Bau steht jetzt einmal in abrufFrage(). Hier bleibt nur,
+       WAS angekuendigt wird - die Posten. Der Wortlaut, die Optik und der
+       Merker liegen damit an genau einer Stelle. */
+    abrufFrage({
+      posten: costing.map(function (x) { return { n: KL[x], was: NM[x] }; }),
+      los: function () { try { runSelected(); } catch (e) {} }
+    });
   }
 
   function selectedSources() { var out = [], m = $(MOUNT_ID); if (!m) return out; m.querySelectorAll('.dp-pf-tile input:checked').forEach(function (c) { out.push(c.value); }); return out; }
@@ -681,9 +802,88 @@
         else toast('⚠ Marktradar-Abruf fehlgeschlagen' + (data && data.message ? ': ' + data.message : ''));
         return;
       }
-      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); /* v742-avm-persist: nur echte Live-Ergebnisse persistieren (kein Stub/live-unmapped) */ if (data.result.mode === 'live') { persistAvmState(); } toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−1 Marktwert-Abruf)')); if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } }
+      if (data && data.result) { _avm[data.result.provider] = data.result; renderResults(); /* v742-avm-persist: nur echte Live-Ergebnisse persistieren (kein Stub/live-unmapped) */ if (data.result.mode === 'live') { persistAvmState(); } toast('✓ ' + data.result.provider + (data.mode === 'stub' ? ' (Demo — kostenlos)' : ' (−1 Marktwert-Abruf)')); if (data.mode !== 'stub') { try { setTimeout(function(){ if (window.AiCredits && typeof window.AiCredits.refreshAvm === 'function') window.AiCredits.refreshAvm(); }, 400); } catch (e) {} } return data.result; }
     } catch (e) { toast('⚠ Netzwerkfehler beim Marktradar-Abruf'); }
   }
+
+  /* ══════════════════════════════════════════════════════════════════
+     v1703 · MARKTPREIS AUS DEM CO-PILOTEN
+     ══════════════════════════════════════════════════════════════════
+     Marcel: „es waere vielleicht auch cool, wenn wir aus dem Copiloten
+     auch eine neue Anfrage machen koennten an unsere Schnittstelle, wie
+     denn so die gaengigen Marktpreise oder Marktpreisindikationen sind.
+     Kann man ja vorher sagen, dass das einen Abruf kosten wuerde."
+
+     Hier wird KEIN zweiter Abrufweg gebaut. `avmFetch()` ist der Weg -
+     mit Pflichtfeldpruefung, den Fehlertexten des Servers, Persistenz
+     und Guthaben-Auffrischung. Der Co-Pilot bekommt nur eine Tuer
+     dorthin.
+
+     > Ein zweiter Abrufweg waere ein zweiter Ort, an dem die Einheit
+     > „Abruf" spaeter falsch stehen kann - genau der Fehler, an dem
+     > v1664 aufgefallen ist („zwei Stellen, die dasselbe ankuendigen,
+     > und nur eine wurde umgestellt").
+
+     Der Anbieter wird nicht erfragt: genommen wird der erste, fuer den
+     die Pflichtfelder vollstaendig sind. Fehlt ueberall etwas, wird
+     NICHT abgerufen und NICHTS belastet - die fehlenden Felder kommen
+     als Text zurueck, damit der Chat sie benennen kann. */
+  function marktpreisFuerCopilot() {
+    return new Promise(function (fertig) {
+      if (!(_avmHealth && _avmHealth.available)) {
+        fertig({ ok: false, grund: 'aus',
+                 text: 'Die Marktbewertung ist derzeit nicht verfügbar.' });
+        return;
+      }
+
+      var kandidaten = ['sprengnetter', 'pricehubble'];
+      var frei = kandidaten.filter(function (p) { return !provComingSoon(p) && !missingFor(p).length; });
+
+      if (!frei.length) {
+        /* Die kuerzeste Liste nennen - das ist der Weg mit dem wenigsten
+           Aufwand fuer den Menschen. */
+        var beste = kandidaten.filter(function (p) { return !provComingSoon(p); })
+                              .map(function (p) { return missingFor(p); })
+                              .sort(function (a, b) { return a.length - b.length; })[0] || [];
+        fertig({ ok: false, grund: 'felder', fehlend: beste,
+                 text: beste.length
+                   ? 'Dafür fehlen noch Pflichtangaben: ' + beste.join(', ') + '.'
+                   : 'Dafür fehlen noch Pflichtangaben.' });
+        return;
+      }
+
+      var provider = frei[0];
+      var demo = !!(_avmHealth && _avmHealth.mode === 'stub');
+
+      function los() {
+        Promise.resolve(avmFetch(provider)).then(function (r) {
+          if (!r) { fertig({ ok: false, grund: 'abruf',
+                             text: 'Der Abruf hat kein Ergebnis geliefert.' }); return; }
+          fertig({ ok: true, demo: r.mode === 'stub', ergebnis: r });
+        }, function () {
+          fertig({ ok: false, grund: 'abruf', text: 'Der Abruf ist fehlgeschlagen.' });
+        });
+      }
+
+      /* Im Demo-Modus kostet nichts - dann auch keine Frage. Genauso wie
+         im Tab Objekt (v1259). */
+      if (demo) { los(); return; }
+
+      abrufFrage({
+        titel: 'Marktpreis abrufen',
+        frage: 'Für diese Marktpreis-Indikation wird dein Kontingent belastet:',
+        posten: [{ n: 1, was: 'Marktwert-Abruf' }],
+        knopf: 'Abrufen',
+        /* Eigener Merker. Wer im Tab Objekt „nicht mehr fragen" gesetzt
+           hat, hat das fuer die Quellenleiste getan, nicht fuer eine
+           Frage im Chat - eine Zustimmung wandert nicht mit. */
+        merker: 'dp_skip_abruf_copilot',
+        los: los,
+        ab: function () { fertig({ ok: false, grund: 'abgebrochen' }); }
+      });
+    });
+  }
+
   function pickMW(r) { return _span === 'low' ? r.low : _span === 'high' ? r.high : r.marktwert; }
   function pickMM(r) { return _span === 'low' ? r.marktmieteLow : _span === 'high' ? r.marktmieteHigh : r.marktmieteCold; }
   function spanLabel() { return _span === 'low' ? 'Unten' : _span === 'high' ? 'Oben' : 'Durchschnitt'; }
@@ -1916,7 +2116,9 @@
   function autoInit() { if ($(MOUNT_ID)) { init(); return; } if (_tries++ < 40) setTimeout(autoInit, 250); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit); else setTimeout(autoInit, 0);
   window.addEventListener('load', autoInit);
-  window.ObjectActions = { init: init, render: render, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending, getQcPending: function(){ return _qcPendingMerged; }, setQcPending: function(p){ _qcPendingMerged=(p&&typeof p==='object')?p:{}; }, clearQcPending: function(){ _qcPendingMerged={}; },
+  window.ObjectActions = { init: init, render: render,
+    /* v1703: die Tuer fuer den Co-Piloten - eine Quelle fuer Frage und Abruf */
+    abrufFrage: abrufFrage, marktpreisFuerCopilot: marktpreisFuerCopilot, openImport: openCombinedImport, enhanceKiLage: enhanceKiLage, syncObjExtra: syncObjExtra, clearAvm: clearAvm, applyQcPending: applyQcPending, getQcPending: function(){ return _qcPendingMerged; }, setQcPending: function(p){ _qcPendingMerged=(p&&typeof p==='object')?p:{}; }, clearQcPending: function(){ _qcPendingMerged={}; },
     /* v503-voice-bridge: Sprach-Ergebnisliste ueber die Import-Mechanik (gleiche Optik,
        gleicher Schreibweg inkl. Sterne + QC-Bucket-Logik). */
     _voice: {
@@ -1944,14 +2146,14 @@
     var trig = document.createElement('button');
     trig.type = 'button'; trig.className = 'dp-pf-mtrigger';
     trig.innerHTML = '<span class="dp-pf-mt-ico">' + PLANE + '</span>' +
-      '<span class="dp-pf-mt-txt"><b>PRE-FLIGHT</b><small>Quellen w\u00e4hlen \u00b7 Boarding</small></span>' +
+      '<span class="dp-pf-mt-txt"><b>Datenaufnahme</b><small>Quellen w\u00e4hlen</small></span>' +
       '<span class="dp-pf-mt-cnt"><b>0</b> aktiv</span><span class="dp-pf-mt-chev">\u25B8</span>';
     host.insertBefore(trig, sheet);
     var bd = document.createElement('div'); bd.className = 'dp-pf-mbackdrop';
     host.insertBefore(bd, sheet);
     var head = document.createElement('div'); head.className = 'dp-pf-msheet-head';
     head.innerHTML = '<span class="dp-pf-mgrip"></span>' +
-      '<div class="dp-pf-mtitle"><b>PRE-FLIGHT</b><small>Datenquellen f\u00fcr diesen Abruf</small></div>' +
+      '<div class="dp-pf-mtitle"><b>Datenaufnahme</b><small>Datenquellen f\u00fcr diesen Abruf</small></div>' +
       '<button type="button" class="dp-pf-mclose" aria-label="Schlie\u00dfen">\u2715</button>';
     sheet.insertBefore(head, sheet.firstChild);
     function refresh() { var n = bar.querySelectorAll('.dp-pf-tile.on').length; var el = trig.querySelector('.dp-pf-mt-cnt b'); if (el) el.textContent = n; }

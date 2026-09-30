@@ -800,7 +800,64 @@ function _mockupRenderBmfResult(r, demoLabel){
   window._lastBmf = r;
   // AfA-Vorschau aktualisieren
   updateAfaPreview(akTotal);
+
+  /* ── v1688 · DIE AUSGABEN GEHOEREN DAHIN, WO GERECHNET WURDE ───────
+     Marcel: „wenn ich auf Kaufpreisaufteilung klicke, oeffnet sich das
+     Modal. Dort soll aber bitte diese PDF-Anlage erstellen … und auch
+     die BMF-XLSX, die standardmaessige, dass man die herunterladen kann
+     und natuerlich dann auch Kaufpreisaufteilung als PDF."
+
+     Beide Wege gibt es seit Langem — `exportBmfPdf()` und
+     `downloadXlsx()`. **`downloadXlsx` hatte keinen einzigen Aufrufer**
+     (gemessen mit `grep` ueber `frontend/js` und `index.html`): die
+     Funktion war exportiert, getestet und fuer den Nutzer unerreichbar.
+     Eine Ausgabe, die niemand starten kann, ist keine.
+
+     Die Leiste erscheint ERST nach der Berechnung — vorher haette sie
+     nichts auszugeben, und ein Knopf, der nur eine Fehlermeldung
+     bringt, ist schlimmer als keiner.                                */
+  try { bmfAusgabenZeigen(); } catch (e) {}
 }
+
+function bmfAusgabenZeigen() {
+  var host = document.getElementById('bmfResult');
+  if (!host) return;
+  var alt = document.getElementById('bmf-ausgaben');
+  if (alt) alt.remove();
+
+  var box = document.createElement('div');
+  box.id = 'bmf-ausgaben';
+  box.className = 'bmf-ausgaben';
+  box.innerHTML =
+      '<div class="bmf-ausgaben-kopf">Ausgabe</div>'
+    + '<div class="bmf-ausgaben-liste">'
+    +   '<button type="button" class="bmf-ausg" data-was="pdf">'
+    +     '<span class="bmf-ausg-l">Kaufpreisaufteilung als PDF</span>'
+    +     '<span class="bmf-ausg-s">Anlage für die Steuererklärung</span></button>'
+    +   '<button type="button" class="bmf-ausg" data-was="xlsx">'
+    +     '<span class="bmf-ausg-l">BMF-Vorlage als XLSX</span>'
+    +     '<span class="bmf-ausg-s">Die amtliche Arbeitshilfe, ausgefüllt</span></button>'
+    + '</div>';
+  host.appendChild(box);
+
+  box.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.bmf-ausg');
+    if (!b) return;
+    var was = b.getAttribute('data-was');
+    try {
+      if (was === 'pdf') {
+        if (typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
+        if (typeof toast === 'function') toast('PDF-Ausgabe nicht geladen.');
+      } else if (was === 'xlsx') {
+        if (typeof window.downloadXlsx === 'function') return window.downloadXlsx();
+        if (typeof toast === 'function') toast('XLSX-Ausgabe nicht geladen.');
+      }
+    } catch (err) {
+      if (typeof toast === 'function') toast('Ausgabe fehlgeschlagen.');
+    }
+  });
+}
+window.bmfAusgabenZeigen = bmfAusgabenZeigen;
 
 function downloadXlsx(){
   /* V292.6.1-xlsx-flat: Variant-spezifischer Excel mit FLAT Backend-Format.

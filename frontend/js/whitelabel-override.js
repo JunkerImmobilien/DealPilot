@@ -328,6 +328,22 @@
      Deshalb: nach TEXT suchen, nicht nach Klasse. */
   var WM_SEL = '.dp-wordmark,.dp-wordmark-auth,.sb-logo,.hdr-brand,.hdr-logo,.sidebar-logo,' +
                '.brand-logo,.rp-logo,.fb-bb-logo,.mf-logo,.dpmb-logo,.dpx-logo,.dp-mtb-brand,' +
+               /* v1698: die Wortmarke der Layout-Schienen. Marcel: „wenn
+                  ich als Partner das Logo und die Farbe aendere, werden
+                  die Einstellungen bei den neuen Layouts nicht
+                  uebernommen."
+
+                  Gemessen: die Schiene traegt
+                  `<span class="dpl-wm">Deal<i>Pilot</i></span>` — Text
+                  genau „DealPilot", also richtig erkannt, aber die
+                  Klasse `dpl-wm` passt auf KEINEN der Muster unten:
+                  weder „wordmark" noch „-logo" noch „-brand" stecken
+                  darin. Das Partner-Logo kam deshalb nie an.
+
+                  > Ein Sammelselektor aus Mustern erfasst nur, wer die
+                  > Muster kennt. Wer neu dazukommt, muss sich melden —
+                  > er wird nicht gefunden. */
+               '.dpl-wm,.dpl-marke,' +
                '[class*="wordmark"],[class*="-logo"],[class*="-brand"]';
   function sweepWordmark(root) {
     if (!_label && !_logo) return;

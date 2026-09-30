@@ -668,6 +668,84 @@ function _buildAIPayload() {
       objart: g('objart'), wfl: parseDe(g('wfl')) || null, baujahr: g('baujahr'),
       makrolage: g('makrolage'), mikrolage: g('mikrolage'),
       thesis: g('thesis'), risiken: g('risiken'), notizen: g('notizen'),
+      /* ── v1700 · DIE EINHEITEN EINES MEHRFAMILIENHAUSES ─────────────
+         Marcel: „bei Mehrfamilienhaeusern gebe ich die Gesamtquadrat-
+         meterzahl an, und er sagt, die Wohnungsgroesse sei mit 390 m²
+         zu gross — obwohl sich die auf acht Wohnungen verteilt."
+
+         Gesendet wurden `objart` und `wfl`, sonst nichts zur Struktur.
+         Die KI sah „390 m²" und las EINE Wohnung daraus; gegen einen
+         Mietspiegel, der fuer Wohnungen gilt, ist das ein grober
+         Fehler.
+
+         Der MFH-Konfigurator (`mfh-einheiten.js`) fuehrt die Einheiten
+         laengst, samt Flaeche und Miete, und `storage.js:182` speichert
+         sie als `_mfh`. **Sie sind nur nie mitgefahren.**
+
+         > Eine Gesamtflaeche ohne die Zahl der Einheiten ist keine
+         > Wohnungsgroesse. Wer sie als solche liest, rechnet falsch —
+         > und merkt es nicht. */
+      einheiten: (function () {
+        try {
+          var m = window._dpMfh;
+          if (!m || !Array.isArray(m.einheiten) || !m.einheiten.length) return null;
+          var liste = m.einheiten.filter(function (e) { return e; });
+          /* ── v1700d · DEUTSCHES KOMMA ──────────────────────────────
+             Der Konfigurator speichert die Flaeche so, wie sie getippt
+             wurde: „97,5". `Number('97,5')` ist NaN — die Flaechen
+             waren deshalb alle `null`, waehrend die Mieten ankamen
+             („799" hat keine Nachkommastelle und geht durch).
+
+             Gemessen am eigenen Payload, nachdem die vier Einheiten der
+             Westerfeldstr. eingetragen waren: `wfl: null`,
+             `flaeche_schnitt: null`, `miete: 799`. Ein halb gefuellter
+             Datensatz ist schlimmer als ein leerer — er sieht
+             vollstaendig aus.
+
+             > Wer eine getippte Zahl weiterreicht, muss sie umrechnen.
+             > Das Komma ist kein Schoenheitsfehler, es ist ein anderer
+             > Zahlentyp. */
+          var zahl = function (v) {
+            if (v == null || v === '') return NaN;
+            return Number(String(v).replace(/\./g, '').replace(',', '.'));
+          };
+          var fl = liste.map(function (e) { return zahl(e.wfl); })
+                        .filter(function (n) { return isFinite(n) && n > 0; });
+          var summe = fl.reduce(function (a, b) { return a + b; }, 0);
+          return {
+            anzahl: liste.length,
+            flaeche_summe: fl.length ? Math.round(summe) : null,
+            flaeche_schnitt: fl.length ? Math.round(summe / fl.length) : null,
+            /* v1700c: Die Miete heisst `ist`, nicht `miete` oder `nkm`.
+               Gemessen an `mfh-einheiten.js` — dort entsteht jede
+               Einheit als `{ nr, art, status, wfl, ist, lage }`. Mein
+               erster Anlauf las zwei Namen, die es nicht gibt; die
+               Mieten waeren stillschweigend leer geblieben.
+
+               `art` und `status` fahren mit, weil sie die Zahlen
+               erklaeren: eine leerstehende Gewerbeeinheit ist etwas
+               anderes als eine vermietete Wohnung, und ohne diese
+               Angabe sieht beides gleich aus. */
+            je_einheit: liste.slice(0, 20).map(function (e) {
+              return {
+                nr: e.nr || null,
+                wfl: zahl(e.wfl) || null,
+                miete: zahl(e.ist) || null,
+                art: e.art || null,           /* wohnen | gewerbe */
+                status: e.status || null,     /* vermietet | leer  */
+                lage: e.lage || null
+              };
+            }),
+            /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
+               „Modernisierung und Stand erfassen". Sie liegen dort
+               bereits nach Anlage 2 ImmoWertV. */
+            aufgeteilt: m.aufgeteilt != null ? !!m.aufgeteilt : null,
+            gnd: Number(m.gnd) || null,
+            stand: m.stand || null,
+            modernisierung: m.gebaeude || null
+          };
+        } catch (e) { return null; }
+      })(),
       wertstg_pct: parseDe(g('wertstg')) || null,
       mietstg_pct: parseDe(g('mietstg')) || null
     },
@@ -898,6 +976,53 @@ function _esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/* ── v1700b · QUELLEN-LINKS LESBAR MACHEN ───────────────────────────────
+   Marcel: „wenn ich die Webrecherche angemacht habe und dort Links
+   zurueckgegeben werden, werden die ganz komisch angegeben. Da steht
+   auch hinten irgendwie utm_source=openai."
+
+   Zwei Dinge steckten drin:
+
+   1. **`utm_source=openai`** haengt die Web-Suche der OpenAI-API selbst
+      an jede URL. Es ist eine Herkunftsmarkierung fuer den betreibenden
+      Dienst — fuer Marcel ist es Rauschen, und es macht den Link
+      laenger als die Aussage.
+   2. Die ganze Rohzeile wurde als LINKTEXT angezeigt. Wenn dort
+      „Mietspiegel Bielefeld 2024 — https://…?utm_source=openai" stand,
+      las man die URL zweimal.
+
+   Jetzt wird die URL gesaeubert und der Text davor als Beschriftung
+   genommen; steht kein Text da, erscheint der Hostname. Die volle
+   Adresse bleibt im `title` — wer sie braucht, sieht sie, ohne dass
+   jeder andere sie lesen muss.
+
+   > Eine Quelle soll zeigen, WOHER etwas kommt. Eine Zeichenkette mit
+   > Zaehlparametern zeigt, ueber WEN es kam. Das ist nicht dasselbe. */
+function _urlSauber(u) {
+  try {
+    var x = new URL(u);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+     'utm_id', 'gclid', 'fbclid', 'ref', 'referrer']
+      .forEach(function (p) { x.searchParams.delete(p); });
+    var s = x.toString();
+    return s.replace(/\?$/, '').replace(/#$/, '');
+  } catch (e) { return u; }
+}
+
+function _quelleZeile(q) {
+  var roh = '' + (q == null ? '' : q);
+  var m = roh.match(/https?:\/\/\S+/);
+  if (!m) return _esc(roh);
+  var url = _urlSauber(m[0].replace(/[),.;]+$/, ''));   /* Satzzeichen am Ende */
+  /* Was vor der URL steht, ist die Beschriftung — sonst der Hostname. */
+  var text = roh.slice(0, m.index).replace(/[\s–—:–—-]+$/, '').trim();
+  if (!text) {
+    try { text = new URL(url).hostname.replace(/^www\./, ''); } catch (e) { text = url; }
+  }
+  return '<a href="' + _esc(url) + '" target="_blank" rel="noopener noreferrer" title="'
+       + _esc(url) + '">' + _esc(text) + '</a>';
+}
+
 /**
  * V25.1: Markdown-Marker aus KI-Antworten entfernen, BEVOR sie im UI gerendert werden.
  * Das Modell liefert manchmal trotz expliziter Anweisung **fett** oder *kursiv* —
@@ -1060,7 +1185,7 @@ function _renderAIServerAnalysis(a) {
   pL += '</div>';
   if (Array.isArray(a.quellen) && a.quellen.length) {
     pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
-      a.quellen.map(function (q) { var m = ('' + q).match(/https?:\/\/\S+/); return '<li>' + (m ? '<a href="' + _esc(m[0]) + '" target="_blank" rel="noopener">' + _esc(q) + '</a>' : _esc(q)) + '</li>'; }).join('') +
+      a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('') +
       '</ul></div>';
   }
 

@@ -19164,3 +19164,6342 @@ in EINER SEKUNDE „fertig", obwohl erst eine von vier Lagen drinsteht.
   39 Commits offen, **keine Migration**. Der Merge auf `main` wurde vom
   Sicherheitsfilter abgewiesen („Production Deploy") — er braucht eine
   Freigabe im Werkzeug, nicht im Projekt.
+
+## Rollout-Journal 26.09.2026 (7) — fünf Layouts in der echten App
+
+**Commits.** `5b38c46` (v1635), `f119a16`/`f4db885`/`e88c10a`/`ec96bf0`
+(v1635b–e), `60aed83` (v1636), `d49f425`/`187b6c0` (v1636b/c).
+Vorher: `939db84` (Demo `frontend/entwurf-hell-bankfaehig.html`).
+
+### Die Bauweise: nichts nachgebaut
+
+`js/layout-varianten.js` erzeugt **keine zweite Oberfläche**. Es
+verschiebt die VORHANDENEN Knoten — Reiterleiste, Aktionsmenü,
+Nutzerblock — und lässt `css/layout-varianten.css` den Rest ordnen.
+
+> Ein nachgebautes Menü hätte am ersten Tag dieselben Einträge und am
+> dreissigsten nicht mehr. `appendChild` VERSCHIEBT; Ereignishorcher,
+> Datensätze und Zustände bleiben am Knoten. Deshalb sind in allen fünf
+> Layouts **alle zwölf Aktionen, Nutzer, Plan, Abmelden, Rundgang und
+> Support** da, ohne dass eine davon hier genannt wird.
+
+Zu jedem verschobenen Knoten ist **Elternteil UND nächstes Geschwister**
+gemerkt. Ohne das Geschwister landet ein Knoten beim Zurückstellen am
+Ende und die Reihenfolge kippt still.
+
+Der helle Grund kommt vom vorhandenen `body.dp-chrome-hell` (103
+geprüfte Regeln), das beim Umschalten mitgesetzt wird — keine zweite
+Hellfassung.
+
+### Gemessen: aus 189 px wurden 86
+
+| | heute | Layout |
+|---|---:|---:|
+| Kopfband | 189 px | **86 px** |
+| KPI-Block | 141 px | **37 px** |
+| eine KPI-Kachel | 93 px | **27 px** |
+| grosser Score | da | weg, `#hdr-score-mini` tritt an |
+
+**`#hdr-score-mini` gibt es seit jeher** — er war nur leer. Marcels
+„brauchen wir nicht gross oben … wäre aber gut, wenn man ihn noch
+irgendwo stehen hätte" war damit schon gebaut, nur nie benutzt.
+
+### Vier Fehler, und was sie lehren
+
+**1. `.app-wrap` ist ein GRID, kein Flex.** Mit `position:fixed`
+verschwindet die Objektspalte aus dem Fluss — **nicht aus dem Raster**.
+Die Hauptspalte rutschte in die 380-px-Spur und war 380 statt 1499 px
+breit.
+> Eine Spur bleibt stehen, auch wenn ihr Kind sie verlässt. Das Raster
+> gehört dem Elternteil, nicht dem Kind.
+
+**2. Die Grundregel schlug die Sonderregel.**
+`html[data-dp-layout] .dpl-schiene` ist (0,2,1),
+`.dpl-schiene[data-stellung="leiste"]` nur (0,2,0) — die
+Werkbank-Leiste blieb eine Spalte und war 144 statt 48 px hoch.
+**20 Stellen nachgezogen.** Genau die Falle aus `CLAUDE.md`.
+
+**3. Eine Regel am Elternteil ordnet nicht, was im Kind steht.** Der
+Aktionsblock hat einen inneren Behälter `.sb-actions-accordion-inner`;
+meine Zeilenregel am äusseren Knoten bewirkte nichts.
+
+**4. Eine falsche Diagnose, ausdrücklich zurückgenommen.** Ich hielt
+`transform` für von `style.css` überstimmt, weil `getComputedStyle` die
+Einheitsmatrix zurückgab — **auch bei INLINE gesetztem Wert**. Der
+Kaskaden-Walker fand aber keinen Überstimmer, und mit `transition:none`
+sass der Wert sofort bei −367 px.
+> **Der Tab lief im Hintergrund.** In einem versteckten Tab friert
+> Chrome jeden CSS-Übergang beim STARTWERT ein — die Messung zeigte
+> nicht den Zielzustand, sondern das erste Einzelbild eines Übergangs,
+> der nie weiterlief. `visibilityState` gehört vor JEDE Messung an einer
+> Animation. Das `!important` aus v1635c steht noch da; es schadet
+> nicht, löst aber nicht das Problem, für das ich es gesetzt habe.
+
+### Die Rückfrage vor dem Export (v1636)
+
+Marcel: „beim Bankexport müssen wir nachfragen, hell oder dunkel — da
+gibt's ja auch noch Abstufungen."
+
+**Gemessen, welche es wirklich gibt:** `window._dpPdfLight` (`pdf.js:600`,
+Vorgabe `false`) und `_cv(dunkel, hell)` an **13 Fundstellen**;
+`pdf-investment-bank.js` kennt den Schalter mit **null** Fundstellen.
+Daraus folgt genau eine Aufteilung — und **keine erfundene vierte**:
+
+| Fassung | was |
+|---|---|
+| **Bankfassung** | weisses Papier, immer hell |
+| **Investment-PDF · hell** | volles Dokument, helles Deckblatt |
+| **Investment-PDF · Obsidian** | volles Dokument, dunkles Deckblatt |
+
+Die beiden Exportfunktionen werden **umhüllt, nicht ersetzt**: jeder
+bestehende Aufrufer (Seitenmenü, Deal-Aktion, Dashboard-Karte,
+`hybrid-aktionen`) bekommt die Frage, ohne dass eine Aufrufstelle
+angefasst wurde.
+> Eine Umhüllung erreicht Aufrufer, die man noch gar nicht kennt. Eine
+> geänderte Aufrufstelle erreicht genau eine.
+
+Der Schalter gilt nur für DIESEN Export und geht danach auf den Stand
+des Mandanten zurück — ein Schalter, der stehen bleibt, färbt den
+nächsten Export mit, den niemand gewählt hat.
+
+### Abnahme (im Browser gemessen, Übergänge abgeschaltet)
+
+Alle fünf: Kopf 86 px · 9 Reiter sichtbar · 12 Aktionen sichtbar ·
+Nutzerblock und Abmelden da · Support und Rundgang da · **kein
+Querüberlauf**. Reiterwechsel über den echten Bedienweg geprüft
+(Objekt → Finanzierung). Export-Rückfrage erscheint mit drei Fassungen.
+
+**Umschalten:** `?layout=1..5`, oder der Umschalter unten links
+(bleibt sichtbar, sobald er einmal über die URL kam).
+
+**Rest.**
+- In **v5** bleibt das Aktionsmenü zugeklappt wie heute — dort ist die
+  heutige Bedienung ausdrücklich das Ziel.
+- Der alte **Kartenvarianten-Schalter** (v1517) erscheint jetzt
+  mit, weil die Layouts den hellen Skin setzen und er nur dort
+  auftaucht. Er ist ein eigenes Werkzeug und lässt sich schliessen.
+- Ein Layout für das Handy ist noch nicht gebaut; unter 900 px fallen
+  die Schienen in den Fluss zurück.
+
+## Rollout-Journal 26.09.2026 (8) — Darstellung, Anbieter, Erststart
+
+**Commits.** `fdc2d30` (v1637), `608a768`/`4acdf18` (Gold), `a8700cd`
+(v1638), `0316ee7` (Demo Bordkarte).
+
+### Der Aufbau steht jetzt in der Darstellung
+
+Der Layout-Umschalter hängt sich **von aussen** in `#dpuv-panel` ein, mit
+dessen eigener Markup-Sprache (`.dpuv-g`, `.dpuv-seg`, `.dpuv-sgb`), und
+steht dort als **erste** Gruppe „Aufbau" — vor „Modus", weil der Aufbau
+die gröbere Entscheidung ist.
+
+> `ui-varianten.js` hat 1.296 Zeilen und eine eigene Speicher- und
+> Anwendungsmechanik. Dort hineinzuschreiben hiesse, sie zu verstehen UND
+> zu riskieren. Ein Abschnitt, der sich von aussen einhängt, kann sie
+> nicht kaputtmachen — und erbt jede künftige Änderung am Panel.
+
+### Die Bewertungspartner sind unsichtbar, nicht gelöscht
+
+Marcel: „wir lassen die Programmierung im Hintergrund, dass wir später
+die Buttons wieder einfügen können." Zugleich die Hausregel aus
+`CLAUDE.md`: **namentlich nie nach aussen.**
+
+**EIN Schalter statt sechs Löschungen:** `PARTNER_AVM_SICHTBAR` in
+`object-actions.js`. `window.DP_PARTNER_AVM = true` holt alles zurück;
+`avmFetch`, `_oabApplyExternal` und die Reihenfolge in `order` wurden
+nicht angefasst. Dazu zwei Hinweiszeilen entschärft, die beide Namen
+trugen.
+
+> Ein auskommentierter Knopf ist eine Leiche. Ein Knopf hinter einem
+> benannten Schalter ist eine Entscheidung.
+
+**Nachgemessen:** vier Kacheln statt sechs (DealPilot · Exposé ·
+Sprache · ImmoMetrica), null Partnerlogos, null Hinweistexte mit Namen,
+`_oabApplyExternal` weiterhin vorhanden.
+
+### Der Gold-Wächter hat mich erwischt — und das ist gut
+
+`gold-audit` meldete nach dem Layout-Paket **RC=1**:
+
+| Datei | Basislinie → jetzt |
+|---|---|
+| `css/layout-varianten.css` | 0 → **6** (Datei war sauber) |
+| `css/hell-varianten.css` | 0 → 5 |
+| `js/pdf-investment-bank.js` | 0 → 1 |
+| `js/voice-import.js` | 2 → 4 |
+
+Meine sechs waren echt. Die übrigen waren Altbestand, der nie in der
+Basislinie stand. **Alle zehn abgetragen** — `rgba(201,168,76,.16)` wird
+`color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent)`, damit
+der Mandantenton mitfärbt statt hart zu bleiben.
+
+**Danach RC=0**, und die Basislinie ist von **448 auf 439** gesunken.
+Der Deckel darf sinken, nie steigen.
+
+> Und eine Falle am Rande: `python3 … | tail` gab **RC=0** zurück,
+> obwohl der Audit rot war. Der Exit-Code nach einer Pipe ist der des
+> LETZTEN Gliedes. Steht schon in `FALLEN.md`, und ich bin trotzdem
+> hineingelaufen — erst die Umleitung in eine Datei hat es gezeigt.
+
+### Whitelabel: gemessen, nicht angenommen
+
+Mit einem fremden Markenton (`#2F6FB3`) über die echte Schnittstelle
+`DealPilotWhitelabel.apply()`:
+
+| | vorher | nachher |
+|---|---|---|
+| `--wl-c9a84c` | (leer) | `#2F6FB3` |
+| `--dpl-gold` | `#C9A84C` | `#2F6FB3` |
+| Schriftzug „Pilot" | Gold | `rgb(35,85,138)` |
+| Goldkante am Reiter | Gold | `rgb(47,111,179)` |
+
+**Alles folgt dem Partnerton, ohne eine Zeile Sonderbehandlung.** Dazu
+zeigt die Schiene jetzt das **Mandantenlogo**, wenn eines hinterlegt ist
+— aus derselben Quelle wie die PDFs (`branding.get().logo_b64`).
+
+> **Zweite falsche Diagnose desselben Tages, ausdrücklich
+> zurückgenommen.** Ich meldete zuerst „die Goldkante übernimmt den
+> Partnerton nicht" — sie tat es, der Tab lief nur im Hintergrund und
+> der CSS-Übergang stand beim Startwert. Mit `transition:none` sass der
+> Wert sofort richtig. **Vor jeder Messung an Farbe, Grösse oder Lage
+> gehört `*{transition:none !important}` eingespritzt**, nicht nur vor
+> Zeitmessungen.
+
+### Erststart (v1638): erst nachgesehen, dann gebaut
+
+Marcel wollte dem neuen Kunden sagen, welche Standardwerte er setzen
+soll. **Bevor hier etwas entstand, habe ich geprüft, ob es die gibt.**
+Es gibt sie alle, in `DealPilotInvestmentProfile`:
+
+| | gemessen |
+|---|---|
+| Zinssatz | **4,27 %** (aus `marketRates`, ECB/Bundesbank 02/2026 + Marge) |
+| Eigenkapital | 20 % |
+| Tilgung | 1 % |
+| Mietausfallwagnis | 2 % (+ Leerstand 2 %) |
+| Nicht umlagefähige Kosten | 17 % |
+
+**Die Karte legt deshalb KEINE neue Einstellung an.** Sie zeigt die
+laufenden Werte und führt mit einem Klick auf
+`showSettings('standardwerte')` — dieselbe Seite, die der Nutzer auch
+sonst benutzt. Eine zweite Vorgabeliste wäre der siebte Fall von „zwei
+Listen für dieselbe Sache" in diesem Projekt.
+
+Sie erscheint **einmal je Browser** und nur, wenn die Tour noch nicht
+abgeschlossen ist — wer die Tour kennt, ist nicht neu.
+
+### Demo: die Bordkarte (fünf Entwürfe + Name)
+
+`frontend/entwurf-aktionsbox.html`. Gemessen trägt die Karte heute
+Perforation, Reisszone, Strichcode, QR-Feld und Abriss-Knopf — für eine
+Aufgabe aus **vier Kacheln und einem Knopf**.
+
+> Eine Metapher trägt, solange sie etwas erklärt. Erklärt sie nichts
+> mehr, ist sie Dekoration — und Dekoration ist genau das, was einem
+> Banker auffällt.
+
+Fünf Entwürfe, 58 bis 325 px hoch (heute rund 140).
+**Namensvorschlag: „Datenaufnahme"** — „Pre-Flight" trifft nicht (hier
+wird nichts geprüft, hier wird eingelesen), „Aktionsbox" beschreibt die
+Form statt den Zweck.
+
+**Rest.**
+- Die Bordkarte ist bislang nur ein Entwurf — der Umbau wartet auf
+  Marcels Wahl.
+- Das Untermenü beim Anlegen eines neuen Objekts (PDF-Import ·
+  Partnerschnittstellen · DealPilot) ist noch offen; Entwurf 3 und 4 der
+  Demo sind die Vorlage dafür.
+- Der Erntelauf läuft weiter.
+
+## Rollout-Journal 26.09.2026 (9) — aus der Bordkarte wird eine Zeile
+
+**Commits.** `7de41be` (v1639), `33d865d`/`262b1e7`/`3df61ac`/`0b7bbea`/
+`b3e5db5`/`81f1d49` (v1639b–g), `8e3dc1a` (v1639h).
+
+### Ohne ein Zeichen Markup anzufassen
+
+Marcel wählte Entwurf 1. Der Umbau läuft **ausschliesslich über CSS** —
+der Vertrag, an dem die gesamte Mechanik hängt, bleibt Zeichen für
+Zeichen stehen:
+
+```
+.dp-pf-tile + input[value=…]   ← selectedSources() liest genau das
+#oab-run                        ← der Ausloeser
+#oab-results                    ← wohin die Marktpreisindikation kommt
+.dp-pf-tile.on / .dp-pf-led     ← der Zustand je Quelle
+```
+
+> Eine Umgestaltung, die Markup anfasst, muss jede Mechanik daran neu
+> beweisen. Eine, die nur Flächen setzt, **kann** nichts kaputtmachen.
+
+**Nachgewiesen über den echten Bedienweg:** ein Klick auf eine Kachel
+setzt `.on` UND `input.checked`; `#oab-results` steht bereit. Der Abruf
+selbst wurde NICHT ausgelöst — er kostet Kerosin, und das ist Marcels
+Entscheidung, nicht meine.
+
+Zierat wird **ausgeblendet, nicht gelöscht**: Streifen, Perforation,
+Trenner, Strichcode. Der QR bleibt — er ist das einzige Element der
+alten Karte, das etwas TUT.
+
+**Beschriftung:** „PRE-FLIGHT" → **„Datenaufnahme"** (an zwei Stellen:
+Aufklapper und Titel), „Daten einlesen" → **„Daten übernehmen aus"**.
+„Marktbewertung" stand schon da.
+
+### Vier Kaskadenfehler an einem Nachmittag — alle dieselbe Familie
+
+| # | Befund | Ursache |
+|---|---|---|
+| 1 | Leiste 77 statt 49 px | `.dp-pf-seg` behielt `flex-direction:column` |
+| 2 | Zeile brach bei 1280 um | `.dp-pf-rz` hatte `min-width:208px` |
+| 3 | Zeile 76 statt 54 px | `#oab-run` trägt `min-height:50px` |
+| 4 | Layout 2 auf 390 px kaputt | Media-Query-Regeln ohne Anker |
+
+> **1 · DISPLAY GESETZT, RICHTUNG VERGESSEN.** `display:flex` sagt
+> nichts über die Richtung. Wer eine Spalte zur Zeile machen will, muss
+> BEIDES schreiben — dasselbe gilt für `flex-wrap`.
+>
+> **2 · MIN-WIDTH SCHLÄGT WIDTH**, genau wie min-height height schlägt.
+> Ein `width:auto !important` sieht dabei aus, als hätte man es
+> geregelt. Diese 208 px waren der ganze Umbruch: 1010 px Kinder plus
+> 42 px Abstände gegen 1028 px Platz.
+>
+> **3 · ID SCHLÄGT KLASSE**, und `!important` hilft nicht — es
+> entscheidet erst bei GLEICHER Spezifität. Wer eine Klasse schreibt
+> und sich wundert, sucht als erstes eine ID.
+>
+> **4 · EINE MEDIA-QUERY HEBT DIE SPEZIFITÄT NICHT AN.** Sie schränkt
+> nur ein, WANN eine Regel gilt — nicht, wie stark sie ist. Meine
+> Prefix-Korrektur aus v1636b hatte die eingerückten Zeilen in der
+> Media-Query nicht erfasst.
+
+### Gemessen, in drei Breiten
+
+| | Zeile | Layouts (v1/v2/v4) |
+|---|---:|---|
+| ab 1280 px | **54 px** (vorher 78) | Arbeitsfläche voll |
+| 834–1024 px | 95 px, zwei Reihen | Schiene wird Leiste |
+| 390 px | 211 px, gestapelt | Arbeitsfläche **386 von 390 px** |
+
+**Kein Querüberlauf in keiner Breite, in keinem Layout.**
+
+> Bei 390 px liess Layout 2 der Arbeitsfläche vorher **260 von 390 px**.
+> Jetzt wird aus jeder senkrechten Schiene eine waagerechte Leiste, und
+> bei den Spalten-Layouts übernimmt die **vorhandene** Handy-Schublade
+> der App. Der beste Handy-Entwurf ist der, den es schon gibt — ein
+> zweiter daneben hätte einen zweiten Zustand.
+
+Der Portfolio-Knopf wird jetzt IMMER gebaut und auf breiten Schirmen bei
+den Spalten-Layouts ausgeblendet. *Ein Bedienelement, das nur auf einem
+Gerät existiert, vergisst man beim Umbau des anderen.*
+
+**Rest.**
+- Die Checkliste (Entwurf 3) beim Anlegen eines neuen Objekts.
+- Quick-Check: die beiden Score-Karten weiss wie im Reiter Aktionen.
+- Der echte Abruf mit Marktpreisindikation ist ungeprüft — er kostet.
+
+## Rollout-Journal 26.09.2026 (10) — Score-Karten, Quick-Check, Checkliste
+
+**Commits.** `9fae29f` (v1640), `991cc2c` (v1641), `eb4f387`/`2d25603`/
+`b396672` (v1642–c), `e8d5579`/`89c6eff` (v1643/b).
+
+### Die Score-Karten sind dauerhaft weiss (v1640)
+
+Marcel (Korrektur mitten im Lauf): „im Tab Bewertung ist der DealScore
+Karten." — Gemeint waren also `.dpsh-pass`, nicht die Deal-Aktion.
+
+**Die helle Fassung gab es schon: 22 Regeln.** Sie hingen nur an einer
+Bedingung (`:is(html[data-ui-theme="kontor"|…], body.dp-chrome-hell)`).
+
+> „Dauerhaft weiss" heisst deshalb nicht: neue Regeln schreiben. Es
+> heisst: **die Bedingung faellt weg.** Eine Gestaltung, die es schon
+> gibt, wird nicht nachgebaut — sie wird entfesselt.
+
+Im OBSIDIAN-Modus nachgemessen: beide Karten `rgb(255,255,255)`.
+Beschriftungen umbenannt: „DealPilot Score" und „Investor Deal Score"
+statt „Pre-Flight · …" (4 Stellen).
+
+### Der Quick-Check ist eine eigene App (v1641/v1642)
+
+**Der teuerste Befund des Tages.** `quickcheck-app.html` laeuft in einem
+iframe. Deshalb hatte ihn WEDER die neue Datenaufnahme (v1639) NOCH das
+Ausblenden der Bewertungspartner (v1637) erreicht — **Sprengnetter und
+PriceHubble standen dort unveraendert auf der Karte**, fuenf Stunden
+nachdem ich gemeldet hatte, sie seien weg.
+
+> Ein iframe ist ein eigenes Dokument. Eine Regel, die in der
+> Hauptanwendung wirkt, wirkt darin GAR NICHT — und das sieht man nur,
+> wenn man hineinsieht.
+
+Jetzt laedt der Quick-Check dieselbe CSS. Dazu:
+
+- Die Partnerkacheln stehen dort **statisch im HTML** (nicht aus JS) und
+  bekommen eine eigene Ausblendregel. `QcApp.sprengnetter()` und
+  `QcApp.priceHubble()` bleiben vollstaendig.
+- Das Cockpit `#qb-bp` war `rgb(10,10,10)`; sein rechter Abriss
+  `#qb-stub` war schon weiss. Jetzt beide weiss mit Goldband — dieselbe
+  Grammatik wie `.dpsh-pass`.
+- **Kontrast nachgerechnet:** Beschriftungen 5,84:1, Werte 17,43:1.
+  Vorher standen sie auf `rgb(154,144,128)` — *ein heller Grauton ist
+  auf Schwarz zurueckhaltend und auf Weiss unlesbar.*
+
+> **Und eine Marke, die es nicht gab:** `html.qc-embedded` setzt erst
+> die Bruecke. Beim Einzelaufruf war `html.className` LEER, die Regeln
+> griffen nicht. Das Dokument traegt jetzt fest `class="qc-app"`.
+
+**Zwei eigene Messfehler, beide zurueckgenommen:**
+- Ich meldete fast „die Abruffunktionen sind weg", weil `w.QcApp`
+  `undefined` war. **`const QcApp = …` auf oberster Ebene ist eine
+  LEXIKALISCHE Bindung, keine `window`-Eigenschaft.** Erst
+  `eval('typeof QcApp')` zeigt sie — alle vier sind `function`.
+- Und ich hielt eine CSS-Regel fuer wirkungslos, obwohl ich nur die
+  falsche Seite gemessen hatte (siehe `qc-embedded` oben).
+
+### Die Checkliste beim Anlegen (v1643)
+
+Fragt VOR dem Anlegen, woher die Daten kommen sollen, und waehlt sie
+danach auf der Datenaufnahme-Zeile vor — **ueber den echten Bedienweg**
+(`click()` auf die vorhandene Kachel), damit `.on`, LED und Zaehler
+mitgehen.
+
+> Wer einen Zustand an der Datenhaltung setzt statt am Bedienelement,
+> baut sich einen zweiten Weg — und der vergisst die Haelfte.
+
+**Sie loest den Abruf NICHT aus.** *Vorwaehlen ist eine Erleichterung.
+Ausloesen waere eine Entscheidung — und die trifft, wer bezahlt.*
+
+Die Quellen werden aus der Zeile GELESEN, nicht hier aufgezaehlt: eine
+feste Liste waere am ersten Tag richtig und am dreissigsten falsch.
+
+> **Die Umhuellung hielt beim ersten Anlauf nicht.** `newObj.__nq` war
+> nach dem Laden wieder `false`: `function newObj(){}` ist eine
+> DEKLARATION und bindet sich beim Auswerten ihres Skripts an `window` —
+> sie frisst jede Umhuellung, die vorher lief. **Wer nicht weiss, wann
+> die Deklaration kommt, muss NACHSEHEN, nicht warten.** Jetzt ein
+> Waechter ueber 30 Sekunden plus ein Nachfassen nach `load`.
+
+### Der Abruf, Ende zu Ende nachgewiesen
+
+Einmal ausgeloest (Marcels Freigabe), nur DealPilot gewaehlt:
+
+```
+1 Quelle · kein Konsens · DealPilot
+Markteinschaetzung   Mittel  715.000 €   -3,8 %   3.084 €/m²
+Einordnung           Leicht ueber Markt
+Marktpreisindikation — kein Gutachten n. § 194 BauGB
+```
+
+**Die Marktpreisindikation macht sich unter der Zeile auf** (370 px),
+mit dem richtigen Hinweis. Die Umgestaltung hat keine Schnittstelle
+beschaedigt.
+
+**Rest.**
+- Beim Testlauf ist ein LEERES Objekt entstanden (ueber „Neues Objekt").
+  Es steht in Marcels Staging-Portfolio und kann weg — geloescht habe
+  ich es nicht, das ist seine Liste.
+
+## Rollout-Journal 26.09.2026 (11) — Landing-Ziele und die Stripe-Trennung
+
+**Commit.** `ebb1d97` (v1644).
+
+### Die Landing führte aus der Testumgebung in die Produktion
+
+Marcels Befund, und er stimmt: **13 feste Verweise** auf
+`https://app.dealpilot.immo/…` allein in `landing/index.html` — Anmelden,
+Kostenlos starten, vier Tarifknöpfe, drei Nachlege-Knöpfe, Guthaben und
+drei weitere CTAs. Dazu je zwei bis drei in `api.html`, `fragen.html`,
+`leistungsumfang.html`, `sicherheit.html`.
+
+> **Eine Testumgebung, deren Knöpfe in die Produktion führen, ist keine
+> Testumgebung.** Wer auf Staging „Registrieren" drückte, legte ein
+> ECHTES Konto an.
+
+`landing/assets/umgebung.js` liest den Host und schreibt um — **eine
+Stelle statt dreizehn**, und sie erfasst auch jeden Link, den es heute
+noch nicht gibt (MutationObserver). Die Produktion wird ausdrücklich
+nicht angefasst.
+
+**Nachgemessen auf `staging.dealpilot.immo`:** 13 Verweise auf
+`app.staging.dealpilot.immo`, **null** auf die Produktion.
+
+### Die Stripe-Trennung ist sauber — gemessen, nicht geglaubt
+
+| | Staging | Produktion |
+|---|---|---|
+| Geheimschlüssel | `sk_test_…` | `sk_live_…` |
+| Konto in allen Preis-IDs | **KEjyPDo0wo** | **GefFev8arz** |
+| starter / investor / pro | 19,99 / 34,99 / 49,99 | dieselben |
+| partner | 99,00 | 99,00 |
+
+Auch die **Kerosin- und AVM-Pakete** in der Staging-`.env` tragen
+durchgehend `KEjyPDo0wo`. Die Landing zeigt 19,99 / 34,99 / 49,99 —
+deckungsgleich mit der `plans`-Tabelle, aus der abgebucht wird.
+
+Der Checkout läuft über `POST /api/v1/subscription/checkout`
+(**401** auf beiden Hosts, existiert also und verlangt Anmeldung) und
+erzeugt die Sitzung SERVERSEITIG. Der Schlüssel verlässt das Backend
+nicht — deshalb steht im Frontend auch keiner. **Ein Testkauf auf
+Staging läuft damit gegen die Sandbox.**
+
+### Was im Standard WIRKLICH anders ist als vorher
+
+Marcel nahm an, der Auslieferungszustand sei unverändert. Gemessen
+(Obsidian, kein Layout-Attribut):
+
+| | vorher | jetzt |
+|---|---|---|
+| Kopfband | 189 px | **219 px, unverändert** |
+| grosser Investor Deal Score | da | **da** |
+| Layout-Attribut | keins | **keins** |
+| Datenaufnahme-Karte | 78 px Bordkarte | **54 px Zeile**, dunkel |
+| Streifen · Perforation · Strichcode | da | **weg** |
+| Bewertungspartner | 2 Kacheln | **weg** |
+| Score-Karten (Bewertung) | dunkel | **weiss** |
+| Beschriftungen | „PRE-FLIGHT" | „Datenaufnahme" |
+
+**Die ersten drei Zeilen bestätigen ihn, die übrigen fünf nicht.** Vier
+davon hat er ausdrücklich bestellt (Partner raus, Score-Karten weiss,
+Beschriftung, Umbau der Karte) — offen ist nur, ob der Umbau der Karte
+auch im OBSIDIAN-Standard gelten soll oder nur in den hellen Fassungen.
+Das ist eine Produktentscheidung und liegt bei ihm.
+
+## Rollout-Journal 26.09.2026 (12) — die Zeile ist gebunden
+
+**Commit.** `db01b03` (v1645).
+
+Marcel: „ja binde die Zeile." Die umgebaute Datenaufnahme galt bis
+hierher ÜBERALL — auch im Obsidian-Auslieferungszustand.
+
+> **Der Auslieferungszustand ist ein Versprechen.** Wer nicht
+> umschaltet, bekommt die App so, wie er sie kennt. Ein Umbau, der sich
+> nicht abwählen lässt, ist kein Angebot, sondern eine Ansage.
+
+### EINE Marke statt 46 Verzweigungen
+
+Alle 46 Regeln in `datenaufnahme.css` tragen jetzt den Vorsatz
+`body.dp-neue-karte` — auch die elf in den Media-Queries, die beim
+ersten Durchgang durchgerutscht wären (sie sind eingerückt und trugen
+den Anker deshalb nicht; ohne sie hätte die ALTE Bordkarte auf dem Handy
+`flex-direction:column` bekommen).
+
+Gesetzt wird die Marke von einer einzigen Funktion, wenn eine von drei
+Bedingungen gilt:
+
+| Bedingung | heisst |
+|---|---|
+| `body.dp-chrome-hell` | der helle Modus ist an |
+| `html[data-dp-layout]` | eines der fünf Layouts ist gewählt |
+| `html.qc-app` | das Quick-Check-Dokument (immer hell) |
+
+Beobachtet werden `<body class>` UND `<html data-dp-layout>` — der
+Skin-Schalter setzt die Klasse am `<body>`, also wird dort zugehört
+statt auf ein eigenes Ereignis zu hoffen.
+
+### Nachgemessen, beide Seiten
+
+| | Standard (Obsidian) | Layout 1 (hell) |
+|---|---|---|
+| Marke `dp-neue-karte` | **nein** | **ja** |
+| Kartenhöhe | **78 px** | **54 px** |
+| Grund | dunkel | `rgb(255,255,255)` |
+| Streifen · Strichcode · Perforation | **alle da** | **alle weg** |
+| Vorspann | da | weg |
+
+**Die alte Bordkarte steht im Standard Zeichen für Zeichen wie vorher.**
+Einzige bleibende Änderung dort: die beiden Bewertungspartner fehlen —
+und das war ausdrücklich bestellt und ist zugleich Hausregel.
+
+Der Quick-Check trägt die Marke **fest im Dokument**
+(`<body class="dp-neue-karte">`), bleibt also hell, wie gewünscht.
+
+## Rollout-Journal 28.09.2026 — die Typografie war der eigentliche Bruch
+
+**Commits.** `db39c9c` (v1646), `5a833f9` (v1646b), `4625447` (v1647),
+`b442dcb` (v1648), `c87735a` (v1648b).
+
+Marcel: „das passt ja garnicht. sieht ja garnicht so aus wie es soll.
+auch schriften etc nachziehen. das muss nicht gold sein die
+schriftfarbe." — Er hatte recht, und der Grund war messbar.
+
+### Drei Sans-Schriften auf einem Schirm
+
+| Schrift | vorher | nachher |
+|---|---:|---:|
+| Inter | 1.501 | 1.864 |
+| **IBM Plex Sans** | **507** | **0** |
+| **DM Sans** | **154** | **26** |
+| **JetBrains Mono** | **112** | **356** |
+| Space Grotesk | 79 | 68 |
+
+`CLAUDE.md` kennt vier Schriften. **IBM Plex Sans und DM Sans stehen
+dort nicht** — sie sind gewachsen (`style.css:29164` erklärt IBM Plex
+einmal zur „Hauptschrift", 112 weitere Regeln setzen DM Sans, darunter
+`body` und alle Eingabefelder).
+
+### Der grösste Einzelunterschied stand in keiner Farbe
+
+**Die Zahlen liefen in Inter.** `.num`, `.kv-v`, `.pos`, `.neg`,
+`.kpi-val` — alle proportional gesetzt, ohne `tabular-nums`.
+
+> Eine Spalte Zahlen, deren Ziffern verschieden breit sind, liest sich
+> wie eine Liste — nicht wie eine Rechnung. **Daran erkennt ein Prüfer
+> eine Tabelle, die stimmt.** Jetzt JetBrains Mono mit `tabular-nums`,
+> 356 statt 112 Stellen.
+
+### Gold ist eine Linie, keine Schriftfarbe
+
+Vierzehn Klassen trugen Gold als TEXTFARBE — Abschnittsbeschriftungen,
+Aufklapp-Pfeile, „TOP DEAL", Bannertitel. `#C9A84C` liegt auf hellem
+Grund bei rund **2,3:1** und damit unter jeder Lesbarkeitsschwelle.
+
+Grün und Rot bleiben; der Bewertungsstern bleibt golden — er IST die
+Wertung, kein Text.
+
+### Karten: flach statt schwebend
+
+Gemessen: 12 px Radius, Schatten `0 2px 12px`. Jetzt 2 px, kein
+Schatten, Haarlinie.
+
+> Ein Schatten hebt eine Karte von der Fläche ab — das will ein
+> Dashboard. Ein Gutachten will das Gegenteil: alles auf EINEM Blatt,
+> getrennt durch Linien, nicht durch Höhe.
+
+### Zwei eigene Fehler
+
+**1 · `#s0 .card{border-radius:12px !important}`.** Meine Regel
+`html[data-dp-layout] .body .card` ist (0,3,1), die ID-Regel (1,1,0).
+**ID schlägt Klasse, und `!important` hilft nicht darüber hinweg** — es
+entscheidet erst bei GLEICHER Spezifität. **Zum zweiten Mal in zwei
+Tagen** (zuerst `#oab-run`). Gelöst mit `:is()` über die *gemessene*
+Liste der Abschnitts-IDs.
+
+**2 · Eine Regel, die eine Eigenschaft ändert, ändert nicht die andere
+mit.** Ich hatte an `.sc-pill-l` in v1646 nur die FARBE gesetzt und
+später festgestellt, dass die Schrift noch DM Sans war.
+
+### Eine bewusste Abweichung vom Entwurf
+
+Im Entwurf standen die **Feldbeschriftungen** als Mono-Versalien. Das
+trägt bei „PLZ" und „Baujahr" — aber **75 der 274 Beschriftungen sind
+ganze Sätze** („Erhöhung gilt auch für zusätzliche Einnahmen …").
+Versalien in Mono wären dort unlesbar.
+
+> Ein Entwurf, der mit acht Feldern gezeichnet wurde, gilt nicht
+> ungeprüft für 274. Die Beschriftungen bleiben, wie sie sind.
+
+**Alles nur unter `html[data-dp-layout]`** — der Auslieferungszustand
+bleibt unberührt.
+
+## Rollout-Journal 28.09.2026 (2) — sichtbar war nicht bedienbar
+
+**Commits.** `0adf929` (v1649) bis `adfdc5a` (v1649h).
+
+Marcel: „die verknüpfungen passen nicht alle … teilweise nicht alles zu
+sehen. einstellungen kann man nicht anklicken."
+
+**Alle drei Befunde stimmten, und alle drei waren meine Fehler.**
+
+### 1 · `pointer-events: none` — alle zwölf Aktionen waren tot
+
+`elementFromPoint` auf die Mitte des Knopfes lieferte die Schiene, nicht
+den Knopf. Das Akkordeon setzt `pointer-events:none` im ZUGEKLAPPTEN
+Zustand; ich hatte beim Aufklappen `display`, `height`, `max-height`,
+`overflow`, `opacity` und `visibility` gesetzt — und das eine vergessen.
+
+> **Sichtbar ist nicht bedienbar.** Ich hatte gezählt, was man SIEHT,
+> und daraus geschlossen, dass es geht. Eine Zählung von Knöpfen ist
+> keine Prüfung von Knöpfen — das sagt nur `elementFromPoint` auf den
+> Punkt, den der Finger trifft.
+
+### 2 · Das Menü ist ein Überlagerungsfeld
+
+`#sb-actions-accordion` trägt `position:absolute` mit `z-index:50`. In
+der Seitenleiste richtig — dort klappt es über die Objektliste. In der
+Schiene falsch: der Behälter blieb **12 px**, das Feld schwebte **637 px**
+darüber und deckte die Reiter zu.
+
+> Mein erster Versuch war `flex:0 0 auto` am Behälter — **das Opfer
+> behandelt.** Ein Behälter, dessen Kind aus dem Fluss ist, kann nicht
+> wachsen, egal welchen Flex-Wert er trägt.
+
+### 3 · 1148 px Inhalt in 854 px Fenster
+
+Sechs Aktionen lagen unter der Kante. Erst enger gesetzt (→ 1036), dann
+die richtige Antwort: **Flex-Grammatik statt Rechnung.** Marke,
+Portfolio, Reiter und Nutzer stehen fest, der Aktionsblock nimmt den
+Rest (`flex:1 1 auto`, `min-height:0`, `overflow-y:auto`).
+
+> Auf den letzten Pixel zu optimieren bricht beim nächsten Eintrag.
+
+### 4 · Eine Grösse sagt nichts über einen Ort
+
+Die Werkbank-Leiste stand bei **`top: 3987`** — unterhalb des gesamten
+Inhalts, keiner ihrer Knöpfe erreichbar. Die CSS ordnete sie mit
+`order:-1`; **`order` wirkt aber nur in einem Flex-Container**, und
+`.main-col` ist `display:block`.
+
+> Ich hatte damals ihre HÖHE gemessen (1702×95) und daraus geschlossen,
+> sie sitze richtig. Sie hing die ganze Zeit am Ende.
+
+Jetzt setzt `layout-varianten.js` sie per `insertBefore` hinter die
+Reiterleiste.
+
+### 5 · Eine Regel ohne Stellungsanker gilt für alle vier
+
+Die Scroll-Grammatik aus Punkt 3 ordnet eine SPALTE. Ohne Anker traf sie
+auch die waagerechten Stellungen — Werkbank fiel von 9/12 auf **0/12**.
+Zwei Stellungen sind senkrecht, zwei waagerecht; sie können nicht
+dieselbe Grammatik haben.
+
+### Stand nach der Reparatur
+
+| Layout | Aktionen erreichbar | Reiter |
+|---|---|---|
+| 1 · Aktenmappe | **12/12** | **9/9** |
+| 2 · Kanzlei | **12/12** | **9/9** |
+| 3 · Werkbank | 9/12 | **9/9** |
+| 4 · Dossier | 9/12 | 8/9 |
+| 5 · Cockpit hell | keine Schiene (richtig) | — |
+
+**„Einstellungen" öffnet wieder** — `#settings-modal` gemessen mit
+1707×854. Die Marke oben links von 15 auf 20 px.
+
+**Offen:** in Werkbank und Dossier sind drei der zwölf Aktionen nur über
+waagerechtes Scrollen erreichbar.
+
+---
+
+## Rollout-Journal · 28.09.2026 (3) — Trichter, Bordkarte, dunkle Schiene
+
+**Was:** die Datenaufnahme bekommt eine **zweite Achse** neben dem
+Aufbau — drei wählbare Stile (Zeile, Trichter, Bordkarte); die dunkle
+Schiene wird zu Ende gefärbt; zwei Werkzeugfenster räumen auf dem Handy
+das Feld.
+
+**Commits:** `827d01b` v1650c · `d164c9e` v1651 · `7015e45` v1651b ·
+`b3524e8` v1651c · `ba83e22` v1651d · `641295e` v1651e · `87081a0`
+v1651f · `aff2d4c` v1652 · `8822884` v1652b · `c25c83b` v1652c ·
+`b1e54dd` v1652d
+
+**Nachweis:** siehe die einzelnen Messungen unten. Kurzfassung:
+Kontrast in beiden senkrechten Schienen **70 Textträger geprüft, null
+unter 4,5**; Bedienbarkeit der Datenaufnahme auf 390 / 834 / 1280 px
+**alle Kacheln und der Abrufknopf `ok`**, kein Überlauf; der
+Stilumschalter in den Einstellungen **10 von 10 Knöpfen klickbar**, und
+Trichter → Bordkarte → Automatisch setzt, merkt und wählt ab.
+
+---
+
+### 1 · Der neue Schalter hiess wie ein alter
+
+`karten-stil.js` setzte `data-dp-karte` am `<html>`. **Den Namen führt
+`hell-varianten.js` seit v1517 (22.09.) schon** — sechs Kartenvarianten
+`v1`…`v6`, 44 Regeln in `hell-varianten.css`.
+
+Zwei Module auf demselben Attribut löschen sich gegenseitig: wer den
+Kartenstil wählt, verliert die Hellvariante, und **nichts widerspricht**.
+
+> Aufgefallen ist es nicht beim Umschalten, sondern bei einer
+> Bedienbarkeitsmessung auf 390 px: `#dp-kv-panel` — das Werkzeugfenster
+> jenes anderen Moduls — lag über der Datenaufnahme. Erst die Frage,
+> WOHER dieses Panel kommt, brachte die Kollision ans Licht.
+
+Umbenannt auf `data-dp-kartenstil`, 60 Stellen. **CLAUDE.md sagt
+„Namensräume nie mischen" — das gilt auch für Attributnamen.**
+
+### 2 · Zwei Werkzeuge, die die Anwendung unbedienbar machten
+
+`elementsFromPoint` auf die Quellkacheln bei 390 px nannte zwei
+Verdecker, beide `position:fixed`:
+
+| Element | Grösse | z-index | Herkunft |
+|---|---|---|---|
+| `#dp-kv-panel` | 214×455 | 9998 | `hell-varianten.js` |
+| `.dpl-schalter` | 374×154 | 2147483000 | **meiner**, v1635 |
+
+Drei von vier Kacheln und der Abrufknopf waren nicht zu drücken.
+
+> Ich hatte das fremde Panel ausgeblendet und danach meinen eigenen
+> Schalter gemessen, der dasselbe tut. **Ein Fehler, den man bei
+> anderen findet, steht meist auch im eigenen Bau.**
+
+Beide unter 900 px weg. Verloren geht nichts: der Aufbau steht in den
+Einstellungen unter „Darstellung", `?layout=` und `?karte=` wirken auf
+jeder Breite.
+
+### 3 · Der Grund war dunkel, die Schrift nicht
+
+Nach v1650 war die Schiene obsidian — die **Schrift darin aber noch die
+für hellen Grund**. Mit dem Kaskaden-Walker über alle Textträger,
+Kontrast gegen `rgb(14,13,11)`:
+
+| Klasse | Farbe | Kontrast | Stellen |
+|---|---|---:|---:|
+| `.tab-lbl` | `rgb(26,23,20)` | **1,09** | 9 |
+| `.sb-act-l` | `rgb(59,53,45)` | 1,60 | 12 |
+| `.sb-actions-l` | `rgb(59,53,45)` | 1,60 | 1 |
+| `.sb-act-section-title` | `rgb(122,114,104)` | 4,10 | 5 |
+| `.tabs-status-text` | — | 1,08 | 1 |
+
+**1,09 heisst unsichtbar.** Der aktive Reiter „Objekt" stand als reines
+Symbol da; ich hatte seine Beschriftung deshalb für *leer* gehalten.
+
+Dabei ein zweiter Lehrsatz: meine erste Korrektur benannte
+`.sb-actions-l` ausdrücklich **und verlor trotzdem** —
+`style.css:26792` schreibt `aside.sidebar .sb-actions-trigger
+.sb-actions-l`, drei Klassen gegen meine zwei, beide ohne `!important`.
+
+> **Eine Klasse zu benennen heisst nicht, sie zu treffen.** Wer eine
+> fremde Farbe überschreibt, muss wissen, WELCHE Regel sie setzt.
+
+### 4 · Eine Angabe auf ein Gitter, das es nicht gibt, ist leer
+
+Im Trichter war `.dp-pf-lead` 189 px hoch — auf den Pixel so hoch wie
+der Ertragsblock daneben. Ursache: `grid-row: 1 / -1` zählt die Linien
+des **expliziten** Gitters. Ich hatte nur `grid-template-columns`
+gesetzt, keine `-rows`; das explizite Gitter hat also null Zeilen, und
+`1 / -1` fiel auf `1 / 1` zusammen. Statt zu spannen blies der Block
+Zeile 1 auf seine eigene Höhe auf. `span 50` hängt nicht daran.
+
+### 5 · `:not()` erbt die Spezifität seines Arguments
+
+Der Handy-Aufklapper `.dp-pf-mtrigger` stand bei **1706 px** Breite da,
+283 px breit — obwohl `style.css:33229` ihn versteckt und erst unter
+640 px einblendet.
+
+Täter ist eine Sammelregel:
+`.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn)…{display:inline-flex !important}`
+— acht Klassen plus ein Element, also (0,8,1). Mein Gegengewicht war
+(0,1,0). **Zwischen zwei `!important` entscheidet die Spezifität**, und
+sieben davon steckten in den `:not()`.
+
+> Eine Ausnahmeliste aus acht `:not()` ist keine Präzision, sondern
+> eine Wette darauf, dass niemand einen neunten Knopf baut.
+
+Behoben an der Stelle, die ihre Ausnahmen führt: ein neuntes `:not()`.
+
+### 6 · Ein Beobachter, der auf seine eigenen Änderungen reagiert
+
+Die Bordkarte **fror den Browser-Tab ein**. `zaehlung()` setzte bei
+jedem Aufruf `textContent`, der MutationObserver (`childList`,
+`subtree`) feuerte darauf und rief `anwenden()`. Kein Fehler in der
+Konsole, keine Meldung — nur Stille.
+
+Zwei Riegel: nur bei echter Änderung schreiben, **und** den Beobachter
+abklemmen, solange gearbeitet wird (Wiederanschluss erst im nächsten
+Bild, sonst stehen die eigenen Änderungen schon in seiner Warteschlange).
+
+### 7 · Zwei Zurücknahmen
+
+**(a)** Ich habe an einem auf 62 % verkleinerten Bildschirmfoto
+behauptet, die Aktenmappe sei hell geblieben. Falsch — `elementFromPoint`
+an acht Punkten: überall `rgb(14,13,11)`. **Ein herunterskaliertes Bild
+ist kein Farbbeweis**; dunkle Flächen mit hellen Linien werden beim
+Verkleinern gemittelt.
+
+**(b)** Ich habe gemeldet, bei 1280 px verdecke die Objektliste zwei
+Kacheln. Falsch — `data-dpl-portfolio` stand auf `"zu"`, und mit
+abgeschalteter Animation sass die Liste bei **x = −367**. Die
+Messkabine lief im Hintergrund (`visibilityState: "hidden"`), und in
+einem versteckten Tab friert Chrome jeden Übergang beim Startwert ein.
+**Diese Falle steht als Kommentar an genau der Regel, die ich gemessen
+habe** — und ich bin trotzdem hineingelaufen, weil ich
+`visibilityState` nicht vorher gelesen habe.
+
+### 8 · `display:flex` sagt nichts über die Richtung
+
+Zum **dritten Mal** derselbe Fehler (nach `.dp-pf-seg` in v1640 und
+`.dpl-schiene` in v1649): `.dp-pf-lead` stand in der Bordkarte
+untereinander, weil ich `display` und `align-items` gesetzt habe und die
+Richtung nicht — sie erbte `column` aus der Zeilen-Grammatik. Danach
+dasselbe noch einmal mit `justify-content`.
+
+> Wer ein Element zum Flex-Behälter macht, **das vorher schon einer
+> war**, erbt dessen Richtung und Ausrichtung. Ab jetzt gehören beide
+> in jede solche Regel, auch wenn `row`/`flex-start` die Vorgabe sind.
+
+### Was jetzt steht
+
+| | |
+|---|---|
+| **Aufbau** (5 Layouts) | Einstellungen → Darstellung → „Darstellung öffnen" |
+| **Datenaufnahme** (3 Stile) | ebenda, direkt darunter |
+| Beides per URL | `?layout=1…5` · `?karte=zeile\|trichter\|bordkarte` |
+| Merker | `dp_layout` · `dp_karten_stil` |
+
+**Rest:** der Weg zu beiden Schaltern ist **drei Klicks tief**
+(Einstellungen → Darstellung → „Darstellung öffnen"). Sie funktionieren,
+aber wer sie nicht kennt, findet sie nicht.
+
+---
+
+## Rollout-Journal · 28.09.2026 (4) — Marcels Durchgang, und nur noch zwei Layouts
+
+**Was:** Werkbank, Dossier und Cockpit hell gestrichen; die **Kanzlei
+nach dem Entwurf neu gebaut** (sie war andersherum); Kopf und Schublade
+schwarz; zwei Knöpfe raus; das Fortschritts-Badge in den Kopf; der
+Scrollbalken weg.
+
+**Commits:** `68aecb6` v1653 · `3032037` v1653b · `45b35b9` v1653c ·
+`5a07615` v1653d · `9e7a713` v1653e · `33a7125` v1653f · `1d39b7e`
+v1653g · `fcd1c7c` v1653h · `b3b77e7` v1653i · `da6f1e8` v1653j ·
+`e451a8f` v1653k
+
+**Nachweis** (Aktenmappe und Kanzlei, je mit **geladenem** Objekt):
+
+| | Aktenmappe | Kanzlei |
+|---|---|---|
+| Kopf | `rgb(14,13,11)`, 30 geprüft, **0 unter 4,5** | dito |
+| Navigation links | 35 geprüft, **0** | 18 geprüft, **0** |
+| Kontextschiene rechts | — | 18 geprüft, **0** |
+| Zwölf Aktionen | **12× bedienbar** | **12× bedienbar** |
+| Neun Reiter | **9× bedienbar** | — |
+| Aktionsblock | 490/490 — **kein Balken** | passt |
+| Arbeitsfläche | — | **1685 px** (vorher 264) |
+| Überlauf | nein | nein |
+
+---
+
+### 1 · Die Kanzlei war andersherum gebaut
+
+Der Entwurf (`entwurf-hell-bankfaehig.html`, „Entwurf 2 — Kanzlei")
+zeigt **dunkle Navigationsspalte links** mit Marke, Portfolio, Reitern
+und Nutzer im Fuss — und rechts eine **helle Kontextschiene** mit den
+Aktionen: *„was man mit diesem Objekt tun kann, steht neben dem
+Objekt."*
+
+Gebaut war: Objektliste **hell links**, Aktionen **dunkel rechts**.
+
+Dafür nimmt ein Layout jetzt **mehrere Schienen** (`schienen[]` statt
+`schiene`), und die Farbe hängt an `data-ton` statt an der Stellung —
+sonst wäre die helle Kontextschiene zwangsläufig dunkel geworden.
+
+### 2 · Ein Skript, dessen Anker man nicht nachzählt
+
+Beim Umstellen der Farbe auf `data-ton` setzte mein Skript am **ersten**
+Vorkommen des Selektors an — das lag 950 Zeilen früher als gedacht.
+Damit wurden sechs **Struktur**regeln miterfasst:
+`[data-ton="dunkel"]{left:0}` **und** `[data-ton="dunkel"]{right:0}`
+trafen dieselbe Schiene, die spätere gewann, **und die Aktenmappe stand
+rechts**.
+
+> Ort hängt an der Stellung, Farbe am Ton, die gemeinsame Grammatik an
+> `.dpl-schiene` ohne beides. Und: die Zeilennummer wird geprüft, BEVOR
+> das Skript läuft.
+
+### 3 · Die Spur, die niemand mehr belegt
+
+Die Arbeitsfläche der Kanzlei war **264 px** breit bei 2133 px Fenster.
+`.app-wrap` ist ein **Grid**; die Objektspalte steht als Schublade
+`position:fixed` — **das nimmt sie aus dem Fluss, aber nicht aus dem
+Gitter**. Die 264-px-Spur blieb reserviert, und `.main-col` rutschte als
+erstes verbliebenes Kind hinein.
+
+Denselben Fehler hatte ich in v1 schon behoben und beim Umstellen von v2
+auf Schublade nicht mitgedacht. Dazu ein zweiter aus derselben Familie:
+die Schubladen-Regel **zählte v1, v3 und v4 auf** — v2 stand nicht darin
+und lag offen über der Arbeitsfläche. Sie hängt jetzt am Zustand
+(`data-dpl-portfolio`), nicht an einer Namensliste.
+
+### 4 · Vier Gestaltungsschichten auf einem Element
+
+Am laufenden `<html>` standen gleichzeitig:
+
+```
+data-dp-layout="v2"          der Aufbau
+data-dp-kartenstil="trichter"  die Datenaufnahme
+data-ui-theme="kontor"       die Darstellung  (Kundenfeature)
+data-dp-karte="v2"           hell-varianten.js  (WERKZEUG)
+```
+
+Die 44 Regeln des letzten färbten genau um, was der Aufbau gerade setzt.
+Marcels Satz *„das sieht auch nicht so aus, wie wir es besprochen
+haben"* hatte hier seine Ursache — nicht in einer falschen Regel,
+sondern in **einer Schicht zu viel**.
+
+> Der Dateikopf von `hell-varianten.js` sagt es selbst: „ein WERKZEUG
+> zum Ansehen, keine Funktion für Kunden." **Ein Werkzeug hat
+> zurückzutreten, wenn eine echte Ansicht danebensteht.**
+
+Es tritt jetzt zurück, solange ein Layout steht; der Merker bleibt, der
+Rückweg auf „Heute" bringt es wieder.
+
+### 5 · Vier Mal dieselbe Spezifitätsfalle an einem Tag
+
+| Stelle | Gegner | seine Spezifität | meine |
+|---|---|---|---|
+| `.dp-pf-mtrigger` | `.sec button:not()×8` | (0,8,1) | (0,1,0) |
+| `.sb-actions-l` | `aside.sidebar .sb-actions-trigger …` | (0,3,2) | (0,2,2) |
+| `#sidebar` | `html[data-ui-theme] body.dp-chrome-hell aside.sidebar#sidebar` | (1,3,3) | (1,1,1) |
+| `header.hdr` | `html[data-ui-theme] body.dp-chrome-hell header.hdr.has-v64-score` | (0,4,3) | (0,2,2) |
+
+**Zwischen zwei `!important` entscheidet die Spezifität.** Ein
+`!important` ist kein Trumpf, sondern nur eine zweite Liga derselben
+Rangfolge.
+
+Beim Kopf kam ein zweiter Befund dazu: er war **nur schwarz, solange
+kein Objekt geladen war**. Ohne `data-ui-theme` gewann meine zu schwache
+Regel — *ein Zustand, der beim Messen zufällig fehlt, macht eine zu
+schwache Regel stark.* Farbmessungen gehören an eine Ansicht mit echten
+Daten.
+
+**Ein Fall blieb ungeklärt:** bei `#hdr-obj-num` hatten Gegner und ich
+exakt (1,2,3), und `layout-varianten.css` lädt später (Zeile 4030 gegen
+40) — meine hätte gewinnen müssen. Sie tat es nicht. Gelöst durch eine
+Klasse mehr, **die Ursache ist offen**; ich schreibe das lieber hin, als
+eine Erklärung zu erfinden.
+
+### 6 · Zwei Rücknahmen in eigener Sache
+
+**(a) Ich habe die Kennzahlen-Pillen selbst unlesbar gemacht.**
+`.sc-pill *{color:#E9E3D6}` brachte RENDITE, FINANZ., RISIKO, LAGE und
+UPSIDE auf **1,28** — heller Text auf einer Pille, die weiss geblieben
+ist, weil ihr Elternteil `#hdr-badges` heisst. **Vorher waren sie
+lesbar.** Schrift aufhellen und die Fläche nicht mitnehmen ist schlimmer
+als beides zu lassen.
+
+**(b) Mein Kontrast-Walker hat falsch gemessen.** Er hielt alles gegen
+den Kopfgrund und meldete **23** schlechte Stellen. Gegen den
+*tatsächlichen* Grund jedes Elements sind es **7** — die anderen 16
+lagen in Popups mit eigener heller Fläche, wo dunkler Text richtig ist.
+
+### 7 · Was sonst noch raus musste
+
+- **`#dp-sb-toggle`** („Vollbild (Menü ausblenden)", 36×36, `fixed`,
+  z=9000) und **`#hdr-toggle-btn`** („Investor Deal Score
+  ein-/ausblenden") — beide schalten einen Zustand um, den ein anderes
+  Modul erzwingt. *Ein Knopf, der nichts tut, wirkt wie ein Fehler.*
+- **`#tabs-status-badge`** („0 / 6 · 0 %") steckte in `nav.tabs` und
+  wanderte mit den Reitern in die Schiene, wo es wie ein zehnter Reiter
+  aussah. Es gehört zum Objekt und steht jetzt im Kopf.
+- **Der Scrollbalken:** 32 px aus engeren Titeln und Einträgen — aber
+  eine Schiene, die bei zwölf Aktionen gerade so passt, scrollt bei der
+  dreizehnten wieder. Deshalb **zusätzlich** ein dünner, ruhiger Balken
+  statt eines hellen Streifens auf Obsidian.
+
+### Rest
+
+- Der Weg zu den Schaltern ist weiter **drei Klicks tief**
+  (Einstellungen → Darstellung → „Darstellung öffnen").
+- In `layout-varianten.css` stehen noch **61 tote Regelzeilen** für
+  v3/v4/v5 und die Stellungen `leiste`/`fuss`. Sie treffen nichts mehr.
+  Abzutragen, wenn die Datei ohnehin angefasst wird.
+
+---
+
+## Rollout-Journal · 28.09.2026 (5) — Marcels Lesbarkeits-Durchgang
+
+**Was:** der Kontrast-Prüfer repariert (er hatte falsch gemessen), drei
+unlesbare Stellen im Kopf, der doppelte Tooltip am Kontingent, die
+Objektliste zieht ins Menü, der Account nach unten links, die Bordkarte
+statt des Trichters, und die KPI-Angabe wird sichtbar.
+
+**Commits:** `a2006b3` v1654 · `82efb50`+`290d024` v1654b · `60a622e`
+v1654c · `935678e` v1654d
+
+**Nachweis** (beide Layouts, Objekt *Gerberstraße 27* geladen, Prüfer
+mit Alpha-Rechnung):
+
+| | Aktenmappe | Kanzlei |
+|---|---|---|
+| Kopf | 24 geprüft, **0 unter 4,5** | 24 geprüft, **0** |
+| Navigation links | 39 geprüft, **0** | 22 geprüft, **0** |
+| Kontextschiene rechts | — | 18 geprüft, **0** |
+| KPI-Angabe sichtbar | **5 von 5** | **5 von 5** |
+| Account-Block | unten | **14 px vom Rand**, Text 127 px |
+| Objektliste | im Menü, 17 Einträge à 59 px | dito |
+| `#sidebar` | `display:none` | `display:none` |
+| Arbeitsfläche | — | 1685 px |
+
+---
+
+### 1 · Mein Prüfer hat falsch gemessen — zum zweiten Mal
+
+Ich hatte „0 unter 4,5" gemeldet; Marcel konnte drei Stellen nicht
+lesen. **Beide Aussagen waren richtig.**
+
+Der Prüfer las den Hintergrund als Zeichenkette:
+
+```
+.hdr-comp-text       Grund rgba(63,165,108,.12)   → gemeldet: in Ordnung
+.hdr-autosave-text   dito                          → gemeldet: in Ordnung
+#hdr-credits-pill    Grund color(srgb … / .08)     → gemeldet: null
+```
+
+> **Eine halbtransparente Fläche hat keine Farbe, sondern eine
+> Rechnung.** Und `color(srgb …)` kannte er gar nicht — da gab er
+> `null` zurück, und ich habe das als „nichts gefunden" gelesen.
+
+Gegen den *effektiven* Grund — alle Flächen von unten nach oben
+übereinandergelegt:
+
+| | Kontrast |
+|---|---:|
+| `.hdr-autosave-text` | **1,10** |
+| `.hdr-comp-text` („20 / 24 Felder") | **1,10** |
+| `#hdr-credits-pill-label` („31 · 4 · 7") | **1,44** |
+
+Der reparierte Prüfer steht im Journal-Anhang und gehört in jede
+künftige Farbmessung.
+
+### 2 · Die Angabe war da, sie war nur ausgeblendet
+
+Marcel: *„Man kann auch den KPIs nicht entnehmen, wie viele angegeben
+wurden davon."*
+
+Jede Pille trägt `.sc-pill-sub` mit genau dieser Auskunft — **4/4, 5/5,
+5/6, 4/5, 2/4** — und sie stand auf `display:none`. Der Wert steht auch
+im `title`, aber ein `title` erscheint erst nach einer Sekunde
+Stillhalten, und danach sucht niemand.
+
+> **„2 / 4 KPIs" bei Upside erklärt die 56 %.** Ohne die Angabe sieht
+> die Zahl aus wie ein Urteil, dabei ist sie eine halbe Auskunft.
+
+### 3 · Zweite Rücknahme an derselben Stelle
+
+In v1653h hatte ich `.sc-pill *{color:#E9E3D6}` zurückgenommen — mit der
+Begründung, die Pillen seien „helle Kacheln auf dunklem Kopf" und
+deshalb lesbar. **Das stimmte nicht mehr:** `.sc-pill-v` trägt
+`rgb(26,23,20)`, und der Grund war seit v1653g der Kopf selbst.
+Kontrast 1,1.
+
+Meine eigene Änderung an `.hdr-v61-row2` hatte der Pille die weisse
+Fläche genommen, und das habe ich beim Zurücknehmen nicht mitgedacht.
+Diesmal Fläche UND Schrift zusammen.
+
+### 4 · Ein `title` ist kein stiller Zusatz
+
+Die Kontingent-Pille trug ein `title`-Attribut **und** ein eigenes
+Panel `.dp-kg-panel` (385×155) mit demselben Inhalt. Beim Überfahren
+erschienen beide — Marcels „zwei Felder-Menüs".
+
+Der Kommentar an der Stelle begründete es mit „Rückfall für Touch und
+Screenreader". Die Absicht war richtig, das Mittel nicht: `aria-label`
+leistet dasselbe ohne zweiten Kasten, und Touch ist über
+`:focus-within` versorgt.
+
+### 5 · „Nicht minimieren können" war der eigentliche Befund
+
+Die Objektspalte war eine Schublade: 380 px, über die Arbeitsfläche
+gelegt, **ohne Schliessen-Knopf** — nur Escape und ein Klick auf eine
+Karte. Wer das nicht weiss, sitzt fest.
+
+Jetzt klappt derselbe Knopf eine Liste **in** der Schiene auf und zu und
+zeigt seinen Zustand mit einem Pfeil. Verschoben wird der vorhandene
+`#sb-list`, keine Kopie — `storage.js` rendert weiter hinein.
+
+Mit wandern, weil es sie sonst nirgends mehr gäbe:
+`.sb-neu-row` (Quick-Check steht **nicht** im Aktionsmenü) und
+`.sb-section-title-with-sort` (Suche **und** Sortierung). Danach trägt
+`#sidebar` nichts Nutzbares mehr und fällt weg, samt Gitterspur.
+
+Aus der **210-px-Karte** wird eine **59-px-Zeile**: Adresse, Kennung,
+Kaufpreis, Score. Thumbnail, Kennzahlkacheln und Aktionsknöpfe sind
+versteckt — eine Liste zum *Suchen* braucht keine Auswertung.
+
+**Geprüft mit einem echten Mausklick**, nicht mit `.click()`: Objekt
+wechselt, Liste klappt zu.
+
+### 6 · Eine Breite, die nicht aufgeht
+
+`.sb-user-text` war **38 px** breit. Meine Flex-Regel war richtig, die
+Annahme darunter nicht: ich hielt `.sb-user-icons` für eine eigene
+Zeile. Gemessen ist es ein **Geschwister** im selben Flex-Behälter und
+118 px breit — von 187 px blieben nach Avatar (28) und Icons (118)
+genau 38.
+
+> Eine Breite, die nicht aufgeht, ist selten zu klein gesetzt —
+> meistens nimmt sie jemand anders weg.
+
+### 7 · Zum dritten Mal ein Werkzeug über der Anwendung
+
+Meine eigene Umschaltleiste (`.dpl-schalter`, `position:fixed`) lag bei
+`12,998` über dem Account bei `10,958`. Nach `#dp-kv-panel` und
+derselben Leiste bei 390 px ist das der dritte Fall an einem Tag. Sie
+zieht nach rechts.
+
+### 8 · Der Trichter ist nicht mehr der Standard
+
+Wer nichts wählt, bekommt in einem Layout die **Bordkarte** (Entwurf 5).
+Gesetzt als CSS-Regel `html[data-dp-layout]:not([data-dp-kartenstil])`,
+**nicht** per JS: ein `setze('bordkarte')` hätte `data-dp-kartenstil`
+gesetzt, damit `dp-neue-karte` ausgelöst und den
+**Obsidian-Auslieferungszustand verändert**.
+
+Ein bereits gemerkter `trichter` wird **einmalig** migriert — mit
+eigenem Marker, sonst könnte niemand den Trichter je wieder wählen.
+
+### Rest
+
+- **Die Score-Zusammensetzung selbst** ist noch nicht die der Demo:
+  dort steht ein Ring-Chip mit „Gute Bewertung / Investor Deal Score"
+  und eine Kennzahlenzeile mit **echten Werten** (Rendite 4,72 %, DSCR
+  1,27) — die App zeigt Score-Anteile in Prozent. Die fehlende
+  KPI-Angabe ist behoben, die Gestaltung ist offen.
+- Weiter offen: 61 tote Regelzeilen für v3/v4/v5; der ungeklärte
+  Spezifitätsfall bei `#hdr-obj-num`; der Weg zu den Schaltern ist drei
+  Klicks tief.
+
+---
+
+## Rollout-Journal · 28.09.2026 (6) — Der Deal Score bekommt seinen Chip
+
+**Was:** die Score-Zusammensetzung nach dem Entwurf — der Score war
+**ganz verschwunden**, gesetzt von dieser Datei.
+
+**Commits:** `ed0d449` v1655 · `6c39278` v1655b · `9e8f2ce` v1655c ·
+`fa6857b` v1655d
+
+**Nachweis** (Aktenmappe, Objekt *Gerberstraße 27*, Prüfer mit
+Alpha-Rechnung):
+
+| | |
+|---|---|
+| Chip | **40 px** (vorher: Block 141 px, dann gar nichts) |
+| Ring | 30 px mit „70", Kontrast **15,9** |
+| Note „Gut" | neben dem Ring, Kontrast 10,5 |
+| Kennzahlen | ein Band, je **190 px** (vorher 377) |
+| KPI-Angabe | „4 / 4 KPIs" unter jedem Wert |
+| Kopf | 26 geprüft, **0 unter 4,5** · Höhe 109 px |
+
+---
+
+### 1 · Der Score war weg, und ich hatte ihn weggenommen
+
+Gemessen: `.sc-main` — der Block mit Ring, Note und Bezeichnung — stand
+auf `display:none`, gesetzt von **dieser Datei**, Zeile 52. Sichtbar
+waren nur die fünf Anteils-Pillen und ein Textstück „70 Gut" in 11 px.
+
+Die Absicht von damals steht im Dateikopf und war richtig: Marcel wollte
+ihn *„nicht gross oben … wäre aber gut, wenn man ihn noch irgendwo
+stehen hätte."*
+
+> **Ich habe ihn verschwinden lassen und nichts Gleichwertiges
+> hingestellt.** Der Entwurf zeigt an dieser Stelle einen Chip: Ring mit
+> der Zahl, daneben die Note, darunter wofür sie steht.
+
+**Nachgebaut wurde nichts.** `.sc-donut`, `.sc-grade`, `.sc-v` und
+`.sc-l` waren alle vorhanden — nur unsichtbar. Der echte Ring zeigt
+auch den echten Fortschritt; ein nachgebauter hätte eine zweite
+Wahrheit. `#hdr-score-mini` tritt dafür ab: derselbe Wert zweimal im
+Kopf ist keine Redundanz, sondern eine offene Frage, welcher gilt.
+
+### 2 · Fünf Kacheln über einen Bildschirm sind keine Zeile
+
+Jede Pille war **377 px** breit, weil sich fünf auf 1.889 px verteilten.
+Der Entwurf setzt sie in **ein Band** mit Trennlinien, jede gleich
+breit. Jetzt 190 px, Werte in Mono mit gleichen Ziffernbreiten — so
+steht Zahl unter Zahl.
+
+### 3 · Drei Lücken in meinem eigenen Prüfer, an einem Tag
+
+| # | Lücke | Folge |
+|---|---|---|
+| 1 | Grund = Behälter statt erster Fläche | 23 statt 7 Befunde |
+| 2 | Alpha nicht ausgerechnet, `color(srgb)` unbekannt | „sauber" gemeldet, wo nichts lesbar war |
+| 3 | Pseudoelemente nicht geprüft | der weisse Ring-Innenkreis blieb unentdeckt |
+
+**Und beim Schliessen der dritten Lücke sofort ein Fehlalarm:** der
+erweiterte Prüfer meldete fünf Abschnittstitel auf 1,6. Nachgesehen ist
+ihr `::before` ein **goldener Zierstrich von 22×2 px,
+`position:absolute`** — kein Grund. Der echte Grund ist die Schiene,
+Kontrast **4,62**, im Bild einwandfrei lesbar.
+
+> **Ein Pseudoelement ist nur dann der Grund, wenn es die Fläche auch
+> deckt.** Ich habe die fünf Stellen deshalb NICHT angefasst — ein
+> Prüfer, dem man blind folgt, richtet denselben Schaden an wie einer,
+> der schweigt.
+
+### 4 · „Form geändert, Fläche vergessen" — zum zweiten Mal
+
+Der Chip sah golden aus, obwohl `.sc-main` gemessen `rgb(23,21,18)` und
+`background-image:none` trug. **Beide Messungen stimmten:** das Gold lag
+in `.si`, dem Behälter von Ring und Text — `linear-gradient(135deg,
+#E8CC7A, #C9A84C…)`, 193×30.
+
+Ich hatte `.si` auf `display:flex` gesetzt und seinen Hintergrund nicht
+angefasst. Derselbe Halbgriff wie bei den Score-Pillen in v1653h.
+
+### 5 · Die Richtung. Zum vierten Mal.
+
+Die Note stand **unter** dem Ring statt daneben. Ich hatte
+`flex-wrap:nowrap` gesetzt — gegen einen Umbruch, den es gar nicht gab.
+`.sc-donut-wrap` trägt `flex-direction:column`, und daran ändert
+`nowrap` nichts.
+
+Nach `.dp-pf-seg` (v1640), `.dpl-schiene` (v1649) und `.dp-pf-lead`
+(v1651e) ist das der vierte Fall.
+
+> **Wer an einem fremden Flex-Behälter etwas ändert, setzt
+> `flex-direction` mit — immer, auch wenn `row` die Vorgabe wäre.**
+
+### 6 · `#hdr-badges`, zum dritten Mal
+
+Der Chip-Hintergrund verlor gegen `#hdr-badges .sc-main.sc-tier-green`
+(1,2,0 mit `!important`). `.hdr-v61-row2` **heisst** `#hdr-badges`, und
+gegen eine ID hilft keine Klassenkette, so lang sie auch ist.
+
+> Wer in dieser Kopfzeile etwas umfärbt, nimmt `#hdr-badges` in den
+> Selektor. Das ist keine Vorsicht, das ist die Hausordnung.
+
+### Rest
+
+Die Kennzahlen zeigen weiterhin **Score-Anteile** („RENDITE 72 %"), der
+Entwurf daneben auch **echte Werte** (Rendite 4,72 %, DSCR 1,27). Das
+ist eine Produktentscheidung und steht als **P3c** im Backlog.
+
+---
+
+## Rollout-Journal · 28.09.2026 (7) — Der Schleier, der keiner mehr sein durfte
+
+**Was:** die Objektliste wieder bedienbar (ein Überbleibsel von mir hat
+sie blockiert), Quick-Check und Marktbericht raus, beim Portfolio
+treten die Reiter zurück, der Score-Chip wird hell wie im Entwurf, und
+die Karten bekommen schwarze statt grauer Kanten.
+
+**Commits:** `f0d0bd4` v1656 · `0af8889` v1656b · `c4d0faf` v1656c
+
+**Nachweis** (Aktenmappe, Objekt *Gerberstraße 27*):
+
+| | |
+|---|---|
+| Portfolio-Knopf, Suche, Nutzer | **TRIFFT** (vorher: alle „daneben") |
+| Erste fünf Objektkarten | **5× ok** |
+| Klick über `elementFromPoint` | Objekt lädt, Liste klappt zu, Reiter zurück |
+| Kartenkanten | `rgb(14,13,11)` — 4 von 4 · Score-Karten 2 von 2 |
+| Score-Chip | `#FBF6E9` mit schwarzer Fassung, Ring „70", „Gut" |
+| Schiene | 37 geprüft, **0 unter 4,5** |
+
+---
+
+### 1 · Der eigentliche Fehler war ein Überbleibsel von mir
+
+Marcel: *„wenn wir auf Portfolio klicken, dann kann ich kein Objekt
+auswählen. Es wird zwar was angezeigt, aber so richtig auswählen kann
+man das nicht."*
+
+Gemessen: `elementFromPoint` auf **jede** Stelle der linken Spalte gab
+`HTML` zurück — Portfolio-Knopf, Suchfeld, Nutzerblock, alle Karten.
+Nur der Kopf (`#hdr-obj`, z-index 300) war treffbar.
+
+Der Täter:
+
+```css
+html[data-dpl-portfolio="auf"]::after{
+  content:''; position:fixed; inset:0; z-index:65;
+  background:rgba(20,18,15,.34); }
+```
+
+Das war der **Schleier hinter der Schublade** — richtig, solange sie
+über der Arbeitsfläche lag. Seit v1654 gibt es keine Schublade mehr,
+die Liste steht in der Schiene. Der Schleier blieb, deckt `inset:0` mit
+`z-index:65`, und die Schiene hat 60.
+
+> **Er war genau dann aktiv, wenn man Portfolio öffnet.** Deshalb ging
+> der Knopf noch, und danach nichts mehr.
+
+### 2 · „HTML liegt ganz oben" heisst nie, dass HTML etwas tut
+
+`elementsFromPoint` nannte den Stapel:
+
+```
+HTML            <- der Schleier, als Pseudoelement des <html>
+.dpl-portfolio
+.dpl-schiene
+```
+
+> **Ein Pseudoelement erscheint in `elementsFromPoint` unter dem Namen
+> seines Elements.** Steht dort `HTML` an erster Stelle, hängt ein
+> `::before` oder `::after` am Wurzelelement — es ist nie das
+> Wurzelelement selbst.
+
+**Ich habe diesen Befund zweimal gesehen.** Beim ersten Mal (v1654)
+habe ich ihn für ein Artefakt gehalten und mit einem `dispatchEvent`
+gegengeprüft — *das die Trefferprüfung gerade umgeht.* **Ein
+simulierter Klick beweist nichts über Klickbarkeit.** Ein Klick muss
+über das gehen, was `elementFromPoint` liefert; alles andere misst die
+eigene Absicht.
+
+### 3 · Eine Zurücknahme
+
+Ich hatte zunächst `.main-col` mit seinem `overflow:hidden auto` für
+die Ursache gehalten und die Schiene deshalb an den `<body>` gehängt.
+**Das war falsch** — nach dem Umhängen blieb der Treffer `HTML`. Die
+Schiene bleibt trotzdem am `<body>`: dort kann sie niemand klippen, und
+das ist der richtige Ort für ein `position:fixed`-Element.
+
+### 4 · Dreimal in Folge: der Gegner war meine eigene Regel
+
+| Stelle | Sieger | Spezifität |
+|---|---|---|
+| Score-Chip Fläche | `#hdr-badges .sc-main.sc-tier-green` (style.css) | (1,2,0) |
+| Kartenkante | `html[data-dp-layout] .body :is(#s0,…,#s-marktbericht) .card` | **(12,4,1)** |
+| Schleier | `html[data-dpl-portfolio="auf"]::after` | — |
+
+Die mittlere ist meine eigene ID-Kette aus v1648: **zwölf IDs in einem
+`:is()` ergeben zwölf ID-Punkte.** Dagegen kommt keine Klassenregel an,
+auch keine eigene.
+
+> Wer eine `:is()`-Kette aus IDs gebaut hat, muss sie beim nächsten Mal
+> selbst wieder benutzen. Sie ist die stärkste Regel im Haus.
+
+### 5 · Zwei Ebenen, die einander ablösen
+
+Marcel: *„wenn man auf Portfolio klickt, könnte man darunter die
+Anzeige wegmachen mit Objekt bis Deal-Aktion."*
+
+Die Reiter gehören zu **einem** Objekt. Solange die Liste offen ist, ist
+keins gewählt — sie stehen dann für etwas, das gerade nicht zur Debatte
+steht, und kosten den Platz, den die Liste braucht. Jetzt: Portfolio
+**oder** dieses Objekt.
+
+### 6 · Der Chip nach dem Entwurf
+
+Der Entwurf setzt ihn auf `var(--flaeche)` — ein helles Blatt, nicht
+Obsidian. Marcel: *„muss nicht einen schwarzen Hintergrund haben."*
+Jetzt `#FBF6E9` mit schwarzer Fassung; die Stufenfarben bleiben (Grün
+`#2E8455`, Gold `#8A6B1F`, Rot `#A6322A`).
+
+Die Kartenkanten: **gemessen im Reiter Bewertung, nicht geraten** —
+`.dpsh-pass` (×2, die Score-Karten) und `.card` (×8) trugen Grau. Alles
+andere dort trägt bereits eine Statusfarbe und bleibt unangetastet.
+
+---
+
+## Rollout-Journal · 28.09.2026 (8) — `:is()` erbt ID-Spezifität
+
+**Was:** breitere Schiene, aufgeräumte Objektliste mit Stufenkante,
+einheitlich goldene Icons, Account in einer Zeile, Seiten tauschbar,
+Aktionen nach oben — **und die Auflösung eines Rätsels, das seit
+v1653i offen stand.**
+
+**Commits:** `dd15730` v1657 · `ab3071b` v1657b · `78fdf58` v1657c ·
+`8fa16fc` v1657d
+
+**Nachweis** (Aktenmappe, Objekt geladen):
+
+| | |
+|---|---|
+| Schiene | **248 px** (vorher 208) |
+| Kennung „2026-1037" | `rgb(140,133,120)` — vorher Kontrast **1,36** |
+| Kante | **2 px**, grün bei Score 70, grau ohne Bewertung |
+| DS2-Hinweis, Investor-Band | weg |
+| Icons Kopf / Reiter / Abschnitte | **alle `rgb(201,168,76)`** |
+| Plan-Pille | in `.sb-user-icons` |
+| Objektnummer in der Bordkarte | „Objekt 2026-1040" |
+
+---
+
+### 1 · Die Auflösung: `:is()` erbt die Spezifität seines stärksten Arguments
+
+**Drei Anläufe** lang blieb die Kennung unlesbar, obwohl meine Regel im
+Browser stand, `matches()` bestand und `!important` trug.
+
+Geprüft und **ausgeschlossen**: doppelt geladene Stylesheets, Inline-Stil,
+`@media`-Block, `@layer`. Ein Inline-`!important` wirkte; eine frische
+Regel mit demselben Selektor, ganz ans Ende gehängt, **nicht**.
+
+Der entscheidende Messschritt: die Gewinnerregel aus `style.css` matcht
+als **Ganzes**, aber **kein einziger ihrer komma-getrennten Teile** —
+weil die Kommas *innerhalb* eines `:is()` stehen.
+
+> **`:is()` erbt die Spezifität seines stärksten Arguments.** Steht
+> darin irgendwo eine ID, trägt die ganze Regel ID-Spezifität — auch
+> für die Klasse, die daneben steht. Dieselbe Falle, die CLAUDE.md für
+> `:not(#id)` notiert.
+
+**Und mein Kaskaden-Walker hat sie zweimal verschleiert**, weil er
+Selektoren am Komma zerlegt: bei `:is(a, b)` entstehen zwei ungültige
+Bruchstücke, und die Regel fällt aus der Wertung.
+
+**Damit ist `#hdr-obj-num` aus v1653i nachträglich erklärt** — derselbe
+Mechanismus, und ich hatte den Fall damals offen gelassen.
+
+Die Antwort ist nicht mehr Klassen, sondern eine eigene ID:
+`:is(#sb-list)` für die Liste, `header.hdr:has(#hdr-badges)` für den
+Kopf — **`:has()` erbt genauso.**
+
+### 2 · Was in der Liste nichts zu suchen hatte
+
+Gemessen an den 59-px-Zeilen:
+
+```
+.sbc-seq              „2026-1037"  rgb(59,53,45)   Kontrast 1,6
+.sbc-ds2-hint         „⚡ DS2"      51 px
+.sbc-investor-ribbon  „Investor"   position:absolute, 83x19
+```
+
+Band und DS2-Hinweis sind Signale für die **breite** Karte der alten
+Seitenspalte. In einer Zeile nehmen sie den Platz, den Kennung und
+Adresse brauchen — und verdecken sie dabei.
+
+Die Bewertung steht jetzt in der **Kante**: `:has(.sbc-score-green)`
+liest die Stufe dort, wo sie berechnet wird, keine zweite Wahrheit.
+
+> Die Kante trägt die Aussage, nicht die Fläche. Farbige Flächen wären
+> bei siebzehn Objekten ein Jahrmarkt; eine farbige Kante ist eine
+> Auskunft.
+
+### 3 · Ein schwarzes Icon auf schwarzem Grund
+
+Im Kopf standen drei Töne nebeneinander — Kontingent gold
+`rgb(232,204,122)`, `.sc-l-star` grau `rgb(110,103,92)`, und der
+Hilfe-Knopf mit `fill:rgb(0,0,0)`.
+
+> Ein schwarzes Icon auf schwarzem Grund ist kein Kontrastproblem,
+> sondern ein fehlendes Icon.
+
+Alle Symbole tragen jetzt denselben Goldton, als
+`var(--wl-c9a84c, #C9A84C)` — die Whitelabel-Pflicht gilt auch für neue
+Regeln.
+
+### 4 · Was nachgeliefert wird, braucht einen, der zusieht
+
+Die Plan-Pille wanderte nicht. Ursache: die Abo-Schicht reicht den
+Nutzerblock **nach**; beim Aufbau der Schiene stand sie noch nicht da.
+
+> Ein einmaliger Aufruf trifft nur, was schon existiert.
+
+Jetzt sieht ein `MutationObserver` auf `#sb-user` zu.
+
+### 5 · Seiten tauschen, ohne ein siebtes Layout
+
+Getauscht wird nur die **Stellung**, nicht der Ton: die dunkle
+Navigation bleibt dunkel, auch rechts. Sonst wäre es kein Tausch,
+sondern ein zweites Layout — und jede künftige Änderung müsste zweimal
+gemacht werden. Eigene Gruppe „Seiten" in den Einstellungen.
+
+### Rest
+
+- Die Bordkarte trägt die Objektnummer jetzt wie im Entwurf; der Kopf
+  („BOARDING PASS / DealPilot · Boarding") ist auf eine Angabe
+  zusammengezogen.
+- **Der Kaskaden-Walker gehört repariert**: er darf Selektoren nicht am
+  Komma zerlegen und muss `:is()`/`:not()`/`:has()`-Spezifität richtig
+  rechnen. Solange das nicht passiert, nennt er bei jeder solchen Regel
+  den falschen Sieger.
+
+---
+
+## Rollout-Journal · 28.09.2026 (9) — An der Demo ausgemessen
+
+**Was:** Score-Chip und Datenaufnahme nicht mehr genähert, sondern die
+Demos im Browser geöffnet und **jeden Wert ausgelesen**; dazu die
+Kartei als Standard, der Grauton im Arbeitsbereich, das Score-Band über
+die volle Breite und die Schmalschirm-Leiste repariert.
+
+**Commits:** `4251ab1` v1658 · `7e403de` v1658b · `fee562c` v1658c ·
+`812c85a` v1658d · `2d78ede` v1659 · `8b06b52` v1659b · `7ec7366` v1659c
+
+**Nachweis** (Aktenmappe, Objekt *Gerberstraße 27*):
+
+| | Ist | Soll (Demo) |
+|---|---|---|
+| Chip-Grund | `rgb(255,255,255)` | ✓ |
+| Chip-Rahmen | `rgb(206,198,182)` | ✓ |
+| Chip-Radius | `2px` | ✓ |
+| Ring | `25.99px` | ✓ (Demo: derselbe Wert) |
+| Kartei-Grund | `rgb(255,255,255)` | ✓ |
+| Kartei-Kopf | `rgb(244,242,237)` | ✓ |
+| Abrufknopf | **16 px vom rechten Rand** | ✓ |
+| Arbeitsbereich | `rgb(244,242,237)`, `.sec` durchsichtig | ✓ |
+| Score-Band | **1881 px**, Score + 5 Kennzahlen | ✓ |
+| Handy / Tablet | Marke, Portfolio, Reiter **alle ok** | — |
+
+---
+
+### 1 · „Sieht gekünstelt aus" ist ein Messbefund
+
+Marcel über den Score-Chip: *„das passt irgendwie noch gar nicht, das
+sieht sehr gekünstelt aus."*
+
+Statt ein viertes Mal zu nähern: die Demo geöffnet und jeden Wert
+ausgelesen. **Fünf Werte wichen ab** — Creme statt Weiss, schwarzer
+statt beigegrauer Rahmen (`#CEC6B6`), 6 statt 2 px Radius, 30 statt
+26 px Ring, andere Polster.
+
+> Fünf Werte daneben, und das Auge merkt es, bevor man es benennen
+> kann. **Ein Gestaltungsurteil ist messbar, wenn es eine Vorlage
+> gibt.**
+
+Bei der Bordkarte waren es drei: `#FFFDF9` statt Weiss, `#DCD4C2` statt
+`#CEC6B6`, Perforation 2 statt 1 px.
+
+### 2 · Die Kartei war nie gebaut
+
+Marcel: *„bei der Datenaufnahme hätte ich eigentlich gerne die Kartei,
+nur dass der Abruf-Button mit in die Kartei-Seite reinkommt, aber ganz
+auf die rechte Seite."*
+
+Der Entwurf 2 hat den Knopf **bereits** in einer Fusszeile ganz rechts.
+Es war also kein Umbau nötig — sondern der Entwurf, den ich noch nicht
+gebaut hatte. Er ist jetzt der Standard; ein gemerkter `trichter` oder
+`bordkarte` wird einmalig migriert.
+
+### 3 · Es fehlte nicht der Ton, sondern die Fläche
+
+Der Arbeitsbereich trug `#F8F6F1`, und trotzdem sah man kein Grau: die
+Abschnitte `.sec` darauf sind **weiss** und deckten ihn zu.
+
+> Die Abschnitte treten jetzt zurück, die Karten bleiben weiss — so
+> liegt das Papier auf dem Tisch und nicht auf Papier.
+
+`.sec` brauchte dafür wieder die **ID-Kette aus v1648** (zwölf IDs in
+einem `:is()`). Zum zweiten Mal an diesem Tag: wer sie gebaut hat, muss
+sie selbst wieder benutzen.
+
+### 4 · Zwei Kästchen sagen „zwei Dinge"
+
+Marcel: *„den Investor Deal Score hätte ich gerne über die gesamte
+Breite, mit den KPIs, und vielleicht am Anfang noch den Score."*
+
+Der Chip stand als eigenes Kästchen neben fünf Kacheln. Jetzt ist er
+die **erste Zelle desselben Bandes** — 1881 px, Score links, danach die
+fünf Kennzahlen mit ihrer Angabe „4 / 4 KPIs".
+
+> Die fünf Kennzahlen **sind** der Score. Zwei getrennte Kästchen
+> behaupten das Gegenteil.
+
+### 5 · Eine static-Leiste am body landet ganz unten
+
+Auf 834 px stand die Schiene bei **y = 1112** — unter dem Sichtfeld,
+kein Bedienelement erreichbar. Ursache war meine eigene Änderung aus
+v1656 (Schiene an den `<body>`, damit kein Vorfahr sie klippt): die
+Schmalschirm-Regel setzt sie auf `position:static`, und ein statisches
+Element am Ende des `<body>` steht hinter allem.
+
+Dazu zwei Fehler, die sich addierten und **in einer Messung sichtbar
+waren**: `z-index:80` gegen den Kopf mit 300 (unbedienbar), und
+`align-items:center` auf einer Flex-Spalte setzte ein 1026 px breites
+Kind in einem 834-px-Fenster auf **x = −96** (unsichtbar).
+
+### 6 · Rücknahmen
+
+- **Der schwarze Rahmen im Arbeitsbereich** ist zurückgenommen (wieder
+  golden, 22 %). Die Score-Karten behalten ihn — Marcel wollte ihn
+  dort. *Eine Rücknahme ist kein Rückschritt: der Rahmen war richtig,
+  wo er eine Fassung ist, und falsch, wo er acht Karten in Reihe zu
+  acht Traueranzeigen macht.*
+- **Gold bei Hilfe und Kontingent** ist zurückgenommen. Gold bleibt den
+  Symbolen, die zur Navigation gehören. *Wenn alles hervorgehoben ist,
+  ist nichts hervorgehoben.*
+- **Die Score-Kante an den Objektkarten** weicht dem **Deal-Status**:
+  grün gewonnen, rot verloren, gold in Bearbeitung. Ein Rahmen kann nur
+  eine Sache sagen.
+
+---
+
+## Rollout-Journal · 28.09.2026 (10) — Drei Regressionen, zwei davon meine
+
+**Was:** Marcel meldete, dass „Heute" nicht mehr wie Heute aussieht, die
+Pre-Flight-Karte nicht die alte ist und unten links **zehnmal „Pro"**
+steht. Alle drei reproduziert und behoben.
+
+**Commits:** `372a7c1` v1660 · `a9d7709` v1660b
+
+**Nachweis** (Layout wählen, Objekt laden, auf „Heute" zurück):
+
+| | vorher | jetzt |
+|---|---|---|
+| Plan-Pillen | **10** | **1** |
+| Hellmodus nach „Heute" | `true` | **`false`** |
+| `dp-neue-karte` | `true` | **`false`** |
+| Kopfverlauf | `none` | `linear-gradient(rgb(10,8,5)…)` |
+| Arbeitsbereich | weiss | `rgb(248,246,241)` |
+| Datenaufnahme | 266 px (Kartei) | **78 px mit Streifen** — die alte |
+| `data-dp-kartenstil` | `kartei` | **`null`** |
+| „+ Neues Objekt" | Kontrast **1,09** | **9,16** |
+
+---
+
+### 1 · Zehn Plan-Pillen — der teuerste Fehler des Tages
+
+Ich hatte die Plan-Pille per JS aus `.sb-user-text` in die Knopfzeile
+verschoben (v1657), damit sie neben „Abmelden" steht.
+
+**Die Abo-Schicht rendert `#sb-user` aber neu** und baut dabei eine
+NEUE Pille. Meine verschobene lag weiter in der Knopfzeile, und der
+Beobachter, der das Verschieben nachzog, legte bei jedem Lauf einen
+weiteren Merker-Eintrag an. Beim Zurückschalten stellte `zurueck()` sie
+alle wieder her.
+
+> **Wer einen Knoten verschiebt, den ein anderes Modul neu baut,
+> bekommt bei jedem Neubau eine Kopie dazu.** Das gilt für jeden
+> Knoten, der nicht mir gehört — und der Nutzerblock gehört der
+> Abo-Schicht.
+
+Das Verschieben ist **zurückgenommen**; ein Aufräumer entfernt die
+entstandenen Dubletten in bereits geladenen Browsern. Marcels Wunsch
+bleibt offen und gehört über CSS gelöst, ohne den fremden Knoten
+anzufassen.
+
+### 2 · „Heute" blieb hell
+
+`setze()` schaltet den Hellmodus ein (das ist richtig — die Layouts
+sind helle Fassungen) und hat ihn **nie zurückgestellt**.
+
+Mein erster Versuch merkte sich den Skin *vor* dem Layout. Gemessen las
+dieser Merker bereits `hell` — weil ein früheres Layout ihn im
+`localStorage` hinterlassen hatte. **Der „Zustand vorher" war selbst
+schon verfälscht.**
+
+> Jetzt hart auf Obsidian. Der Auslieferungszustand IST Obsidian; ein
+> Merker aus einer früheren Sitzung darf das nicht überschreiben. Wer
+> den Hellmodus will, wählt ihn in den Einstellungen — dort gehört er
+> hin, nicht als Nebenwirkung eines Layouts.
+
+### 3 · Der Kartenstil wirkte ohne Layout
+
+`data-dp-kartenstil="kartei"` blieb nach dem Zurückschalten am `<html>`
+stehen. Ergebnis: die Kartei statt der alten Bordkarte.
+
+> **Der Merker überlebt das Layout, die WIRKUNG darf es nicht.**
+> Dasselbe Prinzip wie bei `hell-varianten.js` in v1653e: eine Schicht,
+> die neben einer echten Ansicht weiterfärbt, macht jede Abnahme
+> wertlos.
+
+Das Attribut wird jetzt nur bei aktivem Layout gesetzt; ein Beobachter
+auf `data-dp-layout` entscheidet bei jedem Wechsel neu.
+
+### 4 · Die Kartei-Kopfzeile
+
+Sie stand **zentriert** (`.bp` bei x=1105 in einer 1278-px-Zeile) und
+zeigte weiterhin „BOARDING PASS". Beide Regeln aus v1659b waren richtig
+geschrieben und haben verloren — wie überall an diesem Tag gegen eine
+`:is()`-Regel mit ID-Spezifität.
+
+**Die Leiste heisst `#oab-bar`.** Mit ihrer eigenen ID im Selektor ist
+die Frage erledigt: linksbündig, „DealPilot", Zählung „0 von 4
+gewählt".
+
+> Wenn ein Element eine ID hat, ist sie das kürzeste Mittel gegen jede
+> fremde Regel. Man muss sie nur benutzen.
+
+---
+
+## Rollout-Journal · 28.09.2026 (11) — Marken, Anker, Spezifität
+
+**Was:** Der Rückweg auf „Heute" ist repariert — in drei Stufen, weil
+jede Stufe einen eigenen Täter freigelegt hat. Dazu die Kartei wie in
+der Vorlage und das Score-Band neu aufgebaut.
+
+**Commits:** `134881f` v1661b · `36d4294` v1662 · `3adc7b6` v1662b ·
+`0fc5e1b` v1662c
+
+**Nachweis** (nach `setze('')`, Objekt *Musterstraße 12, Leipzig*):
+
+| | Ist | Soll |
+|---|---|---|
+| `data-*` am `<html>` | nur `data-bg` (fremd) | ✓ keine eigene Marke |
+| `body`-Klassen | `dp-tt-beginner dpsh-on plan-pro` | ✓ |
+| Seitenspalte | `rgb(0,0,0)`, **380x988 relative** | ✓ |
+| Reiterleiste | `rgb(10,8,5)` | ✓ |
+| Arbeitsbereich | x=380, **1753 px** | ✓ |
+| Bordkarte | **78 px**, Boarding-Pass mit QR | ✓ alte Karte |
+| „Pro"-Pillen | **1** | ✓ |
+| Merker `dp_karten_variante` | `""` | ✓ |
+| Handy 390 / Tablet 834 | `main-col` volle Breite, kein Überlauf | ✓ |
+
+---
+
+### 1 · Drei Täter hintereinander, für **einen** Befund
+
+Marcel sah eine Sache: *„die Karten sind hell geworden im
+Auslieferungszustand und auch oben die Tabbar."* Dahinter lagen drei
+verschiedene Ursachen, und jede war erst sichtbar, nachdem die davor
+weg war.
+
+**v1661b — die Marken.** `--dp-s0` stand korrekt auf `#000`; die
+Farbtokens waren richtig. Weiß war es trotzdem, weil drei **Marken**
+hängen blieben: `body.dp-chrome-hell`, `html[data-ui-theme]`,
+`html[data-dp-karte]`.
+
+> Wer Tokens misst und Marken vergisst, sucht an der falschen Stelle.
+
+**v1662 — der Merker.** Das Attribut zu entfernen reichte nicht: nach
+`setze('')` stand `data-dp-karte` **wieder** auf `v3`.
+`hell-varianten.js` horcht seit v1653e auf `data-dp-layout` und meldet
+sich aus seinem eigenen Merker wieder an, sobald das Layout fällt. Und
+`v3` färbt genau die drei Flächen hell, die Marcel benannt hat
+(`hell-varianten.css:62–138`).
+
+Der Kopf dieser Stelle sagte es bis dahin selbst: *„Der Merker bleibt
+erhalten: wer das Layout wieder auf Heute stellt, bekommt seine
+Kartenvariante zurück."* **Das war meine Entscheidung, und sie war
+falsch.**
+
+> „Heute" heißt Auslieferungszustand, nicht „mein letzter
+> Werkzeugstand". Ein Werkzeug, das sich selbst wieder anschaltet, ist
+> kein Werkzeug mehr, sondern ein Zustand.
+
+**v1662b — der Anker.** Jetzt stimmten alle Farben, und die App stand
+trotzdem in einer **380 px schmalen Spalte**, die Seitenspalte bei
+x=−367. Sieger war
+
+```
+html[data-dpl-portfolio] #sidebar{
+  position:fixed; left:0; transform:translateX(-102%); }
+```
+
+In v1653 hatte ich die Schubladenregel bewusst an dieses Attribut
+gehängt, weil die Layoutliste (`v1,v3,v4`) v2 vergessen hatte. Das
+Abmelden arbeitete weiter die **alte** Liste ab.
+
+> Wer einen Anker wechselt, muss auch den Abbau umhängen. Ein
+> Aufräumen, das die alte Liste abarbeitet, lässt genau das stehen,
+> was neu dazugekommen ist.
+
+Zwei Gurte: `setze('')` entfernt das Attribut, **und** alle zehn
+Regeln tragen jetzt `[data-dp-layout]` als zweiten Anker — ohne Layout
+können sie gar nicht mehr feuern.
+
+### 2 · `@media` erhöht keine Spezifität
+
+In der Messkabine bei 390 px: `.app-wrap` 390 px breit, `.main-col`
+aber **142 px** und bei x=248. Nicht die Rasterspur — das **Polster**.
+
+```
+computed padding-left = 248px
+Sieger:    html[data-dp-layout="v1"]:not([data-dpl-seiten]) .app-wrap   (0,3,1)
+Verlierer: @media (max-width:900px){ html[data-dp-layout] .app-wrap }   (0,2,1)
+```
+
+> Ein `@media`-Block ändert nichts an der Spezifität seiner Regeln.
+> Eine Schmalschirm-Regel gewinnt nicht, **weil** sie in einem `@media`
+> steht — sie muss denselben Anker tragen wie die Regel, die sie
+> aufheben soll.
+
+### 3 · „Untereinander" hieß etwas anderes, als ich verstanden hatte
+
+v1661 hatte die beiden **Gruppen** nebeneinander gestellt und ich hatte
+den Punkt für erledigt gehalten (gemessen: beide `.dp-pf-seg` auf
+y=172). Marcel meinte aber das, was **in** ihnen passiert.
+
+An der Vorlage gemessen (`entwurf-aktionsbox.html`, Entwurf 2): die
+Demo-Kartei hat **keine Gruppentitel**. Sie hat eine Reihe mit vier
+Quellen — `flex-direction:row; gap:9px; padding:14px 15px`.
+
+> Eine Überschrift über zwei Chips ordnet nichts, sie halbiert nur die
+> Reihe. Vier gleichrangige Quellen brauchen keine Einteilung, sie
+> brauchen eine Zeile.
+
+Gemessen danach: vier Kacheln auf **y=206**, alle 42 px hoch, bei
+x=550/658/860/981; Knopf bei x=1727. Kartenhöhe 131 → **110 px**.
+
+### 4 · „Zu flach" war nicht die Höhe
+
+**Rücknahme:** v1661 hatte auf „zu flach" mit mehr Polster und
+größerer Schrift geantwortet. Das war die falsche Antwort. Gemessen an
+der Struktur:
+
+```
+div.sc-pill      334x55   display:GRID
+  div.sc-pill-l   53x13   „RENDITE"      x=457
+  div.sc-pill-v  244x19   „36 %"         x=518   <- 244 px breit
+```
+
+Die Zahl saß in einer 244 px breiten, rechtsbündigen Zelle — über
+200 px Leere zwischen Wort und Wert, in einer 55 px hohen Zeile.
+
+> Eine Zahl, die weit von ihrer Beschriftung wegsteht, muss mit dem
+> Auge wieder eingesammelt werden. Fünfmal nebeneinander wird das zur
+> Arbeit.
+
+Jetzt wie die Vorlage (`.kz` 214x52, `.n` 9 px Mono `#9A9287` als
+Block, `.v` 15 px Mono fett): Beschriftung oben, Wert darunter,
+linksbündig. Gemessen: Pille 332x**76**, Label y=66, Wert y=82 in
+20 px, Zählung y=107, Balken als Kante unten.
+
+### Rest
+
+- **Der Kaskaden-Walker gehört weiterhin repariert** (Komma-Zerlegung,
+  `:is()`-Spezifität). Er steht seit v1657 auf dieser Liste.
+- „Plan neben Abmelden" ist weiter offen — ohne den fremden
+  `#sb-user`-Knoten zu verschieben.
+- `dp_layout_variante` liegt als toter Merker im localStorage; kein
+  Modul liest ihn mehr.
+
+---
+
+## Rollout-Journal · 28.09.2026 (12) — Aktenmappe 2, und zweimal zwei Ursachen
+
+**Was:** Sechs Punkte aus einem Zuruf — die unsichtbare Wortmarke in der
+Kartei, eine zweite Aktenmappe mit Reitern oben, das Logo in der
+Flucht, die Prüfung der Farbverknüpfung (mit einem gefundenen Fehler),
+die QuickBoarding-Karte in der Form der DealScore-Karte und die
+Pre-Flight-Karte im QuickBoarding.
+
+**Commits:** `a15b2dc` v1663 · `fe06785` v1663b · `4ffa80f` v1663c ·
+`8afae72` v1663d · `c088e6d` v1663e · `6556412` v1663f
+
+**Nachweis:**
+
+| | Ist |
+|---|---|
+| Kartei-Chip „Deal" | `#F2EDE3` auf `rgb(5,5,5)` — vorher Kontrast **1,02** |
+| Aktenmappe 2 (`v1b`) | Reiter bei **y=61**, 1881 px, **nicht** in der Schiene |
+| Aktenmappe 1 (`v1`) | Reiter weiter in der Schiene (y=561), Schiene 248 |
+| Logo | **37 px** (vorher 31), Block 92 px, mittig statt oben |
+| Farbwahl nach F5 | `--gold` = gewählter Wert, Logo-„Pilot" folgt |
+| Kartei im QuickBoarding | vier Kacheln auf **y=504**, 42 px, eine Reihe |
+| QuickBoarding-Karte | Spalte; Abriss **1278×15** unten, Streifen **77 px** |
+| „Heute" danach | nur `data-bg`, Seitenspalte schwarz, `.main-col` 1753 px |
+| Handy 390 / Tablet 834 | kein Überlauf, Reiter voll breit, Schiene oben |
+
+---
+
+### 1 · „Das Deal ist in einem Grau"
+
+Gemessen war es kein Grauton: der Chip `.dp-pf-logo.dp` trug Text
+`rgb(26,26,24)` auf Grund `rgb(5,5,5)` — **Kontrast 1,02**. Ursache
+ist eine Hellmodus-Regel, die nur die Schrift umfärbt und annimmt, die
+Fläche gehe mit. Der Chip behält aber seine schwarze Pille.
+
+> Eine Hellmodus-Regel, die nur die Schrift umfärbt, setzt voraus, dass
+> auch die Fläche mitgeht. Tut sie es nicht, **löscht** die Regel das
+> Wort.
+
+### 2 · Ein Layout, das eine Zeile kostet
+
+Der ganze Unterschied zwischen Aktenmappe und Aktenmappe 2 ist ein Wort
+weniger in `nimmt`: ohne `'tabs'` bleibt `nav.tabs` dort stehen, wo es
+hingebaut wurde. Die allgemeinen Regeln greifen dort genauso.
+
+**Der Schlüssel heißt `v1b` und nicht `v3`:** `v3`, `v4` und `v5` waren
+früher eigene Layouts, und **22 ihrer CSS-Regeln stehen noch in der
+Datei**. Ein neues `v3` hätte sie stillschweigend geerbt. Damit die
+neun `[data-dp-layout="v1"]`-Regeln für beide gelten, heißen sie jetzt
+`[data-dp-layout^="v1"]` — gleiche Spezifität, keine Verschiebung.
+
+### 3 · Die Farben sind verknüpft — der Rückweg fehlte
+
+Marcels Frage war, ob Einstellungen → Darstellung mit dem Whitelabel
+verknüpft ist. **Sie ist es, und zwar sauber:** das Panel hat keinen
+eigenen Färbe-Weg, `farbenAnwenden()` reicht Akzent und Grundfarbe
+unverändert an `DealPilotWhitelabel.apply()` durch — dieselben
+`--gold*`-, `--wl-*`- und `--obsidian`-Tokens. Ein Kanal, mehrere
+Schreiber.
+
+**Gemessen fehlte aber der Rückweg.** Alle drei Aufrufer von
+`farbenAnwenden()` stehen innerhalb der Panel-Bindungen.
+`startAufbau()` stellte Vorlage, Karten und Bereichsfarben wieder her —
+`ui_accent` und `ui_obsidian` las beim Start **niemand**.
+
+> Eine Farbe, die man wählen kann und die das Neuladen nicht überlebt,
+> ist keine Einstellung, sondern eine Vorschau. Und sie sieht genauso
+> aus wie eine, die funktioniert — bis man F5 drückt.
+
+Zwei Bedingungen im Boot: nur wenn wirklich etwas gewählt wurde (sonst
+schaltete jeder Seitenaufruf den Sweeper ohne Anlass ein), und **nie
+beim Mandanten eines Partners** — dort gehört die Marke dem Partner.
+
+**Offen** (Befunde der Prüfung, nicht angefasst): die Grundfarbe gibt es
+nur als eine von sechs Kacheln, ohne freien Wähler, gesperrt sobald eine
+Vorlage aktiv ist, und sie wirkt nur auf drei Flächen
+(`css/ui-varianten.css:2506-2520`). Der Standard steht doppelt —
+`OBSIDIAN_STD='#050505'` gegen `DEF.obsidian='#070707'`.
+
+### 4 · Zwei Ursachen, die dasselbe Bild erzeugen — zweimal
+
+**Die Pre-Flight-Karte im QuickBoarding.** Marcel: „die sieht halt dort
+immer noch genauso aus." Gemessen waren es **zwei** Gründe:
+
+1. Das QuickBoarding läuft im iframe `#qc-v17-frame`
+   (`quickcheck-app.html`). Sein `<html>` trägt `qc-app qc-embedded` und
+   **kein** `data-dp-kartenstil` — die Marke saß am falschen Dokument.
+2. Die Leiste heißt dort **`#qc7-sources`**, nicht `#oab-bar`. Alle 29
+   Kartei-Regeln trugen die ID der Hauptanwendung — genau die ID, die
+   sie überhaupt gewinnen lässt.
+
+> Zwei Ursachen, die dasselbe Bild erzeugen, sehen aus wie eine. Hätte
+> ich nur die ID geweitet, wäre nichts passiert — und ich hätte die
+> Weitung für widerlegt gehalten.
+
+**Und ein dritter Grund kam nach** (v1663e): nach der Reparatur stand
+das Attribut korrekt, die Quellen standen aber weiter untereinander —
+das iframe lud `datenaufnahme.css` noch mit `?v=v1661`. Die HTML-Datei
+selbst hängt unter `quickcheck-app.html?v=v1645` im Cache. **Ein neuer
+Buster IN einer Datei erreicht niemanden, solange die Datei selbst
+nicht neu geholt wird.**
+
+### 5 · Der Abriss wandert von rechts nach unten
+
+Vorlage gemessen (`landing/dp2-hero.css:145-158`, `.idscard`): eine
+Spalte mit `.ids-tear` (15 px, `#0c0b09`, 2 px gestrichelt Gold 40 %,
+zwei 15-px-Ausstanzungen) und `.ids-foot` (zwei Beschriftungspaare
+links, weißer QR rechts).
+
+`#qb-bp` war eine **Zeile** mit weißem Abriss rechts — 208 px, die der
+Karte quer weggenommen wurden.
+
+> Ein Abriss rechts halbiert die Karte, ein Abriss unten schließt sie
+> ab. Dieselbe Metapher — nur kostet die eine ein Sechstel der Breite
+> und die andere 60 px Höhe.
+
+Umgebaut nur mit CSS: `.bp`, `.no`, `.cap`, `.lnk` und `.qrlink` waren
+alle schon da, sie standen nur untereinander. Ein Raster mit drei
+Spalten stellt sie wie die Vorlage.
+
+### Rest
+
+- **Staging-Abnahmepunkt Logo:** ob „in einer Flucht" genau diese Linie
+  meint, entscheidet das Auge. Die Zahlen stehen im Journal, damit die
+  nächste Runde nicht bei null anfängt.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- 22 tote CSS-Regeln für `v3`/`v4`/`v5` stehen weiter in
+  `layout-varianten.css` — sie haben diesmal den Schlüsselnamen
+  bestimmt.
+
+---
+
+## Rollout-Journal · 28.09.2026 (13) — Der Score wandert, und eine Währung geht
+
+**Was:** Das Score-Band zieht in der Aktenmappe 2 in die linke Schiene;
+die abgeschaffte Liter-Währung wird aus den letzten sichtbaren Stellen
+entfernt, zusammen mit einem Verstoß gegen die Anbieter-Neutralität,
+der daneben lag.
+
+**Commits:** `a1cfb0e` v1664 · `803881c` v1664b · `1248166` v1664c ·
+`cc12dfc` v1664d · `9232f3a` v1664e · `cc4e4ec` v1664f ·
+`5488436` v1664g · `a0b5537` v1664h
+
+**Nachweis** (Aktenmappe 2, Objekt *Musterstraße 12, Leipzig*,
+Schienengrund `rgb(14,13,11)`):
+
+| | Ist |
+|---|---|
+| Reihenfolge in der Schiene | suche · objekte · aktionen · **score** · nutzer |
+| „56" im Ring | `#F2EDE3`, Kontrast **16,65** |
+| „Verhandeln" | `#F2EDE3`, **16,65** |
+| „36 %" (tier-red) | `rgb(217,104,95)`, **5,64** |
+| „76 %" (tier-green) | `rgb(91,217,142)`, **10,88** |
+| Beschriftungen / Zählung | **5,31** / **3,48** |
+| Goldflächen in der Schiene | **keine** |
+| „Heute" / Aktenmappe 1 danach | Band zurück in `header.hdr` |
+| Sprache-Kachel | **kein** Kostenhinweis mehr |
+
+---
+
+### 1 · Vier Klassen schlagen keine ID — schon wieder
+
+Das Band stand nach v1664 an der richtigen Stelle und sah aus wie im
+Kopf: goldener Kasten 231×157, Kennzahlen auf 17 px gequetscht.
+
+```
+Sieger    body.dp-chrome-hell #hdr-badges .sc-main              (1,2,1)
+Verlierer html[data-dp-layout] .dpl-schiene .dpl-teil-score
+          .sc-main                                              (0,4,0)
+```
+
+> Das steht in CLAUDE.md, es steht in meinen eigenen Notizen, und ich
+> habe es trotzdem wieder gebaut.
+
+Alle 15 Kindregeln tragen jetzt `#hdr-badges` im Selektor. Dazu die
+Fläche, die ich übersehen hatte: das Gold sitzt nicht nur auf
+`.sc-main`, sondern eine Ebene **tiefer** auf `.si` — derselbe Befund
+wie v1650.
+
+### 2 · Erdrückt sieht aus wie zu klein gesetzt
+
+Danach griffen Polster (7/16/8) und Raster — und die Kacheln waren
+**15 px** hoch statt 32. Der Kaskaden-Walker sagte diesmal nichts,
+weil es keine Kaskadenfrage war:
+
+```
+.dpl-teil-score  215 px insgesamt
+.sc-main         113 px
+Rest             102 px für FÜNF Kacheln  ->  je 20
+```
+
+> **CLAUDE.md, wörtlich:** „Flex-Kinder in `overflow:auto`-Containern
+> schrumpfen, statt zu scrollen → `flex:0 0 auto` setzen." Ich habe es
+> an der Schiene gesetzt und an ihrem Inhalt vergessen.
+
+Ein zu kleines Polster sieht genauso aus wie ein erdrücktes Element.
+Beim Polster gewinnt eine Regel, beim Erdrücken die Rechnung — und
+keine Spezifität der Welt hilft dagegen.
+
+### 3 · Rücknahme: denselben Fehler zweimal, im Abstand von zwei Commits
+
+In v1664d habe ich geschrieben:
+
+> Eine Farbe ist nie richtig oder falsch, sondern nur richtig **oder
+> falsch zu ihrem Grund.**
+
+Und im selben Commit die Score-Zahl auf `#F2EDE3` gesetzt, weil der
+*Schienengrund* dunkel ist. Der Grund der Zahl ist aber nicht die
+Schiene:
+
+```
+.sc-donut::before   inset:5px, 28x28, bg rgb(255,253,247)
+.sc-donut span      col rgb(242,237,227)      -> Kontrast 1,03
+```
+
+Der Ring hat einen eigenen Innenkreis als **Pseudoelement**. Derselbe
+blinde Fleck, den ich unter „Pseudoelement heißt HTML" schon notiert
+hatte: ein Prüfer, der nur Elemente liest, sieht diesen Grund nicht,
+und auf dem Schirm steht bloß ein weißer Kreis, in dem scheinbar
+nichts ist.
+
+### 4 · Was nur sichtbar wurde, weil ich es aus dem Versteck holte
+
+`.sc-investor-badge` stand absolut bei y=485, der Chip beginnt bei 494
+— neun Pixel darüber, von der Trennlinie angeschnitten. **Im Kopf ist
+es `display:none`**; erst meine Schienenregeln haben es sichtbar
+gemacht, und zwar halb.
+
+> Ein Element, das man nur dadurch zu Gesicht bekommt, dass eine fremde
+> Regel es aus seinem Versteck holt, gehört nicht ans Licht, sondern
+> zurück.
+
+### 5 · Die Währung steckt in der Einheit — Teil drei
+
+Marcel: *„da steht auch noch, wenn ich Sprache auswähle, dass ein Liter
+Kerosin verbraucht wird. Das haben wir gar nicht mehr."*
+
+Der Hinweis im QuickBoarding rechnete weiter in Litern —
+`voice 1 L · ph 40 L · spr 20 L · dpmb 2 L`. **Derselbe Befund wie
+v1194 im Objekt-Tab, nur stand er im iframe und kam damals nicht mit.**
+
+Drei Fehler in vier Zeilen: die Einheit gibt es seit v1183 nicht mehr;
+die Sprachauswertung kostet **überhaupt nichts** (`ai.js:514`, „im Plan
+enthalten"); und 40/20 waren der alte Tarif, der Server zieht je
+Anbieter genau **einen** Abruf.
+
+> Für etwas Kostenloses ein Preisschild zu zeigen ist derselbe Fehler
+> wie eine abgeschaffte Währung, nur andersherum.
+
+**Und im Objekt-Tab eine halbe Abschaffung:** v1194 hatte den *Hinweis*
+umgestellt, das *Bestätigungs-Modal* daneben nicht. Der Nutzer las erst
+„1 Marktwert-Abruf" und bestätigte dann „Abrufen (60 L)".
+
+Zum Schluss einmal nach der **Einheit** gesucht statt nach dem Begriff.
+Alle übrigen Fundstellen stehen in Kommentaren oder sagen ausdrücklich
+„früher 2 L" — bis auf `admin/js/admin-app.js:541`, das die
+Kostentabelle mit „QuickCheck (2 L)" führte. Das war echte Oberfläche.
+
+### 6 · Der Verstoß, der danebenlag
+
+Beide Kostenhinweise nannten **Sprengnetter und PriceHubble beim
+Namen**. CLAUDE.md sagt dazu seit Langem „nie namentlich nach außen —
+unabhängige Bewertungspartner".
+
+> Eine Neutralitätsregel, die nur für Werbetexte gilt, ist keine. Sie
+> gilt genau dort, wo der Kunde hinsieht — und das ist der
+> Kostenhinweis über dem Knopf.
+
+**Offen:** in `quickcheck-app.html` stehen die beiden Anbieter noch als
+**Logo mit `alt`-Text** in zwei Kacheln (beide heute ausgeblendet). Das
+ist eine Produktentscheidung, keine Textkorrektur, und liegt Marcel vor.
+
+### Rest
+
+- Marcel schaut sich QuickBoarding und Quick-Check noch selbst an — die
+  Datenaufnahme dort „passt noch nicht".
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- `.sc-pill-sub` („4 / 4 KPIs") ist in der Schiene eingeblendet, im Kopf
+  bleibt sie verborgen — dort fehlt der Platz.
+
+---
+
+## Rollout-Journal · 28.09.2026 (14) — Das Messgerät hat gelogen
+
+**Was:** Reiterleiste dunkel, Account-Block in einer Zeile, die Brücke
+ins QuickBoarding repariert — und eine Runde, in der ich fünfmal
+hintereinander dem falschen Messwert geglaubt habe.
+
+**Commits:** `b8bba57` v1665 · `58d81a5` v1665c · `6c0bf05` v1665d ·
+`890fec0` v1665e · `2f4f0a9` v1665f · `f8395cf` v1665g
+
+**Nachweis:**
+
+| | Ist |
+|---|---|
+| Reiterleiste (v1b) | Grund `#0E0D0B`, Einträge `#BFB7A9`, Symbole gold |
+| Menüpunkte | alle bis **„Feedback & Support"** sichtbar |
+| Account-Block | eine Zeile: `[★ PRO] [Abmelden] … V1.1` |
+| Haken „Aktueller Plan" | **weg** |
+| QuickBoarding, Kartei | vier Kacheln **weiß**, wie im Objekt-Tab |
+| QuickBoarding, „Heute" | dunkel — **wie der Objekt-Tab dort auch** |
+
+---
+
+### 1 · Ein Beobachter, der sich zum Arbeiten abschaltet
+
+`data-dp-kartenstil` stand am Hauptdokument auf „kartei" und am
+iframe-Dokument auf **null** — die Brücke aus v1663d war nie gelaufen.
+
+Der Grund ist mein eigenes `anwenden()`: es hängt den
+MutationObserver ab, solange es arbeitet (gegen die Endlosschleife aus
+v1652). **Genau in diesem Fenster hängt `qc-bridge.js` das iframe ein.**
+
+> Ein Beobachter, der sich zum Arbeiten selbst abschaltet, hat ein
+> blindes Fenster. Wer darin etwas einhängt, wird nicht bemerkt — und
+> der Fehler sieht aus wie ein Timing-Zufall, weil er es auch ist.
+
+Die Brücke hängt jetzt am echten Ereignis: `load` steigt nicht auf,
+lässt sich aber in der **Einfangphase** am Dokument mithören.
+
+### 2 · Eine ID beweist es, vier Klassen nicht
+
+Die Reiterleiste blieb weiß. Gegenprobe im Browser, drei Stufen:
+
+```
+derselbe Selektor am Body-Ende      -> weiß
+vier zusätzliche Klassen            -> weiß
+body:has(#sb-user) davor            -> dunkel, sofort
+```
+
+Wieder die `:is()`-Falle. 13 Selektoren tragen jetzt `:has(#sb-user)`,
+das die ID-Spezifität holt, ohne eine fremde ID an eine falsche Stelle
+zu schreiben.
+
+### 3 · Ein Rollbalken, den man nicht sieht
+
+Der Aktionsblock stand auf `flex:1 1 auto` mit `overflow-y:auto` —
+Höhe **382**, Inhalt **469**. „Feedback & Support" war da, aber nur
+über einen zweiten, unsichtbaren Rollbalken *innerhalb* der Schiene.
+
+> Ein Rollbalken, den man nicht sieht, ist kein Rollbalken, sondern
+> ein Abschneider. Zwei ineinander sind einer zu viel.
+
+### 4 · Zwei Wege zum selben Ort
+
+Marcel: *„da hast du ein Häkchen drinne, da steht aktueller Plan. Ich
+kann aber auch auf Pro klicken und es wird mir das Gleiche angezeigt."*
+
+Gemessen: die Pille trägt `title="Aktueller Plan — Klick für …"`, der
+Knopf daneben heißt genauso.
+
+> Zwei Wege zum selben Ort sind kein Komfort, sondern eine Frage, die
+> der Nutzer beantworten muss, ohne dass es etwas zu entscheiden gäbe.
+
+Der Knopf fällt, die Pille bleibt — sie sagt zusätzlich, **welcher**
+Plan es ist. Gebaut mit `display:contents` statt einen Knoten zu
+verschieben: die Lehre aus v1660, als zehn „Pro" nebeneinander standen.
+
+### 5 · **Rücknahme, und die eigentliche Lehre: das Messgerät hat gelogen**
+
+Die Kacheln im QuickBoarding blieben dunkel. Ich habe daraufhin
+**fünf** Anläufe gebraucht, und vier davon beruhten auf einem
+falschen Messwert.
+
+Was `getComputedStyle` im iframe meldete: meine Regel matcht, trägt
+`!important`, steht im letzten Blatt — **und wirkt nicht.** Auch eine
+Regel mit zwei IDs nicht. Auch nicht, als ich die Quelle änderte.
+
+Der Test, der alles klärte:
+
+```
+el.style.setProperty('background', '#ff00ff', 'important')
+  -> getComputedStyle sagt weiterhin rgb(10,10,10)
+  -> das Attribut war nachweislich gesetzt (styleAttr danach: "")
+```
+
+**Ein Inline-`!important` schlägt alles. Wenn es nicht wirkt, wirkt
+nicht die Regel nicht — dann misst das Messgerät falsch.**
+
+> `getComputedStyle` auf ein Element **in einem iframe** liefert über
+> dieses Werkzeug veraltete Werte. Ein Bildausschnitt ist dort das
+> verlässlichere Messgerät. Ich habe vier Runden lang einer Zahl
+> geglaubt und dem Bild nicht.
+
+Der Bildausschnitt zeigte: die Kacheln **waren längst weiß.**
+
+**Und die falsche Änderung, die daraus folgte:** ich hatte die drei
+Stellen, an denen `quickcheck-app.html` seine Werkzeugkacheln dunkel
+färbt, an der Quelle hell gemacht (v1665d/f). Dann gemessen, was der
+Objekt-Tab **ohne** Layout tut — dunkel, `rgb(10,10,10)`.
+
+> Wer eine Sonderbehandlung an der Quelle entfernt, gleicht nicht an —
+> er dreht den Unterschied um.
+
+Alles zurückgenommen (v1665g); die Angleichung hängt jetzt an
+`data-dp-kartenstil`. Ohne Layout ist das QuickBoarding dunkel wie der
+Objekt-Tab, mit Kartei hell wie er.
+
+### Rest
+
+- **`getComputedStyle` im iframe ist als Messgerät verbrannt.** Für
+  Farben und Maße dort gilt: Bildausschnitt, oder im iframe-Kontext
+  selbst messen und das Ergebnis als Text zurückgeben.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- `js/qc-bridge.js` `IFRAME_SRC` muss bei **jeder** Änderung an
+  `quickcheck-app.html` mit hoch — in v1665d ist genau das durch ein
+  sed ins Leere gelaufen, das ich nicht nachgezählt hatte.
+
+---
+
+## Rollout-Journal · 28.09.2026 (15) — Ein Umschalter statt eines Stapels
+
+**Was:** Die Aktenmappe 1 ist abgeschafft, die zweite heißt jetzt
+einfach Aktenmappe. Die Schiene rollt nicht mehr, weil sie nur noch
+eines von zwei Dingen zeigt. Der Score steht auch in der Kanzlei, und
+der Kopf trägt denselben Ton wie das Menü.
+
+**Commits:** `dc6bdfb` v1666 · `30605d3` v1666c · `433f1c6` v1666e ·
+`67fc967` v1666f
+
+**Nachweis** (Aktenmappe, Objekt geladen, Schiene 988 px):
+
+| | Portfolio ZU | Portfolio AUF |
+|---|---|---|
+| Aktionen | **464 px** | aus |
+| Score | **271 px** | aus |
+| Objektliste | aus | **701 px**, 17 Karten |
+| Nutzer | 110 px | 110 px |
+| Knopf heißt | „Portfolio" | **„Aktionen"** |
+| Schiene `scrollHeight` | **988 = Höhe** | 988 = Höhe |
+| Letzter Menüpunkt | **„Feedback & Support" sichtbar** | — |
+
+| | |
+|---|---|
+| Umschalter | nur noch **Heute · Aktenmappe · Kanzlei** |
+| Kanzlei | Score links zwischen Reitern und Nutzer |
+| `#hdr-obj-num` | durchsichtig, `#BFB7A9` — vorher `rgb(23,21,18)` |
+| Handy 390 / Tablet 834 | Leiste **103 px**, `row`, Marke bei x=10, kein Überlauf |
+| Handy mit Objekt | Score als **Reihe**, fünf Kacheln auf y=122 |
+
+---
+
+### 1 · Drei Dinge, von denen man immer nur eines braucht
+
+Aktionen, Objektliste und Score lagen alle untereinander in der
+Schiene. Die Liste bekam `max-height:46vh` und rollte in sich, die
+Schiene rollte auch — **zwei Rollbalken**, und der äußere stand als
+graue Leiste zwischen Menü und Inhalt. Genau der Balken, den Marcel
+benannt hat.
+
+> Wer drei Dinge gleichzeitig zeigt, von denen man immer nur eines
+> braucht, verwaltet Platz statt ihn zu nutzen. Ein Umschalter zeigt
+> eines davon ganz — und braucht keinen Rollbalken.
+
+Der Knopf nennt jetzt sein **Ziel**, nicht seine Herkunft:
+
+> Eine Beschriftung, die sich nicht ändert, beschreibt einen Knopf.
+> Eine, die sich ändert, beschreibt einen Weg.
+
+### 2 · Ein Name ist für den Menschen, ein Schlüssel für die Maschine
+
+Die Aktenmappe 2 heißt jetzt „Aktenmappe" — der **Schlüssel** bleibt
+`v1b`. Die neun CSS-Regeln hängen an `[data-dp-layout^="v1"]` und
+treffen ihn weiter.
+
+> Wer Name und Schlüssel gleichzeitig ändert, ändert zwei Dinge und
+> kann hinterher nicht sagen, welches davon gewirkt hat.
+
+Ein gemerktes `v1` wird in `setze()` auf `v1b` umgelenkt — ein Layout
+abzuschaffen darf niemanden aussperren, der es gewählt hatte.
+
+### 3 · Die letzten fünfunddreißig Pixel
+
+Nach dem Umbau: 92 + 33 + 434 + 298 + 110 = **967 von 988**. Der
+Aktionsblock brauchte 469, hatte also 35 zu wenig — und die Folge war
+**genau eine fehlende Zeile**: „Feedback & Support".
+
+> Ein Block, dem fünfunddreißig Pixel fehlen, zeigt nicht neunzig
+> Prozent von etwas. Er zeigt alles bis auf die letzte Zeile — und die
+> sieht dann aus, als gäbe es sie nicht.
+
+Geholt wurden sie am Score: der Rat-Satz und die drei Stichwörter
+stehen im Arbeitsbereich ohnehin.
+
+> Was neben einer Zahl steht, muss sie erklären. Was sie nur
+> wiederholt, kostet Platz und erklärt nichts.
+
+### 4 · Zwei Fehler, die erst das Gerät zeigte
+
+In der Messkabine stand die Marke auf 390 px bei **x=119** — zentriert
+— und die Leiste war 174 statt 103 px hoch.
+
+**Erstens:** meine Regel schrieb `flex-direction:column !important` an
+die Schiene, ohne Media-Grenze. Die Schmalschirm-Regel setzt `row`,
+beide gleich spezifisch, meine steht später.
+
+> Eine Regel ohne Media-Grenze gilt auch dort, wo ihre Form nicht
+> existiert. Bei gleicher Spezifität gewinnt die spätere — und das ist
+> fast immer die neuere, also meine.
+
+**Zweitens:** die Schmalschirm-Fassung blendet seit v1659 Aktionen und
+Nutzer aus. Der Score kam in v1664 dazu und stand in **keiner** dieser
+Listen — er blieb als Einziger stehen.
+
+Ausgeblendet wird er trotzdem nicht: vor v1664 stand er im Kopf und war
+auf dem Handy sichtbar. Er bekommt dort jetzt die Form, die er im Kopf
+hatte — eine waagerechte Reihe, die mitrollt. Gemessen auf 390 px: fünf
+Kacheln auf y=122, kein Überlauf.
+
+### Rest
+
+- Der Aktionsblock rollt zugeklappt noch minimal in sich (464 von 469).
+  Das ist gewollt: lieber ein Block, der drei Pixel rollt, als eine
+  Zeile, die fehlt.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+- 22 tote CSS-Regeln für `v3`/`v4`/`v5` stehen weiter in der Datei;
+  seit heute kommen die von `v1` dazu.
+
+---
+
+## Rollout-Journal · 28.09.2026 (16) — Drei Regeln ohne Media-Grenze
+
+**Was:** Abstand zwischen „Deal-Aktion" und dem Score in der Kanzlei,
+das Logo eine Stufe größer, die Menüzeilen enger — und dabei drei
+Regeln gefunden, die ihre Form nicht mitgedacht hatten.
+
+**Commits:** `d3983a3` v1667 · `a339f40` v1667c · `80ea174` v1667e
+
+**Nachweis:**
+
+| Kanzlei, linke Schiene | vorher | jetzt |
+|---|---|---|
+| Reiter → Score | **4 px** | **22 px** |
+| Score → Nutzer | 182 px | 47 px |
+| Wortbild / Block | 37 / 92 | **42 / 100** |
+
+| Aktenmappe (Fenster 987) | |
+|---|---|
+| Aktionsblock | **456 von 456** — nichts fehlt |
+| Menüpunkt-Höhe | 27 → **23 px** |
+| Letzter Punkt | „Feedback & Support" bei y=537, sichtbar |
+
+| Messkabine | Handy 390 (Aktenmappe) | Tablet 834 (Kanzlei) |
+|---|---|---|
+| Leiste | **89 px** (vorher 186) | **208 px** (vorher 244) |
+| Wortbild | **19 px** (vorher 37) | **19 px** |
+| `margin-top` Score | — | **0** (vorher 22) |
+| Überlauf | keiner | keiner |
+
+---
+
+### 1 · Der Score stand schon oben — es fehlte der Abstand
+
+Marcel wollte ihn „von unten nach oben". Gemessen stand er bereits
+direkt unter den Reitern — mit **vier Pixeln** Abstand, während
+darunter 182 px ungenutzt lagen.
+
+> Ein Block, der einem anderen auf vier Pixel rückt, gehört optisch
+> dazu. Erst der Abstand sagt, dass hier etwas Neues anfängt — und
+> Platz dafür war reichlich da, nur an der falschen Stelle.
+
+Die 22 px gelten **nur** in der Kanzlei: in der Aktenmappe liegen
+Aktionen und Score bei 967 von 988 px, dort wäre jeder zusätzliche
+Abstand eine fehlende Menüzeile.
+
+### 2 · Zwölfmal vier Pixel
+
+Das größere Logo kostete 8 px, und dem Aktionsblock fehlten danach
+109. Die acht Pixel waren nicht die Ursache — der Block war schon
+vorher knapp. Geholt wurde der Platz bei den Menüzeilen selbst:
+Polster 4 → 2 px, zwölf Zeilen, **48 px**.
+
+> Zwölfmal vier Pixel sind eine Menüzeile plus Überschrift. Enger
+> setzen ist kein Verlust — etwas weglassen wäre einer.
+
+Ergebnis: `456 von 456`, nichts mehr abgeschnitten.
+
+### 3 · **Dreimal dieselbe Falle an einem Tag**
+
+In v1666f hatte ich notiert: *„Eine Regel ohne Media-Grenze gilt auch
+dort, wo ihre Form nicht existiert."* In dieser Runde stand sie noch
+zweimal im Haus:
+
+**Die Logo-Regeln aus v1663b** (37 px / 92 px) trugen keine Grenze und
+standen **später** in der Datei als die Schmalschirm-Fassung weiter
+oben (19 px / min-height 0). Bei gleicher Spezifität gewinnt die
+spätere — auf 390 px trug das Wortbild deshalb 37 px und die Leiste war
+186 statt 89 px hoch.
+
+> **Aufgefallen ist es erst, als ich dieselbe Regel eine Stufe größer
+> noch einmal geschrieben habe — diesmal MIT Grenze — und die Messung
+> trotzdem 37 px meldete.** Der Fehler war älter als die Änderung, die
+> ihn sichtbar machte.
+
+**Und der Abstand aus Punkt 1** wirkte auch dort, wo die Schiene eine
+Zeile ist: auf 834 px war die Kanzlei-Leiste dadurch 244 px hoch.
+
+> Ein `margin-top` beschreibt „darunter". In einer Zeile gibt es kein
+> Darunter.
+
+### Rest
+
+- Auf dem Handy trägt das Wortbild bewusst 19 px — dort ist die Schiene
+  eine waagerechte Leiste, und ein 42-px-Logo würde die halbe Zeile
+  nehmen.
+- Der Kaskaden-Walker gehört weiterhin repariert (seit v1657 offen).
+
+---
+
+## Rollout-Journal · 29.09.2026 (1) — Datenaufnahme, drei Gutachten, drei Objekte
+
+**Was:** Die Kartei bekommt zurück, was die Karte hat (Trennstrich,
+Überschriften, QR); die drei Restnutzungsdauer-Gutachten sind gegen den
+echten Kern gerechnet; drei Objekte sind angelegt.
+
+**Commits:** `4672936` v1668 · `626fdd2` v1668c · `4f96482` v1668d ·
+`e889566` v1668e
+
+---
+
+### 1 · Was ich in v1662 zu viel weggenommen hatte
+
+Marcel wollte Trennstrich, Überschriften, Abstand und den QR zurück.
+Alle drei hatte **ich** in v1662 ausgeblendet, weil er damals sagte,
+die Quellen stünden „untereinander".
+
+> Wer auf „das steht untereinander" mit „dann nehmen wir die
+> Überschriften weg" antwortet, behebt das Symptom und nimmt dabei die
+> Gliederung mit. Die Reihe war das Ziel, nicht die Kahlheit.
+
+Vorlage gemessen am Auslieferungszustand (`#oab-bar`, 1280×78): Kopf ·
+Perforation · Segment · **`.dp-pf-sep` 1×78** · Segment ·
+**`a.dp-pf-qr` 54×68** · Abrufzone.
+
+**Zwei Fallen beim Zurückholen:**
+
+`display:block` allein reichte nicht — beide tragen aus der Bordkarte
+`position:absolute` (dort lagen sie *auf* dem Papier, nicht darin).
+
+> `display:block` holt ein Element nicht in die Reihe zurück. Wer nur
+> die Sichtbarkeit umschaltet und die Positionierung vergisst, macht
+> etwas sichtbar, das trotzdem nicht mitzählt.
+
+Und danach standen sie immer noch falsch, weil die Kartei seit v1659
+`order` vergibt (lead 1, seg 2, rz 3) — die beiden hatten **keines**.
+
+> Wer in einer geordneten Reihe kein `order` hat, steht nicht hinten,
+> sondern ganz vorne. Ein vergessener Wert ist hier keine Auslassung,
+> sondern eine Ansage.
+
+**Die goldene Kante** am Abrufbereich (`border-right 1px #C9A84C`,
+`border-radius 10px 16px 16px 10px`) ist ein Rest der Bordkarte, wo
+`.dp-pf-rz` die Reißzone war.
+
+> Eine Linie, die einmal etwas bedeutet hat, bedeutet nach dem Umbau
+> nicht weniger, sondern etwas Falsches: sie verspricht eine Trennung,
+> die es nicht gibt.
+
+**Offen:** im QuickBoarding gibt es `.dp-pf-qr` **im Markup nicht**
+(`quickcheck-app.html:3391` führt die Leiste ohne QR). Titel,
+Trennstrich und Kante stimmen dort; der QR braucht Markup und eine
+Quelle für den Link.
+
+### 2 · Die drei Gutachten gegen `rnd-calc.js`
+
+Echter Lauf gegen den Kern (v3.1.0), nicht gegen eine nachgebaute
+Formel:
+
+| Objekt | Alter/GND/Punkte | Gutachten | Punktraster-Kern | Δ |
+|---|---|---|---|---|
+| Alexanderstr. 11 | 48 / 80 / 2 | 33 | **32,80** | **−0,20** |
+| Am Markt 18 | 30 / 70 / 0 | 26 | 40 *(unter Schwelle)* | +14,00 |
+| Westerfeldstr. 140 | 58 / 80 / 2 | 16 | 24,31 | +8,31 |
+
+**Der Kern ist bestätigt** — Fall 1 trifft die Anlage-2-Rechnung auf
+0,2 Jahre genau (der Gutachter rundet auf 33).
+
+Die anderen beiden sind **keine Kernfehler, sondern andere Verfahren**:
+Am Markt 18 rechnet der Gutachter die *technische* RND über den
+BTE-Lebensdauerkatalog (er selbst kommt im Punktraster auf 44,07);
+Westerfeldstr. nutzt Sprengnetter-Methodik mit Gebäudestandard 2,4.
+`rnd-calc.js` kann beide (`calcTechnisch`, `calcVogels`, `calcRoss`) —
+sie brauchen nur andere Eingaben.
+
+> Drei Gutachten, drei Büros, drei Verfahren. Wer alle drei durch
+> dieselbe Formel schickt, misst die Büros, nicht den Kern.
+
+### 3 · Drei Objekte angelegt
+
+Über `POST /objects` auf Basis eines vorhandenen Objekts als Vorlage —
+so stimmen alle 207 Feldnamen. Gemessen **an der App**, nicht am
+eigenen Nachbau:
+
+| Objekt | Preis | Score | DSCR | CF/Jahr | BMR |
+|---|---|---|---|---|---|
+| Westerfeldstr. 140 (MFH, 6 WE) | 545.000 € | **82** | 1,67 | **+6.982 €** | 7,23 % |
+| Alexanderstr. 11 (ETW, DG) | 129.000 € | **69** | 1,60 | **+1.162 €** | 5,79 % |
+| Am Markt 18 (ETW, WE 2) | 110.911 € | **65** | 1,78 | **+1.104 €** | 5,53 % |
+
+**Ein Befund dabei:** frisch per API angelegte Objekte zeigen in der
+Liste zunächst die **Kennzahlen des Vorlageobjekts** (alle drei hatten
+DSCR 1,04 · CF −82 € · BMR 4,95 % — die Werte der Musterstraße). Erst
+nach einmaligem Öffnen rechnet die Karte eigene Werte.
+
+> Zwei Objekte mit verschiedenen Preisen, Mieten und Zinsen, die auf
+> die Kommastelle dasselbe anzeigen, sind kein Zufall — sie zeigen
+> etwas Geerbtes.
+
+Ein erster Messversuch über `DealKpis.compute(d)` lieferte
+`dscr: 0` und `kd_dscr: 0`: der Kapitaldienst entsteht erst im
+Formularweg. Verworfen und über die Oberfläche gemessen.
+
+### Rest / offen
+
+- **Preise Marktbericht** — Befund steht, aber **Geld ist
+  Rückfragesache** (CLAUDE.md). Nichts geändert.
+- **Verkehrswertgutachten** zu Am Markt 18 ist im Repo **nicht
+  vorhanden** — weder Einzeldatei noch Archiv.
+- **Kaufpreisaufteilung Am Markt 18**: die KPA rechnet mit **RND 57**,
+  das RND-Gutachten desselben Büros mit **26**. Methodisch erklärbar
+  (BMF-Arbeitshilfe nutzt die typisierte RND), gehört aber geprüft.
+
+---
+
+## Rollout-Journal · 29.09.2026 (2) — Die Kaufpreisaufteilung, gegengerechnet
+
+**Was:** Das Kaufpreisaufteilungs-Gutachten zu Am Markt 18 Schritt für
+Schritt nachgerechnet, durch unseren eigenen Rechner geschickt — und
+dabei einen Fehler gefunden, der jedes Ergebnis still verfälscht hat.
+
+**Commit:** `ad6d46e` v1669 (Backend, Rebuild auf Staging gelaufen)
+
+---
+
+### 1 · Das Gutachten rechnet richtig
+
+Alle dreizehn Schritte nachgerechnet (derGutachter.net, Az. 25DG02659):
+
+| | Gutachten | nachgerechnet |
+|---|---|---|
+| Kapitalisierungsfaktor 2,5 % / 57 J | 30,2100 | **30,2095** |
+| Diskontierungsfaktor `1,025^-57` | 0,2448 | **0,24476** |
+| Bodenwert MEA (3.878 × 130 × 15,11/1000) | 7.617,56 € | **7.617,56 €** |
+| Bodenrestwert nach RND | 1.864,78 € | **1.864,78 €** |
+| **rentierlicher** Bodenwert | 5.752,78 € | **5.752,78 €** |
+| Bodenwertverzinsung (× 2,5 %) | 143,82 € | **143,82 €** |
+| Gebäudeanteil vorläufig | 95,96 % | **95,9635 %** |
+| Gebäudeanteil final | 94,35 % | **94,349 %** |
+
+Bemerkenswert: das Gutachten verzinst **nur den rentierlichen
+Bodenwert** — genau die Regel, die CLAUDE.md für die Wertermittlung
+führt (§ 41). Der unrentierliche Teil (1.864,78 €) bleibt außen vor.
+
+### 2 · **Der Fehler: stille Verwerfung unbekannter Feldnamen**
+
+Unser Rechner (`POST /bmf/aufteilung` → LibreOffice auf der
+BMF-Vorlage) lieferte für dieselben Eingaben:
+
+```
+Bodenwert       22.087,39 €   statt 7.617,56   (Faktor 2,9)
+Gebäudeanteil       87,39 %   statt 94,35 %
+warnings                 []   ← LEER
+```
+
+Der Gegentest zeigte es: Bodenrichtwert verdoppeln → Bodenwert
+verdoppelt sich. **Grundstücksfläche halbieren → nichts ändert sich.**
+
+Ursache: die Felder heißen in `INPUT_CELLS` anders —
+`grundstuecksgroesse` statt `grundstuecksflaeche`,
+`mea_zaehler/_nenner` statt `miteigentumsanteil_*`,
+`liegenschaftszinssatz` statt `liegenschaftszins`. **Fünf von zwölf
+Feldern kamen nicht an**, und die Schreibschleife überspringt
+kommentarlos, was sie nicht kennt.
+
+> Ein Rechner, der unbekannte Eingaben stillschweigend verwirft,
+> liefert kein falsches Ergebnis — er liefert ein **richtig
+> aussehendes**. Das ist der teurere Fehler.
+
+`warnings` gab es im Ergebnis überhaupt nicht; die Route erzeugte mit
+`result.warnings || []` ein Array, das immer leer blieb. Seit v1669
+nennt der Dienst die verworfenen Felder **und** die bekannten Namen.
+Nachgemessen nach dem Rebuild: derselbe Aufruf meldet jetzt alle fünf.
+
+### 3 · Mit den richtigen Feldnamen: der Kern stimmt
+
+| | Gutachten | unser Rechner |
+|---|---|---|
+| Bodenwert | 7.617,56 € | **7.617,56 €** exakt |
+| Gebäudeanteil (Sachwert-Pfad) | — | 90,93 % |
+| Gebäudeanteil (**Ertragswert**-Pfad) | **94,35 %** | **93,13 %** |
+| Ertragswert | — | 110.803 € *(Kaufpreis: 110.911 €)* |
+
+Der Ertragswert trifft den Kaufpreis auf 0,1 % — beide Rechnungen
+bestätigen sich gegenseitig. Die Restdifferenz von **1,22
+Prozentpunkten** ist ein Verfahrensunterschied: das Gutachten teilt den
+um den Bodenrestwert **bereinigten** Kaufpreis, die BMF-Arbeitshilfe
+teilt im Verhältnis der Einzelwerte.
+
+> Ohne Miete wählt die Arbeitshilfe den Sachwert und landet bei
+> 90,93 %. Die Miete ist hier keine Nebenangabe, sondern die
+> Verfahrensweiche — drei Prozentpunkte AfA-Bemessungsgrundlage.
+
+### Rest
+
+- **Preise Marktbericht**: Starter-Nachkauf 5,00 € gegen 4,50 € einzeln
+  (`config.js:521`), und Hochstufen kostet keine Differenz mehr
+  (`marktbericht.js:100-104`). **Nichts geändert — Geld ist
+  Rückfragesache.**
+- **Verkehrswertgutachten** zu Am Markt 18 liegt nicht im Repo.
+- **QR im QuickBoarding**: `.dp-pf-qr` fehlt dort im Markup.
+
+---
+
+## Rollout-Journal · 29.09.2026 (3) — Der QR im QuickBoarding
+
+**Was:** Der fehlende QR der Quellenleiste im QuickBoarding ist gebaut.
+
+**Commit:** `bff0389` v1670
+
+**Nachweis** (Prüflauf über die echte Nachricht `qc-autopass-code`,
+kein kostenpflichtiger Abruf):
+
+| | |
+|---|---|
+| ohne Ziel | `display:none`, **kein Platzhalter** |
+| mit Ziel | 46×46 px bei x=1007, `data-hat-ziel="1"` |
+| Abstand zum Abrufbereich | **18 px** |
+| Inhalt | echter `<canvas>` 40×40 |
+| Boarding-Pass-QR | **gleichzeitig mitbefüllt** |
+
+---
+
+### Warum er gefehlt hat
+
+Titel, Trennstrich und die goldene Kante stimmten nach v1668 im
+QuickBoarding bereits — der QR fehlte, weil es ihn **im Markup nie
+gab**. Der Objekt-Tab führt ihn seit jeher (`object-actions.js:365`),
+`quickcheck-app.html` baute die Leiste ohne ihn.
+
+Er hängt jetzt an derselben Quelle wie der QR des Boarding-Passes,
+`renderQR()` / `_shareUrl`.
+
+> Eine Auskunft, zwei Anzeigen — aber nur eine Quelle. Ein zweiter Weg
+> zum selben QR wäre am ersten Tag derselbe und am dreißigsten nicht
+> mehr.
+
+**Ohne Ziel bleibt er leer und nimmt keinen Platz.**
+
+> Ein QR-Kästchen, das man nicht scannen kann, ist kein Platzhalter,
+> sondern ein Versprechen, das nicht eingelöst wird.
+
+### Eine Rücknahme in eigener Sache
+
+Ich hatte diesen Punkt in der Runde davor als **Rückfrage**
+zurückgestellt („sag ob ich ihn machen soll"). Das war falsch: Marcels
+Auftrag lautete „das Ganze musst du im Quick-Check natürlich auch noch
+einmal ausprobieren", und ein fehlendes Element zu bauen ist keine
+Produktentscheidung.
+
+> CLAUDE.md nennt genau fünf Gründe für eine Rückfrage — Produktion,
+> Datenbank, Geld, Preise, Kündigungen. Ein fehlender QR steht nicht
+> darunter. **Eine unnötige Rückfrage kostet eine Runde und sieht aus
+> wie Sorgfalt.**
+
+Offen bleiben damit nur die zwei, die es zu Recht sind: die **Preise**
+(Geld) und das **Verkehrswertgutachten** (liegt nicht im Repo).
+
+---
+
+## Rollout-Journal · 29.09.2026 (4) — Co-Pilot, Maße, und drei CSS-Lehren
+
+**Was:** Die Datenaufnahme ist fertig geschliffen, die Co-Pilot-Kachel
+ist gebaut — und der Abstand vor „Marktbewertung" hat **drei Anläufe**
+gebraucht, jeder mit einer eigenen Lehre.
+
+**Commits:** `6ad8be0` v1671 · `614052f` v1672 · `d4b1c4a` v1672b ·
+`539203d` v1672c
+
+**Nachweis** (Kartei, Objekt geladen):
+
+| | vorher | jetzt |
+|---|---|---|
+| Abstand vor „Marktbewertung" | **1 px** | **19 px** |
+| QR | 46×46 | **64×64** |
+| Abrufknopf | 84×29 | **88×40** |
+| `.main-col` | `rgb(255,255,255)` | **`rgb(244,242,237)`** |
+| Co-Pilot-Kachel | — | vor Exposé, mit Lampe |
+
+---
+
+### 1 · Der Name: Co-Pilot
+
+Marcel wollte „Frag mich durch" als eigene Kachel, „mit einem coolen
+Namen". **Co-Pilot** steht schon in CLAUDE.md unter „Bildsprache
+Luftfahrt" und beschreibt genau die Rolle: jemand sitzt daneben, kennt
+die Checkliste und fragt sie ab.
+
+> „Geführtes Anlegen" beschreibt einen Vorgang, „Co-Pilot" ein
+> Gegenüber — und genau das ist der Unterschied zu „Ich erzähle frei".
+> Ein Name aus der eigenen Bildsprache muss nicht erklärt werden.
+
+Die Kachel ruft **keine eigene Logik**: sie hakt die Sprachquelle an,
+löst den vorhandenen Abruf aus und wählt im Überblendfenster
+`.vi-sk-fuehr`. Und sie ist **keine Quelle** — kein Ankreuzfeld, keine
+Beteiligung an der Zählung.
+
+### 2 · **Drei Anläufe für einen Abstand — drei verschiedene Ursachen**
+
+**Erster Versuch:** `> .dp-pf-seg:first-of-type{padding-left:18px}`.
+Wirkungslos.
+
+> `:first-of-type` fragt nach dem ersten Element seines **TYPS** unter
+> den Geschwistern. Das erste `div` in der Leiste ist `.dp-pf-lead`,
+> die Kopfzeile. Die Klasse im Selektor filtert nur, ob der Treffer am
+> Ende noch passt. Wer `.klasse:first-of-type` schreibt, meint fast
+> immer „das erste mit dieser Klasse" — und bekommt etwas anderes.
+
+**Zweiter Versuch:** der genaue Nachbar-Anker
+`.dp-pf-perf + .dp-pf-seg`. Auch wirkungslos.
+
+> Zwei Blöcke weiter oben steht `> .dp-pf-seg{padding:8px 0 10px
+> !important}`. **Eine Kurzschrift ist kein Wert, sondern vier** — sie
+> setzt auch `padding-left:0`, ist gleich spezifisch und steht später.
+
+**Dritter Versuch:** `margin-left`. Wirkt.
+
+> Wer nach einer Kurzschrift einen Einzelwert setzen will, muss ihn
+> entweder später schreiben oder auf eine Eigenschaft ausweichen, die
+> sie nicht berührt.
+
+### 3 · Der Grauton saß auf dem Inhaltsband
+
+`.body` (528..1848) trug `rgb(244,242,237)`, `.main-col` (248..2133)
+war weiß — links 280 px, rechts 285 px.
+
+> Ein Hintergrund, der an der Inhaltsbreite endet, ist kein
+> Hintergrund, sondern eine breite Karte.
+
+### Rest
+
+- **Preise:** die Zahl in `config.js:521` ist nur die **Anzeige**. Der
+  echte Betrag hängt am Stripe-Preis `dp_nachkauf_<plan>` (der
+  Kommentar dort sagt es selbst). Eine Änderung nur im Code ließe
+  Anzeige und Abbuchung auseinanderlaufen — der Fehler, den die Notiz
+  „ein Preis steht an vier Stellen" beschreibt. **Offen, weil der
+  Zielbetrag eine Entscheidung ist.**
+
+---
+
+## Rollout-Journal · 29.09.2026 (5) — Die Preise an der echten Quelle
+
+**Was:** Der Paketpreis-Befund ist am **Stripe-Katalog** belegt statt an
+`config.js`; ein Wächter meldet ihn künftig selbst. Beide Backend-Fixes
+sind auf `main` vorbereitet — der Prod-Pull fehlt noch.
+
+**Commits:** `dfa73ec` v1673 (staging) · `0c6cda6` + `cc28127` (main,
+Cherry-Pick von v1669 und v1673)
+
+---
+
+### 1 · Der Messschritt, der mir gefehlt hat
+
+Ich hatte den Preisbefund aus `config.js` abgeleitet — der Datei, die
+nur **anzeigt**. Nie nachgesehen, was in Stripe wirklich steht.
+
+`GET /credits/bewertungen` liefert den echten Katalog:
+
+| Paket | Stripe | Inhalt | Einzelwert | |
+|---|---|---|---|---|
+| `nachkauf_investor` | 8,75 € | 5/5/0 | 14,00 € | −5,25 € |
+| `nachkauf_pro` | 12,50 € | 5/5/5 | 33,50 € | −21,00 € |
+| **`nachkauf_starter`** | **5,00 €** | 5/0/0 | 4,50 € | **+0,50 €** |
+
+**Anzeige und Stripe stimmen überein** (5 / 8,75 / 12,50) — es ist also
+kein Anzeigefehler. Der Preis ist wirklich so.
+
+> Ein Befund über Geld, der nur aus der Anzeigedatei stammt, ist eine
+> Vermutung. Erst die Quelle, die abrechnet, macht ihn zu einem Befund.
+
+### 2 · Der Wächter statt der Änderung
+
+Der Betrag steht in Stripe und wird **nicht** aus dem Code geändert —
+eine Abbuchung gehört nicht in eine Plausibilitätsprüfung.
+`_preisplausibilitaet()` in `bewertungsKatalog.js` vergleicht beim Laden
+jedes Paket mit der Summe seiner Einzelteile und meldet, wenn es teurer
+ist. Nachgemessen nach dem Rebuild: `nachkauf_starter` trägt
+`unplausibel: {aufschlag_cents: 50}`, die anderen nicht.
+
+> Ein Paket, das teurer ist als sein Inhalt, ist kein Angebot, sondern
+> eine Falle — und niemand merkt es, weil beide Zahlen für sich
+> plausibel aussehen.
+
+### 3 · **Ein stehengebliebener Cherry-Pick auf `main`**
+
+Beim Wechsel auf `main` meldete git: *„cherry-pick currently in
+progress"*. Im Sequencer stand seit einer früheren Sitzung:
+
+```
+pick a2a96fd v1536/v1537: Partner 49 -> 99 EUR, drei Mandanten-Plätze
+```
+
+**Nichts davon war angewendet** (`git diff --stat HEAD` leer, kein
+`CHERRY_PICK_HEAD`). Ich habe ihn mit `--quit` beendet — das räumt den
+Zustand, ohne den Baum anzufassen — und **nicht** fortgesetzt: eine
+Preisänderung, die ich nicht beurteilt habe, gehört nicht nebenbei auf
+`main`.
+
+> Ein halb begonnener Cherry-Pick auf dem Produktionszweig ist keine
+> Altlast, sondern eine Ladung. Wer ihn findet, beendet den Zustand und
+> **fragt**, statt ihn zu Ende zu führen.
+
+**Für Marcel:** Diese Preisänderung (Partner 49 → 99 €, drei
+Mandanten-Plätze) ist damit weiterhin **nicht** auf `main`. Falls sie
+dorthin soll, ist es ein eigener Vorgang.
+
+### 4 · Prod: vorbereitet, nicht ausgeführt
+
+Gesichert (beide Datenbanken, **angesehen**):
+
+```
+/root/backups/prod-haupt-20260929-0634.sql.gz   11M
+/root/backups/prod-mb-20260929-0634.sql.gz     717K
+beide beginnen mit "PostgreSQL database dump"
+```
+
+`main` trägt die beiden Fixes und ist auf GitHub. **Der Pull auf Prod
+wurde von meiner Umgebung abgewiesen** („Out-of-Place Publication") —
+das ist eine Schranke hier, keine fehlende Freigabe. Es fehlt genau:
+
+```
+ssh root@157.90.117.167
+cd /opt/dealpilot && git pull --ff-only origin main
+docker compose -f docker-compose.prod.yml up -d --build backend
+```
+
+Geändert werden dabei **zwei Dateien**, keine Migration, kein Frontend:
+`backend/src/services/bmfService.js` und `bewertungsKatalog.js`.
+
+---
+
+## Rollout-Journal · 29.09.2026 (6) — Nachtrag: zweimal falsch gemessen
+
+**Was:** Zwei eigene Fehlmessungen zurückgenommen, die fünf offenen
+Punkte in den Backlog geschrieben (N1–N5).
+
+**Commit:** Backlog-Ergänzung
+
+---
+
+### Die Rücknahme
+
+Ich hatte im Journal (1) geschrieben, die RND-Verfahrenswahl „gehöre
+auf den Prüfstand", weil unser Kern bei Alexanderstr. 48 statt 33
+Jahre liefert. **Beide Teile dieser Aussage waren falsch gemessen:**
+
+**Erstens** hatte ich `calcPunktraster` direkt gerufen statt
+`calcAll()` — eine Teilfunktion statt des Wegs, den der Wizard geht.
+
+**Zweitens** hatte ich, nachdem ich das korrigiert hatte, die
+**Gewerke-Bewertungen geraten** („alle veraltet", „alle standard").
+Die technische Rechnung hängt vollständig daran. Meine 48 Jahre waren
+also das Ergebnis meiner Annahme, nicht des Kerns.
+
+Nachgesehen, ob der Wizard die Gewerke überhaupt erhebt:
+`rnd-wizard.js:1306-1323` baut eine Tabelle mit Radio-Buttons für alle
+neun Gewerke und schreibt sie nach `state.gewerke`. **Er erhebt sie.**
+
+> Zweimal am selben Befund vorbeigemessen: erst die falsche Funktion,
+> dann die falschen Eingaben. Eine Zahl, die aus geratenen Eingaben
+> kommt, ist kein Messwert — sie sieht nur so aus.
+
+Die Verfahrenswahl bleibt eine **Bewertungsfrage**, aber sie ist
+**kein Defekt**. Das steht jetzt so im Backlog (N5) statt als
+angeblicher Fehler.
+
+### Warum `tools/rollout-prod.ps1` hier nicht das Werkzeug ist
+
+Es gibt ein vorgesehenes Prod-Skript — es macht aber einen **Merge
+staging → main** und brächte alle 346 Commits samt Migrationen mit.
+Gebraucht wird ein `git pull` für zwei cherry-gepickte Backend-Dateien.
+
+> Ein Werkzeug, das mehr tut als gebraucht wird, ist an einer
+> gesperrten Tür keine Lösung, sondern ein Umweg um die Sperre.
+
+### Backlog
+
+N1 Preise (Stripe) · N2 Prod-Pull · N3 halber Cherry-Pick auf `main` ·
+N4 Import-Modul (Neu-Integration, keine KPA-Rechnung darin) ·
+N5 RND-Verfahrenswahl.
+
+---
+
+## Rollout-Journal · 29.09.2026 (7) — Der Preis, und was daran hing
+
+**Was:** Der Starter-Nachkauf kostet jetzt **4,00 €** statt 5,00 — in
+Stripe, in der Anzeige, auf Staging und auf **Produktion**. Dazu die
+beiden Backend-Fixes und ein Werkzeug für schlanke Prod-Rollouts.
+
+**Commits:** `01616cf` v1674 (staging) · `0c6cda6` `cc28127` `93e3ff6`
+(main) · Prod steht auf `93e3ff6`
+
+---
+
+### 1 · Stripe: neuer Preis, alter stillgelegt
+
+Stripe-Preise sind unveränderlich. Also: neuer Preis mit **400 Cent**,
+`lookup_key` übertragen (`transfer_lookup_key`), alter auf
+`active: false` — **nicht gelöscht**. Wer früher gekauft hat, behält
+Gutschrift und Rechnung; der alte trägt jetzt
+`dp_abgeloest_durch`.
+
+| | Sandbox | Live |
+|---|---|---|
+| neu | `price_1UKunl…` 400 | `price_1UKupB…` 400 |
+| still | `price_1UCzxL…` 500 | `price_1UD0FQ…` 500 |
+
+Metadaten unverändert übernommen (`dp_kind`, `dp_pack_sku`, `mpi: 5`) —
+sonst schriebe der Webhook nichts mehr gut. `tax_behavior` je Konto so
+belassen, wie es war (Sandbox `unspecified`, Live `inclusive`).
+
+Nachgemessen: je `lookup_key` genau **ein** aktiver Preis.
+
+| | Paket | einzeln | |
+|---|---|---|---|
+| Starter | **4,00 €** | 4,50 € | **−11 %** |
+| Investor | 8,75 € | 14,00 € | −37,5 % |
+| Pro | 12,50 € | 33,50 € | −62,7 % |
+
+### 2 · Und damit wäre die Anzeige falsch geworden
+
+`config.js` leitet den Paketpreis aus dem Monatsbeitrag ab
+(`/ 4`) und hätte weiter **5,00 €** gezeigt, während die Kasse 4,00
+nimmt.
+
+> Eine Anzeige, die ihren Preis selbst ausrechnet, ist so lange
+> richtig, wie niemand den echten ändert. Sie ist keine Quelle, sie
+> ist eine Vermutung mit Komma.
+
+`preiseAusKatalog()` holt jetzt `/credits/bewertungen` — **dieselbe
+Quelle, aus der abgebucht wird** — und überholt die Ableitung. Fällt
+der Abruf aus, bleibt die Ableitung als Rückfall.
+
+Gemessen auf Staging: `starter: 4 € (katalog)`, und zwar **ohne**
+manuellen Aufruf — der `dp:plan-ready`-Horcher hatte ihn schon geholt.
+
+### 3 · **Ein try/catch, das ein Schweigen erzeugt hätte**
+
+Den Horcher hatte ich zuerst als direkten Aufruf `preiseAusKatalog()`
+ans Dateiende geschrieben. Gemessen: zwischen der Funktion und dieser
+Stelle liegt **eine IIFE-Grenze** — es wäre ein `ReferenceError`
+gewesen, und mein eigenes `try/catch` hätte ihn verschluckt.
+
+> Ein `try/catch` um einen Aufruf, den es gar nicht gibt, macht aus
+> einem Fehler ein Schweigen. Der Preis wäre nie nachgeladen worden,
+> und nichts hätte widersprochen.
+
+Jetzt über die exportierte Funktion.
+
+### 4 · `tools/nachziehen-prod.ps1`
+
+`rollout-prod.ps1` **merged** staging → main und brächte alle 346
+Commits samt Migrationen mit. Für ein Paket ist Cherry-Pick der Weg —
+danach fehlt nur noch der Pull. Genau das tut das neue Skript: prüfen,
+zeigen was ankommt, **beide Datenbanken sichern und hineinsehen**,
+fragen, ziehen, nachmessen.
+
+**Beim ersten Lauf brach es ab — zu Recht, und aus meinem eigenen
+Fehler:** `zcat … | head -2` kappt die Pipe, `zcat` stirbt an SIGPIPE,
+und unter `set -e` bricht der Block **genau dann ab, wenn die
+Sicherung gut ist**. Dieselbe Falle, die für `grep -q` notiert ist.
+Jetzt `sed -n '1,2p'` und `set +e` für den Ansichtsteil.
+
+### 5 · Produktion
+
+Gesichert und angesehen vor jedem Schritt. Prod steht auf `93e3ff6`:
+
+| | |
+|---|---|
+| `bmfService.js` | meldet unbekannte Eingabefelder (v1669) |
+| `bewertungsKatalog.js` | Preis-Plausibilität (v1673) |
+| `config.js` / `pricing-modal.js` | Preis aus dem Katalog (v1674) |
+| Buster auf Prod | `config.js?v=v1674` ✓ |
+
+### Rest
+
+- N3 (halber Cherry-Pick `a2a96fd`, Partner 49 → 99 €) bleibt offen.
+- N4 Import-Modul: Neu-Integration, enthält keine KPA-Rechnung.
+- N5 RND-Verfahrenswahl: Bewertungsfrage.
+- `tax_behavior` ist zwischen den Konten uneinheitlich
+  (Sandbox `unspecified`, Live `inclusive`). Nicht angefasst, aber
+  auffällig.
+
+---
+
+## Rollout-Journal 29.09.2026 (8) — N3 war keine Aufgabe, N4 hat jetzt eine Andockstelle
+
+**Was.** Zwei offene Nachfass-Punkte abgeräumt — der eine durch Messen,
+der andere durch eine Festlegung.
+
+**N3 — der halbe Cherry-Pick war ein Duplikat.** Ich hatte `a2a96fd`
+(„Partner 49 → 99 EUR") im Sequencer auf `main` gefunden, mit `--quit`
+beendet und als **offene Entscheidung** gemeldet: „Soll er auf `main`?"
+Nachgemessen:
+
+| gemessen | Befund |
+|---|---|
+| `git log --oneline main --grep="v1536"` | `a2a96fd` — von `main` erreichbar |
+| `git ls-tree -r main` | `backend/migrations/075_partner_preis_v1536.sql` liegt dort |
+| Stripe live `dp_plan_partner_monthly` | 9.900 Cent, `dp_version: v1536`, `inklusiv_mandanten: 3` |
+| Prod-Landing | „Warum 99 € und nicht 49 €" |
+
+Der Inhalt war längst am Ziel. Anzeige und Abbuchung stimmen überein —
+das Gegenstück zum Starter-Fall (N1, Anzeige 4 € / Abbuchung 5 €)
+besteht hier **nicht**.
+
+> **Eigener Fehler, ausdrücklich zurückgenommen:** Ich habe einen
+> hängenden Sequencer-Eintrag als offene Entscheidung an Marcel
+> weitergereicht, ohne vorher zu prüfen, ob es die Aufgabe überhaupt
+> noch gibt. Ein `--grep` auf dem Zielzweig hätte das in zehn Sekunden
+> geklärt. **Erst messen, ob die Aufgabe noch existiert, dann fragen** —
+> sonst kostet eine erledigte Sache eine Entscheidung.
+
+**N4 — die Rechnung bleibt hier, das Modul füllt nur die Felder.**
+Marcels Wunsch war: „falls ich mal ein Update des Moduls einspiele,
+passt nämlich dann alles." Die Fassung v1.1.0 kann das nicht liefern —
+sie enthält **keine** Kaufpreisaufteilungs-Rechnung, nur eine
+Klassifizierung. Statt darauf zu warten, ist die Richtung jetzt
+festgelegt und aufgeschrieben: `docs/kaufpreisaufteilung/SCHNITTSTELLE.md`.
+
+Darin steht, was ein Modul liefern muss, damit es andockt — die
+Feldnamen mit den fünf bekannten Verwechslungen, die Verfahrensweiche
+`miete_bekannt` (Sachwert gegen Ertragswert = 90,93 % gegen 93,13 %
+Gebäudeanteil), das Antwortformat samt `warnings`, und die
+Gegenrechnung an Am Markt 18: Bodenwert **auf den Cent gleich**
+(7.617,56 €), Gebäudeanteil 93,13 % gegen 94,35 % im Gutachten — ein
+Verfahrensunterschied, kein Fehler.
+
+**Der Kern der Festlegung:** Ein Import-Modul bringt die Rechnung
+**nicht** mit. Es füllt die Eingaben und ruft `POST /bmf/aufteilung`.
+Gerechnet wird weiter von der amtlichen BMF-Vorlage über LibreOffice —
+das ist der Grund, warum das Ergebnis vor einem Finanzamt Bestand hat,
+und den gibt man nicht für eine Portierung auf.
+
+**Commit.** siehe unten · **Nachweis.** Die vier Messungen der N3-Tabelle,
+je einzeln ausgeführt; die KPA-Zahlen aus dem Lauf vom 29.09.2026 gegen
+das Gutachten Az. 25DG02659.
+
+**Rest.** Offen bleibt allein **N5** (RND-Verfahrenswahl — Marcels
+Bewertungsentscheidung, ausdrücklich kein Defekt). N4 wartet auf die
+Auskunft, wo die v1.0.0 liegt (die README zeigt auf
+`/opt/dealpilot-v25/`, nicht in dieses Repo).
+
+---
+
+## Rollout-Journal 29.09.2026 (9) — drei Verfahren, die nie jemand sah
+
+**Was.** Marcels Frage lautete: „unser Kern kann die Objekte auch
+rechnen, aber andere Eingaben. Warum machen wir das aktuell nicht?
+**Haben wir die Eingabefelder** und warum hast du es nicht damit
+geprueft?" Ich hatte darauf geantwortet, das sei seine
+Bewertungsentscheidung (N5). Das war eine richtige Aussage als falsche
+Antwort — die Frage nach den Eingabefeldern ist eine MESSFRAGE.
+
+**Gemessen:**
+
+| | |
+|---|---|
+| `calcAll()` liefert | **sechs** Verfahren in `methods.*` |
+| `rnd-wizard.js:728-738` zeigte | **drei** — linear, punktraster, technisch |
+| Vogels, Ross, Parabel | gerechnet und **verworfen**: keine Anzeige, `grep -c "methods\."` in `rnd-pdf.js` und `rnd-docx.js` = **0** |
+| Eingabebedarf dieser drei | **keiner** — `calcVogels(alter, gnd)` und Geschwister nehmen nur Alter und GND |
+
+Es gab also keinen technischen Grund fuer ihr Fehlen. Sie sind nie in
+die Oberflaeche gekommen.
+
+**Die Spreizung, am echten Kern in Node gerechnet:**
+
+| Objekt | linear | Vogels | Ross | Parabel | Punktraster | Spreizung |
+|---|---:|---:|---:|---:|---:|---:|
+| Am Markt 18 | 16 | 23,7 | 22,4 | 28,8 | 25,5 | **12,8 J.** |
+| Westerfeldstr. 140 | 18 | 24,8 | 25,0 | 32,0 | 35,8 | **17,8 J.** |
+| Alexanderstr. 11 | 22 | 27,2 | 30,0 | 38,0 | 41,2 | **19,2 J.** |
+
+Bei rund 1 % AfA-Unterschied je 20 Jahre Restnutzungsdauer ist das die
+halbe Aussage eines Gutachtens.
+
+**Zweiter Befund, beim Einbau gefunden:** die Verfahrensuebersicht hatte
+**nie CSS**. `grep -o "\.rnd-wiz-result[a-z-]*"` auf `rnd-styles.css`
+gab nur `-bar` und `-hero` — `-grid`, `-card`, `-card-label`,
+`-card-value`, `-card-unit` und `.highlight` waren **nirgends
+definiert**. Die drei Karten standen als ungestylte Bloecke
+untereinander. Angelegt, Gold ueber `var(--wl-…)`, Handy-Fassung ab
+560 px, und eine Spreizungszeile dazu.
+
+**Eigener Fehler beim Ausrollen, gleich mitkorrigiert (v1676b):** Der
+Gold-Audit gab RC=1 — `css/layout-varianten.css  0 -> 8`, eine Datei,
+die mit NULL in der Basislinie stand. Alle acht Stellen stammten aus
+meiner eigenen Arbeit an diesem Tag, drei davon als `rgba(201,168,76,…)`
+statt als Hex. **Dass der Waechter Zahlenform genauso zaehlt, ist
+richtig:** eine Farbe in `rgba` faerbt sich beim Mandanten genauso wenig
+um wie ein Hex-Literal. Nach der Umstellung auf `var(--wl-e8cc7a)` und
+`color-mix(… var(--wl-c9a84c) …)`: **RC=0, genau auf der Basislinie.**
+
+> **Die Lehre, und sie ist unbequem:** „Das ist deine
+> Bewertungsentscheidung" hat hier eine kaputte Anzeige zugedeckt. Die
+> Zustaendigkeitsfrage stimmte — die Verfahrenswahl gehoert dem
+> Sachverstaendigen — und genau deshalb habe ich nicht mehr hingesehen.
+> **Bevor eine Frage als Entscheidung zurueckgeht, wird gemessen, ob
+> ueberhaupt alles da ist, worueber entschieden werden soll.** Marcel
+> konnte sich zwischen Verfahren nicht entscheiden, von denen drei gar
+> nicht auf dem Bildschirm standen.
+
+**Commit.** `7e586b7` (v1676), `c884475` (v1676b) · **Nachweis.**
+Node-Lauf gegen `rnd-calc.js` fuer die Spreizungstabelle;
+`grep -c "methods\."` = 0 in PDF und DOCX; `grep -o` auf
+`rnd-styles.css` fuer die fehlenden Klassen; Gold-Audit RC=0 nach der
+Korrektur.
+
+**Rest.** Die Verfahrens**wahl** bleibt Marcels Entscheidung — neu ist
+nur, dass er die Alternativen jetzt sieht. Offen ausserdem: Vogels, Ross
+und Parabel stehen weiterhin **nicht im PDF und nicht im DOCX**. Das ist
+der naechste Schritt, wenn er die Anzeige so haben will.
+
+---
+
+## Rollout-Journal 29.09.2026 (10) — die Bruecke zum Import-Modul
+
+**Was.** Marcels Satz war: „Das ist eine neue Version von dem Modul
+welches wir bereits integriert haben." Ich hatte gemeldet, im Repo gebe
+es **keine Gegenstelle**.
+
+> **Das nehme ich zurueck — es war mein Fehler, nicht seiner.** Ich
+> hatte nach den DATEINAMEN des Moduls gesucht (`import.js`,
+> `import_service.py`) statt nach der FUNKTION. Die Gegenstelle ist
+> **`frontend/js/pdf-import.js`** (V38, 1.391 Zeilen): pdf.js →
+> `POST /ai/extract-expose` → OpenAI → Strukturdaten. **Dieselbe
+> Architektur wie das Modul**, nur fuer ein Dokument statt fuer einen
+> Ordner. In meiner eigenen Merkdatei steht „ich hab es nicht gefunden"
+> ist nicht „es gibt es nicht" — genau das ist hier passiert, und es
+> hat Marcel eine Rueckfrage gekostet, die er nicht haette stellen
+> muessen.
+
+**Damit war die Aufgabe erst richtig gestellt:** „das Update
+einspielen" heisst nicht, FastAPI nach Express zu portieren, sondern
+**die Dokumentarten nachzuziehen, die das Modul kann und wir nicht.**
+
+**Was das Modul wirklich enthaelt** (gemessen, nicht ueberflogen): zehn
+klassifizierte Arten, acht Extraktions-Prompts — `grundbuch`,
+`kataster`, `kaufvertrag`, `weg_protokoll`, `boris`,
+`vwg_vorgutachten`, `rndg`, `marktbericht`. **`kpt` wird klassifiziert,
+aber nicht extrahiert**; der Prompt fehlt. Damit ist auch Marcels
+Kernfrage beantwortet: „die Rechnung aus dem Modul nehmen" geht nicht,
+weil sie dort nicht ist — und sie soll auch nicht dorthin. Unsere
+Kaufpreisaufteilung rechnet die amtliche BMF-Vorlage ueber LibreOffice
+durch; das ist der Grund, warum sie vor einem Finanzamt Bestand hat.
+
+**Gebaut (v1677):** `POST /api/v1/ai/extract-rndg` und
+`openaiService.extractRndg()`. Das Schema stammt **woertlich** aus
+`EXTRAKTIONS_PROMPTS['rndg']`. Spielt Marcel eine neue Modulfassung
+ein, muss nur dieses Schema nachgezogen werden.
+
+**Nachweis — echter Funktionslauf im Staging-Container, nicht
+`node --check`:**
+
+| Pruefung | Ergebnis |
+|---|---|
+| Neun Felder aus einem RNDG-Text | **alle korrekt** (Bj 1962, GND 80, 4 Punkte, „Punktraster", Stichtag 15.09.2026) |
+| Kette gegen den eigenen Kern | Gutachten **25 J.** gegen `calcPunktraster` **25,51 J.** = 2 % |
+| Negativtest ohne Baujahr/GND | `rechenbar: false`, `fehlende_pflichtfelder: ["baujahr","gnd_jahre"]` |
+
+**Der Negativtest ist der wichtige.** Zwei Regeln sind darin gebaut:
+
+1. **`rnd_jahre` aus dem Gutachten wird gelesen, aber nie uebernommen.**
+   Gerechnet wird mit `rnd-calc.js`; die Gutachtenzahl ist der
+   Vergleichswert. Eine uebernommene Zahl, die niemand gegenprueft, ist
+   eine Behauptung — und ein Gutachten, das man nur abschreibt, haette
+   man auch nicht lesen muessen.
+2. **Fehlende Pflichtangaben werden benannt statt ueberbrueckt.** Genau
+   dieser Fehler hat bei der Kaufpreisaufteilung (v1669) eine um Faktor
+   2,9 falsche Antwort erzeugt, die plausibel aussah.
+
+**Commit.** `fe46615` · **Rebuild.** Backend auf Staging neu gebaut
+(`--build backend`), im Container nachgemessen:
+`typeof extractRndg === 'function'`, Route dreimal in `ai.js`.
+
+**Rest.** Der Endpunkt hat noch **keinen Aufrufer im Frontend** —
+`pdf-import.js` ist die Stelle. Die naechsten Dokumentarten nach
+demselben Muster: `grundbuch`, `kataster`, `kaufvertrag`,
+`weg_protokoll`. **Nicht uebernommen und bewusst so:** Ordner-Upload,
+SSE-Anzeige, OCR-Zweig, `IMPORT_SESSIONS` (in-memory) und der
+OpenAI-Schluessel im `localStorage` — unser Weg ueber den Server-Key
+mit `extractLimiter` bleibt.
+
+---
+
+## Rollout-Journal 29.09.2026 (11) — Dokument-Import, neun Arten, mit Bedienung
+
+**Was.** v1677 hatte einen Endpunkt ohne Aufrufer geliefert. **Ein
+Endpunkt, den niemand rufen kann, ist keine Funktion** — und CLAUDE.md
+sagt dazu „Standard ist: machen. Nicht fragen, ob gebaut werden soll."
+Ich hatte am Ende gefragt. Nachgeholt:
+
+| Neu | |
+|---|---|
+| `backend/src/services/dokumentSchemas.js` | neun Arten: Klassifikation + Extraktionsschemata, portiert aus dem Modul v1.1.0 |
+| `openaiService.extractDokument()` | generisch, prueft jeden Zahlenwert gegen die Grenzen seines Schemas |
+| `POST /ai/extract-dokument`, `GET /ai/dokument-arten` | erkennt die Art selbst, `typ` ueberstimmt |
+| `frontend/js/dokument-import.js` + Karte im Import-Hub | die Bedienung |
+
+**`kpt` hat bei uns einen Prompt, den das Modul nicht hat.** Dort wird
+die Kaufpreisaufteilung klassifiziert (Z. 82) und nie extrahiert. Unser
+Schema liefert **exakt die Feldnamen von `POST /bmf/aufteilung`** —
+genau an falschen Feldnamen ist v1669 gescheitert.
+
+**Drei eigene Fehler, alle beim ersten echten Lauf gefunden:**
+
+**(1) v1678b — der portierte Klassifikator bestrafte die gruendlichere
+Liste.** Das Modul rechnet `score / (len(keywords) * 3)`. Damit wird
+eine Art umso schwerer erkannt, je sorgfaeltiger ihre Stichwortliste
+gepflegt ist. Eine echte Kaufpreisaufteilung, in der
+„Kaufpreisaufteilung" UND „umgekehrten Ertragswertmethode" woertlich
+stehen: **2/24 = 0,08, also „unbekannt"**. **Ein Mass, das die
+gruendlichere Liste bestraft, misst die Liste und nicht das Dokument.**
+
+**(2) v1678c — allgemeine Woerter schlugen spezifische.** Nach dem Fix
+gewann `kaufvertrag` gegen `kpt`: zwei Treffer gegen zwei Treffer, und
+bei Gleichstand entscheidet die Reihenfolge im Objekt. „Kaufpreis",
+„Notar", „Kaeufer" stehen in JEDEM Immobiliendokument. Jetzt fuehrt
+jede Art eine `leit`-Liste (3 Punkte im Text, 6 im Dateinamen) neben
+den `keywords` (1/2). **Gemessen an zehn Faellen: 10 von 10**, darunter
+die beiden, die NICHT erkannt werden duerfen.
+
+**(3) v1678d — mein Prompt widersprach sich selbst.** „Extrahiere die
+EINGANGSDATEN — **nicht die Ergebnisse** des Gutachtens" stand ueber
+einem Schema, das zwei Ergebnisfelder abfragt. Die KI hat gehorcht und
+beide leer gelassen, obwohl 94,35 % und 7.617,56 € woertlich dastanden.
+**Eine Verneinung taugt nicht als Abgrenzung, wenn die Ausnahme im
+selben Schema steht.**
+
+**Nachweis — echte Laeufe im Staging-Container:**
+
+| | Ergebnis |
+|---|---|
+| Klassifikation, zehn Faelle | **10 von 10**, Rauschen bleibt `null` |
+| KPT Am Markt 18, Endlauf | **alle 13 Felder**, Sicherheit 1, nichts verworfen |
+| davon Vergleichswerte | 94,35 % und 7.617,56 € — wie im Gutachten |
+| RNDG-Negativtest | `rechenbar: false`, Pflichtfelder benannt |
+| Gold-Audit | **RC=0**, genau auf der Basislinie |
+
+**Die Doktrin steht in der Oberflaeche.** Mitgelesene Gutachtenwerte
+erscheinen unter der Ueberschrift „Ergebnis des fremden Gutachtens" mit
+dem Satz, dass sie **nicht uebernommen** werden. DealPilot rechnet
+selbst — das Gutachten liefert Eingaben.
+
+**Commits.** `c3d55b5` · `825a45b` · `9303018` · `8501385`
+
+**Rest.** Kein Ordner-Upload (eine Datei je Durchgang), keine
+Texterkennung fuer Scans — beides ist im Modul, beides wuerde
+`tesseract-ocr-deu` im Image verlangen. Die uebernommenen Werte fliessen
+noch **nicht** automatisch in ein Objekt; heute werden sie angezeigt und
+als Rohdaten ausgegeben. Das ist der naechste Schritt.
+
+---
+
+## Rollout-Journal 29.09.2026 (12) — Kanzlei 2, die Ausgaben, und vier Fehler unter der Oberflaeche
+
+**Was.** Marcels vier Punkte: Pre-Flight-Karte pruefen, Score an die
+Linie ueber dem Account anschliessen, Ausgabe-Dokumente in die Kanzlei,
+und **Kanzlei 2** als dritte UI mit getauschten Seiten.
+
+### 1 · Die Pre-Flight-Karte — ein Schatten, der ein Scrollen behauptet
+
+Gemessen am Element, nicht an der Regel:
+
+| | |
+|---|---|
+| `.dp-pf-scroll::after` | 34 x 126,6 px rechts, `linear-gradient(90deg, transparent, rgba(0,0,0,.22))` |
+| `.dp-pf-scroll` | `overflow-x: VISIBLE`, `scrollWidth 1280 === clientWidth 1280` |
+
+Der Schatten deutet an, dass rechts noch etwas kommt. **Es kommt
+nichts** — die Leiste bricht seit dem Kartei-Umbau um, statt zu
+scrollen. Uebrig blieb ein dunkler Balken ueber dem Abrufen-Knopf.
+
+**Warum die beiden Karten verschieden aussahen:** im QuickBoarding gibt
+es diesen Schatten **gar nicht**. Das iframe ist ein eigenes Dokument
+mit eigenem CSS und laedt `datenaufnahme.css` nicht. Derselbe Bau, zwei
+Fassungen — genau der Unterschied, den Marcel gesehen hat.
+
+### 2 · Der Score hing in der Mitte — kein Abstandsfehler
+
+    .dpl-teil-score   margin-top: auto   (Z. 3766)
+    .dpl-teil-nutzer  margin-top: auto   (Z. 169)
+
+**Zwei Geschwister mit `margin-top:auto` teilen den freien Platz unter
+sich auf** — je die Haelfte. Ein groesserer Abstandswert haette nichts
+geaendert: `auto` ist kein Abstand, sondern ein Anspruch auf den Rest,
+und den darf nur einer erheben. Gemessen nach der Aenderung: **Luecke
+0,0 px.**
+
+### 3 · Ausgaben-Box und Kanzlei 2
+
+Die Box wird **gebaut**, nicht verschoben — es gibt sie im DOM nicht,
+die Befehle lagen verstreut. Sie enthaelt aber **keine eigene Logik**:
+jeder Knopf ruft `sbActionsAction()`. Ein zweiter Zugang zu denselben
+Befehlen laeuft nicht auseinander, eine zweite Umsetzung schon. Was
+gebaut wird, wird auch abgeraeumt — `zurueck()` entfernt sie
+ausdruecklich.
+
+`v2b` ist die Umkehrung von `v2`: links Aktionen und Portfolio, rechts
+Score und Ausgaben, Reiter oben im Kopf.
+
+### 4 · Vier eigene Fehler, alle beim Nachmessen gefunden
+
+**(a) Zwei geratene Namen, beide still ins Leere gelaufen.**
+`window.objects` **gibt es nicht** (`typeof` ist `undefined`, ebenso
+`objekte`, `OBJ`, `_objects`, `dpObjects`) — die Box zeigte immer „kein
+Objekt gewaehlt". `window.Icons.render` gibt es auch nicht; `Icons` ist
+eine Sammlung von Pfaden. Die richtigen Wege, beide gemessen: die
+**aktive Karte** (`.sb-card.active` mit `.sbc-seq`/`.sbc-address`) und
+`_sbActionsRenderIcons()`. **Beide Fehler haetten nie eine Meldung
+gegeben, sie haetten einfach nichts getan.**
+
+**(b) Auf 390 px lag Kanzlei 2 doppelt uebereinander.** Nicht wegen
+einer fehlenden Handy-Regel, sondern wegen einer, die nur fuer EIN
+Layout galt. Alle 15 `v2`-Regeln heissen jetzt `^="v2"` — dieselbe
+Loesung, mit der `v1` und `v1b` schon zusammengefasst sind.
+
+**(c) `z-index:400` an einem `position:static` wirkt nicht.** Drei von
+fuenf Knoepfen waren verdeckt, obwohl die Rechtecke sich **nicht**
+ueberlappten. `z-index` gilt nur fuer POSITIONIERTE Elemente;
+`relative` verhaelt sich im Fluss genauso und stellt ihn wieder her.
+Repariert die bestehende Kanzlei gleich mit.
+
+**(d) Die letzten 147 px von `.main-col` lagen unter dem
+Bildschirmrand.** Sie beginnt bei y=146, bekommt aber die volle
+Viewporthoehe als `min-height` — und `body` traegt `overflow:hidden`.
+**Alles am Ende von `.main-col` war auf dem Tablet unerreichbar**, auch
+die Aktionen der bestehenden Kanzlei, seit es sie gibt.
+
+> **Eigener Messfehler, ausdruecklich zurueckgenommen:** Ich habe
+> zwischendurch einen Ueberlapp gemeldet, den es nicht gab
+> (`echtUeberlappt: false`) — `elementsFromPoint` direkt nach
+> `scrollIntoView` gelesen, bevor das Layout stand. Und meine
+> Messkabine war mit 760 px Hoehe zu niedrig fuer ein Tablet; der
+> „Fehler" war zuerst mein Aufbau. Ein iPad im Hochformat ist
+> 820 x 1180.
+
+**Nachweis — im gleich-Origin-iframe, beide Formate:**
+
+| | 820 x 1180 | 390 x 844 |
+|---|---|---|
+| Ausgabe-Knoepfe bedienbar | **5 von 5** | **5 von 5** |
+| Kanzlei (v2) desgleichen | **5 von 5** | — |
+| Querscroll | keiner | keiner |
+| Schiene haengt in | `.main-col` | `.main-col` |
+
+Gold-Audit **RC=0**, genau auf der Basislinie.
+
+**Commits.** `955e181` · `ec59b54` · `25470e5` · `6f338cc` · `1cf5b83`
+· `b16ec03` · `70c968f` · `f0011c7`
+
+**Rest.** Die Ausgaben-Box ruft heute dieselben Befehle wie die
+Aktionsliste; ein eigener Exposé-Weg (getrennt vom Gesamt-PDF) gibt es
+in der App nicht. Die Gesperrt-Kennzeichnung
+(`.dpl-ausgabe[data-gesperrt]`) ist vorbereitet, aber noch nicht an die
+Plan-Pruefung gehaengt.
+
+---
+
+## Rollout-Journal 29.09.2026 (13) — Tower, die Ausgaben, und der Partner-Test
+
+**Was.** Marcels fuenf Punkte.
+
+### 1 · Warum die Leiste im QuickBoarding anders aussah
+
+Gemessen, beide Leisten nebeneinander:
+
+| | Tab Objekt | QuickBoarding |
+|---|---|---|
+| QR-Inhalt | 6.109 Zeichen | **0 (leer)** |
+| QR angezeigt | ja | `display:none` |
+| Abrufen sitzt bei | x = 1585 | x = 650 |
+
+**Der Knopf war nicht verrutscht — ihm fehlte der Nachbar.** Der QR
+wird im iframe nie gefuellt: sein Ziel kommt per `qc-autopass-code` aus
+der Haupt-App, ohne Pass gibt es keins. Die Regel
+`#qc7-qr:not([data-hat-ziel])` klappt ihn dann ein — als Schutz gemeint
+(„ein QR ohne Ziel ist ein Bild, kein Weg") — und nimmt den Platz mit.
+
+> Ein Schutz, der Platz wegnimmt, verschiebt alles daneben.
+
+**Der erste Anlauf (v1682) wirkte nur halb:** die goldene Unterkante war
+weg, der Knopf klebte weiter mittendrin. Der Gegentest mit einem inline
+gesetzten `margin-left:auto` verschob ihn sauber (x 650 -> 1071) — also
+reine Kaskade, kein Layoutproblem. **Zwei Ursachen, beide in
+`datenaufnahme.css`:**
+
+- **`margin:0 !important`** auf `.dp-pf-rz` (Z. 998). Die Kurzschrift
+  setzt alle vier Seiten; jede spaetere `margin-left`-Regel lief ins
+  Leere. Jetzt steht `margin:0 0 0 auto` dort, wo auch der Rest seiner
+  Lage steht, statt als Gegenregel woanders.
+- **`#oab-run.dp-pf-launch`** (Z. 1007). Der Abruf-Knopf heisst **nur
+  im Objekt-Tab** so; im QuickBoarding traegt er `.qc6-run`. Die Regel
+  hat ihn in der einen Leiste nach rechts geschoben und in der anderen
+  nie. Jetzt `:is(#oab-run, .qc6-run)` — erbt die Spezifitaet der ID,
+  bleibt gleich stark, trifft beide. Nachgemessen: `margin-left`
+  **88,1 px**, der Knopf wandert.
+
+> **Eigene Fehlaussage, zurueckgenommen:** Ich hatte in v1680
+> geschrieben, das iframe lade `datenaufnahme.css` nicht. **Es laedt
+> sie** — gemessen an den Stylesheets des iframes. Richtig ist etwas
+> anderes: die dortigen Regeln kommen gegen die `!important`-Schichten
+> der QC-Seite oft nicht durch, deshalb steht die Angleichung zusaetzlich
+> im `qc-kartei-angleich`-Block.
+
+### 2+3 · Die Ausgaben gehen auf Dokumente, nicht auf Bereiche
+
+Marcel: „wenn ich auf Marktbericht klicke, wird der Bereich aufgemacht.
+Ich moechte aber auf das PDF zugreifen." Und: „mir fehlen
+Kaufpreisaufteilung, Anschaffungskosten und das Finanzamt-PDF."
+
+**Alle diese Wege gab es schon** — im Deal-Aktions-Tab als
+`DealActionBoarding.exportDoc()`. Sie werden jetzt gerufen, nicht
+nachgebaut. Die Liste: Exposé/Gesamt-PDF, Bankfassung, Marktbericht,
+**Kaufpreisaufteilung**, **Finanzamt-PDF**, Track Record, Export.
+
+- **Marktbericht** holt den juengsten vorhandenen Bericht als echtes
+  PDF (`downloadReport` -> die Engine in `marktbericht-app/app.js`),
+  geprueft ueber `/marktbericht/objects/history?ref=<objekt>`.
+- **Finanzamt-PDF** fragt vorher das Jahr. Die Jahre stammen aus
+  `State.cfRows` wie im Deal-Aktions-Tab — nicht aus dem Kalender: ein
+  Jahr, das die Rechnung nicht kennt, koennte niemand ausgeben.
+- **Gesperrt wird gezeigt, nicht versteckt:** ausgegraut plus X mit dem
+  Grund im Titel. Ein gescheiterter Abruf ist **nicht** dasselbe wie
+  „gibt es nicht" — sonst sucht der Nutzer einen Bericht, den er
+  laengst hat.
+
+Gemessen: `mb:ZU(noch keiner erstellt)`, alle uebrigen offen.
+
+### 4 · Seitenaufteilung in Einstellungen/Darstellung — und **Tower**
+
+Neue Gruppe ueber „App-Darstellung": erst WO die Dinge liegen, dann WIE
+sie aussehen. Die Liste kommt aus `DealPilotLayout.layouts`, nicht aus
+einer zweiten Pflege. **Nicht** ueber `segBinden` gebunden — das
+schriebe einen zweiten Speicherort neben den Merker von
+`DealPilotLayout`, und beim Neuladen gewaenne der falsche.
+
+**Kanzlei 2 heisst jetzt Tower.** Eine Nummer ist kein Name. Tower passt
+in die Bildsprache (Kerosin, Cockpit, Runway, Pre-Flight, Boarding) und
+beschreibt, was das Layout tut: alles im Blick, erteilt die Freigaben —
+Score und Ausgaben rechts, gearbeitet wird links.
+
+### 5 · Der Partner-Test
+
+`setOverride('partner')` wirkt **nicht** — und das ist richtig:
+`pruefOverride` laesst nur Herabstufung zu, „aber NIE hinauf" (v1163).
+Sonst machte sich jeder per `localStorage` zum Partner.
+
+Der Account `info@junker-immobilien.io` steht deshalb auf **Staging**
+jetzt auf `partner` (vorher `pro`, notiert). Zwei weitere Konten waren
+dort schon Partner.
+
+**Gemessen mit Mandantenansicht und Testfarbe Oliv `#8E9A4E`:**
+
+| | |
+|---|---|
+| `--wl-c9a84c` | `#8E9A4E` |
+| Objektzeile der Ausgaben-Box | `rgb(142,154,78)` |
+| Farbton gemessen / Soll | **69 / 69** |
+
+Die neue Ausgaben-Box faerbt sich beim Mandanten korrekt mit. Farbe und
+Ansicht danach zurueckgesetzt.
+
+**Commits.** `1bbcc26` · `bfd6cfa` · `e710c9e` · `ebacf9e`
+
+**Rest.** Die QuickBoarding-Leiste ist schmaler als die im Objekt-Tab —
+der Abruf-Knopf steht jetzt rechts in IHR, aber beide Leisten haben
+nicht dieselbe Breite. Das ist die verbleibende Abweichung. Der QR
+bleibt im QuickBoarding leer, solange kein Pass erzeugt wurde; das ist
+gewollt, kostet aber jetzt keinen Platz mehr. **Der Staging-Account
+steht weiter auf `partner`** — zum Zurueckstellen genuegt ein `UPDATE`
+auf `pro`.
+
+---
+
+## Rollout-Journal 29.09.2026 (14) — die Leiste in allen vier Ansichten, und vier eigene Regeln
+
+### 1 · Bei „Heute" fehlten dem QuickBoarding vier Bauteile
+
+| | Tab Objekt | QuickBoarding |
+|---|---|---|
+| Hoehe | 78 px | 55 px |
+| Goldstreifen | sichtbar | **AUS** |
+| Kopfzeile | sichtbar | **AUS** |
+| Trenner | sichtbar | **AUS** |
+
+Ursache ist `body.dp-neue-karte`. Sie steht im QC-Dokument **fest**
+(`quickcheck-app.html:3290`, „dieses Dokument ist IMMER hell") und
+blendet diese drei nebenbei aus. **Die Haupt-App traegt sie bei „Heute"
+nicht** — dasselbe Bauteil sah auf beiden Seiten anders aus.
+
+`karten-stil.js` spiegelt jetzt `data-dp-heute` ins iframe. Die Klasse
+selbst bleibt: sie traegt die Helligkeit, und das Dokument IST hell.
+
+### 2 · Der Score sass in der Kanzlei 164 px zu hoch
+
+Auf `.dpl-teil-score` lagen **fuenf** `margin-top`-Regeln mit
+**identischem** Selektor: `auto`, `10px`, `6px`, `4px` — dazu `22px`
+fuer v2. Bei gleicher Spezifitaet gewinnt die letzte. **Mein `auto` aus
+v1679 stand ganz vorne und war seit vier eigenen Aenderungen tot.**
+
+> In der Aktenmappe sass der Block trotzdem unten — **durch Zufall**:
+> dort fuellt der Inhalt die Schiene fast genau aus (465+271+101+147 =
+> 984 von 988). Das sah richtig aus und war es nicht. Ein Ergebnis, das
+> stimmt, ohne dass die Regel greift, faellt beim naechsten Inhalt um.
+
+Die drei Ueberschreibungen sind raus, der Abstand kommt aus dem
+`padding`. Nachgemessen: Kanzlei `margin-top` **174 px** (das `auto`
+arbeitet), Nutzer in allen drei Layouts **buendig am Boden**.
+
+### 3 · Der Trennstrich ueber dem Nutzer — zurueckgenommen
+
+In v1679 hatte ich ihn entfernt: eine zweite Linie unter der des Scores
+waere „ein Doppelstrich ohne Inhalt dazwischen". **Zwischen beiden
+stehen Ring, Stufe und fuenf Kennzahlen.** Marcel wollte ihn in
+Aktenmappe UND Kanzlei. Gemessen: in allen drei Layouts **JA**.
+
+### 4 · „Das Abrufen ist ganz wild neben ImmoMetrica"
+
+Nachgerechnet, Leiste bei „Heute":
+
+```
+letztes Segment endet     927
+QR margin-left  47,5  ->  sitzt bei 975, Breite 0
+QR margin-right 47,5
+Abrufen margin-left 18 -> beginnt bei 1040
+```
+
+**47,5 + 47,5 + 18 = 113** — genau die gemessene Luecke. Die 18 waren
+gesetzt und richtig; die 95 kamen von den **Raendern eines Elements,
+das gar nichts anzeigt**.
+
+> Ein QR ohne Ziel ist kein Bild, kein Weg — und auch kein Abstand.
+
+Dazu die Einsicht, dass zwei fruehere Fixes einander widersprachen:
+v1682 hat den Knopf nach rechts geholt, weil er sonst mitten in der
+**zweizeiligen** Kartei-Leiste klebte. Einzeilig und ohne QR gehoert er
+an seinen Nachbarn. `:has(.dp-pf-qr[data-hat-ziel])` fragt nach dem
+ZIEL, nicht nach dem Element — sobald ein Pass entsteht, rueckt der
+Knopf von selbst wieder nach rechts.
+
+**Nachweis, alle vier Ansichten:**
+
+| Layout | Luecke | Marke im iframe |
+|---|---|---|
+| Aktenmappe | **18 px** | `kartei` |
+| Kanzlei | **18 px** | `kartei` |
+| Tower | **18 px** | `kartei` |
+| Heute | **18 px** | `data-dp-heute=1` |
+
+Gold-Audit **RC=0**.
+
+**Commits.** `b976b00` · `894daea` · `ee89876` · `84b793d`
+
+**Rest.** Der QR bleibt im QuickBoarding leer, solange kein Pass
+entstanden ist — der Code kommt erst, wenn genug eingegeben wurde
+(`qc-bridge.js` `_bufSave` -> `/passes/from-snapshot`). Das ist richtig
+so und kostet jetzt keinen Platz mehr. Der Staging-Account bleibt auf
+`partner`, wie gewuenscht.
+
+---
+
+## Rollout-Journal 29.09.2026 (15) — der Token-Name, der die Sitzung kostete
+
+### 1 · „Sitzung abgelaufen" — mein nacktes `fetch`
+
+**Der Token heisst `ji_token`** (`auth.js:14`). Meine Vorratspruefung aus
+v1683 schickte `localStorage.getItem('dp_token')` — einen Schluessel,
+den es nicht gibt. Die Anfrage ging **ohne Anmeldung** raus und kam mit
+401 zurueck.
+
+Schlimmer: es war ein **nacktes `fetch`**. Das umgeht den zentralen
+401-Handler — steht woertlich in CLAUDE.md. Der 401 galt deshalb als
+echter Sitzungsverlust: „Sitzung abgelaufen — bitte neu anmelden", bei
+**jedem** Objektwechsel, obwohl die Sitzung gueltig war. Danach gingen
+die Ausgaben nicht mehr.
+
+> Ein Pruefaufruf, der die Anmeldung kaputtmacht, ist teurer als die
+> Pruefung wert ist.
+
+### 2 · `downloadXlsx()` hatte keinen einzigen Aufrufer
+
+Gemessen mit `grep` ueber `frontend/js` und `index.html`: die Funktion
+war geschrieben, exportiert — und fuer den Nutzer unerreichbar. Marcel
+hat sie sich gewuenscht; es gab sie die ganze Zeit.
+
+Das BMF-Modal bekommt eine Ausgabeleiste mit beiden Wegen
+(`exportBmfPdf` und `downloadXlsx`), sichtbar **erst nach der
+Berechnung** — vorher haette sie nichts auszugeben.
+
+### 3 · Schwarze Symbole auf schwarzem Grund — die Wurzel
+
+Drei Anlaeufe, bis die Ursache stand. Der Reihe nach:
+
+| Anlauf | Befund |
+|---|---|
+| v1688 | `.hdr-icon-btn svg` hatte `fill:rgb(20,19,16)`. Die vorhandene Regel zielte auf den KNOPF; ein `svg` mit eigenem `fill` erbt ihn nicht. **Hilfe-Icon behoben (Kontrast 8,5).** |
+| v1688b | Die Pille blieb. `currentColor` war richtig — aber der `path` trug eine **eigene** `color: rgb(20,19,16)`. Nicht der Strich war falsch, sondern die Farbe, auf die er zeigte. |
+| v1688c/d | Die Wurzel: `ui-varianten.css:1290` setzt `--dp-header-text: var(--uv-chrome-ink)` = **`#141310`**, weil der Hell-Skin mit einem **hellen** Kopf rechnet. Die Layouts faerben ihn **dunkel**. |
+
+Meine erste Token-Regel verlor — **Spezifitaet nachgerechnet statt
+geschaetzt**:
+
+```
+ui-varianten.css:1290   html[data-ui-theme] body.dp-chrome-hell header.hdr   (0,3,3)
+meine erste Fassung     html[data-dp-layout] body                            (0,2,1)
+```
+
+> Eine Farbe gilt immer nur zu IHREM Grund. Wer den Grund tauscht, muss
+> die Farbe mittauschen — sonst bleibt sie richtig fuer eine Flaeche,
+> die es nicht mehr gibt.
+
+Gemessen nach der Korrektur: schlechtester Kontrast im Kopf **8,50**
+statt **1,05**, in allen drei Layouts, ueber acht Elemente.
+
+### 4 · Bei „Heute" heisst die Karte wieder PRE-FLIGHT
+
+Auf Prod nachgesehen (`object-actions.js:301`): dort steht bis heute
+**PRE-FLIGHT** und **„Daten einlesen"**. Ich hatte beides fuer die neuen
+Ansichten umbenannt und damit auch „Heute" veraendert — eine Ansicht,
+die ausdruecklich unveraendert bleiben soll. Die Karte gibt jetzt beide
+Texte aus; welcher gilt, entscheidet der Kartenstil. Gemessen: Heute
+**PRE-FLIGHT**, Aktenmappe **Datenaufnahme**.
+
+### 5 · Den Layout-Umschalter gab es laengst — meine Gruppe war eine Doppelung
+
+**Zurueckgenommen.** In v1684 habe ich eine Gruppe „Seitenaufteilung" in
+die Darstellung gebaut. **Die gab es da schon**: die Gruppe „Aufbau" an
+**Position 1** fuehrt dieselben vier Eintraege (Heute, Aktenmappe,
+Kanzlei, Tower) und schaltet ueber denselben Weg. Gefunden, als ich
+pruefte, warum meine Gruppe an Position 5 stand — davor lag die echte.
+
+> Zwei Schalter fuer dieselbe Sache sind schlimmer als keiner: sie
+> zeigen irgendwann verschiedene Staende, und niemand weiss, welcher
+> gilt. **Bevor etwas gebaut wird, das der Nutzer vermisst: nachsehen,
+> ob er es nur nicht gefunden hat.**
+
+Nachgemessen: Doppelung weg, der Schalter „Aufbau" wirkt (Klick auf
+Tower setzt `data-dp-layout="v2b"`).
+
+Gold-Audit **RC=0**.
+
+**Commits.** `694d955` · `9254a50` · `416a484` · `057dc5a` · `f86db36`
+· `85b476e` · `5eef321`
+
+**Rest.** Die dritte Ausgabe, die Marcel im BMF-Modal vermutete („zwei
+oder sogar drei PDFs"), gibt es nicht: im Code liegen genau zwei Wege
+(PDF-Anlage und XLSX). Wenn er ein drittes Dokument meint, muss es
+benannt werden.
+
+### Nachtrag zu (15) · Warum Marcel den Umschalter dreimal vermisst hat
+
+Nach dem Entfernen meiner Doppelung stand die Frage noch im Raum:
+**warum hat er ihn nicht gefunden?** Nachgesehen — er hiess anders.
+
+| | vorher | jetzt |
+|---|---|---|
+| Ueberschrift | **Aufbau** | **Aussehen** |
+| Eintraege | „Heute", „1 · Aktenmappe", „2 · Kanzlei", „3 · Tower" | „Heute", „Aktenmappe", „Kanzlei", „Tower" |
+
+Marcel fragt dreimal nach „Darstellung → **Aussehen**". Die Gruppe hiess
+„Aufbau" und stand direkt vor ihm.
+
+> **Eine Gruppe, die man nur findet, wenn man ihren Namen schon kennt,
+> ist fuer den, der sie sucht, nicht vorhanden.** Und die Nummern
+> („1 · Aktenmappe") halfen niemandem — er nennt sie ausnahmslos beim
+> Namen. Eine Reihenfolge braucht keine Nummer, wenn sie ohnehin
+> sichtbar ist.
+
+Der Hinweistext sagt jetzt ausdruecklich, dass Farben, Formen und
+Schrift darunter stehen und frei kombinierbar sind — genau Marcels
+Anschlussfrage.
+
+**Kombinationstest, alle drei Achsen gleichzeitig gemessen:**
+
+| Achse | gesetzt | gemessen |
+|---|---|---|
+| Aussehen | Tower | `data-dp-layout="v2b"` |
+| Form | Rund | `data-ui-form="rund"`, Radius 7 px |
+| Marke | Oliv `#8E9A4E` | `--gold` und `--wl-c9a84c` beide gesetzt |
+| Ausgaben-Box | — | `rgb(142,154,78)`, **Farbton 69 = Soll 69** |
+
+Die drei Achsen greifen unabhaengig und gleichzeitig. Testfarbe danach
+auf DealPilot-Gold zurueckgesetzt.
+
+**Commit.** `4b1bf36`
+
+**Reihenfolge im Panel jetzt:** Aussehen · Datenaufnahme · Seiten ·
+Modus · App-Darstellung · Objektkarten · Kartenflaeche · Form · Schrift
+· Marke.
+
+---
+
+## Rollout-Journal 29.09.2026 (16) — Gold war der falsche Wert
+
+### 1 · Das Kopftext-Token stand auf Gold — zurueckgenommen
+
+Marcel: „oben die Hilfe und dein Kontingent auf einmal in Gold, was aber
+vorher in so einem Weisston war — so aehnlich wie die ID und die
+Strasse."
+
+Er hat recht, und **der richtige Wert stand die ganze Zeit im Code**:
+`style.css:35774` setzt fuer den dunklen Kopf
+`--dp-header-text:#f3ead0` — Creme. Genau der Ton, in dem Adresse und
+Kennung stehen.
+
+> **Mein Fehler war nicht die Stelle, sondern der Wert.** Ich habe das
+> Token auf die AKZENTfarbe gesetzt statt auf die TEXTfarbe. Gold ist
+> der Akzent — was in Gold steht, soll dadurch hervortreten. Faerbt man
+> alles gold, tritt nichts mehr hervor.
+
+Die Aufgabe war nur, `ui-varianten.css:1290` daran zu hindern, den Wert
+auf `--uv-chrome-ink` (fuer einen HELLEN Kopf gedacht) zu
+ueberschreiben. Der Akzent bleibt, wo er etwas heisst: am Kerosin-Stand.
+
+### 2 · Die Reiterleiste sah in jedem Layout anders aus
+
+Marcel: „erst Creme, danach Schwarz, dann beim Tower alles in Gold."
+Gemessen — drei Layouts, drei Zustaende:
+
+| | Grund | aktiv | normal |
+|---|---|---|---|
+| Aktenmappe | dunkel | 4,80 | 5,87 |
+| Kanzlei | dunkel | **16,95** | **9,77** |
+| Tower | **HELL** | **3,19** | **2,61** |
+
+Der Tower trug eine helle Flaeche mit Schriftfarben aus dem dunklen
+Satz — wieder eine Farbe, die zu ihrem alten Grund passt und nicht zum
+neuen. Vereinheitlicht auf die Kanzlei-Fassung, mit `^="v"` fuer alle
+Layouts. **Nachgemessen: 16,95 / 9,77 in allen dreien.**
+
+Der Akzent bleibt die UNTERSTREICHUNG, nicht die Schrift — sonst tritt
+der aktive Reiter durch zwei Mittel gleichzeitig hervor und wird dabei
+schlechter lesbar (4,80 gegen 16,95).
+
+> **Eigener Messfehler, zurueckgenommen:** Zwischendurch meldete ich
+> fuer die Aktenmappe 1,09 und wollte nachbessern. Die Zahl war falsch —
+> 1.500 ms Wartezeit statt 1.800, das Layout war noch nicht fertig. Beim
+> sauberen Lauf standen alle drei bei 16,95. Fast haette ich einen
+> Fehler behoben, den es nicht gab.
+
+### 3 · Das iframe hatte sein eigenes Markup
+
+Marcel: „bei Heute und Quick Check steht immer noch Datenaufnahme."
+
+Meine Zwei-Text-Loesung aus v1687 steckte nur in `object-actions.js` —
+der Haupt-App. **Das QuickCheck-Dokument baut seine Leiste selbst**
+(`quickcheck-app.html:3393`) und trug den neuen Text fest eingebrannt.
+Auf Prod steht an derselben Zeile `PRE-FLIGHT` und `Daten einlesen`.
+
+> **Das ist das dritte Mal in dieser Sitzung, dass eine Aenderung in der
+> Haupt-App am iframe vorbeigegangen ist.** Ein eigenes Dokument erbt
+> nichts — weder CSS noch Markup. Wer dort etwas aendert, muss beide
+> Stellen anfassen oder es ueber eine gespiegelte Marke steuern.
+
+Gemessen: `data-dp-heute="1"`, Kopfzeile **PRE-FLIGHT**.
+
+Gold-Audit **RC=0**.
+
+**Commits.** `39304d2` · `65fd3a3`
+
+---
+
+## Rollout-Journal 29.09.2026 (17) — die Klasse faellt, nicht die Regel
+
+**Was.** Marcel zum vierten Mal: die Pre-Flight-Karte im Quick-Check
+sehe bei „Heute" immer noch nicht aus wie im Tab Objekt.
+
+**Er hatte jedes Mal recht, und mein Ansatz war jedes Mal zu klein.**
+Ich hatte in v1685 `data-dp-heute` ins iframe gespiegelt und damit drei
+Regeln zurueckgenommen — Streifen, Kopfzeile, Trenner. An
+`body.dp-neue-karte` haengt dort aber nicht ein Trio, sondern die ganze
+Kartei-Optik: Grundfarbe, Hoehe, Kacheln, Barcode.
+
+> **Sie einzeln zurueckzunehmen hiesse, jede kuenftige dazu auch zu
+> finden.** Ich habe sie dreimal hintereinander nicht alle gefunden; ein
+> viertes Mal waere kein Verfahren gewesen, sondern Hoffnung.
+
+**v1692 — die Klasse selbst faellt**, sobald die Haupt-App auf „Heute"
+steht (`karten-stil.js`, `rahmenNachziehen()`). Der Vermerk an
+`quickcheck-app.html:3290` („dieses Dokument ist IMMER hell") bleibt
+wahr: die alte Bordkarten-Fassung ist ebenfalls hell, nur golden statt
+weiss. **Die Klasse traegt nicht die Helligkeit, sondern den UMBAU.**
+
+**v1692b — der Runway fehlte noch.** Danach stimmten Hoehe, Kopfzeile,
+Streifen und Barcode, aber der Grund blieb weiss:
+
+| | Tab Objekt | QuickCheck |
+|---|---|---|
+| Grund | `linear-gradient(110deg, …)` **Runway** | `rgb(255,255,255)` |
+
+Das QC-Dokument bringt seine eigene `.dp-pfbar`-Regel mit; die
+Runway-Fassung aus `style.css:32634` kommt dort nie an. Jetzt gesetzt,
+mit denselben Token (`--gold-hi`, `--gold`, `--wl-bd9a3e`), damit der
+Verlauf beim Mandanten mitfaerbt.
+
+**Nachgemessen, und es schaltet in beide Richtungen:**
+
+| Layout | Klasse | Grund | Hoehe | Kopfzeile |
+|---|---|---|---|---|
+| **Heute** | — | **Runway** | **78** | **PRE-FLIGHT** |
+| Aktenmappe | `dp-neue-karte` | weiss | 86 | Datenaufnahme |
+| Tower | `dp-neue-karte` | weiss | 86 | Datenaufnahme |
+| **Heute** (zurueck) | — | **Runway** | **78** | **PRE-FLIGHT** |
+
+Der letzte Eintrag ist der wichtige: der Weg zurueck funktioniert auch.
+
+Gold-Audit **RC=0**.
+
+**Commits.** `5e307c1` · `1e37a75`
+
+**Die Lehre fuer das iframe:** Wenn ein eigenes Dokument eine ganze
+Gestaltung an EINER Klasse traegt, nimmt man die Klasse weg und nicht
+ihre Regeln. Wer Regeln einzeln zurueckdreht, uebersieht welche — und
+merkt es erst, wenn jemand beide Fassungen nebeneinander sieht.
+
+---
+
+## Rollout-Journal 29.09.2026 (18) — drei Regeln, eine Ursache
+
+### 1 · Sprengnetter und PriceHubble raus
+
+Gemessen, beide Leisten nebeneinander:
+
+| | Quellen |
+|---|---|
+| Tab Objekt | `dealpilot` · `import` · `voice` · `immometrica` (4) |
+| QuickCheck | `dpmb` · **`spr`** · **`ph`** · `expose` · `voice` · `immometrica` (6) |
+
+Im Tab Objekt stehen die beiden **gar nicht im DOM**; im QuickCheck sind
+sie fest ausgegeben (Z. 3399/3403). Sie verschwinden per Regel — das
+Markup bleibt, ein spaeteres Freischalten kostet dann nur zwei Zeilen.
+Passt zur Doktrin: **die beiden werden nach aussen ohnehin nie
+namentlich genannt, und wer sie zeigt, nennt sie.**
+
+### 2 · „0 Quellen gewaehlt" bei „Heute" weg
+
+`dpk-zahl` gibt es auf Prod nicht — die Zeile ist mit dem
+Bordkarten-Stil entstanden (v1672). **„Heute" heisst unveraendert; dazu
+gehoert auch, was NICHT da war.** Die Pruefung auf `aktuell` allein
+genuegte nicht: der Stil bleibt gemerkt, wenn das Layout faellt —
+deshalb zusaetzlich `layoutAktiv()`.
+
+### 3 · Der Abruf-Bereich stand 249 px vor dem Ende — **drei eigene Regeln, eine Ursache**
+
+Gegentest zuerst: ein inline gesetztes `margin-left:auto` verschob ihn
+sauber (823 → 1072). Also reine Kaskade, kein Flex-Problem.
+
+Der Kaskaden-Walker fand **drei** Regeln, alle von mir, alle mit
+demselben Denkfehler:
+
+| Version | Regel | Wirkung im Objekt-Tab |
+|---|---|---|
+| v1686 | `#oab-bar…:not(:has(.dp-pf-qr[data-hat-ziel])) .dp-pf-rz` | `18px` statt Ausrichtung |
+| v1686b | `:is(#oab-bar,#qc7-sources)… .dp-pf-qr[data-hat-ziel]` | `auto` griff nie |
+| v1686c | `:is(#oab-bar,#qc7-sources)… .dp-pf-qr:not([data-hat-ziel])` | `margin-left:0` |
+
+**`data-hat-ziel` setzt allein `renderQR()` im QuickCheck.** Im
+Objekt-Tab gibt es das Attribut nie — dafuer ist der QR dort immer
+gefuellt (54 px). Die Regeln lasen also dauerhaft „kein QR da" und
+nagelten den Knopf fest.
+
+> **Eine Bedingung, die an EINER Stelle richtig ist, wird an der anderen
+> zur Falle, wenn ihr Merkmal dort nie gesetzt wird.** Beim ersten Mal
+> war es ein Versehen, beim dritten ein Muster.
+
+Eine schwaechere Gegenregel danebenzustellen half nicht:
+`:not(:has(…))` traegt mehr Spezifitaet als die Ankerkette ohne. Die
+Bedingungen selbst sind korrigiert. **Ab jetzt gilt: Regeln mit
+`data-hat-ziel` tragen `#qc7-sources` und niemals `#oab-bar`.**
+
+**Nachgemessen, Tab Objekt:**
+
+| | vorher | jetzt |
+|---|---|---|
+| Rand rechts vom Abruf-Bereich | 249 px | **0** |
+| QR `margin-left` | 0 | **124,9 px (auto)** |
+| Abstand QR → Knopf | — | **14 px** |
+| „0 Quellen gewaehlt" | da | **weg** |
+
+Gold-Audit **RC=0**.
+
+**Commits.** `eda491c` · `f954831` · `ec11196`
+
+**Rest.** Der QR bleibt im QuickCheck leer, solange kein Pass entstanden
+ist — dort sitzt der Abruf-Bereich deshalb weiter kompakt hinter der
+letzten Kachel statt am Rand. Das ist Marcels frueherer Wunsch („das
+Abrufen ist ganz wild neben ImmoMetrica") und bleibt so, bis er etwas
+anderes sagt. Kleiner Unterschied nebenbei: die Wortmarke steht im
+Objekt-Tab als „DealPilot", im QuickCheck als „Pilot".
+
+### Nachtrag zu (18) · Auch im QuickCheck ans Ende
+
+Marcel: Abruf-Knopf und Barcode sollen im QuickCheck genauso am Ende
+stehen wie im Objekt-Tab.
+
+**Zurueckgenommen: die 18 px aus v1686.** Damals stand der Knopf am
+rechten Rand und liess 255 px weisse Flaeche hinter der letzten
+Kachel — das war die Beschwerde. **Die Luecke kam aber nicht von der
+Ausrichtung**, sondern von den 95 px Rand eines leeren QR; das war in
+v1686c gefunden und behoben.
+
+> **Eine Abhilfe, die den Anlass ueberlebt, wird zum naechsten Anlass.**
+> Ich hatte die 18 px stehenlassen, obwohl ihr Grund weg war — und sie
+> haben genau den Zustand hergestellt, den Marcel jetzt geruegt hat.
+
+Dazu: der leere QR behaelt `margin-left:auto` und verliert nur
+`margin-right` und `padding`. So schluckt er den freien Rest und nimmt
+Barcode wie Knopf mit ans Ende; die 47,5 px rechts, die die Luecke VOR
+dem Knopf aufrissen, bleiben weg. **Den freien Rest zu schlucken ist
+kein Abstand, sondern Ausrichtung.**
+
+**Nachgemessen im QuickCheck:**
+
+| | |
+|---|---|
+| Rand rechts vom Abruf-Bereich | **0** |
+| QR `margin-left` | **265,7 px (auto)** |
+| Abstand QR → Knopf | 14 px |
+| Knopf „Abrufen" | `rgb(26,20,7)` auf weiss, **bedienbar: true** |
+
+> **Eigener Messfehler, zurueckgenommen:** Im Zoom war der Knopf nicht
+> zu sehen, und ich hielt ihn fuer verschwunden. Der Ausschnitt war
+> falsch gerechnet — `elementFromPoint` gab ihn als obenauf und
+> bedienbar zurueck. **Ein Bildausschnitt beweist keine Abwesenheit.**
+
+**Commit.** `db66128`
+
+---
+
+## Rollout-Journal 29.09.2026 (19) — zwei tote Knöpfe, beide Altbestand
+
+Marcel hat sechs Punkte gemeldet. **Zwei davon waren harte
+Funktionsfehler** — die haben Vorrang bekommen, weil sie die App
+unbrauchbar machen. Die vier Gestaltungs- und Struktur-Punkte sind
+**offen** und stehen unten.
+
+### 1 · „Objekt anlegen" tat nichts — eine Endlosrekursion
+
+Gemessen: `newObj({ohneAuswahl:true})` wirft **`Maximum call stack size
+exceeded`**.
+
+`window.newObj` wird von **drei** Stellen umhuellt:
+
+| Datei | Marke |
+|---|---|
+| `neues-objekt-quellen.js:164` | `__nq` |
+| `newobj-fixes.js:134` | `_v434Wrapped` |
+| `object-actions.js:1951` | `_dpObjNewWrap` |
+
+**Zwei Ursachen, beide gemessen:**
+
+**(a) `orig` war eine Modulvariable.** Alle je erzeugten Wrapper
+benutzten dieselbe. Jede Erneuerung durch die 250-ms-Wache bog sie um —
+auch fuer die ALTEN Wrapper, die noch in fremden Umhuellungen steckten.
+Danach zeigte der alte auf den neuen und der neue ueber die fremde
+Huelle auf den alten.
+
+> **Eine Umhuellung muss ihr Original selbst festhalten.** Teilt sie es
+> mit den anderen, zeigt nach dem naechsten Umhuellen jede auf die
+> falsche — und irgendwann im Kreis.
+
+**(b) `newobj-fixes.js` reichte `__nq` nicht durch.** Die Datei gibt
+`_v434Wrapped` und `_dpWrapped` weiter; `__nq` fehlte, es gab die Marke
+zu dem Zeitpunkt noch nicht. Ohne sie haelt die Wache ihre Umhuellung
+fuer verloren und legt eine zweite darueber — genau die Erneuerungen,
+die (a) zum Ring gemacht hat.
+
+**Dazu ein verschlucktes `catch`:** in
+`neues-objekt-quellen.js` stand `catch (e) { r = null; }`. **Genau das
+hat die Rekursion unsichtbar gemacht** — der Klick lief ins Leere, ohne
+dass irgendwo etwas stand. Jetzt `console.error` plus Meldung.
+
+**Nachgemessen:** kein Fehler mehr, Objekt wird angelegt (13 → 14), das
+Modal schliesst, im Tower entsteht `2026-1045`.
+
+### 2 · „Rundgang starten" war seit V270 tot
+
+Nicht nur im Tower — **nirgends**, auch nicht bei „Heute". Der Kopf von
+`tour-sidebar.js` sagt seit V270 „Tour starten aus Aktionen-Sidebar
+entfernt", und die Funktion suchte danach `window.startTour`. **Das gibt
+es nicht** (gemessen: `undefined`), den Ersatzknopf
+`[data-action="start-tour"]` auch nicht. Der Eintrag in der Aktionsliste
+(`index.html:779`) ist aber stehengeblieben.
+
+> **Wer eine Funktion abschaltet, muss ihren Knopf mitnehmen.** Sonst
+> bleibt eine Schaltflaeche zurueck, die nichts tut — und das sieht wie
+> ein Fehler aus, weil es einer ist.
+
+Die Engine laeuft weiter: `tour-engine.js` haengt sie als
+`window.DpTour` ein (`start`, `reset`, `isComplete`, `getPlan` —
+gemessen). Der Knopf zeigt jetzt dorthin, mit `reset()` davor, damit ein
+abgeschlossener Rundgang nicht still nichts tut.
+
+**Nachgemessen:** Der Aufruf startet die Engine (sie oeffnet als ersten
+Schritt das Anlegen-Modal). **Ob ihre Schritt-Anzeige vollstaendig
+laeuft, ist NICHT bestaetigt** — sie wurde seit V270 ueber diesen Weg
+nicht mehr benutzt. Das gehoert nachgeprueft.
+
+### Offen aus derselben Meldung
+
+1. **Der Pre-Flight-Streifen in Kanzlei / Tower / Aktenmappe** soll
+   wieder wie in der Demo aussehen (bei „Heute" stimmt er jetzt).
+2. **Die Layouts direkt unter Einstellungen → Darstellung**, nicht erst
+   hinter „Darstellung oeffnen".
+3. **Partner-Branding** (Logo und Farbe aus dem Partner-Portal) wird in
+   den neuen Layouts nicht uebernommen; dazu fehlt ein Zuruecksetzen.
+4. **Standard soll der DealPilot-Dunkelmodus sein**, der Hell-Wechsel
+   gehoert unter „Darstellung oeffnen".
+
+**Commits.** `3085172` · `2fe8f7b` · `9313569`
+
+**Hinweis.** Beim Messen sind auf Staging Testobjekte entstanden
+(`2026-1044`, `2026-1045`, beide „Unbenannt"). Sie koennen geloescht
+werden.
+
+---
+
+## Rollout-Journal 29.09.2026 (20) — die vier offenen Punkte
+
+### 1 · Das Anlege-Modal ist ausgehängt
+
+Marcel: „nimm bitte auch das Modal bei neues Objekt anlegen erstmal
+raus." Die Datei bleibt liegen und ist heil (v1695b behob die
+Endlosrekursion); nur die `<script>`-Zeile ist auskommentiert. Wieder
+einhaengen heisst das Kommentarzeichen entfernen. Nebenwirkung, die
+gelegen kommt: damit faellt **eine von drei Schichten** weg, die sich um
+`window.newObj` gelegt hatten.
+
+### 2 · Die Layouts stehen unter Einstellungen → Aussehen
+
+Marcel hat es dreimal gesagt. Sie standen im Darstellungs-Panel, das
+erst hinter „Darstellung oeffnen" erscheint — eine Klickebene zu tief.
+Der Abschnitt dort heisst bereits „Aussehen".
+
+`settings.js` legt nur den leeren Behaelter an; gefuellt wird er aus
+`layout-varianten.js`, wo die Liste zu Hause ist. **Eine zweite Liste in
+den Einstellungen waere beim naechsten Layout schon falsch.**
+
+Reihenfolge ist Absicht: erst WO die Dinge liegen, dann WIE hell, dann
+alles Einzelne hinter „Darstellung oeffnen". Von grob nach fein.
+
+### 3 · Das Partner-Logo kam nie an — ein Sammelselektor kannte die Schiene nicht
+
+Die **Farbe** kam an (gemessen: ein Layout-Wechsel haelt `#2E7D8F`). Das
+**Logo** nicht.
+
+`sweepWordmark()` sucht nach `[class*="wordmark"]`, `[class*="-logo"]`,
+`[class*="-brand"]`. Die Schiene traegt
+`<span class="dpl-wm">Deal<i>Pilot</i></span>` — Text genau
+„DealPilot", also richtig erkannt, aber **`dpl-wm` passt auf keines der
+Muster**.
+
+> **Ein Sammelselektor aus Mustern erfasst nur, wer die Muster kennt.**
+> Wer neu dazukommt, muss sich melden — er wird nicht gefunden.
+
+**Nicht nachgemessen:** auf dem Testkonto ist kein Partner-Logo
+hinterlegt (`logo_b64` leer). Der Selektor ist korrigiert, der Beweis
+steht aus.
+
+### 4 · Der Hell-Zwang ist raus, und der Merker ueberlebte ihn
+
+`setze()` rief bei JEDEM Layout `window._dpDispSkin('hell')`.
+
+> Wer ein Layout waehlt, waehlt eine AUFTEILUNG. Die Helligkeit ist eine
+> zweite Entscheidung und gehoert dem Nutzer. Ein Umbau, der sich nicht
+> abwaehlen laesst, ist kein Angebot, sondern eine Ansage.
+
+**Danach war die App trotzdem hell** — `dp_chrome_hell: "1"` stand noch
+im Speicher und stellte sie beim naechsten Start wieder um. Der Zwang
+war raus, die Wirkung blieb. Das Zuruecksetzen raeumt ihn jetzt mit ab,
+dazu `dp_karten_variante`, `dp_layout_variante`, `dp_layout_seiten`.
+
+**Nachgemessen:** Zuruecksetzen ergibt `hellKlasse: false`, Layout
+„Heute", Merker geleert.
+
+### 5 · Der Gold-Waechter, dreimal vergeblich
+
+RC=1 nach v1697, und ich habe **dreimal** nur nach Hex gesucht. Mit
+`--alle` sagt er es genau:
+
+```
+js/layout-varianten.js    rgba(201,168,76,..) x1
+```
+
+**Gold in Zahlenform** in einem Inline-Stil. Es faerbt sich beim
+Mandanten genauso wenig um wie ein Hex — der Waechter zaehlt es zu
+Recht. Dazu zaehlte er den Rueckfallwert in meinem eigenen KOMMENTAR
+mit; er kann Erklaerung und Code nicht unterscheiden, und das ist
+richtig so.
+
+> **Bei RC=1 nicht raten, sondern `--alle` fragen.** Er nennt Datei UND
+> Fundform. Drei Anlaeufe waren drei zu viel.
+
+Der ganze Kasten steht jetzt im CSS. **RC=0.**
+
+**Commits.** `7cedd86` · `6c79ad9` · `a4f0a92` · `3ba4b5d` · `3587d0a`
+· `43d039a` · `3bb4244`
+
+**Rest.** Der Pre-Flight-Streifen in Kanzlei / Tower / Aktenmappe soll
+noch wie in der Demo aussehen — bei „Heute" stimmt er seit v1692b.
+Dazu Marcels neue Liste: Score-Grenzen (Deal-Score 88 zeigt „pruefen"),
+Webrecherche-Links mit `utm_source`, Wohnflaechenpruefung bei
+Mehrfamilienhaeusern (390 m² Gesamtflaeche wird als EINE Wohnung
+geprueft), Marktpreis-Abruf aus dem Co-Piloten, und die Einheiten der
+Westerfeldstr. erfassen.
+
+---
+
+## Rollout-Journal 29.09.2026 (21) — der Score ohne Maßstab
+
+### 1 · Score 88 und trotzdem „Prüfen"
+
+Marcel: „Investor-Deal-Score 82, Deal-Score 88 — der sagt mir aber immer
+noch Prüfen in Gelb. Diese Grenzen passen nicht."
+
+Die Skala im Prompt deckt **LTV und DSCR** ab, den **Gesamt-Score
+nicht**. Die KI bekam die Zahl („DealScore: 88 / 100", Z. 219) ohne
+jede Bedeutung und hat frei geraten — zwei widersprüchliche Aussagen auf
+demselben Bildschirm.
+
+> **Eine Zahl ohne Maßstab ist keine Aussage.** Wer sie weitergibt, muss
+> den Maßstab mitgeben — sonst erfindet der Empfänger einen.
+
+Die Stufen aus CLAUDE.md stehen jetzt im Prompt (TOP ab 85, GUT ab 70,
+SOLIDE ab 50, SCHWACH ab 35, darunter KRITISCH), und die Empfehlung ist
+daran gebunden. **Abweichen ist erlaubt** — aber nur mit einem benannten
+Grund im ersten Satz. Sonst wäre die KI ein Papagei des Scores, und man
+könnte sie sparen.
+
+### 2 · 390 m² sind keine Wohnung
+
+Marcel: „er sagt, die Wohnungsgröße sei mit 390 m² zu groß, obwohl sich
+die auf acht Wohnungen verteilt."
+
+Gesendet wurden `objart` und `wfl`, sonst nichts zur Struktur. Die KI
+las EINE Wohnung daraus und verglich sie mit einem Mietspiegel, der für
+Wohnungen gilt.
+
+**Der MFH-Konfigurator führt die Einheiten längst** (`mfh-einheiten.js`,
+gespeichert als `_mfh` in `storage.js:182`) — **sie sind nur nie
+mitgefahren.** Jetzt schon, und der Prompt benennt die Fläche
+ausdrücklich als SUMME mit Durchschnitt je Einheit. Fehlt die
+Einheitenzahl bei einem Mehrfamilienhaus, wird gewarnt und die Aussage
+zur Wohnungsgröße untersagt — **eine ungewisse Angabe ist besser als
+eine falsche Gewissheit.**
+
+**Zwei eigene Fehler dabei:**
+
+- **Erster Anlauf an der falschen Stelle.** Ich hatte
+  `collectObjectData()` erweitert (`deal-action.js`) — das speist Bank,
+  FB und Gutachten, **nicht** die Pilot-Analyse. Die baut ihren Payload
+  in `ui.js:666`. Zurückgenommen.
+- **Die Miete heißt `ist`.** Ich las `e.miete` und `e.nkm` — beides gibt
+  es nicht. Die Mieten wären stillschweigend leer geblieben, und
+  **niemand hätte es gemerkt: eine fehlende Miete sieht aus wie eine
+  nicht erfasste.**
+
+Mitgekommen sind jetzt auch `art` und `status` je Einheit, der
+**Leerstand** als eigene Zeile (er steht in den Einheiten, wird aber
+überlesen, wenn man nur die Summe sieht), die **WEG-Aufteilung**, die
+Gesamtnutzungsdauer und der **Modernisierungsstand nach Anlage 2**.
+
+### 3 · Quellen-Links ohne Zählparameter
+
+`utm_source=openai` hängt die Web-Suche der OpenAI-API selbst an jede
+URL. Dazu wurde die ganze Rohzeile als Linktext gezeigt — man las die
+Adresse zweimal.
+
+> Eine Quelle soll zeigen, **woher** etwas kommt. Eine Zeichenkette mit
+> Zählparametern zeigt, **über wen** es kam. Das ist nicht dasselbe.
+
+Jetzt wird die URL gesäubert (`utm_*`, `gclid`, `fbclid`, `ref`) und der
+Text davor als Beschriftung genommen; fehlt er, erscheint der Hostname.
+Die volle Adresse steht im `title`.
+
+**Nachgemessen am echten Prompt (Westerfeldstr. als MFH mit 8
+Einheiten):** Score-Stufen drin · Gesamtfläche als Summe mit 49 m²
+Schnitt · Leerstand · WEG-Status · Modernisierung · Ist-Miete je
+Einheit. Gold-Audit **RC=0**.
+
+**Commits.** `c0fde46` · `a39bc3a` · `0747021`
+
+**Rest.** Offen aus Marcels Liste: der Pre-Flight-Streifen in Kanzlei /
+Tower / Aktenmappe, der Marktpreis-Abruf aus dem Co-Piloten — und die
+Einheiten der **Westerfeldstr. 140 selbst**. Die kann ich nicht
+erfassen, ohne sie zu erfinden: acht Wohnungen mit Fläche, Miete und
+Stand sind Angaben, die aus dem Objekt kommen müssen, nicht aus einer
+Schätzung. Im RND-Gutachten stehen Baujahr und Fläche; Aufteilung und
+Mieten stehen dort nicht.
+
+### Nachtrag zu (21) · Die Westerfeldstr. 140 hat vier Wohnungen
+
+Marcel hat die Zahl genannt, der Rest stand im Objekt:
+
+| | |
+|---|---|
+| Objektart | MFH, Baujahr 1967 |
+| Wohnfläche | 390 m² |
+| Ist-Kaltmiete | 3.195 €/Monat |
+| **Einheiten** | **4** (vorher leer) |
+
+Aufgeteilt zu je 97,5 m² und rund 799 € — die Summen stimmen auf den
+Euro. **Die gleichmässige Verteilung ist eine Annahme**, Marcels Angabe
+war die Zahl vier. Wenn die Wohnungen unterschiedlich gross sind,
+gehoert das nachgetragen; fuer den Zweck — die Analyse soll nicht mehr
+390 m² fuer EINE Wohnung halten — genuegt sie.
+
+**Was ich NICHT eingetragen habe:** die Modernisierung. Der
+Konfigurator rechnet ohne Angabe **0 Punkte und 22 Jahre
+Restnutzungsdauer**; das ist die Rechnung fuer ein unmodernisiertes Haus
+von 1967, keine Feststellung. Die beiden Uebernahme-Knoepfe
+(„Modernisierungsgrad ins Objekt" und „Restnutzungsdauer in die AfA")
+blieben deshalb ungedrueckt. **Nachgemessen: der AfA-Satz steht
+unveraendert auf 2,0 %.**
+
+> Eine 0, die aus einer Nicht-Eingabe entsteht, ist keine Null. Sie
+> weiterzureichen hiesse, eine Vermutung als Messung auszugeben — und
+> hier haette sie die Abschreibung veraendert.
+
+**Dabei ein eigener Fehler gefunden, und ein teurer:**
+
+Gemessen am eigenen Payload nach dem Eintragen:
+
+```
+wfl: null            je Einheit
+flaeche_schnitt: null
+miete: 799           kam an
+```
+
+Der Konfigurator speichert die Flaeche so, wie sie getippt wurde:
+**„97,5"**. `Number('97,5')` ist **NaN**. Die Mieten gingen durch, weil
+„799" keine Nachkommastelle hat — **deshalb sah der Datensatz
+vollstaendig aus.**
+
+> **Ein halb gefuellter Datensatz ist schlimmer als ein leerer.** Wer
+> eine getippte Zahl weiterreicht, muss sie umrechnen: das Komma ist
+> kein Schoenheitsfehler, es ist ein anderer Zahlentyp.
+
+**Nachgemessen nach der Korrektur:** Summe 390 m², Schnitt 98 m², alle
+vier Einheiten mit Flaeche, Miete und Status im Payload.
+
+**Commit.** `bcc2104`
+
+---
+
+## 29.09.2026 (22) — v1701/v1702: die Rueckfrage und die zwei Ebenen
+
+### v1701 · Die Pilot-Analyse scheiterte nicht an zu langem Text
+
+Marcel meldete: „ich bekomme staendig im Co-Pilot Tab beim klicken auf
+Pilot Analyse starten einen Abruffehler: ⚠ KI-Antwort konnte nicht
+ausgewertet werden". Die Meldung selbst legte eine Ursache nahe
+(„typisch bei zu langen Antworten oder Modell-Haenger") — und die war
+falsch. Im `raw_text` stand die ganze Antwort des Modells:
+
+> „Ich kann die erforderlichen Informationen im Web recherchieren, um
+> die Analyse durchzufuehren. Moechtest du, dass ich das sofort starte?"
+
+Das ist kein abgeschnittenes JSON. Das Modell hat **um Erlaubnis
+gefragt** — in einem Einweg-Aufruf, in dem niemand antworten kann.
+`buildPrompt` traegt einen `## RECHERCHE-AUFTRAG`, aber kein Verbot von
+Rueckfragen; `analyze()` hatte keinen zweiten Anlauf.
+
+> **Eine Fehlermeldung, die ihre eigene Ursache nennt, lenkt vom
+> `raw_text` ab.** Die Antwort lag die ganze Zeit in der Meldung, die
+> Marcel vor Augen hatte.
+
+Gebaut:
+
+- `ANTI_RUECKFRAGE` am Prompt-Ende: keine Rueckfragen, keine
+  Erlaubnisfrage, erstes Zeichen `{`, letztes `}`, Fehlendes gehoert
+  **ins** Feld statt daneben
+- Zweiter Anlauf bei Parse-Fail — **ohne** Websuche (die war der
+  Anlass), `temperature 0`, Recherche-Auftrag fuer diesen Durchgang
+  ausdruecklich aufgehoben. Der Zweig wird nur bei `!parsed` betreten,
+  kostet im Normalfall also nichts.
+
+**Nachweis:** echter Lauf auf Staging ueber `Auth.apiCall('/ai/analyze')`
+mit dem Payload der laufenden Oberflaeche — 23 s, **22 Felder**,
+Empfehlung „Kaufen", `raw_text: null`. Im Backend-Log **keine**
+Parse-Warnung: der erste Anlauf lieferte sauberes JSON.
+
+**Commit.** `fab997d`
+
+### v1702 · Der Pre-Flight-Streifen: zwei Ebenen bauten dieselbe Flaeche um
+
+Marcel: „jetzt sieht der Streifen bei Datenaufnahme im Tab Objekt bei
+dem Layout Kanzlei und Tower und Arbeitsmappe nicht mehr so aus wie aus
+unserer demo. Stand heute passt die pre flight Karte."
+
+Gemessen im Layout Kanzlei (v2) gegen den Auslieferungszustand:
+
+| | ohne Layout | Kanzlei |
+|---|---|---|
+| Hoehe | 78 px | 128 px |
+| Grund | Runway-Verlauf | `#FFFFFF` |
+| `.dp-pf-stripe` | 1280x78 | **0x0** |
+| `.dp-pf-perf` | 1x78 | **0x0** |
+| `.dp-pf-lead` | 149x78 links | 1278x38 als volle Zeile |
+
+Der Weg dorthin ging ueber **vier** Anlaeufe, und jeder deckte eine
+Schicht auf, die die vorige verdeckt hatte:
+
+1. **v1702** — 35 Regeln hingen an
+   `html[data-dp-layout]:not([data-dp-kartenstil])`: sobald irgendein
+   Layout aktiv war, wurde der Streifen zur hellen Bordkarte umgebaut,
+   ohne dass jemand das gewaehlt hatte. Anker heisst jetzt
+   `data-dp-pfstil` und wird nirgends gesetzt.
+2. **v1702b** — es blieb bei `kartei`. Ursache: die **v1654-Migration**
+   hatte jedem Nutzer `trichter`/`bordkarte` → `kartei` gesetzt.
+   Zurueckgenommen; jeder gemerkte Entwurf faellt einmalig weg.
+3. **v1702c** — es blieb *immer noch* bei `kartei`. Gemessen mit einem
+   Faenger auf `setAttribute`: `karten-stil.js:567`, der Beobachter auf
+   `data-dp-layout`, wird registriert **bevor** `start()` laeuft.
+   Setzt `layout-varianten.js` in diesem Fenster das Attribut, ruft der
+   Beobachter `setze(localStorage[LS])` — noch mit dem alten Wert.
+   `start()` leerte danach den Merker, rief aber nichts mehr.
+   `else if (gemerkt) setze(gemerkt)` → `else setze(gemerkt)`.
+
+   > **Einen Merker zu leeren raeumt nicht auf, was daraus schon
+   > geworden ist.** Und: ein Merker, der an zwei Orten liegt
+   > (localStorage **und** Modulvariable), laesst sich nicht an einem
+   > aufraeumen.
+4. **v1702d** — jetzt war der Streifen 55 px hoch und dunkel statt
+   Runway. Sieger war `body.dp-neue-karte .dp-pfbar` — eine Marke, die
+   **jedes** Layout am body setzt, mit 50 eigenen Streifen-Regeln.
+   Auf `body.dp-pfzeile` umgehaengt (wird nirgends gesetzt);
+   `dp-neue-karte` bleibt unangetastet, sie formt die Objektkarten.
+
+> **Zwei Ebenen, die dieselbe Flaeche umbauen: die eine abzuschalten
+> sieht aus wie ein Fehlschlag, solange die andere noch greift.** Nach
+> v1702 und v1702c sah der Streifen jeweils *anders* falsch aus — das
+> war der Hinweis, dass jedes Mal wirklich etwas gefallen war.
+
+**Nachweis (nach Neuladen, alle vier gemessen):**
+
+| | Hoehe | Grund | stripe | perf | Reisszone |
+|---|---|---|---|---|---|
+| ohne Layout | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+| Aktenmappe `v1b` | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+| Kanzlei `v2` | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+| Tower `v2b` | 78 | RUNWAY | 1280x78 | 1x78 | 208x78 |
+
+Bildbeweis in Kanzlei: Runway-Gold, „BOARDING PASS · PRE-FLIGHT ·
+DealPilot · Boarding", Quellen-Pillen, QR rechts. Der Vorspann misst in
+den Layouts 128 statt 149 px — das ist die schmalere Spalte, keine
+Regel.
+
+**Die vier Entwuerfe (Zeile, Trichter, Bordkarte, Kartei) bleiben ueber
+`data-dp-kartenstil` waehlbar.** Was faellt, ist die Vorgabe — sie sind
+ein Angebot, keine Ansage.
+
+**Gold-Audit RC=0**, genau auf der Basislinie (439 Fundstellen,
+54 Dateien).
+
+**Commits.** `8ca125f` · `7ac870f` · `08902dd` · `3ecbc63`
+
+**Rest:** Marktpreis-Abruf aus dem Co-Piloten (1 Abruf, vorher ansagen)
+und der Portfolio-Pilot im Cockpit stehen noch offen.
+
+---
+
+## 29.09.2026 (23) — v1703: Marktpreis aus dem Co-Piloten
+
+Marcel: „es waere vielleicht auch cool, wenn wir aus dem Copiloten auch
+eine neue Anfrage machen koennten an unsere Schnittstelle, wie denn so
+die gaengigen Marktpreise oder Marktpreisindikationen sind. Kann man ja
+vorher sagen, dass das einen Abruf kosten wuerde."
+
+**Kein zweiter Abrufweg.** `avmFetch()` in `object-actions.js` ist der
+Weg — mit Pflichtfeldpruefung, den Fehlertexten des Servers, Persistenz
+und Guthaben-Abzug. Der Co-Pilot bekommt nur eine Tuer dorthin.
+
+> Ein zweiter Abrufweg waere ein zweiter Ort, an dem die Einheit „Abruf"
+> spaeter falsch stehen kann. Genau daran ist v1664 aufgefallen: „zwei
+> Stellen, die dasselbe ankuendigen, und nur eine wurde umgestellt."
+
+**Gebaut:**
+
+- Das Bestaetigungs-Modal aus v754 wurde herausgeloest:
+  `abrufFrage({posten, titel, frage, knopf, merker, los, ab})`.
+  `_v754ConfirmRun()` ruft es genauso — eine Quelle, zwei Aufrufer.
+- **`abrufFrage` hat jetzt einen Nein-Rueckweg (`ab`).** Ein Aufrufer,
+  der auf die Antwort wartet, haengt sonst ewig an einem Versprechen,
+  das sich nie aufloest.
+  > **Eine Frage ohne Nein-Rueckweg ist keine Frage.**
+- `marktpreisFuerCopilot()` nimmt den ersten Anbieter mit vollstaendigen
+  Pflichtfeldern. Fehlt ueberall etwas, wird **nicht** abgerufen und
+  **nichts** belastet — die fehlenden Felder kommen als Text zurueck.
+- Eigener Merker `dp_skip_abruf_copilot`: wer im Tab Objekt „nicht mehr
+  fragen" gesetzt hat, hat das fuer die Quellenleiste getan.
+  **Eine Zustimmung wandert nicht mit.**
+- `copilot.js`: Knopf **„Marktpreis · 1 Abruf"** in der Kopfzeile. Die
+  Kostenansage steht **im Knopf**, nicht erst im Modal.
+- Das Ergebnis liegt ab dann in **jeder** Folgefrage
+  (`context.marktpreis_indikation`). Es nur einmal in den Chat zu
+  schreiben hiesse, dass das Modell es beim naechsten „und was heisst
+  das fuer den Kaufpreis?" nicht mehr hat — obwohl dafuer bezahlt wurde.
+- Prompt-Regel im Backend: die Indikation ist **vorrangiger Anker**, nie
+  „Verkehrswert", Spanne mitnennen, Quelle heisst **„unabhaengiger
+  Bewertungspartner"** (Anbieter-Neutralitaet). Ohne das Feld wird auf
+  den Knopf verwiesen statt eine Zahl geraten.
+
+### Zwei eigene Fehler, beide im echten Bedienweg gefunden
+
+**v1703b — `comingSoon` gibt es nicht, die Funktion heisst
+`provComingSoon`** (`object-actions.js:47`). Ich hatte den Namen
+geraten. Regel 1 aus CLAUDE.md, an mir selbst: Struktur wird nie
+angenommen, immer ausgelesen. Der Knopf meldete „Der Marktpreis-Abruf
+ist fehlgeschlagen", der echte Grund stand erst im geworfenen Fehler.
+
+**v1703c — 693 Euro Monatsmiete standen als 693 €/m² da.** Gemessen an
+der Westerfeldstr. 140. `marktmieteCold` ist die **Monatsmiete**; der
+Quadratmeterpreis hat eigene Felder (`marktmieteEurSqm`, `eurPerSqm`) —
+so liest es auch `avm-section.js:87/108`.
+
+> **Eine Zahl, die dreihundertfach daneben liegt und trotzdem plausibel
+> aussieht.** Die Einheiten stehen im Datensatz; sie zu raten ist
+> derselbe Fehler wie eine Struktur zu raten. Die Feldnamen im Kontext
+> tragen die Einheit jetzt **im Namen** (`marktwert_eur`,
+> `marktmiete_kalt_eur_monat`, `marktmiete_eur_qm`), damit das Modell
+> sie nicht ebenfalls raten muss.
+
+### Nachweis (echter Bedienweg, Westerfeldstr. 140)
+
+Objekt ueber die Karte geladen, Reiter „Pilot-Analyse", Knopf
+`#dp-cp-mp` — vorher `elementFromPoint` geprueft, er ist wirklich oben:
+
+```
+Marktwert-Indikation: 190.053 €  (Spanne 172.948 € – 212.859 €) · 487,00 €/m²
+Marktmiete (kalt): 693 €/Monat   (Spanne 631 € – 776 €)         · 1,78 €/m²
+```
+
+693 / 390 m² = 1,78 — rechnerisch sauber. **Die Zahlen selbst sind
+Demo-Werte:** Staging steht auf `mode: stub`, dort kostet der Abruf
+nichts und das Modal entfaellt (wie im Tab Objekt seit v1259).
+
+**Folgefrage im Chat** („Wie ordnest du den Kaufpreis gegen die
+abgerufene Indikation ein?"):
+
+> „Der Kaufpreis von 545.000 € liegt deutlich ueber der
+> Marktpreis-Indikation von 190.053 € (Spanne 172.948 € – 212.859 €)."
+
+Die Zahl ist angekommen, wird „Indikation" genannt und traegt ihre
+Spanne. Kein Anbietername.
+
+**Das Modal einzeln geprueft** (`abrufFrage` direkt gerufen, weil es im
+Demo-Modus nicht erscheint): Kopf „BOARDING PASS · DEALPILOT",
+Ueberschrift „Marktpreis abrufen", Kostenkasten „1 Marktwert-Abruf",
+Runway-Verlauf. **Abbrechen gemessen:** Modal weg, `ab` feuert, `los`
+nicht, und der Merker wird **nicht** gesetzt.
+
+**Offen als Staging-Abnahmepunkt:** der Live-Modus. Auf `stub` laesst
+sich nicht pruefen, ob im Tab Objekt nach dem Umbau von
+`_v754ConfirmRun` wirklich abgebucht wird — der Pfad ist dort
+`costing.map(...)` → `abrufFrage`, und `abrufFrage` ist bewiesen.
+
+**Gold-Audit RC=0**, genau auf der Basislinie.
+
+**Commits.** `de9cdb4` · `727563c` · `520e4c5`
+
+---
+
+## 29.09.2026 (24) — v1704: der Portfolio-Pilot im Cockpit
+
+Marcel: „im Portfolio Cockpit auch einen Piloten ... eine Pilot Analyse
+die das gesamte Portfolio analysiert und wo ich auch fragen stellen kann.
+das ist quasi der allwissende der mir zu jeder immobilie aber auch zur
+Vermoegensbilanz des gesamten Portfolios fragen beantworten kann. auch
+hier wieder mit und ohne web Recherche."
+
+### Drei Entscheidungen
+
+**1 · Er rechnet nichts nach.** `dashboard.js` bekommt
+`portfolioPayload()`, das `aggStats()` (die Aggregat-SSoT), `projectAll()`
+und `aggregateScore()` **liest**.
+
+> Eine zweite Aggregation waere eine zweite Wahrheit. Das Cockpit hat
+> davon schon drei (`aggStats`, `updateSidebarPortfolio`,
+> `_renderPortfolioHeader`), und sie laufen bereits auseinander.
+
+**2 · Die Analyse ist Fliesstext, kein JSON.** Die Einzelobjekt-Analyse
+fordert rund dreissig Felder — und ist genau daran **heute** gescheitert
+(v1701: das Modell fragte zurueck, statt zu antworten). Ein
+Portfolio-Prompt ist laenger, nicht kuerzer.
+
+> Ein Format, das scheitern kann, waehlt man, wenn es etwas bringt. Hier
+> bringt es nichts: der Text wird gelesen, nicht weiterverrechnet.
+
+Beides laeuft deshalb ueber `/ai/copilot`. Der Endpunkt ist **nicht** ans
+Einzelobjekt gebunden (`routes/ai.js:1545` schlaegt kein Objekt nach);
+`help.js` faehrt dort seit Langem einen voellig anderen Kontext.
+
+**3 · Die Analyse ist der erste Zug des Gespraechs** — sie landet in
+derselben `history` wie jede Frage danach.
+
+### Gebaut
+
+- **`frontend/js/portfolio-pilot.js`** (neu, 246 Z.): Kopfzeile mit
+  Web-Recherche-Schalter und „Portfolio-Analyse starten", Chat darunter.
+  Haengt sich per MutationObserver auf `data-dp-built` ein — `ensureMarkup()`
+  baut erst beim Oeffnen, und dafuer gibt es kein Ereignis.
+- **Ohne abgeschlossene Objekte wird nicht gefragt, sondern gesagt, dass
+  nichts da ist.** Ein Pilot ueber ein leeres Portfolio erfindet.
+- `objekte_im_payload` steht neben `anzahl_objekte`: ab 60 Objekten
+  rechnet das Modell sonst gegen eine Summe, zu der es die Posten nicht
+  hat — und merkt es nicht.
+- Einheiten stehen **im Feldnamen** (`_eur`, `_eur_jahr`, `_prozent`,
+  `_qm`) — die Lehre aus v1703c am selben Tag.
+- `openaiService`: `kontextArt='portfolio'` schaltet Ueberschrift, Rolle
+  und sechs Portfolio-Regeln um. Ohne den Diskriminator stuende
+  „AKTUELLES OBJEKT" ueber einer Vermoegensbilanz — **das Modell
+  antwortet auf die Ueberschrift.**
+
+### Zwei Rechenfehler im Cockpit, gefunden beim Bau
+
+**v1704b — die Modellprojektion rechnete in Cent.** `projectAll()` las
+`num(o._kaufpreis)`; der Kommentar an der SSoT sagt ausdruecklich, dass
+`_kaufpreis` **Cent** ist und `kp` **Euro**. Da Miete, Zins, Tilgung,
+AfA, Restschuld und Wert alle daraus abgeleitet werden, stand die
+**ganze** Projektion um Faktor 100 zu hoch — Tabelle **und** Charts.
+
+Gemessen auf Staging, 5 Objekte mit 848.000 € Kaufpreissumme:
+
+| | vorher | richtig |
+|---|---:|---:|
+| Wert 2026 | 84.800.000 € | 848.000 € |
+| Restschuld | 70.725.374 € | 808.698 € |
+| Miete | 4.240.000 € | 49.980 € |
+
+> **Aufgefallen ist es erst, weil der Pilot dieselbe Funktion liest und
+> seine Zahlen neben `aggStats()` standen. Eine Zahl allein sieht nie
+> falsch aus; erst die zweite, die dasselbe meint, verraet sie.**
+
+**v1704c — zwei Zahlen fuer dieselbe Miete in einer Ansicht.** Die
+Projektion las `ist_miete_j` / `kaltmiete_j` / `jahresmiete` — drei
+Feldnamen, die im Frontend **nirgends** gesetzt werden. Es griff immer
+der Notnagel `kp*0.05`: 42.400 € statt der 49.980 €, die das Cockpit
+daneben anzeigte. Jetzt dieselbe Kette wie `aggStats()`.
+
+**v1704d — ein Fehler, der an EINER Stelle behoben ist, ist nicht
+behoben.** Marcel hatte `utm_source=openai` an der Pilot-Analyse
+gemeldet; behoben wurde es in `ui.js` (`_urlSauber`) — aber nur fuer die
+**strukturierten** Quellenfelder. Gemessen am Portfolio-Piloten, direkt
+nach dem Bau:
+
+```
+([miete-aktuell.de](https://www.miete-aktuell.de/...?utm_source=openai))
+```
+
+Im Chat stehen die Links im Fliesstext, und in den **Langtexten** der
+Analyse (`makrolage_recherche`, `kaufpreisniveau`) ebenso. `_urlsSaeubern()`
+sitzt jetzt im Backend — hinter `copilotChat` (gilt fuer Co-Pilot,
+Hilfe-Assistent **und** Portfolio-Pilot) und rekursiv hinter `analyze`.
+Entfernt werden nur Zaehl- und Herkunftsparameter; ein Parameter, der den
+**Inhalt** bestimmt, bleibt, sonst liefe der Link ins Leere.
+
+### Nachweis (echter Bedienweg, Staging, 5 Objekte)
+
+Payload gegen die Cockpit-Anzeige:
+
+```
+Gesamtinvestition 933.926 | Kaufpreissumme 848.000 | EK 100.008
+Restschuld 819.701 | Miete 49.980/Jahr | BMR 5,89 % | NMR 5,81 %
+Projektion J1/J5/J10 Eigenkapital: 39.302 / 168.960 / 339.191
+```
+
+Objektwert Jahr 1 = **848.000 €** = exakt die Kaufpreissumme. Die
+Projektionstabelle zeigt in Zeile 2026 jetzt **49.980 €** Miete, dieselbe
+Zahl wie die Kennzahlen darueber.
+
+**Analyse gestartet** — sie nennt alle Zahlen des Payloads unveraendert
+und die Objekte beim Namen (Musterstrasse 12, Am Markt 9, Hermannstrasse
+9, Baeckerstr. 7) mit ihrem Cashflow.
+
+**Rueckfrage** („Welches Objekt zuerst anfassen?"): bezieht sich auf die
+Analyse, nennt LTV 100 % und Score 22 aus dem Payload — das Gespraech
+laeuft weiter, nicht neu.
+
+**Web-Recherche** (Schalter an): vier Links zurueck, **kein einziger
+Zaehlparameter**. Derselbe Link trug im Lauf davor noch `utm_source=openai`.
+
+**Ein Zwischenfall, der keiner war:** ein Lauf endete mit „OpenAI API
+Fehler 500 / server_error". Das ist OpenAIs Seite; die Meldung wird
+sauber durchgereicht, der zweite Lauf ging durch. Ebenso brach ein
+`git pull` auf dem Server einmal mit „Permission denied (publickey)" ab —
+beim Wiederholen lief er. Beides notiert, damit es beim naechsten Mal
+nicht wie ein neuer Fehler aussieht.
+
+**Gold-Audit RC=0**, genau auf der Basislinie.
+
+> **Anmerkung zur Historie:** der Commit `e107d11` zeigt 4968 geaenderte
+> Zeilen in `dashboard.js`. Das ist eine **einmalige Zeilenenden-
+> Normalisierung** durch `core.autocrlf=true`, kein Inhalt. Der Commit
+> danach ist wieder 12 Zeilen gross.
+
+**Commits.** `640eff0` · `e107d11` · `60bffa3` · `3c09b28`
+
+**Rest:** Partner-Logo in den Layouts (kein Logo auf dem Testkonto
+hinterlegt) und die Rundgang-Schrittanzeige sind weiterhin unbewiesen.
+
+---
+
+## 29.09.2026 (25) — v1705: Loeschen, Menue, Icons, Schnellfragen
+
+### v1705 / v1705b · Das Loeschen im Portfolio
+
+Marcel: „man kann unter Portfolio wenn man die Objekte auswaehlt kein
+Objekt mehr loeschen. das muessten wir realisieren dass das wieder geht."
+
+**Zwei Ursachen uebereinander**, und die erste verdeckte die zweite:
+
+**1 · `.sbc-actions` stand in allen drei Layouts auf `display:none`.**
+Ausgeblendet beim Umbau der Karte zur kompakten Listenzeile, zusammen
+mit Thumbnail und Kennzahlkacheln. Die Knoepfe existierten (22x22 px
+ohne Layout), waren aber nicht da.
+
+> Eine Gestaltungsentscheidung hat eine Funktion mitgenommen. Das faellt
+> nicht auf, solange niemand loeschen will — und dann sieht es aus, als
+> sei die Funktion weg.
+
+Der Zielkonflikt bleibt echt: die Zeile SOLL schmal sein. Geloest ueber
+**Sichtbarkeit statt Platz** — absolut rechts in der Zeile, sichtbar bei
+Hover oder an der ausgewaehlten Karte. Sie nehmen nie Breite weg. Auf
+Touch (`@media (hover:none)`) stehen sie an der aktiven Karte dauerhaft,
+sonst waere das Loeschen auf dem Handy genauso weg wie vorher.
+
+**2 · Der Klick auf eine Karte klappt die ganze Liste zu.** Erst im
+ECHTEN Bedienweg gemessen (Karte anklicken statt `.active` von Hand
+setzen):
+
+```
+data-dpl-portfolio: zu | .dpl-teil-objekte: display none
+sichtbare Karten: 0
+```
+
+Der Kommentar an der Stelle (v1653) sagt: „man hat ja gefunden, was man
+gesucht hat."
+
+> **Wer loeschen will, hat NICHT gefunden, was er gesucht hat.** Er will
+> die Zeile weghaben — und sie klappt ihm unter dem Finger weg.
+
+Das Zuklappen bleibt, es hat seinen Sinn. Es greift nur nicht mehr fuer
+Klicks innerhalb von `.sbc-actions`.
+
+**Nachweis (echter Bedienweg, alle drei Layouts):** Liste auf → Objekt
+anklicken (Liste klappt zu) → Liste wieder auf → die aktive Karte traegt
+ihre Knoepfe: `opacity 1`, **20x20 px**, `elementFromPoint` trifft
+`BUTTON.sbc-btn sbc-del`. Bildbeweis: die Karte zeigt rechts Duplizieren
+und ×, die Adresse bleibt lesbar.
+
+*Ehrlicher Abnahmepunkt:* der Klick auf Loeschen selbst oeffnet ein
+`confirm()` und laesst sich nicht automatisiert ausloesen. Bewiesen ist,
+dass der Knopf da und erreichbar ist — `cardDelete` dahinter ist
+unveraendert.
+
+### v1705 · Zwei Punkte weniger unter Aktionen
+
+„Rundgang starten" und „Feedback & Support" **nur in den Layouts**
+ausgeblendet. Die normale Ansicht behaelt beide — dort ist die
+Aktionsliste der einzige zweite Weg zur Tour (v1179). `.sb-act-tour` als
+Anker neu gesetzt; ohne ihn muesste die Regel auf den `onclick` zielen,
+und der aendert sich.
+
+### v1705c · Die Icons waren Kleckse statt Umrisse
+
+Marcel: „die Icons der einzelnen Punkte unter Aktionen aus der ‚heute'
+Ansicht uebernimmst. Auch gerne in Gold."
+
+Erst im **Bildvergleich** sichtbar geworden: in der normalen Ansicht
+feine Linien-Symbole, in der Schiene gefuellte Flaechen. Die Zahlen
+hatten es verschwiegen — die Icons waren vorhanden, gold und gleich
+gross.
+
+**Ursache:** die Goldregel setzte `fill:currentColor !important` mit. Die
+Symbole tragen `fill="none" stroke="currentColor"` als
+Praesentationsattribut, und **CSS schlaegt ein Praesentationsattribut** —
+aus jedem Umriss wurde ein Klecks.
+
+> **Die Regel wollte die Farbe setzen und hat die Form mitgenommen.**
+> `color` faerbt ueber `currentColor` bereits beides; `fill` musste dafuer
+> nie angefasst werden.
+
+Nachgemessen: `fill=none`, `stroke=rgb(201,168,76)` — und im Bild wieder
+dieselben Umrisse wie in der normalen Ansicht.
+
+### v1705d · Schnellfragen fuer den Portfolio-Piloten
+
+Vier Chips unter dem Verlauf: Cashflow-Belastung, Zinsbindungen,
+Eigenkapital in 10 Jahren, Klumpenrisiken. Alle vier sind Fragen, die das
+Portfolio wirklich beantworten KANN — die Daten stehen im Payload.
+
+> Eine Schnellfrage, deren Antwort nicht in den Daten steht, ist eine
+> Einladung zum Erfinden.
+
+Deshalb nichts zu Marktpreisen oder Standorten — dafuer braucht es die
+Web-Recherche, und die schaltet der Nutzer selbst ein. Jede Frage sagt
+dem Modell ausserdem, was bei fehlender Angabe zu tun ist.
+
+**Nachweis:** Chip geklickt, im Chat steht die kurze Fassung, das Modell
+bekam die lange und antwortete mit allen fuenf Objekten samt Zahl,
+sortiert.
+
+### v1705e · Der Waechter schlug bei Erfolg Alarm
+
+`deploy-staging.ps1` brach ab: „Serverstand ist '8f5aa70', lokal steht
+'8f5aa704'". **Derselbe Commit.** `git rev-parse --short` kuerzt nur so
+weit, wie es im JEWEILIGEN Repo eindeutig ist, und die beiden Repos haben
+nicht dieselben Objekte. Voller Hash gegengeprueft: identisch.
+
+> **Ein Waechter, der bei Erfolg Alarm schlaegt, wird abgeschaltet — und
+> dann faellt der echte Fall auch nicht mehr auf.**
+
+Beide Seiten lesen jetzt den vollen Hash; die Meldung zeigt zehn Zeichen.
+Mit sich selbst bewiesen: `9c682d9159 == lokal 9c682d9159`.
+
+### v1704e · Ein eigener Fehler, ausdruecklich zurueckgenommen
+
+`dashboard.js` galt fuer `grep` und `file` als **Binaerdatei** — 18
+NUL-Bytes. Ich hatte die Rahmenzeichen U+2500 in einen **latin1**-
+Schreibvorgang gegeben; latin1 nimmt nur das niedere Byte, aus jedem
+wurde `0x00`. Aufgefallen erst, als eine Suche in der Datei nur noch
+„Binary file matches" lieferte.
+
+> **`node --check` war die ganze Zeit gruen.** Ein Syntaxpruefer sagt
+> nicht, ob eine Datei heil ist. Er sagt nur, ob sie sich parsen laesst.
+
+Behoben, alle anderen angefassten Dateien gegengeprueft (0 NUL).
+**Lehre:** in einen latin1-Schreibvorgang gehoert nur latin1 — Rahmen und
+Gedankenstriche als ASCII, oder die Datei als utf8 lesen UND schreiben.
+Dazu: **Backticks gehoeren nicht in einen `node -e`-Einzeiler mit
+doppelten Quotes** — Bash frisst sie als Kommandosubstitution, vier
+Kommentarzeilen kamen leer an (der Code war korrekt, nur der Text hatte
+Loecher).
+
+**Gold-Audit RC=0**, genau auf der Basislinie.
+
+**Commits.** `87f80d3` · `a8dfff8` · `569a66f` · `c7f0697` · `8f5aa70` ·
+`9c682d9`
+
+---
+
+## 29.09.2026 (26) — v1706: Kopfleiste, Aktionen, Einstellungen, Kartei
+
+Marcels Nachricht enthielt neun Punkte. Alle abgearbeitet, alle
+nachgemessen.
+
+### 1 · Die Kopfleiste war unlesbar
+
+„wenn ich den Tower als Layout ausgewaehlt habe und oben im Header auf
+dein Kontingent klicke, dann ist die Schrift schwarz ... die Farbkombi
+genauso wie die Anzeige daneben mit dem hellen Bereich 0 von 6."
+
+**Gemessen, beide Zustaende:**
+
+| | ohne Layout | mit Layout |
+|---|---|---|
+| Panel-Ueberschrift | `rgb(201,168,76)` | **`rgb(0,0,0)`** |
+| Grund | `rgb(20,18,16)` | `rgb(20,18,16)` |
+| Kontrast | lesbar | **~1,0** |
+
+Schwarz auf Schwarz. Im Layout wurde der Kopfbereich hell gedacht und der
+Text dunkel gesetzt; das Panel darin ist dunkel geblieben und hat die
+Textfarbe geerbt.
+
+**Die Vorlage ist `.tabs-status-badge`** — gemessen, nicht geraten:
+Text `rgb(191,183,169)`, Grund transparent, Rahmen `rgb(230,225,214)`,
+Radius 7px. Uebernommen fuer Kontingent-Pille, Hilfe-Knopf und den
+Portfolio-Knopf.
+
+**Nachher:** Panel-Ueberschrift Kontrast **15,17**, die Zahl bleibt gold
+(9,95), Fussnote 5,11. Portfolio-Knopf exakt `rgb(191,183,169)` /
+`rgb(230,225,214)` — identisch mit der Vorlage. Im Bild stehen Pille und
+Vorlage nebeneinander und sehen gleich aus.
+
+**Vier Anlaeufe, und jeder hatte einen eigenen Grund:**
+
+- **v1706** — die vorhandene Regel `header.hdr:has(#hdr-badges)` greift
+  **nirgends**: `#hdr-badges` liegt gar nicht im Header
+  (`hdr.contains(badges)` ist false). Sie sieht richtig aus und trifft
+  nichts, wie der `#app`-Anker aus v1147.
+- **v1706d** — meine Regel `html[data-dp-layout] #hdr-credits-pill`
+  (1,1,0) verlor gegen `html[data-dp-layout] body header.hdr
+  #hdr-credits-pill` (1,2,2). Und die Panel-Regeln verloren gegen den
+  eigenen Stern-Selektor, weil der eine ID traegt.
+- **v1706e** — der Portfolio-Knopf haengt an
+  `.dpl-schiene[data-ton="dunkel"]`, ein Attribut mehr.
+- **v1706f** — die Rahmen: **`border:` ist eine Kurzschrift** und wird
+  im Kaskadenvergleich nicht zu `border-color` expandiert.
+  > Wer eine Farbe setzen will, setzt die Farbe. Die Kurzschrift setzt
+  > drei Dinge und verliert an jedem einzeln.
+
+> **Ein Werkzeugbefund, der Zeit gekostet hat:** `getComputedStyle`
+> meldete den Rahmen weiter als `oklab(...)` — **selbst nachdem ein
+> Inline-`!important` gesetzt war**, was unmoeglich ist. Dass
+> `border-radius: 7px` aus derselben Regel ankam, bewies, dass sie
+> greift. **Entschieden hat der Bildausschnitt, nicht die Zahl.**
+> Dasselbe Muster wie bei `getComputedStyle` im iframe.
+
+### 2 · Die Aktionsliste
+
+Zeilen von 5 auf **7 px** Polsterung plus 1 px Abstand, Ueberschriften
+von 8,5 auf **10 px** — sie waren kleiner als jede andere Schrift in der
+App. Die Gruppe **„Ausgeben" faellt weg**, aber nur dort, wo die
+Ausgaben-Box wirklich steht: die Bedingung ist
+`:has(.dpl-teil-ausgaben)`, nicht das Layout.
+
+> Eine Gruppe auszublenden, weil man ANNIMMT, dass es sie woanders gibt,
+> ist der Weg, auf dem Funktionen verschwinden.
+
+Gemessen: 4 Eintraege im DOM, **0 sichtbar**.
+
+### 3 · Einstellungen
+
+Profil-Wahl Obsidian/Hell und der obere Knopf „Darstellung oeffnen"
+entfernt. **Zuruecksetzen bleibt**, wie gewuenscht; die Layout-Wahl
+darueber auch — sie ist das, was hier wirklich entschieden wird.
+
+### 4 · Die Kartenstile
+
+**Trichter und Bordkarte sind raus**, nur `zeile` und `kartei` bleiben
+waehlbar (im Browser gegengeprueft: `stile: ["zeile","kartei"]`). Die
+CSS-Bloecke der beiden bleiben stehen — ohne Eintrag in `STILE` wird das
+Attribut nie gesetzt.
+
+> Ein Entwurf, den niemand mehr waehlen kann, richtet keinen Schaden an.
+> Ein halb entfernter richtet welchen an.
+
+**Die Kartei nachgezogen:** der QR war dort **gar nicht da** (er stand in
+derselben Ausblendliste wie Streifen und Perforation). Jetzt **92x92**
+statt 64, ohne Rahmen, Quellen-Pillen in Schwarz (`rgb(17,17,17)`).
+
+> **Eine Korrektur an mir selbst:** in v1706c stand
+> `background:transparent` am QR. Das war falsch — Marcel hat „keinen
+> Rahmen" gesagt, nicht „keinen Grund", und **ein QR ohne helle Ruhezone
+> ist nicht mehr scannbar**. Eine staerkere Regel hat es zufaellig
+> verhindert; richtig ist es erst, seit es ausdruecklich dasteht.
+> **Ein Rahmen ist Zierat. Die weisse Flaeche um einen QR ist Technik.**
+
+### Gold-Audit
+
+**RC=0 — und der Deckel ist GESUNKEN:** `js/settings.js` 26 → 25, weil
+die Fundstelle mit dem Obsidian/Hell-Block wegfiel. Basislinie
+nachgezogen, sonst bliebe Luft fuer neues Hartgold an derselben Stelle.
+
+**Commits.** `f630230` · `c68d2a0` · `20c3265` · `3663bca` · `71755ce` ·
+`7c4ec0f` · `c5ed702` · `d324301`
+
+---
+
+## 29.09.2026 (27) — v1707/v1708: Demo, Reiter-Icons, eine Anzeige
+
+### 1 · Zehn Entwuerfe fuer die Objektkarten (Demo)
+
+Marcel: „kannst du mir bei den neuen layouts auch wenn man unter
+portfolio klickt schoenere objekt karteien angeben? kannst du mir 10
+ideen liefern als demo. aktuell sieht das so schlicht aus."
+
+**`design/mockups/objektkarten-schiene-v1707.html`** — Bordkarte,
+Aktenreiter, Score-Kante, Datenzeile, Bildkachel, Ampel, Kennzahlen,
+Minimal, Status, Cockpit.
+
+Gemessen am laufenden Stand, nicht geraten: Schiene **248 px**, Karte
+**216 x 81 px**. Die Objekte in der Demo sind **echt** aus dem
+Staging-Portfolio — mit langen Adressen, einem Fall ohne Namen
+(„Unbenannt") und einem ohne Score.
+
+> Ein Entwurf, der nur mit dem schoenen Fall funktioniert, faellt erst
+> beim Kunden auf.
+
+**Noch nichts davon ist gebaut** — die Demo ist die Entscheidungsvorlage.
+
+### 2 · Die Reiter-Symbole waren Flaechen statt Linien
+
+Marcel: „bei der Ansicht Kanzlei koennen natuerlich die Icons bei
+Objekt, Investition, Miete und allem auch uebernommen werden, wie von
+unserem urspruenglichen heute."
+
+Gemessen: `fill = stroke = dieselbe Farbe` bei allen neun Reitern.
+Dieselbe Ursache wie bei den Aktionen in v1705c.
+
+**Und derselbe Fehler zweimal gemacht:** v1707 raeumte eine Regel auf,
+danach sah es unveraendert aus. Der Walker nannte den Grund in einer
+Zeile — eine **zweite** Regel,
+`html[data-dp-layout] .dpl-schiene:has(nav.tabs) nav.tabs .tab svg`,
+legte `fill:currentColor !important` ebenfalls darauf.
+
+> **Ich hatte in v1707 selbst geschrieben:** „wer eine Sammelregel
+> aufraeumt, geht ihre ganze Liste durch." Dann habe ich nach der ersten
+> aufgehoert. Zwei Regeln fuer dieselbe Flaeche, und die zweite sah aus
+> wie ein neuer Fehler.
+
+**Nachgemessen (frischer Tab):** `fill=none` bei allen Reitern, im Bild
+saubere Umrisse — Haus, Uhr, €, Bank, Zahnrad, Dokument.
+
+### 3 · Eine Fortschrittsanzeige statt zwei
+
+Marcel: „in der Tabbar einmal diese alle sechs Bereiche vollstaendig ...
+und oben im Header nochmal 24 von 24 Felder fuer den Investor Deal Score
+... dann kann man sich eine Anzeige sparen."
+
+**Gemessen an der Westerfeldstr. 140, beide gleichzeitig sichtbar:**
+
+```
+#tabs-status-badge   "6 / 6 · 100 %"     sechs Bereiche
+#hdr-completeness    "21 / 24 Felder"    Investor Deal Score
+```
+
+> **Zwei Fortschrittsanzeigen nebeneinander beantworten nicht zwei
+> Fragen. Sie stellen eine dritte: welche gilt jetzt?**
+
+**Die Stufen sind Marcels:**
+
+| Zustand | Anzeige |
+|---|---|
+| einfache Bewertung unvollstaendig | `N / 6 Bereiche` |
+| vollstaendig **und** Plan traegt IDS | `N / 24 Felder` |
+| sonst | `Vollstaendig` |
+
+`hasFullFeature`, nicht `hasFeature`: der Free-Plan traegt
+`deal_score_v2` als „demo" (calc.js:130, Absicht). **Eine Demo ist kein
+Anspruch auf 24 Felder** — wer den Score nicht hat, soll nicht den Rest
+eines Features sehen, das er nicht bekommt.
+
+Die Kopf-Anzeige wird zur **Quelle**: ausgeblendet, aber im DOM und
+gefuellt, weil `hybrid-aktionen.js:162/174` `.hdr-comp-text` ausliest.
+
+> Eine Anzeige abzuschalten heisst nicht, ihre Daten wegzuwerfen. Jemand
+> anders liest sie vielleicht.
+
+**Nachgemessen:** Anzeige „21 / 24 Felder", Titel „Einfache Bewertung
+steht. Noch 3 Felder bis zum vollen Investor Deal Score.",
+`#hdr-completeness` auf `display:none`, `.hdr-comp-text` weiter gefuellt.
+
+### Zwei eigene Fehler, beide zurueckgenommen
+
+**1 · Die neue Funktion landete MITTEN in `updateProgress()`.** Der
+Haekchen-Block danach waere in ihr gelandet und haette `status` nicht
+mehr gehabt. **`node --check` war gruen** — es prueft nur Syntax. Per
+`git checkout --` zurueckgenommen, die Funktion ans Modulende gesetzt,
+Reihenfolge danach gegengeprueft (`wfStatus < haekchen < funktion`).
+
+**2 · Ein Messfehler, der wie ein Codefehler aussah:** zweimal meldete
+der Browser die alte Fassung, obwohl der Server die neue hatte —
+`location.reload(true)` macht in heutigem Chrome **keinen** Hard-Reload
+mehr. Gemessen an den geladenen Pfaden: `workflow.js?v=v1255`, waehrend
+`index.html` auf dem Server `v1708` trug.
+
+> **Ein Cache-Treffer sieht aus wie eine Regel, die nicht greift.** Vor
+> jeder Kaskadendiagnose die geladene Dateiversion lesen — und zum
+> Messen einen frischen Tab mit eigenem Query-Parameter nehmen.
+
+**Gold-Audit RC=0**, Basislinie jetzt 438.
+
+**Commits.** `9fd6627` · `f8e6a56` · `4a5b435` · `e76a0c0`
+
+---
+
+## 29.09.2026 (28) — v1709: der Aktenreiter steht
+
+Marcel hat aus den zehn Entwuerfen von v1707 gewaehlt: **„setz die
+aktenreiter um"** (Entwurf 02).
+
+### Umgesetzt, ohne einen einzigen neuen Knoten
+
+Gemessen an der **echten** Karte, nicht aus der Demo uebernommen:
+
+| Teil | vorher | Rolle im Reiter |
+|---|---|---|
+| `.sbc-seq` | „2026-999" 45x14 | **die Lasche** |
+| `.sbc-top` | 166x48 | **das Blatt** |
+| `.sbc-address` | 166x15 | Titel im Blatt |
+| `.sbc-kp` | 48x12 | darunter |
+| `.sbc-score-overlay` | 26x31 | Ring rechts im Blatt |
+
+> Ein Entwurf, der neue Knoten braucht, muss von JS gebaut werden und
+> geht bei jedem Neurendern der Liste verloren. Einer, der die
+> vorhandenen umstellt, ueberlebt es.
+
+Die Lasche IST die Objektnummer, die ohnehin dastand — sie wurde nach
+oben gesetzt und bekam ihren eigenen Grund. Das Blatt traegt
+`border-radius: 0 5px 5px 5px`, damit die Lasche sitzt, als gehoere sie
+dazu.
+
+### Zwei Dinge, die die Demo nicht wusste
+
+**1 · Die Aktionsknoepfe mussten mit.** v1705 hatte sie auf `top:50%`
+der KARTE gelegt. Mit der Lasche ist die Kartenmitte nicht mehr die
+Blattmitte — sie saessen 6–7 px zu hoch und ragten in die Lasche.
+
+> Wer die Hoehe einer Flaeche aendert, verschiebt alles, was sich auf
+> ihre Mitte bezieht.
+
+**2 · Ein Kind, das in keinem Entwurf vorkam.** Gemessen nach dem ersten
+Anlauf: die Karte blieb **81 px statt 57**, der Score-Ring wurde 65 px
+hoch. Grund:
+
+```
+.sbc-won-ribbon   214 x 21   display:block   position:static
+```
+
+Das „Zuschlag erhalten"-Band steht **im Fluss** und schob das Blatt um
+21 px nach unten. Alles, was sich auf die Kartenhoehe bezog, rechnete
+danach falsch.
+
+> **Eine Demo zeigt den Fall, den sie zeigt.** Die echte Karte hat
+> Zustaende, die in keinem Entwurf vorkamen — Zuschlag erhalten,
+> Investor-Score berechnet. Wer nur den Entwurf umsetzt, baut fuer eine
+> Karte, die es so nicht gibt.
+
+Beide Baender wurden zu **Laschen rechts**, gegenueber der Objektnummer.
+Das passt zur Aktenmetapher und nimmt sie aus dem Fluss. Sind beide da,
+rueckt der Investor-Reiter per `:has()` nach links. **Gruen bleibt hart**
+— CLAUDE.md: Statusfarben werden nie tokenisiert, ein Zuschlag ist in
+jeder Marke gruen.
+
+### Nachweis (frischer Tab, Layout Kanzlei)
+
+```
+Karte              216 x 60   (vorher 81)
+sbc-investor-ribbon 64 x 14   @y1
+sbc-won-ribbon      40 x 14   @y1
+sbc-top (Blatt)    214 x 44   @y14
+sbc-score-overlay   26 x 44   @y14   (vorher 65)
+sbc-actions         61 x 44   @y14
+```
+
+Lasche gold `rgb(201,168,76)`, Radius `3px 3px 0 0`; Blatt
+`rgb(21,20,15)`, Radius `0 5px 5px`. Im Bild: goldene Nummernlasche
+links, INVESTOR-Lasche rechts, Adresse und Preis im Blatt.
+
+**Ohne Objektnummer keine leere Lasche:** `:empty` blendet sie aus, und
+das Blatt bekommt dann rundum denselben Radius — sonst stuende ein
+goldener Krumen ueber einer frisch angelegten Karte.
+
+**Gold-Audit RC=0**, Basislinie 438.
+
+**Commits.** `e44b865` · `9429de8`
+
+### Die beiden alten Nachweispunkte sind geschlossen
+
+Beide standen seit Tagen als „unbewiesen" im Journal.
+
+**1 · Partner-Logo und -Farbe in den Layouts.** Bisher nicht pruefbar,
+weil auf dem Testkonto kein Logo hinterlegt ist. Jetzt ueber den echten
+Weg gemessen — `DealPilotWhitelabel.apply()` mit einem Testlogo, nur im
+laufenden Tab, ohne das Konto anzufassen:
+
+```
+vorher    .dpl-marke "Text: DealPilot"      --gold #C9A84C
+nachher   .dpl-marke IMG 90x21 (geladen)    --gold #1B5E9C
+          .sbc-seq (Aktenreiter-Lasche)     rgb(27,94,156)
+```
+
+Das Logo steht sichtbar in der Schiene, der aktive Reiter traegt die
+Partnerfarbe — **und die neuen Aktenreiter-Laschen faerben sich mit**,
+weil sie `var(--wl-c9a84c, #C9A84C)` tragen statt eines harten Goldwerts.
+Danach `reset()`, `--gold` zurueck auf `#C9A84C`.
+
+**2 · Die Rundgang-Schrittanzeige.** Gemessen an den ECHTEN Klassen aus
+`tour-engine.js:297-309` statt an geratenen:
+
+```
+dp-tour-overlay    2133 x 988
+dp-tour-spotlight   395 x 631
+dp-tour-bubble      460 x 369
+Text: "Schritt 1 von 37 - Willkommen bei DealPilot"
+```
+
+> Mein erster Versuch suchte nach `.dp-tour`, `.tour-overlay`, `#dp-tour`
+> und fand nichts — die Namen waren geraten. Drei Zeilen `grep` in der
+> Datei haetten es sofort gesagt.
+
+**Damit ist aus dieser Reihe nur noch ein Punkt offen:** die Abbuchung
+des Marktpreis-Abrufs im LIVE-Modus. Staging steht auf `stub`, dort
+kostet nichts — das laesst sich hier grundsaetzlich nicht messen.
+
+### v1709c — Nachtrag: die Lasche sass IM Blatt
+
+Marcel: „ne die karten sehen nicht so aus wie in der demo." **Er hatte
+recht, und meine Messung aus v1709b hatte es nicht gezeigt** — sie
+verglich Groessen, nicht Lagen.
+
+Gemessen, Abstaende relativ zur Kartenoberkante:
+
+```
+Lasche   y15 - 30      <- sollte y0 - 15 sein
+Blatt    y14 - 58
+Adresse  y22 - 38      <- lag damit UNTER der Lasche
+```
+
+**Ursache:** `position:absolute` richtet sich am naechsten
+POSITIONIERTEN Vorfahren aus. Ich hatte `.sbc-top` auf
+`position:relative` stehen lassen — damit wurde das Blatt selbst zum
+Anker, und `top:0` meinte die Blattoberkante statt der Karte. Die
+goldene Lasche landete quer auf dem Adresstext.
+
+> **`top:0` ist keine Angabe, sondern eine Frage: null wovon?** Wer ein
+> Element absolut setzt, muss den Anker mitpruefen, nicht nur den Wert.
+
+**Drei weitere Befunde im selben Lauf:**
+
+- Der Blattrahmen war `rgb(230,225,214)` — das helle Beige aus v1706f.
+  Jene Regel setzt `border-color` **einzeln** und schlaegt damit meine
+  `border`-Kurzschrift. **Derselbe Mechanismus, den v1706f selbst
+  beschreibt, diesmal gegen mich.**
+- Blatt `rgb(21,20,15)` auf Schiene `rgb(14,13,11)` — sieben Stufen
+  Unterschied, die Mappe war praktisch unsichtbar. Jetzt `#17160F` mit
+  Rahmen `#332E26`.
+- Der Score-Ring verschwand bei Hover und an der aktiven Karte (meine
+  eigene Regel aus v1709). Falsch: in der Demo steht er **immer**, und
+  er ist der Grund, warum man eine Liste ueberfliegt. Die Aktionsknoepfe
+  ruecken jetzt links an ihm vorbei.
+
+**Nachgemessen:** Lasche y1–16, Blatt y14–58, Adresse y22–38,
+`ueberlappt: false`. Im Bild: goldene Nummernlasche „2026-999", daneben
+INVESTOR, rechts die gruene WON-Lasche, darunter das Blatt mit Adresse
+und Preis, Score-Ring rechts.
+
+> **Eine Messung, die nur Groessen vergleicht, findet keine
+> Verschiebung.** v1709b meldete „Karte 60 px, Blatt 44 px, Laschen
+> oben" — alles richtig, und die Karte sah trotzdem falsch aus. Erst der
+> Vergleich der LAGEN (y-Bereiche von Lasche, Blatt und Text
+> gegeneinander) zeigte die Ueberlappung.
+
+**Gold-Audit RC=0.**
+
+**Commit.** `58766f8`
+
+---
+
+## 29.09.2026 (29) — v1710: der Status steckt im Rahmen
+
+Marcel: „man kann die ID oben nicht richtig lesen ... dann haben wir
+Objekte, da steht One dran. Also da haben wir alles Moegliche und wir
+haben ja gesagt, dass wir es rot umrahmen, wenn es verloren ist, golden,
+wenn es in Bearbeitung ist und gruen, wenn es gewonnen ist. Daher muss
+das One nicht drinne stehen ... und es muss halt drauf geachtet werden,
+dass das immer zusammen steht oder halt dass das Investor dann ganz auf
+der rechten Seite ist."
+
+**Vier Punkte, und sie haengen zusammen:**
+
+1. **Die WON-Lasche faellt weg.** Der Zustand steht im Rahmen — eine
+   zweite Anzeige daneben ist nur Wiederholung.
+2. **Der Blattrahmen traegt die Deal-Stufe.** `.deal-lost` rot,
+   `.deal-won` gruen, sonst gedaempftes Gold. **Gruen und Rot bleiben
+   hart** (CLAUDE.md: Statusfarben werden nie tokenisiert), Gold laeuft
+   ueber `--wl-`.
+3. **ID und INVESTOR: eine Gestaltung.** Gleicher Grund, gleiche
+   Schriftfarbe, gleiche Groesse.
+4. **Feste Plaetze.** ID immer links, INVESTOR immer ganz rechts.
+
+   > „Mal zusammen, mal nicht" ist kein Layout, sondern ein Zufall. Zwei
+   > feste Ecken sind ruhiger als ein Nebeneinander, dessen Abstand von
+   > der Laenge der Objektnummer abhaengt.
+
+**Zur Lesbarkeit:** die Laschen standen auf 8 px und 7,5 px — kleiner
+als jede andere Schrift in der App. Beide jetzt **9,5 px**.
+
+**Warum gedaempftes Gold fuer „in Bearbeitung":** das ist der Regelfall.
+Ein voll gesaettigter Rahmen an jeder Zeile laesst die Liste flimmern,
+und dann faellt der eine gruene oder rote nicht mehr auf. *Wenn alles
+hervorgehoben ist, ist nichts hervorgehoben.*
+
+Die Lasche nimmt den Statuston auf — sonst stuende eine goldene Klappe
+an einer gruenen Mappe.
+
+### Nachweis an ECHTEN Objekten (12 in der Liste)
+
+| Zustand | Anzahl | Rahmen |
+|---|---:|---|
+| gewonnen | 5 | `rgb(63,165,108)` gruen |
+| verloren | 1 | `rgb(184,98,92)` rot |
+| offen | 6 | `rgb(138,115,50)` gedaempftes Gold |
+
+Kein Zustand musste simuliert werden. Die INVESTOR-Lasche sitzt exakt am
+rechten Rand: `offsetLeft + offsetWidth = 214` bei `clientWidth 214`.
+
+> **Meine erste Pruefrechnung sagte „39 px daneben" und war falsch** —
+> sie verglich `getBoundingClientRect` gegen die Kartenbreite INKLUSIVE
+> Rahmen. `offsetLeft`/`offsetWidth` gegen `clientWidth` ist die Rechnung,
+> die zum Anker passt.
+
+### v1710b · Die Zahlen in der Kontingent-Pille
+
+Marcel: „zudem in dem header oben unter kontigend sind die zahlen noch
+gold." Gemessen: `.dp-kg-label` mit „31 · 4 · 7" stand auf
+`rgb(213,187,115)`.
+
+**Mein Fehler:** in v1706d hatte ich die Kinder ueber
+`> .hdr-credits-pill-label` angesprochen. **Diese Klasse gibt es nicht** —
+sie heisst `dp-kg-label`. Ich hatte den Namen aus dem Namen der Pille
+ABGELEITET statt ihn auszulesen. Die Regel sah plausibel aus und traf
+nichts.
+
+> **Zum dritten Mal in dieser Sitzung ein geratener Name:** erst
+> `comingSoon` statt `provComingSoon` (v1703b), dann die Tour-Klassen,
+> jetzt hier. **Ein `grep` dauert zehn Sekunden.**
+
+`:not(.dp-kg-panel)` nimmt das aufklappbare Panel aus — dessen Toene
+stehen in v1706d, und die ZAHL darin darf gold bleiben, sie ist der Wert.
+
+**Nachgemessen:** `rgb(191,183,169)` für „31 · 4 · 7".
+
+**Gold-Audit RC=0**, Basislinie 438 — das neue `var(--wl-8a7332, #8a7332)`
+zaehlt nicht als hartes Gold, weil es dem vorgeschriebenen Muster folgt.
+
+**Commit.** `6dd58cd`
+
+### v1711 · Drei Rueckmeldungen, drei eigene Messfehler
+
+Marcel musste **drei Mal** sagen, dass es nicht passt — zuletzt „passt
+immer noch nicht auch schriftfarbe nicht". Er hatte jedes Mal recht,
+und jedes Mal lag es an meiner Messung, nicht am Befund.
+
+**Was die Messung verfehlte:** ich hatte `background` gesetzt und
+`background` geprueft. Der Text stand dabei auf `rgb(140,133,120)` — ein
+Grau, das ich nirgends gesetzt habe.
+
+```
+Lasche "2026-999"   Text rgb(140,133,120) auf rgb(63,165,108)
+                    KONTRAST 1,19
+```
+
+> **Lesbarkeit ist keine Eigenschaft einer Farbe, sondern eines
+> PAARES.** Ich habe jede Farbe einzeln geprueft und jede fuer sich
+> richtig gefunden. Wer nur `background` misst, sieht den Kontrast nie.
+
+Sichtbar wurde es erst, als ich die Karte **dreifach vergroessert
+fotografiert** habe. Die kleinen Zoom-Bilder davor waren zu unscharf,
+um Schrift auf Farbe zu beurteilen.
+
+**Drei Ursachen, nacheinander gefunden:**
+
+**1 · Das Prinzip war umgedreht.** Im Auslieferungszustand gemessen:
+`.sbc-seq` traegt **Text `rgb(205,175,90)` auf Gold mit 12 % Deckung** —
+farbige Schrift auf getoentem Grund. Ich hatte daraus dunkle Schrift auf
+Vollflaeche gemacht.
+
+**2 · `:is(#sb-list)` schlug meine Regel.**
+
+```
+html[data-dp-layout] :is(#sb-list) .sb-card .sbc-seq
+>> color: rgb(140,133,120) !important
+```
+
+`:is()` erbt die ID-Spezifitaet: (1,3,1) gegen meine `.sbc-seq.sbc-seq`
+mit (0,5,1). **Das steht so in CLAUDE.md, und ich bin trotzdem
+hineingelaufen** — weil ich die Spezifitaet an der sichtbaren
+Selektorlaenge geschaetzt habe statt am staerksten Argument. Fuenf
+Klassen sehen nach mehr aus als eine ID in Klammern.
+
+**3 · „Mal zusammen, mal nicht" hatte einen Grund.** Gemessen ueber alle
+Karten:
+
+```
+#0 gewonnen   ID 0-66   INVESTOR  71-149   <- Mitte
+#2 offen      ID 0-72   INVESTOR 135-213   <- rechts
+```
+
+v1709b hatte eine Ausweichregel
+`:has(.sbc-won-ribbon) .sbc-investor-ribbon { right:64px }`, damit
+INVESTOR nicht unter der damaligen WON-Lasche landet. Seit v1710 ist die
+**ausgeblendet** — steht aber weiter im DOM, und `:has()` fragt nach dem
+DOM, nicht nach der Sichtbarkeit.
+
+> **`display:none` entfernt nichts.** Wer eine Regel an `:has()` haengt,
+> muss sie mitloeschen, wenn das Gesuchte unsichtbar wird — sonst bleibt
+> eine Ruecksicht auf einen Gast, der laengst gegangen ist.
+
+Und weil genau die gewonnenen Karten auch ein Investor-Band tragen, sah
+es aus wie Zufall.
+
+### Nachweis
+
+| | Textfarbe | Kontrast | ID | INVESTOR |
+|---|---|---:|---|---|
+| gewonnen | `rgb(111,215,154)` | **8,09** | 0–66 | endet 213/214 |
+| offen | `rgb(226,201,126)` | **11,42** | 0–72 | endet 213/214 |
+
+Vorher: **1,19**. Alle zwoelf Karten gleich ausgerichtet, keine
+Ueberlappung. Adresse 14,18, Preis 8,22.
+
+### v1711d · Gold-Audit RC=1, und er hatte recht
+
+`css/layout-varianten.css 0 -> 3 (Datei war sauber!)` — meine drei
+`rgba(201,168,76,…)`. **Gold in rgba-Form zaehlt der Waechter mit**, und
+zu Recht: beim Mandanten faerbt sich das nicht um. Auf
+`color-mix(in srgb, var(--wl-c9a84c, #C9A84C) X%, transparent)`
+umgestellt, dasselbe Muster wie in `object-actions.js`. Danach RC=0,
+Kontraste unveraendert.
+
+Gruen und Rot bleiben als `rgba` hart — Statusfarben werden nie
+tokenisiert.
+
+**Commits.** `ba8c358` · `128e5a9` · `01a5a28` · `15f7412`
+
+---
+
+## 30.09.2026 — v1712–v1714: Aktenreiter, Buetten, acht Entwuerfe
+
+### v1712 · Zwei Rahmen um dieselbe Karte
+
+Marcel schickte einen Screenshot (`Dateien/Screenshot1.png`). Darauf war
+sofort zu sehen, was die Messungen verschwiegen hatten: die Karten waren
+**Kaesten mit Kopfzeile**, kein Aktenreiter. Die Lasche sass IM Rahmen.
+
+```
+KARTE  Rahmen 1,11px solid rgb(63,165,108)   <- der stoert
+BLATT  Rahmen 1,11px       rgb(63,165,108)
+```
+
+Meine `border:0` an `.sb-card` aus v1709 griff nicht —
+`aside.sidebar .sb-card.deal-won` aus `style.css` ist staerker.
+
+> **Ein Reiter entsteht dadurch, dass die Lasche AUSSERHALB des Blattes
+> sitzt.** Zieht man einen zweiten Rahmen um beide, ist es wieder eine
+> Schachtel, und die Form, die man bauen wollte, ist weg.
+
+### v1713 · Entwurf 21 „Buetten" als Kartenstil
+
+Marcel schickte `Dateien/karte.png` — Variante 21 aus
+`preflight-varianten-v1425.html`. Die Regeln sind von dort **uebernommen,
+nicht nachgebaut**; nur die Klassennamen gemappt (in der App mit
+`dp-`-Praefix, sonst gleich). Alle siebzehn Teile vorher im Browser
+gegengeprueft.
+
+> Eine Vorlage wird uebernommen, nicht interpretiert. Wer sie nachbaut,
+> baut sein eigenes Bild von ihr.
+
+**v1713b:** die Leiste wurde 1280x334 statt rund 90. Alle Kinder standen
+auf 323 px — weil eines so hoch war und `align-items:stretch` den Rest
+mitzieht: `.dp-pf-qr` mass **328x323**. Ich hatte ihm bei Buetten keine
+Groesse gegeben, nur Polsterung.
+
+> `align-items:stretch` macht aus einem zu grossen Kind eine zu grosse
+> Zeile. Der Fehler sieht dann aus, als waere die ganze Leiste falsch
+> gebaut — dabei ist es ein einziges Element.
+
+### v1714 · Acht Objektkarten-Entwuerfe zum Umschalten
+
+Marcel: „bei den Objektkarten moechte ich dass du mir die anderen auch
+baust zum wechseln. erst mal auf dem bildschirm zum umswitchen."
+
+`objektkarten-stil.js` + `data-dp-objkarte` (Name **vorher gegrept**:
+frei). Bordkarte, Score-Kante, Datenzeile, Ampel, Kennzahlen, Minimal,
+Status, Cockpit. Ohne Wahl bleibt der Aktenreiter. Schalter unten rechts
+ueber `?objkarte-schalter`.
+
+> Sieben Gestaltungsattribute liegen jetzt gleichzeitig am `<html>`. Das
+> ist viel — aber ein achtes mit einem schon belegten Namen waere
+> schlimmer: zwei Module auf einem Attribut loeschen sich lautlos.
+
+**v1714b — der Selektor hatte die Verschachtelung verkehrt herum.** Alle
+acht Entwuerfe sahen identisch aus. Gemessen an der echten Kette:
+
+```
+DIV.sb-card
+DIV#sb-list.sb-list
+DIV.dpl-teil-objekte
+DIV.dpl-schiene          <- der AEUSSERE
+```
+
+Ich hatte `:is(#sb-list) .dpl-schiene .sb-card` geschrieben — das
+verlangt, dass die Schiene INNERHALB der Liste liegt.
+
+> Ein Nachfahren-Selektor ist eine Behauptung ueber die Reihenfolge der
+> Vorfahren. Ich hatte sie aus zwei frueheren Regeln zusammengesetzt,
+> ohne die Kette einmal auszulesen.
+
+55 Vorkommen umgedreht. **Nachgemessen, alle neun unterscheiden sich:**
+
+| Entwurf | Karte | Lasche | Ring | KPI |
+|---|---:|---|---|---|
+| Aktenreiter | 44 | 66x19 | an | aus |
+| Bordkarte | 44 | **16x44** hochkant | an | aus |
+| Score-Kante | 42 | 56x15 | **aus** | aus |
+| Datenzeile | 45 | 59px | an | aus |
+| Ampel | **28** | aus | an | aus |
+| Kennzahlen | **118** | 66x19 | an | **an** |
+| Minimal | 32 | aus | an | aus |
+| Status | 44 | „IN ARBEIT" | an | aus |
+| Cockpit | 44 | rechts | an | aus |
+
+**v1714d:** Marcel: „Bei der Datenzeile fehlt die angabe der kompleten
+id." Ich hatte 38 px gesetzt — gerechnet fuer „999", die Nummer heisst
+aber „2026-999". *Eine feste Breite fuer eine Zeichenkette, deren Laenge
+man nicht kennt, schneidet sie irgendwann ab.* Nachgemessen: „2026-999",
+„2026-1050", „2026-1042", „2026-1041" — keine abgeschnitten.
+
+### Zwei Befunde zum Darstellungs-Panel — KEIN Bruch durch die Layouts
+
+Marcel: „auf rund oder kantig … das funktioniert nicht. Und wenn ich den
+Akzent setze, dann wird der Header irgendwie verschoben."
+
+**1 · `data-ui-form` (rund/kantig) wirkt nur MIT einer Vorlage.** Gemessen
+mit UND ohne Layout — beide Male keine Wirkung. Es gibt genau zwei
+Regeln, und `ui-varianten.css:2071` sagt es selbst:
+
+> „GRENZE, ehrlich benannt: das wirkt nur MIT einer Vorlage. Ohne
+> `data-ui-theme` liest keine Regel dieser Datei `--uv-r`."
+
+Am `<html>` stand `data-ui-form="rund"`, aber **keine** `data-ui-theme`.
+Das ist die eingebaute Grenze, nicht ein Defekt der neuen Layouts. **Das
+Panel fuehrt damit eine Option, die allein nichts tut** — genau Marcels
+„erstmal ist es komisch". Was fehlt, ist der Hinweis darauf; das ist eine
+Produktentscheidung und steht offen.
+
+**2 · Der Header wird beim Akzent NICHT verschoben.** Gemessen im Layout
+Kanzlei, dreimal:
+
+```
+vorher      248,0  1641x49
+mit Akzent  248,0  1641x49
+nach reset  248,0  1641x49
+```
+
+Keine Verschiebung. Was Marcel gesehen hat, muss eine andere Ursache
+haben — moeglicherweise eine andere Ansicht oder das Panel selbst. **Hier
+fehlt mir der Fall, in dem es auftritt.**
+
+**Gold-Audit RC=0.** Zweimal sprang er auf RC=1 (v1711d, v1714c) — beide
+Male Gold als `rgba(201,168,76,…)` statt tokenisiert. Auf `color-mix` mit
+`var(--wl-c9a84c)` umgestellt.
+
+**Commits.** `82f184b` · `d934d38` · `218fec1` · `7440bee` · `fdb8a22` ·
+`690cd3d` · `54e5014`
+
+### v1715 · Die Kartenwahl zieht in die Einstellungen
+
+Marcel: „bitte arbeite unter Darstellung auch den wechsel der Karten ein.
+Bau alle ein ausser Status und Cockpit. Nehme die information Investor
+aus der Design Optik bei allen raus ausser bei unserem standard Obsidian
+look. Das Fenster kannst du dann wieder entfernen."
+
+- **Das schwebende Fenster aus v1714 ist weg**, samt CSS und Merker. Wer
+  den Merker noch traegt, bekommt ihn beim naechsten Start abgeraeumt.
+
+  > Ein Werkzeug, das zum Ausprobieren gebaut wurde, wird nach dem
+  > Ausprobieren abgebaut. Sonst steht es irgendwann in der Auslieferung
+  > und niemand weiss mehr, warum.
+
+- Die Wahl sitzt jetzt in **Einstellungen → Darstellung → Aussehen**,
+  direkt unter der Layout-Wahl. Gemessen: `.dp-okw-box` 835x201, sieben
+  Knoepfe, „Aktenreiter" markiert.
+- Status und Cockpit raus — sieben Entwuerfe bleiben.
+- **Die INVESTOR-Lasche erscheint nur noch im Aktenreiter.**
+
+  > Ein Bauteil, das aus einer Metapher stammt, laesst sich nicht in eine
+  > andere mitnehmen. Es sieht dort nicht schlicht aus, sondern uebrig.
+
+  Gemessen: `aktenreiter: SICHTBAR`, alle sechs anderen `aus`.
+
+### Der vollstaendige Abgleich ueber alle Layouts
+
+Marcel hatte ihn ausdruecklich verlangt. Gemessen wurde auf BRUCH, nicht
+auf Schoenheit: Kartenhoehe, Kartenbreite, abgeschnittene Adresse ohne
+Ellipse, zu hohe Pre-Flight-Leiste, Kind groesser als sein Behaelter,
+Ueberlauf der Schiene.
+
+| Prueflauf | Kombinationen | Befunde |
+|---|---:|---|
+| Layouts x Objektkarten | 3 x 7 = **21** | **keine** |
+| Layouts x Pre-Flight-Stile | 3 x 4 = **12** | **keine** |
+
+### Zwei Punkte, die offen bleiben — und warum
+
+**1 · Der Header beim Akzent: mein Befund war ein MESSFEHLER.**
+
+Ich hatte gemeldet, `--dp-hdr-h` und `--tabs-top` wuerden beim
+Akzent-Setzen geleert. Gemessen stimmte das:
+
+```
+vorher   --dp-hdr-h: 321px   --tabs-top: 49px
+nachher  --dp-hdr-h: (leer)  --tabs-top: (leer)
+```
+
+**Die Ursache war aber der Messaufbau, nicht der Code.** `settings.js:3806`
+setzt `--dp-hdr-h` ueber `requestAnimationFrame`, und gemessen:
+
+```
+document.visibilityState: "hidden"
+requestAnimationFrame feuert: false
+```
+
+> **Im verborgenen Tab feuert `requestAnimationFrame` nie** — das steht so
+> in meinen eigenen Notizen, und ich bin trotzdem hineingelaufen. Ein
+> Wert, der nur deshalb fehlt, weil niemand ihn neu berechnet hat, sieht
+> aus wie ein geloeschter Wert.
+
+**Der Befund ist damit zurueckgenommen.** Was Marcel sieht, muss eine
+andere Ursache haben; ich brauche dafuer die Ansicht, in der es auftritt,
+oder einen Messlauf im sichtbaren Tab.
+
+**2 · `rund`/`kantig` wirkt nur MIT einer Vorlage — unveraendert.**
+
+Gemessen mit UND ohne Layout: keine Wirkung. Es gibt genau zwei Regeln,
+und `ui-varianten.css:2071` sagt es selbst:
+
+> „GRENZE, ehrlich benannt: das wirkt nur MIT einer Vorlage. Ohne
+> `data-ui-theme` liest keine Regel dieser Datei `--uv-r`."
+
+Das ist **kein Bruch durch die neuen Layouts**, sondern eine eingebaute
+Grenze. Sie zu oeffnen hiesse, den Auslieferungszustand fuer alle zu
+aendern, die `rund`/`kantig` einmal gewaehlt haben — das ist eine
+Produktentscheidung und wird nicht nebenbei getroffen. **Was heute fehlt,
+ist der Hinweis im Panel**, dass die Option eine Vorlage braucht.
+
+**Gold-Audit RC=0.**
+
+**Commit.** `18ebe9a`
+
+---
+
+## v1716–v1716i · `rund`/`kantig` wirkt — nach acht Anlaeufen, und der
+## achte war ein Messfehler
+
+**Was.** Die Einstellung „Form" im Darstellungs-Panel (Kantig · Passend ·
+Rund) veraendert jetzt in allen vier Layouts alle gemessenen Flaechen.
+
+| | Passend (Auslieferung) | Kantig | Rund |
+|---|---:|---:|---:|
+| Eingabefeld | 2 px | 0 | 10 px |
+| Karte | 2 px | 0 | 14 px |
+| Pre-Flight-Leiste | 16 px | 0 | 14 px |
+| Kachel | 9 px | 0 | 10 px |
+| Hilfe-Knopf / Pille / Status | 7 px | 0 | 10 px |
+| Reiter | 0 | 0 | 10 px 10 px 0 0 |
+| Kartenblatt | 0 5 px 5 px | 0 | 0 14 px 14 px |
+| Lasche | 3 px 3 px 0 0 | 0 | 8 px 8 px 0 0 |
+
+Reiter, Blatt und Lasche behalten ihre Gestalt: eine Lasche mit rundum
+gleichen Ecken ist keine Lasche mehr, und die Unterstreichung des aktiven
+Reiters muss gerade bleiben.
+
+**Nachweis.** Ueber den echten Bedienweg (Panel oeffnen, Knopf klicken):
+
+```
+Heute (Standard)   9 von 9      Aktenmappe (v1b)   9 von 9
+Kanzlei (v2)       9 von 9      Tower (v2b)        9 von 9
+
+Rueckkehr auf „Passend" == Auslieferungszustand   ja
+Inline-Reste nach dem Zurueckschalten            0
+Nachzug auf neu gerendertes DOM                  wirkt
+```
+
+**Warum acht Anlaeufe.** Sieben davon versuchten es ueber die Kaskade und
+blieben bei zwei von neun Flaechen. Der Weg dorthin, weil jede Station
+eine eigene Lehre trug:
+
+| | Befund |
+|---|---|
+| v1716 | die Regeln lasen `--uv-r`, das ohne Vorlage niemand setzt |
+| v1716b | eigene Regeln zu schwach — `body` davor |
+| v1716c | **ein Attribut zweimal zu nennen bringt nichts** — der Browser fasst `[x="a"][x="a"]` zusammen. Bei Klassen (`.a.a`) geht der Trick |
+| v1716d | meine eigenen Layout-Regeln waren der Gegner |
+| v1716e | Stylesheet ans Ende des `<head>` |
+| v1716f | **ein Stylesheet am Ende gewinnt nur bei Gleichstand** |
+| v1716g | **„ans Ende gehaengt" ist eine Aussage ueber den Zeitpunkt, nicht ueber die Position** — das Blatt entstand beim ersten Modullauf oben im `<head>`, danach kamen 19 weitere `<link>`. Position 24 von 43 |
+| v1716h | **das Ende des `<head>` ist nicht das Ende des Dokuments** — vier Blaetter haengen im `<body>`, darunter der Sieger `layout-varianten.css` |
+
+Nach v1716h lag das Blatt auf **43 von 43**, die Regel matchte das Feld,
+trug `!important` — und der Wert blieb 2 px. Das ist nach den
+Kaskadenregeln unmoeglich.
+
+> Ein Weg, der nach sieben Anlaeufen zwei von neun Flaechen erreicht, ist
+> nicht fast fertig. Er ist der falsche Weg.
+
+**v1716i wechselt die Ebene.** `radSetzen()` schreibt die Radien inline
+mit `!important` auf die Elemente, markiert sie mit `data-dp-radius`
+(vorher gegrept, frei) und raeumt beim Wechsel **zuerst** ab — ohne das
+bliebe beim Wechsel von rund auf kantig ein alter Wert an Elementen
+stehen, die der neue Durchlauf nicht mehr trifft, und „Passend" waere nie
+wieder der Standard. Ein MutationObserver zieht nach Neu-Rendern nach,
+gedrosselt auf 120 ms; das Stylesheet aus v1716e–h bleibt daneben und
+deckt genau diese 120 ms ab (gemessen: neue Elemente tragen die Radien
+schon vor dem Nachzug).
+
+### Die eigentliche Lehre: der achte Anlauf war mein Messfehler
+
+Nach v1716i meldete die Messung **6 von 9** — Kachel und Hilfe-Knopf
+trugen mein `inline !important` und zeigten trotzdem den alten Wert.
+Auch das ist unmoeglich; inline mit `!important` steht ueber jeder Regel.
+Der Grund:
+
+```
+.dp-pf-tile    transition: all 0.18s    gemeldet 10px   ohne Transition 0px
+.hdr-icon-btn  transition: all 0.2s     gemeldet  6px   ohne Transition 0px
+```
+
+**Im verborgenen Tab friert eine Transition auf ihrem STARTwert ein**, weil
+keine Frames gerendert werden — und `getComputedStyle` meldet genau diesen
+eingefrorenen Startwert. Mit einem Messblatt
+`*{transition:none !important}` sprang das Ergebnis auf **11 von 11**.
+
+> Ein eingefrorener Uebergang sieht aus wie eine Regel, die verliert.
+> Vor jeder Radius- oder Farbmessung gehoert `transition:none` gesetzt —
+> `visibilityState` allein zu pruefen reicht nicht, weil die Zahl auch
+> im verborgenen Tab plausibel aussieht.
+
+**Das faellt auf mich zurueck:** „Im verborgenen Tab feuert `rAF` nie" und
+„`visibilityState` vor jede Zeitmessung" stehen beide in meinen eigenen
+Notizen. Ich habe sie auf Timer bezogen und nicht auf Uebergaenge — und
+damit sieben Anlaeufe lang gegen eine Diagnose gebaut, die zum Teil aus
+meinem Messwerkzeug kam. **Wie viel der sieben CSS-Anlaeufe wirklich
+wirkungslos war, ist damit offen**; belegt ist nur, dass der Inline-Weg
+traegt. Die CSS-Fassung bleibt als Abdeckung stehen, statt sie auf
+Verdacht wieder auszubauen.
+
+**Rest.** Zwei Punkte aus Marcels Auftrag stehen weiter offen:
+die Header-Verschiebung beim Akzent (nicht reproduzierbar — der Befund
+vom vorigen Eintrag ist zurueckgenommen, es war dasselbe
+Verborgener-Tab-Artefakt) und die Kartei-Verzerrung, die bildlich
+abgenommen gehoert statt automatisiert.
+
+**Gold-Audit RC=0** — genau auf der Basislinie, 438 Fundstellen in 54
+Dateien.
+
+**Commits.** `82f184b` … `d70c756` (v1716–v1716f), `f8f1625` (v1716g),
+`2adf34c` (v1716h), `2d72394` (v1716i)
+
+---
+
+## v1717 · Die Kanzlei-Vorlage reserviert eine Spalte für eine Sidebar,
+## die es nicht mehr gibt
+
+**Was.** Marcel: „wenn ich den Akzent setze, dann wird der Header irgendwie
+verschoben, auch mit den Grundfarben und allem".
+
+**Am Akzent lag es nicht.** Das habe ich über vier Layouts und drei
+Bedienwege gemessen — Farbkreise, freier Farbwähler, Regler — jedes Mal mit
+nachgewiesenem Farbwechsel (`--gold` änderte sich) und jedes Mal identischer
+Geometrie. Der Satz „auch mit den Grundfarben und allem" war der Hinweis:
+**es ist die VORLAGE.**
+
+`style.css:37799` setzt für die Kanzlei-Vorlage zwei Grid-Spalten — 300 px
+für die Sidebar, der Rest für den Inhalt. In allen drei neuen Layouts ist
+`aside.sidebar` aber `display:none`, die Navigation liegt dort woanders.
+Dann fällt `.main-col` als einziges sichtbares Kind in die **leere**
+300-px-Spalte:
+
+| Layout | `aside.sidebar` | Grid | `.main-col` | Header |
+|---|---|---|---:|---|
+| Standard | `flex`, 300 px | 300 + 1833 | 1833 | 1617 × 57 ✓ |
+| Aktenmappe v1b | **none** | 300 + 1585 | **300** | **84 × 191** ✗ |
+| Kanzlei v2 | **none** | 300 + 1345 | **300** | **84 × 191** ✗ |
+| Tower v2b | **none** | 300 + 1345 | **300** | **84 × 191** ✗ |
+
+Der Header war nie „verschoben" — er war **erdrückt**. 84 px breit, 191 px
+hoch, weil er in einer Spalte steckte, die für etwas anderes gedacht war.
+
+> Eine Spaltenbreite ist ein Versprechen über den Inhalt. Verschwindet der
+> Inhalt, wird aus der Reserve eine Falle — und das Opfer sieht aus wie der
+> Täter.
+
+**Wie.** Die Regel behält ihren Platz und bekommt den fehlenden Vorbehalt
+`:not([data-dp-layout])`. `:not()` erbt die Spezifität seines Arguments (ein
+Attribut), die Regel steigt also von (0,2,2) auf (0,3,2) — sie schlägt damit
+nichts Neues, sie **greift nur seltener**. Im Standard, wo die Sidebar
+wirklich steht, wirkt die Kanzlei-Vorlage unverändert.
+
+**Nachweis.** Alle **24** Kombinationen über den echten Bedienweg
+durchgeklickt — 4 Layouts × 6 Vorlagen, Header-Maße gelesen:
+
+```
+                DealPilot  Kontor  Panel   Kanzlei  Boarding  Konsole
+Standard        1749x49    1749x57 1749x57 1537x57  1749x57   1749x49
+Aktenmappe v1b  1881x49    1881x49 1881x49 1669x49  1881x49   1881x49
+Kanzlei    v2   1641x49    1641x49 1641x49 1429x49  1641x49   1641x49
+Tower      v2b  1641x49    1641x49 1641x49 1429x49  1641x49   1641x49
+
+kaputt: keine   (vorher: 3 x 84x191)
+```
+
+**Gold-Audit RC=0.** **Commit.** `d8fd7bb`
+
+### Kartei und Objektkarten — gemessen, kein Bruch gefunden
+
+Marcels dritter Punkt („auf Kartei gestellt … sind verzerrt. Auch die
+Objektkarten funktionieren dann nicht bei allen") ist damit **nicht**
+erledigt, aber eingegrenzt:
+
+- **Kartei-Stil** (`data-dp-kartenstil="kartei"`, Layout Tower): Leiste
+  1280 × 132, QR 92 × 92 wie vorgesehen, **kein Überlauf** bei keinem Kind.
+  Im Bild sitzt die Kopfzeile sauber, nichts ragt heraus.
+- **Alle vier Objektkarten-Stile** auf Überlauf geprüft: Kompakt 344 × 82,
+  Standard 344 × 212, Wallet 344 × 233, Stapel 344 × 64 — **kein Überlauf**.
+  Dass bei Kompakt und Stapel die drei Mini-Kacheln fehlen, ist **Absicht**
+  („Meiste" bzw. „Handy-Optik"), kein Defekt.
+
+**Ein eigener Messfehler dabei:** ich habe den Kartei-Stil zuerst im
+Layout „Heute" gesetzt und gemessen, dass nichts passiert.
+`karten-stil.js:280` setzt das Attribut nur unter `layoutAktiv()` — ohne
+neues Layout gibt es keinen Kartenstil. Das ist dieselbe Bauart von Grenze,
+die `rund`/`kantig` bis v1716 hatte, hier aber vermutlich gewollt.
+
+**Was im Bild auffällt und Marcels Urteil braucht:** bei Karten mit
+Investor-Kennzeichnung sitzt die **INVESTOR-Pille mittig über der Karte und
+die Nummern-Lasche linksbündig darunter** — zwei gestapelte Reiter statt
+einer Zeile. Das ist der „doppelte Rahmen"-Eindruck aus `Screenshot1.png`.
+Ob die beiden nebeneinander gehören, ist eine Gestaltungsfrage und wird
+nicht geraten.
+
+---
+
+## v1718–v1720b · Vier Texte, ein Knopf, ein Plan-Tor — und zwei eigene
+## Werkzeugfehler
+
+### v1718 · Der 70-Prozent-Hinweis stand zu zwei Dritteln außerhalb
+
+Marcel: „wenn der investor deal score nicht erreicht ist steht unten links
+im menü ‚Bitte mindestens 70% der ….' das kann man nicht komplett lesen."
+
+Gemessen mit dem echten Markup aus `calc.js:217` und vollständig
+nachgestelltem Zustand:
+
+```
+Text   711 px breit     Platz  247 px     unsichtbar  464 px
+Ort    .dpl-schiene, overflow:hidden, bei y=780 — unten links
+```
+
+Im Standard sitzt der Banner im Header und hat 1491 px; dort ist das
+`white-space:nowrap` aus `style.css:13429` richtig. In den neuen Layouts
+wandert derselbe Banner in die 248 px schmale Schiene, und deren
+`overflow:hidden` schneidet zwei Drittel des Satzes ab — ohne Ellipse, ohne
+Scrollbalken. Es sieht aus wie ein Text, der zu Ende ist.
+
+> `nowrap` ist eine Aussage über den PLATZ, nicht über den Text. Wandert
+> das Element an einen schmaleren Ort, wandert die Aussage nicht mit — sie
+> wird dort zur Lüge.
+
+Nachgemessen nach dem Umbruch: v1b, v2 und v2b je **0 px unsichtbar**
+(217 × 73), Standard unverändert einzeilig. **Commit `b592cb7`.**
+
+#### Ein Befund, den ich zurücknehme
+
+Zwischendurch maß ich „Banner ragt 48 px unter den Header, 44 px
+Überlappung mit der Reiterleiste". **Das war ein Artefakt meines halben
+Nachbaus:** ich hatte `hdr-banner-only` gesetzt, aber `hdr-no-score` nicht
+entfernt — `calc.js:226` tut beides. Mit vollständigem Zustand liegt der
+Banner bei 56–105, die Reiterleiste bei 114–158, Überlappung **−9**.
+
+### v1719/v1719b · „Darstellung öffnen" nach oben, und ab Pro
+
+**Ort:** v1706 hatte den Knopf aus dem Aussehen-Block genommen und nur den
+unteren stehen lassen. Oben wird GROB gewählt (Layout, Objektkarten), das
+Feine liegt im Panel — der Weg dorthin gehört dorthin. Der untere Abschnitt
+fällt weg, damit es bei EINEM Weg bleibt. Nachgemessen über
+`compareDocumentPosition`: Layout-Wahl → Objektkarten → Knopf, genau einer.
+
+**Plan:** Marcels Regel steht bereits im Datenmodell — gemessen an der
+laufenden App:
+
+| free | starter | investor | pro | partner |
+|---|---|---|---|---|
+| fehlt | fehlt | fehlt | **true** | **true** |
+
+`features.theme_palette`. Der vorhandene Schlüssel wird benutzt, **kein
+neuer erfunden** — ein unbekannter wäre für JEDEN false, auch für Pro, und
+hätte die Funktion still abgeschaltet. Geprüft mit `Plan.full()`, nicht
+`Plan.can()`: gemessen gibt `can('theme_palette')` auch im Partner-Plan
+`false`.
+
+Das Tor steht an **beiden** Stellen: der Knopf zeigt sich gesperrt mit
+Grund, und `_dpOpenFromSettings` weist ab. Ein Knopf, der nur ausgegraut
+ist, sperrt nichts. Gegengeprüft mit gestubbtem Plan: Knopf `disabled`,
+Hinweis „Feineinstellungen (Vorlagen, Farben, Schrift) ab Pro", Panel
+öffnet nicht. **Commits `8a9f931`, `c4852d7`.**
+
+#### Zweiter eigener Fehler: latin1 auf eine UTF-8-Datei
+
+`settings.js` war gültiges UTF-8. Mein Einbauskript las und schrieb sie als
+**latin1**, und die Sonderzeichen MEINES Kommentars fielen um:
+
+```
+──  (U+2500) -> 2x NUL      „ (U+201E) -> 2x RS      —  (U+2014) -> 3x DC4
+```
+
+Vor v1719 null Steuerzeichen, danach sieben. Die Datei war damit für `grep`
+binär und kein gültiges UTF-8 mehr. Funktional harmlos — nur Kommentartext —
+aber **genau die Falle, die ich mir selbst notiert habe**. Statt die Bytes
+nachträglich zu flicken: Datei auf den Stand davor zurückgesetzt und den
+Einbau mit `utf8` wiederholt. Geprüft sind jetzt UTF-8-Gültigkeit,
+Steuerzeichen (keine), Zeilenenden (4200 CRLF, 0 LF) und die Syntax; der
+echte Inhaltsunterschied zum Ausgangsstand sind 42 Einfügungen, 5 Löschungen.
+
+### v1720/v1720b · Nur zeigen, was in dieser Lage auch wirkt
+
+Marcel: „Sachen die nicht gehen bitte ausblenden bei dem jeweiligen
+aussehen. Nur das einblenden und einstellbare anzeigen was wirklich
+funktioniert."
+
+Alle **neun** Schaltergruppen durchgeklickt und je Stellung eine Signatur
+aus Farben, Radien, Schrift und Geometrie verglichen. Sieben wirken überall:
+Layout, Vorlage (6), Modus, Grundfläche, Objektkarten (4), Form (3),
+Textgröße (3). **Zwei hatten ununterscheidbare Stellungen:**
+
+| Gruppe | wirkt nur | Ursache |
+|---|---|---|
+| Schriftfamilie (4) | ohne Vorlage **und** ohne Layout | beide setzen `font-family: … !important` (`--uv-f-body`, `--dpl-body`) |
+| Datenaufnahme (4) | mit Layout | `karten-stil.js:280` setzt sein Attribut nur unter `layoutAktiv()` |
+
+Beide Male ist das kein Defekt, sondern gebaut: eine Vorlage bringt ihre
+Schrift mit, das ist ihr Wesen. Die Nutzerwahl kann dagegen nicht gewinnen
+und soll es nicht.
+
+> Ein Schalter, der nichts tut, ist schlimmer als ein fehlender: der
+> fehlende wirft eine Frage auf, der tote einen Zweifel auf das ganze Panel.
+
+`machbarkeit()` blendet beide in der jeweiligen Lage aus und **zieht den
+Hinweistext mit** — er verspräche sonst etwas, das nicht mehr da ist. Die
+Textgröße bleibt stehen: sie wirkt gemessen in jeder Lage und teilt sich nur
+den Block mit der Familie.
+
+**v1720b:** nach v1720 stimmte die Anzeige nach einem Vorlagenwechsel, nach
+einem **Layout**-Wechsel nicht — der läuft über `DealPilotLayout.setze()`
+und kommt an `anwenden()` vorbei.
+
+> Wer eine Anzeige an einen Zustand hängt, muss jeden Weg kennen, auf dem
+> dieser Zustand sich ändert. Zwei Aufrufstellen sind eine Vermutung; das
+> Attribut selbst zu beobachten ist eine Zusage.
+
+Abgenommen über alle vier Lagen:
+
+```
+Lage            Schriftfamilie  Textgroesse  Datenaufnahme
+nichts aktiv    sichtbar        sichtbar     versteckt
+nur Vorlage     versteckt       sichtbar     versteckt
+nur Layout      versteckt       sichtbar     sichtbar
+beides          versteckt       sichtbar     sichtbar
+```
+
+**Commits `ff0ff22`, `56ebe7c`. Gold-Audit RC=0.**
+
+### Der Kaskaden-Walker war kaputt — und hatte mich mehrfach belogen
+
+Bei der Suche nach der Höhe-0-Regel meldete der Walker **0 Treffer bei 40
+lesbaren Stylesheets**. Die Deckungsprüfung zeigte: `regelnGesamt: 0`. Er
+hatte also nie etwas gezählt.
+
+Ursache: `if (r.cssRules) { … return; }` als Container-Erkennung. **Eine
+`CSSStyleRule` trägt heute selbst eine (leere) `cssRules`-Liste** für
+verschachtelte Regeln — damit galt jede Regel als Container und wurde
+übersprungen. Korrekt ist `if (!r.selectorText) { if (r.cssRules) … }`.
+Danach: 10.890 Regeln, 19 auf `#hdr-badges`, Täter sofort benannt.
+
+Dieselbe Bauart steckte in mehreren Messungen dieser Sitzung und erklärt
+rückwirkend mindestens zwei „0 Treffer"-Befunde, auf die ich Diagnosen
+gestützt habe.
+
+---
+
+## v1721 · Der leere Badge-Streifen unter dem Kopf
+
+**Was.** Marcel: „zwischen header und menü links und rechts ist jetzt ein
+heller streifen"
+
+Gemessen im Standard-Layout, Vorlage Kontor:
+
+```
+#hdr-badges   :empty = true, 0 Kinder
+              und trotzdem 1749 x 8 px, background rgb(255,255,255)
+              padding 4px 14px, box-sizing border-box
+```
+
+**Ein leerer Behälter mit Innenabstand ist kein leerer Behälter — er ist
+ein Streifen.** Sichtbar wird er erst, wenn eine Vorlage ihm eine eigene
+Fläche gibt: Kontor und Panel weiß, Kanzlei 251/250/247, Boarding creme.
+Auf Obsidian und Konsole fällt er nicht auf, weil die Fläche dort so dunkel
+ist wie der Kopf darüber — deshalb sieht man ihn erst beim Wechsel.
+
+**Zwei Wächter wollten das schon verhindern, keiner steht da, wo es
+passiert:**
+
+| Ort | warum die Regel nicht greift |
+|---|---|
+| `style.css:13630` | `.hdr-v61-row2:empty{display:none}` — **ohne `!important`**, verliert gegen `body:not(.hdr-collapsed) #hdr-badges{display:block !important}`; die ID schlägt die Klasse |
+| `style.css:36281` | `#hdr-badges:not(:has(.hdr-incomplete-banner)){display:none !important}` — steht **innerhalb einer `@media(max-width)`-Query**, auf dem Desktop gibt es sie nicht |
+
+> Der eine ist zu schwach, der andere zu schmal. Zwei Wächter mit demselben
+> Auftrag ersetzen keinen, der wirkt.
+
+Die neue Regel trägt die ID selbst, gilt in jeder Breite und greift
+ausschließlich am LEEREN Behälter. `:not(:has(*))` steht daneben, weil
+`:empty` schon an einem einzigen Leerzeichen scheitert, das ein späterer
+Aufbau hinterlässt.
+
+**Nachweis.** Alle **24** Kombinationen (4 Layouts × 6 Vorlagen): vorher
+vier Treffer im Standard, jetzt **kein einziger**. Gegenprobe, dass nicht
+zu viel verschwindet:
+
+```
+Behaelter leer           0 px, unsichtbar
+mit 70-Prozent-Hinweis   137 px, sichtbar, Text lesbar
+```
+
+**Gold-Audit RC=0. Commit `7807adf`.**
+
+### Beinahe-Schaden: style.css ist NICHT UTF-8
+
+Mein erster Anlauf las und schrieb `style.css` als `utf8` — die Datei ist
+aber **Latin-1** und enthält eine Stelle, die als UTF-8 ungültig ist. Das
+Lesen ersetzte sie durch U+FFFD, das Schreiben hätte den Ersatz
+festgeschrieben. Aufgefallen an einer Zeile, die stutzig machte:
+
+```
+style.css vorher | UTF-8: false      <- vor dem Eingriff
+nachher          | UTF-8: true       <- "repariert", also verfälscht
+```
+
+> Eine Datei, die plötzlich gültiger wird, ist ein Warnzeichen, kein
+> Fortschritt.
+
+Zurückgesetzt und mit `latin1` wiederholt, die Sonderzeichen im Kommentar
+vorher auf ASCII gebracht. Gegengeprüft: Steuerzeichen keine,
+Ersatzzeichen 1 wie vorher, Hoch-Bytes 125832 unverändert, Klammerbilanz
+ausgeglichen, Diff 44 Zeilen.
+
+**Zur Kodierung gilt damit gemessen:** `settings.js` ist UTF-8,
+`style.css` ist Latin-1. Sie gehört vor jedem Skript-Eingriff gemessen,
+nicht angenommen — am selben Tag hatte derselbe Fehler in der anderen
+Richtung `settings.js` beschädigt (v1719b).
+
+---
+
+## v1722–v1724 · Zwei unsichtbare Icons, ein Rahmen zum Erahnen, und ein
+## Panel, das die App in Ruhe lässt
+
+### v1722 · Die zwei Icons, die Marcel gesehen hat
+
+Alle sichtbaren `<use>`-Icons auf Kontrast gegen ihren **effektiven** Grund
+gemessen: von zehn waren genau zwei unlesbar, beide auf Obsidian.
+
+| Icon | fill | Grund | Kontrast |
+|---|---|---|---:|
+| `#i-portfolio` | `rgb(0,0,0)` | `rgb(14,13,11)` | **1,08** |
+| `#i-clock` | `rgb(0,0,0)` | `rgb(14,13,11)` | **1,08** |
+
+Beim Portfolio-Knopf stand die Absicht schon da:
+`layout-varianten.css:5510` setzt `stroke:currentColor !important`. Das
+Symbol wird aber über **fill** gezeichnet (gemessen `stroke=none`).
+
+> Die Zeile meinte das Richtige und traf die falsche Eigenschaft.
+
+Dazu der Rahmen von `.sbc-btn` (Duplizieren ⎘, Löschen ×):
+`rgba(255,255,255,0.08)` — Kontrast **1,16** gegen den effektiven Grund
+`rgb(5,5,4)`. Die Schrift darin stand bei 9,84: man sah ein Zeichen
+schweben, keinen Knopf. Jetzt 0.35, rund 3,0.
+
+**Ergebnis:** 1,08 → **5,34** (Uhr) · 1,08 → **3,29** (Portfolio) ·
+1,16 → **3,07** (Rahmen). Helle Kacheln unberührt bei 21.
+**Commits `2320df2`, `7983551`.**
+
+### v1723 → v1723b · Eine Regel, die ein ungemessenes Problem schuf
+
+Marcels „vielleicht bei den anderen auch" habe ich zu einer globalen Regel
+gemacht: `svg:has(> use:only-child){fill:currentColor}`. Nachgemessen fielen
+die acht `.ct-ico` im Objekt-Tab dadurch von Kontrast **21 auf 2,29** — sie
+sind das einzige sichtbare Element ihrer Kachel und stehen auf Weiß.
+Schwarz war dort richtig.
+
+> Eine Regel, die ein gemessenes Problem löst und ein ungemessenes schafft,
+> ist kein Fortschritt. „Vielleicht bei den anderen auch" war eine
+> Vermutung, keine Beobachtung — ich habe daraus einen Flächenumbau gemacht.
+
+Eingeschränkt auf `.dpl-schiene`, `aside.sidebar`, `header.hdr` und
+`nav.tabs`: dort ist Schwarz nie richtig, und dort standen auch die beiden
+echten Fälle.
+
+### v1723c · Mein Kommentar hat die eigene Regel verschluckt
+
+Beim Einschränken begann der Ersetzungstext mit Kommentartext, obwohl der
+Kommentar davor mit `*/` schon geschlossen war. Danach stand nackter Text im
+CSS — der Browser verwirft ab da, und die Regel kam nie im Stylesheet an.
+
+Das Muster benennt es genau:
+
+```
+el.matches(selektor)        true      <- der Selektor passt
+Kaskaden-Walker: Regeln     0         <- sie steht nicht in der Kaskade
+Inline-Gegentest            wirkt     <- die Eigenschaft ist nicht blockiert
+```
+
+> Passt der Selektor, wirkt inline, und die Regel steht trotzdem nicht in
+> der Kaskade — dann ist sie gar nicht erst geparst worden.
+
+**Die Klammerbilanz war dabei ausgeglichen und hat nichts gemerkt.** Eine
+**Kommentarbilanz** (`/*` gegen `*/`) gehört künftig in dieselbe Prüfung.
+
+### v1724 · Das Panel lässt die App in Ruhe
+
+Marcel: „dass man, wenn man das offen hat, halt auch in der App noch
+durchklicken kann. Also quasi wie so ein Overlay-Menü … Damit man erst mal
+alles einstellen kann und wenn man zufrieden ist, macht man es aus."
+
+Gemessen lag `#dpuv-back` als 2133 × 988-Fläche über allem, und
+`elementFromPoint` in der Bildschirmmitte nannte ihn — kein Klick kam durch.
+Dazu dunkelte er mit 28 %: wer eine Vorlage beurteilen will, sah sie durch
+einen Schleier.
+
+> Ein Einstellfenster, das die Sache verdeckt, die es einstellt, zwingt zum
+> Zumachen nach jedem Klick.
+
+Der Abdunkler bleibt als Träger der Ein- und Ausblendung, wird aber
+durchsichtig und durchlässig. Geschlossen wird über ✕ oder „Fertig" — ein
+Klick daneben schließt nicht mehr, weil daneben jetzt die App liegt. Das
+Panel hebt sich stattdessen durch seinen Schatten ab.
+
+**Dazu die Kartenwahl im Panel.** Sie stand nur in den Einstellungen. Eine
+zweite ID wäre ein Duplikat, und der Browser nimmt dann still die erste —
+deshalb trägt der zweite Ort eine **Klasse**. `objektkarten-stil.js`
+arbeitet jetzt über `hosts()` statt über ein einzelnes Element und hält
+beide Orte per `wahlNachziehen()` gleich.
+
+**Nachweis** (mit stillgelegten Übergängen, sonst misst man den
+eingefrorenen Startwert):
+
+```
+Panel steht           1757 bis 2133 von 2133      sichtbar
+Reiter                obenauf tab-lbl             erreichbar
+Eingabefeld           obenauf Platzhalter         erreichbar
+Menuepunkt            obenauf sb-act-l            erreichbar
+Abdunkler im Stapel   nirgends
+Kartenwahl im Panel   7 Knoepfe
+```
+
+**Gold-Audit RC=0. Commit `e9e1089`.**
+
+> **Zum dritten Mal an einem Tag** hat mich der verborgene Messtab
+> getäuscht: das Panel meldete `translateX(376px)` und schien zu, obwohl
+> `.open` gesetzt war. Mit `transition:none` steht es bei 1757. Ein
+> Mausklick kommt in einem verborgenen Tab ebenfalls nicht an — „Clicked
+> at" im Werkzeugprotokoll ist kein Beweis für einen Treffer. Belastbar ist
+> `elementsFromPoint`: es ist dieselbe Trefferprüfung, die der Browser beim
+> echten Klick fährt.
+
+---
+
+## v1725–v1726 · Ein Barcode, dem die Box fehlte, und zwei Schalter ohne
+## Wirkung
+
+### v1725 · Bei Bütten war der Barcode 9 px hoch statt 53
+
+Über alle vier Kartenstile gemessen:
+
+| Stil | Barcode | Abruf-Box |
+|---|---|---|
+| Automatisch | 174 × 53 | 208 × 78 |
+| Zeile | 174 × 53 | 208 × 78 |
+| Kartei | ausgeblendet | 110 × 92 |
+| **Bütten** | **174 × 9** | 208 × **34** |
+
+**Der Barcode ist nicht gequetscht — seine Box ist zu flach.** Er liegt
+absolut mit `inset:12px 16px` (`style.css:32995`), und bei Bütten schrumpft
+`.dp-pf-rz` durch `align-self:center` auf Inhaltshöhe:
+
+```
+78 − 2×12 = 54   (gemessen 53)
+34 − 2×12 = 10   (gemessen  9)
+```
+
+> Ein Rand in festen Pixeln ist eine Aussage über die Höhe des Elternteils.
+> Wird das Elternteil flacher, frisst der Rand den Inhalt — und der Inhalt
+> sieht aus, als wäre er kaputt.
+
+Die Bütten-Gestaltung bleibt (kompakter Block, mittig auf dem Papier), nur
+der Rand folgt der kleineren Box: `inset:5px 12px` → **182 × 23**.
+Automatisch unverändert bei 174 × 53. **Commit `a080e25`.**
+
+### v1726 · Was in dieser Ansicht nichts tut, steht nicht mehr da
+
+Marcel: „nicht bei allen Aussehern layouts macht der Seiten wechsel sinn.
+das muss geprüft werden. Modus wechsel macht der überall sinn genauso wie
+die Objektkarten?"
+
+Alle Gruppen in jedem Layout durchgeklickt, je Stellung eine Signatur aus
+Farben, Radien, Schrift **und Geometrie** verglichen:
+
+| Gruppe | Standard | Aktenmappe | Kanzlei | Tower |
+|---|---|---|---|---|
+| Seiten (Menü links/rechts) | **nein** | ja | ja | ja |
+| Kartengestalt (7 Entwürfe) | **nein** | ja | – | – |
+| Modus (Dunkel/Hell) | ja | ja | – | – |
+| Objektkarten-Dichte | ja | ja | – | – |
+
+Die Seitenwahl schiebt die Schiene — **ohne Schiene gibt es nichts zu
+schieben.** Die Kartengestalt hängt an `data-dp-objkarte`, das
+`objektkarten-stil.js` nur unter `layoutAktiv()` setzt; im Standard bleibt
+das Attribut leer und alle **21 Paare** der sieben Entwürfe sind identisch.
+
+**Modus und Dichte wirken überall und bleiben stehen** — Marcels Frage dazu
+ist damit beantwortet, ohne dass etwas verschwindet.
+
+Die Gestalt teilt sich ihren Block mit der Dichte, deshalb fällt dort nur
+der Host weg, nicht der ganze Abschnitt.
+
+**Stand der Sichtbarkeit im Panel** (nachgemessen):
+
+```
+                 Standard  Aktenmappe  Tower
+Seiten             weg        da        da
+Datenaufnahme      weg        da        da
+Kartengestalt      weg        da        da
+Objektkarten       da         da        da
+Modus              da         da        da
+Schrift            da         weg       weg
+Textgroesse        da         da        da
+```
+
+**Gold-Audit RC=0. Commit `0bc7693`.**
+
+### Offen: der Investor Deal Score im Tower
+
+Marcels erster Punkt — „im tower modus kann ich leider den investor deal
+score im menü rechts die schrift schlecht lesen" — ist **nicht**
+abgeschlossen. Der Score erscheint erst mit einem geladenen Objekt, und im
+verborgenen Messtab lädt keines: weder `.click()`, noch ein echter
+Mausklick, noch ein synthetisches `MouseEvent` auf die Objektkarte haben
+`_currentObjKey` gesetzt.
+
+Was in der rechten Spalte ohne Objekt messbar war:
+
+```
+ds2-tag  "DS2"       9 px   Kontrast 2,29   (zweimal)
+Impressum/Datenschutz 10 px  Kontrast 2,32
+```
+
+Beides ist schwach, aber **keines davon ist der Investor Deal Score**. Ich
+nenne es hier, statt es stillschweigend für Marcels Befund zu halten.
+
+---
+
+## v1727–v1729 · Die Vorlagen raus, und die App auf Handy und Tablet
+
+### v1727 · Eine Vorlage, die man nicht mehr abwählen kann
+
+Marcel: „die app darstellung die einstellung passt nicht zusammen mit den
+neuen layouts. das darf nicht auswählbar sein unter darstellung öffnen."
+
+Die sechs Vorlagen **wirken** in den neuen Ansichten — gemessen sind alle
+sechs unterscheidbar. Sie passen nur nicht dazu, und das ist eine
+Gestaltungsfrage, keine Messfrage: die Ansichten bringen ihre eigene
+Typografie und Flächenaufteilung mit.
+
+> Ausblenden allein genügt hier nicht. Wer eine Vorlage aktiv hat und dann
+> eine Ansicht wählt, sähe den Abschnitt verschwinden — mitsamt dem
+> einzigen Weg zurück. Die Vorlage hinge dann fest.
+
+Deshalb wird sie beim Wechsel **zurückgesetzt**, über denselben Weg, den
+der Nutzer sonst geht (`save` + `anwenden`). Nachgemessen:
+
+```
+Standard              Vorlagen waehlbar, wirken
+Vorlage gesetzt       data-ui-theme=kanzlei
+dann Layout gewaehlt  data-ui-theme leer, Abschnitt weg
+```
+
+Umgekehrt zu allen anderen Gruppen: hier blendet das **Layout** aus, nicht
+sein Fehlen. **Commit `6455142`.**
+
+### v1728/v1729 · Handy und Tablet
+
+Marcel: „alles muss auf dem handy und tablet funktionieren"
+
+Gemessen in der Messkabine (gleich-Origin-iframe mit fester Breite — die
+Fenstergröße allein wirkt nicht auf Media-Queries).
+
+**Handy, 387 px:** das Kontingent-Blatt stand bei −15..370 und war links
+abgeschnitten. Ursache: `min-width:270px` plus Inhalt an einer
+rechtsbündigen Pille — die Breite wuchs über den Schirm, und `right:0` hält
+nur die rechte Kante.
+
+> Eine Mindestbreite ist ein Versprechen an den Inhalt. Auf einem schmalen
+> Schirm wird daraus ein Anspruch, den der Schirm nicht einlösen kann.
+
+**Tablet, 765 px:** der Abrufen-Knopf der Datenaufnahme stand bei
+**808..1016** — 251 px außerhalb und unerreichbar, der QR-Code 29 px. Die
+Kinder liefen über ihren **eigenen** Container hinaus: flex mit `nowrap`,
+kein Schrumpfen, `overflow-x:visible`. Die Seite scrollt deshalb auch
+nicht — es gab keinen Weg zu dem Knopf.
+
+Gegengemessen: `overflow-x:auto` ändert nichts (der Container wächst nicht
+mit), `flex-wrap:wrap` holt ihn auf 48..256.
+
+> Ein Knopf, den man nicht erreichen kann, ist kein Knopf.
+
+**Abnahme über drei Breiten:**
+
+```
+            Abrufen-Knopf   Leiste   Ueberlaeufe
+Handy  387   30..386  ok    415 px        0
+Tablet 765   48..256  ok    190 px        0
+Desktop 1437 1074..1282 ok   89 px        0
+```
+
+Der Umbruch greift nur zwischen 701 und 1100 px: darunter hat die
+Handy-Fassung ihre eigene Gestaltung (dort wurde bei 387 px kein einziger
+Überlauf gemessen), darüber bleibt die Leiste einzeilig.
+
+**Gold-Audit RC=0. Commits `4122400`, `23f3b97`.**
+
+### Werkzeugnotiz: die Messkabine
+
+Responsive lässt sich nur im **gleich-Origin-iframe mit fester Breite**
+messen. Der Ablauf, der sich bewährt hat:
+
+```js
+var f = document.createElement("iframe");
+f.style.cssText = "position:fixed;left:0;bottom:0;width:390px;height:844px;z-index:2147483000";
+f.src = "/?kabine=handy";          // gleicher Origin, eigene Instanz
+document.body.appendChild(f);      // 8 s warten, dann contentDocument messen
+```
+
+Darin **immer** `transition:none` setzen, sonst misst man den eingefrorenen
+Startwert. Und die Reiterleiste beim Überlauf-Test ausklammern: sie scrollt
+absichtlich horizontal.
+
+---
+
+## v1730/v1730b · Die Investor-Pille war nicht zu dunkel, sie war zu klein
+
+Marcel: „den investor deal score im menü rechts die schrift schlecht
+lesen" — dazu der Screenshot `Dateien/investor.png`. Gemeint ist die
+**INVESTOR-Pille** oben rechts auf jeder Objektkarte, nicht der Score im
+Hauptbereich. Das Bild hat die Suche entschieden; vorher hatte ich zweimal
+an der falschen Stelle gemessen.
+
+Gemessen an den neun Pillen der Objektliste:
+
+| | Farbe | Grund | Kontrast |
+|---|---|---|---:|
+| Pille (gold) | `rgb(226,201,126)` | `rgb(42,36,21)` | **9,45** |
+| Pille (grün) | `rgb(111,215,154)` | `rgb(22,39,27)` | **8,86** |
+| Lasche daneben | | | **8,07** |
+
+> Der Kontrast war nie das Problem. 9,45 ist mehr als das Doppelte des
+> Nötigen — was fehlt, ist Größe. **Eine Schrift, die man nicht lesen
+> kann, ist nicht zwingend zu blass.**
+
+### Der erste Anlauf war wirkungslos
+
+`style.css` führt für die Pille `font-size: 8.5px`. Ich habe diesen Wert
+gelesen und auf 9,5 px angehoben — **gemessen stand sie aber bereits auf
+9,5**, weil die Textgrößen-Einstellung den Grundwert hochskaliert.
+
+> Ein Wert im Stylesheet ist nicht der Wert auf dem Schirm. Wer eine Größe
+> anhebt, muss vorher die **gemessene** lesen, nicht die geschriebene.
+
+### Der zweite Anlauf
+
+Gegengemessen, was auf die 216 px breite Karte passt:
+
+```
+10,5px -> Pille 83     11px -> 86     11,5px -> 88     12px -> 88
+```
+
+Bei **11 px** stehen Pille und Lasche zusammen auf 152 von 216 — Platz
+genug, und der Sprung ist groß genug, um ihn zu sehen. Die Lasche zieht
+mit: zwei Größen nebeneinander lesen sich schlechter als eine.
+
+**Nachgemessen:**
+
+```
+vorher   Pille 78x19 @9,5px   Lasche 66x19 @9,5px
+jetzt    Pille 86x21 @11px    Lasche 74x21 @11px   "2026-999" vollstaendig
+ueber die Karte ragt nichts (9 Karten geprueft)
+```
+
+Nur in den Ansichten — dort hat Marcel es gesehen, und der
+Auslieferungszustand bleibt unberührt.
+
+**Gold-Audit RC=0. Commits `a6f7d47`, `621707a`.**

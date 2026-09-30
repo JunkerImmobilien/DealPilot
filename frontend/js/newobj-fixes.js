@@ -131,6 +131,16 @@
     // damit die ihren Wrap nicht erneut anlegen bzw. erkennen.
     wrapped._v434Wrapped = true;
     if (orig._dpWrapped) wrapped._dpWrapped = true;
+    /* v1695b: `__nq` MIT durchreichen. Fehlt die Marke, haelt die
+       250-ms-Wache in `neues-objekt-quellen.js` ihre Umhuellung fuer
+       verloren und legt eine zweite darueber — mit der ersten als
+       „Original". Zusammen mit dieser hier schliesst sich der Ring, und
+       `newObj` wirft „Maximum call stack size exceeded".
+
+       Der Kommentar darueber sagt es schon: Marker durchreichen, damit
+       die anderen ihren Wrap nicht erneut anlegen. `__nq` war dabei
+       vergessen — es gab ihn zu dem Zeitpunkt noch nicht. */
+    if (orig.__nq) wrapped.__nq = true;
     window.newObj = wrapped;
     return true;
   }

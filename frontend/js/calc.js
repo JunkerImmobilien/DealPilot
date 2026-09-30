@@ -183,16 +183,31 @@ function updHeaderBadges() {
     kpiComp = { byCategory: {}, total: 24, filled: 0, percent: 0 };
   }
 
-  // Globale Anzeige in Reihe 1: "X / Y Felder ausgefüllt · Z %"
+  /* == v1708 - DIE ZWEITE ANZEIGE WIRD ZUR QUELLE ===================
+     Hier stand die Kopf-Anzeige "X / Y Felder - Z %". Sie wird nicht
+     mehr geschrieben, sondern nur noch weitergereicht: die eine
+     Anzeige in der Reiterleiste entscheidet, welche Stufe gilt
+     (workflow.js, `_dpFortschritt`).
+
+     Marcel: "dann kann man sich eine Anzeige sparen und es wird etwas
+     uebersichtlicher."
+
+     Das Element bleibt im DOM und wird ausgeblendet, nicht entfernt:
+     `hybrid-aktionen.js:162/174` liest `.hdr-comp-text` aus. Wer es
+     loescht, nimmt dort still eine Zahl weg.
+
+     > Eine Anzeige abzuschalten heisst nicht, ihre Daten wegzuwerfen.
+       Jemand anders liest sie vielleicht. */
+  window._dpKpiComp = { filled: kpiComp.filled, total: kpiComp.total, percent: kpiComp.percent };
   var globalEl = document.getElementById('hdr-completeness');
   if (globalEl) {
-    var pctClass = kpiComp.percent >= 70 ? 'good' : kpiComp.percent >= 40 ? 'warn' : 'low';
-    globalEl.className = 'hdr-completeness ' + pctClass;
-    globalEl.style.display = 'inline-flex';
+    globalEl.className = 'hdr-completeness';
+    globalEl.style.display = 'none';
     globalEl.innerHTML =
-      '<span class="hdr-comp-text">' + kpiComp.filled + ' / ' + kpiComp.total + ' Felder · ' + kpiComp.percent + ' %</span>' +
-      '<span class="hdr-comp-bar"><span class="hdr-comp-fill" style="width:' + kpiComp.percent + '%"></span></span>';
+      '<span class="hdr-comp-text">' + kpiComp.filled + ' / ' + kpiComp.total
+      + ' Felder \u00b7 ' + kpiComp.percent + ' %</span>';
   }
+  try { if (typeof window._dpFortschritt === 'function') window._dpFortschritt(); } catch (e) {}
 
   // V63: Score erst ab 70% Vollständigkeit zeigen (gilt für Header)
   var MIN_COMP_FOR_SCORE = 0.70;

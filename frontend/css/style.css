@@ -4984,7 +4984,12 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   width: 24px;
   height: 24px;
   background: rgba(0,0,0,0.65);
-  border: 1px solid rgba(255,255,255,0.08);
+  /* v1722: war 0.08 - gemessen Kontrast 1,16 gegen den effektiven Grund
+     rgb(5,5,4). Die Schrift darin steht bei 9,84, die KNOPFFORM war
+     unsichtbar: man sah ein Zeichen schweben, keinen Knopf. 0.35 ergibt
+     rund 3,0 - die Schwelle, ab der ein Bedienelement als solches
+     erkennbar ist, ohne dass der Rahmen die Karte unruhig macht. */
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 5px;
   color:var(--dp-ink-70);
   cursor: pointer;
@@ -17172,6 +17177,11 @@ html body.hdr-collapsed .tabs-workflow-bar {
   border-radius: 5px;
   padding: 2px;
 }
+/* v1722: `<svg><use href="#i-clock"></svg>` ohne fill faellt auf Schwarz
+   zurueck - gemessen rgb(0,0,0) auf rgb(14,13,11), Kontrast 1,08, waehrend
+   der Knopf selbst rgba(255,255,255,.5) fuehrt. currentColor holt die
+   Knopffarbe ins Symbol; damit gelten Hover und Aktiv-Zustand mit. */
+.sb-sort-btn svg { fill: currentColor; }
 .sb-sort-btn {
   width: 22px;
   height: 22px;
@@ -30195,7 +30205,7 @@ html[data-bg="cream"] .sec {
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Universeller Reset — extra spezifisch */
-.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn),
+.sec button:not(.dp-tip):not(.tab):not(.sb-action-btn):not(.fb-modal-close):not(.modal-close):not(.btn-clean):not(.fab-btn):not(.dp-pf-mtrigger),
 .sec .v235-next-btn,
 .sec .da-card-cta,
 .sec .da-bank-pdf-btn,
@@ -32905,6 +32915,12 @@ body.hdr-banner-only .hdr-v61-row2 {
 .dp-cp-badge{font-size:10.5px;font-weight:600;color:#2F8E5A;background:#EBF3EF;border:1px solid #CDE5D6;border-radius:99px;padding:3px 9px;white-space:nowrap}
 .dp-cp-web{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#5C554E;cursor:pointer;user-select:none}
 .dp-cp-web input{accent-color:var(--gold);margin:0}
+/* v1703 � Marktpreis-Abruf aus dem Chat. Die Kostenansage steht IM Knopf,
+   nicht erst im Modal - wer klickt, soll vorher wissen, worauf er klickt.
+   Farben ueber --gold, damit die Marke des Mandanten greift. */
+.dp-cp-mp{border:1px solid var(--wl-ece0be, #ECE0BE);background:var(--wl-fbf6e9, #FBF6E9);color:var(--wl-8a6d22, #8a6d22);font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.2px;padding:6px 10px;border-radius:99px;cursor:pointer;white-space:nowrap;flex:none}
+.dp-cp-mp:hover{background:var(--gold-bg);border-color:var(--gold)}
+.dp-cp-mp:disabled{opacity:.5;cursor:default}
 .dp-cp-log{max-height:340px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .dp-cp-hint{font-size:12.5px;color:#938B7F;line-height:1.5}
 .dp-cp-msg{font-size:13px;line-height:1.55;padding:9px 12px;border-radius:11px;max-width:88%}
@@ -37790,7 +37806,7 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen {
    66px Inhalt -> Zeilen ueberlappten; jetzt auto. Die schwebenden Baender Won/Investor
    passen nicht in eine Listenzeile: Won wird ein Statuspunkt links, Investor faellt
    (der Score steht rechts). */
-@media (min-width: 1025px) { html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; } }  /* v1449d: nur Desktop - am Handy/Tablet ist die Leiste eine Schublade */
+@media (min-width: 1025px) { html[data-ui-theme="kanzlei"]:not([data-dp-layout]) body:not(.dp-sidebar-collapsed) .app-wrap { grid-template-columns:300px minmax(0,1fr) !important; } }  /* v1449d: nur Desktop - am Handy/Tablet ist die Leiste eine Schublade. v1717: und nur OHNE neues Layout - dort ist aside.sidebar display:none, dann faellt .main-col in die leere 300px-Spalte (Header 84x191 statt 1617x57) */
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-top { height:auto !important; max-height:none !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-investor-ribbon, html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card .sbc-won-ribbon { display:none !important; }
 html[data-ui-theme="kanzlei"] body:not(.dp-sidebar-collapsed) #sidebar .sb-card.deal-won { border-left:3px solid #2E8A57 !important; }
@@ -38061,3 +38077,100 @@ html[data-ui-theme="kanzlei"] body.dp-hybrid-rail #dp-hybrid-aktionen{ padding-b
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead *:not(b):not(strong){ color:#4A443B !important; }
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-kg-panel b,
 :is(html[data-ui-theme="kontor"],html[data-ui-theme="panel"],html[data-ui-theme="kanzlei"],html[data-ui-theme="boarding"]) body .dp-pf-lead b{ color:#1C1A16 !important; }
+
+/* =====================================================================
+   v1721 - DER LEERE BADGE-STREIFEN UNTER DEM KOPF
+   =====================================================================
+   Marcel: "zwischen header und menue links und rechts ist jetzt ein
+   heller streifen"
+
+   Gemessen im Standard-Layout, Vorlage Kontor:
+
+     #hdr-badges   :empty = true, 0 Kinder
+                   und trotzdem 1749 x 8 px, background rgb(255,255,255)
+                   padding 4px 14px, box-sizing border-box
+
+   Ein leerer Behaelter mit Innenabstand ist kein leerer Behaelter - er
+   ist ein Streifen. Sichtbar wird er erst, wenn eine Vorlage ihm eine
+   eigene Flaeche gibt: bei Kontor und Panel weiss, bei Kanzlei 251/250/247,
+   bei Boarding creme. Auf Obsidian und Konsole faellt er nicht auf, weil
+   die Flaeche dort so dunkel ist wie der Kopf darueber.
+
+   ZWEI Regeln wollten das schon verhindern, beide greifen nicht:
+
+     style.css:13630  .hdr-v61-row2:empty {display:none}
+                      ohne !important - verliert gegen
+                      `body:not(.hdr-collapsed) #hdr-badges
+                       {display:block !important}` (ID schlaegt Klasse)
+
+     style.css:36281  header.hdr #hdr-badges:not(:has(.hdr-incomplete-banner))
+                      {display:none !important}
+                      steht INNERHALB von @media (max-width:...) - auf dem
+                      Desktop gibt es sie nicht
+
+   > Zwei Waechter mit demselben Auftrag, und keiner steht da, wo es
+   > passiert. Der eine ist zu schwach, der andere zu schmal.
+
+   Diese Regel traegt die ID selbst und gilt in jeder Breite. Sie greift
+   ausschliesslich am LEEREN Behaelter - sobald der Score oder der
+   70-Prozent-Hinweis darin steht, ist sie aus dem Weg. `:not(:has(*))`
+   steht daneben, weil `:empty` schon an einem einzigen Leerzeichen
+   scheitert, das ein spaeterer Aufbau hinterlaesst.
+   ===================================================================== */
+header.hdr #hdr-badges:empty,
+header.hdr #hdr-badges:not(:has(*)){
+  display:none !important;
+}
+
+/* =====================================================================
+   v1723 - EIN ICON, DAS SEINE FARBE NICHT ERBT, IST NUR ZUFAELLIG SICHTBAR
+   =====================================================================
+   Marcel: "Bei der Aktenmappe ist bei Einzelobjekt das Icon noch schwarz
+   ... Das muesste geaendert werden, vielleicht bei den anderen auch."
+
+   Gemessen an allen acht .ct-ico im Portfolio-Cockpit:
+
+     span.ct-ico   color  rgb(201,168,76)   <- Gold, so gemeint
+     svg           fill   rgb(0,0,0)        <- Schwarz, der Rueckfall
+     Grund         weiss                    -> Kontrast 21, sieht gut aus
+
+   Die Icons sind nicht gold, sie sind SCHWARZ und stehen zufaellig auf
+   Weiss. Sobald dieselbe Kachel dunkel wird - andere Vorlage, dunkler
+   Modus, eine Schiene - faellt Kontrast 21 auf 1,08 und das Icon ist weg.
+   Genau das hat Marcel an zwei Stellen gesehen (v1722: #i-portfolio und
+   #i-clock), und es sind nicht die einzigen: die Bauart ist dieselbe.
+
+   > Ein Icon, das seine Farbe nicht erbt, ist nicht sichtbar - es ist
+   > zufaellig sichtbar. Der Unterschied faellt erst auf, wenn jemand die
+   > Flaeche darunter aendert.
+
+   `<svg><use href="#i-..."></svg>` traegt ohne eigenes `fill` den
+   Standardwert Schwarz. `currentColor` holt stattdessen die Farbe, die
+   der Knopf oder die Kachel ohnehin fuehrt - und damit gelten Hover,
+   Aktiv-Zustand, Vorlage und Whitelabel automatisch mit.
+
+   ABSICHTLICH ENG: nur SVGs, deren EINZIGES Kind ein <use> ist. Das sind
+   die Symbol-Icons aus dem Sprite. Mehrteilige SVGs (Score-Ring,
+   Diagramme) setzen fill und stroke an ihren eigenen Knoten und bleiben
+   unberuehrt - sie standen in der Messung auch nie im Weg.
+   =====================================================================
+
+   NACHTRAG v1723b - DIE REGEL WAR ZU BREIT.
+   Erst global gesetzt und nachgemessen: die acht .ct-ico im Objekt-Tab
+   fielen dadurch von Kontrast 21 auf 2,29. Sie sind das EINZIGE sichtbare
+   Element ihrer Kachel und standen auf Weiss - schwarz war dort richtig,
+   gold ist dort schwaecher.
+
+   > Eine Regel, die ein gemessenes Problem loest und ein ungemessenes
+   > schafft, ist kein Fortschritt. Marcels "vielleicht bei den anderen
+   > auch" war eine Vermutung, keine Beobachtung.
+
+   Deshalb nur die DUNKLEN Flaechen: dort ist Schwarz nie richtig, und
+   dort standen auch die beiden Faelle, die Marcel wirklich gesehen hat.
+   Helle Karten bleiben unberuehrt. */
+.dpl-schiene svg:has(> use:only-child),
+aside.sidebar svg:has(> use:only-child),
+header.hdr svg:has(> use:only-child),
+nav.tabs svg:has(> use:only-child){
+  fill:currentColor;
+}

@@ -35,9 +35,9 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1620"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1723c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
-    <link rel="stylesheet" href="css/ui-varianten.css?v=v1192">
+    <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
          Neuladen kurz die DealPilot-Fassung auf, bevor die Vorlage greift.
          Leerer Wert = Attribut gar nicht setzen: "dealpilot"/"standard"/"auto"
@@ -51,8 +51,8 @@
   <link rel="stylesheet" href="css/legal.css?v=W34">
 <link rel="stylesheet" href="css/pricing-modal.css?v=W34">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
-<link rel="stylesheet" href="css/hell-varianten.css?v=v1538">
-<link rel="stylesheet" href="css/rnd-styles.css?v=v1513b">
+<link rel="stylesheet" href="css/hell-varianten.css?v=v1652c">
+<link rel="stylesheet" href="css/rnd-styles.css?v=v1678">
 <link rel="stylesheet" href="css/select-fix.css?v=W34">
     <link rel="stylesheet" href="css/v187-additions.css?v=W34">
   <link rel="stylesheet" href="credits-modal.css?v=W34">
@@ -482,7 +482,7 @@ label.dp-required.qc-required::after {
 <!-- V292.6.5-cache-applied -->
 <!-- V292.6.6-cache-applied -->
 <!-- V292.6.8-cache-applied -->
-  <link rel="stylesheet" href="css/dashboard.css?v=W35">
+  <link rel="stylesheet" href="css/dashboard.css?v=v1705d">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"><!--v922-fonts-->
 </head>
 <body>
@@ -751,15 +751,19 @@ label.dp-required.qc-required::after {
         <span class="sb-act-ico" data-icon="import-hub"></span><span class="sb-act-l">Import</span>
       </button>
 
-      <div class="sb-act-section-title">Ausgeben</div>
+      <!-- v1706: Marke fuer die Layouts. Dort steht die Ausgaben-Box schon
+           in der Schiene (Track Record, Bankexport, Export) - diese Gruppe
+           waere die zweite Stelle fuer dieselbe Sache. In der normalen
+           Ansicht bleibt sie, dort gibt es die Box nicht. -->
+      <div class="sb-act-section-title sb-act-ausgeben">Ausgeben</div>
       <!-- v816h-no-allobjects: Akkordeon-Eintrag entfernt -->
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
+      <button class="sb-act-item sb-act-ausgeben" type="button" onclick="sbActionsAction('trackrec')" data-feature="track_record_pdf">
         <span class="sb-act-ico" data-icon="trackrec"></span><span class="sb-act-l">Track Record</span>
       </button>
-      <button class="sb-act-item" type="button" onclick="sbActionsAction('bankexport')" data-feature="bank_pdf_a3">
+      <button class="sb-act-item sb-act-ausgeben" type="button" onclick="sbActionsAction('bankexport')" data-feature="bank_pdf_a3">
         <span class="sb-act-ico" data-icon="bankexport"></span><span class="sb-act-l">Bankexport</span>
       </button>
-      <button class="sb-act-item" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
+      <button class="sb-act-item sb-act-ausgeben" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
         <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Export</span>
       </button>
 
@@ -776,7 +780,10 @@ label.dp-required.qc-required::after {
            Browser (tour-engine.js:1179, SEEN_KEY wird nie zurueckgesetzt) — und
            danach war sie nur noch ueber die Hilfe zu finden. Es fehlte also
            nicht die Tour, sondern der zweite Weg zu ihr. -->
-      <button class="sb-act-item" type="button" onclick="if(window.startTourFromSidebar)startTourFromSidebar();else if(window.startTour)startTour();">
+      <!-- v1705: eigene Klasse als ANKER. Die Layouts blenden diesen Punkt aus
+           (Marcels Wunsch), die normale Ansicht behaelt ihn - ohne Anker
+           muesste die Regel auf den onclick zielen, und der aendert sich. -->
+      <button class="sb-act-item sb-act-tour" type="button" onclick="if(window.startTourFromSidebar)startTourFromSidebar();else if(window.startTour)startTour();">
         <span class="sb-act-ico" data-icon="help"></span><span class="sb-act-l">Rundgang starten</span>
       </button>
       <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
@@ -3419,8 +3426,8 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
-<script src="js/pdf-investment-bank.js?v=v1634b"></script>
-<script src="js/bmf-modal.js?v=v1499"></script>
+<script src="js/pdf-investment-bank.js?v=v1637"></script>
+<script src="js/bmf-modal.js?v=v1688"></script>
 <script src="js/bmf-modal-v292.js?v=v1504"></script>
 <script src="js/bmf-bodenabschlag.js?v=v1508"></script>
 <script src="js/pdf-kaufpreisaufteilung.js?v=v1634b"></script><!-- v987-v292-restore -->
@@ -3444,12 +3451,12 @@ label.dp-required.qc-required::after {
   <script src="js/wk-aggregator.js?v=2"></script>
   <!-- V276.2-no-sidebar-widget: wk-dashboard entfernt - Inhalt jetzt im Steuermodul -->
   <script src="js/all-objects-views.js?v=1"></script>
-  <script src="js/tour-sidebar.js?v=2"></script>
+  <script src="js/tour-sidebar.js?v=v1696"></script>
   <script src="js/anteilig.js?v=5"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1445"></script>
+  <script src="js/calc.js?v=v1708"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3476,7 +3483,7 @@ label.dp-required.qc-required::after {
   <script src="js/mandanten.js?v=v1428"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v1236"></script>
   <script src="js/apikeys.js?v=811"></script>
-  <script src="js/settings.js?v=v1355"></script>
+  <script src="js/settings.js?v=v1719b"></script>
 <script src="js/pricing-modal.js?v=v1674"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
@@ -3493,7 +3500,7 @@ label.dp-required.qc-required::after {
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=110"></script>
-<script src="js/ui.js?v=v1360"></script>
+<script src="js/ui.js?v=v1700d"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v1608"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
@@ -3518,25 +3525,26 @@ label.dp-required.qc-required::after {
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=v1242c"></script>
 <script src="js/star-rating.js?v=v1622"></script>
-<script src="js/pdf-import.js?v=v1252"></script>
+<script src="js/pdf-import.js?v=v1678"></script>
+<script src="js/dokument-import.js?v=v1678"></script>
 <script src="js/beleg-import.js?v=v1406"></script>
 <script src="js/financing.js?v=v1433"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
-<script src="js/import-export-modal.js?v=893u"></script>
+<script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=463"></script>
-<script src="js/qc-bridge.js?v=v1438"></script>
+<script src="js/qc-bridge.js?v=v1694"></script>
 <script src="js/bodenrichtwert.js?v=v1388"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1437"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1629"></script>
-<script src="js/hell-varianten.js?v=v1527"></script>
+<script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1521"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
-<script src="js/ai-credits.js?v=v1296"></script>
-<script src="js/workflow.js?v=v1255"></script>
+<script src="js/ai-credits.js?v=v1728"></script>
+<script src="js/workflow.js?v=v1708"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v1465"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
@@ -3557,7 +3565,7 @@ label.dp-required.qc-required::after {
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v1081"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
-<script src="js/newobj-fixes.js?v=v1268c"></script>
+<script src="js/newobj-fixes.js?v=v1695b"></script>
 <script src="js/sidebar-search.js?v=846"></script>
 <script src="js/finanz-card-merge.js?v=483"></script>
 <script src="js/avm-missing-reset.js?v=443"></script>
@@ -3574,19 +3582,21 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-calc.js?v=v1426"></script>
 <script src="js/rnd-pdf.js?v=20260611105943"></script>
 <script src="js/rnd-docx.js?v=142"></script>
-<script src="js/rnd-wizard.js?v=v1608"></script>
+<script src="js/rnd-wizard.js?v=v1676"></script>
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v1431"></script>
-<script src="js/dashboard.js?v=v1428"></script>
+<script src="js/dashboard.js?v=v1704c"></script>
+<!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
+<script src="js/portfolio-pilot.js?v=v1705d"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=v1431"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1430"></script>
-  <script src="js/dpsh-score-hero.js?v=v1622"></script><!-- dpsh-score-hero -->
+  <script src="js/object-actions.js?v=v1703b"></script>
+  <script src="js/dpsh-score-hero.js?v=v1640"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1619"></script>
+  <script src="js/voice-import.js?v=v1637"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
@@ -4006,10 +4016,10 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<script src="js/copilot.js?v=v1188"></script>
+<script src="js/copilot.js?v=v1703c"></script>
     <script src="js/rp-pdf-engine.js?v=W27"></script>
     <script src="js/reseller-portal.js?v=v1537"></script><!-- v1112b-rp-mobile -->
-    <script src="js/whitelabel-override.js?v=W41"></script>
+    <script src="js/whitelabel-override.js?v=v1698"></script>
     <script src="js/branding-darstellung.js?v=W12"></script>
     <script src="js/textfarben-karten.js?v=v1123e"></script><!-- v1123-kartentext, nach settings.js: umhuellt _dpLogoBlock -->
     <script src="js/darstellung-reseller.js?v=v1123"></script>
@@ -4020,8 +4030,32 @@ document.addEventListener('DOMContentLoaded', function(){
          seit v650/v652, v1077 und v1112 bis v1117 handytauglich gebaut.
          ACHTUNG: ui-varianten.js liest dasselbe Kennzeichen dp_wl_cache fuer
          die Whitelabel-Sperre der Mandanten (v1111). Das bleibt. -->
-    <script src="js/ui-varianten.js?v=v1380"></script>
+    <script src="js/ui-varianten.js?v=v1727"></script>
     <script src="js/karten-kompakt.js?v=v1095c"></script><!--v1092-kompakt-aufklappbar-->
     <script src="js/deal-action-pdf-gate.js?v=W3"></script>
+    <!-- v1635 · Layout-Varianten. Stylesheet ZULETZT, damit es style.css
+         bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
+         weil es _dpDispSkin fuer den hellen Grund benutzt. -->
+    <link rel="stylesheet" href="css/datenaufnahme.css?v=v1729"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v1730b">
+    <script src="js/pdf-wahl.js?v=v1636"></script><!-- v1636 · Rueckfrage vor dem Export -->
+    <script src="js/layout-varianten.js?v=v1705b"></script>
+<!-- v1714 - die Objektkarten-Entwuerfe zum Umschalten -->
+<script src="js/objektkarten-stil.js?v=v1724"></script>
+    <script src="js/karten-stil.js?v=v1713"></script><!-- v1651 · Trichter und Bordkarte -->
+    <script src="js/erststart.js?v=v1638"></script>
+    <!-- v1697 · DIE CHECKLISTE BEIM ANLEGEN IST AUSGEHAENGT.
+         Marcel: „nimm bitte auch das Modal bei neues Objekt anlegen
+         erstmal raus."
+
+         Die Datei bleibt liegen und ist heil (v1695b behob die
+         Endlosrekursion). Nur diese Zeile entscheidet, ob sie laeuft —
+         wieder einhaengen heisst das Kommentarzeichen entfernen.
+
+         Ohne sie geht `newObj()` wieder direkt durch: die Umhuellung
+         entsteht gar nicht erst, und mit ihr faellt eine von drei
+         Schichten weg, die sich um `window.newObj` gelegt hatten.
+    <script src="js/neues-objekt-quellen.js?v=v1695b"></script>
+    -->
 </body>
 </html>

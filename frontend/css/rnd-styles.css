@@ -1314,3 +1314,173 @@
   font-size: 14px !important;
 }
 .rnd-wiz-field label { font-size: 12px !important; }
+/* ===================================================================
+   v1676 - Verfahrensuebersicht im RND-Assistenten
+   -------------------------------------------------------------------
+   Diese sechs Klassen wurden von rnd-wizard.js seit jeher ausgegeben
+   und hatten KEINE EINZIGE Regel - gemessen am 29.09.2026 mit
+   grep -o "\.rnd-wiz-result[a-z-]*": nur -bar und -hero waren
+   gestaltet. Die Verfahrenskarten standen als ungestylte Bloecke
+   untereinander.
+
+   Zusammen mit v1676 in rnd-wizard.js, das Vogels, Ross und Parabel
+   ueberhaupt erst anzeigt. Der Kern rechnete sie immer und warf sie
+   weg; sie brauchen keine eigenen Eingaben, nur Alter und GND.
+   =================================================================== */
+.rnd-wiz-result-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)) !important;
+  gap: 8px !important;
+  margin: 14px 0 !important;
+}
+.rnd-wiz-result-card {
+  flex: 0 0 auto;                      /* nie schrumpfen lassen */
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;
+  border-radius: 8px !important;
+  padding: 10px 8px !important;
+  text-align: center !important;
+}
+.rnd-wiz-result-card-label {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 10px !important;
+  letter-spacing: .06em !important;
+  text-transform: uppercase !important;
+  opacity: .72 !important;
+  margin-bottom: 4px !important;
+}
+.rnd-wiz-result-card-value {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 21px !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+}
+.rnd-wiz-result-card-unit {
+  font-size: 10px !important;
+  opacity: .62 !important;
+  margin-top: 2px !important;
+}
+/* Das massgebliche Verfahren traegt die Marke, die anderen nicht.
+   Es ist eine WAHL, keine Messung - deshalb muss sie sichtbar sein. */
+.rnd-wiz-result-card.highlight {
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent) !important;
+  border-color: var(--wl-c9a84c, #C9A84C) !important;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent) !important;
+}
+.rnd-wiz-result-card.highlight .rnd-wiz-result-card-value {
+  color: var(--wl-c9a84c, #C9A84C) !important;
+}
+/* Die Spreizung - der eigentliche fachliche Befund */
+.rnd-wiz-spreizung {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  padding: 9px 12px !important;
+  margin: 0 0 14px !important;
+  border-radius: 7px !important;
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C) !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent) !important;
+  opacity: .9 !important;
+}
+@media (max-width: 560px) {
+  .rnd-wiz-result-grid {
+    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)) !important;
+    gap: 6px !important;
+  }
+  .rnd-wiz-result-card-value { font-size: 17px !important; }
+  .rnd-wiz-result-card { padding: 8px 5px !important; }
+}
+
+/* ===================================================================
+   v1678 - Dokument-Import (dokument-import.js)
+   Gold ueber var(--wl-...), Statusfarben bleiben fest: Gruen und Rot
+   muessen in jeder Marke gleich sein.
+   =================================================================== */
+.dpdi-modal {
+  position: fixed !important; inset: 0 !important; z-index: 10050 !important;
+  background: rgba(5,5,5,.72) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  padding: 20px !important;
+}
+.dpdi-box {
+  position: relative !important;
+  width: min(680px, 100%) !important; max-height: 88vh !important;
+  overflow: auto !important;
+  background: var(--surface, #14120f) !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent) !important;
+  border-radius: 14px !important;
+  padding: 22px 24px 26px !important;
+}
+.dpdi-close {
+  position: absolute !important; top: 10px !important; right: 12px !important;
+  background: none !important; border: 0 !important; cursor: pointer !important;
+  font-size: 26px !important; line-height: 1 !important; opacity: .6 !important;
+  color: inherit !important;
+}
+.dpdi-close:hover { opacity: 1 !important; }
+.dpdi-title {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 20px !important; margin: 0 0 6px !important;
+}
+.dpdi-sub { font-size: 13px !important; opacity: .72 !important; margin: 0 0 16px !important; line-height: 1.5 !important; }
+.dpdi-drop {
+  display: flex !important; flex-direction: column !important;
+  align-items: center !important; justify-content: center !important;
+  gap: 8px !important; padding: 26px 16px !important; cursor: pointer !important;
+  border: 1.5px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent) !important;
+  border-radius: 10px !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent) !important;
+}
+.dpdi-drop:hover { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 11%, transparent) !important; }
+.dpdi-drop-icon { font-size: 26px !important; }
+.dpdi-drop-text {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important; letter-spacing: .05em !important; text-transform: uppercase !important;
+}
+.dpdi-status {
+  margin: 14px 0 0 !important; padding: 9px 12px !important;
+  border-radius: 7px !important; font-size: 13px !important; line-height: 1.5 !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent) !important;
+  border-left: 3px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
+}
+/* Statusfarben NICHT tokenisieren - CLAUDE.md */
+.dpdi-status.dpdi-ok     { border-left-color: #3FA56C !important; background: rgba(63,165,108,.10) !important; }
+.dpdi-status.dpdi-warn   { border-left-color: #D8A24C !important; background: rgba(216,162,76,.10) !important; }
+.dpdi-status.dpdi-fehler { border-left-color: #D8564C !important; background: rgba(216,86,76,.10) !important; }
+.dpdi-h3 {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important; letter-spacing: .07em !important; text-transform: uppercase !important;
+  opacity: .66 !important; margin: 18px 0 7px !important;
+}
+.dpdi-table { width: 100% !important; border-collapse: collapse !important; font-size: 13px !important; }
+.dpdi-table td { padding: 6px 8px !important; border-bottom: 1px solid rgba(255,255,255,.07) !important; }
+.dpdi-table td.num {
+  text-align: right !important; font-family: 'JetBrains Mono', monospace !important;
+  white-space: nowrap !important;
+}
+.dpdi-table-vgl td { opacity: .78 !important; }
+.dpdi-hinweis { font-size: 12px !important; line-height: 1.55 !important; opacity: .72 !important; margin: 8px 0 0 !important; }
+.dpdi-warn {
+  margin: 12px 0 !important; padding: 9px 12px !important; border-radius: 7px !important;
+  font-size: 12.5px !important; line-height: 1.5 !important;
+  border-left: 3px solid #D8A24C !important; background: rgba(216,162,76,.10) !important;
+}
+.dpdi-wahl { display: flex !important; flex-wrap: wrap !important; gap: 7px !important; margin-top: 12px !important; }
+.dpdi-wahl-btn, .dpdi-btn {
+  padding: 8px 13px !important; border-radius: 7px !important; cursor: pointer !important;
+  font-size: 12.5px !important; color: inherit !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 36%, transparent) !important;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent) !important;
+}
+.dpdi-wahl-btn:hover, .dpdi-btn:hover { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent) !important; }
+.dpdi-actions { margin-top: 16px !important; }
+.dpdi-json {
+  margin-top: 10px !important; padding: 11px !important; border-radius: 7px !important;
+  background: rgba(0,0,0,.30) !important; font-size: 11.5px !important;
+  max-height: 260px !important; overflow: auto !important; white-space: pre-wrap !important;
+}
+@media (max-width: 560px) {
+  .dpdi-modal { padding: 10px !important; }
+  .dpdi-box { padding: 18px 15px 20px !important; max-height: 94vh !important; }
+  .dpdi-title { font-size: 17px !important; }
+  .dpdi-table { font-size: 12px !important; }
+}

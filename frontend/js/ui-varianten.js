@@ -218,7 +218,218 @@
     attr('data-ui-cards',   get('ui_cards',   CARDS));
     attr('data-ui-surface', get('ui_surface', SURFACE));
     attr('data-ui-form',    get('ui_form',    FORMEN));   /* v1098 */
+    formRadien(get('ui_form', FORMEN));                  /* v1716e */
     grundSperre();                                        /* v1156 */
+
+    machbarkeit();           /* v1720 */
+  }
+
+  /* PP v1716e � DIE FORM BRAUCHT EIN STYLESHEET AM ENDE PPPPPPPPPP
+     Marcel: "Auch auf rund oder kantig ... das funktioniert nicht."
+
+     Vier Anlaeufe ueber CSS-Spezifitaet sind gescheitert. Der Walker
+     zeigt warum - GLEICHSTAND, und dann entscheidet die Reihenfolge
+     der Dateien:
+
+       html[data-dp-layout][data-ui-form="kantig"] .body input  (0,3,2)
+       html[data-dp-layout] .body input[type="text"]            (0,3,2)
+
+     `ui-varianten.css` wird vor `layout-varianten.css` geladen, also
+     gewinnt das Layout. Die Dateireihenfolge zu tauschen waere ein
+     Eingriff in alle anderen Achsen gleichzeitig - zu grob.
+
+     > Wer bei Gleichstand gewinnen will, muss spaeter kommen. Ein
+     > Stylesheet, das erst beim Umschalten entsteht, kommt immer
+     > spaeter als jede Datei.
+
+     Dieses Blatt steht am Ende des <head> und traegt NUR die Radien.
+     Ohne Wahl ist es leer - der Auslieferungszustand bleibt unberuehrt.
+     Dasselbe Muster nutzt `whitelabel-override.js` fuer seine Farben. */
+  var FORM_ID = 'dp-form-radien';
+
+  /* Gemessen, welche Flaechen Radien tragen; je Gruppe ein Mass.
+     Flaechen 14 px, Bedienelemente 10 px, kantig alles 0. */
+  var FORM_FLAECHEN = ['.card', '.dpl-teil', '.dp-kg-panel', '.dp-pfbar'];
+  var FORM_BEDIEN   = ['.btn', 'input', 'input[type="text"]', 'select', 'textarea',
+                       '.dp-pf-tile', '.sb-act-item', '.hdr-icon-btn',
+                       '#hdr-credits-pill', '.dpl-portfolio', '.tabs-status-badge'];
+
+  /* PP v1716i � DIE KASKADE WAR DER FALSCHE WEG PPPPPPPPPPPPPPPPPPPP
+     Marcel: "Auch auf rund oder kantig ... das funktioniert nicht."
+
+     SIEBEN Anlaeufe ueber CSS, und die Messung blieb bei 2 von 9
+     Flaechen. Der letzte Stand war: meine Regel matcht das Feld,
+     traegt !important, liegt auf Blatt 43 von 43 - und der Wert
+     bleibt 2px. Nach den Kaskadenregeln ist das unmoeglich, also
+     messe ich entweder falsch oder ich sehe die Siegerregel nicht.
+     Beides heisst dasselbe: ich kann es ueber CSS nicht garantieren.
+
+     > Ein Weg, der nach sieben Anlaeufen zwei von neun Flaechen
+     > erreicht, ist nicht fast fertig. Er ist der falsche Weg.
+
+     Der Inline-Gegentest hat gezeigt, was traegt: ein inline
+     gesetztes `border-radius: 33px !important` kam sofort an. Inline
+     mit !important steht ueber JEDER Regel - keine Spezifitaet, keine
+     Ladereihenfolge, kein blinder Fleck kann daran vorbei.
+
+     PREIS, ehrlich benannt: Inline ueberlebt kein Neu-Rendern. Wer
+     ein Objekt wechselt, bekommt neue Karten ohne die Radien. Darum
+     zieht ein MutationObserver nach, gedrosselt auf 120 ms. Dasselbe
+     Muster nutzen `dp-band-fix.js` und `deal-action-boarding.js`.
+
+     Das Stylesheet aus v1716e-h bleibt daneben stehen: es greift bei
+     den Flaechen, wo keine staerkere Regel steht, und deckt neue
+     Elemente in den 120 ms ab, die der Beobachter braucht. */
+
+  /* Sonderformen - eine Lasche mit rundum gleichen Ecken ist keine
+     Lasche mehr, und die Unterstreichung des Reiters muss gerade
+     bleiben. Beide folgen der Wahl, behalten aber ihre Gestalt. */
+  var FORM_SONDER = [
+    { sel: 'button.tab',                    kantig: '0px', rund: '10px 10px 0 0' },
+    { sel: '.sb-card .sbc-top',             kantig: '0px', rund: '0 14px 14px 14px' },
+    { sel: '.sb-card .sbc-seq',             kantig: '0px', rund: '8px 8px 0 0' },
+    { sel: '.sb-card .sbc-investor-ribbon', kantig: '0px', rund: '8px 8px 0 0' }
+  ];
+
+  /* Gegen `data-dp-karte` gegrept - der Name ist frei. Zwei Module auf
+     einem Attribut loeschen sich lautlos (v1517). */
+  var RAD_MARKE = 'data-dp-radius';
+  var radBeobachter = null;
+
+  function radSetzen(wert) {
+    /* Erst abraeumen. Ohne das bleibt beim Wechsel von rund auf kantig
+       ein alter Wert an Elementen stehen, die der neue Durchlauf nicht
+       mehr trifft - und "Passend" waere nie wieder der Standard. */
+    Array.prototype.forEach.call(document.querySelectorAll('[' + RAD_MARKE + ']'), function (e) {
+      e.style.removeProperty('border-radius');
+      e.removeAttribute(RAD_MARKE);
+    });
+    if (!wert) { return; }
+
+    var fl = (wert === 'kantig') ? '0px' : '14px';
+    var be = (wert === 'kantig') ? '0px' : '10px';
+    function malen(liste, mass) {
+      liste.forEach(function (s) {
+        Array.prototype.forEach.call(document.querySelectorAll(s), function (e) {
+          e.style.setProperty('border-radius', mass, 'important');
+          e.setAttribute(RAD_MARKE, '1');
+        });
+      });
+    }
+    /* Reihenfolge ist Absicht: Bedienelemente duerfen die Flaechenmasse
+       ueberschreiben, die Sonderformen beide. */
+    malen(FORM_FLAECHEN, fl);
+    malen(FORM_BEDIEN, be);
+    FORM_SONDER.forEach(function (o) {
+      malen([o.sel], wert === 'kantig' ? o.kantig : o.rund);
+    });
+  }
+
+  function radBeobachten(wert) {
+    if (radBeobachter) { radBeobachter.disconnect(); radBeobachter = null; }
+    if (!wert || !document.body) { return; }
+    var warte = null;
+    /* Nur childList/subtree - `style` zu beobachten waere eine Schleife,
+       weil radSetzen genau das schreibt. */
+    radBeobachter = new MutationObserver(function () {
+      if (warte) { return; }
+      warte = setTimeout(function () { warte = null; radSetzen(wert); }, 120);
+    });
+    radBeobachter.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function formRadien(wert) {
+    var st = document.getElementById(FORM_ID);
+    if (!st) {
+      st = document.createElement('style');
+      st.id = FORM_ID;
+    }
+    /* ══ v1716g · "ANS ENDE" GILT NUR FUER DEN AUGENBLICK ═════════════
+       In v1716e stand hier "ans ENDE, das ist der Punkt" - und es war
+       falsch. Gemessen mit dem Kaskaden-Walker am Feld #plz:
+
+         mein Blatt   Position 24 von 43
+         der Sieger   Position 42, layout-varianten.css, 2px !important
+
+       Das Blatt entsteht beim ERSTEN Lauf dieses Moduls, und der liegt
+       oben im <head> - danach parst der Browser noch 19 weitere <link>.
+       Ein Element, das einmal angehaengt wurde, wandert nicht mit.
+
+       > "Ans Ende gehaengt" ist eine Aussage ueber den Zeitpunkt, nicht
+       > ueber die Position. Wer bei Gleichstand gewinnen will, muss bei
+       > JEDEM Umschalten neu ans Ende.
+
+       `appendChild` auf ein bereits vorhandenes Element verschiebt es -
+       darum steht der Aufruf ausserhalb des `if`.
+
+       DAS ENDE DES <head> IST NICHT DAS ENDE DES DOKUMENTS. Nach dem
+       Verschieben lag das Blatt auf 25 von 43, und die Messung zeigte,
+       warum - VIER Blaetter liegen im <body>:
+
+         40 datenraum.css   41 marktbewertung-card.css
+         42 datenaufnahme.css   43 layout-varianten.css   <- der Sieger
+
+       Vom <head> aus ist der Sieger unerreichbar, egal wie oft man
+       anhaengt. Das Blatt gehoert also an den BODY. */
+    (document.body || document.head).appendChild(st);
+    if (!wert) {
+      st.textContent = '';
+      radSetzen('');       /* Inline-Reste abraeumen */
+      radBeobachten('');
+      return;
+    }
+
+    var fl = (wert === 'kantig') ? '0' : '14px';
+    var be = (wert === 'kantig') ? '0' : '10px';
+    /* v1716f: die spaete Position hilft nur bei GLEICHSTAND. Gemessen
+       nach v1716e reagierten 2 von 8 Flaechen - meine Regeln standen
+       auf (0,0,3), die Layout-Regeln auf (0,3,2).
+
+       > Ein Stylesheet am Ende gewinnt nur, wenn es gleich stark ist.
+       > Sonst ist es nur das letzte, das verliert.
+
+       Jede Regel bekommt deshalb VIER Fassungen: mit .body (so zielen
+       die Layout-Regeln), ohne, und beides noch einmal mit dem
+       Layout-Attribut. [lang] steht immer am html und hebt jede um eine
+       Stufe, ohne eine Annahme zu kosten. */
+    function regel(liste, mass) {
+      var teile = [];
+      liste.forEach(function (s) {
+        teile.push('html[lang][data-ui-form] body .body ' + s);
+        teile.push('html[lang][data-ui-form] body ' + s);
+        teile.push('html[data-dp-layout][data-ui-form] body .body ' + s);
+        teile.push('html[data-dp-layout][data-ui-form] body ' + s);
+      });
+      return teile.join(',') + '{border-radius:' + mass + ' !important}';
+    }
+    function regelAlt(liste, mass) {
+      return liste.map(function (s) { return 'html body ' + s; }).join(',')
+           + '{border-radius:' + mass + ' !important}';
+    }
+    var css = regel(FORM_FLAECHEN, fl) + regel(FORM_BEDIEN, be);
+
+    /* Die drei Sonderfaelle bekommen dieselbe Verstaerkung - sonst
+       schlagen die Layout-Regeln sie einzeln wieder. */
+    function einzeln(sel, mass) {
+      var v = ['html[lang][data-ui-form] body ' + sel,
+               'html[data-dp-layout][data-ui-form] body ' + sel,
+               'html[data-dp-layout][data-ui-form] .dpl-schiene body ' + sel];
+      return v.join(',') + '{border-radius:' + mass + ' !important}';
+    }
+
+    /* Der Reiter nur oben - seine Unterstreichung muss gerade bleiben. */
+    css += einzeln('button.tab', wert === 'kantig' ? '0' : '10px 10px 0 0');
+    /* Die Mappe behaelt die offene Ecke, wo die Lasche sitzt - rundum
+       gleich waere kein Aktenreiter mehr. */
+    css += einzeln('.sb-card .sbc-top', wert === 'kantig' ? '0' : '0 14px 14px 14px');
+    css += einzeln('.sb-card .sbc-seq', wert === 'kantig' ? '0' : '8px 8px 0 0');
+    css += einzeln('.sb-card .sbc-investor-ribbon', wert === 'kantig' ? '0' : '8px 8px 0 0');
+
+    st.textContent = css;
+
+    /* Und die Ebene, die wirklich traegt. */
+    radSetzen(wert);
+    radBeobachten(wert);
   }
 
   /* ── v1156-GRUND · Die Grundfarbe gilt nur ohne Vorlage ────────────────
@@ -234,6 +445,142 @@
     l.classList.toggle('locked', vorlageAktiv);
     sperreHart(l, vorlageAktiv);
   }
+
+  /* ══ v1720 · NUR ZEIGEN, WAS HIER AUCH WIRKT ═══════════════════════════
+     Marcel: „Sachen die nicht gehen bitte ausblenden bei dem jeweiligen
+     aussehen. Nur das einblenden und einstellbare anzeigen was wirklich
+     funktioniert."
+
+     Alle neun Schaltergruppen durchgeklickt und je Stellung eine Signatur
+     aus Farben, Radien, Schrift und Geometrie verglichen. Zwei Gruppen
+     hatten Stellungen, die sich NICHT unterscheiden liessen:
+
+       Schriftfamilie   wirkt nur OHNE Vorlage und OHNE Layout
+       Datenaufnahme    wirkt nur MIT Layout
+
+     Beide Male ist es kein Zufall, sondern gebaut:
+     - `ui-varianten.css` setzt `html[data-ui-theme] body {font-family:
+       var(--uv-f-body) !important}`, `layout-varianten.css` dasselbe mit
+       `var(--dpl-body)`. Eine Vorlage bringt ihre Schrift mit - das ist
+       ihr Wesen. Die Nutzerwahl kann dagegen nicht gewinnen, und sie
+       SOLL es auch nicht.
+     - `karten-stil.js:280` setzt sein Attribut nur unter `layoutAktiv()`.
+
+     > Ein Schalter, der nichts tut, ist schlimmer als ein fehlender: der
+     > fehlende wirft eine Frage auf, der tote wirft einen Zweifel auf das
+     > ganze Panel.
+
+     Die Textgroesse (A- A A+) bleibt stehen - sie wirkt gemessen in jeder
+     Lage und teilt sich nur den Block mit der Familie. */
+  function machbarkeit() {
+    var h = document.documentElement;
+    var layout  = !!h.getAttribute('data-dp-layout');
+    var vorlage = !!h.getAttribute('data-ui-theme');
+
+    var f = document.getElementById('dpuv-font');
+    if (f) {
+      var schriftFrei = !layout && !vorlage;
+      f.style.display = schriftFrei ? '' : 'none';
+      /* Der Hinweis darueber verspricht sonst etwas, das nicht mehr da
+         ist - er gehoert mitgezogen, nicht stehengelassen. */
+      var hin = f.parentElement ? f.parentElement.querySelector('.dpuv-hint') : null;
+      if (hin) {
+        hin.textContent = schriftFrei
+          ? 'Schriftfamilie und Textgröße der gesamten App.'
+          : 'Textgröße der gesamten App. Die Schrift bringt '
+            + (vorlage ? 'die Vorlage' : 'die Ansicht') + ' mit.';
+      }
+    }
+
+    /* Die Datenaufnahme-Karte gibt es nur in den neuen Ansichten. Ohne
+       Layout bliebe eine Wahl stehen, die beim Klicken nichts aendert. */
+    var k = document.getElementById('dpk-seg');
+    if (k && k.parentElement) k.parentElement.style.display = layout ? '' : 'none';
+
+    /* ── v1726 · ZWEI WEITERE, DIE NUR MIT LAYOUT WIRKEN ──────────────
+       Marcel: „nicht bei allen Aussehern layouts macht der Seiten wechsel
+       sinn. das muss geprueft werden. Modus wechsel macht der ueberall
+       sinn genauso wie die Objektkarten?"
+
+       Alle Gruppen in jedem Layout durchgeklickt und je Stellung eine
+       Signatur aus Farben, Radien, Schrift UND Geometrie verglichen:
+
+                            Standard  Aktenmappe  Kanzlei  Tower
+         Seiten               NEIN       ja         ja      ja
+         Kartengestalt        NEIN       ja         -       -
+         Modus                ja         ja         -       -
+         Objektkarten-Dichte  ja         ja         -       -
+
+       Die Seitenwahl schiebt die Schiene - ohne Schiene gibt es nichts zu
+       schieben. Die Kartengestalt haengt an `data-dp-objkarte`, das
+       `objektkarten-stil.js` nur unter `layoutAktiv()` setzt (gemessen:
+       im Standard bleibt das Attribut leer, alle 21 Paare identisch).
+
+       Modus und Dichte wirken ueberall und bleiben stehen - Marcels Frage
+       dazu ist damit beantwortet, ohne dass etwas verschwindet. */
+    var se = document.getElementById('dpl-seiten-seg');
+    if (se && se.parentElement) se.parentElement.style.display = layout ? '' : 'none';
+
+    /* Die Gestalt teilt sich den Block mit der Dichte, die ueberall wirkt -
+       deshalb nur der Host, nicht der ganze Abschnitt. */
+    var og = document.querySelector('#dpuv-panel .dp-objkarte-wahl-host');
+    if (og) og.style.display = layout ? '' : 'none';
+
+    /* v1727: die Vorlagen gehoeren nicht in die neuen Ansichten - siehe
+       die Begruendung am Beobachter weiter unten. Umgekehrt zu allen
+       anderen: hier blendet das LAYOUT aus, nicht sein Fehlen. */
+    var th = document.getElementById('dpuv-theme');
+    if (th && th.parentElement) th.parentElement.style.display = layout ? 'none' : '';
+  }
+
+  /* v1720b: die Lage aendert sich auf ZWEI Wegen, nicht auf einem.
+     Gemessen nach v1720: nach einem Vorlagenwechsel stimmte die Anzeige,
+     nach einem LAYOUT-Wechsel nicht - der laeuft ueber
+     `DealPilotLayout.setze()` und kommt an `anwenden()` vorbei.
+
+     > Wer eine Anzeige an einen Zustand haengt, muss jeden Weg kennen,
+     > auf dem dieser Zustand sich aendert. Zwei Aufrufstellen sind eine
+     > Vermutung; das Attribut selbst zu beobachten ist eine Zusage.
+
+     Der Beobachter haengt am Attribut, nicht am Knopf - damit gilt er
+     auch fuer den Umschalter in den Einstellungen und jeden spaeteren
+     Weg. Keine Schleife: machbarkeit() fasst nur `style.display` im
+     Panel an, nie diese Attribute. */
+  /* ══ v1727 · EINE VORLAGE, DIE MAN NICHT MEHR ABWAEHLEN KANN ═══════
+     Marcel: „die app darstellung die einstellung passt nicht zusammen
+     mit den neuen layouts. das darf nicht auswaehlbar sein unter
+     darstellung oeffnen."
+
+     Die sechs Vorlagen WIRKEN in den neuen Ansichten - gemessen sind
+     alle sechs unterscheidbar. Sie passen nur nicht dazu, und das ist
+     eine Gestaltungsfrage, keine Messfrage: die Ansichten bringen ihre
+     eigene Typografie und Flaechenaufteilung mit, eine Vorlage darueber
+     ergibt zwei Handschriften in einem Bild.
+
+     > Ausblenden allein genuegt hier nicht. Wer eine Vorlage aktiv hat
+     > und dann eine Ansicht waehlt, saehe den Abschnitt verschwinden -
+     > mitsamt dem einzigen Weg zurueck. Die Vorlage haenge dann fest.
+
+     Deshalb wird sie beim Wechsel ZURUECKGESETZT, ueber denselben Weg,
+     den der Nutzer sonst geht (`save` + `anwenden`), nicht durch
+     Attribut-Entfernen von aussen. Keine Schleife: beim zweiten
+     Durchlauf ist `ui_theme` bereits leer. */
+  try {
+    new MutationObserver(function () {
+      try {
+        if (document.documentElement.getAttribute('data-dp-layout') &&
+            get('ui_theme', THEMES)) {
+          save({ ui_theme: '' });
+          anwenden();            /* ruft machbarkeit() selbst */
+          return;
+        }
+      } catch (e) {}
+      machbarkeit();
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-dp-layout', 'data-ui-theme']
+    });
+  } catch (e) {}
 
   /* ── v1156c · Eine ausgegraute Sperre ist nur eine optische ────────────
      Im Pruefstand gemessen: `.dpuv-lock.locked>.dpuv-inner` setzt
@@ -376,9 +723,28 @@
     '.dpuv-pf{flex:1;font-size:12.5px;font-weight:600;padding:12px;border-radius:8px;cursor:pointer;min-height:44px;',
       'border:1px solid #DCD5C4;background:#fff;color:#3d382f}',
     '.dpuv-pf.gold{background:var(--wl-c9a84c, #C9A84C);border-color:var(--wl-c9a84c, #C9A84C);color:#1a1407}',
-    '#dpuv-back{position:fixed;inset:0;z-index:2147481999;background:rgba(0,0,0,.28);opacity:0;',
+    /* ── v1724 · DAS PANEL LAESST DIE APP IN RUHE ───────────────────
+       Marcel: „dass man, wenn man das offen hat, halt auch in der App
+       noch durchklicken kann. Also quasi wie so ein Overlay-Menue, dass
+       man dann umschalten kann und dann schliessen kann."
+
+       Gemessen: `#dpuv-back` lag als 2133x988-Flaeche ueber allem und
+       `elementFromPoint` in der Bildschirmmitte nannte ihn - kein Klick
+       kam durch. Dazu dunkelte er mit 28 %: wer eine Vorlage beurteilen
+       will, sah sie durch einen Schleier.
+
+       > Ein Einstellfenster, das die Sache verdeckt, die es einstellt,
+       > zwingt zum Zumachen nach jedem Klick.
+
+       Der Abdunkler bleibt als Traeger der Ein-/Ausblendung, wird aber
+       durchsichtig und durchlaessig. Geschlossen wird ueber das ✕ oder
+       „Fertig" - ein Klick daneben schliesst nicht mehr, weil daneben
+       jetzt die App liegt. Das Panel hebt sich stattdessen durch
+       seinen Schatten ab. */
+    '#dpuv-back{position:fixed;inset:0;z-index:2147481999;background:transparent;opacity:0;',
       'pointer-events:none;transition:opacity .22s}',
-    '#dpuv-back.on{opacity:1;pointer-events:auto}',
+    '#dpuv-back.on{opacity:1;pointer-events:none}',
+    '#dpuv-panel.open{box-shadow:-18px 0 44px -12px rgba(0,0,0,.42)}',
     /* Handy: Blatt von unten statt Spalte von rechts — bei 390px waere eine
        376px-Spalte der ganze Schirm und die Live-Vorschau waere weg. */
     '@media (max-width:700px){',
@@ -497,6 +863,20 @@
            (v1156-GRUND) — der Schalter waehlt nur eine, die zur
            gewuenschten Helligkeit passt, und laesst eine bereits passende
            stehen. */
+        /* ── v1689b · ZURUECKGENOMMEN: HIER STAND EINE DOPPELUNG ──────
+           In v1684 habe ich eine Gruppe "Seitenaufteilung" gebaut, weil
+           Marcel den Layout-Umschalter in den Einstellungen haben wollte.
+           **Den gab es da schon** — die Gruppe "Aufbau" ganz oben fuehrt
+           dieselben vier Eintraege (Heute, Aktenmappe, Kanzlei, Tower)
+           und schaltet ueber denselben Weg.
+
+           Zwei Schalter fuer dieselbe Sache sind schlimmer als keiner:
+           sie zeigen irgendwann verschiedene Staende, und niemand weiss,
+           welcher gilt. Gefunden, als ich pruefte, warum meine Gruppe an
+           Position 5 stand — davor lag die echte.
+
+           > Bevor etwas gebaut wird, das der Nutzer vermisst: nachsehen,
+           > ob er es nur nicht gefunden hat. */
         '<div class="dpuv-g"><h3>Modus</h3>' +
           '<p class="dpuv-hint">Grundhelligkeit der Oberfläche. Wählt die passende Vorlage ' +
             'darunter mit aus — eine, die schon passt, bleibt stehen.</p>' +
@@ -511,7 +891,13 @@
           segHtml('dpuv-theme', THEMES, get('ui_theme', THEMES)) + '</div>' +
         '<div class="dpuv-g"><h3>Objektkarten</h3>' +
           '<p class="dpuv-hint">Wie viel jede Karte in der Objektliste zeigt.</p>' +
-          segHtml('dpuv-cards', CARDS, get('ui_cards', CARDS)) + '</div>' +
+          segHtml('dpuv-cards', CARDS, get('ui_cards', CARDS)) +
+          /* v1724: die Gestalt der Karte - dieselbe Wahl wie in den
+             Einstellungen, hier als KLASSE statt ID (zwei gleiche IDs
+             waeren ein Duplikat). `objektkarten-stil.js` baut in beide
+             Orte und haelt sie ueber `wahlNachziehen()` gleich. */
+          '<div class="dp-objkarte-wahl-host" style="margin-top:10px"></div>' +
+        '</div>' +
         '<div class="dpuv-g"><h3>Kartenfläche</h3>' +
           '<p class="dpuv-hint">Karten folgen der Vorlage oder bleiben weiß.</p>' +
           segHtml('dpuv-surface', SURFACE, get('ui_surface', SURFACE), 2) + '</div>' +
@@ -1147,6 +1533,8 @@
     bauen();
     gateSetzen();
     grundSperre();           /* v1156: beim Aufbau, nicht erst beim naechsten Klick */
+
+    machbarkeit();           /* v1720 */
     markeAuffrischen();      /* v1098: Reseller-Zustand und Logo sind aeusserer Zustand */
     targetUmhuellen();       /* v1098: erst hier, damit reseller-portal.js sicher geladen ist */
     resetUmhuellen();
@@ -1268,13 +1656,57 @@
      diese Luecke schliesst (v1098), war zu dem Zeitpunkt noch nicht
      installiert. Ein Rueckbau muss aber immer vollstaendig sein, egal von
      wo er ausgeloest wird. */
-  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); bereicheUmhuellen(); resetUmhuellen(); }
+  /* ── v1663c · DIE GEWAEHLTE MARKENFARBE UEBERLEBTE KEIN NEULADEN ─────
+     Marcel: „dass man dort dann halt auch die Farben anpassen kann,
+     wenn man den Partnervertrag hat - kannst du schauen, ob du das
+     mit verknuepft hast?"
+
+     Verknuepft ist es, und zwar sauber: das Panel hat KEINEN eigenen
+     Faerbe-Weg, `farbenAnwenden()` reicht Akzent und Grundfarbe
+     unveraendert an `DealPilotWhitelabel.apply()` durch - dieselben
+     `--gold*`-, `--wl-*`- und `--obsidian`-Tokens, die auch das
+     Partner-Whitelabel setzt. Ein Kanal, mehrere Schreiber.
+
+     **Gemessen fehlte aber der Rueckweg.** Alle drei Aufrufer von
+     `farbenAnwenden()` (Z. 737, 774, 811) stehen INNERHALB der
+     Panel-Bindungen, also innerhalb von `oeffnen()`. `startAufbau()`
+     stellte Vorlage, Karten und die Bereichsfarben wieder her -
+     `ui_accent` und `ui_obsidian` las beim Start **niemand**.
+
+     > Eine Farbe, die man waehlen kann und die das Neuladen nicht
+     > ueberlebt, ist keine Einstellung, sondern eine Vorschau. Und sie
+     > sieht genauso aus wie eine, die funktioniert - bis man F5
+     > drueckt.
+
+     Zwei Bedingungen, damit das kein zweiter Schreiber wird:
+
+     - **Nur wenn wirklich etwas gewaehlt wurde.** Sonst riefe jeder
+       Seitenaufruf `apply()` mit den Standardwerten und schaltete den
+       Whitelabel-Sweeper ohne Anlass ein.
+     - **Nie beim Mandanten eines Partners.** Dort gehoert die Marke
+       dem Partner; `mandant-branding.js` setzt sie aus dem Cache und
+       erneut bei `dp:plan-ready`. Eine eigene Wahl davorzuschieben
+       waere ein Wettlauf, den mal der eine und mal der andere
+       gewinnt. */
+  function markenfarbenBooten() {
+    if (istMandant()) return;
+    var st = load();
+    if (!st.ui_accent && !st.ui_obsidian) return;
+    farbenAnwenden(st.ui_accent || GOLD_STD, st.ui_obsidian || OBSIDIAN_STD);
+  }
+
+  function startAufbau() { logoUmhuellen(); chromeFarbenBooten(); markenfarbenBooten(); bereicheUmhuellen(); resetUmhuellen(); }
   if (document.body) startAufbau();
   else document.addEventListener('DOMContentLoaded', startAufbau);
 
   /* Der Plan steht beim Laden noch nicht fest — nachziehen, wenn er kommt.
      dp:plan-ready statt Timer oder Polling (CLAUDE.md). */
   window.addEventListener('dp:plan-ready', gateSetzen);
+  /* v1663c: und die Markenfarbe danach noch einmal - `config.js`
+     entscheidet erst mit dem Plan, ob es selbst `--gold` setzen darf
+     (es ueberspringt den Akzent nur, solange `isActive()` gilt). Wer
+     zuletzt schreibt, gewinnt; das soll die Wahl des Nutzers sein. */
+  window.addEventListener('dp:plan-ready', markenfarbenBooten);
 
   window.DealPilotUiVarianten = {
     open:  oeffnen,
@@ -1289,7 +1721,37 @@
      Die Pruefung wandert deshalb hierher auf die Farbsektion (gateSetzen).
      Der Wrapper wird nicht entfernt, sondern ueberschrieben: diese Datei
      laedt nach settings.js, also gilt diese Zuweisung. */
+  /* ── v1719 · AB PRO ──────────────────────────────────────────────────
+     Marcel: „Erst ab Pro ist das Darstellung oeffnen moeglich."
+
+     Der Knopf in den Einstellungen zeigt sich seither gesperrt; hier
+     steht dasselbe Tor noch einmal im WEG. Ein Knopf, der nur ausgegraut
+     ist, sperrt nichts - er bittet darum, nicht gedrueckt zu werden.
+
+     Geprueft wird `features.theme_palette`, der Schluessel, der die
+     Trennung schon traegt (gemessen: free/starter/investor fuehren ihn
+     nicht, pro und partner auf true). `Plan.full()` statt `Plan.can()`:
+     gemessen gibt `can('theme_palette')` auch im Partner-Plan false.
+
+     Im Zweifel OFFEN, nicht zu: ist `Plan` noch nicht geladen, waere ein
+     hartes Nein schlimmer als ein zu frueh geoeffnetes Panel - der Nutzer
+     haette eine bezahlte Funktion vor sich, die ihn abweist. */
+  function darstellungFrei() {
+    try {
+      if (window.Plan && typeof Plan.full === 'function') return !!Plan.full('theme_palette');
+    } catch (e) {}
+    return true;
+  }
+
   window._dpOpenFromSettings = function () {
+    if (!darstellungFrei()) {
+      try {
+        if (typeof toast === 'function') {
+          toast('Die Feineinstellungen der Darstellung gibt es ab dem Pro-Plan.');
+        }
+      } catch (e) {}
+      return;
+    }
     try { if (typeof closeSettings === 'function') closeSettings(); } catch (e) {}
     setTimeout(oeffnen, 140);
   };
