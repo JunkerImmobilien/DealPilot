@@ -222,7 +222,7 @@
     grundSperre();                                        /* v1156 */
   }
 
-  /* PP v1716e · DIE FORM BRAUCHT EIN STYLESHEET AM ENDE PPPPPPPPPP
+  /* PP v1716e ï¿½ DIE FORM BRAUCHT EIN STYLESHEET AM ENDE PPPPPPPPPP
      Marcel: "Auch auf rund oder kantig ... das funktioniert nicht."
 
      Vier Anlaeufe ueber CSS-Spezifitaet sind gescheitert. Der Walker
@@ -263,21 +263,49 @@
 
     var fl = (wert === 'kantig') ? '0' : '14px';
     var be = (wert === 'kantig') ? '0' : '10px';
+    /* v1716f: die spaete Position hilft nur bei GLEICHSTAND. Gemessen
+       nach v1716e reagierten 2 von 8 Flaechen - meine Regeln standen
+       auf (0,0,3), die Layout-Regeln auf (0,3,2).
+
+       > Ein Stylesheet am Ende gewinnt nur, wenn es gleich stark ist.
+       > Sonst ist es nur das letzte, das verliert.
+
+       Jede Regel bekommt deshalb VIER Fassungen: mit .body (so zielen
+       die Layout-Regeln), ohne, und beides noch einmal mit dem
+       Layout-Attribut. [lang] steht immer am html und hebt jede um eine
+       Stufe, ohne eine Annahme zu kosten. */
     function regel(liste, mass) {
+      var teile = [];
+      liste.forEach(function (s) {
+        teile.push('html[lang][data-ui-form] body .body ' + s);
+        teile.push('html[lang][data-ui-form] body ' + s);
+        teile.push('html[data-dp-layout][data-ui-form] body .body ' + s);
+        teile.push('html[data-dp-layout][data-ui-form] body ' + s);
+      });
+      return teile.join(',') + '{border-radius:' + mass + ' !important}';
+    }
+    function regelAlt(liste, mass) {
       return liste.map(function (s) { return 'html body ' + s; }).join(',')
            + '{border-radius:' + mass + ' !important}';
     }
     var css = regel(FORM_FLAECHEN, fl) + regel(FORM_BEDIEN, be);
 
+    /* Die drei Sonderfaelle bekommen dieselbe Verstaerkung - sonst
+       schlagen die Layout-Regeln sie einzeln wieder. */
+    function einzeln(sel, mass) {
+      var v = ['html[lang][data-ui-form] body ' + sel,
+               'html[data-dp-layout][data-ui-form] body ' + sel,
+               'html[data-dp-layout][data-ui-form] .dpl-schiene body ' + sel];
+      return v.join(',') + '{border-radius:' + mass + ' !important}';
+    }
+
     /* Der Reiter nur oben - seine Unterstreichung muss gerade bleiben. */
-    css += 'html body button.tab{border-radius:' +
-           (wert === 'kantig' ? '0' : '10px 10px 0 0') + ' !important}';
+    css += einzeln('button.tab', wert === 'kantig' ? '0' : '10px 10px 0 0');
     /* Die Mappe behaelt die offene Ecke, wo die Lasche sitzt - rundum
        gleich waere kein Aktenreiter mehr. */
-    css += 'html body .sb-card .sbc-top{border-radius:' +
-           (wert === 'kantig' ? '0' : '0 14px 14px 14px') + ' !important}';
-    css += 'html body .sb-card .sbc-seq,html body .sb-card .sbc-investor-ribbon' +
-           '{border-radius:' + (wert === 'kantig' ? '0' : '8px 8px 0 0') + ' !important}';
+    css += einzeln('.sb-card .sbc-top', wert === 'kantig' ? '0' : '0 14px 14px 14px');
+    css += einzeln('.sb-card .sbc-seq', wert === 'kantig' ? '0' : '8px 8px 0 0');
+    css += einzeln('.sb-card .sbc-investor-ribbon', wert === 'kantig' ? '0' : '8px 8px 0 0');
 
     st.textContent = css;
   }
