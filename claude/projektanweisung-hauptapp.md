@@ -24527,3 +24527,134 @@ Gruen und Rot bleiben als `rgba` hart — Statusfarben werden nie
 tokenisiert.
 
 **Commits.** `ba8c358` · `128e5a9` · `01a5a28` · `15f7412`
+
+---
+
+## 30.09.2026 — v1712–v1714: Aktenreiter, Buetten, acht Entwuerfe
+
+### v1712 · Zwei Rahmen um dieselbe Karte
+
+Marcel schickte einen Screenshot (`Dateien/Screenshot1.png`). Darauf war
+sofort zu sehen, was die Messungen verschwiegen hatten: die Karten waren
+**Kaesten mit Kopfzeile**, kein Aktenreiter. Die Lasche sass IM Rahmen.
+
+```
+KARTE  Rahmen 1,11px solid rgb(63,165,108)   <- der stoert
+BLATT  Rahmen 1,11px       rgb(63,165,108)
+```
+
+Meine `border:0` an `.sb-card` aus v1709 griff nicht —
+`aside.sidebar .sb-card.deal-won` aus `style.css` ist staerker.
+
+> **Ein Reiter entsteht dadurch, dass die Lasche AUSSERHALB des Blattes
+> sitzt.** Zieht man einen zweiten Rahmen um beide, ist es wieder eine
+> Schachtel, und die Form, die man bauen wollte, ist weg.
+
+### v1713 · Entwurf 21 „Buetten" als Kartenstil
+
+Marcel schickte `Dateien/karte.png` — Variante 21 aus
+`preflight-varianten-v1425.html`. Die Regeln sind von dort **uebernommen,
+nicht nachgebaut**; nur die Klassennamen gemappt (in der App mit
+`dp-`-Praefix, sonst gleich). Alle siebzehn Teile vorher im Browser
+gegengeprueft.
+
+> Eine Vorlage wird uebernommen, nicht interpretiert. Wer sie nachbaut,
+> baut sein eigenes Bild von ihr.
+
+**v1713b:** die Leiste wurde 1280x334 statt rund 90. Alle Kinder standen
+auf 323 px — weil eines so hoch war und `align-items:stretch` den Rest
+mitzieht: `.dp-pf-qr` mass **328x323**. Ich hatte ihm bei Buetten keine
+Groesse gegeben, nur Polsterung.
+
+> `align-items:stretch` macht aus einem zu grossen Kind eine zu grosse
+> Zeile. Der Fehler sieht dann aus, als waere die ganze Leiste falsch
+> gebaut — dabei ist es ein einziges Element.
+
+### v1714 · Acht Objektkarten-Entwuerfe zum Umschalten
+
+Marcel: „bei den Objektkarten moechte ich dass du mir die anderen auch
+baust zum wechseln. erst mal auf dem bildschirm zum umswitchen."
+
+`objektkarten-stil.js` + `data-dp-objkarte` (Name **vorher gegrept**:
+frei). Bordkarte, Score-Kante, Datenzeile, Ampel, Kennzahlen, Minimal,
+Status, Cockpit. Ohne Wahl bleibt der Aktenreiter. Schalter unten rechts
+ueber `?objkarte-schalter`.
+
+> Sieben Gestaltungsattribute liegen jetzt gleichzeitig am `<html>`. Das
+> ist viel — aber ein achtes mit einem schon belegten Namen waere
+> schlimmer: zwei Module auf einem Attribut loeschen sich lautlos.
+
+**v1714b — der Selektor hatte die Verschachtelung verkehrt herum.** Alle
+acht Entwuerfe sahen identisch aus. Gemessen an der echten Kette:
+
+```
+DIV.sb-card
+DIV#sb-list.sb-list
+DIV.dpl-teil-objekte
+DIV.dpl-schiene          <- der AEUSSERE
+```
+
+Ich hatte `:is(#sb-list) .dpl-schiene .sb-card` geschrieben — das
+verlangt, dass die Schiene INNERHALB der Liste liegt.
+
+> Ein Nachfahren-Selektor ist eine Behauptung ueber die Reihenfolge der
+> Vorfahren. Ich hatte sie aus zwei frueheren Regeln zusammengesetzt,
+> ohne die Kette einmal auszulesen.
+
+55 Vorkommen umgedreht. **Nachgemessen, alle neun unterscheiden sich:**
+
+| Entwurf | Karte | Lasche | Ring | KPI |
+|---|---:|---|---|---|
+| Aktenreiter | 44 | 66x19 | an | aus |
+| Bordkarte | 44 | **16x44** hochkant | an | aus |
+| Score-Kante | 42 | 56x15 | **aus** | aus |
+| Datenzeile | 45 | 59px | an | aus |
+| Ampel | **28** | aus | an | aus |
+| Kennzahlen | **118** | 66x19 | an | **an** |
+| Minimal | 32 | aus | an | aus |
+| Status | 44 | „IN ARBEIT" | an | aus |
+| Cockpit | 44 | rechts | an | aus |
+
+**v1714d:** Marcel: „Bei der Datenzeile fehlt die angabe der kompleten
+id." Ich hatte 38 px gesetzt — gerechnet fuer „999", die Nummer heisst
+aber „2026-999". *Eine feste Breite fuer eine Zeichenkette, deren Laenge
+man nicht kennt, schneidet sie irgendwann ab.* Nachgemessen: „2026-999",
+„2026-1050", „2026-1042", „2026-1041" — keine abgeschnitten.
+
+### Zwei Befunde zum Darstellungs-Panel — KEIN Bruch durch die Layouts
+
+Marcel: „auf rund oder kantig … das funktioniert nicht. Und wenn ich den
+Akzent setze, dann wird der Header irgendwie verschoben."
+
+**1 · `data-ui-form` (rund/kantig) wirkt nur MIT einer Vorlage.** Gemessen
+mit UND ohne Layout — beide Male keine Wirkung. Es gibt genau zwei
+Regeln, und `ui-varianten.css:2071` sagt es selbst:
+
+> „GRENZE, ehrlich benannt: das wirkt nur MIT einer Vorlage. Ohne
+> `data-ui-theme` liest keine Regel dieser Datei `--uv-r`."
+
+Am `<html>` stand `data-ui-form="rund"`, aber **keine** `data-ui-theme`.
+Das ist die eingebaute Grenze, nicht ein Defekt der neuen Layouts. **Das
+Panel fuehrt damit eine Option, die allein nichts tut** — genau Marcels
+„erstmal ist es komisch". Was fehlt, ist der Hinweis darauf; das ist eine
+Produktentscheidung und steht offen.
+
+**2 · Der Header wird beim Akzent NICHT verschoben.** Gemessen im Layout
+Kanzlei, dreimal:
+
+```
+vorher      248,0  1641x49
+mit Akzent  248,0  1641x49
+nach reset  248,0  1641x49
+```
+
+Keine Verschiebung. Was Marcel gesehen hat, muss eine andere Ursache
+haben — moeglicherweise eine andere Ansicht oder das Panel selbst. **Hier
+fehlt mir der Fall, in dem es auftritt.**
+
+**Gold-Audit RC=0.** Zweimal sprang er auf RC=1 (v1711d, v1714c) — beide
+Male Gold als `rgba(201,168,76,…)` statt tokenisiert. Auf `color-mix` mit
+`var(--wl-c9a84c)` umgestellt.
+
+**Commits.** `82f184b` · `d934d38` · `218fec1` · `7440bee` · `fdb8a22` ·
+`690cd3d` · `54e5014`
