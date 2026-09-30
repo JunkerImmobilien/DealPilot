@@ -38121,3 +38121,39 @@ header.hdr #hdr-badges:empty,
 header.hdr #hdr-badges:not(:has(*)){
   display:none !important;
 }
+
+/* =====================================================================
+   v1723 - EIN ICON, DAS SEINE FARBE NICHT ERBT, IST NUR ZUFAELLIG SICHTBAR
+   =====================================================================
+   Marcel: "Bei der Aktenmappe ist bei Einzelobjekt das Icon noch schwarz
+   ... Das muesste geaendert werden, vielleicht bei den anderen auch."
+
+   Gemessen an allen acht .ct-ico im Portfolio-Cockpit:
+
+     span.ct-ico   color  rgb(201,168,76)   <- Gold, so gemeint
+     svg           fill   rgb(0,0,0)        <- Schwarz, der Rueckfall
+     Grund         weiss                    -> Kontrast 21, sieht gut aus
+
+   Die Icons sind nicht gold, sie sind SCHWARZ und stehen zufaellig auf
+   Weiss. Sobald dieselbe Kachel dunkel wird - andere Vorlage, dunkler
+   Modus, eine Schiene - faellt Kontrast 21 auf 1,08 und das Icon ist weg.
+   Genau das hat Marcel an zwei Stellen gesehen (v1722: #i-portfolio und
+   #i-clock), und es sind nicht die einzigen: die Bauart ist dieselbe.
+
+   > Ein Icon, das seine Farbe nicht erbt, ist nicht sichtbar - es ist
+   > zufaellig sichtbar. Der Unterschied faellt erst auf, wenn jemand die
+   > Flaeche darunter aendert.
+
+   `<svg><use href="#i-..."></svg>` traegt ohne eigenes `fill` den
+   Standardwert Schwarz. `currentColor` holt stattdessen die Farbe, die
+   der Knopf oder die Kachel ohnehin fuehrt - und damit gelten Hover,
+   Aktiv-Zustand, Vorlage und Whitelabel automatisch mit.
+
+   ABSICHTLICH ENG: nur SVGs, deren EINZIGES Kind ein <use> ist. Das sind
+   die Symbol-Icons aus dem Sprite. Mehrteilige SVGs (Score-Ring,
+   Diagramme) setzen fill und stroke an ihren eigenen Knoten und bleiben
+   unberuehrt - sie standen in der Messung auch nie im Weg.
+   ===================================================================== */
+svg:has(> use:only-child){
+  fill:currentColor;
+}
