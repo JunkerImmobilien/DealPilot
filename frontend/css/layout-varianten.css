@@ -6355,7 +6355,15 @@ html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq
   border:0 !important; background:transparent !important;
   padding:0 !important; margin:0 !important;
   font-size:9px !important;
-  width:38px !important; max-width:38px !important;
+  /* v1714d: Marcel: "Bei der Datenzeile fehlt die angabe der
+     kompleten id". Die 38 px waren fuer "999" gerechnet - die Nummer
+     heisst aber "2026-999" und wurde abgeschnitten.
+
+     > Eine feste Breite fuer eine Zeichenkette, deren Laenge man nicht
+     > kennt, schneidet sie irgendwann ab. Hier traegt der Inhalt die
+     > Breite, und nur die Adresse daneben gibt nach. */
+  width:auto !important; max-width:none !important;
+  flex:0 0 auto !important; padding-right:8px !important;
   vertical-align:middle !important;
 }
 html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
@@ -6381,7 +6389,7 @@ html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-inv
   display:none !important;
 }
 html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top-line1{
-  display:inline-block !important; width:38px !important; vertical-align:middle !important;
+  display:inline-block !important; width:auto !important; vertical-align:middle !important;
 }
 
 /* ── 06 AMPEL · ein Punkt sagt die Stufe ───────────────────────────── */
