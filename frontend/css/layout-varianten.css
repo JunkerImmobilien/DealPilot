@@ -6168,7 +6168,7 @@ html[data-dp-layout] .dpl-schiene .sb-card.deal-lost.active .sbc-investor-ribbon
    Gegenmittel aus derselben Zeile: denselben ID-Anker mitnehmen. Dann
    stehen beide bei (1,x,x), und die spaetere Regel gewinnt.
    ===================================================================== */
-html[data-dp-layout] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq,
+html[data-dp-layout] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
 html[data-dp-layout] :is(#sb-list) .sb-card .sbc-seq,
 html[data-dp-layout] :is(#sb-list) .sb-card .sbc-investor-ribbon{
   color:var(--wl-e2c97e, #E2C97E) !important;
@@ -6195,10 +6195,10 @@ html[data-dp-layout] :is(#sb-list) .sb-card.deal-lost.active .sbc-investor-ribbo
 }
 /* Der Adresstext und der Preis im Blatt gehoeren mit geprueft - sie
    haengen an derselben ID-Regel. */
-html[data-dp-layout] :is(#sb-list) .dpl-schiene .sb-card .sbc-address{
+html[data-dp-layout] .dpl-schiene :is(#sb-list) .sb-card .sbc-address{
   color:#F2ECDF !important;
 }
-html[data-dp-layout] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp{
+html[data-dp-layout] .dpl-schiene :is(#sb-list) .sb-card .sbc-kp{
   color:var(--wl-cdaf5a, #CDAF5A) !important;
 }
 
@@ -6295,10 +6295,10 @@ html[data-dp-layout] :is(#sb-list) .sb-card:hover{
    ===================================================================== */
 
 /* ── 01 BORDKARTE · Abriss links, Jahr hochkant ────────────────────── */
-html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card{
+html[data-dp-objkarte="bordkarte"] .dpl-schiene :is(#sb-list) .sb-card{
   padding:0 !important;
 }
-html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+html[data-dp-objkarte="bordkarte"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   position:absolute !important;
   top:0 !important; bottom:0 !important; left:0 !important; right:auto !important;
   width:16px !important; max-width:16px !important;
@@ -6310,45 +6310,45 @@ html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
   font-size:7.5px !important; letter-spacing:.14em !important;
   padding:0 !important;
 }
-html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+html[data-dp-objkarte="bordkarte"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
   border-radius:0 5px 5px 0 !important;
   margin-left:16px !important;
 }
-html[data-dp-objkarte="bordkarte"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon{
+html[data-dp-objkarte="bordkarte"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
   top:auto !important; bottom:4px !important; right:4px !important;
   border-radius:3px !important; font-size:7.5px !important;
   border-bottom:1px solid !important;
 }
 
 /* ── 03 SCORE-KANTE · farbiger Strich statt Ring ───────────────────── */
-html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+html[data-dp-objkarte="kante"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
   border:0 !important;
   border-left:3px solid var(--wl-c9a84c, #C9A84C) !important;
   border-radius:0 4px 4px 0 !important;
   background-color:#17160F !important;
 }
-html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-top{
+html[data-dp-objkarte="kante"] .dpl-schiene :is(#sb-list) .sb-card.deal-won .sbc-top{
   border-left-color:#3FA56C !important;
 }
-html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-top{
+html[data-dp-objkarte="kante"] .dpl-schiene :is(#sb-list) .sb-card.deal-lost .sbc-top{
   border-left-color:#B8625C !important;
 }
-html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-score-overlay{
+html[data-dp-objkarte="kante"] .dpl-schiene :is(#sb-list) .sb-card .sbc-score-overlay{
   display:none !important;
 }
-html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top-body{
+html[data-dp-objkarte="kante"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top-body{
   padding-right:6px !important;
 }
-html[data-dp-objkarte="kante"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+html[data-dp-objkarte="kante"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   border:0 !important; background:transparent !important;
   padding:1px 0 1px 8px !important;
 }
 
 /* ── 04 DATENZEILE · Mono, eine Zeile, buendig ─────────────────────── */
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card{
   padding:0 !important; margin-bottom:1px !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   position:static !important;
   display:inline-block !important;
   border:0 !important; background:transparent !important;
@@ -6357,69 +6357,69 @@ html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq
   width:38px !important; max-width:38px !important;
   vertical-align:middle !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
   border:0 !important; border-radius:3px !important;
   background-color:transparent !important;
   padding:4px 7px !important;
   align-items:center !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card:hover .sbc-top{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card:hover .sbc-top{
   background-color:#1A1815 !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card.active .sbc-top{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card.active .sbc-top{
   background-color:#221F1A !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-address{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-address{
   font-family:var(--dpl-mono, 'JetBrains Mono', monospace) !important;
   font-size:11px !important; font-weight:400 !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp-row{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-kp-row{
   display:none !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
   display:none !important;
 }
-html[data-dp-objkarte="datenzeile"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top-line1{
+html[data-dp-objkarte="datenzeile"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top-line1{
   display:inline-block !important; width:38px !important; vertical-align:middle !important;
 }
 
 /* ── 06 AMPEL · ein Punkt sagt die Stufe ───────────────────────────── */
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card{
   padding:0 !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
   border:0 !important; border-radius:4px !important;
   background-color:transparent !important;
   padding:6px 8px 6px 20px !important;
   position:relative !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card:hover .sbc-top{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card:hover .sbc-top{
   background-color:#1A1815 !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card.active .sbc-top{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card.active .sbc-top{
   background-color:#221F1A !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top::before{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top::before{
   content:'' !important;
   position:absolute !important; left:7px !important; top:50% !important;
   transform:translateY(-50%) !important;
   width:8px !important; height:8px !important; border-radius:50% !important;
   background:var(--wl-c9a84c, #C9A84C) !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-top::before{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card.deal-won .sbc-top::before{
   background:#3FA56C !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-top::before{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card.deal-lost .sbc-top::before{
   background:#B8625C !important;
 }
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq,
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon,
-html[data-dp-objkarte="ampel"] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp-row{
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon,
+html[data-dp-objkarte="ampel"] .dpl-schiene :is(#sb-list) .sb-card .sbc-kp-row{
   display:none !important;
 }
 
 /* ── 07 KENNZAHLEN · Preis, Rendite, Cashflow ──────────────────────── */
-html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbc-mini-grid{
+html[data-dp-objkarte="kennzahlen"] .dpl-schiene :is(#sb-list) .sb-card .sbc-mini-grid{
   display:flex !important;
   gap:7px !important;
   padding:0 9px 7px !important;
@@ -6429,85 +6429,85 @@ html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbc-min
   border-radius:0 0 5px 5px !important;
   background-color:#17160F !important;
 }
-html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-mini-grid{
+html[data-dp-objkarte="kennzahlen"] .dpl-schiene :is(#sb-list) .sb-card.deal-won .sbc-mini-grid{
   border-color:#3FA56C !important;
 }
-html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-mini-grid{
+html[data-dp-objkarte="kennzahlen"] .dpl-schiene :is(#sb-list) .sb-card.deal-lost .sbc-mini-grid{
   border-color:#B8625C !important;
 }
-html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbcm{
+html[data-dp-objkarte="kennzahlen"] .dpl-schiene :is(#sb-list) .sb-card .sbcm{
   flex:1 1 0 !important; min-width:0 !important;
   font-size:9px !important;
   display:block !important;
 }
-html[data-dp-objkarte="kennzahlen"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+html[data-dp-objkarte="kennzahlen"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
   border-radius:0 5px 0 0 !important;
   border-bottom:0 !important;
 }
 
 /* ── 08 MINIMAL · nur Adresse und Ring ─────────────────────────────── */
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card{
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card{
   padding:0 !important;
 }
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top{
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
   border:0 !important; border-radius:4px !important;
   background-color:transparent !important;
   padding:8px 9px !important;
 }
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card:hover .sbc-top{
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card:hover .sbc-top{
   background-color:#1A1815 !important;
 }
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card.active .sbc-top{
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card.active .sbc-top{
   background-color:#221F1A !important;
 }
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq,
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon,
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-kp-row{
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon,
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card .sbc-kp-row{
   display:none !important;
 }
-html[data-dp-objkarte="minimal"] :is(#sb-list) .dpl-schiene .sb-card .sbc-address{
+html[data-dp-objkarte="minimal"] .dpl-schiene :is(#sb-list) .sb-card .sbc-address{
   font-weight:500 !important;
 }
 
 /* ── 09 STATUS · Deal-Stufe zuerst ─────────────────────────────────── */
-html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+html[data-dp-objkarte="status"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   font-size:7.5px !important;
   letter-spacing:.12em !important;
 }
 /* Die Lasche zeigt die Stufe statt der Nummer - der Text kommt aus dem
    Pseudoelement, damit der Knoten unangetastet bleibt. */
-html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+html[data-dp-objkarte="status"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   font-size:0 !important;
 }
-html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq::after{
+html[data-dp-objkarte="status"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq::after{
   content:'IN ARBEIT' !important;
   font-size:9px !important; letter-spacing:.1em !important;
 }
-html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card.deal-won .sbc-seq::after{
+html[data-dp-objkarte="status"] .dpl-schiene :is(#sb-list) .sb-card.deal-won .sbc-seq::after{
   content:'GEWONNEN' !important;
 }
-html[data-dp-objkarte="status"] :is(#sb-list) .dpl-schiene .sb-card.deal-lost .sbc-seq::after{
+html[data-dp-objkarte="status"] .dpl-schiene :is(#sb-list) .sb-card.deal-lost .sbc-seq::after{
   content:'VERLOREN' !important;
 }
 
 /* ── 10 COCKPIT · Score als Rundinstrument ─────────────────────────── */
-html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-score-overlay{
+html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-score-overlay{
   left:9px !important; right:auto !important;
 }
-html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-mini-score{
+html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-mini-score{
   border:1px solid var(--wl-3a352e, #3A352E) !important;
   border-top-color:currentColor !important;
   border-radius:50% !important;
   background:#0B0A08 !important;
 }
-html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-top-body{
+html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top-body{
   padding-left:32px !important; padding-right:6px !important;
 }
-html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-seq{
+html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq{
   left:auto !important; right:0 !important;
   border-radius:3px 3px 0 0 !important;
 }
-html[data-dp-objkarte="cockpit"] :is(#sb-list) .dpl-schiene .sb-card .sbc-investor-ribbon{
+html[data-dp-objkarte="cockpit"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
   right:auto !important; left:0 !important;
 }
 
