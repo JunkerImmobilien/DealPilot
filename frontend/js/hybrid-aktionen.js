@@ -28,7 +28,8 @@
   }
   var AKTIONEN = [
     ['Bankunterlagen', 'dunkel', function () { reiter('Deal-Aktion'); }],
-    ['Investment-PDF · Bank', '', function () { if (window.exportPDFBank) window.exportPDFBank(); }],
+    /* v1733 · hier standen zwei Zeilen, die seit v1636 im selben Dialog
+       endeten (pdf-wahl.js umhuellt beide Exportfunktionen). Eine reicht. */
     ['Investment-PDF', '', function () { if (window.exportPDF) window.exportPDF(); }],
     ['Marktbericht', '', function () { if (window.openMarktberichtView) window.openMarktberichtView(); }],
     ['Finanzamt-PDF', '', function () { if (window.exportWerbungskostenPDF) window.exportWerbungskostenPDF('0'); }]
