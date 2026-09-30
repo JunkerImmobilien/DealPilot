@@ -2811,3 +2811,103 @@ html[data-ui-form="rund"][data-ui-form="rund"] body .sb-card .sbc-seq,
 html[data-ui-form="rund"][data-ui-form="rund"] body .sb-card .sbc-investor-ribbon{
   border-radius:8px 8px 0 0 !important;
 }
+
+/* =====================================================================
+   v1716d - EIN ATTRIBUT ZWEIMAL ZU NENNEN BRINGT NICHTS
+   =====================================================================
+   v1716c hat die Spezifitaet mit `[data-ui-form="x"][data-ui-form="x"]`
+   erhoehen wollen. Gemessen im geladenen Stylesheet:
+
+     Regeln mit data-ui-form:     25
+     Regeln mit dem Doppel:        1     <- von vielen geschriebenen
+
+   Der Browser fasst identische Attributselektoren zusammen. Aus
+   `[x="a"][x="a"]` wird `[x="a"]`, und die Rechnung geht nicht auf. Bei
+   KLASSEN funktioniert der Trick (`.a.a`), bei gleichen Attributen mit
+   gleichem Wert nicht.
+
+   > Ein Kniff, der bei Klassen sitzt, sitzt deshalb noch lange nicht bei
+   > Attributen. Was die Regel wirklich tut, sagt nur das geladene
+   > Stylesheet - nicht die Datei, die man geschrieben hat.
+
+   RICHTIG ist, das Attribut mitzunehmen, das der GEGNER traegt. Der
+   Sieger beim Eingabefeld war
+
+     html[data-dp-layout] .body input[type="text"]      (0,3,1)
+
+   und mit `[data-ui-form]` daneben steht hier (0,4,1). Fuer den Fall
+   ohne Layout nimmt die zweite Gruppe `[lang]` mit - das Attribut steht
+   immer am `<html>` und kostet keine Annahme.
+   ===================================================================== */
+
+/* -- MIT Layout: das Layout-Attribut mitnehmen ---------------------- */
+html[data-dp-layout][data-ui-form="kantig"] .body input,
+html[data-dp-layout][data-ui-form="kantig"] .body input[type="text"],
+html[data-dp-layout][data-ui-form="kantig"] .body select,
+html[data-dp-layout][data-ui-form="kantig"] .body textarea,
+html[data-dp-layout][data-ui-form="kantig"] body .btn,
+html[data-dp-layout][data-ui-form="kantig"] body .card,
+html[data-dp-layout][data-ui-form="kantig"] body .dp-pf-tile,
+html[data-dp-layout][data-ui-form="kantig"] body .sb-act-item,
+html[data-dp-layout][data-ui-form="kantig"] body .hdr-icon-btn,
+html[data-dp-layout][data-ui-form="kantig"] body #hdr-credits-pill,
+html[data-dp-layout][data-ui-form="kantig"] body .dpl-portfolio{
+  border-radius:0 !important;
+}
+html[data-dp-layout][data-ui-form="rund"] .body input,
+html[data-dp-layout][data-ui-form="rund"] .body input[type="text"],
+html[data-dp-layout][data-ui-form="rund"] .body select,
+html[data-dp-layout][data-ui-form="rund"] .body textarea,
+html[data-dp-layout][data-ui-form="rund"] body .btn,
+html[data-dp-layout][data-ui-form="rund"] body .dp-pf-tile,
+html[data-dp-layout][data-ui-form="rund"] body .sb-act-item,
+html[data-dp-layout][data-ui-form="rund"] body .hdr-icon-btn,
+html[data-dp-layout][data-ui-form="rund"] body #hdr-credits-pill,
+html[data-dp-layout][data-ui-form="rund"] body .dpl-portfolio{
+  border-radius:10px !important;
+}
+html[data-dp-layout][data-ui-form="rund"] body .card{
+  border-radius:14px !important;
+}
+
+/* -- OHNE Layout: `[lang]` steht immer am html ---------------------- */
+html[lang][data-ui-form="kantig"] body input,
+html[lang][data-ui-form="kantig"] body input[type="text"],
+html[lang][data-ui-form="kantig"] body select,
+html[lang][data-ui-form="kantig"] body textarea,
+html[lang][data-ui-form="kantig"] body .btn,
+html[lang][data-ui-form="kantig"] body .card,
+html[lang][data-ui-form="kantig"] body .dp-pf-tile,
+html[lang][data-ui-form="kantig"] body .sb-act-item,
+html[lang][data-ui-form="kantig"] body .hdr-icon-btn,
+html[lang][data-ui-form="kantig"] body #hdr-credits-pill{
+  border-radius:0 !important;
+}
+html[lang][data-ui-form="rund"] body input,
+html[lang][data-ui-form="rund"] body input[type="text"],
+html[lang][data-ui-form="rund"] body select,
+html[lang][data-ui-form="rund"] body textarea,
+html[lang][data-ui-form="rund"] body .btn,
+html[lang][data-ui-form="rund"] body .dp-pf-tile,
+html[lang][data-ui-form="rund"] body .sb-act-item,
+html[lang][data-ui-form="rund"] body .hdr-icon-btn,
+html[lang][data-ui-form="rund"] body #hdr-credits-pill{
+  border-radius:10px !important;
+}
+html[lang][data-ui-form="rund"] body .card{
+  border-radius:14px !important;
+}
+
+/* Die Objektkarte: hier gewinnt `:is(#sb-list)`, also kommt es mit. */
+html[data-dp-layout][data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top,
+html[data-dp-layout][data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
+html[data-dp-layout][data-ui-form="kantig"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
+  border-radius:0 !important;
+}
+html[data-dp-layout][data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-top{
+  border-radius:0 14px 14px 14px !important;
+}
+html[data-dp-layout][data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-seq,
+html[data-dp-layout][data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribbon{
+  border-radius:8px 8px 0 0 !important;
+}
