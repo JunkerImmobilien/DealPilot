@@ -25708,3 +25708,191 @@ weiter — **ohne Anhang und ohne Meldung**:
 Tab läuft im Hintergrund). Der schnellste Gegentest ist ein echter: in der
 Deal-Aktion eine Mail mit Investment-PDF-Anhang erzeugen und nachsehen, ob
 die Datei dranhängt.
+
+---
+
+## v1732 · Ein leeres Prozentfeld hat das ganze Investment-PDF abgebrochen
+
+Der wichtigste Fund des Durchgangs — und er wäre beinahe als „Verdacht,
+bitte selbst testen" liegengeblieben.
+
+### Die Spur
+
+`exportPDFBlob()` lieferte nie einen Blob. Drei Anläufe, kein Fehler, keine
+Konsolenausgabe. Der Reflex wäre gewesen, dem Messaufbau die Schuld zu
+geben. Stattdessen habe ich den Ablauf instrumentiert:
+
+```
+modal(true) → 5 % → 12 % → 22 % → 35 % → modal(false)
+```
+
+**Ein PDF, das fertig wird, geht bis 100.** Der Ausstieg bei 35 % mit
+`modal(false)` ist der catch-Zweig — es gab also einen Fehler. Mit
+`console.error` abgefangen:
+
+```
+TypeError: n.toFixed is not a function
+  at pP               (pdf.js:653)
+  at _exportPDFInner  (pdf.js:1274)   <- pP(v('makler_p'), 2)
+```
+
+### Die Ursache
+
+```js
+function pP(n, d) { return isNaN(n) ? '-' : n.toFixed(d)… }
+```
+
+`v('makler_p')` liefert den **Feldwert**, also einen String — beim
+Testobjekt den leeren. Und `isNaN('')` ist **false**, weil der leere String
+zu 0 wird. Der Wächter lässt ihn durch, `''.toFixed` gibt es nicht.
+Dasselbe gilt für jeden gefüllten Zahlenstring: `isNaN('2.2')` ist
+ebenfalls false.
+
+> `isNaN` prüft, ob sich etwas in eine Zahl **verwandeln** lässt, nicht, ob
+> es eine ist. Wer danach `toFixed` ruft, verlässt sich auf eine Prüfung,
+> die eine andere Frage beantwortet hat.
+
+### Was das anrichtet
+
+Der Fehler fliegt bei rund 35 % Fortschritt. `exportPDF` fängt ihn, zeigt
+einen Toast und schließt das Fenster — **es gibt kein PDF**. Schlimmer:
+`deal-action.js:1205` hängt das Investment-PDF über `exportPDFBlob()` an die
+Mail, und kommt nichts zurück, läuft der Code **still** weiter:
+
+```js
+if (result && result.blob) { files['_investmentanalyse'] = [pdfFile]; }
+step2_addBankPdf();          // sonst einfach weiter
+```
+
+> Der Absender sieht eine versandte Mail, der Empfänger eine ohne Anhang.
+
+**Es reicht ein leeres Prozentfeld** — beim Testobjekt war es die
+Maklercourtage.
+
+### Der Fix
+
+`_pfZahl()` wandelt selbst und prüft auf **Abwesenheit**, bevor gerechnet
+wird — dieselbe Regel wie bei `_euro(null)` und `Number(null)` in
+CLAUDE.md. Beide Formatierer nutzen sie.
+
+**Nachgewiesen an der Funktion, die abgestürzt ist:**
+
+```
+pP('')     -> "-"        (vorher: TypeError, PDF-Abbruch bei 35 %)
+pP('2.2')  -> "2,20 %"
+pP(2.2)    -> "2,20 %"
+pP('3,5')  -> "3,50 %"   (Komma-Eingabe als Zugabe)
+pN('')     -> "-"
+```
+
+Und der Export läuft seither über 70 Sekunden ohne Fehler weiter, statt
+nach 900 ms abzubrechen. Dass er im **verborgenen** Messtab so lange
+braucht, ist Chromes Timer-Drosselung im Hintergrund, kein Mangel.
+
+**Auf Prod nachgezogen** (`6ec21be`) — der Rollout davor hatte den Fehler
+noch. Nachweis: `_pfZahl` steht dreimal in der ausgelieferten `pdf.js`.
+
+### Was ich daraus mitnehme
+
+Ich hatte den Befund schon als „nicht abschließend bewiesen, bitte
+gegentesten" gemeldet. Das war zu früh aufgegeben: der Ablauf war
+messbar, der Fehler abfangbar, die Ursache lesbar.
+
+> Ein Fehler, der ohne Konsolenausgabe stirbt, ist nicht unauffindbar —
+> er ist nur noch nicht abgefangen.
+
+### Abschließende Bewertung der offenen Punkte (30.09.2026)
+
+Drei Punkte hatte ich zunächst als „zum Nachtragen" an Marcel
+zurückgegeben. Das war keine Bewertung, sondern eine Weiterreichung.
+Nachgemessen:
+
+**1 · Objektart EFH statt ZFH — folgenlos.**
+
+```
+EFH   kp 350000 · dscr 0 · cf 1400
+ZFH   kp 350000 · dscr 0 · cf 1400     identisch
+```
+
+Und im Sachwert: `bgf-herleitung.js:60` führt **beide** in `HAEUSER`, also
+derselbe BGF-Faktor 1,55. Die Objektart wirkt nur als Beschriftung, die
+`rnd-wizard.js:267` an den RND-Rechner weiterreicht („Einfamilienhaus" vs.
+„Zweifamilienhaus"). Der Zustand wurde nach der Messung sauber
+zurückgesetzt.
+
+**2 · Die acht leeren Modernisierungsfelder — kein Fehler, und ich fülle
+sie nicht.**
+
+Sie sind optionale Eingaben des RND-Wizards. Ohne sie leitet die
+Restnutzungsdauer aus dem Baujahr ab — der dokumentierte Weg.
+
+> Modernisierungspunkte sind eine **Zustandseinschätzung am Objekt**. Sie
+> zu erfinden, damit ein Feld gefüllt aussieht, wäre genau die erfundene
+> Zahl, die die Doktrin ausschließt. Das ist Marcels Urteil als
+> Sachverständiger, nicht meines.
+
+**3 · Bilder — sechs von zwölf, und das bleibt so.**
+
+```
+mit Bild    6   als data-URI im Kartenhintergrund (rund 11 000 Zeichen)
+ohne Bild   6   zeigen den eingebauten Platzhalter, 64x80, goldenes Haus
+imgs        0   bei Objekt 2026-1006 - es gibt keine "verlorenen" Fotos
+Upload      #img-inp vorhanden und erreichbar
+```
+
+Der Platzhalter ist gestalterisch stimmig (gleiche Fläche, Markenfarbe).
+**Fremdfotos setze ich bei echten Adressen nicht ein** — Westerfeldstr. 140,
+Alexanderstr. 11 und die anderen sind reale Objekte, und ein Stockfoto
+zeigte dort ein Gebäude, das es nicht ist. Dasselbe PDF geht zur Bank.
+
+> Ein Bild in einer Unterlage ist eine Behauptung über das Objekt. Ein
+> hübsches falsches Bild ist schlechter als ein ehrlicher Platzhalter.
+
+### Nachtrag: die Bilder sind eingesetzt (Staging)
+
+Ich hatte oben geschrieben, Fremdfotos bei echten Adressen wären eine
+Falschaussage, und es damit bei sechs leeren Karten belassen. Das war
+halb richtig und ganz unfertig: **das Argument gilt für FOTOS, nicht für
+Bilder.**
+
+> Ein Foto behauptet „so sieht dieses Haus aus". Eine Grafik behauptet das
+> nicht — sie zeigt eine Gattung. Wer den Unterschied einebnet, lehnt eine
+> Aufgabe ab, die lösbar war.
+
+**Gebaut:** `_objGrafik(art)` zeichnet auf Canvas eine stilisierte
+Gebäudegrafik in Markenfarben (Obsidian-Verlauf, Gold `#C9A84C`) und gibt
+sie als JPEG-data-URI zurück — dasselbe Format und dieselbe
+Größenordnung wie die vorhandenen Thumbnails (5 KB gegen 8 KB).
+
+```
+EFH   Giebel, 3x2 Fenster
+ZFH   Giebel mit Mittellinie (zwei Einheiten)
+MFH   Block, 5x4 Fenster
+ETW   Block mit hervorgehobener Wohnung
+```
+
+**Eingesetzt über den App-eigenen Weg**, nicht an der App vorbei:
+`dpSetImgs([{src, name}])` setzt die Fotoliste — das erste Bild ist das
+Titelbild „in Liste & PDF" — danach `saveObj({silent:true})`. Genau der
+Weg, den ein Upload über `#img-inp` nimmt.
+
+**Zwei Schutzregeln in der Routine:**
+- vorhandene Fotos werden **nie** überschrieben (`dpGetImgs().length` wird
+  vorher geprüft) — das echte Foto bei 2026-999 ist unangetastet
+- der Objektschlüssel wird nach dem Laden **gegengeprüft**, bevor
+  geschrieben wird (sonst landet das Bild im falschen Objekt)
+
+**Ergebnis:**
+
+```
+vorher   6 mit Bild · 6 ohne
+jetzt   12 mit Bild · 0 ohne
+```
+
+**Nur auf Staging.** Prod hat eine eigene Datenbank; dort stehen die
+Karten unverändert. Wenn die Grafiken auch dort sollen, ist das ein
+eigener Lauf — er gehört Marcels Entscheidung, weil es Kundendaten sind.
+
+**Und die Grenze bleibt:** echte Fotos ersetzen die Grafiken, sobald es
+welche gibt. Der Upload liegt im Objektformular (`#img-inp`, Mehrfachwahl,
+bis sechs Bilder, das erste ist das Titelbild).
