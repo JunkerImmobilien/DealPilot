@@ -88,7 +88,7 @@
       /* v1436 · Backlog v22 Punkt 11: helle Bankfassung als ZWEITE Wahl, das bisherige PDF bleibt */
       docRow('invest_bank', 'Investment-PDF · Bankfassung (hell)', 'Neu zum Testen: ruhige, helle Fassung für Bank und Investoren — Tabellen, Kennzahlen, 10 Jahre Cashflow.', false) +
       faRow() +
-      docRow('kpa', 'Kaufpreisaufteilung (Finanzamt)', 'BMF-Anlage: Aufteilung Grund/Geb\u00e4ude, AfA-Bemessungsgrundlage &amp; Verprobung der 3 Verfahren.', false) +
+      kpaRow() +
       docRow('track', 'Track Record', 'Auswahl-Ansicht \u00f6ffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false);
 
     return '' +
@@ -158,6 +158,49 @@
       '<select id="dab-fa-year" class="dab-fa-year" onfocus="DealActionBoarding.fillFaYears()" title="Steuerjahr f\u00fcr das Finanzamt-PDF"></select>' +
       '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'bmf\')">' + ICO.dl + 'PDF</button></div></div>';
   }
+  /* ══ v1731 · DIE KAUFPREISAUFTEILUNG HAT ZWEI WEGE, NICHT EINEN ═══
+     Marcel: „wenn wir auf Kaufpreisaufteilung klicken, das ist nicht
+     richtig. Da müsste dann eher stehen einmal die BMF-Anlage, dass man
+     die Unterlagen laden kann, dann die Anschaffungskosten-PDF, da sind
+     ja mehrere hinterlegt."
+
+     Bisher lag hinter dem einen Knopf eine Verzweigung, die der Nutzer
+     nicht sieht: liegt ein Rechenergebnis vor, kommt das PDF - sonst
+     öffnet sich der Rechner mit dem Hinweis „erst berechnen lassen".
+     Derselbe Klick tat also zweierlei, und welches, entschied ein
+     Zustand, den niemand angezeigt bekommt.
+
+     > Ein Knopf, der je nach unsichtbarem Zustand etwas anderes tut,
+     > ist kein Knopf, sondern ein Würfel.
+
+     GEMESSEN, was es an dieser Stelle wirklich gibt (nicht geraten):
+
+       window.exportBmfPdf()               die fertige BMF-Anlage
+       window.openBMFModal()               der Rechner dahinter
+       DealPilotBelegImport.open('ak')     die Belege der Anschaffungs-
+                                           kosten, KI-gestützt, mehrere
+                                           je Lauf (bis 40)
+
+     Daraus werden zwei benannte Knöpfe statt einer Verzweigung. Der
+     Reihenfolge nach, wie man arbeitet: erst die Belege einlesen, dann
+     die Anlage ziehen. */
+  function kpaRow() {
+    return '<div class="dab-doc-row"><div class="dab-doc-icb">' +
+      '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>' +
+      '</svg></div>' +
+      '<div class="dab-doc-x"><div class="dab-doc-n">Kaufpreisaufteilung (Finanzamt)</div>' +
+      '<div class="dab-doc-d">BMF-Anlage: Aufteilung Grund/Geb\u00e4ude, AfA-Bemessungsgrundlage ' +
+      '&amp; Verprobung der 3 Verfahren. Die Belege der Anschaffungskosten lassen sich ' +
+      'davor einlesen.</div></div>' +
+      '<div class="dab-doc-act" style="display:flex;gap:8px;align-items:center;flex-shrink:0">' +
+      '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'kpa_ak\')" ' +
+      'title="Belege f\u00fcr die Anschaffungskosten einlesen">Belege</button>' +
+      '<button class="dab-doc-btn" onclick="DealActionBoarding.exportDoc(\'kpa\')">' +
+      ICO.dl + 'BMF-Anlage</button></div></div>';
+  }
+
   function fillFaYears() {
     var sel = document.getElementById('dab-fa-year');
     if (!sel) return;
@@ -675,6 +718,15 @@
           return window.exportWerbungskostenPDF(mode);
         }
         toast('Finanzamt-PDF-Modul nicht geladen.');
+        return;
+      }
+      if (which === 'kpa_ak') {
+        /* v1731: die Belege. Eigener Plan-Schluessel (beleg_import), das
+           Modul prueft ihn selbst und das Backend noch einmal. */
+        if (window.DealPilotBelegImport && typeof DealPilotBelegImport.open === 'function') {
+          return DealPilotBelegImport.open('ak');
+        }
+        toast('Beleg-Import nicht geladen.');
         return;
       }
       if (which === 'kpa') {
