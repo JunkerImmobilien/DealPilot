@@ -274,24 +274,44 @@
     'stroke', 'stroke-width', 'stroke-opacity', 'stroke-dasharray', 'stroke-linecap',
     'stroke-linejoin', 'text-anchor', 'dominant-baseline', 'opacity'];
 
-  /* Die Beschriftung ist für den Bildschirm gerechnet. Auf 174 mm Druckbreite
-     bei viewBox-Breite 1200 sind 10,5 Einheiten rund 4,3 pt - zu wenig für
-     eine Bankunterlage. Faktor 1,55 bringt sie auf rund 6,7 pt. Nur die
-     SCHRIFT wächst; Flächen, Linien und Positionen bleiben, wie sie sind. */
-  var TEXT_F = 1.55;
+  /* ── DIE SCHRIFT WIRD AUF EINE MINDESTGRÖSSE GEHOBEN, NICHT SKALIERT ──
+     Erster Anlauf war ein fester Faktor 1,55 auf jeden Text. Am erzeugten
+     PDF nachgesehen: die Achsen wurden lesbar, aber „+120k €" und
+     „192k €" ragten über ihre goldene Unterlegung hinaus - die Rechtecke
+     dahinter sind für die kleinere Schrift bemessen und wachsen nicht mit.
+
+     > Ein Faktor vergrössert auch das, was schon gross genug war. Was hier
+     > fehlt, ist keine Vergrösserung, sondern eine Untergrenze.
+
+     Gerechnet wird deshalb in DRUCKGRÖSSE: ein Text soll auf dem Papier
+     mindestens MIN_MM hoch sein. Bei Druckbreite 174 mm entspricht eine
+     viewBox-Einheit 174/vbBreite Millimetern, die Untergrenze also
+     MIN_MM * vbBreite / 174 Einheiten. Alles darunter wird angehoben,
+     alles darüber bleibt unberührt - die Labels behalten ihre Grösse,
+     die Achsen werden lesbar.
+
+       vbB 1200 -> Untergrenze 15,9   (9px und 10,5px werden angehoben)
+       vbB 1100 -> Untergrenze 14,6
+       vbB  540 -> Untergrenze  7,1   (Cockpit, schmalere viewBox)  */
+  var MIN_MM = 2.3;        /* rund 6,5 pt */
+  var DRUCK_MM = 174;      /* CW bei A4 mit 18 mm Rändern */
 
   /* Webfonts gibt es in einer data-URI nicht - `Inter` wäre dort eine
      Zusage, die der Renderer nicht halten kann. Deshalb eine Familie, die
      überall vorhanden ist und den Metriken des PDF-Fonts nahekommt. */
   var SVG_FONT = 'Arial, Helvetica, sans-serif';
 
-  function darstellungEinbacken(orig, klon) {
+  function darstellungEinbacken(orig, klon, vbBreite) {
+    /* Untergrenze in viewBox-Einheiten, damit MIN_MM auf dem Papier steht.
+       Ohne bekannte viewBox wird nichts angehoben - lieber zu klein als
+       nach einer geratenen Bezugsgrösse verzerrt. */
+    var minFs = (vbBreite > 0) ? (MIN_MM * vbBreite / DRUCK_MM) : 0;
     var a = orig.querySelectorAll('*'), b = klon.querySelectorAll('*');
     /* Der Klon muss Knoten für Knoten dieselbe Reihenfolge haben. Stimmt die
        Zahl nicht, ist die Zuordnung geraten - dann lieber gar nichts tun,
        als die Werte auf die falschen Elemente zu schreiben. */
-    if (a.length !== b.length) return -1;
-    var n = 0;
+    if (a.length !== b.length) return { knoten: 0, angehoben: 0, minFs: 0, abbruch: 'Knotenzahl ungleich' };
+    var n = 0, n2 = 0;
     for (var i = 0; i < a.length; i++) {
       var cs, tag = b[i].tagName ? String(b[i].tagName).toLowerCase() : '';
       try { cs = getComputedStyle(a[i]); } catch (e) { continue; }
@@ -306,7 +326,9 @@
         if (name === 'font-size' && tag === 'text') {
           var px = parseFloat(wert);
           if (!isFinite(px) || px <= 0) continue;
-          wert = (Math.round(px * TEXT_F * 10) / 10) + 'px';
+          /* nur anheben, nie verkleinern */
+          if (minFs > px) { px = minFs; n2++; }
+          wert = (Math.round(px * 10) / 10) + 'px';
         }
         b[i].setAttribute(name, wert);
       }
@@ -314,7 +336,7 @@
       n++;
     }
     klon.setAttribute('font-family', SVG_FONT);
-    return n;
+    return { knoten: n, angehoben: n2, minFs: Math.round(minFs * 10) / 10 };
   }
 
   function svgBild(id) {
@@ -325,14 +347,11 @@
         var svg = q.svg, weg = q.aufraeumen;
         var k = svg.cloneNode(true);
 
-        /* VOR dem Aufräumen: getComputedStyle braucht das Original noch im
-           Dokument. Eine Zeile später wäre jeder Wert leer. */
-        var eingebacken = darstellungEinbacken(svg, k);
-        if (weg) weg.remove();
-
         /* Zielgrösse aus der viewBox statt aus dem Behälter - sonst legt
            `xMidYMid meet` die Zeichnung in einen Rahmen mit fremdem
-           Verhältnis und der Rest des Bildes bleibt weiss. */
+           Verhältnis und der Rest des Bildes bleibt weiss.
+           Sie wird ZUERST gelesen, weil das Einbacken die Untergrenze der
+           Schrift daraus ableitet. */
         var vb = (k.getAttribute('viewBox') || '').split(/[\s,]+/).filter(function (s) { return s !== ''; });
         var br, ho;
         if (vb.length === 4 && +vb[2] > 0 && +vb[3] > 0) { br = +vb[2]; ho = +vb[3]; }
@@ -340,6 +359,12 @@
           br = Math.max(320, q.breite); ho = Math.max(200, q.hoehe);
           k.setAttribute('viewBox', '0 0 ' + br + ' ' + ho);
         }
+
+        /* VOR dem Aufräumen: getComputedStyle braucht das Original noch im
+           Dokument. Eine Zeile später wäre jeder Wert leer. */
+        var eingebacken = darstellungEinbacken(svg, k, br);
+        if (weg) weg.remove();
+
         k.setAttribute('width', br); k.setAttribute('height', ho);
         k.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         var txt = new XMLSerializer().serializeToString(k);
