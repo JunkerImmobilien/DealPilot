@@ -24658,3 +24658,87 @@ Male Gold als `rgba(201,168,76,…)` statt tokenisiert. Auf `color-mix` mit
 
 **Commits.** `82f184b` · `d934d38` · `218fec1` · `7440bee` · `fdb8a22` ·
 `690cd3d` · `54e5014`
+
+### v1715 · Die Kartenwahl zieht in die Einstellungen
+
+Marcel: „bitte arbeite unter Darstellung auch den wechsel der Karten ein.
+Bau alle ein ausser Status und Cockpit. Nehme die information Investor
+aus der Design Optik bei allen raus ausser bei unserem standard Obsidian
+look. Das Fenster kannst du dann wieder entfernen."
+
+- **Das schwebende Fenster aus v1714 ist weg**, samt CSS und Merker. Wer
+  den Merker noch traegt, bekommt ihn beim naechsten Start abgeraeumt.
+
+  > Ein Werkzeug, das zum Ausprobieren gebaut wurde, wird nach dem
+  > Ausprobieren abgebaut. Sonst steht es irgendwann in der Auslieferung
+  > und niemand weiss mehr, warum.
+
+- Die Wahl sitzt jetzt in **Einstellungen → Darstellung → Aussehen**,
+  direkt unter der Layout-Wahl. Gemessen: `.dp-okw-box` 835x201, sieben
+  Knoepfe, „Aktenreiter" markiert.
+- Status und Cockpit raus — sieben Entwuerfe bleiben.
+- **Die INVESTOR-Lasche erscheint nur noch im Aktenreiter.**
+
+  > Ein Bauteil, das aus einer Metapher stammt, laesst sich nicht in eine
+  > andere mitnehmen. Es sieht dort nicht schlicht aus, sondern uebrig.
+
+  Gemessen: `aktenreiter: SICHTBAR`, alle sechs anderen `aus`.
+
+### Der vollstaendige Abgleich ueber alle Layouts
+
+Marcel hatte ihn ausdruecklich verlangt. Gemessen wurde auf BRUCH, nicht
+auf Schoenheit: Kartenhoehe, Kartenbreite, abgeschnittene Adresse ohne
+Ellipse, zu hohe Pre-Flight-Leiste, Kind groesser als sein Behaelter,
+Ueberlauf der Schiene.
+
+| Prueflauf | Kombinationen | Befunde |
+|---|---:|---|
+| Layouts x Objektkarten | 3 x 7 = **21** | **keine** |
+| Layouts x Pre-Flight-Stile | 3 x 4 = **12** | **keine** |
+
+### Zwei Punkte, die offen bleiben — und warum
+
+**1 · Der Header beim Akzent: mein Befund war ein MESSFEHLER.**
+
+Ich hatte gemeldet, `--dp-hdr-h` und `--tabs-top` wuerden beim
+Akzent-Setzen geleert. Gemessen stimmte das:
+
+```
+vorher   --dp-hdr-h: 321px   --tabs-top: 49px
+nachher  --dp-hdr-h: (leer)  --tabs-top: (leer)
+```
+
+**Die Ursache war aber der Messaufbau, nicht der Code.** `settings.js:3806`
+setzt `--dp-hdr-h` ueber `requestAnimationFrame`, und gemessen:
+
+```
+document.visibilityState: "hidden"
+requestAnimationFrame feuert: false
+```
+
+> **Im verborgenen Tab feuert `requestAnimationFrame` nie** — das steht so
+> in meinen eigenen Notizen, und ich bin trotzdem hineingelaufen. Ein
+> Wert, der nur deshalb fehlt, weil niemand ihn neu berechnet hat, sieht
+> aus wie ein geloeschter Wert.
+
+**Der Befund ist damit zurueckgenommen.** Was Marcel sieht, muss eine
+andere Ursache haben; ich brauche dafuer die Ansicht, in der es auftritt,
+oder einen Messlauf im sichtbaren Tab.
+
+**2 · `rund`/`kantig` wirkt nur MIT einer Vorlage — unveraendert.**
+
+Gemessen mit UND ohne Layout: keine Wirkung. Es gibt genau zwei Regeln,
+und `ui-varianten.css:2071` sagt es selbst:
+
+> „GRENZE, ehrlich benannt: das wirkt nur MIT einer Vorlage. Ohne
+> `data-ui-theme` liest keine Regel dieser Datei `--uv-r`."
+
+Das ist **kein Bruch durch die neuen Layouts**, sondern eine eingebaute
+Grenze. Sie zu oeffnen hiesse, den Auslieferungszustand fuer alle zu
+aendern, die `rund`/`kantig` einmal gewaehlt haben — das ist eine
+Produktentscheidung und wird nicht nebenbei getroffen. **Was heute fehlt,
+ist der Hinweis im Panel**, dass die Option eine Vorlage braucht.
+
+**Gold-Audit RC=0.**
+
+**Commit.** `18ebe9a`
