@@ -257,8 +257,26 @@
     if (!st) {
       st = document.createElement('style');
       st.id = FORM_ID;
-      document.head.appendChild(st);   /* ans ENDE, das ist der Punkt */
     }
+    /* ══ v1716g · "ANS ENDE" GILT NUR FUER DEN AUGENBLICK ═════════════
+       In v1716e stand hier "ans ENDE, das ist der Punkt" - und es war
+       falsch. Gemessen mit dem Kaskaden-Walker am Feld #plz:
+
+         mein Blatt   Position 24 von 43
+         der Sieger   Position 42, layout-varianten.css, 2px !important
+
+       Das Blatt entsteht beim ERSTEN Lauf dieses Moduls, und der liegt
+       oben im <head> - danach parst der Browser noch 19 weitere <link>.
+       Ein Element, das einmal angehaengt wurde, wandert nicht mit.
+
+       > "Ans Ende gehaengt" ist eine Aussage ueber den Zeitpunkt, nicht
+       > ueber die Position. Wer bei Gleichstand gewinnen will, muss bei
+       > JEDEM Umschalten neu ans Ende.
+
+       `appendChild` auf ein bereits vorhandenes Element verschiebt es -
+       darum steht der Aufruf jetzt ausserhalb des `if`. Das kostet
+       nichts und macht aus Position 24 die 43. */
+    document.head.appendChild(st);
     if (!wert) { st.textContent = ''; return; }
 
     var fl = (wert === 'kantig') ? '0' : '14px';
