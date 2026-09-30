@@ -2722,3 +2722,92 @@ html[data-ui-form="rund"] .dpl-schiene :is(#sb-list) .sb-card .sbc-investor-ribb
 html[data-ui-form="rund"] body button.tab{
   border-radius:10px 10px 0 0 !important;
 }
+
+/* =====================================================================
+   v1716c - DIE LAYOUT-REGELN BLOCKIERTEN DIE FORM. MEINE EIGENEN.
+   =====================================================================
+   Nach v1716b reagierten 2 von 8 Flaechen. Der Kaskaden-Walker nennt
+   den Sieger beim Eingabefeld:
+
+     html[data-dp-layout] .body input[type="text"]
+     >> border-radius: 2px !important
+
+   Das ist eine LAYOUT-Regel - aus den Schienen, die in dieser Sitzung
+   entstanden sind. Sie zaehlt (0,3,1), meine Form-Regel
+   `html[data-ui-form="kantig"] body input` nur (0,1,2).
+
+   > Marcel hat gemeldet, dass die Form nicht wirkt, und die Ursache
+   > waren die Layouts, die ich davor gebaut habe. Wer eine neue Schicht
+   > mit `!important` einzieht, nimmt allen darunterliegenden
+   > Einstellungen die Wirkung - und merkt es erst, wenn jemand eine
+   > davon benutzt.
+
+   GEGENMITTEL: das Attribut doppelt nennen. `[data-ui-form="x"]` zaehlt
+   (0,1,0), zweimal genannt (0,2,0) - zusammen mit `body` und dem
+   konkreten Element liegt die Regel damit ueber den Layout-Regeln, ohne
+   eine ID erfinden zu muessen.
+
+   Der Selektor `.body` (eine KLASSE, nicht das Element) kommt aus den
+   Layout-Regeln und wird hier mitgefuehrt, damit dieselben Knoten
+   getroffen werden.
+   ===================================================================== */
+
+/* -- KANTIG --------------------------------------------------------- */
+html[data-ui-form="kantig"][data-ui-form="kantig"] body input,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .body input,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body input[type="text"],
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .body input[type="text"],
+html[data-ui-form="kantig"][data-ui-form="kantig"] body select,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .body select,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body textarea,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .body textarea,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .btn,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body button.tab,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .card,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .dp-pf-tile,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .dp-pf-tile.on,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .sb-act-item,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .hdr-icon-btn,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body #hdr-credits-pill,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .dpl-portfolio,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .dpl-teil,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .sb-card .sbc-top,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .sb-card .sbc-seq,
+html[data-ui-form="kantig"][data-ui-form="kantig"] body .sb-card .sbc-investor-ribbon{
+  border-radius:0 !important;
+}
+
+/* -- RUND: Flaechen 14, Bedienelemente 10 --------------------------- */
+html[data-ui-form="rund"][data-ui-form="rund"] body .card,
+html[data-ui-form="rund"][data-ui-form="rund"] body .dpl-teil{
+  border-radius:14px !important;
+}
+html[data-ui-form="rund"][data-ui-form="rund"] body input,
+html[data-ui-form="rund"][data-ui-form="rund"] body .body input,
+html[data-ui-form="rund"][data-ui-form="rund"] body input[type="text"],
+html[data-ui-form="rund"][data-ui-form="rund"] body .body input[type="text"],
+html[data-ui-form="rund"][data-ui-form="rund"] body select,
+html[data-ui-form="rund"][data-ui-form="rund"] body .body select,
+html[data-ui-form="rund"][data-ui-form="rund"] body textarea,
+html[data-ui-form="rund"][data-ui-form="rund"] body .body textarea,
+html[data-ui-form="rund"][data-ui-form="rund"] body .btn,
+html[data-ui-form="rund"][data-ui-form="rund"] body .dp-pf-tile,
+html[data-ui-form="rund"][data-ui-form="rund"] body .dp-pf-tile.on,
+html[data-ui-form="rund"][data-ui-form="rund"] body .sb-act-item,
+html[data-ui-form="rund"][data-ui-form="rund"] body .hdr-icon-btn,
+html[data-ui-form="rund"][data-ui-form="rund"] body #hdr-credits-pill,
+html[data-ui-form="rund"][data-ui-form="rund"] body .dpl-portfolio{
+  border-radius:10px !important;
+}
+/* Der Reiter nur oben - seine Unterstreichung muss gerade bleiben. */
+html[data-ui-form="rund"][data-ui-form="rund"] body button.tab{
+  border-radius:10px 10px 0 0 !important;
+}
+/* Die Mappe behaelt ihre offene Ecke, wo die Lasche sitzt. */
+html[data-ui-form="rund"][data-ui-form="rund"] body .sb-card .sbc-top{
+  border-radius:0 14px 14px 14px !important;
+}
+html[data-ui-form="rund"][data-ui-form="rund"] body .sb-card .sbc-seq,
+html[data-ui-form="rund"][data-ui-form="rund"] body .sb-card .sbc-investor-ribbon{
+  border-radius:8px 8px 0 0 !important;
+}
