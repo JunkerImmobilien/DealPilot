@@ -25800,3 +25800,50 @@ messbar, der Fehler abfangbar, die Ursache lesbar.
 
 > Ein Fehler, der ohne Konsolenausgabe stirbt, ist nicht unauffindbar —
 > er ist nur noch nicht abgefangen.
+
+### Abschließende Bewertung der offenen Punkte (30.09.2026)
+
+Drei Punkte hatte ich zunächst als „zum Nachtragen" an Marcel
+zurückgegeben. Das war keine Bewertung, sondern eine Weiterreichung.
+Nachgemessen:
+
+**1 · Objektart EFH statt ZFH — folgenlos.**
+
+```
+EFH   kp 350000 · dscr 0 · cf 1400
+ZFH   kp 350000 · dscr 0 · cf 1400     identisch
+```
+
+Und im Sachwert: `bgf-herleitung.js:60` führt **beide** in `HAEUSER`, also
+derselbe BGF-Faktor 1,55. Die Objektart wirkt nur als Beschriftung, die
+`rnd-wizard.js:267` an den RND-Rechner weiterreicht („Einfamilienhaus" vs.
+„Zweifamilienhaus"). Der Zustand wurde nach der Messung sauber
+zurückgesetzt.
+
+**2 · Die acht leeren Modernisierungsfelder — kein Fehler, und ich fülle
+sie nicht.**
+
+Sie sind optionale Eingaben des RND-Wizards. Ohne sie leitet die
+Restnutzungsdauer aus dem Baujahr ab — der dokumentierte Weg.
+
+> Modernisierungspunkte sind eine **Zustandseinschätzung am Objekt**. Sie
+> zu erfinden, damit ein Feld gefüllt aussieht, wäre genau die erfundene
+> Zahl, die die Doktrin ausschließt. Das ist Marcels Urteil als
+> Sachverständiger, nicht meines.
+
+**3 · Bilder — sechs von zwölf, und das bleibt so.**
+
+```
+mit Bild    6   als data-URI im Kartenhintergrund (rund 11 000 Zeichen)
+ohne Bild   6   zeigen den eingebauten Platzhalter, 64x80, goldenes Haus
+imgs        0   bei Objekt 2026-1006 - es gibt keine "verlorenen" Fotos
+Upload      #img-inp vorhanden und erreichbar
+```
+
+Der Platzhalter ist gestalterisch stimmig (gleiche Fläche, Markenfarbe).
+**Fremdfotos setze ich bei echten Adressen nicht ein** — Westerfeldstr. 140,
+Alexanderstr. 11 und die anderen sind reale Objekte, und ein Stockfoto
+zeigte dort ein Gebäude, das es nicht ist. Dasselbe PDF geht zur Bank.
+
+> Ein Bild in einer Unterlage ist eine Behauptung über das Objekt. Ein
+> hübsches falsches Bild ist schlechter als ein ehrlicher Platzhalter.
