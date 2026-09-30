@@ -25503,3 +25503,118 @@ Nur in den Ansichten — dort hat Marcel es gesehen, und der
 Auslieferungszustand bleibt unberührt.
 
 **Gold-Audit RC=0. Commits `a6f7d47`, `621707a`.**
+
+---
+
+## PROD-ROLLOUT 30.09.2026 · 336 Commits, v1675–v1730b
+
+**Ausdrücklich freigegeben:** Marcel: „Ich möchte jetzt bitte, dass du das
+alles einmal auch auf Prod ausrollst."
+
+### Vorher gemessen
+
+```
+Abstand main..staging   336 Commits, 59 Dateien, +24603/-223
+Migrationen             0          <- beide Datenbanken bleiben unberuehrt
+Backend-Dateien         3          ai.js, dokumentSchemas.js, openaiService.js
+Marktbericht-Strang     0 Commits  <- kein Fremdstrang faehrt mit
+Prod-Stand vorher       93e3ff6    v1674
+```
+
+**Die Layout-Grundlage fehlte auf Prod komplett** — `layout-varianten.css`,
+`objektkarten-stil.js` und `datenaufnahme.css` gab es dort nicht. Ein
+Cherry-Pick der Tagesarbeit wäre deshalb ins Leere gelaufen; nur der ganze
+Stand ergibt ein Bild.
+
+### Beide Datenbanken gesichert UND angesehen
+
+```
+/root/backups/haupt-20260930-1106.sql.gz    11 MB   10256 Zeilen
+/root/backups/mb-20260930-1106.sql.gz      717 KB   35386 Zeilen
+beide beginnen mit "PostgreSQL database dump"
+```
+
+Namen vorher aus dem Container gelesen, nicht geraten: `dealpilot_db` mit
+Nutzer `dealpilot`, `marktbericht` mit Nutzer `mb`.
+
+### Der Merge
+
+Zwei Konflikte, beide harmlos: ein Cache-Buster in `index.html`
+(`settings.js` v1355 gegen v1719b) und `tools/nachziehen-prod.ps1`
+(add/add). Beide mit dem staging-Stand aufgelöst. Danach `git diff main
+staging` **leer** — die Zweige sind identisch.
+
+### Auf dem Server
+
+`git pull` (Fast-Forward), dann `docker compose … up -d --build backend`.
+Der Dienst heißt **`backend`**, nicht `dealpilot-backend` — der
+Containername ist nicht der Dienstname.
+
+### Nachweis
+
+```
+Container      dealpilot-backend  Up (healthy)
+Backend-Log    Database connected: dealpilot_db
+               plans-sync: nichts zu tun, plans stimmt mit Stripe ueberein
+Konsole        keine Fehler (nach Reload gemessen)
+Module         DealPilotLayout, DealPilotUiVarianten, __dpObjkarte  alle da
+Buster         ui v1727 · layout-css v1730b · style v1723c
+```
+
+**Dateien wirklich ausgeliefert** — `200` allein beweist nichts, geprüft
+wurde der Inhaltstyp:
+
+```
+layout-varianten.css   text/css          318222 B   (lokal 324895, LF/CRLF)
+objektkarten-stil.js   text/javascript     7517 B
+datenaufnahme.css      text/css          110870 B
+portfolio-pilot.js     text/javascript    14284 B
+index.html             text/html         320975 B   <- anderer Typ, andere Groesse
+```
+
+Und der Anfang der CSS-Datei ist echtes CSS, keine verkleidete index.html.
+
+**Prod-Stand jetzt: `4cbe327`.**
+
+---
+
+## v1731 · Die Kaufpreisaufteilung hat zwei Wege, nicht einen
+
+Marcel: „wenn wir auf Kaufpreisaufteilung klicken, das ist nicht richtig.
+Da müsste dann eher stehen einmal die BMF-Anlage, dass man die Unterlagen
+laden kann, dann die Anschaffungskosten-PDF, da sind ja mehrere hinterlegt."
+
+Bisher lag hinter dem einen Knopf eine Verzweigung, die der Nutzer nicht
+sieht: liegt ein Rechenergebnis vor, kommt das PDF — sonst öffnet sich der
+Rechner mit dem Hinweis „erst berechnen lassen".
+
+> Ein Knopf, der je nach unsichtbarem Zustand etwas anderes tut, ist kein
+> Knopf, sondern ein Würfel.
+
+**Gemessen, was es an dieser Stelle wirklich gibt** (nicht geraten):
+
+| | |
+|---|---|
+| `window.exportBmfPdf()` | die fertige BMF-Anlage |
+| `window.openBMFModal()` | der Rechner dahinter |
+| `DealPilotBelegImport.open('ak')` | die Belege der Anschaffungskosten, KI-gestützt, bis 40 je Lauf |
+
+Daraus zwei benannte Knöpfe in der Reihenfolge, wie man arbeitet:
+**[Belege] [BMF-Anlage]**. Nachgemessen: die Zeile trägt beide, beide sind
+verdrahtet, und der Belege-Knopf öffnet das Fenster („KI liest Datum ·
+Betrag · USt · Aussteller · Kategorie"). **Commit `f2731aa`.**
+
+### MFH-Konfigurator geprüft
+
+`DpMfhEinheiten` — der Knopf „▸ Einheiten erfassen" erscheint erst bei
+Objektart **MFH** (`#objart`). Alle vier Schritte durchgeklickt:
+
+```
+1. Gebaeude            10 Felder   Modernisierungskatalog Anlage 2
+2. Einheiten           12 Felder
+3. Zustand je Einheit   5 Felder
+4. Ergebnis             2 Felder   mit "Uebernehmen"
+```
+
+Läuft durch. Der Testzustand wurde danach zurückgenommen (Abbrechen,
+Objektart wieder leer).
