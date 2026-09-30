@@ -2126,6 +2126,20 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
 }
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-bc{
   display:block !important; opacity:.8 !important;
+  /* v1725: der Barcode war hier 9 px hoch statt 53. Er ist NICHT
+     gequetscht - er ist absolut mit inset:12px 16px gesetzt
+     (style.css:32995), und seine Box ist bei Buetten nur 34 px hoch
+     statt 78 (align-self:center weiter unten). 34 minus zweimal 12
+     ergibt genau die gemessenen 10.
+
+     > Ein Rand in festen Pixeln ist eine Aussage ueber die Hoehe des
+     > Elternteils. Wird das Elternteil flacher, frisst der Rand den
+     > Inhalt - und der Inhalt sieht aus, als waere er kaputt.
+
+     Die Buetten-Gestaltung bleibt (kompakter Block, mittig auf dem
+     Papier), nur der Rand folgt der kleineren Box: 34 minus zweimal 5
+     ergibt 24 px Barcode. */
+  inset:5px 12px !important;
 }
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-stripe{
   display:none !important;   /* der Runway-Verlauf gehoert nicht aufs Papier */
