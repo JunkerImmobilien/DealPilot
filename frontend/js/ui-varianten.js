@@ -252,6 +252,90 @@
                        '.dp-pf-tile', '.sb-act-item', '.hdr-icon-btn',
                        '#hdr-credits-pill', '.dpl-portfolio', '.tabs-status-badge'];
 
+  /* PP v1716i � DIE KASKADE WAR DER FALSCHE WEG PPPPPPPPPPPPPPPPPPPP
+     Marcel: "Auch auf rund oder kantig ... das funktioniert nicht."
+
+     SIEBEN Anlaeufe ueber CSS, und die Messung blieb bei 2 von 9
+     Flaechen. Der letzte Stand war: meine Regel matcht das Feld,
+     traegt !important, liegt auf Blatt 43 von 43 - und der Wert
+     bleibt 2px. Nach den Kaskadenregeln ist das unmoeglich, also
+     messe ich entweder falsch oder ich sehe die Siegerregel nicht.
+     Beides heisst dasselbe: ich kann es ueber CSS nicht garantieren.
+
+     > Ein Weg, der nach sieben Anlaeufen zwei von neun Flaechen
+     > erreicht, ist nicht fast fertig. Er ist der falsche Weg.
+
+     Der Inline-Gegentest hat gezeigt, was traegt: ein inline
+     gesetztes `border-radius: 33px !important` kam sofort an. Inline
+     mit !important steht ueber JEDER Regel - keine Spezifitaet, keine
+     Ladereihenfolge, kein blinder Fleck kann daran vorbei.
+
+     PREIS, ehrlich benannt: Inline ueberlebt kein Neu-Rendern. Wer
+     ein Objekt wechselt, bekommt neue Karten ohne die Radien. Darum
+     zieht ein MutationObserver nach, gedrosselt auf 120 ms. Dasselbe
+     Muster nutzen `dp-band-fix.js` und `deal-action-boarding.js`.
+
+     Das Stylesheet aus v1716e-h bleibt daneben stehen: es greift bei
+     den Flaechen, wo keine staerkere Regel steht, und deckt neue
+     Elemente in den 120 ms ab, die der Beobachter braucht. */
+
+  /* Sonderformen - eine Lasche mit rundum gleichen Ecken ist keine
+     Lasche mehr, und die Unterstreichung des Reiters muss gerade
+     bleiben. Beide folgen der Wahl, behalten aber ihre Gestalt. */
+  var FORM_SONDER = [
+    { sel: 'button.tab',                    kantig: '0px', rund: '10px 10px 0 0' },
+    { sel: '.sb-card .sbc-top',             kantig: '0px', rund: '0 14px 14px 14px' },
+    { sel: '.sb-card .sbc-seq',             kantig: '0px', rund: '8px 8px 0 0' },
+    { sel: '.sb-card .sbc-investor-ribbon', kantig: '0px', rund: '8px 8px 0 0' }
+  ];
+
+  /* Gegen `data-dp-karte` gegrept - der Name ist frei. Zwei Module auf
+     einem Attribut loeschen sich lautlos (v1517). */
+  var RAD_MARKE = 'data-dp-radius';
+  var radBeobachter = null;
+
+  function radSetzen(wert) {
+    /* Erst abraeumen. Ohne das bleibt beim Wechsel von rund auf kantig
+       ein alter Wert an Elementen stehen, die der neue Durchlauf nicht
+       mehr trifft - und "Passend" waere nie wieder der Standard. */
+    Array.prototype.forEach.call(document.querySelectorAll('[' + RAD_MARKE + ']'), function (e) {
+      e.style.removeProperty('border-radius');
+      e.removeAttribute(RAD_MARKE);
+    });
+    if (!wert) { return; }
+
+    var fl = (wert === 'kantig') ? '0px' : '14px';
+    var be = (wert === 'kantig') ? '0px' : '10px';
+    function malen(liste, mass) {
+      liste.forEach(function (s) {
+        Array.prototype.forEach.call(document.querySelectorAll(s), function (e) {
+          e.style.setProperty('border-radius', mass, 'important');
+          e.setAttribute(RAD_MARKE, '1');
+        });
+      });
+    }
+    /* Reihenfolge ist Absicht: Bedienelemente duerfen die Flaechenmasse
+       ueberschreiben, die Sonderformen beide. */
+    malen(FORM_FLAECHEN, fl);
+    malen(FORM_BEDIEN, be);
+    FORM_SONDER.forEach(function (o) {
+      malen([o.sel], wert === 'kantig' ? o.kantig : o.rund);
+    });
+  }
+
+  function radBeobachten(wert) {
+    if (radBeobachter) { radBeobachter.disconnect(); radBeobachter = null; }
+    if (!wert || !document.body) { return; }
+    var warte = null;
+    /* Nur childList/subtree - `style` zu beobachten waere eine Schleife,
+       weil radSetzen genau das schreibt. */
+    radBeobachter = new MutationObserver(function () {
+      if (warte) { return; }
+      warte = setTimeout(function () { warte = null; radSetzen(wert); }, 120);
+    });
+    radBeobachter.observe(document.body, { childList: true, subtree: true });
+  }
+
   function formRadien(wert) {
     var st = document.getElementById(FORM_ID);
     if (!st) {
@@ -286,7 +370,12 @@
        Vom <head> aus ist der Sieger unerreichbar, egal wie oft man
        anhaengt. Das Blatt gehoert also an den BODY. */
     (document.body || document.head).appendChild(st);
-    if (!wert) { st.textContent = ''; return; }
+    if (!wert) {
+      st.textContent = '';
+      radSetzen('');       /* Inline-Reste abraeumen */
+      radBeobachten('');
+      return;
+    }
 
     var fl = (wert === 'kantig') ? '0' : '14px';
     var be = (wert === 'kantig') ? '0' : '10px';
@@ -335,6 +424,10 @@
     css += einzeln('.sb-card .sbc-investor-ribbon', wert === 'kantig' ? '0' : '8px 8px 0 0');
 
     st.textContent = css;
+
+    /* Und die Ebene, die wirklich traegt. */
+    radSetzen(wert);
+    radBeobachten(wert);
   }
 
   /* ── v1156-GRUND · Die Grundfarbe gilt nur ohne Vorlage ────────────────
