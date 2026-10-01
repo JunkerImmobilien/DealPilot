@@ -77,6 +77,41 @@ function setDefaults() {
   // zaer wird automatisch aus anschl_z - d1z berechnet
   sv('geb_ant',  80);
   sv('grenz',    _dpProfilWert('grenzsteuersatz', 40.45));
+  /* ══ v1740d · DAS zvE AUS DEM STEUERZEITRAUM VORBELEGEN ══
+     Marcel am 01.10.2026: „was macht es, wenn wir ein zvE unter Mandanten
+     anlegen?"
+
+     GEMESSEN — es machte für ein NEUES Objekt nichts:
+
+       Steuerzeitraum 2026   zvE 68.000, DB-gebunden, exact
+       gespeichertes Objekt  zvE 90.000 -> Grenzsatz 42,00, Feld gesperrt
+       NEUES Objekt          zvE LEER   -> Grenzsatz 40,45 aus dem Profil
+
+     Das System kannte die Zahl also und fragte trotzdem danach. Wer sie
+     nicht jedes Mal von Hand nachträgt, rechnet jedes neue Objekt gegen
+     einen pauschalen Satz statt gegen sein echtes Einkommen — und sieht
+     dabei ein angehaktes „automatisch", das mangels zvE nichts tut.
+
+     > Eine hinterlegte Angabe, die beim Anlegen nicht gezogen wird, ist
+     > keine Einstellung. Sie ist eine Notiz, die niemand liest.
+
+     Gezogen wird über denselben Weg, den der Steuer-Tab nutzt
+     (`_getZveForDateWithFallback`), damit es nicht zwei Herkünfte gibt.
+     Danach zieht `calc()` den Grenzsteuersatz über `_grenzAutoNachziehen`
+     automatisch nach und sperrt das Feld. */
+  (function () {
+    try {
+      var zveEl = document.getElementById('zve');
+      if (!zveEl || String(zveEl.value).trim() !== '') return;   /* nie überschreiben */
+      if (typeof window._getZveForDateWithFallback !== 'function') return;
+      var t = window._getZveForDateWithFallback(new Date().toISOString().slice(0, 10));
+      var wert = t && t.zve;
+      if (!(wert > 0)) return;
+      zveEl.value = String(wert);
+      zveEl.dispatchEvent(new Event('input', { bubbles: true }));
+      zveEl.dispatchEvent(new Event('change', { bubbles: true }));
+    } catch (e) {}
+  })();
   /* v1257 · Die Bewirtschaftungsquoten und der Mietausfall kommen jetzt
      ebenfalls aus dem Profil. Bisher standen 17 und 16 als `value=` fest
      im HTML — ein Wert, den man nur durch Überschreiben loswird, und der

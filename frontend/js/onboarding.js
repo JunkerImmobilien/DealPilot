@@ -262,26 +262,42 @@ window.DealPilotOnboarding = (function () {
       + '</select></div>';
   }
 
-  /* ══ Einkommensteuertarif — Näherung ══════════════════════════════
-     § 32a EStG, Zonengrenzen 2025/2026. Der Grenzsteuersatz ist die
-     Steigung des Tarifs, nicht der Durchschnittssatz; er wird hier
-     numerisch als Differenzenquotient über 100 € gebildet. Das ist für
-     eine Vorbelegung genau genug und als Schätzung gekennzeichnet. */
-  function _est(zve) {
-    var x = Math.max(0, Math.floor(zve));
-    if (x <= 12096) return 0;
-    if (x <= 17443) { var y = (x - 12096) / 10000; return (932.3 * y + 1400) * y; }
-    if (x <= 68480) { var z = (x - 17443) / 10000; return (176.64 * z + 2397) * z + 1015.13; }
-    if (x <= 277825) return 0.42 * x - 10911.92;
-    return 0.45 * x - 19246.67;
-  }
+  /* ══ v1740d · HIER STAND EIN ZWEITER EINKOMMENSTEUERTARIF ══
+     Ich hatte § 32a EStG selbst nachgebaut — und damit gegen die Regel
+     „Rechenkerne nie duplizieren" verstossen, während drei Zeilen weiter
+     oben steht, dass dieses Modul genau das vermeiden soll.
+
+     Gemessen, was die Doppelung kostete:
+
+       zvE       App (Tax)   mein Nachbau   Abweichung
+       20.000      24,90        24,89         -0,01
+       30.000      28,30        28,42         +0,12
+       50.000      35,30        35,49         +0,19
+       65.000      40,50        40,79         +0,29
+       80.000      42,00        42,00          0
+
+     > Keine dieser Abweichungen fällt auf. Genau das ist das Problem:
+     > zwei Zahlen, die fast gleich sind, erkennt niemand als Widerspruch —
+     > man hält die eine für einen Rundungsfehler der anderen.
+
+     `Tax.calcGrenzsteuersatz()` ist der Kern, mit dem die App rechnet;
+     derselbe, den die Automatik im Steuer-Tab nutzt. Gibt es ihn nicht,
+     wird NICHT geschätzt, sondern nichts geliefert — eine Vorbelegung ist
+     keinen eigenen Tarif wert.
+
+     Die Kirchensteuer kommt oben drauf: sie ist ein Prozentsatz DER
+     Einkommensteuer, keine eigene Tariffrage. */
   function _grenzsatz(zve, kirchePct) {
     if (!(zve > 0)) return null;
-    var d = 100;
-    var grenz = (_est(zve + d) - _est(zve)) / d;       /* Einkommensteuer */
-    var soli = 0;                                      /* greift erst weit oben, hier 0 */
+    var grenz = null;
+    try {
+      if (window.Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
+        grenz = Tax.calcGrenzsteuersatz(zve);
+      }
+    } catch (e) { grenz = null; }
+    if (grenz == null || !isFinite(grenz)) return null;
     var kirche = grenz * (Number(kirchePct) || 0) / 100;
-    return Math.round((grenz + soli + kirche) * 10000) / 100;   /* in % */
+    return Math.round((grenz + kirche) * 10000) / 100;   /* in % */
   }
 
   /* ══ Modal ════════════════════════════════════════════════════════ */
@@ -348,7 +364,13 @@ window.DealPilotOnboarding = (function () {
     var erg = el('dpo-r-erg');
     if (!erg) return;
     var g = _grenzsatz(zve, k);
-    if (g == null) { erg.innerHTML = '<span class="dpo-r-fehl">Bitte ein zu versteuerndes Einkommen eintragen.</span>'; return; }
+    if (g == null) {
+      erg.innerHTML = '<span class="dpo-r-fehl">'
+        + (zve > 0 ? 'Der Steuerrechner ist gerade nicht geladen — trag den Satz bitte direkt ein.'
+                   : 'Bitte ein zu versteuerndes Einkommen eintragen.')
+        + '</span>';
+      return;
+    }
     erg.innerHTML = 'Geschätzter Grenzsteuersatz: <b>' + String(g).replace('.', ',') + ' %</b>'
       + '<button type="button" class="dpo-r-uebernehmen" id="dpo-uebernehmen">übernehmen</button>';
     var b = el('dpo-uebernehmen');
