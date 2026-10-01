@@ -23,7 +23,7 @@
       selector: '#sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
-      body: 'In der **Sidebar links** siehst du **alle deine Objekte**. Hier startest du jede Analyse.',
+      body: 'Hier liegen **alle deine Objekte**. In der Standardansicht in der Sidebar links — in Aktenmappe, Kanzlei und Tower klappst du dafür links die **Portfolio-Schiene** auf. Von hier startet jede Analyse.',
       bodyMore: 'Was die Sidebar dir zeigt:\n\n• **Jedes Objekt als Card** mit Adresse, Kaufpreis, DealScore-Ampel\n• **Kennzahlen** im Mini-Format: DSCR, Cashflow, Bruttomietrendite\n• **Sortier- und Filter-Funktion** nach Score, Lage, Plan\n• **Demo-Objekte** mit grüner Markierung\n\n**Limits nach Plan:**\n• **Free**: 3 Objekte\n• **Starter**: 15 Objekte\n• **Investor**: 50 Objekte\n• **Pro**: unlimited\n\nKlick einfach auf ein Objekt um es zu öffnen und in die Vollanalyse zu starten.',
       placement: 'right'
     },
@@ -33,7 +33,7 @@
       selector: '#sb-list > *:first-child, .dpl-schiene .sb-card, .dpl-schiene, #sb-list button:first-of-type, #sb-list',
       icon: 'i-home',
       title: 'Objekt auswählen',
-      body: '**Klick auf ein Objekt** in der Sidebar — sofort siehst du alle Details, Tabs und Kennzahlen.',
+      body: '**Klick auf ein Objekt** in der Liste — sofort siehst du alle Details, Tabs und Kennzahlen. Ganz oben steht **„Neues Objekt hinzufügen"**: damit legst du ein leeres Objekt von Hand an.',
       bodyMore: 'Was passiert wenn du ein Objekt anklickst:\n\n• **Alle 8 Tabs** werden mit den Objekt-Daten gefüllt\n• **DealScore** wird live berechnet\n• **Bewertungs-Cockpit** zeigt DSCR + LTV im 15-Jahres-Verlauf\n• **Änderungen** werden automatisch gespeichert\n\n**Tipp:** Du kannst zwischen Objekten jederzeit hin- und herwechseln — DealPilot speichert deinen Stand. Auch unfertige Bewertungen bleiben in der Sidebar.\n\nFür die Tour zeigen wir dir jetzt die wichtigsten Funktionen am Beispiel des aktuellen Objekts.',
       placement: 'right'
     },
@@ -78,7 +78,7 @@
       placementHintV866: 1,
       icon: 'i-qr',
       title: 'Boarding-Pass — direkt beim Quick-Boarding',
-      body: '**Rechts oben im Panel** klebt der **Quickboarding-Pass** (der weisse Abriss mit „SCAN › ÜBERNEHMEN“) — dein teilbarer Kurz-Steckbrief. Er entsteht direkt hier beim Quick-Boarding.',
+      body: 'Im Quick-Boarding entsteht nebenbei der **Quickboarding-Pass** — dein teilbarer Kurz-Steckbrief mit QR-Code. Du erkennst ihn am **dunklen Streifen** mit dem Code; je nach Ansicht sitzt er seitlich oder unten.',
       bodyMore: 'Was der Boarding-Pass ist:\n\n• Eine **öffentliche Kurz-Ansicht** deines Objekts: Adresse, Eckdaten, Score — hübsch aufbereitet wie eine echte Bordkarte\n• Erreichbar über **Link oder QR-Code** — ideal für Partner, Mitinvestoren oder die Bank\n• **Zeitlich begrenzt gültig** und jederzeit widerrufbar — du behältst die Kontrolle\n\n**So entsteht er:**\n• Während du das Quick-Boarding befüllst, baut sich der Pass **rechts oben im Panel** automatisch mit auf\n• Beim **Speichern als Objekt** kannst du ihn direkt **mit übernehmen** — inklusive Link + QR-Code\n• Später erstellst/teilst du ihn jederzeit neu über „Quick Boarding teilen“ beim Objekt\n• Der QR-Code erscheint dann auch im **Deal-Aktion-Tab** direkt neben dem Deal-Status',
       placement: 'auto'
     },
@@ -113,7 +113,7 @@
       id: 'pf-import',
       tab: 's0',
       selector: '#obj-action-bar, .obj-action-bar',
-      subTargets: ['Exposé'],
+      subTargets: ['Exposé / Marktbericht'],   /* v1743 · war nur 'Exposé' — im Tower gewinnt damit 'Exposé / Gesamt-PDF' aus der Ausgaben-Schiene, weil _findByText den KUERZESTEN Treffer nimmt (19 statt 21 Zeichen) */
       icon: 'i-file-text',
       title: 'Import aus Exposés & Marktberichten',
       body: '**PDFs oder Dokumente hochladen** — DealPilot liest die wichtigsten Felder automatisch aus.',

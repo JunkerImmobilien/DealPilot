@@ -571,7 +571,19 @@ window.DealPilotOnboarding = (function () {
   }
 
   /* ══ Auslöser ═════════════════════════════════════════════════════ */
+  /* v1743 · `?setup=1` erzwingt das Setup, `?setup=neu` zusaetzlich den
+     Rundgang danach — damit sich der ganze Weg eines neuen Nutzers
+     nachspielen laesst, ohne ein Konto anzulegen. */
+  function _erzwungen() {
+    try {
+      var q = (window.location && location.search) || '';
+      var m = /[?&]setup=([a-z0-9]+)/i.exec(q);
+      return m ? m[1].toLowerCase() : null;
+    } catch (e) { return null; }
+  }
+
   function _faellig() {
+    if (_erzwungen()) return true;
     if (istFertig()) return false;
     try { if (sessionStorage.getItem('dp_auth_flow')) return false; } catch (e) {}
     if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) return false;
@@ -588,6 +600,18 @@ window.DealPilotOnboarding = (function () {
       var da = !!document.querySelector('#sb-list, #sidebar');
       if (!da && (Date.now() - seit) < 2500) { setTimeout(function () { warten(seit); }, 120); return; }
       if (!_faellig()) return;
+      var modus = _erzwungen();
+      if (modus) {
+        /* Erzwungen heisst: von vorn. Ein gemerkter Zwischenschritt waere
+           hier das Gegenteil dessen, was geprueft werden soll. */
+        try { localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY); } catch (e) {}
+        if (modus === 'neu') {
+          ['dp_tour_completed_v1', 'dp_tour_seen_v1', 'dp_tour_offer_count', 'dp_tour_offer_day']
+            .forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+        }
+        zeige(0);
+        return;
+      }
       zeige(parseInt(_ls(SCHRITT_KEY) || '0', 10) || 0);
     })();
   }
@@ -603,6 +627,37 @@ window.DealPilotOnboarding = (function () {
     istFertig: istFertig,
     zuruecksetzen: function () {
       try { localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY); } catch (e) {}
+    },
+    /* ══ v1743 · DAS SETUP NOCH EINMAL SEHEN ══
+       Marcel am 01.10.2026: „Ich würde auch gerne das einmal ausprobieren.
+       Das kann man ja einmal erzwingen bei der nächsten Anmeldung, dass ich
+       sehe mit den Pflichteingaben und sowas, ob das passt."
+
+       Drei Wege, alle ohne Entwicklerwerkzeuge:
+
+         ?setup=1        an die URL haengen — zeigt es sofort
+         ?setup=neu      zusaetzlich Rundgang-Marker loeschen: wie beim
+                         allerersten Anmelden, inklusive Tour danach
+         DealPilotOnboarding.nochmal()   aus der Konsole
+
+       Der FERTIG-Marker wird dabei geloescht, nicht nur umgangen - sonst
+       waere der naechste Seitenaufruf wieder stumm und man koennte den
+       Ablauf nicht zu Ende pruefen. */
+    nochmal: function (auchTour) {
+      try {
+        localStorage.removeItem(FERTIG_KEY);
+        localStorage.removeItem(SCHRITT_KEY);
+        if (auchTour) {
+          ['dp_tour_completed_v1', 'dp_tour_seen_v1', 'dp_tour_offer_count', 'dp_tour_offer_day']
+            .forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+        }
+      } catch (e) {}
+      var alt = document.getElementById('dp-onboarding');
+      if (alt) alt.remove();
+      _ov = null;
+      _wahl = { aussehen: null, typ: 'ausgewogen' };
+      zeige(0);
+      return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls geloescht)' : '');
     },
     _grenzsatz: _grenzsatz,
     _blAusPlz: _blAusPlz

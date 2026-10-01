@@ -760,7 +760,33 @@
       var noObject = !hdrObj || !hdrObj.textContent || hdrObj.textContent.trim() === 'Neues Objekt';
       if (noObject) {
         console.log('[DpTour V239.7] Kein Objekt aktiv -> erstes Sidebar-Item klicken');
-        var firstCard = document.querySelector('#sb-list > .sb-card, #sb-list > *:first-child');
+        /* ══ v1743 · DIE KARTE MUSS SICHTBAR SEIN, SONST GEHT DER KLICK INS LEERE ══
+           Marcel am 01.10.2026 aus dem Tower: „Dann hängt er sich bei mir
+           auf und dann kann ich nichts mehr machen. Dann ist der Bildschirm
+           ausgegraut."
+
+           Hier stand nur `#sb-list > .sb-card`. In Aktenmappe, Kanzlei und
+           Tower wandert die Objektliste aber in eine Schiene; in `#sb-list`
+           bleiben die Karten als HÜLLEN mit 0x0 zurück. `querySelector`
+           findet eine davon, der Klick trifft ein Element ohne Fläche — und
+           lädt nichts.
+
+           > Weil dieser Zweig bei JEDEM Tab-Schritt erneut greift, solange
+           > kein Objekt aktiv ist, wiederholt sich das endlos: die Tour
+           > wartet, klickt ins Nichts, wartet wieder. Von aussen sieht das
+           > aus, als sei sie eingefroren — sie arbeitet nur ergebnislos.
+
+           Gesucht wird jetzt die erste Karte MIT Fläche, egal in welchem
+           Behälter sie liegt. */
+        var firstCard = (function () {
+          var kandidaten = document.querySelectorAll(
+            '.dpl-schiene .sb-card, #sb-list > .sb-card, .sb-card, #sb-list > *:first-child');
+          for (var ci = 0; ci < kandidaten.length; ci++) {
+            var r = kandidaten[ci].getBoundingClientRect();
+            if (r.width > 2 && r.height > 2) return kandidaten[ci];
+          }
+          return null;
+        })();
         if (firstCard) {
           try {
             firstCard.dispatchEvent(new MouseEvent('click', {
