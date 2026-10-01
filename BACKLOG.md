@@ -259,7 +259,7 @@ Ein großes Paket, Marcels Worte zuerst:
 > Objekt hat oder etwas hinzufügen möchte, dann kann ich das Objekt sagen und
 > die Änderungen, und er füllt die Felder aus oder ergänzt sie."
 
-### V1 · Diktat in beiden Piloten — HALB (v1754: Pilot-Analyse steht, Cockpit offen)
+### V1 · Diktat in beiden Piloten — ERLEDIGT (v1760-v1764b: Co-Pilot und Portfolio-Pilot)
 
 Pilot-Analyse (Einzelobjekt) und Portfolio-Pilot bekommen einen Sprechweg.
 **Vorher messen, was es schon gibt:** `voice-import.js` trägt den Sprechlauf
@@ -267,7 +267,7 @@ und die „Geführte Eingabe" (v1746). Ein zweiter Weg daneben läuft auseinande
 sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
 `layout-varianten.js`.
 
-### V2 · Objekt benennen und Felder ergänzen
+### V2 · Objekt benennen und Felder ergänzen — ERLEDIGT (v1762, Zuordnung über die Seitenliste)
 
 „Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
 Sprache, dann Felder füllen.

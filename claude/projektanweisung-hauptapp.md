@@ -27103,3 +27103,162 @@ Kerosin, und zwei Kosten hinter einem Knopf wären wieder der Würfel aus v1731.
 - **Der 38-Schritte-Durchlauf im Tower hängt** bei Schritt 2 (621 s ohne
   Fortschritt). Die Einzelmessung von Schritt 4 war dagegen sauber — es ist
   der Läufer, nicht die Tour.
+
+---
+
+## v1758–v1765 · Die Piloten sprechen, und das Register wächst
+
+### Die Ernte, Stand nach diesem Durchgang
+
+```
+               Liegenschaftszins   Sachwertfaktor
+NW                   972                 34
+NI                    95                 35
+SN                    15                 16   Dresden + Leipzig (v1758/59)
+BB                    14                 36   Landeswerk (v1757)
+HE                     8                160
+HH                     5                  2   Formelwerk (v1761)
+BE / ST / TH      je     1          4 / 28 / 75
+
+mb.param_modell: 2.559 Zeilen · 14 Länder · 8 Kennzahlen · kein Satz ohne Link
+```
+
+**Neun Länder führen jetzt einen Liegenschaftszinssatz**, zu Beginn der Sitzung
+waren es sechs — drei davon mit einem einzigen Alibi-Satz.
+
+### v1758/59 · Dresden und Leipzig — mit Erlaubnis
+
+Beide Berichte verbieten die wirtschaftliche Verwertung ohne Genehmigung
+(Dresden S. 2, Leipzig S. 2). **Marcel hat am 01.10.2026 mitgeteilt, dass die
+Erlaubnis vorliegt** — sie steht als Feld `nutzungsrecht` in jedem der 24
+Sätze, mit dem Hinweis, dass Datum und Aktenzeichen noch nachzutragen sind.
+
+> Eine Befugnis, die nur im Chatverlauf steht, ist für einen Prüfer nicht da.
+
+**Dresdens Sachwertformel ist am Anwendungsbeispiel bewiesen**, nicht
+abgeschrieben:
+
+```
+                        gerechnet    Soll (S. 79)
+-0,3450 × ln(440.000)     -4,4831      -4,4831
+-0,0001 × 270             -0,0270      -0,027
+ 0,1754 × ln(40)           0,6470       0,6470
+ln(SWF)                    0,0942       0,0942
+SWF                        1,0988       1,0988
+marktangepasster Sachwert  483.471 €    483.472 €
+```
+
+Ein Euro Abweichung durch Rundung. **Eine Zahl des Rechercheagenten habe ich
+NICHT übernommen:** er nannte für „EFH freistehend, RND 36–55" n=36, auf S. 89
+steht n=3. Deshalb nur die fünf Zinszeilen, die ich selbst gelesen habe — die
+restlichen rund 55 stehen als offene Auflage IM Datensatz.
+
+### v1761 · Hamburg ist ein Formelwerk
+
+Kein Tabellenwert, sondern `4,37 % × Lagefaktor × Altersfaktor ×
+Erstbezugsfaktor × Stadtteilfaktor × Aktualisierungsfaktor`. Der
+Sachwertfaktor hat 19 Koeffizienten, dazu zwei Stadtteiltabellen mit je 104
+Einträgen und neun Aktualisierungsstichtage.
+
+> Wer daraus eine einzelne Zahl macht, hat nicht vereinfacht, sondern das
+> Modell verlassen. Dann steht im Register ein Wert, den der Ausschuss nie
+> veröffentlicht hat.
+
+**Der Baupreisindex liegt dort stichtagsbezogen vor** — 1,502 (01.01.2022) bis
+**1,911** (01.01.2026). Das ist exakt die Zahl, die seit v1407 als Konstante
+`1.91` im Rechenkern steht; `CLAUDE.md` hielt fest, nur Hamburg habe sie
+beziffert. **Jetzt liegt sie im Register.**
+
+Zwei Vorbehalte stehen in `auflagen`: die Zinssätze für EFH und ETW sind laut
+Bericht **nicht** zur Verkehrswertermittlung dieser Objekte vorgesehen. Und
+die Lizenz `dl-de/by-2-0` steht **nicht im PDF** (214 Seiten, null Treffer),
+nur in der CKAN-API des Transparenzportals.
+
+### v1760–v1764b · Der Co-Pilot nimmt Änderungen entgegen
+
+Marcel: „Ich will eigentlich nur unten in dieses Co-Pilot-Feld, dass ich dort
+einfach Änderungen reindiktieren kann … oder ich habe die Sachen schon dort
+drinne stehen, soll ich die ersetzen?"
+
+**Drei Anläufe, zwei davon falsch — beide Fehler meine:**
+
+`v1760` fing JEDE Nachricht ab und fragte erst den Server, ob Felder darin
+stecken. Damit lief jede normale Frage durch einen zusätzlichen Netzwerkweg.
+
+> Eine Erweiterung, die den Hauptzweck verlangsamt, ist keine Erweiterung,
+> sondern eine Verlagerung.
+
+`v1763` ersetzte das durch ein örtliches Muster — und scheiterte an Marcels
+eigenem Satz: „Kannst du den Zustand auf stark renovierungsbedürftig ändern?"
+Das Muster verlangte eine ZAHL.
+
+> Ein Muster kann zählen, aber nicht verstehen. Jede Lücke, die ich darin
+> schließe, öffnet die nächste.
+
+**`v1764` ist die Lösung:** der Feldkatalog (192 Felder aus `window.FIELDS`)
+reist mit der Frage ans Modell, in EINEM Aufruf. Das Modell entscheidet, ob
+Frage oder Anweisung, und hängt bei einer Anweisung `<<<FELDER … FELDER>>>`
+an. Das Abfangen des Senden-Klicks ist ersatzlos weg.
+
+> Zwei Instanzen, die dieselbe Frage beantworten — hier ein Muster, dort ein
+> Modell — sind eine mehr als nötig. Die schwächere gewinnt immer dann, wenn
+> sie zuerst dran ist.
+
+**Dazu ein zweiter Fund im selben Satz:** das Modell hatte „erfinde keine
+Werte" auf eine ANWEISUNG angewandt und geantwortet, es könne das nicht.
+Einen Wert zu erfinden und einen anzunehmen, den der Nutzer gerade nennt, ist
+nicht dasselbe — die erste Regel schützt vor Behauptung, die zweite wäre
+Gehorsamsverweigerung. Steht jetzt so im Systemprompt.
+
+**Nachgemessen am laufenden System**, mit Marcels Originalsatz:
+
+```
+„Kannst du den Zustand der Wohnung auf stark renovierungsbedürftig ändern?"
+  -> Ich würde den Zustand auf „stark_sanierungsbeduerftig" ändern.
+  -> Hier steht schon etwas — was soll gelten?
+       Zustand der Wohnung
+       [bleibt: Guter Zustand]  [neu: Stark sanierungsbedürftig]
+  Feld bleibt bis zur Bestätigung auf „gut".
+```
+
+Das Modell hat selbst erkannt, dass „renovierungsbedürftig" hier die Option
+**sanierungs**bedürftig meint.
+
+### Drei Fehler, die der Nachlauf aufdeckte
+
+- **`v1760b`:** die Rückfrage nannte das Mietfeld „800" — `nkm` hat kein
+  `label[for]`, und ich war auf den Platzhalter zurückgefallen. *Ein
+  Platzhalter ist ein Beispielwert, keine Beschriftung.*
+- **`v1763b`:** „Konnte den Text nicht auswerten — bitte nochmal" bei einem
+  HTTP 429. *Bei einem Limit ist „nochmal" genau der falsche Rat.*
+- **`v1764b`:** unbekannte Feld-Id, unbekannte Option und „Wert stimmt schon"
+  fielen in dieselbe Meldung. Jetzt zählt er bei einer unbekannten Option die
+  wählbaren Werte auf.
+
+### v1765 · Ein Weg weniger
+
+`js/pilot-sprache.js` ist aus `index.html` ausgehängt. Der Knopf „Änderungen
+diktieren" öffnete den großen Sprechlauf — genau das, was Marcel an dieser
+Stelle nicht wollte. Die Datei bleibt im Repo.
+
+### Zur Spracherkennung, weil die Frage aufkam
+
+`dp-diktat.js` nutzt **nicht** die des Browsers:
+
+```
+POST /api/v1/ai/transcribe-chunk -> voiceExtractService.transcribe()
+                                 -> api.openai.com/v1/audio/transcriptions
+                                 -> gpt-4o-transcribe
+```
+
+Kein `SpeechRecognition` im Code — derselbe Weg, den der Sprechlauf nutzt.
+
+### Rest
+
+- **V4/V5** offen: Marktbericht und Wertermittlung per Sprache auslösen, mit
+  Kosten- und Kontingentansage. Der Verbrauch je Aktion ist noch nicht
+  gemessen — `config.js` führt nur die Kaufpakete, nicht den Abzug.
+- **Dresdens restliche Zinszeilen** (rund 55, S. 87–94).
+- **Bremen und Saarland** haben keine auffindbare Quelle.
+- **Chemnitz 65 €, Landkreis Zwickau 140 €** — die freie Zwickauer Fassung ist
+  nachweislich um die Wertetabellen gekürzt (Druckseiten 111–113, 117–143).
