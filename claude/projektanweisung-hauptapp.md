@@ -26128,3 +26128,178 @@ die Zahl, die die Doktrin ausschliesst. Gehört von Marcel entschieden.
 
 Die restlichen Gutachtendaten decken sich mit den Objekten — Alexanderstr.
 Bj 1976, Am Markt 18 Bj 1994 mit 52,60 m², Westerfeldstr. Bj 1967.
+
+---
+
+## v1735 – v1737 · Das Cockpit wird hell, die Schere zeigt ihr Eigenkapital
+
+Marcels Auftrag vom 01.10.2026 hatte fünf Teile. Zwei davon führten auf
+Fehler, die niemand gesucht hatte.
+
+### 1 · Die Score-Karte in Weiß (v1735)
+
+„im Portfolio Cockpit die Karte oben mit dem Score auch in weiss umbauen,
+dass es aussieht wie der Investor Deal Score."
+
+Der Kaskaden-Walker über **10.939 Regeln aus 42 Blättern** fand genau
+EINEN Treffer für den Grund der Karte:
+
+```
+#dashboard-main .hero{background:var(--c-panel)}      dashboard.css
+```
+
+Der Wert kam aus einem Block namens **„fc9 · Dunkler Hero zum Kontrast"** —
+sechs Regeln, die die Karte gezielt wieder auf Obsidian zurückdrehten,
+obwohl `.stage.fc` längst `--c-panel:#fff` setzt und das übrige Cockpit
+hell ist. Die Vorlage war `dpsh-score-hero.js` im Tab Bewertung.
+
+Eine Abweichung bewusst: die Labels bekommen `#6b6660` statt `#9a948a`.
+Auf Weiß hat `#9a948a` einen Kontrast von **2,8** — zu wenig für
+Kleintext; `#6b6660` liegt bei 5,1.
+
+### 2 · Der Portfolio-Pass tauscht die Seite
+
+Er war ein 158 px breiter **weißer** Block an der rechten Flanke.
+
+> Ein Element, das seine Wirkung aus dem Gegensatz zum Grund zieht,
+> verliert sie, wenn der Grund die Farbe wechselt. Es muss dann die
+> Seiten tauschen, nicht die Position behalten.
+
+Jetzt ein Obsidian-Streifen unter der Karte. Nach dem ersten Ausrollen
+gemessen: **144 px hoch** — ein Block, kein Streifen, weil der QR rund
+100 px mitbrachte und die Beschriftung bei 8 px blieb. Der Code wird jetzt
+kleiner GEZEICHNET statt neu erzeugt (58 px, die Module ändern sich nicht),
+die Schrift wächst. Ergebnis: **91 px**.
+
+### 3 · Der Jahresabschluss verschwindet ohne Gesellschaft
+
+Dort stand ausdrücklich das Gegenteil: „Gibt es keine Gesellschaft,
+verschwindet der Abschnitt NICHT — ein verschwundener Abschnitt sieht aus
+wie ein fehlendes Feature."
+
+Das Argument stimmt weiterhin, wiegt hier aber anders: es greift bei einem
+Feature, das der Nutzer SUCHEN könnte. Bilanz und GuV nach § 8 Abs. 2 KStG
+sucht niemand, der privat vermietet.
+
+> Ein Hinweis auf etwas, das den Leser nichts angeht, ist kein Hinweis,
+> sondern Rauschen.
+
+Die Überschrift verschwindet mit — sonst bliebe Sektion 09 leer stehen.
+Die alte Begründung steht als Kommentar weiter dort, damit niemand sie
+versehentlich zurückbaut.
+
+### 4 · Die Diagramme (v1736)
+
+„Sind die aussagekräftig? Vielleicht auch was in Richtung Vermögensbilanz?"
+
+**Erst gemessen, dann geurteilt** — an den echten Reihen:
+
+```
+Immobilienwert   848.000 -> 1.235.376   (+46 %)
+Restschuld       807.465 ->   523.625   (-35 %)
+```
+
+Die Schere ist also da. Sie war nur nicht zu sehen: beide Linien liegen im
+oberen Drittel einer Achse, die bei null beginnt.
+
+> Die Aussage dieses Bildes ist nicht der Verlauf der zwei Linien, sondern
+> der ABSTAND zwischen ihnen. Genau der war unsichtbar.
+
+Dieser Abstand IST das Eigenkapital (`r.eq`). Er wird jetzt ausgefüllt und
+am rechten Rand beschriftet.
+
+**Die Vermögensbilanz lag bereits vor:** `portfolioPayload()` führt seit
+Langem einen Zweig `vermoegensbilanz`, und die Projektion trägt je Jahr
+`objektwert_eur`, `restschuld_eur` UND `eigenkapital_eur`. Gezeigt wurde
+davon nichts. Gebaut ist also keine neue Rechnung, sondern die Ansicht
+einer vorhandenen — gestapelte Säulen, in denen Eigen- und Fremdkapital
+genau den Objektwert ergeben.
+
+```
+letztes Jahr:  Eigenkapital 672.589  +  Restschuld 538.564  =  Objektwert
+```
+
+Dazu Endwerte an den Kurven: ein Verlauf ohne Zahl zwingt zum Zielen mit
+der Maus — und auf dem Handy gibt es keinen Hover.
+
+### 5 · Die Breite (v1736b/c)
+
+„Der Portfolio-Pilot ist über den gesamten Arbeitsbereich. Können wir das
+auch für die anderen Bereiche machen?"
+
+Gemessen, WARUM er anders ist: `portfolio-pilot.js` hängt seine Sektion an
+`#dp-stage` — an die Bühne, nicht in `.app`. Er lief an der Begrenzung
+vorbei, als Einziger.
+
+```
+Fensterbreite   2133 px
+.app            1140 px      alle uebrigen Sektionen
+Pilot           volle Buehne
+```
+
+Rund 900 px blieben rechts leer, während die Diagramme sich zu zweit
+515 px teilten. Jetzt `min(1680px, 94vw)` für beide — die Kanten fluchten.
+
+### 6 · Der Knopf „Bank" lud die Kaufpreisaufteilung (v1737)
+
+**Gefunden beim Messen der Handy-Breite, nicht gesucht.** Vier Knöpfe in
+einem `flex`-Container mit `nowrap` liefen bei 390 px um 25 px aus der
+Karte. Beim Nachsehen, welcher Knopf da steht, fiel der eigentliche Fehler
+auf:
+
+```js
+var names = ['exportBmfPdf','exportBankPdf','exportBankenPdf','exportBankPDF'];
+```
+
+Gemessen existieren davon **zwei** — die erste und die letzte. Genommen
+wird die erste, und das ist `exportBmfPdf` aus `bmf-modal.js`: die
+**Kaufpreisaufteilung fürs Finanzamt**.
+
+> Auf dem Knopf stand Bank, geliefert wurde Finanzamt. Eine Liste von
+> Namen, die „robust" sein soll, trifft genau dann zuverlässig das
+> Falsche, wenn mehr als einer existiert.
+
+Der Knopf entfällt — konsistent zu v1733: „Investment" ruft `exportPDF`,
+und das ist seit v1636 umhüllt, fragt also nach der Fassung. Das `eval()`
+in derselben Schleife fiel mit weg.
+
+### Responsive — gemessen, nicht angenommen
+
+Im gleich-Origin-iframe mit einer Trägerseite OHNE laufende App:
+
+```
+              roh gemeldet   echte Ueberlaeufe
+Handy  390       231                0
+Tablet 820        65                0
+```
+
+Der Unterschied ist das Prüfverfahren: roh gegen die Bühne gemessen,
+echt gegen den **klippenden Vorfahren**. Fast alle Treffer waren die
+Projektionstabelle, die bewusst horizontal scrollt. `scrollWidth` blieb
+in beiden Fällen gleich der Fensterbreite.
+
+### 7 · Objektdetails und Ausstattung
+
+„bei den ganzen Objekten auch die weiteren Objektdetails anhand der Fotos
+abschätzen und eintragen. Auch Ausstattung im Detail."
+
+**Die Trennung, auf die es dabei ankommt:** aus einem Außenfoto lassen
+sich Dachform, Fassade, Fenster, Balkone und Stellplätze ablesen — eine
+Heizung, ein Bad oder ein Bodenbelag nicht. Für sechs Objekte gibt es
+aber Gutachten mit genau diesen Angaben.
+
+Gefüllt wurden je Objekt `ausst_dach/fenster/heizung` (Gebäudestandard
+1–4,5) und `mod_dach/fenster/heizung/baeder/leitungen`:
+
+```
+Alexanderstr. 11   3,0   Fenster 5-10 J. (2020), Heizung >20 J. (2005)
+Westerfeldstr. 140 2,5   Standard 2,4 lt. GA; Heizung 10-20 J. (2009)
+Hermannstr. 9      4,0   Kernsanierung 2016, Fenster <5 J. (2026)
+Loehner Str. 278   3,0   nur kleine Modernisierungen (3 Punkte)
+Am Markt 9         3,0   Fenster >20 J., Heizung 10-15 J.
+Am Markt 18        2,0   alle Gewerke >20 J., 85 % niedrig/veraltet
+```
+
+Die sechs Demo-Objekte bekamen Werte, die zum verfremdeten Foto und zum
+beim Anlegen gesetzten Zustand passen. **Zwölf Objekte, rund 110 Felder,
+davon 101 vorher leer** — und nach einem echten Neuladen gegengeprüft.
