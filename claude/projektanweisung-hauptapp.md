@@ -26792,3 +26792,125 @@ jetzt    620.000 / 3.100 Miete   Faktor 16,7   6,00 %
 
 Bewusst kein Vorzeigeobjekt mit Traumwerten — das zeigte nur den einen
 Fall, in dem alles grün ist.
+
+---
+
+## v1747–v1748b · Der Rundgang, die Bordkarte und ein Knopf, der würfelte
+
+**Was · Commit · Nachweis · Rest**
+
+### v1747 · Die Tour lädt das echte Demo-Objekt (`75bc4c0`, `f500a58`)
+
+Marcel: „Wir haben doch auch diese Demo-Objekte, die der Kunde bei der
+Erstanmeldung bekommt. Können wir das nicht laden?"
+
+Er hatte recht, und es war doppelte Arbeit. v1746 tippte 16 Felder ins
+Formular und speicherte — **gemessen 13 Sekunden**, Ergebnis ohne Foto, ohne
+KI-Analyse, 16 von 129 Feldern. Jetzt `POST /objects/demo-rundgang`:
+
+```
+Antwort   Demo-Objekt · Beispiel-Wohnung Dealhausen
+Nummer    2026-1057   (frei gezogen)
+Felder    129   Fotos 1   KI-Analyse 9.926 Zeichen
+```
+
+> Der erste Anlauf brach ab: `duplicate key value violates unique constraint
+> "objects_user_seq_unique"`. Der Demo-Datensatz bringt eine feste
+> Objektnummer mit — bei der Registrierung fällt das nie auf, weil der Nutzer
+> dort noch keine Objekte hat. Behoben über `objectService.create()`, das die
+> Nummer selbst zieht; eine zweite Nummernvergabe daneben wäre genau die
+> Doppelung, die wir uns sonst verbieten.
+
+### v1747b/c · Die Schiene stand auf „Aktionen" (`1ed3abc`, `2f51741`)
+
+**Das war die Ursache hinter einem Fehler, den ich für einen Zeitfehler
+hielt:** die Tour legte ein Demo-Objekt an, OBWOHL 18 echte da waren.
+
+```
+vor dem Klick auf .dpl-portfolio   Liste   0 px   sichtbare Karten  0 von 20
+nach dem Klick                     Liste 691 px   sichtbare Karten 20 von 20
+```
+
+> Eine Abwesenheit, die nur eine Verdeckung ist, sieht in jeder Messung gleich
+> aus. Der Unterschied steht erst im Umschalter.
+
+Einmal beim Start aufzuklappen reichte nicht — der Klick auf eine Karte
+schaltet die Schiene selbst wieder zurück. Der Spot lag danach auf 264 × 1004
+px, der **ganzen** Spalte samt Aktionen. Das Aufklappen hängt jetzt in
+`_ensureExpanded`, läuft also vor jedem Schritt, der auf die Liste zeigt; die
+drei Schritte auf die Aktionen sind ausgenommen.
+
+Dazu der Anker selbst: `#sb-list` ist im Tower **236 × 979** und trägt die
+Karten, sein klippender Behälter `.dpl-teil-objekte` nur **693**. Weil die
+Elementsuche ihre Selektoren der Reihe nach nimmt, gewann die überlaufende
+Liste. Jetzt steht die geklippte Hülle vorn.
+
+**Nachgemessen nach dem Rollout:** Spot 263 × 709 auf einer Liste von 693 —
+deckungsgleich; Schritt 2 trifft eine Karte (232 × 60) statt des
+„+ Neues Objekt"-Knopfes.
+
+### v1748 · Die Kaufpreisaufteilung fragt (`0540b42`)
+
+Marcel: „Da haben wir ja mehrere PDFs … Welches wolltest du denn haben?"
+
+**Gemessen, was wirklich dahinterliegt — es ist EIN PDF, nicht mehrere:**
+`openBMFModal()` der Rechner, `exportBmfPdf()` die Anlage,
+`BelegImport.open('ak')` die Belege. Drei **Wege**, kein Vorrat an PDFs. Das
+gehört gesagt, statt drei Einträge zu erfinden.
+
+> Derselbe Satz stand schon in v1731 über dem Deal-Aktions-Tab: „Ein Knopf,
+> der je nach unsichtbarem Zustand etwas anderes tut, ist kein Knopf, sondern
+> ein Würfel." Dort wurde er aufgelöst. Die neuen Ansichten bauen ihre
+> Ausgabeliste aber SELBST (`layout-varianten.js`, `AUSGABEN`) — und dort
+> blieb der eine Eintrag stehen. **Eine Lehre, die nur an einer Stelle gezogen
+> wird, gilt nicht.**
+
+### v1748 · Der QR-Schritt hing an einem Wort
+
+```
+DealPilot   _findByText('PASS') -> A.dp-pf-qr „Pass ›"   1576,23  54x68
+Tower       _findByText('PASS') -> DIV.body, 89.805 Zeichen, 1320x240
+```
+
+> Ein Textanker ist nur so lange eindeutig, wie kein anderes Element das Wort
+> kürzer enthält. Das ist keine Eigenschaft des Ankers, sondern des restlichen
+> Dokuments — und das ändert sich mit jeder Ansicht.
+
+Jetzt `subSelectors: ['#oab-pf-qr']`; das sucht außerdem in den iframes mit,
+`subTargets` nicht.
+
+### v1748b · Die Bordkarte kam nie an (`0c0e987`)
+
+Marcel wollte sie als Vorauswahl. Gemessen am laufenden System:
+
+```
+DealPilotKartenVariante.varianten   "" v1 v2 v3 v4 v5 v6   (Farbfassungen)
+DealPilotKartenStil.stile           zeile · kartei · buetten
+DealPilotObjektkarte.stile          "" bordkarte kante datenzeile ampel …
+```
+
+Das Einrichtungsfenster rief `DealPilotKartenVariante.setze('bordkarte')` —
+ein Wert, den dieses Modul nicht kennt. Es setzt bei Unbekanntem still auf
+`""` zurück: kein Fehler, keine Meldung, **keine Bordkarte**.
+
+> Ein Versprechen im Setup ohne Code, der es einlöst, fällt niemandem auf: der
+> Nutzer kennt die Bordkarte ja nicht und vermisst sie deshalb nicht.
+
+Dazu Marcels zweiter Teil — wer die Ansicht SPÄTER wechselt, bekam gar keine
+Objektkarte. Jetzt Vorgabe, **kein Zwang**: gesetzt nur, wenn der Merker gar
+nicht da ist. Nachgemessen: Merker entfernt, in den Tower gewechselt →
+`data-dp-objkarte=bordkarte` am `<html>`.
+
+### Rest
+
+- **Der komplette 38-Schritte-Durchlauf in vier Ansichten steht aus.** Nicht
+  an der App: das Chrome-Fenster lag im Hintergrund, `visibilityState` =
+  `hidden`, Chrome drosselt dann jeden `setTimeout` auf ~1 s. Gemessen 75 s
+  für einen Schritt statt ~3; hochgerechnet 4,5 Stunden.
+- **Der Demo-Pfad selbst ist unabgenommen** — der Fall „Nutzer hat kein
+  Objekt" ließ sich am Konto mit 17 Objekten nicht herstellen. Karten per CSS
+  zu verbergen reicht nicht: `_ensureObjectLoaded` kehrt vorher an `#hdr-obj`
+  zurück.
+- **T8 ist eine Bewertungsfrage**, keine Programmierfrage: Marcels Gutachten
+  rechnet nach der umgekehrten Ertragswertmethode (Jacoby, BFH IX R 12/21),
+  DealPilot die BMF-Arbeitshilfe. Der Rechenweg steht im Backlog.
