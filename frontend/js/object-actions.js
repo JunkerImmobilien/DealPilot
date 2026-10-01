@@ -294,6 +294,11 @@
     var avmOff = !(_avmHealth && _avmHealth.available);
     var _doc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>';
     var _mic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>';
+    /* v1742 · Geführte Eingabe: eine Liste mit Haken — abgearbeitete Fragen.
+       Bewusst KEIN Mikrofon und kein Sprechblasen-Symbol: beides würde
+       wieder nach Sprache aussehen, und genau davon soll der Weg sich
+       unterscheiden. */
+    var _liste = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h10M10 12h10M10 18h7"/><path d="M3.5 6l1.4 1.4L7.6 4.7"/><path d="M3.5 12l1.4 1.4 2.7-2.7"/><circle cx="5" cy="18" r="1.1"/></svg>';
     /* v1278: Kette als Zeichen fuer den Inserat-Weg. */
     var _link = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
     // PRE-FLIGHT-Kachel mit verstecktem Checkbox-Input (Logik unveraendert) + LED an .on
@@ -342,6 +347,25 @@
           + '<span class="k-neu">Daten \u00fcbernehmen aus</span></span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
+          /* ══ v1742 · GEFÜHRTE EINGABE ALS EIGENER WEG ══
+             Marcel am 01.10.2026: „vielleicht setzen wir die unter Sprache
+             ‚Frag mich durch'-Strecke mit als eigenen Auswahlbutton in die
+             Datenaufnahme-Karte."
+
+             Die Strecke gibt es seit v1275 — aber nur HINTER dem Knopf
+             „Sprache", als zweite von zwei Startoptionen. Dabei kann man
+             dort tippen; im Text steht ausdrücklich „Antworten kannst du
+             tippen oder sprechen".
+
+             > Eine Beschriftung, die eine Funktion falsch einordnet,
+             > versteckt sie vor genau den Nutzern, für die sie gemacht ist.
+             > Wer nicht sprechen will, klickt „Sprache" nie an — und landet
+             > im Formular mit über 250 Feldern.
+
+             Deshalb ein eigener Weg, und deshalb NICHT „Frag mich durch":
+             der Name klänge wieder nach Sprache. „Geführte Eingabe" sagt,
+             was sie vom Formular unterscheidet. */
+          (window.VoiceImport ? pfTileTool('gefuehrt', _liste, 'Geführte Eingabe', 'Frage für Frage — tippen oder sprechen') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
@@ -681,7 +705,11 @@
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }
     /* v1293: Dokumente vor Sprache vor Marktbewertung (war: voice-first). */
-    var order = ['import', 'immometrica', 'voice', 'pricehubble', 'sprengnetter', 'dealpilot'];
+    /* v1742 · „gefuehrt" steht neben „voice": beide fuellen dasselbe
+       Formular, nur auf verschiedenen Wegen. Die Reihenfolge ist dieselbe
+       Logik wie bisher — erst was Dokumente liefern, dann was der Nutzer
+       selbst sagt, dann die Marktbewertung. */
+    var order = ['import', 'immometrica', 'voice', 'gefuehrt', 'pricehubble', 'sprengnetter', 'dealpilot'];
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     /* Was vorher lief, weiss der naechste Schritt — der Sprechlauf sagt
@@ -706,6 +734,21 @@
              hier aus — zweimal abrufen heisst zweimal bezahlen. */
           if (_erg && _erg.marktGeholt) mbImSprechlauf = true;
           vorlauf.push('voice');
+        }
+        /* v1742 · Derselbe Sprechlauf, nur ohne die Wahlkarte davor: wer die
+           Kachel „Geführte Eingabe" angeklickt hat, hat sich schon
+           entschieden. `vorlauf` und `vorlaufFelder` werden mitgegeben wie
+           bei „Sprache", damit der geführte Weg weiss, was ein vorheriger
+           Import bereits gefüllt hat — sonst fragt er danach noch einmal. */
+        else if (s === 'gefuehrt') {
+          setProg('Geführte Eingabe …');
+          await new Promise(function (res) {
+            if (window.VoiceImport) {
+              window.VoiceImport.open(res, { gefuehrt: true, vorlauf: vorlauf.slice(),
+                                             vorlaufFelder: _formularNeu(standVorher) });
+            } else res();
+          });
+          vorlauf.push('gefuehrt');
         }
         else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); vorlauf.push('import'); }
         else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); vorlauf.push('immometrica'); }
