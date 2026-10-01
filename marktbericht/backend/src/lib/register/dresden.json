@@ -1,0 +1,333 @@
+[
+  {
+    "land_code": "SN",
+    "ags": "14612000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "berichtsjahr": 2026,
+    "modellversion": "Grundstücksmarktbericht Dresden 2026",
+    "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "quelle_parser": "v1759-DRESDEN",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "efh_regression",
+    "stichtag": "2025-06-24",
+    "formel": {
+      "form": "regression_log",
+      "bezeichnung": "Ein- und Zweifamilienhäuser, Sachwertfaktor nach Regression",
+      "ausdruck": "ln(SWF) = -0,3450 * ln(vSW) - 0,0001 * BRW + 0,1754 * ln(RND) + 3,9573",
+      "koeffizienten": {
+        "ln_vorlaeufiger_sachwert": -0.345,
+        "bodenrichtwert": -0.0001,
+        "ln_restnutzungsdauer": 0.1754,
+        "konstante": 3.9573
+      },
+      "ergebnis": "SWF = e^ln(SWF)",
+      "bestimmtheitsmass": 0.28
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "gnd_jahre": 80,
+      "regionalfaktor": 1,
+      "nhk": "NHK 2010",
+      "stichprobe_n": 263,
+      "stichprobe_vor_bereinigung": 307,
+      "swf_min": 0.62,
+      "swf_max": 1.82,
+      "swf_median": 1.08,
+      "swf_mittel": 1.12,
+      "swf_sigma": 0.22,
+      "stichtag_hinweis": "Median der Kaufzeitpunkte, 24.06.2025"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Dresden",
+      "sachlich": "Ein- und Zweifamilienhäuser",
+      "extrapolation": "gesperrt",
+      "spannen": {
+        "sachwertfaktor": {
+          "min": 0.62,
+          "max": 1.82
+        }
+      }
+    },
+    "belege": [
+      {
+        "art": "anwendungsbeispiel",
+        "fundstelle": "Grundstücksmarktbericht Dresden 2026, S. 79",
+        "eingabe": {
+          "vorlaeufiger_sachwert_eur": 440000,
+          "bodenrichtwert_eur_qm": 270,
+          "rnd_jahre": 40
+        },
+        "soll": {
+          "ln_swf": 0.0942,
+          "sachwertfaktor": 1.0988,
+          "marktangepasster_sachwert_eur": 483472
+        },
+        "nachgerechnet": {
+          "sachwertfaktor": 1.0988,
+          "marktangepasster_sachwert_eur": 483471,
+          "abweichung_eur": 1,
+          "bemerkung": "Rundung"
+        },
+        "wortlaut": "ln(SWF) = -0,3450 x ln(440.000) - 0,0001 x 270 + 0,1754 x ln(40) + 3,9573 = -4,4831 - 0,027 + 0,6470 + 3,9573 = 0,0942"
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 263,
+    "fundstelle": "Kap. 7.3, S. 76-79"
+  },
+  {
+    "land_code": "SN",
+    "ags": "14612000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "berichtsjahr": 2026,
+    "modellversion": "Grundstücksmarktbericht Dresden 2026",
+    "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "quelle_parser": "v1759-DRESDEN",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "efh_rmh_rnd21_35",
+    "stichtag": "2026-01-01",
+    "formel": {
+      "form": "festwert",
+      "wert_pct": 0.01,
+      "mittel_pct": -0.17,
+      "bezeichnung": "Einfamilienhaus Reihenmittelhaus, Restnutzungsdauer 21 bis 35 Jahre"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "gnd_jahre": 80,
+      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+      "bodenwert": "objektspezifisch angepasster Bodenrichtwert, Stand 01.01.2024",
+      "rnd_herleitung": "§ 4 Abs. 3 ImmoWertV mit Anlage 2"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Dresden",
+      "sachlich": "Einfamilienhaus Reihenmittelhaus, Restnutzungsdauer 21 bis 35 Jahre",
+      "extrapolation": "gesperrt"
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Dresden 2026, S. 88, Kap. 7.5",
+        "wortlaut": "Liegenschaftszinssatz Median 0,01 % (ø -0,17 %), Standardabweichung 0,98, 11 Kauffälle",
+        "kauffaelle": 11
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 11,
+    "streuung": {
+      "sigma_pct": 0.98
+    },
+    "fundstelle": "S. 88",
+    "auflagen": "Dresden gliedert nach Grundstücksart x Gebäudestellung x Restnutzungsdauer-Klasse. Diese Datei enthält nur die Zeilen, die Zeile für Zeile am Dokument gelesen wurden — rund 60 weitere stehen auf S. 87-94 und sind noch nicht übernommen. Wer hier keinen Treffer findet, hat deshalb nicht zwingend keinen Wert: im Bericht nachsehen."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14612000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "berichtsjahr": 2026,
+    "modellversion": "Grundstücksmarktbericht Dresden 2026",
+    "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "quelle_parser": "v1759-DRESDEN",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "efh_rmh_rnd36_55",
+    "stichtag": "2026-01-01",
+    "formel": {
+      "form": "festwert",
+      "wert_pct": 1.25,
+      "mittel_pct": 1.28,
+      "bezeichnung": "Einfamilienhaus Reihenmittelhaus, Restnutzungsdauer 36 bis 55 Jahre"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "gnd_jahre": 80,
+      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+      "bodenwert": "objektspezifisch angepasster Bodenrichtwert, Stand 01.01.2024",
+      "rnd_herleitung": "§ 4 Abs. 3 ImmoWertV mit Anlage 2"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Dresden",
+      "sachlich": "Einfamilienhaus Reihenmittelhaus, Restnutzungsdauer 36 bis 55 Jahre",
+      "extrapolation": "gesperrt"
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Dresden 2026, S. 88, Kap. 7.5",
+        "wortlaut": "Liegenschaftszinssatz Median 1,25 % (ø 1,28 %), Standardabweichung 0,57, 8 Kauffälle",
+        "kauffaelle": 8
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 8,
+    "streuung": {
+      "sigma_pct": 0.57
+    },
+    "fundstelle": "S. 88",
+    "auflagen": "Dresden gliedert nach Grundstücksart x Gebäudestellung x Restnutzungsdauer-Klasse. Diese Datei enthält nur die Zeilen, die Zeile für Zeile am Dokument gelesen wurden — rund 60 weitere stehen auf S. 87-94 und sind noch nicht übernommen. Wer hier keinen Treffer findet, hat deshalb nicht zwingend keinen Wert: im Bericht nachsehen."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14612000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "berichtsjahr": 2026,
+    "modellversion": "Grundstücksmarktbericht Dresden 2026",
+    "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "quelle_parser": "v1759-DRESDEN",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "efh_rmh_alle",
+    "stichtag": "2026-01-01",
+    "formel": {
+      "form": "festwert",
+      "wert_pct": 0.64,
+      "mittel_pct": 0.56,
+      "bezeichnung": "Einfamilienhaus Reihenmittelhaus, alle Restnutzungsdauern"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "gnd_jahre": 80,
+      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+      "bodenwert": "objektspezifisch angepasster Bodenrichtwert, Stand 01.01.2024",
+      "rnd_herleitung": "§ 4 Abs. 3 ImmoWertV mit Anlage 2"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Dresden",
+      "sachlich": "Einfamilienhaus Reihenmittelhaus, alle Restnutzungsdauern",
+      "extrapolation": "gesperrt"
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Dresden 2026, S. 88, Kap. 7.5",
+        "wortlaut": "Liegenschaftszinssatz Median 0,64 % (ø 0,56 %), Standardabweichung 1,01, 25 Kauffälle",
+        "kauffaelle": 25
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 25,
+    "streuung": {
+      "sigma_pct": 1.01
+    },
+    "fundstelle": "S. 88",
+    "auflagen": "Dresden gliedert nach Grundstücksart x Gebäudestellung x Restnutzungsdauer-Klasse. Diese Datei enthält nur die Zeilen, die Zeile für Zeile am Dokument gelesen wurden — rund 60 weitere stehen auf S. 87-94 und sind noch nicht übernommen. Wer hier keinen Treffer findet, hat deshalb nicht zwingend keinen Wert: im Bericht nachsehen."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14612000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "berichtsjahr": 2026,
+    "modellversion": "Grundstücksmarktbericht Dresden 2026",
+    "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "quelle_parser": "v1759-DRESDEN",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "efh_frei_rnd13_20",
+    "stichtag": "2026-01-01",
+    "formel": {
+      "form": "festwert",
+      "wert_pct": 1.02,
+      "mittel_pct": 0.92,
+      "bezeichnung": "Einfamilienhaus freistehend, Restnutzungsdauer 13 bis 20 Jahre"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "gnd_jahre": 80,
+      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+      "bodenwert": "objektspezifisch angepasster Bodenrichtwert, Stand 01.01.2024",
+      "rnd_herleitung": "§ 4 Abs. 3 ImmoWertV mit Anlage 2"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Dresden",
+      "sachlich": "Einfamilienhaus freistehend, Restnutzungsdauer 13 bis 20 Jahre",
+      "extrapolation": "gesperrt"
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Dresden 2026, S. 89, Kap. 7.5",
+        "wortlaut": "Liegenschaftszinssatz Median 1,02 % (ø 0,92 %), Standardabweichung 0,77, 6 Kauffälle",
+        "kauffaelle": 6
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 6,
+    "streuung": {
+      "sigma_pct": 0.77
+    },
+    "fundstelle": "S. 89",
+    "auflagen": "Dresden gliedert nach Grundstücksart x Gebäudestellung x Restnutzungsdauer-Klasse. Diese Datei enthält nur die Zeilen, die Zeile für Zeile am Dokument gelesen wurden — rund 60 weitere stehen auf S. 87-94 und sind noch nicht übernommen. Wer hier keinen Treffer findet, hat deshalb nicht zwingend keinen Wert: im Bericht nachsehen."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14612000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+    "berichtsjahr": 2026,
+    "modellversion": "Grundstücksmarktbericht Dresden 2026",
+    "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+    "quelle_parser": "v1759-DRESDEN",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "efh_frei_rnd21_35",
+    "stichtag": "2026-01-01",
+    "formel": {
+      "form": "festwert",
+      "wert_pct": 0.6,
+      "mittel_pct": 0.6,
+      "bezeichnung": "Einfamilienhaus freistehend, Restnutzungsdauer 21 bis 35 Jahre"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "gnd_jahre": 80,
+      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+      "bodenwert": "objektspezifisch angepasster Bodenrichtwert, Stand 01.01.2024",
+      "rnd_herleitung": "§ 4 Abs. 3 ImmoWertV mit Anlage 2"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Dresden",
+      "sachlich": "Einfamilienhaus freistehend, Restnutzungsdauer 21 bis 35 Jahre",
+      "extrapolation": "gesperrt"
+    },
+    "belege": [
+      {
+        "art": "tabellenwert",
+        "fundstelle": "Grundstücksmarktbericht Dresden 2026, S. 89, Kap. 7.5",
+        "wortlaut": "Liegenschaftszinssatz Median 0,6 % (ø 0,6 %), Standardabweichung 0,78, 14 Kauffälle",
+        "kauffaelle": 14
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 14,
+    "streuung": {
+      "sigma_pct": 0.78
+    },
+    "fundstelle": "S. 89",
+    "auflagen": "Dresden gliedert nach Grundstücksart x Gebäudestellung x Restnutzungsdauer-Klasse. Diese Datei enthält nur die Zeilen, die Zeile für Zeile am Dokument gelesen wurden — rund 60 weitere stehen auf S. 87-94 und sind noch nicht übernommen. Wer hier keinen Treffer findet, hat deshalb nicht zwingend keinen Wert: im Bericht nachsehen."
+  }
+]
