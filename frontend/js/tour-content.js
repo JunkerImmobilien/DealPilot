@@ -20,7 +20,7 @@
     
     {
       tab: 'sidebar',
-      selector: '#sb-list, .dpl-teil-objekte, .dpl-schiene, #sidebar',
+      selector: '.dpl-teil-objekte, #sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'Hier liegen **alle deine Objekte**. In der Standardansicht in der Sidebar links — in Aktenmappe, Kanzlei und Tower klappst du dafür links die **Portfolio-Schiene** auf. Von hier startet jede Analyse.',
@@ -30,7 +30,7 @@
     
     {
       tab: 'sidebar',
-      selector: '#sb-list > *:first-child, .dpl-teil-objekte .sb-card, .dpl-schiene .sb-card, #sb-list button:first-of-type, #sb-list',
+      selector: '.dpl-teil-objekte .sb-card, #sb-list > *:first-child, .dpl-schiene .sb-card, #sb-list button:first-of-type, #sb-list',
       icon: 'i-home',
       title: 'Objekt auswählen',
       body: '**Klick auf ein Objekt** in der Liste — sofort siehst du alle Details, Tabs und Kennzahlen. Ganz oben steht **„Neues Objekt hinzufügen"**: damit legst du ein leeres Objekt von Hand an.',
@@ -500,7 +500,7 @@
     // Sidebar mit Onboarding-Hinweis
     {
       tab: 'sidebar',
-      selector: '#sb-list, .dpl-teil-objekte, .dpl-schiene, #sidebar',
+      selector: '.dpl-teil-objekte, #sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'In der **Sidebar links** sammelst du deine Objekte. **Du hast noch keins** — lass uns dein erstes anlegen!',
