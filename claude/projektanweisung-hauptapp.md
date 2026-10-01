@@ -26408,3 +26408,137 @@ hinterlegte Nettokaltmiete ebenso (4.200 € → 525 je Einheit, Summe 4.200).
 Deal-Status  4 auf Gewonnen gesetzt, 0 auf Verloren
 Mietpotenzial Parkstr. 9: +60,3 % (Ist 2.321, Soll 3.721, Stau 137 TEUR)
 ```
+
+---
+
+## v1739 / v1740 · Der Rundgang und das Grund-Setup davor
+
+### Der Rundgang kam nach acht Sekunden
+
+Marcel: „Das dauert sehr, sehr lange, bis der lädt."
+
+```
+tour-engine.js fertig      2.445 ms
++ setTimeout                3.000 ms   (_maybeAutoStart)
++ setTimeout                2.500 ms   (Angebot zeigen)
+= Angebot erscheint      ~ 7.945 ms
+```
+
+Fünfeinhalb Sekunden davon waren fest verdrahtete Wartezeit. Der Grund stand
+im Kommentar: „damit Sidebar fertig rendert".
+
+> Das ist eine BEDINGUNG, keine Dauer. Eine Zahl, die für das langsamste
+> Gerät gewählt wurde, ist auf jedem anderen eine Wartezeit ohne Zweck.
+> Wer auf etwas wartet, soll danach fragen, nicht die Zeit schätzen.
+
+Jetzt wird alle 120 ms geprüft, ob die Sidebar steht — mit derselben
+Obergrenze als Reißleine. **Gemessen: 654 ms statt rund 5.800.**
+
+#### Drei Messungen, die nichts gemessen haben
+
+Der Zeitpunkt liess sich von aussen nicht bestimmen: zwischen `navigate`
+und meinem Mess-Skript liegen rund neun Sekunden Werkzeug-Latenz. Drei
+Läufe ergaben 9007, 9636 und 9638 ms — und maßen dabei nur, **wann ich
+hingesehen habe.**
+
+> Wenn die Latenz des Messwerkzeugs größer ist als die Größe, die gemessen
+> werden soll, misst man das Werkzeug.
+
+Die Seite kennt den Zeitpunkt selbst. Sie schreibt ihn jetzt nach
+`window.__dpTourAngebotMs`, und die Verbesserung ist nachprüfbar statt
+gerechnet.
+
+### Die Tour in allen vier Ansichten
+
+Alle 37 Schritte gegen jedes Layout geprüft:
+
+```
+Standard     36 von 37 Zielen gefunden
+Aktenmappe   36 von 37
+Kanzlei      36 von 37
+Tower        36 von 37
+```
+
+Die Tour trägt also überall gleich — und es fehlt überall **derselbe**
+Schritt. Nr. 31 „Investment-PDF" zeigte auf `.hdr-pdf-btn` und
+`button[onclick*="exportPDF"]`; beides findet **null** Elemente. Der Knopf
+sass einmal oben rechts im Kopf, heute steht er im Deal-Aktion-Tab unter
+„Ausgabe".
+
+> Ein Tour-Schritt, dessen Ziel es nicht mehr gibt, zeigt ins Leere und
+> erzählt dabei weiter. Für jemanden, der die App zum ersten Mal sieht,
+> ist das nicht „veraltet", sondern falsch.
+
+### Das Grund-Setup (v1740)
+
+Fünf Schritte, jeder einzeln überspringbar:
+
+```
+1 Aussehen      DealPilot / Aktenmappe / Kanzlei / Tower, mit Vorschau.
+                Bei den letzten drei die Bordkarte als Objektkarte.
+                Die Wahl wirkt SOFORT - man sieht sie hinter dem Modal.
+2 Deine Daten   Anschrift fuer den Kopf der Investment-PDFs. E-Mail aus
+                der Anmeldung. PLZ -> Bundesland -> Grunderwerbsteuer.
+3 Finanzierung  Zinsbindung, Zinsstufe, Tilgung, EK, Mietausfall, BWK,
+                Mindest-DSCR. Mit dem Hinweis, dass der Marktzins
+                ohnehin indikativ gezogen wird.
+4 Steuer        Grenzsteuersatz direkt - oder geschaetzt aus dem zu
+                versteuernden Einkommen (Paragraf 32a EStG).
+5 Investortyp   Konservativ / ausgewogen / offensiv.
+```
+
+**Was hier bewusst NICHT gebaut wurde:** ein eigener Speicher. Das Modal
+schreibt in die drei, die es schon gibt — `DealPilotLayout`, `Settings`
+und `DealPilotInvestmentProfile`.
+
+> Ein Einrichtungsassistent, der eigene Werte hält, erzeugt ein zweites
+> Gedächtnis neben den Einstellungen. Spätestens beim ersten Ändern dort
+> weiß niemand mehr, welcher Wert gilt.
+
+Die Standardwerte wurden entsprechend in `config.js` geändert, nicht im
+Setup: Tilgung 1,0 → **1,5**, Eigenkapital 20 → **10**, Mietausfall 2 →
+**1**.
+
+### Drei eigene Fehler in diesem Durchgang
+
+**1 · Das Setup liess sich nach einem Entfernen nie wieder öffnen.**
+`if (_ov) return` prüft die Modulvariable, nicht das DOM. Wird das Overlay
+von aussen entfernt, bleibt die Variable gesetzt und das Modal ist
+dauerhaft tot. Der Merker sass an zwei Orten, aufgeräumt wurde einer.
+Gefragt wird jetzt `isConnected`.
+
+**2 · Das Namensfeld war mit der E-Mail vorbelegt.** `user_name` trägt im
+Bestand oft die Adresse aus der Anmeldung. Als Vorbelegung für „Name"
+sieht das aus wie ein gefülltes Feld, ist aber keines — niemand heisst
+`info@firma.de`.
+
+**3 · Das PLZ-Mapping war als Kette falsch.** Zwei Bedingungen
+überdeckten einander, eine Zeile war unerreichbar. Jetzt eine Tabelle:
+die lässt sich lesen und gegenprüfen, eine Kette aus zwanzig Vergleichen
+nicht.
+
+### Marcels Frage zum Grenzsteuersatz — beantwortet
+
+„ob wir den tatsächlich dort brauchen, ob der überhaupt greift"
+
+Erste Messung: **greift nicht** — Profil 33,3, Formularfeld 42,00.
+**Das war ein Messfehler.** Ich hatte ein GESPEICHERTES Objekt geladen,
+und das bringt seinen eigenen Wert mit; der Profilwert ist eine
+Vorbelegung für NEUE Objekte.
+
+```
+Profil auf 33,3 gesetzt, dann newObj()  ->  Feld `grenz` = 33.3   greift
+```
+
+> Eine Vorbelegung an einem gespeicherten Datensatz zu prüfen heisst, das
+> Gegenteil dessen zu messen, wofür sie da ist.
+
+Der Kommentar „war 42, nie wirksam" in `config.js` beschreibt einen alten,
+behobenen Zustand — nicht den heutigen.
+
+### Responsive
+
+```
+Handy  390   Vollbild, Kacheln einspaltig, 0 Ueberlaeufe
+Tablet 820   Modal 760x580 zentriert, Kacheln zweispaltig, 0 Ueberlaeufe
+```
