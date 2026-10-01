@@ -1321,6 +1321,30 @@
 
   /* v868: zugeklappte Bereiche vorm Fokussieren oeffnen (z.B. PDF-Klappe) */
   function _ensureExpanded(step) {
+    /* v1747 · Zeigt der Schritt auf die Objektliste, muss die Schiene offen
+       sein. Einmal beim Start reicht nicht: der Klick auf eine Karte schaltet
+       sie selbst wieder auf „Aktionen" zurueck - gemessen am 01.10.2026, der
+       Spot lag danach auf 264 x 1004 px, also der GANZEN Spalte samt
+       Aktionen. Genau das hat Marcel gesehen. */
+    try {
+      /* Nur Schritte, die auf die LISTE zeigen. Drei Schritte zeigen auf die
+         Aktionen (`#sb-actions-accordion, .dpl-schiene`) - fuer die waere ein
+         Aufklappen das Gegenteil von hilfreich, es wuerde ihr Ziel zuklappen.
+         Die Suche selbst geht ihre Selektoren der Reihe nach durch und
+         ueberspringt Unsichtbares, deshalb trifft sie danach von allein
+         `.dpl-teil-objekte` statt der ganzen Schiene. */
+      if (step && step.selector &&
+          /dpl-teil-objekte|sb-list/.test(step.selector) &&
+          !/sb-actions/.test(step.selector)) {
+        if (_portfolioAufklappen()) {
+          return new Promise(function (res) { setTimeout(function () { res(_ensureExpandedRest(step)); }, 260); });
+        }
+      }
+    } catch (e) {}
+    return _ensureExpandedRest(step);
+  }
+
+  function _ensureExpandedRest(step) {
     if (!step || !step.ensureVisibleText) return Promise.resolve();
     var probe = _findByText(step.ensureVisibleText, {});
     if (probe) return Promise.resolve();
