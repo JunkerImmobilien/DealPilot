@@ -403,6 +403,16 @@
   #dashboard-main .stage.fc9 .hpass .hp-lab{color:var(--wl-e8cc7a, #E8CC7A)}
   #dashboard-main .stage.fc9 .hpass .hp-code{color:#ece7dd}
   #dashboard-main .stage.fc9 .hpass .hp-sub{color:#9a948a;text-align:left;line-height:1.45;margin-left:auto}
+  /* v1735b · gemessen: der Streifen war 144 px hoch - ein Block, kein
+     Streifen. Der QR brachte rund 100 px mit (Modulgroesse 3 aus
+     _qrSvg), waehrend die Beschriftung bei 8 px blieb: viel dunkle
+     Flaeche, auf der fast nichts steht. Der Code wird kleiner gezeichnet
+     statt neu erzeugt - scannbar bleibt er, die Module aendern sich
+     nicht. Die Schrift waechst dafuer auf ein Mass, das zur Flaeche passt. */
+  #dashboard-main .stage.fc9 .hpass .qb svg{width:58px;height:58px;display:block}
+  #dashboard-main .stage.fc9 .hpass .hp-lab{font-size:9px;letter-spacing:1.6px}
+  #dashboard-main .stage.fc9 .hpass .hp-code{font-size:13px;letter-spacing:1.4px;font-weight:700}
+  #dashboard-main .stage.fc9 .hpass .hp-sub{font-size:9.5px}
   @media(max-width:620px){
     #dashboard-main .stage.fc9 .hpass{flex-wrap:wrap;gap:10px;padding:10px 14px}
     #dashboard-main .stage.fc9 .hpass .hp-sub{margin-left:0;width:100%}
