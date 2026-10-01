@@ -2102,6 +2102,47 @@ async function copilotChat(payload, opts) {
                   ? ' [' + f.options.slice(0, 12).join(' / ') + ']' : '');
           }).join('\n')
         ].join('\n')
+      : '',
+
+    /* ═══ v1766 · ABRUFE AUSLOESEN - MIT KOSTENANSAGE ══════════════════
+       Marcels V4/V5: „auch Marktberichte oder Wertermittlungen dort
+       ausfuehren ... Er sagt dann was es kostet und wieviel Kontingent
+       wir noch haben."
+
+       GEMESSEN, nicht geraten: jeder Abruf kostet GENAU 1 - `cost` ist in
+       `ai_credits_log` immer 1 (aiCreditsService.js:363). Verschieden
+       sind nicht die Preise, sondern die GUTHABENARTEN: mpi, mpi_plus,
+       wev. Der Bestand kommt aus GET /ai/credits und wird vom Frontend
+       mitgeschickt - das Modell rechnet ihn nicht aus.
+
+       > Bei Geld wird nicht geschaetzt. Steht der Bestand nicht im
+       > Auftrag, nennt das Modell auch keinen - lieber keine Zahl als
+       > eine erfundene. */
+    (payload.abrufe && payload.abrufe.length)
+      ? [
+          '',
+          'ABRUFE AUSLOESEN (verbindlich):',
+          'Der Nutzer kann dich bitten, einen kostenpflichtigen Abruf zu starten',
+          '("hol mir eine Marktpreis-Indikation", "mach einen Marktbericht").',
+          'Erkennst du das, haenge an deine Antwort GENAU EINEN Block an:',
+          '',
+          '<<<ABRUF',
+          '{"name":"<name aus der Liste>"}',
+          'ABRUF>>>',
+          '',
+          '- Nenne im Text davor, WAS es kostet und WIEVIEL noch da ist - beides steht',
+          '  unten in der Liste. Erfinde KEINE Zahl und rechne nichts um.',
+          '- Ist das Guthaben 0, haenge KEINEN Block an, sondern sage es.',
+          '- Fuehre nichts aus und behaupte nicht, es sei schon geschehen: der Nutzer',
+          '  bestaetigt den Abruf erst.',
+          '- Bei einer normalen Frage: kein Block.',
+          '',
+          'VERFUEGBARE ABRUFE (name | was es ist | kostet | noch frei):',
+          payload.abrufe.map(function (a) {
+            return '  ' + a.name + ' | ' + a.titel + ' | 1 ' + a.art
+              + ' | ' + (a.rest == null ? 'unbekannt' : a.rest);
+          }).join('\n')
+        ].join('\n')
       : ''
   ].filter(Boolean).join('\n');
 

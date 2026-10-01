@@ -298,6 +298,11 @@
       if (window._currentObjKey && window.DealPilotCopilotAenderungen
           && typeof window.DealPilotCopilotAenderungen.katalog === 'function') {
         body.felder = window.DealPilotCopilotAenderungen.katalog();
+        /* v1766: der Guthabenstand reist mit, damit das Modell die Kosten
+           nennen kann, ohne sie zu schaetzen. */
+        if (typeof window.DealPilotCopilotAenderungen.abrufe === 'function') {
+          body.abrufe = window.DealPilotCopilotAenderungen.abrufe();
+        }
       }
     } catch (e) {}
 

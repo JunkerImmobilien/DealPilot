@@ -553,6 +553,7 @@
         + 'border:1px solid rgba(201,168,76,.4);background:transparent;color:inherit;font-size:12px}',
       '.' + MARKE + '-w.an{background:var(--wl-c9a84c,#C9A84C);color:#0A0A09;'
         + 'border-color:var(--wl-c9a84c,#C9A84C)}',
+      '.' + MARKE + '-kosten{margin:6px 0 2px;font-size:12.5px;opacity:.85}',
       '.' + MARKE + '-akt{display:flex;gap:7px;margin-top:8px}',
       '.' + MARKE + '-ok{padding:6px 14px;border-radius:6px;border:0;cursor:pointer;'
         + 'background:var(--wl-c9a84c,#C9A84C);color:#0A0A09;font-weight:600}',
@@ -809,9 +810,136 @@
     return '';
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1766 · ABRUFE AUSLÖSEN, MIT KOSTENANSAGE (V4 / V5)
+     ═══════════════════════════════════════════════════════════════════
+
+     Marcel: „auch Marktberichte oder Wertermittlungen dort ausführen …
+     Er sagt dann was es kostet und wie viel Kontingent wir noch haben."
+
+     GEMESSEN: jeder Abruf kostet GENAU 1 — `cost` ist in
+     `ai_credits_log` immer 1. Verschieden sind nicht die Preise, sondern
+     die Guthabenarten:
+
+       mpi        Marktpreis-Indikation       (Stufe 1)
+       mpi_plus   erweiterte Indikation       (Stufe 2)
+       wev        Wertermittlung / Bericht    (Stufe 3)
+
+     Der Bestand kommt aus `GET /ai/credits` und wird dem Modell
+     MITGEGEBEN. Es rechnet ihn nicht aus und schätzt ihn nicht.
+
+     > Bei Geld wird nicht geschätzt. Lieber keine Zahl als eine
+     > erfundene — das gilt für einen Kontostand genauso wie für einen
+     > Liegenschaftszinssatz. */
+  var _stand = null;          /* letzter bekannter Guthabenstand */
+
+  var ABRUFE = [
+    { name: 'marktpreis', art: 'mpi',
+      titel: 'Marktpreis-Indikation von einem unabhängigen Bewertungspartner',
+      tun: function () {
+        /* Derselbe Weg wie der Knopf oben im Co-Pilot — kein zweiter. */
+        var b = el('dp-cp-mp');
+        if (b) { b.click(); return true; }
+        return false;
+      } },
+    { name: 'marktbericht', art: 'wev',
+      titel: 'DealPilot-Marktbericht zum Objekt',
+      tun: function () {
+        try {
+          if (window.DealPilotMB && typeof window.DealPilotMB.run === 'function') {
+            window.DealPilotMB.run(); return true;
+          }
+        } catch (e) {}
+        return false;
+      } }
+  ];
+
+  /* Der Stand wird EINMAL je Nachricht geholt und mitgegeben. Ihn bei
+     jeder Antwort erneut zu ziehen wäre ein zusätzlicher Weg für eine
+     Zahl, die sich nur beim Abruf ändert. */
+  function standHolen() {
+    return new Promise(function (fertig) {
+      try {
+        window.Auth.apiCall('/ai/credits').then(function (r) {
+          _stand = r || null; fertig(_stand);
+        }).catch(function () { fertig(_stand); });
+      } catch (e) { fertig(_stand); }
+    });
+  }
+
+  function abrufeFuerPrompt() {
+    var arten = (_stand && _stand.arten) || {};
+    return ABRUFE.map(function (a) {
+      var k = arten[a.art];
+      return { name: a.name, titel: a.titel, art: a.art,
+               rest: (k && typeof k.rest === 'number') ? k.rest : null };
+    });
+  }
+
+  var ABLOCK = /<<<ABRUF\s*([\s\S]*?)\s*ABRUF>>>/;
+
+  function abrufAusAntwort(text, addMsg) {
+    if (!text) return text;
+    var m = String(text).match(ABLOCK);
+    if (!m) return text;
+    var rest = String(text).replace(ABLOCK, '').trim();
+    var j = null;
+    try { j = JSON.parse(m[1]); } catch (e) {}
+    var a = j && ABRUFE.filter(function (x) { return x.name === j.name; })[0];
+    if (!a) return rest || text;
+
+    if (rest) addMsg('assistant', rest);
+
+    var arten = (_stand && _stand.arten) || {};
+    var frei = (arten[a.art] && typeof arten[a.art].rest === 'number') ? arten[a.art].rest : null;
+
+    if (frei === 0) {
+      addMsg('assistant', 'Dafür ist gerade kein Guthaben mehr da.');
+      return '';
+    }
+
+    var box = addMsg('assistant', '');
+    box.classList.add(MARKE + '-box');
+    box.innerHTML = '<b>' + esc(a.titel) + '</b>'
+      + '<div class="' + MARKE + '-kosten">Kostet <b>1 Abruf</b>'
+      + (frei == null ? '' : ' · danach noch <b>' + frei + '</b> frei') + '</div>'
+      + '<div class="' + MARKE + '-akt">'
+      + '<button type="button" class="' + MARKE + '-ok" data-los="1">Abrufen</button>'
+      + '<button type="button" class="' + MARKE + '-nein" data-nein="1">Doch nicht</button>'
+      + '</div>';
+
+    box.addEventListener('click', function (ev) {
+      if (ev.target.getAttribute('data-los')) {
+        var ok = false;
+        try { ok = a.tun(); } catch (e) {}
+        box.innerHTML = ok
+          ? '<b>' + esc(a.titel) + '</b> wird abgerufen …'
+          : '⚠ Der Abruf ließ sich nicht starten.';
+        if (ok) setTimeout(standHolen, 4000);
+        return;
+      }
+      if (ev.target.getAttribute('data-nein')) {
+        box.innerHTML = 'Nicht abgerufen — es wurde nichts verbraucht.';
+      }
+    });
+    return '';
+  }
+
   window.DealPilotCopilotAenderungen = {
     katalog: katalog,
     einhaengen: einhaengen,
-    ausAntwort: ausAntwort
+    ausAntwort: function (text, addMsg) {
+      /* Erst Abrufe, dann Felder — ein Satz kann beides nicht sein, und
+         so steht die Reihenfolge fest statt vom Zufall abzuhängen. */
+      var t = abrufAusAntwort(text, addMsg);
+      if (t === '') return '';
+      return ausAntwort(t, addMsg);
+    },
+    abrufe: abrufeFuerPrompt,
+    standHolen: standHolen,
+    stand: function () { return _stand; }
   };
+
+  /* Einmal beim Laden, damit die erste Frage den Stand schon kennt. */
+  setTimeout(standHolen, 1500);
 })();
