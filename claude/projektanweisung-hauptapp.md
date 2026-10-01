@@ -27488,3 +27488,228 @@ Zweiter Lauf, Satz ohne Objektbezug („Aendere die Miete auf 850"):
   Das Bau-Cockpit pollt mit EINER Instanz; bei einem Bot je Kunde wären das
   N Polling-Schleifen, und die Anleitung nennt dazu die harte Grenze
   „nur eine Instanz darf pollen".
+
+---
+
+## v1768–v1768b · Die Ernte in der Datenbank, und zwei Wächter, die grün waren
+
+### Stand nach diesem Durchgang
+
+```
+               Liegenschaftszins   Sachwertfaktor
+NW                   972                 34
+NI                    95                 35
+BB                    14                 36
+SN                    15                 16
+HE                     8                160
+BE                     7                  4   v1768  (vorher 1)
+HH                     5                  2
+MV                     4                 10   v1768  (vorher 0 / 7)
+TH                     2                 75   v1768  (vorher 1)
+ST                     1                 28
+BW / BY / RP / SH      0          13 / 2 / 1 / 6
+
+mb.param_modell: 2.573 Zeilen · 14 Länder · 8 Kennzahlen · kein Satz ohne Link
+36 Registerdateien (33 mit Werten, 3 Wegweiser)
+```
+
+**Zehn Länder führen jetzt einen Liegenschaftszinssatz.** Zu Beginn der
+vorigen Sitzung waren es sechs, davon drei mit einem einzigen Alibi-Satz.
+
+### v1768 · Was geerntet wurde
+
+| Datei | Sätze | Land | woher |
+|---|---|---|---|
+| `schwerin.json` | 7 | MV | GMB 2025, 4 Zins + 3 Sachwertfaktor |
+| `erfurt.json` | 1 | TH | MFH 2,9 %, Stichtag 01.07.2024, n=61 |
+| `lzs-be-2025.json` | 6 | BE | Amtsblatt 39/2025, je Gebietsgruppe |
+| `verfuegbarkeit-hb.json` | — | HB | Wegweiser |
+| `verfuegbarkeit-sl.json` | — | SL | Wegweiser |
+
+**Berlin ist am Anwendungsbeispiel bewiesen:** die abgedruckte
+Regressionsgleichung trifft **18 von 18** Stützstellen beider Varianten.
+
+**Schwerin hat kein Anwendungsbeispiel.** Ersatzweise vier Proben: Fallzahl
+(32+22=54, 8+13=21), Definition (BRW 610 bei „>300 €/m²"), Vervielfältiger
+(21,8 gegen abgedruckte 22), Quote (ROF/REF = 20–29 % BWK). Alle vier
+Summenzeilen der SWF-Gebäudetypen stimmen, 0 Monotonieverstöße im Gitter.
+
+**Zwei Länder bleiben zu, und der Grund ist dokumentiert:**
+
+- **Bremen:** Sachwertfaktoren gibt es **gar nicht** — der Ausschuss schreibt
+  wörtlich, er sei personell nicht dazu in der Lage (S. 130, im freien
+  Auszug). Zinssätze nur im Vollbericht für 50 €; der freie Auszug lässt
+  genau diese Seiten weg (gemessen).
+- **Saarland:** Quelle gefunden (GMB 2022 Regionalverband Saarbrücken, zwei
+  SWF-Gitter und zwei LZS-Tabellen), aber jede Wiedergabe braucht die
+  Genehmigung des Herausgebers. **Übernommen wurde nichts.**
+
+> Dabei ist eine Behauptung aus `quellen_links.js` gefallen: sie sagt seit
+> v1396, der Saarbrücker Bericht enthalte keine Sachwertfaktoren. Er enthält
+> sie. Der Beleg stammte aus einem anderen, späteren Dokument.
+
+### Drei Korrekturen in `berlin.json`, die NIE feuerten
+
+Altbezirk, Baujahresgruppe und Wohnlage trugen `art: "stufen_kategorial"` —
+eine Art, die **zwei** Größen braucht: eine Kategorie aus `kategorie_feld`
+und eine Zahl aus `feld`. Sie hatten kein `kategorie_feld`:
+
+```
+swf_modelle.js:846    if (!kat) return null;
+```
+
+Es sind reine Nachschlagetabellen Name → Zahl. Richtig ist
+`art: "kategorial"` mit `werte`. Abweichung bis **0,9 Prozentpunkte** am
+Liegenschaftszinssatz.
+
+> Eine Korrektur, die nie feuert, ist schlimmer als keine: ihr Eintrag im
+> Register behauptet, der Wert sei angepasst worden.
+
+**`tools/pruef-berlin-korrekturen.mjs`** fährt das ECHTE Modell des Satzes
+durch den ECHTEN Auswerter und enthält einen **Gegentest**, der die alte Form
+rekonstruiert:
+
+```
+Deckung: 4 Korrekturen · Modellform stufen_1d · liegenschaftszinssatz 2024
+Grundwert bei 9 EUR/m2: 0.03 dezimal = 3 % (Stuetzstelle im Bericht: 3)
+
+OK   Altbezirk Weissensee     soll   0.5  ist   0.5   [Altbezirk=0.5]
+OK   Altbezirk Wedding        soll  -0.3  ist  -0.3   [Altbezirk=-0.3]
+OK   Baujahr 1973-1990 West   soll   0.2  ist   0.2   [Baujahresgruppe=0.2]
+OK   Weissensee + einfach     soll   0.7  ist   0.7   [beide, additiv]
+OK   Altbezirk unbekannt      soll     0  ist     0   [-]
+
+-- Gegentest: die Form von vor v1768 --
+     alte Form {"altbezirk":"Weissensee"}     Wirkung 0 Pp   feuert nicht
+     alte Form {"baujahr":"1973-1990 West"}   Wirkung 0 Pp   feuert nicht
+     alte Form {"wohnlage":"einfach"}         Wirkung 0 Pp   feuert nicht
+
+11 von 11 richtig
+```
+
+> „Nachher richtig" ist kein Beweis für „vorher falsch". Wer nur den neuen
+> Stand prüft, kann eine Korrektur feiern, die nichts geändert hat.
+
+**Zwei Werkzeugfehler auf dem Weg dorthin, beide meine:**
+
+- Mein erster Prüfer baute ein eigenes `{art:'stufen'}`-Modell. Der Satz
+  heißt `form`, nicht `art`, und das Modell steht in `formel` → acht mal
+  `null`.
+- Dann fehlte die `kennzahl` im Modell. `auswerten()` prüft die Einheit
+  gegen `BAND[modell.kennzahl]` (`swf_modelle.js:1352`) und nimmt ohne sie
+  **`sachwertfaktor`** an — ein Zinssatz von 3 % fällt dann als
+  `einheit_unplausibel` durch.
+
+**Beide machten sich als BEFUND bemerkbar, nicht als Ausfall.** Aufgefallen
+nur, weil ALLE Fälle fehlschlugen. Dazu ein falsches Soll von mir:
+Gewerbeanteil 50 % ergibt **0,2** Pp, nicht 0,15 — der Bericht rundet auf
+0,1 Pp (`rundung_stellen: 1`), 3,15 → 3,2. Gemessen über die ganze Reihe.
+
+> Ein Soll-Wert, der die Rundungsregel der Quelle übergeht, macht einen
+> richtigen Rechenweg zum Fehlschlag.
+
+### v1768b · Zwölf von fünfzehn Sätzen kamen nicht an
+
+**1 · Schwerin: `ebene: "kreisfreie_stadt"` gibt es nicht.**
+`param_modell_ebene_check` erlaubt `gemeinde · kreis · bezirk · gaa · land ·
+bund`. Alle sieben Sätze wurden verworfen. Erfurt — ebenfalls kreisfreie
+Landeshauptstadt — trägt korrekt `gemeinde`.
+
+> **Ich nehme meine erste Lesart der Fehlermeldung zurück.** Sie nannte
+> „Modell verworfen: mfh", „ggg", „we_v" — ich hielt das für den falschen
+> Wert. Es war der ZWEIG, den der Einleser zur Kennzeichnung ausgibt; der
+> falsche Wert stand in `ebene` und kam in der Meldung gar nicht vor.
+
+**2 · Berlin: fünf Sätze haben sich still überschrieben.** Alle sechs trugen
+`zweig: "mfh"` und dieselbe `quelle_url` — gemessen: **ein** eindeutiger
+Schlüssel von sechs. Die Gebietsgruppe stand nur in
+`geltungsbereich.raeumlich`. Jetzt im `zweig`: `mfh_suedost`, `mfh_suedwest`,
+`mfh_nord`, `mfh_city`, `mfh_ost`, `mfh_west`.
+
+Dieselbe Falle wie Brandenburg (`v1757`), dort war es die Raumkategorie.
+
+### Der eigentliche Befund: der Einleser war grün
+
+```
+uebernommen 2566 · verworfen 7          <- aus dem Rueckgabewert
+mb.param_modell : 2561 Zeilen           <- aus der Tabelle
+                       ^^^^ Differenz 5, und niemand hat subtrahiert
+
+process.exit(r.uebernommen > 0 ? 0 : 1) <- ein Satz machte den Lauf gruen
+```
+
+> Zwei Zahlen nebeneinander zu drucken ist kein Vergleich. Erst wer sie
+> subtrahiert, hat geprüft.
+
+**Zwei Wächter nachgezogen:**
+
+| | |
+|---|---|
+| `KONFLIKTSCHLÜSSEL` | prüft **vor** dem Schreiben auf Dubletten im Schlüssel, bricht ab und nennt Datei, Gebiet und Geltungsbereich je Dublette |
+| `SOLL GEGEN IST` | eingelesen − verworfen gegen die gelesene Zeilenzahl, mit Deutung **beider** Richtungen; Abweichung = Exit-Code 1 |
+
+Die Dublettenprüfung sitzt **vor** dem Trockenlauf-Ausstieg — sonst prüft
+`--trocken` genau die Prüfung nicht, für die er da ist.
+
+### Und der neue Wächter fand gleich beim ersten Lauf etwas
+
+```
+uebernommen 2573 · verworfen 0
+ABWEICHUNG : 2573 haetten ankommen muessen, in der Tabelle stehen 2574.
+```
+
+Eine **Karteileiche** aus dem 20:02-Lauf, und die gefährlichste Sorte:
+
+```
+id    zweig         erfasst    raeumlich               stufen
+31808 mfh           20:02:50   Gebietsgruppe West      {"4":2.8,"6":3.1,...}
+34386 mfh_west      20:09:55   Gebietsgruppe West      {"4":2.8,"6":3.1,...}
+```
+
+`id=31808` trägt `zweig: "mfh"` — gilt also scheinbar für **ganz Berlin** —,
+enthält aber die Werte der Gebietsgruppe **West**, identisch mit `mfh_west`.
+Sie ist der Rest des Zusammenfalls. Wer nach `BE/liegenschaftszinssatz/mfh`
+gefragt hätte, hätte die West-Zahlen für ganz Berlin bekommen.
+
+Gelöscht, nachdem Inhalt und Herkunft gegen `mfh_west` gehalten wurden —
+kein Verlust. Sicherung vorher:
+`/root/backups/mb-vor-v1768-20261001-2001.sql.gz`, 1,9 MB, angesehen.
+
+**Der Lauf danach:**
+
+```
+KONFLIKTSCHLUESSEL  2573 eindeutige Schluessel aus 2573 Saetzen
+SCHREIBEN           uebernommen 2573 · verworfen 0
+GEGENPROBE          2573 Zeilen · 14 Laender · 8 Kennzahlen
+                    ohne Link 0 · ohne Vermerk 30 · ohne Lizenz 19
+
+SOLL = IST : 2573 Saetze eingeliefert, 2573 in der Tabelle.   RC=0
+```
+
+### `CLAUDE.md` korrigiert
+
+Dort stand `modellansaetze.gnd`. Das Feld heißt in **19 von 22**
+Registerdateien `gnd_jahre`, und `gutachterausschuss.js:662` liest **alle
+drei** Namen:
+
+```
+gnd_jahre  >  gesamtnutzungsdauer_jahre  >  gnd
+```
+
+Wer nach `gnd` greppt, findet drei Dateien und hält die anderen neunzehn für
+lückenhaft. Dazu notiert: `modell_gnd_jahre` wird **nur im Sachwert-Zweig**
+gelesen (`CrossCheckService.js:372`) — die GND gehört an den Sachwertfaktor,
+nicht an den Zinssatz. Die neuen Sätze tragen sie genau dort.
+
+### Rest
+
+- **Rostock (MV)** ist der nächstgrößte Gewinn: Werte vorhanden und
+  maschinenlesbar (Kap. 4.2 S. 55, Kap. 4.4 S. 60), aber
+  genehmigungspflichtig. **Hängt nur an einer Mail.**
+- **Thüringen bleibt bei zwei Zinssätzen:** `tlbg.thueringen.de` ist
+  maschinell gesperrt (Link11-CAPTCHA, antwortet mit HTTP 200 und
+  `text/html` statt PDF, auch mit vollen Browser-Kopfzeilen). Der Umweg über
+  die DNB-Pflichtabgabe führt nur zu Erfurt-Dokumenten; die anderen acht
+  Ausschüsse bleiben zu.
+- **Belegexemplar an Schwerin** ist eine Lizenzbedingung und offen.
+- 30 Sätze ohne Quellenvermerk, 19 ohne Lizenz — unverändert.

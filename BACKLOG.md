@@ -196,6 +196,22 @@ Anleitung. Das gehört beim Angehen gemessen, nicht übernommen.
 
 ## → ERNTE: Stand und nächste Schritte (01.10.2026)
 
+> **Stand nach v1768b, in der Datenbank nachgemessen:** 2.573 Zeilen,
+> 14 Länder, 8 Kennzahlen, kein Satz ohne Link. **Zehn Länder führen einen
+> Liegenschaftszinssatz** (Beginn der vorigen Sitzung: sechs, drei davon
+> mit einem Alibi-Satz). Neu in v1768: MV 4 Zins / 10 SWF, TH 2 Zins,
+> BE 7 Zins.
+>
+> **Bremen und Saarland sind nachweislich zu, nicht unbearbeitet.**
+> Bremen führt gar keine Sachwertfaktoren (der Ausschuss schreibt, er sei
+> personell nicht dazu in der Lage) und seine Zinssätze stehen nur im
+> 50-€-Vollbericht. Für das Saarland ist die Quelle gefunden, aber jede
+> Wiedergabe braucht die Genehmigung des Herausgebers.
+>
+> **Der nächstgrößte Gewinn ist Rostock:** Werte vorhanden und
+> maschinenlesbar, nur genehmigungspflichtig — das hängt an einer Mail,
+> nicht an Arbeit.
+
 ### E1 · Das Register ist eingespielt — ERLEDIGT (v1751, v1751b)
 
 ```
