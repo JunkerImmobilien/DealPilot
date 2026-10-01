@@ -36,6 +36,111 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → ERNTE: Stand und nächste Schritte (01.10.2026)
+
+### E1 · Das Register ist eingespielt — ERLEDIGT (v1751, v1751b)
+
+```
+               Zeilen   Länder   Kennzahlen
+vorher            493        1            1
+nachher         2.505       14            8
+```
+
+Ursache war `tools/register-saat.mjs` Zeile 17: eine hartverdrahtete Datei.
+2.515 geerntete Sätze lagen im Repo, 493 in der Datenbank.
+
+**Zehn Sätze bleiben draußen und das bleibt so:** Sachwertfaktoren aus
+Bochum (05911000), Dortmund (05913000), Essen (05112000) und
+Siegen-Wittgenstein (05962) haben keine `quelle_url` — und **kein einziger**
+Satz dieser vier Ausschüsse hat eine. Eine Herkunft wird nicht erfunden.
+
+**Noch nachzutragen:** 23 Sätze ohne Quellenvermerk, 11 ohne Lizenz.
+
+### E2 · `modellansaetze` ist nur zu 58,8 % gefüllt — OFFEN, wichtig
+
+Gemessen über alle 2.515 Sätze des Dateiregisters:
+
+```
+Pflichtfelder (land_code, ags, ebene, gebiet_name, kennzahl,
+  zweig, formel, belege, stufe, berichtsjahr, modellversion)   100 %
+geltungsbereich                                               94,4 %
+modellansaetze                                                58,8 %   ←
+fallzahl                                                      55,7 %
+korrekturen                                                    1,8 %   (nur wo nötig)
+```
+
+> **Das ist die Stelle, an der still falsch gerechnet wird.** Führt ein
+> Ausschuss eine abweichende Gesamtnutzungsdauer oder einen eigenen
+> Baupreisindex und steht die Zahl nur im Fließtext statt in
+> `modellansaetze`, rechnet das System mit der Konstanten — und nichts
+> widerspricht. Derselbe Befund wie bei Oberursel (GND 70) am 14.09.2026.
+
+### E3 · Wo weiter geerntet werden kann — die Landkarte
+
+Aus `connectors/opendata/laender-registry.js` gelesen:
+
+| Status | Länder |
+|---|---|
+| **produktiv** | NRW |
+| **adresse-bekannt** (Quelle da, nicht geerntet) | NI · BE · BB · MV · SN · ST · HE · RP · SH · HH |
+| **gesperrt** | BW · TH |
+| **nur Landesebene** | BY |
+| **Lücke** (keine Quelle gefunden) | **HB · SL** |
+
+### E4 · Rheinland-Pfalz geprüft — Daten nicht frei verfügbar
+
+Erster echter Ernteversuch am 01.10.2026, Befund:
+
+```
+LGMB-2025_Online_1_3.pdf     106 Seiten, 219.387 Zeichen, 0 leer
+  „Sachwertfaktor"           nur S. 9 und 83 — Inhaltsverzeichnis, ESG-Text
+  „Liegenschaftszins"        nur S. 9 und 93 — Rechtsgrundlage
+  Der Dateiname sagt es: Online_1_3 = Kapitel 1 bis 3.
+  Kapitel 4 trägt die Wertermittlungsdaten und ist NICHT frei.
+
+Zwischenauswertung_Beschluss_SWF_LZ_LGMB2025_bf.pdf   8 S., 12.453 Z.
+  Enthält Zu-/Abschläge auf die LGMB-2025-Werte, KEINE Absolutwerte.
+  Stichtag 01.01.2025, 6 Marktsegmente, 352 Kauffälle.
+  Aussage des Ausschusses: „keine bzw. nur gering signifikante
+  Differenzen" — die Werte von 2024 gelten weiter.
+```
+
+**Daraus folgt für RP:** ohne das kostenpflichtige Kapitel 4 kein Wert. Das
+ist genau der Fall, für den die Doktrin den Weg vorsieht — der Kunde bekommt
+den zuständigen Ausschuss und den Link, mit dem Hinweis auf die Kosten.
+Der Status im Register gehört von `adresse-bekannt` auf
+`daten-kostenpflichtig` präzisiert.
+
+### E5 · Es wird nichts automatisch geerntet — OFFEN
+
+```
+mb.etl_runs      0 Einträge
+mb.param_lauf    5 Läufe (2x NRW-Saat 12.08., 1x imbde 03.08., 2x v1751)
+crontab          kein Eintrag
+systemd-Timer    keiner
+```
+
+Eine jährliche Nachernte braucht einen Plan, sonst fängt sie jedes Mal bei
+der Recherche an. **Das Werkzeug dafür steht jetzt:**
+`tools/pdf-lies.mjs` liest PDF-Text mit pdf.js und nennt seine Deckung
+(Seiten, Zeichen, leere Seiten) — ein Latin-1-Prüfer scheitert an
+komprimierten CID-Strömen und liefert Buchstabensalat.
+
+### E6 · Nächste Kandidaten
+
+Nach Aufwand sortiert — überall erst die Quelle prüfen, dann bauen:
+
+1. **Schleswig-Holstein** — direktes Landes-PDF
+   (`gaZgMarktbericht_SH_2024.pdf`), heute 6 Sachwertfaktoren
+2. **Hamburg** — Transparenzportal mit offenem Datensatz-Katalog, heute 1
+3. **Brandenburg** — je Kreis ein PDF nach festem Muster `GMB_{KRZ}.pdf`,
+   heute 36 SWF und 0 LZS
+4. **Sachsen** — BORIS-Portal, heute 7
+5. **Niedersachsen** — Tableau-Dashboards; der Zugriff ist bekannt schwierig
+   (siehe `ni-lage-parameter`: Parameter nur per Index, nicht per URL)
+
+---
+
 ## → OFFEN aus dem 01.10.2026, nachmittags (Setup-Fenster und die Piloten)
 
 Marcels Durchlauf durch die Erstanmeldung. **Reihenfolge wie genannt.**
