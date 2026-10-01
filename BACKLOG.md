@@ -36,6 +36,164 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → NEU: Telegram-Bot als zweiter Zugang zur App (01.10.2026)
+
+Marcel am 01.10.2026: „Ich würde im ersten Step gerne schauen, ob wir
+vielleicht auch so einen Telegram-Bot einrichten können oder ob ein User den
+selbst einrichten kann, also dass man das in den Einstellungen irgendwo
+ergänzt und dann hat der Zugriff auf alle Objekte … und er kann auch neue
+Objekte anlegen und wir bilden quasi über diesen Telegram-Bot dieses geführte
+Anlegen durch."
+
+**Zwei Dateien liegen dazu im Repo** (beide gesichtet am 01.10.2026):
+
+| Datei | was drin steht |
+|---|---|
+| `Dateien/Anleitung Google Drive und Telegram-Bot an eine eigene Node.js-App anbinden.docx` | 131 Absätze, OAuth-Weg, Long-Polling, Code-Gerüste, 9 benannte Stolperstellen |
+| `Dateien/bau-cockpit-2.2.1-komplett.zip` | 70 Einträge, Marcels laufendes Programm — die Vorlage |
+
+**Google Drive ist ein EIGENES Thema und steht hier nicht drin.** Marcel:
+„Danach gehen wir vielleicht mal das Google-Drive-Thema an. Das wäre aber ein
+extra Thema." Siehe Punkt G1 unten.
+
+### Was im Bau-Cockpit schon gebaut ist — gemessen, nicht vermutet
+
+`bau-cockpit/lib/telegram.js`, 315 Zeilen, CommonJS, **kein npm-Paket für
+Telegram** — nackter `fetch` gegen `api.telegram.org/bot<TOKEN>/…`.
+
+```
+Factory   module.exports = function ({ store, ai, copilot, saveUpload,
+                                       readFile, mail, findUpload, drive })
+Polling   loop() Z.300-310, getUpdates timeout:50, offset in der DB
+          (store.update('settings','main',{telegram:{offset}}))
+Start     start() Z.313 -> getMe; gerufen in server.js:377
+Zugang    TELEGRAM_ALLOWED (IDs ODER @Namen), isAllowed Z.17;
+          leere Liste = niemand darf; Unbekannte bekommen ihre ID zurueck
+Dialog    const convs = new Map() Z.26, chat-ID -> {hist,photos,docs,plan,...}
+          conv(chat) Z.27 mit 2-Stunden-Verfall; /neu loescht ihn
+Agent     agent(chat,input) Z.58: letzte 12 Verlaufseintraege + ctx() + bis
+          zu 3 Bilder -> ai.run({json:true,smart:true})
+Prompt    SYS Z.41-57 erzwingt {antwort, rueckfrage, frage, aktionen[]}
+          mit Whitelist TYP Z.29 (14 Aktionstypen)
+Rueckfr.  rueckfrage:true -> nur Frage zurueck (Z.74), sonst Ankreuz-
+          knoepfe planKb() Z.83 und Ausfuehrung erst nach "go" -> execute()
+Eingang   Fotos (groesste Aufloesung), Fotoalben ueber media_group_id mit
+          2500-ms-Sammeltimer Z.267-272, Sprache -> whisper-1 language=de
+          Z.274-283, PDF ueber pdf-parse Z.286
+```
+
+**Das ist genau Marcels Ablauf.** „Rueckfrage oder Aktionsliste mit
+Bestätigung" ist dasselbe Muster, das der DealPilot-Co-Pilot seit `v1764`
+fährt — Modell schlägt vor, Nutzer bestätigt, nichts passiert vorher.
+
+### T-B1 · Entscheidung zuerst: EIN Bot oder ein Bot JE Kunde
+
+**Das ist keine Programmierfrage, sondern eine Produktentscheidung** —
+Demo-first oder nachfragen. Beide Wege sind gebaut machbar, sie kosten
+Verschiedenes:
+
+| | ein DealPilot-Bot für alle | jeder Kunde legt seinen eigenen an |
+|---|---|---|
+| Kunde muss tun | `/start`, Code aus den Einstellungen schicken | bei @BotFather einen Bot anlegen, Token in die Einstellungen kopieren |
+| Token liegt | bei uns, einmal | beim Kunden, in unserer DB |
+| Polling | **eine** Instanz für alle, ein `getUpdates`-Strom | **eine Instanz JE Kunde** — 50 Kunden = 50 Polling-Schleifen |
+| Marke | „DealPilot" im Chat | der Kunde kann ihn nennen wie er will (Whitelabel!) |
+| Risiko | ein Bot-Token für alle Kunden | ein fremder Token in unserer DB ist ein Passwort (verschlüsselt ablegen) |
+
+**Die Anleitung nennt dazu eine harte Grenze:** *„nur eine Instanz darf
+pollen"* — sonst `Conflict: terminated by other getUpdates`. Bei einem Bot je
+Kunde heißt das: Webhook statt Polling, oder ein Prozess, der N Schleifen
+hält. Der Bau-Cockpit-Weg (Polling, ein Prozess) skaliert für Marcel allein,
+nicht für 50 Mandanten.
+
+> Eine Architektur, die bei einem Nutzer läuft und bei fünfzig kippt, ist
+> keine Architektur, sondern ein Prototyp mit Glück.
+
+**Vorschlag (noch nicht entschieden):** EIN DealPilot-Bot, Webhook statt
+Polling, Verknüpfung über einen Einmal-Code aus den Einstellungen. Whitelabel
+bekommt später einen eigenen Bot je Mandant, nicht je Nutzer.
+
+### T-B2 · Die Kennung ist das Nadelöhr — ZUERST messen
+
+`users.id` ist eine **UUID**. `mb.market_reports.user_id` und
+`object_snapshots.user_id` sind dagegen **INTEGER** — daran scheitern die
+nutzerbezogenen Marktbericht-Wege seit `v942` still.
+
+Ein Telegram-Chat trägt eine **Zahl** (`chat.id`). Die Verknüpfung
+`telegram_chat_id ↔ users.id` braucht also eine eigene Tabelle, und der
+`chat.id` darf **nie** als `user_id` durchgehen.
+
+> Eine Kennung, die irgendwo zur Zahl wird, ist an dieser Stelle verloren.
+> Das hat uns schon einmal einen ganzen Strang gekostet.
+
+### T-B3 · Der Bot braucht keine zweite Rechenlogik
+
+**Alles, was der Bot können soll, gibt es als Endpunkt** — gemessen am
+laufenden System:
+
+| Marcels Wunsch | was es schon gibt |
+|---|---|
+| „man kann ihn zum Portfolio was fragen" | `POST /ai/copilot` mit `kontextArt: 'portfolio'` |
+| „man kann auch Felder ändern" | derselbe Endpunkt, `felder`-Katalog im Auftrag → `<<<FELDER …>>>` (v1764/v1767) |
+| „steht jetzt auf 12 Euro, du musst auf 13 ändern" | genau die Konflikt-Rückfrage aus `copilot-aenderungen.js` (`anwenden()`) |
+| „frei reinsprechen" | `POST /ai/transcribe-chunk` → `gpt-4o-transcribe` |
+| „guckt, was noch übrig bleibt" | `POST /ai/extract-text` `{text, catalog}` → `{fields}` |
+| „geführtes Anlegen" | der Sprechlauf in `voice-import.js` führt die Fragenkette schon |
+
+**Der Bot ist damit eine ANSICHT, kein zweites Programm.** Was er braucht:
+einen Zustand je Chat (wie `convs` im Bau-Cockpit), eine Zuordnung Chat ↔
+Nutzer, und einen Weg, die Antwortblöcke (`<<<FELDER>>>`, `<<<ABRUF>>>`) in
+Telegram-Knöpfe zu übersetzen statt in HTML.
+
+> Eine zweite Rechenlogik für denselben Zweck ist der Fehler, den
+> `CLAUDE.md` unter „Rechenkerne — nie duplizieren" verbietet. Der Bot darf
+> `DealKpis.compute()` nicht nachbauen, auch nicht „nur für die Antwort".
+
+### T-B4 · Was der Bot NICHT darf
+
+- **Kostenpflichtige Abrufe ohne Bestätigung** — dieselbe Regel wie in der
+  App (`v1766`): Kosten und Restkontingent nennen, dann fragen.
+- **Dateien ungeprüft annehmen.** Das Bau-Cockpit bricht bei **48 MB** ab
+  (`fetchFile` in `lib/drive.js` Z.93); DealPilot hat `MAX_UPLOAD_MB`.
+- **Antworten über 4096 Zeichen** — Telegram-Grenze, laut Anleitung.
+- **`callback_data` über 64 Byte** — das Bau-Cockpit löst es über eine
+  flüchtige `fileMap` mit 500 Einträgen (`short(id)` Z.162) und meldet
+  „Liste abgelaufen" (Z.111). Eine UUID passt rein, zwei nicht.
+- **In Gruppen auf alles antworten.** Das Bau-Cockpit reagiert dort nur auf
+  Befehl, Mention oder Reply (Z.242-246).
+
+### T-B5 · Reihenfolge des Baus
+
+1. **T-B1 entscheiden** (ein Bot oder einer je Kunde) — ohne das ist alles
+   andere Spekulation.
+2. Tabelle `telegram_links` (chat_id BIGINT, user_id UUID, code, bestätigt_am)
+   plus Einstellungs-Reiter mit Einmal-Code. **Migration = Rebuild.**
+3. Webhook-Endpunkt (oder Polling-Prozess), Signaturprüfung, Allowlist.
+4. Fragen zum Portfolio — der kürzeste Weg zum Beweis, dass die Kette steht.
+5. Felder ändern mit Konflikt-Rückfrage als Telegram-Knöpfe.
+6. Geführtes Anlegen: erst frei sprechen, dann die Lücken abfragen.
+7. Abrufe mit Kostenansage.
+
+### G1 · Google Drive — eigenes Thema, noch nicht angefasst
+
+Marcel ausdrücklich: *„Das wäre aber ein extra Thema."* Was die Anleitung und
+`bau-cockpit/lib/drive.js` (101 Zeilen) dazu hergeben, steht fest:
+
+- OAuth 2.0, Client-Typ **Desktop-App**, Einmal-Anmeldung über
+  `http://127.0.0.1:53682/callback`, Scope `…/auth/drive`,
+  `access_type=offline` **und** `prompt=consent` — ohne beides kommt **kein**
+  Refresh-Token.
+- Das Bau-Cockpit führt **mehrere Konten**: Token je Konto in
+  `data/google-accounts/<email>.json`, aktives Konto in `data/google-active.json`.
+- `supportsAllDrives=true` bei jedem Aufruf, sonst fehlen geteilte Ablagen.
+- **`invalid_grant` nach 7 Tagen**, solange die App im Testmodus steht.
+
+**Für DealPilot ist das ein Server-Betrieb**, also Client-Typ
+„Webanwendung" mit `GOOGLE_REDIRECT_URI` — nicht der Desktop-Weg der
+Anleitung. Das gehört beim Angehen gemessen, nicht übernommen.
+
+---
+
 ## → ERNTE: Stand und nächste Schritte (01.10.2026)
 
 ### E1 · Das Register ist eingespielt — ERLEDIGT (v1751, v1751b)
@@ -267,7 +425,20 @@ und die „Geführte Eingabe" (v1746). Ein zweiter Weg daneben läuft auseinande
 sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
 `layout-varianten.js`.
 
-### V2 · Objekt benennen und Felder ergänzen — ERLEDIGT (v1762, Zuordnung über die Seitenliste)
+### V2 · Objekt benennen und Felder ergänzen — ERLEDIGT (v1767b)
+
+> **Hier stand „ERLEDIGT (v1762, Zuordnung über die Seitenliste)". Das war
+> nur halb richtig** und ist am 01.10.2026 ausdrücklich zurückgenommen:
+> v1762 hing die Zuordnung an einem Muster (`istAenderungsansage`), das
+> eine ZAHL im Satz verlangte — Marcels „Zustand auf stark
+> renovierungsbedürftig" fiel durch. Das Muster ist mit `v1767` weg;
+> die Zuordnung sitzt jetzt in `objektZuordnen()` und läuft erst, wenn
+> das Modell wirklich eine Änderung vorgeschlagen hat.
+>
+> **Gemessen mit `tools/pruef-objektzuordnung.mjs`:** 21 von 21 Fällen
+> richtig, Deckung 9 von 9 Objekten. Marcels Satz trifft die
+> Musterstraße 12 mit 5:1 statt mit 2:2 — der frühere Gleichstand hätte
+> am falschen Objekt geändert.
 
 „Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
 Sprache, dann Felder füllen.
@@ -294,7 +465,7 @@ buildFullCatalog()            liest aus window.FIELDS           → V7
 gegen ein belegtes Feld (sagt er, was drinsteht?), gegen ein leeres, und
 einer mit Blick auf die Kostenansage.
 
-### V3 · Belegte Felder nicht still überschreiben
+### V3 · Belegte Felder nicht still überschreiben — ERLEDIGT (v1764, v1767b)
 
 Marcel: „Wenn die Felder bereits gefüllt sind, gibt er an, was drin steht, und
 ich muss bestätigen, ob übersprungen wird."
@@ -302,15 +473,28 @@ ich muss bestätigen, ob übersprungen wird."
 > Das ist dieselbe Regel wie „eine generierte Tabelle darf nie einen
 > Handeintrag überschreiben". Hier gilt sie für jedes einzelne Feld.
 
-### V4 · Marktbericht und Wertermittlung per Sprache auslösen
+### V4 · Marktbericht und Wertermittlung per Sprache auslösen — ERLEDIGT (v1766)
 
 Auch **für alle Objekte** auf einmal.
 
-### V5 · Kosten und Restkontingent ansagen
+### V5 · Kosten und Restkontingent ansagen — ERLEDIGT (v1766)
 
 Marcel: „Er sagt dann, was es kostet und wie viel Kontingent wir noch haben."
 **Geld → nie raten.** Die Zahlen kommen aus dem Plan und dem Kerosin-Stand,
 nicht aus einer Konstanten im Sprechmodul.
+
+**Befund (01.10.2026, am laufenden Konto gemessen):** `cost` ist in
+`ai_credits_log` **immer 1** (`aiCreditsService.js:363`). Verschieden sind
+nicht die Preise, sondern die **Guthabenarten** — `mpi` (Stufe 1),
+`mpi_plus` (Stufe 2), `wev` (Wertermittlung/Bericht). Am Testkonto über
+`GET /ai/credits`: mpi 36 frei, mpi_plus 9, wev 10.
+
+Der Stand reist **mit dem Auftrag** ans Modell (`body.abrufe`), es rechnet
+ihn nicht aus. Bei Guthaben 0 hängt es keinen Block an. Die Rückfrage nennt
+„Kostet 1 Abruf · danach noch N frei" und bietet *Abrufen* / *Doch nicht*.
+
+> Bei Geld wird nicht geschätzt. Lieber keine Zahl als eine erfundene — das
+> gilt für einen Kontostand genauso wie für einen Liegenschaftszinssatz.
 
 ### V6 · Beide Piloten holen die Berichte und gleichen ab
 

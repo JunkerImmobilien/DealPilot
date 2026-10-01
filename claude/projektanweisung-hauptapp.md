@@ -27262,3 +27262,229 @@ Kein `SpeechRecognition` im Code — derselbe Weg, den der Sprechlauf nutzt.
 - **Bremen und Saarland** haben keine auffindbare Quelle.
 - **Chemnitz 65 €, Landkreis Zwickau 140 €** — die freie Zwickauer Fassung ist
   nachweislich um die Wertetabellen gekürzt (Druckseiten 111–113, 117–143).
+
+---
+
+## v1766–v1767b · Ein Weg statt zwei, und das richtige Objekt
+
+### v1766 · Abrufe auslösen, mit Kostenansage (Backlog V4/V5)
+
+**Gemessen, nicht geraten:** jeder Abruf kostet **genau 1** — `cost` ist in
+`ai_credits_log` immer 1 (`aiCreditsService.js:363`). Verschieden sind nicht
+die Preise, sondern die Guthabenarten.
+
+```
+GET /ai/credits am laufenden Testkonto:
+  mpi        36 frei     Marktpreis-Indikation (Stufe 1)
+  mpi_plus    9 frei     erweiterte Indikation (Stufe 2)
+  wev        10 frei     Wertermittlung / Bericht (Stufe 3)
+```
+
+Der Stand reist **mit dem Auftrag** ans Modell (`body.abrufe`); es rechnet ihn
+nicht aus und schätzt ihn nicht. Bei Guthaben 0 hängt es keinen Block an.
+
+> Bei Geld wird nicht geschätzt. Lieber keine Zahl als eine erfundene — das
+> gilt für einen Kontostand genauso wie für einen Liegenschaftszinssatz.
+
+### Marcels Prüflauf am 01.10.2026 — drei Sätze, drei Fehlschläge
+
+Er hat es im Portfolio-Piloten durchgespielt und mir das Protokoll geschickt:
+
+```
+„Kannst du in der Musterstrasse den Innenausbau auf ueber 20 Jahren setzen?"
+  -> „Die Informationen zum Innenausbau und zur Anpassung der Tilgung oder
+      Zinsbindung fehlen."
+
+„Ja, in der Musterstrasse 12 in Leipzig den Innenausbau auf ueber 20 Jahre."
+  -> dieselbe Antwort nochmal
+
+„Dann aender bei der Musterstrasse 12 mal die Zimmeranzahl auf fuenf."
+  -> „Ich wuerde die Zimmeranzahl ... aendern."
+  -> „Die genannten Angaben passen zu keinem Feld, das ich kenne
+      (feld_id, anderes_feld)."
+```
+
+**Reproduziert am laufenden System**, mit genau diesem Satz und dem echten
+Feldkatalog (192 Felder, `zimmer` und `mod_innenausbau` beide drin):
+
+```
+Modell: gpt-4o-mini   (COPILOT_MODEL in der .env, nicht gpt-5.6-luna)
+Antwort: <<<FELDER {"feld_id":"zimmer","anderes_feld":"5"} FELDER>>>
+```
+
+**Das Modell hat die PLATZHALTER meines Formatbeispiels für feste Schlüssel
+gehalten.** Dort stand `{"feld_id":"wert","anderes_feld":"wert"}` — für ein
+kleines Modell ist das eine Schablone mit zwei benannten Spalten, kein Muster.
+Es hat Feld-Id und Wert brav in die beiden Spalten einsortiert.
+
+> Ein Platzhalter in einem Beispiel ist eine Einladung, ihn abzuschreiben.
+> Steht dort eine ECHTE Feld-Id, kann das Abschreiben nicht mehr schiefgehen.
+
+### v1767 · Vier Korrekturen
+
+**1 · Das Beispiel kommt jetzt aus dem Katalog.** `_bspBlock` in
+`openaiService.js` nimmt das erste Text- und das erste Auswahlfeld des
+mitgeschickten Katalogs. Dazu eine Zeile, die es ausspricht: der SCHLÜSSEL ist
+die Feld-Id, es gibt keinen Schlüssel `feld_id`.
+
+**2 · Ein Heiler an der Gegenstelle.** `heileSchablone()` wandelt die Paarform
+in `{id: wert}` — und beweist sie daran, dass der genannte Wert eine Feld-Id
+**ist, die es gibt**, nicht am Schlüsselnamen.
+
+> Wo ein Modell die Form bestimmt, gehört ein Heiler an die Gegenstelle. Sonst
+> hängt eine Funktion daran, dass ein Satz gut formuliert war.
+
+**3 · ICH NEHME EINE AUSSAGE AUS DIESEM JOURNAL ZURÜCK.** Zu `v1764` steht
+oben: *„Das Abfangen des Senden-Klicks ist ersatzlos weg."* **Das war falsch.**
+`istAenderungsansage()` hing weiter am Klick und am Enter — beim Co-Pilot
+**und** beim Portfolio-Piloten. Wen es traf, der landete in
+`/ai/extract-text` statt beim Modell.
+
+Ich hatte den Satz dazu im selben Eintrag selbst aufgeschrieben:
+
+> Zwei Instanzen, die dieselbe Frage beantworten, sind eine mehr als nötig.
+> Die schwächere gewinnt immer dann, wenn sie zuerst dran ist.
+
+**Entfernt:** `ANSAGE` (ein Regex über 14 Verbformen), `istAenderungsansage()`,
+`hinweisWennKnapp()` und beide Abfangketten. Von den Einhängepunkten bleibt
+das Mikrofon. 283 Zeilen weg, 205 dazu.
+
+**4 · Der Katalog geht im Portfolio IMMER mit.** Bis v1766 stand dort „nur,
+wenn ein Objekt offen ist" — mit der Begründung, es gäbe sonst kein Ziel.
+`window.FIELDS` ist aber **statisch**: die Feld-Ids sind bei jedem Objekt
+dieselben, verschieden sind nur die Werte.
+
+> Eine Bedingung, die eine Fähigkeit abschaltet, muss ihren Grund messen.
+> „Es gäbe kein Ziel" war eine Annahme — und sie hat den Portfolio-Piloten im
+> häufigsten Fall stumm gemacht.
+
+**Nachgemessen, dieselben drei Sätze:**
+
+```
+„Kannst du in der Musterstrasse den Innenausbau auf ueber 20 Jahren setzen?"
+  -> <<<FELDER {"mod_innenausbau":"> 20 Jahre"} FELDER>>>   woertlich die Option
+
+„Dann aender ... die Zimmeranzahl auf fuenf."
+  -> <<<FELDER {"zimmer":"5"} FELDER>>>
+
+„Wie sieht es mit der Mietentwicklung aus?"
+  -> kein Block. Bleibt eine Frage.
+```
+
+### v1767b · Der Nachlauf fand vier weitere Fehler
+
+Die Kette stand damit noch nicht. Gemessen gegen **17 echte Objekte**:
+
+**1 · Der Export-Wrapper hat den dritten Parameter verschluckt.** Dort stand
+`ausAntwort: function (text, addMsg)` — zwei Parameter. Der `nutzerText`, den
+beide Piloten übergeben, kam nie an; `objektZuordnen()` lief in **keinem**
+Fall.
+
+> Eine Weiterleitung, die einen Parameter nicht kennt, wirft ihn weg, ohne
+> sich zu beschweren. Der Aufrufer sieht nichts, der Empfänger auch nicht —
+> nur die Funktion fehlt.
+
+**Das korrigiert meine erste Diagnose:** ich hatte den ausbleibenden
+Objektwechsel dem Gleichstand zugeschrieben. Der Gleichstand war echt, aber
+nicht die Ursache — diese Zeile war es.
+
+**2 · `indexOf` findet Teilwörter.** „str" steckt in „Musterstraße":
+
+```
+Satz: „Kannst du in der Musterstrasse 12 in Leipzig den Innenausbau ..."
+
+  2026-999  · Musterstrasse 12 Leipzig    2 Punkte  (musterstrasse, leipzig)
+  2026-1052 · Gohliser Str. 42 Leipzig    2 Punkte  (str, leipzig)
+                                          ^^^ Gleichstand
+```
+
+Die Gohliser Straße bekam einen Punkt für ein Wort, das im Satz nicht
+vorkommt. Jetzt zählt nur die **Wortgrenze**, beidseitig normalisiert
+(`ß`→`ss`, `straße`/`strasse`/`str.`→`str`), damit „Parkstr. 9" und
+„Parkstraße 9" dasselbe sind.
+
+**3 · `length > 2` warf die HAUSNUMMER weg** — „12", „9", „42". Genau die
+Zahl, die zwei Objekte in derselben Stadt trennt, war die einzige, die nicht
+zählte. Zahlen zählen jetzt ab einer Stelle und mit drei Punkten;
+Straßenwörter (`str`, `weg`, `platz`, `allee`, …) zählen **gar nicht** — sie
+heben niemanden heraus, erzeugen aber Gleichstände.
+
+> Ein Vergleich, der ein gemeinsames Wort wie ein Merkmal zählt, findet
+> Ähnlichkeit, wo keine ist.
+
+**4 · „Im Zweifel weitermachen" war eine Wette auf Kosten des Nutzers.** Mein
+erster Entwurf gab bei allem außer `art:'eins'` ein `fertig(true)` — also
+Änderung am geladenen Objekt, ohne einen Hinweis darauf. Bei Marcels Satz hätte
+das die Bismarckstraße getroffen.
+
+> Eine Änderung am falschen Objekt ist schlimmer als keine. Sie sieht aus wie
+> Erfolg. Und ein Gleichstand ist keine Entscheidung — er sieht nur so aus,
+> wenn man den ersten nimmt.
+
+Jetzt wird bei Gleichstand **und** bei „kein Objekt genannt" gefragt, mit
+Knöpfen; das offene Objekt steht vorn mit „(offen)", und ohne Auswahl passiert
+nichts.
+
+### Der Prüfer: `tools/pruef-objektzuordnung.mjs`
+
+**Er lädt die ECHTE Datei**, nicht eine Kopie der Funktionen — mit einem
+DOM-Stub, der nur das kann, was die Zuordnung braucht. Und er **nennt seine
+Deckung**, bevor er urteilt.
+
+```
+Deckung: 9 von 9 Objekten gelesen
+
+OK  eins  key-0  [key-0:5 key-5:1]  Kannst du in der Musterstrasse 12 ...
+OK  eins  key-5  [key-5:4]          Bei der Gohliser Str. 42 ist die Miete ...
+OK  eins  key-3  [key-3:1]          Objekt 2026-1054, Miete 980
+OK  mehr  -      [key-0:1 key-5:1]  Wie sieht die Mietentwicklung in Leipzig?
+OK  keins -      []                 Aendere die Miete auf 850
+
+-- heileSchablone --
+OK  {"feld_id":"zimmer","anderes_feld":"5"}  -> {"zimmer":"5"}
+OK  {"id":"nkm","value":"850"}               -> {"nkm":"850"}
+OK  {"feld_id":"gibtsnicht","wert":"5"}      -> unveraendert (kein solches Feld)
+
+21 von 21 richtig   RC=0
+```
+
+Marcels Satz trifft jetzt **5:1** statt 2:2.
+
+> Ein Prüfer, der die Logik nachbaut, misst sich selbst. Und einer, der seine
+> Deckung nicht nennt, kann grün werden, während er nichts gelesen hat.
+
+### Kettenprüfung am laufenden System
+
+```
+vorher geladen: 2026-1054 Bismarckstr. 27 Detmold
+Satz:           „Kannst du in der Musterstrasse 12 in Leipzig den
+                 Innenausbau auf ueber 20 Jahren setzen?"
+
+  objektFinden      -> eins · 2026-999 Musterstrasse 12 Leipzig
+  Chat              -> „Objekt: 2026-999 · Musterstrasse 12 Leipzig"
+  _currentObjKey    -> c650a214  (gewechselt)
+  Rueckfrage        -> „Das trage ich ein: Innenausbau
+                        (Decken, Fussboeden): > 20 Jahre"
+                       [Uebernehmen] [Verwerfen]
+  mod_innenausbau   -> LEER                      nichts ohne Bestaetigung
+
+Zweiter Lauf, Satz ohne Objektbezug („Aendere die Miete auf 850"):
+  -> „An welchem Objekt soll ich das aendern?"
+     [2026-999 ... (offen)] [2026-1056 ...] [2026-1055 ...] + 3 weitere
+     „Ohne Auswahl aendere ich nichts."
+```
+
+### Rest
+
+- **V6** offen: beide Piloten sollen Marktbericht und Berichte holen und
+  abgleichen.
+- **`COPILOT_MODEL=gpt-4o-mini`** steht in der `.env`. Ein größeres Modell
+  wäre eine Geldentscheidung — der Prompt ist stattdessen so gebaut, dass
+  auch ein kleines ihn versteht. Das ist der haltbarere Weg.
+- **Neu im Backlog:** der Telegram-Bot als zweiter Zugang (T-B1 bis T-B5),
+  Google Drive als eigenes Thema (G1). Grundlage sind Marcels Anleitung und
+  sein Bau-Cockpit 2.2.1 — beide gesichtet, die Befunde stehen im Backlog.
+  **Zuerst zu entscheiden: ein DealPilot-Bot für alle oder einer je Kunde.**
+  Das Bau-Cockpit pollt mit EINER Instanz; bei einem Bot je Kunde wären das
+  N Polling-Schleifen, und die Anleitung nennt dazu die harte Grenze
+  „nur eine Instanz darf pollen".
