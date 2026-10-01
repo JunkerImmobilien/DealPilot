@@ -839,7 +839,13 @@ window.DealPilotOnboarding = (function () {
       '.dpo-k-fuer{font-size:12px;line-height:1.5;color:#55504a;margin-top:2px}',
       '.dpo-k-werte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#6b6660;margin-top:4px}',
       '.dpo-k-zusatz{font-size:10.5px;color:var(--wl-b8932f,#b8932f);margin-top:4px;font-weight:600}',
-      '.dpo-k-vorschau{display:block;height:38px;border-radius:7px;overflow:hidden;position:relative;margin-bottom:6px;background:#0c0b09}',
+      /* v1753c · 38 px war das eigentliche Problem.
+         Gemessen: 322 x 38 — ein Verhaeltnis von 8:1. Kein Bildschirm
+         sieht so aus, und in einem so flachen Band ist jede Aufteilung
+         unkenntlich, egal wie genau sie gezeichnet ist. Mit 84 px wird
+         daraus 3,8:1: Kopf, Spalten und Arbeitsbereich sind als solche
+         zu erkennen. */
+      '.dpo-k-vorschau{display:block;height:84px;border-radius:7px;overflow:hidden;position:relative;margin-bottom:8px;background:#0c0b09}',
       '.dpo-k-vorschau i{position:absolute;display:block}',
       /* ── v1753b · Die Miniaturen der vier Ansichten ──────────────────
          Jede zeigt die Aufteilung: Kopf, Spalten, Inhalt. Die alten
