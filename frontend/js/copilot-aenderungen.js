@@ -182,75 +182,21 @@
      durchrutscht — die wiederholt man mit „ändere …" — als eine Frage,
      die auf eine Feldzuordnung wartet. */
 
-  /* Verben und Wendungen, die eine Änderung ANSAGEN. Nur damit wird der
-     teure Weg betreten. */
-  var ANSAGE = new RegExp(
-    '(' +
-    'ändere|ändern|änder\\b|abändern|' +
-    'setze|setz\\b|setzen\\s+auf|' +
-    'trag(e|en)?\\s+(bitte\\s+)?(\\w+\\s+){0,3}ein|eintragen|' +
-    'korrigier(e|en)?|aktualisier(e|en)?|' +
-    'pass(e|en)?\\s+(\\w+\\s+){0,3}an|anpassen|' +
-    'überschreib(e|en)?|ersetz(e|en)?|' +
-    'übernimm|übernehmen\\s+(als|für)|' +
-    'stell(e|en)?\\s+(\\w+\\s+){0,3}auf|' +
-    'mach(e|en)?\\s+(\\w+\\s+){0,3}(zu|auf)\\s|' +
-    /* „ist die Miete jetzt 850" — zwischen Verb und „jetzt" stehen
-       Wörter. Ohne die Lücke verpasst das Muster genau die Form, in der
-       Marcel seine Beispiele formuliert hat. */
-    'ist\\s+(\\w+\\s+){0,3}(jetzt|nun|neu\\b)|sind\\s+(\\w+\\s+){0,3}(jetzt|nun|neu\\b)|' +
-    'liegt\\s+(\\w+\\s+){0,2}(jetzt|nun)\\s+bei|beträgt\\s+(\\w+\\s+){0,2}(jetzt|nun)|' +
-    'soll\\s+(\\w+\\s+){0,4}(sein|betragen|werden)|' +
-    'neuer?\\s+(wert|miete|kaufpreis|baujahr)' +
-    ')', 'i');
+  /* ═══ v1767 · HIER LAG DAS MUSTER, UND ES IST WEG ═══════════════════
 
-  /* v1763b · DIE MELDUNG MUSS DEN ECHTEN GRUND NENNEN.
+     Entfernt: `ANSAGE` (ein Regex über 14 Verbformen),
+     `istAenderungsansage()` und `hinweisWennKnapp()`.
 
-     Gemessen: der Änderungsweg meldete „Konnte den Text nicht auswerten —
-     bitte nochmal". Die wahre Ursache war HTTP 429, das Stundenlimit.
-     „Bitte nochmal" ist dann genau der falsche Rat: Nochmal versuchen
-     verschlimmert es.
+     Das Muster verlangte eine ZAHL im Satz und scheiterte damit an
+     Marcels „Zustand auf stark renovierungsbedürftig". Der Hinweis
+     erklärte dem Nutzer eine Formulierungsregel, die das Modell nicht
+     braucht. Beides lief dem Modell VOR und gewann, wo es traf.
 
-     > Eine Fehlermeldung, die rät statt zu sagen, kostet mehr Zeit als
-     > gar keine — man sucht den Fehler an der falschen Stelle. */
-  function _fehlertext(err) {
-    var s = err && err.status;
-    if (s === 429) {
-      var m = err && err.data && (err.data.message || err.data.error);
-      return m ? String(m) : 'Zu viele Anfragen in kurzer Zeit — das Stundenlimit ist '
-        + 'erreicht. In den Einstellungen lässt sich ein eigener Schlüssel hinterlegen.';
-    }
-    if (s === 401) return 'Die Sitzung ist abgelaufen — bitte neu anmelden.';
-    if (s === 503) return 'Die KI ist gerade nicht erreichbar.';
-    if (s) return 'Der Server hat mit ' + s + ' geantwortet.';
-    return 'Keine Verbindung zum Server — der Text ist noch im Feld.';
-  }
+     > Zwei Instanzen, die dieselbe Frage beantworten, sind eine mehr als
+     > nötig. Die schwächere gewinnt immer dann, wenn sie zuerst dran ist.
 
-  /* Eine Zahl muss dabei sein — „ändere mal was" ist keine Änderung. */
-  function istAenderungsansage(text) {
-    if (!text || text.length < 6) return false;
-    if (!/\d/.test(text)) return false;
-    return ANSAGE.test(text);
-  }
-
-  /* Für den Portfolio-Piloten zusätzlich: ein erkennbarer Objektbezug.
-     Ohne ihn ist selbst „ändere die Miete auf 850" dort mehrdeutig. */
-  function hinweisWennKnapp(text, addMsg) {
-    /* Wer eine Zahl nennt, aber kein Änderungswort, bekommt EINMAL den
-       Hinweis — statt dass er rät, warum nichts passiert ist. */
-    try {
-      if (window.__dpCpaHinweisGezeigt) return;
-      if (!/\d/.test(text)) return;
-      if (istAenderungsansage(text)) return;
-      window.__dpCpaHinweisGezeigt = true;
-      setTimeout(function () {
-        addMsg('assistant', 'Übrigens: wenn ich etwas am Objekt ändern soll, '
-          + 'sag es als Anweisung — zum Beispiel „ändere die Miete auf 850" '
-          + 'oder „die Miete ist jetzt 850". Dann trage ich es ein und frage '
-          + 'nach, falls dort schon etwas steht.');
-      }, 400);
-    } catch (e) {}
-  }
+     Wer hier wieder ein Muster einhängt, baut den zweiten Weg zurück,
+     der v1760 bis v1764 gekostet hat. */
 
   /* ═══════════════════════════════════════════════════════════════════
      v1762 · DER PORTFOLIO-PILOT MUSS ERST WISSEN, WELCHES OBJEKT
@@ -434,101 +380,27 @@
   }
 
   /* ── Der Einhängepunkt ─────────────────────────────────────────────
-     `send()` liegt in copilot.js im Modulabschluss und ist von aussen
-     nicht erreichbar. Statt die Datei umzubauen, wird der Klick ABGEFANGEN
-     und nur dann weitergereicht, wenn es KEINE Änderung ist. Das hält
-     beide Dateien unabhaengig voneinander. */
+
+     v1767 · HIER FING BIS HEUTE NOCH EIN MUSTER DEN SENDEN-KLICK AB.
+
+     **Ich nehme eine Aussage im Journal ausdrücklich zurück.** Zu v1764
+     steht dort: „Das Abfangen des Senden-Klicks ist ersatzlos weg." Das
+     war falsch — `istAenderungsansage()` hing weiter am Klick und am
+     Enter, und wer es traf, landete in `/ai/extract-text` statt beim
+     Modell. Zwei Wege zum selben Ziel, und der schwächere war zuerst
+     dran.
+
+     > Zwei Instanzen, die dieselbe Frage beantworten, sind eine mehr als
+     > nötig. Genau das hatte ich zu v1764 selbst aufgeschrieben — und im
+     > Portfolio-Piloten stehen lassen.
+
+     Jetzt bleibt hier nur noch das Mikrofon. Der Feldkatalog reist mit
+     der Nachricht ans Modell (copilot.js), das Modell entscheidet, und
+     `ausAntwort()` nimmt den Block entgegen. Ein Weg. */
   function einhaengen() {
-    var snd = el('dp-cp-send');
     var inp = el('dp-cp-in');
-    if (!snd || !inp || snd.getAttribute('data-' + MARKE)) return false;
-    snd.setAttribute('data-' + MARKE, '1');
-
-    function pruefen(ev) {
-      var txt = (inp.value || '').trim();
-      if (!txt) return;
-      /* Ohne geladenes Objekt gibt es nichts zu ändern — dann ist es eine
-         normale Frage. */
-      if (!window._currentObjKey) return;
-
-      /* v1763 · DER SCHNELLE WEG IST DER NORMALFALL.
-         Ohne klare Änderungsansage wird NICHTS abgefangen: die Nachricht
-         geht unberührt an den Co-Pilot, ohne zusätzlichen Netzwerkweg.
-         Vorher lief hier jede Frage erst durch extract-text. */
-      if (!istAenderungsansage(txt)) {
-        try { hinweisWennKnapp(txt, window.__dpCpAddMsg); } catch (e) {}
-        return;
-      }
-
-      var kat = katalog();
-      if (!kat.length) return;
-
-      ev.stopImmediatePropagation();
-      ev.preventDefault();
-
-      var merk = txt;
-      inp.value = '';
-      var addMsg = window.__dpCpAddMsg;
-      if (typeof addMsg !== 'function') { inp.value = merk; return; }
-      addMsg('user', merk);
-      var warte = addMsg('assistant', 'Ich sehe nach, ob das Änderungen am Objekt sind …');
-
-      window.Auth.apiCall('/ai/extract-text', {
-        method: 'POST',
-        body: { text: merk.slice(0, 3800), catalog: kat }
-      }).then(function (r) {
-        if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
-        var f = (r && r.fields) || {};
-        var neu = [], konflikte = [];
-        Object.keys(f).forEach(function (id) {
-          var wert = f[id];
-          if (wert == null || String(wert).trim() === '') return;
-          var e = el(id);
-          if (!e) return;
-          if (istLeer(e)) { neu.push({ id: id, wert: wert }); return; }
-          var alt = (e.type === 'checkbox') ? (e.checked ? 'ja' : 'nein') : String(e.value);
-          /* Gleicher Wert ist kein Konflikt — und auch keine Änderung. */
-          if (String(alt).trim() === String(wert).trim()) return;
-          konflikte.push({ id: id, alt: alt, neu: wert });
-        });
-
-        if (!neu.length && !konflikte.length) {
-          /* Keine Felder erkannt: es war doch eine Frage. Zurück in den
-             normalen Weg — der Text steht wieder im Feld, ein Klick
-             genuegt. Ihn still verschwinden zu lassen waere der
-             schlimmere Fehler. */
-          addMsg('assistant', 'Darin habe ich keine Objektangaben erkannt — '
-            + 'ich schicke es als Frage weiter.');
-          inp.value = merk;
-          snd.removeAttribute('data-' + MARKE);
-          snd.click();
-          snd.setAttribute('data-' + MARKE, '1');
-          return;
-        }
-        zeigeVorschlag(neu, konflikte, addMsg);
-      }).catch(function (err) {
-        if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
-        addMsg('assistant', '⚠ ' + _fehlertext(err));
-        inp.value = merk;
-      });
-    }
-
-    snd.addEventListener('click', pruefen, true);
-    inp.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        var txt = (inp.value || '').trim();
-        /* Dieselbe Bedingung wie beim Klick — sonst verhielte sich Enter
-           anders als der Knopf, und genau das sucht später niemand. */
-        if (txt && window._currentObjKey && istAenderungsansage(txt)) {
-          e.stopImmediatePropagation();
-          e.preventDefault();
-          pruefen({ stopImmediatePropagation: function () {}, preventDefault: function () {} });
-        }
-      }
-    }, true);
-
-    /* v1760 · Das Mikrofon daneben — Marcel: „dass man da vielleicht neben
-       dem Senden auch einfach ein Mikrofon-Symbol hat". */
+    if (!inp || inp.getAttribute('data-' + MARKE)) return false;
+    inp.setAttribute('data-' + MARKE, '1');
     try {
       if (window.DealPilotDiktat && typeof window.DealPilotDiktat.knopfAn === 'function') {
         window.DealPilotDiktat.knopfAn('dp-cp-in', { neben: 'dp-cp-send' });
@@ -563,121 +435,15 @@
     document.head.appendChild(s);
   }
 
-  /* ── Der Portfolio-Pilot: dieselbe Mechanik, ein Schritt davor ─────── */
+  /* ── Der Portfolio-Pilot ───────────────────────────────────────────
+     v1767 · Auch hier nur noch das Mikrofon. Welches Objekt gemeint ist,
+     entscheidet `objektZuordnen()` — und zwar erst, wenn das Modell
+     wirklich eine Änderung vorgeschlagen hat. Vorher wurde das Objekt
+     schon beim Senden geöffnet, auf Verdacht eines Musters hin. */
   function einhaengenPortfolio() {
-    var snd = el('dp-pp-send');
     var inp = el('dp-pp-in');
-    if (!snd || !inp || snd.getAttribute('data-' + MARKE)) return false;
-    snd.setAttribute('data-' + MARKE, '1');
-
-    function weiter(text, addMsg) {
-      /* Ab hier ist ein Objekt geladen — der Rest ist derselbe Weg wie
-         beim Co-Pilot. */
-      var kat = katalog();
-      if (!kat.length) { addMsg('assistant', 'Die Felder sind noch nicht geladen — bitte nochmal.'); return; }
-      var warte = addMsg('assistant', 'Ich sehe nach, was sich ändert …');
-      window.Auth.apiCall('/ai/extract-text', {
-        method: 'POST', body: { text: text.slice(0, 3800), catalog: kat }
-      }).then(function (r) {
-        if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
-        var f = (r && r.fields) || {};
-        var neu = [], konflikte = [];
-        Object.keys(f).forEach(function (id) {
-          var wert = f[id];
-          if (wert == null || String(wert).trim() === '') return;
-          var e = el(id); if (!e) return;
-          if (istLeer(e)) { neu.push({ id: id, wert: wert }); return; }
-          var alt = (e.type === 'checkbox') ? (e.checked ? 'ja' : 'nein') : String(e.value);
-          if (String(alt).trim() === String(wert).trim()) return;
-          konflikte.push({ id: id, alt: alt, neu: wert });
-        });
-        if (!neu.length && !konflikte.length) {
-          addMsg('assistant', 'Darin habe ich keine Objektangaben erkannt.');
-          return;
-        }
-        zeigeVorschlag(neu, konflikte, addMsg);
-      }).catch(function (err) {
-        if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
-        addMsg('assistant', '⚠ ' + _fehlertext(err));
-      });
-    }
-
-    function pruefen(ev) {
-      var txt = (inp.value || '').trim();
-      if (!txt || txt.length < 6) return;
-      var addMsg = window.__dpPpAddMsg;
-      if (typeof addMsg !== 'function') return;
-
-      /* v1763 · Zwei Bedingungen, beide örtlich und kostenlos: eine klare
-         Änderungsansage UND ein erkennbares Objekt. Fehlt eines, geht die
-         Nachricht unberührt an den Portfolio-Piloten — er beantwortet
-         Fragen zum ganzen Bestand, und das muss schnell bleiben. */
-      if (!istAenderungsansage(txt)) {
-        try { hinweisWennKnapp(txt, addMsg); } catch (e) {}
-        return;
-      }
-      var fund = objektFinden(txt);
-      if (fund.art === 'keins' || fund.art === 'keine') {
-        /* Änderung gewollt, aber kein Objekt erkannt — das gehört gesagt,
-           sonst wundert sich der Nutzer, warum nichts passiert. */
-        addMsg('assistant', 'Das klingt nach einer Änderung — ich weiß nur nicht, '
-          + 'an welchem Objekt. Nenn die Adresse oder die Objektnummer dazu, '
-          + 'zum Beispiel „bei der Bismarckstr. 27 ist die Miete jetzt 1450".');
-        inp.value = '';
-        ev.stopImmediatePropagation(); ev.preventDefault();
-        return;
-      }
-
-      ev.stopImmediatePropagation(); ev.preventDefault();
-      var merk = txt;
-      inp.value = '';
-      addMsg('user', merk);
-
-      if (fund.art === 'mehrere') {
-        var box = addMsg('assistant', '');
-        box.innerHTML = '<b>Welches Objekt meinst du?</b><div class="' + MARKE + '-konflikte">'
-          + fund.kandidaten.map(function (o) {
-              return '<button type="button" class="' + MARKE + '-w" data-key="' + esc(o.key) + '">'
-                + esc(o.tip) + '</button>';
-            }).join('') + '</div>';
-        box.addEventListener('click', function (e2) {
-          var b = e2.target.closest ? e2.target.closest('[data-key]') : null;
-          if (!b) return;
-          var tip = b.textContent.trim();
-          box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b> — wird geöffnet …';
-          objektLaden(b.getAttribute('data-key')).then(function (ok) {
-            if (!ok) { box.innerHTML = '⚠ Objekt ließ sich nicht öffnen.'; return; }
-            box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b>';
-            weiter(merk, addMsg);
-          });
-        });
-        return;
-      }
-
-      var o = fund.objekt;
-      var hin = addMsg('assistant', 'Das betrifft <b>' + esc(o.tip) + '</b> — ich öffne es …');
-      if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(o.tip) + '</b> — ich öffne es …';
-      objektLaden(o.key).then(function (ok) {
-        if (!ok) {
-          if (hin) hin.innerHTML = '⚠ <b>' + esc(o.tip) + '</b> ließ sich nicht öffnen.';
-          return;
-        }
-        if (hin) hin.innerHTML = 'Objekt: <b>' + esc(o.tip) + '</b>';
-        weiter(merk, addMsg);
-      });
-    }
-
-    snd.addEventListener('click', pruefen, true);
-    inp.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        var txt = (inp.value || '').trim();
-        if (txt && istAenderungsansage(txt)) {
-          e.stopImmediatePropagation(); e.preventDefault();
-          pruefen({ stopImmediatePropagation: function () {}, preventDefault: function () {} });
-        }
-      }
-    }, true);
-
+    if (!inp || inp.getAttribute('data-' + MARKE)) return false;
+    inp.setAttribute('data-' + MARKE, '1');
     try {
       if (window.DealPilotDiktat && typeof window.DealPilotDiktat.knopfAn === 'function') {
         window.DealPilotDiktat.knopfAn('dp-pp-in', { neben: 'dp-pp-send' });
@@ -747,7 +513,95 @@
      Linie der, der Fragen beantwortet. */
   var BLOCK = /<<<FELDER\s*([\s\S]*?)\s*FELDER>>>/;
 
-  function ausAntwort(text, addMsg) {
+  /* ═══ v1767 · DIE SCHABLONE HEILEN ═════════════════════════════════
+
+     Gemessen am laufenden System mit Marcels Satz „änder bei der
+     Musterstraße 12 mal die Zimmeranzahl auf fünf":
+
+       {"feld_id":"zimmer","anderes_feld":"5"}
+
+     Das Modell hat die Platzhalter meines Formatbeispiels für feste
+     Schlüssel gehalten. Die Ursache sitzt im Prompt und ist dort
+     behoben (echtes Beispiel aus dem Katalog) — aber ein Prompt ist eine
+     Bitte, kein Vertrag.
+
+     > Wo ein Modell die Form bestimmt, gehört ein Heiler an die
+     > Gegenstelle. Sonst hängt eine Funktion daran, dass ein Satz gut
+     > formuliert war.
+
+     Geheilt werden drei Formen, alle mit genau DIESER Bedeutung:
+       {"feld_id":"zimmer","anderes_feld":"5"}   -> {"zimmer":"5"}
+       {"feld_id":"zimmer","wert":"5"}           -> {"zimmer":"5"}
+       [{"feld_id":"zimmer","wert":"5"}, ...]    -> {"zimmer":"5", ...}
+
+     Entscheidend ist die Prüfung „ist der WERT eine bekannte Feld-Id?" —
+     nicht der Schlüsselname. Ein Feld namens `wert` gibt es nicht, aber
+     darauf zu bauen wäre dieselbe Wette nochmal. */
+  var SCHLUESSEL_ID = ['feld_id', 'feld', 'field', 'field_id', 'id', 'name'];
+  var SCHLUESSEL_WERT = ['wert', 'value', 'neuer_wert', 'new_value', 'anderes_feld', 'inhalt'];
+
+  function _paarform(o) {
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return null;
+    var k = Object.keys(o);
+    if (k.length !== 2) return null;
+    var idK = null, wertK = null;
+    k.forEach(function (x) {
+      var lx = x.toLowerCase();
+      if (SCHLUESSEL_ID.indexOf(lx) >= 0) idK = x;
+      else if (SCHLUESSEL_WERT.indexOf(lx) >= 0) wertK = x;
+    });
+    if (!idK || !wertK) return null;
+    /* Der Beweis: der genannte Wert MUSS ein Feld sein, das es gibt. */
+    var ziel = String(o[idK] || '').trim();
+    if (!ziel || !el(ziel)) return null;
+    var r = {}; r[ziel] = o[wertK];
+    return r;
+  }
+
+  function heileSchablone(f) {
+    if (Array.isArray(f)) {
+      var zus = {}, getroffen = 0;
+      f.forEach(function (x) {
+        var p = _paarform(x);
+        if (p) { Object.keys(p).forEach(function (k) { zus[k] = p[k]; }); getroffen++; }
+        else if (x && typeof x === 'object') {
+          Object.keys(x).forEach(function (k) { if (el(k)) zus[k] = x[k]; });
+        }
+      });
+      return Object.keys(zus).length ? zus : null;
+    }
+    var p2 = _paarform(f);
+    return p2 || f;
+  }
+
+  /* ═══ v1767 · IM PORTFOLIO ENTSCHEIDET DER SATZ, WELCHES OBJEKT ═════
+
+     Marcel nennt die Adresse: „änder bei der Musterstraße 12 …". Ohne
+     diese Zuordnung schreibt der Portfolio-Pilot in das Objekt, das
+     gerade geladen ist — also womöglich in ein anderes als das genannte.
+
+     > Eine Änderung am falschen Objekt ist schlimmer als keine. Sie sieht
+     > aus wie Erfolg. */
+  function objektZuordnen(nutzerText, addMsg) {
+    return new Promise(function (fertig) {
+      if (!nutzerText) { fertig(true); return; }
+      var fund = objektFinden(nutzerText);
+      if (fund.art !== 'eins') { fertig(true); return; }   /* kein klarer Hinweis -> beim geladenen bleiben */
+      if (fund.objekt.key === window._currentObjKey) { fertig(true); return; }
+      var hin = addMsg('assistant', '');
+      if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(fund.objekt.tip) + '</b> — ich öffne es …';
+      objektLaden(fund.objekt.key).then(function (ok) {
+        if (hin) {
+          hin.innerHTML = ok
+            ? 'Objekt: <b>' + esc(fund.objekt.tip) + '</b>'
+            : '⚠ <b>' + esc(fund.objekt.tip) + '</b> ließ sich nicht öffnen — ich ändere nichts.';
+        }
+        fertig(ok);
+      });
+    });
+  }
+
+  function ausAntwort(text, addMsg, nutzerText) {
     if (!text) return text;
     var m = String(text).match(BLOCK);
     if (!m) return text;
@@ -755,7 +609,21 @@
     var rest = String(text).replace(BLOCK, '').trim();
     var f = null;
     try { f = JSON.parse(m[1]); } catch (e) {}
+    f = heileSchablone(f);
     if (!f || typeof f !== 'object') return rest || text;
+
+    /* Nennt der Satz ein anderes Objekt, wird es ERST geöffnet. */
+    if (nutzerText && objekte().length > 1) {
+      if (rest) addMsg('assistant', rest);
+      objektZuordnen(nutzerText, addMsg).then(function (ok) {
+        if (ok) anwenden(f, addMsg);
+      });
+      return '';
+    }
+    return anwenden(f, addMsg, rest);
+  }
+
+  function anwenden(f, addMsg, rest) {
 
     /* Erst den Satz des Modells zeigen, dann die Rückfrage darunter —
        sonst steht die Begründung unter ihrer eigenen Folge. */

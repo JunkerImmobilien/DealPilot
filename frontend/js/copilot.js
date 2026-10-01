@@ -314,7 +314,12 @@
       try {
         if (window.DealPilotCopilotAenderungen
             && typeof window.DealPilotCopilotAenderungen.ausAntwort === 'function') {
-          reply = window.DealPilotCopilotAenderungen.ausAntwort(reply, addMsg);
+          /* v1767: BEWUSST OHNE Nutzersatz. Der dritte Parameter loest im
+             Portfolio-Piloten einen Objektwechsel aus - hier waere das
+             falsch: im Co-Pilot ist immer das geladene Objekt gemeint, und
+             eine nebenbei genannte andere Adresse duerfte es nicht
+             wegschieben. */
+          reply = window.DealPilotCopilotAenderungen.ausAntwort(reply, addMsg, null);
         }
       } catch (e) {}
       if (reply) addMsg('assistant', reply);

@@ -2007,6 +2007,33 @@ async function copilotChat(payload, opts) {
   const istPortfolio = payload.kontextArt === 'portfolio'
     || (ctx && ctx.art === 'portfolio');
 
+  /* ═══ v1767 · DAS BEISPIEL WIRD AUS DEM KATALOG GEBAUT ══════════════
+     Gemessen am 01.10.2026 mit Marcels eigenem Satz („aender bei der
+     Musterstrasse 12 mal die Zimmeranzahl auf fuenf"):
+
+       <<<FELDER {"feld_id":"zimmer","anderes_feld":"5"} FELDER>>>
+
+     Das Modell hat die PLATZHALTER meines Formatbeispiels fuer feste
+     Schluessel gehalten und Feld-Id und Wert als zwei Werte eingesetzt.
+     Es stand `{"feld_id":"wert","anderes_feld":"wert"}` dort - fuer ein
+     kleines Modell (hier gpt-4o-mini) ist das eine Schablone mit zwei
+     benannten Spalten, kein Muster.
+
+     > Ein Platzhalter in einem Beispiel ist eine Einladung, ihn
+     > abzuschreiben. Steht dort eine ECHTE Feld-Id, kann das Abschreiben
+     > nicht mehr schiefgehen.
+
+     Deshalb: das Beispiel kommt aus dem mitgeschickten Katalog. */
+  const _bspBlock = (function () {
+    const f = Array.isArray(payload.felder) ? payload.felder : [];
+    const t = f.find((x) => x.kind === 'text');
+    const s = f.find((x) => x.kind === 'select' && x.options && x.options.length);
+    const b = {};
+    if (t) b[t.id] = '850';
+    if (s) b[s.id] = String(s.options[0]);
+    return Object.keys(b).length ? JSON.stringify(b) : '{"nkm":"850"}';
+  })();
+
   const sys = [
     istPortfolio
       ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
@@ -2083,10 +2110,18 @@ async function copilotChat(payload, opts) {
           'Erkennst du eine solche Anweisung, haenge an deine Antwort GENAU EINEN Block in dieser Form an:',
           '',
           '<<<FELDER',
-          '{"feld_id":"wert","anderes_feld":"wert"}',
+          _bspBlock,
           'FELDER>>>',
           '',
+          '- Der SCHLUESSEL ist die Feld-Id aus der Liste unten, der WERT ist der neue Inhalt.',
+          '  Es gibt KEINEN Schluessel namens "feld_id", "feld", "id", "wert" oder "value" -',
+          '  wer so etwas schreibt, hat das Beispiel missverstanden.',
           '- Verwende NUR Feld-Ids aus der Liste VERFUEGBARE FELDER unten, nie erfundene.',
+          istPortfolio
+            ? '- Der Nutzer nennt im Portfolio das Objekt dazu ("bei der Musterstr. 12 ..."). '
+              + 'Die Feld-Ids sind bei allen Objekten dieselben - nenne das Objekt in deinem '
+              + 'Satz davor, damit der Nutzer sieht, welches gemeint ist.'
+            : '- Es ist immer das Objekt gemeint, das unter AKTUELLES OBJEKT steht.',
           '- Bei einem Auswahlfeld (kind=select) nimm WOERTLICH eine der angegebenen Optionen.',
           '- Zahlen ohne Tausenderpunkt und ohne Einheit: 850, nicht "850 EUR" und nicht "1.250".',
           '- Bist du dir bei der Zuordnung unsicher, frag nach und haenge KEINEN Block an.',

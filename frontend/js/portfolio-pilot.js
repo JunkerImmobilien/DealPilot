@@ -225,13 +225,25 @@
 
     history.push({ role: 'user', content: sichtbar || nachricht });
 
-    /* v1764: der Feldkatalog geht mit — aber nur, wenn ein Objekt offen
-       ist. Im Portfolio ohne geladenes Objekt gaebe es kein Ziel, und das
-       Modell wuerde Felder vorschlagen, die nirgends ankommen. */
+    /* v1767: DER KATALOG GEHT IMMER MIT.
+
+       Bis v1766 stand hier „nur, wenn ein Objekt offen ist" — mit der
+       Begruendung, es gaebe sonst kein Ziel. Das war falsch gedacht:
+       `window.FIELDS` ist STATISCH, die Feld-Ids sind bei jedem Objekt
+       dieselben. Verschieden sind nur die Werte. Und welches Objekt
+       gemeint ist, sagt Marcels Satz („aender bei der Musterstr. 12 ...")
+       — `objektZuordnen()` oeffnet es, bevor etwas gesetzt wird.
+
+       > Eine Bedingung, die eine Faehigkeit abschaltet, muss den Grund
+       > messen. „Es gaebe kein Ziel" war eine Annahme, und sie hat den
+       > Portfolio-Piloten im haeufigsten Fall stumm gemacht. */
     try {
-      if (window._currentObjKey && window.DealPilotCopilotAenderungen
+      if (window.DealPilotCopilotAenderungen
           && typeof window.DealPilotCopilotAenderungen.katalog === 'function') {
         body.felder = window.DealPilotCopilotAenderungen.katalog();
+        if (typeof window.DealPilotCopilotAenderungen.abrufe === 'function') {
+          body.abrufe = window.DealPilotCopilotAenderungen.abrufe();
+        }
       }
     } catch (e) {}
 
@@ -241,7 +253,9 @@
       try {
         if (window.DealPilotCopilotAenderungen
             && typeof window.DealPilotCopilotAenderungen.ausAntwort === 'function') {
-          reply = window.DealPilotCopilotAenderungen.ausAntwort(reply, addMsg);
+          /* v1767: der Nutzersatz entscheidet, WELCHES Objekt gemeint ist. */
+          reply = window.DealPilotCopilotAenderungen.ausAntwort(
+            reply, addMsg, sichtbar || nachricht);
         }
       } catch (e) {}
       if (reply) addMsg('assistant', reply);
