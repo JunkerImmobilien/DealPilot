@@ -26639,3 +26639,93 @@ Klick -> Abrufen             Wahlkarte uebersprungen, direkt im Fragenlauf
 Tour                         38 Schritte, kennt pf-gefuehrt
 Aufgeraeumt                  7 leere Testobjekte geloescht, 17 Karten, 0 leer
 ```
+
+---
+
+## v1743 / v1744 · Marcels Tower-Durchlauf, Punkt fuer Punkt
+
+Marcel ist die Tour am 01.10.2026 im Tower durchgegangen und hat sieben
+Beobachtungen gemeldet. Alle nachgemessen.
+
+### Die Startdauer und die Zaehigkeit hatten EINE Ursache
+
+In `_ensureCorrectTab` suchte die erste Objektkarte mit
+`#sb-list > .sb-card`. In Aktenmappe, Kanzlei und Tower sind das
+**0x0-Huellen** - die echte Karte liegt in der Schiene. Der Klick ging ins
+Leere, das Objekt lud nie, und weil der Zweig bei JEDEM Tab-Schritt neu
+greift, wiederholte sich das.
+
+```
+Erste Blase im Tower:   19.587 ms  ->  1.764 ms
+```
+
+### Die Import-Kachel: ein Anker, der zu kurz war
+
+`_findByText` nimmt den KUERZESTEN sichtbaren Treffer.
+
+```
+"Exposé / Gesamt-PDF"     19 Zeichen   aus der Ausgaben-Schiene
+"Exposé / Marktbericht"   21 Zeichen   die gemeinte Kachel
+```
+
+> Ein Textfragment als Anker ist nur so lange eindeutig, wie kein anderes
+> Element dasselbe Fragment kuerzer enthaelt. Im Tower kam genau so eines
+> dazu - deshalb ging Sprache, aber Exposé nicht.
+
+### Der "Aufhaenger" war ein Spotlight ueber den ganzen Tab
+
+Gemessen im Bewertungs-Tab:
+
+```
+#bc-cockpit    0x0   (1 Kind)
+#bc-stress     0x0   (0 Kinder - voellig leer)
+#bc-equity     0x0
+#bc-waterfall  0x0
+```
+
+Die Bank-Diagramme entstehen im Cockpit und im PDF, nie im Tab. Die Tour
+fand nichts Sichtbares und fiel auf `#s6` zurueck - **1280x6867 Pixel**.
+
+> Ein Spotlight, der alles umfasst, hebt nichts hervor. Er sieht aus wie
+> ein Fehler: die Seite springt, der Rest wird grau, und der Nutzer sucht,
+> worauf er schauen soll. Die Tour haengt dabei nicht - sie zeigt nur
+> nichts Erkennbares.
+
+Behoben mit `placement: center` fuer die drei betroffenen Schritte.
+
+### Fuenf Texte, die eine Oberflaeche von vieren beschrieben
+
+"Sidebar links", "rechts oben im Panel", "links oben im Panel" - alles
+Orte, die es in drei der vier Ansichten nicht gibt. Sie sagen jetzt, WAS
+dort steht, nicht WO es haengt.
+
+### Das Setup laesst sich erzwingen
+
+```
+?setup=1     zeigt es sofort
+?setup=neu   zusaetzlich Rundgang-Marker loeschen - wie beim ersten Mal
+```
+
+### Fuenf eigene Fehlvermutungen in diesem Durchgang
+
+Ungewoehnlich viele, deshalb einzeln:
+
+- `_hideScoreBand` durchsucht 4316 Elemente - braucht dafuer aber nur 9 ms
+- die Reiter heissen im Tower doch `.tab`, nicht `.st-tab`
+- die 141 Konsolenmeldungen waren Altlasten meiner eigenen Diagnose-Starts
+- zwei "eingefrorene Renderer" waren mein eigenes Zeitlimit (45 s CDP)
+- **`DpTour.goto()` nimmt eine ID, keine Zahl.** Alle meine `goto(22)`-
+  Messungen waren damit sinnlos; der Code faellt auf `Tour.next()` zurueck,
+  und ich hielt das Ergebnis fuer ein Umherspringen der Tour.
+
+> Wer ein Werkzeug falsch bedient und das Ergebnis misst, misst das
+> Werkzeug. Fuenfmal in einem Durchgang ist ein Muster, kein Zufall -
+> die Lehre ist, die SIGNATUR zu lesen, bevor man die Ausgabe deutet.
+
+### Offen
+
+Die Quick-Boarding-Schritte (3-6) bleiben zaeh: sie oeffnen den
+Quick-Check-Modus mit eigenem iframe, und die Engine wartet dort bis zu
+6 Sekunden je Schritt (20 Versuche a 300 ms). Das ist bewusst so gesetzt,
+weil das Panel dynamisch rendert - koennte aber auf ein Ereignis statt auf
+die Uhr warten, wie schon beim Auto-Start.
