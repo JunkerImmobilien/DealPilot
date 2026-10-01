@@ -1672,10 +1672,33 @@
       ? '<div class="kc-share"><a class="qb" href="'+(((window.location&&location.origin)?location.origin:'')+'/pass.html?c='+pass.code)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+_qrSvg(((window.location&&location.origin)?location.origin:'')+'/pass.html?c='+pass.code,3)+'</a>'
         + '<div class="si">Geteilter Pass<br><b>'+esc(pass.code)+'</b><br>'+_passRest(pass.expires_at)+' Restlaufzeit</div></div>'
       : '<div class="cta"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8h16v-8M12 3v13m0-13l-4 4m4-4l4 4"/></svg>Quick Boarding teilen \u2192 QR erscheint</div>';
+    /* \u2550\u2550 v1737 \u00b7 DER KNOPF \u201eBANK" LUD DIE KAUFPREISAUFTEILUNG \u2550\u2550
+       Gefunden beim Messen der Handy-Breite, nicht gesucht: vier Knoepfe in
+       einem `flex`-Container mit `nowrap` liefen bei 390 px um 25 px aus
+       der Karte. Beim Nachsehen, welcher Knopf da ueberhaupt steht, fiel
+       der eigentliche Fehler auf.
+
+       `_runPdf('bank')` klapperte vier moegliche Funktionsnamen ab:
+
+         ['exportBmfPdf','exportBankPdf','exportBankenPdf','exportBankPDF']
+
+       Gemessen existieren davon ZWEI \u2014 die erste und die letzte. Genommen
+       wird die erste, und das ist `exportBmfPdf` aus `bmf-modal.js`: die
+       KAUFPREISAUFTEILUNG fuers Finanzamt. Die Bankfassung ist
+       `exportBankPDF` (calc.js) bzw. heute `exportPDFBank`.
+
+       > Auf dem Knopf stand Bank, geliefert wurde Finanzamt. Eine Liste
+       > von Namen, die \u201erobust" sein soll, trifft genau dann zuverlaessig
+       > das Falsche, wenn mehr als einer existiert.
+
+       Der Knopf entfaellt \u2014 konsistent zu v1733: \u201eInvestment" ruft
+       `exportPDF`, und das ist seit v1636 umhuellt, fragt also nach der
+       Fassung (Bank / hell / Obsidian). Ein eigener Bank-Knopf beschreibt
+       denselben Weg ein zweites Mal. Nebenbei passen drei Knoepfe auf
+       390 px, vier nicht. */
     var pdfs='<div class="pdfs">'+'<button class="kc-openbtn" onclick="event.stopPropagation();DealPilotDashboard.openObject(\''+esc(k)+'\')">Objekt \u00f6ffnen</button>'
       + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'invest\')">'+_dl()+'Investment</button>'
       + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'wk\')">'+_dl()+'Werbungsk.</button>'
-      + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'bank\')">'+_dl()+'Bank</button>'
       + '</div>';
     return '<div class="kc '+tcls+'" onclick="this.classList.toggle(\'open\')">'
       + '<div class="kc-flat"><div class="nm">'+nm+'<small>'+meta+'</small></div>'
@@ -1762,12 +1785,14 @@
       if(fnInv){ try{ fnInv(); }catch(e){} }
       else if(typeof window.toast==='function') window.toast('Investment-PDF-Funktion nicht verfuegbar');
     } else if(typ==='bank'){
-      // Bankexport: mehrere moegliche Funktionsnamen abklappern (robust)
-      var fnBank=null, names=['exportBmfPdf','exportBankPdf','exportBankenPdf','exportBankPDF'];
-      for(var n=0;n<names.length;n++){
-        if(typeof window[names[n]]==='function'){ fnBank=window[names[n]]; break; }
-        try{ if(typeof eval(names[n])==='function'){ fnBank=eval(names[n]); break; } }catch(e){}
-      }
+      /* v1737 · Hier klapperte eine Namensliste vier Kandidaten ab und nahm
+         den ersten Treffer — `exportBmfPdf`, also die Kaufpreisaufteilung
+         fuers Finanzamt. Auf dem Knopf stand „Bank". Der Knopf ist weg;
+         der Zweig bleibt fuer Altaufrufer und ruft jetzt die RICHTIGE
+         Funktion, mit `exportPDFBank` zuerst (seit v1636 umhuellt, fragt
+         also nach der Fassung). Das `eval()` entfaellt mit. */
+      var fnBank = (typeof window.exportPDFBank === 'function') ? window.exportPDFBank
+                 : (typeof window.exportBankPDF === 'function') ? window.exportBankPDF : null;
       if(fnBank){ try{ fnBank(); }catch(e){} }
       else if(typeof window.toast==='function') window.toast('Bankexport-Funktion nicht verfuegbar');
     } else if(typ==='wk-single' || typ==='wk-all'){

@@ -198,7 +198,10 @@
 
   #dashboard-main .kc-share .si b{color:var(--c-front-acc);font-size:11px;letter-spacing:1px}
 
-  #dashboard-main .pdfs{display:flex;gap:6px}
+  /* v1737 · `nowrap` liess die Knoepfe bei 390 px um 25 px aus der Karte
+     laufen — gemessen gegen den klippenden Vorfahren, nicht gegen den
+     Viewport: die Seite scrollte nicht, abgeschnitten wurde trotzdem. */
+  #dashboard-main .pdfs{display:flex;gap:6px;flex-wrap:wrap}
 
   #dashboard-main .pdfs button{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;font-family:'JetBrains Mono';font-size:9px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);color:var(--c-front-acc);border-radius:7px;padding:7px 3px;cursor:pointer}
 
