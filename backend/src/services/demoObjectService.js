@@ -47,6 +47,36 @@ async function assignDemoObject(userId) {
     return null;
   }
 
+  return _einfuegen(userId, demo);
+}
+
+/**
+ * v1747: Dasselbe Objekt fuer den Rundgang — OHNE die Idempotenz-Sperre.
+ *
+ * Marcel am 01.10.2026: „Wir haben doch auch diese Demo-Objekte, die der
+ * Kunde bei der Erstanmeldung bekommt. Koennen wir das nicht laden?"
+ *
+ * Bis v1746 baute die Tour sich ein eigenes Objekt aus 16 getippten Feldern
+ * zusammen. Das hier traegt 129 Felder, ein Foto und eine fertige
+ * KI-Analyse — die Tour kann daran also auch die Schritte erklaeren, die am
+ * handgebauten Objekt leer blieben.
+ *
+ * Die Sperre faellt bewusst weg: der Rundgang entscheidet selbst, ob er ein
+ * Objekt braucht (naemlich wenn keine sichtbare Karte da ist), und raeumt
+ * sein Exemplar hinterher wieder weg. Eine zweite Sperre hier wuerde genau
+ * den Fall verhindern, fuer den der Aufruf gedacht ist.
+ */
+async function fuerRundgangAnlegen(userId) {
+  if (!userId) throw new Error('userId required');
+  const demo = _loadDemo();
+  if (!demo) {
+    console.warn('[demoObjectService] Demo-JSON nicht verfuegbar, skip');
+    return null;
+  }
+  return _einfuegen(userId, demo);
+}
+
+async function _einfuegen(userId, demo) {
   // Insert. Schema: id (uuid auto), user_id, name, data (jsonb),
   //                ai_analysis (text), photos (jsonb), created_at, updated_at
   const name = demo.name || 'Demo-Objekt';
@@ -70,4 +100,4 @@ async function assignDemoObject(userId) {
   return result.rows[0];
 }
 
-module.exports = { assignDemoObject };
+module.exports = { assignDemoObject, fuerRundgangAnlegen };

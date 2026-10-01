@@ -195,4 +195,24 @@ router.post('/:id/steuer-snapshot',
   }
 );
 
+
+/**
+ * POST /objects/demo-rundgang   (v1747)
+ *
+ * Legt das offizielle Demo-Objekt an — dasselbe, das ein neuer Kunde bei der
+ * Registrierung bekommt. Die Tour ruft das, wenn der Nutzer kein eigenes
+ * Objekt hat, und loescht es am Ende per DELETE /objects/:id wieder.
+ *
+ * `requireUnderLimit` bleibt dran: es ist eine Objektanlage wie jede andere,
+ * und der Rundgang ist kein Grund, die Plan-Grenze zu umgehen.
+ */
+router.post('/demo-rundgang', requireUnderLimit('objects'), async (req, res, next) => {
+  try {
+    const demoObjectService = require('../services/demoObjectService');
+    const row = await demoObjectService.fuerRundgangAnlegen(req.user.id);
+    if (!row) return res.status(503).json({ error: 'Demo-Objekt nicht verfuegbar' });
+    res.json({ ok: true, id: row.id, name: row.name });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

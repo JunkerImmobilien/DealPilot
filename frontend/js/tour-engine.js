@@ -195,53 +195,106 @@
     return null;
   }
 
-  function _setzeFeld(id, wert) {
-    var e = document.getElementById(id);
-    if (!e) return;
-    e.value = String(wert);
+  /* V239.7: MouseEvent statt .click(), weil die Karten Event-Delegation
+     nutzen - ein nacktes .click() erreicht den Delegaten nicht immer. */
+  function _karteKlicken(el) {
     try {
-      e.dispatchEvent(new Event('input', { bubbles: true }));
-      e.dispatchEvent(new Event('change', { bubbles: true }));
-    } catch (ex) {}
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+    } catch (e) {
+      try { el.click(); } catch (e2) { console.warn('[DpTour V239.7] click failed:', e2); }
+    }
   }
 
-  /* Die Zahlen sind bewusst unauffaellig: ein kleines Mehrfamilienhaus,
-     das sich knapp traegt. Ein Vorzeigeobjekt mit Traumwerten waere fuer
-     eine Erklaerung schlechter - es zeigt nur den einen Fall, in dem
-     alles gruen ist. */
+  /* ───────────────────────────────────────────────────────────────────────
+     v1747 · DIE SCHIENE AUFKLAPPEN, BEVOR NACH KARTEN GESUCHT WIRD
+
+     Marcel am 01.10.2026: „Ich habe jetzt schon wieder die Tour gestartet
+     und dann hatte ich schon bei dem ersten: Hier stehen deine Objekte.
+     Nee, da sind die Aktionen. Also da muesste dann erst auf Portfolio
+     geklickt werden."
+
+     In Aktenmappe, Kanzlei und Tower hat die Schiene zwei Stellungen, und
+     ausgeliefert wird sie auf „Aktionen" — `.dpl-teil-objekte` steht dann
+     auf `display:none`. Gemessen am 01.10.2026: 20 Karten im DOM, davon 0
+     sichtbar; ein Klick auf `.dpl-portfolio` macht 0 px zu 691 px und alle
+     20 sichtbar.
+
+     > Das war die Ursache hinter einem Fehler, den ich zuerst fuer einen
+     > Zeitfehler hielt: die Tour legte ein Demo-Objekt an, OBWOHL 18 echte
+     > da waren. Sie waren da - nur zugeklappt. Eine Abwesenheit, die nur
+     > eine Verdeckung ist, sieht in jeder Messung gleich aus; der
+     > Unterschied steht erst im Umschalter.
+     ─────────────────────────────────────────────────────────────────── */
+  function _portfolioAufklappen() {
+    try {
+      var liste = document.querySelector('.dpl-teil-objekte');
+      if (!liste) return false;                       /* DealPilot-Ansicht: keine Schiene */
+      if (liste.getBoundingClientRect().height > 20) return false;  /* steht schon offen */
+      var um = document.querySelector('.dpl-portfolio');
+      if (!um) return false;
+      um.click();
+      console.log('[DpTour v1747] Schiene stand auf Aktionen - Portfolio aufgeklappt');
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* Sucht die Karte und klappt dafuer notfalls auf. Der Umweg kostet nichts,
+     wenn die Liste schon offen ist. */
+  function _karteSuchen() {
+    var k = _sichtbareKarte();
+    if (k) return Promise.resolve(k);
+    if (!_portfolioAufklappen()) return Promise.resolve(null);
+    return new Promise(function (fertig) {
+      var seit = Date.now();
+      (function warte() {
+        var k2 = _sichtbareKarte();
+        if (k2 || (Date.now() - seit) > 1200) { fertig(k2); return; }
+        setTimeout(warte, 60);
+      })();
+    });
+  }
+
+  /* ───────────────────────────────────────────────────────────────────────
+     v1747 · DAS OFFIZIELLE DEMO-OBJEKT STATT EINES SELBSTGEBAUTEN
+
+     Marcel am 01.10.2026: „Wir haben doch auch diese Demo-Objekte, die der
+     Kunde bei der Erstanmeldung bekommt. Koennen wir das nicht laden?"
+
+     Er hat recht, und es war doppelte Arbeit. v1746 tippte 16 Felder in das
+     Formular und speicherte - gemessen 13 Sekunden, und das Ergebnis trug
+     kein Foto, keine KI-Analyse und 16 von 129 Feldern. Das Objekt aus
+     `backend/src/db/demo-object.json` hat alles davon und ist dasselbe, das
+     ein Neukunde bei der Registrierung bekommt.
+
+     > Ein Beispiel, das der Kunde ohnehin kennt, ist das bessere Beispiel.
+     > Und ein zweites, handgepflegtes daneben waere eine Stelle mehr, an
+     > der etwas veraltet, ohne dass es jemand merkt.
+     ─────────────────────────────────────────────────────────────────── */
   function _demoAnlegen() {
     return new Promise(function (fertig) {
       try {
-        if (typeof window.newObj !== 'function' || typeof window.saveObj !== 'function') return fertig(null);
-        window.newObj();
-        setTimeout(function () {
-          try {
-            _setzeFeld('str', 'Musterweg');      _setzeFeld('hnr', '7');
-            _setzeFeld('plz', '32602');          _setzeFeld('ort', 'Vlotho');
-            _setzeFeld('objart', 'MFH');         _setzeFeld('baujahr', '1994');
-            _setzeFeld('wfl', '420');            _setzeFeld('einheiten', '6');
-            _setzeFeld('gsfl', '640');           _setzeFeld('zimmer', '16');
-            _setzeFeld('kp', '620000');          _setzeFeld('nkm', '3100');
-            _setzeFeld('ek', '130000');          _setzeFeld('d1', '540000');
-            _setzeFeld('kuerzel', 'RUNDGANG');
-            _setzeFeld('notizen', 'Beispielobjekt für den Rundgang. DealPilot hat es angelegt, weil noch kein eigenes Objekt vorhanden war — nach dem Rundgang verschwindet es wieder.');
-            try { if (typeof window.calc === 'function') window.calc(); } catch (ex) {}
-            setTimeout(function () {
-              try {
-                window._currentObjKey = null;
-                if (window.ObjNumbering && typeof window.ObjNumbering.next === 'function') {
-                  window._currentObjSeq = window.ObjNumbering.next();
-                }
-                Promise.resolve(window.saveObj({ silent: true })).then(function () {
-                  _demoAngelegt = window._currentObjKey || null;
-                  console.log('[DpTour v1746] Demo-Objekt angelegt:', _demoAngelegt);
-                  if (typeof window.refreshSavedList === 'function') { try { window.refreshSavedList(); } catch (ex) {} }
-                  setTimeout(function () { fertig(_demoAngelegt); }, 900);
-                }).catch(function () { fertig(null); });
-              } catch (ex) { fertig(null); }
-            }, 700);
-          } catch (ex) { fertig(null); }
-        }, 700);
+        if (!window.Auth || typeof window.Auth.apiCall !== 'function') return fertig(null);
+        window.Auth.apiCall('/objects/demo-rundgang', { method: 'POST', body: {} })
+          .then(function (r) {
+            var key = (r && (r.id || r.objectId)) || null;
+            if (!key) { fertig(null); return; }
+            _demoAngelegt = key;
+            console.log('[DpTour v1747] Demo-Objekt geladen:', (r && r.name) || key);
+            /* Die Liste neu holen und warten, bis die Karte wirklich steht -
+               nicht auf die Uhr, sondern auf das Ziel. */
+            if (typeof window.refreshSavedList === 'function') {
+              try { window.refreshSavedList(); } catch (ex) {}
+            }
+            var seit = Date.now();
+            (function warte() {
+              if (_sichtbareKarte() || (Date.now() - seit) > 2500) { fertig(key); return; }
+              setTimeout(warte, 70);
+            })();
+          })
+          .catch(function (e) {
+            console.warn('[DpTour v1747] Demo-Objekt konnte nicht geladen werden:', e);
+            fertig(null);
+          });
       } catch (ex) { fertig(null); }
     });
   }
@@ -266,6 +319,12 @@
   // V239.7: MouseEvent statt .click() weil Sidebar-Cards Event-Delegation nutzen
   function _ensureObjectLoaded() {
     return new Promise(function(resolve) {
+      /* v1747 · ZUERST aufklappen, dann alles andere. Das gehoert vor die
+         Abkuerzungen darunter: Marcel hatte ein Objekt geladen, also kehrte
+         die Funktion sofort zurueck - und Schritt 1 rahmte die zugeklappte
+         Aktionen-Zeile ein, weil niemand die Schiene umgeschaltet hatte.
+         Die Karte wird hier gebraucht, auch wenn das Objekt schon steht. */
+      _portfolioAufklappen();
       // Schon ein Objekt aktiv?
       var hdrObj = document.querySelector('#hdr-obj');
       if (hdrObj && hdrObj.textContent && hdrObj.textContent.trim() !== 'Neues Objekt') {
@@ -277,34 +336,39 @@
       }
       /* v1746 · Die SICHTBARE Karte nehmen - in Aktenmappe, Kanzlei und
          Tower liegen in `#sb-list` nur 0x0-Huellen, die echte Karte steht
-         in der Schiene. Ein Klick auf eine Huelle laedt nichts. */
-      var firstItem = _sichtbareKarte();
-      if (firstItem) {
-        try {
-          firstItem.dispatchEvent(new MouseEvent('click', {
-            bubbles: true, cancelable: true, view: window
-          }));
-        } catch(e) {
-          try { firstItem.click(); } catch(e2) {
-            console.warn('[DpTour V239.7] click failed:', e2);
-          }
+         in der Schiene. Ein Klick auf eine Huelle laedt nichts.
+         v1747 · und sie steht nur dann sichtbar dort, wenn die Schiene auf
+         „Portfolio" geschaltet ist - sonst erst umschalten. */
+      _karteSuchen().then(function (firstItem) {
+        if (firstItem) {
+          _karteKlicken(firstItem);
+          /* Auf das geladene Objekt warten statt auf 1800 ms Uhr */
+          var seit = Date.now();
+          (function warte() {
+            var h = document.querySelector('#hdr-obj');
+            var da = (h && h.textContent && h.textContent.trim() !== 'Neues Objekt' && h.textContent.trim() !== '');
+            if (da || (Date.now() - seit) > 1800) { resolve(true); return; }
+            setTimeout(warte, 70);
+          })();
+          return;
         }
-        setTimeout(function() { resolve(true); }, 1800);
-      } else {
-        /* v1746 · Kein Objekt da - also eines anlegen, statt durch leere
+        /* v1746 · Kein Objekt da - also eines holen, statt durch leere
            Felder zu fuehren. Es wird beim Beenden wieder entfernt. */
-        console.log('[DpTour v1746] Kein Objekt vorhanden - Demo wird angelegt');
+        console.log('[DpTour v1747] Keine sichtbare Karte und kein Objekt - Demo wird geladen');
         _demoAnlegen().then(function (key) {
           if (!key) { resolve(false); return; }
-          var karte = _sichtbareKarte();
-          if (karte) {
-            try {
-              karte.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-            } catch (e) { try { karte.click(); } catch (e2) {} }
-          }
-          setTimeout(function () { resolve(true); }, 1500);
+          _karteSuchen().then(function (karte) {
+            if (karte) _karteKlicken(karte);
+            var seit = Date.now();
+            (function warte() {
+              var h = document.querySelector('#hdr-obj');
+              var da = (h && h.textContent && h.textContent.trim() !== 'Neues Objekt' && h.textContent.trim() !== '');
+              if (da || (Date.now() - seit) > 2000) { resolve(true); return; }
+              setTimeout(warte, 70);
+            })();
+          });
         });
-      }
+      });
     });
   }
 
