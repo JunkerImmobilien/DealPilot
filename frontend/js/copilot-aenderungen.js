@@ -118,6 +118,45 @@
     return beschriftung(id, e) || id;
   }
 
+  /* v1764b · WERTE IN KLARTEXT, NICHT ALS SCHLÜSSEL.
+
+     Gemessen: die Rückfrage zeigte „neu: stark_sanierungsbeduerftig".
+     Das ist der interne Wert der Auswahl; auf dem Bildschirm steht an
+     dieser Stelle „Stark sanierungsbedürftig".
+
+     > Wer einen Schlüssel liest, wo ein Wort steht, muss übersetzen —
+     > und genau an der Stelle, an der er entscheiden soll, ob er
+     > zustimmt. */
+  function wertText(id, wert) {
+    var e = el(id);
+    if (!e) return String(wert);
+    if (e.type === 'checkbox') {
+      var w = String(wert).toLowerCase();
+      return (w === 'true' || w === 'ja' || w === '1') ? 'ja' : 'nein';
+    }
+    if (e.tagName === 'SELECT') {
+      for (var i = 0; i < e.options.length; i++) {
+        if (String(e.options[i].value) === String(wert)) {
+          var t = (e.options[i].textContent || '').trim();
+          if (t) return t;
+        }
+      }
+    }
+    return String(wert);
+  }
+
+  /* Der aktuelle Wert eines Feldes, ebenfalls in Klartext. */
+  function istText(id) {
+    var e = el(id);
+    if (!e) return '';
+    if (e.type === 'checkbox') return e.checked ? 'ja' : 'nein';
+    if (e.tagName === 'SELECT' && e.selectedIndex >= 0) {
+      var t = (e.options[e.selectedIndex].textContent || '').trim();
+      if (t) return t;
+    }
+    return String(e.value || '');
+  }
+
   /* ═══════════════════════════════════════════════════════════════════
      v1763 · DIE ABSICHT WIRD ÖRTLICH ERKANNT, NICHT ERFRAGT
      ═══════════════════════════════════════════════════════════════════
@@ -336,7 +375,7 @@
       teile.push('<b>Das trage ich ein:</b><ul class="' + MARKE + '-liste">'
         + neu.map(function (x) {
             _vorschlag.werte[x.id] = x.wert;
-            return '<li>' + esc(anzeige(x.id)) + ': <b>' + esc(String(x.wert)) + '</b></li>';
+            return '<li>' + esc(anzeige(x.id)) + ': <b>' + esc(wertText(x.id, x.wert)) + '</b></li>';
           }).join('')
         + '</ul>');
     }
@@ -349,9 +388,9 @@
               + '<div class="' + MARKE + '-k-name">' + esc(anzeige(x.id)) + '</div>'
               + '<div class="' + MARKE + '-k-wahl">'
               + '<button type="button" class="' + MARKE + '-w" data-i="' + i + '" data-nimm="alt">'
-              +   'bleibt: <b>' + esc(String(x.alt)) + '</b></button>'
+              +   'bleibt: <b>' + esc(istText(x.id) || String(x.alt)) + '</b></button>'
               + '<button type="button" class="' + MARKE + '-w an" data-i="' + i + '" data-nimm="neu">'
-              +   'neu: <b>' + esc(String(x.neu)) + '</b></button>'
+              +   'neu: <b>' + esc(wertText(x.id, x.neu)) + '</b></button>'
               + '</div></div>';
           }).join('')
         + '</div>');
@@ -721,20 +760,49 @@
        sonst steht die Begründung unter ihrer eigenen Folge. */
     if (rest) addMsg('assistant', rest);
 
-    var neu = [], konflikte = [];
+    var neu = [], konflikte = [], unbekannt = [], gleich = [];
     Object.keys(f).forEach(function (id) {
       var wert = f[id];
       if (wert == null || String(wert).trim() === '') return;
       var e = el(id);
-      if (!e) return;                    /* erfundene Id — stillschweigend fallen lassen */
+      /* v1764b · Eine Id, die es nicht gibt, ist etwas ANDERES als ein
+         Wert, der schon stimmt. Vorher fielen beide in dieselbe Meldung
+         („steht schon so") — und bei Marcels erstem Satz war genau das
+         der Fall: das Modell hatte eine Option genannt, die es im Feld
+         nicht gibt. Die Meldung schickte ihn damit in die falsche
+         Richtung. */
+      if (!e) { unbekannt.push(id); return; }
+      /* Bei einer Auswahl zählt nur, was dort auch wählbar ist. */
+      if (e.tagName === 'SELECT') {
+        var kennt = false;
+        for (var i = 0; i < e.options.length; i++) {
+          if (String(e.options[i].value) === String(wert)) { kennt = true; break; }
+        }
+        if (!kennt) {
+          var moeglich = [];
+          for (var j = 0; j < e.options.length; j++) {
+            var t = (e.options[j].textContent || '').trim();
+            if (e.options[j].value !== '' && t) moeglich.push(t);
+          }
+          addMsg('assistant', 'Für „' + esc(anzeige(id)) + '" gibt es den Wert „'
+            + esc(String(wert)) + '" nicht. Zur Auswahl stehen: '
+            + esc(moeglich.join(' · ')) + '.');
+          return;
+        }
+      }
       if (istLeer(e)) { neu.push({ id: id, wert: wert }); return; }
       var alt = (e.type === 'checkbox') ? (e.checked ? 'ja' : 'nein') : String(e.value);
-      if (String(alt).trim() === String(wert).trim()) return;
+      if (String(alt).trim() === String(wert).trim()) { gleich.push(id); return; }
       konflikte.push({ id: id, alt: alt, neu: wert });
     });
 
     if (!neu.length && !konflikte.length) {
-      addMsg('assistant', 'Die genannten Werte stehen schon so im Objekt — nichts zu ändern.');
+      if (unbekannt.length) {
+        addMsg('assistant', 'Die genannten Angaben passen zu keinem Feld, das ich kenne ('
+          + esc(unbekannt.join(', ')) + ').');
+      } else if (gleich.length) {
+        addMsg('assistant', 'Das steht schon so im Objekt — nichts zu ändern.');
+      }
       return '';
     }
     zeigeVorschlag(neu, konflikte, addMsg);
