@@ -46,6 +46,7 @@ const DIR = fileURLToPath(new URL('../src/lib/register/', import.meta.url));
    Angabe ist kein Befund, sondern möglicherweise ein Ausfall. ────────── */
 const alleDateien = readdirSync(DIR).filter((f) => f.endsWith('.json')).sort();
 let gelesen = 0;
+let wegweiser = 0;
 const uebersprungen = [];
 let saetze = [];
 
@@ -58,6 +59,20 @@ for (const f of alleDateien) {
     continue;
   }
   if (!Array.isArray(j)) {
+    /* v1757b · EIN WEGWEISER IST KEIN AUSFALL.
+       Die Verfuegbarkeitsdateien (verfuegbarkeit-*.json) sind bewusst
+       Objekte: sie tragen keine Werte, sondern die Auskunft, WELCHER
+       Ausschuss welche Daten fuehrt. Sie gehoeren nicht nach
+       param_modell.
+
+       Der erste Entwurf zaehlte sie als "nicht gelesen" — mit drei
+       solchen Dateien fiel die Deckung unter 90 % und der Lauf brach ab,
+       OBWOHL nichts kaputt war. Ein Waechter, der dort rot wird, wo nichts
+       falsch ist, wird genauso ignoriert wie einer, der immer gruen ist. */
+    if (j && j.was && (j.gebiete || j.ausschuesse)) {
+      wegweiser++;
+      continue;
+    }
     uebersprungen.push(`${f} — kein Array (${typeof j})`);
     continue;
   }
@@ -73,7 +88,8 @@ if (NUR) saetze = saetze.filter((m) => String(m.land_code).toUpperCase() === NUR
 
 console.log('═══ DECKUNG ═══');
 console.log(`Dateien im Register : ${alleDateien.length}`);
-console.log(`davon gelesen       : ${gelesen}`);
+console.log(`davon Datensatzdateien: ${gelesen}`);
+if (wegweiser) console.log(`davon Wegweiser     : ${wegweiser} (Verfuegbarkeit, keine Werte)`);
 if (uebersprungen.length) {
   console.log(`Hinweise            : ${uebersprungen.length}`);
   uebersprungen.forEach((z) => console.log(`   · ${z}`));
@@ -87,8 +103,8 @@ if (!saetze.length) { console.error('ABBRUCH: keine Datensätze.'); process.exit
    Werkzeug ein Problem, nicht das Register. Dieselbe Schwelle wie beim
    Gold-Audit, und aus demselben Grund: ein Prüfer, der grün wird, ohne
    gelesen zu haben, ist schlimmer als keiner. */
-if (gelesen / alleDateien.length < 0.9) {
-  console.error(`ABBRUCH: nur ${gelesen} von ${alleDateien.length} Dateien lesbar (< 90 %).`);
+if ((gelesen + wegweiser) / alleDateien.length < 0.9) {
+  console.error(`ABBRUCH: nur ${gelesen + wegweiser} von ${alleDateien.length} Dateien lesbar (< 90 %).`);
   process.exit(1);
 }
 
