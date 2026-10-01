@@ -119,6 +119,79 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════
+     v1763 · DIE ABSICHT WIRD ÖRTLICH ERKANNT, NICHT ERFRAGT
+     ═══════════════════════════════════════════════════════════════════
+
+     Marcel am 01.10.2026: „Der braucht jetzt relativ lange. Er möchte
+     halt immer nur gucken, ob es Änderungen gibt, der Co-Pilot. Der soll
+     ja eigentlich Fragen beantworten zum Objekt … Also er soll schon den
+     Funktionsumfang von vorher noch kennen."
+
+     Er hat recht, und der Fehler war meiner. v1760 fing JEDE Nachricht ab
+     und fragte erst den Server, ob Felder darin stecken. Damit lief jede
+     ganz normale Frage — „Wie sieht es mit der Mietentwicklung aus?" —
+     durch einen zusätzlichen Netzwerkweg, bevor sie überhaupt beim
+     Co-Pilot ankam.
+
+     > Eine Erweiterung, die den Hauptzweck verlangsamt, ist keine
+     > Erweiterung, sondern eine Verlagerung. Der Co-Pilot beantwortet
+     > Fragen; Felder zu ändern ist der Sonderfall und muss sich
+     > entsprechend verhalten.
+
+     Jetzt entscheidet eine ÖRTLICHE Prüfung, die nichts kostet. Sie ist
+     bewusst eng: im Zweifel Frage. Lieber eine Änderung, die als Frage
+     durchrutscht — die wiederholt man mit „ändere …" — als eine Frage,
+     die auf eine Feldzuordnung wartet. */
+
+  /* Verben und Wendungen, die eine Änderung ANSAGEN. Nur damit wird der
+     teure Weg betreten. */
+  var ANSAGE = new RegExp(
+    '(' +
+    'ändere|ändern|änder\\b|abändern|' +
+    'setze|setz\\b|setzen\\s+auf|' +
+    'trag(e|en)?\\s+(bitte\\s+)?(\\w+\\s+){0,3}ein|eintragen|' +
+    'korrigier(e|en)?|aktualisier(e|en)?|' +
+    'pass(e|en)?\\s+(\\w+\\s+){0,3}an|anpassen|' +
+    'überschreib(e|en)?|ersetz(e|en)?|' +
+    'übernimm|übernehmen\\s+(als|für)|' +
+    'stell(e|en)?\\s+(\\w+\\s+){0,3}auf|' +
+    'mach(e|en)?\\s+(\\w+\\s+){0,3}(zu|auf)\\s|' +
+    /* „ist die Miete jetzt 850" — zwischen Verb und „jetzt" stehen
+       Wörter. Ohne die Lücke verpasst das Muster genau die Form, in der
+       Marcel seine Beispiele formuliert hat. */
+    'ist\\s+(\\w+\\s+){0,3}(jetzt|nun|neu\\b)|sind\\s+(\\w+\\s+){0,3}(jetzt|nun|neu\\b)|' +
+    'liegt\\s+(\\w+\\s+){0,2}(jetzt|nun)\\s+bei|beträgt\\s+(\\w+\\s+){0,2}(jetzt|nun)|' +
+    'soll\\s+(\\w+\\s+){0,4}(sein|betragen|werden)|' +
+    'neuer?\\s+(wert|miete|kaufpreis|baujahr)' +
+    ')', 'i');
+
+  /* Eine Zahl muss dabei sein — „ändere mal was" ist keine Änderung. */
+  function istAenderungsansage(text) {
+    if (!text || text.length < 6) return false;
+    if (!/\d/.test(text)) return false;
+    return ANSAGE.test(text);
+  }
+
+  /* Für den Portfolio-Piloten zusätzlich: ein erkennbarer Objektbezug.
+     Ohne ihn ist selbst „ändere die Miete auf 850" dort mehrdeutig. */
+  function hinweisWennKnapp(text, addMsg) {
+    /* Wer eine Zahl nennt, aber kein Änderungswort, bekommt EINMAL den
+       Hinweis — statt dass er rät, warum nichts passiert ist. */
+    try {
+      if (window.__dpCpaHinweisGezeigt) return;
+      if (!/\d/.test(text)) return;
+      if (istAenderungsansage(text)) return;
+      window.__dpCpaHinweisGezeigt = true;
+      setTimeout(function () {
+        addMsg('assistant', 'Übrigens: wenn ich etwas am Objekt ändern soll, '
+          + 'sag es als Anweisung — zum Beispiel „ändere die Miete auf 850" '
+          + 'oder „die Miete ist jetzt 850". Dann trage ich es ein und frage '
+          + 'nach, falls dort schon etwas steht.');
+      }, 400);
+    } catch (e) {}
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
      v1762 · DER PORTFOLIO-PILOT MUSS ERST WISSEN, WELCHES OBJEKT
      ═══════════════════════════════════════════════════════════════════
 
@@ -316,7 +389,15 @@
       /* Ohne geladenes Objekt gibt es nichts zu ändern — dann ist es eine
          normale Frage. */
       if (!window._currentObjKey) return;
-      if (txt.length < 6) return;
+
+      /* v1763 · DER SCHNELLE WEG IST DER NORMALFALL.
+         Ohne klare Änderungsansage wird NICHTS abgefangen: die Nachricht
+         geht unberührt an den Co-Pilot, ohne zusätzlichen Netzwerkweg.
+         Vorher lief hier jede Frage erst durch extract-text. */
+      if (!istAenderungsansage(txt)) {
+        try { hinweisWennKnapp(txt, window.__dpCpAddMsg); } catch (e) {}
+        return;
+      }
 
       var kat = katalog();
       if (!kat.length) return;
@@ -375,7 +456,9 @@
     inp.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         var txt = (inp.value || '').trim();
-        if (txt && window._currentObjKey && txt.length >= 6) {
+        /* Dieselbe Bedingung wie beim Klick — sonst verhielte sich Enter
+           anders als der Knopf, und genau das sucht später niemand. */
+        if (txt && window._currentObjKey && istAenderungsansage(txt)) {
           e.stopImmediatePropagation();
           e.preventDefault();
           pruefen({ stopImmediatePropagation: function () {}, preventDefault: function () {} });
@@ -463,12 +546,25 @@
       var addMsg = window.__dpPpAddMsg;
       if (typeof addMsg !== 'function') return;
 
-      /* Nur eingreifen, wenn es nach einer Änderung AUSSIEHT. Eine Frage
-         („wie steht mein Portfolio da?") soll den normalen Weg gehen —
-         sie enthält keine Zahl mit Einheit und keinen Objektbezug. */
+      /* v1763 · Zwei Bedingungen, beide örtlich und kostenlos: eine klare
+         Änderungsansage UND ein erkennbares Objekt. Fehlt eines, geht die
+         Nachricht unberührt an den Portfolio-Piloten — er beantwortet
+         Fragen zum ganzen Bestand, und das muss schnell bleiben. */
+      if (!istAenderungsansage(txt)) {
+        try { hinweisWennKnapp(txt, addMsg); } catch (e) {}
+        return;
+      }
       var fund = objektFinden(txt);
-      if (fund.art === 'keins' || fund.art === 'keine') return;
-      if (!/\d/.test(txt)) return;
+      if (fund.art === 'keins' || fund.art === 'keine') {
+        /* Änderung gewollt, aber kein Objekt erkannt — das gehört gesagt,
+           sonst wundert sich der Nutzer, warum nichts passiert. */
+        addMsg('assistant', 'Das klingt nach einer Änderung — ich weiß nur nicht, '
+          + 'an welchem Objekt. Nenn die Adresse oder die Objektnummer dazu, '
+          + 'zum Beispiel „bei der Bismarckstr. 27 ist die Miete jetzt 1450".');
+        inp.value = '';
+        ev.stopImmediatePropagation(); ev.preventDefault();
+        return;
+      }
 
       ev.stopImmediatePropagation(); ev.preventDefault();
       var merk = txt;
@@ -513,12 +609,9 @@
     inp.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         var txt = (inp.value || '').trim();
-        if (txt && txt.length >= 6 && /\d/.test(txt)) {
-          var f = objektFinden(txt);
-          if (f.art === 'eins' || f.art === 'mehrere') {
-            e.stopImmediatePropagation(); e.preventDefault();
-            pruefen({ stopImmediatePropagation: function () {}, preventDefault: function () {} });
-          }
+        if (txt && istAenderungsansage(txt)) {
+          e.stopImmediatePropagation(); e.preventDefault();
+          pruefen({ stopImmediatePropagation: function () {}, preventDefault: function () {} });
         }
       }
     }, true);
