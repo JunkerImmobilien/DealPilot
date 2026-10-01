@@ -152,6 +152,55 @@ window.DealPilotOnboarding = (function () {
     return false;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1753b · DIE VORSCHAU ZEIGT DIE AUFTEILUNG, NICHT ZWEI RECHTECKE
+     ═══════════════════════════════════════════════════════════════════
+
+     Marcel am 01.10.2026: „Die Bilder der einzelnen Designs sind
+     nichtssagend."
+
+     Er hat recht, und es war messbar: die vier Vorschauen bestanden aus
+     denselben zwei Elementen (`.dpo-v-leiste`, `.dpo-v-flaeche`).
+     Aktenmappe und Kanzlei unterschieden sich um GENAU eine Zahl —
+     `right:5px` gegen `right:14px`. Das sieht niemand.
+
+     > Eine Vorschau, die alle Möglichkeiten gleich aussehen lässt, ist
+     > kein Bild, sondern eine Verzierung. Sie kostet den Nutzer die
+     > Entscheidung, für die sie da ist.
+
+     Was die vier Ansichten WIRKLICH unterscheidet, ist der Raum:
+
+       DealPilot    dunkel · Reiter oben · ein Arbeitsbereich
+       Aktenmappe   hell · Menü links · Reiter oben im Kopf
+       Kanzlei      hell · zwei Schienen: Navigation links, Aktionen rechts
+       Tower        dunkel · Aktionen links, Score und Ausgaben rechts
+
+     Die Miniatur zeigt genau das: Kopf, Spalten, Inhaltskacheln — in der
+     Helligkeit der jeweiligen Ansicht. Gold bleibt der Akzent, nicht die
+     Fläche (sonst tritt nichts mehr hervor). */
+  function _vorschau(id) {
+    var dunkel = (!id || id === 'v2b');            /* DealPilot und Tower */
+    var teile = '<i class="dpo-m-kopf"></i>';
+    if (!id) {
+      /* DealPilot: Reiter im Kopf, darunter ein breiter Bereich */
+      teile += '<i class="dpo-m-reiter"></i><i class="dpo-m-haupt dpo-m-voll"></i>';
+    } else if (id === 'v1b') {
+      /* Aktenmappe: Menüspalte links */
+      teile += '<i class="dpo-m-links"></i><i class="dpo-m-reiter dpo-m-reiter-ein"></i>'
+            +  '<i class="dpo-m-haupt dpo-m-ein"></i>';
+    } else if (id === 'v2') {
+      /* Kanzlei: zwei Schienen */
+      teile += '<i class="dpo-m-links"></i><i class="dpo-m-rechts"></i>'
+            +  '<i class="dpo-m-haupt dpo-m-mitte"></i>';
+    } else {
+      /* Tower: zwei Schienen, dunkel, rechts breiter (Score + Ausgaben) */
+      teile += '<i class="dpo-m-links"></i><i class="dpo-m-rechts dpo-m-rechts-breit"></i>'
+            +  '<i class="dpo-m-haupt dpo-m-mitte dpo-m-mitte-schmal"></i>';
+    }
+    return '<span class="dpo-k-vorschau dpo-mini' + (dunkel ? ' dpo-mini-dunkel' : ' dpo-mini-hell')
+      + '" aria-hidden="true">' + teile + '</span>';
+  }
+
   /* ══ SCHRITT 1 · AUSSEHEN ═════════════════════════════════════════ */
   function s1() {
     return ''
@@ -161,9 +210,7 @@ window.DealPilotOnboarding = (function () {
       + AUSSEHEN.map(function (a) {
           return '<button type="button" class="dpo-kachel' + (_wahl.aussehen === a.id ? ' an' : '')
             + '" data-aussehen="' + esc(a.id) + '">'
-            + '<span class="dpo-k-vorschau dpo-v-' + (a.id || 'std') + '">'
-            +   '<i class="dpo-v-leiste"></i><i class="dpo-v-flaeche"></i>'
-            + '</span>'
+            + _vorschau(a.id)
             + '<span class="dpo-k-name">' + esc(a.name) + '</span>'
             + '<span class="dpo-k-unter">' + esc(a.unter) + '</span>'
             + '<span class="dpo-k-fuer">' + esc(a.fuer) + '</span>'
@@ -794,6 +841,34 @@ window.DealPilotOnboarding = (function () {
       '.dpo-k-zusatz{font-size:10.5px;color:var(--wl-b8932f,#b8932f);margin-top:4px;font-weight:600}',
       '.dpo-k-vorschau{display:block;height:38px;border-radius:7px;overflow:hidden;position:relative;margin-bottom:6px;background:#0c0b09}',
       '.dpo-k-vorschau i{position:absolute;display:block}',
+      /* ── v1753b · Die Miniaturen der vier Ansichten ──────────────────
+         Jede zeigt die Aufteilung: Kopf, Spalten, Inhalt. Die alten
+         Regeln (.dpo-v-*) bleiben stehen, bis klar ist, dass sie
+         nirgends sonst gebraucht werden — sie kosten nichts. */
+      '.dpo-mini{position:relative;overflow:hidden;border-radius:4px}',
+      '.dpo-mini-dunkel{background:#0A0A09}',
+      '.dpo-mini-hell{background:#FDFCFA;box-shadow:inset 0 0 0 1px #E6E1D6}',
+      '.dpo-mini i{position:absolute;display:block}',
+      /* Kopfleiste: in beiden Fassungen vorhanden, dunkel kräftiger */
+      '.dpo-mini .dpo-m-kopf{left:0;right:0;top:0;height:16%;background:var(--wl-c9a84c,#C9A84C);opacity:.85}',
+      /* Reiterzeile unter dem Kopf */
+      '.dpo-mini .dpo-m-reiter{left:4%;right:4%;top:22%;height:7%;border-radius:1px;background:rgba(255,255,255,.3)}',
+      '.dpo-mini-hell .dpo-m-reiter{background:rgba(26,21,8,.22)}',
+      '.dpo-mini .dpo-m-reiter-ein{left:34%}',
+      /* Seitenschienen */
+      '.dpo-mini .dpo-m-links{left:0;top:16%;bottom:0;width:28%;background:rgba(255,255,255,.14)}',
+      '.dpo-mini-hell .dpo-m-links{background:rgba(26,21,8,.1)}',
+      '.dpo-mini .dpo-m-rechts{right:0;top:16%;bottom:0;width:22%;background:rgba(255,255,255,.14)}',
+      '.dpo-mini-hell .dpo-m-rechts{background:rgba(26,21,8,.1)}',
+      '.dpo-mini .dpo-m-rechts-breit{width:30%}',
+      /* Arbeitsbereich */
+      '.dpo-mini .dpo-m-haupt{top:33%;bottom:6%;border-radius:2px;background:rgba(255,255,255,.08)}',
+      '.dpo-mini-hell .dpo-m-haupt{background:rgba(26,21,8,.05);box-shadow:inset 0 0 0 1px rgba(26,21,8,.08)}',
+      '.dpo-mini .dpo-m-voll{left:5%;right:5%}',
+      '.dpo-mini .dpo-m-ein{left:34%;right:5%}',
+      '.dpo-mini .dpo-m-mitte{left:32%;right:26%;top:22%}',
+      '.dpo-mini .dpo-m-mitte-schmal{left:32%;right:34%}',
+
       '.dpo-v-leiste{background:var(--wl-c9a84c,#C9A84C)}.dpo-v-flaeche{background:rgba(255,255,255,.14)}',
       '.dpo-v-std .dpo-v-leiste{left:0;right:0;top:0;height:7px}.dpo-v-std .dpo-v-flaeche{left:5px;right:5px;top:12px;bottom:5px}',
       '.dpo-v-v1b{background:#FDFCFA}.dpo-v-v1b .dpo-v-leiste{left:0;top:0;bottom:0;width:11px}.dpo-v-v1b .dpo-v-flaeche{left:16px;right:5px;top:5px;bottom:5px;background:rgba(26,21,8,.1)}',
