@@ -286,7 +286,16 @@ window.DealPilotOnboarding = (function () {
 
   /* ══ Modal ════════════════════════════════════════════════════════ */
   function zeige(ab) {
+    /* v1740b · `if (_ov) return` allein reicht nicht: wird das Overlay von
+       aussen aus dem DOM genommen - durch fremden Code, einen Neuaufbau
+       der Seite oder beim Messen -, bleibt die Modulvariable gesetzt und
+       das Modal laesst sich NIE WIEDER oeffnen. Der Merker sitzt dann an
+       zwei Orten und nur einer wurde aufgeraeumt. Gefragt wird deshalb das
+       DOM, nicht die Variable. */
+    if (_ov && !_ov.isConnected) _ov = null;
     if (_ov) return;
+    var alt = document.getElementById('dp-onboarding');
+    if (alt) alt.remove();
     _schritt = Math.max(0, Math.min(SCHRITTE.length - 1, ab || 0));
     try { window.__dpOnboardingAktiv = true; } catch (e) {}
 
