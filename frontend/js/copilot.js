@@ -75,6 +75,12 @@
     return d;
   }
 
+  /* v1760: copilot-aenderungen.js schreibt in denselben Verlauf — es soll
+     seine Rueckfrage dort zeigen, wo auch die Antworten stehen, und nicht
+     in einem zweiten Fenster. Nur diese eine Funktion geht nach aussen;
+     send() bleibt intern, der Einhaengepunkt dort ist der Klick. */
+  window.__dpCpAddMsg = addMsg;
+
   function context() {
     var c = {};
     try { if (typeof _buildAIPayload === 'function') c = _buildAIPayload(); } catch (e) {}
