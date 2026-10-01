@@ -92,6 +92,8 @@
 #dashboard-main .bar .bt .n em{font-style:normal;color:var(--c-pmut);font-size:9px;margin-left:5px}
 
   #dashboard-main .bar .bt .v{font-weight:700;color:var(--c-ptext)}
+  /* v1735 · das „/100" hinter dem Wert, wie im Tab Bewertung */
+  #dashboard-main .bar .bt .v i{font-style:normal;font-weight:400;font-size:.72em;color:var(--c-pmut);margin-left:3px}
 
   #dashboard-main .track{height:7px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
 
@@ -348,15 +350,63 @@
   
   /* fc8 · Serif-Headlines */
   
-  /* fc9 · Dunkler Hero zum Kontrast */
-  #dashboard-main .stage.fc9 .hero{--c-panel:#0c0b09;--c-ptext:#ece7dd;--c-pmut:#9a948a;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}
+  /* ══ fc9 · v1735 — HELLER HERO, WIE DIE SCORE-KARTE IM TAB BEWERTUNG ══
+     Marcel am 01.10.2026: „im Portfolio Cockpit die Karte oben mit dem
+     Score auch in weiss umbauen, dass es aussieht wie der Investor Deal
+     Score."
 
-  #dashboard-main .stage.fc9 .hgate{border-right-color:rgba(255,255,255,.12)}
-#dashboard-main .stage.fc9 .hgate .gl, #dashboard-main .stage.fc9 .hgate .gd, #dashboard-main .stage.fc9 .hgate .tot .k{color:#9a948a}
-#dashboard-main .stage.fc9 .hgate .tot{border-top-color:rgba(255,255,255,.1)}
-#dashboard-main .stage.fc9 .hgate .tot .v{color:#fff}
+     Hier stand „fc9 · Dunkler Hero zum Kontrast": sechs Regeln, die die
+     Hero-Karte GEZIELT wieder auf Obsidian zurueckdrehten, waehrend das
+     uebrige Cockpit ueber `.stage.fc` laengst hell ist (`--c-panel:#fff`,
+     Z. 276). Gemessen mit dem Kaskaden-Walker ueber 10.939 Regeln aus 42
+     Blaettern: genau EIN Treffer setzte den Grund der Karte, und das war
+     `var(--c-panel)` — der Wert kam aus dieser fc9-Zeile.
 
-  #dashboard-main .stage.fc9 .track{background:rgba(255,255,255,.08)}
+     Die Vorlage ist `dpsh-score-hero.js` im Tab Bewertung: weisse Karte,
+     goldener Kopfbalken, Ring links, Balken rechts. Dieselbe Sprache,
+     zweimal dieselbe Aussage — nur sah das Cockpit bisher aus wie etwas
+     anderes.
+
+     Die hellen Werte fuer `.hgate` stehen schon in `.stage.fc` (Z. 289 ff.)
+     und sind durchdacht; hier wird nur das zurueckgenommen, was fc9
+     dagegengesetzt hatte. Eine Abweichung bleibt bewusst: die Labels
+     bekommen #6b6660 statt #9a948a. Auf Weiss hat #9a948a einen Kontrast
+     von 2,8 — zu wenig fuer Kleintext; #6b6660 liegt bei 5,1.          */
+  #dashboard-main .stage.fc9 .hero{--c-panel:#fff;--c-ptext:#1b1815;--c-pmut:#6b6660;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}
+
+  #dashboard-main .stage.fc9 .hgate{border-right-color:#e8e3d6}
+#dashboard-main .stage.fc9 .hgate .gl, #dashboard-main .stage.fc9 .hgate .gd, #dashboard-main .stage.fc9 .hgate .tot .k{color:#6b6660}
+#dashboard-main .stage.fc9 .hgate .tot{border-top-color:#eee6d6}
+#dashboard-main .stage.fc9 .hgate .tot .v{color:#1b1815}
+
+  #dashboard-main .stage.fc9 .track{background:#ece8dd}
+
+  /* ══ DER PORTFOLIO-PASS SITZT UNTEN, NICHT MEHR SEITLICH ══
+     Marcel: „und unten den schwarzen Streifen mit dem QR Code, so wie er
+     jetzt seitlich sitzt."
+
+     Er war ein 158 px breiter WEISSER Block an der rechten Flanke — auf
+     einer dunklen Karte ein Kontrastpunkt, auf einer weissen Karte faellt
+     er in sich zusammen: weiss auf weiss, getrennt nur durch eine Linie.
+
+     > Ein Element, das seine Wirkung aus dem Gegensatz zum Grund zieht,
+     > verliert sie, wenn der Grund seine Farbe wechselt. Es muss dann
+     > die Seiten tauschen, nicht die Position behalten.
+
+     Als Obsidian-Streifen unter der Karte traegt er denselben Inhalt und
+     schliesst sie nach unten ab — und nimmt die Markenfarbe auf, die die
+     Karte oben im Goldband fuehrt.                                      */
+  #dashboard-main .stage.fc9 .hero{flex-direction:column}
+  #dashboard-main .stage.fc9 .hpass{flex:0 0 auto;flex-direction:row;align-items:center;justify-content:flex-start;gap:16px;padding:11px 18px;background:#0c0b09;color:#ece7dd;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent)}
+  /* der Code zuerst — er ist der Grund, warum der Streifen da ist */
+  #dashboard-main .stage.fc9 .hpass .qb{order:-1;background:#fff;padding:5px;border-radius:7px;border:none;line-height:0}
+  #dashboard-main .stage.fc9 .hpass .hp-lab{color:var(--wl-e8cc7a, #E8CC7A)}
+  #dashboard-main .stage.fc9 .hpass .hp-code{color:#ece7dd}
+  #dashboard-main .stage.fc9 .hpass .hp-sub{color:#9a948a;text-align:left;line-height:1.45;margin-left:auto}
+  @media(max-width:620px){
+    #dashboard-main .stage.fc9 .hpass{flex-wrap:wrap;gap:10px;padding:10px 14px}
+    #dashboard-main .stage.fc9 .hpass .hp-sub{margin-left:0;width:100%}
+  }
 
 
   

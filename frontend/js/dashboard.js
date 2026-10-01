@@ -341,7 +341,13 @@
       : '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse</button>';
     var catsHtml = ag.cats ? ag.cats.map(function(c){
         var sc=c.score==null?0:c.score; var w=(KPICOUNT[c.key]||0);
-        return '<div class="bar"><div class="bt"><span class="n">'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc)+'</span></div>'
+        /* v1735 \u00b7 \u201eauch die KPIs anzeigen passend" \u2014 die Score-Karte im Tab
+           Bewertung schreibt hinter jeden Wert ein kleines \u201e/100"
+           (dpsh-score-hero.js). Ohne das steht die Zahl ohne Bezug da: 61
+           kann alles heissen. Die Rohwerte, die dort zusaetzlich unter dem
+           Balken stehen (-103 EUR/Mon, DSCR 1.04), gibt es auf
+           Portfolio-Ebene nicht \u2014 sie waeren hier erfunden. */
+        return '<div class="bar"><div class="bt"><span class="n">'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc+'<i>/100</i>')+'</span></div>'
           + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
       }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
     var cfM=S.cfVsM;
@@ -704,7 +710,7 @@
     for(var i=0;i<years;i++){
       var yr=2026+i, miete=0,bwk=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
       arr.forEach(function(o){
-        /* -- v1704b � DIE PROJEKTION RECHNETE IN CENT ----------------
+        /* -- v1704b � DIE PROJEKTION RECHNETE IN CENT ----------------
            Hier stand `num(o._kaufpreis)`. Der Kommentar an der SSoT
            weiter oben sagt es ausdruecklich: `o.kp` ist EURO,
            `o._kaufpreis` ist CENT. Da alle Folgewerte aus `kp` abgeleitet
@@ -1898,7 +1904,10 @@
          KStG), sondern Bilanz und GuV. Deshalb ein EIGENER Abschnitt und
          kein Haken an der Mappe: es sind zwei verschiedene Dokumente fuer
          zwei verschiedene Steuerarten, nicht zwei Fassungen desselben. */
-      + '<div class="sl"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
+      /* v1735 · die Ueberschrift bekommt eine ID, damit sie zusammen mit der
+         Box verschwinden kann — ohne sie bliebe eine Sektionsnummer ohne
+         Inhalt stehen. */
+      + '<div class="sl" id="dp-abschluss-sl"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe" id="dp-abschluss-box">'
       +   '<div class="dp-mappe-t">Für Objekte, die einer <b>GmbH oder UG</b> gehören: Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu ein Anlagenspiegel je Objekt.</div>'
       +   '<div class="dp-mappe-r" id="dp-abschluss-r">'
@@ -2183,9 +2192,31 @@
   /* ════ v1227 · Jahresabschluss — Gesellschaften und Jahre laden ════
      Gefuellt wird aus dem, was WIRKLICH da ist: Mandanten mit Rechtsform
      GmbH oder UG, und je Gesellschaft die Jahre, fuer die Steuersaetze zu
-     ihren Objekten vorliegen. Gibt es keine Gesellschaft, verschwindet der
-     Abschnitt NICHT — er sagt, warum er leer ist. Ein verschwundener
-     Abschnitt sieht aus wie ein fehlendes Feature. */
+     ihren Objekten vorliegen.
+
+     ── v1735 · HIER GALT BIS ZUM 01.10.2026 DAS GEGENTEIL ──────────────
+     Es stand: „Gibt es keine Gesellschaft, verschwindet der Abschnitt
+     NICHT — er sagt, warum er leer ist. Ein verschwundener Abschnitt
+     sieht aus wie ein fehlendes Feature."
+
+     Marcel am 01.10.2026: „Beim Portfolio Cockpit sollte der
+     Jahresabschluss erst erscheinen, wenn wir wirklich eine Gesellschaft
+     haben."
+
+     Das Argument von damals stimmt weiterhin — nur wiegt es hier anders
+     als angenommen. Es greift bei einem Feature, das der Nutzer SUCHEN
+     koennte. Bilanz und GuV nach § 8 Abs. 2 KStG sucht niemand, der
+     privat vermietet: fuer ihn ist der Abschnitt keine Information,
+     sondern eine Zeile, die er jedes Mal ueberliest und die seine
+     Sektionsnummern verschiebt.
+
+     > Ein Hinweis auf etwas, das den Leser nichts angeht, ist kein
+     > Hinweis, sondern Rauschen. Er kostet jeden Blick, den er bekommt,
+     > und zahlt nur an die wenigen zurueck, die ohnehin eine GmbH haben.
+
+     Der Weg dorthin geht nicht verloren: Einstellungen / Mandanten legt
+     die Gesellschaft an, und sobald eine existiert, ist der Abschnitt
+     da — mitsamt Ueberschrift. */
   async function _abschlussInit() {
     var box = document.getElementById('dp-abschluss-box');
     var reihe = document.getElementById('dp-abschluss-r');
@@ -2197,13 +2228,15 @@
         .filter(function (m) { return DealPilotMandanten.isCorp(m.rechtsform); });
     } catch (e) {}
 
+    var sl = document.getElementById('dp-abschluss-sl');
     if (!corps.length) {
-      reihe.innerHTML = '<div style="font-size:12.5px;opacity:.75;line-height:1.55">'
-        + 'Es ist noch keine Gesellschaft angelegt. Unter <b>Einstellungen / Mandanten</b> '
-        + 'eine GmbH oder UG anlegen und die Objekte dort als Halter zuordnen — danach '
-        + 'erscheint hier die Auswahl.</div>';
+      /* v1735 · ganz weg, Ueberschrift mit — sonst steht Sektion 09 leer da */
+      box.style.display = 'none';
+      if (sl) sl.style.display = 'none';
       return;
     }
+    box.style.display = '';
+    if (sl) sl.style.display = '';
 
     var mSel = document.getElementById('dp-abschluss-mand');
     mSel.innerHTML = corps.map(function (m) {
