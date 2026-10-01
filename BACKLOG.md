@@ -42,7 +42,32 @@ Marcels Durchgang am 01.10.2026. **Reihenfolge wie von ihm genannt.**
 Zwei Punkte sind beim Aufschreiben schon gefallen (T3, T4) — sie stehen
 trotzdem hier, damit die Abnahme nachvollziehbar bleibt.
 
-### T1 · Die Tour in JEDER Ansicht komplett durchprüfen
+### T1 · Die Tour in JEDER Ansicht komplett durchprüfen — BLOCKIERT (Messung)
+
+**BLOCKIERT: der Messlauf braucht das Chrome-Fenster im VORDERGRUND.**
+Gemessen am 01.10.2026: `document.visibilityState` steht in allen drei Tabs
+auf `hidden`, weil das ganze Fenster hinter einem anderen Programm liegt.
+Chrome drosselt dann jeden `setTimeout` auf rund eine Sekunde — und die Tour
+besteht aus nichts anderem. Gemessene Folgen:
+
+```
+Schritt 1 -> 2        im Vordergrund erwartet ~3 s
+                      gemessen im Hintergrund    75 s
+2 Schritte            gemessen                  231 s
+38 Schritte x 4 Ansichten  hochgerechnet     ~4,5 h
+```
+
+> Dazu kommt ein Fehler in der MESSUNG selbst, der nur im gedrosselten Tab
+> auftritt: Schritt 2 und 3 meldeten denselben Spot (−8,216 395x546). Der
+> Spot wandert mit einer Blende; wer sofort nach dem Blasenwechsel misst,
+> liest die VORIGE Stellung. Der Läufer wartet jetzt 1,4 s — aber auch das
+> ist im Hintergrund nicht verlässlich.
+
+**Was dafür schon einzeln gemessen und behoben ist** (v1747–v1748b, unten
+unter Fertig): Schritt 1 sitzt auf der Objektliste statt auf der ganzen
+Spalte, Schritt 2 auf einer Karte statt auf dem „+ Neues Objekt"-Knopf, der
+QR-Schritt am QR statt an einem Wort.
+
 
 Marcel: „Ich möchte, dass du die Tour nochmal komplett durchprüfst, einmal
 im DealPilot, also heute Obsidian-Look, und auch dann mit unserem anderen
@@ -62,7 +87,7 @@ das Ziel — nicht `querySelector` gegen null.
 **Dazu gehört:** die Tour muss in allen Ansichten **jederzeit aufrufbar**
 sein, auch über die Hilfe, auch mitten im Betrieb.
 
-### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte
+### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
 kann, dass wir aber standardmäßig einfach unter der Darstellung immer die
@@ -93,7 +118,7 @@ KEIN Objekt" liess sich am Konto mit 17 Objekten nicht herstellen. Karten
 per CSS zu verbergen reicht nicht — `_ensureObjectLoaded` kehrt vorher an
 `#hdr-obj` zurück. Gehört an einem frischen Konto abgenommen.
 
-### T5 · Tower: „Kaufpreisaufteilung" öffnet immer dasselbe PDF
+### T5 · Tower: „Kaufpreisaufteilung" öffnet immer dasselbe PDF — ERLEDIGT (v1748)
 
 Marcel: „Im Tower, wenn ich auf Kaufpreisaufteilung klicke, öffnet sich
 immer noch die Kaufpreisaufteilung. Da haben wir ja mehrere PDFs … vielleicht
@@ -105,7 +130,7 @@ Zwei Sachen in einem: **der Name** (Kaufpreisaufteilung ist das Ergebnis,
 nicht das Werkzeug) und **die Auswahl**. Vorlage ist die Fassungswahl, die
 beim Investment-PDF schon steht (`pdf-wahl.js`, v1744).
 
-### T6 · Pre-Flight-Karte: der QR-Schritt markiert den Boardingpass
+### T6 · Pre-Flight-Karte: der QR-Schritt markiert den Boardingpass — ERLEDIGT (v1748)
 
 Marcel: „Wenn wir die Preflight-Card vorstellen, dass der QR-Code, wenn wir
 dazu den Text machen, dann markiert er vorne den Boardingpass. Das ist
@@ -130,17 +155,67 @@ und zwar an der, die die App auch LIEST.
 > mit demselben Inhalt, 18 Felder beide — und nur einer wird gelesen. Beim
 > Zurücklegen hätte das stillschweigend die falschen Werte zementiert.
 
-### T8 · Kaufpreisaufteilung „Am Markt 18" gegen unsere rechnen
+### T8 · Kaufpreisaufteilung „Am Markt 18" gegen unsere rechnen — GEMESSEN, ENTSCHEIDUNG OFFEN
 
-Marcel hat `Dateien/KPT Am Markt 18, 06184 Kabelsketal - WE 2 (1).pdf`
-abgelegt (dazu `RNDG Am Markt 18 … WE 2.pdf`). Unsere Aufteilung dagegen
-halten, Abweichungen benennen.
+**Es sind zwei verschiedene Verfahren.** Marcels Dokument rechnet nach der
+**umgekehrten Ertragswertmethode („Kaufpreisaufteilung nach Jacoby®")**,
+zugelassen durch BFH-Urteil vom 20.09.2022, IX R 12/21. DealPilot rechnet die
+**BMF-Arbeitshilfe** — gemessen in `bmf-modal.js:519-521` kennt das Modul
+genau drei Wege: Ertragswert, Sachwert, Vergleichswert. Die umgekehrte
+Ertragswertmethode ist **nicht** darunter.
 
-> **Vorsicht bei genau dieser Prüfstrecke:** `/bmf/aufteilung` überspringt
-> unbekannte Eingabefelder kommentarlos — gemessen 5 von 12, Bodenwert um
-> Faktor 2,9 falsch, `warnings` leer. Vor dem Vergleich einen
-> Empfindlichkeitstest je Eingabe fahren, sonst vergleicht man zwei Zahlen,
-> von denen eine gar nicht auf den Eingaben beruht.
+> Zwei Zahlen zu vergleichen, die aus verschiedenen Verfahren stammen, ergibt
+> keine Abweichung, sondern einen Kategorienfehler. Deshalb steht hier der
+> Rechenweg vollständig — damit die Entscheidung auf Zahlen fällt und nicht
+> auf dem Eindruck, es sei „ungefähr dasselbe".
+
+**Der Prüfmaßstab, Zeile für Zeile aus dem Gutachten gelesen** (pdf.js, 11
+Seiten, Az. 25DG02659/HH, Grünwald 03.07.2025):
+
+```
+Kaufpreis (ohne Nebenkosten)                       110.911,00 EUR
++ Reparatur-/Investitionsbedarf                          0,00 EUR
+- Bodenwert insgesamt (MEA)                          7.617,56 EUR
+    3.878,00 m2 x 130,00 EUR = 504.140,00 EUR
+    davon MEA 15,11/1000                             7.617,56 EUR
+= vorlaeufiger Ertragswert der baulichen Anlagen   103.293,44 EUR
+/ Kapitalisierungsfaktor (§ 34 Abs. 2 ImmoWertV)        30,2100
+    Liegenschaftszins 2,5 %, RND 57 Jahre
+= Reinertragsanteil der baulichen Anlagen            3.419,18 EUR
++ Bodenwertverzinsungsbetrag                           143,82 EUR
+    Diskontierungsfaktor (§ 34 Abs. 3)                   0,2448
+    Bodenrestwert nach RND                           1.864,78 EUR
+    Bodenwert waehrend der RND                       5.752,78 EUR
+    davon 2,5 %                                        143,82 EUR
+= jaehrlicher Reinertrag                             3.563,00 EUR
+
+vorlaeufiger Gebaeudeanteil  3.419,18 / 3.563,00       95,96 %
+vorlaeufiger Bodenanteil       143,82 / 3.563,00        4,04 %
+
+bereinigter Kaufpreis                              109.046,22 EUR
+steuerlich absetzbarer Gebaeudeanteil              104.644,60 EUR
+ERGEBNIS  Gebaeude 94,35 %   Boden 5,65 %  (6.266,40 EUR)
+Nebenkostenanteil  11.723,29 x 94,35 %              11.060,93 EUR
+```
+
+**Was jetzt zu entscheiden ist (Bewertungsfrage, gehört Marcel):**
+
+1. Soll DealPilot die **umgekehrte Ertragswertmethode** zusätzlich rechnen?
+   Sie steht dem Steuerpflichtigen seit dem BFH-Urteil offen und führt bei
+   Ertragsobjekten regelmäßig zu einem **höheren** Gebäudeanteil als die
+   BMF-Arbeitshilfe — hier 94,35 %. Das ist genau der Punkt, an dem sich für
+   den Kunden Geld entscheidet.
+2. Oder bleibt es bei der Arbeitshilfe, und das Modul nennt die Alternative
+   nur als Hinweis?
+
+**Vor jedem Zahlenvergleich** gehört ein Empfindlichkeitstest je Eingabe
+gefahren: `/bmf/aufteilung` überspringt unbekannte Felder kommentarlos —
+gemessen 5 von 12, Bodenwert um Faktor 2,9 falsch, `warnings` leer. Sonst
+vergleicht man zwei Zahlen, von denen eine gar nicht auf den Eingaben beruht.
+
+Noch fehlend für den Gegenlauf: Nettokaltmiete und Wohnfläche der WE 2 —
+stehen vermutlich im zweiten Dokument
+`Dateien/RNDG Am Markt 18, 06184 Kabelsketal - WE 2.pdf` (9,5 MB).
 
 ---
 
