@@ -225,10 +225,26 @@
 
     history.push({ role: 'user', content: sichtbar || nachricht });
 
+    /* v1764: der Feldkatalog geht mit — aber nur, wenn ein Objekt offen
+       ist. Im Portfolio ohne geladenes Objekt gaebe es kein Ziel, und das
+       Modell wuerde Felder vorschlagen, die nirgends ankommen. */
+    try {
+      if (window._currentObjKey && window.DealPilotCopilotAenderungen
+          && typeof window.DealPilotCopilotAenderungen.katalog === 'function') {
+        body.felder = window.DealPilotCopilotAenderungen.katalog();
+      }
+    } catch (e) {}
+
     Auth.apiCall('/ai/copilot', { method: 'POST', body: body }).then(function (data) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);
       var reply = (data && data.reply) ? data.reply : 'Keine Antwort erhalten.';
-      addMsg('assistant', reply);
+      try {
+        if (window.DealPilotCopilotAenderungen
+            && typeof window.DealPilotCopilotAenderungen.ausAntwort === 'function') {
+          reply = window.DealPilotCopilotAenderungen.ausAntwort(reply, addMsg);
+        }
+      } catch (e) {}
+      if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
     }).catch(function (err) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);

@@ -290,10 +290,29 @@
       allowWeb: allowWeb
     }, userKeyExtra());
 
+    /* v1764: der Feldkatalog geht MIT. Damit entscheidet das Modell selbst,
+       ob eine Nachricht eine Frage oder eine Anweisung ist - in EINEM
+       Aufruf. Vorher brauchte es dafuer einen zweiten Weg, und ein Muster
+       im Frontend musste raten. */
+    try {
+      if (window._currentObjKey && window.DealPilotCopilotAenderungen
+          && typeof window.DealPilotCopilotAenderungen.katalog === 'function') {
+        body.felder = window.DealPilotCopilotAenderungen.katalog();
+      }
+    } catch (e) {}
+
     Auth.apiCall('/ai/copilot', { method: 'POST', body: body }).then(function (data) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);
       var reply = (data && data.reply) ? data.reply : 'Keine Antwort erhalten.';
-      addMsg('assistant', reply);
+      /* Enthaelt die Antwort einen Feldblock, zeigt das Aenderungsmodul die
+         Rueckfrage und gibt den Text OHNE Block zurueck. */
+      try {
+        if (window.DealPilotCopilotAenderungen
+            && typeof window.DealPilotCopilotAenderungen.ausAntwort === 'function') {
+          reply = window.DealPilotCopilotAenderungen.ausAntwort(reply, addMsg);
+        }
+      } catch (e) {}
+      if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
     }).catch(function (err) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);

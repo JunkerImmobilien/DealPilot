@@ -646,14 +646,35 @@
     return true;
   }
 
+  /* v1764 · Das Abfangen des Senden-Klicks ist WEG.
+
+     `einhaengen()` und `einhaengenPortfolio()` bleiben als Funktionen
+     stehen — sie tragen die Objektzuordnung des Portfolio-Piloten, die
+     weiterhin gebraucht wird. Aber der Klick wird nicht mehr abgefangen:
+     die Nachricht geht immer direkt an den Co-Pilot, der Katalog reist
+     mit, und das Modell entscheidet.
+
+     > Zwei Instanzen, die dieselbe Frage beantworten — hier ein Muster,
+     > dort ein Modell — sind eine mehr als nötig. Die schwächere gewinnt
+     > immer dann, wenn sie zuerst dran ist. */
   function start() {
     stil();
-    var a = einhaengen(), b = einhaengenPortfolio();
-    if (a && b) return;
+    /* Nur noch das Mikrofon anhängen, kein Abfangen mehr. */
+    var fertig = false;
+    function mikrofone() {
+      var a = el('dp-cp-in'), b = el('dp-pp-in');
+      try {
+        if (window.DealPilotDiktat) {
+          if (a) window.DealPilotDiktat.knopfAn('dp-cp-in', { neben: 'dp-cp-send' });
+          if (b) window.DealPilotDiktat.knopfAn('dp-pp-in', { neben: 'dp-pp-send' });
+        }
+      } catch (e) {}
+      return !!(a && b);
+    }
+    fertig = mikrofone();
+    if (fertig) return;
     var mo = new MutationObserver(function () {
-      if (!a) a = einhaengen();
-      if (!b) b = einhaengenPortfolio();
-      if (a && b) { try { mo.disconnect(); } catch (e) {} }
+      if (mikrofone()) { try { mo.disconnect(); } catch (e) {} }
     });
     try { mo.observe(document.body, { childList: true, subtree: true }); } catch (e) {}
     setTimeout(function () { try { mo.disconnect(); } catch (e) {} }, 30000);
@@ -662,5 +683,67 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
-  window.DealPilotCopilotAenderungen = { katalog: katalog, einhaengen: einhaengen };
+  /* ═══════════════════════════════════════════════════════════════════
+     v1764 · DAS MODELL ENTSCHEIDET, NICHT EIN MUSTER
+     ═══════════════════════════════════════════════════════════════════
+
+     Marcel hat es an einem echten Satz vorgeführt:
+
+       „Kannst du den Zustand der Wohnung auf stark
+        renovierungsbedürftig ändern?"
+
+     Mein Muster verlangte eine ZAHL — „stark renovierungsbedürftig" ist
+     aber ein Auswahlwert. Also rutschte die Anweisung als Frage durch,
+     und das Modell antwortete, es könne „keine Werte erfinden".
+
+     > Ein Muster kann zählen, aber nicht verstehen. Jede Lücke, die ich
+     > darin schließe, öffnet die nächste — „mach die Heizung neu", „der
+     > Keller ist jetzt ausgebaut", „Zustand: saniert".
+
+     Deshalb geht der Feldkatalog jetzt mit der Frage ans Modell, und das
+     entscheidet selbst. Kommt eine Anweisung zurück, hängt es einen Block
+     an; den löst diese Funktion heraus und zeigt dieselbe Rückfrage wie
+     vorher. Ein Aufruf statt zwei — und der Co-Pilot bleibt in erster
+     Linie der, der Fragen beantwortet. */
+  var BLOCK = /<<<FELDER\s*([\s\S]*?)\s*FELDER>>>/;
+
+  function ausAntwort(text, addMsg) {
+    if (!text) return text;
+    var m = String(text).match(BLOCK);
+    if (!m) return text;
+
+    var rest = String(text).replace(BLOCK, '').trim();
+    var f = null;
+    try { f = JSON.parse(m[1]); } catch (e) {}
+    if (!f || typeof f !== 'object') return rest || text;
+
+    /* Erst den Satz des Modells zeigen, dann die Rückfrage darunter —
+       sonst steht die Begründung unter ihrer eigenen Folge. */
+    if (rest) addMsg('assistant', rest);
+
+    var neu = [], konflikte = [];
+    Object.keys(f).forEach(function (id) {
+      var wert = f[id];
+      if (wert == null || String(wert).trim() === '') return;
+      var e = el(id);
+      if (!e) return;                    /* erfundene Id — stillschweigend fallen lassen */
+      if (istLeer(e)) { neu.push({ id: id, wert: wert }); return; }
+      var alt = (e.type === 'checkbox') ? (e.checked ? 'ja' : 'nein') : String(e.value);
+      if (String(alt).trim() === String(wert).trim()) return;
+      konflikte.push({ id: id, alt: alt, neu: wert });
+    });
+
+    if (!neu.length && !konflikte.length) {
+      addMsg('assistant', 'Die genannten Werte stehen schon so im Objekt — nichts zu ändern.');
+      return '';
+    }
+    zeigeVorschlag(neu, konflikte, addMsg);
+    return '';
+  }
+
+  window.DealPilotCopilotAenderungen = {
+    katalog: katalog,
+    einhaengen: einhaengen,
+    ausAntwort: ausAntwort
+  };
 })();

@@ -2048,6 +2048,60 @@ async function copilotChat(payload, opts) {
           '- Die Einheit steht IM Feldnamen (_eur, _eur_jahr, _prozent, _qm). Lies sie dort ab, rate sie nicht.',
           '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.'
         ].join('\n')
+      : '',
+
+    /* ═══ v1764 · DER CO-PILOT DARF FELDER AENDERN ═══════════════════════
+       Marcel am 01.10.2026, nach einem echten Versuch:
+
+         „Kannst du den Zustand der Wohnung auf stark
+          renovierungsbeduerftig aendern?"
+         -> „Ich kann den Zustand der Wohnung nicht aendern, da keine
+             Werte erfinden oder anpassen kann."
+
+       Zwei Fehler lagen darin, beide meine. Der Filter im Frontend
+       verlangte eine ZAHL - „stark renovierungsbeduerftig" ist aber ein
+       Auswahlwert. Und selbst wenn er durchgekommen waere: das Modell
+       wusste gar nicht, dass es das darf. Es hat die Regel „erfinde keine
+       Werte" auf eine ANWEISUNG des Nutzers angewandt.
+
+       > Einen Wert zu erfinden und einen anzunehmen, den der Nutzer
+       > gerade nennt, ist nicht dasselbe. Die erste Regel schuetzt vor
+       > Behauptung, die zweite waere Gehorsamsverweigerung.
+
+       Deshalb bekommt das Modell den Feldkatalog und einen klaren
+       Auftrag. Es entscheidet selbst, ob eine Nachricht eine Frage oder
+       eine Anweisung ist - das kann es besser als jedes Muster im
+       Frontend. Geaendert wird trotzdem nichts ohne Bestaetigung: das
+       Modell SCHLAEGT VOR, der Nutzer entscheidet. */
+    (Array.isArray(payload.felder) && payload.felder.length)
+      ? [
+          '',
+          'FELDER AENDERN (verbindlich):',
+          'Der Nutzer kann dich bitten, Angaben am Objekt zu aendern - z. B. "aendere die Miete auf 850",',
+          '"der Zustand ist stark renovierungsbeduerftig", "trag bitte Baujahr 1968 ein".',
+          'Das ist KEIN Erfinden: der Nutzer nennt den Wert, du ordnest ihn nur dem richtigen Feld zu.',
+          'Erkennst du eine solche Anweisung, haenge an deine Antwort GENAU EINEN Block in dieser Form an:',
+          '',
+          '<<<FELDER',
+          '{"feld_id":"wert","anderes_feld":"wert"}',
+          'FELDER>>>',
+          '',
+          '- Verwende NUR Feld-Ids aus der Liste VERFUEGBARE FELDER unten, nie erfundene.',
+          '- Bei einem Auswahlfeld (kind=select) nimm WOERTLICH eine der angegebenen Optionen.',
+          '- Zahlen ohne Tausenderpunkt und ohne Einheit: 850, nicht "850 EUR" und nicht "1.250".',
+          '- Bist du dir bei der Zuordnung unsicher, frag nach und haenge KEINEN Block an.',
+          '- Ist es eine normale Frage, antworte normal und haenge KEINEN Block an.',
+          '- Schreibe im Text davor in EINEM Satz, was du eintragen wuerdest. Behaupte NICHT,',
+          '  dass es schon geaendert sei - der Nutzer bestaetigt es erst.',
+          '',
+          'VERFUEGBARE FELDER (id | Bezeichnung | Art):',
+          payload.felder.slice(0, 220).map(function (f) {
+            return '  ' + f.id + ' | ' + String(f.label || '').slice(0, 48)
+              + ' | ' + (f.kind || 'text')
+              + (f.options && f.options.length
+                  ? ' [' + f.options.slice(0, 12).join(' / ') + ']' : '');
+          }).join('\n')
+        ].join('\n')
       : ''
   ].filter(Boolean).join('\n');
 
