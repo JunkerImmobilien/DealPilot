@@ -1,0 +1,933 @@
+[
+  {
+    "land_code": "HH",
+    "ags": "02000000",
+    "ebene": "land",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "berichtsjahr": 2026,
+    "modellversion": "Immobilienmarktbericht Hamburg 2026",
+    "stichtag": "2026-01-01",
+    "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+    "quelle_parser": "v1761-HAMBURG",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht KEINE Lizenz — 214 Seiten geprüft, null Treffer auf dl-de, Datenlizenz, Namensnennung; dort nur \"© 2026 … unter Angabe der Quelle gestattet\". Belegt ist dl-de/by-2-0 über die CKAN-API des Transparenzportals (Datensatz immobilienmarktberichte-hamburg22, attribution_text \"Gutachterausschuss für Grundstückswerte in Hamburg\").",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "mfh",
+    "formel": {
+      "form": "formelwerk",
+      "ausdruck": "Liegenschaftszinssatz = 4,37 % * Lagefaktor * Altersfaktor * Erstbezugsfaktor * Stadtteilfaktor * Aktualisierungsfaktor",
+      "basiswert_pct": 4.37,
+      "faktoren": {
+        "lagefaktor": {
+          "formel": "(NormBRW19 / 1.100)^-0,2820",
+          "exponent": -0.282,
+          "norm_brw": 1100,
+          "norm_brw_stichtag": "2019-12-31",
+          "basis": "in mittlerer Lage: 1",
+          "hinweis": "Mittlere Lage = Median der auf eine WGFZ von 1,0 normierten Bodenrichtwerte fuer Mehrfamilienhaeuser, Median der NormBRW zum 31.12.2019: 1.100 EUR/m2"
+        },
+        "altersfaktor": {
+          "formel": "1,36 - 0,012 * Alter   wenn Alter < 30 Jahre",
+          "a": 1.36,
+          "b": -0.012,
+          "gueltig_wenn": "Alter < 30 Jahre",
+          "basis": "bei Alter 30 Jahre: 1",
+          "alter_definition": "Alter = Kalenderjahr des Wertermittlungsstichtages - Baujahr"
+        },
+        "erstbezugsfaktor": {
+          "wert": 0.83,
+          "bedingung": "Wohnung, dessen Baujahr im Kalenderjahr des Wertermittlungsstichtages oder in den drei Jahren davor liegt"
+        },
+        "stadtteilfaktor": "siehe stadtteile_lzs",
+        "aktualisierungsfaktor": "siehe aktualisierung"
+      }
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "abschnitt": "7.3.3",
+      "ertragswertmodell": "Entsprechend der ImmoWertV. Bei der Ermittlung der Restnutzungsdauer wurde regelhaft unterstellt, dass aufgrund von Modernisierungen eine Restnutzungsdauer von mindestens 30 Jahren zu verwenden ist",
+      "selektionskriterien": "Verkaeufe von Mehrfamilienhaeuser in den Jahren 2009 bis 2019, ohne gewerblichen Anteil, ohne Erbbaurechte, keine ungewoehnlichen Verhaeltnisse und kein sozialer Wohnungsbau",
+      "aktualisierung": {
+        "2021-01-01": 0.43,
+        "2021-07-01": 0.415,
+        "2022-01-01": 0.33,
+        "2023-01-01": 0.679,
+        "2022-07-01": 0.508,
+        "2023-07-01": 0.803,
+        "2024-01-01": 0.969,
+        "2024-07-01": 0.806,
+        "2025-01-01": 0.732,
+        "2025-07-01": 0.732,
+        "2026-01-01": 0.732
+      },
+      "aktualisierung_untersuchungszeitraum": {
+        "2021-01-01": "1.1.2020 bis 1.1.2021",
+        "2021-07-01": "1.1.2021 bis 1.1.2022",
+        "2022-01-01": "1.1.2021 bis 1.1.2022",
+        "2022-07-01": "1.1.2022 bis 1.1.2023",
+        "2023-01-01": "1.1.2022 bis 1.1.2023",
+        "2023-07-01": "1.1.2023 bis 1.1.2024",
+        "2024-01-01": "1.1.2023 bis 1.1.2024",
+        "2024-07-01": "1.1.2024 bis 1.1.2025",
+        "2025-01-01": "1.1.2024 bis 1.1.2025",
+        "2025-07-01": "1.1.2025 bis 1.1.2026",
+        "2026-01-01": "1.1.2025 bis 1.1.2026"
+      },
+      "stadtteilfaktoren": {
+        "Allermöhe": 1.18,
+        "Alsterdorf": 1,
+        "Altengamme": 1.18,
+        "Altenwerder": 1.14,
+        "Altona-Altstadt": 1,
+        "Altona-Nord": 1,
+        "Bahrenfeld": 1,
+        "Barmbek-Nord": 1,
+        "Barmbek-Süd": 1,
+        "Bergedorf": 1,
+        "Bergstedt": 1,
+        "Billbrook": 1,
+        "Billstedt": 1,
+        "Billwerder": 1.18,
+        "Blankenese": 1,
+        "Borgfelde": 1,
+        "Bramfeld": 1,
+        "Cranz": 1.14,
+        "Curslack": 1.18,
+        "Dulsberg": 1,
+        "Duvenstedt": 1,
+        "Eidelstedt": 1,
+        "Eilbek": 1,
+        "Eimsbüttel": 1,
+        "Eißendorf": 1.14,
+        "Eppendorf": 1,
+        "Farmsen-Berne": 1,
+        "Finkenwerder": 1,
+        "Francop": 1.14,
+        "Fuhlsbüttel": 1,
+        "Groß Borstel": 1,
+        "Groß Flottbek": 1,
+        "Gut Moor": 1.14,
+        "HafenCity": 1,
+        "Hamburg-Altstadt": 1,
+        "Hamm": 1,
+        "Hammerbrook": 1,
+        "Harburg": 1.14,
+        "Harvestehude": 1,
+        "Hausbruch": 1.14,
+        "Heimfeld": 1.14,
+        "Hoheluft-Ost": 1,
+        "Hoheluft-West": 1,
+        "Hohenfelde": 1,
+        "Horn": 1,
+        "Hummelsbüttel": 1,
+        "Iserbrook": 1,
+        "Jenfeld": 1,
+        "Kirchwerder": 1.18,
+        "Kleiner Grasbrook": 0.96,
+        "Langenbek": 1.14,
+        "Langenhorn": 1,
+        "Lemsahl-Mellingstedt": 1,
+        "Lohbrügge": 1,
+        "Lokstedt": 1,
+        "Lurup": 1,
+        "Marienthal": 1,
+        "Marmstorf": 1.14,
+        "Moorburg": 1.14,
+        "Moorfleet": 1.18,
+        "Neuallermöhe": 1,
+        "Neuenfelde": 1.14,
+        "Neuengamme": 1.18,
+        "Neugraben-Fischbek": 1.14,
+        "Neuland": 1.14,
+        "Neustadt": 1,
+        "Niendorf": 1,
+        "Nienstedten": 1,
+        "Ochsenwerder": 1.18,
+        "Ohlsdorf": 1,
+        "Osdorf": 1,
+        "Othmarschen": 1,
+        "Ottensen": 1,
+        "Poppenbüttel": 1,
+        "Rahlstedt": 1,
+        "Reitbrook": 1.18,
+        "Rissen": 1,
+        "Rönneburg": 1.14,
+        "Rothenburgsort": 1,
+        "Rotherbaum": 1,
+        "Sasel": 1,
+        "Schnelsen": 1,
+        "Sinstorf": 1.14,
+        "Spadenland": 1.18,
+        "St. Georg": 1,
+        "St. Pauli": 1,
+        "Steilshoop": 1,
+        "Steinwerder": 0.96,
+        "Stellingen": 1,
+        "Sternschanze": 1,
+        "Sülldorf": 1,
+        "Tatenberg": 1.18,
+        "Tonndorf": 1,
+        "Uhlenhorst": 1,
+        "Veddel": 0.96,
+        "Volksdorf": 1,
+        "Waltershof": 0.96,
+        "Wandsbek": 1,
+        "Wellingsbüttel": 1,
+        "Wilhelmsburg": 0.96,
+        "Wilstorf": 1.14,
+        "Winterhude": 1,
+        "Wohldorf-Ohlstedt": 1,
+        "Neuwerk": null
+      }
+    },
+    "geltungsbereich": {
+      "raeumlich": "ganz Hamburg ohne Neuwerk",
+      "sachlich": "Mehrfamilienhaeuser ohne gewerblichen Anteil",
+      "extrapolation": "gesperrt",
+      "hinweis": "Neuwerk trägt in keiner der beiden Stadtteiltabellen einen Faktor — der Geltungsbereich lautet überall \"ganz Hamburg ohne Neuwerk\"."
+    },
+    "belege": [
+      {
+        "art": "formel",
+        "fundstelle": "Immobilienmarktbericht Hamburg 2026, S. 139-142 (PDF 141-144)",
+        "wortlaut": "Liegenschaftszinssatz = 4,37 % * Lagefaktor * Altersfaktor * Erstbezugsfaktor * Stadtteilfaktor * Aktualisierungsfaktor",
+        "stichprobe": 1104,
+        "streuung_pct": 14,
+        "streuung_wortlaut": "Die relative Standardabweichung des Kaufpreises vom vorlaeufigen Ertragswert betraegt +/- 14 %."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 1104,
+    "fundstelle": "S. 139-142 (PDF 141-144)"
+  },
+  {
+    "land_code": "HH",
+    "ags": "02000000",
+    "ebene": "land",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "berichtsjahr": 2026,
+    "modellversion": "Immobilienmarktbericht Hamburg 2026",
+    "stichtag": "2026-01-01",
+    "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+    "quelle_parser": "v1761-HAMBURG",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht KEINE Lizenz — 214 Seiten geprüft, null Treffer auf dl-de, Datenlizenz, Namensnennung; dort nur \"© 2026 … unter Angabe der Quelle gestattet\". Belegt ist dl-de/by-2-0 über die CKAN-API des Transparenzportals (Datensatz immobilienmarktberichte-hamburg22, attribution_text \"Gutachterausschuss für Grundstückswerte in Hamburg\").",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "buero",
+    "formel": {
+      "form": "formelwerk",
+      "ausdruck": "Liegenschaftszinssatz = 3,10 [%] * Lagefaktor * Baujahrsfaktor * Gebaeudeartfaktor * Aktualisierungsfaktor",
+      "basiswert_pct": 3.1,
+      "faktoren": {
+        "lagefaktor": {
+          "formel": "(NormBRW22 / 900)^-0,3496",
+          "exponent": -0.3496,
+          "norm_brw": 900,
+          "hinweis": "NormBRW22 = Bodenrichtwert zum 1.1.2022 fuer Buerohaeuser bei einer WGFZ von 1,0",
+          "anmerkung_erfassung": "Im PDF fehlt die oeffnende Klammer; dort steht woertlich: NormBRW22 / 900)"
+        },
+        "baujahrsfaktor": {
+          "bis 1939": 0.71,
+          "1940 bis 1959": 0.79,
+          "1960 bis 1979": 0.89,
+          "ab 1980": 1
+        },
+        "gebaeudeartfaktor": {
+          "wert": 1.26,
+          "bedingung": "wenn eingeschossiger Laden",
+          "anmerkung_erfassung": "Ein Wert fuer den Normalfall (sonst) ist im Bericht nicht beziffert"
+        }
+      }
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "abschnitt": "7.4.3",
+      "ertragswertmodell": "Entsprechend der ImmoWertV. Bei der Ermittlung der Restnutzungsdauer wurde regelhaft unterstellt, dass aufgrund von Modernisierungen eine Restnutzungsdauer von mindestens 25 Jahren zu verwenden ist",
+      "selektionskriterien": "Verkaeufe von Buero- und Geschaeftshaeusern in den Jahren 1.1.2009 bis 1.1.2022 mit einem Wohnflaechenanteil < 20%, keine Erbbaurechte, keine ungewoehnlichen Verhaeltnisse",
+      "aktualisierung": {
+        "2023-01-01": 1.07,
+        "2023-07-01": 1.36,
+        "2024-01-01": 1.65,
+        "2024-07-01": 1.71,
+        "2025-01-01": 1.71,
+        "2025-07-01": 1.74,
+        "2026-01-01": 1.77
+      },
+      "ohne_einfluss": [
+        "Baualter",
+        "Anteil Laden an der Nutzflaeche",
+        "Miethoehe"
+      ]
+    },
+    "geltungsbereich": {
+      "raeumlich": "ganz Hamburg ohne Neuwerk",
+      "sachlich": "Buero- und Geschaeftshaeuser",
+      "extrapolation": "gesperrt",
+      "hinweis": "Neuwerk trägt in keiner der beiden Stadtteiltabellen einen Faktor — der Geltungsbereich lautet überall \"ganz Hamburg ohne Neuwerk\"."
+    },
+    "belege": [
+      {
+        "art": "formel",
+        "fundstelle": "Immobilienmarktbericht Hamburg 2026, S. 154-156 (PDF 156-158)",
+        "wortlaut": "Liegenschaftszinssatz = 3,10 [%] * Lagefaktor * Baujahrsfaktor * Gebaeudeartfaktor * Aktualisierungsfaktor",
+        "stichprobe": 300,
+        "streuung_pct": 19,
+        "streuung_wortlaut": "Die relative Standardabweichung des Kaufpreises vom vorlaeufigen Ertragswert betraegt +/- 19 %."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 300,
+    "fundstelle": "S. 154-156 (PDF 156-158)"
+  },
+  {
+    "land_code": "HH",
+    "ags": "02000000",
+    "ebene": "land",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "berichtsjahr": 2026,
+    "modellversion": "Immobilienmarktbericht Hamburg 2026",
+    "stichtag": "2026-01-01",
+    "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+    "quelle_parser": "v1761-HAMBURG",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht KEINE Lizenz — 214 Seiten geprüft, null Treffer auf dl-de, Datenlizenz, Namensnennung; dort nur \"© 2026 … unter Angabe der Quelle gestattet\". Belegt ist dl-de/by-2-0 über die CKAN-API des Transparenzportals (Datensatz immobilienmarktberichte-hamburg22, attribution_text \"Gutachterausschuss für Grundstückswerte in Hamburg\").",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "produktion_logistik",
+    "formel": {
+      "form": "formelwerk",
+      "ausdruck": "Liegenschaftszinssatz = 4,11 [%] * Lagefaktor * Miethoehenfaktor * Erstbezugsfaktor * Aktualisierungsfaktor",
+      "basiswert_pct": 4.11,
+      "faktoren": {
+        "lagefaktor": {
+          "formel": "(BRW22 / 440)^-1,4861",
+          "exponent": -1.4861,
+          "brw": 440,
+          "hinweis": "BRW22 = Bodenrichtwert zum 1.1.2022 fuer Produktions- und Logistik-Immobilien"
+        },
+        "miethoehenfaktor": {
+          "formel": "(MM/RM)^0,0948",
+          "exponent": 0.0948,
+          "hinweis": "MM = Marktuebliche Miete = Tatsaechliche Miete; RM = Referenzmiete (siehe referenzmiete)"
+        },
+        "erstbezugsfaktor": {
+          "wert": 0.84,
+          "bedingung": "Objekt, dessen Baujahr im Kalenderjahr des Wertermittlungsstichtages oder in den drei Jahren davor liegt"
+        }
+      }
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "abschnitt": "7.5.3",
+      "ertragswertmodell": null,
+      "selektionskriterien": "Verkaeufe von Produktions- und Logistik-Immobilien in den Jahren 2009 bis 2021 mit einem Wohnflaechenanteil < 20 %, keine Erbbaurechte, keine ungewoehnlichen Verhaeltnisse",
+      "aktualisierung": {
+        "2023-01-01": 1.1,
+        "2023-07-01": 1.15,
+        "2024-01-01": 1.2,
+        "2024-07-01": 1.15,
+        "2025-01-01": 1.15,
+        "2025-07-01": 1.12,
+        "2026-01-01": 1.1
+      },
+      "referenzmiete": {
+        "formel": "Referenzmiete [EUR/m2 WNFL, monatlich] = 5,45 * Lagefaktor * Mietenindex",
+        "basiswert": 5.45,
+        "lagefaktor": "(BRW22 / 440)^0,8595",
+        "lagefaktor_exponent": 0.8595,
+        "mietenindex": {
+          "2023-01-01": 1.496,
+          "2023-07-01": 1.548,
+          "2024-01-01": 1.6,
+          "2024-07-01": 1.623,
+          "2025-01-01": 1.66,
+          "2025-07-01": 1.652,
+          "2026-01-01": 1.667
+        },
+        "alternative_marktuebliche_miete": "monatliche Nettokaltmiete [EUR/m2 Mietflaeche] zum 01.01.2022 = 0,03208*(BRW22-PL)^0,8595",
+        "fundstelle": "S. 169 (PDF 171)"
+      },
+      "ohne_einfluss": [
+        "Baualter (ausgenommen Erstbezug)",
+        "Baujahr",
+        "Grundstuecksgroesse / WNFL"
+      ]
+    },
+    "geltungsbereich": {
+      "raeumlich": "ganz Hamburg ohne Neuwerk",
+      "sachlich": "Produktions- und Logistik-Immobilien",
+      "extrapolation": "gesperrt",
+      "hinweis": "Neuwerk trägt in keiner der beiden Stadtteiltabellen einen Faktor — der Geltungsbereich lautet überall \"ganz Hamburg ohne Neuwerk\"."
+    },
+    "belege": [
+      {
+        "art": "formel",
+        "fundstelle": "Immobilienmarktbericht Hamburg 2026, S. 166-168 (PDF 168-170)",
+        "wortlaut": "Liegenschaftszinssatz = 4,11 [%] * Lagefaktor * Miethoehenfaktor * Erstbezugsfaktor * Aktualisierungsfaktor",
+        "stichprobe": 110,
+        "streuung_pct": 26,
+        "streuung_wortlaut": "Die relative Standardabweichung des Kaufpreises vom vorlaeufigen Ertragswert betraegt +/- 26 %."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 110,
+    "fundstelle": "S. 166-168 (PDF 168-170)"
+  },
+  {
+    "land_code": "HH",
+    "ags": "02000000",
+    "ebene": "land",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "berichtsjahr": 2026,
+    "modellversion": "Immobilienmarktbericht Hamburg 2026",
+    "stichtag": "2026-01-01",
+    "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+    "quelle_parser": "v1761-HAMBURG",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht KEINE Lizenz — 214 Seiten geprüft, null Treffer auf dl-de, Datenlizenz, Namensnennung; dort nur \"© 2026 … unter Angabe der Quelle gestattet\". Belegt ist dl-de/by-2-0 über die CKAN-API des Transparenzportals (Datensatz immobilienmarktberichte-hamburg22, attribution_text \"Gutachterausschuss für Grundstückswerte in Hamburg\").",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "efh",
+    "formel": {
+      "form": "formelwerk",
+      "ausdruck": "Liegenschaftszinssatz = 0,85 * LIZI(MFH) - 0,53",
+      "a": 0.85,
+      "b": -0.53,
+      "bezug": "LIZI(MFH) aus zweig=mfh"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "abschnitt": "7.2.2",
+      "ertragswertmodell": "Entsprechend der ImmoWertV. Bei der Ermittlung der Restnutzungsdauer wurde regelhaft unterstellt, dass aufgrund von Modernisierungen eine Restnutzungsdauer von mindestens 30 Jahren zu verwenden ist",
+      "selektionskriterien": "Verkaeufe von vermieteten Einfamilienhaeusern in den Jahren 2011 bis 2016"
+    },
+    "geltungsbereich": {
+      "raeumlich": "ganz Hamburg ohne Neuwerk",
+      "sachlich": "Einfamilienhaeuser",
+      "extrapolation": "gesperrt",
+      "hinweis": "Neuwerk trägt in keiner der beiden Stadtteiltabellen einen Faktor — der Geltungsbereich lautet überall \"ganz Hamburg ohne Neuwerk\"."
+    },
+    "belege": [
+      {
+        "art": "formel",
+        "fundstelle": "Immobilienmarktbericht Hamburg 2026, S. 116 (PDF 118)",
+        "wortlaut": "Liegenschaftszinssatz = 0,85 * LIZI(MFH) - 0,53",
+        "stichprobe": 216,
+        "streuung_pct": 37,
+        "streuung_wortlaut": "Die relative Standardabweichung der Kaufpreise vom vorlaeufigen Ertragswert betraegt +/- 37 %."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 216,
+    "fundstelle": "S. 116 (PDF 118)",
+    "auflagen": "Der Liegenschaftszinssatz fuer Einfamilienhaeuser ist nicht zur Ermittlung des Verkehrswertes eines Einfamilienhauses vorgesehen, sondern nur zur Wertermittlung von Wohnrechten u.ae. Der mit dem angegebenen Liegenschaftszinssatz ermittelte vorlaeufige Ertragswert bezieht sich auf ein unvermietetes Einfamilienhaus. Zur Beruecksichtigung der Vermietung siehe 7.2.4"
+  },
+  {
+    "land_code": "HH",
+    "ags": "02000000",
+    "ebene": "land",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "berichtsjahr": 2026,
+    "modellversion": "Immobilienmarktbericht Hamburg 2026",
+    "stichtag": "2026-01-01",
+    "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+    "quelle_parser": "v1761-HAMBURG",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht KEINE Lizenz — 214 Seiten geprüft, null Treffer auf dl-de, Datenlizenz, Namensnennung; dort nur \"© 2026 … unter Angabe der Quelle gestattet\". Belegt ist dl-de/by-2-0 über die CKAN-API des Transparenzportals (Datensatz immobilienmarktberichte-hamburg22, attribution_text \"Gutachterausschuss für Grundstückswerte in Hamburg\").",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "etw",
+    "formel": {
+      "form": "formelwerk",
+      "ausdruck": "Liegenschaftszinssatz = 1,16 * LIZI(MFH) - 2,30",
+      "a": 1.16,
+      "b": -2.3,
+      "bezug": "LIZI(MFH) aus zweig=mfh"
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "abschnitt": "7.6.2",
+      "ertragswertmodell": "Entsprechend der ImmoWertV. Bei der Ermittlung der Restnutzungsdauer wurde regelhaft unterstellt, dass aufgrund von Modernisierungen eine Restnutzungsdauer von mindestens 30 Jahren zu verwenden ist",
+      "selektionskriterien": "Verkaeufe von vermieteten Eigentumswohnungen in den Jahren 2009 bis 2016",
+      "umrechnungsfaktor_vermietet": {
+        "abschnitt": "7.6.3",
+        "datenbasis": "2.815 Verkaeufe von vermieteten Eigentumswohnungen aus den Jahren 2014 - 2018",
+        "rendite_definition": "Rendite [%] = Marktuebliche Jahresnettokaltmiete * 100 / Verkehrswert unvermietet",
+        "formel": "Verkehrswert vermietet / Verkehrswert unvermietet = 0,6578 + 0,0513 * Rendite [%]",
+        "a": 0.6578,
+        "b": 0.0513,
+        "abschlagstabelle_pct": {
+          "1": 29,
+          "2": 24,
+          "3": 19,
+          "4": 14,
+          "5": 9,
+          "6": 4,
+          "6,7": 0
+        },
+        "fundstelle": "S. 177 (PDF 179)"
+      }
+    },
+    "geltungsbereich": {
+      "raeumlich": "ganz Hamburg ohne Neuwerk",
+      "sachlich": "Eigentumswohnungen",
+      "extrapolation": "gesperrt",
+      "hinweis": "Neuwerk trägt in keiner der beiden Stadtteiltabellen einen Faktor — der Geltungsbereich lautet überall \"ganz Hamburg ohne Neuwerk\"."
+    },
+    "belege": [
+      {
+        "art": "formel",
+        "fundstelle": "Immobilienmarktbericht Hamburg 2026, S. 176 (PDF 178)",
+        "wortlaut": "Liegenschaftszinssatz = 1,16 * LIZI(MFH) - 2,30",
+        "stichprobe": 4739,
+        "streuung_pct": 39,
+        "streuung_wortlaut": "Die relative Standardabweichung des Kaufpreises vom vorlaeufigen Ertragswert betraegt +/- 39 %."
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 4739,
+    "fundstelle": "S. 176 (PDF 178)",
+    "auflagen": "Der Liegenschaftszinssatz fuer Eigentumswohnungen ist nicht zur Ermittlung des Verkehrswertes einer Eigentumswohnung vorgesehen, sondern nur zur Wertermittlung von Wohnrechten u.ae. Der mit dem angegebenen Liegenschaftszinssatz ermittelte vorlaeufige Ertragswert bezieht sich auf eine unvermietete Eigentumswohnung. Zur Beruecksichtigung der Vermietung siehe 7.6.3"
+  },
+  {
+    "land_code": "HH",
+    "ags": "02000000",
+    "ebene": "land",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "berichtsjahr": 2026,
+    "modellversion": "Immobilienmarktbericht Hamburg 2026",
+    "stichtag": "2026-01-01",
+    "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+    "quelle_parser": "v1761-HAMBURG",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht KEINE Lizenz — 214 Seiten geprüft, null Treffer auf dl-de, Datenlizenz, Namensnennung; dort nur \"© 2026 … unter Angabe der Quelle gestattet\". Belegt ist dl-de/by-2-0 über die CKAN-API des Transparenzportals (Datensatz immobilienmarktberichte-hamburg22, attribution_text \"Gutachterausschuss für Grundstückswerte in Hamburg\").",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "efh",
+    "formel": {
+      "form": "formelwerk",
+      "ausdruck": "Sachwertfaktor = 0,788 * Lagefaktor * Sachwerthoehenfaktor * Bodenwertanteilsfaktor * Grundstuecksgroessenfaktor * Baujahrsfaktor * Restnutzungsdauerfaktor * Kellerfaktor * Wohnflaechenfaktor * Modernisierungsfaktor * Ecklagefaktor * Wohnungszahlfaktor * Einbaukuechenfaktor * Dachfaktor * Fussbodenheizungsfaktor * Solarenergiefaktor * Waermepumpenfaktor * Stellungsfaktor * Stadtteilfaktor * Aktualisierungsfaktor",
+      "basiswert": 0.788,
+      "koeffizienten": {
+        "lagefaktor": {
+          "formel": "(NormBRW20 / 630)^0,1902",
+          "exponent": 0.1902,
+          "norm_brw": 630,
+          "norm_brw_stichtag": "2020-12-31",
+          "basis": "in mittlerer Lage: 1",
+          "hinweis": "Mittlere Lage = Median der auf eine Flaeche von 1.000 m2 normierten Bodenrichtwerte fuer Ein- und Zweifamilienhaeuser, Median der NormBRW zum 31.12.2020: 630 EUR/m2"
+        },
+        "sachwerthoehenfaktor": {
+          "formel": "(Vorl. Sachwert / Normsachwert)^-0,3558",
+          "exponent": -0.3558,
+          "kappung": {
+            "bedingung": "wenn (Vorl. Sachwert / Normsachwert) >= 1,87",
+            "wert": 0.8
+          },
+          "basis": "bei vorl. Sachwert = Normsachwert: 1",
+          "hinweis": "Normsachwert = Vorl. Sachwert eines Normobjekts (siehe Tabelle der Aktualisierungsfaktoren)"
+        },
+        "bodenwertanteilsfaktor": {
+          "formel": "0,67318 + 0,5447 * Bodenwertanteil",
+          "a": 0.67318,
+          "b": 0.5447,
+          "basis": "bei Bodenwertanteil von 60%: 1"
+        },
+        "grundstuecksgroessenfaktor": {
+          "formel": "(Grundstuecksflaeche / 600 m2)^-0,1138",
+          "exponent": -0.1138,
+          "basis": "bei Grundstuecksgroesse 600 m2: 1"
+        },
+        "baujahrsfaktor": {
+          "basis": "bei Baujahr ab 1980 bis 1989: 1",
+          "bis 1919": 1.007,
+          "1920 bis 1939": 0.997,
+          "1940 bis 1959": 0.934,
+          "1960 bis 1979": 0.961,
+          "1980 bis 1989": 1,
+          "ab 1990": 1.018
+        },
+        "restnutzungsdauerfaktor": {
+          "basis": "bei Restnutzungsdauer 50 Jahre: 1",
+          "RND <= 15 Jahre": 1.016,
+          "RND 16 bis 50 Jahre": "-0,0013 * Restnutzungsdauer + 1,065",
+          "RND > 50 Jahre": 1,
+          "a": -0.0013,
+          "b": 1.065
+        },
+        "kellerfaktor": {
+          "basis": "ohne Keller: 1",
+          "mit_keller": 1.054
+        },
+        "wohnflaechenfaktor": {
+          "formel": "(Wohnflaeche / 120 m2)^0,3881",
+          "exponent": 0.3881,
+          "kappung": {
+            "bedingung": "wenn Wohnflaeche >= 300 m2",
+            "wert": 1.427
+          },
+          "basis": "bei 120 m2 Wohnflaeche: 1"
+        },
+        "modernisierungsfaktor": {
+          "formel": "1 + 0,0076 * (Tatsaechliche Modernisierungspunktzahl - Mittel Baujahrsklasse)",
+          "b": 0.0076,
+          "basis": "bei baujahrstypischer Modernisierungspunktzahl: 1",
+          "hinweis": "Modernisierungspunktzahl gemaess Anlage 2 der ImmoWertV",
+          "baujahrstypische_punktzahl": {
+            "bis 1919": 5.74,
+            "1920 bis 1939": 5.25,
+            "1940 bis 1959": 5.23,
+            "1960 bis 1969": 4.7,
+            "1970 bis 1979": 4.1,
+            "1980 bis 1989": 3.53,
+            "1990 bis 1999": 2.32,
+            "2000 bis 2009": 1.79
+          },
+          "sonderfall": "Wenn Baujahr > 2009 dann Faktor: 1,000"
+        },
+        "ecklagefaktor": {
+          "basis": "keine Ecklage: 1",
+          "ecklage": 0.976
+        },
+        "wohnungszahlfaktor": {
+          "basis": "1 Wohnung: 1",
+          "2 Wohnungen": 0.895
+        },
+        "einbaukuechenfaktor": {
+          "basis": "keine Einbaukueche: 1",
+          "mit_einbaukueche": 1.049
+        },
+        "dachfaktor": {
+          "basis": "1-geschossig mit Dachgeschossausbau: 1",
+          "Bungalow oder 1-geschossig mit Flachdach-Staffelgeschoss": 0.985,
+          "1-geschossig mit nicht ausgebautem Dachgeschoss": 0.942,
+          "2-geschossig mit Flachdach oder Flachdach-Staffelgeschoss": 1.02,
+          "2-geschossig mit nicht ausgebautem Dachgeschoss": 0.99,
+          "2-geschossig mit ausgebautem Dachgeschoss": 1.015,
+          "sonst": 1
+        },
+        "fussbodenheizungsfaktor": {
+          "basis": "keine Fussbodenheizung: 1",
+          "mit_fussbodenheizung": 1.068
+        },
+        "solarenergiefaktor": {
+          "basis": "ohne Solarenergie: 1",
+          "Fotovoltaikanlage oder Solarthermie vorhanden": 1.043
+        },
+        "waermepumpenfaktor": {
+          "basis": "ohne Waermepumpe: 1",
+          "Waermepumpe ohne Solarenergie vorhanden": 1.02,
+          "Waermepumpe mit Solarenergie vorhanden": 1,
+          "fussnote": "Keine Doppelberuecksichtigung von Waermepumpe und Fotovoltaik"
+        },
+        "stellungsfaktor": {
+          "basis": "freistehend: 1",
+          "Doppelhaushaelfte": 0.977,
+          "Mittelreihenhaus": 0.998,
+          "Endreihenhaus": 0.981
+        },
+        "stadtteilfaktor": "siehe stadtteile_swf",
+        "aktualisierungsfaktor": "siehe aktualisierung"
+      }
+    },
+    "korrekturen": {},
+    "modellansaetze": {
+      "abschnitt": "7.2.3",
+      "ertragswertmodell": null,
+      "selektionskriterien": "Verkaeufe von Einfamilienhaeusern ohne gewerblichen Anteil aus den Jahren 2013 bis 2020, keine Erbbaurechte, keine ungewoehnlichen Verhaeltnisse, kein sozialer Wohnungsbau",
+      "gueltig_fuer": "swf_efh (Abschnitt 7.2.3)",
+      "gnd_jahre": 80,
+      "restnutzungsdauer": "Gesamtnutzungsdauer abzueglich Alter bzw. modifizierte Restnutzungsdauer nach ImmoWertV entsprechend der Modernisierungspunktzahl",
+      "alterswertminderung": "linear",
+      "baujahr": "urspruengliches Baujahr",
+      "regionalfaktor": 1.75,
+      "regionalfaktor_hinweis": "1,75 fuer ganz Hamburg",
+      "bodenwert": "objektspezifischer Bodenwert zum Modellstichtag",
+      "standardstufe": "Standardstufe gemaess Anlage 4 der ImmoWertV, siehe IMB Seite 201",
+      "baupreisindex": "interpoliert zum Modellstichtag; Modellstichtag = Stichtag, auf das sich der Aktualisierungsfaktor bezieht",
+      "besondere_bauteile": "kein gesonderter Ansatz - Anlagen sind im ueblichen Umfang enthalten",
+      "garagen_eur_stueck": 9000,
+      "garagen_basisjahr": 2010,
+      "carports_eur_stueck": 3000,
+      "carports_basisjahr": 2010,
+      "aussenanlagen": "kein gesonderter Ansatz - Anlagen sind im ueblichen Umfang enthalten",
+      "normobjekt": {
+        "beschreibung": "Normsachwert = Vorlaeufiger Sachwert zum Modellstichtag eines (Norm-)Objekts",
+        "lage": "Mittlere Lage (Median der normierten EFH-Bodenrichtwerte)",
+        "grundstuecksgroesse_m2": 750,
+        "stellung": "freistehend in Frontlage",
+        "bodenwert": "Bodenwert zum Modellstichtag",
+        "geschosse": "1-geschossig mit voll ausgebautem Dachgeschoss ohne Keller",
+        "bgf_ab_m2": 225,
+        "standardstufe": 3,
+        "nhk2010_eur_m2_bgf": 1005,
+        "regionalfaktor": 1.75,
+        "aussenanlagen": "Aussenanlagen im ueblichen Umfang enthalten",
+        "restnutzungsdauer_jahre": 50
+      },
+      "fundstelle": "S. 117-118 (PDF 119-120)",
+      "aktualisierung": {
+        "2022-01-01": {
+          "faktor": 1,
+          "normsachwert_eur": 970665,
+          "bodenwertanteil_pct": 62,
+          "baupreisindex": 1.502,
+          "untersuchungszeitraum": "1.1.2021 bis 1.1.2022"
+        },
+        "2022-07-01": {
+          "faktor": 0.993,
+          "normsachwert_eur": 1043850,
+          "bodenwertanteil_pct": 61,
+          "baupreisindex": 1.657,
+          "untersuchungszeitraum": "1.1.2022 bis 1.1.2023"
+        },
+        "2023-01-01": {
+          "faktor": 0.932,
+          "normsachwert_eur": 995826,
+          "bodenwertanteil_pct": 57,
+          "baupreisindex": 1.742,
+          "untersuchungszeitraum": "1.1.2022 bis 1.1.2023"
+        },
+        "2023-07-01": {
+          "faktor": 0.947,
+          "normsachwert_eur": 936338,
+          "bodenwertanteil_pct": 53,
+          "baupreisindex": 1.782,
+          "untersuchungszeitraum": "1.1.2023 bis 1.1.2024"
+        },
+        "2024-01-01": {
+          "faktor": 0.971,
+          "normsachwert_eur": 940707,
+          "bodenwertanteil_pct": 52,
+          "baupreisindex": 1.808,
+          "untersuchungszeitraum": "1.1.2023 bis 1.1.2024"
+        },
+        "2024-07-01": {
+          "faktor": 0.939,
+          "normsachwert_eur": 948127,
+          "bodenwertanteil_pct": 52,
+          "baupreisindex": 1.838,
+          "untersuchungszeitraum": "1.1.2024 bis 1.1.2025"
+        },
+        "2025-01-01": {
+          "faktor": 0.933,
+          "normsachwert_eur": 952249,
+          "bodenwertanteil_pct": 52,
+          "baupreisindex": 1.854,
+          "untersuchungszeitraum": "1.1.2024 bis 1.1.2025"
+        },
+        "2025-07-01": {
+          "faktor": 0.957,
+          "normsachwert_eur": 947263,
+          "bodenwertanteil_pct": 51,
+          "baupreisindex": 1.892,
+          "untersuchungszeitraum": "1.1.2025 bis 1.1.2026"
+        },
+        "2026-01-01": {
+          "faktor": 0.973,
+          "normsachwert_eur": 939645,
+          "bodenwertanteil_pct": 50,
+          "baupreisindex": 1.911,
+          "untersuchungszeitraum": "1.1.2025 bis 1.1.2026"
+        }
+      },
+      "baupreisindex_basis": "Baupreisindex Mai 2010 = 1",
+      "stichprobe_merkmale": {
+        "NormBRW20_eur_m2": {
+          "min": 250,
+          "max": 7000,
+          "mittel": 699,
+          "n": 3556
+        },
+        "Sachwerthoehe": {
+          "min": 54000,
+          "max": 5300000,
+          "mittel": 590000,
+          "n": 3556
+        },
+        "Bodenwertanteil": {
+          "min": 0.14,
+          "max": 0.97,
+          "mittel": 0.53,
+          "n": 3556
+        },
+        "Grundstuecksgroesse_m2": {
+          "min": 60,
+          "max": 8740,
+          "mittel": 620,
+          "n": 3556
+        },
+        "Baujahr": {
+          "min": 1645,
+          "max": 2022,
+          "mittel": 1970,
+          "n": 3556
+        },
+        "Restnutzungsdauer": {
+          "min": 12,
+          "max": 80,
+          "mittel": 44,
+          "n": 3556
+        },
+        "Wohnflaeche_m2": {
+          "min": 50,
+          "max": 940,
+          "mittel": 142,
+          "n": 3556
+        },
+        "Modernisierungspunktzahl": {
+          "min": 0,
+          "max": 20,
+          "mittel": 3.98,
+          "n": 3179
+        }
+      },
+      "stadtteilfaktoren": {
+        "Allermöhe": 1.035,
+        "Alsterdorf": 1.193,
+        "Altengamme": 1.035,
+        "Altenwerder": 0.915,
+        "Altona-Altstadt": 1,
+        "Altona-Nord": 1,
+        "Bahrenfeld": 1.063,
+        "Barmbek-Nord": 1,
+        "Barmbek-Süd": 1,
+        "Bergedorf": 1.053,
+        "Bergstedt": 1.002,
+        "Billbrook": 0.914,
+        "Billstedt": 0.914,
+        "Billwerder": 1.035,
+        "Blankenese": 1.063,
+        "Borgfelde": 0.952,
+        "Bramfeld": 0.956,
+        "Cranz": 0.915,
+        "Curslack": 1.035,
+        "Dulsberg": 1,
+        "Duvenstedt": 1.002,
+        "Eidelstedt": 1.018,
+        "Eilbek": 1,
+        "Eimsbüttel": 1,
+        "Eißendorf": 0.915,
+        "Eppendorf": 1,
+        "Farmsen-Berne": 0.956,
+        "Finkenwerder": 1.147,
+        "Francop": 0.915,
+        "Fuhlsbüttel": 0.978,
+        "Groß Borstel": 1.193,
+        "Groß Flottbek": 1.063,
+        "Gut Moor": 0.915,
+        "HafenCity": 1,
+        "Hamburg-Altstadt": 1,
+        "Hamm": 0.952,
+        "Hammerbrook": 0.952,
+        "Harburg": 0.915,
+        "Harvestehude": 1,
+        "Hausbruch": 0.915,
+        "Heimfeld": 0.915,
+        "Hoheluft-Ost": 1,
+        "Hoheluft-West": 1,
+        "Hohenfelde": 1,
+        "Horn": 0.952,
+        "Hummelsbüttel": 0.978,
+        "Iserbrook": 1.063,
+        "Jenfeld": 0.956,
+        "Kirchwerder": 1.035,
+        "Kleiner Grasbrook": 1,
+        "Langenbek": 0.915,
+        "Langenhorn": 0.978,
+        "Lemsahl-Mellingstedt": 1.002,
+        "Lohbrügge": 0.951,
+        "Lokstedt": 1.018,
+        "Lurup": 1.018,
+        "Marienthal": 0.956,
+        "Marmstorf": 0.915,
+        "Moorburg": 0.915,
+        "Moorfleet": 1.035,
+        "Neuallermöhe": 1.035,
+        "Neuenfelde": 0.915,
+        "Neuengamme": 1.035,
+        "Neugraben-Fischbek": 0.915,
+        "Neuland": 0.915,
+        "Neustadt": 1,
+        "Niendorf": 1.018,
+        "Nienstedten": 1.063,
+        "Ochsenwerder": 1.035,
+        "Ohlsdorf": 1.193,
+        "Osdorf": 1.063,
+        "Othmarschen": 1.063,
+        "Ottensen": 1,
+        "Poppenbüttel": 0.978,
+        "Rahlstedt": 0.948,
+        "Reitbrook": 1.035,
+        "Rissen": 1.063,
+        "Rönneburg": 0.915,
+        "Rothenburgsort": 0.952,
+        "Rotherbaum": 1,
+        "Sasel": 1.002,
+        "Schnelsen": 1.018,
+        "Sinstorf": 0.915,
+        "Spadenland": 1.035,
+        "St. Georg": 1,
+        "St. Pauli": 1,
+        "Steilshoop": 0.956,
+        "Steinwerder": 1,
+        "Stellingen": 1.018,
+        "Sternschanze": 1,
+        "Sülldorf": 1.063,
+        "Tatenberg": 1.035,
+        "Tonndorf": 0.956,
+        "Uhlenhorst": 1,
+        "Veddel": 1,
+        "Volksdorf": 1.002,
+        "Waltershof": 1,
+        "Wandsbek": 0.956,
+        "Wellingsbüttel": 0.978,
+        "Wilhelmsburg": 1.093,
+        "Wilstorf": 0.915,
+        "Winterhude": 1,
+        "Wohldorf-Ohlstedt": 1.002,
+        "Neuwerk": null
+      },
+      "ohne_einfluss": [
+        "Alter (Kalenderjahr des Wertermittlungsstichtages - Baujahr)",
+        "Standardstufe gemaess Anlage 4 der ImmoWertV",
+        "Wohnflaeche / Bruttogrundflaeche",
+        "Garage",
+        "Carport",
+        "Stellplatz",
+        "Pfeifenstiel",
+        "Wegerecht",
+        "Endenergiebedarf",
+        "Rechtsform"
+      ],
+      "streuung_anmerkung": "Zum Sachwertfaktor EFH nennt der Bericht auf den Seiten 117-124 keine Qualitaetskennzahl / Standardabweichung"
+    },
+    "geltungsbereich": {
+      "raeumlich": "ganz Hamburg ohne Neuwerk",
+      "sachlich": "Einfamilienhaeuser (als Einfamilienhaeuser werden in diesem Abschnitt Ein- und Zweifamilienhaeuser mit bis zu zwei Wohneinheiten definiert).",
+      "extrapolation": "gesperrt",
+      "hinweis": "Neuwerk trägt in keiner der beiden Stadtteiltabellen einen Faktor — der Geltungsbereich lautet überall \"ganz Hamburg ohne Neuwerk\"."
+    },
+    "belege": [
+      {
+        "art": "formel",
+        "fundstelle": "Immobilienmarktbericht Hamburg 2026, S. 117-124 (PDF 119-126)",
+        "wortlaut": "Sachwertfaktor = 0,788 * Lagefaktor * Sachwerthoehenfaktor * Bodenwertanteilsfaktor * Grundstuecksgroessenfaktor * Baujahrsfaktor * Restnutzungsdauerfaktor * Kellerfaktor * Wohnflaechenfaktor * Modernisierungsfaktor * Ecklagefaktor * Wohnungszahlfaktor * Einbaukuechenfaktor * Dachfaktor * Fussbodenheizungsfaktor * Solarenergiefaktor * Waermepumpenfaktor * Stellungsfaktor * Stadtteilfaktor * Aktualisierungsfaktor",
+        "stichprobe": 3556,
+        "streuung_pct": null,
+        "streuung_wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "fallzahl": 3556,
+    "fundstelle": "S. 117-124 (PDF 119-126)"
+  }
+]
