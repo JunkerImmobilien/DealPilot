@@ -163,6 +163,7 @@
       k = document.createElement('div'); k.id = 'mfh-einstieg'; k.style.cssText = 'margin-top:6px';
       f.appendChild(k);
     }
+    objektfelderNachArt(art);
     if (!ARTEN_MIT_EINHEITEN[art]) { k.innerHTML = ''; k.style.display = 'none'; return; }
     var d = daten(), n = d.einheiten.length;
     k.style.display = '';
@@ -170,6 +171,64 @@
       + (n ? ' (' + n + ' erfasst)' : ' — optional') + '</button>'
       + (n ? '<div class="cf-hint" style="margin-top:4px">Fläche, Einheiten und Ist-Kaltmiete aus ' + n + ' Einheiten übernommen.</div>' : '');
     el('mfh-oeffnen').onclick = function () { oeffnen(0); };
+  }
+
+  /* ══ v1738 · WAS BEI EINEM MEHRFAMILIENHAUS KEINEN SINN ERGIBT ══
+     Marcel am 01.10.2026: „dass wir vielleicht auch Sachen einfach
+     ausblenden bei Mehrfamilienhäusern, die dann keinen Sinn machen bei
+     dem Tab Objekt" und „die Zimmer zusammenzählen und direkt eintragen …
+     das könnte eine Automatik sein".
+
+     ZWEI FELDER VERHALTEN SICH BEI EINHEITEN ANDERS:
+
+     · Miteigentumsanteil — er beschreibt den Bruchteil, mit dem eine
+       Eigentumswohnung am gemeinschaftlichen Eigentum hängt (§ 1 Abs. 2
+       WEG). Wer das GANZE Haus kauft, hält 100 %, und 100 % einzutragen
+       ist keine Angabe, sondern eine Pflichtübung. Das Feld wird
+       ausgeblendet und auf 100 gesetzt, damit nachgelagerte Rechnungen
+       (Bodenwertanteil) weiter aufgehen.
+
+     · Zimmer — bei einer Wohnung ist das eine Eingabe, bei einem Haus mit
+       zwölf Einheiten die SUMME aus zwölf Zeilen. Sie von Hand zu pflegen
+       heißt, sie bei jeder Änderung zu vergessen.
+
+     > Ein Feld, dessen Wert sich aus anderen Feldern ergibt, ist keine
+     > Eingabe. Es als Eingabe stehen zu lassen lädt dazu ein, es falsch
+     > zu füllen — und niemand merkt es, weil beides plausibel aussieht.
+
+     Deshalb wird es schreibgeschützt, trägt den Hinweis, woher die Zahl
+     kommt, und `uebernehmen()` schreibt sie mit. */
+  function feldBox(id) {
+    var e = el(id);
+    return e ? (e.closest ? e.closest('.f') : null) : null;
+  }
+  function objektfelderNachArt(art) {
+    art = art || ((el('objart') && el('objart').value) || '');
+    var mitEinheiten = !!ARTEN_MIT_EINHEITEN[art];
+
+    var meaBox = feldBox('mea'), mea = el('mea');
+    if (meaBox) meaBox.style.display = mitEinheiten ? 'none' : '';
+    if (mea && mitEinheiten && String(mea.value).trim() !== '100') {
+      mea.value = '100';
+      try { mea.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    }
+
+    var zi = el('zimmer');
+    if (zi) {
+      zi.readOnly = mitEinheiten;
+      zi.title = mitEinheiten ? 'Summe aus den erfassten Einheiten — im Einheiten-Dialog pflegen' : '';
+      var box = feldBox('zimmer');
+      if (box) {
+        var h = box.querySelector('.dp-zimmer-auto');
+        if (mitEinheiten && !h) {
+          h = document.createElement('div');
+          h.className = 'cf-hint dp-zimmer-auto';
+          h.style.marginTop = '4px';
+          h.textContent = 'Summe aus den erfassten Einheiten.';
+          box.appendChild(h);
+        } else if (!mitEinheiten && h) { h.remove(); }
+      }
+    }
   }
 
   /* ── Modal mit vier Schritten ───────────────────────────────────── */
@@ -509,6 +568,14 @@
       if (s.flaeche > 0) setzen('wfl', s.flaeche);
       setzen('einheiten', s.wohnen);
       if (s.ist > 0) setzen('nkm', s.ist);
+      /* v1738 · die Zimmer wandern mit — bisher standen sie in jeder
+         Einheitenzeile und mussten in den Objektdetails NOCH EINMAL von
+         Hand gepflegt werden. Zwei Orte für dieselbe Zahl heisst: einer
+         ist irgendwann falsch. Gezaehlt wird ueber alle Zeilen, auch
+         Gewerbe — das Feld fragt nach dem Objekt, nicht nach den
+         Wohnungen. */
+      var zi = list.reduce(function (a, e) { return a + zahl(e.zimmer); }, 0);
+      if (zi > 0) { setzen('zimmer', zi); meldung += ' · ' + zi + ' Zimmer'; }
       /* ═══ v1622 · DIE SOLL-MIETE GEHT IN DIE MIETENTWICKLUNG ═════════
          Marcels Vorgabe vom 26.09.2026: "bitte auch bei dem MFH-
          Konfigurator die Soll-Miete im Tab Miete unter Mietentwicklung
