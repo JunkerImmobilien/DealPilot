@@ -26729,3 +26729,66 @@ Quick-Check-Modus mit eigenem iframe, und die Engine wartet dort bis zu
 6 Sekunden je Schritt (20 Versuche a 300 ms). Das ist bewusst so gesetzt,
 weil das Panel dynamisch rendert - koennte aber auf ein Ereignis statt auf
 die Uhr warten, wie schon beim Auto-Start.
+
+---
+
+## v1746 · Die Tour bringt ihr eigenes Objekt mit
+
+Marcel am 01.10.2026: „Wenn ich die Tour direkt aus der Hilfe starte und
+kein Objekt ausgewählt ist, dann passen die ganzen Anzeigen ja überhaupt
+nicht."
+
+Bisher klickte die Tour die erste Sidebar-Karte an und hoffte. Wer keine
+hat — neu angemeldet, oder die Demo-Objekte gelöscht —, bekam eine Führung
+durch leere Felder: Donuts ohne Wert, Tabellen ohne Zeilen.
+
+> Eine Erklärung am leeren Formular erklärt nichts. Sie zeigt, wo etwas
+> stünde, wenn es da wäre — genau die Auskunft, die niemand braucht, der
+> die App zum ersten Mal sieht.
+
+**Zwei Regeln halten das sauber:** Gelöscht wird NUR, was die Tour selbst
+angelegt hat; ein vorhandenes Objekt wird nie ersetzt, auch kein
+unfertiges — es gehört dem Nutzer.
+
+**Belegt am laufenden System.** Die Karten wurden kurz ausgeblendet, damit
+der Pfad greift, ohne echte Objekte anzufassen:
+
+```
+[DpTour v1746] Kein Objekt vorhanden - Demo wird angelegt
+[DpTour v1746] Demo-Objekt angelegt: 91de1b6e-7d7f-4c87-990e-7f4dd83e128c
+[DpTour v1746] Demo-Objekt wieder entfernt: 91de1b6e-...
+
+nach echtem Neuladen:  18 Karten, 0 Demo-Reste
+```
+
+> Meine erste Messung sagte „NICHT aufgeräumt" — sie las die Sidebar, und
+> die hinkt nach. Zum zweiten Mal in diesem Durchgang dieselbe Falle: die
+> Liste ist nicht der Server.
+
+### Der Anker zeigte auf die Aktionen
+
+Marcel: „Hier stehen deine Objekte. Nee, da sind die Aktionen."
+Gemessen im Tower:
+
+```
+.dpl-portfolio        33 px   "Aktionen 19"   der Umschalter
+.dpl-teil-suche       38 px   "Portfolio"
+.dpl-teil-objekte    755 px   die echte Liste
+```
+
+Die Tour zeigte auf `.dpl-schiene` — die GANZE Schiene, oben der
+Umschalter. Jetzt auf `.dpl-teil-objekte`, in BEIDEN Varianten
+(withObjects und empty; das waren drei Vorkommen).
+
+### Die Zahlen des Demo-Objekts
+
+Der erste Wurf bekam Score 22 — KRITISCH. Als Lehrbeispiel ungünstig: die
+Tour erklärt Kennzahlen an einem Objekt, das in jeder Ampel rot steht.
+
+```
+vorher   690.000 / 2.450 Miete   Faktor 23,5   4,26 %   Score 22
+jetzt    620.000 / 3.100 Miete   Faktor 16,7   6,00 %
+```
+
+Bewusst kein Vorzeigeobjekt mit Traumwerten — das zeigte nur den einen
+Fall, in dem alles grün ist.
