@@ -228,22 +228,83 @@ window.DealPilotOnboarding = (function () {
     return ''
       + '<p class="dpo-vor">Mit diesen Werten rechnet jeder neue Quick-Check, '
       + 'bis du am Objekt etwas anderes einträgst.</p>'
+      /* v1750 · DER ZINS IST EINE WAHL, KEINE ANSAGE.
+         Marcel: „Man sollte eine Checkbox haben, ob er sich den automatisch
+         ziehen soll, und wenn nicht, dass man einen angeben kann … den
+         indikativen Marktzins, der von uns kommt, oder ob wir selber einen
+         eingeben."
+
+         Der Leser dafuer existiert laengst: `investment-profile.js:74`
+         nimmt `zins_override`, wenn er gesetzt ist, sonst den indikativen
+         Satz. Gebaut wird hier also nur das SCHREIBEN - und genau deshalb
+         gegengelesen, bevor gebaut wurde. Zweimal an diesem Tag hatte das
+         Setup Werte geschrieben, die niemand abholt (Bordkarte, Score). */
       + '<div class="dpo-hinweis">'
-      +   '<b>Zinssatz:</b> DealPilot zieht den <b>aktuellen Marktzins</b> und '
-      +   'nimmt ihn indikativ — du musst nichts eintragen' + esc(stand) + '. '
-      +   'Die <b>Zinsstufe</b> sagt, mit welchem Aufschlag gerechnet wird; '
-      +   '„Standard" ist der vorsichtige Mittelweg.'
+      +   '<b>Zinssatz:</b> DealPilot zieht den <b>aktuellen Marktzins</b> '
+      +   'und nimmt ihn indikativ' + esc(stand) + '. Die <b>Zinsstufe</b> '
+      +   'sagt, mit welchem Aufschlag gerechnet wird; „Standard" ist der '
+      +   'vorsichtige Mittelweg. Hast du ein eigenes Angebot, nimm den Haken '
+      +   'raus und trag deinen Satz ein.'
       + '</div>'
+      + '<label class="dpo-haken" for="dpo_zins_auto">'
+      +   '<input type="checkbox" id="dpo_zins_auto"' + (_eigenerZins() == null ? ' checked' : '') + '>'
+      +   '<span>Indikativen Marktzins von DealPilot verwenden</span>'
+      + '</label>'
       + '<div class="dpo-raster">'
-      +   _sel('dpo_zinsbindung', 'Zinsbindung', [[5,'5 Jahre'],[10,'10 Jahre'],[15,'15 Jahre'],[20,'20 Jahre']], profil('zinsbindung_default', 10))
-      +   _sel('dpo_margin', 'Zinsstufe', [['premium','Premium (LTV bis 60 %)'],['standard','Standard (60–80 %)'],['schwach','Schwach (über 90 %)']], profil('zins_margin', 'standard'))
-      +   _num('dpo_tilgung', 'Anfangstilgung', profil('tilgung_default', 1.5), '%')
-      +   _num('dpo_ek', 'Eigenkapital', profil('ek_quote_default', 10), '% vom Kaufpreis')
-      +   _num('dpo_mietausfall', 'Kalkulatorischer Mietausfall', profil('mietausfall_pct', 1), '% der Nettokaltmiete')
-      +   _num('dpo_bwk_ul', 'Bewirtschaftung umlagefähig', profil('bwk_ul_pct_default', 17), '% der NKM')
-      +   _num('dpo_bwk_nu', 'Bewirtschaftung nicht umlagefähig', profil('bwk_anteil_default', 16), '% der NKM')
-      +   _num('dpo_dscr', 'Mindest-DSCR', profil('min_dscr', 1.20), 'ab hier kaufst du')
+      +   _sel('dpo_zinsbindung', 'Zinsbindung', [[5,'5 Jahre'],[10,'10 Jahre'],[15,'15 Jahre'],[20,'20 Jahre']], profil('zinsbindung_default', 10),
+          'Wie lange der Zins festgeschrieben ist. Je länger, desto teurer — dafür planbar.')
+      +   _sel('dpo_margin', 'Zinsstufe', [['premium','Premium (LTV bis 60 %)'],['standard','Standard (60–80 %)'],['schwach','Schwach (über 90 %)']], profil('zins_margin', 'standard'),
+          'Der Aufschlag der Bank auf den Pfandbriefsatz. Er hängt am Beleihungsauslauf: wer wenig Eigenkapital mitbringt, zahlt mehr.')
+      +   _num('dpo_zins', 'Eigener Zinssatz', _eigenerZins(), '% p. a.',
+          'Nur wenn der Haken oben raus ist. Dann rechnet DealPilot mit DIESEM Satz statt mit dem Marktzins.')
+      +   _num('dpo_tilgung', 'Anfangstilgung', profil('tilgung_default', 1.5), '%',
+          'Wie viel du im ersten Jahr tilgst. 1,5 % ist der übliche Einstieg; darunter läuft die Finanzierung sehr lang, darüber drückt es den Cashflow.')
+      +   _num('dpo_ek', 'Eigenkapital', profil('ek_quote_default', 10), '% vom Kaufpreis',
+          'Vorbelegt mit 10 % — das deckt in der Regel die Kaufnebenkosten. 0 % ist die Vollfinanzierung inklusive Nebenkosten.')
+      +   _num('dpo_ltv', 'Beleihungsauslauf (LTV)', profil('max_ltv', 90), '% vom Kaufpreis',
+          'Wie viel vom Kaufpreis die Bank beleiht. 100 % ist die Vollfinanzierung des Kaufpreises, über 100 % geht nur mit zusätzlicher Sicherheit. Der DealScore warnt, wenn ein Objekt darüber liegt.')
+      +   _num('dpo_mietausfall', 'Kalkulatorischer Mietausfall', profil('mietausfall_pct', 1), '% der Nettokaltmiete',
+          'Rücklage für Leerstand und Zahlungsausfall. 1 % ist vorsichtig gerechnet und entspricht etwa einer ausgefallenen Monatsmiete in acht Jahren.')
+      +   _num('dpo_bwk_ul', 'Bewirtschaftung umlagefähig', profil('bwk_ul_pct_default', 17), '% der NKM',
+          'Betriebskosten, die du auf den Mieter umlegst — sie laufen durch, belasten dich also nicht.')
+      +   _num('dpo_bwk_nu', 'Bewirtschaftung nicht umlagefähig', profil('bwk_anteil_default', 16), '% der NKM',
+          'Verwaltung, Instandhaltung, Mietausfallwagnis. Das trägst du selbst, und es ist der Posten, den Anfänger am häufigsten vergessen.')
+      +   _num('dpo_dscr', 'Mindest-DSCR', profil('min_dscr', 1.20), 'ab hier kaufst du',
+          'Debt Service Coverage Ratio: Jahresreinertrag geteilt durch Kapitaldienst. 1,0 heißt, die Miete deckt Zins und Tilgung genau. 1,20 lässt 20 % Luft — darunter wird es bei jeder Mietminderung eng. Banken verlangen meist 1,1 bis 1,3.')
       + '</div>';
+  }
+
+  /* Haken an → das Zinsfeld ist gesperrt und zeigt, was DealPilot gerade
+     zieht. Haken aus → frei. Ein gesperrtes Feld, das den aktuellen
+     Marktzins ANZEIGT, ist ehrlicher als ein leeres: der Nutzer sieht,
+     womit gerechnet wird, bevor er entscheidet, ob er es ersetzt. */
+  function _zinsFeld() {
+    var h = el('dpo_zins_auto'), f = el('dpo_zins');
+    if (!h || !f) return;
+    var auto = !!h.checked;
+    f.disabled = auto;
+    f.classList.toggle('dpo-gesperrt', auto);
+    if (auto) {
+      var z = null;
+      try {
+        if (typeof window.dpGetIndicativeZins === 'function') {
+          z = window.dpGetIndicativeZins(
+            parseFloat((el('dpo_zinsbindung') || {}).value || 10),
+            (el('dpo_margin') || {}).value || 'standard');
+        }
+      } catch (e) {}
+      f.value = (typeof z === 'number' && isFinite(z))
+        ? String(Math.round(z * 100) / 100).replace('.', ',') : '';
+      f.placeholder = (f.value === '') ? 'wird beim Rechnen gezogen' : '';
+    } else if (!f.value) {
+      f.placeholder = 'z. B. 3,65';
+    }
+  }
+
+  /* Leer heisst „nimm den Marktzins" — so liest es auch getZins(). */
+  function _eigenerZins() {
+    var v = profil('zins_override', null);
+    return (v == null || String(v).trim() === '' || !isFinite(parseFloat(v))) ? null : v;
   }
 
   /* ══ SCHRITT 4 · STEUER ═══════════════════════════════════════════ */
@@ -254,20 +315,53 @@ window.DealPilotOnboarding = (function () {
       + 'Steuerwirkung deiner Immobilie — Abschreibung, Werbungskosten, '
       + 'Cashflow nach Steuern.</p>'
       + '<div class="dpo-raster dpo-raster-2">'
-      +   _num('dpo_grenz', 'Grenzsteuersatz', profil('grenzsteuersatz', 40.45), '%')
+      +   _num('dpo_grenz', 'Grenzsteuersatz', profil('grenzsteuersatz', 40.45), '%',
+          'Nicht dein Durchschnittssatz, sondern der Satz auf den nächsten Euro. '
+        + 'Er ist immer höher als der Durchschnitt und ist die richtige Größe, '
+        + 'wenn man wissen will, was eine zusätzliche Einnahme oder eine '
+        + 'Abschreibung wirklich bringt. Vorbelegt mit 40,45 % — das ist der '
+        + 'Satz eines Alleinstehenden mit rund 60.000 € zu versteuerndem '
+        + 'Einkommen inklusive Solidaritätszuschlag.')
       + '</div>'
+      /* ══ v1750 · WAS DER RECHNER TUT, UND WO DIE ZAHL STEHT ══════════
+         Marcel: „Bei der Steuer, was macht der genau? … Man sollte nur genau
+         sagen, wo das zvE zu finden ist."
+
+         Der Gehaltsrechner bleibt bewusst draussen (Marcels Entscheidung vom
+         01.10.2026). Vom Bruttolohn zum zvE fuehrt kein exakter Weg ohne
+         Werbungskosten, Vorsorgeaufwand und Freibetraege — ein Rechner, der
+         so tut, erfindet eine Zahl. Stattdessen der genaue Fundort. */
       + '<div class="dpo-rechner">'
-      +   '<div class="dpo-r-kopf">Du kennst ihn nicht? Dann schätzen wir ihn.</div>'
+      +   '<div class="dpo-r-kopf">Du kennst den Satz nicht? Dann rechnen wir ihn aus.</div>'
+      +   '<p class="dpo-fuss">Du gibst dein <b>zu versteuerndes Einkommen</b> ein, '
+      +   'DealPilot wendet darauf den Einkommensteuertarif nach <b>§ 32a EStG</b> an '
+      +   'und misst, wie viel Steuer auf den <i>nächsten</i> Euro entfällt — '
+      +   'zuzüglich Solidaritätszuschlag und, wenn angegeben, Kirchensteuer. '
+      +   'Genau diesen Satz trägt DealPilot dann oben ein.</p>'
       +   '<div class="dpo-raster dpo-raster-3">'
       +     _num('dpo_zve', 'Zu versteuerndes Einkommen', '', '€ im Jahr')
       +     _sel('dpo_kirche', 'Kirchensteuer', [['0','keine'],['8','8 % (BY, BW)'],['9','9 % (übrige)']], '0')
-      +     '<div class="dpo-f"><label>&nbsp;</label><button type="button" class="dpo-r-btn" id="dpo-rechnen">Schätzen</button></div>'
+      +     '<div class="dpo-f"><label>&nbsp;</label><button type="button" class="dpo-r-btn" id="dpo-rechnen">Ausrechnen</button></div>'
       +   '</div>'
       +   '<div class="dpo-r-erg" id="dpo-r-erg"></div>'
-      +   '<p class="dpo-fuss">Das zu versteuernde Einkommen steht in deinem '
-      +   'letzten <b>Steuerbescheid</b>, Zeile „zu versteuerndes Einkommen" — '
-      +   'nicht das Bruttogehalt. Die Schätzung nutzt den Einkommensteuertarif '
-      +   'nach § 32a EStG und <b>ersetzt keine Steuerberatung</b>.</p>'
+      +   '<div class="dpo-fund">'
+      +     '<b>Wo du das zu versteuernde Einkommen findest</b>'
+      +     '<ul>'
+      +       '<li>In deinem letzten <b>Einkommensteuerbescheid</b> vom Finanzamt, '
+      +         'im Abschnitt <b>„Besteuerungsgrundlagen"</b>.</li>'
+      +       '<li>Dort ist es die Zeile <b>„zu versteuerndes Einkommen"</b> — '
+      +         'die <b>letzte Zeile der Berechnung</b>, direkt über der '
+      +         '„Einkommensteuer laut Grund-/Splittingtabelle".</li>'
+      +       '<li>Hast du den Bescheid digital, liegt er in <b>ELSTER</b> unter '
+      +         '<i>Meine Formulare → Bescheide</i>.</li>'
+      +     '</ul>'
+      +     '<p class="dpo-fuss"><b>Nicht verwechseln:</b> das Bruttogehalt ist es '
+      +       'nicht, und in der <b>Lohnsteuerbescheinigung</b> steht es gar nicht — '
+      +       'die kennt nur den Bruttoarbeitslohn. Wer nie eine Steuererklärung '
+      +       'abgegeben hat, hat auch keinen Bescheid; dann trag den Satz oben '
+      +       'direkt ein oder frag deinen Steuerberater. '
+      +       '<b>Diese Rechnung ersetzt keine Steuerberatung.</b></p>'
+      +   '</div>'
       + '</div>';
   }
 
@@ -298,14 +392,32 @@ window.DealPilotOnboarding = (function () {
     { titel: 'Was für ein Investor bist du?',kurz: 'Profil',      bau: s5 }
   ];
 
-  function _num(id, label, wert, einheit) {
-    return '<div class="dpo-f"><label for="' + id + '">' + esc(label) + '</label>'
+  /* v1750 · ERKLAERUNGEN AN JEDES FELD.
+     Marcel: „Es müssen Erklärungen, so Infofelder dran. Was ist zum Beispiel
+     DSCR und wo setzen wir Standardwerte und erklären beim Tooltip warum."
+
+     Zwei Dinge, nicht eines: WAS die Groesse ist und WARUM genau dieser
+     Vorschlagswert dasteht. Der zweite Teil ist der wichtigere - er macht
+     aus einer Zahl, die vom Himmel faellt, eine nachvollziehbare
+     Empfehlung. Deshalb traegt jeder Text unten beides.
+
+     Kein `title`-Attribut: das erscheint erst nach einer Sekunde Verharren,
+     auf dem Handy nie. Ein eigener Knopf mit Klappbereich erreicht beide. */
+  function _hilfe(id, text) {
+    if (!text) return '';
+    return '<button type="button" class="dpo-i" data-hilfe="' + id + '" '
+      + 'aria-label="Erklärung" title="Erklärung einblenden">i</button>'
+      + '<div class="dpo-i-text" id="dpo-h-' + id + '" hidden>' + esc(text) + '</div>';
+  }
+
+  function _num(id, label, wert, einheit, hilfe) {
+    return '<div class="dpo-f"><label for="' + id + '">' + esc(label) + _hilfe(id, hilfe) + '</label>'
       + '<div class="dpo-iw"><input id="' + id + '" type="text" inputmode="decimal" value="'
       + esc(String(wert == null ? '' : wert).replace('.', ',')) + '">'
       + '<span class="dpo-eh">' + esc(einheit) + '</span></div></div>';
   }
-  function _sel(id, label, opt, wert) {
-    return '<div class="dpo-f"><label for="' + id + '">' + esc(label) + '</label>'
+  function _sel(id, label, opt, wert, hilfe) {
+    return '<div class="dpo-f"><label for="' + id + '">' + esc(label) + _hilfe(id, hilfe) + '</label>'
       + '<select id="' + id + '">'
       + opt.map(function (o) {
           return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(wert) ? ' selected' : '') + '>'
@@ -414,6 +526,14 @@ window.DealPilotOnboarding = (function () {
         k.classList.add('an');
         return;
       }
+      /* v1750 · Erklärung auf- und zuklappen */
+      var ib = ev.target.closest ? ev.target.closest('[data-hilfe]') : null;
+      if (ib) {
+        var box = document.getElementById('dpo-h-' + ib.getAttribute('data-hilfe'));
+        if (box) { box.hidden = !box.hidden; ib.classList.toggle('an', !box.hidden); }
+        return;
+      }
+      if (ev.target.id === 'dpo_zins_auto') { _zinsFeld(); return; }
       if (ev.target.id === 'dpo-rechnen') { _rechnen(); return; }
       if (ev.target.id === 'dpo-weiter') { _sichern(); _vor(); return; }
       if (ev.target.id === 'dpo-zurueck') { _sichern(); _zurueck(); return; }
@@ -499,7 +619,14 @@ window.DealPilotOnboarding = (function () {
         mietausfall_pct: _zahl('dpo_mietausfall'),
         bwk_ul_pct_default: _zahl('dpo_bwk_ul'),
         bwk_anteil_default: _zahl('dpo_bwk_nu'),
-        min_dscr: _zahl('dpo_dscr')
+        min_dscr: _zahl('dpo_dscr'),
+        max_ltv: _zahl('dpo_ltv'),
+        /* v1750 · Haken an = null, und genau das liest getZins() als
+           „nimm den indikativen Satz". Der angezeigte Wert im gesperrten
+           Feld wird bewusst NICHT geschrieben: er ist eine Anzeige des
+           heutigen Marktzinses, kein Beschluss. Wer ihn einfrieren wollte,
+           hätte den Haken rausgenommen. */
+        zins_override: ((el('dpo_zins_auto') || {}).checked ? null : _zahl('dpo_zins'))
       });
     }
     if (_schritt === 3) {
@@ -574,6 +701,19 @@ window.DealPilotOnboarding = (function () {
     el('dpo-zurueck').style.visibility = _schritt === 0 ? 'hidden' : '';
     el('dpo-weiter').textContent = (_schritt === SCHRITTE.length - 1) ? 'Fertig — los geht’s' : 'Weiter';
     try { el('dpo-inhalt').scrollTop = 0; } catch (e) {}
+
+    /* v1750 · Das Zinsfeld richtet sich nach dem Haken — beim Zeichnen UND
+       wenn Zinsbindung oder Zinsstufe wechseln. Ohne das Zweite zeigt das
+       gesperrte Feld den Satz der vorigen Bindung, und niemand sieht den
+       Unterschied zwischen 5 und 20 Jahren, über den dieser Schritt
+       entscheiden lässt. */
+    if (el('dpo_zins_auto')) {
+      _zinsFeld();
+      ['dpo_zinsbindung', 'dpo_margin'].forEach(function (id) {
+        var e = el(id);
+        if (e && !e._dpoWired) { e._dpoWired = 1; e.addEventListener('change', _zinsFeld); }
+      });
+    }
   }
 
   function _abschliessen() {
@@ -613,6 +753,34 @@ window.DealPilotOnboarding = (function () {
       '.dpo-leib h2{font-family:"Space Grotesk",Inter,sans-serif;font-size:21px;margin:0 0 10px;color:#1b1815}',
       '.dpo-vor{font-size:13.5px;line-height:1.6;color:#55504a;margin:0 0 16px}',
       '.dpo-fuss{font-size:11.5px;line-height:1.55;color:#7A7370;margin:12px 0 0}',
+
+      /* ── v1750 · Erklärungen, Häkchen, Fundort ───────────────────────
+         Der i-Knopf sitzt IM Label, damit er mit der Beschriftung
+         zusammen umbricht statt daneben zu stehen. Die Erklärung klappt
+         unter das ganze Feld (grid-column:1/-1), sonst quetscht sie die
+         Rasterspalte zusammen. */
+      '.dpo-f label{display:flex;align-items:center;gap:6px}',
+      '.dpo-i{flex:0 0 auto;width:15px;height:15px;border-radius:50%;border:1px solid #C9BFA8;'
+        + 'background:#fff;color:#8A7F6B;font-size:10px;line-height:1;font-weight:700;'
+        + 'cursor:pointer;padding:0;font-family:Inter,system-ui,sans-serif}',
+      '.dpo-i:hover{border-color:var(--wl-b8932f,#b8932f);color:var(--wl-b8932f,#b8932f)}',
+      '.dpo-i.an{background:var(--wl-c9a84c,#C9A84C);border-color:var(--wl-c9a84c,#C9A84C);color:#1b1815}',
+      '.dpo-i-text{grid-column:1/-1;margin:-2px 0 2px;padding:9px 11px;border-radius:7px;'
+        + 'background:#F6F3EC;border:1px solid #E6E1D6;font-size:11.5px;line-height:1.6;color:#5E574F}',
+
+      '.dpo-haken{display:flex;align-items:center;gap:9px;margin:0 0 12px;padding:10px 12px;'
+        + 'border:1px solid #E6E1D6;border-radius:9px;background:#FBF9F4;cursor:pointer;font-size:12.5px}',
+      '.dpo-haken input{width:15px;height:15px;flex:0 0 auto;cursor:pointer}',
+
+      /* Gesperrt heisst „wird gerade von uns gefüllt", nicht „kaputt" —
+         deshalb lesbar grau und nicht ausgeblichen. */
+      '.dpo-gesperrt{background:#F2EFE8;color:#8A8278;cursor:not-allowed}',
+
+      '.dpo-fund{margin-top:14px;padding:12px 14px;border-radius:9px;background:#FBF9F4;'
+        + 'border:1px solid #E6E1D6}',
+      '.dpo-fund>b{display:block;font-size:12.5px;margin-bottom:6px}',
+      '.dpo-fund ul{margin:0;padding-left:17px;font-size:11.5px;line-height:1.7;color:#5E574F}',
+      '.dpo-fund .dpo-fuss{margin-top:9px}',
       '.dpo-hinweis{background:#F6F2E6;border:1px solid #E8E1CE;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.6;color:#4a453f;margin-bottom:16px}',
       '.dpo-kacheln{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}',
       '.dpo-kacheln-3{grid-template-columns:repeat(3,1fr)}',
