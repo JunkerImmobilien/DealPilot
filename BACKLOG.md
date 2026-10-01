@@ -36,6 +36,114 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → OFFEN aus dem 01.10.2026 (Rundgang, Erstanmeldung, BMF-Ausgabe)
+
+Marcels Durchgang am 01.10.2026. **Reihenfolge wie von ihm genannt.**
+Zwei Punkte sind beim Aufschreiben schon gefallen (T3, T4) — sie stehen
+trotzdem hier, damit die Abnahme nachvollziehbar bleibt.
+
+### T1 · Die Tour in JEDER Ansicht komplett durchprüfen
+
+Marcel: „Ich möchte, dass du die Tour nochmal komplett durchprüfst, einmal
+im DealPilot, also heute Obsidian-Look, und auch dann mit unserem anderen
+Standard … und wenn wir die Ansicht wechseln, dann muss das natürlich auch
+funktionieren."
+
+Nicht „startet sie" prüfen, sondern **jeden der 38 Schritte** in jeder der
+vier Ansichten: findet der Anker ein SICHTBARES Element, sitzt der Spot
+darauf, passt der Text zu dem, was dort steht. Gemessen wird der Spot gegen
+das Ziel — nicht `querySelector` gegen null.
+
+> **Warum das die eigentliche Arbeit ist:** am 30.09. hatte ich „36 von 37
+> Zielen in allen vier Ansichten" gemeldet. Das war falsch — ich hatte
+> geprüft, ob `querySelector` etwas FINDET, nicht ob es sichtbar ist. In
+> `#sb-list` liegen in drei Ansichten 0x0-Hüllen.
+
+**Dazu gehört:** die Tour muss in allen Ansichten **jederzeit aufrufbar**
+sein, auch über die Hilfe, auch mitten im Betrieb.
+
+### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte
+
+Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
+kann, dass wir aber standardmäßig einfach unter der Darstellung immer die
+Bordkarten erstmal auswählen."
+
+Zu prüfen: setzt das Setup aus `onboarding.js` die Bordkarte für Aktenmappe,
+Kanzlei und Tower wirklich — und gilt das auch, wenn der Nutzer die Ansicht
+SPÄTER unter Darstellung wechselt? Der zweite Fall ist der, den er meint.
+
+### T3 · Schritt 1 zeigt auf die Aktionen statt auf die Objekte — ERLEDIGT
+
+Marcel: „Dann müsste halt vorher einmal auf Portfolio geklickt werden."
+Siehe v1747b/v1747c, unten unter Fertig.
+
+### T4 · Demo-Objekt für die Tour vorhalten — ERLEDIGT, aber Abnahme offen
+
+Marcel: „Wir haben ja auch Demo-Objekte, die bei der Erstanmeldung
+entstanden sind. Vielleicht können wir die im Hintergrund komplett immer
+speichern, auch wenn der Kunde das Objekt löscht."
+
+Gebaut als `POST /objects/demo-rundgang` (v1747/v1747d) — der Datensatz
+liegt ohnehin in `backend/src/db/demo-object.json` und wird nie gelöscht, es
+brauchte nur einen Weg dorthin. Am Endpunkt nachgemessen: 129 Felder, 1
+Foto, 9.926 Zeichen KI-Analyse, freie Objektnummer.
+
+**BLOCKIERT ist nur die Abnahme des Pfads selbst:** der Fall „Nutzer hat
+KEIN Objekt" liess sich am Konto mit 17 Objekten nicht herstellen. Karten
+per CSS zu verbergen reicht nicht — `_ensureObjectLoaded` kehrt vorher an
+`#hdr-obj` zurück. Gehört an einem frischen Konto abgenommen.
+
+### T5 · Tower: „Kaufpreisaufteilung" öffnet immer dasselbe PDF
+
+Marcel: „Im Tower, wenn ich auf Kaufpreisaufteilung klicke, öffnet sich
+immer noch die Kaufpreisaufteilung. Da haben wir ja mehrere PDFs … vielleicht
+zu sagen: Welches wolltest du denn haben? Oder wir nennen das nicht
+Kaufpreisaufteilung, sondern BMF-Rechner … und dass wir dann ein Modal
+kriegen, wo wir es aussuchen können."
+
+Zwei Sachen in einem: **der Name** (Kaufpreisaufteilung ist das Ergebnis,
+nicht das Werkzeug) und **die Auswahl**. Vorlage ist die Fassungswahl, die
+beim Investment-PDF schon steht (`pdf-wahl.js`, v1744).
+
+### T6 · Pre-Flight-Karte: der QR-Schritt markiert den Boardingpass
+
+Marcel: „Wenn wir die Preflight-Card vorstellen, dass der QR-Code, wenn wir
+dazu den Text machen, dann markiert er vorne den Boardingpass. Das ist
+natürlich vollkommen falsch. Dann muss er den QR-Code markieren."
+
+Ein falscher Anker, kein Layoutfehler. Der QR-Code braucht einen eigenen
+Selektor — und der muss in allen vier Ansichten greifen.
+
+### T7 · Erstanmeldung: Einstellungen müssen ankommen UND wiederfindbar sein
+
+Marcel: „Das Ziel ist, dass wenn der Kunde sich anmeldet, die Einstellungen
+vernünftig funktionieren, auch der erste Schritt vernünftig funktioniert,
+dass er das Design auswählen kann, dass er die Grunddaten eingibt und dass
+er später auch wiederfindet."
+
+Das letzte Drittel ist der ungeprüfte Teil: **wiederfindet.** Jeder im Setup
+gesetzte Wert muss an der Stelle stehen, an der der Nutzer ihn später sucht —
+und zwar an der, die die App auch LIEST.
+
+> **Am 01.10.2026 teuer gelernt:** das Setup schreibt nach
+> `dp_investment_profile`, meine Sicherung lag auf `profil`. Zwei Schlüssel
+> mit demselben Inhalt, 18 Felder beide — und nur einer wird gelesen. Beim
+> Zurücklegen hätte das stillschweigend die falschen Werte zementiert.
+
+### T8 · Kaufpreisaufteilung „Am Markt 18" gegen unsere rechnen
+
+Marcel hat `Dateien/KPT Am Markt 18, 06184 Kabelsketal - WE 2 (1).pdf`
+abgelegt (dazu `RNDG Am Markt 18 … WE 2.pdf`). Unsere Aufteilung dagegen
+halten, Abweichungen benennen.
+
+> **Vorsicht bei genau dieser Prüfstrecke:** `/bmf/aufteilung` überspringt
+> unbekannte Eingabefelder kommentarlos — gemessen 5 von 12, Bodenwert um
+> Faktor 2,9 falsch, `warnings` leer. Vor dem Vergleich einen
+> Empfindlichkeitstest je Eingabe fahren, sonst vergleicht man zwei Zahlen,
+> von denen eine gar nicht auf den Eingaben beruht.
+
+---
+
 ## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
 
 ### N1 · Starter-Nachkauf ist teurer als der Einzelkauf — ENTSCHEIDUNG OFFEN
