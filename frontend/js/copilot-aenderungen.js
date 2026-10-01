@@ -76,17 +76,38 @@
   }
 
   /* Die Beschriftung aus dem DOM lesen, nicht raten — sonst versteht das
-     Modell nicht, worum es geht. */
+     Modell nicht, worum es geht, und der Nutzer sieht in der Rückfrage
+     einen Feldnamen, den es nirgends gibt.
+
+     v1760b · Gemessen am Mietfeld: `nkm` hat KEIN `label[for]`, sein
+     nächster Behälter `.iw` auch keins — mein erster Entwurf fiel deshalb
+     auf den Platzhalter zurück und nannte das Feld „800". Das richtige
+     Label („Nettokaltmiete / Monat") steht eine Ebene höher.
+
+     > Ein Platzhalter ist ein BEISPIELWERT, keine Beschriftung. Ihn als
+     > Feldnamen zu zeigen ist schlimmer als die nackte Id: die Id verrät
+     > wenigstens, dass hier etwas fehlt.
+
+     Deshalb: aufsteigen, bis ein Label da ist. Der Platzhalter bleibt der
+     allerletzte Ausweg. */
   function beschriftung(id, e) {
     try {
       var l = document.querySelector('label[for="' + id + '"]');
       if (l) return (l.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
-      var p = e.closest ? e.closest('.field, .f, .form-row, div') : null;
-      if (p) {
-        var lab = p.querySelector('label');
-        if (lab) return (lab.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+
+      var x = e.parentElement, tiefe = 0;
+      while (x && tiefe < 5) {
+        var lab = x.querySelector('label');
+        if (lab) {
+          var t = (lab.textContent || '').replace(/\s+/g, ' ').trim();
+          if (t) return t.slice(0, 60);
+        }
+        x = x.parentElement; tiefe++;
       }
-      if (e.placeholder) return String(e.placeholder).slice(0, 60);
+
+      if (e.getAttribute('aria-label')) return String(e.getAttribute('aria-label')).slice(0, 60);
+      if (e.getAttribute('title')) return String(e.getAttribute('title')).slice(0, 60);
+      if (e.placeholder) return 'Feld ' + id + ' (z. B. ' + String(e.placeholder).slice(0, 20) + ')';
     } catch (ex) {}
     return id;
   }
