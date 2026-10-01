@@ -146,7 +146,27 @@ export function machRepository(q) {
                geltungsbereich = EXCLUDED.geltungsbereich,
                belege = EXCLUDED.belege, stufe = EXCLUDED.stufe,
                fallzahl = EXCLUDED.fallzahl, stichtag = EXCLUDED.stichtag,
-               modellversion = EXCLUDED.modellversion, erfasst_am = now()`,
+               modellversion = EXCLUDED.modellversion,
+               /* v1752c - DIE HERKUNFT MUSS NACHTRAGBAR SEIN.
+                  Hier fehlten quelle_parser, quellenvermerk und lizenz.
+                  Folge: wer einen fehlenden Quellenvermerk nachtrug und
+                  neu einspielte, bekam ihn NICHT in die Tabelle - die
+                  Zeile existierte ja schon, und das UPDATE ruehrte diese
+                  drei Spalten nicht an. Gemessen am 01.10.2026: sechs
+                  Erfurter Saetze, Lizenz in der Datei gesetzt, in der
+                  Tabelle weiterhin leer.
+
+                  Eine Korrektur, die nicht ankommt, sieht genauso aus
+                  wie eine, die nie gemacht wurde - nur dass man sie
+                  fuer erledigt haelt.
+
+                  quelle_url bleibt bewusst draussen: sie ist Teil des
+                  Konfliktschluessels. Eine andere URL ist ein anderer
+                  Datensatz, keine Korrektur. */
+               quelle_parser = EXCLUDED.quelle_parser,
+               quellenvermerk = COALESCE(EXCLUDED.quellenvermerk, mb.param_modell.quellenvermerk),
+               lizenz = COALESCE(EXCLUDED.lizenz, mb.param_modell.lizenz),
+               erfasst_am = now()`,
             [m.land_code, m.ags, m.ebene, m.gebiet_name || null, m.gaa_name || null,
              m.kennzahl, m.zweig || 'standard',
              JSON.stringify(m.formel), JSON.stringify(m.korrekturen || {}),
