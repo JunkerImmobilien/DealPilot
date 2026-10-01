@@ -26914,3 +26914,87 @@ nicht da ist. Nachgemessen: Merker entfernt, in den Tower gewechselt →
 - **T8 ist eine Bewertungsfrage**, keine Programmierfrage: Marcels Gutachten
   rechnet nach der umgekehrten Ertragswertmethode (Jacoby, BFH IX R 12/21),
   DealPilot die BMF-Arbeitshilfe. Der Rechenweg steht im Backlog.
+
+---
+
+## v1751 · Die Ernte kommt in die Datenbank
+
+Marcel am 01.10.2026: „Kannst du die ganzen Werte jetzt auch in der Datenbank
+übernehmen? Sind dann alle Spalten für diese Zeile gefüllt und auch mit Link
+und Quellenangabe?"
+
+**Was · Commit · Nachweis · Rest**
+
+### Der Befund: eine hartverdrahtete Datei
+
+`tools/register-saat.mjs` Zeile 17 las genau eine Datei:
+
+```
+const DATEI = new URL('../src/lib/register/lzs-nrw.json', import.meta.url);
+```
+
+Deshalb standen 2.515 geerntete Datensätze im Repo und 493 in der Datenbank.
+
+> Eine Ernte, die das Repo nicht verlässt, ist keine Ernte. Sie sieht aus wie
+> Fortschritt und wirkt nirgends.
+
+### Vorher / nachher (aus der TABELLE gelesen, nicht vom Schreiber behauptet)
+
+```
+               Zeilen   Länder   Kennzahlen
+vorher            493        1            1
+nachher         2.505       14            8
+```
+
+Je Land, Sachwertfaktor / Liegenschaftszins:
+
+```
+NW  24 / 972     HE 160 /  8     NI  35 / 95     TH  75 / 1
+BB  36 /   0     ST  28 /  1     BW  13 /  0     SN   7 / 0
+MV   7 /   0     SH   6 /  0     BE   4 /  1     BY   2 / 0
+HH   1 /   0     RP   1 /  0
+fehlen ganz: Bremen, Saarland
+```
+
+### Marcels Frage nach den Spalten — gemessen
+
+```
+Pflichtfelder (land_code, ags, ebene, gebiet_name, kennzahl,
+  zweig, formel, belege, stufe, berichtsjahr, modellversion)   100 %
+quelle_url (Link)        2.505 / 2.505   nach dem Lauf: 0 ohne
+quellenvermerk              23 fehlen
+lizenz                      11 fehlen
+geltungsbereich           94,4 %
+modellansaetze            58,8 %   ← der kritische
+fallzahl                  55,7 %
+korrekturen                1,8 %   (nur wo es welche gibt)
+```
+
+> **`modellansaetze` mit 58,8 % ist der Punkt, der weh tut.** Genau dort muss
+> eine abweichende GND oder ein Baupreisindex als ZAHL stehen — steht sie nur
+> im Fließtext der Auflagen, rechnet das System mit der Konstanten, und nichts
+> widerspricht. Das ist derselbe Befund wie bei Oberursel (GND 70) am
+> 14.09.2026.
+
+### Zehn Sätze bleiben draußen, und das ist richtig so
+
+Verworfen wurden 10 Sachwertfaktoren aus NRW — Bochum (05911000), Dortmund
+(05913000), Essen (05112000), Siegen-Wittgenstein (05962). Ihnen fehlt die
+`quelle_url`, und **kein einziger** Satz dieser vier Ausschüsse trägt eine.
+
+> Eine Herkunft wird nicht erfunden. Wo die Quelle fehlt, fehlt der Wert —
+> das ist das Gegenstück zur Doktrin, nicht ihre Ausnahme.
+
+Acht weitere Sätze (Erbbaurechtskoeffizienten Braunschweig-Wolfsburg) fielen
+zuerst ebenfalls durch — dort fehlte aber nur `quelle_parser`, eine
+**technische** Angabe. Herkunft, Vermerk, Lizenz, Fundstelle (S. 35–36) und
+Stufe A waren vollständig. Nachgetragen in `v1751b`, Kodierung vorher
+gemessen, Umlaute (124) und Satzanzahl danach gegengelesen.
+
+### Rest
+
+- **Es wird weiterhin nichts automatisch geerntet.** Gemessen: `mb.etl_runs`
+  leer, `mb.param_lauf` fünf Läufe, kein Cron, kein systemd-Timer.
+- **23 Sätze ohne Quellenvermerk, 11 ohne Lizenz** — nachzutragen, wenn diese
+  Sätze ohnehin angefasst werden.
+- **Bremen und Saarland fehlen vollständig**, Bayern hat zwei Sätze.
