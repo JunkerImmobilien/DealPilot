@@ -165,6 +165,28 @@
     'neuer?\\s+(wert|miete|kaufpreis|baujahr)' +
     ')', 'i');
 
+  /* v1763b · DIE MELDUNG MUSS DEN ECHTEN GRUND NENNEN.
+
+     Gemessen: der Änderungsweg meldete „Konnte den Text nicht auswerten —
+     bitte nochmal". Die wahre Ursache war HTTP 429, das Stundenlimit.
+     „Bitte nochmal" ist dann genau der falsche Rat: Nochmal versuchen
+     verschlimmert es.
+
+     > Eine Fehlermeldung, die rät statt zu sagen, kostet mehr Zeit als
+     > gar keine — man sucht den Fehler an der falschen Stelle. */
+  function _fehlertext(err) {
+    var s = err && err.status;
+    if (s === 429) {
+      var m = err && err.data && (err.data.message || err.data.error);
+      return m ? String(m) : 'Zu viele Anfragen in kurzer Zeit — das Stundenlimit ist '
+        + 'erreicht. In den Einstellungen lässt sich ein eigener Schlüssel hinterlegen.';
+    }
+    if (s === 401) return 'Die Sitzung ist abgelaufen — bitte neu anmelden.';
+    if (s === 503) return 'Die KI ist gerade nicht erreichbar.';
+    if (s) return 'Der Server hat mit ' + s + ' geantwortet.';
+    return 'Keine Verbindung zum Server — der Text ist noch im Feld.';
+  }
+
   /* Eine Zahl muss dabei sein — „ändere mal was" ist keine Änderung. */
   function istAenderungsansage(text) {
     if (!text || text.length < 6) return false;
@@ -445,9 +467,9 @@
           return;
         }
         zeigeVorschlag(neu, konflikte, addMsg);
-      }).catch(function () {
+      }).catch(function (err) {
         if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
-        addMsg('assistant', '⚠ Konnte den Text nicht auswerten — bitte nochmal.');
+        addMsg('assistant', '⚠ ' + _fehlertext(err));
         inp.value = merk;
       });
     }
@@ -534,9 +556,9 @@
           return;
         }
         zeigeVorschlag(neu, konflikte, addMsg);
-      }).catch(function () {
+      }).catch(function (err) {
         if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
-        addMsg('assistant', '⚠ Konnte den Text nicht auswerten.');
+        addMsg('assistant', '⚠ ' + _fehlertext(err));
       });
     }
 
