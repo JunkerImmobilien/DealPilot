@@ -162,6 +162,53 @@ console.log('Länder   :', Object.keys(nachLand).sort()
 console.log('Kennzahlen:', Object.keys(nachKennzahl).sort()
   .map((k) => `${k} ${nachKennzahl[k]}`).join(' · '));
 
+/* ── 2b · DUBLETTEN IM KONFLIKTSCHLÜSSEL — v1768b ──────────────────────
+   Gemessen am 01.10.2026 an Berlin: sechs Sätze, je einer pro
+   Gebietsgruppe, alle mit `zweig: "mfh"` und derselben `quelle_url`. Der
+   Konfliktschlüssel ist
+
+     (land_code, ags, kennzahl, zweig, COALESCE(berichtsjahr,-1), quelle_url)
+
+   also für alle sechs derselbe. Fünf überschrieben sich gegenseitig, und
+   der Lauf meldete „übernommen 2566" — die Tabelle enthielt 2561. Niemand
+   stellte die beiden Zahlen nebeneinander.
+
+   > Ein Einleser, der „übernommen" aus dem Rückgabewert liest und nicht
+   > gegen das Geschriebene hält, meldet seine Absicht, nicht sein Ergebnis.
+
+   Dieselbe Falle hatte Brandenburg (v1757), dort war es die
+   Raumkategorie. Deshalb steht sie jetzt VOR dem Schreiben und bricht ab:
+   wer zwei Sätze mit demselben Schlüssel einliefert, hat eine
+   unterscheidende Angabe nicht in den Schlüssel gelegt. Das zu melden,
+   NACHDEM einer den anderen gelöscht hat, hilft niemandem. */
+const _schl = (m) => [m.land_code, m.ags, m.kennzahl, m.zweig,
+  (m.berichtsjahr == null ? -1 : m.berichtsjahr), m.quelle_url].join('');
+const _nachSchl = new Map();
+saetze.forEach((m) => {
+  const k = _schl(m);
+  if (!_nachSchl.has(k)) _nachSchl.set(k, []);
+  _nachSchl.get(k).push(m);
+});
+const _dubletten = [..._nachSchl.values()].filter((g) => g.length > 1);
+console.log('');
+console.log('═══ KONFLIKTSCHLÜSSEL ═══');
+console.log(`${_nachSchl.size} eindeutige Schlüssel aus ${saetze.length} Sätzen`);
+if (_dubletten.length) {
+  const _verloren = _dubletten.reduce((s, g) => s + g.length - 1, 0);
+  console.error(`ABBRUCH: ${_dubletten.length} Schlüssel doppelt — ${_verloren} Sätze`
+    + ` würden sich still überschreiben. Es wird NICHTS geschrieben.`);
+  _dubletten.slice(0, 8).forEach((g) => {
+    console.error(`   · ${g.length}x ${g[0].land_code}/${g[0].ags || '-'}`
+      + ` ${g[0].kennzahl} zweig="${g[0].zweig}" ${g[0].berichtsjahr || '-'}`);
+    g.slice(0, 3).forEach((m) => console.error(`       ${m._datei}`
+      + `  ${(m.gebiet_name || '').slice(0, 30)}`
+      + `  ${JSON.stringify((m.geltungsbereich || {}).raeumlich || '').slice(0, 44)}`));
+  });
+  console.error('   -> was die Sätze unterscheidet, gehört in den `zweig`.');
+  process.exit(1);
+}
+console.log('keine Dublette — jeder Satz hat seinen eigenen Platz.');
+
 if (TROCKEN) {
   console.log('');
   console.log('Trockenlauf — es wird nichts geschrieben.');
@@ -208,4 +255,32 @@ console.log('═══ GEGENPROBE (gelesen aus der Tabelle) ═══');
 console.log(`mb.param_modell : ${n[0].n} Zeilen · ${n[0].laender} Länder · ${n[0].kennzahlen} Kennzahlen`);
 console.log(`ohne Link ${fehlt[0].ohne_link} · ohne Quellenvermerk ${fehlt[0].ohne_vermerk} · ohne Lizenz ${fehlt[0].ohne_lizenz}`);
 
-process.exit(r.uebernommen > 0 ? 0 : 1);
+/* ── 6 · SOLL GEGEN IST — v1768b ────────────────────────────────────────
+   Bis hierher stand die Gegenprobe allein da: eine Zahl aus der Tabelle,
+   neben einer Zahl vom Schreiber, und niemand verglich sie. Am 01.10.2026
+   war der Unterschied 5 — genau die fünf Berliner Sätze, die sich
+   gegenseitig überschrieben hatten.
+
+   > Zwei Zahlen nebeneinander zu drucken ist kein Vergleich. Erst wer sie
+   > subtrahiert, hat geprüft.
+
+   Der Exit-Code hing dabei an `uebernommen > 0`: ein einziger
+   durchgekommener Satz machte den Lauf grün. */
+const _soll = saetze.length - r.verworfen;
+const _ist = n[0].n;
+console.log('');
+if (_ist === _soll) {
+  console.log(`✓ SOLL = IST : ${_soll} Sätze eingeliefert, ${_ist} in der Tabelle.`);
+} else {
+  console.error(`✗ ABWEICHUNG : ${_soll} Sätze hätten ankommen müssen`
+    + ` (${saetze.length} eingelesen − ${r.verworfen} verworfen), in der Tabelle`
+    + ` stehen ${_ist}. Differenz ${_ist - _soll}.`);
+  console.error('   Eine negative Differenz heißt: Sätze haben sich überschrieben,'
+    + ' obwohl die Dublettenprüfung sie durchgelassen hat — dann steht etwas'
+    + ' im Konfliktschlüssel der Tabelle, was hier nicht nachgebildet ist.');
+  console.error('   Eine positive Differenz heißt: in der Tabelle stehen Sätze,'
+    + ' die dieser Lauf nicht geschrieben hat (Karteileichen aus einem'
+    + ' früheren Lauf).');
+}
+
+process.exit((r.uebernommen > 0 && _ist === _soll) ? 0 : 1);

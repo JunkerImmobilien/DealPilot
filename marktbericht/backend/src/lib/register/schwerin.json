@@ -2,7 +2,7 @@
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -147,12 +147,13 @@
   "fallzahl": 54,
   "stichtag": "2025-01-01",
   "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Mehrfamilienhäuser\""
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Mehrfamilienhäuser\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  },
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -302,12 +303,13 @@
   "fallzahl": 21,
   "stichtag": "2025-01-01",
   "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Wohn- und Geschäftshäuser\""
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Wohn- und Geschäftshäuser\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  },
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -473,12 +475,13 @@
   "fallzahl": null,
   "stichtag": "2025-01-01",
   "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Eigentumswohnung im Weiterverkauf\""
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Eigentumswohnung im Weiterverkauf\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  },
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -557,12 +560,13 @@
    "max_pct": 3.1
   },
   "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63)"
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63)",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  },
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -755,12 +759,13 @@
   "stufe": "A",
   "stichtag": "2025-01-01",
   "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe nach dem Impressum). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufpreise 2021 bis 2023.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\""
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  },
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -958,12 +963,13 @@
   "stufe": "A",
   "stichtag": "2025-01-01",
   "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe nach dem Impressum). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufpreise 2021 bis 2023.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\""
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  },
  {
   "land_code": "MV",
   "ags": "13004",
-  "ebene": "kreisfreie_stadt",
+  "ebene": "gemeinde",
   "gebiet_name": "Schwerin, Landeshauptstadt",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
   "berichtsjahr": 2025,
@@ -1240,6 +1246,7 @@
   "stufe_grund": "Bestimmtheitsmaß 0,30, und der Bericht stellt die Tabelle selbst als nachrangige Anhaltswerte dar.",
   "stichtag": "2025-01-01",
   "auflagen": "Nachrangig gegenüber den Gebäudetyp-Sätzen. — Belegexemplar an den Herausgeber steht noch aus.",
-  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 65 (PDF-Seite 67)"
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 65 (PDF-Seite 67)",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
  }
 ]

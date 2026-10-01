@@ -6,7 +6,7 @@
   "gebiet_name": "Berlin",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
-  "zweig": "mfh",
+  "zweig": "mfh_suedost",
   "formel": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
@@ -514,7 +514,8 @@
   "lizenz": "dl-de/zero-2-0",
   "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
   "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
-  "fundstelle": "Tabelle 6, S. 12; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16"
+  "fundstelle": "Tabelle 6, S. 12; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Südost\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
  },
  {
   "land_code": "BE",
@@ -523,7 +524,7 @@
   "gebiet_name": "Berlin",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
-  "zweig": "mfh",
+  "zweig": "mfh_suedwest",
   "formel": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
@@ -987,7 +988,8 @@
   "lizenz": "dl-de/zero-2-0",
   "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
   "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
-  "fundstelle": "Tabelle 7, S. 12; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16"
+  "fundstelle": "Tabelle 7, S. 12; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Südwest\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
  },
  {
   "land_code": "BE",
@@ -996,7 +998,7 @@
   "gebiet_name": "Berlin",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
-  "zweig": "mfh",
+  "zweig": "mfh_nord",
   "formel": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
@@ -1532,7 +1534,8 @@
   "lizenz": "dl-de/zero-2-0",
   "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
   "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
-  "fundstelle": "Tabelle 8, S. 13; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16"
+  "fundstelle": "Tabelle 8, S. 13; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Nord\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
  },
  {
   "land_code": "BE",
@@ -1541,7 +1544,7 @@
   "gebiet_name": "Berlin",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
-  "zweig": "mfh",
+  "zweig": "mfh_city",
   "formel": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
@@ -2030,7 +2033,8 @@
   "lizenz": "dl-de/zero-2-0",
   "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
   "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
-  "fundstelle": "Tabelle 9, S. 13-14; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16"
+  "fundstelle": "Tabelle 9, S. 13-14; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"City\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
  },
  {
   "land_code": "BE",
@@ -2039,7 +2043,7 @@
   "gebiet_name": "Berlin",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
-  "zweig": "mfh",
+  "zweig": "mfh_ost",
   "formel": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
@@ -2519,7 +2523,8 @@
   "lizenz": "dl-de/zero-2-0",
   "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
   "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
-  "fundstelle": "Tabelle 10, S. 14; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16"
+  "fundstelle": "Tabelle 10, S. 14; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Ost\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
  },
  {
   "land_code": "BE",
@@ -2528,7 +2533,7 @@
   "gebiet_name": "Berlin",
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
-  "zweig": "mfh",
+  "zweig": "mfh_west",
   "formel": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
@@ -2988,6 +2993,7 @@
   "lizenz": "dl-de/zero-2-0",
   "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
   "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
-  "fundstelle": "Tabelle 11, S. 15; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16"
+  "fundstelle": "Tabelle 11, S. 15; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"West\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
  }
 ]
