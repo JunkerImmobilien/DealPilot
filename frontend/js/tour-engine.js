@@ -221,8 +221,8 @@
             _setzeFeld('objart', 'MFH');         _setzeFeld('baujahr', '1994');
             _setzeFeld('wfl', '420');            _setzeFeld('einheiten', '6');
             _setzeFeld('gsfl', '640');           _setzeFeld('zimmer', '16');
-            _setzeFeld('kp', '690000');          _setzeFeld('nkm', '2450');
-            _setzeFeld('ek', '140000');          _setzeFeld('d1', '620000');
+            _setzeFeld('kp', '620000');          _setzeFeld('nkm', '3100');
+            _setzeFeld('ek', '130000');          _setzeFeld('d1', '540000');
             _setzeFeld('kuerzel', 'RUNDGANG');
             _setzeFeld('notizen', 'Beispielobjekt für den Rundgang. DealPilot hat es angelegt, weil noch kein eigenes Objekt vorhanden war — nach dem Rundgang verschwindet es wieder.');
             try { if (typeof window.calc === 'function') window.calc(); } catch (ex) {}
