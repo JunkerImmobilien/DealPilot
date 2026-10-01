@@ -384,8 +384,23 @@ window.DealPilotOnboarding = (function () {
     var a = AUSSEHEN.filter(function (x) { return x.id === id; })[0];
     try { if (window.DealPilotLayout && DealPilotLayout.setze) DealPilotLayout.setze(id || ''); } catch (e) {}
     try {
-      if (a && a.karte && window.DealPilotKartenVariante && DealPilotKartenVariante.setze) {
-        DealPilotKartenVariante.setze(a.karte);
+      /* v1748b · DAS FALSCHE MODUL.
+         Hier stand `DealPilotKartenVariante.setze('bordkarte')`. Gemessen am
+         01.10.2026 am laufenden System:
+
+           DealPilotKartenVariante.varianten   "" v1 v2 v3 v4 v5 v6  (Farbfassungen)
+           DealPilotKartenStil.stile           zeile · kartei · buetten
+           DealPilotObjektkarte.stile          "" bordkarte kante datenzeile ampel …
+
+         „bordkarte" kennt nur das DRITTE Modul. Die anderen beiden setzen bei
+         einem unbekannten Wert still auf "" zurueck — kein Fehler, keine
+         Meldung, nur keine Bordkarte.
+
+         > Ein Versprechen im Einrichtungsfenster, das keinen Code hat, der es
+         > einloest, faellt niemandem auf: der Nutzer kennt die Bordkarte ja
+         > nicht und vermisst sie deshalb auch nicht. */
+      if (a && a.karte && window.DealPilotObjektkarte && DealPilotObjektkarte.setze) {
+        DealPilotObjektkarte.setze(a.karte);
       }
     } catch (e) {}
   }

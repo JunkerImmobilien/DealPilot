@@ -1131,6 +1131,27 @@
         skinVorher = document.body.classList.contains('dp-chrome-hell') ? 'hell' : 'obsidian';
       }
     } catch (e) {}
+    /* ── v1748b · DIE BORDKARTE IST DIE VORGABE, NICHT DER ZWANG ────
+       Marcel: „dass wir aber standardmaessig einfach unter der
+       Darstellung, dass wir immer die Bordkarten erstmal auswaehlen."
+
+       Bisher setzte nur das Einrichtungsfenster bei der Erstanmeldung
+       eine Objektkarte. Wer die Ansicht SPAETER unter Darstellung
+       wechselt - und genau das meint Marcel - bekam die Schiene ohne
+       Kartenbild.
+
+       Gesetzt wird nur, wenn der Merker gar nicht DA ist. Wer einmal
+       selbst gewaehlt hat - auch die leere Fassung „Heute", die
+       schreibt einen leeren Wert - behaelt seine Wahl. Zwanzig Zeilen
+       weiter oben steht, warum das so sein muss: „Ein Umbau, der sich
+       nicht abwaehlen laesst, ist kein Angebot, sondern eine Ansage."
+       Eine Vorgabe ueberschreibt nichts, sie fuellt eine Luecke. */
+    try {
+      if (localStorage.getItem('dp_objkarte_stil') === null &&
+          window.DealPilotObjektkarte && typeof window.DealPilotObjektkarte.setze === 'function') {
+        window.DealPilotObjektkarte.setze('bordkarte');
+      }
+    } catch (e) {}
     kopfOffenHalten(true);
     baueSchienen(v);
     try { localStorage.setItem(LS, v); } catch (e) {}
