@@ -814,6 +814,26 @@
     var pause = 400;
     if (step.tab === 's-quick') pause = 1500;
     if (step.tab === 's8') pause = 1500;
+    /* ══ v1745 · AUCH HIER AUF DAS ZIEL WARTEN STATT AUF DIE UHR ══
+       Marcel: „Ich finde, die läuft auch nicht sehr flüssig."
+
+       Die Pausen oben sind für den langsamsten Fall gewählt — das
+       Quick-Boarding rendert in einem eigenen iframe, der Deal-Aktion-Tab
+       baut sein Cockpit nach. Auf einem Rechner, der schneller fertig ist,
+       bleibt die Tour trotzdem die volle Zeit stehen: 1,5 Sekunden pro
+       Schritt, bei vier aufeinanderfolgenden Quick-Boarding-Schritten also
+       sechs Sekunden Warten auf etwas, das längst da ist.
+
+       > Dieselbe Lehre wie beim Auto-Start: eine Zahl, die für das
+       > langsamste Gerät gewählt wurde, ist auf jedem anderen eine
+       > Wartezeit ohne Zweck.
+
+       Gewartet wird jetzt darauf, dass der Zielbereich WIRKLICH steht —
+       mit den bisherigen Pausen als Obergrenze, damit nichts
+       haengenbleibt, wenn er nie kommt. */
+    var _marker = (step.tab === 's-quick') ? '#qc-score-circle, #qc-tab-host'
+                : (step.tab === 's8')      ? '#s8 .dab-body, #s8 .dab-cockpit, #s8'
+                : ('#' + step.tab);
     // V239.3: Wenn vorheriger Step in QC war und jetzt rauswechseln -> mehr Zeit
     if (document.body.classList.contains('qc-standalone-active') === false &&
         step.tab && step.tab.indexOf('s') === 0 && step.tab !== 's-quick' &&
@@ -821,7 +841,14 @@
         state.steps[state.idx - 1] && state.steps[state.idx - 1].tab === 's-quick') {
       pause = 900;
     }
-    setTimeout(callback, pause);
+    (function _warteAufBereich(seit) {
+      seit = seit || Date.now();
+      var el = null;
+      try { el = document.querySelector(_marker); } catch (e) {}
+      var steht = el && el.getBoundingClientRect().height > 20;
+      if (steht || (Date.now() - seit) >= pause) { callback(); return; }
+      setTimeout(function () { _warteAufBereich(seit); }, 80);
+    })();
   }
 
   // ─── Public API ──────────────────────────────────────────────────────
