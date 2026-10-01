@@ -118,6 +118,89 @@
     return beschriftung(id, e) || id;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1762 · DER PORTFOLIO-PILOT MUSS ERST WISSEN, WELCHES OBJEKT
+     ═══════════════════════════════════════════════════════════════════
+
+     Im Cockpit ist kein Objekt geladen. „Die Miete ist jetzt 850" hat
+     dort keinen Adressaten — erst muss klar sein, WOFÜR.
+
+     > Ein Satz ohne Adressat ist im Portfolio keine Änderung, sondern
+     > eine Mehrdeutigkeit. Sie aufzulösen, indem man das zuletzt
+     > geöffnete Objekt nimmt, wäre der schlimmste Weg: es ginge meistens
+     > gut und irgendwann ins falsche Objekt.
+
+     Die Zuordnung läuft über die Karten der Seitenliste. Jede trägt
+     `data-key` und `data-tip` („2026-999 · Musterstraße 12, Leipzig").
+     Erkannt wird über die ZAHLEN und die Wortanfänge — eine Hausnummer
+     unterscheidet zwei Objekte derselben Straße, ein Straßenname zwei
+     Objekte derselben Stadt.
+
+     Bleibt es mehrdeutig, wird GEFRAGT statt geraten. */
+  function objekte() {
+    var liste = [];
+    try {
+      document.querySelectorAll('.sb-card[data-key]').forEach(function (c) {
+        var tip = c.getAttribute('data-tip') || '';
+        if (!tip) return;
+        liste.push({ key: c.getAttribute('data-key'), tip: tip, el: c });
+      });
+    } catch (e) {}
+    return liste;
+  }
+
+  /* Wie gut passt `text` auf `tip`? Zahlen zählen doppelt — eine
+     Objektnummer oder Hausnummer trennt schärfer als ein Wort. */
+  function treffer(text, tip) {
+    var t = text.toLowerCase();
+    var punkte = 0;
+    var teile = tip.toLowerCase().split(/[\s,·]+/).filter(function (w) { return w.length > 2; });
+    teile.forEach(function (w) {
+      var sauber = w.replace(/[^\wäöüß-]/g, '');
+      if (!sauber || sauber.length < 3) return;
+      if (t.indexOf(sauber) >= 0) punkte += /^\d/.test(sauber) ? 2 : 1;
+    });
+    return punkte;
+  }
+
+  function objektFinden(text) {
+    var liste = objekte();
+    if (!liste.length) return { art: 'keine' };
+    var bewertet = liste.map(function (o) {
+      return { key: o.key, tip: o.tip, punkte: treffer(text, o.tip) };
+    }).filter(function (o) { return o.punkte > 0; })
+      .sort(function (a, b) { return b.punkte - a.punkte; });
+
+    if (!bewertet.length) return { art: 'keins' };
+    /* Eindeutig ist es nur, wenn der Beste ECHT besser ist. Gleichstand
+       heisst mehrdeutig, nicht „nimm den ersten". */
+    if (bewertet.length === 1 || bewertet[0].punkte > bewertet[1].punkte) {
+      return { art: 'eins', objekt: bewertet[0] };
+    }
+    return { art: 'mehrere', kandidaten: bewertet.filter(function (o) {
+      return o.punkte === bewertet[0].punkte; }).slice(0, 5) };
+  }
+
+  function objektLaden(key) {
+    return new Promise(function (fertig) {
+      try {
+        if (typeof window.loadSaved === 'function') {
+          Promise.resolve(window.loadSaved(key)).then(function () {
+            setTimeout(function () { fertig(window._currentObjKey === key); }, 900);
+          }).catch(function () { fertig(false); });
+          return;
+        }
+        var k = document.querySelector('.sb-card[data-key="' + key + '"]');
+        if (k) {
+          k.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+          setTimeout(function () { fertig(window._currentObjKey === key); }, 1400);
+          return;
+        }
+      } catch (e) {}
+      fertig(false);
+    });
+  }
+
   function istLeer(e) {
     if (!e) return true;
     if (e.type === 'checkbox') return !e.checked;
@@ -335,10 +418,128 @@
     document.head.appendChild(s);
   }
 
+  /* ── Der Portfolio-Pilot: dieselbe Mechanik, ein Schritt davor ─────── */
+  function einhaengenPortfolio() {
+    var snd = el('dp-pp-send');
+    var inp = el('dp-pp-in');
+    if (!snd || !inp || snd.getAttribute('data-' + MARKE)) return false;
+    snd.setAttribute('data-' + MARKE, '1');
+
+    function weiter(text, addMsg) {
+      /* Ab hier ist ein Objekt geladen — der Rest ist derselbe Weg wie
+         beim Co-Pilot. */
+      var kat = katalog();
+      if (!kat.length) { addMsg('assistant', 'Die Felder sind noch nicht geladen — bitte nochmal.'); return; }
+      var warte = addMsg('assistant', 'Ich sehe nach, was sich ändert …');
+      window.Auth.apiCall('/ai/extract-text', {
+        method: 'POST', body: { text: text.slice(0, 3800), catalog: kat }
+      }).then(function (r) {
+        if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
+        var f = (r && r.fields) || {};
+        var neu = [], konflikte = [];
+        Object.keys(f).forEach(function (id) {
+          var wert = f[id];
+          if (wert == null || String(wert).trim() === '') return;
+          var e = el(id); if (!e) return;
+          if (istLeer(e)) { neu.push({ id: id, wert: wert }); return; }
+          var alt = (e.type === 'checkbox') ? (e.checked ? 'ja' : 'nein') : String(e.value);
+          if (String(alt).trim() === String(wert).trim()) return;
+          konflikte.push({ id: id, alt: alt, neu: wert });
+        });
+        if (!neu.length && !konflikte.length) {
+          addMsg('assistant', 'Darin habe ich keine Objektangaben erkannt.');
+          return;
+        }
+        zeigeVorschlag(neu, konflikte, addMsg);
+      }).catch(function () {
+        if (warte && warte.parentNode) warte.parentNode.removeChild(warte);
+        addMsg('assistant', '⚠ Konnte den Text nicht auswerten.');
+      });
+    }
+
+    function pruefen(ev) {
+      var txt = (inp.value || '').trim();
+      if (!txt || txt.length < 6) return;
+      var addMsg = window.__dpPpAddMsg;
+      if (typeof addMsg !== 'function') return;
+
+      /* Nur eingreifen, wenn es nach einer Änderung AUSSIEHT. Eine Frage
+         („wie steht mein Portfolio da?") soll den normalen Weg gehen —
+         sie enthält keine Zahl mit Einheit und keinen Objektbezug. */
+      var fund = objektFinden(txt);
+      if (fund.art === 'keins' || fund.art === 'keine') return;
+      if (!/\d/.test(txt)) return;
+
+      ev.stopImmediatePropagation(); ev.preventDefault();
+      var merk = txt;
+      inp.value = '';
+      addMsg('user', merk);
+
+      if (fund.art === 'mehrere') {
+        var box = addMsg('assistant', '');
+        box.innerHTML = '<b>Welches Objekt meinst du?</b><div class="' + MARKE + '-konflikte">'
+          + fund.kandidaten.map(function (o) {
+              return '<button type="button" class="' + MARKE + '-w" data-key="' + esc(o.key) + '">'
+                + esc(o.tip) + '</button>';
+            }).join('') + '</div>';
+        box.addEventListener('click', function (e2) {
+          var b = e2.target.closest ? e2.target.closest('[data-key]') : null;
+          if (!b) return;
+          var tip = b.textContent.trim();
+          box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b> — wird geöffnet …';
+          objektLaden(b.getAttribute('data-key')).then(function (ok) {
+            if (!ok) { box.innerHTML = '⚠ Objekt ließ sich nicht öffnen.'; return; }
+            box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b>';
+            weiter(merk, addMsg);
+          });
+        });
+        return;
+      }
+
+      var o = fund.objekt;
+      var hin = addMsg('assistant', 'Das betrifft <b>' + esc(o.tip) + '</b> — ich öffne es …');
+      if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(o.tip) + '</b> — ich öffne es …';
+      objektLaden(o.key).then(function (ok) {
+        if (!ok) {
+          if (hin) hin.innerHTML = '⚠ <b>' + esc(o.tip) + '</b> ließ sich nicht öffnen.';
+          return;
+        }
+        if (hin) hin.innerHTML = 'Objekt: <b>' + esc(o.tip) + '</b>';
+        weiter(merk, addMsg);
+      });
+    }
+
+    snd.addEventListener('click', pruefen, true);
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        var txt = (inp.value || '').trim();
+        if (txt && txt.length >= 6 && /\d/.test(txt)) {
+          var f = objektFinden(txt);
+          if (f.art === 'eins' || f.art === 'mehrere') {
+            e.stopImmediatePropagation(); e.preventDefault();
+            pruefen({ stopImmediatePropagation: function () {}, preventDefault: function () {} });
+          }
+        }
+      }
+    }, true);
+
+    try {
+      if (window.DealPilotDiktat && typeof window.DealPilotDiktat.knopfAn === 'function') {
+        window.DealPilotDiktat.knopfAn('dp-pp-in', { neben: 'dp-pp-send' });
+      }
+    } catch (e) {}
+    return true;
+  }
+
   function start() {
     stil();
-    if (einhaengen()) return;
-    var mo = new MutationObserver(function () { if (einhaengen()) { try { mo.disconnect(); } catch (e) {} } });
+    var a = einhaengen(), b = einhaengenPortfolio();
+    if (a && b) return;
+    var mo = new MutationObserver(function () {
+      if (!a) a = einhaengen();
+      if (!b) b = einhaengenPortfolio();
+      if (a && b) { try { mo.disconnect(); } catch (e) {} }
+    });
     try { mo.observe(document.body, { childList: true, subtree: true }); } catch (e) {}
     setTimeout(function () { try { mo.disconnect(); } catch (e) {} }, 30000);
   }

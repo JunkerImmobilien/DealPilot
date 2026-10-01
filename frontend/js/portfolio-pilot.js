@@ -161,6 +161,12 @@
     return d;
   }
 
+  /* v1762: copilot-aenderungen.js schreibt in denselben Verlauf. Es faengt
+     Saetze ab, die eine Aenderung an EINEM Objekt beschreiben, sucht das
+     Objekt in der Seitenliste, oeffnet es und zeigt die Rueckfrage hier.
+     Nur diese eine Funktion geht nach aussen; senden() bleibt intern. */
+  window.__dpPpAddMsg = addMsg;
+
   /* ── Der Kontext ─────────────────────────────────────────────────── */
   function kontext() {
     try {
