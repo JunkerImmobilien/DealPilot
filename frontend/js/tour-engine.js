@@ -157,6 +157,111 @@
     return children && children.length > 0;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1746 · DAS OBJEKT, AN DEM DIE TOUR ERKLÄRT
+     ═══════════════════════════════════════════════════════════════════
+     Marcel am 01.10.2026: „Wenn ich die Tour direkt aus der Hilfe starte
+     und kein Objekt ausgewählt ist, dann passen die ganzen Anzeigen ja
+     überhaupt nicht … dass wir vielleicht einfach ein Demo-Objekt dann
+     erzeugen, das öffnet, daran erklärt und beim Tour beenden wieder
+     löscht."
+
+     Bisher klickte die Tour die erste Sidebar-Karte an und hoffte. Wer
+     keine hat - neu angemeldet, oder die Demo-Objekte geloescht -, bekam
+     eine Fuehrung durch leere Felder: Donuts ohne Wert, Tabellen ohne
+     Zeilen, ein DealScore aus null.
+
+     > Eine Erklaerung am leeren Formular erklaert nichts. Sie zeigt, wo
+     > etwas stuende, wenn es da waere - und das ist genau die Auskunft,
+     > die niemand braucht, der die App zum ersten Mal sieht.
+
+     Deshalb legt die Tour sich ein Objekt an, wenn keines da ist, und
+     raeumt es hinterher weg. Zwei Regeln halten das sauber:
+
+     · Geloescht wird NUR, was die Tour selbst angelegt hat. Der Schluessel
+       steht in `_demoAngelegt`; ist er leer, wird nichts angefasst.
+     · Ein vorhandenes Objekt wird nie ersetzt. Gibt es eines, nimmt die
+       Tour es - auch wenn es unfertig ist, denn es gehoert dem Nutzer.
+  ═══════════════════════════════════════════════════════════════════ */
+  var _demoAngelegt = null;
+
+  function _sichtbareKarte() {
+    var l = document.querySelectorAll(
+      '.dpl-teil-objekte .sb-card, .dpl-schiene .sb-card, #sb-list .sb-card, .sb-card');
+    for (var i = 0; i < l.length; i++) {
+      var r = l[i].getBoundingClientRect();
+      if (r.width > 2 && r.height > 2) return l[i];
+    }
+    return null;
+  }
+
+  function _setzeFeld(id, wert) {
+    var e = document.getElementById(id);
+    if (!e) return;
+    e.value = String(wert);
+    try {
+      e.dispatchEvent(new Event('input', { bubbles: true }));
+      e.dispatchEvent(new Event('change', { bubbles: true }));
+    } catch (ex) {}
+  }
+
+  /* Die Zahlen sind bewusst unauffaellig: ein kleines Mehrfamilienhaus,
+     das sich knapp traegt. Ein Vorzeigeobjekt mit Traumwerten waere fuer
+     eine Erklaerung schlechter - es zeigt nur den einen Fall, in dem
+     alles gruen ist. */
+  function _demoAnlegen() {
+    return new Promise(function (fertig) {
+      try {
+        if (typeof window.newObj !== 'function' || typeof window.saveObj !== 'function') return fertig(null);
+        window.newObj();
+        setTimeout(function () {
+          try {
+            _setzeFeld('str', 'Musterweg');      _setzeFeld('hnr', '7');
+            _setzeFeld('plz', '32602');          _setzeFeld('ort', 'Vlotho');
+            _setzeFeld('objart', 'MFH');         _setzeFeld('baujahr', '1994');
+            _setzeFeld('wfl', '420');            _setzeFeld('einheiten', '6');
+            _setzeFeld('gsfl', '640');           _setzeFeld('zimmer', '16');
+            _setzeFeld('kp', '690000');          _setzeFeld('nkm', '2450');
+            _setzeFeld('ek', '140000');          _setzeFeld('d1', '620000');
+            _setzeFeld('kuerzel', 'RUNDGANG');
+            _setzeFeld('notizen', 'Beispielobjekt für den Rundgang. DealPilot hat es angelegt, weil noch kein eigenes Objekt vorhanden war — nach dem Rundgang verschwindet es wieder.');
+            try { if (typeof window.calc === 'function') window.calc(); } catch (ex) {}
+            setTimeout(function () {
+              try {
+                window._currentObjKey = null;
+                if (window.ObjNumbering && typeof window.ObjNumbering.next === 'function') {
+                  window._currentObjSeq = window.ObjNumbering.next();
+                }
+                Promise.resolve(window.saveObj({ silent: true })).then(function () {
+                  _demoAngelegt = window._currentObjKey || null;
+                  console.log('[DpTour v1746] Demo-Objekt angelegt:', _demoAngelegt);
+                  if (typeof window.refreshSavedList === 'function') { try { window.refreshSavedList(); } catch (ex) {} }
+                  setTimeout(function () { fertig(_demoAngelegt); }, 900);
+                }).catch(function () { fertig(null); });
+              } catch (ex) { fertig(null); }
+            }, 700);
+          } catch (ex) { fertig(null); }
+        }, 700);
+      } catch (ex) { fertig(null); }
+    });
+  }
+
+  /* Wird beim Beenden UND beim Abschliessen gerufen. Loescht nur den
+     eigenen Schluessel - und setzt ihn danach zurueck, damit ein zweiter
+     Aufruf nicht ins Leere greift. */
+  function _demoAufraeumen() {
+    var key = _demoAngelegt;
+    _demoAngelegt = null;
+    if (!key) return;
+    try {
+      if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
+      window.Auth.apiCall('/objects/' + key, { method: 'DELETE' }).then(function () {
+        console.log('[DpTour v1746] Demo-Objekt wieder entfernt:', key);
+        if (typeof window.refreshSavedList === 'function') { try { window.refreshSavedList(); } catch (e) {} }
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   // V239.1: Stelle sicher, dass ein Objekt geladen ist (sonst leere Donuts)
   // V239.7: MouseEvent statt .click() weil Sidebar-Cards Event-Delegation nutzen
   function _ensureObjectLoaded() {
@@ -170,8 +275,10 @@
       if (kp && kp.value && kp.value.length > 0) {
         return resolve(true);
       }
-      // Erstes Sidebar-Element klicken via MouseEvent
-      var firstItem = document.querySelector('#sb-list > .sb-card, #sb-list > *:first-child');
+      /* v1746 · Die SICHTBARE Karte nehmen - in Aktenmappe, Kanzlei und
+         Tower liegen in `#sb-list` nur 0x0-Huellen, die echte Karte steht
+         in der Schiene. Ein Klick auf eine Huelle laedt nichts. */
+      var firstItem = _sichtbareKarte();
       if (firstItem) {
         try {
           firstItem.dispatchEvent(new MouseEvent('click', {
@@ -184,7 +291,19 @@
         }
         setTimeout(function() { resolve(true); }, 1800);
       } else {
-        resolve(false);
+        /* v1746 · Kein Objekt da - also eines anlegen, statt durch leere
+           Felder zu fuehren. Es wird beim Beenden wieder entfernt. */
+        console.log('[DpTour v1746] Kein Objekt vorhanden - Demo wird angelegt');
+        _demoAnlegen().then(function (key) {
+          if (!key) { resolve(false); return; }
+          var karte = _sichtbareKarte();
+          if (karte) {
+            try {
+              karte.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+            } catch (e) { try { karte.click(); } catch (e2) {} }
+          }
+          setTimeout(function () { resolve(true); }, 1500);
+        });
       }
     });
   }
@@ -950,14 +1069,22 @@
       Tour.complete();
     },
 
+    /* v1746 · dasselbe beim vorzeitigen Abbrechen */
+
     exit: function() {
+
+          try { _demoAufraeumen(); } catch (e) {}
       // v433: beim Schliessen (X / ESC) als gesehen markieren, sonst startet die
       // Tour bei jedem Hard-Reload erneut (nur complete()/skip() setzten das Flag).
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
       _cleanup();
     },
 
+    /* v1746 · Demo-Objekt der Tour entfernen, falls sie eines angelegt hat */
+
     complete: function() {
+
+          try { _demoAufraeumen(); } catch (e) {}
       if (!state.active) return;  // V239.1: doppel-Aufrufe schlucken
       state.active = false;  // V239.1: SOFORT deaktivieren
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
