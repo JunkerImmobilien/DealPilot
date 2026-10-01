@@ -297,7 +297,7 @@
     { act: 'invest',      art: 'dok',    ico: 'export-hub', l: 'Exposé / Gesamt-PDF',  sub: 'Alle Kapitel als Dokument' },
     { act: 'invest_bank', art: 'dok',    ico: 'bankexport', l: 'Bankfassung',          sub: 'Investment-Case für die Bank', feature: 'bank_pdf_a3' },
     { act: 'mb',          art: 'vorrat', ico: 'market',     l: 'Marktbericht',         sub: 'Als PDF, wenn einer vorliegt' },
-    { act: 'kpa',         art: 'dok',    ico: 'export-hub', l: 'Kaufpreisaufteilung',  sub: 'BMF-Anlage, Grund und Gebäude', feature: 'bmf_calc_export' },
+    { act: 'kpa',         art: 'dok',    ico: 'export-hub', l: 'Kaufpreisaufteilung · BMF', sub: 'Rechner, Anlage oder Belege', feature: 'bmf_calc_export' },
     { act: 'bmf',         art: 'jahr',   ico: 'export-hub', l: 'Finanzamt-PDF',        sub: 'Anlage V · Werbungskosten' },
     { act: 'track',       art: 'dok',    ico: 'trackrec',   l: 'Track Record',         sub: 'Nachweise für die Bank',       feature: 'track_record_pdf' },
     { act: 'hub-export',  art: 'dok',    ico: 'export-hub', l: 'Export',               sub: 'PDF, CSV, Sicherung',          feature: 'export_csv' }

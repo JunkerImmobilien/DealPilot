@@ -774,6 +774,10 @@
             || DealPilotConfig.pricing.hasFeature('bmf_calc_export');
           if (!_kOk) { toast('Kaufpreisaufteilung ist ab dem Investor-Plan verf\u00fcgbar.'); return; }
         } catch (e) {}
+        /* v1748 · fragen statt raten - die drei Wege stehen in bmf-wahl.js.
+           Der alte Zweig entschied an `_lastBmfResults`, also an einem
+           Zustand, den niemand sieht. */
+        if (window.DealPilotBmfWahl && typeof window.DealPilotBmfWahl.zeige === 'function') return window.DealPilotBmfWahl.zeige();
         if (window._lastBmfResults && typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
         if (typeof window.openBMFModal === 'function') { window.openBMFModal(); toast('Erst berechnen lassen, dann als PDF-Anlage exportieren.'); return; }
         toast('BMF-Rechner nicht geladen.');

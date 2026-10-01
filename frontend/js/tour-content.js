@@ -30,7 +30,7 @@
     
     {
       tab: 'sidebar',
-      selector: '.dpl-teil-objekte .sb-card, #sb-list > *:first-child, .dpl-schiene .sb-card, #sb-list button:first-of-type, #sb-list',
+      selector: '.dpl-teil-objekte .sb-card, #sb-list .sb-card, .dpl-schiene .sb-card, .sb-card, #sb-list',
       icon: 'i-home',
       title: 'Objekt auswählen',
       body: '**Klick auf ein Objekt** in der Liste — sofort siehst du alle Details, Tabs und Kennzahlen. Ganz oben steht **„Neues Objekt hinzufügen"**: damit legst du ein leeres Objekt von Hand an.',
@@ -176,7 +176,8 @@
       id: 'pass-obj',
       tab: 's0',
       selector: '#obj-action-bar, .tab[data-target-sec="s0"]',
-      subTargets: ['PASS'],
+      /* v1747e · der QR selbst, nicht das Wort PASS irgendwo im Dokument */
+      subSelectors: ['#oab-pf-qr', '.dp-pf-qr'],
       icon: 'i-qr',
       title: 'Boarding-Pass zum Objekt',
       body: 'Auch hier im **Tab Objekt** erstellst du jederzeit einen **Boarding-Pass** — und teilst ihn per Link oder QR-Code.',

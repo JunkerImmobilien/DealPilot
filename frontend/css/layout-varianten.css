@@ -539,6 +539,13 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
 .dpw-merk input{ width:14px; height:14px; }
 .dpw-merk span{ color:#9A9287; }
 
+/* v1748 · Ein Weg, der eine Voraussetzung hat, wird ausgegraut und sagt
+   warum - statt still etwas anderes zu tun. Statusfarben bleiben hier
+   bewusst aussen vor: das ist kein Fehler, sondern eine Reihenfolge. */
+.dpw-k.dpw-aus{ opacity:.52; cursor:not-allowed; background:#F7F5F0; }
+.dpw-k.dpw-aus:hover{ border-color:#E6E1D6; }
+.dpw-k.dpw-aus .dpw-f{ color:#8A7F6B; }
+
 /* Gruppenüberschriften ("PORTFOLIO", "WERKZEUGE") ordnen eine SPALTE.
    In einer waagerechten Leiste stehen sie zwischen den Knöpfen und
    machen sie 95 px hoch, ohne etwas zu ordnen. Statt ihrer ein
