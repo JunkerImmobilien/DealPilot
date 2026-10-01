@@ -55,17 +55,69 @@ window.DealPilotOnboarding = (function () {
       fuer: 'Alles im Blick wie im Cockpit — für den zweiten Bildschirm.' }
   ];
 
-  var INVESTORTYP = [
-    { id: 'konservativ', name: 'Konservativ', dscr: 1.35, ltv: 80, ek: 20,
-      risk: 'Konservativ (sicherheitsorientiert)',
-      unter: 'Sicherheit vor Rendite. Höhere Tilgung, mehr Eigenkapital.' },
-    { id: 'ausgewogen',  name: 'Ausgewogen',  dscr: 1.20, ltv: 90, ek: 10,
-      risk: 'Moderat (ausgewogen)',
-      unter: 'Der Mittelweg — die Vorbelegung, wenn du dich nicht festlegst.' },
-    { id: 'offensiv',    name: 'Offensiv',    dscr: 1.05, ltv: 95, ek: 5,
-      risk: 'Chancenorientiert (höheres Risiko)',
-      unter: 'Hebel nutzen. Wenig Eigenkapital, engere Kapitaldienstdeckung.' }
-  ];
+  /* ═══════════════════════════════════════════════════════════════════
+     v1749 · DIE INVESTORTYPEN SIND DIE DEALSCORE-PROFILE
+     ═══════════════════════════════════════════════════════════════════
+
+     Marcel am 01.10.2026: „Die Investorentypen sind nicht die, die wir im
+     DealPilot als Profile für den Investor DealScore hinterlegt haben."
+
+     Er hat recht, und es war schlimmer. Gemessen:
+
+       DealScore2.getPresets()   balanced · conservative · optimistic ·
+                                 lage · cashflow · sicherheit        (6)
+       onboarding INVESTORTYP    konservativ · ausgewogen · offensiv  (3)
+
+     Nicht nur drei fehlten — die Schlüssel waren ANDERE (`konservativ`
+     gegen `conservative`), „Offensiv" gibt es im DealScore gar nicht, und
+     das Setup rief `setActivePreset()` NIE. Der Kunde wählte also einen
+     Typ, und der Score rechnete weiter mit dem, was vorher dastand.
+
+     > Derselbe Fehlertyp wie bei der Bordkarte in v1748b: ein Versprechen
+     > im Einrichtungsfenster, für das kein Code existiert, der es einlöst.
+
+     Deshalb wird die Liste jetzt **gelesen, nicht gepflegt** —
+     `DealScore2.getPresets()` ist die einzige Quelle. Kommt dort ein
+     siebtes Profil dazu, steht es hier von allein. Eine zweite Liste
+     daneben läuft auseinander, sobald eine von beiden gepflegt wird.
+
+     Was der DealScore NICHT trägt, sind DSCR, LTV und Eigenkapitalquote —
+     das sind Finanzierungsgrenzen, keine Score-Gewichte. Diese Brücke
+     steht hier, und nur sie: */
+  var GRENZEN = {
+    /* Die ersten drei sind die bisherigen Werte, unverändert übernommen. */
+    conservative: { dscr: 1.35, ltv: 80, ek: 20, risk: 'Konservativ (sicherheitsorientiert)' },
+    balanced:     { dscr: 1.20, ltv: 90, ek: 10, risk: 'Moderat (ausgewogen)' },
+    optimistic:   { dscr: 1.05, ltv: 95, ek: 5,  risk: 'Chancenorientiert (höheres Risiko)' },
+    /* ⚠ Die drei folgenden sind VORSCHLÄGE und von Marcel noch nicht
+       abgenommen — sie standen bisher nirgends, weil es die Profile im
+       Setup gar nicht gab. Sie sind aus der Beschreibung des jeweiligen
+       Profils abgeleitet, nicht gemessen. */
+    lage:         { dscr: 1.15, ltv: 85, ek: 15, risk: 'Moderat (ausgewogen)' },
+    cashflow:     { dscr: 1.30, ltv: 85, ek: 15, risk: 'Moderat (ausgewogen)' },
+    sicherheit:   { dscr: 1.40, ltv: 75, ek: 25, risk: 'Konservativ (sicherheitsorientiert)' }
+  };
+
+  /* Fällt der DealScore aus, bleibt das Setup bedienbar — mit genau dem
+     einen Profil, das auch sonst die Vorbelegung ist. */
+  function _profile() {
+    var ps = null;
+    try {
+      if (window.DealScore2 && typeof window.DealScore2.getPresets === 'function') {
+        ps = window.DealScore2.getPresets();
+      }
+    } catch (e) {}
+    if (!ps || !ps.length) {
+      return [{ id: 'balanced', name: 'Ausgewogen',
+        unter: 'Der Mittelweg — die Vorbelegung, wenn du dich nicht festlegst.',
+        dscr: 1.20, ltv: 90, ek: 10, risk: 'Moderat (ausgewogen)' }];
+    }
+    return ps.map(function (p) {
+      var g = GRENZEN[p.key] || GRENZEN.balanced;
+      return { id: p.key, name: p.label, unter: p.description || '',
+               dscr: g.dscr, ltv: g.ltv, ek: g.ek, risk: g.risk };
+    });
+  }
 
   var _schritt = 0, _ov = null;
   var _wahl = { aussehen: null, typ: 'ausgewogen' };
@@ -226,7 +278,7 @@ window.DealPilotOnboarding = (function () {
       + 'Das setzt die Schwellen für Score und Empfehlung — und lässt sich '
       + 'jederzeit ändern.</p>'
       + '<div class="dpo-kacheln dpo-kacheln-3">'
-      + INVESTORTYP.map(function (t) {
+      + _profile().map(function (t) {
           return '<button type="button" class="dpo-kachel' + (_wahl.typ === t.id ? ' an' : '')
             + '" data-typ="' + t.id + '">'
             + '<span class="dpo-k-name">' + esc(t.name) + '</span>'
@@ -340,7 +392,18 @@ window.DealPilotOnboarding = (function () {
     _stil();
     _zeichne();
 
+    /* v1749 · Ein Klick daneben darf nichts tun.
+       Marcel: „Wenn man neben das Modal klickt, soll es sich nicht
+       schließen." Im Code stand kein solcher Weg — der Eindruck kann also
+       auch von einem durchgereichten Klick auf die App DAHINTER kommen, die
+       dann ihrerseits etwas oeffnet. Beides erledigt dieselbe Zeile: der
+       Klick stirbt am Hintergrund, statt weiterzulaufen. */
+    _ov.addEventListener('mousedown', function (ev) {
+      if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); }
+    }, true);
+
     _ov.addEventListener('click', function (ev) {
+      if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); return; }
       var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ]') : null;
       if (k) {
         if (k.hasAttribute('data-aussehen')) {
@@ -444,8 +507,23 @@ window.DealPilotOnboarding = (function () {
       if (g != null) profilSchreiben({ grenzsteuersatz: g });
     }
     if (_schritt === 4) {
-      var t = INVESTORTYP.filter(function (x) { return x.id === _wahl.typ; })[0];
-      if (t) profilSchreiben({ min_dscr: t.dscr, max_ltv: t.ltv, ek_quote_default: t.ek, ai_risk: t.risk });
+      var t = _profile().filter(function (x) { return x.id === _wahl.typ; })[0];
+      if (t) {
+        profilSchreiben({ min_dscr: t.dscr, max_ltv: t.ltv, ek_quote_default: t.ek, ai_risk: t.risk });
+        /* v1749 · DAS WAR DIE EIGENTLICHE LUECKE.
+           Hier endete das Setup bisher: es schrieb die Finanzierungsgrenzen
+           und war fertig. Der DealScore las davon nichts — sein Profil
+           steht in `dp_dealscore2_preset`, und das blieb unberuehrt.
+
+           > Ein Fenster, das nach dem Investortyp fragt und die Antwort
+           > dann nicht an die Stelle gibt, die danach rechnet, hat nur
+           > gefragt. */
+        try {
+          if (window.DealScore2 && typeof window.DealScore2.setActivePreset === 'function') {
+            window.DealScore2.setActivePreset(t.id);
+          }
+        } catch (e) {}
+      }
     }
   }
 
@@ -515,7 +593,14 @@ window.DealPilotOnboarding = (function () {
     var s = document.createElement('style');
     s.id = 'dpo-stil';
     s.textContent = [
-      '.dpo-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,5,5,.82);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;font-family:Inter,system-ui,sans-serif}',
+      /* v1749 · DER HINTERGRUND MUSS SICHTBAR BLEIBEN.
+         Marcel: „Der Hintergrund sollte nicht so ausgegraut sein, damit man
+         sehen kann, wie sich die Optik im Hintergrund ändert."
+         Hier stand `rgba(5,5,5,.82)` PLUS `blur(4px)`. Beides zusammen macht
+         genau die Ansicht unlesbar, über die Schritt 1 entscheiden lässt.
+         Jetzt .34 statt .82 und keine Unschaerfe — der Kasten traegt seinen
+         Kontrast selbst (heller Grund, kraeftiger Schatten). */
+      '.dpo-ov{position:fixed;inset:0;z-index:100000;background:rgba(5,5,5,.34);display:flex;align-items:center;justify-content:center;padding:18px;font-family:Inter,system-ui,sans-serif}',
       '.dpo-kasten{background:#FDFCFA;color:#1b1815;border-radius:18px;width:min(760px,100%);max-height:min(92vh,860px);display:flex;flex-direction:column;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);overflow:hidden}',
       '.dpo-kopf{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));padding:13px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}',
       '.dpo-marke{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:15px;color:#1a1508;letter-spacing:.2px}',

@@ -36,6 +36,176 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → OFFEN aus dem 01.10.2026, nachmittags (Setup-Fenster und die Piloten)
+
+Marcels Durchlauf durch die Erstanmeldung. **Reihenfolge wie genannt.**
+
+---
+
+### U1 · Der Hintergrund darf nicht so dunkel sein
+
+Marcel: „Der Hintergrund sollte nicht so ausgegraut sein, damit man sehen
+kann, wie sich die Optik im Hintergrund ändert."
+
+Gemessen: `.dpo-ov` hat `background:rgba(5,5,5,.82)` **und**
+`backdrop-filter:blur(4px)`. Beides zusammen macht die Ansicht dahinter
+unlesbar — genau die Ansicht, über die der Nutzer in diesem Schritt
+entscheidet.
+
+> Ein Auswahlfenster, das verdeckt, worüber es entscheiden lässt, nimmt dem
+> Nutzer die einzige Grundlage, die er hat.
+
+### U2 · Ein Klick daneben darf nicht schließen
+
+Marcel: „Wenn man neben das Modal klickt, soll es sich nicht schließen."
+
+**Vorsicht beim Bauen:** im Code steht KEIN Listener, der bei einem Klick auf
+den Hintergrund schließt (`onboarding.js:343` fängt nur Kacheln und Knöpfe ab,
+`_ov.remove()` steht nur in `_fertig()`). Also entweder schließt etwas
+anderes, oder der Eindruck entstand durch den „Fertig"-Weg. **Erst am
+laufenden Fenster nachstellen, dann bauen** — sonst wird ein Schutz gegen
+etwas gebaut, das es nicht gibt, und die echte Ursache bleibt.
+
+### U3 · Die Vorschaubilder der vier Ansichten sagen nichts
+
+Marcel: „Die Bilder der einzelnen Designs sind nichtssagend."
+
+Heute sind es CSS-Rechtecke (`.dpo-v-v1b`, `.dpo-v-v2`, …): ein goldener
+Streifen und eine graue Fläche. Das unterscheidet Aktenmappe und Kanzlei
+faktisch nicht. **Optikfrage → Demo-first**, Entwürfe nach
+`design/Vorschläge/`.
+
+### U4 · LTV wählbar ODER frei eingebbar
+
+Marcel: „Den LTV sollte man auswählen können oder auch frei eingeben, zum
+Beispiel 100 % Finanzierung gibt es ja auch."
+
+Heute kommt der LTV **ausschließlich** aus der Investortyp-Karte (80/90/95),
+ist nirgends sichtbar und nicht änderbar.
+
+### U5 · Checkbox „automatisch ziehen", sonst selbst angeben
+
+Marcel: „Man sollte eine Checkbox haben, ob er sich den automatisch ziehen
+soll, und wenn nicht, dass man einen angeben kann."
+
+**Zweideutig und vor dem Bauen zu klären:** „den" kann der LTV sein (dann:
+automatisch aus der Eigenkapitalquote, denn LTV = 100 − EK) oder der
+Marktzins (dafür gibt es `indicative-zins.js`). **Die Lösung deckt beides ab:**
+je ein Feld mit Häkchen „automatisch" — LTV aus der EK-Quote, Zins aus der
+Abfrage. Ohne Häkchen wird das Feld frei.
+
+### U6 · Erklärungen an jedes Feld
+
+Marcel: „Es müssen Erklärungen, so Infofelder dran. Was ist zum Beispiel DSCR
+und wo setzen wir Standardwerte und erklären beim Tooltip warum."
+
+Zwei Dinge, nicht eines: **was die Größe ist** und **warum genau dieser
+Vorschlagswert steht**. Der zweite Teil ist der wichtigere — er macht aus
+einer Zahl, die vom Himmel fällt, eine nachvollziehbare Empfehlung.
+
+### U7 · Steuer erklären, und ein Gehaltsrechner dazu
+
+Marcel: „Bei der Steuer, was macht der genau? Können wir auch Gehaltsrechner
+anbieten, irgendwas wie als Unterpunkt, falls man sein zvE nicht kennt? Dann
+können wir das daraus berechnen."
+
+Der Rechner nimmt heute das **zu versteuernde Einkommen** und liefert über
+`Tax.calcGrenzsteuersatz()` den Grenzsteuersatz. Wer sein zvE nicht kennt —
+und das sind die meisten Angestellten — kommt nicht weiter.
+
+> **Doktrin beachten:** vom Bruttolohn zum zvE führt kein exakter Weg ohne
+> Werbungskosten, Vorsorgeaufwand und Freibeträge. Ein Rechner, der so tut,
+> erfindet eine Zahl. Entweder die Abzüge werden abgefragt, oder das Ergebnis
+> trägt sichtbar den Vermerk „Schätzung".
+
+### U8 · Die Investortypen sind nicht die DealScore-Profile — GEMESSEN
+
+Marcel: „Die Investorentypen sind nicht die, die wir im DealPilot als Profile
+für den Investor DealScore hinterlegt haben."
+
+Er hat recht, und es ist schlimmer. Gemessen am 01.10.2026:
+
+| DealScore (`dealscore2.js`, 6 Profile) | Setup (`onboarding.js`, 3) |
+|---|---|
+| `balanced` Ausgewogen | `ausgewogen` Ausgewogen |
+| `conservative` Konservativ | `konservativ` Konservativ |
+| `optimistic` Optimistisch | `offensiv` **Offensiv** — gibt es dort nicht |
+| `lage` Lage-Fokus | fehlt |
+| `cashflow` Cashflow-Fokus | fehlt |
+| `sicherheit` Sicherheit | fehlt |
+
+**Und der eigentliche Fehler:** das Setup setzt `dp_dealscore2_preset`
+**gar nicht** (gegrept: kein Vorkommen in `onboarding.js`). Der Kunde wählt
+einen Investortyp, und der DealScore rechnet weiter mit dem Default.
+
+> Derselbe Fehlertyp wie bei der Bordkarte in v1748b: ein Versprechen im
+> Einrichtungsfenster, für das kein Code existiert, der es einlöst. **Beim
+> nächsten Setup-Feld zuerst prüfen, WO der Wert gelesen wird** — und ob er
+> dort überhaupt ankommt.
+
+---
+
+## → NEU: Die beiden Piloten sollen sprechen können (01.10.2026)
+
+Ein großes Paket, Marcels Worte zuerst:
+
+> „Bei der Pilot-Analyse für das einzelne Objekt, aber auch beim Portfolio-
+> Piloten, dass man per Sprache etwas diktieren kann. Wenn man Änderungen beim
+> Objekt hat oder etwas hinzufügen möchte, dann kann ich das Objekt sagen und
+> die Änderungen, und er füllt die Felder aus oder ergänzt sie."
+
+### V1 · Diktat in beiden Piloten
+
+Pilot-Analyse (Einzelobjekt) und Portfolio-Pilot bekommen einen Sprechweg.
+**Vorher messen, was es schon gibt:** `voice-import.js` trägt den Sprechlauf
+und die „Geführte Eingabe" (v1746). Ein zweiter Weg daneben läuft auseinander,
+sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
+`layout-varianten.js`.
+
+### V2 · Objekt benennen und Felder ergänzen
+
+„Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
+Sprache, dann Felder füllen.
+
+### V3 · Belegte Felder nicht still überschreiben
+
+Marcel: „Wenn die Felder bereits gefüllt sind, gibt er an, was drin steht, und
+ich muss bestätigen, ob übersprungen wird."
+
+> Das ist dieselbe Regel wie „eine generierte Tabelle darf nie einen
+> Handeintrag überschreiben". Hier gilt sie für jedes einzelne Feld.
+
+### V4 · Marktbericht und Wertermittlung per Sprache auslösen
+
+Auch **für alle Objekte** auf einmal.
+
+### V5 · Kosten und Restkontingent ansagen
+
+Marcel: „Er sagt dann, was es kostet und wie viel Kontingent wir noch haben."
+**Geld → nie raten.** Die Zahlen kommen aus dem Plan und dem Kerosin-Stand,
+nicht aus einer Konstanten im Sprechmodul.
+
+### V6 · Beide Piloten holen die Berichte und gleichen ab
+
+Marcel: „Wichtig ist auch, dass sich beide Piloten immer auch zum Objekt bei
+der Pilot-Analyse oder dem ganzen Bestand beim Portfolio-Piloten den
+Marktbericht oder die Berichte holen und alles abgleichen."
+
+### V7 · Jedes Feld muss erreichbar sein, auch künftige
+
+Marcel: „Jedes Feld, was wir haben und was wir noch anlegen, muss dort rein
+und erreichbar sein."
+
+**Das ist die Architekturvorgabe des ganzen Pakets:** keine gepflegte Liste
+von Feldnamen im Sprechmodul, sondern eine, die aus der Feldbeschreibung der
+App entsteht. Sonst fehlt jedes neue Feld still — und niemand merkt es.
+
+> Genau diese Falle ist bei `/bmf/aufteilung` schon einmal zugeschnappt:
+> unbekannte Eingabefelder wurden kommentarlos übersprungen, 5 von 12,
+> `warnings` leer.
+
+---
+
 ## → OFFEN aus dem 01.10.2026 (Rundgang, Erstanmeldung, BMF-Ausgabe)
 
 Marcels Durchgang am 01.10.2026. **Reihenfolge wie von ihm genannt.**
