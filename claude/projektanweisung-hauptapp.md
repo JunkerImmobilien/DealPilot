@@ -26303,3 +26303,108 @@ Am Markt 18        2,0   alle Gewerke >20 J., 85 % niedrig/veraltet
 Die sechs Demo-Objekte bekamen Werte, die zum verfremdeten Foto und zum
 beim Anlegen gesetzten Zustand passen. **Zwölf Objekte, rund 110 Felder,
 davon 101 vorher leer** — und nach einem echten Neuladen gegengeprüft.
+
+---
+
+## v1738 · Bodenrichtwerte, Verkehrswerte und zwei Automatiken
+
+### Zuerst ein Fehler von mir, den Marcel gefunden hat
+
+Ich hatte gemeldet: „genau ein verlorenes Objekt". **Es waren fünf.**
+
+```
+2026-1052 bis 2026-1056   alle auf LOST
+```
+
+Ursache ist dieselbe wie beim ersten Mal: `_deal_lost_state` ist ein
+Formularfeld, das beim Objektwechsel stehen bleibt und sich beim Speichern
+weiterträgt. Ich hatte nur Ravensberger repariert — und dann im **Cockpit**
+gegengeprüft, wo nur BEWERTETE Objekte zählen. Dort stand „verloren: 1",
+und das stimmte sogar; es beantwortete nur eine andere Frage als die, die
+ich gestellt hatte.
+
+> Eine Gegenprobe, die eine Teilmenge misst, bestätigt eine Aussage über
+> die Gesamtmenge nicht. Sie sieht nur so aus.
+
+Jetzt wird der Status je Objekt **ausdrücklich** gesetzt — won UND lost,
+nie nur eines — und über alle 17 Karten gegengeprüft: 0 verloren.
+
+### Bodenrichtwerte über die Schnittstelle
+
+`DealPilotBrw.borisHolen({plz, ort, str})` ist der reine Abruf ohne DOM.
+Dreizehn Objekte haben jetzt einen amtlichen Wert mit Stichtag und Quelle.
+
+**Zwei Treffer bestätigen die Kette gegen die Gutachten:**
+
+```
+Hermannstr. 9     BORIS  90 EUR/m2   Gutachten: "Bodenrichtwert 90,00 EUR/m2"
+Loehner Str. 278  BORIS 150 EUR/m2   Gutachten: "150,00 EUR/m2 (vorderer Bereich)"
+```
+
+**Und ein Fund, der zurückzunehmen war:** bei „Musterstraße 12, Leipzig"
+lieferte der Abruf **2.300 €/m²** statt der hinterlegten 160. Die Adresse
+gibt es nicht; das Geocoding fällt dann auf den Stadtmittelpunkt, und BORIS
+antwortet mit dem Wert FÜR DIESEN PUNKT — fachlich richtig, nur für ein
+anderes Grundstück.
+
+> Ein amtlicher Wert an einer erfundenen Adresse ist keine Auskunft über
+> das Objekt. Er ist eine Auskunft über den Ort, an dem die Suche
+> steckengeblieben ist.
+
+Zurückgesetzt auf 160, Stichtag bewusst leer. Dasselbe gilt für
+„Bäckerstr. 7, Musterhausen". Bei Hauptstr. 51 (Ibbenbüren) liefert BORIS
+gar nicht — dort steht ein als manuell gekennzeichneter Wert.
+
+### Verkehrswert, Miteigentumsanteil, Zimmer
+
+Verkehrswert nach Marcels Vorgabe „gleich oder ein bisschen drüber":
+Kaufpreis mal 1,00 bis 1,08, je nach Qualität des Einkaufs.
+
+Miteigentumsanteil, wo belegt aus dem Gutachten: Alexanderstr. **140/1000
+= 14 %**, Hermannstr. **50/100 = 50 %**. Bei Häusern mit Einheiten 100 %.
+
+### Zwei Automatiken (v1738)
+
+**Die Zimmer zählen sich selbst.** Sie standen in jeder Einheitenzeile UND
+mussten in den Objektdetails noch einmal von Hand gepflegt werden.
+
+> Ein Feld, dessen Wert sich aus anderen Feldern ergibt, ist keine
+> Eingabe. Es als Eingabe stehen zu lassen lädt dazu ein, es falsch zu
+> füllen — und niemand merkt es, weil beides plausibel aussieht.
+
+`uebernehmen()` schreibt die Summe mit, das Feld ist bei Häusern mit
+Einheiten schreibgeschützt und trägt den Hinweis, woher die Zahl kommt.
+
+**Der Miteigentumsanteil verschwindet beim MFH.** Er beschreibt den
+Bruchteil, mit dem eine Eigentumswohnung am gemeinschaftlichen Eigentum
+hängt (§ 1 Abs. 2 WEG). Wer das ganze Haus kauft, hält 100 % — das
+einzutragen ist keine Angabe, sondern eine Pflichtübung. Ausgeblendet und
+auf 100 gesetzt, damit der Bodenwertanteil weiter aufgeht.
+
+Beides hängt an `knopf()`, das bei `objart`-Wechsel und `dp:object-ready`
+ohnehin läuft. `ARTEN_MIT_EINHEITEN` gab es bereits.
+
+### Was dabei noch auffiel
+
+**Löhner Str. 278 stand als EFH** — das Gutachten weist ein
+**Zweifamilienhaus** aus (WE 1 = 141,7 m², WE 2 = 103,38 m², auf WE 2 ein
+lebenslanges Wohnrecht). Rechnerisch folgenlos (`bgf-herleitung.js` führt
+beide in `HAEUSER`, gleicher Faktor 1,55), als Beschriftung falsch — und
+der RND-Rechner reicht sie weiter. Korrigiert, samt der zwei Einheiten mit
+den Flächen aus dem Gutachten.
+
+**Wilhelm-Busch-Straße führte 8 Einheiten im Feld und null im
+Konfigurator.** Angelegt, ohne eine Zahl zu erfinden: die Gesamtfläche des
+Objekts auf acht verteilt (607 m² → 75,9 je Einheit, Summe 607,2) und die
+hinterlegte Nettokaltmiete ebenso (4.200 € → 525 je Einheit, Summe 4.200).
+
+### Stand
+
+```
+17 Objekte   Bodenrichtwert 17   davon mit Stichtag 14
+             Verkehrswert   17   Miteigentumsanteil 17
+             Zimmer         17   Ausstattung (3 Felder) 17
+             Einheiten mit Zustand: 5 Objekte, 59 Einheiten
+Deal-Status  4 auf Gewonnen gesetzt, 0 auf Verloren
+Mietpotenzial Parkstr. 9: +60,3 % (Ist 2.321, Soll 3.721, Stau 137 TEUR)
+```
