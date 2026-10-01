@@ -1950,7 +1950,7 @@
       + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld \u2014 die F\u00e4rbung dazwischen ist dein Eigenkapital','Mio \u20ac')
       /* v1736 \u00b7 die Bilanz neben der Schere: dieselben Zahlen, andere Frage.
          Die Schere zeigt den Abstand, die Bilanz die Zusammensetzung. */
-      + chartCard('dpc-bilanz','M3 21h18M5 21V9h4v12M13 21V5h4v16','Verm\u00f6gensbilanz','Eigenkapital und Restschuld ergeben den Objektwert','gestapelt')
+      + chartCard('dpc-bilanz','M3 21h18M5 21V9h4v12M13 21V5h4v16','Verm\u00f6gensbilanz','Eigenkapital und Restschuld ergeben den Objektwert','gestapelt',true)
       + chartCard('dpc-mittelverw','M4 20V10M10 20V4M16 20v-7M22 20H2','Mittelverwendung','Jahr 1','Allokation')
       + chartCard('dpc-wealth','M3 21h18M6 21V9l6-4 6 4v12','Wealth-Stacks','Eigenkapital-Aufbau','Aufbau',true)
       + chartCard('dpc-klumpen','M12 2a10 10 0 1 0 10 10H12z','Klumpenrisiko','Volumen nach Lage','Diversifikation')

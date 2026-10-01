@@ -26,7 +26,30 @@
     --page-bg:radial-gradient(110% 50% at 88% -8%,color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent),transparent 55%),#fff;
     background:var(--page-bg);background-attachment:fixed;color:var(--c-ink);min-height:100vh;padding:0 0 70px}
 
-  #dashboard-main .app{max-width:1140px;margin:0 auto;padding:0 16px}
+  /* ══ v1736b · DIE ANDEREN BEREICHE BEKOMMEN DIE BREITE DES PILOTEN ══
+     Marcel am 01.10.2026: „Der Portfolio-Pilot ist über den gesamten
+     Arbeitsbereich. Können wir das auch für die anderen Bereiche machen,
+     und auch so, dass es auf Handy und Tablet geht?"
+
+     Gemessen, warum der Pilot anders ist: `portfolio-pilot.js` haengt
+     seine Sektion an `#dp-stage` — also an die BUEHNE, nicht in `.app`.
+     Damit lief er an dieser Begrenzung vorbei, als Einziger.
+
+       Fensterbreite   2133 px
+       .app            1140 px      ← alle Sektionen
+       Pilot           volle Buehne
+
+     Rund 900 px blieben rechts leer, waehrend die Diagramme sich zu
+     zweit 515 px teilten.
+
+     > Eine Breitenbegrenzung schuetzt Fliesstext vor zu langen Zeilen.
+     > Ein Raster aus Diagrammen und Kacheln schuetzt sie vor nichts —
+     > dort kostet sie nur Flaeche.
+
+     Deshalb `min()`: auf grossen Schirmen bis 1680 px, darunter 94 vw,
+     und unterhalb ohnehin die volle Breite minus Innenabstand. Handy und
+     Tablet aendern sich dadurch nicht — dort war 1140 nie die Grenze. */
+  #dashboard-main .app{max-width:min(1680px, 94vw);margin:0 auto;padding:0 16px}
 
   #dashboard-main .hdr{display:flex;align-items:center;gap:13px;padding:18px 4px 6px}
 
