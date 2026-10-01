@@ -20,7 +20,7 @@
     
     {
       tab: 'sidebar',
-      selector: '#sb-list, #sidebar',
+      selector: '#sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'In der **Sidebar links** siehst du **alle deine Objekte**. Hier startest du jede Analyse.',
@@ -30,7 +30,7 @@
     
     {
       tab: 'sidebar',
-      selector: '#sb-list > *:first-child, #sb-list button:first-of-type, #sb-list',
+      selector: '#sb-list > *:first-child, .dpl-schiene .sb-card, .dpl-schiene, #sb-list button:first-of-type, #sb-list',
       icon: 'i-home',
       title: 'Objekt auswählen',
       body: '**Klick auf ein Objekt** in der Sidebar — sofort siehst du alle Details, Tabs und Kennzahlen.',
@@ -413,7 +413,7 @@
     {
       id: 'actions-menu',
       tab: 'sidebar',
-      selector: '#sb-actions-accordion',
+      selector: '#sb-actions-accordion, .dpl-schiene',
       icon: 'i-menu',
       title: 'Das Aktionen-Menü',
       body: 'Über **Aktionen** in der Sidebar erreichst du alles Zentrale: Neues Objekt, Quick Boarding, Portfolio-Cockpit, Marktbericht, Import & Export.',
@@ -424,7 +424,7 @@
     {
       id: 'cockpit-offer',
       tab: 'sidebar',
-      selector: '#sb-actions-accordion',
+      selector: '#sb-actions-accordion, .dpl-schiene',
       subTargets: ['Portfolio-Cockpit'],
       icon: 'i-portfolio',
       title: 'Portfolio-Cockpit — alles auf einen Blick',
@@ -456,7 +456,7 @@
     {
       id: 'finish',
       tab: 'sidebar',
-      selector: '#sb-actions-accordion',
+      selector: '#sb-actions-accordion, .dpl-schiene',
       icon: 'i-help',
       title: 'Tool-Tips: Anfänger, Profi oder Aus?',
       body: 'DealPilot zeigt **Tool-Tips** bei vielen Feldern (kleine ?-Icons). Welcher Modus passt zu dir? **Probier es direkt aus:**',
@@ -483,7 +483,7 @@
     // Sidebar mit Onboarding-Hinweis
     {
       tab: 'sidebar',
-      selector: '#sb-list, #sidebar',
+      selector: '#sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'In der **Sidebar links** sammelst du deine Objekte. **Du hast noch keins** — lass uns dein erstes anlegen!',
