@@ -26542,3 +26542,100 @@ behobenen Zustand — nicht den heutigen.
 Handy  390   Vollbild, Kacheln einspaltig, 0 Ueberlaeufe
 Tablet 820   Modal 760x580 zentriert, Kacheln zweispaltig, 0 Ueberlaeufe
 ```
+
+---
+
+## v1741 / v1742 · Die Tour in allen Ansichten, und die Geführte Eingabe
+
+### Die Tour fand ihren Einstieg nur in einer von vier Ansichten
+
+**Hier muss ich eine eigene Aussage korrigieren.** Ich hatte gemeldet:
+„36 von 37 Zielen in allen vier Ansichten gefunden". Geprüft hatte ich
+dabei nur, ob `querySelector` etwas FINDET — nicht, ob es sichtbar ist.
+
+```
+Ansicht      #sb-list    Objektkarte   sichtbarer Behaelter
+DealPilot    379x692     344x215       #sb-list
+Aktenmappe   0x0         0x0           .dpl-schiene
+Kanzlei      0x0         0x0           .dpl-schiene
+Tower        0x0         0x0           .dpl-schiene
+```
+
+In den drei neuen Layouts wandert die Objektliste in eine Schiene;
+`#sb-list` bleibt als leere Hülle mit null Ausdehnung zurück. Die Tour
+prüft korrekt auf Sichtbarkeit — findet also nichts und überspringt.
+
+Am laufenden System gemessen:
+
+```
+Standard  Blase nach 3,8 s  "Schritt 1 von 37 - Willkommen bei DealPilot"
+Tower     Blase erscheint   "Schritt 1 von 37 - Quick-Boarding Score"
+```
+
+> Die Tour hatte drei Schritte übersprungen und sagte trotzdem „Schritt 1".
+> Ein Rundgang, der seinen Einstieg verliert und weiterzählt, erzählt dem
+> Nutzer etwas über eine Oberfläche, die er gerade nicht sieht.
+
+Behoben an den sechs Sidebar-Selektoren: `.dpl-schiene` kommt als
+Alternative dazu. Nach dem Ausrollen starten **alle vier** mit „Schritt 1
+von 37 · Willkommen bei DealPilot".
+
+### Geführte Eingabe (v1742)
+
+Marcels Vorschlag: die „Frag mich durch"-Strecke als eigenen Knopf in die
+Datenaufnahme-Karte. **Die Strecke gab es seit v1275 — nur am falschen
+Ort:** hinter dem Knopf „Sprache", als zweite von zwei Startoptionen.
+Dabei kann man dort tippen; im Text steht ausdrücklich „Antworten kannst
+du tippen oder sprechen".
+
+> Eine Beschriftung, die eine Funktion falsch einordnet, versteckt sie vor
+> genau den Nutzern, für die sie gemacht ist. Wer nicht sprechen will —
+> im Büro, ohne Mikrofon, aus Scheu — klickt „Sprache" nie an und landet
+> im Formular mit über 250 Feldern.
+
+Deshalb **nicht** „Frag mich durch": der Name klänge wieder nach Sprache.
+Marcels Entscheidung: **Geführte Eingabe**.
+
+Drei Stellen, keine neue Maschinerie: eine Kachel (Icon: Liste mit Haken,
+bewusst kein Mikrofon), `gefuehrt` in der Reihenfolge der Quellen, und ein
+Zweig, der `VoiceImport.open({gefuehrt:true})` ruft. Im Sprechlauf wird die
+Wahlkarte übersprungen — wer die Kachel geklickt hat, hat die Frage schon
+beantwortet.
+
+**Gegen stille Verwerfung geprüft:** `ordered` filtert `order` nach der
+Auswahl, und `gefuehrt` steht in `order` — die Quelle fällt nicht lautlos
+raus.
+
+### Die Tour kannte den neuen Weg nicht
+
+Der PRE-FLIGHT-Schritt sagte „**Vier Wege**, wie deine Daten ins Objekt
+kommen".
+
+> Ein Text, der eine Anzahl nennt, veraltet bei jeder Erweiterung — und
+> zwar unsichtbar, weil die Zahl weiter plausibel klingt. Wer vier liest
+> und fünf Kacheln sieht, hält eine davon für etwas anderes.
+
+Jetzt fünf, dazu ein eigener Schritt `pf-gefuehrt`. Die Tour hat **38 statt
+37** Schritte — gegengeprüft mit einem **echten Lauf** der Datei, nicht nur
+`node --check`: der prüft Syntax, nicht ob `DpTourVariants` am Ende enthält,
+was es soll.
+
+### Zwei Werkzeugfallen, beide bekannt, beide wieder getreten
+
+Beim Einfügen des Tour-Schritts zweimal zurückgerollt:
+
+- **mehrzeilige Anker scheitern am durchgehenden CRLF** des Frontends
+- **Escape-Sequenzen in `node -e` frisst die Shell** — aus `\\n` wurde ein
+  echter Zeilenumbruch im String, und die Datei war kaputt
+
+Beides steht in den Projektnotizen. Gelöst über eine Skriptdatei, die den
+Backslash per `String.fromCharCode(92)` selbst erzeugt, statt ihn zu tippen.
+
+### Abnahme
+
+```
+Kachel "Gefuehrte Eingabe"   in allen vier Ansichten sichtbar, 158x34
+Klick -> Abrufen             Wahlkarte uebersprungen, direkt im Fragenlauf
+Tour                         38 Schritte, kennt pf-gefuehrt
+Aufgeraeumt                  7 leere Testobjekte geloescht, 17 Karten, 0 leer
+```
