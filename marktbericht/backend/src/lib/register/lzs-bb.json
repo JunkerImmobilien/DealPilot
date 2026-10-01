@@ -6,7 +6,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh",
+    "zweig": "mfh_bu",
     "formel": {
       "form": "festwert",
       "wert_pct": 3.2,
@@ -69,7 +69,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh",
+    "zweig": "mfh_wm",
     "formel": {
       "form": "festwert",
       "wert_pct": 3.5,
@@ -128,7 +128,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh",
+    "zweig": "mfh_kf",
     "formel": {
       "form": "festwert",
       "wert_pct": 2.8,
@@ -191,7 +191,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "wgh",
+    "zweig": "wgh_bu",
     "formel": {
       "form": "festwert",
       "wert_pct": 3.7,
@@ -250,7 +250,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "wgh",
+    "zweig": "wgh_wm",
     "formel": {
       "form": "festwert",
       "wert_pct": 4.6,
@@ -313,7 +313,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "wgh",
+    "zweig": "wgh_kf",
     "formel": {
       "form": "festwert",
       "wert_pct": 3.4,
@@ -372,7 +372,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "gh",
+    "zweig": "gh_land",
     "formel": {
       "form": "festwert",
       "wert_pct": 4.5,
@@ -435,7 +435,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "gh",
+    "zweig": "gh_bu",
     "formel": {
       "form": "festwert",
       "wert_pct": 4.3,
@@ -494,7 +494,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "gh",
+    "zweig": "gh_wm",
     "formel": {
       "form": "festwert",
       "wert_pct": 5.3,
@@ -553,7 +553,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "indwb",
+    "zweig": "indwb_bu",
     "formel": {
       "form": "festwert",
       "wert_pct": 2.4,
@@ -616,7 +616,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "indwb",
+    "zweig": "indwb_wm",
     "formel": {
       "form": "festwert",
       "wert_pct": 2.9,
@@ -679,7 +679,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "we",
+    "zweig": "we_bu",
     "formel": {
       "form": "festwert",
       "wert_pct": 2.5,
@@ -742,7 +742,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "we",
+    "zweig": "we_wm",
     "formel": {
       "form": "festwert",
       "wert_pct": 3.2,
@@ -805,7 +805,7 @@
     "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
     "kennzahl": "liegenschaftszinssatz",
-    "zweig": "we",
+    "zweig": "we_kf",
     "formel": {
       "form": "festwert",
       "wert_pct": 1.6,
