@@ -104,8 +104,8 @@
       selector: '#obj-action-bar, .obj-action-bar',
       icon: 'i-rocket',
       title: 'PRE-FLIGHT — dein Daten-Cockpit',
-      body: 'Die **PRE-FLIGHT-Karte** oben im Objekt-Tab bringt Daten in Sekunden ins Objekt: Import, Sprache, Schnittstelle, Marktbewertung.',
-      bodyMore: 'Vier Wege, wie deine Daten ins Objekt kommen:\n\n• **Dokument-Import** — Exposés und Marktberichte hochladen, DealPilot liest die Felder aus\n• **Sprachaufzeichnung** — Objekt einfach einsprechen\n• **ImmoMetrica-Import** — Objekte direkt aus deinem ImmoMetrica-Konto ziehen\n• **Marktbewertung** — professionelle Marktwert- und Mietpreis-Einschätzung abrufen\n\nDie nächsten Schritte zeigen dir jeden Weg einzeln.',
+      body: 'Die **PRE-FLIGHT-Karte** oben im Objekt-Tab bringt Daten in Sekunden ins Objekt: Import, Sprache, geführte Eingabe, Schnittstelle, Marktbewertung.',
+      bodyMore: 'Fünf Wege, wie deine Daten ins Objekt kommen:\n\n• **Dokument-Import** — Exposés und Marktberichte hochladen, DealPilot liest die Felder aus\n• **Sprachaufzeichnung** — Objekt einfach einsprechen\n• **Geführte Eingabe** — DealPilot fragt der Reihe nach, du tippst oder sprichst\n• **ImmoMetrica-Import** — Objekte direkt aus deinem ImmoMetrica-Konto ziehen\n• **Marktbewertung** — professionelle Marktwert- und Mietpreis-Einschätzung abrufen\n\nDie nächsten Schritte zeigen dir jeden Weg einzeln.',
       placement: 'auto'
     },
 
@@ -130,6 +130,21 @@
       title: 'Sprachaufzeichnung',
       body: 'Objekt **einfach einsprechen** — mit allen wichtigen Informationen. DealPilot übernimmt den Rest.',
       bodyMore: 'So nutzt du die Sprachaufzeichnung:\n\n• **Aufnahme starten** und das Objekt beschreiben: Adresse, Grösse, Preis, Miete, Zustand, Besonderheiten\n• DealPilot **erkennt die Angaben** und ordnet sie den richtigen Feldern zu\n• Perfekt **unterwegs nach der Besichtigung** oder beim Telefonat mit dem Makler\n\n**Tipp:** Sprich Zahlen klar aus („Kaufpreis zweihundertfünfzigtausend Euro“) — dann sitzt die Zuordnung am besten.',
+      placement: 'auto'
+    },
+
+    /* v1742 · Eigener Schritt für die geführte Eingabe. Sie stand bis
+       hierher nur HINTER dem Knopf „Sprache" — wer die Tour sah, erfuhr
+       nie, dass es einen Weg ohne Formular und ohne Mikrofon gibt. */
+    {
+      id: 'pf-gefuehrt',
+      tab: 's0',
+      selector: '#obj-action-bar, .obj-action-bar',
+      subTargets: ['Geführte Eingabe'],
+      icon: 'i-list',
+      title: 'Geführte Eingabe',
+      body: 'Kein Formular, kein Mikrofon: DealPilot **fragt der Reihe nach** — Preis, Miete, Fläche, Adresse und den Rest. Antworten kannst du **tippen oder sprechen**.',
+      bodyMore: 'Wann dieser Weg der richtige ist:\n\n• Du willst **nichts vergessen** — gefragt wird jedes Feld, das für die Rechnung zählt\n• Du sitzt im **Büro oder Zug** und möchtest nicht sprechen\n• Das Objekt ist **neu** und es gibt noch kein Exposé\n\n**Wie es läuft:**\n• Eine Frage nach der anderen, mit kurzer Erklärung, wozu die Zahl dient\n• **Weiss ich nicht** überspringt eine Frage — nichts wird erfunden\n• **Fertig** springt jederzeit zur Übernahme-Tabelle\n• Unterwegs rechnet DealPilot schon mit und zeigt, wohin es läuft\n\n**Kombinierbar:** erst ein Exposé einlesen, dann die Lücken per geführter Eingabe schliessen — was bereits gefüllt ist, wird nicht noch einmal gefragt.',
       placement: 'auto'
     },
 
