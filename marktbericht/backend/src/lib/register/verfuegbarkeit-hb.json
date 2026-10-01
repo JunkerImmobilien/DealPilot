@@ -1,0 +1,60 @@
+{
+  "was": "Verfuegbarkeit wertermittlungsrelevanter Daten beim Gutachterausschuss fuer Grundstueckswerte in Bremen (Land Bremen)",
+  "keine_werte": "Dieser Eintrag traegt bewusst KEINE Zahlen. Liegenschaftszinssaetze fuehrt der Bremer Ausschuss, sie stehen aber nur im KOSTENPFLICHTIGEN Vollbericht (50 Euro); der frei abrufbare Auszug laesst genau dieses Kapitel weg. Sachwertfaktoren fuehrt der Ausschuss ueberhaupt nicht — und sagt das selbst. Diese Datei ist deshalb der WEG ZUR QUELLE, nicht die Quelle.",
+  "land_code": "HB",
+  "stand": "2026",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://www.gutachterausschuss.bremen.de/marktbericht-1469",
+  "quelle_url_auszug": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf",
+  "quelle_url_auszug_vorjahr": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Grundst%C3%BCcksmarktbericht%20Bremen%202025_Auszug_gesichert.pdf",
+  "quellenvermerk": "Gutachterausschuss fuer Grundstueckswerte in Bremen, Grundstuecksmarktbericht 2026",
+  "quelle_parser": "v1768-HBVERF",
+  "lizenz": null,
+  "lizenz_hinweis": "Woertlich auf der letzten Seite des Auszugs (S. 135): „Dieser Grundstuecksmarktbericht ist urheberrechtlich geschuetzt. Vervielfaeltigung und Verbreitung sind nur mit Genehmigung des Gutachterausschusses fuer Grundstueckswerte in Bremen zulaessig.\" Eine Uebernahme von Werten ins Register ist damit genehmigungspflichtig — deshalb stehen hier keine.",
+  "zugang": "kostenpflichtig",
+  "kosten_eur": 50,
+  "kosten_wortlaut": "Gebuehrenuebersicht S. 135: „Grundstuecksmarktbericht (ab 2024 nur als pdf-Version) 50,- Euro\". Ein Auszug aus der Kaufpreissammlung kostet 240,- Euro (bis zu 15 Kauffaelle).",
+  "rechtsgrundlage": "Veroeffentlichung auf der Grundlage von § 13 Abs. 2 der Verordnung ueber die Gutachterausschuesse fuer Grundstueckswerte nach dem Baugesetzbuch vom 2. September 2008 (Brem.Gbl. 2008, S. 321)",
+  "kontakt": "Gutachterausschuss fuer Grundstueckswerte in Bremen bei GeoInformation Bremen, Lloydstrasse 4, 28217 Bremen, Telefon 0421 361-78689, gutachterausschuss@geo.bremen.de; Bestellung des Marktberichts 0421 361-78694",
+  "ausschuesse": [
+    {
+      "kuerzel": "HB",
+      "name": "Gutachterausschuss fuer Grundstueckswerte in Bremen",
+      "ags": "04011",
+      "ebene": "kreisfreie_stadt",
+      "hinweis": "zustaendig fuer die Stadtgemeinde Bremen"
+    },
+    {
+      "kuerzel": "BRV",
+      "name": "Gutachterausschuss fuer Grundstueckswerte in Bremerhaven",
+      "ags": "04012",
+      "ebene": "kreisfreie_stadt",
+      "hinweis": "Eigener Ausschuss fuer die Stadt Bremerhaven. NICHT geprueft — der hier ausgewertete Bericht ist der der Stadtgemeinde Bremen. Ob Bremerhaven Liegenschaftszinssaetze oder Sachwertfaktoren fuehrt und zu welchen Bedingungen, ist offen."
+    }
+  ],
+  "liegenschaftszinssaetze": {
+    "gefuehrt": true,
+    "fundstelle": "Grundstuecksmarktbericht Bremen 2026, Kapitel 8.1 „Liegenschaftszinssaetze und Ertragsfaktoren (§§ 20 und 21 ImmoWertV 21)\", S. 113 bis 123",
+    "untergliederung": [
+      "8.1.1 Eigentumswohnungen, S. 114",
+      "8.1.2 Wohngebaeude, S. 119",
+      "8.1.3 Buero- und Geschaeftshaeuser, S. 122",
+      "8.1.4 Gewerbeimmobilien, S. 123"
+    ],
+    "im_auszug_enthalten": false,
+    "gemessen": "Am 01.10.2026 am Auszug 2026 geprueft: das Inhaltsverzeichnis fuehrt 8.1 bis 8.1.4 mit Seitenzahlen, der Textkoerper des Auszugs enthaelt das Kapitel NICHT — der einzige Treffer auf „8.1 Liegenschaftszinssaetze\" liegt im Inhaltsverzeichnis. Die Seiten 113 bis 123 fehlen im Auszug ganz.",
+    "weg": "Vollbericht als PDF fuer 50 Euro bei GeoInformation Bremen bestellen. Danach Kapitel 8.1 einlesen; die vier Objektarten decken ETW, Wohngebaeude, Buero/Geschaeft und Gewerbe ab — fuer die Haupt-App sind 8.1.1 und 8.1.2 die relevanten."
+  },
+  "sachwertfaktoren": {
+    "gefuehrt": false,
+    "fundstelle": "Grundstuecksmarktbericht Bremen 2026, Kapitel 8.4 „Sachwertfaktoren (§ 21 ImmoWertV 2021)\", S. 130 — im freien Auszug ENTHALTEN",
+    "wortlaut": "„Gemaess §21 (3) Nr.1 ImmoWertV 2021 sowie §35 bis §38 ImmoWertV 2021 sollen von den Gutachterausschuessen Sachwertfaktoren ermittelt werden. Es handelt sich hierbei um eine personalintensive Aufgabe. Aufgrund unzureichender Personalausstattung seiner Geschaeftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusaetzlichen Aufgabe nachzukommen. Sachverstaendigen wird daher empfohlen, fuer Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskuenfte aus der Kaufpreissammlung) einzuholen.\"",
+    "weg": "Es gibt keinen. Fuer Bremen existiert kein amtlicher Sachwertfaktor — nicht kostenpflichtig, sondern gar nicht. Ein Nachbarwert aus Niedersachsen waere hier besonders verfuehrerisch, weil Bremen seine Bodenrichtwerte ueber immobilienmarkt.niedersachsen.de ausliefert; er bleibt trotzdem verboten. Der Kunde bekommt den Hinweis auf die Einzelauskunft aus der Kaufpreissammlung (240 Euro) als Weg.",
+    "wiedervorlage": "Jaehrlich am neuen Auszug pruefen, ob der Satz noch dasteht. Er ist mit der Personalausstattung begruendet, nicht mit der Sache — er kann wegfallen."
+  },
+  "bodenrichtwerte": {
+    "gefuehrt": true,
+    "zugang": "kostenfrei online",
+    "weg": "Die Bodenrichtwerte der Stadt Bremen sind kostenfrei abrufbar ueber das Portal der Gutachterausschuesse in Niedersachsen, www.immobilienmarkt.niedersachsen.de (Hinweis im Auszug 2026, Kapitel 9.1, S. 132). Die naechste Bodenrichtwertkarte Bremen erscheint planmaessig zum Stichtag 01.01.2028."
+  }
+}

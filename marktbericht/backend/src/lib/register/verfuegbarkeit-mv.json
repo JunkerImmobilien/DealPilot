@@ -13,33 +13,231 @@
   "ags_hinweis": "ags_belegt=true heisst: der Schluessel steht so in einem vorhandenen Registersatz. Die uebrigen sind nach amtlicher Systematik zugeordnet (kreisfreie Staedte 13003/13004, Landkreise 13071-13076 alphabetisch) und durch die drei belegten Schluessel stichprobenhaft bestaetigt - 13071 Mecklenburgische Seenplatte, 13073 Vorpommern-Ruegen, 13076 Ludwigslust-Parchim.",
   "lesehinweis": "Die Tabelle wurde SPALTENTREU ueber die x-Koordinaten der Textstuecke gelesen, nicht aus dem Textstrom. Im Textstrom fehlen die leeren Zellen: dort steht \"Mehrfamilienhaeuser x x x x x\" - fuenf Kreuze fuer acht Ausschuesse, ohne Angabe welche drei fehlen. Spaltentreu ergibt sich \"- x x x x - x -\", also SN, MSE, LRO, VR, VG statt der ersten fuenf. Eine Tabelle ohne ihre Leerstellen ist keine Tabelle, sondern eine Aufzaehlung.",
   "ausschuesse": [
-    { "kuerzel": "HRO", "name": "Rostock, Hansestadt", "ags": "13003", "ags_belegt": false, "ebene": "kreisfreie_stadt" },
-    { "kuerzel": "SN", "name": "Schwerin, Landeshauptstadt", "ags": "13004", "ags_belegt": false, "ebene": "kreisfreie_stadt" },
-    { "kuerzel": "MSE", "name": "Mecklenburgische Seenplatte", "ags": "13071", "ags_belegt": true, "ebene": "kreis" },
-    { "kuerzel": "LRO", "name": "Rostock, Landkreis", "ags": "13072", "ags_belegt": false, "ebene": "kreis" },
-    { "kuerzel": "VR", "name": "Vorpommern-Ruegen", "ags": "13073", "ags_belegt": true, "ebene": "kreis" },
-    { "kuerzel": "NWM", "name": "Nordwestmecklenburg", "ags": "13074", "ags_belegt": false, "ebene": "kreis" },
-    { "kuerzel": "VG", "name": "Vorpommern-Greifswald", "ags": "13075", "ags_belegt": false, "ebene": "kreis" },
-    { "kuerzel": "LUP", "name": "Ludwigslust-Parchim", "ags": "13076", "ags_belegt": true, "ebene": "kreis" }
+    {
+      "kuerzel": "HRO",
+      "name": "Rostock, Hansestadt",
+      "ags": "13003",
+      "ags_belegt": false,
+      "ebene": "kreisfreie_stadt"
+    },
+    {
+      "kuerzel": "SN",
+      "name": "Schwerin, Landeshauptstadt",
+      "ags": "13004",
+      "ags_belegt": false,
+      "ebene": "kreisfreie_stadt"
+    },
+    {
+      "kuerzel": "MSE",
+      "name": "Mecklenburgische Seenplatte",
+      "ags": "13071",
+      "ags_belegt": true,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "LRO",
+      "name": "Rostock, Landkreis",
+      "ags": "13072",
+      "ags_belegt": false,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "VR",
+      "name": "Vorpommern-Ruegen",
+      "ags": "13073",
+      "ags_belegt": true,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "NWM",
+      "name": "Nordwestmecklenburg",
+      "ags": "13074",
+      "ags_belegt": false,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "VG",
+      "name": "Vorpommern-Greifswald",
+      "ags": "13075",
+      "ags_belegt": false,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "LUP",
+      "name": "Ludwigslust-Parchim",
+      "ags": "13076",
+      "ags_belegt": true,
+      "ebene": "kreis"
+    }
   ],
   "liegenschaftszinssaetze": [
-    { "objektart": "Mehrfamilienhaeuser", "ausschuesse": ["SN", "MSE", "LRO", "VR", "VG"] },
-    { "objektart": "Mehrfamilienhaeuser ueber 6 Wohneinheiten", "ausschuesse": ["HRO", "NWM", "LUP"] },
-    { "objektart": "Mehrfamilienhaeuser 3 bis 6 Wohneinheiten", "ausschuesse": ["LUP"] },
-    { "objektart": "Eigentumswohnungen", "ausschuesse": ["HRO", "SN", "MSE", "LRO", "VR", "NWM", "VG", "LUP"] },
-    { "objektart": "Wohn- und Geschaeftshaeuser", "ausschuesse": ["SN", "VG", "LUP"] },
-    { "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Wohnen", "ausschuesse": ["HRO", "MSE"] },
-    { "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Gewerbe", "ausschuesse": [] },
-    { "objektart": "Ferienhaeuser und Ferienwohnungen", "ausschuesse": ["NWM"] },
-    { "objektart": "Beherbergung und Gastronomie", "ausschuesse": [] },
-    { "objektart": "Handel", "ausschuesse": ["HRO"] },
-    { "objektart": "Gewerbe", "ausschuesse": ["HRO", "MSE", "LRO"] },
-    { "objektart": "Buero-, Verwaltungs- und Praxisgebaeude", "ausschuesse": ["HRO", "MSE"] }
+    {
+      "objektart": "Mehrfamilienhaeuser",
+      "ausschuesse": [
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "VG"
+      ]
+    },
+    {
+      "objektart": "Mehrfamilienhaeuser ueber 6 Wohneinheiten",
+      "ausschuesse": [
+        "HRO",
+        "NWM",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Mehrfamilienhaeuser 3 bis 6 Wohneinheiten",
+      "ausschuesse": [
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Eigentumswohnungen",
+      "ausschuesse": [
+        "HRO",
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "NWM",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Wohn- und Geschaeftshaeuser",
+      "ausschuesse": [
+        "SN",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Wohnen",
+      "ausschuesse": [
+        "HRO",
+        "MSE"
+      ]
+    },
+    {
+      "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Gewerbe",
+      "ausschuesse": []
+    },
+    {
+      "objektart": "Ferienhaeuser und Ferienwohnungen",
+      "ausschuesse": [
+        "NWM"
+      ]
+    },
+    {
+      "objektart": "Beherbergung und Gastronomie",
+      "ausschuesse": []
+    },
+    {
+      "objektart": "Handel",
+      "ausschuesse": [
+        "HRO"
+      ]
+    },
+    {
+      "objektart": "Gewerbe",
+      "ausschuesse": [
+        "HRO",
+        "MSE",
+        "LRO"
+      ]
+    },
+    {
+      "objektart": "Buero-, Verwaltungs- und Praxisgebaeude",
+      "ausschuesse": [
+        "HRO",
+        "MSE"
+      ]
+    }
   ],
   "sachwertfaktoren": [
-    { "objektart": "Freistehende Ein- und Zweifamilienhaeuser", "ausschuesse": ["HRO", "SN", "MSE", "LRO", "VR", "NWM", "VG", "LUP"] },
-    { "objektart": "Reihenhaeuser und Doppelhaushaelften", "ausschuesse": ["SN", "MSE", "LRO", "VR", "NWM", "VG", "LUP"] },
-    { "objektart": "Wochenendhaeuser", "ausschuesse": ["MSE"] },
-    { "objektart": "Handel und Gewerbe", "ausschuesse": ["MSE"] }
-  ]
+    {
+      "objektart": "Freistehende Ein- und Zweifamilienhaeuser",
+      "ausschuesse": [
+        "HRO",
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "NWM",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Reihenhaeuser und Doppelhaushaelften",
+      "ausschuesse": [
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "NWM",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Wochenendhaeuser",
+      "ausschuesse": [
+        "MSE"
+      ]
+    },
+    {
+      "objektart": "Handel und Gewerbe",
+      "ausschuesse": [
+        "MSE"
+      ]
+    }
+  ],
+  "zugang_je_ausschuss": {
+    "was": "Zugang und Lizenz der acht oertlichen Marktberichte — ergaenzt am 01.10.2026. Die Uebersicht oben sagt, WELCHER Ausschuss welche Daten fuehrt; hier steht, ob man sie bekommt und uebernehmen darf.",
+    "SN": {
+      "bericht": "Grundstuecksmarktbericht 2025 der Landeshauptstadt Schwerin",
+      "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+      "zugang": "PDF frei (gedruckt 40 Euro ueber den Geoshop Schwerin)",
+      "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Belegexemplar, ohne Genehmigung gestattet",
+      "stand": "GEERNTET — die Werte stehen in schwerin.json: 4 Liegenschaftszinssatz-Saetze (Mehrfamilienhaeuser, Wohn-/Geschaeftshaeuser, Eigentumswohnungen Weiterverkauf, individueller Wohnungsbau nach 1990) und 3 Sachwertfaktor-Saetze (Gebaeudetypen 1.xx, Gebaeudetypen 2.xx, Regressionsgitter). Fundstellen Abschnitt 5.4 und 5.5, S. 60-65.",
+      "offene_auflage": "Belegexemplar an den Herausgeber ist Bedingung der auszugsweisen Wiedergabe und steht noch aus."
+    },
+    "HRO": {
+      "bericht": "Grundstuecksmarktbericht 2026 bzw. 2025 der Hanse- und Universitaetsstadt Rostock",
+      "url": "https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html",
+      "zugang": "PDF frei ueber den Geoshop Rostock",
+      "lizenz": null,
+      "lizenz_wortlaut": "Verwendungshinweis im Bericht: „Der Grundstuecksmarktbericht ist urheberrechtlich geschuetzt. Vervielfaeltigungen, auch auszugsweise, und Verbreitung sind nur mit Genehmigung des Herausgebers gestattet. Alle Rechte, auch die des Nachdruckes von Auszuegen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\"",
+      "stand": "NICHT GEERNTET — genehmigungspflichtig. Die Werte sind vorhanden und maschinenlesbar: Kapitel 4.2 „Mittlere Liegenschaftszinssaetze in der Hanse- und Universitaetsstadt Rostock\", S. 55, und Kapitel 4.4 „Sachwertfaktoren fuer Ein- und Zweifamilienhaeuser\", S. 60 (Tabelle 42, S. 61). Am 01.10.2026 gemessen am Jahrgang 2025 (6.223 Textzeilen) und am Jahrgang 2026, Redaktionsschluss 18.03.2026 — der 2026er Download ist nur das Vorblatt mit Inhaltsverzeichnis (214 Zeilen), die Vollversion 2025 traegt die Zahlen.",
+      "weg": "Genehmigung beim Gutachterausschuss einholen (gutachterausschuss@rostock.de, 0381 381-6270). Danach sind beide Kapitel in einem Arbeitsgang uebernehmbar."
+    },
+    "MSE": {
+      "stand": "teilweise geerntet — 3 Sachwertfaktor-Saetze 2024 in swf-mv.json, Liegenschaftszinssaetze offen",
+      "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+    },
+    "VR": {
+      "stand": "teilweise geerntet — 3 Sachwertfaktor-Saetze 2019 in swf-mv.json, Liegenschaftszinssaetze offen, Jahrgang veraltet",
+      "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+    },
+    "LUP": {
+      "stand": "teilweise geerntet — 1 Sachwertfaktor-Satz 2018 in swf-mv.json, Liegenschaftszinssaetze offen, Jahrgang veraltet",
+      "url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/"
+    },
+    "LRO": {
+      "stand": "nicht geprueft"
+    },
+    "NWM": {
+      "stand": "nicht geprueft"
+    },
+    "VG": {
+      "stand": "nicht geprueft"
+    },
+    "bilanz": "Nach dieser Ernte: Mecklenburg-Vorpommern hat erstmals amtliche Liegenschaftszinssaetze im Register (Schwerin, 4 Saetze), und die Sachwertfaktoren stehen fuer vier der acht Ausschuesse (Schwerin neu, MSE, VR, LUP vorhanden). Offen sind die Liegenschaftszinssaetze von sieben Ausschuessen; der naechstgroesste Gewinn liegt bei Rostock und haengt nur an einer Genehmigung, nicht an der Beschaffung."
+  }
 }
