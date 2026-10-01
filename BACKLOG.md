@@ -305,7 +305,7 @@ Marcels Durchlauf durch die Erstanmeldung. **Reihenfolge wie genannt.**
 
 ---
 
-### U1 · Der Hintergrund darf nicht so dunkel sein
+### U1 · Der Hintergrund darf nicht so dunkel sein — ERLEDIGT (v1749)
 
 Marcel: „Der Hintergrund sollte nicht so ausgegraut sein, damit man sehen
 kann, wie sich die Optik im Hintergrund ändert."
@@ -318,7 +318,24 @@ entscheidet.
 > Ein Auswahlfenster, das verdeckt, worüber es entscheiden lässt, nimmt dem
 > Nutzer die einzige Grundlage, die er hat.
 
-### U2 · Ein Klick daneben darf nicht schließen
+**Belegt am 01.10.2026 im Code** (`onboarding.js:790`):
+
+```
+.dpo-ov{ ... background:rgba(5,5,5,.34) ... }   kein backdrop-filter mehr
+```
+
+Der Kommentar daneben (`onboarding.js:783-789`) hält den alten Stand fest.
+
+**Abgenommen am laufenden Fenster, 01.10.2026** (`?setup=1`,
+`getComputedStyle` auf `.dpo-ov`):
+
+```
+background-color   rgba(5, 5, 5, 0.34)
+backdrop-filter    none
+Kasten             760 x 676 px, linke Kante bei 687
+```
+
+### U2 · Ein Klick daneben darf nicht schließen — ERLEDIGT (v1749)
 
 Marcel: „Wenn man neben das Modal klickt, soll es sich nicht schließen."
 
@@ -328,6 +345,30 @@ den Hintergrund schließt (`onboarding.js:343` fängt nur Kacheln und Knöpfe ab
 anderes, oder der Eindruck entstand durch den „Fertig"-Weg. **Erst am
 laufenden Fenster nachstellen, dann bauen** — sonst wird ein Schutz gegen
 etwas gebaut, das es nicht gibt, und die echte Ursache bleibt.
+
+**Gebaut mit genau dieser Vorsicht** (`onboarding.js:560-565`): zwei
+Listener in der Fangphase, `mousedown` und `click`, die beide nur bei
+`ev.target === _ov` greifen — also nur auf dem Hintergrund selbst.
+
+> Der Eindruck kann auch von einem DURCHGEREICHTEN Klick auf die App
+> dahinter kommen, die dann ihrerseits etwas öffnet. Beides erledigt
+> dieselbe Zeile: der Klick stirbt am Hintergrund, statt weiterzulaufen.
+
+Das ist die ehrliche Fassung — die Ursache ist weiterhin nicht bewiesen,
+aber beide möglichen Wege sind zu.
+
+**Abgenommen am laufenden Fenster, 01.10.2026.** Klickpunkt (343, 494) —
+links neben dem Kasten; `elementFromPoint` bestätigt dort `.dpo-ov`:
+
+```
+Fenster vor dem Klick    offen
+Fenster nach dem Klick   offen        <- U2 erfuellt
+Zeugen an body/document  0 Treffer    <- der Klick wird NICHT durchgereicht
+```
+
+> Der zweite Messwert ist der wichtigere: er beweist die Vermutung, dass
+> der Eindruck von einem durchgereichten Klick kam. Dieser Weg ist jetzt
+> messbar zu — nicht nur der, den es nie gab.
 
 ### U3 · Die Vorschaubilder der vier Ansichten sagen nichts — ERLEDIGT (v1753b/c)
 
@@ -496,7 +537,105 @@ ihn nicht aus. Bei Guthaben 0 hängt es keinen Block an. Die Rückfrage nennt
 > Bei Geld wird nicht geschätzt. Lieber keine Zahl als eine erfundene — das
 > gilt für einen Kontostand genauso wie für einen Liegenschaftszinssatz.
 
-### V6 · Beide Piloten holen die Berichte und gleichen ab
+### V6 · Beide Piloten holen die Berichte und gleichen ab — BLOCKIERT (Entscheidung)
+
+**BLOCKIERT:** der Weg zu den Berichten ist seit `v942` defekt. Der Defekt
+ist am 01.10.2026 auf Staging gemessen und vollständig verstanden; die
+Reparatur braucht eine **Migration in der Marktbericht-Datenbank**, und die
+gehört Marcel vorgelegt.
+
+#### Der Befund
+
+`users.id` ist eine **UUID**. `mb.market_reports.user_id` und
+`mb.object_snapshots.user_id` führen sie als **INTEGER**. Fünf Routen in
+`marktbericht/backend/src/routes/api.js` machen daraus
+`parseInt(req.query.user_id, 10)`:
+
+```
+api.js:488   GET    /objects
+api.js:509   GET    /objects/history      <- den braucht der Co-Pilot
+api.js:531   POST   /verlauf-text
+api.js:745   GET    /reports/one
+api.js:775   DELETE /reports/:id
+```
+
+`parseInt("2a1ac331-…")` ist `2`, nicht `NaN` — aber der Proxy schickt die
+volle UUID (`marktbericht.js:155`, `p.set('user_id', String(req.user.id))`),
+und die Abfrage sucht dann nach einer Zahl, die in der Spalte nicht steht.
+**Alle fünf Routen antworten einem echten Nutzer mit HTTP 400.**
+
+> Im Frontend sieht das aus wie „noch keine Marktberichte für dieses
+> Objekt" — also wie ein leeres Fach, nicht wie ein Defekt. Deshalb ist es
+> seit v942 niemandem aufgefallen.
+
+Der Kommentar in `api.js:291` sagt es selbst: *„Die nutzerbezogenen
+Marktbericht-Wege waren auf Produktion nie benutzbar."*
+
+**Das trifft auch Marcels Marktbericht-Band im Boarding** —
+`deal-action-boarding.js:987` ruft `objects/history`, bekommt 400, und
+`((j && j.history) || [])` macht daraus eine leere Liste.
+
+#### Gemessen auf Staging (01.10.2026)
+
+```
+mb.object_snapshots    122 Zeilen, 3 "Nutzer", Typ integer
+mb.market_reports      122 Zeilen, 3 "Nutzer", Typ integer
+mb.valuation_inputs                              Typ text    <- schon richtig
+
+in der mb-DB    echte UUID in users                     E-Mail
+2      (72x)    2a1ac331-7d7f-44a5-813b-c0080ffb81c3    info@junker-immobilien.io
+833654 (22x)    833654ba-870b-4fe8-9de0-398c56a11d26    junker_immobilien@gmx.de
+1       (7x)    1c6fe29f-f83b-49bb-9a34-975462a2b7ea    majunker@gmx.net
+NULL   (21x)    -
+
+Alle 5 Nutzer haben VERSCHIEDENE Ziffernpraefixe: 2, 9, 6, 1, 833654
+```
+
+**`parseInt` hat die Kennung nicht verworfen, sondern GESTÜMMELT.** Jede Zahl
+ist das Ziffernpräfix genau einer UUID — die Zuordnung ist damit
+rekonstruierbar, und zwar verlustfrei.
+
+> Eine Kennung, die irgendwo zur Zahl wird, ist an dieser Stelle verloren.
+> Hier war sie es nicht ganz — und genau das macht sie reparierbar.
+
+**Sicherung liegt und ist angesehen:**
+`/root/backups/mb-vor-uid-20261001-1859.sql.gz`, 1,9 MB, enthält
+`object_snapshots`, `market_reports` und `param_modell`.
+
+#### Was Marcel entscheiden muss
+
+**Die Migration wandelt den Spaltentyp in der Marktbericht-Datenbank.** Sie
+landet im Image und läuft beim nächsten Prod-Rollout **auch auf Produktion**.
+Deshalb steht sie hier und nicht im Code.
+
+| | |
+|---|---|
+| **Schritt 1** | `015_user_id_text.sql`: `user_id` auf TEXT in beiden Tabellen. Verlustfrei — die alten Zahlen bleiben als Text stehen, Indizes baut Postgres selbst neu. |
+| **Schritt 2** | `api.js`: die fünf `parseInt` auf `_uidAus(req)` umstellen. **Diese Funktion ist seit v1601 schon gebaut** (`api.js:304`) und prüft die Kennung auf Unbedenklichkeit statt auf Zahligkeit — sie wird an diesen fünf Stellen nur nicht benutzt. |
+| **Schritt 3** | `tools/mb-uid-zuordnen.mjs`: ordnet die 101 Altzeilen den vollen UUIDs zu. **Prüft zuerst die Eindeutigkeit und bricht ab, wenn zwei UUIDs dasselbe Ziffernpräfix haben** — auf Prod kann das anders liegen als auf Staging. |
+
+**Ohne Schritt 1 und 2 bleibt V6 zu**, und mit ihm das Marktbericht-Band im
+Boarding. Schritt 3 ist nachrangig: er holt die 101 alten Berichte zurück,
+neue wären ab Schritt 2 ohnehin richtig zugeordnet.
+
+#### Was danach gebaut wird (steht, sobald der Weg offen ist)
+
+Marcel: „Wichtig ist auch, dass sich beide Piloten immer auch zum Objekt bei
+der Pilot-Analyse oder dem ganzen Bestand beim Portfolio-Piloten den
+Marktbericht oder die Berichte holen und alles abgleichen."
+
+- **Co-Pilot:** `objects/history?ref=<objId>` liefert je Bericht
+  `market_value`, `median_sqm`, `gross_yield_pct`, `deal_score`,
+  `micro_score`, `macro_score`, `price_cagr_pct`, `confidence` — der jüngste
+  Satz geht in den Kontext.
+- **Portfolio-Pilot:** dieselbe Route **ohne** `ref` liefert alle Berichte des
+  Nutzers (steht so im Kommentar bei `api.js:507`). Ein Abruf, nicht N.
+- **Abgleichen heißt benennen, nicht rechnen:** wo der Bericht einen anderen
+  Marktwert führt als die Objektkalkulation, sagt der Pilot BEIDE Zahlen und
+  woher sie kommen. Er rechnet keine dritte aus.
+
+> Zwei Zahlen zur selben Größe sind kein Widerspruch, solange beide ihre
+> Herkunft tragen. Eine dritte, gemittelte wäre einer.
 
 Marcel: „Wichtig ist auch, dass sich beide Piloten immer auch zum Objekt bei
 der Pilot-Analyse oder dem ganzen Bestand beim Portfolio-Piloten den
