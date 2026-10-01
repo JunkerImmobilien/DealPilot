@@ -229,16 +229,68 @@
     return liste;
   }
 
-  /* Wie gut passt `text` auf `tip`? Zahlen zählen doppelt — eine
-     Objektnummer oder Hausnummer trennt schärfer als ein Wort. */
+  /* ═══ v1767b · DREI FEHLER IM VERGLEICH, ALLE GEMESSEN ═════════════
+
+     Geprüft mit Marcels Satz „Kannst du in der Musterstraße 12 in
+     Leipzig den Innenausbau auf über 20 Jahren setzen?" gegen 17 echte
+     Objekte:
+
+       2026-999  · Musterstraße 12 Leipzig       2 Punkte (musterstraße, leipzig)
+       2026-1052 · Gohliser Str. 42 Leipzig      2 Punkte (str, leipzig)
+
+     **Gleichstand — und damit wurde am falschen Objekt geändert.** Drei
+     Ursachen:
+
+     1 `indexOf` findet TEILWÖRTER. „str" steckt in „Musterstraße", also
+       bekam die Gohliser Straße einen Punkt für ein Wort, das im Satz
+       gar nicht vorkommt. Jetzt zählt nur die Wortgrenze.
+
+     2 `length > 2` warf die HAUSNUMMER weg — „12", „9", „42". Genau die
+       Zahl, die zwei Objekte in derselben Stadt trennt, war die einzige,
+       die nicht zählte.
+
+     3 Straßenwörter sind keine Merkmale. `str`, `weg`, `platz`, `allee`
+       stehen in jedem zweiten Namen; sie heben niemanden heraus, aber
+       sie erzeugen Gleichstände.
+
+     > Ein Vergleich, der ein gemeinsames Wort wie ein Merkmal zählt,
+     > findet Ähnlichkeit, wo keine ist. Und ein Gleichstand ist keine
+     > Entscheidung — er sieht nur so aus, wenn man den ersten nimmt.
+
+     Normalisiert wird beidseitig (`ß`→`ss`, `straße`/`strasse`/`str.`
+     → `str`), damit „Parkstr. 9" und „Parkstraße 9" dasselbe sind. */
+  var GENERISCH = {
+    str: 1, weg: 1, platz: 1, allee: 1, ring: 1, gasse: 1, hof: 1, berg: 1,
+    am: 1, an: 1, auf: 1, der: 1, den: 1, zum: 1, zur: 1, bei: 1, und: 1
+  };
+
+  function normStr(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/ß/g, 'ss')
+      .replace(/stra(ss)?e\b/g, 'str')
+      .replace(/str\./g, 'str');
+  }
+
+  function wortDrin(text, wort) {
+    try {
+      var e = wort.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return new RegExp('(^|[^0-9a-zäöü])' + e + '([^0-9a-zäöü]|$)').test(text);
+    } catch (ex) { return false; }
+  }
+
   function treffer(text, tip) {
-    var t = text.toLowerCase();
+    var t = normStr(text);
     var punkte = 0;
-    var teile = tip.toLowerCase().split(/[\s,·]+/).filter(function (w) { return w.length > 2; });
-    teile.forEach(function (w) {
-      var sauber = w.replace(/[^\wäöüß-]/g, '');
-      if (!sauber || sauber.length < 3) return;
-      if (t.indexOf(sauber) >= 0) punkte += /^\d/.test(sauber) ? 2 : 1;
+    normStr(tip).split(/[\s,·]+/).forEach(function (w) {
+      var sauber = w.replace(/[^0-9a-zäöü-]/g, '');
+      if (!sauber) return;
+      if (GENERISCH[sauber]) return;
+      var zahl = /^\d+$/.test(sauber);
+      /* Zahlen zählen ab EINER Stelle — die Hausnummer trennt am
+         schärfsten. Wörter erst ab vier Zeichen: „der", „bei", „ost"
+         tragen nichts und erzeugen nur Gleichstände. */
+      if (!zahl && sauber.length < 4) return;
+      if (wortDrin(t, sauber)) punkte += zahl ? 3 : 1;
     });
     return punkte;
   }
@@ -581,22 +633,82 @@
      gerade geladen ist — also womöglich in ein anderes als das genannte.
 
      > Eine Änderung am falschen Objekt ist schlimmer als keine. Sie sieht
-     > aus wie Erfolg. */
+     > aus wie Erfolg.
+
+     v1767b · GENAU DAS IST PASSIERT. Mein erster Entwurf schrieb bei
+     allem außer `art:'eins'` ein `fertig(true)` — „kein klarer Hinweis,
+     dann beim geladenen bleiben". Gemessen an Marcels Satz: der Vergleich
+     ergab einen Gleichstand (siehe `treffer()`), also `art:'mehrere'`,
+     also `true`, also Änderung an der Bismarckstraße statt an der
+     Musterstraße. Ohne einen Hinweis darauf.
+
+     > „Im Zweifel weitermachen" ist bei einer Zuordnung keine
+     > Milde, sondern eine Wette auf Kosten des Nutzers.
+
+     Jetzt gilt: nur ein EINDEUTIGER Treffer darf durch. Gleichstand und
+     „kein Objekt genannt" werden GEFRAGT, und ohne Antwort passiert
+     nichts. */
   function objektZuordnen(nutzerText, addMsg) {
     return new Promise(function (fertig) {
-      if (!nutzerText) { fertig(true); return; }
-      var fund = objektFinden(nutzerText);
-      if (fund.art !== 'eins') { fertig(true); return; }   /* kein klarer Hinweis -> beim geladenen bleiben */
-      if (fund.objekt.key === window._currentObjKey) { fertig(true); return; }
-      var hin = addMsg('assistant', '');
-      if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(fund.objekt.tip) + '</b> — ich öffne es …';
-      objektLaden(fund.objekt.key).then(function (ok) {
-        if (hin) {
-          hin.innerHTML = ok
-            ? 'Objekt: <b>' + esc(fund.objekt.tip) + '</b>'
-            : '⚠ <b>' + esc(fund.objekt.tip) + '</b> ließ sich nicht öffnen — ich ändere nichts.';
-        }
-        fertig(ok);
+      var geladen = window._currentObjKey;
+      var fund = nutzerText ? objektFinden(nutzerText) : { art: 'keins' };
+
+      /* Eindeutig und schon offen: nichts zu tun. */
+      if (fund.art === 'eins' && fund.objekt.key === geladen) { fertig(true); return; }
+
+      /* Eindeutig und ein anderes: öffnen. */
+      if (fund.art === 'eins') {
+        var hin = addMsg('assistant', '');
+        if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(fund.objekt.tip) + '</b> — ich öffne es …';
+        objektLaden(fund.objekt.key).then(function (ok) {
+          if (hin) {
+            hin.innerHTML = ok
+              ? 'Objekt: <b>' + esc(fund.objekt.tip) + '</b>'
+              : '⚠ <b>' + esc(fund.objekt.tip) + '</b> ließ sich nicht öffnen — ich ändere nichts.';
+          }
+          fertig(ok);
+        });
+        return;
+      }
+
+      /* Mehrdeutig oder gar nicht genannt: FRAGEN. Bei Gleichstand nur
+         die Kandidaten, sonst das geladene Objekt plus die Liste. */
+      var wahl = (fund.art === 'mehrere') ? fund.kandidaten : null;
+      if (!wahl) {
+        var alle = objekte();
+        if (!alle.length) { fertig(false); return; }
+        /* Ist ein Objekt offen, ist es der naheliegendste Kandidat — aber
+           es wird bestätigt, nicht unterstellt. */
+        wahl = alle.filter(function (o) { return o.key === geladen; })
+          .concat(alle.filter(function (o) { return o.key !== geladen; }))
+          .slice(0, 6);
+      }
+
+      var box = addMsg('assistant', '');
+      if (!box) { fertig(false); return; }
+      box.innerHTML = '<b>' + (fund.art === 'mehrere'
+          ? 'Das passt auf mehrere Objekte — welches meinst du?'
+          : 'An welchem Objekt soll ich das ändern?')
+        + '</b><div class="' + MARKE + '-konflikte">'
+        + wahl.map(function (o) {
+            return '<button type="button" class="' + MARKE + '-w" data-key="' + esc(o.key) + '">'
+              + esc(o.tip) + (o.key === geladen ? ' (offen)' : '') + '</button>';
+          }).join('')
+        + '</div><div class="' + MARKE + '-kosten">Ohne Auswahl ändere ich nichts.</div>';
+
+      box.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('[data-key]') : null;
+        if (!b) return;
+        var key = b.getAttribute('data-key');
+        var tip = (b.textContent || '').replace(/\s*\(offen\)$/, '').trim();
+        box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b> — wird geöffnet …';
+        if (key === geladen) { box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b>'; fertig(true); return; }
+        objektLaden(key).then(function (ok) {
+          box.innerHTML = ok
+            ? 'Objekt: <b>' + esc(tip) + '</b>'
+            : '⚠ <b>' + esc(tip) + '</b> ließ sich nicht öffnen — ich ändere nichts.';
+          fertig(ok);
+        });
       });
     });
   }
@@ -796,16 +908,30 @@
   window.DealPilotCopilotAenderungen = {
     katalog: katalog,
     einhaengen: einhaengen,
-    ausAntwort: function (text, addMsg) {
+    /* v1767b · DER WRAPPER HAT DEN DRITTEN PARAMETER VERSCHLUCKT.
+       Hier stand `function (text, addMsg)` — zwei Parameter. Der
+       `nutzerText`, den copilot.js und portfolio-pilot.js übergeben, kam
+       damit nie an, und `objektZuordnen()` lief in keinem einzigen Fall.
+       Gemessen: das Objekt wechselte nicht, obwohl der Satz die Adresse
+       nannte.
+
+       > Eine Weiterleitung, die einen Parameter nicht kennt, wirft ihn
+       > weg, ohne sich zu beschweren. Der Aufrufer sieht nichts, der
+       > Empfänger auch nicht — nur die Funktion fehlt. */
+    ausAntwort: function (text, addMsg, nutzerText) {
       /* Erst Abrufe, dann Felder — ein Satz kann beides nicht sein, und
          so steht die Reihenfolge fest statt vom Zufall abzuhängen. */
       var t = abrufAusAntwort(text, addMsg);
       if (t === '') return '';
-      return ausAntwort(t, addMsg);
+      return ausAntwort(t, addMsg, nutzerText);
     },
     abrufe: abrufeFuerPrompt,
     standHolen: standHolen,
-    stand: function () { return _stand; }
+    stand: function () { return _stand; },
+    /* Für die Prüfstrecke: ein Prüfer, der die Zuordnung nicht selbst
+       aufrufen kann, misst sich am Ende nur selbst. */
+    _pruef: { treffer: treffer, objektFinden: objektFinden,
+              heileSchablone: heileSchablone, objekte: objekte }
   };
 
   /* Einmal beim Laden, damit die erste Frage den Stand schon kennt. */
