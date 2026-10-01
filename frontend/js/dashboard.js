@@ -785,7 +785,7 @@
     if(typeof Chart==='undefined') return;
     destroyCharts();
     var arr=detailArr();
-    var loadingHosts=['dpc-cashflow','dpc-vermoegen','dpc-mittelverw','dpc-wealth','dpc-klumpen','dpc-steuer'];
+    var loadingHosts=['dpc-cashflow','dpc-vermoegen','dpc-bilanz','dpc-mittelverw','dpc-wealth','dpc-klumpen','dpc-steuer'];
     if(!_detailsLoaded || !arr.length){
       loadingHosts.forEach(function(id){ var c=$(id); if(c){var box=c.closest('.chart-box'); if(box)box.innerHTML='<div class="dp-chart-loading"><span class="dp-spin"></span>laden…</div>';} });
       return;
@@ -829,6 +829,42 @@
         y:{ grid:{color:gridCol,drawBorder:false}, ticks:{color:axisCol,callback:opts.money===false?undefined:function(v){return yfmt(v);}} }
       };
     }
+    /* v1736 · Endwert an die Kurve schreiben.
+       Ein Verlauf ohne Zahl zwingt zum Zielen mit der Maus - und auf dem
+       Handy gibt es keinen Hover. Beschriftet wird nur der LETZTE Punkt
+       jeder Reihe: er traegt die Aussage ("wo stehe ich am Ende"), alles
+       davor ist Weg dorthin. */
+    function _endLabel(){
+      return {
+        id: 'dpEndLabel',
+        afterDatasetsDraw: function (chart) {
+          var ctx = chart.ctx;
+          ctx.save();
+          ctx.font = '600 10px JetBrains Mono, monospace';
+          ctx.textBaseline = 'middle';
+          chart.data.datasets.forEach(function (ds, di) {
+            var meta = chart.getDatasetMeta(di);
+            if (!meta || meta.hidden || !meta.data || !meta.data.length) return;
+            var pt = meta.data[meta.data.length - 1];
+            if (!pt) return;
+            var v = ds.data[ds.data.length - 1];
+            if (typeof v !== 'number' || !isFinite(v)) return;
+            var txt = yfmt(v) + ' €';
+            var w = ctx.measureText(txt).width;
+            var x = pt.x - w - 7, y = pt.y;
+            if (x < chart.chartArea.left + 2) x = chart.chartArea.left + 2;
+            if (y < chart.chartArea.top + 8) y = chart.chartArea.top + 8;
+            if (y > chart.chartArea.bottom - 8) y = chart.chartArea.bottom - 8;
+            ctx.fillStyle = isDark() ? 'rgba(12,11,9,.82)' : 'rgba(255,255,255,.88)';
+            ctx.fillRect(x - 4, y - 8, w + 8, 16);
+            ctx.fillStyle = ds.borderColor || ds.backgroundColor || axisCol;
+            ctx.fillText(txt, x, y);
+          });
+          ctx.restore();
+        }
+      };
+    }
+
     function mk(id,cfg){ var cv=$(id); if(!cv)return; cfg.options=cfg.options||{}; cfg.options.responsive=true; cfg.options.maintainAspectRatio=false; cfg.options.devicePixelRatio=2;
       if(cfg.type!=='doughnut' && cfg.type!=='pie'){
         cfg.options.scales=cfg.options.scales||axes(cfg._axesOpts);
@@ -843,11 +879,54 @@
       {label:'CF nach St.',data:PR.map(function(r){return Math.round(r.cfNach);}),borderColor:SER[1],tension:.35,fill:false,pointRadius:0,borderWidth:2,borderDash:[5,4]}
     ]},options:{plugins:{legend:{display:true}}}});
 
-    // 2) Vermoegens-Schere (Wert vs. Restschuld)
+    /* ══ v1736 · DIE SCHERE ZEIGT JETZT, WAS ZWISCHEN IHREN SCHENKELN LIEGT ══
+       Marcel am 01.10.2026: „Die Projektion und Verlauf, schau dir mal die
+       Diagramme an. Sind die aussagekraeftig?"
+
+       Gemessen an den echten Reihen dieses Portfolios:
+
+         Immobilienwert   848.000 -> 1.235.376   (+46 %)
+         Restschuld       807.465 ->   523.625   (-35 %)
+
+       Die Schere ist also da. Sie war nur nicht zu sehen: beide Linien
+       liegen im oberen Drittel einer Achse, die bei null beginnt, und
+       wirken dadurch flach und parallel.
+
+       > Die Aussage dieses Bildes ist nicht der Verlauf der zwei Linien,
+       > sondern der Abstand zwischen ihnen. Genau der war unsichtbar.
+
+       Dieser Abstand IST das Eigenkapital (`r.eq`). Er wird jetzt
+       ausgefuellt - `fill:'+1'` faerbt bis zur naechsten Reihe - und am
+       rechten Rand beschriftet. Gerechnet wird nichts Neues; sichtbar
+       gemacht wird, was die Reihen ohnehin hergeben. */
     mk('dpc-vermoegen',{type:'line',data:{labels:labels,datasets:[
-      {label:'Immobilienwert',data:PR.map(function(r){return Math.round(r.wert);}),borderColor:SER[0],backgroundColor:SER[0]+'18',tension:.3,fill:true,pointRadius:0,borderWidth:2},
+      {label:'Immobilienwert',data:PR.map(function(r){return Math.round(r.wert);}),borderColor:SER[0],backgroundColor:SER[0]+'2E',tension:.3,fill:'+1',pointRadius:0,borderWidth:2.2},
       {label:'Restschuld',data:PR.map(function(r){return Math.round(r.rest);}),borderColor:isDark()?SER[2]:'#2A2727',tension:.3,fill:false,pointRadius:0,borderWidth:2}
-    ]},options:{plugins:{legend:{display:true}}}});
+    ]},options:{plugins:{legend:{display:true}}},plugins:[_endLabel()]});
+
+    /* ══ v1736 · VERMOEGENSBILANZ ══
+       Marcel: „Vielleicht auch was in Richtung Vermoegensbilanz und
+       Portfolio-Entwicklung?"
+
+       Die Daten dafuer lagen bereits vor - `portfolioPayload()` fuehrt
+       einen Zweig `vermoegensbilanz`, und die Projektion traegt je Jahr
+       `objektwert_eur`, `restschuld_eur` UND `eigenkapital_eur`. Gezeigt
+       wurde davon nichts; gebaut wird hier also keine neue Rechnung,
+       sondern die Ansicht einer vorhandenen.
+
+       Die Schere sagt, WIE WEIT Wert und Schuld auseinanderlaufen. Die
+       Bilanz sagt, WORAUS das Vermoegen besteht: gestapelt ergeben
+       Eigen- und Fremdkapital genau den Objektwert - die Grundgleichung
+       jeder Bilanz. Man sieht den goldenen Teil wachsen und den dunklen
+       schrumpfen, in derselben Saeule. */
+    var _bi = Math.max(1, Math.ceil(_projYears / 10));
+    var _bPR = PR.filter(function (_, i) { return i % _bi === 0; });
+    var _bLab = labels.filter(function (_, i) { return i % _bi === 0; });
+    var _bAxes = axes(); _bAxes.x.stacked = true; _bAxes.y.stacked = true;
+    mk('dpc-bilanz',{type:'bar',data:{labels:_bLab,datasets:[
+      {label:'Eigenkapital',data:_bPR.map(function(r){return Math.round(r.eq);}),backgroundColor:SER[0],borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4},stack:'bil'},
+      {label:'Restschuld',data:_bPR.map(function(r){return Math.round(r.rest);}),backgroundColor:isDark()?'rgba(232,226,212,.22)':'rgba(42,39,39,.72)',borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},stack:'bil'}
+    ]},options:{scales:_bAxes,plugins:{legend:{display:true}}}});
 
     // 3) Mittelverwendung Jahr 1 (Bars)
     var p0=PR[0]||{};
@@ -1868,7 +1947,10 @@
       + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">06</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
       + '<div class="charts">'
       + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','\u20ac/Jahr')
-      + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld','Mio \u20ac')
+      + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld \u2014 die F\u00e4rbung dazwischen ist dein Eigenkapital','Mio \u20ac')
+      /* v1736 \u00b7 die Bilanz neben der Schere: dieselben Zahlen, andere Frage.
+         Die Schere zeigt den Abstand, die Bilanz die Zusammensetzung. */
+      + chartCard('dpc-bilanz','M3 21h18M5 21V9h4v12M13 21V5h4v16','Verm\u00f6gensbilanz','Eigenkapital und Restschuld ergeben den Objektwert','gestapelt')
       + chartCard('dpc-mittelverw','M4 20V10M10 20V4M16 20v-7M22 20H2','Mittelverwendung','Jahr 1','Allokation')
       + chartCard('dpc-wealth','M3 21h18M6 21V9l6-4 6 4v12','Wealth-Stacks','Eigenkapital-Aufbau','Aufbau',true)
       + chartCard('dpc-klumpen','M12 2a10 10 0 1 0 10 10H12z','Klumpenrisiko','Volumen nach Lage','Diversifikation')
