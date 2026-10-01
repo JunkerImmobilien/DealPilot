@@ -1,0 +1,45 @@
+{
+  "was": "Verfuegbarkeit wertermittlungsrelevanter Daten je Gutachterausschuss in Mecklenburg-Vorpommern",
+  "keine_werte": "Der Landesgrundstuecksmarktbericht veroeffentlicht KEINE Zahlenwerte zu Liegenschaftszinssaetzen und Sachwertfaktoren. Abb. 5.1 und 5.2 stellen nur dar, WELCHE Daten ein Ausschuss zum 01.01.2025 abgeleitet hat; die Werte selbst stehen in den Marktberichten der acht oertlichen Ausschuesse. Woertlich (S. 83): \"Nachfolgend werden ueberblicksweise die durch die Gutachterausschuesse in Mecklenburg-Vorpommern abgeleiteten und in ihren Marktberichten veroeffentlichten SWE Daten dargestellt.\" Diese Datei ist deshalb der WEG ZUR QUELLE, nicht die Quelle.",
+  "land_code": "MV",
+  "stand": "01.01.2025",
+  "berichtsjahr": 2025,
+  "quelle_url": "https://www.laiv-mv.de/static/LAIV/Geoinformation/Dateien/Wertermittlung/LGMB_2025_Web.pdf",
+  "quellenvermerk": "Landesamt fuer innere Verwaltung Mecklenburg-Vorpommern, Landesgrundstuecksmarktbericht Mecklenburg-Vorpommern 2025",
+  "fundstelle": "Landesgrundstuecksmarktbericht M-V 2025, Kapitel 5, Abb. 5.1 und 5.2, S. 83-84",
+  "quelle_parser": "v1756-MVVERF",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Bericht nicht gefunden. Vor einer Weitergabe der abgeleiteten Werte beim LAiV nachfragen; der Quellenvermerk steht vorsorglich dabei.",
+  "ags_hinweis": "ags_belegt=true heisst: der Schluessel steht so in einem vorhandenen Registersatz. Die uebrigen sind nach amtlicher Systematik zugeordnet (kreisfreie Staedte 13003/13004, Landkreise 13071-13076 alphabetisch) und durch die drei belegten Schluessel stichprobenhaft bestaetigt - 13071 Mecklenburgische Seenplatte, 13073 Vorpommern-Ruegen, 13076 Ludwigslust-Parchim.",
+  "lesehinweis": "Die Tabelle wurde SPALTENTREU ueber die x-Koordinaten der Textstuecke gelesen, nicht aus dem Textstrom. Im Textstrom fehlen die leeren Zellen: dort steht \"Mehrfamilienhaeuser x x x x x\" - fuenf Kreuze fuer acht Ausschuesse, ohne Angabe welche drei fehlen. Spaltentreu ergibt sich \"- x x x x - x -\", also SN, MSE, LRO, VR, VG statt der ersten fuenf. Eine Tabelle ohne ihre Leerstellen ist keine Tabelle, sondern eine Aufzaehlung.",
+  "ausschuesse": [
+    { "kuerzel": "HRO", "name": "Rostock, Hansestadt", "ags": "13003", "ags_belegt": false, "ebene": "kreisfreie_stadt" },
+    { "kuerzel": "SN", "name": "Schwerin, Landeshauptstadt", "ags": "13004", "ags_belegt": false, "ebene": "kreisfreie_stadt" },
+    { "kuerzel": "MSE", "name": "Mecklenburgische Seenplatte", "ags": "13071", "ags_belegt": true, "ebene": "kreis" },
+    { "kuerzel": "LRO", "name": "Rostock, Landkreis", "ags": "13072", "ags_belegt": false, "ebene": "kreis" },
+    { "kuerzel": "VR", "name": "Vorpommern-Ruegen", "ags": "13073", "ags_belegt": true, "ebene": "kreis" },
+    { "kuerzel": "NWM", "name": "Nordwestmecklenburg", "ags": "13074", "ags_belegt": false, "ebene": "kreis" },
+    { "kuerzel": "VG", "name": "Vorpommern-Greifswald", "ags": "13075", "ags_belegt": false, "ebene": "kreis" },
+    { "kuerzel": "LUP", "name": "Ludwigslust-Parchim", "ags": "13076", "ags_belegt": true, "ebene": "kreis" }
+  ],
+  "liegenschaftszinssaetze": [
+    { "objektart": "Mehrfamilienhaeuser", "ausschuesse": ["SN", "MSE", "LRO", "VR", "VG"] },
+    { "objektart": "Mehrfamilienhaeuser ueber 6 Wohneinheiten", "ausschuesse": ["HRO", "NWM", "LUP"] },
+    { "objektart": "Mehrfamilienhaeuser 3 bis 6 Wohneinheiten", "ausschuesse": ["LUP"] },
+    { "objektart": "Eigentumswohnungen", "ausschuesse": ["HRO", "SN", "MSE", "LRO", "VR", "NWM", "VG", "LUP"] },
+    { "objektart": "Wohn- und Geschaeftshaeuser", "ausschuesse": ["SN", "VG", "LUP"] },
+    { "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Wohnen", "ausschuesse": ["HRO", "MSE"] },
+    { "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Gewerbe", "ausschuesse": [] },
+    { "objektart": "Ferienhaeuser und Ferienwohnungen", "ausschuesse": ["NWM"] },
+    { "objektart": "Beherbergung und Gastronomie", "ausschuesse": [] },
+    { "objektart": "Handel", "ausschuesse": ["HRO"] },
+    { "objektart": "Gewerbe", "ausschuesse": ["HRO", "MSE", "LRO"] },
+    { "objektart": "Buero-, Verwaltungs- und Praxisgebaeude", "ausschuesse": ["HRO", "MSE"] }
+  ],
+  "sachwertfaktoren": [
+    { "objektart": "Freistehende Ein- und Zweifamilienhaeuser", "ausschuesse": ["HRO", "SN", "MSE", "LRO", "VR", "NWM", "VG", "LUP"] },
+    { "objektart": "Reihenhaeuser und Doppelhaushaelften", "ausschuesse": ["SN", "MSE", "LRO", "VR", "NWM", "VG", "LUP"] },
+    { "objektart": "Wochenendhaeuser", "ausschuesse": ["MSE"] },
+    { "objektart": "Handel und Gewerbe", "ausschuesse": ["MSE"] }
+  ]
+}
