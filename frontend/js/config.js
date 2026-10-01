@@ -996,19 +996,19 @@ window.DealPilotConfig = (function() {
          gelebte Stand. Vorher standen hier andere Zahlen (2,5 statt 1,0;
          42 statt 40,45; 2,0 statt 2,20), sie sind nur nie angekommen.
          Wer jetzt nichts einstellt, bekommt exakt wie bisher. */
-      tilgung_default:        1.0,    // % p.a.  (war 2,5 — nie wirksam)
+      tilgung_default:        1.5,    /* % p.a. — Marcel 01.10.2026: "Standardtilgung wuerde ich 1,5 setzen". War 1,0 (davor 2,5, nie wirksam). */
       zinsbindung_default:    10,     // Jahre
       zins_override:          null,   // eigener Zinssatz (%); null = indikativer Pfandbrief-Satz
       zins_margin:            'standard', // Zins-Stufe: premium (LTV<=60%) / standard (60-80%) / schwach (>90%)
       hausgeld_pct:           null,   // Hausgeld-Annahme als % vom Kaufpreis p.a.; null = aus
-      ek_quote_default:       20,     // % vom Kaufpreis
+      ek_quote_default:       10,     /* % vom Kaufpreis — Marcel 01.10.2026: "Standard Eigenkapital wuerde ich eigentlich immer jetzt erst mal 10 Prozent setzen". Damit liegt der LTV ueber 90 %, was zur vorsichtigen Vorbelegung passt. */
       /* Bewirtschaftung — v1257: Marcels Wunsch, „Mietausfall und BWK-Quote
          in die Einstellungen". Die nicht-umlagefähige Quote stand hier
          schon, sie kam nur nie an; der Mietausfall fehlte ganz. Die Werte
          entsprechen den Vorbelegungen im Formular. */
       bwk_ul_pct_default:     17,     // % der NKM (umlagefähig)
       bwk_anteil_default:     16,     // % der NKM (nicht-umlagefähig; war 22, nie wirksam)
-      mietausfall_pct:         2,     // % der NKM — kalkulatorischer Mietausfall
+      mietausfall_pct:         1,     /* % der NKM — Marcel 01.10.2026: "kalkulatorischer Mietausfall vielleicht mit 1 Prozent". War 2. */
       /* ═══ v1328 · Langfrist-Annahmen ═══════════════════════════════
          Marcels Befund im Durchlauf: "Dann fragt er mich nach
          Wertsteigerung, Mietsteigerung und Leerstand. Auch da habe ich

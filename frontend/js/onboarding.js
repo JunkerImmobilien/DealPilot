@@ -128,13 +128,19 @@ window.DealPilotOnboarding = (function () {
     /* Die E-Mail kennt die Anmeldung bereits — danach noch einmal zu
        fragen wäre eine Frage nach etwas, das schon beantwortet ist. */
     var mail = s.pdf_email || _mailAusSitzung() || '';
+    /* `user_name` traegt im Bestand oft die E-Mail-Adresse - die Anmeldung
+       hat sie dort hinterlassen. Als Vorbelegung fuer „Name" sieht das aus
+       wie ein gefuelltes Feld, ist aber keines: niemand heisst
+       info@firma.de. Dann lieber leer lassen, damit die Frage noch als
+       Frage erkennbar ist. */
+    var name = (s.user_name && s.user_name.indexOf('@') < 0) ? s.user_name : '';
     return ''
       + '<p class="dpo-vor">Diese Angaben stehen später im Kopf deiner '
       + '<b>Investment-PDFs und Bankunterlagen</b> — dort, wo sonst ein '
       + 'leeres Feld steht. Du kannst den Schritt überspringen und es '
       + 'später unter <b>Einstellungen → Profil</b> nachtragen.</p>'
       + '<div class="dpo-raster">'
-      +   _feld('dpo_name',    'Name',            s.user_name    || '', 'Vor- und Nachname')
+      +   _feld('dpo_name',    'Name',            name,              'Vor- und Nachname')
       +   _feld('dpo_firma',   'Firma (optional)',s.user_company || '', 'z. B. Muster Immobilien GmbH')
       +   _feld('dpo_strasse', 'Straße + Nr.',    s.pdf_address  || '', 'Musterstraße 12')
       +   _feld('dpo_plz',     'PLZ',             s.pdf_plz      || '', '32609')
