@@ -388,12 +388,23 @@
     },
     
     {
-      tab: 'header',
-      selector: '.hdr-pdf-btn, button[onclick*="exportPDF"]',
+      /* v1739 · HIER ZEIGTE DIE TOUR AUF EINEN KNOPF, DEN ES NICHT GIBT.
+         Gemessen in allen vier Ansichten (Standard, Aktenmappe, Kanzlei,
+         Tower): `.hdr-pdf-btn` und `button[onclick*="exportPDF"]` finden
+         NULL Elemente - als einziger der 37 Schritte. Der Knopf sass
+         einmal oben rechts im Kopf; heute steht er im Deal-Aktion-Tab in
+         der Liste „Ausgabe" (`.dab-doc-btn`, sechs Stueck).
+
+         > Ein Tour-Schritt, dessen Ziel es nicht mehr gibt, zeigt ins
+         > Leere und erzaehlt dabei weiter. Der Text beschrieb eine Stelle,
+         > an der der Nutzer nichts findet - und fuer einen, der die App
+         > zum ersten Mal sieht, ist das nicht „veraltet", sondern falsch. */
+      tab: 's8',
+      selector: '[onclick*="exportDoc(\'invest\')"], .dab-doc-btn.gold',
       icon: 'i-file-text',
       title: 'Investment-PDF',
-      body: 'Der **Investment-PDF-Button oben rechts im Header** (gespotlightet) erstellt das bank-fertige Investment-PDF mit allen aktuellen Daten.',
-      bodyMore: '**Wo finden:** Sidebar links unter "Aktionen" -> "Business-Case-PDF". Oder direkt im Deal-Aktion-Tab.\n\n**Wie generieren:** Ein Klick. DealPilot baut das PDF mit allen aktuellen Daten und öffnet einen Download-Link. Dauer 5-30 Sekunden.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsübersicht\n• Cashflow-Tabelle über 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n• Werbungskosten-Anlage für Finanzamt\n\n**Tipp vor PDF-Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
+      body: 'Im Deal-Aktion-Tab unter **Ausgabe** steht das bank-fertige Investment-PDF (gespotlightet). Ein Klick fragt, welche **Fassung** du brauchst — Bankfassung, hell oder Obsidian.',
+      bodyMore: '**Wo finden:** Deal-Aktion-Tab, Abschnitt "Ausgabe", erste Zeile.\n\n**Wie generieren:** Ein Klick auf "PDF". DealPilot fragt nach der Fassung und baut das Dokument mit allen aktuellen Daten. Dauer 5-30 Sekunden.\n\n**Drei Fassungen:**\n• **Bankfassung** — weisses Papier, Kennzahlen als Tabelle. Für Bank, Finanzierung, Steuerberater.\n• **Hell** — volles Dokument, helles Deckblatt. Für Miteigentümer und Ausdruck.\n• **Obsidian** — volles Dokument, dunkles Deckblatt. Für den eigenen Gebrauch.\n\nÜber den Knopf **"Fassung"** daneben lässt sich die Wahl jederzeit ändern.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsübersicht\n• Cashflow-Tabelle über 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n\nDas Finanzamt-PDF und die Kaufpreisaufteilung stehen als **eigene Zeilen** darunter.\n\n**Tipp vor dem Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
       placement: 'auto'
     },
     

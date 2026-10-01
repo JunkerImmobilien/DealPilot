@@ -1284,8 +1284,33 @@
         console.log('[DpTour v427] Auto-Start unterdrueckt: dp_auth_flow gesetzt');
         return;
       } } catch (e) {}
-      // V247: Laengere Wartezeit damit Sidebar fertig rendert + Auth-Modal-Check
-      setTimeout(function() {
+      /* ══ v1739 · WARTEN AUF EINE BEDINGUNG STATT AUF DIE UHR ══
+         Marcel am 01.10.2026: „Das dauert sehr, sehr lange, bis der laedt."
+
+         Gemessen am geladenen Staging:
+
+           tour-engine.js fertig      2.445 ms
+           + setTimeout                3.000 ms   (_maybeAutoStart)
+           + setTimeout                2.500 ms   (dieser hier)
+           = Angebot erscheint      ~ 7.945 ms
+
+         Fuenfeinhalb Sekunden davon sind fest verdrahtete Wartezeit. Der
+         Grund dafuer steht im alten Kommentar: „damit Sidebar fertig
+         rendert". Das ist eine Bedingung, keine Dauer - und sie war auf
+         langsamen Geraeten zu kurz und auf schnellen siebenmal zu lang.
+
+         > Eine Zahl, die fuer das langsamste Geraet gewaehlt wurde, ist auf
+         > jedem anderen eine Wartezeit ohne Zweck. Wer auf etwas wartet,
+         > soll danach fragen, nicht die Zeit schaetzen.
+
+         Geprueft wird jetzt alle 120 ms, ob die Sidebar wirklich steht -
+         mit derselben Obergrenze wie vorher, damit nichts haengenbleibt,
+         wenn die Bedingung nie eintritt. */
+      (function wartenBisBereit(seit) {
+        seit = seit || Date.now();
+        var sidebarDa = !!document.querySelector('#sb-list .sb-card, #sb-list, #sidebar');
+        var abgelaufen = (Date.now() - seit) > 2500;
+        if (!sidebarDa && !abgelaufen) { setTimeout(function () { wartenBisBereit(seit); }, 120); return; }
         if (Tour.isComplete()) return;
         // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
         if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) {
@@ -1304,15 +1329,20 @@
            Begrenzung uebernehmen jetzt OFFER_COUNT und OFFER_LAST. */
         if (!_angebotFaellig()) return;
         _angebotZeigen();
-      }, 2500);
+      })();
     } catch(e) {
       console.warn('[DpTour V247] Auto-Start fehlgeschlagen:', e.message);
     }
   }
 
+  /* v1739 · auch hier wurde blind gewartet: 3000 ms, obwohl das Dokument
+     schon fertig war (dieser Zweig laeuft nur, wenn readyState NICHT mehr
+     'loading' ist). Ein kurzer Anlauf reicht, damit die uebrigen Module
+     ihre Knoepfe gesetzt haben; auf die Sidebar wartet die Pruefung oben
+     ohnehin selbst. */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _maybeAutoStart);
   } else {
-    setTimeout(_maybeAutoStart, 3000);
+    setTimeout(_maybeAutoStart, 400);
   }
 })();
