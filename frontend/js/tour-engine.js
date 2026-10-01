@@ -1328,6 +1328,11 @@
            „Spaeter" waehlt, soll sie spaeter noch bekommen koennen — die
            Begrenzung uebernehmen jetzt OFFER_COUNT und OFFER_LAST. */
         if (!_angebotFaellig()) return;
+        /* v1739 · Messmarke. Der Zeitpunkt, zu dem das Angebot erscheint,
+           laesst sich von aussen nicht zuverlaessig messen - die Latenz
+           eines Mess-Werkzeugs ist groesser als die Zeit, um die es geht.
+           Die Seite kennt ihn selbst, also schreibt sie ihn auf. */
+        try { window.__dpTourAngebotMs = Math.round(performance.now()); } catch (e) {}
         _angebotZeigen();
       })();
     } catch(e) {
