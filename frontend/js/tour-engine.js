@@ -1311,6 +1311,15 @@
         var sidebarDa = !!document.querySelector('#sb-list .sb-card, #sb-list, #sidebar');
         var abgelaufen = (Date.now() - seit) > 2500;
         if (!sidebarDa && !abgelaufen) { setTimeout(function () { wartenBisBereit(seit); }, 120); return; }
+        /* v1740 · Das Grund-Setup kommt VOR dem Rundgang. Solange es laeuft,
+           bietet sich die Tour nicht an - sie zeigt die Oberflaeche, und
+           welche das ist, entscheidet gerade der erste Schritt. Nach dem
+           Abschluss startet `onboarding.js` sie selbst. */
+        try {
+          if (window.__dpOnboardingAktiv) return;
+          if (window.DealPilotOnboarding && typeof DealPilotOnboarding.istFertig === 'function'
+              && !DealPilotOnboarding.istFertig()) return;
+        } catch (e) {}
         if (Tour.isComplete()) return;
         // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
         if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) {
