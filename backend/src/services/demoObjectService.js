@@ -73,7 +73,32 @@ async function fuerRundgangAnlegen(userId) {
     console.warn('[demoObjectService] Demo-JSON nicht verfuegbar, skip');
     return null;
   }
-  return _einfuegen(userId, demo);
+
+  /* Die Objektnummer aus dem Demo-JSON muss weg.
+     Gemessen am 01.10.2026: `duplicate key value violates unique constraint
+     "objects_user_seq_unique"` — der Datensatz bringt eine feste Nummer mit,
+     und wer sie schon hat, bekommt kein Demo-Objekt. Bei der Registrierung
+     faellt das nie auf, weil der Nutzer dort noch gar keine Objekte hat.
+
+     Deshalb hier nicht das eigene INSERT von oben, sondern objectService
+     .create(): das zieht bei leerer Nummer die naechste freie und faengt eine
+     Kollision ausserdem mit sechs Versuchen ab. Eine zweite Nummernvergabe
+     daneben waere genau die Doppelung, die wir uns sonst verbieten.
+
+     Die Kopie ist noetig, weil `_loadDemo()` seinen Datensatz zwischenspeichert
+     — ohne sie wuerde der zweite Aufruf auf einem veraenderten Original
+     arbeiten. */
+  const objectService = require('./objectService');
+  const data = Object.assign({}, demo.data || {});
+  delete data._obj_seq;
+
+  const row = await objectService.create(userId, {
+    data: data,
+    aiAnalysis: demo.ai_analysis || null,
+    photos: demo.photos || []
+  });
+  console.log('[demoObjectService] Demo-Objekt fuer den Rundgang angelegt:', userId, '→', row && row.seq_no);
+  return row;
 }
 
 async function _einfuegen(userId, demo) {
