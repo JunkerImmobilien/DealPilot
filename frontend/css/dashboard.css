@@ -833,7 +833,13 @@
    werden nie tokenisiert, aber hier gibt es auch keinen Status.
    ═══════════════════════════════════════════════════════════════════════ */
 #dashboard-main .dp-pp{
-  margin:22px 0 6px;border:1px solid #E7E4DC;border-radius:14px;background:#fff;
+  /* v1736b · derselbe Rahmen wie `.app`. Der Pilot haengt an der Buehne und
+     war dadurch 69 px breiter als jede andere Sektion - nach dem Angleichen
+     der uebrigen Bereiche faellt genau dieser Rest als Versatz auf, weil die
+     Kanten jetzt fast fluchten. Fast fluchtende Kanten sehen schlechter aus
+     als deutlich verschiedene. */
+  max-width:min(1680px, 94vw);margin:22px auto 6px;padding:0;
+  border:1px solid #E7E4DC;border-radius:14px;background:#fff;
   box-shadow:0 1px 2px rgba(40,35,20,.04);overflow:hidden;font-family:'Inter',sans-serif;
 }
 #dashboard-main .dp-pp-head{
