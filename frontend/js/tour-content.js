@@ -63,7 +63,7 @@
       subTargets: ['Quick Boarding'],
       subClimb: 150,
       title: 'Quick-Boarding Score',
-      body: '**Links oben im Panel**: der Live-Tacho. Während du Daten eingibst, wandert die Bewertung von rot zu grün.',
+      body: 'Im Quick-Boarding läuft ein **Live-Tacho** mit: während du Daten eingibst, wandert die Bewertung von rot zu grün. Je nach Ansicht steht er oben im Panel oder im dunklen Streifen daneben.',
       bodyMore: 'Was im Score-Bereich passiert:\n\n• **DealScore-Donut** zeigt Wert 0-100 in Echtzeit\n• **5 Hauptkennzahlen** werden live aktualisiert: Bruttomietrendite, Nettomietrendite, Cashflow, DSCR, LTV\n• **Ampel-Farben**: Grün ab DealScore 70, Gelb 40-69, Rot unter 40\n\nDie Berechnung passiert ohne dass du speichern musst — sofort sichtbar nach jeder Eingabe.\n\n**Tipp:** Spiel mit Kaufpreis, Miete und Eigenkapital — du siehst sofort wie sich die Bewertung ändert. Perfekt für Verhandlungs-Vorbereitung.',
       placement: 'auto'
     },
@@ -91,9 +91,9 @@
       subTargets: ['Als Objekt speichern', 'speichern'],
       icon: 'i-piggy-bank',
       title: 'Als Objekt speichern',
-      body: 'Vielversprechend? **Ein Klick** übernimmt alle Daten in die Vollanalyse mit 8 Tabs.',
+      body: 'Vielversprechend? Der Knopf **„Als Objekt speichern"** am Ende des Quick-Boardings übernimmt alle Daten in die Vollanalyse mit 8 Tabs — scroll im Panel nach unten, falls du ihn nicht siehst.',
       bodyMore: 'Was beim Speichern passiert:\n\n• Alle Quick-Check-Daten landen in **Tab Objekt + Investition + Miete**\n• Wohnfläche, Adresse, Baujahr werden vorbefüllt — kein doppeltes Tippen\n• Das Objekt erscheint dauerhaft in deiner **Sidebar links**\n• Du landest direkt in der Vollanalyse\n\nJetzt zeigen wir dir die 8 Tabs einzeln — das ist die eigentliche Bewertungs-Tiefe.',
-      placement: 'auto'
+      placement: 'center'   /* v1744 · der Knopf liegt am Ende eines scrollbaren Panels; ohne Treffer wurde der Schritt still uebersprungen */
     },
 
     // ═══ Phase 2b: PRE-FLIGHT-Karte (v865) ═════════════════════
@@ -286,22 +286,24 @@
     
     {
       tab: 's6',
-      selector: '#bc-cockpit, #s6',
+      selector: '#bc-cockpit',
+      subTargets: ['Cockpit'],   /* v1744 · #bc-cockpit ist im Tab 0x0; ohne Fallback auf #s6 bleibt der Spotlight weg statt den ganzen Tab zu umfassen */
       icon: 'i-gauge',
       title: 'Bewertungs-Cockpit',
       body: '**DSCR & LTV im 15-Jahres-Verlauf** — was die Bank zürst sieht.',
       bodyMore: '**DSCR (Schuldendienstdeckung):**\n• über 1,2 = solide\n• 1,0-1,2 = knapp\n• unter 1,0 = kritisch\n\n**LTV (Beleihungsauslauf):**\n• unter 85% = solide, beste Konditionen\n• 85-100% = erhöhter Zins\n• über 100% = Vollfinanzierung, schwierig\n\n**Wertpuffer:** Differenz Verkehrswert vs. Kaufpreis. Je grösser, desto mehr Sicherheit.\n\nDie Bank schaut sich zürst diese Zahlen an, bevor sie überhaupt das Objekt anschaut.',
-      placement: 'auto'
+      placement: 'center'   /* v1744 · ohne Ziel mittig statt den ganzen Tab anleuchten */
     },
     
     {
       tab: 's6',
-      selector: '#bc-stress, #s6',
+      selector: '#bc-stress',
+      subTargets: ['Stress'],   /* v1744 · #bc-stress ist ein voellig leerer div (0 Kinder) - gerahmt wird die sichtbare Stress-Kennzahl */
       icon: 'i-cpu',
       title: 'Stress-Test',
       body: 'Was passiert wenn **Zinsen steigen** oder **Miete ausfällt**? Der Stress-Test simuliert es.',
       bodyMore: 'Standard-Szenarien:\n\n• **Anschlusszins +2 Prozentpunkte** — was kostet das Darlehen in 10 Jahren?\n• **Mietausfall 3 Monate** — bleibt der Cashflow stabil?\n• **Leerstand 10 %** dauerhaft — kippt die Finanzierung?\n• **Marktwertverlust 15 %** — wie steht der LTV dann?\n\nFür jedes Szenario zeigt DealPilot den **neuen DSCR** und ob die Finanzierung weiter trägt. **Banken lieben diese Analyse** — sie zeigt dass du das Risiko verstanden hast. Print direkt mit ins Business-Case-PDF.',
-      placement: 'auto'
+      placement: 'center'   /* v1744 · ohne Ziel mittig statt den ganzen Tab anleuchten */
     },
 
     // ═══ Phase 5: Deal-Aktion ═════════════════════════════════════════
