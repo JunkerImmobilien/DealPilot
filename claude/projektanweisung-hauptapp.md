@@ -26998,3 +26998,108 @@ gemessen, Umlaute (124) und Satzanzahl danach gegengelesen.
 - **23 Sätze ohne Quellenvermerk, 11 ohne Lizenz** — nachzutragen, wenn diese
   Sätze ohnehin angefasst werden.
 - **Bremen und Saarland fehlen vollständig**, Bayern hat zwei Sätze.
+
+---
+
+## v1752–v1754 · Quellen, Schleswig-Holstein und der Sprechlauf in der Analyse
+
+### v1752 · Die fehlenden Quellen nachgeschlagen (`c8c4bb8`)
+
+Marcel: „Du hast sie ja irgendwo her, kannst du nicht diese Quelle dann dran
+schreiben?" Er hatte recht — die Belege trugen Fundstellen („S. 50",
+„Kap. 5.1.4, S. 43"), nur der Link fehlte.
+
+**Nicht geraten, sondern belegt:** die Nachbarsätze folgen dem Muster
+`boris.nrw.de/…/GMB_{nr}_2026.pdf`, und die Nummern sind alphabetisch —
+Bielefeld 10200, Bonn 10400, Bottrop 10500, Düsseldorf 10700, Essen 10900.
+Daraus die Hypothese, dann **jede URL geladen und die erste Seite gelesen**:
+
+```
+GMB_10300_2026.pdf   8,7 MB   „Stadt Bochum"
+GMB_10600_2026.pdf   3,2 MB   „Stadt Dortmund"
+GMB_10800_2026.pdf   2,7 MB   „Stadt Duisburg"
+```
+
+> Nötig war das, weil ALLE geratenen Nummern ein gültiges PDF lieferten.
+> HTTP 200 und `application/pdf` beweisen, dass eine Datei existiert — nicht
+> welche.
+
+**Die Lizenz steht im Dokument und wurde dort gelesen:** Bochum
+„Namensnennung 2.0" (`dl-de/by-2-0`, Vermerk Pflicht), Dortmund und Duisburg
+„Zero 2.0". Hätte Bochum die Lizenz des Nachbarn bekommen, stünde dort eine
+falsche Rechtsfolge.
+
+### v1752c · Die Herkunft war gar nicht nachtragbar (`d773611`)
+
+Thüringens Lizenz stand nach dem Einspielen **immer noch nicht** in der
+Tabelle. Das `ON CONFLICT DO UPDATE` in `schreibeModelle()` listete
+`quellenvermerk` und `lizenz` nicht auf.
+
+> Eine Korrektur, die nicht ankommt, sieht genauso aus wie eine, die nie
+> gemacht wurde — nur dass man sie für erledigt hält.
+
+Mit `COALESCE` behoben: ein neuer Wert schreibt, ein fehlender löscht nicht.
+**Ergebnis in der Tabelle: ohne Lizenz 11 → 5, ohne Link 0, 2.513 Zeilen.**
+
+### v1753 · Schleswig-Holstein — die Verfügbarkeit, nicht die Werte (`a9fc37c`)
+
+Der Immobilienmarktbericht SH 2024 (115 Seiten, 187.734 Zeichen) veröffentlicht
+bewusst keine Zahlen. Wörtlich S. 92: „…wird auf eine Zusammenstellung in
+diesem Bericht verzichtet … muss bei den regionalen Gutachterausschüssen
+erfragt werden."
+
+Was er hat, ist Tabelle 44 — je Kreis, ob Liegenschaftszins und Sachwertfaktor
+vorliegen. Genau die Auskunft, die die Doktrin verlangt:
+
+```
+15 Kreise / kreisfreie Städte
+  13 mit Sachwertfaktor
+  12 mit Liegenschaftszins (mindestens eine Objektart)
+   2 ohne jede Angabe: Nordfriesland, Segeberg
+```
+
+Zwei Dinge stehen offengelegt im Datensatz statt verschleiert: der Bericht
+nennt **keine Lizenz** (über alle 115 Seiten geprüft), und von 15 AGS sind nur
+3 aus vorhandenen Registersätzen belegt — die übrigen tragen
+`ags_belegt:false`.
+
+### v1753b/c · Die Vorschauen zeigen jetzt die Aufteilung (`23d1652`, `83768b3`)
+
+Marcel: „Die Bilder der einzelnen Designs sind nichtssagend." Messbar:
+Aktenmappe und Kanzlei unterschieden sich um **genau eine Zahl** —
+`right:5px` gegen `right:14px`.
+
+Und der eigentliche Grund: die Vorschau war **322 × 38 px**, ein Verhältnis
+von 8:1. In einem so flachen Band ist jede Aufteilung unkenntlich, egal wie
+genau sie gezeichnet ist. Jetzt 84 px und vier erkennbare Grundrisse.
+
+### v1754 · Der Sprechlauf in der Pilot-Analyse (`e1d79d2`)
+
+**Erst gemessen, dann gebaut.** Vorhanden war bereits:
+
+```
+window.FIELDS                221 Felder, 213 im DOM, 192 Eingaben
+VoiceImport._konfliktZeigen  „das Feld ist schon gefüllt"
+VoiceImport._gleicherWert    erkennt, wenn sich nichts ändert
+VoiceImport._kontingent      Kosten und Restguthaben
+buildFullCatalog()           liest aus window.FIELDS
+```
+
+> Damit sind V3, V5 und V7 im Kern da — V7 sogar strukturell. Gefehlt hat
+> nur der EINSTIEG an den Piloten, nicht die Maschine dahinter. Ein zweiter
+> Sprechweg daneben liefe auseinander, sobald einer gepflegt wird.
+
+Nachgemessen: Knopf 1234 × 40 @y292, unter „Pilot-Analyse starten" (@y244),
+Objekt geladen. Er sitzt **neben** dem Start-Knopf, nicht darin — beide kosten
+Kerosin, und zwei Kosten hinter einem Knopf wären wieder der Würfel aus v1731.
+
+### Rest
+
+- **Der Portfolio-Pilot hat noch keinen Sprechweg** — dort ist kein Objekt
+  geladen, das braucht zuerst die Objektzuordnung per Sprache (V2).
+- **Der Märkische Kreis** bleibt ohne Quelle (Kreise tragen andere
+  BORIS-Nummern), **München und Sachsen-Anhalt** ohne Lizenzangabe — ihre
+  Dokumente nennen keine.
+- **Der 38-Schritte-Durchlauf im Tower hängt** bei Schritt 2 (621 s ohne
+  Fortschritt). Die Einzelmessung von Schritt 4 war dagegen sauber — es ist
+  der Läufer, nicht die Tour.

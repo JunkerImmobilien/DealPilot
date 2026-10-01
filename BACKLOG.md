@@ -126,7 +126,7 @@ der Recherche an. **Das Werkzeug dafür steht jetzt:**
 (Seiten, Zeichen, leere Seiten) — ein Latin-1-Prüfer scheitert an
 komprimierten CID-Strömen und liefert Buchstabensalat.
 
-### E6 · Nächste Kandidaten
+### E6 · Nächste Kandidaten — SH erledigt (v1753)
 
 Nach Aufwand sortiert — überall erst die Quelle prüfen, dann bauen:
 
@@ -171,7 +171,7 @@ anderes, oder der Eindruck entstand durch den „Fertig"-Weg. **Erst am
 laufenden Fenster nachstellen, dann bauen** — sonst wird ein Schutz gegen
 etwas gebaut, das es nicht gibt, und die echte Ursache bleibt.
 
-### U3 · Die Vorschaubilder der vier Ansichten sagen nichts
+### U3 · Die Vorschaubilder der vier Ansichten sagen nichts — ERLEDIGT (v1753b/c)
 
 Marcel: „Die Bilder der einzelnen Designs sind nichtssagend."
 
@@ -180,7 +180,7 @@ Streifen und eine graue Fläche. Das unterscheidet Aktenmappe und Kanzlei
 faktisch nicht. **Optikfrage → Demo-first**, Entwürfe nach
 `design/Vorschläge/`.
 
-### U4 · LTV wählbar ODER frei eingebbar
+### U4 · LTV wählbar ODER frei eingebbar — ERLEDIGT (v1750)
 
 Marcel: „Den LTV sollte man auswählen können oder auch frei eingeben, zum
 Beispiel 100 % Finanzierung gibt es ja auch."
@@ -188,7 +188,7 @@ Beispiel 100 % Finanzierung gibt es ja auch."
 Heute kommt der LTV **ausschließlich** aus der Investortyp-Karte (80/90/95),
 ist nirgends sichtbar und nicht änderbar.
 
-### U5 · Checkbox „automatisch ziehen", sonst selbst angeben
+### U5 · Checkbox „automatisch ziehen", sonst selbst angeben — ERLEDIGT (v1750, Marktzins)
 
 Marcel: „Man sollte eine Checkbox haben, ob er sich den automatisch ziehen
 soll, und wenn nicht, dass man einen angeben kann."
@@ -199,7 +199,7 @@ Marktzins (dafür gibt es `indicative-zins.js`). **Die Lösung deckt beides ab:*
 je ein Feld mit Häkchen „automatisch" — LTV aus der EK-Quote, Zins aus der
 Abfrage. Ohne Häkchen wird das Feld frei.
 
-### U6 · Erklärungen an jedes Feld
+### U6 · Erklärungen an jedes Feld — ERLEDIGT (v1750, Finanzierung)
 
 Marcel: „Es müssen Erklärungen, so Infofelder dran. Was ist zum Beispiel DSCR
 und wo setzen wir Standardwerte und erklären beim Tooltip warum."
@@ -208,7 +208,7 @@ Zwei Dinge, nicht eines: **was die Größe ist** und **warum genau dieser
 Vorschlagswert steht**. Der zweite Teil ist der wichtigere — er macht aus
 einer Zahl, die vom Himmel fällt, eine nachvollziehbare Empfehlung.
 
-### U7 · Steuer erklären, und ein Gehaltsrechner dazu
+### U7 · Steuer erklären — ERLEDIGT (v1750); Gehaltsrechner von Marcel gestrichen
 
 Marcel: „Bei der Steuer, was macht der genau? Können wir auch Gehaltsrechner
 anbieten, irgendwas wie als Unterpunkt, falls man sein zvE nicht kennt? Dann
@@ -259,7 +259,7 @@ Ein großes Paket, Marcels Worte zuerst:
 > Objekt hat oder etwas hinzufügen möchte, dann kann ich das Objekt sagen und
 > die Änderungen, und er füllt die Felder aus oder ergänzt sie."
 
-### V1 · Diktat in beiden Piloten
+### V1 · Diktat in beiden Piloten — HALB (v1754: Pilot-Analyse steht, Cockpit offen)
 
 Pilot-Analyse (Einzelobjekt) und Portfolio-Pilot bekommen einen Sprechweg.
 **Vorher messen, was es schon gibt:** `voice-import.js` trägt den Sprechlauf
@@ -271,6 +271,28 @@ sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
 
 „Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
 Sprache, dann Felder füllen.
+
+### V3 · V5 · V7 — GEMESSEN: im Kern schon vorhanden
+
+Am 01.10.2026 am laufenden System gemessen, BEVOR gebaut wurde:
+
+```
+window.FIELDS                 221 Felder · 213 im DOM · 192 Eingaben
+VoiceImport._konfliktZeigen   „das Feld ist schon gefüllt"      → V3
+VoiceImport._gleicherWert     erkennt, wenn sich nichts ändert  → V3
+VoiceImport._ueberspringen    der Weg daran vorbei              → V3
+VoiceImport._kontingent       Kosten und Restguthaben           → V5
+buildFullCatalog()            liest aus window.FIELDS           → V7
+```
+
+> **V7 ist strukturell erfüllt**, nicht nur zufällig: der Feldkatalog
+> entsteht aus `window.FIELDS`, nicht aus einer gepflegten Liste im
+> Sprachmodul. Ein neues Feld steht damit von allein darin — genau das,
+> was Marcel verlangt hat („jedes Feld, was wir noch anlegen").
+
+**Zu tun bleibt die Abnahme**, nicht der Bau: je ein echter Sprechlauf
+gegen ein belegtes Feld (sagt er, was drinsteht?), gegen ein leeres, und
+einer mit Blick auf die Kostenansage.
 
 ### V3 · Belegte Felder nicht still überschreiben
 
