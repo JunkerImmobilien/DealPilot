@@ -455,15 +455,28 @@ window.DealPilotOnboarding = (function () {
   function s5() {
     return ''
       + '<p class="dpo-vor">Wonach soll DealPilot deine Objekte bewerten? '
-      + 'Das setzt die Schwellen für Score und Empfehlung — und lässt sich '
-      + 'jederzeit ändern.</p>'
+      + 'Das Profil gewichtet Rendite, Finanzierung, Risiko, Lage und Upside '
+      + 'im DealScore — und lässt sich jederzeit ändern.</p>'
+      /* v1776: Der Satz sagt jetzt, WAS das Profil tut und was es NICHT
+         tut. Vorher stand hier „setzt die Schwellen für Score und
+         Empfehlung" — und genau das stimmte zur Haelfte: es setzte auch
+         DSCR, LTV und Eigenkapital, die der Nutzer zwei Schritte vorher
+         selbst eingegeben hatte. */
+      + '<p class="dpo-vor dpo-vor-klein">Deine Finanzierungsgrenzen aus '
+      + 'Schritt <b>Finanzierung</b> bleiben, wie du sie eingestellt hast. '
+      + 'Die Zahlen auf den Kacheln zeigen nur, was für das jeweilige Profil '
+      + 'typisch ist. Ändern kannst du sie dort — oder später unter '
+      + '<b>Einstellungen › Investmentprofil</b>.</p>'
       + '<div class="dpo-kacheln dpo-kacheln-3">'
       + _profile().map(function (t) {
           return '<button type="button" class="dpo-kachel' + (_wahl.typ === t.id ? ' an' : '')
             + '" data-typ="' + t.id + '">'
             + '<span class="dpo-k-name">' + esc(t.name) + '</span>'
             + '<span class="dpo-k-unter">' + esc(t.unter) + '</span>'
-            + '<span class="dpo-k-werte">DSCR ab ' + String(t.dscr).replace('.', ',')
+            /* v1776: Diese Zahlen sind ORIENTIERUNG, kein Beschluss. Was
+               wirklich gilt, hat der Nutzer in Schritt 3 eingegeben; das
+               Profil ueberschreibt es nicht mehr. */
+            + '<span class="dpo-k-werte">typisch: DSCR ab ' + String(t.dscr).replace('.', ',')
             +   ' · LTV bis ' + t.ltv + ' % · EK ' + t.ek + ' %</span>'
             + '</button>';
         }).join('')
@@ -738,7 +751,38 @@ window.DealPilotOnboarding = (function () {
         } catch (e) {}
       }
       if (t) {
-        profilSchreiben({ min_dscr: t.dscr, max_ltv: t.ltv, ek_quote_default: t.ek, ai_risk: t.risk });
+        /* ═══ v1776 · DAS PROFIL ÜBERSCHRIEB, WAS DER NUTZER EINGEGEBEN HAT ═══
+
+           Marcel am 02.10.2026: „Also ich weiß gar nicht, wofür du diese
+           drei Finanzierungsgrenzen haben möchtest. … Ich würde dann die
+           bestehenden nehmen, die wir jetzt hier haben. Die halte ich für
+           sehr realistisch. … wichtig ist natürlich auch, dass man sich
+           die selber setzen kann."
+
+           Die Frage war berechtigt, und die Messung gibt ihm recht:
+
+             Schritt 3 „Finanzierung"   dpo_ek · dpo_ltv · dpo_dscr
+                                        -> ek_quote_default, max_ltv, min_dscr
+             Schritt 5 „Profil"         ueberschrieb GENAU DIESE DREI
+
+           Der Nutzer gibt sie zwei Schritte vorher selbst ein, mit je
+           einem Absatz Erklaerung daneben — und das Profil warf sie weg.
+
+           > Ein Fenster, das erst nach einem Wert fragt und ihn zwei
+           > Schritte spaeter selbst ueberschreibt, hat nicht gefragt,
+           > sondern sich erkundigt.
+
+           Dass die Werte WIRKEN, ist gemessen: `dealscore2-ui.js:286/291`
+           zeigt sie seit v1356 als eigene Ampel neben dem Score. Und
+           selbst setzen kann man sie an zwei Stellen — hier in Schritt 3
+           und spaeter unter `investment-profile.js` (`ip_min_dscr`,
+           `ip_max_ltv`, `ip_ek_quote_default`).
+
+           Geschrieben wird deshalb nur noch, was zum PROFIL gehoert: der
+           Risikotext. Die Zahlen auf der Kachel bleiben als Orientierung
+           stehen — sie sagen, was fuer dieses Profil typisch ist, und
+           beschliessen nichts. */
+        profilSchreiben({ ai_risk: t.risk });
         /* v1749 · DAS WAR DIE EIGENTLICHE LUECKE.
            Hier endete das Setup bisher: es schrieb die Finanzierungsgrenzen
            und war fertig. Der DealScore las davon nichts — sein Profil
@@ -853,6 +897,7 @@ window.DealPilotOnboarding = (function () {
       '.dpo-pkt.fertig{color:rgba(26,21,8,.75)}.dpo-pkt.fertig i{background:rgba(26,21,8,.6)}',
       '.dpo-leib{padding:22px 24px;overflow-y:auto;flex:1 1 auto;min-height:0}',
       '.dpo-leib h2{font-family:"Space Grotesk",Inter,sans-serif;font-size:21px;margin:0 0 10px;color:#1b1815}',
+      '.dpo-vor-klein{font-size:12.5px;opacity:.78;margin-top:-4px}',   /* v1776 */
       '.dpo-vor{font-size:13.5px;line-height:1.6;color:#55504a;margin:0 0 16px}',
       '.dpo-fuss{font-size:11.5px;line-height:1.55;color:#7A7370;margin:12px 0 0}',
 
