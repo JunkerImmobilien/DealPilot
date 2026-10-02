@@ -451,11 +451,15 @@ async function marktbericht_preis(ctx, args) {
     }
     return {
       objekt_id: id, stufen: alle,
-      hinweis: 'Der Nutzer hat KEINE Stufe genannt. Zeige ihm diese drei mit dem, '
-             + 'was sie unterscheidet, und FRAGE, welche er moechte. Waehle KEINE '
-             + 'selbst und rufe marktbericht_abrufen noch nicht auf. Dieser '
-             + 'Voranschlag verbraucht selbst kein Guthaben — das ist eine Angabe '
-             + 'fuer dich, nicht fuer den Nutzer.'
+      hinweis: 'Hier stehen alle drei Stufen mit Preis und Inhalt.\n'
+             + 'HAT DER NUTZER EINE GENANNT (z.B. "erweiterte", "vollstaendige '
+             + 'Wertermittlung", "Marktpreisindikation")? Dann nenne NUR DIESE, mit '
+             + 'ihrem so_sagen-Satz, und frage, ob du sie abrufen sollst.\n'
+             + 'HAT ER KEINE GENANNT? Dann zeige ihm alle drei mit dem, was sie '
+             + 'unterscheidet, und frage, welche er moechte. Waehle KEINE selbst.\n'
+             + 'In beiden Faellen: marktbericht_abrufen erst nach einem '
+             + 'ausdruecklichen Ja. Dieser Voranschlag verbraucht selbst kein '
+             + 'Guthaben — das ist eine Angabe fuer dich, nicht fuer den Nutzer.'
     };
   }
 
