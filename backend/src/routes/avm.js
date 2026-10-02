@@ -344,3 +344,77 @@ router.delete('/:objectId/history/:id', authenticate, async function (req, res, 
 });
 
 module.exports = router;
+
+/* ── v1795 · DERSELBE ABRUF, OHNE req/res ────────────────────────────────
+ *
+ * Der Telegram-Bot soll eine Marktpreisindikation holen koennen. Er hat
+ * aber kein `req`/`res` — und `runProvider` ist darauf gebaut.
+ *
+ * Statt den Ablauf nachzubauen (Pflichtfelder, Modus, Kosten, Bestand,
+ * Cache, Abzug — sechs Dinge, die beim zweiten Mal anders ausfallen),
+ * stehen hier zwei duenne Funktionen auf DENSELBEN Helfern.
+ *
+ *   > Ein zweiter Abrufweg ist ein zweiter Ort, an dem Guthaben abgezogen
+ *   > wird. Davon darf es genau einen geben.
+ *
+ * `voranschlag` kostet nichts und ist die Grundlage der Kostenansage im
+ * Chat. `abrufen` fuehrt aus — und wird vom Bot NUR nach einem
+ * ausdruecklichen "ja" gerufen. */
+module.exports.avmDienst = {
+  async voranschlag(userId, provider, inputs) {
+    if (!avmEnabled()) return { moeglich: false, grund: 'AVM-Abruf ist derzeit deaktiviert.' };
+    if (!providerEnabled(provider)) return { moeglich: false, grund: 'Dieser Anbieter ist noch nicht verfuegbar.' };
+    const fehlt = missingFields(provider, inputs || {});
+    const mode = await modeForUser(userId);
+    const status = await aiCreditsService.getStatus(userId);
+    const seite = AVM_SEITE[provider] || 'a';
+    return {
+      moeglich: true,
+      mode: mode,
+      kostenlos: mode === 'stub',
+      kosten: costFor(provider, inputs || {}),
+      fehlende_felder: fehlt,
+      bereit: fehlt.length === 0,
+      bestand: (status.avm && status.avm[seite]) || 0,
+      genug: mode === 'stub' ? true : (((status.avm && status.avm[seite]) || 0) >= 1)
+    };
+  },
+
+  async abrufen(userId, provider, inputs) {
+    const v = await this.voranschlag(userId, provider, inputs);
+    if (!v.moeglich) { const e = new Error(v.grund); e.fachlich = true; throw e; }
+    if (!v.bereit) {
+      const e = new Error('Es fehlen Pflichtangaben: ' + v.fehlende_felder.join(', '));
+      e.fachlich = true; throw e;
+    }
+    if (!v.genug) {
+      const e = new Error('Kein Marktwert-Abruf mehr frei.');
+      e.fachlich = true; e.needsCredits = true; throw e;
+    }
+
+    const cacheKey = v.mode === 'live' ? _cacheKey(userId, provider, inputs) : null;
+    if (cacheKey) {
+      const hit = _cacheGet(cacheKey);
+      if (hit) return { result: hit, mode: v.mode, kosten: 0, aus_cache: true };
+    }
+
+    let result;
+    if (v.mode === 'stub') {
+      result = provider === 'pricehubble' ? stub.pricehubbleStub(inputs) : stub.sprengnetterStub(inputs);
+    } else {
+      const client = provider === 'pricehubble' ? pricehubble : sprengnetter;
+      result = await client.valuate(inputs);
+      if (cacheKey) _cacheSet(cacheKey, result);
+    }
+
+    if (v.mode === 'live') {
+      try {
+        await aiCreditsService.consumeAvm(userId, AVM_SEITE[provider] || 'a',
+          'avm:' + provider, { mode: v.mode, quelle: 'telegram' });
+      } catch (e) {
+        console.warn('[avmDienst] Abzug fehlgeschlagen: ' + e.message);
+      }
+    }
+    return { result: result, mode: v.mode, kosten: v.kostenlos ? 0 : v.kosten, aus_cache: false };
+  }
+};

@@ -37,6 +37,7 @@ const fuehrung = require('../services/fuehrungService');
 const voiceExtract = require('../services/voiceExtractService');
 const config = require('../config');
 const { copilotKontingent } = require('./ai');
+const { avmDienst } = require('./avm');
 
 const TG = 'https://api.telegram.org/bot';
 const PROVIDER = 'telegram';
@@ -50,8 +51,12 @@ const HILFE =
   + '• *Übersicht* — /objekte zeigt deine Objekte\n\n'
   + '• *Neues Objekt anlegen* — /neu führt dich Schritt für Schritt durch. '
   + 'Du kannst auch mehrere Angaben in einem Satz schicken, ich sortiere sie zu.\n\n'
+  + '• *Felder ändern* — "setz die Zimmerzahl bei der Musterstr. 12 auf 5". '
+  + 'Steht da schon etwas, frage ich vorher.\n'
+  + '• *Marktpreisindikation* — /marktpreis. Ich nenne die Kosten, bevor '
+  + 'etwas abgerufen wird.\n\n'
   + '*Befehle*\n'
-  + '/neu · /objekte · /portfolio · /abbrechen · /hilfe · /stop';
+  + '/neu · /objekte · /portfolio · /marktpreis · /abbrechen · /hilfe · /stop';
 
 /* Portfolio-Fragen erkennt man am Wortfeld, nicht an einer Absicht —
    ein Modell dafuer zu fragen waere ein Aufruf fuer eine Weiche. */
@@ -108,6 +113,105 @@ async function sendenLang(token, chatId, text) {
     await senden(token, chatId, stueck);
     rest = rest.slice(stueck.length).replace(/^\n+/, '');
   }
+}
+
+/* ── Marktpreisindikation ────────────────────────────────────────────────
+ *
+ * Zwei Schritte, immer in dieser Reihenfolge: ansagen, dann abrufen. Der
+ * Voranschlag kostet nichts und nennt Modus, Preis, Bestand und fehlende
+ * Pflichtangaben.
+ */
+async function marktpreisAnbieten(token, chatId, userId, text) {
+  const liste = await dialog.objekteListe(userId, 60);
+  const t = dialog.objektRaten(text, liste);
+  if (t.art === 'mehrdeutig') {
+    await senden(token, chatId, 'Für welches Objekt?\n\n'
+      + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n'));
+    return;
+  }
+  let objekt = null;
+  if (t.art === 'eindeutig') objekt = await dialog.objektKontext(userId, t.objekt.id);
+  else if (liste.length === 1) objekt = await dialog.objektKontext(userId, liste[0].id);
+  if (!objekt) {
+    await senden(token, chatId,
+      'Für welches Objekt? Nenn mir die Adresse — /objekte zeigt die Liste.');
+    return;
+  }
+
+  const d = objekt.daten || {};
+  const inputs = {
+    street: d.str || '', houseNumber: d.hnr || '', postCode: d.plz || '',
+    city: d.ort || '', livingArea: d.wfl || '', buildingYear: d.baujahr || '',
+    propertyType: d.objart || '', rooms: d.zimmer || ''
+  };
+
+  let v;
+  try {
+    v = await avmDienst.voranschlag(userId, 'sprengnetter', inputs);
+  } catch (e) {
+    await senden(token, chatId, 'Der Voranschlag ging nicht: ' + (e.message || e));
+    return;
+  }
+
+  if (!v.moeglich) { await senden(token, chatId, v.grund); return; }
+
+  if (!v.bereit) {
+    /* Die Doktrin: wo kein Wert vorliegt, bekommt der Kunde den Weg
+       dorthin — hier also, WAS genau fehlt. */
+    await senden(token, chatId,
+      'Für eine Indikation fehlen mir noch Pflichtangaben:\n'
+      + v.fehlende_felder.map((f) => '• ' + f).join('\n')
+      + '\n\nSag sie mir einfach, dann hole ich sie ab.');
+    return;
+  }
+
+  if (!v.genug) {
+    await senden(token, chatId,
+      'Dein Guthaben für Marktwert-Abrufe ist aufgebraucht. In DealPilot '
+      + 'kannst du nachkaufen.');
+    return;
+  }
+
+  await zustandSetzen(chatId, userId, {
+    modus: 'marktpreis_bestaetigen',
+    entwurf: { __inputs: inputs },
+    objekt_id: objekt.objekt_id
+  });
+
+  await senden(token, chatId,
+    '*Marktpreisindikation* für ' + [d.str, d.hnr].filter(Boolean).join(' ')
+    + ', ' + [d.plz, d.ort].filter(Boolean).join(' ') + '\n\n'
+    + (v.kostenlos
+        ? '_Testbetrieb — dieser Abruf kostet nichts._'
+        : 'Das kostet *einen Abruf* aus deinem Guthaben (noch ' + v.bestand + ' übrig).')
+    + '\n\nSoll ich? (ja / nein)');
+}
+
+async function marktpreisAbrufen(token, chatId, userId, objektId, inputs) {
+  await zustandLoeschen(chatId, userId);
+  await senden(token, chatId, 'Ich frage an …');
+  let r;
+  try {
+    r = await avmDienst.abrufen(userId, 'sprengnetter', inputs);
+  } catch (e) {
+    await senden(token, chatId, (e.fachlich ? '' : 'Da ging etwas schief: ') + (e.message || e));
+    return;
+  }
+
+  const w = r.result || {};
+  const z = (x) => (x == null ? null : Number(x).toLocaleString('de-DE'));
+  const wert = w.value || w.marktwert || w.estimate || (w.valuation && w.valuation.value);
+  const von = w.valueRange && (w.valueRange.lower || w.valueRange.min);
+  const bis = w.valueRange && (w.valueRange.upper || w.valueRange.max);
+
+  await senden(token, chatId,
+    '*Indikation*\n\n'
+    + (wert ? 'Wert: *' + z(wert) + ' €*\n' : '')
+    + (von && bis ? 'Spanne: ' + z(von) + ' – ' + z(bis) + ' €\n' : '')
+    + (r.aus_cache ? '\n_aus dem Zwischenspeicher, kostenlos_' : '')
+    + (r.mode === 'stub' ? '\n_Testbetrieb — keine echten Marktdaten._' : '')
+    + '\n\n_Indikation eines unabhängigen Bewertungspartners, kein '
+    + 'Verkehrswert und kein Gutachten._');
 }
 
 /* ── Eine Aenderung anbieten, nie still ausfuehren ───────────────────────
@@ -344,6 +448,31 @@ async function beantworten(token, chatId, userId, text, msg) {
       + 'du kannst aber auch gleich mehrere Angaben in einem Satz schicken, '
       + 'ich sortiere sie zu.\n\n_/abbrechen beendet jederzeit._');
     await weiterFragen(token, chatId, userId, {});
+    return;
+  }
+
+  /* ── Marktpreisindikation: erst ansagen, dann abrufen ─────────────────
+   *
+   * Marcel: "man koennte daraus jetzt auch einfach eine
+   * Marktpreisindikation holen, wenn man die Sachen angibt."
+   *
+   * Der Abruf kostet Guthaben. Deshalb geht hier NIE etwas raus, bevor der
+   * Preis im Chat stand und jemand "ja" gesagt hat.
+   *
+   *   > Bei Geld gibt es kein "im Zweifel ausfuehren". Ein Abruf, den
+   *   > niemand bestaetigt hat, ist eine Abbuchung ohne Auftrag. */
+  if (z && z.modus === 'marktpreis_bestaetigen') {
+    if (/^(ja|hol|mach|ok|okay|j)\b/i.test(text.trim())) {
+      await marktpreisAbrufen(token, chatId, userId, z.objekt_id, (z.entwurf || {}).__inputs || {});
+      return;
+    }
+    await zustandLoeschen(chatId, userId);
+    await senden(token, chatId, 'Gut, ich hole nichts ab.');
+    return;
+  }
+
+  if (/^\/marktpreis/i.test(text) || /marktpreis|markt\s?wert|wertindikation|was ist (es|das objekt) wert/i.test(text)) {
+    await marktpreisAnbieten(token, chatId, userId, text);
     return;
   }
 
