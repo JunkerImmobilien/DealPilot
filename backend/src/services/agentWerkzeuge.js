@@ -153,6 +153,26 @@ async function felder_aendern(ctx, args) {
      Wohnflaeche auf 85" trifft `wfl` nur, wenn jemand den Namen kennt. */
   const text = String((args && args.beschreibung) || '').trim();
   if (text) {
+    /* ── v1807 · ZUERST DAS GENANNTE FELD, DANN DIE EXTRAKTION ─────────
+     *
+     * GEMESSEN: "setz den Zustand auf total marode" landete als
+     * `notizen: "total marode"` — die Extraktion ordnete den Satz einem
+     * FREITEXTFELD zu, nicht dem Auswahlfeld `ds2_zustand`. Das Werkzeug
+     * fragte daraufhin brav zurueck, aber zum falschen Feld; und der
+     * Agent meldete "Zustand wurde auf total marode gesetzt".
+     *
+     *   > Eine Aenderung am falschen Feld ist schlimmer als gar keine.
+     *   > Sie wird gemeldet, geglaubt — und steht dann an einer Stelle,
+     *   > an der sie nichts bewirkt.
+     *
+     * Deshalb wird zuerst geprueft, ob der Nutzer ein Feld BEIM NAMEN
+     * nennt. Ist es ein Auswahlfeld, wird die Angabe gegen seine Werte
+     * gehalten — und bei Unklarheit gefragt, mit den Moeglichkeiten. */
+    const genannt = _feldAusSatz(text);
+    if (genannt && felder[genannt.feld.id] == null) {
+      felder[genannt.feld.id] = genannt.wert;
+    }
+
     try {
       const o0 = await dialog.objektKontext(ctx.userId, id);
       const r = await voiceExtract.extractFromText(text, fuehrung.katalog(), {
@@ -160,6 +180,11 @@ async function felder_aendern(ctx, args) {
         kontext: (o0 && o0.daten) || {}
       });
       Object.entries((r && r.fields) || {}).forEach(([fid, w]) => {
+        /* Was die Extraktion in ein FREITEXTFELD gelegt hat, obwohl der
+           Nutzer ein anderes Feld genannt hat, wird verworfen — sonst
+           steht derselbe Satz zweimal im Datensatz. */
+        if (genannt && fid !== genannt.feld.id
+            && String(w).toLowerCase().indexOf(String(genannt.wert).toLowerCase()) >= 0) return;
         if (felder[fid] == null) felder[fid] = w;
       });
     } catch (e) { /* dann eben nur die ausdruecklichen Felder */ }
@@ -461,6 +486,52 @@ function _ohneIntern(d) {
 function _stufe(args) {
   const s = Number((args && args.stufe) || 1);
   return (s === 1 || s === 2 || s === 3) ? s : 1;
+}
+
+/* ── Welches Feld meint der Satz? ────────────────────────────────────────
+ *
+ * "setz den ZUSTAND auf total marode" -> ds2_zustand + "total marode"
+ * "die ZIMMERZAHL auf 5"              -> zimmer + "5"
+ *
+ * Gesucht wird ueber die Feld-Beschriftung, nicht ueber die interne Id —
+ * der Nutzer sagt "Zustand", nicht "ds2_zustand". Bei mehreren Treffern
+ * gewinnt der laengste, also der genaueste.
+ */
+/* Umlaute vereinheitlichen. GEMESSEN: "setz die Wohnflaeche auf 85" fand
+   das Feld "Wohnfläche (m²)" nicht — ae gegen ä. Wer diktiert oder schnell
+   tippt, schreibt beides.
+
+     > Ein Treffer, der an einem Umlaut scheitert, scheitert bei jedem
+     > zweiten Nutzer. */
+function _flach(s) {
+  return String(s || '').toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+}
+
+function _feldAusSatz(text) {
+  const t = _flach(text);
+  /* "auf X" / "von X auf Y" — der Wert steht hinter dem letzten "auf" */
+  const m = /\bauf\s+(.+?)\s*[.?!]?$/i.exec(text);
+  if (!m) return null;
+  const wert = m[1].trim();
+  if (!wert || wert.length > 60) return null;
+
+  let bester = null;
+  fuehrung.katalog().forEach((f) => {
+    const label = _flach(f.label)
+      .replace(/\s*\([^)]*\)\s*/g, ' ')
+      .replace(/\b(ds2|dp|v\d+)\b/g, ' ')
+      .replace(/[^a-z ]/g, ' ').trim();
+    if (label.length < 4) return;
+    /* Das Label kann mehrere Woerter haben ("Zustand der Wohnung") —
+       es genuegt, wenn das erste davon im Satz steht. */
+    const kern = label.split(/\s+/)[0];
+    if (kern.length < 5) return;
+    if (t.indexOf(kern) < 0) return;
+    if (!bester || kern.length > bester.kern.length) bester = { feld: f, kern };
+  });
+  if (!bester) return null;
+  return { feld: bester.feld, wert };
 }
 
 /* Ordnet eine Nutzerangabe einer Auswahl zu. Eindeutig heisst: genau ein
