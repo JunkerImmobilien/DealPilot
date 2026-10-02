@@ -166,6 +166,41 @@ export function machRepository(q) {
                quelle_parser = EXCLUDED.quelle_parser,
                quellenvermerk = COALESCE(EXCLUDED.quellenvermerk, mb.param_modell.quellenvermerk),
                lizenz = COALESCE(EXCLUDED.lizenz, mb.param_modell.lizenz),
+               /* v1790 - UND DREI WEITERE, DIE v1752c UEBERSAH.
+                  Derselbe Fehler, dieselbe Zeile, eine Version spaeter:
+                  ebene, gebiet_name und gaa_name wurden nur beim INSERT
+                  geschrieben und danach nie mehr.
+
+                  ACHTUNG, DIESER KOMMENTAR STEHT IN EINEM TEMPLATE-
+                  LITERAL: ein Backtick darin beendet den SQL-String.
+                  Deshalb hier keine - auch oben in v1752c keine.
+
+                  GEMESSEN am 02.10.2026, alle 15 Nutzspalten aller 2.655
+                  Saetze gegen die Dateien gehalten (39.825 Feldvergleiche):
+
+                    ebene         24 Zeilen veraltet  (lzs-nrw.json, AGS
+                                  05562012/14/24: Datei sagt "gaa",
+                                  Tabelle sagt weiter "gemeinde")
+                    gebiet_name    2 Zeilen veraltet  (dresden.json, die
+                                  beiden in v1787 umbenannten Saetze)
+                    gaa_name       0 - aber aus demselben Grund gefaehrdet
+
+                  Keine ZAHL war betroffen - die Spalte formel ist in allen
+                  2.655 Saetzen deckungsgleich. Betroffen ist die HERKUNFT:
+                  WertParameterService schreibt die ebene in den
+                  Modellvermerk und in den Text "Wert der Ebene ...".
+
+                  > Eine Herkunftsangabe, die nicht stimmt, behauptet eine
+                  > Herkunft. Das ist schlimmer als eine fehlende - die
+                  > fehlende sieht man.
+
+                  gebiet_name und gaa_name mit COALESCE, damit eine Datei
+                  ohne Namen keinen vorhandenen loescht; ebene ist Pflicht
+                  und wird hart gesetzt. quelle_url bleibt weiter draussen
+                  (Schluessel, siehe oben). */
+               ebene = EXCLUDED.ebene,
+               gebiet_name = COALESCE(EXCLUDED.gebiet_name, mb.param_modell.gebiet_name),
+               gaa_name = COALESCE(EXCLUDED.gaa_name, mb.param_modell.gaa_name),
                erfasst_am = now()`,
             [m.land_code, m.ags, m.ebene, m.gebiet_name || null, m.gaa_name || null,
              m.kennzahl, m.zweig || 'standard',
