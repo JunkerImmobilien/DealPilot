@@ -1062,15 +1062,68 @@ Standard (Heute) / Zweig A     36 Schritte · Tour beendet · 100 s
 jetzt nur noch einer. Die Tour erreicht dabei Schritte, die in keinem
 früheren Lauf vorkamen (z. B. „DealScore 0–100").
 
-##### Was noch offen ist
+##### Schritt 24 · nachgegangen, EIN Fund gelöst, einer offen (v1780–v1782b)
 
-- **Schritt 24 „Stress-Test"** (`#bc-stress`) hat weiterhin keinen Spot.
-  Einer von 36 — die Blase erscheint, markiert aber nichts.
+Marcel: „bitte schritt 24 nachgehen und lösen."
+
+**Der Weg dahin führte zu einem Fehler, der jeden Nutzer trifft.** Gemessen:
+
+```
+bc-equity     1 Kind, 702 px      gerendert
+bc-cockpit    1 Kind, 628 px      gerendert
+bc-waterfall  0 Kinder, 0 px      <- stuerzt ab
+bc-stress     0 Kinder, 0 px      <- wird nie erreicht
+
+BankCharts.renderWaterfall(host, State)
+  -> ReferenceError: tilgEffektivBrutto is not defined
+```
+
+`tilgEffektivBrutto` wird in zwei Fußzeilen gelesen und **nirgends gesetzt**.
+Weil `_renderAll()` die vier Charts nacheinander rendert, riss der Waterfall
+den Stress-Test mit. Von Hand aufgerufen rendert `renderStressMatrix`
+einwandfrei (883 px) — **er war nie kaputt, er kam nur nie an die Reihe.**
+
+> Vier Dinge in einer Reihe: der erste Fehler kostet alle, die danach
+> kommen. Und der Schaden sieht aus wie vier Fehler.
+
+**Vier Zeilen höher steht derselbe Fehler schon einmal** („V63.90 BUG-FIX:
+endRow war undefiniert"). Dieselbe Funktion, dieselbe Fehlerklasse.
+
+Behoben in `v1780`: die Größe ist `tilgEffektiv + eigenanteil` — so sagt es
+der Fußzeilentext selbst, und es ist gegengeprüft (`tilg_durch_einnahmen
+20.209 + tilg_eigenanteil 3.254 = 23.463 = tilgung_kum`). Dazu stehen die
+vier Aufrufe jetzt **einzeln**: ein Chart, der stirbt, zeigt seinen Fehler im
+eigenen Behälter.
+
+**Ergebnis: alle vier Charts rendern** (702 · 628 · 707 · 883 px).
+
+##### Schritt 24 selbst bleibt offen — nach vier Anläufen
+
+| Versuch | Ergebnis |
+|---|---|
+| `v1780` Charts entkoppelt | Schritt 24 hat **einen** Spot (vorher keinen) — er liegt außerhalb |
+| `v1781` auf Scroll-Ende warten | **Denkfehler, zurückgenommen:** „zweimal gleich" trifft auch die Ruhe VOR dem Start |
+| `v1781b` sofort statt smooth | unverändert — und gemessen, dass das Scrollen für sich wirkt (7.598 → 99) |
+| `v1782` Spot nachziehen | **schlechter, zurückgenommen:** 2 Fehler statt 1, Schritt 6 fiel mit raus |
+
+> Eine Korrektur, die einen Fehler behebt und einen neuen macht, ist keine
+> Korrektur.
+
+**Was dabei gemessen und festgehalten ist:** `_applySubHl` läuft 420 ms
+nach dem Setzen des Spots und scrollt **noch einmal** (für das Unterziel).
+Der Spot bleibt stehen, das Bild wandert. Das Nachziehen an dieser Stelle
+hat andere Schritte zerstört — die richtige Lösung sitzt vermutlich darin,
+das Unterziel schon beim ERSTEN Scrollen zu berücksichtigen, statt zweimal
+zu scrollen. Das ist ein eigener Umbau.
+
+**Stand: 35 von 36 Schritten sitzen.** Schritt 24 ist der einzige Fehler.
+
+##### Was sonst noch offen ist
+
 - **Kanzlei und Tower** sind nicht fertig gemessen: der Läufer blieb dort
-  bei Schritt 1 stehen, **obwohl derselbe Knopf von Hand sofort wirkt.**
-  Das ist ein Prüfer-, kein App-Problem — und es ist offen.
-- **Schritt 37 und 38** erreicht kein Zweig in der Standardansicht;
-  in Aktenmappe/B taucht 38 auf und sitzt auf dem falschen Element.
+  bei Schritt 1, **obwohl derselbe Knopf von Hand sofort wirkt.** Prüfer-,
+  kein App-Problem.
+- **Schritt 37 und 38** erreicht kein Zweig in der Standardansicht.
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
