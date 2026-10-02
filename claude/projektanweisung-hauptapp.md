@@ -28929,3 +28929,88 @@ teurere. Sie wird jetzt immer gesetzt.
 DealScore         17 von 17      Investor Deal Score 15 von 17
 Stufenkette       10 von 10
 ```
+
+---
+
+## Rollout-Journal 02.10.2026 (7) — v1800–v1807: der Copilot wird ein Agent
+
+**Was** · Das Backlog A-1 bis A-8 abgearbeitet und durchgetestet. Der Bot
+entscheidet nicht mehr über Musterlisten, sondern über einen Werkzeugkasten.
+
+**Commits** · `v1800` Befunde · `v1801` Werkzeugkasten · `v1802` Tilgung ·
+`v1803` Cent-Falle · `v1804` Anlage gesperrt · `v1805` Sammelaktionen ·
+`v1806` Freitext · `v1807` Feldauflösung
+
+### Die Grenze, die alles trägt
+
+> Die KI darf entscheiden, **was getan wird** — nie, **was wahr ist**.
+
+Kein Werkzeug rechnet. Sie lesen aus Datenbank und Spiegel oder rufen eine
+vorhandene Systemfunktion.
+
+### Was das Durchtesten gefunden hat
+
+Sieben Fehler, alle erst beim Messen sichtbar:
+
+| | Befund | Ursache |
+|---|---|---|
+| v1800 | „hat die Hälfte ignoriert" | `modus: 'antwort'` statt `'inserat'` |
+| v1800 | „ist hängen geblieben" | Anlege-Modus ohne Ausgang |
+| v1803 | **472.157,90 € statt 4.721.579 €** | Modell las Euro als Cent |
+| v1804 | **Der Bot konnte gar nichts anlegen** | `objects.name` ist NOT NULL |
+| v1806 | **5 von 7 Angaben fielen weg** | Modell kennt die Feldnamen nicht |
+| v1806b | „Eigentumswohnung" in den Notizen | Auswahlwert nicht zugeordnet |
+| v1807 | „Zustand auf *total marode* gesetzt" | Extraktion traf `notizen` |
+
+Der gefährlichste war **v1803**: er trat nur *gelegentlich* auf.
+
+> Ein Fehler, der jedes dritte Mal auftritt, besteht jeden Einzeltest.
+
+Deshalb gehen die Beträge jetzt **fertig formatiert** ans Modell. Eine
+Prompt-Regel allein genügt nicht — ein Modell hält sich *meistens* daran.
+
+Der teuerste war **v1804**: der eigene `INSERT` ging an `objectService`
+vorbei, der Name, Sequenznummer und Summenspalten setzt.
+
+> Wer an einer Tabelle vorbei einfügt, an der ein Dienst hängt, übernimmt
+> dessen ganze Arbeit — und merkt erst an der ersten Spalte, dass es
+> welche gab.
+
+### Geld: die Sperre sitzt außerhalb des Modells
+
+Ein kostenpflichtiger Abruf läuft nur, wenn **zwei** Dinge zusammenkommen:
+der Nutzer sagt gerade ja, **und** die Nachricht davor war eine
+Preisansage.
+
+> Ein „ja" allein ist keine Freigabe — es könnte die Antwort auf
+> irgendetwas sein. Und eine Preisansage allein auch nicht: sie ist die
+> Frage, nicht die Antwort.
+
+Bei Sammelaktionen nennt der Agent die **Gesamtzahl** der Abrufe.
+
+### Nachgemessen
+
+```
+Portfolio-Fragen (Marcels fünf)     5 von 5 über portfolio_lesen
+Zahlentreue, 3 Fragen x 4 Läufe    12 von 12 richtig
+Werkzeuge einzeln                  16 von 16 Proben
+Anlage: genannte Angaben             7 von 7 im Datensatz
+Gesamtlauf durch den Agenten         9 von 9 Proben
+```
+
+### Zwei Prüferfehler, ausdrücklich zurückgenommen
+
+1. „Auswahlwerte reisen nicht mit" — der Testfall hatte `objart` bereits
+   gefüllt. **Der Code war richtig.**
+2. „Vergleichsfrage ohne `portfolio_lesen`" — der Agent nahm einen
+   teureren Weg und lieferte das **richtige** Ergebnis. Falsch war der
+   Preis, nicht die Antwort.
+
+> Bevor ein Prüfer den Code beschuldigt, muss er sich selbst verdächtigen.
+
+### Rest
+
+- **A-9 (E-Mail-Abgleich)** bleibt blockiert: keine Mail-Anbindung.
+- **A-8 ausführliche Antwort** (Lage, Vergleichsdaten, Quellen) ist auf
+  die Preisansage und den Abruf beschränkt; der Berichtsinhalt wird noch
+  nicht aufbereitet.
