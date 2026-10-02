@@ -247,6 +247,17 @@
       }
     } catch (e) {}
 
+    /* v1769 · DIE MARKTBERICHTE DES GANZEN BESTANDS REISEN MIT (V6).
+       EIN Abruf fuer alle Objekte (/objects/history ohne ref), je Objekt
+       der juengste Bericht. Aus dem Zwischenspeicher. */
+    try {
+      if (window.DealPilotPilotBerichte
+          && typeof window.DealPilotPilotBerichte.standBestand === 'function') {
+        var _mbb = window.DealPilotPilotBerichte.standBestand();
+        if (_mbb) body.marktberichte = _mbb;
+      }
+    } catch (e) {}
+
     Auth.apiCall('/ai/copilot', { method: 'POST', body: body }).then(function (data) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);
       var reply = (data && data.reply) ? data.reply : 'Keine Antwort erhalten.';

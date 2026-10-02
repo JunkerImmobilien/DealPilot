@@ -306,6 +306,18 @@
       }
     } catch (e) {}
 
+    /* v1769 · DER MARKTBERICHT ZUM OBJEKT REIST MIT (Backlog V6).
+       Aus dem Zwischenspeicher, nicht frisch geholt - der Abruf laeuft
+       beim Objektwechsel, nicht vor jeder Frage. Ist nichts da, geht
+       nichts mit, und das Modell behauptet auch nichts. */
+    try {
+      if (window.DealPilotPilotBerichte
+          && typeof window.DealPilotPilotBerichte.standObjekt === 'function') {
+        var _mb = window.DealPilotPilotBerichte.standObjekt();
+        if (_mb) body.marktberichte = _mb;
+      }
+    } catch (e) {}
+
     Auth.apiCall('/ai/copilot', { method: 'POST', body: body }).then(function (data) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);
       var reply = (data && data.reply) ? data.reply : 'Keine Antwort erhalten.';

@@ -2178,6 +2178,53 @@ async function copilotChat(payload, opts) {
               + ' | ' + (a.rest == null ? 'unbekannt' : a.rest);
           }).join('\n')
         ].join('\n')
+      : '',
+
+    /* ═══ v1769 · DIE MARKTBERICHTE (Backlog V6) ══════════════════════
+       Marcel: „Wichtig ist auch, dass sich beide Piloten immer auch zum
+       Objekt bei der Pilot-Analyse oder dem ganzen Bestand beim
+       Portfolio-Piloten den Marktbericht oder die Berichte holen und
+       alles abgleichen."
+
+       Der Weg dorthin war seit v942 zu: `objects/history` machte
+       `parseInt()` auf eine UUID und antwortete mit HTTP 400. Migration
+       015 und `_uidAus()` haben ihn geoeffnet (v1769).
+
+       ABGLEICHEN HEISST BENENNEN, NICHT RECHNEN. Der Marktbericht und
+       die Objektkalkulation sind zwei Quellen zur selben Groesse. Eine
+       dritte, gemittelte Zahl waere eine Behauptung, die in keiner von
+       beiden steht.
+
+       > Zwei Zahlen zur selben Groesse sind kein Widerspruch, solange
+       > beide ihre Herkunft tragen. Eine dritte, gemittelte waere einer. */
+    (payload.marktberichte && typeof payload.marktberichte === 'object')
+      ? [
+          '',
+          'MARKTBERICHTE (verbindlich):',
+          istPortfolio
+            ? 'Unter "MARKTBERICHTE ZUM BESTAND" steht je Objekt der JUENGSTE '
+              + 'DealPilot-Marktbericht.'
+            : 'Unter "MARKTBERICHT ZUM OBJEKT" steht der juengste DealPilot-'
+              + 'Marktbericht zu diesem Objekt.',
+          '- Diese Marktwerte stammen aus dem BERICHT, nicht aus der Kalkulation.',
+          '  Weichen sie ab, nenne BEIDE Zahlen und sage, woher jede kommt.',
+          '- Rechne KEINE dritte Zahl aus und bilde kein Mittel. Eine gemittelte',
+          '  Zahl steht in keiner der beiden Quellen.',
+          istPortfolio
+            ? '- Bilde auch keine Summe ueber die Berichts-Marktwerte: die '
+              + 'Vermoegensbilanz ist die Summe, und sie rechnet anders.'
+            : '- "bericht_id" ist die Nummer des Berichts; nenne sie, wenn du dich '
+              + 'auf ihn beziehst.',
+          '- Fehlt ein Feld, ist es im Bericht nicht erfasst. Sage das, statt es zu',
+          '  ueberspringen - und erfinde es nicht aus der Kalkulation.',
+          '- Steht dort "abruf": "fehlgeschlagen", konnte ich die Berichte NICHT',
+          '  laden. Sage das ausdruecklich; es ist nicht dasselbe wie "es gibt keine".',
+          '- Die Einheit steht IM Feldnamen (_eur, _eur_qm, _prozent, _qm).',
+          '',
+          (istPortfolio ? 'MARKTBERICHTE ZUM BESTAND' : 'MARKTBERICHT ZUM OBJEKT')
+            + ' (JSON):',
+          JSON.stringify(payload.marktberichte, null, 1)
+        ].join('\n')
       : ''
   ].filter(Boolean).join('\n');
 
