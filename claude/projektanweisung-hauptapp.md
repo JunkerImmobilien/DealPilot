@@ -28403,3 +28403,106 @@ Treffer statt gar keiner.
   ob sie Spalten brauchen.
 - **Telegram-Bot** (T-B1): Marcels Anforderung steht jetzt vollständig im
   Backlog.
+
+---
+
+## Rollout-Journal 02.10.2026 (2) — v1791: die Telegram-Einrichtung, und eine Tür, die sich nie öffnete
+
+**Was** · Die halbe Telegram-Strecke, die ohne Bot-Token baubar ist: Tabelle,
+vier Endpunkte, Einstellungs-Panel. Dabei gefunden und behoben: Marcels
+API-Keys waren für ihn selbst gesperrt.
+
+**Commit** · `e1c0bb6` (v1791) · `337d9e7` (v1791b)
+
+### T-B1 ist entschieden — durch Marcels Satz, nicht durch eine Rückfrage
+
+> „der muss über **einstellungen vernünftig einzurichten** sein"
+
+Damit ist die Spalte gewählt: **ein DealPilot-Bot für alle, Verknüpfung per
+Einmal-Code.** Die Gegenvariante verlangt vom Kunden, bei @BotFather einen
+Bot anzulegen und einen Token zu kopieren — das ist für einen
+nicht-technischen Nutzer nicht „vernünftig einzurichten", und Marcel ist der
+Maßstab dafür. Whitelabel bekommt später einen Bot je Mandant; heute gibt es
+genau **ein** Partner-Abo, und einen zweiten Weg für niemanden zu bauen wäre
+Arbeit auf Verdacht.
+
+### Migration 076 — zwei Kennungen, zwei Spalten, zwei Typen
+
+| | |
+|---|---|
+| `user_id` | **UUID** — DealPilot-Konto |
+| `chat_id` | **BIGINT** — Telegram-Chat |
+
+> Eine Kennung, die irgendwo zur Zahl wird, ist an dieser Stelle verloren.
+
+Das ist keine Theorie: seit `v942` scheitern die nutzerbezogenen
+Marktbericht-Wege genau daran still, weil `parseInt()` auf eine UUID keine
+Fehlermeldung gibt, sondern die erste Ziffernfolge. Deshalb wandelt hier
+keine Zeile die eine in die andere — auch nicht nach außen: `chat_id` geht
+als **Zeichenkette** ins JSON, weil `JSON.parse` im Browser aus einem BIGINT
+eine Gleitkommazahl macht.
+
+Zwei Teil-Indizes tragen die Regeln: ein Chat gehört höchstens **einem**
+Konto, ein Konto hat höchstens **einen** offenen Code.
+
+### Das Panel verspricht nichts, was es noch nicht gibt
+
+Es gibt keinen Bot-Token. Solange der Server `bot_bereit: false` meldet,
+steht in den Einstellungen „Der Bot wird gerade eingerichtet" — und es gibt
+**keinen Knopf**, der einen Code erzeugt. `POST /code` antwortet mit 503.
+
+> Ein Einrichtungsweg, der am Ende ins Leere führt, ist schlimmer als einer,
+> der fehlt. Der fehlende kostet eine Frage, der leere eine Viertelstunde
+> und das Vertrauen.
+
+Dieselbe Lehre wie bei „3 Berater-Seats inklusive" — ein beworbenes
+Versprechen ohne Code, der es durchsetzt.
+
+**Nachgemessen auf Staging:** Migration 076 steht, `user_id uuid` /
+`chat_id bigint` getrennt, beide Teil-Indizes da. Panel 835 × 89 px im
+Konto-Reiter, **0 Knöpfe**. `GET /telegram/status` liefert
+`bot_bereit:false`, `POST /telegram/code` lehnt ab.
+
+### Die Tür, die sich nie öffnete — gefunden beim Hinsehen
+
+Im Abnahme-Screenshot stand eine Zeile über dem neuen Panel:
+
+```
+DEALPILOT API
+Fehler: API-Keys erfordern einen aktiven Pro-Plan
+```
+
+**Marcel hat Partner.** In der Datenbank gemessen:
+
+```
+free false · starter false · investor false · pro TRUE · partner TRUE
+```
+
+Die Daten sind richtig — der Code fragt sie nur nicht. `routes/apiKeys.js`
+prüfte den **Plan-Namen** (`!== 'pro'`) statt das Flag. Und das Frontend
+wusste es längst besser: `frontend/js/apikeys.js:9` trägt seit `v1081` den
+Kommentar „war `=== 'pro'`. Der Partner hat `api_access` in der DB, wurde
+hier aber trotzdem ausgesperrt" — und prüft seitdem die Planfamilie.
+**Der Server wurde nie nachgezogen.**
+
+> Eine Berechtigung an zwei Stellen mit zwei Maßstäben: der laxere lässt
+> herein, der strengere wirft hinaus. Der Nutzer sieht eine Tür, die sich
+> nicht öffnet, und keiner der beiden meldet einen Fehler.
+
+Jetzt über `requireFeature('api_access')`. Die Middleware gab es bereits —
+und `planLimits.js:14` nennt als **Beispiel** exakt diesen Anwendungsfall.
+Der richtige Weg stand als Gebrauchsanweisung in der Datei, die ihn anbietet.
+
+**Nachgemessen:** `GET /api-keys` liefert jetzt **3 Keys** statt 403. Die
+drei lagen die ganze Zeit da und waren für ihren Eigentümer unerreichbar.
+
+### Rest
+
+- **Der Bot-Token fehlt.** Den kann nur Marcel bei @BotFather holen; ohne
+  ihn gibt es keinen Webhook und keine Verknüpfung.
+- **Die drei Bauposten aus T-B6** stehen: Feldkatalog serverseitig,
+  Portfolio-Zahlen serverseitig (**nicht nachbauen**), Führungslogik
+  serverseitig.
+- `req.apiKey.scopes` wird gesetzt, aber an keiner gefundenen Stelle
+  ausgewertet — ein Key hat faktisch Vollzugriff. Für einen Bot gehört das
+  eingegrenzt.
