@@ -33,6 +33,9 @@ const router = express.Router();
 const { query } = require('../db/pool');
 const creds = require('../services/providerCredentialsService');
 const dialog = require('../services/telegramDialogService');
+const fuehrung = require('../services/fuehrungService');
+const voiceExtract = require('../services/voiceExtractService');
+const config = require('../config');
 const { copilotKontingent } = require('./ai');
 
 const TG = 'https://api.telegram.org/bot';
@@ -45,9 +48,10 @@ const HILFE =
   + '• *Portfolio* — "wie ist meine Vermögensbilanz?", '
   + '"wo stehe ich in zehn Jahren?", "wie viele Objekte habe ich?"\n'
   + '• *Übersicht* — /objekte zeigt deine Objekte\n\n'
+  + '• *Neues Objekt anlegen* — /neu führt dich Schritt für Schritt durch. '
+  + 'Du kannst auch mehrere Angaben in einem Satz schicken, ich sortiere sie zu.\n\n'
   + '*Befehle*\n'
-  + '/objekte · /portfolio · /hilfe · /stop\n\n'
-  + '_Neue Objekte anlegen und Felder ändern kommen als Nächstes._';
+  + '/neu · /objekte · /portfolio · /abbrechen · /hilfe · /stop';
 
 /* Portfolio-Fragen erkennt man am Wortfeld, nicht an einer Absicht —
    ein Modell dafuer zu fragen waere ein Aufruf fuer eine Weiche. */
@@ -87,6 +91,138 @@ async function sendenLang(token, chatId, text) {
   }
 }
 
+/* ── Der Gespraechszustand ───────────────────────────────────────────── */
+async function zustand(chatId, userId) {
+  const r = await query(
+    `SELECT modus, entwurf, offene_ids, letzte_frage, objekt_id
+       FROM telegram_dialog WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId]);
+  return r.rows[0] || null;
+}
+async function zustandSetzen(chatId, userId, z) {
+  await query(
+    `INSERT INTO telegram_dialog
+       (chat_id, bot_user_id, modus, entwurf, offene_ids, letzte_frage, objekt_id, aktualisiert)
+     VALUES ($1::bigint,$2,$3,$4::jsonb,$5,$6,$7,now())
+     ON CONFLICT (chat_id, bot_user_id) DO UPDATE SET
+       modus = EXCLUDED.modus, entwurf = EXCLUDED.entwurf,
+       offene_ids = EXCLUDED.offene_ids, letzte_frage = EXCLUDED.letzte_frage,
+       objekt_id = EXCLUDED.objekt_id, aktualisiert = now()`,
+    [String(chatId), userId, z.modus || null, JSON.stringify(z.entwurf || {}),
+     z.offene_ids || null, z.letzte_frage || null, z.objekt_id || null]);
+}
+async function zustandLoeschen(chatId, userId) {
+  await query(`DELETE FROM telegram_dialog WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId]);
+}
+
+function euro(n) { return Number(n).toLocaleString('de-DE'); }
+
+/* ── Eine Antwort aufnehmen ──────────────────────────────────────────────
+ *
+ * Der Text geht an `extractFromText` — DENSELBEN Dienst, den der Sprechlauf
+ * im Browser nutzt. Der Feldkatalog kommt aus den extrahierten
+ * Frontend-Konstanten, nicht aus einer Liste in dieser Datei.
+ */
+async function aufnehmen(token, chatId, userId, text, entwurf) {
+  let neu = {};
+  try {
+    const r = await voiceExtract.extractFromText(text, fuehrung.katalog(), {
+      apiKey: config.openai.apiKey,
+      modus: 'antwort',
+      kontext: entwurf
+    });
+    neu = (r && r.fields) || {};
+  } catch (e) {
+    await senden(token, chatId, 'Das konnte ich nicht zuordnen: ' + (e.message || e)
+      + '\n\nVersuch es nochmal — oder /abbrechen.');
+    return;
+  }
+
+  if (!Object.keys(neu).length) {
+    await senden(token, chatId,
+      'Daraus konnte ich kein Feld lesen. Sag es gern anders — oder '
+      + '/abbrechen, wenn du aufhören willst.');
+    return;
+  }
+
+  const zusammen = Object.assign({}, entwurf, neu);
+
+  /* ── DIE ADRESSE WIRD IMMER RUECKBESTAETIGT ───────────────────────────
+   *
+   * Marcel am 02.10.2026: "Die Adresse, da sollte er auf jeden Fall immer
+   * nach einer Bestaetigung fragen, weil das kann ja auch sein, dass sie
+   * durch die Sprachaufzeichnung manchmal nicht richtig uebermittelt wird."
+   *
+   * Dieselbe Regel gilt im Sprechlauf (`_rfAdresseBestaetigen`), und aus
+   * demselben Grund:
+   *
+   *   > An der Adresse haengt alles Weitere — Bodenrichtwert,
+   *   > Marktpreisindikation, Lage, Grunderwerbsteuer. Eine falsch
+   *   > verstandene Strasse macht aus vier richtigen Abrufen vier falsche,
+   *   > und keiner davon meldet einen Fehler: die Nachbarstadt hat auch
+   *   > Marktdaten.
+   *
+   * Gefragt wird genau EINMAL — wenn die Adresse frisch dazugekommen ist. */
+  const adresseNeu = ['str', 'hnr', 'plz', 'ort'].some((id) => neu[id] != null);
+  const adresseDa = zusammen.plz || zusammen.ort;
+  if (adresseNeu && adresseDa && !entwurf.__adr_ok) {
+    zusammen.__adr_ok = true;
+    await zustandSetzen(chatId, userId, { modus: 'adresse_bestaetigen', entwurf: zusammen });
+    await senden(token, chatId,
+      'Ich habe verstanden:\n\n*'
+      + [zusammen.str, zusammen.hnr].filter(Boolean).join(' ')
+      + (zusammen.str ? '\n' : '')
+      + [zusammen.plz, zusammen.ort].filter(Boolean).join(' ')
+      + '*\n\nStimmt das so? (ja / nein)');
+    return;
+  }
+
+  /* Kurz sagen, was angekommen ist — sonst weiss der Nutzer nie, ob der Bot
+     ihn verstanden hat. */
+  const erkannt = Object.keys(neu).filter((id) => id.indexOf('__') !== 0).map((id) => {
+    const f = fuehrung.feld(id);
+    return '• ' + (f && f.label ? f.label : id) + ': *' + neu[id] + '*';
+  });
+  if (erkannt.length) await senden(token, chatId, 'Notiert:\n' + erkannt.join('\n'));
+
+  await weiterFragen(token, chatId, userId, zusammen);
+}
+
+/* ── Die naechste Frage stellen ───────────────────────────────────────── */
+async function weiterFragen(token, chatId, userId, entwurf) {
+  const naechste = fuehrung.naechsteFrage(entwurf, { modus: 'anlegen' });
+  const fo = fuehrung.fortschritt(entwurf);
+
+  if (!naechste) {
+    /* Nichts mehr offen: anlegen. */
+    const r = await query(
+      `INSERT INTO objects (user_id, data) VALUES ($1, $2::jsonb) RETURNING id`,
+      [userId, JSON.stringify(entwurf)]);
+    await zustandLoeschen(chatId, userId);
+    await senden(token, chatId,
+      '✓ *Objekt angelegt.*\n\n'
+      + (entwurf.str ? entwurf.str + ' ' + (entwurf.hnr || '') + ', ' : '')
+      + (entwurf.plz || '') + ' ' + (entwurf.ort || '')
+      + '\n\nDu findest es ab sofort in DealPilot. Dort kannst du es '
+      + 'weiter ausfüllen und rechnen lassen.');
+    return r.rows[0].id;
+  }
+
+  await zustandSetzen(chatId, userId, {
+    modus: 'anlegen', entwurf: entwurf,
+    offene_ids: naechste.ids.filter((id) => !fuehrung.gefuellt(entwurf, id)),
+    letzte_frage: naechste.frage
+  });
+
+  const et = fuehrung.etappe(naechste.et);
+  await senden(token, chatId,
+    (et ? '_Etappe ' + et.nr + ' von 6 · ' + et.name + '_\n\n' : '')
+    + naechste.frage
+    + '\n\n_' + fo.fertig + ' von ' + fo.bloecke + ' erledigt · /abbrechen beendet_');
+  return null;
+}
+
 /* ── Die Auskunft ────────────────────────────────────────────────────────
  *
  * Drei Wege, und keiner davon rechnet: Objektliste aus `objects`, Portfolio
@@ -94,6 +230,47 @@ async function sendenLang(token, chatId, text) {
  * der Browser ruft.
  */
 async function beantworten(token, chatId, userId, text, msg) {
+  /* ── Laeuft gerade eine gefuehrte Anlage? ──────────────────────────── */
+  const z = await zustand(chatId, userId);
+
+  if (/^\/abbrechen/i.test(text)) {
+    if (z) { await zustandLoeschen(chatId, userId); await senden(token, chatId, 'Abgebrochen. Der Entwurf ist verworfen.'); }
+    else await senden(token, chatId, 'Es läuft gerade nichts, was ich abbrechen könnte.');
+    return;
+  }
+
+  if (/^\/neu/i.test(text)) {
+    await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
+    await senden(token, chatId,
+      '*Neues Objekt.* Ich frage dich Schritt für Schritt durch — '
+      + 'du kannst aber auch gleich mehrere Angaben in einem Satz schicken, '
+      + 'ich sortiere sie zu.\n\n_/abbrechen beendet jederzeit._');
+    await weiterFragen(token, chatId, userId, {});
+    return;
+  }
+
+  if (z && z.modus === 'adresse_bestaetigen') {
+    if (/^(ja|passt|stimmt|korrekt|richtig|j)\b/i.test(text.trim())) {
+      await weiterFragen(token, chatId, userId, z.entwurf);
+      return;
+    }
+    if (/^(nein|falsch|n)\b/i.test(text.trim())) {
+      const e = Object.assign({}, z.entwurf);
+      ['str', 'hnr', 'plz', 'ort'].forEach((id) => { delete e[id]; });
+      await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: e });
+      await senden(token, chatId, 'Gut — dann nochmal: Straße, Hausnummer, PLZ und Ort?');
+      return;
+    }
+    /* Keine klare Antwort: als Korrektur der Adresse lesen. */
+    await aufnehmen(token, chatId, userId, text, z.entwurf);
+    return;
+  }
+
+  if (z && z.modus === 'anlegen') {
+    await aufnehmen(token, chatId, userId, text, z.entwurf);
+    return;
+  }
+
   if (msg && (msg.voice || msg.audio)) {
     await senden(token, chatId,
       'Sprachnachrichten kann ich noch nicht auswerten — das kommt mit dem '
