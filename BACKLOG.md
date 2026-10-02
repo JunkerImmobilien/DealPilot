@@ -2296,10 +2296,49 @@ echten Whitelabel-Kunden gehören `pricing-modal.js` (53),
 Marcels Wunsch vom 08.09., **zurückgestellt**. Der Code liegt vollständig da,
 `OPENAI_VOICE_VERIFY=1` schaltet ihn an.
 
-### 7 · IRR/Break-Even ins Portfolio-Cockpit
+### 7 · IRR/Break-Even ins Portfolio-Cockpit — GEMESSEN, größer als gedacht
 
 **Teilweise erledigt** — sie stehen in den Kennzahlen-Kacheln (Reiter
 Bewertung); im Portfolio-Cockpit noch nicht.
+
+**Am 02.10.2026 gemessen, warum das kein Einzeiler ist:**
+
+**1 · Die Werte sind am Objekt gar nicht gespeichert.** Ein Objekt trägt
+sechs KPI-Felder:
+
+```
+_kpis_bmy · _kpis_bwk_y · _kpis_cf_ns · _kpis_cf_vs · _kpis_dscr · _kpis_ltv
+```
+
+`calc.js:2654` **berechnet** `irr`, `be_cf`, `be_kum` und `be_kum_ek` — sie
+landen aber nicht am Datensatz. `aggStats()` im Cockpit arbeitet mit genau
+diesen gespeicherten Feldern; es hat also gar keine Grundlage.
+
+**2 · Und ein Portfolio-IRR ist kein Mittelwert.** Er lässt sich nicht aus
+den Einzel-IRRs gewichten wie die Nettorendite, die `aggStats()` korrekt
+nach Kaufpreis gewichtet. Der interne Zinsfuß über mehrere Objekte braucht
+die **zusammengelegten Zahlungsströme** — Jahr für Jahr, über alle Objekte,
+inklusive Anfangsauszahlung und Exit.
+
+> Zwei Objekte mit je 8 % IRR ergeben zusammen nicht 8 %, wenn ihre
+> Zahlungen zu verschiedenen Zeiten fallen. Ein gewichtetes Mittel wäre
+> eine Zahl, die nirgends herkommt.
+
+Dasselbe gilt für den Break-Even: er ist das Jahr, in dem der KUMULIERTE
+Cashflow über alle Objekte positiv wird — nicht der Durchschnitt der
+einzelnen Break-Even-Jahre.
+
+**Was der Bau also braucht (drei Schritte, in dieser Reihenfolge):**
+
+| | |
+|---|---|
+| 1 | `irr`, `be_cf`, `be_kum`, `be_kum_ek` **und die Zahlungsreihe** am Objekt mitspeichern (`State._irrReihe` steht schon, nur für das aktive Objekt) |
+| 2 | Im Cockpit die Reihen **addieren**, nicht die Ergebnisse — Jahr für Jahr |
+| 3 | `window.IrrEngine.compute()` auf die Summenreihe. **Kein eigener Rechenweg** — die Engine ist die Quelle (CLAUDE.md: Rechenkerne nie duplizieren). |
+
+**Nicht gebaut**, weil ein gewichtetes Mittel schnell gegangen wäre und
+eine Zahl ergeben hätte, die fachlich falsch ist. Ein Portfolio-Cockpit,
+das einen erfundenen IRR zeigt, ist schlechter als eines ohne.
 
 ### 8 · Der Einzelkauf — welche Fassung?
 
