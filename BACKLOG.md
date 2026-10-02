@@ -36,6 +36,291 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → NEU und OBERSTE PRIORITÄT: Der Copilot wird ein Agent (02.10.2026)
+
+Marcel am 02.10.2026, nach dem ersten echten Gebrauch des Telegram-Bots.
+Zwei konkrete Befunde aus der Nutzung, und daraus eine Spezifikation, die
+weit über den Bot hinausgeht: **„Das Ziel ist ein handlungsfähiger,
+kontextbezogener Immobilien-Agent und nicht lediglich ein Chatfenster über
+der bestehenden Software."**
+
+Die vollständige Spezifikation steht unten ab A-1. Davor stehen die zwei
+Fehler, die er gemeldet hat — **gemessen, mit Ursache**, denn beide sind
+nicht „fehlende Features", sondern Folgen einer Bauart, die an ihre Grenze
+gekommen ist.
+
+---
+
+### Der Befund: warum die Musterweiche nicht mehr trägt
+
+Der Bot entscheidet heute über **Regex-Muster**, was eine Nachricht will
+(`telegramAbsichtService.js`). Das war für „liste" und „/neu" richtig. Für
+das, was Marcel jetzt will, ist es die falsche Bauart — und das zeigen
+seine beiden Befunde genau.
+
+#### Befund 1 · „ich sage Vermögensbilanz und dann listet er es einfach auf, aber einfache Fragen dazu kann er dann nicht beantworten"
+
+Nachgemessen am 02.10.2026 an Marcels eigenen Beispielfragen:
+
+| Satz | erkannt als | richtig wäre |
+|---|---|---|
+| „zeig mir die Vermögensbilanz" | `portfolio` | ✓ |
+| „wie hoch ist die Gesamttilgung von allen Objekten?" | **`frei`** | portfolio |
+| „was sind meine aktuellen Verbindlichkeiten bei allen Objekten?" | **`frei`** | portfolio |
+| „wie hoch ist der Gesamtwert meines **portfolios**?" | **`frei`** | portfolio |
+| „welche Objekte haben den höchsten Finanzierungsbedarf?" | **`liste`** | portfolio |
+
+Drei verschiedene Ursachen, und die dritte ist die eigentliche:
+
+1. **Das Plural-s.** `\b(portfolio)\b` trifft „portfolios" nicht — nach
+   dem „o" kommt ein „s", also keine Wortgrenze. Dieselbe Falle wie bei
+   „parkstr" in v1798, zum dritten Mal in zwei Tagen.
+2. **Die Muster streiten sich.** „welche Objekte …" steht im
+   Liste-Muster und gewinnt, obwohl die Frage aufs Portfolio zielt.
+3. **Nach einer Portfolio-Antwort bleibt der Kontext nicht.** Jede
+   Folgefrage wird von vorn eingeordnet. „und die Gesamttilgung?" hat
+   keine Chance, weil niemand sich merkt, dass eben über das Portfolio
+   geredet wurde.
+
+> Eine Musterliste kann man erweitern, bis sie Marcels fünf Beispiele
+> trifft. Beim sechsten Satz, den er sich ausdenkt, fällt sie wieder
+> durch. **Das Problem ist nicht die Liste, sondern dass es eine Liste
+> ist.**
+
+#### Befund 2 · „hat die Hälfte ignoriert … und dann ist er in diesem Schritt hängen geblieben"
+
+Zwei Ursachen, beide gemessen:
+
+4. **Der falsche Auslesemodus.** `anlegenStarten` und `aufnehmen` rufen
+   `extractFromText` mit `modus: 'antwort'`. Der ist für die Antwort auf
+   EINE Frage gebaut („Baujahr und Kaufpreis?" → „1962, 189000") und
+   deckelt bei 4.000 Zeichen. Für einen Fließtext mit zehn Angaben gibt
+   es `modus: 'inserat'` (40.000 Zeichen, eigener Prompt
+   `ZUSATZ_INSERAT`). Deshalb fiel die Hälfte heraus.
+5. **Der Anlege-Modus ist eine Falle ohne Ausgang.**
+   `telegramWebhook.js:725` fängt im Modus `anlegen` **jede** Nachricht ab
+   und schickt sie durch `aufnehmen`. Versteht `extractFromText` nichts,
+   kommt „Daraus konnte ich kein Feld lesen" — und bei der nächsten
+   Nachricht wieder. Man kommt weder weiter noch heraus, und eine
+   Zwischenfrage ist unmöglich.
+
+> Ein Zustand, aus dem nur ein Befehl herausführt, den der Nutzer nicht
+> kennt, ist kein Dialog, sondern ein Formular mit Sprechblasen — genau
+> das, was der Bot nicht sein sollte.
+
+---
+
+### Was daraus folgt: die KI entscheidet, das Backend liefert
+
+Marcels eigener Schluss, und er ist richtig: **„Ich glaube, das kann man
+gut machen, indem man den Text übermittelt und dann per KI auswerten lässt
+und das in Bezug auf die Datenbank und dem Gesamtobjekt."**
+
+Also: weg von der Weiche, hin zu einem Agenten mit **Werkzeugen**. Die
+Muster bleiben nur dort, wo sie nachweislich schneller und sicher sind
+(`/neu`, `/abbrechen`, `/stop`) — alles andere entscheidet das Modell.
+
+> Die KI ist die Steuerungsebene über der Anwendung. Datenbank und Backend
+> bleiben die verlässliche Quelle für Daten und Aktionen. **Die KI darf
+> entscheiden, was getan wird — nie, was wahr ist.**
+
+**Das ist die Grenze, die jede Zeile dieses Umbaus einhalten muss:** kein
+Wert, keine Kennzahl und kein Score wird vom Modell erfunden oder
+nachgerechnet. Das Modell wählt Werkzeuge; die Werkzeuge rechnen nicht,
+sondern lesen — und wo gerechnet werden muss, rechnet der vorhandene Kern.
+
+---
+
+### A-1 · Der Werkzeugkasten (Grundlage für alles Weitere)
+
+Ein Register von Werkzeugen, die das Modell aufrufen darf. Jedes Werkzeug
+hat einen Namen, eine Beschreibung, ein Eingabeschema und eine
+Berechtigungsstufe.
+
+| Werkzeug | tut | kostet |
+|---|---|---|
+| `objekte_liste` | Kurzliste mit Nummer, Adresse, Kaufpreis, Score | — |
+| `objekt_lesen` | voller Datensatz eines Objekts | — |
+| `objekt_suchen` | Adresse/Name/ID/Listennummer → Objekt | — |
+| `portfolio_lesen` | der Spiegel samt Stand | — |
+| `feld_katalog` | welche Felder es gibt, mit Auswahlwerten | — |
+| `objekt_anlegen` | legt an | — |
+| `felder_aendern` | ändert, nach Bestätigung | — |
+| `marktbericht` | Stufe 1–3 | **Guthaben** |
+| `score_lesen` | DealScore / Investor Deal Score | — |
+
+**Drei Stufen, und die mittlere ist die wichtige:**
+
+- **lesen** — läuft sofort
+- **schreiben** — läuft nach einer Bestätigung im Chat
+- **kostet** — läuft nach einer Bestätigung, in der der Preis stand
+
+> Ein Agent, der ohne Rückfrage Geld ausgibt, ist keine Erleichterung,
+> sondern ein Risiko. Die Bestätigungsregel aus v1795 gilt unverändert
+> weiter und wird vom Werkzeugregister erzwungen, nicht von der Höflichkeit
+> des Modells.
+
+### A-2 · Portfolio-Kontext an die KI (Marcels Punkt 1)
+
+Der Spiegel (`portfolio_spiegel`) geht bei **jeder** Portfolio-nahen Frage
+mit, nicht nur bei den fünf Formulierungen, die ein Muster kennt. Dazu der
+Gesprächsverlauf, damit „und die Gesamttilgung?" eine Folgefrage sein darf.
+
+**Abgeleitete Kennzahlen:** Marcel will „Gesamttilgung", „aktuelle
+Verbindlichkeiten", „höchster Finanzierungsbedarf". Zwei Wege, und sie
+schließen sich nicht aus:
+
+1. **Rechnen lassen, wo es eindeutig ist.** Die Summe der Restschulden
+   steht im Spiegel je Objekt — das Modell darf sie addieren.
+2. **Als Feld führen, wo es wiederkehrt.** „Aktuelle Verbindlichkeiten"
+   gehört in `portfolioPayload()` als benanntes Feld, nicht in jede
+   Antwort neu addiert.
+
+> Punkt 2 schlägt Punkt 1, wo immer es geht. Eine Zahl, die das Modell
+> jedes Mal neu addiert, ist jedes Mal eine neue Gelegenheit, sie anders zu
+> addieren. **Was benannt ist, wird gelesen; was gelesen wird, stimmt.**
+
+**ZU PRÜFEN, BEVOR GEBAUT WIRD:** welche der gewünschten Größen im Spiegel
+schon stehen (`restschuld_heute_eur` ist da) und welche fehlen
+(Tilgungsanteil je Jahr, Finanzierungsbedarf). Fehlende kommen in
+`dashboard.js portfolioPayload()` — **dort**, wo gerechnet wird, nicht im
+Bot.
+
+### A-3 · Objekte flexibel ansprechen (Punkt 2)
+
+Name · ID · Adresse · **Nummer aus der letzten Liste** · Gesprächskontext.
+Die Nummer funktioniert seit v1798; ID und Name fehlen noch. Die
+Zahlenfalle bleibt: „Musterstr. **12**" ist eine Hausnummer, „Nummer
+**12**" ein Listeneintrag.
+
+### A-4 · Auswahlfelder (Punkt 3)
+
+Der Feldkatalog führt die `options` bereits mit (189 Felder, 53 davon
+Auswahlfelder — `frontend-konstanten.json`). Fehlt: das Modell soll
+umgangssprachliche Angaben zuordnen („renovierungsbedürftig" ≈
+„renovierungsbedarf") und **nur bei echter Mehrdeutigkeit** fragen:
+
+> „Den Wert konnte ich dem Feld ‚Zustand' nicht eindeutig zuordnen. Zur
+> Auswahl stehen: … Welchen möchtest du?"
+
+**Nie einen ungültigen Wert schreiben.** Was nicht in den `options` steht,
+wird nicht gespeichert — das ist die Regel aus „stille Verwerfung ist der
+teure Fehler", nur andersherum: hier wird nicht still verworfen, sondern
+nachgefragt.
+
+### A-5 · Aktionen über den Agenten (Punkt 4)
+
+„Leg ein neues Objekt in der Musterstraße 12 an", „Ändere bei Objekt 17 die
+Zimmerzahl auf 5", **„Erstelle für ALLE Objekte eine
+Marktpreisindikation."**
+
+Der letzte Satz ist der heikle:
+
+> Eine Aktion über ALLE Objekte ist siebzehn Aktionen. Kostet sie Geld,
+> sind es siebzehn Abbuchungen — und die Bestätigung muss die
+> GESAMTSUMME nennen, nicht den Einzelpreis. Wer „ja" sagt, muss wissen,
+> wozu.
+
+Dazu: Teilerfolge sind der Normalfall (drei Objekte haben keine
+Wohnfläche). Der Agent meldet am Ende, was lief und was nicht — und warum.
+
+### A-6 · Intelligente Objektanlage (Punkt 5)
+
+Behebt Befund 2. Drei Dinge:
+
+- `modus: 'inserat'` für Fließtext (behebt Ursache 4)
+- Der Anlege-Modus bekommt einen **Ausgang**: Fragen zwischendurch sind
+  erlaubt, der Entwurf bleibt stehen (behebt Ursache 5)
+- Genannte Angaben werden **nie erneut gefragt** — schon gebaut
+  (`fuehrungService.luecken`), scheiterte nur am falschen Modus
+
+> „Der Prozess muss zustandsbehaftet sein. Wird die Anlage unterbrochen
+> oder werden zwischendurch andere Fragen gestellt, darf der bisherige
+> Fortschritt nicht verloren gehen." (Marcel, Punkt 5)
+
+### A-7 · Geführte Prozesse per Sprache (Punkt 6)
+
+Das KI-gestützte dynamische Formular. Baut auf A-6 auf; die
+Führungsdaten (8 Etappen, 18 Frageblöcke) liegen seit v1794 serverseitig
+vor.
+
+### A-8 · Marktberichte und Wertermittlung (Punkt 7)
+
+Vier Stufen statt zwei: Marktbericht · Marktpreisindikation · erweiterte ·
+vollständige Wertermittlung (`wev`). Geht aus der Anfrage nicht hervor,
+welche gemeint ist, **fragt der Agent** — und nennt dabei die Preise.
+
+Das Ergebnis ist mehr als eine Zahl: Marktwert bzw. Korridor, verwendete
+Objektdaten, Lage und Mikrolage, Marktdaten, Vergleichsdaten,
+wertbeeinflussende Eigenschaften, **Annahmen und Rechengrundlagen**,
+Risiken, **Quellen**.
+
+> Der letzte Punkt ist keine Zutat. Die Wertermittlungsdoktrin verlangt,
+> dass jede Zahl ihre Herkunft trägt — ein Agent, der einen Wert nennt und
+> die Quelle weglässt, verstößt gegen sie, egal wie gut er formuliert.
+
+Rückfragen zur Analyse danach ohne erneute Erklärung.
+
+### A-9 · E-Mail- und Aufgabenabgleich (Punkt 8)
+
+**Eigenständiges Thema, hängt an den anderen nicht.** Der Agent prüft
+**nicht nur ungelesene** Mails, sondern gleicht auch gelesene und
+abgelegte gegen offene Aufgaben ab, ordnet sie Objekt und Vorgang zu,
+legt sie ab, erledigt die Aufgabe und schreibt einen nachvollziehbaren
+Vermerk:
+
+> „Erledigt am 02.10.2026 aufgrund der E-Mail von … , Betreff: … , vom …"
+
+**BLOCKIERT:** Es gibt heute keine Mail-Anbindung. Das ist ein eigener
+Bau (Zugang, Ablagestruktur, Aufgabenmodell) und gehört **nicht** in
+dieselbe Runde wie A-1 bis A-8. Siehe auch G1 (Google Drive).
+
+### A-10 · Die Verarbeitungskette (Punkt 9)
+
+```
+Eingabe → Absicht → Entitäten → Kontext laden → vorhandene Daten
+→ fehlende bestimmen → Berechnung/Aktion planen → ausführen
+→ Ergebnis prüfen → verständlich antworten
+```
+
+**Kein ungefilterter Datenbank-Dump an die KI.** Erst bestimmen, was
+gebraucht wird, dann gezielt laden. Das ist nicht nur eine Kostenfrage:
+
+> Je mehr Unwichtiges im Kontext steht, desto öfter antwortet ein Modell
+> auf das Unwichtige. Ein Dump macht den Agenten nicht klüger, sondern
+> beliebiger.
+
+---
+
+### Reihenfolge des Baus
+
+1. **Die zwei Befunde beheben** — Ursachen 4 und 5 (falscher Auslesemodus,
+   Anlege-Falle). Klein, sofort spürbar, unabhängig vom Rest.
+2. **A-1 Werkzeugkasten** — ohne ihn ist alles andere Spekulation.
+3. **A-2 Portfolio-Kontext** samt der fehlenden Kennzahlen in
+   `portfolioPayload()`.
+4. **A-3 / A-4** Identifikation und Auswahlfelder.
+5. **A-6 / A-7** Anlage und geführte Prozesse.
+6. **A-5** Aktionen, zuletzt die Sammelaktionen mit Gesamtpreis.
+7. **A-8** Berichtsstufen und die ausführliche Antwort.
+8. **A-9** eigenes Thema, eigener Zeitpunkt.
+
+**Getestet wird am Ende durchgehend** — Marcel: „teste es danach auch
+durch." Die Prüfstrecke läuft gegen das echte Konto mit seinen 17
+Objekten, mit Gegentests für jede Zahlenfalle.
+
+### Was dieser Umbau NICHT ändern darf
+
+- **Rechenkerne werden nicht dupliziert.** Der Spiegel bleibt der Weg zu
+  Portfolio-Zahlen, die Scores werden gelesen.
+- **Geld nur nach Bestätigung mit Preis.** Bei Sammelaktionen mit
+  Gesamtsumme.
+- **Die Adresse wird rückbestätigt.**
+- **Ein belegtes Feld wird nie still überschrieben.**
+- **Jede Zahl trägt ihre Herkunft und ihren Stand.**
+
+---
+
 ## → NEU: Telegram-Bot als zweiter Zugang zur App (01.10.2026)
 
 Marcel am 01.10.2026: „Ich würde im ersten Step gerne schauen, ob wir
