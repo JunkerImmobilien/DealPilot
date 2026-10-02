@@ -593,9 +593,13 @@ const WERKZEUGE = [
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
 
   { name: 'portfolio_lesen', stufe: 'lesen', fn: portfolio_lesen,
-    beschreibung: 'Die Portfolio-Zahlen: Vermoegensbilanz, Projektion, alle Objekte mit '
-      + 'Kennzahlen. IMMER aufrufen bei Fragen zum Gesamtbestand, zu Summen, '
-      + 'Verbindlichkeiten, Tilgung, Rendite ueber alles oder zur Zukunft. '
+    beschreibung: 'Die Portfolio-Zahlen in EINEM Aufruf: Vermoegensbilanz, Projektion '
+      + 'UND alle Objekte einzeln mit Kaufpreis, Darlehen, Restschuld, Tilgung, Zins, '
+      + 'Miete, Cashflow, DSCR, LTV, Rendite und beiden Scores. '
+      + 'IMMER aufrufen bei Fragen zum Gesamtbestand, zu Summen, Verbindlichkeiten, '
+      + 'Tilgung, Rendite ueber alles, zur Zukunft — UND bei Vergleichen ueber mehrere '
+      + 'Objekte ("welche haben den hoechsten/niedrigsten ..."). '
+      + 'Dafuer NICHT jedes Objekt einzeln lesen: hier steht alles schon drin. '
       + 'Rechne Summen NUR aus diesen Zahlen, nie aus eigener Annahme.',
     parameter: { type: 'object', properties: {}, additionalProperties: false } },
 
