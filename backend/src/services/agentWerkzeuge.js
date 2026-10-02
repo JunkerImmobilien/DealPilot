@@ -423,6 +423,42 @@ async function anlage_luecken(ctx, args) {
 async function marktbericht_preis(ctx, args) {
   const id = await _findeObjekt(ctx, args);
   if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden.' };
+
+  /* ── v1811b · OHNE STUFE GIBT ES ALLE DREI ───────────────────────────
+   *
+   * Der Hinweis "frag nach der Stufe" half nicht: das Modell gab einfach
+   * `stufe: 1` mit und meinte, damit sei gefragt. Es konnte ja eine
+   * waehlen.
+   *
+   *   > Ein Hinweis, der eine Wahl verbietet, die das Werkzeug anbietet,
+   *   > verliert gegen das Werkzeug. Wer will, dass gefragt wird, darf
+   *   > nicht waehlen lassen.
+   *
+   * Ohne ausdrueckliche Stufe bekommt das Modell jetzt ALLE DREI mit
+   * Preis und Inhalt — und keine Moeglichkeit, eine davon fuer den Nutzer
+   * zu bestimmen. */
+  if (!(args && args.stufe)) {
+    const alle = [];
+    for (const s of [1, 2, 3]) {
+      const v = await markt.voranschlag(ctx.userId, id, s);
+      if (!v.moeglich) continue;
+      alle.push({
+        stufe: s, name: v.name, was_drin_ist: v.was_drin_ist,
+        verbraucht_einen_abruf: v.verbraucht_einen_abruf,
+        guthaben_abrufe_uebrig: v.bestand,
+        so_sagen: v.so_sagen
+      });
+    }
+    return {
+      objekt_id: id, stufen: alle,
+      hinweis: 'Der Nutzer hat KEINE Stufe genannt. Zeige ihm diese drei mit dem, '
+             + 'was sie unterscheidet, und FRAGE, welche er moechte. Waehle KEINE '
+             + 'selbst und rufe marktbericht_abrufen noch nicht auf. Dieser '
+             + 'Voranschlag verbraucht selbst kein Guthaben — das ist eine Angabe '
+             + 'fuer dich, nicht fuer den Nutzer.'
+    };
+  }
+
   const stufe = _stufe(args);
   const v = await markt.voranschlag(ctx.userId, id, stufe);
   /* Derselbe Grund wie bei marktbericht_preis_alle: `bestand` allein ist
