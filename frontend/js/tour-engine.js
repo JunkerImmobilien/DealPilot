@@ -1494,17 +1494,30 @@
           if (fr.top < 70 || fr.bottom > vh - 70) first.scrollIntoView({ behavior: 'auto', block: 'center' });
         } catch (e) {}
       }
-      /* v1782: Der Spot wird NACHGEZOGEN. Ohne das zeigt er nach dem
-         Sub-Scrollen auf eine Stelle, die weggewandert ist. Gezogen wird
-         auf das UNTERZIEL, wenn eines gefunden wurde — das ist ohnehin
-         das, was der Schritt meint; der Container ist nur sein Behaelter. */
-      try {
-        var _ziel = first || rootIgnored;
-        if (_ziel && state && state.spotlight) {
-          _positionSpotlight(_ziel);
-          if (step && step.placement) _positionBubble(_ziel, step.placement);
-        }
-      } catch (e) {}
+      /* ═══ v1782b · DAS NACHZIEHEN IST ZURUECKGENOMMEN ═══════════════
+
+         Hier stand ab v1782 ein `_positionSpotlight(first)`, das den Spot
+         nach dem Sub-Scrollen auf das Unterziel ziehen sollte. GEMESSEN
+         wurde es schlechter, nicht besser:
+
+           vor v1782   34 ok · 1 Spot ausserhalb  (nur Schritt 24)
+           mit v1782   34 ok · 2 Spot ausserhalb  (24 UND 6)
+
+         Schritt 6 ("Als Objekt speichern") hatte vorher gesessen und
+         landete danach bei y 2.039 — das Nachziehen hat ihn aus dem Bild
+         geschoben.
+
+         > Eine Korrektur, die einen Fehler behebt und einen neuen macht,
+         > ist keine Korrektur. Zurueck auf den Stand, der gemessen
+         > besser war.
+
+         Was BLEIBT, weil es fuer sich richtig ist: `behavior: 'auto'`
+         oben statt `smooth`. Ein Scrollen, das beendet ist, wenn die
+         naechste Zeile laeuft, hilft an jeder Stelle — es war nur nicht
+         die Ursache von Schritt 24.
+
+         Schritt 24 bleibt damit offen: ein Fehler von 36, und zwar der
+         einzige. Er steht im Backlog unter T1. */
     } catch (e) {}
   }
 
