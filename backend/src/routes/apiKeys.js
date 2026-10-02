@@ -14,15 +14,32 @@ function requireJwt(req, res, next) {
   if (req.apiKey) return res.status(403).json({ error: 'Key-Verwaltung nur nach Login moeglich' });
   next();
 }
-async function requirePro(req, res, next) {
-  try {
-    const plan = await subscriptionService.getEffectivePlan(req.user.id);
-    if (((plan && plan.plan_id) || '').toLowerCase() !== 'pro') {
-      return res.status(403).json({ error: 'API-Keys erfordern einen aktiven Pro-Plan', plan_id: plan && plan.plan_id });
-    }
-    next();
-  } catch (e) { next(e); }
-}
+/* v1791 · HIER STAND EINE PRUEFUNG AUF DEN PLAN-NAMEN: `!== 'pro'`.
+   Der Partner wurde damit ausgesperrt, obwohl er `api_access` hat —
+   gemessen am 02.10.2026 in der Staging-Datenbank:
+
+     free false · starter false · investor false · pro TRUE · partner TRUE
+
+   Die Oberflaeche wusste es laengst besser. `frontend/js/apikeys.js:9`
+   traegt seit v1081 den Kommentar "war === 'pro'. Der Partner hat
+   api_access in der DB, wurde hier aber trotzdem ausgesperrt" — und
+   prueft seitdem die Planfamilie. DER SERVER WURDE NIE NACHGEZOGEN.
+
+   Folge, an Marcels eigenem Konto sichtbar: das Panel erscheint (der
+   Client laesst ihn durch) und jeder Aufruf dahinter scheitert mit 403.
+   In den Einstellungen stand "Fehler: API-Keys erfordern einen aktiven
+   Pro-Plan" — bei einem Partner-Abo.
+
+   > Eine Berechtigung an zwei Stellen mit zwei Massstaeben: der laxere
+   > laesst herein, der strengere wirft hinaus. Der Nutzer sieht eine Tuer,
+   > die sich nicht oeffnet, und keiner der beiden meldet einen Fehler.
+
+   Jetzt ueber `requireFeature('api_access')` — die Middleware gab es
+   bereits, und `planLimits.js:14` nennt als BEISPIEL exakt diesen
+   Anwendungsfall. Wer kuenftig einen Plan anlegt, setzt ein Flag und
+   muss keine Namensliste im Code suchen. */
+const { requireFeature } = require('../middleware/planLimits');
+const requirePro = requireFeature('api_access');
 
 router.get('/', requireJwt, requirePro, async (req, res, next) => {
   try { res.json({ keys: await apiKeyService.listForUser(req.user.id) }); }
