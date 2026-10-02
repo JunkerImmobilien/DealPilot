@@ -418,7 +418,7 @@ async function marktbericht_preis_alle(ctx, args) {
   let kostenpflichtig = 0, bereit = 0;
   for (const o of liste) {
     const v = await markt.voranschlag(ctx.userId, o.id, stufe);
-    const k = v.moeglich && v.kostet;
+    const k = v.moeglich && v.verbraucht_einen_abruf;
     if (k) kostenpflichtig++;
     /* Pflichtangaben prueft der Bericht selbst; hier nur die groben. */
     const d = (await dialog.objektKontext(ctx.userId, o.id)).daten || {};

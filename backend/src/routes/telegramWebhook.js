@@ -476,7 +476,7 @@ async function marktpreisAnbieten(token, chatId, userId, text, bezugObjektId) {
   await senden(token, chatId,
     '*' + v.name + '* für ' + [d.str, d.hnr].filter(Boolean).join(' ')
     + ', ' + [d.plz, d.ort].filter(Boolean).join(' ') + '\n\n'
-    + (v.kostet
+    + (v.verbraucht_einen_abruf
         ? 'Das kostet *eine ' + v.name + '*'
           + (v.bestand != null ? ' (noch ' + v.bestand + ' in deinem Kontingent)' : '') + '.'
           + (v.schon_bezahlt ? '\n_Die Stufe darunter ist schon bezahlt — es wird nur die Differenz fällig._' : '')

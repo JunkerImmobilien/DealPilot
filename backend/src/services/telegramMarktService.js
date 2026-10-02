@@ -108,13 +108,35 @@ async function voranschlag(userId, objektId, stufe) {
     bestand = a ? a.rest : null;
   } catch (e) { /* ohne Bestandsangabe geht es auch, nur weniger genau */ }
 
+  /* ── v1808b · "kostet" WAR ZWEIDEUTIG ────────────────────────────────
+   *
+   * GEMESSEN: der Voranschlag gab `kostet: true` zurueck, und das Modell
+   * schrieb daraufhin "kostet *nichts*" bzw. "kostet **0 EUR**". Es las
+   * `guthaben_abrufe_uebrig: 36` daneben und schloss, es sei im
+   * Kontingent enthalten und damit gratis.
+   *
+   *   > Bei Geld ist eine zweideutige Formulierung kein Schoenheitsfehler.
+   *   > Wer "kostet nichts" liest und ja sagt, hat nicht zugestimmt — er
+   *   > hat etwas anderes zugestimmt.
+   *
+   * Deshalb derselbe Weg wie bei den Betraegen: ein FERTIGER SATZ geht
+   * mit. Was fertig dasteht, wird abgeschrieben statt ausgelegt. */
+  const kostet = kosten.anzahl > 0;
+  const satz = kostet
+    ? ('Das verbraucht einen Abruf vom Typ "' + STUFEN[s].name + '" aus deinem '
+       + 'Kontingent' + (bestand != null ? ' (noch ' + bestand + ' uebrig)' : '') + '.')
+    : ('Diese Tiefe ist fuer dieses Objekt bereits bezahlt — es wird nichts '
+       + 'weiter verbraucht.');
+
   return {
     moeglich: true,
     stufe: s,
     art: STUFEN[s].art,
     name: STUFEN[s].name,
+    was_drin_ist: STUFEN[s].was,
     schon_bezahlt: r.body.bezahlte_stufe || 0,
-    kostet: kosten.anzahl > 0,
+    verbraucht_einen_abruf: kostet,
+    so_sagen: satz,
     bestand: bestand
   };
 }
