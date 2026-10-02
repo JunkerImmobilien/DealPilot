@@ -95,9 +95,27 @@
         var rect = el.getBoundingClientRect();
         var mcRect = mainCol.getBoundingClientRect();
         var offset = rect.top - mcRect.top - 100;
-        mainCol.scrollBy({ top: offset, behavior: 'smooth' });
+        /* v1781b · SOFORT statt smooth.
+
+           Ein weiches Scrollen sieht hübscher aus, aber die Tour setzt
+           danach einen Rahmen auf eine Stelle, die sich noch bewegt.
+           Gemessen an Schritt 24: der Spot landete bei y 1.642 in einem
+           987 px hohen Fenster — vollstaendig unterhalb des Bildes.
+
+           Mein erster Versuch, das abzuwarten (v1781), hatte einen
+           Denkfehler: er wartete, bis das Ziel ZWEIMAL an derselben
+           Stelle steht — und das gilt auch VOR dem Start des Scrollens.
+           Er maß die Ruhe davor statt der danach.
+
+           > Wer auf Stillstand wartet, muss wissen, ob die Bewegung
+           > schon begonnen hat.
+
+           Mit `auto` ist das Scrollen beendet, bevor die naechste Zeile
+           laeuft. Fuer eine Tour, die ohnehin von Station zu Station
+           springt, ist das kein Verlust. */
+        mainCol.scrollBy({ top: offset, behavior: 'auto' });
       } else {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'auto', block: 'center' });
       }
     } catch(e) {}
   }
@@ -1013,13 +1031,17 @@
            Obergrenze, damit nichts haengenbleibt, wenn etwas dauernd in
            Bewegung ist (Animation, Ladebalken). Dieselbe Bauart wie der
            Tab-Wechsel seit v1745. */
+        /* v1781b: Mindestens 120 ms, bevor Stillstand zaehlt — sonst
+           misst die Schleife die Ruhe VOR der Bewegung. Mit
+           `behavior: 'auto'` oben ist das Scrollen da laengst durch;
+           die Schleife faengt nur noch nachladende Inhalte ab. */
         (function _wennRuhig(seit, letztesY, gleich) {
           seit = seit || Date.now();
           var y = null;
           try { y = Math.round(el.getBoundingClientRect().top); } catch (e) {}
           var ruht = (y !== null && y === letztesY);
           gleich = ruht ? (gleich || 0) + 1 : 0;
-          if (gleich >= 2 || (Date.now() - seit) >= 900) {
+          if ((gleich >= 2 && (Date.now() - seit) >= 120) || (Date.now() - seit) >= 900) {
             _createOverlay();
             _positionSpotlight(el);
             _renderBubbleContent(step);
