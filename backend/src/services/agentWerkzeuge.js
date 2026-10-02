@@ -267,9 +267,44 @@ async function objekt_anlegen(ctx, args) {
         apiKey: config.openai.apiKey, modus: 'inserat'
       });
       Object.entries((r && r.fields) || {}).forEach(([fid, w]) => {
-        if (fuehrung.feld(fid)) sauber[fid] = w;
+        if (!fuehrung.feld(fid)) return;
+        const f = fuehrung.feld(fid);
+        /* Auswahlfelder normalisieren — die Extraktion liefert manchmal
+           den Klartext ("Eigentumswohnung"), gespeichert wird der Wert. */
+        if (f.kind === 'select' && f.optionen && f.optionen.length) {
+          const t = _ordneOption(w, f.optionen);
+          if (t.eindeutig) sauber[fid] = t.wert;
+          return;
+        }
+        sauber[fid] = w;
       });
     } catch (e) { /* ohne Freitext geht es auch, nur mit weniger */ }
+
+    /* ── v1806b · AUSWAHLFELDER AUS DEM SATZ NACHZIEHEN ────────────────
+     *
+     * GEMESSEN: "Leg mir eine Eigentumswohnung ... an" ergab `notizen:
+     * "Eigentumswohnung; aktuell vermietet"` und ein LEERES `objart` —
+     * obwohl es dort die Option "Eigentumswohnung (ETW)" gibt.
+     *
+     *   > Eine Angabe, die in einem Freitextfeld landet statt im
+     *   > zustaendigen Auswahlfeld, ist nicht gespeichert, sondern
+     *   > abgelegt. Sie steht da und wirkt nicht.
+     *
+     * Deshalb: fuer jedes leere Auswahlfeld im Satz nachsehen, ob einer
+     * seiner Optionstexte woertlich vorkommt. Nur bei GENAU EINEM
+     * Treffer — zwei waeren keine Entscheidung. */
+    const klein = text.toLowerCase();
+    fuehrung.katalog().forEach((kf) => {
+      if (kf.kind !== 'select' || sauber[kf.id] != null) return;
+      const roh = fuehrung.feld(kf.id);
+      if (!roh || !roh.optionen) return;
+      const treffer = roh.optionen.filter((o) => {
+        const t = String(o.text || '').toLowerCase()
+          .replace(/\s*\([^)]*\)\s*/g, '').trim();   /* "Eigentumswohnung (ETW)" -> "eigentumswohnung" */
+        return t.length >= 5 && klein.indexOf(t) >= 0;
+      });
+      if (treffer.length === 1) sauber[kf.id] = treffer[0].wert;
+    });
   }
 
   Object.entries(felder).forEach(([fid, w]) => {
