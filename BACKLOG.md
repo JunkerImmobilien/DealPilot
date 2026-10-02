@@ -488,36 +488,66 @@ Merker geloescht, OHNE Kachelklick auf "Fertig - los geht's":
 
 ---
 
-#### U8-R · Drei Finanzierungsgrenzen sind Vorschläge — ENTSCHEIDUNG MARCEL
+#### U8-R · Die Frage war die richtige — ERLEDIGT (v1776)
 
-Der DealScore trägt **keine** DSCR, LTV und Eigenkapitalquote — das sind
-Finanzierungsgrenzen, keine Score-Gewichte. Diese Brücke steht in
-`onboarding.js` als `GRENZEN`.
+Marcel am 02.10.2026: *„Also ich weiß gar nicht, wofür du diese drei
+Finanzierungsgrenzen haben möchtest. … Ich würde dann die bestehenden
+nehmen, die wir jetzt hier haben. Die halte ich für sehr realistisch. …
+wichtig ist natürlich auch, dass man sich die selber setzen kann. Also auch
+noch mal benutzerspezifisch. Und die müssen überall greifen."*
 
-**Die ersten drei sind die bisherigen Werte, unverändert übernommen.** Die
-drei neuen standen bisher nirgends, weil es die Profile im Setup gar nicht
-gab — sie sind **aus der Profilbeschreibung abgeleitet, nicht gemessen**:
+**Die Messung gibt ihm recht, und der Befund ist schwerer als die Frage:**
 
-| Profil | DSCR ab | LTV bis | EK ab | Risikotext | Herkunft |
-|---|---:|---:|---:|---|---|
-| Ausgewogen | 1,20 | 90 % | 10 % | Moderat (ausgewogen) | **bisher** |
-| Konservativ | 1,35 | 80 % | 20 % | Konservativ (sicherheitsorientiert) | **bisher** |
-| Optimistisch | 1,05 | 95 % | 5 % | Chancenorientiert (höheres Risiko) | **bisher** |
-| Lage-Fokus | 1,15 | 85 % | 15 % | Moderat (ausgewogen) | ⚠ Vorschlag |
-| Cashflow-Fokus | 1,30 | 85 % | 15 % | Moderat (ausgewogen) | ⚠ Vorschlag |
-| Sicherheit | 1,40 | 75 % | 25 % | Konservativ (sicherheitsorientiert) | ⚠ Vorschlag |
+```
+Schritt 3 "Finanzierung"   dpo_ek · dpo_ltv · dpo_dscr
+                           -> ek_quote_default, max_ltv, min_dscr
+Schritt 5 "Profil"         ueberschrieb GENAU DIESE DREI
+```
 
-**Marcel ist DESAG-zertifizierter Sachverständiger — bei Bewertungs- und
-Finanzierungsgrenzen weiß er es besser.** Die drei Zeilen stehen im
-Einrichtungsfenster und bestimmen danach jede Empfehlung; eine abgeleitete
-Zahl ist dort keine Zahl, sondern eine Vermutung mit Nachkommastelle.
+**Der Nutzer gibt sie zwei Schritte vorher selbst ein** — jedes Feld mit
+einem Absatz Erklärung daneben — und das Profil warf sie weg.
 
-> Wo kein Wert vorliegt, bekommt der Kunde den Weg dorthin. Hier liegt ein
-> Wert vor — nur hat ihn niemand gesetzt, der es entscheiden darf.
+> Ein Fenster, das erst nach einem Wert fragt und ihn zwei Schritte später
+> selbst überschreibt, hat nicht gefragt, sondern sich erkundigt.
 
-**Zu sehen:** `?setup=1` öffnen, viermal „Weiter" — die Grenzen stehen auf
-jeder Kachel.
+**Die Antwort auf „wofür überhaupt?":** Die Grenzen sind die persönliche
+Kaufschwelle und sie **wirken** — `dealscore2-ui.js:286/291` zeigt sie seit
+`v1356` als eigene Ampel neben dem Score. Ein Objekt kann 82 Punkte holen
+und trotzdem unter dem Mindest-DSCR liegen; deshalb stehen sie NEBEN dem
+Score, nicht darin.
 
+**Selbst setzbar sind sie an zwei Stellen** (beide gemessen):
+
+| Ort | Felder |
+|---|---|
+| Setup, Schritt „Finanzierung" | `dpo_dscr` · `dpo_ltv` · `dpo_ek` |
+| Einstellungen › Investmentprofil | `ip_min_dscr` · `ip_max_ltv` · `ip_ek_quote_default` |
+
+**Behoben in v1776:** das Profil schreibt nur noch `ai_risk` und ruft
+`setActivePreset()`. Die Zahlen auf der Kachel tragen jetzt das Wort
+**„typisch:"** — sie sagen, was für dieses Profil üblich ist, und
+beschließen nichts. Der Einleitungstext nennt beides ausdrücklich.
+
+**Abgenommen am laufenden System:**
+
+```
+eigene Werte gesetzt       min_dscr 1,44 · max_ltv 77 · ek 23
+Profil "Sicherheit" gewaehlt   (dessen typische Werte: 1,40 / 75 / 25)
+
+danach:  min_dscr 1,44 · max_ltv 77 · ek 23      unveraendert
+         dp_dealscore2_preset = "sicherheit"     gesetzt
+         ai_risk = "Konservativ (sicherheitsorientiert)"
+```
+
+#### Noch offen: greifen sie WIRKLICH überall?
+
+Gemessen ist **ein** Leser: die Ampel in `dealscore2-ui.js`. Marcel sagt
+„und die müssen überall greifen" — zu prüfen bleibt, ob Empfehlungstexte,
+PDF-Ausgaben und der Co-Pilot dieselbe Schwelle verwenden oder eigene
+Konstanten führen.
+
+> Ein Feld ohne Leser sieht aus wie ein Feld. Ein Feld mit EINEM Leser sieht
+> aus wie eine Einstellung, die überall gilt.
 ---
 
 ## → NEU: Die beiden Piloten sollen sprechen können (01.10.2026)
