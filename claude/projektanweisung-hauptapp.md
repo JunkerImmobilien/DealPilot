@@ -27713,3 +27713,162 @@ nicht an den Zinssatz. Die neuen Sätze tragen sie genau dort.
   Ausschüsse bleiben zu.
 - **Belegexemplar an Schwerin** ist eine Lizenzbedingung und offen.
 - 30 Sätze ohne Quellenvermerk, 19 ohne Lizenz — unverändert.
+
+---
+
+## v1769–v1769c · Die Kennung ist eine UUID, und die Piloten sehen die Berichte
+
+Marcels Freigabe am 02.10.2026: **„ja mach die migration."**
+
+### Der Defekt, den sie behebt
+
+`users.id` ist eine UUID. `mb.market_reports.user_id` und
+`mb.object_snapshots.user_id` führten sie als INTEGER, und fünf Routen in
+`api.js` machten `parseInt()` daraus:
+
+```
+api.js:488   GET    /objects
+api.js:509   GET    /objects/history       <- den braucht der Co-Pilot
+api.js:531   POST   /verlauf-text
+api.js:745   GET    /reports/one
+api.js:775   DELETE /reports/:id
+```
+
+Der Proxy schickt die volle UUID (`marktbericht.js:155`), die Abfrage sucht
+danach eine Zahl, die in der Spalte nicht steht. **Alle fünf antworteten
+einem echten Nutzer mit HTTP 400 — seit v942.**
+
+> Im Frontend sah das aus wie „noch keine Marktberichte für dieses Objekt",
+> also wie ein leeres Fach und nicht wie ein Defekt. Deshalb ist es fast ein
+> Jahr lang niemandem aufgefallen.
+
+Der Kommentar in `api.js:291` sagte es selbst: *„Die nutzerbezogenen
+Marktbericht-Wege waren auf Produktion nie benutzbar."*
+
+### Drei Teile
+
+**1 · `migrations/015_user_id_text.sql`** wandelt nur den Typ auf TEXT. Die
+alten Zahlen bleiben als Text stehen, nichts wird gelöscht, die fünf Indizes
+baut Postgres beim Typwechsel selbst neu. Kein `BEGIN`/`COMMIT` —
+`migrate.js:41` setzt die Transaktion selbst, ein `COMMIT` hier würde sie
+beenden und der Eintrag in `_mb_migrations` landete außerhalb.
+
+**2 · `api.js`:** die fünf `parseInt` auf `_uidAus(req)`. Diese Funktion
+prüft auf **Unbedenklichkeit** statt auf Zahligkeit und ist seit `v1601`
+gebaut — an diesen fünf Stellen wurde sie nur nicht gerufen.
+
+**3 · `tools/mb-uid-zuordnen.mjs`** ordnet die Altzeilen zurück. `parseInt`
+hat die Kennung nicht verworfen, sondern **gestümmelt**:
+
+```
+in der mb-DB   echte UUID                              E-Mail
+2      (72x)   2a1ac331-7d7f-44a5-813b-c0080ffb81c3    info@junker-immobilien.io
+833654 (22x)   833654ba-870b-4fe8-9de0-398c56a11d26    junker_immobilien@gmx.de
+1       (7x)   1c6fe29f-f83b-49bb-9a34-975462a2b7ea    majunker@gmx.net
+NULL   (21x)   --
+```
+
+Damit ist sie rekonstruierbar — **solange die Präfixe eindeutig sind.** Das
+Werkzeug beweist das zuerst und bricht sonst ab.
+
+> Eine falsche Zuordnung wäre schlimmer als keine: sie gäbe einem Nutzer die
+> Berichte eines anderen.
+
+Es prüft auch, ob die Spalte wirklich `text` ist, und bricht ab, wenn
+Migration 015 noch nicht gelaufen ist.
+
+### Gemessen am laufenden System
+
+```
+Migration    [migrate] apply 015_user_id_text.sql ... OK
+             market_reports : text · object_snapshots : text
+             5 Indizes auf user_id, alle da
+
+Zuordnung    alle 5 Praefixe eindeutig (2, 9, 6, 1, 833654)
+             202 Zeilen umgeschrieben (je 72+22+7 in beiden Tabellen)
+             122 Zeilen · 101 mit UUID · 21 ohne Kennung
+             Keine gestuemmelte Kennung mehr uebrig.
+
+Routen       /objects               200   21 Objekte          (vorher 400)
+             /objects/history       200   72 Berichte         (vorher 400)
+             /objects/history?ref=  200   28 zu einem Objekt  (vorher 400)
+             /reports/one?id=1      200   data + report_md 6478 Zeichen
+
+Band         28 Zeilen mit Kuerzel, Adresse, Datum, Marktwert
+             (vorher: "Noch keine Marktberichte fuer dieses Objekt")
+```
+
+### v1769b · V6 ist damit gebaut
+
+**Eine Route, zwei Fragen:** `/objects/history` ohne `ref` liefert den ganzen
+Bestand, mit `ref` ein Objekt. Ein Abruf, nicht einer je Objekt.
+
+**Der Abruf wartet nicht vor jeder Frage.** Marcels Kritik an `v1760` gilt
+weiter — der Stand liegt in einem Zwischenspeicher und frischt sich bei
+`dp:object-ready` auf, nicht beim Fragen.
+
+> Eine Erweiterung, die den Hauptzweck verlangsamt, ist keine Erweiterung,
+> sondern eine Verlagerung.
+
+Je Objekt geht nur der **jüngste** Bericht mit; 28 Läufe am selben Objekt
+sind keine 28 Aussagen, sondern eine mit 27 Vorstufen (`verlauf_laeufe`).
+Größe des Auftrags gemessen: 680 Byte fürs Objekt, 9.072 Byte für den
+Bestand.
+
+**Abgenommen mit einer echten Frage:**
+
+```
+„Was sagt der Marktbericht zum Wert dieses Objekts, und passt das zu
+ meiner Kalkulation?"
+
+  -> „... Marktwert von 182.000 EUR, mit einer Spanne von 146.000 EUR
+      bis 224.000 EUR (Bericht-ID 132). Dein Kaufpreis von 210.000 EUR
+      liegt ueber dem Marktwert und innerhalb der Spanne. Die Differenz
+      zum Marktwert betraegt 28.000 EUR. ... Bruttorendite laut
+      Bericht 6,6 %."
+```
+
+Beide Zahlen, beide mit Herkunft, **keine dritte**.
+
+> Zwei Zahlen zur selben Größe sind kein Widerspruch, solange beide ihre
+> Herkunft tragen. Eine dritte, gemittelte wäre einer.
+
+### v1769c · Eine ausgezählte Zahl wird gelesen, nicht nachgezählt
+
+Auf *„wie viele meiner Objekte haben einen Marktbericht"* antwortete der
+Portfolio-Pilot **„8"**. Im Auftrag stand `objekte_mit_bericht: 21`, und alle
+21 Sätze trugen einen Marktwert — in der Liste selbst nachgemessen. **Das
+Modell hat gezählt statt zu lesen und sich verzählt.**
+
+Für die Vermögensbilanz steht die Regel seit `v1704` im Prompt („Rechne sie
+NICHT nach"). Für die Berichte fehlte sie.
+
+> Eine Zahl, die im Auftrag steht, soll gelesen werden, nicht nachgezählt.
+> Wer zählt, kann sich verzählen — und das Ergebnis sieht genauso aus wie ein
+> gelesenes.
+
+Danach: *„Von deinen 21 Objekten haben 21 einen Marktbericht."*
+
+### Zwei eigene Fallen, beide gemessen
+
+- **`api.js` ist CRLF.** Meine ersten mehrzeiligen Anker ersetzten **0 von
+  5** Stellen — und meldeten das auch so, weil der Zähler gegen die
+  erwartete Zahl prüft.
+- **`q()` gibt `res.rows` zurück, kein `rowCount`** (`db.js:19`). Mein
+  UPDATE-Zähler hätte zuverlässig null gemeldet. Jetzt mit `RETURNING 1`
+  und `rows.length`.
+
+> Ein Zähler, der seine Quelle nicht kennt, zählt zuverlässig null.
+
+### Rest
+
+- **Die 21 Zeilen ohne Kennung** (`user_id IS NULL`) bleiben stehen. Sie
+  haben nie eine getragen, und eine erfundene Zuordnung wäre schlimmer als
+  keine.
+- **Produktion ist nicht angefasst.** Die Migration läuft beim nächsten
+  Prod-Rollout mit; `mb-uid-zuordnen.mjs` muss dort **eigens** gestartet
+  werden und prüft die Eindeutigkeit erneut — auf Prod kann sie anders liegen
+  als auf Staging.
+- Sicherung vor dem Eingriff:
+  `/root/backups/mb-vor-migration-015-20261002-0517.sql.gz`, 1,9 MB,
+  enthält alle drei Tabellen, angesehen.
