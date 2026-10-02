@@ -92,10 +92,34 @@ async function portfolio_lesen(ctx) {
              + 'der Nutzer muss die App einmal oeffnen. NICHT selbst ausrechnen.'
     };
   }
+  /* ── v1803 · DIE BETRAEGE GEHEN FERTIG FORMATIERT MIT ────────────────
+   *
+   * GEMESSEN am 02.10.2026: auf "wie hoch sind meine Verbindlichkeiten"
+   * antwortete das Modell mit *472.157,90 EUR*. Richtig sind
+   * 4.721.579 EUR — es hat die letzten beiden Ziffern als Cent gelesen.
+   *
+   *   > Dieselbe Falle, die `projectAll` jahrelang in Cent rechnen liess.
+   *   > Nur merkt man sie hier schneller, weil ein Mensch die Antwort
+   *   > liest — und genau deshalb darf man sich darauf nicht verlassen.
+   *
+   * Eine Prompt-Regel allein genuegt nicht: ein Modell haelt sich
+   * meistens daran. Deshalb bekommt es die Zahl zusaetzlich SO, wie sie
+   * dastehen soll. Was fertig dasteht, wird abgeschrieben statt
+   * umgerechnet. */
+  const bil = (sp.payload && sp.payload.vermoegensbilanz) || {};
+  const lesbar = {};
+  Object.keys(bil).forEach((k) => {
+    if (!/_eur$/.test(k) || !Number.isFinite(Number(bil[k]))) return;
+    lesbar[k] = Number(bil[k]).toLocaleString('de-DE') + ' EUR';
+  });
+
   return {
     vorhanden: true,
     stand: dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem),
     geaendert_seitdem: sp.geaendert_seitdem,
+    hinweis: 'Alle Betraege sind GANZE EURO. Unter "so_schreiben" stehen sie '
+           + 'fertig formatiert — nimm diese Schreibweise unveraendert.',
+    so_schreiben: lesbar,
     daten: sp.payload
   };
 }

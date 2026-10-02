@@ -55,7 +55,12 @@ const SYSTEM =
 + 'Bewertungen immer zuerst marktbericht_preis, dann fragen, dann abrufen.\n'
 + '6. Was ein Werkzeug als "hinweis" zurueckgibt, befolgst du.\n'
 + '7. Du fragst hoechstens EINE Sache auf einmal.\n'
-+ '8. Keine Floskeln, keine Wiederholung der Frage. Antworte direkt.\n\n'
++ '8. Keine Floskeln, keine Wiederholung der Frage. Antworte direkt.\n'
++ '9. ALLE Geldbetraege sind GANZE EURO, niemals Cent. 4721579 ist '
++ '"4.721.579 EUR", nicht "47.215,79". Du verschiebst kein Komma und '
++ 'rechnest nicht um. Felder mit "_eur" sind Euro, "_prozent" sind Prozent.\n'
++ '10. Fragt jemand nach den HOECHSTEN oder NIEDRIGSTEN, sortierst du und '
++ 'nennst die Reihenfolge richtig.\n\n'
 + 'FORMAT: Telegram-Markdown. *fett* fuer Zahlen und Namen, _kursiv_ fuer '
 + 'Nebenbemerkungen. Keine Ueberschriften, keine Tabellen.';
 
