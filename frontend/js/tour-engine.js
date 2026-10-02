@@ -1470,9 +1470,41 @@
         try {
           var fr = first.getBoundingClientRect();
           var vh = first.ownerDocument.defaultView.innerHeight || window.innerHeight;
-          if (fr.top < 70 || fr.bottom > vh - 70) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          /* v1782 · DIESES SCROLLEN HAT DEN SPOT STEHENLASSEN.
+
+             `_applySubHl` laeuft 420 ms NACH dem Setzen des Spots
+             (`_renderStep`, Z. 967) und scrollt noch einmal — fuer das
+             UNTERZIEL. Der Spot bleibt dabei, wo er war, und das Bild
+             wandert unter ihm weg.
+
+             Gemessen an Schritt 24 (Stress-Test, `subTargets: ["Stress"]`):
+
+               _scrollIntoView(el)   Ziel von y 7.598 auf y 99   korrekt
+               Spot gesetzt          auf y 99                    korrekt
+               _applySubHl scrollt   nochmal                     <- hier
+               Spot gemessen         y 1.642, Fenster 987 px     ausserhalb
+
+             > Ein Rahmen, der einmal gesetzt und danach nicht mehr
+             > angefasst wird, zeigt auf eine Stelle, die es so nicht
+             > mehr gibt.
+
+             Zwei Aenderungen: `auto` statt `smooth`, damit das Scrollen
+             beendet ist, wenn die naechste Zeile laeuft — und der Spot
+             wird danach NACHGEZOGEN (unten in `_applySubHl`). */
+          if (fr.top < 70 || fr.bottom > vh - 70) first.scrollIntoView({ behavior: 'auto', block: 'center' });
         } catch (e) {}
       }
+      /* v1782: Der Spot wird NACHGEZOGEN. Ohne das zeigt er nach dem
+         Sub-Scrollen auf eine Stelle, die weggewandert ist. Gezogen wird
+         auf das UNTERZIEL, wenn eines gefunden wurde — das ist ohnehin
+         das, was der Schritt meint; der Container ist nur sein Behaelter. */
+      try {
+        var _ziel = first || rootIgnored;
+        if (_ziel && state && state.spotlight) {
+          _positionSpotlight(_ziel);
+          if (step && step.placement) _positionBubble(_ziel, step.placement);
+        }
+      } catch (e) {}
     } catch (e) {}
   }
 
