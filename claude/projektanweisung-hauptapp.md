@@ -28056,3 +28056,192 @@ Aussteller und Aktenzeichen** — sonst steht die Befugnis nur im Chatverlauf.
 - **Die drei Finanzierungsgrenzen** für Lage-Fokus, Cashflow-Fokus und
   Sicherheit sind abgeleitet, nicht gemessen. Marcel gibt eigene Zahlen.
 - **Heilbronn und Ulm** werden jetzt vollständig geerntet.
+
+---
+
+## v1776–v1786 · Der Tag, an dem die Ernte ankam
+
+### Der schwerste Fund: die Ernte erreichte keinen Kundenbericht
+
+Zwei Ursachen, beide am 02.10.2026 gemessen.
+
+**1 · Eine Handliste war zehn Dateien hinterher.**
+
+```
+in SAATDATEIEN          24 Dateien
+im Ordner register/     40 (davon 6 Wegweiser ohne Werte)
+NICHT in der Liste      10 Dateien mit zusammen 89 Saetzen
+```
+
+Betroffen war die **gesamte Ernte vom 01. und 02.10.** — Dresden, Erfurt,
+Hamburg, Leipzig, Brandenburg, Berlin, Baden-Württemberg, Rheinland-Pfalz,
+Schleswig-Holstein, Schwerin.
+
+**Das ist kein Nebenweg:** `gutachterausschuss.js` importiert aus
+`ausschuss_register.js`, `CrossCheckService` nutzt `gutachterausschuss.js` —
+der Rechenweg zum Kundenbericht läuft dort entlang. Die Sätze standen in
+`mb.param_modell` und erreichten trotzdem keinen einzigen Bericht.
+
+> Eine Ernte, die das Repo nicht verlässt, ist keine Ernte. Eine, die die
+> Datenbank erreicht und den Rechenweg nicht, ist auch keine.
+
+`ladeSaat()` **2.515 → 2.604 Sätze**. Dazu `fehlendeSaatdateien()`, das
+Ordner gegen Liste abgleicht. Die Liste bleibt trotzdem handgeführt:
+
+> Eine neue Datei soll nicht dadurch in den Kundenbericht geraten, dass
+> jemand sie ablegt. Die Aufnahme ist eine Entscheidung — sie braucht nur
+> einen, der nachzählt.
+
+**2 · Der Rechenkern starb an einem leeren Objekt.** `korrekturen: {}` statt
+`[]` → `TypeError: object is not iterable`. `{}` ist truthy, also greift
+`modell.korrekturen || []` nicht. **69 Sätze** in sieben Dateien.
+
+Beide Seiten behoben: die Sätze auf `[]`, und `_korrListe()` gibt **immer**
+ein Array, meldet Abweichungen und behandelt sie als leer.
+
+> Ein Rechenkern, der an einem Datenfeld stirbt, verliert nicht ein Feld,
+> sondern die Antwort.
+
+### Die Ernte selbst
+
+| Land | vorher | nachher |
+|---|---:|---:|
+| BW | 13 | **26** (Heilbronn, Ulm) |
+| RP | 1 | **27** (Mainz + elf Stadtteile) |
+| SH | 6 | **18** |
+
+**Ulms Anwendungsbeispiele: 3 von 3 exakt** (495.000 / 600.000 / 903.900 €).
+Ulm beziffert eine von Anlage 1 abweichende GND — Fertighäuser bis 1989 und
+Mischnutzung 70, Geschäftshäuser 60 — und sie steht als **Zahl** im Feld.
+
+**Drei Fehler in den alten Heilbronn-Sätzen gefunden:** eine tote Quell-URL,
+eine fehlende Fallzahl — und **ein Satz trug `zweig: "mfh"`, war aber der
+Faktor für Dreifamilienhäuser.** Heilbronn führt gar keinen
+MFH-Sachwertfaktor; jedes Mehrfamilienhaus dort bekam den falschen. Vier
+Karteileichen gelöscht, `✓ SOLL = IST: 2604`.
+
+### v1776 · Das Profil überschrieb, was der Nutzer eingegeben hatte
+
+Marcel fragte: *„Also ich weiß gar nicht, wofür du diese drei
+Finanzierungsgrenzen haben möchtest."* Die Frage war die richtige:
+
+```
+Schritt 3 "Finanzierung"   dpo_ek · dpo_ltv · dpo_dscr
+Schritt 5 "Profil"         ueberschrieb GENAU DIESE DREI
+```
+
+> Ein Fenster, das erst nach einem Wert fragt und ihn zwei Schritte später
+> selbst überschreibt, hat nicht gefragt, sondern sich erkundigt.
+
+Das Profil setzt jetzt nur noch `ai_risk` und das DealScore-Profil. Die
+Kachelzahlen tragen das Wort **„typisch:"**. Abgenommen mit eigenen Werten
+1,44 / 77 / 23 und dem Profil „Sicherheit" (typisch 1,40 / 75 / 25) — die
+Grenzen blieben unverändert.
+
+### Der Rundgang
+
+**Acht Anläufe für den Prüfer, sieben davon maßen ihn selbst.** Er liegt
+jetzt als `frontend/dev/tour-pruefer.js` im Repo und trägt alle acht Lehren
+im Dateikopf — von „`goto()` auf eine beendete Tour tut nichts" bis
+„Timer nicht pauschal löschen, das legt die Tour mit lahm".
+
+Entscheidend war zuletzt ein **Protokoll im Läufer**: je Schritt hält er
+fest, welchen Knopf er greift und ob der Klick ankam.
+
+> Ein Prüfer, der nicht protokolliert, was er TUT, liefert bei einem
+> Fehlschlag nur die Hälfte des Befundes.
+
+**Marcels Entscheidung („b"): Schritte ohne sichtbares Ziel halten die Tour
+nicht mehr auf.** Wartezeiten 6,0 → 2,0 s (Quick-Boarding), 2,0 → 1,1 s
+sonst.
+
+### v1780 · Zwei von vier Bank-Charts fehlten — und das trifft jeden Nutzer
+
+```
+bc-equity     1 Kind, 702 px      gerendert
+bc-cockpit    1 Kind, 628 px      gerendert
+bc-waterfall  0 Kinder, 0 px      <- stuerzt ab
+bc-stress     0 Kinder, 0 px      <- wird nie erreicht
+
+BankCharts.renderWaterfall(host, State)
+  -> ReferenceError: tilgEffektivBrutto is not defined
+```
+
+Die Variable wird in zwei Fußzeilen gelesen und **nirgends gesetzt**. Weil
+`_renderAll()` die vier Charts nacheinander rendert, riss der Waterfall den
+Stress-Test mit. Von Hand aufgerufen rendert der einwandfrei (883 px) — **er
+war nie kaputt, er kam nur nie an die Reihe.**
+
+> Vier Dinge in einer Reihe: der erste Fehler kostet alle, die danach
+> kommen. Und der Schaden sieht aus wie vier Fehler.
+
+**Vier Zeilen höher steht derselbe Fehler schon einmal** („V63.90 BUG-FIX:
+endRow war undefiniert"). Jetzt stehen die vier Aufrufe einzeln.
+
+### Zwei Rücknahmen an einem Tag
+
+**`v1781`** wollte auf das Ende des Scrollens warten und prüfte „zweimal
+dieselbe Stelle" — das trifft auch die Ruhe VOR dem Start.
+
+> Wer auf Stillstand wartet, muss wissen, ob die Bewegung schon begonnen
+> hat.
+
+**`v1782`** zog den Spot nach dem Sub-Scrollen nach. Gemessen wurde es
+schlechter: 2 Fehler statt 1, Schritt 6 fiel mit raus.
+
+> Eine Korrektur, die einen Fehler behebt und einen neuen macht, ist keine
+> Korrektur.
+
+**Stand: 35 von 36 Schritten sitzen.** Schritt 24 bleibt offen; die Diagnose
+steht im Code (`_applySubHl` scrollt 420 ms nach dem Spot ein zweites Mal).
+
+### Drei kleinere Funde
+
+**`v1783` · Das Einstellungsformular löschte, was es nicht zeigt.**
+`save()` schreibt das ganze Profil neu; alles, was das Formular nicht
+einsammelt, war weg. Gemessen an `ai_risk`: vor dem Speichern
+„Konservativ (sicherheitsorientiert)", danach `undefined`.
+
+> Ein Formular, das speichert, was es zeigt, löscht alles andere. Und was
+> es nie gezeigt hat, vermisst niemand — bis es rechnet.
+
+**`v1784` · Die GND-Lücke dort gemessen, wo sie rechnet.** Im Backlog stand
+„`modellansaetze` nur zu 58,8 % gefüllt" — die Zahl zählt alle 2.624 Sätze,
+aber **ein Zinssatz braucht keine Gesamtnutzungsdauer**. Präzise:
+
+```
+Sachwertfaktoren             422
+davon OHNE GND als Zahl      171   (41 %)
+```
+
+> Eine Quote über alles misst nicht die Lücke, sondern verdünnt sie.
+
+**`v1785` · „RENDITE 72 %" war keine Rendite.** Der Tooltip sagte seit jeher
+„Rendite (72/100)", der sichtbare Text trug ein Prozentzeichen. Jetzt steht
+dort `72/100`.
+
+> Eine Einheit, die nicht stimmt, ist schlimmer als keine. Sie wird gelesen
+> und geglaubt.
+
+### v1786 · Was ich NICHT gebaut habe
+
+IRR und Break-Even fürs Portfolio-Cockpit (Backlog-Punkt 7). Gemessen:
+
+- Die Werte sind **am Objekt gar nicht gespeichert** (sechs KPI-Felder, kein
+  IRR). `calc.js` berechnet sie, speichert sie aber nicht.
+- **Ein Portfolio-IRR ist kein Mittelwert.** Er braucht die
+  zusammengelegten Zahlungsströme, Jahr für Jahr.
+
+> Zwei Objekte mit je 8 % IRR ergeben zusammen nicht 8 %, wenn ihre
+> Zahlungen zu verschiedenen Zeiten fallen. Ein gewichtetes Mittel wäre eine
+> Zahl, die nirgends herkommt.
+
+Ein gewichtetes Mittel wäre schnell gegangen. Der Weg steht jetzt in drei
+Schritten im Backlog — die Zahlungsreihe mitspeichern, die REIHEN addieren,
+`IrrEngine.compute()` auf die Summe.
+
+### Rest
+
+- **Schritt 24** der Tour, **Kanzlei und Tower** nicht fertig gemessen.
+- **Die BW-Genehmigung** braucht Datum, Aussteller und Aktenzeichen.
+- **„Die Grenzen müssen überall greifen"** — gemessen ist ein Leser.
