@@ -139,10 +139,26 @@ async function marktpreisAnbieten(token, chatId, userId, text) {
   }
 
   const d = objekt.daten || {};
+  /* v1795c · HIER STANDEN ENGLISCHE FELDNAMEN (postCode, city, livingArea).
+     GEMESSEN an `missingFields` in avm.js:122: der Abruf erwartet DEUTSCHE
+     Namen, und zwar fast dieselben, die das Objekt ohnehin traegt —
+     plz, ort, str, hnr, objektart, wfl.
+
+     Folge der Annahme: der Voranschlag meldete "fehlende Felder: PLZ, Ort,
+     Objektart, Wohnflaeche" fuer ein Objekt, dessen Adresse vollstaendig
+     dasteht ("Musterstrasse 12, 04109 Leipzig"). Kein Fehler, keine
+     Warnung — nur vier Felder, die es zu kennen glaubte und nicht fand.
+
+     > Feldnamen werden nie angenommen, sondern an der Gegenstelle
+     > ausgelesen. Eine Zuordnung, die daneben greift, meldet nichts: sie
+     > findet einfach nichts.
+
+     Einzige echte Abweichung: das Objekt fuehrt `objart`, der Abruf will
+     `objektart`. */
   const inputs = {
-    street: d.str || '', houseNumber: d.hnr || '', postCode: d.plz || '',
-    city: d.ort || '', livingArea: d.wfl || '', buildingYear: d.baujahr || '',
-    propertyType: d.objart || '', rooms: d.zimmer || ''
+    plz: d.plz || '', ort: d.ort || '', str: d.str || '', hnr: d.hnr || '',
+    objektart: d.objektart || d.objart || '', wfl: d.wfl || '',
+    baujahr: d.baujahr || '', zimmer: d.zimmer || ''
   };
 
   let v;
