@@ -52,7 +52,7 @@
     "Gesamt": 54
    }
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
    "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
@@ -203,7 +203,7 @@
     "Gesamt": 21
    }
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
    "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
@@ -366,7 +366,7 @@
     "komplexer_wohnungsbau": 30
    }
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
    "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
@@ -501,7 +501,7 @@
    "bezeichnung": "Individueller Wohnungsbau, Weiterverkauf, Baujahr nach 1990",
    "hinweis": "Ergebnis in PROZENT (2,4 bedeutet 2,4 %). Keine Achse, keine Interpolation — der Bericht druckt für diesen Teilmarkt eine einzige Spalte."
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
    "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
@@ -685,7 +685,7 @@
     "1.33": "Einfamilienhaus, freistehend; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
    }
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62).",
    "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
@@ -889,7 +889,7 @@
     "2.33": "Doppel- und Reihenendhaus; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
    }
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62).",
    "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
@@ -1172,7 +1172,7 @@
    "interpolation": "Kreuzinterpolation zwischen benachbarten Stützstellen. Eine LEERE Zelle wird nicht durch einen Nachbarwert ersetzt.",
    "bestimmtheitsmass": 0.3
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62).",
    "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",

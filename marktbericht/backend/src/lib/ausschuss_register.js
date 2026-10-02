@@ -27,7 +27,7 @@
 // Genau so ist in v1060 ein Vergleichsfaktor aus Minden-Luebbecke in einen
 // Bericht fuer Hiddenhausen geraten.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -92,6 +92,29 @@ function indizieren(saetze) {
  *
  * Deshalb wird GESAMMELT und einmal indiziert. Fehlt eine Datei, laedt die
  * andere trotzdem — aber die Luecke wird gemeldet, nicht verschwiegen. */
+/* ═══ v1778 · DIE HANDLISTE WAR ZEHN DATEIEN HINTERHER ═══════════════
+
+   Gemessen am 02.10.2026:
+
+     in SAATDATEIEN          24 Dateien
+     im Ordner register/     40 (davon 6 Wegweiser ohne Werte)
+     NICHT in der Liste      10 Dateien mit zusammen 89 Saetzen
+
+   Betroffen war die gesamte Ernte vom 01. und 02.10.2026: dresden,
+   erfurt, hamburg, leipzig, lzs-bb, lzs-be-2025, lzs-bw, lzs-rp,
+   lzs-sh, schwerin.
+
+   DAS IST KEIN NEBENWEG. `gutachterausschuss.js` importiert aus dieser
+   Datei, `CrossCheckService` nutzt `gutachterausschuss.js` — der
+   Rechenweg zum KUNDENBERICHT laeuft hier entlang. Die Saetze standen
+   in `mb.param_modell` (dort liest `register-saat.mjs` hinein) und
+   erreichten trotzdem keinen einzigen Bericht.
+
+   > Eine Ernte, die das Repo nicht verlaesst, ist keine Ernte. Eine,
+   > die die Datenbank erreicht und den Rechenweg nicht, ist auch keine.
+
+   Der Abgleich unten (`fehlendeSaatdateien`) sorgt dafuer, dass die
+   Luecke beim naechsten Mal AUFFAELLT, statt still zu bleiben. */
 export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             'berlin.json',           /* v1085 */
                             'lzs-nrw-2023.json',     /* v1086 · Zeitreihe */
@@ -177,7 +200,54 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                was in dieser Liste steht. Eine fehlende Zeile
                                sieht aus wie "kein Ausschuss hinterlegt" und ist
                                keine. */
-                            'swf-bw.json'];
+                            'swf-bw.json',
+                            /* ═══ v1778 · die Ernte vom 01./02.10.2026 ═══
+                               Zehn Dateien, 89 Saetze, die hier fehlten.
+                               Reihenfolge wie im Ordner. */
+                            'dresden.json',       /* SN · 6 */
+                            'erfurt.json',        /* TH · 1 */
+                            'hamburg.json',       /* HH · 6 */
+                            'leipzig.json',       /* SN · 18 */
+                            'lzs-bb.json',        /* BB · 14 */
+                            'lzs-be-2025.json',   /* BE · 6 */
+                            'lzs-bw.json',        /* BW · 13 (Heilbronn, Ulm) */
+                            'lzs-rp.json',        /* RP · 6 (Mainz) */
+                            'lzs-sh.json',        /* SH · 12 */
+                            'schwerin.json'       /* MV · 7 */
+                           ];
+
+/* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
+
+   Eine handgefuehrte Liste neben einem Ordner laeuft auseinander, und
+   zwar lautlos: die Datei liegt da, der Lauf meldet keinen Fehler, und
+   erst eine Zaehlung faellt auf. Am 02.10.2026 waren es zehn Dateien.
+
+   Warum die Liste trotzdem bleibt und nicht durch `readdirSync` ersetzt
+   wird: eine neue Datei soll nicht dadurch in den Kundenbericht
+   geraten, dass jemand sie ablegt. Die Aufnahme ist eine Entscheidung.
+
+   > Eine Liste, die man pflegen muss, braucht einen, der nachzaehlt.
+
+   Wegweiser (`verfuegbarkeit-*.json`) tragen keine Werte und gehoeren
+   nicht hierher — sie werden ausgenommen, nicht gemeldet. */
+export function fehlendeSaatdateien() {
+  try {
+    const ordner = join(HIER, 'register');
+    const da = readdirSync(ordner).filter((f) => f.endsWith('.json'));
+    const fehlt = [];
+    for (const f of da) {
+      if (/^verfuegbarkeit-/.test(f)) continue;
+      if (SAATDATEIEN.indexOf(f) >= 0) continue;
+      let n = 0;
+      try {
+        const a = JSON.parse(readFileSync(join(ordner, f), 'utf8'));
+        n = Array.isArray(a) ? a.length : 0;
+      } catch (e) {}
+      fehlt.push({ datei: f, saetze: n });
+    }
+    return fehlt;
+  } catch (e) { return []; }
+}
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])

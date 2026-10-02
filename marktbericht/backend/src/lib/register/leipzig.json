@@ -1,1059 +1,1059 @@
 [
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh_altbau_rnd20_24",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 0.6,
-      "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 20 bis 24 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 6.71,
-      "bwk_pct": 27,
-      "bodenwertanteil_pct": 37,
-      "rohertragsfaktor": 21.6,
-      "rnd_jahre": 22
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 20 bis 24 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
-        "wortlaut": "LZS 0,6 % ± 1 (Standardabweichung), 22 Kauffälle",
-        "kauffaelle": 22
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 22,
-    "streuung": {
-      "sigma_pct": 1
-    },
-    "fundstelle": "S. 83"
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_altbau_rnd20_24",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 0.6,
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 20 bis 24 Jahre"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh_altbau_rnd25_34",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 1.4,
-      "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 25 bis 34 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 6.63,
-      "bwk_pct": 28,
-      "bodenwertanteil_pct": 32,
-      "rohertragsfaktor": 22,
-      "rnd_jahre": 30
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 25 bis 34 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
-        "wortlaut": "LZS 1,4 % ± 0,8 (Standardabweichung), 18 Kauffälle",
-        "kauffaelle": 18
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 18,
-    "streuung": {
-      "sigma_pct": 0.8
-    },
-    "fundstelle": "S. 83"
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 6.71,
+   "bwk_pct": 27,
+   "bodenwertanteil_pct": 37,
+   "rohertragsfaktor": 21.6,
+   "rnd_jahre": 22
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh_altbau_rnd35plus",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 2.4,
-      "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 35 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 7.73,
-      "bwk_pct": 24,
-      "bodenwertanteil_pct": 26,
-      "rohertragsfaktor": 22.4,
-      "rnd_jahre": 46
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 35 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
-        "wortlaut": "LZS 2,4 % ± 0,8 (Standardabweichung), 16 Kauffälle",
-        "kauffaelle": 16
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 16,
-    "streuung": {
-      "sigma_pct": 0.8
-    },
-    "fundstelle": "S. 83"
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 20 bis 24 Jahre",
+   "extrapolation": "gesperrt"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "mfh_ab1991",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 2.2,
-      "bezeichnung": "Mehrfamilienhaus Wiederverkauf, Baujahre ab 1991, gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 20 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 6.49,
-      "bwk_pct": 27,
-      "bodenwertanteil_pct": 26,
-      "rohertragsfaktor": 24.9,
-      "rnd_jahre": 53
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Mehrfamilienhaus Wiederverkauf, Baujahre ab 1991, gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 20 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
-        "wortlaut": "LZS 2,2 % ± 0,8 (Standardabweichung), 6 Kauffälle",
-        "kauffaelle": 6
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 6,
-    "streuung": {
-      "sigma_pct": 0.8
-    },
-    "fundstelle": "S. 83"
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
+    "wortlaut": "LZS 0,6 % ± 1 (Standardabweichung), 22 Kauffälle",
+    "kauffaelle": 22
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 22,
+  "streuung": {
+   "sigma_pct": 1
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "wgh_altbau",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 3.5,
-      "bezeichnung": "Wohn- und Geschäftshaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Flächenanteil ab 20 %, Restnutzungsdauer ab 20 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 8.56,
-      "bwk_pct": 24,
-      "bodenwertanteil_pct": 41,
-      "rohertragsfaktor": 18.3,
-      "rnd_jahre": 32
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Wohn- und Geschäftshaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Flächenanteil ab 20 %, Restnutzungsdauer ab 20 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
-        "wortlaut": "LZS 3,5 % ± 2,3 (Standardabweichung), 7 Kauffälle",
-        "kauffaelle": 7
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 7,
-    "streuung": {
-      "sigma_pct": 2.3
-    },
-    "fundstelle": "S. 83"
+  "fundstelle": "S. 83"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_altbau_rnd25_34",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 1.4,
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 25 bis 34 Jahre"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "etw_altbau_rnd20_34",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 1.9,
-      "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 20 bis 34 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 7.58,
-      "bwk_pct": 26,
-      "bodenwertanteil_pct": 27,
-      "rohertragsfaktor": 30.1,
-      "wohnflaeche_qm": 71,
-      "rnd_jahre": 26
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 20 bis 34 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
-        "wortlaut": "LZS 1,9 % ± 0,5 (Standardabweichung), 356 Kauffälle",
-        "kauffaelle": 356
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 356,
-    "streuung": {
-      "sigma_pct": 0.5
-    },
-    "fundstelle": "S. 84"
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 6.63,
+   "bwk_pct": 28,
+   "bodenwertanteil_pct": 32,
+   "rohertragsfaktor": 22,
+   "rnd_jahre": 30
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "etw_altbau_rnd35_49",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 2.1,
-      "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 35 bis 49 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 8.63,
-      "bwk_pct": 23,
-      "bodenwertanteil_pct": 23,
-      "rohertragsfaktor": 29.3,
-      "wohnflaeche_qm": 75,
-      "rnd_jahre": 42
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 35 bis 49 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
-        "wortlaut": "LZS 2,1 % ± 0,5 (Standardabweichung), 252 Kauffälle",
-        "kauffaelle": 252
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 252,
-    "streuung": {
-      "sigma_pct": 0.5
-    },
-    "fundstelle": "S. 84"
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 25 bis 34 Jahre",
+   "extrapolation": "gesperrt"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "etw_altbau_rnd50plus",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 2.3,
-      "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer ab 50 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 9.54,
-      "bwk_pct": 21,
-      "bodenwertanteil_pct": 22,
-      "rohertragsfaktor": 27.9,
-      "wohnflaeche_qm": 73,
-      "rnd_jahre": 52
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer ab 50 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
-        "wortlaut": "LZS 2,3 % ± 0,6 (Standardabweichung), 38 Kauffälle",
-        "kauffaelle": 38
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 38,
-    "streuung": {
-      "sigma_pct": 0.6
-    },
-    "fundstelle": "S. 84"
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
+    "wortlaut": "LZS 1,4 % ± 0,8 (Standardabweichung), 18 Kauffälle",
+    "kauffaelle": 18
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 18,
+  "streuung": {
+   "sigma_pct": 0.8
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "etw_ab1991_rnd40_59",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 2.2,
-      "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer 40 bis 59 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 8.04,
-      "bwk_pct": 27,
-      "bodenwertanteil_pct": 22,
-      "rohertragsfaktor": 27.4,
-      "wohnflaeche_qm": 63,
-      "rnd_jahre": 51
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer 40 bis 59 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
-        "wortlaut": "LZS 2,2 % ± 0,5 (Standardabweichung), 283 Kauffälle",
-        "kauffaelle": 283
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 283,
-    "streuung": {
-      "sigma_pct": 0.5
-    },
-    "fundstelle": "S. 84"
+  "fundstelle": "S. 83"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_altbau_rnd35plus",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 2.4,
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 35 Jahre"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "etw_ab1991_rnd60plus",
-    "formel": {
-      "form": "festwert",
-      "wert_pct": 2.1,
-      "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer ab 60 Jahre"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
-      "rnd_min_jahre": 20,
-      "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
-      "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
-      "nettokaltmiete_eur_qm": 11.18,
-      "bwk_pct": 18,
-      "bodenwertanteil_pct": 21,
-      "rohertragsfaktor": 32.5,
-      "wohnflaeche_qm": 96,
-      "rnd_jahre": 71
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer ab 60 Jahre",
-      "extrapolation": "gesperrt"
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
-        "wortlaut": "LZS 2,1 % ± 0,5 (Standardabweichung), 17 Kauffälle",
-        "kauffaelle": 17
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 17,
-    "streuung": {
-      "sigma_pct": 0.5
-    },
-    "fundstelle": "S. 84"
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 7.73,
+   "bwk_pct": 24,
+   "bodenwertanteil_pct": 26,
+   "rohertragsfaktor": 22.4,
+   "rnd_jahre": 46
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_frei_vor1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.06,
-      "median": 0.98,
-      "bezeichnung": "Ein-/Zweifamilienhaus freistehend, Baujahre vor 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Ein-/Zweifamilienhaus freistehend, Baujahre vor 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.71,
-          "max": 1.66
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,71 / max 1,66 / Mittel 1,06 / Median 0,98 / Sigma 0,25, 66 Kauffälle",
-        "kauffaelle": 66
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 66,
-    "streuung": {
-      "min": 0.71,
-      "max": 1.66,
-      "sigma": 0.25
-    },
-    "fundstelle": "S. 87"
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 35 Jahre",
+   "extrapolation": "gesperrt"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_dhh_vor1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.16,
-      "median": 1.18,
-      "bezeichnung": "Doppelhaushälfte, Baujahre vor 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Doppelhaushälfte, Baujahre vor 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.74,
-          "max": 1.61
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,74 / max 1,61 / Mittel 1,16 / Median 1,18 / Sigma 0,2, 85 Kauffälle",
-        "kauffaelle": 85
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 85,
-    "streuung": {
-      "min": 0.74,
-      "max": 1.61,
-      "sigma": 0.2
-    },
-    "fundstelle": "S. 87"
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
+    "wortlaut": "LZS 2,4 % ± 0,8 (Standardabweichung), 16 Kauffälle",
+    "kauffaelle": 16
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 16,
+  "streuung": {
+   "sigma_pct": 0.8
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_reh_vor1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.21,
-      "median": 1.19,
-      "bezeichnung": "Reihenendhaus, Baujahre vor 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Reihenendhaus, Baujahre vor 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.8,
-          "max": 1.67
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,8 / max 1,67 / Mittel 1,21 / Median 1,19 / Sigma 0,27, 14 Kauffälle",
-        "kauffaelle": 14
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 14,
-    "streuung": {
-      "min": 0.8,
-      "max": 1.67,
-      "sigma": 0.27
-    },
-    "fundstelle": "S. 87"
+  "fundstelle": "S. 83"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_ab1991",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 2.2,
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, Baujahre ab 1991, gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 20 Jahre"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_rmh_vor1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.45,
-      "median": 1.46,
-      "bezeichnung": "Reihenmittelhaus, Baujahre vor 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Reihenmittelhaus, Baujahre vor 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.87,
-          "max": 1.98
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,87 / max 1,98 / Mittel 1,45 / Median 1,46 / Sigma 0,36, 14 Kauffälle",
-        "kauffaelle": 14
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 14,
-    "streuung": {
-      "min": 0.87,
-      "max": 1.98,
-      "sigma": 0.36
-    },
-    "fundstelle": "S. 87"
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 6.49,
+   "bwk_pct": 27,
+   "bodenwertanteil_pct": 26,
+   "rohertragsfaktor": 24.9,
+   "rnd_jahre": 53
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_frei_ab1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.12,
-      "median": 1.09,
-      "bezeichnung": "Ein-/Zweifamilienhaus freistehend, Baujahre ab 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Ein-/Zweifamilienhaus freistehend, Baujahre ab 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.8,
-          "max": 1.53
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,8 / max 1,53 / Mittel 1,12 / Median 1,09 / Sigma 0,19, 62 Kauffälle",
-        "kauffaelle": 62
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 62,
-    "streuung": {
-      "min": 0.8,
-      "max": 1.53,
-      "sigma": 0.19
-    },
-    "fundstelle": "S. 87"
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Mehrfamilienhaus Wiederverkauf, Baujahre ab 1991, gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 20 Jahre",
+   "extrapolation": "gesperrt"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_dhh_ab1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.11,
-      "median": 1.15,
-      "bezeichnung": "Doppelhaushälfte, Baujahre ab 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Doppelhaushälfte, Baujahre ab 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.78,
-          "max": 1.38
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,78 / max 1,38 / Mittel 1,11 / Median 1,15 / Sigma 0,16, 20 Kauffälle",
-        "kauffaelle": 20
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 20,
-    "streuung": {
-      "min": 0.78,
-      "max": 1.38,
-      "sigma": 0.16
-    },
-    "fundstelle": "S. 87"
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
+    "wortlaut": "LZS 2,2 % ± 0,8 (Standardabweichung), 6 Kauffälle",
+    "kauffaelle": 6
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 6,
+  "streuung": {
+   "sigma_pct": 0.8
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_reh_ab1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.3,
-      "median": 1.12,
-      "bezeichnung": "Reihenendhaus, Baujahre ab 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Reihenendhaus, Baujahre ab 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 0.85,
-          "max": 1.99
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 0,85 / max 1,99 / Mittel 1,3 / Median 1,12 / Sigma 0,37, 15 Kauffälle",
-        "kauffaelle": 15
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 15,
-    "streuung": {
-      "min": 0.85,
-      "max": 1.99,
-      "sigma": 0.37
-    },
-    "fundstelle": "S. 87"
+  "fundstelle": "S. 83"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh_altbau",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 3.5,
+   "bezeichnung": "Wohn- und Geschäftshaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Flächenanteil ab 20 %, Restnutzungsdauer ab 20 Jahre"
   },
-  {
-    "land_code": "SN",
-    "ags": "14713000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
-    "berichtsjahr": 2026,
-    "modellversion": "Marktbericht Leipzig 2026",
-    "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-    "quelle_parser": "v1758-LEIPZIG",
-    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
-    "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
-    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
-    "stichtag": "2026-01-01",
-    "kennzahl": "sachwertfaktor",
-    "zweig": "efh_rmh_ab1991",
-    "formel": {
-      "form": "festwert",
-      "wert": 1.34,
-      "median": 1.4,
-      "bezeichnung": "Reihenmittelhaus, Baujahre ab 1991"
-    },
-    "korrekturen": {},
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "regionalfaktor": 1,
-      "nhk": "NHK 2010",
-      "bodenrichtwert_stand": "2025-01-01",
-      "garage_eur": 5000,
-      "carport_eur": 2000,
-      "filter": {
-        "grundstueck_max_qm": 1500,
-        "wohnflaeche_min_qm": 80,
-        "rnd_min_jahre": 15
-      }
-    },
-    "geltungsbereich": {
-      "raeumlich": "Stadtgebiet Leipzig",
-      "sachlich": "Reihenmittelhaus, Baujahre ab 1991",
-      "extrapolation": "gesperrt",
-      "spannen": {
-        "sachwertfaktor": {
-          "min": 1.14,
-          "max": 1.49
-        }
-      }
-    },
-    "belege": [
-      {
-        "art": "tabellenwert",
-        "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
-        "wortlaut": "Sachwertfaktor min 1,14 / max 1,49 / Mittel 1,34 / Median 1,4 / Sigma 0,13, 13 Kauffälle",
-        "kauffaelle": 13
-      }
-    ],
-    "stufe": "A",
-    "fallzahl": 13,
-    "streuung": {
-      "min": 1.14,
-      "max": 1.49,
-      "sigma": 0.13
-    },
-    "fundstelle": "S. 87"
-  }
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 8.56,
+   "bwk_pct": 24,
+   "bodenwertanteil_pct": 41,
+   "rohertragsfaktor": 18.3,
+   "rnd_jahre": 32
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Wohn- und Geschäftshaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Flächenanteil ab 20 %, Restnutzungsdauer ab 20 Jahre",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 83, Tab. 118-122",
+    "wortlaut": "LZS 3,5 % ± 2,3 (Standardabweichung), 7 Kauffälle",
+    "kauffaelle": 7
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 7,
+  "streuung": {
+   "sigma_pct": 2.3
+  },
+  "fundstelle": "S. 83"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw_altbau_rnd20_34",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 1.9,
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 20 bis 34 Jahre"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 7.58,
+   "bwk_pct": 26,
+   "bodenwertanteil_pct": 27,
+   "rohertragsfaktor": 30.1,
+   "wohnflaeche_qm": 71,
+   "rnd_jahre": 26
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 20 bis 34 Jahre",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
+    "wortlaut": "LZS 1,9 % ± 0,5 (Standardabweichung), 356 Kauffälle",
+    "kauffaelle": 356
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 356,
+  "streuung": {
+   "sigma_pct": 0.5
+  },
+  "fundstelle": "S. 84"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw_altbau_rnd35_49",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 2.1,
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 35 bis 49 Jahre"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 8.63,
+   "bwk_pct": 23,
+   "bodenwertanteil_pct": 23,
+   "rohertragsfaktor": 29.3,
+   "wohnflaeche_qm": 75,
+   "rnd_jahre": 42
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 35 bis 49 Jahre",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
+    "wortlaut": "LZS 2,1 % ± 0,5 (Standardabweichung), 252 Kauffälle",
+    "kauffaelle": 252
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 252,
+  "streuung": {
+   "sigma_pct": 0.5
+  },
+  "fundstelle": "S. 84"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw_altbau_rnd50plus",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 2.3,
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer ab 50 Jahre"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 9.54,
+   "bwk_pct": 21,
+   "bodenwertanteil_pct": 22,
+   "rohertragsfaktor": 27.9,
+   "wohnflaeche_qm": 73,
+   "rnd_jahre": 52
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer ab 50 Jahre",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
+    "wortlaut": "LZS 2,3 % ± 0,6 (Standardabweichung), 38 Kauffälle",
+    "kauffaelle": 38
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 38,
+  "streuung": {
+   "sigma_pct": 0.6
+  },
+  "fundstelle": "S. 84"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw_ab1991_rnd40_59",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 2.2,
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer 40 bis 59 Jahre"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 8.04,
+   "bwk_pct": 27,
+   "bodenwertanteil_pct": 22,
+   "rohertragsfaktor": 27.4,
+   "wohnflaeche_qm": 63,
+   "rnd_jahre": 51
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer 40 bis 59 Jahre",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
+    "wortlaut": "LZS 2,2 % ± 0,5 (Standardabweichung), 283 Kauffälle",
+    "kauffaelle": 283
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 283,
+  "streuung": {
+   "sigma_pct": 0.5
+  },
+  "fundstelle": "S. 84"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw_ab1991_rnd60plus",
+  "formel": {
+   "form": "festwert",
+   "wert_pct": 2.1,
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer ab 60 Jahre"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bwk_grundlage": "§ 32 und Anlage 3 ImmoWertV, bezogen auf das Kalenderjahr 2025",
+   "rnd_min_jahre": 20,
+   "kauffaelle_zeitraum": "2025-01-01 bis 2025-12-31",
+   "ausreisser": "eliminiert ausserhalb der 2,0-fachen Standardabweichung vom Mittelwert",
+   "nettokaltmiete_eur_qm": 11.18,
+   "bwk_pct": 18,
+   "bodenwertanteil_pct": 21,
+   "rohertragsfaktor": 32.5,
+   "wohnflaeche_qm": 96,
+   "rnd_jahre": 71
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer ab 60 Jahre",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 84, Tab. 118-122",
+    "wortlaut": "LZS 2,1 % ± 0,5 (Standardabweichung), 17 Kauffälle",
+    "kauffaelle": 17
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 17,
+  "streuung": {
+   "sigma_pct": 0.5
+  },
+  "fundstelle": "S. 84"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_frei_vor1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.06,
+   "median": 0.98,
+   "bezeichnung": "Ein-/Zweifamilienhaus freistehend, Baujahre vor 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Ein-/Zweifamilienhaus freistehend, Baujahre vor 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.71,
+     "max": 1.66
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,71 / max 1,66 / Mittel 1,06 / Median 0,98 / Sigma 0,25, 66 Kauffälle",
+    "kauffaelle": 66
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 66,
+  "streuung": {
+   "min": 0.71,
+   "max": 1.66,
+   "sigma": 0.25
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_dhh_vor1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.16,
+   "median": 1.18,
+   "bezeichnung": "Doppelhaushälfte, Baujahre vor 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Doppelhaushälfte, Baujahre vor 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.74,
+     "max": 1.61
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,74 / max 1,61 / Mittel 1,16 / Median 1,18 / Sigma 0,2, 85 Kauffälle",
+    "kauffaelle": 85
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 85,
+  "streuung": {
+   "min": 0.74,
+   "max": 1.61,
+   "sigma": 0.2
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_reh_vor1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.21,
+   "median": 1.19,
+   "bezeichnung": "Reihenendhaus, Baujahre vor 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Reihenendhaus, Baujahre vor 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.8,
+     "max": 1.67
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,8 / max 1,67 / Mittel 1,21 / Median 1,19 / Sigma 0,27, 14 Kauffälle",
+    "kauffaelle": 14
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 14,
+  "streuung": {
+   "min": 0.8,
+   "max": 1.67,
+   "sigma": 0.27
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_rmh_vor1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.45,
+   "median": 1.46,
+   "bezeichnung": "Reihenmittelhaus, Baujahre vor 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Reihenmittelhaus, Baujahre vor 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.87,
+     "max": 1.98
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,87 / max 1,98 / Mittel 1,45 / Median 1,46 / Sigma 0,36, 14 Kauffälle",
+    "kauffaelle": 14
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 14,
+  "streuung": {
+   "min": 0.87,
+   "max": 1.98,
+   "sigma": 0.36
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_frei_ab1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.12,
+   "median": 1.09,
+   "bezeichnung": "Ein-/Zweifamilienhaus freistehend, Baujahre ab 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Ein-/Zweifamilienhaus freistehend, Baujahre ab 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.8,
+     "max": 1.53
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,8 / max 1,53 / Mittel 1,12 / Median 1,09 / Sigma 0,19, 62 Kauffälle",
+    "kauffaelle": 62
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 62,
+  "streuung": {
+   "min": 0.8,
+   "max": 1.53,
+   "sigma": 0.19
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_dhh_ab1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.11,
+   "median": 1.15,
+   "bezeichnung": "Doppelhaushälfte, Baujahre ab 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Doppelhaushälfte, Baujahre ab 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.78,
+     "max": 1.38
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,78 / max 1,38 / Mittel 1,11 / Median 1,15 / Sigma 0,16, 20 Kauffälle",
+    "kauffaelle": 20
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 20,
+  "streuung": {
+   "min": 0.78,
+   "max": 1.38,
+   "sigma": 0.16
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_reh_ab1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.3,
+   "median": 1.12,
+   "bezeichnung": "Reihenendhaus, Baujahre ab 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Reihenendhaus, Baujahre ab 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 0.85,
+     "max": 1.99
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 0,85 / max 1,99 / Mittel 1,3 / Median 1,12 / Sigma 0,37, 15 Kauffälle",
+    "kauffaelle": 15
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 15,
+  "streuung": {
+   "min": 0.85,
+   "max": 1.99,
+   "sigma": 0.37
+  },
+  "fundstelle": "S. 87"
+ },
+ {
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "berichtsjahr": 2026,
+  "modellversion": "Marktbericht Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v1758-LEIPZIG",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt. Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+  "stichtag": "2026-01-01",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh_rmh_ab1991",
+  "formel": {
+   "form": "festwert",
+   "wert": 1.34,
+   "median": 1.4,
+   "bezeichnung": "Reihenmittelhaus, Baujahre ab 1991"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "nhk": "NHK 2010",
+   "bodenrichtwert_stand": "2025-01-01",
+   "garage_eur": 5000,
+   "carport_eur": 2000,
+   "filter": {
+    "grundstueck_max_qm": 1500,
+    "wohnflaeche_min_qm": 80,
+    "rnd_min_jahre": 15
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgebiet Leipzig",
+   "sachlich": "Reihenmittelhaus, Baujahre ab 1991",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "sachwertfaktor": {
+     "min": 1.14,
+     "max": 1.49
+    }
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Leipzig 2026, S. 87, Tab. 124/126",
+    "wortlaut": "Sachwertfaktor min 1,14 / max 1,49 / Mittel 1,34 / Median 1,4 / Sigma 0,13, 13 Kauffälle",
+    "kauffaelle": 13
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 13,
+  "streuung": {
+   "min": 1.14,
+   "max": 1.49,
+   "sigma": 0.13
+  },
+  "fundstelle": "S. 87"
+ }
 ]

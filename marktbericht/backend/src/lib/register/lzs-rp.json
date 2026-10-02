@@ -26,7 +26,7 @@
    "wert_ungekappt": 2.13,
    "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 2,13 % bei 29 Fällen und einer Standardabweichung von 1,31. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
    "gnd_jahre": 80,
@@ -129,7 +129,7 @@
    "wert_ungekappt": 2.69,
    "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 2,69 % bei 61 Fällen und einer Standardabweichung von 1,63. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
    "gnd_jahre": 80,
@@ -231,7 +231,7 @@
    "wert_ungekappt": 2.97,
    "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 2,97 % bei 28 Fällen und einer Standardabweichung von 1,4. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
    "gnd_jahre": 80,
@@ -334,7 +334,7 @@
    "wert_ungekappt": 3.97,
    "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 3,97 % bei 21 Fällen und einer Standardabweichung von 2,44. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
    "gnd_jahre": null,
@@ -500,7 +500,7 @@
    ],
    "interpolation": "keine — Bänder, so wie der Bericht sie abdruckt"
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
    "gnd_jahre": 80,
@@ -674,7 +674,7 @@
    ],
    "interpolation": "keine — Bänder, so wie der Bericht sie abdruckt"
   },
-  "korrekturen": {},
+  "korrekturen": [],
   "modellansaetze": {
    "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
    "gnd_jahre": 80,
