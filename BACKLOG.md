@@ -1036,14 +1036,41 @@ gleich erscheint. Für eines, das gar nicht kommt, sind es sechs verlorene
 Sekunden. Ein früherer Abbruch (etwa nach 1,5 s) macht die Tour spürbar
 flüssiger und kostet nur dort etwas, wo ein Bereich wirklich langsam lädt.
 
+##### Marcels Entscheidung: „b" — UMGESETZT in v1779
+
+Schritte, deren Ziel nicht sichtbar ist, halten die Tour nicht mehr auf.
+Die Wartezeiten der Elementsuche:
+
+```
+allgemein   2,0 -> 1,1 s
+s-quick     6,0 -> 2,0 s     (iframe, rendert wirklich nach)
+s8          4,5 -> 2,0 s     (Cockpit baut nach)
+```
+
+Die zwei Sekunden decken das Nachladen **gemessen** ab; die sechs waren für
+den langsamsten *denkbaren* Fall gewählt, nicht für den gemessenen.
+
+**Nachgemessen am laufenden System, frisch geladen:**
+
+```
+Standard (Heute) / Zweig A     36 Schritte · Tour beendet · 100 s
+   ok 35 · kein Spot 1
+   24  Stress-Test [s6]
+```
+
+**35 von 36.** Vorher waren es drei Schritte ohne Markierung (22, 23, 24) —
+jetzt nur noch einer. Die Tour erreicht dabei Schritte, die in keinem
+früheren Lauf vorkamen (z. B. „DealScore 0–100").
+
 ##### Was noch offen ist
 
-- **Kanzlei und Tower** wurden nicht fertig gemessen: der Kanzlei-Lauf blieb
-  bei Schritt 1 stehen. **Gegengeprüft von Hand:** derselbe „Weiter"-Knopf
-  bewegt die Tour sofort. Der Klick des Läufers kommt dort nicht an — das
-  ist noch nicht geklärt und ein Prüferproblem, kein App-Problem.
+- **Schritt 24 „Stress-Test"** (`#bc-stress`) hat weiterhin keinen Spot.
+  Einer von 36 — die Blase erscheint, markiert aber nichts.
+- **Kanzlei und Tower** sind nicht fertig gemessen: der Läufer blieb dort
+  bei Schritt 1 stehen, **obwohl derselbe Knopf von Hand sofort wirkt.**
+  Das ist ein Prüfer-, kein App-Problem — und es ist offen.
 - **Schritt 37 und 38** erreicht kein Zweig in der Standardansicht;
-  in Aktenmappe/B taucht 38 auf und sitzt dort auf dem falschen Element.
+  in Aktenmappe/B taucht 38 auf und sitzt auf dem falschen Element.
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
