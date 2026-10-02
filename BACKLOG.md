@@ -292,6 +292,34 @@ gebraucht wird, dann gezielt laden. Das ist nicht nur eine Kostenfrage:
 
 ---
 
+### ✓ ABGEARBEITET am 02.10.2026 — v1800 bis v1807
+
+**A-1 bis A-8 stehen und sind durchgetestet.** Was beim Testen gefunden
+wurde, steht im Rollout-Journal; hier nur der Stand.
+
+| Punkt | Stand | Commit |
+|---|---|---|
+| Befund 1+2 (Modus, Falle) | ✓ |  |
+| A-1 Werkzeugkasten (9 Werkzeuge, 3 Stufen) | ✓ |  |
+| A-2 Portfolio-Kontext + Tilgung/Verbindlichkeiten als Feld | ✓ |  |
+| A-3 Objektbezug: Nummer, UUID, Adresse, Anknüpfung | ✓ |  |
+| A-4 Auswahlfelder mit Rückfrage | ✓ |  |
+| A-5 Aktionen inkl. Sammelaktion mit Gesamtpreis | ✓ |  |
+| A-6 Anlage: alle genannten Angaben werden übernommen | ✓ |  |
+| A-7 geführte Prozesse per Sprache/Text | ✓ | / |
+| A-8 Berichtsstufen mit Preisansage | **teilweise** |  |
+| A-9 E-Mail-Abgleich | **BLOCKIERT** | — |
+
+**Was an A-8 noch fehlt:** die ausführliche Zusammenführung des
+Ergebnisses (Lage, Mikrolage, Vergleichsdaten, Annahmen, Quellen). Preis
+und Abruf stehen, der Berichtsinhalt wird noch nicht aufbereitet.
+
+**Prüfstrecke:**  — fünf Läufer, die im Container
+gegen das echte Konto laufen und protokollieren, WELCHE Werkzeuge der
+Agent gewählt hat.
+
+
+
 ### Reihenfolge des Baus
 
 1. **Die zwei Befunde beheben** — Ursachen 4 und 5 (falscher Auslesemodus,
