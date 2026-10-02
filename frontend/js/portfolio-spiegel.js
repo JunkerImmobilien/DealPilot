@@ -73,9 +73,8 @@
 
        > Eine Funktion, die ohne Vorbereitung eine PLAUSIBLE Null liefert,
        > ist gefaehrlicher als eine, die wirft. */
-    if (typeof D.ladeDetails === 'function') {
-      try { await D.ladeDetails(); } catch (e) { return; }
-    }
+    if (typeof D.portfolioLaden !== 'function') return;
+    try { await D.portfolioLaden(); } catch (e) { return; }
 
     var payload;
     try {

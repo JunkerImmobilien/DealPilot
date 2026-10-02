@@ -2559,8 +2559,30 @@
        > "du hast kein Portfolio" gesagt.
 
        Deshalb geht der Lader mit nach aussen. `portfolioPayload()` bleibt
-       unveraendert synchron - wer die Zahlen will, laedt vorher. */
-    ladeDetails: loadDetails,
+       unveraendert synchron - wer die Zahlen will, laedt vorher.
+
+       v1793b · UND ZWAR DIE GANZE KETTE. Mein erster Versuch exportierte
+       nur `loadDetails` - danach stand da immer noch 0, weil die Kette
+       einen Schritt frueher beginnt:
+
+         loadSummaries()  fuellt _summaries  (die Liste vom Server)
+              v
+         wonList()        filtert auf 'won'
+              v
+         loadDetails()    fuellt _details    (die vollen Datensaetze)
+              v
+         detailArr()      -> aggStats() -> portfolioPayload()
+
+       > Eine Vorbereitung auf jedem Einzelschritt ergibt keine
+       > Vorbereitung auf dem Ganzen. Wer nur den letzten Schritt
+       > exportiert, laedt Details zu einer Liste, die es noch nicht gibt -
+       > und bekommt wieder eine plausible Null.
+
+       Deshalb EINE Funktion, die beides tut. Sie laesst sich nicht
+       halb aufrufen. */
+    portfolioLaden: function () {
+      return loadSummaries().then(function () { return loadDetails(); });
+    },
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
     steuerMappe: steuerMappe,   /* v1215-mappe */
