@@ -283,7 +283,35 @@ window.DealPilotInvestmentProfile = (function() {
     };
     // Nullen rausfiltern (User hat das Feld leer gelassen → fällt auf Default zurück)
     Object.keys(p).forEach(function(k) { if (p[k] === null) delete p[k]; });
-    save(p);
+
+    /* ═══ v1783 · DAS FORMULAR DARF NICHT LOESCHEN, WAS ES NICHT ZEIGT ═══
+
+       `save()` schreibt mit `JSON.stringify(profile)` das GANZE Profil neu.
+       Alles, was dieses Formular nicht einsammelt, war danach weg.
+
+       Gemessen am 02.10.2026 am laufenden System:
+
+         vor dem Speichern   ai_risk = "Konservativ (sicherheitsorientiert)"
+         Knopf "Speichern"   geklickt
+         danach              ai_risk = undefined
+
+       `ai_risk` setzt das EINRICHTUNGSFENSTER beim Investortyp; das
+       Einstellungsformular fuehrt kein Feld dafuer (`ip_ai_risk` gibt es
+       im DOM nicht). Wer nach dem Setup irgendetwas in den Einstellungen
+       aenderte, verlor seinen Risikotext — ohne einen Hinweis.
+
+       > Ein Formular, das speichert, was es zeigt, loescht alles andere.
+       > Und was es nie gezeigt hat, vermisst niemand — bis es rechnet.
+
+       Deshalb wird jetzt GEMISCHT: der gespeicherte Stand ist die Basis,
+       die Formularwerte liegen darueber. `save({})` in
+       `resetToDefaults()` bleibt davon unberuehrt und leert weiterhin
+       vollstaendig — das ist dort gewollt. */
+    var _vorher = load() || {};
+    var _zusammen = {};
+    Object.keys(_vorher).forEach(function (k) { _zusammen[k] = _vorher[k]; });
+    Object.keys(p).forEach(function (k) { _zusammen[k] = p[k]; });
+    save(_zusammen);
     // V63.90: KI-Tab Display & hidden Inputs sofort updaten
     syncAiParamsToTab();
     if (typeof toast === 'function') toast('✓ Investmentprofil gespeichert');
