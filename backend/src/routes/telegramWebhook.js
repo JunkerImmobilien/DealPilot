@@ -146,6 +146,23 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
      Nutzer den Bot fuer tot. */
   try { await tgGet(token, 'sendChatAction', { chat_id: chatId, action: 'typing' }); } catch (e) {}
 
+  /* ── v1805 · WANN DARF DER AGENT GELD AUSGEBEN? ──────────────────────
+   *
+   * Nur, wenn der Nutzer gerade JA gesagt hat UND die Nachricht davor
+   * eine Preisansage des Bots war. Beides zusammen, nicht eins davon.
+   *
+   *   > Ein "ja" allein ist keine Freigabe — es koennte die Antwort auf
+   *   > irgendetwas sein. Und eine Preisansage allein auch nicht: sie ist
+   *   > die Frage, nicht die Antwort.
+   *
+   * Die Sperre sitzt damit AUSSERHALB des Modells. Es kann sie nicht
+   * uebergehen, auch wenn es die Zustimmung missversteht. */
+  const sagtJa = /^(ja|jo|jep|ok|okay|mach|los|gern|bitte|passt|einverstanden|hol|zieh)\b/i
+    .test(String(text || '').trim());
+  const letzteBotzeile = (((z && z.verlauf) || []).filter((e) => e.rolle !== 'user').slice(-1)[0] || {}).text || '';
+  const standPreis = /kostet|Kontingent|Abruf|Guthaben|Soll ich/i.test(letzteBotzeile);
+  const darfKosten = sagtJa && standPreis;
+
   const protokoll = [];
   const ctx = {
     userId: userId,
@@ -161,10 +178,7 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
   try {
     r = await agent.laufen(text, ctx, {
       verlauf: (z && z.verlauf) || [],
-      /* Geld NIE im ersten Anlauf. Der Agent darf den Preis holen und
-         fragen; abrufen darf er erst, wenn der Nutzer zugestimmt hat —
-         und das erkennt der Bestaetigungszweig, nicht das Modell. */
-      darfKosten: false
+      darfKosten: darfKosten
     });
   } catch (e) {
     await senden(token, chatId,

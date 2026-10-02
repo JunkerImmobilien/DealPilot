@@ -274,6 +274,56 @@ async function marktbericht_preis(ctx, args) {
            + 'ob abgerufen werden soll. Erst nach einem Ja marktbericht_abrufen.' });
 }
 
+/* ── Sammelaktion: was kostet es fuer ALLE? ──────────────────────────────
+ *
+ * Marcel: "ich moechte fuer alle Objekte die Marktpreisindikation oder die
+ * erweiterte Marktpreisindikation machen, dass er das ausfuehrt."
+ *
+ *   > Eine Aktion ueber ALLE Objekte ist siebzehn Aktionen. Kostet sie
+ *   > Geld, sind es siebzehn Abbuchungen — und die Bestaetigung muss die
+ *   > GESAMTSUMME nennen, nicht den Einzelpreis. Wer "ja" sagt, muss
+ *   > wissen, wozu.
+ */
+async function marktbericht_preis_alle(ctx, args) {
+  const stufe = _stufe(args);
+  const liste = await dialog.objekteListe(ctx.userId, 60);
+  if (!liste.length) return { anzahl: 0, hinweis: 'Keine Objekte vorhanden.' };
+
+  const je = [];
+  let kostenpflichtig = 0, bereit = 0;
+  for (const o of liste) {
+    const v = await markt.voranschlag(ctx.userId, o.id, stufe);
+    const k = v.moeglich && v.kostet;
+    if (k) kostenpflichtig++;
+    /* Pflichtangaben prueft der Bericht selbst; hier nur die groben. */
+    const d = (await dialog.objektKontext(ctx.userId, o.id)).daten || {};
+    const fehlt = [];
+    if (!d.plz && !d.ort) fehlt.push('PLZ/Ort');
+    if (!d.objektart && !d.objart) fehlt.push('Objektart');
+    if (!d.wfl) fehlt.push('Wohnflaeche');
+    if (!fehlt.length) bereit++;
+    je.push({ id: o.id, adresse: o.adresse, kostet: k,
+      fehlende_angaben: fehlt.length ? fehlt : undefined });
+  }
+
+  const art = (markt.STUFEN[stufe] || markt.STUFEN[1]);
+  const bestand = je.length ? (await markt.voranschlag(ctx.userId, je[0].id, stufe)).bestand : null;
+
+  return {
+    anzahl: liste.length, stufe, name: art.name,
+    davon_bereit: bereit,
+    davon_unvollstaendig: liste.length - bereit,
+    kostenpflichtige_abrufe: kostenpflichtig,
+    bestand: bestand,
+    reicht_nicht: (bestand != null && kostenpflichtig > bestand),
+    objekte: je,
+    hinweis: 'Das kostet NICHTS. Nenne dem Nutzer die GESAMTZAHL der Abrufe '
+           + '(' + kostenpflichtig + ' x ' + art.name + '), seinen Bestand und wie viele '
+           + 'Objekte unvollstaendig sind. Erst nach einem ausdruecklichen Ja '
+           + 'marktbericht_abrufen je Objekt aufrufen.'
+  };
+}
+
 async function marktbericht_abrufen(ctx, args) {
   const id = await _findeObjekt(ctx, args);
   if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden.' };
@@ -409,6 +459,14 @@ const WERKZEUGE = [
     parameter: { type: 'object',
       properties: Object.assign({}, OBJEKT_ARGS,
         { stufe: { type: 'integer', description: '1, 2 oder 3' } }),
+      additionalProperties: false } },
+
+  { name: 'marktbericht_preis_alle', stufe: 'lesen', fn: marktbericht_preis_alle,
+    beschreibung: 'Was kostet eine Bewertung fuer ALLE Objekte zusammen? Nennt die '
+      + 'Gesamtzahl der Abrufe, den Bestand und welche Objekte unvollstaendig sind. '
+      + 'Kostet selbst nichts. IMMER aufrufen, wenn der Nutzer "fuer alle Objekte" sagt.',
+    parameter: { type: 'object',
+      properties: { stufe: { type: 'integer', description: '1, 2 oder 3' } },
       additionalProperties: false } },
 
   { name: 'marktbericht_abrufen', stufe: 'kostet', fn: marktbericht_abrufen,
