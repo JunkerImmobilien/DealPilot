@@ -174,7 +174,17 @@ async function laufen(frage, ctx, opts) {
           const args = a.args ? JSON.parse(a.args) : {};
           ergebnis = await w.fn(ctx, args);
         } catch (e) {
-          ergebnis = { fehler: String(e.message || e) };
+          /* v1809 · Mehrdeutigkeit ist ein Ergebnis, kein Fehler. Die
+             Kandidaten gehen ans Modell, damit es nachfragen kann — und
+             die Liste ist bereits gemerkt, also funktioniert "die zweite"
+             danach. */
+          if (e && e.mehrdeutig) {
+            ergebnis = { ok: false, rueckfrage: true, kandidaten: e.mehrdeutig,
+              hinweis: 'Mehrere Objekte passen. Zeige dem Nutzer die nummerierte '
+                     + 'Liste und frage, welches er meint. NICHTS ausfuehren.' };
+          } else {
+            ergebnis = { fehler: String(e.message || e) };
+          }
         }
       }
       if (ctx.protokoll) ctx.protokoll.push({ werkzeug: a.name, stufe: w ? w.stufe : '?' });

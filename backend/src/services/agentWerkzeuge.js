@@ -21,11 +21,29 @@
  * ── DREI STUFEN ──────────────────────────────────────────────────────────
  *
  *   lesen      laeuft sofort
- *   schreiben  laeuft erst nach einer Bestaetigung im Chat
- *   kostet     laeuft erst nach einer Bestaetigung, in der der PREIS stand
+ *   schreiben  laeuft sofort, aber NIE still: jedes Schreibwerkzeug
+ *              prueft selbst und gibt bei belegten Feldern oder unklaren
+ *              Auswahlwerten eine RUECKFRAGE zurueck, statt zu speichern
+ *   kostet     laeuft nur, wenn `darfKosten` gesetzt ist — und das setzt
+ *              der Webhook, nicht das Modell
  *
- * Die Stufe steht am Werkzeug, nicht im Prompt. Ein Modell, das man bittet,
- * vorher zu fragen, fragt meistens — und einmal nicht.
+ * ── v1809 · HIER STAND EIN VERSPRECHEN, DAS DER CODE NICHT HIELT ─────────
+ *
+ * Bis v1808 stand hier "schreiben laeuft erst nach einer Bestaetigung im
+ * Chat". Gemessen: `agentLauf.js` prueft NUR `stufe === 'kostet'`.
+ * Schreibwerkzeuge liefen ohne jede externe Sperre.
+ *
+ *   > Ein Kommentar, der mehr verspricht als der Code haelt, ist
+ *   > gefaehrlicher als gar keiner. Wer ihn liest, hoert auf zu pruefen.
+ *
+ * Die Sperre fuer Schreibwerkzeuge sitzt deshalb IM Werkzeug und ist
+ * inhaltlich: `felder_aendern` schreibt kein belegtes Feld und keinen
+ * ungueltigen Auswahlwert, sondern fragt. `objekt_anlegen` legt an — das
+ * ist bewusst erlaubt, weil ein neues Objekt nichts ueberschreibt und
+ * jederzeit wieder loeschbar ist.
+ *
+ * Fuer Geld gilt die harte Sperre: sie steht in `agentLauf.js` und das
+ * Modell kann sie nicht uebergehen.
  */
 const { query } = require('../db/pool');
 const dialog = require('./telegramDialogService');
@@ -358,6 +376,22 @@ async function objekt_anlegen(ctx, args) {
   });
   const r = { rows: [{ id: erstellt.id }] };
   ctx.merkeObjekt(r.rows[0].id);
+
+  /* ── v1809 · DEN LAUFENDEN ENTWURF AUFRAEUMEN ────────────────────────
+   *
+   * GEMESSEN: legte der Agent waehrend einer laufenden Webhook-Anlage ein
+   * Objekt an, blieb der Zustand `modus='anlegen'` samt Entwurf stehen.
+   * Die naechste Nachricht ging wieder in die Fuehrung, und am Ende stand
+   * DASSELBE Objekt ein zweites Mal in der Datenbank.
+   *
+   *   > Wer eine Sache zu Ende bringt, muss auch den Zettel wegwerfen,
+   *   > auf dem sie stand. Sonst macht sie jemand noch einmal.
+   *
+   * `ctx.anlageFertig` setzt der Webhook; ausserhalb davon (Prueflaeufe)
+   * gibt es sie nicht und es passiert nichts. */
+  if (typeof ctx.anlageFertig === 'function') {
+    try { await ctx.anlageFertig(); } catch (e) { /* nicht kritisch */ }
+  }
   const fo = fuehrung.fortschritt(sauber);
   const offen = fuehrung.luecken(sauber, { modus: 'anlegen' }).slice(0, 3);
   return { ok: true, id: r.rows[0].id, uebernommen: sauber,
@@ -629,7 +663,47 @@ async function _findeObjekt(ctx, args) {
     const liste = await dialog.objekteListe(ctx.userId, 60);
     const t = dialog.objektRaten(String(a.adresse), liste);
     if (t.art === 'eindeutig') return t.objekt.id;
-    if (t.art === 'mehrdeutig') return null;
+    if (t.art === 'mehrdeutig') {
+      /* ── v1809 · MEHRDEUTIG WAR EINE SACKGASSE ────────────────────────
+       *
+       * Hier stand `return null`, und das Werkzeug meldete darauf "Kein
+       * Objekt gefunden" — obwohl zwei gefunden wurden. Die Kandidaten
+       * gingen verloren, und ein spaeteres "die zweite" fand keine Liste.
+       *
+       *   > Zwei Treffer sind kein Fehlschlag, sondern eine Frage. Wer
+       *   > sie als Fehlschlag meldet, macht aus einer Rueckfrage eine
+       *   > Sackgasse. */
+      const ids = t.kandidaten.map((o) => o.id);
+      if (ctx.merkeListe) ctx.merkeListe(ids);
+      const e = new Error('mehrdeutig');
+      e.mehrdeutig = t.kandidaten.map((o, i) => ({ nummer: i + 1, adresse: o.adresse }));
+      throw e;
+    }
+  }
+
+  /* ── v1809 · NICHT BLIND AUFS LETZTE OBJEKT ZURUECKFALLEN ────────────
+   *
+   * Hier stand `return ctx.letztesObjekt` ohne jede Pruefung. Folge: eine
+   * Frage, die eine UNBEKANNTE Adresse nennt, wurde stillschweigend zum
+   * zuletzt besprochenen Objekt beantwortet.
+   *
+   *   > Eine Antwort zum falschen Objekt sieht genauso aus wie eine zum
+   *   > richtigen. Nur die Zahlen stimmen nicht, und das faellt niemandem
+   *   > auf, der sie nicht ohnehin kennt.
+   *
+   * Der Rueckfall gilt jetzt nur, wenn der Satz GAR KEINE eigene Adresse
+   * nennt — dieselbe Pruefung, die der Webhook mit `knuepftAn` macht. */
+  if (a.adresse && !ctx.letztesObjekt) return null;
+  if (a.adresse && ctx.letztesObjekt) {
+    const nennt = /\b(str\.|stra(ß|ss)e|weg|allee|platz|gasse|ring|damm)\b/i.test(String(a.adresse))
+      || /[a-zäöüß]{3,}(str\.?|stra(ß|ss)e|weg|allee|platz)\b/i.test(String(a.adresse));
+    if (nennt) return null;   /* eigene Adresse genannt, aber nicht gefunden */
+  }
+
+  /* Genau ein Objekt vorhanden? Dann ist es gemeint. */
+  if (!ctx.letztesObjekt) {
+    const liste = await dialog.objekteListe(ctx.userId, 3);
+    if (liste.length === 1) return liste[0].id;
   }
   return ctx.letztesObjekt || null;
 }

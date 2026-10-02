@@ -39,7 +39,6 @@ const voiceExtract = require('../services/voiceExtractService');
 const config = require('../config');
 const openai = require('../services/openaiService');
 const { copilotKontingent } = require('./ai');
-const markt = require('../services/telegramMarktService');
 const agent = require('../services/agentLauf');
 const objectService = require('../services/objectService');
 
@@ -65,10 +64,6 @@ const HILFE =
   + '„setz die Zimmerzahl auf 5"\n\n'
   + '_Befehle gehen auch: /neu · /objekte · /portfolio · /marktpreis · '
   + '/abbrechen · /stop_';
-
-/* Portfolio-Fragen erkennt man am Wortfeld, nicht an einer Absicht —
-   ein Modell dafuer zu fragen waere ein Aufruf fuer eine Weiche. */
-const PORTFOLIO_WORTE = /(portfolio|vermögen|vermoegen|bilanz|gesamt|insgesamt|alle objekte|wie viele objekte|in (fünf|zehn|5|10) jahren|zukunft|prognose|entwicklung|eigenkapital|restschuld|gesamtinvestition)/i;
 
 /* Eine lesende Telegram-Abfrage (getFile). Eigene Funktion, weil `senden`
    bewusst jeden Fehler schluckt — hier muss ein Fehler ankommen, sonst
@@ -123,6 +118,26 @@ async function sendenLang(token, chatId, text) {
   }
 }
 
+
+/* ── v1809 · JEDE BOTANTWORT GEHT IN DEN VERLAUF ─────────────────────────
+ *
+ * Vorher lief verlaufMerken nur an drei Stellen. Preisansage,
+ * Etappenfragen und Adressrueckfrage standen NIE darin — und die
+ * Geldsperre in agentAntwort liest genau diesen Verlauf, um zu
+ * entscheiden, ob ein "ja" eine Freigabe ist.
+ *
+ *   > Eine Sperre, die einen halb gefuellten Verlauf liest, prueft nicht
+ *   > die letzte Nachricht, sondern irgendeine aeltere. Dass sie
+ *   > meistens richtig liegt, macht sie nicht sicher.
+ *
+ * botSagt() sendet UND merkt. Wer senden() direkt ruft, muss einen Grund
+ * haben (Zwischenrufe wie "Ich hoere rein ...", die keine Antwort sind).
+ */
+async function botSagt(token, chatId, userId, text) {
+  await sendenLang(token, chatId, text);
+  await verlaufMerken(chatId, userId, 'assistant', text);
+}
+
 /* ── Der Agent antwortet ─────────────────────────────────────────────────
  *
  * Alles, was die Schnellmuster nicht abfangen, landet hier. Der Agent
@@ -171,6 +186,12 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     entwurf: (z && z.modus === 'anlegen' && z.entwurf) ? _ohneMarker(z.entwurf) : null,
     protokoll: protokoll,
     merkeObjekt: function (id) { this.letztesObjekt = id; },
+    /* v1809 · Legt der Agent ein Objekt an, waehrend hier eine Anlage
+       laeuft, wird der Entwurf aufgeraeumt - sonst steht dieselbe Sache
+       am Ende zweimal in der Datenbank. */
+    anlageFertig: async function () {
+      if (z && z.modus === 'anlegen') await zustandLoeschen(chatId, userId);
+    },
     merkeListe: function (ids) { this.letzteListe = ids; }
   };
 
@@ -224,9 +245,29 @@ function _ohneMarker(d) {
 function istFrage(text) {
   const t = String(text || '').trim();
   if (!t) return false;
+
+  /* ── v1809 · WAR ZU STRENG ───────────────────────────────────────────
+   *
+   * Hier stand "Fragewort am Anfang UND laenger als 12 Zeichen". Damit
+   * fiel "und die Miete?" durch (14 Zeichen, aber kein Fragewort aus der
+   * Liste) und landete in der Feldextraktion.
+   *
+   *   > Der Ausgang war da, aber nur fuer lange Fragen offen. Wer kurz
+   *   > fragt, sass fest.
+   *
+   * Das Fragezeichen entscheidet jetzt mit. Eine Angabe traegt selten
+   * eins — und wenn doch ("Baujahr 1962?"), greift die Ausnahme darunter. */
+  const mitFragezeichen = /\?\s*$/.test(t);
+
+  /* Eine Angabe, die fragend klingt: kurz, und ueberwiegend Zahlen oder
+     ein Feldwort mit Wert. "Baujahr 1962?" ist eine Angabe, keine Frage. */
+  if (mitFragezeichen && t.length < 30 && /\d/.test(t)
+      && !/^(wie|was|wo|wann|warum|wieso|welche|wieviel|wie viel)\b/i.test(t)) return false;
+
+  if (mitFragezeichen) return true;
   if (/^(wie|was|wo|wann|warum|wieso|welche[rsn]?|wieviel|wie viel|kannst du|zeig|gib mir|sag mir|liste)\b/i.test(t)
       && t.length > 12) return true;
-  if (/\b(portfolio|verm(ö|oe)gensbilanz|verbindlichkeit|gesamttilgung|deal ?score|marktpreis)\b/i.test(t)) return true;
+  if (/\b(portfolio|verm(ö|oe)gensbilanz|verbindlichkeit|gesamttilgung|deal ?score|marktpreis|marktwert)\b/i.test(t)) return true;
   return false;
 }
 
@@ -236,7 +277,7 @@ async function anlageAbschliessen(token, chatId, userId, entwurf) {
   const sauber = {};
   Object.keys(entwurf || {}).forEach((k) => { if (k.indexOf('__') !== 0) sauber[k] = entwurf[k]; });
   if (!Object.keys(sauber).length) {
-    await senden(token, chatId, 'Ich habe noch nichts, was ich anlegen könnte.');
+    await botSagt(token, chatId, userId, 'Ich habe noch nichts, was ich anlegen könnte.');
     return null;
   }
   /* v1804 · Ueber objectService.create, nicht per eigenem INSERT.
@@ -251,7 +292,7 @@ async function anlageAbschliessen(token, chatId, userId, entwurf) {
   await zustandLoeschen(chatId, userId);
   await objektMerken(chatId, userId, r.rows[0].id);
   const fo = fuehrung.fortschritt(sauber);
-  await senden(token, chatId,
+  await botSagt(token, chatId, userId,
     '✓ *Objekt angelegt.*\n\n'
     + (sauber.str ? sauber.str + ' ' + (sauber.hnr || '') + '\n' : '')
     + [sauber.plz, sauber.ort].filter(Boolean).join(' ')
@@ -294,304 +335,17 @@ async function anlegenStarten(token, chatId, userId, text) {
   await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
 
   if (Object.keys(schonDa).length) {
-    await senden(token, chatId, '*Neues Objekt* — das hast du mir schon gesagt:');
+    await botSagt(token, chatId, userId, '*Neues Objekt* — das hast du mir schon gesagt:');
     await aufnehmenFelder(token, chatId, userId, schonDa, {});
     return;
   }
 
-  await senden(token, chatId,
+  await botSagt(token, chatId, userId,
     '*Neues Objekt.* Erzähl mir davon — am liebsten als Sprachnachricht: '
     + 'Adresse, Art, Größe, Baujahr, Kaufpreis, Miete. Was du gerade weißt.\n\n'
     + 'Du kannst auch ein *Foto* vom Exposé schicken oder einfach tippen. '
     + 'Was fehlt, frage ich danach Schritt für Schritt nach.\n\n'
     + '_/abbrechen beendet jederzeit._');
-}
-
-/* ── DealScore und Investor Deal Score ───────────────────────────────────
- *
- * Beide werden im Browser gerechnet und am Objekt PERSISTIERT. Der Bot
- * liest sie, er rechnet sie nicht nach — dieselbe Regel wie beim
- * Portfolio-Spiegel.
- *
- *   > Ein zweiter Score waere eine zweite Meinung ueber denselben Deal.
- *   > Davon darf es keine geben, sonst steht im Chat eine andere Zahl als
- *   > auf der Karte.
- */
-async function scoreAuskunft(token, chatId, userId, text, bezugObjektId, z) {
-  let objektId = bezugObjektId;
-  if (!objektId) {
-    const liste = await dialog.objekteListe(userId, 60);
-    const t = dialog.objektRaten(text, liste);
-    if (t.art === 'mehrdeutig') {
-      await listeMerken(chatId, userId, t.kandidaten.map((o) => o.id), 'kandidaten');
-      await senden(token, chatId, 'Für welches Objekt?\n\n'
-        + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n'));
-      return;
-    }
-    if (t.art === 'eindeutig') objektId = t.objekt.id;
-    else if (z && z.letztes_objekt) objektId = z.letztes_objekt;
-    else if (liste.length === 1) objektId = liste[0].id;
-  }
-  if (!objektId) {
-    await senden(token, chatId,
-      'Für welches Objekt? Nenn mir die Adresse oder die Nummer aus der Liste.');
-    return;
-  }
-
-  const o = await dialog.objektKontext(userId, objektId);
-  if (!o) { await senden(token, chatId, 'Das Objekt finde ich nicht.'); return; }
-  await objektMerken(chatId, userId, objektId);
-
-  const s = dialog.scoreLesen(o.daten);
-  const adr = [o.daten.str, o.daten.hnr].filter(Boolean).join(' ')
-            + (o.daten.ort ? ', ' + o.daten.ort : '');
-
-  if (!s.dealscore && !s.investor) {
-    /* Nicht raten, nicht rechnen — den Weg nennen. */
-    await senden(token, chatId,
-      'Für *' + (adr || 'dieses Objekt') + '* liegt mir noch kein Score vor.\n\n'
-      + 'Er entsteht in DealPilot, sobald die Grundfelder stehen — Kaufpreis, '
-      + 'Miete, Finanzierung. Öffne das Objekt dort einmal, dann kann ich ihn '
-      + 'dir hier nennen.');
-    return;
-  }
-
-  let txt = '*' + (adr || 'Objekt') + '*\n';
-  if (s.dealscore != null) {
-    txt += '\nDealScore: *' + s.dealscore + '* von 100'
-         + (s.stufe ? ' · ' + s.stufe : '');
-  }
-  if (s.investor != null) {
-    txt += '\nInvestor Deal Score: *' + s.investor + '*'
-         + (s.investorStufe ? ' · ' + s.investorStufe : '');
-  }
-  if (s.weitere && s.weitere.length) {
-    txt += '\n\n' + s.weitere.map((w) => '• ' + w.name + ': *' + w.wert + '*').join('\n');
-  }
-  txt += '\n\n_Gerechnet in DealPilot — ich lese den gespeicherten Wert._';
-  await senden(token, chatId, txt);
-}
-
-/* ── Marktpreisindikation ────────────────────────────────────────────────
- *
- * Zwei Schritte, immer in dieser Reihenfolge: ansagen, dann abrufen. Der
- * Voranschlag kostet nichts und nennt Modus, Preis, Bestand und fehlende
- * Pflichtangaben.
- */
-async function marktpreisAnbieten(token, chatId, userId, text, bezugObjektId) {
-  let objekt = null;
-  if (bezugObjektId) {
-    objekt = await dialog.objektKontext(userId, bezugObjektId);
-  } else {
-    const liste = await dialog.objekteListe(userId, 60);
-    const t = dialog.objektRaten(text, liste);
-    if (t.art === 'mehrdeutig') {
-      await listeMerken(chatId, userId, t.kandidaten.map((o) => o.id), 'kandidaten');
-      await senden(token, chatId, 'Für welches Objekt?\n\n'
-        + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n')
-        + '\n\n_Nenn mir die Adresse oder einfach die Nummer._');
-      return;
-    }
-    if (t.art === 'eindeutig') objekt = await dialog.objektKontext(userId, t.objekt.id);
-    else if (liste.length === 1) objekt = await dialog.objektKontext(userId, liste[0].id);
-  }
-  if (!objekt) {
-    await senden(token, chatId,
-      'Für welches Objekt? Nenn mir die Adresse oder die Nummer — /objekte zeigt die Liste.');
-    return;
-  }
-  await objektMerken(chatId, userId, objekt.objekt_id);
-
-  const d = objekt.daten || {};
-  /* v1795c · HIER STANDEN ENGLISCHE FELDNAMEN (postCode, city, livingArea).
-     GEMESSEN an `missingFields` in avm.js:122: der Abruf erwartet DEUTSCHE
-     Namen, und zwar fast dieselben, die das Objekt ohnehin traegt —
-     plz, ort, str, hnr, objektart, wfl.
-
-     Folge der Annahme: der Voranschlag meldete "fehlende Felder: PLZ, Ort,
-     Objektart, Wohnflaeche" fuer ein Objekt, dessen Adresse vollstaendig
-     dasteht ("Musterstrasse 12, 04109 Leipzig"). Kein Fehler, keine
-     Warnung — nur vier Felder, die es zu kennen glaubte und nicht fand.
-
-     > Feldnamen werden nie angenommen, sondern an der Gegenstelle
-     > ausgelesen. Eine Zuordnung, die daneben greift, meldet nichts: sie
-     > findet einfach nichts.
-
-     Einzige echte Abweichung: das Objekt fuehrt `objart`, der Abruf will
-     `objektart`. */
-  const inputs = {
-    plz: d.plz || '', ort: d.ort || '', str: d.str || '', hnr: d.hnr || '',
-    objektart: d.objektart || d.objart || '', wfl: d.wfl || '',
-    baujahr: d.baujahr || '', zimmer: d.zimmer || ''
-  };
-
-  /* ── v1798 · WELCHE STUFE? ────────────────────────────────────────────
-   *
-   * Marcel: "ich kann auch eine marktpreisindikation oder eine erweiterte
-   * Marktpreisindikation abrufen".
-   *
-   *   1  mpi       Lage und Preisspanne
-   *   2  mpi_plus  zusaetzlich Zustand und Qualitaet
-   *
-   * Hier stand bis v1798 der AVM-Fremdabruf (sprengnetter). Der ist etwas
-   * ANDERES und als Produkt stillgelegt: `config.js:474` nahm `avm_a` und
-   * `avm_b` am 11.09.2026 aus der Preisliste, der Kaufweg ist zu, und
-   * gemessen stehen beide Baenke bei 0. Der Bot haette also zuverlaessig
-   * "Guthaben aufgebraucht" gemeldet.
-   *
-   *   > Ein Abrufweg, den es als Produkt nicht mehr gibt, ist kein
-   *   > Fallback. Er ist eine Sackgasse mit freundlicher Fehlermeldung. */
-  const willErweitert = /\b(erweitert|ausf(ü|ue)hrlich|gross|gro(ß|ss)|plus|genauer|detailliert)\b/i.test(text || '');
-  const stufe = willErweitert ? 2 : 1;
-
-  /* Pflichtangaben prueft der Marktbericht selbst — aber was ihm fehlt,
-     soll der Nutzer vorher wissen, nicht erst nach dem Abruf. */
-  const fehlt = [];
-  if (!d.plz && !d.ort) fehlt.push('PLZ oder Ort');
-  if (!d.objektart && !d.objart) fehlt.push('Objektart');
-  if (!d.wfl) fehlt.push('Wohnfläche');
-  if (fehlt.length) {
-    await senden(token, chatId,
-      'Für eine Indikation fehlen mir noch Angaben:\n'
-      + fehlt.map((f) => '• ' + f).join('\n')
-      + '\n\nSag sie mir einfach, dann hole ich sie ab.');
-    return;
-  }
-
-  let v;
-  try {
-    v = await markt.voranschlag(userId, objekt.objekt_id, stufe);
-  } catch (e) {
-    await senden(token, chatId, 'Der Voranschlag ging nicht: ' + (e.message || e));
-    return;
-  }
-  if (!v.moeglich) { await senden(token, chatId, v.grund); return; }
-
-  await zustandSetzen(chatId, userId, {
-    modus: 'marktpreis_bestaetigen',
-    entwurf: { __stufe: v.stufe },
-    objekt_id: objekt.objekt_id
-  });
-
-  await senden(token, chatId,
-    '*' + v.name + '* für ' + [d.str, d.hnr].filter(Boolean).join(' ')
-    + ', ' + [d.plz, d.ort].filter(Boolean).join(' ') + '\n\n'
-    + (v.verbraucht_einen_abruf
-        ? 'Das kostet *eine ' + v.name + '*'
-          + (v.bestand != null ? ' (noch ' + v.bestand + ' in deinem Kontingent)' : '') + '.'
-          + (v.schon_bezahlt ? '\n_Die Stufe darunter ist schon bezahlt — es wird nur die Differenz fällig._' : '')
-        : '_Diese Tiefe hast du für dieses Objekt bereits bezahlt — kostet nichts._')
-    + '\n\nSoll ich? (ja / nein)'
-    + (stufe === 1 ? '\n\n_Sag „erweitert", wenn du zusätzlich Zustand und Qualität willst._' : ''));
-}
-
-async function marktpreisAbrufen(token, chatId, userId, objektId, stufe) {
-  await zustandLoeschen(chatId, userId);
-  const objekt = await dialog.objektKontext(userId, objektId);
-  if (!objekt) { await senden(token, chatId, 'Das Objekt finde ich nicht mehr.'); return; }
-
-  await senden(token, chatId, 'Ich rechne — das dauert einen Moment …');
-  let r;
-  try {
-    r = await markt.abrufen(userId, objekt, stufe || 1);
-  } catch (e) {
-    await senden(token, chatId,
-      (e.fachlich ? '' : 'Da ging etwas schief: ') + (e.message || e)
-      + (e.upgradeTo ? '\n\n_Ab dem ' + e.upgradeTo + '-Plan ist diese Tiefe enthalten._' : ''));
-    return;
-  }
-
-  const z = (x) => (x == null ? null : Number(x).toLocaleString('de-DE'));
-  const w = r.wert || r.ergebnis || r.result || r;
-  const wert = w.marktwert || w.wert || w.value;
-  const von = w.spanne_von || w.low || (w.spanne && w.spanne.von);
-  const bis = w.spanne_bis || w.high || (w.spanne && w.spanne.bis);
-  const qm = w.eur_pro_qm || w.eur_per_sqm;
-
-  let txt = '*' + (markt.STUFEN[stufe || 1] || markt.STUFEN[1]).name + '*\n';
-  if (wert) txt += '\nWert: *' + z(wert) + ' €*';
-  if (von && bis) txt += '\nSpanne: ' + z(von) + ' – ' + z(bis) + ' €';
-  if (qm) txt += '\n' + z(qm) + ' €/m²';
-  if (!wert && !von) {
-    txt += '\n\nDer Bericht ist erstellt, eine Zahl kann ich hier aber nicht '
-         + 'herauslesen. Schau ihn dir in DealPilot an.';
-  }
-  txt += '\n\n_Indikation aus den Daten des zuständigen Gutachterausschusses — '
-       + 'kein Verkehrswert und kein Gutachten._';
-  await sendenLang(token, chatId, txt);
-}
-
-/* ── Eine Aenderung anbieten, nie still ausfuehren ───────────────────────
- *
- * Dieselbe Regel wie im Browser (`anwenden()` in copilot-aenderungen.js):
- * steht in einem Feld schon ein Wert, wird er GENANNT und die Aenderung
- * bestaetigt. Ein leeres Feld wird ohne Rueckfrage gefuellt — da gibt es
- * nichts zu verlieren.
- */
-async function aenderungAnbieten(token, chatId, userId, kontext, felder, antwortText) {
-  const daten = kontext.daten || {};
-  const sofort = {}, nachfragen = [];
-
-  for (const [id, wert] of Object.entries(felder)) {
-    if (!fuehrung.feld(id)) continue;                 /* unbekanntes Feld: still verwerfen waere falsch */
-    if (fuehrung.gefuellt(daten, id) && String(daten[id]) !== String(wert)) {
-      nachfragen.push({ id, alt: daten[id], neu: wert });
-    } else {
-      sofort[id] = wert;
-    }
-  }
-
-  const unbekannt = Object.keys(felder).filter((id) => !fuehrung.feld(id));
-
-  if (!Object.keys(sofort).length && !nachfragen.length) {
-    await senden(token, chatId,
-      unbekannt.length
-        ? 'Die genannten Angaben passen zu keinem Feld, das ich kenne ('
-          + unbekannt.join(', ') + ').'
-        : 'Da war nichts zu ändern — die Werte stehen schon so drin.');
-    return;
-  }
-
-  function name(id) { const f = fuehrung.feld(id); return (f && f.label) || id; }
-
-  if (nachfragen.length) {
-    /* Die Rueckfrage nennt BEIDE Werte. "Soll ich das aendern?" allein
-       waere eine Frage, die der Nutzer nicht beantworten kann. */
-    await zustandSetzen(chatId, userId, {
-      modus: 'aenderung_bestaetigen',
-      entwurf: { __felder: Object.assign({}, sofort,
-        Object.fromEntries(nachfragen.map((n) => [n.id, n.neu]))) },
-      objekt_id: kontext.objekt_id,
-      letzte_frage: 'aenderung'
-    });
-    await senden(token, chatId,
-      nachfragen.map((n) => '• *' + name(n.id) + '* steht auf *' + n.alt
-        + '*, du willst *' + n.neu + '*').join('\n')
-      + (Object.keys(sofort).length
-          ? '\n\nDazu neu: ' + Object.keys(sofort).map((id) => name(id) + ' = ' + sofort[id]).join(', ')
-          : '')
-      + '\n\nÄndern? (ja / nein)');
-    return;
-  }
-
-  await objektAendern(token, chatId, userId, kontext.objekt_id, sofort);
-}
-
-async function objektAendern(token, chatId, userId, objektId, felder) {
-  const r = await query(`SELECT data FROM objects WHERE id = $1 AND user_id = $2`,
-    [objektId, userId]);
-  if (!r.rows.length) { await senden(token, chatId, 'Das Objekt finde ich nicht mehr.'); return; }
-  const daten = Object.assign({}, r.rows[0].data || {}, felder);
-  await query(`UPDATE objects SET data = $3::jsonb, updated_at = now()
-                WHERE id = $1 AND user_id = $2`,
-    [objektId, userId, JSON.stringify(daten)]);
-  await zustandLoeschen(chatId, userId);
-
-  function name(id) { const f = fuehrung.feld(id); return (f && f.label) || id; }
-  await senden(token, chatId,
-    '✓ Geändert:\n'
-    + Object.keys(felder).map((id) => '• ' + name(id) + ': *' + felder[id] + '*').join('\n')
-    + '\n\n_Die Kennzahlen rechnet DealPilot beim nächsten Öffnen neu._');
 }
 
 /* ── Der Gespraechszustand ───────────────────────────────────────────── */
@@ -668,8 +422,6 @@ async function zustandLoeschen(chatId, userId) {
   await query(`DELETE FROM telegram_dialog WHERE chat_id = $1::bigint AND bot_user_id = $2`,
     [String(chatId), userId]);
 }
-
-function euro(n) { return Number(n).toLocaleString('de-DE'); }
 
 /* ── Eine Antwort aufnehmen ──────────────────────────────────────────────
  *
@@ -749,7 +501,7 @@ async function aufnehmenFelder(token, chatId, userId, neu, entwurf) {
   if (adresseNeu && adresseDa && !entwurf.__adr_ok) {
     zusammen.__adr_ok = true;
     await zustandSetzen(chatId, userId, { modus: 'adresse_bestaetigen', entwurf: zusammen });
-    await senden(token, chatId,
+    await botSagt(token, chatId, userId,
       'Ich habe verstanden:\n\n*'
       + [zusammen.str, zusammen.hnr].filter(Boolean).join(' ')
       + (zusammen.str ? '\n' : '')
@@ -764,7 +516,7 @@ async function aufnehmenFelder(token, chatId, userId, neu, entwurf) {
     const f = fuehrung.feld(id);
     return '• ' + (f && f.label ? f.label : id) + ': *' + neu[id] + '*';
   });
-  if (erkannt.length) await senden(token, chatId, 'Notiert:\n' + erkannt.join('\n'));
+  if (erkannt.length) await botSagt(token, chatId, userId, 'Notiert:\n' + erkannt.join('\n'));
 
   await weiterFragen(token, chatId, userId, zusammen);
 }
@@ -805,7 +557,7 @@ async function weiterFragen(token, chatId, userId, entwurf, zuletztOffen) {
     }
   });
 
-  await senden(token, chatId,
+  await botSagt(token, chatId, userId,
     (et ? '_Etappe ' + et.nr + ' von 6 · ' + et.name + '_\n\n' : '')
     + naechste.frage
     + (wahl.length ? '\n\n' + wahl.join('\n') : '')
@@ -821,66 +573,44 @@ async function weiterFragen(token, chatId, userId, entwurf, zuletztOffen) {
  * der Browser ruft.
  */
 async function beantworten(token, chatId, userId, text, msg) {
-  /* ── Laeuft gerade eine gefuehrte Anlage? ──────────────────────────── */
+  /* ── v1809 · EIN WEG, NICHT ZWEI ─────────────────────────────────────
+   *
+   * Nach dem Umbau auf den Agenten (v1801) lagen hier ZWEI Fassungen
+   * nebeneinander: die alte Musterweiche und der Agent. Beim Nachmessen
+   * am 02.10.2026 kam heraus, was das anrichtet:
+   *
+   *   - Der richtige Marktpreis-Aufruf war TOT, der kaputte lebte: er
+   *     bekam die Listennummer nicht und suchte nach einer Hausnummer 17.
+   *   - Ein Marktpreis-Satz waehrend einer Anlage VERNICHTETE den Entwurf.
+   *   - Die Adress-Rueckbestaetigung galt nur auf einem der beiden Wege —
+   *     wer anders formulierte, umging genau die Sicherung, die gegen
+   *     Sprachfehler gebaut war.
+   *   - Rund 200 Zeilen waren nur noch ueber die Tuer "abbrechen ohne
+   *     Schraegstrich" erreichbar.
+   *
+   *   > Zwei Wege zu derselben Sache sind nicht doppelt sicher. Einer
+   *   > davon ist der, auf dem die Fehler sitzen, und niemand weiss,
+   *   > welcher.
+   *
+   * Jetzt gilt: der Webhook fuehrt den ZUSTAND (Anlage, Bestaetigungen)
+   * und reicht alles andere an den Agenten. Was eine Entscheidung
+   * braucht, entscheidet das Modell mit Werkzeugen; was einen Zustand
+   * braucht, steht hier.
+   */
   const z = await zustand(chatId, userId);
 
-  if (/^\/abbrechen/i.test(text)) {
-    if (z) { await zustandLoeschen(chatId, userId); await senden(token, chatId, 'Abgebrochen. Der Entwurf ist verworfen.'); }
-    else await senden(token, chatId, 'Es läuft gerade nichts, was ich abbrechen könnte.');
-    return;
-  }
-
-  if (/^\/neu/i.test(text)) {
-    await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
-    await senden(token, chatId,
-      '*Neues Objekt.* Ich frage dich Schritt für Schritt durch — '
-      + 'du kannst aber auch gleich mehrere Angaben in einem Satz schicken, '
-      + 'ich sortiere sie zu.\n\n_/abbrechen beendet jederzeit._');
-    await weiterFragen(token, chatId, userId, {});
-    return;
-  }
-
-  /* ── Marktpreisindikation: erst ansagen, dann abrufen ─────────────────
-   *
-   * Marcel: "man koennte daraus jetzt auch einfach eine
-   * Marktpreisindikation holen, wenn man die Sachen angibt."
-   *
-   * Der Abruf kostet Guthaben. Deshalb geht hier NIE etwas raus, bevor der
-   * Preis im Chat stand und jemand "ja" gesagt hat.
-   *
-   *   > Bei Geld gibt es kein "im Zweifel ausfuehren". Ein Abruf, den
-   *   > niemand bestaetigt hat, ist eine Abbuchung ohne Auftrag. */
-  if (z && z.modus === 'marktpreis_bestaetigen') {
-    if (/^(ja|hol|mach|ok|okay|j)\b/i.test(text.trim())) {
-      await marktpreisAbrufen(token, chatId, userId, z.objekt_id, (z.entwurf || {}).__stufe || 1);
-      return;
-    }
-    await zustandLoeschen(chatId, userId);
-    await senden(token, chatId, 'Gut, ich hole nichts ab.');
-    return;
-  }
-
-  if (/^\/marktpreis/i.test(text) || /marktpreis|markt\s?wert|wertindikation|was ist (es|das objekt) wert/i.test(text)) {
-    await marktpreisAnbieten(token, chatId, userId, text);
-    return;
-  }
-
-  if (z && z.modus === 'aenderung_bestaetigen') {
-    if (/^(ja|mach|ok|okay|passt|j)\b/i.test(text.trim())) {
-      await objektAendern(token, chatId, userId, z.objekt_id, (z.entwurf || {}).__felder || {});
-      return;
-    }
-    if (/^(nein|nicht|stop|n)\b/i.test(text.trim())) {
+  /* ── Befehle, die immer gelten ───────────────────────────────────── */
+  if (/^\/abbrechen|^(abbrechen|abbruch|vergiss es|lass gut sein)\b/i.test(text.trim())) {
+    if (z && z.modus) {
       await zustandLoeschen(chatId, userId);
-      await senden(token, chatId, 'Gut, ich lasse es.');
-      return;
+      await senden(token, chatId, 'Abgebrochen. Der Entwurf ist verworfen.');
+    } else {
+      await senden(token, chatId, 'Es läuft gerade nichts, was ich abbrechen könnte.');
     }
-    /* Alles andere ist keine Antwort auf die Frage — lieber nachfassen als
-       eine Aenderung ausfuehren, die niemand bestaetigt hat. */
-    await senden(token, chatId, 'Soll ich das ändern? Bitte *ja* oder *nein*.');
     return;
   }
 
+  /* ── Bestaetigungen: hier haengt Geld und hier haengen Daten ──────── */
   if (z && z.modus === 'adresse_bestaetigen') {
     if (/^(ja|passt|stimmt|korrekt|richtig|j)\b/i.test(text.trim())) {
       await weiterFragen(token, chatId, userId, z.entwurf);
@@ -889,8 +619,9 @@ async function beantworten(token, chatId, userId, text, msg) {
     if (/^(nein|falsch|n)\b/i.test(text.trim())) {
       const e = Object.assign({}, z.entwurf);
       ['str', 'hnr', 'plz', 'ort'].forEach((id) => { delete e[id]; });
+      delete e.__adr_ok;
       await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: e });
-      await senden(token, chatId, 'Gut — dann nochmal: Straße, Hausnummer, PLZ und Ort?');
+      await botSagt(token, chatId, userId, 'Gut — dann nochmal: Straße, Hausnummer, PLZ und Ort?');
       return;
     }
     /* Keine klare Antwort: als Korrektur der Adresse lesen. */
@@ -898,51 +629,32 @@ async function beantworten(token, chatId, userId, text, msg) {
     return;
   }
 
-  /* ── v1800 · DER ANLEGE-MODUS HATTE KEINEN AUSGANG ───────────────────
-   *
-   * Hier stand ein unbedingtes `aufnehmen(...)` mit `return`. Jede
-   * Nachricht im Anlege-Modus ging in die Feldextraktion — und wenn die
-   * nichts verstand, kam "Daraus konnte ich kein Feld lesen", bei der
-   * naechsten Nachricht wieder, und wieder.
-   *
-   * Marcel am 02.10.2026: "dann ist er in diesem Schritt haengen
-   * geblieben und hat nicht weitergemacht."
-   *
-   *   > Ein Zustand, aus dem nur ein Befehl herausfuehrt, den der Nutzer
-   *   > nicht kennt, ist kein Dialog, sondern ein Formular mit
-   *   > Sprechblasen.
-   *
-   * Drei Auswege, und der Entwurf bleibt bei allen dreien stehen:
-   *   1. eine ECHTE FRAGE geht an den Agenten, nicht in die Extraktion
-   *   2. "weiter"/"ueberspringen" ueberspringt den aktuellen Block
-   *   3. "fertig" legt an, was da ist
-   *
-   * Der Fortschritt ist damit zustandsbehaftet UND unterbrechbar — genau
-   * das, was die Spezifikation unter Punkt 5 verlangt. */
+  /* ── Die gefuehrte Anlage ─────────────────────────────────────────── */
   if (z && z.modus === 'anlegen') {
     if (/^(weiter|n(ä|ae)chste|ueberspringen|überspringen|skip|wei(ss|ß) ich nicht|keine ahnung|sp(ä|ae)ter)\b/i.test(text.trim())) {
-      /* Den Block ueberspringen: die offenen Ids als "bewusst leer"
-         merken, damit `luecken` sie nicht sofort wieder anbietet. */
       const e = Object.assign({}, z.entwurf || {});
       (z.offene_ids || []).forEach((id) => { if (e[id] == null) e['__uebersprungen_' + id] = true; });
       await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: e });
-      await weiterFragen(token, chatId, userId, e, (z.offene_ids || []));
+      await weiterFragen(token, chatId, userId, e);
       return;
     }
     if (/^(fertig|speichern|anlegen|das war'?s|das wars|reicht)\b/i.test(text.trim())) {
       await anlageAbschliessen(token, chatId, userId, z.entwurf || {});
       return;
     }
-    /* Eine Frage ist keine Antwort. Wer mitten in der Anlage wissen will,
-       wie sein Portfolio steht, bekommt die Auskunft — und danach geht es
-       weiter, wo es war. */
+    /* Eine Frage ist keine Antwort. Sie geht an den Agenten, der Entwurf
+       bleibt stehen — und danach geht es weiter, wo es war.
+
+       v1809: istFrage war zu streng (Fragewort UND Laenge > 12), "und
+       die Miete?" fiel durch. Jetzt entscheidet das Fragezeichen mit. */
     if (istFrage(text)) {
-      await senden(token, chatId, '_(Die Anlage läuft weiter — ich merke sie mir.)_');
-      /* NICHT return: faellt durch zur normalen Auskunft weiter unten. */
-    } else {
-      await aufnehmen(token, chatId, userId, text, z.entwurf);
+      await agentAntwort(token, chatId, userId, text, z, null);
+      const offen = fuehrung.naechsteFrage(_ohneMarker(z.entwurf || {}), { modus: 'anlegen' });
+      if (offen) await botSagt(token, chatId, userId, '_Zurück zur Anlage:_ ' + offen.frage);
       return;
     }
+    await aufnehmen(token, chatId, userId, text, z.entwurf);
+    return;
   }
 
   /* ── Sprachnachricht ──────────────────────────────────────────────────
@@ -1091,206 +803,37 @@ async function beantworten(token, chatId, userId, text, msg) {
 
   const was = absicht.erkenne(text);
 
-  /* ── v1801 · DIE MUSTER SIND NUR NOCH EIN SCHNELLPFAD ────────────────
+  /* ── v1809 · NUR NOCH DREI SCHNELLPFADE ──────────────────────────────
    *
-   * Bis v1800 entschied die Musterliste, was eine Nachricht will. Marcel
-   * hat gemessen, wo das endet: von seinen fuenf Portfolio-Fragen traf
-   * sie eine. Erweitern haette nichts geholfen —
+   * Die Liste und die Hilfe sind haeufig, eindeutig und kosten nichts — ein
+   * Modellaufruf dafuer waere nur langsamer. Das Anlegen startet einen
+   * ZUSTAND, und der gehoert in den Webhook, nicht ins Modell.
    *
-   *   > Das Problem ist nicht die Liste, sondern dass es eine Liste ist.
-   *
-   * Jetzt faengt sie nur noch ab, was EINDEUTIG und HAEUFIG ist: die
-   * Objektliste, die Hilfe, die Befehle. Alles andere geht an den
-   * Agenten, der sich seine Daten selbst holt.
-   *
-   * `portfolio` und `score` sind bewusst NICHT mehr dabei: dort beginnen
-   * die Rueckfragen, und genau die konnte die Weiche nicht. */
-  const SCHNELL = ['liste', 'hilfe', 'anlegen', 'abbrechen', 'stop'];
-  if (SCHNELL.indexOf(was.art) < 0) {
-    await agentAntwort(token, chatId, userId, text, z, bezugObjektId);
-    return;
-  }
-
-  /* ── Liste ────────────────────────────────────────────────────────── */
+   * Alles andere geht an den Agenten. Auch Marktpreis, Score und
+   * Portfolio: dort beginnen die Rueckfragen, und genau die konnte die
+   * Musterweiche nie. */
   if (was.art === 'liste') {
     const liste = await dialog.objekteListe(userId, 40);
     if (!liste.length) {
-      await senden(token, chatId, 'Ich sehe noch keine Objekte in deinem Konto.');
+      await botSagt(token, chatId, userId, 'Ich sehe noch keine Objekte in deinem Konto.');
       return;
     }
-    /* Die Reihenfolge wird GEMERKT — sie ist die Grundlage für "Objekt 17". */
     await listeMerken(chatId, userId, liste.map((o) => o.id), 'objekte');
     const zeilen = liste.map((o, i) => (i + 1) + '. *' + (o.adresse || 'ohne Adresse') + '*'
       + (o.kp ? ' · ' + Number(o.kp).toLocaleString('de-DE') + ' €' : ''));
-    const txt = '*Deine Objekte* (' + liste.length + ')\n\n' + zeilen.join('\n')
-      + '\n\n_Frag mich zu einem davon — Adresse oder einfach die Nummer._';
-    await sendenLang(token, chatId, txt);
-    await verlaufMerken(chatId, userId, 'assistant', 'Liste mit ' + liste.length + ' Objekten gezeigt');
+    await sendenLang(token, chatId,
+      '*Deine Objekte* (' + liste.length + ')' + '\n\n' + zeilen.join('\n')
+      + '\n\n_Frag mich zu einem davon — Adresse oder einfach die Nummer._');
+    await verlaufMerken(chatId, userId, 'assistant',
+      'Nummerierte Liste mit ' + liste.length + ' Objekten gezeigt.');
     return;
   }
 
-  if (was.art === 'hilfe') { await senden(token, chatId, HILFE); return; }
+  if (was.art === 'hilfe') { await botSagt(token, chatId, userId, HILFE); return; }
 
   if (was.art === 'anlegen') { await anlegenStarten(token, chatId, userId, text); return; }
 
-  if (was.art === 'marktpreis') {
-    await marktpreisAnbieten(token, chatId, userId, text, bezugObjektId);
-    return;
-  }
-
-  if (was.art === 'score') {
-    await scoreAuskunft(token, chatId, userId, text, bezugObjektId, z);
-    return;
-  }
-
-  /* Portfolio: Spiegel oder ehrliche Fehlanzeige. */
-  const willPortfolio = was.art === 'portfolio';
-  let kontext = null, kontextArt = null, stand = null;
-
-  if (willPortfolio) {
-    const sp = await dialog.portfolioKontext(userId);
-    if (!sp) {
-      /* KEINE ERSATZRECHNUNG. Lieber sagen, dass die Zahl fehlt, als eine
-         zweite Quelle aufzumachen — genau daran ist projectAll jahrelang
-         unbemerkt vorbeigerechnet. */
-      await senden(token, chatId,
-        'Deine Portfolio-Zahlen liegen mir hier noch nicht vor.\n\n'
-        + 'Sie entstehen in DealPilot selbst — öffne die App einmal kurz, '
-        + 'dann kann ich sie dir hier nennen. (Ich rechne sie bewusst nicht '
-        + 'selbst nach: eine zweite Rechnung wäre irgendwann eine andere.)');
-      return;
-    }
-    kontext = sp.payload;
-    kontextArt = 'portfolio';
-    stand = dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem);
-    if (/^\/portfolio\s*$/i.test(text)) {
-      text = 'Gib mir einen kurzen Ueberblick ueber mein Portfolio: '
-           + 'Anzahl Objekte, Gesamtinvestition, Eigenkapital, Restschuld, '
-           + 'Cashflow und wo ich in zehn Jahren stehe.';
-    }
-  } else {
-    /* ── Welches Objekt ist gemeint? VIER Wege, in dieser Reihenfolge ───
-     *
-     *   1. Bezug auf die Liste   "Objekt 17"      — eindeutig, schlaegt alles
-     *   2. Adresse im Satz        "Parkstr. 9"    — die Zuordnung fragt bei Gleichstand
-     *   3. Anknuepfung            "und die Miete?" — das zuletzt besprochene
-     *   4. genau ein Objekt vorhanden
-     *
-     * Die Reihenfolge ist nicht beliebig: wer zuerst nach einer Adresse
-     * sucht, findet in "Objekt 17" keine und faellt auf die Anknuepfung
-     * zurueck — und antwortet dann zum vorigen Objekt. */
-    if (bezugObjektId) {
-      kontext = await dialog.objektKontext(userId, bezugObjektId);
-      if (!kontext) {
-        await senden(token, chatId, 'Das Objekt aus der Liste finde ich nicht mehr.');
-        return;
-      }
-    } else {
-      const liste = await dialog.objekteListe(userId, 60);
-      const t = dialog.objektRaten(text, liste);
-      if (t.art === 'mehrdeutig') {
-        /* Auch diese Liste wird gemerkt — "die zweite" muss danach gehen. */
-        await listeMerken(chatId, userId, t.kandidaten.map((o) => o.id), 'kandidaten');
-        await senden(token, chatId,
-          'Welches Objekt meinst du?\n\n'
-          + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n')
-          + '\n\n_Nenn mir die Hausnummer, den Ort — oder einfach die Nummer._');
-        return;
-      }
-      if (t.art === 'eindeutig') {
-        kontext = await dialog.objektKontext(userId, t.objekt.id);
-      } else if (z && z.letztes_objekt && absicht.knuepftAn(text)) {
-        kontext = await dialog.objektKontext(userId, z.letztes_objekt);
-      } else if (liste.length === 1) {
-        kontext = await dialog.objektKontext(userId, liste[0].id);
-      } else {
-        await senden(token, chatId,
-          'Zu welchem Objekt? Nenn mir die Adresse oder die Nummer aus der Liste '
-          + '— /objekte zeigt sie dir.\n\n'
-          + 'Oder frag mich etwas über dein *Portfolio* als Ganzes.');
-        return;
-      }
-    }
-    if (kontext) await objektMerken(chatId, userId, kontext.objekt_id);
-  }
-
-  /* Das Tageslimit ist DASSELBE wie im Browser (ai.js). Zwei Zaehler waeren
-     zwei Limits. */
-  const k = await copilotKontingent.verbrauchen(userId);
-  if (!k.ok) {
-    await senden(token, chatId,
-      'Dein Co-Pilot-Tageslimit ist erreicht (' + k.limit + ' Antworten). Morgen wieder.');
-    return;
-  }
-
-  let r;
-  try {
-    /* DER KATALOG GEHT MIT — sonst kann das Modell gar nicht erkennen,
-       dass ein Satz eine Anweisung ist, und antwortet freundlich statt zu
-       aendern. Im Browser gilt seit v1767 dieselbe Regel, und dort steht
-       auch die Begruendung: die Feld-Ids sind bei jedem Objekt dieselben,
-       verschieden sind nur die Werte. */
-    /* v1798 · DER VERLAUF GEHT MIT. Ohne ihn beantwortet das Modell
-       "und die Miete?" aus dem Nichts — es weiss nicht, wovon eben die
-       Rede war, und fragt zurueck oder rät.
-
-       Die Form ist dieselbe wie im Browser-Co-Piloten:
-       [{ role, content }], die letzten zwölf. */
-    const verlauf = ((z && z.verlauf) || [])
-      .slice(-12)
-      .map((e) => ({ role: e.rolle === 'user' ? 'user' : 'assistant', content: e.text }));
-
-    r = await dialog.antwort({
-      message: text, context: kontext, kontextArt: kontextArt,
-      history: verlauf,
-      felder: kontextArt === 'portfolio' ? null : fuehrung.katalog()
-    });
-  } catch (e) {
-    await senden(token, chatId, 'Da ist mir gerade etwas dazwischengekommen: ' + (e.message || e));
-    return;
-  }
-
-  /* Das Feld heisst `reply` — gemessen an openaiService.js:2275, nicht
-     geraten. Mein erster Versuch las `message || text || answer` und haette
-     bei JEDER Antwort "keine Antwort bekommen" gemeldet. */
-  let out = (r && r.reply) || '';
-  if (!out) { await senden(token, chatId, 'Dazu habe ich keine Antwort bekommen.'); return; }
-
-  /* ── Will das Modell etwas AENDERN? ───────────────────────────────────
-   *
-   * `copilotChat` antwortet mit einem Block `<<<FELDER {"id":"wert"} FELDER>>>`,
-   * wenn der Satz eine Anweisung war ("aender die Zimmerzahl auf fuenf").
-   * Im Browser wertet `copilot-aenderungen.js` ihn aus; hier dasselbe —
-   * mit derselben Regel, die es dort gekostet hat:
-   *
-   *   > Eine Aenderung an einem belegten Feld wird NIE still gemacht.
-   *   > Gefragt wird mit beiden Werten im Satz, und ohne Antwort passiert
-   *   > nichts.
-   *
-   * Das Objekt steht hier bereits fest: `kontext.objekt_id` kommt aus der
-   * Zuordnung weiter oben, und die fragt bei Gleichstand nach. */
-  const fblock = /<<<FELDER\s*([\s\S]*?)\s*FELDER>>>/.exec(out);
-  if (fblock && kontext && kontext.objekt_id) {
-    let felder = null;
-    try { felder = JSON.parse(fblock[1]); } catch (e) { felder = null; }
-    if (felder && typeof felder === 'object' && !Array.isArray(felder)) {
-      await aenderungAnbieten(token, chatId, userId, kontext, felder, out);
-      return;
-    }
-  }
-
-  /* Steueranweisungen des Modells gehoeren nicht in den Chat — sie sind
-     fuer die Oberflaeche gedacht, nicht fuer den Leser. */
-  out = out.replace(/<<<FELDER[\s\S]*?FELDER>>>/g, '').replace(/<<<ABRUF[\s\S]*?ABRUF>>>/g, '').trim();
-  if (!out) {
-    await senden(token, chatId,
-      'Das habe ich als Anweisung gelesen, aber ich konnte kein Objekt dazu '
-      + 'finden. Nenn mir die Adresse — /objekte zeigt die Liste.');
-    return;
-  }
-
-  if (stand) out += '\n\n_' + stand + '_';
-  await sendenLang(token, chatId, out);
+  await agentAntwort(token, chatId, userId, text, z, bezugObjektId);
 }
 
 router.post('/:pfad', async (req, res) => {
