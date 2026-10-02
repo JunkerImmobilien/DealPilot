@@ -993,14 +993,43 @@
 
         _scrollIntoView(el);
 
-        setTimeout(function() {
-          _createOverlay();
-          _positionSpotlight(el);
-          _renderBubbleContent(step);
-          setTimeout(function() {
-            _positionBubble(el, step.placement);
-          }, 30);
-        }, 450);
+        /* ═══ v1781 · AUF DAS ENDE DES SCROLLENS WARTEN, NICHT AUF DIE UHR ═══
+
+           Hier standen 450 ms nach dem START eines `behavior: 'smooth'`-
+           Scrollings. Bei einem kurzen Weg reicht das; bei einem langen
+           ist das Bild noch unterwegs, und der Spot wird auf die ALTE
+           Position gesetzt.
+
+           Gemessen am 02.10.2026 an Schritt 24 (Stress-Test): der Chart
+           ist 883 px hoch und steht bei y ≈ 6.869 — der Spot landete
+           ausserhalb des Fensters, obwohl das Ziel da war und gefunden
+           wurde.
+
+           > Eine feste Wartezeit nach einer Bewegung trifft nur die
+           > Wege, fuer die sie gewaehlt wurde.
+
+           Gewartet wird jetzt, bis das Ziel ZWEIMAL hintereinander an
+           derselben Stelle steht — dann steht das Bild. Mit 900 ms
+           Obergrenze, damit nichts haengenbleibt, wenn etwas dauernd in
+           Bewegung ist (Animation, Ladebalken). Dieselbe Bauart wie der
+           Tab-Wechsel seit v1745. */
+        (function _wennRuhig(seit, letztesY, gleich) {
+          seit = seit || Date.now();
+          var y = null;
+          try { y = Math.round(el.getBoundingClientRect().top); } catch (e) {}
+          var ruht = (y !== null && y === letztesY);
+          gleich = ruht ? (gleich || 0) + 1 : 0;
+          if (gleich >= 2 || (Date.now() - seit) >= 900) {
+            _createOverlay();
+            _positionSpotlight(el);
+            _renderBubbleContent(step);
+            setTimeout(function () {
+              _positionBubble(el, step.placement);
+            }, 30);
+            return;
+          }
+          setTimeout(function () { _wennRuhig(seit, y, gleich); }, 90);
+        })();
       });
     });
   }
