@@ -365,7 +365,28 @@ function updHeaderBadges() {
     html +=
       '<div class="sc-pill tier-' + pillTier + '" title="' + d.label + ' (' + pct + '/100) — ' + compInfo.filled + ' von ' + compInfo.total + ' KPIs ausgefüllt">' +
         '<div class="sc-pill-l"><span>' + d.label.toUpperCase() + '</span><span class="ic"><svg><use href="#' + d.icon + '"/></svg></span></div>' +
-        '<div class="sc-pill-v">' + pct + ' %</div>' +
+        /* ═══ v1785 · "72 %" UNTER "RENDITE" IST KEINE RENDITE ═══════════
+
+           Marcel am 28.09.2026: „die Zusammensetzung des Deal Scores, das
+           sieht in der Demo noch anders aus." Im Backlog steht der Kern
+           davon als P3c:
+
+             > „RENDITE 72 %" liest sich wie eine Rendite, ist aber ein
+             > Score-Anteil.
+
+           Der `title` dieser Pille sagt es seit jeher richtig —
+           „Rendite (72/100) — 4 von 4 KPIs ausgefuellt". Nur der
+           SICHTBARE Text trug ein Prozentzeichen, und das macht aus
+           72 Punkten eine Rendite von 72 Prozent.
+
+           > Eine Einheit, die nicht stimmt, ist schlimmer als keine. Sie
+           > wird gelesen und geglaubt.
+
+           `72/100` ist dieselbe Zahl, nur ohne die falsche Behauptung.
+           Die GESTALTUNG bleibt unveraendert — ob die Zeile kuenftig die
+           echten Werte tragen soll (Rendite 4,72 %, DSCR 1,27 wie in der
+           Demo), ist eine Produktentscheidung und steht weiter offen. */
+        '<div class="sc-pill-v">' + pct + '<span class="sc-pill-v-max">/100</span></div>' +
         '<div class="sc-pill-sub">' + compInfo.filled + ' / ' + compInfo.total + ' KPIs</div>' +
         '<div class="sc-bar"><i style="width:' + pct + '%"></i></div>' +
       '</div>';
