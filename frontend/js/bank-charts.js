@@ -704,6 +704,50 @@ if (!window._wlc) {
     var total        = _vz.verm_zuwachs;                                      // Total = Σ aller 4
 
     var eigenanteil = _vz.tilg_eigenanteil;
+
+    /* ═══ v1780 · tilgEffektivBrutto WAR NIE DEFINIERT ═══════════════════
+
+       Gemessen am 02.10.2026 am laufenden System:
+
+         BankCharts.renderWaterfall(host, State)
+           -> ReferenceError: tilgEffektivBrutto is not defined
+
+       Die Variable wird in zwei Fusszeilen gelesen (Z. 869 und 871),
+       aber nirgends gesetzt. Der Waterfall stuerzte deshalb bei JEDEM
+       Aufruf ab — und weil `_renderAll()` die vier Charts NACHEINANDER
+       rendert, riss er den Stress-Test mit:
+
+         bc-equity     1 Kind, 702 px      gerendert
+         bc-cockpit    1 Kind, 628 px      gerendert
+         bc-waterfall  0 Kinder, 0 px      <- stuerzt hier ab
+         bc-stress     0 Kinder, 0 px      <- wird nie erreicht
+
+       Von Hand aufgerufen rendert `renderStressMatrix` einwandfrei
+       (883 px). Der Stress-Test war also nie kaputt — er kam nur nie
+       an die Reihe.
+
+       > Zwei Charts hintereinander in einer Funktion heissen: der erste
+       > Fehler kostet beide. Aufgefallen ist es ueber die Tour, die auf
+       > `#bc-stress` zeigte und nichts markieren konnte.
+
+       VIER ZEILEN HOEHER STEHT DERSELBE FEHLER SCHON EINMAL: "V63.90
+       BUG-FIX: endRow war undefiniert — JS-ReferenceError liess den
+       Waterfall crashen". Dieselbe Funktion, dieselbe Fehlerklasse.
+
+       WAS DIE GROESSE IST, sagt der Fusszeilentext selbst: "Brutto X
+       (Tilgung + BSV-Guthaben), abzueglich Eigenanteil = echter
+       Schuldenabbau". Also brutto = netto + Eigenanteil.
+
+       Gegengeprueft am echten Datensatz, beide Lesarten treffen sich:
+
+         tilg_durch_einnahmen   20.209
+         tilg_eigenanteil        3.254
+         Summe                  23.463
+         tilgung_kum            23.463   <- identisch, gemessen
+
+       Keine neue Rechnung: `tilgEffektiv` und `eigenanteil` stehen
+       beide schon hier und kommen aus `_vz` (calc.js). */
+    var tilgEffektivBrutto = tilgEffektiv + eigenanteil;
     // V63.90 BUG-FIX: endRow war undefiniert — JS-ReferenceError ließ den Waterfall
     // crashen, sodass im PDF "Chart konnte nicht gerendert werden" erschien.
     var endRow = cfRows[cfRows.length - 1];
@@ -1062,10 +1106,35 @@ if (!window._wlc) {
     var h3 = document.getElementById('bc-waterfall');
     var h4 = document.getElementById('bc-stress');
 
-    if (h1) _renderEquityBuild(h1, state);
-    if (h2) _renderBankCockpit(h2, state);
-    if (h3) _renderWaterfall(h3, state);
-    if (h4) _renderStressMatrix(h4, state);
+    /* ═══ v1780 · EIN CHART DARF DIE ANDEREN NICHT MITREISSEN ═══════════
+
+       Hier standen vier nackte Aufrufe. Als `_renderWaterfall` an einem
+       ReferenceError starb, blieb `bc-stress` leer — nicht weil er kaputt
+       war, sondern weil er nie an die Reihe kam. Gemessen: von Hand
+       aufgerufen rendert er 883 px einwandfrei.
+
+       > Vier Dinge in einer Reihe: der erste Fehler kostet alle, die
+       > danach kommen. Und der Schaden sieht aus wie vier Fehler.
+
+       Jeder Aufruf steht jetzt für sich. Ein Chart, der stirbt, zeigt
+       seinen Fehler IM Behaelter — sonst bliebe eine leere Flaeche, und
+       die sieht aus wie "nichts zu zeigen" statt wie ein Defekt. */
+    var _vier = [[h1, _renderEquityBuild, 'Eigenkapital-Aufbau'],
+                 [h2, _renderBankCockpit, 'Bank-Cockpit'],
+                 [h3, _renderWaterfall,   'Vom Mietertrag zum Cashflow'],
+                 [h4, _renderStressMatrix, 'Belastungsprobe']];
+    _vier.forEach(function (x) {
+      if (!x[0]) return;
+      try {
+        x[1](x[0], state);
+      } catch (e) {
+        try {
+          console.error('[BankCharts v1780] ' + x[2] + ' konnte nicht gerendert werden:', e);
+          x[0].innerHTML = '<div class="bc-empty">' + x[2]
+            + ' konnte nicht berechnet werden. Die anderen Auswertungen stehen.</div>';
+        } catch (e2) {}
+      }
+    });
   }
 
   // ═══════════════════════════════════════════════════════════════
