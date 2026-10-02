@@ -40,6 +40,7 @@ const config = require('../config');
 const openai = require('../services/openaiService');
 const { copilotKontingent } = require('./ai');
 const markt = require('../services/telegramMarktService');
+const agent = require('../services/agentLauf');
 
 const TG = 'https://api.telegram.org/bot';
 const PROVIDER = 'telegram';
@@ -119,6 +120,83 @@ async function sendenLang(token, chatId, text) {
     await senden(token, chatId, stueck);
     rest = rest.slice(stueck.length).replace(/^\n+/, '');
   }
+}
+
+/* ── Der Agent antwortet ─────────────────────────────────────────────────
+ *
+ * Alles, was die Schnellmuster nicht abfangen, landet hier. Der Agent
+ * bekommt die Frage, die Lage (letzte Liste, letztes Objekt, laufender
+ * Entwurf) und den Werkzeugkasten — und holt sich selbst, was er braucht.
+ *
+ * Das Tageslimit ist DASSELBE wie im Browser. Ein Agentenlauf kann
+ * mehrere Modellrunden kosten, zaehlt aber als EINE Antwort: gezaehlt
+ * wird, was der Nutzer bekommt, nicht was intern passiert.
+ */
+async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
+  const k = await copilotKontingent.verbrauchen(userId);
+  if (!k.ok) {
+    await senden(token, chatId,
+      'Dein Co-Pilot-Tageslimit ist erreicht (' + k.limit + ' Antworten). Morgen wieder.');
+    return;
+  }
+
+  /* Telegram zeigt "tippt …", solange wir arbeiten. Bei mehreren
+     Werkzeugrunden dauert das ein paar Sekunden — ohne Zeichen haelt der
+     Nutzer den Bot fuer tot. */
+  try { await tgGet(token, 'sendChatAction', { chat_id: chatId, action: 'typing' }); } catch (e) {}
+
+  const protokoll = [];
+  const ctx = {
+    userId: userId,
+    letzteListe: (z && z.letzte_liste) || null,
+    letztesObjekt: bezugObjektId || (z && z.letztes_objekt) || null,
+    entwurf: (z && z.modus === 'anlegen' && z.entwurf) ? _ohneMarker(z.entwurf) : null,
+    protokoll: protokoll,
+    merkeObjekt: function (id) { this.letztesObjekt = id; },
+    merkeListe: function (ids) { this.letzteListe = ids; }
+  };
+
+  let r;
+  try {
+    r = await agent.laufen(text, ctx, {
+      verlauf: (z && z.verlauf) || [],
+      /* Geld NIE im ersten Anlauf. Der Agent darf den Preis holen und
+         fragen; abrufen darf er erst, wenn der Nutzer zugestimmt hat —
+         und das erkennt der Bestaetigungszweig, nicht das Modell. */
+      darfKosten: false
+    });
+  } catch (e) {
+    await senden(token, chatId,
+      e.code === 'NO_API_KEY'
+        ? 'Mir fehlt gerade der Zugang zur KI.'
+        : 'Da ist mir etwas dazwischengekommen: ' + (e.message || e));
+    return;
+  }
+
+  /* Hat der Agent ein Objekt angefasst, merken wir es uns fuer "und die
+     Miete?" — der Agent selbst hat keinen Zugriff auf die Datenbankzeile. */
+  if (ctx.letztesObjekt && ctx.letztesObjekt !== (z && z.letztes_objekt)) {
+    await objektMerken(chatId, userId, ctx.letztesObjekt);
+  }
+  if (ctx.letzteListe && ctx.letzteListe !== (z && z.letzte_liste)) {
+    await listeMerken(chatId, userId, ctx.letzteListe, 'objekte');
+  }
+
+  const out = String(r.text || '').trim();
+  if (!out) { await senden(token, chatId, 'Dazu fällt mir gerade nichts ein.'); return; }
+  await sendenLang(token, chatId, out);
+  await verlaufMerken(chatId, userId, 'assistant', out);
+
+  try {
+    console.debug('[agent] ' + protokoll.length + ' Werkzeuge in ' + r.runden
+      + ' Runden: ' + protokoll.map((p) => p.werkzeug).join(', '));
+  } catch (e) {}
+}
+
+function _ohneMarker(d) {
+  const o = {};
+  Object.keys(d || {}).forEach((k) => { if (k.indexOf('__') !== 0) o[k] = d[k]; });
+  return o;
 }
 
 /* Ist das eine Frage oder eine Angabe? Entscheidet, ob eine Nachricht im
@@ -991,6 +1069,26 @@ async function beantworten(token, chatId, userId, text, msg) {
   }
 
   const was = absicht.erkenne(text);
+
+  /* ── v1801 · DIE MUSTER SIND NUR NOCH EIN SCHNELLPFAD ────────────────
+   *
+   * Bis v1800 entschied die Musterliste, was eine Nachricht will. Marcel
+   * hat gemessen, wo das endet: von seinen fuenf Portfolio-Fragen traf
+   * sie eine. Erweitern haette nichts geholfen —
+   *
+   *   > Das Problem ist nicht die Liste, sondern dass es eine Liste ist.
+   *
+   * Jetzt faengt sie nur noch ab, was EINDEUTIG und HAEUFIG ist: die
+   * Objektliste, die Hilfe, die Befehle. Alles andere geht an den
+   * Agenten, der sich seine Daten selbst holt.
+   *
+   * `portfolio` und `score` sind bewusst NICHT mehr dabei: dort beginnen
+   * die Rueckfragen, und genau die konnte die Weiche nicht. */
+  const SCHNELL = ['liste', 'hilfe', 'anlegen', 'abbrechen', 'stop'];
+  if (SCHNELL.indexOf(was.art) < 0) {
+    await agentAntwort(token, chatId, userId, text, z, bezugObjektId);
+    return;
+  }
 
   /* ── Liste ────────────────────────────────────────────────────────── */
   if (was.art === 'liste') {
