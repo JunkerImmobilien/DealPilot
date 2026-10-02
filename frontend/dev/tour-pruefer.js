@@ -32,7 +32,43 @@
       "Blase da" wartet, findet die alte und misst in die Lücke. Gewartet
       wird auf den ERSTEN Schritt, am Titel erkannt.
 
+   8  Timer NICHT pauschal löschen. Ein `for (i..) clearTimeout(i)` über
+      692 Timer legt die TOUR mit lahm — sie besteht aus nichts anderem.
+      Danach stand sie auf Schritt 1 und kam nie weiter, und das sah aus
+      wie ein Hänger in der App.
+
    > Ein Prüfer, der sein Prüfobjekt nicht kennt, misst sich selbst.
+
+   ────────────────────────────────────────────────────────────────────────
+   NOCH OFFEN (Stand 02.10.2026)
+
+   Dieser Prüfer kommt über Schritt 1 nicht hinaus: er misst, wartet
+   1,1 s, klickt `[data-action="next"]` — und der Titel bleibt stehen.
+   GEGENGEPRÜFT: derselbe Knopf, von Hand geklickt, wechselt sofort auf
+   „Objekt auswählen". Der Klick des Prüfers kommt also nicht an, obwohl
+   er denselben Knopf trifft.
+
+   DER NÄCHSTLIEGENDE VERDACHT IST WIDERLEGT. Vermutet hatte ich, die
+   Blase werde bei jedem Schritt neu gebaut und die gemerkte Referenz
+   zeige ins Leere. Gemessen:
+
+     gemerkte Blase nach dem Klick   isConnected: true
+     dieselbe wie im Dokument        true
+
+   Sie bleibt dasselbe Element, nur ihr `innerHTML` wird ersetzt — ein
+   `blase.querySelector(...)` im Timeout holt also einen frischen Knopf.
+
+   Was die Messung STATTDESSEN zeigte: bei Schritt 3 gibt es gar keinen
+   `[data-action="next"]`, weil dort die VERZWEIGUNG steht — nur zwei
+   `[data-goto]`-Knöpfe. Der Prüfer sucht die zuerst ab, das ist also
+   nicht die Ursache.
+
+   > Ein widerlegter Verdacht gehört aufgeschrieben, nicht gelöscht.
+   > Sonst prüft ihn der Nächste noch einmal.
+
+   Was noch zu messen ist: ein Protokoll IM Läufer, das je Takt festhält,
+   welchen Zweig er nimmt (`data-goto`, `next` oder keins) und ob der
+   Klick ankam. Ohne das ist jede weitere Vermutung geraten.
 
    ────────────────────────────────────────────────────────────────────────────
    WAS GEMESSEN WIRD
