@@ -387,6 +387,7 @@ app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
    kein Nutzer-Token, also kaeme nie eine Nachricht an. Umgekehrt darf der
    Webhook-Pfad NICHTS von dem koennen, was die Einrichtung kann.
    Express nimmt den ERSTEN passenden Mount. */
+app.use('/api/v1/portfolio-spiegel', require('./routes/portfolioSpiegel'));  // v1793 — der Browser legt ab, der Bot liest
 app.use('/api/v1/telegram/webhook', require('./routes/telegramWebhook'));  // ohne authenticate (kommt von Telegram)
 app.use('/api/v1/telegram', require('./routes/telegram'));  // v1791/v1792 — die Einrichtung, nur mit JWT
 app.use('/api/v1/avm', avmRoutes);  // V326: AVM-Integration

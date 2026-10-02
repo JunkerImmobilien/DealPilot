@@ -1650,3 +1650,27 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
 
 
 module.exports = router;
+
+/* ── v1793 · DAS CO-PILOT-TAGESLIMIT WIRD GETEILT ────────────────────────
+ *
+ * Der Telegram-Bot ruft `copilotChat` auf demselben Weg wie der Browser.
+ * Haette er einen eigenen Zaehler, koennte ein Nutzer BEIDE ausschoepfen —
+ * bei `free` also 20 statt 10 Antworten am Tag.
+ *
+ *   > Zwei Waechter mit zwei Zaehlern sind kein Limit, sondern zwei
+ *   > Limits. Genau diese Bauart hat uns schon einmal einen Partner vor
+ *   > einer Tuer sitzen lassen, die der Client ihm geoeffnet hatte.
+ *
+ * Deshalb kein zweiter Zaehler, sondern DIESER hier — als kleine
+ * Schnittstelle neben dem Router. `verbrauchen()` fragt und zaehlt in
+ * einem Schritt, damit niemand das Zaehlen vergessen kann. */
+module.exports.copilotKontingent = {
+  async verbrauchen(uid) {
+    const limit = await _copilotLimit(uid);
+    const key = _cpKey(uid);
+    const used = _cpDaily.get(key) || 0;
+    if (used >= limit) return { ok: false, limit: limit, benutzt: used };
+    _cpDaily.set(key, used + 1);
+    return { ok: true, limit: limit, benutzt: used + 1 };
+  }
+};
