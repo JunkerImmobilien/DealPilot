@@ -533,14 +533,45 @@
     document.body.classList.remove('dp-tour-active');
   }
 
+  /* ═══ v1775 · DER SPOT DARF NICHT GROESSER SEIN ALS DER BILDSCHIRM ═══
+
+     Gemessen am 02.10.2026 an den drei Quick-Boarding-Schritten (4, 5, 6)
+     in Tower, Aktenmappe und Kanzlei - in allen dreien gleich:
+
+       Spot      l 420 · t 63 · w 1296 · h 2216
+       Fenster                            h  988
+       Spot-Mitte y = 1171  ->  183 px UNTER dem sichtbaren Bereich
+
+     Diese Schritte zeigen auf `#qc-tab-host, #s-quick` - einen Behaelter,
+     der viel hoeher ist als das Fenster. Der Rahmen lief unten aus dem
+     Bild, und das Markierte war nicht zu sehen.
+
+     > Ein Rahmen, der groesser ist als das Bild, hebt nichts hervor. Er
+     > faerbt nur alles andere dunkel.
+
+     Der Spot wird deshalb auf den SICHTBAREN Teil des Ziels beschnitten.
+     Liegt das Ziel ganz ausserhalb, bleibt er, wo er ist - dann hat der
+     Aufrufer vorher nicht gescrollt, und das ist ein anderer Fehler. */
+  function _beschneideAufSicht(x, y, w, h) {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var l = Math.max(0, x), t = Math.max(0, y);
+    var r = Math.min(vw, x + w), b = Math.min(vh, y + h);
+    /* Ganz ausserhalb: unveraendert zurueck, damit nichts auf 0x0 faellt. */
+    if (r - l < 4 || b - t < 4) return { x: x, y: y, w: w, h: h, beschnitten: false };
+    return { x: l, y: t, w: r - l, h: b - t,
+             beschnitten: (l !== x || t !== y || r !== x + w || b !== y + h) };
+  }
+
   function _positionSpotlight(el) {
     if (!state.spotlight || !el) return;
     var rect = el.getBoundingClientRect();
     var pad = 8;
-    var x = rect.left - pad;
-    var y = rect.top - pad;
-    var w = rect.width + pad * 2;
-    var h = rect.height + pad * 2;
+    var _b = _beschneideAufSicht(rect.left - pad, rect.top - pad,
+                                 rect.width + pad * 2, rect.height + pad * 2);
+    var x = _b.x;
+    var y = _b.y;
+    var w = _b.w;
+    var h = _b.h;
     var vw = window.innerWidth;
     var vh = window.innerHeight;
 
