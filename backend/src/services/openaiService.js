@@ -2206,6 +2206,24 @@ async function copilotChat(payload, opts) {
               + 'DealPilot-Marktbericht.'
             : 'Unter "MARKTBERICHT ZUM OBJEKT" steht der juengste DealPilot-'
               + 'Marktbericht zu diesem Objekt.',
+          /* v1769c · GEMESSEN am 02.10.2026: auf die Frage „wie viele meiner
+             Objekte haben einen Marktbericht" antwortete das Modell „8" —
+             im Auftrag stand `objekte_mit_bericht: 21`, und alle 21 Saetze
+             trugen einen Marktwert. Es hat die Liste gezaehlt statt die
+             Zahl zu lesen, und sich verzaehlt.
+
+             Fuer die Vermoegensbilanz steht diese Regel schon oben
+             („Rechne sie NICHT nach"). Fuer die Berichte fehlte sie.
+
+             > Eine Zahl, die im Auftrag steht, soll gelesen werden, nicht
+             > nachgezaehlt. Wer zaehlt, kann sich verzaehlen — und das
+             > Ergebnis sieht genauso aus wie ein gelesenes. */
+          istPortfolio
+            ? '- "objekte_mit_bericht" und "berichte_gesamt" sind BEREITS AUSGEZAEHLT. '
+              + 'Lies sie ab und zaehle die Liste NICHT selbst nach; bei einer '
+              + 'Abweichung gilt die angegebene Zahl.'
+            : '- "vorhanden" ist die Zahl der Berichte zu diesem Objekt, bereits '
+              + 'ausgezaehlt. Lies sie ab.',
           '- Diese Marktwerte stammen aus dem BERICHT, nicht aus der Kalkulation.',
           '  Weichen sie ab, nenne BEIDE Zahlen und sage, woher jede kommt.',
           '- Rechne KEINE dritte Zahl aus und bilde kein Mittel. Eine gemittelte',
