@@ -107,6 +107,94 @@ async function objekteListe(userId, limit) {
   });
 }
 
+/* ── Scores und Kerndaten lesen, nie rechnen ─────────────────────────────
+ *
+ * Beide Scores werden im Browser gerechnet und am Objekt gespeichert. Der
+ * Bot liest den gespeicherten Wert — eine zweite Rechnung waere eine
+ * zweite Meinung ueber denselben Deal, und im Chat staende dann eine
+ * andere Zahl als auf der Karte.
+ *
+ * DIE STUFE steht nirgends gespeichert; sie entsteht erst bei der Anzeige.
+ * Die Kette unten ist die aus CLAUDE.md, die fuer die Objektkarte gilt:
+ * 85 / 70 / 50 / 35. (`score-tiers.js` kennt nur vier Baender und endet
+ * bei 50 — die fuenfte Stufe KRITISCH ist dort nicht abgebildet. Die
+ * Abweichung ist bekannt und dokumentiert; maßgeblich ist, was die App
+ * dem Nutzer zeigt.)
+ */
+function stufeZu(score) {
+  if (score == null) return null;
+  if (score >= 85) return 'TOP';
+  if (score >= 70) return 'GUT';
+  if (score >= 50) return 'SOLIDE';
+  if (score >= 35) return 'SCHWACH';
+  return 'KRITISCH';
+}
+
+function scoreLesen(daten) {
+  const d = daten || {};
+  const ds = Number.isFinite(Number(d._dealpilot_score)) ? Number(d._dealpilot_score) : null;
+
+  /* DAS GATE: `_ds2_score` existiert auch dann, wenn der Investor Deal
+     Score gar nicht gerechnet wurde. Ohne diese Pruefung behauptet der
+     Bot einen Wert, den die App selbst nicht anzeigt.
+
+     > Eine Zahl, die im Datensatz steht, ist noch kein Ergebnis. */
+  const dsTwoOk = d._ds2_computed === true;
+  const ds2 = dsTwoOk && Number.isFinite(Number(d._ds2_score)) ? Number(d._ds2_score) : null;
+
+  const weitere = [];
+  const zeig = [
+    ['_kpis_dscr', 'DSCR', (v) => Number(v).toFixed(2)],
+    ['_kpis_ltv', 'LTV', (v) => Number(v).toFixed(1) + ' %'],
+    ['_kpis_bmy', 'Bruttomietrendite', (v) => Number(v).toFixed(2) + ' %'],
+    ['_kpis_cf_ns', 'Cashflow nach Steuer', (v) => Math.round(v).toLocaleString('de-DE') + ' €/Jahr']
+  ];
+  zeig.forEach(([id, name, f]) => {
+    const v = d[id];
+    if (v == null || !Number.isFinite(Number(v))) return;
+    weitere.push({ name, wert: f(v) });
+  });
+
+  return {
+    dealscore: ds, stufe: stufeZu(ds),
+    investor: ds2, investorStufe: stufeZu(ds2),
+    investor_gerechnet: dsTwoOk,
+    weitere
+  };
+}
+
+/* ── Kerndaten eines Objekts ─────────────────────────────────────────────
+ *
+ * Marcel: "sag mir was Objekt 17 davon an Kerndaten hat."
+ *
+ * Bewusst nur Felder, die WIRKLICH im Datensatz stehen. Gemessen am
+ * 02.10.2026: von den `_kpis_*`-Feldern werden nur sechs je geschrieben —
+ * `_kpis_miete_j`, `_kpis_gi`, `_kpis_restschuld`, `_kpis_nmy` und
+ * `_kpis_nmr` werden im Frontend GELESEN, aber nirgends geschrieben, und
+ * `_kpis_vuv` ist im Code selbst als Leiche markiert.
+ *
+ *   > Ein Feld, das nur gelesen wird, sieht im Code aus wie eine
+ *   > Datenquelle und ist eine Luecke.
+ */
+function kerndaten(daten) {
+  const d = daten || {};
+  const z = (v) => Number(v).toLocaleString('de-DE');
+  const reihen = [];
+  const dazu = (name, wert) => { if (wert != null && wert !== '') reihen.push({ name, wert }); };
+
+  dazu('Objektart', d.objart || d.objektart);
+  dazu('Wohnfläche', d.wfl ? d.wfl + ' m²' : null);
+  dazu('Zimmer', d.zimmer);
+  dazu('Baujahr', d.baujahr);             /* nie durch Intl.NumberFormat */
+  dazu('Kaufpreis', d.kp ? z(d.kp) + ' €' : null);
+  dazu('Kaltmiete', d.nkm ? z(d.nkm) + ' €/Monat' : null);
+  dazu('Eigenkapital', d.ek ? z(d.ek) + ' €' : null);
+  dazu('Darlehen', d.d1 ? z(d.d1) + ' €' : null);
+  dazu('Zins', d.d1z ? d.d1z + ' %' : null);
+  dazu('Tilgung', d.d1t ? d.d1t + ' %' : null);
+  return reihen;
+}
+
 async function objektKontext(userId, objektId) {
   const r = await query(
     `SELECT id, data, ai_analysis, updated_at FROM objects WHERE user_id = $1 AND id = $2`,
@@ -188,5 +276,6 @@ async function antwort(opts) {
 }
 
 module.exports = {
-  portfolioKontext, standSatz, objekteListe, objektKontext, objektRaten, antwort
+  portfolioKontext, standSatz, objekteListe, objektKontext, objektRaten, antwort,
+  scoreLesen, kerndaten, stufeZu
 };

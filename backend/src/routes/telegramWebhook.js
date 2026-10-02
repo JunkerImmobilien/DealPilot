@@ -34,30 +34,35 @@ const { query } = require('../db/pool');
 const creds = require('../services/providerCredentialsService');
 const dialog = require('../services/telegramDialogService');
 const fuehrung = require('../services/fuehrungService');
+const absicht = require('../services/telegramAbsichtService');
 const voiceExtract = require('../services/voiceExtractService');
 const config = require('../config');
 const openai = require('../services/openaiService');
 const { copilotKontingent } = require('./ai');
-const { avmDienst } = require('./avm');
+const markt = require('../services/telegramMarktService');
 
 const TG = 'https://api.telegram.org/bot';
 const PROVIDER = 'telegram';
 
 const HILFE =
-  '*Was ich kann*\n\n'
-  + '• *Fragen zu einem Objekt* — nenn mir die Adresse: '
-  + '"wie ist der DSCR bei der Musterstr. 12?"\n'
-  + '• *Portfolio* — "wie ist meine Vermögensbilanz?", '
-  + '"wo stehe ich in zehn Jahren?", "wie viele Objekte habe ich?"\n'
-  + '• *Übersicht* — /objekte zeigt deine Objekte\n\n'
-  + '• *Neues Objekt anlegen* — /neu führt dich Schritt für Schritt durch. '
-  + 'Du kannst auch mehrere Angaben in einem Satz schicken, ich sortiere sie zu.\n\n'
-  + '• *Felder ändern* — "setz die Zimmerzahl bei der Musterstr. 12 auf 5". '
-  + 'Steht da schon etwas, frage ich vorher.\n'
-  + '• *Marktpreisindikation* — /marktpreis. Ich nenne die Kosten, bevor '
-  + 'etwas abgerufen wird.\n\n'
-  + '*Befehle*\n'
-  + '/neu · /objekte · /portfolio · /marktpreis · /abbrechen · /hilfe · /stop';
+  '*Sag es einfach so, wie du es denkst.* Befehle brauchst du nicht.\n\n'
+  + '*Objekte*\n'
+  + '„gib mir ne Liste der Objekte"\n'
+  + '„was hat Objekt 17 für Kerndaten?"\n'
+  + '„wie ist der DSCR bei der Musterstr. 12?"\n'
+  + '„und die Miete?" — ich bleibe beim selben Objekt\n\n'
+  + '*Portfolio*\n'
+  + '„wie ist meine Vermögensbilanz?"\n'
+  + '„wo stehe ich in zehn Jahren?"\n\n'
+  + '*Bewertung*\n'
+  + '„wie ist der DealScore?" · „Investor Deal Score von Objekt 3"\n'
+  + '„hol mir eine Marktpreisindikation" — oder „erweiterte"\n\n'
+  + '*Anlegen und ändern*\n'
+  + '„leg mir ein Objekt an" — dann sprich einfach drauf los, '
+  + 'schick ein Foto vom Exposé oder tippe\n'
+  + '„setz die Zimmerzahl auf 5"\n\n'
+  + '_Befehle gehen auch: /neu · /objekte · /portfolio · /marktpreis · '
+  + '/abbrechen · /stop_';
 
 /* Portfolio-Fragen erkennt man am Wortfeld, nicht an einer Absicht —
    ein Modell dafuer zu fragen waere ein Aufruf fuer eine Weiche. */
@@ -116,28 +121,142 @@ async function sendenLang(token, chatId, text) {
   }
 }
 
+/* ── Anlegen: locker beginnen, nicht mit einem Formular ──────────────────
+ *
+ * Marcel: "Bitte leg mir ein Objekt an und dann gibt es eine rueckantwort
+ * und die sagt sag mir welches Objekt und ich fange dann an eine
+ * Sprachnachricht zu erzeugen."
+ *
+ * Also KEIN sofortiges "Etappe 1 von 6: Wo steht das Objekt?". Erst die
+ * offene Frage — wer schon etwas erzaehlt hat, soll nicht bei null
+ * anfangen muessen.
+ */
+async function anlegenStarten(token, chatId, userId, text) {
+  /* Stand im Satz schon etwas? "leg mir die Hermannstr. 9 in Huellhorst an"
+     ist bereits die halbe Antwort — die wegzuwerfen und dann danach zu
+     fragen waere unhoeflich und langsam. */
+  let schonDa = {};
+  const roh = String(text || '').replace(/^\s*\/neu\b/i, '').trim();
+  const lohnt = roh.length > 25 && /\d/.test(roh);
+  if (lohnt) {
+    try {
+      const r = await voiceExtract.extractFromText(roh, fuehrung.katalog(), {
+        apiKey: config.openai.apiKey, modus: 'antwort'
+      });
+      schonDa = (r && r.fields) || {};
+    } catch (e) { schonDa = {}; }
+  }
+
+  await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
+
+  if (Object.keys(schonDa).length) {
+    await senden(token, chatId, '*Neues Objekt* — das hast du mir schon gesagt:');
+    await aufnehmenFelder(token, chatId, userId, schonDa, {});
+    return;
+  }
+
+  await senden(token, chatId,
+    '*Neues Objekt.* Erzähl mir davon — am liebsten als Sprachnachricht: '
+    + 'Adresse, Art, Größe, Baujahr, Kaufpreis, Miete. Was du gerade weißt.\n\n'
+    + 'Du kannst auch ein *Foto* vom Exposé schicken oder einfach tippen. '
+    + 'Was fehlt, frage ich danach Schritt für Schritt nach.\n\n'
+    + '_/abbrechen beendet jederzeit._');
+}
+
+/* ── DealScore und Investor Deal Score ───────────────────────────────────
+ *
+ * Beide werden im Browser gerechnet und am Objekt PERSISTIERT. Der Bot
+ * liest sie, er rechnet sie nicht nach — dieselbe Regel wie beim
+ * Portfolio-Spiegel.
+ *
+ *   > Ein zweiter Score waere eine zweite Meinung ueber denselben Deal.
+ *   > Davon darf es keine geben, sonst steht im Chat eine andere Zahl als
+ *   > auf der Karte.
+ */
+async function scoreAuskunft(token, chatId, userId, text, bezugObjektId, z) {
+  let objektId = bezugObjektId;
+  if (!objektId) {
+    const liste = await dialog.objekteListe(userId, 60);
+    const t = dialog.objektRaten(text, liste);
+    if (t.art === 'mehrdeutig') {
+      await listeMerken(chatId, userId, t.kandidaten.map((o) => o.id), 'kandidaten');
+      await senden(token, chatId, 'Für welches Objekt?\n\n'
+        + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n'));
+      return;
+    }
+    if (t.art === 'eindeutig') objektId = t.objekt.id;
+    else if (z && z.letztes_objekt) objektId = z.letztes_objekt;
+    else if (liste.length === 1) objektId = liste[0].id;
+  }
+  if (!objektId) {
+    await senden(token, chatId,
+      'Für welches Objekt? Nenn mir die Adresse oder die Nummer aus der Liste.');
+    return;
+  }
+
+  const o = await dialog.objektKontext(userId, objektId);
+  if (!o) { await senden(token, chatId, 'Das Objekt finde ich nicht.'); return; }
+  await objektMerken(chatId, userId, objektId);
+
+  const s = dialog.scoreLesen(o.daten);
+  const adr = [o.daten.str, o.daten.hnr].filter(Boolean).join(' ')
+            + (o.daten.ort ? ', ' + o.daten.ort : '');
+
+  if (!s.dealscore && !s.investor) {
+    /* Nicht raten, nicht rechnen — den Weg nennen. */
+    await senden(token, chatId,
+      'Für *' + (adr || 'dieses Objekt') + '* liegt mir noch kein Score vor.\n\n'
+      + 'Er entsteht in DealPilot, sobald die Grundfelder stehen — Kaufpreis, '
+      + 'Miete, Finanzierung. Öffne das Objekt dort einmal, dann kann ich ihn '
+      + 'dir hier nennen.');
+    return;
+  }
+
+  let txt = '*' + (adr || 'Objekt') + '*\n';
+  if (s.dealscore != null) {
+    txt += '\nDealScore: *' + s.dealscore + '* von 100'
+         + (s.stufe ? ' · ' + s.stufe : '');
+  }
+  if (s.investor != null) {
+    txt += '\nInvestor Deal Score: *' + s.investor + '*'
+         + (s.investorStufe ? ' · ' + s.investorStufe : '');
+  }
+  if (s.weitere && s.weitere.length) {
+    txt += '\n\n' + s.weitere.map((w) => '• ' + w.name + ': *' + w.wert + '*').join('\n');
+  }
+  txt += '\n\n_Gerechnet in DealPilot — ich lese den gespeicherten Wert._';
+  await senden(token, chatId, txt);
+}
+
 /* ── Marktpreisindikation ────────────────────────────────────────────────
  *
  * Zwei Schritte, immer in dieser Reihenfolge: ansagen, dann abrufen. Der
  * Voranschlag kostet nichts und nennt Modus, Preis, Bestand und fehlende
  * Pflichtangaben.
  */
-async function marktpreisAnbieten(token, chatId, userId, text) {
-  const liste = await dialog.objekteListe(userId, 60);
-  const t = dialog.objektRaten(text, liste);
-  if (t.art === 'mehrdeutig') {
-    await senden(token, chatId, 'Für welches Objekt?\n\n'
-      + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n'));
-    return;
-  }
+async function marktpreisAnbieten(token, chatId, userId, text, bezugObjektId) {
   let objekt = null;
-  if (t.art === 'eindeutig') objekt = await dialog.objektKontext(userId, t.objekt.id);
-  else if (liste.length === 1) objekt = await dialog.objektKontext(userId, liste[0].id);
+  if (bezugObjektId) {
+    objekt = await dialog.objektKontext(userId, bezugObjektId);
+  } else {
+    const liste = await dialog.objekteListe(userId, 60);
+    const t = dialog.objektRaten(text, liste);
+    if (t.art === 'mehrdeutig') {
+      await listeMerken(chatId, userId, t.kandidaten.map((o) => o.id), 'kandidaten');
+      await senden(token, chatId, 'Für welches Objekt?\n\n'
+        + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n')
+        + '\n\n_Nenn mir die Adresse oder einfach die Nummer._');
+      return;
+    }
+    if (t.art === 'eindeutig') objekt = await dialog.objektKontext(userId, t.objekt.id);
+    else if (liste.length === 1) objekt = await dialog.objektKontext(userId, liste[0].id);
+  }
   if (!objekt) {
     await senden(token, chatId,
-      'Für welches Objekt? Nenn mir die Adresse — /objekte zeigt die Liste.');
+      'Für welches Objekt? Nenn mir die Adresse oder die Nummer — /objekte zeigt die Liste.');
     return;
   }
+  await objektMerken(chatId, userId, objekt.objekt_id);
 
   const d = objekt.daten || {};
   /* v1795c · HIER STANDEN ENGLISCHE FELDNAMEN (postCode, city, livingArea).
@@ -162,73 +281,100 @@ async function marktpreisAnbieten(token, chatId, userId, text) {
     baujahr: d.baujahr || '', zimmer: d.zimmer || ''
   };
 
-  let v;
-  try {
-    v = await avmDienst.voranschlag(userId, 'sprengnetter', inputs);
-  } catch (e) {
-    await senden(token, chatId, 'Der Voranschlag ging nicht: ' + (e.message || e));
-    return;
-  }
+  /* ── v1798 · WELCHE STUFE? ────────────────────────────────────────────
+   *
+   * Marcel: "ich kann auch eine marktpreisindikation oder eine erweiterte
+   * Marktpreisindikation abrufen".
+   *
+   *   1  mpi       Lage und Preisspanne
+   *   2  mpi_plus  zusaetzlich Zustand und Qualitaet
+   *
+   * Hier stand bis v1798 der AVM-Fremdabruf (sprengnetter). Der ist etwas
+   * ANDERES und als Produkt stillgelegt: `config.js:474` nahm `avm_a` und
+   * `avm_b` am 11.09.2026 aus der Preisliste, der Kaufweg ist zu, und
+   * gemessen stehen beide Baenke bei 0. Der Bot haette also zuverlaessig
+   * "Guthaben aufgebraucht" gemeldet.
+   *
+   *   > Ein Abrufweg, den es als Produkt nicht mehr gibt, ist kein
+   *   > Fallback. Er ist eine Sackgasse mit freundlicher Fehlermeldung. */
+  const willErweitert = /\b(erweitert|ausf(ü|ue)hrlich|gross|gro(ß|ss)|plus|genauer|detailliert)\b/i.test(text || '');
+  const stufe = willErweitert ? 2 : 1;
 
-  if (!v.moeglich) { await senden(token, chatId, v.grund); return; }
-
-  if (!v.bereit) {
-    /* Die Doktrin: wo kein Wert vorliegt, bekommt der Kunde den Weg
-       dorthin — hier also, WAS genau fehlt. */
+  /* Pflichtangaben prueft der Marktbericht selbst — aber was ihm fehlt,
+     soll der Nutzer vorher wissen, nicht erst nach dem Abruf. */
+  const fehlt = [];
+  if (!d.plz && !d.ort) fehlt.push('PLZ oder Ort');
+  if (!d.objektart && !d.objart) fehlt.push('Objektart');
+  if (!d.wfl) fehlt.push('Wohnfläche');
+  if (fehlt.length) {
     await senden(token, chatId,
-      'Für eine Indikation fehlen mir noch Pflichtangaben:\n'
-      + v.fehlende_felder.map((f) => '• ' + f).join('\n')
+      'Für eine Indikation fehlen mir noch Angaben:\n'
+      + fehlt.map((f) => '• ' + f).join('\n')
       + '\n\nSag sie mir einfach, dann hole ich sie ab.');
     return;
   }
 
-  if (!v.genug) {
-    await senden(token, chatId,
-      'Dein Guthaben für Marktwert-Abrufe ist aufgebraucht. In DealPilot '
-      + 'kannst du nachkaufen.');
+  let v;
+  try {
+    v = await markt.voranschlag(userId, objekt.objekt_id, stufe);
+  } catch (e) {
+    await senden(token, chatId, 'Der Voranschlag ging nicht: ' + (e.message || e));
     return;
   }
+  if (!v.moeglich) { await senden(token, chatId, v.grund); return; }
 
   await zustandSetzen(chatId, userId, {
     modus: 'marktpreis_bestaetigen',
-    entwurf: { __inputs: inputs },
+    entwurf: { __stufe: v.stufe },
     objekt_id: objekt.objekt_id
   });
 
   await senden(token, chatId,
-    '*Marktpreisindikation* für ' + [d.str, d.hnr].filter(Boolean).join(' ')
+    '*' + v.name + '* für ' + [d.str, d.hnr].filter(Boolean).join(' ')
     + ', ' + [d.plz, d.ort].filter(Boolean).join(' ') + '\n\n'
-    + (v.kostenlos
-        ? '_Testbetrieb — dieser Abruf kostet nichts._'
-        : 'Das kostet *einen Abruf* aus deinem Guthaben (noch ' + v.bestand + ' übrig).')
-    + '\n\nSoll ich? (ja / nein)');
+    + (v.kostet
+        ? 'Das kostet *eine ' + v.name + '*'
+          + (v.bestand != null ? ' (noch ' + v.bestand + ' in deinem Kontingent)' : '') + '.'
+          + (v.schon_bezahlt ? '\n_Die Stufe darunter ist schon bezahlt — es wird nur die Differenz fällig._' : '')
+        : '_Diese Tiefe hast du für dieses Objekt bereits bezahlt — kostet nichts._')
+    + '\n\nSoll ich? (ja / nein)'
+    + (stufe === 1 ? '\n\n_Sag „erweitert", wenn du zusätzlich Zustand und Qualität willst._' : ''));
 }
 
-async function marktpreisAbrufen(token, chatId, userId, objektId, inputs) {
+async function marktpreisAbrufen(token, chatId, userId, objektId, stufe) {
   await zustandLoeschen(chatId, userId);
-  await senden(token, chatId, 'Ich frage an …');
+  const objekt = await dialog.objektKontext(userId, objektId);
+  if (!objekt) { await senden(token, chatId, 'Das Objekt finde ich nicht mehr.'); return; }
+
+  await senden(token, chatId, 'Ich rechne — das dauert einen Moment …');
   let r;
   try {
-    r = await avmDienst.abrufen(userId, 'sprengnetter', inputs);
+    r = await markt.abrufen(userId, objekt, stufe || 1);
   } catch (e) {
-    await senden(token, chatId, (e.fachlich ? '' : 'Da ging etwas schief: ') + (e.message || e));
+    await senden(token, chatId,
+      (e.fachlich ? '' : 'Da ging etwas schief: ') + (e.message || e)
+      + (e.upgradeTo ? '\n\n_Ab dem ' + e.upgradeTo + '-Plan ist diese Tiefe enthalten._' : ''));
     return;
   }
 
-  const w = r.result || {};
   const z = (x) => (x == null ? null : Number(x).toLocaleString('de-DE'));
-  const wert = w.value || w.marktwert || w.estimate || (w.valuation && w.valuation.value);
-  const von = w.valueRange && (w.valueRange.lower || w.valueRange.min);
-  const bis = w.valueRange && (w.valueRange.upper || w.valueRange.max);
+  const w = r.wert || r.ergebnis || r.result || r;
+  const wert = w.marktwert || w.wert || w.value;
+  const von = w.spanne_von || w.low || (w.spanne && w.spanne.von);
+  const bis = w.spanne_bis || w.high || (w.spanne && w.spanne.bis);
+  const qm = w.eur_pro_qm || w.eur_per_sqm;
 
-  await senden(token, chatId,
-    '*Indikation*\n\n'
-    + (wert ? 'Wert: *' + z(wert) + ' €*\n' : '')
-    + (von && bis ? 'Spanne: ' + z(von) + ' – ' + z(bis) + ' €\n' : '')
-    + (r.aus_cache ? '\n_aus dem Zwischenspeicher, kostenlos_' : '')
-    + (r.mode === 'stub' ? '\n_Testbetrieb — keine echten Marktdaten._' : '')
-    + '\n\n_Indikation eines unabhängigen Bewertungspartners, kein '
-    + 'Verkehrswert und kein Gutachten._');
+  let txt = '*' + (markt.STUFEN[stufe || 1] || markt.STUFEN[1]).name + '*\n';
+  if (wert) txt += '\nWert: *' + z(wert) + ' €*';
+  if (von && bis) txt += '\nSpanne: ' + z(von) + ' – ' + z(bis) + ' €';
+  if (qm) txt += '\n' + z(qm) + ' €/m²';
+  if (!wert && !von) {
+    txt += '\n\nDer Bericht ist erstellt, eine Zahl kann ich hier aber nicht '
+         + 'herauslesen. Schau ihn dir in DealPilot an.';
+  }
+  txt += '\n\n_Indikation aus den Daten des zuständigen Gutachterausschusses — '
+       + 'kein Verkehrswert und kein Gutachten._';
+  await sendenLang(token, chatId, txt);
 }
 
 /* ── Eine Aenderung anbieten, nie still ausfuehren ───────────────────────
@@ -307,11 +453,20 @@ async function objektAendern(token, chatId, userId, objektId, felder) {
 /* ── Der Gespraechszustand ───────────────────────────────────────────── */
 async function zustand(chatId, userId) {
   const r = await query(
-    `SELECT modus, entwurf, offene_ids, letzte_frage, objekt_id
+    `SELECT modus, entwurf, offene_ids, letzte_frage, objekt_id,
+            letzte_liste, letzte_liste_art, letztes_objekt, verlauf
        FROM telegram_dialog WHERE chat_id = $1::bigint AND bot_user_id = $2`,
     [String(chatId), userId]);
   return r.rows[0] || null;
 }
+
+/* v1798 · `zustandSetzen` schreibt die Anlage-Felder. Das GEDAECHTNIS
+   (Liste, letztes Objekt, Verlauf) wird getrennt gepflegt — sonst wuerde
+   jedes `zustandSetzen` beim Anlegen die Liste loeschen, auf die sich der
+   naechste Satz bezieht.
+
+   > Zwei Dinge, die verschieden lange leben, duerfen nicht an einem
+   > Schalter haengen. */
 async function zustandSetzen(chatId, userId, z) {
   await query(
     `INSERT INTO telegram_dialog
@@ -323,6 +478,47 @@ async function zustandSetzen(chatId, userId, z) {
        objekt_id = EXCLUDED.objekt_id, aktualisiert = now()`,
     [String(chatId), userId, z.modus || null, JSON.stringify(z.entwurf || {}),
      z.offene_ids || null, z.letzte_frage || null, z.objekt_id || null]);
+}
+
+/* Die Zeile muss existieren, bevor das Gedaechtnis sie fortschreibt. */
+async function zeileSichern(chatId, userId) {
+  await query(
+    `INSERT INTO telegram_dialog (chat_id, bot_user_id) VALUES ($1::bigint, $2)
+     ON CONFLICT (chat_id, bot_user_id) DO NOTHING`,
+    [String(chatId), userId]);
+}
+
+async function listeMerken(chatId, userId, ids, art) {
+  await zeileSichern(chatId, userId);
+  await query(
+    `UPDATE telegram_dialog SET letzte_liste = $3, letzte_liste_art = $4, aktualisiert = now()
+      WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId, ids, art || 'objekte']);
+}
+
+async function objektMerken(chatId, userId, objektId) {
+  if (!objektId) return;
+  await zeileSichern(chatId, userId);
+  await query(
+    `UPDATE telegram_dialog SET letztes_objekt = $3, aktualisiert = now()
+      WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId, objektId]);
+}
+
+/* Der Verlauf ist auf 12 Wortwechsel gedeckelt — dieselbe Zahl wie im
+   Browser-Co-Piloten, damit das Modell beide Male gleich viel Faden hat. */
+async function verlaufMerken(chatId, userId, rolle, text) {
+  if (!text) return;
+  await zeileSichern(chatId, userId);
+  await query(
+    `UPDATE telegram_dialog
+        SET verlauf = (
+              CASE WHEN jsonb_array_length(verlauf) >= 12
+                   THEN verlauf - 0 ELSE verlauf END
+            ) || jsonb_build_object('rolle', $3::text, 'text', $4::text),
+            aktualisiert = now()
+      WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId, rolle, String(text).slice(0, 1200)]);
 }
 async function zustandLoeschen(chatId, userId) {
   await query(`DELETE FROM telegram_dialog WHERE chat_id = $1::bigint AND bot_user_id = $2`,
@@ -480,7 +676,7 @@ async function beantworten(token, chatId, userId, text, msg) {
    *   > niemand bestaetigt hat, ist eine Abbuchung ohne Auftrag. */
   if (z && z.modus === 'marktpreis_bestaetigen') {
     if (/^(ja|hol|mach|ok|okay|j)\b/i.test(text.trim())) {
-      await marktpreisAbrufen(token, chatId, userId, z.objekt_id, (z.entwurf || {}).__inputs || {});
+      await marktpreisAbrufen(token, chatId, userId, z.objekt_id, (z.entwurf || {}).__stufe || 1);
       return;
     }
     await zustandLoeschen(chatId, userId);
@@ -651,23 +847,66 @@ async function beantworten(token, chatId, userId, text, msg) {
 
   if (!text) return;
 
-  /* /objekte — reine Datenbankauskunft, kostet kein Kontingent. */
-  if (/^\/objekte/i.test(text)) {
+  await verlaufMerken(chatId, userId, 'user', text);
+
+  /* ── v1798 · ZUERST DER BEZUG, DANN DIE ABSICHT ───────────────────────
+   *
+   * "Objekt 17 davon" meint die 17 aus der Liste, die eine Nachricht
+   * vorher kam. Das muss aufgeloest sein, BEVOR irgendetwas anderes
+   * entschieden wird — sonst sucht die Objektzuordnung nach einem Haus
+   * mit der Nummer 17.
+   *
+   *   > Eine Zahl, die sich auf eine Liste bezieht, ist keine Hausnummer.
+   *   > Wer das verwechselt, antwortet zum falschen Objekt — und die
+   *   > Antwort sieht dabei richtig aus. */
+  let bezugObjektId = null;
+  if (z && z.letzte_liste && z.letzte_liste.length) {
+    const b = absicht.bezug(text, z.letzte_liste);
+    if (b && b.fehler === 'ausserhalb') {
+      await senden(token, chatId,
+        'Die Liste hat ' + b.laenge + ' Einträge — eine ' + b.genannt
+        + ' gibt es darin nicht.');
+      return;
+    }
+    if (b && b.id) bezugObjektId = b.id;
+  }
+
+  const was = absicht.erkenne(text);
+
+  /* ── Liste ────────────────────────────────────────────────────────── */
+  if (was.art === 'liste') {
     const liste = await dialog.objekteListe(userId, 40);
     if (!liste.length) {
       await senden(token, chatId, 'Ich sehe noch keine Objekte in deinem Konto.');
       return;
     }
+    /* Die Reihenfolge wird GEMERKT — sie ist die Grundlage für "Objekt 17". */
+    await listeMerken(chatId, userId, liste.map((o) => o.id), 'objekte');
     const zeilen = liste.map((o, i) => (i + 1) + '. *' + (o.adresse || 'ohne Adresse') + '*'
       + (o.kp ? ' · ' + Number(o.kp).toLocaleString('de-DE') + ' €' : ''));
-    await sendenLang(token, chatId,
-      '*Deine Objekte* (' + liste.length + ')\n\n' + zeilen.join('\n')
-      + '\n\nFrag mich zu einem davon — nenn einfach die Adresse.');
+    const txt = '*Deine Objekte* (' + liste.length + ')\n\n' + zeilen.join('\n')
+      + '\n\n_Frag mich zu einem davon — Adresse oder einfach die Nummer._';
+    await sendenLang(token, chatId, txt);
+    await verlaufMerken(chatId, userId, 'assistant', 'Liste mit ' + liste.length + ' Objekten gezeigt');
+    return;
+  }
+
+  if (was.art === 'hilfe') { await senden(token, chatId, HILFE); return; }
+
+  if (was.art === 'anlegen') { await anlegenStarten(token, chatId, userId, text); return; }
+
+  if (was.art === 'marktpreis') {
+    await marktpreisAnbieten(token, chatId, userId, text, bezugObjektId);
+    return;
+  }
+
+  if (was.art === 'score') {
+    await scoreAuskunft(token, chatId, userId, text, bezugObjektId, z);
     return;
   }
 
   /* Portfolio: Spiegel oder ehrliche Fehlanzeige. */
-  const willPortfolio = /^\/portfolio/i.test(text) || PORTFOLIO_WORTE.test(text);
+  const willPortfolio = was.art === 'portfolio';
   let kontext = null, kontextArt = null, stand = null;
 
   if (willPortfolio) {
@@ -692,26 +931,49 @@ async function beantworten(token, chatId, userId, text, msg) {
            + 'Cashflow und wo ich in zehn Jahren stehe.';
     }
   } else {
-    /* Einzelobjekt: aus dem Satz zuordnen. Bei Gleichstand wird GEFRAGT. */
-    const liste = await dialog.objekteListe(userId, 60);
-    const t = dialog.objektRaten(text, liste);
-    if (t.art === 'mehrdeutig') {
-      await senden(token, chatId,
-        'Welches Objekt meinst du?\n\n'
-        + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n')
-        + '\n\nNenn mir bitte die Hausnummer oder den Ort dazu.');
-      return;
-    }
-    if (t.art === 'eindeutig') {
-      kontext = await dialog.objektKontext(userId, t.objekt.id);
-    } else if (liste.length === 1) {
-      kontext = await dialog.objektKontext(userId, liste[0].id);
+    /* ── Welches Objekt ist gemeint? VIER Wege, in dieser Reihenfolge ───
+     *
+     *   1. Bezug auf die Liste   "Objekt 17"      — eindeutig, schlaegt alles
+     *   2. Adresse im Satz        "Parkstr. 9"    — die Zuordnung fragt bei Gleichstand
+     *   3. Anknuepfung            "und die Miete?" — das zuletzt besprochene
+     *   4. genau ein Objekt vorhanden
+     *
+     * Die Reihenfolge ist nicht beliebig: wer zuerst nach einer Adresse
+     * sucht, findet in "Objekt 17" keine und faellt auf die Anknuepfung
+     * zurueck — und antwortet dann zum vorigen Objekt. */
+    if (bezugObjektId) {
+      kontext = await dialog.objektKontext(userId, bezugObjektId);
+      if (!kontext) {
+        await senden(token, chatId, 'Das Objekt aus der Liste finde ich nicht mehr.');
+        return;
+      }
     } else {
-      await senden(token, chatId,
-        'Zu welchem Objekt? Nenn mir die Adresse — /objekte zeigt dir die Liste.\n\n'
-        + 'Oder frag mich etwas über dein *Portfolio* als Ganzes.');
-      return;
+      const liste = await dialog.objekteListe(userId, 60);
+      const t = dialog.objektRaten(text, liste);
+      if (t.art === 'mehrdeutig') {
+        /* Auch diese Liste wird gemerkt — "die zweite" muss danach gehen. */
+        await listeMerken(chatId, userId, t.kandidaten.map((o) => o.id), 'kandidaten');
+        await senden(token, chatId,
+          'Welches Objekt meinst du?\n\n'
+          + t.kandidaten.map((o, i) => (i + 1) + '. ' + o.adresse).join('\n')
+          + '\n\n_Nenn mir die Hausnummer, den Ort — oder einfach die Nummer._');
+        return;
+      }
+      if (t.art === 'eindeutig') {
+        kontext = await dialog.objektKontext(userId, t.objekt.id);
+      } else if (z && z.letztes_objekt && absicht.knuepftAn(text)) {
+        kontext = await dialog.objektKontext(userId, z.letztes_objekt);
+      } else if (liste.length === 1) {
+        kontext = await dialog.objektKontext(userId, liste[0].id);
+      } else {
+        await senden(token, chatId,
+          'Zu welchem Objekt? Nenn mir die Adresse oder die Nummer aus der Liste '
+          + '— /objekte zeigt sie dir.\n\n'
+          + 'Oder frag mich etwas über dein *Portfolio* als Ganzes.');
+        return;
+      }
     }
+    if (kontext) await objektMerken(chatId, userId, kontext.objekt_id);
   }
 
   /* Das Tageslimit ist DASSELBE wie im Browser (ai.js). Zwei Zaehler waeren
@@ -730,8 +992,19 @@ async function beantworten(token, chatId, userId, text, msg) {
        aendern. Im Browser gilt seit v1767 dieselbe Regel, und dort steht
        auch die Begruendung: die Feld-Ids sind bei jedem Objekt dieselben,
        verschieden sind nur die Werte. */
+    /* v1798 · DER VERLAUF GEHT MIT. Ohne ihn beantwortet das Modell
+       "und die Miete?" aus dem Nichts — es weiss nicht, wovon eben die
+       Rede war, und fragt zurueck oder rät.
+
+       Die Form ist dieselbe wie im Browser-Co-Piloten:
+       [{ role, content }], die letzten zwölf. */
+    const verlauf = ((z && z.verlauf) || [])
+      .slice(-12)
+      .map((e) => ({ role: e.rolle === 'user' ? 'user' : 'assistant', content: e.text }));
+
     r = await dialog.antwort({
       message: text, context: kontext, kontextArt: kontextArt,
+      history: verlauf,
       felder: kontextArt === 'portfolio' ? null : fuehrung.katalog()
     });
   } catch (e) {
