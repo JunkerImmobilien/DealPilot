@@ -28826,3 +28826,106 @@ dieselbe Schablonenheilung, dieselbe Prozentfalle, dieselbe Adressprüfung.
 **PDFs kann der Bot nicht:** im Backend liegt kein PDF-Leser (gemessen —
 die Umwandlung macht im Browser pdf.js). Das sagt er, statt es zu
 verschweigen.
+
+---
+
+## Rollout-Journal 02.10.2026 (6) — v1798: der Bot merkt sich, worüber geredet wird
+
+**Was** · Gesprächsgedächtnis, Absichtserkennung ohne Befehle, Scores,
+Kerndaten — und der Marktpreis vom stillgelegten AVM auf die eigenen Stufen.
+
+**Commit** · v1798
+
+> Marcel: „ich möchte einfach sachen sagen wie gib mir ne liste der objekte
+> aus. sag mir was Objekt 17 davon an Kerndaten hat. (…) Das muss halt ein
+> lockerer flow sein."
+
+### Das Gedächtnis (Migration 080)
+
+„Objekt 17 davon" ist ohne Vorgeschichte sinnlos. Telegram liefert jede
+Nachricht einzeln, ohne Erinnerung an die vorige.
+
+> Ein Bot ohne Gedächtnis zwingt den Nutzer, in jedem Satz alles zu
+> wiederholen. Das ist kein Gespräch, das ist ein Formular mit Sprechblasen.
+
+Vier Spalten: `letzte_liste` (Position → Kennung), `letzte_liste_art`,
+`letztes_objekt`, `verlauf`. Die Liste merkt sich **nur die Reihenfolge der
+Kennungen** — die Daten werden bei jeder Frage frisch gelesen.
+
+Liste und Anlage-Zustand hängen an **getrennten** Schreibwegen: zwei Dinge,
+die verschieden lange leben, dürfen nicht an einem Schalter hängen.
+
+### Die Zahlenfalle, zweimal
+
+| | |
+|---|---|
+| „Objekt 17" | Position |
+| „Musterstr. 12" | **Hausnummer** |
+
+> Eine Zahl ohne Bezugswort ist eine Zahl, keine Position. Wer das
+> verwechselt, beantwortet die Frage zum falschen Objekt — und merkt es nie,
+> weil die Antwort plausibel aussieht.
+
+Beim Bauen gleich die Gegenfalle: „was ist mit der parkstr 9" galt als
+Anknüpfung ans vorige Objekt. Der Fix traf „parkstr" zuerst **nicht**, weil
+`\b(str…)` eine Wortgrenze verlangt und das „str" am „park" klebt —
+dieselbe Teilwortfalle wie bei der Objektzuordnung, nur andersherum: dort
+traf `indexOf` zu viel, hier traf `\b` zu wenig.
+
+**29 Proben, 0 Fehler.**
+
+### Scores: gelesen, nie gerechnet — und ein Gate
+
+**Gemessen:** `_ds2_score` existiert auch dann, wenn der Investor Deal Score
+gar nicht gerechnet wurde. Ohne `_ds2_computed === true` hätte der Bot einen
+Wert behauptet, den die App selbst nicht anzeigt.
+
+> Eine Zahl, die im Datensatz steht, ist noch kein Ergebnis.
+
+Die Stufe steht **nirgends** gespeichert — sie entsteht aus der Kette in
+CLAUDE.md (85/70/50/35), gegengetestet an zehn Werten.
+
+Bei den Kerndaten nur Felder, die wirklich dastehen: von den `_kpis_*`
+werden **nur sechs je geschrieben**. `_kpis_miete_j`, `_kpis_gi`,
+`_kpis_restschuld`, `_kpis_nmy`, `_kpis_nmr` werden im Frontend **gelesen
+und nirgends geschrieben**, `_kpis_vuv` ist im Code als Leiche markiert.
+
+> Ein Feld, das nur gelesen wird, sieht im Code aus wie eine Datenquelle und
+> ist eine Lücke.
+
+### Der Marktpreis lief in eine Sackgasse
+
+Der Bot nutzte seit v1795 den AVM-Fremdabruf. **Gemessen:** `config.js:474`
+nahm `avm_a`/`avm_b` am 11.09.2026 aus der Preisliste, der Kaufweg ist zu,
+beide Bänke stehen bei 0.
+
+> Ein Abrufweg, den es als Produkt nicht mehr gibt, ist kein Fallback. Er
+> ist eine Sackgasse mit freundlicher Fehlermeldung.
+
+Jetzt die eigenen Stufen: 1 = Marktpreisindikation, 2 = Erweiterte.
+
+**Und hier wird ausnahmsweise nicht entkoppelt.** `marktbericht.js` ist
+geldführend: fällige Stufe, Kontingentprüfung vor der Leistung, Aufpreis
+gegen bezahlte Stufen, Abbuchung.
+
+> Bei einer geldführenden Strecke ist jede zweite Fassung eine zweite
+> Stelle, an der abgebucht wird. Eine davon ist irgendwann die falsche, und
+> auffallen wird es auf einer Rechnung.
+
+Der Bot geht deshalb **den Weg des Browsers**: HTTP an die eigene API mit
+einem kurzlebigen Token. Alle Schranken greifen unverändert.
+
+Die teuerste Einzelheit dabei: `marktbericht.js` fällt **ohne `wert_stufe`
+auf Stufe 2** zurück — wer sie nicht mitschickt, bucht ungewollt die
+teurere. Sie wird jetzt immer gesetzt.
+
+### Nachgemessen am echten Konto
+
+```
+"gib mir ne liste der objekte aus"              -> liste, 17 Positionen gemerkt
+"sag mir was Objekt 17 davon an Kerndaten hat"  -> Position 17
+                                                -> Parkstr. 9, Bad Oeynhausen
+                                                -> 10 Kerndaten
+DealScore         17 von 17      Investor Deal Score 15 von 17
+Stufenkette       10 von 10
+```
