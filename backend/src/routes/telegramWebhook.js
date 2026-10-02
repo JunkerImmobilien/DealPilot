@@ -110,6 +110,79 @@ async function sendenLang(token, chatId, text) {
   }
 }
 
+/* ── Eine Aenderung anbieten, nie still ausfuehren ───────────────────────
+ *
+ * Dieselbe Regel wie im Browser (`anwenden()` in copilot-aenderungen.js):
+ * steht in einem Feld schon ein Wert, wird er GENANNT und die Aenderung
+ * bestaetigt. Ein leeres Feld wird ohne Rueckfrage gefuellt — da gibt es
+ * nichts zu verlieren.
+ */
+async function aenderungAnbieten(token, chatId, userId, kontext, felder, antwortText) {
+  const daten = kontext.daten || {};
+  const sofort = {}, nachfragen = [];
+
+  for (const [id, wert] of Object.entries(felder)) {
+    if (!fuehrung.feld(id)) continue;                 /* unbekanntes Feld: still verwerfen waere falsch */
+    if (fuehrung.gefuellt(daten, id) && String(daten[id]) !== String(wert)) {
+      nachfragen.push({ id, alt: daten[id], neu: wert });
+    } else {
+      sofort[id] = wert;
+    }
+  }
+
+  const unbekannt = Object.keys(felder).filter((id) => !fuehrung.feld(id));
+
+  if (!Object.keys(sofort).length && !nachfragen.length) {
+    await senden(token, chatId,
+      unbekannt.length
+        ? 'Die genannten Angaben passen zu keinem Feld, das ich kenne ('
+          + unbekannt.join(', ') + ').'
+        : 'Da war nichts zu ändern — die Werte stehen schon so drin.');
+    return;
+  }
+
+  function name(id) { const f = fuehrung.feld(id); return (f && f.label) || id; }
+
+  if (nachfragen.length) {
+    /* Die Rueckfrage nennt BEIDE Werte. "Soll ich das aendern?" allein
+       waere eine Frage, die der Nutzer nicht beantworten kann. */
+    await zustandSetzen(chatId, userId, {
+      modus: 'aenderung_bestaetigen',
+      entwurf: { __felder: Object.assign({}, sofort,
+        Object.fromEntries(nachfragen.map((n) => [n.id, n.neu]))) },
+      objekt_id: kontext.objekt_id,
+      letzte_frage: 'aenderung'
+    });
+    await senden(token, chatId,
+      nachfragen.map((n) => '• *' + name(n.id) + '* steht auf *' + n.alt
+        + '*, du willst *' + n.neu + '*').join('\n')
+      + (Object.keys(sofort).length
+          ? '\n\nDazu neu: ' + Object.keys(sofort).map((id) => name(id) + ' = ' + sofort[id]).join(', ')
+          : '')
+      + '\n\nÄndern? (ja / nein)');
+    return;
+  }
+
+  await objektAendern(token, chatId, userId, kontext.objekt_id, sofort);
+}
+
+async function objektAendern(token, chatId, userId, objektId, felder) {
+  const r = await query(`SELECT data FROM objects WHERE id = $1 AND user_id = $2`,
+    [objektId, userId]);
+  if (!r.rows.length) { await senden(token, chatId, 'Das Objekt finde ich nicht mehr.'); return; }
+  const daten = Object.assign({}, r.rows[0].data || {}, felder);
+  await query(`UPDATE objects SET data = $3::jsonb, updated_at = now()
+                WHERE id = $1 AND user_id = $2`,
+    [objektId, userId, JSON.stringify(daten)]);
+  await zustandLoeschen(chatId, userId);
+
+  function name(id) { const f = fuehrung.feld(id); return (f && f.label) || id; }
+  await senden(token, chatId,
+    '✓ Geändert:\n'
+    + Object.keys(felder).map((id) => '• ' + name(id) + ': *' + felder[id] + '*').join('\n')
+    + '\n\n_Die Kennzahlen rechnet DealPilot beim nächsten Öffnen neu._');
+}
+
 /* ── Der Gespraechszustand ───────────────────────────────────────────── */
 async function zustand(chatId, userId) {
   const r = await query(
@@ -274,6 +347,22 @@ async function beantworten(token, chatId, userId, text, msg) {
     return;
   }
 
+  if (z && z.modus === 'aenderung_bestaetigen') {
+    if (/^(ja|mach|ok|okay|passt|j)\b/i.test(text.trim())) {
+      await objektAendern(token, chatId, userId, z.objekt_id, (z.entwurf || {}).__felder || {});
+      return;
+    }
+    if (/^(nein|nicht|stop|n)\b/i.test(text.trim())) {
+      await zustandLoeschen(chatId, userId);
+      await senden(token, chatId, 'Gut, ich lasse es.');
+      return;
+    }
+    /* Alles andere ist keine Antwort auf die Frage — lieber nachfassen als
+       eine Aenderung ausfuehren, die niemand bestaetigt hat. */
+    await senden(token, chatId, 'Soll ich das ändern? Bitte *ja* oder *nein*.');
+    return;
+  }
+
   if (z && z.modus === 'adresse_bestaetigen') {
     if (/^(ja|passt|stimmt|korrekt|richtig|j)\b/i.test(text.trim())) {
       await weiterFragen(token, chatId, userId, z.entwurf);
@@ -429,7 +518,15 @@ async function beantworten(token, chatId, userId, text, msg) {
 
   let r;
   try {
-    r = await dialog.antwort({ message: text, context: kontext, kontextArt: kontextArt });
+    /* DER KATALOG GEHT MIT — sonst kann das Modell gar nicht erkennen,
+       dass ein Satz eine Anweisung ist, und antwortet freundlich statt zu
+       aendern. Im Browser gilt seit v1767 dieselbe Regel, und dort steht
+       auch die Begruendung: die Feld-Ids sind bei jedem Objekt dieselben,
+       verschieden sind nur die Werte. */
+    r = await dialog.antwort({
+      message: text, context: kontext, kontextArt: kontextArt,
+      felder: kontextArt === 'portfolio' ? null : fuehrung.katalog()
+    });
   } catch (e) {
     await senden(token, chatId, 'Da ist mir gerade etwas dazwischengekommen: ' + (e.message || e));
     return;
@@ -441,9 +538,38 @@ async function beantworten(token, chatId, userId, text, msg) {
   let out = (r && r.reply) || '';
   if (!out) { await senden(token, chatId, 'Dazu habe ich keine Antwort bekommen.'); return; }
 
+  /* ── Will das Modell etwas AENDERN? ───────────────────────────────────
+   *
+   * `copilotChat` antwortet mit einem Block `<<<FELDER {"id":"wert"} FELDER>>>`,
+   * wenn der Satz eine Anweisung war ("aender die Zimmerzahl auf fuenf").
+   * Im Browser wertet `copilot-aenderungen.js` ihn aus; hier dasselbe —
+   * mit derselben Regel, die es dort gekostet hat:
+   *
+   *   > Eine Aenderung an einem belegten Feld wird NIE still gemacht.
+   *   > Gefragt wird mit beiden Werten im Satz, und ohne Antwort passiert
+   *   > nichts.
+   *
+   * Das Objekt steht hier bereits fest: `kontext.objekt_id` kommt aus der
+   * Zuordnung weiter oben, und die fragt bei Gleichstand nach. */
+  const fblock = /<<<FELDER\s*([\s\S]*?)\s*FELDER>>>/.exec(out);
+  if (fblock && kontext && kontext.objekt_id) {
+    let felder = null;
+    try { felder = JSON.parse(fblock[1]); } catch (e) { felder = null; }
+    if (felder && typeof felder === 'object' && !Array.isArray(felder)) {
+      await aenderungAnbieten(token, chatId, userId, kontext, felder, out);
+      return;
+    }
+  }
+
   /* Steueranweisungen des Modells gehoeren nicht in den Chat — sie sind
      fuer die Oberflaeche gedacht, nicht fuer den Leser. */
   out = out.replace(/<<<FELDER[\s\S]*?FELDER>>>/g, '').replace(/<<<ABRUF[\s\S]*?ABRUF>>>/g, '').trim();
+  if (!out) {
+    await senden(token, chatId,
+      'Das habe ich als Anweisung gelesen, aber ich konnte kein Objekt dazu '
+      + 'finden. Nenn mir die Adresse — /objekte zeigt die Liste.');
+    return;
+  }
 
   if (stand) out += '\n\n_' + stand + '_';
   await sendenLang(token, chatId, out);
