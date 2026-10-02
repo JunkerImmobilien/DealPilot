@@ -114,7 +114,42 @@ und verbindest ihn mit einem Einmal-Code. Niemand sonst hat Zugriff darauf.</p>
 
 <h2>1 · Fragen zu einem Objekt</h2>
 
-<p>Nenn die Adresse irgendwo im Satz — der Bot sucht sie in deinen Objekten.</p>
+<p><b>Du brauchst keine Befehle.</b> Sag es so, wie du es denkst — der Bot
+versteht die Absicht und merkt sich, worüber ihr gerade redet.</p>
+
+<div class="chat">
+  <div class="b du"><div class="blase">gib mir ne Liste der Objekte aus</div></div>
+  <div class="b bot"><div class="blase"><b>Deine Objekte</b> (17)<br>
+    1. <b>Musterstraße 12, 04109 Leipzig</b> · 189.000 €<br>
+    2. <b>Bismarckstr. 27, 32756 Detmold</b> · 395.000 €<br>
+    …<br>
+    17. <b>Parkstr. 9, 32545 Bad Oeynhausen</b> · 780.000 €
+    <span class="leise">Frag mich zu einem davon — Adresse oder einfach die Nummer.</span></div></div>
+  <div class="b du"><div class="blase">sag mir was Objekt 17 davon an Kerndaten hat</div></div>
+  <div class="b bot"><div class="blase"><b>Parkstr. 9, Bad Oeynhausen</b><br><br>
+    Objektart: <b>MFH</b><br>Wohnfläche: <b>427 m²</b><br>Zimmer: <b>14</b><br>
+    Baujahr: <b>1905</b><br>Kaufpreis: <b>780.000 €</b><br>
+    Kaltmiete: <b>2.321 €/Monat</b><br>Eigenkapital: <b>190.000 €</b><br>
+    Darlehen: <b>640.000 €</b> · Zins 4,0 % · Tilgung 1,0 %</div></div>
+  <div class="b du"><div class="blase">und die Miete?</div></div>
+  <div class="b bot"><div class="blase">Die Kaltmiete liegt bei 2.321 € im Monat, also
+    27.852 € im Jahr — bei 427 m² sind das 5,44 €/m².</div></div>
+</div>
+
+<div class="merk gut">
+  <b>Er bleibt beim Thema.</b> „und die Miete?" braucht keine Adresse mehr —
+  der Bot weiß, von welchem Objekt gerade die Rede war. „Objekt 17" bezieht
+  sich auf die Liste, die er dir eben geschickt hat.
+</div>
+
+<div class="merk warn">
+  <b>Eine Zahl ist nicht automatisch eine Position.</b> „Musterstr. <b>12</b>"
+  ist eine Hausnummer, „Objekt <b>12</b>" ein Listeneintrag. Der Bot
+  unterscheidet das — sonst würde er die Frage am falschen Haus beantworten,
+  und die Antwort sähe dabei richtig aus.
+</div>
+
+<h3>Oder klassisch über die Adresse</h3>
 
 <div class="chat">
   <div class="b du"><div class="blase">wie ist der DSCR bei der Musterstr. 12?</div></div>
@@ -295,19 +330,64 @@ wie aktuell sie sind — und zwar nicht nur das Datum:</p>
 Ein Feld, das er <b>nicht kennt</b>, nennt er dir, statt es stillschweigend
 wegzuwerfen.</p>
 
-<h2>5 · Marktpreisindikation</h2>
+<h2>5 · DealScore und Investor Deal Score</h2>
 
 <div class="chat">
-  <div class="b du"><div class="blase">/marktpreis</div></div>
+  <div class="b du"><div class="blase">wie ist der DealScore von Objekt 3?</div></div>
+  <div class="b bot"><div class="blase"><b>Hermannstraße 9, Hüllhorst</b><br><br>
+    DealScore: <b>85</b> von 100 · TOP<br>
+    Investor Deal Score: <b>86</b> · TOP<br><br>
+    • DSCR: <b>1.83</b><br>• LTV: <b>88.2 %</b><br>
+    • Bruttomietrendite: <b>6.60 %</b><br>
+    • Cashflow nach Steuer: <b>4.366 €/Jahr</b>
+    <span class="leise">Gerechnet in DealPilot — ich lese den gespeicherten Wert.</span></div></div>
+</div>
+
+<table>
+  <tr><th>Score</th><th>Stufe</th></tr>
+  <tr><td>ab 85</td><td><b>TOP</b></td></tr>
+  <tr><td>ab 70</td><td><b>GUT</b></td></tr>
+  <tr><td>ab 50</td><td><b>SOLIDE</b></td></tr>
+  <tr><td>ab 35</td><td><b>SCHWACH</b></td></tr>
+  <tr><td>darunter</td><td><b>KRITISCH</b></td></tr>
+</table>
+
+<div class="merk">
+  <b>Der Bot rechnet keinen Score.</b> Er liest den, der in DealPilot
+  entstanden ist. Ein zweiter Score wäre eine zweite Meinung über denselben
+  Deal — und im Chat stünde eine andere Zahl als auf der Karte. Liegt noch
+  keiner vor, sagt er das, statt zu schätzen.
+</div>
+
+<h2>6 · Marktpreisindikation</h2>
+
+<p>Zwei Tiefen — du wählst mit einem Wort.</p>
+
+<table>
+  <tr><th>Stufe</th><th>Was drinsteckt</th></tr>
+  <tr><td><b>Marktpreisindikation</b></td>
+      <td>Lage und Preisspanne aus den Daten des zuständigen Gutachterausschusses</td></tr>
+  <tr><td><b>Erweiterte</b></td>
+      <td>zusätzlich Zustand und Qualität — deutlich engere Spanne, mit Dossier</td></tr>
+</table>
+
+<div class="chat">
+  <div class="b du"><div class="blase">hol mir eine Marktpreisindikation für die Musterstr. 12</div></div>
   <div class="b bot"><div class="blase"><b>Marktpreisindikation</b> für
     Musterstraße 12, 04109 Leipzig<br><br>
-    Das kostet <b>einen Abruf</b> aus deinem Guthaben (noch 12 übrig).<br><br>
-    Soll ich? (ja / nein)</div></div>
+    Das kostet <b>eine Marktpreisindikation</b> (noch 5 in deinem Kontingent).<br><br>
+    Soll ich? (ja / nein)
+    <span class="leise">Sag „erweitert", wenn du zusätzlich Zustand und Qualität willst.</span></div></div>
   <div class="b du"><div class="blase">ja</div></div>
-  <div class="b bot"><div class="blase"><b>Indikation</b><br><br>
-    Wert: <b>201.400 €</b><br>Spanne: 186.300 – 216.500 €
-    <span class="leise">Indikation eines unabhängigen Bewertungspartners,
-    kein Verkehrswert und kein Gutachten.</span></div></div>
+  <div class="b bot"><div class="blase"><b>Marktpreisindikation</b><br><br>
+    Wert: <b>201.400 €</b><br>Spanne: 186.300 – 216.500 €<br>2.014 €/m²
+    <span class="leise">Indikation aus den Daten des zuständigen
+    Gutachterausschusses — kein Verkehrswert und kein Gutachten.</span></div></div>
+</div>
+
+<div class="merk gut">
+  <b>Hast du die kleine Stufe schon bezahlt</b> und willst die erweiterte,
+  wird nur die Differenz fällig. Der Bot sagt das vorher.
 </div>
 
 <div class="merk warn">
@@ -322,10 +402,11 @@ wegzuwerfen.</p>
     <span class="leise">Sag sie mir einfach, dann hole ich sie ab.</span></div></div>
 </div>
 
-<h2>6 · Alle Befehle</h2>
+<h2>7 · Alle Befehle</h2>
 
 <table>
   <tr><th>Befehl</th><th>Wirkung</th></tr>
+  <tr><td colspan="2"><i>Du brauchst sie nicht — sag es einfach, wie du es denkst. Sie gehen aber auch.</i></td></tr>
   <tr><td><code>/neu</code></td><td>Neues Objekt anlegen, Schritt für Schritt</td></tr>
   <tr><td><code>/objekte</code></td><td>Deine Objekte auflisten</td></tr>
   <tr><td><code>/portfolio</code></td><td>Vermögensbilanz und Projektion</td></tr>
@@ -335,7 +416,7 @@ wegzuwerfen.</p>
   <tr><td><code>/stop</code></td><td>Verbindung stilllegen (in den Einstellungen reaktivierbar)</td></tr>
 </table>
 
-<h2>7 · Einrichtung</h2>
+<h2>8 · Einrichtung</h2>
 
 <ul>
   <li>In Telegram <b>@BotFather</b> öffnen und <code>/newbot</code> schicken</li>
