@@ -121,6 +121,47 @@ async function sendenLang(token, chatId, text) {
   }
 }
 
+/* Ist das eine Frage oder eine Angabe? Entscheidet, ob eine Nachricht im
+ * Anlege-Modus in die Feldextraktion geht oder an die Auskunft.
+ *
+ * Bewusst streng: im Zweifel ist es eine ANGABE. Wer "Baujahr 1962?"
+ * tippt, meint das Baujahr, nicht eine Frage. Nur was eindeutig fragt —
+ * Fragewort am Anfang oder ein Wortfeld, das es im Formular nicht gibt —
+ * wird durchgereicht. */
+function istFrage(text) {
+  const t = String(text || '').trim();
+  if (!t) return false;
+  if (/^(wie|was|wo|wann|warum|wieso|welche[rsn]?|wieviel|wie viel|kannst du|zeig|gib mir|sag mir|liste)\b/i.test(t)
+      && t.length > 12) return true;
+  if (/\b(portfolio|verm(ö|oe)gensbilanz|verbindlichkeit|gesamttilgung|deal ?score|marktpreis)\b/i.test(t)) return true;
+  return false;
+}
+
+/* Die Anlage abschliessen — aus `weiterFragen` herausgezogen, damit auch
+   "fertig" sie auslösen kann. */
+async function anlageAbschliessen(token, chatId, userId, entwurf) {
+  const sauber = {};
+  Object.keys(entwurf || {}).forEach((k) => { if (k.indexOf('__') !== 0) sauber[k] = entwurf[k]; });
+  if (!Object.keys(sauber).length) {
+    await senden(token, chatId, 'Ich habe noch nichts, was ich anlegen könnte.');
+    return null;
+  }
+  const r = await query(
+    `INSERT INTO objects (user_id, data) VALUES ($1, $2::jsonb) RETURNING id`,
+    [userId, JSON.stringify(sauber)]);
+  await zustandLoeschen(chatId, userId);
+  await objektMerken(chatId, userId, r.rows[0].id);
+  const fo = fuehrung.fortschritt(sauber);
+  await senden(token, chatId,
+    '✓ *Objekt angelegt.*\n\n'
+    + (sauber.str ? sauber.str + ' ' + (sauber.hnr || '') + '\n' : '')
+    + [sauber.plz, sauber.ort].filter(Boolean).join(' ')
+    + '\n\n' + fo.fertig + ' von ' + fo.bloecke + ' Angabenblöcken gefüllt.'
+    + (fo.offen ? ' Den Rest kannst du in DealPilot ergänzen — oder mich später fragen.' : '')
+    );
+  return r.rows[0].id;
+}
+
 /* ── Anlegen: locker beginnen, nicht mit einem Formular ──────────────────
  *
  * Marcel: "Bitte leg mir ein Objekt an und dann gibt es eine rueckantwort
@@ -141,7 +182,11 @@ async function anlegenStarten(token, chatId, userId, text) {
   if (lohnt) {
     try {
       const r = await voiceExtract.extractFromText(roh, fuehrung.katalog(), {
-        apiKey: config.openai.apiKey, modus: 'antwort'
+        /* v1800 · `inserat` statt `antwort`: wer "leg mir eine ETW in der
+           Musterstr. 12 in Hannover an, 85 qm, vier Zimmer, 2. OG,
+           vermietet" sagt, liefert einen Fliesstext, keine Antwort auf
+           eine Frage. Siehe die Begruendung in `aufnehmen`. */
+        apiKey: config.openai.apiKey, modus: 'inserat'
       });
       schonDa = (r && r.fields) || {};
     } catch (e) { schonDa = {}; }
@@ -536,9 +581,30 @@ function euro(n) { return Number(n).toLocaleString('de-DE'); }
 async function aufnehmen(token, chatId, userId, text, entwurf) {
   let neu = {};
   try {
+    /* ── v1800 · DER MODUS WAR FALSCH ───────────────────────────────────
+     *
+     * Hier stand `modus: 'antwort'`. Der ist fuer die Antwort auf EINE
+     * Frage gebaut ("Baujahr und Kaufpreis?" -> "1962, 189000") und hat
+     * einen eigenen Prompt (`ZUSATZ_ANTWORT`) sowie 4.000 Zeichen Deckel.
+     *
+     * Marcel am 02.10.2026: "habe ihm dann auch die Groesse und schon
+     * mehrere Daten genannt und dann hat er die Haelfte ignoriert."
+     *
+     * Genau das war die Ursache. Ein Fliesstext mit zehn Angaben gehoert
+     * in `inserat` — eigener Prompt (`ZUSATZ_INSERAT`), 40.000 Zeichen.
+     *
+     *   > Ein Modus, der fuer eine Antwort gebaut ist, liest auch nur
+     *   > eine. Er meldet dabei keinen Fehler: was er nicht erwartet,
+     *   > taucht einfach nicht auf.
+     *
+     * Die Entscheidung faellt am Text: mehrere Angaben erkennt man an
+     * Laenge und Zahlen. Eine knappe Antwort auf eine knappe Frage bleibt
+     * bei `antwort`, wo dieser Modus staerker ist. */
+    const vieles = String(text || '').trim().length > 60
+                || (String(text || '').match(/\d+/g) || []).length >= 3;
     const r = await voiceExtract.extractFromText(text, fuehrung.katalog(), {
       apiKey: config.openai.apiKey,
-      modus: 'antwort',
+      modus: vieles ? 'inserat' : 'antwort',
       kontext: entwurf
     });
     neu = (r && r.fields) || {};
@@ -605,23 +671,22 @@ async function aufnehmenFelder(token, chatId, userId, neu, entwurf) {
 }
 
 /* ── Die naechste Frage stellen ───────────────────────────────────────── */
-async function weiterFragen(token, chatId, userId, entwurf) {
-  const naechste = fuehrung.naechsteFrage(entwurf, { modus: 'anlegen' });
+async function weiterFragen(token, chatId, userId, entwurf, zuletztOffen) {
+  /* v1800 · Uebersprungene Bloecke nicht sofort wieder anbieten. Wer
+     "weiss ich nicht" sagt, soll nicht dieselbe Frage nochmal bekommen —
+     das ist der Unterschied zwischen Fuehrung und Verhoer. */
+  const uebersprungen = Object.keys(entwurf || {})
+    .filter((k) => k.indexOf('__uebersprungen_') === 0)
+    .map((k) => k.replace('__uebersprungen_', ''));
+
+  const alle = fuehrung.luecken(entwurf, { modus: 'anlegen' });
+  const naechste = alle.find((b) => !b.ids.every((id) => uebersprungen.indexOf(id) >= 0))
+                || null;
   const fo = fuehrung.fortschritt(entwurf);
 
   if (!naechste) {
-    /* Nichts mehr offen: anlegen. */
-    const r = await query(
-      `INSERT INTO objects (user_id, data) VALUES ($1, $2::jsonb) RETURNING id`,
-      [userId, JSON.stringify(entwurf)]);
-    await zustandLoeschen(chatId, userId);
-    await senden(token, chatId,
-      '✓ *Objekt angelegt.*\n\n'
-      + (entwurf.str ? entwurf.str + ' ' + (entwurf.hnr || '') + ', ' : '')
-      + (entwurf.plz || '') + ' ' + (entwurf.ort || '')
-      + '\n\nDu findest es ab sofort in DealPilot. Dort kannst du es '
-      + 'weiter ausfüllen und rechnen lassen.');
-    return r.rows[0].id;
+    await anlageAbschliessen(token, chatId, userId, entwurf);
+    return null;
   }
 
   await zustandSetzen(chatId, userId, {
@@ -631,10 +696,22 @@ async function weiterFragen(token, chatId, userId, entwurf) {
   });
 
   const et = fuehrung.etappe(naechste.et);
+  /* Bei Auswahlfeldern die Moeglichkeiten gleich mitgeben — fragen und
+     dann die Antwort nicht zuordnen koennen ist eine Runde zu viel. */
+  const wahl = [];
+  naechste.ids.forEach((id) => {
+    const f = fuehrung.feld(id);
+    if (f && f.kind === 'select' && f.optionen && f.optionen.length && f.optionen.length <= 12) {
+      wahl.push('*' + (f.label || id) + '*: ' + f.optionen.map((o) => o.text || o.wert).join(' · '));
+    }
+  });
+
   await senden(token, chatId,
     (et ? '_Etappe ' + et.nr + ' von 6 · ' + et.name + '_\n\n' : '')
     + naechste.frage
-    + '\n\n_' + fo.fertig + ' von ' + fo.bloecke + ' erledigt · /abbrechen beendet_');
+    + (wahl.length ? '\n\n' + wahl.join('\n') : '')
+    + '\n\n_' + fo.fertig + ' von ' + fo.bloecke + ' erledigt · '
+    + '„weiter" überspringt · „fertig" legt an · /abbrechen beendet_');
   return null;
 }
 
@@ -722,9 +799,51 @@ async function beantworten(token, chatId, userId, text, msg) {
     return;
   }
 
+  /* ── v1800 · DER ANLEGE-MODUS HATTE KEINEN AUSGANG ───────────────────
+   *
+   * Hier stand ein unbedingtes `aufnehmen(...)` mit `return`. Jede
+   * Nachricht im Anlege-Modus ging in die Feldextraktion — und wenn die
+   * nichts verstand, kam "Daraus konnte ich kein Feld lesen", bei der
+   * naechsten Nachricht wieder, und wieder.
+   *
+   * Marcel am 02.10.2026: "dann ist er in diesem Schritt haengen
+   * geblieben und hat nicht weitergemacht."
+   *
+   *   > Ein Zustand, aus dem nur ein Befehl herausfuehrt, den der Nutzer
+   *   > nicht kennt, ist kein Dialog, sondern ein Formular mit
+   *   > Sprechblasen.
+   *
+   * Drei Auswege, und der Entwurf bleibt bei allen dreien stehen:
+   *   1. eine ECHTE FRAGE geht an den Agenten, nicht in die Extraktion
+   *   2. "weiter"/"ueberspringen" ueberspringt den aktuellen Block
+   *   3. "fertig" legt an, was da ist
+   *
+   * Der Fortschritt ist damit zustandsbehaftet UND unterbrechbar — genau
+   * das, was die Spezifikation unter Punkt 5 verlangt. */
   if (z && z.modus === 'anlegen') {
-    await aufnehmen(token, chatId, userId, text, z.entwurf);
-    return;
+    if (/^(weiter|n(ä|ae)chste|ueberspringen|überspringen|skip|wei(ss|ß) ich nicht|keine ahnung|sp(ä|ae)ter)\b/i.test(text.trim())) {
+      /* Den Block ueberspringen: die offenen Ids als "bewusst leer"
+         merken, damit `luecken` sie nicht sofort wieder anbietet. */
+      const e = Object.assign({}, z.entwurf || {});
+      (z.offene_ids || []).forEach((id) => { if (e[id] == null) e['__uebersprungen_' + id] = true; });
+      await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: e });
+      await weiterFragen(token, chatId, userId, e, (z.offene_ids || []));
+      return;
+    }
+    if (/^(fertig|speichern|anlegen|das war'?s|das wars|reicht)\b/i.test(text.trim())) {
+      await anlageAbschliessen(token, chatId, userId, z.entwurf || {});
+      return;
+    }
+    /* Eine Frage ist keine Antwort. Wer mitten in der Anlage wissen will,
+       wie sein Portfolio steht, bekommt die Auskunft — und danach geht es
+       weiter, wo es war. */
+    if (istFrage(text)) {
+      await senden(token, chatId, '_(Die Anlage läuft weiter — ich merke sie mir.)_');
+      /* NICHT return: faellt durch zur normalen Auskunft weiter unten. */
+    } else {
+      await aufnehmen(token, chatId, userId, text, z.entwurf);
+      return;
+    }
   }
 
   /* ── Sprachnachricht ──────────────────────────────────────────────────
