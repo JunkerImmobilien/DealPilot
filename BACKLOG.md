@@ -1613,11 +1613,35 @@ zu drücken. **Beide sind seit v1652c/d unter 900 px ausgeblendet.**
 - **Handy-Layout der fünf Varianten** ist gebaut und gemessen, aber nur
   an drei Breiten (1024 / 834 / 390) und nur in v1, v2, v4. v3 und v5
   fehlen in der Messreihe.
-- **`verfuegbarkeit-by.json`** wird von keinem Ausgabeweg gelesen
-  (Befund vom 25.09., unverändert).
-- **`mb.market_reports.user_id` ist INTEGER**, `users.id` eine UUID —
-  die nutzerbezogenen Marktbericht-Wege scheitern daran seit v942 still.
-  Braucht eine Migration.
+- ~~**`verfuegbarkeit-by.json`** wird von keinem Ausgabeweg gelesen~~ —
+  **überholt, am 02.10.2026 nachgemessen.** Die Auskunft steht: für sieben
+  Stichproben aus allen sechs Wegweiser-Ländern liefert
+  `quelleFuer(ags)` → `quellenSatz()` eine vollständige Antwort.
+
+  ```
+  Ebersberg (BY, kein Sachwertfaktor im Register):
+
+    stelle   Gutachterausschuss ... Landkreis Ebersberg
+    url      gutachterausschuesse-bayern.de/marktberichte-bayern/
+    zugang   kostenfrei
+    hinweis  "Die Uebersicht sagt nur, OB Daten vorliegen - nicht fuer
+             welche Objektart oder welchen Stichtag ..."
+  ```
+
+  `AUSSCHUSS_QUELLEN` führt 120 Einträge und deckt genau die sechs
+  Wegweiser-Länder ab (AGS-Präfixe 01 · 04 · 08 · 09 · 10 · 13).
+
+  **Was bleibt, ist eine Kopie:** `BY_AUSSCHUSS_DATEN` in
+  `quellen_links.js` ist aus `verfuegbarkeit-by.json` ABGELEITET und
+  eingefroren (96 Kreise, Stand 25.09.). Ändert sich die Registerdatei,
+  ändert sich die Tabelle nicht mit.
+
+  > Zwei Listen mit demselben Inhalt laufen auseinander, sobald eine
+  > gepflegt wird. Hier ist es noch keine, weil beide stillstehen.
+
+- ~~**`mb.market_reports.user_id` ist INTEGER**~~ — **ERLEDIGT (v1769).**
+  Migration `015_user_id_text.sql` gelaufen, 202 Zeilen zugeordnet, alle
+  fünf Routen antworten (vorher HTTP 400). Siehe V6.
 
 ---
 
