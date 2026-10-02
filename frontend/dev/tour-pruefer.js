@@ -198,16 +198,40 @@ window.DpTourPruefer = (function () {
             if (r.fenster) e.fenster = r.fenster;
           }
           out.push(e);
-          /* Verzweigung: den gewählten Zweig klicken. Lehre 2. */
-          var w = blase.querySelectorAll('[data-goto]');
+
+          /* ── DAS PROTOKOLL ─────────────────────────────────────────
+             Bis hierher war nach einem Steckenbleiben nicht zu sagen,
+             WORAN es lag: welcher Knopf gesucht wurde, ob er da war, ob
+             der Klick ankam. Jede Vermutung darüber war geraten.
+
+             > Ein Prüfer, der nicht protokolliert, was er TUT, liefert
+             > bei einem Fehlschlag nur die Hälfte des Befundes. */
+          var frisch = document.querySelector('.dp-tour-bubble');
+          var w = frisch ? frisch.querySelectorAll('[data-goto]') : [];
+          var nx = frisch ? frisch.querySelector('[data-action="next"]') : null;
+          var vorKlick = titel();
+          e.tat = { blase_frisch: !!frisch, goto_knoepfe: w.length, next_knopf: !!nx };
+
           if (w.length) {
-            w[(zweig === 'B' && w[1]) ? 1 : 0].click();
-            busy = false; return;
+            var wi = (zweig === 'B' && w[1]) ? 1 : 0;
+            e.tat.gewaehlt = 'goto:' + (w[wi].getAttribute('data-goto') || '?');
+            w[wi].click();
+          } else if (nx) {
+            e.tat.gewaehlt = 'next';
+            nx.click();
+          } else {
+            e.tat.gewaehlt = 'KEIN KNOPF';
+            clearInterval(iv);
+            fertig({ ansicht: name, zweig: zweig, schritte: out, ende: 'letzter Schritt erreicht' });
+            return;
           }
-          var nx = blase.querySelector('[data-action="next"]');
-          if (nx) { nx.click(); busy = false; return; }
-          clearInterval(iv);
-          fertig({ ansicht: name, zweig: zweig, schritte: out, ende: 'letzter Schritt erreicht' });
+          /* Kam der Klick an? Erst das macht aus dem Protokoll einen Beweis. */
+          setTimeout(function () {
+            e.tat.titel_danach = titel().slice(0, 26);
+            e.tat.bewegt = (titel() !== vorKlick);
+            busy = false;
+          }, 900);
+          return;
         }, 1100);
       }, 300);
     });
@@ -280,7 +304,8 @@ window.DpTourPruefer = (function () {
           zeilen.push('   ' + String(s.n || '?').padStart(2) + ' ' + s.urteil.padEnd(16)
             + String(s.tab || '-').padEnd(9) + s.titel
             + (s.liegt_auf ? '  liegt auf ' + s.liegt_auf : '')
-            + (s.spot && s.urteil === 'SPOT_AUSSERHALB' ? '  Spot ' + JSON.stringify(s.spot) : ''));
+            + (s.spot && s.urteil === 'SPOT_AUSSERHALB' ? '  Spot ' + JSON.stringify(s.spot) : '')
+            + (s.tat && s.tat.bewegt === false ? '  KLICK OHNE WIRKUNG: ' + JSON.stringify(s.tat) : ''));
         });
       });
       /* Welche Schritte hat KEIN Lauf erreicht? Das ist selbst ein Befund. */
