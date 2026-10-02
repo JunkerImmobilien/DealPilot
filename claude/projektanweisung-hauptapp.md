@@ -28506,3 +28506,114 @@ drei lagen die ganze Zeit da und waren für ihren Eigentümer unerreichbar.
 - `req.apiKey.scopes` wird gesetzt, aber an keiner gefundenen Stelle
   ausgewertet — ein Key hat faktisch Vollzugriff. Für einen Bot gehört das
   eingegrenzt.
+
+---
+
+## Rollout-Journal 02.10.2026 (3) — v1792: zurückgenommen, jeder Kunde bekommt seinen eigenen Bot
+
+**Was** · Die Entscheidung aus v1791 war falsch. Marcel will einen Bot **je
+Kunde**; der ist jetzt gebaut, inklusive Webhook-Eingang.
+
+**Commit** · `165c812`
+
+### Die Rücknahme
+
+> „aber ich möchte dass der kunde für sein objekt einen anlegen kann also
+> selber. **jeder kunde kann für sich und sein portfolio einen eigenen bot
+> anlegen.** jetzt würde ich dir ja diesen schicken und wir haben nur einen
+> bot oder?"
+
+Seine Nachfrage trifft genau zu: mit v1791 hätten wir **einen** Bot gehabt.
+Ich hatte „der muss über Einstellungen vernünftig einzurichten sein" als
+„möglichst wenig Arbeit für den Kunden" gelesen. Gemeint war: **dort trägt
+der Kunde seinen eigenen Bot ein.**
+
+### Das Gegenargument war keines
+
+In T-B1 stand gegen „Bot je Kunde": *„Polling: eine Instanz JE Kunde — 50
+Kunden = 50 Polling-Schleifen"*, dazu die harte Grenze aus der Anleitung.
+
+> Das gilt für **Polling**. Mit einem Webhook fällt es ersatzlos weg: jeder
+> Bot ruft von sich aus unsere URL auf, und wir halten keine einzige
+> Schleife. Fünfzig Bots kosten dann genau so viel wie einer.
+
+Das Argument richtete sich gegen die **Bauart des Bau-Cockpits**, nicht gegen
+Marcels Weg — ich hatte beides vermengt. Und der Vorteil, der in derselben
+Tabelle stand, blieb ungewichtet: **der Kunde darf den Bot nennen wie er
+will.** Für eine Whitelabel-SaaS ist das genau das Produkt, nicht ein
+Nebenpunkt.
+
+### Migration 077 — und wo der Token NICHT liegt
+
+`telegram_bots` führt Bot-Name, Webhook-Pfad und Webhook-Secret. **Der Token
+steht nicht darin.** Er ist ein fremdes Passwort und liegt verschlüsselt in
+`user_provider_credentials` (AES-256-GCM über `credentialVault`), genau wie
+der ImmoMetrica-Zugang. Nach außen gibt die API nur die letzten vier Zeichen.
+
+`telegram_links` (076) bleibt gültig — auch bei eigenem Bot muss der Chat
+verknüpft werden: wer den Bot kennt, kann ihm schreiben, und der Einmal-Code
+entscheidet, *wessen* Daten er sieht. Neu ist `bot_user_id`; ohne diese
+Spalte würde ein bei Kunde A verknüpfter Chat auch über den Bot von Kunde B
+gelten.
+
+### `PUT /bot` — erst prüfen, dann speichern
+
+```
+1 getMe       ist der Token echt, und wie heisst der Bot?
+2 speichern   verschluesselt, plus Pfad und Secret erzeugen
+3 setWebhook  ab jetzt schickt Telegram an uns
+```
+
+Ein falsch abgetippter Token darf nicht als „eingerichtet" in der Datenbank
+stehen. Schlägt Schritt 3 fehl, ist der Bot gespeichert aber **stumm** — und
+genau das zeigt die Oberfläche dann an, statt „fertig" zu melden.
+
+### Der Webhook ist eine eigene Datei — und die Mount-Reihenfolge zählt
+
+`routes/telegram.js` beginnt mit `router.use(authenticate)`. Beim Webhook ist
+es umgekehrt: die Anfrage kommt von Telegram, ohne Anmeldung.
+
+> Zwei Berechtigungslagen in einer Datei sind eine Einladung, die falsche zu
+> erwischen. Eine vergessene Zeile `authenticate` fällt niemandem auf,
+> solange der eigene Test angemeldet läuft.
+
+Drei Merkmale entscheiden, wessen Daten gelesen werden, und **keines steht im
+Nachrichteninhalt**: Pfad (24 Zufallsbytes je Bot), Secret-Kopf, dann erst
+`chat.id`. Geantwortet wird **immer sofort mit 200**, sonst wiederholt
+Telegram 24 Stunden lang.
+
+### 200 ist kein Nachweis — diesmal angewandt
+
+Beide DealPilot-Domains antworten auf jeden Pfad mit 200 und liefern die
+`index.html`. Dass der Webhook wirklich beim Backend landet, beweist erst der
+Inhaltstyp:
+
+| Pfad | HTTP | content-type | Größe |
+|---|---|---|---|
+| `/api/v1/telegram/webhook/<erfunden>` | 200 | **application/json** | 11 B (`{"ok":true}`) |
+| `/gibtesnicht` | 200 | text/html | 322.083 B |
+
+### Gemessen statt geraten: die öffentliche Adresse
+
+`basisUrl()` las `PUBLIC_API_URL` und `APP_BASE_URL` — **beide gibt es im
+Container nicht.** Im Browser gemessen: die API läuft auf derselben Domain
+unter `/api/v1` (`Auth.getApiBase()` und das meta-Tag sagen beides), und
+`APP_URL=https://app.staging.dealpilot.immo` steht im Container bereit. Beide
+alten Namen bleiben als erste Wahl stehen, damit eine Installation mit
+getrennter API-Domain sie setzen kann.
+
+### Der Bot sagt, was er noch nicht kann
+
+Verknüpfen funktioniert (`/start`, Code, `/stop`). Auf alles andere antwortet
+er „Verbunden — aber ich kann noch nicht antworten", statt zu schweigen.
+
+> Ein Bot, der auf eine Frage schweigt, sieht aus wie ein kaputter Bot. Einer,
+> der sagt „das kann ich noch nicht", ist ein ehrlicher.
+
+### Rest
+
+- **Die drei Posten aus T-B6** sind unverändert die Arbeit, die bleibt:
+  Feldkatalog, Portfolio-Zahlen (**nicht nachbauen**) und Führungslogik
+  liegen im Frontend-JS.
+- **Der Token darf nie in einen Chat oder ein Ticket.** Er wird im Panel
+  eingetragen und landet verschlüsselt in der Datenbank.
