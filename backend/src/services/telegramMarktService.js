@@ -34,9 +34,26 @@ const jwtUtil = require('../utils/jwt');
 const config = require('../config');
 const aiCreditsService = require('./aiCreditsService');
 
+/* ── v1808 · STUFE 3 FEHLTE, UND DAS FIEL NICHT AUF ──────────────────────
+ *
+ * Hier standen nur 1 und 2. `_stufe()` liess die 3 durch, `STUFEN[3]` war
+ * aber undefined — und jeder Zugriff fiel still auf Stufe 1 zurueck. Wer
+ * eine Wertermittlung nach ImmoWertV wollte, bekam den NAMEN der
+ * Marktpreisindikation zu sehen.
+ *
+ *   > Ein Rueckfall auf den Standard sieht aus wie eine Antwort. Er sagt
+ *   > nicht "das kenne ich nicht", sondern etwas Falsches in ruhigem Ton.
+ *
+ * Marcel will sie ausdruecklich: "Gib mir wirklich eine Wertermittlung
+ * komplett, dass ich dann alles bekomme."
+ */
 const STUFEN = {
-  1: { art: 'mpi',      name: 'Marktpreisindikation' },
-  2: { art: 'mpi_plus', name: 'Erweiterte Marktpreisindikation' }
+  1: { art: 'mpi',      name: 'Marktpreisindikation',
+       was: 'Lage und Preisspanne aus den Daten des zustaendigen Gutachterausschusses' },
+  2: { art: 'mpi_plus', name: 'Erweiterte Marktpreisindikation',
+       was: 'zusaetzlich Zustand und Qualitaet — engere Spanne, mit Dossier' },
+  3: { art: 'wev',      name: 'Wertermittlung nach ImmoWertV',
+       was: 'Boden-, Ertrags- und Sachwert mit Rechenweg' }
 };
 
 function basis() {
@@ -103,13 +120,28 @@ async function voranschlag(userId, objektId, stufe) {
 }
 
 /* ── Der Abruf. Nur nach ausdruecklicher Bestaetigung. ───────────────── */
-async function abrufen(userId, objekt, stufe) {
+async function abrufen(userId, objekt, stufe, opts) {
   const s = STUFEN[stufe] ? stufe : 1;
   const d = (objekt && objekt.daten) || {};
+  /* ── v1808 · `fast` NUR bei der kleinen Stufe ────────────────────────
+   *
+   * Der Schnellmodus rechnet nur Marktwert- und Mietindikation und
+   * ueberspringt KI-Bericht und Preishistorie — das steht woertlich im
+   * Ergebnis ("KI-Bericht und Preishistorie wurden uebersprungen").
+   *
+   * Fuer Stufe 1 ist das richtig: dort will jemand schnell eine Spanne.
+   * Fuer die erweiterte Indikation und die Wertermittlung ist es falsch —
+   * Marcel will dort "alles, was er dazu gefunden hat, auch zur Lage und
+   * allem".
+   *
+   *   > Wer die teurere Stufe bezahlt und die schnelle bekommt, bezahlt
+   *   > fuer etwas, das er nicht sieht. */
+  const schnell = (opts && opts.schnell != null) ? Boolean(opts.schnell) : (s === 1);
   const r = await ruf(userId, '/marktbericht/reports/from-dealpilot', {
     method: 'POST',
+    timeoutMs: schnell ? 120000 : 240000,
     body: {
-      fast: true,
+      fast: schnell,
       external_ref: objekt.objekt_id,
       wert_stufe: s,            /* NIE weglassen — der Default waere 2 */
       object: {

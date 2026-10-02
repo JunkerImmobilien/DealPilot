@@ -464,11 +464,72 @@ async function marktbericht_abrufen(ctx, args) {
   try {
     const r = await markt.abrufen(ctx.userId, o, stufe);
     ctx.merkeObjekt(id);
-    return { ok: true, stufe, ergebnis: r };
+
+    /* ── v1808 · DAS ERGEBNIS IST MEHR ALS EINE ZAHL ───────────────────
+     *
+     * Marcel, Punkt 7: "Das Ergebnis soll nicht lediglich aus einem
+     * einzelnen Marktpreis bestehen" — er will Lage, Marktdaten,
+     * Vergleichsdaten, Annahmen, Risiken und QUELLEN.
+     *
+     * Der Bericht liefert das als Markdown (`report_md`) plus Zahlen im
+     * Rumpf. Beides geht ans Modell; es soll zusammenfassen, nicht
+     * nacherzaehlen — und die QUELLEN mitnehmen.
+     *
+     *   > Eine Wertauskunft ohne ihre Herkunft verstoesst gegen die
+     *   > Wertermittlungsdoktrin, egal wie gut sie formuliert ist. */
+    const bericht = r.report_md || r.bericht_md || r.markdown || null;
+    const stufeInfo = markt.STUFEN[stufe] || markt.STUFEN[1];
+
+    return {
+      ok: true, stufe, art: stufeInfo.art, name: stufeInfo.name,
+      zahlen: _berichtZahlen(r),
+      bericht_text: bericht ? String(bericht).slice(0, 14000) : null,
+      rumpf: _ohneGrosseFelder(r),
+      hinweis: 'Fasse fuer den Nutzer zusammen: Wert bzw. Spanne, die verwendeten '
+             + 'Objektangaben, Lage, Marktdaten, Annahmen und Besonderheiten — und '
+             + 'NENNE DIE QUELLEN, wenn welche dastehen. Erfinde nichts dazu. '
+             + 'Sag ausdruecklich, dass es eine Indikation ist und kein Gutachten '
+             + '(ausser bei der Wertermittlung nach ImmoWertV). '
+             + 'Nenne Anbieter nie beim Namen — "unabhaengiger Bewertungspartner".'
+    };
   } catch (e) {
     return { ok: false, fehler: e.message, kontingent: Boolean(e.kontingent),
       upgrade_zu: e.upgradeTo || undefined };
   }
+}
+
+/* Zahlen aus dem Berichtsrumpf, unter den Namen, die dort vorkommen
+   koennen. Was nicht da ist, kommt nicht vor — nichts wird geraten. */
+function _berichtZahlen(r) {
+  const w = r.wert || r.ergebnis || r.result || r || {};
+  const z = {};
+  const nimm = (ziel, ...kandidaten) => {
+    for (const k of kandidaten) {
+      const v = (w && w[k]) != null ? w[k] : (r && r[k]);
+      if (v != null && Number.isFinite(Number(v))) {
+        z[ziel] = Number(v).toLocaleString('de-DE'); return;
+      }
+    }
+  };
+  nimm('marktwert_eur', 'marktwert', 'wert', 'value');
+  nimm('spanne_von_eur', 'spanne_von', 'low', 'min');
+  nimm('spanne_bis_eur', 'spanne_bis', 'high', 'max');
+  nimm('eur_pro_qm', 'eur_pro_qm', 'eur_per_sqm');
+  nimm('marktmiete_eur', 'marktmiete', 'miete');
+  return Object.keys(z).length ? z : null;
+}
+
+/* Grosse Textfelder raus — sie stehen schon in `bericht_text`, und zweimal
+   dasselbe im Kontext macht den Agenten nur beliebiger. */
+function _ohneGrosseFelder(r) {
+  const o = {};
+  Object.keys(r || {}).forEach((k) => {
+    if (/report_md|bericht_md|markdown|html/i.test(k)) return;
+    const v = r[k];
+    if (typeof v === 'string' && v.length > 600) return;
+    o[k] = v;
+  });
+  return o;
 }
 
 /* ═══ Helfer ═════════════════════════════════════════════════════════ */
@@ -639,9 +700,14 @@ const WERKZEUGE = [
       }, additionalProperties: false } },
 
   { name: 'marktbericht_preis', stufe: 'lesen', fn: marktbericht_preis,
-    beschreibung: 'Was kostet eine Bewertung? Stufe 1 Marktpreisindikation, '
-      + '2 erweiterte, 3 Wertermittlung nach ImmoWertV. Kostet selbst nichts. '
-      + 'IMMER vor marktbericht_abrufen.',
+    beschreibung: 'Was kostet eine Bewertung? Drei Stufen: '
+      + '1 = Marktpreisindikation (Lage und Preisspanne), '
+      + '2 = Erweiterte Marktpreisindikation (zusaetzlich Zustand und Qualitaet, '
+      + 'engere Spanne, mit Dossier), '
+      + '3 = Wertermittlung nach ImmoWertV (Boden-, Ertrags- und Sachwert mit '
+      + 'Rechenweg). Kostet selbst nichts. IMMER vor marktbericht_abrufen. '
+      + 'Geht aus der Frage nicht hervor, welche Stufe gemeint ist, FRAG den Nutzer '
+      + 'und nenne dabei, was die Stufen unterscheiden.',
     parameter: { type: 'object',
       properties: Object.assign({}, OBJEKT_ARGS,
         { stufe: { type: 'integer', description: '1, 2 oder 3' } }),
