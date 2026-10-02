@@ -438,30 +438,85 @@ und das sind die meisten Angestellten — kommt nicht weiter.
 > erfindet eine Zahl. Entweder die Abzüge werden abgefragt, oder das Ergebnis
 > trägt sichtbar den Vermerk „Schätzung".
 
-### U8 · Die Investortypen sind nicht die DealScore-Profile — GEMESSEN
+### U8 · Die Investortypen sind die DealScore-Profile — ERLEDIGT (v1749, v1770)
 
 Marcel: „Die Investorentypen sind nicht die, die wir im DealPilot als Profile
 für den Investor DealScore hinterlegt haben."
 
-Er hat recht, und es ist schlimmer. Gemessen am 01.10.2026:
+**v1749 hat die Liste richtig gemacht:** `_profile()` liest
+`DealScore2.getPresets()` — eine Quelle, keine Pflegeliste. Kommt dort ein
+siebtes Profil dazu, steht es von allein im Setup. Und `setActivePreset()`
+wird gerufen, der Score rechnet also mit dem gewählten Profil.
 
-| DealScore (`dealscore2.js`, 6 Profile) | Setup (`onboarding.js`, 3) |
-|---|---|
-| `balanced` Ausgewogen | `ausgewogen` Ausgewogen |
-| `conservative` Konservativ | `konservativ` Konservativ |
-| `optimistic` Optimistisch | `offensiv` **Offensiv** — gibt es dort nicht |
-| `lage` Lage-Fokus | fehlt |
-| `cashflow` Cashflow-Fokus | fehlt |
-| `sicherheit` Sicherheit | fehlt |
+**v1770 hat den Rest gefunden, und er war der schlimmere Teil.** Gemessen am
+02.10.2026 am laufenden System:
 
-**Und der eigentliche Fehler:** das Setup setzt `dp_dealscore2_preset`
-**gar nicht** (gegrept: kein Vorkommen in `onboarding.js`). Der Kunde wählt
-einen Investortyp, und der DealScore rechnet weiter mit dem Default.
+```
+DealScore2.getPresets()    6 Profile
+                           balanced · conservative · optimistic ·
+                           lage · cashflow · sicherheit
+Default im Setup           "ausgewogen"
+in der Liste enthalten     NEIN
+```
 
-> Derselbe Fehlertyp wie bei der Bordkarte in v1748b: ein Versprechen im
-> Einrichtungsfenster, für das kein Code existiert, der es einlöst. **Beim
-> nächsten Setup-Feld zuerst prüfen, WO der Wert gelesen wird** — und ob er
-> dort überhaupt ankommt.
+`_profile().filter(x => x.id === "ausgewogen")` ergibt `undefined`, `if (t)`
+ist falsch — **wer das Profil-Fenster ohne Klick durchlief, bekam weder
+Finanzierungsgrenzen noch ein Score-Profil.** Dazu war die Kachel
+„Ausgewogen" beim Öffnen nie markiert.
+
+> v1749 hat die Liste richtig gemacht und den Default vergessen. **Eine
+> halbe Umstellung ist schwerer zu finden als keine:** die Kacheln stimmen,
+> also sieht alles richtig aus.
+
+Behoben: `_typDefault()` holt den Default **aus** der Liste (`balanced`,
+sonst das erste) — er kann nicht mehr daneben liegen. Dazu ein Wächter an
+der Schreibstelle: ein unbekannter Schlüssel fällt nicht mehr still aus,
+sondern auf das erste Profil zurück **und meldet sich in der Konsole**.
+
+> Ein Rückfall ohne Hinweis ist eine zweite Tarnung für denselben Fehler.
+
+**Abgenommen am laufenden System:**
+
+```
+Sechs Kacheln, echte Schluessel, "Ausgewogen" markiert:
+  balanced (an) · conservative · optimistic · lage · cashflow · sicherheit
+
+Merker geloescht, OHNE Kachelklick auf "Fertig - los geht's":
+  dp_dealscore2_preset -> "balanced"      (vorher: nichts)
+  DealScore2.getActivePreset() -> balanced
+```
+
+---
+
+#### U8-R · Drei Finanzierungsgrenzen sind Vorschläge — ENTSCHEIDUNG MARCEL
+
+Der DealScore trägt **keine** DSCR, LTV und Eigenkapitalquote — das sind
+Finanzierungsgrenzen, keine Score-Gewichte. Diese Brücke steht in
+`onboarding.js` als `GRENZEN`.
+
+**Die ersten drei sind die bisherigen Werte, unverändert übernommen.** Die
+drei neuen standen bisher nirgends, weil es die Profile im Setup gar nicht
+gab — sie sind **aus der Profilbeschreibung abgeleitet, nicht gemessen**:
+
+| Profil | DSCR ab | LTV bis | EK ab | Risikotext | Herkunft |
+|---|---:|---:|---:|---|---|
+| Ausgewogen | 1,20 | 90 % | 10 % | Moderat (ausgewogen) | **bisher** |
+| Konservativ | 1,35 | 80 % | 20 % | Konservativ (sicherheitsorientiert) | **bisher** |
+| Optimistisch | 1,05 | 95 % | 5 % | Chancenorientiert (höheres Risiko) | **bisher** |
+| Lage-Fokus | 1,15 | 85 % | 15 % | Moderat (ausgewogen) | ⚠ Vorschlag |
+| Cashflow-Fokus | 1,30 | 85 % | 15 % | Moderat (ausgewogen) | ⚠ Vorschlag |
+| Sicherheit | 1,40 | 75 % | 25 % | Konservativ (sicherheitsorientiert) | ⚠ Vorschlag |
+
+**Marcel ist DESAG-zertifizierter Sachverständiger — bei Bewertungs- und
+Finanzierungsgrenzen weiß er es besser.** Die drei Zeilen stehen im
+Einrichtungsfenster und bestimmen danach jede Empfehlung; eine abgeleitete
+Zahl ist dort keine Zahl, sondern eine Vermutung mit Nachkommastelle.
+
+> Wo kein Wert vorliegt, bekommt der Kunde den Weg dorthin. Hier liegt ein
+> Wert vor — nur hat ihn niemand gesetzt, der es entscheiden darf.
+
+**Zu sehen:** `?setup=1` öffnen, viermal „Weiter" — die Grenzen stehen auf
+jeder Kachel.
 
 ---
 
