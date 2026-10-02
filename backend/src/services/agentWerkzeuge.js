@@ -437,7 +437,7 @@ async function marktbericht_preis(ctx, args) {
    * Ohne ausdrueckliche Stufe bekommt das Modell jetzt ALLE DREI mit
    * Preis und Inhalt — und keine Moeglichkeit, eine davon fuer den Nutzer
    * zu bestimmen. */
-  if (!(args && args.stufe)) {
+  {
     const alle = [];
     for (const s of [1, 2, 3]) {
       const v = await markt.voranschlag(ctx.userId, id, s);
@@ -459,38 +459,6 @@ async function marktbericht_preis(ctx, args) {
     };
   }
 
-  const stufe = _stufe(args);
-  const v = await markt.voranschlag(ctx.userId, id, stufe);
-  /* Derselbe Grund wie bei marktbericht_preis_alle: `bestand` allein ist
-     zweideutig. */
-  if (v && v.bestand != null) { v.guthaben_abrufe_uebrig = v.bestand; delete v.bestand; }
-
-  /* ── v1811 · MEIN EIGENER HINWEIS WAR DIE QUELLE DES WIDERSPRUCHS ────
-   *
-   * Hier stand "Das kostet NICHTS." — gemeint war DIESER Werkzeugaufruf.
-   * Das Modell las es als Aussage ueber die BEWERTUNG und schrieb dem
-   * Nutzer: "Das kostet *nichts* und verbraucht einen Abruf aus deinem
-   * Kontingent." Ein Widerspruch in einem Satz, bei einer Geldfrage.
-   *
-   *   > Ein Hinweis an das Modell steht im selben Text wie die Daten. Was
-   *   > darin mehrdeutig ist, landet mehrdeutig beim Nutzer — und bei
-   *   > Geld ist das keine Unschaerfe, sondern eine Falschaussage.
-   *
-   * Jetzt redet der Hinweis ueber sich selbst in der dritten Person und
-   * verweist fuer die Aussage an den Nutzer auf `so_sagen`. */
-  const ohneStufe = !(args && args.stufe);
-  return Object.assign({ objekt_id: id }, v, {
-    hinweis: 'Dieser Voranschlag verbraucht selbst kein Guthaben — das ist eine '
-           + 'Angabe fuer dich, NICHT fuer den Nutzer. Sag ihm woertlich, was '
-           + 'unter "so_sagen" steht, und frage dann, ob abgerufen werden soll. '
-           + 'Schreibe NIE "kostet nichts", wenn verbraucht_einen_abruf true ist. '
-           + 'Erst nach einem ausdruecklichen Ja marktbericht_abrufen.'
-           + (ohneStufe
-               ? ' ACHTUNG: der Nutzer hat KEINE Stufe genannt. Nenne ihm die drei '
-                 + '(Marktpreisindikation / erweiterte / Wertermittlung nach ImmoWertV) '
-                 + 'mit dem, was sie unterscheidet, und FRAGE, welche er will. '
-                 + 'Waehle nicht selbst.'
-               : '') });
 }
 
 /* ── Sammelaktion: was kostet es fuer ALLE? ──────────────────────────────
@@ -842,7 +810,8 @@ const WERKZEUGE = [
       }, additionalProperties: false } },
 
   { name: 'marktbericht_preis', stufe: 'lesen', fn: marktbericht_preis,
-    beschreibung: 'Was kostet eine Bewertung? Drei Stufen: '
+    beschreibung: 'Was kosten die Bewertungen? Liefert IMMER ALLE DREI Stufen '
+      + 'mit Preis und Inhalt — du waehlst keine aus, der Nutzer waehlt. Drei Stufen: '
       + '1 = Marktpreisindikation (Lage und Preisspanne), '
       + '2 = Erweiterte Marktpreisindikation (zusaetzlich Zustand und Qualitaet, '
       + 'engere Spanne, mit Dossier), '
@@ -850,9 +819,7 @@ const WERKZEUGE = [
       + 'Rechenweg). Kostet selbst nichts. IMMER vor marktbericht_abrufen. '
       + 'Geht aus der Frage nicht hervor, welche Stufe gemeint ist, FRAG den Nutzer '
       + 'und nenne dabei, was die Stufen unterscheiden.',
-    parameter: { type: 'object',
-      properties: Object.assign({}, OBJEKT_ARGS,
-        { stufe: { type: 'integer', description: '1, 2 oder 3' } }),
+    parameter: { type: 'object', properties: OBJEKT_ARGS,
       additionalProperties: false } },
 
   { name: 'marktbericht_preis_alle', stufe: 'lesen', fn: marktbericht_preis_alle,
