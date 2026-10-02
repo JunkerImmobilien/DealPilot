@@ -32,6 +32,8 @@ const dialog = require('./telegramDialogService');
 const fuehrung = require('./fuehrungService');
 const markt = require('./telegramMarktService');
 const objectService = require('./objectService');
+const voiceExtract = require('./voiceExtractService');
+const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
 
@@ -144,7 +146,24 @@ async function feld_katalog(ctx, args) {
 async function felder_aendern(ctx, args) {
   const id = await _findeObjekt(ctx, args);
   if (!id) return { ok: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
-  const felder = (args && args.felder) || {};
+  let felder = Object.assign({}, (args && args.felder) || {});
+
+  /* v1806 · Auch hier der Freitext — aus demselben Grund wie bei
+     `objekt_anlegen`: das Modell kennt die Feldnamen nicht. "setz die
+     Wohnflaeche auf 85" trifft `wfl` nur, wenn jemand den Namen kennt. */
+  const text = String((args && args.beschreibung) || '').trim();
+  if (text) {
+    try {
+      const o0 = await dialog.objektKontext(ctx.userId, id);
+      const r = await voiceExtract.extractFromText(text, fuehrung.katalog(), {
+        apiKey: config.openai.apiKey, modus: 'antwort',
+        kontext: (o0 && o0.daten) || {}
+      });
+      Object.entries((r && r.fields) || {}).forEach(([fid, w]) => {
+        if (felder[fid] == null) felder[fid] = w;
+      });
+    } catch (e) { /* dann eben nur die ausdruecklichen Felder */ }
+  }
 
   /* ── Auswahlfelder: niemals einen ungueltigen Wert schreiben ────────
    *
@@ -207,9 +226,52 @@ async function felder_aendern(ctx, args) {
 }
 
 async function objekt_anlegen(ctx, args) {
+  /* ── v1806 · DER FREITEXT IST DER WICHTIGSTE PARAMETER ────────────────
+   *
+   * GEMESSEN am 02.10.2026 mit Marcels eigenem Satz:
+   *
+   *   "Leg mir eine Eigentumswohnung in der Musterstrasse 12 in Hannover
+   *    an. Die Wohnung hat 85 m2, vier Zimmer, liegt im zweiten
+   *    Obergeschoss und ist aktuell vermietet."
+   *
+   *   uebernommen: zimmer=4, etage=2.  NICHT uebernommen: Objektart,
+   *   Strasse, Hausnummer, Ort, Wohnflaeche — fuenf von sieben.
+   *
+   * Das Modell hatte sie GELESEN (es nannte "Musterstrasse 12, Hannover"
+   * in seiner Antwort), aber es kennt die FELDNAMEN nicht: dass die
+   * Strasse `str` heisst, der Ort `ort`, die Objektart `objart` und die
+   * Wohnflaeche `wfl`. Es hat `zimmer` und `etage` getroffen, weil die
+   * zufaellig wie das deutsche Wort heissen.
+   *
+   *   > Ein Modell, das die Namen nicht kennt, raet sie — und trifft
+   *   > genau die, die man ohnehin erraten haette. Der Rest faellt
+   *   > lautlos weg.
+   *
+   * Den ganzen Katalog mitzugeben waere ein Dump (189 Felder in jedem
+   * Prompt). Stattdessen nimmt dieses Werkzeug den SATZ entgegen und
+   * laesst `extractFromText` die Felder ziehen — denselben Dienst, den
+   * Sprechlauf, Sprachnachricht und Foto schon nutzen, samt
+   * Schablonenheilung und Prozentfalle.
+   *
+   * `felder` bleibt zusaetzlich moeglich fuer das, was das Modell sicher
+   * weiss. Beides wird gemischt; der Freitext gewinnt nicht gegen eine
+   * ausdrueckliche Feldangabe. */
   const felder = (args && args.felder) || {};
   const sauber = {};
   const unbekannt = [];
+
+  const text = String((args && args.beschreibung) || '').trim();
+  if (text) {
+    try {
+      const r = await voiceExtract.extractFromText(text, fuehrung.katalog(), {
+        apiKey: config.openai.apiKey, modus: 'inserat'
+      });
+      Object.entries((r && r.fields) || {}).forEach(([fid, w]) => {
+        if (fuehrung.feld(fid)) sauber[fid] = w;
+      });
+    } catch (e) { /* ohne Freitext geht es auch, nur mit weniger */ }
+  }
+
   Object.entries(felder).forEach(([fid, w]) => {
     if (fuehrung.feld(fid)) sauber[fid] = w; else unbekannt.push(fid);
   });
@@ -440,17 +502,21 @@ const WERKZEUGE = [
       + 'Felder zurueck, statt sie zu ueberschreiben.',
     parameter: { type: 'object',
       properties: Object.assign({}, OBJEKT_ARGS, {
+        beschreibung: { type: 'string', description: 'Der Aenderungswunsch des Nutzers, woertlich' },
         felder: { type: 'object', description: 'Feld-Id zu Wert, z.B. {"zimmer":"5"}' },
         bestaetigt: { type: 'boolean', description: 'true erst, wenn der Nutzer ja gesagt hat' }
       }),
-      required: ['felder'], additionalProperties: false } },
+      additionalProperties: false } },
 
   { name: 'objekt_anlegen', stufe: 'schreiben', fn: objekt_anlegen,
-    beschreibung: 'Legt ein neues Objekt an. Uebergib ALLE Felder, die der Nutzer genannt '
-      + 'hat — frage nichts erneut, was schon gesagt wurde.',
+    beschreibung: 'Legt ein neues Objekt an. Gib in "beschreibung" den ganzen Satz des '
+      + 'Nutzers WOERTLICH weiter — daraus werden die Felder gezogen, auch die, deren '
+      + 'interne Namen du nicht kennst. In "felder" nur, was du sicher zuordnen kannst.',
     parameter: { type: 'object',
-      properties: { felder: { type: 'object', description: 'Feld-Id zu Wert' } },
-      required: ['felder'], additionalProperties: false } },
+      properties: {
+        beschreibung: { type: 'string', description: 'Der Satz des Nutzers, woertlich' },
+        felder: { type: 'object', description: 'Feld-Id zu Wert, soweit sicher bekannt' }
+      }, additionalProperties: false } },
 
   { name: 'marktbericht_preis', stufe: 'lesen', fn: marktbericht_preis,
     beschreibung: 'Was kostet eine Bewertung? Stufe 1 Marktpreisindikation, '
