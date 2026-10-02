@@ -735,51 +735,97 @@ Marcels Durchgang am 01.10.2026. **Reihenfolge wie von ihm genannt.**
 Zwei Punkte sind beim Aufschreiben schon gefallen (T3, T4) — sie stehen
 trotzdem hier, damit die Abnahme nachvollziehbar bleibt.
 
-### T1 · Die Tour in JEDER Ansicht komplett durchprüfen — BLOCKIERT (Messung)
+### T1 · Die Tour in jeder Ansicht — GEMESSEN (02.10.2026), vier Befunde
 
-**BLOCKIERT: der Messlauf braucht das Chrome-Fenster im VORDERGRUND.**
-Gemessen am 01.10.2026: `document.visibilityState` steht in allen drei Tabs
-auf `hidden`, weil das ganze Fenster hinter einem anderen Programm liegt.
-Chrome drosselt dann jeden `setTimeout` auf rund eine Sekunde — und die Tour
-besteht aus nichts anderem. Gemessene Folgen:
+**Die Blockade ist weg.** Marcel hat das Chrome-Fenster nach vorne geholt;
+gemessen vorher und nachher:
 
 ```
-Schritt 1 -> 2        im Vordergrund erwartet ~3 s
-                      gemessen im Hintergrund    75 s
-2 Schritte            gemessen                  231 s
-38 Schritte x 4 Ansichten  hochgerechnet     ~4,5 h
+Fenster hinten    1.000 ms angefordert -> 19.612 ms   Faktor 19,6
+Fenster vorne     1.000 ms angefordert ->  1.097 ms   Faktor 1,1
 ```
 
-> Dazu kommt ein Fehler in der MESSUNG selbst, der nur im gedrosselten Tab
-> auftritt: Schritt 2 und 3 meldeten denselben Spot (−8,216 395x546). Der
-> Spot wandert mit einer Blende; wer sofort nach dem Blasenwechsel misst,
-> liest die VORIGE Stellung. Der Läufer wartet jetzt 1,4 s — aber auch das
-> ist im Hintergrund nicht verlässlich.
+#### Vier Befunde, drei davon in JEDER Ansicht gleich
 
-**Was dafür schon einzeln gemessen und behoben ist** (v1747–v1748b, unten
-unter Fertig): Schritt 1 sitzt auf der Objektliste statt auf der ganzen
-Spalte, Schritt 2 auf einer Karte statt auf dem „+ Neues Objekt"-Knopf, der
-QR-Schritt am QR statt an einem Wort.
+**B1 · Der Spot liegt außerhalb des Bildschirms** (Schritt 4, 5, 6 —
+Quick-Boarding Score, Boarding-Pass, Als Objekt speichern):
 
+```
+Spot      l 420 · t 63 · w 1296 · h 2216
+Fenster                            h  988
+Spot-Mitte y = 1171   ->  liegt 183 px UNTER dem sichtbaren Bereich
+```
 
-Marcel: „Ich möchte, dass du die Tour nochmal komplett durchprüfst, einmal
-im DealPilot, also heute Obsidian-Look, und auch dann mit unserem anderen
-Standard … und wenn wir die Ansicht wechseln, dann muss das natürlich auch
-funktionieren."
+Der Rahmen ist mehr als doppelt so hoch wie das Fenster. Der Nutzer sieht
+eine Blase, die auf etwas zeigt, das er nicht sehen kann. Alle drei Schritte
+tragen `subTargets` — der Spot fällt offenbar auf den Container
+(`#qc-tab-host, #s-quick`) zurück, statt das Unterziel zu treffen.
 
-Nicht „startet sie" prüfen, sondern **jeden der 38 Schritte** in jeder der
-vier Ansichten: findet der Anker ein SICHTBARES Element, sitzt der Spot
-darauf, passt der Text zu dem, was dort steht. Gemessen wird der Spot gegen
-das Ziel — nicht `querySelector` gegen null.
+**B2 · Gar kein Spot** (Schritt 22, 23, 24 — Investor Deal Score,
+Bewertungs-Cockpit, Stress-Test, alle Tab `s6`): `.dp-tour-spotlight` ist
+nicht vorhanden. Die Blase erscheint, markiert aber nichts.
 
-> **Warum das die eigentliche Arbeit ist:** am 30.09. hatte ich „36 von 37
-> Zielen in allen vier Ansichten" gemeldet. Das war falsch — ich hatte
-> geprüft, ob `querySelector` etwas FINDET, nicht ob es sichtbar ist. In
-> `#sb-list` liegen in drei Ansichten 0x0-Hüllen.
+**B3 · In der Kanzlei-Ansicht (`v2`) HÄNGT die Tour bei Schritt 6.**
+Gegengeprüft mit dem echten Knopf, nicht nur mit `next()`:
 
-**Dazu gehört:** die Tour muss in allen Ansichten **jederzeit aufrufbar**
-sein, auch über die Hilfe, auch mitten im Betrieb.
+```
+Titel vor dem Klick    "Als Objekt speichern"
+echter "Weiter"-Knopf  geklickt  ->  Titel unveraendert
+DpTour.next()          gerufen   ->  Titel unveraendert
+```
 
+**Ein Nutzer käme dort nicht mehr weiter** — außer über „Tour überspringen".
+In Tower (`v2b`) und Aktenmappe (`v1b`) läuft derselbe Schritt durch.
+
+**B4 · Die Tour hat Verzweigungen.** Schritt 3 (`qb-intro`), 35 und 36
+tragen `choices` mit `goto`. Der durchlaufene Pfad hängt davon ab, was der
+Nutzer wählt:
+
+```
+gefahrener Pfad (jeweils erste Wahl):
+  1 · 2 · 4 · 5 · 6 · 22 · 23 · 24 · 34 · 35 · 36    = 11 von 38
+```
+
+> **Die 38 Schritte sind ein Vorrat, kein Weg.** Wer „38 Schritte geprüft"
+> meldet, hat entweder mehrere Pfade gefahren oder nicht gemessen, was er
+> prüft. Der zweite Zweig jeder Verzweigung ist noch ungeprüft.
+
+#### Ergebnis je Ansicht
+
+| Ansicht | gemessen | ok | Spot außerhalb | kein Spot | hängt |
+|---|---:|---:|---:|---:|---|
+| Tower (`v2b`) | 11 | 5 | 3 | 3 | — |
+| Aktenmappe (`v1b`) | 11 | 5 | 3 | 3 | — |
+| Kanzlei (`v2`) | 6 | — | 3 | — | **bei Schritt 6** |
+| Standard (Heute) | offen | | | | |
+
+**B1 und B2 sind in Tower und Aktenmappe identisch** — sie hängen also an
+den Schritten selbst, nicht am Layout. Nur B3 ist ansichtsabhängig.
+
+#### Vier Anläufe für den Läufer — drei davon maßen sich selbst
+
+> Ein Prüfer, der sein Prüfobjekt nicht kennt, misst sich selbst. Das ist
+> an einem Tag dreimal passiert, und jedes Mal sah das Ergebnis wie ein
+> Befund aus.
+
+| Anlauf | Ergebnis | was wirklich los war |
+|---|---|---|
+| 1 | „3 von 38 ok" | `goto()` sprang auf eine **beendete** Tour — danach gab es gar keinen Spot mehr |
+| 2 | „4 von 38 ok" | lief nach **eigenem Index**; die Tour verzweigt und überspringt, Titel in der Blase passte bei 3 von 6 Proben nicht |
+| 3 | „53× hängt" | taktete blind mit 1.400 ms und rief `next()`, **während die Blase noch wechselte** — die Tour sprang dadurch von 2 auf 5 |
+| 4 | tragfähig | wartet auf den **Titelwechsel**, liest den aktuellen Schritt aus der Blase, bedient Verzweigungen, misst per `elementsFromPoint`, was unter dem Spot liegt |
+
+Erst Anlauf 4 prüft auch, **ob die Tour überhaupt noch offen ist** — ohne
+das meldet ein Läufer nach einem Abbruch lauter Fehler, die seine eigenen
+sind.
+
+#### Offen
+
+- **Standardansicht (Heute)** noch nicht gefahren.
+- **Der zweite Zweig** jeder Verzweigung (Schritt 3, 35, 36).
+- **Die Ursache von B1** (Spot auf dem Container statt auf dem Unterziel)
+  und **B2** (kein Spot auf `s6`) ist noch nicht im Code gesucht.
+- **B3 ist der dringendste** — dort bleibt ein echter Nutzer stecken.
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
