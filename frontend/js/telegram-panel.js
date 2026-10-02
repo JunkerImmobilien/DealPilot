@@ -80,16 +80,61 @@
   function _renderBody(host, s) {
     var h = '<div class="f"><label>Telegram-Bot</label>';
 
-    /* ── Fall 1: den Bot gibt es noch nicht ───────────────────────────── */
+    /* ── Fall 1: noch kein eigener Bot hinterlegt ─────────────────────── */
     if (!s.bot_bereit) {
       h += '<div style="color:var(--muted);font-size:13px;line-height:1.6">'
         + 'DealPilot per Telegram bedienen — Objekte abfragen, Felder ändern, '
         + 'neue Objekte per Sprachnachricht anlegen und Portfolio-Zahlen abrufen.'
-        + '<br><br><b>Der Bot wird gerade eingerichtet.</b> Sobald er steht, '
-        + 'erscheint hier ein Verbindungscode — ein Klick, einmal im Chat '
-        + 'eintippen, fertig.</div></div>';
+        + '<br><br><b>Dein eigener Bot, dein Name.</b> Du legst ihn in Telegram '
+        + 'selbst an und trägst ihn hier ein — niemand sonst hat Zugriff darauf.'
+        + '</div>';
+
+      h += '<ol style="color:var(--muted);font-size:13px;line-height:1.7;'
+        + 'margin:12px 0 0;padding-left:20px">'
+        + '<li>In Telegram <b>@BotFather</b> öffnen und <b>/newbot</b> schicken.</li>'
+        + '<li>Einen Namen vergeben (frei wählbar) und einen Benutzernamen, '
+        + 'der auf <b>bot</b> endet.</li>'
+        + '<li>BotFather antwortet mit einem Token der Form '
+        + '<span style="font-family:\'JetBrains Mono\',monospace">123456789:AA…</span> '
+        + '— diese Zeile hier einfügen.</li></ol>';
+
+      if (!s.webhook_moeglich) {
+        h += '<div style="margin-top:12px;font-size:13px;color:var(--warn, #D8954C)">'
+          + 'Diese Installation hat noch keine öffentliche Adresse hinterlegt '
+          + '(<span style="font-family:monospace">PUBLIC_API_URL</span>). '
+          + 'Ohne sie kann Telegram den Bot nicht erreichen.</div>';
+      }
+
+      h += '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
+        + '<input type="password" id="dp-tg-token" autocomplete="off" spellcheck="false"'
+        + ' placeholder="123456789:AA…" style="flex:1 1 280px;min-width:0"'
+        + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();DealPilotTelegram.botSpeichern();}">'
+        + '<button type="button" class="btn" onclick="DealPilotTelegram.botSpeichern()">Bot verbinden</button>'
+        + '</div>'
+        + '<div id="dp-tg-fehler" style="margin-top:8px;font-size:13px;color:var(--bad, #D8564C)"></div>';
+
+      h += '</div>';
       host.innerHTML = h;
       return;
+    }
+
+    /* ── Der Bot ist hinterlegt: Kopfzeile mit seinem Namen ───────────── */
+    if (s.bot) {
+      h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;'
+        + 'border-bottom:1px solid var(--border);font-size:13px">'
+        + '<div style="flex:1 1 auto">'
+        + '<div><b>' + _esc(s.bot.username ? '@' + s.bot.username : (s.bot.name || 'Dein Bot')) + '</b>'
+        + ' <span style="color:var(--muted)">· dein eigener Bot</span></div>'
+        + '<div style="color:var(--muted);font-size:12px">'
+        + (s.bot.webhook_gesetzt
+            ? 'empfangsbereit seit ' + _fmt(s.bot.webhook_gesetzt)
+            : '<span style="color:var(--bad, #D8564C)">nicht empfangsbereit'
+              + (s.bot.letzter_fehler ? ': ' + _esc(s.bot.letzter_fehler) : '') + '</span>')
+        + (s.bot.token_endet_auf ? ' · Token …' + _esc(s.bot.token_endet_auf) : '')
+        + '</div></div>'
+        + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
+        + ' onclick="DealPilotTelegram.botEntfernen()">Bot entfernen</button>'
+        + '</div>';
     }
 
     /* ── Fall 2: schon verbunden ──────────────────────────────────────── */
@@ -118,10 +163,10 @@
     }
 
     /* ── Fall 3: bereit, aber noch nicht verbunden ────────────────────── */
-    var bot = s.bot_name ? '@' + s.bot_name : 'den DealPilot-Bot';
-    h += '<div style="color:var(--muted);font-size:13px;line-height:1.6">'
-      + 'DealPilot per Telegram bedienen — Objekte abfragen, Felder ändern, '
-      + 'neue Objekte per Sprachnachricht anlegen und Portfolio-Zahlen abrufen.</div>';
+    var bot = (s.bot && s.bot.username) ? '@' + s.bot.username : 'deinen Bot';
+    h += '<div style="color:var(--muted);font-size:13px;line-height:1.6;margin-top:10px">'
+      + 'Noch ist kein Chat verbunden. Der Code sagt dem Bot, <b>wessen</b> Daten er '
+      + 'zeigen darf — ohne ihn antwortet er niemandem.</div>';
 
     if (s.offener_code) {
       h += '<div style="margin-top:12px;padding:14px;border:1px solid var(--border);'
@@ -147,6 +192,33 @@
   function _neu() {
     var host = document.getElementById(HOST_ID);
     if (host) _render(host);
+  }
+
+  async function botSpeichern() {
+    if (_laeuft) return;
+    var feld = document.getElementById('dp-tg-token');
+    var fehler = document.getElementById('dp-tg-fehler');
+    var token = feld ? String(feld.value || '').trim() : '';
+    if (!token) { if (fehler) fehler.textContent = 'Bitte den Token einfügen.'; return; }
+    _laeuft = true;
+    if (fehler) fehler.textContent = 'Prüfe den Token bei Telegram …';
+    try {
+      var r = await _api('/bot', { method: 'PUT', body: { token: token } });
+      /* Den Token sofort aus dem Feld nehmen — er soll nicht im DOM stehen
+         bleiben, auch nicht in einem Passwortfeld. */
+      if (feld) feld.value = '';
+      if (r && r.webhook_gesetzt === false && window.toast) {
+        window.toast('⚠ Bot gespeichert, aber nicht empfangsbereit');
+      }
+      _neu();
+    } catch (e) {
+      if (fehler) fehler.textContent = (e && e.message) || String(e);
+    } finally { _laeuft = false; }
+  }
+
+  async function botEntfernen() {
+    try { await _api('/bot', { method: 'DELETE' }); _neu(); }
+    catch (e) { if (window.toast) window.toast('⚠ ' + (e && e.message || e)); }
   }
 
   async function codeHolen() {
@@ -198,6 +270,7 @@
   }
 
   window.DealPilotTelegram = {
+    botSpeichern: botSpeichern, botEntfernen: botEntfernen,
     codeHolen: codeHolen, umschalten: umschalten, trennen: trennen,
     kopieren: kopieren, _mount: _mount
   };

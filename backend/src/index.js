@@ -381,7 +381,14 @@ app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Ste
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/credits', creditsRoutes);  // V197
 app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
-app.use('/api/v1/telegram', require('./routes/telegram'));  // v1791 T-B5/2 — nur die Einrichtung, NICHT der Webhook
+/* v1792 · DIE REIHENFOLGE DIESER ZWEI ZEILEN IST SICHERHEITSRELEVANT.
+   routes/telegram.js beginnt mit router.use(authenticate). Stuende der
+   Webhook dahinter, liefe er durch dieselbe Pruefung — und Telegram hat
+   kein Nutzer-Token, also kaeme nie eine Nachricht an. Umgekehrt darf der
+   Webhook-Pfad NICHTS von dem koennen, was die Einrichtung kann.
+   Express nimmt den ERSTEN passenden Mount. */
+app.use('/api/v1/telegram/webhook', require('./routes/telegramWebhook'));  // ohne authenticate (kommt von Telegram)
+app.use('/api/v1/telegram', require('./routes/telegram'));  // v1791/v1792 — die Einrichtung, nur mit JWT
 app.use('/api/v1/avm', avmRoutes);  // V326: AVM-Integration
 app.use('/api/v1/immometrica', require('./routes/immometrica'));  // v655: ImmoMetrica
 app.use('/api/v1/marktbericht', marktberichtRoutes);  // v539: Marktbericht-Proxy

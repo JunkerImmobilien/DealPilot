@@ -148,29 +148,42 @@ Webhook statt Polling, Verknüpfung über einen Einmal-Code aus den
 Einstellungen. Whitelabel bekommt später einen eigenen Bot je Mandant, nicht
 je Nutzer.
 
-#### ENTSCHIEDEN am 02.10.2026 — durch Marcels Satz zur Einrichtung
+#### ENTSCHIEDEN am 02.10.2026 — die RECHTE Spalte: jeder Kunde legt seinen eigenen an
 
-> „der muss über **einstellungen vernünftig einzurichten** sein"
+> Marcel: „aber ich möchte dass der kunde für sein objekt einen anlegen kann
+> also selber. **jeder kunde kann für sich und sein portfolio einen eigenen
+> bot anlegen.**"
 
-Damit ist die Spalte gewählt, und zwar ohne dass darüber noch geredet werden
-muss: **ein DealPilot-Bot für alle, Verknüpfung per Einmal-Code.** Die rechte
-Spalte verlangt vom Kunden, bei @BotFather einen Bot anzulegen und einen
-Token zu kopieren — das ist für einen nicht-technischen Nutzer **nicht**
-„vernünftig einzurichten", und Marcel ist der Maßstab dafür. Was der Kunde
-tut, schrumpft auf: Einstellungen öffnen, Code sehen, im Chat `/start` und
-den Code schicken.
+**Hier stand zuvor das Gegenteil** — „ein DealPilot-Bot für alle", abgeleitet
+aus seinem Satz „der muss über einstellungen vernünftig einzurichten sein".
+Das war eine Fehldeutung: ich habe „vernünftig einzurichten" als „möglichst
+wenig Arbeit für den Kunden" gelesen. Gemeint war, **dass der Kunde dort
+seinen eigenen Bot einträgt**. Die Entscheidung ist zurückgenommen.
 
-**Was die Entscheidung mitnimmt:**
+**Das Gegenargument in der Tabelle oben war keines.** Dort steht bei „jeder
+Kunde legt seinen eigenen an": *„Polling: eine Instanz JE Kunde — 50 Kunden =
+50 Polling-Schleifen"*, dazu die harte Grenze aus der Anleitung („nur eine
+Instanz darf pollen").
 
-- **Webhook statt Polling** — die harte Grenze oben („nur eine Instanz darf
-  pollen") ist damit umgangen, nicht verwaltet.
-- **Ein Token, bei uns** — kein fremdes Passwort in unserer Datenbank.
-- **Whitelabel wird später nachgerüstet**, je Mandant ein Bot. Heute gibt es
-  genau **ein** Partner-Abo; einen zweiten Weg für niemanden zu bauen wäre
-  Arbeit auf Verdacht.
+> Das gilt für **Polling**. Mit einem Webhook fällt es ersatzlos weg: jeder
+> Bot ruft von sich aus unsere URL auf, und wir halten keine einzige
+> Schleife. Fünfzig Bots kosten dann genau so viel wie einer.
 
-> Widerspricht Marcel, ist nur dieser Block hinfällig — T-B2 bis T-B6 gelten
-> für beide Wege. Deshalb steht die Entscheidung hier und nicht im Code.
+Das Argument richtete sich also gegen die **Bauart des Bau-Cockpits**, nicht
+gegen Marcels Weg — ich hatte beides vermengt. Und der Vorteil, der in
+derselben Tabelle stand, blieb ungewichtet: **der Kunde darf den Bot nennen
+wie er will.** Für eine Whitelabel-SaaS ist das kein Nebenpunkt, sondern
+genau das Produkt.
+
+**Was gilt:**
+
+| | |
+|---|---|
+| Bot | **je Kunde einer**, bei @BotFather selbst angelegt |
+| Token | kommt vom Kunden, liegt **verschlüsselt** in `user_provider_credentials` (AES-256-GCM), nie im Klartext und nie in einer API-Antwort |
+| Empfang | **Webhook**, Pfad je Bot (24 Zufallsbytes) **plus** Secret-Header — zwei unabhängige Merkmale |
+| Verknüpfung | Einmal-Code **bleibt**: wer den Bot kennt, kann ihm schreiben. Der Code entscheidet, *wessen* Daten er sieht |
+| Whitelabel | fällt dadurch von selbst an — kein eigener Bau |
 
 ### T-B2 · Die Kennung ist das Nadelöhr — ZUERST messen
 
