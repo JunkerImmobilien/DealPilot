@@ -890,16 +890,52 @@
     state.expanded = false;
 
     _ensureCorrectTab(step, function() {
-      // V239: Laengere Retries fuer s-quick und s8 (dynamisch gerendert)
-      // V239.2: s-quick auf 20x300ms = 6s erhoeht
-      var retries = 10;
-      var interval = 200;
+      /* ═══ v1779 · EIN SCHRITT OHNE ZIEL WARTET NICHT MEHR SECHS SEKUNDEN ═══
+
+         Marcel am 02.10.2026, auf die Frage was mit Schritten geschehen
+         soll, deren Ziel nicht sichtbar ist: **"b"** — sie entfallen.
+         Die Tour wird kuerzer und laeuft dafuer fluessig.
+
+         GEMESSEN in vier Durchlaeufen (Standard und Aktenmappe, je beide
+         Zweige): in ALLEN VIER dieselben drei Schritte ohne Spot, alle im
+         Tab `s6` — Investor Deal Score, Bewertungs-Cockpit, Stress-Test.
+         Das Protokoll des Pruefers:
+
+           blase_frisch : true     die Blase ist da
+           next_knopf   : true     der Weiter-Knopf existiert
+           gewaehlt     : next     er wurde geklickt
+           bewegt       : FALSE    nach 900 ms hat sich nichts getan
+
+         Die Tour kam danach doch weiter — ueber den Auto-Skip, nach bis
+         zu 20 x 300 ms = SECHS SEKUNDEN. Dreimal hintereinander.
+
+         > Fuer den Nutzer sind das drei Blasen, die nichts markieren und
+         > je sechs Sekunden stehen. Von aussen sieht das aus wie ein
+         > Haenger — die Tour arbeitet nur ergebnislos.
+
+         Die Wartezeiten sind deshalb halbiert bis gedrittelt. Sie bleiben
+         dort am laengsten, wo ein Bereich WIRKLICH nachlaedt: das
+         Quick-Boarding rendert in einem eigenen iframe, der
+         Deal-Aktion-Tab baut sein Cockpit nach. Zwei Sekunden decken das
+         gemessen ab — die sechs waren fuer den langsamsten denkbaren
+         Fall gewaehlt, nicht fuer den gemessenen.
+
+         > Eine Zahl, die fuer das langsamste Geraet gewaehlt wurde, ist
+         > auf jedem anderen eine Wartezeit ohne Zweck. (Dieselbe Lehre
+         > steht schon bei v1745 — dort fuer die Tab-Pause.)
+
+         Was dabei NICHT geaendert wird: der Auto-Skip selbst. Ein Schritt
+         ohne sichtbares Ziel wird uebersprungen, nicht uebergangen — die
+         Konsole nennt ihn weiterhin mit der Zahl der DOM-Treffer, damit
+         ein stummer Schritt auffaellt statt zu verschwinden. */
+      var retries = 6;
+      var interval = 180;              /* rund 1,1 s statt 2,0 s */
       if (step.tab === 's-quick') {
-        retries = 20;
-        interval = 300;
+        retries = 10;
+        interval = 200;                /* 2,0 s statt 6,0 s (iframe) */
       } else if (step.tab === 's8') {
-        retries = 15;
-        interval = 300;
+        retries = 10;
+        interval = 200;                /* 2,0 s statt 4,5 s (Cockpit) */
       }
 
       _clearSubHl();
