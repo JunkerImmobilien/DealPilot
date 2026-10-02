@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>DealPilot Telegram-Bot — Handbuch</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* DealPilot-Marke: Obsidian #050505, Gold #C9A84C (hell #E8CC7A, dunkel #b8932f),
+     Gruen #3FA56C, Rot #B8625C, Creme #FDFCFA, Karte #FBF6E9.
+     Gedruckt wird auf WEISS - der Obsidian-Kopf bleibt als Deckblattflaeche. */
+  :root{
+    --obsidian:#050505; --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --gruen:#3FA56C; --rot:#B8625C; --creme:#FDFCFA; --karte:#FBF6E9;
+    --tinte:#1a1a1a; --grau:#5a5a5a; --linie:#e3ddd0;
+  }
+  @page{ size:A4; margin:16mm 14mm 18mm; }
+  *{ box-sizing:border-box; }
+  body{
+    font-family:'Inter',system-ui,sans-serif; color:var(--tinte);
+    font-size:10.2pt; line-height:1.55; margin:0; background:#fff;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  h1,h2,h3{ font-family:'Space Grotesk',sans-serif; margin:0; }
+
+  /* ── Deckblatt ── */
+  .deckblatt{
+    background:var(--obsidian); color:var(--creme);
+    margin:-16mm -14mm 10mm; padding:26mm 14mm 14mm;
+    page-break-after:avoid;
+  }
+  .marke{ font-family:'Space Grotesk'; font-size:26pt; font-weight:700; letter-spacing:-.5px; }
+  .marke span{ color:var(--gold); }
+  .runway{
+    height:3px; width:62mm; margin:7mm 0 9mm;
+    background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+  }
+  .deckblatt h1{ font-size:21pt; font-weight:700; line-height:1.18; }
+  .deckblatt .unter{ color:var(--gold-hi); font-size:11pt; margin-top:4mm; }
+  .deckblatt .fuss{
+    margin-top:11mm; font-family:'JetBrains Mono'; font-size:8pt;
+    color:#9a9287; letter-spacing:.4px;
+  }
+
+  h2{
+    font-size:14pt; margin:9mm 0 3mm; padding-bottom:1.8mm;
+    border-bottom:2px solid var(--gold); page-break-after:avoid;
+  }
+  h3{ font-size:11pt; margin:6mm 0 2mm; color:var(--gold-lo); page-break-after:avoid; }
+  p{ margin:0 0 3mm; }
+
+  /* ── Chat-Beispiele ── */
+  .chat{
+    background:var(--karte); border:1px solid var(--linie); border-radius:4mm;
+    padding:4mm 4mm 2mm; margin:3mm 0 5mm; page-break-inside:avoid;
+  }
+  .b{ margin-bottom:2.5mm; display:flex; }
+  .b .blase{
+    max-width:84%; padding:2.2mm 3.2mm; border-radius:3mm;
+    font-size:9.4pt; line-height:1.5;
+  }
+  .du{ justify-content:flex-end; }
+  .du .blase{ background:var(--obsidian); color:var(--creme); border-bottom-right-radius:.8mm; }
+  .bot .blase{ background:#fff; border:1px solid var(--linie); border-bottom-left-radius:.8mm; }
+  .blase b{ color:inherit; }
+  .bot .blase b{ color:var(--gold-lo); }
+  .blase .leise{ color:var(--grau); font-size:8.4pt; font-style:italic; display:block; margin-top:1.4mm; }
+  .du .blase .leise{ color:#b8b0a4; }
+
+  table{ width:100%; border-collapse:collapse; margin:2mm 0 5mm; font-size:9.4pt; page-break-inside:avoid; }
+  th{ text-align:left; background:var(--obsidian); color:var(--gold-hi);
+      font-family:'JetBrains Mono'; font-size:8pt; letter-spacing:.6px;
+      text-transform:uppercase; padding:2mm 2.5mm; }
+  td{ padding:2mm 2.5mm; border-bottom:1px solid var(--linie); vertical-align:top; }
+  tr:last-child td{ border-bottom:none; }
+  code, .mono{ font-family:'JetBrains Mono'; font-size:8.8pt;
+               background:#f2ece0; padding:.4mm 1.4mm; border-radius:1mm; }
+
+  .merk{
+    border-left:3px solid var(--gold); background:#faf6ec;
+    padding:3mm 4mm; margin:3mm 0 5mm; font-size:9.6pt; page-break-inside:avoid;
+  }
+  .merk b{ color:var(--gold-lo); }
+  .warn{ border-left-color:var(--rot); background:#fbf1f0; }
+  .warn b{ color:var(--rot); }
+  .gut{ border-left-color:var(--gruen); background:#f0f7f3; }
+  .gut b{ color:var(--gruen); }
+
+  ul{ margin:0 0 4mm; padding-left:5mm; }
+  li{ margin-bottom:1.2mm; }
+  .bruch{ page-break-before:always; }
+  .fuss-seite{ margin-top:9mm; padding-top:2.5mm; border-top:1px solid var(--linie);
+               font-size:8pt; color:var(--grau); font-family:'JetBrains Mono'; }
+</style>
+</head>
+<body>
+
+<div class="deckblatt">
+  <div class="marke">Deal<span>Pilot</span></div>
+  <div class="runway"></div>
+  <h1>Dein Telegram-Bot</h1>
+  <div class="unter">Objekte abfragen, anlegen und ändern — direkt im Chat</div>
+  <div class="fuss">HANDBUCH · STAND 02.10.2026 · JUNKER SOLUTION</div>
+</div>
+
+<p>Der Bot ist <b>dein eigener</b>. Du legst ihn in Telegram selbst an, trägst ihn
+in DealPilot unter <i>Einstellungen → Account &amp; Sicherheit → Telegram-Bot</i> ein
+und verbindest ihn mit einem Einmal-Code. Niemand sonst hat Zugriff darauf.</p>
+
+<div class="merk">
+  <b>Er rechnet nichts selbst.</b> Alle Zahlen kommen aus DealPilot — derselbe
+  Rechenkern, dieselben Kennzahlen. Der Bot ist ein zweiter Zugang zu deinen
+  Daten, kein zweites Programm.
+</div>
+
+<h2>1 · Fragen zu einem Objekt</h2>
+
+<p>Nenn die Adresse irgendwo im Satz — der Bot sucht sie in deinen Objekten.</p>
+
+<div class="chat">
+  <div class="b du"><div class="blase">wie ist der DSCR bei der Musterstr. 12?</div></div>
+  <div class="b bot"><div class="blase">Der DSCR liegt bei <b>1,04</b> — die Mieteinnahmen decken den
+    Kapitaldienst also knapp. Bei einem Anschlusszins von 5 % fällt er unter 1,0.</div></div>
+</div>
+
+<h3>Wenn zwei Objekte passen, fragt er nach</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">wie läuft es in Leipzig?</div></div>
+  <div class="b bot"><div class="blase">Welches Objekt meinst du?<br>
+    1. Musterstraße 12, 04109 Leipzig<br>
+    2. Gohliser Str. 42, 04155 Leipzig
+    <span class="leise">Nenn mir bitte die Hausnummer oder den Ort dazu.</span></div></div>
+</div>
+
+<div class="merk gut">
+  <b>Er rät nie.</b> Zwei gleich gute Treffer sind keine Entscheidung — eine
+  falsche Zuordnung würde Daten am falschen Haus ändern.
+</div>
+
+<h3>Die Übersicht</h3>
+<div class="chat">
+  <div class="b du"><div class="blase">/objekte</div></div>
+  <div class="b bot"><div class="blase"><b>Deine Objekte</b> (17)<br>
+    1. <b>Musterstraße 12, 04109 Leipzig</b> · 189.000 €<br>
+    2. <b>Parkstr. 9, 32545 Bad Oeynhausen</b> · 780.000 €<br>
+    3. <b>Hauptstr. 51, 49477 Ibbenbüren</b> · 310.000 €
+    <span class="leise">Frag mich zu einem davon — nenn einfach die Adresse.</span></div></div>
+</div>
+
+<h2>2 · Portfolio</h2>
+
+<div class="chat">
+  <div class="b du"><div class="blase">/portfolio</div></div>
+  <div class="b bot"><div class="blase">Dein Portfolio umfasst <b>9 Objekte</b> mit einer
+    Gesamtinvestition von <b>5.811.926 €</b>. Eingesetzt hast du 1.320.008 € Eigenkapital,
+    die Restschuld liegt bei 4.721.579 €.<br><br>
+    Die Kaltmiete bringt 289.224 € im Jahr, das sind 5,08 % Bruttorendite. Der
+    Portfolio-DSCR von 0,90 zeigt, dass der Kapitaldienst derzeit nicht vollständig
+    aus den Mieten gedeckt ist.
+    <span class="leise">Stand: heute 13:06 Uhr.</span></div></div>
+</div>
+
+<div class="chat">
+  <div class="b du"><div class="blase">wo stehe ich in zehn Jahren?</div></div>
+  <div class="b bot"><div class="blase">In zehn Jahren sinkt deine Restschuld auf
+    <b>3.783.647 €</b>, während der Objektwert auf 6.809.637 € steigt. Dein Eigenkapital
+    wächst damit von 1,32 Mio auf <b>3,03 Mio €</b> — gut das Doppelte.
+    <span class="leise">Stand: heute 13:06 Uhr.</span></div></div>
+</div>
+
+<h3>Der Stand ist Teil der Antwort</h3>
+<p>Die Portfolio-Summen entstehen in DealPilot selbst. Der Bot sagt deshalb immer,
+wie aktuell sie sind — und zwar nicht nur das Datum:</p>
+
+<table>
+  <tr><th>Lage</th><th>Was er schreibt</th></tr>
+  <tr><td>frisch</td><td><i>Stand: heute 13:06 Uhr.</i></td></tr>
+  <tr><td>du hast seitdem Objekte bearbeitet</td>
+      <td><i>… seitdem hast du 2 Objekte bearbeitet. Öffne DealPilot einmal kurz,
+      dann stimmen die Summen wieder.</i></td></tr>
+  <tr><td>drei Wochen alt, nichts geändert</td><td><i>… unverändert seitdem.</i></td></tr>
+</table>
+
+<div class="merk">
+  <b>Ein alter Stand ohne Änderung ist aktuell.</b> Ein frischer, hinter dem zwei
+  Objekte bearbeitet wurden, ist es nicht. Deshalb zählt der Bot die Änderungen,
+  nicht die Tage.
+</div>
+
+<div class="bruch"></div>
+
+<h2>3 · Ein Objekt anlegen</h2>
+
+<p>Vier Wege — alle führen durch dieselbe Prüfung.</p>
+
+<table>
+  <tr><th>Weg</th><th>Wie</th></tr>
+  <tr><td><b>Geführt</b></td><td><code>/neu</code> — Etappe für Etappe, mit Fortschritt</td></tr>
+  <tr><td><b>Sprachnachricht</b></td><td>Einfach einsprechen, mit allem was du weißt</td></tr>
+  <tr><td><b>Foto</b></td><td>Exposé abfotografieren oder Screenshot schicken</td></tr>
+  <tr><td><b>Frei tippen</b></td><td>Mehrere Angaben in einem Satz — er sortiert sie zu</td></tr>
+</table>
+
+<h3>Geführt</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">/neu</div></div>
+  <div class="b bot"><div class="blase"><b>Neues Objekt.</b> Ich frage dich Schritt für
+    Schritt durch — du kannst aber auch gleich mehrere Angaben in einem Satz schicken,
+    ich sortiere sie zu.
+    <span class="leise">/abbrechen beendet jederzeit.</span></div></div>
+  <div class="b bot"><div class="blase"><i>Etappe 1 von 6 · Basis</i><br><br>
+    Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort.
+    <span class="leise">1 von 18 erledigt · /abbrechen beendet</span></div></div>
+  <div class="b du"><div class="blase">Hermannstraße 9 in 32609 Hüllhorst</div></div>
+  <div class="b bot"><div class="blase">Ich habe verstanden:<br><br>
+    <b>Hermannstraße 9<br>32609 Hüllhorst</b><br><br>
+    Stimmt das so? (ja / nein)</div></div>
+  <div class="b du"><div class="blase">ja</div></div>
+  <div class="b bot"><div class="blase"><i>Etappe 1 von 6 · Basis</i><br><br>
+    Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer.
+    <span class="leise">2 von 18 erledigt · /abbrechen beendet</span></div></div>
+</div>
+
+<div class="merk warn">
+  <b>Die Adresse wird immer rückbestätigt.</b> An ihr hängt alles Weitere —
+  Bodenrichtwert, Marktpreisindikation, Lage, Grunderwerbsteuer. Eine falsch
+  verstandene Straße macht aus vier richtigen Abrufen vier falsche, und keiner
+  davon meldet einen Fehler: die Nachbarstadt hat auch Marktdaten.
+</div>
+
+<h3>Per Sprachnachricht</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">🎤 <i>Sprachnachricht, 0:24</i></div></div>
+  <div class="b bot"><div class="blase">Verstanden: <i>„Ich hab hier eine Eigentumswohnung
+    in der Hermannstraße 9 in Hüllhorst, 32609. Hundert Quadratmeter, Baujahr 1962,
+    drei Zimmer. Der Kaufpreis liegt bei 189.000, die Kaltmiete bei 490 im Monat."</i>
+    <br><br><b>Ich lege daraus ein Objekt an.</b></div></div>
+  <div class="b bot"><div class="blase">Ich habe verstanden:<br><br>
+    <b>Hermannstraße 9<br>32609 Hüllhorst</b><br><br>Stimmt das so? (ja / nein)</div></div>
+  <div class="b du"><div class="blase">ja</div></div>
+  <div class="b bot"><div class="blase">Notiert:<br>
+    • Objektart: <b>ETW</b><br>• Wohnfläche (m²): <b>100</b><br>
+    • Zimmer: <b>3</b><br>• Baujahr: <b>1962</b><br>
+    • Kaufpreis: <b>189000</b><br>• Nettokaltmiete / Monat: <b>490</b></div></div>
+  <div class="b bot"><div class="blase"><i>Etappe 2 von 6 · Geld</i><br><br>
+    Wie finanzierst du? Eigenkapital, Zinssatz, Tilgung und Zinsbindung.
+    <span class="leise">4 von 18 erledigt · /abbrechen beendet</span></div></div>
+</div>
+
+<h3>Per Foto</h3>
+<div class="chat">
+  <div class="b du"><div class="blase">📷 <i>Foto eines Exposés</i></div></div>
+  <div class="b bot"><div class="blase">Ich schau mir das Bild an …</div></div>
+  <div class="b bot"><div class="blase">Gelesen: <i>„Charmante 3-Zimmer-Wohnung,
+    Hermannstraße 9, 32609 Hüllhorst. Wohnfläche 100 m², Baujahr 1962, 2. OG,
+    Kaufpreis 189.000 €, aktuelle Kaltmiete 490 €/Monat, Hausgeld 180 €."</i></div></div>
+  <div class="b bot"><div class="blase"><b>Ich lege daraus ein Objekt an.</b></div></div>
+</div>
+
+<div class="merk">
+  <b>PDFs kann der Bot nicht lesen</b> — dafür gibt es den Dokument-Import in
+  DealPilot selbst. Ein Foto der Seite geht aber.
+</div>
+
+<h3>Er fragt nur, was zur Objektart passt</h3>
+<table>
+  <tr><th>Objektart</th><th>Wird gefragt</th><th>Wird nicht gefragt</th></tr>
+  <tr><td>Eigentumswohnung</td><td>Zimmer, Bäder, Etage, <b>Miteigentumsanteil</b></td><td>Wohneinheiten</td></tr>
+  <tr><td>Mehrfamilienhaus</td><td>Vollgeschosse, <b>Wohneinheiten</b></td><td>Zimmer, Miteigentumsanteil</td></tr>
+  <tr><td>Einfamilienhaus</td><td>Zimmer, Bäder, Vollgeschosse</td><td>Wohneinheiten, Miteigentumsanteil</td></tr>
+</table>
+
+<div class="bruch"></div>
+
+<h2>4 · Felder ändern</h2>
+
+<div class="chat">
+  <div class="b du"><div class="blase">setz die Zimmerzahl bei der Musterstr. 12 auf 5</div></div>
+  <div class="b bot"><div class="blase">• <b>Zimmer</b> steht auf <b>3</b>, du willst <b>5</b><br><br>
+    Ändern? (ja / nein)</div></div>
+  <div class="b du"><div class="blase">ja</div></div>
+  <div class="b bot"><div class="blase">✓ Geändert:<br>• Zimmer: <b>5</b>
+    <span class="leise">Die Kennzahlen rechnet DealPilot beim nächsten Öffnen neu.</span></div></div>
+</div>
+
+<div class="merk warn">
+  <b>Ein belegtes Feld wird nie still überschrieben.</b> Der Bot nennt beide Werte
+  und wartet. „Soll ich das ändern?" allein wäre eine Frage, die du nicht
+  beantworten kannst — ohne zu wissen, was vorher dastand.
+</div>
+
+<p>Ein <b>leeres</b> Feld füllt er ohne Rückfrage — da ist nichts zu verlieren.
+Ein Feld, das er <b>nicht kennt</b>, nennt er dir, statt es stillschweigend
+wegzuwerfen.</p>
+
+<h2>5 · Marktpreisindikation</h2>
+
+<div class="chat">
+  <div class="b du"><div class="blase">/marktpreis</div></div>
+  <div class="b bot"><div class="blase"><b>Marktpreisindikation</b> für
+    Musterstraße 12, 04109 Leipzig<br><br>
+    Das kostet <b>einen Abruf</b> aus deinem Guthaben (noch 12 übrig).<br><br>
+    Soll ich? (ja / nein)</div></div>
+  <div class="b du"><div class="blase">ja</div></div>
+  <div class="b bot"><div class="blase"><b>Indikation</b><br><br>
+    Wert: <b>201.400 €</b><br>Spanne: 186.300 – 216.500 €
+    <span class="leise">Indikation eines unabhängigen Bewertungspartners,
+    kein Verkehrswert und kein Gutachten.</span></div></div>
+</div>
+
+<div class="merk warn">
+  <b>Vor jedem Abruf steht der Preis im Chat.</b> Ohne ein ausdrückliches „ja"
+  wird nichts abgerufen und nichts abgebucht.
+</div>
+
+<p>Fehlen Pflichtangaben, sagt der Bot <b>welche</b> — statt nur, dass es nicht geht:</p>
+<div class="chat">
+  <div class="b bot"><div class="blase">Für eine Indikation fehlen mir noch Pflichtangaben:<br>
+    • Objektart<br>• Wohnfläche
+    <span class="leise">Sag sie mir einfach, dann hole ich sie ab.</span></div></div>
+</div>
+
+<h2>6 · Alle Befehle</h2>
+
+<table>
+  <tr><th>Befehl</th><th>Wirkung</th></tr>
+  <tr><td><code>/neu</code></td><td>Neues Objekt anlegen, Schritt für Schritt</td></tr>
+  <tr><td><code>/objekte</code></td><td>Deine Objekte auflisten</td></tr>
+  <tr><td><code>/portfolio</code></td><td>Vermögensbilanz und Projektion</td></tr>
+  <tr><td><code>/marktpreis</code></td><td>Wertindikation — mit Kostenansage vorab</td></tr>
+  <tr><td><code>/abbrechen</code></td><td>Laufende Anlage verwerfen</td></tr>
+  <tr><td><code>/hilfe</code></td><td>Kurzübersicht im Chat</td></tr>
+  <tr><td><code>/stop</code></td><td>Verbindung stilllegen (in den Einstellungen reaktivierbar)</td></tr>
+</table>
+
+<h2>7 · Einrichtung</h2>
+
+<ul>
+  <li>In Telegram <b>@BotFather</b> öffnen und <code>/newbot</code> schicken</li>
+  <li>Namen vergeben (frei wählbar), Benutzernamen muss auf <b>bot</b> enden</li>
+  <li>BotFather antwortet mit einem Token <span class="mono">123456789:AA…</span></li>
+  <li>In DealPilot: <i>Einstellungen → Account &amp; Sicherheit → Telegram-Bot</i> → Token einfügen</li>
+  <li>Dort <b>Verbindungscode erzeugen</b>, dem Bot <code>/start</code> schicken und den Code eintippen</li>
+</ul>
+
+<div class="merk">
+  <b>Der Code ist kein Beiwerk.</b> Wer deinen Bot kennt, kann ihm schreiben — der
+  Code entscheidet, wessen Daten er zeigt. Er gilt 15 Minuten und nur einmal.
+</div>
+
+<div class="merk gut">
+  <b>Dein Token bleibt dein Token.</b> Er liegt verschlüsselt in der Datenbank
+  (AES-256-GCM); die Oberfläche zeigt nur die letzten vier Zeichen. Gib ihn
+  niemals in einem Chat oder einer E-Mail weiter.
+</div>
+
+<div class="fuss-seite">
+  DEALPILOT · JUNKER SOLUTION · MARCEL JUNKER · HANDBUCH TELEGRAM-BOT · 02.10.2026
+</div>
+
+</body>
+</html>
