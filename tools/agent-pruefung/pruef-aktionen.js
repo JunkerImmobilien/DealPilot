@@ -118,9 +118,22 @@ function ruf(name, ctx, args) {
 
   /* ── Marktbericht: Preis kostet nichts ───────────────────────────── */
   console.log('\n=== A-8 · Preisansage ===');
-  const preis = await ruf('marktbericht_preis', ctx, { nummer: 1, stufe: 1 });
-  pruef('marktbericht_preis liefert Name und Kostenlage'
-    + (preis.name ? ' (' + preis.name + ')' : ''), preis.moeglich === true);
+  /* v1811c · Die Rueckgabe hat sich geaendert: marktbericht_preis liefert
+     jetzt IMMER alle drei Stufen, damit das Modell keine fuer den Nutzer
+     waehlen kann. Der Pruefer hatte noch die alte Form erwartet und meldete
+     deshalb FALSCH - er war veraltet, nicht der Code. */
+  const preis = await ruf('marktbericht_preis', ctx, { nummer: 1 });
+  const dreiStufen = Array.isArray(preis.stufen) && preis.stufen.length === 3;
+  pruef('marktbericht_preis liefert ALLE DREI Stufen'
+    + (dreiStufen ? ' (' + preis.stufen.map(function(x){return x.name;}).join(' / ') + ')' : ''),
+    dreiStufen);
+  if (dreiStufen) {
+    pruef('jede Stufe nennt ihren fertigen Satz',
+      preis.stufen.every(function(x){ return typeof x.so_sagen === 'string' && x.so_sagen.length > 10; }));
+    pruef('keine Stufe behauptet "kostet nichts", wenn sie verbraucht',
+      preis.stufen.every(function(x){
+        return !x.verbraucht_einen_abruf || !/kostet nichts/i.test(x.so_sagen); }));
+  }
 
   /* ── Aufraeumen ──────────────────────────────────────────────────── */
   if (testId) {

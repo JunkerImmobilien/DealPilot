@@ -29014,3 +29014,94 @@ Gesamtlauf durch den Agenten         9 von 9 Proben
 - **A-8 ausführliche Antwort** (Lage, Vergleichsdaten, Quellen) ist auf
   die Preisansage und den Abruf beschränkt; der Berichtsinhalt wird noch
   nicht aufbereitet.
+
+---
+
+## Rollout-Journal 02.10.2026 (8) — v1809–v1811: aufgeräumt, nachgemessen, acht Fehler
+
+**Was** · Marcel: *„bitte auch nochmal prüfen ob das jetzt alles sinn macht."*
+Antwort nach dem Nachmessen: **nein, noch nicht.** Jetzt schon.
+
+**Commits** · `v1809` ein Weg statt zwei · `v1810` Präfixtreffer ·
+`v1811a–d` Berichtsstufen
+
+### Der Befund: zwei Fassungen nebeneinander
+
+Nach dem Umbau auf den Agenten (v1801) lagen die alte Musterweiche und der
+Agent im selben Ablauf. Ein Prüfdurchgang quer durch die Datei fand acht
+Stellen, an denen das wehtut:
+
+| | |
+|---|---|
+| 1 | **Der richtige Marktpreis-Aufruf war tot, der kaputte lebte** — „Marktpreis für Objekt 17" suchte nach *Hausnummer* 17 |
+| 2 | Ein Marktpreis-Satz während einer Anlage **vernichtete den Entwurf** |
+| 3 | Die **Adress-Rückbestätigung war umgehbar** — wer anders formulierte, umging genau die Sicherung gegen Sprachfehler |
+| 4 | `objekt_anlegen` hinterließ **Zombie-Entwürfe** → dasselbe Objekt zweimal |
+| 5 | `_findeObjekt` fiel **blind** aufs letzte Objekt zurück |
+| 6 | **Mehrdeutig war eine Sackgasse** — zwei Treffer meldeten „nicht gefunden" |
+| 7 | Ein **Kommentar versprach mehr als der Code hielt** (Schreibsperre) |
+| 8 | Die **Geldsperre las einen halb gefüllten Verlauf** |
+
+> Zwei Wege zu derselben Sache sind nicht doppelt sicher. Einer davon ist
+> der, auf dem die Fehler sitzen, und niemand weiß, welcher.
+
+Der Webhook führt jetzt nur noch den **Zustand** (Anlage,
+Adressbestätigung) und drei Schnellpfade. Alles andere geht an den Agenten.
+**1424 → 942 Zeilen.**
+
+### Drei Fehler, die erst der Aufräumer sichtbar machte
+
+**„Musterstr" fand „Musterstraße 12" nicht.** Die Wortgrenzen-Regel aus
+v1767b war gegen die `indexOf`-Falle richtig, traf aber auch die Abkürzung,
+die jeder schreibt. Jetzt zählt ein Präfix ab fünf Zeichen.
+
+**Und warum das niemand merkte:** die alte Fassung gab bei einem Fehlschlag
+stillschweigend das zuletzt besprochene Objekt zurück. Die Probe prüfte nur
+`gefunden === true`.
+
+> Eine Probe, die nur fragt **ob** etwas kam, ist bei einem stillen
+> Rückfall immer grün. Sie prüft dann nicht die Funktion, sondern den
+> Rückfall.
+
+**Stufe 3 gab es gar nicht.** `STUFEN` kannte nur 1 und 2; jeder Zugriff auf
+3 fiel still auf 1 zurück. Wer eine Wertermittlung nach ImmoWertV wollte,
+sah den Namen der Marktpreisindikation.
+
+> Ein Rückfall auf den Standard sieht aus wie eine Antwort. Er sagt nicht
+> „das kenne ich nicht", sondern etwas Falsches in ruhigem Ton.
+
+### Zweimal Geld, zweimal meine Schuld
+
+**„kostet *nichts* und verbraucht einen Abruf"** — ein Widerspruch in einem
+Satz. Die Quelle war mein eigener Hinweis: „Das kostet NICHTS" meinte den
+*Voranschlag*, das Modell las es als Aussage über die *Bewertung*.
+
+> Ein Hinweis an das Modell steht im selben Text wie die Daten. Was darin
+> mehrdeutig ist, landet mehrdeutig beim Nutzer — und bei Geld ist das
+> keine Unschärfe, sondern eine Falschaussage.
+
+**Und die Stufe wählte es selbst.** Zweimal versucht, es per Hinweis zum
+Fragen zu bringen; zweimal gab es einfach eine Stufe mit.
+
+> Solange ein Werkzeug eine Wahl anbietet, trifft das Modell sie. Nicht aus
+> Ungehorsam — eine Wahl im Schema sieht aus wie ein Auftrag. Wer will,
+> dass gefragt wird, nimmt sie aus dem Schema.
+
+`marktbericht_preis` hat den Parameter nicht mehr und liefert **alle drei**.
+
+### Nachgemessen
+
+```
+1 WERKZEUGE   : alle Proben bestanden
+2 ZAHLENTREUE : 12 von 12 richtig
+3 ANLAGE      :  7 von 7 Angaben im Datensatz
+4 GESAMT      :  9 von 9 Proben
+5 STUFENWAHL  :  3 von 3 Proben
+```
+
+### Rest
+
+- Nennt der Nutzer eine Stufe ausdrücklich, listet der Agent trotzdem alle
+  drei. Kosmetisch — es fließt kein falsches Geld, es ist eine Antwort zu
+  viel.
+- **A-9 (E-Mail-Abgleich)** bleibt blockiert.
