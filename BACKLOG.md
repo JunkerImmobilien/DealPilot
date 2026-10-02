@@ -45,6 +45,40 @@ ergänzt und dann hat der Zugriff auf alle Objekte … und er kann auch neue
 Objekte anlegen und wir bilden quasi über diesen Telegram-Bot dieses geführte
 Anlegen durch."
 
+**Marcel am 02.10.2026 — die vollständige Anforderung.** Sie geht deutlich
+über „Objekte anlegen" hinaus, deshalb hier wörtlich zerlegt:
+
+| # | was der Bot können soll | Marcels Worte |
+|---|---|---|
+| 1 | **Fragen zu einem einzelnen Objekt** | „dass ich auf einzelne Objekte überall zugreifen kann" |
+| 2 | **Portfolio-Daten abgreifen** | „wie ist meine Vermögensbilanz, wo stehe ich in zehn Jahren, wie viele Objekte habe ich, gib mir ein paar Eckdaten" |
+| 3 | **Objekt per Sprachnachricht anlegen** | „ich würde einfach eine Audio aufnehmen und dort reinsenden mit Adresse und allen möglichen Daten und er wertet aus, ob er alles dafür zur Verfügung hat" |
+| 4 | **Lücken benennen und durchleiten** | „mir fehlen noch für die Bewertung die und die Eckdaten — und würde dann vielleicht auch so durchleiten wie bei der Schritt-für-Schritt-Anleitung" |
+| 5 | **Felder ändern** | „man kann aber auch Felder ändern" (01.10.) |
+| 6 | **Marktpreisindikation** | „man könnte daraus jetzt auch einfach eine Marktpreisindikation holen, wenn man die Sachen angibt" |
+| 7 | **Adresse IMMER rückbestätigen** | „da sollte er auf jeden Fall immer nach einer Bestätigung fragen, weil das kann ja auch sein, dass sie durch die Sprachaufzeichnung manchmal nicht richtig übermittelt wird" |
+| 8 | **Einrichtung über die Einstellungen** | „der muss über einstellungen vernünftig einzurichten sein" |
+
+**Gemessen am 02.10.2026: sieben von acht haben bereits einen Weg.** Der Bot
+ist ein **neuer Kanal auf vorhandene Fähigkeiten**, kein zweites Programm:
+
+| # | Status | wo der Weg schon liegt |
+|---|---|---|
+| 1 | **vorhanden** | `POST /api/v1/ai/copilot` ohne `kontextArt` |
+| 2 | *teilweise* | `dashboard.js:2459` `portfolioPayload()` — fertig, aber **nur im Frontend** |
+| 3 | **vorhanden** | `POST /ai/extract-voice` (Audio + Feldextraktion in einem Zug, bis ~10 Min); `POST /objects` hat **keine** Pflichtfelder |
+| 4 | *teilweise* | `voice-import.js:9124` `_rfLuecken`, `ETAPPEN`/`RFRAGEN` ab `:2682` — **Frontend-Konstanten** |
+| 5 | **vorhanden** | `<<<FELDER>>>`-Block + `heileSchablone` + `objektZuordnen` + `anwenden` |
+| 6 | **vorhanden** | `/avm/quote` (kostenlos) → `/avm/*`; oder per `<<<ABRUF>>>` mit Pflicht-Kostenansage |
+| 7 | **vorhanden** | `voice-import.js:9970` `_rfAdresseBestaetigen()` — die **einzige** Rückfrage im ganzen Sprechlauf, aus genau Marcels Grund |
+| 8 | *teilweise* | Reiter-Muster `settings.js:189/291`; zwei fertige Vorbilder für Schlüsselfelder (s. T-B6) |
+
+> Punkt 7 war schon gebaut, bevor Marcel ihn forderte — und mit derselben
+> Begründung: „eine falsch verstandene Straße macht aus vier richtigen
+> Abrufen vier falsche, und keiner davon meldet einen Fehler, denn die
+> Nachbarstadt hat auch Marktdaten." Das ist kein Zufall, sondern dieselbe
+> Erfahrung zweimal.
+
 **Zwei Dateien liegen dazu im Repo** (beide gesichtet am 01.10.2026):
 
 | Datei | was drin steht |
@@ -109,9 +143,34 @@ nicht für 50 Mandanten.
 > Eine Architektur, die bei einem Nutzer läuft und bei fünfzig kippt, ist
 > keine Architektur, sondern ein Prototyp mit Glück.
 
-**Vorschlag (noch nicht entschieden):** EIN DealPilot-Bot, Webhook statt
-Polling, Verknüpfung über einen Einmal-Code aus den Einstellungen. Whitelabel
-bekommt später einen eigenen Bot je Mandant, nicht je Nutzer.
+**Vorschlag (hier stand: noch nicht entschieden):** EIN DealPilot-Bot,
+Webhook statt Polling, Verknüpfung über einen Einmal-Code aus den
+Einstellungen. Whitelabel bekommt später einen eigenen Bot je Mandant, nicht
+je Nutzer.
+
+#### ENTSCHIEDEN am 02.10.2026 — durch Marcels Satz zur Einrichtung
+
+> „der muss über **einstellungen vernünftig einzurichten** sein"
+
+Damit ist die Spalte gewählt, und zwar ohne dass darüber noch geredet werden
+muss: **ein DealPilot-Bot für alle, Verknüpfung per Einmal-Code.** Die rechte
+Spalte verlangt vom Kunden, bei @BotFather einen Bot anzulegen und einen
+Token zu kopieren — das ist für einen nicht-technischen Nutzer **nicht**
+„vernünftig einzurichten", und Marcel ist der Maßstab dafür. Was der Kunde
+tut, schrumpft auf: Einstellungen öffnen, Code sehen, im Chat `/start` und
+den Code schicken.
+
+**Was die Entscheidung mitnimmt:**
+
+- **Webhook statt Polling** — die harte Grenze oben („nur eine Instanz darf
+  pollen") ist damit umgangen, nicht verwaltet.
+- **Ein Token, bei uns** — kein fremdes Passwort in unserer Datenbank.
+- **Whitelabel wird später nachgerüstet**, je Mandant ein Bot. Heute gibt es
+  genau **ein** Partner-Abo; einen zweiten Weg für niemanden zu bauen wäre
+  Arbeit auf Verdacht.
+
+> Widerspricht Marcel, ist nur dieser Block hinfällig — T-B2 bis T-B6 gelten
+> für beide Wege. Deshalb steht die Entscheidung hier und nicht im Code.
 
 ### T-B2 · Die Kennung ist das Nadelöhr — ZUERST messen
 
@@ -136,7 +195,7 @@ laufenden System:
 | „man kann ihn zum Portfolio was fragen" | `POST /ai/copilot` mit `kontextArt: 'portfolio'` |
 | „man kann auch Felder ändern" | derselbe Endpunkt, `felder`-Katalog im Auftrag → `<<<FELDER …>>>` (v1764/v1767) |
 | „steht jetzt auf 12 Euro, du musst auf 13 ändern" | genau die Konflikt-Rückfrage aus `copilot-aenderungen.js` (`anwenden()`) |
-| „frei reinsprechen" | `POST /ai/transcribe-chunk` → `gpt-4o-transcribe` |
+| „frei reinsprechen" | `POST /ai/transcribe-chunk` → `gpt-4o-mini-transcribe` *(hier stand `gpt-4o-transcribe`; der laufende Default ist seit v1169 das mini — `voiceExtractService.js:32`, Tempo)* |
 | „guckt, was noch übrig bleibt" | `POST /ai/extract-text` `{text, catalog}` → `{fields}` |
 | „geführtes Anlegen" | der Sprechlauf in `voice-import.js` führt die Fragenkette schon |
 
@@ -164,15 +223,63 @@ Telegram-Knöpfe zu übersetzen statt in HTML.
 
 ### T-B5 · Reihenfolge des Baus
 
-1. **T-B1 entscheiden** (ein Bot oder einer je Kunde) — ohne das ist alles
-   andere Spekulation.
+1. ~~**T-B1 entscheiden**~~ — **erledigt am 02.10.2026**: ein Bot, Webhook,
+   Einmal-Code aus den Einstellungen.
 2. Tabelle `telegram_links` (chat_id BIGINT, user_id UUID, code, bestätigt_am)
    plus Einstellungs-Reiter mit Einmal-Code. **Migration = Rebuild.**
-3. Webhook-Endpunkt (oder Polling-Prozess), Signaturprüfung, Allowlist.
-4. Fragen zum Portfolio — der kürzeste Weg zum Beweis, dass die Kette steht.
-5. Felder ändern mit Konflikt-Rückfrage als Telegram-Knöpfe.
-6. Geführtes Anlegen: erst frei sprechen, dann die Lücken abfragen.
-7. Abrufe mit Kostenansage.
+3. Webhook-Endpunkt, Signaturprüfung (`X-Telegram-Bot-Api-Secret-Token`),
+   Allowlist.
+4. **Feldkatalog serverseitig** (T-B6 ①) — Voraussetzung für 5 UND 6.
+5. Fragen zum Portfolio — der kürzeste Weg zum Beweis, dass die Kette steht.
+   Braucht T-B6 ②.
+6. Felder ändern mit Konflikt-Rückfrage als Telegram-Knöpfe.
+7. Geführtes Anlegen: erst frei sprechen, dann die Lücken abfragen
+   (T-B6 ③), Adresse rückbestätigen.
+8. Abrufe mit Kostenansage.
+
+### T-B6 · Die drei echten Bauposten — alles andere ist Kanal-Arbeit
+
+Gemessen am 02.10.2026 quer durch Backend und Frontend. Sieben der acht
+Wünsche haben einen Weg (Tabelle oben); was wirklich fehlt, ist dreimal
+dasselbe Muster: **die Logik liegt im Frontend, der Bot hat kein Frontend.**
+
+**① Der Feldkatalog liest heute das DOM.**
+`copilot-aenderungen.js:52` baut `katalog()` aus `window.FIELDS` **plus dem
+DOM** — Bezeichnung, Art, select-Optionen. Ein Bot hat kein DOM, also auch
+keinen Katalog, also kann das Modell keine Feld-Id treffen. Ohne diesen
+Posten funktioniert weder „Felder ändern" noch „Lücken abfragen".
+
+**② Portfolio-Zahlen gibt es nur im Browser.**
+`dashboard.js:456` `aggStats()` und `:704` `projectAll(years)` sind die
+Quelle für Vermögensbilanz und „wo stehe ich in zehn Jahren";
+`:2459 portfolioPayload()` liest sie bereits fertig zusammen und rechnet
+selbst nichts. **Einen Backend-Weg zu Portfolio-Summen gibt es nicht.**
+
+> **Hier ist die Versuchung, und sie ist verboten.** `CLAUDE.md`:
+> „Rechenkerne — nie duplizieren." Eine zweite Vermögensbilanz im Backend
+> wäre genau der Fehler, der uns `projectAll` in Cent hat rechnen lassen —
+> jahrelang, Faktor 100, sichtbar erst als eine zweite Quelle danebenstand.
+> Der Weg ist, `dashboard.js`/`calc.js` als Node-Modul lauffähig zu machen
+> (ES5-IIFE, das geht), **nicht** nachzubauen.
+
+**③ Die Führung durchs Anlegen ist eine Frontend-Konstante.**
+`voice-import.js:2682` `ETAPPEN` (6 + 2 extra) und `:2718` `RFRAGEN` — die
+Feldreihenfolge, die Marcel mit „so durchleiten wie bei der
+Schritt-für-Schritt-Anleitung" meint. Dazu `:3045 _rfZuschnitt` (die Fragen
+richten sich nach der Objektart, `objektart-felder.js:208 pflicht()`) und
+`:9124 _rfLuecken` („was fehlt noch"). Alles vorhanden, alles im Browser.
+
+**Was dagegen fertig ist und nur angeschlossen werden muss:**
+
+| | |
+|---|---|
+| Audio | `POST /ai/extract-voice` nimmt `mime` als Parameter — Telegram liefert OGG/Opus, also reicht Download + base64 |
+| Anmeldung | `x-api-key` ist **gebaut** (`middleware/auth.js:48`, 120/min je Key, nur sha256 gespeichert). **Zwei Haken:** nur Pro-Plan, und `req.apiKey.scopes` wird gesetzt, aber an keiner gefundenen Stelle ausgewertet — ein Key hat faktisch Vollzugriff. Für einen Bot gehört das eingegrenzt. |
+| Einstellungs-Panel | `apikeys.js` ist das Vorbild: **selbst-einhängend** über einen eigenen Host-Div, kein Eingriff in `settings.js`. Für Fremdzugangsdaten ist `immometrica.js:17` das Muster (PUT/DELETE/reveal, verschlüsselt). |
+
+**Eine Zahl zum Mitnehmen:** `callback_data` eines Telegram-Knopfes fasst
+**64 Byte**. Eine UUID passt rein, zwei nicht — Knöpfe müssen also auf eine
+Sitzung zeigen, nicht auf ein Objektpaar.
 
 ### G1 · Google Drive — eigenes Thema, noch nicht angefasst
 
