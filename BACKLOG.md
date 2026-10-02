@@ -299,24 +299,32 @@ wurde, steht im Rollout-Journal; hier nur der Stand.
 
 | Punkt | Stand | Commit |
 |---|---|---|
-| Befund 1+2 (Modus, Falle) | ✓ |  |
-| A-1 Werkzeugkasten (9 Werkzeuge, 3 Stufen) | ✓ |  |
-| A-2 Portfolio-Kontext + Tilgung/Verbindlichkeiten als Feld | ✓ |  |
-| A-3 Objektbezug: Nummer, UUID, Adresse, Anknüpfung | ✓ |  |
-| A-4 Auswahlfelder mit Rückfrage | ✓ |  |
-| A-5 Aktionen inkl. Sammelaktion mit Gesamtpreis | ✓ |  |
-| A-6 Anlage: alle genannten Angaben werden übernommen | ✓ |  |
-| A-7 geführte Prozesse per Sprache/Text | ✓ | / |
-| A-8 Berichtsstufen mit Preisansage | **teilweise** |  |
+| Befund 1+2 (Modus, Falle) | ✓ | `v1800` |
+| A-1 Werkzeugkasten (9 Werkzeuge, 3 Stufen) | ✓ | `v1801` |
+| A-2 Portfolio-Kontext + Tilgung/Verbindlichkeiten als Feld | ✓ | `v1802` |
+| A-3 Objektbezug: Nummer, UUID, Adresse, Anknüpfung | ✓ | `v1801` |
+| A-4 Auswahlfelder mit Rückfrage | ✓ | `v1807` |
+| A-5 Aktionen inkl. Sammelaktion mit Gesamtpreis | ✓ | `v1805` |
+| A-6 Anlage: alle genannten Angaben werden übernommen | ✓ | `v1806` |
+| A-7 geführte Prozesse per Sprache/Text | ✓ | `v1800` / `v1806` |
+| A-8 Berichtsstufen mit Preisansage | **teilweise** | `v1805` |
 | A-9 E-Mail-Abgleich | **BLOCKIERT** | — |
 
 **Was an A-8 noch fehlt:** die ausführliche Zusammenführung des
 Ergebnisses (Lage, Mikrolage, Vergleichsdaten, Annahmen, Quellen). Preis
 und Abruf stehen, der Berichtsinhalt wird noch nicht aufbereitet.
 
-**Prüfstrecke:**  — fünf Läufer, die im Container
+**Prüfstrecke:** `tools/agent-pruefung/` — fünf Läufer, die im Container
 gegen das echte Konto laufen und protokollieren, WELCHE Werkzeuge der
 Agent gewählt hat.
+```
+Portfolio-Fragen (Marcels fünf)     5 von 5 über portfolio_lesen
+Zahlentreue, 3 Fragen x 4 Läufe    12 von 12 richtig
+Werkzeuge einzeln                  16 von 16 Proben
+Anlage: genannte Angaben             7 von 7 im Datensatz
+Gesamtlauf durch den Agenten         9 von 9 Proben
+```
+
 
 
 
