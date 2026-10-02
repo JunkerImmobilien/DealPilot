@@ -450,6 +450,62 @@ const jahrVerteilung = {};
 liste.forEach((g) => { const k = g.jahr == null ? 'ohne' : g.jahr; jahrVerteilung[k] = (jahrVerteilung[k] || 0) + 1; });
 
 say('');
+/* ═══ E2 · DIE GND FEHLT DORT, WO SIE RECHNET ══════════════════════════
+
+   Im Backlog stand „`modellansaetze` ist nur zu 58,8 % gefüllt". Diese
+   Zahl ist richtig und trotzdem irreführend: sie zählt alle 2.624 Sätze,
+   aber **ein Liegenschaftszinssatz braucht gar keine Gesamtnutzungsdauer**.
+   Die 1.174 Zinssätze drücken die Quote, ohne dass etwas fehlt.
+
+   Gemessen am 02.10.2026, nur dort wo es rechnet:
+
+     Sachwertfaktoren             422
+     davon OHNE GND als Zahl      171   (41 %)
+
+   > Eine Quote über alles misst nicht die Lücke, sondern verdünnt sie.
+
+   Und das ist der Schaden: `CrossCheckService` liest die GND aus
+   `modellansaetze.gnd_jahre` und fällt sonst auf die Konstante 80 zurück.
+   Führt ein Ausschuss eine andere und steht sie nur im Fließtext, rechnet
+   das System mit 80 — und nichts widerspricht. An einem Reihenhaus sind
+   das rund 19.000 €. */
+function gndStand(saetze) {
+  const swf = saetze.filter((s) => s.kennzahl === 'sachwertfaktor');
+  const ohne = [];
+  for (const s of swf) {
+    const m = s.modellansaetze || {};
+    const roh = (m.gnd_jahre != null) ? m.gnd_jahre
+              : (m.gesamtnutzungsdauer_jahre != null) ? m.gesamtnutzungsdauer_jahre
+              : (m.gnd != null) ? m.gnd : null;
+    const z = Number(roh);
+    if (roh == null || !Number.isFinite(z) || z <= 0) {
+      ohne.push({ datei: s._datei || '?', land: s.land_code,
+                  gebiet: (s.gebiet_name || '?').slice(0, 26),
+                  zweig: s.zweig || '-',
+                  jahr: s.berichtsjahr || null });
+    }
+  }
+  return { swf: swf.length, ohne };
+}
+
+const _gnd = gndStand(saetze);
+say('');
+say('═══ GESAMTNUTZUNGSDAUER (nur Sachwertfaktoren) ═══');
+say(`Sachwertfaktoren        : ${_gnd.swf}`);
+say(`davon OHNE GND als Zahl : ${_gnd.ohne.length}` +
+    (_gnd.swf ? `   (${Math.round(100 * _gnd.ohne.length / _gnd.swf)} %)` : ''));
+if (_gnd.ohne.length) {
+  say('Dort rechnet das System mit der Rueckfallzahl 80 — auch wenn der');
+  say('Bericht eine andere fuehrt. Je Datei:');
+  const jeDatei = {};
+  _gnd.ohne.forEach((x) => { jeDatei[x.datei] = (jeDatei[x.datei] || 0) + 1; });
+  Object.keys(jeDatei).sort((a, b) => jeDatei[b] - jeDatei[a]).forEach((d) => {
+    say(`   ${String(jeDatei[d]).padStart(4)}  ${d}`);
+  });
+} else {
+  say('Jeder Sachwertfaktor fuehrt seine GND als Zahl.');
+}
+
 say('═══ ALTER DER JAHRGÄNGE ═══');
 say(`Bezugsjahr ${JAHR} · fällig ab ${FAELLIG_AB} Jahr(en) Rückstand`);
 say('Jahrgang: ' + Object.keys(jahrVerteilung).sort()
