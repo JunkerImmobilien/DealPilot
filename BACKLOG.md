@@ -883,21 +883,71 @@ das auf dem Bildschirm nicht existiert.
 **Die Standardansicht ist der schwerste Fall:** dort kommt ein neuer Kunde
 über Schritt 3 nicht hinaus, und das ist der erste Rundgang, den er sieht.
 
-#### Zu entscheiden
+#### BEHOBEN in v1774 — die Ursache war ein `querySelector`
 
-1. **Soll ich die Sichtbarkeit zur Bedingung machen?** Die Tour-Engine
-   müsste ihr Ziel nicht nur finden, sondern öffnen (Akkordeon, Tab,
-   Schiene) — und wenn das nicht geht, den Schritt **überspringen statt
-   stehenzubleiben**. Ein Rundgang, der hängt, ist schlimmer als einer, der
-   eine Station auslässt.
-2. **Oder sollen die betroffenen Schritte in der Standardansicht ganz
-   entfallen?** Dann wird die Tour dort kürzer, aber sie läuft.
+Marcel am 02.10.2026: „tour hänger suchen und lösen."
 
-#### Offen
+`_findElementWithRetry` nahm `document.querySelector(selectors[i])` — **einen**
+Treffer je Teilselektor. Ist ausgerechnet der erste unsichtbar, gab die Suche
+auf, obwohl ein späterer Treffer desselben Selektors sichtbar war:
 
-- Die **Ursache**, warum die Ziele unsichtbar sind (Akkordeon zu? Tab nicht
-   aktiv? Schiene eingeklappt?), ist noch nicht im Code gesucht.
-- `tour-engine.js` trägt noch den Cache-Buster `v1747b`.
+```
+  var el = document.querySelector(selectors[i]);
+  if (el && _isVisible(el)) return resolve(el);      // <- gibt auf
+```
+
+Jetzt `querySelectorAll` und der erste **sichtbare**.
+
+> **Genau dieser Fehler steht in diesem Punkt schon einmal — als meiner.**
+> Am 30.09. hatte ich „36 von 37 Zielen in allen vier Ansichten" gemeldet,
+> weil ich `querySelector` gegen null geprüft hatte statt gegen die
+> Sichtbarkeit. Die Tour-Engine machte denselben Fehler, nur meldete sie ihn
+> als „Element nicht gefunden" — und wer dem folgte, suchte einen Tippfehler
+> im Selektor statt eine zugeklappte Schiene.
+
+**Die Meldung sagt jetzt, was wirklich los ist:** statt „Element nicht
+gefunden" nennt sie die Zahl der Treffer im DOM und dass keiner davon
+sichtbar ist.
+
+**Nachgemessen am laufenden System, frisch geladen (`v1774`):**
+
+```
+Standardansicht - vorher Haenger bei Schritt 3, jetzt:
+
+   3.0 s  Willkommen bei DealPilot
+   4.8 s  Objekt auswaehlen
+   9.9 s  Neues Objekt? Quick-Boarding!      <- hier stand sie 42 s still
+  13.9 s  Quick-Boarding Score
+  17.9 s  Boarding-Pass
+  20.8 s  Als Objekt speichern
+  24.0 s  PRE-FLIGHT - dein Daten-Cockpit
+  27.2 s  Import aus Exposes & Marktberichten
+
+Kanzlei (v2) - vorher Haenger bei Schritt 6: laeuft ebenfalls durch.
+```
+
+**Beide vorher hängenden Stellen laufen.** Vor v1774 bewegten dort weder der
+echte „Weiter"-Knopf noch beide Zweige der Verzweigung noch `DpTour.goto()`
+etwas — 42 Sekunden lang beobachtet.
+
+#### Was damit NOCH NICHT belegt ist
+
+- **Nicht alle 38 Schritte in allen vier Ansichten.** Belegt ist, dass die
+  beiden Hänger weg sind und die Tour über sie hinwegläuft.
+- **B1 (Spot außerhalb des Bildschirms)** bei den drei Quick-Boarding-
+  Schritten ist davon unberührt — der Spot ist 2.216 px hoch bei 988 px
+  Fenster. Das ist eine eigene Ursache (Unterziel gegen Container).
+- **B2 (kein Spot)** bei Investor Deal Score, Bewertungs-Cockpit und
+  Stress-Test — ebenfalls offen.
+
+#### Noch zu entscheiden
+
+**Soll ein Schritt ohne sichtbares Ziel ganz entfallen?** Die Engine springt
+heute weiter (Auto-Skip), zeigt aber vorher bis zu **6 Sekunden** lang nichts
+(20 Versuche × 300 ms). Bei mehreren solchen Schritten hintereinander wirkt
+die Tour zäh, obwohl sie arbeitet.
+
+> Ein Rundgang, der wartet, sieht aus wie einer, der hängt.
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
