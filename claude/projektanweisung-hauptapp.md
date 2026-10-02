@@ -28768,3 +28768,61 @@ stille Verwerfung war der teure Fehler bei `/bmf/aufteilung`.
 - Der Spiegel ist nur so frisch wie der letzte Browser-Besuch. Das ist
   benannt, nicht behoben — ein serverseitiger Rechenweg wäre die verbotene
   zweite Quelle.
+
+---
+
+## Rollout-Journal 02.10.2026 (5) — v1796: die drei offenen Punkte
+
+**Was** · Der Spiegel sagt jetzt, ob sich etwas geändert hat; der
+API-Key-Scope wird endlich gelesen; der Bot liest Fotos.
+
+**Commit** · `v1796`
+
+### 1 · Der Stand beantwortet jetzt die richtige Frage
+
+Bisher nannte der Bot nur das Datum des Spiegels.
+
+> Ein drei Wochen alter Stand, an dem sich nichts geändert hat, ist
+> aktuell. Ein zwei Stunden alter, hinter dem zwei Objekte bearbeitet
+> wurden, ist es nicht.
+
+`objects.updated_at` weiß das, und die Abfrage kostet nichts. Gemessen:
+
+```
+30 min alt, 0 geaendert  ->  "Stand: heute 13:06 Uhr."
+30 min alt, 2 geaendert  ->  "... seitdem hast du 2 Objekte bearbeitet.
+                              Oeffne DealPilot einmal kurz."
+3 Wochen alt, 0 geaendert -> "... unveraendert seitdem."
+```
+
+### 2 · Der Scope war eine Behauptung
+
+`req.apiKey.scopes` wurde seit jeher **gesetzt** und nirgends ausgewertet
+— gemessen quer durch `backend/src`: genau ein Treffer, die Zuweisung
+selbst.
+
+> Ein Recht, das vergeben, angezeigt und nie geprüft wird, ist keine
+> Einschränkung, sondern eine Behauptung. Die Oberfläche sagt dem Nutzer,
+> sein Key könne „lesen" — und er kann löschen.
+
+Die Prüfung sitzt in der **Middleware**, nicht an den Routen: eine Stelle
+deckt alle, und niemand kann sie beim nächsten Endpunkt vergessen.
+Gegengeprüft an den echten Keys: ein aktiver, Scope `crud` — unverändert.
+Ein Key **ohne** Scope behält vollen Zugriff und wird protokolliert; ihn
+nachträglich zu entrechten bräche eine laufende Verbindung, und der Fehler
+läge nicht beim Nutzer.
+
+### 3 · Fotos über den vorhandenen Weg
+
+Naheliegend wäre ein dritter Auslese-Weg neben Text und Sprache gewesen.
+
+> Drei Wege zu denselben Feldern weichen irgendwann in drei Richtungen ab.
+> Zwei davon merkt niemand.
+
+`bildZuText` macht deshalb **nur** Text. Was daraus ein Objektfeld wird,
+entscheidet derselbe `extractFromText` wie bei Sprache und Tastatur —
+dieselbe Schablonenheilung, dieselbe Prozentfalle, dieselbe Adressprüfung.
+
+**PDFs kann der Bot nicht:** im Backend liegt kein PDF-Leser (gemessen —
+die Umwandlung macht im Browser pdf.js). Das sagt er, statt es zu
+verschweigen.
