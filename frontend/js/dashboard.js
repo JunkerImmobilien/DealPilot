@@ -2546,6 +2546,21 @@
   window.DealPilotDashboard = {
     /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
     portfolioPayload: portfolioPayload,
+    /* v1793 · GEMESSEN: portfolioPayload() gibt 0 Objekte zurueck, solange
+       das Dashboard nicht einmal offen war. Grund ist `_details` - ein
+       Cache, den nur `loadDetails()` fuellt, und das lief bisher
+       ausschliesslich in `openDashboard`. Am 02.10.2026 auf Staging
+       gemessen: 17 Karten in der Seitenleiste, 9 davon gewonnen,
+       `anzahl_objekte: 0`.
+
+       > Eine Funktion, die ohne Vorbereitung eine PLAUSIBLE Null liefert,
+       > ist gefaehrlicher als eine, die wirft. Der Portfolio-Spiegel
+       > haette eine leere Vermoegensbilanz abgelegt, und der Bot haette
+       > "du hast kein Portfolio" gesagt.
+
+       Deshalb geht der Lader mit nach aussen. `portfolioPayload()` bleibt
+       unveraendert synchron - wer die Zahlen will, laedt vorher. */
+    ladeDetails: loadDetails,
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
     steuerMappe: steuerMappe,   /* v1215-mappe */

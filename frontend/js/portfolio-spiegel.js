@@ -65,6 +65,18 @@
     var D = window.DealPilotDashboard;
     if (!D || typeof D.portfolioPayload !== 'function') return;
 
+    /* ERST LADEN, DANN RECHNEN LASSEN. `portfolioPayload()` liest einen
+       Cache (`_details`), den nur `loadDetails()` fuellt — und das lief
+       bisher nur beim Oeffnen des Dashboards. Gemessen am 02.10.2026:
+       ohne diesen Schritt meldet der Payload `anzahl_objekte: 0`, obwohl
+       neun gewonnene Objekte da sind.
+
+       > Eine Funktion, die ohne Vorbereitung eine PLAUSIBLE Null liefert,
+       > ist gefaehrlicher als eine, die wirft. */
+    if (typeof D.ladeDetails === 'function') {
+      try { await D.ladeDetails(); } catch (e) { return; }
+    }
+
     var payload;
     try {
       payload = D.portfolioPayload();
