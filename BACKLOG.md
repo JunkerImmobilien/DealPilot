@@ -970,44 +970,80 @@ etwas — 42 Sekunden lang beobachtet.
 - **B2 (kein Spot)** bei Investor Deal Score, Bewertungs-Cockpit und
   Stress-Test — ebenfalls offen.
 
-#### Vollprüfung aller 38 Schritte — ANGEFANGEN, das Werkzeug taugt noch nicht
+#### Vollprüfung — GEMESSEN (02.10.2026), vier Läufe, ein Muster
 
-Marcel am 02.10.2026 entschieden: Vollprüfung aller 38 Schritte in allen
-vier Ansichten.
+Das Werkzeug liegt als `frontend/dev/tour-pruefer.js` im Repo und trägt
+**acht Lehren** im Dateikopf — so viele Anläufe hat es gebraucht, und sieben
+davon maßen den Prüfer statt die Tour.
 
-**Der fünfte Läufer ist am selben Problem gescheitert wie die ersten vier.**
-Er springt jeden Schritt EINZELN an (`reset` → `start` → `goto(id)`), damit
-auch Schritte erreicht werden, die auf keinem Verzweigungspfad liegen. Für
-die Schritte OHNE `id` sucht er mit wiederholtem `next()` — und diese
-Suchschleife läuft PARALLEL zur Messung weiter. Die Blase blieb deshalb auf
-Schritt 1 stehen, während der Läufer schon maß.
+Entscheidend war zuletzt ein **Protokoll im Läufer**: je Schritt hält er
+fest, welchen Knopf er greift und ob der Klick ankam.
 
-> Ein Läufer, der zwei Uhren hat, misst die falsche.
+> Ein Prüfer, der nicht protokolliert, was er TUT, liefert bei einem
+> Fehlschlag nur die Hälfte des Befundes.
 
-**Der richtige Weg** ist ein Durchlauf JE ZWEIG statt Einzelsprüngen:
+##### Das Ergebnis
+
+| Lauf | Schritte | ok | kein Spot | Spot fremd |
+|---|---:|---:|---:|---:|
+| Standard (Heute) / A | 12 | 9 | 3 | — |
+| Standard (Heute) / B | 10 | 7 | 3 | — |
+| Aktenmappe / A | 11 | 8 | 3 | — |
+| Aktenmappe / B | 12 | 8 | 3 | 1 |
+
+**In allen vier Läufen sind es dieselben drei Schritte**, und alle drei
+liegen im Tab `s6`:
 
 ```
-Lauf A   bei Schritt 3 "Quick-Boarding Schritt fuer Schritt ansehen"
-Lauf B   bei Schritt 3 "Ueberspringen - weiter zur PRE-FLIGHT-Karte"
-         dito bei Schritt 35 und 36
-
-je Ansicht 2 Laeufe x 4 Ansichten = 8 Durchlaeufe
+22  Investor Deal Score
+23  Bewertungs-Cockpit
+24  Stress-Test
 ```
 
-Dabei wird **nach** jedem Titelwechsel gewartet (nicht getaktet), der
-aktuelle Schritt **aus der Blase** gelesen (nicht aus einem eigenen Zähler),
-und der Spot per `elementsFromPoint` gegen das Ziel geprüft (nicht per
-Überlappung mit dem Container). Ein Schritt, den kein Zweig erreicht, wird
-als solcher gemeldet — das ist selbst ein Befund.
+##### Und das Protokoll sagt, was dort passiert
 
-**Was aus den bisherigen Messungen schon feststeht:**
+```
+22 KEIN_SPOT  s6  Investor Deal Score
+   blase_frisch : true          die Blase ist da und frisch geholt
+   next_knopf   : true          der "Weiter"-Knopf existiert
+   gewaehlt     : "next"        er wurde geklickt
+   titel_danach : "Investor Deal Score"
+   bewegt       : FALSE         nach 900 ms hat sich nichts getan
+```
+
+**Der Knopf ist da, der Klick geht raus — und 900 ms später steht die Tour
+noch auf demselben Schritt.** Dass sie danach doch weiterkommt (alle vier
+Läufe erreichen ihr Ende), passt zur Elementsuche: sie versucht es **20 ×
+300 ms = bis zu 6 Sekunden**, bevor der Auto-Skip greift.
+
+> Für den Nutzer sind das drei Blasen hintereinander, die nichts markieren
+> und je sechs Sekunden stehen. Von außen sieht das aus wie ein Hänger —
+> die Tour arbeitet nur ergebnislos.
+
+##### Was zu entscheiden ist
+
+**1 · Die drei `s6`-Schritte.** Ihre Ziele (`#bc-stress` und Nachbarn) sind
+im DOM, aber nicht sichtbar — das Bewertungs-Cockpit ist zugeklappt oder der
+Tab nicht offen. Zwei Wege:
 
 | | |
 |---|---|
-| Hänger Standardansicht, Schritt 3 | **behoben** in v1774, nachgemessen |
-| Hänger Kanzlei, Schritt 6 | **behoben** in v1774, nachgemessen |
-| Spot höher als der Bildschirm (B1) | **behoben** in v1775, 0 von 15 außerhalb |
-| Kein Spot bei Schritt 22–24 (B2) | **offen** |
+| **a** | Die Engine öffnet den Bereich, bevor sie sucht (wie `_expandSidebarActionsIfCollapsed()` es für das Aktionen-Akkordeon tut) |
+| **b** | Die drei Schritte entfallen, wenn ihr Ziel nicht sichtbar ist — die Tour wird kürzer, läuft aber flüssig |
+
+**2 · Die Wartezeit.** 20 Versuche × 300 ms sind für ein Ziel gedacht, das
+gleich erscheint. Für eines, das gar nicht kommt, sind es sechs verlorene
+Sekunden. Ein früherer Abbruch (etwa nach 1,5 s) macht die Tour spürbar
+flüssiger und kostet nur dort etwas, wo ein Bereich wirklich langsam lädt.
+
+##### Was noch offen ist
+
+- **Kanzlei und Tower** wurden nicht fertig gemessen: der Kanzlei-Lauf blieb
+  bei Schritt 1 stehen. **Gegengeprüft von Hand:** derselbe „Weiter"-Knopf
+  bewegt die Tour sofort. Der Klick des Läufers kommt dort nicht an — das
+  ist noch nicht geklärt und ein Prüferproblem, kein App-Problem.
+- **Schritt 37 und 38** erreicht kein Zweig in der Standardansicht;
+  in Aktenmappe/B taucht 38 auf und sitzt dort auf dem falschen Element.
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
