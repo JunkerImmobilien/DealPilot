@@ -28617,3 +28617,154 @@ er „Verbunden — aber ich kann noch nicht antworten", statt zu schweigen.
   liegen im Frontend-JS.
 - **Der Token darf nie in einen Chat oder ein Ticket.** Er wird im Panel
   eingetragen und landet verschlüsselt in der Datenbank.
+
+---
+
+## Rollout-Journal 02.10.2026 (4) — v1793 bis v1795: der volle Bot, ohne eine Zeile doppelt
+
+**Was** · Der Telegram-Bot gibt Auskunft über Objekte und Portfolio, legt
+Objekte Schritt für Schritt an (auch per Sprachnachricht) und ändert Felder.
+**Keine Zahl, keine Frage und keine Feldliste ist dafür abgeschrieben
+worden.**
+
+**Commit** · `c779256` (v1793) · `83824c8`/`45f0809` (v1793b/c, v1794c) ·
+`e1c0bb6`→ (v1794, v1794b) · v1795
+
+Marcel: *„ich möchte eigentlich die komplette Auskunft haben und du sollst
+das auch nicht doppelt bauen. Ich würde vorschlagen, dass wir die Werte dann
+mit in die Datenbank schreiben, beim Portfolio."*
+
+### Das Problem, und warum sein Vorschlag es löst
+
+Portfolio-Zahlen entstehen **ausschließlich im Browser** (`dashboard.js`
+`aggStats()`, `projectAll()`, `portfolioPayload()`). Einen Backend-Weg gibt
+es nicht, und ihn zu bauen ist verboten — `projectAll` rechnete jahrelang in
+Cent, Faktor 100, und aufgefallen ist es erst, als eine zweite Quelle
+danebenstand.
+
+**Migration 078 `portfolio_spiegel`:** Der Browser rechnet wie bisher und
+legt sein Ergebnis ab. Drei Stellen tragen die Regel ausdrücklich — das
+Frontend-Modul ruft nur, der Endpunkt liest die Übersichtsspalten **aus**
+statt sie zu bilden, und der Dialogdienst reicht weiter.
+
+> Ein Spiegel, der selbst rechnet, ist kein Spiegel mehr.
+
+**Der Stand ist Teil der Auskunft**, ab einer Woche wird er zur Warnung.
+Liegt kein Spiegel vor, sagt der Bot das — und rechnet nicht ersatzweise.
+
+**Gemessen:** 9 Objekte, 5.811.926 € Gesamtinvestition, Projektion Jahr
+1/5/10.
+
+### Zwei plausible Nullen auf dem Weg dahin
+
+| | |
+|---|---|
+| **v1793b** | `portfolioPayload()` meldete **0 Objekte** bei 17 Karten (9 gewonnen). `_details` ist ein Cache, den nur `loadDetails()` füllt — und das lief nur in `openDashboard`. |
+| **v1793c** | Nur `loadDetails` zu exportieren half nicht: die Kette beginnt bei `loadSummaries()`. Details zu einer Liste zu laden, die es noch nicht gibt, ergibt wieder eine Null. |
+
+> Eine Funktion, die ohne Vorbereitung eine **plausible** Null liefert, ist
+> gefährlicher als eine, die wirft. Und: eine Vorbereitung auf jedem
+> Einzelschritt ergibt keine Vorbereitung auf dem Ganzen.
+
+Dass der Spiegel bei 0 Objekten **nicht** schreibt, hat den Schaden
+verhindert — die Sperre war gegen eine noch nicht geladene Liste gedacht und
+hat einen anderen Fall mitgefangen.
+
+### Der Extraktor — `tools/frontend-konstanten.mjs`
+
+Die Führungslogik ist gebaut, aber im Browser. **Gemessen: ETAPPEN, RFRAGEN,
+ARTEN und FIELDS enthalten zusammen null Funktionen** — reine Daten, also
+ableitbar statt abschreibbar.
+
+Das Werkzeug führt die IIFE-Module in Node **aus**, mit einem DOM-Stub
+(gemessen, was sie beim Laden wirklich anfassen: `injectCss` und `boot`,
+mehr nicht). Typ, Optionen und Beschriftung kommen aus `index.html`.
+
+```
+Objektarten 11 · Etappen 8 · Frageblöcke 18 · Feld-Ids 221
+Felder mit Form aus dem HTML: 189 (53 select, 1 bool, 186 beschriftet)
+```
+
+> Eine Kopie von Hand ist eine zweite Quelle, die beim ersten Nachpflegen
+> auseinanderläuft. Eine Ableitung ist immer falsch **oder** immer richtig,
+> nie halb.
+
+Es gab bereits zwei handgepflegte Duplikate mit Kommentar-Vertrag („MUSS MIT
+`frontend/js/config.js` ZUSAMMENPASSEN"). Diese Bauart sollte nicht noch
+einmal entstehen.
+
+**Der Wächter** (`--pruefen`) vergleicht die Prüfsumme jeder Quelldatei und
+läuft seit v1794c **im Deploy** — mit Abbruch, nicht mit Warnung: eine
+Warnung im Deploy liest nach dem dritten Mal niemand mehr. Gegengetestet:
+Quelle künstlich geändert → RC=1 mit beiden Summen, nach Rücknahme RC=0.
+
+### Zwei Fehler, die erst das Nachmessen gefunden hat
+
+1. **„nur 1 bool"** sah falsch aus (41 Checkboxen im HTML). Gegengeprüft:
+   von den 41 steht genau **eine** in `FIELDS`, die anderen 40 sind
+   UI-Schalter. 0 fehlen, 0 falscher Typ — der Extraktor hatte recht.
+2. **`objart` trug das Label „PLZ Ort Straße Hausnummer Objektart"** — vier
+   Beschriftungen in einer. Ursache war ein Lookahead, der sich über mehrere
+   `<label>` dehnte. Der Bot hätte diesen Satz als Feldnamen vorgelesen.
+
+> Ein Extraktor, der etwas Plausibles liefert, wird nicht nachgemessen.
+> Gerade deshalb muss man ihn nachmessen.
+
+### Zwei Sortierungen aus denselben Daten
+
+Nach `rang` lautet die erste Frage an ein leeres Objekt „Baujahr und
+Kaufpreis?" — die **Adresse käme erst an fünfter Stelle**. Im Frontend ist
+das richtig: `rang` ist das Gewicht für Rückfragen **nach** einem freien
+Diktat. Beim Anlegen im Chat stimmt es nicht, denn an der Adresse hängt
+alles Weitere.
+
+> Dieselben Daten, zwei Fragen: „was fehlt am dringendsten?" und „womit
+> fängt man an?". Die Antworten dürfen verschieden sein.
+
+**Gegentests:** alles gefüllt → 0 offen. Nichts gefüllt → 17 von 18. **ETW**
+vermisst nur `etagen_ges`, **MFH** zusätzlich `einheiten` — die
+Objektart-Tabelle greift.
+
+### Die Adresse wird immer rückbestätigt
+
+Wie im Sprechlauf, und aus demselben Grund: an ihr hängen Bodenrichtwert,
+Marktpreisindikation, Lage und Grunderwerbsteuer. Eine falsch verstandene
+Straße macht aus vier richtigen Abrufen vier falsche, und keiner meldet einen
+Fehler — die Nachbarstadt hat auch Marktdaten.
+
+### Ein Tageslimit, nicht zwei
+
+`ai.js` exportiert den Co-Pilot-Zähler als `copilotKontingent`. Mit einem
+eigenen Zähler könnte ein Nutzer **beide** ausschöpfen — bei `free` also 20
+statt 10 Antworten.
+
+### Felder ändern: angeboten, nie still ausgeführt
+
+> Eine Änderung an einem belegten Feld wird nie still gemacht. Gefragt wird
+> mit **beiden** Werten im Satz („Zimmer steht auf 3, du willst 5"), und ohne
+> Antwort passiert nichts.
+
+Unbekannte Feld-Ids werden **genannt**, nicht still verworfen — genau diese
+stille Verwerfung war der teure Fehler bei `/bmf/aufteilung`.
+
+### Gemessen statt angenommen
+
+- `copilotChat` gibt **`reply`** zurück. Mein erster Entwurf las
+  `message || text || answer` und hätte bei **jeder** Antwort „keine Antwort
+  bekommen" gemeldet, ohne dass ein Fehler aufgetreten wäre.
+- Die öffentliche Adresse steht als `APP_URL` im Container, nicht als
+  `PUBLIC_API_URL`.
+- Objektzuordnung gegen die echte Liste: „musterstrasse 12" → eindeutig,
+  „parkstr 9" → eindeutig (5 Punkte, die Hausnummer wiegt), „leipzig" →
+  **mehrdeutig, 2 Kandidaten** (der Bot fragt nach). Gegentests: reine
+  Straßenwörter und „str" allein treffen **nichts**.
+
+### Rest
+
+- **Marktpreisindikation über den Bot** — der `<<<ABRUF>>>`-Weg steht im
+  Co-Piloten, kostet aber Guthaben und braucht eine Kostenansage im Chat.
+  Noch nicht angeschlossen.
+- `req.apiKey.scopes` wird gesetzt, aber nirgends ausgewertet.
+- Der Spiegel ist nur so frisch wie der letzte Browser-Besuch. Das ist
+  benannt, nicht behoben — ein serverseitiger Rechenweg wäre die verbotene
+  zweite Quelle.
