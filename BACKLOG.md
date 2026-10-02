@@ -819,13 +819,85 @@ Erst Anlauf 4 prüft auch, **ob die Tour überhaupt noch offen ist** — ohne
 das meldet ein Läufer nach einem Abbruch lauter Fehler, die seine eigenen
 sind.
 
+#### Nachtrag 02.10.2026 · Standardansicht und zweiter Zweig gemessen
+
+**B5 · In der STANDARDANSICHT hängt die Tour schon bei Schritt 3.** Das ist
+die Ansicht, die ein neuer Kunde als erstes sieht.
+
+```
+Titel         "Neues Objekt? Quick-Boarding!"  (Schritt 3, die Verzweigung)
+
+Zweig A  Knopf "Quick-Boarding Schritt fuer Schritt ansehen"  -> nichts
+Zweig B  Knopf "Ueberspringen - weiter zur PRE-FLIGHT-Karte"  -> nichts
+direkt   DpTour.goto("qb-score")                              -> nichts
+
+JavaScript-Fehler dabei: keine.
+```
+
+**Damit ist auch der zweite Zweig geprüft** — beide führen ins Leere.
+
+#### Die Ursache steht in der Konsole, und sie erklärt B1 bis B5
+
+```
+[DpTour V239] Element nicht gefunden:
+   #sb-actions-accordion .sb-act-accent[onclick*="quickcheck"] ... (Step 3)
+   #obj-action-bar, .obj-action-bar  (Step 8, 10, 12, 13, 14, 16)
+   #obj-action-bar, .tab[data-target-sec="s0"]  (Step 17)
+   .tab[data-target-sec="s0"]  (Step 18)
+   #bc-stress  (Step 25)
+```
+
+**Nachgemessen, und das ist der Punkt:**
+
+```
+Schritt 3 Ziel      1 im DOM, 0 sichtbar
+das Akkordeon       1 im DOM, 0 sichtbar
+Schritt 8-18 Ziel   1 im DOM, 0 sichtbar
+Schritt 25 Ziel     1 im DOM, 0 sichtbar
+Tab s0              1 im DOM, 0 sichtbar
+```
+
+**Alle Ziele sind da — und keines ist sichtbar.** Die Tour-Engine meldet
+„Element nicht gefunden", obwohl sie es findet; was fehlt, ist die
+Sichtbarkeit.
+
+> Genau dieser Fehler steht weiter oben in diesem Punkt schon einmal: am
+> 30.09. hatte ich „36 von 37 Zielen" gemeldet, weil ich `querySelector`
+> gegen null geprüft hatte statt gegen die Sichtbarkeit. **Die Tour-Engine
+> macht denselben Fehler** — nur meldet sie ihn als „nicht gefunden" und
+> bleibt dann stehen.
+
+**Das Bild sagt es am deutlichsten:** bei Schritt 26 („Stress-Test") steht
+die Blase über einer **vollständig leeren Fläche**. Die Tour erklärt etwas,
+das auf dem Bildschirm nicht existiert.
+
+#### Ergebnis je Ansicht — vollständig
+
+| Ansicht | gemessen | ok | Spot außerhalb | kein Spot | hängt bei |
+|---|---:|---:|---:|---:|---|
+| Tower (`v2b`) | 11 | 5 | 3 | 3 | — |
+| Aktenmappe (`v1b`) | 11 | 5 | 3 | 3 | — |
+| Kanzlei (`v2`) | 6 | — | 3 | — | **Schritt 6** |
+| Standard (Heute) | 3 | 2 | — | — | **Schritt 3** |
+
+**Die Standardansicht ist der schwerste Fall:** dort kommt ein neuer Kunde
+über Schritt 3 nicht hinaus, und das ist der erste Rundgang, den er sieht.
+
+#### Zu entscheiden
+
+1. **Soll ich die Sichtbarkeit zur Bedingung machen?** Die Tour-Engine
+   müsste ihr Ziel nicht nur finden, sondern öffnen (Akkordeon, Tab,
+   Schiene) — und wenn das nicht geht, den Schritt **überspringen statt
+   stehenzubleiben**. Ein Rundgang, der hängt, ist schlimmer als einer, der
+   eine Station auslässt.
+2. **Oder sollen die betroffenen Schritte in der Standardansicht ganz
+   entfallen?** Dann wird die Tour dort kürzer, aber sie läuft.
+
 #### Offen
 
-- **Standardansicht (Heute)** noch nicht gefahren.
-- **Der zweite Zweig** jeder Verzweigung (Schritt 3, 35, 36).
-- **Die Ursache von B1** (Spot auf dem Container statt auf dem Unterziel)
-  und **B2** (kein Spot auf `s6`) ist noch nicht im Code gesucht.
-- **B3 ist der dringendste** — dort bleibt ein echter Nutzer stecken.
+- Die **Ursache**, warum die Ziele unsichtbar sind (Akkordeon zu? Tab nicht
+   aktiv? Schiene eingeklappt?), ist noch nicht im Code gesucht.
+- `tour-engine.js` trägt noch den Cache-Buster `v1747b`.
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen

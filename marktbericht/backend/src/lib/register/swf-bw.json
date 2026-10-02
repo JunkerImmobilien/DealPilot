@@ -99,7 +99,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -186,7 +192,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -273,7 +285,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -354,7 +372,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -474,7 +498,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -594,7 +624,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -714,7 +750,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -834,7 +876,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -954,7 +1002,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -1074,7 +1128,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -1194,7 +1254,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -1314,7 +1380,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  },
  {
@@ -1434,7 +1506,13 @@
    "quelle_erreichbar": false,
    "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
    "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
-   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "nachzutragen": "Datum, Aussteller und Aktenzeichen der Genehmigung - ohne sie steht die Befugnis nur im Chatverlauf und ist fuer einen Pruefer nicht da.",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten."
   }
  }
 ]

@@ -33,6 +33,31 @@
 
   // ─── Helpers ─────────────────────────────────────────────────────────
 
+  /* ═══ v1774 · querySelector NIMMT DEN ERSTEN, NICHT DEN SICHTBAREN ═══
+
+     Hier stand `document.querySelector(selectors[i])` — ein Treffer je
+     Teilselektor. Ist ausgerechnet der erste unsichtbar, gab die Suche
+     auf, OBWOHL ein spaeterer Treffer desselben Selektors sichtbar war.
+
+     Gemessen am 02.10.2026 in der Standardansicht, nachdem die Tour dort
+     bei Schritt 3 haengen blieb:
+
+       Schritt 3 Ziel      1 im DOM, 0 sichtbar
+       das Akkordeon       1 im DOM, 0 sichtbar
+       Schritt 8-18 Ziel   1 im DOM, 0 sichtbar
+       Schritt 25 Ziel     1 im DOM, 0 sichtbar
+
+     Die Konsole meldete dazu "Element nicht gefunden" — und das ist der
+     irrefuehrende Teil: gefunden wurde es, nur nicht sichtbar.
+
+     > Genau dieser Fehler steht im Backlog unter T1 schon einmal, als
+     > MEINER: am 30.09. hatte ich "36 von 37 Zielen in allen vier
+     > Ansichten" gemeldet, weil ich `querySelector` gegen null geprueft
+     > hatte statt gegen die Sichtbarkeit. In `#sb-list` liegen in drei
+     > Ansichten 0x0-Huellen.
+
+     Jetzt wird JEDER Treffer geprueft, nicht nur der erste. Das kostet
+     nichts: `querySelectorAll` laeuft ohnehin ueber dieselbe Liste. */
   function _findElementWithRetry(selector, retries, intervalMs) {
     return new Promise(function(resolve) {
       var attempts = 0;
@@ -40,8 +65,10 @@
         var selectors = selector.split(',').map(function(s) { return s.trim(); });
         for (var i = 0; i < selectors.length; i++) {
           try {
-            var el = document.querySelector(selectors[i]);
-            if (el && _isVisible(el)) return resolve(el);
+            var alle = document.querySelectorAll(selectors[i]);
+            for (var k = 0; k < alle.length; k++) {
+              if (_isVisible(alle[k])) return resolve(alle[k]);
+            }
           } catch(e) {}
         }
         attempts++;
@@ -856,7 +883,19 @@
       });
       _pEl.then(function(el) {
         if (!el) {
-          console.warn('[DpTour V239] Element nicht gefunden: ' + step.selector + ' (Step ' + (state.idx + 1) + ')');
+          /* v1774: "nicht gefunden" war die falsche Auskunft - meist IST
+             das Element da und nur unsichtbar. Wer der alten Meldung
+             folgte, suchte einen Tippfehler im Selektor statt eine
+             zugeklappte Schiene. */
+          var _imDom = 0;
+          try {
+            step.selector.split(',').forEach(function (t) {
+              try { _imDom += document.querySelectorAll(t.trim()).length; } catch (e) {}
+            });
+          } catch (e) {}
+          console.warn('[DpTour v1774] Kein SICHTBARES Ziel: ' + step.selector
+            + ' (Step ' + (state.idx + 1) + ') — ' + _imDom + ' Treffer im DOM, '
+            + (_imDom ? 'keiner davon sichtbar' : 'auch keiner im DOM'));
           if (step.placement === 'center') {
             _createOverlay();
             _hideSpotlight();
