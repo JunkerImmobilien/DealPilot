@@ -27872,3 +27872,187 @@ Danach: *„Von deinen 21 Objekten haben 21 einen Marktbericht."*
 - Sicherung vor dem Eingriff:
   `/root/backups/mb-vor-migration-015-20261002-0517.sql.gz`, 1,9 MB,
   enthält alle drei Tabellen, angesehen.
+
+---
+
+## v1770–v1775 · Der Rundgang, die Investortypen und ein Wächter für die Ernte
+
+### v1770 · Der Investortyp-Default war ein toter Schlüssel (U8)
+
+`v1749` hatte die Liste richtig gemacht: `_profile()` liest
+`DealScore2.getPresets()`, die sechs Schlüssel stimmen, `setActivePreset()`
+wird gerufen. **Ein Rest blieb, und er war der schlimmere Teil.**
+
+```
+DealScore2.getPresets()    6 Profile
+                           balanced · conservative · optimistic ·
+                           lage · cashflow · sicherheit
+Default im Setup           "ausgewogen"
+in der Liste enthalten     NEIN
+```
+
+`_profile().filter(x => x.id === "ausgewogen")` ergibt `undefined`, `if (t)`
+ist falsch — **wer das Profil-Fenster ohne Klick durchlief, bekam weder
+Finanzierungsgrenzen noch ein Score-Profil.** Die Kachel „Ausgewogen" war
+dabei nie markiert.
+
+> v1749 hat die Liste richtig gemacht und den Default vergessen. Eine halbe
+> Umstellung ist schwerer zu finden als keine: die Kacheln stimmen, also
+> sieht alles richtig aus.
+
+`_typDefault()` holt ihn jetzt **aus** der Liste. Dazu ein Wächter an der
+Schreibstelle: ein unbekannter Schlüssel fällt auf das erste Profil zurück
+**und meldet sich**.
+
+> Ein Rückfall ohne Hinweis ist eine zweite Tarnung für denselben Fehler.
+
+**Abgenommen:** Merker gelöscht, ohne Kachelklick auf „Fertig" →
+`dp_dealscore2_preset` steht auf `balanced`.
+
+### v1771 · Der Ernte-Wächter (E5)
+
+Im Backlog stand „Es wird nichts automatisch geerntet". Im Container
+gegengeprüft: `mb.etl_runs` ist **leer**, `mb.param_lauf` führt 18 Läufe,
+alle von Hand.
+
+`tools/ernte-waechter.mjs` sagt, **wo** nachzuernten ist — er erntet nicht.
+Das steht so im Dateikopf begründet: der Prüfmaßstab ist das
+Anwendungsbeispiel des amtlichen Dokuments, und ein Automat hat es nicht
+nachgerechnet. Er würde eine Herkunft behaupten.
+
+```
+DECKUNG   36 von 36 Dateien = 100 % · 2.573 Saetze
+          168 Ausschuesse · 105 Quellen · Abbruch unter 90 %
+ALTER     2018 -> 1 · 2019 -> 1 · 2022 -> 2 · 2024 -> 74
+          2025 -> 35 · 2026 -> 55     81 von 168 faellig
+QUELLEN   96 erreichbar · 1 TOTFUND · 8 nicht erreichbar     RC=1
+```
+
+**Der Totfund ist der wichtige Befund:** LVermGeo Sachsen-Anhalt antwortet
+mit HTTP 200 und `text/html`, 380.913 Bytes — wo ein PDF stehen soll.
+Derselbe Fall wie Thüringen.
+
+> HTTP 200 allein beweist nichts — darum stehen `content-type` und
+> `-length` im Protokoll.
+
+Rückgabewert 1 nur bei **defekter** Quelle; ein fälliger Jahrgang ist gelb.
+Sonst wäre der Wächter jedes Frühjahr rot und würde nicht gelesen.
+
+### v1772–v1775 · Der Rundgang
+
+**Marcel hat das Fenster nach vorne geholt** — damit war die Messung
+überhaupt erst möglich:
+
+```
+hinten  1.000 ms angefordert -> 19.612 ms   Faktor 19,6
+vorne   1.000 ms angefordert ->  1.097 ms   Faktor 1,1
+```
+
+#### Vier Läufer-Anläufe, drei davon maßen sich selbst
+
+| Anlauf | Ergebnis | was wirklich los war |
+|---|---|---|
+| 1 | „3 von 38 ok" | `goto()` sprang auf eine **beendete** Tour — danach gab es gar keinen Spot |
+| 2 | „4 von 38 ok" | lief nach **eigenem Index**; die Tour verzweigt, der Titel passte bei 3 von 6 Proben nicht |
+| 3 | „53× hängt" | taktete blind und rief `next()`, **während die Blase noch wechselte** — die Tour sprang von 2 auf 5 |
+| 4 | tragfähig | wartet auf den **Titelwechsel**, liest den Schritt aus der Blase, bedient Verzweigungen |
+
+> Ein Prüfer, der sein Prüfobjekt nicht kennt, misst sich selbst. Das ist an
+> einem Tag dreimal passiert, und jedes Mal sah das Ergebnis wie ein Befund
+> aus.
+
+#### v1774 · Die Ursache des Hängers war ein `querySelector`
+
+```
+  var el = document.querySelector(selectors[i]);
+  if (el && _isVisible(el)) return resolve(el);      // <- gibt auf
+```
+
+**Einen** Treffer je Teilselektor. Ist ausgerechnet der erste unsichtbar, gab
+die Suche auf, obwohl ein späterer sichtbar war. Gemessen in der
+Standardansicht: alle Ziele **1 im DOM, 0 sichtbar**.
+
+> **Genau dieser Fehler steht im Backlog unter T1 schon einmal — als
+> meiner.** Am 30.09. hatte ich „36 von 37 Zielen" gemeldet, weil ich gegen
+> null geprüft hatte statt gegen die Sichtbarkeit. Die Engine machte
+> denselben Fehler, nur meldete sie ihn als „Element nicht gefunden" — wer
+> dem folgte, suchte einen Tippfehler statt einer zugeklappten Schiene.
+
+**Nachgemessen, frisch geladen:**
+
+```
+Standardansicht - vorher Haenger bei Schritt 3:
+   3,0 s  Willkommen bei DealPilot
+   4,8 s  Objekt auswaehlen
+   9,9 s  Neues Objekt? Quick-Boarding!   <- hier stand sie 42 s still
+  13,9 s  Quick-Boarding Score
+  20,8 s  Als Objekt speichern
+  24,0 s  PRE-FLIGHT
+  27,2 s  Import aus Exposes
+
+Kanzlei (v2) - vorher Haenger bei Schritt 6: laeuft ebenfalls durch.
+```
+
+Vorher bewegten dort **weder** der echte Knopf **noch** beide Zweige der
+Verzweigung **noch** `DpTour.goto()` etwas — 42 Sekunden beobachtet.
+
+#### v1775 · Der Spot war höher als der Bildschirm
+
+```
+Spot      l 420 · t 63 · w 1296 · h 2216
+Fenster                            h  988
+Spot-Mitte y = 1171  ->  183 px UNTER dem sichtbaren Bereich
+```
+
+Die drei Quick-Boarding-Schritte zeigen auf `#qc-tab-host, #s-quick` — einen
+Behälter, der viel höher ist als das Fenster.
+
+> Ein Rahmen, der größer ist als das Bild, hebt nichts hervor. Er färbt nur
+> alles andere dunkel.
+
+`_beschneideAufSicht()` deckelt den Spot auf den sichtbaren Teil. Liegt das
+Ziel **ganz** außerhalb, bleibt er unverändert — dann hat der Aufrufer nicht
+gescrollt, und ein auf 0×0 geschrumpfter Spot würde das nur verdecken.
+
+### Die Ernte in diesem Durchgang
+
+| Land | vorher | nachher | Quelle |
+|---|---:|---:|---|
+| SH | 0 Zins | **12** | Lübeck, Herzogtum Lauenburg, Ostholstein |
+| RP | 0 Zins | **6** | Mainz, GMB 2025 |
+
+**E4 ist überholt:** „Rheinland-Pfalz — Daten nicht frei verfügbar" galt für
+den LANDESbericht. Mainz veröffentlicht den vollen GMB 2025 kostenfrei und
+erlaubt die Wiedergabe ausdrücklich.
+
+**Nachgerechnet:** Mainz **13 von 13** Zeilen Ziffer für Ziffer gegen das
+Detailkapitel — Mittelwert, Streuung und Fallzahl. SH hat kein
+Anwendungsbeispiel; stattdessen schließt die abgedruckte Formel bei 20 %
+Bewirtschaftungskosten in allen zwölf Teilmärkten.
+
+### Der Lizenzkonflikt in `swf-bw.json`
+
+13 Sätze trugen „Wiedergabe mit Quellenangabe" — das Heilbronner Impressum
+sagt „Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit
+Genehmigung." Beide `quelle_url` sind **tot** (HTTP 404, mit dem neuen
+Wächter gemessen).
+
+Die Sätze wurden **weder gelöscht noch stillschweigend behalten**: jeder
+trägt den Konflikt mit Messdatum und Folge.
+
+> Eine stille Löschung wäre genauso falsch wie ein stilles Weiterverwenden —
+> die eine verliert Daten, die andere behauptet eine Erlaubnis.
+
+**Marcel am 02.10.2026: „ich habe eine lizenz schriftlich bekommen"** — und
+auf Nachfrage: sie umfasst den **ganzen Bericht**. Der Konflikt bleibt als
+Chronik stehen und ist auf „GEKLÄRT" gesetzt; ein getilgter Befund ist für
+einen Prüfer dasselbe wie ein nie erhobener. **Nachzutragen bleiben Datum,
+Aussteller und Aktenzeichen** — sonst steht die Befugnis nur im Chatverlauf.
+
+### Rest
+
+- **B2** offen: bei Investor Deal Score, Bewertungs-Cockpit und Stress-Test
+  erscheint die Blase ohne jede Markierung.
+- **Die drei Finanzierungsgrenzen** für Lage-Fokus, Cashflow-Fokus und
+  Sicherheit sind abgeleitet, nicht gemessen. Marcel gibt eigene Zahlen.
+- **Heilbronn und Ulm** werden jetzt vollständig geerntet.
