@@ -151,6 +151,34 @@ if ($offen) {
 }
 Write-Host "   [ok] Arbeitsverzeichnis sauber"
 
+# --- 3b) Sind die abgeleiteten Frontend-Konstanten noch aktuell? ------
+#
+# `backend/src/generated/frontend-konstanten.json` wird aus den
+# FRONTEND-Dateien erzeugt (voice-import.js ETAPPEN/RFRAGEN,
+# objektart-felder.js ARTEN, storage.js FIELDS, index.html). Der
+# Telegram-Bot fuehrt seine Schritt-fuer-Schritt-Anlage daraus.
+#
+#   > Eine Ableitung, die niemand nachzieht, ist nach der ersten Aenderung
+#   > eine Kopie - und zwar eine veraltete. Dann fragt der Bot nach einem
+#   > Feld, das es nicht mehr gibt, und nennt es beim alten Namen.
+#
+# Der Pruefer vergleicht die Pruefsumme jeder Quelldatei. Er bricht ab,
+# statt zu warnen: eine Warnung im Deploy liest nach dem dritten Mal
+# niemand mehr.
+if (Test-Path "tools\frontend-konstanten.mjs") {
+    $null = node tools/frontend-konstanten.mjs --pruefen 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        node tools/frontend-konstanten.mjs --pruefen
+        Write-Host ""
+        Write-Host "ABBRUCH: die abgeleiteten Frontend-Konstanten sind veraltet." -ForegroundColor Red
+        Write-Host "         node tools/frontend-konstanten.mjs" -ForegroundColor Yellow
+        Write-Host "         danach die geaenderte JSON mitcommitten." -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
+    }
+    Write-Host "   [ok] Frontend-Konstanten aktuell"
+}
+
 # --- 4) Was geht raus? ------------------------------------------------
 git fetch origin $ZWEIG --quiet
 PruefeExit "git fetch"
