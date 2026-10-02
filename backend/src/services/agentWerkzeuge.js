@@ -31,6 +31,7 @@ const { query } = require('../db/pool');
 const dialog = require('./telegramDialogService');
 const fuehrung = require('./fuehrungService');
 const markt = require('./telegramMarktService');
+const objectService = require('./objectService');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
 
@@ -216,9 +217,24 @@ async function objekt_anlegen(ctx, args) {
     return { ok: false, unbekannte_felder: unbekannt,
       hinweis: 'Keine verwertbaren Felder. Frag nach Adresse, Objektart und Flaeche.' };
   }
-  const r = await query(
-    `INSERT INTO objects (user_id, data) VALUES ($1, $2::jsonb) RETURNING id`,
-    [ctx.userId, JSON.stringify(sauber)]);
+  /* ── v1804 · NICHT SELBST INSERTEN ───────────────────────────────────
+   *
+   * Hier stand ein direktes `INSERT INTO objects (user_id, data)`. Das
+   * schlug fehl: `objects.name` ist NOT NULL, und der Name entsteht nicht
+   * im Datensatz, sondern in `extractSummary` aus Strasse, Hausnummer und
+   * Ort. Dazu vergibt `create` atomar eine Sequenznummer und schreibt
+   * die Summenspalten (bmy, cf_ns, dscr, kaufpreis).
+   *
+   * GEMESSEN am 02.10.2026: der Bot konnte KEIN Objekt anlegen —
+   * "null value in column name violates not-null constraint".
+   *
+   *   > Wer an einer Tabelle vorbei einfuegt, an der ein Dienst haengt,
+   *   > uebernimmt dessen ganze Arbeit — und merkt erst an der ersten
+   *   > Spalte, dass es welche gab. */
+  const erstellt = await objectService.create(ctx.userId, {
+    data: sauber, aiAnalysis: null, photos: []
+  });
+  const r = { rows: [{ id: erstellt.id }] };
   ctx.merkeObjekt(r.rows[0].id);
   const fo = fuehrung.fortschritt(sauber);
   const offen = fuehrung.luecken(sauber, { modus: 'anlegen' }).slice(0, 3);

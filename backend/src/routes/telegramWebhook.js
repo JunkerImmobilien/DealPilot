@@ -41,6 +41,7 @@ const openai = require('../services/openaiService');
 const { copilotKontingent } = require('./ai');
 const markt = require('../services/telegramMarktService');
 const agent = require('../services/agentLauf');
+const objectService = require('../services/objectService');
 
 const TG = 'https://api.telegram.org/bot';
 const PROVIDER = 'telegram';
@@ -224,9 +225,15 @@ async function anlageAbschliessen(token, chatId, userId, entwurf) {
     await senden(token, chatId, 'Ich habe noch nichts, was ich anlegen könnte.');
     return null;
   }
-  const r = await query(
-    `INSERT INTO objects (user_id, data) VALUES ($1, $2::jsonb) RETURNING id`,
-    [userId, JSON.stringify(sauber)]);
+  /* v1804 · Ueber objectService.create, nicht per eigenem INSERT.
+     `objects.name` ist NOT NULL und entsteht in `extractSummary` aus
+     Strasse, Hausnummer und Ort; dazu vergibt `create` atomar die
+     Sequenznummer und fuellt die Summenspalten. Gemessen: der eigene
+     INSERT scheiterte mit "null value in column name". */
+  const erstellt = await objectService.create(userId, {
+    data: sauber, aiAnalysis: null, photos: []
+  });
+  const r = { rows: [{ id: erstellt.id }] };
   await zustandLoeschen(chatId, userId);
   await objektMerken(chatId, userId, r.rows[0].id);
   const fo = fuehrung.fortschritt(sauber);
