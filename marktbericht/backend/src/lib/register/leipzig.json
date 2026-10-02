@@ -16,9 +16,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_altbau_rnd20_24",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 0.6,
-   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 20 bis 24 Jahre"
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 20 bis 24 Jahre",
+   "wert": 0.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -70,9 +74,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_altbau_rnd25_34",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 1.4,
-   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 25 bis 34 Jahre"
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer 25 bis 34 Jahre",
+   "wert": 1.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -124,9 +132,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_altbau_rnd35plus",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.4,
-   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 35 Jahre"
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 35 Jahre",
+   "wert": 2.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -178,9 +190,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_ab1991",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.2,
-   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, Baujahre ab 1991, gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 20 Jahre"
+   "bezeichnung": "Mehrfamilienhaus Wiederverkauf, Baujahre ab 1991, gewerblicher Mietflächenanteil unter 20 %, Restnutzungsdauer ab 20 Jahre",
+   "wert": 2.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -232,9 +248,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_altbau",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 3.5,
-   "bezeichnung": "Wohn- und Geschäftshaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Flächenanteil ab 20 %, Restnutzungsdauer ab 20 Jahre"
+   "bezeichnung": "Wohn- und Geschäftshaus Wiederverkauf, sanierter Altbau (Bj vor 1991), gewerblicher Flächenanteil ab 20 %, Restnutzungsdauer ab 20 Jahre",
+   "wert": 3.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -286,9 +306,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw_altbau_rnd20_34",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 1.9,
-   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 20 bis 34 Jahre"
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 20 bis 34 Jahre",
+   "wert": 1.9,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -341,9 +365,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw_altbau_rnd35_49",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.1,
-   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 35 bis 49 Jahre"
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer 35 bis 49 Jahre",
+   "wert": 2.1,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -396,9 +424,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw_altbau_rnd50plus",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.3,
-   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer ab 50 Jahre"
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, sanierter Altbau (Bj vor 1991), Restnutzungsdauer ab 50 Jahre",
+   "wert": 2.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -451,9 +483,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw_ab1991_rnd40_59",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.2,
-   "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer 40 bis 59 Jahre"
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer 40 bis 59 Jahre",
+   "wert": 2.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -506,9 +542,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw_ab1991_rnd60plus",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.1,
-   "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer ab 60 Jahre"
+   "bezeichnung": "Eigentumswohnung Wiederverkauf, Baujahre nach 1990, Restnutzungsdauer ab 60 Jahre",
+   "wert": 2.1,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {

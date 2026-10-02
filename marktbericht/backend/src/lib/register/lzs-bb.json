@@ -8,9 +8,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_bu",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 3.2,
-   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)"
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 3.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -71,9 +75,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_wm",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 3.5,
-   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)"
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 3.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -130,9 +138,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_kf",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.8,
-   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)"
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 2.8,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -193,9 +205,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_bu",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 3.7,
-   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)"
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 3.7,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -252,9 +268,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_wm",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 4.6,
-   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)"
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 4.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -315,9 +335,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_kf",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 3.4,
-   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)"
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 3.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -374,9 +398,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gh_land",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 4.5,
-   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)"
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 4.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -437,9 +465,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gh_bu",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 4.3,
-   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)"
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 4.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -496,9 +528,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gh_wm",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 5.3,
-   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)"
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 5.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -555,9 +591,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "indwb_bu",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.4,
-   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)"
+   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "wert": 2.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -618,9 +658,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "indwb_wm",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.9,
-   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)"
+   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "wert": 2.9,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -681,9 +725,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_bu",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 2.5,
-   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)"
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 2.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -744,9 +792,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_wm",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 3.2,
-   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)"
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 3.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -807,9 +859,13 @@
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_kf",
   "formel": {
-   "form": "festwert",
+   "form": "konstante",
    "wert_pct": 1.6,
-   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)"
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 1.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
   },
   "korrekturen": [],
   "modellansaetze": {
