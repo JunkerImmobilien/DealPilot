@@ -17636,7 +17636,7 @@ Blatt einen Wortlaut, den es amtlich nicht gibt.
 |---|---|---|
 | v1495 | `a92c79f` | Die Abschreibungstabelle erzwingt keinen Seitenwechsel mehr, sie haengt am Notarblatt. „Sofort abzugsfaehige Kosten" komplett raus (Abschnitt, Feld, Tabellenzeile, Ereignisbindung). Klauseltext: die Betraege als **vollstaendiger Satz** statt eingerueckter Liste — in einer Urkunde steht ein Satz, den man vorlesen kann. Der Satz zur Bindungswirkung ist kein Vertragstext mehr, sondern steht als Information darunter, normal statt kursiv. Ueberschrift „Möglicher Zusatz …" in Gold |
 | v1496 | `ebb9059` | **Erfundene Vorbelegungen im BMF-Modal.** Im HTML standen FESTE Beispielwerte: `ak_fahrt_km` **2.151**, `ak_fahrt` **817,44 €**, `ak_verpfl` **56,00 €**, `ak_hotel` **40,00 €** — bei JEDEM Objekt. Seit v1478 gehen die Fahrtkosten in die AfA-Bemessungsgrundlage ein: **die Aufteilung rechnete mit einer erfundenen Zahl, und das PDF druckte sie als Beleg.** Dieselbe Falle bei `ak_kp` (87.569,13), `ak_grest` (4.250,00), `ak_notar` (1.492,26) — die Vorbefuellung aus dem Objekt setzt sie nur bei einem Wert > 0, stand dort nichts, blieb der Beispielwert in der Summe. Alle geleert, Platzhalter statt Wert. Der Kilometersatz 0,38 bleibt, das ist eine echte Pauschale |
-| v1497 | `edbcf2a` | **Im ganzen PDF stand kein einziges Euro-Zeichen.** Ursache war die eigene Schutzzeile in `sauber()`: `[^ -ÿ]` wirft alles ausserhalb Latin-1 weg — und das Euro-Zeichen ist **U+20AC**, liegt also ausserhalb. Dass jsPDF es als WinAnsi-Byte 0x80 drucken KANN, half nichts; es kam nie dorthin. Jetzt bleiben die WinAnsi-Sonderzeichen stehen. Dazu: Grunderwerbsteuer, Notar, Grundbuch und Makler tragen den **hinterlegten** Satz in Klammern (nicht zurueckgerechnet), Stichtag bleibt leer |
+| v1497 | `edbcf2a` | **Im ganzen PDF stand kein einziges Euro-Zeichen.** Ursache war die eigene Schutzzeile in `sauber()`: `[^\x00-ÿ]` wirft alles ausserhalb Latin-1 weg — und das Euro-Zeichen ist **U+20AC**, liegt also ausserhalb. Dass jsPDF es als WinAnsi-Byte 0x80 drucken KANN, half nichts; es kam nie dorthin. Jetzt bleiben die WinAnsi-Sonderzeichen stehen. Dazu: Grunderwerbsteuer, Notar, Grundbuch und Makler tragen den **hinterlegten** Satz in Klammern (nicht zurueckgerechnet), Stichtag bleibt leer |
 
 **Nachweis am erzeugten PDF (pdf.js):** 4 Seiten · **68 Euro-Zeichen** (vorher 0) ·
 67 Umlaute, 0 verstuemmelt · „Grunderwerbsteuer (5,00 % vom Kaufpreis)", „Notar
@@ -28245,3 +28245,161 @@ Schritten im Backlog — die Zahlungsreihe mitspeichern, die REIHEN addieren,
 - **Schritt 24** der Tour, **Kanzlei und Tower** nicht fertig gemessen.
 - **Die BW-Genehmigung** braucht Datum, Aussteller und Aktenzeichen.
 - **„Die Grenzen müssen überall greifen"** — gemessen ist ein Leser.
+
+---
+
+## Rollout-Journal 02.10.2026 — v1789/v1790: der Notnagel, der den Defekt überlebt hat
+
+**Was** · Schritt 24 der Tour (Stress-Test) sitzt, das Investment-PDF zeigt
+auf die Zeile statt auf ein Knöpfchen, und die 26 veralteten Felder in
+`mb.param_modell` sind nachgezogen. Dazu ein Nullbyte aus dieser Datei
+entfernt.
+
+**Commit** · `5254d66` (v1789, Tour) · `3932b48` (v1790, Register-Repository)
+
+### Vier Anläufe am falschen Ende — die Ursache stand als Kommentar daneben
+
+Schritt 24 war seit v1744 der einzige Fehler von 36. Zweimal habe ich das
+Scrollen repariert (v1782, v1782b) und beide Male zurückgenommen. Gemessen
+am 02.10.2026 auf Staging war die Ursache eine andere:
+
+| | |
+|---|---|
+| behauptet (v1744) | „`#bc-stress` ist ein völlig leerer div (0 Kinder)" |
+| gemessen (02.10.) | **1280 × 883 px, 1 Kind** — `.bc-head` „Stress-Test · DSCR-Resilienz", `.bc-body` 746 px Matrix |
+
+Weil das Ziel angeblich leer war, stand dort ein Ersatz
+(`subTargets: ['Stress']`). Der traf per `_findByText` den **kürzesten**
+Knoten mit dem Wort — gemessen vier Kandidaten, der kürzeste ein Chip von
+**29 × 16 px**. Und weil `_applySubHl` 420 ms **nach** dem Spot läuft und
+auf sein Unterziel scrollt, wanderte das Bild unter dem fertig gesetzten
+Rahmen weg.
+
+> Repariert gehörte nicht das Scrollen, sondern der Grund, warum überhaupt
+> ein zweites Mal gescrollt wurde: ein Ersatzziel für ein Ziel, das es
+> längst wieder gibt. **Ein Notnagel, den niemand nachmisst, überlebt den
+> Defekt, gegen den er gebaut wurde — und wird selbst zu einem.**
+
+Der Cockpit-Schritt eine Zeile höher trug denselben Ersatz mit derselben
+falschen Begründung („`#bc-cockpit` ist im Tab 0×0"; gemessen 1280 × 628).
+Beide standen auf `placement: 'center'`, was dem leeren Ziel galt.
+
+**Nachweis** (nach dem Ausrollen im Browser gemessen):
+
+| Schritt | Spot deckt Ziel | im Bild |
+|---|---:|---|
+| 23 Bewertungs-Cockpit | **100 %** | ja |
+| 24 Stress-Test | **72 %** (unten beschnitten) | ja — Überschrift und ganze DSCR-Matrix |
+| 33 Investment-PDF | **100 %** | ja |
+
+### Das Investment-PDF traf — aber zu klein
+
+Der Selektor fand genau ein Element: den Knopf „PDF", **82 × 39 px**,
+zwischen fünf gleich aussehenden Geschwistern (`.dab-doc-btn` gibt es
+sechsmal, der erste heißt „Fassung"). Der Tour-Text davor sagt „unter
+Ausgabe steht das bank-fertige Investment-PDF" — gerahmt wurde ein
+Knöpfchen ohne Beschriftung.
+
+> Ein Spot ist eine Antwort auf „wo?". Ein 82-px-Knopf ohne seine Zeile
+> beantwortet die Frage nicht — der Name der Sache steht daneben, und
+> genau der fällt aus dem Rahmen.
+
+Jetzt `.dab-doc-row` (1240 × 73) per `:has()`, mit dem Knopf als Rückfall;
+`_findElementWithRetry` splittet bei Komma und probiert jeden Teil einzeln
+in `try/catch`.
+
+### Die Ernte ist vollständig in der Datenbank — die Herkunft war es nicht
+
+Marcels Auftrag: „stelle sicher dass auch alle werte die du geerntet hast
+in der datenbank sind." Beide Wege unabhängig gemessen:
+
+```
+JSON-Register (ladeSaat)   2655 Sätze, 34 Dateien, vermisst []
+mb.param_modell            2655 Zeilen
+Differenz                     0  ·  keine Karteileiche
+```
+
+Gegentest zum Nullbefund: ein Schlüssel künstlich verbogen — der Prüfer
+meldet sofort je 1. Die Null ist ein Befund, kein ausgefallenes Werkzeug.
+
+**Ein Schlüsselvergleich sagt aber nur, dass die Zeile existiert.** Deshalb
+zusätzlich alle 15 Nutzspalten jeder Zeile inhaltlich verglichen —
+**39.825 Feldvergleiche**:
+
+| Spalte | Befund |
+|---|---|
+| `ebene` | **24 Zeilen veraltet** — `lzs-nrw.json`, AGS 05562012/14/24: Datei sagt `gaa`, Tabelle sagte `gemeinde` |
+| `gebiet_name` | **2 Zeilen veraltet** — die beiden in v1787 umbenannten Dresdner Sätze |
+| die 13 übrigen | 2655 von 2655 identisch |
+
+**Keine Zahl war betroffen** — `formel` ist überall deckungsgleich.
+
+Ursache in `param-repository.js`: das `ON CONFLICT … DO UPDATE SET` listet
+13 Spalten, aber nicht `ebene`, `gebiet_name`, `gaa_name`. Sie wurden nur
+beim INSERT geschrieben. **Das ist genau der Fehler, den der Kommentar
+v1752c eine Version höher für `quelle_parser`/`quellenvermerk`/`lizenz`
+beschreibt** — damals wurden drei Spalten nachgetragen und drei andere
+übersehen.
+
+Wirkung: `WertParameterService` schreibt die `ebene` in den Modellvermerk
+und in den Text „Wert der Ebene …". Für die Rechnung folgenlos, für die
+Auskunft nicht.
+
+> Eine Herkunftsangabe, die nicht stimmt, behauptet eine Herkunft. Das ist
+> schlimmer als eine fehlende — die fehlende sieht man.
+
+**Nachweis nach Rebuild und Saatlauf auf Staging** (DB vorher gesichert,
+2,1 MB, 25 Tabellen, Anfang angesehen):
+
+```
+ebene gaa        24  ->  48      gemeinde  1595 -> 1571
+Dresden          alle sechs Sätze tragen "Dresden, Landeshauptstadt"
+SOLL = IST       2655 eingeliefert, 2655 in der Tabelle
+```
+
+### Ein Nullbyte hat diese Datei für jede Suche unsichtbar gemacht
+
+`grep` meldete auf `projektanweisung-hauptapp.md` nur noch
+**„Binary file matches"** statt der Treffer — wegen **eines einzigen
+NUL-Bytes** in 1.361.491. Es stand in der Beschreibung einer
+Regex-Zeichenklasse: gemeint war der Text `\x00`, geschrieben wurde das
+Byte selbst (Zeile 17639, Eintrag v1497 — ausgerechnet der über
+Zeichensatz-Fallen).
+
+Ersetzt, +3 Bytes. `grep -c "Rollout-Journal"` findet wieder **134**
+Treffer statt gar keiner.
+
+> Eine Datei, die jede Suche still mit null Treffern beantwortet, ist
+> schlimmer als eine fehlende. Wer hier nachschlug, bekam „nicht
+> gefunden" — und das stimmte nie.
+
+### Werkzeugfallen, die elf Prüfanläufe gekostet haben
+
+1. **`DpTour.goto(x)` nimmt eine `step.id` (Zeichenkette), nie einen
+   Index.** Bei einer Zahl findet es nichts und fällt auf `Tour.next()`
+   durch — der Prüfer ging also immer genau **einen** Schritt weiter und
+   „klemmte bei Schritt 2". Die laufende Liste ist außerdem
+   `DpTourVariants[withObjects|empty]` (38 bzw. 37 Schritte), **nicht**
+   `DpTourSteps`.
+2. **Der Spot wird nachgezogen.** Die Engine wartet auf Ruhe (bis 900 ms)
+   und setzt ihn erst dann. Wer nach ~500 ms Stillstand misst, sieht den
+   Spot des vorigen Schritts und hält ihn für falsch gesetzt. Genau das
+   war mein erster Messwert für alle drei Schritte.
+3. **Ein Backtick im Kommentar bricht den SQL-String.** Der v1790-Kommentar
+   steht **innerhalb** eines Template-Literals; der erste Anlauf machte die
+   Datei unlesbar. Deshalb trägt auch der v1752c-Kommentar darüber keine.
+   Steht jetzt als Warnung im Kommentar selbst.
+
+### Rest
+
+- **Kanzlei- und Tower-Ansicht** weiter nicht fertig gemessen.
+- **Vier MV-Ausschüsse** (Rostock, NWM, LRO, VG) anschreiben — alle
+  kostenfrei, alle genehmigungspflichtig.
+- **„Die Grenzen müssen überall greifen"** — gemessen ist weiterhin ein
+  Leser.
+- **`nutzungsrecht`, `auflagen`, `stufe_grund`, `fundstelle`** haben keine
+  Spalte in `param_modell` und erreichen die Datenbank nie. Die
+  BW-Genehmigung aus v1788 lebt deshalb nur in der Datei. Zu entscheiden,
+  ob sie Spalten brauchen.
+- **Telegram-Bot** (T-B1): Marcels Anforderung steht jetzt vollständig im
+  Backlog.
