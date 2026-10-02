@@ -288,23 +288,49 @@
     {
       tab: 's6',
       selector: '#bc-cockpit',
-      subTargets: ['Cockpit'],   /* v1744 · #bc-cockpit ist im Tab 0x0; ohne Fallback auf #s6 bleibt der Spotlight weg statt den ganzen Tab zu umfassen */
+      /* v1789 · Derselbe Notnagel wie beim Stress-Test, derselbe Befund:
+         hier stand `subTargets: ['Cockpit']`, weil "#bc-cockpit im Tab
+         0x0" sei. Gemessen am 02.10.2026: 1280 x 628 px, 1 Kind, Inhalt
+         "Bank-Cockpit · Risiko-Kennzahlen". Auch dieser Ersatz ist weg. */
       icon: 'i-gauge',
       title: 'Bewertungs-Cockpit',
       body: '**DSCR & LTV im 15-Jahres-Verlauf** — was die Bank zürst sieht.',
       bodyMore: '**DSCR (Schuldendienstdeckung):**\n• über 1,2 = solide\n• 1,0-1,2 = knapp\n• unter 1,0 = kritisch\n\n**LTV (Beleihungsauslauf):**\n• unter 85% = solide, beste Konditionen\n• 85-100% = erhöhter Zins\n• über 100% = Vollfinanzierung, schwierig\n\n**Wertpuffer:** Differenz Verkehrswert vs. Kaufpreis. Je grösser, desto mehr Sicherheit.\n\nDie Bank schaut sich zürst diese Zahlen an, bevor sie überhaupt das Objekt anschaut.',
-      placement: 'center'   /* v1744 · ohne Ziel mittig statt den ganzen Tab anleuchten */
+      placement: 'auto'   /* v1789 · war 'center' - das galt dem angeblich leeren Ziel. Die Karte ist da und wird gerahmt, also sitzt die Blase wieder daneben. */
     },
     
     {
       tab: 's6',
       selector: '#bc-stress',
-      subTargets: ['Stress'],   /* v1744 · #bc-stress ist ein voellig leerer div (0 Kinder) - gerahmt wird die sichtbare Stress-Kennzahl */
+      /* v1789 · HIER STAND `subTargets: ['Stress']` MIT DER BEGRUENDUNG
+         "#bc-stress ist ein voellig leerer div (0 Kinder)". GEMESSEN am
+         02.10.2026 auf Staging stimmt das nicht mehr:
+
+           #bc-stress   1280 x 883 px, 1 Kind (.bc-card)
+                        > .bc-head  "Stress-Test · DSCR-Resilienz"
+                        > .bc-body  746 px Szenarien-Matrix
+
+         Der Notnagel traf damit per _findByText den KUERZESTEN Knoten mit
+         dem Wort - ein Chip von 29 x 16 px irgendwo im Formular. Und weil
+         _applySubHl 420 ms NACH dem Spot laeuft und auf sein Unterziel
+         scrollt, wanderte das Bild unter dem fertig gesetzten Rahmen weg.
+         GENAU DAS war Schritt 24, vier Anlaeufe lang.
+
+         > Zweimal habe ich das Scrollen repariert (v1782, v1782b) und
+         > beide Male zurueckgenommen. Repariert gehoerte nicht das
+         > Scrollen, sondern der Grund, warum ueberhaupt ein zweites Mal
+         > gescrollt wurde: ein Ersatzziel fuer ein Ziel, das es laengst
+         > wieder gibt. Ein Notnagel, den niemand nachmisst, ueberlebt den
+         > Defekt, gegen den er gebaut wurde - und wird selbst zu einem.
+
+         Ohne subTargets laeuft _applySubHl gar nicht erst an. Der Spot
+         bleibt, wo _scrollIntoView ihn gesetzt hat, und die Karte passt
+         mit 883 px in den sichtbaren Bereich (gemessen 988 px). */
       icon: 'i-cpu',
       title: 'Stress-Test',
       body: 'Was passiert wenn **Zinsen steigen** oder **Miete ausfällt**? Der Stress-Test simuliert es.',
       bodyMore: 'Standard-Szenarien:\n\n• **Anschlusszins +2 Prozentpunkte** — was kostet das Darlehen in 10 Jahren?\n• **Mietausfall 3 Monate** — bleibt der Cashflow stabil?\n• **Leerstand 10 %** dauerhaft — kippt die Finanzierung?\n• **Marktwertverlust 15 %** — wie steht der LTV dann?\n\nFür jedes Szenario zeigt DealPilot den **neuen DSCR** und ob die Finanzierung weiter trägt. **Banken lieben diese Analyse** — sie zeigt dass du das Risiko verstanden hast. Print direkt mit ins Business-Case-PDF.',
-      placement: 'center'   /* v1744 · ohne Ziel mittig statt den ganzen Tab anleuchten */
+      placement: 'auto'   /* v1789 · war 'center' - das galt dem angeblich leeren Ziel. Die Karte ist da und wird gerahmt, also sitzt die Blase wieder daneben. */
     },
 
     // ═══ Phase 5: Deal-Aktion ═════════════════════════════════════════
@@ -418,7 +444,26 @@
          > an der der Nutzer nichts findet - und fuer einen, der die App
          > zum ersten Mal sieht, ist das nicht „veraltet", sondern falsch. */
       tab: 's8',
-      selector: '[onclick*="exportDoc(\'invest\')"], .dab-doc-btn.gold',
+      /* v1789 · DER SELEKTOR TRAF ZWAR, ABER ZU KLEIN. Gemessen am
+         02.10.2026 fand er genau ein Element: den Knopf "PDF", 82 x 39 px.
+         Der Tour-Text davor sagt "unter Ausgabe steht das bank-fertige
+         Investment-PDF" - gespotlightet wurde dann ein Knoepfchen ohne
+         Beschriftung, zwischen fuenf gleich aussehenden Geschwistern
+         (.dab-doc-btn gibt es sechsmal, der erste heisst "Fassung").
+
+           button.dab-doc-btn.gold    82 x 39    "PDF"
+           div.dab-doc-act           173 x 39    "Fassung PDF"
+           div.dab-doc-row          1240 x 73    "Investment-PDF Empfohlen -
+                                                  Business-Case, bank-fertig"   <- das ist die Stelle
+
+         > Ein Spot ist eine Antwort auf "wo?". Ein 82-px-Knopf ohne
+         > seine Zeile beantwortet die Frage nicht - der Name der Sache
+         > steht daneben, und genau der faellt aus dem Rahmen.
+
+         Erster Teil mit :has() auf die Zeile; _findElementWithRetry
+         splittet bei Komma und probiert jeden Teil einzeln in try/catch,
+         also faellt es notfalls sauber auf den Knopf zurueck. */
+      selector: '.dab-doc-row:has([onclick*="exportDoc(\'invest\')"]), [onclick*="exportDoc(\'invest\')"], .dab-doc-btn.gold',
       icon: 'i-file-text',
       title: 'Investment-PDF',
       body: 'Im Deal-Aktion-Tab unter **Ausgabe** steht das bank-fertige Investment-PDF (gespotlightet). Ein Klick fragt, welche **Fassung** du brauchst — Bankfassung, hell oder Obsidian.',
