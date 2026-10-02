@@ -478,10 +478,16 @@
       if(isFinite(v)){ nw+=w; nws+=v*w; }
     });
     var nettoCalc = nw>0 ? (nws/nw) : null;
+    /* v1802 · Tilgung und Zins getrennt. `kdSum` fuehrt beide zusammen als
+       Kapitaldienst — fuer den DSCR richtig, fuer die Frage "wie hoch ist
+       meine Gesamttilgung" nicht. Dieselbe Rechnung, nur einzeln. */
+    var tilgSum=sum(function(o){return num(o.d1)*num(o.d1t)/100 + num(o.d2)*num(o.d2t)/100;});
+    var zinsSum=sum(function(o){return num(o.d1)*num(o.d1z)/100 + num(o.d2)*num(o.d2z)/100;});
     return {
       n:arr.length, gi:giSum, kp:kpSum, ek:ekSum, darl:darlSum,
       mieteJ:mieteJ, mieteM:mieteJ/12, rest:rest,
       cfNsJ:cfNsJ, cfVsJ:cfVsJ, cfNsM:cfNsJ/12, cfVsM:cfVsJ/12,
+      tilgJ:tilgSum, zinsJ:zinsSum, kdJ:kdSum,
       brutto:(kpSum>0?(mieteJ/kpSum*100):null),
       netto:nettoCalc,
       dscr:(kdSum>0?(mieteJ/kdSum):null)
@@ -2485,6 +2491,27 @@
         restschuld_eur: Math.round(_restschuldOf(o)) || null,
         zins_prozent: _ppZahl(o.d1z),
         tilgung_prozent: _ppZahl(o.d1t),
+        /* v1802 · DIE TILGUNG IN EURO, NICHT NUR IN PROZENT.
+           Marcel fragte den Bot nach der "Gesamttilgung aller Objekte".
+           Er bekam eine Liste von Prozentsaetzen und die Rueckfrage, ob
+           er rechnen solle — denn aus "1 %" allein wird keine Summe.
+
+           > Eine Zahl, die das Modell jedes Mal neu ausrechnet, ist jedes
+           > Mal eine neue Gelegenheit, sie anders auszurechnen. Was
+           > benannt ist, wird gelesen; was gelesen wird, stimmt.
+
+           Gerechnet wird hier, wo auch alles andere gerechnet wird — der
+           anfaengliche Tilgungsbetrag ist Darlehenssumme mal Satz. Beide
+           Darlehen werden einzeln genommen, weil sie verschiedene Saetze
+           haben koennen. */
+        tilgung_eur_jahr: (function () {
+          var t = num(o.d1) * num(o.d1t) / 100 + num(o.d2) * num(o.d2t) / 100;
+          return t > 0 ? Math.round(t) : null;
+        })(),
+        zins_eur_jahr: (function () {
+          var z = num(o.d1) * num(o.d1z) / 100 + num(o.d2) * num(o.d2z) / 100;
+          return z > 0 ? Math.round(z) : null;
+        })(),
         zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,
         dscr: _ppZahl(o._kpis_dscr),
         ltv_prozent: _ppZahl(o.ltv) != null ? _ppZahl(o.ltv) : _ppZahl(o._kpis_ltv),
@@ -2529,6 +2556,14 @@
         eigenkapital_eingesetzt_eur: Math.round(a.ek) || null,
         darlehen_aufgenommen_eur: Math.round(a.darl) || null,
         restschuld_heute_eur: Math.round(a.rest) || null,
+        /* v1802 · Dieselbe Zahl unter dem Namen, unter dem Marcel danach
+           fragt. "Aktuelle Verbindlichkeiten" IST die Restschuld — aber
+           wer so fragt, soll nicht darauf angewiesen sein, dass ein
+           Modell die Gleichsetzung errät. */
+        verbindlichkeiten_eur: Math.round(a.rest) || null,
+        tilgung_eur_jahr: Math.round(a.tilgJ) || null,
+        zins_eur_jahr: Math.round(a.zinsJ) || null,
+        kapitaldienst_eur_jahr: Math.round(a.kdJ) || null,
         miete_kalt_eur_jahr: Math.round(a.mieteJ) || null,
         miete_kalt_eur_monat: Math.round(a.mieteM) || null,
         cashflow_nach_steuer_eur_jahr: Math.round(a.cfNsJ) || null,
