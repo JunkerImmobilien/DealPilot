@@ -119,8 +119,47 @@ window.DealPilotOnboarding = (function () {
     });
   }
 
+  /* ═══ v1770 · DER DEFAULT WAR EIN TOTER SCHLUESSEL ═══════════════
+
+     Hier stand `typ: 'ausgewogen'`. Das ist der Schluessel aus der Zeit
+     VOR v1749, als das Setup eine eigene Dreierliste fuehrte. Die sechs
+     echten Profile heissen `balanced`, `conservative`, `optimistic`,
+     `lage`, `cashflow`, `sicherheit`.
+
+     Gemessen am laufenden System (02.10.2026):
+
+       DealScore2.getPresets()    6 Profile
+       Default im Setup           "ausgewogen"
+       in der Liste enthalten     NEIN
+
+     Folge: `_profile().filter(x => x.id === _wahl.typ)` findet nichts,
+     `if (t)` ist falsch, und WER DAS PROFIL-FENSTER OHNE KLICK
+     DURCHLAEUFT, BEKOMMT WEDER FINANZIERUNGSGRENZEN NOCH EIN
+     SCORE-PROFIL. Dazu war die Kachel "Ausgewogen" beim Oeffnen nie
+     markiert, weil `_wahl.typ === t.id` nie zutraf.
+
+     > v1749 hat die Liste richtig gemacht und den Default vergessen.
+     > Eine halbe Umstellung ist schwerer zu finden als keine: die
+     > Kacheln stimmen, also sieht alles richtig aus.
+
+     Deshalb kommt der Default jetzt AUS der Liste und kann nicht mehr
+     daneben liegen. */
+  function _typDefault() {
+    try {
+      var ps = _profile();
+      if (ps && ps.length) {
+        /* `balanced` ist auch im DealScore die Vorbelegung
+           (dealscore2.js, DEFAULT_PRESET_KEY). Fehlt sie, gilt das
+           erste Profil der Liste — nie ein Literal von hier. */
+        var b = ps.filter(function (x) { return x.id === 'balanced'; })[0];
+        return (b || ps[0]).id;
+      }
+    } catch (e) {}
+    return 'balanced';
+  }
+
   var _schritt = 0, _ov = null;
-  var _wahl = { aussehen: null, typ: 'ausgewogen' };
+  var _wahl = { aussehen: null, typ: _typDefault() };
 
   function _ls(k)      { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function _lsSet(k,v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -682,6 +721,22 @@ window.DealPilotOnboarding = (function () {
     }
     if (_schritt === 4) {
       var t = _profile().filter(function (x) { return x.id === _wahl.typ; })[0];
+      /* v1770 · PASST DER SCHLUESSEL NICHT, FIEL HIER ALLES STILL AUS.
+         Genau das ist mit "ausgewogen" passiert: kein Treffer, kein `t`,
+         kein Schreiben — und keine Meldung. Jetzt gilt das erste Profil,
+         und die Konsole sagt es.
+
+         > Ein Rueckfall ohne Hinweis ist eine zweite Tarnung fuer
+         > denselben Fehler. */
+      if (!t) {
+        var alle = _profile() || [];
+        t = alle.length ? alle[0] : null;
+        try {
+          console.warn('[dpo] Investortyp nicht bekannt: ' + _wahl.typ
+            + ' -> es gilt ' + (t ? t.id : '(keines)')
+            + ' | bekannt: ' + alle.map(function (x) { return x.id; }).join(', '));
+        } catch (e) {}
+      }
       if (t) {
         profilSchreiben({ min_dscr: t.dscr, max_ltv: t.ltv, ek_quote_default: t.ek, ai_risk: t.risk });
         /* v1749 · DAS WAR DIE EIGENTLICHE LUECKE.
@@ -1004,7 +1059,7 @@ window.DealPilotOnboarding = (function () {
       var alt = document.getElementById('dp-onboarding');
       if (alt) alt.remove();
       _ov = null;
-      _wahl = { aussehen: null, typ: 'ausgewogen' };
+      _wahl = { aussehen: null, typ: _typDefault() };   /* v1770 */
       zeige(0);
       return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls geloescht)' : '');
     },
