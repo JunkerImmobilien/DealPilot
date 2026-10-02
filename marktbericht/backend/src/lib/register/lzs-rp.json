@@ -1,0 +1,772 @@
+[
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Mainz, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Mainz 2025 (ImmoWertV21, GND 80, Mittel nach 20-%-Kappung, Kauffälle 2023+2024)",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1770-RPMZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)",
+  "lizenz": "Nachdruck, Vervielfältigung und Speicherung auf Datenträgern nur mit Quellenangabe gestattet",
+  "lizenz_hinweis": "Wörtlich (Impressum, S. 2): „Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet. Das Bild des Titelblattes unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden.\" — Die Übernahme einzelner Kennzahlen in das Register ist damit AUSDRÜCKLICH erlaubt, solange der Quellenvermerk mitläuft; eine Genehmigung ist nur für das Titelbild nötig, das hier nicht verwendet wird. Das unterscheidet Mainz von den baden-württembergischen Ausschüssen (Heilbronn, Ulm: „Nachdruck, auch auszugsweise, nur mit Genehmigung\") und ist der Grund, warum hier Werte stehen und dort nur ein Wegweiser.",
+  "kennzahl": "liegenschaftszinssatz",
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Wertermittlungsstichtag. Eingetragen ist das Ende des Berichtszeitraums (31.12.2024), das auf dem Titel steht: „Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)\". Die Zinssatzauswertungen greifen auf die Kauffälle 2023 UND 2024 zurück, haben also keinen Stichtagsbezug im engeren Sinn. Die Bodenrichtwerte des Modells sind die zum 01.01.2024 beschlossenen — das ist ein ANDERES Datum und steht gesondert in modellansaetze.bodenrichtwert_stichtag.",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.02,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein- und Zweifamilienhäuser, stadtweit",
+   "hinweis": "Ergebnis in PROZENT (2,02 bedeutet 2,02 %), nicht als Dezimalbruch. Der Wert ist das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte, so wie der Bericht ihn in der Übersicht auf S. 94 führt. Keine Achse: für das Wohnungseigentum hat der Ausschuss eine Abhängigkeit von Objektgröße, Bodenrichtwert und Wohnfläche ausdrücklich geprüft und verworfen; für die übrigen Teilmärkte druckt er nur einen Wert.",
+   "wert_ungekappt": 2.13,
+   "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 2,13 % bei 29 Fällen und einer Standardabweichung von 1,31. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 64 (Wohnungseigentum): „Die wirtschaftliche Gesamtnutzungsdauer wurde generell mit 80 Jahren angenommen.\" Wörtlich S. 83 (Renditeobjekte): „der Ansatz der wirtschaftlichen Gesamtnutzungsdauer (GND) für Mehrfamilienhäuser und Wohn- und Geschäftshäuser einheitlich mit 80 Jahren (Angabe der wirtschaftlichen Restnutzungsdauer (RND) in % bezogen auf die GND).\" Dazu S. 61: „Die Gesamtnutzungsdauer wurde pauschal mit 80 Jahren angenommen.\"",
+   "gnd_warnung": "Die 80 Jahre gelten NICHT für die Gewerbeobjekte. Dort schreibt der Bericht (S. 83) ausdrücklich: „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\" Der Gewerbe-Satz trägt deshalb eine eigene, abweichende Angabe.",
+   "restnutzungsdauer": "Bei den Renditeobjekten wird die Restnutzungsdauer RELATIV in Prozent der Gesamtnutzungsdauer ausgewiesen, nicht in Jahren. Bei Mehrfamilienhäusern führt der Bericht die Modernisierung über eine Verlängerung nach ImmoWertV; ein Beispiel nennt er auf S. 60: „bei durchschnittlicher Instandhaltung und dem Baujahr 1975 beträgt [die Restnutzungsdauer] beispielsweise 30 Jahre\".",
+   "bewirtschaftungskosten": "wörtlich „Der Ansatz der Bewirtschaftungskosten entspricht den Vorgaben der ImmoWertV21\" (S. 64)",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze; er verweist nur auf die ImmoWertV 2021. Eine Zahl steht nicht da und wird hier nicht ergänzt.",
+   "rohertrag_wohnungseigentum": "ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz für Wohnraum, bezogen auf Baujahr und Wohnungsgröße. Die Wohnflächenklassen des Berichts sind deshalb KEINE eigene Erfindung, sondern die Eingruppierungen des Mietspiegels.",
+   "rohertrag_ezfh": "TATSÄCHLICH erbrachte Mieten, soweit sie der Geschäftsstelle marktüblich erschienen — nicht die Medianmiete. Der Bericht misst die Differenz selbst: „für 1- und 2-Familienhäuser [übersteigt] die tatsächliche Miete die Medianmiete nach dem Qualifizierten Mietspiegel Mainz für Wohnraum im langjährigen Mittel um 16 %\" (178 Kauffälle 2014–2024, nach 20-%-Kappung 106, Standardabweichung 11 %). Für die 16 Kauffälle aus 2024 allein betrug die Abweichung nur 7 % (Standardabweichung 16 %; nach Kappung auf 10 Fälle 6 % bei 9 %). WER HIER MIT DER MEDIANMIETE RECHNET, RECHNET NICHT MODELLKONFORM.",
+   "rohertrag_renditeobjekte": "durchschnittliche TATSÄCHLICHE Nettokaltmiete in €/m² Wohnfläche des untersuchten Kaufobjekts",
+   "bodenwert_ezfh": "keine Flächenanpassung, Ausnahme übergroße Grundstücke (eigener Abschnitt „Bodenwertanpassung wegen abweichender Flächengrößen\"). Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt; der Bericht gibt die Steigerung des Bodenrichtwerts von 01.01.2023 auf 01.01.2025 mit „ca. 0 %\" an.",
+   "bodenwert_renditeobjekte": "an die örtliche Situation angepasst, siehe Abschnitt „Bodenwertanpassung wegen abweichender Ausnutzung\"; Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt (ca. 0 % von 01.01.2023 auf 01.01.2025)",
+   "bodenrichtwert_stichtag": "2024-01-01",
+   "bodenrichtwert_beleg": "Der Gutachterausschuss hat die Bodenrichtwerte zum Stichtag 01. Januar 2024 beschlossen; die Bodenrichtwertkarte des Berichts trägt „Stichtag: 01.01.2024\".",
+   "besondere_merkmale": "berücksichtigt. Bei Ein- und Zweifamilienhäusern über eine eigene Staffel für den Instandhaltungsstau (einfach −500 €/m² Wohnfläche, mittel −750, erheblich −1.000, sehr erheblich −1.500), in der Regel als Korrektur des Ausstattungsstandards und der Restnutzungsdauer.",
+   "instandhaltungsstau_eur_qm_wf": {
+    "einfach": -500,
+    "mittel": -750,
+    "erheblich": -1000,
+    "sehr_erheblich": -1500
+   },
+   "stellplaetze": "In den zugrunde gelegten Kauffalldaten des Wohnungseigentums sind KEINE Kaufpreisanteile für Kfz-Stellplätze enthalten (S. 64).",
+   "kaufpreisanpassung": "Für das Wohnungseigentum fand ausdrücklich KEINE Kaufpreisanpassung auf den Kaufzeitpunkt statt (S. 64). Die Indexierung auf den Stichtag 01.01.2025 über die Trendfunktion y = −0,00040522·x² + 37,0104·x − 839813 (x = Datumszahl, 01.01.2025 = 45685) betrifft die NEUBAU-Kaufpreisanalyse, nicht die Liegenschaftszinssätze.",
+   "verfahren": "Ertragswertverfahren, rückwärts gerechnet; je Kauffall ein Einzelzinssatz. Veröffentlicht wird das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte — nicht der Median und nicht das ungekappte Mittel. Der Bericht druckt beide Werte nebeneinander ab.",
+   "abhaengigkeitspruefung": "Der Ausschuss hat für das Wohnungseigentum ausdrücklich geprüft, ob der Liegenschaftszinssatz von Objektgröße (Anzahl der Wohneinheiten), Bodenrichtwert oder Wohnfläche abhängt: „Die Ergebnisse führten jeweils zu einer breiten Streuung ohne klare Tendenz. Auf eine Darstellung der Diagramme wurde daher verzichtet.\" Eine Achse über diese Größen wäre hier also Dokumentbruch — die Wohnflächenklassen stammen aus dem Mietspiegel und sind der Teilmarktschnitt, keine Regressionsachse.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang. Der Bericht führt einen Baupreisindex für Wohngebäude nur in der Zeitreihentabelle (Stichtag jeweils 31.12.) und bezieht ihn nicht auf die Liegenschaftszinssätze. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "datenbasis": "Kauffälle der Jahre 2023 und 2024 (Berichtszeitraum des Berichts selbst ist 01.01.2024 – 31.12.2024; die Zinssatzauswertungen greifen ausdrücklich auf zwei Jahrgänge zurück). Redaktionsschluss 25.11.2025."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Mainz (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Der Bericht führt für das Wohnungseigentum ZUSÄTZLICH stadtteilbezogene Liegenschaftszinssätze (Spalten Mainz, Weisenau, Laubenheim, Hechtsheim, Ebersheim, Marienborn, Bretzenheim, Drais, Finthen, Gonsenheim, Mombach) sowie eine Toplagen-Auswertung mit dem Kriterium „Blickbezug zum Rhein\". Eingetragen ist hier die STADTWEITE Spalte „Gesamt\". Die Stadtteilwerte sind eine offene Ernte-Chance und stehen noch NICHT im Register; sie bräuchten je Stadtteil einen eigenen zweig, sonst überschreiben sie sich im Konfliktschlüssel. Ein Stadtteilwert darf nicht aus dem stadtweiten Wert abgeleitet werden und umgekehrt.",
+   "extrapolation": "gesperrt",
+   "sachlich": "Ein- und Zweifamilienhäuser",
+   "hinweis": "Der Wert ist an das Modell dieses Berichts gebunden (§ 10 ImmoWertV): ImmoWertV 2021, Gesamtnutzungsdauer 80 Jahre, Bodenrichtwerte zum 01.01.2024, Bewirtschaftungskosten nach ImmoWertV, Mittel nach 20-%-Kappung. Die Streuung ist mit abgedruckt (Standardabweichung 0,54 Prozentpunkte bei 17 gekappten Fällen); eine sachverständige Anpassung gehört in diese Größenordnung.",
+   "stichprobe": {
+    "anzahl_gekappt": 17,
+    "anzahl_gesamtheit": 29,
+    "rangbereich_nach_kappung": "7–23",
+    "mittelwert_gekappt_pct": 2.02,
+    "mittelwert_gesamtheit_pct": 2.13,
+    "standardabweichung_gekappt": 0.54,
+    "standardabweichung_gesamtheit": 1.31,
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 82, Fußzeile der Einzelfalltabelle „Liegenschaftszinssätze für Ein- und Zweifamilienhäuser\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94, Tabelle „Übersicht Liegenschaftszinssätze\", Zeile „Ein- und Zweifamilienhäuser\", Spalte „LZ\"",
+    "wortlaut": "Ein- und Zweifamilienhäuser: LZ 2,02 · Standardabweichung 0,54 · Anzahl nach Kappung 17. Kopfzeile der Tabelle: „Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen von Kauffällen der Jahre 2023 und 2024. Dargestellt sind die Mittelwerte nach Kappung von jeweils 20% der Minimum- / Maximumwerte.\"",
+    "kauffaelle": 17,
+    "gegenprobe": "Detailkapitel S. 82, Fußzeile der Einzelfalltabelle: „Gesamtheit (1-29): Mittelwert 2,13 / Stand.abw. 1,31 / Anzahl 29\" gegen „20%-Kappung (7–23): 2,02 / 0,54 / 17\". Mittelwert, Standardabweichung und Fallzahl stimmen mit der Übersicht überein.",
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026) aus der Tabelle „Übersicht Liegenschaftszinssätze\" auf S. 94.\nGEGENPROBE AN DEN DETAILKAPITELN — der eigentliche Prüfmaßstab: die Übersicht auf S. 94 ist eine Zusammenfassung („Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen\"). ALLE DREIZEHN ZEILEN wurden gegen ihr Detailkapitel gehalten, jede mit Mittelwert, Standardabweichung UND Fallzahl, und alle dreizehn stimmen Ziffer für Ziffer:\n  Ein- und Zweifamilienhäuser  S. 82  2,02 / 0,54 / 17   (Gesamtheit 2,13 / 1,31 / 29)\n  Mehrfamilienhäuser           S. 87  2,67 / 0,69 / 37   (Gesamtheit 2,69 / 1,63 / 61)\n  Wohn- und Geschäftshäuser    S. 90  2,91 / 0,70 / 16   (Gesamtheit 2,97 / 1,40 / 28)\n  Gewerbeobjekte               S. 92  3,59 / 1,27 / 13   (Gesamtheit 3,97 / 2,44 / 21)\n  Erstverkauf  < 40 m²         S. 69  1,73 / 0,14 /  8\n  Erstverkauf  40 – < 60 m²    S. 70  1,24 / 0,17 / 19\n  Erstverkauf  60 – < 80 m²    S. 71  1,38 / 0,35 / 15\n  Erstverkauf  >= 80 m²        S. 72  1,23 / 0,32 / 36\n  Weiterverkauf < 40 m²        S. 76  2,31 / 0,67 / 171\n  Weiterverkauf 40 – < 60 m²   S. 77  1,64 / 0,53 / 184\n  Weiterverkauf 60 – < 80 m²   S. 78  1,28 / 0,60 / 170\n  Weiterverkauf >= 80 m²       S. 79  1,41 / 0,49 / 239\n  (die dreizehnte Zeile ist die Gesamtheit-Zeile des Weiterverkaufs, die die Übersicht nicht gesondert führt)\nKAPPUNGSPROBE (Rechenprobe an der eigenen Regel des Berichts): der Bericht kappt je 20 % der Minimum- und Maximumwerte und druckt den verbleibenden Rangbereich mit ab. Nachgerechnet: EZFH 29 Fälle, Ränge 7–23 = 17 (29 − 2·6); MFH 61, Ränge 13–49 = 37 (61 − 2·12); WGH 28, Ränge 7–22 = 16 (28 − 2·6); Gewerbe 21, Ränge 5–17 = 13 (21 − 2·4). Vier von vier stimmen, und 20 % von 29/61/28/21 ergibt gerundet genau 6/12/6/4. Die Kappung ist damit nicht nur behauptet, sondern nachvollzogen.\nEIN DURCHGERECHNETES ANWENDUNGSBEISPIEL enthält der Bericht nicht; er druckt stattdessen die EINZELKAUFFÄLLE mit allen Eingangsgrößen ab (Gemarkung, Flur, Bodenrichtwert, Bodenwertanteil, relative Restnutzungsdauer, Nettokaltmiete, Wohnfläche, Kaufpreis je m² und den daraus abgeleiteten Zinssatz). Das ist mehr als ein Beispiel und ersetzt es: die Mittelwerte sind an ihrer eigenen Fallliste nachprüfbar."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses, an der eigenen Einzelfallliste nachprüfbar, mit Standardabweichung (0,54 Prozentpunkte) und Fallzahl (17 nach Kappung, 29 in der Gesamtheit).",
+  "fallzahl": 17,
+  "streuung": {
+   "stabw_pp": 0.54,
+   "stabw_pp_ungekappt": 1.31,
+   "stabw_art": "Standardabweichung der gekappten Stichprobe in Prozentpunkten (nicht Quantilsspanne, nicht Minimum/Maximum)"
+  },
+  "auflagen": [
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: der Bericht verweist nur auf die ImmoWertV 2021. Wer modellkonform rechnen will, muss die Ansätze selbst setzen; eine Quote steht nicht im Bericht und wird hier nicht ergänzt.",
+   "STICHTAG ABGELEITET, NICHT ABGEDRUCKT: eingetragen ist das Ende des Berichtszeitraums. Siehe stichtag_hinweis.",
+   "STADTTEILWERTE NOCH NICHT GEERNTET: der Bericht führt für das Wohnungseigentum elf Stadtteile und eine Toplagen-Auswertung gesondert. Diese Werte stehen noch nicht im Register und brauchen je Stadtteil einen eigenen zweig.",
+   "GERINGE FALLZAHL: der Wert stützt sich auf 17 gekappte Fälle aus 29. Der Bericht druckt die Einzelfälle vollständig ab (S. 82) — bei dieser Fallzahl ist der Blick in die Liste die bessere Grundlage als der Mittelwert allein."
+  ],
+  "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94 (Übersicht) und S. 82 (Einzelfälle und Zusammenfassung); Modellbeschreibung S. 80 bzw. S. 83",
+  "seite": 94
+ },
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Mainz, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Mainz 2025 (ImmoWertV21, GND 80, Mittel nach 20-%-Kappung, Kauffälle 2023+2024)",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1770-RPMZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)",
+  "lizenz": "Nachdruck, Vervielfältigung und Speicherung auf Datenträgern nur mit Quellenangabe gestattet",
+  "lizenz_hinweis": "Wörtlich (Impressum, S. 2): „Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet. Das Bild des Titelblattes unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden.\" — Die Übernahme einzelner Kennzahlen in das Register ist damit AUSDRÜCKLICH erlaubt, solange der Quellenvermerk mitläuft; eine Genehmigung ist nur für das Titelbild nötig, das hier nicht verwendet wird. Das unterscheidet Mainz von den baden-württembergischen Ausschüssen (Heilbronn, Ulm: „Nachdruck, auch auszugsweise, nur mit Genehmigung\") und ist der Grund, warum hier Werte stehen und dort nur ein Wegweiser.",
+  "kennzahl": "liegenschaftszinssatz",
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Wertermittlungsstichtag. Eingetragen ist das Ende des Berichtszeitraums (31.12.2024), das auf dem Titel steht: „Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)\". Die Zinssatzauswertungen greifen auf die Kauffälle 2023 UND 2024 zurück, haben also keinen Stichtagsbezug im engeren Sinn. Die Bodenrichtwerte des Modells sind die zum 01.01.2024 beschlossenen — das ist ein ANDERES Datum und steht gesondert in modellansaetze.bodenrichtwert_stichtag.",
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.67,
+   "rundung_stellen": 2,
+   "bezeichnung": "Mehrfamilienhäuser, stadtweit",
+   "hinweis": "Ergebnis in PROZENT (2,02 bedeutet 2,02 %), nicht als Dezimalbruch. Der Wert ist das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte, so wie der Bericht ihn in der Übersicht auf S. 94 führt. Keine Achse: für das Wohnungseigentum hat der Ausschuss eine Abhängigkeit von Objektgröße, Bodenrichtwert und Wohnfläche ausdrücklich geprüft und verworfen; für die übrigen Teilmärkte druckt er nur einen Wert.",
+   "wert_ungekappt": 2.69,
+   "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 2,69 % bei 61 Fällen und einer Standardabweichung von 1,63. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 64 (Wohnungseigentum): „Die wirtschaftliche Gesamtnutzungsdauer wurde generell mit 80 Jahren angenommen.\" Wörtlich S. 83 (Renditeobjekte): „der Ansatz der wirtschaftlichen Gesamtnutzungsdauer (GND) für Mehrfamilienhäuser und Wohn- und Geschäftshäuser einheitlich mit 80 Jahren (Angabe der wirtschaftlichen Restnutzungsdauer (RND) in % bezogen auf die GND).\" Dazu S. 61: „Die Gesamtnutzungsdauer wurde pauschal mit 80 Jahren angenommen.\"",
+   "gnd_warnung": "Die 80 Jahre gelten NICHT für die Gewerbeobjekte. Dort schreibt der Bericht (S. 83) ausdrücklich: „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\" Der Gewerbe-Satz trägt deshalb eine eigene, abweichende Angabe.",
+   "restnutzungsdauer": "Bei den Renditeobjekten wird die Restnutzungsdauer RELATIV in Prozent der Gesamtnutzungsdauer ausgewiesen, nicht in Jahren. Bei Mehrfamilienhäusern führt der Bericht die Modernisierung über eine Verlängerung nach ImmoWertV; ein Beispiel nennt er auf S. 60: „bei durchschnittlicher Instandhaltung und dem Baujahr 1975 beträgt [die Restnutzungsdauer] beispielsweise 30 Jahre\".",
+   "bewirtschaftungskosten": "wörtlich „Der Ansatz der Bewirtschaftungskosten entspricht den Vorgaben der ImmoWertV21\" (S. 64)",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze; er verweist nur auf die ImmoWertV 2021. Eine Zahl steht nicht da und wird hier nicht ergänzt.",
+   "rohertrag_wohnungseigentum": "ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz für Wohnraum, bezogen auf Baujahr und Wohnungsgröße. Die Wohnflächenklassen des Berichts sind deshalb KEINE eigene Erfindung, sondern die Eingruppierungen des Mietspiegels.",
+   "rohertrag_ezfh": "TATSÄCHLICH erbrachte Mieten, soweit sie der Geschäftsstelle marktüblich erschienen — nicht die Medianmiete. Der Bericht misst die Differenz selbst: „für 1- und 2-Familienhäuser [übersteigt] die tatsächliche Miete die Medianmiete nach dem Qualifizierten Mietspiegel Mainz für Wohnraum im langjährigen Mittel um 16 %\" (178 Kauffälle 2014–2024, nach 20-%-Kappung 106, Standardabweichung 11 %). Für die 16 Kauffälle aus 2024 allein betrug die Abweichung nur 7 % (Standardabweichung 16 %; nach Kappung auf 10 Fälle 6 % bei 9 %). WER HIER MIT DER MEDIANMIETE RECHNET, RECHNET NICHT MODELLKONFORM.",
+   "rohertrag_renditeobjekte": "durchschnittliche TATSÄCHLICHE Nettokaltmiete in €/m² Wohnfläche des untersuchten Kaufobjekts",
+   "bodenwert_ezfh": "keine Flächenanpassung, Ausnahme übergroße Grundstücke (eigener Abschnitt „Bodenwertanpassung wegen abweichender Flächengrößen\"). Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt; der Bericht gibt die Steigerung des Bodenrichtwerts von 01.01.2023 auf 01.01.2025 mit „ca. 0 %\" an.",
+   "bodenwert_renditeobjekte": "an die örtliche Situation angepasst, siehe Abschnitt „Bodenwertanpassung wegen abweichender Ausnutzung\"; Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt (ca. 0 % von 01.01.2023 auf 01.01.2025)",
+   "bodenrichtwert_stichtag": "2024-01-01",
+   "bodenrichtwert_beleg": "Der Gutachterausschuss hat die Bodenrichtwerte zum Stichtag 01. Januar 2024 beschlossen; die Bodenrichtwertkarte des Berichts trägt „Stichtag: 01.01.2024\".",
+   "besondere_merkmale": "berücksichtigt. Bei Ein- und Zweifamilienhäusern über eine eigene Staffel für den Instandhaltungsstau (einfach −500 €/m² Wohnfläche, mittel −750, erheblich −1.000, sehr erheblich −1.500), in der Regel als Korrektur des Ausstattungsstandards und der Restnutzungsdauer.",
+   "instandhaltungsstau_eur_qm_wf": {
+    "einfach": -500,
+    "mittel": -750,
+    "erheblich": -1000,
+    "sehr_erheblich": -1500
+   },
+   "stellplaetze": "In den zugrunde gelegten Kauffalldaten des Wohnungseigentums sind KEINE Kaufpreisanteile für Kfz-Stellplätze enthalten (S. 64).",
+   "kaufpreisanpassung": "Für das Wohnungseigentum fand ausdrücklich KEINE Kaufpreisanpassung auf den Kaufzeitpunkt statt (S. 64). Die Indexierung auf den Stichtag 01.01.2025 über die Trendfunktion y = −0,00040522·x² + 37,0104·x − 839813 (x = Datumszahl, 01.01.2025 = 45685) betrifft die NEUBAU-Kaufpreisanalyse, nicht die Liegenschaftszinssätze.",
+   "verfahren": "Ertragswertverfahren, rückwärts gerechnet; je Kauffall ein Einzelzinssatz. Veröffentlicht wird das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte — nicht der Median und nicht das ungekappte Mittel. Der Bericht druckt beide Werte nebeneinander ab.",
+   "abhaengigkeitspruefung": "Der Ausschuss hat für das Wohnungseigentum ausdrücklich geprüft, ob der Liegenschaftszinssatz von Objektgröße (Anzahl der Wohneinheiten), Bodenrichtwert oder Wohnfläche abhängt: „Die Ergebnisse führten jeweils zu einer breiten Streuung ohne klare Tendenz. Auf eine Darstellung der Diagramme wurde daher verzichtet.\" Eine Achse über diese Größen wäre hier also Dokumentbruch — die Wohnflächenklassen stammen aus dem Mietspiegel und sind der Teilmarktschnitt, keine Regressionsachse.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang. Der Bericht führt einen Baupreisindex für Wohngebäude nur in der Zeitreihentabelle (Stichtag jeweils 31.12.) und bezieht ihn nicht auf die Liegenschaftszinssätze. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "datenbasis": "Kauffälle der Jahre 2023 und 2024 (Berichtszeitraum des Berichts selbst ist 01.01.2024 – 31.12.2024; die Zinssatzauswertungen greifen ausdrücklich auf zwei Jahrgänge zurück). Redaktionsschluss 25.11.2025."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Mainz (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Der Bericht führt für das Wohnungseigentum ZUSÄTZLICH stadtteilbezogene Liegenschaftszinssätze (Spalten Mainz, Weisenau, Laubenheim, Hechtsheim, Ebersheim, Marienborn, Bretzenheim, Drais, Finthen, Gonsenheim, Mombach) sowie eine Toplagen-Auswertung mit dem Kriterium „Blickbezug zum Rhein\". Eingetragen ist hier die STADTWEITE Spalte „Gesamt\". Die Stadtteilwerte sind eine offene Ernte-Chance und stehen noch NICHT im Register; sie bräuchten je Stadtteil einen eigenen zweig, sonst überschreiben sie sich im Konfliktschlüssel. Ein Stadtteilwert darf nicht aus dem stadtweiten Wert abgeleitet werden und umgekehrt.",
+   "extrapolation": "gesperrt",
+   "sachlich": "Mehrfamilienhäuser",
+   "hinweis": "Der Wert ist an das Modell dieses Berichts gebunden (§ 10 ImmoWertV): ImmoWertV 2021, Gesamtnutzungsdauer 80 Jahre, Bodenrichtwerte zum 01.01.2024, Bewirtschaftungskosten nach ImmoWertV, Mittel nach 20-%-Kappung. Die Streuung ist mit abgedruckt (Standardabweichung 0,69 Prozentpunkte bei 37 gekappten Fällen); eine sachverständige Anpassung gehört in diese Größenordnung.",
+   "stichprobe": {
+    "anzahl_gekappt": 37,
+    "anzahl_gesamtheit": 61,
+    "rangbereich_nach_kappung": "13–49",
+    "mittelwert_gekappt_pct": 2.67,
+    "mittelwert_gesamtheit_pct": 2.69,
+    "standardabweichung_gekappt": 0.69,
+    "standardabweichung_gesamtheit": 1.63,
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 87, Fußzeile der Einzelfalltabelle „Liegenschaftszinssätze für Mehrfamilienhäuser (MFH)\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94, Tabelle „Übersicht Liegenschaftszinssätze\", Zeile „Mehrfamilienhäuser\", Spalte „LZ\"",
+    "wortlaut": "Mehrfamilienhäuser: LZ 2,67 · Standardabweichung 0,69 · Anzahl nach Kappung 37. Kopfzeile der Tabelle: „Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen von Kauffällen der Jahre 2023 und 2024. Dargestellt sind die Mittelwerte nach Kappung von jeweils 20% der Minimum- / Maximumwerte.\"",
+    "kauffaelle": 37,
+    "gegenprobe": "Detailkapitel S. 87, Fußzeile der Einzelfalltabelle: „Gesamtheit (1-61): Mittelwert 2,69 / Stand.abw. 1,63 / Anzahl 61\" gegen „20%-Kappung (13–49): 2,67 / 0,69 / 37\". Mittelwert, Standardabweichung und Fallzahl stimmen mit der Übersicht überein.",
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026) aus der Tabelle „Übersicht Liegenschaftszinssätze\" auf S. 94.\nGEGENPROBE AN DEN DETAILKAPITELN — der eigentliche Prüfmaßstab: die Übersicht auf S. 94 ist eine Zusammenfassung („Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen\"). ALLE DREIZEHN ZEILEN wurden gegen ihr Detailkapitel gehalten, jede mit Mittelwert, Standardabweichung UND Fallzahl, und alle dreizehn stimmen Ziffer für Ziffer:\n  Ein- und Zweifamilienhäuser  S. 82  2,02 / 0,54 / 17   (Gesamtheit 2,13 / 1,31 / 29)\n  Mehrfamilienhäuser           S. 87  2,67 / 0,69 / 37   (Gesamtheit 2,69 / 1,63 / 61)\n  Wohn- und Geschäftshäuser    S. 90  2,91 / 0,70 / 16   (Gesamtheit 2,97 / 1,40 / 28)\n  Gewerbeobjekte               S. 92  3,59 / 1,27 / 13   (Gesamtheit 3,97 / 2,44 / 21)\n  Erstverkauf  < 40 m²         S. 69  1,73 / 0,14 /  8\n  Erstverkauf  40 – < 60 m²    S. 70  1,24 / 0,17 / 19\n  Erstverkauf  60 – < 80 m²    S. 71  1,38 / 0,35 / 15\n  Erstverkauf  >= 80 m²        S. 72  1,23 / 0,32 / 36\n  Weiterverkauf < 40 m²        S. 76  2,31 / 0,67 / 171\n  Weiterverkauf 40 – < 60 m²   S. 77  1,64 / 0,53 / 184\n  Weiterverkauf 60 – < 80 m²   S. 78  1,28 / 0,60 / 170\n  Weiterverkauf >= 80 m²       S. 79  1,41 / 0,49 / 239\n  (die dreizehnte Zeile ist die Gesamtheit-Zeile des Weiterverkaufs, die die Übersicht nicht gesondert führt)\nKAPPUNGSPROBE (Rechenprobe an der eigenen Regel des Berichts): der Bericht kappt je 20 % der Minimum- und Maximumwerte und druckt den verbleibenden Rangbereich mit ab. Nachgerechnet: EZFH 29 Fälle, Ränge 7–23 = 17 (29 − 2·6); MFH 61, Ränge 13–49 = 37 (61 − 2·12); WGH 28, Ränge 7–22 = 16 (28 − 2·6); Gewerbe 21, Ränge 5–17 = 13 (21 − 2·4). Vier von vier stimmen, und 20 % von 29/61/28/21 ergibt gerundet genau 6/12/6/4. Die Kappung ist damit nicht nur behauptet, sondern nachvollzogen.\nEIN DURCHGERECHNETES ANWENDUNGSBEISPIEL enthält der Bericht nicht; er druckt stattdessen die EINZELKAUFFÄLLE mit allen Eingangsgrößen ab (Gemarkung, Flur, Bodenrichtwert, Bodenwertanteil, relative Restnutzungsdauer, Nettokaltmiete, Wohnfläche, Kaufpreis je m² und den daraus abgeleiteten Zinssatz). Das ist mehr als ein Beispiel und ersetzt es: die Mittelwerte sind an ihrer eigenen Fallliste nachprüfbar."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses, an der eigenen Einzelfallliste nachprüfbar, mit Standardabweichung (0,69 Prozentpunkte) und Fallzahl (37 nach Kappung, 61 in der Gesamtheit).",
+  "fallzahl": 37,
+  "streuung": {
+   "stabw_pp": 0.69,
+   "stabw_pp_ungekappt": 1.63,
+   "stabw_art": "Standardabweichung der gekappten Stichprobe in Prozentpunkten (nicht Quantilsspanne, nicht Minimum/Maximum)"
+  },
+  "auflagen": [
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: der Bericht verweist nur auf die ImmoWertV 2021. Wer modellkonform rechnen will, muss die Ansätze selbst setzen; eine Quote steht nicht im Bericht und wird hier nicht ergänzt.",
+   "STICHTAG ABGELEITET, NICHT ABGEDRUCKT: eingetragen ist das Ende des Berichtszeitraums. Siehe stichtag_hinweis.",
+   "STADTTEILWERTE NOCH NICHT GEERNTET: der Bericht führt für das Wohnungseigentum elf Stadtteile und eine Toplagen-Auswertung gesondert. Diese Werte stehen noch nicht im Register und brauchen je Stadtteil einen eigenen zweig."
+  ],
+  "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94 (Übersicht) und S. 87 (Einzelfälle und Zusammenfassung); Modellbeschreibung S. 80 bzw. S. 83",
+  "seite": 94
+ },
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Mainz, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Mainz 2025 (ImmoWertV21, GND 80, Mittel nach 20-%-Kappung, Kauffälle 2023+2024)",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1770-RPMZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)",
+  "lizenz": "Nachdruck, Vervielfältigung und Speicherung auf Datenträgern nur mit Quellenangabe gestattet",
+  "lizenz_hinweis": "Wörtlich (Impressum, S. 2): „Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet. Das Bild des Titelblattes unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden.\" — Die Übernahme einzelner Kennzahlen in das Register ist damit AUSDRÜCKLICH erlaubt, solange der Quellenvermerk mitläuft; eine Genehmigung ist nur für das Titelbild nötig, das hier nicht verwendet wird. Das unterscheidet Mainz von den baden-württembergischen Ausschüssen (Heilbronn, Ulm: „Nachdruck, auch auszugsweise, nur mit Genehmigung\") und ist der Grund, warum hier Werte stehen und dort nur ein Wegweiser.",
+  "kennzahl": "liegenschaftszinssatz",
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Wertermittlungsstichtag. Eingetragen ist das Ende des Berichtszeitraums (31.12.2024), das auf dem Titel steht: „Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)\". Die Zinssatzauswertungen greifen auf die Kauffälle 2023 UND 2024 zurück, haben also keinen Stichtagsbezug im engeren Sinn. Die Bodenrichtwerte des Modells sind die zum 01.01.2024 beschlossenen — das ist ein ANDERES Datum und steht gesondert in modellansaetze.bodenrichtwert_stichtag.",
+  "zweig": "ggg",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.91,
+   "rundung_stellen": 2,
+   "bezeichnung": "Wohn- und Geschäftshäuser, stadtweit",
+   "hinweis": "Ergebnis in PROZENT (2,02 bedeutet 2,02 %), nicht als Dezimalbruch. Der Wert ist das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte, so wie der Bericht ihn in der Übersicht auf S. 94 führt. Keine Achse: für das Wohnungseigentum hat der Ausschuss eine Abhängigkeit von Objektgröße, Bodenrichtwert und Wohnfläche ausdrücklich geprüft und verworfen; für die übrigen Teilmärkte druckt er nur einen Wert.",
+   "wert_ungekappt": 2.97,
+   "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 2,97 % bei 28 Fällen und einer Standardabweichung von 1,4. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 64 (Wohnungseigentum): „Die wirtschaftliche Gesamtnutzungsdauer wurde generell mit 80 Jahren angenommen.\" Wörtlich S. 83 (Renditeobjekte): „der Ansatz der wirtschaftlichen Gesamtnutzungsdauer (GND) für Mehrfamilienhäuser und Wohn- und Geschäftshäuser einheitlich mit 80 Jahren (Angabe der wirtschaftlichen Restnutzungsdauer (RND) in % bezogen auf die GND).\" Dazu S. 61: „Die Gesamtnutzungsdauer wurde pauschal mit 80 Jahren angenommen.\"",
+   "gnd_warnung": "Die 80 Jahre gelten NICHT für die Gewerbeobjekte. Dort schreibt der Bericht (S. 83) ausdrücklich: „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\" Der Gewerbe-Satz trägt deshalb eine eigene, abweichende Angabe.",
+   "restnutzungsdauer": "Bei den Renditeobjekten wird die Restnutzungsdauer RELATIV in Prozent der Gesamtnutzungsdauer ausgewiesen, nicht in Jahren. Bei Mehrfamilienhäusern führt der Bericht die Modernisierung über eine Verlängerung nach ImmoWertV; ein Beispiel nennt er auf S. 60: „bei durchschnittlicher Instandhaltung und dem Baujahr 1975 beträgt [die Restnutzungsdauer] beispielsweise 30 Jahre\".",
+   "bewirtschaftungskosten": "wörtlich „Der Ansatz der Bewirtschaftungskosten entspricht den Vorgaben der ImmoWertV21\" (S. 64)",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze; er verweist nur auf die ImmoWertV 2021. Eine Zahl steht nicht da und wird hier nicht ergänzt.",
+   "rohertrag_wohnungseigentum": "ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz für Wohnraum, bezogen auf Baujahr und Wohnungsgröße. Die Wohnflächenklassen des Berichts sind deshalb KEINE eigene Erfindung, sondern die Eingruppierungen des Mietspiegels.",
+   "rohertrag_ezfh": "TATSÄCHLICH erbrachte Mieten, soweit sie der Geschäftsstelle marktüblich erschienen — nicht die Medianmiete. Der Bericht misst die Differenz selbst: „für 1- und 2-Familienhäuser [übersteigt] die tatsächliche Miete die Medianmiete nach dem Qualifizierten Mietspiegel Mainz für Wohnraum im langjährigen Mittel um 16 %\" (178 Kauffälle 2014–2024, nach 20-%-Kappung 106, Standardabweichung 11 %). Für die 16 Kauffälle aus 2024 allein betrug die Abweichung nur 7 % (Standardabweichung 16 %; nach Kappung auf 10 Fälle 6 % bei 9 %). WER HIER MIT DER MEDIANMIETE RECHNET, RECHNET NICHT MODELLKONFORM.",
+   "rohertrag_renditeobjekte": "durchschnittliche TATSÄCHLICHE Nettokaltmiete in €/m² Wohnfläche des untersuchten Kaufobjekts",
+   "bodenwert_ezfh": "keine Flächenanpassung, Ausnahme übergroße Grundstücke (eigener Abschnitt „Bodenwertanpassung wegen abweichender Flächengrößen\"). Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt; der Bericht gibt die Steigerung des Bodenrichtwerts von 01.01.2023 auf 01.01.2025 mit „ca. 0 %\" an.",
+   "bodenwert_renditeobjekte": "an die örtliche Situation angepasst, siehe Abschnitt „Bodenwertanpassung wegen abweichender Ausnutzung\"; Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt (ca. 0 % von 01.01.2023 auf 01.01.2025)",
+   "bodenrichtwert_stichtag": "2024-01-01",
+   "bodenrichtwert_beleg": "Der Gutachterausschuss hat die Bodenrichtwerte zum Stichtag 01. Januar 2024 beschlossen; die Bodenrichtwertkarte des Berichts trägt „Stichtag: 01.01.2024\".",
+   "besondere_merkmale": "berücksichtigt. Bei Ein- und Zweifamilienhäusern über eine eigene Staffel für den Instandhaltungsstau (einfach −500 €/m² Wohnfläche, mittel −750, erheblich −1.000, sehr erheblich −1.500), in der Regel als Korrektur des Ausstattungsstandards und der Restnutzungsdauer.",
+   "instandhaltungsstau_eur_qm_wf": {
+    "einfach": -500,
+    "mittel": -750,
+    "erheblich": -1000,
+    "sehr_erheblich": -1500
+   },
+   "stellplaetze": "In den zugrunde gelegten Kauffalldaten des Wohnungseigentums sind KEINE Kaufpreisanteile für Kfz-Stellplätze enthalten (S. 64).",
+   "kaufpreisanpassung": "Für das Wohnungseigentum fand ausdrücklich KEINE Kaufpreisanpassung auf den Kaufzeitpunkt statt (S. 64). Die Indexierung auf den Stichtag 01.01.2025 über die Trendfunktion y = −0,00040522·x² + 37,0104·x − 839813 (x = Datumszahl, 01.01.2025 = 45685) betrifft die NEUBAU-Kaufpreisanalyse, nicht die Liegenschaftszinssätze.",
+   "verfahren": "Ertragswertverfahren, rückwärts gerechnet; je Kauffall ein Einzelzinssatz. Veröffentlicht wird das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte — nicht der Median und nicht das ungekappte Mittel. Der Bericht druckt beide Werte nebeneinander ab.",
+   "abhaengigkeitspruefung": "Der Ausschuss hat für das Wohnungseigentum ausdrücklich geprüft, ob der Liegenschaftszinssatz von Objektgröße (Anzahl der Wohneinheiten), Bodenrichtwert oder Wohnfläche abhängt: „Die Ergebnisse führten jeweils zu einer breiten Streuung ohne klare Tendenz. Auf eine Darstellung der Diagramme wurde daher verzichtet.\" Eine Achse über diese Größen wäre hier also Dokumentbruch — die Wohnflächenklassen stammen aus dem Mietspiegel und sind der Teilmarktschnitt, keine Regressionsachse.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang. Der Bericht führt einen Baupreisindex für Wohngebäude nur in der Zeitreihentabelle (Stichtag jeweils 31.12.) und bezieht ihn nicht auf die Liegenschaftszinssätze. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "datenbasis": "Kauffälle der Jahre 2023 und 2024 (Berichtszeitraum des Berichts selbst ist 01.01.2024 – 31.12.2024; die Zinssatzauswertungen greifen ausdrücklich auf zwei Jahrgänge zurück). Redaktionsschluss 25.11.2025."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Mainz (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Der Bericht führt für das Wohnungseigentum ZUSÄTZLICH stadtteilbezogene Liegenschaftszinssätze (Spalten Mainz, Weisenau, Laubenheim, Hechtsheim, Ebersheim, Marienborn, Bretzenheim, Drais, Finthen, Gonsenheim, Mombach) sowie eine Toplagen-Auswertung mit dem Kriterium „Blickbezug zum Rhein\". Eingetragen ist hier die STADTWEITE Spalte „Gesamt\". Die Stadtteilwerte sind eine offene Ernte-Chance und stehen noch NICHT im Register; sie bräuchten je Stadtteil einen eigenen zweig, sonst überschreiben sie sich im Konfliktschlüssel. Ein Stadtteilwert darf nicht aus dem stadtweiten Wert abgeleitet werden und umgekehrt.",
+   "extrapolation": "gesperrt",
+   "sachlich": "Wohn- und Geschäftshäuser",
+   "hinweis": "Der Wert ist an das Modell dieses Berichts gebunden (§ 10 ImmoWertV): ImmoWertV 2021, Gesamtnutzungsdauer 80 Jahre, Bodenrichtwerte zum 01.01.2024, Bewirtschaftungskosten nach ImmoWertV, Mittel nach 20-%-Kappung. Die Streuung ist mit abgedruckt (Standardabweichung 0,7 Prozentpunkte bei 16 gekappten Fällen); eine sachverständige Anpassung gehört in diese Größenordnung.",
+   "stichprobe": {
+    "anzahl_gekappt": 16,
+    "anzahl_gesamtheit": 28,
+    "rangbereich_nach_kappung": "7–22",
+    "mittelwert_gekappt_pct": 2.91,
+    "mittelwert_gesamtheit_pct": 2.97,
+    "standardabweichung_gekappt": 0.7,
+    "standardabweichung_gesamtheit": 1.4,
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 90, Fußzeile der Einzelfalltabelle „Liegenschaftszinssätze für Wohn- und Geschäftshäuser (WGH)\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94, Tabelle „Übersicht Liegenschaftszinssätze\", Zeile „Wohn- und Geschäftshäuser\", Spalte „LZ\"",
+    "wortlaut": "Wohn- und Geschäftshäuser: LZ 2,91 · Standardabweichung 0,7 · Anzahl nach Kappung 16. Kopfzeile der Tabelle: „Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen von Kauffällen der Jahre 2023 und 2024. Dargestellt sind die Mittelwerte nach Kappung von jeweils 20% der Minimum- / Maximumwerte.\"",
+    "kauffaelle": 16,
+    "gegenprobe": "Detailkapitel S. 90, Fußzeile der Einzelfalltabelle: „Gesamtheit (1-28): Mittelwert 2,97 / Stand.abw. 1,4 / Anzahl 28\" gegen „20%-Kappung (7–22): 2,91 / 0,7 / 16\". Mittelwert, Standardabweichung und Fallzahl stimmen mit der Übersicht überein.",
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026) aus der Tabelle „Übersicht Liegenschaftszinssätze\" auf S. 94.\nGEGENPROBE AN DEN DETAILKAPITELN — der eigentliche Prüfmaßstab: die Übersicht auf S. 94 ist eine Zusammenfassung („Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen\"). ALLE DREIZEHN ZEILEN wurden gegen ihr Detailkapitel gehalten, jede mit Mittelwert, Standardabweichung UND Fallzahl, und alle dreizehn stimmen Ziffer für Ziffer:\n  Ein- und Zweifamilienhäuser  S. 82  2,02 / 0,54 / 17   (Gesamtheit 2,13 / 1,31 / 29)\n  Mehrfamilienhäuser           S. 87  2,67 / 0,69 / 37   (Gesamtheit 2,69 / 1,63 / 61)\n  Wohn- und Geschäftshäuser    S. 90  2,91 / 0,70 / 16   (Gesamtheit 2,97 / 1,40 / 28)\n  Gewerbeobjekte               S. 92  3,59 / 1,27 / 13   (Gesamtheit 3,97 / 2,44 / 21)\n  Erstverkauf  < 40 m²         S. 69  1,73 / 0,14 /  8\n  Erstverkauf  40 – < 60 m²    S. 70  1,24 / 0,17 / 19\n  Erstverkauf  60 – < 80 m²    S. 71  1,38 / 0,35 / 15\n  Erstverkauf  >= 80 m²        S. 72  1,23 / 0,32 / 36\n  Weiterverkauf < 40 m²        S. 76  2,31 / 0,67 / 171\n  Weiterverkauf 40 – < 60 m²   S. 77  1,64 / 0,53 / 184\n  Weiterverkauf 60 – < 80 m²   S. 78  1,28 / 0,60 / 170\n  Weiterverkauf >= 80 m²       S. 79  1,41 / 0,49 / 239\n  (die dreizehnte Zeile ist die Gesamtheit-Zeile des Weiterverkaufs, die die Übersicht nicht gesondert führt)\nKAPPUNGSPROBE (Rechenprobe an der eigenen Regel des Berichts): der Bericht kappt je 20 % der Minimum- und Maximumwerte und druckt den verbleibenden Rangbereich mit ab. Nachgerechnet: EZFH 29 Fälle, Ränge 7–23 = 17 (29 − 2·6); MFH 61, Ränge 13–49 = 37 (61 − 2·12); WGH 28, Ränge 7–22 = 16 (28 − 2·6); Gewerbe 21, Ränge 5–17 = 13 (21 − 2·4). Vier von vier stimmen, und 20 % von 29/61/28/21 ergibt gerundet genau 6/12/6/4. Die Kappung ist damit nicht nur behauptet, sondern nachvollzogen.\nEIN DURCHGERECHNETES ANWENDUNGSBEISPIEL enthält der Bericht nicht; er druckt stattdessen die EINZELKAUFFÄLLE mit allen Eingangsgrößen ab (Gemarkung, Flur, Bodenrichtwert, Bodenwertanteil, relative Restnutzungsdauer, Nettokaltmiete, Wohnfläche, Kaufpreis je m² und den daraus abgeleiteten Zinssatz). Das ist mehr als ein Beispiel und ersetzt es: die Mittelwerte sind an ihrer eigenen Fallliste nachprüfbar."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses, an der eigenen Einzelfallliste nachprüfbar, mit Standardabweichung (0,7 Prozentpunkte) und Fallzahl (16 nach Kappung, 28 in der Gesamtheit).",
+  "fallzahl": 16,
+  "streuung": {
+   "stabw_pp": 0.7,
+   "stabw_pp_ungekappt": 1.4,
+   "stabw_art": "Standardabweichung der gekappten Stichprobe in Prozentpunkten (nicht Quantilsspanne, nicht Minimum/Maximum)"
+  },
+  "auflagen": [
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: der Bericht verweist nur auf die ImmoWertV 2021. Wer modellkonform rechnen will, muss die Ansätze selbst setzen; eine Quote steht nicht im Bericht und wird hier nicht ergänzt.",
+   "STICHTAG ABGELEITET, NICHT ABGEDRUCKT: eingetragen ist das Ende des Berichtszeitraums. Siehe stichtag_hinweis.",
+   "STADTTEILWERTE NOCH NICHT GEERNTET: der Bericht führt für das Wohnungseigentum elf Stadtteile und eine Toplagen-Auswertung gesondert. Diese Werte stehen noch nicht im Register und brauchen je Stadtteil einen eigenen zweig.",
+   "GERINGE FALLZAHL: der Wert stützt sich auf 16 gekappte Fälle aus 28. Der Bericht druckt die Einzelfälle vollständig ab (S. 90) — bei dieser Fallzahl ist der Blick in die Liste die bessere Grundlage als der Mittelwert allein."
+  ],
+  "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94 (Übersicht) und S. 90 (Einzelfälle und Zusammenfassung); Modellbeschreibung S. 80 bzw. S. 83",
+  "seite": 94
+ },
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Mainz, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Mainz 2025 (ImmoWertV21, GND 80, Mittel nach 20-%-Kappung, Kauffälle 2023+2024)",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1770-RPMZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)",
+  "lizenz": "Nachdruck, Vervielfältigung und Speicherung auf Datenträgern nur mit Quellenangabe gestattet",
+  "lizenz_hinweis": "Wörtlich (Impressum, S. 2): „Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet. Das Bild des Titelblattes unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden.\" — Die Übernahme einzelner Kennzahlen in das Register ist damit AUSDRÜCKLICH erlaubt, solange der Quellenvermerk mitläuft; eine Genehmigung ist nur für das Titelbild nötig, das hier nicht verwendet wird. Das unterscheidet Mainz von den baden-württembergischen Ausschüssen (Heilbronn, Ulm: „Nachdruck, auch auszugsweise, nur mit Genehmigung\") und ist der Grund, warum hier Werte stehen und dort nur ein Wegweiser.",
+  "kennzahl": "liegenschaftszinssatz",
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Wertermittlungsstichtag. Eingetragen ist das Ende des Berichtszeitraums (31.12.2024), das auf dem Titel steht: „Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)\". Die Zinssatzauswertungen greifen auf die Kauffälle 2023 UND 2024 zurück, haben also keinen Stichtagsbezug im engeren Sinn. Die Bodenrichtwerte des Modells sind die zum 01.01.2024 beschlossenen — das ist ein ANDERES Datum und steht gesondert in modellansaetze.bodenrichtwert_stichtag.",
+  "zweig": "gewerbe",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.59,
+   "rundung_stellen": 2,
+   "bezeichnung": "Gewerbeobjekte, stadtweit",
+   "hinweis": "Ergebnis in PROZENT (2,02 bedeutet 2,02 %), nicht als Dezimalbruch. Der Wert ist das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte, so wie der Bericht ihn in der Übersicht auf S. 94 führt. Keine Achse: für das Wohnungseigentum hat der Ausschuss eine Abhängigkeit von Objektgröße, Bodenrichtwert und Wohnfläche ausdrücklich geprüft und verworfen; für die übrigen Teilmärkte druckt er nur einen Wert.",
+   "wert_ungekappt": 3.97,
+   "wert_ungekappt_hinweis": "Der Bericht druckt daneben das UNGEKAPPTE Mittel der Gesamtheit ab: 3,97 % bei 21 Fällen und einer Standardabweichung von 2,44. Eingetragen ist der GEKAPPTE Wert, weil die Übersicht des Berichts ihn als Ergebnis führt. Die beiden Zahlen nicht verwechseln — die ungekappte Standardabweichung ist zwei- bis dreimal so groß."
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
+   "gnd_jahre": null,
+   "gnd_beleg": "Für Gewerbeobjekte nennt der Bericht KEINE einheitliche Zahl, sondern Spannen (S. 83): „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\"",
+   "gnd_warnung": "Die 80 Jahre gelten NICHT für die Gewerbeobjekte. Dort schreibt der Bericht (S. 83) ausdrücklich: „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\" Der Gewerbe-Satz trägt deshalb eine eigene, abweichende Angabe.",
+   "restnutzungsdauer": "Bei den Renditeobjekten wird die Restnutzungsdauer RELATIV in Prozent der Gesamtnutzungsdauer ausgewiesen, nicht in Jahren. Bei Mehrfamilienhäusern führt der Bericht die Modernisierung über eine Verlängerung nach ImmoWertV; ein Beispiel nennt er auf S. 60: „bei durchschnittlicher Instandhaltung und dem Baujahr 1975 beträgt [die Restnutzungsdauer] beispielsweise 30 Jahre\".",
+   "bewirtschaftungskosten": "wörtlich „Der Ansatz der Bewirtschaftungskosten entspricht den Vorgaben der ImmoWertV21\" (S. 64)",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze; er verweist nur auf die ImmoWertV 2021. Eine Zahl steht nicht da und wird hier nicht ergänzt.",
+   "rohertrag_wohnungseigentum": "ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz für Wohnraum, bezogen auf Baujahr und Wohnungsgröße. Die Wohnflächenklassen des Berichts sind deshalb KEINE eigene Erfindung, sondern die Eingruppierungen des Mietspiegels.",
+   "rohertrag_ezfh": "TATSÄCHLICH erbrachte Mieten, soweit sie der Geschäftsstelle marktüblich erschienen — nicht die Medianmiete. Der Bericht misst die Differenz selbst: „für 1- und 2-Familienhäuser [übersteigt] die tatsächliche Miete die Medianmiete nach dem Qualifizierten Mietspiegel Mainz für Wohnraum im langjährigen Mittel um 16 %\" (178 Kauffälle 2014–2024, nach 20-%-Kappung 106, Standardabweichung 11 %). Für die 16 Kauffälle aus 2024 allein betrug die Abweichung nur 7 % (Standardabweichung 16 %; nach Kappung auf 10 Fälle 6 % bei 9 %). WER HIER MIT DER MEDIANMIETE RECHNET, RECHNET NICHT MODELLKONFORM.",
+   "rohertrag_renditeobjekte": "durchschnittliche TATSÄCHLICHE Nettokaltmiete in €/m² Wohnfläche des untersuchten Kaufobjekts",
+   "bodenwert_ezfh": "keine Flächenanpassung, Ausnahme übergroße Grundstücke (eigener Abschnitt „Bodenwertanpassung wegen abweichender Flächengrößen\"). Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt; der Bericht gibt die Steigerung des Bodenrichtwerts von 01.01.2023 auf 01.01.2025 mit „ca. 0 %\" an.",
+   "bodenwert_renditeobjekte": "an die örtliche Situation angepasst, siehe Abschnitt „Bodenwertanpassung wegen abweichender Ausnutzung\"; Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt (ca. 0 % von 01.01.2023 auf 01.01.2025)",
+   "bodenrichtwert_stichtag": "2024-01-01",
+   "bodenrichtwert_beleg": "Der Gutachterausschuss hat die Bodenrichtwerte zum Stichtag 01. Januar 2024 beschlossen; die Bodenrichtwertkarte des Berichts trägt „Stichtag: 01.01.2024\".",
+   "besondere_merkmale": "berücksichtigt. Bei Ein- und Zweifamilienhäusern über eine eigene Staffel für den Instandhaltungsstau (einfach −500 €/m² Wohnfläche, mittel −750, erheblich −1.000, sehr erheblich −1.500), in der Regel als Korrektur des Ausstattungsstandards und der Restnutzungsdauer.",
+   "instandhaltungsstau_eur_qm_wf": {
+    "einfach": -500,
+    "mittel": -750,
+    "erheblich": -1000,
+    "sehr_erheblich": -1500
+   },
+   "stellplaetze": "In den zugrunde gelegten Kauffalldaten des Wohnungseigentums sind KEINE Kaufpreisanteile für Kfz-Stellplätze enthalten (S. 64).",
+   "kaufpreisanpassung": "Für das Wohnungseigentum fand ausdrücklich KEINE Kaufpreisanpassung auf den Kaufzeitpunkt statt (S. 64). Die Indexierung auf den Stichtag 01.01.2025 über die Trendfunktion y = −0,00040522·x² + 37,0104·x − 839813 (x = Datumszahl, 01.01.2025 = 45685) betrifft die NEUBAU-Kaufpreisanalyse, nicht die Liegenschaftszinssätze.",
+   "verfahren": "Ertragswertverfahren, rückwärts gerechnet; je Kauffall ein Einzelzinssatz. Veröffentlicht wird das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte — nicht der Median und nicht das ungekappte Mittel. Der Bericht druckt beide Werte nebeneinander ab.",
+   "abhaengigkeitspruefung": "Der Ausschuss hat für das Wohnungseigentum ausdrücklich geprüft, ob der Liegenschaftszinssatz von Objektgröße (Anzahl der Wohneinheiten), Bodenrichtwert oder Wohnfläche abhängt: „Die Ergebnisse führten jeweils zu einer breiten Streuung ohne klare Tendenz. Auf eine Darstellung der Diagramme wurde daher verzichtet.\" Eine Achse über diese Größen wäre hier also Dokumentbruch — die Wohnflächenklassen stammen aus dem Mietspiegel und sind der Teilmarktschnitt, keine Regressionsachse.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang. Der Bericht führt einen Baupreisindex für Wohngebäude nur in der Zeitreihentabelle (Stichtag jeweils 31.12.) und bezieht ihn nicht auf die Liegenschaftszinssätze. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "datenbasis": "Kauffälle der Jahre 2023 und 2024 (Berichtszeitraum des Berichts selbst ist 01.01.2024 – 31.12.2024; die Zinssatzauswertungen greifen ausdrücklich auf zwei Jahrgänge zurück). Redaktionsschluss 25.11.2025.",
+   "gnd_hinweis": "Hier steht BEWUSST keine Zahl. Die 80 Jahre der Wohnteilmärkte gelten für Gewerbe NICHT, und welche Zahl innerhalb von 40 bis 80 Jahren richtig ist, entscheidet nach dem Bericht die Lage (innerstädtisch mehrgeschossig gegen Gewerbegebiet), die Nutzung und die Bauweise. Eine Rückfallzahl wäre hier eine Erfindung.",
+   "gnd_spannen_jahre": {
+    "innerstaedtisch_mehrgeschossig": [
+     60,
+     80
+    ],
+    "gewerbegebiet": [
+     40,
+     60
+    ]
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Mainz (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Der Bericht führt für das Wohnungseigentum ZUSÄTZLICH stadtteilbezogene Liegenschaftszinssätze (Spalten Mainz, Weisenau, Laubenheim, Hechtsheim, Ebersheim, Marienborn, Bretzenheim, Drais, Finthen, Gonsenheim, Mombach) sowie eine Toplagen-Auswertung mit dem Kriterium „Blickbezug zum Rhein\". Eingetragen ist hier die STADTWEITE Spalte „Gesamt\". Die Stadtteilwerte sind eine offene Ernte-Chance und stehen noch NICHT im Register; sie bräuchten je Stadtteil einen eigenen zweig, sonst überschreiben sie sich im Konfliktschlüssel. Ein Stadtteilwert darf nicht aus dem stadtweiten Wert abgeleitet werden und umgekehrt.",
+   "extrapolation": "gesperrt",
+   "sachlich": "Gewerbeobjekte (Gewerbeimmobilien)",
+   "hinweis": "Der Wert ist an das Modell dieses Berichts gebunden (§ 10 ImmoWertV): ImmoWertV 2021, Gesamtnutzungsdauer 40 bis 80 Jahre je nach Lage und Bauweise, Bodenrichtwerte zum 01.01.2024, Bewirtschaftungskosten nach ImmoWertV, Mittel nach 20-%-Kappung. Die Streuung ist mit abgedruckt (Standardabweichung 1,27 Prozentpunkte bei 13 gekappten Fällen); eine sachverständige Anpassung gehört in diese Größenordnung.",
+   "stichprobe": {
+    "anzahl_gekappt": 13,
+    "anzahl_gesamtheit": 21,
+    "rangbereich_nach_kappung": "5–17",
+    "mittelwert_gekappt_pct": 3.59,
+    "mittelwert_gesamtheit_pct": 3.97,
+    "standardabweichung_gekappt": 1.27,
+    "standardabweichung_gesamtheit": 2.44,
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 92, Fußzeile der Einzelfalltabelle „Liegenschaftszinssätze für Gewerbeimmobilien (G)\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94, Tabelle „Übersicht Liegenschaftszinssätze\", Zeile „Gewerbeobjekte\", Spalte „LZ\"",
+    "wortlaut": "Gewerbeobjekte: LZ 3,59 · Standardabweichung 1,27 · Anzahl nach Kappung 13. Kopfzeile der Tabelle: „Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen von Kauffällen der Jahre 2023 und 2024. Dargestellt sind die Mittelwerte nach Kappung von jeweils 20% der Minimum- / Maximumwerte.\"",
+    "kauffaelle": 13,
+    "gegenprobe": "Detailkapitel S. 92, Fußzeile der Einzelfalltabelle: „Gesamtheit (1-21): Mittelwert 3,97 / Stand.abw. 2,44 / Anzahl 21\" gegen „20%-Kappung (5–17): 3,59 / 1,27 / 13\". Mittelwert, Standardabweichung und Fallzahl stimmen mit der Übersicht überein.",
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026) aus der Tabelle „Übersicht Liegenschaftszinssätze\" auf S. 94.\nGEGENPROBE AN DEN DETAILKAPITELN — der eigentliche Prüfmaßstab: die Übersicht auf S. 94 ist eine Zusammenfassung („Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen\"). ALLE DREIZEHN ZEILEN wurden gegen ihr Detailkapitel gehalten, jede mit Mittelwert, Standardabweichung UND Fallzahl, und alle dreizehn stimmen Ziffer für Ziffer:\n  Ein- und Zweifamilienhäuser  S. 82  2,02 / 0,54 / 17   (Gesamtheit 2,13 / 1,31 / 29)\n  Mehrfamilienhäuser           S. 87  2,67 / 0,69 / 37   (Gesamtheit 2,69 / 1,63 / 61)\n  Wohn- und Geschäftshäuser    S. 90  2,91 / 0,70 / 16   (Gesamtheit 2,97 / 1,40 / 28)\n  Gewerbeobjekte               S. 92  3,59 / 1,27 / 13   (Gesamtheit 3,97 / 2,44 / 21)\n  Erstverkauf  < 40 m²         S. 69  1,73 / 0,14 /  8\n  Erstverkauf  40 – < 60 m²    S. 70  1,24 / 0,17 / 19\n  Erstverkauf  60 – < 80 m²    S. 71  1,38 / 0,35 / 15\n  Erstverkauf  >= 80 m²        S. 72  1,23 / 0,32 / 36\n  Weiterverkauf < 40 m²        S. 76  2,31 / 0,67 / 171\n  Weiterverkauf 40 – < 60 m²   S. 77  1,64 / 0,53 / 184\n  Weiterverkauf 60 – < 80 m²   S. 78  1,28 / 0,60 / 170\n  Weiterverkauf >= 80 m²       S. 79  1,41 / 0,49 / 239\n  (die dreizehnte Zeile ist die Gesamtheit-Zeile des Weiterverkaufs, die die Übersicht nicht gesondert führt)\nKAPPUNGSPROBE (Rechenprobe an der eigenen Regel des Berichts): der Bericht kappt je 20 % der Minimum- und Maximumwerte und druckt den verbleibenden Rangbereich mit ab. Nachgerechnet: EZFH 29 Fälle, Ränge 7–23 = 17 (29 − 2·6); MFH 61, Ränge 13–49 = 37 (61 − 2·12); WGH 28, Ränge 7–22 = 16 (28 − 2·6); Gewerbe 21, Ränge 5–17 = 13 (21 − 2·4). Vier von vier stimmen, und 20 % von 29/61/28/21 ergibt gerundet genau 6/12/6/4. Die Kappung ist damit nicht nur behauptet, sondern nachvollzogen.\nEIN DURCHGERECHNETES ANWENDUNGSBEISPIEL enthält der Bericht nicht; er druckt stattdessen die EINZELKAUFFÄLLE mit allen Eingangsgrößen ab (Gemarkung, Flur, Bodenrichtwert, Bodenwertanteil, relative Restnutzungsdauer, Nettokaltmiete, Wohnfläche, Kaufpreis je m² und den daraus abgeleiteten Zinssatz). Das ist mehr als ein Beispiel und ersetzt es: die Mittelwerte sind an ihrer eigenen Fallliste nachprüfbar."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses, an der eigenen Einzelfallliste nachprüfbar, mit Standardabweichung (1,27 Prozentpunkte) und Fallzahl (13 nach Kappung, 21 in der Gesamtheit).",
+  "fallzahl": 13,
+  "streuung": {
+   "stabw_pp": 1.27,
+   "stabw_pp_ungekappt": 2.44,
+   "stabw_art": "Standardabweichung der gekappten Stichprobe in Prozentpunkten (nicht Quantilsspanne, nicht Minimum/Maximum)"
+  },
+  "auflagen": [
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: der Bericht verweist nur auf die ImmoWertV 2021. Wer modellkonform rechnen will, muss die Ansätze selbst setzen; eine Quote steht nicht im Bericht und wird hier nicht ergänzt.",
+   "STICHTAG ABGELEITET, NICHT ABGEDRUCKT: eingetragen ist das Ende des Berichtszeitraums. Siehe stichtag_hinweis.",
+   "STADTTEILWERTE NOCH NICHT GEERNTET: der Bericht führt für das Wohnungseigentum elf Stadtteile und eine Toplagen-Auswertung gesondert. Diese Werte stehen noch nicht im Register und brauchen je Stadtteil einen eigenen zweig.",
+   "GERINGE FALLZAHL: der Wert stützt sich auf 13 gekappte Fälle aus 21. Der Bericht druckt die Einzelfälle vollständig ab (S. 92) — bei dieser Fallzahl ist der Blick in die Liste die bessere Grundlage als der Mittelwert allein.",
+   "GESAMTNUTZUNGSDAUER NICHT BEZIFFERT: für Gewerbeobjekte führt der Bericht nur Spannen (40 bis 80 Jahre je nach Lage, Nutzung und Bauweise). modellansaetze.gnd_jahre steht deshalb auf null. Wer mit 80 Jahren rechnet, rechnet hier NICHT modellkonform."
+  ],
+  "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94 (Übersicht) und S. 92 (Einzelfälle und Zusammenfassung); Modellbeschreibung S. 80 bzw. S. 83",
+  "seite": 94
+ },
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Mainz, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Mainz 2025 (ImmoWertV21, GND 80, Mittel nach 20-%-Kappung, Kauffälle 2023+2024)",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1770-RPMZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)",
+  "lizenz": "Nachdruck, Vervielfältigung und Speicherung auf Datenträgern nur mit Quellenangabe gestattet",
+  "lizenz_hinweis": "Wörtlich (Impressum, S. 2): „Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet. Das Bild des Titelblattes unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden.\" — Die Übernahme einzelner Kennzahlen in das Register ist damit AUSDRÜCKLICH erlaubt, solange der Quellenvermerk mitläuft; eine Genehmigung ist nur für das Titelbild nötig, das hier nicht verwendet wird. Das unterscheidet Mainz von den baden-württembergischen Ausschüssen (Heilbronn, Ulm: „Nachdruck, auch auszugsweise, nur mit Genehmigung\") und ist der Grund, warum hier Werte stehen und dort nur ein Wegweiser.",
+  "kennzahl": "liegenschaftszinssatz",
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Wertermittlungsstichtag. Eingetragen ist das Ende des Berichtszeitraums (31.12.2024), das auf dem Titel steht: „Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)\". Die Zinssatzauswertungen greifen auf die Kauffälle 2023 UND 2024 zurück, haben also keinen Stichtagsbezug im engeren Sinn. Die Bodenrichtwerte des Modells sind die zum 01.01.2024 beschlossenen — das ist ein ANDERES Datum und steht gesondert in modellansaetze.bodenrichtwert_stichtag.",
+  "zweig": "we_e",
+  "formel": {
+   "form": "baender_1d",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "achse_feld": "wohnflaeche_qm",
+   "achse_bez": "Wohnfläche in m² (Klassen des Qualifizierten Mietspiegels Mainz für Wohnraum)",
+   "bezeichnung": "Wohnungseigentum — Erstverkauf, stadtweit, nach Wohnflächenklasse",
+   "hinweis": "Ergebnis in PROZENT (2,31 bedeutet 2,31 %). Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird — die Grenzen sind die Eingruppierungen des Mainzer Mietspiegels und keine Stützstellen einer Kurve. Jeder Bandwert ist das arithmetische Mittel nach Kappung von je 20 % der Minimum- und Maximumwerte.",
+   "grenzen_warnung": "ACHTUNG, GEMESSENE ABWEICHUNG: der Bericht grenzt seine Klassen als „< 40\", „40 bis < 60\", „60 bis < 80\", „>= 80\" ab — die Grenze gehört also zur OBEREN Klasse. Der Auswerter baender_1d prüft dagegen (von < x <= bis), die Grenze gehört bei ihm zur UNTEREN Klasse. Bei einer Wohnfläche von exakt 40,00 / 60,00 / 80,00 m² liefert er deshalb eine Klasse zu niedrig. Das ist hier benannt und nicht durch erfundene Grenzwerte wie 39,99 verdeckt. Unterhalb der Rundungsgrenze trifft es nur die drei exakten Werte; wer dort rechnet, nimmt die obere Klasse.",
+   "baender": [
+    {
+     "schluessel": "unter_40",
+     "bez": "< 40 m² Wohnfläche",
+     "von": null,
+     "bis": 40,
+     "wert": 1.73,
+     "fallzahl": 8,
+     "streuung": {
+      "stabw_pp": 0.14
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 69, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    },
+    {
+     "schluessel": "40_bis_unter_60",
+     "bez": "40 bis < 60 m² Wohnfläche",
+     "von": 40,
+     "bis": 60,
+     "wert": 1.24,
+     "fallzahl": 19,
+     "streuung": {
+      "stabw_pp": 0.17
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 70, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    },
+    {
+     "schluessel": "60_bis_unter_80",
+     "bez": "60 bis < 80 m² Wohnfläche",
+     "von": 60,
+     "bis": 80,
+     "wert": 1.38,
+     "fallzahl": 15,
+     "streuung": {
+      "stabw_pp": 0.35
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 71, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    },
+    {
+     "schluessel": "ab_80",
+     "bez": "80 m² Wohnfläche und mehr",
+     "von": 80,
+     "bis": null,
+     "wert": 1.23,
+     "fallzahl": 36,
+     "streuung": {
+      "stabw_pp": 0.32
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 72, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    }
+   ],
+   "interpolation": "keine — Bänder, so wie der Bericht sie abdruckt"
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 64 (Wohnungseigentum): „Die wirtschaftliche Gesamtnutzungsdauer wurde generell mit 80 Jahren angenommen.\" Wörtlich S. 83 (Renditeobjekte): „der Ansatz der wirtschaftlichen Gesamtnutzungsdauer (GND) für Mehrfamilienhäuser und Wohn- und Geschäftshäuser einheitlich mit 80 Jahren (Angabe der wirtschaftlichen Restnutzungsdauer (RND) in % bezogen auf die GND).\" Dazu S. 61: „Die Gesamtnutzungsdauer wurde pauschal mit 80 Jahren angenommen.\"",
+   "gnd_warnung": "Die 80 Jahre gelten NICHT für die Gewerbeobjekte. Dort schreibt der Bericht (S. 83) ausdrücklich: „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\" Der Gewerbe-Satz trägt deshalb eine eigene, abweichende Angabe.",
+   "restnutzungsdauer": "Bei den Renditeobjekten wird die Restnutzungsdauer RELATIV in Prozent der Gesamtnutzungsdauer ausgewiesen, nicht in Jahren. Bei Mehrfamilienhäusern führt der Bericht die Modernisierung über eine Verlängerung nach ImmoWertV; ein Beispiel nennt er auf S. 60: „bei durchschnittlicher Instandhaltung und dem Baujahr 1975 beträgt [die Restnutzungsdauer] beispielsweise 30 Jahre\".",
+   "bewirtschaftungskosten": "wörtlich „Der Ansatz der Bewirtschaftungskosten entspricht den Vorgaben der ImmoWertV21\" (S. 64)",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze; er verweist nur auf die ImmoWertV 2021. Eine Zahl steht nicht da und wird hier nicht ergänzt.",
+   "rohertrag_wohnungseigentum": "ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz für Wohnraum, bezogen auf Baujahr und Wohnungsgröße. Die Wohnflächenklassen des Berichts sind deshalb KEINE eigene Erfindung, sondern die Eingruppierungen des Mietspiegels.",
+   "rohertrag_ezfh": "TATSÄCHLICH erbrachte Mieten, soweit sie der Geschäftsstelle marktüblich erschienen — nicht die Medianmiete. Der Bericht misst die Differenz selbst: „für 1- und 2-Familienhäuser [übersteigt] die tatsächliche Miete die Medianmiete nach dem Qualifizierten Mietspiegel Mainz für Wohnraum im langjährigen Mittel um 16 %\" (178 Kauffälle 2014–2024, nach 20-%-Kappung 106, Standardabweichung 11 %). Für die 16 Kauffälle aus 2024 allein betrug die Abweichung nur 7 % (Standardabweichung 16 %; nach Kappung auf 10 Fälle 6 % bei 9 %). WER HIER MIT DER MEDIANMIETE RECHNET, RECHNET NICHT MODELLKONFORM.",
+   "rohertrag_renditeobjekte": "durchschnittliche TATSÄCHLICHE Nettokaltmiete in €/m² Wohnfläche des untersuchten Kaufobjekts",
+   "bodenwert_ezfh": "keine Flächenanpassung, Ausnahme übergroße Grundstücke (eigener Abschnitt „Bodenwertanpassung wegen abweichender Flächengrößen\"). Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt; der Bericht gibt die Steigerung des Bodenrichtwerts von 01.01.2023 auf 01.01.2025 mit „ca. 0 %\" an.",
+   "bodenwert_renditeobjekte": "an die örtliche Situation angepasst, siehe Abschnitt „Bodenwertanpassung wegen abweichender Ausnutzung\"; Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt (ca. 0 % von 01.01.2023 auf 01.01.2025)",
+   "bodenrichtwert_stichtag": "2024-01-01",
+   "bodenrichtwert_beleg": "Der Gutachterausschuss hat die Bodenrichtwerte zum Stichtag 01. Januar 2024 beschlossen; die Bodenrichtwertkarte des Berichts trägt „Stichtag: 01.01.2024\".",
+   "besondere_merkmale": "berücksichtigt. Bei Ein- und Zweifamilienhäusern über eine eigene Staffel für den Instandhaltungsstau (einfach −500 €/m² Wohnfläche, mittel −750, erheblich −1.000, sehr erheblich −1.500), in der Regel als Korrektur des Ausstattungsstandards und der Restnutzungsdauer.",
+   "instandhaltungsstau_eur_qm_wf": {
+    "einfach": -500,
+    "mittel": -750,
+    "erheblich": -1000,
+    "sehr_erheblich": -1500
+   },
+   "stellplaetze": "In den zugrunde gelegten Kauffalldaten des Wohnungseigentums sind KEINE Kaufpreisanteile für Kfz-Stellplätze enthalten (S. 64).",
+   "kaufpreisanpassung": "Für das Wohnungseigentum fand ausdrücklich KEINE Kaufpreisanpassung auf den Kaufzeitpunkt statt (S. 64). Die Indexierung auf den Stichtag 01.01.2025 über die Trendfunktion y = −0,00040522·x² + 37,0104·x − 839813 (x = Datumszahl, 01.01.2025 = 45685) betrifft die NEUBAU-Kaufpreisanalyse, nicht die Liegenschaftszinssätze.",
+   "verfahren": "Ertragswertverfahren, rückwärts gerechnet; je Kauffall ein Einzelzinssatz. Veröffentlicht wird das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte — nicht der Median und nicht das ungekappte Mittel. Der Bericht druckt beide Werte nebeneinander ab.",
+   "abhaengigkeitspruefung": "Der Ausschuss hat für das Wohnungseigentum ausdrücklich geprüft, ob der Liegenschaftszinssatz von Objektgröße (Anzahl der Wohneinheiten), Bodenrichtwert oder Wohnfläche abhängt: „Die Ergebnisse führten jeweils zu einer breiten Streuung ohne klare Tendenz. Auf eine Darstellung der Diagramme wurde daher verzichtet.\" Eine Achse über diese Größen wäre hier also Dokumentbruch — die Wohnflächenklassen stammen aus dem Mietspiegel und sind der Teilmarktschnitt, keine Regressionsachse.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang. Der Bericht führt einen Baupreisindex für Wohngebäude nur in der Zeitreihentabelle (Stichtag jeweils 31.12.) und bezieht ihn nicht auf die Liegenschaftszinssätze. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "datenbasis": "Kauffälle der Jahre 2023 und 2024 (Berichtszeitraum des Berichts selbst ist 01.01.2024 – 31.12.2024; die Zinssatzauswertungen greifen ausdrücklich auf zwei Jahrgänge zurück). Redaktionsschluss 25.11.2025."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Mainz (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Der Bericht führt für das Wohnungseigentum ZUSÄTZLICH stadtteilbezogene Liegenschaftszinssätze (Spalten Mainz, Weisenau, Laubenheim, Hechtsheim, Ebersheim, Marienborn, Bretzenheim, Drais, Finthen, Gonsenheim, Mombach) sowie eine Toplagen-Auswertung mit dem Kriterium „Blickbezug zum Rhein\". Eingetragen ist hier die STADTWEITE Spalte „Gesamt\". Die Stadtteilwerte sind eine offene Ernte-Chance und stehen noch NICHT im Register; sie bräuchten je Stadtteil einen eigenen zweig, sonst überschreiben sie sich im Konfliktschlüssel. Ein Stadtteilwert darf nicht aus dem stadtweiten Wert abgeleitet werden und umgekehrt.",
+   "extrapolation": "gesperrt",
+   "sachlich": "Wohnungseigentum im Erstverkauf",
+   "hinweis": "Der Wert ist an das Modell dieses Berichts gebunden (§ 10 ImmoWertV): Mietansatz ist die ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz nach Baujahr und Wohnungsgröße, Gesamtnutzungsdauer 80 Jahre, Bewirtschaftungskosten nach ImmoWertV 2021, keine Kaufpreisanteile für Kfz-Stellplätze, keine Kaufpreisanpassung auf den Kaufzeitpunkt. Der Ausschuss hat eine Abhängigkeit des Zinssatzes von Objektgröße, Bodenrichtwert und Wohnfläche geprüft und keine klare Tendenz gefunden — die Wohnflächenklassen sind der Teilmarktschnitt des Mietspiegels, keine Regressionsachse.",
+   "stichprobe": {
+    "je_klasse": {
+     "unter_40": {
+      "mittelwert_gekappt_pct": 1.73,
+      "standardabweichung": 0.14,
+      "anzahl_gekappt": 8
+     },
+     "40_bis_unter_60": {
+      "mittelwert_gekappt_pct": 1.24,
+      "standardabweichung": 0.17,
+      "anzahl_gekappt": 19
+     },
+     "60_bis_unter_80": {
+      "mittelwert_gekappt_pct": 1.38,
+      "standardabweichung": 0.35,
+      "anzahl_gekappt": 15
+     },
+     "ab_80": {
+      "mittelwert_gekappt_pct": 1.23,
+      "standardabweichung": 0.32,
+      "anzahl_gekappt": 36
+     }
+    },
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 69, 70, 71, 72 (je Wohnflächenklasse eine eigene Tabelle), Spalte „Gesamt\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94, Tabelle „Übersicht Liegenschaftszinssätze\", Block „Wohnungseigentum - Erstverkauf\"",
+    "wortlaut": "< 40 m² Wohnfläche: LZ 1,73 · Standardabweichung 0,14 · Anzahl nach Kappung 8 | 40 bis < 60 m² Wohnfläche: LZ 1,24 · Standardabweichung 0,17 · Anzahl nach Kappung 19 | 60 bis < 80 m² Wohnfläche: LZ 1,38 · Standardabweichung 0,35 · Anzahl nach Kappung 15 | 80 m² Wohnfläche und mehr: LZ 1,23 · Standardabweichung 0,32 · Anzahl nach Kappung 36",
+    "kauffaelle": 78,
+    "gegenprobe": "< 40 m² Wohnfläche → Detailtabelle S. 69, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,73, Standardabweichung 0,14, Anzahl 8 — stimmt mit der Übersicht überein. 40 bis < 60 m² Wohnfläche → Detailtabelle S. 70, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,24, Standardabweichung 0,17, Anzahl 19 — stimmt mit der Übersicht überein. 60 bis < 80 m² Wohnfläche → Detailtabelle S. 71, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,38, Standardabweichung 0,35, Anzahl 15 — stimmt mit der Übersicht überein. 80 m² Wohnfläche und mehr → Detailtabelle S. 72, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,23, Standardabweichung 0,32, Anzahl 36 — stimmt mit der Übersicht überein.",
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026) aus der Tabelle „Übersicht Liegenschaftszinssätze\" auf S. 94.\nGEGENPROBE AN DEN DETAILKAPITELN — der eigentliche Prüfmaßstab: die Übersicht auf S. 94 ist eine Zusammenfassung („Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen\"). ALLE DREIZEHN ZEILEN wurden gegen ihr Detailkapitel gehalten, jede mit Mittelwert, Standardabweichung UND Fallzahl, und alle dreizehn stimmen Ziffer für Ziffer:\n  Ein- und Zweifamilienhäuser  S. 82  2,02 / 0,54 / 17   (Gesamtheit 2,13 / 1,31 / 29)\n  Mehrfamilienhäuser           S. 87  2,67 / 0,69 / 37   (Gesamtheit 2,69 / 1,63 / 61)\n  Wohn- und Geschäftshäuser    S. 90  2,91 / 0,70 / 16   (Gesamtheit 2,97 / 1,40 / 28)\n  Gewerbeobjekte               S. 92  3,59 / 1,27 / 13   (Gesamtheit 3,97 / 2,44 / 21)\n  Erstverkauf  < 40 m²         S. 69  1,73 / 0,14 /  8\n  Erstverkauf  40 – < 60 m²    S. 70  1,24 / 0,17 / 19\n  Erstverkauf  60 – < 80 m²    S. 71  1,38 / 0,35 / 15\n  Erstverkauf  >= 80 m²        S. 72  1,23 / 0,32 / 36\n  Weiterverkauf < 40 m²        S. 76  2,31 / 0,67 / 171\n  Weiterverkauf 40 – < 60 m²   S. 77  1,64 / 0,53 / 184\n  Weiterverkauf 60 – < 80 m²   S. 78  1,28 / 0,60 / 170\n  Weiterverkauf >= 80 m²       S. 79  1,41 / 0,49 / 239\n  (die dreizehnte Zeile ist die Gesamtheit-Zeile des Weiterverkaufs, die die Übersicht nicht gesondert führt)\nKAPPUNGSPROBE (Rechenprobe an der eigenen Regel des Berichts): der Bericht kappt je 20 % der Minimum- und Maximumwerte und druckt den verbleibenden Rangbereich mit ab. Nachgerechnet: EZFH 29 Fälle, Ränge 7–23 = 17 (29 − 2·6); MFH 61, Ränge 13–49 = 37 (61 − 2·12); WGH 28, Ränge 7–22 = 16 (28 − 2·6); Gewerbe 21, Ränge 5–17 = 13 (21 − 2·4). Vier von vier stimmen, und 20 % von 29/61/28/21 ergibt gerundet genau 6/12/6/4. Die Kappung ist damit nicht nur behauptet, sondern nachvollzogen.\nEIN DURCHGERECHNETES ANWENDUNGSBEISPIEL enthält der Bericht nicht; er druckt stattdessen die EINZELKAUFFÄLLE mit allen Eingangsgrößen ab (Gemarkung, Flur, Bodenrichtwert, Bodenwertanteil, relative Restnutzungsdauer, Nettokaltmiete, Wohnfläche, Kaufpreis je m² und den daraus abgeleiteten Zinssatz). Das ist mehr als ein Beispiel und ersetzt es: die Mittelwerte sind an ihrer eigenen Fallliste nachprüfbar."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Bandtabelle eines Gutachterausschusses, je Band mit Standardabweichung und Fallzahl, alle vier Bänder gegen ihr Detailkapitel geprüft. Summe der gekappten Fälle: 78.",
+  "fallzahl": 78,
+  "streuung": {
+   "stabw_pp_je_klasse": {
+    "unter_40": 0.14,
+    "40_bis_unter_60": 0.17,
+    "60_bis_unter_80": 0.35,
+    "ab_80": 0.32
+   },
+   "stabw_art": "Standardabweichung der gekappten Stichprobe in Prozentpunkten, je Wohnflächenklasse"
+  },
+  "auflagen": [
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: der Bericht verweist nur auf die ImmoWertV 2021. Wer modellkonform rechnen will, muss die Ansätze selbst setzen; eine Quote steht nicht im Bericht und wird hier nicht ergänzt.",
+   "STICHTAG ABGELEITET, NICHT ABGEDRUCKT: eingetragen ist das Ende des Berichtszeitraums. Siehe stichtag_hinweis.",
+   "STADTTEILWERTE NOCH NICHT GEERNTET: der Bericht führt für das Wohnungseigentum elf Stadtteile und eine Toplagen-Auswertung gesondert. Diese Werte stehen noch nicht im Register und brauchen je Stadtteil einen eigenen zweig.",
+   "KLASSENGRENZE: die Intervallrichtung des Auswerters weicht von der des Berichts ab. Siehe formel.grenzen_warnung — betroffen sind nur Wohnflächen von exakt 40,00 / 60,00 / 80,00 m².",
+   "GERINGE FALLZAHLEN IM ERSTVERKAUF: 8 / 19 / 15 / 36 gekappte Fälle je Klasse. Die kleinste Klasse (< 40 m²) stützt sich auf acht Fälle; ihre Standardabweichung ist mit 0,14 Prozentpunkten auffällig klein, was bei acht Fällen eher für eine homogene Einzelanlage als für einen breiten Teilmarkt spricht. Der Bericht druckt die Einzelfälle ab (S. 69) — dort nachsehen."
+  ],
+  "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94 (Übersicht) und S. 69, 70, 71, 72 (je Wohnflächenklasse); Modellbeschreibung S. 64",
+  "seite": 94
+ },
+ {
+  "land_code": "RP",
+  "ags": "07315000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Mainz, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Mainz 2025 (ImmoWertV21, GND 80, Mittel nach 20-%-Kappung, Kauffälle 2023+2024)",
+  "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+  "quelle_parser": "v1770-RPMZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)",
+  "lizenz": "Nachdruck, Vervielfältigung und Speicherung auf Datenträgern nur mit Quellenangabe gestattet",
+  "lizenz_hinweis": "Wörtlich (Impressum, S. 2): „Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet. Das Bild des Titelblattes unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden.\" — Die Übernahme einzelner Kennzahlen in das Register ist damit AUSDRÜCKLICH erlaubt, solange der Quellenvermerk mitläuft; eine Genehmigung ist nur für das Titelbild nötig, das hier nicht verwendet wird. Das unterscheidet Mainz von den baden-württembergischen Ausschüssen (Heilbronn, Ulm: „Nachdruck, auch auszugsweise, nur mit Genehmigung\") und ist der Grund, warum hier Werte stehen und dort nur ein Wegweiser.",
+  "kennzahl": "liegenschaftszinssatz",
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Wertermittlungsstichtag. Eingetragen ist das Ende des Berichtszeitraums (31.12.2024), das auf dem Titel steht: „Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024)\". Die Zinssatzauswertungen greifen auf die Kauffälle 2023 UND 2024 zurück, haben also keinen Stichtagsbezug im engeren Sinn. Die Bodenrichtwerte des Modells sind die zum 01.01.2024 beschlossenen — das ist ein ANDERES Datum und steht gesondert in modellansaetze.bodenrichtwert_stichtag.",
+  "zweig": "we_v",
+  "formel": {
+   "form": "baender_1d",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "achse_feld": "wohnflaeche_qm",
+   "achse_bez": "Wohnfläche in m² (Klassen des Qualifizierten Mietspiegels Mainz für Wohnraum)",
+   "bezeichnung": "Wohnungseigentum — Weiterverkauf, stadtweit, nach Wohnflächenklasse",
+   "hinweis": "Ergebnis in PROZENT (2,31 bedeutet 2,31 %). Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird — die Grenzen sind die Eingruppierungen des Mainzer Mietspiegels und keine Stützstellen einer Kurve. Jeder Bandwert ist das arithmetische Mittel nach Kappung von je 20 % der Minimum- und Maximumwerte.",
+   "grenzen_warnung": "ACHTUNG, GEMESSENE ABWEICHUNG: der Bericht grenzt seine Klassen als „< 40\", „40 bis < 60\", „60 bis < 80\", „>= 80\" ab — die Grenze gehört also zur OBEREN Klasse. Der Auswerter baender_1d prüft dagegen (von < x <= bis), die Grenze gehört bei ihm zur UNTEREN Klasse. Bei einer Wohnfläche von exakt 40,00 / 60,00 / 80,00 m² liefert er deshalb eine Klasse zu niedrig. Das ist hier benannt und nicht durch erfundene Grenzwerte wie 39,99 verdeckt. Unterhalb der Rundungsgrenze trifft es nur die drei exakten Werte; wer dort rechnet, nimmt die obere Klasse.",
+   "baender": [
+    {
+     "schluessel": "unter_40",
+     "bez": "< 40 m² Wohnfläche",
+     "von": null,
+     "bis": 40,
+     "wert": 2.31,
+     "fallzahl": 171,
+     "streuung": {
+      "stabw_pp": 0.67
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 76, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    },
+    {
+     "schluessel": "40_bis_unter_60",
+     "bez": "40 bis < 60 m² Wohnfläche",
+     "von": 40,
+     "bis": 60,
+     "wert": 1.64,
+     "fallzahl": 184,
+     "streuung": {
+      "stabw_pp": 0.53
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 77, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    },
+    {
+     "schluessel": "60_bis_unter_80",
+     "bez": "60 bis < 80 m² Wohnfläche",
+     "von": 60,
+     "bis": 80,
+     "wert": 1.28,
+     "fallzahl": 170,
+     "streuung": {
+      "stabw_pp": 0.6
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 78, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    },
+    {
+     "schluessel": "ab_80",
+     "bez": "80 m² Wohnfläche und mehr",
+     "von": 80,
+     "bis": null,
+     "wert": 1.41,
+     "fallzahl": 239,
+     "streuung": {
+      "stabw_pp": 0.49
+     },
+     "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 79, Spalte „Gesamt\", Zeile „Mittelwert (20%-Kappung)\""
+    }
+   ],
+   "interpolation": "keine — Bänder, so wie der Bericht sie abdruckt"
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich: „Das Wertermittlungsmodell fußt auf den Vorgaben der ImmoWertV21.\" Die Modellbeschreibungen stehen je Teilmarkt getrennt (S. 64 Wohnungseigentum, S. 80 Ein-/Zweifamilienhäuser, S. 83 Renditeobjekte) und unterscheiden sich im Mietansatz und in der Bodenwertbehandlung.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 64 (Wohnungseigentum): „Die wirtschaftliche Gesamtnutzungsdauer wurde generell mit 80 Jahren angenommen.\" Wörtlich S. 83 (Renditeobjekte): „der Ansatz der wirtschaftlichen Gesamtnutzungsdauer (GND) für Mehrfamilienhäuser und Wohn- und Geschäftshäuser einheitlich mit 80 Jahren (Angabe der wirtschaftlichen Restnutzungsdauer (RND) in % bezogen auf die GND).\" Dazu S. 61: „Die Gesamtnutzungsdauer wurde pauschal mit 80 Jahren angenommen.\"",
+   "gnd_warnung": "Die 80 Jahre gelten NICHT für die Gewerbeobjekte. Dort schreibt der Bericht (S. 83) ausdrücklich: „Für mehrgeschossige Gewerbeimmobilien im innerstädtischen Bereich wurden 60-80 Jahre angenommen, wohingegen für Gewerbeimmobilien in Gewerbegebieten, je nach Nutzung, und Bauweise, 40-60 Jahre zum Ansatz kamen.\" Der Gewerbe-Satz trägt deshalb eine eigene, abweichende Angabe.",
+   "restnutzungsdauer": "Bei den Renditeobjekten wird die Restnutzungsdauer RELATIV in Prozent der Gesamtnutzungsdauer ausgewiesen, nicht in Jahren. Bei Mehrfamilienhäusern führt der Bericht die Modernisierung über eine Verlängerung nach ImmoWertV; ein Beispiel nennt er auf S. 60: „bei durchschnittlicher Instandhaltung und dem Baujahr 1975 beträgt [die Restnutzungsdauer] beispielsweise 30 Jahre\".",
+   "bewirtschaftungskosten": "wörtlich „Der Ansatz der Bewirtschaftungskosten entspricht den Vorgaben der ImmoWertV21\" (S. 64)",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze; er verweist nur auf die ImmoWertV 2021. Eine Zahl steht nicht da und wird hier nicht ergänzt.",
+   "rohertrag_wohnungseigentum": "ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz für Wohnraum, bezogen auf Baujahr und Wohnungsgröße. Die Wohnflächenklassen des Berichts sind deshalb KEINE eigene Erfindung, sondern die Eingruppierungen des Mietspiegels.",
+   "rohertrag_ezfh": "TATSÄCHLICH erbrachte Mieten, soweit sie der Geschäftsstelle marktüblich erschienen — nicht die Medianmiete. Der Bericht misst die Differenz selbst: „für 1- und 2-Familienhäuser [übersteigt] die tatsächliche Miete die Medianmiete nach dem Qualifizierten Mietspiegel Mainz für Wohnraum im langjährigen Mittel um 16 %\" (178 Kauffälle 2014–2024, nach 20-%-Kappung 106, Standardabweichung 11 %). Für die 16 Kauffälle aus 2024 allein betrug die Abweichung nur 7 % (Standardabweichung 16 %; nach Kappung auf 10 Fälle 6 % bei 9 %). WER HIER MIT DER MEDIANMIETE RECHNET, RECHNET NICHT MODELLKONFORM.",
+   "rohertrag_renditeobjekte": "durchschnittliche TATSÄCHLICHE Nettokaltmiete in €/m² Wohnfläche des untersuchten Kaufobjekts",
+   "bodenwert_ezfh": "keine Flächenanpassung, Ausnahme übergroße Grundstücke (eigener Abschnitt „Bodenwertanpassung wegen abweichender Flächengrößen\"). Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt; der Bericht gibt die Steigerung des Bodenrichtwerts von 01.01.2023 auf 01.01.2025 mit „ca. 0 %\" an.",
+   "bodenwert_renditeobjekte": "an die örtliche Situation angepasst, siehe Abschnitt „Bodenwertanpassung wegen abweichender Ausnutzung\"; Bodenwertveränderung zum Kaufzeitpunkt berücksichtigt (ca. 0 % von 01.01.2023 auf 01.01.2025)",
+   "bodenrichtwert_stichtag": "2024-01-01",
+   "bodenrichtwert_beleg": "Der Gutachterausschuss hat die Bodenrichtwerte zum Stichtag 01. Januar 2024 beschlossen; die Bodenrichtwertkarte des Berichts trägt „Stichtag: 01.01.2024\".",
+   "besondere_merkmale": "berücksichtigt. Bei Ein- und Zweifamilienhäusern über eine eigene Staffel für den Instandhaltungsstau (einfach −500 €/m² Wohnfläche, mittel −750, erheblich −1.000, sehr erheblich −1.500), in der Regel als Korrektur des Ausstattungsstandards und der Restnutzungsdauer.",
+   "instandhaltungsstau_eur_qm_wf": {
+    "einfach": -500,
+    "mittel": -750,
+    "erheblich": -1000,
+    "sehr_erheblich": -1500
+   },
+   "stellplaetze": "In den zugrunde gelegten Kauffalldaten des Wohnungseigentums sind KEINE Kaufpreisanteile für Kfz-Stellplätze enthalten (S. 64).",
+   "kaufpreisanpassung": "Für das Wohnungseigentum fand ausdrücklich KEINE Kaufpreisanpassung auf den Kaufzeitpunkt statt (S. 64). Die Indexierung auf den Stichtag 01.01.2025 über die Trendfunktion y = −0,00040522·x² + 37,0104·x − 839813 (x = Datumszahl, 01.01.2025 = 45685) betrifft die NEUBAU-Kaufpreisanalyse, nicht die Liegenschaftszinssätze.",
+   "verfahren": "Ertragswertverfahren, rückwärts gerechnet; je Kauffall ein Einzelzinssatz. Veröffentlicht wird das arithmetische MITTEL nach Kappung von je 20 % der Minimum- und Maximumwerte — nicht der Median und nicht das ungekappte Mittel. Der Bericht druckt beide Werte nebeneinander ab.",
+   "abhaengigkeitspruefung": "Der Ausschuss hat für das Wohnungseigentum ausdrücklich geprüft, ob der Liegenschaftszinssatz von Objektgröße (Anzahl der Wohneinheiten), Bodenrichtwert oder Wohnfläche abhängt: „Die Ergebnisse führten jeweils zu einer breiten Streuung ohne klare Tendenz. Auf eine Darstellung der Diagramme wurde daher verzichtet.\" Eine Achse über diese Größen wäre hier also Dokumentbruch — die Wohnflächenklassen stammen aus dem Mietspiegel und sind der Teilmarktschnitt, keine Regressionsachse.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang. Der Bericht führt einen Baupreisindex für Wohngebäude nur in der Zeitreihentabelle (Stichtag jeweils 31.12.) und bezieht ihn nicht auf die Liegenschaftszinssätze. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "datenbasis": "Kauffälle der Jahre 2023 und 2024 (Berichtszeitraum des Berichts selbst ist 01.01.2024 – 31.12.2024; die Zinssatzauswertungen greifen ausdrücklich auf zwei Jahrgänge zurück). Redaktionsschluss 25.11.2025."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Mainz (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Der Bericht führt für das Wohnungseigentum ZUSÄTZLICH stadtteilbezogene Liegenschaftszinssätze (Spalten Mainz, Weisenau, Laubenheim, Hechtsheim, Ebersheim, Marienborn, Bretzenheim, Drais, Finthen, Gonsenheim, Mombach) sowie eine Toplagen-Auswertung mit dem Kriterium „Blickbezug zum Rhein\". Eingetragen ist hier die STADTWEITE Spalte „Gesamt\". Die Stadtteilwerte sind eine offene Ernte-Chance und stehen noch NICHT im Register; sie bräuchten je Stadtteil einen eigenen zweig, sonst überschreiben sie sich im Konfliktschlüssel. Ein Stadtteilwert darf nicht aus dem stadtweiten Wert abgeleitet werden und umgekehrt.",
+   "extrapolation": "gesperrt",
+   "sachlich": "Wohnungseigentum im Weiterverkauf",
+   "hinweis": "Der Wert ist an das Modell dieses Berichts gebunden (§ 10 ImmoWertV): Mietansatz ist die ortsübliche MEDIANMIETE des Qualifizierten Mietspiegels Mainz nach Baujahr und Wohnungsgröße, Gesamtnutzungsdauer 80 Jahre, Bewirtschaftungskosten nach ImmoWertV 2021, keine Kaufpreisanteile für Kfz-Stellplätze, keine Kaufpreisanpassung auf den Kaufzeitpunkt. Der Ausschuss hat eine Abhängigkeit des Zinssatzes von Objektgröße, Bodenrichtwert und Wohnfläche geprüft und keine klare Tendenz gefunden — die Wohnflächenklassen sind der Teilmarktschnitt des Mietspiegels, keine Regressionsachse.",
+   "stichprobe": {
+    "je_klasse": {
+     "unter_40": {
+      "mittelwert_gekappt_pct": 2.31,
+      "standardabweichung": 0.67,
+      "anzahl_gekappt": 171
+     },
+     "40_bis_unter_60": {
+      "mittelwert_gekappt_pct": 1.64,
+      "standardabweichung": 0.53,
+      "anzahl_gekappt": 184
+     },
+     "60_bis_unter_80": {
+      "mittelwert_gekappt_pct": 1.28,
+      "standardabweichung": 0.6,
+      "anzahl_gekappt": 170
+     },
+     "ab_80": {
+      "mittelwert_gekappt_pct": 1.41,
+      "standardabweichung": 0.49,
+      "anzahl_gekappt": 239
+     }
+    },
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 76, 77, 78, 79 (je Wohnflächenklasse eine eigene Tabelle), Spalte „Gesamt\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94, Tabelle „Übersicht Liegenschaftszinssätze\", Block „Wohnungseigentum - Weiterverkauf\"",
+    "wortlaut": "< 40 m² Wohnfläche: LZ 2,31 · Standardabweichung 0,67 · Anzahl nach Kappung 171 | 40 bis < 60 m² Wohnfläche: LZ 1,64 · Standardabweichung 0,53 · Anzahl nach Kappung 184 | 60 bis < 80 m² Wohnfläche: LZ 1,28 · Standardabweichung 0,6 · Anzahl nach Kappung 170 | 80 m² Wohnfläche und mehr: LZ 1,41 · Standardabweichung 0,49 · Anzahl nach Kappung 239",
+    "kauffaelle": 764,
+    "gegenprobe": "< 40 m² Wohnfläche → Detailtabelle S. 76, Spalte „Gesamt\": Mittelwert (20%-Kappung) 2,31, Standardabweichung 0,67, Anzahl 171 — stimmt mit der Übersicht überein. 40 bis < 60 m² Wohnfläche → Detailtabelle S. 77, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,64, Standardabweichung 0,53, Anzahl 184 — stimmt mit der Übersicht überein. 60 bis < 80 m² Wohnfläche → Detailtabelle S. 78, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,28, Standardabweichung 0,6, Anzahl 170 — stimmt mit der Übersicht überein. 80 m² Wohnfläche und mehr → Detailtabelle S. 79, Spalte „Gesamt\": Mittelwert (20%-Kappung) 1,41, Standardabweichung 0,49, Anzahl 239 — stimmt mit der Übersicht überein.",
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026) aus der Tabelle „Übersicht Liegenschaftszinssätze\" auf S. 94.\nGEGENPROBE AN DEN DETAILKAPITELN — der eigentliche Prüfmaßstab: die Übersicht auf S. 94 ist eine Zusammenfassung („Die Ergebnisse beziehen sich auf die vorangegangenen Auswertungen\"). ALLE DREIZEHN ZEILEN wurden gegen ihr Detailkapitel gehalten, jede mit Mittelwert, Standardabweichung UND Fallzahl, und alle dreizehn stimmen Ziffer für Ziffer:\n  Ein- und Zweifamilienhäuser  S. 82  2,02 / 0,54 / 17   (Gesamtheit 2,13 / 1,31 / 29)\n  Mehrfamilienhäuser           S. 87  2,67 / 0,69 / 37   (Gesamtheit 2,69 / 1,63 / 61)\n  Wohn- und Geschäftshäuser    S. 90  2,91 / 0,70 / 16   (Gesamtheit 2,97 / 1,40 / 28)\n  Gewerbeobjekte               S. 92  3,59 / 1,27 / 13   (Gesamtheit 3,97 / 2,44 / 21)\n  Erstverkauf  < 40 m²         S. 69  1,73 / 0,14 /  8\n  Erstverkauf  40 – < 60 m²    S. 70  1,24 / 0,17 / 19\n  Erstverkauf  60 – < 80 m²    S. 71  1,38 / 0,35 / 15\n  Erstverkauf  >= 80 m²        S. 72  1,23 / 0,32 / 36\n  Weiterverkauf < 40 m²        S. 76  2,31 / 0,67 / 171\n  Weiterverkauf 40 – < 60 m²   S. 77  1,64 / 0,53 / 184\n  Weiterverkauf 60 – < 80 m²   S. 78  1,28 / 0,60 / 170\n  Weiterverkauf >= 80 m²       S. 79  1,41 / 0,49 / 239\n  (die dreizehnte Zeile ist die Gesamtheit-Zeile des Weiterverkaufs, die die Übersicht nicht gesondert führt)\nKAPPUNGSPROBE (Rechenprobe an der eigenen Regel des Berichts): der Bericht kappt je 20 % der Minimum- und Maximumwerte und druckt den verbleibenden Rangbereich mit ab. Nachgerechnet: EZFH 29 Fälle, Ränge 7–23 = 17 (29 − 2·6); MFH 61, Ränge 13–49 = 37 (61 − 2·12); WGH 28, Ränge 7–22 = 16 (28 − 2·6); Gewerbe 21, Ränge 5–17 = 13 (21 − 2·4). Vier von vier stimmen, und 20 % von 29/61/28/21 ergibt gerundet genau 6/12/6/4. Die Kappung ist damit nicht nur behauptet, sondern nachvollzogen.\nEIN DURCHGERECHNETES ANWENDUNGSBEISPIEL enthält der Bericht nicht; er druckt stattdessen die EINZELKAUFFÄLLE mit allen Eingangsgrößen ab (Gemarkung, Flur, Bodenrichtwert, Bodenwertanteil, relative Restnutzungsdauer, Nettokaltmiete, Wohnfläche, Kaufpreis je m² und den daraus abgeleiteten Zinssatz). Das ist mehr als ein Beispiel und ersetzt es: die Mittelwerte sind an ihrer eigenen Fallliste nachprüfbar."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Bandtabelle eines Gutachterausschusses, je Band mit Standardabweichung und Fallzahl, alle vier Bänder gegen ihr Detailkapitel geprüft. Summe der gekappten Fälle: 764.",
+  "fallzahl": 764,
+  "streuung": {
+   "stabw_pp_je_klasse": {
+    "unter_40": 0.67,
+    "40_bis_unter_60": 0.53,
+    "60_bis_unter_80": 0.6,
+    "ab_80": 0.49
+   },
+   "stabw_art": "Standardabweichung der gekappten Stichprobe in Prozentpunkten, je Wohnflächenklasse"
+  },
+  "auflagen": [
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: der Bericht verweist nur auf die ImmoWertV 2021. Wer modellkonform rechnen will, muss die Ansätze selbst setzen; eine Quote steht nicht im Bericht und wird hier nicht ergänzt.",
+   "STICHTAG ABGELEITET, NICHT ABGEDRUCKT: eingetragen ist das Ende des Berichtszeitraums. Siehe stichtag_hinweis.",
+   "STADTTEILWERTE NOCH NICHT GEERNTET: der Bericht führt für das Wohnungseigentum elf Stadtteile und eine Toplagen-Auswertung gesondert. Diese Werte stehen noch nicht im Register und brauchen je Stadtteil einen eigenen zweig.",
+   "KLASSENGRENZE: die Intervallrichtung des Auswerters weicht von der des Berichts ab. Siehe formel.grenzen_warnung — betroffen sind nur Wohnflächen von exakt 40,00 / 60,00 / 80,00 m²."
+  ],
+  "fundstelle": "Grundstücksmarktbericht Mainz 2025 (Berichtszeitraum 01.01.2024 – 31.12.2024), S. 94 (Übersicht) und S. 76, 77, 78, 79 (je Wohnflächenklasse); Modellbeschreibung S. 64",
+  "seite": 94
+ }
+]

@@ -91,7 +91,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Nachdruck, auch auszugsweise, nur mit Genehmigung des Gutachterausschusses (Impressum des Immobilienmarktberichts Heilbronn 2025).",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -169,7 +178,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Nachdruck, auch auszugsweise, nur mit Genehmigung des Gutachterausschusses (Impressum des Immobilienmarktberichts Heilbronn 2025).",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -247,7 +265,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Nachdruck, auch auszugsweise, nur mit Genehmigung des Gutachterausschusses (Impressum des Immobilienmarktberichts Heilbronn 2025).",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -319,7 +346,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Nachdruck, auch auszugsweise, nur mit Genehmigung des Gutachterausschusses (Impressum des Immobilienmarktberichts Heilbronn 2025).",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026 mit tools/ernte-waechter.mjs)",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -384,7 +420,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -409,7 +445,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -430,7 +466,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -495,7 +540,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -520,7 +565,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -541,7 +586,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -606,7 +660,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -631,7 +685,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -652,7 +706,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -717,7 +780,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -742,7 +805,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -763,7 +826,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -828,7 +900,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -853,7 +925,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -874,7 +946,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -939,7 +1020,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -964,7 +1045,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -985,7 +1066,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -1050,7 +1140,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -1075,7 +1165,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -1096,7 +1186,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -1161,7 +1260,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -1186,7 +1285,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -1207,7 +1306,16 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  },
  {
   "land_code": "BW",
@@ -1272,7 +1380,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -1297,7 +1405,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -1318,6 +1426,15 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "offen, Marcel vorgelegt am 02.10.2026"
+  }
  }
 ]

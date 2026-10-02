@@ -1340,5 +1340,37 @@
    "teilgebiet": null
   }
  ],
- "hinweis_doppelte_ags": "09671 (Landkreis Aschaffenburg) steht zweimal: der Ausschuss fuehrt \"Rest LK\" und \"Rhein-Main LK\" getrennt. Beide Zeilen melden derzeit keine Daten."
+ "hinweis_doppelte_ags": "09671 (Landkreis Aschaffenburg) steht zweimal: der Ausschuss fuehrt \"Rest LK\" und \"Rhein-Main LK\" getrennt. Beide Zeilen melden derzeit keine Daten.",
+ "lizenzbefund_20261001": {
+  "was": "Nachgemessen am 01.10.2026: WARUM aus Bayern trotz dieser Liste keine Werte kommen.",
+  "landesbericht": "Der Immobilienmarktbericht Bayern 2026 (https://www.gutachterausschuesse-bayern.de/fileadmin/user_upload/Immobilienmarktberichte/2026_IMB_BY_final_Optimized.pdf, 18,7 MB, 207 Seiten) wurde geladen und durchsucht. Das Wort \"Liegenschaftszinssatz\" kommt darin DREIMAL vor: im Abkuerzungsverzeichnis, in der Aufgabenbeschreibung und in Kapitel 11. \"Sachwertfaktor\" zweimal. KEINE Tabelle, KEIN Wert. Woertlich: die weiteren wertermittlungsrelevanten Daten \"werden ueberwiegend in den oertlichen Immobilienmarktberichten der Gutachterausschuesse veroeffentlicht\". Der Landesbericht ist also die LISTE, nicht die Quelle - genau wie dieser Wegweiser schon sagt.",
+  "landesbericht_lizenz": "Woertlich (S. 2): \"Dieser Immobilienmarktbericht fuer den Freistaat Bayern ist urheberrechtlich geschuetzt. Nachdruck, Vervielfaeltigung oder [...] nur mit Genehmigung des Herausgebers und mit Quellenangabe gestattet.\"",
+  "oertliche_berichte": "Die drei groessten Ausschuesse wurden am 01.10.2026 einzeln geprueft. Alle drei verkaufen ihren Bericht; frei steht jeweils nur eine Leseprobe oder das Inhaltsverzeichnis:",
+  "muenchen": {
+   "ags": "09162",
+   "frei": "nur das Inhaltsverzeichnis (https://stadt.muenchen.de/dam/jcr:e6701022-5eba-4b23-a995-ebf4d48aa3f1/Inhaltsverzeichnis_JB%202024.pdf, 2 Seiten). Es nennt die Fundstellen: \"Liegenschaftszinssaetze fuer Einfamilienhaeuser\" S. 30, \"Apartments und Wohnungen < 45 m2\" S. 32, \"Liegenschaftszinssaetze fuer Mehrfamilien-, Buero-[haeuser]\" sowie \"Durchschnittliche Liegenschaftszinssaetze\" S. 43, \"Sachwertfaktoren\" S. 58 mit dem Hinweis \"keine Sachwertfaktoren fuer Eigentumswohnungen\", \"Liegenschaftszinssatz bei gemindertem [Ertrag]\" und \"Unterjaehrige Marktentwicklungen im Berichtsjahr\" S. 64.",
+   "bericht_2025_veroeffentlicht": "11.06.2026",
+   "bezug": "gutachterausschuss@muenchen.de bzw. www.bodenrichtwerte-muenchen.de",
+   "gemessen_negativ": "Die frei abrufbaren Korrekturseiten zum Immobilienmarktbericht 2024 (jcr:39b9a80a..., 12 Seiten, Quelle der beiden Muenchener Sachwertfaktor-Saetze in sued-nord.json) enthalten KEINE Liegenschaftszinssatz-Tabelle. Geprueft: zwei Treffer, beide nur eine Fussnote \"Erbbauzinssaetze und Liegenschaftszinssaetze werden als identisch angenommen\". Auch die Herbstanalyse 2025 (12 Seiten) traegt keine Werte."
+  },
+  "nuernberg": {
+   "ags": "09564",
+   "frei": "nur eine Leseprobe (https://www.nuernberg.de/imperia/md/gutachterausschuss/dokumente/25v400_gmb_nurnberg_2025_leseprobe.pdf)",
+   "inhalt_laut_quelle": "Der Grundstuecksmarktbericht Nuernberg 2025 fuehrt Marktanpassungen mit Sachwertfaktoren und Erbbaurechtsfaktoren sowie Ertragsdaten mit Liegenschaftszinssaetzen und Rohertragsvervielfaeltigern.",
+   "bezug": "kostenpflichtig, Vertrieb ueber boris-bayern.de"
+  },
+  "augsburg_stadt": {
+   "ags": "09761",
+   "frei": false,
+   "preis": "50 Euro (135 Seiten, Download ueber boris-bayern.de)",
+   "inhalt_laut_quelle": "Vertragszahlen, Liegenschaftszinssaetze und Sachwertfaktoren sowie Vergleichsfaktoren (Gebaeude- und Ertragsfaktoren)"
+  },
+  "augsburg_landkreis": {
+   "ags": "09772",
+   "frei": "nur eine Leseprobe (https://www.landkreis-augsburg.de/fileadmin/user_upload/Gutachterausschuss/Leseprobe_Immobilienmarktbericht_2025.pdf)",
+   "preis": "Berichtspaket mit PDF-Rechner (IMB-Plus+) 340 Euro, PDF-Download ohne Immobilienmarktbericht 280 Euro"
+  },
+  "folge": "Fuer Bayern aendert sich an der Doktrin nichts: kostenpflichtig heisst kein Wert, sondern der Weg. Dieser Wegweiser ist dieser Weg und bleibt die richtige Antwort. Die beiden Muenchener Sachwertfaktoren in sued-nord.json stammen aus den FREIEN Korrekturseiten und sind davon nicht betroffen - sie tragen allerdings weder lizenz noch quellenvermerk und gehoeren insoweit nachgezogen.",
+  "quelle_parser": "v1770-BYLIZ"
+ }
 }

@@ -1,0 +1,3142 @@
+[
+ {
+  "land_code": "SH",
+  "ags": "01003000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Lübeck, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Lübeck Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaLiegZ2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck, Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.38,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein/Zweifamilienhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 1.87,
+    "2022": 1.76,
+    "2023": 3,
+    "2024": 2.87,
+    "2025": 3.1,
+    "2021-2025": 2.38
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Stadtteile sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12.3,
+     "150": 12.7,
+     "200": 13.3,
+     "250": 13.8,
+     "300": 14.2,
+     "400": 14.9,
+     "500": 15.4
+    },
+    "gb": {
+     "100": 9.4,
+     "125": 9.9,
+     "150": 10.3,
+     "200": 10.9,
+     "250": 11.4,
+     "300": 11.8,
+     "400": 12.6,
+     "500": 13.1,
+     "600": 13.6,
+     "800": 14.5
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Hansestadt Lübeck OHNE die Innere Stadt",
+   "raeumlich_hinweis": "Der Titel des Blattes lautet ausdrücklich „Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt)\". Für die Innere Stadt weist dieses Blatt KEINEN Liegenschaftszinssatz aus; der Wert darf dorthin nicht übertragen werden. Dieselbe Trennung führt der Sachwertfaktor-Satz desselben Ausschusses (swf-sh.json) — dort sind die Ganghäuser der Inneren Stadt eine eigene Tabelle und bewusst nicht übernommen.",
+   "sachlich": "Ein- und Zweifamilienhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 442,
+    "wohnflaeche_qm": 140,
+    "restnutzungsdauer_jahre": 36,
+    "nettokaltmiete_eur_qm_monat": 10.69,
+    "rohertragsfaktor_median": 24.65,
+    "rohertragsfaktor_spanne_16_84": [
+     16.96,
+     36.03
+    ],
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 2,38 · Spanne (16 % – 84 % Quantil) 0.65 – 4.15 · Standardfehler (Median) 0.12 · Anzahl der Stichproben 442 · Ø Wohnfläche 140 m² · Ø Restnutzungsdauer 36 Jahre · Ø Nettokaltmiete 10.69 €/m² · Rohertragsfaktor (Median) 24.65",
+    "kauffaelle": 442,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 1.87,
+      "2022": 1.76,
+      "2023": 3,
+      "2024": 2.87,
+      "2025": 3.1,
+      "2021-2025": 2.38
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       0.29,
+       3.31
+      ],
+      "2022": [
+       0.26,
+       3.41
+      ],
+      "2023": [
+       1.83,
+       4.25
+      ],
+      "2024": [
+       1.1,
+       4.79
+      ],
+      "2025": [
+       1.14,
+       4.78
+      ],
+      "2021-2025": [
+       0.65,
+       4.15
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.18,
+      "2022": 0.23,
+      "2023": 0.22,
+      "2024": 0.33,
+      "2025": 0.28,
+      "2021-2025": 0.12
+     },
+     "anzahl_stichproben": {
+      "2021": 123,
+      "2022": 116,
+      "2023": 57,
+      "2024": 75,
+      "2025": 71,
+      "2021-2025": 442
+     },
+     "wohnflaeche_qm": {
+      "2021": 151,
+      "2022": 143,
+      "2023": 148,
+      "2024": 146,
+      "2025": 152,
+      "2021-2025": 140
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 38,
+      "2022": 35,
+      "2023": 33,
+      "2024": 36,
+      "2025": 36,
+      "2021-2025": 36
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 9.89,
+      "2022": 11.22,
+      "2023": 12.43,
+      "2024": 11.62,
+      "2025": 13.08,
+      "2021-2025": 10.69
+     },
+     "rohertragsfaktor_median": {
+      "2021": 28.65,
+      "2022": 27.19,
+      "2023": 21.37,
+      "2024": 23.21,
+      "2025": 18.9,
+      "2021-2025": 24.65
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       20.07,
+       38.22
+      ],
+      "2022": [
+       19.15,
+       40.26
+      ],
+      "2023": [
+       17.22,
+       27.37
+      ],
+      "2024": [
+       16.17,
+       30.86
+      ],
+      "2025": [
+       14,
+       30.17
+      ],
+      "2021-2025": [
+       16.96,
+       36.03
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (442), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 442,
+  "streuung": {
+   "min_pct": 0.65,
+   "max_pct": 4.15,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.12
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01003000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Lübeck, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Lübeck Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaLiegZ2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck, Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.06,
+   "rundung_stellen": 2,
+   "bezeichnung": "Doppelhaus/Reihenmittel - Reihenendhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.17,
+    "2022": 2.45,
+    "2023": 3.08,
+    "2024": 3.9,
+    "2025": 5.5,
+    "2021-2025": 3.06
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Stadtteile sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12.3,
+     "150": 12.7,
+     "200": 13.3,
+     "250": 13.8,
+     "300": 14.2,
+     "400": 14.9,
+     "500": 15.4
+    },
+    "gb": {
+     "100": 9.4,
+     "125": 9.9,
+     "150": 10.3,
+     "200": 10.9,
+     "250": 11.4,
+     "300": 11.8,
+     "400": 12.6,
+     "500": 13.1,
+     "600": 13.6,
+     "800": 14.5
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Hansestadt Lübeck OHNE die Innere Stadt",
+   "raeumlich_hinweis": "Der Titel des Blattes lautet ausdrücklich „Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt)\". Für die Innere Stadt weist dieses Blatt KEINEN Liegenschaftszinssatz aus; der Wert darf dorthin nicht übertragen werden. Dieselbe Trennung führt der Sachwertfaktor-Satz desselben Ausschusses (swf-sh.json) — dort sind die Ganghäuser der Inneren Stadt eine eigene Tabelle und bewusst nicht übernommen.",
+   "sachlich": "Doppelhaushälften, Reihenmittel- und Reihenendhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 750,
+    "wohnflaeche_qm": 116,
+    "restnutzungsdauer_jahre": 37,
+    "nettokaltmiete_eur_qm_monat": 11.08,
+    "rohertragsfaktor_median": 21.07,
+    "rohertragsfaktor_spanne_16_84": [
+     13.05,
+     29.12
+    ],
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 3,06 · Spanne (16 % – 84 % Quantil) 1.39 – 6.07 · Standardfehler (Median) 0.13 · Anzahl der Stichproben 750 · Ø Wohnfläche 116 m² · Ø Restnutzungsdauer 37 Jahre · Ø Nettokaltmiete 11.08 €/m² · Rohertragsfaktor (Median) 21.07",
+    "kauffaelle": 750,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.17,
+      "2022": 2.45,
+      "2023": 3.08,
+      "2024": 3.9,
+      "2025": 5.5,
+      "2021-2025": 3.06
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       0.76,
+       3.8
+      ],
+      "2022": [
+       1.06,
+       4.14
+      ],
+      "2023": [
+       2.15,
+       5.67
+      ],
+      "2024": [
+       1.9,
+       8.17
+      ],
+      "2025": [
+       3.08,
+       8.69
+      ],
+      "2021-2025": [
+       1.39,
+       6.07
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.14,
+      "2022": 0.17,
+      "2023": 0.37,
+      "2024": 0.92,
+      "2025": 0.28,
+      "2021-2025": 0.13
+     },
+     "anzahl_stichproben": {
+      "2021": 216,
+      "2022": 212,
+      "2023": 84,
+      "2024": 21,
+      "2025": 217,
+      "2021-2025": 750
+     },
+     "wohnflaeche_qm": {
+      "2021": 116,
+      "2022": 113,
+      "2023": 123,
+      "2024": 137,
+      "2025": 136,
+      "2021-2025": 116
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 37,
+      "2022": 36,
+      "2023": 37,
+      "2024": 35,
+      "2025": 35,
+      "2021-2025": 37
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 10.43,
+      "2022": 11.55,
+      "2023": 12.38,
+      "2024": 12.94,
+      "2025": 14.13,
+      "2021-2025": 11.08
+     },
+     "rohertragsfaktor_median": {
+      "2021": 23.95,
+      "2022": 23.88,
+      "2023": 20.59,
+      "2024": 17.65,
+      "2025": 14.64,
+      "2021-2025": 21.07
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       17.45,
+       32.18
+      ],
+      "2022": [
+       16.9,
+       30.76
+      ],
+      "2023": [
+       13.2,
+       26.38
+      ],
+      "2024": [
+       10.4,
+       23.34
+      ],
+      "2025": [
+       9.72,
+       21.47
+      ],
+      "2021-2025": [
+       13.05,
+       29.12
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (750), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 750,
+  "streuung": {
+   "min_pct": 1.39,
+   "max_pct": 6.07,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.13
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01003000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Lübeck, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Lübeck Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaLiegZ2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck, Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.89,
+   "rundung_stellen": 2,
+   "bezeichnung": "Mehrfamilienhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.55,
+    "2022": 3.09,
+    "2023": 4.77,
+    "2024": 5.96,
+    "2025": 6.34,
+    "2021-2025": 3.89
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Stadtteile sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12.3,
+     "150": 12.7,
+     "200": 13.3,
+     "250": 13.8,
+     "300": 14.2,
+     "400": 14.9,
+     "500": 15.4
+    },
+    "gb": {
+     "100": 9.4,
+     "125": 9.9,
+     "150": 10.3,
+     "200": 10.9,
+     "250": 11.4,
+     "300": 11.8,
+     "400": 12.6,
+     "500": 13.1,
+     "600": 13.6,
+     "800": 14.5
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Hansestadt Lübeck OHNE die Innere Stadt",
+   "raeumlich_hinweis": "Der Titel des Blattes lautet ausdrücklich „Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt)\". Für die Innere Stadt weist dieses Blatt KEINEN Liegenschaftszinssatz aus; der Wert darf dorthin nicht übertragen werden. Dieselbe Trennung führt der Sachwertfaktor-Satz desselben Ausschusses (swf-sh.json) — dort sind die Ganghäuser der Inneren Stadt eine eigene Tabelle und bewusst nicht übernommen.",
+   "sachlich": "Mehrfamilienhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 125,
+    "wohnflaeche_qm": 625,
+    "restnutzungsdauer_jahre": 32,
+    "nettokaltmiete_eur_qm_monat": 11.28,
+    "rohertragsfaktor_median": 15.92,
+    "rohertragsfaktor_spanne_16_84": [
+     10.56,
+     23.1
+    ],
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Mehrfamilienhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Mehrfamilienhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 3,89 · Spanne (16 % – 84 % Quantil) 1.46 – 7.32 · Standardfehler (Median) 0.35 · Anzahl der Stichproben 125 · Ø Wohnfläche 625 m² · Ø Restnutzungsdauer 32 Jahre · Ø Nettokaltmiete 11.28 €/m² · Rohertragsfaktor (Median) 15.92",
+    "kauffaelle": 125,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.55,
+      "2022": 3.09,
+      "2023": 4.77,
+      "2024": 5.96,
+      "2025": 6.34,
+      "2021-2025": 3.89
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       0.93,
+       4.19
+      ],
+      "2022": [
+       1.25,
+       6.31
+      ],
+      "2023": [
+       3.17,
+       8.42
+      ],
+      "2024": [
+       3.68,
+       9.89
+      ],
+      "2025": [
+       2.64,
+       7.75
+      ],
+      "2021-2025": [
+       1.46,
+       7.32
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.36,
+      "2022": 0.83,
+      "2023": 0.8,
+      "2024": 0.7,
+      "2025": 0.99,
+      "2021-2025": 0.35
+     },
+     "anzahl_stichproben": {
+      "2021": 42,
+      "2022": 23,
+      "2023": 10,
+      "2024": 36,
+      "2025": 14,
+      "2021-2025": 125
+     },
+     "wohnflaeche_qm": {
+      "2021": 623,
+      "2022": 694,
+      "2023": 496,
+      "2024": 291,
+      "2025": 344,
+      "2021-2025": 625
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 33,
+      "2022": 37,
+      "2023": 28,
+      "2024": 30,
+      "2025": 30,
+      "2021-2025": 32
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 9.96,
+      "2022": 10.6,
+      "2023": 11.02,
+      "2024": 12.92,
+      "2025": 12.35,
+      "2021-2025": 11.28
+     },
+     "rohertragsfaktor_median": {
+      "2021": 20.39,
+      "2022": 19.85,
+      "2023": 13.31,
+      "2024": 12.49,
+      "2025": 11.86,
+      "2021-2025": 15.92
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       15.66,
+       25.78
+      ],
+      "2022": [
+       11.63,
+       31.84
+      ],
+      "2023": [
+       9.63,
+       17.05
+      ],
+      "2024": [
+       8.21,
+       16.44
+      ],
+      "2025": [
+       9.9,
+       18.03
+      ],
+      "2021-2025": [
+       10.56,
+       23.1
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (125), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 125,
+  "streuung": {
+   "min_pct": 1.46,
+   "max_pct": 7.32,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.35
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten.",
+   "TEILMARKT DÜNN BESETZT: 125 Kauffälle über fünf Jahre, 2023 nur 10, 2025 nur 14. Die Jahresreihe steigt von 2,55 auf 6,34 % — der Zeitraumwert 3,89 % liegt deutlich unter dem letzten Jahr. Wer zu einem heutigen Stichtag bewertet, muss diese Entwicklung sachverständig würdigen."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 1 von 4, Tabelle „Mehrfamilienhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01003000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Lübeck, Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Lübeck Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Luebeck/gaLiegZ2025Luebeck.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck, Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnung — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 1.66,
+    "2022": 1.54,
+    "2023": 2.42,
+    "2024": 3.08,
+    "2025": 2.64,
+    "2021-2025": 2.3
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Stadtteile sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12.3,
+     "150": 12.7,
+     "200": 13.3,
+     "250": 13.8,
+     "300": 14.2,
+     "400": 14.9,
+     "500": 15.4
+    },
+    "gb": {
+     "100": 9.4,
+     "125": 9.9,
+     "150": 10.3,
+     "200": 10.9,
+     "250": 11.4,
+     "300": 11.8,
+     "400": 12.6,
+     "500": 13.1,
+     "600": 13.6,
+     "800": 14.5
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Hansestadt Lübeck OHNE die Innere Stadt",
+   "raeumlich_hinweis": "Der Titel des Blattes lautet ausdrücklich „Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt)\". Für die Innere Stadt weist dieses Blatt KEINEN Liegenschaftszinssatz aus; der Wert darf dorthin nicht übertragen werden. Dieselbe Trennung führt der Sachwertfaktor-Satz desselben Ausschusses (swf-sh.json) — dort sind die Ganghäuser der Inneren Stadt eine eigene Tabelle und bewusst nicht übernommen.",
+   "sachlich": "Eigentumswohnungen im Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 1476,
+    "wohnflaeche_qm": 64,
+    "restnutzungsdauer_jahre": 38,
+    "nettokaltmiete_eur_qm_monat": 11.53,
+    "rohertragsfaktor_median": 22.1,
+    "rohertragsfaktor_spanne_16_84": [
+     15.59,
+     33.01
+    ],
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 2 von 4, Tabelle „Eigentumswohnung\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 2 von 4, Tabelle „Eigentumswohnung\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 2,30 · Spanne (16 % – 84 % Quantil) 0.65 – 4.15 · Standardfehler (Median) 0.07 · Anzahl der Stichproben 1476 · Ø Wohnfläche 64 m² · Ø Restnutzungsdauer 38 Jahre · Ø Nettokaltmiete 11.53 €/m² · Rohertragsfaktor (Median) 22.1",
+    "kauffaelle": 1476,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 1.66,
+      "2022": 1.54,
+      "2023": 2.42,
+      "2024": 3.08,
+      "2025": 2.64,
+      "2021-2025": 2.3
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       0.04,
+       3.14
+      ],
+      "2022": [
+       0.25,
+       3.58
+      ],
+      "2023": [
+       1.03,
+       4.16
+      ],
+      "2024": [
+       1.36,
+       4.87
+      ],
+      "2025": [
+       0.96,
+       4.35
+      ],
+      "2021-2025": [
+       0.65,
+       4.15
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.12,
+      "2022": 0.14,
+      "2023": 0.14,
+      "2024": 0.16,
+      "2025": 0.15,
+      "2021-2025": 0.07
+     },
+     "anzahl_stichproben": {
+      "2021": 345,
+      "2022": 275,
+      "2023": 266,
+      "2024": 298,
+      "2025": 292,
+      "2021-2025": 1476
+     },
+     "wohnflaeche_qm": {
+      "2021": 65,
+      "2022": 65,
+      "2023": 62,
+      "2024": 63,
+      "2025": 65,
+      "2021-2025": 64
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 38,
+      "2022": 38,
+      "2023": 40,
+      "2024": 37,
+      "2025": 38,
+      "2021-2025": 38
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 9.92,
+      "2022": 10.9,
+      "2023": 11.73,
+      "2024": 12.85,
+      "2025": 12.52,
+      "2021-2025": 11.53
+     },
+     "rohertragsfaktor_median": {
+      "2021": 23.71,
+      "2022": 24.64,
+      "2023": 21.81,
+      "2024": 18.67,
+      "2025": 20.45,
+      "2021-2025": 22.1
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       17.55,
+       38.64
+      ],
+      "2022": [
+       16.8,
+       35.1
+      ],
+      "2023": [
+       15.59,
+       30.7
+      ],
+      "2024": [
+       13.85,
+       28.97
+      ],
+      "2025": [
+       15.3,
+       31.52
+      ],
+      "2021-2025": [
+       15.59,
+       33.01
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (1476), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 1476,
+  "streuung": {
+   "min_pct": 0.65,
+   "max_pct": 4.15,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.07
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten.",
+   "AUFFÄLLIGKEIT: die Spanne der Eigentumswohnung im Zeitraum 2021–2025 (0,65 – 4,15) ist Ziffer für Ziffer dieselbe wie die des Ein/Zweifamilienhauses auf S. 1. Mit pdftotext -table auf beiden Seiten gegengelesen — so steht es im Blatt. Bei zwei Teilmärkten mit verschiedenen Medianen (2,30 gegen 2,38) und Standardfehlern (0,07 gegen 0,12) ist das möglich, aber auffällig. Nicht korrigiert und nicht übergangen."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Hansestadt Lübeck (ohne Innere Stadt), S. 2 von 4, Tabelle „Eigentumswohnung\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 2
+ },
+ {
+  "land_code": "SH",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Herzogtum Lauenburg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Herzogtum Lauenburg Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaLiegZHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg, Liegenschaftszinssätze Kreis Herzogtum Lauenburg, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.93,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein/Zweifamilienhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.26,
+    "2022": 2.38,
+    "2023": 3.32,
+    "2024": 3.7,
+    "2025": 4.16,
+    "2021-2025": 2.93
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12,
+     "150": 12.1,
+     "200": 12.3,
+     "250": 12.5,
+     "300": 12.6,
+     "400": 12.8,
+     "500": 12.9
+    },
+    "gb": {
+     "100": 7.9,
+     "125": 8.4,
+     "150": 8.8,
+     "200": 9.5,
+     "250": 10.1,
+     "300": 10.6,
+     "400": 11.5,
+     "500": 12.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Herzogtum Lauenburg (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; eine Gliederung nach Gemeinden gibt es ausdrücklich NICHT — die Lage wird über den Bodenrichtwert in der Mietstaffel abgebildet.",
+   "sachlich": "Ein- und Zweifamilienhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 1376,
+    "wohnflaeche_qm": 137,
+    "restnutzungsdauer_jahre": 38,
+    "nettokaltmiete_eur_qm_monat": 11.22,
+    "rohertragsfaktor_median": 22.93,
+    "rohertragsfaktor_spanne_16_84": [
+     15.53,
+     30.31
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 2,93 · Spanne (16 % – 84 % Quantil) 1.6 – 5.06 · Standardfehler (Median) 0.17 · Anzahl der Stichproben 1376 · Ø Wohnfläche 137 m² · Ø Restnutzungsdauer 38 Jahre · Ø Nettokaltmiete 11.22 €/m² · Rohertragsfaktor (Median) 22.93",
+    "kauffaelle": 1376,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.26,
+      "2022": 2.38,
+      "2023": 3.32,
+      "2024": 3.7,
+      "2025": 4.16,
+      "2021-2025": 2.93
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       1.2,
+       3.7
+      ],
+      "2022": [
+       1.38,
+       3.86
+      ],
+      "2023": [
+       2.13,
+       5.21
+      ],
+      "2024": [
+       1.82,
+       6.2
+      ],
+      "2025": [
+       2.65,
+       6.03
+      ],
+      "2021-2025": [
+       1.6,
+       5.06
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.09,
+      "2022": 0.13,
+      "2023": 0.18,
+      "2024": 0.19,
+      "2025": 0.14,
+      "2021-2025": 0.17
+     },
+     "anzahl_stichproben": {
+      "2021": 370,
+      "2022": 293,
+      "2023": 177,
+      "2024": 271,
+      "2025": 265,
+      "2021-2025": 1376
+     },
+     "wohnflaeche_qm": {
+      "2021": 138,
+      "2022": 133,
+      "2023": 137,
+      "2024": 136,
+      "2025": 140,
+      "2021-2025": 137
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 40,
+      "2022": 40,
+      "2023": 38,
+      "2024": 35,
+      "2025": 37,
+      "2021-2025": 38
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 10.07,
+      "2022": 10.87,
+      "2023": 11.46,
+      "2024": 12.2,
+      "2025": 12.46,
+      "2021-2025": 11.22
+     },
+     "rohertragsfaktor_median": {
+      "2021": 24.62,
+      "2022": 25.35,
+      "2023": 21.02,
+      "2024": 19,
+      "2025": 18.09,
+      "2021-2025": 22.93
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       18.54,
+       34.21
+      ],
+      "2022": [
+       17.67,
+       35.25
+      ],
+      "2023": [
+       15.12,
+       29.21
+      ],
+      "2024": [
+       13.14,
+       26.55
+      ],
+      "2025": [
+       13.18,
+       26.31
+      ],
+      "2021-2025": [
+       15.53,
+       30.31
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (1376), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 1376,
+  "streuung": {
+   "min_pct": 1.6,
+   "max_pct": 5.06,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.17
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Herzogtum Lauenburg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Herzogtum Lauenburg Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaLiegZHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg, Liegenschaftszinssätze Kreis Herzogtum Lauenburg, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.25,
+   "rundung_stellen": 2,
+   "bezeichnung": "Doppelhaus/Reihenmittel - Reihenendhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.51,
+    "2022": 2.3,
+    "2023": 2.79,
+    "2024": 4.26,
+    "2025": 4.41,
+    "2021-2025": 3.25
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12,
+     "150": 12.1,
+     "200": 12.3,
+     "250": 12.5,
+     "300": 12.6,
+     "400": 12.8,
+     "500": 12.9
+    },
+    "gb": {
+     "100": 7.9,
+     "125": 8.4,
+     "150": 8.8,
+     "200": 9.5,
+     "250": 10.1,
+     "300": 10.6,
+     "400": 11.5,
+     "500": 12.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Herzogtum Lauenburg (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; eine Gliederung nach Gemeinden gibt es ausdrücklich NICHT — die Lage wird über den Bodenrichtwert in der Mietstaffel abgebildet.",
+   "sachlich": "Doppelhaushälften, Reihenmittel- und Reihenendhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 830,
+    "wohnflaeche_qm": 106,
+    "restnutzungsdauer_jahre": 42,
+    "nettokaltmiete_eur_qm_monat": 11.57,
+    "rohertragsfaktor_median": 21.45,
+    "rohertragsfaktor_spanne_16_84": [
+     15.3,
+     28.55
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 3,25 · Spanne (16 % – 84 % Quantil) 2.08 – 5.01 · Standardfehler (Median) 0.1 · Anzahl der Stichproben 830 · Ø Wohnfläche 106 m² · Ø Restnutzungsdauer 42 Jahre · Ø Nettokaltmiete 11.57 €/m² · Rohertragsfaktor (Median) 21.45",
+    "kauffaelle": 830,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.51,
+      "2022": 2.3,
+      "2023": 2.79,
+      "2024": 4.26,
+      "2025": 4.41,
+      "2021-2025": 3.25
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       1.6,
+       3.82
+      ],
+      "2022": [
+       1.43,
+       3.6
+      ],
+      "2023": [
+       2.02,
+       4.05
+      ],
+      "2024": [
+       2.48,
+       6.43
+      ],
+      "2025": [
+       2.54,
+       5.41
+      ],
+      "2021-2025": [
+       2.08,
+       5.01
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.16,
+      "2022": 0.15,
+      "2023": 0.15,
+      "2024": 0.35,
+      "2025": 0.17,
+      "2021-2025": 0.1
+     },
+     "anzahl_stichproben": {
+      "2021": 204,
+      "2022": 188,
+      "2023": 117,
+      "2024": 163,
+      "2025": 158,
+      "2021-2025": 830
+     },
+     "wohnflaeche_qm": {
+      "2021": 107,
+      "2022": 107,
+      "2023": 106,
+      "2024": 104,
+      "2025": 107,
+      "2021-2025": 106
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 45,
+      "2022": 45,
+      "2023": 43,
+      "2024": 34,
+      "2025": 44,
+      "2021-2025": 42
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 10.45,
+      "2022": 11.25,
+      "2023": 11.64,
+      "2024": 12.47,
+      "2025": 12.02,
+      "2021-2025": 11.57
+     },
+     "rohertragsfaktor_median": {
+      "2021": 24.08,
+      "2022": 24.06,
+      "2023": 20.04,
+      "2024": 16.99,
+      "2025": 19.71,
+      "2021-2025": 21.45
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       17.3,
+       30.69
+      ],
+      "2022": [
+       18.1,
+       30.58
+      ],
+      "2023": [
+       15.3,
+       26.03
+      ],
+      "2024": [
+       12.66,
+       22.43
+      ],
+      "2025": [
+       14.48,
+       26.2
+      ],
+      "2021-2025": [
+       15.3,
+       28.55
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (830), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 830,
+  "streuung": {
+   "min_pct": 2.08,
+   "max_pct": 5.01,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.1
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Herzogtum Lauenburg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Herzogtum Lauenburg Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaLiegZHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg, Liegenschaftszinssätze Kreis Herzogtum Lauenburg, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 4.96,
+   "rundung_stellen": 2,
+   "bezeichnung": "Mehrfamilienhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 4.75,
+    "2022": null,
+    "2023": null,
+    "2024": 6.35,
+    "2025": 6.64,
+    "2021-2025": 4.96
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12,
+     "150": 12.1,
+     "200": 12.3,
+     "250": 12.5,
+     "300": 12.6,
+     "400": 12.8,
+     "500": 12.9
+    },
+    "gb": {
+     "100": 7.9,
+     "125": 8.4,
+     "150": 8.8,
+     "200": 9.5,
+     "250": 10.1,
+     "300": 10.6,
+     "400": 11.5,
+     "500": 12.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Herzogtum Lauenburg (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; eine Gliederung nach Gemeinden gibt es ausdrücklich NICHT — die Lage wird über den Bodenrichtwert in der Mietstaffel abgebildet.",
+   "sachlich": "Mehrfamilienhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 37,
+    "wohnflaeche_qm": 538,
+    "restnutzungsdauer_jahre": 34,
+    "nettokaltmiete_eur_qm_monat": 9.84,
+    "rohertragsfaktor_median": 13.45,
+    "rohertragsfaktor_spanne_16_84": [
+     10.17,
+     20.7
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Mehrfamilienhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Mehrfamilienhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 4,96 · Spanne (16 % – 84 % Quantil) 2.73 – 7.7 · Standardfehler (Median) 0.46 · Anzahl der Stichproben 37 · Ø Wohnfläche 538 m² · Ø Restnutzungsdauer 34 Jahre · Ø Nettokaltmiete 9.84 €/m² · Rohertragsfaktor (Median) 13.45",
+    "kauffaelle": 37,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 4.75,
+      "2022": null,
+      "2023": null,
+      "2024": 6.35,
+      "2025": 6.64,
+      "2021-2025": 4.96
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       2.05,
+       8.75
+      ],
+      "2022": null,
+      "2023": null,
+      "2024": [
+       2.64,
+       8.71
+      ],
+      "2025": [
+       2.99,
+       7.58
+      ],
+      "2021-2025": [
+       2.73,
+       7.7
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 1,
+      "2022": null,
+      "2023": null,
+      "2024": 0.98,
+      "2025": 0.55,
+      "2021-2025": 0.46
+     },
+     "anzahl_stichproben": {
+      "2021": 10,
+      "2022": 2,
+      "2023": 1,
+      "2024": 8,
+      "2025": 16,
+      "2021-2025": 37
+     },
+     "wohnflaeche_qm": {
+      "2021": 399,
+      "2022": null,
+      "2023": null,
+      "2024": 448,
+      "2025": 778,
+      "2021-2025": 538
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 43,
+      "2022": null,
+      "2023": null,
+      "2024": 41,
+      "2025": 34,
+      "2021-2025": 34
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 8.96,
+      "2022": null,
+      "2023": null,
+      "2024": 11.48,
+      "2025": 9.79,
+      "2021-2025": 9.84
+     },
+     "rohertragsfaktor_median": {
+      "2021": 13.44,
+      "2022": null,
+      "2023": null,
+      "2024": 12.93,
+      "2025": 13.46,
+      "2021-2025": 13.45
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       9.62,
+       28.47
+      ],
+      "2022": null,
+      "2023": null,
+      "2024": [
+       9.55,
+       19.73
+      ],
+      "2025": [
+       9.89,
+       18.04
+      ],
+      "2021-2025": [
+       10.17,
+       20.7
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (37), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 37,
+  "streuung": {
+   "min_pct": 2.73,
+   "max_pct": 7.7,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.46
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten.",
+   "GERINGE FALLZAHL: der Zeitraumwert 4,96 % stützt sich auf 37 Kauffälle, und für 2022 (2 Fälle) und 2023 (1 Fall) weist der Ausschuss ausdrücklich KEINEN Wert aus („–\"). Der Standardfehler des Medians liegt bei 0,46 Prozentpunkten, die Spanne reicht von 2,73 bis 7,70 %. Ein Median aus so wenigen Verkäufen braucht eine sachverständige kritische Würdigung; ein Auszug aus der Kaufpreissammlung ist der sicherere Weg."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 1 von 4, Tabelle „Mehrfamilienhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01053",
+  "ebene": "kreis",
+  "gebiet_name": "Herzogtum Lauenburg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Herzogtum Lauenburg Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_HzgtLauenburg/gaLiegZHzgtLauenburg2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg, Liegenschaftszinssätze Kreis Herzogtum Lauenburg, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.16,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnung — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.67,
+    "2022": 2.82,
+    "2023": 3.61,
+    "2024": 4.19,
+    "2025": 3.08,
+    "2021-2025": 3.16
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 11.9,
+     "125": 12,
+     "150": 12.1,
+     "200": 12.3,
+     "250": 12.5,
+     "300": 12.6,
+     "400": 12.8,
+     "500": 12.9
+    },
+    "gb": {
+     "100": 7.9,
+     "125": 8.4,
+     "150": 8.8,
+     "200": 9.5,
+     "250": 10.1,
+     "300": 10.6,
+     "400": 11.5,
+     "500": 12.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Herzogtum Lauenburg (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; eine Gliederung nach Gemeinden gibt es ausdrücklich NICHT — die Lage wird über den Bodenrichtwert in der Mietstaffel abgebildet.",
+   "sachlich": "Eigentumswohnungen im Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 848,
+    "wohnflaeche_qm": 73,
+    "restnutzungsdauer_jahre": 41,
+    "nettokaltmiete_eur_qm_monat": 9.84,
+    "rohertragsfaktor_median": 19.79,
+    "rohertragsfaktor_spanne_16_84": [
+     13.94,
+     27.38
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 2 von 4, Tabelle „Eigentumswohnung\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 2 von 4, Tabelle „Eigentumswohnung\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 3,16 · Spanne (16 % – 84 % Quantil) 1.83 – 5 · Standardfehler (Median) 0.09 · Anzahl der Stichproben 848 · Ø Wohnfläche 73 m² · Ø Restnutzungsdauer 41 Jahre · Ø Nettokaltmiete 9.84 €/m² · Rohertragsfaktor (Median) 19.79",
+    "kauffaelle": 848,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.67,
+      "2022": 2.82,
+      "2023": 3.61,
+      "2024": 4.19,
+      "2025": 3.08,
+      "2021-2025": 3.16
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       1.49,
+       4.27
+      ],
+      "2022": [
+       1.45,
+       4.51
+      ],
+      "2023": [
+       1.93,
+       5.29
+      ],
+      "2024": [
+       2.58,
+       6.33
+      ],
+      "2025": [
+       1.99,
+       4.67
+      ],
+      "2021-2025": [
+       1.83,
+       5
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.18,
+      "2022": 0.15,
+      "2023": 0.21,
+      "2024": 0.23,
+      "2025": 0.14,
+      "2021-2025": 0.09
+     },
+     "anzahl_stichproben": {
+      "2021": 209,
+      "2022": 180,
+      "2023": 125,
+      "2024": 168,
+      "2025": 166,
+      "2021-2025": 848
+     },
+     "wohnflaeche_qm": {
+      "2021": 70,
+      "2022": 69,
+      "2023": 71,
+      "2024": 73,
+      "2025": 77,
+      "2021-2025": 73
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 42,
+      "2022": 41,
+      "2023": 40,
+      "2024": 38,
+      "2025": 40,
+      "2021-2025": 41
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 9.46,
+      "2022": 10.48,
+      "2023": 11.25,
+      "2024": 11.42,
+      "2025": 10.89,
+      "2021-2025": 9.84
+     },
+     "rohertragsfaktor_median": {
+      "2021": 21.76,
+      "2022": 21.4,
+      "2023": 19.21,
+      "2024": 16.74,
+      "2025": 19.82,
+      "2021-2025": 19.79
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       16.02,
+       28.97
+      ],
+      "2022": [
+       15.36,
+       29.1
+      ],
+      "2023": [
+       13.62,
+       27.2
+      ],
+      "2024": [
+       11.85,
+       22.69
+      ],
+      "2025": [
+       15.1,
+       25.92
+      ],
+      "2021-2025": [
+       13.94,
+       27.38
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (848), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 848,
+  "streuung": {
+   "min_pct": 1.83,
+   "max_pct": 5,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.09
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Herzogtum Lauenburg, S. 2 von 4, Tabelle „Eigentumswohnung\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 2
+ },
+ {
+  "land_code": "SH",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Ostholstein, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Ostholstein Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaLiegZOstholstein2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein, Liegenschaftszinssätze Kreis Ostholstein, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.67,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein/Zweifamilienhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.01,
+    "2022": 2.25,
+    "2023": 3.31,
+    "2024": 3.57,
+    "2025": 3.52,
+    "2021-2025": 2.67
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden in Ostholstein, insbesondere in Küstennähe, sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 10.2,
+     "125": 10.6,
+     "150": 10.9,
+     "200": 11.5,
+     "250": 12,
+     "300": 12.4,
+     "400": 13,
+     "500": 13.6,
+     "1000": 15.4
+    },
+    "gb": {
+     "100": 9.2,
+     "125": 9.6,
+     "150": 10,
+     "200": 10.7,
+     "250": 11.2,
+     "300": 11.7,
+     "400": 12.4,
+     "500": 13,
+     "1000": 15.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Ostholstein (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; die Küstennähe ist ausdrücklich NICHT als eigene Kategorie geführt, sondern nur über den Bodenrichtwert in der Mietstaffel.",
+   "sachlich": "Ein- und Zweifamilienhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 1735,
+    "wohnflaeche_qm": 138,
+    "restnutzungsdauer_jahre": 39,
+    "nettokaltmiete_eur_qm_monat": 11.04,
+    "rohertragsfaktor_median": 22.69,
+    "rohertragsfaktor_spanne_16_84": [
+     15.75,
+     33.24
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 2,67 · Spanne (16 % – 84 % Quantil) 1.29 – 4.64 · Standardfehler (Median) 0.06 · Anzahl der Stichproben 1735 · Ø Wohnfläche 138 m² · Ø Restnutzungsdauer 39 Jahre · Ø Nettokaltmiete 11.04 €/m² · Rohertragsfaktor (Median) 22.69",
+    "kauffaelle": 1735,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.01,
+      "2022": 2.25,
+      "2023": 3.31,
+      "2024": 3.57,
+      "2025": 3.52,
+      "2021-2025": 2.67
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       0.83,
+       3.69
+      ],
+      "2022": [
+       1.12,
+       3.86
+      ],
+      "2023": [
+       1.92,
+       4.97
+      ],
+      "2024": [
+       2.17,
+       5.73
+      ],
+      "2025": [
+       1.95,
+       5.71
+      ],
+      "2021-2025": [
+       1.29,
+       4.64
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.11,
+      "2022": 0.11,
+      "2023": 0.16,
+      "2024": 0.13,
+      "2025": 0.13,
+      "2021-2025": 0.06
+     },
+     "anzahl_stichproben": {
+      "2021": 403,
+      "2022": 336,
+      "2023": 238,
+      "2024": 383,
+      "2025": 375,
+      "2021-2025": 1735
+     },
+     "wohnflaeche_qm": {
+      "2021": 138,
+      "2022": 137,
+      "2023": 141,
+      "2024": 139,
+      "2025": 139,
+      "2021-2025": 138
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 40,
+      "2022": 40,
+      "2023": 39,
+      "2024": 35,
+      "2025": 39,
+      "2021-2025": 39
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 9.73,
+      "2022": 10.84,
+      "2023": 11.4,
+      "2024": 11.39,
+      "2025": 12.04,
+      "2021-2025": 11.04
+     },
+     "rohertragsfaktor_median": {
+      "2021": 26.17,
+      "2022": 25.14,
+      "2023": 20.41,
+      "2024": 19.62,
+      "2025": 19.85,
+      "2021-2025": 22.69
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       18.58,
+       36.81
+      ],
+      "2022": [
+       18.45,
+       36.84
+      ],
+      "2023": [
+       14.7,
+       29.94
+      ],
+      "2024": [
+       14.02,
+       28.65
+      ],
+      "2025": [
+       13.78,
+       28.9
+      ],
+      "2021-2025": [
+       15.75,
+       33.24
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (1735), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 1735,
+  "streuung": {
+   "min_pct": 1.29,
+   "max_pct": 4.64,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.06
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Ein/Zweifamilienhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Ostholstein, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Ostholstein Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaLiegZOstholstein2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein, Liegenschaftszinssätze Kreis Ostholstein, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.9,
+   "rundung_stellen": 2,
+   "bezeichnung": "Doppelhaus/Reihenmittel - Reihenendhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.2,
+    "2022": 2.43,
+    "2023": 3.02,
+    "2024": 3.83,
+    "2025": 3.57,
+    "2021-2025": 2.9
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden in Ostholstein, insbesondere in Küstennähe, sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 10.2,
+     "125": 10.6,
+     "150": 10.9,
+     "200": 11.5,
+     "250": 12,
+     "300": 12.4,
+     "400": 13,
+     "500": 13.6,
+     "1000": 15.4
+    },
+    "gb": {
+     "100": 9.2,
+     "125": 9.6,
+     "150": 10,
+     "200": 10.7,
+     "250": 11.2,
+     "300": 11.7,
+     "400": 12.4,
+     "500": 13,
+     "1000": 15.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Ostholstein (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; die Küstennähe ist ausdrücklich NICHT als eigene Kategorie geführt, sondern nur über den Bodenrichtwert in der Mietstaffel.",
+   "sachlich": "Doppelhaushälften, Reihenmittel- und Reihenendhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 810,
+    "wohnflaeche_qm": 105,
+    "restnutzungsdauer_jahre": 40,
+    "nettokaltmiete_eur_qm_monat": 11.37,
+    "rohertragsfaktor_median": 23.21,
+    "rohertragsfaktor_spanne_16_84": [
+     15.28,
+     32.52
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 2,90 · Spanne (16 % – 84 % Quantil) 1.62 – 4.96 · Standardfehler (Median) 0.09 · Anzahl der Stichproben 810 · Ø Wohnfläche 105 m² · Ø Restnutzungsdauer 40 Jahre · Ø Nettokaltmiete 11.37 €/m² · Rohertragsfaktor (Median) 23.21",
+    "kauffaelle": 810,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.2,
+      "2022": 2.43,
+      "2023": 3.02,
+      "2024": 3.83,
+      "2025": 3.57,
+      "2021-2025": 2.9
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       1.11,
+       3.84
+      ],
+      "2022": [
+       1.23,
+       4.43
+      ],
+      "2023": [
+       1.9,
+       4.43
+      ],
+      "2024": [
+       2.22,
+       6.36
+      ],
+      "2025": [
+       2.35,
+       5.32
+      ],
+      "2021-2025": [
+       1.62,
+       4.96
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.13,
+      "2022": 0.16,
+      "2023": 0.17,
+      "2024": 0.21,
+      "2025": 0.19,
+      "2021-2025": 0.09
+     },
+     "anzahl_stichproben": {
+      "2021": 277,
+      "2022": 203,
+      "2023": 133,
+      "2024": 197,
+      "2025": 191,
+      "2021-2025": 810
+     },
+     "wohnflaeche_qm": {
+      "2021": 105,
+      "2022": 102,
+      "2023": 113,
+      "2024": 105,
+      "2025": 102,
+      "2021-2025": 105
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 43,
+      "2022": 41,
+      "2023": 41,
+      "2024": 38,
+      "2025": 38,
+      "2021-2025": 40
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 10.04,
+      "2022": 11.02,
+      "2023": 11.84,
+      "2024": 12.51,
+      "2025": 12.44,
+      "2021-2025": 11.37
+     },
+     "rohertragsfaktor_median": {
+      "2021": 25.78,
+      "2022": 25.21,
+      "2023": 21.55,
+      "2024": 19.21,
+      "2025": 20.42,
+      "2021-2025": 23.21
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       17.94,
+       36.74
+      ],
+      "2022": [
+       15.99,
+       34.51
+      ],
+      "2023": [
+       15.33,
+       30.82
+      ],
+      "2024": [
+       12.75,
+       28.18
+      ],
+      "2025": [
+       13.87,
+       26.06
+      ],
+      "2021-2025": [
+       15.28,
+       32.52
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV.\nABWEICHUNG in genau diesem Teilmarkt: ostholstein/rhdhh: gedruckt 810, Summe der Jahresspalten 1001. Nicht stillschweigend korrigiert — siehe auflagen."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (810), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 810,
+  "streuung": {
+   "min_pct": 1.62,
+   "max_pct": 4.96,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.09
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten.",
+   "ZÄHLPROBE ABWEICHEND: ostholstein/rhdhh: gedruckt 810, Summe der Jahresspalten 1001. Gegengeprüft am Vorjahrgang (gaLiegZOstholstein2024.pdf, S. 1): dort stimmte die Summe exakt, 1124 = 314+277+203+133+197. Die hier gedruckte 810 ist genau dieses Vorjahrestotal 1124 minus die weggefallene Spalte 2020 (314) — die neu hinzugekommene Spalte 2025 (191) wurde offenbar nicht aufaddiert. Arithmetisch richtig wären 1001. Eingetragen ist die GEDRUCKTE 810; 1001 wäre meine Zahl, nicht die des Ausschusses. Beim Ausschuss zu klären. Der Liegenschaftszinssatz selbst ist davon nicht betroffen: er liegt in seiner Spanne, und derselbe Teilmarkt wies im Vorjahrgang für 2023 noch 3,04 % aus, jetzt 3,02 % — die Reihe wurde also neu gerechnet, nur die Summenzeile nicht nachgezogen."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Doppelhaus/Reihenmittel - Reihenendhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Ostholstein, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Ostholstein Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaLiegZOstholstein2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein, Liegenschaftszinssätze Kreis Ostholstein, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 4.68,
+   "rundung_stellen": 2,
+   "bezeichnung": "Mehrfamilienhaus — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 2.86,
+    "2022": 4.13,
+    "2023": 5.23,
+    "2024": 6.63,
+    "2025": 6.69,
+    "2021-2025": 4.68
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden in Ostholstein, insbesondere in Küstennähe, sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 10.2,
+     "125": 10.6,
+     "150": 10.9,
+     "200": 11.5,
+     "250": 12,
+     "300": 12.4,
+     "400": 13,
+     "500": 13.6,
+     "1000": 15.4
+    },
+    "gb": {
+     "100": 9.2,
+     "125": 9.6,
+     "150": 10,
+     "200": 10.7,
+     "250": 11.2,
+     "300": 11.7,
+     "400": 12.4,
+     "500": 13,
+     "1000": 15.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Ostholstein (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; die Küstennähe ist ausdrücklich NICHT als eigene Kategorie geführt, sondern nur über den Bodenrichtwert in der Mietstaffel.",
+   "sachlich": "Mehrfamilienhäuser, Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 133,
+    "wohnflaeche_qm": 331,
+    "restnutzungsdauer_jahre": 34,
+    "nettokaltmiete_eur_qm_monat": 10.84,
+    "rohertragsfaktor_median": 15.27,
+    "rohertragsfaktor_spanne_16_84": [
+     10.01,
+     24.82
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Mehrfamilienhaus\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Mehrfamilienhaus\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 4,68 · Spanne (16 % – 84 % Quantil) 2.1 – 8.31 · Standardfehler (Median) 0.36 · Anzahl der Stichproben 133 · Ø Wohnfläche 331 m² · Ø Restnutzungsdauer 34 Jahre · Ø Nettokaltmiete 10.84 €/m² · Rohertragsfaktor (Median) 15.27",
+    "kauffaelle": 133,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 2.86,
+      "2022": 4.13,
+      "2023": 5.23,
+      "2024": 6.63,
+      "2025": 6.69,
+      "2021-2025": 4.68
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       1.97,
+       4.75
+      ],
+      "2022": [
+       1.9,
+       5.71
+      ],
+      "2023": [
+       1.77,
+       7.1
+      ],
+      "2024": [
+       3.23,
+       10.86
+      ],
+      "2025": [
+       3.05,
+       9.62
+      ],
+      "2021-2025": [
+       2.1,
+       8.31
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.52,
+      "2022": 0.47,
+      "2023": 0.92,
+      "2024": 0.92,
+      "2025": 0.73,
+      "2021-2025": 0.36
+     },
+     "anzahl_stichproben": {
+      "2021": 39,
+      "2022": 24,
+      "2023": 9,
+      "2024": 18,
+      "2025": 43,
+      "2021-2025": 133
+     },
+     "wohnflaeche_qm": {
+      "2021": 260,
+      "2022": 293,
+      "2023": 345,
+      "2024": 354,
+      "2025": 406,
+      "2021-2025": 331
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 36,
+      "2022": 33,
+      "2023": 34,
+      "2024": 32,
+      "2025": 33,
+      "2021-2025": 34
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 9.32,
+      "2022": 10.6,
+      "2023": 10.83,
+      "2024": 11.92,
+      "2025": 12.01,
+      "2021-2025": 10.84
+     },
+     "rohertragsfaktor_median": {
+      "2021": 18.81,
+      "2022": 17.18,
+      "2023": 14.91,
+      "2024": 12.16,
+      "2025": 12.39,
+      "2021-2025": 15.27
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       13.94,
+       26.73
+      ],
+      "2022": [
+       12.99,
+       28.08
+      ],
+      "2023": [
+       11.3,
+       28.2
+      ],
+      "2024": [
+       7.48,
+       21.33
+      ],
+      "2025": [
+       8.46,
+       22.08
+      ],
+      "2021-2025": [
+       10.01,
+       24.82
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (133), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 133,
+  "streuung": {
+   "min_pct": 2.1,
+   "max_pct": 8.31,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.36
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 1 von 4, Tabelle „Mehrfamilienhaus\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 1
+ },
+ {
+  "land_code": "SH",
+  "ags": "01055",
+  "ebene": "kreis",
+  "gebiet_name": "Ostholstein, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein",
+  "berichtsjahr": 2025,
+  "modellversion": "LiegZ Ostholstein Berichtszeitraum 2021-2025 (GND 80, Median, veröffentlicht 30.06.2026)",
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ostholstein/gaLiegZOstholstein2025.pdf?__blob=publicationFile&v=2",
+  "quelle_parser": "v1770-SHLZ",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Kreis Ostholstein, Liegenschaftszinssätze Kreis Ostholstein, Berichtszeitraum 2021–2025, veröffentlicht am 30.06.2026",
+  "lizenz": "frei zugänglich, kostenfreier Download",
+  "lizenz_hinweis": "Das Blatt selbst nennt KEINE Lizenz — über alle vier Seiten geprüft (01.10.2026): kein dl-de-Vermerk, kein Copyright, kein Nachdruckhinweis. Dieselbe Lücke hatte schon der Landesbericht (verfuegbarkeit-sh.json). Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung nötig wäre; der Quellenvermerk steht deshalb vorsorglich dabei. Die Dateien stehen auf dem Landesportal zum kostenfreien Abruf.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.67,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnung — Median des Berichtszeitraums 2021–2025",
+   "hinweis": "Ergebnis in PROZENT (2,38 bedeutet 2,38 %), nicht als Dezimalbruch. Der Wert ist der MEDIAN der Einzelliegenschaftszinssätze, nicht das arithmetische Mittel.",
+   "wahl_der_spalte": "Das Blatt druckt SECHS Spalten: den Median über den gesamten Berichtszeitraum 2021–2025 und je einen pro Einzeljahr. Eingetragen ist die Spalte „2021-2025\", weil der Ausschuss den Zeitraumwert als sein Ergebnis überschreibt („hat für den Berichtszeitraum 2021 - 2025 die folgend abgebildeten Liegenschaftszinssätze ... abgeleitet\"). Die Einzeljahre stehen vollständig in belege[0].jahresreihe. Sie sind BEWUSST keine Achse der Formel: der Auswerter (swf_modelle.js, stufen_kategorial) kennt keinen Rückfall auf eine Kategorie — eine Jahresachse würde den Wert ganz verschlucken, sobald das Feld nicht gesetzt ist. Wer sachverständig ein Einzeljahr vorzieht (die Reihe steigt in allen zwölf Teilmärkten deutlich), muss das begründen; zwischen den Jahren wird nicht interpoliert.",
+   "jahresreihe_pct": {
+    "2021": 0.66,
+    "2022": 0.88,
+    "2023": 1.86,
+    "2024": 2.28,
+    "2025": 2.31,
+    "2021-2025": 1.67
+   }
+  },
+  "korrekturen": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus dem Abschnitt „Modellbeschreibung\", S. 2 bis 4 des Blattes. Alle drei Ausschüsse (Lübeck, Herzogtum Lauenburg, Ostholstein) verwenden denselben Text — am 01.10.2026 Zeile für Zeile gegeneinander geprüft (diff), es unterscheiden sich nur der Ausschussname und die Mietstaffel.",
+   "kaufpreis": "aus der Kaufpreissammlung, nur Weiterverkäufe; besondere objektspezifische Grundstücksmerkmale (boG) werden NICHT berücksichtigt",
+   "rohertrag": "Produkt aus marktüblich erzielbarer Nettokaltmiete und Wohnfläche. Die Kaltmieten sind Angebotsmieten aus dem Internet, NICHT gemeindeweise, sondern nach der Lage (nach Bodenrichtwert) gegliedert und vom Gutachterausschuss stichprobenartig geprüft.",
+   "bewirtschaftungskosten": "wörtlich nur „Ermittelt auf der Grundlage der ImmoWertV\" — das Blatt beziffert KEINEN Ansatz und KEINE Quote.",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Nicht beziffert. Aus der Formel des Blattes zurückgerechnet liegt sie bei etwa 20 % (siehe Identitätsprobe in belege). Das ist eine Ableitung von mir und darf NICHT als Modellansatz des Ausschusses verwendet werden.",
+   "reinertrag": "Differenz zwischen Rohertrag und Bewirtschaftungskosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 3: „Restnutzungsdauer: Errechnet aus Gesamtnutzungsdauer (80 Jahre) minus Alter der baulichen Anlagen.\" Die Zahl steht ausdrücklich im Dokument und gilt in allen drei Blättern gleich — sie ist hier belegt und nicht die Rückfallzahl des Rechenkerns.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer 80 Jahre minus Alter. Durchgeführte Instandsetzungen und Modernisierungen verlängern sie nach der eigenen Zustandstabelle des Blattes (NICHT nach Anlage 2 ImmoWertV).",
+   "restnutzungsdauer_zustandstabelle": {
+    "bez": "Gebäudezustand (1 bis 9) → Restnutzungsdauer in Jahren, S. 3",
+    "stufen": {
+     "1": 10,
+     "2": 10,
+     "3": 20,
+     "4": 20,
+     "5": 30,
+     "6": 30,
+     "7": 40,
+     "8": 40,
+     "9": 40
+    },
+    "hinweis": "Zustand 1–3 „schlecht\", 4–6 „mittel\", 7–9 „gut\". Die Tabelle liefert die Restnutzungsdauer DIREKT, sie ist kein Zuschlag. Innerhalb einer Gruppe ändert sich der Wert nicht — 1 und 2 geben beide 10, 7 bis 9 geben alle 40. Das steht so im Blatt und ist nicht geglättet."
+   },
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Für das Ertragswertmodell ohne Belang; das Blatt nennt keinen Baupreisindex. Die Rückfallkonstante 1,91 des Rechenkerns ist hier NICHT belegt.",
+   "verfahren": "Einzelliegenschaftszinssatz je Kaufpreis iterativ aus p = RE/KP − ((q−1)/(q^n−1)) · G/KP, mit G = KP − BW und q = 1 + p, Startwert p0 = RE/KP, bis zur zweiten Nachkommastelle stabil. Veröffentlicht wird der MEDIAN der Einzelzinssätze, nicht das arithmetische Mittel.",
+   "verfahren_hinweis": "Die Legende der Formel ist im PDF-Textstrom um eine Zeile verschoben. Gelesen nach der Gegenprobe „worin G = KP − BW\": RE = Reinertrag des Grundstücks, KP = Kaufpreis, G = Gebäudewertanteil am Kaufpreis, BW = Bodenwertanteil am Kaufpreis, p = Liegenschaftszinssatz, q = 1 + p, n = Restnutzungsdauer. Wer die Legende zeilentreu liest, erhält „RE = Kaufpreis\" und rechnet etwas anderes.",
+   "rohertragsfaktor_definition": "Kaufpreis / Rohertrag",
+   "ausschluss": "Kauffälle mit fehlerhaften oder lückenhaften Angaben wurden nicht verwendet.",
+   "bodenwert_mfh": "Bodenrichtwert ohne Anpassung",
+   "bodenwert_individueller_wohnungsbau": "Bodenrichtwert mit Anpassung nach den Erläuterungen zu den Bodenrichtwerten",
+   "etw_wohnflaechenfaktor": {
+    "bez": "Die Miete der Eigentumswohnung wird nach Wohnfläche korrigiert (S. 2)",
+    "stufen": {
+     "bis_50": 1.1,
+     "51_bis_110": 1,
+     "ueber_110": 0.9
+    },
+    "hinweis": "MULTIPLIKATIV auf die Nettokaltmiete, nicht auf den Zinssatz. Gilt nur für den Teilmarkt Eigentumswohnung."
+   },
+   "lagegliederung": "Die Gemeinden in Ostholstein, insbesondere in Küstennähe, sind, die Lage betreffend, sehr inhomogen. Deshalb wurden die erzielbaren Kaltmieten nach der Lage (nach Bodenrichtwert) gegliedert, nicht gemeindeweise.",
+   "mietstaffel_2025": {
+    "bez": "Nettokaltmiete 2025 in €/m² Monat je Bodenrichtwert in €/m², S. 2 des Blattes",
+    "efh_zfh": {
+     "100": 10.2,
+     "125": 10.6,
+     "150": 10.9,
+     "200": 11.5,
+     "250": 12,
+     "300": 12.4,
+     "400": 13,
+     "500": 13.6,
+     "1000": 15.4
+    },
+    "gb": {
+     "100": 9.2,
+     "125": 9.6,
+     "150": 10,
+     "200": 10.7,
+     "250": 11.2,
+     "300": 11.7,
+     "400": 12.4,
+     "500": 13,
+     "1000": 15.2
+    },
+    "hinweis": "Schlüssel ist der BODENRICHTWERT in €/m², Wert die Monats-Nettokaltmiete in €/m². Die zweite Spalte ist im Blatt nur mit „GB\" überschrieben und nicht aufgelöst; sie trägt durchgehend niedrigere Mieten als EFH/ZFH. Was „GB\" bedeutet, sagt das Blatt NICHT — die Zuordnung ist offen und steht in auflagen. Zwischen den Stützstellen ist nicht interpoliert, so wie das Blatt sie abdruckt."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Kreis Ostholstein (Gebiet des Gutachterausschusses)",
+   "raeumlich_hinweis": "Keine räumliche Einschränkung im Blatt. Der Wert gilt für den ganzen Kreis; die Küstennähe ist ausdrücklich NICHT als eigene Kategorie geführt, sondern nur über den Bodenrichtwert in der Mietstaffel.",
+   "sachlich": "Eigentumswohnungen im Weiterverkauf",
+   "extrapolation": "gesperrt",
+   "hinweis": "Das Blatt enthält KEINE ausdrückliche Anpassungsklausel, wie sie andere Ausschüsse abdrucken. Es nennt aber mit der 16/84-%-Spanne und dem Standardfehler des Medians die Streuung; eine sachverständige Abweichung gehört in diese Spanne und nicht darüber hinaus. Der Wert ist ausdrücklich an das Modell dieses Blattes gebunden (§ 10 ImmoWertV): Rohertrag aus Angebotsmieten nach Bodenrichtwertlage, Gesamtnutzungsdauer 80 Jahre, Restnutzungsdauer aus der eigenen Zustandstabelle, nur Weiterverkäufe, ohne besondere objektspezifische Grundstücksmerkmale.",
+   "stichprobe": {
+    "anzahl": 3765,
+    "wohnflaeche_qm": 56,
+    "restnutzungsdauer_jahre": 39,
+    "nettokaltmiete_eur_qm_monat": 12.85,
+    "rohertragsfaktor_median": 27.43,
+    "rohertragsfaktor_spanne_16_84": [
+     17.83,
+     40.68
+    ],
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 2 von 4, Tabelle „Eigentumswohnung\", Spalte „2021-2025\""
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 2 von 4, Tabelle „Eigentumswohnung\", Spalte „2021-2025\", Zeile „Ø Liegenschaftszinssatz % (Median)\"",
+    "wortlaut": "Ø Liegenschaftszinssatz % (Median) 1,67 · Spanne (16 % – 84 % Quantil) 0.03 – 3.74 · Standardfehler (Median) 0.04 · Anzahl der Stichproben 3765 · Ø Wohnfläche 56 m² · Ø Restnutzungsdauer 39 Jahre · Ø Nettokaltmiete 12.85 €/m² · Rohertragsfaktor (Median) 27.43",
+    "kauffaelle": 3765,
+    "jahresreihe": {
+     "liegenschaftszinssatz_pct": {
+      "2021": 0.66,
+      "2022": 0.88,
+      "2023": 1.86,
+      "2024": 2.28,
+      "2025": 2.31,
+      "2021-2025": 1.67
+     },
+     "spanne_16_84_pct": {
+      "2021": [
+       -1.06,
+       2.51
+      ],
+      "2022": [
+       -0.4,
+       2.52
+      ],
+      "2023": [
+       0.44,
+       2.52
+      ],
+      "2024": [
+       0.77,
+       4.37
+      ],
+      "2025": [
+       0.83,
+       4.12
+      ],
+      "2021-2025": [
+       0.03,
+       3.74
+      ]
+     },
+     "standardfehler_median": {
+      "2021": 0.1,
+      "2022": 0.1,
+      "2023": 0.11,
+      "2024": 0.09,
+      "2025": 0.08,
+      "2021-2025": 0.04
+     },
+     "anzahl_stichproben": {
+      "2021": 785,
+      "2022": 650,
+      "2023": 621,
+      "2024": 823,
+      "2025": 886,
+      "2021-2025": 3765
+     },
+     "wohnflaeche_qm": {
+      "2021": 57,
+      "2022": 56,
+      "2023": 56,
+      "2024": 57,
+      "2025": 56,
+      "2021-2025": 56
+     },
+     "restnutzungsdauer_jahre": {
+      "2021": 40,
+      "2022": 40,
+      "2023": 39,
+      "2024": 38,
+      "2025": 38,
+      "2021-2025": 39
+     },
+     "nettokaltmiete_eur_qm_monat": {
+      "2021": 10.39,
+      "2022": 12.29,
+      "2023": 13.27,
+      "2024": 13.67,
+      "2025": 13.76,
+      "2021-2025": 12.85
+     },
+     "rohertragsfaktor_median": {
+      "2021": 33.99,
+      "2022": 32.71,
+      "2023": 26.14,
+      "2024": 24.04,
+      "2025": 23.56,
+      "2021-2025": 27.43
+     },
+     "rohertragsfaktor_spanne_16_84": {
+      "2021": [
+       21.37,
+       47.78
+      ],
+      "2022": [
+       21.95,
+       48.26
+      ],
+      "2023": [
+       17.03,
+       37.47
+      ],
+      "2024": [
+       15.64,
+       34.35
+      ],
+      "2025": [
+       16.87,
+       34.23
+      ],
+      "2021-2025": [
+       17.83,
+       40.68
+      ]
+     },
+     "hinweis": "Alle sechs Spalten des Blattes, so abgedruckt. null steht für das „–\" des Blattes: der Ausschuss weist für dieses Jahr KEINEN Wert aus (zu wenige Kauffälle). Diese Lücken werden NICHT durch einen Nachbarwert und nicht durch den Zeitraumwert ersetzt."
+    },
+    "pruefprotokoll": "Spaltentreu gelesen mit pdftotext -table (01.10.2026). Mit -layout war die Tabelle VERSCHOBEN — Labelspalte und Werte lagen um eine Zeile gegeneinander, die Zinssätze landeten optisch in der Zeile „Anzahl der Stichproben\". Wer so liest, trägt die Fallzahl als Zinssatz ein. Erst -table setzt jede Zeile an ihren Platz.\nZÄHLPROBE (Zeilenzuordnung): die Fallzahlen der fünf Jahresspalten müssen die Spalte „2021-2025\" ergeben. Elf von zwölf Teilmärkten stimmen exakt — Lübeck 442/750/125/1476, Herzogtum Lauenburg 1376/830/37/848, Ostholstein 1735/133/3765. Eine Ausnahme steht in auflagen.\nSPANNENPROBE (Wertzuordnung): der Median muss in seiner eigenen 16/84-%-Spanne liegen. In allen zwölf Teilmärkten und in jeder der sechs Spalten trifft das zu — 72 von 72.\nIDENTITÄTSPROBE (Modellprobe am Rechenweg des Blattes): das Blatt druckt seine Formel p = RE/KP − ((q−1)/(q^n−1)) · G/KP, aber KEIN durchgerechnetes Zahlenbeispiel. Ein amtliches Anwendungsbeispiel gibt es hier also nicht — der sonst geltende Prüfmaßstab fehlt im Dokument. Stattdessen gegen die mitveröffentlichten Größen gerechnet: mit RE/KP = (1−BWK)/Rohertragsfaktor und n = Restnutzungsdauer nach G/KP aufgelöst. Bei einer Bewirtschaftungskostenquote von 20 % ergibt sich in allen zwölf Teilmärkten ein Gebäudewertanteil zwischen 38 und 83 % — durchgehend physikalisch möglich. Bei 25 % kippen drei Teilmärkte auf 18 bis 24 % Gebäudeanteil, was an einem Wohngebäude nicht mehr plausibel ist. Die Zahlen des Blattes schließen sich also mit seiner eigenen Formel, und zwar bei etwa 20 % BWK. ACHTUNG: diese Quote ist eine Ableitung von MIR, kein Modellansatz des Ausschusses — das Blatt beziffert die Bewirtschaftungskosten nicht und verweist nur auf die ImmoWertV."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtlicher Einzelwert eines Gutachterausschusses mit ausgewiesener Fallzahl (3765), Quantilsspanne und Standardfehler; Modell vollständig beschrieben.",
+  "fallzahl": 3765,
+  "streuung": {
+   "min_pct": 0.03,
+   "max_pct": 3.74,
+   "spannen_art": "16 % – 84 % Quantil (NICHT die 2/3-Spanne anderer Berichte und nicht Minimum/Maximum)",
+   "standardfehler_median": 0.04
+  },
+  "stichtag": null,
+  "stichtag_hinweis": "OFFEN. Das Blatt nennt KEINEN Wertermittlungsstichtag — weder im Titel noch in der Modellbeschreibung. Es nennt nur den Berichtszeitraum 2021–2025 (Kaufpreisjahrgänge) und das Datum der Veröffentlichung im Internet, den 30.06.2026. Ein Median über fünf Jahrgänge hat auch sachlich keinen Stichtag. Es wird hier deshalb KEINE Datumsangabe erfunden; der Zeitbezug steckt in berichtsjahr und in der Jahresreihe.",
+  "auflagen": [
+   "STICHTAG FEHLT: das Blatt nennt keinen Wertermittlungsstichtag, nur den Berichtszeitraum 2021–2025 und die Veröffentlichung am 30.06.2026. Nachzutragen, falls der Ausschuss ihn auf Anfrage beziffert.",
+   "LIZENZ FEHLT: das Blatt nennt keine Lizenz und keinen vorgeschriebenen Quellenvermerk-Wortlaut. Ohne Lizenzangabe lässt sich nicht entscheiden, ob eine Namensnennung verlangt ist; der Quellenvermerk steht vorsorglich dabei. Beim Ausschuss zu klären.",
+   "BEWIRTSCHAFTUNGSKOSTEN NICHT BEZIFFERT: das Blatt verweist nur auf die ImmoWertV. Modellkonform rechnen lässt sich damit nur, wenn man die Quote selbst setzt — die aus der Formel zurückgerechneten rund 20 % sind eine Ableitung von mir, kein Ansatz des Ausschusses.",
+   "SPALTE „GB\" IN DER MIETSTAFFEL NICHT AUFGELÖST: das Blatt schreibt nur „GB Miete (€/m²) 2025\". Vermutlich Geschosswohnungsbau oder gemischte Nutzung; das Blatt sagt es nicht, und es wird hier nicht geraten."
+  ],
+  "fundstelle": "Liegenschaftszinssätze Kreis Ostholstein, S. 2 von 4, Tabelle „Eigentumswohnung\"; Modellbeschreibung S. 2–3; Berechnungsformel S. 4",
+  "seite": 2
+ }
+]
