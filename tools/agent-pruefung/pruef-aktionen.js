@@ -37,8 +37,13 @@ function ruf(name, ctx, args) {
   const perId = await ruf('objekt_lesen', ctx, { id: ctx.letzteListe[0] });
   pruef('per UUID -> ' + (perId.adresse || '?'), perId.gefunden === true);
 
+  /* v1810 · Diese Probe war zu lasch: sie prueft jetzt WELCHES Objekt
+     kommt. Vorher genuegte 'gefunden === true' - und der alte Code gab bei
+     einem Fehlschlag stillschweigend das zuletzt besprochene zurueck.
+     Die Probe war gruen, waehrend das falsche Objekt kam. */
   const perAdr = await ruf('objekt_lesen', ctx, { adresse: 'Musterstr' });
-  pruef('per ADRESSE "Musterstr" -> ' + (perAdr.adresse || '?'), perAdr.gefunden === true);
+  pruef('per ADRESSE "Musterstr" -> ' + (perAdr.adresse || '?'),
+    perAdr.gefunden === true && /musterstr/i.test(perAdr.adresse || ''));
 
   const ausserhalb = await ruf('objekt_lesen', ctx, { nummer: 999 });
   pruef('Nummer 999 meldet "nicht gefunden" statt zu raten', ausserhalb.gefunden === false);

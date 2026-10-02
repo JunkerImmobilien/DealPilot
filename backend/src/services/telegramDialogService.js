@@ -237,13 +237,31 @@ function _woerter(s) {
 function objektRaten(satz, liste) {
   const w = _woerter(satz);
   const treffer = liste.map((o) => {
-    const ow = new Set(_woerter(o.adresse));
+    const ows = _woerter(o.adresse);
+    const ow = new Set(ows);
     let p = 0;
     for (const t of w) {
-      if (!ow.has(t)) continue;
-      if (/^\d+$/.test(t)) p += 3;                 /* Hausnummer/PLZ wiegen schwer */
-      else if (STRASSENWOERTER.has(t)) continue;   /* "strasse" sagt nichts */
-      else if (t.length > 2) p += 2;
+      if (/^\d+$/.test(t)) { if (ow.has(t)) p += 3; continue; }  /* Hausnummer/PLZ */
+      if (STRASSENWOERTER.has(t)) continue;                      /* "strasse" sagt nichts */
+      if (ow.has(t)) { if (t.length > 2) p += 2; continue; }
+
+      /* ── v1810 · ABGEKUERZTE STRASSENNAMEN ────────────────────────────
+       *
+       * GEMESSEN: "Musterstr" fand "Musterstraße 12" NICHT. Die
+       * Wortgrenzen-Regel aus v1767b war gegen die indexOf-Falle gebaut
+       * ("str" steckt in jeder Strasse) und hat recht — aber sie trifft
+       * auch die Abkuerzung, die jeder schreibt.
+       *
+       *   > Wer "Musterstr" tippt, meint die Musterstrasse. Eine Regel,
+       *   > die das nicht trifft, ist zu streng geworden statt sicher.
+       *
+       * Ein PRAEFIX zaehlt deshalb, wenn es lang genug ist: ab fuenf
+       * Zeichen. "str" (drei) bleibt draussen, "muster" trifft
+       * "musterstrasse", und das ist gewollt. */
+      if (t.length >= 5) {
+        const praefix = ows.some((a) => a.length > t.length && a.indexOf(t) === 0);
+        if (praefix) { p += 2; continue; }
+      }
     }
     return { o: o, p: p };
   }).filter((x) => x.p > 0).sort((a, b) => b.p - a.p);
