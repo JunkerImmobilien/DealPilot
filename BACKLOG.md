@@ -940,14 +940,44 @@ etwas — 42 Sekunden lang beobachtet.
 - **B2 (kein Spot)** bei Investor Deal Score, Bewertungs-Cockpit und
   Stress-Test — ebenfalls offen.
 
-#### Noch zu entscheiden
+#### Vollprüfung aller 38 Schritte — ANGEFANGEN, das Werkzeug taugt noch nicht
 
-**Soll ein Schritt ohne sichtbares Ziel ganz entfallen?** Die Engine springt
-heute weiter (Auto-Skip), zeigt aber vorher bis zu **6 Sekunden** lang nichts
-(20 Versuche × 300 ms). Bei mehreren solchen Schritten hintereinander wirkt
-die Tour zäh, obwohl sie arbeitet.
+Marcel am 02.10.2026 entschieden: Vollprüfung aller 38 Schritte in allen
+vier Ansichten.
 
-> Ein Rundgang, der wartet, sieht aus wie einer, der hängt.
+**Der fünfte Läufer ist am selben Problem gescheitert wie die ersten vier.**
+Er springt jeden Schritt EINZELN an (`reset` → `start` → `goto(id)`), damit
+auch Schritte erreicht werden, die auf keinem Verzweigungspfad liegen. Für
+die Schritte OHNE `id` sucht er mit wiederholtem `next()` — und diese
+Suchschleife läuft PARALLEL zur Messung weiter. Die Blase blieb deshalb auf
+Schritt 1 stehen, während der Läufer schon maß.
+
+> Ein Läufer, der zwei Uhren hat, misst die falsche.
+
+**Der richtige Weg** ist ein Durchlauf JE ZWEIG statt Einzelsprüngen:
+
+```
+Lauf A   bei Schritt 3 "Quick-Boarding Schritt fuer Schritt ansehen"
+Lauf B   bei Schritt 3 "Ueberspringen - weiter zur PRE-FLIGHT-Karte"
+         dito bei Schritt 35 und 36
+
+je Ansicht 2 Laeufe x 4 Ansichten = 8 Durchlaeufe
+```
+
+Dabei wird **nach** jedem Titelwechsel gewartet (nicht getaktet), der
+aktuelle Schritt **aus der Blase** gelesen (nicht aus einem eigenen Zähler),
+und der Spot per `elementsFromPoint` gegen das Ziel geprüft (nicht per
+Überlappung mit dem Container). Ein Schritt, den kein Zweig erreicht, wird
+als solcher gemeldet — das ist selbst ein Befund.
+
+**Was aus den bisherigen Messungen schon feststeht:**
+
+| | |
+|---|---|
+| Hänger Standardansicht, Schritt 3 | **behoben** in v1774, nachgemessen |
+| Hänger Kanzlei, Schritt 6 | **behoben** in v1774, nachgemessen |
+| Spot höher als der Bildschirm (B1) | **behoben** in v1775, 0 von 15 außerhalb |
+| Kein Spot bei Schritt 22–24 (B2) | **offen** |
 ### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
 
 Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
