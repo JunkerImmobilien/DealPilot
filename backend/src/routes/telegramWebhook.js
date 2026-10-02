@@ -36,6 +36,7 @@ const dialog = require('../services/telegramDialogService');
 const fuehrung = require('../services/fuehrungService');
 const voiceExtract = require('../services/voiceExtractService');
 const config = require('../config');
+const openai = require('../services/openaiService');
 const { copilotKontingent } = require('./ai');
 const { avmDienst } = require('./avm');
 
@@ -587,6 +588,67 @@ async function beantworten(token, chatId, userId, text, msg) {
     }
     return;
   }
+  /* ── Foto ─────────────────────────────────────────────────────────────
+   *
+   * Ein abfotografiertes Exposé, ein Screenshot aus einem Portal. Das Bild
+   * geht durch `bildZuText` und von dort in DENSELBEN `extractFromText`,
+   * den auch Sprache und Tastatur durchlaufen — es gibt keinen dritten
+   * Auslese-Weg.
+   *
+   * PDFs kann der Bot nicht: im Backend liegt kein PDF-Leser (gemessen,
+   * die Umwandlung macht im Browser pdf.js). Das wird gesagt, nicht
+   * verschwiegen. */
+  if (msg && (msg.photo || msg.document)) {
+    const istBild = Boolean(msg.photo)
+      || (msg.document && /^image\//.test(msg.document.mime_type || ''));
+    if (!istBild) {
+      await senden(token, chatId,
+        'Dokumente kann ich hier noch nicht lesen — ein *Foto* der Seite geht '
+        + 'aber. In DealPilot selbst kannst du PDFs hochladen, dort werden sie '
+        + 'ausgelesen.');
+      return;
+    }
+    /* Telegram liefert mehrere Groessen; die letzte ist die groesste. */
+    const bild = msg.photo ? msg.photo[msg.photo.length - 1] : msg.document;
+    await senden(token, chatId, 'Ich schau mir das Bild an …');
+    let datenUrl;
+    try {
+      const f = await tgGet(token, 'getFile', { file_id: bild.file_id });
+      const r = await fetch('https://api.telegram.org/file/bot' + token + '/' + f.file_path);
+      if (!r.ok) throw new Error('Download fehlgeschlagen (HTTP ' + r.status + ')');
+      const buf = Buffer.from(await r.arrayBuffer());
+      const mime = (msg.document && msg.document.mime_type) || 'image/jpeg';
+      datenUrl = 'data:' + mime + ';base64,' + buf.toString('base64');
+    } catch (e) {
+      await senden(token, chatId, 'Das Bild kam nicht durch: ' + (e.message || e));
+      return;
+    }
+
+    let gelesen = '';
+    try {
+      gelesen = await openai.bildZuText(datenUrl, {});
+    } catch (e) {
+      await senden(token, chatId, 'Beim Lesen ist etwas schiefgegangen: ' + (e.message || e));
+      return;
+    }
+    if (!gelesen) {
+      await senden(token, chatId,
+        'Auf dem Bild finde ich nichts, was zu einem Objekt gehört.');
+      return;
+    }
+
+    await senden(token, chatId, 'Gelesen:\n_' + gelesen.slice(0, 600) + '_');
+
+    const z0 = await zustand(chatId, userId);
+    const entwurf = (z0 && z0.modus && z0.entwurf) || {};
+    if (!z0 || !z0.modus) {
+      await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
+      await senden(token, chatId, '*Ich lege daraus ein Objekt an.*');
+    }
+    await aufnehmen(token, chatId, userId, gelesen, entwurf);
+    return;
+  }
+
   if (!text) return;
 
   /* /objekte — reine Datenbankauskunft, kostet kein Kontingent. */
@@ -623,7 +685,7 @@ async function beantworten(token, chatId, userId, text, msg) {
     }
     kontext = sp.payload;
     kontextArt = 'portfolio';
-    stand = dialog.standSatz(sp.erfasst_am, sp.alter_minuten);
+    stand = dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem);
     if (/^\/portfolio\s*$/i.test(text)) {
       text = 'Gib mir einen kurzen Ueberblick ueber mein Portfolio: '
            + 'Anzahl Objekte, Gesamtinvestition, Eigenkapital, Restschuld, '

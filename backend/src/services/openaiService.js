@@ -2621,8 +2621,48 @@ async function extractRndg(text, opts) {
   return { success: true, model: r.model, extracted: out };
 }
 
+/* ── v1796 · Bild -> Text, mehr nicht ────────────────────────────────────
+ *
+ * Der Telegram-Bot bekommt Fotos: ein abfotografiertes Exposé, ein
+ * Screenshot aus einem Portal, ein Seitenausschnitt.
+ *
+ * Es waere naheliegend, dafuer einen dritten Auslese-Weg zu bauen (neben
+ * `extractFromText` und `extractFromAudio`). Das waere einer zu viel:
+ *
+ *   > Drei Wege zu denselben Feldern weichen irgendwann in drei
+ *   > Richtungen ab. Zwei davon merkt niemand.
+ *
+ * Deshalb tut diese Funktion nur EINEN Schritt — sie macht aus dem Bild
+ * Text. Was daraus ein Objektfeld wird, entscheidet danach derselbe
+ * `extractFromText`, den auch Sprache und Tastatur durchlaufen. Dieselbe
+ * Schablonen-Heilung, dieselbe Prozent-Falle, dieselbe Adresspruefung.
+ */
+async function bildZuText(imageDataUrl, opts) {
+  const o = opts || {};
+  const prompt =
+    'Gib den fuer eine Immobilienbewertung relevanten Inhalt dieses Bildes '
+    + 'als FLIESSTEXT wieder. Nenne Adresse, Objektart, Wohnflaeche, '
+    + 'Grundstuecksflaeche, Zimmer, Baujahr, Kaufpreis, Miete, Hausgeld und '
+    + 'alles Weitere, was dasteht.\n\n'
+    + 'ERFINDE NICHTS. Was du nicht sicher lesen kannst, laesst du weg. '
+    + 'Schreibe keine Einleitung und keine Bewertung, nur den Inhalt. '
+    + 'Ist auf dem Bild nichts Immobilienbezogenes zu sehen, antworte genau '
+    + 'mit: KEIN_INHALT';
+  const content = [
+    { type: 'input_text', text: prompt },
+    { type: 'input_image', image_url: imageDataUrl }
+  ];
+  const r = await _callOpenAIVision(content, {
+    userApiKey: o.userApiKey, model: o.model, maxTokens: 2000
+  });
+  const t = String((r && r.text) || '').trim();
+  if (!t || /^KEIN_INHALT/i.test(t)) return '';
+  return t;
+}
+
 module.exports = {
   copilotChat,  /* v585 */
+  bildZuText,   /* v1796 — macht nur Text; die Felder macht extractFromText */
   analyze,
   analyzeLage,
   suggestDs2Fields,

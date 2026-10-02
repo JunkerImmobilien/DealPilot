@@ -35,20 +35,50 @@ async function portfolioKontext(userId) {
   );
   if (!r.rows.length) return null;
   const alterMin = Math.round((Date.now() - new Date(r.rows[0].erfasst_am).getTime()) / 60000);
-  return { payload: r.rows[0].payload, erfasst_am: r.rows[0].erfasst_am, alter_minuten: alterMin };
+
+  /* ── v1796 · WIE ALT IST ALT? ─────────────────────────────────────────
+   *
+   * Bis hierher nannte der Bot nur das Datum des Spiegels. Das ist
+   * richtig, aber es beantwortet die falsche Frage. Entscheidend ist
+   * nicht, wie alt der Stand IST, sondern ob sich seitdem etwas GEAENDERT
+   * hat.
+   *
+   *   > Ein drei Wochen alter Stand, an dem sich nichts geaendert hat, ist
+   *   > aktuell. Ein zwei Stunden alter, hinter dem zwei Objekte
+   *   > bearbeitet wurden, ist es nicht.
+   *
+   * `objects.updated_at` weiss das, und die Abfrage kostet nichts. Damit
+   * kann der Bot statt einer Altersangabe eine Aussage machen. */
+  const g = await query(
+    `SELECT count(*)::int AS n FROM objects
+      WHERE user_id = $1 AND updated_at > $2`,
+    [userId, r.rows[0].erfasst_am]
+  );
+
+  return {
+    payload: r.rows[0].payload,
+    erfasst_am: r.rows[0].erfasst_am,
+    alter_minuten: alterMin,
+    geaendert_seitdem: (g.rows[0] && g.rows[0].n) || 0
+  };
 }
 
-function standSatz(erfasstAm, alterMin) {
+function standSatz(erfasstAm, alterMin, geaendertSeitdem) {
   const d = new Date(erfasstAm);
   const uhr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
   const tag = d.toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' });
-  if (alterMin < 90) return 'Stand: heute ' + uhr + ' Uhr.';
-  if (alterMin < 60 * 24) return 'Stand: heute ' + uhr + ' Uhr.';
-  if (alterMin < 60 * 24 * 7) return 'Stand: ' + tag + ', ' + uhr + ' Uhr.';
-  /* Ab einer Woche wird aus der Angabe eine WARNUNG. Wer so lange nicht in
-     der App war, hat womoeglich ausserhalb etwas geaendert. */
-  return 'Stand: ' + tag + ' — seitdem warst du nicht mehr in DealPilot, '
-       + 'die Zahlen koennen veraltet sein.';
+  const wann = alterMin < 60 * 24 ? 'heute ' + uhr + ' Uhr' : tag + ', ' + uhr + ' Uhr';
+
+  /* v1796 · Die Aenderung schlaegt das Alter. Sie ist die eigentliche
+     Aussage: ein alter Stand ohne Aenderung stimmt noch, ein frischer mit
+     Aenderung nicht mehr. */
+  if (geaendertSeitdem > 0) {
+    return 'Stand: ' + wann + ' — seitdem '
+      + (geaendertSeitdem === 1 ? 'hast du ein Objekt' : 'hast du ' + geaendertSeitdem + ' Objekte')
+      + ' bearbeitet. Öffne DealPilot einmal kurz, dann stimmen die Summen wieder.';
+  }
+  if (alterMin < 60 * 24 * 7) return 'Stand: ' + wann + '.';
+  return 'Stand: ' + wann + ' — unverändert seitdem.';
 }
 
 /* ── Objekte ─────────────────────────────────────────────────────────────

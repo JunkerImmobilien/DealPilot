@@ -30,6 +30,43 @@ async function _authViaApiKey(req, res, next, plain) {
     } catch (e) { /* im Zweifel durchlassen statt Owner aussperren */ }
     req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
     req.apiKey = { id: rec.id, scopes: rec.scopes };
+
+    /* ── v1796 · DER SCOPE WIRD JETZT AUCH GELESEN ────────────────────────
+     *
+     * Hier wurde `rec.scopes` seit jeher GESETZT und an keiner Stelle des
+     * Programms ausgewertet — gemessen am 02.10.2026 quer durch
+     * `backend/src`: genau ein Treffer, nämlich diese Zuweisung.
+     *
+     *   > Ein Recht, das vergeben, angezeigt und nie geprüft wird, ist
+     *   > keine Einschränkung, sondern eine Behauptung. Die Oberfläche sagt
+     *   > dem Nutzer, sein Key könne „lesen" — und er kann löschen.
+     *
+     * Die Prüfung sitzt hier und nicht an den Routen: eine Stelle deckt
+     * alle, und niemand kann sie beim nächsten Endpunkt vergessen.
+     *
+     * RUECKWAERTSKOMPATIBEL: alle drei heute vergebenen Keys tragen `crud`,
+     * also ändert sich für sie nichts. Ein Key OHNE Scope behält vollen
+     * Zugriff — ihn nachträglich zu entrechten würde eine laufende
+     * Verbindung brechen, und der Fehler läge nicht beim Nutzer. Er wird
+     * stattdessen protokolliert.
+     *
+     * Damit ist der Weg frei für einen Bot-Key, der nur lesen darf. */
+    const scope = String(rec.scopes || '').toLowerCase();
+    const schreibend = ['POST', 'PUT', 'PATCH', 'DELETE'].indexOf(req.method) >= 0;
+    if (!scope) {
+      console.warn('[api-key] ' + rec.id + ' hat keinen Scope — voller Zugriff (Altbestand)');
+    } else if (schreibend && scope.indexOf('crud') < 0 && scope.indexOf('write') < 0) {
+      return res.status(403).json({
+        error: 'Dieser API-Key darf nur lesen.',
+        scope: scope, methode: req.method
+      });
+    } else if (req.method === 'DELETE' && scope.indexOf('crud') < 0 && scope.indexOf('delete') < 0) {
+      return res.status(403).json({
+        error: 'Dieser API-Key darf nicht loeschen.',
+        scope: scope, methode: req.method
+      });
+    }
+
     apiKeyService.touchLastUsed(rec.id).catch(function () {});
     next();
   } catch (err) { next(err); }
