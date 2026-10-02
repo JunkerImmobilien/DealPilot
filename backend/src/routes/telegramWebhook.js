@@ -57,6 +57,25 @@ const HILFE =
    ein Modell dafuer zu fragen waere ein Aufruf fuer eine Weiche. */
 const PORTFOLIO_WORTE = /(portfolio|vermögen|vermoegen|bilanz|gesamt|insgesamt|alle objekte|wie viele objekte|in (fünf|zehn|5|10) jahren|zukunft|prognose|entwicklung|eigenkapital|restschuld|gesamtinvestition)/i;
 
+/* Eine lesende Telegram-Abfrage (getFile). Eigene Funktion, weil `senden`
+   bewusst jeden Fehler schluckt — hier muss ein Fehler ankommen, sonst
+   laedt der Bot eine Datei von `undefined`. */
+async function tgGet(token, methode, body) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const r = await fetch(TG + token + '/' + methode, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {}),
+      signal: ctrl.signal
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.description || ('HTTP ' + r.status));
+    return j.result;
+  } finally { clearTimeout(t); }
+}
+
 async function senden(token, chatId, text, extra) {
   try {
     const ctrl = new AbortController();
@@ -145,7 +164,13 @@ async function aufnehmen(token, chatId, userId, text, entwurf) {
       + '/abbrechen, wenn du aufhören willst.');
     return;
   }
+  await aufnehmenFelder(token, chatId, userId, neu, entwurf);
+}
 
+/* Der Teil ab den fertigen Feldern — gemeinsam fuer Text UND Sprache.
+   Haette ich ihn zweimal geschrieben, waere die Adress-Rueckbestaetigung
+   beim zweiten Weg irgendwann anders ausgefallen als beim ersten. */
+async function aufnehmenFelder(token, chatId, userId, neu, entwurf) {
   const zusammen = Object.assign({}, entwurf, neu);
 
   /* ── DIE ADRESSE WIRD IMMER RUECKBESTAETIGT ───────────────────────────
@@ -271,10 +296,61 @@ async function beantworten(token, chatId, userId, text, msg) {
     return;
   }
 
+  /* ── Sprachnachricht ──────────────────────────────────────────────────
+   *
+   * Marcel: "ich wuerde einfach eine Audio aufnehmen und dort reinsenden
+   * mit Adresse und allen moeglichen Daten und er wertet aus, ob er alles
+   * dafuer zur Verfuegung hat."
+   *
+   * Telegram liefert OGG/Opus. `extractFromAudio` nimmt den mime-Typ als
+   * Parameter — es ist DERSELBE Dienst, den der Sprechlauf im Browser
+   * nutzt, nur mit einem anderen Behaelter. Nichts daran ist neu gebaut. */
   if (msg && (msg.voice || msg.audio)) {
-    await senden(token, chatId,
-      'Sprachnachrichten kann ich noch nicht auswerten — das kommt mit dem '
-      + 'Anlegen neuer Objekte. Schreib mir solange bitte.');
+    const a = msg.voice || msg.audio;
+    await senden(token, chatId, 'Ich höre rein …');
+    let b64, mime;
+    try {
+      const f = await tgGet(token, 'getFile', { file_id: a.file_id });
+      const r = await fetch('https://api.telegram.org/file/bot' + token + '/' + f.file_path);
+      if (!r.ok) throw new Error('Download fehlgeschlagen (HTTP ' + r.status + ')');
+      b64 = Buffer.from(await r.arrayBuffer()).toString('base64');
+      mime = a.mime_type || 'audio/ogg';
+    } catch (e) {
+      await senden(token, chatId, 'Die Aufnahme kam nicht durch: ' + (e.message || e));
+      return;
+    }
+
+    const z0 = await zustand(chatId, userId);
+    const entwurf = (z0 && z0.modus && z0.entwurf) || {};
+    try {
+      const r = await voiceExtract.extractFromAudio(b64, mime, fuehrung.katalog(), {
+        apiKey: config.openai.apiKey, kontext: entwurf
+      });
+      const felder = (r && r.fields) || {};
+      const gehoert = (r && r.transcript) || '';
+
+      if (!Object.keys(felder).length) {
+        await senden(token, chatId,
+          (gehoert ? 'Verstanden habe ich: _' + gehoert.slice(0, 300) + '_\n\n' : '')
+          + 'Daraus konnte ich kein Feld lesen. Sag gern Adresse, Fläche, '
+          + 'Baujahr und Kaufpreis dazu.');
+        return;
+      }
+
+      /* Laeuft keine Anlage, wird eine angefangen: eine Sprachnachricht mit
+         Objektdaten IST der Wunsch, eines anzulegen. */
+      if (!z0 || !z0.modus) {
+        await senden(token, chatId,
+          (gehoert ? 'Verstanden: _' + gehoert.slice(0, 400) + '_\n\n' : '')
+          + '*Ich lege daraus ein Objekt an.*');
+        await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
+      } else if (gehoert) {
+        await senden(token, chatId, 'Verstanden: _' + gehoert.slice(0, 400) + '_');
+      }
+      await aufnehmenFelder(token, chatId, userId, felder, entwurf);
+    } catch (e) {
+      await senden(token, chatId, 'Beim Auswerten ist etwas schiefgegangen: ' + (e.message || e));
+    }
     return;
   }
   if (!text) return;
