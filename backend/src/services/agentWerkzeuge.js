@@ -366,6 +366,9 @@ async function marktbericht_preis(ctx, args) {
   if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden.' };
   const stufe = _stufe(args);
   const v = await markt.voranschlag(ctx.userId, id, stufe);
+  /* Derselbe Grund wie bei marktbericht_preis_alle: `bestand` allein ist
+     zweideutig. */
+  if (v && v.bestand != null) { v.guthaben_abrufe_uebrig = v.bestand; delete v.bestand; }
   return Object.assign({ objekt_id: id }, v, {
     hinweis: 'Das kostet NICHTS. Nenne dem Nutzer Name und Preis und frage, '
            + 'ob abgerufen werden soll. Erst nach einem Ja marktbericht_abrufen.' });
@@ -411,7 +414,14 @@ async function marktbericht_preis_alle(ctx, args) {
     davon_bereit: bereit,
     davon_unvollstaendig: liste.length - bereit,
     kostenpflichtige_abrufe: kostenpflichtig,
-    bestand: bestand,
+    /* v1806c · Hiess vorher nur `bestand` — das Modell las es als Zahl der
+       OBJEKTE und schrieb "Dein Gesamtbestand umfasst 36 Objekte". Gemeint
+       war das Guthaben.
+
+         > Ein Feldname, der zwei Lesarten zulaesst, bekommt irgendwann die
+         > falsche. Und der Leser merkt es nicht, weil beide Zahlen
+         > plausibel aussehen. */
+    guthaben_abrufe_uebrig: bestand,
     reicht_nicht: (bestand != null && kostenpflichtig > bestand),
     objekte: je,
     hinweis: 'Das kostet NICHTS. Nenne dem Nutzer die GESAMTZAHL der Abrufe '
