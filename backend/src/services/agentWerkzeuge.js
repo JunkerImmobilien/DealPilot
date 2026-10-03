@@ -176,6 +176,36 @@ async function objekte_felder(ctx, args) {
     return { fehler: 'Bitte in "felder" die Feld-Ids angeben, z.B. ["baujahr","objart"]. '
                    + 'Welche es gibt, sagt feld_katalog.' };
   }
+
+  /* ── v1812e · GELD STEHT NICHT HIER, UND DAS SAGT DAS WERKZEUG SELBST ─
+   *
+   * GEMESSEN: auf "welche Objekte haben den hoechsten Finanzierungsbedarf"
+   * nahm der Agent dieses Werkzeug, fand `d1`/`restschuld` leer und
+   * meldete "12 von 18 Objekten haben keinen eingetragenen
+   * Finanzierungsbedarf" — eine falsche Aussage, denn die Werte sind nicht
+   * leer, sie werden GERECHNET.
+   *
+   * Ich hatte das in die Werkzeugbeschreibung geschrieben. Es half nicht,
+   * zum zweiten Mal heute:
+   *
+   *   > Was im Ergebnis steht, wirkt. Was in der Beschreibung steht,
+   *   > wirkt manchmal. Wer einen Irrweg verhindern will, stellt das
+   *   > Schild an den Weg, nicht an die Karte.
+   */
+  const GERECHNET = /^(d\d|restschuld|cashflow|cf_|rendite|dscr|ltv|tilg|zins_eur|kapitaldienst|score|_kpis)/i;
+  const falsch = gewuenscht.filter((f) => GERECHNET.test(String(f))
+    || /darlehen|restschuld|cashflow|rendite|tilgung|finanzierungsbedarf|eigenkapital/i.test(String(f)));
+  if (falsch.length) {
+    return {
+      ok: false,
+      falsche_felder: falsch,
+      hinweis: 'Diese Groessen stehen NICHT im Objektdatensatz — sie werden in '
+             + 'DealPilot gerechnet. Ein leeres Feld hier heisst NICHT, dass der '
+             + 'Wert fehlt. Nimm portfolio_lesen: dort stehen Darlehen, Restschuld, '
+             + 'Tilgung, Zins, Cashflow, Rendite, DSCR, LTV und beide Scores fuer '
+             + 'JEDES Objekt einzeln und fertig gerechnet.'
+    };
+  }
   /* Nur bekannte Felder — sonst liest das Modell sich etwas zusammen, das
      es nicht gibt, und haelt das Ergebnis fuer eine Fehlanzeige.
      v1812b: Nennt das Modell statt der Id eine Beschriftung ("Wohnfläche",
