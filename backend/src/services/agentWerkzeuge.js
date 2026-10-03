@@ -177,12 +177,22 @@ async function objekte_felder(ctx, args) {
                    + 'Welche es gibt, sagt feld_katalog.' };
   }
   /* Nur bekannte Felder — sonst liest das Modell sich etwas zusammen, das
-     es nicht gibt, und haelt das Ergebnis fuer eine Fehlanzeige. */
-  const gueltig = gewuenscht.filter((f) => fuehrung.feld(f));
-  const unbekannt = gewuenscht.filter((f) => !fuehrung.feld(f));
+     es nicht gibt, und haelt das Ergebnis fuer eine Fehlanzeige.
+     v1812b: Nennt das Modell statt der Id eine Beschriftung ("Wohnfläche",
+     "Baujahr"), wird sie aufgeloest statt abgewiesen — es kennt die
+     internen Namen nicht, und das ist kein Grund zu scheitern. */
+  const gueltig = [], unbekannt = [];
+  gewuenscht.forEach((f) => {
+    if (fuehrung.feld(f)) { gueltig.push(f); return; }
+    const flach = _flach(f);
+    const treffer = fuehrung.katalog().filter((k) =>
+      _flach(k.id) === flach || _flach(k.label) === flach
+      || _flach(k.label).replace(/\s*\([^)]*\)\s*/g, '').trim() === flach);
+    if (treffer.length === 1) gueltig.push(treffer[0].id); else unbekannt.push(f);
+  });
   if (!gueltig.length) {
     return { fehler: 'Keines dieser Felder gibt es.', unbekannte_felder: unbekannt,
-             hinweis: 'Frag feld_katalog nach dem richtigen Namen.' };
+             hinweis: 'Frag feld_katalog mit einem Suchwort nach dem richtigen Namen.' };
   }
 
   const r = await query(
@@ -225,12 +235,31 @@ async function objekte_felder(ctx, args) {
 }
 
 async function feld_katalog(ctx, args) {
-  const suche = String((args && args.suche) || '').toLowerCase().trim();
+  /* ── v1812b · DIE UMLAUTFALLE, ZUM VIERTEN MAL AN EINEM TAG ──────────
+   *
+   * GEMESSEN: der Agent suchte "wohnflaeche" und bekam NICHTS — das Feld
+   * heisst `wfl` und traegt das Label "Wohnfläche (m²)". Daraufhin
+   * antwortete er dem Nutzer: "Es gibt kein Feld fuer Wohnflaeche."
+   *
+   * Dieselbe Falle hatte heute schon "parkstr", "portfolios" und
+   * "Wohnflaeche" in `_feldAusSatz`. Dort habe ich `_flach()` gebaut —
+   * und hier nicht angewandt.
+   *
+   *   > Eine Falle, gegen die man an einer Stelle ein Mittel hat, trifft
+   *   > einen an der naechsten. Das Mittel gehoert nicht an die Stelle,
+   *   > sondern an jede.
+   *
+   * Zusaetzlich beidseitig: wer "flaeche" sucht, soll "Wohnfläche"
+   * finden, und wer "Wohnfläche (m²)" eingibt, soll `wfl` finden. */
+  const suche = _flach(String((args && args.suche) || '').trim());
   let felder = fuehrung.katalog();
   if (suche) {
-    felder = felder.filter((f) =>
-      f.id.toLowerCase().indexOf(suche) >= 0
-      || String(f.label || '').toLowerCase().indexOf(suche) >= 0);
+    felder = felder.filter((f) => {
+      const id = _flach(f.id);
+      const label = _flach(f.label);
+      return id.indexOf(suche) >= 0 || label.indexOf(suche) >= 0
+          || (suche.length >= 5 && suche.indexOf(label) >= 0 && label.length >= 4);
+    });
   }
   /* Ohne Suche nur die Auswahlfelder und die wichtigsten — der ganze
      Katalog waere ein Dump, und ein Dump macht den Agenten beliebiger. */
