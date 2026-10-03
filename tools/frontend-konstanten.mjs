@@ -215,6 +215,31 @@ function felderAusHtml(html, ids) {
       const txt = lab.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       if (txt) eintrag.label = txt;
     }
+
+    /* v1813c · DREI FELDER HATTEN KEIN LABEL — UND DER BOT ZEIGTE DEN
+       FELDNAMEN. Gemessen am 03.10.2026: `leerstand`, `btj` und `exit_bmy`
+       kamen ohne Beschriftung durch, weil ihre Zeile keinen <label> fuehrt,
+       sondern ein <span class="ass-l">. Der Agent las dem Nutzer daraufhin
+       "leerstand: 0" vor.
+
+         > Die Beschriftung ist das einzige, was ein Feld fuer einen
+         > Menschen lesbar macht. Fehlt sie, zeigt die Maschine ihre
+         > Innereien — und das sieht aus wie ein Datenfehler.
+
+       Der Ausdruck greift nur, wenn KEIN <label> gefunden wurde, und nur in
+       den letzten 400 Zeichen: so weit reicht eine Zeile, nicht weiter.
+       Dass der Zaehler unten "mit Beschriftung" mitfuehrt, hat diesen
+       Befund ueberhaupt erst sichtbar gemacht. */
+    if (!eintrag.label) {
+      const nah = html.slice(Math.max(0, m.index - 400), m.index);
+      const re3 = /<span[^>]*class="[^"]*\bass-l\b[^"]*"[^>]*>([\s\S]*?)<\/span>/gi;
+      let sp = null, t3;
+      while ((t3 = re3.exec(nah))) sp = t3[1];
+      if (sp) {
+        const txt = sp.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        if (txt) eintrag.label = txt;
+      }
+    }
     raus.push(eintrag);
   }
   return raus;

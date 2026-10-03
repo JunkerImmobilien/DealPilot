@@ -713,7 +713,12 @@ function _hebelFuer(d) {
 
 async function cashflow_hebel(ctx, args) {
   const a = args || {};
-  const bereich = String(a.bereich || '').toLowerCase() === 'portfolio' ? 'portfolio' : 'objekt';
+  /* Ohne Objektbezug UND ohne vorher besprochenes Objekt ist "mein
+     Cashflow" der ganze Bestand. Sonst beantwortet eine Portfolio-Frage
+     ein einzelnes Haus, und niemand sieht es. */
+  const hatBezug = (a.nummer != null) || a.id || a.adresse;
+  const bereich = (String(a.bereich || '').toLowerCase() === 'portfolio'
+    || (!hatBezug && !ctx.letztesObjekt)) ? 'portfolio' : 'objekt';
 
   if (bereich === 'portfolio') {
     const sp = await dialog.portfolioKontext(ctx.userId);
@@ -737,6 +742,29 @@ async function cashflow_hebel(ctx, args) {
         zinssatz: o.zins_prozent != null ? o.zins_prozent + ' %' : null,
         dscr: _kzText(o.dscr, 'zahl2') }));
 
+    /* ── v1813c · DIE HEBEL DER DREI SCHWAECHSTEN GEHEN MIT ─────────────
+     *
+     * GEMESSEN: auf "wie kann ich meinen Cashflow steigern" rief der Agent
+     * dieses Werkzeug ACHTZEHNMAL — einmal je Objekt — und schrieb am Ende
+     * trotzdem "Miete erhoehen, Kosten senken", ohne eine einzige Zahl.
+     *
+     *   > Ein Werkzeug, das nur einen Teil der Antwort liefert, wird so
+     *   > oft gerufen, wie es Teile gibt. Und die Antwort wird davon nicht
+     *   > besser, sondern teurer.
+     *
+     * Also kommen die gerechneten Hebel der drei schwaechsten Objekte
+     * gleich mit: ein Aufruf, und die Antwort hat Zahlen. */
+    const schwach = [];
+    for (const o of negativ.slice(0, 3)) {
+      if (!o.id) continue;
+      const q = await query(`SELECT data FROM objects WHERE id = $1 AND user_id = $2`,
+        [o.id, ctx.userId]);
+      if (!q.rows.length) continue;
+      const h = _hebelFuer(q.rows[0].data || {});
+      schwach.push({ name: o.name, cashflow: o.cashflow, hebel: h.hebel,
+        dafuer_fehlt_eine_angabe: h.fehlt.length ? h.fehlt : undefined });
+    }
+
     const tilg = Number(b.tilgung_eur_jahr), zins = Number(b.zins_eur_jahr);
     const stellen = [];
     if (Number.isFinite(tilg) && tilg > 0) {
@@ -758,12 +786,16 @@ async function cashflow_hebel(ctx, args) {
       dscr_portfolio: _kzText(b.dscr_portfolio, 'zahl2'),
       stellschrauben: stellen,
       schwaechste_objekte: negativ.length ? negativ : undefined,
-      hinweis: 'Alle Zahlen sind fertig formatiert — nimm sie unverändert. Antworte mit '
-             + 'den Hebeln, die hier stehen, und nenne bei jedem die Einschränkung. '
-             + 'Erfinde KEINE weiteren Zahlen und keine Zinsangebote. Für ein einzelnes '
-             + 'Objekt ruf dieses Werkzeug mit bereich="objekt" und dem Objekt auf. Sag '
-             + 'am Ende, dass das eine Rechnung auf seinen eingetragenen Zahlen ist und '
-             + 'keine Finanzierungs- oder Steuerberatung.'
+      hebel_der_schwaechsten: schwach.length ? schwach : undefined,
+      hinweis: 'DAS IST DIE GANZE ANTWORT — ruf dieses Werkzeug NICHT noch einmal und '
+             + 'nicht je Objekt auf. Unter "hebel_der_schwaechsten" stehen die '
+             + 'gerechneten Hebel der Objekte, die am meisten kosten. '
+             + 'NENNE BEI JEDEM HEBEL DIE EURO-WIRKUNG, die hier steht, und das Objekt, '
+             + 'zu dem sie gehoert — ein Hebel ohne Zahl ist ein Allgemeinplatz und '
+             + 'hilft bei keinem Portfolio. Nenne dazu jede Einschraenkung. Alle Zahlen '
+             + 'sind fertig formatiert; nimm sie unveraendert und erfinde keine weiteren '
+             + 'und keine Zinsangebote. Sag am Ende, dass das eine Rechnung auf seinen '
+             + 'eingetragenen Zahlen ist und keine Finanzierungs- oder Steuerberatung.'
     };
   }
 
@@ -1517,8 +1549,40 @@ async function _findeObjekt(ctx, args) {
   const a = args || {};
   if (a.nummer != null && ctx.letzteListe && ctx.letzteListe.length) {
     const n = Number(a.nummer);
-    if (n >= 1 && n <= ctx.letzteListe.length) return ctx.letzteListe[n - 1];
-    return null;
+    if (!(n >= 1 && n <= ctx.letzteListe.length)) return null;
+    const perNr = ctx.letzteListe[n - 1];
+
+    /* ── v1813c · EINE GERATENE NUMMER SCHLUG DIE GENANNTE ADRESSE ──────
+     *
+     * GEMESSEN am 03.10.2026: auf "wie ist der Cashflow bei der
+     * Musterstraße?" rief der Agent `objekt_kennzahlen` mit `adresse:
+     * "Musterstraße"` UND `nummer: 1` — die Nummer hatte er sich gedacht,
+     * der Nutzer hatte keine genannt. Hier gewann die Nummer, und die
+     * Antwort galt "Unbenannt" statt der Musterstraße.
+     *
+     *   > Eine Angabe, die der Nutzer gemacht hat, darf nie gegen eine
+     *   > verlieren, die das Modell dazuerfunden hat.
+     *
+     * Widersprechen sich beide, wird gefragt. Das ist die einzige Antwort,
+     * die in keinem Fall das falsche Haus trifft. */
+    if (a.adresse) {
+      const liste = await dialog.objekteListe(ctx.userId, 60);
+      const t = dialog.objektRaten(String(a.adresse), liste);
+      const perAdr = (t.art === 'eindeutig') ? t.objekt.id : null;
+      if (perAdr && String(perAdr) !== String(perNr)) {
+        const nrAdr = (liste.find((o) => o.id === perNr) || {}).adresse || ('Nummer ' + n);
+        if (ctx.merkeListe) ctx.merkeListe([perAdr, perNr]);
+        const e = new Error('mehrdeutig');
+        e.mehrdeutig = [
+          { nummer: 1, adresse: t.objekt.adresse },
+          { nummer: 2, adresse: nrAdr }
+        ];
+        e.grund = 'Die genannte Adresse und die genannte Nummer zeigen auf '
+                + 'verschiedene Objekte.';
+        throw e;
+      }
+    }
+    return perNr;
   }
   if (a.id && /^[0-9a-f-]{36}$/i.test(String(a.id))) {
     const r = await query(`SELECT id FROM objects WHERE id = $1 AND user_id = $2`,
@@ -1634,7 +1698,10 @@ const WERKZEUGE = [
       + 'Liefert je Objekt mehrere Kennzahlen nebeneinander, damit du nicht EINE '
       + 'Bedeutung von "beste" unterstellst. Mit "objektart" filtern ("Wohnung" wird zu '
       + 'ETW aufgeloest), mit "kennzahl" ordnen — aber nur, wenn der Nutzer die '
-      + 'Messgroesse selbst nennt.',
+      + 'Messgroesse selbst nennt. '
+      + 'FRAG NICHT NACH DER KENNZAHL: ohne Angabe kommen Score, Cashflow und Rendite '
+      + 'nebeneinander, und du nennst in der Antwort, nach was du geordnet hast. Eine '
+      + 'Rueckfrage ist hier eine unnoetige Runde — die Zahlen liegen alle vor.',
     parameter: { type: 'object',
       properties: {
         kennzahl: { type: 'string',

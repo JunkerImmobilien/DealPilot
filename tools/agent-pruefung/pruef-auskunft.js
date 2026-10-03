@@ -244,7 +244,28 @@ function zahl(s) {
         && !(hb.hebel || []).some((h) => /Marktniveau/.test(h.hebel) && /kein Spielraum/.test(h.wirkung || '')));
   }
 
+  /* v1813c · Nummer und Adresse widersprechen sich -> fragen, nicht raten. */
+  const andereNr = (nrImChat === 1 ? 2 : 1);
+  let gefragt = false;
+  try {
+    await ruf('objekt_kennzahlen', ctx, { nummer: andereNr, adresse: 'Bismarckstr' });
+  } catch (e) { gefragt = Boolean(e && e.mehrdeutig); }
+  pruef('Nummer gegen Adresse: fragt zurueck statt eine zu uebergehen', gefragt);
+
+  /* Ohne Objektbezug ist "mein Cashflow" der ganze Bestand. */
+  const ctxFrisch = { userId: uid, letzteListe: ctx.letzteListe, letztesObjekt: null,
+    protokoll: [], merkeObjekt() {}, merkeListe() {} };
+  const hoBezug = await ruf('cashflow_hebel', ctxFrisch, {});
+  pruef('ohne Objektbezug -> Portfolio, nicht ein einzelnes Haus',
+    hoBezug.bereich === 'portfolio');
+
   const hp = await ruf('cashflow_hebel', ctx, { bereich: 'portfolio' });
+  pruef('Portfolio-Antwort traegt die gerechneten Hebel der schwaechsten Objekte mit',
+    Array.isArray(hp.hebel_der_schwaechsten) && hp.hebel_der_schwaechsten.length > 0
+      && hp.hebel_der_schwaechsten.every((x) => Array.isArray(x.hebel)),
+    hp.hebel_der_schwaechsten
+      ? hp.hebel_der_schwaechsten.map((x) => x.name + ': ' + x.hebel.length + ' Hebel').join(' · ')
+      : 'fehlt — dann ruft das Modell wieder je Objekt');
   const sollPf = Math.round(Number(spiegel.vermoegensbilanz.cashflow_nach_steuer_eur_jahr));
   const istPf = zahl(hp.cashflow_nach_steuer);
   pruef('Portfolio-Hebel: Cashflow stimmt mit dem Spiegel',
@@ -274,7 +295,13 @@ function zahl(s) {
     const benutzt = (c2.protokoll || []).map((p) => p.werkzeug);
     const sek = ((Date.now() - t0) / 1000).toFixed(1);
     console.log('\n  » ' + s.f);
-    console.log('    Werkzeuge: ' + (benutzt.join(' + ') || 'KEINE') + '  (' + sek + ' s)');
+    console.log('    Werkzeuge: ' + (benutzt.length || 'KEINE') + '  (' + sek + ' s)');
+    /* MIT ARGUMENTEN. Achtzehnmal derselbe Werkzeugname sagt nicht, womit —
+       und ohne das ist jede Ursachenvermutung geraten. */
+    (c2.protokoll || []).forEach((p, i) =>
+      console.log('      ' + (i + 1) + '. ' + p.werkzeug + ' ' + (p.args || '')));
+    pruef('hoechstens 3 Werkzeugaufrufe fuer diese Frage (' + benutzt.length + ')',
+      benutzt.length <= 3);
     console.log('    ' + String(erg.text || '').replace(/\n/g, '\n    ').slice(0, 700));
     pruef('nimmt ' + s.will, benutzt.indexOf(s.will) >= 0);
     pruef('antwortet ohne Rueckfrage und ohne Fehler',

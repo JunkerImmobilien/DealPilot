@@ -1,5 +1,5 @@
 {
- "erzeugt_am": "2026-10-03T07:10:20.717Z",
+ "erzeugt_am": "2026-10-03T07:16:21.376Z",
  "quellen": {
   "voice-import": "7dbbe6cf88e245a8",
   "objektart-felder": "7e35d8f32caad19d",
@@ -870,15 +870,18 @@
    },
    {
     "id": "leerstand",
-    "kind": "text"
+    "kind": "text",
+    "label": "Leerstand p.a."
    },
    {
     "id": "btj",
-    "kind": "text"
+    "kind": "text",
+    "label": "Betrachtungszeitraum"
    },
    {
     "id": "exit_bmy",
-    "kind": "text"
+    "kind": "text",
+    "label": "Exit-Rendite (Verkauf %)"
    },
    {
     "id": "nkm",

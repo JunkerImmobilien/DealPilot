@@ -37,6 +37,22 @@ const werkzeuge = require('./agentWerkzeuge');
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const RUNDEN_MAX = 6;
+
+/* ── v1813c · EINE FRIST AUF DEN RUNDEN IST KEINE FRIST AUF DEM GANZEN ──
+ *
+ * RUNDEN_MAX begrenzt die Runden, nicht die Aufrufe: in einer Runde darf
+ * das Modell beliebig viele Werkzeuge rufen. GEMESSEN am 03.10.2026: auf
+ * "wie kann ich meinen Cashflow steigern" rief es `cashflow_hebel`
+ * ACHTZEHNMAL — innerhalb der sechs erlaubten Runden, also ohne dass
+ * irgendeine Grenze ansprach.
+ *
+ *   > Eine Grenze auf jedem Einzelschritt ergibt keine Grenze auf dem
+ *   > Ganzen. (Dieselbe Lehre wie bei den Fristen, zum zweiten Mal.)
+ *
+ * Ab AUFRUFE_MAX wird nichts mehr ausgefuehrt; das Modell bekommt statt
+ * eines Ergebnisses die Ansage, mit dem zu antworten, was es hat. Lieber
+ * eine Teilantwort als eine Schleife auf Marcels Rechnung. */
+const AUFRUFE_MAX = 14;
 const FRIST_MS = 90000;
 
 const SYSTEM =
@@ -68,9 +84,11 @@ const SYSTEM =
 + 'mit portfolio_lesen. Die Objekte dort tragen keine Nummer, und die '
 + 'Nummer aus der Chat-Liste gilt dort nicht.\n'
 + '7d. "Was sind meine besten ...", "welches laeuft am besten", "wo ist die '
-+ 'Rendite am hoechsten" -> objekte_rangliste. Nenne IMMER, nach welcher '
-+ 'Kennzahl du ordnest: "beste" ist keine Kennzahl, und wer das weglaesst, '
-+ 'laesst eine Entscheidung wie eine Tatsache aussehen.\n'
++ 'Rendite am hoechsten" -> objekte_rangliste, OHNE vorher nach der Kennzahl '
++ 'zu fragen: das Werkzeug liefert Score, Cashflow und Rendite nebeneinander. '
++ 'Nenne in der Antwort IMMER, nach welcher Kennzahl du geordnet hast — '
++ '"beste" ist keine Kennzahl, und wer das weglaesst, laesst eine Entscheidung '
++ 'wie eine Tatsache aussehen.\n'
 + '7e. "Zeig mir die Felder", "was steht da alles drin" -> '
 + 'objekt_felder_liste. Gib Bezeichnungen, nie interne Feldnamen.\n'
 + '7f. "Wie kann ich meinen Cashflow steigern / optimieren" -> '
@@ -78,6 +96,9 @@ const SYSTEM =
 + 'Werkzeug hast du keine Zahlen dazu, und allgemeine Ratschlaege ("Miete '
 + 'erhoehen, Kosten senken") helfen bei keinem Portfolio. Jeder Hebel kommt '
 + 'mit seiner Einschraenkung — nenne beide, nie nur die Wirkung.\n'
++ '7g. Gilt eine Antwort EINEM Objekt, nennst du es beim Namen — Adresse '
++ 'oder Nummer. Eine Zahl ohne Objekt kann der Nutzer nicht nachpruefen, und '
++ 'genau daran ist schon eine Auskunft zum falschen Haus unbemerkt geblieben.\n'
 + '8. Keine Floskeln, keine Wiederholung der Frage. Antworte direkt.\n'
 + '9. ALLE Geldbetraege sind GANZE EURO, niemals Cent. 4721579 ist '
 + '"4.721.579 EUR", nicht "47.215,79". Du verschiebst kein Komma und '
@@ -183,6 +204,17 @@ async function laufen(frage, ctx, opts) {
     for (const a of aufrufe) {
       const w = werkzeuge.finde(a.name);
       let ergebnis;
+      const bisher = (ctx.protokoll || []).length;
+      if (bisher >= AUFRUFE_MAX) {
+        ergebnis = { ok: false, abgeschnitten: true,
+          hinweis: 'Du hast in diesem Lauf schon ' + bisher + ' Werkzeuge gerufen. '
+                 + 'Es wird nichts mehr ausgefuehrt. Antworte JETZT mit dem, was du '
+                 + 'hast, und sag ehrlich, was du nicht pruefen konntest.' };
+        if (ctx.protokoll) ctx.protokoll.push({ werkzeug: a.name, stufe: 'gesperrt' });
+        eingabe.push({ type: 'function_call_output', call_id: a.call_id,
+          output: JSON.stringify(ergebnis) });
+        continue;
+      }
       if (!w) {
         ergebnis = { fehler: 'Unbekanntes Werkzeug: ' + a.name };
       } else if (w.stufe === 'kostet' && !o.darfKosten) {
@@ -203,6 +235,7 @@ async function laufen(frage, ctx, opts) {
              danach. */
           if (e && e.mehrdeutig) {
             ergebnis = { ok: false, rueckfrage: true, kandidaten: e.mehrdeutig,
+              grund: e.grund || undefined,
               hinweis: 'Mehrere Objekte passen. Zeige dem Nutzer die nummerierte '
                      + 'Liste und frage, welches er meint. NICHTS ausfuehren.' };
           } else {
@@ -210,7 +243,16 @@ async function laufen(frage, ctx, opts) {
           }
         }
       }
-      if (ctx.protokoll) ctx.protokoll.push({ werkzeug: a.name, stufe: w ? w.stufe : '?' });
+      /* v1813c · MIT ARGUMENTEN. Als der Agent `cashflow_hebel` achtzehnmal
+         rief, stand im Protokoll achtzehnmal derselbe Name — und nicht,
+         WOMIT. Jede Ursachenvermutung war damit geraten.
+
+           > Ein Protokoll, das nur das Werkzeug nennt, sagt nicht, was
+           > getan wurde. */
+      if (ctx.protokoll) {
+        ctx.protokoll.push({ werkzeug: a.name, stufe: w ? w.stufe : '?',
+          args: String(a.args || '').slice(0, 160) });
+      }
       eingabe.push({
         type: 'function_call_output',
         call_id: a.call_id,
