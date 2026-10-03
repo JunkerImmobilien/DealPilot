@@ -31,8 +31,17 @@ const agent = require('/app/src/services/agentLauf');
     }
     const benutzt = protokoll.map((p) => p.werkzeug);
     let ok = true, warum = '';
-    if (erwartet.werkzeug && benutzt.indexOf(erwartet.werkzeug) < 0) {
-      ok = false; warum = 'ohne ' + erwartet.werkzeug;
+    /* v1813f · ERWARTET DARF EINE LISTE SEIN. Seit v1813 gibt es fuer
+       dieselbe Frage bessere Wege: 'und die Miete?' beantwortet
+       objekt_felder_liste mit bereich=miete genauer als objekt_lesen, und
+       eine Rangliste ist objekte_rangliste statt portfolio_lesen.
+
+         > Ein Pruefer, der EINEN Weg erwartet, meldet jeden besseren als
+         > Fehler. Das ist hier schon einmal passiert und steht als
+         > Prueferfehler Nr. 2 in der README. */
+    const erlaubt = [].concat(erwartet.werkzeug || []);
+    if (erlaubt.length && !erlaubt.some((w) => benutzt.indexOf(w) >= 0)) {
+      ok = false; warum = 'ohne ' + erlaubt.join(' oder ');
     }
     if (erwartet.nicht && benutzt.indexOf(erwartet.nicht) >= 0) {
       ok = false; warum = 'hat ' + erwartet.nicht + ' AUSGEFUEHRT';
@@ -65,7 +74,7 @@ const agent = require('/app/src/services/agentLauf');
 
   await probe('Anknuepfung: „und die Miete?"',
     'und die Miete?',
-    { werkzeug: 'objekt_lesen' },
+    { werkzeug: ['objekt_lesen', 'objekt_felder_liste', 'objekt_kennzahlen'] },
     { letztes: ids[2], verlauf: [
       { rolle: 'user', text: 'was hat Objekt 3 für Kerndaten?' },
       { rolle: 'assistant', text: 'Hermannstraße 9, Hüllhorst: ETW, 100 m², Baujahr 1962.' }] });

@@ -22,9 +22,24 @@ const { query } = require('/app/src/db/pool');
 const W = require('/app/src/services/agentWerkzeuge');
 const agent = require('/app/src/services/agentLauf');
 
+/* ── DER PRUEFER STELLT SEINE AUSGANGSLAGE VOR JEDER PROBE HER ───────────
+ *
+ * Dreimal in einem Lauf hat sich eine Probe die naechste verdorben: die
+ * Werkzeuge rufen `ctx.merkeListe()`, wenn sie eine Rueckfrage stellen —
+ * danach hat "die zuletzt gezeigte Liste" zwei Eintraege, und jede Probe
+ * mit `nummer: 3` scheitert zu Recht.
+ *
+ *   > Ein Pruefer, der seine eigene Umgebung veraendert, misst sich selbst.
+ *
+ * Also wird die volle Liste vor JEDEM Werkzeugaufruf wiederhergestellt.
+ * Das ist genau die Lage, die Teil A annimmt: dem Nutzer wurde eben die
+ * ganze Liste gezeigt. */
+let VOLLE = null;
+
 function ruf(name, ctx, args) {
   const w = W.finde(name);
   if (!w) throw new Error('kein Werkzeug ' + name);
+  if (VOLLE && ctx && 'letzteListe' in ctx) ctx.letzteListe = VOLLE.slice();
   return w.fn(ctx, args || {});
 }
 function zahl(s) {
@@ -76,6 +91,7 @@ function zahl(s) {
    *
    * VOLLE_LISTE ist die unveraenderliche Kopie; Teil B nimmt nur die. */
   const VOLLE_LISTE = liste.objekte.map((o) => o.id);
+  VOLLE = VOLLE_LISTE;   /* ab hier stellt ruf() die Liste vor jeder Probe her */
   ctx.letzteListe = VOLLE_LISTE.slice();
 
   /* ══ TEIL A1 · Der Gegentest: stimmten die Nummern ueberhaupt nicht? ══ */
@@ -257,13 +273,24 @@ function zahl(s) {
         && !(hb.hebel || []).some((h) => /Marktniveau/.test(h.hebel) && /kein Spielraum/.test(h.wirkung || '')));
   }
 
-  /* v1813c · Nummer und Adresse widersprechen sich -> fragen, nicht raten. */
-  const andereNr = (nrImChat === 1 ? 2 : 1);
-  let gefragt = false;
-  try {
-    await ruf('objekt_kennzahlen', ctx, { nummer: andereNr, adresse: 'Bismarckstr' });
-  } catch (e) { gefragt = Boolean(e && e.mehrdeutig); }
-  pruef('Nummer gegen Adresse: fragt zurueck statt eine zu uebergehen', gefragt);
+  /* v1813c · Nummer und Adresse widersprechen sich -> fragen, nicht raten.
+     DIE NUMMER MUSS AUF EIN OBJEKT MIT ADRESSE ZEIGEN. Hier stand vorher
+     "das andere von 1 und 2", und das traf das leere Objekt "Unbenannt" —
+     da gewinnt seit v1813e absichtlich die Adresse, und die Probe meldete
+     einen Fehler, der keiner war. Ein Pruefer muss seinen Fall AUFBAUEN,
+     nicht hoffen, dass er vorliegt. */
+  const bisIdx = liste.objekte.findIndex((o) => /bismarck/i.test(o.adresse || ''));
+  const andereIdx = liste.objekte.findIndex((o, i) =>
+    i !== bisIdx && String(o.adresse || '').replace(/[\s,]/g, '').length > 5);
+  let gefragt = false, aufgebaut = (bisIdx >= 0 && andereIdx >= 0);
+  if (aufgebaut) {
+    try {
+      await ruf('objekt_kennzahlen', ctx, { nummer: andereIdx + 1, adresse: 'Bismarckstr' });
+    } catch (e) { gefragt = Boolean(e && e.mehrdeutig); }
+  }
+  pruef('Nummer gegen Adresse: fragt zurueck statt eine zu uebergehen', aufgebaut && gefragt,
+    aufgebaut ? 'Nummer ' + (andereIdx + 1) + ' (' + liste.objekte[andereIdx].adresse
+      + ') gegen "Bismarckstr"' : 'Fall nicht aufbaubar — kein zweites Objekt mit Adresse');
 
   /* Aber nicht gegen ein leeres Objekt: ein Datensatz OHNE jede Adresse
      kann nicht der sein, den der Nutzer per Adresse genannt hat. */

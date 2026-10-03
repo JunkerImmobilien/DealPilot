@@ -1633,6 +1633,24 @@ async function _findeObjekt(ctx, args) {
        *   > sie als Fehlschlag meldet, macht aus einer Rueckfrage eine
        *   > Sackgasse. */
       const ids = t.kandidaten.map((o) => o.id);
+
+      /* ── v1813f · BEI GLEICHSTAND GEWINNT DAS GESPRAECH ────────────────
+       *
+       * GEMESSEN: auf die Anschlussfrage "und die Miete?" gab das Modell
+       * die Adresse des gerade besprochenen Objekts mit. War die
+       * mehrdeutig, fragte der Agent zurueck — nach einem Objekt, ueber
+       * das die beiden gerade geredet hatten.
+       *
+       *   > Zwei gleich gute Treffer sind keine Entscheidung. Steckt einer
+       *   > davon im laufenden Gespraech, ist er es aber doch.
+       *
+       * Das ist KEIN Zurueckfallen ins Blaue: es gilt nur, wenn das
+       * besprochene Objekt unter den Kandidaten IST. Ist es das nicht,
+       * wird weiter gefragt. */
+      if (ctx.letztesObjekt && ids.some((i) => String(i) === String(ctx.letztesObjekt))) {
+        return ctx.letztesObjekt;
+      }
+
       if (ctx.merkeListe) ctx.merkeListe(ids);
       const e = new Error('mehrdeutig');
       e.mehrdeutig = t.kandidaten.map((o, i) => ({ nummer: i + 1, adresse: o.adresse }));

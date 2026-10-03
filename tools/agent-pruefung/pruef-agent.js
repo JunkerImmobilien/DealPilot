@@ -10,7 +10,8 @@ const agent = require('/app/src/services/agentLauf');
 const FRAGEN = [
   { f: 'Wie hoch ist die Gesamttilgung aller Objekte?',            erwartet: 'portfolio_lesen' },
   { f: 'Wie hoch sind meine aktuellen Verbindlichkeiten über das gesamte Portfolio?', erwartet: 'portfolio_lesen' },
-  { f: 'Welche Objekte haben aktuell den höchsten Finanzierungsbedarf?', erwartet: 'portfolio_lesen' },
+  { f: 'Welche Objekte haben aktuell den höchsten Finanzierungsbedarf?',
+    erwartet: ['portfolio_lesen', 'objekte_rangliste'] },
   { f: 'Zeig mir die Vermögensbilanz.',                            erwartet: 'portfolio_lesen' },
   { f: 'Wie hoch ist der aktuelle Gesamtwert meines Portfolios?',   erwartet: 'portfolio_lesen' }
 ];
@@ -40,17 +41,20 @@ const FRAGEN = [
       fehler++; continue;
     }
     const benutzt = protokoll.map((x) => x.werkzeug);
-    const ok = benutzt.indexOf(p.erwartet) >= 0;
+    /* v1813f · Alternativen zulassen — objekte_rangliste ist fuer eine
+       Rangfrage der genauere Weg als portfolio_lesen. */
+    const erlaubt = [].concat(p.erwartet);
+    const ok = erlaubt.some((w) => benutzt.indexOf(w) >= 0);
     if (!ok) fehler++;
     console.log('FRAGE: ' + p.f);
     console.log('  Werkzeuge: ' + (benutzt.join(', ') || 'KEINE')
-      + (ok ? '   ok' : '   FEHLT: ' + p.erwartet));
+      + (ok ? '   ok' : '   FEHLT: ' + [].concat(p.erwartet).join(' oder ')));
     console.log('  Runden: ' + r.runden + ', ' + Math.round((Date.now() - t0) / 100) / 10 + ' s');
     console.log('  Antwort:');
     String(r.text || '').split('\n').forEach((z) => console.log('    ' + z));
     console.log('');
   }
 
-  console.log('DECKUNG: ' + FRAGEN.length + ' Fragen, ' + fehler + ' ohne das erwartete Werkzeug.');
+  console.log('DECKUNG: ' + FRAGEN.length + ' Fragen, ' + fehler + ' ohne eines der erwarteten Werkzeuge.');
   process.exit(fehler ? 1 : 0);
 })().catch((e) => { console.error('AUSNAHME: ' + e.message); process.exit(2); });
