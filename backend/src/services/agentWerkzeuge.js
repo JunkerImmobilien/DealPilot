@@ -471,8 +471,26 @@ async function objekt_anlegen(ctx, args) {
     });
   }
 
+  /* ── v1812d · AUCH `felder` MUSS DURCH DIE AUSWAHLPRUEFUNG ───────────
+   *
+   * GEMESSEN: `objart` landete als "Eigentumswohnung" im Datensatz statt
+   * als "ETW". Der Freitext-Weg normalisiert Auswahlwerte seit v1806b —
+   * dieser Weg hier nicht, und er laeuft DANACH, ueberschreibt also das
+   * richtige Ergebnis mit dem Klartext.
+   *
+   *   > Zwei Wege in dieselbe Spalte, und nur einer prueft. Der andere
+   *   > gewinnt, weil er spaeter kommt. */
   Object.entries(felder).forEach(([fid, w]) => {
-    if (fuehrung.feld(fid)) sauber[fid] = w; else unbekannt.push(fid);
+    const f = fuehrung.feld(fid);
+    if (!f) { unbekannt.push(fid); return; }
+    if (f.kind === 'select' && f.optionen && f.optionen.length) {
+      const t = _ordneOption(w, f.optionen);
+      if (t.eindeutig) sauber[fid] = t.wert;
+      /* Nicht eindeutig: NICHT setzen. Ein ungueltiger Auswahlwert ist
+         schlimmer als ein leeres Feld — er sieht aus wie eine Angabe. */
+      return;
+    }
+    sauber[fid] = w;
   });
   if (!Object.keys(sauber).length) {
     return { ok: false, unbekannte_felder: unbekannt,
@@ -900,13 +918,15 @@ const WERKZEUGE = [
     parameter: { type: 'object', properties: {}, additionalProperties: false } },
 
   { name: 'objekte_felder', stufe: 'lesen', fn: objekte_felder,
-    beschreibung: 'Liest BELIEBIGE Felder ueber ALLE Objekte auf einmal. '
-      + 'DAS IST DAS WERKZEUG FUER JEDE FRAGE NACH "WELCHE OBJEKTE ..." — '
+    beschreibung: 'Liest BELIEBIGE Felder ueber ALLE Objekte auf einmal — '
       + 'Baujahr, Objektart, Keller, Heizung, Energieausweis, Zinsbindung, '
-      + 'Sanierungsstand, einfach jedes Feld. '
-      + 'Lies NIEMALS zwanzig Objekte einzeln, um sie zu vergleichen: ein '
-      + 'Aufruf hier liefert dasselbe. '
-      + 'Kennst du den Feldnamen nicht, frag vorher feld_katalog.',
+      + 'Zustand, Ausstattung: jede EINGETRAGENE Angabe. '
+      + 'Lies NIEMALS zwanzig Objekte einzeln, um sie zu vergleichen. '
+      + 'Kennst du den Feldnamen nicht, frag vorher feld_katalog. '
+      + 'NICHT FUER GELD UND KENNZAHLEN: Restschuld, Cashflow, Rendite, DSCR, '
+      + 'LTV, Tilgung und Scores stehen hier NICHT drin, weil sie gerechnet '
+      + 'werden und nicht eingetragen sind — dafuer portfolio_lesen, das hat '
+      + 'sie fuer alle Objekte fertig.',
     parameter: { type: 'object',
       properties: { felder: { type: 'array', items: { type: 'string' },
         description: 'Feld-Ids, z.B. ["baujahr","objart","keller"]' } },
