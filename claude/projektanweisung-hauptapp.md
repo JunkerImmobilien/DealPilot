@@ -29105,3 +29105,85 @@ Fragen zu bringen; zweimal gab es einfach eine Stufe mit.
   drei. Kosmetisch — es fließt kein falsches Geld, es ist eine Antwort zu
   viel.
 - **A-9 (E-Mail-Abgleich)** bleibt blockiert.
+
+---
+
+## Rollout-Journal 03.10.2026 — v1812: ein Feld über alle Objekte
+
+**Was** · Marcel: *„geht das noch intelligenter und schlauer, sodass er alle
+fragen zu meinen objekten versteht?"* — er hatte eine echte Lücke gespürt.
+
+**Commits** · `v1812` bis `v1812e`
+
+### Die Lücke, gemessen
+
+| Frage | vorher |
+|---|---|
+| „Welche Objekte haben keinen Keller?" | **19 Werkzeugaufrufe, 17 s** |
+| „Wie viele sind Mehrfamilienhäuser?" | **18 Aufrufe, 17 s** |
+| „Welche sind vor 1960 gebaut?" | **fragte zurück**, statt zu antworten |
+
+Der Agent hatte nur zwei Wege: den Portfolio-Spiegel mit 22 Kernfeldern
+oder ein Objekt **einzeln**. Alles, was im Spiegel fehlt — Keller, Heizung,
+Energieausweis, Zustand — zwang ihn, achtzehnmal dasselbe zu tun.
+
+> Ein Agent, der eine Frage nur beantworten kann, indem er achtzehnmal
+> nachschlägt, beantwortet sie meistens nicht. Er fragt zurück, und das
+> sieht aus wie Dummheit, ist aber ein fehlendes Werkzeug.
+
+**`objekte_felder`** liest beliebige Felder über **alle** Objekte in einem
+Aufruf. Nachgemessen:
+
+```
+vor 1960 gebaut        1 Aufruf  4,4 s   (vorher: Rückfrage)
+größte Wohnfläche      1 Aufruf  3,2 s
+Mehrfamilienhäuser     1 Aufruf  2,2 s   (vorher: 18 Aufrufe, 17 s)
+keinen Keller          3 Aufrufe 5,3 s   (vorher: 19 Aufrufe, 17 s)
+```
+
+### Vier Fehler beim Bauen — dreimal dieselbe Lehre
+
+**1 · „Es gibt kein Feld für Wohnfläche."** Der Agent suchte
+„wohnflaeche", das Label heißt „Wohnfläche (m²)". **Die Umlautfalle zum
+vierten Mal an einem Tag** — nach „parkstr", „portfolios" und
+„Wohnflaeche" in `_feldAusSatz`. Dort hatte ich `_flach()` gebaut und hier
+nicht angewandt.
+
+> Eine Falle, gegen die man an einer Stelle ein Mittel hat, trifft einen an
+> der nächsten. Das Mittel gehört nicht an die Stelle, sondern an jede.
+
+**2 · Ein leeres Feld las das Modell als „nein".** Auf „welche haben keinen
+Keller" kam eine Liste — darunter Objekte, bei denen das Feld schlicht leer
+war. Der Hinweis daneben half nicht; jetzt steht `(nicht ausgefuellt)` im
+**Wert**.
+
+> Ein leeres Feld ist keine Aussage. Wer es als Nein liest, behauptet etwas
+> über ein Haus, das niemand geprüft hat.
+
+**3 · „Eigentumswohnung" statt „ETW".** Der Freitext-Weg normalisierte
+Auswahlwerte, der direkte nicht — und er lief danach.
+
+> Zwei Wege in dieselbe Spalte, und nur einer prüft. Der andere gewinnt,
+> weil er später kommt.
+
+**4 · Das neue Werkzeug wurde für Geldfragen benutzt** und meldete „12 von
+18 Objekten haben keinen Finanzierungsbedarf" — die Werte sind nicht leer,
+sie werden **gerechnet**. Ich hatte das in die Beschreibung geschrieben; es
+half nicht.
+
+> Was im Ergebnis steht, wirkt. Was in der Beschreibung steht, wirkt
+> manchmal. Wer einen Irrweg verhindern will, stellt das Schild an den Weg,
+> nicht an die Karte.
+
+Das ist **dreimal an zwei Tagen** dieselbe Lehre — bei den Beträgen
+(v1803), beim Preis (v1811), hier. Sie steht jetzt in der Erinnerung
+`werkzeug-schlaegt-hinweis`.
+
+### Nachgemessen
+
+```
+1 WERKZEUGE   : alle Proben bestanden
+2 ZAHLENTREUE : 12 von 12 richtig
+3 ANLAGE      :  7 von 7 Angaben im Datensatz
+4 GESAMT      :  9 von 9 Proben
+```
