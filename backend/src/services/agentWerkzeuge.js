@@ -134,14 +134,671 @@ async function portfolio_lesen(ctx) {
     lesbar[k] = Number(bil[k]).toLocaleString('de-DE') + ' EUR';
   });
 
+  /* ── v1813 · DIE NUMMER DES SPIEGELS GEHT NICHT MIT ─────────────────
+   *
+   * GEMESSEN am 03.10.2026 auf Staging: Nr 8 der Chat-Liste ist
+   * "Bäckerstr. 7 Musterhausen", `nr: 8` im Spiegel ist "Ravensberger Weg
+   * 38 Bielefeld". Die beiden Zählungen haben verschiedene Grundmengen —
+   * alle Objekte nach Änderungsdatum gegen nur die gewonnenen in
+   * API-Reihenfolge — und laufen ab Platz 2 auseinander.
+   *
+   *   > Zwei Zählungen für dasselbe Wort sind schlimmer als keine. Was
+   *   > nicht dasteht, kann nicht falsch gelesen werden.
+   *
+   * Also steht sie nicht mehr da. Die Referenz ist die ID (v1813 im
+   * Frontend), und für ein einzelnes Objekt gibt es `objekt_kennzahlen`. */
+  const daten = Object.assign({}, sp.payload);
+  if (Array.isArray(daten.objekte)) {
+    daten.objekte = daten.objekte.map((o) => {
+      const k = Object.assign({}, o);
+      delete k.nr;
+      return k;
+    });
+  }
+
   return {
     vorhanden: true,
     stand: dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem),
     geaendert_seitdem: sp.geaendert_seitdem,
     hinweis: 'Alle Betraege sind GANZE EURO. Unter "so_schreiben" stehen sie '
-           + 'fertig formatiert — nimm diese Schreibweise unveraendert.',
+           + 'fertig formatiert — nimm diese Schreibweise unveraendert. '
+           + 'Die Objekte hier tragen KEINE Nummer: die Nummer aus der Chat-Liste '
+           + 'gilt hier nicht. Willst du die Kennzahlen EINES Objekts, nimm '
+           + 'objekt_kennzahlen — das ordnet richtig zu.',
     so_schreiben: lesbar,
-    daten: sp.payload
+    daten: daten
+  };
+}
+
+/* ── Der Spiegel, aufgeschlossen für EIN Objekt ──────────────────────────
+ *
+ * Die Zuordnung geht über die ID. Nur wenn der Spiegel noch von vor v1813
+ * stammt und keine ID führt, wird der Name genommen — und auch das nur,
+ * wenn er EINDEUTIG ist. Auf Staging heißen zwei Objekte "Am Markt 9
+ * Kabelsketal"; bei denen wäre ein Namenstreffer ein Münzwurf.
+ */
+function _spiegelEintrag(payload, objektId, daten) {
+  const liste = (payload && Array.isArray(payload.objekte)) ? payload.objekte : [];
+  if (!liste.length) return { eintrag: null, grund: 'leer' };
+
+  const ueberId = liste.filter((o) => o && o.id && String(o.id) === String(objektId));
+  if (ueberId.length === 1) return { eintrag: ueberId[0], grund: 'id' };
+
+  /* Kein Eintrag mit dieser ID, aber der Spiegel führt IDs? Dann ist das
+     Objekt wirklich nicht drin — nicht gewonnen, oder nach dem Spiegel
+     angelegt. Dann NICHT über den Namen weitersuchen: das Ergebnis wäre
+     ein anderes Haus. */
+  const mitId = liste.filter((o) => o && o.id).length;
+  if (mitId) return { eintrag: null, grund: 'nicht_im_spiegel' };
+
+  const d = daten || {};
+  const name = _flach([d.str, d.hnr].filter(Boolean).join(' '));
+  const ort = _flach(d.ort || '');
+  if (!name) return { eintrag: null, grund: 'alt_ohne_id' };
+  const treffer = liste.filter((o) => {
+    const nm = _flach(o && o.name);
+    if (!nm) return false;
+    return nm.indexOf(name) >= 0
+        && (!ort || _flach(o.ort).indexOf(ort) >= 0 || nm.indexOf(ort) >= 0);
+  });
+  if (treffer.length === 1) return { eintrag: treffer[0], grund: 'name' };
+  if (treffer.length > 1) return { eintrag: null, grund: 'name_mehrdeutig' };
+  return { eintrag: null, grund: 'nicht_im_spiegel' };
+}
+
+/* Die Kennzahlen eines Spiegel-Eintrags, FERTIG FORMATIERT — weil ein
+   Modell 4721579 als "47.215,79" gelesen hat (v1803). Was fertig dasteht,
+   wird abgeschrieben statt umgerechnet. */
+const KZ_FELDER = [
+  ['cashflow_nach_steuer_eur_jahr', 'Cashflow nach Steuer', 'eur_jahr'],
+  ['cashflow_vor_steuer_eur_jahr', 'Cashflow vor Steuer', 'eur_jahr'],
+  ['miete_kalt_eur_jahr', 'Kaltmiete', 'eur_jahr'],
+  ['kaufpreis_eur', 'Kaufpreis', 'eur'],
+  ['eigenkapital_eur', 'Eigenkapital', 'eur'],
+  ['darlehen_eur', 'Darlehen', 'eur'],
+  ['restschuld_eur', 'Restschuld heute', 'eur'],
+  ['zins_eur_jahr', 'Zins', 'eur_jahr'],
+  ['tilgung_eur_jahr', 'Tilgung', 'eur_jahr'],
+  ['bruttomietrendite_prozent', 'Bruttomietrendite', 'prozent'],
+  ['dscr', 'DSCR', 'zahl2'],
+  ['ltv_prozent', 'LTV', 'prozent'],
+  ['zins_prozent', 'Zinssatz', 'prozent'],
+  ['tilgung_prozent', 'Tilgungssatz', 'prozent']
+];
+
+function _kzText(wert, art) {
+  const z = Number(wert);
+  if (!Number.isFinite(z)) return null;
+  if (art === 'eur') return Math.round(z).toLocaleString('de-DE') + ' EUR';
+  if (art === 'eur_jahr') return Math.round(z).toLocaleString('de-DE') + ' EUR/Jahr';
+  if (art === 'prozent') return z.toFixed(2).replace('.', ',') + ' %';
+  if (art === 'zahl2') return z.toFixed(2).replace('.', ',');
+  if (art === 'jahr') return String(Math.round(z));
+  return String(wert);
+}
+
+/* ── Die gerechneten Zahlen EINES Objekts ───────────────────────────────
+ *
+ * Marcel: "Wie ist der Cashflow bei wohnung xy. wie ist der Investro deal
+ * score."
+ *
+ * Bisher gab es dafür nur `portfolio_lesen` — neun Objekte im Paket, und
+ * das Modell musste das richtige darin finden. Über die Nummer. Die nicht
+ * stimmt. Hier kommt genau ein Objekt, zugeordnet über die ID.
+ */
+async function objekt_kennzahlen(ctx, args) {
+  const id = await _findeObjekt(ctx, args);
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+
+  const d = o.daten || {};
+  const adresse = [d.str, d.hnr].filter(Boolean).join(' ')
+    + (d.ort ? ', ' + [d.plz, d.ort].filter(Boolean).join(' ') : '');
+  const sc = dialog.scoreLesen(d);
+  const sp = await dialog.portfolioKontext(ctx.userId);
+  const tr = sp ? _spiegelEintrag(sp.payload, id, d) : { eintrag: null, grund: 'kein_spiegel' };
+
+  const kennzahlen = {}, fehlen = [];
+  if (tr.eintrag) {
+    KZ_FELDER.forEach((f) => {
+      const t = _kzText(tr.eintrag[f[0]], f[2]);
+      if (t) kennzahlen[f[1]] = t; else fehlen.push(f[1]);
+    });
+    /* Der Monatswert, weil danach so oft gefragt wird — aus derselben Zahl
+       geteilt, nicht aus einer zweiten Quelle. */
+    const cf = Number(tr.eintrag.cashflow_nach_steuer_eur_jahr);
+    if (Number.isFinite(cf)) {
+      kennzahlen['Cashflow nach Steuer je Monat'] =
+        Math.round(cf / 12).toLocaleString('de-DE') + ' EUR/Monat';
+    }
+  }
+
+  const ergebnis = {
+    gefunden: true, id: id, adresse: adresse,
+    objektart: d.objart || d.objektart || null,
+    dealpilot_score: sc.dealscore, dealpilot_stufe: sc.stufe,
+    investor_deal_score: sc.investor, investor_stufe: sc.investorStufe,
+    kennzahlen: Object.keys(kennzahlen).length ? kennzahlen : null,
+    stand: tr.eintrag
+      ? dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem) : null
+  };
+
+  if (!sc.investor_gerechnet) {
+    ergebnis.investor_hinweis = 'Der Investor Deal Score ist für dieses Objekt NICHT '
+      + 'gerechnet. Sag das so — nenne keine Zahl dafür. Er entsteht in DealPilot, '
+      + 'wenn das Objekt im Deal-Score-Modul durchgerechnet wird.';
+  }
+  if (!tr.eintrag) {
+    /* Jeder Grund bekommt seinen eigenen Satz. Ein gemeinsamer wäre
+       bequemer und in jedem Einzelfall ungenau. */
+    const saetze = {
+      kein_spiegel: 'Es liegt kein Portfolio-Stand vor — der Nutzer muss DealPilot '
+        + 'einmal öffnen. Dann stehen Cashflow, DSCR, LTV und Rendite hier.',
+      leer: 'Der Portfolio-Stand enthält keine Objekte.',
+      nicht_im_spiegel: 'Dieses Objekt steht NICHT im Portfolio-Stand. Das ist der Fall, '
+        + 'wenn es nicht auf "gewonnen" steht oder nach dem letzten Stand angelegt '
+        + 'wurde. Cashflow, DSCR, LTV und Rendite gibt es dafür deshalb nicht — '
+        + 'behaupte dafür keine Zahl.',
+      alt_ohne_id: 'Der Portfolio-Stand ist älter als der Umbau und lässt sich diesem '
+        + 'Objekt nicht sicher zuordnen. Der Nutzer muss DealPilot einmal öffnen.',
+      name_mehrdeutig: 'Im Portfolio-Stand passen mehrere Einträge auf diese Adresse. '
+        + 'Ich nenne lieber keine Zahl als die eines anderen Hauses. Der Nutzer muss '
+        + 'DealPilot einmal öffnen, dann ist die Zuordnung eindeutig.'
+    };
+    ergebnis.kennzahlen_hinweis = saetze[tr.grund] || saetze.nicht_im_spiegel;
+  }
+  if (fehlen.length) ergebnis.nicht_gerechnet = fehlen;
+  return ergebnis;
+}
+
+/* ── Rangliste: "was sind meine besten Wohnungen" ───────────────────────
+ *
+ * "Beste" ist keine Kennzahl. Wer die Frage mit EINER Zahl beantwortet,
+ * hat sich für eine Bedeutung entschieden, ohne es zu sagen.
+ *
+ *   > Eine Wahl im Werkzeugschema ist ein Auftrag — das Modell trifft sie,
+ *   > ohne zu fragen. (v1811, zweimal gemessen.)
+ *
+ * Deshalb ist `kennzahl` NICHT verpflichtend: ohne Angabe kommen mehrere
+ * Kennzahlen nebeneinander, sortiert nach dem Investor Deal Score, und das
+ * Ergebnis trägt die Anweisung, die Messgröße zu nennen.
+ */
+const RANG = {
+  investor_deal_score: ['Investor Deal Score', 'investor_deal_score', 'score', 'hoch'],
+  dealpilot_score: ['DealPilot-Score', 'dealpilot_score', 'score', 'hoch'],
+  cashflow: ['Cashflow nach Steuer', 'cashflow_nach_steuer_eur_jahr', 'eur_jahr', 'hoch'],
+  cashflow_vor_steuer: ['Cashflow vor Steuer', 'cashflow_vor_steuer_eur_jahr', 'eur_jahr', 'hoch'],
+  bruttomietrendite: ['Bruttomietrendite', 'bruttomietrendite_prozent', 'prozent', 'hoch'],
+  dscr: ['DSCR', 'dscr', 'zahl2', 'hoch'],
+  ltv: ['LTV', 'ltv_prozent', 'prozent', 'niedrig'],
+  kaufpreis: ['Kaufpreis', 'kaufpreis_eur', 'eur', 'hoch'],
+  miete: ['Kaltmiete', 'miete_kalt_eur_jahr', 'eur_jahr', 'hoch'],
+  restschuld: ['Restschuld', 'restschuld_eur', 'eur', 'hoch'],
+  wohnflaeche: ['Wohnfläche', 'wohnflaeche_qm', 'zahl2', 'hoch'],
+  baujahr: ['Baujahr', 'baujahr', 'jahr', 'hoch']
+};
+
+/* "Wohnung" ist keine Objektart — im Datensatz heißt sie ETW. Wer nach
+   seinen "besten Wohnungen" fragt, soll nicht am Vokabular scheitern.
+   Dieselbe Lehre wie bei den Umlauten: das Mittel gehört an jede Stelle. */
+const ART_WORTE = {
+  wohnung: 'ETW', wohnungen: 'ETW', etw: 'ETW', eigentumswohnung: 'ETW',
+  eigentumswohnungen: 'ETW', haus: 'EFH', haeuser: 'EFH', einfamilienhaus: 'EFH',
+  efh: 'EFH', zfh: 'ZFH', zweifamilienhaus: 'ZFH', mfh: 'MFH',
+  mehrfamilienhaus: 'MFH', mehrfamilienhaeuser: 'MFH', dhh: 'DHH',
+  doppelhaushaelfte: 'DHH', rh: 'RH', reihenhaus: 'RH', buero: 'BUERO',
+  gewerbe: 'GEW', gew: 'GEW', garage: 'GAR', gar: 'GAR',
+  geschaeftshaus: 'GESCH', gesch: 'GESCH', hotel: 'HOTEL'
+};
+
+async function objekte_rangliste(ctx, args) {
+  const a = args || {};
+  const sp = await dialog.portfolioKontext(ctx.userId);
+  if (!sp || !sp.payload || !Array.isArray(sp.payload.objekte) || !sp.payload.objekte.length) {
+    return { vorhanden: false,
+      hinweis: 'Es liegt kein Portfolio-Stand vor. Er entsteht in DealPilot selbst; der '
+             + 'Nutzer muss die App einmal öffnen. NICHT selbst ausrechnen.' };
+  }
+
+  let liste = sp.payload.objekte.slice();
+  const gesamt = liste.length;
+
+  let art = null;
+  if (a.objektart) {
+    const roh = _flach(String(a.objektart).trim());
+    art = ART_WORTE[roh] || String(a.objektart).trim().toUpperCase();
+    liste = liste.filter((o) => _flach(o.objektart) === _flach(art));
+    if (!liste.length) {
+      const vorhanden = {};
+      sp.payload.objekte.forEach((o) => {
+        if (o.objektart) vorhanden[o.objektart] = (vorhanden[o.objektart] || 0) + 1;
+      });
+      return { vorhanden: true, anzahl: 0, gefiltert_auf: art,
+        objektarten_im_bestand: vorhanden,
+        hinweis: 'Kein Objekt dieser Art im Portfolio-Stand. Nenne dem Nutzer, welche '
+               + 'Arten er hat — die stehen unter objektarten_im_bestand.' };
+    }
+  }
+
+  const schluessel = (a.kennzahl && RANG[a.kennzahl]) ? a.kennzahl : 'investor_deal_score';
+  const label = RANG[schluessel][0], feld = RANG[schluessel][1];
+  const fmtArt = RANG[schluessel][2], richtung = RANG[schluessel][3];
+
+  const ohne = liste.filter((o) => !Number.isFinite(Number(o[feld]))).length;
+  const sortiert = liste.slice().sort((x, y) => {
+    const vx = Number(x[feld]), vy = Number(y[feld]);
+    const ax = Number.isFinite(vx), ay = Number.isFinite(vy);
+    if (!ax && !ay) return 0;
+    if (!ax) return 1;                      /* ohne Wert immer nach hinten */
+    if (!ay) return -1;
+    return richtung === 'niedrig' ? vx - vy : vy - vx;
+  });
+
+  const grenze = Math.min(Number(a.anzahl) > 0 ? Number(a.anzahl) : 20, 30);
+  const zeilen = sortiert.slice(0, grenze).map((o, i) => {
+    const z = { platz: i + 1, id: o.id || null, name: o.name || null,
+      ort: o.ort || null, objektart: o.objektart || null };
+    z[label] = _kzText(o[feld], fmtArt) || '(nicht gerechnet)';
+    /* Immer mehrere Kennzahlen dazu — "beste" heißt für verschiedene Leute
+       Verschiedenes, und eine Rangliste mit nur einer Zahl lässt die
+       Antwort einseitiger aussehen als die Lage ist. */
+    if (feld !== 'investor_deal_score') {
+      z['Investor Deal Score'] = Number.isFinite(Number(o.investor_deal_score))
+        ? String(Math.round(o.investor_deal_score)) : '(nicht gerechnet)';
+    }
+    if (feld !== 'dealpilot_score') {
+      z['DealPilot-Score'] = Number.isFinite(Number(o.dealpilot_score))
+        ? String(Math.round(o.dealpilot_score)) : '(nicht gerechnet)';
+    }
+    if (feld !== 'cashflow_nach_steuer_eur_jahr') {
+      z['Cashflow nach Steuer'] =
+        _kzText(o.cashflow_nach_steuer_eur_jahr, 'eur_jahr') || '(nicht gerechnet)';
+    }
+    if (feld !== 'bruttomietrendite_prozent') {
+      z['Bruttomietrendite'] =
+        _kzText(o.bruttomietrendite_prozent, 'prozent') || '(nicht gerechnet)';
+    }
+    return z;
+  });
+
+  return {
+    vorhanden: true,
+    anzahl: zeilen.length,
+    von_insgesamt: gesamt,
+    gefiltert_auf: art,
+    sortiert_nach: label,
+    beste_zuerst: true,
+    bessere_richtung: richtung === 'niedrig' ? 'niedriger ist besser' : 'hoeher ist besser',
+    ohne_wert: ohne,
+    stand: dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem),
+    rangliste: zeilen,
+    hinweis: 'Sortiert ist nach "' + label + '". SAG DAS in deiner Antwort — "beste" ist '
+           + 'keine Kennzahl, und der Nutzer muss wissen, nach was du ordnest. '
+           + (a.kennzahl ? '' : 'Der Nutzer hat keine Messgröße genannt: nenne die '
+             + 'Reihenfolge nach Score und weise auf eine abweichende Reihenfolge bei '
+             + 'Cashflow oder Rendite hin, wenn sie sich unterscheidet. ')
+           + (ohne ? 'Bei ' + ohne + ' Objekt(en) ist diese Kennzahl nicht gerechnet — '
+             + 'die stehen am Ende und dürfen NICHT als "schlecht" dargestellt werden. ' : '')
+           + 'Alle Beträge sind fertig formatiert; nimm sie unverändert.'
+  };
+}
+
+/* ── "Gib mir die Felder von Wohnung 17" ────────────────────────────────
+ *
+ * Marcel: "damit ich sehen kann was alles drin steht."
+ *
+ * `objekt_lesen` gibt den Datensatz schon mit — aber mit den INTERNEN
+ * Namen: `wfl`, `d1t`, `ds2_zustand`. Das ist eine Datenbankzeile, keine
+ * Auskunft. Hier stehen Beschriftung und Wert, nach Etappen geordnet, und
+ * dazu, wie viele Felder leer sind.
+ */
+const ETAPPEN_NAMEN = (function () {
+  const m = {};
+  try { fuehrung.etappen().forEach((e) => { m[e.nr] = e.nr + '. ' + e.name; }); } catch (e) {}
+  return m;
+})();
+
+/* Welche Etappe trägt ein Feld? Die Zuordnung steckt in den Frageblöcken.
+   GEMESSEN: nur 51 von 189 Feldern stehen in einem Block — der Rest läuft
+   als "Weitere Felder". Das ist ehrlicher als eine erfundene Einteilung. */
+const FELD_ETAPPE = (function () {
+  const m = {};
+  try {
+    const k = require('../generated/frontend-konstanten.json');
+    const d = k.daten || k;
+    (d.fragen || []).forEach((b) => (b.ids || []).forEach((i) => { m[i] = b.et || 1; }));
+  } catch (e) {}
+  return m;
+})();
+
+const GELD_WORT = /preis|miete|kosten|darlehen|kapital|wert|rücklage|hausgeld|ausfall|betrag|summe|erbbauzins/i;
+
+function _feldWert(feld, wert) {
+  if (wert == null || wert === '') return null;
+  if (typeof wert === 'object') return JSON.stringify(wert).slice(0, 120);
+  const s = String(wert);
+  const label = (feld && feld.label) || '';
+  /* Baujahr und Jahreszahlen NIE durch eine Tausendertrennung. */
+  if (/baujahr|jahr\b|\(jahre\)/i.test(label)
+      || /^(baujahr|btj|anschl_bj|d1_bindj|d2_bindj)$/.test(feld.id)) return s;
+  const z = Number(s.replace(/\./g, '').replace(',', '.'));
+  if (!Number.isFinite(z) || !/^[\d.,\s-]+$/.test(s)) return s;
+  if (/%/.test(label)) return s.replace('.', ',') + ' %';
+  if (/€\/m²/.test(label)) return s.replace('.', ',') + ' EUR/m²';
+  if (/m²/.test(label)) return s.replace('.', ',') + ' m²';
+  if (GELD_WORT.test(label) && Math.abs(z) >= 100) {
+    return Math.round(z).toLocaleString('de-DE') + ' EUR';
+  }
+  return s;
+}
+
+async function objekt_felder_liste(ctx, args) {
+  const a = args || {};
+  const id = await _findeObjekt(ctx, a);
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+  const d = o.daten || {};
+
+  const suche = _flach(String(a.bereich || '').trim());
+  const katalog = fuehrung.katalog();
+  const gruppen = {};
+  const leere_namen = [];
+  let gefuellt = 0, leer = 0;
+
+  katalog.forEach((f) => {
+    if (suche && _flach(f.id).indexOf(suche) < 0 && _flach(f.label).indexOf(suche) < 0) return;
+    const wert = _feldWert(f, d[f.id]);
+    if (wert == null) {
+      leer++;
+      if (leere_namen.length < 40) leere_namen.push(f.label);
+      return;
+    }
+    gefuellt++;
+    const et = FELD_ETAPPE[f.id];
+    const g = et ? (ETAPPEN_NAMEN[et] || ('Etappe ' + et)) : 'Weitere Felder';
+    if (!gruppen[g]) gruppen[g] = [];
+    gruppen[g].push({ feld: f.id, bezeichnung: f.label, wert: wert });
+  });
+
+  /* Was im Datensatz steht, aber in keinem Katalog — Notizen, Importfelder.
+     Es weglassen hieße behaupten, der Datensatz sei leerer als er ist. */
+  const bekannt = {};
+  katalog.forEach((f) => { bekannt[f.id] = true; });
+  const sonstige = [];
+  Object.keys(d).forEach((k) => {
+    if (k.indexOf('_') === 0 || bekannt[k]) return;
+    const v = d[k];
+    if (v == null || v === '') return;
+    if (suche && _flach(k).indexOf(suche) < 0) return;
+    const t = typeof v === 'object' ? JSON.stringify(v) : String(v);
+    sonstige.push({ feld: k, wert: t.length > 200 ? t.slice(0, 200) + ' …' : t });
+  });
+
+  let luecken = [];
+  try {
+    luecken = (fuehrung.luecken(d, { bisEtappe: 4 }) || []).slice(0, 5)
+      .map((b) => b.frage || (b.ids || []).join(', '));
+  } catch (e) {}
+
+  return {
+    gefunden: true, id: id,
+    adresse: [d.str, d.hnr].filter(Boolean).join(' ')
+      + (d.ort ? ', ' + [d.plz, d.ort].filter(Boolean).join(' ') : ''),
+    gesucht: a.bereich || null,
+    gefuellte_felder: gefuellt,
+    leere_felder: leer,
+    felder_nach_bereich: gruppen,
+    weitere_eintraege: sonstige.length ? sonstige.slice(0, 30) : undefined,
+    leere_beispiele: leere_namen.length ? leere_namen : undefined,
+    naechste_luecken: luecken.length ? luecken : undefined,
+    stand: o.geaendert,
+    hinweis: 'Das sind die EINGETRAGENEN Felder. Gerechnete Größen — Cashflow, Rendite, '
+           + 'DSCR, LTV, Restschuld, Scores — stehen hier NICHT drin; dafür '
+           + 'objekt_kennzahlen. Gib dem Nutzer die Felder nach Bereichen geordnet mit '
+           + 'Bezeichnung und Wert, nicht die internen Feldnamen. Sind es mehr als etwa '
+           + 'dreißig, nenne die Bereiche mit ihren wichtigsten Werten und frage, '
+           + 'welchen Bereich er im Einzelnen sehen will.'
+  };
+}
+
+/* ── "Wie kann ich meinen Cashflow steigern?" ───────────────────────────
+ *
+ * Die Frage ist beantwortbar — aber nur mit den eigenen Zahlen. Ein Modell,
+ * das hier aus dem Allgemeinwissen antwortet, schreibt "Miete erhöhen,
+ * Kosten senken, umschulden": richtig, nutzlos und von jedem Portfolio
+ * unabhängig.
+ *
+ * Dieses Werkzeug rechnet die Hebel am ECHTEN Datensatz und nennt bei
+ * jedem, worauf er sich stützt. Gerechnet wird mit derselben Arithmetik
+ * wie im Portfolio-Spiegel (Darlehenssumme mal Satz durch 100) — kein
+ * zweiter Rechenkern, dieselbe Zeile.
+ *
+ * UND WO KEINE ANGABE LIEGT, STEHT DER WEG DORTHIN. Fehlt die Marktmiete,
+ * ist der Mietspielraum nicht "null", sondern unbekannt — und das Werkzeug
+ * sagt, welches Feld fehlt.
+ */
+function _zahl(v) {
+  const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.'));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function _hebelFuer(d) {
+  const hebel = [], fehlt = [];
+  const eur = (x) => Math.round(x).toLocaleString('de-DE') + ' EUR/Jahr';
+
+  /* 1 · Tilgung. Der Cashflow steigt sofort, das Vermögen wächst langsamer
+     — beides gehört in denselben Satz. */
+  const d1 = _zahl(d.d1), d2 = _zahl(d.d2), t1 = _zahl(d.d1t), t2 = _zahl(d.d2t);
+  const tilgJ = d1 * t1 / 100 + d2 * t2 / 100;
+  if (tilgJ > 0 && (t1 > 1 || t2 > 1)) {
+    const auf1 = d1 * Math.min(t1, 1) / 100 + d2 * Math.min(t2, 1) / 100;
+    hebel.push({
+      hebel: 'Tilgungssatz senken',
+      jetzt: 'Tilgung ' + [t1 ? t1 + ' %' : null, t2 ? t2 + ' %' : null].filter(Boolean).join(' / ')
+           + ' = ' + eur(tilgJ),
+      wenn: 'auf 1 % gesenkt',
+      wirkung: '+' + eur(tilgJ - auf1),
+      aber: 'Der Cashflow steigt sofort, aber die Restschuld sinkt langsamer — das Geld '
+          + 'ist nicht verdient, nur verschoben. Mit der Bank zu vereinbaren.'
+    });
+  } else if (tilgJ > 0) {
+    hebel.push({ hebel: 'Tilgungssatz senken',
+      jetzt: 'Tilgung liegt bereits bei 1 % oder darunter (' + eur(tilgJ) + ')',
+      wirkung: 'kein Spielraum nach unten' });
+  }
+
+  /* 2 · Zins. Kein Zielzins wird erfunden — die Wirkung steht je halbem
+     Prozentpunkt da, und der Nutzer setzt sein eigenes Angebot ein. */
+  const z1 = _zahl(d.d1z), z2 = _zahl(d.d2z);
+  const zinsJ = d1 * z1 / 100 + d2 * z2 / 100;
+  if (zinsJ > 0) {
+    const jeHalb = (d1 + d2) * 0.5 / 100;
+    hebel.push({
+      hebel: 'Zins senken (Umschuldung, Prolongation)',
+      jetzt: 'Zinssatz ' + [z1 ? z1 + ' %' : null, z2 ? z2 + ' %' : null].filter(Boolean).join(' / ')
+           + ' = ' + eur(zinsJ),
+      wenn: 'je 0,5 Prozentpunkte weniger',
+      wirkung: '+' + eur(jeHalb),
+      aber: (d.d1_bindj || d.anschl_z)
+        ? 'Zinsbindung ' + (d.d1_bindj ? d.d1_bindj + ' Jahre' : 'nicht eingetragen')
+          + (d.anschl_z ? ', Anschlusszins kalkuliert mit ' + d.anschl_z + ' %' : '')
+          + '. Vor dem Ende der Bindung geht das nur mit Vorfälligkeitsentschädigung.'
+        : 'Die Zinsbindung ist nicht eingetragen — ohne sie lässt sich nicht sagen, ab '
+          + 'wann umgeschuldet werden kann.'
+    });
+  }
+
+  /* 3 · Miete gegen Marktmiete — nur mit eingetragener Vergleichsmiete. */
+  const wfl = _zahl(d.wfl), nkm = _zahl(d.nkm), ze = _zahl(d.ze);
+  const mmDs2 = _zahl(d.ds2_marktmiete), mmSoll = _zahl(d.me_soll);
+  const mm = mmDs2 || mmSoll;
+  if (mm > 0 && wfl > 0 && nkm > 0) {
+    const sollJ = mm * wfl * 12, istJ = nkm * 12;
+    const quelle = mmDs2 ? 'Marktmiete (DS2)' : 'Soll-Mietspiegel';
+    const je = (nkm / wfl).toFixed(2).replace('.', ',');
+    if (sollJ > istJ) {
+      hebel.push({
+        hebel: 'Miete an das Marktniveau heranführen',
+        jetzt: je + ' EUR/m² (' + eur(istJ) + ')',
+        wenn: String(mm).replace('.', ',') + ' EUR/m² nach ' + quelle,
+        wirkung: '+' + eur(sollJ - istJ),
+        aber: 'Nur im Rahmen von Mietspiegel, Kappungsgrenze und laufendem Vertrag — bei '
+            + 'Bestandsmietern meist in Schritten oder erst bei Neuvermietung.'
+      });
+    } else {
+      hebel.push({ hebel: 'Miete an das Marktniveau heranführen',
+        jetzt: je + ' EUR/m²',
+        wirkung: 'kein Spielraum — die Miete liegt bereits auf oder über dem ' + quelle
+               + ' (' + String(mm).replace('.', ',') + ' EUR/m²)' });
+    }
+  } else if (wfl > 0 && nkm > 0) {
+    fehlt.push({ hebel: 'Mietspielraum',
+      fehlendes_feld: 'Marktmiete (€/m²) DS2 oder Soll-Mietspiegel (€/m²)',
+      warum: 'Ohne eine Vergleichsmiete lässt sich nicht sagen, ob die Miete unter Markt '
+           + 'liegt. Das ist KEIN "kein Spielraum", sondern unbekannt.' });
+  }
+
+  /* 4 · Die nicht umlagefähigen Kosten — die einzigen, die den Cashflow
+     wirklich drücken. Umlagefähiges zahlt der Mieter. */
+  const nul = [
+    ['hg_nul', 'Hausgeld (nicht umlagefähig)'],
+    ['weg_r', 'WEG-Rücklage'],
+    ['eigen_r', 'eigene Instandhaltungsrücklage'],
+    ['nul_sonst', 'Sonderverwaltung'],
+    ['mietausfall', 'kalkulierter Mietausfall']
+  ].map((p) => ({ name: p[1], wert: _zahl(d[p[0]]) })).filter((x) => x.wert > 0);
+  if (nul.length) {
+    const summe = nul.reduce((s, x) => s + x.wert, 0);
+    const rohertrag = (nkm + ze) * 12;
+    hebel.push({
+      hebel: 'Nicht umlagefähige Kosten',
+      jetzt: nul.map((x) => x.name + ' ' + Math.round(x.wert).toLocaleString('de-DE') + ' EUR')
+               .join(', ') + ' = ' + eur(summe)
+           + (rohertrag > 0 ? ' (' + (summe / rohertrag * 100).toFixed(1).replace('.', ',')
+             + ' % des Rohertrags)' : ''),
+      wirkung: 'Jeder hier gesparte Euro geht voll in den Cashflow',
+      aber: 'Rücklagen zu senken verschiebt Instandhaltung in die Zukunft — das ist kein '
+          + 'Gewinn, sondern eine Verschiebung.'
+    });
+  }
+
+  /* 5 · Zusätzliche Einnahmen — eingetragen oder fehlend. */
+  const stp = _zahl(d.stellplatz_miete_monat);
+  if (ze > 0 || stp > 0) {
+    hebel.push({ hebel: 'Zusätzliche Einnahmen',
+      jetzt: (ze > 0 ? Math.round(ze).toLocaleString('de-DE') + ' EUR/Monat' : '')
+           + (stp > 0 ? (ze > 0 ? ', darin Stellplatz ' : 'Stellplatz ')
+              + Math.round(stp).toLocaleString('de-DE') + ' EUR/Monat' : ''),
+      wirkung: 'Stellplatz, Garage, Werbefläche oder Waschkeller wirken voll auf den '
+             + 'Cashflow und sind nicht an die Kappungsgrenze gebunden' });
+  } else {
+    fehlt.push({ hebel: 'Zusätzliche Einnahmen',
+      fehlendes_feld: 'Zusätzliche Einnahmen / Monat',
+      warum: 'Nicht eingetragen. Stellplatz, Garage oder Waschkeller wirken voll auf den '
+           + 'Cashflow — wenn es sie gibt, fehlen sie heute in der Rechnung.' });
+  }
+
+  /* 6 · Leerstand */
+  if (d.vermstand) {
+    hebel.push({ hebel: 'Vermietungsstand', jetzt: String(d.vermstand),
+      wirkung: 'Bei Leerstand ist die Vermietung der größte einzelne Hebel' });
+  }
+
+  return { hebel: hebel, fehlt: fehlt };
+}
+
+async function cashflow_hebel(ctx, args) {
+  const a = args || {};
+  const bereich = String(a.bereich || '').toLowerCase() === 'portfolio' ? 'portfolio' : 'objekt';
+
+  if (bereich === 'portfolio') {
+    const sp = await dialog.portfolioKontext(ctx.userId);
+    if (!sp || !sp.payload) {
+      return { vorhanden: false,
+        hinweis: 'Kein Portfolio-Stand vorhanden — der Nutzer muss DealPilot einmal öffnen.' };
+    }
+    const b = sp.payload.vermoegensbilanz || {};
+    const objekte = Array.isArray(sp.payload.objekte) ? sp.payload.objekte : [];
+    /* Wo sitzt der Schmerz? Das sagt, welches Objekt es wert ist, einzeln
+       angesehen zu werden — und macht aus einem Allgemeinplatz eine
+       Handlungsfolge. */
+    const negativ = objekte
+      .filter((o) => Number(o.cashflow_nach_steuer_eur_jahr) < 0)
+      .sort((x, y) => Number(x.cashflow_nach_steuer_eur_jahr)
+                    - Number(y.cashflow_nach_steuer_eur_jahr))
+      .slice(0, 5)
+      .map((o) => ({ id: o.id || null, name: o.name,
+        cashflow: _kzText(o.cashflow_nach_steuer_eur_jahr, 'eur_jahr'),
+        tilgungssatz: o.tilgung_prozent != null ? o.tilgung_prozent + ' %' : null,
+        zinssatz: o.zins_prozent != null ? o.zins_prozent + ' %' : null,
+        dscr: _kzText(o.dscr, 'zahl2') }));
+
+    const tilg = Number(b.tilgung_eur_jahr), zins = Number(b.zins_eur_jahr);
+    const stellen = [];
+    if (Number.isFinite(tilg) && tilg > 0) {
+      stellen.push({ hebel: 'Tilgung im ganzen Bestand', jetzt: _kzText(tilg, 'eur_jahr'),
+        wirkung: 'Jeder Prozentpunkt weniger Tilgung ist unmittelbar Cashflow — aber die '
+               + 'Restschuld sinkt langsamer' });
+    }
+    if (Number.isFinite(zins) && zins > 0) {
+      stellen.push({ hebel: 'Zins im ganzen Bestand', jetzt: _kzText(zins, 'eur_jahr'),
+        wirkung: 'Je 0,5 Prozentpunkte auf die Darlehenssumme: '
+               + _kzText(Number(b.darlehen_aufgenommen_eur || 0) * 0.5 / 100, 'eur_jahr') });
+    }
+    return {
+      vorhanden: true, bereich: 'portfolio',
+      stand: dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem),
+      cashflow_nach_steuer: _kzText(b.cashflow_nach_steuer_eur_jahr, 'eur_jahr'),
+      cashflow_vor_steuer: _kzText(b.cashflow_vor_steuer_eur_jahr, 'eur_jahr'),
+      kapitaldienst: _kzText(b.kapitaldienst_eur_jahr, 'eur_jahr'),
+      dscr_portfolio: _kzText(b.dscr_portfolio, 'zahl2'),
+      stellschrauben: stellen,
+      schwaechste_objekte: negativ.length ? negativ : undefined,
+      hinweis: 'Alle Zahlen sind fertig formatiert — nimm sie unverändert. Antworte mit '
+             + 'den Hebeln, die hier stehen, und nenne bei jedem die Einschränkung. '
+             + 'Erfinde KEINE weiteren Zahlen und keine Zinsangebote. Für ein einzelnes '
+             + 'Objekt ruf dieses Werkzeug mit bereich="objekt" und dem Objekt auf. Sag '
+             + 'am Ende, dass das eine Rechnung auf seinen eingetragenen Zahlen ist und '
+             + 'keine Finanzierungs- oder Steuerberatung.'
+    };
+  }
+
+  const id = await _findeObjekt(ctx, a);
+  if (!id) {
+    return { gefunden: false,
+      hinweis: 'Kein Objekt zu dieser Angabe gefunden. Für den Gesamtbestand: '
+             + 'bereich="portfolio".' };
+  }
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+  const d = o.daten || {};
+  const sp = await dialog.portfolioKontext(ctx.userId);
+  const tr = sp ? _spiegelEintrag(sp.payload, id, d) : { eintrag: null, grund: 'kein_spiegel' };
+  const erg = _hebelFuer(d);
+
+  return {
+    gefunden: true, bereich: 'objekt', id: id,
+    adresse: [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : ''),
+    cashflow_jetzt: tr.eintrag
+      ? _kzText(tr.eintrag.cashflow_nach_steuer_eur_jahr, 'eur_jahr') : null,
+    cashflow_jetzt_hinweis: tr.eintrag ? undefined
+      : 'Der gerechnete Cashflow liegt für dieses Objekt nicht vor — es steht nicht im '
+      + 'Portfolio-Stand. Die Hebel unten gelten trotzdem: sie kommen aus dem Datensatz, '
+      + 'nicht aus der Rechnung. Nenne keinen Ausgangs-Cashflow.',
+    dscr: tr.eintrag ? _kzText(tr.eintrag.dscr, 'zahl2') : null,
+    hebel: erg.hebel,
+    dafuer_fehlt_eine_angabe: erg.fehlt.length ? erg.fehlt : undefined,
+    hinweis: 'Jeder Hebel steht mit seiner Wirkung UND seiner Einschränkung da — nenne '
+           + 'beide. Alle Beträge sind fertig formatiert; nimm sie unverändert und rechne '
+           + 'nichts dazu. Steht unter "dafuer_fehlt_eine_angabe" etwas, sag dem Nutzer, '
+           + 'welches Feld fehlt — ein fehlender Wert ist KEIN fehlender Hebel. Schließe '
+           + 'damit, dass das eine Rechnung auf seinen eigenen eingetragenen Zahlen ist '
+           + 'und keine Finanzierungs- oder Steuerberatung.'
   };
 }
 
@@ -961,6 +1618,58 @@ const WERKZEUGE = [
       properties: { felder: { type: 'array', items: { type: 'string' },
         description: 'Feld-Ids, z.B. ["baujahr","objart","keller"]' } },
       required: ['felder'], additionalProperties: false } },
+
+  { name: 'objekt_kennzahlen', stufe: 'lesen', fn: objekt_kennzahlen,
+    beschreibung: 'Die GERECHNETEN Zahlen EINES Objekts: Cashflow (Jahr und Monat), '
+      + 'DSCR, LTV, Bruttomietrendite, Restschuld, Zins und Tilgung in Euro, '
+      + 'DealPilot-Score und Investor Deal Score mit Stufe. '
+      + 'IMMER nehmen bei "wie ist der Cashflow bei ...", "wie ist der Score von ...", '
+      + '"was bringt mir Objekt N" — NICHT portfolio_lesen und darin suchen: die '
+      + 'Nummern der beiden Listen stimmen nicht ueberein.',
+    parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  { name: 'objekte_rangliste', stufe: 'lesen', fn: objekte_rangliste,
+    beschreibung: 'Rangliste ueber alle Objekte: "was sind meine besten Wohnungen", '
+      + '"welches Objekt hat den hoechsten Cashflow", "wo ist die Rendite am besten". '
+      + 'Liefert je Objekt mehrere Kennzahlen nebeneinander, damit du nicht EINE '
+      + 'Bedeutung von "beste" unterstellst. Mit "objektart" filtern ("Wohnung" wird zu '
+      + 'ETW aufgeloest), mit "kennzahl" ordnen — aber nur, wenn der Nutzer die '
+      + 'Messgroesse selbst nennt.',
+    parameter: { type: 'object',
+      properties: {
+        kennzahl: { type: 'string',
+          enum: ['investor_deal_score', 'dealpilot_score', 'cashflow', 'cashflow_vor_steuer',
+                 'bruttomietrendite', 'dscr', 'ltv', 'kaufpreis', 'miete', 'restschuld',
+                 'wohnflaeche', 'baujahr'],
+          description: 'Nur angeben, wenn der Nutzer die Messgroesse nennt' },
+        objektart: { type: 'string', description: 'z.B. "Wohnung", "ETW", "MFH"' },
+        anzahl: { type: 'integer', description: 'wie viele Plaetze, hoechstens 30' }
+      }, additionalProperties: false } },
+
+  { name: 'objekt_felder_liste', stufe: 'lesen', fn: objekt_felder_liste,
+    beschreibung: 'Alle EINGETRAGENEN Felder EINES Objekts mit Bezeichnung und Wert, nach '
+      + 'Bereichen geordnet, dazu wie viele Felder leer sind. '
+      + 'Nehmen bei "gib mir die Felder von ...", "was steht bei Objekt N alles drin", '
+      + '"zeig mir alle Daten dazu". Mit "bereich" auf einen Teil eingrenzen '
+      + '("miete", "darlehen", "zustand").',
+    parameter: { type: 'object',
+      properties: Object.assign({}, OBJEKT_ARGS, {
+        bereich: { type: 'string', description: 'Suchwort, um die Liste einzugrenzen' }
+      }), additionalProperties: false } },
+
+  { name: 'cashflow_hebel', stufe: 'lesen', fn: cashflow_hebel,
+    beschreibung: 'Wie laesst sich der Cashflow steigern? Rechnet die Hebel am ECHTEN '
+      + 'Datensatz: Tilgung, Zins, Mietspielraum gegen die eingetragene Vergleichsmiete, '
+      + 'nicht umlagefaehige Kosten, zusaetzliche Einnahmen, Leerstand — jeder mit '
+      + 'Wirkung in Euro pro Jahr UND mit seiner Einschraenkung. '
+      + 'IMMER nehmen bei "wie kann ich meinen Cashflow steigern", "wo kann ich '
+      + 'optimieren", "was wuerde es bringen, wenn ...". Antworte NIE aus eigenem '
+      + 'Wissen: ohne dieses Werkzeug hast du dazu keine Zahlen.',
+    parameter: { type: 'object',
+      properties: Object.assign({}, OBJEKT_ARGS, {
+        bereich: { type: 'string', enum: ['objekt', 'portfolio'],
+          description: '"portfolio" fuer den Gesamtbestand, sonst "objekt"' }
+      }), additionalProperties: false } },
 
   { name: 'feld_katalog', stufe: 'lesen', fn: feld_katalog,
     beschreibung: 'Welche Felder es gibt und welche Werte bei Auswahlfeldern erlaubt '

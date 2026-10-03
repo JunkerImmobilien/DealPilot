@@ -192,10 +192,14 @@
   }
 
   // Detail-Objekte als Array (nur erfolgreich geladene)
-  function detailArr(){
+  /* v1813: `alleTrotzAuswahl` uebergeht die Einzelobjekt-Auswahl. Sie ist
+     ein ANSICHTSFILTER — fuer den Portfolio-Spiegel, der dem Bot als
+     Tatsache gilt, darf sie nicht gelten. Gemessen: mit gesetzter Auswahl
+     schrieb der Spiegel ein Portfolio aus einem Haus. */
+  function detailArr(alleTrotzAuswahl){
     var all = wonList().map(function(o){ return _details[o.id||o.key]; }).filter(Boolean);
     all = (window.DealPilotMandanten && window.DealPilotMandanten.filterByHalter) ? window.DealPilotMandanten.filterByHalter(all) : all; /* mand-filter v803 */
-    if(_dashSelIdx>=0 && _dashSelIdx<all.length) return [all[_dashSelIdx]];   // v475: Einzelobjekt-Ansicht
+    if(!alleTrotzAuswahl && _dashSelIdx>=0 && _dashSelIdx<all.length) return [all[_dashSelIdx]];   // v475: Einzelobjekt-Ansicht
     return all;
   }
 
@@ -453,8 +457,8 @@
   }
   /* ════ HEALTH-LEISTE (braucht Detaildaten) ════ */
   /* ══ v456: Portfolio-Uebersicht (Bestands-Hardfacts, aggregiert) ══ */
-  function aggStats(){
-    var arr=detailArr();
+  function aggStats(alleTrotzAuswahl){
+    var arr=detailArr(alleTrotzAuswahl);
     var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
     var kpSum=sum(_kpEuro);
     var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san)+num(o.moebl);});
@@ -707,8 +711,8 @@
     return 0;
   }
 
-  function projectAll(years){
-    var arr=detailArr(); var rows=[]; var cumCf=0;
+  function projectAll(years, alleTrotzAuswahl){
+    var arr=detailArr(alleTrotzAuswahl); var rows=[]; var cumCf=0;
     /* v1397: `vuvY1` stand hier und las `_kpis_vuv` — ein Feld, das NIRGENDS
        im Frontend gesetzt wird. Die Summe war damit immer 0, und verwendet
        wurde sie ohnehin nie. Ersatzlos entfernt: toter Code, der aussieht,
@@ -2468,14 +2472,22 @@
   }
 
   function portfolioPayload() {
-    var arr = detailArr();
-    var a = aggStats();
+    /* v1813 · IMMER das ganze Portfolio, auch wenn im Cockpit gerade ein
+       einzelnes Objekt ausgewaehlt ist. */
+    var arr = detailArr(true);
+    var a = aggStats(true);
 
     var objekte = arr.slice(0, PP_MAX_OBJEKTE).map(function (o, i) {
       var kp = _kpEuro(o);
       var mieteJ = _ppZahl(o._kpis_miete_j);
       if (mieteJ == null) { var mm = num(o.nkm) + num(o.ze); mieteJ = mm > 0 ? mm * 12 : null; }
       return {
+        /* v1813 · DIE ID IST DIE REFERENZ, NICHT DIE NUMMER.
+           Gemessen: Bot-Liste Nr 8 und Spiegel nr 8 sind verschiedene
+           Haeuser, und zwei Objekte tragen denselben Namen. Ohne diese
+           Zeile beantwortet der Bot eine Frage zum falschen Objekt — und
+           die Antwort sieht aus wie die richtige. */
+        id: o._key || (o._sum && (o._sum.id || o._sum.key)) || null,
         nr: i + 1,
         name: o.name || o._name || null,
         ort: o.ort || null,
@@ -2525,7 +2537,7 @@
        Wer zehn Zeilen liest, sieht dieselbe Kurve wie bei dreissig. */
     var proj = null;
     try {
-      var p = projectAll(10);
+      var p = projectAll(10, true);
       if (Array.isArray(p) && p.length) {
         proj = [1, 5, 10].map(function (j) {
           var z = p[j - 1] || p[p.length - 1];
