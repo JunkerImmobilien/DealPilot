@@ -711,14 +711,22 @@ function _hebelFuer(d) {
   return { hebel: hebel, fehlt: fehlt };
 }
 
+/* ── v1813d · ZWEI WERKZEUGE STATT EINES MIT SCHALTER ────────────────────
+ *
+ * Erst war das EIN Werkzeug mit `bereich: 'objekt'|'portfolio'`. GEMESSEN:
+ * auf "wie kann ich meinen Cashflow steigern" gab das Modell
+ * `bereich: "objekt"` mit und erfand dazu einen Objektbezug — die Antwort
+ * galt dann einem einzelnen Haus und sah wie die ganze aus.
+ *
+ *   > Was ein Werkzeug anbietet, wird benutzt. Wer eine Verwechslung
+ *   > ausschliessen will, darf sie nicht anbieten.
+ *
+ * Jetzt sind es zwei: das Portfolio-Werkzeug nimmt GAR KEINE Parameter, es
+ * gibt also nichts zu erfinden. Die Wahl steckt im Namen, und den waehlt
+ * das Modell an der Frage — nicht in einem Feld, das es ausfuellen muss. */
 async function cashflow_hebel(ctx, args) {
   const a = args || {};
-  /* Ohne Objektbezug UND ohne vorher besprochenes Objekt ist "mein
-     Cashflow" der ganze Bestand. Sonst beantwortet eine Portfolio-Frage
-     ein einzelnes Haus, und niemand sieht es. */
-  const hatBezug = (a.nummer != null) || a.id || a.adresse;
-  const bereich = (String(a.bereich || '').toLowerCase() === 'portfolio'
-    || (!hatBezug && !ctx.letztesObjekt)) ? 'portfolio' : 'objekt';
+  const bereich = String(a.bereich || '').toLowerCase() === 'portfolio' ? 'portfolio' : 'objekt';
 
   if (bereich === 'portfolio') {
     const sp = await dialog.portfolioKontext(ctx.userId);
@@ -756,10 +764,19 @@ async function cashflow_hebel(ctx, args) {
      * gleich mit: ein Aufruf, und die Antwort hat Zahlen. */
     const schwach = [];
     for (const o of negativ.slice(0, 3)) {
-      if (!o.id) continue;
-      const q = await query(`SELECT data FROM objects WHERE id = $1 AND user_id = $2`,
-        [o.id, ctx.userId]);
-      if (!q.rows.length) continue;
+      /* Ueber die ID, und bei einem Spiegel von vor v1813 ueber den Namen —
+         aber nur, wenn er EINDEUTIG ist. `objects.name` ist genau das Feld,
+         aus dem der Spiegel seinen Namen nimmt. */
+      let q = null;
+      if (o.id) {
+        q = await query(`SELECT data FROM objects WHERE id = $1 AND user_id = $2`,
+          [o.id, ctx.userId]);
+      } else if (o.name) {
+        q = await query(`SELECT data FROM objects WHERE user_id = $1 AND name = $2`,
+          [ctx.userId, o.name]);
+        if (q.rows.length !== 1) q = null;
+      }
+      if (!q || !q.rows.length) continue;
       const h = _hebelFuer(q.rows[0].data || {});
       schwach.push({ name: o.name, cashflow: o.cashflow, hebel: h.hebel,
         dafuer_fehlt_eine_angabe: h.fehlt.length ? h.fehlt : undefined });
@@ -802,8 +819,8 @@ async function cashflow_hebel(ctx, args) {
   const id = await _findeObjekt(ctx, a);
   if (!id) {
     return { gefunden: false,
-      hinweis: 'Kein Objekt zu dieser Angabe gefunden. Für den Gesamtbestand: '
-             + 'bereich="portfolio".' };
+      hinweis: 'Kein Objekt zu dieser Angabe gefunden. Ging die Frage um den '
+             + 'GESAMTBESTAND, nimm cashflow_hebel_portfolio.' };
   }
   const o = await dialog.objektKontext(ctx.userId, id);
   if (!o) return { gefunden: false };
@@ -1565,7 +1582,7 @@ async function _findeObjekt(ctx, args) {
      *
      * Widersprechen sich beide, wird gefragt. Das ist die einzige Antwort,
      * die in keinem Fall das falsche Haus trifft. */
-    if (a.adresse) {
+    if (a.adresse && !_istPlatzhalter(a.adresse)) {
       const liste = await dialog.objekteListe(ctx.userId, 60);
       const t = dialog.objektRaten(String(a.adresse), liste);
       const perAdr = (t.art === 'eindeutig') ? t.objekt.id : null;
@@ -1588,6 +1605,11 @@ async function _findeObjekt(ctx, args) {
     const r = await query(`SELECT id FROM objects WHERE id = $1 AND user_id = $2`,
       [a.id, ctx.userId]);
     return r.rows.length ? r.rows[0].id : null;
+  }
+  if (a.adresse && _istPlatzhalter(a.adresse)) {
+    /* Ein Platzhalter ist keine Angabe. Ihn wie eine zu behandeln heisst,
+       ein Objekt auf eine Erfindung hin zu zeigen. */
+    delete a.adresse;
   }
   if (a.adresse) {
     const liste = await dialog.objekteListe(ctx.userId, 60);
@@ -1640,11 +1662,40 @@ async function _findeObjekt(ctx, args) {
 
 /* ═══ Das Register ═══════════════════════════════════════════════════ */
 
+/* ── v1813d · "NUR WENN ..., SONST WEGLASSEN" ────────────────────────────
+ *
+ * GEMESSEN am 03.10.2026: das Modell fuellt JEDES Feld des Schemas, auch
+ * wenn es den Wert nicht hat. Aus dem Protokoll:
+ *
+ *   {"nummer":1,"id":"uuid-Musterstraße","adresse":"Musterstraße"}
+ *   {"nummer":1,"id":"uuid1","adresse":"Adresse des ersten Objekts"}
+ *   {"nummer":3,"id":"1","adresse":"Musterstraße 12"}   <- bei Frage zu Nr 3
+ *
+ * Die dritte Zeile ist die gefaehrliche: eine erfundene Adresse, die sich
+ * eindeutig aufloesen laesst, neben der richtigen Nummer.
+ *
+ *   > Ein leeres Feld im Schema ist fuer ein Modell eine Aufgabe, kein
+ *   > Angebot. Was weggelassen werden darf, muss dastehen.
+ */
 const OBJEKT_ARGS = {
-  nummer: { type: 'integer', description: 'Nummer aus der zuletzt gezeigten Liste' },
-  id: { type: 'string', description: 'Objekt-UUID' },
-  adresse: { type: 'string', description: 'Adresse oder Teil davon' }
+  nummer: { type: 'integer',
+    description: 'Nummer aus der zuletzt gezeigten Liste — NUR wenn der Nutzer '
+      + 'eine Zahl genannt hat. Sonst WEGLASSEN, nicht raten.' },
+  id: { type: 'string',
+    description: 'Objekt-UUID, 36 Zeichen — NUR wenn du sie aus einem '
+      + 'Werkzeugergebnis hast. Sonst WEGLASSEN, nie erfinden.' },
+  adresse: { type: 'string',
+    description: 'Adresse oder Teil davon, WOERTLICH aus der Frage des Nutzers — '
+      + 'NUR wenn er eine genannt hat. Sonst WEGLASSEN, keinen Platzhalter.' }
 };
+
+/* Erfundene Platzhalter abweisen, bevor sie ein Objekt treffen. */
+function _istPlatzhalter(s) {
+  const t = String(s || '').trim();
+  if (t.length < 3) return true;
+  return /^(uuid|id|xy|xyz|objekt|adresse|beispiel|string|null|undefined|n\/a)\b/i.test(t)
+      || /uuid|platzhalter|des ersten objekts|der wohnung xy/i.test(t);
+}
 
 const WERKZEUGE = [
   { name: 'objekte_liste', stufe: 'lesen', fn: objekte_liste,
@@ -1724,19 +1775,26 @@ const WERKZEUGE = [
         bereich: { type: 'string', description: 'Suchwort, um die Liste einzugrenzen' }
       }), additionalProperties: false } },
 
-  { name: 'cashflow_hebel', stufe: 'lesen', fn: cashflow_hebel,
-    beschreibung: 'Wie laesst sich der Cashflow steigern? Rechnet die Hebel am ECHTEN '
-      + 'Datensatz: Tilgung, Zins, Mietspielraum gegen die eingetragene Vergleichsmiete, '
-      + 'nicht umlagefaehige Kosten, zusaetzliche Einnahmen, Leerstand — jeder mit '
-      + 'Wirkung in Euro pro Jahr UND mit seiner Einschraenkung. '
+  { name: 'cashflow_hebel_portfolio', stufe: 'lesen',
+    fn: (ctx) => cashflow_hebel(ctx, { bereich: 'portfolio' }),
+    beschreibung: 'Wie laesst sich der Cashflow im GESAMTBESTAND steigern? '
       + 'IMMER nehmen bei "wie kann ich meinen Cashflow steigern", "wo kann ich '
-      + 'optimieren", "was wuerde es bringen, wenn ...". Antworte NIE aus eigenem '
-      + 'Wissen: ohne dieses Werkzeug hast du dazu keine Zahlen.',
-    parameter: { type: 'object',
-      properties: Object.assign({}, OBJEKT_ARGS, {
-        bereich: { type: 'string', enum: ['objekt', 'portfolio'],
-          description: '"portfolio" fuer den Gesamtbestand, sonst "objekt"' }
-      }), additionalProperties: false } },
+      + 'optimieren", "wo verliere ich Geld" — also immer dann, wenn der Nutzer KEIN '
+      + 'einzelnes Objekt nennt. Liefert Cashflow und Kapitaldienst des Bestands, die '
+      + 'Stellschrauben und die gerechneten Hebel der Objekte, die am meisten kosten — '
+      + 'alles in EINEM Aufruf. Antworte NIE aus eigenem Wissen: ohne dieses Werkzeug '
+      + 'hast du dazu keine Zahlen, und allgemeine Ratschlaege helfen bei keinem '
+      + 'Portfolio.',
+    parameter: { type: 'object', properties: {}, additionalProperties: false } },
+
+  { name: 'cashflow_hebel', stufe: 'lesen', fn: cashflow_hebel,
+    beschreibung: 'Wie laesst sich der Cashflow EINES Objekts steigern? Rechnet die '
+      + 'Hebel am ECHTEN Datensatz: Tilgung, Zins, Mietspielraum gegen die eingetragene '
+      + 'Vergleichsmiete, nicht umlagefaehige Kosten, zusaetzliche Einnahmen, Leerstand '
+      + '— jeder mit Wirkung in Euro pro Jahr UND mit seiner Einschraenkung. '
+      + 'Nur nehmen, wenn der Nutzer ein BESTIMMTES Objekt nennt; sonst '
+      + 'cashflow_hebel_portfolio.',
+    parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
 
   { name: 'feld_katalog', stufe: 'lesen', fn: feld_katalog,
     beschreibung: 'Welche Felder es gibt und welche Werte bei Auswahlfeldern erlaubt '

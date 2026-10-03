@@ -63,7 +63,20 @@ function zahl(s) {
   }
 
   const liste = await ruf('objekte_liste', ctx);
-  ctx.letzteListe = liste.objekte.map((o) => o.id);
+  /* ── PRUEFERFEHLER, GEMESSEN AM 03.10.2026 ──────────────────────────────
+   *
+   * Hier stand nur `ctx.letzteListe = ...`, und Teil B bekam `ctx` mit.
+   * Dazwischen prueft A5 den Nummer-gegen-Adresse-Fall — und der RUFT
+   * `ctx.merkeListe([...])` mit zwei Kandidaten. Danach hatte die "Liste"
+   * zwei Eintraege, und das Modell meldete auf "Nummer 3" voellig richtig
+   * "es gibt kein Objekt mit der Nummer 3".
+   *
+   *   > Der Zustand aus der vorigen Probe verfaelscht die naechste. Ein
+   *   > Pruefer, der seine eigene Umgebung veraendert, misst sich selbst.
+   *
+   * VOLLE_LISTE ist die unveraenderliche Kopie; Teil B nimmt nur die. */
+  const VOLLE_LISTE = liste.objekte.map((o) => o.id);
+  ctx.letzteListe = VOLLE_LISTE.slice();
 
   /* ══ TEIL A1 · Der Gegentest: stimmten die Nummern ueberhaupt nicht? ══ */
   console.log('\n=== A1 · GEGENTEST auf den gefundenen Fehler ===');
@@ -253,13 +266,13 @@ function zahl(s) {
   pruef('Nummer gegen Adresse: fragt zurueck statt eine zu uebergehen', gefragt);
 
   /* Ohne Objektbezug ist "mein Cashflow" der ganze Bestand. */
-  const ctxFrisch = { userId: uid, letzteListe: ctx.letzteListe, letztesObjekt: null,
+  const ctxFrisch = { userId: uid, letzteListe: VOLLE_LISTE.slice(), letztesObjekt: null,
     protokoll: [], merkeObjekt() {}, merkeListe() {} };
-  const hoBezug = await ruf('cashflow_hebel', ctxFrisch, {});
-  pruef('ohne Objektbezug -> Portfolio, nicht ein einzelnes Haus',
+  const hoBezug = await ruf('cashflow_hebel_portfolio', ctxFrisch, {});
+  pruef('cashflow_hebel_portfolio nimmt keine Parameter und liefert den Bestand',
     hoBezug.bereich === 'portfolio');
 
-  const hp = await ruf('cashflow_hebel', ctx, { bereich: 'portfolio' });
+  const hp = await ruf('cashflow_hebel_portfolio', ctx, {});
   pruef('Portfolio-Antwort traegt die gerechneten Hebel der schwaechsten Objekte mit',
     Array.isArray(hp.hebel_der_schwaechsten) && hp.hebel_der_schwaechsten.length > 0
       && hp.hebel_der_schwaechsten.every((x) => Array.isArray(x.hebel)),
@@ -281,11 +294,11 @@ function zahl(s) {
     { f: 'wie ist der Cashflow bei der Musterstraße?', will: 'objekt_kennzahlen' },
     { f: 'wie ist der Investor Deal Score von Nummer 3?', will: 'objekt_kennzahlen' },
     { f: 'gib mir die Felder von Nummer 3', will: 'objekt_felder_liste' },
-    { f: 'wie kann ich meinen Cashflow steigern?', will: 'cashflow_hebel' }
+    { f: 'wie kann ich meinen Cashflow steigern?', will: 'cashflow_hebel_portfolio' }
   ];
 
   for (const s of SAETZE) {
-    const c2 = { userId: uid, letzteListe: ctx.letzteListe, letztesObjekt: null, protokoll: [],
+    const c2 = { userId: uid, letzteListe: VOLLE_LISTE.slice(), letztesObjekt: null, protokoll: [],
       merkeObjekt(id) { this.letztesObjekt = id; },
       merkeListe(i) { this.letzteListe = i; } };
     const t0 = Date.now();
