@@ -209,10 +209,19 @@ async function objekte_felder(ctx, args) {
     };
     gueltig.forEach((f) => {
       const v = d[f];
-      /* Leer heisst LEER und nicht "nein". Ein fehlender Keller-Eintrag
-         bedeutet nicht, dass keiner da ist — nur, dass niemand es
-         eingetragen hat. Das muss das Modell unterscheiden koennen. */
-      e[f] = (v === '' || v == null) ? null : v;
+      /* ── v1812c · LEER STEHT ALS WORT DA, NICHT ALS null ──────────────
+       *
+       * GEMESSEN: auf "welche Objekte haben keinen Keller" antwortete der
+       * Agent mit einer Liste — darunter Objekte, bei denen das Feld
+       * schlicht LEER war. Ein `null` im JSON liest ein Modell als "nein".
+       *
+       *   > Ein leeres Feld ist keine Aussage. Wer es als Nein liest,
+       *   > behauptet etwas ueber ein Haus, das niemand geprueft hat.
+       *
+       * Der Hinweis daneben half nicht — dieselbe Lehre wie bei den
+       * Betraegen und beim Preis: was im Wert steht, schlaegt, was im
+       * Hinweis steht. Also steht es jetzt im Wert. */
+      e[f] = (v === '' || v == null) ? '(nicht ausgefuellt)' : v;
     });
     return e;
   });
@@ -220,7 +229,9 @@ async function objekte_felder(ctx, args) {
   /* Wie viele tragen das Feld ueberhaupt? Ohne diese Zahl haelt das Modell
      siebzehn Leerwerte fuer siebzehn Neins. */
   const gefuellt = {};
-  gueltig.forEach((f) => { gefuellt[f] = zeilen.filter((z) => z[f] != null).length; });
+  gueltig.forEach((f) => {
+    gefuellt[f] = zeilen.filter((z) => z[f] !== '(nicht ausgefuellt)').length;
+  });
 
   return {
     anzahl: zeilen.length,
@@ -228,9 +239,11 @@ async function objekte_felder(ctx, args) {
     unbekannte_felder: unbekannt.length ? unbekannt : undefined,
     wie_viele_tragen_das_feld: gefuellt,
     objekte: zeilen,
-    hinweis: 'null heisst NICHT ausgefuellt — das ist etwas anderes als "nein" '
-           + 'oder "null". Sag dem Nutzer, wenn ein Feld bei vielen Objekten leer '
-           + 'ist, statt daraus eine Aussage zu machen.'
+    hinweis: '"(nicht ausgefuellt)" heisst: niemand hat das Feld gepflegt. Das ist '
+           + 'KEIN Nein und keine Null. Wer danach fragt, bekommt von dir die '
+           + 'Objekte, bei denen das Feld WIRKLICH einen Wert hat — und dazu den '
+           + 'Satz, bei wie vielen es leer ist. Behaupte nie etwas ueber ein Objekt, '
+           + 'dessen Feld leer ist.'
   };
 }
 
