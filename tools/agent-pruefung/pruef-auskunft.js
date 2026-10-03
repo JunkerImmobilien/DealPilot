@@ -265,6 +265,24 @@ function zahl(s) {
   } catch (e) { gefragt = Boolean(e && e.mehrdeutig); }
   pruef('Nummer gegen Adresse: fragt zurueck statt eine zu uebergehen', gefragt);
 
+  /* Aber nicht gegen ein leeres Objekt: ein Datensatz OHNE jede Adresse
+     kann nicht der sein, den der Nutzer per Adresse genannt hat. */
+  const leerNr = liste.objekte.findIndex((o) => !String(o.adresse || '').replace(/[\s,]/g, ''));
+  if (leerNr >= 0) {
+    const adrTeil = (liste.objekte.find((o, i) => i !== leerNr
+      && /str|weg|platz|allee/i.test(o.adresse || '')) || {}).adresse || '';
+    const wort = adrTeil.split(/[\s,]/)[0];
+    if (wort && wort.length > 3) {
+      let erg = null, warFrage = false;
+      try { erg = await ruf('objekt_kennzahlen', ctx, { nummer: leerNr + 1, adresse: wort }); }
+      catch (e) { warFrage = Boolean(e && e.mehrdeutig); }
+      pruef('gegen ein Objekt ohne Adresse gewinnt die genannte Adresse ("' + wort + '")',
+        !warFrage && erg && erg.gefunden === true
+          && String(erg.adresse || '').toLowerCase().indexOf(wort.toLowerCase()) >= 0,
+        erg ? 'bekommen: ' + erg.adresse : 'es wurde gefragt');
+    }
+  }
+
   /* Ohne Objektbezug ist "mein Cashflow" der ganze Bestand. */
   const ctxFrisch = { userId: uid, letzteListe: VOLLE_LISTE.slice(), letztesObjekt: null,
     protokoll: [], merkeObjekt() {}, merkeListe() {} };

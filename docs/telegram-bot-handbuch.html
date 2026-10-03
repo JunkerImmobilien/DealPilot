@@ -99,7 +99,7 @@
   <div class="runway"></div>
   <h1>Dein Telegram-Bot</h1>
   <div class="unter">Objekte abfragen, anlegen und ändern — direkt im Chat</div>
-  <div class="fuss">HANDBUCH · STAND 02.10.2026 · JUNKER SOLUTION</div>
+  <div class="fuss">HANDBUCH · STAND 03.10.2026 · JUNKER SOLUTION</div>
 </div>
 
 <p>Der Bot ist <b>dein eigener</b>. Du legst ihn in Telegram selbst an, trägst ihn
@@ -224,7 +224,126 @@ wie aktuell sie sind — und zwar nicht nur das Datum:</p>
 
 <div class="bruch"></div>
 
-<h2>3 · Ein Objekt anlegen</h2>
+<h2>3 · Vergleichen, auflisten, verbessern</h2>
+
+<p>Das sind die vier Fragen, die vorher nicht gingen. Alle Antworten unten sind
+<b>echte Ausgaben</b> aus dem Prüflauf vom 03.10.2026 — nicht nachgebaut.</p>
+
+<h3>Was sind meine besten Wohnungen?</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">was sind meine besten Wohnungen?</div></div>
+  <div class="b bot"><div class="blase">Die besten Wohnungen, sortiert nach
+    <i>Cashflow nach Steuer</i>:<br><br>
+    1. <b>Hermannstraße 9, Hüllhorst</b>: 4.366 €/Jahr (Investor Deal Score 86,
+    DealPilot-Score 85, Bruttomietrendite 6,60 %)<br>
+    2. <b>Am Markt 9, Kabelsketal</b>: 1.086 €/Jahr (84 · 74 · 6,73 %)<br>
+    3. <b>Am Markt 9, Kabelsketal</b>: 785 €/Jahr (84 · 88 · 6,73 %)<br>
+    4. <b>Musterstraße 12, Leipzig</b>: −82 €/Jahr (62 · 55 · 4,95 %)</div></div>
+</div>
+
+<div class="merk gut">
+  <b>Er sagt immer, nach was er ordnet.</b> „Beste“ ist keine Kennzahl — für den
+  einen ist es der Score, für den anderen der Cashflow. Deshalb stehen in jeder
+  Zeile beide Scores und die Rendite daneben, und oben steht die Messgröße.
+  Willst du eine andere: <i>„die besten nach Rendite“</i>.
+</div>
+
+<p>„Wohnung“ wird dabei zu <b>ETW</b> aufgelöst, „Haus“ zu EFH, „Mehrfamilienhaus“
+zu MFH. Du musst die internen Kürzel nicht kennen. Gibt es die Art nicht, sagt er
+dir, welche du hast.</p>
+
+<h3>Wie ist der Cashflow bei Objekt xy?</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">wie ist der Investor Deal Score von Nummer 3?</div></div>
+  <div class="b bot"><div class="blase">Der Investor Deal Score von <b>Nummer 3</b>
+    (Bismarckstr. 27, 32756 Detmold) liegt bei <b>68</b> und ist damit in der
+    Kategorie <b>SOLIDE</b>.<br>
+    <span class="leise">Stand: heute 07:46 Uhr.</span></div></div>
+</div>
+
+<p>Dasselbe gilt für Cashflow (Jahr <i>und</i> Monat), DSCR, LTV,
+Bruttomietrendite, Restschuld, Zins und Tilgung in Euro sowie den
+DealPilot-Score — alles für ein einzelnes Objekt, in einem Zug.</p>
+
+<div class="merk gut">
+  <b>Er nennt immer das Objekt dazu.</b> Eine Zahl ohne Haus kannst du nicht
+  nachprüfen. Genau daran war eine Auskunft zum falschen Objekt einmal unbemerkt
+  geblieben — die Zahl war richtig, nur das Haus nicht.
+</div>
+
+<div class="merk warn">
+  <b>Nicht gerechnet heißt nicht null.</b> Steht ein Objekt nicht auf
+  „gewonnen“ oder wurde der Investor Deal Score nie durchgerechnet, nennt der Bot
+  keine Zahl, sondern sagt, warum sie fehlt. Eine erfundene Null wäre schlimmer
+  als eine Lücke.
+</div>
+
+<h3>Gib mir die Felder von Objekt 3</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">gib mir die Felder von Nummer 3</div></div>
+  <div class="b bot"><div class="blase">Objekt <b>Nummer 3</b>, Bismarckstr. 27,
+    32756 Detmold:<br><br>
+    <b>1. Basis</b><br>
+    PLZ 32756 · Ort Detmold · Straße Bismarckstr. · Hausnummer 27<br>
+    Objektart <b>MFH</b> · Wohnfläche 546 m² · Baujahr 1908<br>
+    Kaufpreis <b>1.150.000 €</b> · Nettokaltmiete 4.506 €/Monat<br>
+    Zimmer 19 · Etagen 4 · Wohneinheiten 6<br><br>
+    <b>2. Geld</b><br>
+    Eigenkapital 280.000 € · Zins 4,0 % · Tilgung 1,0 % · Zinsbindung 10 Jahre<br><br>
+    <b>3. Lage &amp; Zustand</b><br>
+    Makrolage gut · Mikrolage sehr gut …
+    <span class="leise">97 Felder gefüllt, 92 leer.</span></div></div>
+</div>
+
+<p>Zu groß? Dann grenze ein: <i>„nur die Mietfelder“</i>, <i>„was steht beim
+Darlehen?“</i>, <i>„zeig mir den Zustand“</i>.</p>
+
+<div class="merk">
+  <b>Er zeigt Bezeichnungen, nicht Feldnamen.</b> Du liest „Wohnfläche (m²)“,
+  nicht <span class="mono">wfl</span>. Und er sagt dir, wie viele Felder leer
+  sind — damit du siehst, was noch fehlt, statt es zu vermuten.
+</div>
+
+<h3>Wie kann ich meinen Cashflow steigern?</h3>
+
+<div class="chat">
+  <div class="b du"><div class="blase">wie kann ich meinen Cashflow steigern?</div></div>
+  <div class="b bot"><div class="blase">Dein Cashflow nach Steuern liegt bei
+    <b>30.912 €/Jahr</b>, vor Steuern bei 19.780 €. Kapitaldienst 322.815 €/Jahr,
+    DSCR 0,90.<br><br>
+    <b>Hebel</b><br>
+    1. <b>Tilgung senken</b> — jeder Prozentpunkt weniger ist unmittelbar
+    Cashflow, aber die Restschuld sinkt langsamer.<br>
+    2. <b>Zins senken</b> — je 0,5 Prozentpunkte <b>+24.070 €/Jahr</b>.<br><br>
+    <b>Schwächste Objekte</b><br>
+    1. <b>Bäckerstr. 7 Musterhausen</b> (−2.828 €/Jahr): Tilgungssatz von 2 %
+    auf 1 % senken → +3.…</div></div>
+</div>
+
+<div class="merk gut">
+  <b>Jeder Hebel kommt mit einer Zahl und mit seinem Preis.</b> „Miete erhöhen,
+  Kosten senken“ wäre richtig und nutzlos — es gilt für jedes Portfolio. Hier
+  steht, was <i>deine</i> Zahlen hergeben: die Tilgung mit ihrem Betrag, der Zins
+  je halbem Prozentpunkt, der Mietabstand gegen deine eingetragene
+  Vergleichsmiete, die nicht umlagefähigen Kosten mit ihrem Anteil am Rohertrag.
+</div>
+
+<div class="merk warn">
+  <b>Fehlt eine Angabe, sagt er das — statt „kein Spielraum“.</b> Ohne
+  eingetragene Marktmiete lässt sich nicht sagen, ob deine Miete unter Markt
+  liegt. Das ist <i>unbekannt</i>, nicht <i>null</i>. Er nennt dir dann das Feld,
+  das fehlt.
+</div>
+
+<div class="merk">
+  <b>Das ist eine Rechnung auf deinen eigenen Zahlen</b> — keine Finanzierungs-
+  oder Steuerberatung. Der Bot sagt das in seiner Antwort selbst.
+</div>
+
+<h2>4 · Ein Objekt anlegen</h2>
 
 <p>Vier Wege — alle führen durch dieselbe Prüfung.</p>
 
@@ -309,7 +428,7 @@ wie aktuell sie sind — und zwar nicht nur das Datum:</p>
 
 <div class="bruch"></div>
 
-<h2>4 · Felder ändern</h2>
+<h2>5 · Felder ändern</h2>
 
 <div class="chat">
   <div class="b du"><div class="blase">setz die Zimmerzahl bei der Musterstr. 12 auf 5</div></div>
@@ -330,7 +449,7 @@ wie aktuell sie sind — und zwar nicht nur das Datum:</p>
 Ein Feld, das er <b>nicht kennt</b>, nennt er dir, statt es stillschweigend
 wegzuwerfen.</p>
 
-<h2>5 · DealScore und Investor Deal Score</h2>
+<h2>6 · DealScore und Investor Deal Score</h2>
 
 <div class="chat">
   <div class="b du"><div class="blase">wie ist der DealScore von Objekt 3?</div></div>
@@ -359,7 +478,7 @@ wegzuwerfen.</p>
   keiner vor, sagt er das, statt zu schätzen.
 </div>
 
-<h2>6 · Marktpreisindikation</h2>
+<h2>7 · Marktpreisindikation</h2>
 
 <p>Zwei Tiefen — du wählst mit einem Wort.</p>
 
@@ -402,7 +521,7 @@ wegzuwerfen.</p>
     <span class="leise">Sag sie mir einfach, dann hole ich sie ab.</span></div></div>
 </div>
 
-<h2>7 · Alle Befehle</h2>
+<h2>8 · Alle Befehle</h2>
 
 <table>
   <tr><th>Befehl</th><th>Wirkung</th></tr>
@@ -416,7 +535,7 @@ wegzuwerfen.</p>
   <tr><td><code>/stop</code></td><td>Verbindung stilllegen (in den Einstellungen reaktivierbar)</td></tr>
 </table>
 
-<h2>8 · Einrichtung</h2>
+<h2>9 · Einrichtung</h2>
 
 <ul>
   <li>In Telegram <b>@BotFather</b> öffnen und <code>/newbot</code> schicken</li>

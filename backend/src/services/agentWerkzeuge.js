@@ -1587,7 +1587,14 @@ async function _findeObjekt(ctx, args) {
       const t = dialog.objektRaten(String(a.adresse), liste);
       const perAdr = (t.art === 'eindeutig') ? t.objekt.id : null;
       if (perAdr && String(perAdr) !== String(perNr)) {
-        const nrAdr = (liste.find((o) => o.id === perNr) || {}).adresse || ('Nummer ' + n);
+        const nrAdr = (liste.find((o) => o.id === perNr) || {}).adresse || '';
+        /* Ein Objekt OHNE jede Adresse kann nicht das sein, das der Nutzer
+           per Adresse genannt hat. GEMESSEN: auf "Cashflow bei der
+           Musterstraße" fragte der Agent zurueck und bot als zweiten
+           Kandidaten "Nummer 1" an — ein leeres Objekt namens "Unbenannt",
+           das das Modell geraten hatte. Eine Rueckfrage zwischen einer
+           Adresse und einem Nichts ist keine Frage. */
+        if (!nrAdr.replace(/[\s,]/g, '')) return perAdr;
         if (ctx.merkeListe) ctx.merkeListe([perAdr, perNr]);
         const e = new Error('mehrdeutig');
         e.mehrdeutig = [
