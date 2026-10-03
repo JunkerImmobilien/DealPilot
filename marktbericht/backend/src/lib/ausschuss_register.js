@@ -440,9 +440,44 @@ export function findeZweig(kennzahl, ags, zweig, lage) {
 
   /* Mehrere Saetze — die Lage entscheidet. */
   const l = String(lage || '').trim().toLowerCase();
-  if (!l) return null;
-  return passend.find((s) =>
-    String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase() === l) || null;
+  if (l) {
+    const nachLage = passend.find((s) =>
+      String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase() === l);
+    if (nachLage) return nachLage;
+  }
+
+  /* ── v1816 · ZWEI JAHRGAENGE SIND KEINE MEHRDEUTIGKEIT ─────────────────
+   *
+   * GEMESSEN am 03.10.2026: 231 von 572 Abrufen scheiterten mit
+   * `zweig_nicht_abgeleitet`, obwohl der Zweig im Register stand. Die
+   * Ursache war hier: bei mehreren Saetzen und ohne Lageangabe gab diese
+   * Funktion `null` zurueck. Die Saetze unterschieden sich aber gar nicht
+   * in der Lage —
+   *
+   *     05711 Bielefeld  we_v  2023  2023-12-31  lage: (leer)
+   *     05711 Bielefeld  we_v  2024  2024-12-31  lage: (leer)
+   *
+   * — sondern im JAHRGANG. Und dafuer gibt es eine Regel, keine Frage:
+   * es gilt das Modell des Stichtags (§ 10 ImmoWertV), also der jüngste
+   * Satz, der am Stichtag schon veroeffentlicht war.
+   *
+   *   > Zwei Treffer sind eine Frage, solange man nicht weiss, wodurch
+   *   > sie sich unterscheiden. Weiss man es, ist es eine Regel.
+   *
+   * Nur wenn sich die Saetze WIRKLICH in der Lage unterscheiden, bleibt
+   * es eine Frage — dann muss die Lage mitkommen. */
+  const lagenVerschieden = new Set(passend.map((s) =>
+    String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase())).size > 1;
+  if (lagenVerschieden) return null;
+
+  const jahr = (s) => {
+    const t = String(s.stichtag || '').slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+    const b = Number(s.berichtsjahr);
+    return Number.isFinite(b) ? String(b) + '-12-31' : '0000-00-00';
+  };
+  const sortiert = passend.slice().sort((a, b) => (jahr(a) < jahr(b) ? 1 : jahr(a) > jahr(b) ? -1 : 0));
+  return sortiert[0];
 }
 
 /** Ist fuer dieses Gebiet ueberhaupt etwas hinterlegt? */

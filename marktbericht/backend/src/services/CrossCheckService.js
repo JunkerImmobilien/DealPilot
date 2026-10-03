@@ -12,6 +12,7 @@ import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
+import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js'; /* v1816 */
 import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
 /* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
 /* v1073-WGAA-1 · Nicht mehr ein Modul, sondern der Aufloeser. Er
@@ -198,34 +199,35 @@ export const CrossCheckService = {
        eindeutig, eine Umrechnung waere eine Methodenwahl (34/80 auf 70
        ergibt je nach Weg 30 oder 24 Jahre - 19.000 Euro Unterschied an
        einem Reihenhaus). Diese Wahl trifft die Software nicht. */
+    /* ── v1816 · DIE ABLEITUNG LIEGT JETZT IN EINEM EIGENEN MODUL ────────
+     *
+     * Hier stand sie als Closure — von außen nicht erreichbar. Das wurde
+     * zum Problem, als die amtlichen Liegenschaftszinssätze angeschlossen
+     * wurden: die Gutachterausschüsse staffeln sie nach Restnutzungsdauer
+     * (Dresden `efh_frei_rnd36_55`, Leipzig `etw_altbau_rnd20_34`), und
+     * der Zinssatz wird im Bericht VOR dem Sachwert geholt.
+     *
+     * Der bequeme Weg wäre gewesen, sie dort noch einmal abzuleiten.
+     *
+     *   > Zwei Ableitungen derselben Zahl laufen auseinander. Nicht heute,
+     *   > nicht absichtlich — aber sie laufen auseinander, und dann steht
+     *   > in einem Gutachten an zwei Stellen eine andere
+     *   > Restnutzungsdauer.
+     *
+     * CLAUDE.md: „Eine Restnutzungsdauer für alle Verfahren." Jetzt
+     * buchstäblich eine.
+     *
+     * NACHGEMESSEN vor dem Umbau: 147 Fälle (7 Baujahre × 7
+     * Modernisierungsgrade × 3 Modernisierungsarten), Modul gegen diese
+     * Closure — 147 mal dieselbe Zahl, 0 Abweichungen. */
     const _rndEinheitlich = (gndArg) => {
-      const GND = Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE;
-      _rndHerkunft.gnd_jahre = GND;
-
-      const _mp = _num(ref.mod_punkte);
-      if (_mp == null) {
-        return _rndMerke('geschaetzt', 'kein_modernisierungsgrad', rnd,
-          _SCHAETZUNG + ' Es wurde kein Modernisierungsgrad erfasst. Mit '
-          + 'Modernisierungspunkten fällt die Restnutzungsdauer regelmäßig '
-          + 'höher aus, und mit ihr der Gebäudesachwert.');
-      }
-      const _kern = /kernsaniert/i.test(String(ref.modernization || '')) && _mp >= 18;
-      const _bj = _kern && _num(ref.modernization_year) > 1500
-        ? _num(ref.modernization_year) : _num(ref.build_year);
-      if (!(_bj > 1500)) {
-        return _rndMerke('geschaetzt', 'kein_baujahr', rnd,
-          _SCHAETZUNG + ' Es liegt kein verwertbares Baujahr vor.');
-      }
-      const _a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, (new Date().getFullYear()) - _bj),
-                               punkte: _mp, kernsaniert: _kern });
-      if (!(_a2 && _a2.rnd != null)) {
-        return _rndMerke('geschaetzt', 'anlage2_ohne_ergebnis', rnd,
-          _SCHAETZUNG + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.');
-      }
-      return _rndMerke('anlage2', null, _a2.rnd,
-        'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
-        + GND + ' Jahren, aus ' + _mp
-        + ' Modernisierungspunkten' + (_kern ? ' (Kernsanierung)' : '') + '.');
+      const e = rndEinheitlich(ref, Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE);
+      _rndHerkunft.gnd_jahre = e.gnd_jahre;
+      /* Der Rückfall des Moduls rechnet dieselbe Schätzung; stimmt sie
+         nicht mit der hier gebildeten überein, gilt die hier gebildete —
+         sie ist die, mit der die übrigen Verfahren dieses Laufs rechnen. */
+      const wert = (e.quelle === 'anlage2') ? e.rnd : rnd;
+      return _rndMerke(e.quelle, e.grund, wert, e.hinweis);
     };
     /* v1338: Die GND, mit der der Sachwert rechnet. Vor dem ersten Lauf
        kennt niemand das Modell des Ausschusses - der Faktor wird erst

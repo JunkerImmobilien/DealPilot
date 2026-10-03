@@ -15,6 +15,8 @@ import { HarvestService } from './HarvestService.js';
 import { KiGegenrechnungService } from './KiGegenrechnungService.js';
 import { ErtragswertService } from './ErtragswertService.js';
 import { CrossCheckService } from './CrossCheckService.js';
+/* v1816 · dieselbe Restnutzungsdauer wie Sachwert und Erbbaurecht */
+import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
 /* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
@@ -571,11 +573,45 @@ export const ReportOrchestrator = {
       }
     } catch (e) { /* eine Nebenangabe darf den Bericht nie kippen */ }
 
+    /* ── v1816 · DIE ANGABEN, DIE DER AUSSCHUSS ZUM STAFFELN BRAUCHT ─────
+     *
+     * Die amtlichen Liegenschaftszinssätze liegen objektscharf: Dresden
+     * führt `efh_frei_rnd36_55`, Leipzig `etw_altbau_rnd20_34`, Mainz je
+     * Stadtteil. Ohne Haustyp, Baujahr und Restnutzungsdauer lässt sich
+     * der richtige Satz nicht zuordnen — und bis v1815 wurde gar keiner
+     * zugeordnet: der Bericht rechnete außerhalb von NRW mit § 256 BewG,
+     * obwohl 1.205 amtliche Sätze im Register lagen.
+     *
+     * DIE RESTNUTZUNGSDAUER KOMMT AUS DEM GEMEINSAMEN MODUL. Sie wird
+     * weiter unten für Sachwert und Erbbaurecht noch einmal gebraucht —
+     * und zwar dieselbe. Eine zweite Ableitung hier wäre genau der
+     * Fehler, den `lib/rnd-einheitlich.js` verhindert.
+     *
+     * Die GND ist hier noch nicht bekannt (sie steht im Modell des
+     * Ausschusses, den wir erst suchen). Deshalb Anlage 1 mit 80 — wie es
+     * `CrossCheckService` im ersten Lauf auch tut. */
+    const _rndVorab = rndEinheitlich(ref, 80);
+    step('rnd-vorab: ' + (_rndVorab.rnd != null ? _rndVorab.rnd + ' Jahre (' + _rndVorab.quelle + ')' : 'keine'));
+
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
         ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
+        objekt: {
+          objart: ref.property_type,
+          /* v1816 · Marcels Entscheidung: eine Eigentumswohnung ist
+             standardmäßig VERMIETET — „Ist ja ein Kapitalrechner." Nur
+             wenn der Nutzer ausdrücklich Eigennutzung angibt, gilt der
+             Zweig für selbstgenutztes Wohnungseigentum. */
+          nutzung: ref.nutzung || ref.usage_type || 'vermietet',
+          haustyp: ref.haustyp || null,
+          baujahr: ref.build_year || null,
+          restnutzungsdauer: _rndVorab.rnd,
+          einheiten: ref.units || null,
+          lage: ref.lage || null,
+          stadtteil: ref.stadtteil || ref.ortsteil || null,
+        },
       });
       /* v1049-WBWK-1 · Die Bewirtschaftungskostenquote, die der
        * Gutachterausschuss selbst gemessen hat. Sie steht als eigener

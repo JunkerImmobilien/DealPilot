@@ -12,6 +12,11 @@
 // Eine Zahl ohne Herkunft ist im Dossier wertlos.
 
 import { q } from '../lib/db.js';
+/* v1816 · der Weg zum Register. Kein Ringschluss: gutachterausschuss.js
+   und ausschuss_register.js kennen diesen Dienst nicht (gegengeprueft). */
+import { finde as regFinde, lagenFuer as regLagen } from '../lib/ausschuss_register.js';
+import { liegenschaftszinssatz as regZins } from '../lib/gutachterausschuss.js';
+import { zinssatzFuerObjekt } from '../lib/zweigwahl.js';
 import { lzsNach256, MODELL } from '../lib/immowertv.js';
 import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
 /* v1063-WOD-1 · Die Open-Data-Tabelle wurde in v1054 angelegt, gefuellt hat
@@ -230,9 +235,83 @@ export const WertParameterService = {
    * @returns {Promise<{wert:number,stufe:string,quelle:string,hinweis:string,
    *                    parameter_id:number|null,modellversion:string,fallzahl:number|null}>}
    */
-  async hole({ typ, ags, objektart, anzahlWe = null, stichtag = null, brwSqm = null }) {
+  async hole({ typ, ags, objektart, anzahlWe = null, stichtag = null, brwSqm = null,
+               objekt = null }) {
     const art = parameterObjektart(objektart, anzahlWe);
     const tag = stichtag || new Date().toISOString().slice(0, 10);
+
+    /* ══ v1816 · DAS REGISTER ZUERST ════════════════════════════════════
+     *
+     * GEMESSEN am 03.10.2026 am laufenden Dienst: außerhalb von NRW rechnete
+     * der Ertragswert mit dem gesetzlichen Auffangwert nach § 256 BewG —
+     * obwohl im Register 1.205 amtliche Liegenschaftszinssätze mit
+     * Quellenvermerk, Jahrgang und Lizenz lagen.
+     *
+     *     Dresden    Bericht 3,00 % Stufe D    Register 0,54 %    −2,46 PP
+     *     Hannover   Bericht 3,00 % Stufe D    Register 0,90 %    −2,10 PP
+     *     Leipzig    Bericht 3,00 % Stufe D    Register 2,10 %    −0,90 PP
+     *
+     * Der Weg dorthin fehlte: `GAA.liegenschaftszinssatz()` war gebaut,
+     * verlangt aber einen ZWEIG — und den leitete niemand ab. Das macht
+     * jetzt `zweigwahl.js` aus den Schlüsseln, die der Ausschuss selbst
+     * führt (`efh_frei_rnd36_55` = freistehendes EFH, RND 36–55 Jahre).
+     *
+     * WARUM VOR DER TABELLE `wert_parameter`: das Register ist dieselbe
+     * amtliche Quelle, nur objektscharf statt nach Objektart gemittelt.
+     * GEGENGEPRÜFT, nicht gehofft — für NRW liefern beide Wege denselben
+     * Wert:
+     *
+     *     Bielefeld  Tabelle 2,80 %    Register 2,80 %    Differenz 0,00
+     *     Detmold    Tabelle 2,10 %    Register 2,10 %    Differenz 0,00
+     *
+     *   > Zwei unabhängige Quellen, dieselbe Zahl: erst das macht aus
+     *   > einer Umstellung einen Beweis.
+     *
+     * UND DIE LÜCKE REDET. Fehlt eine Angabe, die der Ausschuss braucht
+     * (Lage, Stadtteil, Restnutzungsdauer), fällt die Kaskade weiter wie
+     * bisher — aber `rueckfrage` reist mit nach außen. Marcel am
+     * 03.10.2026: „konnte nicht gemacht werden aus den und den Gründen und
+     * dann kann man diese Sachen noch eingeben, damit dann so ein Zinssatz
+     * abgerufen wird."
+     *
+     *   > Eine Lücke, die sagt was ihr fehlt, ist keine Lücke mehr,
+     *   > sondern der nächste Schritt. */
+    let _rueckfrage = null;
+    if (typ === 'lzs' && ags) {
+      try {
+        const reg = zinssatzFuerObjekt(
+          { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
+          String(ags),
+          { objart: objektart, einheiten: anzahlWe, ...(objekt || {}) });
+        if (reg && reg.verfuegbar) {
+          return {
+            wert: Number(reg.wert_pct), min: null, max: null,
+            stufe: reg.stufe || 'A', stufe_roh: reg.stufe || 'A',
+            quelle: reg.quellenvermerk || reg.ausschuss || 'Gutachterausschuss',
+            quelle_url: reg.quelle_url || null,
+            parameter_id: null, modellversion: MODELL.IMMOWERTV_2021,
+            fallzahl: null, ebene: 'gaa',
+            zweig: reg.zweig, lage: reg.lage || null,
+            berichtsjahr: reg.berichtsjahr || null,
+            stichtag: reg.stichtag || null,
+            modellansaetze: reg.modellansaetze || null,
+            hinweis: [reg.begruendung, reg.stufe_grund].filter(Boolean).join(' '),
+            aus_register: true,
+          };
+        }
+        if (reg && reg.rueckfrage && reg.rueckfrage !== 'kein_ausschuss'
+            && reg.rueckfrage !== 'keine_art') {
+          _rueckfrage = { grund: reg.rueckfrage, fehlt: reg.fehlt || null,
+            auswahl: reg.auswahl || [], zweig: reg.zweig || null,
+            hinweis: reg.hinweis || null };
+        }
+      } catch (e) {
+        /* Das Register darf den Bericht nie kippen — aber der Ausfall
+           bleibt sichtbar, statt als "kein Wert" durchzugehen. */
+        _rueckfrage = { grund: 'register_fehler', fehlt: null, auswahl: [],
+          hinweis: 'Das Register war nicht lesbar: ' + (e && e.message) };
+      }
+    }
 
     /* v1063-WOD-3 · Einmal fragen, vor der Kaskade. Der klassierte Satz ist
      * auch NEBEN einem amtlichen Wert eine Auskunft und haengt deshalb an
@@ -306,6 +385,7 @@ export const WertParameterService = {
           hinweis: _str.herabgestuft ? _str.hinweis
                                      : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl),
           einordnung: _odEinordnung,   /* v1063-WOD-4 */
+          rueckfrage: _rueckfrage,   /* v1816 */
         };
       }
     }
@@ -337,16 +417,18 @@ export const WertParameterService = {
      * liegt nach unseren NRW-Zahlen durchweg zu hoch (3,0 gegen 2,2). */
     if (_odRechen && (_odRechen.stufe === 'A' || _odRechen.stufe === 'B')) {
       _odRechen.einordnung = _odEinordnung;
+      _odRechen.rueckfrage = _rueckfrage;   /* v1816 */
       return _odRechen;
     }
 
     if (typ === 'lzs' && NACHBARWERT_AN) {
       const nb = await nachbarwert(a8(ags), art, tag);
-      if (nb) { nb.einordnung = _odEinordnung; return nb; }
+      if (nb) { nb.einordnung = _odEinordnung; nb.rueckfrage = _rueckfrage; return nb; }
     }
 
     if (_odRechen) {
       _odRechen.einordnung = _odEinordnung;
+      _odRechen.rueckfrage = _rueckfrage;   /* v1816 */
       return _odRechen;
     }
 
@@ -359,6 +441,10 @@ export const WertParameterService = {
         modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'bund',
         hinweis: fb.hinweis,
         einordnung: _odEinordnung,   /* v1063-WOD-6 */
+        /* v1816 · WARUM es der Auffangwert wurde, obwohl das Register
+           etwas fuehrt. Ohne diese Zeile sieht der Bericht aus, als gaebe
+           es fuer diesen Ort keinen amtlichen Zinssatz. */
+        rueckfrage: _rueckfrage,
       };
     }
     return null;
@@ -367,7 +453,8 @@ export const WertParameterService = {
   /**
    * Liegenschaftszinssatz mit Vorrang der Nutzereingabe (Stufe E).
    */
-  async liegenschaftszins({ ags, objektart, anzahlWe, brwSqm, stichtag, nutzerwert = null }) {
+  async liegenschaftszins({ ags, objektart, anzahlWe, brwSqm, stichtag, nutzerwert = null,
+                            objekt = null }) {
     const eigen = Number(nutzerwert);
     if (Number.isFinite(eigen) && eigen > 0) {
       return {
@@ -379,7 +466,12 @@ export const WertParameterService = {
     /* v1099-WQL: Der Weg zur Quelle haengt an JEDER Antwort - auch an der
        leeren. Gerade dann ist er die einzige Auskunft, die wir geben. */
     return this.mitQuelle(
-      await this.hole({ typ: 'lzs', ags, objektart, anzahlWe, stichtag, brwSqm }),
+      /* v1816 · `objekt` traegt die Angaben, die der Gutachterausschuss zum
+         Staffeln braucht: Haustyp (freistehend/DHH/Reihenhaus), Nutzung
+         (vermietet ist der Standard — es ist ein Kapitalanlagerechner),
+         Baujahr, Restnutzungsdauer, Lage, Stadtteil. Ohne sie kommt eine
+         Rueckfrage statt eines Wertes, und das ist richtig so. */
+      await this.hole({ typ: 'lzs', ags, objektart, anzahlWe, stichtag, brwSqm, objekt }),
       ags, 'liegenschaftszinssatz');
 
   },
