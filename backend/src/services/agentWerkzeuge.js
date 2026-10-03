@@ -145,6 +145,85 @@ async function portfolio_lesen(ctx) {
   };
 }
 
+/* ── Ein Feld ueber ALLE Objekte ─────────────────────────────────────────
+ *
+ * Marcel am 03.10.2026: "geht das noch intelligenter und schlauer, sodass
+ * er alle fragen zu meinen objekten versteht?"
+ *
+ * GEMESSEN, warum er das fragt:
+ *
+ *   "Welche Objekte haben keinen Keller?"     19 Werkzeugaufrufe, 17 s
+ *   "Wie viele sind Mehrfamilienhaeuser?"     18 Werkzeugaufrufe, 17 s
+ *   "Welche sind vor 1960 gebaut?"            fragte zurueck statt zu antworten
+ *
+ * Der Agent hatte nur zwei Wege: den Portfolio-Spiegel (22 Kernfelder) oder
+ * ein Objekt einzeln. Alles, was im Spiegel fehlt — Keller, Heizung,
+ * Energieausweis, Zinsbindung, Sanierungsstand — zwang ihn, achtzehnmal
+ * dasselbe zu tun.
+ *
+ *   > Ein Agent, der eine Frage nur beantworten kann, indem er achtzehnmal
+ *   > nachschlaegt, beantwortet sie meistens nicht. Er fragt zurueck, und
+ *   > das sieht aus wie Dummheit, ist aber ein fehlendes Werkzeug.
+ *
+ * Dieses Werkzeug liest beliebige Felder ueber ALLE Objekte in EINEM
+ * Aufruf. Es rechnet nichts — es liest, was im Datensatz steht. Die
+ * Auswertung ("vor 1960", "kein Keller") macht das Modell auf den Zahlen,
+ * die es bekommt, nicht auf eigener Annahme.
+ */
+async function objekte_felder(ctx, args) {
+  const gewuenscht = Array.isArray(args && args.felder) ? args.felder : [];
+  if (!gewuenscht.length) {
+    return { fehler: 'Bitte in "felder" die Feld-Ids angeben, z.B. ["baujahr","objart"]. '
+                   + 'Welche es gibt, sagt feld_katalog.' };
+  }
+  /* Nur bekannte Felder — sonst liest das Modell sich etwas zusammen, das
+     es nicht gibt, und haelt das Ergebnis fuer eine Fehlanzeige. */
+  const gueltig = gewuenscht.filter((f) => fuehrung.feld(f));
+  const unbekannt = gewuenscht.filter((f) => !fuehrung.feld(f));
+  if (!gueltig.length) {
+    return { fehler: 'Keines dieser Felder gibt es.', unbekannte_felder: unbekannt,
+             hinweis: 'Frag feld_katalog nach dem richtigen Namen.' };
+  }
+
+  const r = await query(
+    `SELECT id, name, ort, data FROM objects
+      WHERE user_id = $1 ORDER BY updated_at DESC LIMIT 200`,
+    [ctx.userId]);
+
+  const zeilen = r.rows.map((z, i) => {
+    const d = z.data || {};
+    const e = {
+      nummer: i + 1, id: z.id,
+      adresse: [d.str, d.hnr].filter(Boolean).join(' ')
+             + (d.ort ? ', ' + d.ort : (z.ort ? ', ' + z.ort : ''))
+    };
+    gueltig.forEach((f) => {
+      const v = d[f];
+      /* Leer heisst LEER und nicht "nein". Ein fehlender Keller-Eintrag
+         bedeutet nicht, dass keiner da ist — nur, dass niemand es
+         eingetragen hat. Das muss das Modell unterscheiden koennen. */
+      e[f] = (v === '' || v == null) ? null : v;
+    });
+    return e;
+  });
+
+  /* Wie viele tragen das Feld ueberhaupt? Ohne diese Zahl haelt das Modell
+     siebzehn Leerwerte fuer siebzehn Neins. */
+  const gefuellt = {};
+  gueltig.forEach((f) => { gefuellt[f] = zeilen.filter((z) => z[f] != null).length; });
+
+  return {
+    anzahl: zeilen.length,
+    felder: gueltig,
+    unbekannte_felder: unbekannt.length ? unbekannt : undefined,
+    wie_viele_tragen_das_feld: gefuellt,
+    objekte: zeilen,
+    hinweis: 'null heisst NICHT ausgefuellt — das ist etwas anderes als "nein" '
+           + 'oder "null". Sag dem Nutzer, wenn ein Feld bei vielen Objekten leer '
+           + 'ist, statt daraus eine Aussage zu machen.'
+  };
+}
+
 async function feld_katalog(ctx, args) {
   const suche = String((args && args.suche) || '').toLowerCase().trim();
   let felder = fuehrung.katalog();
@@ -778,9 +857,24 @@ const WERKZEUGE = [
       + 'Rechne Summen NUR aus diesen Zahlen, nie aus eigener Annahme.',
     parameter: { type: 'object', properties: {}, additionalProperties: false } },
 
+  { name: 'objekte_felder', stufe: 'lesen', fn: objekte_felder,
+    beschreibung: 'Liest BELIEBIGE Felder ueber ALLE Objekte auf einmal. '
+      + 'DAS IST DAS WERKZEUG FUER JEDE FRAGE NACH "WELCHE OBJEKTE ..." — '
+      + 'Baujahr, Objektart, Keller, Heizung, Energieausweis, Zinsbindung, '
+      + 'Sanierungsstand, einfach jedes Feld. '
+      + 'Lies NIEMALS zwanzig Objekte einzeln, um sie zu vergleichen: ein '
+      + 'Aufruf hier liefert dasselbe. '
+      + 'Kennst du den Feldnamen nicht, frag vorher feld_katalog.',
+    parameter: { type: 'object',
+      properties: { felder: { type: 'array', items: { type: 'string' },
+        description: 'Feld-Ids, z.B. ["baujahr","objart","keller"]' } },
+      required: ['felder'], additionalProperties: false } },
+
   { name: 'feld_katalog', stufe: 'lesen', fn: feld_katalog,
-    beschreibung: 'Welche Felder es gibt und welche Werte bei Auswahlfeldern erlaubt sind. '
-      + 'Vor dem Aendern eines Auswahlfeldes aufrufen.',
+    beschreibung: 'Welche Felder es gibt und welche Werte bei Auswahlfeldern erlaubt '
+      + 'sind. Mit "suche" nach einem Begriff fragen ("keller", "heizung", "zins") — '
+      + 'das liefert die internen Feld-Ids, die objekte_felder und felder_aendern '
+      + 'brauchen. Vor dem Aendern eines Auswahlfeldes aufrufen.',
     parameter: { type: 'object',
       properties: { suche: { type: 'string', description: 'Feldname oder Teil davon' } },
       additionalProperties: false } },
