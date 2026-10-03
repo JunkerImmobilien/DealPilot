@@ -336,6 +336,12 @@ const RANG = {
   kaufpreis: ['Kaufpreis', 'kaufpreis_eur', 'eur', 'hoch'],
   miete: ['Kaltmiete', 'miete_kalt_eur_jahr', 'eur_jahr', 'hoch'],
   restschuld: ['Restschuld', 'restschuld_eur', 'eur', 'hoch'],
+  /* v1813g · "Finanzierungsbedarf" hatte keine Kennzahl, und das Modell
+     nahm daraufhin den KAUFPREIS. Eine fehlende Wahl wird nicht zur
+     Rueckfrage, sondern zur naechstbesten. */
+  darlehen: ['Darlehen', 'darlehen_eur', 'eur', 'hoch'],
+  eigenkapital: ['Eigenkapital', 'eigenkapital_eur', 'eur', 'hoch'],
+  zinssatz: ['Zinssatz', 'zins_prozent', 'prozent', 'niedrig'],
   wohnflaeche: ['Wohnfläche', 'wohnflaeche_qm', 'zahl2', 'hoch'],
   baujahr: ['Baujahr', 'baujahr', 'jahr', 'hoch']
 };
@@ -423,18 +429,44 @@ async function objekte_rangliste(ctx, args) {
     return z;
   });
 
+  /* ── v1813g · EIN FILTER, DEN NIEMAND WOLLTE, FIEL NICHT AUF ────────────
+   *
+   * GEMESSEN am 03.10.2026: auf "welche Objekte haben den hoechsten
+   * Finanzierungsbedarf" rief der Agent dieses Werkzeug mit
+   * `{"kennzahl":"kaufpreis","objektart":"Wohnung"}` — beides erfunden. Die
+   * Antwort nannte "Hermannstraße 9, 200.000 EUR" als Spitze, waehrend das
+   * teuerste Objekt 1.394.304 EUR Restschuld traegt. Vier MFH fehlten
+   * stillschweigend, weil sie keine Wohnungen sind.
+   *
+   *   > Ein Filter, der die Haelfte des Bestands entfernt, muss im SATZ
+   *   > stehen, nicht im Feld daneben. `gefiltert_auf` stand da und wurde
+   *   > nicht gelesen — zum dritten Mal dieselbe Lehre.
+   *
+   * Also steht der Satz jetzt fertig im Ergebnis, und zwar an der Stelle,
+   * die das Modell abschreibt. */
+  const sagen = [];
+  if (art) {
+    sagen.push('Gezeigt werden NUR ' + zeilen.length + ' von ' + gesamt
+      + ' Objekten — gefiltert auf die Objektart ' + art + '. Sag das dem Nutzer, '
+      + 'bevor du die Liste nennst.');
+  }
+  sagen.push('Sortiert nach: ' + label + (richtung === 'niedrig'
+    ? ' (niedriger ist besser)' : ' (hoeher ist besser)') + '.');
+
   return {
     vorhanden: true,
     anzahl: zeilen.length,
     von_insgesamt: gesamt,
     gefiltert_auf: art,
+    so_sagen: sagen.join(' '),
     sortiert_nach: label,
     beste_zuerst: true,
     bessere_richtung: richtung === 'niedrig' ? 'niedriger ist besser' : 'hoeher ist besser',
     ohne_wert: ohne,
     stand: dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem),
     rangliste: zeilen,
-    hinweis: 'Sortiert ist nach "' + label + '". SAG DAS in deiner Antwort — "beste" ist '
+    hinweis: (art ? 'ZUERST: ' + sagen[0] + ' ' : '')
+           + 'Sortiert ist nach "' + label + '". SAG DAS in deiner Antwort — "beste" ist '
            + 'keine Kennzahl, und der Nutzer muss wissen, nach was du ordnest. '
            + (a.kennzahl ? '' : 'Der Nutzer hat keine Messgröße genannt: nenne die '
              + 'Reihenfolge nach Score und weise auf eine abweichende Reihenfolge bei '
@@ -1783,10 +1815,17 @@ const WERKZEUGE = [
         kennzahl: { type: 'string',
           enum: ['investor_deal_score', 'dealpilot_score', 'cashflow', 'cashflow_vor_steuer',
                  'bruttomietrendite', 'dscr', 'ltv', 'kaufpreis', 'miete', 'restschuld',
-                 'wohnflaeche', 'baujahr'],
-          description: 'Nur angeben, wenn der Nutzer die Messgroesse nennt' },
-        objektart: { type: 'string', description: 'z.B. "Wohnung", "ETW", "MFH"' },
-        anzahl: { type: 'integer', description: 'wie viele Plaetze, hoechstens 30' }
+                 'darlehen', 'eigenkapital', 'zinssatz', 'wohnflaeche', 'baujahr'],
+          description: 'NUR angeben, wenn der Nutzer die Messgroesse nennt. '
+            + '"Finanzierungsbedarf", "Schulden", "wie viel steht noch offen" '
+            + '-> restschuld. "Was habe ich aufgenommen" -> darlehen. '
+            + 'Sonst WEGLASSEN — dann kommen Score, Cashflow und Rendite zusammen.' },
+        objektart: { type: 'string',
+          description: 'NUR wenn der Nutzer selbst eine Art nennt ("Wohnungen", "meine '
+            + 'MFH"). Sonst WEGLASSEN — ein Filter, den niemand wollte, versteckt die '
+            + 'Haelfte des Bestands, und die Antwort sieht trotzdem vollstaendig aus.' },
+        anzahl: { type: 'integer',
+          description: 'Wie viele Plaetze, hoechstens 30. Sonst WEGLASSEN.' }
       }, additionalProperties: false } },
 
   { name: 'objekt_felder_liste', stufe: 'lesen', fn: objekt_felder_liste,

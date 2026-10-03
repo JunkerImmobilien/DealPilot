@@ -65,7 +65,7 @@ const agent = require('/app/src/services/agentLauf');
 
   await probe('„Welche Objekte haben den hoechsten Finanzierungsbedarf?"',
     'Welche Objekte haben aktuell den höchsten Finanzierungsbedarf?',
-    { werkzeug: 'portfolio_lesen' });
+    { werkzeug: ['portfolio_lesen', 'objekte_rangliste'], enthaelt: '1\.394\.304' });
 
   console.log('═══ A-3 · Objektbezug ═══\n');
   await probe('„was hat Objekt 3 fuer Kerndaten?"',
