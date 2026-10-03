@@ -142,9 +142,30 @@ var _objCache = {};         // Cache of full object data when in API mode
 
 function collectData() {
   var d = {};
+  /* ── v1815 · EINE CHECKBOX HAT KEIN .value, DAS ETWAS BEDEUTET ─────────
+   *
+   * GEMESSEN am 03.10.2026 ueber alle 18 Objekte auf Staging: genau EIN
+   * Feld wich zwischen Datensatz und Formular ab, und zwar bei JEDEM
+   * Objekt — `san_tax_active` stand als "on" im Datensatz und war im
+   * Formular nicht angehakt.
+   *
+   * Ursache: hier stand `d[id] = e.value`. Bei einer Checkbox ist `.value`
+   * immer "on", egal ob sie angehakt ist. Gespeichert wurde also in jedem
+   * Fall "on" — eine Angabe ohne Aussage. Und `loadData` setzte spiegel-
+   * bildlich `e.value = d[id]`, also wieder das Attribut statt des Hakens.
+   *
+   *   > Zwei Schreibweisen, die zueinander passen, koennen gemeinsam
+   *   > falsch sein. Dass Lesen und Schreiben sich einig sind, beweist
+   *   > nichts — nur dass niemand nachgesehen hat.
+   *
+   * Betroffen sind die zwei Werbungskosten-Haken (san_tax_active,
+   * moebl_tax_active). Der Nutzer hakte "Sanierung als Werbungskosten
+   * ansetzen" an, die Steuerrechnung folgte sofort — und nach dem
+   * naechsten Laden war der Haken weg. Das ist STEUERRELEVANT. */
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e) d[id] = e.value;
+    if (!e) return;
+    d[id] = (e.type === 'checkbox') ? !!e.checked : e.value;
   });
   // V187-h2: KI-Lage-Cache aus currentDeal mit speichern (falls vorhanden)
   try {
@@ -351,7 +372,26 @@ function loadData(d) {
   });
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e && d[id] !== undefined) e.value = d[id];
+    if (!e || d[id] === undefined) return;
+    if (e.type === 'checkbox') {
+      /* v1815 · Den HAKEN setzen, nicht das Attribut.
+       *
+       * ALTBESTAND: bis v1814 wurde "on" gespeichert, OHNE Ruecksicht auf
+       * den Haken — bei allen 18 Objekten auf Staging steht es. Diese "on"
+       * bedeuten NICHTS. Sie jetzt als "angehakt" zu lesen, wuerde bei
+       * jedem Altobjekt eine steuerliche Annahme aktivieren, die niemand
+       * getroffen hat.
+       *
+       *   > Eine Angabe ohne Aussage darf nicht nachtraeglich zur
+       *   > Zustimmung werden. Lieber die Luecke als eine erfundene
+       *   > Entscheidung — bei Steuern erst recht.
+       *
+       * Darum gilt nur echtes true/false. Ab jetzt wird die Wahrheit
+       * geschrieben, und ab dann traegt sie. */
+      e.checked = (d[id] === true || d[id] === 'true');
+      return;
+    }
+    e.value = d[id];
   });
   // V187-h2: KI-Lage-Cache aus data ins currentDeal-Object übernehmen
   try {
@@ -800,7 +840,12 @@ async function saveObj(opts) {
 function _clearFormForNewObject() {
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e) e.value = '';
+    if (!e) return;
+    /* v1815 · Eine Checkbox wird nicht durch e.value='' leer. Beide
+       Leer-Wege (neues Objekt, Formular zuruecksetzen) liessen den Haken
+       des vorigen Objekts stehen. */
+    if (e.type === 'checkbox') { e.checked = false; return; }
+    e.value = '';
   });
   var qcIds = ['qc_kp','qc_nkm','qc_nkm_grund','qc_nkm_stp','qc_nkm_garage','qc_nkm_sonst',
                'qc_ek','qc_knk','qc_knk_eur','qc_san','qc_zins','qc_tilg','qc_d1','qc_d1z','qc_d1t',
@@ -876,7 +921,12 @@ function newObj() {
 function _newObjLeeren() {
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e) e.value = '';
+    if (!e) return;
+    /* v1815 · Eine Checkbox wird nicht durch e.value='' leer. Beide
+       Leer-Wege (neues Objekt, Formular zuruecksetzen) liessen den Haken
+       des vorigen Objekts stehen. */
+    if (e.type === 'checkbox') { e.checked = false; return; }
+    e.value = '';
   });
   // V63.22: Auch QC-Felder explizit leeren (waren nicht in FIELDS)
   // Sonst behalten qc_kp / qc_nkm_grund / qc_nkm_stp / qc_nkm_garage / qc_nkm_sonst /
