@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-03T08:00:05.307Z",
+ "erzeugt_am": "2026-10-03T08:38:36.843Z",
  "quellen": {
   "voice-import": "7dbbe6cf88e245a8",
   "objektart-felder": "7e35d8f32caad19d",
-  "storage": "40445c1afc9c8485",
-  "index-html": "86ed60a7937f5d04"
+  "storage": "077cfe4e9901f982",
+  "index-html": "8cc14008fb9b05cd"
  },
  "daten": {
   "objektarten": {
@@ -370,6 +370,7 @@
    "makrolage",
    "mikrolage",
    "vermstand",
+   "nutzungsart",
    "exitstr",
    "kp",
    "makler_p",
@@ -762,6 +763,21 @@
     "id": "vermstand",
     "kind": "select",
     "label": "Vermietungsstand"
+   },
+   {
+    "id": "nutzungsart",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "kapitalanlage",
+      "text": "Vermietet (Kapitalanlage)"
+     },
+     {
+      "wert": "eigennutzung",
+      "text": "Selbst genutzt"
+     }
+    ],
+    "label": "Nutzungsart"
    },
    {
     "id": "exitstr",

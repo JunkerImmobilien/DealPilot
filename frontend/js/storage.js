@@ -54,7 +54,7 @@ var WM_FIELDS = [
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
-  'vermstand','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
+  'vermstand','nutzungsart','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V291.1-storage-cleanup: kp_kueche deprecated — Eingabe komplett über inv_* Felder
   // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
   'san','moebl','inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst', /* V291-inventar-fields-applied */

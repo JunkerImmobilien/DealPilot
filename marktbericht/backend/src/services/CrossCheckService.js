@@ -98,10 +98,45 @@ export const CrossCheckService = {
         liegenschaftszins_pct_effektiv: (params && params.lzs_pct != null)
           ? Number(params.lzs_pct) : LIEGENSCHAFTSZINS * 100,
         liegenschaftszins_stufe: (params && params.lzs_stufe) || null,
+        /* v1816 · Welcher Zweig des Ausschusses — die Angabe trennt einen
+           amtlichen Wert von einem gemittelten. */
+        liegenschaftszins_zweig: (params && params.lzs_zweig) || null,
+        liegenschaftszins_berichtsjahr: (params && params.lzs_berichtsjahr) || null,
+        liegenschaftszins_aus_register: !!(params && params.lzs_aus_register),
         bwk_quote: BWK_QUOTE, liegenschaftszins: LIEGENSCHAFTSZINS,
       },
       notes: ['Vereinfachtes Sachwert-/Ertragswertverfahren nach ImmoWertV-Logik als Plausibilitäts-Quercheck. Indikativ, kein Gutachten n. § 194 BauGB.'],
     };
+
+    /* ── v1816 · DIE RUECKFRAGE WIRD EIN SATZ IM BERICHT ──────────────────
+     *
+     * Der Gutachterausschuss fuehrt fuer diesen Ort einen amtlichen
+     * Liegenschaftszinssatz, aber es fehlt eine Angabe zum Staffeln.
+     * Gerechnet wurde deshalb mit dem Rueckfall.
+     *
+     *   > Ein Auffangwert ohne Begruendung sieht aus wie das Beste, was
+     *   > es gibt. Er ist das Schlechteste, was es gibt.
+     *
+     * Der Satz nennt, WAS fehlt und WAS der Ausschuss anbietet — damit der
+     * Nutzer es nachtragen und den amtlichen Wert bekommen kann. */
+    try {
+      const _rf = params && params.lzs_rueckfrage;
+      if (_rf && _rf.hinweis) {
+        const _was = {
+          lage: 'die Lage', stadtteil: 'der Stadtteil',
+          restnutzungsdauer: 'die Restnutzungsdauer', baujahr: 'das Baujahr',
+          objektart: 'die Objektart',
+        }[_rf.fehlt || _rf.grund] || 'eine Angabe';
+        const _auswahl = (Array.isArray(_rf.auswahl) && _rf.auswahl.length)
+          ? ' Der Ausschuss führt: ' + _rf.auswahl.slice(0, 12).join(', ') + '.' : '';
+        out.notes.push('Für diesen Ort liegt ein amtlicher Liegenschaftszinssatz '
+          + 'des Gutachterausschusses vor, konnte aber nicht zugeordnet werden: '
+          + _was + ' fehlt.' + _auswahl + ' ' + _rf.hinweis
+          + ' Gerechnet wurde deshalb mit dem Rückfallwert '
+          + ((params && params.lzs_stufe) ? '(Stufe ' + params.lzs_stufe + ')' : '') + '.');
+        out.liegenschaftszins_rueckfrage = _rf;
+      }
+    } catch (e) { /* ein Hinweis darf den Bericht nie kippen */ }
 
     /* v955-etw: Die Objektart kam in dieser Datei bisher NICHT vor (grep = 0).
      * Gerechnet wurde alles als EFH — auch jede Eigentumswohnung. */

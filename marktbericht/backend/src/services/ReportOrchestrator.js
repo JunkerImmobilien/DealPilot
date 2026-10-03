@@ -808,6 +808,24 @@ export const ReportOrchestrator = {
           bwk_quote_quelle: _bwkPct ? _bwkPct.quelle : null,
           modellversion: _lzs.modellversion || null,
           lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
+          /* ── v1816 · DIE RUECKFRAGE REIST BIS IN DEN BERICHT ──────────
+           *
+           * Liegt fuer diesen Ort ein amtlicher Zinssatz vor, fehlt aber
+           * eine Angabe, die der Ausschuss zum Staffeln braucht (Lage,
+           * Stadtteil, Restnutzungsdauer), rechnet die Kaskade mit dem
+           * Rueckfall — und der Bericht soll SAGEN, warum.
+           *
+           *   > Ein Auffangwert ohne Begruendung sieht aus wie das Beste,
+           *   > was es gibt. Er ist das Schlechteste, was es gibt.
+           *
+           * Marcel: "konnte nicht gemacht werden aus den und den Gruenden
+           * und dann kann man diese Sachen noch eingeben, damit dann so
+           * ein Zinssatz abgerufen wird." */
+          lzs_rueckfrage: _lzs.rueckfrage || null,
+          /* Woher der Wert kommt, in EINEM Feld — fuer die Ansicht. */
+          lzs_zweig: _lzs.zweig || null,
+          lzs_aus_register: !!_lzs.aus_register,
+          lzs_berichtsjahr: _lzs.berichtsjahr || null,
           bodenwert: _bw,
           flaeche: _flaeche,   /* v1049-WFLA-2 */
           /* v1055-WSPL-1 · Hinweis, wenn Stellplaetze da sind und kein
