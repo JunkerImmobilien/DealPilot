@@ -2650,7 +2650,12 @@ function _calcImmediate(){
      Prozent zurück) und darf NULL sein — „nicht bestimmbar" ist etwas
      anderes als „null Prozent". Jeder Leser muss auf Abwesenheit prüfen,
      bevor er rechnet: Number(null) ist 0 und besteht Number.isFinite. */
-  State.kpis={bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
+  /* v1814 · DIE RECHNUNG STEMPELT SICH SELBST — mit Herkunft.
+     `_fuer` sagt, fuer welches Objekt gerechnet wurde. Wer die Zahlen
+     abholt (storage.js), prueft das und schreibt sonst nichts.
+
+       > Wer eine Rechnung abholt, muss wissen, zu wem sie gehoert. */
+  State.kpis={_fuer:(window._currentObjKey||null),bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
     irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
 
   // V258-07: WK-Snapshot + andere Objekte beruecksichtigen
@@ -3428,6 +3433,9 @@ function _calcImmediate(){
   // V63.17: setTimeout(qcCalc) entfernt — das verursachte zusammen mit V63.11 calc() in qcCalc Endlos-Loop.
   // Quick-Check rechnet seinen eigenen Score auf User-Eingabe (über `oninput="qcCalc()"`),
   // er muss nicht zusätzlich aus calc() heraus getriggert werden.
+
+  /* v1814 · die fertige Rechnung ans geladene Objekt nachziehen */
+  if (typeof window._dpKpisNachziehen === 'function') window._dpKpisNachziehen();
 }
 function renderProjTable(){
   var tbody=el('proj-body');if(!tbody)return;
@@ -4602,3 +4610,24 @@ if (typeof ResizeObserver !== 'undefined') {
     }
   }, 200);
 }
+
+/* v1814 · NACHZIEHEN, WENN DIE RECHNUNG SPAETER FERTIG WIRD.
+ *
+ * `calc()` ist um 300 ms verzoegert. Wer danach nicht nachstempelt,
+ * laesst am Objekt eine Luecke stehen, obwohl die Zahl inzwischen da
+ * ist. Diese Funktion wird am Ende jeder Rechnung gerufen und
+ * schreibt die Kennzahlen ans GELADENE Objekt — nur dorthin.
+ *
+ *   > Eine Rechnung, die niemand abholt, ist so gut wie keine. */
+window._dpKpisNachziehen = function () {
+  try {
+    var o = window._currentObjData;
+    if (!o || typeof State === 'undefined' || !State.kpis) return;
+    if (String(State.kpis._fuer || '') !== String(window._currentObjKey || '')) return;
+    o._kpis_bmy   = State.kpis.bmy;
+    o._kpis_cf_ns = State.kpis.cf_ns;
+    o._kpis_cf_vs = State.kpis.cf_op;
+    o._kpis_dscr  = State.kpis.dscr;
+    o._kpis_ltv   = State.kpis.ltv;
+  } catch (e) {}
+};

@@ -240,7 +240,27 @@ function collectData() {
   d._at = new Date().toISOString();
   d._v = '9.0';
   // Snapshot key KPIs for backend indexing
-  if (typeof State !== 'undefined' && State.kpis) {
+  /* v1814 · NUR MIT PASSENDER HERKUNFT. `State.kpis._fuer` traegt den
+     Objektschluessel, fuer den gerechnet wurde (calc.js). Stimmt er nicht
+     mit dem geladenen Objekt ueberein, wird NICHT gestempelt — dann
+     stehen keine Kennzahlen am Datensatz, und das ist richtiger als die
+     eines anderen Hauses.
+
+       > Eine Luecke sieht man. Eine falsche Zahl nicht. */
+  var _kpiPasst = (typeof State !== 'undefined' && State.kpis)
+    && (State.kpis._fuer === undefined
+        || String(State.kpis._fuer || '') === String(window._currentObjKey || ''));
+  if (!_kpiPasst && typeof State !== 'undefined' && State.kpis) {
+    console.warn('[storage v1814] Kennzahlen NICHT gestempelt: gerechnet fuer '
+      + State.kpis._fuer + ', geladen ist ' + window._currentObjKey);
+    /* Was schon am Objekt steht, bleibt — es ist aelter, aber es gehoert
+       diesem Objekt. Ueberschrieben wird nur mit einer passenden Rechnung. */
+    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y']
+      .forEach(function (f) {
+        if (window._currentObjData && window._currentObjData[f] != null) d[f] = window._currentObjData[f];
+      });
+  }
+  if (_kpiPasst) {
     d._kpis_bmy = State.kpis.bmy;
     d._kpis_cf_ns = State.kpis.cf_ns;
     d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
@@ -437,9 +457,18 @@ function loadData(d) {
   if (window.MietEntwicklung && typeof MietEntwicklung.refresh === 'function') {
     var mMode = (d.me_modus === 'detail') ? 'detail' : 'prog';
     MietEntwicklung.setMode(mMode);  // ruft intern auch calc()
-  } else if (typeof calc === 'function') {
-    calcNow();  /* V29: direkt — nach loadObject */
   }
+  /* v1814 · UND IMMER SOFORT RECHNEN.
+     Hier stand `else if` — und MietEntwicklung ist immer da, also war
+     dieser Zweig unerreichbar. `setMode` ruft `calc()`, und das ist um
+     300 ms verzoegert; der Stempel unten lief vorher und trug deshalb die
+     Kennzahlen des VORGAENGERS. Gemessen an drei Objektpaaren mit
+     byte-identischem Cashflow bei verschiedenen Mieten.
+
+       > Ein else-Zweig hinter einer Bedingung, die immer zutrifft, ist
+       > toter Code, der aussieht wie eine Absicherung. */
+  if (typeof calcNow === 'function') calcNow();
+  else if (typeof calc === 'function') calc();
   if (typeof updHeader === 'function') updHeader();
   // V37: Sterne-Bewertung re-rendern nach Load
   if (window.StarRating && typeof StarRating.refresh === 'function') {
@@ -453,7 +482,12 @@ function loadData(d) {
   // damit die Sidebar (gecacht) = geladene Bewertung (live) ist — ohne manuelles Speichern.
   try {
     var _o351 = window._currentObjData;
-    if (_o351 && typeof State !== 'undefined' && State.kpis) {
+    /* v1814 · auch hier die Herkunft pruefen — dieser Block war die
+       Stelle, die den Cashflow des Vorgaengers aufgestempelt hat. */
+    var _passt351 = (typeof State !== 'undefined' && State.kpis)
+      && (State.kpis._fuer === undefined
+          || String(State.kpis._fuer || '') === String(window._currentObjKey || ''));
+    if (_o351 && _passt351) {
       _o351._kpis_bmy  = State.kpis.bmy;
       _o351._kpis_cf_ns = State.kpis.cf_ns;
       _o351._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs */
@@ -1592,8 +1626,12 @@ async function loadSaved(k) {
         imgs = (obj.photos || []).map(function(src, i){ return { src: src, name: 'photo_' + i + '.jpg' }; });
         if (typeof renderImgs === 'function') renderImgs();
       }
+      /* v1814 · DER SCHLUESSEL ZUERST. Hier stand er NACH loadData —
+          damit rechnete calc() noch unter dem Schluessel des Vorgaengers,
+          und der Stempel konnte seine Herkunft nicht pruefen. */
+      _currentObjKey = k;
       loadData(d);
-      _currentObjKey = k; _dpFireObjectReady(k); /* v946 */
+      _dpFireObjectReady(k); /* v946 */
 
       // Load bemerkungen for this object (Migration 006)
       try {
@@ -1629,8 +1667,9 @@ async function loadSaved(k) {
       imgs = d._photos.map(function(src, i){ return { src: src, name: 'photo_' + i + '.jpg' }; });
       if (typeof renderImgs === 'function') renderImgs();
     }
+    _currentObjKey = k;                 /* v1814 · Schluessel zuerst */
     loadData(d);
-    _currentObjKey = k; _dpFireObjectReady(k); /* v946 */
+    _dpFireObjectReady(k); /* v946 */
     // V63.8: QC-Host als nicht-gerendert markieren — beim nächsten QC-Besuch wird neu gerendert
       var __qcH = document.getElementById('qc-tab-host'); if (__qcH) __qcH.dataset.rendered = '0';
       // V63.48: Erst auf Einzelobjekt-View wechseln, dann auf Tab Objekt + WF-Update
