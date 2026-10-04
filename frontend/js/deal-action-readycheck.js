@@ -78,6 +78,59 @@
     return { exists: true, filled: val !== '' };  // "0" zaehlt als gefuellt
   }
 
+  /* ── v1841 · DIE PFLICHTFELDER DER OBJEKTART FEHLTEN IM ZÄHLER ──────────
+   *
+   * Marcel am 04.10.2026: „für jedes Objekt alle Felder vernünftig
+   * befüllen … dass wir auch überall dann einmal eine Wertermittlung
+   * abrufen können."
+   *
+   * GEMESSEN: dieser Check prüft fünfzehn fest verdrahtete Felder und
+   * fragt `DealPilotObjektart.pflicht()` NIE — obwohl die Tabelle seit
+   * v1437 für alle elf Objektarten weiß, was zwingend gebraucht wird.
+   *
+   * Dadurch fehlten zwei Felder in jedem Zähler, und zwar genau die, an
+   * denen die Wertermittlung scheitert:
+   *
+   *     mea        bei ETW   ohne Miteigentumsanteil kein Bodenwert
+   *     einheiten  bei MFH   ohne sie laufen die Verwaltungskosten am
+   *                          Durchschnitt statt je bewerteter Einheit
+   *                          (Anlage 3 ImmoWertV)
+   *
+   * Ein Objekt konnte „100 % · STARTKLAR" zeigen und trotzdem keine
+   * Wertermittlung können.
+   *
+   *   > Eine Vollständigkeitsanzeige, die nicht alles kennt, was
+   *   > gebraucht wird, meldet Vollständigkeit — und das ist schlimmer
+   *   > als keine Anzeige. Sie beendet die Suche.
+   *
+   * Die Felder reisen deshalb aus der EINEN Tabelle mit, nicht aus einer
+   * zweiten Liste hier: `DealPilotObjektart` ist die Quelle, und wenn
+   * dort eine Art dazukommt, zählt sie hier automatisch mit. */
+  var ART_PFLICHT = {
+    mea:       'Miteigentumsanteil',
+    einheiten: 'Wohneinheiten',
+    zimmer:    'Zimmer',
+    bad_anz:   'Badezimmer',
+    etage:     'Etage',
+    etagen_ges:'Etagen gesamt'
+  };
+
+  function artPflichtFelder() {
+    var OA = window.DealPilotObjektart;
+    var sel = document.getElementById('objart');
+    var art = sel ? String(sel.value || '').trim() : '';
+    if (!OA || typeof OA.pflicht !== 'function' || !art) return [];
+    var raus = [];
+    Object.keys(ART_PFLICHT).forEach(function (id) {
+      if (!OA.pflicht(art, id)) return;
+      var e = document.getElementById(id);
+      if (!e) return;                       /* nicht im DOM — nicht zaehlen */
+      raus.push({ id: id, name: ART_PFLICHT[id],
+        gefuellt: String(e.value || '').trim() !== '' });
+    });
+    return raus;
+  }
+
   function getData() {
     var total = 0, missing = [];
     Object.keys(FIELD_TARGETS).forEach(function (k) {
@@ -85,6 +138,11 @@
       if (!f.exists) return;       // Feld nicht im DOM -> nicht zaehlen
       total++;
       if (!f.filled) missing.push({ key: k, name: LABELS[k] || k });
+    });
+    /* v1841 · Was die gewaehlte Objektart zwingend braucht. */
+    artPflichtFelder().forEach(function (p) {
+      total++;
+      if (!p.gefuellt) missing.push({ key: '_art_' + p.id, name: p.name, art: true });
     });
     var filled = total - missing.length;
     var percent = total ? Math.round(filled / total * 100) : 0;
@@ -142,7 +200,13 @@
   }
 
   function jump(key) {
-    var el = firstEl(FIELD_TARGETS[key] || []);
+    /* v1841 · Die Pflichtfelder der Objektart tragen den Praefix `_art_`
+       und stehen nicht in FIELD_TARGETS — ihre id ist der Schluessel
+       selbst. Ohne diesen Zweig fuehrte ihr Chip ins Leere, und ein Chip,
+       der nicht springt, sieht aus wie ein kaputter Chip. */
+    var el = (key && key.indexOf('_art_') === 0)
+      ? document.getElementById(key.slice(5))
+      : firstEl(FIELD_TARGETS[key] || []);
     if (!el) return;
     var sec = el.closest ? el.closest('.sec') : null;
     if (sec) {
