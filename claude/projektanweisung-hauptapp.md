@@ -30135,3 +30135,11 @@ Zuordnung aus der Datei); der dynamische Beweis — Eintrag 2,5 im Zinsfeld
   den ich nicht geöffnet habe. Nicht angefasst.
 - Gohliser Str. 42: Baujahr 1938 ergibt mit GND 80 keine RND — bei Stufe D
   ohnehin verweigert, bei Stufe A bräuchte es Modernisierungspunkte.
+
+**Nachtrag 04.10.2026, Abnahmepunkt Sachwertfaktor erledigt.** Im offenen
+Modal (Hermannstraße, Buster `v1846b`) 2,5 ins Zinsfeld, Pipeline neu:
+der Sammler schickt `sachwertfaktor: 1` und `liegenschaftszinssatz: 2,5`.
+Verkehrswert 188.161 → 223.432 € (×1,19 — der Ertragswert reagiert auf den
+niedrigeren Zins), **nicht** ×2,5. Jacoby unverändert 84,55 %, weil es nur
+den amtlichen Registerzins nimmt (2,2 % Stufe A), nie das Feld. Feld danach
+zurückgesetzt, nichts gespeichert.
