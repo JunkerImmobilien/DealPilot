@@ -891,7 +891,7 @@ router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next
          (CLAUDE.md, js/dashboard.js:390). Ein Modell, das denselben Score
          mit einem anderen Wort belegt, erzeugt genau den Widerspruch, der
          in v1203 im Marktbericht aufgefallen ist. */
-      '6. Score-Stufen, falls du einen Score einordnest: ab 85 Top, ab 70',
+      '6. Score-Stufen, falls du einen Score einordnest: ab 85 Sehr gut, ab 70',
       '   Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Benutze',
       '   genau diese Woerter.',
       /* v1288b: Steht bei einem Wert eine Quelle, gehoert sie zur Auskunft.

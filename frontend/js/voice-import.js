@@ -5439,7 +5439,7 @@
   function _stufe(score) {
     var s = Number(score);
     if (!isFinite(s)) return { wort: '–', kamel: '–', farbe: '#7A7370' };
-    if (s >= 85) return { wort: 'TOP',       kamel: 'Top',       farbe: '#3FA56C' };
+    if (s >= 85) return { wort: 'SEHR GUT',  kamel: 'Sehr gut',  farbe: '#3FA56C' };   /* v1863 */
     if (s >= 70) return { wort: 'GUT',       kamel: 'Gut',       farbe: '#3FA56C' };
     if (s >= 50) return { wort: 'SOLIDE',    kamel: 'Solide',    farbe: 'var(--wl-b8932f, #b8932f)' };   /* v1290c: auf hellem Grund traegt das helle Gold nicht */
     if (s >= 35) return { wort: 'SCHWACH',   kamel: 'Schwach',   farbe: '#B8625C' };

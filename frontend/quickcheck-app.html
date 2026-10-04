@@ -3904,7 +3904,7 @@ const QcEngine = (function() {
     const tier = _st ? (_st.farbe === 'top' ? 'green-strong' : _st.farbe)
                : (score >= 85 ? 'green-strong' : score >= 70 ? 'green' : score >= 50 ? 'gold' : 'red');
     const label = _st ? _st.wort
-               : (score >= 85 ? 'Top' : score >= 70 ? 'Gut' : score >= 50 ? 'Solide' : score >= 35 ? 'Schwach' : 'Kritisch');
+               : (score >= 85 ? 'Sehr gut' : score >= 70 ? 'Gut' : score >= 50 ? 'Solide' : score >= 35 ? 'Schwach' : 'Kritisch');
 
     return {
       score, tier, label,
@@ -6284,8 +6284,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
   <script src="js/dscr-engine.js?v=969n"></script>
   <script src="js/deal-kpis.js?v=969n"></script>
-  <script src="js/score-tiers.js?v=v1861"></script>
-  <script src="js/dealscore.js?v=v1861"></script>
+  <script src="js/score-tiers.js?v=v1863"></script>
+  <script src="js/dealscore.js?v=v1863"></script>
   <script src="js/avm-section.js?v=W33"></script>
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
      kommt hier nicht rein. Deshalb laedt der iframe die Override-Ebene selbst
@@ -6501,7 +6501,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
            ['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-dscr','DSCR','\u22651,2'],['kpi-ltv','LTV','<90%'],['kpi-bwk','Bewirtsch.','18\u201335%']];
   function tc(s){return s>=70?'#3FA56C':s>=50?window._qcGold('--gold', '#C9A84C'):'#B8625C';}
   function th(s){return s>=70?'#5BD98E':s>=50?window._qcGold('--gold-hi', '#E8CC7A'):'#D9685F';}
-  function tl(s){return s>=70?'STARK':s>=50?'SOLIDE':'SCHWACH';}
+  function tl(s){ /* v1863: dieselbe Kette wie die Haupt-App (hier stand STARK/SOLIDE/SCHWACH bei 70/50) */
+    if(window.ScoreTier&&ScoreTier.stufe)return ScoreTier.stufe(s).versal;
+    return s>=85?'SEHR GUT':s>=70?'GUT':s>=50?'SOLIDE':s>=35?'SCHWACH':'KRITISCH';}
   function jet(){return '<svg viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>';}
   function num(el){ if(!el)return null; var t=(el.textContent||'').replace(/\s/g,''); if(t===''||t==='-'||t==='\u2013')return null; var m=t.match(/-?\d+/); if(!m)return null; var n=parseInt(m[0],10); return isNaN(n)?null:n; }
   function pt(cx,cy,r,d){var a=(d-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}

@@ -2212,7 +2212,7 @@
     var total=(ag && ag.total!=null)?ag.total:null;
     var tcol=total==null?'var(--dp-gold)':(total>=70?'#3FA56C':total>=50?'var(--wl-c9a84c, #C9A84C)':'#B86250');
     /* v1861: ein Wort, eine Kette (score-tiers.js) */
-    var tlab=total==null?'\u2013':((window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(total).wort:(total>=85?'Top':total>=70?'Gut':total>=50?'Solide':total>=35?'Schwach':'Kritisch'));
+    var tlab=total==null?'\u2013':((window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(total).wort:(total>=85?'Sehr gut':total>=70?'Gut':total>=50?'Solide':total>=35?'Schwach':'Kritisch'));
     var head='<div class="dp-sd-total">Gesamt <b style="color:'+tcol+'">'+(total==null?'\u2013':total)+'/100</b> \u00b7 '+tlab
       +' \u2014 gewichteter Durchschnitt \u00fcber alle Kategorien und '+totalKpi+' KPIs</div>';
     var rows=(cats||[]).map(function(c){

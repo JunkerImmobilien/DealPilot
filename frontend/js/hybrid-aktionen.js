@@ -61,7 +61,8 @@
      die EINZIGE Anzeige - dann muss dort die geltende Kette stehen.
      Der Kopftext wird nur noch genommen, wenn er zur Kette passt. */
   function stufe(n, st) {
-    var soll = n >= 85 ? 'TOP' : n >= 70 ? 'GUT' : n >= 50 ? 'SOLIDE' : n >= 35 ? 'SCHWACH' : 'KRITISCH';
+    var soll = (window.ScoreTier && ScoreTier.stufe) ? ScoreTier.stufe(n).versal   /* v1863: eine Kette */
+             : (n >= 85 ? 'SEHR GUT' : n >= 70 ? 'GUT' : n >= 50 ? 'SOLIDE' : n >= 35 ? 'SCHWACH' : 'KRITISCH');
     var ausKopfText = (st && st.textContent.trim()) || '';
     return ausKopfText.toUpperCase() === soll ? ausKopfText : soll;
   }

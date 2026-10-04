@@ -3847,7 +3847,9 @@ window._checkObjIdConflict = _checkObjIdConflict;
  */
 function _scoreLabel(s) {
   if (s == null || isNaN(s)) return '–';
-  if (s >= 85) return 'TOP';
+  /* v1863 · EINE Kette: score-tiers.js (Sehr gut / Gut / Solide / Schwach / Kritisch) */
+  if (window.ScoreTier && typeof ScoreTier.stufe === 'function') return ScoreTier.stufe(s).versal;
+  if (s >= 85) return 'SEHR GUT';
   if (s >= 70) return 'GUT';
   if (s >= 50) return 'SOLIDE';
   if (s >= 35) return 'SCHWACH';

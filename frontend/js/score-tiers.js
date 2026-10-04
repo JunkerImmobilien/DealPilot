@@ -37,7 +37,9 @@
   function stufe(score) {
     var s = (typeof score === 'number' && isFinite(score)) ? score : parseFloat(score);
     if (!isFinite(s)) return { wort: '–', versal: '–', farbe: 'na' };
-    if (s >= TOP)     return { wort: 'Top',      versal: 'TOP',      farbe: 'top' };
+    /* v1863 · Marcel: „mit gut, sehr gut und dann halt die anderen" — die
+       oberste Stufe heisst „Sehr gut", nicht „Top". Schwellen unveraendert. */
+    if (s >= TOP)     return { wort: 'Sehr gut', versal: 'SEHR GUT', farbe: 'top' };
     if (s >= GREEN)   return { wort: 'Gut',      versal: 'GUT',      farbe: 'green' };
     if (s >= GOLD)    return { wort: 'Solide',   versal: 'SOLIDE',   farbe: 'gold' };
     if (s >= SCHWACH) return { wort: 'Schwach',  versal: 'SCHWACH',  farbe: 'red' };

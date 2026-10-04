@@ -290,14 +290,20 @@ Pille in `js/storage.js` von `_scoreLabel()` (Z. 3637, gerufen aus
 
 | Score | Stufe |
 |---|---|
-| ≥ 85 | **TOP** |
+| ≥ 85 | **SEHR GUT** |
 | ≥ 70 | **GUT** |
 | ≥ 50 | **SOLIDE** |
 | ≥ 35 | **SCHWACH** |
 | < 35 | **KRITISCH** |
 
 Auf der Karte als Versalien-Pille, in Fließtext und Überschriften in
-Kamelschrift (`Top`, `Gut`, …). **Die Schwellen sind überall dieselben** —
+Kamelschrift (`Sehr gut`, `Gut`, …). **Die Kette steht an EINER Stelle:
+`js/score-tiers.js` (`ScoreTier.stufe(score)` → `{wort, versal, farbe}`)**;
+jede andere Stelle liest sie von dort. Seit v1863 heißt die oberste Stufe
+**„Sehr gut"** statt „TOP" — Marcels Entscheidung vom 04.10.2026 („mit
+gut, sehr gut und dann halt die anderen"); die Schwellen bleiben.
+Backend-Texte (openaiService, telegramDialogService, ai.js) führen
+dieselben Wörter. **Die Schwellen sind überall dieselben** —
 auch die Farbketten (`top` / `green` / `gold` / `red`) brechen bei
 85 / 70 / 50.
 

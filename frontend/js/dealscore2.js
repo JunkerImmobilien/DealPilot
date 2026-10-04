@@ -677,7 +677,7 @@ window.DealScore2 = (function() {
     if (_k === 'red')        { label = (totalScore >= 35 ? 'Schwach' : 'Kritisch'); color = 'red'; }
     else if (_k === 'gold')  { label = 'Solide';   color = 'gold'; }
     else if (_k === 'green') { label = 'Gut';      color = 'green'; }
-    else                     { label = 'Top';      color = 'green-strong'; }
+    else                     { label = 'Sehr gut'; color = 'green-strong'; }
     if (window.ScoreTier && window.ScoreTier.stufe) label = window.ScoreTier.stufe(totalScore).wort;
 
     // Top 3 positive + top 3 negative Sub-KPIs (über alle Kategorien) sammeln

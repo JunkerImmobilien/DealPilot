@@ -123,7 +123,7 @@ async function objekteListe(userId, limit) {
  */
 function stufeZu(score) {
   if (score == null) return null;
-  if (score >= 85) return 'TOP';
+  if (score >= 85) return 'SEHR GUT';   /* v1863: Marcel - "mit gut, sehr gut und dann die anderen" */
   if (score >= 70) return 'GUT';
   if (score >= 50) return 'SOLIDE';
   if (score >= 35) return 'SCHWACH';

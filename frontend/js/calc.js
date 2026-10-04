@@ -262,7 +262,7 @@ function updHeaderBadges() {
   else if (score >= 50) { headline = 'Verhandeln';         }
   else if (score >= 35) { headline = 'Schwacher Deal';     }
   else                  { headline = 'Kritischer Deal';    }
-  verdict = _st ? _st.wort : (score >= 85 ? 'Top' : score >= 70 ? 'Gut' : score >= 50 ? 'Solide' : score >= 35 ? 'Schwach' : 'Kritisch');
+  verdict = _st ? _st.wort : (score >= 85 ? 'Sehr gut' : score >= 70 ? 'Gut' : score >= 50 ? 'Solide' : score >= 35 ? 'Schwach' : 'Kritisch');
 
   var strengthsText = '';
   if (result.positives && result.positives.length > 0) {
