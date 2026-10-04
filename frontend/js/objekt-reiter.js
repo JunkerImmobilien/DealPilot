@@ -51,7 +51,7 @@
     var brw = _v('brw'), stich = _v('brw_stichtag');
     var status = $('brw-ai-status') ? String($('brw-ai-status').textContent || '').trim() : '';
     var manuell = _v('brw_manuell');
-    var q = status ? esc(status) : 'noch nicht abgerufen — Knopf „Bodenrichtwert abrufen" oben';
+    var q = status ? esc(status) : (brw ? 'gespeicherter Wert — Herkunft nicht vermerkt (Abruf oder Eingabe)' : 'noch nicht abgerufen — Knopf „Bodenrichtwert abrufen" oben');
     if (stich) q += ' · Stichtag ' + esc(stich);
     if (manuell) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(manuell) + ' €/m² — ' + q;
     return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'Ansatz ändern' : 'abweichend eintragen', 'brw_manuell'));
@@ -104,7 +104,10 @@
     } else {
       var stufe = r.stufe || '?';
       var cls = stufe === 'A' ? 'a' : (stufe === 'B' || stufe === 'C') ? 'b' : 'x';
-      var q = st(cls, 'Stufe ' + stufe) + esc(r.quelle || r.ausschuss || '') + (r.berichtsjahr ? ' · ' + esc(r.berichtsjahr) : '')
+      /* Die Quelle ist ein ganzer Satz (Ausschuss, Traeger, Lizenz) — in der
+         Zeile steht der erste Teil, der Rest als Tooltip. */
+      var qv = String(r.quelle || r.ausschuss || ''), qk = qv.split(',')[0];
+      var q = st(cls, 'Stufe ' + stufe) + '<span title="' + esc(qv) + '">' + esc(qk) + '</span>' + (r.berichtsjahr ? ' · ' + esc(r.berichtsjahr) : '')
             + (r.zweig ? ' · ' + esc(r.zweig) : '') + (r.quelle_url ? ' · <a href="' + esc(r.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '');
       var eigen = _v('lzs_pct');
       if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(eigen) + ' % — amtlich ' + q;
