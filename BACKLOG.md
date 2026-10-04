@@ -265,6 +265,16 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N11 · Kopf-Score, Kaufpreisaufteilung, Rundgang (04.10.2026) — erledigt v1859b
+
+Score-Wort aus der zentralen Kette (`ScoreTier.stufe`, fünf Stufen) und
+farbig; Belege-Scan raus; Exporte: Kaufpreisaufteilung-PDF,
+Arbeitshilfe-PDF, Original-XLSX in Reiter 2 und auf der letzten Seite;
+„PDF-Anlage erstellen" (Duplikat) weg; Vorlage ohne no-store.
+**Offen:** `dashboard.js:1283` und der Marktbericht-ScoringService führen
+noch eigene Vokabulare (CLAUDE.md-Befund) — `ScoreTier.stufe()` wäre jetzt
+der eine Ort dafür.
+
 ### N10 · Reiter Objekt, dritte Runde (04.10.2026) — erledigt v1858c
 
 Abruf als Zeilen unter den Anfragen, Stufenpillen in der Pre-Flight-Kachel

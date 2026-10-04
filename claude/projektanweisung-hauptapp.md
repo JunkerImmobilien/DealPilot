@@ -30652,3 +30652,52 @@ linke 1476 px — passt wieder; Hover über Wohnfläche → „Wohnfläche § Wo
 `.dp-tip` `display:none`, Modus „beginner".
 
 **Rest.** Prod v1846b; Staging v1858a.
+
+## Rollout-Journal 04.10.2026 (23) — v1859–v1859b: Kopf-Score in der Kette, Kaufpreisaufteilung aufgeräumt, Rundgang
+
+Marcel: Kopf-Score „OK"/„schwach" grau unlesbar; alles durchgehen (Objekte,
+PDFs); „Belege scannen" raus („totaler Humbug"); Modal lädt lange, AfA-
+Vorschau zeigt Altes; Exporte = Original-XLSX, Kaufpreisaufteilung-PDF,
+Arbeitshilfe-PDF; „PDF-Anlage erstellen" doppelt?; Anschaffungskosten
+müssen mit aufs PDF; alle Ausgaben auf die letzte Seite.
+
+**Kopf-Score (`e7864fd1`).** Das Wort kam aus `calc.js:254` mit einer
+eigenen Kette (Sehr gut / Gut / **Okay** / Schwach) — nicht die der
+Objektkarte (CLAUDE.md: TOP · GUT · SOLIDE · SCHWACH · KRITISCH bei
+85/70/50/35), dieselbe Abweichung wie v1734 in storage.js. `score-tiers.js`
+führt jetzt `stufe(score)` mit den fünf Wörtern (Farbkette unverändert),
+`calc.js` nimmt sie; das Wort im Kopf trägt die Stufenfarbe (vorher Grau
+mit Opacity .82). Gemessen: Hermannstraße „85 Top", `rgb(94,217,146)`,
+Opacity 1.
+
+**Kaufpreisaufteilung.** „Belege scannen (KI)" aus dem Template entfernt
+(`beleg-import.js` bleibt im Repo). Demo-Summe „€ 94.224,83" → Strich.
+**Exporte:** „PDF-Anlage erstellen" im Fuß war **derselbe Export** wie
+„Kaufpreisaufteilung als PDF" (`exportBmfPdf`, enthält die
+Anschaffungskosten als `state.inputs.anschaffung`) — Knopf weg,
+Platzhalter bleibt für `_show()`. Der Block „Ausgabe" führt jetzt
+Kaufpreisaufteilung-PDF, **BMF-Arbeitshilfe-PDF** (über den Knopf des
+Bodenwert-Reiters, ein Weg) und BMF-Original-XLSX; die **letzte Seite**
+(Bodenwert) hat alle drei (XLSX neu dazu). Die v292-Schicht verdeckte
+`#bmfResult`, deshalb hängt der Block jetzt unter ihrem Ergebnis
+(`_renderPane2`, `bmfAusgabenZeigen(host)`).
+**Ladezeit:** gemessen 930 ms bis offen beim ersten Öffnen (Vorlage mit
+`no-store`); jetzt ohne `no-store` (Buster in der URL). Der eigentliche
+Rechenlauf (~3 s) bleibt — er ist der LibreOffice-Lauf.
+**AfA-Vorschau beim Direktsprung:** „wird berechnet …" statt Altwert
+(gemessen auf frischer Seite).
+
+**Rundgang.** Objekte: `objekt-vollstaendigkeit` 21/21 je Stufe; SQL: 17
+Objekte, keines ohne Kaufpreis, Miete, Darlehen, Vertragsnummer,
+Bodenrichtwert, Standardstufe, Makrolage; 5 ohne Pilot-Analyse (drei
+Gutachtenobjekte, bewusst nicht erfunden). PDFs: App-PDF und Bank-PDF je
+Objektart heute schon (Journal 19); BMF: Kaufpreisaufteilung-PDF 3 Seiten,
+Arbeitshilfe-PDF und XLSX als Download abgefangen — alle drei liefern.
+
+**Nicht nachgemessen:** der automatische Ausgabe-Block in Reiter 2 nach
+dem Rechenlauf — der Mess-Tab lag im Hintergrund, dort drosselt Chrome
+die Timer, der Lauf startete nicht. Der Render-Weg ist gemessen (Block
+mit drei Knöpfen in `p-bmf` über denselben Host), der Aufruf steht im
+Code. Marcel sieht es beim nächsten Öffnen.
+
+**Rest.** Prod v1846b; Staging v1859b.
