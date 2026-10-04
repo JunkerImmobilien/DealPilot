@@ -133,7 +133,16 @@
     /* Die Flurangaben sind nicht Pflicht, aber sie ersparen dem Amt die
        Suche — und damit dem Nutzer eine Woche. Deshalb steht hier, was
        fehlt, statt es stillschweigend wegzulassen. */
-    var fehlendFlur = ['gemarkung', 'flur', 'flurstueck'].filter(function (k) { return !o[k]; });
+    /* v1834b · Die BESCHRIFTUNG, nicht die Feld-id. Gemessen im Browser
+       stand da „Ohne gemarkung, flur, flurstueck" — technische Namen in
+       einem Satz, den der Kunde liest.
+
+         > Eine Feld-id ist ein Name für den Code. Im Nutztext ist sie
+         > eine Zumutung. */
+    var NAME_FLUR = { gemarkung: 'Gemarkung', flur: 'Flur', flurstueck: 'Flurstück' };
+    var fehlendFlur = ['gemarkung', 'flur', 'flurstueck']
+      .filter(function (k) { return !o[k]; })
+      .map(function (k) { return NAME_FLUR[k]; });
     if (fehlendFlur.length) {
       h += '<div style="color:var(--muted,#8b8678);font-size:12.5px;line-height:1.6;'
         + 'margin-bottom:14px">Ohne <b>' + fehlendFlur.join(', ')
