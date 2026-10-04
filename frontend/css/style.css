@@ -38329,3 +38329,13 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 
 /* v1858b · Anfragen und Abruf liegen im .g2-Raster der Karte: volle Breite, untereinander (Parkstr. 9: standen in 318 px nebeneinander) */
 #qz-card .g2 > #oe-anfragen, #qz-card .g2 > #oe-abruf-box { grid-column: 1 / -1; }
+
+/* v1859 · Kopf-Score: das Wort traegt die Stufenfarbe, nicht Grau (Marcel: „kann man nicht lesen") */
+body.hdr-collapsed .hdr-score-mini span { opacity: 1; font-weight: 600; }
+body.hdr-collapsed .hdr-score-mini-top span, body.hdr-collapsed .hdr-score-mini-green span { color: #5ed992; }
+body.hdr-collapsed .hdr-score-mini-gold span { color: var(--wl-E8C964, #E8C964); }
+body.hdr-collapsed .hdr-score-mini-red span { color: #e8a09a; }
+.hdr-score-mini span { opacity: 1; }
+.hdr-score-mini-top span, .hdr-score-mini-green span { color: #3FA56C; }
+.hdr-score-mini-gold span { color: var(--wl-b8932f, #b8932f); }
+.hdr-score-mini-red span { color: #B8625C; }

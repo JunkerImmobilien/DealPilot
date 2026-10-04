@@ -269,7 +269,11 @@
       '<textarea id="bmf-boden-klausel-text" readonly style="width:100%;min-height:150px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;font:12.5px/1.6 Inter,sans-serif;background:#FBFAF7;color:#2A2727"></textarea>' +
       '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>'
       + '<button type="button" class="btn btn-sm" id="bmf-boden-pdf" style="background:#2A2727;color:#fff;border:none">Kaufpreisaufteilung als PDF</button>'
-      + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-arbeitshilfe">BMF-Arbeitshilfe als PDF</button>' +
+      + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-arbeitshilfe">BMF-Arbeitshilfe als PDF</button>'
+      /* v1859 · Marcel: „dass man da alle PDFs dann rausziehen kann" — die dritte
+         Ausgabe, das amtliche Original als XLSX, steht jetzt auch hier auf der
+         letzten Seite (downloadXlsx aus bmf-modal.js, kein Nachbau). */
+      + '<button type="button" class="btn btn-outline btn-sm" id="bmf-boden-xlsx" onclick="if(typeof downloadXlsx===\'function\')downloadXlsx()">BMF-Original als XLSX</button>' +
       (grund ? '' : '<span class="cf-hint" style="margin-left:10px">Ohne Begründung bleibt der Abschlag angreifbar — sie gehört in den Text.</span>') + '</div>';
     el('bmf-boden-klausel-text').value = txt;
     var hHost = el('bmf-boden-hinweis');

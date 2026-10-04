@@ -145,13 +145,12 @@
           </div>
         </details>
 
-        <!-- v1008-beleg: KI-Beleg-Import -->
-        <div class="bi-launch" style="margin:8px 0 2px;text-align:right">
-          <button type="button" onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open()" style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:7px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📎 Belege scannen (KI)</button>
-        </div>
+        <!-- v1859 · „Belege scannen (KI)" entfernt — Marcel: „Das ist totaler
+             Humbug" (04.10.2026). Das Modul beleg-import.js bleibt im Repo,
+             der Knopf in der Kaufpreisaufteilung ist weg. -->
         <div class="total-bar">
           <span id="ak_total_label">Anschaffungskosten insgesamt</span>
-          <span class="total-val" id="ak_total">€ 94.224,83</span>
+          <span class="total-val" id="ak_total">—</span>
         </div>
 
       </div>
@@ -604,7 +603,10 @@
       </div>
       <!-- V289.2.3: Pane-Navigation -->
       <button class="btn btn-outline" onclick="bmfPaneBack()" id="btnBmfBack" style="display:none">← Zurück</button>
-      <button class="btn btn-outline" onclick="exportBmfPdf()" id="btnBmfPdf" style="display:none">📄 PDF-Anlage erstellen</button>
+      <!-- v1859 · „PDF-Anlage erstellen" war derselbe Export wie „Kaufpreisaufteilung
+           als PDF" (exportBmfPdf) — doppelt, deshalb weg. Alle Ausgaben stehen im
+           Block „Ausgabe" (Reiter 2 und zuletzt). -->
+      <button class="btn btn-outline" onclick="exportBmfPdf()" id="btnBmfPdf" style="display:none !important" hidden aria-hidden="true"></button>
       <!-- v990: Abbrechen entfernt (X schliesst) -->
       <button class="btn btn-gold" onclick="bmfPaneNext()" id="btnBmfNext">Weiter →</button>
       <button class="btn btn-gold" onclick="applyToTax()" id="btnBmfApply" style="display:none">✓ Übernehmen</button>

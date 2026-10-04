@@ -250,11 +250,19 @@ function updHeaderBadges() {
   var donutDash = (score / 100 * 176).toFixed(1);
   var donutColor = tier === 'green' ? '#5ED99E' : tier === 'gold' ? '#C9A84C' : '#f08080';
 
+  /* v1859 · Marcel: im Kopf stand „OK" oder „schwach", grau. „Okay" kommt
+     in der Kette der Objektkarte nicht vor (CLAUDE.md: TOP · GUT · SOLIDE ·
+     SCHWACH · KRITISCH bei 85 / 70 / 50 / 35) — dieselbe Abweichung, die
+     v1734 schon in storage.js behoben hat. Das Wort kommt jetzt aus der
+     zentralen Kette (score-tiers.js), die Überschrift bleibt. */
   var verdict, headline;
-  if (score >= 85)      { headline = 'Solide Investition'; verdict = 'Sehr gut'; }
-  else if (score >= 70) { headline = 'Gute Bewertung';     verdict = 'Gut'; }
-  else if (score >= 50) { headline = 'Verhandeln';         verdict = 'Okay'; }
-  else                  { headline = 'Schwacher Deal';     verdict = 'Schwach'; }
+  var _st = (window.ScoreTier && typeof ScoreTier.stufe === 'function') ? ScoreTier.stufe(score) : null;
+  if (score >= 85)      { headline = 'Solide Investition'; }
+  else if (score >= 70) { headline = 'Gute Bewertung';     }
+  else if (score >= 50) { headline = 'Verhandeln';         }
+  else if (score >= 35) { headline = 'Schwacher Deal';     }
+  else                  { headline = 'Kritischer Deal';    }
+  verdict = _st ? _st.wort : (score >= 85 ? 'Top' : score >= 70 ? 'Gut' : score >= 50 ? 'Solide' : score >= 35 ? 'Schwach' : 'Kritisch');
 
   var strengthsText = '';
   if (result.positives && result.positives.length > 0) {

@@ -835,9 +835,12 @@ function bmfAusgabenZeigen() {
     +   '<button type="button" class="bmf-ausg" data-was="pdf">'
     +     '<span class="bmf-ausg-l">Kaufpreisaufteilung als PDF</span>'
     +     '<span class="bmf-ausg-s">Anlage für die Steuererklärung</span></button>'
+    +   '<button type="button" class="bmf-ausg" data-was="arbeitshilfe">'
+    +     '<span class="bmf-ausg-l">BMF-Arbeitshilfe als PDF</span>'
+    +     '<span class="bmf-ausg-s">Das ausgefüllte amtliche Formular</span></button>'
     +   '<button type="button" class="bmf-ausg" data-was="xlsx">'
-    +     '<span class="bmf-ausg-l">BMF-Vorlage als XLSX</span>'
-    +     '<span class="bmf-ausg-s">Die amtliche Arbeitshilfe, ausgefüllt</span></button>'
+    +     '<span class="bmf-ausg-l">BMF-Original als XLSX</span>'
+    +     '<span class="bmf-ausg-s">Die amtliche Arbeitshilfe (Juni 2023), ausgefüllt</span></button>'
     + '</div>';
   host.appendChild(box);
 
@@ -852,6 +855,14 @@ function bmfAusgabenZeigen() {
       } else if (was === 'xlsx') {
         if (typeof window.downloadXlsx === 'function') return window.downloadXlsx();
         if (typeof toast === 'function') toast('XLSX-Ausgabe nicht geladen.');
+      } else if (was === 'arbeitshilfe') {
+        /* v1859 · dieselbe Ausgabe wie der Knopf im Reiter Bodenwert
+           (bmf-bodenabschlag.js) — EIN Weg, kein Nachbau. Ist der Reiter
+           noch nicht gerendert, wird er geholt und der Knopf danach gedrückt. */
+        var k = document.getElementById('bmf-boden-arbeitshilfe');
+        if (k) return k.click();
+        if (typeof switchPane === 'function') switchPane('p-boden');
+        setTimeout(function () { var k2 = document.getElementById('bmf-boden-arbeitshilfe'); if (k2) k2.click(); else if (typeof toast === 'function') toast('Arbeitshilfe-PDF: bitte erst Reiter „Bodenwert" öffnen.'); }, 700);
       }
     } catch (err) {
       if (typeof toast === 'function') toast('Ausgabe fehlgeschlagen.');
@@ -1981,7 +1992,7 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=v1856', { cache: 'no-store' })
+  fetch('/js/bmf-modal-html.html?v=v1859', { cache: 'no-store' })
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
@@ -2198,7 +2209,7 @@ function _updateFooterNav(paneId){
   _show('btnBmfNext', !isLast);
   // Übernehmen + PDF: nur auf letzter Pane
   _show('btnBmfApply', isLast);
-  _show('btnBmfPdf', isLast);
+  _show('btnBmfPdf', false);   /* v1859: war derselbe Export wie „Kaufpreisaufteilung als PDF" — doppelt, bleibt aus */
   // Abbrechen: immer
   _show('btnBmfCancel', true);
 
