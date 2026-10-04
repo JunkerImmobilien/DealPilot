@@ -30747,3 +30747,68 @@ aktiv. Verkehrswert-Übernahme: 31 Berichte, Übernahme setzt 195.000 €
 weg.
 
 **Rest.** Prod v1846b; Staging v1860c.
+
+### (25) 04.10.2026 — v1861 bis v1862c: Score-Wörter, geführte Eingabe mit Eingabetiefe, Handy
+
+**Was.** Marcels Gesamtdurchgang: „das muss überall gleich sein",
+„Bitte geh die Geführte Eingabe durch … Ist das auch an die neuen Felder
+angepasst?", „läuft alles auf dem Handy und Tablet?".
+
+**Score-Wörter (v1861, `8e2de37`).** Gemessen: fünf Stellen führten eigene
+Wörter oder Schwellen — dashboard.js „Sehr gut", dealscore.js „Top Deal",
+dealscore2.js „Okay/Sehr gut", quick-check.js „Sehr gut", und das
+QuickBoarding-iframe rechnete mit **80/65** statt 85/70 (ein 82er hieß
+dort „Sehr gut", auf der Karte „GUT"). Alle lesen jetzt
+`ScoreTier.stufe()`; das iframe lädt score-tiers.js selbst. Nachweis:
+Karte 82 = GUT, Kopf = Gut, Kennzahlen 88 = TOP, Investor Deal Score 82 =
+Gut, Dashboard 72 = Gut (17 Karten), Score-Modal „Gesamt 72/100 · Gut",
+QuickBoarding 47 = Schwach, Kritisch unter 35.
+
+**Geführte Eingabe (v1862–v1862c).** Befund: sie kannte weder die
+Eingabetiefe (`dp_zielstufe`) noch `pflichtFuer()` — BGF, NHK-Typ,
+Nutzungsart, MEA, Standardstufe fragte kein Block, danach meldete der
+Pre-Flight-Schritt „Angaben fehlen". Ihre drei Abrufe bauten je eine
+Handliste (die neuen Felder reisten nie mit), die Wert-Schleife buchte
+Stufe 2 und versprach Stufe 3, und das Ergebnis erreichte die Karte nicht
+(bezahlt, Kette übersprungen, Karte leer). Dazu, erst im Live-Lauf
+sichtbar: die Wertermittlung stand HINTER dem Feinheiten-Angebot, dessen
+„Zur Übersicht" direkt zur Tabelle springt — das Angebot war für die
+meisten unerreichbar; „2. Stock" stand wörtlich im Zahlenfeld Etage; eine
+nackte „50" auf den Miteigentumsanteil kam als „nichts verstanden"
+zurück; die Wertermittlung zeigte „Sachwert – · Bodenwert –", weil der
+Bericht `cross_check.sachwert/bodenwert/ertragswert` als OBJEKTE führt
+(`value_eur`, `bodenwert.wert`, `restnutzungsdauer_jahre`,
+`ertragswert_kern.lzs.pct`) und der Dialog flache Zahlen las.
+Gebaut: `RFRAGEN_STUFE` (acht Frageformen; WAS Pflicht ist, sagt allein
+`pflichtFuer(stufe, art, garagen)`), Stufen-Schleife vor den Feinheiten,
+Auto-Start der Wertermittlung sobald die Stufe-3-Pflicht steht,
+`_rfObjektVoll()` = `DealPilotMB.inputs()` + Gesagtes für jeden Abruf,
+`_rfWertStufe()` bucht 3 wenn wev frei (sonst ehrlich 2), nackte Zahl auf
+ein einzelnes offenes Zahlenfeld ohne Modell, Zahlwort-Extraktion für
+inputmode=decimal, Labels aus `.f`, `DealPilotMB.uebernehmen()` +
+`dp:mb-ready` → Karte, Verkehrswert-Übernahme und Leiste.
+Nachweis (drei Live-Läufe, neues ETW Hüllhorst, Eingabetiefe Ausgiebig,
+Berichte 158–160 auf Staging): 14 Grundfragen, dann „Eingabetiefe
+Ausgiebig — noch 6 Angaben", Standardstufe/Etage/Nutzungsart/Grundstück/
+MEA/BGF; „2" und „50" in rund einer Sekunde im Feld; „Alles da … ich
+starte sie jetzt"; Ergebnis im Dialog: Bodenwert 42.750 €, vorläufiger
+Sachwert 83.720 € (Sachwertfaktor nicht abgeleitet — Minden-Lübbecke
+leitet ihn nur für Häuser ab), RND 16 von 80, Ertragswert 122.000 € bei
+2,2 %; Übersicht 12 Zeilen mit Marktwert 169.000 und Marktmiete 7,86;
+nach Übernahme `fehltFuer(3)` leer, Karte mit mw 169.000, Verkehrswert-
+Übernahme „Marktbericht 4.10.2026 · 169.000 €". Testobjekte gelöscht.
+
+**Handy/Tablet (v1862c).** Messkabine (iframe 390 × 844 in impressum.html):
+die Gewerke-Tabelle war 396 px breit, die Karte klippte bei 311 px — die
+Standardstufen-Spalte war abgeschnitten. Jetzt wischt sie unter 520 px.
+Alle Reiter (Objekt, Sanierung, Miete, Finanzierung, Bewirtschaftung,
+Steuern, Pilot-Analyse, Bewertung, Deal-Status) ohne Überlauf, Kopf und
+Reiterleiste passen. 820 px: sauber.
+
+**Register (gemessen).** Liegenschaftszins 14/16 Länder (BY fehlt),
+Sachwertfaktor 14/16 (HB, SL fehlen); 3 von 105 Quell-Links tot
+(Remscheid, Brandenburg GMB_LOS, Horb) — im Backlog N12.
+
+**Rest.** Prod v1846b; Staging v1862c (`b62ba81`). Offen klein:
+„KI-Lauf" statt „Stufe 3" in der Verkehrswert-Übernahme (ai_mode ist
+`openai`, Stufe nicht in der History-Antwort).

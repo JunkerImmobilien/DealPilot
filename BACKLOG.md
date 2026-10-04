@@ -265,6 +265,38 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N12 · Gesamtdurchgang: Score-Wörter, geführte Eingabe, Handy (04.10.2026) — erledigt v1861–v1862c
+
+Marcels Auftrag: „geh alles komplett nochmal durch … Bitte geh die Geführte
+Eingabe durch … Ist das auch an die neuen Felder angepasst? läuft alles auf
+dem Handy und Tablet? … warum steht beim dealscore jetzt sowas wie top oder
+solide? … das muss überall gleich sein."
+
+**Erledigt (Commits `8e2de37` v1861, `f5518ad` v1862, `63ac7f1` v1862a,
+`e91df24` v1862b, `2c51832`/`b62ba81` v1862c):**
+- Score-Wörter: EINE Kette (`score-tiers.js`, Top/Gut/Solide/Schwach/
+  Kritisch bei 85/70/50/35) in dashboard.js, dealscore.js, dealscore2.js,
+  quick-check.js und quickcheck-app.html (dort stand 80/65 „Sehr gut").
+- Geführte Eingabe kennt die Eingabetiefe: fragt die Pflicht der Stufe
+  (pflichtFuer), schickt das ganze Objekt (DealPilotMB.inputs), bucht die
+  Stufe, die sie verspricht, zeigt die echte Berichtsform, und das Ergebnis
+  landet auf der Karte und in der Verkehrswert-Übernahme (dp:mb-ready).
+- Handy 390 px: Gewerke-Tabelle wischt statt zu klippen; alle Reiter ohne
+  Überlauf. Tablet 820 px: sauber.
+
+**Offen, klein:**
+- Verkehrswert-Übernahme nennt Berichte aus dem Dialog „KI-Lauf" statt
+  „Stufe 2/3" — `ai_mode` ist für beide `openai`, die Stufe steht nicht in
+  der History-Antwort (`/marktbericht/objects/history`). Stufe in die
+  Antwort aufnehmen (MB-Backend, Rebuild) und `_stufeAus()` darauf lesen.
+- Register (gemessen 04.10.): Liegenschaftszins in 14 Ländern (BY fehlt),
+  Sachwertfaktor in 14 (HB und SL fehlen ganz). Lizenz fehlt bei BB-LZS
+  (14), BY-SWF (2), ST-LZS (1), NW-SWF (2); Vermerk fehlt NW-SWF (26).
+  Drei tote Quell-Links: Remscheid GMB 2025 (gars.nrw, 404), Brandenburg
+  GMB_LOS.pdf (404), Horb id=4870 (404). gag.niedersachsen.de antwortet
+  auf HEAD mit 400, GET 200 — kein Fehler.
+- Prod steht auf v1846b; Freigabe für den Block v1849–v1862c offen.
+
 ### N11 · Kopf-Score, Kaufpreisaufteilung, Rundgang (04.10.2026) — erledigt v1859b
 
 Score-Wort aus der zentralen Kette (`ScoreTier.stufe`, fünf Stufen) und
