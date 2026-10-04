@@ -820,8 +820,10 @@ function _mockupRenderBmfResult(r, demoLabel){
   try { bmfAusgabenZeigen(); } catch (e) {}
 }
 
-function bmfAusgabenZeigen() {
-  var host = document.getElementById('bmfResult');
+function bmfAusgabenZeigen(hostEl) {
+  /* v1859: Host kann uebergeben werden — die v292-Schicht rendert Reiter 2
+     selbst und verdeckt #bmfResult; der Block gehoert unter IHR Ergebnis. */
+  var host = (hostEl && hostEl.nodeType === 1) ? hostEl : document.getElementById('bmfResult');
   if (!host) return;
   var alt = document.getElementById('bmf-ausgaben');
   if (alt) alt.remove();

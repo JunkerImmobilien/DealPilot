@@ -433,6 +433,11 @@
           + 'border-radius:8px;font-size:12.5px;line-height:1.55;color:#2A2727;background:#FFFFFF';
         if (elHint && elHint.parentNode) elHint.parentNode.insertBefore(host, elHint.nextSibling);
       }
+      /* v1859 · Marcel: „Kaufpreisaufteilung als PDF … BMF-Arbeitshilfe als
+         PDF … die Originalvorlage als Excel" — der Ausgabe-Block hängt hier
+         unter dem Ergebnis, nicht nur im alten, von dieser Schicht
+         verdeckten Render (gemessen: #bmf-ausgaben fehlte in Reiter 2). */
+      try { if (window.bmfAusgabenZeigen && host.parentNode) bmfAusgabenZeigen(host.parentNode); } catch (e) {}
       if (!jz) { host.style.display = 'none'; return; }
       host.style.display = '';
       var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
