@@ -30701,3 +30701,49 @@ mit drei Knöpfen in `p-bmf` über denselben Host), der Aufruf steht im
 Code. Marcel sieht es beim nächsten Öffnen.
 
 **Rest.** Prod v1846b; Staging v1859b.
+
+## Rollout-Journal 04.10.2026 (24) — v1860–v1860c: der Rechenlauf hing an den falschen Reitern, RND-Assistent komplett vorbelegt
+
+Marcel: *„du kannst jetzt wieder testen, ich habe den tab vorgeholt. lass
+dir zeit und teste alles genau durch."* Sichtbarer Tab, Hermannstraße.
+
+**Befund 1 — BMF: „Weiter" nach Reiter 1 rechnete nichts.** 26 s im
+sichtbaren Tab ohne Antwort; `_BMF_BRAUCHT_ERGEBNIS = ['p-afa','p-hebel']`
+— der Ergebnis-Reiter selbst stand nicht drin, nur AfA und Hebel lösten
+den Lauf aus. Kontrollmessung: Klick auf AfA → Lauf in 5 s, danach
+Ausgabe-Block und Jacoby in Reiter 2. **Das war Marcels „lädt sehr lange /
+zeigt Altes".** `p-bmf` ergänzt (`919cfb8`). Nachweis nach Neuladen:
+Reiter 1 → „Weiter" → 5 s → Gebäudeanteil 77,29 %, Ausgabe-Block (pdf ·
+arbeitshilfe · xlsx), Jacoby-Zeile.
+
+**Befund 2 — zwei verschiedene „Kaufpreisaufteilung als PDF".** Reiter 2
+lief auf `exportBmfPdf` (pdf-anlage-bmf.js): Datei
+`BMF_Anlage_Finanzamt_____2026-10-04.pdf`, 2 Seiten — die Adressfelder
+`ak_str/ak_plz/ak_ort`, die es liest, gibt es in der Vorlage nicht. Die
+letzte Seite lief auf `exportPDFKaufpreisaufteilung`
+(pdf-kaufpreisaufteilung.js): `Kaufpreisaufteilung_Hermannstrasse_9_…`,
+3 Seiten, mit Abschnitt „Anschaffungskosten". Marcel: „das ist das
+Genaue." Reiter 2 nimmt jetzt dasselbe (`18e4dbd`). Nachweis: 3 Seiten,
+Adresse im Namen. Arbeitshilfe-PDF und Original-XLSX aus Reiter 2 und
+von der letzten Seite als Download abgefangen.
+
+**Befund 3 — RND-Assistent blockierte in Schritt 3 und 4.** „Weiter"
+ging nicht weiter: Bedachung, Fenster, Heizungsart (Schritt 3) und
+Brennstoff, Warmwasser (Schritt 4) waren Pflicht und leer — die
+Energieklasse hieß im Wizard `energieklasse`, nicht `ds2_energie`.
+`_getRndPrefill()` übersetzt jetzt aus dem Objekt: eq_roof → Bedachung
+(Schiefer/Metall/Flachdach/Satteldach mit Tonziegeln), eq_windows →
+Verglasung (Rahmen Kunststoff als häufigster Fall), eq_heating →
+Gas-Zentral/Brennwert, Brennstoff Erdgas, Warmwasser zentral — als
+**Vorschlag sichtbar**, nicht als Befund; bad_anz, ds2_energie.
+Nachweis (`f24bf51`): Schritt 1–6 ohne Halt; Schritt 5 trägt die acht
+Modernisierungen aus dem Objekt (Dach 5–10 J., Fenster < 5 J., Leitungen
+Kernsanierung …). Klick aufs Overlay → Fenster bleibt.
+
+**Weitere Nachweise.** Pre-Flight-Pille „2" → Eingabetiefe 2, Mittel
+aktiv. Verkehrswert-Übernahme: 31 Berichte, Übernahme setzt 195.000 €
+(Stufe 1, 04.10.), danach zurückgesetzt. Hover-Hilfe im Bild (Wohnfläche
+§ WoFlV). Kopf „85 TOP" grün. Fuß-Knopf „PDF-Anlage" weg, Belege-Knopf
+weg.
+
+**Rest.** Prod v1846b; Staging v1860c.
