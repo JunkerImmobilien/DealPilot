@@ -90,11 +90,15 @@
   /* ── Tier-Logik (1:1 wie DESIGN-DECISIONS) ── */
   function tierOf(score){
     if(score==null) return {t:'na', l:'–', col:'var(--dp-muted)'};
+    /* v1861 · Marcel: „das muss überall gleich sein." Das Wort kommt aus der
+       EINEN Kette (score-tiers.js: Top · Gut · Solide · Schwach · Kritisch),
+       nicht mehr aus einer eigenen Liste je Anzeige. */
     var _k=(window.ScoreTier?window.ScoreTier.classify(score):(score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
-    if(_k==='top') return {t:'top', l:'Sehr gut', col:'var(--dp-green)'};
-    if(_k==='green') return {t:'hi',  l:'Gut',      col:'var(--dp-green)'};
-    if(_k==='gold') return {t:'mid', l:'Solide',   col:'var(--dp-gold)'};
-    return {t:'lo', l:'Schwach', col:'var(--dp-red)'};
+    var _w=(window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(score).wort:null;
+    if(_k==='top') return {t:'top', l:_w||'Top', col:'var(--dp-green)'};
+    if(_k==='green') return {t:'hi',  l:_w||'Gut',      col:'var(--dp-green)'};
+    if(_k==='gold') return {t:'mid', l:_w||'Solide',   col:'var(--dp-gold)'};
+    return {t:'lo', l:_w||'Schwach', col:'var(--dp-red)'};
   }
   function catBarColor(s){ return s>=70?'var(--dp-green)':s>=50?'var(--dp-gold)':'var(--dp-red)'; }
   function _dl(){return '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>';}
@@ -2207,7 +2211,8 @@
     var totalKpi=0; Object.keys(meta).forEach(function(k){ totalKpi+=meta[k].count||0; });
     var total=(ag && ag.total!=null)?ag.total:null;
     var tcol=total==null?'var(--dp-gold)':(total>=70?'#3FA56C':total>=50?'var(--wl-c9a84c, #C9A84C)':'#B86250');
-    var tlab=total==null?'\u2013':(total>=85?'Sehr gut':total>=70?'Gut':total>=50?'Solide':'Schwach');
+    /* v1861: ein Wort, eine Kette (score-tiers.js) */
+    var tlab=total==null?'\u2013':((window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(total).wort:(total>=85?'Top':total>=70?'Gut':total>=50?'Solide':total>=35?'Schwach':'Kritisch'));
     var head='<div class="dp-sd-total">Gesamt <b style="color:'+tcol+'">'+(total==null?'\u2013':total)+'/100</b> \u00b7 '+tlab
       +' \u2014 gewichteter Durchschnitt \u00fcber alle Kategorien und '+totalKpi+' KPIs</div>';
     var rows=(cats||[]).map(function(c){

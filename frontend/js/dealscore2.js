@@ -673,10 +673,12 @@ window.DealScore2 = (function() {
     // Ampel-Logik
     var label, color;
     var _k = (window.ScoreTier ? window.ScoreTier.classify(totalScore) : (totalScore>=85?'top':totalScore>=70?'green':totalScore>=50?'gold':'red'));
-    if (_k === 'red')        { label = 'Schwach';  color = 'red'; }
-    else if (_k === 'gold')  { label = 'Okay';     color = 'gold'; }
+    // v1861: Wort aus EINER Kette (score-tiers.js) - Top/Gut/Solide/Schwach/Kritisch
+    if (_k === 'red')        { label = (totalScore >= 35 ? 'Schwach' : 'Kritisch'); color = 'red'; }
+    else if (_k === 'gold')  { label = 'Solide';   color = 'gold'; }
     else if (_k === 'green') { label = 'Gut';      color = 'green'; }
-    else                     { label = 'Sehr gut'; color = 'green-strong'; }
+    else                     { label = 'Top';      color = 'green-strong'; }
+    if (window.ScoreTier && window.ScoreTier.stufe) label = window.ScoreTier.stufe(totalScore).wort;
 
     // Top 3 positive + top 3 negative Sub-KPIs (über alle Kategorien) sammeln
     var allKpis = [];

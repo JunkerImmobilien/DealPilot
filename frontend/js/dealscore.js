@@ -196,11 +196,13 @@ var DealScore = (function() {
     //   ≥65 → grün "Gut"
     //   ≥50 → gold "Solide"
     //   <50 → rot "Schwach"
+    // v1861: Wort und Farbe aus EINER Kette (score-tiers.js) - Top/Gut/Solide/Schwach/Kritisch
     var _k = (window.ScoreTier ? window.ScoreTier.classify(score) : (score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
-    if (_k === 'top')        { color = 'green'; label = 'Top Deal'; }
+    if (_k === 'top')        { color = 'green'; label = 'Top'; }
     else if (_k === 'green') { color = 'green'; label = 'Gut'; }
     else if (_k === 'gold')  { color = 'gold';  label = 'Solide'; }
-    else                     { color = 'red';   label = 'Schwach'; }
+    else                     { color = 'red';   label = (score >= 35 ? 'Schwach' : 'Kritisch'); }
+    if (window.ScoreTier && window.ScoreTier.stufe) label = window.ScoreTier.stufe(score).wort;
 
     return {
       score: score,
@@ -332,8 +334,8 @@ function _dsIconFor(label) {
 
 // Top-Deal-Badge je nach Score-Stufe
 function _dsBadgeFor(label, color) {
-  if (label === 'Top Deal' || label === 'TOP DEAL') {
-    return { icon: _DS_ICONS.trophy, label: 'TOP DEAL', class: 'ds-badge-top' };
+  if (label === 'Top' || label === 'TOP' || label === 'Top Deal' || label === 'TOP DEAL') {
+    return { icon: _DS_ICONS.trophy, label: 'TOP', class: 'ds-badge-top' }; /* v1861: ein Wort */
   }
   if (color === 'green') return { icon: _DS_ICONS.trendingUp, label: label.toUpperCase(), class: 'ds-badge-green' };
   if (color === 'gold')  return { icon: _DS_ICONS.scale,      label: label.toUpperCase(), class: 'ds-badge-gold' };

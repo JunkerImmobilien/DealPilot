@@ -3897,8 +3897,14 @@ const QcEngine = (function() {
     } else {
       score = Math.round(sRendite*0.30 + sCashflow*0.25 + sSicherheit*0.20 + sFinanz*0.15 + sEffizienz*0.10);
     }
-    const tier = score >= 80 ? 'green-strong' : score >= 65 ? 'green' : score >= 50 ? 'gold' : 'red';
-    const label = score >= 80 ? 'Sehr gut' : score >= 65 ? 'Gut' : score >= 50 ? 'Solide' : 'Schwach';
+    /* v1861: dieselbe Kette wie die Haupt-App (js/score-tiers.js): 85 / 70 / 50 / 35.
+       Hier stand bis v1860c 80 / 65 mit "Sehr gut" - ein 82er hiess im Boarding
+       "Sehr gut" und auf der Karte "GUT". */
+    const _st = (window.ScoreTier && window.ScoreTier.stufe) ? window.ScoreTier.stufe(score) : null;
+    const tier = _st ? (_st.farbe === 'top' ? 'green-strong' : _st.farbe)
+               : (score >= 85 ? 'green-strong' : score >= 70 ? 'green' : score >= 50 ? 'gold' : 'red');
+    const label = _st ? _st.wort
+               : (score >= 85 ? 'Top' : score >= 70 ? 'Gut' : score >= 50 ? 'Solide' : score >= 35 ? 'Schwach' : 'Kritisch');
 
     return {
       score, tier, label,
@@ -6278,7 +6284,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
   <script src="js/dscr-engine.js?v=969n"></script>
   <script src="js/deal-kpis.js?v=969n"></script>
-  <script src="js/dealscore.js?v=969n"></script>
+  <script src="js/score-tiers.js?v=v1861"></script>
+  <script src="js/dealscore.js?v=v1861"></script>
   <script src="js/avm-section.js?v=W33"></script>
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
      kommt hier nicht rein. Deshalb laedt der iframe die Override-Ebene selbst

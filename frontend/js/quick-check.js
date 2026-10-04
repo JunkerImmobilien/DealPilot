@@ -615,10 +615,12 @@
 
     var tag, cls, ringColor;
     var _k = (window.ScoreTier ? window.ScoreTier.classify(score) : (score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
-    if (_k === 'top')        { tag = 'Sehr gut'; cls = 'ds-score-green-strong'; ringColor = '#10A65C'; }
+    /* v1861: Wort aus EINER Kette (score-tiers.js) */
+    if (_k === 'top')        { tag = 'Top';      cls = 'ds-score-green-strong'; ringColor = '#10A65C'; }
     else if (_k === 'green') { tag = 'Gut';      cls = 'ds-score-green';        ringColor = '#2FBE6E'; }
     else if (_k === 'gold')  { tag = 'Solide';   cls = 'ds-score-gold';         ringColor = '#E5BD53'; }
-    else                     { tag = 'Schwach';  cls = 'ds-score-red';          ringColor = '#D55B5B'; }
+    else                     { tag = (score >= 35 ? 'Schwach' : 'Kritisch'); cls = 'ds-score-red'; ringColor = '#D55B5B'; }
+    if (window.ScoreTier && window.ScoreTier.stufe) tag = window.ScoreTier.stufe(score).wort;
 
     if (scoreVal) scoreVal.textContent = score;
     if (scoreTag) {
