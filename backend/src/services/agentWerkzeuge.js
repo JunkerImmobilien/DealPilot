@@ -145,6 +145,84 @@ async function objekt_lesen(ctx, args) {
  * sondern die Abschnitte, die auch die Pilot-Analyse zeigt: Briefing,
  * Stärken, Risiken, Risikoanalyse, Lage, Verhandlung, Bank. Fehlt eine
  * Analyse, steht das da — mit dem Weg dorthin, nicht mit einer Erfindung. */
+/* ═══ v1853 · N8 · Der Bankexport über den Bot ═══════════════════════════
+ * Marcel: „der bankexport soll auch über den bot abgefragt werden können.
+ * So kann man schnell eine übersicht bekommen."
+ *
+ * Der Bankexport der App ist eine Tabelle, EINE ZEILE JE DARLEHEN
+ * (calc.js renderBankTable): Adresse, Art, m², Miete, Bank, Darlehensart,
+ * Finanzierungsdatum, Vertragsnr., Summe, Zins, Tilgung, Rate, Bindung,
+ * Restschuld. Hier dasselbe aus zwei Quellen, ohne Nachbau:
+ *   · die EINGABEN aus objects.data (Bank, Vertrag, Summe, Zins, Tilgung,
+ *     Bindung, Daten) — je Darlehen d1/d2;
+ *   · die GERECHNETEN Groessen aus dem Portfolio-Spiegel (Restschuld, Zins-
+ *     und Tilgungsbetrag je Jahr, Bindung bis) — je Objekt, gerechnet im
+ *     Browser. Fehlt der Spiegel, fehlen diese Spalten, und das steht da.
+ * Nichts wird hier gerechnet. Stufe `lesen`, kostet nichts. */
+async function bank_uebersicht(ctx, args) {
+  const r = await query(
+    `SELECT id, name, data FROM objects WHERE user_id = $1 ORDER BY seq_no NULLS LAST, created_at`,
+    [ctx.userId]);
+  const sp = await dialog.portfolioKontext(ctx.userId);
+  const spiegel = {};
+  if (sp && sp.payload && Array.isArray(sp.payload.objekte)) sp.payload.objekte.forEach((o) => { if (o && o.id) spiegel[String(o.id)] = o; });
+  const num = (v) => { if (v == null || v === '') return null; const n = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) ? n : null; };
+  const dez = (v) => { if (v == null || v === '') return null; const n = parseFloat(String(v).replace(',', '.')); return Number.isFinite(n) ? n : null; };
+  const eur = (n) => n == null ? '—' : Math.round(n).toLocaleString('de-DE') + ' EUR';
+  const pct = (n) => n == null ? '—' : n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
+  const zeilen = [], text = [];
+  let nr = 0;
+  const filter = args && args.adresse ? _flach(String(args.adresse)) : null;
+  r.rows.forEach((o) => {
+    let d = {}; try { d = typeof o.data === 'string' ? JSON.parse(o.data) : (o.data || {}); } catch (e) { d = {}; }
+    const adresse = [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + [d.plz, d.ort].filter(Boolean).join(' ') : '');
+    if (filter && !_flach(adresse + ' ' + (o.name || '')).includes(filter)) return;
+    const s = spiegel[String(o.id)] || null;
+    [['d1', 'I'], ['d2', 'II']].forEach(([k, roem]) => {
+      const summe = num(d[k]);
+      if (!(summe > 0)) return;
+      nr++;
+      const art = (d[k + '_type'] === 'tilgungsaussetzung' ? 'Tilgungsaussetzungsdarlehen' : 'Annuitätendarlehen') + ' ' + roem;
+      const z = {
+        nr, objekt_id: o.id, adresse, objektart: d.objart || null, wohnflaeche_qm: num(d.wfl),
+        bank: d.bank_inst || null, darlehensart: art, vertragsnummer: d[k + '_vertrag'] || null,
+        vertragsdatum: d[k + '_vertragsdatum'] || null, auszahlung: d[k + '_auszahl'] || null, kaufdatum: d.kaufdat || null,
+        summe_eur: summe, zins_pct: dez(d[k + 'z']), tilgung_pct: dez(d[k + 't']), bindung_jahre: num(d[k + '_bindj']),
+        nkm_monat_eur: s && Number.isFinite(Number(s.miete_kalt_eur_jahr)) ? Math.round(Number(s.miete_kalt_eur_jahr) / 12) : (num(d.nkm) || null),
+        restschuld_eur: s && Number.isFinite(Number(s.restschuld_eur)) ? Number(s.restschuld_eur) : null,
+        rate_monat_eur: s && Number.isFinite(Number(s.zins_eur_jahr)) && Number.isFinite(Number(s.tilgung_eur_jahr))
+          ? Math.round((Number(s.zins_eur_jahr) + Number(s.tilgung_eur_jahr)) / 12) : null,
+        zinsbindung_bis: s && s.zinsbindung_bis ? s.zinsbindung_bis : null,
+        spiegel_vorhanden: !!s
+      };
+      zeilen.push(z);
+      text.push(nr + ' · ' + adresse + (z.objektart ? ' (' + z.objektart + ')' : '') + ' · ' + (z.bank || 'Bank —') + ' · ' + art
+        + ' ' + eur(summe) + ' · Zins ' + pct(z.zins_pct) + ' / Tilgung ' + pct(z.tilgung_pct)
+        + (z.bindung_jahre ? ' · Bindung ' + z.bindung_jahre + ' J.' + (z.zinsbindung_bis ? ' bis ' + z.zinsbindung_bis : '') : '')
+        + (z.vertragsnummer ? ' · Vertrag ' + z.vertragsnummer + (z.vertragsdatum ? ' (' + z.vertragsdatum + ')' : '') : ' · ohne Vertragsnummer')
+        + (z.restschuld_eur != null ? ' · Restschuld ' + eur(z.restschuld_eur) : '')
+        + (z.rate_monat_eur != null ? ' · Rate ' + eur(z.rate_monat_eur) + '/Monat' : ''));
+    });
+  });
+  if (!zeilen.length) {
+    return { anzahl: 0, so_sagen: filter
+      ? 'Zu „' + args.adresse + '" finde ich kein Objekt mit Darlehen.'
+      : 'Es ist noch kein Darlehen eingetragen — die Bankübersicht entsteht aus den Finanzierungsfeldern der Objekte (Reiter Finanzierung).' };
+  }
+  const ohneSpiegel = zeilen.filter((z) => !z.spiegel_vorhanden).length;
+  return {
+    anzahl: zeilen.length,
+    stand: sp ? dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem) : null,
+    so_schreiben: text,
+    hinweis: 'Eine Zeile je Darlehen, wie der Bankexport in DealPilot. Betraege in "so_schreiben" '
+      + 'sind fertig formatiert - nimm sie unveraendert. Eingaben (Bank, Vertrag, Summe, Zins, Tilgung, Bindung) '
+      + 'stammen aus dem Objekt; Restschuld, Rate und "Bindung bis" aus dem Portfolio-Stand, gerechnet in DealPilot'
+      + (ohneSpiegel ? '. ' + ohneSpiegel + ' Zeile(n) haben keinen Portfolio-Stand - dort fehlen Restschuld und Rate, erfinde sie nicht.' : '.'),
+    so_sagen: ohneSpiegel && !sp ? 'Es liegt kein Portfolio-Stand vor — Restschuld und Rate kann ich erst nennen, wenn DealPilot einmal geöffnet wurde.' : undefined,
+    zeilen
+  };
+}
+
 async function pilot_analyse_lesen(ctx, args) {
   const id = await _findeObjekt(ctx, args);
   if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
@@ -2309,6 +2387,17 @@ const WERKZEUGE = [
     beschreibung: 'Alle Objekte des Nutzers mit Nummer, Adresse, Kaufpreis und Scores. '
       + 'Die Nummer ist die, auf die sich der Nutzer spaeter bezieht.',
     parameter: { type: 'object', properties: {}, additionalProperties: false } },
+
+  /* v1853 · N8 · Der Bankexport als Uebersicht — eine Zeile je Darlehen. */
+  { name: 'bank_uebersicht', stufe: 'lesen', fn: bank_uebersicht,
+    beschreibung: 'Die Bankuebersicht (Bankexport) ueber alle Objekte oder EIN Objekt: je Darlehen '
+      + 'Adresse, Bank, Darlehensart, Summe, Zins, Tilgung, Zinsbindung, Vertragsnummer und '
+      + '-datum, Restschuld und Rate. Nutze es, wenn nach Bankexport, Darlehensuebersicht, '
+      + 'Finanzierungsuebersicht, Restschulden, Zinsbindungen oder Vertragsnummern gefragt wird. '
+      + 'Kostet nichts; rechnet nichts. Gib "so_schreiben" zeilenweise wieder.',
+    parameter: { type: 'object', properties: {
+      adresse: { type: 'string', description: 'Optional: nur dieses Objekt (Adresse oder Teil davon)' }
+    }, additionalProperties: false } },
 
   /* v1847 · Die Pilot-Analyse — gerechnet im Browser, gelesen vom Bot. */
   { name: 'pilot_analyse_lesen', stufe: 'lesen', fn: pilot_analyse_lesen,
