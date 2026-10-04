@@ -190,6 +190,42 @@
     setTimeout(anwenden, 900);
     setTimeout(anwenden, 2200);
   }
+
+  /* ── v1840 · DAS MODUL LIEF, ABER NICHT BEIM OBJEKTWECHSEL ──────────────
+   *
+   * Marcel am 04.10.2026: „beim Mehrfamilienhaus fragen wir nach Bad. Und
+   * dann ein Bad, mehr als ein Bad. Na ja, beim Mehrfamilienhaus ist das
+   * klar, dass wir mehrere Badezimmer haben."
+   *
+   * GEMESSEN an Lindenhof 14 (MFH): `bad_anz` und `zimmer` standen
+   * unmarkiert im Formular, ohne jede `dp-oa-`Klasse. Nach einem
+   * HÄNDISCHEN `anwenden()` war alles richtig:
+   *
+   *     bad_anz   dp-oa-aus   „passt nicht zu dieser Objektart —
+   *                            gilt für eine einzelne Wohnung"
+   *     zimmer    dp-oa-aus   dito
+   *     etage     dp-oa-leer  ausgeblendet (leer)
+   *     einheiten normal
+   *
+   * Die Typlogik ist also vollständig und richtig — sie wurde beim
+   * Objektwechsel nur nicht gerufen. `boot()` legt zwei Zeitzünder (900
+   * und 2200 ms) und das war es; danach lief sie nur noch, wenn der
+   * Nutzer die Objektart SELBST umstellte.
+   *
+   *   > Zwei Zeitzünder beim Start sind keine Verdrahtung. Sie treffen
+   *   > das erste Objekt und keines danach.
+   *
+   * Das ist derselbe Fehler, der am selben Tag den BORIS-Knopf bei jedem
+   * Objekt grau ließ (v1835) — und dieselbe Lösung: `dp:object-ready`
+   * feuert bei jedem Objektwechsel (storage.js:206) und wird seither
+   * auch hier gehört.
+   *
+   * Der kleine Verzug ist Absicht: `loadData()` setzt die Felder, und
+   * `anwenden()` liest sie. Erst wenn alles steht, stimmt das Bild. */
+  global.addEventListener('dp:object-ready', function () {
+    setTimeout(anwenden, 120);
+    setTimeout(anwenden, 700);
+  });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
