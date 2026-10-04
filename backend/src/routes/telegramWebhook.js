@@ -683,36 +683,82 @@ async function beantworten(token, chatId, userId, text, msg) {
 
     const z0 = await zustand(chatId, userId);
     const entwurf = (z0 && z0.modus && z0.entwurf) || {};
-    try {
-      const r = await voiceExtract.extractFromAudio(b64, mime, fuehrung.katalog(), {
-        apiKey: config.openai.apiKey, kontext: entwurf
-      });
-      const felder = (r && r.fields) || {};
-      const gehoert = (r && r.transcript) || '';
 
-      if (!Object.keys(felder).length) {
-        await senden(token, chatId,
-          (gehoert ? 'Verstanden habe ich: _' + gehoert.slice(0, 300) + '_\n\n' : '')
-          + 'Daraus konnte ich kein Feld lesen. Sag gern Adresse, Fläche, '
-          + 'Baujahr und Kaufpreis dazu.');
-        return;
+    /* ── v1818 · LÄUFT EINE ANLAGE? Dann ist die Absicht geklärt ────────
+     *
+     * Nur in diesem Fall geht die Sprachnachricht direkt in den
+     * Feld-Extraktor: der Zustand sagt, dass gerade ein Objekt entsteht,
+     * und das Diktat ist die nächste Angabe dazu. */
+    if (z0 && z0.modus === 'anlegen') {
+      try {
+        const r = await voiceExtract.extractFromAudio(b64, mime, fuehrung.katalog(), {
+          apiKey: config.openai.apiKey, kontext: entwurf
+        });
+        const felder = (r && r.fields) || {};
+        const gehoert = (r && r.transcript) || '';
+        if (gehoert) await senden(token, chatId, 'Verstanden: _' + gehoert.slice(0, 400) + '_');
+        if (!Object.keys(felder).length) {
+          await senden(token, chatId,
+            'Daraus konnte ich kein Feld lesen. Sag gern Adresse, Fläche, '
+            + 'Baujahr und Kaufpreis dazu — oder schreib *abbrechen*.');
+          return;
+        }
+        await aufnehmenFelder(token, chatId, userId, felder, entwurf);
+      } catch (e) {
+        await senden(token, chatId, 'Beim Auswerten ist etwas schiefgegangen: ' + (e.message || e));
       }
-
-      /* Laeuft keine Anlage, wird eine angefangen: eine Sprachnachricht mit
-         Objektdaten IST der Wunsch, eines anzulegen. */
-      if (!z0 || !z0.modus) {
-        await senden(token, chatId,
-          (gehoert ? 'Verstanden: _' + gehoert.slice(0, 400) + '_\n\n' : '')
-          + '*Ich lege daraus ein Objekt an.*');
-        await zustandSetzen(chatId, userId, { modus: 'anlegen', entwurf: {} });
-      } else if (gehoert) {
-        await senden(token, chatId, 'Verstanden: _' + gehoert.slice(0, 400) + '_');
-      }
-      await aufnehmenFelder(token, chatId, userId, felder, entwurf);
-    } catch (e) {
-      await senden(token, chatId, 'Beim Auswerten ist etwas schiefgegangen: ' + (e.message || e));
+      return;
     }
-    return;
+
+    /* ── v1818 · SONST: TRANSKRIBIEREN UND WIE TEXT BEHANDELN ───────────
+     *
+     * Marcel am 04.10.2026: "Ich sage dem Bot, wie viele Objekte habe ich
+     * im Portfolio und er antwortet ständig, daraus konnte ich kein Feld
+     * lesen, sag gerne Adresse, Fläche, Baujahr und Kaufpreis dazu."
+     *
+     * Hier stand: jede Sprachnachricht geht in den Feld-Extraktor. Der
+     * Kommentar daneben nannte die Fehlannahme selbst — "eine
+     * Sprachnachricht mit Objektdaten IST der Wunsch, eines anzulegen".
+     * Mit Objektdaten, ja. Aber das stand nicht in der Bedingung; dort
+     * stand nur "ist Audio". Marcel diktiert, also traf es ihn bei JEDER
+     * Frage.
+     *
+     *   > Der Kanal sagt nichts über die Absicht. Wer aus "das kam als
+     *   > Sprachnachricht" schließt "das soll ein Objekt werden", hat die
+     *   > Frage nie gelesen.
+     *
+     * UND DER AGENT HAT DIESE NACHRICHTEN NIE GESEHEN. Es war gleichgültig,
+     * wie gut er wurde — der Pfad davor nahm sie ihm weg.
+     *
+     *   > Ein Schnellpfad, der vor dem Verstehen entscheidet, macht jedes
+     *   > Verstehen danach wertlos.
+     *
+     * Jetzt wird nur TRANSKRIBIERT. Danach läuft das Transkript durch
+     * dieselbe Funktion wie getippter Text: derselbe Agent, dieselben
+     * Werkzeuge, dieselben Schnellpfade. Eine Frage wird beantwortet,
+     * Objektdaten werden angelegt — die Absicht erkennt der Agent, nicht
+     * der Kanal.
+     *
+     * Der rekursive Aufruf kann nicht kreisen: voice und audio sind
+     * entfernt, die Nachricht ist von hier an eine Textnachricht. */
+    let gehoert = '';
+    try {
+      gehoert = await voiceExtract.transcribe(
+        Buffer.from(b64, 'base64'), mime, config.openai.apiKey);
+    } catch (e) {
+      await senden(token, chatId, 'Ich konnte die Aufnahme nicht verstehen: '
+        + (e.message || e) + ' Schreib es mir gern.');
+      return;
+    }
+    gehoert = String(gehoert || '').trim();
+    if (!gehoert) {
+      await senden(token, chatId, 'Da war nichts zu hören. Sprich gern noch einmal '
+        + '— oder schreib es mir.');
+      return;
+    }
+    await senden(token, chatId, 'Verstanden: _' + gehoert.slice(0, 400) + '_');
+    return beantworten(token, chatId, userId, gehoert,
+      Object.assign({}, msg, { text: gehoert, voice: null, audio: null }));
   }
   /* ── Foto ─────────────────────────────────────────────────────────────
    *
