@@ -140,7 +140,10 @@
     
     var plz = _val('plz');
     var ort = _val('ort');
-    var str = _val('str');
+    /* v1836 · Mit Hausnummer, aus demselben Grund wie in fetchBoris:
+       eine Strasse laeuft durch mehrere Bodenrichtwertzonen, und die
+       KI-Schaetzung soll fuer das HAUS gelten, nicht fuer die Strasse. */
+    var str = [_val('str'), _val('hnr')].filter(Boolean).join(' ');
     
     if (!plz || !ort) {
       _setStatus('⚠ Erst PLZ + Ort eingeben', 'err');
@@ -503,7 +506,32 @@
 
   async function fetchBoris() {
     var btn = _el('brw-boris-btn');
-    var plz = _val('plz'), ort = _val('ort'), str = _val('str');
+    /* ── v1836 · DIE HAUSNUMMER FEHLTE ───────────────────────────────────
+     *
+     * Hier stand `var str = _val('str')` — nur der Straßenname, ohne
+     * `hnr`. Der Abruf geokodierte damit DIE STRASSE statt DES HAUSES.
+     *
+     * GEMESSEN am 04.10.2026 an Bismarckstr. 27, 32756 Detmold:
+     *
+     *     ohne Hausnummer   Zone 2160145   900 €/m²
+     *     mit Hausnummer    Zone 2160138   700 €/m²
+     *
+     * 28 Prozent Unterschied, und niemand hätte es bemerkt: beide Werte
+     * sind plausibel, beide kommen mit Stichtag und Zonennummer, beide
+     * tragen „BORIS-NRW" als Quelle.
+     *
+     *   > Eine Straße ist kein Ort. Sie läuft durch mehrere
+     *   > Bodenrichtwertzonen, und welche der Abruf trifft, entscheidet
+     *   > dann der Zufall des Geocoders.
+     *
+     * Das wirkt auf Bodenwert, Sachwert, Kaufpreisaufteilung und die
+     * AfA-Bemessungsgrundlage — überall dort, wo der Bodenrichtwert
+     * eingeht.
+     *
+     * Die Hausnummer ist nicht Pflicht: fehlt sie, bleibt es beim alten
+     * Verhalten, und das ist immer noch besser als kein Wert. */
+    var plz = _val('plz'), ort = _val('ort');
+    var str = [_val('str'), _val('hnr')].filter(Boolean).join(' ');
     if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">⏳</span> BORIS …'; }
     _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
