@@ -1061,7 +1061,10 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     try {
       const r = GAA.sachwertfaktor({ ags: String(ags), objektart: m.property_type, sachwert_eur: null,
                                      baujahr: m.build_year, rnd_jahre: rndJ });
-      swfQuelle = r ? { verfuegbar: !!r.verfuegbar || !!r.ausschuss || r.grund !== 'kein_ausschuss_hinterlegt',
+      /* Gemessen an Huellhorst/ETW: ohne Sachwert kommt `objektart_nicht_abgeleitet`
+         mit ausschuss null zurueck — das ist KEINE Tabelle. Verfuegbar heisst:
+         der Leser nennt einen Ausschuss oder sagt selbst verfuegbar. */
+      swfQuelle = r ? { verfuegbar: !!r.verfuegbar || !!r.ausschuss,
                         ausschuss: r.ausschuss || null, grund: r.grund || null, hinweis: r.hinweis || null,
                         quelle: r.quelle || null, quelle_url: r.quelle_url || null, jahrgang: r.berichtsjahr || r.jahrgang || null }
                     : null;

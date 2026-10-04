@@ -241,7 +241,16 @@
       var el = $(id); if (el) el.addEventListener('change', function () { spaeter(automatik, 100); });
     });
     ['makrolage', 'mikrolage', 'ds2_bevoelkerung', 'ds2_nachfrage'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('change', function () { spaeter(lageVergleich, 100); }); });
-    document.addEventListener('dp:object-ready', function () { setTimeout(function () { alles(); stufen(); }, 80); });
+    /* storage.js:206 feuert auf WINDOW, nicht auf document — ein Listener am
+       document hoert es nie (gemessen v1851: die Leiste blieb auf
+       „PLZ eintragen", obwohl die Hermannstrasse geladen war). Zweimal
+       nachziehen: sofort nach dem Befuellen und nach dem Bodenrichtwert-
+       Autolauf, der etwas spaeter seinen Status schreibt. */
+    window.addEventListener('dp:object-ready', function () {
+      setTimeout(function () { alles(); stufen(); }, 120);
+      setTimeout(alles, 1800);
+    });
+    window.addEventListener('dp:plan-ready', function () { stufen(); });
     document.addEventListener('dp:plan-ready', function () { stufen(); });
     alles(); stufen();
   }
