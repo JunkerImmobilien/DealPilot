@@ -36,6 +36,154 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+## → NEU und OBERSTE PRIORITÄT: Der Reiter Objekt wird neu geordnet (04.10.2026)
+
+Marcel am 04.10.2026, abends. Sieben Punkte, von ihm selbst ins Backlog
+gegeben: *„Kannst du ins backlog schreiben und dann abarbeiten wenn du die
+anderen sachen ausgiebig gemacht hast."*
+
+Der Kern ist **N4** — alles andere hängt davon ab oder ist klein.
+
+---
+
+### N1 · Das Unterlagen-Modal trägt nicht die Marke
+
+Marcel: *„Das müsste einmal das Modal auch im Stil vom Deal-Piloten, also
+so wie das Einstellungsmenü oder die anderen Modals, die wir öffnen, auch
+mit dem Gold, mit dem Schwarz, mit dem Weiß. Dann kann man die Amt
+ermitteln, das kann man nicht lesen, auch das Anschreiben."*
+
+Gebaut in v1834 mit Inline-Stilen statt der vorhandenen Modal-Klassen.
+Zwei Mängel, beide gemeldet:
+
+- **Gestaltung**: Obsidian `#050505`, Gold `#C9A84C`, Creme `#FDFCFA`.
+  Vorbild ist das Einstellungs-Modal. Vor dem Bauen dort auslesen, welche
+  Klassen es nutzt — nicht nachbauen.
+- **Lesbarkeit**: die Knöpfe „Amt ermitteln" und „Anschreiben" sind nicht
+  zu lesen. Vermutlich `btn-ghost` auf dunklem Grund. **Kontrast gegen den
+  effektiven Grund messen**, nicht gegen den Behälter.
+
+### N2 · „Alle abrufen" statt fünfmal klicken
+
+Marcel: *„man muss die ja alle einzeln abrufen. Genau, dass man da noch
+einen Button macht: alle abrufen."*
+
+Fünf Unterlagen, fünf Klicks, je ~20 s KI-Recherche. Ein Knopf, der alle
+fünf nacheinander holt, mit Fortschritt je Zeile.
+
+> Nacheinander, nicht gleichzeitig: fünf Websuchen parallel sind für
+> dieselbe Gemeinde fünfmal dieselbe Arbeit, und die Ämter-Ernte kann
+> jeden Treffer für den nächsten nutzen.
+
+### N3 · Sind Gemarkung, Flur und Flurstück Pflicht?
+
+Marcel: *„ist es zwangsläufig notwendig, dass man Flur, Gemarkung und
+Flurstück eingeben muss?"*
+
+**Nein** — gemessen am Anschreiben-Erzeuger (`unterlagenService.anschreiben`):
+die Angaben sind optional, ohne sie steht die Flurzeile nicht im Brief.
+Das Amt sucht dann selbst, was länger dauert.
+
+Zu prüfen und dann im Modal klarstellen: der Text sagt heute „muss das Amt
+das Flurstück selbst heraussuchen" — das klingt nach Pflicht, ist aber nur
+ein Hinweis. **Dazu:** die BORIS-Antwort trägt Gemarkungsnummer und -name
+(41 Felder, siehe `boris-liefert-die-gemarkung`). Das Feld liesse sich beim
+Bodenrichtwert-Abruf mitfüllen.
+
+### N4 · DER REITER OBJEKT WIRD NEU GEORDNET — das große Stück
+
+Marcel: *„im Tab Objekt haben wir unten Wertermittlung, Marktbericht. Da
+haben wir uns irgendwie falsch verstanden. Das ist ja jede, jede, jede
+Menge, die dort angegeben werden muss an Feldern. … Wir haben auch
+besondere Bauteile, auch die Ausstattung und allem. Das haben wir doch
+oben im Tab Objekt schon drin. Auch was das für ein Haus ist, was für
+Geschosse, Unterkellerung, Dachausbildung. … Weil da haben wir zum
+Beispiel auch Keller und Abstellraum."*
+
+**Der Befund, den er beschreibt: Felder stehen doppelt.** Oben in „weitere
+Objektdetails" und unten im Wertermittlungs-Block.
+
+Was zu tun ist, in dieser Reihenfolge:
+
+1. **Die Schnittstelle vollständig abprüfen.** Marcel: *„Da musst du mal
+   gucken, wie weit die Schnittstelle das alles nutzt und auch welche
+   Felder genutzt werden und welche nicht."* Also: GeoMap und jeder weitere
+   Beteiligte. Je Feld: geht es raus, wird es verwendet, oder liegt es
+   brach? `DealPilotObjectMapper.reportInput()` ist der Ausgangspunkt — er
+   führt heute `eq_heating`, `eq_windows`, `eq_floor`, `eq_bath`,
+   `eq_guest_wc`, `eq_store_room`, `eq_walls`, `eq_roof`, `eq_elevator`.
+
+2. **Die Doppelungen auflisten.** Keller, Abstellraum, Ausstattung,
+   Geschosse, Unterkellerung, Dachausbildung — gemessen, nicht vermutet.
+
+3. **Was automatisch geht, wird nicht gefragt.** Marcel: *„Liegenschafts-
+   zinssatz und allem, die können wir ja automatisch ermitteln, genauso wie
+   den Bodenrichtwert."* Der Zinssatz kommt aus dem Register
+   (`zinssatzFuerObjekt`, Stufe A bei 10 von 17 Objekten gemessen), der
+   Bodenrichtwert aus BORIS. Beide gehören **nicht** als leeres Eingabefeld
+   in den Reiter, sondern als abgerufener Wert mit Herkunft.
+
+4. **Eine Stufe tiefer.** Marcel: *„notfalls könnten wir dort unter den
+   weiteren Objektdetails … noch eine Stufe irgendwie darunter machen …
+   Weil das wird mir hier ein bisschen zu viel."*
+
+5. **Danach neu gestalten.** Marcel: *„jetzt steigt da, glaube ich, der
+   Kunde nicht richtig durch."* → Demo-first: erst ein Entwurf in
+   `design/Vorschläge/`, dann bauen.
+
+**Das Ziel in seinen Worten:** *„dass wir alle Felder haben, dass wir alle
+Bewertungsverfahren machen können, dass wir die Schnittstelle auch
+vollumfänglich nutzen."*
+
+### N5 · „BORIS abrufen" heißt nicht immer BORIS
+
+Marcel: *„Rufen wir wirklich immer bei BORIS ab oder haben wir für die 16
+Bundesländer auch andere Quellen? Weil dann brauchen wir es ja nicht
+BORIS-Abruf nennen, sondern Bodenrichtwert abrufen, ne?"*
+
+**Er hat recht, und es ist gemessen:** die Registry kennt neben den
+Landesdiensten (`nrw`, `by`, `bw`, `he`, `mv`, `sh`, `sl`, `bb`, `be`) auch
+`borisd` als bundesweiten Catch-all — für Bremen, Hamburg, Niedersachsen,
+Rheinland-Pfalz, Sachsen, Sachsen-Anhalt und Thüringen. Der Abruf an
+Hüllhorst meldete `BORIS-NRW`, der an Ibbenbüren ebenso; andere Länder
+melden andere Quellen.
+
+→ Knopf und Statuszeile auf **„Bodenrichtwert abrufen"**. Die konkrete
+Quelle steht ohnehin schon im Ergebnis („✓ … · BORIS-NRW").
+
+### N6 · Pilot-Analyse: der Marktpreis-Abruf wandert in den Co-Piloten
+
+Marcel: *„bei der Pilotanalyse, haben wir jetzt dort Marktpreis, einen
+Abruf. Also das kann da wieder raus. Wenn man dem sagt oder dort in der
+Frage beim Co-Piloten reinschreibt: Bitte ruf eine Marktpreisindikation
+ab, dann soll er das bitte machen. soll er mal sagen, es kostet was."*
+
+Der Weg steht schon: der Agent hat `marktbericht_abrufen` mit der Stufe
+`kostet`, und die Preisansage mit Angebot (v1821) ist gebaut. Zu tun:
+
+- den Abruf-Knopf aus der Pilot-Analyse entfernen
+- sicherstellen, dass der Co-Pilot im Browser denselben Weg geht wie der
+  Telegram-Bot — **einen** Geldweg, nicht zwei
+
+### N7 · Die Pilot-Analyse gehört ins Projektwissen
+
+Marcel: *„wenn wir die Pilotanalyse gemacht haben, dass die dem
+Projektwissen zur Verfügung steht, dass der Bot, der Telegram-Bot, die auch
+abfragen kann. Also es muss dann der Pilotanalyse wie auch dem
+Portfolio-Pilot, muss es auch zur Verfügung stehen."*
+
+Heute liest `pilot-berichte.js` je Objekt nur den **jüngsten** Marktbericht
+und gibt die Verlaufslänge als Zahl weiter. Die Pilot-Analyse selbst
+(Briefing, Stärken/Risiken, Verhandlung, Bank) steht dem Agenten nicht zur
+Verfügung.
+
+→ Ein Werkzeug `pilot_analyse_lesen` nach dem Muster von
+`objekt_schnellblick`. **Der Spiegel-Weg gilt:** rechnen tut der Browser,
+der Agent liest (siehe `spiegel-statt-zweiter-rechnung`).
+
+---
+
+
 ## → NEU und OBERSTE PRIORITÄT: Der Copilot wird ein Agent (02.10.2026)
 
 Marcel am 02.10.2026, nach dem ersten echten Gebrauch des Telegram-Bots.
