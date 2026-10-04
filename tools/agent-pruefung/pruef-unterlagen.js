@@ -39,7 +39,7 @@ console.log('   Quelle: ' + _quelle);
 console.log('');
 
 /* ── 1 · Die fünf Arten, vollständig ─────────────────────────────────── */
-pruefe('fünf Unterlagenarten', u.ARTEN.length === 5, 'sind ' + u.ARTEN.length);
+pruefe('sechs Unterlagenarten (v1855: + Gutachterausschuss)', u.ARTEN.length === 6 && u.ARTEN.some(function (a) { return a.id === 'gutachterausschuss'; }), 'sind ' + u.ARTEN.length);
 for (const a of u.ARTEN) {
   pruefe('„' + a.name + '" hat Regel, Betreff und Bitte',
     Boolean(a.id && a.name && a.regel && a.betreff && a.bitte));
