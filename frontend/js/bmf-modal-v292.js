@@ -114,6 +114,16 @@
     var objekt = {
       plz:        _v('plz'),
       ort:        _v('ort'),
+      /* v1846b · GEMESSEN im Modal an der Hermannstraße: Jacoby antwortete
+         „Objektart nicht erkannt". Hier reiste nur `objart_bmf` (die
+         BMF-Grundstücksart, „Wohnungseigentum [WE]") — der Marktbericht-
+         Mapper liest aber `objart` (ETW/MFH/…) und `einheiten`. Zwei
+         Vokabulare für dieselbe Sache; die Register-Abfrage braucht das
+         der App. Beide gehen jetzt mit, das BMF-Feld bleibt unberührt. */
+      objart:      _v('objart'),
+      einheiten:   _v('einheiten'),
+      haustyp:     _v('haustyp'),
+      nutzungsart: _v('nutzungsart'),
       str:        _v('str'),
       hnr:        _v('hnr'),
       /* v1474 · Hier stand 'Wohnungseigentum [WE]' FEST verdrahtet. Die
