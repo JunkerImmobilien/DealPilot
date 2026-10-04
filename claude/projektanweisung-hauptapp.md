@@ -30230,3 +30230,98 @@ pruef-pilot-analyse.js, Staging-Container, Stand a0785a0d
 ```
 
 **Prod:** v1847–v1849 liegen nur auf Staging. Prod steht auf v1846b.
+
+## Rollout-Journal 04.10.2026 (14) — v1850–v1851c: der Reiter Objekt in drei Ebenen (N4)
+
+### v1850 — die Vorlage, und vier Entscheidungen
+
+Vorlage `design/mockups/objekt-reiter-v1850.html` (auf Staging unter
+`/vorlage-v1850.html`, untracked). Marcel: „sieht gut aus … in dem Stil und
+layout wie es aktuell auch im dealpilot ist." Seine vier Entscheidungen
+(§ 5.6 des Vorschlags): Standardstufe als die eine Skala mit Umschlüsselung
+auf `quality`; Lage-Indikatoren an den Bericht; Stufe 3 aus der Haupt-App,
+ans Kontingent gekoppelt; Sterne umlegen. Dazu sein Rahmen: Feld-IDs
+bleiben, PDF/Import/Exporte müssen weiter greifen; Bankexport über den Bot
+(N8, Backlog).
+
+**Zurückgenommen:** „die Sterne gehen nicht in den Deal Score." Falsch —
+`dealscore2-ui.js:105` ruft `StarRating.getAverage()`, setzt
+`deal.qualitaetSterne` und überstimmt `deal.zustand`. Mein Grep hatte nur
+die Feldnamen gesucht, nicht den Modulaufruf. Marcel hatte es gesehen.
+
+### v1851 — der Umbau (`84b90f19`)
+
+**Was.** `tools/n4-umbau-index.mjs` schneidet die vorhandenen `.f`-Kästen
+und Steuerelemente aus und setzt sie neu — **873 IDs vorher = nachher,
+div-Bilanz 0, Doppellauf meldet skip.** Ebene 1 „Objektdaten" (Adresse,
+Art, Nutzung, Fläche, Zimmer, Baujahr, Etage, Einheiten, Zustand,
+Standardstufe, Energie, Vermietung, Grundstück, MEA) neben der Karte
+„Automatisch ermittelt" (Bodenrichtwert mit Abruf, Zins, Sachwertfaktor-
+Quelle, GND/RND, Baupreisindex, Modernisierungspunkte; Knöpfe Stufe 1/2/3
+mit Kontingent). Ebene 2 `#oe-details` mit Gewerke-Tabelle (Art ·
+modernisiert · Standardstufe, 10 Zeilen, Vorschlag gestrichelt), Bauteile &
+Grundstück (inkl. Erbbau, Flurstück, Unterlagen-Knopf), Lage als „Ihre
+Einschätzung neben der Datenlage", Wertanker. Ebene 3 = die alte Karte
+`wm-obj`, jetzt „Für das Gutachten · Stufe 3", ohne die abgewanderten
+Felder. Karte „Lage & Markt" und „Grund & Boden" sind aufgegangen, die
+Sterne bleiben versteckt im DOM (Altobjekte). `eq_bath` ist ein echtes
+Auswahlfeld (war versteckt, ohne Schreiber).
+
+Mapper: `reportInput()` gibt den ganzen Wertermittlungsblock zurück
+(vorher: **kein einziges** der 37 Felder), dazu `modernis`, `garagen`,
+`stellpl_aussen`, `balkon_flae`, `bad_anz`, `nutzungsart`; `quality` aus
+der Standardstufe (1–2 einfach, 3 normal, 4 gehoben, 5 luxus);
+`nutzerEinschaetzung()` als eigener Payload-Block `nutzer_einschaetzung`
+neben `assessment`. Neue Lesewege `/wertparameter/zinssatz` (+
+Sachwertfaktor-Quelle, Baupreisindex, GND-Quelle) und
+`/ausstattung/vorschlag` (dieselbe Tabelle wie der Bericht, Standardstufe
+nur bei 100 Anteilen, sonst Rohwert mit Abdeckung), beide durch den Proxy.
+`dealpilot-mb.js`: ZUSATZ um 50 Felder, Häkchen reisen nur gesetzt,
+`run({stufe})` sendet `wert_stufe` 2/3. Sterne-Umlegung:
+`StarRating.getAverage()` liest zuerst die neun Gewerke-Stufen
+(`quelle:'gewerke'`), der Score überstimmt den Zustand nur noch bei alten
+Sternen; `rnd-calc.js` nimmt `ausst_sanitaer/fenster/fussboeden` vor
+`rate_*`. `storage.js` schlägt bei ausdrücklich gesetztem `ausst` die Stufe
+vor (nie bei „Normal", das ist die Vorauswahl).
+
+**Nachweise.** feld-waechter sauber; Konstanten-Extraktor 223 Beschriftungen
+(zuerst 200 — die Tabellenzellen hatten kein Label; jetzt `.f` mit
+unsichtbarem Label). Mapper-Funktionslauf: quality gehoben aus Stufe 4,
+nhk_typ 1.02, bauteile_detail, usage_type, garages, bathrooms. MB-Dienst
+direkt: Zins 2,2 % Stufe A, GND 80/RND 16, BPI 1,91; Vorschlag sechs
+Gewerke, eigene Angabe gewinnt, Rohwert 2,79 bei 72 Anteilen. Browser
+(Hermannstraße): Leiste gefüllt, 10 Gewerke-Zeilen, Stufen-Knöpfe
+„24 · 8 · 10 frei", Sterne und `ausst` versteckt, Lage-Vergleich sichtbar;
+Musterstraße: „Vorschlag 3" am Bad, Standardstufe „Vorschlag 3,4 · erst 44
+von 100 Anteilen". Echter Stufe-1-Bericht (12:42): `standardstufe 4`,
+`quality gehoben`, neun Gewerke, `usage vermietet`, `mod_punkte 10`,
+`nutzer_einschaetzung` mit sieben Feldern — **alles angekommen**.
+
+### v1851a–c — drei Dinge, die der Lauf gezeigt hat
+
+- **a** (`c360d90`): `dp:object-ready` feuert auf `window`, mein Listener
+  hing am `document` — die Leiste blieb auf „PLZ eintragen". Und die
+  Sachwertfaktor-Quelle meldete „verfügbar" mit Ausschuss `null`
+  (`objektart_nicht_abgeleitet` ist keine Tabelle).
+- **b** (`73cdc42`): gespeicherter Bodenrichtwert ohne Herkunftsvermerk
+  heißt nicht „noch nicht abgerufen"; Zins-Quelle ist ein ganzer Satz —
+  gekürzt, Rest als Tooltip.
+- **c** (`5d75f34`): **`lzs_pct` „2.56" kam im Bericht als 256 an.**
+  `num()` im Mapper liest den Punkt als Tausenderpunkt — richtig für
+  „200.000", falsch für Prozent. Dasselbe bei `sachwertfaktor` („1.15" →
+  115) und **schon vor v1851 bei `mea` („7.06" → 706)**. Jetzt `dez()`
+  für Prozent, Faktoren, €/m². Funktionslauf: 2.56 / 1.15 / 7.06 / −10 /
+  5,5 richtig, kp 200.000 und wfl 165,5 unverändert. Ein zweiter
+  Testbericht wurde nicht gezogen (kostet Kontingent) — der Weg ist
+  derselbe wie beim ersten, nur der Parser ist anders.
+
+### Rest
+
+- Der Bericht trägt `nutzer_einschaetzung`, zeigt sie aber noch nicht:
+  Web-Ansicht und PDF der Marktbericht-App müssen den Block neben der
+  Datenlage rendern. Eigenes Paket (N4-P1b).
+- Lage-Vergleich im Reiter nimmt die letzte Karte (`DealPilotMB.letzter`)
+  — nach Neuladen leer, bis ein Bericht gezogen wurde.
+- Musterstraße 12 bekam im Test kurz `eq_roof/eq_windows/eq_bath`
+  (Auto-Save) — wieder geleert, Auto-Save hat es mitgenommen.
+- Prod steht auf v1846b; v1847–v1851c nur Staging.
