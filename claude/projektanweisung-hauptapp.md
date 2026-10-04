@@ -29462,3 +29462,201 @@ Browser (Staging, frischer Tab, Buster v=v1827)
 - Der Stufe-3-Fehler (1,79 Mio, Baujahr 1938) braucht einen kontrollierten
   Testabruf — er kostet einen von fünf `wev` und wartet auf Marcels Zustimmung.
 - Prod liegt weit zurück; der Komplett-Check vor der Vermarktung steht noch aus.
+
+---
+
+## Rollout-Journal 04.10.2026 (6) — Prod: 199 Commits, 8 Migrationen, und eine Ernte, die nie ankam
+
+**Was** · Marcel: *„bitte jetzt gleich rollout"*
+
+**Commits** · Merge `staging` → `main` (`d96dfaa9`), danach `9f4fda2a`
+
+### Der Weg
+
+Beide Datenbanken gesichert **und angesehen** — 11 MB mit 63 Tabellen
+(Haupt-DB), 717 KB mit 26 Tabellen (Marktbericht). Nicht 20 Byte.
+
+```
+Haupt-Backend : Migrationen 76–82 angewandt, Server listening
+Marktbericht  : Migration 015_user_id_text.sql angewandt, listening on :4000
+```
+
+### Der Befund, der ohne Nachmessen untergegangen wäre
+
+Nach dem Rollout stand in `mb.param_modell` auf Prod: **493 Sätze**. Auf
+Staging: **2662**.
+
+> Der Code kam, die Ernte nicht. Eine Migration bringt Struktur, keine
+> Daten — und ein Rollout, der nur „läuft" meldet, verschweigt das.
+
+Die Registersätze liegen als JSON im Repo und müssen über
+`register-saat.mjs` eingespielt werden. Erst trocken gefahren (2662 Sätze,
+keine Dublette, 2662 eindeutige Konfliktschlüssel), dann echt:
+
+```
+VORHER 493 → NACHHER 2662 · übernommen 2662 · verworfen 0
+✓ SOLL = IST
+pruef-zweigwahl auf Prod: Dekoder alle 111 Zweige, Lübeck/Lauenburg
+Stufe A, Bielefeld und Detmold Differenz 0.00
+```
+
+---
+
+## Rollout-Journal 04.10.2026 (7) — v1828–v1831: der Bot fand das Haus nicht, und 24 Felder gingen verloren
+
+**Was** · Marcel: *„Zum Bot. ich haben ihn eben gefragt was er mir zum
+Objekt in der Bismarckstraße sagen kann und das konnte er nicht."* Dazu:
+*„guckst, dass du alle Felder gefüllt hast, auch Finanzierungsfelder …
+dass du eine Vertragsnummer für das Darlehen auch setzt."*
+
+**Commits** · `v1828`, `v1828b`, `v1829`, `v1830`, `v1831`
+
+### v1828 — die Abkürzung ging nur in eine Richtung
+
+Das Objekt heißt „Bismarckstr. 27 Detmold". Die Präfixregel aus v1810
+prüft, ob ein OBJEKTwort LÄNGER ist und mit dem Suchwort beginnt — sie
+löste „Musterstr → Musterstraße". Umgekehrt griff nichts:
+„bismarckstrasse" hat 15 Zeichen, „bismarckstr" elf.
+
+> Eine Abkürzungsregel, die nur in eine Richtung greift, löst den halben
+> Fall — und zwar die Hälfte, die seltener vorkommt. Objekte werden
+> abgekürzt ANGELEGT und ausgeschrieben GESPROCHEN.
+
+Von Marcels 18 Objekten tragen **sechs** eine abgekürzte Straße. Jedes war
+per gesprochenem Namen unerreichbar. Behoben über eine gemeinsame
+Stammform (`bismarckstr` und `bismarckstrasse` → `bismarck~`).
+
+### v1828b — der falsche Treffer war schlimmer als der Fehlschlag
+
+Beim Prüfen gefunden. Auf den **ganzen Satz** „Was kannst du mir zum
+Objekt in der Bismarckstraße sagen?" antwortete der alte Stand nicht mit
+„kenne ich nicht", sondern **eindeutig mit „Demo-Objekt ·
+Beispiel-Wohnung Dealhausen"**. Das Wort „objekt" punktete wie ein
+Straßenname.
+
+> Ein Fehlschlag ist ärgerlich, ein falscher Treffer ist gefährlich.
+> „Kenne ich nicht" sieht jeder; die falsche Wohnung sieht niemand.
+
+Marcel hat den Fehlschlag gemeldet. Den falschen Treffer hätte er
+vielleicht nie gemeldet — er hätte die Zahlen der Demo-Wohnung gelesen
+und für seine gehalten.
+
+### v1829 — 24 Felder, die kein Neuladen überlebten
+
+In v1815 habe ich `san_tax_active` repariert und **nicht gefragt, ob er
+Geschwister hat**. Er hatte drei.
+
+Gemessen an der Staging-Datenbank, von 22 Objekten führen:
+
+| Schlüssel | Objekte |
+|---|---:|
+| `bank_inst`, `d1_vertrag` | 22 |
+| `san_tax_active` | 21 |
+| `afa_sonder7b_*`, `fesh_*`, `inv_tax_*` | **0** |
+
+Verloren gingen: die **§ 7b Sonder-AfA** (fünf Voraussetzungen), die
+**energetische Sanierung nach § 35c** (acht Maßnahmen mit Haken und
+Betrag), die **Inventar-Abschreibung**, dazu `d2_vertrag` und `d2_bspar`
+(an vier Stellen gelesen, nie geschrieben) und `ek_inkl_nk` (steuert den
+LTV-Bezug).
+
+> Ein Feld, das gelesen und nie geschrieben wird, sieht im Code aus wie
+> eine Funktion. Es ist eine Leitung ohne Zufluss.
+
+Dazu ein vierter Fall andersherum: `grenz_auto` steht ab Werk auf
+`checked`. Das Leeren setzte **jede** Checkbox auf false.
+
+> Eine Leerlogik, die „leer = false" annimmt, bricht jeden Haken, dessen
+> Standard an ist.
+
+Neu gebaut, weil Marcel es vermisst hat: **Vertragsdatum** für Darlehen I,
+Darlehen II und den Bausparvertrag. Es gab nur das Auszahlungsdatum — und
+das ist ein anderer Tag.
+
+**Wächter** `tools/feld-waechter.mjs` gegen den ganzen Fehlertyp, mit
+Basislinie (25 Felder: PDF-Schalter, Suchzeile, Euro-Spiegel, Aufklapper).
+
+Zwei eigene Fehler dabei, beide vom Wächter selbst gemeldet, weil er seine
+**Deckung** nennt: er las erst nur bis zur ersten `];` und verfehlte
+`WM_FIELDS` (87 Felder falsch gemeldet, darunter `baujahr`); und er fand
+„0 mit eigener Behandlung", weil er nur dieselbe Zeile absuchte.
+
+> Ein Wächter, der die halbe Quelle liest, meldet die andere Hälfte als
+> Fehler. Er ist dann lauter als ein kaputter, aber genauso unbrauchbar.
+
+### v1830 — der Wegweiser zeigte ins Leere, und der Verlauf war da
+
+**Marcels Frage beantwortet: der Marktbericht liegt im Reiter
+„Deal-Aktion", Band „Marktberichte".** Im Reiter Bewertung steht die
+AVM-Bewertungshistorie, nicht der Marktbericht.
+
+Der Leertext sagte „im Bewertung-Tab einen erstellen" — diesen Knopf gibt
+es dort nicht, er wurde entfernt. Jetzt steht da der Knopf selbst.
+
+Und den **Verlauf** gibt es vollständig: Linie, Delta-Tabelle über sieben
+Kennzahlen, KI-Trendtext. Er sitzt in einem Unter-Tab von „Pilot-Analyse",
+der sich ausblendet, solange weniger als zwei Berichte da sind.
+
+> Bevor etwas gebaut wird, das der Nutzer vermisst: nachsehen, ob er es
+> nur nicht gefunden hat.
+
+Deshalb kein zweiter Verlauf, sondern die Tür zum vorhandenen: unter der
+Berichtsliste steht ab zwei Berichten „n Berichte über x Jahre, Marktwert
++y %" und daneben „Verlauf ansehen".
+
+### v1831 — derselbe Score, zwei Wörter
+
+An einem echten Agentenlauf gemessen: der Bot nannte den Score 71 einmal
+„SOLIDE" und einmal „GUT". `objekte_liste` gab nur die **Zahl**.
+
+> Wo das Werkzeug nur eine Zahl liefert, denkt das Modell sich das Wort
+> dazu. Was wörtlich so heißen soll, gehört als fertiger Wert ins
+> Ergebnis.
+
+Bemerkenswert: die Kette stand seit v1817 vollständig im Projektwissen.
+Das Modell kannte sie und wandte sie trotzdem falsch an.
+
+### Nachgemessen
+
+```
+pruef-adresssuche (echte Funktion, Marcels echte Objektliste)
+  23 Proben, 23 grün · Gegentest: alter Stand fand "Bismarckstraße" = keiner
+
+feld-waechter
+  Deckung 273 Eingabefelder · 337 FIELDS-Einträge · sauber
+
+Browser (Staging, frischer Tab, Buster storage v1828)
+  collectData sammelt alle 12 neuen Felder
+  Leeren: grenz_auto bleibt true (HTML-Standard), andere false
+  Laden: alle 8 Werte kommen an, inkl. grenz_auto=false
+
+Agentenlauf gegen Marcels Bestand, nach v1831
+  "Was kannst du mir zum Objekt in der Bismarckstraße sagen?"
+  → DealPilot-Score 71 (GUT) · Investor Deal Score 68 (SOLIDE)
+  beide Antworten konsistent
+```
+
+### Die Objekte, wie Marcel es verlangt hat
+
+Alle 22 durchgegangen. Vollständig bis auf **vier Lücken**, alle bei
+Verwaltungsdaten: Hermannstraße 9 (Vertragsnummer, Bank,
+Auszahlungsdatum), Löhner Str. 278 und Wilhelm-Busch-Straße (Darlehen
+samt Vertragsdaten — das sind Gutachtenobjekte ohne Finanzierung),
+Hölderlinstr. 1 (Vertragsnummer, Bank).
+
+**Diese Felder fülle ich nicht.** Eine Vertragsnummer, die ich mir
+ausdenke, sieht aus wie eine echte.
+
+Die Zahlen selbst geprüft: Dezimaltrennzeichen stehen gemischt in der
+Datenbank (`3,5` neben `3.5`), `parseDe` verträgt aber beides. Die eine
+gefährliche Form — ein Punkt mit genau drei Folgeziffern, der als
+Tausendertrenner gilt — kommt **20-mal** vor, und in allen 20 Fällen ist
+der Punkt wirklich ein Tausendertrenner (`176.537 €`). Kein Fehler.
+
+### Rest
+
+- `deal-action-boarding.js:987` ruft ein **nacktes `fetch`** gegen die
+  eigene API und umgeht den zentralen 401-Handler. Gemessen, nicht
+  angefasst.
+- Die Unterlagen-App (`Dateien/unterlagen-app.zip`) ist gesichtet, die
+  Anbindung steht aus.
