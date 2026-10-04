@@ -44,6 +44,22 @@ const openaiService = require('./openaiService');
  * `bitte` ist der Satz, der im Anschreiben steht — er nennt die
  * Rechtsgrundlage, wo es eine gibt. */
 const ARTEN = [
+  /* v1855 · Marcel: „für die Sachwertfaktoren und Liegenschaftszinsen …
+     auch dort diese Unterlagenanfrage". Zuständig ist der örtliche
+     Gutachterausschuss; die Kennzahlen stehen in seinem
+     Grundstücksmarktbericht (§ 193 Abs. 5 BauGB), oft kostenpflichtig. */
+  {
+    id: 'gutachterausschuss', name: 'Grundstücksmarktbericht (Gutachterausschuss)',
+    regel: 'Liegenschaftszinssätze, Sachwertfaktoren und Bodenrichtwerte leitet der '
+         + 'Gutachterausschuss für Grundstückswerte ab (§ 193 Abs. 5 BauGB). Zuständig ist '
+         + 'der Ausschuss des Kreises bzw. der kreisfreien Stadt, in einigen Ländern ein '
+         + 'zentraler Ausschuss; die Geschäftsstelle sitzt meist beim Katasteramt.',
+    betreff: 'Anfrage Grundstücksmarktbericht · Liegenschaftszinssätze und Sachwertfaktoren',
+    bitte: 'Ich bitte um Übersendung des aktuellen Grundstücksmarktberichts bzw. der '
+         + 'veröffentlichten Liegenschaftszinssätze und Sachwertfaktoren für den Zuständigkeits- '
+         + 'bereich (ersatzweise um den Link zur amtlichen Veröffentlichung) sowie um Mitteilung '
+         + 'etwaiger Gebühren vor Versand.'
+  },
   {
     id: 'flurkarte', name: 'Flurkarte',
     regel: 'Auszug aus der Liegenschaftskarte. Zuständig ist das Katasteramt '

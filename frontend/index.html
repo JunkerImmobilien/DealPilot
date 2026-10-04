@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1854"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1855"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -1120,10 +1120,11 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
-        <div class="f s2" id="oe-auto-wrap"><div id="oe-auto" class="oe-auto"></div><div id="oe-stufen" class="oe-stufen"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div id="oe-anfragen" class="oe-anfragen"><span class="oe-anfragen-lbl">Anfragen</span><button type="button" class="oe-btn" style="font-size:12.5px"
+        <div class="f s2" id="oe-auto-wrap"><div id="oe-auto" class="oe-auto"></div></div>
+        <div id="oe-anfragen" class="oe-anfragen"><div class="oe-anfragen-kopf"><span class="oe-anfragen-lbl">Anfragen</span><button type="button" class="oe-btn" style="font-size:12.5px"
             onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
             Unterlagen beim Amt anfordern
-          </button></div></div>
+          </button><span class="oe-q" id="oe-anfragen-hint"></span></div><div id="oe-quellen" class="oe-quellen"></div></div>
         <div class="f" data-v363-ausst style="display:none"><label>Ausstattung (Altfeld, ersetzt durch die Standardstufe)</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
         
       </div>
@@ -1499,6 +1500,12 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
+  <!-- ═══ v1855 · N4 · Marktbericht abrufen — drei Stufen als Kacheln, Absprung in den Marktbericht (tools/n4e-abruf-karte.mjs) ═══ -->
+  <div class="card" id="oe-abruf-karte"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Marktbericht abrufen <span class="oe-ct-hint">drei Stufen — die gewählte Eingabetiefe ist vorgemerkt</span></div>
+    <div id="oe-stufen" class="oe-abruf"></div>
+    <div id="oe-fehlt" class="oe-fehlt" style="display:none"></div>
+    <div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf dieses Objekts — und steht oben am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div>
+  </div>
   <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Investition</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s0');return false;">Weiter: Investition<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
@@ -3549,7 +3556,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1840"></script>
-<script src="js/objekt-reiter.js?v=v1854"></script>
+<script src="js/objekt-reiter.js?v=v1855"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1738"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>

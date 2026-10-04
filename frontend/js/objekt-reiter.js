@@ -54,7 +54,7 @@
     var q = status ? esc(status) : (brw ? 'gespeicherter Wert — Herkunft nicht vermerkt (Abruf oder Eingabe)' : 'noch nicht abgerufen — Knopf „Bodenrichtwert abrufen" oben');
     if (stich) q += ' · Stichtag ' + esc(stich);
     if (manuell) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(manuell) + ' €/m² — ' + q;
-    return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'Ansatz ändern' : 'abweichend eintragen', 'brw_manuell'));
+    return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));
   }
 
   function modPunkte() {
@@ -111,18 +111,18 @@
             + (r.zweig ? ' · ' + esc(r.zweig) : '') + (r.quelle_url ? ' · <a href="' + esc(r.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '');
       var eigen = _v('lzs_pct');
       if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(eigen) + ' % — amtlich ' + q;
-      html += zeile('Liegenschaftszins', deNum(r.wert_pct, 2) + ' %', q, knopf(eigen ? 'Ansatz ändern' : 'abweichend eintragen', 'lzs_pct'));
+      html += zeile('Liegenschaftszins', deNum(r.wert_pct, 2) + ' %', q, knopf(eigen ? 'ändern' : 'eintragen', 'lzs_pct'));
       var sq = r.sachwertfaktor_quelle;
       var swfEigen = _v('sachwertfaktor');
-      if (swfEigen) html += zeile('Sachwertfaktor', esc(swfEigen), st('b', 'eigener Ansatz') + 'statt der Tabelle des Ausschusses', knopf('Ansatz ändern', 'sachwertfaktor'));
+      if (swfEigen) html += zeile('Sachwertfaktor', esc(swfEigen), st('b', 'eigener Ansatz') + 'statt der Tabelle des Ausschusses', knopf('ändern', 'sachwertfaktor'));
       /* v1852 · Marcel an der Bismarckstraße: „steht ‚im Bericht' — was ist
          damit gemeint?" Jetzt steht da, WAS der Ausschuss führt: eine
          Tabelle (dann wird der Faktor im Bericht aus dem vorläufigen
          Sachwert abgelesen, § 21 Abs. 3 — vorher gibt es ihn nicht) oder
          eben keine für diese Objektart (Lippe: nur EZFH). Eintragen geht
          immer, als eigener Ansatz. */
-      else if (sq && sq.verfuegbar) html += zeile('Sachwertfaktor', 'Tabelle vorhanden', st('a', 'Ausschuss') + '<span title="' + esc(sq.ausschuss || '') + '">' + esc((sq.ausschuss || r.ausschuss || '').split(',')[0]) + '</span>' + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eigenen Faktor eintragen', 'sachwertfaktor'));
-      else html += zeile('Sachwertfaktor', '—', st('x', 'kein Wert') + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.') + (sq && sq.ausschuss ? ' <span class="oe-q" title="' + esc(sq.ausschuss) + '">(' + esc(String(sq.ausschuss).split(',')[0]) + ')</span>' : ''), knopf('eigenen Faktor eintragen', 'sachwertfaktor'));
+      else if (sq && sq.verfuegbar) html += zeile('Sachwertfaktor', 'Tabelle vorhanden', st('a', 'Ausschuss') + '<span title="' + esc(sq.ausschuss || '') + '">' + esc((sq.ausschuss || r.ausschuss || '').split(',')[0]) + '</span>' + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eintragen', 'sachwertfaktor'));
+      else html += zeile('Sachwertfaktor', '—', st('x', 'kein Wert') + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.') + (sq && sq.ausschuss ? ' <span class="oe-q" title="' + esc(sq.ausschuss) + '">(' + esc(String(sq.ausschuss).split(',')[0]) + ')</span>' : ''), knopf('eintragen', 'sachwertfaktor'));
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
       html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + (r.rnd_jahre != null ? r.rnd_jahre : '—') + ' J.',
         gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV') + ' · Restnutzungsdauer aus Baujahr' + (mp ? ' — mit ' + mp.total + ' Modernisierungspunkten rechnet der Bericht nach Anlage 2 neu' : ''), '');
@@ -131,6 +131,45 @@
     }
     html += mpZeile;
     box.innerHTML = html;
+    /* v1855 · was der Anfragen-Block wissen muss: fehlt der Zins, fehlt der Faktor? */
+    _leiste = { zins: !!(r && r.verfuegbar), swf: !!(r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.verfuegbar),
+                ausschuss: (r && (r.ausschuss || r.quelle)) || null, swfHinweis: (r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.hinweis) || null };
+    quellen();
+  }
+
+  /* ═══ Quellen und Anfragen ═══════════════════════════════════════════
+     Marcel: „für die Sachwertfaktoren und Liegenschaftszinsen … auch dort
+     diese Unterlagenanfrage … und dann geben wir dann auch die Quelle an …
+     die passende Seite, gleich die Verlinkung … oder halt das PDF direkt."
+     Quelle ist das Register (/marktbericht/quellen?plz=): je Kennzahl der
+     Ausschuss, der Jahrgang und der Link — oder „fehlt" mit dem Weg. */
+  var _leiste = null, _quellenLauf = 0;
+  async function quellen() {
+    var box = $('oe-quellen'), hint = $('oe-anfragen-hint'); if (!box) return;
+    var plz = _v('plz');
+    if (!plz) { box.innerHTML = ''; if (hint) hint.textContent = ''; return; }
+    var lauf = ++_quellenLauf;
+    var q = await api('/marktbericht/quellen?plz=' + encodeURIComponent(plz));
+    if (lauf !== _quellenLauf) return;
+    var NAME = { lzs: 'Liegenschaftszins', liegenschaftszins: 'Liegenschaftszins', swf: 'Sachwertfaktor', sachwertfaktor: 'Sachwertfaktor', brw: 'Bodenrichtwert', bodenrichtwert: 'Bodenrichtwert', vergleichsfaktor: 'Vergleichsfaktor', gnd: 'Gesamtnutzungsdauer' };
+    var zeilen = [];
+    var hinterlegt = (q && q.hinterlegt) || [], fehlt = (q && q.fehlt) || [];
+    hinterlegt.forEach(function (e) {
+      var link = e.quelle_url ? '<a href="' + esc(e.quelle_url) + '" target="_blank" rel="noopener">' + (/\.pdf(\?|$)/i.test(e.quelle_url) ? 'Bericht (PDF) öffnen' : 'Quelle öffnen') + '</a>' : '<span class="oe-leer">kein Link hinterlegt</span>';
+      zeilen.push('<div class="oe-qz"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>' + esc(e.ausschuss || q.ausschuss || '') + (e.jahrgang || e.berichtsjahr ? ' · ' + esc(e.jahrgang || e.berichtsjahr) : '') + (e.gebiet ? ' · ' + esc(e.gebiet) : '') + '</span>' + link + '</div>');
+    });
+    fehlt.forEach(function (e) {
+      zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — beim Gutachterausschuss' + (q && q.ausschuss ? ' (' + esc(q.ausschuss) + ')' : '') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
+    });
+    if (_leiste && !_leiste.swf && !fehlt.some(function (e) { return /swf|sachwert/.test(e.kennzahl); })) {
+      zeilen.push('<div class="oe-qz fehlt"><b>Sachwertfaktor</b><span>' + esc(_leiste.swfHinweis || 'für diese Objektart nicht hinterlegt') + '</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
+    }
+    var brauchtAnfrage = fehlt.length > 0 || (_leiste && (!_leiste.zins || !_leiste.swf));
+    if (hint) hint.innerHTML = brauchtAnfrage
+      ? st('x', 'nötig') + 'Für dieses Objekt fehlt eine amtliche Kennzahl — Quelle unten, Anfrage mit einem Klick.'
+      : (q && q.ausschuss ? st('a', 'vollständig') + 'Alle Kennzahlen liegen im Register (' + esc(q.ausschuss) + ').' : '');
+    box.innerHTML = zeilen.join('');
+    box.style.display = zeilen.length ? '' : 'none';
   }
 
   /* „abweichend eintragen": Ebene 3 öffnen und das Feld zeigen */
@@ -269,17 +308,25 @@
     var arten = (_kont && _kont.arten) || {};
     var rest = function (art) { var a = arten[art]; return (a && typeof a.rest === 'number') ? a.rest : null; };
     var konto = { 1: rest('mpi'), 2: rest('mpi_plus'), 3: rest('wev') };
-    var namen = { 1: 'Marktbericht · Stufe 1 (einfach)', 2: 'Stufe 2 (mittel) · erweitert', 3: 'Stufe 3 (ausgiebig) · Sach- & Ertragswert' };
+    /* v1855 · drei Kacheln unten in der Karte „Marktbericht abrufen" */
+    var kacheln = {
+      1: { name: 'Einfach · Stufe 1', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
+      2: { name: 'Mittel · Stufe 2', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
+      3: { name: 'Ausgiebig · Stufe 3', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
+    };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
     var z = zielstufe();
     box.innerHTML = [1, 2, 3].map(function (s) {
-      var fehlt = fehltFuer(s).length, r = konto[s];
+      var fehlt = fehltFuer(s).length, r = konto[s], k = kacheln[s];
       var aus = r === 0;
-      var cls = 'oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '');
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
-      return '<button type="button" class="' + cls + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">'
-        + namen[s] + (r == null ? '' : ' · ' + r + ' frei') + (fehlt ? ' · ' + fehlt + ' fehlt' : '') + '</button>';
-    }).join('') + '<span class="oe-stufen-hint">Ein Knopf mit gestricheltem Rand: da fehlen Angaben — Klick zeigt welche. Der Bericht rechnet nie halb.' + (konto[3] === 0 ? ' Stufe 3 gehört zum Pro-Plan.' : '') + '</span>';
+      return '<div class="oe-tile' + (s === z ? ' on' : '') + '">'
+        + '<h4>' + k.name + '</h4><div class="oe-tile-sub">' + k.sub + '</div>'
+        + '<div class="oe-tile-meta">' + (r == null ? 'Kontingent unbekannt' : r + ' frei') + (fehlt ? ' · ' + fehlt + ' Feld' + (fehlt > 1 ? 'er' : '') + ' fehlt' : ' · alle Angaben da') + (aus && ab[s] ? ' · ' + ab[s] : '') + '</div>'
+        + '<button type="button" class="oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">'
+        + (fehlt ? 'Fehlende Angaben zeigen' : k.art + ' abrufen') + '</button>'
+        + '</div>';
+    }).join('');
   }
   var _fehlStufe = null;   /* v1852: die zuletzt angefragte Stufe — die Fehlliste folgt der Eingabe */
   function fehlendeNachziehen() { if (_fehlStufe) fehlendeZeigen(_fehlStufe, fehltFuer(_fehlStufe)); }
@@ -418,6 +465,14 @@
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }
       var zb = e.target.closest('[data-oe-ziel]'); if (zb) { zielSetzen(parseInt(zb.getAttribute('data-oe-ziel'), 10)); return; }
       if (e.target.closest('#oe-vw-btn')) { verkehrswertSetzen(); return; }
+      /* v1855 · Absprung in den Marktbericht (derselbe Weg wie der Kopf-Knopf) */
+      if (e.target.closest('#oe-mb-oeffnen')) {
+        var mb = [].slice.call(document.querySelectorAll('button,a')).find(function (b) { return /^\s*MARKTBERICHT\s*$/i.test(b.textContent || ''); });
+        if (mb) mb.click(); else if (typeof openMarktberichtView === 'function') openMarktberichtView();
+        return;
+      }
+      var amt = e.target.closest('[data-oe-amt]');
+      if (amt && window.DealPilotUnterlagen && typeof DealPilotUnterlagen.oeffnen === 'function') { DealPilotUnterlagen.oeffnen(amt.getAttribute('data-oe-amt')); return; }
       var s = e.target.closest('[data-oe-stufe]');
       if (s && !s.disabled) stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10));
     });

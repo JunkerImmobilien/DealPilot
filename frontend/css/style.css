@@ -38263,3 +38263,32 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-kopf-cb input { accent-color: var(--wl-C9A84C, #C9A84C); }
 .oe-karte[data-oe-detail].oe-aus { display: none !important; }
 .oe-karte .card-title { margin-top: 10px; }
+
+/* ═══ v1855 · Checkboxen dezent (Marcel: „riesig") — schlaegt v1147-CB33 durch html-Anker ═══ */
+html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.fesh-tile input):not(.dp-pf-tile input) { width: 16px; height: 16px; margin: 0 2px 0 0; }
+@media (pointer: coarse) { html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):not(.fesh-tile input):not(.dp-pf-tile input) { width: 22px; height: 22px; } }
+/* v1855 · Leiste in festen Spalten, Knoepfe gleich breit, Quelle einzeilig (Rest im Tooltip) */
+.oe-auto .oe-row { grid-template-columns: 150px 92px minmax(0, 1fr) 118px; gap: 10px; align-items: center; }
+.oe-auto .oe-q { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oe-auto .oe-row > span:last-child { display: flex; justify-content: flex-end; }
+.oe-auto .oe-btn { width: 112px; text-align: center; padding: 4px 6px; }
+.oe-st { min-width: 58px; text-align: center; }
+/* v1855 · Anfragen und Quellen */
+.oe-anfragen { display: block; }
+.oe-anfragen-kopf { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.oe-quellen { margin-top: 8px; display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 12px; }
+.oe-quellen .oe-qz { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 5px 0; border-top: 1px dashed var(--border, #E0DBD3); }
+.oe-quellen .oe-qz b { font-weight: 600; }
+.oe-quellen .oe-qz.fehlt { color: #B8625C; }
+.oe-quellen a { color: var(--wl-b8932f, #b8932f); text-decoration: underline; }
+/* v1855 · Abruf-Karte unten: drei Kacheln */
+.oe-abruf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.oe-tile { border: 1px solid var(--border-g, #e9dcb3); border-radius: 10px; padding: 12px 14px; background: var(--karte, #FBF6E9); display: flex; flex-direction: column; gap: 6px; min-height: 150px; }
+.oe-tile.on { border-color: var(--wl-C9A84C, #C9A84C); box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 20%, transparent); }
+.oe-tile h4 { margin: 0; font: 600 13.5px "Space Grotesk", Inter, sans-serif; }
+.oe-tile .oe-tile-sub { font-size: 12px; color: var(--muted, #7A7370); flex: 1 1 auto; }
+.oe-tile .oe-tile-meta { font: 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); }
+.oe-tile .oe-btn { width: 100%; text-align: center; }
+.oe-tile .oe-btn.oe-unvollstaendig { opacity: .6; border-style: dashed; }
+.oe-abruf-foot { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted, #7A7370); }
+@media (max-width: 760px) { .oe-abruf { grid-template-columns: 1fr; } .oe-auto .oe-row { grid-template-columns: 1fr 1fr; } .oe-quellen .oe-qz { grid-template-columns: 1fr; } }
