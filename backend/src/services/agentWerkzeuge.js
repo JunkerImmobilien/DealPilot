@@ -192,6 +192,23 @@ async function pilot_analyse_lesen(ctx, args) {
     hinweis: 'Die Pilot-Analyse ist eine KI-Einschätzung auf Basis der Objektdaten zum '
            + 'Zeitpunkt ihrer Erstellung — keine Wertermittlung und kein amtlicher Wert.'
   };
+  /* v1849 · Fremdanalyse-Wächter. Gemessen am 04.10.2026: sechs Objekte
+   * trugen byte-identisch dieselbe Analyse, und die zur Gohliser Straße
+   * (Leipzig) sprach von Bielefeld. Eine Analyse, die den Ort des Objekts
+   * nirgends nennt, aber EINEN ANDEREN Ort aus dem Portfolio, ist mit hoher
+   * Wahrscheinlichkeit kopiert — dann bekommt der Nutzer das gesagt, statt
+   * dass der Bot dem falschen Haus die richtige Sprache gibt. */
+  const ort = String(o.daten.ort || '').trim();
+  if (ort) {
+    const text = (typeof roh === 'string') ? roh : JSON.stringify(roh);
+    const nenntOrt = text.toLowerCase().includes(ort.toLowerCase());
+    if (!nenntOrt) {
+      aus.fremd_verdacht = true;
+      aus.so_sagen = 'Achtung: Die gespeicherte Pilot-Analyse nennt den Ort ' + ort + ' nirgends — '
+                   + 'sie stammt vermutlich von einem anderen Objekt. Bitte in DealPilot im Reiter '
+                   + '„Pilot-Analyse" neu erstellen, bevor du dich darauf stützt.';
+    }
+  }
   /* Leere Teilbäume ganz weglassen, damit das Modell nicht "null" vorliest. */
   Object.keys(aus).forEach((k) => {
     const v = aus[k];

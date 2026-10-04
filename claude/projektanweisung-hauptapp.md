@@ -30143,3 +30143,78 @@ Verkehrswert 188.161 → 223.432 € (×1,19 — der Ertragswert reagiert auf de
 niedrigeren Zins), **nicht** ×2,5. Jacoby unverändert 84,55 %, weil es nur
 den amtlichen Registerzins nimmt (2,2 % Stufe A), nie das Feld. Feld danach
 zurückgesetzt, nichts gespeichert.
+
+## Rollout-Journal 04.10.2026 (13) — v1847–v1849: der Bot liest die Pilot-Analyse, der Marktpreis-Knopf fällt, und ein Formular, das ins Leere schreibt
+
+### v1847 — die Pilot-Analyse für den Bot (N7)
+
+**Was.** Werkzeug `pilot_analyse_lesen` in `agentWerkzeuge.js`, Stufe
+`lesen`. Es liest `objects.ai_analysis` über `dialog.objektKontext()` und
+gibt die Abschnitte strukturiert heraus — Briefing (Empfehlung, Fazit,
+Gesamtbewertung), Stärken, Risiken, Risikoanalyse, Szenarien, Lage,
+Verhandlung, Bankargumente —, nie den Rohtext (bis zehn Kilobyte
+Modell-JSON). Ohne Analyse: der fertige Satz `so_sagen` mit dem Weg
+(Reiter „Pilot-Analyse", ein Klick). `objekt_lesen` filtert `ai_analysis`
+und `ai_lage_cache` aus den Feldern (`_ohneIntern`) — vorher kamen sie als
+„Feld" heraus. Der Browser-Co-Pilot bekommt `window._aiAnalysis` als
+`pilot_analyse` in den Kontext (`copilot.js` `context()`).
+
+**Commit** `5ca46455`.
+
+**Nachweis.** `tools/agent-pruefung/pruef-pilot-analyse.js` im Container
+gegen die echte DB: 16/16 grün — Register, Stufe, Hermannstraße mit
+Abschnitten (unter 12 kB), ein Objekt ohne Analyse mit `so_sagen`, kein
+Leck in `objekt_lesen`.
+
+**Datenbefund dabei:** sechs Objekte des Testkontos tragen
+**byte-identisch** dieselbe Analyse (Prüfsumme), dazu ein Paar Am Markt 9.
+Kein Werkzeugfehler — aber der Bot hätte dem falschen Haus die richtige
+Sprache gegeben. → v1849.
+
+### v1848 — der Marktpreis-Knopf ist raus, und zwei Konten hießen falsch (N6)
+
+**Was.** `copilot.js`: Knopf `dp-cp-mp` samt Listener entfernt; die
+Funktion steht als `window.__dpCpMarktpreis`. `copilot-aenderungen.js`:
+im ABRUFE-Katalog trägt `marktpreis` jetzt `art:'avm'` (Bewertungspartner,
+Konten a+b) — **vorher stand `mpi` da, also das Marktbericht-Konto**, und
+die Ansage hätte den falschen Rest genannt. `marktbericht` sagt ehrlich
+„1 Marktbericht Stufe 1 (Marktpreisindikation)". Neue Hilfsfunktion
+`restFuer(art)`.
+
+**Commit** `8bc9ed5a`.
+
+**Nachweis.** Staging, Tab mit Hermannstraße: `knopf_da:false`,
+`__dpCpMarktpreis:"function"`, `abrufe()` → marktpreis `avm` Rest 0,
+marktbericht `mpi` Rest 24. Über `ausAntwort()` ohne Serveraufruf:
+marktpreis → „Dafür ist gerade kein Guthaben mehr da."; marktbericht →
+Box „Kostet 1 Marktbericht Stufe 1 (Marktpreisindikation) · danach noch
+24 frei" mit Abrufen/Doch nicht. Nicht geklickt.
+
+**Rest — N6b.** Die Zustimmung im Browser ist rein clientseitig. Der
+geprüfte Geldweg des Telegram-Agenten (`darfKosten` + Angebot, v1821)
+gilt im Browser nicht. Steht im Backlog als eigenes Paket.
+
+### v1849 — Fremdanalyse-Wächter, und der Befund zum Reiter Objekt (N4)
+
+**Was.** `pilot_analyse_lesen` prüft, ob die gespeicherte Analyse den Ort
+des Objekts überhaupt nennt. Gemessen per SQL: die Analyse der Gohliser
+Straße (Leipzig) nennt Bielefeld und nie Leipzig; die der Hermannstraße
+nennt Hüllhorst. Nennt sie den Ort nicht → `fremd_verdacht:true` und
+`so_sagen` „vermutlich von einem anderen Objekt … neu erstellen". Prüfer
+um drei Prüfungen erweitert (Hermannstraße ohne Verdacht, Gohliser mit,
+Satz nennt den Weg). Wie die Kopien entstanden sind, ist offen (Backlog N7).
+
+**Befund N4** (Schnittstellen-Messung, Agent + Stichproben am Mapper):
+`DealPilotObjectMapper.reportInput()` gibt **30 Schlüssel** zurück. **Vom
+Block „Wertermittlung (Marktbericht)" — 37 Felder — ist keiner darunter.**
+Stufe 3 sendet kein Aufrufer der Haupt-App (`fast:true` = 1,
+Spracheingabe = 2). An GeoMap gehen aus dem Objekt fünf Dinge
+(Koordinate, Art, Fläche, Baujahr, Zustand), der Rest ist fest im Code.
+`assessment()` (Lage-Indikatoren) hat keinen Aufrufer, `eq_bath` ist ein
+verstecktes Feld ohne Schreiber, `modernis`/`garagen`/`stellpl_aussen`
+werden gesendet und verworfen. Vollständig in
+`design/Vorschläge/objekt-reiter-neuordnung.md` §4; Vorschlag in §5 (drei
+Ebenen, Gewerke-Tabelle, Automatik-Leiste, Pakete P1–P5, vier
+Bewertungsfragen an Marcel). **Nicht gebaut** — Demo-first.
+
+**Nachweis v1849.** Prüfer im Container, siehe unten.

@@ -135,6 +135,22 @@ Was zu tun ist, in dieser Reihenfolge:
 Bewertungsverfahren machen können, dass wir die Schnittstelle auch
 vollumfänglich nutzen."*
 
+**Stand 04.10.2026 (v1849): Schritte 1–3 gemessen, Schritt 5 als Entwurf
+geschrieben — wartet auf Marcels Blick.** Alles in
+`design/Vorschläge/objekt-reiter-neuordnung.md`. Die drei Kernbefunde:
+
+- Vom Block „Wertermittlung (Marktbericht)" — 37 Felder — erreicht auf dem
+  Objekt-Weg **kein einziges** den Bericht; der Mapper gibt 30 Schlüssel
+  zurück, keiner davon aus diesem Block.
+- Stufe 3 (Sach-/Ertragswert) ist **aus der Haupt-App gar nicht
+  erreichbar** — jeder Aufrufer sendet Stufe 1 oder 2.
+- An GeoMap gehen aus dem Objekt **fünf** Dinge (Koordinate, Art, Fläche,
+  Baujahr, Zustand); alles andere ist fest im Code.
+
+Offen: vier Bewertungsfragen in Abschnitt 5.5 (eine Ausstattungsskala,
+Lage-Indikatoren, Stufe 3 aus der Haupt-App, Sterne streichen). Danach
+Vorlage in `design/mockups/`, dann P1 (Mapper) vor P4 (Formular).
+
 ### N5 · „BORIS abrufen" heißt nicht immer BORIS
 
 Marcel: *„Rufen wir wirklich immer bei BORIS ab oder haben wir für die 16
@@ -165,6 +181,22 @@ Der Weg steht schon: der Agent hat `marktbericht_abrufen` mit der Stufe
 - sicherstellen, dass der Co-Pilot im Browser denselben Weg geht wie der
   Telegram-Bot — **einen** Geldweg, nicht zwei
 
+**Erledigt 04.10.2026, v1848 (`8bc9ed5a`), Staging:** Knopf raus
+(`dp-cp-mp` samt Listener), der Abruf steht als `__dpCpMarktpreis` dem
+Co-Piloten zur Verfügung; im ABRUFE-Katalog trägt `marktpreis` jetzt das
+Konto `avm` (vorher stand `mpi` da — das falsche Konto) und `marktbericht`
+die ehrliche Ansage „1 Marktbericht Stufe 1 (Marktpreisindikation)".
+Bewiesen im Browser: Rest 0 beim Bewertungspartner → „Dafür ist gerade kein
+Guthaben mehr da.", Rest 24 beim Marktbericht → Box mit Kosten und
+Abrufen/Doch nicht.
+
+**N6b · offen — der zweite Geldweg existiert noch.** Die Zustimmung im
+Browser-Co-Piloten ist **rein clientseitig** (`copilot-aenderungen.js`
+rechnet den Rest selbst und ruft dann die Funktion); der geprüfte Geldweg
+des Telegram-Agenten (`darfKosten` + Angebot, v1821) gilt im Browser nicht.
+Wer die Box umgeht, umgeht die Ansage. Eigenes Paket: der Browser-Chat geht
+über dieselben Werkzeuge mit Stufe `kostet` wie der Bot.
+
 ### N7 · Die Pilot-Analyse gehört ins Projektwissen
 
 Marcel: *„wenn wir die Pilotanalyse gemacht haben, dass die dem
@@ -180,6 +212,23 @@ Verfügung.
 → Ein Werkzeug `pilot_analyse_lesen` nach dem Muster von
 `objekt_schnellblick`. **Der Spiegel-Weg gilt:** rechnen tut der Browser,
 der Agent liest (siehe `spiegel-statt-zweiter-rechnung`).
+
+**Erledigt 04.10.2026, v1847 (`5ca46455`) + v1849, Staging:** Werkzeug
+`pilot_analyse_lesen` (Stufe `lesen`, kostet nichts) liefert Briefing,
+Stärken, Risiken, Risikoanalyse, Szenarien, Lage, Verhandlung, Bank —
+nicht den Rohtext; ohne Analyse den fertigen Satz mit dem Weg dorthin.
+`objekt_lesen` gibt `ai_analysis`/`ai_lage_cache` nicht mehr als Feld
+heraus. Der Browser-Co-Pilot bekommt die Analyse als `pilot_analyse` in
+den Kontext. Prüfer `tools/agent-pruefung/pruef-pilot-analyse.js`.
+
+**Datenbefund dabei (kein Werkzeugfehler):** sechs Objekte des Testkontos
+tragen **byte-identisch dieselbe** Analyse — und die zur Gohliser Straße
+(Leipzig) spricht von **Bielefeld**. Seit **v1849** warnt das Werkzeug
+(`fremd_verdacht`, `so_sagen` „neu erstellen"), wenn die Analyse den Ort
+des Objekts nirgends nennt. Wie die Kopien entstanden sind (Objekt
+dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
+`storage.js` beim Duplizieren und beim Ändern der Adresse auf
+`ai_analysis` prüfen.
 
 ---
 

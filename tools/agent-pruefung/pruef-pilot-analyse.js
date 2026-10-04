@@ -93,6 +93,19 @@ function ctxFuer(uid) {
     pruefe('ohne Analyse: keine Abschnitte erfunden', !r.briefing && !r.staerken && !r.risiken);
   } else { zeilen.push('  [?]    ohne Analyse — NICHT PRUEFBAR: alle Objekte haben eine'); }
 
+  /* 3b · v1849 Fremdanalyse-Waechter: Hermannstr. (Huellhorst) nennt ihren Ort,
+   *      Gohliser Str. (Leipzig) trug am 04.10.2026 eine Bielefeld-Analyse. */
+  if (mit.rows[0]) {
+    const r = await eintrag.fn(ctxFuer(uid), { id: mit.rows[0].id });
+    pruefe('Waechter: eigene Analyse traegt KEINEN fremd_verdacht', !r.fremd_verdacht);
+  }
+  const fremd = await query("SELECT id, name, ai_analysis ILIKE '%'||ort||'%' AS nennt FROM objects WHERE user_id=$1 AND ai_analysis IS NOT NULL AND name LIKE 'Gohliser%' LIMIT 1", [uid]);
+  if (fremd.rows[0] && fremd.rows[0].nennt === false) {
+    const r = await eintrag.fn(ctxFuer(uid), { id: fremd.rows[0].id });
+    pruefe('Waechter: Gohliser Str. (Analyse ohne Ortsnennung) -> fremd_verdacht', r.fremd_verdacht === true);
+    pruefe('Waechter: so_sagen nennt den Weg (neu erstellen)', /neu erstellen/.test(r.so_sagen || ''));
+  } else { zeilen.push('  [?]    Waechter-Positivfall — NICHT PRUEFBAR: Gohliser traegt (inzwischen) eine eigene Analyse'); }
+
   /* 4 · Leck-Check an objekt_lesen */
   if (olesen && mit.rows[0]) {
     const r = await olesen.fn(ctxFuer(uid), { id: mit.rows[0].id });
