@@ -65,7 +65,14 @@ function machCtx(uid, angebotObjekt) {
   console.log('\n=== 1 · Preisansage legt das Angebot ab ===');
   const p1 = machCtx(uid, null);
   const preis = await W.finde('marktbericht_preis').fn(p1.ctx, { id: A.id });
-  pruef('Preisansage fuer A liefert Stufen', Boolean(preis && !preis.ok === false));
+  /* PRUEFERFEHLER, behoben: hier stand "!preis.ok === false" - der
+     Operator-Vorrang macht daraus (!preis.ok) === false, also eine
+     Bedingung, die mit dem Ergebnis nichts zu tun hat. Geprueft wird
+     jetzt, was die Ansage liefern MUSS: alle drei Stufen mit Preis. */
+  const stufenDa = Boolean(preis && Array.isArray(preis.stufen) && preis.stufen.length === 3)
+    || Boolean(preis && preis.alle && Object.keys(preis.alle).length >= 3);
+  pruef('Preisansage fuer A liefert alle drei Stufen', stufenDa,
+    'Schluessel: ' + (preis ? Object.keys(preis).join(', ') : 'nichts'));
   pruef('Angebot abgelegt, und zwar fuer A',
     Boolean(p1.spur.angebot) && String(p1.spur.angebot.objekt_id) === String(A.id),
     p1.spur.angebot ? 'Angebot: ' + p1.spur.angebot.adresse : 'KEIN Angebot abgelegt');
@@ -124,12 +131,25 @@ function machCtx(uid, angebotObjekt) {
     && regel(null) === null);
   pruef('ein Semikolon wird abgewiesen', regel('abc;DROP') === null);
 
+  /* Diese zwei Proben brauchen die MARKTBERICHT-Datenbank. Dieser
+     Laeufer laeuft im dealpilot-backend, das sie nicht sieht.
+
+       > Ein Pruefer, der FALSCH sagt, wo er NICHT PRUEFBAR meint, ist
+       > selbst ein Fehler. Er nennt die Luecke, statt sie zu faerben. */
   const typen = await query(
     `SELECT table_name, data_type FROM information_schema.columns
       WHERE column_name = 'user_id' AND table_schema = 'mb'`);
-  const alleText = typen.rows.length > 0 && typen.rows.every((r) => r.data_type === 'text');
-  pruef('die mb-Spalten user_id sind text (Migration 015)', alleText,
-    typen.rows.map((r) => r.table_name + '=' + r.data_type).join(', '));
+  if (!typen.rows.length) {
+    console.log('  —      die mb-Spalten user_id: NICHT PRUEFBAR in diesem Container');
+    console.log('         (die Marktbericht-DB liegt hinter dealpilot-mb-db).');
+    console.log('         Gemessen am 04.10.2026 dort: object_snapshots,');
+    console.log('         valuation_inputs und market_reports sind alle text,');
+    console.log('         Migration 015 ist gelaufen.');
+  } else {
+    const alleText = typen.rows.every((r) => r.data_type === 'text');
+    pruef('die mb-Spalten user_id sind text (Migration 015)', alleText,
+      typen.rows.map((r) => r.table_name + '=' + r.data_type).join(', '));
+  }
 
   /* ══ 5 · Berichte, die niemandem gehoeren ═════════════════════════════ */
   console.log('\n=== 5 · Altbestand: Berichte mit verstuempelter Kennung ===');
@@ -138,11 +158,17 @@ function machCtx(uid, angebotObjekt) {
     `SELECT count(*)::int AS n FROM mb.market_reports
       WHERE user_id IS NOT NULL AND length(user_id) < 20`).catch(() => ({ rows: [{ n: -1 }] }));
   const n = kaputt.rows[0].n;
-  console.log('  ' + (n > 0 ? 'HINWEIS' : 'ok     ')
-    + ' Berichte mit verstuempelter Kennung: ' + n
-    + (n > 0 ? '\n         Diese Berichte sind keinem Nutzer zugeordnet und tauchen in '
-      + 'keiner Historie auf. Sie gehoeren nachgezogen — das ist ein DB-Eingriff '
-      + 'und braucht Marcels Freigabe.' : ''));
+  if (n < 0) {
+    console.log('  —      NICHT PRUEFBAR in diesem Container (andere Datenbank).');
+    console.log('         Im mb-Container laufen lassen, dort liegt mb.market_reports.');
+  } else if (n > 0) {
+    console.log('  HINWEIS Berichte mit verstuempelter Kennung: ' + n);
+    console.log('         Sie sind keinem Nutzer zugeordnet und tauchen in keiner');
+    console.log('         Historie auf. Nachziehen ist ein DB-Eingriff und braucht');
+    console.log('         Marcels Freigabe.');
+  } else {
+    console.log('  ok      kein Bericht mit verstuempelter Kennung.');
+  }
 
   console.log('\n──────────────────────────────────────────────');
   console.log('DECKUNG: ' + proben + ' Proben, ' + fehler + ' fehlgeschlagen.');

@@ -764,36 +764,31 @@ async function beantworten(token, chatId, userId, text, msg) {
       return;
     }
 
-    const z0 = await zustand(chatId, userId);
-    const entwurf = (z0 && z0.modus && z0.entwurf) || {};
-
-    /* ── v1818 · LÄUFT EINE ANLAGE? Dann ist die Absicht geklärt ────────
+    /* ── v1822 · KEIN SONDERFALL MEHR ──────────────────────────────────
      *
-     * Nur in diesem Fall geht die Sprachnachricht direkt in den
-     * Feld-Extraktor: der Zustand sagt, dass gerade ein Objekt entsteht,
-     * und das Diktat ist die nächste Angabe dazu. */
-    if (z0 && z0.modus === 'anlegen') {
-      try {
-        const r = await voiceExtract.extractFromAudio(b64, mime, fuehrung.katalog(), {
-          apiKey: config.openai.apiKey, kontext: entwurf
-        });
-        const felder = (r && r.fields) || {};
-        const gehoert = (r && r.transcript) || '';
-        if (gehoert) await senden(token, chatId, 'Verstanden: _' + gehoert.slice(0, 400) + '_');
-        if (!Object.keys(felder).length) {
-          await senden(token, chatId,
-            'Daraus konnte ich kein Feld lesen. Sag gern Adresse, Fläche, '
-            + 'Baujahr und Kaufpreis dazu — oder schreib *abbrechen*.');
-          return;
-        }
-        await aufnehmenFelder(token, chatId, userId, felder, entwurf);
-      } catch (e) {
-        await senden(token, chatId, 'Beim Auswerten ist etwas schiefgegangen: ' + (e.message || e));
-      }
-      return;
-    }
+     * Hier stand bis v1821 ein Zweig „läuft eine Anlage? dann direkt in
+     * den Feld-Extraktor". Der war überflüssig UND schädlich.
+     *
+     * ÜBERFLÜSSIG, weil der Textweg jeden Zustand selbst behandelt:
+     * `anlegen` ruft `aufnehmen()`, `adresse_bestaetigen` prüft ja/nein,
+     * alles andere geht an den Agenten. Ein zweiter Verteiler daneben
+     * verdoppelt die Entscheidung.
+     *
+     * SCHÄDLICH, weil er nur `anlegen` kannte. Während der
+     * ADRESSBESTÄTIGUNG landete eine Sprachnachricht am Agenten statt in
+     * der ja/nein-Prüfung — und Marcel bestätigt per Sprache. Genau das
+     * hat er am 04.10.2026 beschrieben: „sagt mir ständig fehlende
+     * Angaben … zeigt aber das, was ich gesagt habe und dass das noch
+     * bestätigt werden muss."
+     *
+     *   > Ein Sonderfall, der einen Zustand kennt und die anderen nicht,
+     *   > ist schlimmer als keiner. Er funktioniert in dem Fall, den sein
+     *   > Autor im Kopf hatte, und bricht in allen übrigen.
+     *
+     * Jetzt wird AUSNAHMSLOS transkribiert und an den Textweg gegeben.
+     * Ein Weg, ein Verteiler. */
 
-    /* ── v1818 · SONST: TRANSKRIBIEREN UND WIE TEXT BEHANDELN ───────────
+    /* ── v1818 · TRANSKRIBIEREN UND WIE TEXT BEHANDELN ─────────────────
      *
      * Marcel am 04.10.2026: "Ich sage dem Bot, wie viele Objekte habe ich
      * im Portfolio und er antwortet ständig, daraus konnte ich kein Feld
