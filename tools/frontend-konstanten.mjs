@@ -61,7 +61,19 @@ const QUELLEN = {
   'voice-import': path.join(FE, 'js', 'voice-import.js'),
   'objektart-felder': path.join(FE, 'js', 'objektart-felder.js'),
   'storage': path.join(FE, 'js', 'storage.js'),
-  'index-html': path.join(FE, 'index.html')
+  'index-html': path.join(FE, 'index.html'),
+  /* ── v1823 · DIE GRUNDERWERBSTEUER ──────────────────────────────────
+   *
+   * Marcel am 04.10.2026 zum Bot: „dass wir da vielleicht einfach gucken,
+   * einmal den Ort abfragen, was haben wir denn da, und dann koennen wir
+   * ja grob das hochrechnen, was die Kaufnebenkosten waeren."
+   *
+   * Die Tabelle gibt es seit V226: PLZ-Bereich -> Bundesland -> Satz,
+   * sechzehn Laender, von 3,5 % (Bayern) bis 6,5 %. Sie ist reine Daten.
+   *
+   *   > Eine zweite Steuertabelle im Backend waere die Stelle, an der ein
+   *   > Satz nach der naechsten Gesetzesaenderung an EINEM Ort stimmt. */
+  'grest': path.join(FE, 'js', 'grest-plz-lookup.js')
 };
 
 const nurPruefen = process.argv.includes('--pruefen');
@@ -150,6 +162,25 @@ function ernte() {
 
   /* ── 4 · Beschriftung, Art und Optionen aus dem HTML ───────────────── */
   ergebnis.daten.felder = felderAusHtml(fs.readFileSync(QUELLEN['index-html'], 'utf8'), F);
+
+  /* ── 5 · Grunderwerbsteuer je Bundesland, PLZ-Bereiche ─────────────── */
+  ladeModul(QUELLEN['grest'], kontext);
+  const G = kontext.DealPilotGrest || win.DealPilotGrest;
+  if (!G || !G.rates || !G._ranges) {
+    throw new Error('DealPilotGrest.rates/._ranges nicht erreichbar — der Pruefhaken ist weg');
+  }
+  if (Object.keys(G.rates).length !== 16) {
+    throw new Error('GREST_RATES hat ' + Object.keys(G.rates).length
+      + ' Laender, nicht 16 — da fehlt eines');
+  }
+  ergebnis.daten.grest = {
+    saetze: G.rates,
+    namen: G.names,
+    plz_bereiche: G._ranges,
+    hinweis: 'Saetze je Bundesland in Prozent. plz_bereiche ist [von, bis, '
+           + 'Landeskuerzel] und wird der Reihe nach geprueft — der erste '
+           + 'Treffer gilt, wie im Frontend.'
+  };
 
   return ergebnis;
 }

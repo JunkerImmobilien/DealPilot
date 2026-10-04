@@ -54,8 +54,44 @@
   // Format: [von, bis, BL-Kürzel]. Reihenfolge wichtig (erste Match gewinnt).
   // Vereinfachung: Wir nutzen 5-stellige Integer-Vergleiche.
   const PLZ_RANGES = [
-    // 01000–09999 Sachsen
-    [1000, 9999, 'SN'],
+    /* ── v1823 · DIE LEITZONE 0 SIND VIER BUNDESLAENDER, NICHT EINES ───
+     *
+     * Hier stand [1000, 9999, 'SN'] — die ganze Leitzone 0 als Sachsen.
+     * GEFUNDEN am 04.10.2026 bei einer Gegenprobe an echten Postleitzahlen
+     * fuer den Telegram-Bot:
+     *
+     *   06184 Kabelsketal  ->  SN 5,5 %   richtig ist  ST 5,0 %
+     *   07743 Jena         ->  SN 5,5 %   richtig ist  TH 6,5 %
+     *   03046 Cottbus      ->  SN 5,5 %   richtig ist  BB 6,5 %
+     *
+     * Das ist kein Schoenheitsfehler: dieses Modul belegt bei jeder
+     * PLZ-Eingabe das Feld `gest_p` vor (bindPlzListener unten). Wer in
+     * Jena ein Objekt fuer 300.000 Euro rechnet, bekam 16.500 statt
+     * 19.500 Euro Grunderwerbsteuer — 3.000 Euro zu wenig in der
+     * Gesamtinvestition, und damit in Rendite, Cashflow und Score.
+     *
+     *   > Ein Satz, der fuer die halbe Leitzone stimmt, sieht genauso aus
+     *   > wie einer, der fuer die ganze stimmt. Auffallen wuerde er erst
+     *   > beim Finanzamt.
+     *
+     * Die Zuordnung der Leitzone 0 (05 ist nicht vergeben):
+     *   01, 02      Sachsen            Dresden, Bautzen, Goerlitz
+     *   03          Brandenburg        Cottbus, Lausitz
+     *   04          Sachsen            Leipzig
+     *   04900-04938 Brandenburg        Herzberg/Elster, Bad Liebenwerda
+     *   06          Sachsen-Anhalt     Halle, Merseburg, Dessau
+     *   07          Thueringen         Jena, Gera, Rudolstadt
+     *   08, 09      Sachsen            Zwickau, Plauen, Chemnitz
+     *
+     * Die Reihenfolge zaehlt: der engere Bereich 04900-04938 steht VOR
+     * dem weiteren 04000-04999, weil der erste Treffer gilt. */
+    [1000, 2999, 'SN'],     // Dresden, Bautzen, Goerlitz
+    [3000, 3999, 'BB'],     // Cottbus und die Lausitz
+    [4900, 4938, 'BB'],     // Herzberg/Elster, Bad Liebenwerda — VOR 04000-04999
+    [4000, 4999, 'SN'],     // Leipzig
+    [6000, 6999, 'ST'],     // Halle, Merseburg, Dessau
+    [7000, 7999, 'TH'],     // Jena, Gera, Rudolstadt
+    [8000, 9999, 'SN'],     // Zwickau, Plauen, Chemnitz
     // 10000–14999 Berlin (10xxx-14xxx) + teils Brandenburg (14xxx)
     [10000, 13999, 'BE'],
     [14000, 14199, 'BE'],
@@ -182,6 +218,19 @@
     forPlz: grestForPlz,
     rates: GREST_RATES,
     names: BL_NAMES,
+    /* ── v1823 · PRUEFHAKEN FUER DEN EXTRAKTOR ────────────────────────
+     *
+     * `tools/frontend-konstanten.mjs` holt diese Tabelle ins Backend,
+     * damit der Telegram-Bot die Kaufnebenkosten aus der PLZ hochrechnen
+     * kann — ohne eine zweite Steuertabelle anzulegen.
+     *
+     *   > Eine zweite Steuertabelle ist die Stelle, an der ein Satz nach
+     *   > der naechsten Gesetzesaenderung an EINEM Ort stimmt.
+     *
+     * Funktionen lassen sich nicht nach JSON extrahieren, Bereiche schon.
+     * Faellt dieser Haken weg, bricht der Extraktor mit Namen — er darf
+     * nicht still eine leere Tabelle schreiben. */
+    _ranges: PLZ_RANGES,
   };
 
   // Auto-Wire: bei PLZ-Eingabe in Tab Objekt → Tab Investition GrESt updaten
