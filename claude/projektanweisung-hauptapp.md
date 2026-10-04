@@ -30373,3 +30373,35 @@ Frage ist damit mit Ja beantwortet: dieselben Felder stehen im
 Marktbericht-Formular.
 
 **Rest.** Prod steht auf v1846b; v1847–v1852a nur Staging.
+
+## Rollout-Journal 04.10.2026 (16) — v1852b–c: Eingabetiefe oben, Pflichtrahmen, Verkehrswert-Übernahme
+
+Marcel: *„die eingabetiefe muss auf jedenfall irgendwo nach oben sichtbar
+sein. nicht mitten im feld. werden wirklich bei allen stufen alle felder
+rot umrandet …? Wenn wir einen Verkehrswert ermittelt haben sollten wir am
+feld verkehrswert auch ein button haben mit übernahme. wenn es mehrere
+marktberichte gibt dann zum auswählen."*
+
+**Was (`274a604`, `3fcf8ba`).** `tools/n4c-kopf.mjs` (IDs 885 → 887,
+div-Bilanz 0): die Eingabetiefe steht jetzt als Leiste direkt unter dem
+Reitertitel „Objekt & Fotos", 39 px unter der Überschrift, goldene Kante.
+Am Verkehrswert ein Block `#oe-vw`: jüngster Bericht mit Datum, Stufe und
+Marktwert, bei mehreren eine Auswahl (Hermannstraße: 31 Stände), Knopf
+„als Verkehrswert übernehmen" setzt `svwert`, feuert `input`/`change`,
+ruft `calc()`. Quelle `/marktbericht/objects/history?ref=` — derselbe
+Verlauf wie Deal-Aktion und Pilot. Nach einem Abruf wird die Auswahl
+nachgeladen.
+
+**Pflichtrahmen — Antwort auf die Frage:** markiert werden die Pflichtfelder
+der GEWÄHLTEN Eingabetiefe, solange sie leer sind — nicht alle Stufen auf
+einmal. Gemessen an der Bismarckstraße (Felder kurz geleert, ohne
+Ereignis, sofort zurück): Tiefe 1 → nichts; Tiefe 2 → `kp`; Tiefe 3 →
+`standardstufe, gsfl, brw, kp`. Die Regel aus dem Stylesheet kam am Feld
+nicht an (eine stärkere Regel gewinnt — auch der Schatten fehlte), jetzt
+inline mit `!important`, beim Löschen entfernt. **`getComputedStyle`
+meldete trotz Inline-!important weiter die alte Farbe** — der
+Bildausschnitt zeigte den roten Rahmen. Bekannte Falle
+(`kurzschrift-verliert-einzeln`), hier zum zweiten Mal.
+
+**Rest.** N4-P1b (Lage-Einschätzung im Bericht sichtbar), N8 (Bankexport
+über den Bot), Prüfstrecke Exporte. Prod v1846b; Staging v1852c.
