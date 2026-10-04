@@ -29911,3 +29911,125 @@ identische Adressen treffen den Cache.
   Wilhelm-Busch-Straße): kein Darlehen, kein Eigenkapital. Beides
   Gutachtenobjekte ohne Finanzierung.
 - Sachsen und Sachsen-Anhalt sind beim Liegenschaftszins nicht geerntet.
+
+---
+
+## Rollout-Journal 04.10.2026 (11) — v1840–v1844: zwei stumme Module, ein unlesbares Modal, ein Wort als Adresse
+
+**Was** · Marcel, abends: die Ausstattungsfrage beim MFH, das Unterlagen-
+Modal („mit dem Gold, mit dem Schwarz, mit dem Weiß … das kann man nicht
+lesen"), „alle abrufen", ob Flurangaben Pflicht sind, und „BORIS abrufen"
+→ „Bodenrichtwert abrufen". Seine sieben Punkte stehen als **N1–N7** an
+oberster Stelle im Backlog.
+
+**Commits** · `v1840`, `v1841`, `v1842`, `v1843`, `v1844`
+
+### v1840 — beim Mehrfamilienhaus stand die Frage nach dem Bad
+
+Die Typlogik (`objektart-felder.js`) weiß seit v1437 für alle elf
+Objektarten, welches Feld passt und welches Pflicht ist. Gemessen an
+Lindenhof 14 (MFH): `bad_anz` und `zimmer` standen unmarkiert da. Nach
+einem **händischen** `anwenden()` war alles richtig.
+
+`boot()` legte zwei Zeitzünder und das war es — danach lief die Logik nur,
+wenn der Nutzer die Objektart selbst umstellte.
+
+> Zwei Zeitzünder beim Start sind keine Verdrahtung. Sie treffen das
+> erste Objekt und keines danach.
+
+Derselbe Fehler wie beim BORIS-Knopf am Morgen (v1835), dieselbe Lösung:
+`dp:object-ready` feuert bei jedem Objektwechsel und wird jetzt gehört.
+
+### v1841 — „100 % startklar" bei einem Objekt, das keine Wertermittlung kann
+
+Der Vorflug-Check prüfte fünfzehn feste Felder und fragte
+`DealPilotObjektart.pflicht()` nie. `mea` (ETW) und `einheiten` (MFH)
+fehlten in jedem Zähler — genau die zwei, an denen die Wertermittlung
+scheitert.
+
+> Eine Vollständigkeitsanzeige, die nicht alles kennt, was gebraucht
+> wird, meldet Vollständigkeit — und das ist schlimmer als keine Anzeige.
+> Sie beendet die Suche.
+
+Die Felder reisen aus der **einen** Tabelle mit; eine neue Objektart zählt
+automatisch.
+
+### v1842 — „BORIS abrufen" heißt nicht immer BORIS
+
+Marcel hatte recht: die Registry nutzt neben neun Landesdiensten den
+bundesweiten Catch-all `borisd` für sieben Länder. Der Knopf heißt jetzt
+nach der **Sache**, die er holt. Die konkrete Quelle steht ohnehin im
+Ergebnis („· BORIS-NRW").
+
+### v1843 — weiß auf Creme, Kontrast 1,00
+
+```
+Hülle            var(--surface,#14110f) → löst auf rgb(248,246,241) auf
+„Amt ermitteln"  btn-ghost, rgba(255,255,255,.7)
+Kontrast         1,00
+```
+
+Der Rückfall war dunkel, der Token hell. Die Knöpfe erbten Farben für
+dunklen Grund und standen auf Creme.
+
+> Eine Farbe gilt nur zu ihrem Grund. Wer die Hülle einem Token
+> überlässt, überlässt ihm auch die Lesbarkeit jedes Knopfes darin.
+
+Jetzt die Marke, einzeln benannt: Karte `#FBF6E9`, schwarzer Kopf,
+Obsidian-Text, Gold als `--wl-`-Token. Drei Knopfarten mit
+ausgeschriebenem Grund **und** Text. Nachgemessen gegen den **deckenden**
+Grund — meine erste Messung hatte ein `rgba(…,0.08)` als Grund genommen,
+und das ist keiner:
+
+```
+Titel 19,88 · Fließtext 13,72 · „Amt ermitteln" 14,81 · Gold-Knöpfe 8,92
+```
+
+Dazu N2 („Alle abrufen", nacheinander, mit „Suche 2 von 5") und N3 (der
+Satz zu den Flurangaben sagt jetzt **Optional**, weil sie es sind).
+
+Die Commit-Sperre hielt einmal an: sie las meinen eigenen Kommentar, der
+den alten Code zitiert, als Token-Rest. Jetzt prüft sie nur Code.
+
+> Ein Wächter, der Richtiges anmahnt, wird genauso schnell ignoriert wie
+> einer, der Falsches durchlässt.
+
+### v1844 — das Modell gab das Wort „email" als Adresse zurück
+
+Beim ersten „Alle abrufen" für Hüllhorst: fünf Ämter in 35 Sekunden, zwei
+aus der Ernte, drei frisch — und zwei davon mit der Adresse `email`. Dem
+**Wort**. Das Modell hatte meinen JSON-Schlüssel als Wert geliefert.
+Gespeichert, angezeigt, `mailto:email` wäre gebaut worden.
+
+Die Belegprüfung hielt („nicht belegt") — aber sie hätte geprüft, ob
+„email" auf der Quellseite steht. Das Wort steht auf fast jeder Seite.
+
+> Was keine Adresse sein kann, darf nicht als Adresse geprüft werden.
+> Eine Prüfung, die auf ein Nichts ein Ja sagen kann, ist keine.
+
+`mailGueltig()` an **einer** Stelle, beide Wege nutzen sie. Die zwei
+Altzeilen auf NULL gesetzt, mit Grund.
+
+Zweiter Befund: das Modal zählte beim Öffnen „5 von 5 fehlen", obwohl zwei
+längst hinterlegt waren. Neu: `GET /unterlagen/aemter` liest die Ernte,
+das Modal fragt einmal je Öffnen und vergisst beim Schließen.
+
+### Nachgemessen
+
+```
+pruef-unterlagen (Container)        44 von 44, darunter acht neue Fälle
+Browser, Hüllhorst, Buster v1844
+  Öffnen            „Alle 5 Zuständigkeiten liegen vor." · Knopf gesperrt
+  Zeilen ohne Mail  „nur über das Portal", nirgends das Wort email
+  Brief ohne Mail   „An: — keine Adresse —", kein Mailprogramm-Knopf
+  zweites Öffnen    identisch (Reset beim Schließen, Neu-Lesen)
+Lindenhof (MFH)     bad_anz/zimmer markiert „gilt für eine einzelne Wohnung"
+Hermannstraße (ETW) unmarkiert — richtig
+```
+
+### Rest
+
+- `grundbuch` für Hüllhorst zeigt noch `portal-grundbuchamt.de` als
+  Quelle — gespeichert **vor** dem Filter aus v1833c. Ein „Neu suchen"
+  räumt es ab; nicht automatisch angefasst.
+- N4 (Reiter Objekt neu ordnen), N6, N7 stehen offen — siehe Backlog.
