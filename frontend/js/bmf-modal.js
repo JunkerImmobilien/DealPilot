@@ -856,6 +856,13 @@ function bmfAusgabenZeigen(hostEl) {
     var was = b.getAttribute('data-was');
     try {
       if (was === 'pdf') {
+        /* v1860 · Gemessen: dieser Knopf lief auf exportBmfPdf (pdf-anlage-bmf.js,
+           „BMF_Anlage_Finanzamt_____" — die Adressfelder ak_str/ak_plz/ak_ort
+           gibt es in der Vorlage nicht, 2 Seiten), der Knopf der letzten Seite
+           auf exportPDFKaufpreisaufteilung (pdf-kaufpreisaufteilung.js, mit
+           Adresse, Anschaffungskosten, 3 Seiten). Marcel: „die Kaufpreis-
+           aufteilung als PDF, das ist das Genaue." Also EIN Export, der genaue. */
+        if (typeof window.exportPDFKaufpreisaufteilung === 'function') return window.exportPDFKaufpreisaufteilung();
         if (typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
         if (typeof toast === 'function') toast('PDF-Ausgabe nicht geladen.');
       } else if (was === 'xlsx') {
