@@ -17,8 +17,23 @@
  * und das muss ein Pruefer sagen koennen.
  */
 const path = require('path');
-const dialog = require(path.join(__dirname, '..', '..', 'backend', 'src',
-  'services', 'telegramDialogService.js'));
+const fs = require('fs');
+
+/* Die Datei liegt im Repo unter backend/src/…, im Container aber unter
+   /app/src/… — dort ist `backend` die Wurzel. Beide Orte werden probiert,
+   und der GEFUNDENE wird genannt: ein Pruefer, der nicht sagt, welche
+   Datei er geladen hat, kann die falsche geladen haben. */
+const _orte = [
+  path.join(__dirname, '..', '..', 'backend', 'src', 'services', 'telegramDialogService.js'),
+  path.join(__dirname, '..', '..', 'src', 'services', 'telegramDialogService.js')
+];
+const _quelle = _orte.find((p) => fs.existsSync(p));
+if (!_quelle) {
+  console.log('ABBRUCH: telegramDialogService.js an keinem der Orte gefunden:');
+  console.log(_orte.map((p) => '  ' + p).join('\n'));
+  process.exit(2);
+}
+const dialog = require(_quelle);
 
 /* Marcels echte Objektliste vom 04.10.2026, aus der Staging-Datenbank
    gelesen. Keine erfundenen Adressen: der Fehler hing an der Schreibweise,
@@ -81,6 +96,7 @@ function probe(frage, sollAdresse) {
 }
 
 console.log('== pruef-adresssuche (v1828) ==');
+console.log('   Quelle: ' + _quelle);
 console.log('   Liste: ' + LISTE.length + ' echte Objekte aus Marcels Staging-Bestand');
 console.log('');
 
@@ -128,6 +144,26 @@ if (ammarkt.art === 'mehrdeutig') { ok++; grenz.push('  [ok]   "Am Markt" bleibt
 else { schlecht++; grenz.push('  [NEIN] "Am Markt" ist ' + ammarkt.art + ', muesste mehrdeutig sein'); }
 darfNicht('Marktplatz', 'Am Markt 9 Kabelsketal', 'anderes Wort, nur gleicher Anfang');
 darfNicht('Hofstraße', 'Lindenhof 14 Castrop-Rauxel', 'der Stamm von Lindenhof ist linden~, nicht hof');
+
+/* ── v1828b · DER FALSCHE TREFFER IST DER GEFAEHRLICHERE FALL ──────────
+ *
+ * Der alte Stand antwortete auf den ganzen Fragesatz EINDEUTIG mit
+ * "Demo-Objekt · Beispiel-Wohnung Dealhausen" — das Wort "objekt"
+ * punktete wie ein Strassenname.
+ *
+ *   > Ein Fehlschlag ist aergerlich, ein falscher Treffer ist
+ *   > gefaehrlich. "Kenne ich nicht" sieht jeder; die falsche Wohnung
+ *   > sieht niemand. */
+darfNicht('Was kannst du mir zum Objekt sagen?', 'Demo-Objekt · Beispiel-Wohnung Dealhausen',
+  'das blosse Wort "Objekt" darf kein Haus auswaehlen');
+darfNicht('Zeig mir mal die Wohnung', 'Demo-Objekt · Beispiel-Wohnung Dealhausen',
+  'das blosse Wort "Wohnung" ebenso wenig');
+
+/* Und die Gegenprobe dazu: mit Fuellwoertern DRUMHERUM muss die Adresse
+   trotzdem sauber durchkommen. Ein Filter, der zu viel wegnimmt, faellt
+   hier auf. */
+probe('Was kannst du mir zum Objekt in der Hauptstraße sagen?', 'Hauptstr. 51 Ibbenbüren');
+probe('Gib mir bitte die Zahlen zur Wohnung in der Gohliser Straße', 'Gohliser Str. 42 Leipzig');
 
 console.log('── Grenzfaelle ──');
 console.log(grenz.join('\n'));

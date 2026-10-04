@@ -271,6 +271,37 @@ function _woerter(s) {
 const _ENDUNGEN = ['strasse', 'straße', 'str', 'weg', 'allee', 'platz',
   'gasse', 'ring', 'damm', 'ufer', 'chaussee', 'hof', 'park'];
 
+/* ── v1828b · WOERTER, DIE EINE FRAGE AUSMACHEN, KEINE ADRESSE ───────────
+ *
+ * GEMESSEN beim Pruefen von v1828, und es war schlimmer als der
+ * gemeldete Fehler. Auf den GANZEN Satz
+ *
+ *     "Was kannst du mir zum Objekt in der Bismarckstraße sagen?"
+ *
+ * antwortete der alte Stand EINDEUTIG mit "Demo-Objekt ·
+ * Beispiel-Wohnung Dealhausen". Das Wort "objekt" steht in diesem Namen,
+ * und es punktete genau wie ein Strassenname.
+ *
+ *   > Ein Fehlschlag ist aergerlich, ein falscher Treffer ist gefaehrlich.
+ *   > "Kenne ich nicht" sieht jeder; die falsche Wohnung sieht niemand.
+ *
+ * Deshalb zaehlen Gattungs- und Fragewoerter nicht mit. Sie stehen in
+ * jeder zweiten Frage und in manchem Objektnamen — und sagen in beiden
+ * Faellen nichts darueber aus, WELCHES Haus gemeint ist. Ortsnamen und
+ * Strassen bleiben unberuehrt. */
+const _FUELLWOERTER = new Set([
+  /* Gattung */
+  'objekt', 'objekte', 'wohnung', 'wohnungen', 'haus', 'immobilie',
+  'immobilien', 'etw', 'efh', 'mfh', 'zfh', 'demo', 'beispiel', 'unbenannt',
+  /* Frage und Fuellsel */
+  'was', 'wie', 'wer', 'wo', 'warum', 'welche', 'welches', 'welcher',
+  'kannst', 'kann', 'koennen', 'könnte', 'sagen', 'sag', 'zeig', 'zeige',
+  'gib', 'mir', 'mich', 'ich', 'du', 'das', 'der', 'die', 'den', 'dem',
+  'ein', 'eine', 'einen', 'einem', 'einer', 'zum', 'zur', 'bei', 'bitte',
+  'und', 'oder', 'von', 'vom', 'fuer', 'für', 'auf', 'mit', 'ist', 'sind',
+  'hat', 'habe', 'haben', 'mal', 'bitte', 'danke', 'ueber', 'über'
+]);
+
 function _stamm(t) {
   for (const e of _ENDUNGEN) {
     if (t.length > e.length + 2 && t.endsWith(e)) return t.slice(0, -e.length) + '~';
@@ -282,7 +313,9 @@ function objektRaten(satz, liste) {
   /* v1828 · Beide Seiten in dieselbe Stammform, bevor verglichen wird.
      Vorher verglich hier eine ausgeschriebene gegen eine abgekuerzte
      Strasse und fand nichts. */
-  const w = _woerter(satz).map(_stamm);
+  /* v1828b · Fuellwoerter raus, BEVOR gestammt wird. Ein "objekt" in der
+     Frage darf nicht gegen eine Strasse antreten. */
+  const w = _woerter(satz).filter((t) => !_FUELLWOERTER.has(t)).map(_stamm);
   const treffer = liste.map((o) => {
     const ows = _woerter(o.adresse).map(_stamm);
     const ow = new Set(ows);
