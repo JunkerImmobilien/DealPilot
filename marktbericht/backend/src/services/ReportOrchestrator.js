@@ -1255,8 +1255,35 @@ export const ReportOrchestrator = {
       [propertyId, JSON.stringify(valuation)]);
     await q('INSERT INTO mb.deal_scores (property_id,score,breakdown) VALUES ($1,$2,$3)',
       [propertyId, deal.score, JSON.stringify(deal.breakdown)]);
-    /* v942-userbind */
-    const _uid = (input.user_id != null && !isNaN(parseInt(input.user_id, 10))) ? parseInt(input.user_id, 10) : null;
+    /* ── v942-userbind · v1821: parseInt RAUS ─────────────────────────────
+     *
+     * GEMESSEN am 04.10.2026 an Bericht 137: `user_id = 2`. Marcels
+     * Kennung ist `2a1ac331-7d7f-44a5-…`, und
+     *
+     *     parseInt('2a1ac331-7d7f-44a5-…', 10)  ===  2
+     *
+     * weil JavaScript bis zum ersten ungueltigen Zeichen liest. `isNaN(2)`
+     * ist false, also wurde die 2 fuer eine gueltige Kennung gehalten.
+     *
+     * FOLGE 1: der Bericht gehoerte niemandem. Die Historie am Objekt blieb
+     * leer, obwohl der Bericht da war — genau das, was Marcel vermisst hat.
+     *
+     * FOLGE 2, die schwerere: es gibt nur 16 moegliche erste Zeichen einer
+     * UUID. Ab etwa zehn Kunden teilen zwei dieselbe Pseudokennung — und
+     * `routes/api.js` filtert Abruf UND Loeschung nach `user_id`. Beim
+     * Reseller-Modell waere das ein Mandantenleck.
+     *
+     *   > Eine Kennung in eine Zahl zu wandeln ist nie eine Pruefung. Es
+     *   > ist eine Verkuerzung, die wie eine Pruefung aussieht.
+     *
+     * Die Routen wurden in v1769 alle auf `_uidAus()` umgestellt; diese
+     * eine Stelle im Orchestrator ist uebrig geblieben. Die Spalten sind
+     * seit Migration 015 `text` — die Kennung passt also hinein, wie sie
+     * ist. Gepruefte Form statt Umwandlung: Ziffern, Buchstaben, Striche,
+     * hoechstens 64 Zeichen (dieselbe Regel wie in `_uidAus`). */
+    const _uidRoh = String(input.user_id == null ? '' : input.user_id).trim();
+    const _uid = (_uidRoh && _uidRoh !== 'undefined' && _uidRoh !== 'null'
+                  && /^[A-Za-z0-9-]{1,64}$/.test(_uidRoh)) ? _uidRoh : null;
     const _label = (typeof input.object_label === 'string' && input.object_label.trim()) ? input.object_label.trim() : null;
     const rep = await q1(
       'INSERT INTO mb.market_reports (property_id,ai_mode,payload,report_md,user_id) VALUES ($1,$2,$3,$4,$5) RETURNING id',

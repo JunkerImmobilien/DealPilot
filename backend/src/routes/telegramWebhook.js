@@ -176,7 +176,26 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     .test(String(text || '').trim());
   const letzteBotzeile = (((z && z.verlauf) || []).filter((e) => e.rolle !== 'user').slice(-1)[0] || {}).text || '';
   const standPreis = /kostet|Kontingent|Abruf|Guthaben|Soll ich/i.test(letzteBotzeile);
-  const darfKosten = sagtJa && standPreis;
+  /* ── v1821 · DIE ZUSTIMMUNG BRAUCHT EINEN GEGENSTAND ────────────────
+   *
+   * Bis hierher genuegte "ja" plus "irgendwo stand ein Preis". GEMESSEN:
+   * der Preis galt Am Markt 9, abgerufen und abgebucht wurde Gohliser
+   * Strasse 42.
+   *
+   *   > Eine Zustimmung ohne Gegenstand ist keine Zustimmung.
+   *
+   * Die Spalte `angebot` traegt das Objekt, fuer das der Preis genannt
+   * wurde. Nur darauf darf sich ein "ja" beziehen, und nur 30 Minuten
+   * lang — danach ist eine Zustimmung kein Bezug mehr, sondern Zufall. */
+  const angebot = angebotGueltig(z && z.angebot);
+  const darfKosten = sagtJa && standPreis && Boolean(angebot);
+  if (sagtJa && standPreis && !angebot) {
+    /* Zugestimmt, aber kein frisches Angebot: NICHT abrufen. Das ist der
+       Fall, in dem bisher das falsche Objekt gerechnet wurde. */
+    try {
+      console.warn('[telegram v1821] Zustimmung ohne gueltiges Angebot - kein Abruf. chat=' + chatId);
+    } catch (_) {}
+  }
 
   const protokoll = [];
   const ctx = {
@@ -192,7 +211,27 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     anlageFertig: async function () {
       if (z && z.modus === 'anlegen') await zustandLoeschen(chatId, userId);
     },
-    merkeListe: function (ids) { this.letzteListe = ids; }
+    merkeListe: function (ids) { this.letzteListe = ids; },
+
+    /* ── v1821 · DAS ANGEBOT GEHT MIT, UND ZWAR GESCHLOSSEN ─────────────
+     *
+     * `angebotObjekt` ist das Objekt, für das der Preis angesagt wurde —
+     * oder null. `marktbericht_abrufen` nimmt NUR das; eine Objektangabe
+     * des Modells wird bei einem kostenpflichtigen Abruf ignoriert.
+     *
+     *   > Was Geld kostet, darf das Modell nicht adressieren. Es darf es
+     *   > vorschlagen, und der Nutzer bestätigt den Vorschlag — nicht
+     *   > irgendeinen.
+     *
+     * `merkeAngebot` ruft die Preisansage, `angebotVerbraucht` der Abruf:
+     * eine zweite Zustimmung darf denselben Abruf nicht erneut auslösen. */
+    angebotObjekt: (angebot && angebot.objekt_id) || null,
+    merkeAngebot: async function (id, adresse) {
+      try { await angebotSetzen(chatId, userId, id, adresse); } catch (e) {}
+    },
+    angebotVerbraucht: async function () {
+      try { await angebotLoeschen(chatId, userId); } catch (e) {}
+    }
   };
 
   let r;
@@ -352,7 +391,8 @@ async function anlegenStarten(token, chatId, userId, text) {
 async function zustand(chatId, userId) {
   const r = await query(
     `SELECT modus, entwurf, offene_ids, letzte_frage, objekt_id,
-            letzte_liste, letzte_liste_art, letztes_objekt, verlauf
+            letzte_liste, letzte_liste_art, letztes_objekt, verlauf,
+            angebot            /* v1821 · wofuer der Preis angesagt wurde */
        FROM telegram_dialog WHERE chat_id = $1::bigint AND bot_user_id = $2`,
     [String(chatId), userId]);
   return r.rows[0] || null;
@@ -376,6 +416,49 @@ async function zustandSetzen(chatId, userId, z) {
        objekt_id = EXCLUDED.objekt_id, aktualisiert = now()`,
     [String(chatId), userId, z.modus || null, JSON.stringify(z.entwurf || {}),
      z.offene_ids || null, z.letzte_frage || null, z.objekt_id || null]);
+}
+
+/* ── v1821 · DAS ANGEBOT: WOFÜR DER PREIS ANGESAGT WURDE ────────────────
+ *
+ * GEMESSEN am 04.10.2026 an Marcels Dialog: der Preis galt „Am Markt 9",
+ * abgerufen und abgebucht wurde „Gohliser Straße 42".
+ *
+ *   > Die Geldsperre fragt, ob zugestimmt wurde. Sie fragt nicht, wozu.
+ *   > Eine Zustimmung ohne Gegenstand ist keine Zustimmung.
+ *
+ * `marktbericht_preis` legt hier ab, für welches Objekt und welche Stufen
+ * der Preis genannt wurde. `marktbericht_abrufen` nimmt AUSSCHLIESSLICH
+ * dieses Objekt — auch wenn das Modell etwas anderes mitgibt.
+ *
+ * DIE FRIST: ein Angebot gilt 30 Minuten. Danach ist ein „ja" kein Bezug
+ * mehr, sondern ein Zufall.
+ */
+const ANGEBOT_FRIST_MS = 30 * 60 * 1000;
+
+async function angebotSetzen(chatId, userId, objektId, adresse) {
+  await zeileSichern(chatId, userId);
+  await query(
+    `UPDATE telegram_dialog SET angebot = $3::jsonb, aktualisiert = now()
+      WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId,
+     JSON.stringify({ objekt_id: objektId, adresse: adresse || null,
+                      zeit: new Date().toISOString() })]);
+}
+
+async function angebotLoeschen(chatId, userId) {
+  await query(
+    `UPDATE telegram_dialog SET angebot = NULL, aktualisiert = now()
+      WHERE chat_id = $1::bigint AND bot_user_id = $2`,
+    [String(chatId), userId]);
+}
+
+/** Ist das Angebot noch frisch? Gibt die Objekt-Id zurück oder null. */
+function angebotGueltig(a) {
+  if (!a || !a.objekt_id) return null;
+  const t = Date.parse(a.zeit || '');
+  if (!Number.isFinite(t)) return null;
+  if (Date.now() - t > ANGEBOT_FRIST_MS) return null;
+  return a;
 }
 
 /* Die Zeile muss existieren, bevor das Gedaechtnis sie fortschreibt. */

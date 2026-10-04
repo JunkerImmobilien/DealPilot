@@ -1444,6 +1444,24 @@ async function marktbericht_preis(ctx, args) {
   const id = await _findeObjekt(ctx, args);
   if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden.' };
 
+  /* ── v1821 · DIE PREISANSAGE HAELT IHREN GEGENSTAND FEST ─────────────
+   *
+   * GEMESSEN am 04.10.2026: der Preis galt "Am Markt 9", abgerufen und
+   * abgebucht wurde "Gohliser Strasse 42". Diese Funktion hat das Objekt
+   * ermittelt und es dann VERGESSEN — kein merkeObjekt, kein Angebot.
+   * Beim "ja" suchte der Abruf neu und landete woanders.
+   *
+   *   > Wer einen Preis nennt, nennt ihn fuer etwas. Was man nicht
+   *   > festhaelt, muss man neu suchen — und beim zweiten Suchen findet
+   *   > man etwas anderes.
+   *
+   * Ab hier gilt: das Objekt wird gemerkt UND als Angebot abgelegt. Der
+   * Abruf nimmt ausschliesslich dieses. */
+  ctx.merkeObjekt(id);
+  const _o = await dialog.objektKontext(ctx.userId, id);
+  const _adr = _adrVon(_o) || null;   /* EINE Stelle, siehe _adrVon */
+  if (typeof ctx.merkeAngebot === 'function') await ctx.merkeAngebot(id, _adr);
+
   /* ── v1811b · OHNE STUFE GIBT ES ALLE DREI ───────────────────────────
    *
    * Der Hinweis "frag nach der Stufe" half nicht: das Modell gab einfach
@@ -1551,13 +1569,38 @@ async function marktbericht_preis_alle(ctx, args) {
 }
 
 async function marktbericht_abrufen(ctx, args) {
-  const id = await _findeObjekt(ctx, args);
-  if (!id) return { ok: false, hinweis: 'Kein Objekt gefunden.' };
+  /* ══ v1821 · DAS ANGEBOT ENTSCHEIDET, NICHT DAS MODELL ══════════════
+   *
+   * GEMESSEN am 04.10.2026 an Marcels Dialog: Preis fuer "Am Markt 9"
+   * angesagt, "Gohliser Strasse 42" abgerufen und abgebucht.
+   *
+   *   > Was Geld kostet, darf das Modell nicht adressieren. Es darf es
+   *   > vorschlagen; bestaetigt wird DER VORSCHLAG, nicht irgendeiner.
+   *
+   * Liegt ein Angebot vor (die Preisansage hat es abgelegt, der Webhook
+   * hat die Zustimmung geprueft), gilt AUSSCHLIESSLICH dessen Objekt.
+   * Eine abweichende Angabe des Modells wird nicht befolgt, sondern
+   * gemeldet — stillschweigend zu uebergehen waere derselbe Fehler mit
+   * umgekehrtem Vorzeichen. */
+  let id = ctx.angebotObjekt || null;
+  let abweichung = null;
+  if (id) {
+    const gewuenscht = await _findeObjekt(ctx, args).catch(() => null);
+    if (gewuenscht && String(gewuenscht) !== String(id)) abweichung = gewuenscht;
+  } else {
+    id = await _findeObjekt(ctx, args);
+  }
+  if (!id) {
+    return { ok: false, hinweis: 'Kein Objekt gefunden. Nenne zuerst den Preis '
+           + '(marktbericht_preis) und lass den Nutzer zustimmen — erst dann gibt es '
+           + 'ein Objekt, auf das sich der Abruf beziehen darf.' };
+  }
   const stufe = _stufe(args);
   const o = await dialog.objektKontext(ctx.userId, id);
   try {
     const r = await markt.abrufen(ctx.userId, o, stufe);
     ctx.merkeObjekt(id);
+    if (typeof ctx.angebotVerbraucht === 'function') await ctx.angebotVerbraucht();
 
     /* ── v1808 · DAS ERGEBNIS IST MEHR ALS EINE ZAHL ───────────────────
      *
@@ -1576,6 +1619,15 @@ async function marktbericht_abrufen(ctx, args) {
 
     return {
       ok: true, stufe, art: stufeInfo.art, name: stufeInfo.name,
+      /* v1821 · WOFUER gerechnet wurde, steht im Ergebnis. Ohne diese
+         Zeile kann das Modell eine andere Adresse darueberschreiben — und
+         genau das ist am 04.10.2026 passiert. */
+      abgerufen_fuer: _adrVon(o),
+      abweichung_gemeldet: abweichung
+        ? 'Das Modell wollte ein ANDERES Objekt abrufen. Gerechnet wurde das '
+          + 'Objekt der Preisansage. Sag dem Nutzer ausdruecklich, WELCHES Objekt '
+          + 'berechnet wurde.'
+        : undefined,
       zahlen: _berichtZahlen(r),
       bericht_text: bericht ? String(bericht).slice(0, 14000) : null,
       rumpf: _ohneGrosseFelder(r),
@@ -1587,8 +1639,29 @@ async function marktbericht_abrufen(ctx, args) {
              + 'Nenne Anbieter nie beim Namen — "unabhaengiger Bewertungspartner".'
     };
   } catch (e) {
+    /* ── v1821 · EINE GELDAKTION DARF NICHT SPURLOS SCHEITERN ──────────
+     *
+     * GEMESSEN: drei Abrufe im Agentenlog, nur EIN Bericht im
+     * Marktbericht-Dienst. Zwei sind vorher gescheitert, und der Fehler
+     * ging ausschliesslich als Werkzeugergebnis ans Modell. Als Marcel
+     * sagte, die Wertermittlung habe nicht funktioniert, gab es keine
+     * einzige Spur davon.
+     *
+     *   > Ein Fehler, der nur dem Modell gemeldet wird, ist nach der
+     *   > Antwort verschwunden. */
+    try {
+      console.error('[marktbericht v1821] Abruf FEHLGESCHLAGEN'
+        + ' stufe=' + stufe + ' objekt=' + id
+        + ' adresse=' + _adrVon(o)
+        + ' kontingent=' + Boolean(e.kontingent)
+        + ' fehler=' + String(e && e.message).slice(0, 300));
+    } catch (_) {}
     return { ok: false, fehler: e.message, kontingent: Boolean(e.kontingent),
-      upgrade_zu: e.upgradeTo || undefined };
+      upgrade_zu: e.upgradeTo || undefined,
+      abgerufen_fuer: _adrVon(o), stufe: stufe,
+      hinweis: 'Der Abruf ist fehlgeschlagen. Nenne dem Nutzer den Fehlertext und '
+             + 'das Objekt, um das es ging, und frag, ob er es erneut versuchen '
+             + 'soll. Erfinde keine Zahlen aus einem gescheiterten Abruf.' };
   }
 }
 
@@ -1627,6 +1700,15 @@ function _ohneGrosseFelder(r) {
 }
 
 /* ═══ Helfer ═════════════════════════════════════════════════════════ */
+
+/* v1821 · Eine Adresse an EINER Stelle gebildet. Sie steht jetzt im
+   Ergebnis des Abrufs UND im Fehlerprotokoll — zwei Schreibweisen
+   derselben Adresse waeren zwei Gelegenheiten, sie falsch zu bilden. */
+function _adrVon(o) {
+  const d = (o && o.daten) || {};
+  return [d.str, d.hnr].filter(Boolean).join(' ')
+    + (d.ort ? ', ' + [d.plz, d.ort].filter(Boolean).join(' ') : '');
+}
 
 function _ohneIntern(d) {
   const o = {};
