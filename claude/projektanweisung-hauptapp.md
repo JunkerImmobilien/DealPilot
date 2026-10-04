@@ -29187,3 +29187,278 @@ Das ist **dreimal an zwei Tagen** dieselbe Lehre — bei den Beträgen
 3 ANLAGE      :  7 von 7 Angaben im Datensatz
 4 GESAMT      :  9 von 9 Proben
 ```
+
+---
+
+## Rollout-Journal 03.–04.10.2026 — v1813–v1815: alle Fragen beantwortbar, und zwei stille Rechenfehler
+
+**Was** · Marcel: *„ich möchte auch alle fragen stellen könne und eine
+vernünftige antwort bekommen … was sind meine besten Wohnungen. Wie ist der
+Cashflow bei wohnung xy … auch fragen wie: wie kann ich meinen cashflow
+steigern"*
+
+**Commits** · `v1813` bis `v1815`
+
+### Gebaut
+
+Sieben neue Werkzeuge im Agenten (jetzt 19): `objekt_kennzahlen`,
+`objekte_rangliste`, `objekt_felder_liste`, `cashflow_hebel` und
+`cashflow_hebel_portfolio`, `pakete_und_preise`, `objekt_schnellblick`.
+
+Der **Portfolio-Spiegel** ist dabei die tragende Idee: der Browser rechnet
+(er ist der einzige Rechenkern) und legt sein Ergebnis in `portfolio_spiegel`
+ab. Der Bot liest, er rechnet nicht nach.
+
+> Ein zweiter Rechenweg für dieselbe Zahl ist keine Absicherung, sondern
+> eine zweite Wahrheit.
+
+### Zwei Fehler, die erst beim Bauen auffielen — beide im Frontend
+
+**v1814 · Der Cashflow des Vorgängers.** Jeder Objektwechsel stempelte dem
+neuen Objekt die Kennzahlen des alten auf. Ursache: ein `else if` hinter
+einer immer wahren Bedingung machte `calcNow()` unerreichbar, und der
+Kennzahlen-Stempel trug keine Herkunft.
+
+> Ein Zwischenspeicher ohne Herkunftsvermerk ist kein Zwischenspeicher,
+> sondern eine Behauptung.
+
+Behoben: Schlüssel **zuerst** setzen, **immer** rechnen, Stempel nur bei
+`State.kpis._fuer === window._currentObjKey`. 18 Objekte neu gerechnet,
+0 Dubletten.
+
+**v1815 · Der Haken, der kein Neuladen überlebt — steuerrelevant.**
+`san_tax_active` wurde beim Speichern mit `e.value` gelesen; bei einer
+Checkbox ist das **immer** `"on"`, also truthy. Beim Laden wurde `value`
+gesetzt statt `checked`. Ergebnis: ein Haken, der gesetzt aussah, aber keiner
+war — an der Sonder-AfA.
+
+Der Altbestand wurde dabei **nicht** als Zustimmung gelesen: nur `true` und
+`'true'` gelten. Eine Migration, die `"on"` als Haken deutet, hätte für
+jeden Nutzer eine steuerliche Angabe erfunden.
+
+### Mein eigener Fehler, offen gemeldet
+
+Beim Reparaturlauf habe ich das leere Objekt „Unbenannt" mit den Daten der
+Musterstraße gefüllt. Marcel soll das Doppel auf Staging löschen.
+
+---
+
+## Rollout-Journal 04.10.2026 (2) — v1816–v1817: die amtlichen Zinssätze kommen an, und der Bot hört auf zu raten
+
+**Was** · Marcel: *„Okay, also wir müssen sicherstellen, dass auf jeden Fall
+die Liegenschaftszinsen im Bericht ankommen."* Dazu: *„ist der bot jetzt
+durch projektwissen schlauer?"*
+
+**Commits** · `v1816`, `v1816b`, `v1817`
+
+### v1816 — der Weg vom Register bis in den Bericht
+
+`WertParameterService` nimmt jetzt das **Register als erste Quelle**, nicht
+als Rückfall. Neu dazu `lib/zweigwahl.js` (~500 Zeilen): `dekodiere`,
+`typVon`, `waehle`, `zinssatzFuerObjekt` — die Zweigschlüssel des Registers
+(`efh_frei_rnd36_55`, `we_v_bj1989_rnd26_40`, `mfh_bis6`) werden gelesen
+statt geraten.
+
+**Nachgemessen:** Zinssatz-Deckung **427 von 576** Gebieten (vorher 194),
+also 74 %. NRW blieb bei 0,00 Prozentpunkten Abweichung — das Modell dort
+ist unverändert.
+
+### v1816b — wo kein Treffer ist, steht jetzt ein Satz
+
+Statt Schweigen trägt der Bericht die **Rückfrage**: welcher Ausschuss
+zuständig ist, was fehlt, und wo die echte Zahl steht. Das Feld dafür gab es
+bereits — es wurde nur an keinem Rückgabeweg gefüllt.
+
+> Wo die Quelle endet, endet die Rechnung. Aber sie endet mit einem Satz,
+> nicht mit einer Lücke.
+
+### v1817 — Projektwissen statt Erfindung
+
+Der Bot beantwortete **drei von fünf** Produktfragen falsch — und zwar
+flüssig. Neu: `backend/bot-wissen.md`, rund 160 Zeilen pflegbarer Text
+**ohne Zahlen** (Score-Stufen, beide Scores mit echten Gewichtungen, die
+Luftfahrt-Begriffe, „Objekte" gegen „Portfolio", Anbieter-Neutralität).
+
+Zahlen stehen bewusst **nicht** drin: ein Preis in einer Wissensdatei wird
+nie nachgezogen. Der Preis kommt aus `plans` (Pro = 49,99 €/Monat), geprüft.
+
+**Danach:** 4–5 von 5 Produktfragen richtig.
+
+---
+
+## Rollout-Journal 04.10.2026 (3) — v1818–v1820: Sprache, zwei Zahlen, und eine Sperre, die auf einem abgeschnittenen Zitat beruhte
+
+**Commits** · `v1818`, `v1818b`, `v1818c`, `v1819`, `v1820`, `v1820b`
+
+### v1818 — eine Sprachnachricht ist keine Objektaufnahme
+
+Der Sprachweg transkribiert jetzt **nur** und ruft dann den normalen
+Textweg rekursiv auf. Vorher hatte er einen eigenen Pfad mit eigenen Regeln
+— zwei Wege für dieselbe Sache, und einer davon war schlechter.
+
+### v1818b — Portfolio und Objekte sind zwei Zahlen
+
+„18 angelegt, davon 9 im Bestand" — eine davon allein sieht wie ein Fehler
+aus. Der Bot nennt jetzt beide.
+
+### v1818c — der fertige Satz ins Ergebnis, zum dritten Mal dieselbe Lehre
+
+Ein Modul rechnete einen fertigen Satz aus, und der Aufrufer baute ihn neu.
+Dieselbe Lehre wie beim RND-Wizard und bei der Herkunftsangabe.
+
+### v1819/v1820 — Ludwigslust-Parchim, und eine Sperre, die keine war
+
+Eine halb geerntete Quelle sieht aus wie eine kaputte. Die Sperre für
+Ludwigslust-Parchim beruhte auf einem **abgeschnittenen Zitat** aus den
+Lizenzbedingungen — der vollständige Satz erlaubt die Nutzung.
+
+**Geerntet:** 7 Zinssätze Stufe A mit vollem Modellvermerk. DB 2655 → 2662
+Sätze, Zins 1205 → 1212. **Soll = Ist**, Abruf 8 von 8 auf Stufe A.
+
+`v1820b` nimmt die falsche Sperre im Backlog ausdrücklich zurück.
+
+> Eine Sperre, die nicht mehr gilt, hält Arbeit auf, die längst erlaubt ist.
+
+### Ein eigener Fehler, offen
+
+Am 02.10. stand in `verfuegbarkeit-mv.json` bereits geprüft, dass die
+HRO/LRO-Lizenzen kein Datenproblem sind, sondern „vier Briefe". Ich habe das
+nicht gelesen und die Prüfung wiederholt. **Erst das eigene Register lesen.**
+
+---
+
+## Rollout-Journal 04.10.2026 (4) — v1821–v1823: eine Zustimmung ohne Gegenstand, und drei falsche Steuersätze
+
+**Commits** · `v1821`, `v1822`, `v1823`
+
+### v1821 — der teuerste Fehler dieser Reihe
+
+Gemessen an Marcels eigenem Dialog: der Preis wurde für **Am Markt 9**
+angesagt, abgerufen und abgebucht wurde **Gohliser Str. 42**.
+
+> Die Geldsperre fragte, ob zugestimmt wurde. Sie fragte nicht, wozu.
+> Eine Zustimmung ohne Gegenstand ist keine Zustimmung.
+
+Behoben über `telegram_dialog.angebot` (Migration 081): die Preisansage legt
+ab, **wofür** sie gilt. Der Abruf nimmt ausschließlich das — und ignoriert
+jede Objektangabe des Modells. Das WOFÜR gehört genauso außerhalb des
+Modells wie das OB.
+
+**Im selben Zug gefunden:** `parseInt()` auf eine UUID. `users.id` ist eine
+UUID; `parseInt("2a1ac331-…")` ergibt **2**. Die Berichtshistorie fehlte
+deshalb, und ab rund zehn Kunden wäre daraus ein Leck geworden. Bericht 137
+auf Marcels echte Kennung korrigiert, **0 verstümmelte Kennungen** im
+Bestand.
+
+### v1822 — mein eigener Sonderfall aus v1818
+
+`if (z0 && z0.modus === 'anlegen')` kannte **einen** Zustand und ignorierte
+die anderen. Dadurch brach die Adressbestätigung per Sprache — genau das
+Quick-Check-Problem, das Marcel gemeldet hatte. Sonderfall entfernt.
+
+### v1823 — drei Bundesländer zahlten den falschen Steuersatz
+
+`grest-plz-lookup.js` führte `[1000, 9999, 'SN']`. Die Leitzone 0 sind aber
+**vier** Bundesländer. Brandenburg, Sachsen-Anhalt und Thüringen galten als
+Sachsen.
+
+Gemessen an Jena bei 300.000 € Kaufpreis: **3.000 € zu wenig**
+Kaufnebenkosten. Nach der Korrektur 14 von 14 Postleitzahlen richtig, und
+ein Prüfhaken `_ranges` liegt jetzt am Modul.
+
+---
+
+## Rollout-Journal 04.10.2026 (5) — v1824–v1827: der Quick-Check-Fluss, das Trennen, und eine Rechtsgrundlage, die es nicht gab
+
+**Was** · Marcel: *„Wenn ich einen Quick-Check machen will … dann sagt er mir
+ständig fehlende Angaben … wir wollen ja als Erstes einen Deal-Score haben …
+dann müssen wir auch die Möglichkeit haben, den Telegram-Bot auch wieder zu
+entkoppeln. Und wir müssen das vielleicht auch mit dann einer zusätzlichen
+Datenschutzvereinbarung oder so das bestätigen."*
+
+**Commits** · `v1824`, `v1824b`, `v1825`, `v1826`, `v1827`, `v1827b`
+
+### v1824/v1825 — Schnellblick, Vorgaben, und ein Trennen, das wirklich trennt
+
+**Schnellblick:** nach `anlageAbschliessen` kommt der Deal-Score
+unaufgefordert — kein zweites Nachfragen nach Angaben, die schon dastehen.
+15 von 15 Proben.
+
+**Vorgaben** (`botVorgabenService`, `user_settings` → `bot_vorgaben`): sieben
+erlaubte Felder mit Rahmen. `ergaenzung()` trennt sauber in `vorhanden` /
+`vom_nutzer` / `vorschlag` (mit Herkunft) / `fehlt` — ein Vorschlag wird nie
+als Angabe des Nutzers ausgegeben. Die Kaufnebenkosten kommen über
+`grestFuerPlz()` aus dem Ort.
+
+**Trennen:** `DELETE /link` löscht jetzt den `telegram_dialog` mit. Vorher
+blieb der Gesprächsverlauf — Adressen, Preise, Mieten — nach dem Trennen
+stehen.
+
+> „Es geht nichts verloren" war beruhigend und falsch. Beim Trennen soll
+> etwas verloren gehen; das ist der Sinn.
+
+### v1824b — eine Lücke in einem Posten darf nicht die ganze Rechnung ausknipsen
+
+### v1826 — Telegram in der Datenschutzerklärung
+
+Der Bot lief seit dem 02.10. und stand in der Erklärung **null Mal**. Neu als
+Abschnitt 9, mit dem, was weh tut: keine Ende-zu-Ende-Verschlüsselung,
+Sprachnachrichten gehen zur Transkription an OpenAI, Drittland **ohne**
+Angemessenheitsbeschluss (Art. 49 Abs. 1 lit. a).
+
+Dabei fiel `13a. Sicherheitsprotokollierung` auf: der Einschub hing an
+„13. Datensicherheit", die jetzt 14 ist — er heißt deshalb **14a**.
+
+> Ein Buchstabensuffix schützt die Nachbarn, nicht die eigene Zahl.
+
+Gegengeprüft: Abschnitte 1–16 plus 14a, keine Lücke, keine Dublette.
+
+### v1827 — die Einwilligung, die der Text behauptete
+
+v1826 stützte die Übermittlung auf die Einwilligung. **Gemessen: erhoben
+wurde sie nirgends.** Wer seinen Token eintrug, bekam seinen Webhook.
+
+> Der Text behauptete eine Rechtsgrundlage, die es nicht gab. Das ist
+> derselbe Fehler wie „3 Berater-Seats inklusive", nur umgekehrt — nicht
+> eine Leistung ohne Code, sondern eine Erlaubnis ohne Code.
+
+Drei Sperren **vor** `getMe` (denn schon `getMe` ist eine Verbindung zu
+Telegram): Einwilligung fehlt → 400 · falsche Fassung → 409 · dann erst
+Token und Telegram.
+
+Migration 082 führt `einwilligung_am` und `einwilligung_fassung` an
+`telegram_bots`. **Kein Default `now()`** — das hätte für den Altbestand eine
+Zustimmung erfunden. Marcels bestehender Bot zeigt deshalb offen
+„Einwilligung nicht dokumentiert".
+
+Der Haken steht **über** dem Tokenfeld (wer den Token schon eingefügt hat,
+liest keinen Text mehr dazwischen) und ist nicht vorangekreuzt (EuGH
+Planet49).
+
+### Nachgemessen
+
+```
+pruef-einwilligung (HTTP, echter Login, eigener Testnutzer)
+  17 Pruefungen gefahren, 17 gruen, 0 rot
+  darunter: einwilligung_fehlt als Gegentest auf den alten Stand,
+            INSERT-SQL AUS der Routendatei gelesen statt nachgebaut,
+            zweimal gefahren und die Zeitstempel SUBTRAHIERT
+
+Browser (Staging, frischer Tab, Buster v=v1827)
+  Haken vorhanden, nicht vorangekreuzt, VOR dem Tokenfeld
+  Knopf gesperrt (opacity 0.45) -> nach dem Haken frei (opacity 1)
+  gesendet: {token, einwilligung:true, ds_fassung:"1.1"}
+  Gegentest abhaken -> wieder gesperrt, nichts gesendet
+  Sperre am Knopf umgangen -> "Bitte zuerst die Einwilligung bestaetigen."
+  datenschutz.html: 200, text/html, 29.583 Bytes, Anker #telegram vorhanden
+```
+
+### Rest
+
+- **Der Rechtstext ist ein Entwurf.** Er gehört vor der Vermarktung
+  anwaltlich geprüft — besonders die Stützung auf Art. 49 Abs. 1 lit. a und
+  die Rollenverteilung bei einem vom Kunden selbst betriebenen Bot.
+- Eine **AVV mit OpenAI** ist im Repo nirgends sichtbar.
+- Der Stufe-3-Fehler (1,79 Mio, Baujahr 1938) braucht einen kontrollierten
+  Testabruf — er kostet einen von fünf `wev` und wartet auf Marcels Zustimmung.
+- Prod liegt weit zurück; der Komplett-Check vor der Vermarktung steht noch aus.
