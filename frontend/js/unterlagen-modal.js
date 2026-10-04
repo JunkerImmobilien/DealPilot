@@ -87,6 +87,11 @@
     var m = document.getElementById(ID);
     if (m) m.remove();
     document.removeEventListener('keydown', _esc_taste);
+    /* v1844 · Beim Schließen vergessen: das nächste Öffnen kann ein anderes
+       Objekt sein, und die Ämter einer anderen Gemeinde dürfen nicht
+       stehen bleiben. */
+    _vorgeladen = false;
+    _amtJeArt = {};
   }
   function _esc_taste(e) { if (e.key === 'Escape') _schliessen(); }
 
@@ -161,6 +166,20 @@
           + 'Konnte die Unterlagenarten nicht laden: ' + _esc(e.message || e) + '</div>';
         return;
       }
+    }
+
+    /* ── v1844 · DIE ERNTE BEIM ÖFFNEN LESEN ──────────────────────────────
+       Gemessen: das Modal zählte „5 von 5 fehlen", obwohl für Hüllhorst
+       zwei Ämter längst hinterlegt waren — es erfuhr das erst beim Klick.
+       Eine Anzeige, die mehr Arbeit ankündigt als da ist, ist falsch.
+       Einmal je Öffnen, ohne Kontingent: nur lesen. */
+    if (!_vorgeladen && (o.plz || o.ort)) {
+      _vorgeladen = true;
+      try {
+        var vl = await _api('/aemter?plz=' + encodeURIComponent(o.plz)
+          + '&ort=' + encodeURIComponent(o.ort), {});
+        (vl.aemter || []).forEach(function (a) { if (a && a.art) _amtJeArt[a.art] = a; });
+      } catch (e) { /* Lesen darf scheitern — dann sucht der Nutzer eben. */ }
     }
 
     var h = '';
@@ -382,6 +401,9 @@
    * Zeile, wo es gerade steht. Was schon da ist, wird übersprungen —
    * „alle" heißt alle FEHLENDEN, nicht alle noch einmal. */
   var _alleLaeuft = false;
+  /* v1844 · Einmal je Öffnen die Ernte lesen — und beim Schließen
+     vergessen, denn das nächste Öffnen kann ein anderes Objekt sein. */
+  var _vorgeladen = false;
   async function alleAbrufen() {
     if (_alleLaeuft || !_arten) return;
     _alleLaeuft = true;

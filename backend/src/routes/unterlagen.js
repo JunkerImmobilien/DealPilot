@@ -145,4 +145,19 @@ router.put('/anfrage/:id', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/* ─── GET /aemter?plz=&ort= ─────────────────────────────────────────────
+ *
+ * v1844 · Was die Ernte für diese Gemeinde schon hält. Das Modal fragt
+ * das beim Öffnen, damit „Alle abrufen" nur holt, was fehlt — und die
+ * Zahl daneben stimmt. Kein Kontingent, keine Recherche: nur lesen.
+ */
+router.get('/aemter', async (req, res, next) => {
+  try {
+    const plz = String(req.query.plz || '').trim();
+    const ort = String(req.query.ort || '').trim();
+    if (!plz && !ort) return res.json({ aemter: [] });
+    res.json({ aemter: await unterlagen.aemterFuer(plz, ort) });
+  } catch (e) { next(e); }
+});
+
 module.exports = router;

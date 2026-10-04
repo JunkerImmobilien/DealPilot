@@ -92,6 +92,20 @@ for (const url of amtlich) {
 
 /* ── 4 · Die Belegprüfung, ohne Netz ─────────────────────────────────── */
 (async () => {
+  /* ── v1844 · DIESE FAELLE SIND GEMESSEN, NICHT AUSGEDACHT ─────────────
+     Beim ersten "Alle abrufen" fuer Huellhorst kamen zwei Aemter mit der
+     Adresse "email" zurueck - dem Wort. Gespeichert, angezeigt, und
+     "Im Mailprogramm oeffnen" haette mailto:email gebaut. */
+  pruefe('mailGueltig: das Wort "email" ist keine Adresse', u.mailGueltig('email') === false);
+  pruefe('mailGueltig: "keine" ist keine Adresse', u.mailGueltig('keine') === false);
+  pruefe('mailGueltig: leer ist keine Adresse', u.mailGueltig('') === false);
+  pruefe('mailGueltig: ohne Domain-Punkt keine Adresse', u.mailGueltig('amt@kreis') === false);
+  pruefe('mailGueltig: mit Leerzeichen keine Adresse', u.mailGueltig('amt @kreis.de') === false);
+  pruefe('mailGueltig: echte Funktionsadresse geht', u.mailGueltig('katasteramt@minden-luebbecke.de') === true);
+  pruefe('mailGueltig: Grossschreibung geht', u.mailGueltig('Poststelle@AG-Luebbecke.NRW.de') === true);
+  const f0 = await u.belegPruefen('email', 'https://www.huellhorst.de/');
+  pruefe('belegPruefen: "email" wird VOR dem Seitenabruf verworfen',
+    f0.ok === false && /keine gültige Adresse/.test(f0.grund), f0.grund);
   const f1 = await u.belegPruefen('', 'https://beispiel.de');
   pruefe('ohne Adresse: kein Beleg', f1.ok === false && /keine Adresse/i.test(f1.grund));
   const f2 = await u.belegPruefen('a@b.de', '');

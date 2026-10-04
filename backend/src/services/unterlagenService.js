@@ -153,6 +153,31 @@ function gemeindeSchluessel(plz, ort) {
 function _s(v) { return typeof v === 'string' ? v.trim() : ''; }
 function _link(v) { return /^https?:\/\//i.test(_s(v)) ? _s(v) : ''; }
 
+/* ── v1844 · EINE ADRESSE MUSS WIE EINE AUSSEHEN ───────────────────────────
+ *
+ * GEMESSEN am 04.10.2026 beim ersten „Alle abrufen" für Hüllhorst: zwei
+ * Ämter kamen mit der Adresse `email` zurück — dem Wort, nicht einer
+ * Adresse. Das Modell hatte meinen JSON-Schlüssel als Wert zurückgegeben.
+ * Gespeichert wurde es, angezeigt wurde es, und „Im Mailprogramm öffnen"
+ * hätte `mailto:email` gebaut.
+ *
+ * Die Belegprüfung hielt („nicht belegt") — aber sie prüfte, ob „email"
+ * auf der Quellseite steht. Das Wort steht auf fast jeder Seite. Ein
+ * Zufallstreffer hätte die Zeile grün gemacht.
+ *
+ *   > Was keine Adresse sein kann, darf nicht als Adresse geprüft werden.
+ *   > Eine Prüfung, die auf ein Nichts ein Ja sagen kann, ist keine.
+ *
+ * Deshalb EINE Stelle für die Form, und beide Wege nutzen sie: der
+ * Rückweg der Recherche und die Belegprüfung. Streng: ein @, danach eine
+ * Domain mit Punkt, keine Leerzeichen, kein Platzhalterwort. */
+function mailGueltig(v) {
+  const s = _s(v).toLowerCase();
+  if (!s) return false;
+  if (/^(email|e-mail|mail|keine|none|null|n\/a|—|-)$/.test(s)) return false;
+  return /^[^\s@<>()[\]]+@[^\s@<>()[\]]+\.[a-z]{2,}$/.test(s);
+}
+
 /* Trackingparameter raus, bevor die Seite abgerufen oder gespeichert wird.
    Die Websuche hängt `?utm_source=openai` an — gemessen an Hüllhorst. Eine
    Quellenangabe, die verrät, über welches Werkzeug sie gefunden wurde,
@@ -197,6 +222,10 @@ function _findeJson(text) {
  * auftauchen. */
 async function belegPruefen(email, quelleUrl) {
   if (!email) return { ok: false, grund: 'keine Adresse genannt' };
+  /* v1844 · Vor dem Abruf der Quelle: kann das überhaupt eine Adresse
+     sein? „email" steht auf fast jeder Seite — eine Belegprüfung darauf
+     wäre ein Zufallsgenerator. */
+  if (!mailGueltig(email)) return { ok: false, grund: 'keine gültige Adresse (' + _s(email).slice(0, 30) + ')' };
   if (!quelleUrl) return { ok: false, grund: 'keine Quelle genannt' };
   if (istGewerblich(quelleUrl)) {
     return { ok: false, grund: 'die Quelle ist ein gewerbliches Portal, keine amtliche Seite' };
@@ -305,7 +334,10 @@ async function amtSuchen(art, ort, opts = {}) {
 
   return {
     behoerde: _s(r.behoerde), abteilung: _s(r.abteilung),
-    email: _s(r.email).toLowerCase(), telefon: _s(r.telefon),
+    /* v1844 · Nur, was eine Adresse sein kann. Sonst leer — und leer heißt
+       im Modal „nur über das Portal" oder „keine Adresse", nie `mailto:`. */
+    email: mailGueltig(r.email) ? _s(r.email).toLowerCase() : '',
+    telefon: _s(r.telefon),
     kanal: ['email', 'portal', 'formular', 'post'].includes(_s(r.kanal)) ? _s(r.kanal) : 'email',
     antrag_url: _link(r.antragUrl), quelle_url: _sauber(quelle),
     seiten: [...new Set(seiten.concat(hinweisLinks))].map(_sauber).slice(0, 8),
@@ -419,7 +451,22 @@ function anschreiben(art, objekt, absender) {
   };
 }
 
+/* ═══ LESEN: was die Ernte für eine Gemeinde schon hält ═════════════════
+ *
+ * v1844 · Das Modal zählte beim Öffnen „5 von 5 fehlen", obwohl für
+ * Hüllhorst zwei Ämter längst hinterlegt waren — es erfuhr das erst beim
+ * Klick. Eine Anzeige, die mehr Arbeit ankündigt als da ist, ist eine
+ * falsche Anzeige. */
+async function aemterFuer(plz, ort) {
+  const schluessel = gemeindeSchluessel(plz, ort);
+  if (!schluessel || schluessel === '-') return [];
+  const r = await query(
+    `SELECT * FROM unterlagen_aemter WHERE gemeinde_schluessel = $1 ORDER BY art`,
+    [schluessel]);
+  return r.rows;
+}
+
 module.exports = {
-  ARTEN, ARTEN_MAP, gemeindeSchluessel, istGewerblich,
-  amtSuchen, amtHolen, belegPruefen, anschreiben
+  ARTEN, ARTEN_MAP, gemeindeSchluessel, istGewerblich, mailGueltig,
+  amtSuchen, amtHolen, aemterFuer, belegPruefen, anschreiben
 };
