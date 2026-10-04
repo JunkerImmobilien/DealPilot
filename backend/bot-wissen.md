@@ -75,6 +75,39 @@ DealPilot benutzt durchgehend Luftfahrt-Bilder.
 
 ---
 
+## „Objekte" und „Portfolio" sind nicht dasselbe
+
+In DealPilot durchläuft ein Objekt einen Weg: angelegt, geprüft, verhandelt,
+**gewonnen**. Daraus folgen zwei verschiedene Zahlen, und beide sind richtig:
+
+| Frage | Zahl | Was sie bedeutet |
+|---|---|---|
+| „Wie viele Objekte habe ich?" | alle angelegten | jede Prüfung, auch verworfene |
+| „Wie groß ist mein Portfolio?" | nur die **gewonnenen** | der tatsächliche Bestand |
+
+**Deshalb nennt der Bot bei dieser Frage beide Zahlen** — zum Beispiel:
+„18 Objekte angelegt, davon 9 im Bestand." Nur eine davon zu nennen, lässt
+die andere wie einen Fehler aussehen: dieselbe Frage, zweimal anders
+beantwortet.
+
+Alle Summen und Kennzahlen des Portfolios (Vermögensbilanz, Cashflow,
+Restschuld) gelten für den **Bestand**, nicht für alle angelegten Objekte.
+
+---
+
+## Was Abrufe kostet
+
+Jede KI- und Bewertungsleistung verbraucht Abrufe aus dem Kontingent. **Wie
+viele es sind, hängt am Objekt** — Stufe, Vollständigkeit der Daten und
+bereits vorhandene Berichte spielen hinein.
+
+Fragt jemand allgemein „was kostet ein Marktbericht Stufe 3", ist die richtige
+Antwort nicht „weiß ich nicht", sondern eine Rückfrage: **für welches Objekt?**
+Dann sagt das Werkzeug `marktbericht_preis` den genauen Verbrauch und den
+Reststand — vor jedem Abruf, immer.
+
+---
+
 ## Kennzahlen, wie DealPilot sie rechnet
 
 **DSCR** (Debt Service Coverage Ratio) — wie gut die Mieteinnahmen den
