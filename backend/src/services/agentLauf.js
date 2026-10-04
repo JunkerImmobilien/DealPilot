@@ -32,8 +32,59 @@
  * Hoechstens RUNDEN_MAX Werkzeugrunden. Ein Modell, das sich im Kreis
  * dreht, dreht sich sonst auf Marcels Rechnung.
  */
+const fs = require('fs');
+const path = require('path');
 const config = require('../config');
 const werkzeuge = require('./agentWerkzeuge');
+
+/* ── v1817 · DAS PROJEKTWISSEN ──────────────────────────────────────────
+ *
+ * GEMESSEN am 04.10.2026 mit fünf echten Wissensfragen: der Agent konnte
+ * Fragen zu DATEN beantworten und erfand Antworten auf Fragen zum PRODUKT.
+ *
+ *   "Was ist QuickBoarding?"
+ *   -> "ein kurzer und effizienter Prozess zur schnellen Einarbeitung
+ *       neuer Nutzer oder Mitarbeiter"
+ *
+ * QuickBoarding ist das Teilen eines Objekts per Link und QR-Code. Drei von
+ * fünf Antworten waren frei erfunden, und alle drei klangen plausibel.
+ *
+ *   > Eine erfundene Erklaerung klingt wie eine echte. Sie ist schwerer zu
+ *   > entdecken als eine Luecke — der Nutzer glaubt sie und merkt nie,
+ *   > dass er sie glaubt.
+ *
+ * Das Wissen steht in `backend/bot-wissen.md`, NICHT hier im Code: Marcel
+ * soll es selbst pflegen koennen. Geaendert wird die Datei, neu gestartet
+ * das Backend, fertig.
+ *
+ * ZAHLEN STEHEN NICHT DRIN. Preise und Kontingente kommen aus Werkzeugen,
+ * die die echte Quelle lesen. Ein Preis in einer Wissensdatei waere die
+ * fuenfte Stelle, an der ein Preis steht — und damit irgendwann die
+ * falsche. (Gemessen: config.js, plans, Billing-Portal, .env.)
+ */
+/* Im Container ist __dirname /app/src/services, also liegt die Datei bei
+   /app/bot-wissen.md. Lokal ist es backend/bot-wissen.md — derselbe
+   relative Weg. EIN Ort, keine Kopie: eine handgepflegte Datei zweimal zu
+   haben heisst, sie laeuft auseinander. */
+const WISSEN_PFAD = path.join(__dirname, '..', '..', 'bot-wissen.md');
+let _wissen = null;
+function wissen() {
+  if (_wissen !== null) return _wissen;
+  try {
+    const t = fs.readFileSync(WISSEN_PFAD, 'utf8');
+    /* Der Kopf der Datei richtet sich an Marcel, nicht an das Modell —
+       alles bis zum ersten `---` ist Anleitung zum Pflegen. */
+    const i = t.indexOf('\n---\n');
+    _wissen = (i > 0 ? t.slice(i + 5) : t).trim();
+  } catch (e) {
+    /* Fehlt die Datei, laeuft der Agent weiter — aber OHNE Produktwissen,
+       und die Regel unten verbietet ihm dann jede Produktaussage. Lieber
+       ein Agent, der "weiss ich nicht" sagt, als einer, der raet. */
+    _wissen = '';
+    try { console.warn('[agentLauf] Projektwissen nicht lesbar: ' + WISSEN_PFAD); } catch (_) {}
+  }
+  return _wissen;
+}
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const RUNDEN_MAX = 6;
@@ -105,6 +156,13 @@ const SYSTEM =
 + '7g. Gilt eine Antwort EINEM Objekt, nennst du es beim Namen — Adresse '
 + 'oder Nummer. Eine Zahl ohne Objekt kann der Nutzer nicht nachpruefen, und '
 + 'genau daran ist schon eine Auskunft zum falschen Haus unbemerkt geblieben.\n'
++ '7i. PRODUKTFRAGEN beantwortest du NUR aus dem Projektwissen, das dir als '
++ 'eigener Block mitgegeben wird. Fragen nach Preisen und Paketen gehen an '
++ 'pakete_und_preise — niemals aus dem Gedaechtnis, der Preis steht in der '
++ 'Datenbank. Steht die Antwort nirgends, sagst du das und nennst den Weg '
++ '(in der App nachsehen, Marcel fragen). Eine erfundene Erklaerung fuer '
++ 'einen DealPilot-Begriff klingt wie eine echte und ist damit schlimmer '
++ 'als eine Luecke.\n'
 + '8. Keine Floskeln, keine Wiederholung der Frage. Antworte direkt.\n'
 + '9. ALLE Geldbetraege sind GANZE EURO, niemals Cent. 4721579 ist '
 + '"4.721.579 EUR", nicht "47.215,79". Du verschiebst kein Komma und '
@@ -163,6 +221,19 @@ async function laufen(frage, ctx, opts) {
 
   const eingabe = [];
   eingabe.push({ role: 'system', content: SYSTEM });
+
+  /* v1817 · Das Projektwissen als eigener Block NACH den Regeln und VOR
+     der Lage. Beide sind über alle Anfragen gleich, das ist für den
+     Prompt-Cache die richtige Reihenfolge: stabil zuerst. */
+  const _w = wissen();
+  if (_w) {
+    eingabe.push({ role: 'system', content:
+      'PROJEKTWISSEN DEALPILOT. Das Folgende ist die EINZIGE Quelle für '
+      + 'Aussagen über das Produkt, seine Begriffe und seine Kennzahlen. '
+      + 'Steht eine Antwort hier nicht drin und liefert sie auch kein '
+      + 'Werkzeug, sagst du das — du erfindest KEINE Erklärung für einen '
+      + 'DealPilot-Begriff.\n\n' + _w });
+  }
 
   /* Was der Agent ueber die Lage wissen muss, OHNE ein Werkzeug zu rufen —
      drei Zeilen, kein Dump. */

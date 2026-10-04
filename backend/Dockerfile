@@ -27,6 +27,9 @@ COPY src ./src
 COPY templates ./templates
 COPY migrations ./migrations
 COPY seed-data ./seed-data
+# v1817 · Das Projektwissen des Bots. Marcel pflegt diese Datei; sie muss
+# deshalb im Image liegen, nicht in claude/ (dort ist Doku, nicht Betrieb).
+COPY bot-wissen.md ./bot-wissen.md
 COPY scripts ./scripts
 
 # Uploads-Verzeichnis (wird von Volume gemountet)

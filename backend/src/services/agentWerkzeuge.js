@@ -1015,6 +1015,87 @@ async function objekte_felder(ctx, args) {
   };
 }
 
+/* ── v1817 · PREISE KOMMEN AUS DER DATENBANK, NIE AUS DEM GEDAECHTNIS ───
+ *
+ * GEMESSEN am 04.10.2026: auf "Was kostet DealPilot Pro im Monat?"
+ * antwortete der Agent "Bitte besuche die offizielle Website". Ehrlich,
+ * aber nutzlos — der Preis steht in `plans`, drei Zeilen entfernt.
+ *
+ * DIE VERSUCHUNG WAERE, IHN IN DIE WISSENSDATEI ZU SCHREIBEN. Dann stuende
+ * er an einer FUENFTEN Stelle: config.js (Anzeige), plans (Abbuchung),
+ * Billing-Portal (Kundenportal), .env (Seats, Kontingente) — und jetzt
+ * noch eine Textdatei.
+ *
+ *   > Jede weitere Stelle, an der ein Preis steht, ist eine weitere
+ *   > Stelle, an der er falsch sein kann. Und Preise fallen durch jedes
+ *   > Raster: niemand prueft sie, bis ein Kunde sich beschwert.
+ *
+ * Gelesen wird deshalb `plans` — die Tabelle, nach der ABGEBUCHT wird.
+ * Was dort steht, ist das, was der Kunde zahlt.
+ */
+async function pakete_und_preise(ctx, args) {
+  const r = await query(
+    `SELECT id, name, tagline, price_monthly_cents, price_yearly_cents,
+            max_objects, max_users, is_listed
+       FROM plans
+      WHERE is_active = true
+      ORDER BY sort_order, price_monthly_cents`);
+  if (!r.rows.length) {
+    return { fehler: 'Es sind keine Pakete hinterlegt.' };
+  }
+
+  const eur = (cents) => (cents == null ? null
+    : (Number(cents) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' EUR');
+
+  /* Welches Paket hat der Nutzer? Die Frage "was kostet Pro" heisst oft
+     "lohnt der Wechsel" — ohne den eigenen Stand ist die Antwort halb.
+     Es steht in `subscriptions`, NICHT an `users`: dort gibt es gar keine
+     Plan-Spalte. Mein erster Anlauf las `users.plan_id`, lief in den
+     try/catch und haette immer null gemeldet.
+
+       > Eine Abfrage, die still scheitert, sieht aus wie eine Antwort.
+       > Gemessen statt angenommen: 0 Spalten mit "plan" an `users`. */
+  let eigenes = null, eigenesInterval = null;
+  try {
+    const u = await query(
+      `SELECT plan_id, billing_interval FROM subscriptions
+        WHERE user_id = $1 AND status IN ('active','trialing')
+        ORDER BY created_at DESC LIMIT 1`, [ctx.userId]);
+    if (u.rows.length) {
+      eigenes = u.rows[0].plan_id;
+      eigenesInterval = u.rows[0].billing_interval || null;
+    }
+  } catch (e) { /* ohne eigenes Paket bleibt die Liste trotzdem richtig */ }
+
+  const pakete = r.rows
+    .filter((p) => p.is_listed || p.id === eigenes)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      kurz: p.tagline || null,
+      /* FERTIG FORMATIERT. Das Modell hat schon zweimal Euro als Cent
+         gelesen (v1803) — bei einem PREIS waere das eine Falschaussage
+         gegenueber einem Kunden. */
+      preis_monatlich: p.price_monthly_cents === 0 ? 'kostenlos' : eur(p.price_monthly_cents),
+      preis_jaehrlich: p.price_yearly_cents === 0 ? 'kostenlos' : eur(p.price_yearly_cents),
+      objekte: p.max_objects === -1 ? 'unbegrenzt' : String(p.max_objects),
+      nutzer: p.max_users === -1 ? 'unbegrenzt' : String(p.max_users),
+      dein_paket: p.id === eigenes || undefined,
+    }));
+
+  return {
+    pakete,
+    dein_paket: eigenes,
+    deine_zahlweise: eigenesInterval,
+    hinweis: 'Die Preise stehen fertig formatiert da — nimm sie UNVERAENDERT und '
+           + 'rechne nichts um. Es sind Bruttopreise in Euro; Junker Solution ist '
+           + 'Kleinunternehmer nach § 19 UStG, es wird keine Umsatzsteuer '
+           + 'ausgewiesen. Nenne bei einem Jahrespreis auch, dass er auf zwoelf '
+           + 'Monate gerechnet guenstiger ist, wenn das zutrifft. Nicht gelistete '
+           + 'Pakete nennst du nur, wenn es das Paket des Nutzers ist.',
+  };
+}
+
 async function feld_katalog(ctx, args) {
   /* ── v1812b · DIE UMLAUTFALLE, ZUM VIERTEN MAL AN EINEM TAG ──────────
    *
@@ -1859,6 +1940,15 @@ const WERKZEUGE = [
       + 'Nur nehmen, wenn der Nutzer ein BESTIMMTES Objekt nennt; sonst '
       + 'cashflow_hebel_portfolio.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  { name: 'pakete_und_preise', stufe: 'lesen', fn: pakete_und_preise,
+    beschreibung: 'Die Pakete mit ihren PREISEN, direkt aus der Datenbank, nach der '
+      + 'auch abgebucht wird — monatlich und jaehrlich, dazu Objekt- und '
+      + 'Nutzergrenzen und welches Paket der Nutzer selbst hat. '
+      + 'IMMER nehmen bei "was kostet ...", "welche Pakete gibt es", "was ist in '
+      + 'Pro drin", "lohnt der Wechsel". Nenne NIE einen Preis aus dem Gedaechtnis: '
+      + 'er steht in der Datenbank und aendert sich dort.',
+    parameter: { type: 'object', properties: {}, additionalProperties: false } },
 
   { name: 'feld_katalog', stufe: 'lesen', fn: feld_katalog,
     beschreibung: 'Welche Felder es gibt und welche Werte bei Auswahlfeldern erlaubt '
