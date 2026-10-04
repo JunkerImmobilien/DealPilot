@@ -30812,3 +30812,47 @@ Sachwertfaktor 14/16 (HB, SL fehlen); 3 von 105 Quell-Links tot
 **Rest.** Prod v1846b; Staging v1862c (`b62ba81`). Offen klein:
 „KI-Lauf" statt „Stufe 3" in der Verkehrswert-Übernahme (ai_mode ist
 `openai`, Stufe nicht in der History-Antwort).
+
+### (26) 04.10.2026 — v1863/v1864: „Sehr gut" statt „Top", schwarzer Bewertungs-Streifen, Cashflow-Phasen hell
+
+**Was.** Marcel, nach v1861: „die bewertung muss so sein wie auf den
+deal score karten oder beim investor deal score. mit gut sehr gut und
+dann halt die anderen. das muss einheitlich sein überall." Und: „bei
+beiden dealscore karten im tab bewertung … den unteren streifen in
+schwarz machen und die bewertung passend dadrauf legen … wie die auf der
+landingpage … die schwarz hinterlegten karten für cashflow vor steuer bis
+break even auch in hell".
+
+**v1863 (`0b81689`).** Die oberste Stufe heißt **Sehr gut** (Schwellen
+85/70/50/35 unverändert), eine Stelle: `score-tiers.js`. Nachgezogen, wo
+noch eigene Ketten standen: `storage.js _scoreLabel` (Karte),
+`voice-import.js _stufe` (Dialog), `hybrid-aktionen.js` (Kopfspalte),
+`quickcheck-app.html tl()` (dort STARK/SOLIDE/SCHWACH bei 70/50!),
+`dealscore.js` Badge, Rückfälle in dashboard/dealscore/dealscore2/
+quick-check/calc; Backend: `telegramDialogService.stufeZu`,
+openaiService-Prompt, ai.js-Prompt (Backend auf Staging neu gebaut).
+CLAUDE.md-Tabelle und Hinweis angepasst. Nachweis: Karte 91 = SEHR GUT,
+Kopf Gut, Verdict „BEWERTUNG · SEHR GUT", `ScoreTier.stufe(87)` = Sehr
+gut.
+
+**v1864 (`4a4786e`).** Gemessen: der Streifen ist `.dpsh-verdictbar` in
+`.dpsh-body` (Padding 16/24/18, Hülle `.dpsh-pass` Radius 18, overflow
+hidden); die Regeln kommen aus `dpsh-score-hero.js` (dynamisches Blatt)
+— deshalb `body .dpsh-body …` plus `!important` in style.css. Jetzt:
+Obsidian `#0D0D0D` über die volle Kartenbreite (margin 16/-24/-18), Label
+grün/gold/rot nach Stufe in Mono, Text Creme `#f3ead0`. Die Blöcke
+„Cashflow VOR/NACH Steuern · pro Monat" (`.cf-phase-block`, bisher
+`rgb(13,13,13)`) sind weiß mit cremefarbenen Kacheln, Titel Gold dunkel,
+Werte Grün/Rot. Nachweis im Bild: Streifen 395–1112 px bei Karte 394–1113,
+`bg rgb(13,13,13)`, `.cf-phase-block` `rgb(255,255,255)`, Kacheln
+`rgb(251,246,233)`.
+
+**Landingpage „Kostenlos starten".** Gemessen: der Link führt auf
+`app…/?register=1`, auth.js öffnet dann `#dp-register-modal` (Name,
+E-Mail, Passwort — leer, nur Platzhalter; beide Haken AUS). Dahinter liegt
+die normale App mit ihren Vorbelegungen (Zins 4,35 %, Tilgung 2 % …),
+lesbar — das sind die „Standardwerte". Kein Demo-Datensatz, kein Fehler;
+ob der Hintergrund abgedunkelt oder unscharf sein soll, ist Marcels
+Entscheidung.
+
+**Rest.** Prod v1846b; Staging v1864 (`4a4786e`).

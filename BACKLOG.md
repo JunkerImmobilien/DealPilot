@@ -283,6 +283,10 @@ solide? … das muss überall gleich sein."
   landet auf der Karte und in der Verkehrswert-Übernahme (dp:mb-ready).
 - Handy 390 px: Gewerke-Tabelle wischt statt zu klippen; alle Reiter ohne
   Überlauf. Tablet 820 px: sauber.
+- v1863 (`0b81689`): oberste Stufe heißt „Sehr gut" statt „Top" — überall,
+  auch Bot und KI-Prompts (Marcel: „mit gut, sehr gut und dann die anderen").
+- v1864 (`4a4786e`): Bewertungs-Streifen beider Score-Karten schwarz wie
+  auf der Landingpage; Cashflow-Phasen vor/nach Steuern hell.
 
 **Offen, klein:**
 - Verkehrswert-Übernahme nennt Berichte aus dem Dialog „KI-Lauf" statt
