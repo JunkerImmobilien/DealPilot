@@ -1992,7 +1992,11 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=v1859', { cache: 'no-store' })
+  /* v1859 · Marcel: „das lädt sehr lange". Gemessen 930 ms bis das Fenster
+     offen ist — davon der Abruf der Vorlage mit `no-store` bei JEDEM
+     ersten Öffnen. Der Buster in der URL macht den Cache sicher; der
+     Browser darf die Vorlage behalten. */
+  fetch('/js/bmf-modal-html.html?v=v1859')
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
