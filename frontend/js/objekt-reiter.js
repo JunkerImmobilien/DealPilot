@@ -333,7 +333,14 @@
      Berichts — mit Datum und Stufe, damit klar ist, was da steht. */
   var _vwLauf = 0;
   function _datum(iso) { try { return new Date(iso).toLocaleDateString('de-DE'); } catch (e) { return String(iso || '').slice(0, 10); } }
-  function _stufeAus(h) { var m = String(h.ai_mode || '').match(/stufe[_\s]?(\d)/i); return m ? 'Stufe ' + m[1] : (h.ai_mode ? String(h.ai_mode) : ''); }
+  /* ai_mode im Verlauf heisst 'schnell' (= fast, Stufe 1), 'openai' (KI-Lauf)
+     oder traegt die Stufe im Namen — gemessen an 31 Staenden der Hermannstrasse. */
+  function _stufeAus(h) {
+    var a = String(h.ai_mode || '');
+    var m = a.match(/stufe[_\s]?(\d)/i); if (m) return 'Stufe ' + m[1];
+    if (/schnell|fast/i.test(a)) return 'Stufe 1';
+    return a ? 'KI-Lauf' : '';
+  }
   async function verkehrswertUebernahme() {
     var box = $('oe-vw'); if (!box) return;
     var ref = window._currentObjKey; if (!ref) { box.style.display = 'none'; return; }
