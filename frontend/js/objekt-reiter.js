@@ -234,8 +234,11 @@
         + namen[s] + (r == null ? '' : ' · ' + r + ' frei') + (fehlt ? ' · ' + fehlt + ' fehlt' : '') + '</button>';
     }).join('') + '<span class="oe-stufen-hint">Ein Knopf mit gestricheltem Rand: da fehlen Angaben — Klick zeigt welche. Der Bericht rechnet nie halb.' + (konto[3] === 0 ? ' Stufe 3 gehört zum Pro-Plan.' : '') + '</span>';
   }
+  var _fehlStufe = null;   /* v1852: die zuletzt angefragte Stufe — die Fehlliste folgt der Eingabe */
+  function fehlendeNachziehen() { if (_fehlStufe) fehlendeZeigen(_fehlStufe, fehltFuer(_fehlStufe)); }
   function stufeAbrufen(s) {
     var fehlt = fehltFuer(s);
+    _fehlStufe = s;
     if (fehlt.length) { fehlendeZeigen(s, fehlt); abweichend(fehlt[0]); return; }
     fehlendeZeigen(s, []);
     if (window.DealPilotMB && typeof DealPilotMB.run === 'function') DealPilotMB.run({ stufe: s });
@@ -320,8 +323,8 @@
     /* Pflichtfelder: Markierung und Fehlzahl folgen der Eingabe */
     Object.keys(FELDNAMEN).forEach(function (id) {
       var el = $(id); if (!el) return;
-      el.addEventListener('input', function () { spaeter(function () { zielAnwenden(); stufen(); }, 400); });
-      el.addEventListener('change', function () { spaeter(function () { zielAnwenden(); stufen(); }, 150); });
+      el.addEventListener('input', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 400); });
+      el.addEventListener('change', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 150); });
     });
     ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell'].forEach(function (id) {
       var el = $(id); if (!el) return;
