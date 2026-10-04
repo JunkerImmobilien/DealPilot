@@ -124,6 +124,85 @@ async function objekt_lesen(ctx, args) {
   };
 }
 
+/* ═══ v1847 · DIE PILOT-ANALYSE FUER DEN BOT ═══════════════════════════════
+ *
+ * Marcel am 04.10.2026: „wenn wir die Pilotanalyse gemacht haben, dass die
+ * dem Projektwissen zur Verfügung steht, dass der Bot, der Telegram-Bot,
+ * die auch abfragen kann."
+ *
+ * GEMESSEN: die Analyse entsteht aus EINER KI-Antwort (/ai/analyze), wird
+ * vollständig als JSON in `objects.ai_analysis` gespeichert, und
+ * `dialog.objektKontext()` liest sie seit jeher als `ki_lagebewertung`
+ * mit. Elf Aufrufer in dieser Datei — und keiner hat je hineingesehen.
+ *
+ *   > Der Weg war bis zur letzten Tür gebaut. Es fehlte nur die Klinke.
+ *
+ * Das ist der Spiegel-Weg, wie er sein soll: gerechnet und bezahlt hat der
+ * Browser (eine Analyse, einmal), der Bot LIEST. Er rechnet nichts nach
+ * und löst keine neue Anfrage aus — Stufe `lesen`, kostet nichts.
+ *
+ * Herausgegeben wird nicht der Rohtext (bis zu zehn Kilobyte Modell-JSON),
+ * sondern die Abschnitte, die auch die Pilot-Analyse zeigt: Briefing,
+ * Stärken, Risiken, Risikoanalyse, Lage, Verhandlung, Bank. Fehlt eine
+ * Analyse, steht das da — mit dem Weg dorthin, nicht mit einer Erfindung. */
+async function pilot_analyse_lesen(ctx, args) {
+  const id = await _findeObjekt(ctx, args);
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+  const adresse = [o.daten.str, o.daten.hnr].filter(Boolean).join(' ')
+    + (o.daten.ort ? ', ' + [o.daten.plz, o.daten.ort].filter(Boolean).join(' ') : '');
+
+  const roh = o.ki_lagebewertung;
+  if (!roh) {
+    return { gefunden: true, id: o.objekt_id, adresse: adresse, analyse_vorhanden: false,
+      so_sagen: 'Für dieses Objekt liegt noch keine Pilot-Analyse vor. Sie wird in '
+              + 'DealPilot im Reiter „Pilot-Analyse" mit einem Klick erstellt — '
+              + 'danach kann ich sie dir hier zusammenfassen.' };
+  }
+  let a;
+  try { a = (typeof roh === 'string') ? JSON.parse(roh) : roh; }
+  catch (e) {
+    return { gefunden: true, id: o.objekt_id, adresse: adresse, analyse_vorhanden: false,
+      so_sagen: 'Die gespeicherte Pilot-Analyse ist nicht lesbar (kein gültiges JSON). '
+              + 'Bitte in DealPilot neu erstellen.' };
+  }
+  /* Nur was es gibt — ein leeres Feld ist kein Feld. */
+  const nimm = (v) => (v == null || v === '' || (Array.isArray(v) && !v.length)) ? undefined : v;
+  const liste = (v) => Array.isArray(v) ? v.filter(Boolean).slice(0, 8) : nimm(v);
+  const aus = {
+    gefunden: true, id: o.objekt_id, adresse: adresse, analyse_vorhanden: true,
+    stand: o.geaendert,
+    briefing: {
+      empfehlung: nimm(a.empfehlung), fazit_kurz: nimm(a.fazit_kurz),
+      gesamtbewertung: nimm(a.gesamtbewertung), begruendung: nimm(a.empfehlung_begruendung),
+      investmentbewertung: nimm(a.investmentbewertung), dealpilot_insight: nimm(a.dealpilot_insight),
+      investor_fit: nimm(a.investor_fit)
+    },
+    staerken: liste(a.staerken), risiken: liste(a.risiken),
+    risikoanalyse: nimm(a.risikoanalyse), szenarien: nimm(a.szenarien),
+    anschlussfinanzierung: nimm(a.anschlussfinanzierung),
+    lage: { makro: nimm(a.makrolage_recherche), mikro: nimm(a.mikrolage_recherche),
+            mietspiegel_eur_qm: nimm(a.mietspiegel_eur_qm), kaufpreisniveau: nimm(a.kaufpreisniveau),
+            quellen: liste(a.quellen) },
+    verhandlung: { empfehlung: nimm(a.verhandlungsempfehlung), kaufpreis_offerte: nimm(a.kaufpreis_offerte),
+                   offerte_mail: nimm(a.offerte_mail) },
+    bankargumente: liste(a.bankargumente),
+    hinweis: 'Die Pilot-Analyse ist eine KI-Einschätzung auf Basis der Objektdaten zum '
+           + 'Zeitpunkt ihrer Erstellung — keine Wertermittlung und kein amtlicher Wert.'
+  };
+  /* Leere Teilbäume ganz weglassen, damit das Modell nicht "null" vorliest. */
+  Object.keys(aus).forEach((k) => {
+    const v = aus[k];
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      Object.keys(v).forEach((kk) => { if (v[kk] === undefined) delete v[kk]; });
+      if (!Object.keys(v).length) delete aus[k];
+    } else if (v === undefined) delete aus[k];
+  });
+  return aus;
+}
+
 async function portfolio_lesen(ctx) {
   const sp = await dialog.portfolioKontext(ctx.userId);
   if (!sp) {
@@ -1967,6 +2046,12 @@ function _ohneIntern(d) {
   const o = {};
   Object.keys(d || {}).forEach((k) => {
     if (k.indexOf('_') === 0) return;      /* _kpis_*, _ds2_*, _dealpilot_score */
+    /* v1847 · GEMESSEN: `ai_lage_cache` (ki-lage.js:432) beginnt nicht mit
+       `_` und trug rohes HTML samt Zeitstempel ins Modell — ein Feld, das
+       niemand lesen soll, als "Feld" ausgegeben. Alles, was ein Zwischen-
+       speicher ist, bleibt draussen. Die Pilot-Analyse hat ihr eigenes
+       Werkzeug (pilot_analyse_lesen) und gehoert hier ebenfalls nicht hin. */
+    if (/_cache$|^ai_analysis$|^ai_lage/.test(k)) return;
     if (d[k] == null || d[k] === '') return;
     o[k] = d[k];
   });
@@ -2207,6 +2292,20 @@ const WERKZEUGE = [
     beschreibung: 'Alle Objekte des Nutzers mit Nummer, Adresse, Kaufpreis und Scores. '
       + 'Die Nummer ist die, auf die sich der Nutzer spaeter bezieht.',
     parameter: { type: 'object', properties: {}, additionalProperties: false } },
+
+  /* v1847 · Die Pilot-Analyse — gerechnet im Browser, gelesen vom Bot. */
+  { name: 'pilot_analyse_lesen', stufe: 'lesen', fn: pilot_analyse_lesen,
+    beschreibung: 'Die gespeicherte Pilot-Analyse EINES Objekts: Briefing mit Empfehlung, '
+      + 'Staerken, Risiken, Risikoanalyse und Szenarien, Lage (Makro/Mikro/Mietspiegel), '
+      + 'Verhandlungsempfehlung mit Kaufpreis-Offerte, Bankargumente. Nutze es, wenn nach '
+      + 'Einschaetzung, Empfehlung, Staerken/Schwaechen, Risiken, Verhandlung oder Bank '
+      + 'gefragt wird. Kostet nichts; rechnet nichts neu. Liegt keine Analyse vor, sagt '
+      + 'das Ergebnis, wie sie entsteht - erfinde dann keine.',
+    parameter: { type: 'object', properties: {
+      adresse: { type: 'string', description: 'Adresse oder Teil davon' },
+      nummer:  { type: 'integer', description: 'Nummer aus der zuletzt gezeigten Liste' },
+      id:      { type: 'string', description: 'Objekt-Kennung, falls bekannt' }
+    }, additionalProperties: false } },
 
   { name: 'objekt_lesen', stufe: 'lesen', fn: objekt_lesen,
     beschreibung: 'Alle Daten EINES Objekts: Kerndaten, Scores, Kennzahlen, Felder. '
