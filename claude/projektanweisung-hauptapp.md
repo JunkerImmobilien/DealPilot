@@ -30855,4 +30855,6 @@ lesbar — das sind die „Standardwerte". Kein Demo-Datensatz, kein Fehler;
 ob der Hintergrund abgedunkelt oder unscharf sein soll, ist Marcels
 Entscheidung.
 
-**Rest.** Prod v1846b; Staging v1864 (`4a4786e`).
+**v1864a (`bd34c87`).** Marcels „bis Break-Even" meinte auch die acht Kennzahl-Kacheln darunter (`#s6 .kpi-grid-eval .kpi`, Obsidian-Verlauf aus Z. 31543 mit ID-Spezifität) — jetzt weiß, Rand Gold, Werte Grün/Rot; gemessen `rgb(255,255,255)`, Bild bis Break-Even hell.
+
+**Rest.** Prod v1846b; Staging v1864a (`bd34c87`).
