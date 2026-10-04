@@ -568,7 +568,7 @@
       return { ok: false, grund: 'boris', fehler: (bd && (bd.error || bd.message)) || ('Fehler ' + b.status) };
     }
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
-      return { ok: false, grund: 'kein_wert', fehler: 'Kein BORIS-Wert für diese Lage' };
+      return { ok: false, grund: 'kein_wert', fehler: 'Kein amtlicher Bodenrichtwert für diese Lage' };
     }
     /* v1838 · Die Nutzungsart reist mit. Sie kam schon immer in der
        Antwort und wurde hier weggeworfen — siehe `_nutzungPruefen`. */
@@ -661,7 +661,7 @@
      * Verhalten, und das ist immer noch besser als kein Wert. */
     var plz = _val('plz'), ort = _val('ort');
     var str = [_val('str'), _val('hnr')].filter(Boolean).join(' ');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">⏳</span> BORIS …'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">⏳</span> Abruf …'; }
     _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
       var r = await borisHolen({ plz: plz, ort: ort, str: str });
@@ -687,19 +687,19 @@
          dem Haken - und sie wird gelb, nicht gruen. Ein Wert mit
          Vorbehalt darf nicht aussehen wie einer ohne. */
       if (_nutz && _nutz.warnung) {
-        _setStatus('⚠ BORIS: ' + r.wert + ' €/m²'
+        _setStatus('⚠ Bodenrichtwert: ' + r.wert + ' €/m²'
           + (extra.length ? ' (' + extra.join(' · ') + ')' : '')
           + ' — ' + _nutz.warnung, 'err');
         if (typeof toast === 'function') toast('⚠ ' + _nutz.warnung);
       } else {
-        _setStatus('✓ BORIS: ' + r.wert + ' €/m²' + (extra.length ? ' (' + extra.join(' · ') + ')' : ''), 'ok');
-        if (typeof toast === 'function') toast('✓ Bodenrichtwert (BORIS): ' + r.wert + ' €/m²');
+        _setStatus('✓ Bodenrichtwert: ' + r.wert + ' €/m²' + (extra.length ? ' (' + extra.join(' · ') + ')' : ''), 'ok');
+        if (typeof toast === 'function') toast('✓ Bodenrichtwert: ' + r.wert + ' €/m²');
       }
     } catch (err) {
       _setStatus('⚠ ' + (err.message || 'BORIS-Fehler'), 'err');
       if (typeof toast === 'function') toast('⚠ ' + (err.message || 'BORIS-Fehler'));
     } finally {
-      if (btn) { btn.innerHTML = '<span class="btn-brw-icon">📍</span> BORIS abrufen'; _refreshBorisBtn(); }
+      if (btn) { btn.innerHTML = '<span class="btn-brw-icon">📍</span> Bodenrichtwert abrufen'; _refreshBorisBtn(); }
     }
   }
   (function _wireBoris(){
