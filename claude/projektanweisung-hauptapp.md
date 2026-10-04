@@ -30325,3 +30325,51 @@ von 100 Anteilen". Echter Stufe-1-Bericht (12:42): `standardstufe 4`,
 - Musterstraße 12 bekam im Test kurz `eq_roof/eq_windows/eq_bath`
   (Auto-Save) — wieder geleert, Auto-Save hat es mitgenommen.
 - Prod steht auf v1846b; v1847–v1851c nur Staging.
+
+## Rollout-Journal 04.10.2026 (15) — v1852–v1852a: Eingabetiefe, Fehlliste, Anfragen — und eine Rücknahme
+
+Marcel nach dem Blick auf Staging: Anordnung gefällt; Stufe 1 direkt
+abrufbar ist „cool"; fünf Punkte. Und mitten drin: *„wichtig ist dass wir
+wählen können wie detailreich die eingabe wird."*
+
+**Was (`0f71850b`, `2ffed52`).** `tools/n4b-zielstufe.mjs` (IDs 881 → 885,
+div-Bilanz 0, Doppellauf skip): **Eingabetiefe** 1/2/3 über der Leiste —
+Stufe 1 zeigt nur Ebene 1, Ebene 2 bleibt zu; 2 öffnet Ebene 2; 3 blendet
+„Sach- und Ertragswert · Stufe 3" (vormals „Für das Gutachten") ein und
+klappt sie auf. Merker `dp_zielstufe` je Nutzer. Pflichtfelder der
+Zielstufe sind rot gerahmt, solange sie leer sind. **Stufen-Knöpfe**:
+gestrichelt mit „n fehlt", solange Felder fehlen; Klick zeigt die
+Fehlliste als Chips (Sprung zum Feld, auch in andere Reiter — Kaufpreis,
+Miete) und ruft NICHT ab; die Liste folgt der Eingabe. Staffel wie
+`tools/objekt-vollstaendigkeit.mjs` (Stufe 3 je Objektart: MEA bei ETW,
+Einheiten bei MFH, BGF + NHK bei Häusern). **Anfragen**-Block mit dem
+Unterlagen-Knopf unter den Abrufen. **Sachwertfaktor-Zeile** sagt, was der
+Ausschuss führt — Bismarckstraße: Lippe leitet nur für EZFH ab, für MFH
+gibt es keinen Faktor (§ 10, nicht übertragbar); „im Bericht" war falsch
+und ist weg. `api.js`: ein genannter Ausschuss ist noch keine Tabelle für
+diese Objektart.
+
+**Gohliser Str. 42, Leipzig — 1.200 €/m²:** amtlich, BORIS-D, Zone
+71300079, Stichtag 01.01.2025, Nutzungsart 1100 (Wohnbaufläche), Lizenz
+dl-de/by-2-0; für Gohlis plausibel.
+
+**Nachweise (Bismarckstraße, Buster v1852).** Zielstufe 1 → Ebene 3
+`display:none`, Hinweistext passt; Zielstufe 3 → Ebene 3 sichtbar und
+aufgeklappt, Knopf Stufe 3 goldfarben; Fehlliste mit kurz geleertem
+`gsfl`: Chip „Grundstücksfläche", Fokus springt ins Feld, kein Abruf;
+Wert sofort wiederhergestellt (ohne Ereignis, Auto-Save blieb still).
+Anfragen-Block da. Sachwertfaktor-Zeile: „kein Wert · … Geführt werden:
+ezfh".
+
+**Zurückgenommen.** Ich hatte gemessen: „die Marktbericht-App schreibt
+die Wertermittlungsfelder ans Objekt, liest sie aber nie zurück" — und
+ein Vorbelegungsmodul gebaut. Falsch: `mb-objektwahl.js:325/470`
+(`fillFromData`, `fuelleWertermittlung`) füllt Stammdaten und alle 42
+Wertermittlungsschlüssel, gemessen im iframe (Standardstufe 4, Dach 4,
+Punkte 8, Miete, Einheiten standen da, OHNE mein Modul — das war wegen
+des eigenen iframe-Busters `?v=1351` gar nicht geladen). Ich hatte nur
+`app.js` durchsucht. Das Modul ist wieder entfernt (`2ffed52`). Marcels
+Frage ist damit mit Ja beantwortet: dieselben Felder stehen im
+Marktbericht-Formular.
+
+**Rest.** Prod steht auf v1846b; v1847–v1852a nur Staging.
