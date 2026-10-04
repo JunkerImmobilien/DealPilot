@@ -38297,3 +38297,12 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 .oe-auto .oe-q { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
 .oe-auto .oe-row { align-items: start; }
 .oe-auto .oe-k, .oe-auto .oe-w { padding-top: 2px; }
+
+/* v1857 · Abruf-Kaestchen in der rechten Karte, optional-Schild im Stufe-3-Block */
+.oe-abruf-box { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
+.oe-abruf-box .card-title { margin: 0 0 8px; }
+.oe-abruf-box .oe-abruf { grid-template-columns: 1fr; gap: 8px; }
+.oe-abruf-box .oe-tile { min-height: 0; padding: 10px 12px; gap: 4px; }
+.oe-abruf-box .oe-tile .oe-tile-sub { font-size: 11.5px; }
+.oe-abruf-box .oe-abruf-foot { margin-top: 8px; font-size: 11.5px; }
+.oe-opt { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; font: 500 9.5px "JetBrains Mono", monospace; letter-spacing: .04em; color: var(--muted, #7A7370); border: 1px solid var(--border, #E0DBD3); vertical-align: middle; text-transform: uppercase; }

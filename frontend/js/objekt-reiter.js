@@ -231,14 +231,38 @@
       if (art === 'MFH') l.push('einheiten');
     }
     if (stufe >= 3) {
-      l = l.concat(['nutzungsart', 'gsfl', 'brw']);
+      /* v1857 · am Rechenkern gemessen (CrossCheckService / nhk2010):
+         - ETW: Sachwert braucht BGF der Wohnung UND Standardstufe — die BGF
+           wird bei Wohnungen NICHT aus der Wohnfläche genähert (Z. 650 ff.);
+         - Haus: NHK-Typ (Hausform · Geschosse · Dach) + Standardstufe, BGF
+           sonst Näherung aus der Wohnfläche („nicht verlässlich");
+         - MFH: Einheiten (NHK-Typ daraus) + Standardstufe;
+         - Bodenwert: Grundstück + Bodenrichtwert, bei ETW der MEA — sonst
+           „Sachwert OHNE Bodenwert";
+         - Ertragswert: Miete, Baujahr (RND), Nutzungsart.
+         Alles Weitere im Block verfeinert nur (Anlage-3-Ansätze als Rückfall). */
+      l = l.concat(['nutzungsart', 'gsfl', 'brw', 'bgf']);
       if (art === 'ETW') l.push('mea');
-      if (/^(EFH|ZFH|DHH|RH)$/.test(art)) l = l.concat(['bgf', 'nhk_haus', 'nhk_geschosse', 'nhk_dach']);
-      if (art === 'MFH') l.push('bgf');
+      if (/^(EFH|ZFH|DHH|RH)$/.test(art)) l = l.concat(['nhk_haus', 'nhk_geschosse', 'nhk_dach']);
       var gar = parseFloat(_v('garagen').replace(',', '.'));
       if (gar > 0) l = l.concat(['garagen_bgf_qm', 'garagen_stufe']);
     }
     return l;
+  }
+  /* v1857 · Die Felder des Stufe-3-Blocks, die NICHT Pflicht sind, tragen
+     ein „optional"-Schild — Marcel: „Diese Angaben müssen doch auch alle
+     gemacht werden?" Nein: ohne sie rechnet der Bericht mit den Ansätzen
+     der Anlage 3; sie verfeinern. Das steht jetzt dran, statt dass ein
+     fehlender Rahmen wie ein Fehler wirkt. */
+  function optionalMarkieren() {
+    var e3 = document.querySelector('.card[data-oe-stufe-min="3"]'); if (!e3) return;
+    var pflicht = pflichtFuer(3);
+    e3.querySelectorAll('.f').forEach(function (f) {
+      var el = f.querySelector('input,select'); if (!el || !el.id) return;
+      var lab = f.querySelector('label'); if (!lab) return;
+      var alt = lab.querySelector('.oe-opt'); if (alt) alt.remove();
+      if (pflicht.indexOf(el.id) < 0) { var s = document.createElement('span'); s.className = 'oe-opt'; s.textContent = 'optional'; s.title = 'Verfeinert den Bericht — ohne Angabe gilt der Ansatz der Anlage 3 ImmoWertV bzw. kein Zuschlag.'; lab.appendChild(s); }
+    });
   }
   function fehltFuer(stufe) { return pflichtFuer(stufe).filter(function (id) { return !_v(id); }); }
 
@@ -308,6 +332,7 @@
       el.style.setProperty('border-color', '#B8625C', 'important');
       el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
     });
+    optionalMarkieren();
   }
 
   /* ═══ Stufen-Knöpfe: Kontingent UND Vollständigkeit ══════════════════ */
