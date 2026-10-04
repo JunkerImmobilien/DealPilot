@@ -70,6 +70,13 @@ const ART_RANG = {
   zfh:        ['zfh', 'ezfh', 'efh'],
   dreifh:     ['dreifh', 'mfh'],
   mfh:        ['mfh', 'wgh'],
+  /* v1820 · Staffelung nach Wohneinheiten. Ludwigslust-Parchim fuehrt
+     mfh_bis6 und mfh_ueber6 getrennt (5,4 gegen 6,2 Prozent) — das ist
+     ein Unterschied, den die Objektart allein nicht hergibt. Die
+     Reihenfolge ist Rangfolge: der passende Zweig zuerst, der allgemeine
+     danach. */
+  mfh_bis6:   ['mfh_bis6', 'mfh', 'wgh'],
+  mfh_ueber6: ['mfh_ueber6', 'mfh', 'wgh'],
   wgh:        ['wgh', 'mfh'],
   buero:      ['gg_buero', 'buero', 'gewerbe', 'gew_dl', 'ggg'],
   handel:     ['handel', 'gewerbe', 'ggg', 'gegi'],
@@ -169,7 +176,17 @@ export function typVon({ objart, haustyp, nutzung, einheiten }) {
     return 'efh';
   }
   if (/^zfh|zweifamilien/.test(a)) return 'zfh';
-  if (/^mfh|mehrfamilien/.test(a)) return Number(einheiten) === 3 ? 'dreifh' : 'mfh';
+  if (/^mfh|mehrfamilien/.test(a)) {
+    const we = Number(einheiten);
+    if (we === 3) return 'dreifh';
+    /* v1820 · Kennt der Ausschuss eine Staffelung nach Wohneinheiten,
+       entscheidet sie. Ist die Zahl unbekannt, bleibt es beim allgemeinen
+       Zweig — und wenn der Ausschuss NUR gestaffelte Saetze fuehrt, kommt
+       daraus eine Rueckfrage nach der Wohneinheitenzahl. Das ist richtig:
+       5,4 gegen 6,2 Prozent sind am Ertragswert keine Rundungsfrage. */
+    if (Number.isFinite(we) && we > 0) return we > 6 ? 'mfh_ueber6' : 'mfh_bis6';
+    return 'mfh';
+  }
   if (/gesch/.test(a)) return 'wgh';
   if (/buero|büro/.test(a)) return 'buero';
   if (/hotel/.test(a)) return 'hotel';

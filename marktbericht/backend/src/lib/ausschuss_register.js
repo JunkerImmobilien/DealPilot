@@ -213,7 +213,13 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             'lzs-bw.json',        /* BW · 13 (Heilbronn, Ulm) */
                             'lzs-rp.json',        /* RP · 6 (Mainz) */
                             'lzs-sh.json',        /* SH · 12 */
-                            'schwerin.json'       /* MV · 7 */
+                            'schwerin.json',      /* MV · 7 */
+                            /* v1820 · Ludwigslust-Parchim. Die Sperre im Backlog war
+                               falsch: das Zitat vom 13.09.2026 endete mitten im Satz,
+                               vor den Worten "ist ohne Genehmigung gestattet". Am
+                               Originalimpressum nachgelesen - erlaubt, wortgleich mit
+                               Schwerin (gemeinsame Geschaeftsstelle). */
+                            'ludwigslust-parchim.json' /* MV · 7 */
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
