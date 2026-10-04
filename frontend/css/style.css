@@ -38326,3 +38326,6 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 .dp-feldhilfe-leer { opacity: .6; font-style: italic; }
 .dp-feldhilfe-wofuer { margin: 6px 0 0; padding-left: 16px; color: #e8dcbf; }
 .dp-feldhilfe-wofuer li { margin: 2px 0; }
+
+/* v1858b · Anfragen und Abruf liegen im .g2-Raster der Karte: volle Breite, untereinander (Parkstr. 9: standen in 318 px nebeneinander) */
+#qz-card .g2 > #oe-anfragen, #qz-card .g2 > #oe-abruf-box { grid-column: 1 / -1; }
