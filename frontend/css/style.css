@@ -38339,3 +38339,12 @@ body.hdr-collapsed .hdr-score-mini-red span { color: #e8a09a; }
 .hdr-score-mini-top span, .hdr-score-mini-green span { color: #3FA56C; }
 .hdr-score-mini-gold span { color: var(--wl-b8932f, #b8932f); }
 .hdr-score-mini-red span { color: #B8625C; }
+
+/* ===== v1862c · Gewerke-Tabelle auf dem Handy (gemessen in der Messkabine, 390 px):
+   die Tabelle ist 396 px breit (Gewerk 132 · Art 78 · modernisiert 90 · Standardstufe 97),
+   die Karte klippt bei 311 px - die Standardstufen-Spalte war abgeschnitten. Auf 820 px
+   (Tablet) passt alles. Unter 520 px wischt die Tabelle statt zu klippen. ===== */
+@media (max-width: 520px) {
+  #oe-karte-gewerke #oe-gewerke { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  #oe-karte-gewerke #oe-gewerke td.oe-g { white-space: normal; }
+}
