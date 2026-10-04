@@ -29660,3 +29660,254 @@ der Punkt wirklich ein Tausendertrenner (`176.537 €`). Kein Fehler.
   angefasst.
 - Die Unterlagen-App (`Dateien/unterlagen-app.zip`) ist gesichtet, die
   Anbindung steht aus.
+
+---
+
+## Rollout-Journal 04.10.2026 (8) — v1832–v1834: Jacoby rechnet, und die Unterlagen kommen vom Amt
+
+**Was** · Marcel: *„die kaufpreisaufteilung … die machen wir ja anders als
+das gutachten nach jacoby … ich würde gerne mal einen test sehen"* und
+*„wenn wir irgendwelche Unterlagen für ein Objekt brauchen, dass wir die
+halt anfragen können"*
+
+**Commits** · `v1832`, `v1832b`, `v1833`, `v1833b`, `v1833c`, `v1834`, `v1834b`
+
+### v1832 — die umgekehrte Ertragswertmethode
+
+Zuerst eine Korrektur an mir selbst: es heißt **Jacoby**, nicht Jacobi.
+Wer nach „jacobi" greppt, findet nichts und hält das Thema für unberührt —
+tatsächlich stand der vollständige Rechenweg samt Gutachten seit Wochen in
+`BACKLOG.md:1639`.
+
+> „Ich hab es nicht gefunden" ist nicht „es gibt es nicht". Erst recht
+> nicht, wenn man den Namen falsch schreibt.
+
+**Der Prüfmaßstab** ist das Gutachten Az. 25DG02659/HH (Grünwald
+03.07.2025) zu Am Markt 18 Kabelsketal, Zeile für Zeile. **Alle 14 Größen
+treffen** — Kapitalisierungsfaktor 30,2100, Bodenrestwert 1.864,78 €,
+Gebäudeanteil 94,35 %, Nebenkostenanteil 11.060,93 €.
+
+**Die Rundungsregel der Quelle** war der Schlüssel. Erst wichen fünf
+Größen um 12 bis 31 Cent ab; die Ursache ist keine Formel, sondern eine
+Konvention: das Gutachten rundet den Diskontierungsfaktor auf vier
+Nachkommastellen und rechnet damit weiter.
+
+> Ein Soll-Wert ohne die Rundungsregel der Quelle macht einen richtigen
+> Rechenweg zum Fehlschlag.
+
+**Drei eigene Fehler im Vergleichslauf**, alle vom Lauf selbst sichtbar
+gemacht, weil er seine Deckung ansagt:
+
+1. Mein Parser entfernte alle Punkte als Tausendertrenner — aus dem
+   Liegenschaftszins `2.56` wurde 256. Eine Stunde nachdem ich bei
+   `parseDe` vor genau dieser Falle gewarnt hatte.
+2. Ich übergab `ags = null` — die Ableitung aus der PLZ hatte ich nicht
+   gebaut. 21 von 22 Objekten meldeten „kein Liegenschaftszins".
+3. Den dritten Abhängigkeitsnamen habe ich **geraten** statt beim
+   produktiven Aufrufer nachzusehen.
+
+> Null Treffer aus einem Werkzeug, das nie gesucht hat, ist kein Befund,
+> sondern ein Ausfall.
+
+### v1833 — Unterlagen beim Amt anfordern
+
+Die Fachdaten stammen aus Marcels eigenständiger App und wurden
+**übernommen, nicht neu erfunden**: fünf Zuständigkeitsregeln und
+Anschreiben, juristisch belegt (§ 12 GBO, kein Baulastenverzeichnis in
+Bayern). Angebunden werden konnte sie nicht — sie läuft auf localhost ohne
+Login und sagt das selbst.
+
+**Die Ämter-Ernte** (Migration 083): einmal ermitteln, belegen,
+hinterlegen — beim nächsten Objekt in derselben Gemeinde steht es da.
+
+> Eine Recherche, die bei jedem Objekt von vorn beginnt, ist keine
+> Recherche, sondern eine Gebühr.
+
+**Die Belegpflicht** ist das Neue: die KI nennt die Quellseite, der Dienst
+ruft sie **selbst ab** und sieht nach.
+
+> Lieber eine Adresse mit Warnung als eine ohne Zweifel.
+
+An Hüllhorst gemessen, beide Behörden richtig gefunden:
+```
+Flurkarte  → Kataster- und Vermessungsamt Kreis Minden-Lübbecke  ✓ belegt
+Grundbuch  → Amtsgericht Lübbecke, Grundbuchamt
+```
+
+**v1833b:** Das Modell legte den Link im *Hinweis* ab statt im Quellfeld,
+und die Belegprüfung meldete „keine Quelle genannt".
+
+> Eine Angabe im falschen Feld ist keine fehlende Angabe.
+
+**v1833c:** `portal-grundbuchamt.de` — ein gewerblicher Antragsservice —
+rutschte durch den Filter. Gehalten hat die zweite Prüfung.
+
+> Ein Filter, der einmal durchlässt, ist kein kaputter Filter. Er ist der
+> Grund, warum es einen zweiten gibt.
+
+### v1834 — zwei Türen, ein Raum
+
+Marcel hatte gefragt, wo der Einstieg hingehört: Deal-Aktion oder
+Objekt-Reiter. **Beide**, und beide öffnen dasselbe Modal.
+
+> Zwei Einstiege sind erst dann ein Fehler, wenn sie zu zwei verschiedenen
+> Flächen führen.
+
+In Deal-Aktion **kein neues Band**: „Bordkarte & Unterlagen" listet seit
+Langem „Aktueller Grundbuchauszug" zum Abhaken, ohne zu sagen, woher.
+
+Drei neue Felder — **weil gemessen statt angenommen**: `gemarkung`, `flur`
+und `flurstueck` wollte ich aus dem Objekt lesen, und ein grep zeigte,
+dass es sie gar nicht gab.
+
+---
+
+## Rollout-Journal 04.10.2026 (9) — v1835–v1838: BORIS war überall grau
+
+**Was** · Marcel: *„bei allen Objekten ist Boris ausgegraut im Tab Objekt.
+Da steht direkt Abruf hier nicht verfügbar, obwohl wir ja alles schon
+integriert haben."*
+
+**Commits** · `v1835`, `v1836`, `v1837`, `v1838`
+
+### Vier Fehler, einer hinter dem anderen
+
+**v1835 · Die Auswertung lief genau einmal** — beim Laden der Seite, als
+das PLZ-Feld leer war. Nachgezogen wurde nur bei `input`, und das feuert
+beim Tippen.
+
+> Ein `input`-Listener hört den Nutzer, nicht das Programm. Wer ein Feld
+> per Code füllt, muss selbst Bescheid sagen.
+
+Dazu nannte der Tooltip vier Bundesländer, die seit v1265 frei sind, und
+der Coverage-Leser erwartete ein Array statt eines Objekts.
+
+> Ein Leser, der die Antwort nicht versteht und trotzdem das Richtige tut,
+> ist kein funktionierender Leser. Er ist eine Wette, die bisher aufging.
+
+**v1836 · Dem Abruf fehlte die Hausnummer.**
+```
+Bismarckstr. 27, Detmold
+  ohne Hausnummer   Zone 2160145   900 €/m²
+  mit Hausnummer    Zone 2160138   700 €/m²
+```
+
+> Eine Straße ist kein Ort. Sie läuft durch mehrere Bodenrichtwertzonen.
+
+**v1837 · Elftausend Postleitzahlen ohne Land.** Ausgelöst durch
+Ibbenbüren, dann die ganze Tabelle durchgezählt: 49000–53999 (Köln, Bonn,
+Aachen), 57000–59999, 88000–89999, 97000–97999.
+
+> Eine Tabelle, die Bereiche aufzählt, hat ihre Lücken dort, wo niemand
+> hingesehen hat.
+
+Und ein zweiter Fund: `1000–9999 → Sachsen` nahm die ganze Leitzone 0, die
+Regeln für Sachsen-Anhalt darunter wurden nie erreicht. **Kabelsketal galt
+als Sachsen** — derselbe Fehler wie am selben Tag bei der
+Grunderwerbsteuer (v1823), in einer zweiten Tabelle.
+
+> Eine Regel, die eine spätere unerreichbar macht, ist schlimmer als eine
+> fehlende. Die fehlende sieht man, die tote nicht.
+
+**v1838 · Die Nutzungsart wurde weggeworfen.** Ibbenbüren liefert 45 €/m²
+mit `nutzung: "GE"`.
+
+> Ein Bodenrichtwert ohne seine Nutzungsart ist eine Zahl ohne ihren
+> Gegenstand. 45 €/m² sind für Grünland richtig und für ein
+> Wohngrundstück ein Fehler.
+
+### Eine Fehldiagnose, ausdrücklich zurückgenommen
+
+Ich hatte gemeldet, Marcels Bodenrichtwerte seien „geschätzt, nicht
+amtlich, bei der Bismarckstraße 28 % daneben". **Das war falsch.** Der
+Lauf über alle Objekte zeigt: **14 von 17 stimmen exakt** mit dem
+amtlichen Wert, zwei Abweichungen betreffen Testobjekte mit erfundener
+Adresse. Falsch war der Knopf, nicht seine Daten.
+
+### Nachgemessen
+
+```
+pruef-plz-abdeckung   99.000 Nummern, 33 Städte, 0 Lücken, 0 Soll verfehlt
+Browser (Staging)     Hüllhorst · Leipzig · Castrop-Rauxel · Detmold → aktiv
+Abruf Ibbenbüren      45 €/m² · Gewerbegebiet · grün (GESCH passt)
+Abruf Hermannstraße   90 €/m² · Wohnbaufläche · grün (ETW passt)
+Gegentest ETW in GE   gelb, mit Begründung
+```
+
+---
+
+## Rollout-Journal 04.10.2026 (10) — v1839: alle 21 Objekte wertermittlungsfähig
+
+**Was** · Marcel: *„für jedes Objekt alle Felder vernünftig befüllen …
+dass wir auch überall dann einmal eine Wertermittlung abrufen können"* und
+*„für alle dann Marktbericht erstellen"*
+
+**Commits** · `v1839`, `v1839b`
+
+### Erst gemessen, wo es klemmt
+
+`tools/objekt-vollstaendigkeit.mjs` lädt den **echten** Mapper und prüft,
+was wirklich ankommt — zwischen Datenbank und Bericht liegt der Mapper,
+und genau dort ist schon einmal etwas verloren gegangen (v1444).
+
+```
+            vorher        nachher
+Stufe 1   20 von 21  →  21 von 21
+Stufe 2   20 von 21  →  21 von 21
+Stufe 3   18 von 21  →  21 von 21
+```
+
+### Fünf von elf Objektarten fielen durch
+
+Hauptstr. 51 Ibbenbüren (GESCH) bekam „Objekttyp nicht angegeben — bitte
+im Formular ergänzen". Er **war** angegeben. `mapPropertyType` kannte
+sechs der elf Arten; BUERO, GESCH, HOTEL, GEW, GAR nicht.
+
+> Eine Meldung, die „fehlt" sagt, wo „kenne ich nicht" richtig wäre,
+> schickt den Nutzer zurück ins Formular, in dem alles steht.
+
+Gewerbe wird **nicht** als Wohnen gerechnet — die NHK-Tabellen der
+Anlage 4 sind die wohnwirtschaftlichen (§ 10 ImmoWertV).
+
+### Marktberichte für alle
+
+**17 von 17 erzeugt**, alle am Objekt hinterlegt (`report_id` 139–155),
+Kontingent 36 → 24.
+
+| Liegenschaftszins | Anzahl |
+|---|---:|
+| Stufe A (amtlich) | 10 |
+| Stufe B | 1 |
+| Stufe D (gesetzlicher Auffangwert) | 6 |
+
+Die sechs Stufe-D-Fälle liegen in Leipzig und Kabelsketal — Sachsen und
+Sachsen-Anhalt sind noch nicht geerntet. Kein Fehler, offene Ernte.
+
+**Marcels 1,79 Millionen sind aufgetaucht:** Gohliser Str. 42 →
+1.790.000 € bei 852 m² = 2.101 €/m² in Leipzig-Gohlis, Kaufpreis
+1.680.000. Der Wert ist plausibel; der Zinssatz dort ist Stufe D.
+
+**Ein Objekt ohne Marktwert:** Hölderlinstr. 1 — *„Keine Marktdaten von
+GeoMap für diesen Standort/Objekttyp."* Die Doktrin greift: kein Treffer
+heißt kein Wert.
+
+### Der Verlauf trackt bereits
+
+Hermannstraße 9: **29 Einträge** seit dem 17.07.2026, von 210.000 über
+197.000 und 192.000 auf 181.000 €.
+
+### Richtigstellung
+
+Ich hatte gemeldet, der erste Abruf habe kein Kontingent gekostet. Zu früh
+gemessen — die Buchung kommt verzögert. 17 Abrufe kosteten 12 Einheiten;
+identische Adressen treffen den Cache.
+
+### Rest
+
+- **Vertragsdatum fehlt bei allen 21 Objekten** — das Feld ist neu
+  (v1829). Bank und Vertragsnummer fehlen bei vier. Diese Angaben sind
+  Tatsachen aus der Welt und werden nicht erfunden.
+- Die Rechnung blockiert nur bei **zwei** Objekten (Löhner Str. 278,
+  Wilhelm-Busch-Straße): kein Darlehen, kein Eigenkapital. Beides
+  Gutachtenobjekte ohne Finanzierung.
+- Sachsen und Sachsen-Anhalt sind beim Liegenschaftszins nicht geerntet.
