@@ -58,6 +58,7 @@ const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
    steht da, aber nicht in einem Feld, das jemand abholen kann.
    Siehe Backlog B1 (2). */
 const BAUPREISINDEX = 1.91;       // Neubau Wohngebaeude, 2010 -> 01.01.2026
+export const BAUPREISINDEX_KONSTANTE = { wert: BAUPREISINDEX, stichtag: '2026-01-01', art: 'konstante' }; /* v1851: fuer die Automatik-Leiste, EINE Quelle */
                                   // Quellen: IMB Hamburg 2026 (1,911),
                                   // GMB Dortmund 2026 (1,906)
 const BGF_FAKTOR = 1.35;          // BGF ≈ Wohnfläche × 1,35 (EFH-Faustwert)

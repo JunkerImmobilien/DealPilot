@@ -239,6 +239,40 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N8 · Der Bankexport über den Bot (04.10.2026)
+
+Marcel: *„der bankexport soll auch über den bot abgefragt werden können.
+So kann man schnell eine übersicht bekommen."*
+
+**Gemessen:** der Bankexport ist `renderBankTable()` in `calc.js:3892` —
+eine Zeile je Darlehen mit Adresse, Art, m², NKM/Monat, €/m², NK/Monat,
+Bank, Darlehensart, Finanzierungsdatum, Vertragsnr., Summe, Zins, Tilgung,
+Rate, Laufzeit, Bindung bis, Restschuld aktuell/Ende, Volltilgung. CSV
+(`exportBankCSV`) liest die gerenderte Tabelle aus dem DOM.
+
+**Weg (Spiegel, kein Nachbau):** die Eingaben (`bank_inst`, `d1_vertrag`,
+`d1`, `d1z`, `d1t`, `d1_bindj`, `kaufdat`, `d2_*`) stehen in
+`objects.data`; die gerechneten Größen (Restschuld, Rate, Bindung bis)
+trägt `portfolio_spiegel.payload` je Objekt (`darlehen_eur`,
+`restschuld_eur`, `zins_prozent`, `tilgung_prozent`, `zinsbindung_bis`).
+→ Werkzeug `bank_uebersicht` (Stufe `lesen`), eine Zeile je Darlehen,
+`so_schreiben` als fertige Tabelle; fehlt der Spiegel: `so_sagen` „in
+DealPilot einmal öffnen". Restschuld **Ende** steht nicht im Spiegel —
+entweder `portfolioPayload()` um `restschuld_ende_eur` und `rate_eur_monat`
+erweitern (Browser rechnet, Spiegel trägt) oder im Bot ehrlich weglassen.
+
+**Reihenfolge:** nach N4-P1/P2, vor N4-P4.
+
+**Dazu Marcels Rahmen für N4 (04.10.2026):** *„dass wir die Felder dann
+auch alle passend verknüpft haben … dass unser PDF noch passt, dass wir
+passend importieren können, dass alle unsere Exporte vernünftig
+funktionieren."* → **Feld-IDs bleiben alle bestehen.** Der Umbau ordnet
+und leitet ab (Gewerke-Zeile = `eq_*` + `mod_*` + `ausst_*` nebeneinander,
+NHK-Typ = `nhk_haus/geschosse/dach` in einer Zeile, Bauteile = `btl_*` als
+Liste); PDF, pdf-import, voice-import, xlsx/docx/Bankexport lesen weiter
+dieselben IDs. Prüfstrecke vor dem Rollout: `tools/feld-waechter.mjs`,
+ein PDF-Export, ein Sprechlauf-Import, ein Bankexport je Objektart.
+
 ---
 
 

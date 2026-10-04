@@ -38184,3 +38184,49 @@ header.hdr svg:has(> use:only-child),
 nav.tabs svg:has(> use:only-child){
   fill:currentColor;
 }
+
+/* ═══ v1851 · N4 · Reiter Objekt: Gewerke-Tabelle, Automatik-Leiste, Ebene 3 ═══
+   Gestaltung wie die Vorlage design/mockups/objekt-reiter-v1850.html, Tokens der
+   App. Gold nur als var(--wl-…)-Token (Whitelabel-Pflicht), Status-Farben fest. */
+#oe-details #obj-extra-wrap > * { grid-column: 1 / -1; }
+#oe-details .card-title { margin-top: 6px; }
+.oe-ct-hint { margin-left: auto; font-family: "JetBrains Mono", monospace; font-weight: 400; font-size: 10px; letter-spacing: 0; text-transform: none; color: var(--muted, #7A7370); }
+table.oe-gewerke { width: 100%; border-collapse: collapse; font-size: 13px; margin: 2px 0 6px; }
+table.oe-gewerke th { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border-g, #e9dcb3); letter-spacing: .04em; }
+table.oe-gewerke td { padding: 5px 8px; border-bottom: 1px solid var(--border, #E0DBD3); vertical-align: middle; }
+table.oe-gewerke td.oe-g { font-weight: 600; white-space: nowrap; }
+table.oe-gewerke td.oe-wg { font: 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); text-align: right; }
+table.oe-gewerke select { width: 100%; min-width: 0; }
+table.oe-gewerke .oe-leer { color: var(--muted2, #9A9390); }
+table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(--wl-C9A84C, #C9A84C); color: var(--muted, #7A7370); }
+.oe-gew-hint { margin: 2px 0 10px; }
+.oe-auto { border: 1px solid var(--border-g, #e9dcb3); background: var(--karte, #FBF6E9); border-radius: 10px; overflow: hidden; margin-top: 4px; }
+.oe-auto .oe-row { display: grid; grid-template-columns: 1.2fr 0.9fr 1.8fr auto; gap: 8px; align-items: center; padding: 8px 12px; border-top: 1px solid var(--border-g, #e9dcb3); font-size: 12.5px; }
+.oe-auto .oe-row:first-child { border-top: 0; }
+.oe-auto .oe-k { font-weight: 600; }
+.oe-auto .oe-w { font-family: "JetBrains Mono", monospace; }
+.oe-auto .oe-q { color: var(--muted, #7A7370); font-size: 11.5px; }
+.oe-auto .oe-q a { color: inherit; text-decoration: underline; }
+.oe-st { display: inline-block; font: 10px "JetBrains Mono", monospace; padding: 1px 6px; border-radius: 4px; border: 1px solid; margin-right: 6px; vertical-align: middle; }
+.oe-st.a { color: #3FA56C; border-color: #3FA56C; }
+.oe-st.b { color: var(--wl-b8932f, #b8932f); border-color: var(--wl-C9A84C, #C9A84C); }
+.oe-st.x { color: #B8625C; border-color: #B8625C; }
+.oe-btn { font: 11.5px Inter, system-ui, sans-serif; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--wl-C9A84C, #C9A84C); background: transparent; color: var(--wl-b8932f, #b8932f); cursor: pointer; white-space: nowrap; }
+.oe-btn:hover { background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 10%, transparent); }
+.oe-stufen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.oe-stufen .oe-btn.solid { background: linear-gradient(110deg, var(--wl-E8CC7A, #E8CC7A), var(--wl-C9A84C, #C9A84C) 55%, var(--wl-b8932f, #b8932f)); color: #050505; border-color: transparent; font-weight: 600; }
+.oe-stufen .oe-btn[disabled] { opacity: .5; cursor: not-allowed; }
+.oe-stufen .oe-stufen-hint { font-size: 11.5px; color: var(--muted, #7A7370); flex-basis: 100%; }
+.oe-hint3 { border: 1px dashed var(--wl-C9A84C, #C9A84C); border-radius: 8px; padding: 8px 12px; background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 7%, transparent); }
+.oe-lage-vergleich { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 2px 0 12px; }
+.oe-lage-vergleich .oe-box { background: var(--creme, #FDFCFA); border: 1px solid var(--border, #E0DBD3); border-radius: 8px; padding: 9px 12px; font-size: 12.5px; }
+.oe-lage-vergleich .oe-box h5 { margin: 0 0 5px; font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
+@media (max-width: 640px) {
+  .oe-auto .oe-row { grid-template-columns: 1fr 1fr; row-gap: 3px; }
+  .oe-lage-vergleich { grid-template-columns: 1fr; }
+  table.oe-gewerke th:nth-child(5), table.oe-gewerke td:nth-child(5) { display: none; }
+}
+
+/* v1851 · Zellen der Gewerke-Tabelle: .f mit unsichtbarem Label (Extraktor, objektart-felder) */
+.f.oe-cell { margin: 0; padding: 0; min-width: 0; }
+.oe-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

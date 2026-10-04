@@ -107,12 +107,20 @@ function _buildDeal2FromState() {
     if (avgInfo && avgInfo.count > 0) {
       var a = avgInfo.avg;
       deal.qualitaetSterne = a;            // V42: 1-5 für DS2 KPI "Qualität & Zustand"
-      deal.zustand =
-        a >= 4.5 ? 'neubau' :
-        a >= 3.5 ? 'gut' :
-        a >= 2.5 ? 'normal' :
-        a >= 1.5 ? 'renovierungsbeduerftig' :
-                   'stark_sanierungsbeduerftig';
+      /* v1851 · Die Sterne sind durch die Gewerke-Stufen ersetzt (N4).
+         getAverage() liefert jetzt zuerst den Mittelwert der Standardstufen
+         je Gewerk (quelle 'gewerke') - das ist QUALITAET, kein Zustand. Den
+         Zustand sagt dann das Feld ds2_zustand selbst. Nur die alten Sterne
+         (quelle 'sterne', Altobjekte ohne Gewerke-Stufen) duerfen das
+         Zustands-Dropdown wie bisher ueberstimmen. */
+      if (avgInfo.quelle !== 'gewerke') {
+        deal.zustand =
+          a >= 4.5 ? 'neubau' :
+          a >= 3.5 ? 'gut' :
+          a >= 2.5 ? 'normal' :
+          a >= 1.5 ? 'renovierungsbeduerftig' :
+                     'stark_sanierungsbeduerftig';
+      }
       deal._sternebewertung = avgInfo;
     }
   }
@@ -528,12 +536,17 @@ function renderDealScore2() {
   var sternBannerHtml = '';
   if (deal._sternebewertung && deal._sternebewertung.count > 0) {
     var sb = deal._sternebewertung;
-    sternBannerHtml =
-      '<div class="ds2-stern-banner">' +
-        '<span class="ds2-stern-icon">★</span>' +
-        '<span><strong>Sterne-Bewertung Q&amp;Z aktiv:</strong> ' +
-        sb.avg.toFixed(1).replace('.', ',') + ' / 5,0 aus ' + sb.count + ' Bereichen → wird im Risiko-Score (Baujahr/Zustand) verwendet.</span>' +
-      '</div>';
+    sternBannerHtml = (sb.quelle === 'gewerke')
+      ? '<div class="ds2-stern-banner">' +
+          '<span class="ds2-stern-icon">▦</span>' +
+          '<span><strong>Gewerke-Stufen aktiv:</strong> Standardstufe ' +
+          sb.avg.toFixed(1).replace('.', ',') + ' / 5 aus ' + sb.count + ' Gewerken (Anlage 4 ImmoWertV) → Risiko-Kategorie Qualität.</span>' +
+        '</div>'
+      : '<div class="ds2-stern-banner">' +
+          '<span class="ds2-stern-icon">★</span>' +
+          '<span><strong>Sterne-Bewertung Q&amp;Z aktiv:</strong> ' +
+          sb.avg.toFixed(1).replace('.', ',') + ' / 5,0 aus ' + sb.count + ' Bereichen → wird im Risiko-Score (Baujahr/Zustand) verwendet.</span>' +
+        '</div>';
   }
 
   box.innerHTML =

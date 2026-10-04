@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1785"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1851"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -1035,56 +1035,15 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Objektart</label><select id="objart"><!-- v1315c: Bis zum 11.09.2026 gab es KEINE leere Option - ETW war damit an jedem leeren Objekt vorausgewaehlt, ohne dass es jemand gesagt hatte. Seit v1314 waehlt die Objektart auch das Marktsegment bei GeoMap: eine stillschweigende ETW-Annahme misst ein Haus am Wohnungsmarkt. --><option value="">&#8211; bitte w&auml;hlen &#8211;</option><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option>
               <option value="ZFH">Zweifamilienhaus (ZFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
+      <div class="f"><label>Nutzungsart</label><select id="nutzungsart"><option value="kapitalanlage" selected>Vermietet (Kapitalanlage)</option><option value="eigennutzung">Selbst genutzt</option></select></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+      <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
       <!-- v445-obj-reorder -->
       <div class="f"><label class="dp-required" data-v236-required-set="1">Baujahr</label><input id="baujahr" type="text" inputmode="decimal" placeholder="1997"></div>
-      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
-      <div class="obj-extra-acc" id="obj-extra-toggle" role="button" tabindex="0" aria-expanded="false" style="grid-column:1/-1"><span class="obj-extra-chev" aria-hidden="true">▸</span><span class="obj-extra-acc-lbl">Weitere Objektdetails</span></div>
-      <div id="obj-extra-wrap" class="obj-extra-wrap">
-      <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
-      <div class="f"><label>Badezimmer</label><input id="bad_anz" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
       <div class="f"><label>Anzahl Etagen</label><input id="etagen_ges" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
-      <div class="f"><label>Modernisierungsjahr</label><input id="modernis" type="text" inputmode="decimal" placeholder="z.B. 2025"></div>
-      <!-- v1608 · Modernisierungsgrad nach Anlage 2 ImmoWertV.
-           Acht Bauteile, Hoechstpunktzahl 20. Bis hierher standen sie nur
-           im Restnutzungsdauer-Assistenten und gingen mit ihm verloren.
-           Die Reihenfolge ist die der Anlage 2 und die von
-           computeModPoints() in rnd-wizard.js - sie darf nicht
-           auseinanderlaufen, weil die Punktzahl die Restnutzungsdauer
-           und damit die Abschreibung steuert. -->
-      <div class="f"><label>Dacherneuerung inkl. W&auml;rmed&auml;mmung <button type="button" class="dp-tip" data-tip-id="rnd.mod_dach" tabindex="-1" aria-label="Hilfe zu Dacherneuerung"></button></label><select id="mod_dach"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>Fenster und Au&szlig;ent&uuml;ren <button type="button" class="dp-tip" data-tip-id="rnd.mod_fenster" tabindex="-1" aria-label="Hilfe zu Fenster und Außentüren"></button></label><select id="mod_fenster"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>Leitungssysteme (Strom, Gas, Wasser) <button type="button" class="dp-tip" data-tip-id="rnd.mod_leitungen" tabindex="-1" aria-label="Hilfe zu Leitungssysteme"></button></label><select id="mod_leitungen"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>Heizungsanlage <button type="button" class="dp-tip" data-tip-id="rnd.mod_heizung" tabindex="-1" aria-label="Hilfe zu Heizungsanlage"></button></label><select id="mod_heizung"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>W&auml;rmed&auml;mmung Au&szlig;enw&auml;nde <button type="button" class="dp-tip" data-tip-id="rnd.mod_aussenwand" tabindex="-1" aria-label="Hilfe zu Wärmedämmung Außenwände"></button></label><select id="mod_aussenwand"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>B&auml;der <button type="button" class="dp-tip" data-tip-id="rnd.mod_baeder" tabindex="-1" aria-label="Hilfe zu Bäder"></button></label><select id="mod_baeder"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>Innenausbau (Decken, Fu&szlig;b&ouml;den) <button type="button" class="dp-tip" data-tip-id="rnd.mod_innenausbau" tabindex="-1" aria-label="Hilfe zu Innenausbau"></button></label><select id="mod_innenausbau"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>Wesentliche &Auml;nderung der Grundrissgestaltung <button type="button" class="dp-tip" data-tip-id="rnd.mod_grundriss" tabindex="-1" aria-label="Hilfe zu Grundrissgestaltung"></button></label><select id="mod_grundriss"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div>
-      <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
-      <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
-      <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
-      <!-- v737-eq-move: Ausstattungsdetails hierher verschoben (aus qz-card) --><!-- v727-ausst-fields A: Ausstattungsdetails (Qualitaet) --><div class="f" style="grid-column:1/-1"><div class="qz-acc-sub" style="font-size:12px;color:var(--muted);margin:4px 0 2px;font-weight:600">Ausstattung im Detail <span style="font-weight:400">(verbessert die Marktbewertung)</span></div></div><div class="f"><label>Heizung <button type="button" class="dp-tip" data-tip-id="tab1.eq_heating" tabindex="-1" aria-label="Hilfe zu Heizung"></button></label><select id="eq_heating"><option value="">– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Verglasung <button type="button" class="dp-tip" data-tip-id="tab1.eq_windows" tabindex="-1" aria-label="Hilfe zu Verglasung"></button></label><select id="eq_windows"><option value="">– keine Angabe –</option><option value="EINFACH">Einfachverglasung</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Bodenbelag <button type="button" class="dp-tip" data-tip-id="tab1.eq_floor" tabindex="-1" aria-label="Hilfe zu Bodenbelag"></button></label><select id="eq_floor"><option value="">– keine Angabe –</option><option value="PARKETT_NATURSTEIN">Parkett / Naturstein</option><option value="FLIESEN">Fliesen</option><option value="TEPPICH_LAMINAT">Teppich / Laminat</option><option value="KUNSTSTOFF_PVC">Kunststoff / PVC</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div><input type="hidden" id="eq_bath"><!-- v1311: die Herkunft je Feld, als JSON - siehe storage.js FIELDS --><input type="hidden" id="_dp_herkunft"><!-- v727-ausst-fields B: Bauliche Details --><div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div><div class="f"><label>Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div><div class="f"><label>Dacheindeckung <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div><div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
-      </div><!-- /obj-extra-wrap -->
-      <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
-      <div class="f s2"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
-      <!-- v363-erwerb: abgesetzte Untergruppe -->
-      <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
-      <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><!-- v816h-field-trl v816i-all-rightalign -->
-    </div></div>
-
-    <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-quality"/></svg></span>Ausstattungsqualität</div>
-      <div class="g2">
-        <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
-          <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
-            <option value="">– keine Angabe –</option>
-            <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-          </select>
-        </div>
-        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
+      <div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
           <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
             <option value="">– bitte wählen –</option>
             <option value="neubau">Neubau / kernsaniert</option>
@@ -1094,19 +1053,79 @@ label.dp-required.qc-required::after {
             <option value="stark_sanierungsbeduerftig">Stark sanierungsbedürftig</option>
           </select>
         </div>
-        <div class="f"><label>Vermietungsstand <button type="button" class="dp-tip" data-tip-id="tab1.vermietungsstand" tabindex="-1" aria-label="Hilfe zu tab1.vermietungsstand"></button></label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
+      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fuenf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualitaet des Gebaeudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
+        <option value="">— keine Angabe —</option>
+        <option value="1">1 · sehr einfach (nur Häuser)</option>
+        <option value="2">2 · einfach (nur Häuser)</option>
+        <option value="3">3 · Standard</option>
+        <option value="4">4 · gehoben</option>
+        <option value="5">5 · stark gehoben</option>
+      </select></div></div>
+      <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
+          <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
+            <option value="">– keine Angabe –</option>
+            <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
+            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
+            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+      <div class="f"><label>Vermietungsstand <button type="button" class="dp-tip" data-tip-id="tab1.vermietungsstand" tabindex="-1" aria-label="Hilfe zu tab1.vermietungsstand"></button></label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
+      <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+      <div class="f"><label>Kürzel <button type="button" class="dp-tip" data-tip-id="tab1.kuerzel" tabindex="-1" aria-label="Hilfe zu tab1.kuerzel"></button></label><input id="kuerzel" type="text" placeholder="z.B. MS_MUS_12"></div>
+      <input type="hidden" id="_dp_herkunft">
+      <div class="f s2"><label>Investitionsthese <button type="button" class="dp-tip" data-tip-id="tab1.investitionsthese" tabindex="-1" aria-label="Hilfe zu tab1.investitionsthese"></button></label><textarea id="thesis" placeholder="Was macht dieses Objekt besonders?"></textarea></div>
+      <div class="f s2"><label>Bekannte Risiken <button type="button" class="dp-tip" data-tip-id="tab1.bekannte_risiken" tabindex="-1" aria-label="Hilfe zu tab1.bekannte_risiken"></button></label><textarea id="risiken" placeholder="Bekannte Risiken und Maßnahmen..."></textarea></div>
+      <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
+      <!-- v363-erwerb: abgesetzte Untergruppe -->
+      <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
+      <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
+      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- mand-halter-block v815 (umgezogen nach Erwerb) --><!-- v816g-halter-show: sichtbar, Sperrung via JS --><div class="f" data-mand data-halter-lock="1"><label>Halter / Mandant <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· wer hält das Objekt</span></label><select id="halter"></select></div><input id="obj_herkunft" type="hidden" value="neukauf"><div class="f" data-mand style="grid-column:1/-1"><label class="cb-label"><input id="mand_ueberf_cb" type="checkbox" onchange="if(window.DealPilotMandanten)DealPilotMandanten.onUeberfToggle(this.checked)"><span>Dieses Objekt wurde aus dem Privatbestand überführt</span></label></div><div class="f mand-ueberf" data-mand style="display:none"><label>Verkehrswert <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(AfA-Basis Gesellschaft)</span></label><div class="iw"><span class="pfx">€</span><input id="verkehrswert_ueberf" type="text" inputmode="decimal" class="trl" placeholder="z.B. 450000"></div></div><div class="f mand-ueberf" data-mand style="display:none"><label>Überführungspreis <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(GrESt-Basis)</span></label><div class="iw"><span class="pfx">€</span><input id="ueberf_preis" type="text" inputmode="decimal" class="trl" placeholder="z.B. 340000"></div><span class="hint" id="mand-ueberf-pct">—</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Stichtag Überführung <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat → Gesellschaft)</span></label><input id="halter_seit" type="date" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Gesellschafterdarlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(gestundeter Kaufpreis)</span></label><div class="iw"><span class="pfx">€</span><input id="gesellschafterdarlehen" type="text" inputmode="decimal" class="trl" placeholder="0"></div></div><!-- v813-3d --><div class="f mand-ueberf" data-mand style="display:none"><label>&Uuml;bernommene Restschuld <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Darlehen geht mit in die Gesellschaft)</span></label><div class="iw"><span class="pfx">&euro;</span><input id="ueberf_restschuld" type="text" inputmode="decimal" class="trl" placeholder="0"></div><span class="hint" id="mand-rest-hint">&mdash;</span></div><div class="f mand-ueberf" data-mand style="display:none"><label>Zins &uuml;bernommenes Darlehen <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">% p.a. (falls neu verhandelt)</span></label><input id="ueberf_rest_zins" type="text" inputmode="decimal" placeholder="z.B. 3,8" class="tr"></div><div class="f mand-ueberf" data-mand style="display:none"><label>Privat-Ende / überführt am <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">(Cut: Privat-Objekt rechnet bis hier, dann eingefroren)</span></label><input id="ueberf_ende" type="date" class="tr"></div><input id="_ueberf_link" type="hidden" value=""><!-- v816h-field-trl v816i-all-rightalign -->
+    </div></div>
+
+    <div class="card card-stretch qz-card" id="qz-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Automatisch ermittelt <span class="oe-ct-hint">Wert · Quelle · Stichtag — kein Eingabefeld</span></div>
+      <div class="g2">
+        
+        
+        
         <!-- v1816 · Die Nutzungsart entscheidet, WELCHEN amtlichen Zinssatz
              der Gutachterausschuss hergibt: viele fuehren getrennte Saetze fuer
              vermietetes (we_v) und selbstgenutztes (we_s) Wohnungseigentum.
              Standard ist VERMIETET - DealPilot ist ein Kapitalanlagerechner.
              Der Marktbericht sucht dieses Feld bereits (app.js Z.2325), es gab
              es in der Haupt-App nur nicht. -->
-        <div class="f"><label>Nutzungsart</label><select id="nutzungsart"><option value="kapitalanlage" selected>Vermietet (Kapitalanlage)</option><option value="eigennutzung">Selbst genutzt</option></select></div>
-        <div class="f" data-v363-ausst><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
-        <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
+        
+        <div class="f">
+              <label>Bodenrichtwert (€/m²) <button type="button" class="dp-tip" data-tip-id="tab1.bodenrichtwert" tabindex="-1" aria-label="Hilfe zu tab1.bodenrichtwert"></button></label>
+              <div class="iw"><span class="pfx">€</span><input id="brw" type="text" inputmode="decimal" placeholder="150" class="trl" oninput="calc()"></div>
+              <div class="brw-helpers">
+                <!-- v1268: Der amtliche Direktabruf hatte nie einen Knopf. Das
+                     Modul erwartete #brw-boris-btn seit v785, im HTML stand er
+                     nie - fetchBoris() war nur ueber die Automatik (v1265)
+                     und ueber DealPilotBrw.fetchBoris() erreichbar. -->
+                <button type="button" class="btn-brw" id="brw-boris-btn" onclick="DealPilotBrw.fetchBoris()" title="Bodenrichtwert direkt abrufen — gratis (Open Data)">
+                  <span class="btn-brw-icon">📍</span> Bodenrichtwert abrufen
+                </button>
+                <button type="button" class="btn-brw" onclick="DealPilotBrw.openBoris()" title="Öffnet BORIS-Portal des passenden Bundeslandes">
+                  <span class="btn-brw-icon">🔗</span> BORIS-Portal
+                </button>
+                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
+                  <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
+                </button>
+                <span id="brw-ai-status" class="brw-ai-status"></span>
+              </div>
+              <!-- V190: Container für KI-Result-Card mit Confidence/Begründung/BORIS-Verify -->
+              <div id="brw-ki-result" class="brw-ki-result" style="display:none"></div>
+            </div>
+        <div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
+        <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
+        <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
+        <div class="f s2" id="oe-auto-wrap"><div id="oe-auto" class="oe-auto"></div><div id="oe-stufen" class="oe-stufen"></div></div>
+        <div class="f" data-v363-ausst style="display:none"><label>Ausstattung (Altfeld, ersetzt durch die Standardstufe)</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
+        
       </div>
       
-      <div class="qz-divider"></div>
+      <div id="oe-sterne-alt" style="display:none"><div class="qz-divider"></div>
       <div class="qz-acc" id="qz-stars-toggle" role="button" tabindex="0" aria-expanded="false"><span class="qz-acc-chev" aria-hidden="true">▸</span><span class="qz-acc-lbl">Sterne-Bewertung</span><span class="qz-acc-hint">Zustand &amp; Qualität bewerten</span></div>
       <div class="qz-rows" id="qz-stars-rows">
         <div class="qz-subhead" data-v362-zust-head style="grid-column:1/-1;margin:2px 0;font-size:12px;font-weight:600;color:var(--muted,#7A7370);letter-spacing:.04em;text-transform:uppercase">Zustand</div>
@@ -1176,24 +1195,87 @@ label.dp-required.qc-required::after {
         <span class="qz-footer-l">Durchschnitt:</span>
         <span class="qz-footer-stars" id="qz_avg_stars">– – – – –</span>
         <span class="qz-footer-v" id="qz_avg_label">noch keine Bewertung</span>
-      </div>
+      </div></div>
     </div>
   </div>
 
 
-  <!-- V53: Lage- & Markt-Indikatoren — ALLES drin: Bewertung, Makro/Mikro, DS2-Felder -->
-  <div class="card lage-markt-card">
-    <div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage- &amp; Markt-Indikatoren <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span></div>
-    <p class="hint">Werte fließen in DealScore 2.0 (Lage 10% + Upside 10%) ein.</p>
-
-    <!-- V206: Marktbericht-PDF Import — Coming Soon (ausgegraut, Button disabled) -->
-
-    <div class="g2">
-      <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
-      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div></div>
-      <!-- v1445 · Backlog v22 Punkt 5: Wert NACH Sanierung (stabilisiert) - Nenner fuer den LTV nach Sanierung -->
-      <div class="f"><label title="Erwarteter Wert nach Abschluss der Sanierung/Modernisierung (stabilisierter Zustand). Banken rechnen Sanierungsfinanzierungen gegen diesen Wert (as-completed).">Wert nach Sanierung <span class="cf-hint">(optional · stabilisiert)</span></label><div class="iw"><span class="pfx">€</span><input id="wert_soll" type="text" inputmode="decimal" placeholder="z.B. 1.250.000" class="trl" oninput="calc()"></div></div>
-      <div class="f"><label>Makrolage</label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
+  <!-- ═══ v1851 · N4 · EBENE 2 — Weitere Objektdetails ═══════════════════
+         Gewerke-Tabelle (Art · modernisiert · Standardstufe), Bauteile & Grundstück,
+         Lage als Einschätzung NEBEN der Datenlage, Wertanker. Alle Feld-IDs sind
+         die alten — nur die Ordnung ist neu. Umgebaut von tools/n4-umbau-index.mjs. -->
+    <div class="card" id="oe-details"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Weitere Objektdetails <span class="oe-ct-hint">verfeinern den Marktbericht</span></div>
+      <div class="obj-extra-acc" id="obj-extra-toggle" role="button" tabindex="0" aria-expanded="false"><span class="obj-extra-chev" aria-hidden="true">▸</span><span class="obj-extra-acc-lbl">Gewerke, Bauteile, Grundstück, Lage</span><span class="obj-extra-acc-hint">eine Zeile je Gewerk — die Stufe wird vorgeschlagen</span></div>
+      <div id="obj-extra-wrap" class="obj-extra-wrap">
+        <div class="card-title">Gewerke · Art, Modernisierung, Standardstufe (Anlage 4 ImmoWertV)</div>
+        <table class="oe-gewerke" id="oe-gewerke"><thead><tr><th>Gewerk</th><th>Art / Ausführung</th><th>modernisiert</th><th>Standardstufe</th><th>Gewicht</th></tr></thead><tbody>
+    <tr><td class="oe-g">Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></td><td><div class="f oe-cell"><label class="oe-sr">Außenwände · Art</label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Außenwände · modernisiert</label><select id="mod_aussenwand"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Außenwände · Standardstufe</label><select id="ausst_aussenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">23</td></tr>
+    <tr><td class="oe-g">Dach <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></td><td><div class="f oe-cell"><label class="oe-sr">Dach · Art</label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Dach · modernisiert</label><select id="mod_dach"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Dach · Standardstufe</label><select id="ausst_dach"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">15</td></tr>
+    <tr><td class="oe-g">Fenster / Außentüren <button type="button" class="dp-tip" data-tip-id="tab1.eq_windows" tabindex="-1" aria-label="Hilfe zu Verglasung"></button></td><td><div class="f oe-cell"><label class="oe-sr">Fenster / Außentüren · Art</label><select id="eq_windows"><option value="">– keine Angabe –</option><option value="EINFACH">Einfachverglasung</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Fenster / Außentüren · modernisiert</label><select id="mod_fenster"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Fenster / Außentüren · Standardstufe</label><select id="ausst_fenster"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">11</td></tr>
+    <tr><td class="oe-g">Heizung <button type="button" class="dp-tip" data-tip-id="tab1.eq_heating" tabindex="-1" aria-label="Hilfe zu Heizung"></button></td><td><div class="f oe-cell"><label class="oe-sr">Heizung · Art</label><select id="eq_heating"><option value="">– keine Angabe –</option><option value="FUSSBODENHEIZUNG">Fußbodenheizung</option><option value="ZENTRALHEIZUNG">Zentralheizung</option><option value="EINZELOEFEN">Einzelöfen</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Heizung · modernisiert</label><select id="mod_heizung"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Heizung · Standardstufe</label><select id="ausst_heizung"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">9</td></tr>
+    <tr><td class="oe-g">Bad / Sanitär <button type="button" class="dp-tip" data-tip-id="rnd.mod_baeder" tabindex="-1" aria-label="Hilfe zu Bäder"></button></td><td><div class="f oe-cell"><label class="oe-sr">Bad / Sanitär · Art</label><select id="eq_bath"><option value="">– keine Angabe –</option><option value="EIN_BAD">Ein Bad</option><option value="INNENLIEGEND">Innenliegend, ohne Fenster</option><option value="MIT_FENSTER">Mit Fenster</option><option value="MEHR_ALS_EIN_BAD">Mehr als ein Bad</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Bad / Sanitär · modernisiert</label><select id="mod_baeder"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Bad / Sanitär · Standardstufe</label><select id="ausst_sanitaer"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">9</td></tr>
+    <tr><td class="oe-g">Fußböden <button type="button" class="dp-tip" data-tip-id="tab1.eq_floor" tabindex="-1" aria-label="Hilfe zu Bodenbelag"></button></td><td><div class="f oe-cell"><label class="oe-sr">Fußböden · Art</label><select id="eq_floor"><option value="">– keine Angabe –</option><option value="PARKETT_NATURSTEIN">Parkett / Naturstein</option><option value="FLIESEN">Fliesen</option><option value="TEPPICH_LAMINAT">Teppich / Laminat</option><option value="KUNSTSTOFF_PVC">Kunststoff / PVC</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><span class="oe-leer">—</span></td><td><div class="f oe-cell"><label class="oe-sr">Fußböden · Standardstufe</label><select id="ausst_fussboeden"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">5</td></tr>
+    <tr><td class="oe-g">Innenwände <button type="button" class="dp-tip" data-tip-id="rnd.mod_innenausbau" tabindex="-1" aria-label="Hilfe zu Innenausbau"></button></td><td><span class="oe-leer">—</span></td><td><div class="f oe-cell"><label class="oe-sr">Innenwände · modernisiert</label><select id="mod_innenausbau"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Innenwände · Standardstufe</label><select id="ausst_innenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">11</td></tr>
+    <tr><td class="oe-g">Decken / Treppen</td><td><span class="oe-leer">—</span></td><td><span class="oe-leer">—</span></td><td><div class="f oe-cell"><label class="oe-sr">Decken / Treppen · Standardstufe</label><select id="ausst_decken"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">11</td></tr>
+    <tr><td class="oe-g">Technik / Leitungen <button type="button" class="dp-tip" data-tip-id="rnd.mod_leitungen" tabindex="-1" aria-label="Hilfe zu Leitungssysteme"></button></td><td><span class="oe-leer">—</span></td><td><div class="f oe-cell"><label class="oe-sr">Technik / Leitungen · modernisiert</label><select id="mod_leitungen"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Technik / Leitungen · Standardstufe</label><select id="ausst_technik"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">6</td></tr>
+    <tr><td class="oe-g">Grundriss (Anlage 2) <button type="button" class="dp-tip" data-tip-id="rnd.mod_grundriss" tabindex="-1" aria-label="Hilfe zu Grundrissgestaltung"></button></td><td><span class="oe-leer">—</span></td><td><div class="f oe-cell"><label class="oe-sr">Grundriss (Anlage 2) · modernisiert</label><select id="mod_grundriss"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><span class="oe-leer">—</span></td><td class="oe-wg">—</td></tr>
+        </tbody></table>
+        <p class="hint oe-gew-hint" id="oe-gewerke-hint">Die Stufe je Gewerk wird aus Art und Modernisierung <b>vorgeschlagen</b> (gestrichelt) und lässt sich überschreiben. Aus den Stufen entstehen die Standardstufe oben, die Modernisierungspunkte (Anlage 2) und der Modernisierungsgrad der Restnutzungsdauer — früher die Sterne.</p>
+        <div class="card-title">Bauteile &amp; Grundstück</div>
+        <div class="g3">
+          <div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
+      <div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div>
+      <div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div>
+      <div class="f"><label>Badezimmer</label><input id="bad_anz" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
+      <div class="f"><label>Balkon / Terrasse (m&sup2;)</label><div class="iw"><input id="balkon_flae" type="text" inputmode="decimal" placeholder="z.B. 10" class="tr"><span class="sfx">m&sup2;</span></div></div>
+      <div class="f"><label>Garagenpl&auml;tze</label><input id="garagen" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
+      <div class="f"><label>Au&szlig;enstellpl&auml;tze</label><input id="stellpl_aussen" type="text" inputmode="decimal" placeholder="z.B. 0"></div>
+      <div class="f"><label>Modernisierungsjahr</label><input id="modernis" type="text" inputmode="decimal" placeholder="z.B. 2025"></div>
+          <div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus">
+        <option value="">— keine Angabe —</option>
+        <option value="bestand">Bestand</option>
+        <option value="bestand_erstbezug_saniert">Bestand – Erstbezug nach Sanierung</option>
+        <option value="neubau_erstbezug">Neubau – Erstbezug</option>
+        <option value="neubau_im_bau">Neubau – im Bau</option>
+        <option value="geplant">Geplant / Bauträger</option>
+      </select></div></div>
+          <div class="f"><label>Gemarkung</label><input id="gemarkung" type="text" placeholder="z.B. Hüllhorst"></div>
+      <div class="f"><label>Flur</label><input id="flur" type="text" placeholder="z.B. 3"></div>
+      <div class="f"><label>Flurstück</label><input id="flurstueck" type="text" placeholder="z.B. 45"></div>
+          <div class="f s2" style="display:flex;align-items:flex-end">
+          <button type="button" class="btn btn-ghost" style="font-size:12.5px"
+            onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
+            Unterlagen beim Amt anfordern
+          </button>
+        </div>
+          <div class="f"><label>Zusätzliche Fläche / Hinterland (m²)</label><div class="iw"><input id="hinterland_qm" type="text" inputmode="decimal" placeholder="nur die Fläche AUSSERHALB des Baulands" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Wertansatz Hinterland (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="hinterland_eur_qm" type="text" inputmode="decimal" placeholder="z. B. 5 €/m²" class="trl"></div></div>
+      <div class="f"><label>Zusatzfläche ist rentierlich</label><div class="iw"><select id="hinterland_rentierlich">
+        <option value="">nein · wirft keinen Ertrag ab (Standard)</option>
+        <option value="ja">ja · wird vermietet oder verpachtet</option>
+      </select></div></div>
+          <div class="f s2" style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
+            <input type="checkbox" id="erbpacht" onchange="if(window.DealPilotErbbau)DealPilotErbbau.toggle(this.checked);calc()">
+            <span>Erbbaurecht / Erbpacht</span>
+            <button type="button" class="dp-tip" data-tip-id="tab1.erbpacht" tabindex="-1" aria-label="Hilfe zu Erbbaurecht"></button>
+          </label>
+          <div class="dz-sub" style="margin-top:2px">Das Grundstück gehört nicht mit — es wird gegen Erbbauzins überlassen.</div>
+        </div>
+          <div class="f s2" id="erbpacht_body" style="display:none">
+          <div class="g2">
+            <div class="f"><label>Erbbauzins (€ pro Jahr)</label><div class="iw"><span class="pfx">€</span><input id="erbbauzins" type="text" inputmode="decimal" placeholder="1.800" class="trl" oninput="calc()"></div></div>
+            <div class="f"><label>Restlaufzeit (Jahre)</label><div class="iw"><input id="erb_restlz" type="text" inputmode="numeric" placeholder="55" class="tr" oninput="calc()"><span class="sfx">J</span></div></div>
+            <div class="f"><label>Angemessener Erbbauzinssatz (%)</label><div class="iw"><input id="erb_zs_ang" type="text" inputmode="decimal" placeholder="3,5" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f"><label>Entschädigung bei Zeitablauf (%)</label><div class="iw"><input id="erb_entsch" type="text" inputmode="decimal" placeholder="66,7" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Verkehrswert / Bankbewertung ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
+          </div>
+          <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
+        </div>
+        </div>
+        <div class="card-title">Lage — Ihre Einschätzung neben der Datenlage <span class="ds2-tag" title="Investor Deal Score (DS2): Diese Felder fließen in die Bewertung ein. Im Marktbericht stehen sie als Ihre Einschätzung NEBEN der gemessenen Datenlage — getrennt beschriftet.">DS2</span></div>
+        <div class="g3">
+          <div class="f"><label>Makrolage</label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f"><label>Mikrolage</label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">
         <label>Bevölkerungsentwicklung</label>
@@ -1239,10 +1321,9 @@ label.dp-required.qc-required::after {
           <option value="keine">Keine</option>
         </select>
       </div>
-    </div>
-
-    <!-- V53: KI-Lage-Bewertung UNTEN — bewertet ALLE Lage-Felder gemeinsam -->
-    <div class="ki-lage-box ki-lage-box-bottom" id="ki-lage-box">
+        </div>
+        <div id="oe-lage-vergleich" class="oe-lage-vergleich" style="display:none"></div>
+        <div class="ki-lage-box ki-lage-box-bottom" id="ki-lage-box">
       <div class="ki-lage-header">
         <div class="ki-lage-title">
           <span id="ki-lage-icon" class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
@@ -1257,7 +1338,14 @@ label.dp-required.qc-required::after {
         <div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — DealPilot bewertet Makro/Mikro, Bevölkerung, Nachfrage, Wertsteigerung &amp; Entwicklung in einem Aufruf mit Quellen.</div>
       </div>
     </div>
-  </div>
+        <div class="card-title">Wertanker</div>
+        <div class="g3">
+          <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label title="Erwarteter Wert nach Abschluss der Sanierung/Modernisierung (stabilisierter Zustand). Banken rechnen Sanierungsfinanzierungen gegen diesen Wert (as-completed).">Wert nach Sanierung <span class="cf-hint">(optional · stabilisiert)</span></label><div class="iw"><span class="pfx">€</span><input id="wert_soll" type="text" inputmode="decimal" placeholder="z.B. 1.250.000" class="trl" oninput="calc()"></div></div>
+        </div>
+      </div><!-- /obj-extra-wrap -->
+    </div>
 
   <!-- V53: Untere Reihe — Fotos + Bemerkungen + Grund & Boden -->
   <div class="col2">
@@ -1276,92 +1364,7 @@ label.dp-required.qc-required::after {
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-note"/></svg></span>Sonstige Bemerkungen</div>
         <div class="f"><label>Zusätzliche Notizen <button type="button" class="dp-tip" data-tip-id="tab1.notizen" tabindex="-1" aria-label="Hilfe zu tab1.notizen"></button></label><textarea id="notizen" placeholder="z.B. Makler sagt: Verwalterwechsel geplant · Besichtigung 12.09. · Keller feucht?"></textarea></div>
       </div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-land"/></svg></span>Grund &amp; Boden</div><div class="g2">
-        <div class="f">
-              <label>Bodenrichtwert (€/m²) <button type="button" class="dp-tip" data-tip-id="tab1.bodenrichtwert" tabindex="-1" aria-label="Hilfe zu tab1.bodenrichtwert"></button></label>
-              <div class="iw"><span class="pfx">€</span><input id="brw" type="text" inputmode="decimal" placeholder="150" class="trl" oninput="calc()"></div>
-              <div class="brw-helpers">
-                <!-- v1268: Der amtliche Direktabruf hatte nie einen Knopf. Das
-                     Modul erwartete #brw-boris-btn seit v785, im HTML stand er
-                     nie - fetchBoris() war nur ueber die Automatik (v1265)
-                     und ueber DealPilotBrw.fetchBoris() erreichbar. -->
-                <button type="button" class="btn-brw" id="brw-boris-btn" onclick="DealPilotBrw.fetchBoris()" title="Bodenrichtwert direkt abrufen — gratis (Open Data)">
-                  <span class="btn-brw-icon">📍</span> Bodenrichtwert abrufen
-                </button>
-                <button type="button" class="btn-brw" onclick="DealPilotBrw.openBoris()" title="Öffnet BORIS-Portal des passenden Bundeslandes">
-                  <span class="btn-brw-icon">🔗</span> BORIS-Portal
-                </button>
-                <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
-                  <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
-                </button>
-                <span id="brw-ai-status" class="brw-ai-status"></span>
-              </div>
-              <!-- V190: Container für KI-Result-Card mit Confidence/Begründung/BORIS-Verify -->
-              <div id="brw-ki-result" class="brw-ki-result" style="display:none"></div>
-            </div>
-        <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7.06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-        <!-- WOBJ32-1 · Wertermittlung: Baustatus, BRW-Stichtag, Wohneinheiten,
-     Bruttogrundflaeche, Standardstufe.
-     v1136-WMTAB-1 · Baustatus, Bruttogrundflaeche und Standardstufe sind in
-     den Block "Wertermittlung (Marktbericht)" am Ende dieses Reiters
-     gewandert — sie gehoeren zum Gebaeude, nicht zum Boden, und standen
-     hier ohne Speicherweg. Der Stichtag bleibt beim Bodenrichtwert, zu dem
-     er gehoert; die Wohneinheiten bleiben, sie werden auch sonst gebraucht. -->
-<div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
-<div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
-<div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
-        <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
-        <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
-        <!-- ═══ v1834 · FLURSTÜCK UND UNTERLAGEN ═══════════════════════════
-             Marcel am 04.10.2026 zur Unterlagenanfrage: „ob wir das
-             vielleicht auch direkt im Tab Objekt, da beim Bodenrichtwert
-             mit angeben."
-
-             Genau hier gehört es hin, und zwar aus einem sachlichen Grund:
-             Gemarkung, Flur und Flurstück BESCHREIBEN den Boden, dessen
-             Wert eine Zeile höher steht. Und sie sind zugleich das, was
-             jedes Amt zuerst wissen will.
-
-             Ohne diese Angaben muss das Amt das Flurstück selbst
-             heraussuchen. Das geht, dauert aber länger — deshalb stehen
-             die Felder da, wo man ohnehin ist, wenn man den Bodenwert
-             pflegt. -->
-        <div class="f"><label>Gemarkung</label><input id="gemarkung" type="text" placeholder="z.B. Hüllhorst"></div>
-        <div class="f"><label>Flur</label><input id="flur" type="text" placeholder="z.B. 3"></div>
-        <div class="f"><label>Flurstück</label><input id="flurstueck" type="text" placeholder="z.B. 45"></div>
-        <div class="f s2" style="display:flex;align-items:flex-end">
-          <button type="button" class="btn btn-ghost" style="font-size:12.5px"
-            onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
-            Unterlagen beim Amt anfordern
-          </button>
-        </div>
-        <!-- ═══ v1312 · Erbbaurecht (Erbpacht) ═══════════════════════════
-             Steht hier, weil das Erbbaurecht eine Belastung des BODENS ist -
-             der Bodenwert direkt darueber ist die Groesse, an der es haengt.
-             Kein Bewertungspartner nimmt den Parameter entgegen (gemessen
-             11.09.2026 gegen GeoMap: leasehold, heritableBuildingRight,
-             groundLease, erbbaurecht, erbpacht - alle 400 Unrecognized
-             field). Die Marktbewertung liefert also IMMER Volleigentum;
-             den Abschlag rechnen wir selbst, nach § 50 ImmoWertV. -->
-        <div class="f s2" style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
-            <input type="checkbox" id="erbpacht" onchange="if(window.DealPilotErbbau)DealPilotErbbau.toggle(this.checked);calc()">
-            <span>Erbbaurecht / Erbpacht</span>
-            <button type="button" class="dp-tip" data-tip-id="tab1.erbpacht" tabindex="-1" aria-label="Hilfe zu Erbbaurecht"></button>
-          </label>
-          <div class="dz-sub" style="margin-top:2px">Das Grundstück gehört nicht mit — es wird gegen Erbbauzins überlassen.</div>
-        </div>
-        <div class="f s2" id="erbpacht_body" style="display:none">
-          <div class="g2">
-            <div class="f"><label>Erbbauzins (€ pro Jahr)</label><div class="iw"><span class="pfx">€</span><input id="erbbauzins" type="text" inputmode="decimal" placeholder="1.800" class="trl" oninput="calc()"></div></div>
-            <div class="f"><label>Restlaufzeit (Jahre)</label><div class="iw"><input id="erb_restlz" type="text" inputmode="numeric" placeholder="55" class="tr" oninput="calc()"><span class="sfx">J</span></div></div>
-            <div class="f"><label>Angemessener Erbbauzinssatz (%)</label><div class="iw"><input id="erb_zs_ang" type="text" inputmode="decimal" placeholder="3,5" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f"><label>Entschädigung bei Zeitablauf (%)</label><div class="iw"><input id="erb_entsch" type="text" inputmode="decimal" placeholder="66,7" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
-            <div class="f s2"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:12px;color:var(--muted)"><input type="checkbox" id="erb_wert_ist_erb" onchange="calc()"><span>Verkehrswert / Bankbewertung ist bereits der Erbbaurechtswert (dann nicht noch einmal kürzen)</span></label></div>
-          </div>
-          <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
-        </div>
-      </div></div>
+      
     </div>
   </div>
 
@@ -1381,31 +1384,17 @@ label.dp-required.qc-required::after {
 
        Keine oninput="calc()"-Aufrufe: calc() liest keines dieser Felder.
        Sie sind Wertermittlung, keine Investitionsrechnung. -->
-  <div class="card" data-collapsible="wm-obj" data-collapse-title="Wertermittlung (Marktbericht)">
+  <div class="card" data-collapsible="wm-obj" data-collapse-title="Für das Gutachten · Stufe 3">
     <div class="ct-row">
-      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Wertermittlung (Marktbericht)</div>
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-calculator"/></svg></span>Für das Gutachten · Stufe 3 (Sach- und Ertragswert)</div>
     </div>
-    <p class="sec-desc" style="margin:0 0 16px">Diese Angaben braucht der Marktbericht für Sachwert- und Ertragswertverfahren. Sie bleiben am Objekt gespeichert und werden bei der Objektwahl im Marktbericht wieder eingesetzt — hier lassen sie sich ansehen und ändern, ohne einen Bericht zu erzeugen. Alles freiwillig: was fehlt, rechnet der Bericht nicht halb, sondern gar nicht.</p>
+    <p class="sec-desc oe-hint3" style="margin:0 0 16px">Nur für die Wertermittlung nach ImmoWertV (Stufe 3). Die Marktpreisindikation braucht nichts davon. Fehlt hier eine Pflichtangabe, erscheint das Verfahren im Bericht nicht — es rechnet nie halb. Die Überschreibungen der automatisch ermittelten Werte (Zins, Bodenrichtwert, Sachwertfaktor) stehen unten bei den Ansätzen des Sachverständigen — mit Begründung.</p>
 
     <div class="card-title">Grundlagen</div>
     <div class="g3">
-      <div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus">
-        <option value="">— keine Angabe —</option>
-        <option value="bestand">Bestand</option>
-        <option value="bestand_erstbezug_saniert">Bestand – Erstbezug nach Sanierung</option>
-        <option value="neubau_erstbezug">Neubau – Erstbezug</option>
-        <option value="neubau_im_bau">Neubau – im Bau</option>
-        <option value="geplant">Geplant / Bauträger</option>
-      </select></div></div>
+      
       <div class="f"><label title="Bruttogrundflaeche nach DIN 277: alle Grundflaechen aller Grundrissebenen, aussen gemessen. NICHT die Wohnflaeche — die BGF ist regelmaessig deutlich groesser und ist die Bezugsgroesse der NHK.">Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div></div>
-      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fuenf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualitaet des Gebaeudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
-        <option value="">— keine Angabe —</option>
-        <option value="1">1 · sehr einfach (nur Häuser)</option>
-        <option value="2">2 · einfach (nur Häuser)</option>
-        <option value="3">3 · Standard</option>
-        <option value="4">4 · gehoben</option>
-        <option value="5">5 · stark gehoben</option>
-      </select></div></div>
+      
       <div class="f"><label>Grundrissart</label><div class="iw"><select id="grundriss">
         <option value="">— keine Angabe —</option>
         <option value="einspaenner">Einspänner · 1 Wohnung je Treppenhaus (× 1,05)</option>
@@ -1472,14 +1461,11 @@ label.dp-required.qc-required::after {
     </div>
 
     <hr class="dvd">
-    <div class="card-title">Grundstück, Garage, Außenanlagen</div>
+    <div class="card-title">Garage und Außenanlagen</div>
     <div class="g3">
-      <div class="f"><label>Zusätzliche Fläche / Hinterland (m²)</label><div class="iw"><input id="hinterland_qm" type="text" inputmode="decimal" placeholder="nur die Fläche AUSSERHALB des Baulands" class="tr"><span class="sfx">m²</span></div></div>
-      <div class="f"><label>Wertansatz Hinterland (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="hinterland_eur_qm" type="text" inputmode="decimal" placeholder="z. B. 5 €/m²" class="trl"></div></div>
-      <div class="f"><label>Zusatzfläche ist rentierlich</label><div class="iw"><select id="hinterland_rentierlich">
-        <option value="">nein · wirft keinen Ertrag ab (Standard)</option>
-        <option value="ja">ja · wird vermietet oder verpachtet</option>
-      </select></div></div>
+      
+      
+      
       <div class="f"><label>Garage / Carport – Bruttogrundfläche (m²)</label><div class="iw"><input id="garagen_bgf_qm" type="text" inputmode="decimal" placeholder="Länge × Breite, alle zusammen" class="tr"><span class="sfx">m²</span></div></div>
       <div class="f"><label>Garage – Standardstufe</label><div class="iw"><select id="garagen_stufe">
         <option value="">— keine Angabe —</option>
@@ -1491,20 +1477,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label>Außenanlagen (€)</label><div class="iw"><span class="pfx">€</span><input id="aussenanlagen" type="text" inputmode="decimal" placeholder="Wege, Einfriedung, Ver- und Entsorgung" class="trl"></div></div>
     </div>
 
-    <hr class="dvd">
-    <div class="card-title">Ausstattung nach Gewerken · nur Häuser</div>
-    <p class="sec-desc" style="margin:-6px 0 12px">Stufen 1 bis 5 nach SW-RL 2012, Anlage 2, halbe Stufen erlaubt. <strong>Alle neun oder keins</strong> — bei einer Lücke rechnet der Bericht mit der glatten Standardstufe oben.</p>
-    <div class="g3">
-      <div class="f"><label>Außenwände · 23 %</label><div class="iw"><select id="ausst_aussenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Dach · 15 %</label><div class="iw"><select id="ausst_dach"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Fenster/Außentüren · 11 %</label><div class="iw"><select id="ausst_fenster"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Innenwände · 11 %</label><div class="iw"><select id="ausst_innenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Decken/Treppen · 11 %</label><div class="iw"><select id="ausst_decken"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Fußböden · 5 %</label><div class="iw"><select id="ausst_fussboeden"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Sanitär · 9 %</label><div class="iw"><select id="ausst_sanitaer"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>Heizung · 9 %</label><div class="iw"><select id="ausst_heizung"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-      <div class="f"><label>sonst. Technik · 6 %</label><div class="iw"><select id="ausst_technik"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></div>
-    </div>
+    
 
     <hr class="dvd">
     <div class="card-title">Besondere und sonstige Bauteile</div>
@@ -3544,7 +3517,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1700d"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1828"></script>
+<script src="js/storage.js?v=v1851"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
@@ -3562,11 +3535,11 @@ label.dp-required.qc-required::after {
 <script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=v1622"></script>
-<script src="js/dealscore2-ui.js?v=v1622"></script>
+<script src="js/dealscore2-ui.js?v=v1851"></script>
 <script src="js/ds2-ai.js?v=166"></script>
 <script src="js/ki-lage.js?v=187h2"></script>
 <script src="js/ki-miete.js?v=v1242c"></script>
-<script src="js/star-rating.js?v=v1622"></script>
+<script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v1678"></script>
 <script src="js/dokument-import.js?v=v1678"></script>
 <script src="js/beleg-import.js?v=v1406"></script>
@@ -3579,6 +3552,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1840"></script>
+<script src="js/objekt-reiter.js?v=v1851"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1738"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
@@ -3604,7 +3578,7 @@ label.dp-required.qc-required::after {
 <script src="js/deal-action.js?v=v1608"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1599"></script>
-<script src="js/deal-action-readycheck.js?v=v1841"></script>
+<script src="js/deal-action-readycheck.js?v=v1851"></script>
 <script src="js/deal-action-boarding.js?v=v1834"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v1081"></script> <!-- v856-einreichung -->
@@ -3616,14 +3590,14 @@ label.dp-required.qc-required::after {
 <link rel="stylesheet" href="css/marktbewertung-card.css?v=W34">
 <script src="js/marktbewertung-card.js?v=540"></script>
 <script src="js/avm-section.js?v=v1178"></script>
-<script src="js/dealpilot-mb.js?v=v1444"></script>
+<script src="js/dealpilot-mb.js?v=v1851"></script>
   <script src="js/marktbericht-view.js?v=1351"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=v1426"></script>
 <script src="js/rnd-bte-katalog.js?v=142"></script>
-<script src="js/rnd-calc.js?v=v1426"></script>
+<script src="js/rnd-calc.js?v=v1851"></script>
 <script src="js/rnd-pdf.js?v=20260611105943"></script>
 <script src="js/rnd-docx.js?v=142"></script>
 <script src="js/rnd-wizard.js?v=v1676"></script>

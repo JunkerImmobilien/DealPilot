@@ -488,6 +488,18 @@ router.post('/location-finder', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/location-finder', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
 });
+/* v1851 · Zwei LESENDE Wege fuer die Automatik-Leiste im Reiter Objekt (N4):
+   der amtliche Zins samt GND/RND (seit v1846 im MB-Dienst, bisher nur vom
+   Jacoby-Rechner serverseitig gerufen) und der Standardstufen-Vorschlag aus
+   den Ausstattungsangaben. Kein Kontingent, kein Bericht, kein Schreiben. */
+router.post('/wertparameter/zinssatz', authenticate, async function (req, res) {
+  try { const out = await forward('POST', '/wertparameter/zinssatz', { body: req.body || {} }); res.status(out.status).json(out.data); }
+  catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
+});
+router.post('/ausstattung/vorschlag', authenticate, async function (req, res) {
+  try { const out = await forward('POST', '/ausstattung/vorschlag', { body: req.body || {} }); res.status(out.status).json(out.data); }
+  catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
+});
 // v560-stream: echtes NDJSON-Streaming durch den Proxy (Auth + 5L), Lade-Fortschritt bleibt erhalten.
 router.post('/reports/generate-stream', authenticate, async function (req, res) {
   const body = req.body || {};

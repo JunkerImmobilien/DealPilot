@@ -61,13 +61,15 @@ export const ReportOrchestrator = {
     // 0) DealPilot-Objekt (.dpkt) als Quelle? -> Stammdaten + Score/KI uebernehmen.
     //    Lage-/Potenzialbewertungen kommen NICHT aus der Eingabe, sondern aus echten APIs (s.u.).
     let dealpilotMeta = null;
+    let nutzerEinschaetzung = null;   /* v1851 · Lage aus Nutzersicht, siehe Payload */
     if (input.dealpilot) {
       const mapped = DealPilotObjectMapper.reportInput(input.dealpilot);
       for (const k of Object.keys(mapped)) {
         if (input[k] == null || input[k] === '') input[k] = mapped[k];
       }
       dealpilotMeta = DealPilotObjectMapper.dealpilot(input.dealpilot);
-      step(`dealpilot: Stammdaten übernommen${dealpilotMeta ? ' +Score/KI' : ''}`);
+      nutzerEinschaetzung = DealPilotObjectMapper.nutzerEinschaetzung(input.dealpilot);
+      step(`dealpilot: Stammdaten übernommen${dealpilotMeta ? ' +Score/KI' : ''}${nutzerEinschaetzung ? ' +Lage-Einschätzung' : ''}`);
     }
 
     // 1) Geocoding
@@ -1179,6 +1181,9 @@ export const ReportOrchestrator = {
       deal_score: deal,
       dealscore_meta: dealscoreMeta,
       assessment,            // jetzt aus echten APIs abgeleitet (oder null)
+      /* v1851 · die Lage-Einschätzung des NUTZERS — getrennt von `assessment`,
+         getrennt beschriftet. Sie ersetzt keine Messung, sie steht daneben. */
+      nutzer_einschaetzung: nutzerEinschaetzung,
       market_history: insights ? insights.series : null,   // Preis-/Mietreihe für Chart
       market_dynamics: insights ? insights.dynamics : null, // Angebotsdauer (Markttempo)
       dealpilot: dealpilotMeta, // berechneter DealScore + KI-Analyse (Zweitmeinung)

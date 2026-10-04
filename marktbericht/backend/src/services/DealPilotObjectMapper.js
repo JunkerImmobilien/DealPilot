@@ -70,6 +70,44 @@ function vacancyFrom(d) {
   return false;
 }
 
+/* v1851 · Eine Ausstattungsskala. Marcels Entscheidung vom 04.10.2026: die
+   Standardstufe 1–5 (Anlage 4 ImmoWertV) ist die eine Skala; `ausst`
+   (einfach/normal/gehoben/luxus) fällt. Damit die erweiterte
+   Marktpreisindikation (Stufe 2, QUALITY_FACTOR in ValuationService) weiter
+   greift, wird umgeschlüsselt — in BEIDE Richtungen, damit Altobjekte, die
+   nur `ausst` tragen, nichts verlieren. */
+const AUSST_ZU_STUFE = { einfach: 2, normal: 3, gehoben: 4, luxus: 5, 'luxuriös': 5, luxurioes: 5 };
+const STUFE_ZU_QUALITY = { 1: 'einfach', 2: 'einfach', 3: 'normal', 4: 'gehoben', 5: 'luxus' };
+const GEWERKE = { aussenwaende: 'ausst_aussenwaende', dach: 'ausst_dach', fenster_tueren: 'ausst_fenster',
+                  innenwaende: 'ausst_innenwaende', decken_treppen: 'ausst_decken', fussboeden: 'ausst_fussboeden',
+                  sanitaer: 'ausst_sanitaer', heizung: 'ausst_heizung', sonstige_technik: 'ausst_technik' };
+const BTL = ['btl_gauben', 'btl_balkone', 'btl_vordach', 'btl_terrassen', 'btl_sonstige'];
+function standardstufeAus(d) {
+  const s = num(pick(d, ['standardstufe']));
+  if (s >= 1 && s <= 5) return s;
+  const a = String(pick(d, ['ausst']) || '').toLowerCase();
+  return AUSST_ZU_STUFE[a] || null;
+}
+function qualityAus(d) {
+  /* Die Standardstufe gewinnt: `ausst` steht im Formular IMMER auf
+     „Normal" (vorausgewaehlt, index.html:1105) und sagt deshalb nichts,
+     sobald eine Stufe eingetragen ist. */
+  const s = num(pick(d, ['standardstufe']));
+  if (s >= 1 && s <= 5) return STUFE_ZU_QUALITY[Math.round(s)] || null;
+  return pick(d, ['quality', 'ausst', 'ausstattung']);
+}
+function gewerkeAus(d) {
+  const o = {}; let n = 0;
+  Object.keys(GEWERKE).forEach((k) => {
+    /* Nicht num(): das liest „2.5" als deutsche 25 (Tausenderpunkt). Die
+       Selects liefern halbe Stufen mit Punkt — gemessen im Funktionslauf. */
+    const roh = d[GEWERKE[k]];
+    const v = (roh == null || roh === '') ? NaN : parseFloat(String(roh).replace(',', '.'));
+    if (v >= 1 && v <= 5) { o[k] = v; n++; }
+  });
+  return n ? o : null;
+}
+
 export const DealPilotObjectMapper = {
   reportInput(obj) {
     const d = dataOf(obj);
@@ -88,7 +126,7 @@ export const DealPilotObjectMapper = {
       condition: pick(d, ['ds2_zustand', 'zustand']) || 'gepflegt',
       /* v1444: ValuationService liest ref.quality - hier kam die Ausstattung nur als
          `ausstattung` an, der Qualitaetsfaktor griff auf dem Objektweg nie. */
-      quality: pick(d, ['quality', 'ausst', 'ausstattung']),
+      quality: qualityAus(d),   /* v1851: aus `ausst` ODER aus der Standardstufe */
       energy_class: pick(d, ['ds2_energie', 'energieklasse', 'energie_label']),
       purchase_price: num(pick(d, ['kp', 'kaufpreis'])),
       monthly_net_rent: num(pick(d, ['nkm', 'nettokaltmiete'])),
@@ -127,7 +165,83 @@ export const DealPilotObjectMapper = {
       exterior_walls: pick(d, ['eq_walls']),
       roof: pick(d, ['eq_roof']),
       elevator: pick(d, ['eq_elevator']),
+
+      /* ═══ v1851 · DER BLOCK MIT DEN MEISTEN FELDERN LIEFERTE NICHTS ═══
+         Gemessen am 04.10.2026 (N4): von den 37 Feldern des Blocks
+         „Wertermittlung (Marktbericht)" im Reiter Objekt kam auf dem
+         Objekt-Weg KEIN EINZIGES hier an — der Orchestrator liest sie
+         alle (ref-Literal ab ReportOrchestrator.js:88), aber dieser Mapper
+         gab sie nicht zurück. Dazu `modernis`, `garagen`, `stellpl_aussen`,
+         `balkon_flae`, `nutzungsart`, `bad_anz`: gesendet, verworfen.
+
+         Die Namen sind die des ref-Literals — wer dort nicht steht,
+         existiert für den Bericht nicht. Leere Felder bleiben null; der
+         Orchestrator füllt `ausstattung` aus den eq_* nur dort, wo hier
+         nichts steht (die eigene Angabe gewinnt). */
+      usage_type: (function () {
+        const n = String(pick(d, ['nutzungsart']) || '').toLowerCase();
+        return n ? (/eigen/.test(n) ? 'eigennutzung' : 'vermietet') : null;
+      })(),
+      modernization_year: num(pick(d, ['modernis'])),
+      garages: num(pick(d, ['garagen'])),
+      outdoor_parking: num(pick(d, ['stellpl_aussen'])),
+      balcony_area: num(pick(d, ['balkon_flae'])),
+      bathrooms: num(pick(d, ['bad_anz'])),
+      baustatus: pick(d, ['baustatus']),
+      /* Sachwert (Stufe 3) */
+      bgf: num(pick(d, ['bgf'])),
+      standardstufe: standardstufeAus(d),
+      grundriss: pick(d, ['grundriss']),
+      mod_punkte: num(pick(d, ['mod_punkte'])),
+      sachwertfaktor: num(pick(d, ['sachwertfaktor'])),
+      nhk_typ: (function () {
+        const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
+        return (h && g != null && g !== '' && dd) ? (String(h) + '.' + String(g) + String(dd)) : null;
+      })(),
+      hinterland_qm: num(pick(d, ['hinterland_qm'])),
+      hinterland_eur_qm: num(pick(d, ['hinterland_eur_qm'])),
+      hinterland_rentierlich: /^(ja|true|1)$/i.test(String(pick(d, ['hinterland_rentierlich']) || '')),
+      garagen_bgf_qm: num(pick(d, ['garagen_bgf_qm'])),
+      garagen_stufe: num(pick(d, ['garagen_stufe'])),
+      aussenanlagen_pct: num(pick(d, ['aussenanlagen_pct'])),
+      aussenanlagen: num(pick(d, ['aussenanlagen'])),
+      bes_bauteile: num(pick(d, ['bes_bauteile'])),
+      ausstattung: gewerkeAus(d),
+      bauteile_hk: (function () {
+        const s = BTL.reduce((a, k) => a + (num(d[k]) || 0), 0);
+        return s > 0 ? Math.round(s) : null;
+      })(),
+      bauteile_detail: (function () {
+        const o = { gauben: num(d.btl_gauben), balkone: num(d.btl_balkone), vordaecher: num(d.btl_vordach),
+                    terrassen: num(d.btl_terrassen), sonstige: num(d.btl_sonstige) };
+        return Object.values(o).some((v) => v) ? o : null;
+      })(),
+      /* Ertragswert (Stufe 3) */
+      lzs_pct: num(pick(d, ['lzs_pct'])),
+      brw_anpassung_pct: num(pick(d, ['brw_anpassung_pct'])),
+      brw_anpassung_grund: pick(d, ['brw_anpassung_grund']),
+      stellplatz_miete_monat: num(pick(d, ['stellplatz_miete_monat'])),
     };
+  },
+
+  /* v1851 · Die Nutzer-Einschätzung der Lage — getrennt von `assessment`
+     (das der Orchestrator aus GeoMap/Zensus/Makro baut und ausdrücklich
+     NICHT aus Nutzereingaben). Marcels Entscheidung vom 04.10.2026: die
+     Indikatoren gehören in den Bericht — aber als das, was sie sind. */
+  nutzerEinschaetzung(obj) {
+    const d = dataOf(obj);
+    const out = {
+      mikrolage: pick(d, ['mikrolage']),
+      makrolage: pick(d, ['makrolage']),
+      bevoelkerung: pick(d, ['ds2_bevoelkerung']),
+      nachfrage: pick(d, ['ds2_nachfrage']),
+      entwicklung: pick(d, ['ds2_entwicklung']),
+      wertsteigerung: pick(d, ['ds2_wertsteigerung']),
+      mietausfallrisiko: pick(d, ['ds2_mietausfall']),
+      marktmiete_eur_qm: num(pick(d, ['ds2_marktmiete'])),
+      marktfaktor: num(pick(d, ['ds2_marktfaktor'])),
+    };
+    return Object.values(out).some((v) => v != null && v !== '') ? out : null;
   },
 
   // Lage- und Potenzialbewertungen (DealPilot-Eingaben). Strings bleiben lesbar (gut/mittel/…).

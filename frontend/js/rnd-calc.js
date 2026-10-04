@@ -679,10 +679,14 @@
     const fallbackGrad = zustandFallback(d.ds2_zustand);
     const energieGrad = energieToGrad(d.ds2_energie);
 
-    // 4 explizite rates aus DealPilot
-    const gradBaeder   = rateToGrad(d.rate_bad)     || fallbackGrad;
-    const gradFenster  = rateToGrad(d.rate_fenster) || fallbackGrad;
-    const gradBoden    = rateToGrad(d.rate_boden);  // boden mappt auf "innenausbau"
+    /* v1851 · N4: Gewerke-Stufen (ausst_*, Anlage 4, 1-5) ersetzen die
+       Sterne - dieselbe Schwelle (<=2 veraltet, 3 standard, >=4 gehoben),
+       nur die Quelle ist jetzt die Gewerke-Tabelle. Altobjekte ohne
+       Gewerke-Stufen fallen auf die Sterne zurueck, bis sie einmal
+       gespeichert wurden. Kueche bleibt bei den Baedern (kein Gewerk). */
+    const gradBaeder   = rateToGrad(d.ausst_sanitaer)   || rateToGrad(d.rate_bad)     || fallbackGrad;
+    const gradFenster  = rateToGrad(d.ausst_fenster)    || rateToGrad(d.rate_fenster) || fallbackGrad;
+    const gradBoden    = rateToGrad(d.ausst_fussboeden) || rateToGrad(d.rate_boden);  // boden mappt auf "innenausbau"
     const gradKueche   = rateToGrad(d.rate_kueche); // küche kein direktes Gewerk — mit Bädern
     
     // Mehrheits-Heuristik für unbewertete Gewerke

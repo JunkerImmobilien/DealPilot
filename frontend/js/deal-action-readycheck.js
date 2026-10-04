@@ -25,7 +25,7 @@
     tilgung:        ['d1t'],
     baujahr:        ['baujahr'],
     energie:        ['ds2_energie'],
-    qualitaet:      ['qz-stars-rows', 'rate_kueche'],
+    qualitaet:      ['oe-gewerke', 'ausst_sanitaer', 'qz-stars-rows', 'rate_kueche'], /* v1851: Gewerke-Tabelle statt Sterne */
     mikrolage:      ['mikrolage'],
     makrolage:      ['makrolage'],
     bevoelkerung:   ['ds2_bevoelkerung'],

@@ -964,6 +964,43 @@ router.get('/stats/offers', async (req, res) => {
   res.json(rows);
 });
 
+/* ═══ v1851 · POST /ausstattung/vorschlag ═══════════════════════════════
+ *
+ * Body: { eq: { eq_walls, eq_roof, eq_windows, eq_bath, eq_guest_wc,
+ *               eq_heating, eq_floor, eq_energie } }
+ * Antwort: { gewerke: {aussenwaende: 2, …}, herkunft, hinweise, anzahl }
+ *
+ * NUR LESEN, kein Kontingent. Die Gewerke-Tabelle im Reiter Objekt zeigt
+ * den Standardstufen-Vorschlag gestrichelt — und holt ihn HIER, aus
+ * derselben Tabelle (ausstattung_stufen.js), die der Bericht nimmt.
+ * Ein zweiter Satz Zuordnungen im Frontend wäre ein zweiter Rechenkern.
+ */
+router.post('/ausstattung/vorschlag', async (req, res) => {
+  try {
+    const { ableiten, zusammenfuehren } = await import('../lib/ausstattung_stufen.js');
+    const { standardstufeAusGewerken, WAEGUNGSANTEILE_EFH } = await import('../lib/anlage2.js');
+    const eq = (req.body && req.body.eq) || {};
+    const eigene = (req.body && req.body.gewerke) || {};
+    const av = ableiten(eq);
+    /* Die eigene Angabe gewinnt, der Vorschlag fuellt nur Leeres - dieselbe
+       Regel wie im Orchestrator. Die Standardstufe des Gebaeudes kommt aus
+       anlage2.js (volle 100 Anteile), sonst nur ein gewogener ROHWERT mit
+       Abdeckung - gekennzeichnet, nie als Stufe verkauft. */
+    const zus = zusammenfuehren(eigene, av.gewerke || {});
+    const ges = standardstufeAusGewerken(zus.gewerke || {});
+    let roh = null, deckung = 0;
+    { let s = 0, g = 0;
+      for (const [k, w] of Object.entries(WAEGUNGSANTEILE_EFH)) { const v = Number(zus.gewerke && zus.gewerke[k]); if (v >= 1 && v <= 5) { s += v * w; g += w; } }
+      if (g > 0) { roh = Math.round((s / g) * 100) / 100; deckung = g; } }
+    res.json({ gewerke: av.gewerke || {}, herkunft: av.herkunft || {}, hinweise: av.hinweise || [],
+               anzahl: av.anzahl || Object.keys(av.gewerke || {}).length, stufe: 'D',
+               zusammen: zus.gewerke || {}, woher: zus.woher || {},
+               standardstufe: ges.stufe, standardstufe_roh: roh, abdeckung_pct: deckung, grund: ges.grund || null });
+  } catch (e) {
+    res.status(500).json({ error: 'vorschlag_fehlgeschlagen', message: e.message });
+  }
+});
+
 /* ═══ v1846 · POST /wertparameter/zinssatz ═══════════════════════════════
  *
  * Body: { object }  — ein DealPilot-Objekt, wie es /reports/from-dealpilot
@@ -1014,6 +1051,23 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       rndJ = (rr && typeof rr === 'object') ? (rr.rnd ?? rr.jahre ?? null) : rr;
     } catch (e) { rndJ = null; }
 
+    /* v1851 · Die Automatik-Leiste im Reiter Objekt zeigt neben dem Zins auch,
+       ob der Ausschuss SACHWERTFAKTOREN fuehrt. Der Faktor selbst haengt am
+       vorlaeufigen Sachwert (§ 21 Abs. 3) und entsteht erst im Bericht -
+       hier steht nur die QUELLE: fuehrt der Ausschuss eine Tabelle, oder
+       endet dort die Rechnung. Dazu der Baupreisindex, der heute noch eine
+       Konstante ist (Backlog B1) - und als solche benannt wird. */
+    let swfQuelle = null;
+    try {
+      const r = GAA.sachwertfaktor({ ags: String(ags), objektart: m.property_type, sachwert_eur: null,
+                                     baujahr: m.build_year, rnd_jahre: rndJ });
+      swfQuelle = r ? { verfuegbar: !!r.verfuegbar || !!r.ausschuss || r.grund !== 'kein_ausschuss_hinterlegt',
+                        ausschuss: r.ausschuss || null, grund: r.grund || null, hinweis: r.hinweis || null,
+                        quelle: r.quelle || null, quelle_url: r.quelle_url || null, jahrgang: r.berichtsjahr || r.jahrgang || null }
+                    : null;
+    } catch (e) { swfQuelle = { verfuegbar: false, grund: e.message }; }
+    const { BAUPREISINDEX_KONSTANTE } = await import('../services/CrossCheckService.js');
+
     res.json({
       verfuegbar: true,
       wert_pct: Number(p.wert), stufe: p.stufe || null, quelle: p.quelle || null,
@@ -1021,6 +1075,9 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       berichtsjahr: p.berichtsjahr || null, stichtag: p.stichtag || null,
       ausschuss: p.quelle || null,
       gnd_jahre: Number(gndJ) || null, rnd_jahre: Number(rndJ) || null,
+      gnd_quelle: (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd)) ? 'register' : 'anlage1',
+      sachwertfaktor_quelle: swfQuelle,
+      baupreisindex: BAUPREISINDEX_KONSTANTE,
       objektart: m.property_type, ags: String(ags)
     });
   } catch (e) { res.status(500).json({ verfuegbar: false, grund: e.message }); }

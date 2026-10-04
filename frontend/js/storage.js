@@ -129,7 +129,7 @@ var FIELDS = [
   /* v1828 · Das Vertragsdatum. Es gab nur das Auszahlungsdatum, und das
      ist ein anderer Tag: unterschrieben wird frueher als ausgezahlt. */
   'd1_vertragsdatum', 'd2_vertragsdatum', 'bspar_vertragsdatum',
-  /* v1834 � Gemarkung, Flur und Flurstueck. Sie beschreiben den Boden,
+  /* v1834 � Gemarkung, Flur und Flurstueck. Sie beschreiben den Boden,
      dessen Wert eine Zeile hoeher steht, und sind zugleich das, was jedes
      Amt bei einer Unterlagenanfrage zuerst wissen will. */
   'gemarkung', 'flur', 'flurstueck',
@@ -576,6 +576,21 @@ function loadData(d) {
 
        > Ein else-Zweig hinter einer Bedingung, die immer zutrifft, ist
        > toter Code, der aussieht wie eine Absicherung. */
+  /* v1851 · N4: die Standardstufe (Anlage 4, 1-5) ist die eine
+     Ausstattungsskala; `ausst` (Einfach/Normal/Gehoben/Luxus) faellt aus
+     der Oberflaeche, bleibt aber als Altfeld gespeichert. Ein Altobjekt,
+     bei dem jemand `ausst` ausdruecklich gesetzt hat, bekommt die Stufe
+     hier vorgeschlagen - NUR dann: „Normal" ist die Vorauswahl des alten
+     Selects und sagt nichts (index.html:1105). Gespeichert wird erst,
+     wenn der Nutzer speichert. */
+  try {
+    var _ssEl = document.getElementById('standardstufe'), _auEl = document.getElementById('ausst');
+    if (_ssEl && _auEl && !_ssEl.value) {
+      var _au = String(_auEl.value || '').toLowerCase();
+      var _map = { einfach: '2', gehoben: '4', luxus: '5' };
+      if (_map[_au]) _ssEl.value = _map[_au];
+    }
+  } catch (e) {}
   if (typeof calcNow === 'function') calcNow();
   else if (typeof calc === 'function') calc();
   if (typeof updHeader === 'function') updHeader();

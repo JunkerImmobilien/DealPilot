@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-04T11:14:09.556Z",
+ "erzeugt_am": "2026-10-04T12:34:11.935Z",
  "quellen": {
   "voice-import": "7dbbe6cf88e245a8",
   "objektart-felder": "b1481ff1f7c0b04d",
-  "storage": "99ce245ca5180819",
-  "index-html": "f14690832e3c0e97",
+  "storage": "9fb59fcf2100b4df",
+  "index-html": "635a3b08a5d6999a",
   "grest": "9c0a4587759b4148"
  },
  "daten": {
@@ -712,7 +712,7 @@
    {
     "id": "ausst",
     "kind": "select",
-    "label": "Ausstattung"
+    "label": "Ausstattung (Altfeld, ersetzt durch die Standardstufe)"
    },
    {
     "id": "thesis",
@@ -1694,42 +1694,42 @@
    {
     "id": "mod_dach",
     "kind": "select",
-    "label": "Dacherneuerung inkl. W&auml;rmed&auml;mmung"
+    "label": "Dach · modernisiert"
    },
    {
     "id": "mod_fenster",
     "kind": "select",
-    "label": "Fenster und Au&szlig;ent&uuml;ren"
+    "label": "Fenster / Außentüren · modernisiert"
    },
    {
     "id": "mod_leitungen",
     "kind": "select",
-    "label": "Leitungssysteme (Strom, Gas, Wasser)"
+    "label": "Technik / Leitungen · modernisiert"
    },
    {
     "id": "mod_heizung",
     "kind": "select",
-    "label": "Heizungsanlage"
+    "label": "Heizung · modernisiert"
    },
    {
     "id": "mod_aussenwand",
     "kind": "select",
-    "label": "W&auml;rmed&auml;mmung Au&szlig;enw&auml;nde"
+    "label": "Außenwände · modernisiert"
    },
    {
     "id": "mod_baeder",
     "kind": "select",
-    "label": "B&auml;der"
+    "label": "Bad / Sanitär · modernisiert"
    },
    {
     "id": "mod_innenausbau",
     "kind": "select",
-    "label": "Innenausbau (Decken, Fu&szlig;b&ouml;den)"
+    "label": "Innenwände · modernisiert"
    },
    {
     "id": "mod_grundriss",
     "kind": "select",
-    "label": "Wesentliche &Auml;nderung der Grundrissgestaltung"
+    "label": "Grundriss (Anlage 2) · modernisiert"
    },
    {
     "id": "garagen",
@@ -1827,7 +1827,7 @@
       "text": "Sonstige"
      }
     ],
-    "label": "Heizung"
+    "label": "Heizung · Art"
    },
    {
     "id": "eq_windows",
@@ -1866,7 +1866,7 @@
       "text": "Sonstige"
      }
     ],
-    "label": "Verglasung"
+    "label": "Fenster / Außentüren · Art"
    },
    {
     "id": "eq_floor",
@@ -1893,7 +1893,30 @@
       "text": "Sonstige"
      }
     ],
-    "label": "Bodenbelag"
+    "label": "Fußböden · Art"
+   },
+   {
+    "id": "eq_bath",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "EIN_BAD",
+      "text": "Ein Bad"
+     },
+     {
+      "wert": "INNENLIEGEND",
+      "text": "Innenliegend, ohne Fenster"
+     },
+     {
+      "wert": "MIT_FENSTER",
+      "text": "Mit Fenster"
+     },
+     {
+      "wert": "MEHR_ALS_EIN_BAD",
+      "text": "Mehr als ein Bad"
+     }
+    ],
+    "label": "Bad / Sanitär · Art"
    },
    {
     "id": "eq_guest_wc",
@@ -1946,7 +1969,7 @@
       "text": "Nicht gedämmt"
      }
     ],
-    "label": "Außenwände"
+    "label": "Außenwände · Art"
    },
    {
     "id": "eq_roof",
@@ -1973,7 +1996,7 @@
       "text": "Sonstige"
      }
     ],
-    "label": "Dacheindeckung"
+    "label": "Dach · Art"
    },
    {
     "id": "eq_elevator",
@@ -2331,7 +2354,7 @@
       "text": "5"
      }
     ],
-    "label": "Außenwände · 23 %"
+    "label": "Außenwände · Standardstufe"
    },
    {
     "id": "ausst_dach",
@@ -2374,7 +2397,7 @@
       "text": "5"
      }
     ],
-    "label": "Dach · 15 %"
+    "label": "Dach · Standardstufe"
    },
    {
     "id": "ausst_fenster",
@@ -2417,7 +2440,7 @@
       "text": "5"
      }
     ],
-    "label": "Fenster/Außentüren · 11 %"
+    "label": "Fenster / Außentüren · Standardstufe"
    },
    {
     "id": "ausst_innenwaende",
@@ -2460,7 +2483,7 @@
       "text": "5"
      }
     ],
-    "label": "Innenwände · 11 %"
+    "label": "Innenwände · Standardstufe"
    },
    {
     "id": "ausst_decken",
@@ -2503,7 +2526,7 @@
       "text": "5"
      }
     ],
-    "label": "Decken/Treppen · 11 %"
+    "label": "Decken / Treppen · Standardstufe"
    },
    {
     "id": "ausst_fussboeden",
@@ -2546,7 +2569,7 @@
       "text": "5"
      }
     ],
-    "label": "Fußböden · 5 %"
+    "label": "Fußböden · Standardstufe"
    },
    {
     "id": "ausst_sanitaer",
@@ -2589,7 +2612,7 @@
       "text": "5"
      }
     ],
-    "label": "Sanitär · 9 %"
+    "label": "Bad / Sanitär · Standardstufe"
    },
    {
     "id": "ausst_heizung",
@@ -2632,7 +2655,7 @@
       "text": "5"
      }
     ],
-    "label": "Heizung · 9 %"
+    "label": "Heizung · Standardstufe"
    },
    {
     "id": "ausst_technik",
@@ -2675,7 +2698,7 @@
       "text": "5"
      }
     ],
-    "label": "sonst. Technik · 6 %"
+    "label": "Technik / Leitungen · Standardstufe"
    },
    {
     "id": "bes_bauteile",

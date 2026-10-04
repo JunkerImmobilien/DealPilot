@@ -150,14 +150,29 @@ window.StarRating = (function() {
    * Durchschnitt aus allen befüllten Sterne-Werten + Footer aktualisieren.
    * Returns null wenn keine Bewertungen vorhanden.
    */
+  /* v1851 · N4: die Sterne sind durch die Gewerke-Tabelle ersetzt. Die
+     Standardstufen je Gewerk (ausst_*, 1-5, Anlage 4 ImmoWertV) tragen
+     dieselbe Skala wie die Sterne und gehen deshalb an derselben Stelle in
+     den Investor Deal Score (dealscore2-ui.js:105) - Marcel hatte den
+     Zusammenhang richtig gesehen, mein Grep nach den Feldnamen nicht.
+     Altobjekte ohne Gewerke-Stufen fallen auf die acht Sterne zurueck.
+     `quelle` sagt dem Score, was er bekommt: Qualitaet oder Zustand. */
+  var GEWERKE_KEYS = ['ausst_aussenwaende', 'ausst_dach', 'ausst_fenster', 'ausst_innenwaende', 'ausst_decken',
+                      'ausst_fussboeden', 'ausst_sanitaer', 'ausst_heizung', 'ausst_technik'];
   function getAverage() {
-    var keys = ['rate_kueche', 'rate_bad', 'rate_boden', 'rate_fenster', 'qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster']; // v364: Qualitaet zaehlt mit
     var sum = 0, count = 0;
+    GEWERKE_KEYS.forEach(function(k) {
+      var el = document.getElementById(k);
+      var r = el ? parseFloat(String(el.value || '').replace(',', '.')) : 0;
+      if (r >= 1 && r <= 5) { sum += r; count++; }
+    });
+    if (count > 0) return { avg: sum / count, count: count, quelle: 'gewerke' };
+    var keys = ['rate_kueche', 'rate_bad', 'rate_boden', 'rate_fenster', 'qual_kueche', 'qual_bad', 'qual_boden', 'qual_fenster']; // v364: Qualitaet zaehlt mit
     keys.forEach(function(k) {
       var r = getRating(k);
       if (r > 0) { sum += r; count++; }
     });
-    return count > 0 ? { avg: sum / count, count: count } : null;
+    return count > 0 ? { avg: sum / count, count: count, quelle: 'sterne' } : null;
   }
 
   function _updateAverage() {

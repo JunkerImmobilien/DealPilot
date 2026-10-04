@@ -155,11 +155,27 @@ if (!window._wlc) {
      als „normal". Der DealPilotObjectMapper versteht das ganze Objekt; mit geht,
      was im Formular steht (leere Felder nicht). */
   var ZUSATZ = ['ds2_zustand', 'ausst', 'ds2_energie', 'modernis', 'gsfl', 'einheiten', 'zimmer', 'etage', 'vermstand',
-    'eq_heating', 'eq_windows', 'eq_floor', 'eq_bath', 'eq_guest_wc', 'eq_store_room', 'eq_walls', 'eq_roof', 'eq_elevator'];
+    'eq_heating', 'eq_windows', 'eq_floor', 'eq_bath', 'eq_guest_wc', 'eq_store_room', 'eq_walls', 'eq_roof', 'eq_elevator',
+    /* v1851 · N4: alles, was der Mapper seit v1851 liest - vorher kam vom
+       Block Wertermittlung KEIN Feld an (gemessen 04.10.2026). Dazu nkm, brw,
+       mea und das Erbbaurecht, die der Mapper schon immer las und die die
+       Karte nie schickte. */
+    'nkm', 'brw', 'mea', 'erbpacht', 'erbbauzins', 'erb_restlz', 'nutzungsart', 'garagen', 'stellpl_aussen', 'balkon_flae', 'bad_anz',
+    'baustatus', 'bgf', 'standardstufe', 'grundriss', 'mod_punkte', 'sachwertfaktor', 'nhk_haus', 'nhk_geschosse', 'nhk_dach',
+    'hinterland_qm', 'hinterland_eur_qm', 'hinterland_rentierlich', 'garagen_bgf_qm', 'garagen_stufe', 'aussenanlagen_pct', 'aussenanlagen',
+    'ausst_aussenwaende', 'ausst_dach', 'ausst_fenster', 'ausst_innenwaende', 'ausst_decken', 'ausst_fussboeden', 'ausst_sanitaer', 'ausst_heizung', 'ausst_technik',
+    'bes_bauteile', 'btl_gauben', 'btl_balkone', 'btl_vordach', 'btl_terrassen', 'btl_sonstige',
+    'lzs_pct', 'brw_anpassung_pct', 'brw_anpassung_grund', 'stellplatz_miete_monat',
+    'mikrolage', 'makrolage', 'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung', 'ds2_mietausfall'];
   function inputs() {
     var o = { plz: vIn('plz'), ort: vIn('ort'), str: vIn('str'), hnr: vIn('hnr'), objektart: vIn('objart'), objart: vIn('objart'), wfl: numDe(vIn('wfl')), baujahr: numDe(vIn('baujahr')), kp: numDe(vIn('kp')) };
     var art = String(o.objart || '').toUpperCase(), OA = window.DealPilotObjektart;
     ZUSATZ.forEach(function (id) {
+      var el = $(id);
+      /* v1851: ein Haekchen hat .value "on", ob gesetzt oder nicht - der
+         Mapper liest `erbpacht` als Wahrheit und haette JEDES Objekt zum
+         Erbbaurecht gemacht. Nur ein gesetztes Haekchen reist mit. */
+      if (el && el.type === 'checkbox') { if (el.checked) o[id] = true; return; }
       var v = vIn(id); if (v == null || String(v).trim() === '') return;
       if (OA && OA.passt && OA.passt(art, id) === false) return;   /* v1437: nur was zur Art passt */
       o[id] = v;
@@ -518,7 +534,14 @@ if (!window._wlc) {
       document.body.appendChild(o);
     } else { var e=document.getElementById(ID); if (e&&e.parentNode) e.parentNode.removeChild(e); }
   }
-  async function run() {
+  /* v1851 · N4: die Stufe kommt vom Aufrufer. Ohne Angabe bleibt es die
+     schnelle Marktpreisindikation (fast = Stufe 1, wie bisher). Stufe 2
+     und 3 schicken `wert_stufe`; der Proxy rechnet sie ab (_stufeAus) und
+     prueft das Kontingent je Art (mpi_plus, wev) - ein Geldweg, derselbe
+     wie beim Sprechlauf. Stufe 3 ist damit zum ersten Mal aus der
+     Haupt-App erreichbar (Marcels Entscheidung vom 04.10.2026). */
+  async function run(opts) {
+    var stufe = (opts && opts.stufe >= 1 && opts.stufe <= 3) ? Math.round(opts.stufe) : 1;
     var i = inputs();
     if (!i.plz && !i.ort) { toast('Bitte mindestens PLZ oder Ort ausfüllen'); return; }
     var _dph = await _dpmbHealth();
@@ -535,7 +558,8 @@ if (!window._wlc) {
     try {
       var res = await fetch('/api/v1/marktbericht/reports/from-dealpilot', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok() },
-        body: JSON.stringify({ fast: true, external_ref: ref, object: i })
+        body: JSON.stringify(stufe >= 2 ? { wert_stufe: stufe, external_ref: ref, object: i }
+                                        : { fast: true, external_ref: ref, object: i })
       });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
@@ -583,7 +607,7 @@ if (!window._wlc) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
 
-  global.DealPilotMB = { run: run, restore: restore, /* v752-api */
+  global.DealPilotMB = { run: run, restore: restore, letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
     getData: function () { return (D && D.mw) ? { D: D, mode: mode } : null; },
     setMode: function (m) { mode = (m === 'mid') ? 'med' : m; try { persistLight(); } catch (e) {} },
     apply: applyToFields,
