@@ -30433,3 +30433,52 @@ Spiegel ohne Restschuld, Filter „Hermann" → 1 Zeile.
 
 **Rest.** Prüfstrecke Exporte nach dem Umbau (PDF, Sprechlauf-Import,
 Bankexport je Objektart) steht noch aus. Prod v1846b; Staging v1853.
+
+## Rollout-Journal 04.10.2026 (18) — v1854: Einfach / Mittel / Ausgiebig, Karten per Haken, Schätzwerte für alle Objekte
+
+Marcel: *„brauchen wir für die einfache Bewertung denn diese weiteren
+Objektdetails? … in so einzelne Karten … je nachdem, ob man die braucht
+… Natürlich muss immer alles drauf sein, was wir für den Dealscore 2
+brauchen … Einfach, Mittel, Ausgiebig … für alle meine Häuser … nach
+Schätzen … bei der Stufe 2 alle wichtigen Felder rot … unter datenlage
+bitte die Partner rausnehmen."*
+
+**Antwort auf die Frage:** Für die einfache Bewertung (Stufe 1) braucht
+es die weiteren Objektdetails NICHT — nur Adresse, Objektart, Fläche,
+Baujahr. Was immer sichtbar bleiben muss, ist die Lage (Makro/Mikro,
+Bevölkerung, Nachfrage, Wertsteigerung, Entwicklung) — sie geht in den
+Investor Deal Score.
+
+**Was (`cfd2e01`).** `tools/n4d-karten.mjs` (IDs 887 → 888, −3 Akkordeon
++4 neu, div-Bilanz 0): drei Karten statt Akkordeon — „Gewerke &
+Ausstattung" und „Bauteile & Grundstück" hängen am Haken „weitere
+Objektdetails angeben" in der Kopf-Leiste (Merker `dp_details`), „Lage &
+Einschätzung" (mit Wertankern) ist immer da. Eingabetiefe heißt Einfach /
+Mittel / Ausgiebig mit Untertitel und Erklärtext; Mittel und Ausgiebig
+setzen den Haken, Ausgiebig blendet „Sach- und Ertragswert · Stufe 3"
+ein. Pflichtfelder Stufe 2: + Zustand, Energie, Standardstufe, Zimmer,
+Etage (ETW), Einheiten (MFH); Stufe 3: + Nutzung, Grundstück, BRW, MEA
+(ETW), BGF (Häuser, MFH), NHK-Typ (Häuser), Garage (wenn Garagen > 0).
+Datenlage heißt „gemessen (Marktdaten, Zensus, Makro-Score)" — kein
+Partnername. Das alte Akkordeon fällt; `object-actions.js:2066` verträgt
+das (`if (tg && wrap)`). Der Haken steht in der Feld-Wächter-Basislinie
+(26), er ist kein Objektdatum.
+
+**Nachweis (Bismarckstraße, Buster v1854).** Einfach: Gewerke/Bauteile
+`none`, Lage `block`, Stufe 3 `none`, Haken aus. Mittel: Haken gesetzt,
+Gewerke `block`, 13 Pflichtfelder, keins fehlt. Ausgiebig: Stufe 3
+`block`, 17 Pflichtfelder, `bgf` fehlt und ist markiert.
+
+**Schätzwerte (`tools/staging-schaetzwerte-v1854.js`, Staging, Testkonto).**
+Sicherung `/root/backups/haupt-20261004-1438-vor-schaetzwerte.sql.gz`
+(48 MB, Kopf geprüft). Probelauf, dann geschrieben: **17 Objekte, 319 leere
+Felder** — Gewerke-Art, Modernisierung je Bauteil, Bauteile, Lage,
+Stufe-3-Block (BGF nur wo leer, NHK-Typ bei Häusern, Grundriss bei MFH),
+abgeleitet aus Objektart, Baujahr, Zustand, Fläche. Jeder Wert trägt in
+`_dp_herkunft` den Vermerk „geschaetzt (Demo-Vorbelegung v1854)". Keine
+Preise, Mieten, Bodenrichtwerte angefasst. Löhner Str. 278 (ZFH) im
+Browser: 31 Herkunftsvermerke, eigene BGF 346,62 unverändert, Stufe 2 und
+3 ohne Fehlliste. Hauptstr. 51 (GESCH) bekam Wohn-Gewerke — Demo, als
+solche vermerkt.
+
+**Rest.** Prüfstrecke Exporte; Prod v1846b, Staging v1854.
