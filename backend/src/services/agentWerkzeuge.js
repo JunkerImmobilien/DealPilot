@@ -156,10 +156,42 @@ async function portfolio_lesen(ctx) {
     });
   }
 
+  /* ── v1818b · BEIDE ZAHLEN, FERTIG FORMULIERT ───────────────────────
+   *
+   * GEMESSEN: "wie viele Objekte habe ich im Portfolio" -> 9,
+   * "wie viele objekte habe ich" -> 18. Beide richtig (18 angelegt, 9 im
+   * Bestand), fuer den Nutzer ein Widerspruch.
+   *
+   *   > Zwei richtige Zahlen auf eine Frage sind schlimmer als eine
+   *   > falsche. Die falsche korrigiert man, am Widerspruch zweifelt man
+   *   > an allem.
+   *
+   * In der Wissensdatei stand die Regel schon — das Modell befolgte sie
+   * halb und nannte weiter nur eine Zahl. Zum dritten Mal dieselbe Lehre:
+   * was im ERGEBNIS steht, wirkt; was daneben steht, wirkt manchmal.
+   * Also steht der Satz jetzt fertig im Ergebnis. */
+  let angelegt = null;
+  try {
+    const r = await query(`SELECT count(*)::int AS n FROM objects WHERE user_id = $1`,
+      [ctx.userId]);
+    angelegt = r.rows.length ? r.rows[0].n : null;
+  } catch (e) { /* ohne die Zahl bleibt der Rest richtig */ }
+  const imBestand = (sp.payload && sp.payload.anzahl_objekte) || 0;
+
   return {
     vorhanden: true,
     stand: dialog.standSatz(sp.erfasst_am, sp.alter_minuten, sp.geaendert_seitdem),
     geaendert_seitdem: sp.geaendert_seitdem,
+    objekte_angelegt: angelegt,
+    objekte_im_bestand: imBestand,
+    so_sagen_anzahl: (angelegt != null && angelegt !== imBestand)
+      ? angelegt + ' Objekte angelegt, davon ' + imBestand + ' im Bestand'
+      : imBestand + ' Objekte im Bestand',
+    hinweis_anzahl: 'Nennt der Nutzer die ANZAHL seiner Objekte oder fragt nach '
+      + 'der Groesse des Portfolios, nimm "so_sagen_anzahl" UNVERAENDERT. Beide '
+      + 'Zahlen gehoeren zusammen: alles hier Folgende gilt fuer den BESTAND, '
+      + 'nicht fuer alle angelegten Objekte. Nur eine Zahl zu nennen laesst die '
+      + 'andere wie einen Fehler aussehen.',
     hinweis: 'Alle Betraege sind GANZE EURO. Unter "so_schreiben" stehen sie '
            + 'fertig formatiert — nimm diese Schreibweise unveraendert. '
            + 'Die Objekte hier tragen KEINE Nummer: die Nummer aus der Chat-Liste '
