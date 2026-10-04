@@ -30520,3 +30520,52 @@ s0-Knopf gefunden, er kommt in jedem Reiter vor).
   nicht aus dem Umbau.
 
 **Rest.** Prod v1846b; Staging v1855b. Marcels BMF-Punkte folgen.
+
+## Rollout-Journal 04.10.2026 (20) — v1856–v1856a: BMF-Rechner und RND-Assistent
+
+Marcel: *„bei Anschaffungskosten die Tabelle am Anfang gar nicht aufgemacht
+… AfA-Vorschau … irgendwas Altes angezeigt für vier oder fünf Sekunden …
+Restnutzungsdauer berechnen … Geben wir die jetzt nicht schon im Tab
+Objekt ein? … wenn man daneben drückt, dann schließt sich das direkt …
+im Dealpilot-Stil … wo ist eigentlich die kaufpreisaufteilung nach
+jacobi?"* Dazu: *„die quellen … kann man den text nicht ganz lesen hinter
+den werten."*
+
+**Gemessen (Parkstr. 9, dann Hermannstraße, Staging).** AfA-Vorschau beim
+Öffnen **780.000 € / 91,58 %**, nach fünf Sekunden **423.618 €** — das
+Fenster behielt den DOM-Inhalt des vorigen Objekts; nach Neuladen kamen
+die **91,58 % aus dem Template** `bmf-modal-html.html` (Demo-Zahlen
+94.224,83 € / 91,58 % im Markup) und `updateAfaPreview()` hatte den
+Notnagel `ak = 94224.83`. Der Reiter „Anschaffungskosten" öffnete sich
+bei der Messung korrekt (erstes Öffnen nicht reproduzierbar — dort kommt
+das Markup gerade erst aus dem Netz). Das BMF-Fenster schließt beim
+Danebenklicken NICHT; das RND-Modal (`rnd-wizard.js:333`) tat es.
+
+**Was (`4be691b`, `6aeff52`).** `updateAfaPreview`: Ergebnis zählt nur mit
+passender Objekt-Kennung (`_objKey`, gesetzt beim Ergebnis), ohne Kennung
+gilt es als fremd; ohne Anschaffungskosten „—", ohne Ergebnis „wird
+berechnet …"; Notnagel gestrichen. `openBMFModal`: fremdes Ergebnis
+verwerfen, Vorschau zurücksetzen, Reiter 1 nach 400 ms nachsetzen.
+Template-Demozahlen → Striche, Template-Buster v1856. **RND-Assistent:**
+`_getRndPrefill()` (deal-action.js) gibt `mod` (acht `mod_*`) und
+`gewerke` (über `DealPilotRND.mapDealPilotObject`, denselben Rechenkern)
+mit — Schritt 5 und 6 vorbelegt; `rnd-calc.js` nimmt Dach, Heizung,
+Außenwände, Technik, Decken aus den Gewerke-Stufen vor dem Energie-
+Rückschluss. Klick neben das Fenster schließt nicht mehr (× / Escape).
+Kopf Obsidian `#050505`, Titel Gold, Untertitel Creme `#f3ead0`, Hülle
+`#FBF6E9` — Farben einzeln benannt (v1843-Lehre), Gold als Token.
+Leiste: Quelle darf zwei Zeilen (`-webkit-line-clamp: 2`).
+
+**Nachweise.** Nach v1856a: AfA-Vorschau beim Öffnen „wird berechnet …"
+statt 220.400 € / 91,58 %; nach dem Lauf rendert die v292-Schicht ihre
+Tabelle (`#v292_pane3_container`). RND-Wizard: Kopf `rgb(5,5,5)`, Titel
+`rgb(201,168,76)`, Overlay `rgba(5,5,5,.72)`, Klick aufs Overlay → Fenster
+bleibt. Vorbelegung: Code-Weg (`prefill.mod`/`prefill.gewerke` werden in
+`buildInitialState` tief gemischt) — im Browser nicht bis Schritt 5
+durchgeklickt. **Jacoby:** steht im BMF-Rechner, Reiter 2 „BMF-Ergebnis",
+Zeile `#bmfJacobyZeile` unter dem Automatik-Hinweis — Hermannstraße:
+„84,55 % Gebäude (+7,3 Punkte gegenüber der Arbeitshilfe) · Zins 2,2 %
+Stufe A". Sie erscheint nur, wenn der amtliche Zins Stufe A/B hat.
+
+**Rest.** Prod v1846b; Staging v1856a. Staging-Rollout erledigt; Prod nur
+nach ausdrücklicher Freigabe.

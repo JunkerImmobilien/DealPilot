@@ -265,6 +265,15 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N9 · BMF-Rechner und RND-Assistent (04.10.2026) — erledigt v1856a
+
+AfA-Vorschau ohne Altwert und ohne Notnagel, Reiter 1 nachgesetzt, RND-Modal
+mit Vorbelegung aus dem Objekt (mod_*, Gewerke-Stufen), kein Schließen beim
+Danebenklicken, Obsidian/Gold-Kopf. Jacoby steht im BMF-Reiter 2 — nur bei
+Zins Stufe A/B. **Offen:** die Vorbelegung bis Schritt 5/6 im Browser
+durchklicken; das erste Öffnen (Markup aus dem Netz) am echten Erstkontakt
+messen.
+
 ### N8 · Der Bankexport über den Bot (04.10.2026)
 
 Marcel: *„der bankexport soll auch über den bot abgefragt werden können.
