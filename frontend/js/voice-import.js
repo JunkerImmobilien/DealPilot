@@ -365,6 +365,14 @@
       if (l && l.textContent && l.textContent.trim()) return l.textContent.trim().replace(/\s+/g, ' ').slice(0, 80);
     } catch (e) {}
     if (HINTS[id]) return HINTS[id];
+    /* v1862a · DealPilot-Felder tragen ihr <label> als Geschwister in .f, ohne
+       for= — gemessen standen „bgf", „standardstufe", „nutzungsart" nackt in
+       der Übernahme-Tabelle. */
+    try {
+      var f = el && el.closest ? el.closest('.f') : null;
+      var fl = f ? f.querySelector('label') : null;
+      if (fl && fl.textContent && fl.textContent.trim()) return fl.textContent.replace(/\s+/g, ' ').replace(/\s*ℹ.*$/, '').trim().slice(0, 80);
+    } catch (e) {}
     if (el && el.title && el.title.trim()) return el.title.trim().slice(0, 80);
     return id;
   }
@@ -2873,13 +2881,13 @@
     { et: 7, ids: ['etage'], rang: 2, stufe: 2,
       frage: 'In welchem Stockwerk liegt die Wohnung? Erdgeschoss ist 0.' },
     { et: 7, ids: ['nutzungsart'], rang: 3, stufe: 3, skalen: 1,
-      frage: 'Wie wird das Objekt genutzt — Wohnen, gemischt oder gewerblich? '
-           + 'Davon hängen Bewirtschaftungskosten und Ertragswert ab.' },
+      frage: 'Wird das Objekt vermietet oder selbst genutzt? '
+           + 'Davon hängt ab, wie der Ertragswert gerechnet wird.' },
     { et: 7, ids: ['gsfl', 'brw'], rang: 4, stufe: 3,
       frage: 'Wie groß ist das Grundstück, und welcher Bodenrichtwert gilt? '
            + 'Den Bodenrichtwert hole ich dir auch ab.' },
     { et: 7, ids: ['mea'], rang: 5, stufe: 3,
-      frage: 'Wie hoch ist der Miteigentumsanteil der Wohnung in Prozent? '
+      frage: 'Wie hoch ist der Miteigentumsanteil der Wohnung in Prozent — zum Beispiel 8,7? '
            + 'Ohne ihn gibt es keinen Bodenwert.' },
     { et: 7, ids: ['bgf'], rang: 6, stufe: 3,
       frage: 'Wie groß ist die Bruttogrundfläche in Quadratmetern? Der Sachwert rechnet '
@@ -6332,7 +6340,8 @@
       var _pct = _ges ? Math.round((_rf.i / _ges) * 100) : 0;
       kopf.innerHTML =
         '<span class="vi-kopf-txt">' + escH(akt
-          ? 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt)
+          ? (akt > liste.length ? 'Zusatz · ' + _etName(akt)   /* v1862a: „Etappe 7 von 6" war die Wertermittlung */
+                                : 'Etappe ' + akt + ' von ' + liste.length + ' · ' + _etName(akt))
           : (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen')) + '</span>' +
         (_ges ? '<span class="vi-kopf-zahl">Frage ' + _nr + ' / ' + _ges + '</span>' +
                 '<span class="vi-kopf-bar"><i style="width:' + _pct + '%"></i></span>' : '');
@@ -9589,7 +9598,11 @@
                    body: { wert_stufe: _ws, wertermittlung: true, object: obj,
                            external_ref: (window._currentObjKey || null) },
                    timeout: 180000 })
-      .then(function (d) { if (_rf) _rfWertFertig(d); })
+      .then(function (d) {
+        if (_rf) _rfWertFertig(d);
+        /* v1862a · Dialog schon zu: der Bericht gehört trotzdem auf die Karte */
+        else { _mbGeholt = true; try { if (window.DealPilotMB && DealPilotMB.uebernehmen) DealPilotMB.uebernehmen(d); } catch (e) {} }
+      })
       .catch(function (err) { if (_rf) _rfWertFehler(err); });
   }
 
@@ -9599,9 +9612,20 @@
     _rfBlase('co', '<span style="opacity:.6">Die Wertermittlung hat nicht geklappt'
       + (m ? ': ' + escH(String(m).slice(0, 120)) : '') + '. Es wurde nichts abgebucht.</span>');
     if (_fs.an && _fs.stream) _fsHoeren(true);
+    /* v1862a · lief die Wertermittlung von selbst (Eingabetiefe Ausgiebig),
+       geht der Dialog nach dem Fehler weiter — sonst stünde er still. */
+    if (_rf && _rf.wertAuto) { _rf.wertAn = 2; try { _rfFertig(); } catch (e) {} }
   }
 
+  /* v1862a · Hülle: nach dem Ergebnis läuft der Dialog weiter (Feinheiten,
+     Nachfassen, Abschluss), wenn die Wertermittlung von selbst gestartet
+     war. Vorher stand sie am Ende der Strecke und brauchte kein Danach. */
   function _rfWertFertig(d) {
+    try { _rfWertFertigKern(d); }
+    catch (e) { try { console.warn('[voice] Wertermittlung anzeigen', e); } catch (e2) {} }
+    if (_rf && _rf.wertAuto && _rf.wertAn === 2) { try { _rfFertig(); } catch (e) {} }
+  }
+  function _rfWertFertigKern(d) {
     _rf.wertLaeuft = 0;
     /* v1862 · Der Bericht trägt auch die Marktpreisindikation: ist sie in
        diesem Gespräch noch nicht geholt, werden Lage, Marktmiete und
@@ -9723,8 +9747,11 @@
        Grund, warum der Nutzer noch hier ist. `wertAn === 1` heisst
        „gestartet, noch kein Ergebnis"; 2 heisst fertig. */
     if (_rf && _rf.wertAn === 1 && !_rf.wertLaeuft) {
-      var nochOffen = RFRAGEN_WERT.some(function (e) { return _rfFehlt(e, _rf.data.fields); })
-                   || _rfStufeBloecke(3).length > 0;   /* v1862 */
+      /* v1862a · offen heißt: noch nicht GESTELLT. Eine übersprungene Frage
+         („Weiß ich nicht") hielt den Abruf sonst für immer auf — Garagen und
+         Modernisierung sind keine Pflicht, und was der Rechenkern braucht,
+         benennt er selbst. */
+      var nochOffen = _rf.offen.slice(_rf.i).some(function (e) { return e.wert || e.stufe; });
       if (!nochOffen) { _rfWertAbrufen(); return; }
     }
     /* v1862 · Die Eingabetiefe (Reiter Objekt / Pre-Flight-Pillen) VOR den
@@ -9732,6 +9759,18 @@
     if (!erzwungen && _rf && _rf.alle && !_rf.stufeGefragt) {
       _rf.stufeGefragt = 1;
       if (_rfStufeStarten()) return;
+    }
+    /* v1862a · Eingabetiefe Ausgiebig: die Wertermittlung startet, SOBALD
+       ihre Pflicht steht — nicht erst hinter dem Feinheiten-Angebot. Gemessen:
+       dessen „Zur Übersicht" springt direkt zur Tabelle, das Angebot am Ende
+       war damit für die meisten unerreichbar. */
+    if (_rf && _rf.alle && !_rf.wertGefragt && !_rf.wertAn && _rfZiel() >= 3
+        && _rfWertVerfuegbar() && !_rfStufeBloecke(3).length) {
+      _rf.wertGefragt = 1; _rf.wertAuto = 1;
+      _rfBlase('co', '<span style="opacity:.8">Alles da, was die <b>Wertermittlung nach ImmoWertV</b> '
+        + 'braucht — ich starte sie jetzt. Du hast sie mit <b>Eingabetiefe Ausgiebig</b> gewählt.</span>');
+      _rfWertStarten();
+      return;
     }
     /* v1282: Ist die Pflichtstrecke durch, wird EINMAL nach den Feinheiten
        gefragt - aber nur im gefuehrten Weg und nur, wenn der Nutzer nicht
@@ -9991,6 +10030,19 @@
          nur `e.ids`. Nebenbei Gesagtes beschleunigt also, es ueberspringt
          nichts. */
       var gefragt = e.ids.indexOf(id) >= 0;
+      /* v1862a · Zahlenfelder (inputmode decimal/numeric) bekommen eine Zahl:
+         gemessen landete „2. Stock" wörtlich im Feld Etage — der Katalog
+         kennt nur type=number als Zahl, DealPilot nutzt type=text. Das
+         erste Zahlwort zählt, deutsches Format bleibt (150.000 · 4,35). */
+      try {
+        var _el = document.getElementById(id);
+        var _im = _el ? String(_el.getAttribute('inputmode') || '') : '';
+        if (_el && (_im === 'decimal' || _im === 'numeric' || _el.type === 'number')
+            && typeof v === 'string' && /[A-Za-zÄÖÜäöüß]/.test(v)) {
+          var _m = v.match(/-?\d{1,3}(?:\.\d{3})+(?:,\d+)?|-?\d+(?:[.,]\d+)?/);
+          if (_m) v = _m[0];
+        }
+      } catch (e2) {}
       _rf.data.fields[id] = v;
       var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
       var name = (kat ? kat.label : id) + ' = ' + v;
