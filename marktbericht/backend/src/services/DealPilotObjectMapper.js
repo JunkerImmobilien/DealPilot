@@ -70,6 +70,20 @@ function vacancyFrom(d) {
   return false;
 }
 
+/* v1851 · DEZIMALFELDER LESEN KEINEN TAUSENDERPUNKT. Gemessen am ersten
+   Bericht nach dem Umbau: lzs_pct „2.56" kam als 256 an — num() nimmt den
+   Punkt als Tausenderpunkt (richtig fuer „200.000", falsch fuer einen
+   Prozentsatz). Dasselbe traf sachwertfaktor („1.15" → 115) und, schon
+   vor v1851, mea („7.06" → 706). Prozent, Faktoren und Quadratmeterpreise
+   haben keine Tausender — sie lesen Punkt UND Komma als Dezimaltrenner. */
+function dez(v) {
+  if (v == null || v === '') return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  const s = String(v).trim().replace(/\s|%|€/g, '').replace(',', '.');
+  const n = parseFloat(s);
+  return Number.isFinite(n) ? n : null;
+}
+
 /* v1851 · Eine Ausstattungsskala. Marcels Entscheidung vom 04.10.2026: die
    Standardstufe 1–5 (Anlage 4 ImmoWertV) ist die eine Skala; `ausst`
    (einfach/normal/gehoben/luxus) fällt. Damit die erweiterte
@@ -151,7 +165,7 @@ export const DealPilotObjectMapper = {
          wie hoch der Zins und wie lange der Vertrag noch laeuft. Der
          Bodenwert steht schon oben (land_value_manual). */
       plot_area: num(pick(d, ['gsfl', 'grundstuecksflaeche'])),
-      mea_pct: num(pick(d, ['mea'])),
+      mea_pct: dez(pick(d, ['mea'])),   /* v1851: „7.06" ist 7,06 %, nicht 706 */
       leasehold: !!pick(d, ['_erbpacht', 'erbpacht']),
       leasehold_rent_year: num(pick(d, ['erbbauzins'])),
       leasehold_years_left: num(pick(d, ['erb_restlz'])),
@@ -193,17 +207,17 @@ export const DealPilotObjectMapper = {
       standardstufe: standardstufeAus(d),
       grundriss: pick(d, ['grundriss']),
       mod_punkte: num(pick(d, ['mod_punkte'])),
-      sachwertfaktor: num(pick(d, ['sachwertfaktor'])),
+      sachwertfaktor: dez(pick(d, ['sachwertfaktor'])),
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
         return (h && g != null && g !== '' && dd) ? (String(h) + '.' + String(g) + String(dd)) : null;
       })(),
       hinterland_qm: num(pick(d, ['hinterland_qm'])),
-      hinterland_eur_qm: num(pick(d, ['hinterland_eur_qm'])),
+      hinterland_eur_qm: dez(pick(d, ['hinterland_eur_qm'])),
       hinterland_rentierlich: /^(ja|true|1)$/i.test(String(pick(d, ['hinterland_rentierlich']) || '')),
       garagen_bgf_qm: num(pick(d, ['garagen_bgf_qm'])),
       garagen_stufe: num(pick(d, ['garagen_stufe'])),
-      aussenanlagen_pct: num(pick(d, ['aussenanlagen_pct'])),
+      aussenanlagen_pct: dez(pick(d, ['aussenanlagen_pct'])),
       aussenanlagen: num(pick(d, ['aussenanlagen'])),
       bes_bauteile: num(pick(d, ['bes_bauteile'])),
       ausstattung: gewerkeAus(d),
@@ -217,8 +231,8 @@ export const DealPilotObjectMapper = {
         return Object.values(o).some((v) => v) ? o : null;
       })(),
       /* Ertragswert (Stufe 3) */
-      lzs_pct: num(pick(d, ['lzs_pct'])),
-      brw_anpassung_pct: num(pick(d, ['brw_anpassung_pct'])),
+      lzs_pct: dez(pick(d, ['lzs_pct'])),               /* v1851: „2.56" kam als 256 an */
+      brw_anpassung_pct: dez(pick(d, ['brw_anpassung_pct'])),
       brw_anpassung_grund: pick(d, ['brw_anpassung_grund']),
       stellplatz_miete_monat: num(pick(d, ['stellplatz_miete_monat'])),
     };
