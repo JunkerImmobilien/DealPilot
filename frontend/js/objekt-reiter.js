@@ -162,6 +162,9 @@
     (function () { var gesehen = {}; hinterlegt = hinterlegt.filter(function (e) { var n = NAME[e.kennzahl] || e.name || e.kennzahl; if (gesehen[n]) return false; gesehen[n] = true; return true; }); })();
     var kurz = function (s) { return String(s || '').replace(/^Der Gutachterausschuss für Grundstückswerte /, 'GAA ').split(',')[0]; };
     var swfOhneArt = _leiste && !_leiste.swf;
+    /* v1858c · steht der Sachwertfaktor schon in „fehlt" (Register führt
+       keinen), kommt keine zweite Zeile dazu — Parkstr. 9 hatte zwei. */
+    if (fehlt.some(function (e) { return /sachwert|swf/i.test(String(e.kennzahl) + String(e.name)); })) swfOhneArt = false;
     hinterlegt.forEach(function (e) {
       var istSwf = /sachwert|swf/i.test(String(e.kennzahl) + e.name);
       var link = e.quelle_url ? '<a href="' + esc(e.quelle_url) + '" target="_blank" rel="noopener">' + (/\.pdf(\?|$)/i.test(e.quelle_url) ? 'Bericht (PDF)' : 'Quelle öffnen') + '</a>' : '<span class="oe-leer">kein Link hinterlegt</span>';

@@ -265,6 +265,16 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N10 · Reiter Objekt, dritte Runde (04.10.2026) — erledigt v1858c
+
+Abruf als Zeilen unter den Anfragen, Stufenpillen in der Pre-Flight-Kachel
+(ein Abruf statt Sprechlauf + Kachel), Hover-Hilfe an jedem Feld
+(`feld-hilfe.js`, folgt dem Tooltip-Modus; gelbe i-Knöpfe weichen),
+Quellen je Kennzahl eine Zeile, Anfragen/Abruf in voller Breite.
+**Offen:** Hilfetexte für die ~130 Felder ohne gepflegten Tooltip — heute
+zeigt der Rückfall Beschriftung + Verwendung; echte Texte sind
+Redaktionsarbeit (Marcel/Fachlichkeit), kein Code.
+
 ### N9 · BMF-Rechner und RND-Assistent (04.10.2026) — erledigt v1856a
 
 AfA-Vorschau ohne Altwert und ohne Notnagel, Reiter 1 nachgesetzt, RND-Modal
