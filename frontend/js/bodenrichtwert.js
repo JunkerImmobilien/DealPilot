@@ -570,8 +570,67 @@
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
       return { ok: false, grund: 'kein_wert', fehler: 'Kein BORIS-Wert für diese Lage' };
     }
+    /* v1838 · Die Nutzungsart reist mit. Sie kam schon immer in der
+       Antwort und wurde hier weggeworfen — siehe `_nutzungPruefen`. */
     return { ok: true, wert: bd.value_sqm, stichtag: bd.stichtag || null,
-             zone: bd.zone || null, quelle: bd.source || 'BORIS', roh: bd };
+             zone: bd.zone || null, quelle: bd.source || 'BORIS',
+             nutzung: bd.nutzung || null, roh: bd };
+  }
+
+  /* ═══ v1838 · PASST DIE ZONE ZUM OBJEKT? ═══════════════════════════════
+   *
+   * GEMESSEN am 04.10.2026 an Hauptstr. 51, 49477 Ibbenbüren: der Abruf
+   * lieferte 45 €/m² mit `nutzung: "GE"` — eine Gewerbezone. Der Wert
+   * ging ins Feld, die Nutzungsart wurde weggeworfen.
+   *
+   *   > Ein Bodenrichtwert ohne seine Nutzungsart ist eine Zahl ohne
+   *   > ihren Gegenstand. 45 €/m² sind für Grünland richtig, für ein
+   *   > Wohngrundstück ein Fehler — und man sieht es der Zahl nicht an.
+   *
+   * § 13 ImmoWertV: der Bodenrichtwert gilt für ein Grundstück mit den
+   * dargelegten Merkmalen. Weicht das Objekt davon ab, ist er ohne
+   * Anpassung nicht anwendbar.
+   *
+   * Hier wird deshalb nur GEWARNT, nicht verworfen: die Zuordnung kann
+   * stimmen (ein Geschäftshaus IM Gewerbegebiet), und wer bewertet,
+   * entscheidet selbst. Aber er soll es sehen.
+   *
+   * Die Kürzel sind die der BORIS-Länderdienste (BauNVO-Gebietstypen). */
+  var NUTZUNG_TEXT = {
+    W: 'Wohnbaufläche', WA: 'allgemeines Wohngebiet', WR: 'reines Wohngebiet',
+    WB: 'besonderes Wohngebiet', WS: 'Kleinsiedlung',
+    M: 'gemischte Baufläche', MI: 'Mischgebiet', MD: 'Dorfgebiet',
+    MK: 'Kerngebiet', MU: 'urbanes Gebiet',
+    G: 'gewerbliche Baufläche', GE: 'Gewerbegebiet', GI: 'Industriegebiet',
+    SO: 'Sondergebiet', S: 'Sonderbaufläche',
+    LF: 'Land- und Forstwirtschaft', L: 'landwirtschaftliche Fläche',
+    F: 'Forstwirtschaft', EF: 'Erholungsfläche', GR: 'Grünfläche',
+    A: 'Ackerland', GL: 'Grünland'
+  };
+  /* Welche Nutzung passt zu welcher Objektart. Leer = keine Aussage. */
+  var NUTZUNG_WOHNEN = ['W', 'WA', 'WR', 'WB', 'WS', 'M', 'MI', 'MD', 'MK', 'MU'];
+  var NUTZUNG_GEWERBE = ['G', 'GE', 'GI', 'MK', 'MU', 'MI', 'SO', 'S'];
+  var NUTZUNG_UNBEBAUT = ['LF', 'L', 'F', 'A', 'GL', 'GR', 'EF'];
+
+  function _nutzungPruefen(nutzung, objart) {
+    var n = String(nutzung || '').trim().toUpperCase();
+    if (!n) return null;
+    var text = NUTZUNG_TEXT[n] || n;
+    var art = String(objart || '').trim().toLowerCase();
+    /* Eine Zone für unbebaute Flächen passt zu keinem bebauten Objekt. */
+    if (NUTZUNG_UNBEBAUT.indexOf(n) >= 0) {
+      return { text: text, warnung: 'Diese Zone gilt für ' + text
+        + ' — für ein bebautes Grundstück ist der Wert ohne Anpassung nicht anwendbar (§ 13 ImmoWertV).' };
+    }
+    if (!art) return { text: text, warnung: null };
+    var istGewerbe = (art.indexOf('gesch') >= 0 || art.indexOf('gewerbe') >= 0);
+    var passt = istGewerbe
+      ? NUTZUNG_GEWERBE.indexOf(n) >= 0
+      : NUTZUNG_WOHNEN.indexOf(n) >= 0;
+    if (passt) return { text: text, warnung: null };
+    return { text: text, warnung: 'Diese Zone gilt für ' + text
+      + ', das Objekt ist als ' + (istGewerbe ? 'Gewerbe' : 'Wohnen')
+      + ' erfasst — bitte prüfen, ob der Wert passt.' };
   }
 
   async function fetchBoris() {
@@ -619,9 +678,23 @@
       var extra = [];
       if (r.stichtag) extra.push('Stichtag ' + r.stichtag);
       if (r.zone) extra.push('Zone ' + r.zone);
+      /* v1838 · Die Nutzungsart gehört neben den Wert, nicht in die
+         Antwort des Servers und von dort in den Papierkorb. */
+      var _nutz = _nutzungPruefen(r.nutzung, _val('objart'));
+      if (_nutz) extra.push(_nutz.text);
       if (r.quelle) extra.push(r.quelle);
-      _setStatus('✓ BORIS: ' + r.wert + ' €/m²' + (extra.length ? ' (' + extra.join(' · ') + ')' : ''), 'ok');
-      if (typeof toast === 'function') toast('✓ Bodenrichtwert (BORIS): ' + r.wert + ' €/m²');
+      /* v1838 · Passt die Zone nicht zum Objekt, steht die Warnung VOR
+         dem Haken - und sie wird gelb, nicht gruen. Ein Wert mit
+         Vorbehalt darf nicht aussehen wie einer ohne. */
+      if (_nutz && _nutz.warnung) {
+        _setStatus('⚠ BORIS: ' + r.wert + ' €/m²'
+          + (extra.length ? ' (' + extra.join(' · ') + ')' : '')
+          + ' — ' + _nutz.warnung, 'err');
+        if (typeof toast === 'function') toast('⚠ ' + _nutz.warnung);
+      } else {
+        _setStatus('✓ BORIS: ' + r.wert + ' €/m²' + (extra.length ? ' (' + extra.join(' · ') + ')' : ''), 'ok');
+        if (typeof toast === 'function') toast('✓ Bodenrichtwert (BORIS): ' + r.wert + ' €/m²');
+      }
     } catch (err) {
       _setStatus('⚠ ' + (err.message || 'BORIS-Fehler'), 'err');
       if (typeof toast === 'function') toast('⚠ ' + (err.message || 'BORIS-Fehler'));
