@@ -38348,3 +38348,36 @@ body.hdr-collapsed .hdr-score-mini-red span { color: #e8a09a; }
   #oe-karte-gewerke #oe-gewerke { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
   #oe-karte-gewerke #oe-gewerke td.oe-g { white-space: normal; }
 }
+
+/* ===== v1864 · Marcel (04.10.2026): „bei beiden Dealscore-Karten im Tab Bewertung den unteren
+   Streifen in schwarz machen und die Bewertung passend darauf legen — dann sehen die Karten so aus
+   wie auf der Landingpage" und „die schwarz hinterlegten Karten für Cashflow vor Steuer bis
+   Break-Even auch in Hell". Gemessen: der Streifen ist .dpsh-verdictbar in .dpsh-body (Padding
+   16/24/18, Hülle .dpsh-pass Radius 18, overflow hidden) — Regeln kommen aus dpsh-score-hero.js
+   (dynamisches Blatt), deshalb hier höhere Spezifität plus !important. Die Phasen-Blöcke
+   (.cf-phase-block) tragen Obsidian aus einer späteren Regel; hell = weiße Karte, Kacheln creme. ===== */
+body .dpsh-body .dpsh-verdictbar { margin: 16px -24px -18px !important; padding: 0 !important;
+  background: #0D0D0D !important; border-top: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) !important;
+  border-radius: 0 !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-verdict { border-radius: 0 !important; background: none !important;
+  box-shadow: none !important; padding: 14px 24px 16px !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-vt { color: var(--wl-e8cc7a, #E8CC7A) !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-verdict.t-g .dpsh-vt { color: #5BD98E !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-verdict.t-r .dpsh-vt { color: #D9685F !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-vlead { color: #f3ead0 !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-vico { background: rgba(255,255,255,.06) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.16) !important; }
+body .dpsh-body .dpsh-verdictbar .dpsh-verdict.t-o .dpsh-vico { color: var(--wl-e8cc7a, #E8CC7A) !important; }
+
+body .sec .cf-phase-block, body .sec .cf-phase-block.cf-phase-block-tax { background: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent) !important;
+  color: #2A2727 !important; box-shadow: 0 6px 18px rgba(0,0,0,.06) !important; }
+body .sec .cf-phase-card { background: #FBF6E9 !important; border: 1px solid rgba(0,0,0,.06) !important; }
+body .sec .cf-phase-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.10) !important; }
+body .sec .cf-phase-title { color: var(--wl-b8932f, #b8932f) !important; }
+body .sec .cf-phase-block-tax .cf-phase-title { color: #2E8455 !important; }
+body .sec .cf-phase-label { color: #6b655f !important; }
+body .sec .cf-phase-val { color: #2A2727 !important; }
+body .sec .cf-phase-val.positive { color: #2E8455 !important; }
+body .sec .cf-phase-val.negative { color: #B8625C !important; }
+body .sec .cf-phase-sub { color: #8a837c !important; }
