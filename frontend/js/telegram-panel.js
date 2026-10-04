@@ -25,6 +25,11 @@
   'use strict';
   var HOST_ID = 'dp-telegram-host';
   var _laeuft = false;
+  /* v1827 · Die Fassung der Datenschutzerklaerung, die gerade angezeigt
+     wird. Sie kommt vom Server (`/status`), nicht aus einer zweiten
+     Konstanten hier — zwei Stellen fuer dieselbe Zahl laufen auseinander,
+     und dann steht im Nachweis eine Fassung, die der Nutzer nie sah. */
+  var _dsFassung = '1.1';
 
   function _esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
@@ -105,11 +110,35 @@
           + 'Ohne sie kann Telegram den Bot nicht erreichen.</div>';
       }
 
+      /* v1827 · DIE EINWILLIGUNG. Sie steht VOR dem Tokenfeld, nicht
+         darunter: wer den Token schon eingefuegt hat, liest keinen Text
+         mehr, der zwischen ihm und dem Knopf steht. Und sie ist nicht
+         vorangekreuzt — eine vorangekreuzte Einwilligung ist nach der
+         Rechtsprechung des EuGH (Planet49) keine. */
+      _dsFassung = (s && s.ds_fassung) || '1.1';
+      h += '<label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;'
+        + 'padding:12px;border:1px solid var(--border);border-radius:10px;'
+        + 'font-size:13px;line-height:1.6;cursor:pointer">'
+        + '<input type="checkbox" id="dp-tg-einwilligung" style="margin-top:3px;flex:0 0 auto"'
+        + ' onchange="DealPilotTelegram.einwilligungGeprueft()">'
+        + '<span>Ich willige ein, dass meine Objektdaten — Adressen, Kaufpreise, Mieten '
+        + 'und Kennzahlen — über Telegram übertragen werden, und dass sie dabei '
+        + '<b>in die Vereinigten Arabischen Emirate</b> gelangen, für die kein '
+        + 'Angemessenheitsbeschluss der EU besteht. Bot-Chats sind '
+        + '<b>nicht Ende-zu-Ende-verschlüsselt</b>. '
+        + '<a href="datenschutz.html#telegram" target="_blank" rel="noopener">'
+        + 'Abschnitt 9 der Datenschutzerklärung</a> · Fassung ' + _esc(_dsFassung)
+        + '<br><span style="color:var(--muted)">Ich kann das jederzeit widerrufen, '
+        + 'indem ich den Bot hier wieder entferne.</span></span>'
+        + '</label>';
+
       h += '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
         + '<input type="password" id="dp-tg-token" autocomplete="off" spellcheck="false"'
         + ' placeholder="123456789:AA…" style="flex:1 1 280px;min-width:0"'
         + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();DealPilotTelegram.botSpeichern();}">'
-        + '<button type="button" class="btn" onclick="DealPilotTelegram.botSpeichern()">Bot verbinden</button>'
+        + '<button type="button" class="btn" id="dp-tg-los" disabled'
+        + ' style="opacity:.45;cursor:not-allowed"'
+        + ' onclick="DealPilotTelegram.botSpeichern()">Bot verbinden</button>'
         + '</div>'
         + '<div id="dp-tg-fehler" style="margin-top:8px;font-size:13px;color:var(--bad, #D8564C)"></div>';
 
@@ -131,6 +160,21 @@
             : '<span style="color:var(--bad, #D8564C)">nicht empfangsbereit'
               + (s.bot.letzter_fehler ? ': ' + _esc(s.bot.letzter_fehler) : '') + '</span>')
         + (s.bot.token_endet_auf ? ' · Token …' + _esc(s.bot.token_endet_auf) : '')
+        + '</div>'
+        /* v1827 · Der Nachweis gehoert dem Nutzer, nicht nur unserer
+           Datenbank: er soll sehen koennen, wann und worin er eingewilligt
+           hat. Fehlt die Angabe (Altbestand vor v1827), steht das da —
+           nicht nichts. */
+        + '<div style="color:var(--muted);font-size:12px">'
+        + (s.einwilligung
+            ? 'Einwilligung erteilt am ' + _fmt(s.einwilligung.am)
+              + ' · Datenschutzerklärung Fassung ' + _esc(s.einwilligung.fassung)
+              + (s.einwilligung.veraltet
+                  ? ' <span style="color:var(--warn, #D8954C)">· die Erklärung hat sich '
+                    + 'seitdem geändert</span>'
+                  : '')
+            : '<span style="color:var(--warn, #D8954C)">Einwilligung nicht '
+              + 'dokumentiert</span> — beim nächsten Verbinden wird sie erfragt')
         + '</div></div>'
         + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
         + ' onclick="DealPilotTelegram.botEntfernen()">Bot entfernen</button>'
@@ -194,16 +238,40 @@
     if (host) _render(host);
   }
 
+  /* v1827 · Der Knopf folgt dem Haken. Die Sperre ist bewusst SICHTBAR
+     (ausgegrauter Knopf) statt stumm: ein Knopf, der nichts tut, sieht aus
+     wie ein Fehler; ein ausgegrauter sagt, was fehlt. */
+  function einwilligungGeprueft() {
+    var k = document.getElementById('dp-tg-einwilligung');
+    var b = document.getElementById('dp-tg-los');
+    if (!b) return;
+    var an = Boolean(k && k.checked);
+    b.disabled = !an;
+    b.style.opacity = an ? '' : '.45';
+    b.style.cursor = an ? '' : 'not-allowed';
+  }
+
   async function botSpeichern() {
     if (_laeuft) return;
     var feld = document.getElementById('dp-tg-token');
     var fehler = document.getElementById('dp-tg-fehler');
+    var haken = document.getElementById('dp-tg-einwilligung');
     var token = feld ? String(feld.value || '').trim() : '';
+    /* Die Einwilligung zuerst pruefen, nicht den Token: sonst heisst die
+       erste Meldung "Token fehlt", obwohl beides fehlt, und der Nutzer
+       sieht den eigentlichen Grund erst im zweiten Anlauf. */
+    if (!(haken && haken.checked)) {
+      if (fehler) fehler.textContent = 'Bitte zuerst die Einwilligung bestätigen.';
+      return;
+    }
     if (!token) { if (fehler) fehler.textContent = 'Bitte den Token einfügen.'; return; }
     _laeuft = true;
     if (fehler) fehler.textContent = 'Prüfe den Token bei Telegram …';
     try {
-      var r = await _api('/bot', { method: 'PUT', body: { token: token } });
+      var r = await _api('/bot', {
+        method: 'PUT',
+        body: { token: token, einwilligung: true, ds_fassung: _dsFassung }
+      });
       /* Den Token sofort aus dem Feld nehmen — er soll nicht im DOM stehen
          bleiben, auch nicht in einem Passwortfeld. */
       if (feld) feld.value = '';
@@ -321,6 +389,9 @@
        Export ruft das onclick ins Leere, und die Rueckfrage liesse sich
        nur durch Neuladen schliessen. */
     trennenAbbrechen: trennenAbbrechen,
+    /* v1827 · Haengt am onchange der Einwilligungs-Checkbox. Fehlt der
+       Export, bleibt der Knopf fuer immer grau — dieselbe Falle wie oben. */
+    einwilligungGeprueft: einwilligungGeprueft,
     kopieren: kopieren, _mount: _mount
   };
 })();

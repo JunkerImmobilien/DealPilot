@@ -33,6 +33,25 @@ const creds = require('../services/providerCredentialsService');
 
 router.use(authenticate);
 
+/* ── DIE FASSUNG DER DATENSCHUTZERKLAERUNG (v1827) ────────────────────────
+ *
+ * Abschnitt 9 der Erklaerung stuetzt die Uebermittlung an Telegram auf die
+ * Einwilligung (Art. 6 Abs. 1 lit. a) und den Transfer in die VAE auf
+ * Art. 49 Abs. 1 lit. a. Diese Einwilligung wird hier erhoben, und zwar
+ * MIT der Fassung, die der Nutzer dabei vor sich hatte.
+ *
+ * Warum nicht einfach serverseitig die aktuelle Fassung eintragen: dann
+ * stuende in der Datenbank, der Nutzer habe Fassung 1.2 zugestimmt, obwohl
+ * sein Browser noch 1.1 anzeigte. Die Fassung kommt deshalb vom Frontend
+ * und wird hier GEGENGEPRUEFT — weicht sie ab, hat er eine alte Seite
+ * offen und muss sie neu laden. Ein Nachweis, der die falsche Fassung
+ * nennt, ist schlechter als keiner.
+ *
+ * Diese Zahl steht an zwei Stellen: hier und in `frontend/datenschutz.html`
+ * ("Version 1.1"). Wer den Text aendert, zieht beide nach.
+ */
+const DS_FASSUNG = '1.1';
+
 /* Verwaltung NIE per API-Key — sonst koennte ein Key sich selbst einen
  * zweiten Zugang in Telegram einrichten. Gleiches Muster wie apiKeys.js. */
 function requireJwt(req, res, next) {
@@ -136,7 +155,8 @@ router.get('/status', requireJwt, async (req, res, next) => {
     const offen = r.rows.find((z) => !z.bestaetigt_am);
 
     const b = await query(
-      `SELECT bot_username, bot_name, webhook_gesetzt, letzter_fehler, aktiv
+      `SELECT bot_username, bot_name, webhook_gesetzt, letzter_fehler, aktiv,
+              einwilligung_am, einwilligung_fassung
          FROM telegram_bots WHERE user_id = $1`,
       [req.user.id]
     );
@@ -155,6 +175,15 @@ router.get('/status', requireJwt, async (req, res, next) => {
         aktiv: bot.aktiv,
         token_endet_auf: meta.hint || null   /* nie der Token selbst */
       } : null,
+      /* v1827 · Der Nachweis, damit der Nutzer ihn selbst sehen kann.
+         `veraltet` sagt, dass die Erklaerung sich seit seiner Zustimmung
+         geaendert hat — dann ist sie fuer die neuen Punkte keine. */
+      einwilligung: bot && bot.einwilligung_am ? {
+        am: bot.einwilligung_am,
+        fassung: bot.einwilligung_fassung,
+        veraltet: bot.einwilligung_fassung !== DS_FASSUNG
+      } : null,
+      ds_fassung: DS_FASSUNG,
       webhook_moeglich: Boolean(basisUrl()),
       verbunden: bestaetigt.length > 0,
       verbindungen: bestaetigt.map((z) => ({
@@ -193,6 +222,27 @@ router.put('/bot', requireJwt, async (req, res, next) => {
     const token = String((req.body && req.body.token) || '').trim();
     if (!token) return res.status(400).json({ error: 'Bot-Token fehlt' });
 
+    /* 0 · Die Einwilligung. VOR allem anderen — auch vor getMe, denn schon
+       das ist eine Verbindung zu Telegram. Sie ist nicht optional: ohne sie
+       gibt es fuer die Uebermittlung in die VAE keine Rechtsgrundlage. */
+    const ein = req.body && req.body.einwilligung;
+    if (ein !== true) {
+      return res.status(400).json({
+        error: 'Ohne die Einwilligung nach Abschnitt 9 der Datenschutzerklaerung '
+             + 'kann der Bot nicht eingerichtet werden.',
+        einwilligung_fehlt: true
+      });
+    }
+    const fassung = String((req.body && req.body.ds_fassung) || '').trim();
+    if (fassung !== DS_FASSUNG) {
+      return res.status(409).json({
+        error: 'Die Datenschutzerklaerung wurde inzwischen geaendert. Bitte die '
+             + 'Seite neu laden und sie noch einmal lesen.',
+        fassung_erwartet: DS_FASSUNG,
+        fassung_gesendet: fassung || null
+      });
+    }
+
     /* Grobform vorab, damit ein offensichtlicher Vertipper nicht erst
        ueber das Netz auffaellt: <zahlen>:<35 Zeichen>. */
     if (!/^\d{5,}:[A-Za-z0-9_-]{30,}$/.test(token)) {
@@ -229,8 +279,9 @@ router.put('/bot', requireJwt, async (req, res, next) => {
     const secret = crypto.randomBytes(24).toString('base64url');
     await query(
       `INSERT INTO telegram_bots
-         (user_id, bot_username, bot_name, bot_id, webhook_pfad, webhook_secret, aktiv)
-       VALUES ($1,$2,$3,$4,$5,$6,TRUE)
+         (user_id, bot_username, bot_name, bot_id, webhook_pfad, webhook_secret, aktiv,
+          einwilligung_am, einwilligung_fassung)
+       VALUES ($1,$2,$3,$4,$5,$6,TRUE, now(), $7)
        ON CONFLICT (user_id) DO UPDATE SET
          bot_username = EXCLUDED.bot_username,
          bot_name     = EXCLUDED.bot_name,
@@ -239,8 +290,16 @@ router.put('/bot', requireJwt, async (req, res, next) => {
          webhook_secret = EXCLUDED.webhook_secret,
          webhook_gesetzt = NULL,
          letzter_fehler = NULL,
-         aktiv = TRUE`,
-      [req.user.id, me.username || null, me.first_name || null, me.id || null, pfad, secret]
+         aktiv = TRUE,
+         /* Jedes Einrichten ist eine EIGENE Einwilligung — auch das zweite
+            mit demselben Bot. Deshalb ueberschreiben und nicht
+            COALESCE(alt, neu): sonst stuende hier ewig das Datum des
+            ersten Males, und eine zwischenzeitlich geaenderte Fassung
+            waere nie zugestimmt worden. */
+         einwilligung_am      = EXCLUDED.einwilligung_am,
+         einwilligung_fassung = EXCLUDED.einwilligung_fassung`,
+      [req.user.id, me.username || null, me.first_name || null, me.id || null, pfad, secret,
+       DS_FASSUNG]
     );
 
     /* 3 · Webhook. Schlaegt er fehl, ist der Bot gespeichert, aber stumm —
