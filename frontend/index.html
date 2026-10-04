@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1852"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1852b"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -993,7 +993,7 @@ label.dp-required.qc-required::after {
 <!-- ═══════════ TAB 1: OBJEKT ═══════════ -->
 <div class="sec active" id="s0">
   <div id="obj-action-bar"></div>
-  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p>
+  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><div id="oe-ziel" class="oe-ziel" role="group" aria-label="Eingabetiefe"><span class="oe-ziel-lbl">Eingabetiefe</span><button type="button" class="oe-ziel-btn" data-oe-ziel="1">Stufe 1 · Marktpreis</button><button type="button" class="oe-ziel-btn" data-oe-ziel="2">Stufe 2 · erweitert</button><button type="button" class="oe-ziel-btn" data-oe-ziel="3">Stufe 3 · Sach- &amp; Ertragswert</button></div><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p></div>
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_immometrica_id" value="">
@@ -1120,7 +1120,7 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
-        <div class="f s2" id="oe-auto-wrap"><div id="oe-ziel" class="oe-ziel" role="group" aria-label="Eingabetiefe"><span class="oe-ziel-lbl">Eingabetiefe</span><button type="button" class="oe-ziel-btn" data-oe-ziel="1">Stufe 1 · Marktpreis</button><button type="button" class="oe-ziel-btn" data-oe-ziel="2">Stufe 2 · erweitert</button><button type="button" class="oe-ziel-btn" data-oe-ziel="3">Stufe 3 · Sach- &amp; Ertragswert</button></div><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-auto" class="oe-auto"></div><div id="oe-stufen" class="oe-stufen"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div id="oe-anfragen" class="oe-anfragen"><span class="oe-anfragen-lbl">Anfragen</span><button type="button" class="oe-btn" style="font-size:12.5px"
+        <div class="f s2" id="oe-auto-wrap"><div id="oe-auto" class="oe-auto"></div><div id="oe-stufen" class="oe-stufen"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div id="oe-anfragen" class="oe-anfragen"><span class="oe-anfragen-lbl">Anfragen</span><button type="button" class="oe-btn" style="font-size:12.5px"
             onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
             Unterlagen beim Amt anfordern
           </button></div></div>
@@ -1339,7 +1339,7 @@ label.dp-required.qc-required::after {
         <div class="card-title">Wertanker</div>
         <div class="g3">
           <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
-      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div></div>
+      <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div><div id="oe-vw" class="oe-vw" style="display:none"></div></div>
       <div class="f"><label title="Erwarteter Wert nach Abschluss der Sanierung/Modernisierung (stabilisierter Zustand). Banken rechnen Sanierungsfinanzierungen gegen diesen Wert (as-completed).">Wert nach Sanierung <span class="cf-hint">(optional · stabilisiert)</span></label><div class="iw"><span class="pfx">€</span><input id="wert_soll" type="text" inputmode="decimal" placeholder="z.B. 1.250.000" class="trl" oninput="calc()"></div></div>
         </div>
       </div><!-- /obj-extra-wrap -->
@@ -3550,7 +3550,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1840"></script>
-<script src="js/objekt-reiter.js?v=v1852a"></script>
+<script src="js/objekt-reiter.js?v=v1852b"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1738"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>

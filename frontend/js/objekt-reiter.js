@@ -209,9 +209,21 @@
     }
     var tg = $('obj-extra-toggle');
     if (tg && typeof tg._dpSetOpen === 'function') { if (z >= 2) tg._dpSetOpen(true); }
-    /* Pflichtfelder markieren: nur die der Zielstufe, nur solange leer */
-    document.querySelectorAll('.f.oe-pflicht-fehlt').forEach(function (f) { f.classList.remove('oe-pflicht-fehlt'); });
-    fehltFuer(z).forEach(function (id) { var el = $(id); var f = el && el.closest('.f'); if (f) f.classList.add('oe-pflicht-fehlt'); });
+    /* Pflichtfelder markieren: nur die der Zielstufe, nur solange leer.
+       v1852b: die Stylesheet-Regel kam am Eingabefeld nicht an (gemessen:
+       Rahmen blieb var(--border), auch der Schatten fehlte — eine
+       staerkere Regel gewinnt). Inline mit !important schlaegt alles,
+       und beim Loeschen wird es wieder entfernt. */
+    document.querySelectorAll('.f.oe-pflicht-fehlt').forEach(function (f) {
+      f.classList.remove('oe-pflicht-fehlt');
+      f.querySelectorAll('input,select').forEach(function (el) { el.style.removeProperty('border-color'); el.style.removeProperty('box-shadow'); });
+    });
+    fehltFuer(z).forEach(function (id) {
+      var el = $(id); var f = el && el.closest('.f'); if (!f) return;
+      f.classList.add('oe-pflicht-fehlt');
+      el.style.setProperty('border-color', '#B8625C', 'important');
+      el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
+    });
   }
 
   /* ═══ Stufen-Knöpfe: Kontingent UND Vollständigkeit ══════════════════ */
@@ -241,7 +253,12 @@
     _fehlStufe = s;
     if (fehlt.length) { fehlendeZeigen(s, fehlt); abweichend(fehlt[0]); return; }
     fehlendeZeigen(s, []);
-    if (window.DealPilotMB && typeof DealPilotMB.run === 'function') DealPilotMB.run({ stufe: s });
+    if (window.DealPilotMB && typeof DealPilotMB.run === 'function') {
+      var p = DealPilotMB.run({ stufe: s });
+      /* danach den Verlauf nachladen — der neue Bericht gehört in die Übernahme-Auswahl */
+      var nach = function () { setTimeout(verkehrswertUebernahme, 1500); };
+      if (p && typeof p.then === 'function') p.then(nach, nach); else setTimeout(nach, 10000);
+    }
   }
 
   /* ═══ Gewerke: Stufenvorschlag aus derselben Tabelle wie der Bericht ══ */
@@ -306,10 +323,51 @@
     box.style.display = '';
   }
 
+  /* ═══ Verkehrswert aus dem Marktbericht übernehmen ═══════════════════
+     Marcel, 04.10.2026: „Wenn wir einen Verkehrswert ermittelt haben
+     sollten wir am feld verkehrswert auch ein button haben mit übernahme.
+     wenn es mehrere marktberichte gibt dann zum auswählen."
+     Quelle ist der Verlauf (mb.object_snapshots über
+     /marktbericht/objects/history?ref=…), derselbe, den Deal-Aktion und
+     Portfolio-Pilot lesen. Übernommen wird der Marktwert des gewählten
+     Berichts — mit Datum und Stufe, damit klar ist, was da steht. */
+  var _vwLauf = 0;
+  function _datum(iso) { try { return new Date(iso).toLocaleDateString('de-DE'); } catch (e) { return String(iso || '').slice(0, 10); } }
+  function _stufeAus(h) { var m = String(h.ai_mode || '').match(/stufe[_\s]?(\d)/i); return m ? 'Stufe ' + m[1] : (h.ai_mode ? String(h.ai_mode) : ''); }
+  async function verkehrswertUebernahme() {
+    var box = $('oe-vw'); if (!box) return;
+    var ref = window._currentObjKey; if (!ref) { box.style.display = 'none'; return; }
+    var lauf = ++_vwLauf;
+    var j = await api('/marktbericht/objects/history?ref=' + encodeURIComponent(ref));
+    if (lauf !== _vwLauf) return;
+    var liste = ((j && j.history) || []).filter(function (h) { return Number(h.market_value) > 0; });
+    if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    liste.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+    var opt = function (h, i) {
+      return '<option value="' + i + '">' + _datum(h.created_at) + (_stufeAus(h) ? ' · ' + _stufeAus(h) : '') + ' · ' + deNum(h.market_value, 0) + ' €</option>';
+    };
+    box.innerHTML = (liste.length > 1
+      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'
+      : '<span class="oe-q">Marktbericht ' + _datum(liste[0].created_at) + (_stufeAus(liste[0]) ? ' · ' + _stufeAus(liste[0]) : '') + ': <b>' + deNum(liste[0].market_value, 0) + ' €</b></span>')
+      + '<button type="button" class="oe-btn" id="oe-vw-btn">als Verkehrswert übernehmen</button>'
+      + (liste.length > 1 ? '<span class="oe-q">' + liste.length + ' Berichte im Verlauf</span>' : '');
+    box.style.display = '';
+    box._liste = liste;
+  }
+  function verkehrswertSetzen() {
+    var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
+    var sel = $('oe-vw-wahl'); var h = box._liste[sel ? parseInt(sel.value, 10) || 0 : 0]; if (!h) return;
+    el.value = String(Math.round(Number(h.market_value)));
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    if (typeof calc === 'function') { try { calc(); } catch (e) {} }
+    if (typeof toast === 'function') { try { toast('✓ Verkehrswert ' + deNum(h.market_value, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
+  }
+
   /* ═══ Verdrahtung ════════════════════════════════════════════════════ */
   var _t = null;
   function spaeter(fn, ms) { clearTimeout(_t); _t = setTimeout(fn, ms || 350); }
-  function alles() { zielAnwenden(); automatik(); gewerke(); lageVergleich(); }
+  function alles() { zielAnwenden(); automatik(); gewerke(); lageVergleich(); verkehrswertUebernahme(); }
   var _verdrahtet = false;
   function verdrahten() {
     if (_verdrahtet || !$('oe-auto')) return;
@@ -317,6 +375,7 @@
     document.addEventListener('click', function (e) {
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }
       var zb = e.target.closest('[data-oe-ziel]'); if (zb) { zielSetzen(parseInt(zb.getAttribute('data-oe-ziel'), 10)); return; }
+      if (e.target.closest('#oe-vw-btn')) { verkehrswertSetzen(); return; }
       var s = e.target.closest('[data-oe-stufe]');
       if (s && !s.disabled) stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10));
     });
