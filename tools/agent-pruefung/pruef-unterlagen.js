@@ -66,7 +66,14 @@ const gewerblich = [
   'https://www.katasteramt-online.de/bestellen',
   'https://baulastenverzeichnis-online.de/nrw',
   'https://grundbuchauszug24.de',
-  'https://geoindex.de/flurkarte'
+  'https://geoindex.de/flurkarte',
+  /* v1833c · DIESE DREI SIND GEMESSEN, NICHT AUSGEDACHT. Der erste kam
+     am 04.10.2026 aus einer echten Recherche für Hüllhorst zurück und
+     rutschte durch das damalige Muster — es kannte „portal" nur als
+     Nachsilbe. Gehalten hat nur die Belegprüfung. */
+  'https://portal-grundbuchamt.de/grundbuchamt/Nordrhein-Westfalen/32609-Huellhorst/antragsformular',
+  'https://mein-grundbuchauszug.de/bestellen',
+  'https://www.flurkarte-express.de/nrw'
 ];
 for (const url of gewerblich) {
   pruefe('erkennt gewerblich: ' + url.slice(8, 40), u.istGewerblich(url) === true);

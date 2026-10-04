@@ -106,12 +106,42 @@ ARTEN.forEach((a) => { ARTEN_MAP[a.id] = a; });
 /* Gewerbliche Bestellportale sind keine amtliche Quelle — auch nicht für
    die Zuständigkeit. Sie sehen auf den ersten Blick amtlich aus, und
    genau darauf sind sie gebaut. */
-const GEWERBLICH = /(katasteramt|baulastenverzeichnis|grundbuchauszug|altlasten|bauakte|flurkarte)[-.]?(online|portal|direkt|service|24)|geoindex|immobilien-?scout|grundbuch24|\.shop\b/i;
+/* ── v1833c · DAS MUSTER WAR ZU ENG ───────────────────────────────────────
+ *
+ * GEMESSEN am 04.10.2026: die Grundbuch-Recherche für Hüllhorst nannte als
+ * Quelle `portal-grundbuchamt.de` — ein gewerblicher Antragsservice, der
+ * sich im eigenen Hinweis als „privater Antragsservice" zu erkennen gibt.
+ * Mein Muster fing ihn NICHT, weil es „portal" nur als Nachsilbe kannte
+ * (`katasteramt-portal`), nicht als Vorsilbe.
+ *
+ * Gehalten hat trotzdem die zweite Linie: die Adresse stand dort nicht,
+ * also kein Beleg. Genau dafür sind es zwei Prüfungen.
+ *
+ *   > Ein Filter, der einmal durchlässt, ist kein kaputter Filter — er ist
+ *   > der Grund, warum es einen zweiten gibt. Beide zu haben ist die
+ *   > Entscheidung, nicht den einen perfekt zu machen.
+ *
+ * Erkannt wird jetzt in beide Richtungen, und die amtlichen Domains sind
+ * ausdrücklich ausgenommen: eine echte Behördenseite endet auf `.de` unter
+ * einem Kreis-, Stadt-, Landes- oder Justiznamen, und `justiz.nrw.de`
+ * enthält selbst das Wort „justiz" — ein blindes Muster würde sie treffen. */
+const AMTLICH = /(^|\.)((kreis|stadt|gemeinde|landkreis|bezirk)-[a-z-]+|justiz|service|serviceportal|amt24|buergerservice)\.[a-z]{2,}$|\.(bund|nrw|bayern|berlin|hamburg|bremen|sachsen|thueringen|niedersachsen|hessen|rlp|saarland|schleswig-holstein|brandenburg|mv-regierung|sachsen-anhalt|baden-wuerttemberg)\.de$/i;
+const GEWERBLICH = new RegExp(
+  '(katasteramt|baulastenverzeichnis|grundbuchauszug|grundbuchamt|altlasten|bauakte|flurkarte|grundbuch)'
+  + '[-._]?(online|portal|direkt|service|24|express|jetzt|antrag)'
+  + '|(online|portal|direkt|express|mein|dein)[-._]?'
+  + '(katasteramt|baulastenverzeichnis|grundbuchauszug|grundbuchamt|bauakte|flurkarte|grundbuch)'
+  + '|geoindex|immobilien-?scout|grundbuch24|antragsservice|\\.shop\\b', 'i');
 
 function istGewerblich(url) {
   if (!url) return false;
-  try { return GEWERBLICH.test(new URL(url).hostname + new URL(url).pathname); }
-  catch (e) { return GEWERBLICH.test(String(url)); }
+  let wirt = String(url), pfad = '';
+  try { const x = new URL(url); wirt = x.hostname; pfad = x.pathname; }
+  catch (e) { /* kein gueltiger Link — dann gegen die ganze Zeichenkette */ }
+  /* Eine amtliche Domain bleibt amtlich, auch wenn ihr Pfad ein
+     Schlagwort enthält (`justiz.nrw.de/grundbuchamt`). */
+  if (AMTLICH.test(wirt)) return false;
+  return GEWERBLICH.test(wirt + pfad);
 }
 
 function gemeindeSchluessel(plz, ort) {
