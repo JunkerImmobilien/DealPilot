@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-04T07:25:20.780Z",
+ "erzeugt_am": "2026-10-04T08:51:02.042Z",
  "quellen": {
   "voice-import": "7dbbe6cf88e245a8",
   "objektart-felder": "7e35d8f32caad19d",
-  "storage": "077cfe4e9901f982",
-  "index-html": "a2a37aa1c4659875",
+  "storage": "6f0d0bab4dbf587e",
+  "index-html": "82986628f549db21",
   "grest": "9c0a4587759b4148"
  },
  "daten": {
@@ -450,6 +450,36 @@
    "d2_auszahl",
    "d2_az",
    "d2_at",
+   "d2_vertrag",
+   "d2_bspar",
+   "ek_inkl_nk",
+   "afa_sonder7b_aktiv",
+   "afa_sonder7b_neubau",
+   "afa_sonder7b_vermietung",
+   "afa_sonder7b_eh40",
+   "afa_sonder7b_baukosten",
+   "fesh_b",
+   "fesh_b_cost",
+   "fesh_d",
+   "fesh_d_cost",
+   "fesh_e",
+   "fesh_e_cost",
+   "fesh_f",
+   "fesh_f_cost",
+   "fesh_h",
+   "fesh_h_cost",
+   "fesh_k",
+   "fesh_k_cost",
+   "fesh_o",
+   "fesh_o_cost",
+   "fesh_s",
+   "fesh_s_cost",
+   "inv_tax_active",
+   "inv_tax_years",
+   "grenz_auto",
+   "d1_vertragsdatum",
+   "d2_vertragsdatum",
+   "bspar_vertragsdatum",
    "bspar_inst",
    "bspar_vertrag",
    "bspar_sum",
@@ -1180,6 +1210,173 @@
     "id": "d2_at",
     "kind": "text",
     "label": "Tilgung Anschluss (%)"
+   },
+   {
+    "id": "d2_vertrag",
+    "kind": "text",
+    "label": "Vertragsnummer"
+   },
+   {
+    "id": "d2_bspar",
+    "kind": "text",
+    "label": "Bausparvertrag (optional)"
+   },
+   {
+    "id": "ek_inkl_nk",
+    "kind": "bool",
+    "label": "Eigenkapital entspricht den Kaufnebenkosten"
+   },
+   {
+    "id": "afa_sonder7b_aktiv",
+    "kind": "bool"
+   },
+   {
+    "id": "afa_sonder7b_neubau",
+    "kind": "bool",
+    "label": "10 Jahre Vermietung verbindlich"
+   },
+   {
+    "id": "afa_sonder7b_vermietung",
+    "kind": "bool",
+    "label": "Baukosten ≤ 5.200 €/m² Wohnfläche"
+   },
+   {
+    "id": "afa_sonder7b_eh40",
+    "kind": "bool",
+    "label": "§ 7b Sonder-AfA aktivieren"
+   },
+   {
+    "id": "afa_sonder7b_baukosten",
+    "kind": "bool",
+    "label": "Effizienzhaus 40 NH (QNG-Siegel)"
+   },
+   {
+    "id": "fesh_b",
+    "kind": "bool",
+    "label": "Dach/Fassade €"
+   },
+   {
+    "id": "fesh_b_cost",
+    "kind": "text",
+    "label": "Dach/Fassade €"
+   },
+   {
+    "id": "fesh_d",
+    "kind": "bool",
+    "label": "Heizung €"
+   },
+   {
+    "id": "fesh_d_cost",
+    "kind": "text",
+    "label": "Heizung €"
+   },
+   {
+    "id": "fesh_e",
+    "kind": "bool",
+    "label": "Fenster €"
+   },
+   {
+    "id": "fesh_e_cost",
+    "kind": "text",
+    "label": "Fenster €"
+   },
+   {
+    "id": "fesh_f",
+    "kind": "bool",
+    "label": "Sanierungsbedarf einschätzen"
+   },
+   {
+    "id": "fesh_f_cost",
+    "kind": "text",
+    "label": "Sanierungsbedarf einschätzen"
+   },
+   {
+    "id": "fesh_h",
+    "kind": "bool",
+    "label": "Sanitär €"
+   },
+   {
+    "id": "fesh_h_cost",
+    "kind": "text",
+    "label": "Sanitär €"
+   },
+   {
+    "id": "fesh_k",
+    "kind": "bool",
+    "label": "Bäder €"
+   },
+   {
+    "id": "fesh_k_cost",
+    "kind": "text",
+    "label": "Bäder €"
+   },
+   {
+    "id": "fesh_o",
+    "kind": "bool",
+    "label": "Küche €"
+   },
+   {
+    "id": "fesh_o_cost",
+    "kind": "text",
+    "label": "Küche €"
+   },
+   {
+    "id": "fesh_s",
+    "kind": "bool",
+    "label": "Elektrik €"
+   },
+   {
+    "id": "fesh_s_cost",
+    "kind": "text",
+    "label": "Elektrik €"
+   },
+   {
+    "id": "inv_tax_active",
+    "kind": "bool",
+    "label": "Inventarkosten"
+   },
+   {
+    "id": "inv_tax_years",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "5",
+      "text": "5 Jahre"
+     },
+     {
+      "wert": "8",
+      "text": "8 Jahre"
+     },
+     {
+      "wert": "10",
+      "text": "10 Jahre (Standard)"
+     },
+     {
+      "wert": "15",
+      "text": "15 Jahre"
+     }
+    ],
+    "label": "Verteilung über"
+   },
+   {
+    "id": "grenz_auto",
+    "kind": "bool",
+    "label": "Persönl. Grenzsteuersatz (%)"
+   },
+   {
+    "id": "d1_vertragsdatum",
+    "kind": "text",
+    "label": "Vertragsdatum"
+   },
+   {
+    "id": "d2_vertragsdatum",
+    "kind": "text",
+    "label": "Vertragsdatum"
+   },
+   {
+    "id": "bspar_vertragsdatum",
+    "kind": "text",
+    "label": "Vertragsdatum"
    },
    {
     "id": "bspar_inst",

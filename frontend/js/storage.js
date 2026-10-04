@@ -68,6 +68,71 @@ var FIELDS = [
   // V63.49: D1-Typ + Bausparvertrag
   'd1_type', 'd1_auszahl', 'd1_vertrag',
   'd2_auszahl', 'd2_az', 'd2_at',  /* V354-fields: D2 Auszahlung + eigene Anschlussfinanzierung */
+  /* ── v1828 · DREI FELDER, DIE JEDES SPEICHERN VERWARFEN ────────────────
+   *
+   * GEMESSEN am 04.10.2026: `d2_vertrag`, `d2_bspar` und `ek_inkl_nk`
+   * stehen seit jeher im HTML, wurden aber NIE in diese Liste
+   * eingetragen. `collectData()` sammelt ausschliesslich, was hier steht
+   * — alles andere faellt beim Speichern lautlos weg.
+   *
+   * Besonders bitter bei den beiden ersten: `storage.js` und `calc.js`
+   * LESEN sie an vier Stellen (Bankexport, Rechnung). Sie waren also
+   * fest eingeplant und immer leer.
+   *
+   *   > Ein Feld, das gelesen und nie geschrieben wird, sieht im Code
+   *   > aus wie eine Funktion. Es ist eine Leitung ohne Zufluss.
+   *
+   * `ek_inkl_nk` wiegt am schwersten: der Haken steuert, ob der LTV auf
+   * den Kaufpreis oder auf Kaufpreis plus Nebenkosten gerechnet wird
+   * (calc.js). Wer ihn setzte, sah den richtigen Wert — bis zum naechsten
+   * Laden. Dieselbe Art Fehler wie `san_tax_active` in v1815.
+   *
+   * Die Fremdfelder-Rettung weiter unten half hier NICHT: sie bewahrt nur
+   * Schluessel, die im gespeicherten Datensatz schon stehen. Da nie etwas
+   * diese drei schrieb, konnten sie dort nie stehen. */
+  'd2_vertrag', 'd2_bspar', 'ek_inkl_nk',
+  /* ── v1828 · DREI WEITERE HAKEN, DIE KEIN NEULADEN UEBERLEBEN ──────────
+   *
+   * In v1815 habe ich `san_tax_active` repariert — und nicht gefragt, ob
+   * er Geschwister hat. Er hatte drei.
+   *
+   * GEMESSEN am 04.10.2026 an der Staging-Datenbank, der einzige Beweis
+   * der zaehlt: von 22 Objekten fuehrt `san_tax_active` 21 und
+   * `d1_vertrag` 22 — und `afa_sonder7b_*`, `fesh_*`, `inv_tax_*` fuehrt
+   * NULL. Nicht eines. Sie wurden nie gespeichert.
+   *
+   *   > Einen Fehler beheben heisst nicht, ihn gefunden zu haben. Die
+   *   > Frage danach ist immer: wo steht derselbe Fehler noch?
+   *
+   * Alle drei sind STEUERRELEVANT, genau wie v1815:
+   *
+   *   afa_sonder7b_*   § 7b Sonder-AfA — fuenf Voraussetzungen, die der
+   *                    Nutzer bestaetigt (Neubau, Vermietung, EH40,
+   *                    Baukostenobergrenze). Er hakt sie an, die
+   *                    Abschreibung springt, und nach dem naechsten Laden
+   *                    ist alles weg.
+   *   fesh_*           energetische Sanierungsmassnahmen nach § 35c,
+   *                    acht Stueck mit je einem Haken und einem Betrag —
+   *                    sechzehn Felder, alle fluechtig.
+   *   inv_tax_*        Abschreibung des Inventars, Haken und Jahre.
+   *
+   * `grenz_auto` kommt dazu: der Haken steht ab Werk AN und zieht den
+   * Grenzsteuersatz automatisch. Wer ihn abwaehlt und von Hand rechnet,
+   * hat ihn nach dem Laden wieder an — und die Automatik ueberschreibt
+   * seinen Wert. Deshalb nimmt das Leeren jetzt `defaultChecked`. */
+  'afa_sonder7b_aktiv', 'afa_sonder7b_neubau', 'afa_sonder7b_vermietung',
+  'afa_sonder7b_eh40', 'afa_sonder7b_baukosten',
+  'fesh_b', 'fesh_b_cost', 'fesh_d', 'fesh_d_cost', 'fesh_e', 'fesh_e_cost',
+  'fesh_f', 'fesh_f_cost', 'fesh_h', 'fesh_h_cost', 'fesh_k', 'fesh_k_cost',
+  'fesh_o', 'fesh_o_cost', 'fesh_s', 'fesh_s_cost',
+  'inv_tax_active', 'inv_tax_years', 'grenz_auto',
+  /* v1828 · Das Vertragsdatum. Es gab nur das Auszahlungsdatum, und das
+     ist ein anderer Tag: unterschrieben wird frueher als ausgezahlt. */
+  'd1_vertragsdatum', 'd2_vertragsdatum', 'bspar_vertragsdatum',
+  /* `bspar_zuteil` steht hier seit V63.49 und hat KEIN Element im HTML —
+     das Zuteilungsdatum wird gerechnet und in `bspar_zuteil_auto`
+     angezeigt. Der Eintrag bleibt stehen, weil er bei Altobjekten einen
+     gespeicherten Wert tragen kann; er sammelt nichts ein. */
   'bspar_inst', 'bspar_vertrag', 'bspar_sum', 'bspar_rate', 'bspar_zuteil', 'bspar_zins',
   'bspar_quote_min', 'bspar_dar_z', 'bspar_dar_t',
   // V23: Mietentwicklung Detail-Modus
@@ -844,7 +909,15 @@ function _clearFormForNewObject() {
     /* v1815 · Eine Checkbox wird nicht durch e.value='' leer. Beide
        Leer-Wege (neues Objekt, Formular zuruecksetzen) liessen den Haken
        des vorigen Objekts stehen. */
-    if (e.type === 'checkbox') { e.checked = false; return; }
+    /* v1828 � Der STANDARD aus dem Markup, nicht blind false.
+       `grenz_auto` steht im HTML auf `checked` - die Automatik fuer den
+       Grenzsteuersatz ist ab Werk an. Ein Leeren auf false haette jedem
+       neuen Objekt die Automatik abgeschaltet, ohne dass es jemand sieht.
+
+         > Eine Leerlogik, die "leer = false" annimmt, bricht jeden
+         > Haken, dessen Standard an ist. `defaultChecked` ist genau der
+         > Wert, den das Markup setzt - und damit der einzig richtige. */
+    if (e.type === 'checkbox') { e.checked = e.defaultChecked; return; }
     e.value = '';
   });
   var qcIds = ['qc_kp','qc_nkm','qc_nkm_grund','qc_nkm_stp','qc_nkm_garage','qc_nkm_sonst',
@@ -925,7 +998,15 @@ function _newObjLeeren() {
     /* v1815 · Eine Checkbox wird nicht durch e.value='' leer. Beide
        Leer-Wege (neues Objekt, Formular zuruecksetzen) liessen den Haken
        des vorigen Objekts stehen. */
-    if (e.type === 'checkbox') { e.checked = false; return; }
+    /* v1828 � Der STANDARD aus dem Markup, nicht blind false.
+       `grenz_auto` steht im HTML auf `checked` - die Automatik fuer den
+       Grenzsteuersatz ist ab Werk an. Ein Leeren auf false haette jedem
+       neuen Objekt die Automatik abgeschaltet, ohne dass es jemand sieht.
+
+         > Eine Leerlogik, die "leer = false" annimmt, bricht jeden
+         > Haken, dessen Standard an ist. `defaultChecked` ist genau der
+         > Wert, den das Markup setzt - und damit der einzig richtige. */
+    if (e.type === 'checkbox') { e.checked = e.defaultChecked; return; }
     e.value = '';
   });
   // V63.22: Auch QC-Felder explizit leeren (waren nicht in FIELDS)

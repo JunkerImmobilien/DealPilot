@@ -2515,6 +2515,15 @@ label.dp-required.qc-required::after {
             <div class="f"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
             <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
           </div>
+          <!-- v1828 · Das Vertragsdatum fehlte. Es gab nur das
+               Auszahlungsdatum — und das ist ein anderer Tag: der Vertrag
+               wird unterschrieben, die Valuta fliesst spaeter. Fuer die
+               Rechnung zaehlt die Auszahlung (anteilig.js), fuer die Akte
+               der Vertrag. -->
+          <div class="g2" style="margin-top:8px">
+            <div class="f"><label>Vertragsdatum</label><input id="d1_vertragsdatum" type="text" placeholder="z.B. 14.03.2025"></div>
+            <div class="f"></div>
+          </div>
         </details>
         <!-- V63.57: Darlehenstyp-Auswahl für D1 -->
         <div class="g2">
@@ -2624,6 +2633,7 @@ label.dp-required.qc-required::after {
         <div class="g2" style="margin-top:12px">
           <div class="f"><label>Bausparkasse</label><input id="bspar_inst" type="text" placeholder="z.B. Wüstenrot, Schwäbisch Hall"></div>
           <div class="f"><label>Vertragsnummer</label><input id="bspar_vertrag" type="text" placeholder="z.B. BSV-12345678"></div>
+          <div class="f"><label>Vertragsdatum</label><input id="bspar_vertragsdatum" type="text" placeholder="z.B. 14.03.2025"></div>
         </div>
         <div class="g2">
           <div class="f"><label>Bausparsumme</label><div class="iw"><span class="pfx">€</span><input id="bspar_sum" type="text" inputmode="decimal" placeholder="200000" class="trl" oninput="calc()"></div></div>
@@ -2692,7 +2702,7 @@ label.dp-required.qc-required::after {
           </div>
           <div class="g2">
             <div class="f"><label>Auszahlungsdatum</label><input id="d2_auszahl" type="text" placeholder="z.B. 06.2026" oninput="calc()"></div>
-            <div class="f"></div>
+            <div class="f"><label>Vertragsdatum</label><input id="d2_vertragsdatum" type="text" placeholder="z.B. 02.06.2026"></div>
           </div>
           <div class="f"><label>Darlehenssumme</label><div class="iw"><span class="pfx">€</span><input id="d2" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
           <div class="g2">
@@ -3510,7 +3520,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1700d"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1816"></script>
+<script src="js/storage.js?v=v1828"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
