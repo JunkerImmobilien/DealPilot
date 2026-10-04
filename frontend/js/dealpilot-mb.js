@@ -620,6 +620,9 @@ if (!window._wlc) {
       price_trend_pct: payload.price_trend_pct != null ? payload.price_trend_pct : null
     });
     try { if (global.AiCredits && typeof global.AiCredits.refreshAvm === 'function') setTimeout(global.AiCredits.refreshAvm, 400); } catch (e) {}
+    /* v1862b · wer auf den Bericht wartet (Reiter Objekt: Verkehrswert-Übernahme,
+       Leiste), erfährt es hier — statt erst beim nächsten Objektwechsel. */
+    try { global.dispatchEvent(new CustomEvent('dp:mb-ready', { detail: { object_key: data.object_key || null } })); } catch (e) {}
     return true;
   }
 

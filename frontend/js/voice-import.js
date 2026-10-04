@@ -8515,7 +8515,9 @@
       bevRaw: (p.bevoelkerung_trend_pct != null) ? p.bevoelkerung_trend_pct : null,
       tageRaw: (p.days_on_market != null) ? p.days_on_market
                : ((p.market_dynamics && p.market_dynamics.days_on_market != null) ? p.market_dynamics.days_on_market : null),
-      marktkontext: p.marktkontext || null,
+      /* v1862a · im Bericht ist marktkontext ein OBJEKT (vermietung, energie …) —
+         als Zeile stand „[object Object]". Nur Text wird gezeigt. */
+      marktkontext: (typeof p.marktkontext === 'string') ? p.marktkontext : null,
       erbbaurecht: p.erbbaurecht || null,
       trendRaw: (p.price_trend_pct != null) ? p.price_trend_pct : null,
       /* v1290: nur die volle Stufe liefert Fliesstext und Historie. */
@@ -9642,21 +9644,56 @@
     var gaa = p.gutachterausschuss || cc.gutachterausschuss || {};
     var zeilen = [];
 
+    /* v1862a · DIE ECHTE FORM DES BERICHTS — gemessen an Bericht 159 (Staging,
+       Stufe 3): cross_check.sachwert ist ein OBJEKT {value_eur, vorlaeufig,
+       marktangepasst, bezeichnung, sachwertfaktor, sachwertfaktor_hinweis,
+       sachwertfaktor_ausschuss, restnutzungsdauer_jahre,
+       gesamtnutzungsdauer_jahre, bodenwert_eur}, cross_check.bodenwert.wert,
+       cross_check.ertragswert {value_eur}, cross_check.ertragswert_kern.lzs.pct.
+       Bis hierher las der Dialog flache Zahlen (cc.sachwert, cc.bodenwert) —
+       _euroKurz(Objekt) ergab „–", und die Wertermittlung stand als
+       „Sachwert – · Bodenwert –" da. Die flachen Schlüssel bleiben Rückfall. */
+    var SW = (cc.sachwert && typeof cc.sachwert === 'object') ? cc.sachwert : {};
+    var EW = (cc.ertragswert && typeof cc.ertragswert === 'object') ? cc.ertragswert : {};
+    var BW = (cc.bodenwert && typeof cc.bodenwert === 'object') ? cc.bodenwert : {};
+    var LZ = (cc.ertragswert_kern && cc.ertragswert_kern.lzs) || {};
+    if (!gaa.ausschuss && !gaa.gaa_name && SW.sachwertfaktor_ausschuss) {
+      gaa = { ausschuss: SW.sachwertfaktor_ausschuss, stichtag: SW.sachwertfaktor_stichtag || null,
+              fundstelle: SW.sachwertfaktor_quelle_url || null, wert: SW.sachwertfaktor, stufe: null };
+    }
     var swf = (gaa.wert != null) ? gaa.wert
-            : (cc.sachwertfaktor != null ? cc.sachwertfaktor : null);
-    var sw  = (cc.sachwert != null) ? cc.sachwert
-            : (cc.marktangepasster_sachwert != null ? cc.marktangepasster_sachwert : null);
+            : (SW.sachwertfaktor != null ? SW.sachwertfaktor
+            : (typeof cc.sachwertfaktor === 'number' ? cc.sachwertfaktor : null));
+    var sw  = (SW.value_eur != null) ? SW.value_eur
+            : (typeof cc.sachwert === 'number' ? cc.sachwert
+            : (cc.marktangepasster_sachwert != null ? cc.marktangepasster_sachwert : null));
+    var bw  = (BW.wert != null) ? BW.wert
+            : (SW.bodenwert_eur != null ? SW.bodenwert_eur
+            : (typeof cc.bodenwert === 'number' ? cc.bodenwert : null));
+    var rnd = (SW.restnutzungsdauer_jahre != null) ? SW.restnutzungsdauer_jahre
+            : (cc.rnd_jahre != null ? cc.rnd_jahre : null);
+    var gnd = SW.gesamtnutzungsdauer_jahre || null;
 
-    if (cc.vorlaeufiger_sachwert != null) {
+    if (bw != null) zeilen.push(_zeile('Bodenwert', _euroKurz(bw)));
+    if (sw != null) {
+      var swName = SW.bezeichnung ? (String(SW.bezeichnung).charAt(0).toUpperCase() + String(SW.bezeichnung).slice(1))
+                 : (SW.marktangepasst === false ? 'Vorläufiger Sachwert' : 'Sachwert (marktangepasst)');
+      zeilen.push(_zeile(escH(swName), _euroKurz(sw)));
+    } else if (cc.vorlaeufiger_sachwert != null) {
       zeilen.push(_zeile('Vorläufiger Sachwert', _euroKurz(cc.vorlaeufiger_sachwert)));
     }
     if (swf != null) {
       zeilen.push(_zeile('Sachwertfaktor', String(swf).replace('.', ',')
         + (gaa.stufe ? ' · Stufe ' + escH(gaa.stufe) : '')));
+    } else if (SW.sachwertfaktor_hinweis || SW.hinweis_kurz) {
+      zeilen.push(_zeile('Sachwertfaktor', 'nicht abgeleitet — '
+        + escH(String(SW.sachwertfaktor_hinweis || SW.hinweis_kurz).slice(0, 160))));
     }
-    if (sw != null) zeilen.push(_zeile('Sachwert (marktangepasst)', _euroKurz(sw)));
-    if (cc.bodenwert != null) zeilen.push(_zeile('Bodenwert', _euroKurz(cc.bodenwert)));
-    if (cc.rnd_jahre != null) zeilen.push(_zeile('Restnutzungsdauer', Math.round(cc.rnd_jahre) + ' Jahre'));
+    if (rnd != null) zeilen.push(_zeile('Restnutzungsdauer', Math.round(rnd) + ' Jahre' + (gnd ? ' von ' + gnd : '')));
+    if (EW.value_eur != null) {
+      zeilen.push(_zeile('Ertragswert', _euroKurz(EW.value_eur)
+        + (LZ.pct != null ? ' · Liegenschaftszins ' + String(LZ.pct).replace('.', ',') + ' %' : '')));
+    }
 
     /* DER AUSSCHUSS GEHOERT DAZU. Eine amtliche Zahl ohne ihre Herkunft
        ist im Gutachten wertlos — und der Modellvermerk ist Pflicht
@@ -11065,6 +11102,26 @@
     /* v1315: Erst die Bestaetigung. Sie uebernimmt nur, was schon
        dasteht - das Modell koennte hier eine Hausnummer erfinden. */
     if (_rfBestaetigungUebertragen(text)) { _rfWeiter(); return; }
+    /* v1862a · Eine nackte Zahl auf eine Frage mit genau EINEM offenen
+       Zahlenfeld braucht kein Modell. Gemessen: „50" auf den Miteigentums-
+       anteil kam zweimal als „Da war nichts zu verstehen" zurück, erst
+       „Miteigentumsanteil 50 Prozent" ging durch. */
+    try {
+      var _mz = text.match(/^\s*(-?\d{1,3}(?:\.\d{3})+(?:,\d+)?|-?\d+(?:[.,]\d+)?)\s*(%|prozent|euro|€|eur|m²|m2|qm|quadratmeter|jahre?|stück|stueck)?\.?\s*$/i);
+      if (_mz) {
+        var _offen = (e.ids || []).filter(function (id) {
+          var w = _rf.data.fields[id];
+          if (!(w === undefined || w === null || w === '')) return false;
+          var k = catalogEntry(_rf.catalog, id);
+          return !k || (k.kind !== 'select' && k.kind !== 'bool' && k.kind !== 'date');
+        });
+        if (_offen.length === 1) {
+          var _f = {}; _f[_offen[0]] = _mz[1];
+          _rfUebernehmen(_f, ausSprache);
+          return;
+        }
+      }
+    } catch (_ez) {}
     return Auth.apiCall('/ai/extract-text', {
       method: 'POST',
       body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }

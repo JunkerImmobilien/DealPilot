@@ -578,6 +578,11 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', verdrahten); else verdrahten();
   setTimeout(verdrahten, 600); setTimeout(verdrahten, 2500);
 
+  /* v1862b · ein Bericht, der aus dem Dialog (geführte Eingabe, Sprechlauf)
+     kam: Verkehrswert-Übernahme und Leiste nachziehen. */
+  window.addEventListener('dp:mb-ready', function () {
+    setTimeout(function () { try { verkehrswertUebernahme(); } catch (e) {} try { automatik(); } catch (e) {} }, 1500);
+  });
   window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte,
     zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen };
 })();
