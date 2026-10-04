@@ -15,8 +15,38 @@
     var p = parseInt(plz, 10);
     if (isNaN(p) || p < 1000 || p > 99999) return null;
 
-    // Sachsen
-    if (p >= 1000 && p <= 9999)  return 'SN';
+    /* ── v1837 · DIE LEITZONE 0 SIND VIER BUNDESLÄNDER ──────────────────
+     *
+     * Hier stand `if (p >= 1000 && p <= 9999) return 'SN'` — die ganze
+     * Leitzone 0 als Sachsen. Weiter unten standen zwar Regeln für
+     * Sachsen-Anhalt (6000–6999), sie wurden aber NIE erreicht: die
+     * SN-Zeile greift vorher.
+     *
+     * GEMESSEN an Marcels eigenen Objekten: Am Markt 9 und Am Markt 18 in
+     * 06184 Kabelsketal galten als Sachsen. Kabelsketal liegt in
+     * Sachsen-Anhalt.
+     *
+     *   > Eine Regel, die eine spätere unerreichbar macht, ist schlimmer
+     *   > als eine fehlende. Die fehlende sieht man, die tote nicht.
+     *
+     * Das ist derselbe Fehler, der am 04.10.2026 bei der
+     * Grunderwerbsteuer gefunden wurde (v1823) — in einer ZWEITEN Tabelle,
+     * die dieselbe Frage beantwortet. Die Aufteilung unten ist von dort
+     * übernommen (`grest-plz-lookup.js`, PLZ_RANGES), weil sie geprüft
+     * ist: 14 von 14 Postleitzahlen richtig.
+     *
+     * DASS ES ZWEI TABELLEN GIBT, BLEIBT FALSCH. Sie beantworten
+     * dieselbe Frage und können wieder auseinanderlaufen. Zusammenlegen
+     * geht hier nicht ohne Weiteres, weil diese Tabelle MISCHCODES führt
+     * ('NRW-NI') und die andere sich entscheiden muss — das gehört in ein
+     * eigenes Paket. Bis dahin steht hier der Verweis. */
+    if (p >= 1000 && p <= 2999)  return 'SN';   // Dresden, Bautzen, Görlitz
+    if (p >= 3000 && p <= 3999)  return 'BB';   // Cottbus, Lausitz
+    if (p >= 4900 && p <= 4938)  return 'BB';   // Herzberg/Elster — VOR 04000
+    if (p >= 4000 && p <= 4999)  return 'SN';   // Leipzig
+    if (p >= 6000 && p <= 6999)  return 'ST';   // Halle, Merseburg, Dessau
+    if (p >= 7000 && p <= 7999)  return 'TH';   // Jena, Gera, Rudolstadt
+    if (p >= 8000 && p <= 9999)  return 'SN';   // Zwickau, Plauen, Chemnitz
     // Brandenburg (östlich) + Berlin
     if (p >= 10000 && p <= 14999) return 'BB-BE';
     if (p >= 15000 && p <= 16999) return 'BB';
@@ -37,6 +67,38 @@
     if (p >= 38000 && p <= 38999) return 'NI';
     // NRW
     if (p >= 40000 && p <= 48999) return 'NRW';
+    /* ── v1837 · ELFTAUSEND POSTLEITZAHLEN FIELEN DURCH ───────────────────
+     *
+     * GEMESSEN am 04.10.2026, ausgelöst durch Hauptstr. 51 in 49477
+     * Ibbenbüren: „Direkt-Abruf hier nicht verfügbar". Die Ursache war
+     * keine Sperre, sondern eine LÜCKE — 49477 traf keine einzige Regel,
+     * `_plzToBundesland` gab null, und null heißt hier „nicht verfügbar".
+     *
+     * Die ganze Tabelle durchgerechnet: 11.000 Postleitzahlen ohne
+     * Zuordnung, in vier Blöcken.
+     *
+     *     49000–53999   Osnabrück, KÖLN, BONN, AACHEN   (5.000)
+     *     57000–59999   Siegen, Hagen, Hamm, Soest      (3.000)
+     *     88000–89999   Ravensburg, Ulm                 (2.000)
+     *     97000–97999   Würzburg, Schweinfurt           (1.000)
+     *
+     *   > Eine Tabelle, die Bereiche aufzählt, hat ihre Lücken dort, wo
+     *   > niemand hingesehen hat. Sie fallen nicht auf, weil jede einzelne
+     *   > Zeile richtig ist — erst das Durchzählen zeigt sie.
+     *
+     * Köln allein hat über eine Million Einwohner. Für jeden Kunden dort
+     * war der Abruf gesperrt, und bis v1835 nannte der Tooltip dazu auch
+     * noch vier Bundesländer, die gar nicht gemeint waren.
+     *
+     * MISCHZONEN BLEIBEN MISCHZONEN. Wo eine Leitzone über eine
+     * Landesgrenze reicht, steht hier ein Mischcode — dann wird dem Abruf
+     * KEIN Land mitgegeben, und die Registry entscheidet über die
+     * Koordinate. Das ist besser als ein geratenes Land (v1388). */
+    if (p >= 49000 && p <= 49999) return 'NRW-NI';  // Osnabrück (NI) / Ibbenbüren, Rheine (NRW)
+    if (p >= 50000 && p <= 52999) return 'NRW';     // Köln, Leverkusen, Aachen
+    if (p >= 53000 && p <= 53999) return 'NRW-RP';  // Bonn (NRW) / Remagen, Sinzig (RP)
+    if (p >= 57000 && p <= 57999) return 'NRW-RP';  // Siegen (NRW) / Westerwald (RP)
+    if (p >= 58000 && p <= 59999) return 'NRW';     // Hagen, Lüdenscheid, Hamm, Soest
     // Hessen
     if (p >= 60000 && p <= 65999) return 'HE';
     // Rheinland-Pfalz + Saarland
@@ -47,7 +109,10 @@
     if (p >= 68000 && p <= 79999) return 'BW';
     // Bayern
     if (p >= 80000 && p <= 87999) return 'BY';
+    if (p >= 88000 && p <= 88999) return 'BW-BY';   // Ravensburg (BW) / Memmingen-Umland (BY)
+    if (p >= 89000 && p <= 89999) return 'BW-BY';   // Ulm (BW) / Neu-Ulm, Günzburg (BY)
     if (p >= 90000 && p <= 96999) return 'BY';
+    if (p >= 97000 && p <= 97999) return 'BY-BW';   // Würzburg (BY) / Tauberbischofsheim (BW)
     // Thüringen
     if (p >= 98000 && p <= 99999) return 'TH';
     if (p >= 99000 && p <= 99999) return 'TH';
@@ -75,6 +140,10 @@
     'HB-NI': { name: 'Bremen/Niedersachsen', url: 'https://immobilienmarkt.niedersachsen.de/' },
     'NRW':   { name: 'Nordrhein-Westfalen', url: 'https://www.boris.nrw.de/' },
     'NRW-NI':{ name: 'NRW/Niedersachsen', url: 'https://www.boris.nrw.de/' },
+    /* v1837 · die neuen Mischzonen */
+    'NRW-RP':{ name: 'NRW/Rheinland-Pfalz', url: 'https://www.boris.nrw.de/' },
+    'BW-BY': { name: 'Baden-Wuerttemberg/Bayern', url: 'https://www.gutachterausschuesse-bw.de/borisbw/' },
+    'BY-BW': { name: 'Bayern/Baden-Wuerttemberg', url: 'https://www.boris-bayern.de/' },
     'RP':    { name: 'Rheinland-Pfalz',   url: 'https://www.gutachterausschuesse.rlp.de/' },
     'SL':    { name: 'Saarland',          url: 'https://geoportal.saarland.de/' },
     'SL-RP': { name: 'Saarland/RLP',      url: 'https://geoportal.saarland.de/' },
@@ -335,7 +404,8 @@
   var PLZ_TO_BORIS = {
     'BW':'bw', 'BY':'by', 'BE':'be', 'BB':'bb', 'BB-BE':'bb', 'HB':'borisd', 'HB-NI':'borisd',
     'HH':'borisd', 'HH-SH':'sh', 'HE':'he', 'HE-NI':'he', 'MV':'mv', 'NI':'borisd',
-    'NRW':'nrw', 'NRW-NI':'nrw', 'RP':'borisd', 'SH':'sh', 'SL':'sl', 'SL-RP':'sl',
+    'NRW':'nrw', 'NRW-NI':'nrw', 'NRW-RP':'nrw', 'RP':'borisd', 'SH':'sh', 'SL':'sl', 'SL-RP':'sl',
+    'BW-BY':'bw', 'BY-BW':'by',   /* v1837 · konservativ auf das groessere Land */
     'SN':'borisd', 'ST':'borisd', 'TH':'borisd'
   };
   /* v1265 · Der Rückfall sperrte vier Länder, die längst frei sind.
