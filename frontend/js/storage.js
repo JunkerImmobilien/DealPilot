@@ -129,6 +129,10 @@ var FIELDS = [
   /* v1828 · Das Vertragsdatum. Es gab nur das Auszahlungsdatum, und das
      ist ein anderer Tag: unterschrieben wird frueher als ausgezahlt. */
   'd1_vertragsdatum', 'd2_vertragsdatum', 'bspar_vertragsdatum',
+  /* v1834 � Gemarkung, Flur und Flurstueck. Sie beschreiben den Boden,
+     dessen Wert eine Zeile hoeher steht, und sind zugleich das, was jedes
+     Amt bei einer Unterlagenanfrage zuerst wissen will. */
+  'gemarkung', 'flur', 'flurstueck',
   /* `bspar_zuteil` steht hier seit V63.49 und hat KEIN Element im HTML —
      das Zuteilungsdatum wird gerechnet und in `bspar_zuteil_auto`
      angezeigt. Der Eintrag bleibt stehen, weil er bei Altobjekten einen

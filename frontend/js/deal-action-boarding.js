@@ -137,6 +137,28 @@
           '<div><div class="dab-ct">Pers\u00f6nliche Unterlagen</div><ul class="dab-list"><li>Personalausweis (Kopie)</li><li>Letzte 3 Gehaltsabrechnungen</li><li>Steuerbescheide 2 Jahre</li><li>SCHUFA-Selbstauskunft</li><li>Verm\u00f6gen &amp; Verbindlichkeiten</li></ul></div>' +
           '<div><div class="dab-ct">Objekt-Unterlagen</div><ul class="dab-list"><li>Expos\u00e9 / Verkaufsanzeige</li><li>Aktueller Grundbuchauszug</li><li>Wohnfl\u00e4chenberechnung</li><li>Nebenkostenabrechnungen</li><li>Bei WEG: Teilungserkl\u00e4rung</li></ul></div>' +
         '</div>' +
+        /* \u2500\u2500 v1834 \u00b7 DIE LISTE SAGTE, WAS FEHLT \u2014 NICHT, WOHER ES KOMMT \u2500\u2500\u2500
+         *
+         * Dieses Band listet seit jeher \u201eAktueller Grundbuchauszug" als
+         * eine Zeile zum Abhaken. Woher man ihn bekommt, stand nirgends.
+         *
+         *   > Eine Liste, die nur benennt was fehlt, ist eine Mahnung.
+         *   > Erst der Weg daneben macht sie zu einer Hilfe.
+         *
+         * Deshalb KEIN neues Band: der Knopf geh\u00f6rt an die Liste, die
+         * ohnehin danach fragt. Er \u00f6ffnet dieselbe Fl\u00e4che wie der
+         * Einstieg beim Bodenrichtwert \u2014 zwei T\u00fcren, ein Raum. */
+        '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border,#2a2522);' +
+        'display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+          '<div style="flex:1 1 240px;color:var(--muted,#8b8678);font-size:12.5px;line-height:1.55">' +
+            'Flurkarte, Grundbuchauszug, Altlasten, Baulasten und Bauakte ' +
+            'kommen von f\u00fcnf verschiedenen \u00c4mtern. DealPilot ermittelt ' +
+            'die zust\u00e4ndige Stelle und schreibt den Antrag.' +
+          '</div>' +
+          '<button type="button" class="btn" style="font-size:12.5px"' +
+          ' onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">' +
+          'Unterlagen beim Amt anfordern</button>' +
+        '</div>' +
         '<div id="dab-dr-host" class="dab-dr-host"></div>' +
       '</div>' +
 

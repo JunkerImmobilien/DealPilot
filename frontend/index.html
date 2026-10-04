@@ -1312,6 +1312,29 @@ label.dp-required.qc-required::after {
 <div class="f"><label>Grundstücksfläche (m²)</label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
+        <!-- ═══ v1834 · FLURSTÜCK UND UNTERLAGEN ═══════════════════════════
+             Marcel am 04.10.2026 zur Unterlagenanfrage: „ob wir das
+             vielleicht auch direkt im Tab Objekt, da beim Bodenrichtwert
+             mit angeben."
+
+             Genau hier gehört es hin, und zwar aus einem sachlichen Grund:
+             Gemarkung, Flur und Flurstück BESCHREIBEN den Boden, dessen
+             Wert eine Zeile höher steht. Und sie sind zugleich das, was
+             jedes Amt zuerst wissen will.
+
+             Ohne diese Angaben muss das Amt das Flurstück selbst
+             heraussuchen. Das geht, dauert aber länger — deshalb stehen
+             die Felder da, wo man ohnehin ist, wenn man den Bodenwert
+             pflegt. -->
+        <div class="f"><label>Gemarkung</label><input id="gemarkung" type="text" placeholder="z.B. Hüllhorst"></div>
+        <div class="f"><label>Flur</label><input id="flur" type="text" placeholder="z.B. 3"></div>
+        <div class="f"><label>Flurstück</label><input id="flurstueck" type="text" placeholder="z.B. 45"></div>
+        <div class="f s2" style="display:flex;align-items:flex-end">
+          <button type="button" class="btn btn-ghost" style="font-size:12.5px"
+            onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
+            Unterlagen beim Amt anfordern
+          </button>
+        </div>
         <!-- ═══ v1312 · Erbbaurecht (Erbpacht) ═══════════════════════════
              Steht hier, weil das Erbbaurecht eine Belastung des BODENS ist -
              der Bodenwert direkt darueber ist die Groesse, an der es haengt.
@@ -3501,6 +3524,7 @@ label.dp-required.qc-required::after {
   <script src="js/ueberfuehrung-wizard.js?v=v1236"></script>
   <script src="js/apikeys.js?v=811"></script>
   <script src="js/telegram-panel.js?v=v1827"></script>
+  <script src="js/unterlagen-modal.js?v=v1834"></script>
   <script src="js/settings.js?v=v1719b"></script>
 <script src="js/pricing-modal.js?v=v1674"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
@@ -3581,7 +3605,7 @@ label.dp-required.qc-required::after {
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1599"></script>
 <script src="js/deal-action-readycheck.js?v=v1622"></script>
-<script src="js/deal-action-boarding.js?v=v1830"></script>
+<script src="js/deal-action-boarding.js?v=v1834"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v1081"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
