@@ -237,12 +237,57 @@
     catch (e) { if (window.toast) window.toast('⚠ ' + (e && e.message || e)); }
   }
 
-  async function trennen() {
-    /* Keine Browser-Bestaetigung (confirm blockiert und sieht fremd aus) —
-       die Verbindung ist mit einem Code in zehn Sekunden wiederhergestellt,
-       es geht nichts verloren. */
-    try { await _api('/link', { method: 'DELETE' }); _neu(); }
-    catch (e) { if (window.toast) window.toast('⚠ ' + (e && e.message || e)); }
+  /* v1825 · HIER STAND "es geht nichts verloren". Das stimmt nicht mehr:
+     seit v1825 loescht das Trennen auch den CHATVERLAUF — Adressen,
+     Kaufpreise, den laufenden Entwurf. Das ist gewollt (Artikel 17 DSGVO),
+     aber es ist ein Verlust.
+
+       > Ein Knopf, dessen Kommentar seine Wirkung beschoenigt, ist ein
+       > Knopf, den man versehentlich drueckt.
+
+     Gefragt wird im Panel, nicht mit `confirm()`: ein Browser-Dialog
+     blockiert und sieht fremd aus, und er laesst sich nicht erklaeren. */
+  var _trennenOffen = false;
+
+  async function trennen(bestaetigt) {
+    if (!bestaetigt) {
+      if (_trennenOffen) return;
+      _trennenOffen = true;
+      var host = document.getElementById(HOST_ID);
+      if (!host) { _trennenOffen = false; return; }
+      var box = document.createElement('div');
+      box.id = 'dptg-trennen';
+      box.style.cssText = 'margin:10px 0;padding:12px 14px;border-radius:10px;'
+        + 'border:1px solid var(--wl-B8625C,#B8625C);background:rgba(184,98,92,.08);'
+        + 'font-size:13px;line-height:1.5';
+      box.innerHTML = '<b>Verbindung wirklich trennen?</b><br>'
+        + 'Dabei wird auch der <b>Chatverlauf</b> im Bot gelöscht — Adressen, '
+        + 'Kaufpreise und ein angefangenes Objekt. Deine Objekte in DealPilot '
+        + 'bleiben unberührt, der Bot-Token bleibt hinterlegt.'
+        + '<div style="margin-top:10px;display:flex;gap:8px">'
+        + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
+        + ' onclick="DealPilotTelegram.trennen(true)">Trennen und Verlauf löschen</button>'
+        + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
+        + ' onclick="DealPilotTelegram.trennenAbbrechen()">Abbrechen</button>'
+        + '</div>';
+      host.insertBefore(box, host.firstChild);
+      return;
+    }
+    _trennenOffen = false;
+    try {
+      var r = await _api('/link', { method: 'DELETE' });
+      _neu();
+      if (window.toast) {
+        window.toast('✓ Getrennt'
+          + (r && r.dialoge_geloescht ? ' · Verlauf gelöscht' : ''));
+      }
+    } catch (e) { if (window.toast) window.toast('⚠ ' + (e && e.message || e)); }
+  }
+
+  function trennenAbbrechen() {
+    _trennenOffen = false;
+    var b = document.getElementById('dptg-trennen');
+    if (b && b.parentNode) b.parentNode.removeChild(b);
   }
 
   function kopieren(text) {
@@ -272,6 +317,10 @@
   window.DealPilotTelegram = {
     botSpeichern: botSpeichern, botEntfernen: botEntfernen,
     codeHolen: codeHolen, umschalten: umschalten, trennen: trennen,
+    /* v1825 · Der Abbrechen-Knopf der Trennen-Rueckfrage. Ohne diesen
+       Export ruft das onclick ins Leere, und die Rueckfrage liesse sich
+       nur durch Neuladen schliessen. */
+    trennenAbbrechen: trennenAbbrechen,
     kopieren: kopieren, _mount: _mount
   };
 })();

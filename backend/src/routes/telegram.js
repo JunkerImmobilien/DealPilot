@@ -338,10 +338,42 @@ router.put('/aktiv', requireJwt, async (req, res, next) => {
 });
 
 /* ─── DELETE /link ────────────────────────────────────────────────────── */
+/* ── v1825 · TRENNEN HEISST AUCH: DER CHATVERLAUF GEHT MIT ──────────────
+ *
+ * GEMESSEN am 04.10.2026: `DELETE /link` loeschte die Verknuepfung und
+ * liess `telegram_dialog` stehen — bei Marcel zwoelf Nachrichten mit
+ * Adressen, Kaufpreisen und Mieten, dazu der laufende Anlage-Entwurf und
+ * die letzte Preisansage.
+ *
+ * Wer eine Verbindung trennt, erwartet, dass die Daten weg sind. Das ist
+ * nicht nur eine Erwartung, sondern Artikel 17 DSGVO.
+ *
+ *   > Eine Verbindung zu kappen und den Inhalt zu behalten ist kein
+ *   > Trennen. Es ist ein Archiv, von dem niemand weiss.
+ *
+ * Marcel am 04.10.2026: „dann muessen wir auch die Moeglichkeit haben,
+ * den Telegram-Bot auch wieder zu entkoppeln. Und wir muessen das
+ * vielleicht auch mit dann einer zusaetzlichen Datenschutzvereinbarung
+ * oder so das bestaetigen."
+ *
+ * Der Bot-Token bleibt bewusst stehen: er liegt verschluesselt in
+ * `user_provider_credentials` und gehoert dem Nutzer, nicht der
+ * Verknuepfung. Wer ihn loeschen will, tut das dort — sonst muesste man
+ * ihn nach jedem Trennen neu bei BotFather holen.
+ */
 router.delete('/link', requireJwt, async (req, res, next) => {
   try {
     const chatId = req.body && req.body.chat_id;
     let r;
+
+    /* Welche Chats sind betroffen? Vor dem Loeschen gefragt, weil danach
+       niemand mehr sagen kann, welche Dialoge dazugehoerten. */
+    const betroffen = await query(
+      chatId
+        ? `SELECT chat_id FROM telegram_links WHERE user_id = $1 AND chat_id = $2::bigint`
+        : `SELECT chat_id FROM telegram_links WHERE user_id = $1`,
+      chatId ? [req.user.id, String(chatId)] : [req.user.id]);
+
     if (chatId) {
       /* Als Zeichenkette hereingereicht, als BIGINT verglichen. Postgres
          wandelt den Text selbst — in JavaScript duerfte die Zahl das nicht
@@ -357,7 +389,36 @@ router.delete('/link', requireJwt, async (req, res, next) => {
         [req.user.id]
       );
     }
-    res.json({ geloescht: r.rows.length });
+
+    /* Der Verlauf, der Entwurf, die Preisansage — alles weg. Auch der
+       Dialog eines Chats, der dem Nutzer als Bot-Besitzer zugeordnet war:
+       `bot_user_id` deckt den Fall, dass er seinen eigenen Bot betreibt. */
+    let dialoge = 0;
+    try {
+      const ids = betroffen.rows.map((z) => String(z.chat_id));
+      if (ids.length) {
+        const d = await query(
+          `DELETE FROM telegram_dialog
+            WHERE bot_user_id = $1 AND chat_id = ANY($2::bigint[]) RETURNING 1`,
+          [req.user.id, ids]);
+        dialoge = d.rows.length;
+      }
+      if (!chatId) {
+        /* Beim vollstaendigen Trennen bleibt nichts stehen, auch kein
+           Dialog ohne passende Verknuepfung (etwa ein abgebrochener
+           Verbindungsversuch). */
+        const rest = await query(
+          `DELETE FROM telegram_dialog WHERE bot_user_id = $1 RETURNING 1`,
+          [req.user.id]);
+        dialoge += rest.rows.length;
+      }
+    } catch (e) {
+      /* Die Verknuepfung ist weg — das ist die Hauptsache. Dass der
+         Verlauf stehen blieb, wird aber GEMELDET, nicht verschwiegen. */
+      try { console.error('[telegram v1825] Dialog nicht geloescht: ' + (e && e.message)); } catch (_) {}
+    }
+
+    res.json({ geloescht: r.rows.length, dialoge_geloescht: dialoge });
   } catch (e) { next(e); }
 });
 

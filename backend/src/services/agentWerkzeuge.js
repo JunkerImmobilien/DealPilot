@@ -51,6 +51,7 @@ const fuehrung = require('./fuehrungService');
 const markt = require('./telegramMarktService');
 const objectService = require('./objectService');
 const voiceExtract = require('./voiceExtractService');
+const vorgaben = require('./botVorgabenService');   /* v1824 */
 const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
@@ -1128,6 +1129,219 @@ async function pakete_und_preise(ctx, args) {
   };
 }
 
+/* ── v1824 · DER SCHNELLBLICK ────────────────────────────────────────────
+ *
+ * Marcel am 04.10.2026:
+ *
+ *   "wir wollen ja als Erstes einen Deal-Score haben … dass er dann
+ *    automatisch dann eine Abfrage macht über das Objekt, ob das gut oder
+ *    schlecht ist … die Einschätzung, die der Quick-Check dort geben
+ *    würde unten, also eine Kaufempfehlung, diese Heuristik, den
+ *    Deal-Score, die Werte dazu."
+ *
+ * ── WARUM DIESES WERKZEUG KEINEN DEAL-SCORE RECHNET ───────────────────
+ *
+ * GEMESSEN am 04.10.2026: der DealPilot-Score und der Investor Deal Score
+ * werden im BROWSER gerechnet (`dealscore.js`, `dealscore2.js`). Das
+ * Backend liest nur, was dort entstanden ist — `objectService` nimmt
+ * `_kpis_cf_ns` und `_dealpilot_score` aus dem Datensatz und rechnet
+ * selbst nichts.
+ *
+ * Eine Score-Engine im Backend wäre ein zweiter Rechenkern. CLAUDE.md
+ * verbietet das aus gutem Grund:
+ *
+ *   > Eine zweite Rechnung über denselben Deal ist eine zweite Meinung.
+ *   > Im Chat stünde dann eine andere Zahl als auf der Karte, und keiner
+ *   > von beiden wäre falsch — das ist schlimmer als ein Fehler.
+ *
+ * Deshalb liefert der Schnellblick, was sich OHNE Score sagen lässt, und
+ * nennt es auch so. Drei Dreisatzrechnungen, jede offen vorgerechnet:
+ *
+ *     Bruttomietrendite   Jahreskaltmiete / Kaufpreis
+ *     Kaufpreisfaktor     Kaufpreis / Jahreskaltmiete
+ *     Kapitaldienst       Darlehen × (Zins + Tilgung)
+ *
+ * Das ist kein Score und heißt auch nicht so. Der Score kommt, sobald das
+ * Objekt in DealPilot gerechnet wurde — und dann steht er über
+ * `objekt_kennzahlen` zur Verfügung.
+ *
+ * ── UND DIE FEHLENDEN ANGABEN ─────────────────────────────────────────
+ *
+ * Marcel: "einmal den Ort abfragen, was haben wir denn da, und dann
+ * können wir ja grob das hochrechnen, was die Kaufnebenkosten wären."
+ *
+ * Die Grunderwerbsteuer steht im Landesgesetz und kommt aus der PLZ
+ * (eine Tabelle, im Frontend gepflegt). Notar und Grundbuch sind
+ * Richtwerte und werden als solche gekennzeichnet. Zins und Tilgung
+ * kommen aus seinen Vorgaben — oder es wird EINMAL gefragt.
+ */
+async function objekt_schnellblick(ctx, args) {
+  const id = await _findeObjekt(ctx, args);
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+  const d = o.daten || {};
+
+  const z = (v) => {
+    const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+  };
+  const eur = (x) => Math.round(x).toLocaleString('de-DE') + ' EUR';
+  const pct = (x) => x.toFixed(2).replace('.', ',') + ' %';
+
+  const kp = z(d.kp), nkm = z(d.nkm), ze = z(d.ze) || 0, wfl = z(d.wfl);
+  const erg = await vorgaben.ergaenzung(ctx.userId, d);
+
+  /* ── Was fehlt, um ueberhaupt etwas zu sagen? ───────────────────────── */
+  const pflicht = [];
+  if (!kp) pflicht.push('Kaufpreis');
+  if (!nkm) pflicht.push('Nettokaltmiete pro Monat');
+  if (pflicht.length) {
+    return {
+      gefunden: true, id: id, adresse: _adrVon(o),
+      geht_noch_nicht: pflicht,
+      hinweis: 'Ohne ' + pflicht.join(' und ') + ' laesst sich nichts rechnen. '
+             + 'Frag genau danach — eine Zahl, die man nicht hat, wird nicht '
+             + 'geschaetzt.'
+    };
+  }
+
+  /* ── Die drei Dreisatzrechnungen, offen ─────────────────────────────── */
+  const mieteJahr = (nkm + ze) * 12;
+  const bmr = mieteJahr / kp * 100;
+  const faktor = kp / mieteJahr;
+
+  const rechnung = {
+    jahreskaltmiete: eur(mieteJahr)
+      + (ze ? '  (' + eur(nkm * 12) + ' Miete + ' + eur(ze * 12) + ' zusaetzlich)' : ''),
+    bruttomietrendite: pct(bmr) + '  = ' + eur(mieteJahr) + ' / ' + eur(kp),
+    kaufpreisfaktor: faktor.toFixed(1).replace('.', ',') + '-fach'
+      + '  = ' + eur(kp) + ' / ' + eur(mieteJahr),
+  };
+  if (wfl) {
+    rechnung.kaufpreis_je_qm = eur(kp / wfl) + '/m²';
+    rechnung.miete_je_qm = (nkm / wfl).toFixed(2).replace('.', ',') + ' EUR/m²';
+  }
+
+  /* ── Kaufnebenkosten, soweit belegbar ───────────────────────────────── */
+  const satzVon = (id2) => {
+    if (erg.vorhanden[id2] != null) return { wert: z(erg.vorhanden[id2]), quelle: 'am Objekt' };
+    if (erg.vom_nutzer[id2] != null) return { wert: Number(erg.vom_nutzer[id2]), quelle: 'deine Vorgabe' };
+    if (erg.vorschlag[id2]) return { wert: Number(erg.vorschlag[id2].wert), quelle: erg.vorschlag[id2].herkunft };
+    return null;
+  };
+  const knkTeile = [];
+  let knkSumme = 0, knkVollstaendig = true;
+  [['gest_p', 'Grunderwerbsteuer'], ['notar_p', 'Notar'], ['gba_p', 'Grundbuch'],
+   ['makler_p', 'Maklercourtage']].forEach(([fid, name]) => {
+    const s = satzVon(fid);
+    if (!s || s.wert == null) { knkVollstaendig = false; knkTeile.push(name + ': unbekannt'); return; }
+    const betrag = kp * s.wert / 100;
+    knkSumme += betrag;
+    knkTeile.push(name + ' ' + pct(s.wert) + ' = ' + eur(betrag) + '  (' + s.quelle + ')');
+  });
+
+  const kaufnebenkosten = {
+    posten: knkTeile,
+    summe: knkVollstaendig ? eur(knkSumme) : eur(knkSumme) + ' (unvollstaendig)',
+    anteil_am_kaufpreis: knkVollstaendig ? pct(knkSumme / kp * 100) : null,
+    gesamtinvestition: knkVollstaendig ? eur(kp + knkSumme) : null,
+    vollstaendig: knkVollstaendig,
+  };
+
+  /* ── Finanzierung, wenn Vorgaben vorliegen ──────────────────────────── */
+  let finanzierung = null;
+  const zins = satzVon('d1z'), tilg = satzVon('d1t');
+  const ekQuote = erg.vom_nutzer.ek_quote != null ? Number(erg.vom_nutzer.ek_quote) : null;
+  if (zins && tilg && knkVollstaendig) {
+    const gi = kp + knkSumme;
+    const ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
+    const darlehen = Math.max(0, gi - ek);
+    const kapitaldienst = darlehen * (zins.wert + tilg.wert) / 100;
+    finanzierung = {
+      eigenkapital: eur(ek) + (ekQuote != null ? '  (' + pct(ekQuote) + ' deiner Vorgabe)' : ''),
+      darlehen: eur(darlehen),
+      zins: pct(zins.wert) + '  (' + zins.quelle + ')',
+      tilgung: pct(tilg.wert) + '  (' + tilg.quelle + ')',
+      kapitaldienst_jahr: eur(kapitaldienst)
+        + '  = ' + eur(darlehen) + ' x ' + pct(zins.wert + tilg.wert),
+      ueberschuss_vor_bwk_und_steuer: eur(mieteJahr - kapitaldienst),
+      hinweis_ueberschuss: 'Das ist die Miete MINUS Kapitaldienst — ohne '
+        + 'Bewirtschaftungskosten und ohne Steuer. Der echte Cashflow liegt '
+        + 'darunter und wird in DealPilot gerechnet.',
+    };
+  }
+
+  return {
+    gefunden: true, id: id, adresse: _adrVon(o),
+    objektart: d.objart || d.objektart || null,
+    baujahr: d.baujahr || null,
+    wohnflaeche: wfl ? wfl + ' m²' : null,
+    rechnung,
+    kaufnebenkosten,
+    finanzierung,
+    fehlende_angaben: erg.fehlt.length
+      ? erg.fehlt.map((f) => erg.beschriftung[f] || f) : undefined,
+    vorgaben_hinterlegt: erg.hat_vorgaben,
+    /* ── KEIN SCORE, UND DAS STEHT IM ERGEBNIS ──────────────────────── */
+    kein_score: 'Dies ist KEIN DealPilot-Score und kein Investor Deal Score. '
+      + 'Die beiden werden in DealPilot gerechnet; hier stehen nur die drei '
+      + 'Groessen, die sich aus Kaufpreis und Miete unmittelbar ergeben.',
+    hinweis: 'Gib dem Nutzer die Zahlen MIT ihrem Rechenweg, so wie sie hier '
+      + 'stehen — sie sind fertig formatiert. Sag ausdruecklich, dass das noch '
+      + 'kein Score ist und dass der Score kommt, sobald das Objekt in DealPilot '
+      + 'gerechnet wurde. '
+      + (erg.hat_vorgaben
+          ? 'Der Nutzer hat Vorgaben hinterlegt; sie sind eingesetzt und als '
+            + '"deine Vorgabe" gekennzeichnet. '
+          : 'Der Nutzer hat KEINE Vorgaben hinterlegt. Frag ihn EINMAL, ob er '
+            + 'Zinssatz, Tilgung und Eigenkapitalquote fuer kuenftige Objekte '
+            + 'hinterlegen will — mit vorgaben_setzen. Danach nie wieder fragen. ')
+      + (erg.fehlt.length
+          ? 'Nenne die fehlenden Angaben und frag nach ihnen — EINE auf einmal. '
+          : '')
+      + 'Biete am Ende die Marktpreisindikation an und sag, dass sie einen Abruf '
+      + 'aus dem Kontingent kostet (marktbericht_preis nennt den Preis). '
+      + 'Behaupte KEINE Kaufempfehlung aus diesen drei Zahlen — sie reichen fuer '
+      + 'eine Richtung, nicht fuer ein Urteil.'
+  };
+}
+
+/* ── v1824 · DIE VORGABEN SETZEN ─────────────────────────────────────────
+ *
+ * Marcel: "Soll ich irgendwie kuenftig die Sachen dann hinterlegen? Aber
+ * nur dann, wenn nichts hinterlegt ist, dass man einmal fragt, dann wird
+ * es naechstes Mal schneller gehen."
+ *
+ * Darum prueft `objekt_schnellblick` selbst, ob Vorgaben da sind, und
+ * sagt dem Modell nur im Leerfall, dass es fragen soll. Die Frage kommt
+ * EINMAL — danach stehen die Werte.
+ */
+async function vorgaben_setzen(ctx, args) {
+  const felder = (args && args.felder) || {};
+  if (!Object.keys(felder).length) {
+    return { ok: false,
+      moeglich: Object.fromEntries(Object.entries(vorgaben.ERLAUBT)
+        .map(([id, r]) => [id, r.label + ' in ' + r.einheit])),
+      hinweis: 'Gib in "felder" die Werte an, die der Nutzer genannt hat. '
+             + 'Erfinde keine — nur was er gesagt hat.' };
+  }
+  const r = await vorgaben.setzen(ctx.userId, felder);
+  return {
+    ok: r.uebernommen.length > 0,
+    uebernommen: r.uebernommen.map((id) =>
+      (vorgaben.ERLAUBT[id] ? vorgaben.ERLAUBT[id].label : id) + ': ' + r.vorgaben[id]),
+    abgewiesen: r.abgewiesen.length ? r.abgewiesen : undefined,
+    hinweis: (r.abgewiesen.length
+      ? 'Abgewiesen wurde, was nicht in den erlaubten Rahmen passt (ein Zinssatz '
+        + 'von 50 % ist ein Tippfehler, kein Zinssatz). Frag diese Werte nochmal. '
+      : '')
+      + 'Bestaetige dem Nutzer kurz, was hinterlegt ist, und sag, dass es ab '
+      + 'jetzt automatisch benutzt wird. Er kann es jederzeit aendern.'
+  };
+}
+
 async function feld_katalog(ctx, args) {
   /* ── v1812b · DIE UMLAUTFALLE, ZUM VIERTEN MAL AN EINEM TAG ──────────
    *
@@ -2054,6 +2268,31 @@ const WERKZEUGE = [
       + 'Nur nehmen, wenn der Nutzer ein BESTIMMTES Objekt nennt; sonst '
       + 'cashflow_hebel_portfolio.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  { name: 'objekt_schnellblick', stufe: 'lesen', fn: objekt_schnellblick,
+    beschreibung: 'Die erste Einschaetzung zu einem Objekt, OHNE Abruf und ohne Kosten: '
+      + 'Bruttomietrendite, Kaufpreisfaktor, Kaufpreis und Miete je Quadratmeter — '
+      + 'jede Zahl mit ihrem Rechenweg. Dazu die Kaufnebenkosten, soweit belegbar: '
+      + 'die GRUNDERWERBSTEUER kommt aus der Postleitzahl (gesetzlicher Satz des '
+      + 'Landes), Notar und Grundbuch sind gekennzeichnete Richtwerte. Und die '
+      + 'Finanzierung, wenn der Nutzer Zinssatz und Tilgung hinterlegt hat. '
+      + 'IMMER nehmen direkt nach dem Anlegen eines Objekts und bei "ist das ein '
+      + 'guter Deal", "was haelst du davon", "lohnt sich das". '
+      + 'ES IST KEIN SCORE: der DealPilot-Score und der Investor Deal Score werden '
+      + 'in DealPilot gerechnet und stehen danach in objekt_kennzahlen. Sag das.',
+    parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  { name: 'vorgaben_setzen', stufe: 'schreiben', fn: vorgaben_setzen,
+    beschreibung: 'Hinterlegt die Standardwerte des Nutzers fuer kuenftige Objekte: '
+      + 'Zinssatz (d1z), Tilgung (d1t), Zinsbindung (d1_bindj), Eigenkapitalquote '
+      + '(ek_quote), Maklercourtage (makler_p), Notar (notar_p), Grundbuch (gba_p). '
+      + 'Nur aufrufen, wenn der Nutzer sie GENANNT hat — erfinde keine Saetze. '
+      + 'objekt_schnellblick sagt dir, ob schon Vorgaben hinterlegt sind; nur wenn '
+      + 'nicht, fragst du EINMAL danach.',
+    parameter: { type: 'object',
+      properties: { felder: { type: 'object',
+        description: 'Feld-Id zu Zahl, z.B. {"d1z": 3.8, "d1t": 2, "ek_quote": 20}' } },
+      required: ['felder'], additionalProperties: false } },
 
   { name: 'pakete_und_preise', stufe: 'lesen', fn: pakete_und_preise,
     beschreibung: 'Die Pakete mit ihren PREISEN, direkt aus der Datenbank, nach der '

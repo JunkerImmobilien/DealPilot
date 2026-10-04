@@ -338,6 +338,37 @@ async function anlageAbschliessen(token, chatId, userId, entwurf) {
     + '\n\n' + fo.fertig + ' von ' + fo.bloecke + ' Angabenblöcken gefüllt.'
     + (fo.offen ? ' Den Rest kannst du in DealPilot ergänzen — oder mich später fragen.' : '')
     );
+
+  /* ── v1824 · UND DANN DIE EINSCHÄTZUNG, OHNE DASS JEMAND FRAGT ────────
+   *
+   * Marcel am 04.10.2026: „wir wollen ja als Erstes einen Deal-Score
+   * haben … dass er dann automatisch dann eine Abfrage macht über das
+   * Objekt, ob das gut oder schlecht ist."
+   *
+   * Hier endete der Fluss mit „Objekt angelegt" — und wer eine Bewertung
+   * wollte, musste danach selbst fragen.
+   *
+   *   > Ein Werkzeug, das am Ziel aufhört und das Ziel nicht nennt, ist
+   *   > auf halbem Weg fertig.
+   *
+   * Der Schnellblick rechnet nichts Neues: Bruttomietrendite,
+   * Kaufpreisfaktor, Kaufnebenkosten aus der Postleitzahl. Er kostet
+   * keinen Abruf. Was er NICHT liefert, ist der Score — der entsteht im
+   * Browser, und das sagt er auch.
+   *
+   * Gerufen wird über den Agenten, nicht direkt: er formatiert die Zahlen
+   * und stellt die Folgefragen (Vorgaben hinterlegen? Marktpreis-
+   * indikation?). Eine zweite Formatierung hier wäre eine Dublette. */
+  try {
+    await agentAntwort(token, chatId, userId,
+      'Das Objekt ist gerade angelegt. Gib mir dazu den Schnellblick.',
+      null, r.rows[0].id);
+  } catch (e) {
+    /* Die Einschätzung ist eine Zugabe. Fällt sie aus, bleibt das Objekt
+       angelegt — das ist die Hauptsache und schon gemeldet. */
+    try { console.warn('[telegram v1824] Schnellblick nach Anlage fehlgeschlagen: '
+      + (e && e.message)); } catch (_) {}
+  }
   return r.rows[0].id;
 }
 
