@@ -414,11 +414,90 @@ export function zinssatzFuerObjekt(deps, ags, obj = {}) {
   const r = abruf({ ...obj, ags, zweig: w.zweig, lage }) || {};
   const wert = r.wert_pct != null ? r.wert_pct : (r.wert != null ? r.wert : null);
   if (!r.verfuegbar || wert == null) {
+    /* ── v1819 · WELCHE FAKTOREN FEHLEN, STATT "form_unbekannt" ──────────
+     *
+     * GEMESSEN an Hamburg: der Ausschuss rechnet den Zinssatz als
+     * Faktormodell —
+     *
+     *   4,37 % × Lagefaktor × Altersfaktor × Erstbezugsfaktor
+     *          × Stadtteilfaktor × Aktualisierungsfaktor
+     *
+     * Im Registersatz liegen `stadtteilfaktoren` und `aktualisierung`;
+     * Lage-, Alters- und Erstbezugsfaktor sind nicht erfasst. Der Abruf
+     * meldete dafür `form_unbekannt` — ein Fehlercode, aus dem niemand
+     * ablesen kann, was zu tun ist.
+     *
+     *   > Eine halb geerntete Quelle sieht aus wie eine kaputte. Der
+     *   > Unterschied ist genau die Liste dessen, was noch fehlt.
+     *
+     * Der Ausdruck des Ausschusses NENNT seine Faktoren. Also werden sie
+     * aus ihm gelesen und gegen die Modellansätze gehalten — und heraus
+     * kommt eine Ernte-Aufgabe statt einer Fehlermeldung. Das gilt für
+     * jeden Ausschuss mit Faktormodell, nicht nur für Hamburg. */
+    let fehlende = null, _quelleZweig = null;
+    try {
+      /* Der Ausdruck steht im REGISTERSATZ, nicht im Rückgabewert des
+         Abrufs — gemessen: der liefert nur `modellform: 'formelwerk'`,
+         ohne Ausdruck und ohne Modellansätze. Den Satz habe ich hier
+         schon, also wird er gelesen statt geraten. */
+      const satz = saetze.find((s) => String(s.zweig || '').toLowerCase()
+        === String(w.zweig).toLowerCase()) || {};
+      let ausdruck = String((satz.formel && satz.formel.ausdruck) || '');
+
+
+      /* ── EINE FORMEL KANN AN EINEM ANDEREN ZWEIG HAENGEN ───────────────
+       *
+       * Hamburg leitet Eigentumswohnung und Einfamilienhaus AUS dem
+       * Mehrfamilienhaus-Zinssatz ab:
+       *
+       *   etw:  Liegenschaftszinssatz = 1,16 × LIZI(MFH) − 2,30
+       *   efh:  Liegenschaftszinssatz = 0,85 × LIZI(MFH) − 0,53
+       *
+       * Ihr eigener Ausdruck nennt also keinen einzigen Faktor — die
+       * fehlen eine Stufe tiefer. Wer nur den eigenen Ausdruck liest,
+       * meldet "nichts fehlt" und hat trotzdem keinen Wert.
+       *
+       *   > Eine Luecke, die eine Stufe tiefer liegt, ist keine andere
+       *   > Luecke. Sie gehoert mit demselben Namen gemeldet. */
+      const bezug = String((satz.formel && satz.formel.bezug) || '');
+      const mBezug = /zweig\s*=\s*([a-z0-9_]+)/i.exec(bezug);
+      if (mBezug) {
+        const quelle = saetze.find((s) => String(s.zweig || '').toLowerCase()
+          === mBezug[1].toLowerCase());
+        if (quelle) {
+          _quelleZweig = mBezug[1];
+          ausdruck = String((quelle.formel && quelle.formel.ausdruck) || ausdruck);
+          satz.modellansaetze = quelle.modellansaetze || satz.modellansaetze;
+        }
+      }
+
+      const genannt = [...new Set((ausdruck.match(/[A-ZÄÖÜ][a-zäöüß]*faktor/g) || []))];
+
+      if (genannt.length) {
+        const da = Object.keys(satz.modellansaetze || {});
+        const flach = da.map((k) => String(k).toLowerCase().replace(/en$/, ''));
+        fehlende = genannt.filter((f) => {
+          const stamm = f.toLowerCase().replace(/faktor$/, '');
+          return !flach.some((k) => k.indexOf(stamm) >= 0 || stamm.indexOf(k) >= 0);
+        });
+        if (!fehlende.length) fehlende = null;
+      }
+    } catch (e) { fehlende = null; }
+
     return { verfuegbar: false, rueckfrage: r.grund || 'kein_wert',
       zweig: w.zweig, spanne: r.spanne || null,
       spanne_wortlaut: r.spanne_wortlaut || null,
-      hinweis: r.hinweis || 'Der Gutachterausschuss führt zu diesem Zweig keinen '
-             + 'auswertbaren Wert.' };
+      fehlende_faktoren: fehlende,
+      haengt_an_zweig: _quelleZweig,
+      hinweis: fehlende
+        ? 'Dieser Gutachterausschuss leitet den Liegenschaftszinssatz über ein '
+          + 'Faktormodell ab'
+          + (_quelleZweig ? ' und rechnet diesen Zweig AUS dem Zweig "' + _quelleZweig + '"' : '')
+          + '. Im Register fehlen noch: ' + fehlende.join(', ')
+          + '. Solange sie fehlen, wird der Wert NICHT gerechnet — ein Faktor, '
+          + 'den man auf 1 setzt, ist eine Erfindung mit Nachkommastelle.'
+        : (r.hinweis || 'Der Gutachterausschuss führt zu diesem Zweig keinen '
+          + 'auswertbaren Wert.') };
   }
   return { verfuegbar: true, wert_pct: wert, stufe: r.stufe || 'A',
     zweig: w.zweig, lage, begruendung: w.begruendung,
