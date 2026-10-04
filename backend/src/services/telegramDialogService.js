@@ -234,10 +234,57 @@ function _woerter(s) {
     .filter(Boolean);
 }
 
+/* ── v1828 · DIE ABKUERZUNG GEHT IN BEIDE RICHTUNGEN ─────────────────────
+ *
+ * GEMESSEN am 04.10.2026: Marcel fragte den Bot nach dem Objekt in der
+ * "Bismarckstraße". Das Objekt heisst in seiner Liste "Bismarckstr. 27
+ * Detmold" — der Bot fand es nicht und sagte, er kenne es nicht.
+ *
+ * Die Praefixregel aus v1810 loeste den Fall "Nutzer kuerzt ab, Objekt
+ * ist ausgeschrieben" (Musterstr -> Musterstraße). Sie prueft, ob ein
+ * OBJEKTwort LAENGER ist und mit dem Suchwort beginnt. Der umgekehrte
+ * Fall kam nie an: "bismarckstrasse" (15) ist laenger als
+ * "bismarckstr" (11), also griff nichts.
+ *
+ *   > Eine Abkuerzungsregel, die nur in eine Richtung greift, loest den
+ *   > halben Fall — und zwar die Haelfte, die seltener vorkommt. Objekte
+ *   > werden abgekuerzt angelegt und ausgeschrieben gesprochen.
+ *
+ * Statt die Regel ein zweites Mal zu flicken, bekommen beide Seiten
+ * dieselbe STAMMFORM: ein Wort, das auf eine Strassenendung auslaeuft,
+ * wird auf seinen Stamm plus Marker gekuerzt.
+ *
+ *     bismarckstrasse -> bismarck~        bismarckstr -> bismarck~
+ *     musterstraße    -> muster~          musterstr   -> muster~
+ *     lindenhof       -> linden~
+ *
+ * Der Marker `~` bleibt dran, damit "Parkstr." nicht auf das blosse Wort
+ * "Park" trifft. Dass "Parkstr." und "Parkweg" beide zu "park~" werden,
+ * ist beabsichtigt: dann punkten beide gleich, und das ist eine
+ * Rueckfrage — die einzige Antwort, die in keinem Fall das falsche Haus
+ * trifft.
+ *
+ * Die Laengenbedingung schuetzt die Endung selbst: aus dem allein
+ * stehenden "weg" oder "str" wird kein Stamm, sie fallen weiter unter
+ * STRASSENWOERTER.
+ */
+const _ENDUNGEN = ['strasse', 'straße', 'str', 'weg', 'allee', 'platz',
+  'gasse', 'ring', 'damm', 'ufer', 'chaussee', 'hof', 'park'];
+
+function _stamm(t) {
+  for (const e of _ENDUNGEN) {
+    if (t.length > e.length + 2 && t.endsWith(e)) return t.slice(0, -e.length) + '~';
+  }
+  return t;
+}
+
 function objektRaten(satz, liste) {
-  const w = _woerter(satz);
+  /* v1828 · Beide Seiten in dieselbe Stammform, bevor verglichen wird.
+     Vorher verglich hier eine ausgeschriebene gegen eine abgekuerzte
+     Strasse und fand nichts. */
+  const w = _woerter(satz).map(_stamm);
   const treffer = liste.map((o) => {
-    const ows = _woerter(o.adresse);
+    const ows = _woerter(o.adresse).map(_stamm);
     const ow = new Set(ows);
     let p = 0;
     for (const t of w) {
@@ -258,8 +305,16 @@ function objektRaten(satz, liste) {
        * Ein PRAEFIX zaehlt deshalb, wenn es lang genug ist: ab fuenf
        * Zeichen. "str" (drei) bleibt draussen, "muster" trifft
        * "musterstrasse", und das ist gewollt. */
+      /* v1828 · in BEIDE Richtungen. Die Stammform oben faengt die
+         Strassenendungen; diese Regel bleibt fuer alles andere, was
+         jemand verkuerzt tippt ("alexander" -> "alexanderstraße" und
+         umgekehrt "hermannstrasse" -> "hermann"). Beide Seiten muessen
+         mindestens fuenf Zeichen tragen, sonst trifft ein Wortanfang
+         zu viele. */
       if (t.length >= 5) {
-        const praefix = ows.some((a) => a.length > t.length && a.indexOf(t) === 0);
+        const praefix = ows.some((a) =>
+          (a.length > t.length && a.indexOf(t) === 0) ||
+          (t.length > a.length && a.length >= 5 && t.indexOf(a) === 0));
         if (praefix) { p += 2; continue; }
       }
     }
