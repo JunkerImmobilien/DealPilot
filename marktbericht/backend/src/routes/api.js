@@ -21,6 +21,12 @@ import { sperreRest, merkeLauf } from '../lib/harvestScheduler.js';
 import { q as qMb } from '../lib/db.js';
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { AgsResolver } from '../connectors/AgsResolver.js';
+/* v1846 · fuer POST /wertparameter/zinssatz — der amtliche Zins und die
+   RND nach Anlage 2 als LESEROUTE, damit das Haupt-Backend (Jacoby) nicht
+   nachbaut, was hier schon steht. */
+import { WertParameterService } from '../services/WertParameterService.js';
+import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
+import { gnd as iwGnd, rnd as iwRnd } from '../lib/immowertv.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import { GeoapifyConnector } from '../connectors/GeoapifyConnector.js';
 import { LocationFinderService } from '../services/LocationFinderService.js';
@@ -956,4 +962,66 @@ router.get('/stats/offers', async (req, res) => {
      FROM mb.offers GROUP BY city, listing_type ORDER BY city, listing_type`
   );
   res.json(rows);
+});
+
+/* ═══ v1846 · POST /wertparameter/zinssatz ═══════════════════════════════
+ *
+ * Body: { object }  — ein DealPilot-Objekt, wie es /reports/from-dealpilot
+ * bekommt. Antwort: der amtliche Liegenschaftszinssatz samt Stufe und
+ * Herkunft, dazu die Restnutzungsdauer nach Anlage 2 ImmoWertV.
+ *
+ * NUR LESEN. Kein Bericht, kein Kontingent, keine Websuche. Gebaut fuer
+ * die Kaufpreisaufteilung nach Jacoby im Haupt-Backend: der Rechenkern
+ * liegt dort, der Zins liegt hier — und keiner baut den anderen nach.
+ *
+ * Objektart, Einheiten, Baujahr und Adresse kommen durch DENSELBEN Mapper
+ * wie beim Bericht (v1839) — damit ein Geschaeftshaus hier dasselbe
+ * bekommt wie dort: kein Wohn-Zins fuer Gewerbe.
+ */
+router.post('/wertparameter/zinssatz', async (req, res) => {
+  try {
+    const obj = (req.body && req.body.object) || {};
+    const m = DealPilotObjectMapper.reportInput(obj);
+    const d = (obj && obj.data) || obj;
+    const plz = String(d.plz || '').trim();
+    if (!plz) return res.json({ verfuegbar: false, grund: 'Keine Postleitzahl am Objekt.' });
+    if (!m.property_type || m.property_type === 'gewerbe' || m.property_type === 'garage') {
+      return res.json({ verfuegbar: false,
+        grund: m.property_type ? 'Fuer gewerbliche Objekte liegt kein Liegenschaftszinssatz fuer Wohnnutzung vor.'
+                               : 'Objektart nicht erkannt.' });
+    }
+    const agsInfo = await AgsResolver.fromPostcode(plz).catch(() => null);
+    const ags = agsInfo && agsInfo.kreis_ags;
+    if (!ags) return res.json({ verfuegbar: false, grund: 'Kein Gemeindeschluessel zur Postleitzahl ' + plz + '.' });
+
+    const p = await WertParameterService.hole({
+      typ: 'lzs', ags: String(ags), objektart: m.property_type, anzahlWe: m.units || null,
+      objekt: { objart: d.objart, baujahr: m.build_year, einheiten: m.units,
+                haustyp: d.haustyp, nutzung: d.nutzungsart, lage: d.lage }
+    });
+    if (!p || p.wert == null) {
+      return res.json({ verfuegbar: false, grund: (p && (p.rueckfrage || p.hinweis)) || 'Kein Zinssatz ermittelbar.',
+        ausschuss: p && p.quelle });
+    }
+    /* RND nach Anlage 2: Gesamtnutzungsdauer aus dem Register, sonst die
+       Tabelle der ImmoWertV. Eine Restnutzungsdauer wird abgeleitet, nicht
+       aus einer fertigen Zahl umgerechnet (v1338). */
+    const gndJ = (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd))
+                 || iwGnd(m.property_type);
+    let rndJ = null;
+    try {
+      const rr = iwRnd(gndJ, m.build_year, 'bestand', new Date().getFullYear());
+      rndJ = (rr && typeof rr === 'object') ? (rr.rnd ?? rr.jahre ?? null) : rr;
+    } catch (e) { rndJ = null; }
+
+    res.json({
+      verfuegbar: true,
+      wert_pct: Number(p.wert), stufe: p.stufe || null, quelle: p.quelle || null,
+      quelle_url: p.quelle_url || null, zweig: p.zweig || null, lage: p.lage || null,
+      berichtsjahr: p.berichtsjahr || null, stichtag: p.stichtag || null,
+      ausschuss: p.quelle || null,
+      gnd_jahre: Number(gndJ) || null, rnd_jahre: Number(rndJ) || null,
+      objektart: m.property_type, ags: String(ags)
+    });
+  } catch (e) { res.status(500).json({ verfuegbar: false, grund: e.message }); }
 });

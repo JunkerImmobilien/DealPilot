@@ -22,6 +22,77 @@
 
 const bmfService = require('./bmfService');
 
+/* ═══ v1846 · JACOBY NEBEN BMF — ein Rechenkern, eine Zinsquelle ═══════════
+ *
+ * Marcel am 04.10.2026: „Beide Verfahren nebeneinander … nur wo ein
+ * amtlicher Zinssatz (Stufe A/B) vorliegt."
+ *
+ * Der Jacoby-Kern liegt HIER (jacobyService, CommonJS, am Gutachten auf
+ * den Cent geprüft). Der amtliche Zinssatz und die Restnutzungsdauer nach
+ * Anlage 2 liegen im Marktbericht-Dienst (Register, ESM). Keines von
+ * beidem wird nachgebaut: die Pipeline fragt den Dienst nach Zins und
+ * RND und rechnet dann selbst.
+ *
+ *   > Zwei Dienste, die dieselbe Zahl kennen, laufen auseinander. Einer
+ *   > kennt sie, der andere fragt.
+ *
+ * Der Bodenwert ist DERSELBE wie bei der Arbeitshilfe (Zelle K59, schon
+ * anteilig nach MEA). Nur so ist der Vergleich fair: beide Verfahren
+ * teilen denselben Kaufpreis um denselben Boden.
+ *
+ * Fehlt der amtliche Zins (Stufe C/D), gibt es KEINEN Jacoby-Wert — das
+ * Verfahren erscheint dann mit dem Grund, nicht mit einer Zahl aus einem
+ * gesetzlichen Auffangwert. Kein Verfahren rechnet halb. */
+const jacobyService = require('./jacobyService');
+const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
+
+async function _jacobyBlock(objekt, kaufpreis, bodenwert) {
+  const aus = (grund, extra) => Object.assign({ verfuegbar: false, grund: grund }, extra || {});
+  if (!(kaufpreis > 0)) return aus('Kein Kaufpreis.');
+  if (!(bodenwert >= 0)) return aus('Kein Bodenwert aus der Arbeitshilfe.');
+  let z;
+  try {
+    const r = await fetch(MB_BASE + '/wertparameter/zinssatz', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ object: objekt || {} }),
+      signal: AbortSignal.timeout(15000)
+    });
+    z = await r.json();
+  } catch (e) {
+    return aus('Der Marktbericht-Dienst war nicht erreichbar: ' + (e.message || e));
+  }
+  if (!z || !z.verfuegbar) {
+    return aus(z && z.grund ? z.grund : 'Kein amtlicher Liegenschaftszinssatz für diesen Ort.',
+      { stufe: z && z.stufe, ausschuss: z && z.ausschuss });
+  }
+  if (!/^[AB]$/.test(String(z.stufe || ''))) {
+    return aus('Der Liegenschaftszinssatz liegt nur als Stufe ' + z.stufe
+      + ' vor (kein amtlicher Wert). Nach Jacoby wird nur mit amtlichem Zins gerechnet.',
+      { stufe: z.stufe, lzs_pct: z.wert_pct, ausschuss: z.ausschuss });
+  }
+  if (!(z.rnd_jahre > 0)) return aus('Keine Restnutzungsdauer ableitbar (Baujahr/Modernisierung prüfen).',
+    { stufe: z.stufe, lzs_pct: z.wert_pct });
+  const j = jacobyService.berechne({ kaufpreis: kaufpreis, bodenwert: bodenwert,
+    lzs_pct: z.wert_pct, rnd_jahre: z.rnd_jahre });
+  if (!j.verfuegbar) return aus(j.hinweis, { stufe: z.stufe, lzs_pct: z.wert_pct, rnd_jahre: z.rnd_jahre });
+  return {
+    verfuegbar: true,
+    verfahren: j.verfahren,
+    gebaeudeanteil_prozent: j.gebaeudeanteil_pct,
+    bodenanteil_prozent: j.bodenanteil_pct,
+    gebaeudewert: j.gebaeudewert_eur,
+    bodenwert: j.bodenwert_eur,
+    lzs_pct: z.wert_pct, lzs_stufe: z.stufe, lzs_quelle: z.quelle || null,
+    ausschuss: z.ausschuss || null, rnd_jahre: z.rnd_jahre, gnd_jahre: z.gnd_jahre || null,
+    kapitalisierungsfaktor: j.kapitalisierungsfaktor, diskontierungsfaktor: j.diskontierungsfaktor,
+    bodenrestwert: j.bodenrestwert, bereinigter_kaufpreis: j.bereinigter_kaufpreis,
+    schritte: j.schritte,
+    hinweis: 'Umgekehrte Ertragswertmethode (BFH, Urteil vom 20.09.2022, IX R 12/21). '
+           + 'Die Wahl des Verfahrens gegenüber dem Finanzamt muss sachlich begründet '
+           + 'werden — beide Wege sind zulässig, keiner ist automatisch der richtige.'
+  };
+}
+
 const ENGINE_VERSION = 'v290.0.0';
 
 /* v1491 · Marcel 21.09.2026: "vielleicht koennen wir eine vierte Kachel dazu
@@ -157,7 +228,13 @@ async function _phase4_bmf(inputs, phase3) {
     miete_monatlich,
     vergleichsfaktor_vorhanden: gaa.vergleichsmiete_low ? 'Ja' : 'Nein',
     regionalfaktor: 1,
-    sachwertfaktor: Number(gaa.sachwertfaktor) || 1
+    sachwertfaktor: Number(gaa.sachwertfaktor) || 1,
+    /* v1846 · Der Zins kam bis hierher NIE an — das Modal schickte ihn als
+       Sachwertfaktor (siehe bmf-modal-v292.js). Zelle K37 blieb leer, die
+       Arbeitshilfe nahm ihren Modellwert. Leer bleibt erlaubt: dann gilt
+       weiter der Modellwert, und das ist die richtige Vorgabe. */
+    ...(Number(gaa.liegenschaftszinssatz) > 0
+        ? { liegenschaftszinssatz: Number(gaa.liegenschaftszinssatz) } : {})
   };
 
   // Pflichtfelder validieren (Backend-Service erwartet sie)
@@ -198,12 +275,20 @@ async function _phase4_bmf(inputs, phase3) {
     verfahren = closest.name;
   }
 
+  /* v1846 · Jacoby neben BMF — mit DEMSELBEN Bodenwert (K59). Erst nach
+     der Arbeitshilfe, weil der Bodenwert von ihr kommt; ein Fehler hier
+     darf die Arbeitshilfe nicht mitreissen, deshalb in eigenem try. */
+  let jacoby;
+  try { jacoby = await _jacobyBlock(objekt, Number(bmfInputs.kaufpreis), Number(bodenwert)); }
+  catch (e) { jacoby = { verfuegbar: false, grund: 'Jacoby nicht gerechnet: ' + (e.message || e) }; }
+
   return {
     bodenwert,
     gebaeudewert,
     bodenanteil_prozent: boden_pct,
     gebaeudeanteil_prozent: gebaeude_pct,
     verfahren,
+    jacoby,
     massgebender_verkehrswert: massgebend,
     fiktives_baujahr: r.fiktives_baujahr?.value ?? null,
     warnings: bmfResult.warnings || []

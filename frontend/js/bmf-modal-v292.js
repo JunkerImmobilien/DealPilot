@@ -149,7 +149,22 @@
       brw_user:           _parseDe(_v('bmf_brw')),
       vergleichsmiete_low: _parseDe(_v('bmf_vm_low')),
       vergleichsmiete_high: _parseDe(_v('bmf_vm_high')),
-      sachwertfaktor:     _parseDe(_v('bmf_lzs')) || 1
+      /* ── v1846 · DER ZINSSATZ GING ALS SACHWERTFAKTOR RAUS ──────────────
+       *
+       * GEMESSEN am 04.10.2026: hier stand `sachwertfaktor: _v('bmf_lzs')`.
+       * `bmf_lzs` ist das Feld „Liegenschaftszins" — Suffix %, Platzhalter
+       * „leer = Modellwert". Wer dort 2,5 eintrug, bekam Sachwertfaktor
+       * 2,5 statt rund 1,0: Sachwert mal zweieinhalb, Gebäudeanteil
+       * entsprechend, AfA-Bemessungsgrundlage entsprechend.
+       *
+       *   > Ein Feld, das an der falschen Zelle hängt, rechnet nicht
+       *   > falsch — es rechnet richtig mit der falschen Zahl. Das sieht
+       *   > man dem Ergebnis nicht an.
+       *
+       * Das Sachwertfaktor-Feld gibt es: `gaa_swf` („aus KI-Vorschlag").
+       * Der Zins geht jetzt als das, was er ist, an Zelle K37. */
+      sachwertfaktor:        _parseDe(_v('gaa_swf')) || 1,
+      liegenschaftszinssatz: _parseDe(_v('bmf_lzs')) || null
     };
 
     // Renovierung
@@ -387,6 +402,56 @@
       elHint.textContent = '✓ Maßgebend: ' + verfLabel + ' (' + _fmtPct(p4.gebaeudeanteil_prozent) + ' Gebäude)';
       elHint.style.color = '';
     }
+
+    /* ── v1846 · JACOBY NEBEN BMF ────────────────────────────────────────
+     *
+     * Marcel: „Beide Verfahren nebeneinander … mit Rechenweg und Hinweis,
+     * dass die Wahl steuerlich begründet sein muss. Nur wo ein amtlicher
+     * Zinssatz (Stufe A/B) vorliegt."
+     *
+     * Die Zeile steht unter dem BMF-Ergebnis, nie an seiner Stelle. Fehlt
+     * der amtliche Zins, steht der GRUND da — keine Zahl. Der Rechenweg
+     * liegt zugeklappt darunter: wer ihn braucht, klappt ihn auf, und wer
+     * nicht, sieht nur das eine Prozent. */
+    (function(){
+      var jz = p4.jacoby;
+      var host = document.getElementById('bmfJacobyZeile');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'bmfJacobyZeile';
+        host.style.cssText = 'margin-top:8px;padding:10px 12px;border:1px solid rgba(201,168,76,.35);'
+          + 'border-radius:8px;font-size:12.5px;line-height:1.55;color:#2A2727;background:#FFFFFF';
+        if (elHint && elHint.parentNode) elHint.parentNode.insertBefore(host, elHint.nextSibling);
+      }
+      if (!jz) { host.style.display = 'none'; return; }
+      host.style.display = '';
+      var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+      var fmtE = function(n){ return (Math.round(n)).toLocaleString('de-DE') + ' €'; };
+      if (!jz.verfuegbar) {
+        host.innerHTML = '<b>Nach Jacoby (umgekehrte Ertragswertmethode):</b> nicht gerechnet — '
+          + esc(jz.grund || 'kein amtlicher Zinssatz')
+          + (jz.lzs_pct != null ? ' <span style="color:#6f6960">(vorliegend: ' + esc(jz.lzs_pct) + ' %, Stufe ' + esc(jz.stufe||'?') + ')</span>' : '');
+        return;
+      }
+      var diff = (jz.gebaeudeanteil_prozent - p4.gebaeudeanteil_prozent);
+      var schritte = (jz.schritte || []).map(function(s){
+        var w = (s.einheit === '%') ? (Number(s.wert).toFixed(2).replace('.',',') + ' %')
+              : (Math.abs(Number(s.wert)) < 100 && String(s.text).indexOf('faktor') >= 0
+                  ? Number(s.wert).toFixed(4).replace('.',',') : fmtE(s.wert));
+        return '<tr><td style="padding:2px 8px 2px 0;color:#6f6960">' + esc(s.text) + '</td>'
+             + '<td style="padding:2px 0;text-align:right;white-space:nowrap">' + w + '</td></tr>';
+      }).join('');
+      host.innerHTML =
+          '<b>Nach Jacoby (umgekehrte Ertragswertmethode):</b> '
+        + '<b style="color:#050505">' + _fmtPct(jz.gebaeudeanteil_prozent) + ' Gebäude</b>'
+        + ' <span style="color:#6f6960">(' + (diff >= 0 ? '+' : '') + diff.toFixed(1).replace('.',',') + ' Punkte gegenüber der Arbeitshilfe)</span>'
+        + '<br><span style="color:#6f6960">Liegenschaftszins ' + esc(jz.lzs_pct) + ' % · Stufe ' + esc(jz.lzs_stufe)
+        + (jz.ausschuss ? ' · ' + esc(jz.ausschuss) : '') + ' · RND ' + esc(jz.rnd_jahre) + ' J.'
+        + (jz.gnd_jahre ? ' (GND ' + esc(jz.gnd_jahre) + ')' : '') + '</span>'
+        + '<details style="margin-top:6px"><summary style="cursor:pointer;color:var(--wl-b8932f,#b8932f)">Rechenweg (BFH IX R 12/21)</summary>'
+        + '<table style="margin-top:6px;border-collapse:collapse;font-size:12px">' + schritte + '</table>'
+        + '<div style="margin-top:6px;color:#6f6960;font-size:11.5px">' + esc(jz.hinweis) + '</div></details>';
+    })();
 
     // Verfahren-Toggle-Buttons: maßgebendes Verfahren markieren
     var verfBtnMap = { ertragswert: 'vb-ertrag', sachwert: 'vb-sach', vergleichswert: 'vb-vergl' };
