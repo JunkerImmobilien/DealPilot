@@ -9686,8 +9686,7 @@
       zeilen.push(_zeile('Sachwertfaktor', String(swf).replace('.', ',')
         + (gaa.stufe ? ' · Stufe ' + escH(gaa.stufe) : '')));
     } else if (SW.sachwertfaktor_hinweis || SW.hinweis_kurz) {
-      zeilen.push(_zeile('Sachwertfaktor', 'nicht abgeleitet — '
-        + escH(String(SW.sachwertfaktor_hinweis || SW.hinweis_kurz).slice(0, 160))));
+      zeilen.push(_zeile('Sachwertfaktor', 'nicht abgeleitet'));   /* Begründung unten, nicht in der Zeile */
     }
     if (rnd != null) zeilen.push(_zeile('Restnutzungsdauer', Math.round(rnd) + ' Jahre' + (gnd ? ' von ' + gnd : '')));
     if (EW.value_eur != null) {
@@ -9705,6 +9704,12 @@
         + (gaa.stichtag ? ' · Stichtag ' + escH(gaa.stichtag) : '')
         + (gaa.fundstelle ? '<br><span style="opacity:.75">' + escH(String(gaa.fundstelle).slice(0, 220)) + '</span>' : '')
         + '</div>';
+    }
+    /* v1862b · warum kein Sachwertfaktor: als Absatz, nicht in der Zeile
+       (gemessen: der Satz lief über die Spalte hinaus) */
+    if (swf == null && (SW.sachwertfaktor_hinweis || SW.hinweis_kurz)) {
+      herkunft += '<div class="vi-sc-annahmen"><b>Sachwertfaktor:</b> '
+        + escH(String(SW.sachwertfaktor_hinweis || SW.hinweis_kurz).slice(0, 320)) + '</div>';
     }
 
     if (!zeilen.length) {
