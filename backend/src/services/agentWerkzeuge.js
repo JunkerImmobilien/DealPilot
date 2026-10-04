@@ -74,10 +74,29 @@ async function objekte_liste(ctx) {
        sein und mit dem uebereinstimmen, was der Nutzer im Chat sieht. */
     objekte: liste.map((o, i) => {
       const e = extra[o.id] || {};
+      /* ── v1831 · DIE STUFE GEHOERT ZUR ZAHL ───────────────────────────
+       *
+       * GEMESSEN am 04.10.2026 an einem echten Lauf: auf dieselbe Frage
+       * nannte der Bot den Score 71 einmal "SOLIDE" und einmal "GUT" —
+       * in zwei Antworten hintereinander. Richtig ist GUT (ab 70).
+       *
+       * Die Ursache stand hier: dieses Werkzeug gab nur die ZAHL. Das
+       * Wort dazu hat das Modell erfunden, und es erfand es jedes Mal
+       * neu.
+       *
+       *   > Wo das Werkzeug nur eine Zahl liefert, denkt das Modell sich
+       *   > das Wort dazu. Was woertlich so heissen soll, gehoert als
+       *   > fertiger Wert ins Ergebnis.
+       *
+       * `stufeZu` ist dieselbe Funktion, die `objekt_kennzahlen` und
+       * `objekt_schnellblick` benutzen — ein Weg zur Stufe, nicht drei.
+       * Die Kette (85/70/50/35) ist die der Objektkarte. */
       return {
         nummer: i + 1, id: o.id, adresse: o.adresse, kaufpreis_eur: o.kp,
         dealscore: e.score != null ? e.score : null,
-        investor_deal_score: e.ids_ok ? e.ids_score : null
+        dealscore_stufe: dialog.stufeZu(e.score != null ? e.score : null),
+        investor_deal_score: e.ids_ok ? e.ids_score : null,
+        investor_stufe: dialog.stufeZu(e.ids_ok ? e.ids_score : null)
       };
     })
   };
