@@ -163,6 +163,14 @@ in drei Ebenen — alles in einem Paket, Feld-IDs unverändert
 Dabei gefunden und behoben: `num()` im Mapper las „2.56" als 256 (lzs_pct,
 sachwertfaktor, **mea schon vorher**).
 
+**Nachtrag v1852–v1852a (04.10.2026, Staging):** Eingabetiefe 1/2/3
+wählbar (steuert Ebene 2/3 und die Pflichtfeld-Markierung), Stufen-Knöpfe
+gestrichelt mit Fehlliste statt Abruf, Anfragen-Block mit dem
+Unterlagen-Knopf unter den Abrufen, Ebene 3 heißt „Sach- und Ertragswert
+· Stufe 3", Sachwertfaktor-Zeile nennt, was der Ausschuss führt (Lippe:
+nur EZFH). Marktbericht-App füllt ihr Formular längst aus dem Objekt
+(`mb-objektwahl.js` — mein Gegenteil-Befund war falsch, Modul entfernt).
+
 **Offen aus dem Paket:**
 - **N4-P1b** — der Bericht trägt `nutzer_einschaetzung`, zeigt sie aber
   noch nicht: Web-Ansicht und PDF der Marktbericht-App müssen den Block
