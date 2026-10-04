@@ -30405,3 +30405,31 @@ Bildausschnitt zeigte den roten Rahmen. Bekannte Falle
 
 **Rest.** N4-P1b (Lage-Einschätzung im Bericht sichtbar), N8 (Bankexport
 über den Bot), Prüfstrecke Exporte. Prod v1846b; Staging v1852c.
+
+## Rollout-Journal 04.10.2026 (17) — v1853: Lage-Einschätzung im Bericht (N4-P1b) und Bankübersicht im Bot (N8)
+
+**P1b (`05d331f`).** Web-Ansicht (`renderAssessment`) und PDF („Bewertung
+& Potenzial") der Marktbericht-App zeigen `nutzer_einschaetzung` als
+eigenen, beschrifteten Block „Ihre Einschätzung (aus DealPilot, Reiter
+Objekt) — keine Messung", unter der gemessenen Datenlage; die Kacheln
+tragen „· Ihre Angabe" und einen gestrichelten Rand. Buster app.js 1853,
+iframe-Aufruf 1853 (der eigene Buster in `marktbericht-view.js:91`, ohne
+ihn lud das iframe die alte App — dieselbe Falle wie bei qc-bridge).
+**Nachweis:** Bericht 156 (Hermannstraße, 12:42) im iframe geöffnet: 7
+Nutzer-Kacheln, Überschrift wie oben. PDF nicht neu gezogen — derselbe
+Datenweg, dieselbe `autoTable`-Form wie die Datenlage darüber.
+
+**N8 (`d614195`).** Werkzeug `bank_uebersicht` (Stufe `lesen`): eine
+Zeile je Darlehen wie der Bankexport — Eingaben aus `objects.data` (Bank,
+Vertragsnr./-datum, Auszahlung, Summe, Zins, Tilgung, Bindung, d1 und d2),
+gerechnete Größen aus dem Portfolio-Spiegel (Restschuld, Rate aus Zins-
+und Tilgungsbetrag je Jahr, Bindung bis). Fehlt der Spiegel, bleiben die
+Spalten leer, und der Hinweis sagt es — erfunden wird nichts. Filter auf
+eine Adresse, fertiger Satz bei Unbekanntem. Prozentfelder über `dez()`
+(die Falle aus v1851c). **Nachweis:** `pruef-bank.js` im Container
+**12/12**: SQL 17 Darlehen = 17 Zeilen, 17 Vertragsnummern aus dem
+Objekt, Zins im Bereich, 9 von 9 Spiegel-Zeilen mit Restschuld, 8 ohne
+Spiegel ohne Restschuld, Filter „Hermann" → 1 Zeile.
+
+**Rest.** Prüfstrecke Exporte nach dem Umbau (PDF, Sprechlauf-Import,
+Bankexport je Objektart) steht noch aus. Prod v1846b; Staging v1853.

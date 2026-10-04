@@ -172,9 +172,9 @@ nur EZFH). Marktbericht-App füllt ihr Formular längst aus dem Objekt
 (`mb-objektwahl.js` — mein Gegenteil-Befund war falsch, Modul entfernt).
 
 **Offen aus dem Paket:**
-- **N4-P1b** — der Bericht trägt `nutzer_einschaetzung`, zeigt sie aber
-  noch nicht: Web-Ansicht und PDF der Marktbericht-App müssen den Block
-  **neben** der Datenlage rendern, getrennt beschriftet.
+- ~~**N4-P1b**~~ — **erledigt v1853 (`05d331f`)**: Web-Ansicht und PDF
+  zeigen „Ihre Einschätzung (aus DealPilot) — keine Messung" unter der
+  Datenlage, getrennt beschriftet.
 - **N4-P5** — GeoMap-Filter (Zimmer, Grundstück, Heizung) — erst messen,
   ob die Vergleichsmenge nicht zu klein wird.
 - Empfindlichkeitstest je Mapper-Feld (ändert sich der Bericht, wenn das
@@ -285,7 +285,11 @@ DealPilot einmal öffnen". Restschuld **Ende** steht nicht im Spiegel —
 entweder `portfolioPayload()` um `restschuld_ende_eur` und `rate_eur_monat`
 erweitern (Browser rechnet, Spiegel trägt) oder im Bot ehrlich weglassen.
 
-**Reihenfolge:** nach N4-P1/P2, vor N4-P4.
+**Erledigt 04.10.2026, v1853 (`d614195`):** Werkzeug `bank_uebersicht`,
+Stufe `lesen`, eine Zeile je Darlehen; Restschuld/Rate/Bindung bis aus dem
+Spiegel, sonst leer und gesagt. Prüfer `pruef-bank.js` 12/12 (SQL 17
+Darlehen = 17 Zeilen). `restschuld_ende` bleibt weg — steht nicht im
+Spiegel, ehrlich weggelassen.
 
 **Dazu Marcels Rahmen für N4 (04.10.2026):** *„dass wir die Felder dann
 auch alle passend verknüpft haben … dass unser PDF noch passt, dass wir
