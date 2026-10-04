@@ -1064,7 +1064,10 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       /* Gemessen an Huellhorst/ETW: ohne Sachwert kommt `objektart_nicht_abgeleitet`
          mit ausschuss null zurueck — das ist KEINE Tabelle. Verfuegbar heisst:
          der Leser nennt einen Ausschuss oder sagt selbst verfuegbar. */
-      swfQuelle = r ? { verfuegbar: !!r.verfuegbar || !!r.ausschuss,
+      /* v1852, Bismarckstr. 27 Detmold: der Ausschuss Lippe IST hinterlegt,
+         leitet aber nur fuer EZFH ab (grund objektart_nicht_abgeleitet) —
+         ein genannter Ausschuss ist also noch keine Tabelle fuer DIESE Art. */
+      swfQuelle = r ? { verfuegbar: !!r.verfuegbar || (!!r.ausschuss && !r.grund),
                         ausschuss: r.ausschuss || null, grund: r.grund || null, hinweis: r.hinweis || null,
                         quelle: r.quelle || null, quelle_url: r.quelle_url || null, jahrgang: r.berichtsjahr || r.jahrgang || null }
                     : null;

@@ -115,8 +115,14 @@
       var sq = r.sachwertfaktor_quelle;
       var swfEigen = _v('sachwertfaktor');
       if (swfEigen) html += zeile('Sachwertfaktor', esc(swfEigen), st('b', 'eigener Ansatz') + 'statt der Tabelle des Ausschusses', knopf('Ansatz ändern', 'sachwertfaktor'));
-      else if (sq && sq.verfuegbar) html += zeile('Sachwertfaktor', 'im Bericht', st('a', 'Tabelle') + esc(sq.ausschuss || r.ausschuss || '') + ' führt Faktoren — der Wert hängt am vorläufigen Sachwert (§ 21 Abs. 3) und entsteht im Bericht', knopf('abweichend eintragen', 'sachwertfaktor'));
-      else html += zeile('Sachwertfaktor', '—', st('x', 'kein Wert') + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.'), knopf('eintragen', 'sachwertfaktor'));
+      /* v1852 · Marcel an der Bismarckstraße: „steht ‚im Bericht' — was ist
+         damit gemeint?" Jetzt steht da, WAS der Ausschuss führt: eine
+         Tabelle (dann wird der Faktor im Bericht aus dem vorläufigen
+         Sachwert abgelesen, § 21 Abs. 3 — vorher gibt es ihn nicht) oder
+         eben keine für diese Objektart (Lippe: nur EZFH). Eintragen geht
+         immer, als eigener Ansatz. */
+      else if (sq && sq.verfuegbar) html += zeile('Sachwertfaktor', 'Tabelle vorhanden', st('a', 'Ausschuss') + '<span title="' + esc(sq.ausschuss || '') + '">' + esc((sq.ausschuss || r.ausschuss || '').split(',')[0]) + '</span>' + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eigenen Faktor eintragen', 'sachwertfaktor'));
+      else html += zeile('Sachwertfaktor', '—', st('x', 'kein Wert') + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.') + (sq && sq.ausschuss ? ' <span class="oe-q" title="' + esc(sq.ausschuss) + '">(' + esc(String(sq.ausschuss).split(',')[0]) + ')</span>' : ''), knopf('eigenen Faktor eintragen', 'sachwertfaktor'));
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
       html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + (r.rnd_jahre != null ? r.rnd_jahre : '—') + ' J.',
         gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV') + ' · Restnutzungsdauer aus Baujahr' + (mp ? ' — mit ' + mp.total + ' Modernisierungspunkten rechnet der Bericht nach Anlage 2 neu' : ''), '');
@@ -129,25 +135,110 @@
 
   /* „abweichend eintragen": Ebene 3 öffnen und das Feld zeigen */
   function abweichend(feld) {
-    var card = document.querySelector('.card[data-collapsible="wm-obj"]');
-    if (card && card.classList.contains('v212-collapsed')) { var t = card.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
     var el = $(feld); if (!el) return;
+    var card = document.querySelector('.card[data-collapsible="wm-obj"]');
+    if (card && card.contains(el)) {
+      /* v1852: liegt das Feld in Ebene 3 und ist die Eingabetiefe kleiner,
+         will der Nutzer gerade genau dorthin — die Tiefe folgt dem Klick. */
+      if (card.classList.contains('oe-stufe-aus')) { try { localStorage.setItem(ZIEL_KEY, '3'); } catch (e) {} zielAnwenden(); }
+      if (card.classList.contains('v212-collapsed')) { var t = card.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
+    }
+    var wrap = $('obj-extra-wrap'), tg = $('obj-extra-toggle');
+    if (wrap && wrap.contains(el) && tg && typeof tg._dpSetOpen === 'function') tg._dpSetOpen(true);
+    /* Reiterwechsel, wenn das Feld woanders liegt (Kaufpreis, Miete) */
+    var sec = el.closest('.sec');
+    if (sec && !sec.classList.contains('active')) { var tab = document.querySelector('[data-target-sec="' + sec.id + '"]'); if (tab) tab.click(); }
     setTimeout(function () { try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); el.focus(); } catch (e) {} }, 120);
   }
 
-  /* ═══ Stufen-Knöpfe mit Kontingent ═══════════════════════════════════ */
+  /* ═══ Was jede Stufe braucht ═════════════════════════════════════════
+     Dieselbe Staffel wie tools/objekt-vollstaendigkeit.mjs (dort als Lauf
+     über alle Objekte, hier je Feld am Bildschirm). Ändert sich eine Seite,
+     muss die andere nachziehen — beide nennen die Quelle:
+       Stufe 1  Adresse, Objektart, Wohnfläche, Baujahr
+       Stufe 2  dazu Kaufpreis und Nettokaltmiete
+       Stufe 3  dazu Grundstück, Bodenrichtwert, Zustand, Standardstufe,
+                MEA bei ETW, Einheiten bei MFH, BGF + NHK-Typ bei Häusern */
+  var FELDNAMEN = { plz: 'PLZ', ort: 'Ort', str: 'Straße', objart: 'Objektart', wfl: 'Wohnfläche', baujahr: 'Baujahr',
+    kp: 'Kaufpreis (Reiter Investition)', nkm: 'Nettokaltmiete (Reiter Miete)', gsfl: 'Grundstücksfläche', brw: 'Bodenrichtwert',
+    ds2_zustand: 'Zustand', standardstufe: 'Standardstufe', mea: 'Miteigentumsanteil', einheiten: 'Wohneinheiten',
+    bgf: 'Bruttogrundfläche', nhk_haus: 'Hausform (NHK)', nhk_geschosse: 'Geschosse und Unterkellerung', nhk_dach: 'Dachausbildung' };
+  function pflichtFuer(stufe) {
+    var art = _v('objart').toUpperCase();
+    var l = ['plz', 'ort', 'str', 'objart', 'wfl', 'baujahr'];
+    if (stufe >= 2) l = l.concat(['kp', 'nkm']);
+    if (stufe >= 3) {
+      l = l.concat(['gsfl', 'brw', 'ds2_zustand', 'standardstufe']);
+      if (art === 'ETW') l.push('mea');
+      if (art === 'MFH') l.push('einheiten');
+      if (/^(EFH|ZFH|DHH|RH)$/.test(art)) l = l.concat(['bgf', 'nhk_haus', 'nhk_geschosse', 'nhk_dach']);
+    }
+    return l;
+  }
+  function fehltFuer(stufe) { return pflichtFuer(stufe).filter(function (id) { return !_v(id); }); }
+
+  function fehlendeZeigen(stufe, liste) {
+    var box = $('oe-fehlt'); if (!box) return;
+    if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    box.innerHTML = '<b>Für Stufe ' + stufe + ' fehlt noch:</b> '
+      + liste.map(function (id) { return '<span class="oe-chip" data-oe-feld="' + id + '">' + esc(FELDNAMEN[id] || id) + '</span>'; }).join('')
+      + '<div class="hint" style="margin:6px 0 0">Klick auf einen Eintrag springt zum Feld. Die Stufe lässt sich erst abrufen, wenn alles da ist — der Bericht rechnet nie halb.</div>';
+    box.style.display = '';
+  }
+
+  /* ═══ Eingabetiefe (Zielstufe) — Marcel: „wichtig ist dass wir wählen
+     können wie detailreich die eingabe wird" ═════════════════════════════
+     1: nur Ebene 1 offen, Ebene 2 zu, Ebene 3 weg.
+     2: Ebene 2 offen, Ebene 3 weg.
+     3: alles, Ebene 3 aufgeklappt. Pflichtfelder der Zielstufe werden
+     markiert, solange sie leer sind. Merker je Nutzer, nicht je Objekt. */
+  var ZIEL_KEY = 'dp_zielstufe';
+  function zielstufe() { try { var z = parseInt(localStorage.getItem(ZIEL_KEY), 10); return (z >= 1 && z <= 3) ? z : 1; } catch (e) { return 1; } }
+  function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} zielAnwenden(); stufen(); }
+  function zielAnwenden() {
+    var z = zielstufe();
+    document.querySelectorAll('[data-oe-ziel]').forEach(function (b) { b.classList.toggle('on', parseInt(b.getAttribute('data-oe-ziel'), 10) === z); });
+    var hint = $('oe-ziel-hint');
+    if (hint) hint.textContent = z === 1 ? 'Marktpreisindikation: Adresse, Objektart, Wohnfläche, Baujahr — mehr braucht Stufe 1 nicht.'
+      : z === 2 ? 'Erweiterte Indikation: dazu Kaufpreis und Miete. Die Objektdetails unten verfeinern den Bericht.'
+      : 'Sach- und Ertragswert nach ImmoWertV: Grundstück, Bodenrichtwert, Zustand, Standardstufe, bei Häusern BGF und NHK-Typ — der Block „Sach- und Ertragswert" unten ist dafür da.';
+    var e3 = document.querySelector('.card[data-oe-stufe-min="3"]');
+    if (e3) {
+      e3.classList.toggle('oe-stufe-aus', z < 3);
+      if (z === 3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
+    }
+    var tg = $('obj-extra-toggle');
+    if (tg && typeof tg._dpSetOpen === 'function') { if (z >= 2) tg._dpSetOpen(true); }
+    /* Pflichtfelder markieren: nur die der Zielstufe, nur solange leer */
+    document.querySelectorAll('.f.oe-pflicht-fehlt').forEach(function (f) { f.classList.remove('oe-pflicht-fehlt'); });
+    fehltFuer(z).forEach(function (id) { var el = $(id); var f = el && el.closest('.f'); if (f) f.classList.add('oe-pflicht-fehlt'); });
+  }
+
+  /* ═══ Stufen-Knöpfe: Kontingent UND Vollständigkeit ══════════════════ */
+  var _kont = null;
   async function stufen() {
     var box = $('oe-stufen'); if (!box) return;
-    var k = await api('/ai/credits');
-    var arten = (k && k.arten) || {};
+    if (!_kont) _kont = await api('/ai/credits');
+    var arten = (_kont && _kont.arten) || {};
     var rest = function (art) { var a = arten[art]; return (a && typeof a.rest === 'number') ? a.rest : null; };
-    var r1 = rest('mpi'), r2 = rest('mpi_plus'), r3 = rest('wev');
-    var frei = function (n) { return n == null ? '' : ' · ' + n + ' frei'; };
-    box.innerHTML =
-      '<button type="button" class="oe-btn solid" data-oe-stufe="1"' + (r1 === 0 ? ' disabled title="Kontingent aufgebraucht"' : '') + '>Marktbericht Stufe 1' + frei(r1) + '</button>'
-      + '<button type="button" class="oe-btn" data-oe-stufe="2"' + (r2 === 0 ? ' disabled title="Erweiterte Indikation: ab Investor"' : '') + '>Stufe 2 · erweitert' + frei(r2) + '</button>'
-      + '<button type="button" class="oe-btn" data-oe-stufe="3"' + (r3 === 0 ? ' disabled title="Wertermittlung nach ImmoWertV: ab Pro"' : '') + '>Stufe 3 · Wertermittlung ImmoWertV' + frei(r3) + '</button>'
-      + '<span class="oe-stufen-hint">Stufe 3 braucht die Angaben aus „Für das Gutachten" unten — fehlt etwas, erscheint das Verfahren nicht.' + (r3 === 0 ? ' Die Wertermittlung gehört zum Pro-Plan.' : '') + '</span>';
+    var konto = { 1: rest('mpi'), 2: rest('mpi_plus'), 3: rest('wev') };
+    var namen = { 1: 'Marktbericht Stufe 1', 2: 'Stufe 2 · erweitert', 3: 'Stufe 3 · Sach- & Ertragswert' };
+    var ab = { 2: 'ab Investor', 3: 'ab Pro' };
+    var z = zielstufe();
+    box.innerHTML = [1, 2, 3].map(function (s) {
+      var fehlt = fehltFuer(s).length, r = konto[s];
+      var aus = r === 0;
+      var cls = 'oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '');
+      var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
+      return '<button type="button" class="' + cls + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">'
+        + namen[s] + (r == null ? '' : ' · ' + r + ' frei') + (fehlt ? ' · ' + fehlt + ' fehlt' : '') + '</button>';
+    }).join('') + '<span class="oe-stufen-hint">Ein Knopf mit gestricheltem Rand: da fehlen Angaben — Klick zeigt welche. Der Bericht rechnet nie halb.' + (konto[3] === 0 ? ' Stufe 3 gehört zum Pro-Plan.' : '') + '</span>';
+  }
+  function stufeAbrufen(s) {
+    var fehlt = fehltFuer(s);
+    if (fehlt.length) { fehlendeZeigen(s, fehlt); abweichend(fehlt[0]); return; }
+    fehlendeZeigen(s, []);
+    if (window.DealPilotMB && typeof DealPilotMB.run === 'function') DealPilotMB.run({ stufe: s });
   }
 
   /* ═══ Gewerke: Stufenvorschlag aus derselben Tabelle wie der Bericht ══ */
@@ -215,15 +306,22 @@
   /* ═══ Verdrahtung ════════════════════════════════════════════════════ */
   var _t = null;
   function spaeter(fn, ms) { clearTimeout(_t); _t = setTimeout(fn, ms || 350); }
-  function alles() { automatik(); gewerke(); lageVergleich(); }
+  function alles() { zielAnwenden(); automatik(); gewerke(); lageVergleich(); }
   var _verdrahtet = false;
   function verdrahten() {
     if (_verdrahtet || !$('oe-auto')) return;
     _verdrahtet = true;
     document.addEventListener('click', function (e) {
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }
+      var zb = e.target.closest('[data-oe-ziel]'); if (zb) { zielSetzen(parseInt(zb.getAttribute('data-oe-ziel'), 10)); return; }
       var s = e.target.closest('[data-oe-stufe]');
-      if (s && window.DealPilotMB && typeof DealPilotMB.run === 'function') { DealPilotMB.run({ stufe: parseInt(s.getAttribute('data-oe-stufe'), 10) }); }
+      if (s && !s.disabled) stufeAbrufen(parseInt(s.getAttribute('data-oe-stufe'), 10));
+    });
+    /* Pflichtfelder: Markierung und Fehlzahl folgen der Eingabe */
+    Object.keys(FELDNAMEN).forEach(function (id) {
+      var el = $(id); if (!el) return;
+      el.addEventListener('input', function () { spaeter(function () { zielAnwenden(); stufen(); }, 400); });
+      el.addEventListener('change', function () { spaeter(function () { zielAnwenden(); stufen(); }, 150); });
     });
     ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell'].forEach(function (id) {
       var el = $(id); if (!el) return;
@@ -260,5 +358,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', verdrahten); else verdrahten();
   setTimeout(verdrahten, 600); setTimeout(verdrahten, 2500);
 
-  window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte };
+  window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte,
+    zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen };
 })();

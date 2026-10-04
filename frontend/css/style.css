@@ -38230,3 +38230,19 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 /* v1851 · Zellen der Gewerke-Tabelle: .f mit unsichtbarem Label (Extraktor, objektart-felder) */
 .f.oe-cell { margin: 0; padding: 0; min-width: 0; }
 .oe-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* v1852 · Eingabetiefe (Zielstufe), Fehlliste, Anfragen */
+.oe-ziel { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0 0 6px; }
+.oe-ziel-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; margin-right: 4px; }
+.oe-ziel-btn { font: 12px Inter, system-ui, sans-serif; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: transparent; color: var(--text, #2A2727); cursor: pointer; }
+.oe-ziel-btn.on { border-color: var(--wl-C9A84C, #C9A84C); background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 14%, transparent); font-weight: 600; }
+.oe-ziel-hint { margin: 0 0 8px; }
+.oe-stufen .oe-btn.oe-unvollstaendig { opacity: .55; border-style: dashed; }
+.oe-fehlt { border: 1px dashed #B8625C; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 12.5px; background: color-mix(in srgb, #B8625C 6%, transparent); }
+.oe-fehlt b { color: #B8625C; }
+.oe-fehlt .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
+.oe-fehlt .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+.f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
+.oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
+.oe-anfragen-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
+.card[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
