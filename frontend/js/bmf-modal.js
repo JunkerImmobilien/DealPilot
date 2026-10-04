@@ -404,7 +404,11 @@ document.addEventListener('keydown', function(e){
    Objekts: Zahlen, die aussehen wie die eigenen. Das Fenster geht weiter
    auf (man soll ja sehen, was fehlt), aber die Reiter, die ein Ergebnis
    zeigen, bleiben zu, bis es eines gibt. */
-var _BMF_BRAUCHT_ERGEBNIS = ['p-afa', 'p-hebel'];
+/* v1860 · Gemessen (Hermannstraße, sichtbarer Tab, 26 s): ein Klick auf den
+   Reiter „BMF-Ergebnis" (p-bmf) löste KEINEN Rechenlauf aus — er stand
+   nicht in dieser Liste, obwohl er das Ergebnis zeigt. Nur „Weiter →"
+   erzwang ihn. Jetzt rechnet auch der direkte Klick. */
+var _BMF_BRAUCHT_ERGEBNIS = ['p-bmf', 'p-afa', 'p-hebel'];
 
 function _bmfTabsSperren(){
   var fehlt = (typeof _bmfFehlend === 'function') ? _bmfFehlend() : [];
