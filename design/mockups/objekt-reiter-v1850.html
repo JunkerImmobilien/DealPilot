@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reiter Objekt — Vorlage v1850</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Vorlage, kein App-Code. Zeigt den Zielzustand des Reiters Objekt (N4):
+   drei Ebenen, Automatik-Leiste, Gewerke-Tabelle. Beispiel: Hermannstraße 9,
+   Hüllhorst (ETW 165 m², Bj 1968) — Werte aus Staging, nichts erfunden. */
+:root{--obs:#050505;--gold:#C9A84C;--gold-hi:#E8CC7A;--gold-lo:#b8932f;--gruen:#3FA56C;--rot:#B8625C;
+  --creme:#FDFCFA;--karte:#FBF6E9;--surface:#f3f0e8;--ink:#1c1b18;--muted:#6f6a5e;--line:#e6dfcf;--line-g:#e9dcb3;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+.hdr{background:var(--obs);height:56px;border-bottom:2.5px solid var(--gold);display:flex;align-items:center;padding:0 22px;gap:14px;color:#f3ead0}
+.hdr b{font-family:'Space Grotesk',sans-serif;color:var(--gold);letter-spacing:.04em}
+.tabs{display:flex;gap:2px;background:var(--obs);padding:0 22px;border-bottom:1px solid #222}
+.tabs span{padding:10px 14px;color:#a9a394;font-size:12.5px}
+.tabs span.on{color:#f3ead0;border-bottom:2px solid var(--gold)}
+main{max-width:1060px;margin:22px auto;padding:0 16px}
+.note{background:var(--karte);border:1px solid var(--line-g);border-left:3px solid var(--gold);padding:10px 14px;border-radius:8px;margin-bottom:18px;font-size:13px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ct{font-size:9.5px;font-weight:600;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid var(--line-g);display:flex;align-items:center;gap:10px}
+.ct .n{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:400;color:var(--muted);letter-spacing:0;text-transform:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px 14px}
+.f label{display:block;font-size:10.5px;color:var(--muted);letter-spacing:.04em;margin-bottom:3px;font-family:'JetBrains Mono',monospace}
+.f .v,.f select,.f input{width:100%;border:1px solid var(--line);border-radius:7px;padding:7px 9px;font:13.5px Inter,sans-serif;background:#fff;color:var(--ink)}
+.f .v{background:var(--creme)}
+.wide{grid-column:1/-1}
+/* Automatik-Leiste */
+.auto{border:1px solid var(--line-g);background:var(--karte);border-radius:10px;overflow:hidden}
+.auto .row{display:grid;grid-template-columns:1.3fr 1fr 1.7fr auto;gap:10px;align-items:center;padding:9px 14px;border-top:1px solid var(--line-g);font-size:13px}
+.auto .row:first-child{border-top:0;background:#f6efdc;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.auto .k{font-weight:600}
+.auto .w{font-family:'JetBrains Mono',monospace}
+.auto .q{color:var(--muted);font-size:12px}
+.st{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid;margin-right:6px}
+.st.a{color:var(--gruen);border-color:var(--gruen)}.st.b{color:var(--gold-lo);border-color:var(--gold)}.st.x{color:var(--rot);border-color:var(--rot)}
+.btn{font:12px Inter,sans-serif;padding:5px 10px;border-radius:6px;border:1px solid var(--gold);background:#fff;color:var(--gold-lo);cursor:pointer;white-space:nowrap}
+.btn.solid{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:var(--obs);border-color:transparent;font-weight:600}
+/* Akkordeon */
+.acc{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:14px}
+.acc > summary{list-style:none;cursor:pointer;padding:14px 20px;display:flex;align-items:center;gap:12px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px}
+.acc > summary::before{content:'▸';color:var(--gold);font-size:12px}
+.acc[open] > summary::before{content:'▾'}
+.acc > summary .sub{margin-left:auto;font:11px 'JetBrains Mono',monospace;color:var(--muted);font-weight:400}
+.acc .body{padding:0 20px 18px}
+/* Gewerke-Tabelle */
+table.gw{width:100%;border-collapse:collapse;font-size:13px}
+table.gw th{font:10.5px 'JetBrains Mono',monospace;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line-g);letter-spacing:.04em;font-weight:500}
+table.gw td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.gw td.g{font-weight:600}
+table.gw select,table.gw input{border:1px solid var(--line);border-radius:6px;padding:5px 7px;font:13px Inter,sans-serif;width:100%;background:#fff}
+table.gw input{width:76px}
+.stufe{display:inline-flex;gap:3px}
+.stufe i{width:22px;height:22px;border-radius:5px;border:1px solid var(--line);display:grid;place-items:center;font:11px 'JetBrains Mono',monospace;color:var(--muted);font-style:normal}
+.stufe i.on{background:var(--gold);border-color:var(--gold);color:var(--obs);font-weight:600}
+.stufe i.vor{border-style:dashed;border-color:var(--gold)}
+.wg{font:10.5px 'JetBrains Mono',monospace;color:var(--muted);text-align:right}
+.vgl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.vgl .box{background:var(--creme);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px}
+.vgl .box h5{margin:0 0 6px;font:10.5px 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.04em}
+.vgl .box b{font-weight:600}
+.hint3{background:#fff8e6;border:1px dashed var(--gold);padding:8px 12px;border-radius:8px;font-size:12.5px;margin-bottom:12px}
+.foot{font-size:11.5px;color:var(--muted);margin:26px 0 40px;font-family:'JetBrains Mono',monospace}
+@media (max-width:640px){.auto .row{grid-template-columns:1fr 1fr;row-gap:4px}.vgl{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr"><b>DealPilot</b> <span style="font-size:12px;color:#a9a394">Hermannstraße 9 · 32609 Hüllhorst · 2026-001</span></div>
+<div class="tabs"><span>Übersicht</span><span class="on">Objekt</span><span>Kauf</span><span>Finanzierung</span><span>Steuer</span><span>Pilot-Analyse</span><span>Deal-Aktion</span></div>
+<main>
+
+<div class="note"><b>Vorlage N4 (v1850)</b> — drei Ebenen statt elf Gruppen. Sichtbar ist, was der Marktbericht rechnet; eine Stufe tiefer, was ihn verfeinert; die dritte nur fürs Gutachten. Die Werte sind der Staging-Stand der Hermannstraße, nichts erfunden.</div>
+
+<!-- ══ EBENE 1 ══ -->
+<div class="card">
+  <div class="ct">Objekt <span class="n">16 Felder · alle gehen in den Bericht</span></div>
+  <div class="grid">
+    <div class="f"><label>Straße</label><div class="v">Hermannstraße</div></div>
+    <div class="f"><label>Nr.</label><div class="v">9</div></div>
+    <div class="f"><label>PLZ</label><div class="v">32609</div></div>
+    <div class="f"><label>Ort</label><div class="v">Hüllhorst</div></div>
+    <div class="f"><label>Objektart</label><select><option>Eigentumswohnung</option></select></div>
+    <div class="f"><label>Nutzung</label><select><option>Vermietet (Kapitalanlage)</option></select></div>
+    <div class="f"><label>Wohnfläche m²</label><div class="v">100</div></div>
+    <div class="f"><label>Zimmer</label><div class="v">3</div></div>
+    <div class="f"><label>Baujahr</label><div class="v">1962</div></div>
+    <div class="f"><label>Etage / Etagen</label><div class="v">1 / 2</div></div>
+    <div class="f"><label>Einheiten im Haus</label><div class="v">2</div></div>
+    <div class="f"><label>Zustand</label><select><option>Normaler Zustand</option></select></div>
+    <div class="f"><label>Standardstufe (Anlage 4)</label><select><option>3 · Standard</option></select></div>
+    <div class="f"><label>Energieklasse</label><select><option>E</option></select></div>
+    <div class="f"><label>Grundstück m² · MEA</label><div class="v">950 · 50 %</div></div>
+    <div class="f"><label>Vermietungsstand</label><select><option>vermietet</option></select></div>
+  </div>
+
+  <div class="ct" style="margin-top:18px">Automatisch ermittelt <span class="n">Wert · Quelle · Stichtag — kein Eingabefeld</span></div>
+  <div class="auto">
+    <div class="row"><span>Kennzahl</span><span>Wert</span><span>Quelle</span><span></span></div>
+    <div class="row"><span class="k">Bodenrichtwert</span><span class="w">90 €/m²</span><span class="q"><span class="st a">BORIS-NRW</span>Zone Hüllhorst-West · 01.01.2025</span><button class="btn">abweichend eintragen</button></div>
+    <div class="row"><span class="k">Liegenschaftszins</span><span class="w">2,2 %</span><span class="q"><span class="st a">Stufe A</span>GAA Minden-Lübbecke · Grundstücksmarktbericht 2025 · ETW</span><button class="btn">abweichend eintragen</button></div>
+    <div class="row"><span class="k">Sachwertfaktor</span><span class="w">—</span><span class="q"><span class="st x">kein Wert</span>Register führt für Minden-Lübbecke keinen ETW-Faktor · Weg: <u>Grundstücksmarktbericht 2025, S. 74</u></span><button class="btn">eintragen</button></div>
+    <div class="row"><span class="k">GND / RND</span><span class="w">80 / 22 J.</span><span class="q"><span class="st b">Anlage 2</span>Rückfall 80, Bj 1962, Modernisierungspunkte 4 (aus der Gewerke-Tabelle)</span><button class="btn">Rechenweg</button></div>
+    <div class="row"><span class="k">Modernisierungspunkte</span><span class="w">4 von 20</span><span class="q"><span class="st b">gerechnet</span>Fenster 2004 · Heizung 2011 · Bad 1998 — aus Ebene 2, kein Feld</span><span></span></div>
+    <div class="row"><span class="k">Baupreisindex</span><span class="w">1,91</span><span class="q"><span class="st b">Konstante</span>01.01.2026 · noch nicht je Ausschuss — Backlog B1</span><span></span></div>
+  </div>
+  <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button class="btn solid">Marktbericht Stufe 1 · 1 von 24</button>
+    <button class="btn">Stufe 2 · erweitert · 5 frei</button>
+    <button class="btn" title="Pro: 5 Wertermittlungen im Kontingent">Stufe 3 · Wertermittlung ImmoWertV · 5 frei</button>
+    <span style="font-size:12px;color:var(--muted)">Stufe 3 braucht alles aus Ebene 3 — fehlt etwas, erscheint das Verfahren nicht.</span>
+  </div>
+</div>
+
+<!-- ══ EBENE 2 ══ -->
+<details class="acc" open>
+  <summary>Weitere Objektdetails <span class="sub">verfeinert den Bericht · ca. 30 Felder</span></summary>
+  <div class="body">
+    <div class="ct">Gewerke — eine Zeile je Gewerk <span class="n">Art · Jahr · Standardstufe (Vorschlag gestrichelt, Klick überschreibt)</span></div>
+    <table class="gw">
+      <tr><th>Gewerk</th><th>Art / Ausführung</th><th>modernisiert</th><th>Standardstufe</th><th style="text-align:right">Gewicht</th></tr>
+      <tr><td class="g">Außenwände</td><td><select><option>Nicht gedämmt</option></select></td><td><input value="—"></td><td><span class="stufe"><i>1</i><i class="on">2</i><i>3</i><i>4</i><i>5</i></span></td><td class="wg">23</td></tr>
+      <tr><td class="g">Dach</td><td><select><option>Dachpfannen · DG nicht ausgebaut</option></select></td><td><input value="—"></td><td><span class="stufe"><i>1</i><i>2</i><i class="on">3</i><i>4</i><i>5</i></span></td><td class="wg">15</td></tr>
+      <tr><td class="g">Fenster / Außentüren</td><td><select><option>Zweifachverglasung</option></select></td><td><input value="2004"></td><td><span class="stufe"><i>1</i><i>2</i><i class="on">3</i><i class="vor">4</i><i>5</i></span></td><td class="wg">11</td></tr>
+      <tr><td class="g">Heizung</td><td><select><option>Zentralheizung · Gas</option></select></td><td><input value="2011"></td><td><span class="stufe"><i>1</i><i>2</i><i class="on">3</i><i>4</i><i>5</i></span></td><td class="wg">9</td></tr>
+      <tr><td class="g">Bad / Sanitär</td><td><select><option>Ein Bad, mit Fenster</option></select></td><td><input value="1998"></td><td><span class="stufe"><i>1</i><i class="vor">2</i><i class="on">3</i><i>4</i><i>5</i></span></td><td class="wg">9</td></tr>
+      <tr><td class="g">Fußböden</td><td><select><option>Teppich / Laminat</option></select></td><td><input value="—"></td><td><span class="stufe"><i>1</i><i class="on">2</i><i>3</i><i>4</i><i>5</i></span></td><td class="wg">5</td></tr>
+      <tr><td class="g">Innenwände / Decken</td><td><select><option>— keine Angabe —</option></select></td><td><input value="—"></td><td><span class="stufe"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></span></td><td class="wg">8 + 11</td></tr>
+      <tr><td class="g">Technik (Elektro)</td><td><select><option>— keine Angabe —</option></select></td><td><input value="—"></td><td><span class="stufe"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></span></td><td class="wg">9</td></tr>
+    </table>
+    <div style="font-size:12px;color:var(--muted);margin:8px 0 16px">Ergibt die Standardstufe oben (gewichtet, Anlage 4) <b>und</b> den Modernisierungsgrad für die Restnutzungsdauer (bisher die Sterne). Küche zählt zum Bad, wie bisher in der RND-Rechnung.</div>
+
+    <div class="ct">Bauteile &amp; Grundstück</div>
+    <div class="grid">
+      <div class="f"><label>Aufzug</label><select><option>Nein</option></select></div>
+      <div class="f"><label>Balkon / Terrasse m²</label><input value="8"></div>
+      <div class="f"><label>Keller / Abstellraum</label><select><option>Innerhalb</option></select></div>
+      <div class="f"><label>Bäder (Anzahl)</label><input value="1"></div>
+      <div class="f"><label>Garagen</label><input value="1"></div>
+      <div class="f"><label>Außenstellplätze</label><input value="0"></div>
+      <div class="f"><label>Gemarkung · Flur · Flurstück</label><input placeholder="optional — für Unterlagen-Anfragen"></div>
+      <div class="f"><label>Erbbaurecht</label><select><option>Nein</option></select></div>
+      <div class="f"><label>Baustatus</label><select><option>Bestand</option></select></div>
+      <div class="f"><label>Hinterland m² · €/m²</label><input value="828 · 5"></div>
+    </div>
+
+    <div class="ct" style="margin-top:18px">Lage — Ihre Einschätzung neben der Datenlage <span class="n">beides im Bericht, getrennt beschriftet</span></div>
+    <div class="grid">
+      <div class="f"><label>Mikrolage</label><select><option>Gut</option></select></div>
+      <div class="f"><label>Makrolage</label><select><option>Durchschnittlich</option></select></div>
+      <div class="f"><label>Bevölkerung</label><select><option>Stabil</option></select></div>
+      <div class="f"><label>Nachfrage</label><select><option>Mittel</option></select></div>
+      <div class="f"><label>Entwicklung</label><select><option>Stabil</option></select></div>
+      <div class="f"><label>Mietausfallrisiko</label><select><option>Gering</option></select></div>
+    </div>
+    <div class="vgl">
+      <div class="box"><h5>IHRE EINSCHÄTZUNG</h5>Mikrolage <b>gut</b> · Nachfrage <b>mittel</b> · Bevölkerung <b>stabil</b></div>
+      <div class="box"><h5>DATENLAGE (GeoMap · Zensus · Makro-Score)</h5>Makrolage <b>durchschnittlich</b> (Score 52) · Leerstand Zensus <b>moderat</b> (4,1 %) · Vermarktungsdauer <b>71 Tage</b></div>
+    </div>
+  </div>
+</details>
+
+<!-- ══ EBENE 3 ══ -->
+<details class="acc">
+  <summary>Für das Gutachten — Stufe 3 <span class="sub">Sach- und Ertragswert nach ImmoWertV · ca. 20 Felder</span></summary>
+  <div class="body">
+    <div class="hint3">Nur für die Wertermittlung (Stufe 3). Die Marktpreisindikation braucht nichts davon. Fehlt hier eine Pflichtangabe, erscheint das Verfahren im Bericht nicht — es rechnet nie halb.</div>
+    <div class="grid">
+      <div class="f"><label>BGF m²</label><input placeholder="Bruttogrundfläche"></div>
+      <div class="f"><label>Haustyp (NHK 2010)</label><select><option>— nur Häuser —</option></select></div>
+      <div class="f"><label>Geschosse · Keller · Dach</label><select><option>KG + EG + OG · DG nicht ausgebaut</option></select></div>
+      <div class="f"><label>Grundriss (MFH)</label><select><option>—</option></select></div>
+      <div class="f"><label>Garagen BGF m² · Stufe</label><input value="18 · 3"></div>
+      <div class="f"><label>Außenanlagen %</label><input value="4"></div>
+      <div class="f wide"><label>Besondere Bauteile (Liste: Bezeichnung · €)</label><input placeholder="z. B. Aufzug · 45.000 — eine Zeile je Bauteil"></div>
+      <div class="f"><label>Instandhaltung €/m²</label><input placeholder="leer = Anlage 3"></div>
+      <div class="f"><label>Mietausfall %</label><input placeholder="leer = Anlage 3"></div>
+      <div class="f"><label>Verwaltung € je Einheit</label><input placeholder="leer = Anlage 3"></div>
+      <div class="f"><label>Bodenwert-Abschlag € · Grund</label><input placeholder="bom"></div>
+      <div class="f wide"><label>Sonstige wertbeeinflussende Umstände</label><input placeholder="€ · Dauer in Jahren · Grund"></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:10px">Überschreibungen der Automatik-Leiste (Bodenrichtwert, Zins, Sachwertfaktor) landen hier — mit Pflicht-Grund, und der Bericht druckt den Grund.</div>
+  </div>
+</details>
+
+<div class="foot">Felder: 16 + ca. 30 + ca. 20 ≈ 66 (heute 121) · jedes gelesen · Sterne, zweite Ausstattungsskala, mod_punkte, brw_manuell, btl_1–5 entfallen · Vorlage ohne App-Code</div>
+</main>
+</body>
+</html>

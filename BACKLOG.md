@@ -147,9 +147,18 @@ geschrieben — wartet auf Marcels Blick.** Alles in
 - An GeoMap gehen aus dem Objekt **fünf** Dinge (Koordinate, Art, Fläche,
   Baujahr, Zustand); alles andere ist fest im Code.
 
-Offen: vier Bewertungsfragen in Abschnitt 5.5 (eine Ausstattungsskala,
-Lage-Indikatoren, Stufe 3 aus der Haupt-App, Sterne streichen). Danach
-Vorlage in `design/mockups/`, dann P1 (Mapper) vor P4 (Formular).
+**Entschieden 04.10.2026 (Marcel, §5.6):** Standardstufe 1–5 als eine
+Skala mit Umschlüsselung auf `quality` für Stufe 2; Lage-Indikatoren an
+den Bericht — als eigener Block `nutzer_einschaetzung` neben der
+Datenlage, nie ins gemessene `assessment`; Stufe 3 aus der Haupt-App,
+gekoppelt ans Kontingent (`wev` nur pro/partner, existiert schon); Sterne
+**umlegen**: sie gehen nicht in den Deal Score (gemessen), aber in die
+RND-Rechnung (`rnd-calc.js:683`) — dieselbe Schwelle künftig auf die
+Gewerke-Stufe. Vorlage: `design/mockups/objekt-reiter-v1850.html`.
+
+Nächster Schritt nach Marcels Blick auf die Vorlage: P1 (Mapper +
+Empfindlichkeitstest je Feld) → P2 (`wert_stufe:3` im Objekt-Weg) →
+P3 (Automatik-Leiste) → P4 (Formular + Migration `ausst`/`rate_*`).
 
 ### N5 · „BORIS abrufen" heißt nicht immer BORIS
 

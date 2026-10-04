@@ -268,3 +268,34 @@ P1 und P2 sind Voraussetzung, P3 und P4 sind das, was Marcel sieht.
 Nach dem Ja zu diesen vier Punkten entsteht als Nächstes eine **Vorlage
 in `design/mockups/`** (Demo-first) für Ebene 1 mit Automatik-Leiste und
 die Gewerke-Tabelle — bevor eine Zeile gebaut wird.
+
+### 5.6 · Marcels Entscheidungen (04.10.2026) und was sie technisch heißen
+
+| Frage | Entscheidung | Konsequenz |
+|---|---|---|
+| 1 · Eine Skala | **Standardstufe 1–5**, `ausst` fällt — *„du musst nur sicherstellen, dass es noch verknüpft ist mit der erweiterten Marktpreisindikation … passend umschlüsseln und mitgeben"* | Der Mapper leitet `quality` aus der Standardstufe ab (Tabelle unten). `ausst` bleibt als verstecktes Altfeld, `storage.js` migriert beim Laden einmalig `ausst` → Standardstufe |
+| 2 · Lage-Indikatoren | **anschließen** | **Nicht** in das gemessene `assessment` mischen — der Orchestrator sagt dort ausdrücklich „aus ECHTEN Quellen, keine Nutzereingabe" (`ReportOrchestrator.js:375`). Stattdessen ein eigener Block `nutzer_einschaetzung`, im Bericht **neben** der Datenlage, getrennt beschriftet („Ihre Einschätzung · Datenlage"). Herkunft bleibt sauber, und der Vergleich ist selbst eine Aussage |
+| 3 · Stufe 3 aus der Haupt-App | **ja, an den Plan gekoppelt** | Die Kopplung existiert: `aiCreditsService.js:37-41` gibt `wev` nur bei `pro`/`partner` (5), sonst 0. Der Objekt-Weg sendet `wert_stufe:3`, wenn Kontingent da ist; sonst Upgrade-Hinweis und **kein** Aufruf. Kein neuer Schalter, kein zweiter Geldweg |
+| 4 · Sterne | *„Ich meine, dass dort die Sternebewertung mit eingeht [Deal Score] … wenn wir sie umlegen können … passend wieder verknüpfen"* | **Gemessen:** in den Deal Score gehen sie **nicht** (`dealscore2.js`, `deal-kpis.js`: kein Treffer). Sie gehen in die **RND-Rechnung**: `rnd-calc.js:683` macht aus `rate_bad/fenster/boden/kueche` den Modernisierungsgrad (≤2 veraltet · 3 standard · ≥4 gehoben), gelesen von rnd-wizard, deal-action, mfh-einheiten, tax. **Umlegung:** dieselbe Schwelle auf die Gewerke-Stufe (Bad → Sanitär, Fenster → Fenster, Boden → Fußböden, Küche → Sanitär wie bisher); Altobjekte ohne Gewerke-Stufe fallen auf `rate_*` zurück, bis sie einmal gespeichert wurden |
+
+**Umschlüsselung Standardstufe → `quality` (Stufe-2-Faktor, `ValuationService.js:19`):**
+
+| Standardstufe | `quality` | Faktor |
+|---|---|---|
+| 1 · sehr einfach, 2 · einfach | `einfach` | 0,93 |
+| 3 · Standard | `normal` | 1,00 |
+| 4 · gehoben | `gehoben` | 1,06 |
+| 5 · stark gehoben | `luxus` | 1,12 |
+
+Rückweg für Altobjekte (`ausst` → Standardstufe): einfach → 2, normal → 3,
+gehoben → 4, luxus → 5.
+
+**Umlegung Gewerke-Stufe → RND-Modernisierungsgrad (ersetzt `rateToGrad`):**
+Stufe 1–2 → `veraltet`, 3 → `standard`, 4–5 → `gehoben`. Dazu das
+Modernisierungsjahr je Gewerk → Anlage-2-Punkte (`computeModPoints()`), was
+`MOD_ELEMENTE.gewerk_mapping` seit Paket A vorbereitet und nie verdrahtet
+hat.
+
+**Vorlage:** `design/mockups/objekt-reiter-v1850.html` — Ebene 1 mit
+Automatik-Leiste, Gewerke-Tabelle, Lage-Vergleich, Ebene 3. Werte der
+Hermannstraße aus Staging.
