@@ -814,15 +814,25 @@
   var _stand = null;          /* letzter bekannter Guthabenstand */
 
   var ABRUFE = [
-    { name: 'marktpreis', art: 'mpi',
+    /* ── v1848 · DIE ANSAGE NANNTE DIE FALSCHE GUTHABENART ──────────────
+       GEMESSEN: "marktpreis" sagte `mpi` an und belastete `avm_a`/`avm_b`
+       (routes/avm.js:272, aiCreditsService.js:382); "marktbericht" sagte
+       `wev` an und belastete `mpi` (fast:true = Stufe 1, marktbericht.js:58).
+       Zwei Preisansagen, beide mit dem falschen Rest dahinter.
+         > Eine Preisansage, die das falsche Konto nennt, ist keine
+         > Ansage. Sie ist eine Zahl, die zufaellig stimmt oder nicht.
+       Jetzt traegt jeder Abruf die Art, die wirklich belastet wird, und
+       einen Kostentext, der sie beim Namen nennt. */
+    { name: 'marktpreis', art: 'avm', kosten: '1 Abruf beim Bewertungspartner',
       titel: 'Marktpreis-Indikation von einem unabhängigen Bewertungspartner',
       tun: function () {
         /* Derselbe Weg wie der Knopf oben im Co-Pilot — kein zweiter. */
-        var b = el('dp-cp-mp');
-        if (b) { b.click(); return true; }
+        /* v1848 · Der Knopf ist weg (copilot.js); die Funktion ist exportiert. */
+        if (typeof window.__dpCpMarktpreis === 'function') { window.__dpCpMarktpreis(); return true; }
+        /* kein Knopf mehr, den man klicken koennte */
         return false;
       } },
-    { name: 'marktbericht', art: 'wev',
+    { name: 'marktbericht', art: 'mpi', kosten: '1 Marktbericht Stufe 1 (Marktpreisindikation)',
       titel: 'DealPilot-Marktbericht zum Objekt',
       tun: function () {
         try {
@@ -847,12 +857,29 @@
     });
   }
 
+  /* v1848 · Der Rest je Abrufart aus DEM Konto, das belastet wird.
+     `/ai/credits` fuehrt mpi/mpi_plus/wev unter `arten`, das Bewertungs-
+     partner-Kontingent aber getrennt unter `avm: {a, b}` — zwei Anbieter,
+     ein Topf fuer die Ansage. Vorher las die Ansage fuer "marktpreis" den
+     mpi-Rest, obwohl avm belastet wurde. */
+  function restFuer(art) {
+    if (!_stand) return null;
+    if (art === 'avm') {
+      var v = _stand.avm || {};
+      var a = Number(v.a), b = Number(v.b);
+      if (!isFinite(a) && !isFinite(b)) return null;
+      return (isFinite(a) ? a : 0) + (isFinite(b) ? b : 0);
+    }
+    var k = (_stand.arten || {})[art];
+    return (k && typeof k.rest === 'number') ? k.rest : null;
+  }
+
   function abrufeFuerPrompt() {
     var arten = (_stand && _stand.arten) || {};
     return ABRUFE.map(function (a) {
       var k = arten[a.art];
       return { name: a.name, titel: a.titel, art: a.art,
-               rest: (k && typeof k.rest === 'number') ? k.rest : null };
+               rest: restFuer(a.art) };   /* v1848 · aus dem belasteten Konto */
     });
   }
 
@@ -871,7 +898,7 @@
     if (rest) addMsg('assistant', rest);
 
     var arten = (_stand && _stand.arten) || {};
-    var frei = (arten[a.art] && typeof arten[a.art].rest === 'number') ? arten[a.art].rest : null;
+    var frei = restFuer(a.art);   /* v1848 · aus dem belasteten Konto, nicht aus einem Nachbarkonto */
 
     if (frei === 0) {
       addMsg('assistant', 'Dafür ist gerade kein Guthaben mehr da.');
@@ -881,7 +908,7 @@
     var box = addMsg('assistant', '');
     box.classList.add(MARKE + '-box');
     box.innerHTML = '<b>' + esc(a.titel) + '</b>'
-      + '<div class="' + MARKE + '-kosten">Kostet <b>1 Abruf</b>'
+      + '<div class="' + MARKE + '-kosten">Kostet <b>' + esc(a.kosten || '1 Abruf') + '</b>'
       + (frei == null ? '' : ' · danach noch <b>' + frei + '</b> frei') + '</div>'
       + '<div class="' + MARKE + '-akt">'
       + '<button type="button" class="' + MARKE + '-ok" data-los="1">Abrufen</button>'

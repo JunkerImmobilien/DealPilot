@@ -39,7 +39,10 @@
            Kann man ja vorher sagen, dass das einen Abruf kosten wuerde."
            Die Kostenansage steht im Knopf, nicht erst im Modal: wer
            klickt, soll vorher wissen, worauf er klickt. */
-        '<button type="button" class="dp-cp-mp" id="dp-cp-mp" title="Holt eine Marktpreis-Indikation von einem unabhaengigen Bewertungspartner. Kostet 1 Abruf.">Marktpreis · 1 Abruf</button>' +
+        /* v1848 · Marcel: „bei der Pilotanalyse haben wir jetzt dort
+           Marktpreis, einen Abruf. Also das kann da wieder raus." Der
+           Knopf ist weg; der Weg bleibt — ueber den Chat, mit Preisansage
+           und Zustimmung (copilot-aenderungen.js, ABRUFE). */
       '</div>' +
       '<div class="dp-cp-log" id="dp-cp-log">' +
         '<div class="dp-cp-hint">Frag mich zu Lage, Verhandlung, Finanzierung oder Bank \u2014 ich arbeite mit den Daten dieses Objekts. Fuer aktuelle Marktdaten aus dem Web aktiviere oben die Web-Recherche.</div>' +
@@ -52,8 +55,8 @@
 
     var web = el('dp-cp-web');
     if (web) web.addEventListener('change', function () { allowWeb = this.checked; });
-    var mp = el('dp-cp-mp');
-    if (mp) mp.addEventListener('click', marktpreis);
+    /* v1848 · kein Knopf mehr, kein Listener (siehe oben) */
+    /* v1848 · marktpreis() haengt jetzt am Chat-Weg (window.__dpCpMarktpreis) */
     var snd = el('dp-cp-send');
     if (snd) snd.addEventListener('click', send);
     var inp = el('dp-cp-in');
@@ -80,6 +83,11 @@
      in einem zweiten Fenster. Nur diese eine Funktion geht nach aussen;
      send() bleibt intern, der Einhaengepunkt dort ist der Klick. */
   window.__dpCpAddMsg = addMsg;
+  /* v1848 · Der Marktpreis-Abruf geht nur noch ueber den Chat (ABRUFE in
+     copilot-aenderungen.js). Dafuer braucht der die Funktion — exportiert
+     wie addMsg, nach demselben Muster. Ohne Export wuerde das onclick der
+     Preisansage ins Leere laufen (die Falle aus v1825). */
+  window.__dpCpMarktpreis = marktpreis;
 
   function context() {
     var c = {};
@@ -90,6 +98,16 @@
        nur einmal in den Chat zu schreiben hiesse, dass das Modell sie
        beim naechsten „und was heisst das fuer den Kaufpreis?" nicht mehr
        hat - obwohl der Nutzer dafuer bezahlt hat. */
+    /* v1847 · Marcel: die Pilot-Analyse soll auch dem Co-Piloten zur
+       Verfuegung stehen. GEMESSEN: context() schickte nur die EINGABEN
+       (_buildAIPayload), nie das ERGEBNIS — obwohl es nach jeder Analyse
+       in window._aiAnalysis liegt (ui.js:931) und beim Laden aus
+       objects.ai_analysis zurueckkommt (storage.js:559). Der Chat fragte
+       das Modell also zu einem Objekt, dessen fertige Einschaetzung
+       daneben im Reiter stand. Gerechnet wird nichts — nur gelesen. */
+    if (window._aiAnalysis && typeof window._aiAnalysis === 'object') {
+      try { c.pilot_analyse = window._aiAnalysis; } catch (e) {}
+    }
     if (_mpErgebnis) {
       try { c.marktpreis_indikation = _mpErgebnis; } catch (e) {}
     }
