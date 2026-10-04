@@ -797,6 +797,7 @@ function _mockupRenderBmfResult(r, demoLabel){
 
   toast('BMF-Ergebnis: ' + fmtPct(r.geb_pct) + ' Gebäudeanteil');
 
+  try { r._objKey = window._currentObjKey || null; } catch(e) {}   /* v1856: Ergebnis gehoert zu DIESEM Objekt */
   window._lastBmf = r;
   // AfA-Vorschau aktualisieren
   updateAfaPreview(akTotal);
@@ -1014,9 +1015,22 @@ function downloadXlsx(){
    ────────────────────────────────────────────────────── */
 function _bmfHk(){ try{ var v = parseDe((document.getElementById('bmf_hk')||{}).value); return (v > 0) ? v : 0; }catch(e){ return 0; } }  /* v988-hk-calc */
 function updateAfaPreview(ak_total){
+  /* v1856 · Marcel: „dann bin ich auf AfA-Vorschau gegangen und dann hat er
+     irgendwas Altes angezeigt für vier oder fünf Sekunden und hat dann
+     umgeswitcht." Gemessen: `window._lastBmf` war das Ergebnis des VORIGEN
+     Objekts (der Rechner braucht rund drei Sekunden), und `ak` fiel ohne
+     Wert auf eine erfundene 94.224,83 zurück. Jetzt zählt ein Ergebnis nur,
+     wenn es zu DIESEM Objekt gehört; ohne Ergebnis steht „wird berechnet",
+     ohne Anschaffungskosten steht nichts. Notnagel gestrichen. */
   var r = window._lastBmf;
-  var ak = ak_total != null ? ak_total : 94224.83;
-  var geb_pct = r ? r.geb_pct : 80;
+  var _ok = r && (!r._objKey || !window._currentObjKey || String(r._objKey) === String(window._currentObjKey));
+  if (!_ok) r = null;
+  var ak = ak_total != null ? ak_total : 0;
+  var geb_pct = r ? r.geb_pct : null;
+  if (!(ak > 0) || geb_pct == null) {
+    ['afa_show_ak','afa_show_pct','afa_show_satz','afa_show_save','afa_show_save50','afa_basis','afa_jahr_big','afa_total'].forEach(function(id){ setText(id, geb_pct == null ? 'wird berechnet …' : '—'); });
+    return;
+  }
   var afa_satz = parseDe($('afa_satz').value) || 3.0;
 
   var afa_basis = ak * geb_pct / 100 + _bmfHk();  /* v988: HK 100% Gebaeude */
@@ -2013,15 +2027,30 @@ function openBMFModal(){
 
     // Modal öffnen
     ov.classList.add('open');
+    /* v1856 · Gemessen (Parkstr. 9, Staging): die AfA-Vorschau zeigte beim
+       Oeffnen 780.000 EUR und nach fuenf Sekunden 423.618 EUR — das Fenster
+       behaelt den DOM-Inhalt des VORIGEN Objekts, bis der neue Lauf
+       (rund drei Sekunden) da ist. Ein fremdes Ergebnis wird deshalb beim
+       Oeffnen verworfen, die Vorschau sagt „wird berechnet". */
+    try {
+      if (window._lastBmf && window._lastBmf._objKey && window._currentObjKey
+          && String(window._lastBmf._objKey) !== String(window._currentObjKey)) window._lastBmf = null;
+      if (typeof updateAfaPreview === 'function') updateAfaPreview(null);
+    } catch(e) {}
 
     // V289.2.3: Pane 1 als Start aktivieren + Footer initialisieren
-    setTimeout(function(){
+    var _paneSetzen = function(){
       if(typeof switchPane === 'function'){
         switchPane('p-ak');
       } else if(typeof _updateFooterNav === 'function'){
         _updateFooterNav('p-ak');
       }
-    }, 10);
+    };
+    setTimeout(_paneSetzen, 10);
+    /* v1856 · Marcel: „beim ersten Mal … die Tabelle am Anfang gar nicht
+       aufgemacht" — beim allerersten Oeffnen kommt das Markup gerade erst
+       aus dem Netz; steht nach 400 ms noch kein Reiter aktiv, noch einmal. */
+    setTimeout(function(){ if(!document.querySelector('.bmfmo-pane.active')) _paneSetzen(); }, 400);
 
     // Auto-Sync beim Öffnen
     if(typeof syncFromTabInvest === 'function'){

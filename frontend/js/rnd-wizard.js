@@ -329,8 +329,12 @@
     overlayEl.querySelector('#rnd-wiz-next').onclick = goNext;
 
     // Klick außerhalb schließt
+    /* v1856 · Marcel: „wenn man daneben drückt, dann schließt sich das
+       direkt. Das möchte ich nicht." Ein Klick neben das Fenster schließt
+       NICHT mehr — Schließen nur über × oder Escape, damit eine halb
+       gefüllte Eingabe nicht durch einen Fehlklick verloren geht. */
     overlayEl.addEventListener('click', function (e) {
-      if (e.target === overlayEl) close();
+      if (e.target === overlayEl) { e.stopPropagation(); }
     });
   }
 

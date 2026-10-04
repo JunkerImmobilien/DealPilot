@@ -702,15 +702,25 @@
 
     // Gewerke-Bewertung: explizite rates wo verfügbar, sonst Mehrheit/fallback
     // Energieklasse beeinflusst Heizung und Außenwand (Wärmedämmung)
+    /* v1856 · Marcel: „Bedachung, Fenster, Heizungsart, das haben wir ja
+       alles. Das können wir ja alles schon angeben." Die Gewerke-Stufen aus
+       dem Reiter Objekt (ausst_*, Anlage 4) gehen jetzt je Gewerk vor den
+       Energie-Rückschluss — dieselbe Schwelle wie bei Bad/Fenster/Boden. */
+    const gradDach    = rateToGrad(d.ausst_dach);
+    const gradHeizung = rateToGrad(d.ausst_heizung);
+    const gradWand    = rateToGrad(d.ausst_aussenwaende);
+    const gradTechnik = rateToGrad(d.ausst_technik);
+    const gradDecken  = rateToGrad(d.ausst_decken);
+    const gradInnen   = rateToGrad(d.ausst_innenwaende);
     const gewerkeBewertung = {
-      dach:       energieGrad || mehrheit,    // Wärmedämmung Dach
+      dach:       gradDach || energieGrad || mehrheit,    // Wärmedämmung Dach
       fenster:    gradFenster || energieGrad || mehrheit,
-      leitungen:  mehrheit,
-      heizung:    energieGrad || mehrheit,    // Heizung wird stark vom Energiekennwert geprägt
-      aussenwand: energieGrad || mehrheit,    // Wärmedämmung Außenwand
+      leitungen:  gradTechnik || mehrheit,
+      heizung:    gradHeizung || energieGrad || mehrheit,    // Heizung wird stark vom Energiekennwert geprägt
+      aussenwand: gradWand || energieGrad || mehrheit,    // Wärmedämmung Außenwand
       baeder:     gradBaeder || mehrheit,
-      decken:     mehrheit,
-      technik:    gradKueche || mehrheit,
+      decken:     gradDecken || gradInnen || mehrheit,
+      technik:    gradTechnik || gradKueche || mehrheit,
       grundriss:  fallbackGrad
     };
 

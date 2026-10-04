@@ -1734,6 +1734,24 @@ window.DealPilotDealAction = (function() {
   //       Dropdown im Wizard die richtige Option vorauswählt.
   function _getRndPrefill() {
     var prefill = {};
+    /* v1856 · Marcel: „Geben wir die jetzt nicht schon im Tab Objekt ein?
+       Wenn wir das haben, können wir die dann mit übertragen." Die acht
+       Modernisierungsangaben (mod_*, Anlage 2) und die Gewerke-Stufen
+       (ausst_*, über denselben Rechenkern rnd-calc.mapDealPilotObject) reisen
+       in den Wizard — Schritt 5 und 6 sind dann vorbelegt, nicht leer. Der
+       Wizard mischt Objekte tief (buildInitialState), eine leere Angabe
+       bleibt beim Standard. */
+    try {
+      var _mod = {}, _modMap = { dach: 'mod_dach', fenster: 'mod_fenster', leitungen: 'mod_leitungen', heizung: 'mod_heizung',
+                                 aussenwand: 'mod_aussenwand', baeder: 'mod_baeder', innenausbau: 'mod_innenausbau', grundriss: 'mod_grundriss' };
+      var _n = 0;
+      Object.keys(_modMap).forEach(function (k) { var el = document.getElementById(_modMap[k]); var v = el ? String(el.value || '').trim() : ''; if (v) { _mod[k] = v; _n++; } });
+      if (_n) prefill.mod = _mod;
+      if (window.DealPilotRND && typeof DealPilotRND.mapDealPilotObject === 'function' && typeof collectData === 'function') {
+        var _m = DealPilotRND.mapDealPilotObject(collectData());
+        if (_m && _m.gewerkeBewertung) prefill.gewerke = _m.gewerkeBewertung;
+      }
+    } catch (e) { try { console.warn('[deal-action] RND-Vorbelegung aus dem Objekt:', e.message); } catch (_) {} }
     // Erst versuchen mit echten Live-IDs (V125+), Fallback mit input-Prefix
     var fieldMap = {
       // Wizard-Feld    : [Live-ID,        Fallback-ID]
