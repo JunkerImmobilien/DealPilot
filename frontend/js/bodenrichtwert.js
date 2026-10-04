@@ -354,10 +354,35 @@
     var token = _token();
     return fetch(_apiBase() + '/marktbericht/boris/coverage', token ? { headers: { 'Authorization': 'Bearer ' + token } } : {})
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (list) {
+      .then(function (antwort) {
+        /* ── v1835 · DER LESER ERWARTETE EIN ARRAY ─────────────────────────
+         *
+         * Hier stand `if (Array.isArray(list))`. GEMESSEN am 04.10.2026
+         * gibt `/marktbericht/boris/coverage` aber ein OBJEKT zurück:
+         *
+         *     { hinweis, zusammenfassung:{live,vorbereitet,manuell},
+         *       laender:[ {code, name, restricted, …} ] }
+         *
+         * Der Zweig lief also immer ins `else`, und die Sperrliste blieb
+         * leer. Das Ergebnis war zufällig richtig — gesperrt ist derzeit
+         * nichts — aber aus dem falschen Grund: die App las die Antwort
+         * nie. Würde morgen ein Land gesperrt, bliebe es unbemerkt.
+         *
+         *   > Ein Leser, der die Antwort nicht versteht und trotzdem das
+         *   > Richtige tut, ist kein funktionierender Leser. Er ist eine
+         *   > Wette, die bisher aufging.
+         *
+         * Beide Formen werden jetzt gelesen — ein blankes Array wie
+         * früher und das heutige Objekt. */
+        var liste = Array.isArray(antwort) ? antwort
+                  : (antwort && Array.isArray(antwort.laender) ? antwort.laender : null);
         var set = {};
-        if (Array.isArray(list)) { list.forEach(function (a) { if (a && a.restricted) set[a.code] = 1; }); }
-        else { set = {}  /* v1265: siehe Kommentar bei _loadBorisCoverage */; } /* Fallback = bekannter Stand */
+        if (liste) {
+          liste.forEach(function (a) { if (a && a.restricted) set[a.code] = 1; });
+        }
+        /* Kein verwertbares Format = nichts sperren: im Zweifel probieren.
+           Ein Fehlversuch kostet eine Sekunde, eine falsche Sperre einen
+           Abruf, der funktioniert hätte (v1265). */
         _borisRestricted = set; return set;
       })
       .catch(function () { _borisRestricted = {}  /* v1265: siehe Kommentar bei _loadBorisCoverage */; return _borisRestricted; });
@@ -372,10 +397,32 @@
   }
   function _refreshBorisBtn() {
     var btn = _el('brw-boris-btn'); if (!btn) return;
-    var ok = borisAvailableForPlz(_val('plz'));
+    var plz = _val('plz');
+    var ok = borisAvailableForPlz(plz);
     btn.disabled = !ok;
-    btn.title = ok ? 'Bodenrichtwert direkt abrufen — gratis (Open Data)' /* v785f-tooltip */
-                   : 'Direkt-Abruf hier nicht verfügbar (Bayern, Baden-Württemberg, Schleswig-Holstein, Saarland) — BORIS-Portal nutzen';
+    /* ── v1835 · DER TOOLTIP NANNTE DEN FALSCHEN GRUND ─────────────────────
+     *
+     * Hier stand immer „Direkt-Abruf hier nicht verfügbar (Bayern,
+     * Baden-Württemberg, Schleswig-Holstein, Saarland)". Diese vier Länder
+     * sind seit v1265 NICHT mehr gesperrt — gemessen damals gegen
+     * /boris/coverage: 11 von 11 Ländern live, 0 eingeschränkt. Der Text
+     * blieb trotzdem stehen.
+     *
+     * Er war damit die falsche Fährte zum echten Fehler: wer ihn in
+     * Nordrhein-Westfalen las, suchte nach einem Lizenzproblem, während
+     * in Wahrheit nur das PLZ-Feld leer war.
+     *
+     *   > Eine Fehlermeldung, die den falschen Grund nennt, kostet mehr
+     *   > Zeit als gar keine. Sie schickt die Suche in die Irre.
+     *
+     * Jetzt nennt sie den Grund, der wirklich zutrifft. */
+    btn.title = ok
+      ? 'Bodenrichtwert direkt abrufen — gratis (Open Data)' /* v785f-tooltip */
+      : (!String(plz || '').trim()
+          ? 'Bitte zuerst die Postleitzahl eintragen'
+          : (!/^\d{5}$/.test(String(plz).trim())
+              ? 'Die Postleitzahl muss fünfstellig sein'
+              : 'Für diese Region ist der Direkt-Abruf gerade nicht freigegeben — BORIS-Portal nutzen'));
   }
   /* ═══ v1288 · Der reine Abruf, ohne DOM ══════════════════════════════
      Bis hierher steckte der BORIS-Abruf IN `fetchBoris()`: Adresse aus dem
@@ -486,6 +533,34 @@
   }
   (function _wireBoris(){
     function go(){ try { _loadBorisCoverage().then(function(){ _refreshBorisBtn(); }); var p = _el('plz'); if (p && !p._borisWired) { p._borisWired = 1; p.addEventListener('input', _refreshBorisBtn); } } catch (e) {} }
+
+    /* ── v1835 · DER KNOPF WAR BEI JEDEM OBJEKT GRAU ───────────────────────
+     *
+     * Marcel am 04.10.2026: „bei allen Objekten ist Boris ausgegraut im Tab
+     * Objekt. Da steht direkt Abruf hier nicht verfügbar, obwohl wir ja
+     * alles schon integriert haben."
+     *
+     * GEMESSEN an Hermannstraße 9, 32609 Hüllhorst (Nordrhein-Westfalen):
+     *
+     *     Knopf disabled, Tooltip „Bayern, Baden-Württemberg, …"
+     *     nach `refreshBorisBtn()` von Hand  ->  aktiv
+     *     mit leerem PLZ-Feld               ->  disabled
+     *
+     * Die Auswertung lief also genau einmal, beim Laden der Seite — und da
+     * war das PLZ-Feld leer. `borisAvailableForPlz('')` gibt false, der
+     * Knopf ging aus und blieb aus. Nachgezogen wurde nur bei `input`,
+     * und das feuert beim TIPPEN.
+     *
+     *   > Ein input-Listener hört den Nutzer, nicht das Programm. Wer ein
+     *   > Feld per Code füllt, muss selbst Bescheid sagen.
+     *
+     * `loadData()` setzt die Felder per `e.value = …`, und das löst kein
+     * Ereignis aus. Das Ereignis, auf das es ankommt, gibt es aber schon:
+     * `dp:object-ready` feuert seit v1814 bei jedem Objektwechsel
+     * (storage.js:206). Es musste nur jemand zuhören. */
+    window.addEventListener('dp:object-ready', function () {
+      try { _loadBorisCoverage().then(function () { _refreshBorisBtn(); }); } catch (e) {}
+    });
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else setTimeout(go, 300);
   })();
 
