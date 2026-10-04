@@ -38306,3 +38306,23 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 .oe-abruf-box .oe-tile .oe-tile-sub { font-size: 11.5px; }
 .oe-abruf-box .oe-abruf-foot { margin-top: 8px; font-size: 11.5px; }
 .oe-opt { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; font: 500 9.5px "JetBrains Mono", monospace; letter-spacing: .04em; color: var(--muted, #7A7370); border: 1px solid var(--border, #E0DBD3); vertical-align: middle; text-transform: uppercase; }
+
+/* v1858 · Abruf als Zeilen im Leisten-Raster; Stufenpillen in der Pre-Flight-Kachel */
+.oe-abruf-box .oe-abruf { display: block; }
+.oe-abruf-zeilen .oe-row.on { background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 9%, transparent); }
+.oe-abruf-zeilen .oe-k { font-weight: 600; }
+.dp-pf-stufen { display: inline-flex; gap: 3px; margin-left: 8px; vertical-align: middle; }
+.dp-pf-pille { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(243,234,208,.45); font: 600 10px "JetBrains Mono", monospace; font-style: normal; color: #f3ead0; cursor: pointer; opacity: .75; }
+.dp-pf-pille.on { background: var(--wl-C9A84C, #C9A84C); border-color: var(--wl-C9A84C, #C9A84C); color: #050505; opacity: 1; }
+.dp-pf-pille.fehlt { border-style: dashed; }
+.dp-pf-pille:hover { opacity: 1; border-color: var(--wl-C9A84C, #C9A84C); }
+
+/* v1858 · Hover-Hilfe an jedem Feld; gelbe i-Knoepfe weichen, wenn sie an ist */
+.dp-feldhilfe-an .dp-tip { display: none !important; }
+.dp-feldhilfe-popup { position: absolute; z-index: 10060; max-width: 360px; background: #050505; color: #f3ead0; border: 1px solid var(--wl-C9A84C, #C9A84C); border-radius: 10px; padding: 10px 12px; font: 12.5px/1.45 Inter, system-ui, sans-serif; box-shadow: 0 12px 32px rgba(0,0,0,.35); pointer-events: none; }
+.dp-feldhilfe-titel { font: 600 13px "Space Grotesk", Inter, sans-serif; color: var(--wl-C9A84C, #C9A84C); margin-bottom: 4px; }
+.dp-feldhilfe-par { font: 10px "JetBrains Mono", monospace; color: #c9bfa6; margin-left: 6px; }
+.dp-feldhilfe-body { opacity: .95; }
+.dp-feldhilfe-leer { opacity: .6; font-style: italic; }
+.dp-feldhilfe-wofuer { margin: 6px 0 0; padding-left: 16px; color: #e8dcbf; }
+.dp-feldhilfe-wofuer li { margin: 2px 0; }

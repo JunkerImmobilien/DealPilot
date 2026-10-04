@@ -333,6 +333,7 @@
       el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
     });
     optionalMarkieren();
+    preflightPillen();
   }
 
   /* ═══ Stufen-Knöpfe: Kontingent UND Vollständigkeit ══════════════════ */
@@ -351,17 +352,33 @@
     };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
     var z = zielstufe();
-    box.innerHTML = [1, 2, 3].map(function (s) {
+    /* v1858 · Marcel: „nicht so viel Weiß … in der gleichen Größe wie oben
+       auch das Feld Bodenrichtwert … den Button an die Seite." Drei Zeilen
+       im Raster der Leiste statt drei Kacheln. */
+    box.innerHTML = '<div class="oe-auto oe-abruf-zeilen">' + [1, 2, 3].map(function (s) {
       var fehlt = fehltFuer(s).length, r = konto[s], k = kacheln[s];
       var aus = r === 0;
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
-      return '<div class="oe-tile' + (s === z ? ' on' : '') + '">'
-        + '<h4>' + k.name + '</h4><div class="oe-tile-sub">' + k.sub + '</div>'
-        + '<div class="oe-tile-meta">' + (r == null ? 'Kontingent unbekannt' : r + ' frei') + (fehlt ? ' · ' + fehlt + ' Feld' + (fehlt > 1 ? 'er' : '') + ' fehlt' : ' · alle Angaben da') + (aus && ab[s] ? ' · ' + ab[s] : '') + '</div>'
-        + '<button type="button" class="oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">'
-        + (fehlt ? 'Fehlende Angaben zeigen' : k.art + ' abrufen') + '</button>'
+      return '<div class="oe-row' + (s === z ? ' on' : '') + '">'
+        + '<span class="oe-k">' + k.name + '</span>'
+        + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + '</span>'
+        + '<span class="oe-q" title="' + esc(k.sub) + '">' + (fehlt ? st('x', fehlt + ' fehlt') : st('a', 'bereit')) + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
+        + '<span><button type="button" class="oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">' + (fehlt ? 'was fehlt' : 'abrufen') + '</button></span>'
         + '</div>';
+    }).join('') + '</div>';
+    preflightPillen();
+  }
+  /* v1858 · dieselbe Eingabetiefe als drei Pillen in der Pre-Flight-Kachel
+     „DealPilot" (object-actions.js, #oab-dp-stufen). Klick setzt sie. */
+  function preflightPillen() {
+    var host = $('oab-dp-stufen'); if (!host) return;
+    var z = zielstufe();
+    host.innerHTML = [1, 2, 3].map(function (s) {
+      var fehlt = fehltFuer(s).length;
+      return '<i class="dp-pf-pille' + (s === z ? ' on' : '') + (fehlt ? ' fehlt' : '') + '" data-oe-ziel="' + s + '" title="Stufe ' + s + (fehlt ? ' · ' + fehlt + ' Feld(er) fehlen' : ' · bereit') + '">' + s + '</i>';
     }).join('');
+    /* Klick auf die Pille darf die Kachel nicht an-/abwählen */
+    if (!host._oeBound) { host._oeBound = true; host.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); var p = e.target.closest('[data-oe-ziel]'); if (p) zielSetzen(parseInt(p.getAttribute('data-oe-ziel'), 10)); }); }
   }
   var _fehlStufe = null;   /* v1852: die zuletzt angefragte Stufe — die Fehlliste folgt der Eingabe */
   function fehlendeNachziehen() { if (_fehlStufe) fehlendeZeigen(_fehlStufe, fehltFuer(_fehlStufe)); }
