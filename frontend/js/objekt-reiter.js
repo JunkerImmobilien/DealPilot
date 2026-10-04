@@ -157,6 +157,9 @@
        Preisentwicklung und Durchschnittspreise bleiben im Register, nicht hier. */
     var relevant = function (e) { var k = String(e.kennzahl || '') + ' ' + String(e.name || ''); return /liegenschaft|lzs|sachwert|swf|bodenricht/i.test(k); };
     var hinterlegt = ((q && q.hinterlegt) || []).filter(relevant), fehlt = ((q && q.fehlt) || []).filter(relevant);
+    /* v1858a · Parkstr. 9: zweimal „Sachwertfaktor" (zwei Tabellen desselben
+       Ausschusses) — je Kennzahl eine Zeile, die erste gewinnt. */
+    (function () { var gesehen = {}; hinterlegt = hinterlegt.filter(function (e) { var n = NAME[e.kennzahl] || e.name || e.kennzahl; if (gesehen[n]) return false; gesehen[n] = true; return true; }); })();
     var kurz = function (s) { return String(s || '').replace(/^Der Gutachterausschuss für Grundstückswerte /, 'GAA ').split(',')[0]; };
     var swfOhneArt = _leiste && !_leiste.swf;
     hinterlegt.forEach(function (e) {

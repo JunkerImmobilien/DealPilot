@@ -30605,3 +30605,50 @@ im Block: `bgf`, `garagen_bgf_qm`, `garagen_stufe`.
 Defekt.
 
 **Rest.** Prod v1846b; Staging v1857.
+
+## Rollout-Journal 04.10.2026 (22) — v1858–v1858a: Abruf-Zeilen, Stufenwahl im Pre-Flight, ein Abruf, Hover-Hilfe überall
+
+Marcel: Abruf unter den Anfragen kompakt wie die Bodenrichtwert-Zeile;
+ist die Stufe-3-Markierung (nur BGF) richtig?; Hover-Hilfe an **allen**
+Feldern statt gelber i-Knöpfe, abschaltbar; Stufenwahl in der Pre-Flight-
+Kachel „DealPilot"; keine Kombination Marktbewertung + geführte Eingabe
+(Doppelabruf); Schätzwerte durchwachsener; Parkstr. 9 sah mit den Quellen
+nicht gut aus.
+
+**Was (`aa98457`, v1858a).**
+- **Abruf** als drei Zeilen im Leisten-Raster (`.oe-auto`): Stufe · frei ·
+  Beschreibung · Knopf „abrufen"/„was fehlt" an der Seite. Keine Kacheln.
+- **Pre-Flight-Kachel „DealPilot"** trägt drei Pillen 1·2·3 (`#oab-dp-
+  stufen`, `object-actions.js`), dieselbe Eingabetiefe `dp_zielstufe`;
+  Klick setzt sie, Pille gestrichelt = Felder fehlen. Der **DealPilot-
+  Schritt** der Datenaufnahme ruft mit der gewählten Stufe ab und bricht
+  mit Fehlliste ab, wenn Pflichtfelder fehlen.
+- **Ein Abruf statt zwei:** der Sprechlauf bekommt `marktbewertung:false`
+  — er ruft keine Marktbewertung mehr selbst ab; das macht danach der eine
+  DealPilot-Schritt. (Vorher: Sprechlauf Stufe 2 UND Kachel.)
+- **Hover-Hilfe** `feld-hilfe.js`: Maus über `.f` → nach 300 ms Popup
+  (Obsidian/Gold). Text: der gepflegte Tooltip (89 Einträge in
+  `tooltip-content.js`, über den `.dp-tip[data-tip-id]` im Label) — sonst
+  Beschriftung + messbare Verwendung: Pflicht für Stufe 1/2/3
+  (`pflichtFuer`), Deal Score, Verfeinerung Stufe 3, Anlage 2/4. Folgt
+  dem Tooltip-Modus der Einstellungen (`dp_tooltip_mode`: Aus = keine
+  Hover-Hilfe); ist sie an, sind die gelben `.dp-tip`-Knöpfe ausgeblendet
+  (`body.dp-feldhilfe-an`, Knöpfe bleiben im DOM).
+- **Quellen**: je Kennzahl eine Zeile (Parkstr. 9 hatte zweimal
+  Sachwertfaktor — zwei Tabellen eines Ausschusses).
+- **Stufe-3-Markierung bestätigt:** am Rechenkern gemessen stoppt bei der
+  ETW nur die fehlende BGF (plus Garage, wenn Garagen > 0); der Rest des
+  Blocks verfeinert — Journal (21).
+- **Schätzwerte durchwachsen** (`staging-schaetzwerte-v1858-variation.js`,
+  nur v1854-Vermerke): 16 von 17 Objekten hatten bereits eigene Lage-
+  Werte; nur Wilhelm-Busch-Str. (Rinteln) trug die v1854-Vorgabe → jetzt
+  Kleinstadt-Profil (makro schwach, Bevölkerung leicht fallend …).
+  Gewerke/Modernisierung variieren ohnehin nach Baujahr und Zustand.
+
+**Nachweise (Parkstr. 9, Buster v1858).** Abruf-Zeilen „Einfach · Stufe 1
+| 24 frei | abrufen" …; Pillen 1·2·3 in der Kachel; rechte Karte 1450 px,
+linke 1476 px — passt wieder; Hover über Wohnfläche → „Wohnfläche § WoFlV
+…" (gepflegt), über Hinterland → Beschriftung + Beispiel (Rückfall);
+`.dp-tip` `display:none`, Modus „beginner".
+
+**Rest.** Prod v1846b; Staging v1858a.
