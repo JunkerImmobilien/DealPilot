@@ -987,7 +987,27 @@
       var t = token(); var res = await fetch('/api/v1/marktbericht/objects/history?ref=' + encodeURIComponent(id), { headers: t ? { Authorization: 'Bearer ' + t } : {} });
       var j = await res.json();
       var reps = ((j && j.history) || []).filter(function (h) { return h && h.report_id != null; });
-      if (!reps.length) { host.innerHTML = '<div class="dab-mb-empty">Noch keine Marktberichte f\u00fcr dieses Objekt \u2014 im Bewertung-Tab einen erstellen.</div>'; return; }
+      /* \u2500\u2500 v1830 \u00b7 DER WEGWEISER ZEIGTE INS LEERE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+       *
+       * Hier stand: "im Bewertung-Tab einen erstellen." GEMESSEN am
+       * 04.10.2026: im Reiter Bewertung gibt es keinen solchen Knopf.
+       * Er wurde entfernt (`avm-section.js:371` haelt das ausdruecklich
+       * fest), der Einstieg liegt seither in der Seitenleiste.
+       *
+       *   > Ein Wegweiser, der auf eine leere Ecke zeigt, ist schlimmer
+       *   > als keiner. Wer keinen sieht, fragt; wer einem falschen folgt,
+       *   > haelt die App fuer kaputt.
+       *
+       * Statt den Satz zu korrigieren, steht hier jetzt der KNOPF. Den
+       * Weg zu beschreiben ist die zweitbeste Loesung, wenn man ihn auch
+       * gehen kann. */
+      if (!reps.length) {
+        host.innerHTML = '<div class="dab-mb-empty">Noch keine Marktberichte f\u00fcr dieses Objekt.'
+          + '<button type="button" class="dab-mb-tog" style="margin-left:10px"'
+          + ' onclick="if(typeof openMarktberichtView===\'function\')openMarktberichtView()">'
+          + 'Marktbericht erstellen</button></div>';
+        return;
+      }
       reps.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
       /* v942-mbrow: Kuerzel + Adresse + Datum + Marktwert statt nacktem Timestamp.
        * Alle vier Werte liegen seit jeher in mb.object_snapshots — sie wurden nur
@@ -1028,8 +1048,45 @@
           + '<span class="lbl-more">' + _rest.length + ' weitere anzeigen</span>'
           + '<span class="lbl-less">weniger anzeigen</span></button>';
       }
+      /* ── v1830 · DER VERLAUF WAR DA UND UNAUFFINDBAR ─────────────────────
+       *
+       * Marcel: "wir muessen ja auch den Verlauf tracken, dass wir halt
+       * auch einfach wissen: wie entwickelt sich diese Wohnung ueber die
+       * Jahre."
+       *
+       * GEMESSEN: den Verlauf gibt es vollstaendig — Linie, Delta-Tabelle
+       * ueber sieben Kennzahlen, KI-Trendtext (`ui.js:2025-2112`). Er
+       * sitzt in einem Unter-Tab von "Pilot-Analyse", der sich
+       * ausblendet, solange weniger als zwei Berichte da sind
+       * (`ui.js:2146`) — und der deshalb niemandem auffaellt, der ihn
+       * noch nie gesehen hat.
+       *
+       *   > Bevor etwas gebaut wird, das der Nutzer vermisst: nachsehen,
+       *   > ob er es nur nicht gefunden hat.
+       *
+       * Hier steht deshalb kein zweiter Verlauf, sondern die Tuer zum
+       * vorhandenen — mit der einen Zahl, die sie oeffnen laesst. */
+      var _spur = '';
+      var _mw = reps.filter(function (h) { return h.market_value != null; });
+      if (_mw.length >= 2) {
+        /* reps ist absteigend sortiert: [0] ist der juengste. */
+        var _neu = _mw[0], _alt = _mw[_mw.length - 1];
+        var _a = Number(_alt.market_value), _n = Number(_neu.market_value);
+        var _pct = (_a > 0) ? ((_n - _a) / _a * 100) : null;
+        var _jahre = (new Date(_neu.created_at) - new Date(_alt.created_at)) / 31557600000;
+        var _vz = (_pct == null) ? '' : (_pct >= 0 ? '+' : '');
+        _spur = '<div class="dab-mb-empty" style="display:flex;align-items:center;'
+          + 'gap:10px;flex-wrap:wrap;margin-top:10px">'
+          + '<span>' + _mw.length + ' Berichte'
+          + (_jahre >= 0.08 ? ' über ' + _jahre.toFixed(1).replace('.', ',') + ' Jahre' : '')
+          + (_pct == null ? '' : ' · Marktwert <b>' + _vz
+              + _pct.toFixed(1).replace('.', ',') + ' %</b>')
+          + '</span>'
+          + '<button type="button" class="dab-mb-tog"'
+          + ' onclick="DealActionBoarding.zeigeVerlauf()">Verlauf ansehen</button></div>';
+      }
       host.className = 'dab-mb-host';
-      host.innerHTML = _head + _tail;
+      host.innerHTML = _head + _tail + _spur;
     } catch (e) { host.innerHTML = '<div class="dab-mb-empty">Konnte Marktberichte nicht laden.</div>'; }
   }
   /* v949-realpdf
@@ -1130,6 +1187,37 @@
   /* v965-mbtog: klappt den Rest der Marktberichte auf/zu. Nur eine Klasse am
    * Host — kein Fetch, kein Re-Render, der Zustand ueberlebt kein Neuladen der
    * Liste, und genau das ist gewollt: nach dem Tab-Wechsel wieder eingeklappt. */
+  /* v1830 · Zum Marktbericht-Verlauf springen.
+   *
+   * Zwei Schritte, beide ueber den Bedienweg: der Reiter "Pilot-Analyse"
+   * wird geklickt wie vom Nutzer, dann der Unter-Tab. Dazwischen muss
+   * gewartet werden — der Unter-Tab-Knopf wird erst beim Aufbau der
+   * Pilot-Analyse erzeugt und bleibt auf `display:none`, bis die Historie
+   * geladen ist (`ui.js:2146`). Deshalb wird er gesucht, nicht
+   * vorausgesetzt: bis zu zwei Sekunden, in Schritten.
+   *
+   *   > Ein Knopf, der ins Leere greift, weil das Ziel noch nicht da ist,
+   *   > sieht aus wie ein kaputter Knopf. */
+  function zeigeVerlauf() {
+    var reiter = document.querySelector('.tab[data-target-sec="s5"]');
+    if (reiter) reiter.click();
+    var versuche = 0;
+    var uhr = setInterval(function () {
+      versuche++;
+      var b = document.getElementById('dp-pa-tab-verlauf');
+      if (b && b.style.display !== 'none') {
+        clearInterval(uhr);
+        b.click();
+        try { b.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+        return;
+      }
+      if (versuche > 20) {              /* 2 s */
+        clearInterval(uhr);
+        if (window.toast) window.toast('⚠ Verlauf noch nicht geladen — Pilot-Analyse ist offen');
+      }
+    }, 100);
+  }
+
   function toggleReports(btn) {
     var host = document.getElementById('dab-mb-host');
     if (host) host.classList.toggle('mb-open');
@@ -1153,6 +1241,11 @@
     toggleCustomDoc: toggleCustomDoc,
     partnerInterest: partnerInterest,
     downloadReport: downloadReport,
+    /* v1830 · Die Tuer zum vorhandenen Verlauf. Sie geht ueber den
+       ECHTEN Bedienweg: erst den Reiter Pilot-Analyse klicken, dann den
+       Unter-Tab. Ein direktes Setzen von display/active wuerde die
+       Nachladefunktion ueberspringen, und der Verlauf bliebe leer. */
+    zeigeVerlauf: zeigeVerlauf,
     deleteReport: deleteReport /* v966-delexport */
   };
 
