@@ -117,8 +117,19 @@ for (const url of amtlich) {
   pruefe('ohne Vollmacht: KEIN "liegt bei"',
     !/liegt diesem Schreiben bei/.test(ohne.text), 'der Brief behauptet eine Anlage, die fehlt');
   pruefe('ohne Vollmacht: bietet Nachreichen an', /nachreichen/i.test(ohne.text));
-  pruefe('ohne Flurstück: keine leere Flurzeile',
-    !/Gemarkung\s*·|Flur\s*·|^\s*$/m.test(ohne.text.split('\n')[5] || ''));
+  /* HIER STAND EIN FEHLER IN DIESEM PRUEFER: er las Zeile 5 und prüfte sie
+     unter anderem gegen `^\s*$` — und Zeile 5 IST eine Leerzeile, von
+     Anfang an und mit Absicht. Die Probe schlug also fehl, obwohl der
+     Brief richtig war.
+
+       > Ein Pruefer, der die falsche Zeile misst, meldet einen Fehler,
+       > den es nicht gibt — und kostet die Zeit, die er sparen soll.
+
+     Richtig gemessen: ohne Flurangaben darf keines dieser Wörter im Brief
+     stehen. Das ist, was die Probe sagen wollte. */
+  pruefe('ohne Flurstück: keine Flurzeile im Brief',
+    !/Gemarkung|Flurstück/.test(ohne.text),
+    'der Brief nennt Flurangaben, die es nicht gibt');
 
   /* Unbekannte Art muss abbrechen, nicht leise einen leeren Brief bauen. */
   let geworfen = false;

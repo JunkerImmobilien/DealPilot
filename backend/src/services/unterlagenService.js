@@ -123,6 +123,23 @@ function gemeindeSchluessel(plz, ort) {
 function _s(v) { return typeof v === 'string' ? v.trim() : ''; }
 function _link(v) { return /^https?:\/\//i.test(_s(v)) ? _s(v) : ''; }
 
+/* Trackingparameter raus, bevor die Seite abgerufen oder gespeichert wird.
+   Die Websuche hängt `?utm_source=openai` an — gemessen an Hüllhorst. Eine
+   Quellenangabe, die verrät, über welches Werkzeug sie gefunden wurde,
+   gehört nicht in einen Nachweis, und manche Server antworten darauf
+   anders. */
+function _sauber(url) {
+  const u = _link(url);
+  if (!u) return '';
+  try {
+    const x = new URL(u);
+    for (const p of [...x.searchParams.keys()]) {
+      if (/^utm_|^ref$|^source$|^fbclid$|^gclid$/i.test(p)) x.searchParams.delete(p);
+    }
+    return x.toString();
+  } catch (e) { return u; }
+}
+
 function _findeJson(text) {
   if (!text) return null;
   const roh = String(text);
@@ -205,6 +222,9 @@ async function amtSuchen(art, ort, opts = {}) {
     + 'persönliches Postfach einzelner Beschäftigter, solange es eine '
     + 'Funktionsadresse gibt.\n'
     + '- Schreibe die Adresse in einfachen Zeichen mit normalem Bindestrich.\n'
+    + '- "quelle" ist ein PFLICHTFELD: dort gehört die URL der Seite hinein, '
+    + 'auf der du die Adresse gelesen hast. Schreibe den Link nicht in den '
+    + 'Hinweis und nicht in den Fließtext, sondern in dieses Feld.\n'
     + '- Stelle keine Rückfragen und bitte nicht um Erlaubnis. Antworte direkt.'
     + nachtrag + '\n\n'
     + 'Antworte am Ende ausschließlich mit einem JSON-Objekt, ohne Einleitung '
@@ -230,12 +250,35 @@ async function amtSuchen(art, ort, opts = {}) {
     });
   }
 
+  /* ── v1833b · DEN BELEG EINSAMMELN, WO ER WIRKLICH LIEGT ───────────────
+   *
+   * GEMESSEN am 04.10.2026 an Hüllhorst: das Modell fand beide Behörden
+   * richtig (Kreis Minden-Lübbecke, Amtsgericht Lübbecke), ließ `quelle`
+   * aber LEER und schrieb den Link stattdessen in den Hinweis:
+   *
+   *     "... ([minden-luebbecke.de](https://www.minden-luebbecke.de/...))"
+   *
+   * Die Belegprüfung meldete daraufhin „keine Quelle genannt" — richtig
+   * nach ihrer Regel und trotzdem falsch, denn die Quelle stand da.
+   *
+   *   > Eine Angabe im falschen Feld ist keine fehlende Angabe. Wer sie
+   *   > als fehlend behandelt, verwirft, was er schon hat.
+   *
+   * Deshalb wird der Beleg jetzt aus allen drei Stellen eingesammelt:
+   * `quelle`, `seiten`, und zuletzt die Links im Fließtext des Hinweises.
+   * Das ist keine Nachsicht — geprüft wird danach genauso streng. */
+  let quelle = _link(r.quelle);
+  const seiten = Array.isArray(r.seiten) ? r.seiten.map(_link).filter(Boolean) : [];
+  const hinweisLinks = (_s(r.hinweis).match(/https?:\/\/[^\s)\]"']+/g) || []);
+  if (!quelle) quelle = seiten.find((u) => !istGewerblich(u)) || '';
+  if (!quelle) quelle = hinweisLinks.find((u) => !istGewerblich(u)) || '';
+
   return {
     behoerde: _s(r.behoerde), abteilung: _s(r.abteilung),
     email: _s(r.email).toLowerCase(), telefon: _s(r.telefon),
     kanal: ['email', 'portal', 'formular', 'post'].includes(_s(r.kanal)) ? _s(r.kanal) : 'email',
-    antrag_url: _link(r.antragUrl), quelle_url: _link(r.quelle),
-    seiten: Array.isArray(r.seiten) ? r.seiten.filter(_link).slice(0, 8) : [],
+    antrag_url: _link(r.antragUrl), quelle_url: _sauber(quelle),
+    seiten: [...new Set(seiten.concat(hinweisLinks))].map(_sauber).slice(0, 8),
     gebuehr: _s(r.gebuehr), hinweis: _s(r.hinweis),
     kreis: _s(r.kreis), bundesland: _s(r.bundesland)
   };
