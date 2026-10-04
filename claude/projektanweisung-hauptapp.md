@@ -30482,3 +30482,41 @@ Browser: 31 Herkunftsvermerke, eigene BGF 346,62 unverändert, Stufe 2 und
 solche vermerkt.
 
 **Rest.** Prüfstrecke Exporte; Prod v1846b, Staging v1854.
+
+## Rollout-Journal 04.10.2026 (19) — v1855–v1855b: Checkboxen, Leiste, Quellen, Abruf-Karte — und die Prüfstrecke der Exporte
+
+**Was (`d2b21a58`, `cb7afaa`).** Checkboxen 16 px statt 33 (v1147-CB33 war
+eine Touch-Regel; bei `pointer: coarse` 22 px). Leiste in festen Spalten
+(150 / 92 / Rest / 118 px), Knöpfe einheitlich „eintragen" / „ändern" /
+gleich breit, Quelle einzeilig mit Tooltip. Unter der Leiste der
+**Anfragen-Block**: je Kennzahl (Zins, Sachwertfaktor, Bodenrichtwert)
+Ausschuss, Jahrgang und Link bzw. PDF aus `/marktbericht/quellen?plz=`;
+„nötig"-Signal, wenn Zins oder Faktor fehlt; Knopf „anfragen" öffnet das
+Unterlagen-Modal, das jetzt die sechste Art **„Grundstücksmarktbericht
+(Gutachterausschuss)"** kennt (`unterlagenService.js`, Prüfer 45/45).
+Bismarckstraße: Sachwertfaktor „nicht für diese Objektart" (Lippe: EZFH)
+in EINER Zeile. Die drei Abrufe sind eine Karte **„Marktbericht abrufen"**
+am Ende des Reiters: Kacheln Einfach/Mittel/Ausgiebig mit Beschreibung,
+Kontingent, Fehlzahl, Knopf — und „Im Marktbericht öffnen →" als Absprung
+(`tools/n4e-abruf-karte.mjs`, IDs 888 → 892, der Reiter-Fuß wird über den
+s0-Knopf gefunden, er kommt in jedem Reiter vor).
+
+**Prüfstrecke Exporte nach dem Umbau — bestanden.**
+- Statisch (Feld-IDs gegen das DOM): Sprechlauf 45/45, Bankexport-Tabelle
+  19/19, PDF-Import 17 mit einer Lücke `nk_pct` — **die gab es schon vor
+  dem Umbau** (`8bc9ed5a`: 0 Treffer), ebenso 11 FIELDS-Einträge ohne
+  DOM (`afa_*`, `ai_*`, `bspar_zuteil` — dynamisch gerendert).
+- Browser, Staging, `exportPDF({ohneRueckfrage:true})` und
+  `exportPDFBank(...)` mit abgefangenem `jsPDF.save` (kein Download,
+  Seiten gezählt): **MFH** Bismarckstr. 27 Voll 11 S. / Bank 8 S.; **ETW**
+  Hermannstr. 9 Voll 10 / Bank 7; **ZFH** Löhner Str. 278 Voll 10 / Bank 8;
+  **GESCH** Hauptstr. 51 Voll 11 / Bank 8. Keine Fehler, kein Crash.
+- **Falle dabei:** der Voll-Export wartet auf `requestAnimationFrame` und
+  blieb 115 s stehen, solange der Mess-Tab verborgen war (`visibilityState
+  hidden`) — nach dem Sichtbarmachen lief er in Sekunden durch. Kein
+  Defekt des Exports; die bekannte rAF-Falle.
+- Die DOM-Bank-Tabelle (`#bank-tbody`, `exportBankCSV`) existiert im
+  Markup nicht mehr — der Bankexport läuft über `exportPDFBank`. Altlast,
+  nicht aus dem Umbau.
+
+**Rest.** Prod v1846b; Staging v1855b. Marcels BMF-Punkte folgen.

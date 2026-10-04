@@ -180,9 +180,11 @@ nur EZFH). Marktbericht-App füllt ihr Formular längst aus dem Objekt
 - Empfindlichkeitstest je Mapper-Feld (ändert sich der Bericht, wenn das
   Feld sich ändert?) steht noch aus — bisher nur Funktionslauf und ein
   echter Stufe-1-Bericht.
-- Prüfstrecke Exporte nach dem Umbau: ein PDF-Export, ein
-  Sprechlauf-Import, ein Bankexport je Objektart — IDs sind gleich, aber
-  „gleich" ist eine Behauptung, bis es jemand gemessen hat.
+- ~~Prüfstrecke Exporte~~ — **bestanden v1855 (Journal 19)**: vier
+  Objektarten, je Voll- und Bank-PDF ohne Fehler; Import-/Export-IDs
+  vollständig. Altlasten (nicht aus dem Umbau): `nk_pct` in pdf-import.js
+  ohne Feld, `#bank-tbody` nicht mehr im Markup (CSV-Export tot, der
+  Bankexport läuft über `exportPDFBank`).
 
 ### N5 · „BORIS abrufen" heißt nicht immer BORIS
 
