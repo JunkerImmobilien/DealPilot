@@ -40,6 +40,23 @@
   var _amtJeArt = {};     /* art -> Amt-Datensatz */
   var _laeuft = {};
 
+  /* v1843 · Drei Knopfarten, jede mit AUSGESCHRIEBENEM Grund und Text.
+     Keine `.btn`-Klasse: deren Farben hängen an Tokens, die je nach Skin
+     anders auflösen — gemessen: weiß auf Creme, Kontrast 1,00.
+       GOLD   Runway-Verlauf, Obsidian-Schrift      — die eine Haupthandlung
+       HELL   Weiß, Gold-Rand, Obsidian-Schrift     — Nebenhandlungen auf Creme
+       DUNKEL Obsidian, Gold-Rand, Creme-Schrift    — im schwarzen Kopf */
+  var _KNOPF_BASIS = 'font:600 12.5px/1 Inter,system-ui,sans-serif;padding:9px 14px;'
+    + 'border-radius:8px;cursor:pointer;white-space:nowrap;';
+  var _KNOPF_GOLD = _KNOPF_BASIS
+    + 'background:linear-gradient(110deg,var(--wl-E8CC7A,#E8CC7A),var(--wl-C9A84C,#C9A84C) 55%,var(--wl-b8932f,#b8932f));'
+    + 'color:#050505;border:1px solid var(--wl-b8932f,#b8932f);';
+  var _KNOPF_HELL = _KNOPF_BASIS
+    + 'background:#FFFFFF;color:#2A2727;border:1px solid var(--wl-C9A84C,#C9A84C);';
+  var _KNOPF_DUNKEL = _KNOPF_BASIS
+    + 'background:#050505;color:#f3ead0;border:1px solid var(--wl-C9A84C,#C9A84C);';
+  var _KNOPF_AUS = 'opacity:.45;cursor:not-allowed;';
+
   function _esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
@@ -83,24 +100,48 @@
       + 'display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:28px 16px';
     hu.addEventListener('click', function (e) { if (e.target === hu) _schliessen(); });
 
-    hu.innerHTML = '<div style="background:var(--surface,#14110f);border:1px solid var(--border,#2a2522);'
-      + 'border-radius:14px;max-width:860px;width:100%;padding:0;overflow:hidden">'
+    /* ── v1843 · DIE FARBEN HINGEN AN TOKENS, DIE ANDERS AUFLÖSTEN ─────────
+     *
+     * Marcel: „Das müsste einmal das Modal auch im Stil vom Deal-Piloten
+     * … mit dem Gold, mit dem Schwarz, mit dem Weiß. Dann kann man die Amt
+     * ermitteln, das kann man nicht lesen."
+     *
+     * GEMESSEN am 04.10.2026: die Hülle war `var(--surface,#14110f)` — der
+     * Rückfall ist dunkel, der Token löst aber auf Creme
+     * rgb(248,246,241) auf. Der Knopf „Amt ermitteln" (btn-ghost) trug
+     * darauf weißen Text mit 70 % Deckung: Kontrast 1,00. Unlesbar, und
+     * zwar exakt.
+     *
+     *   > Eine Farbe gilt nur zu ihrem Grund. Wer die Hülle einem Token
+     *   > überlässt, überlässt ihm auch die Lesbarkeit jedes Knopfes
+     *   > darin — und erfährt es erst, wenn der Token anders auflöst.
+     *
+     * Deshalb hier KEINE Tokens für die farbtragenden Flächen, sondern die
+     * Marke, einzeln benannt (CLAUDE.md: „farbtragende Flächen müssen
+     * einzeln benannt werden"): Karte #FBF6E9 als Hülle, Obsidian-Schrift
+     * #2A2727 darauf, Gold als Akzent — und Gold als `--wl-`-Token, weil
+     * ein Mandant es umfärben darf. Grün und Rot bleiben hart (Statusfarben
+     * nie tokenisieren). */
+    hu.innerHTML = '<div style="background:#FBF6E9;color:#2A2727;'
+      + 'border:1px solid var(--wl-C9A84C,#C9A84C);'
+      + 'border-radius:14px;max-width:860px;width:100%;padding:0;overflow:hidden;'
+      + 'box-shadow:0 24px 64px rgba(5,5,5,.45)">'
       + '<div style="display:flex;align-items:center;gap:12px;padding:16px 20px;'
-      + 'border-bottom:1px solid var(--border,#2a2522)">'
+      + 'background:#050505;color:#FDFCFA;'
+      + 'border-bottom:2px solid var(--wl-C9A84C,#C9A84C)">'
       + '<div style="flex:1 1 auto">'
-      + '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:17px;font-weight:600">'
-      + 'Unterlagen beim Amt anfordern</div>'
-      + '<div style="color:var(--muted,#8b8678);font-size:12.5px;margin-top:2px">'
+      + '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:17px;font-weight:600;'
+      + 'color:#FDFCFA">Unterlagen beim Amt anfordern</div>'
+      + '<div style="color:#f3ead0;opacity:.78;font-size:12.5px;margin-top:2px">'
       + (o.strasse || o.ort
           ? _esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(' ')].filter(Boolean).join(', '))
-          : '<span style="color:var(--warn,#D8954C)">Kein Objekt geladen — '
-            + 'Adresse fehlt</span>')
+          : '<span style="color:#E8CC7A">Kein Objekt geladen — Adresse fehlt</span>')
       + '</div></div>'
-      + '<button type="button" class="btn btn-ghost" style="font-size:13px"'
+      + '<button type="button" style="' + _KNOPF_DUNKEL + '"'
       + ' onclick="DealPilotUnterlagen.schliessen()">Schließen</button>'
       + '</div>'
-      + '<div id="dp-ul-body" style="padding:18px 20px;max-height:72vh;overflow:auto">'
-      + '<div style="color:var(--muted,#8b8678);font-size:13px">Lade …</div>'
+      + '<div id="dp-ul-body" style="padding:18px 20px;max-height:72vh;overflow:auto;color:#2A2727">'
+      + '<div style="color:#6f6960;font-size:13px">Lade …</div>'
       + '</div></div>';
 
     document.body.appendChild(hu);
@@ -143,37 +184,61 @@
     var fehlendFlur = ['gemarkung', 'flur', 'flurstueck']
       .filter(function (k) { return !o[k]; })
       .map(function (k) { return NAME_FLUR[k]; });
+    /* v1843 · Marcel: „ist es zwangsläufig notwendig, dass man Flur,
+       Gemarkung und Flurstück eingeben muss?" — NEIN. Der alte Satz
+       („muss das Amt … selbst heraussuchen") klang nach Pflicht. Jetzt
+       steht das Wort, das stimmt: optional. */
     if (fehlendFlur.length) {
-      h += '<div style="color:var(--muted,#8b8678);font-size:12.5px;line-height:1.6;'
-        + 'margin-bottom:14px">Ohne <b>' + fehlendFlur.join(', ')
-        + '</b> muss das Amt das Flurstück selbst heraussuchen. '
-        + 'Das geht, dauert aber länger. Die Angaben stehen im Grundbuchauszug '
-        + 'oder auf der Flurkarte.</div>';
+      h += '<div style="color:#6f6960;font-size:12.5px;line-height:1.6;'
+        + 'margin-bottom:14px"><b style="color:#2A2727">Optional:</b> '
+        + fehlendFlur.join(', ') + '. Ohne diese Angaben sucht das Amt das '
+        + 'Flurstück selbst heraus — das geht, dauert nur länger. Du findest '
+        + 'sie im Grundbuchauszug oder auf der Flurkarte.</div>';
     }
+
+    /* ── v1843 · „ALLE ABRUFEN" — Marcel: „man muss die ja alle einzeln
+       abrufen … dass man da noch einen Button macht: alle abrufen." ──── */
+    var offen = _arten.filter(function (a) { return !_amtJeArt[a.id]; }).length;
+    h += '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;'
+      + 'margin-bottom:12px;padding:10px 14px;background:#FFFFFF;'
+      + 'border:1px solid var(--wl-C9A84C,#C9A84C);border-radius:10px">'
+      + '<div style="flex:1 1 240px;font-size:12.5px;line-height:1.5;color:#2A2727">'
+      + (offen
+          ? '<b>' + offen + ' von ' + _arten.length + '</b> Zuständigkeiten noch nicht ermittelt. '
+            + 'Jede Suche dauert rund 20 Sekunden.'
+          : '<b>Alle ' + _arten.length + '</b> Zuständigkeiten liegen vor.')
+      + '</div>'
+      + '<button type="button" id="dp-ul-alle" style="' + _KNOPF_GOLD + (offen ? '' : _KNOPF_AUS) + '"'
+      + (offen ? '' : ' disabled')
+      + ' onclick="DealPilotUnterlagen.alleAbrufen()">Alle abrufen</button>'
+      + '</div>';
 
     h += '<div style="display:flex;flex-direction:column;gap:10px">';
     _arten.forEach(function (a) {
       var amt = _amtJeArt[a.id];
-      h += '<div style="border:1px solid var(--border,#2a2522);border-radius:10px;padding:12px 14px">'
+      h += '<div style="background:#FFFFFF;border:1px solid rgba(201,168,76,.35);'
+        + 'border-radius:10px;padding:12px 14px">'
         + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
         + '<div style="flex:1 1 220px;min-width:0">'
-        + '<div style="font-weight:600;font-size:14px">' + _esc(a.name) + '</div>'
-        + '<div id="dp-ul-amt-' + a.id + '" style="color:var(--muted,#8b8678);'
+        + '<div style="font-weight:600;font-size:14px;color:#2A2727">' + _esc(a.name) + '</div>'
+        + '<div id="dp-ul-amt-' + a.id + '" style="color:#6f6960;'
         + 'font-size:12.5px;margin-top:3px;line-height:1.55">'
         + (amt ? _amtZeile(amt) : 'Zuständigkeit noch nicht ermittelt')
         + '</div></div>'
-        + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
+        + '<button type="button" style="' + _KNOPF_HELL + '"'
         + ' onclick="DealPilotUnterlagen.amtSuchen(\'' + a.id + '\')">'
         + (amt ? 'Neu suchen' : 'Amt ermitteln') + '</button>'
-        + '<button type="button" class="btn" style="font-size:12px"'
-        + (amt ? '' : ' disabled style="font-size:12px;opacity:.45;cursor:not-allowed"')
+        /* Vorher standen hier bei fehlendem Amt ZWEI style-Attribute am
+           selben Knopf — das zweite verfällt still. Jetzt eines. */
+        + '<button type="button" style="' + _KNOPF_GOLD + (amt ? '' : _KNOPF_AUS) + '"'
+        + (amt ? '' : ' disabled')
         + ' onclick="DealPilotUnterlagen.entwurf(\'' + a.id + '\')">Anschreiben</button>'
         + '</div></div>';
     });
     h += '</div>';
 
-    h += '<div style="color:var(--muted,#8b8678);font-size:12px;line-height:1.6;margin-top:16px;'
-      + 'padding-top:12px;border-top:1px solid var(--border,#2a2522)">'
+    h += '<div style="color:#6f6960;font-size:12px;line-height:1.6;margin-top:16px;'
+      + 'padding-top:12px;border-top:1px solid rgba(201,168,76,.35)">'
       + 'DealPilot <b>verschickt nichts</b>. Es erzeugt das Anschreiben und legt es '
       + 'in die Zwischenablage — gesendet wird aus deinem eigenen Mailprogramm.'
       + '</div>';
@@ -255,8 +320,8 @@
   function _zeigeBrief(r, amt) {
     var body = document.getElementById('dp-ul-body');
     if (!body) return;
-    body.innerHTML = '<div style="font-size:13px;line-height:1.6">'
-      + '<div style="color:var(--muted,#8b8678);font-size:12.5px;margin-bottom:8px">'
+    body.innerHTML = '<div style="font-size:13px;line-height:1.6;color:#2A2727">'
+      + '<div style="color:#6f6960;font-size:12.5px;margin-bottom:8px">'
       + 'An: <b>' + _esc(amt && amt.email ? amt.email : '— keine Adresse —') + '</b>'
       + (amt && !amt.beleg_ok
           ? ' <span style="color:var(--warn,#D8954C)">(nicht belegt — bitte prüfen)</span>'
@@ -267,14 +332,14 @@
       + 'font-family:ui-monospace,monospace;font-size:12.5px;line-height:1.55">'
       + _esc(r.text) + '</textarea>'
       + '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
-      + '<button type="button" class="btn" style="font-size:12px"'
+      + '<button type="button" style="' + _KNOPF_GOLD + '"'
       + ' onclick="DealPilotUnterlagen.kopieren()">In die Zwischenablage</button>'
       + (amt && amt.email
-          ? '<button type="button" class="btn btn-ghost" style="font-size:12px"'
+          ? '<button type="button" style="' + _KNOPF_HELL + '"'
             + ' onclick="DealPilotUnterlagen.mailOeffnen(\'' + _esc(amt.email) + '\')">'
             + 'Im Mailprogramm öffnen</button>'
           : '')
-      + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
+      + '<button type="button" style="' + _KNOPF_HELL + '"'
       + ' onclick="DealPilotUnterlagen.zurueck()">Zurück</button>'
       + '</div></div>';
   }
@@ -309,9 +374,41 @@
 
   function zurueck() { _aufbauen(); }
 
+  /* ── v1843 · ALLE ABRUFEN ────────────────────────────────────────────────
+   *
+   * NACHEINANDER, nicht gleichzeitig. Fünf Websuchen parallel wären für
+   * dieselbe Gemeinde fünfmal dieselbe Arbeit; so kann die Ämter-Ernte
+   * jeden Treffer für den nächsten nutzen, und der Nutzer sieht Zeile für
+   * Zeile, wo es gerade steht. Was schon da ist, wird übersprungen —
+   * „alle" heißt alle FEHLENDEN, nicht alle noch einmal. */
+  var _alleLaeuft = false;
+  async function alleAbrufen() {
+    if (_alleLaeuft || !_arten) return;
+    _alleLaeuft = true;
+    var k = document.getElementById('dp-ul-alle');
+    if (k) { k.disabled = true; k.style.cssText = _KNOPF_GOLD + _KNOPF_AUS; }
+    var fehlend = _arten.filter(function (a) { return !_amtJeArt[a.id]; });
+    var n = 0;
+    try {
+      for (var i = 0; i < fehlend.length; i++) {
+        k = document.getElementById('dp-ul-alle');
+        if (k) k.textContent = 'Suche ' + (i + 1) + ' von ' + fehlend.length + ' …';
+        await amtSuchen(fehlend[i].id);
+        if (_amtJeArt[fehlend[i].id]) n++;
+      }
+    } finally {
+      _alleLaeuft = false;
+      await _aufbauen();
+      if (window.toast) window.toast('✓ ' + n + ' von ' + fehlend.length + ' Zuständigkeiten ermittelt');
+    }
+  }
+
   window.DealPilotUnterlagen = {
     oeffnen: oeffnen, schliessen: _schliessen,
     amtSuchen: amtSuchen, entwurf: entwurf,
+    /* v1843 · Ohne Export ruft das onclick ins Leere — derselbe Fehler
+       wie beim Abbrechen-Knopf des Telegram-Panels (v1825). */
+    alleAbrufen: alleAbrufen,
     kopieren: kopieren, mailOeffnen: mailOeffnen, zurueck: zurueck
   };
 })();
