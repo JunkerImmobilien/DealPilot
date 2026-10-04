@@ -156,9 +156,25 @@ gekoppelt ans Kontingent (`wev` nur pro/partner, existiert schon); Sterne
 RND-Rechnung (`rnd-calc.js:683`) — dieselbe Schwelle künftig auf die
 Gewerke-Stufe. Vorlage: `design/mockups/objekt-reiter-v1850.html`.
 
-Nächster Schritt nach Marcels Blick auf die Vorlage: P1 (Mapper +
-Empfindlichkeitstest je Feld) → P2 (`wert_stufe:3` im Objekt-Weg) →
-P3 (Automatik-Leiste) → P4 (Formular + Migration `ausst`/`rate_*`).
+**Gebaut 04.10.2026, v1851–v1851c (Staging):** P1 Mapper, P2 Stufe 3 im
+Objekt-Weg (`DealPilotMB.run({stufe})`), P3 Automatik-Leiste, P4 Formular
+in drei Ebenen — alles in einem Paket, Feld-IDs unverändert
+(`tools/n4-umbau-index.mjs`, 873 = 873). Nachweise im Journal (14).
+Dabei gefunden und behoben: `num()` im Mapper las „2.56" als 256 (lzs_pct,
+sachwertfaktor, **mea schon vorher**).
+
+**Offen aus dem Paket:**
+- **N4-P1b** — der Bericht trägt `nutzer_einschaetzung`, zeigt sie aber
+  noch nicht: Web-Ansicht und PDF der Marktbericht-App müssen den Block
+  **neben** der Datenlage rendern, getrennt beschriftet.
+- **N4-P5** — GeoMap-Filter (Zimmer, Grundstück, Heizung) — erst messen,
+  ob die Vergleichsmenge nicht zu klein wird.
+- Empfindlichkeitstest je Mapper-Feld (ändert sich der Bericht, wenn das
+  Feld sich ändert?) steht noch aus — bisher nur Funktionslauf und ein
+  echter Stufe-1-Bericht.
+- Prüfstrecke Exporte nach dem Umbau: ein PDF-Export, ein
+  Sprechlauf-Import, ein Bankexport je Objektart — IDs sind gleich, aber
+  „gleich" ist eine Behauptung, bis es jemand gemessen hat.
 
 ### N5 · „BORIS abrufen" heißt nicht immer BORIS
 
