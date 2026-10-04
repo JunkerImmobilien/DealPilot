@@ -613,7 +613,28 @@ export const CrossCheckService = {
     }
 
     const _typUnbekannt = !ref.property_type;
+    /* v1839 · Gewerbe und Garage sind KEINE fehlende Angabe. Sie sind
+       eine Angabe, für die dieser Dienst kein Verfahren hat. Der
+       Unterschied ist für den Nutzer der ganze: beim einen soll er etwas
+       ergänzen, beim anderen gibt es nichts zu ergänzen. */
+    const _typ = String(ref.property_type || '').toLowerCase();
+    const _gewerblich = (_typ === 'gewerbe' || _typ === 'garage');
     if (_nhkFertig) { /* WNHK-6: Sachwert steht bereits aus der NHK-Rechnung */ }
+    else if (_gewerblich) {
+      out.sachwert = { available: false,
+        grund: _typ === 'garage'
+          ? 'Garagen und Stellplätze werden in diesem Bericht nicht eigenständig '
+            + 'bewertet — sie gehören als Zubehör zum Hauptobjekt.'
+          : 'Für gewerblich genutzte Objekte führt dieser Bericht kein Verfahren. '
+            + 'Die Normalherstellungskosten der Anlage 4 ImmoWertV, die hier '
+            + 'hinterlegt sind, gelten für Wohnnutzung; eine Bewertung darüber '
+            + 'wäre nicht modellkonform (§ 10 ImmoWertV).' };
+      out.notes.push(_typ === 'garage'
+        ? 'Sachwert nicht ausgewiesen: Garagen sind kein eigenständiges Bewertungsobjekt.'
+        : 'Sachwert nicht ausgewiesen: gewerbliche Nutzung. Für Büro, Geschäftshaus, '
+          + 'Hotel und sonstiges Gewerbe braucht es die gewerblichen NHK-Typen — '
+          + 'die sind hier nicht hinterlegt.');
+    }
     else if (_typUnbekannt) {
       out.sachwert = { available: false,
         grund: 'Objekttyp nicht angegeben — ohne ihn ist die richtige NHK-Tabelle nicht bestimmbar.' };

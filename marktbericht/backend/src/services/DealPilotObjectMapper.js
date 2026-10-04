@@ -20,11 +20,37 @@ function num(v) {
     : parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
   return isNaN(n) ? null : n;
 }
+/* ── v1839 · FÜNF VON ELF OBJEKTARTEN FIELEN DURCH ───────────────────────
+ *
+ * GEMESSEN am 04.10.2026 an Marcels Objekt Hauptstr. 51, 49477 Ibbenbüren
+ * (Objektart GESCH): der Marktbericht meldete „Objekttyp nicht angegeben
+ * — bitte im Formular ergänzen". Er WAR angegeben. Dieser Mapper kannte
+ * ihn nur nicht und gab `null` zurück.
+ *
+ * Die App führt elf Objektarten (frontend-konstanten.json): ETW, EFH,
+ * ZFH, DHH, RH, MFH, BUERO, GESCH, HOTEL, GEW, GAR. Abgedeckt waren
+ * sechs — die fünf gewerblichen nicht.
+ *
+ *   > Eine Meldung, die „fehlt" sagt, wo „kenne ich nicht" richtig wäre,
+ *   > schickt den Nutzer zurück ins Formular, in dem alles steht. Er
+ *   > trägt dann ein, was schon da ist, und es ändert sich nichts.
+ *
+ * GEWERBE WIRD NICHT ALS WOHNEN GERECHNET. Die NHK-Tabellen der Anlage 4
+ * ImmoWertV, die dieser Dienst führt, sind die wohnwirtschaftlichen;
+ * ein Geschäftshaus darüber zu bewerten wäre schlimmer als gar nicht.
+ * Deshalb reist die Art jetzt als `gewerbe` mit — der Bericht kann dann
+ * sagen, WARUM er nicht rechnet, statt eine falsche Lücke zu melden.
+ *
+ * Garagen sind ein eigener Fall: sie sind kein Bewertungsobjekt für
+ * diesen Bericht, sondern Zubehör.
+ */
 function mapPropertyType(raw) {
   const s = String(raw || '').toLowerCase();
   if (/etw|wohnung|eigentumswohnung/.test(s)) return 'wohnung';
   if (/mfh|mehrfamilien/.test(s)) return 'mfh';
   if (/efh|dhh|rh|zfh|haus|einfamilien|doppelhaus|reihenhaus/.test(s)) return 'haus';
+  if (/^gar$|garage|stellplatz/.test(s)) return 'garage';
+  if (/buero|büro|gesch|hotel|gew|laden|handel|praxis/.test(s)) return 'gewerbe';
   return null;
 }
 function buildAddress(d) {
