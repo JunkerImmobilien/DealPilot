@@ -30569,3 +30569,39 @@ Stufe A". Sie erscheint nur, wenn der amtliche Zins Stufe A/B hat.
 
 **Rest.** Prod v1846b; Staging v1856a. Staging-Rollout erledigt; Prod nur
 nach ausdrücklicher Freigabe.
+
+## Rollout-Journal 04.10.2026 (21) — v1857: Abruf-Kästchen rechts, Stufe-3-Pflicht nachgemessen
+
+Marcel: *„Marktbericht abrufen … seitlich packen unter Anfrage … ein
+neues Kästchen"* und *„bist du dir sicher, dass wir für die Stufe 3
+wirklich nur 14 Felder brauchen? … Diese Angaben müssen doch auch alle
+gemacht werden … prüfe das."*
+
+**Geprüft am Rechenkern** (`CrossCheckService.js:612–700`, `nhk2010.js
+bgf()`, `ErtragswertService`): Verfahren stoppen bei ETW ohne **BGF der
+Wohnung** (keine Näherung aus der Wohnfläche, Z. 650 ff.) oder ohne
+**Standardstufe**; bei Häusern ohne **NHK-Typ**; bei MFH ohne
+**Einheiten**; Bodenwert ohne **Grundstück + Bodenrichtwert** (ETW: + MEA);
+Ertragswert ohne **Miete**, Baujahr, Nutzungsart. Alles Weitere im Block
+(Hinterland, Garagen-BGF ohne Garagen, Außenanlagen, Bauteile in €,
+Stellplatzmiete, sonstige Einnahmen, Abschläge, eigene Ansätze) verfeinert
+— ohne Angabe gelten die Ansätze der Anlage 3 oder kein Zuschlag.
+**Gefehlt hatte die BGF bei der ETW** — ergänzt. Die Verfeinerungsfelder
+tragen ein „optional"-Schild (20 an der Hermannstraße gemessen), damit
+ein fehlender roter Rahmen nicht wie ein Versäumnis wirkt.
+
+**Was (`a67a88f`).** `tools/n4f-abruf-box.mjs`: die drei Kacheln als
+Kästchen `#oe-abruf-box` in der rechten Karte unter den Anfragen (IDs
+892 = 892, div-Bilanz 0); Karte unten weg. `pflichtFuer(3)`: `bgf` für
+alle Wohnarten; `optionalMarkieren()`.
+
+**Nachweis (Hermannstraße, ETW, Buster v1857).** Kästchen in `#qz-card`,
+3 Kacheln, alte Karte weg; Pflicht Stufe 3 = 20 Felder (inkl. `bgf`,
+`mea`, Garage wegen 1 Garage), nichts fehlt; 20 optional-Schilder, Pflicht
+im Block: `bgf`, `garagen_bgf_qm`, `garagen_stufe`.
+
+**Nebenbefund.** Mein Mess-Tab hielt nach dem BMF-Test einen
+„Seite verlassen?"-Dialog (ungespeicherter Zustand) — neuer Tab, kein
+Defekt.
+
+**Rest.** Prod v1846b; Staging v1857.
