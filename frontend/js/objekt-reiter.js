@@ -228,8 +228,10 @@
      Standardstufe → Qualitätsfaktor, Zimmer, Etage bei ETW, Einheiten bei
      MFH), Stufe 3 dazu alles, was Sach- und Ertragswert brauchen —
      einschließlich der Felder im Block „Sach- und Ertragswert". */
-  function pflichtFuer(stufe) {
-    var art = _v('objart').toUpperCase();
+  /* v1862 · `artOpt`/`garOpt`: die geführte Eingabe kennt Art und Garagen
+     schon aus dem Gespräch, bevor sie im Formular stehen. */
+  function pflichtFuer(stufe, artOpt, garOpt) {
+    var art = String(artOpt || _v('objart')).toUpperCase();
     var l = ['plz', 'ort', 'str', 'objart', 'wfl', 'baujahr'];
     if (stufe >= 2) {
       l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe', 'zimmer']);
@@ -250,7 +252,7 @@
       l = l.concat(['nutzungsart', 'gsfl', 'brw', 'bgf']);
       if (art === 'ETW') l.push('mea');
       if (/^(EFH|ZFH|DHH|RH)$/.test(art)) l = l.concat(['nhk_haus', 'nhk_geschosse', 'nhk_dach']);
-      var gar = parseFloat(_v('garagen').replace(',', '.'));
+      var gar = parseFloat(String(garOpt != null && garOpt !== '' ? garOpt : _v('garagen')).replace(',', '.'));
       if (gar > 0) l = l.concat(['garagen_bgf_qm', 'garagen_stufe']);
     }
     return l;

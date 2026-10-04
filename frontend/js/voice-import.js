@@ -2849,6 +2849,124 @@
            + 'nach Anlage 2 ImmoWertV.' }
   ];
 
+  /* ═══ v1862 · DIE EINGABETIEFE IM GEFÜHRTEN WEG ═══════════════════════
+     Gemessen am 04.10.2026: der Reiter Objekt kennt seit v1854 drei
+     Eingabetiefen (Einfach / Mittel / Ausgiebig = Stufe 1/2/3), und die
+     Pflichtstaffel dazu steht in objekt-reiter.js (pflichtFuer). Die
+     geführte Eingabe kannte sie NICHT: sie fragte ihre 18 Blöcke, dann
+     „vier weitere Fragen" einer eigenen Wertermittlungs-Schleife — und
+     danach meldete der Pre-Flight-Schritt „Stufe 3: Angaben fehlen —
+     siehe Reiter Objekt". BGF, NHK-Typ, Nutzungsart, Miteigentumsanteil,
+     Standardstufe: kein Block fragte sie.
+
+     Die Blöcke hier sind KEINE zweite Pflichtliste. Welche Felder die
+     Stufe braucht, sagt allein pflichtFuer(); hier steht nur, WIE man
+     danach fragt. Ein Feld, das dort nicht steht, wird hier nicht gefragt
+     — und ein Feld, das dort steht und hier keinen Block hat, fällt
+     später im Reiter Objekt als rot auf (Wächter, kein Ersatz). */
+  var RFRAGEN_STUFE = [
+    { et: 7, ids: ['standardstufe'], rang: 1, stufe: 2, skalen: 1,
+      frage: 'Wie ist das Gebäude ausgestattet? Die Normalherstellungskosten 2010 kennen '
+           + 'fünf Standardstufen: 1 sehr einfach, 2 einfach, 3 Standard, 4 gehoben, '
+           + '5 stark gehoben. Es geht um die Qualität der Ausstattung — nicht um den '
+           + 'Zustand, der steckt im Modernisierungsgrad.' },
+    { et: 7, ids: ['etage'], rang: 2, stufe: 2,
+      frage: 'In welchem Stockwerk liegt die Wohnung? Erdgeschoss ist 0.' },
+    { et: 7, ids: ['nutzungsart'], rang: 3, stufe: 3, skalen: 1,
+      frage: 'Wie wird das Objekt genutzt — Wohnen, gemischt oder gewerblich? '
+           + 'Davon hängen Bewirtschaftungskosten und Ertragswert ab.' },
+    { et: 7, ids: ['gsfl', 'brw'], rang: 4, stufe: 3,
+      frage: 'Wie groß ist das Grundstück, und welcher Bodenrichtwert gilt? '
+           + 'Den Bodenrichtwert hole ich dir auch ab.' },
+    { et: 7, ids: ['mea'], rang: 5, stufe: 3,
+      frage: 'Wie hoch ist der Miteigentumsanteil der Wohnung in Prozent? '
+           + 'Ohne ihn gibt es keinen Bodenwert.' },
+    { et: 7, ids: ['bgf'], rang: 6, stufe: 3,
+      frage: 'Wie groß ist die Bruttogrundfläche in Quadratmetern? Der Sachwert rechnet '
+           + 'damit — bei Wohnungen nicht mit der Wohnfläche.' },
+    { et: 7, ids: ['nhk_haus', 'nhk_geschosse', 'nhk_dach'], rang: 7, stufe: 3, skalen: 1,
+      frage: 'Für die Normalherstellungskosten: Welche Hausform, wie viele Geschosse, '
+           + 'und wie ist das Dach ausgeführt?' },
+    { et: 7, ids: ['garagen_bgf_qm', 'garagen_stufe'], rang: 8, stufe: 3,
+      frage: 'Zu den Garagen: Grundfläche in Quadratmetern und Standardstufe?' }
+  ];
+  function _rfZiel() {
+    try {
+      var R = window.DealPilotObjektReiter;
+      var z = (R && typeof R.zielstufe === 'function') ? R.zielstufe() : 1;
+      return (z >= 1 && z <= 3) ? z : 1;
+    } catch (e) { return 1; }
+  }
+  /* Die Blöcke, die für Stufe z noch offen sind — Art und Garagen aus dem
+     Gespräch, nicht aus dem Formular (dort stehen sie erst nach der
+     Übernahme). `ausser`: Felder, die ein anderer Block schon fragt. */
+  function _rfStufeBloecke(z, ausser) {
+    var R = window.DealPilotObjektReiter;
+    if (!R || typeof R.pflichtFuer !== 'function' || !_rf) return [];
+    var fields = _rf.data.fields || {};
+    var pflicht;
+    try { pflicht = R.pflichtFuer(z, _rfArt(fields), _rfFeld('garagen')); } catch (e) { return []; }
+    var da = {}; (ausser || []).forEach(function (id) { da[id] = 1; });
+    var out = [];
+    RFRAGEN_STUFE.forEach(function (e) {
+      if (e.stufe > z) return;
+      var ids = e.ids.filter(function (id) { return pflicht.indexOf(id) >= 0 && !da[id]; });
+      if (!ids.length) return;
+      var k = {}; Object.keys(e).forEach(function (s) { k[s] = e[s]; });
+      k.ids = ids;
+      if (!_rfFehlt(k, fields)) return;
+      ids.forEach(function (id) { da[id] = 1; });
+      out.push(k);
+    });
+    return out;
+  }
+  function _rfStufeStarten() {
+    if (!_rf || _rf.stufeAn) return false;
+    var z = _rfZiel();
+    if (z < 2) return false;
+    var neu = _rfStufeBloecke(z);
+    if (!neu.length) return false;
+    _rf.stufeAn = 1;
+    _rfBlase('co', '<b>Eingabetiefe ' + (z >= 3 ? 'Ausgiebig' : 'Mittel') + '.</b><br>'
+      + '<span style="opacity:.8">Dafür brauche ich noch ' + neu.length
+      + (neu.length === 1 ? ' Angabe' : ' Angaben') + ' — '
+      + (z >= 3 ? 'ohne sie rechnet der Sach- und Ertragswert nicht zu Ende.'
+                : 'sie gehören zur erweiterten Marktpreisindikation.') + '</span>');
+    _rfKatalogErgaenzen(neu);
+    _rf.offen = _rf.offen.concat(_rfAufKatalog(neu, _rf.catalog));
+    _rfStandZeichnen();
+    _rfFrage();
+    return true;
+  }
+  /* EIN Sammler für jeden Abruf aus dem Dialog: das ganze Formular (wie
+     die Karte, DealPilotMB.inputs — mit den 50 Feldern der Wertermittlung),
+     darüber das, was in diesem Gespräch gesagt wurde. Vorher hatten
+     Marktpreisindikation und Wertermittlung je eine eigene Handliste,
+     und BGF, Standardstufe, NHK-Typ reisten nie mit. */
+  function _rfObjektVoll(basis) {
+    var obj = {};
+    try { if (window.DealPilotMB && typeof DealPilotMB.inputs === 'function') obj = DealPilotMB.inputs() || {}; } catch (e) { obj = {}; }
+    Object.keys(basis || {}).forEach(function (k) {
+      var v = basis[k]; if (v !== null && v !== undefined && v !== '') obj[k] = v;
+    });
+    var f = (_rf && _rf.data && _rf.data.fields) || {};
+    Object.keys(f).forEach(function (k) {
+      var v = f[k];
+      if (v === null || v === undefined || v === '' || /^_/.test(k)) return;
+      obj[k] = v;
+    });
+    if (obj.objart && !obj.objektart) obj.objektart = obj.objart;
+    try {
+      var OA = window.DealPilotObjektart, art = String(obj.objart || '').toUpperCase();
+      if (OA && OA.passt) Object.keys(obj).forEach(function (id) { if (OA.passt(art, id) === false) delete obj[id]; });
+    } catch (e) {}
+    return obj;
+  }
+  /* Die Wertermittlungs-Schleife bucht die Stufe, die sie verspricht:
+     Sach- und Ertragswert gibt es nur in Stufe 3 (wev). Bis v1861 stand
+     hier wert_stufe 2 — versprochen Stufe 3, geliefert „nicht im Umfang". */
+  function _rfWertStufe() { var kg = _rfKontingent(); return (kg && kg.wev > 0) ? 3 : 2; }
+
   /* ═══ v1608 · DIE RESTNUTZUNGSDAUER-STRECKE ═════════════════════════
      Marcel: "wir koennen ja fragen ob die rnd strecke abgefragt werden
      soll. wenn ja werden die fragen gestellt. am besten auch wieder mit
@@ -7924,7 +8042,7 @@
         var r = (a.rest != null) ? a.rest : null;
         return (r == null) ? 0 : r;
       }
-      return { plan: s.plan || null, mpi: rest('mpi'), mpi_plus: rest('mpi_plus') };
+      return { plan: s.plan || null, mpi: rest('mpi'), mpi_plus: rest('mpi_plus'), wev: rest('wev') };   /* v1862: wev dazu */
     } catch (e) { return null; }
   }
 
@@ -7965,6 +8083,27 @@
           'ich frage die Werte stattdessen ab. Nachkaufen kannst du sie jederzeit im Marktbericht.</span>');
       }
       _rf.marktGefragt = 1;
+      return;
+    }
+    /* v1862 · Die Eingabetiefe ist schon gewählt (Reiter Objekt, Pre-Flight-
+       Pillen) — dann ist die Stufe keine Frage mehr. Ausgiebig: die
+       Wertermittlung nach ImmoWertV am Ende enthält die Marktpreisindikation,
+       ein zweiter Abruf vorher kostete doppelt. Mittel: die erweiterte,
+       wie gewählt. Einfach: das Angebot wie bisher. */
+    var _z = _rfZiel();
+    if (_z >= 3 && kg.wev > 0) {
+      _rf.marktGefragt = 1;
+      _rfBlase('co', '<span style="opacity:.8">Du hast <b>Eingabetiefe Ausgiebig</b> gewählt: '
+        + 'die Wertermittlung nach ImmoWertV hole ich am Ende — mit Marktpreisindikation, '
+        + 'Boden-, Ertrags- und Sachwert. Vorher frage ich, was sie braucht.</span>');
+      return;
+    }
+    if (_z >= 2 && kg.mpi_plus > 0) {
+      _rf.marktGefragt = 1;
+      _rfBlase('co', '<span style="opacity:.8">Du hast <b>Eingabetiefe Mittel</b> gewählt — '
+        + 'ich hole die <b>erweiterte Marktpreisindikation</b>, sobald Zustand, Energieausweis '
+        + 'und Lage stehen.</span>');
+      _rfMarktWaehlen(2);
       return;
     }
     _rf.marktGefragt = 1;
@@ -8177,6 +8316,8 @@
       var _oa = window.DealPilotObjektart, _art = String(obj.objart || '').toUpperCase();
       if (_oa && _oa.passt) Object.keys(obj).forEach(function (id) { if (_oa.passt(_art, id) === false) delete obj[id]; });
     } catch (e) {}
+    /* v1862 · ab Stufe 2 das ganze Objekt (Formular + Gesagtes), wie die Karte */
+    if (stufe >= 2) obj = _rfObjektVoll(obj);
     var koerper = (stufe >= 2) ? { wert_stufe: 2, object: obj } : { fast: true, object: obj };
     try { koerper.external_ref = window._currentObjKey || null; } catch (e) {}
     _rfBlase('co', '<span style="opacity:.75">' +
@@ -8374,6 +8515,9 @@
     _rf.markt = M;
     if (stufe >= 2) _rf.markt2 = M;
     _mbGeholt = true;   /* v1293: die Pre-Flight-Kette ueberspringt den eigenen Abruf */
+    /* v1862 · … und die Karte „DealPilot-Marktbewertung" zeigt, was hier geholt
+       wurde. Gemessen: bezahlt, Kette übersprungen, Karte leer. */
+    try { if (window.DealPilotMB && typeof DealPilotMB.uebernehmen === 'function') DealPilotMB.uebernehmen(d); } catch (e) {}
 
     /* Die Lagestufen: 0-100 vom Marktbericht auf die fuenf Stufen des
        Formulars. Die Grenzen sind dieselben wie in dealpilot-mb.js
@@ -9283,7 +9427,7 @@
        Auskunft gerade nicht zu haben ist (v1293d). Dann lieber nichts
        anbieten als etwas Falsches behaupten. */
     if (!kg) return false;
-    return (kg.mpi_plus > 0);
+    return (kg.wev > 0);   /* v1862: die Schleife bucht Stufe 3, also zählt das wev-Kontingent */
   }
 
   /* Das Angebot — einmal, am Ende, und nur wenn es etwas zu holen gibt. */
@@ -9303,8 +9447,16 @@
       + 'und rechne das Sachwertverfahren durch.</span>');
       return false;
     }
+    /* v1862 · Eingabetiefe Ausgiebig heißt Stufe 3 — das ist die Wahl,
+       nicht erst eine Frage. Die Fragen dazu sind oben schon gestellt. */
+    if (_rfZiel() >= 3) {
+      _rfBlase('co', '<span style="opacity:.8">Du hast <b>Eingabetiefe Ausgiebig</b> gewählt — '
+        + 'die Wertermittlung nach ImmoWertV (Stufe 3) gehört dazu, ich starte sie.</span>');
+      _rfWertStarten();
+      return true;
+    }
     _rfAktion('wert',
-      'Soll ich noch eine Wertermittlung nach ImmoWertV anschließen?',
+      'Soll ich noch eine Wertermittlung nach ImmoWertV anschließen? Stufe 3: Boden-, Ertrags- und Sachwert.',
       'Ja, Wertermittlung');
     return true;
   }
@@ -9313,7 +9465,11 @@
     if (!_rf || _rf.wertAn) return;
     _rf.wertAn = 1;
     _rfAktionWeg('wert');
-    var neu = RFRAGEN_WERT.filter(function (e) { return _rfFehlt(e); });
+    /* v1862 · dazu die Pflicht der Stufe 3 (BGF, NHK-Typ, Nutzungsart, MEA …),
+       ohne Doppelfrage zu den vier Blöcken hier; gesagt zählt wie eingetragen. */
+    var neu = RFRAGEN_WERT.filter(function (e) { return _rfFehlt(e, _rf.data.fields); });
+    var _schon = []; neu.forEach(function (e) { _schon = _schon.concat(e.ids); });
+    neu = neu.concat(_rfStufeBloecke(3, _schon));
     _rfBlase('co',
       '<b>Wertermittlung nach ImmoWertV.</b><br>'
     + '<span style="opacity:.8">' + (neu.length
@@ -9406,6 +9562,12 @@
       var v = _rfFeld(id);
       if (v !== null && v !== undefined && v !== '') obj[id] = v;
     });
+    /* v1862 · das ganze Objekt dazu (BGF, NHK-Typ, Nutzungsart, Gewerke …)
+       und die Stufe, die die Schleife verspricht: 3, wenn das Kontingent
+       sie hergibt — sonst ehrlich die erweiterte Indikation. */
+    obj = _rfObjektVoll(obj);
+    var _ws = _rfWertStufe();
+    _rf.wertStufe = _ws;
     /* v1603 · Hier stand "Die Wertermittlung läuft — ich frage den
        Gutachterausschuss deines Gebiets ab und rechne das
        Sachwertverfahren." Abgerechnet wird aber wert_stufe 2, die
@@ -9416,12 +9578,15 @@
        Ob der Sprechlauf kuenftig Stufe 3 buchen soll, ist eine
        Preisentscheidung und gehoert Marcel. Bis dahin sagt der Satz,
        was wirklich passiert. */
-    _rfBlase('co', '<span style="opacity:.75">Die erweiterte Marktpreisindikation '
-      + 'läuft — ich hole Lage, Mieten und Vergleichswerte zu deiner '
-      + 'Adresse.</span>');
+    _rfBlase('co', '<span style="opacity:.75">' + (_ws >= 3
+      ? 'Die <b>Wertermittlung nach ImmoWertV</b> läuft — Marktpreisindikation, Bodenwert, '
+        + 'Ertrags- und Sachwert mit dem Sachwertfaktor deines Gutachterausschusses.'
+      : 'Die erweiterte Marktpreisindikation läuft — ich hole Lage, Mieten und '
+        + 'Vergleichswerte zu deiner Adresse. Sach- und Ertragswert gehören zur Stufe 3, '
+        + 'die dein Kontingent gerade nicht hergibt.') + '</span>');
     Auth.apiCall('/marktbericht/reports/from-dealpilot',
                  { method: 'POST',
-                   body: { wert_stufe: 2, wertermittlung: true, object: obj,
+                   body: { wert_stufe: _ws, wertermittlung: true, object: obj,
                            external_ref: (window._currentObjKey || null) },
                    timeout: 180000 })
       .then(function (d) { if (_rf) _rfWertFertig(d); })
@@ -9438,6 +9603,16 @@
 
   function _rfWertFertig(d) {
     _rf.wertLaeuft = 0;
+    /* v1862 · Der Bericht trägt auch die Marktpreisindikation: ist sie in
+       diesem Gespräch noch nicht geholt, werden Lage, Marktmiete und
+       Marktwert jetzt daraus übernommen (ein Abruf, alle Werte) — und die
+       Karte „DealPilot-Marktbewertung" zeigt ihn. */
+    if (d && !d.no_data && !_rf.markt2) {
+      try { _rfMarktFertig(d, _rf.wertStufe || 2); } catch (e) { try { console.warn('[voice] Wert→Markt', e); } catch (e2) {} }
+    } else {
+      try { if (window.DealPilotMB && typeof DealPilotMB.uebernehmen === 'function') DealPilotMB.uebernehmen(d); } catch (e) {}
+    }
+    _mbGeholt = true;
     var p = (d && (d.data || d)) || {};
     var cc = p.crosscheck || p.cross_check || p.sachwert || {};
     var gaa = p.gutachterausschuss || cc.gutachterausschuss || {};
@@ -9548,8 +9723,15 @@
        Grund, warum der Nutzer noch hier ist. `wertAn === 1` heisst
        „gestartet, noch kein Ergebnis"; 2 heisst fertig. */
     if (_rf && _rf.wertAn === 1 && !_rf.wertLaeuft) {
-      var nochOffen = RFRAGEN_WERT.some(function (e) { return _rfFehlt(e); });
+      var nochOffen = RFRAGEN_WERT.some(function (e) { return _rfFehlt(e, _rf.data.fields); })
+                   || _rfStufeBloecke(3).length > 0;   /* v1862 */
       if (!nochOffen) { _rfWertAbrufen(); return; }
+    }
+    /* v1862 · Die Eingabetiefe (Reiter Objekt / Pre-Flight-Pillen) VOR den
+       Feinheiten: was die gewählte Stufe braucht, ist Pflicht, nicht Kür. */
+    if (!erzwungen && _rf && _rf.alle && !_rf.stufeGefragt) {
+      _rf.stufeGefragt = 1;
+      if (_rfStufeStarten()) return;
     }
     /* v1282: Ist die Pflichtstrecke durch, wird EINMAL nach den Feinheiten
        gefragt - aber nur im gefuehrten Weg und nur, wenn der Nutzer nicht

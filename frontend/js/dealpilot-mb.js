@@ -599,6 +599,30 @@ if (!window._wlc) {
     finally { _mbSpinner(false); }
   }
 
+  /* v1862 · Ein Ergebnis, das WOANDERS geholt wurde (geführte Eingabe,
+     Sprechlauf), landet hier auf der Karte — gemessen am 04.10.2026: der
+     Dialog holte die Marktpreisindikation, setzte `_mbGeholt`, die
+     Pre-Flight-Kette übersprang ihren Abruf, und die Karte blieb leer.
+     Bezahlt, aber nicht angezeigt. `data` ist die Antwort des Proxys
+     ({data, object_key, cost}) oder der nackte Bericht. */
+  function uebernehmen(data) {
+    data = data || {};
+    var payload = data.data || data;
+    if (!payload || (!payload.valuation && !payload.rent)) return false;
+    D = mapCard(payload); mode = (_prefSpan() || 'med'); collapsed = false;
+    render();
+    try { autoLage(); } catch (e) {}
+    persistFull({
+      object_key: data.object_key || null, cost: (typeof data.cost === 'number' ? data.cost : (data.charged || data.liters || 0)),
+      market_value: (payload.valuation && payload.valuation.market_value) || null,
+      micro: payload.micro ? payload.micro.score : null,
+      macro: payload.macro ? payload.macro.score : null,
+      price_trend_pct: payload.price_trend_pct != null ? payload.price_trend_pct : null
+    });
+    try { if (global.AiCredits && typeof global.AiCredits.refreshAvm === 'function') setTimeout(global.AiCredits.refreshAvm, 400); } catch (e) {}
+    return true;
+  }
+
   function watch() {
     var el = $(STATE_ID);
     if (el) { el.addEventListener('input', restore); el.addEventListener('change', restore); }
@@ -607,7 +631,7 @@ if (!window._wlc) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
 
-  global.DealPilotMB = { run: run, restore: restore, letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
+  global.DealPilotMB = { run: run, restore: restore, inputs: inputs, uebernehmen: uebernehmen, /* v1862: ein Sammler, eine Karte */ letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
     getData: function () { return (D && D.mw) ? { D: D, mode: mode } : null; },
     setMode: function (m) { mode = (m === 'mid') ? 'med' : m; try { persistLight(); } catch (e) {} },
     apply: applyToFields,
