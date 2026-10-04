@@ -30033,3 +30033,105 @@ Hermannstraße (ETW) unmarkiert — richtig
   Quelle — gespeichert **vor** dem Filter aus v1833c. Ein „Neu suchen"
   räumt es ab; nicht automatisch angefasst.
 - N4 (Reiter Objekt neu ordnen), N6, N7 stehen offen — siehe Backlog.
+
+---
+
+## Rollout-Journal 04.10.2026 (12) — v1845–v1846b: die Felder, Jacoby neben der Arbeitshilfe, und ein Zinssatz, der als Faktor reiste
+
+**Was** · Marcels Entscheidungen auf zwei direkte Fragen: *„Demo-Werte in
+alle leeren Felder"* (Finanzierung/Vertragsdaten) und *„Beide Verfahren
+nebeneinander"* (Kaufpreisaufteilung nach Jacoby, nur mit amtlichem
+Zinssatz Stufe A/B).
+
+**Commits** · `v1845`, `v1846`, `v1846b`
+
+### v1845 — die Felder, mit Freigabe
+
+Der erste Lauf wurde vom Berechtigungsfilter abgelehnt („Modify Shared
+Resources"). Nicht umgangen — Marcel gefragt, Freigabe bekommen, derselbe
+Lauf erneut. Nur **leere** Felder, nie ein gesetzter Wert; Platzhalter als
+solche erkennbar (`DEMO-2026-NNN`, `Demo-Bank (Platzhalter)`).
+
+```
+UPDATE 2 · 4 · 4 · 21 · 3   →   0 leere Felder bei 21 Objekten
+Löhner Str. 278      280.000 / 70.000   DSCR 1,09
+Wilhelm-Busch-Str.   552.000 / 138.000  DSCR 1,66
+```
+
+Das Skript liegt als Nachweis unter `tools/staging-demo-finanzierung.sql`.
+
+**Nicht gefüllt, mit Absicht:** die acht Bewertungsfelder des DealScore
+2.0 (Lage, Nachfrage, Bevölkerung, Wertsteigerung …). 18 von 21 tragen
+alle; die drei offenen sind Gutachtenobjekte. Das sind
+Sachverständigen-Urteile, keine Platzhalter.
+
+### v1846 — der Zinssatz reiste als Sachwertfaktor
+
+Beim Messen der Andockstellen für Jacoby fiel es auf:
+
+```
+bmf-modal-v292.js:152   sachwertfaktor: _parseDe(_v('bmf_lzs')) || 1
+bmf-modal-html.html:242 <input id="bmf_lzs" … placeholder="leer = Modellwert"> %
+```
+
+`bmf_lzs` ist das Feld **Liegenschaftszins**. Wer dort 2,5 eintrug, bekam
+Sachwertfaktor 2,5 statt rund 1,0 — Sachwert mal zweieinhalb,
+Gebäudeanteil entsprechend, AfA entsprechend. Und der Zins selbst kam
+**nie** an Zelle K37 an.
+
+> Ein Feld, das an der falschen Zelle hängt, rechnet nicht falsch — es
+> rechnet richtig mit der falschen Zahl. Das sieht man dem Ergebnis nicht
+> an.
+
+Jetzt: `gaa_swf` → Sachwertfaktor, `bmf_lzs` → `liegenschaftszinssatz`
+(K37); leer heißt weiter Modellwert.
+
+### v1846 — Jacoby neben BMF: ein Rechenkern, eine Zinsquelle
+
+Der Jacoby-Kern liegt im Haupt-Backend (am Gutachten auf den Cent
+geprüft, v1832). Zins und RND liegen im Marktbericht-Dienst. Keines wird
+nachgebaut: neue **Leseroute** `POST /wertparameter/zinssatz` dort (kein
+Bericht, kein Kontingent), die Pipeline fragt sie und rechnet selbst —
+durch **denselben** Objekt-Mapper wie der Bericht (v1839), also kein
+Wohn-Zins für Gewerbe.
+
+> Zwei Dienste, die dieselbe Zahl kennen, laufen auseinander. Einer kennt
+> sie, der andere fragt.
+
+Der Bodenwert ist **derselbe** wie bei der Arbeitshilfe (K59, nach MEA).
+Fehlt der amtliche Zins (Stufe C/D), steht im Modal der Grund, keine
+Zahl. Der Rechenweg liegt zugeklappt darunter, mit dem Hinweis, dass die
+Wahl gegenüber dem Finanzamt sachlich begründet werden muss (BFH IX R
+12/21). Ein Fehler im Jacoby-Zweig reißt die Arbeitshilfe nicht mit.
+
+### v1846b — zwei Vokabulare für die Objektart
+
+Erster Modal-Lauf: Arbeitshilfe 77,29 %, Jacoby *„nicht gerechnet:
+Objektart nicht erkannt"*. Das Modal legte nur `objart_bmf`
+(„Wohnungseigentum [WE]") ab; der Mapper liest `objart` (ETW/MFH) und
+`einheiten`. Jetzt reisen beide mit.
+
+### Nachgemessen
+
+```
+mb-Route von innen (Staging)
+  Hermannstraße 9     LZS 2,2 % Stufe A · RND 16 (GND 80) · Oberer GAA NRW
+  Gohliser Str. 42    LZS 4,5 % Stufe D  → wird verweigert (kein amtlicher Wert)
+  Hauptstr. 51        gewerblich → verweigert
+
+Modal, Hermannstraße, Pipeline echt, Buster v1846b
+  Arbeitshilfe   77,29 % Ertragswert · Bodenwert 42.750 €
+  Jacoby         84,55 % (+7,3 Punkte) · 2,2 % Stufe A · RND 16 · 13 Schritte
+  Zeile sichtbar, Rechenweg zugeklappt, Hinweis zur Begründungspflicht
+```
+
+Der Sachwertfaktor-Fix ist **statisch** geprüft (Commit-Sperre liest die
+Zuordnung aus der Datei); der dynamische Beweis — Eintrag 2,5 im Zinsfeld
+ändert den Sachwert nicht mehr — steht als Staging-Abnahmepunkt aus.
+
+### Rest
+
+- Ein Tab `bad-oeynhausen.de/umweltamt/` tauchte in der Browsergruppe auf,
+  den ich nicht geöffnet habe. Nicht angefasst.
+- Gohliser Str. 42: Baujahr 1938 ergibt mit GND 80 keine RND — bei Stufe D
+  ohnehin verweigert, bei Stufe A bräuchte es Modernisierungspunkte.
