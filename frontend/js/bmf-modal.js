@@ -1023,7 +1023,9 @@ function updateAfaPreview(ak_total){
      wenn es zu DIESEM Objekt gehört; ohne Ergebnis steht „wird berechnet",
      ohne Anschaffungskosten steht nichts. Notnagel gestrichen. */
   var r = window._lastBmf;
-  var _ok = r && (!r._objKey || !window._currentObjKey || String(r._objKey) === String(window._currentObjKey));
+  /* Ein Ergebnis OHNE Objekt-Kennung ist ein fremdes: es stammt aus einer
+     Zeit, in der die Kennung noch nicht mitgeschrieben wurde. */
+  var _ok = r && (!window._currentObjKey || (r._objKey && String(r._objKey) === String(window._currentObjKey)));
   if (!_ok) r = null;
   var ak = ak_total != null ? ak_total : 0;
   var geb_pct = r ? r.geb_pct : null;
@@ -1979,7 +1981,7 @@ function _ensureModalLoaded(callback){
   _bmfModalLoading = true;
   console.log('[bmf-modal] Modal-HTML wird geladen...');
 
-  fetch('/js/bmf-modal-html.html?v=v1496', { cache: 'no-store' })
+  fetch('/js/bmf-modal-html.html?v=v1856', { cache: 'no-store' })
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
