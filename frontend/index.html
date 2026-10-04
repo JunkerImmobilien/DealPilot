@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1852b"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1854"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -993,7 +993,7 @@ label.dp-required.qc-required::after {
 <!-- ═══════════ TAB 1: OBJEKT ═══════════ -->
 <div class="sec active" id="s0">
   <div id="obj-action-bar"></div>
-  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><div id="oe-ziel" class="oe-ziel" role="group" aria-label="Eingabetiefe"><span class="oe-ziel-lbl">Eingabetiefe</span><button type="button" class="oe-ziel-btn" data-oe-ziel="1">Stufe 1 · Marktpreis</button><button type="button" class="oe-ziel-btn" data-oe-ziel="2">Stufe 2 · erweitert</button><button type="button" class="oe-ziel-btn" data-oe-ziel="3">Stufe 3 · Sach- &amp; Ertragswert</button></div><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p></div>
+  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><div id="oe-ziel" class="oe-ziel" role="group" aria-label="Eingabetiefe"><span class="oe-ziel-lbl">Eingabetiefe</span><button type="button" class="oe-ziel-btn" data-oe-ziel="1"><b>Einfach</b><small>Marktpreisindikation · Stufe 1</small></button><button type="button" class="oe-ziel-btn" data-oe-ziel="2"><b>Mittel</b><small>erweiterte Indikation · Stufe 2</small></button><button type="button" class="oe-ziel-btn" data-oe-ziel="3"><b>Ausgiebig</b><small>Sach- &amp; Ertragswert · Stufe 3</small></button></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p></div>
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_immometrica_id" value="">
@@ -1207,11 +1207,9 @@ label.dp-required.qc-required::after {
          Gewerke-Tabelle (Art · modernisiert · Standardstufe), Bauteile & Grundstück,
          Lage als Einschätzung NEBEN der Datenlage, Wertanker. Alle Feld-IDs sind
          die alten — nur die Ordnung ist neu. Umgebaut von tools/n4-umbau-index.mjs. -->
-    <div class="card" id="oe-details" data-oe-stufe-min="1"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Weitere Objektdetails <span class="oe-ct-hint">verfeinern den Marktbericht</span></div>
-      <div class="obj-extra-acc" id="obj-extra-toggle" role="button" tabindex="0" aria-expanded="false"><span class="obj-extra-chev" aria-hidden="true">▸</span><span class="obj-extra-acc-lbl">Gewerke, Bauteile, Grundstück, Lage</span><span class="obj-extra-acc-hint">eine Zeile je Gewerk — die Stufe wird vorgeschlagen</span></div>
-      <div id="obj-extra-wrap" class="obj-extra-wrap">
-        <div class="card-title">Gewerke · Art, Modernisierung, Standardstufe (Anlage 4 ImmoWertV)</div>
-        <table class="oe-gewerke" id="oe-gewerke"><thead><tr><th>Gewerk</th><th>Art / Ausführung</th><th>modernisiert</th><th>Standardstufe</th><th>Gewicht</th></tr></thead><tbody>
+    <!-- ═══ v1854 · N4 · drei Karten statt eines Akkordeons (tools/n4d-karten.mjs) ═══ -->
+<div class="card oe-karte" id="oe-karte-gewerke" data-oe-detail="1"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-home"/></svg></span>Gewerke &amp; Ausstattung <span class="oe-ct-hint">Art · modernisiert · Standardstufe — die Stufe wird vorgeschlagen</span></div>
+<table class="oe-gewerke" id="oe-gewerke"><thead><tr><th>Gewerk</th><th>Art / Ausführung</th><th>modernisiert</th><th>Standardstufe</th><th>Gewicht</th></tr></thead><tbody>
     <tr><td class="oe-g">Außenwände <button type="button" class="dp-tip" data-tip-id="tab1.eq_walls" tabindex="-1" aria-label="Hilfe zu Außenwände"></button></td><td><div class="f oe-cell"><label class="oe-sr">Außenwände · Art</label><select id="eq_walls"><option value="">– keine Angabe –</option><option value="AUSSENWAENDE_GEDAEMMT">Gedämmt</option><option value="AUSSENWAENDE_NICHT_GEDAEMMT">Nicht gedämmt</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Außenwände · modernisiert</label><select id="mod_aussenwand"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Außenwände · Standardstufe</label><select id="ausst_aussenwaende"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">23</td></tr>
     <tr><td class="oe-g">Dach <button type="button" class="dp-tip" data-tip-id="tab1.eq_roof" tabindex="-1" aria-label="Hilfe zu Dacheindeckung"></button></td><td><div class="f oe-cell"><label class="oe-sr">Dach · Art</label><select id="eq_roof"><option value="">– keine Angabe –</option><option value="DACHPFANNEN">Dachpfannen</option><option value="SCHIEFER">Schiefer</option><option value="METALL">Metall</option><option value="DACHPAPPE">Dachpappe</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Dach · modernisiert</label><select id="mod_dach"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Dach · Standardstufe</label><select id="ausst_dach"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">15</td></tr>
     <tr><td class="oe-g">Fenster / Außentüren <button type="button" class="dp-tip" data-tip-id="tab1.eq_windows" tabindex="-1" aria-label="Hilfe zu Verglasung"></button></td><td><div class="f oe-cell"><label class="oe-sr">Fenster / Außentüren · Art</label><select id="eq_windows"><option value="">– keine Angabe –</option><option value="EINFACH">Einfachverglasung</option><option value="ISOLIERVERGLASUNG">Isolierverglasung</option><option value="ZWEIFACHVERGLASUNG">Zweifachverglasung</option><option value="DREIFACHVERGLASUNG">Dreifachverglasung</option><option value="SPEZIALVERGLASUNG">Spezialverglasung</option><option value="RAUMHOHE_VERGLASUNG">Raumhohe Verglasung</option><option value="KASTENFENSTER">Kastenfenster</option><option value="SONSTIGE">Sonstige</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Fenster / Außentüren · modernisiert</label><select id="mod_fenster"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><div class="f oe-cell"><label class="oe-sr">Fenster / Außentüren · Standardstufe</label><select id="ausst_fenster"><option value="">–</option><option value="1">1</option><option value="1.5">1,5</option><option value="2">2</option><option value="2.5">2,5</option><option value="3">3</option><option value="3.5">3,5</option><option value="4">4</option><option value="4.5">4,5</option><option value="5">5</option></select></div></td><td class="oe-wg">11</td></tr>
@@ -1224,8 +1222,9 @@ label.dp-required.qc-required::after {
     <tr><td class="oe-g">Grundriss (Anlage 2) <button type="button" class="dp-tip" data-tip-id="rnd.mod_grundriss" tabindex="-1" aria-label="Hilfe zu Grundrissgestaltung"></button></td><td><span class="oe-leer">—</span></td><td><div class="f oe-cell"><label class="oe-sr">Grundriss (Anlage 2) · modernisiert</label><select id="mod_grundriss"><option value="">&ndash; keine Angabe &ndash;</option><option>Keine/Nie</option><option>&gt; 20 Jahre</option><option>10 - 20 Jahre</option><option>5 - 10 Jahre</option><option>&lt; 5 Jahre</option><option>Kernsanierung</option></select></div></td><td><span class="oe-leer">—</span></td><td class="oe-wg">—</td></tr>
         </tbody></table>
         <p class="hint oe-gew-hint" id="oe-gewerke-hint">Die Stufe je Gewerk wird aus Art und Modernisierung <b>vorgeschlagen</b> (gestrichelt) und lässt sich überschreiben. Aus den Stufen entstehen die Standardstufe oben, die Modernisierungspunkte (Anlage 2) und der Modernisierungsgrad der Restnutzungsdauer — früher die Sterne.</p>
-        <div class="card-title">Bauteile &amp; Grundstück</div>
-        <div class="g3">
+</div>
+<div class="card oe-karte" id="oe-karte-bauteile" data-oe-detail="1"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-land"/></svg></span>Bauteile &amp; Grundstück <span class="oe-ct-hint">verfeinert den Marktbericht</span></div>
+  <div class="g3">
           <div class="f"><label>Aufzug <button type="button" class="dp-tip" data-tip-id="tab1.eq_elevator" tabindex="-1" aria-label="Hilfe zu Aufzug"></button></label><select id="eq_elevator"><option value="">– keine Angabe –</option><option value="Ja">Ja</option><option value="Nein">Nein</option></select></div>
       <div class="f"><label>Gäste-WC <button type="button" class="dp-tip" data-tip-id="tab1.eq_guest_wc" tabindex="-1" aria-label="Hilfe zu Gäste-WC"></button></label><select id="eq_guest_wc"><option value="">– keine Angabe –</option><option value="GAESTE_WC">Ja</option><option value="KEIN_GAESTE_WC">Nein</option></select></div>
       <div class="f"><label>Keller / Abstellraum <button type="button" class="dp-tip" data-tip-id="tab1.eq_store_room" tabindex="-1" aria-label="Hilfe zu Keller / Abstellraum"></button></label><select id="eq_store_room"><option value="">– keine Angabe –</option><option value="INNERHALB">Innerhalb</option><option value="AUSSERHALB">Außerhalb</option><option value="INNERHALB_UND_AUSSERHALB">Innen & außen</option><option value="KEINER">Keiner</option></select></div>
@@ -1271,8 +1270,9 @@ label.dp-required.qc-required::after {
           <div id="erb_ergebnis" class="brw-ki-result" style="display:none;margin-top:8px"></div>
         </div>
         </div>
-        <div class="card-title">Lage — Ihre Einschätzung neben der Datenlage <span class="ds2-tag" title="Investor Deal Score (DS2): Diese Felder fließen in die Bewertung ein. Im Marktbericht stehen sie als Ihre Einschätzung NEBEN der gemessenen Datenlage — getrennt beschriftet.">DS2</span></div>
-        <div class="g3">
+</div>
+<div class="card oe-karte" id="oe-karte-lage"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage &amp; Einschätzung <span class="oe-ct-hint">geht in den Investor Deal Score — immer sichtbar</span></div>
+<div class="g3">
           <div class="f"><label>Makrolage</label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f"><label>Mikrolage</label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">
@@ -1336,14 +1336,13 @@ label.dp-required.qc-required::after {
         <div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — DealPilot bewertet Makro/Mikro, Bevölkerung, Nachfrage, Wertsteigerung &amp; Entwicklung in einem Aufruf mit Quellen.</div>
       </div>
     </div>
-        <div class="card-title">Wertanker</div>
+<div class="card-title">Wertanker</div>
         <div class="g3">
           <div class="f"><label>Bankbewertung <button type="button" class="dp-tip" data-tip-id="tab1.bankbewertung" tabindex="-1" aria-label="Hilfe zu tab1.bankbewertung"></button></label><div class="iw"><span class="pfx">€</span><input id="bankval" type="text" inputmode="decimal" placeholder="234000" class="trl" oninput="calc()"></div></div>
       <div class="f"><label title="Verkehrswert nach § 194 BauGB / ImmoWertV — durch Sachwert-, Ertragswert- oder Vergleichswertverfahren ermittelt">Verkehrswert <span class="cf-hint">(§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)</span> <button type="button" class="dp-tip" data-tip-id="tab1.verkehrswert" tabindex="-1" aria-label="Hilfe zu Verkehrswert"></button></label><div class="iw"><span class="pfx">€</span><input id="svwert" type="text" inputmode="decimal" placeholder="237000" class="trl" oninput="calc()"></div><div id="oe-vw" class="oe-vw" style="display:none"></div></div>
       <div class="f"><label title="Erwarteter Wert nach Abschluss der Sanierung/Modernisierung (stabilisierter Zustand). Banken rechnen Sanierungsfinanzierungen gegen diesen Wert (as-completed).">Wert nach Sanierung <span class="cf-hint">(optional · stabilisiert)</span></label><div class="iw"><span class="pfx">€</span><input id="wert_soll" type="text" inputmode="decimal" placeholder="z.B. 1.250.000" class="trl" oninput="calc()"></div></div>
         </div>
-      </div><!-- /obj-extra-wrap -->
-    </div>
+</div>
 
   <!-- V53: Untere Reihe — Fotos + Bemerkungen + Grund & Boden -->
   <div class="col2">
@@ -3550,7 +3549,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1840"></script>
-<script src="js/objekt-reiter.js?v=v1852c"></script>
+<script src="js/objekt-reiter.js?v=v1854"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1738"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>

@@ -21,5 +21,6 @@ ji_e	input/text
 makler_e	input/text
 mand_ueberf_cb	input/checkbox
 notar_e	input/text
+oe-details-cb	input/checkbox
 sanbedarf_toggle	input/checkbox
 zaer	input/hidden

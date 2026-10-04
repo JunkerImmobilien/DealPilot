@@ -143,8 +143,10 @@
       if (card.classList.contains('oe-stufe-aus')) { try { localStorage.setItem(ZIEL_KEY, '3'); } catch (e) {} zielAnwenden(); }
       if (card.classList.contains('v212-collapsed')) { var t = card.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
     }
-    var wrap = $('obj-extra-wrap'), tg = $('obj-extra-toggle');
-    if (wrap && wrap.contains(el) && tg && typeof tg._dpSetOpen === 'function') tg._dpSetOpen(true);
+    /* v1854: liegt das Feld in einer zugeschalteten Detailkarte, die gerade
+       aus ist, setzt der Sprung den Haken — der Nutzer will genau dorthin. */
+    var dk = el.closest('.oe-karte[data-oe-detail]'), cb = $('oe-details-cb');
+    if (dk && dk.classList.contains('oe-aus') && cb) { cb.checked = true; try { localStorage.setItem('dp_details', '1'); } catch (e) {} detailsAnwenden(); }
     /* Reiterwechsel, wenn das Feld woanders liegt (Kaufpreis, Miete) */
     var sec = el.closest('.sec');
     if (sec && !sec.classList.contains('active')) { var tab = document.querySelector('[data-target-sec="' + sec.id + '"]'); if (tab) tab.click(); }
@@ -161,17 +163,31 @@
                 MEA bei ETW, Einheiten bei MFH, BGF + NHK-Typ bei Häusern */
   var FELDNAMEN = { plz: 'PLZ', ort: 'Ort', str: 'Straße', objart: 'Objektart', wfl: 'Wohnfläche', baujahr: 'Baujahr',
     kp: 'Kaufpreis (Reiter Investition)', nkm: 'Nettokaltmiete (Reiter Miete)', gsfl: 'Grundstücksfläche', brw: 'Bodenrichtwert',
-    ds2_zustand: 'Zustand', standardstufe: 'Standardstufe', mea: 'Miteigentumsanteil', einheiten: 'Wohneinheiten',
-    bgf: 'Bruttogrundfläche', nhk_haus: 'Hausform (NHK)', nhk_geschosse: 'Geschosse und Unterkellerung', nhk_dach: 'Dachausbildung' };
+    ds2_zustand: 'Zustand', ds2_energie: 'Energieklasse', standardstufe: 'Standardstufe', zimmer: 'Zimmer', etage: 'Etage',
+    mea: 'Miteigentumsanteil', einheiten: 'Wohneinheiten', nutzungsart: 'Nutzungsart',
+    bgf: 'Bruttogrundfläche', nhk_haus: 'Hausform (NHK)', nhk_geschosse: 'Geschosse und Unterkellerung', nhk_dach: 'Dachausbildung',
+    garagen_bgf_qm: 'Garage · Bruttogrundfläche', garagen_stufe: 'Garage · Standardstufe' };
+  /* v1854 · Marcel: „bei der Stufe 2, dass da alle wichtigen Felder rot
+     markiert sind und dann halt bei der Stufe 3 auch" — Stufe 2 nimmt die
+     Felder, die die erweiterte Indikation rechnet (Zustand, Energie,
+     Standardstufe → Qualitätsfaktor, Zimmer, Etage bei ETW, Einheiten bei
+     MFH), Stufe 3 dazu alles, was Sach- und Ertragswert brauchen —
+     einschließlich der Felder im Block „Sach- und Ertragswert". */
   function pflichtFuer(stufe) {
     var art = _v('objart').toUpperCase();
     var l = ['plz', 'ort', 'str', 'objart', 'wfl', 'baujahr'];
-    if (stufe >= 2) l = l.concat(['kp', 'nkm']);
-    if (stufe >= 3) {
-      l = l.concat(['gsfl', 'brw', 'ds2_zustand', 'standardstufe']);
-      if (art === 'ETW') l.push('mea');
+    if (stufe >= 2) {
+      l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe', 'zimmer']);
+      if (art === 'ETW') l.push('etage');
       if (art === 'MFH') l.push('einheiten');
+    }
+    if (stufe >= 3) {
+      l = l.concat(['nutzungsart', 'gsfl', 'brw']);
+      if (art === 'ETW') l.push('mea');
       if (/^(EFH|ZFH|DHH|RH)$/.test(art)) l = l.concat(['bgf', 'nhk_haus', 'nhk_geschosse', 'nhk_dach']);
+      if (art === 'MFH') l.push('bgf');
+      var gar = parseFloat(_v('garagen').replace(',', '.'));
+      if (gar > 0) l = l.concat(['garagen_bgf_qm', 'garagen_stufe']);
     }
     return l;
   }
@@ -192,6 +208,20 @@
      2: Ebene 2 offen, Ebene 3 weg.
      3: alles, Ebene 3 aufgeklappt. Pflichtfelder der Zielstufe werden
      markiert, solange sie leer sind. Merker je Nutzer, nicht je Objekt. */
+  /* v1854 · Haken „weitere Objektdetails angeben": Merker je Nutzer. */
+  function detailsAnwenden() {
+    var cb = $('oe-details-cb'); if (!cb) return;
+    document.querySelectorAll('.oe-karte[data-oe-detail]').forEach(function (k) { k.classList.toggle('oe-aus', !cb.checked); });
+  }
+  function detailsInit() {
+    var cb = $('oe-details-cb'); if (!cb) return;
+    try { cb.checked = localStorage.getItem('dp_details') === '1'; } catch (e) {}
+    cb.addEventListener('change', function () {
+      try { localStorage.setItem('dp_details', cb.checked ? '1' : '0'); } catch (e) {}
+      detailsAnwenden();
+    });
+    detailsAnwenden();
+  }
   var ZIEL_KEY = 'dp_zielstufe';
   function zielstufe() { try { var z = parseInt(localStorage.getItem(ZIEL_KEY), 10); return (z >= 1 && z <= 3) ? z : 1; } catch (e) { return 1; } }
   function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} zielAnwenden(); stufen(); }
@@ -199,16 +229,21 @@
     var z = zielstufe();
     document.querySelectorAll('[data-oe-ziel]').forEach(function (b) { b.classList.toggle('on', parseInt(b.getAttribute('data-oe-ziel'), 10) === z); });
     var hint = $('oe-ziel-hint');
-    if (hint) hint.textContent = z === 1 ? 'Marktpreisindikation: Adresse, Objektart, Wohnfläche, Baujahr — mehr braucht Stufe 1 nicht.'
-      : z === 2 ? 'Erweiterte Indikation: dazu Kaufpreis und Miete. Die Objektdetails unten verfeinern den Bericht.'
-      : 'Sach- und Ertragswert nach ImmoWertV: Grundstück, Bodenrichtwert, Zustand, Standardstufe, bei Häusern BGF und NHK-Typ — der Block „Sach- und Ertragswert" unten ist dafür da.';
+    if (hint) hint.textContent = z === 1 ? 'Einfach — eine Marktpreisindikation: Adresse, Objektart, Wohnfläche, Baujahr. Lage & Einschätzung bleiben sichtbar, sie gehen in den Deal Score.'
+      : z === 2 ? 'Mittel — die erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe. Die Karten Gewerke und Bauteile werden eingeblendet.'
+      : 'Ausgiebig — Sach- und Ertragswert nach ImmoWertV: dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ. Der Block „Sach- und Ertragswert" unten erscheint.';
     var e3 = document.querySelector('.card[data-oe-stufe-min="3"]');
     if (e3) {
       e3.classList.toggle('oe-stufe-aus', z < 3);
       if (z === 3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
     }
-    var tg = $('obj-extra-toggle');
-    if (tg && typeof tg._dpSetOpen === 'function') { if (z >= 2) tg._dpSetOpen(true); }
+    /* v1854 · die Detailkarten (Gewerke, Bauteile) hängen am Haken; Mittel
+       und Ausgiebig setzen ihn von selbst, Einfach lässt ihn, wie er war. */
+    var cb = $('oe-details-cb');
+    if (cb) {
+      if (z >= 2 && !cb.checked) { cb.checked = true; try { localStorage.setItem('dp_details', '1'); } catch (e) {} }
+      detailsAnwenden();
+    }
     /* Pflichtfelder markieren: nur die der Zielstufe, nur solange leer.
        v1852b: die Stylesheet-Regel kam am Eingabefeld nicht an (gemessen:
        Rahmen blieb var(--border), auch der Schatten fehlte — eine
@@ -234,7 +269,7 @@
     var arten = (_kont && _kont.arten) || {};
     var rest = function (art) { var a = arten[art]; return (a && typeof a.rest === 'number') ? a.rest : null; };
     var konto = { 1: rest('mpi'), 2: rest('mpi_plus'), 3: rest('wev') };
-    var namen = { 1: 'Marktbericht Stufe 1', 2: 'Stufe 2 · erweitert', 3: 'Stufe 3 · Sach- & Ertragswert' };
+    var namen = { 1: 'Marktbericht · Stufe 1 (einfach)', 2: 'Stufe 2 (mittel) · erweitert', 3: 'Stufe 3 (ausgiebig) · Sach- & Ertragswert' };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
     var z = zielstufe();
     box.innerHTML = [1, 2, 3].map(function (s) {
@@ -319,7 +354,7 @@
       if (D.bevRaw != null) dat.push('Bevölkerung <b>' + (D.bevRaw >= 0 ? '+' : '') + esc(deNum(D.bevRaw, 1)) + ' %</b>');
     }
     box.innerHTML = '<div class="oe-box"><h5>IHRE EINSCHÄTZUNG</h5>' + (eig.length ? eig.join(' · ') : '<span class="oe-leer">noch keine</span>') + '</div>'
-      + '<div class="oe-box"><h5>DATENLAGE (GeoMap · Zensus · Makro-Score)</h5>' + (dat.length ? dat.join(' · ') : '<span class="oe-leer">erscheint nach dem ersten Marktbericht</span>') + '</div>';
+      + '<div class="oe-box"><h5>DATENLAGE · GEMESSEN (Marktdaten, Zensus, Makro-Score)</h5>' + (dat.length ? dat.join(' · ') : '<span class="oe-leer">erscheint nach dem ersten Marktbericht</span>') + '</div>';
     box.style.display = '';
   }
 
@@ -422,6 +457,7 @@
     });
     window.addEventListener('dp:plan-ready', function () { stufen(); });
     document.addEventListener('dp:plan-ready', function () { stufen(); });
+    detailsInit();
     alles(); stufen();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', verdrahten); else verdrahten();

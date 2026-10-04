@@ -38253,3 +38253,13 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-kopf .oe-ziel-hint { margin: 0; flex: 1 1 260px; font-size: 12px; }
 .oe-vw { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 12px; }
 .oe-vw select { font: 12px Inter, system-ui, sans-serif; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border, #E0DBD3); max-width: 100%; }
+
+/* v1854 · Karten statt Akkordeon, Haken, Eingabetiefe mit Untertitel */
+.oe-ziel-btn { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; padding: 5px 12px; }
+.oe-ziel-btn b { font-weight: 600; font-size: 12.5px; }
+.oe-ziel-btn small { font-size: 10.5px; color: var(--muted, #7A7370); font-weight: 400; }
+.oe-ziel-btn.on small { color: inherit; }
+.oe-kopf-cb { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.oe-kopf-cb input { accent-color: var(--wl-C9A84C, #C9A84C); }
+.oe-karte[data-oe-detail].oe-aus { display: none !important; }
+.oe-karte .card-title { margin-top: 10px; }
