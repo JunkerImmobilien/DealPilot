@@ -38381,3 +38381,19 @@ body .sec .cf-phase-val { color: #2A2727 !important; }
 body .sec .cf-phase-val.positive { color: #2E8455 !important; }
 body .sec .cf-phase-val.negative { color: #B8625C !important; }
 body .sec .cf-phase-sub { color: #8a837c !important; }
+
+/* ===== v1864a · „… bis Break-Even auch in Hell": die acht Kennzahl-Kacheln unter den
+   Cashflow-Phasen (#s6 .kpi-grid-eval .kpi, Bruttomietrendite … Break-Even) trugen denselben
+   Obsidian-Verlauf aus Z. 31543 (ID-Spezifität + !important) — gleiche Spezifität, später, hell. ===== */
+#s6 .kpi-grid-eval .kpi { background: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent) !important;
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C) !important; box-shadow: 0 6px 18px rgba(0,0,0,.06) !important; }
+#s6 .kpi-grid-eval .kpi:hover { background: #FBF6E9 !important; }
+#s6 .kpi-grid-eval .kpi:has(.kpi-val.gn) { border-left-color: #2E8455 !important; }
+#s6 .kpi-grid-eval .kpi:has(.kpi-val.rd) { border-left-color: #B8625C !important; }
+#s6 .kpi-grid-eval .kpi-label { color: #6b655f !important; }
+#s6 .kpi-grid-eval .kpi-val { color: #2A2727 !important; }
+#s6 .kpi-grid-eval .kpi-val.gn { color: #2E8455 !important; }
+#s6 .kpi-grid-eval .kpi-val.rd { color: #B8625C !important; }
+#s6 .kpi-grid-eval .kpi-sub { color: #8a837c !important; }
+#s6 .kpi-grid-eval .kpi-label .dp-tip { filter: none !important; }
