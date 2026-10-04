@@ -1254,7 +1254,21 @@ async function objekt_schnellblick(ctx, args) {
   let finanzierung = null;
   const zins = satzVon('d1z'), tilg = satzVon('d1t');
   const ekQuote = erg.vom_nutzer.ek_quote != null ? Number(erg.vom_nutzer.ek_quote) : null;
-  if (zins && tilg && knkVollstaendig) {
+  /* ── v1824b · AUCH OHNE VOLLSTAENDIGE KAUFNEBENKOSTEN ────────────────
+   *
+   * Hier stand `knkVollstaendig` als Bedingung. GEMESSEN an Marcels
+   * Objekt: die Maklercourtage ist nicht hinterlegt (sie ist
+   * Verhandlungssache, es gibt keinen Richtwert) — und deshalb fiel die
+   * ganze Finanzierung aus. Mit Zins und Tilgung, aber ohne Rechnung.
+   *
+   *   > Eine Luecke in einem Posten darf nicht die ganze Rechnung
+   *   > ausknipsen. Sie gehoert benannt, nicht hochgerechnet auf alles.
+   *
+   * Gerechnet wird mit dem, was belegt ist, und der Hinweis sagt, in
+   * welche Richtung das Ergebnis dadurch verschoben ist: fehlt ein
+   * Kostenposten, ist das Darlehen zu klein und der Kapitaldienst zu
+   * niedrig. */
+  if (zins && tilg) {
     const gi = kp + knkSumme;
     const ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
     const darlehen = Math.max(0, gi - ek);
@@ -1270,6 +1284,12 @@ async function objekt_schnellblick(ctx, args) {
       hinweis_ueberschuss: 'Das ist die Miete MINUS Kapitaldienst — ohne '
         + 'Bewirtschaftungskosten und ohne Steuer. Der echte Cashflow liegt '
         + 'darunter und wird in DealPilot gerechnet.',
+      /* Die Richtung der Verschiebung, wenn ein Kostenposten fehlt. */
+      vorbehalt: knkVollstaendig ? undefined
+        : 'Bei den Kaufnebenkosten fehlt noch ein Posten. Die Gesamtinvestition '
+          + 'ist dadurch ZU KLEIN, also das Darlehen zu klein und der '
+          + 'Kapitaldienst zu niedrig — der Überschuss sieht besser aus, als er '
+          + 'ist. Sag das dem Nutzer und frag nach dem fehlenden Satz.',
     };
   }
 
