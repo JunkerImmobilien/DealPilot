@@ -1747,6 +1747,23 @@ window.DealPilotDealAction = (function() {
       var _n = 0;
       Object.keys(_modMap).forEach(function (k) { var el = document.getElementById(_modMap[k]); var v = el ? String(el.value || '').trim() : ''; if (v) { _mod[k] = v; _n++; } });
       if (_n) prefill.mod = _mod;
+      /* v1860 · Schritt 3 „Bauliche Anlagen" verlangt Bedachung, Fenster,
+         Heizungsart (ohne sie geht „Weiter" nicht) — Marcel: „Bedachung,
+         Fenster, Heizungsart, das haben wir ja alles." Übersetzt aus den
+         Objektfeldern; wo das Objekt weniger weiß als der Wizard fragt
+         (Dachform, Rahmen, Brennstoff), steht der häufigste Fall und der
+         Nutzer sieht ihn vorbelegt — er ist ein Vorschlag, kein Befund. */
+      var _g = function (id) { var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; };
+      var _roof = _g('eq_roof'), _win = _g('eq_windows'), _heat = _g('eq_heating'), _nhkDach = _g('nhk_dach'), _bad = _g('bad_anz');
+      var _bedachung = _roof === 'SCHIEFER' ? 'Schieferdach' : _roof === 'METALL' ? 'Metalldach (Zink/Kupfer)' : _roof === 'DACHPAPPE' ? 'Flachdach (Bitumen)'
+        : _roof === 'DACHPFANNEN' ? (_nhkDach === '3' ? 'Flachdach (Bitumen)' : 'Satteldach mit Tonziegeln') : '';
+      var _fenster = /^(EINFACH|KASTENFENSTER)$/.test(_win) ? 'einfach verglast' : /^(ZWEIFACHVERGLASUNG|ISOLIERVERGLASUNG)$/.test(_win) ? '2-fach Verglasung, Kunststoff'
+        : /^(DREIFACHVERGLASUNG|SPEZIALVERGLASUNG|RAUMHOHE_VERGLASUNG)$/.test(_win) ? '3-fach Verglasung, Kunststoff' : '';
+      var _heizung = _heat === 'ZENTRALHEIZUNG' ? 'Gas-Zentralheizung' : _heat === 'FUSSBODENHEIZUNG' ? 'Gas-Brennwertheizung' : '';
+      if (_bedachung) prefill.bedachung = _bedachung;
+      if (_fenster) prefill.fenster = _fenster;
+      if (_heizung) prefill.heizungsart = _heizung;
+      if (_bad) prefill.anzahl_baeder = _bad;
       if (window.DealPilotRND && typeof DealPilotRND.mapDealPilotObject === 'function' && typeof collectData === 'function') {
         var _m = DealPilotRND.mapDealPilotObject(collectData());
         if (_m && _m.gewerkeBewertung) prefill.gewerke = _m.gewerkeBewertung;
