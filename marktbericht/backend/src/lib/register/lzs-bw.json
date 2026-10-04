@@ -1,0 +1,1301 @@
+[
+ {
+  "land_code": "BW",
+  "ags": "08121000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Heilbronn 2025",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "we_v",
+  "formel": {
+   "form": "baender_1d",
+   "liefert": "prozent",
+   "achse_feld": "wohnflaeche",
+   "achse_bez": "Wohnfläche in m²",
+   "rundung_stellen": 1,
+   "interpolation": "keine — der Ausschuss ordnet jeder Wohnflaechenklasse EINEN Mittelwert zu; zwischen den Klassen wird nicht interpoliert.",
+   "baender": [
+    {
+     "wert": 1.9,
+     "bis": 29,
+     "schluessel": "bis 29 m² Wohnfläche",
+     "fallzahl": 9,
+     "streuung": "-0,5 bis 4,5",
+     "min": -0.5,
+     "max": 4.5,
+     "rnd_mittel": 37,
+     "rnd_spanne": "29-75",
+     "ertragsfaktor": 20.8,
+     "ertragsfaktor_spanne": "16,3-27,4",
+     "wohnlage_mittel": 39
+    },
+    {
+     "wert": 2.1,
+     "von": 29,
+     "bis": 40,
+     "schluessel": "30 bis 40 m² Wohnfläche",
+     "fallzahl": 22,
+     "streuung": "0,5 bis 3,7",
+     "min": 0.5,
+     "max": 3.7,
+     "rnd_mittel": 44,
+     "rnd_spanne": "27-56",
+     "ertragsfaktor": 24,
+     "ertragsfaktor_spanne": "17,8-31,0",
+     "wohnlage_mittel": 31
+    },
+    {
+     "wert": 1.7,
+     "von": 40,
+     "bis": 60,
+     "schluessel": "41 bis 60 m² Wohnfläche",
+     "fallzahl": 66,
+     "streuung": "0,1 bis 3,0",
+     "min": 0.1,
+     "max": 3,
+     "rnd_mittel": 44,
+     "rnd_spanne": "27-71",
+     "ertragsfaktor": 26.2,
+     "ertragsfaktor_spanne": "19,7-35,0",
+     "wohnlage_mittel": 31
+    },
+    {
+     "wert": 1.7,
+     "von": 60,
+     "bis": 80,
+     "schluessel": "61 bis 80 m² Wohnfläche",
+     "fallzahl": 114,
+     "streuung": "-0,3 bis 3,6",
+     "min": -0.3,
+     "max": 3.6,
+     "rnd_mittel": 45,
+     "rnd_spanne": "27-75",
+     "ertragsfaktor": 27.3,
+     "ertragsfaktor_spanne": "17,7-37,1",
+     "wohnlage_mittel": 30
+    },
+    {
+     "wert": 1.5,
+     "von": 80,
+     "bis": 110,
+     "schluessel": "81 bis 110 m² Wohnfläche",
+     "fallzahl": 97,
+     "streuung": "-0,5 bis 3,5",
+     "min": -0.5,
+     "max": 3.5,
+     "rnd_mittel": 44,
+     "rnd_spanne": "27-78",
+     "ertragsfaktor": 28.4,
+     "ertragsfaktor_spanne": "18,0-46,1",
+     "wohnlage_mittel": 28
+    },
+    {
+     "wert": 1.6,
+     "von": 110,
+     "schluessel": "ab 111 m² Wohnfläche",
+     "fallzahl": 24,
+     "streuung": "0,1 bis 3,3",
+     "min": 0.1,
+     "max": 3.3,
+     "rnd_mittel": 50,
+     "rnd_spanne": "27-75",
+     "ertragsfaktor": 31.6,
+     "ertragsfaktor_spanne": "19,8-50,6",
+     "wohnlage_mittel": 24
+    }
+   ],
+   "hinweis": "KLASSEN, KEINE STUETZSTELLEN. Ergebnis in PROZENT (1,9 bedeutet 1,9 %). Die Werte gelten nur fuer Eigentumswohnungen AB BAUJAHR 1970 — fuer aeltere weist der Bericht keinen Liegenschaftszinssatz aus, weil er dort „unplausibel niedrige\" Werte erhielt (S. 44). Restnutzungsdauer, Ertragsfaktor und mittlere Wohnlagezahl stehen je Klasse als Beschreibung der Stichprobe mit; sie sind KEINE Eingangsgroesse dieses Modells. Die Reihe ist nicht monoton (1,9 / 2,1 / 1,7 / 1,7 / 1,5 / 1,6) — so steht sie im Bericht und wurde nicht geglaettet.",
+   "normobjekt": "Eigentumswohnungen ab Baujahr 1970, Kernstadt und Stadtteile, Kaufvertraege 2024, 332 Faelle. Mittlere Wohnlagezahl (LAZ) 24 bis 39, mittlere Restnutzungsdauer 37 bis 50 Jahre."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 6.4.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Ertragswertverfahren\" (Bericht S. 44) und, fuer die Restnutzungsdauer, Kapitel 6.2.1 (S. 35), auf das 6.4.1 ausdruecklich verweist.",
+   "verfahren": "Umkehrung des Rechengangs des Ertragswertverfahrens (ImmoWertV 2021)",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschlaege entsprechend der tatsaechlichen baulichen Ausnutzung (Geschossflaechenzahl nach BauNVO 1977), der Lage, der Groesse und des Zuschnitts individuelle, auf das einzelne Grundstueck bezogene Bodenwerte. Umrechnungskoeffizienten fuer GFZ und Grundstuecksgroesse siehe Kapitel 6.1 des Berichts.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "wohn_nutzflaeche": "Wohnflaechenverordnung 2003 und gif-Richtlinie MF-G 2004",
+   "rohertrag": "Wohnungs- und Gewerbemieten nach Anlage 4 des Berichts (Nettokaltmiete)",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV „Modellansaetze fuer Bewirtschaftungskosten\": Verwaltungskosten, Instandhaltungskosten, Mietausfallwagnis",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansaetze; er nennt die drei Kostenarten und die Anlage. Eine Zahl steht nicht da und wird hier nicht erfunden.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusaetzlich beruecksichtigt: der Zuwachs an Nutzungsdauer ueber 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlaengerung linear abgeschrieben (6.2.1, S. 35).",
+   "ausreisser": "Ab 8 Kauffaellen statistisch: Interquartilsabstand, ausgehend vom unteren bzw. oberen Quartil der 1,5-fache Interquartilsabstand ab- bzw. hinzugezogen; Werte ausserhalb wurden nicht herangezogen. Unter 8 Kauffaellen sachverstaendig ermittelt.",
+   "datenbasis": "Kaufvertraege aus dem Jahr 2024. Bei Liegenschaftszinssaetzen aus 10 oder mehr Kaufvertraegen liegt das durchschnittliche Vertragsdatum im Juni bzw. Juli 2024.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle — auch nicht im Sachwertteil 6.2.1. Es steht keine Zahl da und es wird keine erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse.",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "Woertlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine Aussage zum Sachwertverfahren und steht hier nur, damit sie nicht an anderer Stelle erfunden wird.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Kapitel 6.4.1 sagt nur „Gesamtnutzungsdauer entsprechend Anlage 1 ImmoWertV\" und beziffert sie fuer DIESEN Teilmarkt nicht. Die einzige Zahl im Bericht gilt ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung (S. 45). Der Bericht fuehrt Eigentumswohnungen, Dreifamilienhaeuser, Mehrfamilienhaeuser und Wohn- und Geschaeftshaeuser als GETRENNTE Kategorien — deshalb wird die 80 hier nicht uebertragen. Die Rueckfallzahl 80 ist fuer diesen Satz NICHT belegt.",
+   "besondere_merkmale": "Bei den Eigentumswohnungen liegen nicht flaechendeckend Informationen zur Ableitung des Modernisierungsgrades vor; deshalb wurde IMMER von einem nicht modernisierten Zustand ausgegangen (S. 44). Das fuehrt bei weit zurueckliegendem Baujahr zu unplausibel niedrigen Werten — daher die Beschraenkung auf Baujahre ab 1970."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Heilbronn, Kernstadt und Stadtteile (Gebiet des Ausschusses)",
+   "sachlich": "Eigentumswohnungen ab Baujahr 1970",
+   "baujahr_von": 1970,
+   "extrapolation": "gesperrt",
+   "hinweis": "Fuer Eigentumswohnungen mit Baujahr VOR 1970 weist der Bericht ausdruecklich keinen Liegenschaftszinssatz aus. Er darf nicht uebertragen werden."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, Bericht S. 46 (PDF-Seite 48), Tabelle „Eigentumswohnungen (ab Baujahr 1970)\"",
+    "wortlaut": "Je Wohnflaechenklasse: Lage „Kernstadt u. Stadtteile\", mittlere Wohnlage, Zahl der Faelle, Restnutzungsdauer (Spanne und arithmetisches Mittel), Liegenschaftszins (Spanne und Mittel), Ertragsfaktor = Kaufpreis/Rohertrag (Spanne und Mittel). Vorjahreswerte stehen in Klammern und sind NICHT als Wert uebernommen.",
+    "vorjahr": "Vorjahresreihe (im Bericht in Klammern): bis 29 m² 1,4 % (8 Faelle), 30-40 m² 1,7 % (14), 41-60 m² 1,4 % (67), 61-80 m² 1,1 % (73), 81-110 m² 0,9 % (96), ab 111 m² 2,1 % (13). Nur zur Einordnung. Der Bericht schreibt dazu: die Zinssaetze fuer Eigentumswohnungen bis 110 m² sind gegenueber dem Vorjahr grundsaetzlich gestiegen (S. 45) — das trifft auf alle fuenf Klassen bis 110 m² zu und ist eine weitere Gegenprobe der Zeilenzuordnung.",
+    "pruefprotokoll": "Vier unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen; beide Lesungen stimmen Zelle fuer Zelle. Der reine Textstrom verschiebt die Wohnflaechenklassen gegen ihre Datenzeilen (gemessen) und wurde deshalb nicht verwendet. (2) ZAEHLPROBE — die Fallzahlen der sechs Eigentumswohnungsklassen addieren sich auf 9+22+66+114+97+24 = 332. Dieselbe Summe hatte die unabhaengige Sichtung vom 01.10.2026 (verfuegbarkeit-bw.json) ergeben. (3) REGELPROBE AN DER EIGENEN AUSSAGE DES BERICHTS — S. 45: „Je kuerzer die angesetzte Restnutzungsdauer, desto niedriger ist der Liegenschaftszinssatz und der Ertragsfaktor.\" Das trifft auf JEDES gelesene Paar zu: Dreifamilienhaus Kernstadt RND 15 -> 0,5 % / Ertragsfaktor 27,6 gegen RND 28 -> 1,6 % / 28,0; Stadtteile RND 15 -> 0,01 % / 21,1 gegen RND 32 -> 1,1 % / 26,9; Mehrfamilienhaus Kernstadt RND 18 -> 0,03 % / 21,0, RND 24 -> 1,2 % / 25,4, RND 67 -> 2,1 % / 31,9. Haette eine Zeile ihren Platz verloren, muesste mindestens ein Paar der Regel widersprechen. (4) ANWENDUNGSBEISPIEL DES DOKUMENTS — der Bericht enthaelt ZWEI durchgerechnete Beispielrechnungen (6.3.2, S. 41 und 6.3.3, S. 42). Beide wurden aus den abgedruckten Tabellen nachgerechnet und stimmen auf den Euro: LAZ 30 / 135 m² / 215 m² / aeussere Stadtteile / Mitte 2024 -> 2.930 + 30 − 480 = 2.480 €/m², × 135 m² = 334.800 € (Bericht: rd. 335.000 €); LAZ 30 / 135 m² / 400 m² / innere Stadtteile -> 4.100 − 160 − 500 = 3.440 €/m², × 135 m² = 464.400 € (Bericht: rd. 464.000 €). Damit ist die LESEART der Tabellen dieses Berichts am Anwendungsbeispiel geprueft. WICHTIG UND OFFEN: ein durchgerechnetes Beispiel zum LIEGENSCHAFTSZINSSATZ oder zum SACHWERTFAKTOR enthaelt der Heilbronner Bericht NICHT. Das „Beispiel fuer die Wahl des geeigneten Liegenschaftszinssatzes\" (S. 45) und das „Bewertungsbeispiel\" (S. 54) sind Auswahlhinweise in Worten, ohne eine einzige Zahl."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Klassentabelle eines oertlich zustaendigen Ausschusses, Jahrgang 2025, Gemeindeebene, 332 Kauffaelle, je Klasse eine abgedruckte Spanne. KEINE Stufe A: der Ausschuss ist bei den Eigentumswohnungen durchgehend von einem NICHT MODERNISIERTEN Zustand ausgegangen, weil ihm die Modernisierungsdaten fehlten (S. 44). Das ist eine Verzerrung im Modell selbst, und der Bericht benennt sie.",
+  "fallzahl": 332,
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,9 bedeutet 1,9 %), kein Dezimalbruch. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufvertraege 2024 und Bodenrichtwerte vom 01.01.2023. Der Ausschuss gibt die Wahl innerhalb der Spanne ausdruecklich vor (S. 45): Bereichsuntergrenze bei niedriger Restnutzungsdauer, geringem gewerblichem Anteil und niedrigen Mieten, Bereichsobergrenze bei hoher Restnutzungsdauer (bei abgaengigen Gewerbeobjekten umgekehrt), hohem gewerblichem Anteil und hohen Mieten. ZU DIESEN WERTEN GEHOERT DIE SPANNE — ein Mittelwert ohne sie ist hier eine halbe Auskunft.",
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, S. 46 (PDF-Seite 48)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08121000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Heilbronn 2025",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "dreifh",
+  "formel": {
+   "form": "baender_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "lage",
+   "achse_k_bez": "Lage im Stadtgebiet: „kernstadt\" oder „stadtteile\". Eine Sammelzeile fuer beide druckt der Bericht NICHT — ohne Lage gibt es keinen Wert.",
+   "achse_feld": "rnd",
+   "achse_bez": "Restnutzungsdauer in Jahren",
+   "rundung_stellen": 2,
+   "kategorien": [
+    "kernstadt",
+    "stadtteile"
+   ],
+   "baender_je_kategorie": {
+    "kernstadt": [
+     {
+      "wert": 0.5,
+      "von": 12,
+      "bis": 18,
+      "bez": "Restnutzungsdauer 12 bis 18 Jahre",
+      "fallzahl": 7,
+      "min": -0.6,
+      "max": 1.7,
+      "streuung": "-0,6 bis 1,7",
+      "rnd_mittel": 15,
+      "ertragsfaktor": 27.6,
+      "ertragsfaktor_spanne": "17,5-34,2",
+      "wohnflaeche_spanne_qm": "176-252",
+      "wohnlage_mittel": 25
+     },
+     {
+      "wert": 1.6,
+      "von": 21,
+      "bis": 34,
+      "bez": "Restnutzungsdauer 21 bis 34 Jahre",
+      "fallzahl": 5,
+      "min": 0.9,
+      "max": 3.2,
+      "streuung": "0,9 bis 3,2",
+      "rnd_mittel": 28,
+      "ertragsfaktor": 28,
+      "ertragsfaktor_spanne": "16,8-40,4",
+      "wohnflaeche_spanne_qm": "194-367",
+      "wohnlage_mittel": 25
+     }
+    ],
+    "stadtteile": [
+     {
+      "wert": 0.01,
+      "von": 12,
+      "bis": 18,
+      "bez": "Restnutzungsdauer 12 bis 18 Jahre",
+      "fallzahl": 10,
+      "min": -3.1,
+      "max": 3.4,
+      "streuung": "-3,1 bis 3,4",
+      "rnd_mittel": 15,
+      "ertragsfaktor": 21.1,
+      "ertragsfaktor_spanne": "16,2-32,3",
+      "wohnflaeche_spanne_qm": "147-308",
+      "wohnlage_mittel": 34,
+      "achtung": "Der Bericht druckt hier 0,01 % ab. Das liegt UNTER dem Plausibilitaetsband des Auswerters fuer `liegenschaftszinssatz` (0,1 bis 15 %), weshalb der Auswerter diesen Band-Treffer mit `einheit_unplausibel` verwirft — am 02.10.2026 gemessen. Der Wert ist amtlich und steht deshalb hier; bei einer Spanne von -3,1 bis 3,4 Prozentpunkten aus zehn Faellen ist die SPANNE die Auskunft, nicht der Mittelwert."
+     },
+     {
+      "wert": 1.1,
+      "von": 26,
+      "bis": 41,
+      "bez": "Restnutzungsdauer 26 bis 41 Jahre",
+      "fallzahl": 9,
+      "min": -0.5,
+      "max": 2.5,
+      "streuung": "-0,5 bis 2,5",
+      "rnd_mittel": 32,
+      "ertragsfaktor": 26.9,
+      "ertragsfaktor_spanne": "20,5-32,6",
+      "wohnflaeche_spanne_qm": "158-275",
+      "wohnlage_mittel": 33
+     }
+    ]
+   },
+   "interpolation": "keine — die Lage ist kategorial, die Restnutzungsdauer ist in Baender geteilt. Zwischen Kernstadt und Stadtteilen wird nicht gemittelt, und zwischen den Baendern wird nicht interpoliert.",
+   "hinweis": "Ergebnis in PROZENT. DIE BANDGRENZEN SIND INKLUSIVE: ein Band „von 12 bis 18\" trifft 12 und 18 ebenso wie die Werte dazwischen. Der Bericht fuehrt je Lage ZWEI Zeilen, die sich durch die Restnutzungsdauer unterscheiden — genau der Einfluss, den er auf S. 45 als „durchgaengig ablesbar\" beschreibt. Die Baender sind die im Bericht abgedruckten Restnutzungsdauer-SPANNEN der Stichproben. In der Kernstadt liegt zwischen ihnen eine Luecke (19 und 20 Jahre), in den Stadtteilen ebenfalls (19 bis 25 Jahre); darueber und darunter endet die Quelle. DIE LUECKEN WERDEN NICHT GEFUELLT — dort gibt es keinen Wert. Die Wohnflaechenspannen beschreiben die Stichprobe und ueberschneiden sich; sie sind KEINE Auswahlachse.",
+   "normobjekt": "Dreifamilienhaeuser, Kaufvertraege 2024, 31 Faelle (Kernstadt 12, Stadtteile 19). Mittlere Wohnlagezahl 25 bis 34."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 6.4.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Ertragswertverfahren\" (Bericht S. 44) und, fuer die Restnutzungsdauer, Kapitel 6.2.1 (S. 35), auf das 6.4.1 ausdruecklich verweist.",
+   "verfahren": "Umkehrung des Rechengangs des Ertragswertverfahrens (ImmoWertV 2021)",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschlaege entsprechend der tatsaechlichen baulichen Ausnutzung (Geschossflaechenzahl nach BauNVO 1977), der Lage, der Groesse und des Zuschnitts individuelle, auf das einzelne Grundstueck bezogene Bodenwerte. Umrechnungskoeffizienten fuer GFZ und Grundstuecksgroesse siehe Kapitel 6.1 des Berichts.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "wohn_nutzflaeche": "Wohnflaechenverordnung 2003 und gif-Richtlinie MF-G 2004",
+   "rohertrag": "Wohnungs- und Gewerbemieten nach Anlage 4 des Berichts (Nettokaltmiete)",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV „Modellansaetze fuer Bewirtschaftungskosten\": Verwaltungskosten, Instandhaltungskosten, Mietausfallwagnis",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansaetze; er nennt die drei Kostenarten und die Anlage. Eine Zahl steht nicht da und wird hier nicht erfunden.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusaetzlich beruecksichtigt: der Zuwachs an Nutzungsdauer ueber 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlaengerung linear abgeschrieben (6.2.1, S. 35).",
+   "ausreisser": "Ab 8 Kauffaellen statistisch: Interquartilsabstand, ausgehend vom unteren bzw. oberen Quartil der 1,5-fache Interquartilsabstand ab- bzw. hinzugezogen; Werte ausserhalb wurden nicht herangezogen. Unter 8 Kauffaellen sachverstaendig ermittelt.",
+   "datenbasis": "Kaufvertraege aus dem Jahr 2024. Bei Liegenschaftszinssaetzen aus 10 oder mehr Kaufvertraegen liegt das durchschnittliche Vertragsdatum im Juni bzw. Juli 2024.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle — auch nicht im Sachwertteil 6.2.1. Es steht keine Zahl da und es wird keine erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse.",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "Woertlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine Aussage zum Sachwertverfahren und steht hier nur, damit sie nicht an anderer Stelle erfunden wird.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Kapitel 6.4.1 sagt nur „Gesamtnutzungsdauer entsprechend Anlage 1 ImmoWertV\" und beziffert sie fuer DIESEN Teilmarkt nicht. Die einzige Zahl im Bericht gilt ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung (S. 45). Der Bericht fuehrt Eigentumswohnungen, Dreifamilienhaeuser, Mehrfamilienhaeuser und Wohn- und Geschaeftshaeuser als GETRENNTE Kategorien — deshalb wird die 80 hier nicht uebertragen. Die Rueckfallzahl 80 ist fuer diesen Satz NICHT belegt."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Heilbronn, getrennt nach Kernstadt und Stadtteilen",
+   "sachlich": "Dreifamilienhäuser",
+   "extrapolation": "gesperrt",
+   "hinweis": "Ohne bestimmte Lage (Kernstadt oder Stadtteile) gibt es keinen Wert; der Bericht druckt keine Sammelzeile. Ausserhalb der abgedruckten Restnutzungsdauerspannen endet die Quelle."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, Bericht S. 46 (PDF-Seite 48), Block „Dreifamilienhaus\"",
+    "wortlaut": "Vier Zeilen: Kernstadt, Wohnlage 25, 7 Faelle, RND 12-18 (Mittel 15), Liegenschaftszins -0,6 bis 1,7 (0,5), Ertragsfaktor 17,5-34,2 (27,6), Wohnflaeche 176-252 m². Kernstadt, Wohnlage 25, 5 Faelle, RND 21-34 (28), 0,9 bis 3,2 (1,6), 16,8-40,4 (28,0), 194-367 m². Stadtteile, Wohnlage 34, 10 Faelle, RND 12-18 (15), -3,1 bis 3,4 (0,01), 16,2-32,3 (21,1), 147-308 m². Stadtteile, Wohnlage 33, 9 Faelle, RND 26-41 (32), -0,5 bis 2,5 (1,1), 20,5-32,6 (26,9), 158-275 m².",
+    "vorjahr": "Vorjahresreihe (in Klammern): Kernstadt kurze RND 1,0 % (10 Faelle), Kernstadt lange RND 1,7 % (6), Stadtteile kurze RND 0,2 % (8), Stadtteile lange RND 0,7 % (7).",
+    "pruefprotokoll": "Vier unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen; beide Lesungen stimmen Zelle fuer Zelle. Der reine Textstrom verschiebt die Wohnflaechenklassen gegen ihre Datenzeilen (gemessen) und wurde deshalb nicht verwendet. (2) ZAEHLPROBE — die Fallzahlen der sechs Eigentumswohnungsklassen addieren sich auf 9+22+66+114+97+24 = 332. Dieselbe Summe hatte die unabhaengige Sichtung vom 01.10.2026 (verfuegbarkeit-bw.json) ergeben. (3) REGELPROBE AN DER EIGENEN AUSSAGE DES BERICHTS — S. 45: „Je kuerzer die angesetzte Restnutzungsdauer, desto niedriger ist der Liegenschaftszinssatz und der Ertragsfaktor.\" Das trifft auf JEDES gelesene Paar zu: Dreifamilienhaus Kernstadt RND 15 -> 0,5 % / Ertragsfaktor 27,6 gegen RND 28 -> 1,6 % / 28,0; Stadtteile RND 15 -> 0,01 % / 21,1 gegen RND 32 -> 1,1 % / 26,9; Mehrfamilienhaus Kernstadt RND 18 -> 0,03 % / 21,0, RND 24 -> 1,2 % / 25,4, RND 67 -> 2,1 % / 31,9. Haette eine Zeile ihren Platz verloren, muesste mindestens ein Paar der Regel widersprechen. (4) ANWENDUNGSBEISPIEL DES DOKUMENTS — der Bericht enthaelt ZWEI durchgerechnete Beispielrechnungen (6.3.2, S. 41 und 6.3.3, S. 42). Beide wurden aus den abgedruckten Tabellen nachgerechnet und stimmen auf den Euro: LAZ 30 / 135 m² / 215 m² / aeussere Stadtteile / Mitte 2024 -> 2.930 + 30 − 480 = 2.480 €/m², × 135 m² = 334.800 € (Bericht: rd. 335.000 €); LAZ 30 / 135 m² / 400 m² / innere Stadtteile -> 4.100 − 160 − 500 = 3.440 €/m², × 135 m² = 464.400 € (Bericht: rd. 464.000 €). Damit ist die LESEART der Tabellen dieses Berichts am Anwendungsbeispiel geprueft. WICHTIG UND OFFEN: ein durchgerechnetes Beispiel zum LIEGENSCHAFTSZINSSATZ oder zum SACHWERTFAKTOR enthaelt der Heilbronner Bericht NICHT. Das „Beispiel fuer die Wahl des geeigneten Liegenschaftszinssatzes\" (S. 45) und das „Bewertungsbeispiel\" (S. 54) sind Auswahlhinweise in Worten, ohne eine einzige Zahl."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckte Tabelle, aber je Zeile nur 5 bis 10 Kauffaelle und bei den Stadtteilen eine Spanne von -3,1 bis 3,4 Prozentpunkten. Ein Mittelwert aus so wenigen, so stark streuenden Faellen traegt keine Stufe B.",
+  "fallzahl": 31,
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,9 bedeutet 1,9 %), kein Dezimalbruch. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufvertraege 2024 und Bodenrichtwerte vom 01.01.2023. Der Ausschuss gibt die Wahl innerhalb der Spanne ausdruecklich vor (S. 45): Bereichsuntergrenze bei niedriger Restnutzungsdauer, geringem gewerblichem Anteil und niedrigen Mieten, Bereichsobergrenze bei hoher Restnutzungsdauer (bei abgaengigen Gewerbeobjekten umgekehrt), hohem gewerblichem Anteil und hohen Mieten. ZU DIESEN WERTEN GEHOERT DIE SPANNE — ein Mittelwert ohne sie ist hier eine halbe Auskunft.",
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, S. 46 (PDF-Seite 48), Block „Dreifamilienhaus\""
+ },
+ {
+  "land_code": "BW",
+  "ags": "08121000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Heilbronn 2025",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "mfh",
+  "formel": {
+   "form": "baender_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "lage",
+   "achse_k_bez": "Lage im Stadtgebiet: „kernstadt\" oder „stadtteile\"",
+   "achse_feld": "rnd",
+   "achse_bez": "Restnutzungsdauer in Jahren",
+   "rundung_stellen": 1,
+   "kategorien": [
+    "kernstadt",
+    "stadtteile"
+   ],
+   "baender_je_kategorie": {
+    "kernstadt": [
+     {
+      "wert": 1.2,
+      "von": 21,
+      "bis": 28,
+      "bez": "Restnutzungsdauer 21 bis 28 Jahre",
+      "fallzahl": 7,
+      "min": -0.5,
+      "max": 2.7,
+      "streuung": "-0,5 bis 2,7",
+      "rnd_mittel": 24,
+      "ertragsfaktor": 25.4,
+      "ertragsfaktor_spanne": "20,6-36,2",
+      "wohnflaeche_spanne_qm": "132-640",
+      "wohnlage_mittel": 31
+     }
+    ],
+    "stadtteile": [
+     {
+      "wert": 2,
+      "von": 22,
+      "bis": 30,
+      "bez": "Restnutzungsdauer 22 bis 30 Jahre",
+      "fallzahl": 5,
+      "min": 1.4,
+      "max": 2.6,
+      "streuung": "1,4 bis 2,6",
+      "rnd_mittel": 27,
+      "ertragsfaktor": 21,
+      "ertragsfaktor_spanne": "17,9-23,8",
+      "wohnflaeche_spanne_qm": "252-608",
+      "wohnlage_mittel": 26
+     }
+    ]
+   },
+   "interpolation": "keine",
+   "hinweis": "Ergebnis in PROZENT. DIE BANDGRENZEN SIND INKLUSIVE: ein Band „von 12 bis 18\" trifft 12 und 18 ebenso wie die Werte dazwischen. JE LAGE NUR EIN BAND. Der Bericht fuehrt fuer die Kernstadt zwei weitere Zeilen, aber jede nur mit DREI Kauffaellen, einer einzelnen Restnutzungsdauer und OHNE Spanne: 0,03 % bei RND 18 (Ertragsfaktor 21,0, Wohnflaeche 402-611 m², Wohnlage 33) und 2,1 % bei RND 67 (31,9, Wohnflaeche 273-4.508 m², Wohnlage 38). Sie sind hier BEWUSST NICHT als Wert uebernommen: der Bericht sagt auf S. 45 selbst, solche Einzelfalldaten seien angegeben, „um wenigstens die Veraenderungstendenz erkennen zu koennen\". Eine Tendenz ist kein Modellwert. Sie stehen im Beleg, damit sie nachlesbar bleiben. Eine zweite Stadtteilzeile fuehrt der Bericht mit dem Vermerk „nicht genuegend verwendbare Kaufvertraege 2023\" — dort gibt es keinen Wert, und es wird keiner ersetzt. Alle Zeilen dieses Blocks tragen einen gewerblichen Ertragsanteil von unter 20 % — das ist Teil des Geltungsbereichs, keine Achse.",
+   "normobjekt": "Mehrfamilienhaeuser und Wohn- und Geschaeftshaeuser mit gewerblichem Ertragsanteil unter 20 %, Kaufvertraege 2024, 12 uebernommene Faelle."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 6.4.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Ertragswertverfahren\" (Bericht S. 44) und, fuer die Restnutzungsdauer, Kapitel 6.2.1 (S. 35), auf das 6.4.1 ausdruecklich verweist.",
+   "verfahren": "Umkehrung des Rechengangs des Ertragswertverfahrens (ImmoWertV 2021)",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschlaege entsprechend der tatsaechlichen baulichen Ausnutzung (Geschossflaechenzahl nach BauNVO 1977), der Lage, der Groesse und des Zuschnitts individuelle, auf das einzelne Grundstueck bezogene Bodenwerte. Umrechnungskoeffizienten fuer GFZ und Grundstuecksgroesse siehe Kapitel 6.1 des Berichts.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "wohn_nutzflaeche": "Wohnflaechenverordnung 2003 und gif-Richtlinie MF-G 2004",
+   "rohertrag": "Wohnungs- und Gewerbemieten nach Anlage 4 des Berichts (Nettokaltmiete)",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV „Modellansaetze fuer Bewirtschaftungskosten\": Verwaltungskosten, Instandhaltungskosten, Mietausfallwagnis",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansaetze; er nennt die drei Kostenarten und die Anlage. Eine Zahl steht nicht da und wird hier nicht erfunden.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusaetzlich beruecksichtigt: der Zuwachs an Nutzungsdauer ueber 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlaengerung linear abgeschrieben (6.2.1, S. 35).",
+   "ausreisser": "Ab 8 Kauffaellen statistisch: Interquartilsabstand, ausgehend vom unteren bzw. oberen Quartil der 1,5-fache Interquartilsabstand ab- bzw. hinzugezogen; Werte ausserhalb wurden nicht herangezogen. Unter 8 Kauffaellen sachverstaendig ermittelt.",
+   "datenbasis": "Kaufvertraege aus dem Jahr 2024. Bei Liegenschaftszinssaetzen aus 10 oder mehr Kaufvertraegen liegt das durchschnittliche Vertragsdatum im Juni bzw. Juli 2024.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle — auch nicht im Sachwertteil 6.2.1. Es steht keine Zahl da und es wird keine erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse.",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "Woertlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine Aussage zum Sachwertverfahren und steht hier nur, damit sie nicht an anderer Stelle erfunden wird.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 45: „Seit dem 01.01.2022 gelten nach Anlage 1 ImmoWertV fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung Gesamtnutzungsdauern von 80 Jahren.\"",
+   "gnd_hinweis": "Die Zahl steht im Bericht und trifft genau den sachlichen Geltungsbereich dieses Satzes. Fuer die anderen Teilmaerkte des Berichts (Eigentumswohnungen, Dreifamilienhaeuser) ist sie dort NICHT genannt.",
+   "ausgeschlossene_faelle": "Der Bericht nimmt zwei Mehrfamilienhaus-Kauffaelle mit sehr grossen Wohnflaechen (durchschnittlich ca. 8.700 m²) AUSDRUECKLICH NICHT in die Tabelle auf: dort ergaben sich bei mittlerer Wohnlage 26 und mittlerer Restnutzungsdauer 24 Jahren im Schnitt 5,6 % und ein Ertragsfaktor von 13,3 (S. 45). Diese 5,6 % sind damit KEIN Tabellenwert und stehen hier nur, damit sie nicht aus Versehen als einer gelesen werden."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Heilbronn, getrennt nach Kernstadt und Stadtteilen",
+   "sachlich": "Mehrfamilienhäuser und Wohn- und Geschäftshäuser mit gewerblichem Ertragsanteil unter 20 %",
+   "gewerblicher_ertragsanteil_pct_bis": 20,
+   "extrapolation": "gesperrt",
+   "hinweis": "Gilt nur bei gewerblichem Ertragsanteil unter 20 %. Fuer hoehere Anteile fuehrt der Bericht eigene Zeilen (Wohn- und Geschaeftshaus nach Nutzungsart, S. 47) — siehe den Satz mit zweig „ggg\"."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, Bericht S. 46 (PDF-Seite 48), Block „Mehrfamilienhaus / WGH\"",
+    "wortlaut": "Uebernommen: Kernstadt, gewerbl. Ertragsanteil < 20 %, Wohnflaeche 132-640 m², Wohnlage 31, 7 Faelle, RND 21-28 (Mittel 24), Liegenschaftszins -0,5 bis 2,7 (1,2), Ertragsfaktor 20,6-36,2 (25,4). Stadtteile, < 20 %, 252-608 m², Wohnlage 26, 5 Faelle, RND 22-30 (27), 1,4 bis 2,6 (2,0), 17,9-23,8 (21,0).",
+    "nicht_uebernommen": "Kernstadt 402-611 m², Wohnlage 33, 3 Faelle, RND 18, 0,03 %, Ertragsfaktor 21,0 — keine Spanne. Kernstadt 273-4.508 m², Wohnlage 38, 3 Faelle, RND 67, 2,1 %, Ertragsfaktor 31,9 — keine Spanne. Beide sind Einzelfalldarstellungen zur Tendenz (S. 45) und keine Modellwerte.",
+    "pruefprotokoll": "Vier unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen; beide Lesungen stimmen Zelle fuer Zelle. Der reine Textstrom verschiebt die Wohnflaechenklassen gegen ihre Datenzeilen (gemessen) und wurde deshalb nicht verwendet. (2) ZAEHLPROBE — die Fallzahlen der sechs Eigentumswohnungsklassen addieren sich auf 9+22+66+114+97+24 = 332. Dieselbe Summe hatte die unabhaengige Sichtung vom 01.10.2026 (verfuegbarkeit-bw.json) ergeben. (3) REGELPROBE AN DER EIGENEN AUSSAGE DES BERICHTS — S. 45: „Je kuerzer die angesetzte Restnutzungsdauer, desto niedriger ist der Liegenschaftszinssatz und der Ertragsfaktor.\" Das trifft auf JEDES gelesene Paar zu: Dreifamilienhaus Kernstadt RND 15 -> 0,5 % / Ertragsfaktor 27,6 gegen RND 28 -> 1,6 % / 28,0; Stadtteile RND 15 -> 0,01 % / 21,1 gegen RND 32 -> 1,1 % / 26,9; Mehrfamilienhaus Kernstadt RND 18 -> 0,03 % / 21,0, RND 24 -> 1,2 % / 25,4, RND 67 -> 2,1 % / 31,9. Haette eine Zeile ihren Platz verloren, muesste mindestens ein Paar der Regel widersprechen. (4) ANWENDUNGSBEISPIEL DES DOKUMENTS — der Bericht enthaelt ZWEI durchgerechnete Beispielrechnungen (6.3.2, S. 41 und 6.3.3, S. 42). Beide wurden aus den abgedruckten Tabellen nachgerechnet und stimmen auf den Euro: LAZ 30 / 135 m² / 215 m² / aeussere Stadtteile / Mitte 2024 -> 2.930 + 30 − 480 = 2.480 €/m², × 135 m² = 334.800 € (Bericht: rd. 335.000 €); LAZ 30 / 135 m² / 400 m² / innere Stadtteile -> 4.100 − 160 − 500 = 3.440 €/m², × 135 m² = 464.400 € (Bericht: rd. 464.000 €). Damit ist die LESEART der Tabellen dieses Berichts am Anwendungsbeispiel geprueft. WICHTIG UND OFFEN: ein durchgerechnetes Beispiel zum LIEGENSCHAFTSZINSSATZ oder zum SACHWERTFAKTOR enthaelt der Heilbronner Bericht NICHT. Das „Beispiel fuer die Wahl des geeigneten Liegenschaftszinssatzes\" (S. 45) und das „Bewertungsbeispiel\" (S. 54) sind Auswahlhinweise in Worten, ohne eine einzige Zahl."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckt, aber 7 bzw. 5 Kauffaelle je Zeile. Zwei weitere Zeilen desselben Blocks tragen nur drei Faelle ohne Spanne und sind deshalb gar nicht uebernommen.",
+  "fallzahl": 12,
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,9 bedeutet 1,9 %), kein Dezimalbruch. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufvertraege 2024 und Bodenrichtwerte vom 01.01.2023. Der Ausschuss gibt die Wahl innerhalb der Spanne ausdruecklich vor (S. 45): Bereichsuntergrenze bei niedriger Restnutzungsdauer, geringem gewerblichem Anteil und niedrigen Mieten, Bereichsobergrenze bei hoher Restnutzungsdauer (bei abgaengigen Gewerbeobjekten umgekehrt), hohem gewerblichem Anteil und hohen Mieten. ZU DIESEN WERTEN GEHOERT DIE SPANNE — ein Mittelwert ohne sie ist hier eine halbe Auskunft.",
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, S. 46 (PDF-Seite 48), Block „Mehrfamilienhaus / WGH\""
+ },
+ {
+  "land_code": "BW",
+  "ags": "08121000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Heilbronn 2025",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "ggg",
+  "formel": {
+   "form": "baender_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "lage",
+   "achse_k_bez": "Lage: „innenstadt_2a_2b\" oder „innenstadt_3_kernstadt_aussen\". „Innenstadt\" ist nach den Fussnoten des Berichts (S. 47) der Bereich der alten Reichsstadt zwischen Altneckar und Allee; „Aussen\" sind Bereiche der Kernstadt ausserhalb von Innenstadt und City ohne GE-/GI-Gebiete.",
+   "achse_feld": "rnd",
+   "achse_bez": "Restnutzungsdauer in Jahren",
+   "rundung_stellen": 1,
+   "kategorien": [
+    "innenstadt_2a_2b",
+    "innenstadt_3_kernstadt_aussen"
+   ],
+   "baender_je_kategorie": {
+    "innenstadt_2a_2b": [
+     {
+      "wert": 2,
+      "von": 18,
+      "bis": 31,
+      "bez": "Restnutzungsdauer 18 bis 31 Jahre",
+      "fallzahl": 4,
+      "min": 0.8,
+      "max": 3.2,
+      "streuung": "0,8 bis 3,2",
+      "rnd_mittel": 22,
+      "ertragsfaktor": 17.4,
+      "ertragsfaktor_spanne": "15,6-19,8",
+      "gewerblicher_ertragsanteil_pct": "47-78",
+      "wohn_nutzflaeche_spanne_qm": "401-1.504"
+     }
+    ],
+    "innenstadt_3_kernstadt_aussen": [
+     {
+      "wert": 1.6,
+      "von": 13,
+      "bis": 25,
+      "bez": "Restnutzungsdauer 13 bis 25 Jahre",
+      "fallzahl": 5,
+      "min": -0.4,
+      "max": 3.8,
+      "streuung": "-0,4 bis 3,8",
+      "rnd_mittel": 21,
+      "ertragsfaktor": 19.8,
+      "ertragsfaktor_spanne": "12,5-25,9",
+      "gewerblicher_ertragsanteil_pct": "28-90",
+      "wohn_nutzflaeche_spanne_qm": "300-918"
+     }
+    ]
+   },
+   "interpolation": "keine",
+   "hinweis": "Ergebnis in PROZENT. DIE BANDGRENZEN SIND INKLUSIVE: ein Band „von 12 bis 18\" trifft 12 und 18 ebenso wie die Werte dazwischen. Beide Zeilen betreffen Wohn- und Geschaeftshaeuser MIT LADEN. Die Unterarten „mit Buero/Praxis\", „mit Werkstatt/Lager/tw. Buero\" und „mit Gaststaette\" fuehrt der Bericht fuer 2024 mit einem Gedankenstrich — kein Kauffall, kein Wert. Eine dritte Ladenzeile (Stadtteile, 3 Faelle, RND 18, 0,7 %, Ertragsfaktor 16,3, gewerbl. Anteil 32-35 %, 222-255 m²) ist wegen drei Faellen ohne Spanne nicht uebernommen.",
+   "normobjekt": "Wohn- und Geschaeftshaeuser mit Laden, Kaufvertraege 2024, 9 uebernommene Faelle, gewerblicher Ertragsanteil 28 bis 90 %."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 6.4.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Ertragswertverfahren\" (Bericht S. 44) und, fuer die Restnutzungsdauer, Kapitel 6.2.1 (S. 35), auf das 6.4.1 ausdruecklich verweist.",
+   "verfahren": "Umkehrung des Rechengangs des Ertragswertverfahrens (ImmoWertV 2021)",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschlaege entsprechend der tatsaechlichen baulichen Ausnutzung (Geschossflaechenzahl nach BauNVO 1977), der Lage, der Groesse und des Zuschnitts individuelle, auf das einzelne Grundstueck bezogene Bodenwerte. Umrechnungskoeffizienten fuer GFZ und Grundstuecksgroesse siehe Kapitel 6.1 des Berichts.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "wohn_nutzflaeche": "Wohnflaechenverordnung 2003 und gif-Richtlinie MF-G 2004",
+   "rohertrag": "Wohnungs- und Gewerbemieten nach Anlage 4 des Berichts (Nettokaltmiete)",
+   "bewirtschaftungskosten": "nach Anlage 3 ImmoWertV „Modellansaetze fuer Bewirtschaftungskosten\": Verwaltungskosten, Instandhaltungskosten, Mietausfallwagnis",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansaetze; er nennt die drei Kostenarten und die Anlage. Eine Zahl steht nicht da und wird hier nicht erfunden.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusaetzlich beruecksichtigt: der Zuwachs an Nutzungsdauer ueber 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlaengerung linear abgeschrieben (6.2.1, S. 35).",
+   "ausreisser": "Ab 8 Kauffaellen statistisch: Interquartilsabstand, ausgehend vom unteren bzw. oberen Quartil der 1,5-fache Interquartilsabstand ab- bzw. hinzugezogen; Werte ausserhalb wurden nicht herangezogen. Unter 8 Kauffaellen sachverstaendig ermittelt.",
+   "datenbasis": "Kaufvertraege aus dem Jahr 2024. Bei Liegenschaftszinssaetzen aus 10 oder mehr Kaufvertraegen liegt das durchschnittliche Vertragsdatum im Juni bzw. Juli 2024.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle — auch nicht im Sachwertteil 6.2.1. Es steht keine Zahl da und es wird keine erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse.",
+   "regionalfaktor": null,
+   "regionalfaktor_hinweis": "Woertlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine Aussage zum Sachwertverfahren und steht hier nur, damit sie nicht an anderer Stelle erfunden wird.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 45: „Seit dem 01.01.2022 gelten nach Anlage 1 ImmoWertV fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung Gesamtnutzungsdauern von 80 Jahren.\"",
+   "gnd_hinweis": "Die Zahl steht im Bericht und trifft genau den sachlichen Geltungsbereich dieses Satzes. Fuer die anderen Teilmaerkte des Berichts (Eigentumswohnungen, Dreifamilienhaeuser) ist sie dort NICHT genannt."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Heilbronn, Innenstadt IIa/IIb bzw. Innenstadt III und Kernstadt Außen",
+   "sachlich": "Wohn- und Geschäftshäuser mit Laden",
+   "extrapolation": "gesperrt",
+   "hinweis": "Fuer Wohn- und Geschaeftshaeuser mit Buero/Praxis, mit Werkstatt/Lager oder mit Gaststaette weist der Bericht fuer 2024 KEINEN Wert aus. Ein Ladenobjektwert darf dafuer nicht eingesetzt werden."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, Bericht S. 47 (PDF-Seite 49), Block „Wohn- und Geschäftshaus – mit Laden\"",
+    "wortlaut": "401-1.504 m² Wohn-/Nutzflaeche, gewerbl. Ertragsanteil 47-78 %, Innenstadt IIa/IIb, 4 Faelle, RND 18-31 (Mittel 22), Liegenschaftszins 0,8 bis 3,2 (2,0), Ertragsfaktor 15,6-19,8 (17,4). 300-918 m², 28-90 %, Innenstadt III / Kernstadt Aussen, 5 Faelle, RND 13-25 (21), -0,4 bis 3,8 (1,6), 12,5-25,9 (19,8).",
+    "nicht_uebernommen": "Stadtteile, 222-255 m², 32-35 %, 3 Faelle, RND 18, 0,7 %, Ertragsfaktor 16,3 — drei Faelle, keine Spanne. Geschaeftshaus mit Laden/Buero, 687-2.828 m² Nutzflaeche, 100 % gewerblich, Innenstadt Ia/IIb, 3 Faelle, RND 23,0, 4,4 %, Ertragsfaktor 12,9 — ebenfalls drei Faelle ohne Spanne, deshalb kein eigener Satz. Gewerbe (Dienstleister oder Produktionsbetriebe, Hotel): „nicht genuegend verwendbare Kaufvertraege 2024\".",
+    "pruefprotokoll": "Vier unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen; beide Lesungen stimmen Zelle fuer Zelle. Der reine Textstrom verschiebt die Wohnflaechenklassen gegen ihre Datenzeilen (gemessen) und wurde deshalb nicht verwendet. (2) ZAEHLPROBE — die Fallzahlen der sechs Eigentumswohnungsklassen addieren sich auf 9+22+66+114+97+24 = 332. Dieselbe Summe hatte die unabhaengige Sichtung vom 01.10.2026 (verfuegbarkeit-bw.json) ergeben. (3) REGELPROBE AN DER EIGENEN AUSSAGE DES BERICHTS — S. 45: „Je kuerzer die angesetzte Restnutzungsdauer, desto niedriger ist der Liegenschaftszinssatz und der Ertragsfaktor.\" Das trifft auf JEDES gelesene Paar zu: Dreifamilienhaus Kernstadt RND 15 -> 0,5 % / Ertragsfaktor 27,6 gegen RND 28 -> 1,6 % / 28,0; Stadtteile RND 15 -> 0,01 % / 21,1 gegen RND 32 -> 1,1 % / 26,9; Mehrfamilienhaus Kernstadt RND 18 -> 0,03 % / 21,0, RND 24 -> 1,2 % / 25,4, RND 67 -> 2,1 % / 31,9. Haette eine Zeile ihren Platz verloren, muesste mindestens ein Paar der Regel widersprechen. (4) ANWENDUNGSBEISPIEL DES DOKUMENTS — der Bericht enthaelt ZWEI durchgerechnete Beispielrechnungen (6.3.2, S. 41 und 6.3.3, S. 42). Beide wurden aus den abgedruckten Tabellen nachgerechnet und stimmen auf den Euro: LAZ 30 / 135 m² / 215 m² / aeussere Stadtteile / Mitte 2024 -> 2.930 + 30 − 480 = 2.480 €/m², × 135 m² = 334.800 € (Bericht: rd. 335.000 €); LAZ 30 / 135 m² / 400 m² / innere Stadtteile -> 4.100 − 160 − 500 = 3.440 €/m², × 135 m² = 464.400 € (Bericht: rd. 464.000 €). Damit ist die LESEART der Tabellen dieses Berichts am Anwendungsbeispiel geprueft. WICHTIG UND OFFEN: ein durchgerechnetes Beispiel zum LIEGENSCHAFTSZINSSATZ oder zum SACHWERTFAKTOR enthaelt der Heilbronner Bericht NICHT. Das „Beispiel fuer die Wahl des geeigneten Liegenschaftszinssatzes\" (S. 45) und das „Bewertungsbeispiel\" (S. 54) sind Auswahlhinweise in Worten, ohne eine einzige Zahl."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Vier bzw. fuenf Kauffaelle je Zeile, gewerbliche Ertragsanteile von 28 bis 90 % in einer Zeile zusammengefasst, Spanne bis 3,8 Prozentpunkte. Amtlich abgedruckt, aber als Mittelwert nur indikativ — der Bericht sagt selbst, bei geringen Fallzahlen entstehen „starke Schwankungen\" (S. 48).",
+  "fallzahl": 9,
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,9 bedeutet 1,9 %), kein Dezimalbruch. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufvertraege 2024 und Bodenrichtwerte vom 01.01.2023. Der Ausschuss gibt die Wahl innerhalb der Spanne ausdruecklich vor (S. 45): Bereichsuntergrenze bei niedriger Restnutzungsdauer, geringem gewerblichem Anteil und niedrigen Mieten, Bereichsobergrenze bei hoher Restnutzungsdauer (bei abgaengigen Gewerbeobjekten umgekehrt), hohem gewerblichem Anteil und hohen Mieten. ZU DIESEN WERTEN GEHOERT DIE SPANNE — ein Mittelwert ohne sie ist hier eine halbe Auskunft. DIESER SATZ IST INDIKATIV: vier bzw. fuenf Kauffaelle. Ohne eigene sachverstaendige Wuerdigung nicht zu verwenden.",
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.4.2, S. 47 (PDF-Seite 49)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.1,
+   "rundung_stellen": 1,
+   "bezeichnung": "Ein- und Zweifamilienhäuser, alle Baujahre, Vertragsjahre 2023+2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 0,2 bis 2,0 %, 11 Vertraege, mittlere Restnutzungsdauer 37 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 30.4 (Spanne 27,3-33,5).",
+   "spanne_pct": [
+    0.2,
+    2
+   ],
+   "fallzahl": 11,
+   "restnutzungsdauer_mittel": 37,
+   "ertragsfaktor": 30.4,
+   "ertragsfaktor_spanne": "27,3-33,5",
+   "vertragsjahre": "2023+2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser, also 80 Jahre.",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Ein- und Zweifamilienhäuser, alle Baujahre",
+   "extrapolation": "gesperrt",
+   "hinweis": "Alle Baujahre. Sonderfall des Ausschusses: Fertighaeuser bis Baujahr 1989 werden mit einer Gesamtnutzungsdauer von 70 Jahren statt 80 gerechnet — bei einem Fertighaus ist dieser Satz nur mit der GND 70 modellkonform."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.1 „Daten für Wohngebäude\", Bericht S. 28 (PDF-Seite 30)",
+    "wortlaut": "Ein- und Zweifamilienhaeuser, Vertragsjahr 2023+2024, alle Baujahre, 11 Vertraege, Ø Restnutzungsdauer 37 Jahre, Ertragsfaktor 30,4 (Spanne 27,3 - 33,5), Liegenschaftszinssatz 1,1 % (Spanne 0,2 - 2,0).",
+    "vorjahr": "Vorjahresreihe derselben Tabelle: Vertragsjahr 2022+2023, alle Baujahre, 10 Vertraege, Ø RND 39 Jahre, Ertragsfaktor 38,8 (22,2 - 55,4), Liegenschaftszinssatz 0,4 % (-0,8 - 1,7). Nicht als eigener Satz erfasst: derselbe Konfliktschluessel (gleiches Land, AGS, Kennzahl, Zweig, Berichtsjahr und Quelle) — zwei Jahrgaenge wuerden sich still ueberschreiben.",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckte Tabelle eines oertlich zustaendigen Ausschusses, Jahrgang 2025, Gemeindeebene — aber nur 11 Kaufvertraege, und die einfache Standardabweichung reicht von 0,2 bis 2,0 Prozentpunkten. Der Mittelwert von 1,1 % traegt bei dieser Streuung keine Stufe B.",
+  "fallzahl": 11,
+  "streuung": {
+   "min_pct": 0.2,
+   "max_pct": 2,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27). INDIKATIV: elf Kaufvertraege.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.1 „Daten für Wohngebäude\", Bericht S. 28 (PDF-Seite 30)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "dreifh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.5,
+   "rundung_stellen": 1,
+   "bezeichnung": "Drei- und Vierfamilienhäuser, alle Baujahre, Vertragsjahre 2023+2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 0,1 bis 2,9 %, 20 Vertraege, mittlere Restnutzungsdauer 29 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 26.2 (Spanne 18,8-33,7).",
+   "spanne_pct": [
+    0.1,
+    2.9
+   ],
+   "fallzahl": 20,
+   "restnutzungsdauer_mittel": 29,
+   "ertragsfaktor": 26.2,
+   "ertragsfaktor_spanne": "18,8-33,7",
+   "vertragsjahre": "2023+2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser, also 80 Jahre.",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Drei- und Vierfamilienhäuser, alle Baujahre",
+   "extrapolation": "gesperrt",
+   "hinweis": "Der Ausschuss fasst Drei- UND Vierfamilienhaeuser in einer Zeile zusammen. Fuer Haeuser ab fuenf Wohneinheiten fuehrt er eine eigene Zeile (siehe zweig „mfh\")."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.1 „Daten für Wohngebäude\", Bericht S. 28 (PDF-Seite 30)",
+    "wortlaut": "Drei- und Vierfamilienhaeuser, Vertragsjahr 2023+2024, alle Baujahre, 20 Vertraege, Ø Restnutzungsdauer 29 Jahre, Ertragsfaktor 26,2 (Spanne 18,8 - 33,7), Liegenschaftszinssatz 1,5 % (Spanne 0,1 - 2,9).",
+    "vorjahr": "Vertragsjahr 2022+2023: 21 Vertraege, Ø RND 31, Ertragsfaktor 28,5 (21,6 - 35,4), Liegenschaftszinssatz 1,0 % (-0,6 - 2,5).",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckt, 20 Kaufvertraege, Standardabweichung 0,1 bis 2,9 Prozentpunkte. Fuer Stufe B zu wenige Faelle bei dieser Streuung.",
+  "fallzahl": 20,
+  "streuung": {
+   "min_pct": 0.1,
+   "max_pct": 2.9,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27).",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.1 „Daten für Wohngebäude\", Bericht S. 28 (PDF-Seite 30)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.3,
+   "rundung_stellen": 1,
+   "bezeichnung": "Mehrfamilienhäuser ab 5 Wohneinheiten, alle Baujahre, Vertragsjahre 2023+2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) -0,7 bis 3,3 %, 16 Vertraege, mittlere Restnutzungsdauer 30 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 22.8 (Spanne 17,1-28,4).",
+   "spanne_pct": [
+    -0.7,
+    3.3
+   ],
+   "fallzahl": 16,
+   "restnutzungsdauer_mittel": 30,
+   "ertragsfaktor": 22.8,
+   "ertragsfaktor_spanne": "17,1-28,4",
+   "vertragsjahre": "2023+2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser, also 80 Jahre.",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Mehrfamilienhäuser ab 5 Wohneinheiten, alle Baujahre",
+   "extrapolation": "gesperrt",
+   "hinweis": "Gilt erst ab fuenf Wohneinheiten. Drei- und Vierfamilienhaeuser fuehrt der Bericht getrennt (siehe zweig „dreifh\") — der eine Wert darf nicht fuer den anderen Teilmarkt eingesetzt werden."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.1 „Daten für Wohngebäude\", Bericht S. 28 (PDF-Seite 30)",
+    "wortlaut": "Mehrfamilienhaeuser (ab 5 Wohneinheiten), Vertragsjahr 2023+2024, alle Baujahre, 16 Vertraege, Ø Restnutzungsdauer 30 Jahre, Ertragsfaktor 22,8 (Spanne 17,1 - 28,4), Liegenschaftszinssatz 1,3 % (Spanne -0,7 - 3,3).",
+    "vorjahr": "Vertragsjahr 2022+2023: 14 Vertraege, Ø RND 31, Ertragsfaktor 24,4 (18,2 - 30,7), Liegenschaftszinssatz 1,0 % (-1,1 - 3,1).",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "16 Kaufvertraege, und die untere Grenze der Standardabweichung liegt bei -0,7 % — also im negativen Bereich. Amtlich abgedruckt, aber als Mittelwert nur mit der Spanne zu verwenden.",
+  "fallzahl": 16,
+  "streuung": {
+   "min_pct": -0.7,
+   "max_pct": 3.3,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27).",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.1 „Daten für Wohngebäude\", Bericht S. 28 (PDF-Seite 30)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "ggg_gew_unter50",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gemischt genutzte Grundstücke, gewerblicher Rohertrag unter 50 %, Vertragsjahre 2023+2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 1,1 bis 4,8 %, 11 Vertraege, mittlere Restnutzungsdauer 34 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 22 (Spanne 13,9-30,0). Mittlerer gewerblicher Rohertragsanteil 37 %; die Restnutzungsdauer ist in dieser Tabelle ERTRAGSGEWICHTET.",
+   "spanne_pct": [
+    1.1,
+    4.8
+   ],
+   "fallzahl": 11,
+   "restnutzungsdauer_mittel": 34,
+   "ertragsfaktor": 22,
+   "ertragsfaktor_spanne": "13,9-30,0",
+   "vertragsjahre": "2023+2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser mit Mischnutzung, also 70 Jahre.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Gemischt genutzte Grundstücke mit einem gewerblichen Rohertragsanteil unter 50 % (im Mittel 37 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Gewerblicher Rohertragsanteil unter 50 %. Der Ausschuss ordnet Objekte mit gemischter gewerblicher Nutzung (z. B. Laden mit Buero) der Kategorie des HOEHEREN gewerblichen Rohertragsanteils zu. Die Restnutzungsdauer dieser Tabelle ist ertragsgewichtet, nicht arithmetisch."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)",
+    "wortlaut": "Gemischt genutzte Grundstuecke / gewerblicher Rohertrag < 50 %, Vertragsjahr 2023+2024, alle Baujahre, 11 Vertraege, Ø RND 34 Jahre (ertragsgewichtet), gewerblicher Rohertrag 37 %, Ertragsfaktor 22,0 (13,9 - 30,0), Liegenschaftszinssatz 3,0 % (1,1 - 4,8).",
+    "vorjahr": "Vertragsjahr 2022+2023: 9 Vertraege, Ø RND 28, gewerblicher Rohertrag 31 %, Ertragsfaktor 25,8 (16,0 - 35,7), Liegenschaftszinssatz 1,2 % (-1,5 - 3,8). Der Sprung von 1,2 auf 3,0 % bei neun bzw. elf Faellen zeigt, wie wenig belastbar der Mittelwert hier ist.",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Elf Kaufvertraege, Standardabweichung 1,1 bis 4,8 Prozentpunkte, und der Vorjahresmittelwert derselben Kategorie lag bei 1,2 % statt 3,0 %. Amtlich abgedruckt, aber indikativ.",
+  "fallzahl": 11,
+  "streuung": {
+   "min_pct": 1.1,
+   "max_pct": 4.8,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27). INDIKATIV: elf Kaufvertraege, und der Wert hat sich gegenueber dem Vorjahr mehr als verdoppelt. Ohne eigene sachverstaendige Wuerdigung nicht zu verwenden.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "ggg_gew_50_99",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.9,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gemischt genutzte Grundstücke, gewerblicher Rohertrag 50 bis 99 %, Vertragsjahre 2023+2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 0,9 bis 2,9 %, 7 Vertraege, mittlere Restnutzungsdauer 31 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 23.4 (Spanne 18,6-28,2). Mittlerer gewerblicher Rohertragsanteil 68 %; Restnutzungsdauer ertragsgewichtet.",
+   "spanne_pct": [
+    0.9,
+    2.9
+   ],
+   "fallzahl": 7,
+   "restnutzungsdauer_mittel": 31,
+   "ertragsfaktor": 23.4,
+   "ertragsfaktor_spanne": "18,6-28,2",
+   "vertragsjahre": "2023+2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser mit Mischnutzung, also 70 Jahre.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Gemischt genutzte Grundstücke mit einem gewerblichen Rohertragsanteil von 50 bis 99 % (im Mittel 68 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Gewerblicher Rohertragsanteil 50 bis 99 %. Bei 100 % fuehrt der Bericht eine eigene Zeile (siehe zweig „gegi\")."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)",
+    "wortlaut": "Gemischt genutzte Grundstuecke / gewerblicher Rohertrag 50 - 99 %, Vertragsjahr 2023+2024, alle Baujahre, 7 Vertraege, Ø RND 31 Jahre (ertragsgewichtet), gewerblicher Rohertrag 68 %, Ertragsfaktor 23,4 (18,6 - 28,2), Liegenschaftszinssatz 1,9 % (0,9 - 2,9).",
+    "vorjahr": "Vertragsjahr 2022+2023: 8 Vertraege, Ø RND 27, gewerblicher Rohertrag 70 %, Ertragsfaktor 22,7 (17,3 - 28,1), Liegenschaftszinssatz 1,8 % (0,5 - 3,1). Vorjahr und Jahr liegen hier nur 0,1 Prozentpunkte auseinander — anders als in der Kategorie unter 50 %.",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Sieben Kaufvertraege. Amtlich abgedruckt und zwischen den Jahrgaengen stabil (1,8 gegen 1,9 %), aber die Fallzahl traegt keine hoehere Stufe.",
+  "fallzahl": 7,
+  "streuung": {
+   "min_pct": 0.9,
+   "max_pct": 2.9,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27). INDIKATIV: sieben Kaufvertraege.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "ggg_gew_0_99_sammel",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.8,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gemischt genutzte Grundstücke, gewerblicher Rohertrag 0 bis 99 % (Sammelzeile), Vertragsjahr 2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 1,2 bis 4,5 %, 10 Vertraege, mittlere Restnutzungsdauer 33 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 21 (Spanne 13,9-28,0). SAMMELZEILE: sie fasst die Kategorien unter 50 % und 50 bis 99 % zusammen und ist nur fuer EIN Vertragsjahr gerechnet. Mittlerer gewerblicher Rohertragsanteil 46 %; Restnutzungsdauer ertragsgewichtet.",
+   "spanne_pct": [
+    1.2,
+    4.5
+   ],
+   "fallzahl": 10,
+   "restnutzungsdauer_mittel": 33,
+   "ertragsfaktor": 21,
+   "ertragsfaktor_spanne": "13,9-28,0",
+   "vertragsjahre": "nur 2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser mit Mischnutzung, also 70 Jahre.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Gemischt genutzte Grundstücke mit einem gewerblichen Rohertragsanteil von 0 bis 99 % — die SAMMELZEILE über beide Kategorien (im Mittel 46 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "DIES IST DER RUECKFALL, wenn der gewerbliche Rohertragsanteil nicht bestimmbar ist. Ist er bestimmbar, gilt die passende Kategorie (zweig „ggg_gew_unter50\" bzw. „ggg_gew_50_99\") und NICHT diese Sammelzeile. Sie ist kein eigener Teilmarkt und darf nicht neben einer der beiden anderen verwendet werden."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)",
+    "wortlaut": "Gemischt genutzte Grundstuecke / gewerblicher Rohertrag 0 - 99 %, nur Vertragsjahr 2024, alle Baujahre, 10 Vertraege, Ø RND 33 Jahre (ertragsgewichtet), gewerblicher Rohertrag 46 %, Ertragsfaktor 21,0 (13,9 - 28,0), Liegenschaftszinssatz 2,8 % (1,2 - 4,5).",
+    "vorjahr": "Nur Vertragsjahr 2023: 8 Vertraege, Ø RND 33, gewerblicher Rohertrag 53 %, Ertragsfaktor 24,4 (17,9 - 30,9), Liegenschaftszinssatz 2,2 % (0,5 - 3,9).",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Zehn Kaufvertraege, und es ist eine SAMMELZEILE ueber zwei Teilmaerkte, deren eigene Mittelwerte 3,0 und 1,9 % betragen. Als Rueckfall brauchbar, als Wert nur indikativ.",
+  "fallzahl": 10,
+  "streuung": {
+   "min_pct": 1.2,
+   "max_pct": 4.5,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27). RUECKFALL, NICHT ERSTE WAHL: nur verwenden, wenn der gewerbliche Rohertragsanteil nicht bestimmbar ist.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "gegi",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 1,
+   "bezeichnung": "Objekte mit 100 % gewerblichem Rohertrag, Vertragsjahre 2023+2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) -1,8 bis 5,3 %, 5 Vertraege, mittlere Restnutzungsdauer 16 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 17 (Spanne 10,5-23,6). Restnutzungsdauer ertragsgewichtet; Kaufpreise bei Gewerbeobjekten ohne Mehrwertsteuer.",
+   "spanne_pct": [
+    -1.8,
+    5.3
+   ],
+   "fallzahl": 5,
+   "restnutzungsdauer_mittel": 16,
+   "ertragsfaktor": 17,
+   "ertragsfaktor_spanne": "10,5-23,6",
+   "vertragsjahre": "2023+2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 60,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Geschaeftshaeuser, also 60 Jahre. Fuer reine Gewerbeobjekte verweist der Bericht dagegen auf Anlage 1 ImmoWertV — welche der beiden Zeilen fuer ein konkretes Objekt gilt, ist eine sachverstaendige Zuordnung und hier nicht entschieden.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Objekte mit 100 % gewerblichem Rohertrag",
+   "extrapolation": "gesperrt",
+   "hinweis": "Fuenf Kaufvertraege mit einer ertragsgewichteten Restnutzungsdauer von nur 16 Jahren. Die Standardabweichung reicht von -1,8 bis 5,3 Prozentpunkten — ueber sieben Prozentpunkte Breite. Der Mittelwert allein ist hier keine Auskunft."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)",
+    "wortlaut": "Objekte mit 100 % gewerblichem Rohertrag, Vertragsjahr 2023+2024, alle Baujahre, 5 Vertraege, Ø RND 16 Jahre (ertragsgewichtet), gewerblicher Rohertrag 100 %, Ertragsfaktor 17,0 (10,5 - 23,6), Liegenschaftszinssatz 1,8 % (-1,8 - 5,3).",
+    "vorjahr": "Vertragsjahr 2022+2023: 4 Vertraege, Ø RND 27, Ertragsfaktor 22,1 (17,8 - 26,5), Liegenschaftszinssatz 0,8 % (-0,2 - 1,8).",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Fuenf Kaufvertraege und eine Standardabweichung von -1,8 bis 5,3 Prozentpunkten. Amtlich abgedruckt, als Einzelwert aber nicht belastbar.",
+  "fallzahl": 5,
+  "streuung": {
+   "min_pct": -1.8,
+   "max_pct": 5.3,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27). INDIKATIV: fuenf Kaufvertraege, Spanne ueber sieben Prozentpunkte. Ohne eigene sachverstaendige Wuerdigung nicht zu verwenden.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung\", Bericht S. 30 (PDF-Seite 32)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 1,
+   "bezeichnung": "Eigentumswohnungen (ohne Senioren- und Studentenwohnungen), Vertragsjahr 2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 0,8 bis 2,8 %, 46 Vertraege, mittlere Restnutzungsdauer 43 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 28.5 (Spanne 21,0-35,9). Mittlere Wohnflaeche der Stichprobe 65 m².",
+   "spanne_pct": [
+    0.8,
+    2.8
+   ],
+   "fallzahl": 46,
+   "restnutzungsdauer_mittel": 43,
+   "ertragsfaktor": 28.5,
+   "ertragsfaktor_spanne": "21,0-35,9",
+   "vertragsjahre": "2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Eigentumswohnungen, also 80 Jahre — hier nicht aus der Liste auf S. 24 abgeleitet, sondern ausdruecklich in der Tabelle 5.1.4 selbst abgedruckt („Gesamtnutzungsdauer 80 Jahre\" fuer Kaufvertraege ab 2015).",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bewirtschaftungskostenquote": 19,
+   "bewirtschaftungskostenquote_beleg": "Woertlich in der Kopftabelle von 5.1.4 (S. 37): „Bewirtschaftungskosten 19 %\" — fuer Kaufvertraege von 2003 bis 2014 UND fuer Kaufvertraege ab 2015. DAS IST EINE ZAHL, nicht nur ein Verweis auf Anlage 3, und sie ist deshalb als Zahl eingetragen.",
+   "gebaeudesachwert": "NHK 2010 fuer Kaufvertraege ab 2015 (NHK 2000 fuer 2003 bis 2014), Alterswertminderung linear ab 2015 (bis 2014: baujahrsabhaengiger NHK-2000-Wert + Abschreibung nach Ross)",
+   "mietansatz": "tatsaechlich bezahlte Miete"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Eigentumswohnungen, alle Wohnflächen, ohne Senioren- und Studentenwohnungen",
+   "extrapolation": "gesperrt",
+   "hinweis": "Senioren- und Studentenwohnungen sind ausdruecklich AUSGENOMMEN; fuer sie weist der Bericht keinen Liegenschaftszinssatz aus. Eine Unterteilung nach Wohnflaechenklassen enthaelt diese Tabelle nicht — der Bericht zeigt die Abhaengigkeit von Wohnflaeche und Kaufpreis nur als Diagramm (S. 38), aus dem keine Zahl ablesbar ist."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 5.1.4 „Liegenschaftszinssätze und Ertragsfaktoren für Eigentumswohnungen\", Bericht S. 37 (PDF-Seite 39)",
+    "wortlaut": "alle Wohnungen (ohne Senioren- und Studentenwohnungen), Vertragsjahr 2024, 46 Vertraege, Ø Wohnflaeche 65 m², Ø Restnutzungsdauer 43 Jahre, Ertragsfaktor 28,5 (Spanne 21,0 - 35,9), Liegenschaftszinssatz 1,8 % (Spanne 0,8 - 2,8).",
+    "vorjahr": "Dieselbe Tabelle fuehrt 2022 (44 Vertraege, Ø WF 64 m², Ø RND 45, Ertragsfaktor 34,1 [29,3 - 38,9], Zins 1,2 % [0,7 - 1,8]) und 2023 (39 Vertraege, 76 m², RND 42, 30,4 [23,1 - 37,7], 1,6 % [0,8 - 2,4]). Uebernommen ist 2024 als juengster Jahrgang; die aelteren wuerden im Konfliktschluessel kollidieren.",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "46 Kaufvertraege eines oertlich zustaendigen Ausschusses, Jahrgang 2025, Gemeindeebene, mit abgedruckter Spanne, bezifferter Bewirtschaftungskostenquote (19 %) und bezifferter Gesamtnutzungsdauer (80 Jahre) — die vollstaendigsten Modellangaben der ganzen BW-Ernte. KEINE Stufe A: der Bericht unterteilt nicht nach Wohnflaeche, Baujahr oder Lage, obwohl er die Abhaengigkeiten als Diagramme zeigt; ein Mittelwert ueber alle Wohnungen ist damit modellbedingt grob.",
+  "fallzahl": 46,
+  "streuung": {
+   "min_pct": 0.8,
+   "max_pct": 2.8,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27).",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 5.1.4 „Liegenschaftszinssätze und Ertragsfaktoren für Eigentumswohnungen\", Bericht S. 37 (PDF-Seite 39)"
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2025,
+  "modellversion": "IMB Ulm 2025",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Die Produkte des Gutachterausschusses sind urheberrechtlich geschuetzt. Nachdruck und sonstige Vervielfaeltigung, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum S. 2). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
+  "stichtag": "2025-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "zweig": "teileigentum",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 5,
+   "rundung_stellen": 1,
+   "bezeichnung": "Teileigentum (gemischt genutzte Gebäude und Gebäude mit 100 % gewerblicher Nutzung), Vertragsjahr 2024",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne (einfache Standardabweichung) 4,0 bis 5,9 %, 5 Vertraege, mittlere Restnutzungsdauer 58 Jahre, Ertragsfaktor (Vielfaches des Jahresrohertrags) 16.2 (Spanne 13,4-19,1). Durchschnittliche Miete der Stichprobe 19,0 €/m² Nutzflaeche.",
+   "spanne_pct": [
+    4,
+    5.9
+   ],
+   "fallzahl": 5,
+   "restnutzungsdauer_mittel": 58,
+   "ertragsfaktor": 16.2,
+   "ertragsfaktor_spanne": "13,4-19,1",
+   "vertragsjahre": "2024"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024. Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter fuer die SACHWERTFAKTOREN (S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)\" OHNE Zahl. Der Bericht druckt auf S. 48 eine Indexreihe ab, in der die Zeile „Baupreisindex\" fuer die Stichtage 1994/1996/1998/2000/2002/2004/2006/2008/2010/2012/2014/2016/2018/2020/2022 (jeweils 31.12.) und 2023 sowie 01.01.2025 die Werte 99/101/100/100/100/101/104/114/116/123/127/132/142/150/164/191/213 traegt. DIESE ZAHL IST HIER NICHT ALS MODELLANSATZ EINGETRAGEN, und zwar aus zwei gemessenen Gruenden: (a) die Tabelle ist mit „Indexreihe fuer Wohnbaugrundstuecke: Jahr 2000 = 100\" ueberschrieben, die Basis ist also 2000, nicht 2010 wie bei den NHK 2010 — umgerechnet waeren das 213/123 = 1,73 und damit etwas voellig anderes als die 1,91 des Rechenkerns; (b) der Bericht sagt NICHT, dass er genau diesen Wert bei der Ableitung der Sachwertfaktoren angesetzt hat. Fuer den Liegenschaftszinssatz ist der Index ohnehin keine Eingangsgroesse. Wer ihn eintragen will, muss ihn beim Ausschuss erfragen.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Teileigentum, also pauschal 70 Jahre — hier nicht aus der Liste auf S. 24 abgeleitet, sondern ausdruecklich im Text von 5.2.5 abgedruckt („eine Gesamtnutzungsdauer von pauschal 70 Jahren\").",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT und ist deshalb hier als Zahl eingetragen, nicht nur im Fliesstext. Der Ansatz S. 27 gilt woertlich fuer die Kaufvertraege „bis einschliesslich 2023\"; fuer 2024 nennt der Bericht keinen abweichenden Ansatz, und die Liste steht in den Modellparametern des Sachwertteils (S. 24) ohne Jahresbegrenzung. Sonderfall: Fertighaeuser bis Baujahr 1989 fuehrt der Ausschuss mit 70 Jahren statt 80 — wer ein Fertighaus bewertet, rechnet mit 70.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bewirtschaftungskostenquote": 15,
+   "bewirtschaftungskostenquote_beleg": "Woertlich S. 42: „Als feste Groessen wurden bei der Auswertung der Kaufvertraege Bewirtschaftungskosten mit 15 % und eine Gesamtnutzungsdauer von pauschal 70 Jahren in Ansatz gebracht.\" Beide Zahlen stehen als Zahl im Bericht.",
+   "datenbasis": "ausgewertete Vertraege aus den Jahren 2021 bis 2024; der hier erfasste Wert ist das Vertragsjahr 2024"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Teileigentum — sowohl in gemischt genutzten Gebäuden als auch in Gebäuden mit 100 % gewerblicher Nutzung",
+   "extrapolation": "gesperrt",
+   "hinweis": "Fuenf Kaufvertraege mit einer durchschnittlichen Miete von 19,0 €/m² Nutzflaeche und einer Restnutzungsdauer von 58 Jahren. Die Jahrgaenge schwanken stark (2021: 0,1 %, 2022: 3,0 %, 2023: 2,3 %, 2024: 5,0 %) — der Bericht zeigt dazu die Abhaengigkeit des Zinssatzes von der Miete als Diagramm. Ohne diese Einordnung ist der Einzelwert irrefuehrend."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 5.2.5 „Liegenschaftszinssätze und Ertragsfaktoren für Teileigentum\", Bericht S. 42 (PDF-Seite 44)",
+    "wortlaut": "Vertragsjahr 2024, 5 Vertraege, durchschnittliche Miete 19,0 €/m² NF, durchschnittliche Restnutzungsdauer 58 Jahre, Ertragsfaktor Spanne 13,4 - 19,1 bei Mittel 16,2, Liegenschaftszins Spanne 4,0 - 5,9 bei Mittel 5,0 %.",
+    "vorjahr": "Dieselbe Tabelle: 2021 2 Vertraege, Miete 6,3 €/m², RND 25, Ertragsfaktor 31,1 (keine Spanne), Zins 0,1 %; 2022 3 Vertraege, 15,7 €/m², RND 39, 21,6 (18,8 - 24,4), 3,0 % (2,5 - 3,4); 2023 2 Vertraege, 8,8 €/m², RND 28, 29,9 (keine Spanne), 2,3 %. Die Jahrgaenge 2021 und 2023 tragen nur zwei Vertraege und keine Spanne und sind deshalb nicht erfasst.",
+    "pruefprotokoll": "Drei unabhaengige Gegenproben am 02.10.2026: (1) ZWEI LESEWEGE — jede Zahl spaltentreu mit `pdftotext -table` UND mit `pdftotext -layout` gelesen. Beide Lesungen stimmen Zelle fuer Zelle; bei der -layout-Lesung der Tabelle 4.3.1 stehen die Ergebnisspalten teilweise untereinander statt in der Zeile, deshalb ist die -table-Lesung die Grundlage und -layout die Gegenprobe. (2) ZEITREIHENPROBE AM EIGENEN DIAGRAMM DES BERICHTS — fuer die Eigentumswohnungen druckt S. 37 ueber der Tabelle eine Balkenreihe mit den Jahreswerten 2010 bis 2024 ab: 4,0 / 3,9 / 3,2 / 3,2 / 2,9 / 2,6 / 2,4 / 2,1 / 2,0 / 1,4 / 1,4 / 1,2 / 1,2 / 1,7 / 1,8 und daneben die Ertragsfaktoren 18,6 bis 28,5. Fuer 2024 (1,8 % / 28,5) und 2022 (1,2 % / 34,1) stimmen Diagramm und Tabelle ueberein — damit sitzt die 2024er-Zeile richtig. ABWEICHUNG IM DOKUMENT: fuer 2023 zeigt das Diagramm 1,7 % und Ertragsfaktor 29,8, die Tabelle 1,6 % und 30,4. Das ist eine Unstimmigkeit des Berichts, kein Lesefehler; uebernommen ist ausschliesslich der TABELLENwert 2024, der von ihr nicht betroffen ist. (3) ANWENDUNGSBEISPIELE DES DOKUMENTS NACHGERECHNET (S. 59) — Beispiel 1: Reihenhaus, NHK 2010, Zone A, vorlaeufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,65 (+ 65 %) = + 195.000 €, Verkehrswert 495.000 €. Nachgerechnet: 300.000 × 0,65 = 195.000 (Soll 195.000) und 300.000 × 1,65 = 495.000 (Soll 495.000) — beides auf den Euro. Beispiel 2: freistehendes EFH, Zone B, 500.000 €, Faktor ca. 1,2 (+ 20 %) = + 100.000 €, Verkehrswert 600.000 €. Nachgerechnet: 500.000 × 0,20 = 100.000 und 500.000 × 1,20 = 600.000 — beides auf den Euro. Beispiel 3 (Abbruchobjekt, S. 59): 300 €/m² × 2,3 × 1.310 m² = 903.900 € (Soll 903.900 €, stimmt), aber die mitgedruckte Herleitung ergibt (833.000 + 65.000) / 1.310 = 685,50 €/m², also einen Faktor von 2,285 — mit dem gerundeten 2,3 liegt das Ergebnis 5.900 € ueber den 898.000 € der Herleitung. Das ist die Rundung des Berichts, keine Abweichung meiner Rechnung, und betrifft keinen hier erfassten Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Fuenf Kaufvertraege, und der Mittelwert hat sich innerhalb von vier Jahrgaengen von 0,1 auf 5,0 % bewegt. Amtlich abgedruckt, als Einzelwert aber nur indikativ.",
+  "fallzahl": 5,
+  "streuung": {
+   "min_pct": 4,
+   "max_pct": 5.9,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL (1,8 bedeutet 1,8 %), kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG, nicht ein Min-Max und nicht eine 2/3-Spanne. Der Bericht nennt fuer die Liegenschaftszinssaetze keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die im Satz genannten Vertragsjahre und Bodenrichtwerte zum 01.01.2023. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse\", weil Alter, Zustand, Lage, Grundstuecksgroesse und Bodenwert nicht einfliessen (S. 27). INDIKATIV: fuenf Kaufvertraege, Jahrgangsschwankung von 0,1 bis 5,0 %. Ohne eigene sachverstaendige Wuerdigung nicht zu verwenden.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2025, Kapitel 5.2.5 „Liegenschaftszinssätze und Ertragsfaktoren für Teileigentum\", Bericht S. 42 (PDF-Seite 44)"
+ }
+]

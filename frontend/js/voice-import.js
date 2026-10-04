@@ -780,7 +780,19 @@
     });
 
     _viWacheStarten();  /* v1293e: raeumt auf, egal wer das Fenster schliesst */
-    _startkarte(OA);   /* v1275: erst die Wahl, dann die Aufnahme */
+    /* ══ v1742 · DIREKT IN DEN GEFÜHRTEN WEG ══
+       Marcel am 01.10.2026: die Strecke „Frag mich durch" soll als eigener
+       Knopf in die Datenaufnahme-Karte, unter dem Namen „Geführte Eingabe".
+
+       Wer dort darauf geklickt hat, hat die Frage der Startkarte bereits
+       beantwortet. Sie trotzdem zu zeigen hiesse, zweimal dasselbe zu
+       fragen — und beim zweiten Mal mit anderen Worten.
+
+       Der geführte Weg selbst bleibt unverändert: derselbe Fragen-Ablauf,
+       dieselben Regeln (tippen oder sprechen, „Weiss ich nicht" beendet
+       eine Frage, „Fertig" springt zur Tabelle). */
+    if (opts && opts.gefuehrt) { _gefuehrt(OA); }
+    else { _startkarte(OA); }   /* v1275: erst die Wahl, dann die Aufnahme */
   }
 
   /* ═══════════════════════════════════════════════════════════════════

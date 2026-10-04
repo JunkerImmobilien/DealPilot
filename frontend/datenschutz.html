@@ -87,7 +87,7 @@
   <main>
     <a href="/" class="back">← zurück zu DealPilot</a>
     <h1>Datenschutzerklärung</h1>
-    <p class="meta">Stand: 24. Mai 2026 · Version 1.0</p>
+    <p class="meta">Stand: 4. Oktober 2026 · Version 1.1</p>
 
     <div class="version-banner">
       Diese Datenschutzerklärung informiert Sie gemäß <strong>Art. 13 DSGVO</strong> über die Art, den Umfang und die Zwecke der Verarbeitung Ihrer personenbezogenen Daten durch Junker Immobilien im Rahmen der Nutzung der Software-as-a-Service-Plattform „DealPilot".
@@ -236,7 +236,47 @@
 
     <p>Datenschutzerklärung von Hetzner: <a href="https://www.hetzner.com/rechtliches/datenschutz" target="_blank" rel="noopener">https://www.hetzner.com/rechtliches/datenschutz</a>.</p>
 
-    <h2>9. E-Mail-Versand</h2>
+    <h2 id="telegram">9. Telegram-Bot (optional)</h2>
+
+    <div class="important">
+      <strong>Freiwillige Zusatzfunktion.</strong> DealPilot kann über einen Telegram-Bot bedient werden. Diese Funktion ist <strong>standardmäßig nicht aktiv</strong> — sie entsteht erst, wenn Sie in den Einstellungen einen eigenen Bot hinterlegen und Ihren Chat mit einem Einmal-Code verbinden. Ohne diesen Schritt werden keine Daten an Telegram übermittelt.
+    </div>
+
+    <h3>(1) Sie betreiben Ihren eigenen Bot</h3>
+    <p>Der Bot wird <strong>von Ihnen</strong> bei Telegram angelegt (über den offiziellen „BotFather") und mit Ihrem persönlichen Bot-Token in DealPilot hinterlegt. Für diesen Bot und die darin geführten Chats sind Sie damit datenschutzrechtlich <strong>selbst Verantwortlicher</strong> im Sinne des Art. 4 Nr. 7 DSGVO. Wir betreiben keinen gemeinsamen Bot für mehrere Kunden.</p>
+    <p>Ihr Bot-Token wird bei uns <strong>verschlüsselt</strong> gespeichert (AES-256-GCM) und ausschließlich verwendet, um Nachrichten Ihres verbundenen Chats zu empfangen und zu beantworten.</p>
+
+    <h3>(2) Anbieter</h3>
+    <p>Telegram FZ-LLC, 71–75 Shelton Street, Covent Garden, London, Vereinigtes Königreich, mit Sitz der Betriebsgesellschaft in Dubai, Vereinigte Arabische Emirate.</p>
+
+    <h3>(3) Was über Telegram läuft</h3>
+    <ul>
+      <li>Ihre Nachrichten an den Bot (Text und Sprachnachrichten)</li>
+      <li>Die Antworten des Bots — darunter <strong>Objektdaten</strong>: Adressen, Kaufpreise, Mieten, Kennzahlen und Bewertungen</li>
+      <li>Ihre Telegram-Chat-Kennung (<code>chat_id</code>), um den Chat Ihrem DealPilot-Konto zuzuordnen</li>
+      <li>Ein kurzer Gesprächsverlauf (die letzten Nachrichten), damit der Bot Rückfragen versteht</li>
+    </ul>
+
+    <div class="important">
+      <strong>Keine Ende-zu-Ende-Verschlüsselung.</strong> Chats mit Telegram-Bots sind <strong>nicht</strong> Ende-zu-Ende-verschlüsselt. Die Übertragung ist transportverschlüsselt (TLS), die Inhalte sind für Telegram auf seinen Servern jedoch grundsätzlich zugänglich. Senden Sie über den Bot daher keine Angaben, die Sie Telegram nicht anvertrauen möchten — insbesondere keine personenbezogenen Daten Ihrer Mieter.
+    </div>
+
+    <h3>(4) Sprachnachrichten werden transkribiert</h3>
+    <p>Senden Sie eine Sprachnachricht, wird die Audiodatei zur Umwandlung in Text an OpenAI übermittelt (siehe Abschnitt 6). Es gelten dieselben Bedingungen wie für die übrigen KI-Funktionen.</p>
+
+    <h3>(5) Rechtsgrundlage</h3>
+    <p>Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Sie erteilen sie, indem Sie die Verbindung in den Einstellungen herstellen; die Funktion ist nicht Teil der geschuldeten Leistung, sondern ein zusätzlicher Zugang.</p>
+
+    <h3>(6) Drittland-Transfer</h3>
+    <p>Für die Vereinigten Arabischen Emirate besteht <strong>kein Angemessenheitsbeschluss</strong> der EU-Kommission. Die Übermittlung erfolgt daher auf Grundlage Ihrer ausdrücklichen Einwilligung nach Art. 49 Abs. 1 lit. a DSGVO. Ein angemessenes Datenschutzniveau im Sinne der DSGVO kann für diese Übermittlung nicht garantiert werden.</p>
+    <p>Telegram-Datenschutzerklärung: <a href="https://telegram.org/privacy" target="_blank" rel="noopener">telegram.org/privacy</a></p>
+
+    <h3>(7) Speicherdauer und Widerruf</h3>
+    <p>Wir speichern die Chat-Kennung und den kurzen Gesprächsverlauf, solange die Verbindung besteht. <strong>Trennen Sie die Verbindung in den Einstellungen, werden Chat-Kennung und Gesprächsverlauf bei uns gelöscht</strong> — einschließlich eines angefangenen Objektentwurfs. Ihre Objekte in DealPilot bleiben davon unberührt.</p>
+    <p>Nachrichten, die in Ihrem Telegram-Chat liegen, können wir nicht löschen: sie befinden sich auf Ihrem Gerät und bei Telegram. Löschen Sie sie dort selbst, wenn Sie das wünschen.</p>
+    <p>Sie können Ihre Einwilligung jederzeit ohne Angabe von Gründen widerrufen, indem Sie die Verbindung trennen. Die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung bleibt unberührt.</p>
+
+    <h2>10. E-Mail-Versand</h2>
 
     <h3>(1) Transaktions-Mails</h3>
     <p>Für den Versand von Transaktions-E-Mails (Registrierungs-Bestätigung, Passwort-Reset, Rechnungsbenachrichtigungen) nutzen wir den SMTP-Dienst der Alfahosting GmbH, August-Bebel-Straße 51, 06108 Halle (Saale), Deutschland.</p>
@@ -259,7 +299,7 @@
     <h3>(5) Newsletter / Produkt-Informationen</h3>
     <p>Sofern Sie hierin gesondert und freiwillig eingewilligt haben, verwenden wir Ihre E-Mail-Adresse, um Ihnen Produkt-Neuigkeiten, Tipps und Angebote zu DealPilot zuzusenden. Die Einwilligung ist freiwillig und kann jederzeit mit Wirkung für die Zukunft widerrufen werden – etwa über den Abmeldelink in jeder Newsletter-E-Mail oder per Nachricht an info@dealpilot.immo. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Wir speichern den Zeitpunkt der Einwilligung zum Nachweis gemäß Art. 7 Abs. 1 DSGVO. Bis zur Aktivierung eines Newsletter-Versands werden auf dieser Grundlage keine werblichen E-Mails versendet.</p>
 
-    <h2>10. Cookies</h2>
+    <h2>11. Cookies</h2>
     <p>DealPilot verwendet ausschließlich <strong>technisch notwendige Cookies</strong> und vergleichbare Technologien (z.B. localStorage, Session-Tokens), die für den Betrieb der Plattform erforderlich sind. Hierzu gehören insbesondere:</p>
     <ul>
       <li>Session-Token (JWT) für die Authentifizierung</li>
@@ -269,7 +309,7 @@
     <p>Wir setzen <strong>keine</strong> Tracking-, Marketing- oder Analyse-Cookies ein. Es ist kein Cookie-Banner erforderlich.</p>
     <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO i.V.m. § 25 Abs. 2 Nr. 2 TTDSG (technisch notwendige Speicherung).</p>
 
-    <h2>11. Speicherdauer und Löschung</h2>
+    <h2>12. Speicherdauer und Löschung</h2>
 
     <table>
       <tr>
@@ -302,7 +342,7 @@
       </tr>
     </table>
 
-    <h2>12. Ihre Rechte als Betroffener</h2>
+    <h2>13. Ihre Rechte als Betroffener</h2>
     <p>Sie haben gegenüber uns folgende Rechte hinsichtlich der Sie betreffenden personenbezogenen Daten:</p>
 
     <h3>(1) Recht auf Auskunft (Art. 15 DSGVO)</h3>
@@ -337,7 +377,7 @@
       Web: <a href="https://www.ldi.nrw.de" target="_blank" rel="noopener">www.ldi.nrw.de</a>
     </p>
 
-    <h2>13. Datensicherheit</h2>
+    <h2>14. Datensicherheit</h2>
     <p>Wir setzen technische und organisatorische Maßnahmen (TOMs) ein, um Ihre Daten vor Verlust, Manipulation und unberechtigtem Zugriff zu schützen:</p>
     <ul>
       <li>SSL/TLS-Verschlüsselung der gesamten Verbindung (HTTPS)</li>
@@ -362,7 +402,7 @@
          der Code tut, ist schlechter als keine.
          ══════════════════════════════════════════════════════════════ -->
 
-    <h2>13a. Sicherheitsprotokollierung und Missbrauchserkennung</h2>
+    <h2>14a. Sicherheitsprotokollierung und Missbrauchserkennung</h2>
 
     <p><strong>Zweck.</strong> Um den Dienst für alle Nutzer verfügbar zu
     halten und um zu erkennen, ob ein Zugang automatisiert oder in
@@ -430,11 +470,11 @@
     Dienstes dient, prüfen wir im Einzelfall, ob zwingende schutzwürdige
     Gründe überwiegen; das Ergebnis teilen wir Ihnen begründet mit.</p>
 
-    <h2>14. Datenverarbeitung Dritter durch den Nutzer</h2>
+    <h2>15. Datenverarbeitung Dritter durch den Nutzer</h2>
     <p>Soweit der Nutzer in DealPilot personenbezogene Daten Dritter (z.B. potenzielle Mieter, Verkäufer, Berater) eingibt, ist der Nutzer selbst <strong>Verantwortlicher</strong> im Sinne der DSGVO. Junker Immobilien fungiert insofern als <strong>Auftragsverarbeiter</strong>.</p>
     <p>Der Nutzer ist verpflichtet, sicherzustellen, dass er zur Eingabe und Verarbeitung dieser Drittdaten berechtigt ist (z.B. durch Einwilligung der Betroffenen oder gesetzliche Erlaubnis).</p>
 
-    <h2>15. Änderung der Datenschutzerklärung</h2>
+    <h2>16. Änderung der Datenschutzerklärung</h2>
     <p>Diese Datenschutzerklärung kann angepasst werden, wenn dies aufgrund rechtlicher Änderungen oder technischer Anpassungen erforderlich wird. Die jeweils aktuelle Version finden Sie stets unter dieser URL.</p>
     <p>Wesentliche Änderungen werden Ihnen per E-Mail mitgeteilt.</p>
 

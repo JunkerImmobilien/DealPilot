@@ -47,6 +47,61 @@ async function assignDemoObject(userId) {
     return null;
   }
 
+  return _einfuegen(userId, demo);
+}
+
+/**
+ * v1747: Dasselbe Objekt fuer den Rundgang — OHNE die Idempotenz-Sperre.
+ *
+ * Marcel am 01.10.2026: „Wir haben doch auch diese Demo-Objekte, die der
+ * Kunde bei der Erstanmeldung bekommt. Koennen wir das nicht laden?"
+ *
+ * Bis v1746 baute die Tour sich ein eigenes Objekt aus 16 getippten Feldern
+ * zusammen. Das hier traegt 129 Felder, ein Foto und eine fertige
+ * KI-Analyse — die Tour kann daran also auch die Schritte erklaeren, die am
+ * handgebauten Objekt leer blieben.
+ *
+ * Die Sperre faellt bewusst weg: der Rundgang entscheidet selbst, ob er ein
+ * Objekt braucht (naemlich wenn keine sichtbare Karte da ist), und raeumt
+ * sein Exemplar hinterher wieder weg. Eine zweite Sperre hier wuerde genau
+ * den Fall verhindern, fuer den der Aufruf gedacht ist.
+ */
+async function fuerRundgangAnlegen(userId) {
+  if (!userId) throw new Error('userId required');
+  const demo = _loadDemo();
+  if (!demo) {
+    console.warn('[demoObjectService] Demo-JSON nicht verfuegbar, skip');
+    return null;
+  }
+
+  /* Die Objektnummer aus dem Demo-JSON muss weg.
+     Gemessen am 01.10.2026: `duplicate key value violates unique constraint
+     "objects_user_seq_unique"` — der Datensatz bringt eine feste Nummer mit,
+     und wer sie schon hat, bekommt kein Demo-Objekt. Bei der Registrierung
+     faellt das nie auf, weil der Nutzer dort noch gar keine Objekte hat.
+
+     Deshalb hier nicht das eigene INSERT von oben, sondern objectService
+     .create(): das zieht bei leerer Nummer die naechste freie und faengt eine
+     Kollision ausserdem mit sechs Versuchen ab. Eine zweite Nummernvergabe
+     daneben waere genau die Doppelung, die wir uns sonst verbieten.
+
+     Die Kopie ist noetig, weil `_loadDemo()` seinen Datensatz zwischenspeichert
+     — ohne sie wuerde der zweite Aufruf auf einem veraenderten Original
+     arbeiten. */
+  const objectService = require('./objectService');
+  const data = Object.assign({}, demo.data || {});
+  delete data._obj_seq;
+
+  const row = await objectService.create(userId, {
+    data: data,
+    aiAnalysis: demo.ai_analysis || null,
+    photos: demo.photos || []
+  });
+  console.log('[demoObjectService] Demo-Objekt fuer den Rundgang angelegt:', userId, '→', row && row.seq_no);
+  return row;
+}
+
+async function _einfuegen(userId, demo) {
   // Insert. Schema: id (uuid auto), user_id, name, data (jsonb),
   //                ai_analysis (text), photos (jsonb), created_at, updated_at
   const name = demo.name || 'Demo-Objekt';
@@ -70,4 +125,4 @@ async function assignDemoObject(userId) {
   return result.rows[0];
 }
 
-module.exports = { assignDemoObject };
+module.exports = { assignDemoObject, fuerRundgangAnlegen };

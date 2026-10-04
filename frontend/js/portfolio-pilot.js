@@ -161,6 +161,12 @@
     return d;
   }
 
+  /* v1762: copilot-aenderungen.js schreibt in denselben Verlauf. Es faengt
+     Saetze ab, die eine Aenderung an EINEM Objekt beschreiben, sucht das
+     Objekt in der Seitenliste, oeffnet es und zeigt die Rueckfrage hier.
+     Nur diese eine Funktion geht nach aussen; senden() bleibt intern. */
+  window.__dpPpAddMsg = addMsg;
+
   /* ── Der Kontext ─────────────────────────────────────────────────── */
   function kontext() {
     try {
@@ -219,10 +225,51 @@
 
     history.push({ role: 'user', content: sichtbar || nachricht });
 
+    /* v1767: DER KATALOG GEHT IMMER MIT.
+
+       Bis v1766 stand hier „nur, wenn ein Objekt offen ist" — mit der
+       Begruendung, es gaebe sonst kein Ziel. Das war falsch gedacht:
+       `window.FIELDS` ist STATISCH, die Feld-Ids sind bei jedem Objekt
+       dieselben. Verschieden sind nur die Werte. Und welches Objekt
+       gemeint ist, sagt Marcels Satz („aender bei der Musterstr. 12 ...")
+       — `objektZuordnen()` oeffnet es, bevor etwas gesetzt wird.
+
+       > Eine Bedingung, die eine Faehigkeit abschaltet, muss den Grund
+       > messen. „Es gaebe kein Ziel" war eine Annahme, und sie hat den
+       > Portfolio-Piloten im haeufigsten Fall stumm gemacht. */
+    try {
+      if (window.DealPilotCopilotAenderungen
+          && typeof window.DealPilotCopilotAenderungen.katalog === 'function') {
+        body.felder = window.DealPilotCopilotAenderungen.katalog();
+        if (typeof window.DealPilotCopilotAenderungen.abrufe === 'function') {
+          body.abrufe = window.DealPilotCopilotAenderungen.abrufe();
+        }
+      }
+    } catch (e) {}
+
+    /* v1769 · DIE MARKTBERICHTE DES GANZEN BESTANDS REISEN MIT (V6).
+       EIN Abruf fuer alle Objekte (/objects/history ohne ref), je Objekt
+       der juengste Bericht. Aus dem Zwischenspeicher. */
+    try {
+      if (window.DealPilotPilotBerichte
+          && typeof window.DealPilotPilotBerichte.standBestand === 'function') {
+        var _mbb = window.DealPilotPilotBerichte.standBestand();
+        if (_mbb) body.marktberichte = _mbb;
+      }
+    } catch (e) {}
+
     Auth.apiCall('/ai/copilot', { method: 'POST', body: body }).then(function (data) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);
       var reply = (data && data.reply) ? data.reply : 'Keine Antwort erhalten.';
-      addMsg('assistant', reply);
+      try {
+        if (window.DealPilotCopilotAenderungen
+            && typeof window.DealPilotCopilotAenderungen.ausAntwort === 'function') {
+          /* v1767: der Nutzersatz entscheidet, WELCHES Objekt gemeint ist. */
+          reply = window.DealPilotCopilotAenderungen.ausAntwort(
+            reply, addMsg, sichtbar || nachricht);
+        }
+      } catch (e) {}
+      if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
     }).catch(function (err) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);

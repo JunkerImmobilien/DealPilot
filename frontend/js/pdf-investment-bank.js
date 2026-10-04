@@ -205,7 +205,22 @@
       if (!f) { var vb = (s.getAttribute('viewBox') || '').split(/[ ,]+/); f = (+vb[2] || 0) * (+vb[3] || 0); }
       if (f > bestF) { bestF = f; best = s; }
     }
-    return bestF > 2000 ? best : null;
+    if (!(bestF > 2000)) return null;
+    /* v1733 · DIE FLÄCHE ALLEIN SAGT NICHT, DASS ES EINE ZEICHNUNG IST.
+       Gemessen an `bc-cockpit`: das grösste SVG im Behälter war 255x100 mit
+       viewBox 540x100 und NULL Texten - ein Fortschrittsbalken, kein
+       Diagramm. Es kam durch die Flächenschwelle und landete als drittes
+       „Diagramm" im Dokument.
+
+       > Eine Zeichnung ohne jede Beschriftung gehört in keine
+       > Bankunterlage. Sie behauptet etwas, das niemand nachlesen kann.
+
+       Verlangt wird deshalb beides: mindestens eine Beschriftung UND
+       genug Formen, um überhaupt etwas darzustellen. */
+    var texte = best.querySelectorAll('text').length;
+    var formen = best.querySelectorAll('path,rect,circle,line,polyline,polygon').length;
+    if (texte < 1 || formen < 4) return null;
+    return best;
   }
   function svgQuelle(id) {
     var host = document.getElementById(id), svg = groesstesSvg(host);
@@ -220,6 +235,110 @@
     if (!s2) { tmp.remove(); return null; }
     return { svg: s2, breite: 640, hoehe: 340, aufraeumen: tmp };
   }
+  /* ══ v1733 · WARUM DIE DIAGRAMME IM PDF ANDERS AUSSAHEN ALS AM BILDSCHIRM ══
+     Marcel am 30.09.2026: „Und bei dieser Bankfassung, was mir gar nicht
+     gefällt, sind die Diagramme. Die sind gar nicht gut angegeben."
+
+     GEMESSEN an `renderEquityBuild`, Objekt 2026-1042:
+
+       Texte im SVG                      21
+       davon MIT font-size-Attribut       8
+       davon ohne - aus dem Stylesheet   13
+       <style>-Block im SVG            keiner
+
+     Ein serialisiertes SVG in einer data-URI ist ein EIGENES DOKUMENT. Es
+     sieht das Stylesheet der App nicht. Die dreizehn Texte ohne eigenes
+     Attribut fallen darin auf die SVG-Vorgabe zurück: 16px statt 10,5px,
+     und SCHWARZ statt Grau, weil auch `fill` aus dem CSS kam.
+
+     > Das Layout war für 10,5px gerechnet. Mit 16px stehen die
+     > Beschriftungen übereinander - und am Bildschirm sieht alles richtig
+     > aus, weil dort das Stylesheet noch greift.
+
+     Dieselbe Falle wie beim iframe, zum wiederholten Mal: das eigene
+     Dokument erbt nichts.
+
+     DAZU ZWEI GRÖSSENFEHLER:
+     · Die viewBox ist 1200x380 (Verhältnis 3,16), gesetzt wurde ein Rahmen
+       640x340 (1,88). `xMidYMid meet` verzerrt dabei nicht - es passt die
+       Zeichnung ein und lässt rund 40 % der Bildhöhe LEER. Die Zeichnung
+       wird dadurch kleiner, nicht schiefer.
+     · Gedruckt wurde zweispaltig auf 87 mm. Eine 10,5er Beschriftung auf
+       viewBox-Breite 1200 ergibt dort 1,5 pt. Das ist nicht klein, das ist
+       unsichtbar.
+
+     Behoben wird alles drei: Darstellung einbacken, Zielgrösse aus der
+     viewBox, und im Dokument volle Breite statt zwei Spalten.
+     ════════════════════════════════════════════════════════════════════ */
+  var EINBACKEN = ['font-size', 'font-weight', 'font-style', 'fill', 'fill-opacity',
+    'stroke', 'stroke-width', 'stroke-opacity', 'stroke-dasharray', 'stroke-linecap',
+    'stroke-linejoin', 'text-anchor', 'dominant-baseline', 'opacity'];
+
+  /* ── DIE SCHRIFT WIRD AUF EINE MINDESTGRÖSSE GEHOBEN, NICHT SKALIERT ──
+     Erster Anlauf war ein fester Faktor 1,55 auf jeden Text. Am erzeugten
+     PDF nachgesehen: die Achsen wurden lesbar, aber „+120k €" und
+     „192k €" ragten über ihre goldene Unterlegung hinaus - die Rechtecke
+     dahinter sind für die kleinere Schrift bemessen und wachsen nicht mit.
+
+     > Ein Faktor vergrössert auch das, was schon gross genug war. Was hier
+     > fehlt, ist keine Vergrösserung, sondern eine Untergrenze.
+
+     Gerechnet wird deshalb in DRUCKGRÖSSE: ein Text soll auf dem Papier
+     mindestens MIN_MM hoch sein. Bei Druckbreite 174 mm entspricht eine
+     viewBox-Einheit 174/vbBreite Millimetern, die Untergrenze also
+     MIN_MM * vbBreite / 174 Einheiten. Alles darunter wird angehoben,
+     alles darüber bleibt unberührt - die Labels behalten ihre Grösse,
+     die Achsen werden lesbar.
+
+       vbB 1200 -> Untergrenze 15,9   (9px und 10,5px werden angehoben)
+       vbB 1100 -> Untergrenze 14,6
+       vbB  540 -> Untergrenze  7,1   (Cockpit, schmalere viewBox)  */
+  var MIN_MM = 2.3;        /* rund 6,5 pt */
+  var DRUCK_MM = 174;      /* CW bei A4 mit 18 mm Rändern */
+
+  /* Webfonts gibt es in einer data-URI nicht - `Inter` wäre dort eine
+     Zusage, die der Renderer nicht halten kann. Deshalb eine Familie, die
+     überall vorhanden ist und den Metriken des PDF-Fonts nahekommt. */
+  var SVG_FONT = 'Arial, Helvetica, sans-serif';
+
+  function darstellungEinbacken(orig, klon, vbBreite) {
+    /* Untergrenze in viewBox-Einheiten, damit MIN_MM auf dem Papier steht.
+       Ohne bekannte viewBox wird nichts angehoben - lieber zu klein als
+       nach einer geratenen Bezugsgrösse verzerrt. */
+    var minFs = (vbBreite > 0) ? (MIN_MM * vbBreite / DRUCK_MM) : 0;
+    var a = orig.querySelectorAll('*'), b = klon.querySelectorAll('*');
+    /* Der Klon muss Knoten für Knoten dieselbe Reihenfolge haben. Stimmt die
+       Zahl nicht, ist die Zuordnung geraten - dann lieber gar nichts tun,
+       als die Werte auf die falschen Elemente zu schreiben. */
+    if (a.length !== b.length) return { knoten: 0, angehoben: 0, minFs: 0, abbruch: 'Knotenzahl ungleich' };
+    var n = 0, n2 = 0;
+    for (var i = 0; i < a.length; i++) {
+      var cs, tag = b[i].tagName ? String(b[i].tagName).toLowerCase() : '';
+      try { cs = getComputedStyle(a[i]); } catch (e) { continue; }
+      if (!cs) continue;
+      for (var j = 0; j < EINBACKEN.length; j++) {
+        var name = EINBACKEN[j], wert = cs.getPropertyValue(name);
+        if (!wert) continue;
+        /* `fill:none` MUSS gesetzt werden - die SVG-Vorgabe ist schwarz, ein
+           nicht gesetztes fill füllt also jeden offenen Pfad aus. Bei stroke
+           ist `none` die Vorgabe und darf wegbleiben. */
+        if (wert === 'none' && name !== 'fill') continue;
+        if (name === 'font-size' && tag === 'text') {
+          var px = parseFloat(wert);
+          if (!isFinite(px) || px <= 0) continue;
+          /* nur anheben, nie verkleinern */
+          if (minFs > px) { px = minFs; n2++; }
+          wert = (Math.round(px * 10) / 10) + 'px';
+        }
+        b[i].setAttribute(name, wert);
+      }
+      if (tag === 'text' || tag === 'tspan') b[i].setAttribute('font-family', SVG_FONT);
+      n++;
+    }
+    klon.setAttribute('font-family', SVG_FONT);
+    return { knoten: n, angehoben: n2, minFs: Math.round(minFs * 10) / 10 };
+  }
+
   function svgBild(id) {
     return new Promise(function (fertig) {
       try {
@@ -227,10 +346,26 @@
         if (!q) return fertig(null);
         var svg = q.svg, weg = q.aufraeumen;
         var k = svg.cloneNode(true);
+
+        /* Zielgrösse aus der viewBox statt aus dem Behälter - sonst legt
+           `xMidYMid meet` die Zeichnung in einen Rahmen mit fremdem
+           Verhältnis und der Rest des Bildes bleibt weiss.
+           Sie wird ZUERST gelesen, weil das Einbacken die Untergrenze der
+           Schrift daraus ableitet. */
+        var vb = (k.getAttribute('viewBox') || '').split(/[\s,]+/).filter(function (s) { return s !== ''; });
+        var br, ho;
+        if (vb.length === 4 && +vb[2] > 0 && +vb[3] > 0) { br = +vb[2]; ho = +vb[3]; }
+        else {
+          br = Math.max(320, q.breite); ho = Math.max(200, q.hoehe);
+          k.setAttribute('viewBox', '0 0 ' + br + ' ' + ho);
+        }
+
+        /* VOR dem Aufräumen: getComputedStyle braucht das Original noch im
+           Dokument. Eine Zeile später wäre jeder Wert leer. */
+        var eingebacken = darstellungEinbacken(svg, k, br);
         if (weg) weg.remove();
-        var br = Math.max(320, q.breite), ho = Math.max(200, q.hoehe);
+
         k.setAttribute('width', br); k.setAttribute('height', ho);
-        if (!k.getAttribute('viewBox')) k.setAttribute('viewBox', '0 0 ' + br + ' ' + ho);
         k.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         var txt = new XMLSerializer().serializeToString(k);
         var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(txt);
@@ -238,11 +373,15 @@
         i.onload = function () {
           try {
             /* v1463d: PNG blies das Dokument auf 13,7 MB. JPEG mit weissem
-               Grund bringt dieselbe Zeichnung bei rund einem Fuenfzigstel. */
-            var c = document.createElement('canvas'); c.width = Math.round(br * 1.6); c.height = Math.round(ho * 1.6);
+               Grund bringt dieselbe Zeichnung bei rund einem Fuenfzigstel.
+               v1733: Faktor 1,6 -> 1,8. Bei viewBox-Breite 1200 auf 174 mm
+               sind das rund 305 dpi statt 271 - die Beschriftung braucht
+               den Rand an Schärfe, die Flächen kosten nichts. */
+            var c = document.createElement('canvas');
+            c.width = Math.round(br * 1.8); c.height = Math.round(ho * 1.8);
             var ctx = c.getContext('2d'); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, c.width, c.height);
             ctx.drawImage(i, 0, 0, c.width, c.height);
-            fertig({ src: c.toDataURL('image/jpeg', 0.86), w: c.width, h: c.height, id: id });
+            fertig({ src: c.toDataURL('image/jpeg', 0.88), w: c.width, h: c.height, id: id, stile: eingebacken });
           } catch (e) { fertig(null); }
         };
         i.onerror = function () { fertig(null); };
@@ -1013,19 +1152,31 @@
       if (bd) diagramme.push({ bild: bd, titel: DIA[di][1] });
     }
     if (diagramme.length) {
-      platz(60, 'Diagramme', (adr || 'Objekt') + ' · aus der Bankansicht');
+      platz(64, 'Diagramme', (adr || 'Objekt') + ' · aus der Bankansicht');
       abschnitt('Diagramme');
-      var dw = (CW - 6) / 2;
-      diagramme.forEach(function (d, i) {
-        var dh = Math.min(62, dw * d.bild.h / d.bild.w);
-        if (i % 2 === 0 && i > 0) y += 0;
-        var sp = i % 2, rr = Math.floor(i / 2);
-        if (sp === 0 && platz(dh + 12)) { /* Seitenwechsel vor der Reihe */ }
-        var xx = L + sp * (dw + 6), yy = y + (sp === 0 ? 0 : 0);
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(120);
-        doc.text(d.titel, xx, yy + 3.4);
-        bild(d.bild, xx, yy + 5, dw, dh);
-        if (sp === 1 || i === diagramme.length - 1) y += dh + 12;
+      /* v1733 · VOLLE BREITE STATT ZWEI SPALTEN.
+         Zwei Spalten ergaben 87 mm je Diagramm - eine 10,5er Beschriftung
+         auf viewBox-Breite 1200 landete damit bei 1,5 pt. Über die ganzen
+         174 mm sind es 4,3 pt, und mit dem Schriftfaktor aus `svgBild`
+         rund 6,7 pt. Erst damit ist die Zeichnung eine Aussage und nicht
+         nur ein Muster.
+
+         Hier standen ausserdem zwei Zeilen, die nichts taten:
+           if (i % 2 === 0 && i > 0) y += 0;        // addiert null
+           var yy = y + (sp === 0 ? 0 : 0);         // beide Zweige null
+         Sie sind mit dem Spaltenlayout weggefallen. */
+      var dw = CW;
+      diagramme.forEach(function (d) {
+        var dh = dw * d.bild.h / d.bild.w, dbw = dw;
+        /* Deckel, damit vier Diagramme nicht vier Seiten fuellen. `bild()`
+           setzt proportional ein, also wird die BREITE mitgezogen - sonst
+           bliebe im Rahmen wieder Luft. */
+        if (dh > 74) { dbw = dw * 74 / dh; dh = 74; }
+        platz(dh + 15);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(110);
+        doc.text(d.titel, L, y + 3.8);
+        bild(d.bild, L + (dw - dbw) / 2, y + 5.8, dbw, dh);
+        y += dh + 15;
       });
       y += 2;
     }

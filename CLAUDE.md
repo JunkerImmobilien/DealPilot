@@ -283,7 +283,10 @@ Inter (Body) · Cormorant Garamond (Serif).
 **Bildsprache Luftfahrt durchgehend:** Kerosin (KI-Guthaben) · Cockpit ·
 Boarding / QuickBoarding · Co-Pilot · Runway · Pre-Flight · Score-Dial.
 
-**Score-Stufen — die Kette der Objektkarte gilt** (`js/dashboard.js:390`):
+**Score-Stufen — die Kette der Objektkarte gilt.** Geschrieben wird die
+Pille in `js/storage.js` von `_scoreLabel()` (Z. 3637, gerufen aus
+`_renderRichCard()` in Z. 1243); dieselbe Kette steht in
+`js/dashboard.js:390`:
 
 | Score | Stufe |
 |---|---|
@@ -311,6 +314,23 @@ auch die Farbketten (`top` / `green` / `gold` / `red`) brechen bei
 > (`ScoringService`) führt ein eigenes Vokabular `Sehr attraktiv /
 > Attraktiv / Durchschnittlich / Unterdurchschnittlich`, das seit `v1203`
 > **nicht mehr angezeigt** wird. Beide gehören noch angeglichen.
+>
+> **Eine dritte kam am 30.09.2026 dazu — auf der Karte selbst, also an
+> genau der Stelle, auf die dieser Abschnitt sich beruft.** `_scoreLabel()`
+> in `js/storage.js` führte vier Stufen: `Sehr gut · Gut · Okay · Schwach`.
+> „Okay" kommt in der Kette oben nicht vor, und **KRITISCH fehlte ganz** —
+> alles unter 50 hiess „Schwach", auch eine 12. Aufgefallen an einem frisch
+> angelegten Objekt mit Score 56, das „Okay" statt „SOLIDE" trug.
+> Begründet war es im Kommentar mit „Konsistent mit `dealscore2.js`" — die
+> Konsistenz bestand also zu einem anderen Modul, nicht zur Doktrin.
+> **Behoben in `v1734`.**
+>
+> **Hier stand dabei auch ein falscher Verweis:** „die Kette der
+> Objektkarte gilt (`js/dashboard.js:390`)". Dort stimmt die Kette zwar,
+> aber die Objektkarte baut `_renderRichCard()` in `js/storage.js` — was
+> weiter oben in dieser Datei unter „Struktur der Objektkarte" richtig
+> steht. Wer dem Verweis folgte, prüfte die falsche Datei und fand alles in
+> Ordnung.
 
 ### Whitelabel-Pflicht
 Jedes Gold-Literal steht als `var(--wl-<hex>, #<hex>)`. Tokens stehen in
@@ -410,18 +430,31 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
 
 - **`GND_JAHRE = 80` ist die Rückfallzahl, nicht mehr die einzige** —
   seit v1338 liest `CrossCheckService` die Gesamtnutzungsdauer aus dem
-  Registerdatensatz (`modellansaetze.gnd`) und leitet die
+  Registerdatensatz (`modellansaetze.gnd_jahre`) und leitet die
   Restnutzungsdauer im richtigen Rahmen **neu** ab (Anlage 2, aus Baujahr
   und Modernisierungspunkten) — statt eine fertige Zahl umzurechnen. Das
   ist der Unterschied, auf den es ankommt: 34/80 auf 70 ergibt je nach Weg
   30 oder 24 Jahre, an einem Reihenhaus rund 19.000 €.
   > **Der Fehler ist damit verlagert, nicht verschwunden:** er sitzt jetzt
   > im REZEPT. Führt ein Ausschuss eine abweichende GND und steht sie nur
-  > im Fließtext der `auflagen` statt als Zahl in `modellansaetze.gnd`,
+  > im Fließtext der `auflagen` statt als Zahl in `modellansaetze.gnd_jahre`,
   > rechnet das System weiter mit 80 — und nichts widerspricht. Gemessen
   > am 14.09.2026 an Oberursel (GND **70**): `modellansaetze` war leer,
   > die 70 stand nur im Text. **Beim Anlegen eines Rezepts gehört jede
   > abweichende GND als ZAHL ins Feld**, und danach wird sie nachgemessen.
+  >
+  > **Hier stand bis zum 01.10.2026 `modellansaetze.gnd`.** Das Feld heißt
+  > in 19 von 22 Registerdateien `gnd_jahre`; `gutachterausschuss.js:662`
+  > liest **alle drei** Namen in dieser Rangfolge:
+  >
+  > ```
+  > gnd_jahre  >  gesamtnutzungsdauer_jahre  >  gnd
+  > ```
+  >
+  > Wer nach `gnd` greppt, findet drei Dateien und hält die anderen
+  > neunzehn für lückenhaft. **Neue Sätze tragen `gnd_jahre`** — und sie
+  > tragen sie am SACHWERTFAKTOR, nicht am Zinssatz: `modell_gnd_jahre`
+  > wird nur im Sachwert-Zweig gelesen (`CrossCheckService.js:372`).
 - **Der Baupreisindex ist korrigiert, aber immer noch eine Konstante.**
   Bis v1406 stand dort `2.02`; gemessen sagen **zwei** unabhängige amtliche
   Quellen zum 01.01.2026 etwas anderes — Hamburg **1,911**, Dortmund

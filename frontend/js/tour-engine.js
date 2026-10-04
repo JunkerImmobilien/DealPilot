@@ -33,6 +33,31 @@
 
   // ─── Helpers ─────────────────────────────────────────────────────────
 
+  /* ═══ v1774 · querySelector NIMMT DEN ERSTEN, NICHT DEN SICHTBAREN ═══
+
+     Hier stand `document.querySelector(selectors[i])` — ein Treffer je
+     Teilselektor. Ist ausgerechnet der erste unsichtbar, gab die Suche
+     auf, OBWOHL ein spaeterer Treffer desselben Selektors sichtbar war.
+
+     Gemessen am 02.10.2026 in der Standardansicht, nachdem die Tour dort
+     bei Schritt 3 haengen blieb:
+
+       Schritt 3 Ziel      1 im DOM, 0 sichtbar
+       das Akkordeon       1 im DOM, 0 sichtbar
+       Schritt 8-18 Ziel   1 im DOM, 0 sichtbar
+       Schritt 25 Ziel     1 im DOM, 0 sichtbar
+
+     Die Konsole meldete dazu "Element nicht gefunden" — und das ist der
+     irrefuehrende Teil: gefunden wurde es, nur nicht sichtbar.
+
+     > Genau dieser Fehler steht im Backlog unter T1 schon einmal, als
+     > MEINER: am 30.09. hatte ich "36 von 37 Zielen in allen vier
+     > Ansichten" gemeldet, weil ich `querySelector` gegen null geprueft
+     > hatte statt gegen die Sichtbarkeit. In `#sb-list` liegen in drei
+     > Ansichten 0x0-Huellen.
+
+     Jetzt wird JEDER Treffer geprueft, nicht nur der erste. Das kostet
+     nichts: `querySelectorAll` laeuft ohnehin ueber dieselbe Liste. */
   function _findElementWithRetry(selector, retries, intervalMs) {
     return new Promise(function(resolve) {
       var attempts = 0;
@@ -40,8 +65,10 @@
         var selectors = selector.split(',').map(function(s) { return s.trim(); });
         for (var i = 0; i < selectors.length; i++) {
           try {
-            var el = document.querySelector(selectors[i]);
-            if (el && _isVisible(el)) return resolve(el);
+            var alle = document.querySelectorAll(selectors[i]);
+            for (var k = 0; k < alle.length; k++) {
+              if (_isVisible(alle[k])) return resolve(alle[k]);
+            }
           } catch(e) {}
         }
         attempts++;
@@ -68,9 +95,27 @@
         var rect = el.getBoundingClientRect();
         var mcRect = mainCol.getBoundingClientRect();
         var offset = rect.top - mcRect.top - 100;
-        mainCol.scrollBy({ top: offset, behavior: 'smooth' });
+        /* v1781b · SOFORT statt smooth.
+
+           Ein weiches Scrollen sieht hübscher aus, aber die Tour setzt
+           danach einen Rahmen auf eine Stelle, die sich noch bewegt.
+           Gemessen an Schritt 24: der Spot landete bei y 1.642 in einem
+           987 px hohen Fenster — vollstaendig unterhalb des Bildes.
+
+           Mein erster Versuch, das abzuwarten (v1781), hatte einen
+           Denkfehler: er wartete, bis das Ziel ZWEIMAL an derselben
+           Stelle steht — und das gilt auch VOR dem Start des Scrollens.
+           Er maß die Ruhe davor statt der danach.
+
+           > Wer auf Stillstand wartet, muss wissen, ob die Bewegung
+           > schon begonnen hat.
+
+           Mit `auto` ist das Scrollen beendet, bevor die naechste Zeile
+           laeuft. Fuer eine Tour, die ohnehin von Station zu Station
+           springt, ist das kein Verlust. */
+        mainCol.scrollBy({ top: offset, behavior: 'auto' });
       } else {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'auto', block: 'center' });
       }
     } catch(e) {}
   }
@@ -157,10 +202,174 @@
     return children && children.length > 0;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     v1746 · DAS OBJEKT, AN DEM DIE TOUR ERKLÄRT
+     ═══════════════════════════════════════════════════════════════════
+     Marcel am 01.10.2026: „Wenn ich die Tour direkt aus der Hilfe starte
+     und kein Objekt ausgewählt ist, dann passen die ganzen Anzeigen ja
+     überhaupt nicht … dass wir vielleicht einfach ein Demo-Objekt dann
+     erzeugen, das öffnet, daran erklärt und beim Tour beenden wieder
+     löscht."
+
+     Bisher klickte die Tour die erste Sidebar-Karte an und hoffte. Wer
+     keine hat - neu angemeldet, oder die Demo-Objekte geloescht -, bekam
+     eine Fuehrung durch leere Felder: Donuts ohne Wert, Tabellen ohne
+     Zeilen, ein DealScore aus null.
+
+     > Eine Erklaerung am leeren Formular erklaert nichts. Sie zeigt, wo
+     > etwas stuende, wenn es da waere - und das ist genau die Auskunft,
+     > die niemand braucht, der die App zum ersten Mal sieht.
+
+     Deshalb legt die Tour sich ein Objekt an, wenn keines da ist, und
+     raeumt es hinterher weg. Zwei Regeln halten das sauber:
+
+     · Geloescht wird NUR, was die Tour selbst angelegt hat. Der Schluessel
+       steht in `_demoAngelegt`; ist er leer, wird nichts angefasst.
+     · Ein vorhandenes Objekt wird nie ersetzt. Gibt es eines, nimmt die
+       Tour es - auch wenn es unfertig ist, denn es gehoert dem Nutzer.
+  ═══════════════════════════════════════════════════════════════════ */
+  var _demoAngelegt = null;
+
+  function _sichtbareKarte() {
+    var l = document.querySelectorAll(
+      '.dpl-teil-objekte .sb-card, .dpl-schiene .sb-card, #sb-list .sb-card, .sb-card');
+    for (var i = 0; i < l.length; i++) {
+      var r = l[i].getBoundingClientRect();
+      if (r.width > 2 && r.height > 2) return l[i];
+    }
+    return null;
+  }
+
+  /* V239.7: MouseEvent statt .click(), weil die Karten Event-Delegation
+     nutzen - ein nacktes .click() erreicht den Delegaten nicht immer. */
+  function _karteKlicken(el) {
+    try {
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+    } catch (e) {
+      try { el.click(); } catch (e2) { console.warn('[DpTour V239.7] click failed:', e2); }
+    }
+  }
+
+  /* ───────────────────────────────────────────────────────────────────────
+     v1747 · DIE SCHIENE AUFKLAPPEN, BEVOR NACH KARTEN GESUCHT WIRD
+
+     Marcel am 01.10.2026: „Ich habe jetzt schon wieder die Tour gestartet
+     und dann hatte ich schon bei dem ersten: Hier stehen deine Objekte.
+     Nee, da sind die Aktionen. Also da muesste dann erst auf Portfolio
+     geklickt werden."
+
+     In Aktenmappe, Kanzlei und Tower hat die Schiene zwei Stellungen, und
+     ausgeliefert wird sie auf „Aktionen" — `.dpl-teil-objekte` steht dann
+     auf `display:none`. Gemessen am 01.10.2026: 20 Karten im DOM, davon 0
+     sichtbar; ein Klick auf `.dpl-portfolio` macht 0 px zu 691 px und alle
+     20 sichtbar.
+
+     > Das war die Ursache hinter einem Fehler, den ich zuerst fuer einen
+     > Zeitfehler hielt: die Tour legte ein Demo-Objekt an, OBWOHL 18 echte
+     > da waren. Sie waren da - nur zugeklappt. Eine Abwesenheit, die nur
+     > eine Verdeckung ist, sieht in jeder Messung gleich aus; der
+     > Unterschied steht erst im Umschalter.
+     ─────────────────────────────────────────────────────────────────── */
+  function _portfolioAufklappen() {
+    try {
+      var liste = document.querySelector('.dpl-teil-objekte');
+      if (!liste) return false;                       /* DealPilot-Ansicht: keine Schiene */
+      if (liste.getBoundingClientRect().height > 20) return false;  /* steht schon offen */
+      var um = document.querySelector('.dpl-portfolio');
+      if (!um) return false;
+      um.click();
+      console.log('[DpTour v1747] Schiene stand auf Aktionen - Portfolio aufgeklappt');
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* Sucht die Karte und klappt dafuer notfalls auf. Der Umweg kostet nichts,
+     wenn die Liste schon offen ist. */
+  function _karteSuchen() {
+    var k = _sichtbareKarte();
+    if (k) return Promise.resolve(k);
+    if (!_portfolioAufklappen()) return Promise.resolve(null);
+    return new Promise(function (fertig) {
+      var seit = Date.now();
+      (function warte() {
+        var k2 = _sichtbareKarte();
+        if (k2 || (Date.now() - seit) > 1200) { fertig(k2); return; }
+        setTimeout(warte, 60);
+      })();
+    });
+  }
+
+  /* ───────────────────────────────────────────────────────────────────────
+     v1747 · DAS OFFIZIELLE DEMO-OBJEKT STATT EINES SELBSTGEBAUTEN
+
+     Marcel am 01.10.2026: „Wir haben doch auch diese Demo-Objekte, die der
+     Kunde bei der Erstanmeldung bekommt. Koennen wir das nicht laden?"
+
+     Er hat recht, und es war doppelte Arbeit. v1746 tippte 16 Felder in das
+     Formular und speicherte - gemessen 13 Sekunden, und das Ergebnis trug
+     kein Foto, keine KI-Analyse und 16 von 129 Feldern. Das Objekt aus
+     `backend/src/db/demo-object.json` hat alles davon und ist dasselbe, das
+     ein Neukunde bei der Registrierung bekommt.
+
+     > Ein Beispiel, das der Kunde ohnehin kennt, ist das bessere Beispiel.
+     > Und ein zweites, handgepflegtes daneben waere eine Stelle mehr, an
+     > der etwas veraltet, ohne dass es jemand merkt.
+     ─────────────────────────────────────────────────────────────────── */
+  function _demoAnlegen() {
+    return new Promise(function (fertig) {
+      try {
+        if (!window.Auth || typeof window.Auth.apiCall !== 'function') return fertig(null);
+        window.Auth.apiCall('/objects/demo-rundgang', { method: 'POST', body: {} })
+          .then(function (r) {
+            var key = (r && (r.id || r.objectId)) || null;
+            if (!key) { fertig(null); return; }
+            _demoAngelegt = key;
+            console.log('[DpTour v1747] Demo-Objekt geladen:', (r && r.name) || key);
+            /* Die Liste neu holen und warten, bis die Karte wirklich steht -
+               nicht auf die Uhr, sondern auf das Ziel. */
+            if (typeof window.refreshSavedList === 'function') {
+              try { window.refreshSavedList(); } catch (ex) {}
+            }
+            var seit = Date.now();
+            (function warte() {
+              if (_sichtbareKarte() || (Date.now() - seit) > 2500) { fertig(key); return; }
+              setTimeout(warte, 70);
+            })();
+          })
+          .catch(function (e) {
+            console.warn('[DpTour v1747] Demo-Objekt konnte nicht geladen werden:', e);
+            fertig(null);
+          });
+      } catch (ex) { fertig(null); }
+    });
+  }
+
+  /* Wird beim Beenden UND beim Abschliessen gerufen. Loescht nur den
+     eigenen Schluessel - und setzt ihn danach zurueck, damit ein zweiter
+     Aufruf nicht ins Leere greift. */
+  function _demoAufraeumen() {
+    var key = _demoAngelegt;
+    _demoAngelegt = null;
+    if (!key) return;
+    try {
+      if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
+      window.Auth.apiCall('/objects/' + key, { method: 'DELETE' }).then(function () {
+        console.log('[DpTour v1746] Demo-Objekt wieder entfernt:', key);
+        if (typeof window.refreshSavedList === 'function') { try { window.refreshSavedList(); } catch (e) {} }
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   // V239.1: Stelle sicher, dass ein Objekt geladen ist (sonst leere Donuts)
   // V239.7: MouseEvent statt .click() weil Sidebar-Cards Event-Delegation nutzen
   function _ensureObjectLoaded() {
     return new Promise(function(resolve) {
+      /* v1747 · ZUERST aufklappen, dann alles andere. Das gehoert vor die
+         Abkuerzungen darunter: Marcel hatte ein Objekt geladen, also kehrte
+         die Funktion sofort zurueck - und Schritt 1 rahmte die zugeklappte
+         Aktionen-Zeile ein, weil niemand die Schiene umgeschaltet hatte.
+         Die Karte wird hier gebraucht, auch wenn das Objekt schon steht. */
+      _portfolioAufklappen();
       // Schon ein Objekt aktiv?
       var hdrObj = document.querySelector('#hdr-obj');
       if (hdrObj && hdrObj.textContent && hdrObj.textContent.trim() !== 'Neues Objekt') {
@@ -170,22 +379,41 @@
       if (kp && kp.value && kp.value.length > 0) {
         return resolve(true);
       }
-      // Erstes Sidebar-Element klicken via MouseEvent
-      var firstItem = document.querySelector('#sb-list > .sb-card, #sb-list > *:first-child');
-      if (firstItem) {
-        try {
-          firstItem.dispatchEvent(new MouseEvent('click', {
-            bubbles: true, cancelable: true, view: window
-          }));
-        } catch(e) {
-          try { firstItem.click(); } catch(e2) {
-            console.warn('[DpTour V239.7] click failed:', e2);
-          }
+      /* v1746 · Die SICHTBARE Karte nehmen - in Aktenmappe, Kanzlei und
+         Tower liegen in `#sb-list` nur 0x0-Huellen, die echte Karte steht
+         in der Schiene. Ein Klick auf eine Huelle laedt nichts.
+         v1747 · und sie steht nur dann sichtbar dort, wenn die Schiene auf
+         „Portfolio" geschaltet ist - sonst erst umschalten. */
+      _karteSuchen().then(function (firstItem) {
+        if (firstItem) {
+          _karteKlicken(firstItem);
+          /* Auf das geladene Objekt warten statt auf 1800 ms Uhr */
+          var seit = Date.now();
+          (function warte() {
+            var h = document.querySelector('#hdr-obj');
+            var da = (h && h.textContent && h.textContent.trim() !== 'Neues Objekt' && h.textContent.trim() !== '');
+            if (da || (Date.now() - seit) > 1800) { resolve(true); return; }
+            setTimeout(warte, 70);
+          })();
+          return;
         }
-        setTimeout(function() { resolve(true); }, 1800);
-      } else {
-        resolve(false);
-      }
+        /* v1746 · Kein Objekt da - also eines holen, statt durch leere
+           Felder zu fuehren. Es wird beim Beenden wieder entfernt. */
+        console.log('[DpTour v1747] Keine sichtbare Karte und kein Objekt - Demo wird geladen');
+        _demoAnlegen().then(function (key) {
+          if (!key) { resolve(false); return; }
+          _karteSuchen().then(function (karte) {
+            if (karte) _karteKlicken(karte);
+            var seit = Date.now();
+            (function warte() {
+              var h = document.querySelector('#hdr-obj');
+              var da = (h && h.textContent && h.textContent.trim() !== 'Neues Objekt' && h.textContent.trim() !== '');
+              if (da || (Date.now() - seit) > 2000) { resolve(true); return; }
+              setTimeout(warte, 70);
+            })();
+          });
+        });
+      });
     });
   }
 
@@ -323,14 +551,45 @@
     document.body.classList.remove('dp-tour-active');
   }
 
+  /* ═══ v1775 · DER SPOT DARF NICHT GROESSER SEIN ALS DER BILDSCHIRM ═══
+
+     Gemessen am 02.10.2026 an den drei Quick-Boarding-Schritten (4, 5, 6)
+     in Tower, Aktenmappe und Kanzlei - in allen dreien gleich:
+
+       Spot      l 420 · t 63 · w 1296 · h 2216
+       Fenster                            h  988
+       Spot-Mitte y = 1171  ->  183 px UNTER dem sichtbaren Bereich
+
+     Diese Schritte zeigen auf `#qc-tab-host, #s-quick` - einen Behaelter,
+     der viel hoeher ist als das Fenster. Der Rahmen lief unten aus dem
+     Bild, und das Markierte war nicht zu sehen.
+
+     > Ein Rahmen, der groesser ist als das Bild, hebt nichts hervor. Er
+     > faerbt nur alles andere dunkel.
+
+     Der Spot wird deshalb auf den SICHTBAREN Teil des Ziels beschnitten.
+     Liegt das Ziel ganz ausserhalb, bleibt er, wo er ist - dann hat der
+     Aufrufer vorher nicht gescrollt, und das ist ein anderer Fehler. */
+  function _beschneideAufSicht(x, y, w, h) {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var l = Math.max(0, x), t = Math.max(0, y);
+    var r = Math.min(vw, x + w), b = Math.min(vh, y + h);
+    /* Ganz ausserhalb: unveraendert zurueck, damit nichts auf 0x0 faellt. */
+    if (r - l < 4 || b - t < 4) return { x: x, y: y, w: w, h: h, beschnitten: false };
+    return { x: l, y: t, w: r - l, h: b - t,
+             beschnitten: (l !== x || t !== y || r !== x + w || b !== y + h) };
+  }
+
   function _positionSpotlight(el) {
     if (!state.spotlight || !el) return;
     var rect = el.getBoundingClientRect();
     var pad = 8;
-    var x = rect.left - pad;
-    var y = rect.top - pad;
-    var w = rect.width + pad * 2;
-    var h = rect.height + pad * 2;
+    var _b = _beschneideAufSicht(rect.left - pad, rect.top - pad,
+                                 rect.width + pad * 2, rect.height + pad * 2);
+    var x = _b.x;
+    var y = _b.y;
+    var w = _b.w;
+    var h = _b.h;
     var vw = window.innerWidth;
     var vh = window.innerHeight;
 
@@ -649,16 +908,52 @@
     state.expanded = false;
 
     _ensureCorrectTab(step, function() {
-      // V239: Laengere Retries fuer s-quick und s8 (dynamisch gerendert)
-      // V239.2: s-quick auf 20x300ms = 6s erhoeht
-      var retries = 10;
-      var interval = 200;
+      /* ═══ v1779 · EIN SCHRITT OHNE ZIEL WARTET NICHT MEHR SECHS SEKUNDEN ═══
+
+         Marcel am 02.10.2026, auf die Frage was mit Schritten geschehen
+         soll, deren Ziel nicht sichtbar ist: **"b"** — sie entfallen.
+         Die Tour wird kuerzer und laeuft dafuer fluessig.
+
+         GEMESSEN in vier Durchlaeufen (Standard und Aktenmappe, je beide
+         Zweige): in ALLEN VIER dieselben drei Schritte ohne Spot, alle im
+         Tab `s6` — Investor Deal Score, Bewertungs-Cockpit, Stress-Test.
+         Das Protokoll des Pruefers:
+
+           blase_frisch : true     die Blase ist da
+           next_knopf   : true     der Weiter-Knopf existiert
+           gewaehlt     : next     er wurde geklickt
+           bewegt       : FALSE    nach 900 ms hat sich nichts getan
+
+         Die Tour kam danach doch weiter — ueber den Auto-Skip, nach bis
+         zu 20 x 300 ms = SECHS SEKUNDEN. Dreimal hintereinander.
+
+         > Fuer den Nutzer sind das drei Blasen, die nichts markieren und
+         > je sechs Sekunden stehen. Von aussen sieht das aus wie ein
+         > Haenger — die Tour arbeitet nur ergebnislos.
+
+         Die Wartezeiten sind deshalb halbiert bis gedrittelt. Sie bleiben
+         dort am laengsten, wo ein Bereich WIRKLICH nachlaedt: das
+         Quick-Boarding rendert in einem eigenen iframe, der
+         Deal-Aktion-Tab baut sein Cockpit nach. Zwei Sekunden decken das
+         gemessen ab — die sechs waren fuer den langsamsten denkbaren
+         Fall gewaehlt, nicht fuer den gemessenen.
+
+         > Eine Zahl, die fuer das langsamste Geraet gewaehlt wurde, ist
+         > auf jedem anderen eine Wartezeit ohne Zweck. (Dieselbe Lehre
+         > steht schon bei v1745 — dort fuer die Tab-Pause.)
+
+         Was dabei NICHT geaendert wird: der Auto-Skip selbst. Ein Schritt
+         ohne sichtbares Ziel wird uebersprungen, nicht uebergangen — die
+         Konsole nennt ihn weiterhin mit der Zahl der DOM-Treffer, damit
+         ein stummer Schritt auffaellt statt zu verschwinden. */
+      var retries = 6;
+      var interval = 180;              /* rund 1,1 s statt 2,0 s */
       if (step.tab === 's-quick') {
-        retries = 20;
-        interval = 300;
+        retries = 10;
+        interval = 200;                /* 2,0 s statt 6,0 s (iframe) */
       } else if (step.tab === 's8') {
-        retries = 15;
-        interval = 300;
+        retries = 10;
+        interval = 200;                /* 2,0 s statt 4,5 s (Cockpit) */
       }
 
       _clearSubHl();
@@ -673,7 +968,19 @@
       });
       _pEl.then(function(el) {
         if (!el) {
-          console.warn('[DpTour V239] Element nicht gefunden: ' + step.selector + ' (Step ' + (state.idx + 1) + ')');
+          /* v1774: "nicht gefunden" war die falsche Auskunft - meist IST
+             das Element da und nur unsichtbar. Wer der alten Meldung
+             folgte, suchte einen Tippfehler im Selektor statt eine
+             zugeklappte Schiene. */
+          var _imDom = 0;
+          try {
+            step.selector.split(',').forEach(function (t) {
+              try { _imDom += document.querySelectorAll(t.trim()).length; } catch (e) {}
+            });
+          } catch (e) {}
+          console.warn('[DpTour v1774] Kein SICHTBARES Ziel: ' + step.selector
+            + ' (Step ' + (state.idx + 1) + ') — ' + _imDom + ' Treffer im DOM, '
+            + (_imDom ? 'keiner davon sichtbar' : 'auch keiner im DOM'));
           if (step.placement === 'center') {
             _createOverlay();
             _hideSpotlight();
@@ -704,14 +1011,47 @@
 
         _scrollIntoView(el);
 
-        setTimeout(function() {
-          _createOverlay();
-          _positionSpotlight(el);
-          _renderBubbleContent(step);
-          setTimeout(function() {
-            _positionBubble(el, step.placement);
-          }, 30);
-        }, 450);
+        /* ═══ v1781 · AUF DAS ENDE DES SCROLLENS WARTEN, NICHT AUF DIE UHR ═══
+
+           Hier standen 450 ms nach dem START eines `behavior: 'smooth'`-
+           Scrollings. Bei einem kurzen Weg reicht das; bei einem langen
+           ist das Bild noch unterwegs, und der Spot wird auf die ALTE
+           Position gesetzt.
+
+           Gemessen am 02.10.2026 an Schritt 24 (Stress-Test): der Chart
+           ist 883 px hoch und steht bei y ≈ 6.869 — der Spot landete
+           ausserhalb des Fensters, obwohl das Ziel da war und gefunden
+           wurde.
+
+           > Eine feste Wartezeit nach einer Bewegung trifft nur die
+           > Wege, fuer die sie gewaehlt wurde.
+
+           Gewartet wird jetzt, bis das Ziel ZWEIMAL hintereinander an
+           derselben Stelle steht — dann steht das Bild. Mit 900 ms
+           Obergrenze, damit nichts haengenbleibt, wenn etwas dauernd in
+           Bewegung ist (Animation, Ladebalken). Dieselbe Bauart wie der
+           Tab-Wechsel seit v1745. */
+        /* v1781b: Mindestens 120 ms, bevor Stillstand zaehlt — sonst
+           misst die Schleife die Ruhe VOR der Bewegung. Mit
+           `behavior: 'auto'` oben ist das Scrollen da laengst durch;
+           die Schleife faengt nur noch nachladende Inhalte ab. */
+        (function _wennRuhig(seit, letztesY, gleich) {
+          seit = seit || Date.now();
+          var y = null;
+          try { y = Math.round(el.getBoundingClientRect().top); } catch (e) {}
+          var ruht = (y !== null && y === letztesY);
+          gleich = ruht ? (gleich || 0) + 1 : 0;
+          if ((gleich >= 2 && (Date.now() - seit) >= 120) || (Date.now() - seit) >= 900) {
+            _createOverlay();
+            _positionSpotlight(el);
+            _renderBubbleContent(step);
+            setTimeout(function () {
+              _positionBubble(el, step.placement);
+            }, 30);
+            return;
+          }
+          setTimeout(function () { _wennRuhig(seit, y, gleich); }, 90);
+        })();
       });
     });
   }
@@ -760,7 +1100,33 @@
       var noObject = !hdrObj || !hdrObj.textContent || hdrObj.textContent.trim() === 'Neues Objekt';
       if (noObject) {
         console.log('[DpTour V239.7] Kein Objekt aktiv -> erstes Sidebar-Item klicken');
-        var firstCard = document.querySelector('#sb-list > .sb-card, #sb-list > *:first-child');
+        /* ══ v1743 · DIE KARTE MUSS SICHTBAR SEIN, SONST GEHT DER KLICK INS LEERE ══
+           Marcel am 01.10.2026 aus dem Tower: „Dann hängt er sich bei mir
+           auf und dann kann ich nichts mehr machen. Dann ist der Bildschirm
+           ausgegraut."
+
+           Hier stand nur `#sb-list > .sb-card`. In Aktenmappe, Kanzlei und
+           Tower wandert die Objektliste aber in eine Schiene; in `#sb-list`
+           bleiben die Karten als HÜLLEN mit 0x0 zurück. `querySelector`
+           findet eine davon, der Klick trifft ein Element ohne Fläche — und
+           lädt nichts.
+
+           > Weil dieser Zweig bei JEDEM Tab-Schritt erneut greift, solange
+           > kein Objekt aktiv ist, wiederholt sich das endlos: die Tour
+           > wartet, klickt ins Nichts, wartet wieder. Von aussen sieht das
+           > aus, als sei sie eingefroren — sie arbeitet nur ergebnislos.
+
+           Gesucht wird jetzt die erste Karte MIT Fläche, egal in welchem
+           Behälter sie liegt. */
+        var firstCard = (function () {
+          var kandidaten = document.querySelectorAll(
+            '.dpl-schiene .sb-card, #sb-list > .sb-card, .sb-card, #sb-list > *:first-child');
+          for (var ci = 0; ci < kandidaten.length; ci++) {
+            var r = kandidaten[ci].getBoundingClientRect();
+            if (r.width > 2 && r.height > 2) return kandidaten[ci];
+          }
+          return null;
+        })();
         if (firstCard) {
           try {
             firstCard.dispatchEvent(new MouseEvent('click', {
@@ -788,6 +1154,26 @@
     var pause = 400;
     if (step.tab === 's-quick') pause = 1500;
     if (step.tab === 's8') pause = 1500;
+    /* ══ v1745 · AUCH HIER AUF DAS ZIEL WARTEN STATT AUF DIE UHR ══
+       Marcel: „Ich finde, die läuft auch nicht sehr flüssig."
+
+       Die Pausen oben sind für den langsamsten Fall gewählt — das
+       Quick-Boarding rendert in einem eigenen iframe, der Deal-Aktion-Tab
+       baut sein Cockpit nach. Auf einem Rechner, der schneller fertig ist,
+       bleibt die Tour trotzdem die volle Zeit stehen: 1,5 Sekunden pro
+       Schritt, bei vier aufeinanderfolgenden Quick-Boarding-Schritten also
+       sechs Sekunden Warten auf etwas, das längst da ist.
+
+       > Dieselbe Lehre wie beim Auto-Start: eine Zahl, die für das
+       > langsamste Gerät gewählt wurde, ist auf jedem anderen eine
+       > Wartezeit ohne Zweck.
+
+       Gewartet wird jetzt darauf, dass der Zielbereich WIRKLICH steht —
+       mit den bisherigen Pausen als Obergrenze, damit nichts
+       haengenbleibt, wenn er nie kommt. */
+    var _marker = (step.tab === 's-quick') ? '#qc-score-circle, #qc-tab-host'
+                : (step.tab === 's8')      ? '#s8 .dab-body, #s8 .dab-cockpit, #s8'
+                : ('#' + step.tab);
     // V239.3: Wenn vorheriger Step in QC war und jetzt rauswechseln -> mehr Zeit
     if (document.body.classList.contains('qc-standalone-active') === false &&
         step.tab && step.tab.indexOf('s') === 0 && step.tab !== 's-quick' &&
@@ -795,7 +1181,14 @@
         state.steps[state.idx - 1] && state.steps[state.idx - 1].tab === 's-quick') {
       pause = 900;
     }
-    setTimeout(callback, pause);
+    (function _warteAufBereich(seit) {
+      seit = seit || Date.now();
+      var el = null;
+      try { el = document.querySelector(_marker); } catch (e) {}
+      var steht = el && el.getBoundingClientRect().height > 20;
+      if (steht || (Date.now() - seit) >= pause) { callback(); return; }
+      setTimeout(function () { _warteAufBereich(seit); }, 80);
+    })();
   }
 
   // ─── Public API ──────────────────────────────────────────────────────
@@ -897,14 +1290,22 @@
       Tour.complete();
     },
 
+    /* v1746 · dasselbe beim vorzeitigen Abbrechen */
+
     exit: function() {
+
+          try { _demoAufraeumen(); } catch (e) {}
       // v433: beim Schliessen (X / ESC) als gesehen markieren, sonst startet die
       // Tour bei jedem Hard-Reload erneut (nur complete()/skip() setzten das Flag).
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
       _cleanup();
     },
 
+    /* v1746 · Demo-Objekt der Tour entfernen, falls sie eines angelegt hat */
+
     complete: function() {
+
+          try { _demoAufraeumen(); } catch (e) {}
       if (!state.active) return;  // V239.1: doppel-Aufrufe schlucken
       state.active = false;  // V239.1: SOFORT deaktivieren
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
@@ -1069,14 +1470,83 @@
         try {
           var fr = first.getBoundingClientRect();
           var vh = first.ownerDocument.defaultView.innerHeight || window.innerHeight;
-          if (fr.top < 70 || fr.bottom > vh - 70) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          /* v1782 · DIESES SCROLLEN HAT DEN SPOT STEHENLASSEN.
+
+             `_applySubHl` laeuft 420 ms NACH dem Setzen des Spots
+             (`_renderStep`, Z. 967) und scrollt noch einmal — fuer das
+             UNTERZIEL. Der Spot bleibt dabei, wo er war, und das Bild
+             wandert unter ihm weg.
+
+             Gemessen an Schritt 24 (Stress-Test, `subTargets: ["Stress"]`):
+
+               _scrollIntoView(el)   Ziel von y 7.598 auf y 99   korrekt
+               Spot gesetzt          auf y 99                    korrekt
+               _applySubHl scrollt   nochmal                     <- hier
+               Spot gemessen         y 1.642, Fenster 987 px     ausserhalb
+
+             > Ein Rahmen, der einmal gesetzt und danach nicht mehr
+             > angefasst wird, zeigt auf eine Stelle, die es so nicht
+             > mehr gibt.
+
+             Zwei Aenderungen: `auto` statt `smooth`, damit das Scrollen
+             beendet ist, wenn die naechste Zeile laeuft — und der Spot
+             wird danach NACHGEZOGEN (unten in `_applySubHl`). */
+          if (fr.top < 70 || fr.bottom > vh - 70) first.scrollIntoView({ behavior: 'auto', block: 'center' });
         } catch (e) {}
       }
+      /* ═══ v1782b · DAS NACHZIEHEN IST ZURUECKGENOMMEN ═══════════════
+
+         Hier stand ab v1782 ein `_positionSpotlight(first)`, das den Spot
+         nach dem Sub-Scrollen auf das Unterziel ziehen sollte. GEMESSEN
+         wurde es schlechter, nicht besser:
+
+           vor v1782   34 ok · 1 Spot ausserhalb  (nur Schritt 24)
+           mit v1782   34 ok · 2 Spot ausserhalb  (24 UND 6)
+
+         Schritt 6 ("Als Objekt speichern") hatte vorher gesessen und
+         landete danach bei y 2.039 — das Nachziehen hat ihn aus dem Bild
+         geschoben.
+
+         > Eine Korrektur, die einen Fehler behebt und einen neuen macht,
+         > ist keine Korrektur. Zurueck auf den Stand, der gemessen
+         > besser war.
+
+         Was BLEIBT, weil es fuer sich richtig ist: `behavior: 'auto'`
+         oben statt `smooth`. Ein Scrollen, das beendet ist, wenn die
+         naechste Zeile laeuft, hilft an jeder Stelle — es war nur nicht
+         die Ursache von Schritt 24.
+
+         Schritt 24 bleibt damit offen: ein Fehler von 36, und zwar der
+         einzige. Er steht im Backlog unter T1. */
     } catch (e) {}
   }
 
   /* v868: zugeklappte Bereiche vorm Fokussieren oeffnen (z.B. PDF-Klappe) */
   function _ensureExpanded(step) {
+    /* v1747 · Zeigt der Schritt auf die Objektliste, muss die Schiene offen
+       sein. Einmal beim Start reicht nicht: der Klick auf eine Karte schaltet
+       sie selbst wieder auf „Aktionen" zurueck - gemessen am 01.10.2026, der
+       Spot lag danach auf 264 x 1004 px, also der GANZEN Spalte samt
+       Aktionen. Genau das hat Marcel gesehen. */
+    try {
+      /* Nur Schritte, die auf die LISTE zeigen. Drei Schritte zeigen auf die
+         Aktionen (`#sb-actions-accordion, .dpl-schiene`) - fuer die waere ein
+         Aufklappen das Gegenteil von hilfreich, es wuerde ihr Ziel zuklappen.
+         Die Suche selbst geht ihre Selektoren der Reihe nach durch und
+         ueberspringt Unsichtbares, deshalb trifft sie danach von allein
+         `.dpl-teil-objekte` statt der ganzen Schiene. */
+      if (step && step.selector &&
+          /dpl-teil-objekte|sb-list/.test(step.selector) &&
+          !/sb-actions/.test(step.selector)) {
+        if (_portfolioAufklappen()) {
+          return new Promise(function (res) { setTimeout(function () { res(_ensureExpandedRest(step)); }, 260); });
+        }
+      }
+    } catch (e) {}
+    return _ensureExpandedRest(step);
+  }
+
+  function _ensureExpandedRest(step) {
     if (!step || !step.ensureVisibleText) return Promise.resolve();
     var probe = _findByText(step.ensureVisibleText, {});
     if (probe) return Promise.resolve();
@@ -1284,8 +1754,42 @@
         console.log('[DpTour v427] Auto-Start unterdrueckt: dp_auth_flow gesetzt');
         return;
       } } catch (e) {}
-      // V247: Laengere Wartezeit damit Sidebar fertig rendert + Auth-Modal-Check
-      setTimeout(function() {
+      /* ══ v1739 · WARTEN AUF EINE BEDINGUNG STATT AUF DIE UHR ══
+         Marcel am 01.10.2026: „Das dauert sehr, sehr lange, bis der laedt."
+
+         Gemessen am geladenen Staging:
+
+           tour-engine.js fertig      2.445 ms
+           + setTimeout                3.000 ms   (_maybeAutoStart)
+           + setTimeout                2.500 ms   (dieser hier)
+           = Angebot erscheint      ~ 7.945 ms
+
+         Fuenfeinhalb Sekunden davon sind fest verdrahtete Wartezeit. Der
+         Grund dafuer steht im alten Kommentar: „damit Sidebar fertig
+         rendert". Das ist eine Bedingung, keine Dauer - und sie war auf
+         langsamen Geraeten zu kurz und auf schnellen siebenmal zu lang.
+
+         > Eine Zahl, die fuer das langsamste Geraet gewaehlt wurde, ist auf
+         > jedem anderen eine Wartezeit ohne Zweck. Wer auf etwas wartet,
+         > soll danach fragen, nicht die Zeit schaetzen.
+
+         Geprueft wird jetzt alle 120 ms, ob die Sidebar wirklich steht -
+         mit derselben Obergrenze wie vorher, damit nichts haengenbleibt,
+         wenn die Bedingung nie eintritt. */
+      (function wartenBisBereit(seit) {
+        seit = seit || Date.now();
+        var sidebarDa = !!document.querySelector('#sb-list .sb-card, #sb-list, #sidebar');
+        var abgelaufen = (Date.now() - seit) > 2500;
+        if (!sidebarDa && !abgelaufen) { setTimeout(function () { wartenBisBereit(seit); }, 120); return; }
+        /* v1740 · Das Grund-Setup kommt VOR dem Rundgang. Solange es laeuft,
+           bietet sich die Tour nicht an - sie zeigt die Oberflaeche, und
+           welche das ist, entscheidet gerade der erste Schritt. Nach dem
+           Abschluss startet `onboarding.js` sie selbst. */
+        try {
+          if (window.__dpOnboardingAktiv) return;
+          if (window.DealPilotOnboarding && typeof DealPilotOnboarding.istFertig === 'function'
+              && !DealPilotOnboarding.istFertig()) return;
+        } catch (e) {}
         if (Tour.isComplete()) return;
         // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
         if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) {
@@ -1303,16 +1807,26 @@
            „Spaeter" waehlt, soll sie spaeter noch bekommen koennen — die
            Begrenzung uebernehmen jetzt OFFER_COUNT und OFFER_LAST. */
         if (!_angebotFaellig()) return;
+        /* v1739 · Messmarke. Der Zeitpunkt, zu dem das Angebot erscheint,
+           laesst sich von aussen nicht zuverlaessig messen - die Latenz
+           eines Mess-Werkzeugs ist groesser als die Zeit, um die es geht.
+           Die Seite kennt ihn selbst, also schreibt sie ihn auf. */
+        try { window.__dpTourAngebotMs = Math.round(performance.now()); } catch (e) {}
         _angebotZeigen();
-      }, 2500);
+      })();
     } catch(e) {
       console.warn('[DpTour V247] Auto-Start fehlgeschlagen:', e.message);
     }
   }
 
+  /* v1739 · auch hier wurde blind gewartet: 3000 ms, obwohl das Dokument
+     schon fertig war (dieser Zweig laeuft nur, wenn readyState NICHT mehr
+     'loading' ist). Ein kurzer Anlauf reicht, damit die uebrigen Module
+     ihre Knoepfe gesetzt haben; auf die Sidebar wartet die Pruefung oben
+     ohnehin selbst. */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _maybeAutoStart);
   } else {
-    setTimeout(_maybeAutoStart, 3000);
+    setTimeout(_maybeAutoStart, 400);
   }
 })();

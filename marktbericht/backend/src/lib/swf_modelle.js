@@ -1198,6 +1198,41 @@ function bedingungPruefen(modell, eingabe) {
   return null;
 }
 
+/* ═══ v1778 · EIN RECHENKERN DARF NICHT AN EINEM DATENFELD STERBEN ═══
+
+   Gemessen am 02.10.2026: `korrekturen: {}` — ein LEERES OBJEKT statt
+   eines leeren Arrays — liess `auswerten()` mit
+
+     TypeError: object is not iterable
+
+   abstuerzen. `{}` ist truthy, also greift `modell.korrekturen || []`
+   nicht, und `for..of` kann es nicht durchlaufen. Betroffen waren **69
+   Saetze** in sieben Registerdateien (dresden, hamburg, leipzig,
+   lzs-bb, lzs-rp, lzs-sh, schwerin) — die ganze Ernte vom 01./02.10.
+
+   Die Saetze sind korrigiert. ABER: der Rechenkern bleibt sonst so
+   zerbrechlich, dass der naechste Tippfehler in einer Registerdatei ihn
+   wieder umwirft — und ein Absturz ist die schlechteste Art, einen
+   Datenfehler zu melden, weil er die ganze Auskunft mitnimmt.
+
+   > Ein Rechenkern, der an einem Datenfeld stirbt, verliert nicht ein
+   > Feld, sondern die Antwort.
+
+   `_korrListe()` gibt IMMER ein Array. Was keines ist, wird gemeldet
+   und als leer behandelt — die Zahl kommt dann ohne Korrektur heraus,
+   und das steht im Protokoll statt in einem Stacktrace. */
+function _korrListe(modell) {
+  const k = modell && modell.korrekturen;
+  if (Array.isArray(k)) return k;
+  if (k == null) return [];
+  try {
+    console.warn('[swf_modelle v1778] korrekturen ist kein Array ('
+      + (typeof k) + ', ' + JSON.stringify(k).slice(0, 80)
+      + ') — wird als leer behandelt. Registerdatensatz pruefen.');
+  } catch (e) {}
+  return [];
+}
+
 export function auswerten(modell, eingabe) {
   if (!modell || !modell.form) return nichts('kein_modell', 'Kein Modell hinterlegt.');
 
@@ -1252,7 +1287,7 @@ export function auswerten(modell, eingabe) {
   if (einheit === 'wert_eur' || r.liefert === 'wert_eur') {
     const kE = [];
     const offenE = [];
-    for (const k of (modell.korrekturen || [])) {
+    for (const k of _korrListe(modell)) {
       const t = korrekturAnwenden(k, _eingabeK);
       if (t && (t.wert || t.wirkung === 'multiplikativ')) kE.push(t);
       else if (t == null) offenE.push(k.bez || k.feld);
@@ -1281,7 +1316,7 @@ export function auswerten(modell, eingabe) {
     r.dokumentwert = betrag;
     r.korrekturen = kE;
     r.korrekturen_offen = offenE;
-    r.korrekturen_gefuehrt = (modell.korrekturen || []).length;
+    r.korrekturen_gefuehrt = _korrListe(modell).length;
     r.korrekturen_multiplikativ = mulE.length;
     r.rechenweg = [`Tabellenwert ${r.tabellenwert} EUR`]
       .concat(addE.map((k) => `${k.wert > 0 ? '+' : '−'} ${Math.abs(k.wert)} (${k.merkmal})`))
@@ -1292,7 +1327,7 @@ export function auswerten(modell, eingabe) {
 
   const korr = [];
   const offen = [];
-  for (const k of (modell.korrekturen || [])) {
+  for (const k of _korrListe(modell)) {
     const t = korrekturAnwenden(k, _eingabeK);
     /* v1093-WMUL · Ein additiver Zuschlag von 0,00 ist ein Nichts — so
      * druckt Herford ihn ab (kBgf 0,00), und so wird er seit v1083
@@ -1371,7 +1406,7 @@ export function auswerten(modell, eingabe) {
    * Jede Zahl traegt ihre Herkunft — auch die Luecken darin. */
   r.korrekturen = korr;
   r.korrekturen_offen = offen;
-  r.korrekturen_gefuehrt = (modell.korrekturen || []).length;
+  r.korrekturen_gefuehrt = _korrListe(modell).length;
   r.einheit = einheit;
   r.dokumentwert = dokument;        /* die Zahl, wie der Bericht sie druckt */
   r.wert = Math.round(faktor * 10000) / 10000;

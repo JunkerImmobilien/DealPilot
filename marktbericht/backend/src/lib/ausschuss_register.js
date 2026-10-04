@@ -27,7 +27,7 @@
 // Genau so ist in v1060 ein Vergleichsfaktor aus Minden-Luebbecke in einen
 // Bericht fuer Hiddenhausen geraten.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -92,6 +92,29 @@ function indizieren(saetze) {
  *
  * Deshalb wird GESAMMELT und einmal indiziert. Fehlt eine Datei, laedt die
  * andere trotzdem — aber die Luecke wird gemeldet, nicht verschwiegen. */
+/* ═══ v1778 · DIE HANDLISTE WAR ZEHN DATEIEN HINTERHER ═══════════════
+
+   Gemessen am 02.10.2026:
+
+     in SAATDATEIEN          24 Dateien
+     im Ordner register/     40 (davon 6 Wegweiser ohne Werte)
+     NICHT in der Liste      10 Dateien mit zusammen 89 Saetzen
+
+   Betroffen war die gesamte Ernte vom 01. und 02.10.2026: dresden,
+   erfurt, hamburg, leipzig, lzs-bb, lzs-be-2025, lzs-bw, lzs-rp,
+   lzs-sh, schwerin.
+
+   DAS IST KEIN NEBENWEG. `gutachterausschuss.js` importiert aus dieser
+   Datei, `CrossCheckService` nutzt `gutachterausschuss.js` — der
+   Rechenweg zum KUNDENBERICHT laeuft hier entlang. Die Saetze standen
+   in `mb.param_modell` (dort liest `register-saat.mjs` hinein) und
+   erreichten trotzdem keinen einzigen Bericht.
+
+   > Eine Ernte, die das Repo nicht verlaesst, ist keine Ernte. Eine,
+   > die die Datenbank erreicht und den Rechenweg nicht, ist auch keine.
+
+   Der Abgleich unten (`fehlendeSaatdateien`) sorgt dafuer, dass die
+   Luecke beim naechsten Mal AUFFAELLT, statt still zu bleiben. */
 export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                             'berlin.json',           /* v1085 */
                             'lzs-nrw-2023.json',     /* v1086 · Zeitreihe */
@@ -177,7 +200,60 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
                                was in dieser Liste steht. Eine fehlende Zeile
                                sieht aus wie "kein Ausschuss hinterlegt" und ist
                                keine. */
-                            'swf-bw.json'];
+                            'swf-bw.json',
+                            /* ═══ v1778 · die Ernte vom 01./02.10.2026 ═══
+                               Zehn Dateien, 89 Saetze, die hier fehlten.
+                               Reihenfolge wie im Ordner. */
+                            'dresden.json',       /* SN · 6 */
+                            'erfurt.json',        /* TH · 1 */
+                            'hamburg.json',       /* HH · 6 */
+                            'leipzig.json',       /* SN · 18 */
+                            'lzs-bb.json',        /* BB · 14 */
+                            'lzs-be-2025.json',   /* BE · 6 */
+                            'lzs-bw.json',        /* BW · 13 (Heilbronn, Ulm) */
+                            'lzs-rp.json',        /* RP · 6 (Mainz) */
+                            'lzs-sh.json',        /* SH · 12 */
+                            'schwerin.json',      /* MV · 7 */
+                            /* v1820 · Ludwigslust-Parchim. Die Sperre im Backlog war
+                               falsch: das Zitat vom 13.09.2026 endete mitten im Satz,
+                               vor den Worten "ist ohne Genehmigung gestattet". Am
+                               Originalimpressum nachgelesen - erlaubt, wortgleich mit
+                               Schwerin (gemeinsame Geschaeftsstelle). */
+                            'ludwigslust-parchim.json' /* MV · 7 */
+                           ];
+
+/* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
+
+   Eine handgefuehrte Liste neben einem Ordner laeuft auseinander, und
+   zwar lautlos: die Datei liegt da, der Lauf meldet keinen Fehler, und
+   erst eine Zaehlung faellt auf. Am 02.10.2026 waren es zehn Dateien.
+
+   Warum die Liste trotzdem bleibt und nicht durch `readdirSync` ersetzt
+   wird: eine neue Datei soll nicht dadurch in den Kundenbericht
+   geraten, dass jemand sie ablegt. Die Aufnahme ist eine Entscheidung.
+
+   > Eine Liste, die man pflegen muss, braucht einen, der nachzaehlt.
+
+   Wegweiser (`verfuegbarkeit-*.json`) tragen keine Werte und gehoeren
+   nicht hierher — sie werden ausgenommen, nicht gemeldet. */
+export function fehlendeSaatdateien() {
+  try {
+    const ordner = join(HIER, 'register');
+    const da = readdirSync(ordner).filter((f) => f.endsWith('.json'));
+    const fehlt = [];
+    for (const f of da) {
+      if (/^verfuegbarkeit-/.test(f)) continue;
+      if (SAATDATEIEN.indexOf(f) >= 0) continue;
+      let n = 0;
+      try {
+        const a = JSON.parse(readFileSync(join(ordner, f), 'utf8'));
+        n = Array.isArray(a) ? a.length : 0;
+      } catch (e) {}
+      fehlt.push({ datei: f, saetze: n });
+    }
+    return fehlt;
+  } catch (e) { return []; }
+}
 
 export function ladeSaat(dateien = SAATDATEIEN) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
@@ -370,9 +446,44 @@ export function findeZweig(kennzahl, ags, zweig, lage) {
 
   /* Mehrere Saetze — die Lage entscheidet. */
   const l = String(lage || '').trim().toLowerCase();
-  if (!l) return null;
-  return passend.find((s) =>
-    String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase() === l) || null;
+  if (l) {
+    const nachLage = passend.find((s) =>
+      String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase() === l);
+    if (nachLage) return nachLage;
+  }
+
+  /* ── v1816 · ZWEI JAHRGAENGE SIND KEINE MEHRDEUTIGKEIT ─────────────────
+   *
+   * GEMESSEN am 03.10.2026: 231 von 572 Abrufen scheiterten mit
+   * `zweig_nicht_abgeleitet`, obwohl der Zweig im Register stand. Die
+   * Ursache war hier: bei mehreren Saetzen und ohne Lageangabe gab diese
+   * Funktion `null` zurueck. Die Saetze unterschieden sich aber gar nicht
+   * in der Lage —
+   *
+   *     05711 Bielefeld  we_v  2023  2023-12-31  lage: (leer)
+   *     05711 Bielefeld  we_v  2024  2024-12-31  lage: (leer)
+   *
+   * — sondern im JAHRGANG. Und dafuer gibt es eine Regel, keine Frage:
+   * es gilt das Modell des Stichtags (§ 10 ImmoWertV), also der jüngste
+   * Satz, der am Stichtag schon veroeffentlicht war.
+   *
+   *   > Zwei Treffer sind eine Frage, solange man nicht weiss, wodurch
+   *   > sie sich unterscheiden. Weiss man es, ist es eine Regel.
+   *
+   * Nur wenn sich die Saetze WIRKLICH in der Lage unterscheiden, bleibt
+   * es eine Frage — dann muss die Lage mitkommen. */
+  const lagenVerschieden = new Set(passend.map((s) =>
+    String(((s.geltungsbereich || {}).lage) || '').trim().toLowerCase())).size > 1;
+  if (lagenVerschieden) return null;
+
+  const jahr = (s) => {
+    const t = String(s.stichtag || '').slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+    const b = Number(s.berichtsjahr);
+    return Number.isFinite(b) ? String(b) + '-12-31' : '0000-00-00';
+  };
+  const sortiert = passend.slice().sort((a, b) => (jahr(a) < jahr(b) ? 1 : jahr(a) > jahr(b) ? -1 : 0));
+  return sortiert[0];
 }
 
 /** Ist fuer dieses Gebiet ueberhaupt etwas hinterlegt? */

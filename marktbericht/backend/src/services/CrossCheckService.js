@@ -12,6 +12,7 @@ import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
+import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js'; /* v1816 */
 import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
 /* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
 /* v1073-WGAA-1 · Nicht mehr ein Modul, sondern der Aufloeser. Er
@@ -97,10 +98,45 @@ export const CrossCheckService = {
         liegenschaftszins_pct_effektiv: (params && params.lzs_pct != null)
           ? Number(params.lzs_pct) : LIEGENSCHAFTSZINS * 100,
         liegenschaftszins_stufe: (params && params.lzs_stufe) || null,
+        /* v1816 · Welcher Zweig des Ausschusses — die Angabe trennt einen
+           amtlichen Wert von einem gemittelten. */
+        liegenschaftszins_zweig: (params && params.lzs_zweig) || null,
+        liegenschaftszins_berichtsjahr: (params && params.lzs_berichtsjahr) || null,
+        liegenschaftszins_aus_register: !!(params && params.lzs_aus_register),
         bwk_quote: BWK_QUOTE, liegenschaftszins: LIEGENSCHAFTSZINS,
       },
       notes: ['Vereinfachtes Sachwert-/Ertragswertverfahren nach ImmoWertV-Logik als Plausibilitäts-Quercheck. Indikativ, kein Gutachten n. § 194 BauGB.'],
     };
+
+    /* ── v1816 · DIE RUECKFRAGE WIRD EIN SATZ IM BERICHT ──────────────────
+     *
+     * Der Gutachterausschuss fuehrt fuer diesen Ort einen amtlichen
+     * Liegenschaftszinssatz, aber es fehlt eine Angabe zum Staffeln.
+     * Gerechnet wurde deshalb mit dem Rueckfall.
+     *
+     *   > Ein Auffangwert ohne Begruendung sieht aus wie das Beste, was
+     *   > es gibt. Er ist das Schlechteste, was es gibt.
+     *
+     * Der Satz nennt, WAS fehlt und WAS der Ausschuss anbietet — damit der
+     * Nutzer es nachtragen und den amtlichen Wert bekommen kann. */
+    try {
+      const _rf = params && params.lzs_rueckfrage;
+      if (_rf && _rf.hinweis) {
+        const _was = {
+          lage: 'die Lage', stadtteil: 'der Stadtteil',
+          restnutzungsdauer: 'die Restnutzungsdauer', baujahr: 'das Baujahr',
+          objektart: 'die Objektart',
+        }[_rf.fehlt || _rf.grund] || 'eine Angabe';
+        const _auswahl = (Array.isArray(_rf.auswahl) && _rf.auswahl.length)
+          ? ' Der Ausschuss führt: ' + _rf.auswahl.slice(0, 12).join(', ') + '.' : '';
+        out.notes.push('Für diesen Ort liegt ein amtlicher Liegenschaftszinssatz '
+          + 'des Gutachterausschusses vor, konnte aber nicht zugeordnet werden: '
+          + _was + ' fehlt.' + _auswahl + ' ' + _rf.hinweis
+          + ' Gerechnet wurde deshalb mit dem Rückfallwert '
+          + ((params && params.lzs_stufe) ? '(Stufe ' + params.lzs_stufe + ')' : '') + '.');
+        out.liegenschaftszins_rueckfrage = _rf;
+      }
+    } catch (e) { /* ein Hinweis darf den Bericht nie kippen */ }
 
     /* v955-etw: Die Objektart kam in dieser Datei bisher NICHT vor (grep = 0).
      * Gerechnet wurde alles als EFH — auch jede Eigentumswohnung. */
@@ -198,34 +234,35 @@ export const CrossCheckService = {
        eindeutig, eine Umrechnung waere eine Methodenwahl (34/80 auf 70
        ergibt je nach Weg 30 oder 24 Jahre - 19.000 Euro Unterschied an
        einem Reihenhaus). Diese Wahl trifft die Software nicht. */
+    /* ── v1816 · DIE ABLEITUNG LIEGT JETZT IN EINEM EIGENEN MODUL ────────
+     *
+     * Hier stand sie als Closure — von außen nicht erreichbar. Das wurde
+     * zum Problem, als die amtlichen Liegenschaftszinssätze angeschlossen
+     * wurden: die Gutachterausschüsse staffeln sie nach Restnutzungsdauer
+     * (Dresden `efh_frei_rnd36_55`, Leipzig `etw_altbau_rnd20_34`), und
+     * der Zinssatz wird im Bericht VOR dem Sachwert geholt.
+     *
+     * Der bequeme Weg wäre gewesen, sie dort noch einmal abzuleiten.
+     *
+     *   > Zwei Ableitungen derselben Zahl laufen auseinander. Nicht heute,
+     *   > nicht absichtlich — aber sie laufen auseinander, und dann steht
+     *   > in einem Gutachten an zwei Stellen eine andere
+     *   > Restnutzungsdauer.
+     *
+     * CLAUDE.md: „Eine Restnutzungsdauer für alle Verfahren." Jetzt
+     * buchstäblich eine.
+     *
+     * NACHGEMESSEN vor dem Umbau: 147 Fälle (7 Baujahre × 7
+     * Modernisierungsgrade × 3 Modernisierungsarten), Modul gegen diese
+     * Closure — 147 mal dieselbe Zahl, 0 Abweichungen. */
     const _rndEinheitlich = (gndArg) => {
-      const GND = Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE;
-      _rndHerkunft.gnd_jahre = GND;
-
-      const _mp = _num(ref.mod_punkte);
-      if (_mp == null) {
-        return _rndMerke('geschaetzt', 'kein_modernisierungsgrad', rnd,
-          _SCHAETZUNG + ' Es wurde kein Modernisierungsgrad erfasst. Mit '
-          + 'Modernisierungspunkten fällt die Restnutzungsdauer regelmäßig '
-          + 'höher aus, und mit ihr der Gebäudesachwert.');
-      }
-      const _kern = /kernsaniert/i.test(String(ref.modernization || '')) && _mp >= 18;
-      const _bj = _kern && _num(ref.modernization_year) > 1500
-        ? _num(ref.modernization_year) : _num(ref.build_year);
-      if (!(_bj > 1500)) {
-        return _rndMerke('geschaetzt', 'kein_baujahr', rnd,
-          _SCHAETZUNG + ' Es liegt kein verwertbares Baujahr vor.');
-      }
-      const _a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, (new Date().getFullYear()) - _bj),
-                               punkte: _mp, kernsaniert: _kern });
-      if (!(_a2 && _a2.rnd != null)) {
-        return _rndMerke('geschaetzt', 'anlage2_ohne_ergebnis', rnd,
-          _SCHAETZUNG + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.');
-      }
-      return _rndMerke('anlage2', null, _a2.rnd,
-        'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
-        + GND + ' Jahren, aus ' + _mp
-        + ' Modernisierungspunkten' + (_kern ? ' (Kernsanierung)' : '') + '.');
+      const e = rndEinheitlich(ref, Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE);
+      _rndHerkunft.gnd_jahre = e.gnd_jahre;
+      /* Der Rückfall des Moduls rechnet dieselbe Schätzung; stimmt sie
+         nicht mit der hier gebildeten überein, gilt die hier gebildete —
+         sie ist die, mit der die übrigen Verfahren dieses Laufs rechnen. */
+      const wert = (e.quelle === 'anlage2') ? e.rnd : rnd;
+      return _rndMerke(e.quelle, e.grund, wert, e.hinweis);
     };
     /* v1338: Die GND, mit der der Sachwert rechnet. Vor dem ersten Lauf
        kennt niemand das Modell des Ausschusses - der Faktor wird erst

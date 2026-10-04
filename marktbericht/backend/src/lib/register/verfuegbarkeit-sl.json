@@ -1,0 +1,120 @@
+{
+  "was": "Verfuegbarkeit wertermittlungsrelevanter Daten im Saarland — Zentrale Geschaeftsstelle und Gutachterausschuss Regionalverband Saarbruecken",
+  "keine_werte": "Dieser Eintrag traegt bewusst KEINE Zahlen, obwohl welche gefunden wurden. Der Grundstuecksmarktbericht 2022 des Regionalverbands Saarbruecken ist frei herunterladbar und enthaelt vollstaendige Sachwertfaktoren-Gitter UND Liegenschaftszinssatz-Tabellen — sein Impressum verlangt fuer jede Wiedergabe, auch auszugsweise, die Genehmigung des Herausgebers. Nach der Doktrin wird dann nicht uebernommen, sondern der Weg beschrieben. Diese Datei ist deshalb der WEG ZUR QUELLE, nicht die Quelle.",
+  "land_code": "SL",
+  "stand": "2022",
+  "berichtsjahr": 2022,
+  "quelle_url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html",
+  "quelle_parser": "v1768-SLVERF",
+  "lizenz": null,
+  "zugang": "gemischt — Landesbericht kostenpflichtig, Kreisbericht frei aber genehmigungspflichtig",
+  "korrektur_frueherer_befund": "ACHTUNG, hier wird eine frueher getroffene Aussage ZURUECKGENOMMEN. In src/lib/quellen_links.js steht seit v1396 fuer alle sechs saarlaendischen Kreise: „Kostenfrei abrufbar ist dagegen der Immobilienmarktbericht des Regionalverbands Saarbruecken: er enthaelt Liegenschaftszinssaetze, Bodenrichtwerte und — allerdings nur fuer den Saarpfalz-Kreis — Vergleichsfaktoren. Sachwertfaktoren enthaelt er nicht.\" Am 01.10.2026 am Grundstuecksmarktbericht 2022 (Vollversion, 9,7 MB) nachgemessen: der Bericht ENTHAELT Sachwertfaktoren, und zwar zwei vollstaendige Gitter in den Kapiteln 12.2.1 (freistehende Ein- und Zweifamilienhaeuser, S. 81-82) und 12.2.2 (angebaute, S. 83-84), mit Ableitungsmodell in 12.2 (S. 80). Der frueher herangezogene Beleg war das Kapitel 7.3 des Immobilienmarktberichts 2026 — ein anderes, spaeteres Dokument. Beide Aussagen koennen zugleich wahr sein: der Regionalverband hat die Daten 2022 veroeffentlicht und in der 2024er Ausgabe nur noch eine Kurzversion ohne Kapitel 12 ausgeliefert. Der Satz in quellen_links.js gehoert daraufhin praezisiert, nicht geloescht.",
+  "ausschuesse": [
+    {
+      "kuerzel": "ZGGA",
+      "name": "Zentrale Geschaeftsstelle der Gutachterausschuesse des Saarlandes beim Landesamt fuer Vermessung, Geoinformation und Landentwicklung (LVGL)",
+      "ags": "10",
+      "ebene": "land",
+      "hinweis": "Veroeffentlicht den Grundstuecksmarktbericht des Saarlandes einheitlich fuer alle Kreise, den Regionalverband und die Landeshauptstadt."
+    },
+    {
+      "kuerzel": "SBR",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer den Regionalverband Saarbruecken",
+      "ags": "10041",
+      "ebene": "kreis",
+      "hinweis": "Eigener Grundstuecksmarktbericht, Vollversion 2022 frei abrufbar."
+    },
+    {
+      "kuerzel": "LHS",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer die Landeshauptstadt Saarbruecken",
+      "ags": "10041100",
+      "ebene": "gemeinde",
+      "hinweis": "Eigener Immobilienmarktbericht (2018, 2023 geprueft). Beide Jahrgaenge nennen Liegenschaftszinssaetze nur im Text, nicht als Tabelle; Sachwertfaktoren fuehren sie nicht (je ein Treffer auf „Sachwertfaktor\", im Erlaeuterungsteil)."
+    },
+    {
+      "kuerzel": "MZG",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer den Landkreis Merzig-Wadern",
+      "ags": "10042",
+      "ebene": "kreis",
+      "hinweis": "nicht geprueft"
+    },
+    {
+      "kuerzel": "NK",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer den Landkreis Neunkirchen",
+      "ags": "10043",
+      "ebene": "kreis",
+      "hinweis": "nicht geprueft"
+    },
+    {
+      "kuerzel": "SLS",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer den Landkreis Saarlouis",
+      "ags": "10044",
+      "ebene": "kreis",
+      "hinweis": "nicht geprueft"
+    },
+    {
+      "kuerzel": "SPK",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer den Saarpfalz-Kreis",
+      "ags": "10045",
+      "ebene": "kreis",
+      "hinweis": "nicht geprueft"
+    },
+    {
+      "kuerzel": "WND",
+      "name": "Gutachterausschuss fuer Grundstueckswerte fuer den Landkreis St. Wendel",
+      "ags": "10046",
+      "ebene": "kreis",
+      "hinweis": "nicht geprueft"
+    }
+  ],
+  "quellen": [
+    {
+      "bez": "Grundstuecksmarktbericht des Saarlandes (Landesbericht)",
+      "stelle": "ZGGA beim LVGL",
+      "url": "https://www.saarland.de/lvgl/DE/service/publikationen/grundstuecksmarktbericht2024.pdf",
+      "jahrgang": 2024,
+      "zugang": "kostenpflichtig",
+      "kosten_eur": 75,
+      "erscheint": "zweijaehrlich",
+      "inhalt": "Sachwertfaktoren fuer Ein- und Zweifamilienhaeuser, Liegenschaftszinssaetze fuer Ein-, Zwei- und Mehrfamilienhaeuser, Wohn-/Geschaeftshaeuser und Wohnungseigentum sowie Vergleichsfaktoren — einheitlich fuer alle Landkreise, den Regionalverband Saarbruecken und die Landeshauptstadt.",
+      "abruf_gemessen": "Am 01.10.2026 geprueft: der Server antwortet auf die PDF-URL mit HTTP 403 (auch mit Browser-Kopfzeilen, auch ueber WebFetch). Maschinell nicht abrufbar. Inhaltsangabe und Preis stammen von der Seite der ZGGA, nicht aus dem Dokument.",
+      "weg": "Bei der ZGGA als PDF oder in gedruckter Form fuer 75 Euro bestellen."
+    },
+    {
+      "bez": "Grundstuecksmarktbericht 2022 fuer den Regionalverband Saarbruecken (Vollversion)",
+      "stelle": "Gutachterausschuss fuer Grundstueckswerte fuer den Regionalverband Saarbruecken, Schlossplatz 1-15, 66119 Saarbruecken, 0681/506-6030, gutachterausschuss@rvsbr.de",
+      "url": "https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf",
+      "jahrgang": 2022,
+      "veroeffentlichungsdatum": "30.11.2022",
+      "zugang": "PDF frei abrufbar, Wiedergabe genehmigungspflichtig",
+      "kosten_eur": 50,
+      "lizenz_wortlaut": "Impressum S. 1: „Gebuehr: 50 Euro. Dieser Bericht ist urheberrechtlich geschuetzt. Vervielfaeltigung und Verbreitung (auch auszugsweise) beduerfen der Genehmigung des Herausgebers.\"",
+      "abruf_gemessen": "Am 01.10.2026 geladen: HTTP 200, content_type application/pdf, 9,7 MB, 6.288 Textzeilen. Die Werte sind da.",
+      "enthaelt": [
+        {
+          "kennzahl": "sachwertfaktor",
+          "fundstelle": "Kapitel 12.2 Ableitungsmodell (S. 80), 12.2.1 freistehende Ein- und Zweifamilienhaeuser (S. 81-82), 12.2.2 ein- oder beidseitig angebaute Ein- und Zweifamilienhaeuser (S. 83-84)",
+          "form": "zwei Gitter vorlaeufiger Sachwert x lage- und groessenangepasster Bodenrichtwert; freistehend 50.000 bis 550.000 Euro gegen 70 bis 150 Euro/m² (Bestimmtheitsmass 0,66, 118 nachbewertete Kaufvertraege 2020 bis Juni 2022), angebaut 50.000 bis 375.000 Euro gegen 75 bis 150 Euro/m² (Bestimmtheitsmass 0,49, 116 Kaufvertraege)"
+        },
+        {
+          "kennzahl": "liegenschaftszinssatz",
+          "fundstelle": "Kapitel 12.3 Ableitungsmodell (S. 85), 12.3.1 freistehende Ein- und Zweifamilienhaeuser (S. 86), 12.3.2 angebaute (S. 87)",
+          "form": "je eine Tabelle ueber die Restnutzungsdauer, Stuetzstellen 10 bis 70 Jahre in Fuenferschritten; freistehend 79 Kauffaelle, angebaut 69 Kauffaelle. Die Raender (RND 10, 15, 65, 70) sind im Dokument mit Sternchen als duenn belegt gekennzeichnet."
+        }
+      ],
+      "modellhinweis_gnd": "WICHTIG fuer eine spaetere Uebernahme: das Modell setzt die Gesamtnutzungsdauer „gewichtet entsprechend der Standardstufe\" an, nennt also KEINE einzelne Zahl. Die Stichprobenkennwerte des Berichts liegen bei 61 bis 75 Jahren (Mittel 69, Median 68) fuer freistehende und 62 bis 72 Jahren (Mittel 67, Median 67) fuer angebaute Objekte. Die Rueckfallzahl 80 des Rechenkerns liegt AUSSERHALB dieser Baender — ein mit 80 gerechneter Sachwert ist hier nicht modellkonform. Beim Anlegen eines Rezepts darf deshalb keine 80 ins Feld gnd_jahre, sondern null plus dieser Hinweis; die Stichprobenmittel 69 bzw. 67 sind Beobachtungen, keine Modellansaetze, und duerfen nicht als solche eingetragen werden.",
+      "modellhinweis_bpi": "Der Baupreisindex ist im Modell als „aktueller (quartalsweise) Index zum Beurkundungsdatum des statistischen Bundesamtes (Deutschland insgesamt)\" beschrieben und NICHT beziffert. Regionalfaktor 1,0.",
+      "weg": "Genehmigung des Herausgebers fuer die auszugsweise Wiedergabe einholen (gutachterausschuss@rvsbr.de). Liegt sie vor, sind die vier Kapitel in zwei Arbeitstagen ins Register uebertragbar — sie sind maschinenlesbar und spaltentreu auslesbar."
+    },
+    {
+      "bez": "Grundstuecksmarktbericht 2024 fuer den Regionalverband Saarbruecken (Kurzversion)",
+      "url": "https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2024_Kurzversion.pdf",
+      "jahrgang": 2024,
+      "zugang": "frei",
+      "abruf_gemessen": "Am 01.10.2026 geladen: HTTP 200, 8,0 MB. Das Inhaltsverzeichnis fuehrt 12.2.1 „Sachwertfaktoren fuer Ein- und Zweifamilienhaeuser (2022-2023 zusammen)\" S. 78, 12.2.2 „(nur 2023)\" S. 80, 12.3.1 „Liegenschaftszinssaetze (2022-2023 zus.)\" S. 83 und 12.3.2 „(nur 2023)\" S. 84 — das Kapitel 12 selbst ist in der Kurzversion NICHT enthalten (null Treffer auf „Ableitungsmodell\" ausserhalb des Inhaltsverzeichnisses).",
+      "hinweis": "Eine Vollversion 2024 ist oeffentlich nicht auffindbar; die URL-Muster _2024_Vollversion.pdf, _2023_Vollversion.pdf, _2025_Vollversion.pdf und _2026_Vollversion.pdf geben alle HTTP 404. Es gibt eine Komplettversion 2021 unter .../grundstuecksmarktbericht_2021_komplettversion.pdf (nicht geprueft).",
+      "weg": "Die aktuellen Zahlen (2022-2023 und nur 2023) bei der Geschaeftsstelle anfragen; die Kurzversion nennt sie nicht."
+    }
+  ],
+  "offen": "Fuenf der sieben saarlaendischen Ausschuesse (Merzig-Wadern, Neunkirchen, Saarlouis, Saarpfalz-Kreis, St. Wendel) wurden nicht geprueft. Nach der Aussage des Immobilienmarktberichts 2026 des Regionalverbands (Kapitel 7.3) leiten die oertlichen Ausschuesse keine eigenen Sachwertfaktoren ab, sondern die ZGGA landesweit — das wuerde eine eigene Pruefung erspraren. Diese Aussage ist aber zweiter Hand und am Landesbericht selbst nicht nachgemessen; der Regionalverband widerlegt sie fuer sich selbst, indem er 2022 eigene Faktoren veroeffentlicht hat."
+}

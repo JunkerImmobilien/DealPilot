@@ -3,8 +3,8 @@
   "land_code": "BW",
   "ags": "08121000",
   "ebene": "gemeinde",
-  "gebiet_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
   "kennzahl": "sachwertfaktor",
   "zweig": "ezfh",
   "formel": {
@@ -73,7 +73,25 @@
    "normobjekt": "Kauffälle des Jahres 2024 in Heilbronn. Mittlere Restnutzungsdauer je Klasse 13 bis 45 Jahre, mittlere Wohnfläche 112 bis 233 m²."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. v1776: dieses Feld war LEER ({}). Woertlich aus Kapitel 6.2.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Sachwertverfahren\", Bericht S. 35 f.",
+   "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
+   "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
+   "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
+   "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschläge entsprechend der tatsächlichen baulichen Ausnutzung (wertrelevante Geschossflächenzahl nach BauNVO 1977), der Lage, der Größe und des Zuschnitts individuelle, auf das einzelne Grundstück bezogene Bodenwerte.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "regionalfaktor": null,
+   "regionalfaktor_beleg": "Wörtlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine ausdrückliche Aussage des Ausschusses, kein Fehlen einer Angabe.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
+   "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
+   "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht Heilbronn 2025, Seite 39."
@@ -85,20 +103,39 @@
   "stichtag": "2024-01-01",
   "berichtsjahr": 2025,
   "modellversion": "GMB 2025",
-  "quelle_url": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
-  "quelle_parser": "v1084-WREZ",
-  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Impressum, Abschnitt „Urhebervermerk\": „Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle\" — am 02.10.2026 am Dokument nachgelesen (PDF-Seite 2).",
+   "quelle_erreichbar": true,
+   "quelle_befund": "v1776, 02.10.2026: die 404-Adresse ist ersetzt. Das PDF antwortet mit 200 und application/pdf, 2.880.081 Bytes.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: schriftliche Genehmigung liegt vor, Umfang ganzer Bericht (mitgeteilt von Marcel Junker). Damit ist auch der Ertragswertteil geerntet — siehe lzs-bw.json.",
+   "erledigt": true
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "quelle_url_vorher": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
+  "quelle_uebersicht_url": "https://www.heilbronn.de/rathaus/stadtverwaltung-aemter-a-z/dezernat-iv-buergermeister-andreas-ringle/vermessungs-und-katasteramt/wertermittlung-von-immobilien.html",
+  "quelle_befund": "v1776, gemessen am 02.10.2026 mit curl: die bisher eingetragene Adresse (quelle_url_vorher) antwortet mit HTTP 404. Das PDF selbst antwortet mit 200 und content_type application/pdf, 2.880.081 Bytes; die neue Uebersichtsseite (quelle_uebersicht_url) mit 200 text/html, der Kurzlink heilbronn.de/gutachterausschuss leitet dorthin. Eingetragen ist das PDF, weil nur sein content_type beweist, dass das Dokument da ist — eine HTML-Seite antwortet auch dann mit 200, wenn das Dokument fehlt."
  },
  {
   "land_code": "BW",
   "ags": "08121000",
   "ebene": "gemeinde",
-  "gebiet_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
   "kennzahl": "sachwertfaktor",
   "zweig": "rhdhh",
   "formel": {
@@ -151,7 +188,25 @@
    "normobjekt": "Kauffälle des Jahres 2024 in Heilbronn. Mittlere Restnutzungsdauer je Klasse 18 bis 56 Jahre, mittlere Wohnfläche 101 bis 144 m²."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. v1776: dieses Feld war LEER ({}). Woertlich aus Kapitel 6.2.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Sachwertverfahren\", Bericht S. 35 f.",
+   "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
+   "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
+   "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
+   "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschläge entsprechend der tatsächlichen baulichen Ausnutzung (wertrelevante Geschossflächenzahl nach BauNVO 1977), der Lage, der Größe und des Zuschnitts individuelle, auf das einzelne Grundstück bezogene Bodenwerte.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "regionalfaktor": null,
+   "regionalfaktor_beleg": "Wörtlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine ausdrückliche Aussage des Ausschusses, kein Fehlen einer Angabe.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
+   "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
+   "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht Heilbronn 2025, Seite 39."
@@ -163,20 +218,39 @@
   "stichtag": "2024-01-01",
   "berichtsjahr": 2025,
   "modellversion": "GMB 2025",
-  "quelle_url": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
-  "quelle_parser": "v1084-WREZ",
-  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Impressum, Abschnitt „Urhebervermerk\": „Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle\" — am 02.10.2026 am Dokument nachgelesen (PDF-Seite 2).",
+   "quelle_erreichbar": true,
+   "quelle_befund": "v1776, 02.10.2026: die 404-Adresse ist ersetzt. Das PDF antwortet mit 200 und application/pdf, 2.880.081 Bytes.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: schriftliche Genehmigung liegt vor, Umfang ganzer Bericht (mitgeteilt von Marcel Junker). Damit ist auch der Ertragswertteil geerntet — siehe lzs-bw.json.",
+   "erledigt": true
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "quelle_url_vorher": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
+  "quelle_uebersicht_url": "https://www.heilbronn.de/rathaus/stadtverwaltung-aemter-a-z/dezernat-iv-buergermeister-andreas-ringle/vermessungs-und-katasteramt/wertermittlung-von-immobilien.html",
+  "quelle_befund": "v1776, gemessen am 02.10.2026 mit curl: die bisher eingetragene Adresse (quelle_url_vorher) antwortet mit HTTP 404. Das PDF selbst antwortet mit 200 und content_type application/pdf, 2.880.081 Bytes; die neue Uebersichtsseite (quelle_uebersicht_url) mit 200 text/html, der Kurzlink heilbronn.de/gutachterausschuss leitet dorthin. Eingetragen ist das PDF, weil nur sein content_type beweist, dass das Dokument da ist — eine HTML-Seite antwortet auch dann mit 200, wenn das Dokument fehlt."
  },
  {
   "land_code": "BW",
   "ags": "08121000",
   "ebene": "gemeinde",
-  "gebiet_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
   "kennzahl": "sachwertfaktor",
   "zweig": "rmh",
   "formel": {
@@ -229,7 +303,25 @@
    "normobjekt": "Kauffälle des Jahres 2024 in Heilbronn. Mittlere Restnutzungsdauer je Klasse 18 bis 56 Jahre, mittlere Wohnfläche 101 bis 144 m²."
   },
   "korrekturen": [],
-  "modellansaetze": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. v1776: dieses Feld war LEER ({}). Woertlich aus Kapitel 6.2.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Sachwertverfahren\", Bericht S. 35 f.",
+   "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
+   "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
+   "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
+   "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschläge entsprechend der tatsächlichen baulichen Ausnutzung (wertrelevante Geschossflächenzahl nach BauNVO 1977), der Lage, der Größe und des Zuschnitts individuelle, auf das einzelne Grundstück bezogene Bodenwerte.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "regionalfaktor": null,
+   "regionalfaktor_beleg": "Wörtlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine ausdrückliche Aussage des Ausschusses, kein Fehlen einer Angabe.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
+   "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
+   "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+  },
   "geltungsbereich": {},
   "belege": [
    "Immobilienmarktbericht Heilbronn 2025, Seite 39."
@@ -241,22 +333,41 @@
   "stichtag": "2024-01-01",
   "berichtsjahr": 2025,
   "modellversion": "GMB 2025",
-  "quelle_url": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
-  "quelle_parser": "v1084-WREZ",
-  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Impressum, Abschnitt „Urhebervermerk\": „Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle\" — am 02.10.2026 am Dokument nachgelesen (PDF-Seite 2).",
+   "quelle_erreichbar": true,
+   "quelle_befund": "v1776, 02.10.2026: die 404-Adresse ist ersetzt. Das PDF antwortet mit 200 und application/pdf, 2.880.081 Bytes.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: schriftliche Genehmigung liegt vor, Umfang ganzer Bericht (mitgeteilt von Marcel Junker). Damit ist auch der Ertragswertteil geerntet — siehe lzs-bw.json.",
+   "erledigt": true
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "quelle_url_vorher": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
+  "quelle_uebersicht_url": "https://www.heilbronn.de/rathaus/stadtverwaltung-aemter-a-z/dezernat-iv-buergermeister-andreas-ringle/vermessungs-und-katasteramt/wertermittlung-von-immobilien.html",
+  "quelle_befund": "v1776, gemessen am 02.10.2026 mit curl: die bisher eingetragene Adresse (quelle_url_vorher) antwortet mit HTTP 404. Das PDF selbst antwortet mit 200 und content_type application/pdf, 2.880.081 Bytes; die neue Uebersichtsseite (quelle_uebersicht_url) mit 200 text/html, der Kurzlink heilbronn.de/gutachterausschuss leitet dorthin. Eingetragen ist das PDF, weil nur sein content_type beweist, dass das Dokument da ist — eine HTML-Seite antwortet auch dann mit 200, wenn das Dokument fehlt."
  },
  {
   "land_code": "BW",
   "ags": "08121000",
   "ebene": "gemeinde",
-  "gebiet_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
+  "gebiet_name": "Heilbronn, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
   "kennzahl": "sachwertfaktor",
-  "zweig": "mfh",
+  "zweig": "dreifh",
   "formel": {
    "form": "baender_1d",
    "achse_feld": "sachwert",
@@ -266,60 +377,113 @@
      "wert": 1.66,
      "bis": 299999.99,
      "schluessel": "unter 300.000 €",
-     "streuung": "1,26-2,27"
+     "streuung": "1,26-2,27",
+     "fallzahl": 13
     },
     {
      "wert": 1.46,
      "von": 299999.99,
      "bis": 400000,
      "schluessel": "300.000 bis 400.000 €",
-     "streuung": "1,13-1,85"
+     "streuung": "1,13-1,85",
+     "fallzahl": 6
     },
     {
      "wert": 1.2,
      "von": 400000,
      "bis": 500000,
      "schluessel": "400.000 bis 500.000 €",
-     "streuung": "1,01-1,46"
+     "streuung": "1,01-1,46",
+     "fallzahl": 8
     },
     {
      "wert": 1.23,
      "von": 500000,
      "bis": 700000,
      "schluessel": "500.000 bis 700.000 €",
-     "streuung": "1,05-1,46"
+     "streuung": "1,05-1,46",
+     "fallzahl": 8
     },
     {
      "wert": 1.32,
      "von": 700000,
-     "schluessel": "über 700.000 €"
+     "schluessel": "über 700.000 €",
+     "fallzahl": 3
     }
    ],
    "rundung_stellen": 2,
    "liefert": "faktor",
    "hinweis": "BÄNDER, KEINE STÜTZSTELLEN: Der Ausschuss ordnet jedem Bereich des vorläufigen Sachwerts EINEN Faktor zu; zwischen den Bereichen wird nicht interpoliert. DIE SPANNEN GEHÖREN ZUM WERT und sind hier vollständig aufgeführt: unter 300.000 €: 1.66 (Spanne 1,26-2,27) · 300.000 bis 400.000 €: 1.46 (Spanne 1,13-1,85) · 400.000 bis 500.000 €: 1.2 (Spanne 1,01-1,46) · 500.000 bis 700.000 €: 1.23 (Spanne 1,05-1,46) · über 700.000 €: 1.32. Bei der untersten Klasse liegt der Faktor als Mittel aus wenigen Kauffällen vor, deren beobachtete Werte um mehr als ein Drittel auseinandergehen — das ist bei der sachverständigen Würdigung zu berücksichtigen. Dieser Satz braucht NUR den vorläufigen Sachwert: weder Bodenrichtwert noch Restnutzungsdauer gehen als Eingangsgröße ein. Der Bericht führt zu jeder Klasse die MITTLERE Restnutzungsdauer und Wohnfläche als Beschreibung der Stichprobe mit — sie sind Kennzeichnung, keine Eingangsgröße.",
-   "normobjekt": "Kauffälle des Jahres 2024 in Heilbronn. Mittlere Restnutzungsdauer je Klasse 17 bis 25 Jahre, mittlere Wohnfläche 187 bis 272 m²."
+   "normobjekt": "Kauffaelle des Jahres 2024 in Heilbronn (Kernstadt und Stadtteile gemeinsam), 38 Faelle, mittlere LAZ-Zahl 32. Mittlere Restnutzungsdauer je Klasse 17 bis 25 Jahre, mittlere Wohnflaeche 187 bis 272 m², Bodenwertanteil 56 bis 72 % des vorlaeufigen Sachwerts."
   },
   "korrekturen": [],
-  "modellansaetze": {},
-  "geltungsbereich": {},
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. v1776: dieses Feld war LEER ({}). Woertlich aus Kapitel 6.2.1 „Angesetzte Ausgangsdaten bei der Auswertung nach dem Sachwertverfahren\", Bericht S. 35 f.",
+   "verfahren": "Gegenbewertung im Sachwertverfahren; Faktor = Kaufpreis / berechneter vorläufiger Sachwert",
+   "normalherstellungskosten": "NHK 2010 nach ImmoWertV 2021, je m² Brutto-Grundfläche in Abhängigkeit von Gebäudetyp und Standardstufe. Bei für den Gebäudetyp ungewöhnlich kleinen oder großen Brutto-Grundflächen erfolgten Zu- bzw. Abschläge bei den NHK 2010.",
+   "aussenanlagen": "ca. 4 % bis 6 % des Zeitwerts der Gebäude",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Woertlich S. 35: „Gesamtnutzungsdauer entsprechend Anlage 1 der ImmoWertV 2021.\" Eine ZAHL steht fuer den Sachwertteil nicht da. Die einzige bezifferte Gesamtnutzungsdauer des Berichts (80 Jahre) steht auf S. 45 und gilt dort ausdruecklich nur fuer Mehrfamilienhaeuser und Wohnhaeuser mit Mischnutzung im ERTRAGSwertteil. Fuer die Objektarten dieses Satzes fuehrt Anlage 1 ImmoWertV 80 Jahre — das steht aber in der Verordnung, nicht im Bericht, und wird deshalb hier nicht als Modellansatz des Ausschusses behauptet.",
+   "alterswertminderung": "Die Alterswertminderung selbst beziffert der Bericht im Sachwertteil nicht; er regelt nur die Restnutzungsdauer.",
+   "restnutzungsdauer": "nach Anlage 2 ImmoWertV 2021. Das Alter der Modernisierung wird zusätzlich berücksichtigt: der Zuwachs an Nutzungsdauer über 40 Jahre wird bis auf einen Mindestbetrag von 15 % der jeweils vollen Restnutzungsdauerverlängerung linear abgeschrieben.",
+   "bodenwert": "Bodenrichtwerte vom 01.01.2023; durch Zu- oder Abschläge entsprechend der tatsächlichen baulichen Ausnutzung (wertrelevante Geschossflächenzahl nach BauNVO 1977), der Lage, der Größe und des Zuschnitts individuelle, auf das einzelne Grundstück bezogene Bodenwerte.",
+   "bodenrichtwert_stichtag": "2023-01-01",
+   "regionalfaktor": null,
+   "regionalfaktor_beleg": "Wörtlich S. 36: „Es wurde kein Regionalfaktor (§ 35 und 36 ImmoWertV) abgeleitet.\" Das ist eine ausdrückliche Aussage des Ausschusses, kein Fehlen einer Angabe.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Am 02.10.2026 am GANZEN Dokument gemessen: der Immobilienmarktbericht Heilbronn 2025 nennt „Baupreisindex\", „Preisindex\" und § 36 ImmoWertV an KEINER Stelle. Fuer ein Sachwertmodell nach § 36 Abs. 2 ImmoWertV ist das eine Luecke IM BERICHT, nicht in der Ernte. Es wird keine Zahl erfunden, insbesondere nicht die Rueckfallkonstante 1,91 des Rechenkerns — sie hat keinen Stichtagsbezug und waere hier auch nicht der Ansatz des Ausschusses.",
+   "besondere_merkmale": "Besondere objektspezifische Grundstücksmerkmale (boG) werden in der Regel NICHT vor der Auswertung berücksichtigt, sondern in anderer geeigneter Weise (§ 8 Abs. 3 ImmoWertV), sofern sie sich im marktüblichen Schwankungsbereich bewegen. Kleinere Baumängel, Bauschäden, Ausstattungsmängel und ein überdurchschnittlicher Erhaltungszustand werden über Zustands- und Ausstattungsnoten im Rahmen der LAZ-Zahl erfasst; außergewöhnliche Umstände (z. B. wirtschaftliche Überalterung, größere Baumängel) über eine Anpassung der Restnutzungsdauer. Geh-, Fahr- und Leitungsrechte werden beim Bodenwertansatz berücksichtigt. FOLGE: die boG sind in den Marktanpassungsfaktoren über den Bezug auf die LAZ-Zahlen BEREITS ENTHALTEN — wer sie zusätzlich abzieht, zieht zweimal ab.",
+   "laz_zahl": "In Heilbronn wird die „LAZ-Zahl\" abgeleitet: der Durchschnitt aus Lage-, Ausstattungs- und Zustandsziffer (Definitionen in den Anlagen 1 bis 3 des Berichts). Für 2024 ließ sich KEINE Abhängigkeit zwischen LAZ-Zahl und Höhe des Sachwertfaktors feststellen (S. 36) — anders als in den Vorjahren. Die LAZ ist deshalb KEINE Eingangsgröße dieser Sätze, sondern Beschreibung der Stichprobe.",
+   "datenbasis": "Kaufverträge aus dem gesamten Jahr 2024"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Heilbronn, Kernstadt und Stadtteile",
+   "sachlich": "Dreifamilienhäuser",
+   "extrapolation": "gesperrt",
+   "hinweis": "Woertlich S. 37: „Wie im Vorjahr laesst sich kein Unterschied zwischen der Kernstadt und den Stadtteilen feststellen. Es wird daher nur eine Kurve mit einer mittleren LAZ-Zahl von 32 dargestellt.\" Die Kurve ist das Ergebnis einer Regression mit einem Bestimmtheitsmass (R²) von 0,40 — weniger als die Haelfte der Streuung ist damit erklaert. Ausserhalb des abgedruckten Sachwertbereichs endet die Quelle."
+  },
   "belege": [
-   "Immobilienmarktbericht Heilbronn 2025, Seite 37."
+   "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 „Sachwertfaktoren für Dreifamilienhäuser\", Bericht S. 37 (PDF-Seite 39).",
+   "v1776, zweifach gelesen am 02.10.2026 (pdftotext -table und -layout): vorläufiger Sachwert < 300T / 300-400T / 400-500T / 500-700T / > 700T, Sachwertfaktor 1,66 / 1,46 / 1,20 / 1,23 / 1,32, Spanne 1,26-2,27 / 1,13-1,85 / 1,01-1,46 / 1,05-1,46 / (keine), Restnutzungsdauer 17 / 19 / 22 / 25 / 23 Jahre, Wohnfläche 187 / 207 / 218 / 237 / 272 m², Bodenwertanteil 56 / 58 / 57 / 60 / 72 %, LAZ 36 / 34 / 30 / 28 / 26, Grundstücksgröße 238 / 380 / 409 / 649 / 613 m², Anzahl 13 / 6 / 8 / 8 / 3.",
+   "ZÄHLPROBE: 13+6+8+8+3 = 38, und der Text auf S. 37 nennt dieselbe Zahl — „Es sind 38 Kauffälle aus dem Jahr 2024 in die Ableitung der Kurve eingeflossen. Die Kurve ist das Ergebnis einer Regression mit einem Bestimmtheitsmaß (R²) von 0,40.\"",
+   "LESEPROBE AM ANWENDUNGSBEISPIEL DES DOKUMENTS: der Bericht enthält zwar kein durchgerechnetes Beispiel zum Sachwertfaktor, aber zwei zu den Wohnflächenpreisen (6.3.2 S. 41 und 6.3.3 S. 42). Beide wurden aus den abgedruckten Tabellen nachgerechnet und stimmen auf den Euro: 2.930 + 30 − 480 = 2.480 €/m², × 135 m² = 334.800 € (Bericht: rd. 335.000 €) und 4.100 − 160 − 500 = 3.440 €/m², × 135 m² = 464.400 € (Bericht: rd. 464.000 €). Damit ist die Leseart der Tabellen dieses Berichts am Anwendungsbeispiel geprüft."
   ],
   "stufe": "C",
-  "stufe_grund": "Amtlich abgedruckte Klassentabelle. KEINE Stufe B: die Fallzahlen je Klasse liegen im einstelligen bis niedrigen zweistelligen Bereich, und der Bericht druckt zu jedem Faktor eine Spanne ab, die bei der untersten Klasse von 1,36 bis 1,90 reicht. Ein Mittelwert aus sieben so streuenden Faellen traegt keine Stufe B.",
-  "fallzahl": null,
+  "stufe_grund": "Amtlich abgedruckte Klassentabelle (Kapitel 6.2.2, S. 37), 38 Kauffaelle aus 2024 auf fuenf Klassen verteilt (13/6/8/8/3). KEINE Stufe B: drei bis dreizehn Faelle je Klasse, die oberste Klasse ohne abgedruckte Spanne, und das Bestimmtheitsmass der Regression betraegt nur 0,40. v1776-KORREKTUR: hier stand vorher die Begruendung des Ein- und Zweifamilienhaus-Satzes („die Fallzahlen je Klasse liegen im einstelligen bis niedrigen zweistelligen Bereich … Spanne, die bei der untersten Klasse von 1,36 bis 1,90 reicht\"). Die Spanne 1,36-1,90 kommt in DIESER Tabelle nicht vor; sie steht bei den freistehenden Ein- und Zweifamilienhaeusern. Eine Begruendung, die auf die falsche Tabelle zeigt, haelt jeder Pruefung stand, bis jemand nachsieht.",
+  "fallzahl": 38,
   "streuung": null,
   "stichtag": "2024-01-01",
   "berichtsjahr": 2025,
   "modellversion": "GMB 2025",
-  "quelle_url": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
-  "quelle_parser": "v1084-WREZ",
-  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Heilbronn",
-  "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+  "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/Stadtverwaltung_-_AEmter_A-Z/Vermessungs-_und_Katasteramt/Immobilienmarktbericht_2025_web.pdf",
+  "quelle_parser": "v1776-BWHNULM",
+  "quellenvermerk": "Immobilienmarktbericht Heilbronn 2025 © Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn",
+  "lizenz": "Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschaeftsstelle (Impressum, Abschnitt Urhebervermerk). Die Genehmigung liegt vor — siehe Feld nutzungsrecht.",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Die Klassen sind BÄNDER, zwischen denen NICHT interpoliert wird. Der Ausschuss druckt zu jedem Faktor die beobachtete Spanne und die Fallzahl ab; beide gehören zur sachverständigen Würdigung und stehen im Modellvermerk.",
-  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.)."
+  "fundstelle": "Immobilienmarktbericht Heilbronn 2025, Kapitel 6.2.2 (Dreifamilienhäuser, Seite 37) und 6.2.3 (Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser, Seiten 38 f.).",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Impressum, Abschnitt „Urhebervermerk\": „Alle Rechte vorbehalten. Nachdruck, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle\" — am 02.10.2026 am Dokument nachgelesen (PDF-Seite 2).",
+   "quelle_erreichbar": true,
+   "quelle_befund": "v1776, 02.10.2026: die 404-Adresse ist ersetzt. Das PDF antwortet mit 200 und application/pdf, 2.880.081 Bytes.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: schriftliche Genehmigung liegt vor, Umfang ganzer Bericht (mitgeteilt von Marcel Junker). Damit ist auch der Ertragswertteil geerntet — siehe lzs-bw.json.",
+   "erledigt": true
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  },
+  "quelle_url_vorher": "https://www.heilbronn.de/umwelt-verkehr/vermessung-geoinformation/gutachterausschuss.html",
+  "quelle_uebersicht_url": "https://www.heilbronn.de/rathaus/stadtverwaltung-aemter-a-z/dezernat-iv-buergermeister-andreas-ringle/vermessungs-und-katasteramt/wertermittlung-von-immobilien.html",
+  "quelle_befund": "v1776, gemessen am 02.10.2026 mit curl: die bisher eingetragene Adresse (quelle_url_vorher) antwortet mit HTTP 404. Das PDF selbst antwortet mit 200 und content_type application/pdf, 2.880.081 Bytes; die neue Uebersichtsseite (quelle_uebersicht_url) mit 200 text/html, der Kurzlink heilbronn.de/gutachterausschuss leitet dorthin. Eingetragen ist das PDF, weil nur sein content_type beweist, dass das Dokument da ist — eine HTML-Seite antwortet auch dann mit 200, wenn das Dokument fehlt.",
+  "zweig_vorher": "mfh",
+  "zweig_befund": "v1776, gemessen am 02.10.2026: dieser Satz traegt die Tabelle aus Kapitel 6.2.2 „Sachwertfaktoren fuer DREIFAMILIENHAEUSER\" (Bericht S. 37, PDF-Seite 39) — die `fundstelle` dieses Satzes sagt das selbst, der `zweig` sagte etwas anderes. Kapitel 6.2 heisst „Sachwertfaktoren fuer Ein- bis Dreifamilienhaeuser\"; einen Sachwertfaktor fuer Mehrfamilienhaeuser fuehrt der Heilbronner Bericht gar nicht. ZWEIG_VORZUG in gutachterausschuss.js bildet „Dreifamilienhaus\" auf `dreifh` ab und „Mehrfamilienhaus\" auf `mfh` — unter `mfh` bekam in Heilbronn jedes Mehrfamilienhaus den Faktor eines Dreifamilienhauses.",
+  "fallzahl_befund": "v1776: stand auf null. Der Bericht druckt die Anzahl je Klasse ab — 13 + 6 + 8 + 8 + 3 = 38 — und der Text auf S. 37 sagt „Es sind 38 Kauffaelle aus dem Jahr 2024 in die Ableitung der Kurve eingeflossen\". Zwei unabhaengige Stellen, dieselbe Zahl."
  },
  {
   "land_code": "BW",
@@ -384,7 +548,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -409,7 +573,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -430,7 +594,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -495,7 +675,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -520,7 +700,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -541,7 +721,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -606,7 +802,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -631,7 +827,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -652,7 +848,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -717,7 +929,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -742,7 +954,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -763,7 +975,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -828,7 +1056,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -853,7 +1081,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -874,7 +1102,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -939,7 +1183,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -964,7 +1208,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -985,7 +1229,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -1050,7 +1310,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -1075,7 +1335,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -1096,7 +1356,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -1161,7 +1437,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -1186,7 +1462,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -1207,7 +1483,23 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  },
  {
   "land_code": "BW",
@@ -1272,7 +1564,7 @@
     "510000": 1.02,
     "520000": 1.02,
     "530000": 1.01,
-    "540000": 1.0,
+    "540000": 1,
     "550000": 0.99,
     "560000": 0.98,
     "570000": 0.97,
@@ -1297,7 +1589,7 @@
   "korrekturen": [],
   "modellansaetze": {
    "nhk": "NHK 2010",
-   "regionalfaktor": 1.0,
+   "regionalfaktor": 1,
    "alterswertminderung": "linear",
    "verfahren": "Sachwertverfahren nach ImmoWertV 2021"
   },
@@ -1318,6 +1610,22 @@
   "lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
   "verwendung": "produkt",
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: Sachwertverfahren nach ImmoWertV 2021, Normalherstellungskosten NHK 2010, REGIONALFAKTOR 1,0, lineare Alterswertminderung, zuzüglich baulicher Außenanlagen und Bodenwert. DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN. Der Ausschuss verlangt ausdrücklich, die Faktoren „aufgrund der jeweiligen aktuellen Situation am Immobilienmarkt sachverständig zu würdigen\".",
-  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26."
+  "fundstelle": "Grundstücksmarktbericht 2025, Kapitel 12.2, Tabelle auf Seite 26.",
+  "lizenz_konflikt": {
+   "festgestellt_am": "2026-10-02",
+   "eingetragene_lizenz": "Kostenfrei als PDF abrufbar; Wiedergabe mit Quellenangabe",
+   "im_dokument_steht": "Noch nicht am Dokument geprueft - die Quelle ist nicht mehr erreichbar.",
+   "quelle_erreichbar": false,
+   "quelle_befund": "HTTP 404 (gemessen 02.10.2026) - der Lizenznachweis ist damit auch technisch verloren.",
+   "folge": "Diese Zahlen gehoeren NICHT in einen Kundenbericht, solange der Widerspruch nicht geklaert ist. Entweder liegt eine Genehmigung vor - dann darf auch der Rest des Berichts geerntet werden - oder die Saetze werden zurueckgebaut.",
+   "entscheidung": "GEKLAERT am 02.10.2026: Marcel hat eine schriftliche Genehmigung erhalten. Die Saetze duerfen verwendet werden."
+  },
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "umfang_offen": "Gilt die Genehmigung nur fuer die bereits erfassten 13 Saetze oder fuer den ganzen Bericht? Heilbronn fuehrt 332 ETW-Faelle und ein Anwendungsbeispiel, Ulm ebenfalls Zinssatztabellen - beide waeren dann zu ernten.",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern."
+  }
  }
 ]

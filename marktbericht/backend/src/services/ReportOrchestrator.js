@@ -15,6 +15,8 @@ import { HarvestService } from './HarvestService.js';
 import { KiGegenrechnungService } from './KiGegenrechnungService.js';
 import { ErtragswertService } from './ErtragswertService.js';
 import { CrossCheckService } from './CrossCheckService.js';
+/* v1816 · dieselbe Restnutzungsdauer wie Sachwert und Erbbaurecht */
+import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
 /* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
@@ -571,11 +573,45 @@ export const ReportOrchestrator = {
       }
     } catch (e) { /* eine Nebenangabe darf den Bericht nie kippen */ }
 
+    /* ── v1816 · DIE ANGABEN, DIE DER AUSSCHUSS ZUM STAFFELN BRAUCHT ─────
+     *
+     * Die amtlichen Liegenschaftszinssätze liegen objektscharf: Dresden
+     * führt `efh_frei_rnd36_55`, Leipzig `etw_altbau_rnd20_34`, Mainz je
+     * Stadtteil. Ohne Haustyp, Baujahr und Restnutzungsdauer lässt sich
+     * der richtige Satz nicht zuordnen — und bis v1815 wurde gar keiner
+     * zugeordnet: der Bericht rechnete außerhalb von NRW mit § 256 BewG,
+     * obwohl 1.205 amtliche Sätze im Register lagen.
+     *
+     * DIE RESTNUTZUNGSDAUER KOMMT AUS DEM GEMEINSAMEN MODUL. Sie wird
+     * weiter unten für Sachwert und Erbbaurecht noch einmal gebraucht —
+     * und zwar dieselbe. Eine zweite Ableitung hier wäre genau der
+     * Fehler, den `lib/rnd-einheitlich.js` verhindert.
+     *
+     * Die GND ist hier noch nicht bekannt (sie steht im Modell des
+     * Ausschusses, den wir erst suchen). Deshalb Anlage 1 mit 80 — wie es
+     * `CrossCheckService` im ersten Lauf auch tut. */
+    const _rndVorab = rndEinheitlich(ref, 80);
+    step('rnd-vorab: ' + (_rndVorab.rnd != null ? _rndVorab.rnd + ' Jahre (' + _rndVorab.quelle + ')' : 'keine'));
+
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
         ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
+        objekt: {
+          objart: ref.property_type,
+          /* v1816 · Marcels Entscheidung: eine Eigentumswohnung ist
+             standardmäßig VERMIETET — „Ist ja ein Kapitalrechner." Nur
+             wenn der Nutzer ausdrücklich Eigennutzung angibt, gilt der
+             Zweig für selbstgenutztes Wohnungseigentum. */
+          nutzung: ref.nutzung || ref.usage_type || 'vermietet',
+          haustyp: ref.haustyp || null,
+          baujahr: ref.build_year || null,
+          restnutzungsdauer: _rndVorab.rnd,
+          einheiten: ref.units || null,
+          lage: ref.lage || null,
+          stadtteil: ref.stadtteil || ref.ortsteil || null,
+        },
       });
       /* v1049-WBWK-1 · Die Bewirtschaftungskostenquote, die der
        * Gutachterausschuss selbst gemessen hat. Sie steht als eigener
@@ -772,6 +808,24 @@ export const ReportOrchestrator = {
           bwk_quote_quelle: _bwkPct ? _bwkPct.quelle : null,
           modellversion: _lzs.modellversion || null,
           lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
+          /* ── v1816 · DIE RUECKFRAGE REIST BIS IN DEN BERICHT ──────────
+           *
+           * Liegt fuer diesen Ort ein amtlicher Zinssatz vor, fehlt aber
+           * eine Angabe, die der Ausschuss zum Staffeln braucht (Lage,
+           * Stadtteil, Restnutzungsdauer), rechnet die Kaskade mit dem
+           * Rueckfall — und der Bericht soll SAGEN, warum.
+           *
+           *   > Ein Auffangwert ohne Begruendung sieht aus wie das Beste,
+           *   > was es gibt. Er ist das Schlechteste, was es gibt.
+           *
+           * Marcel: "konnte nicht gemacht werden aus den und den Gruenden
+           * und dann kann man diese Sachen noch eingeben, damit dann so
+           * ein Zinssatz abgerufen wird." */
+          lzs_rueckfrage: _lzs.rueckfrage || null,
+          /* Woher der Wert kommt, in EINEM Feld — fuer die Ansicht. */
+          lzs_zweig: _lzs.zweig || null,
+          lzs_aus_register: !!_lzs.aus_register,
+          lzs_berichtsjahr: _lzs.berichtsjahr || null,
           bodenwert: _bw,
           flaeche: _flaeche,   /* v1049-WFLA-2 */
           /* v1055-WSPL-1 · Hinweis, wenn Stellplaetze da sind und kein
@@ -1201,8 +1255,35 @@ export const ReportOrchestrator = {
       [propertyId, JSON.stringify(valuation)]);
     await q('INSERT INTO mb.deal_scores (property_id,score,breakdown) VALUES ($1,$2,$3)',
       [propertyId, deal.score, JSON.stringify(deal.breakdown)]);
-    /* v942-userbind */
-    const _uid = (input.user_id != null && !isNaN(parseInt(input.user_id, 10))) ? parseInt(input.user_id, 10) : null;
+    /* ── v942-userbind · v1821: parseInt RAUS ─────────────────────────────
+     *
+     * GEMESSEN am 04.10.2026 an Bericht 137: `user_id = 2`. Marcels
+     * Kennung ist `2a1ac331-7d7f-44a5-…`, und
+     *
+     *     parseInt('2a1ac331-7d7f-44a5-…', 10)  ===  2
+     *
+     * weil JavaScript bis zum ersten ungueltigen Zeichen liest. `isNaN(2)`
+     * ist false, also wurde die 2 fuer eine gueltige Kennung gehalten.
+     *
+     * FOLGE 1: der Bericht gehoerte niemandem. Die Historie am Objekt blieb
+     * leer, obwohl der Bericht da war — genau das, was Marcel vermisst hat.
+     *
+     * FOLGE 2, die schwerere: es gibt nur 16 moegliche erste Zeichen einer
+     * UUID. Ab etwa zehn Kunden teilen zwei dieselbe Pseudokennung — und
+     * `routes/api.js` filtert Abruf UND Loeschung nach `user_id`. Beim
+     * Reseller-Modell waere das ein Mandantenleck.
+     *
+     *   > Eine Kennung in eine Zahl zu wandeln ist nie eine Pruefung. Es
+     *   > ist eine Verkuerzung, die wie eine Pruefung aussieht.
+     *
+     * Die Routen wurden in v1769 alle auf `_uidAus()` umgestellt; diese
+     * eine Stelle im Orchestrator ist uebrig geblieben. Die Spalten sind
+     * seit Migration 015 `text` — die Kennung passt also hinein, wie sie
+     * ist. Gepruefte Form statt Umwandlung: Ziffern, Buchstaben, Striche,
+     * hoechstens 64 Zeichen (dieselbe Regel wie in `_uidAus`). */
+    const _uidRoh = String(input.user_id == null ? '' : input.user_id).trim();
+    const _uid = (_uidRoh && _uidRoh !== 'undefined' && _uidRoh !== 'null'
+                  && /^[A-Za-z0-9-]{1,64}$/.test(_uidRoh)) ? _uidRoh : null;
     const _label = (typeof input.object_label === 'string' && input.object_label.trim()) ? input.object_label.trim() : null;
     const rep = await q1(
       'INSERT INTO mb.market_reports (property_id,ai_mode,payload,report_md,user_id) VALUES ($1,$2,$3,$4,$5) RETURNING id',

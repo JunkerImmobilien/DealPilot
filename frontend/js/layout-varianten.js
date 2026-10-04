@@ -297,7 +297,7 @@
     { act: 'invest',      art: 'dok',    ico: 'export-hub', l: 'Exposé / Gesamt-PDF',  sub: 'Alle Kapitel als Dokument' },
     { act: 'invest_bank', art: 'dok',    ico: 'bankexport', l: 'Bankfassung',          sub: 'Investment-Case für die Bank', feature: 'bank_pdf_a3' },
     { act: 'mb',          art: 'vorrat', ico: 'market',     l: 'Marktbericht',         sub: 'Als PDF, wenn einer vorliegt' },
-    { act: 'kpa',         art: 'dok',    ico: 'export-hub', l: 'Kaufpreisaufteilung',  sub: 'BMF-Anlage, Grund und Gebäude', feature: 'bmf_calc_export' },
+    { act: 'kpa',         art: 'dok',    ico: 'export-hub', l: 'Kaufpreisaufteilung · BMF', sub: 'Rechner, Anlage oder Belege', feature: 'bmf_calc_export' },
     { act: 'bmf',         art: 'jahr',   ico: 'export-hub', l: 'Finanzamt-PDF',        sub: 'Anlage V · Werbungskosten' },
     { act: 'track',       art: 'dok',    ico: 'trackrec',   l: 'Track Record',         sub: 'Nachweise für die Bank',       feature: 'track_record_pdf' },
     { act: 'hub-export',  art: 'dok',    ico: 'export-hub', l: 'Export',               sub: 'PDF, CSV, Sicherung',          feature: 'export_csv' }
@@ -1129,6 +1129,27 @@
     try {
       if (skinVorher === null && document.body) {
         skinVorher = document.body.classList.contains('dp-chrome-hell') ? 'hell' : 'obsidian';
+      }
+    } catch (e) {}
+    /* ── v1748b · DIE BORDKARTE IST DIE VORGABE, NICHT DER ZWANG ────
+       Marcel: „dass wir aber standardmaessig einfach unter der
+       Darstellung, dass wir immer die Bordkarten erstmal auswaehlen."
+
+       Bisher setzte nur das Einrichtungsfenster bei der Erstanmeldung
+       eine Objektkarte. Wer die Ansicht SPAETER unter Darstellung
+       wechselt - und genau das meint Marcel - bekam die Schiene ohne
+       Kartenbild.
+
+       Gesetzt wird nur, wenn der Merker gar nicht DA ist. Wer einmal
+       selbst gewaehlt hat - auch die leere Fassung „Heute", die
+       schreibt einen leeren Wert - behaelt seine Wahl. Zwanzig Zeilen
+       weiter oben steht, warum das so sein muss: „Ein Umbau, der sich
+       nicht abwaehlen laesst, ist kein Angebot, sondern eine Ansage."
+       Eine Vorgabe ueberschreibt nichts, sie fuellt eine Luecke. */
+    try {
+      if (localStorage.getItem('dp_objkarte_stil') === null &&
+          window.DealPilotObjektkarte && typeof window.DealPilotObjektkarte.setze === 'function') {
+        window.DealPilotObjektkarte.setze('bordkarte');
       }
     } catch (e) {}
     kopfOffenHalten(true);

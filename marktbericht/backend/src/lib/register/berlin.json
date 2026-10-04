@@ -16,11 +16,11 @@
     "3": 2.3,
     "5": 2.6,
     "7": 2.8,
-    "9": 3.0,
+    "9": 3,
     "11": 3.3,
     "13": 3.5,
     "15": 3.7,
-    "17": 4.0,
+    "17": 4,
     "19": 4.2,
     "22": 4.6
    },
@@ -32,61 +32,63 @@
    {
     "bez": "Altbezirk",
     "feld": "altbezirk",
-    "art": "stufen_kategorial",
-    "stufen": {
-     "Mitte": 0.0,
-     "Tiergarten": 0.0,
-     "Wedding": -0.3,
-     "Prenzlauer Berg": 0.0,
-     "Friedrichshain": 0.2,
-     "Kreuzberg": 0.0,
-     "Charlottenburg": 0.0,
-     "Spandau": 0.0,
-     "Wilmersdorf": 0.0,
-     "Zehlendorf": 0.0,
-     "Schöneberg": 0.2,
-     "Steglitz": 0.3,
-     "Tempelhof": 0.0,
-     "Neukölln": 0.0,
-     "Treptow": 0.0,
-     "Köpenick": 0.0,
-     "Lichtenberg": 0.0,
-     "Weißensee": 0.5,
-     "Pankow": 0.0,
-     "Reinickendorf": 0.2,
-     "Marzahn": 0.0,
-     "Hohenschönhausen": 0.0,
-     "Hellersdorf": 0.0
-    },
+    "art": "kategorial",
     "rundung_stellen": 1,
     "einheit": "prozentpunkte",
     "vorbehalt": true,
-    "hinweis": "Additiv in Prozentpunkten auf den abgelesenen Zinssatz. 23 Altbezirke (Stand vor der Gebietsreform 2001) — hier sind ALLE 23 abgedeckt, anders als beim Sachwertfaktor. VORBEHALT: die 23 Einzelwerte stammen aus nur EINEM Lesedurchgang. Gegenprüfung: ein unabhängiger Durchgang nannte die Spanne „−0,3 bis +0,5\", und Minimum (Wedding −0,3) wie Maximum (Weißensee +0,5) treffen diese Spanne exakt. Das stützt die Randwerte, nicht jede Einzelzuordnung. Vor produktivem Einsatz am PDF bestätigen."
+    "hinweis": "Additiv in Prozentpunkten auf den abgelesenen Zinssatz. 23 Altbezirke (Stand vor der Gebietsreform 2001) — hier sind ALLE 23 abgedeckt, anders als beim Sachwertfaktor. VORBEHALT: die 23 Einzelwerte stammen aus nur EINEM Lesedurchgang. Gegenprüfung: ein unabhängiger Durchgang nannte die Spanne „−0,3 bis +0,5\", und Minimum (Wedding −0,3) wie Maximum (Weißensee +0,5) treffen diese Spanne exakt. Das stützt die Randwerte, nicht jede Einzelzuordnung. Vor produktivem Einsatz am PDF bestätigen.",
+    "werte": {
+     "Mitte": 0,
+     "Tiergarten": 0,
+     "Wedding": -0.3,
+     "Prenzlauer Berg": 0,
+     "Friedrichshain": 0.2,
+     "Kreuzberg": 0,
+     "Charlottenburg": 0,
+     "Spandau": 0,
+     "Wilmersdorf": 0,
+     "Zehlendorf": 0,
+     "Schöneberg": 0.2,
+     "Steglitz": 0.3,
+     "Tempelhof": 0,
+     "Neukölln": 0,
+     "Treptow": 0,
+     "Köpenick": 0,
+     "Lichtenberg": 0,
+     "Weißensee": 0.5,
+     "Pankow": 0,
+     "Reinickendorf": 0.2,
+     "Marzahn": 0,
+     "Hohenschönhausen": 0,
+     "Hellersdorf": 0
+    },
+    "korrigiert": "v1768: trug art \"stufen_kategorial\" ohne kategorie_feld und feuerte deshalb nie (swf_modelle.js:846 return null). Es ist eine reine Nachschlagetabelle -> art \"kategorial\" mit werte."
    },
    {
     "bez": "Baujahresgruppe",
     "feld": "baujahr",
-    "art": "stufen_kategorial",
-    "stufen": {
-     "Altbauten (vor 1919)": 0.0,
-     "Zwischenkriegsbauten (1919–1948)": 0.0,
-     "1949–1972": 0.0,
-     "1973–1990 West": 0.2,
-     "1973–1990 Ost": 0.0,
-     "1991–2002": 0.0,
-     "ab 2003": 0.0
-    },
+    "art": "kategorial",
     "rundung_stellen": 1,
     "einheit": "prozentpunkte",
     "vorbehalt": true,
-    "hinweis": "Additiv in Prozentpunkten. Nur die Gruppe „1973–1990 West\" trägt einen Wert; die Unterscheidung West/Ost innerhalb derselben Baujahresspanne setzt die Kenntnis der Lage im ehemaligen West- bzw. Ostteil Berlins voraus. Nur EIN Lesedurchgang — Vorbehalt."
+    "hinweis": "Additiv in Prozentpunkten. Nur die Gruppe „1973–1990 West\" trägt einen Wert; die Unterscheidung West/Ost innerhalb derselben Baujahresspanne setzt die Kenntnis der Lage im ehemaligen West- bzw. Ostteil Berlins voraus. Nur EIN Lesedurchgang — Vorbehalt.",
+    "werte": {
+     "Altbauten (vor 1919)": 0,
+     "Zwischenkriegsbauten (1919–1948)": 0,
+     "1949–1972": 0,
+     "1973–1990 West": 0.2,
+     "1973–1990 Ost": 0,
+     "1991–2002": 0,
+     "ab 2003": 0
+    },
+    "korrigiert": "v1768: trug art \"stufen_kategorial\" ohne kategorie_feld und feuerte deshalb nie (swf_modelle.js:846 return null). Es ist eine reine Nachschlagetabelle -> art \"kategorial\" mit werte."
    },
    {
     "bez": "Gewerblicher Mietanteil",
     "feld": "gewerbeanteil_prozent",
     "art": "stufen",
     "stufen": {
-     "0": 0.0,
+     "0": 0,
      "10": 0.03,
      "20": 0.06,
      "30": 0.09,
@@ -103,17 +105,18 @@
    {
     "bez": "Stadträumliche Wohnlage",
     "feld": "wohnlage",
-    "art": "stufen_kategorial",
-    "stufen": {
-     "einfach": 0.2,
-     "mittel": 0.0,
-     "gut": 0.0,
-     "sehr gut": -0.07
-    },
+    "art": "kategorial",
     "rundung_stellen": 2,
     "einheit": "prozentpunkte",
     "vorbehalt": true,
-    "hinweis": "Additiv in Prozentpunkten. Bezugsfall mittel; „gut\" liegt gleichauf mit „mittel\". Nur EIN Lesedurchgang — Vorbehalt."
+    "hinweis": "Additiv in Prozentpunkten. Bezugsfall mittel; „gut\" liegt gleichauf mit „mittel\". Nur EIN Lesedurchgang — Vorbehalt.",
+    "werte": {
+     "einfach": 0.2,
+     "mittel": 0,
+     "gut": 0,
+     "sehr gut": -0.07
+    },
+    "korrigiert": "v1768: trug art \"stufen_kategorial\" ohne kategorie_feld und feuerte deshalb nie (swf_modelle.js:846 return null). Es ist eine reine Nachschlagetabelle -> art \"kategorial\" mit werte."
    }
   ],
   "modellansaetze": {
@@ -125,7 +128,7 @@
     "offener_stellplatz_eur_platz_jahr": 50
    },
    "verwaltungskosten": {
-    "wohnen_eur_wohnung_jahr": 339.0,
+    "wohnen_eur_wohnung_jahr": 339,
     "gewerbe": "3 % vom Mietertrag"
    },
    "mietausfallwagnis": {
@@ -154,8 +157,8 @@
    "hinweis": "Wörtlicher Anwendungshinweis zur Tabelle: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" Die Korrekturen sind damit PFLICHT, nicht Kür. Außerhalb der Mietspanne 3,00 bis 22,00 EUR/m² und außerhalb der Objektartdefinition (mind. vier Mieteinheiten, Gewerbeanteil bis 80 %) wird ausgewiesen, nicht gerechnet.",
    "spannen": {
     "objektkaltmiete_eur_m2_monat": [
-     3.0,
-     22.0
+     3,
+     22
     ],
     "gewerbeanteil_prozent": [
      0,
@@ -174,11 +177,11 @@
     "soll_stuetzstellen": 10,
     "soll_eckwerte": [
      {
-      "objektkaltmiete_eur_m2_monat": 3.0,
+      "objektkaltmiete_eur_m2_monat": 3,
       "wert": 2.3
      },
      {
-      "objektkaltmiete_eur_m2_monat": 22.0,
+      "objektkaltmiete_eur_m2_monat": 22,
       "wert": 4.6
      }
     ],

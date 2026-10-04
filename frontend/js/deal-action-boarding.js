@@ -84,9 +84,24 @@
   /* ────────────────── Kopf-Markup ────────────────── */
   function buildTop() {
     var docs =
-      docRow('invest', 'Investment-PDF', 'Business-Case, bank-fertig: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Stress-Test.', true) +
-      /* v1436 · Backlog v22 Punkt 11: helle Bankfassung als ZWEITE Wahl, das bisherige PDF bleibt */
-      docRow('invest_bank', 'Investment-PDF · Bankfassung (hell)', 'Neu zum Testen: ruhige, helle Fassung für Bank und Investoren — Tabellen, Kennzahlen, 10 Jahre Cashflow.', false) +
+      /* v1733 · Marcel 30.09.2026: „egal worauf ich klicke, also ob ich jetzt
+         auf Investment PDF klicke oder halt auf Investment PDF Bankfassung,
+         es öffnet sich immer Modal und dann kann ich auswählen. Das heißt, da
+         bräuchten wir ja nur eine Version."
+
+         NACHGEMESSEN UND BESTÄTIGT: seit v1636 umhüllt `pdf-wahl.js` BEIDE
+         Funktionen — `exportPDF` UND `exportPDFBank`. Beide Zeilen landeten
+         im selben Dialog mit denselben drei Karten; der einzige Unterschied
+         war die Vorauswahl, und die markiert nur eine Karte, sie wählt nichts.
+         Der zweite Eintrag stammt aus v1436, als die Bankfassung noch ein
+         eigener Weg war. Seit der Umhüllung beschreibt er einen Weg, den es
+         nicht mehr gibt.
+
+         > Zwei Türen in denselben Raum sind keine Wahl, sondern eine Frage,
+         > die der Nutzer sich stellt und die niemand beantwortet.
+
+         Eine Zeile also — welche Fassung, entscheidet der Dialog. */
+      docRow('invest', 'Investment-PDF', 'Business-Case, bank-fertig: Kaufpreis, Finanzierung, Cashflow, DSCR/LTV, Stress-Test. Beim Klick wird gefragt, welche Fassung: Bankfassung, hell oder Obsidian.', true) +
       faRow() +
       kpaRow() +
       docRow('track', 'Track Record', 'Auswahl-Ansicht \u00f6ffnen: gewonnene Deals filtern, Einzel- oder Sammel-PDF erzeugen.', false);
@@ -145,9 +160,32 @@
       : which === 'bmf'
         ? '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 14l6-6M9.5 9h.01M14.5 14h.01"/>'
         : '<path d="M12 2l2.5 5 5.5.8-4 3.9 1 5.5L12 15l-5 2.9 1-5.5-4-3.9 5.5-.8z"/>';
+    /* v1733 · DER WEG ZURÜCK, DEN DER DIALOG VERSPRACH UND NICHT HATTE.
+       Gemessen: `DealPilotPdfWahl.vergessen()` hat ausserhalb seiner eigenen
+       Datei NULL Aufrufer — der Dialog schreibt aber unter das Kästchen
+       „Diese Wahl merken" den Zusatz „(änderbar in den Einstellungen)".
+       Wer einmal anhakt, sieht den Dialog nie wieder und kommt an die
+       anderen beiden Fassungen nicht mehr heran.
+
+       > Eine Sackgasse, die sich selbst als änderbar ausgibt, ist schlimmer
+       > als eine, die ehrlich ist: man sucht den Ausgang, den es gibt.
+
+       Der Knopf steht am Ort der Handlung, nicht in den Einstellungen —
+       dort hätte ihn niemand gesucht, der gerade exportieren will. */
+    var zweit = (which === 'invest')
+      ? '<button class="dab-doc-btn dab-doc-btn-neb" onclick="DealActionBoarding.fassungWaehlen()" title="Welche Fassung? Bankfassung, hell oder Obsidian">Fassung</button>'
+      : '';
     return '<div class="dab-doc-row"><div class="dab-doc-icb"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ic + '</svg></div>' +
       '<div class="dab-doc-x"><div class="dab-doc-n">' + name + badge + '</div><div class="dab-doc-d">' + desc + '</div></div>' +
-      '<div class="dab-doc-act"><button class="dab-doc-btn' + (gold ? ' gold' : '') + '" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + 'PDF</button></div></div>';
+      '<div class="dab-doc-act">' + zweit + '<button class="dab-doc-btn' + (gold ? ' gold' : '') + '" onclick="DealActionBoarding.exportDoc(\'' + which + '\')">' + ICO.dl + 'PDF</button></div></div>';
+  }
+
+  /* v1733 · immer den Dialog zeigen, auch wenn eine Wahl gemerkt ist */
+  function fassungWaehlen() {
+    if (!window.DealPilotPdfWahl || typeof window.DealPilotPdfWahl.neuWaehlen !== 'function') {
+      toast('Die Fassungswahl ist noch nicht geladen.'); return;
+    }
+    window.DealPilotPdfWahl.neuWaehlen();
   }
 
   /* v854: Finanzamt-PDF = Steuerformular (exportWerbungskostenPDF) mit Jahr-Auswahl */
@@ -736,6 +774,10 @@
             || DealPilotConfig.pricing.hasFeature('bmf_calc_export');
           if (!_kOk) { toast('Kaufpreisaufteilung ist ab dem Investor-Plan verf\u00fcgbar.'); return; }
         } catch (e) {}
+        /* v1748 · fragen statt raten - die drei Wege stehen in bmf-wahl.js.
+           Der alte Zweig entschied an `_lastBmfResults`, also an einem
+           Zustand, den niemand sieht. */
+        if (window.DealPilotBmfWahl && typeof window.DealPilotBmfWahl.zeige === 'function') return window.DealPilotBmfWahl.zeige();
         if (window._lastBmfResults && typeof window.exportBmfPdf === 'function') return window.exportBmfPdf();
         if (typeof window.openBMFModal === 'function') { window.openBMFModal(); toast('Erst berechnen lassen, dann als PDF-Anlage exportieren.'); return; }
         toast('BMF-Rechner nicht geladen.');
@@ -1102,6 +1144,7 @@
     railScroll: railScroll,
     toggleSmart: toggleSmart,
     exportDoc: exportDoc,
+    fassungWaehlen: fassungWaehlen,   /* v1733 */
     fillFaYears: fillFaYears,
     gutachtenModal: gutachtenModal,
     leadSheet: leadSheet,
@@ -1208,7 +1251,13 @@
     '#s8 .dab-doc-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#2A2727;border:1.5px solid rgba(42,39,39,.1);border-radius:9px;padding:9px 16px;font-family:var(--dab-fs);font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s;flex-shrink:0}',
     '#s8 .dab-doc-btn:hover{border-color:var(--dab-gold);color:var(--dab-gold3);transform:translateY(-1px)}',
     '#s8 .dab-doc-btn.gold{background:var(--dab-run);color:#1a1508;border:none;box-shadow:0 3px 12px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}',
-    '@media(max-width:560px){#s8 .dab-doc-row{flex-wrap:wrap}}',
+    /* v1733 · der Nebenknopf „Fassung": leiser als der PDF-Knopf, weil er
+       seltener gebraucht wird - aber sichtbar, weil er sonst denselben
+       Zweck verfehlt wie der Satz „änderbar in den Einstellungen". */
+    '#s8 .dab-doc-act{display:flex;align-items:center;gap:8px;flex-shrink:0}',
+    '#s8 .dab-doc-btn-neb{background:transparent;border-color:rgba(42,39,39,.16);color:#6A6360;font-weight:600;padding:9px 12px}',
+    '#s8 .dab-doc-btn-neb:hover{background:#fff;border-color:var(--dab-gold);color:var(--dab-gold3)}',
+    '@media(max-width:560px){#s8 .dab-doc-row{flex-wrap:wrap}#s8 .dab-doc-act{gap:6px}#s8 .dab-doc-btn-neb{padding:9px 10px}}',
     '#s8 .dab-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}',
     '#s8 .dab-ct{font-family:var(--dab-fs);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--dab-gold3);margin-bottom:9px}',
     '#s8 .dab-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:0;padding:0}',

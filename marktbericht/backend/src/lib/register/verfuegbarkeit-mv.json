@@ -1,0 +1,300 @@
+{
+  "was": "Verfuegbarkeit wertermittlungsrelevanter Daten je Gutachterausschuss in Mecklenburg-Vorpommern",
+  "keine_werte": "Der Landesgrundstuecksmarktbericht veroeffentlicht KEINE Zahlenwerte zu Liegenschaftszinssaetzen und Sachwertfaktoren. Abb. 5.1 und 5.2 stellen nur dar, WELCHE Daten ein Ausschuss zum 01.01.2025 abgeleitet hat; die Werte selbst stehen in den Marktberichten der acht oertlichen Ausschuesse. Woertlich (S. 83): \"Nachfolgend werden ueberblicksweise die durch die Gutachterausschuesse in Mecklenburg-Vorpommern abgeleiteten und in ihren Marktberichten veroeffentlichten SWE Daten dargestellt.\" Diese Datei ist deshalb der WEG ZUR QUELLE, nicht die Quelle.",
+  "land_code": "MV",
+  "stand": "01.01.2025",
+  "berichtsjahr": 2025,
+  "quelle_url": "https://www.laiv-mv.de/static/LAIV/Geoinformation/Dateien/Wertermittlung/LGMB_2025_Web.pdf",
+  "quellenvermerk": "Landesamt fuer innere Verwaltung Mecklenburg-Vorpommern, Landesgrundstuecksmarktbericht Mecklenburg-Vorpommern 2025",
+  "fundstelle": "Landesgrundstuecksmarktbericht M-V 2025, Kapitel 5, Abb. 5.1 und 5.2, S. 83-84",
+  "quelle_parser": "v1756-MVVERF + v1780-MVLIZ",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Bericht nicht gefunden. Vor einer Weitergabe der abgeleiteten Werte beim LAiV nachfragen; der Quellenvermerk steht vorsorglich dabei.",
+  "ags_hinweis": "ags_belegt=true heisst: der Schluessel steht so in einem vorhandenen Registersatz. Die uebrigen sind nach amtlicher Systematik zugeordnet (kreisfreie Staedte 13003/13004, Landkreise 13071-13076 alphabetisch) und durch die drei belegten Schluessel stichprobenhaft bestaetigt - 13071 Mecklenburgische Seenplatte, 13073 Vorpommern-Ruegen, 13076 Ludwigslust-Parchim.",
+  "lesehinweis": "Die Tabelle wurde SPALTENTREU ueber die x-Koordinaten der Textstuecke gelesen, nicht aus dem Textstrom. Im Textstrom fehlen die leeren Zellen: dort steht \"Mehrfamilienhaeuser x x x x x\" - fuenf Kreuze fuer acht Ausschuesse, ohne Angabe welche drei fehlen. Spaltentreu ergibt sich \"- x x x x - x -\", also SN, MSE, LRO, VR, VG statt der ersten fuenf. Eine Tabelle ohne ihre Leerstellen ist keine Tabelle, sondern eine Aufzaehlung.",
+  "ausschuesse": [
+    {
+      "kuerzel": "HRO",
+      "name": "Rostock, Hansestadt",
+      "ags": "13003",
+      "ags_belegt": false,
+      "ebene": "gemeinde",
+      "ebene_hinweis": "Hier stand „kreisfreie_stadt“. Diesen Wert kennt die Spalte `ebene` in mb.param_modell NICHT — erlaubt sind gemeinde, kreis, bezirk, gaa, land, bund. Eine kreisfreie Stadt ist dort `gemeinde` (so fuehren es Berlin, Hamburg und Heilbronn). Geaendert am 02.10.2026, damit niemand den Wert aus diesem Wegweiser in einen Datensatz uebernimmt und der Saatlauf ihn still verwirft."
+    },
+    {
+      "kuerzel": "SN",
+      "name": "Schwerin, Landeshauptstadt",
+      "ags": "13004",
+      "ags_belegt": false,
+      "ebene": "gemeinde",
+      "ebene_hinweis": "Hier stand „kreisfreie_stadt“. Diesen Wert kennt die Spalte `ebene` in mb.param_modell NICHT — erlaubt sind gemeinde, kreis, bezirk, gaa, land, bund. Eine kreisfreie Stadt ist dort `gemeinde` (so fuehren es Berlin, Hamburg und Heilbronn). Geaendert am 02.10.2026, damit niemand den Wert aus diesem Wegweiser in einen Datensatz uebernimmt und der Saatlauf ihn still verwirft."
+    },
+    {
+      "kuerzel": "MSE",
+      "name": "Mecklenburgische Seenplatte",
+      "ags": "13071",
+      "ags_belegt": true,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "LRO",
+      "name": "Rostock, Landkreis",
+      "ags": "13072",
+      "ags_belegt": false,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "VR",
+      "name": "Vorpommern-Ruegen",
+      "ags": "13073",
+      "ags_belegt": true,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "NWM",
+      "name": "Nordwestmecklenburg",
+      "ags": "13074",
+      "ags_belegt": false,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "VG",
+      "name": "Vorpommern-Greifswald",
+      "ags": "13075",
+      "ags_belegt": false,
+      "ebene": "kreis"
+    },
+    {
+      "kuerzel": "LUP",
+      "name": "Ludwigslust-Parchim",
+      "ags": "13076",
+      "ags_belegt": true,
+      "ebene": "kreis"
+    }
+  ],
+  "liegenschaftszinssaetze": [
+    {
+      "objektart": "Mehrfamilienhaeuser",
+      "ausschuesse": [
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "VG"
+      ]
+    },
+    {
+      "objektart": "Mehrfamilienhaeuser ueber 6 Wohneinheiten",
+      "ausschuesse": [
+        "HRO",
+        "NWM",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Mehrfamilienhaeuser 3 bis 6 Wohneinheiten",
+      "ausschuesse": [
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Eigentumswohnungen",
+      "ausschuesse": [
+        "HRO",
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "NWM",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Wohn- und Geschaeftshaeuser",
+      "ausschuesse": [
+        "SN",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Wohnen",
+      "ausschuesse": [
+        "HRO",
+        "MSE"
+      ]
+    },
+    {
+      "objektart": "Wohn- und Geschaeftshaeuser, ueberwiegend Gewerbe",
+      "ausschuesse": []
+    },
+    {
+      "objektart": "Ferienhaeuser und Ferienwohnungen",
+      "ausschuesse": [
+        "NWM"
+      ]
+    },
+    {
+      "objektart": "Beherbergung und Gastronomie",
+      "ausschuesse": []
+    },
+    {
+      "objektart": "Handel",
+      "ausschuesse": [
+        "HRO"
+      ]
+    },
+    {
+      "objektart": "Gewerbe",
+      "ausschuesse": [
+        "HRO",
+        "MSE",
+        "LRO"
+      ]
+    },
+    {
+      "objektart": "Buero-, Verwaltungs- und Praxisgebaeude",
+      "ausschuesse": [
+        "HRO",
+        "MSE"
+      ]
+    }
+  ],
+  "sachwertfaktoren": [
+    {
+      "objektart": "Freistehende Ein- und Zweifamilienhaeuser",
+      "ausschuesse": [
+        "HRO",
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "NWM",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Reihenhaeuser und Doppelhaushaelften",
+      "ausschuesse": [
+        "SN",
+        "MSE",
+        "LRO",
+        "VR",
+        "NWM",
+        "VG",
+        "LUP"
+      ]
+    },
+    {
+      "objektart": "Wochenendhaeuser",
+      "ausschuesse": [
+        "MSE"
+      ]
+    },
+    {
+      "objektart": "Handel und Gewerbe",
+      "ausschuesse": [
+        "MSE"
+      ]
+    }
+  ],
+  "zugang_je_ausschuss": {
+    "was": "Zugang und Lizenz der acht oertlichen Marktberichte. Die Uebersicht oben sagt, WELCHER Ausschuss welche Daten fuehrt; hier steht, ob man sie bekommt und uebernehmen darf. Stand 02.10.2026: fuenf der acht Ausschuesse sind am Impressum ihres aktuellen Jahrgangs gemessen, drei (MSE, VR, LUP) tragen den Stand vom 01.10.2026.",
+    "SN": {
+      "bericht": "Grundstuecksmarktbericht 2025 der Landeshauptstadt Schwerin",
+      "url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+      "zugang": "PDF frei (gedruckt 40 Euro ueber den Geoshop Schwerin)",
+      "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Belegexemplar, ohne Genehmigung gestattet",
+      "stand": "GEERNTET — die Werte stehen in schwerin.json: 4 Liegenschaftszinssatz-Saetze (Mehrfamilienhaeuser, Wohn-/Geschaeftshaeuser, Eigentumswohnungen Weiterverkauf, individueller Wohnungsbau nach 1990) und 3 Sachwertfaktor-Saetze (Gebaeudetypen 1.xx, Gebaeudetypen 2.xx, Regressionsgitter). Fundstellen Abschnitt 5.4 und 5.5, S. 60-65.",
+      "offene_auflage": "Belegexemplar an den Herausgeber ist Bedingung der auszugsweisen Wiedergabe und steht noch aus."
+    },
+    "HRO": {
+      "bericht": "Grundstuecksmarktbericht 2026 der Hanse- und Universitaetsstadt Rostock (Redaktionsschluss 18.03.2026); Vollversion der Zahlen im Jahrgang 2025",
+      "url": "https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html",
+      "zugang": "PDF kostenfrei ueber den Geoshop Rostock",
+      "lizenz": null,
+      "lizenz_wortlaut": "Verwendungshinweis, Jahrgang 2026 UND 2025 wortgleich: „Der Grundstuecksmarktbericht ist urheberrechtlich geschuetzt. Vervielfaeltigungen, auch auszugsweise, und Verbreitung sind nur mit Genehmigung des Herausgebers gestattet. Alle Rechte, auch die des Nachdruckes von Auszuegen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.“",
+      "lizenz_gemessen": "am 02.10.2026 im Jahrgang 2026 nachgeprueft (Zeile 188 des Textstroms) — der Wortlaut ist gegenueber 2025 UNVERAENDERT. Die Hoffnung, der neue Jahrgang koennte milder sein, ist damit gemessen widerlegt und nicht nur vermutet.",
+      "stand": "NICHT GEERNTET — genehmigungspflichtig. Die Werte sind vorhanden und maschinenlesbar.",
+      "fundstellen": {
+        "liegenschaftszinssatz": "Kapitel 4.2 „Mittlere Liegenschaftszinssaetze in der Hanse- und Universitaetsstadt Rostock“, S. 55",
+        "sachwertfaktor": "Kapitel 4.4 „Sachwertfaktoren fuer Ein- und Zweifamilienhaeuser“, S. 60 (Tabelle 42, S. 61)",
+        "weitere": "Kapitel 4.3 „Vergleichs- und Rohertragsfaktoren“, S. 57; Kapitel 4.1 Indexreihen, S. 47"
+      },
+      "weg": "Genehmigung beim Gutachterausschuss einholen (gutachterausschuss@rostock.de, 0381 381-6270). Danach sind beide Kapitel in einem Arbeitsgang uebernehmbar — die Tabellen liegen als Text im PDF, nicht als Bild.",
+      "was_der_kunde_bekommt": "Solange die Genehmigung fehlt: der zustaendige Ausschuss, der Link auf den Geoshop und der Hinweis, dass die Zahl dort steht. Keine erfundene Zahl, kein Nachbarkreis, kein Landesmittel."
+    },
+    "MSE": {
+      "stand": "teilweise geerntet — 3 Sachwertfaktor-Saetze 2024 in swf-mv.json, Liegenschaftszinssaetze offen",
+      "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+      "lizenz_stand": "nicht am aktuellen Jahrgang nachgeprueft (Stand 01.10.2026). Die drei vorhandenen Sachwertfaktor-Saetze in swf-mv.json tragen die Lizenz, unter der sie geerntet wurden."
+    },
+    "VR": {
+      "stand": "teilweise geerntet — 3 Sachwertfaktor-Saetze 2019 in swf-mv.json, Liegenschaftszinssaetze offen, Jahrgang veraltet",
+      "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+      "lizenz_stand": "nicht am aktuellen Jahrgang nachgeprueft (Stand 01.10.2026)."
+    },
+    "LUP": {
+      "stand": "teilweise geerntet — 1 Sachwertfaktor-Satz 2018 in swf-mv.json, Liegenschaftszinssaetze offen, Jahrgang veraltet",
+      "url": "https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/",
+      "lizenz_stand": "nicht am aktuellen Jahrgang nachgeprueft (Stand 01.10.2026). Die Auflage „Quellenangabe UND Belegexemplar“ aus v1098j steht weiter offen."
+    },
+    "LRO": {
+      "bericht": "Grundstuecksmarktbericht 2025 des Landkreises Rostock (80 Seiten, Berichtszeitraum 01.01.–31.12.2024, Redaktionsschluss 03.01.2025)",
+      "url": "https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html",
+      "zugang": "PDF kostenfrei ueber den Geoshop Landkreis Rostock (Jahrgaenge 2012 bis 2025)",
+      "lizenz": null,
+      "lizenz_wortlaut": "„Vervielfaeltigung und Verbreitung: Dieser Bericht ueber den Grundstuecksmarkt ist urheberrechtlich geschuetzt. Die Vervielfaeltigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.“",
+      "lizenz_gemessen": "am 02.10.2026 am heruntergeladenen Jahrgang 2025 gelesen (Zeile 39 des Textstroms).",
+      "stand": "NICHT GEERNTET — genehmigungspflichtig. Vorher stand hier „nicht geprueft“.",
+      "fundstellen": {
+        "sachwertfaktor": "Kapitel 3.6.1.2 „Sachwertfaktoren“, S. 41 (Modell: Sachwertfaktor in Abhaengigkeit von LAGEKLASSE/Bodenwertniveau UND Hoehe des vorlaeufigen Sachwerts) und 3.6.1.3 „Sachwertfaktoren nach vorlaeufigem Sachwert und Bodenrichtwertniveau“, S. 42",
+        "liegenschaftszinssatz": "Kapitel 3.6.5 „Liegenschaftszinssatz“, S. 51",
+        "weitere": "Kapitel „Gebaeudefaktoren fuer Mehrfamilienhaeuser“, S. 46",
+        "besonderheit": "Woertlich S. 42: „Fuer die Ableitung der Sachwertfaktoren wurden insgesamt 675 Kauffaelle verwendet.“ Und: „Insgesamt kristallisierten sich 5 raeumliche Bereiche heraus“ — die Faktoren gelten NICHT fuer den ganzen Landkreis einheitlich. Wer sie uebernimmt, braucht die Zuordnung der fuenf Teilraeume mit, sonst ist die Zahl ohne ihren Geltungsbereich."
+      },
+      "weg": "Genehmigung bei der Geschaeftsstelle des Gutachterausschusses im Landkreis Rostock einholen (Kataster- und Vermessungsamt). Die Landkreis-Webseite selbst fuehrt keinen Download — der Weg laeuft ueber den Geoshop."
+    },
+    "NWM": {
+      "bericht": "Grundstuecksmarktbericht 2026 des Landkreises Nordwestmecklenburg (95 Seiten)",
+      "url": "https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html",
+      "zugang": "PDF kostenfrei ueber den Geoshop NWM (gedruckt 60 Euro bei der Geschaeftsstelle, Rostocker Str. 76, 23970 Wismar). Jahrgaenge 2020 bis 2026 sind dort alle als „kostenfrei“ ausgewiesen.",
+      "lizenz": null,
+      "lizenz_wortlaut": "„Vervielfaeltigung und Verbreitung: Der Bericht ueber den Grundstuecksmarkt ist urheberrechtlich geschuetzt (§ 2 Urhebergesetz – UrhG). Er darf Dritten, auch auszugsweise, nicht verwertbar gemacht werden (§ 12 i. V. mit § 87 a UrhG). Vervielfaeltigung, auch auszugsweise, und Verbreitung nur mit Genehmigung des Herausgebers.“",
+      "lizenz_gemessen": "am 02.10.2026 am heruntergeladenen Jahrgang 2026 gelesen. DIESER WORTLAUT GEHT WEITER ALS DIE UEBRIGEN: er verbietet nicht nur die Vervielfaeltigung, sondern das Verwertbarmachen fuer Dritte — genau das waere ein Kundenbericht.",
+      "stand": "NICHT GEERNTET — genehmigungspflichtig. Vorher stand hier „nicht geprueft“.",
+      "fundstellen": {
+        "sachwertfaktor": "Kapitel 3.2.7.2 „Sachwertfaktoren im Landkreis Nordwestmecklenburg“, S. 50 (Abbildung 38 Landkreis allgemein und laendliche Zentralorte, Abbildung 39 Ostseeregion) und 3.2.7.3 „Sachwertfaktoren in der Hansestadt Wismar“, S. 51 (Abbildung 40)",
+        "liegenschaftszinssatz": "Kapitel 3.2.7.5 „Liegenschaftszinssaetze im Landkreis Nordwestmecklenburg“, S. 53, und 3.2.7.6 „Liegenschaftszinssaetze in der Hansestadt Wismar“, S. 54",
+        "modellansaetze": "Kapitel 3.2.7.4 „Wesentliche Modellparameter zur Ableitung von Liegenschaftszinsaetzen“, S. 52 — PFLICHTLEKTUERE vor jeder Uebernahme (§ 10 ImmoWertV).",
+        "besonderheit": "Der Ausschuss hat fuer den laendlichen Bereich KEINEN Mietspiegel und leitet die Netto-Kaltmieten aus Befragungen der Marktteilnehmer ab (S. 53). Woertlich: „Die aufgefuehrten Mietspannen dienen ausschliesslich der Ableitung marktgerechter Liegenschaftszinssaetze.“ Wer mit diesen Zinssaetzen rechnet, muss mit diesen Mieten rechnen."
+      },
+      "weg": "Genehmigung bei der Geschaeftsstelle des Gutachterausschusses im Landkreis Nordwestmecklenburg einholen (Rostocker Strasse 76, 23970 Wismar). Die Sachwertfaktoren stehen als Regressionskurven in Abbildungen — selbst nach der Genehmigung ist zu pruefen, ob die Funktionsgleichungen im Text stehen oder nur die Grafik."
+    },
+    "VG": {
+      "bericht": "Grundstuecksmarktbericht 2024 des Landkreises Vorpommern-Greifswald (94 Seiten). ACHTUNG: der Ausschuss berichtet im ZWEIJAHRESRHYTHMUS — 2024 ist der aktuelle Jahrgang, 2025 gibt es nicht.",
+      "url": "https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html",
+      "zugang": "PDF kostenfrei ueber den Geoshop VG (digital kostenfrei, gedruckt 30 bis 60 Euro). Verfuegbare Jahrgaenge dort: 2024, 2022, 2019, 2017, 2015 und aelter.",
+      "lizenz": null,
+      "lizenz_wortlaut": "„Vervielfaeltigung und Verbreitung: Der Grundstuecksmarktbericht ist urheberrechtlich geschuetzt (§ 2 Urheberrechtsgesetz – UrhG). Nachdruck, Vervielfaeltigung, auch auszugsweise und Verbreitung, ist nur mit Genehmigung des Herausgebers gestattet.“",
+      "lizenz_gemessen": "am 02.10.2026 am heruntergeladenen Jahrgang 2024 gelesen (Zeile 20 des Textstroms).",
+      "stand": "NICHT GEERNTET — genehmigungspflichtig. Vorher stand hier „nicht geprueft“.",
+      "fundstellen": {
+        "sachwertfaktor": "Kapitel 6.1 „Marktanpassung – Sachwertfaktoren“, S. 83, und 6.1.1 „Sachwertfaktoren fuer freistehende Ein- und Zweifamilienhaeuser“, S. 85",
+        "liegenschaftszinssatz": "Kapitel 6.2 „Liegenschaftszinssaetze“, S. 86; Tabellen „Liegenschaftszinssaetze 2022 / 2023“ auf S. 88 und „Liegenschaftszinssaetze 2023“ auf S. 89",
+        "besonderheit": "Der Bericht fuehrt die Altkreise VG, UER, OVP und HGW getrennt (Jahrgaenge ab 1995). Beim Zweijahresrhythmus ist der Jahrgang 2024 zum Stichtag 01.01.2026 bereits zwei Jahre alt — das gehoert in jede Auskunft, die ihn verwendet."
+      },
+      "weg": "Genehmigung bei der Geschaeftsstelle des Gutachterausschusses einholen (Feldstrasse 85a, 17489 Greifswald, 03834 8760-3403)."
+    },
+    "bilanz": "Stand 02.10.2026. Mecklenburg-Vorpommern hat EINEN Ausschuss mit uebernehmbaren Werten im Register: Schwerin (4 Liegenschaftszinssatz- und 3 Sachwertfaktor-Saetze in schwerin.json, Jahrgang 2025). Sachwertfaktoren liegen zusaetzlich fuer MSE (2024), VR (2019) und LUP (2018) vor — zwei davon mit veraltetem Jahrgang. NEU GEMESSEN am 02.10.2026: die vier bis dahin offenen oder unklaren Ausschuesse HRO, NWM, LRO und VG sind ALLE VIER genehmigungspflichtig, obwohl ihre Berichte kostenfrei herunterladbar sind. Damit ist die Lage in MV nicht mehr unklar, sondern bekannt: sieben von acht Ausschuessen liefern keine uebernehmbaren Zinssaetze, und die Ursache ist bei vier davon dieselbe und mit einer einzigen Massnahme behebbar — eine Genehmigungsanfrage. DER GROESSTE EINZELGEWINN BLEIBT ROSTOCK (Liegenschaftszinssaetze UND Sachwertfaktoren, Kapitel 4.2 und 4.4, maschinenlesbar). Danach NWM (Landkreis und Hansestadt Wismar getrennt) und LRO (fuenf Teilraeume, 675 Kauffaelle). Was fehlt, ist kein Datenproblem, sondern vier Briefe.",
+    "messung_02_10_2026": {
+      "was": "Lizenzpruefung am Impressum des jeweils AKTUELLEN Jahrgangs, jedes PDF heruntergeladen und der Verwendungshinweis im Volltext gelesen.",
+      "ergebnis": "VIER VON VIER NEU GEPRUEFTEN AUSSCHUESSEN SIND GENEHMIGUNGSPFLICHTIG (HRO, NWM, LRO, VG). Bei allen vier ist der Download kostenfrei. Kostenfrei heisst erreichbar, nicht uebernehmbar — deshalb stehen hier keine Werte, sondern Wege.",
+      "einziger_freigegebener": "Schwerin (SN): „auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Belegexemplar, ohne Genehmigung gestattet“. Nur deshalb stehen die Schweriner Werte im Register (schwerin.json, 7 Saetze).",
+      "lehre": "Die Spalten „zugang“ und „lizenz“ sind zwei verschiedene Fragen und wurden hier bis zum 01.10.2026 in einer Zeile beantwortet. Ein „PDF frei“ in der Zugangsspalte liest sich wie eine Freigabe und ist keine."
+    }
+  },
+  "stand_lizenzpruefung": "02.10.2026 (HRO, NWM, LRO, VG am aktuellen Jahrgang gemessen)"
+}

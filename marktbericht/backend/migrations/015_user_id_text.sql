@@ -1,0 +1,76 @@
+-- 015_user_id_text.sql  (v1769)
+--
+-- user_id WIRD TEXT — DIE KENNUNG IST EINE UUID, KEINE ZAHL
+--
+-- `users.id` in der Haupt-Datenbank ist eine UUID. `mb.market_reports.user_id`
+-- und `mb.object_snapshots.user_id` fuehren sie als INTEGER. Fuenf Routen in
+-- `src/routes/api.js` machen daraus `parseInt(req.query.user_id, 10)`:
+--
+--   api.js   GET    /objects
+--   api.js   GET    /objects/history        <- den braucht der Co-Pilot
+--   api.js   POST   /verlauf-text
+--   api.js   GET    /reports/one
+--   api.js   DELETE /reports/:id
+--
+-- Der Proxy im Hauptbackend schickt die volle UUID
+-- (`backend/src/routes/marktbericht.js:155`, `p.set('user_id', String(req.user.id))`),
+-- und die Abfrage sucht danach eine Zahl, die in der Spalte nicht steht.
+-- ALLE FUENF ROUTEN ANTWORTEN EINEM ECHTEN NUTZER MIT HTTP 400 — seit v942.
+--
+-- Im Frontend sieht das aus wie "noch keine Marktberichte fuer dieses Objekt",
+-- also wie ein leeres Fach und nicht wie ein Defekt. Deshalb ist es niemandem
+-- aufgefallen. Der Kommentar in api.js:291 sagt es selbst:
+-- "Die nutzerbezogenen Marktbericht-Wege waren auf Produktion nie benutzbar."
+--
+-- Das trifft auch das Marktbericht-Band im Boarding
+-- (`frontend/js/deal-action-boarding.js:987`): es ruft `objects/history`,
+-- bekommt 400, und `((j && j.history) || [])` macht daraus eine leere Liste.
+--
+--
+-- GEMESSEN AUF STAGING AM 01.10.2026
+--
+--   mb.object_snapshots   122 Zeilen, 3 "Nutzer", Typ integer
+--   mb.market_reports     122 Zeilen, 3 "Nutzer", Typ integer
+--   mb.valuation_inputs                             Typ text   <- schon richtig
+--
+--   in der mb-DB   echte UUID in users                      E-Mail
+--   ------------   ------------------------------------     ------------------
+--   2      (72x)   2a1ac331-7d7f-44a5-813b-c0080ffb81c3     info@junker-immobilien.io
+--   833654 (22x)   833654ba-870b-4fe8-9de0-398c56a11d26     junker_immobilien@gmx.de
+--   1       (7x)   1c6fe29f-f83b-49bb-9a34-975462a2b7ea     majunker@gmx.net
+--   NULL   (21x)   --
+--
+-- Alle fuenf Nutzer haben VERSCHIEDENE Ziffernpraefixe: 2, 9, 6, 1, 833654.
+--
+-- `parseInt` hat die Kennung also nicht verworfen, sondern GESTUEMMELT — und
+-- damit ist die Zuordnung rekonstruierbar.
+--
+--   > Eine Kennung, die irgendwo zur Zahl wird, ist an dieser Stelle verloren.
+--   > Hier war sie es nicht ganz, und genau das macht sie reparierbar.
+--
+-- DIESE MIGRATION ORDNET NICHTS ZU. Das tut `tools/mb-uid-zuordnen.mjs`: es
+-- braucht die `users`-Tabelle aus der ANDEREN Datenbank, und es muss die
+-- Eindeutigkeit der Praefixe erst beweisen. Auf Produktion kann sie anders
+-- liegen als auf Staging.
+--
+-- Hier wandert NUR der Typ. Die alten Zahlen bleiben als Text stehen; nichts
+-- wird geloescht, nichts umgeschrieben. Die fuenf Indizes auf user_id baut
+-- Postgres beim Typwechsel selbst neu:
+--
+--   idx_obj_snap_user · idx_obj_snap_user_ref · idx_obj_snap_user_key
+--   idx_market_reports_user · ix_valuation_inputs_user (unberuehrt, schon text)
+--
+-- Freigabe von Marcel am 02.10.2026: "ja mach die migration."
+-- Sicherung vorher: /root/backups/mb-vor-migration-015-20261002-0517.sql.gz
+--   1,9 MB, enthaelt object_snapshots, market_reports und param_modell,
+--   angesehen (zcat | head).
+--
+-- KEIN BEGIN/COMMIT: `src/lib/migrate.js:41` setzt die Transaktion selbst.
+-- Ein COMMIT hier wuerde sie beenden, und der Eintrag in _mb_migrations
+-- landete ausserhalb.
+
+ALTER TABLE mb.object_snapshots
+  ALTER COLUMN user_id TYPE TEXT USING user_id::text;
+
+ALTER TABLE mb.market_reports
+  ALTER COLUMN user_id TYPE TEXT USING user_id::text;

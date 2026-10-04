@@ -113,8 +113,12 @@
       + '<p class="dpw-vor">Drei Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
       + 'und im Deckblatt - der Inhalt ist derselbe.</p>'
       + '<div class="dpw-liste">' + karten + '</div>'
+      /* v1733 · hier stand „(änderbar in den Einstellungen)". Das war eine
+         Zusage ohne Code: `vergessen()` hatte ausserhalb dieser Datei null
+         Aufrufer, und in den Einstellungen gab es nichts. Jetzt steht dort,
+         wo der Weg wirklich liegt — neben dem PDF-Knopf in der Ausgabe. */
       + '<label class="dpw-merk"><input type="checkbox" id="dpw-merken"> '
-      + 'Diese Wahl merken <span>(änderbar in den Einstellungen)</span></label>'
+      + 'Diese Wahl merken <span>(später über „Fassung" neben dem PDF-Knopf änderbar)</span></label>'
       + '</div>';
 
     document.body.appendChild(ov);
@@ -174,6 +178,14 @@
   window.DealPilotPdfWahl = {
     zeige: zeige,
     vergessen: function () { try { localStorage.removeItem(LS); } catch (e) {} },
+    /* v1733 · der eine Aufruf, den es brauchte: Merker loeschen UND fragen.
+       `zeige()` allein haette den alten Merker stehen lassen - wer dann ohne
+       Haken eine andere Fassung waehlt, bekaeme beim naechsten Mal wieder
+       die alte. */
+    neuWaehlen: function (vorauswahl) {
+      try { localStorage.removeItem(LS); } catch (e) {}
+      zeige(vorauswahl || 'bank');
+    },
     gemerkt: gemerkt,
     wahlen: WAHLEN
   };

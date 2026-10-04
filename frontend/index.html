@@ -1,4 +1,4 @@
-<!--v902-goldshades-->
+﻿<!--v902-goldshades-->
 <!--v900-accent-central-->
 <!DOCTYPE html>
 <html lang="de">
@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1723c"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1785"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -482,7 +482,7 @@ label.dp-required.qc-required::after {
 <!-- V292.6.5-cache-applied -->
 <!-- V292.6.6-cache-applied -->
 <!-- V292.6.8-cache-applied -->
-  <link rel="stylesheet" href="css/dashboard.css?v=v1705d">
+  <link rel="stylesheet" href="css/dashboard.css?v=v1737">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"><!--v922-fonts-->
 </head>
 <body>
@@ -1095,6 +1095,13 @@ label.dp-required.qc-required::after {
           </select>
         </div>
         <div class="f"><label>Vermietungsstand <button type="button" class="dp-tip" data-tip-id="tab1.vermietungsstand" tabindex="-1" aria-label="Hilfe zu tab1.vermietungsstand"></button></label><select id="vermstand"><option selected>Vollvermietet</option><option>Teilweise leer</option><option>Leer</option></select></div>
+        <!-- v1816 · Die Nutzungsart entscheidet, WELCHEN amtlichen Zinssatz
+             der Gutachterausschuss hergibt: viele fuehren getrennte Saetze fuer
+             vermietetes (we_v) und selbstgenutztes (we_s) Wohnungseigentum.
+             Standard ist VERMIETET - DealPilot ist ein Kapitalanlagerechner.
+             Der Marktbericht sucht dieses Feld bereits (app.js Z.2325), es gab
+             es in der Haupt-App nur nicht. -->
+        <div class="f"><label>Nutzungsart</label><select id="nutzungsart"><option value="kapitalanlage" selected>Vermietet (Kapitalanlage)</option><option value="eigennutzung">Selbst genutzt</option></select></div>
         <div class="f" data-v363-ausst><label>Ausstattung</label><select id="ausst"><option>Einfach</option><option selected>Normal</option><option>Gehoben</option><option>Luxus</option></select></div>
         <div class="f"><label>Exitstrategie <button type="button" class="dp-tip" data-tip-id="tab1.exitstrategie" tabindex="-1" aria-label="Hilfe zu tab1.exitstrategie"></button></label><select id="exitstr"><option selected>Langfristig halten</option><option>Verkauf nach 10 Jahren</option><option>Verkauf nach 20 Jahren</option><option>Aufwertung &amp; Verkauf</option></select></div>
       </div>
@@ -3426,7 +3433,7 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
-<script src="js/pdf-investment-bank.js?v=v1637"></script>
+<script src="js/pdf-investment-bank.js?v=v1733b"></script>
 <script src="js/bmf-modal.js?v=v1688"></script>
 <script src="js/bmf-modal-v292.js?v=v1504"></script>
 <script src="js/bmf-bodenabschlag.js?v=v1508"></script>
@@ -3456,14 +3463,14 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1708"></script>
+  <script src="js/calc.js?v=v1814"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v1457"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v1406"></script>
-<script src="js/config.js?v=v1674"></script>
+<script src="js/config.js?v=v1740b"></script>
   <script src="js/legal-links.js?v=174" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -3483,6 +3490,7 @@ label.dp-required.qc-required::after {
   <script src="js/mandanten.js?v=v1428"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v1236"></script>
   <script src="js/apikeys.js?v=811"></script>
+  <script src="js/telegram-panel.js?v=v1827"></script>
   <script src="js/settings.js?v=v1719b"></script>
 <script src="js/pricing-modal.js?v=v1674"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
@@ -3502,7 +3510,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1700d"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1608"></script>
+<script src="js/storage.js?v=v1816"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
@@ -3538,21 +3546,23 @@ label.dp-required.qc-required::after {
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1437"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v1629"></script>
+<script src="js/mfh-einheiten.js?v=v1738"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
-<script src="js/hybrid-aktionen.js?v=v1521"></script>
+<script src="js/hybrid-aktionen.js?v=v1733"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
 <script src="js/geb-ant-banner.js?v=187hotfix"></script>
 <script src="js/ai-credits.js?v=v1728"></script>
 <script src="js/workflow.js?v=v1708"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
-<script src="js/bank-charts.js?v=v1465"></script>
+<script src="js/bank-charts.js?v=v1780"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
 <script src="js/help.js?v=v1188"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
   <script src="js/dp-plan-gates.js?v=v1084"></script> <!-- v874-plan-gates -->
-  <script src="js/tour-engine.js?v=v1239"></script>
-  <script src="js/tour-content.js?v=873"></script>
+  <script src="js/tour-engine.js?v=v1782b"></script>
+  <script src="js/tour-content.js?v=v1789"></script>
+  <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
+  <script src="js/onboarding.js?v=v1776"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
@@ -3561,7 +3571,7 @@ label.dp-required.qc-required::after {
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1599"></script>
 <script src="js/deal-action-readycheck.js?v=v1622"></script>
-<script src="js/deal-action-boarding.js?v=v1731"></script>
+<script src="js/deal-action-boarding.js?v=v1748"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v1081"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
@@ -3585,18 +3595,20 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=v1676"></script>
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v1431"></script>
-<script src="js/dashboard.js?v=v1704c"></script>
-<!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
-<script src="js/portfolio-pilot.js?v=v1705d"></script>
+<script src="js/investment-profile.js?v=v1783"></script>
+<script src="js/dashboard.js?v=v1813"></script>
+<script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
+
+<!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
+<script src="js/portfolio-pilot.js?v=v1769"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=v1431"></script>
+<script src="js/main.js?v=v1740d"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1703b"></script>
+  <script src="js/object-actions.js?v=v1742"></script>
   <script src="js/dpsh-score-hero.js?v=v1640"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1637"></script>
+  <script src="js/voice-import.js?v=v1742"></script>
 </div><!-- .main-col --></div><!-- .app-wrap -->
 </form><!-- V32 dp-noform -->
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
@@ -3604,7 +3616,7 @@ label.dp-required.qc-required::after {
 
   <script src="js/register-easter-egg.js?v=v1421b" defer></script>
   <script src="credits-modal.js?v=1194"></script>
-  <script src="js/grest-plz-lookup.js?v=226"></script>
+  <script src="js/grest-plz-lookup.js?v=v1823"></script>
 
 <!-- V229: globaler PLZ-Fehler-Interceptor -->
 <script id="v229-plz-interceptor">
@@ -4016,7 +4028,10 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<script src="js/copilot.js?v=v1703c"></script>
+<script src="js/copilot.js?v=v1769"></script>
+<script src="js/dp-diktat.js?v=v1760"></script><!-- v1760 · Mikrofon fuer Textfelder -->
+<script src="js/copilot-aenderungen.js?v=v1767b"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
+<script src="js/pilot-berichte.js?v=v1769"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->
     <script src="js/rp-pdf-engine.js?v=W27"></script>
     <script src="js/reseller-portal.js?v=v1537"></script><!-- v1112b-rp-mobile -->
     <script src="js/whitelabel-override.js?v=v1698"></script>
@@ -4037,9 +4052,17 @@ document.addEventListener('DOMContentLoaded', function(){
          bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v1729"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
-    <link rel="stylesheet" href="css/layout-varianten.css?v=v1730b">
-    <script src="js/pdf-wahl.js?v=v1636"></script><!-- v1636 · Rueckfrage vor dem Export -->
-    <script src="js/layout-varianten.js?v=v1705b"></script>
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v1748">
+    <script src="js/pdf-wahl.js?v=v1733"></script><!-- v1636 · Rueckfrage vor dem Export -->
+    <script src="js/bmf-wahl.js?v=v1748"></script><!-- v1748 · Auswahl bei der Kaufpreisaufteilung -->
+    <!-- v1765 · js/pilot-sprache.js ist RAUS. Der Knopf "Aenderungen
+         diktieren" oeffnete den grossen Sprechlauf - genau das, was Marcel
+         an dieser Stelle NICHT wollte ("Du hast da wirklich den Sprechlauf
+         genommen. Das meinte ich auch nicht."). Seit v1764 nimmt der
+         Co-Pilot darunter Aenderungen im Satz entgegen; zwei Wege zum
+         selben Ziel sind einer zuviel. Die Datei bleibt im Repo, falls der
+         Sprechlauf dort doch noch gebraucht wird. -->
+    <script src="js/layout-varianten.js?v=v1748b"></script>
 <!-- v1714 - die Objektkarten-Entwuerfe zum Umschalten -->
 <script src="js/objektkarten-stil.js?v=v1724"></script>
     <script src="js/karten-stil.js?v=v1713"></script><!-- v1651 · Trichter und Bordkarte -->

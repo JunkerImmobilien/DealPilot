@@ -192,10 +192,14 @@
   }
 
   // Detail-Objekte als Array (nur erfolgreich geladene)
-  function detailArr(){
+  /* v1813: `alleTrotzAuswahl` uebergeht die Einzelobjekt-Auswahl. Sie ist
+     ein ANSICHTSFILTER — fuer den Portfolio-Spiegel, der dem Bot als
+     Tatsache gilt, darf sie nicht gelten. Gemessen: mit gesetzter Auswahl
+     schrieb der Spiegel ein Portfolio aus einem Haus. */
+  function detailArr(alleTrotzAuswahl){
     var all = wonList().map(function(o){ return _details[o.id||o.key]; }).filter(Boolean);
     all = (window.DealPilotMandanten && window.DealPilotMandanten.filterByHalter) ? window.DealPilotMandanten.filterByHalter(all) : all; /* mand-filter v803 */
-    if(_dashSelIdx>=0 && _dashSelIdx<all.length) return [all[_dashSelIdx]];   // v475: Einzelobjekt-Ansicht
+    if(!alleTrotzAuswahl && _dashSelIdx>=0 && _dashSelIdx<all.length) return [all[_dashSelIdx]];   // v475: Einzelobjekt-Ansicht
     return all;
   }
 
@@ -341,7 +345,13 @@
       : '<button class="hkpi-btn" onclick="DealPilotDashboard.showScoreUpgrade()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Volle 24-KPI-Analyse</button>';
     var catsHtml = ag.cats ? ag.cats.map(function(c){
         var sc=c.score==null?0:c.score; var w=(KPICOUNT[c.key]||0);
-        return '<div class="bar"><div class="bt"><span class="n">'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc)+'</span></div>'
+        /* v1735 \u00b7 \u201eauch die KPIs anzeigen passend" \u2014 die Score-Karte im Tab
+           Bewertung schreibt hinter jeden Wert ein kleines \u201e/100"
+           (dpsh-score-hero.js). Ohne das steht die Zahl ohne Bezug da: 61
+           kann alles heissen. Die Rohwerte, die dort zusaetzlich unter dem
+           Balken stehen (-103 EUR/Mon, DSCR 1.04), gibt es auf
+           Portfolio-Ebene nicht \u2014 sie waeren hier erfunden. */
+        return '<div class="bar"><div class="bt"><span class="n">'+esc(c.label)+'<em>'+w+' KPIs</em></span><span class="v">'+(c.score==null?'\u2013':sc+'<i>/100</i>')+'</span></div>'
           + '<div class="track"><div class="fill" data-w="'+sc+'" style="width:0;background:'+catBarColor(sc)+'"></div></div></div>';
       }).join('') : '<div class="bar" style="color:var(--c-pmut);font-family:JetBrains Mono;font-size:11px">Kategorien werden geladen\u2026</div>';
     var cfM=S.cfVsM;
@@ -447,8 +457,8 @@
   }
   /* ════ HEALTH-LEISTE (braucht Detaildaten) ════ */
   /* ══ v456: Portfolio-Uebersicht (Bestands-Hardfacts, aggregiert) ══ */
-  function aggStats(){
-    var arr=detailArr();
+  function aggStats(alleTrotzAuswahl){
+    var arr=detailArr(alleTrotzAuswahl);
     var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
     var kpSum=sum(_kpEuro);
     var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san)+num(o.moebl);});
@@ -472,10 +482,16 @@
       if(isFinite(v)){ nw+=w; nws+=v*w; }
     });
     var nettoCalc = nw>0 ? (nws/nw) : null;
+    /* v1802 · Tilgung und Zins getrennt. `kdSum` fuehrt beide zusammen als
+       Kapitaldienst — fuer den DSCR richtig, fuer die Frage "wie hoch ist
+       meine Gesamttilgung" nicht. Dieselbe Rechnung, nur einzeln. */
+    var tilgSum=sum(function(o){return num(o.d1)*num(o.d1t)/100 + num(o.d2)*num(o.d2t)/100;});
+    var zinsSum=sum(function(o){return num(o.d1)*num(o.d1z)/100 + num(o.d2)*num(o.d2z)/100;});
     return {
       n:arr.length, gi:giSum, kp:kpSum, ek:ekSum, darl:darlSum,
       mieteJ:mieteJ, mieteM:mieteJ/12, rest:rest,
       cfNsJ:cfNsJ, cfVsJ:cfVsJ, cfNsM:cfNsJ/12, cfVsM:cfVsJ/12,
+      tilgJ:tilgSum, zinsJ:zinsSum, kdJ:kdSum,
       brutto:(kpSum>0?(mieteJ/kpSum*100):null),
       netto:nettoCalc,
       dscr:(kdSum>0?(mieteJ/kdSum):null)
@@ -695,8 +711,8 @@
     return 0;
   }
 
-  function projectAll(years){
-    var arr=detailArr(); var rows=[]; var cumCf=0;
+  function projectAll(years, alleTrotzAuswahl){
+    var arr=detailArr(alleTrotzAuswahl); var rows=[]; var cumCf=0;
     /* v1397: `vuvY1` stand hier und las `_kpis_vuv` — ein Feld, das NIRGENDS
        im Frontend gesetzt wird. Die Summe war damit immer 0, und verwendet
        wurde sie ohnehin nie. Ersatzlos entfernt: toter Code, der aussieht,
@@ -704,7 +720,7 @@
     for(var i=0;i<years;i++){
       var yr=2026+i, miete=0,bwk=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
       arr.forEach(function(o){
-        /* -- v1704b � DIE PROJEKTION RECHNETE IN CENT ----------------
+        /* -- v1704b � DIE PROJEKTION RECHNETE IN CENT ----------------
            Hier stand `num(o._kaufpreis)`. Der Kommentar an der SSoT
            weiter oben sagt es ausdruecklich: `o.kp` ist EURO,
            `o._kaufpreis` ist CENT. Da alle Folgewerte aus `kp` abgeleitet
@@ -779,7 +795,7 @@
     if(typeof Chart==='undefined') return;
     destroyCharts();
     var arr=detailArr();
-    var loadingHosts=['dpc-cashflow','dpc-vermoegen','dpc-mittelverw','dpc-wealth','dpc-klumpen','dpc-steuer'];
+    var loadingHosts=['dpc-cashflow','dpc-vermoegen','dpc-bilanz','dpc-mittelverw','dpc-wealth','dpc-klumpen','dpc-steuer'];
     if(!_detailsLoaded || !arr.length){
       loadingHosts.forEach(function(id){ var c=$(id); if(c){var box=c.closest('.chart-box'); if(box)box.innerHTML='<div class="dp-chart-loading"><span class="dp-spin"></span>laden…</div>';} });
       return;
@@ -823,6 +839,42 @@
         y:{ grid:{color:gridCol,drawBorder:false}, ticks:{color:axisCol,callback:opts.money===false?undefined:function(v){return yfmt(v);}} }
       };
     }
+    /* v1736 · Endwert an die Kurve schreiben.
+       Ein Verlauf ohne Zahl zwingt zum Zielen mit der Maus - und auf dem
+       Handy gibt es keinen Hover. Beschriftet wird nur der LETZTE Punkt
+       jeder Reihe: er traegt die Aussage ("wo stehe ich am Ende"), alles
+       davor ist Weg dorthin. */
+    function _endLabel(){
+      return {
+        id: 'dpEndLabel',
+        afterDatasetsDraw: function (chart) {
+          var ctx = chart.ctx;
+          ctx.save();
+          ctx.font = '600 10px JetBrains Mono, monospace';
+          ctx.textBaseline = 'middle';
+          chart.data.datasets.forEach(function (ds, di) {
+            var meta = chart.getDatasetMeta(di);
+            if (!meta || meta.hidden || !meta.data || !meta.data.length) return;
+            var pt = meta.data[meta.data.length - 1];
+            if (!pt) return;
+            var v = ds.data[ds.data.length - 1];
+            if (typeof v !== 'number' || !isFinite(v)) return;
+            var txt = yfmt(v) + ' €';
+            var w = ctx.measureText(txt).width;
+            var x = pt.x - w - 7, y = pt.y;
+            if (x < chart.chartArea.left + 2) x = chart.chartArea.left + 2;
+            if (y < chart.chartArea.top + 8) y = chart.chartArea.top + 8;
+            if (y > chart.chartArea.bottom - 8) y = chart.chartArea.bottom - 8;
+            ctx.fillStyle = isDark() ? 'rgba(12,11,9,.82)' : 'rgba(255,255,255,.88)';
+            ctx.fillRect(x - 4, y - 8, w + 8, 16);
+            ctx.fillStyle = ds.borderColor || ds.backgroundColor || axisCol;
+            ctx.fillText(txt, x, y);
+          });
+          ctx.restore();
+        }
+      };
+    }
+
     function mk(id,cfg){ var cv=$(id); if(!cv)return; cfg.options=cfg.options||{}; cfg.options.responsive=true; cfg.options.maintainAspectRatio=false; cfg.options.devicePixelRatio=2;
       if(cfg.type!=='doughnut' && cfg.type!=='pie'){
         cfg.options.scales=cfg.options.scales||axes(cfg._axesOpts);
@@ -837,11 +889,54 @@
       {label:'CF nach St.',data:PR.map(function(r){return Math.round(r.cfNach);}),borderColor:SER[1],tension:.35,fill:false,pointRadius:0,borderWidth:2,borderDash:[5,4]}
     ]},options:{plugins:{legend:{display:true}}}});
 
-    // 2) Vermoegens-Schere (Wert vs. Restschuld)
+    /* ══ v1736 · DIE SCHERE ZEIGT JETZT, WAS ZWISCHEN IHREN SCHENKELN LIEGT ══
+       Marcel am 01.10.2026: „Die Projektion und Verlauf, schau dir mal die
+       Diagramme an. Sind die aussagekraeftig?"
+
+       Gemessen an den echten Reihen dieses Portfolios:
+
+         Immobilienwert   848.000 -> 1.235.376   (+46 %)
+         Restschuld       807.465 ->   523.625   (-35 %)
+
+       Die Schere ist also da. Sie war nur nicht zu sehen: beide Linien
+       liegen im oberen Drittel einer Achse, die bei null beginnt, und
+       wirken dadurch flach und parallel.
+
+       > Die Aussage dieses Bildes ist nicht der Verlauf der zwei Linien,
+       > sondern der Abstand zwischen ihnen. Genau der war unsichtbar.
+
+       Dieser Abstand IST das Eigenkapital (`r.eq`). Er wird jetzt
+       ausgefuellt - `fill:'+1'` faerbt bis zur naechsten Reihe - und am
+       rechten Rand beschriftet. Gerechnet wird nichts Neues; sichtbar
+       gemacht wird, was die Reihen ohnehin hergeben. */
     mk('dpc-vermoegen',{type:'line',data:{labels:labels,datasets:[
-      {label:'Immobilienwert',data:PR.map(function(r){return Math.round(r.wert);}),borderColor:SER[0],backgroundColor:SER[0]+'18',tension:.3,fill:true,pointRadius:0,borderWidth:2},
+      {label:'Immobilienwert',data:PR.map(function(r){return Math.round(r.wert);}),borderColor:SER[0],backgroundColor:SER[0]+'2E',tension:.3,fill:'+1',pointRadius:0,borderWidth:2.2},
       {label:'Restschuld',data:PR.map(function(r){return Math.round(r.rest);}),borderColor:isDark()?SER[2]:'#2A2727',tension:.3,fill:false,pointRadius:0,borderWidth:2}
-    ]},options:{plugins:{legend:{display:true}}}});
+    ]},options:{plugins:{legend:{display:true}}},plugins:[_endLabel()]});
+
+    /* ══ v1736 · VERMOEGENSBILANZ ══
+       Marcel: „Vielleicht auch was in Richtung Vermoegensbilanz und
+       Portfolio-Entwicklung?"
+
+       Die Daten dafuer lagen bereits vor - `portfolioPayload()` fuehrt
+       einen Zweig `vermoegensbilanz`, und die Projektion traegt je Jahr
+       `objektwert_eur`, `restschuld_eur` UND `eigenkapital_eur`. Gezeigt
+       wurde davon nichts; gebaut wird hier also keine neue Rechnung,
+       sondern die Ansicht einer vorhandenen.
+
+       Die Schere sagt, WIE WEIT Wert und Schuld auseinanderlaufen. Die
+       Bilanz sagt, WORAUS das Vermoegen besteht: gestapelt ergeben
+       Eigen- und Fremdkapital genau den Objektwert - die Grundgleichung
+       jeder Bilanz. Man sieht den goldenen Teil wachsen und den dunklen
+       schrumpfen, in derselben Saeule. */
+    var _bi = Math.max(1, Math.ceil(_projYears / 10));
+    var _bPR = PR.filter(function (_, i) { return i % _bi === 0; });
+    var _bLab = labels.filter(function (_, i) { return i % _bi === 0; });
+    var _bAxes = axes(); _bAxes.x.stacked = true; _bAxes.y.stacked = true;
+    mk('dpc-bilanz',{type:'bar',data:{labels:_bLab,datasets:[
+      {label:'Eigenkapital',data:_bPR.map(function(r){return Math.round(r.eq);}),backgroundColor:SER[0],borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4},stack:'bil'},
+      {label:'Restschuld',data:_bPR.map(function(r){return Math.round(r.rest);}),backgroundColor:isDark()?'rgba(232,226,212,.22)':'rgba(42,39,39,.72)',borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0},stack:'bil'}
+    ]},options:{scales:_bAxes,plugins:{legend:{display:true}}}});
 
     // 3) Mittelverwendung Jahr 1 (Bars)
     var p0=PR[0]||{};
@@ -1587,10 +1682,33 @@
       ? '<div class="kc-share"><a class="qb" href="'+(((window.location&&location.origin)?location.origin:'')+'/pass.html?c='+pass.code)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+_qrSvg(((window.location&&location.origin)?location.origin:'')+'/pass.html?c='+pass.code,3)+'</a>'
         + '<div class="si">Geteilter Pass<br><b>'+esc(pass.code)+'</b><br>'+_passRest(pass.expires_at)+' Restlaufzeit</div></div>'
       : '<div class="cta"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8h16v-8M12 3v13m0-13l-4 4m4-4l4 4"/></svg>Quick Boarding teilen \u2192 QR erscheint</div>';
+    /* \u2550\u2550 v1737 \u00b7 DER KNOPF \u201eBANK" LUD DIE KAUFPREISAUFTEILUNG \u2550\u2550
+       Gefunden beim Messen der Handy-Breite, nicht gesucht: vier Knoepfe in
+       einem `flex`-Container mit `nowrap` liefen bei 390 px um 25 px aus
+       der Karte. Beim Nachsehen, welcher Knopf da ueberhaupt steht, fiel
+       der eigentliche Fehler auf.
+
+       `_runPdf('bank')` klapperte vier moegliche Funktionsnamen ab:
+
+         ['exportBmfPdf','exportBankPdf','exportBankenPdf','exportBankPDF']
+
+       Gemessen existieren davon ZWEI \u2014 die erste und die letzte. Genommen
+       wird die erste, und das ist `exportBmfPdf` aus `bmf-modal.js`: die
+       KAUFPREISAUFTEILUNG fuers Finanzamt. Die Bankfassung ist
+       `exportBankPDF` (calc.js) bzw. heute `exportPDFBank`.
+
+       > Auf dem Knopf stand Bank, geliefert wurde Finanzamt. Eine Liste
+       > von Namen, die \u201erobust" sein soll, trifft genau dann zuverlaessig
+       > das Falsche, wenn mehr als einer existiert.
+
+       Der Knopf entfaellt \u2014 konsistent zu v1733: \u201eInvestment" ruft
+       `exportPDF`, und das ist seit v1636 umhuellt, fragt also nach der
+       Fassung (Bank / hell / Obsidian). Ein eigener Bank-Knopf beschreibt
+       denselben Weg ein zweites Mal. Nebenbei passen drei Knoepfe auf
+       390 px, vier nicht. */
     var pdfs='<div class="pdfs">'+'<button class="kc-openbtn" onclick="event.stopPropagation();DealPilotDashboard.openObject(\''+esc(k)+'\')">Objekt \u00f6ffnen</button>'
       + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'invest\')">'+_dl()+'Investment</button>'
       + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'wk\')">'+_dl()+'Werbungsk.</button>'
-      + '<button onclick="event.stopPropagation();DealPilotDashboard.cardPdf(\''+esc(k)+'\',\'bank\')">'+_dl()+'Bank</button>'
       + '</div>';
     return '<div class="kc '+tcls+'" onclick="this.classList.toggle(\'open\')">'
       + '<div class="kc-flat"><div class="nm">'+nm+'<small>'+meta+'</small></div>'
@@ -1677,12 +1795,14 @@
       if(fnInv){ try{ fnInv(); }catch(e){} }
       else if(typeof window.toast==='function') window.toast('Investment-PDF-Funktion nicht verfuegbar');
     } else if(typ==='bank'){
-      // Bankexport: mehrere moegliche Funktionsnamen abklappern (robust)
-      var fnBank=null, names=['exportBmfPdf','exportBankPdf','exportBankenPdf','exportBankPDF'];
-      for(var n=0;n<names.length;n++){
-        if(typeof window[names[n]]==='function'){ fnBank=window[names[n]]; break; }
-        try{ if(typeof eval(names[n])==='function'){ fnBank=eval(names[n]); break; } }catch(e){}
-      }
+      /* v1737 · Hier klapperte eine Namensliste vier Kandidaten ab und nahm
+         den ersten Treffer — `exportBmfPdf`, also die Kaufpreisaufteilung
+         fuers Finanzamt. Auf dem Knopf stand „Bank". Der Knopf ist weg;
+         der Zweig bleibt fuer Altaufrufer und ruft jetzt die RICHTIGE
+         Funktion, mit `exportPDFBank` zuerst (seit v1636 umhuellt, fragt
+         also nach der Fassung). Das `eval()` entfaellt mit. */
+      var fnBank = (typeof window.exportPDFBank === 'function') ? window.exportPDFBank
+                 : (typeof window.exportBankPDF === 'function') ? window.exportBankPDF : null;
       if(fnBank){ try{ fnBank(); }catch(e){} }
       else if(typeof window.toast==='function') window.toast('Bankexport-Funktion nicht verfuegbar');
     } else if(typ==='wk-single' || typ==='wk-all'){
@@ -1862,7 +1982,10 @@
       + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">06</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
       + '<div class="charts">'
       + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','\u20ac/Jahr')
-      + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld','Mio \u20ac')
+      + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld \u2014 die F\u00e4rbung dazwischen ist dein Eigenkapital','Mio \u20ac')
+      /* v1736 \u00b7 die Bilanz neben der Schere: dieselben Zahlen, andere Frage.
+         Die Schere zeigt den Abstand, die Bilanz die Zusammensetzung. */
+      + chartCard('dpc-bilanz','M3 21h18M5 21V9h4v12M13 21V5h4v16','Verm\u00f6gensbilanz','Eigenkapital und Restschuld ergeben den Objektwert','gestapelt',true)
       + chartCard('dpc-mittelverw','M4 20V10M10 20V4M16 20v-7M22 20H2','Mittelverwendung','Jahr 1','Allokation')
       + chartCard('dpc-wealth','M3 21h18M6 21V9l6-4 6 4v12','Wealth-Stacks','Eigenkapital-Aufbau','Aufbau',true)
       + chartCard('dpc-klumpen','M12 2a10 10 0 1 0 10 10H12z','Klumpenrisiko','Volumen nach Lage','Diversifikation')
@@ -1898,7 +2021,10 @@
          KStG), sondern Bilanz und GuV. Deshalb ein EIGENER Abschnitt und
          kein Haken an der Mappe: es sind zwei verschiedene Dokumente fuer
          zwei verschiedene Steuerarten, nicht zwei Fassungen desselben. */
-      + '<div class="sl"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
+      /* v1735 · die Ueberschrift bekommt eine ID, damit sie zusammen mit der
+         Box verschwinden kann — ohne sie bliebe eine Sektionsnummer ohne
+         Inhalt stehen. */
+      + '<div class="sl" id="dp-abschluss-sl"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe" id="dp-abschluss-box">'
       +   '<div class="dp-mappe-t">Für Objekte, die einer <b>GmbH oder UG</b> gehören: Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu ein Anlagenspiegel je Objekt.</div>'
       +   '<div class="dp-mappe-r" id="dp-abschluss-r">'
@@ -2183,9 +2309,31 @@
   /* ════ v1227 · Jahresabschluss — Gesellschaften und Jahre laden ════
      Gefuellt wird aus dem, was WIRKLICH da ist: Mandanten mit Rechtsform
      GmbH oder UG, und je Gesellschaft die Jahre, fuer die Steuersaetze zu
-     ihren Objekten vorliegen. Gibt es keine Gesellschaft, verschwindet der
-     Abschnitt NICHT — er sagt, warum er leer ist. Ein verschwundener
-     Abschnitt sieht aus wie ein fehlendes Feature. */
+     ihren Objekten vorliegen.
+
+     ── v1735 · HIER GALT BIS ZUM 01.10.2026 DAS GEGENTEIL ──────────────
+     Es stand: „Gibt es keine Gesellschaft, verschwindet der Abschnitt
+     NICHT — er sagt, warum er leer ist. Ein verschwundener Abschnitt
+     sieht aus wie ein fehlendes Feature."
+
+     Marcel am 01.10.2026: „Beim Portfolio Cockpit sollte der
+     Jahresabschluss erst erscheinen, wenn wir wirklich eine Gesellschaft
+     haben."
+
+     Das Argument von damals stimmt weiterhin — nur wiegt es hier anders
+     als angenommen. Es greift bei einem Feature, das der Nutzer SUCHEN
+     koennte. Bilanz und GuV nach § 8 Abs. 2 KStG sucht niemand, der
+     privat vermietet: fuer ihn ist der Abschnitt keine Information,
+     sondern eine Zeile, die er jedes Mal ueberliest und die seine
+     Sektionsnummern verschiebt.
+
+     > Ein Hinweis auf etwas, das den Leser nichts angeht, ist kein
+     > Hinweis, sondern Rauschen. Er kostet jeden Blick, den er bekommt,
+     > und zahlt nur an die wenigen zurueck, die ohnehin eine GmbH haben.
+
+     Der Weg dorthin geht nicht verloren: Einstellungen / Mandanten legt
+     die Gesellschaft an, und sobald eine existiert, ist der Abschnitt
+     da — mitsamt Ueberschrift. */
   async function _abschlussInit() {
     var box = document.getElementById('dp-abschluss-box');
     var reihe = document.getElementById('dp-abschluss-r');
@@ -2197,13 +2345,15 @@
         .filter(function (m) { return DealPilotMandanten.isCorp(m.rechtsform); });
     } catch (e) {}
 
+    var sl = document.getElementById('dp-abschluss-sl');
     if (!corps.length) {
-      reihe.innerHTML = '<div style="font-size:12.5px;opacity:.75;line-height:1.55">'
-        + 'Es ist noch keine Gesellschaft angelegt. Unter <b>Einstellungen / Mandanten</b> '
-        + 'eine GmbH oder UG anlegen und die Objekte dort als Halter zuordnen — danach '
-        + 'erscheint hier die Auswahl.</div>';
+      /* v1735 · ganz weg, Ueberschrift mit — sonst steht Sektion 09 leer da */
+      box.style.display = 'none';
+      if (sl) sl.style.display = 'none';
       return;
     }
+    box.style.display = '';
+    if (sl) sl.style.display = '';
 
     var mSel = document.getElementById('dp-abschluss-mand');
     mSel.innerHTML = corps.map(function (m) {
@@ -2322,14 +2472,22 @@
   }
 
   function portfolioPayload() {
-    var arr = detailArr();
-    var a = aggStats();
+    /* v1813 · IMMER das ganze Portfolio, auch wenn im Cockpit gerade ein
+       einzelnes Objekt ausgewaehlt ist. */
+    var arr = detailArr(true);
+    var a = aggStats(true);
 
     var objekte = arr.slice(0, PP_MAX_OBJEKTE).map(function (o, i) {
       var kp = _kpEuro(o);
       var mieteJ = _ppZahl(o._kpis_miete_j);
       if (mieteJ == null) { var mm = num(o.nkm) + num(o.ze); mieteJ = mm > 0 ? mm * 12 : null; }
       return {
+        /* v1813 · DIE ID IST DIE REFERENZ, NICHT DIE NUMMER.
+           Gemessen: Bot-Liste Nr 8 und Spiegel nr 8 sind verschiedene
+           Haeuser, und zwei Objekte tragen denselben Namen. Ohne diese
+           Zeile beantwortet der Bot eine Frage zum falschen Objekt — und
+           die Antwort sieht aus wie die richtige. */
+        id: o._key || (o._sum && (o._sum.id || o._sum.key)) || null,
         nr: i + 1,
         name: o.name || o._name || null,
         ort: o.ort || null,
@@ -2345,6 +2503,27 @@
         restschuld_eur: Math.round(_restschuldOf(o)) || null,
         zins_prozent: _ppZahl(o.d1z),
         tilgung_prozent: _ppZahl(o.d1t),
+        /* v1802 · DIE TILGUNG IN EURO, NICHT NUR IN PROZENT.
+           Marcel fragte den Bot nach der "Gesamttilgung aller Objekte".
+           Er bekam eine Liste von Prozentsaetzen und die Rueckfrage, ob
+           er rechnen solle — denn aus "1 %" allein wird keine Summe.
+
+           > Eine Zahl, die das Modell jedes Mal neu ausrechnet, ist jedes
+           > Mal eine neue Gelegenheit, sie anders auszurechnen. Was
+           > benannt ist, wird gelesen; was gelesen wird, stimmt.
+
+           Gerechnet wird hier, wo auch alles andere gerechnet wird — der
+           anfaengliche Tilgungsbetrag ist Darlehenssumme mal Satz. Beide
+           Darlehen werden einzeln genommen, weil sie verschiedene Saetze
+           haben koennen. */
+        tilgung_eur_jahr: (function () {
+          var t = num(o.d1) * num(o.d1t) / 100 + num(o.d2) * num(o.d2t) / 100;
+          return t > 0 ? Math.round(t) : null;
+        })(),
+        zins_eur_jahr: (function () {
+          var z = num(o.d1) * num(o.d1z) / 100 + num(o.d2) * num(o.d2z) / 100;
+          return z > 0 ? Math.round(z) : null;
+        })(),
         zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,
         dscr: _ppZahl(o._kpis_dscr),
         ltv_prozent: _ppZahl(o.ltv) != null ? _ppZahl(o.ltv) : _ppZahl(o._kpis_ltv),
@@ -2358,7 +2537,7 @@
        Wer zehn Zeilen liest, sieht dieselbe Kurve wie bei dreissig. */
     var proj = null;
     try {
-      var p = projectAll(10);
+      var p = projectAll(10, true);
       if (Array.isArray(p) && p.length) {
         proj = [1, 5, 10].map(function (j) {
           var z = p[j - 1] || p[p.length - 1];
@@ -2389,6 +2568,14 @@
         eigenkapital_eingesetzt_eur: Math.round(a.ek) || null,
         darlehen_aufgenommen_eur: Math.round(a.darl) || null,
         restschuld_heute_eur: Math.round(a.rest) || null,
+        /* v1802 · Dieselbe Zahl unter dem Namen, unter dem Marcel danach
+           fragt. "Aktuelle Verbindlichkeiten" IST die Restschuld — aber
+           wer so fragt, soll nicht darauf angewiesen sein, dass ein
+           Modell die Gleichsetzung errät. */
+        verbindlichkeiten_eur: Math.round(a.rest) || null,
+        tilgung_eur_jahr: Math.round(a.tilgJ) || null,
+        zins_eur_jahr: Math.round(a.zinsJ) || null,
+        kapitaldienst_eur_jahr: Math.round(a.kdJ) || null,
         miete_kalt_eur_jahr: Math.round(a.mieteJ) || null,
         miete_kalt_eur_monat: Math.round(a.mieteM) || null,
         cashflow_nach_steuer_eur_jahr: Math.round(a.cfNsJ) || null,
@@ -2406,6 +2593,43 @@
   window.DealPilotDashboard = {
     /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
     portfolioPayload: portfolioPayload,
+    /* v1793 · GEMESSEN: portfolioPayload() gibt 0 Objekte zurueck, solange
+       das Dashboard nicht einmal offen war. Grund ist `_details` - ein
+       Cache, den nur `loadDetails()` fuellt, und das lief bisher
+       ausschliesslich in `openDashboard`. Am 02.10.2026 auf Staging
+       gemessen: 17 Karten in der Seitenleiste, 9 davon gewonnen,
+       `anzahl_objekte: 0`.
+
+       > Eine Funktion, die ohne Vorbereitung eine PLAUSIBLE Null liefert,
+       > ist gefaehrlicher als eine, die wirft. Der Portfolio-Spiegel
+       > haette eine leere Vermoegensbilanz abgelegt, und der Bot haette
+       > "du hast kein Portfolio" gesagt.
+
+       Deshalb geht der Lader mit nach aussen. `portfolioPayload()` bleibt
+       unveraendert synchron - wer die Zahlen will, laedt vorher.
+
+       v1793b · UND ZWAR DIE GANZE KETTE. Mein erster Versuch exportierte
+       nur `loadDetails` - danach stand da immer noch 0, weil die Kette
+       einen Schritt frueher beginnt:
+
+         loadSummaries()  fuellt _summaries  (die Liste vom Server)
+              v
+         wonList()        filtert auf 'won'
+              v
+         loadDetails()    fuellt _details    (die vollen Datensaetze)
+              v
+         detailArr()      -> aggStats() -> portfolioPayload()
+
+       > Eine Vorbereitung auf jedem Einzelschritt ergibt keine
+       > Vorbereitung auf dem Ganzen. Wer nur den letzten Schritt
+       > exportiert, laedt Details zu einer Liste, die es noch nicht gibt -
+       > und bekommt wieder eine plausible Null.
+
+       Deshalb EINE Funktion, die beides tut. Sie laesst sich nicht
+       halb aufrufen. */
+    portfolioLaden: function () {
+      return loadSummaries().then(function () { return loadDetails(); });
+    },
     open: openDashboard, close: closeDashboard,
     setProjYears: setProjYears, setCardView: setCardView,
     steuerMappe: steuerMappe,   /* v1215-mappe */

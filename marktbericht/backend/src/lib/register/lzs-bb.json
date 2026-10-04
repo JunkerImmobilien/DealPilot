@@ -1,0 +1,920 @@
+[
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_bu",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 3.2,
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 3.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berliner Umland ohne Potsdam",
+   "sachlich": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 7",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 3,2 % (0,4 % - 5,6 %), 75 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 75
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 75,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 7, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": 0.4,
+   "max_pct": 5.6
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_wm",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 3.5,
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 3.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weiterer Metropolenraum ohne kreisfreie Städte",
+   "sachlich": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 8",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 3,5 %, 265 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 265
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 265,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 8, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_kf",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 2.8,
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 2.8,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "kreisfreie Städte ohne Potsdam",
+   "sachlich": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 10",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 2,8 % (-0,8 % - 5,9 %), 79 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 79
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 79,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 10, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": -0.8,
+   "max_pct": 5.9
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh_bu",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 3.7,
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 3.7,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berliner Umland ohne Potsdam",
+   "sachlich": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 12",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 3,7 %, 30 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 30
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 30,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 12, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh_wm",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 4.6,
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 4.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weiterer Metropolenraum ohne kreisfreie Städte",
+   "sachlich": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 13",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 4,6 % (-0,9 % - 9,7 %), 66 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 66
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 66,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 13, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": -0.9,
+   "max_pct": 9.7
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh_kf",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 3.4,
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 3.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "kreisfreie Städte ohne Potsdam",
+   "sachlich": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 14",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 3,4 %, 16 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 16
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 16,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 14, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gh_land",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 4.5,
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 4.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Land Brandenburg",
+   "sachlich": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 17",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 4,5 % (-0,2 % - 9 %), 24 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 24
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 24,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 17, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": -0.2,
+   "max_pct": 9
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gh_bu",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 4.3,
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 4.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berliner Umland",
+   "sachlich": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 18",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 4,3 %, 17 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 17
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 17,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 18, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gh_wm",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 5.3,
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 5.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weiterer Metropolenraum",
+   "sachlich": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 19",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 5,3 %, 8 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 8
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 8,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 19, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "indwb_bu",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 2.4,
+   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "wert": 2.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berliner Umland",
+   "sachlich": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 22",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 2,4 % (0,3 % - 4,8 %), 119 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 119
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 119,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 22, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": 0.3,
+   "max_pct": 4.8
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "indwb_wm",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 2.9,
+   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "wert": 2.9,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weiterer Metropolenraum",
+   "sachlich": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 24",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 2,9 % (-0,4 % - 10 %), 64 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 64
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 64,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 24, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": -0.4,
+   "max_pct": 10
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_bu",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 2.5,
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 2.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berliner Umland ohne Potsdam",
+   "sachlich": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 27",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 2,5 % (0,1 % - 5,4 %), 549 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 549
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 549,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 27, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": 0.1,
+   "max_pct": 5.4
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_wm",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 3.2,
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 3.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weiterer Metropolenraum ohne kreisfreie Städte",
+   "sachlich": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 29",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 3,2 % (0,6 % - 7,7 %), 214 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 214
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 214,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 29, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": 0.6,
+   "max_pct": 7.7
+  }
+ },
+ {
+  "land_code": "BB",
+  "ags": "12",
+  "ebene": "land",
+  "gebiet_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_kf",
+  "formel": {
+   "form": "konstante",
+   "wert_pct": 1.6,
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 1.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "verwaltungskosten_wohnung_eur": 359,
+   "verwaltungskosten_etw_eur": 429,
+   "verwaltungskosten_garage_eur": 47,
+   "verwaltungskosten_gewerbe_pct_rohertrag": 3,
+   "instandhaltung_eur_qm_wohnflaeche": 14,
+   "instandhaltung_eur_parkplatz": 106,
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "kosten_stichtag": "2025-01-01",
+   "selektion": {
+    "rnd_min_jahre": 20,
+    "bodenwertanteil_max_pct": 80,
+    "rohertragsfaktor_min": 5,
+    "miete_min_eur_qm": 2
+   },
+   "kps_stichtag": "2026-02-27"
+  },
+  "geltungsbereich": {
+   "raeumlich": "kreisfreie Städte ohne Potsdam",
+   "sachlich": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Raumkategorie, nicht Kreis. Zuordnung über den Gemeindeschlüssel nach Anlage 2 des Dokuments (S. 35-36, Gemeindeliste Berliner Umland)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssätze 2025 Land Brandenburg, S. 30",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz 1,6 % (-1,6 % - 4,3 %), 46 Kauffälle, Datenbasis 2023-2025, Stichtag 01.07.2024",
+    "kauffaelle": 46
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 46,
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LIZI 2025 OGA BB",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
+  "quelle_parser": "v1757-BBLZS",
+  "quellenvermerk": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Liegenschaftszinssätze 2025 Land Brandenburg",
+  "lizenz": null,
+  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
+  "fundstelle": "S. 30, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "streuung": {
+   "min_pct": -1.6,
+   "max_pct": 4.3
+  }
+ }
+]

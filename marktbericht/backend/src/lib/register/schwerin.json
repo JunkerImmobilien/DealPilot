@@ -1,0 +1,1252 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "bau_unterhaltungszustand",
+   "achse_k_bez": "Bau- und Unterhaltungszustand (gut / befriedigend); „Gesamt\" ist der Rückfall",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "kategorien": [
+    "gut",
+    "befriedigend",
+    "Gesamt"
+   ],
+   "stufen": {
+    "gut": 3,
+    "befriedigend": 2.7,
+    "Gesamt": 2.9
+   },
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Die Spalte „Gesamt\" ist der Rückfall, wenn die Kategorie nicht bestimmbar ist — sie steht so im Bericht und ist kein Mittelwert von mir.",
+   "stufen_spannen_pct": {
+    "gut": [
+     1.9,
+     3.7
+    ],
+    "befriedigend": [
+     1.6,
+     3.7
+    ],
+    "Gesamt": [
+     1.8,
+     3.7
+    ]
+   },
+   "stufen_fallzahl": {
+    "gut": 32,
+    "befriedigend": 22,
+    "Gesamt": 54
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": {
+     "gut": 170,
+     "befriedigend": 160,
+     "Gesamt": 165
+    },
+    "preis_eur_qm_wohn_nutzflaeche": {
+     "gut": 1510,
+     "befriedigend": 1270,
+     "Gesamt": 1410
+    },
+    "restnutzungsdauer_jahre": {
+     "gut": 39,
+     "befriedigend": 30,
+     "Gesamt": 35
+    },
+    "wohnflaeche_qm": {
+     "gut": 530,
+     "befriedigend": 470,
+     "Gesamt": 530
+    },
+    "reinertragsfaktor": {
+     "gut": [
+      23,
+      21,
+      26
+     ],
+     "befriedigend": [
+      21,
+      19,
+      25
+     ],
+     "Gesamt": [
+      22,
+      20,
+      26
+     ]
+    },
+    "rohertragsfaktor": {
+     "gut": [
+      17,
+      15,
+      19
+     ],
+     "befriedigend": [
+      15,
+      14,
+      17
+     ],
+     "Gesamt": [
+      16,
+      15,
+      19
+     ]
+    },
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]. Rein- und Rohertragsfaktor sind KEINE Kennzahl des Registers und stehen nur als Modellbegleitung hier."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne.",
+   "sachlich": "Mehrfamilienhäuser"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Mehrfamilienhäuser\"",
+    "wortlaut": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (Tabellen S. 61): Mehrfamilienhäuser — Liegenschaftszinssatz je Kategorie mit 2/3-Spanne und Anzahl der Kauffälle. Spaltentreu gelesen (pdftotext -table), nicht aus dem Textstrom.",
+    "pruefprotokoll": "Drei unabhängige Gegenproben am 01.10.2026: (1) ZEILENZUORDNUNG — die Anzahl der Kauffälle addiert sich über die Kategorien auf die Spalte „Gesamt\" (MFH 32+22=54, WGH 8+13=21). (2) DEFINITIONSPROBE — in der WGH-Tabelle trägt die Spalte „> 300 €/m²\" den Bodenrichtwert 610 und die Spalte „< 300 €/m²\" den Bodenrichtwert 180; die Zeile sitzt also richtig. (3) VERVIELFÄLTIGER-PROBE — für MFH gesamt ergibt (1−1,029^−35)/0,029 = 21,8, abgedruckt ist ein Reinertragsfaktor von 22. Bei den übrigen Teilmärkten liegt der abgedruckte Reinertragsfaktor systematisch 1 bis 3 Punkte höher als der reine Barwertfaktor; das ist der Bodenwertanteil und kein Lesefehler. Ein durchgerechnetes Anwendungsbeispiel enthält der Bericht nicht.",
+    "quotenprobe": "Rohertragsfaktor / Reinertragsfaktor = 1 − Bewirtschaftungskostenquote. Ausgerechnet ergibt das 26,1 / 28,6 / 27,3 % (MFH), 22,2 / 28,0 / 27,3 % (WGH), 25,0 / 25,0 / 30,8 / 33,3 % (ETW) und 20,6 % (individueller Wohnungsbau) — durchgehend plausible Größenordnungen, die die Zuordnung der drei Faktorzeilen zueinander stützen."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 54,
+  "stichtag": "2025-01-01",
+  "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Mehrfamilienhäuser\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "bodenrichtwertniveau",
+   "achse_k_bez": "Lage nach Bodenrichtwertniveau (> 300 €/m² bzw. < 300 €/m²); „Gesamt\" ist der Rückfall",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "kategorien": [
+    "ueber_300",
+    "unter_300",
+    "Gesamt"
+   ],
+   "stufen": {
+    "ueber_300": 4.5,
+    "unter_300": 2.4,
+    "Gesamt": 3.3
+   },
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Die Spalte „Gesamt\" ist der Rückfall, wenn die Kategorie nicht bestimmbar ist — sie steht so im Bericht und ist kein Mittelwert von mir.",
+   "stufen_spannen_pct": {
+    "ueber_300": [
+     4,
+     5.1
+    ],
+    "unter_300": [
+     0.7,
+     3.6
+    ],
+    "Gesamt": [
+     1.8,
+     4.7
+    ]
+   },
+   "stufen_fallzahl": {
+    "ueber_300": 8,
+    "unter_300": 13,
+    "Gesamt": 21
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": {
+     "ueber_300": 610,
+     "unter_300": 180,
+     "Gesamt": 340
+    },
+    "preis_eur_qm_wohn_nutzflaeche": {
+     "ueber_300": 1660,
+     "unter_300": 1600,
+     "Gesamt": 1620
+    },
+    "restnutzungsdauer_jahre": {
+     "ueber_300": 33,
+     "unter_300": 35,
+     "Gesamt": 34
+    },
+    "wohn_nutzflaeche_qm": {
+     "ueber_300": 740,
+     "unter_300": 450,
+     "Gesamt": 560
+    },
+    "gewerblicher_flaechenanteil_pct": {
+     "ueber_300": 48,
+     "unter_300": 29,
+     "Gesamt": 36
+    },
+    "reinertragsfaktor": {
+     "ueber_300": [
+      18,
+      16,
+      22
+     ],
+     "unter_300": [
+      25,
+      19,
+      30
+     ],
+     "Gesamt": [
+      22,
+      17,
+      29
+     ]
+    },
+    "rohertragsfaktor": {
+     "ueber_300": [
+      14,
+      13,
+      16
+     ],
+     "unter_300": [
+      18,
+      14,
+      21
+     ],
+     "Gesamt": [
+      16,
+      13,
+      20
+     ]
+    },
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne.",
+   "sachlich": "Wohn- und Geschäftshäuser (Bau- und Unterhaltungszustand sehr gut und gut)"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Wohn- und Geschäftshäuser\"",
+    "wortlaut": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (Tabellen S. 61): Wohn- und Geschäftshäuser (Bau- und Unterhaltungszustand sehr gut und gut) — Liegenschaftszinssatz je Kategorie mit 2/3-Spanne und Anzahl der Kauffälle. Spaltentreu gelesen (pdftotext -table), nicht aus dem Textstrom.",
+    "pruefprotokoll": "Drei unabhängige Gegenproben am 01.10.2026: (1) ZEILENZUORDNUNG — die Anzahl der Kauffälle addiert sich über die Kategorien auf die Spalte „Gesamt\" (MFH 32+22=54, WGH 8+13=21). (2) DEFINITIONSPROBE — in der WGH-Tabelle trägt die Spalte „> 300 €/m²\" den Bodenrichtwert 610 und die Spalte „< 300 €/m²\" den Bodenrichtwert 180; die Zeile sitzt also richtig. (3) VERVIELFÄLTIGER-PROBE — für MFH gesamt ergibt (1−1,029^−35)/0,029 = 21,8, abgedruckt ist ein Reinertragsfaktor von 22. Bei den übrigen Teilmärkten liegt der abgedruckte Reinertragsfaktor systematisch 1 bis 3 Punkte höher als der reine Barwertfaktor; das ist der Bodenwertanteil und kein Lesefehler. Ein durchgerechnetes Anwendungsbeispiel enthält der Bericht nicht.",
+    "quotenprobe": "Rohertragsfaktor / Reinertragsfaktor = 1 − Bewirtschaftungskostenquote. Ausgerechnet ergibt das 26,1 / 28,6 / 27,3 % (MFH), 22,2 / 28,0 / 27,3 % (WGH), 25,0 / 25,0 / 30,8 / 33,3 % (ETW) und 20,6 % (individueller Wohnungsbau) — durchgehend plausible Größenordnungen, die die Zuordnung der drei Faktorzeilen zueinander stützen."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 21,
+  "stichtag": "2025-01-01",
+  "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Wohn- und Geschäftshäuser\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "formel": {
+   "form": "stufen_kategorial",
+   "liefert": "prozent",
+   "achse_k_feld": "etw_klasse",
+   "achse_k_bez": "Teilmarkt der Eigentumswohnung (Altbau > 45 m² bis 1949 saniert / Neubau > 45 m² ab 1991 / Wohnung < 45 m² / komplexer Wohnungsbau). Eine Spalte „Gesamt\" druckt der Bericht hier NICHT — ohne Zuordnung gibt es keinen Wert.",
+   "rundung_stellen": 1,
+   "interpolation": "keine — kategoriale Nachschlagetabelle",
+   "kategorien": [
+    "altbau_ueber45",
+    "neubau_ueber45",
+    "wohnung_unter45",
+    "komplexer_wohnungsbau"
+   ],
+   "stufen": {
+    "altbau_ueber45": 0.8,
+    "neubau_ueber45": 1.9,
+    "wohnung_unter45": 2.9,
+    "komplexer_wohnungsbau": 1
+   },
+   "stufen_hinweis": "Ergebnis in PROZENT (3,0 bedeutet 3,0 %), nicht als Dezimalbruch. Die Spalte „Gesamt\" ist der Rückfall, wenn die Kategorie nicht bestimmbar ist — sie steht so im Bericht und ist kein Mittelwert von mir.",
+   "stufen_spannen_pct": {
+    "altbau_ueber45": [
+     -0.4,
+     2.1
+    ],
+    "neubau_ueber45": [
+     1.1,
+     2.8
+    ],
+    "wohnung_unter45": [
+     1.4,
+     4.5
+    ],
+    "komplexer_wohnungsbau": [
+     -0.6,
+     2.6
+    ]
+   },
+   "stufen_fallzahl": {
+    "altbau_ueber45": 93,
+    "neubau_ueber45": 154,
+    "wohnung_unter45": 30,
+    "komplexer_wohnungsbau": 30
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": {
+     "altbau_ueber45": 225,
+     "neubau_ueber45": 171,
+     "wohnung_unter45": 142,
+     "komplexer_wohnungsbau": 89
+    },
+    "preis_eur_qm_wohnflaeche": {
+     "altbau_ueber45": 2070,
+     "neubau_ueber45": 2438,
+     "wohnung_unter45": 1493,
+     "komplexer_wohnungsbau": 1420
+    },
+    "restnutzungsdauer_jahre": {
+     "altbau_ueber45": 34,
+     "neubau_ueber45": 57,
+     "wohnung_unter45": 46,
+     "komplexer_wohnungsbau": 32
+    },
+    "wohnflaeche_qm": {
+     "altbau_ueber45": 81,
+     "neubau_ueber45": 74,
+     "wohnung_unter45": 39,
+     "komplexer_wohnungsbau": 61
+    },
+    "reinertragsfaktor": {
+     "altbau_ueber45": [
+      32,
+      25,
+      38
+     ],
+     "neubau_ueber45": [
+      36,
+      29,
+      43
+     ],
+     "wohnung_unter45": [
+      26,
+      19,
+      34
+     ],
+     "komplexer_wohnungsbau": [
+      30,
+      25,
+      39
+     ]
+    },
+    "rohertragsfaktor": {
+     "altbau_ueber45": [
+      24,
+      19,
+      29
+     ],
+     "neubau_ueber45": [
+      27,
+      22,
+      32
+     ],
+     "wohnung_unter45": [
+      18,
+      13,
+      22
+     ],
+     "komplexer_wohnungsbau": [
+      20,
+      17,
+      27
+     ]
+    },
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne.",
+   "sachlich": "Eigentumswohnungen im Weiterverkauf"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Eigentumswohnung im Weiterverkauf\"",
+    "wortlaut": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (Tabellen S. 61): Eigentumswohnungen im Weiterverkauf — Liegenschaftszinssatz je Kategorie mit 2/3-Spanne und Anzahl der Kauffälle. Spaltentreu gelesen (pdftotext -table), nicht aus dem Textstrom.",
+    "pruefprotokoll": "Drei unabhängige Gegenproben am 01.10.2026: (1) ZEILENZUORDNUNG — die Anzahl der Kauffälle addiert sich über die Kategorien auf die Spalte „Gesamt\" (MFH 32+22=54, WGH 8+13=21). (2) DEFINITIONSPROBE — in der WGH-Tabelle trägt die Spalte „> 300 €/m²\" den Bodenrichtwert 610 und die Spalte „< 300 €/m²\" den Bodenrichtwert 180; die Zeile sitzt also richtig. (3) VERVIELFÄLTIGER-PROBE — für MFH gesamt ergibt (1−1,029^−35)/0,029 = 21,8, abgedruckt ist ein Reinertragsfaktor von 22. Bei den übrigen Teilmärkten liegt der abgedruckte Reinertragsfaktor systematisch 1 bis 3 Punkte höher als der reine Barwertfaktor; das ist der Bodenwertanteil und kein Lesefehler. Ein durchgerechnetes Anwendungsbeispiel enthält der Bericht nicht.",
+    "quotenprobe": "Rohertragsfaktor / Reinertragsfaktor = 1 − Bewirtschaftungskostenquote. Ausgerechnet ergibt das 26,1 / 28,6 / 27,3 % (MFH), 22,2 / 28,0 / 27,3 % (WGH), 25,0 / 25,0 / 30,8 / 33,3 % (ETW) und 20,6 % (individueller Wohnungsbau) — durchgehend plausible Größenordnungen, die die Zuordnung der drei Faktorzeilen zueinander stützen."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": null,
+  "stichtag": "2025-01-01",
+  "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Eigentumswohnung im Weiterverkauf\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.4,
+   "rundung_stellen": 1,
+   "bezeichnung": "Individueller Wohnungsbau, Weiterverkauf, Baujahr nach 1990",
+   "hinweis": "Ergebnis in PROZENT (2,4 bedeutet 2,4 %). Keine Achse, keine Interpolation — der Bericht druckt für diesen Teilmarkt eine einzige Spalte."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Der Bericht beschreibt das Ertragswertmodell in Abschnitt 5.4 (S. 60) in Worten, nicht in Zahlen.",
+   "rohertrag": "tatsächliche Erträge bzw. marktüblich erzielbare Erträge — Nettokaltmieten (Mieten aus Mietspiegel bzw. gewerblichen Mietpreisübersichten)",
+   "bewirtschaftungskosten": "§ 32 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Der Bericht beziffert KEINE Quote und keine Einzelansätze. Rückgerechnet aus den mitveröffentlichten Faktoren (Rohertragsfaktor / Reinertragsfaktor = 1 − BWK-Quote) ergeben sich 20 bis 29 % je Teilmarkt — das ist eine Ableitung von mir, kein Modellansatz des Ausschusses, und darf nicht als solcher verwendet werden.",
+   "bodenwert": "Grundstücksfläche × Bodenrichtwert, nach Anlage 3 (zu § 12 Abs. 5 Satz 2) ImmoWertV",
+   "restnutzungsdauer": "nach Anlage 2 (zu § 12 Abs. 5 Satz 1) ImmoWertV",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Für die Liegenschaftszinssätze nennt der Bericht keine Gesamtnutzungsdauer, nur die Restnutzungsdauer nach Anlage 2 ImmoWertV. Eine Zahl steht nicht da — die Rückfallzahl 80 ist hier NICHT belegt.",
+   "besondere_merkmale": "nur Kaufpreise ohne besondere objektspezifische Grundstücksmerkmale (nur schadensfreie Objekte), § 4 ImmoWertV",
+   "verfahren": "iteratives Rechenmodell (Sprengnetter WF AKUK)",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "bezug": "Grundstücksmarktbericht Schwerin 2025, Abschnitt 5.4 (S. 60) — Ertragswertmodell nach ImmoWertV 2021 §§ 31 bis 34, Nettokaltmieten aus Mietspiegel, Bodenwert nach Anlage 3, Restnutzungsdauer nach Anlage 2; keine bezifferte Bewirtschaftungskostenquote.",
+   "datenbasis": "Mehrfamilienhäuser, Eigentumswohnungen (Weiterverkauf) und Häuser des individuellen Wohnungsbaus aus Stichproben 2023–2024; Wohn- und Geschäftshäuser aus Stichproben 2022–2024 (Abschnitt 5.4, S. 60). Der allgemeine Modellabschnitt S. 3 nennt dagegen „die Kaufpreise der Jahre 2022 bis 2024\" für alle Teilmärkte — die beiden Angaben weichen voneinander ab, hier stehen beide.",
+   "begleitwerte": {
+    "bodenrichtwert_eur_qm": 160,
+    "preis_eur_qm_wohnflaeche": 2810,
+    "restnutzungsdauer_jahre": 61,
+    "wohnflaeche_qm": 123,
+    "reinertragsfaktor": [
+     34,
+     28,
+     40
+    ],
+    "rohertragsfaktor": [
+     27,
+     22,
+     32
+    ],
+    "schluessel": "Faktoren als [Mittelwert, Spanne_unten, Spanne_oben]."
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 60): „Soweit weitere Indikatoren, wie z.B. Anzahl der im Gebäude vorhandenen Wohneinheiten oder eine besonders gute bzw. schlechte Lage, einen begründeten Einfluss auf die Höhe der Liegenschaftszinssätze, Rein- und Rohertragsfaktoren haben, kann von dem angegebenen Mittelwert innerhalb der 2/3-Spanne abgewichen werden.\" Die Abweichung ist damit sachverständig gedeckt, aber nur INNERHALB der Spanne. — Der Wert gilt ausdrücklich nur für Baujahre NACH 1990. Für älteren individuellen Wohnungsbau weist der Bericht keinen Liegenschaftszinssatz aus; übertragen werden darf er nicht.",
+   "sachlich": "Individueller Wohnungsbau (Einfamilien-, Doppel- und Reihenhäuser), Weiterverkauf, Baujahr nach 1990"
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63), Tabelle „Individueller Wohnungsbau, Weiterverkauf, Baujahr nach 1990\"",
+    "wortlaut": "Liegenschaftszins 2,4 % (2/3-Spanne 1,8–3,1), 46 Kauffälle, Reinertragsfaktor 34 (28–40), Rohertragsfaktor 27 (22–32), Bodenrichtwert 160 €/m², Preis 2.810 €/m² Wohnfläche, Restnutzungsdauer 61 Jahre, Wohnfläche 123 m².",
+    "kauffaelle": 46,
+    "pruefprotokoll": "Quotenprobe: 27/34 = 0,794, also eine Bewirtschaftungskostenquote von 20,6 % — für selbstgenutzten individuellen Wohnungsbau die erwartete Größenordnung und damit eine Stütze der Zeilenzuordnung. Vervielfältiger zu 2,4 % und 61 Jahren: 31,9 gegenüber abgedruckten 34 — die Differenz ist der Bodenwertanteil im Reinertragsfaktor."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 46,
+  "stichtag": "2025-01-01",
+  "streuung": {
+   "min_pct": 1.8,
+   "max_pct": 3.1
+  },
+  "auflagen": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Berichts (01.01.2025); der Wert hat damit keinen eigenen Stichtagsbezug, sondern nur die Kaufpreisjahrgänge. — Belegexemplar an den Herausgeber ist nach dem Impressum Bedingung der auszugsweisen Wiedergabe und steht noch aus.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 61 (PDF-Seite 63)",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "achse_k_feld": "baujahrsklasse",
+   "achse_k_bez": "Baujahrsklasse (bis_1990 oder ab_1991)",
+   "modell_je_kategorie": {
+    "bis_1990": {
+     "form": "stufen_kategorial",
+     "liefert": "faktor",
+     "achse_k_feld": "gebaeudetyp_nhk2010",
+     "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre bis 1990\")",
+     "rundung_stellen": 2,
+     "stufen": {
+      "1": 1.27,
+      "1.01": 1.31
+     },
+     "kategorie_ohne_wert": [
+      "1.21",
+      "1.22",
+      "1.23",
+      "1.32",
+      "1.33"
+     ],
+     "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert. Der Bericht unterscheidet zwei Gründe: „–\" = kein Kauffall, „*\" = zu wenige Kauffälle, der Ausschuss weist deshalb keinen Wert aus (die Fallzahl steht trotzdem da). Beide werden NICHT durch einen Nachbarwert ersetzt. Welcher Fall vorliegt, sagt fallzahl.",
+     "fallzahl": {
+      "1": 16,
+      "1.01": 15,
+      "1.21": 1,
+      "1.22": null,
+      "1.23": null,
+      "1.32": null,
+      "1.33": null
+     },
+     "spanne": {
+      "1": [
+       1.09,
+       1.56
+      ],
+      "1.01": [
+       1.14,
+       1.56
+      ]
+     }
+    },
+    "ab_1991": {
+     "form": "stufen_kategorial",
+     "liefert": "faktor",
+     "achse_k_feld": "gebaeudetyp_nhk2010",
+     "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre ab 1991\")",
+     "rundung_stellen": 2,
+     "stufen": {
+      "1": 1.13,
+      "1.01": 1.21,
+      "1.21": 1.14,
+      "1.22": 0.85,
+      "1.23": 1.18
+     },
+     "kategorie_ohne_wert": [
+      "1.32",
+      "1.33"
+     ],
+     "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert. Der Bericht unterscheidet zwei Gründe: „–\" = kein Kauffall, „*\" = zu wenige Kauffälle, der Ausschuss weist deshalb keinen Wert aus (die Fallzahl steht trotzdem da). Beide werden NICHT durch einen Nachbarwert ersetzt. Welcher Fall vorliegt, sagt fallzahl.",
+     "fallzahl": {
+      "1": 34,
+      "1.01": 4,
+      "1.21": 20,
+      "1.22": 3,
+      "1.23": 4,
+      "1.32": 1,
+      "1.33": 2
+     },
+     "spanne": {
+      "1": [
+       0.97,
+       1.32
+      ],
+      "1.01": [
+       1.03,
+       1.37
+      ],
+      "1.21": [
+       0.96,
+       1.34
+      ],
+      "1.22": [
+       0.72,
+       1.07
+      ],
+      "1.23": [
+       0.99,
+       1.32
+      ]
+     }
+    }
+   },
+   "interpolation": "keine — beide Achsen sind kategorial. Zwischen Baujahrsklassen wird nicht gemittelt: 1990 und 1991 sind zwei Teilmärkte, nicht zwei Stützstellen.",
+   "beschreibung_je_gebaeudetyp": {
+    "1": "Einfamilienhaus gesamt (Summenzeile des Berichts)",
+    "1.01": "Einfamilienhaus, freistehend; Keller-, Erd-, vollausgebautes Dachgeschoss",
+    "1.21": "Einfamilienhaus, freistehend; Erd-, vollausgebautes Dachgeschoss, nicht unterkellert",
+    "1.22": "Einfamilienhaus, freistehend; Erd-, nicht ausgebautes Dachgeschoss, nicht unterkellert",
+    "1.23": "Einfamilienhaus, freistehend; Erdgeschoss, Flachdach, nicht unterkellert",
+    "1.32": "Einfamilienhaus, freistehend; Erd-, Ober-, nicht ausgebautes Dachgeschoss, nicht unterkellert",
+    "1.33": "Einfamilienhaus, freistehend; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62).",
+   "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+   "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Der Bericht schreibt nur „× Baupreisindex des Statistischen Bundesamtes/100\" (S. 62) und beziffert den Index NICHT. Eine Zahl steht nicht da und wird hier auch nicht erfunden — insbesondere nicht die Rückfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.\"",
+   "gnd_hinweis": "Der Bericht nennt keine eigene Zahl, sondern verweist auf Anlage 1 ImmoWertV. Für den sachlichen Geltungsbereich dieses Satzes — Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenhäuser — sind das 80 Jahre; deshalb steht hier 80 und nicht null. Für andere Gebäudearten führt Anlage 1 andere Werte, und dieser Satz gilt für sie nicht.",
+   "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+   "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+   "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+   "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+   "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+   "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2021 bis 2023",
+   "stichprobe": {
+    "anzahl": 98,
+    "bodenrichtwert_eur_qm": {
+     "mittel": 145,
+     "spanne": [
+      120,
+      175
+     ]
+    },
+    "preis_eur_qm_wohnflaeche": {
+     "mittel": 2830,
+     "spanne": [
+      1930,
+      3710
+     ]
+    },
+    "gesamtkaufpreis_eur": {
+     "mittel": 358000,
+     "spanne": [
+      255000,
+      480000
+     ]
+    },
+    "baujahr": {
+     "mittel": 1998,
+     "spanne": [
+      1973,
+      2012
+     ]
+    },
+    "bgf_qm": {
+     "mittel": 212,
+     "spanne": [
+      150,
+      280
+     ]
+    },
+    "fundstelle": "S. 62 (PDF-Seite 65), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung\""
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "sachlich": "Ein- und Zweifamilienhäuser, freistehend (Gebäudetypen 1.01 bis 1.33 der NHK 2010)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtlich S. 63: „Bei den Sachwertfaktoren zu den Gebäudetypen nach NHK 2010 handelt es sich um mittlere Werte der Kauffälle des jeweiligen Gebäudetyps.\" Trifft die Tabelle für den Gebäudetyp keine Aussage, verweist der Bericht auf die Regressionstabelle (eigener Registersatz, zweig ezfh_rhdhh_regression) — nicht auf einen benachbarten Gebäudetyp."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\" — Zeilen 1.01 bis 1 (Summe)",
+    "wortlaut": "Spalten: „Baujahre bis 1990\" und „Baujahre ab 1991\", je mit Fallzahl und NHK-2010-Faktor samt 2/3-Spanne. Die Tabellenüberschrift lautet im Bericht für beide Spalten „Sachwertfaktor für Einfamilienhäuser\", obwohl die Zeilen 2.xx Doppel- und Reihenendhäuser führen — die Überschrift ist so abgedruckt und wurde nicht korrigiert.",
+    "pruefprotokoll": "ZÄHLPROBE am 01.10.2026: die Fallzahlen der Einzel-Gebäudetypen addieren sich auf die abgedruckten Summenzeilen — EFH bis 1990: 15+1 = 16 (abgedruckt 16); EFH ab 1991: 4+20+3+4+1+2 = 34 (abgedruckt 34); Doppel-/Reihenendhaus bis 1990: 3+2+1 = 6 (abgedruckt 6); ab 1991: 5+4+5+6 = 20 (abgedruckt 20). Vier von vier Summen stimmen — damit sitzt jede Fallzahl in ihrer Zeile. OFFEN: die Summe aller vier Blöcke ist 76, die Stichprobe auf S. 62 nennt dagegen 98 Kauffälle. Die Differenz von 22 ist im Bericht nicht erklärt; wahrscheinlich Gebäudetypen, die die Tabelle nicht führt (z.B. Zweifamilienhäuser). Sie wurde NICHT stillschweigend verteilt.",
+    "kettenpruefung": "Am 01.10.2026 durch den echten Auswerter (swf_modelle.js) gelaufen: Gebäudetyp 1.01 / bis_1990 gibt 1,31 wie abgedruckt, die leere Zelle 1.22 / bis_1990 gibt „kategorie_unbekannt\" statt einer Zahl, und eine unbekannte Baujahrsklasse gibt „kategorie_unbekannt\". Der Wert kommt also an, und die Lücke bleibt eine Lücke."
+   }
+  ],
+  "stufe": "A",
+  "stichtag": "2025-01-01",
+  "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe nach dem Impressum). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufpreise 2021 bis 2023.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "verzweigt",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "achse_k_feld": "baujahrsklasse",
+   "achse_k_bez": "Baujahrsklasse (bis_1990 oder ab_1991)",
+   "modell_je_kategorie": {
+    "bis_1990": {
+     "form": "stufen_kategorial",
+     "liefert": "faktor",
+     "achse_k_feld": "gebaeudetyp_nhk2010",
+     "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre bis 1990\")",
+     "rundung_stellen": 2,
+     "stufen": {
+      "2": 1.32,
+      "2.01": 1.36
+     },
+     "kategorie_ohne_wert": [
+      "2.11",
+      "2.13",
+      "2.21",
+      "2.23",
+      "2.31",
+      "2.33"
+     ],
+     "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert. Der Bericht unterscheidet zwei Gründe: „–\" = kein Kauffall, „*\" = zu wenige Kauffälle, der Ausschuss weist deshalb keinen Wert aus (die Fallzahl steht trotzdem da). Beide werden NICHT durch einen Nachbarwert ersetzt. Welcher Fall vorliegt, sagt fallzahl.",
+     "fallzahl": {
+      "2": 6,
+      "2.01": 3,
+      "2.11": 2,
+      "2.13": 1,
+      "2.21": null,
+      "2.23": null,
+      "2.31": null,
+      "2.33": null
+     },
+     "spanne": {
+      "2": [
+       1.09,
+       1.54
+      ],
+      "2.01": [
+       1.09,
+       1.54
+      ]
+     }
+    },
+    "ab_1991": {
+     "form": "stufen_kategorial",
+     "liefert": "faktor",
+     "achse_k_feld": "gebaeudetyp_nhk2010",
+     "achse_k_bez": "Gebäudetyp nach dem Gebäudekatalog der NHK 2010 (Spalte „Baujahre ab 1991\")",
+     "rundung_stellen": 2,
+     "stufen": {
+      "2": 1.25,
+      "2.21": 1.18,
+      "2.23": 1.46,
+      "2.31": 1.24,
+      "2.33": 1.25
+     },
+     "kategorie_ohne_wert": [
+      "2.01",
+      "2.11",
+      "2.13"
+     ],
+     "kategorie_ohne_wert_hinweis": "Diese Gebäudetypen stehen in der Tabelle, tragen aber keinen Wert. Der Bericht unterscheidet zwei Gründe: „–\" = kein Kauffall, „*\" = zu wenige Kauffälle, der Ausschuss weist deshalb keinen Wert aus (die Fallzahl steht trotzdem da). Beide werden NICHT durch einen Nachbarwert ersetzt. Welcher Fall vorliegt, sagt fallzahl.",
+     "fallzahl": {
+      "2": 20,
+      "2.01": null,
+      "2.11": null,
+      "2.13": null,
+      "2.21": 5,
+      "2.23": 4,
+      "2.31": 5,
+      "2.33": 6
+     },
+     "spanne": {
+      "2": [
+       0.97,
+       1.51
+      ],
+      "2.21": [
+       0.9,
+       1.4
+      ],
+      "2.23": [
+       1.25,
+       1.75
+      ],
+      "2.31": [
+       1.11,
+       1.47
+      ],
+      "2.33": [
+       0.79,
+       1.88
+      ]
+     }
+    }
+   },
+   "interpolation": "keine — beide Achsen sind kategorial. Zwischen Baujahrsklassen wird nicht gemittelt: 1990 und 1991 sind zwei Teilmärkte, nicht zwei Stützstellen.",
+   "beschreibung_je_gebaeudetyp": {
+    "2": "Doppel- und Reihenendhaus gesamt (Summenzeile des Berichts)",
+    "2.01": "Doppel- und Reihenendhaus; Keller-, Erd-, voll ausgebautes Dachgeschoss",
+    "2.11": "Doppel- und Reihenendhaus; Keller-, Erd-, Ober-, voll ausgebautes Dachgeschoss",
+    "2.13": "Doppel- und Reihenendhaus; Keller-, Erd-, Obergeschoss, Flachdach",
+    "2.21": "Doppel- und Reihenendhaus; Erd-, voll ausgebautes Dachgeschoss, nicht unterkellert",
+    "2.23": "Doppel- und Reihenendhaus; Erdgeschoss, Flachdach, nicht unterkellert",
+    "2.31": "Doppel- und Reihenendhaus; Erd-, Ober-, voll ausgebautes Dachgeschoss, nicht unterkellert",
+    "2.33": "Doppel- und Reihenendhaus; Erd-, Obergeschoss, Flachdach, nicht unterkellert"
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62).",
+   "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+   "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Der Bericht schreibt nur „× Baupreisindex des Statistischen Bundesamtes/100\" (S. 62) und beziffert den Index NICHT. Eine Zahl steht nicht da und wird hier auch nicht erfunden — insbesondere nicht die Rückfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.\"",
+   "gnd_hinweis": "Der Bericht nennt keine eigene Zahl, sondern verweist auf Anlage 1 ImmoWertV. Für den sachlichen Geltungsbereich dieses Satzes — Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenhäuser — sind das 80 Jahre; deshalb steht hier 80 und nicht null. Für andere Gebäudearten führt Anlage 1 andere Werte, und dieser Satz gilt für sie nicht.",
+   "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+   "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+   "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+   "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+   "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+   "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2021 bis 2023",
+   "stichprobe": {
+    "anzahl": 98,
+    "bodenrichtwert_eur_qm": {
+     "mittel": 145,
+     "spanne": [
+      120,
+      175
+     ]
+    },
+    "preis_eur_qm_wohnflaeche": {
+     "mittel": 2830,
+     "spanne": [
+      1930,
+      3710
+     ]
+    },
+    "gesamtkaufpreis_eur": {
+     "mittel": 358000,
+     "spanne": [
+      255000,
+      480000
+     ]
+    },
+    "baujahr": {
+     "mittel": 1998,
+     "spanne": [
+      1973,
+      2012
+     ]
+    },
+    "bgf_qm": {
+     "mittel": 212,
+     "spanne": [
+      150,
+      280
+     ]
+    },
+    "fundstelle": "S. 62 (PDF-Seite 65), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung\""
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "sachlich": "Doppel- und Reihenendhäuser (Gebäudetypen 2.01 bis 2.33 der NHK 2010)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtlich S. 63: „Bei den Sachwertfaktoren zu den Gebäudetypen nach NHK 2010 handelt es sich um mittlere Werte der Kauffälle des jeweiligen Gebäudetyps.\" Trifft die Tabelle für den Gebäudetyp keine Aussage, verweist der Bericht auf die Regressionstabelle (eigener Registersatz, zweig ezfh_rhdhh_regression) — nicht auf einen benachbarten Gebäudetyp."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\" — Zeilen 2.01 bis 2 (Summe)",
+    "wortlaut": "Spalten: „Baujahre bis 1990\" und „Baujahre ab 1991\", je mit Fallzahl und NHK-2010-Faktor samt 2/3-Spanne. Die Tabellenüberschrift lautet im Bericht für beide Spalten „Sachwertfaktor für Einfamilienhäuser\", obwohl die Zeilen 2.xx Doppel- und Reihenendhäuser führen — die Überschrift ist so abgedruckt und wurde nicht korrigiert.",
+    "pruefprotokoll": "ZÄHLPROBE am 01.10.2026: die Fallzahlen der Einzel-Gebäudetypen addieren sich auf die abgedruckten Summenzeilen — EFH bis 1990: 15+1 = 16 (abgedruckt 16); EFH ab 1991: 4+20+3+4+1+2 = 34 (abgedruckt 34); Doppel-/Reihenendhaus bis 1990: 3+2+1 = 6 (abgedruckt 6); ab 1991: 5+4+5+6 = 20 (abgedruckt 20). Vier von vier Summen stimmen — damit sitzt jede Fallzahl in ihrer Zeile. OFFEN: die Summe aller vier Blöcke ist 76, die Stichprobe auf S. 62 nennt dagegen 98 Kauffälle. Die Differenz von 22 ist im Bericht nicht erklärt; wahrscheinlich Gebäudetypen, die die Tabelle nicht führt (z.B. Zweifamilienhäuser). Sie wurde NICHT stillschweigend verteilt.",
+    "kettenpruefung": "Am 01.10.2026 durch den echten Auswerter (swf_modelle.js) gelaufen: Gebäudetyp 1.01 / bis_1990 gibt 1,31 wie abgedruckt, die leere Zelle 1.22 / bis_1990 gibt „kategorie_unbekannt\" statt einer Zahl, und eine unbekannte Baujahrsklasse gibt „kategorie_unbekannt\". Der Wert kommt also an, und die Lücke bleibt eine Lücke."
+   }
+  ],
+  "stufe": "A",
+  "stichtag": "2025-01-01",
+  "auflagen": "Belegexemplar an den Herausgeber steht noch aus (Bedingung der auszugsweisen Wiedergabe nach dem Impressum). — Der Bericht nennt für die Sachwertfaktoren keinen eigenen Stichtag; eingetragen ist der Stand des Berichts (01.01.2025), Datenbasis sind die Kaufpreise 2021 bis 2023.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 63-64 (PDF-Seite 66), Tabelle „Sachwertfaktoren in Abhängigkeit vom Gebäudetyp\"",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ },
+ {
+  "land_code": "MV",
+  "ags": "13004",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwerin, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Schwerin 2025",
+  "quelle_url": "https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf",
+  "quelle_parser": "v1768-MVSN",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin, Grundstücksmarktbericht 2025",
+  "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Zusendung eines Belegexemplars, ohne Genehmigung gestattet",
+  "lizenz_hinweis": "Impressum, S. 2: „Der Grundstücksmarktbericht ist gesetzlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Als Vervielfältigung gelten: Nachdruck, Fotokopie, Mikroverfilmung und Speicherung auf Datenträger. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben, verbunden mit der Zusendung eines Belegexemplares an den Herausgeber ist ohne Genehmigung gestattet.\" — die Übernahme einzelner Kennzahlen in das Register ist damit erlaubt; das Belegexemplar ist eine offene Auflage.",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh_rhdhh_regression",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert des Grundstücks in Euro",
+   "achse_x": [
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000,
+    325000,
+    350000,
+    375000,
+    400000,
+    450000,
+    500000,
+    600000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    90,
+    100,
+    125,
+    150,
+    175,
+    200,
+    225,
+    250,
+    275,
+    300
+   ],
+   "zellen_schluessel": "Bodenrichtwert -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "90": [
+     1.3,
+     1.27,
+     1.23,
+     1.2,
+     1.17,
+     1.14,
+     1.11,
+     1.07,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "100": [
+     1.32,
+     1.28,
+     1.25,
+     1.22,
+     1.19,
+     1.16,
+     1.13,
+     1.09,
+     1.06,
+     null,
+     null,
+     null,
+     null
+    ],
+    "125": [
+     1.36,
+     1.33,
+     1.3,
+     1.27,
+     1.24,
+     1.21,
+     1.17,
+     1.14,
+     1.11,
+     1.08,
+     null,
+     null,
+     null
+    ],
+    "150": [
+     1.41,
+     1.38,
+     1.35,
+     1.32,
+     1.29,
+     1.25,
+     1.22,
+     1.19,
+     1.16,
+     1.13,
+     1.06,
+     null,
+     null
+    ],
+    "175": [
+     1.46,
+     1.43,
+     1.4,
+     1.37,
+     1.33,
+     1.3,
+     1.27,
+     1.24,
+     1.21,
+     1.18,
+     1.11,
+     null,
+     null
+    ],
+    "200": [
+     1.51,
+     1.48,
+     1.45,
+     1.41,
+     1.38,
+     1.35,
+     1.32,
+     1.29,
+     1.26,
+     1.22,
+     1.16,
+     1.1,
+     null
+    ],
+    "225": [
+     null,
+     1.53,
+     1.49,
+     1.46,
+     1.43,
+     1.4,
+     1.37,
+     1.34,
+     1.3,
+     1.27,
+     1.21,
+     1.14,
+     1.02
+    ],
+    "250": [
+     null,
+     null,
+     null,
+     1.51,
+     1.48,
+     1.45,
+     1.42,
+     1.38,
+     1.35,
+     1.32,
+     1.26,
+     1.19,
+     1.07
+    ],
+    "275": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.46,
+     1.43,
+     1.4,
+     1.37,
+     1.3,
+     1.24,
+     1.11
+    ],
+    "300": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     1.48,
+     1.45,
+     1.42,
+     1.35,
+     1.29,
+     1.16
+    ]
+   },
+   "interpolation": "Kreuzinterpolation zwischen benachbarten Stützstellen. Eine LEERE Zelle wird nicht durch einen Nachbarwert ersetzt.",
+   "bestimmtheitsmass": 0.3
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Modell wörtlich aus Abschnitt 5.5 (S. 62).",
+   "normalherstellungskosten": "NHK 2010 einschließlich Baunebenkosten",
+   "bezugsgroesse": "Brutto-Grundfläche (BGF), Angaben aus dem Geoinformationssystem",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Der Bericht schreibt nur „× Baupreisindex des Statistischen Bundesamtes/100\" (S. 62) und beziffert den Index NICHT. Eine Zahl steht nicht da und wird hier auch nicht erfunden — insbesondere nicht die Rückfallkonstante 1,91 des Rechenkerns, die keinen Stichtagsbezug hat.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 62: „Alterswertminderungsfaktor nach § 38 ImmoWertV 2021 (linear); Gesamtnutzungsdauer nach Anlage 1 ImmoWertV; Restnutzungsdauer nach § 4 Abs. 3 ImmoWertV.\"",
+   "gnd_hinweis": "Der Bericht nennt keine eigene Zahl, sondern verweist auf Anlage 1 ImmoWertV. Für den sachlichen Geltungsbereich dieses Satzes — Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenhäuser — sind das 80 Jahre; deshalb steht hier 80 und nicht null. Für andere Gebäudearten führt Anlage 1 andere Werte, und dieser Satz gilt für sie nicht.",
+   "alterswertminderung": "linear, § 38 ImmoWertV 2021",
+   "aussenanlagen": "pauschale Schätzung in Höhe von 2 bis 4 % des Gebäudewertes (ggf. Berücksichtigung Carports), § 37 ImmoWertV 2021",
+   "nebengebaeude": "pauschale Schätzung des Wertes der Nebengebäude (z.B. Garagen) und sonstiger baulicher Anlagen",
+   "bodenwert": "Fläche × angepasstem Bodenrichtwert",
+   "besondere_merkmale": "nicht berücksichtigt — es wurden nur schadensfreie Objekte ausgewertet",
+   "datenbasis": "tatsächlich gezahlte Kaufpreise der Jahre 2021 bis 2023",
+   "stichprobe": {
+    "anzahl": 98,
+    "bodenrichtwert_eur_qm": {
+     "mittel": 145,
+     "spanne": [
+      120,
+      175
+     ]
+    },
+    "preis_eur_qm_wohnflaeche": {
+     "mittel": 2830,
+     "spanne": [
+      1930,
+      3710
+     ]
+    },
+    "gesamtkaufpreis_eur": {
+     "mittel": 358000,
+     "spanne": [
+      255000,
+      480000
+     ]
+    },
+    "baujahr": {
+     "mittel": 1998,
+     "spanne": [
+      1973,
+      2012
+     ]
+    },
+    "bgf_qm": {
+     "mittel": 212,
+     "spanne": [
+      150,
+      280
+     ]
+    },
+    "fundstelle": "S. 62 (PDF-Seite 65), Tabelle „Dem Gutachterausschuss stand eine Stichprobe mit folgenden Kennwerten zur Verfügung\""
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landeshauptstadt Schwerin (Gebiet des Gutachterausschusses)",
+   "sachlich": "Ein- und Zweifamilienhäuser sowie Doppelhaushälften und Reihenhäuser — Rückfalltabelle, wenn die Gebäudetyp-Tabelle für den Typ keine Aussage trifft",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 65): „Die in der nachstehenden Tabelle angegebenen Anpassungsfaktoren können als Anhaltswerte dienen, wenn die vorstehende Tabelle für den Gebäudetyp keine Aussage trifft. Sie sind nach sachverständigem Ermessen zu werten und anzuwenden. Es sind nur die durch Kaufpreise abgedeckten Sachwertfaktorenbereiche belegt. Eine Extrapolation von Werten für die nicht beschriebenen Bereiche ist nicht sachgerecht.\" — Dieser Satz ist damit NACHRANGIG gegenüber den Gebäudetyp-Sätzen (zweig ezfh, rhdhh), und das Bestimmtheitsmaß von 0,30 ist niedrig."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 65 (PDF-Seite 67), Tabelle „Sachwertfaktoren\" mit Bestimmtheitsmaß R² = 0,30",
+    "wortlaut": "Zeilen: vorläufiger Sachwert 175.000 bis 600.000 €. Spalten: Bodenrichtwert 90 bis 300 €/m². 96 der 130 Zellen sind belegt; die Lücken liegen in den Ecken und stehen so im Bericht („Es sind nur die durch Kaufpreise abgedeckten Sachwertfaktorenbereiche belegt\").",
+    "pruefprotokoll": "GITTERPROBE am 01.10.2026 gegen das Gitter selbst: 96 belegte Zellen von 130. MONOTONIE über den vorläufigen Sachwert: streng fallend, 0 Verstöße. MONOTONIE über den Bodenrichtwert: streng steigend, 0 Verstöße. Beide Richtungen entsprechen der Regressionsform k = f(vSW, BRW), ein Zahlendreher hätte die Monotonie gebrochen. Die Zeilenlängen (6·7·7·8·8·8·9·10·9·8·7·5·4) bilden ein zusammenhängendes Diagonalband — genau das Muster, das eine Kaufpreisabdeckung erzeugt. Die Regressionsgleichung selbst druckt der Bericht NICHT ab, nur R² = 0,30; ein Anwendungsbeispiel zum Nachrechnen gibt es damit nicht."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Bestimmtheitsmaß 0,30, und der Bericht stellt die Tabelle selbst als nachrangige Anhaltswerte dar.",
+  "stichtag": "2025-01-01",
+  "auflagen": "Nachrangig gegenüber den Gebäudetyp-Sätzen. — Belegexemplar an den Herausgeber steht noch aus.",
+  "fundstelle": "Grundstücksmarktbericht Schwerin 2025, S. 65 (PDF-Seite 67)",
+  "ebene_hinweis": "v1768b: trug \"kreisfreie_stadt\" — kein erlaubter Wert (param_modell_ebene_check). Eine kreisfreie Stadt ist auf der Ebene \"gemeinde\" zu fuehren, so wie Erfurt."
+ }
+]

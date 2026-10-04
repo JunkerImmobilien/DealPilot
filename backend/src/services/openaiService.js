@@ -2007,6 +2007,33 @@ async function copilotChat(payload, opts) {
   const istPortfolio = payload.kontextArt === 'portfolio'
     || (ctx && ctx.art === 'portfolio');
 
+  /* ═══ v1767 · DAS BEISPIEL WIRD AUS DEM KATALOG GEBAUT ══════════════
+     Gemessen am 01.10.2026 mit Marcels eigenem Satz („aender bei der
+     Musterstrasse 12 mal die Zimmeranzahl auf fuenf"):
+
+       <<<FELDER {"feld_id":"zimmer","anderes_feld":"5"} FELDER>>>
+
+     Das Modell hat die PLATZHALTER meines Formatbeispiels fuer feste
+     Schluessel gehalten und Feld-Id und Wert als zwei Werte eingesetzt.
+     Es stand `{"feld_id":"wert","anderes_feld":"wert"}` dort - fuer ein
+     kleines Modell (hier gpt-4o-mini) ist das eine Schablone mit zwei
+     benannten Spalten, kein Muster.
+
+     > Ein Platzhalter in einem Beispiel ist eine Einladung, ihn
+     > abzuschreiben. Steht dort eine ECHTE Feld-Id, kann das Abschreiben
+     > nicht mehr schiefgehen.
+
+     Deshalb: das Beispiel kommt aus dem mitgeschickten Katalog. */
+  const _bspBlock = (function () {
+    const f = Array.isArray(payload.felder) ? payload.felder : [];
+    const t = f.find((x) => x.kind === 'text');
+    const s = f.find((x) => x.kind === 'select' && x.options && x.options.length);
+    const b = {};
+    if (t) b[t.id] = '850';
+    if (s) b[s.id] = String(s.options[0]);
+    return Object.keys(b).length ? JSON.stringify(b) : '{"nkm":"850"}';
+  })();
+
   const sys = [
     istPortfolio
       ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
@@ -2047,6 +2074,174 @@ async function copilotChat(payload, opts) {
           '  Zins und Tilgung. Nenne sie so, wenn du sie verwendest.',
           '- Die Einheit steht IM Feldnamen (_eur, _eur_jahr, _prozent, _qm). Lies sie dort ab, rate sie nicht.',
           '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.'
+        ].join('\n')
+      : '',
+
+    /* ═══ v1764 · DER CO-PILOT DARF FELDER AENDERN ═══════════════════════
+       Marcel am 01.10.2026, nach einem echten Versuch:
+
+         „Kannst du den Zustand der Wohnung auf stark
+          renovierungsbeduerftig aendern?"
+         -> „Ich kann den Zustand der Wohnung nicht aendern, da keine
+             Werte erfinden oder anpassen kann."
+
+       Zwei Fehler lagen darin, beide meine. Der Filter im Frontend
+       verlangte eine ZAHL - „stark renovierungsbeduerftig" ist aber ein
+       Auswahlwert. Und selbst wenn er durchgekommen waere: das Modell
+       wusste gar nicht, dass es das darf. Es hat die Regel „erfinde keine
+       Werte" auf eine ANWEISUNG des Nutzers angewandt.
+
+       > Einen Wert zu erfinden und einen anzunehmen, den der Nutzer
+       > gerade nennt, ist nicht dasselbe. Die erste Regel schuetzt vor
+       > Behauptung, die zweite waere Gehorsamsverweigerung.
+
+       Deshalb bekommt das Modell den Feldkatalog und einen klaren
+       Auftrag. Es entscheidet selbst, ob eine Nachricht eine Frage oder
+       eine Anweisung ist - das kann es besser als jedes Muster im
+       Frontend. Geaendert wird trotzdem nichts ohne Bestaetigung: das
+       Modell SCHLAEGT VOR, der Nutzer entscheidet. */
+    (Array.isArray(payload.felder) && payload.felder.length)
+      ? [
+          '',
+          'FELDER AENDERN (verbindlich):',
+          'Der Nutzer kann dich bitten, Angaben am Objekt zu aendern - z. B. "aendere die Miete auf 850",',
+          '"der Zustand ist stark renovierungsbeduerftig", "trag bitte Baujahr 1968 ein".',
+          'Das ist KEIN Erfinden: der Nutzer nennt den Wert, du ordnest ihn nur dem richtigen Feld zu.',
+          'Erkennst du eine solche Anweisung, haenge an deine Antwort GENAU EINEN Block in dieser Form an:',
+          '',
+          '<<<FELDER',
+          _bspBlock,
+          'FELDER>>>',
+          '',
+          '- Der SCHLUESSEL ist die Feld-Id aus der Liste unten, der WERT ist der neue Inhalt.',
+          '  Es gibt KEINEN Schluessel namens "feld_id", "feld", "id", "wert" oder "value" -',
+          '  wer so etwas schreibt, hat das Beispiel missverstanden.',
+          '- Verwende NUR Feld-Ids aus der Liste VERFUEGBARE FELDER unten, nie erfundene.',
+          istPortfolio
+            ? '- Der Nutzer nennt im Portfolio das Objekt dazu ("bei der Musterstr. 12 ..."). '
+              + 'Die Feld-Ids sind bei allen Objekten dieselben - nenne das Objekt in deinem '
+              + 'Satz davor, damit der Nutzer sieht, welches gemeint ist.'
+            : '- Es ist immer das Objekt gemeint, das unter AKTUELLES OBJEKT steht.',
+          '- Bei einem Auswahlfeld (kind=select) nimm WOERTLICH eine der angegebenen Optionen.',
+          '- Zahlen ohne Tausenderpunkt und ohne Einheit: 850, nicht "850 EUR" und nicht "1.250".',
+          '- Bist du dir bei der Zuordnung unsicher, frag nach und haenge KEINEN Block an.',
+          '- Ist es eine normale Frage, antworte normal und haenge KEINEN Block an.',
+          '- Schreibe im Text davor in EINEM Satz, was du eintragen wuerdest. Behaupte NICHT,',
+          '  dass es schon geaendert sei - der Nutzer bestaetigt es erst.',
+          '',
+          'VERFUEGBARE FELDER (id | Bezeichnung | Art):',
+          payload.felder.slice(0, 220).map(function (f) {
+            return '  ' + f.id + ' | ' + String(f.label || '').slice(0, 48)
+              + ' | ' + (f.kind || 'text')
+              + (f.options && f.options.length
+                  ? ' [' + f.options.slice(0, 12).join(' / ') + ']' : '');
+          }).join('\n')
+        ].join('\n')
+      : '',
+
+    /* ═══ v1766 · ABRUFE AUSLOESEN - MIT KOSTENANSAGE ══════════════════
+       Marcels V4/V5: „auch Marktberichte oder Wertermittlungen dort
+       ausfuehren ... Er sagt dann was es kostet und wieviel Kontingent
+       wir noch haben."
+
+       GEMESSEN, nicht geraten: jeder Abruf kostet GENAU 1 - `cost` ist in
+       `ai_credits_log` immer 1 (aiCreditsService.js:363). Verschieden
+       sind nicht die Preise, sondern die GUTHABENARTEN: mpi, mpi_plus,
+       wev. Der Bestand kommt aus GET /ai/credits und wird vom Frontend
+       mitgeschickt - das Modell rechnet ihn nicht aus.
+
+       > Bei Geld wird nicht geschaetzt. Steht der Bestand nicht im
+       > Auftrag, nennt das Modell auch keinen - lieber keine Zahl als
+       > eine erfundene. */
+    (payload.abrufe && payload.abrufe.length)
+      ? [
+          '',
+          'ABRUFE AUSLOESEN (verbindlich):',
+          'Der Nutzer kann dich bitten, einen kostenpflichtigen Abruf zu starten',
+          '("hol mir eine Marktpreis-Indikation", "mach einen Marktbericht").',
+          'Erkennst du das, haenge an deine Antwort GENAU EINEN Block an:',
+          '',
+          '<<<ABRUF',
+          '{"name":"<name aus der Liste>"}',
+          'ABRUF>>>',
+          '',
+          '- Nenne im Text davor, WAS es kostet und WIEVIEL noch da ist - beides steht',
+          '  unten in der Liste. Erfinde KEINE Zahl und rechne nichts um.',
+          '- Ist das Guthaben 0, haenge KEINEN Block an, sondern sage es.',
+          '- Fuehre nichts aus und behaupte nicht, es sei schon geschehen: der Nutzer',
+          '  bestaetigt den Abruf erst.',
+          '- Bei einer normalen Frage: kein Block.',
+          '',
+          'VERFUEGBARE ABRUFE (name | was es ist | kostet | noch frei):',
+          payload.abrufe.map(function (a) {
+            return '  ' + a.name + ' | ' + a.titel + ' | 1 ' + a.art
+              + ' | ' + (a.rest == null ? 'unbekannt' : a.rest);
+          }).join('\n')
+        ].join('\n')
+      : '',
+
+    /* ═══ v1769 · DIE MARKTBERICHTE (Backlog V6) ══════════════════════
+       Marcel: „Wichtig ist auch, dass sich beide Piloten immer auch zum
+       Objekt bei der Pilot-Analyse oder dem ganzen Bestand beim
+       Portfolio-Piloten den Marktbericht oder die Berichte holen und
+       alles abgleichen."
+
+       Der Weg dorthin war seit v942 zu: `objects/history` machte
+       `parseInt()` auf eine UUID und antwortete mit HTTP 400. Migration
+       015 und `_uidAus()` haben ihn geoeffnet (v1769).
+
+       ABGLEICHEN HEISST BENENNEN, NICHT RECHNEN. Der Marktbericht und
+       die Objektkalkulation sind zwei Quellen zur selben Groesse. Eine
+       dritte, gemittelte Zahl waere eine Behauptung, die in keiner von
+       beiden steht.
+
+       > Zwei Zahlen zur selben Groesse sind kein Widerspruch, solange
+       > beide ihre Herkunft tragen. Eine dritte, gemittelte waere einer. */
+    (payload.marktberichte && typeof payload.marktberichte === 'object')
+      ? [
+          '',
+          'MARKTBERICHTE (verbindlich):',
+          istPortfolio
+            ? 'Unter "MARKTBERICHTE ZUM BESTAND" steht je Objekt der JUENGSTE '
+              + 'DealPilot-Marktbericht.'
+            : 'Unter "MARKTBERICHT ZUM OBJEKT" steht der juengste DealPilot-'
+              + 'Marktbericht zu diesem Objekt.',
+          /* v1769c · GEMESSEN am 02.10.2026: auf die Frage „wie viele meiner
+             Objekte haben einen Marktbericht" antwortete das Modell „8" —
+             im Auftrag stand `objekte_mit_bericht: 21`, und alle 21 Saetze
+             trugen einen Marktwert. Es hat die Liste gezaehlt statt die
+             Zahl zu lesen, und sich verzaehlt.
+
+             Fuer die Vermoegensbilanz steht diese Regel schon oben
+             („Rechne sie NICHT nach"). Fuer die Berichte fehlte sie.
+
+             > Eine Zahl, die im Auftrag steht, soll gelesen werden, nicht
+             > nachgezaehlt. Wer zaehlt, kann sich verzaehlen — und das
+             > Ergebnis sieht genauso aus wie ein gelesenes. */
+          istPortfolio
+            ? '- "objekte_mit_bericht" und "berichte_gesamt" sind BEREITS AUSGEZAEHLT. '
+              + 'Lies sie ab und zaehle die Liste NICHT selbst nach; bei einer '
+              + 'Abweichung gilt die angegebene Zahl.'
+            : '- "vorhanden" ist die Zahl der Berichte zu diesem Objekt, bereits '
+              + 'ausgezaehlt. Lies sie ab.',
+          '- Diese Marktwerte stammen aus dem BERICHT, nicht aus der Kalkulation.',
+          '  Weichen sie ab, nenne BEIDE Zahlen und sage, woher jede kommt.',
+          '- Rechne KEINE dritte Zahl aus und bilde kein Mittel. Eine gemittelte',
+          '  Zahl steht in keiner der beiden Quellen.',
+          istPortfolio
+            ? '- Bilde auch keine Summe ueber die Berichts-Marktwerte: die '
+              + 'Vermoegensbilanz ist die Summe, und sie rechnet anders.'
+            : '- "bericht_id" ist die Nummer des Berichts; nenne sie, wenn du dich '
+              + 'auf ihn beziehst.',
+          '- Fehlt ein Feld, ist es im Bericht nicht erfasst. Sage das, statt es zu',
+          '  ueberspringen - und erfinde es nicht aus der Kalkulation.',
+          '- Steht dort "abruf": "fehlgeschlagen", konnte ich die Berichte NICHT',
+          '  laden. Sage das ausdruecklich; es ist nicht dasselbe wie "es gibt keine".',
+          '- Die Einheit steht IM Feldnamen (_eur, _eur_qm, _prozent, _qm).',
+          '',
+          (istPortfolio ? 'MARKTBERICHTE ZUM BESTAND' : 'MARKTBERICHT ZUM OBJEKT')
+            + ' (JSON):',
+          JSON.stringify(payload.marktberichte, null, 1)
         ].join('\n')
       : ''
   ].filter(Boolean).join('\n');
@@ -2426,8 +2621,48 @@ async function extractRndg(text, opts) {
   return { success: true, model: r.model, extracted: out };
 }
 
+/* ── v1796 · Bild -> Text, mehr nicht ────────────────────────────────────
+ *
+ * Der Telegram-Bot bekommt Fotos: ein abfotografiertes Exposé, ein
+ * Screenshot aus einem Portal, ein Seitenausschnitt.
+ *
+ * Es waere naheliegend, dafuer einen dritten Auslese-Weg zu bauen (neben
+ * `extractFromText` und `extractFromAudio`). Das waere einer zu viel:
+ *
+ *   > Drei Wege zu denselben Feldern weichen irgendwann in drei
+ *   > Richtungen ab. Zwei davon merkt niemand.
+ *
+ * Deshalb tut diese Funktion nur EINEN Schritt — sie macht aus dem Bild
+ * Text. Was daraus ein Objektfeld wird, entscheidet danach derselbe
+ * `extractFromText`, den auch Sprache und Tastatur durchlaufen. Dieselbe
+ * Schablonen-Heilung, dieselbe Prozent-Falle, dieselbe Adresspruefung.
+ */
+async function bildZuText(imageDataUrl, opts) {
+  const o = opts || {};
+  const prompt =
+    'Gib den fuer eine Immobilienbewertung relevanten Inhalt dieses Bildes '
+    + 'als FLIESSTEXT wieder. Nenne Adresse, Objektart, Wohnflaeche, '
+    + 'Grundstuecksflaeche, Zimmer, Baujahr, Kaufpreis, Miete, Hausgeld und '
+    + 'alles Weitere, was dasteht.\n\n'
+    + 'ERFINDE NICHTS. Was du nicht sicher lesen kannst, laesst du weg. '
+    + 'Schreibe keine Einleitung und keine Bewertung, nur den Inhalt. '
+    + 'Ist auf dem Bild nichts Immobilienbezogenes zu sehen, antworte genau '
+    + 'mit: KEIN_INHALT';
+  const content = [
+    { type: 'input_text', text: prompt },
+    { type: 'input_image', image_url: imageDataUrl }
+  ];
+  const r = await _callOpenAIVision(content, {
+    userApiKey: o.userApiKey, model: o.model, maxTokens: 2000
+  });
+  const t = String((r && r.text) || '').trim();
+  if (!t || /^KEIN_INHALT/i.test(t)) return '';
+  return t;
+}
+
 module.exports = {
   copilotChat,  /* v585 */
+  bildZuText,   /* v1796 — macht nur Text; die Felder macht extractFromText */
   analyze,
   analyzeLage,
   suggestDs2Fields,

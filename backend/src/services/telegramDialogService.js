@@ -1,0 +1,299 @@
+'use strict';
+/* services/telegramDialogService.js — die Auskunft des Bots (v1793)
+ *
+ * ── DIE REGEL DIESER DATEI ───────────────────────────────────────────────
+ *
+ * HIER WIRD NICHTS GERECHNET. Keine Rendite, keine Restschuld, kein DSCR.
+ * Diese Datei holt Daten, die woanders entstanden sind, und reicht sie an
+ * `openaiService.copilotChat` weiter — denselben Dienst, den der Browser
+ * ruft.
+ *
+ *   > "Rechenkerne — nie duplizieren" (CLAUDE.md). `projectAll` rechnete
+ *   > jahrelang in Cent, und aufgefallen ist es erst, als eine zweite
+ *   > Quelle danebenstand. Eine zweite Vermoegensbilanz im Bot waere
+ *   > derselbe Fehler noch einmal.
+ *
+ * Zwei Quellen, beide fremd:
+ *   Portfolio  -> `portfolio_spiegel` (vom Browser abgelegt, v1793)
+ *   Objekt     -> `objects.data` (die App schreibt es, wir lesen es)
+ */
+const { query } = require('../db/pool');
+const openaiService = require('./openaiService');
+
+/* ── Portfolio ───────────────────────────────────────────────────────────
+ *
+ * Der Spiegel ist nur so frisch wie der letzte Besuch im Browser. Deshalb
+ * kommt der Stand IMMER mit — nicht als Fussnote, sondern als Teil der
+ * Auskunft.
+ *
+ *   > Eine Zahl ohne Stand behauptet, aktuell zu sein.
+ */
+async function portfolioKontext(userId) {
+  const r = await query(
+    `SELECT payload, erfasst_am FROM portfolio_spiegel WHERE user_id = $1`,
+    [userId]
+  );
+  if (!r.rows.length) return null;
+  const alterMin = Math.round((Date.now() - new Date(r.rows[0].erfasst_am).getTime()) / 60000);
+
+  /* ── v1796 · WIE ALT IST ALT? ─────────────────────────────────────────
+   *
+   * Bis hierher nannte der Bot nur das Datum des Spiegels. Das ist
+   * richtig, aber es beantwortet die falsche Frage. Entscheidend ist
+   * nicht, wie alt der Stand IST, sondern ob sich seitdem etwas GEAENDERT
+   * hat.
+   *
+   *   > Ein drei Wochen alter Stand, an dem sich nichts geaendert hat, ist
+   *   > aktuell. Ein zwei Stunden alter, hinter dem zwei Objekte
+   *   > bearbeitet wurden, ist es nicht.
+   *
+   * `objects.updated_at` weiss das, und die Abfrage kostet nichts. Damit
+   * kann der Bot statt einer Altersangabe eine Aussage machen. */
+  const g = await query(
+    `SELECT count(*)::int AS n FROM objects
+      WHERE user_id = $1 AND updated_at > $2`,
+    [userId, r.rows[0].erfasst_am]
+  );
+
+  return {
+    payload: r.rows[0].payload,
+    erfasst_am: r.rows[0].erfasst_am,
+    alter_minuten: alterMin,
+    geaendert_seitdem: (g.rows[0] && g.rows[0].n) || 0
+  };
+}
+
+function standSatz(erfasstAm, alterMin, geaendertSeitdem) {
+  const d = new Date(erfasstAm);
+  const uhr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
+  const tag = d.toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' });
+  const wann = alterMin < 60 * 24 ? 'heute ' + uhr + ' Uhr' : tag + ', ' + uhr + ' Uhr';
+
+  /* v1796 · Die Aenderung schlaegt das Alter. Sie ist die eigentliche
+     Aussage: ein alter Stand ohne Aenderung stimmt noch, ein frischer mit
+     Aenderung nicht mehr. */
+  if (geaendertSeitdem > 0) {
+    return 'Stand: ' + wann + ' — seitdem '
+      + (geaendertSeitdem === 1 ? 'hast du ein Objekt' : 'hast du ' + geaendertSeitdem + ' Objekte')
+      + ' bearbeitet. Öffne DealPilot einmal kurz, dann stimmen die Summen wieder.';
+  }
+  if (alterMin < 60 * 24 * 7) return 'Stand: ' + wann + '.';
+  return 'Stand: ' + wann + ' — unverändert seitdem.';
+}
+
+/* ── Objekte ─────────────────────────────────────────────────────────────
+ *
+ * Die Liste ist bewusst schmal: Kennung, Adresse, Stand. Alles Weitere holt
+ * `objektKontext` erst, wenn ein Objekt wirklich gemeint ist.
+ */
+async function objekteListe(userId, limit) {
+  const r = await query(
+    `SELECT id, data, updated_at FROM objects
+      WHERE user_id = $1
+      ORDER BY updated_at DESC NULLS LAST
+      LIMIT $2`,
+    [userId, limit || 60]
+  );
+  return r.rows.map((z) => {
+    const d = z.data || {};
+    return {
+      id: z.id,
+      adresse: [d.str, d.hnr].filter(Boolean).join(' ')
+             + (d.plz || d.ort ? ', ' + [d.plz, d.ort].filter(Boolean).join(' ') : ''),
+      seq: d.seq || d.objektnummer || null,
+      kp: d.kp || null,
+      geaendert: z.updated_at
+    };
+  });
+}
+
+/* ── Scores und Kerndaten lesen, nie rechnen ─────────────────────────────
+ *
+ * Beide Scores werden im Browser gerechnet und am Objekt gespeichert. Der
+ * Bot liest den gespeicherten Wert — eine zweite Rechnung waere eine
+ * zweite Meinung ueber denselben Deal, und im Chat staende dann eine
+ * andere Zahl als auf der Karte.
+ *
+ * DIE STUFE steht nirgends gespeichert; sie entsteht erst bei der Anzeige.
+ * Die Kette unten ist die aus CLAUDE.md, die fuer die Objektkarte gilt:
+ * 85 / 70 / 50 / 35. (`score-tiers.js` kennt nur vier Baender und endet
+ * bei 50 — die fuenfte Stufe KRITISCH ist dort nicht abgebildet. Die
+ * Abweichung ist bekannt und dokumentiert; maßgeblich ist, was die App
+ * dem Nutzer zeigt.)
+ */
+function stufeZu(score) {
+  if (score == null) return null;
+  if (score >= 85) return 'TOP';
+  if (score >= 70) return 'GUT';
+  if (score >= 50) return 'SOLIDE';
+  if (score >= 35) return 'SCHWACH';
+  return 'KRITISCH';
+}
+
+function scoreLesen(daten) {
+  const d = daten || {};
+  const ds = Number.isFinite(Number(d._dealpilot_score)) ? Number(d._dealpilot_score) : null;
+
+  /* DAS GATE: `_ds2_score` existiert auch dann, wenn der Investor Deal
+     Score gar nicht gerechnet wurde. Ohne diese Pruefung behauptet der
+     Bot einen Wert, den die App selbst nicht anzeigt.
+
+     > Eine Zahl, die im Datensatz steht, ist noch kein Ergebnis. */
+  const dsTwoOk = d._ds2_computed === true;
+  const ds2 = dsTwoOk && Number.isFinite(Number(d._ds2_score)) ? Number(d._ds2_score) : null;
+
+  const weitere = [];
+  const zeig = [
+    ['_kpis_dscr', 'DSCR', (v) => Number(v).toFixed(2)],
+    ['_kpis_ltv', 'LTV', (v) => Number(v).toFixed(1) + ' %'],
+    ['_kpis_bmy', 'Bruttomietrendite', (v) => Number(v).toFixed(2) + ' %'],
+    ['_kpis_cf_ns', 'Cashflow nach Steuer', (v) => Math.round(v).toLocaleString('de-DE') + ' €/Jahr']
+  ];
+  zeig.forEach(([id, name, f]) => {
+    const v = d[id];
+    if (v == null || !Number.isFinite(Number(v))) return;
+    weitere.push({ name, wert: f(v) });
+  });
+
+  return {
+    dealscore: ds, stufe: stufeZu(ds),
+    investor: ds2, investorStufe: stufeZu(ds2),
+    investor_gerechnet: dsTwoOk,
+    weitere
+  };
+}
+
+/* ── Kerndaten eines Objekts ─────────────────────────────────────────────
+ *
+ * Marcel: "sag mir was Objekt 17 davon an Kerndaten hat."
+ *
+ * Bewusst nur Felder, die WIRKLICH im Datensatz stehen. Gemessen am
+ * 02.10.2026: von den `_kpis_*`-Feldern werden nur sechs je geschrieben —
+ * `_kpis_miete_j`, `_kpis_gi`, `_kpis_restschuld`, `_kpis_nmy` und
+ * `_kpis_nmr` werden im Frontend GELESEN, aber nirgends geschrieben, und
+ * `_kpis_vuv` ist im Code selbst als Leiche markiert.
+ *
+ *   > Ein Feld, das nur gelesen wird, sieht im Code aus wie eine
+ *   > Datenquelle und ist eine Luecke.
+ */
+function kerndaten(daten) {
+  const d = daten || {};
+  const z = (v) => Number(v).toLocaleString('de-DE');
+  const reihen = [];
+  const dazu = (name, wert) => { if (wert != null && wert !== '') reihen.push({ name, wert }); };
+
+  dazu('Objektart', d.objart || d.objektart);
+  dazu('Wohnfläche', d.wfl ? d.wfl + ' m²' : null);
+  dazu('Zimmer', d.zimmer);
+  dazu('Baujahr', d.baujahr);             /* nie durch Intl.NumberFormat */
+  dazu('Kaufpreis', d.kp ? z(d.kp) + ' €' : null);
+  dazu('Kaltmiete', d.nkm ? z(d.nkm) + ' €/Monat' : null);
+  dazu('Eigenkapital', d.ek ? z(d.ek) + ' €' : null);
+  dazu('Darlehen', d.d1 ? z(d.d1) + ' €' : null);
+  dazu('Zins', d.d1z ? d.d1z + ' %' : null);
+  dazu('Tilgung', d.d1t ? d.d1t + ' %' : null);
+  return reihen;
+}
+
+async function objektKontext(userId, objektId) {
+  const r = await query(
+    `SELECT id, data, ai_analysis, updated_at FROM objects WHERE user_id = $1 AND id = $2`,
+    [userId, objektId]
+  );
+  if (!r.rows.length) return null;
+  const z = r.rows[0];
+  return {
+    objekt_id: z.id,
+    daten: z.data || {},
+    ki_lagebewertung: z.ai_analysis || null,
+    geaendert: z.updated_at
+  };
+}
+
+/* ── Objektzuordnung aus einem Satz ──────────────────────────────────────
+ *
+ * Dasselbe Verfahren wie im Browser (`copilot-aenderungen.js objektZuordnen`),
+ * und mit denselben zwei Lehren, die es dort gekostet hat:
+ *
+ *   1. `indexOf` findet TEILWOERTER: "str" steckt in "Musterstrasse".
+ *      Deshalb Wortgrenzen.
+ *   2. Ein Laengenfilter wirft die HAUSNUMMER weg — und genau die
+ *      unterscheidet zwei Objekte in derselben Strasse. Zahlen zaehlen ab
+ *      einer Stelle und wiegen schwerer.
+ *
+ * Und die wichtigste: BEI GLEICHSTAND WIRD GEFRAGT, nicht geraten. Ein
+ * falsch zugeordnetes Objekt aendert Daten am falschen Haus.
+ */
+const STRASSENWOERTER = new Set(['strasse', 'straße', 'str', 'weg', 'allee', 'platz',
+  'gasse', 'ring', 'damm', 'ufer', 'chaussee', 'hof', 'park']);
+
+function _woerter(s) {
+  return String(s || '').toLowerCase()
+    .replace(/[^a-zäöüß0-9]+/g, ' ')
+    .split(' ')
+    .filter(Boolean);
+}
+
+function objektRaten(satz, liste) {
+  const w = _woerter(satz);
+  const treffer = liste.map((o) => {
+    const ows = _woerter(o.adresse);
+    const ow = new Set(ows);
+    let p = 0;
+    for (const t of w) {
+      if (/^\d+$/.test(t)) { if (ow.has(t)) p += 3; continue; }  /* Hausnummer/PLZ */
+      if (STRASSENWOERTER.has(t)) continue;                      /* "strasse" sagt nichts */
+      if (ow.has(t)) { if (t.length > 2) p += 2; continue; }
+
+      /* ── v1810 · ABGEKUERZTE STRASSENNAMEN ────────────────────────────
+       *
+       * GEMESSEN: "Musterstr" fand "Musterstraße 12" NICHT. Die
+       * Wortgrenzen-Regel aus v1767b war gegen die indexOf-Falle gebaut
+       * ("str" steckt in jeder Strasse) und hat recht — aber sie trifft
+       * auch die Abkuerzung, die jeder schreibt.
+       *
+       *   > Wer "Musterstr" tippt, meint die Musterstrasse. Eine Regel,
+       *   > die das nicht trifft, ist zu streng geworden statt sicher.
+       *
+       * Ein PRAEFIX zaehlt deshalb, wenn es lang genug ist: ab fuenf
+       * Zeichen. "str" (drei) bleibt draussen, "muster" trifft
+       * "musterstrasse", und das ist gewollt. */
+      if (t.length >= 5) {
+        const praefix = ows.some((a) => a.length > t.length && a.indexOf(t) === 0);
+        if (praefix) { p += 2; continue; }
+      }
+    }
+    return { o: o, p: p };
+  }).filter((x) => x.p > 0).sort((a, b) => b.p - a.p);
+
+  if (!treffer.length) return { art: 'keiner' };
+  if (treffer.length > 1 && treffer[0].p === treffer[1].p) {
+    return { art: 'mehrdeutig', kandidaten: treffer.filter((x) => x.p === treffer[0].p).map((x) => x.o) };
+  }
+  return { art: 'eindeutig', objekt: treffer[0].o, punkte: treffer[0].p };
+}
+
+/* ── Die Antwort ─────────────────────────────────────────────────────────
+ *
+ * `copilotChat` ist derselbe Dienst, den der Browser ruft. `kontextArt`
+ * entscheidet, wie das Modell den Kontext beschriftet — ohne ihn stuende
+ * "AKTUELLES OBJEKT" ueber einer Vermoegensbilanz (v1704).
+ */
+async function antwort(opts) {
+  const nutzlast = {
+    message: opts.message,
+    history: (opts.history || []).slice(-12),
+    context: opts.context,
+    allowWeb: false
+  };
+  if (opts.kontextArt) nutzlast.kontextArt = opts.kontextArt;
+  if (opts.felder) nutzlast.felder = opts.felder;
+
+  const r = await openaiService.copilotChat(nutzlast, {});
+  return r;
+}
+
+module.exports = {
+  portfolioKontext, standSatz, objekteListe, objektKontext, objektRaten, antwort,
+  scoreLesen, kerndaten, stufeZu
+};

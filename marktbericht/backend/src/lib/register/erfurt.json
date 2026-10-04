@@ -1,0 +1,199 @@
+[
+ {
+  "land_code": "TH",
+  "ags": "16051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Erfurt, Landeshauptstadt (kreisfreie Stadt)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.9,
+   "rundung_stellen": 1,
+   "bezeichnung": "Grundstücke mit Mehrfamilienhäusern (MFH), auch mit geringem gewerblichen Anteil unter 20 % vom Rohertrag",
+   "hinweis": "Ergebnis in PROZENT (2,9 bedeutet 2,9 %), nicht als Dezimalbruch. Keine Achse: der Ausschuss hat ausdrücklich geprüft und KEINE signifikante Abhängigkeit von Restnutzungsdauer oder Jahresrohertrag gefunden und deshalb das arithmetische Mittel gewählt. Eine Stufentabelle wäre hier Dokumentbruch."
+  },
+  "korrekturen": [
+   {
+    "bez": "Korrekturfaktoren nach Anzahl der Stellplätze (Entwurf EW-RL vom 05.05.2014)",
+    "feld": "stellplaetze_anzahl",
+    "art": "stufen",
+    "stufen": {
+     "1": 1.45,
+     "4": 1.2,
+     "12": 1,
+     "30": 0.84,
+     "90": 0.64
+    },
+    "einheit": "faktor_auf_bewirtschaftungskosten_stellplatz",
+    "hinweis": "MULTIPLIKATIV auf die Bewirtschaftungskosten der Stellplätze, NICHT additiv auf den Zinssatz. Der Faktor gehört in die Rohertrags-/Reinertragsrechnung, mit der das Modell arbeitet. Wer ihn auf den Zinssatz anwendet, rechnet etwas anderes als der Ausschuss.",
+    "fundstelle": "Abbildung 2 (Modellbeschreibung), S. 6"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich S. 6: „Die Anwendung des Ertragswertverfahrens führt nur dann zu marktgerechten Ergebnissen, wenn die in den folgenden Abschnitten veröffentlichten Liegenschaftszinssätze in dem Bewertungsmodell angewendet werden, in dem sie auch abgeleitet wurden (Modellkonformität).\"",
+   "grundstuecksart": "Mehrfamilienhausgrundstücke, auch mit einem geringen gewerblichen Anteil (< 20 % vom Rohertrag)",
+   "vermietung": "Vollvermietung wird unterstellt",
+   "rohertrag": "Ansatz tatsächlicher Erträge (Nettokaltmieten), auf Marktüblichkeit geprüft; ohne Angaben sachverständige Schätzung nach Lage und Ausstattung (Preisspiegel Thüringen 23/24 des IVD)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 ImmoWertV, bezifferte Ansätze in Anlage 1 des Dokuments; getrennt für Wohn- und Gewerbeanteil",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_etw_eur": 420,
+   "verwaltungskosten_gewerbe": "3 % vom Jahresrohertrag, mindestens 351 €/Einheit",
+   "verwaltungskosten_garage_eur_je_einheit": {
+    "1": 66,
+    "4": 55,
+    "12": 46,
+    "30": 39,
+    "90": 29
+   },
+   "verwaltungskosten_carport_eur_je_einheit": {
+    "1": 33,
+    "4": 28,
+    "12": 23,
+    "30": 19,
+    "90": 15
+   },
+   "instandhaltung_eur_qm_wohn_nutzflaeche": 13.8,
+   "instandhaltung_eur_qm_verbrauchermaerkte": 6.9,
+   "instandhaltung_eur_qm_lager_logistik_produktion": 4.1,
+   "instandhaltung_garage_eur_je_einheit": {
+    "1": 151,
+    "4": 125,
+    "12": 104,
+    "30": 87,
+    "90": 66
+   },
+   "instandhaltung_carport_eur_je_einheit": {
+    "1": 45,
+    "4": 37,
+    "12": 31,
+    "30": 26,
+    "90": 20
+   },
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "stellplatz_sonderregel": "Außenstellplatz/Carport: Verwaltung 50 % des Einstellplatzes, Instandhaltung 30 % des Einstellplatzes",
+   "kosten_stichtag": "Anlage 1 ist im Inhaltsverzeichnis mit „Bewirtschaftungskosten 2023\" überschrieben, auf der Anlagenseite selbst mit „Bewirtschaftungskosten 2024\". Die beiden Angaben im Dokument widersprechen sich; die Zahlen oben sind von der Anlagenseite. Nicht stillschweigend entschieden.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Wörtlich S. 6 (Abbildung 2): „Gesamtnutzungsdauer — gem. Anlage 1 ImmoWertV — Mehrfamilienhäuser 80 Jahre, Wohnhäuser mit Mischnutzung 80 Jahre.\" Dazu S. 5: „Gegenüber den Ableitungen der vergangenen Jahre wurde das Modell dahingehend angepasst, dass jetzt gem. Anlage 1 ImmoWertV eine einheitliche Gesamtnutzungsdauer von 80 Jahren angesetzt wird. Dadurch ergeben sich längere Restnutzungsdauern und auch höhere Liegenschaftszinssätze im Vergleich zu den Vorjahren.\"",
+   "gnd_warnung": "Die 80 Jahre sind NEU — bis einschließlich des Jahrgangs 2022 rechnete dieser Ausschuss anders. Ein Vergleich mit dem älteren Erfurt-Satz in ost.json (0,9 % für 2021) ist deshalb kein Zeitvergleich, sondern ein Modellwechsel.",
+   "restnutzungsdauer": "Gesamtnutzungsdauer abzüglich Alter; ggf. modifizierte Restnutzungsdauer; bei Modernisierungsmaßnahmen Verlängerung nach Anlage 2 ImmoWertV",
+   "bodenwert": "ungedämpft, zutreffender Bodenrichtwert, ggf. angepasst an die Merkmale des Einzelobjekts (Bodenrichtwert zum Stichtag 01.01.2024)",
+   "grundstuecksflaeche": "entsprechend §§ 40 und 41 ImmoWertV",
+   "besondere_merkmale": "entsprechende Kaufpreisbereinigung",
+   "verfahren": "arithmetisches Mittel der Einzelzinssätze (Regression auf Restnutzungsdauer und Jahresrohertrag geprüft, nicht signifikant)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "kreisfreie Stadt Erfurt",
+   "sachlich": "Mehrfamilienhausgrundstücke, erschließungsbeitragsfrei, typisches Gebäude, gewerblicher Anteil unter 20 % vom Rohertrag",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflage (S. 8): „Weichen die Merkmale des Bewertungsobjektes signifikant von den beschreibenden Qualitätsmerkmalen der Stichprobe ab, ist eine sachverständige Anpassung des Liegenschaftszinssatzes bzw. des Rohertragsfaktors vorzunehmen.\" Dazu S. 7: „Auf Grund der geringen Kauffallanzahl wird im besonderen Maße auf die Ausweisung der Kennzahlen der Stichprobe verwiesen. Mittelwerte aus einer geringen Anzahl von Verkäufen bedürfen stets einer sachverständigen kritischen Würdigung, daher wird für diese Daten generell ein Auszug aus der Kaufpreissammlung empfohlen.\"",
+   "stichprobe": {
+    "anzahl": 61,
+    "kaufvertragsdatum": "05.01.2024 bis 17.12.2024",
+    "liegenschaftszinssatz_pct": {
+     "min": 1.2,
+     "p5": 1.4,
+     "median": 3,
+     "mittel": 2.9,
+     "p95": 4.5,
+     "max": 5.3
+    },
+    "rohertragsfaktor": {
+     "min": 11.5,
+     "p5": 12.8,
+     "median": 17,
+     "mittel": 17,
+     "p95": 22.3,
+     "max": 24.7
+    },
+    "bereinigter_kaufpreis_eur_qm": {
+     "min": 880,
+     "p5": 994,
+     "median": 1497,
+     "mittel": 1580,
+     "p95": 2412,
+     "max": 2784
+    },
+    "bodenrichtwert_eur_qm": {
+     "min": 150,
+     "p5": 160,
+     "median": 310,
+     "mittel": 315,
+     "p95": 580,
+     "max": 730
+    },
+    "baujahr": {
+     "min": 1878,
+     "p5": 1884,
+     "median": 1907,
+     "mittel": 1909,
+     "p95": 1930,
+     "max": 1992
+    },
+    "wohn_nutzflaeche_qm": {
+     "min": 207,
+     "p5": 269,
+     "median": 577,
+     "mittel": 617,
+     "p95": 939,
+     "max": 2310
+    },
+    "grundstuecksgroesse_qm": {
+     "min": 179,
+     "p5": 224,
+     "median": 391,
+     "mittel": 479,
+     "p95": 1000,
+     "max": 2372
+    },
+    "restnutzungsdauer_jahre": {
+     "min": 25,
+     "p5": 27,
+     "median": 29,
+     "mittel": 32,
+     "p95": 48,
+     "max": 49
+    },
+    "nettokaltmiete_wohnen_eur_qm_monat": {
+     "min": 5.7,
+     "p5": 5.8,
+     "median": 7.6,
+     "mittel": 7.6,
+     "p95": 9.5,
+     "max": 9.9
+    },
+    "fundstelle": "Abbildung 4 „Kennzahlen der Stichprobe\", S. 9"
+   }
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Liegenschaftszinssatz und Rohertragsfaktor für Mehrfamilienhausgrundstücke 2025, Abbildung 3, S. 8",
+    "wortlaut": "Liegenschaftszinssatz [%] 2,9 · Standardabweichung (Stichprobe) [%] 0,98 · Rohertragsfaktor 17,0 · Standardabweichung (Stichprobe) 2,91 — Spaltenkopf „2024\".",
+    "kauffaelle": 61,
+    "beschluss": "Wörtlich S. 7: „Der Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt hat in seiner Beratung am 26. Juni 2025 gemäß § 17 Thüringer Gutachterausschussverordnung (ThürGAVO) den Liegenschaftszinssatz und den Rohertragsfaktor für das Jahr 2024 zum Stichtag 01.07.2024, wie im Folgenden dargestellt, beschlossen.\"",
+    "pruefprotokoll": "GEGENPROBE am 01.10.2026: der abgedruckte Mittelwert 2,9 % stimmt mit dem Mittelwert in der Stichprobentabelle (Abbildung 4, S. 9) überein, der Rohertragsfaktor 17,0 ebenso mit dem dortigen Mittelwert und Median. Zwei Tabellen desselben Dokuments nennen damit dieselben Zahlen. KAUFFALLKETTE: 66 Kaufverträge aus 2024 einbezogen, 5 als nicht vergleichbar ausgeschlossen, 61 geblieben — 66 − 5 = 61, und 61 ist die Fallzahl der Stichprobentabelle. Ein durchgerechnetes Anwendungsbeispiel enthält das Dokument NICHT; die Formel zur Ermittlung von p steht auf S. 5, aber ohne Zahlenbeispiel."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Standardabweichung 0,98 Prozentpunkte, unter der Wohnen-Schwelle von 1,55 Prozentpunkten.",
+  "fallzahl": 61,
+  "streuung": {
+   "stabw_pp": 0.98
+  },
+  "stichtag": "2024-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "LZ/RoF MFH 2025 GAA Erfurt (GND 80, Modellwechsel)",
+  "quelle_url": "https://d-nb.info/137325114X/34",
+  "quelle_parser": "v1768-THEF",
+  "quellenvermerk": "Liegenschaftszinssatz und Rohertragsfaktor für Mehrfamilienhausgrundstücke 2025 © Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "lizenz": "Wiedergabe nur mit Quellenangabe gestattet; der Quellenvermerk ist im Dokument wörtlich vorgegeben",
+  "lizenz_hinweis": "Wörtlich (Titelseite): „Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet. Der Quellenvermerk ist wie folgt anzugeben: ...\" — der Vermerk in quellenvermerk ist genau dieser Wortlaut und darf nicht gekürzt werden.",
+  "auflagen": "Der Rohertragsfaktor 17,0 (Standardabweichung 2,91) gehört zu demselben Modell und ist hier NICHT als eigene Kennzahl erfasst — das Register führt keine Kennzahl „rohertragsfaktor\". Er steht in belege und in geltungsbereich.stichprobe. — Die abweichende Jahresangabe der Anlage 1 (2023 im Inhaltsverzeichnis, 2024 auf der Anlagenseite) ist am Dokument nachzusehen.",
+  "fundstelle": "Abbildung 3, S. 8; Modellbeschreibung Abbildung 2, S. 6; Bewirtschaftungskosten Anlage 1, S. 10; Stichprobe Abbildung 4, S. 9",
+  "bezugsquelle_hinweis": "Das Dokument steht auf tlbg.thueringen.de unter /fileadmin/TLBG/Wertermittlung/Berichte_Grundstuecksmarkt/Erfurt/, ist dort aber maschinell nicht abrufbar: der Server antwortet mit HTTP 200 und content_type text/html — einer Link11-CAPTCHA-Seite — statt mit dem PDF. Gelesen wurde deshalb die Pflichtabgabe bei der Deutschen Nationalbibliothek (IDN 137325114X, URN urn:nbn:de:101:1-2508061336347.375264715376), inhaltsgleich und dauerhaft adressierbar."
+ }
+]

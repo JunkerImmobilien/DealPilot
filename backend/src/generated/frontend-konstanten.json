@@ -1,0 +1,2983 @@
+{
+ "erzeugt_am": "2026-10-04T07:25:20.780Z",
+ "quellen": {
+  "voice-import": "7dbbe6cf88e245a8",
+  "objektart-felder": "7e35d8f32caad19d",
+  "storage": "077cfe4e9901f982",
+  "index-html": "a2a37aa1c4659875",
+  "grest": "9c0a4587759b4148"
+ },
+ "daten": {
+  "objektarten": {
+   "ETW": {
+    "passt": [
+     "zimmer",
+     "bad_anz",
+     "etage",
+     "etagen_ges",
+     "mea"
+    ],
+    "pflicht": [
+     "mea"
+    ],
+    "hinweis": {
+     "mea": "Bei Wohnungseigentum trägt der Miteigentumsanteil den Bodenwert."
+    }
+   },
+   "EFH": {
+    "passt": [
+     "zimmer",
+     "bad_anz",
+     "etagen_ges"
+    ],
+    "pflicht": []
+   },
+   "ZFH": {
+    "passt": [
+     "zimmer",
+     "bad_anz",
+     "etagen_ges",
+     "einheiten"
+    ],
+    "pflicht": []
+   },
+   "DHH": {
+    "passt": [
+     "zimmer",
+     "bad_anz",
+     "etagen_ges"
+    ],
+    "pflicht": []
+   },
+   "RH": {
+    "passt": [
+     "zimmer",
+     "bad_anz",
+     "etagen_ges"
+    ],
+    "pflicht": []
+   },
+   "MFH": {
+    "passt": [
+     "etagen_ges",
+     "einheiten"
+    ],
+    "pflicht": [
+     "einheiten"
+    ],
+    "hinweis": {
+     "einheiten": "Beim Mehrfamilienhaus zählt die Zahl der Wohneinheiten, nicht die Zimmer einer einzelnen."
+    }
+   },
+   "BUERO": {
+    "passt": [
+     "etagen_ges",
+     "einheiten"
+    ],
+    "pflicht": []
+   },
+   "GESCH": {
+    "passt": [
+     "etagen_ges",
+     "einheiten"
+    ],
+    "pflicht": []
+   },
+   "HOTEL": {
+    "passt": [
+     "etagen_ges",
+     "einheiten"
+    ],
+    "pflicht": []
+   },
+   "GEW": {
+    "passt": [
+     "etagen_ges"
+    ],
+    "pflicht": []
+   },
+   "GAR": {
+    "passt": [],
+    "pflicht": []
+   }
+  },
+  "etappen": [
+   {
+    "nr": 1,
+    "name": "Basis",
+    "ziel": "Objekt, Preis und Miete"
+   },
+   {
+    "nr": 2,
+    "name": "Geld",
+    "ziel": "Finanzierung und Kaufnebenkosten"
+   },
+   {
+    "nr": 3,
+    "name": "Lage & Zustand",
+    "ziel": "wo es steht und wie es dasteht"
+   },
+   {
+    "nr": 4,
+    "name": "Feinschliff",
+    "ziel": "Bewirtschaftung, Entwicklung, Steuer"
+   },
+   {
+    "nr": 5,
+    "name": "Deine Sicht",
+    "ziel": "These und Risiken"
+   },
+   {
+    "nr": 6,
+    "name": "Feinheiten",
+    "ziel": "alle übrigen Felder"
+   },
+   {
+    "nr": 7,
+    "name": "Wertermittlung",
+    "ziel": "Sachwertverfahren nach ImmoWertV",
+    "extra": true
+   },
+   {
+    "nr": 8,
+    "name": "Restnutzungsdauer",
+    "ziel": "Modernisierungsgrad nach Anlage 2",
+    "extra": true
+   }
+  ],
+  "fragen": [
+   {
+    "et": 1,
+    "ids": [
+     "plz",
+     "ort",
+     "str",
+     "hnr"
+    ],
+    "rang": 5,
+    "frage": "Wo steht das Objekt? Straße, Hausnummer, PLZ und Ort."
+   },
+   {
+    "et": 1,
+    "ids": [
+     "objart",
+     "wfl",
+     "zimmer",
+     "einheiten",
+     "etagen_ges"
+    ],
+    "rang": 3,
+    "nachArt": 1,
+    "frage": "Was für ein Objekt ist es, und wie groß? Art, Wohnfläche, Zimmer."
+   },
+   {
+    "et": 1,
+    "ids": [
+     "baujahr",
+     "kp"
+    ],
+    "rang": 1,
+    "frage": "Baujahr und Kaufpreis?"
+   },
+   {
+    "et": 1,
+    "ids": [
+     "nkm",
+     "ze"
+    ],
+    "rang": 2,
+    "frage": "Was kommt monatlich rein? Kaltmiete und Zusatzeinnahmen wie Stellplatz."
+   },
+   {
+    "et": 2,
+    "ids": [
+     "ek",
+     "d1z",
+     "d1t",
+     "d1_bindj"
+    ],
+    "rang": 4,
+    "vorbelegt": 1,
+    "profil": "finanzierung",
+    "frage": "Wie finanzierst du? Eigenkapital, Zinssatz, Tilgung und Zinsbindung."
+   },
+   {
+    "et": 2,
+    "ids": [
+     "makler_p",
+     "notar_p",
+     "gba_p",
+     "gest_p"
+    ],
+    "rang": 6,
+    "vorbelegt": 1,
+    "profil": "nebenkosten",
+    "frage": "Die Kaufnebenkosten — Makler, Notar, Grundbuch und Grunderwerbsteuer, jeweils in Prozent vom Kaufpreis."
+   },
+   {
+    "et": 3,
+    "ids": [
+     "makrolage",
+     "mikrolage"
+    ],
+    "rang": 12,
+    "skalen": 1,
+    "abruf": "lage",
+    "frage": "Wie schätzt du die Lage ein — erst die Region, dann die Straße?"
+   },
+   {
+    "et": 3,
+    "ids": [
+     "ds2_zustand",
+     "ds2_energie"
+    ],
+    "rang": 12,
+    "skalen": 1,
+    "nachArt": 1,
+    "frage": "Wie ist der Zustand der Wohnung, und was steht im Energieausweis?"
+   },
+   {
+    "et": 3,
+    "ids": [
+     "san",
+     "moebl"
+    ],
+    "rang": 9,
+    "frage": "Muss etwas saniert werden, und wird etwas mitverkauft — Küche, Möbel?"
+   },
+   {
+    "et": 3,
+    "ids": [
+     "brw",
+     "gsfl",
+     "mea"
+    ],
+    "rang": 11,
+    "abruf": "brw",
+    "nachArt": 1,
+    "frage": "Was weißt du zum Grundstück — Bodenrichtwert, Fläche, Miteigentumsanteil? Und: ist das Grundstück Erbbaurecht?",
+    "frageWennAbruf": "Wie groß ist das Grundstück, und wie hoch ist dein Miteigentumsanteil? Den Bodenrichtwert hole ich gleich amtlich. Und: ist das Grundstück Erbbaurecht?"
+   },
+   {
+    "et": 3,
+    "ids": [
+     "erbbauzins",
+     "erb_restlz"
+    ],
+    "rang": 10,
+    "nurWenn": "erbpacht",
+    "frage": "Zum Erbbaurecht brauche ich noch zwei Zahlen: wie hoch ist der Erbbauzins im Jahr, und wie lange läuft der Vertrag noch?"
+   },
+   {
+    "et": 4,
+    "ids": [
+     "hg_ul",
+     "hg_nul"
+    ],
+    "rang": 8,
+    "vorbelegt": 1,
+    "profil": "bewirtschaftung",
+    "nachArt": 1,
+    "frage": "Wie teilt sich das Hausgeld im Jahr auf — welcher Teil ist auf den Mieter umlegbar, und welcher trägst du selbst?"
+   },
+   {
+    "et": 4,
+    "ids": [
+     "mietstg",
+     "wertstg",
+     "leerstand"
+    ],
+    "rang": 14,
+    "vorbelegt": 1,
+    "profil": "langfrist",
+    "frage": "Womit rechnest du langfristig — Mietsteigerung, Wertsteigerung und Leerstand in Prozent?"
+   },
+   {
+    "et": 4,
+    "ids": [
+     "ds2_mietausfall"
+    ],
+    "rang": 13,
+    "skalen": 1,
+    "frage": "Wie schätzt du das Mietausfall-Risiko ein? Bei mehreren Einheiten verteilt es sich — bei einer trifft ein Auszug voll."
+   },
+   {
+    "et": 4,
+    "ids": [
+     "ds2_bevoelkerung",
+     "ds2_nachfrage",
+     "ds2_wertsteigerung",
+     "ds2_entwicklung"
+    ],
+    "rang": 15,
+    "skalen": 1,
+    "frage": "Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?"
+   },
+   {
+    "et": 4,
+    "ids": [
+     "kaufdat",
+     "wirtschaftlicher_uebergang"
+    ],
+    "rang": 10,
+    "frage": "Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?"
+   },
+   {
+    "et": 4,
+    "ids": [
+     "afa_satz",
+     "geb_ant",
+     "grenz",
+     "zve"
+    ],
+    "eins": [
+     "grenz",
+     "zve"
+    ],
+    "rang": 16,
+    "vorbelegt": 1,
+    "profil": "steuer",
+    "frage": "Zur Steuer — AfA-Satz, Gebäudeanteil und dein Grenzsteuersatz. Wenn du den Satz nicht im Kopf hast: sag mir dein zu versteuerndes Einkommen, dann rechne ich ihn aus."
+   },
+   {
+    "et": 5,
+    "ids": [
+     "thesis",
+     "risiken",
+     "notizen"
+    ],
+    "rang": 13,
+    "frage": "Warum lohnt sich das Objekt für dich, was könnte schiefgehen, und was ist sonst wichtig?"
+   }
+  ],
+  "feld_ids": [
+   "plz",
+   "ort",
+   "str",
+   "hnr",
+   "objart",
+   "wfl",
+   "baujahr",
+   "wert_soll",
+   "kaufdat",
+   "wirtschaftlicher_uebergang",
+   "kuerzel",
+   "ausst",
+   "thesis",
+   "risiken",
+   "notizen",
+   "bankval",
+   "svwert",
+   "makrolage",
+   "mikrolage",
+   "vermstand",
+   "nutzungsart",
+   "exitstr",
+   "kp",
+   "makler_p",
+   "notar_p",
+   "gba_p",
+   "gest_p",
+   "ji_p",
+   "san",
+   "moebl",
+   "inv_kueche",
+   "inv_moebel",
+   "inv_geraete",
+   "inv_pv",
+   "inv_stellplatz",
+   "inv_sonst",
+   "brw",
+   "mea",
+   "gsfl",
+   "mietstg",
+   "wertstg",
+   "kostenstg",
+   "leerstand",
+   "btj",
+   "exit_bmy",
+   "nkm",
+   "ze",
+   "umlagef",
+   "afa_satz",
+   "afa_eigen",
+   "afa_eigen_grundlage",
+   "afa_rnd_jahre",
+   "geb_ant",
+   "zve",
+   "grenz",
+   "ek",
+   "d1",
+   "d1z",
+   "d1t",
+   "d1_bindj",
+   "anschl_z",
+   "anschl_t",
+   "anschl_bj",
+   "hg_ul",
+   "grundsteuer",
+   "ul_sonst",
+   "hg_nul",
+   "weg_r",
+   "eigen_r",
+   "mietausfall",
+   "nul_sonst",
+   "kp1",
+   "kp1l",
+   "kp2",
+   "kp2l",
+   "kp3",
+   "kp3l",
+   "kp4",
+   "kp4l",
+   "bank_inst",
+   "ai_strat",
+   "ai_verk",
+   "ai_risk",
+   "ai_markt",
+   "d2",
+   "d2z",
+   "d2t",
+   "d2_bindj",
+   "d2_inst",
+   "d2_type",
+   "bwk_ul_pct",
+   "bwk_nul_pct",
+   "bwk_kp_pct",
+   "d1_type",
+   "d1_auszahl",
+   "d1_vertrag",
+   "d2_auszahl",
+   "d2_az",
+   "d2_at",
+   "bspar_inst",
+   "bspar_vertrag",
+   "bspar_sum",
+   "bspar_rate",
+   "bspar_zuteil",
+   "bspar_zins",
+   "bspar_quote_min",
+   "bspar_dar_z",
+   "bspar_dar_t",
+   "mietspiegel",
+   "me_modus",
+   "me_soll",
+   "me_anz",
+   "me_int",
+   "me_pct",
+   "ds2_zustand",
+   "ds2_energie",
+   "ds2_mietausfall",
+   "ds2_marktmiete",
+   "ds2_bevoelkerung",
+   "ds2_nachfrage",
+   "ds2_marktfaktor",
+   "ds2_wertsteigerung",
+   "ds2_entwicklung",
+   "rate_kueche",
+   "rate_bad",
+   "rate_boden",
+   "rate_fenster",
+   "qual_kueche",
+   "qual_bad",
+   "qual_boden",
+   "qual_fenster",
+   "zimmer",
+   "bad_anz",
+   "etage",
+   "etagen_ges",
+   "modernis",
+   "mod_dach",
+   "mod_fenster",
+   "mod_leitungen",
+   "mod_heizung",
+   "mod_aussenwand",
+   "mod_baeder",
+   "mod_innenausbau",
+   "mod_grundriss",
+   "garagen",
+   "stellpl_aussen",
+   "balkon_flae",
+   "_avm_state",
+   "_mb_state",
+   "einheiten",
+   "san_tax_active",
+   "san_tax_years",
+   "moebl_tax_active",
+   "moebl_tax_years",
+   "san_ust",
+   "erwerbsart",
+   "anbietertyp",
+   "_immometrica_id",
+   "_immometrica_online_since",
+   "_immometrica_portals",
+   "eq_heating",
+   "eq_windows",
+   "eq_floor",
+   "eq_bath",
+   "eq_guest_wc",
+   "eq_store_room",
+   "eq_walls",
+   "eq_roof",
+   "eq_elevator",
+   "halter",
+   "halter_seit",
+   "obj_herkunft",
+   "verkehrswert_ueberf",
+   "ueberf_preis",
+   "gesellschafterdarlehen",
+   "ueberf_restschuld",
+   "ueberf_rest_zins",
+   "ueberf_ende",
+   "_ueberf_link",
+   "_dp_herkunft",
+   "erbbauzins",
+   "erb_restlz",
+   "erb_zs_ang",
+   "erb_entsch",
+   "baustatus",
+   "bgf",
+   "standardstufe",
+   "grundriss",
+   "mod_punkte",
+   "sachwertfaktor",
+   "stellplatz_miete_monat",
+   "sonstige_jahr",
+   "nhk_haus",
+   "nhk_geschosse",
+   "nhk_dach",
+   "hinterland_qm",
+   "hinterland_eur_qm",
+   "hinterland_rentierlich",
+   "garagen_bgf_qm",
+   "garagen_stufe",
+   "aussenanlagen_pct",
+   "aussenanlagen",
+   "ausst_aussenwaende",
+   "ausst_dach",
+   "ausst_fenster",
+   "ausst_innenwaende",
+   "ausst_decken",
+   "ausst_fussboeden",
+   "ausst_sanitaer",
+   "ausst_heizung",
+   "ausst_technik",
+   "bes_bauteile",
+   "btl_gauben",
+   "btl_balkone",
+   "btl_vordach",
+   "btl_terrassen",
+   "btl_sonstige",
+   "lzs_pct",
+   "brw_manuell",
+   "brw_anpassung_pct",
+   "brw_anpassung_grund",
+   "brw_stichtag"
+  ],
+  "felder": [
+   {
+    "id": "plz",
+    "kind": "text",
+    "label": "PLZ"
+   },
+   {
+    "id": "ort",
+    "kind": "text",
+    "label": "Ort"
+   },
+   {
+    "id": "str",
+    "kind": "text",
+    "label": "Straße"
+   },
+   {
+    "id": "hnr",
+    "kind": "text",
+    "label": "Hausnummer"
+   },
+   {
+    "id": "objart",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "ETW",
+      "text": "Eigentumswohnung (ETW)"
+     },
+     {
+      "wert": "EFH",
+      "text": "Einfamilienhaus (EFH)"
+     },
+     {
+      "wert": "ZFH",
+      "text": "Zweifamilienhaus (ZFH)"
+     },
+     {
+      "wert": "MFH",
+      "text": "Mehrfamilienhaus (MFH)"
+     },
+     {
+      "wert": "DHH",
+      "text": "Doppelhaushälfte (DHH)"
+     },
+     {
+      "wert": "RH",
+      "text": "Reihenhaus (RH)"
+     },
+     {
+      "wert": "BUERO",
+      "text": "Bürogebäude"
+     },
+     {
+      "wert": "GESCH",
+      "text": "Geschäftshaus"
+     },
+     {
+      "wert": "HOTEL",
+      "text": "Hotel"
+     },
+     {
+      "wert": "GEW",
+      "text": "Gewerbe-/Industriegebäude"
+     },
+     {
+      "wert": "GAR",
+      "text": "Garage / Stellplatz"
+     }
+    ],
+    "label": "Objektart"
+   },
+   {
+    "id": "wfl",
+    "kind": "text",
+    "label": "Wohnfläche (m²)"
+   },
+   {
+    "id": "baujahr",
+    "kind": "text",
+    "label": "Baujahr"
+   },
+   {
+    "id": "wert_soll",
+    "kind": "text",
+    "label": "Wert nach Sanierung (optional · stabilisiert)"
+   },
+   {
+    "id": "kaufdat",
+    "kind": "text",
+    "label": "Kaufdatum"
+   },
+   {
+    "id": "wirtschaftlicher_uebergang",
+    "kind": "text",
+    "label": "Wirtsch. Übergang · Nutzen-/Lastenwechsel"
+   },
+   {
+    "id": "kuerzel",
+    "kind": "text",
+    "label": "Kürzel"
+   },
+   {
+    "id": "ausst",
+    "kind": "select",
+    "label": "Ausstattung"
+   },
+   {
+    "id": "thesis",
+    "kind": "text",
+    "label": "Investitionsthese"
+   },
+   {
+    "id": "risiken",
+    "kind": "text",
+    "label": "Bekannte Risiken"
+   },
+   {
+    "id": "notizen",
+    "kind": "text",
+    "label": "Zusätzliche Notizen"
+   },
+   {
+    "id": "bankval",
+    "kind": "text",
+    "label": "Bankbewertung"
+   },
+   {
+    "id": "svwert",
+    "kind": "text",
+    "label": "Verkehrswert (§ 194 BauGB · Sachwert/Ertragswert/Vergleichswert)"
+   },
+   {
+    "id": "makrolage",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "sehr_schwach",
+      "text": "Sehr schwach"
+     },
+     {
+      "wert": "schwach",
+      "text": "Schwach"
+     },
+     {
+      "wert": "durchschnittlich",
+      "text": "Durchschnittlich"
+     },
+     {
+      "wert": "gut",
+      "text": "Gut"
+     },
+     {
+      "wert": "sehr_gut",
+      "text": "Sehr gut"
+     }
+    ],
+    "label": "Makrolage"
+   },
+   {
+    "id": "mikrolage",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "sehr_schwach",
+      "text": "Sehr schwach"
+     },
+     {
+      "wert": "schwach",
+      "text": "Schwach"
+     },
+     {
+      "wert": "durchschnittlich",
+      "text": "Durchschnittlich"
+     },
+     {
+      "wert": "gut",
+      "text": "Gut"
+     },
+     {
+      "wert": "sehr_gut",
+      "text": "Sehr gut"
+     }
+    ],
+    "label": "Mikrolage"
+   },
+   {
+    "id": "vermstand",
+    "kind": "select",
+    "label": "Vermietungsstand"
+   },
+   {
+    "id": "nutzungsart",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "kapitalanlage",
+      "text": "Vermietet (Kapitalanlage)"
+     },
+     {
+      "wert": "eigennutzung",
+      "text": "Selbst genutzt"
+     }
+    ],
+    "label": "Nutzungsart"
+   },
+   {
+    "id": "exitstr",
+    "kind": "select",
+    "label": "Exitstrategie"
+   },
+   {
+    "id": "kp",
+    "kind": "text",
+    "label": "Kaufpreis"
+   },
+   {
+    "id": "makler_p",
+    "kind": "text",
+    "label": "Makler (%)"
+   },
+   {
+    "id": "notar_p",
+    "kind": "text",
+    "label": "Notar (%)"
+   },
+   {
+    "id": "gba_p",
+    "kind": "text",
+    "label": "Grundbuchamt (%) · Vorbelegung 0,5 %"
+   },
+   {
+    "id": "gest_p",
+    "kind": "text",
+    "label": "Grunderwerbsteuer (%)"
+   },
+   {
+    "id": "ji_p",
+    "kind": "text",
+    "label": "Sonstige (%) · Bausachverständiger, Anfahrt, Gutachten"
+   },
+   {
+    "id": "san",
+    "kind": "text",
+    "label": "Sanierungskosten"
+   },
+   {
+    "id": "moebl",
+    "kind": "text",
+    "label": "Inventarkosten"
+   },
+   {
+    "id": "inv_kueche",
+    "kind": "text",
+    "label": "Küche"
+   },
+   {
+    "id": "inv_moebel",
+    "kind": "text",
+    "label": "Möbel"
+   },
+   {
+    "id": "inv_geraete",
+    "kind": "text",
+    "label": "Geräte"
+   },
+   {
+    "id": "inv_pv",
+    "kind": "text",
+    "label": "PV-Anlage"
+   },
+   {
+    "id": "inv_stellplatz",
+    "kind": "text",
+    "label": "Stellplatz"
+   },
+   {
+    "id": "inv_sonst",
+    "kind": "text",
+    "label": "Sonstiges"
+   },
+   {
+    "id": "brw",
+    "kind": "text",
+    "label": "Bodenrichtwert (€/m²)"
+   },
+   {
+    "id": "mea",
+    "kind": "text",
+    "label": "Miteigentumsanteil (%)"
+   },
+   {
+    "id": "gsfl",
+    "kind": "text",
+    "label": "Grundstücksfläche (m²)"
+   },
+   {
+    "id": "mietstg",
+    "kind": "text",
+    "label": "Erhöhung gilt auch für zusätzliche Einnahmen Wenn aktiv, wachsen Stellplatz, Garage und sonstige zusätzliche Einnahmen im selben Verhältnis wie die Nettokaltmiete. Standardmäßig (deaktiviert) bleibt nur die NKM dynamisch — zusätzliche Einnahmen bleiben über alle Jahre konstant."
+   },
+   {
+    "id": "wertstg",
+    "kind": "text",
+    "label": "Entwicklungs-Opportunität"
+   },
+   {
+    "id": "kostenstg",
+    "kind": "text",
+    "label": "Entwicklungs-Opportunität"
+   },
+   {
+    "id": "leerstand",
+    "kind": "text",
+    "label": "Leerstand p.a."
+   },
+   {
+    "id": "btj",
+    "kind": "text",
+    "label": "Betrachtungszeitraum"
+   },
+   {
+    "id": "exit_bmy",
+    "kind": "text",
+    "label": "Exit-Rendite (Verkauf %)"
+   },
+   {
+    "id": "nkm",
+    "kind": "text",
+    "label": "Nettokaltmiete / Monat"
+   },
+   {
+    "id": "ze",
+    "kind": "text",
+    "label": "Zusätzliche Einnahmen / Monat"
+   },
+   {
+    "id": "umlagef",
+    "kind": "text",
+    "label": "Umlagefähige Kosten / Monat"
+   },
+   {
+    "id": "afa_satz",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "2.0",
+      "text": "2,0 % linear — Standard ab 1925"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5 % linear — Baujahr vor 1925"
+     },
+     {
+      "wert": "3.0",
+      "text": "3,0 % linear — Wohnzwecke ab 2023"
+     },
+     {
+      "wert": "5.0_deg",
+      "text": "5,0 % degressiv — ohne Wechsel"
+     },
+     {
+      "wert": "5.0_deg_wechsel",
+      "text": "5,0 % degressiv mit Wechsel auf 3% linear (empfohlen)"
+     }
+    ],
+    "label": "AfA-Satz"
+   },
+   {
+    "id": "geb_ant",
+    "kind": "text",
+    "label": "Gebäudeanteil am KP (%)"
+   },
+   {
+    "id": "zve",
+    "kind": "text",
+    "label": "Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr"
+   },
+   {
+    "id": "grenz",
+    "kind": "text",
+    "label": "Persönl. Grenzsteuersatz (%)"
+   },
+   {
+    "id": "ek",
+    "kind": "text",
+    "label": "Eigenkapital *"
+   },
+   {
+    "id": "d1",
+    "kind": "text",
+    "label": "Anfängl. Darlehenssumme"
+   },
+   {
+    "id": "d1z",
+    "kind": "text",
+    "label": "Zinssatz nominal (% p.a.)"
+   },
+   {
+    "id": "d1t",
+    "kind": "text",
+    "label": "Tilgung (% p.a.) — bei Aussetzung deaktiviert"
+   },
+   {
+    "id": "d1_bindj",
+    "kind": "text",
+    "label": "Zinsbindung (Jahre)"
+   },
+   {
+    "id": "anschl_z",
+    "kind": "text",
+    "label": "Zinssatz Anschluss (%)"
+   },
+   {
+    "id": "anschl_t",
+    "kind": "text",
+    "label": "Tilgung Anschluss (%)"
+   },
+   {
+    "id": "anschl_bj",
+    "kind": "text",
+    "label": "Zinsbindung Anschluss (J.)"
+   },
+   {
+    "id": "hg_ul",
+    "kind": "text",
+    "label": "Hausgeld (umlagefähig) / Jahr"
+   },
+   {
+    "id": "grundsteuer",
+    "kind": "text",
+    "label": "Grundsteuer / Jahr"
+   },
+   {
+    "id": "ul_sonst",
+    "kind": "text",
+    "label": "Sonstiges umlagefähig / Jahr"
+   },
+   {
+    "id": "hg_nul",
+    "kind": "text",
+    "label": "Hausgeld (nicht umlagefähig)"
+   },
+   {
+    "id": "weg_r",
+    "kind": "text",
+    "label": "WEG-Rücklage / Jahr ℹ Info"
+   },
+   {
+    "id": "eigen_r",
+    "kind": "text",
+    "label": "Eigene Instandhaltungsrücklage"
+   },
+   {
+    "id": "mietausfall",
+    "kind": "text",
+    "label": "Kalkulat. Mietausfall / Jahr"
+   },
+   {
+    "id": "nul_sonst",
+    "kind": "text",
+    "label": "Sonderverwaltung / Jahr"
+   },
+   {
+    "id": "kp1",
+    "kind": "text",
+    "label": "Kostenposition I (€)"
+   },
+   {
+    "id": "kp1l",
+    "kind": "text",
+    "label": "Bezeichnung"
+   },
+   {
+    "id": "kp2",
+    "kind": "text",
+    "label": "Kostenposition II (€)"
+   },
+   {
+    "id": "kp2l",
+    "kind": "text",
+    "label": "Bezeichnung"
+   },
+   {
+    "id": "kp3",
+    "kind": "text",
+    "label": "Kostenposition III (€)"
+   },
+   {
+    "id": "kp3l",
+    "kind": "text",
+    "label": "Bezeichnung"
+   },
+   {
+    "id": "kp4",
+    "kind": "text",
+    "label": "Kostenposition IV (€)"
+   },
+   {
+    "id": "kp4l",
+    "kind": "text",
+    "label": "Bezeichnung"
+   },
+   {
+    "id": "bank_inst",
+    "kind": "text",
+    "label": "Institution"
+   },
+   {
+    "id": "d2",
+    "kind": "text",
+    "label": "Darlehenssumme"
+   },
+   {
+    "id": "d2z",
+    "kind": "text",
+    "label": "Zinssatz nominal (%)"
+   },
+   {
+    "id": "d2t",
+    "kind": "text",
+    "label": "Tilgung (%)"
+   },
+   {
+    "id": "d2_bindj",
+    "kind": "text",
+    "label": "Zinsbindung (Jahre)"
+   },
+   {
+    "id": "d2_inst",
+    "kind": "text",
+    "label": "Institution"
+   },
+   {
+    "id": "d2_type",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "annuitaet",
+      "text": "Annuitätendarlehen"
+     },
+     {
+      "wert": "tilgungsaussetzung",
+      "text": "Tilgungsaussetzungsdarlehen"
+     },
+     {
+      "wert": "kfw",
+      "text": "KfW-Darlehen"
+     }
+    ],
+    "label": "Art des Darlehens"
+   },
+   {
+    "id": "bwk_ul_pct",
+    "kind": "text",
+    "label": "Umlagefähig (% der NKM)"
+   },
+   {
+    "id": "bwk_nul_pct",
+    "kind": "text",
+    "label": "Nicht umlagefähig (% der NKM)"
+   },
+   {
+    "id": "bwk_kp_pct",
+    "kind": "text",
+    "label": "BWK gesamt (% vom Kaufpreis)"
+   },
+   {
+    "id": "d1_type",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "annuitaet",
+      "text": "Annuitätendarlehen"
+     },
+     {
+      "wert": "tilgungsaussetzung",
+      "text": "Tilgungsaussetzungsdarlehen (mit Bausparvertrag)"
+     }
+    ],
+    "label": "Art des Darlehens"
+   },
+   {
+    "id": "d1_auszahl",
+    "kind": "text",
+    "label": "Auszahlungsdatum"
+   },
+   {
+    "id": "d1_vertrag",
+    "kind": "text",
+    "label": "Vertragsnummer"
+   },
+   {
+    "id": "d2_auszahl",
+    "kind": "text",
+    "label": "Auszahlungsdatum"
+   },
+   {
+    "id": "d2_az",
+    "kind": "text",
+    "label": "Zinssatz Anschluss (%)"
+   },
+   {
+    "id": "d2_at",
+    "kind": "text",
+    "label": "Tilgung Anschluss (%)"
+   },
+   {
+    "id": "bspar_inst",
+    "kind": "text",
+    "label": "Bausparkasse"
+   },
+   {
+    "id": "bspar_vertrag",
+    "kind": "text",
+    "label": "Vertragsnummer"
+   },
+   {
+    "id": "bspar_sum",
+    "kind": "text",
+    "label": "Bausparsumme"
+   },
+   {
+    "id": "bspar_rate",
+    "kind": "text",
+    "label": "Sparrate / Monat"
+   },
+   {
+    "id": "bspar_zins",
+    "kind": "text",
+    "label": "Guthaben-Zinssatz (%)"
+   },
+   {
+    "id": "bspar_quote_min",
+    "kind": "text",
+    "label": "Mindestsparquote für Zuteilung (%)"
+   },
+   {
+    "id": "bspar_dar_z",
+    "kind": "text",
+    "label": "Zinssatz Bauspardarlehen (%)"
+   },
+   {
+    "id": "bspar_dar_t",
+    "kind": "text",
+    "label": "Tilgung Bauspardarlehen (%)"
+   },
+   {
+    "id": "me_soll",
+    "kind": "text",
+    "label": "Soll-Mietspiegel (€/m²)"
+   },
+   {
+    "id": "me_anz",
+    "kind": "text",
+    "label": "Anzahl Erhöhungen"
+   },
+   {
+    "id": "me_int",
+    "kind": "text",
+    "label": "Intervall"
+   },
+   {
+    "id": "me_pct",
+    "kind": "text",
+    "label": "Angestrebte Entwicklung"
+   },
+   {
+    "id": "ds2_zustand",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "neubau",
+      "text": "Neubau / kernsaniert"
+     },
+     {
+      "wert": "gut",
+      "text": "Guter Zustand"
+     },
+     {
+      "wert": "normal",
+      "text": "Normaler Zustand"
+     },
+     {
+      "wert": "renovierungsbeduerftig",
+      "text": "Renovierungsbedürftig"
+     },
+     {
+      "wert": "stark_sanierungsbeduerftig",
+      "text": "Stark sanierungsbedürftig"
+     }
+    ],
+    "label": "Zustand der Wohnung DS2"
+   },
+   {
+    "id": "ds2_energie",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "A+",
+      "text": "A+"
+     },
+     {
+      "wert": "A",
+      "text": "A"
+     },
+     {
+      "wert": "B",
+      "text": "B"
+     },
+     {
+      "wert": "C",
+      "text": "C"
+     },
+     {
+      "wert": "D",
+      "text": "D"
+     },
+     {
+      "wert": "E",
+      "text": "E"
+     },
+     {
+      "wert": "F",
+      "text": "F"
+     },
+     {
+      "wert": "G",
+      "text": "G"
+     },
+     {
+      "wert": "H",
+      "text": "H"
+     }
+    ],
+    "label": "Energieklasse DS2"
+   },
+   {
+    "id": "ds2_mietausfall",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "sehr_niedrig",
+      "text": "Sehr niedrig"
+     },
+     {
+      "wert": "niedrig",
+      "text": "Niedrig"
+     },
+     {
+      "wert": "mittel",
+      "text": "Mittel"
+     },
+     {
+      "wert": "erhoeht",
+      "text": "Erhöht"
+     },
+     {
+      "wert": "hoch",
+      "text": "Hoch"
+     }
+    ],
+    "label": "Mietausfall-Risiko DS2"
+   },
+   {
+    "id": "ds2_marktmiete",
+    "kind": "text",
+    "label": "Marktmiete (€/m²) DS2"
+   },
+   {
+    "id": "ds2_bevoelkerung",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "stark_wachsend",
+      "text": "Stark wachsend"
+     },
+     {
+      "wert": "wachsend",
+      "text": "Wachsend"
+     },
+     {
+      "wert": "stabil",
+      "text": "Stabil"
+     },
+     {
+      "wert": "leicht_fallend",
+      "text": "Leicht fallend"
+     },
+     {
+      "wert": "stark_fallend",
+      "text": "Stark fallend"
+     }
+    ],
+    "label": "Bevölkerungsentwicklung"
+   },
+   {
+    "id": "ds2_nachfrage",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "sehr_stark",
+      "text": "Sehr stark (Uni, ÖPNV, Top-Arbeitgeber)"
+     },
+     {
+      "wert": "stark",
+      "text": "Stark"
+     },
+     {
+      "wert": "mittel",
+      "text": "Mittel"
+     },
+     {
+      "wert": "schwach",
+      "text": "Schwach"
+     },
+     {
+      "wert": "sehr_schwach",
+      "text": "Sehr schwach"
+     }
+    ],
+    "label": "Nachfrage-Indikatoren"
+   },
+   {
+    "id": "ds2_wertsteigerung",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "sehr_hoch",
+      "text": "Sehr hoch"
+     },
+     {
+      "wert": "hoch",
+      "text": "Hoch"
+     },
+     {
+      "wert": "mittel",
+      "text": "Mittel"
+     },
+     {
+      "wert": "niedrig",
+      "text": "Niedrig"
+     },
+     {
+      "wert": "keines",
+      "text": "Keines"
+     }
+    ],
+    "label": "Wertsteigerungs-Potenzial"
+   },
+   {
+    "id": "ds2_entwicklung",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "mehrere",
+      "text": "Mehrere klare Möglichkeiten"
+     },
+     {
+      "wert": "eine_starke",
+      "text": "Eine starke Möglichkeit"
+     },
+     {
+      "wert": "begrenzt",
+      "text": "Begrenzt"
+     },
+     {
+      "wert": "kaum",
+      "text": "Kaum"
+     },
+     {
+      "wert": "keine",
+      "text": "Keine"
+     }
+    ],
+    "label": "Entwicklungsmöglichkeiten"
+   },
+   {
+    "id": "zimmer",
+    "kind": "text",
+    "label": "Zimmer"
+   },
+   {
+    "id": "bad_anz",
+    "kind": "text",
+    "label": "Badezimmer"
+   },
+   {
+    "id": "etage",
+    "kind": "text",
+    "label": "Etage"
+   },
+   {
+    "id": "etagen_ges",
+    "kind": "text",
+    "label": "Anzahl Etagen"
+   },
+   {
+    "id": "modernis",
+    "kind": "text",
+    "label": "Modernisierungsjahr"
+   },
+   {
+    "id": "mod_dach",
+    "kind": "select",
+    "label": "Dacherneuerung inkl. W&auml;rmed&auml;mmung"
+   },
+   {
+    "id": "mod_fenster",
+    "kind": "select",
+    "label": "Fenster und Au&szlig;ent&uuml;ren"
+   },
+   {
+    "id": "mod_leitungen",
+    "kind": "select",
+    "label": "Leitungssysteme (Strom, Gas, Wasser)"
+   },
+   {
+    "id": "mod_heizung",
+    "kind": "select",
+    "label": "Heizungsanlage"
+   },
+   {
+    "id": "mod_aussenwand",
+    "kind": "select",
+    "label": "W&auml;rmed&auml;mmung Au&szlig;enw&auml;nde"
+   },
+   {
+    "id": "mod_baeder",
+    "kind": "select",
+    "label": "B&auml;der"
+   },
+   {
+    "id": "mod_innenausbau",
+    "kind": "select",
+    "label": "Innenausbau (Decken, Fu&szlig;b&ouml;den)"
+   },
+   {
+    "id": "mod_grundriss",
+    "kind": "select",
+    "label": "Wesentliche &Auml;nderung der Grundrissgestaltung"
+   },
+   {
+    "id": "garagen",
+    "kind": "text",
+    "label": "Garagenpl&auml;tze"
+   },
+   {
+    "id": "stellpl_aussen",
+    "kind": "text",
+    "label": "Au&szlig;enstellpl&auml;tze"
+   },
+   {
+    "id": "balkon_flae",
+    "kind": "text",
+    "label": "Balkon / Terrasse (m&sup2;)"
+   },
+   {
+    "id": "einheiten",
+    "kind": "text",
+    "label": "Wohneinheiten im Gebäude"
+   },
+   {
+    "id": "san_tax_active",
+    "kind": "bool",
+    "label": "Angegebener Betrag — für die 15 %-Grenze"
+   },
+   {
+    "id": "san_tax_years",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "auto",
+      "text": "Automatisch (15%-Regel)"
+     },
+     {
+      "wert": "1",
+      "text": "1 Jahr (sofort)"
+     },
+     {
+      "wert": "2",
+      "text": "2 Jahre"
+     },
+     {
+      "wert": "3",
+      "text": "3 Jahre"
+     },
+     {
+      "wert": "4",
+      "text": "4 Jahre"
+     },
+     {
+      "wert": "5",
+      "text": "5 Jahre (Standard §82b)"
+     },
+     {
+      "wert": "50",
+      "text": "Über AfA-Nutzungsdauer (anschaffungsnahe HK)"
+     }
+    ],
+    "label": "Verteilung über"
+   },
+   {
+    "id": "san_ust",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "brutto",
+      "text": "brutto (inkl. 19 % USt)"
+     },
+     {
+      "wert": "netto",
+      "text": "netto (ohne USt)"
+     }
+    ],
+    "label": "Angegebener Betrag — für die 15 %-Grenze"
+   },
+   {
+    "id": "eq_heating",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "FUSSBODENHEIZUNG",
+      "text": "Fußbodenheizung"
+     },
+     {
+      "wert": "ZENTRALHEIZUNG",
+      "text": "Zentralheizung"
+     },
+     {
+      "wert": "EINZELOEFEN",
+      "text": "Einzelöfen"
+     },
+     {
+      "wert": "SONSTIGE",
+      "text": "Sonstige"
+     }
+    ],
+    "label": "Heizung"
+   },
+   {
+    "id": "eq_windows",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "EINFACH",
+      "text": "Einfachverglasung"
+     },
+     {
+      "wert": "ISOLIERVERGLASUNG",
+      "text": "Isolierverglasung"
+     },
+     {
+      "wert": "ZWEIFACHVERGLASUNG",
+      "text": "Zweifachverglasung"
+     },
+     {
+      "wert": "DREIFACHVERGLASUNG",
+      "text": "Dreifachverglasung"
+     },
+     {
+      "wert": "SPEZIALVERGLASUNG",
+      "text": "Spezialverglasung"
+     },
+     {
+      "wert": "RAUMHOHE_VERGLASUNG",
+      "text": "Raumhohe Verglasung"
+     },
+     {
+      "wert": "KASTENFENSTER",
+      "text": "Kastenfenster"
+     },
+     {
+      "wert": "SONSTIGE",
+      "text": "Sonstige"
+     }
+    ],
+    "label": "Verglasung"
+   },
+   {
+    "id": "eq_floor",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "PARKETT_NATURSTEIN",
+      "text": "Parkett / Naturstein"
+     },
+     {
+      "wert": "FLIESEN",
+      "text": "Fliesen"
+     },
+     {
+      "wert": "TEPPICH_LAMINAT",
+      "text": "Teppich / Laminat"
+     },
+     {
+      "wert": "KUNSTSTOFF_PVC",
+      "text": "Kunststoff / PVC"
+     },
+     {
+      "wert": "SONSTIGE",
+      "text": "Sonstige"
+     }
+    ],
+    "label": "Bodenbelag"
+   },
+   {
+    "id": "eq_guest_wc",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "GAESTE_WC",
+      "text": "Ja"
+     },
+     {
+      "wert": "KEIN_GAESTE_WC",
+      "text": "Nein"
+     }
+    ],
+    "label": "Gäste-WC"
+   },
+   {
+    "id": "eq_store_room",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "INNERHALB",
+      "text": "Innerhalb"
+     },
+     {
+      "wert": "AUSSERHALB",
+      "text": "Außerhalb"
+     },
+     {
+      "wert": "INNERHALB_UND_AUSSERHALB",
+      "text": "Innen & außen"
+     },
+     {
+      "wert": "KEINER",
+      "text": "Keiner"
+     }
+    ],
+    "label": "Keller / Abstellraum"
+   },
+   {
+    "id": "eq_walls",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "AUSSENWAENDE_GEDAEMMT",
+      "text": "Gedämmt"
+     },
+     {
+      "wert": "AUSSENWAENDE_NICHT_GEDAEMMT",
+      "text": "Nicht gedämmt"
+     }
+    ],
+    "label": "Außenwände"
+   },
+   {
+    "id": "eq_roof",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "DACHPFANNEN",
+      "text": "Dachpfannen"
+     },
+     {
+      "wert": "SCHIEFER",
+      "text": "Schiefer"
+     },
+     {
+      "wert": "METALL",
+      "text": "Metall"
+     },
+     {
+      "wert": "DACHPAPPE",
+      "text": "Dachpappe"
+     },
+     {
+      "wert": "SONSTIGE",
+      "text": "Sonstige"
+     }
+    ],
+    "label": "Dacheindeckung"
+   },
+   {
+    "id": "eq_elevator",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "Ja",
+      "text": "Ja"
+     },
+     {
+      "wert": "Nein",
+      "text": "Nein"
+     }
+    ],
+    "label": "Aufzug"
+   },
+   {
+    "id": "halter",
+    "kind": "select",
+    "label": "Halter / Mandant · wer hält das Objekt"
+   },
+   {
+    "id": "halter_seit",
+    "kind": "text",
+    "label": "Stichtag Überführung (Cut: Privat → Gesellschaft)"
+   },
+   {
+    "id": "verkehrswert_ueberf",
+    "kind": "text",
+    "label": "Verkehrswert (AfA-Basis Gesellschaft)"
+   },
+   {
+    "id": "ueberf_preis",
+    "kind": "text",
+    "label": "Überführungspreis (GrESt-Basis)"
+   },
+   {
+    "id": "gesellschafterdarlehen",
+    "kind": "text",
+    "label": "Gesellschafterdarlehen (gestundeter Kaufpreis)"
+   },
+   {
+    "id": "ueberf_restschuld",
+    "kind": "text",
+    "label": "&Uuml;bernommene Restschuld (Darlehen geht mit in die Gesellschaft)"
+   },
+   {
+    "id": "ueberf_rest_zins",
+    "kind": "text",
+    "label": "Zins &uuml;bernommenes Darlehen % p.a. (falls neu verhandelt)"
+   },
+   {
+    "id": "ueberf_ende",
+    "kind": "text",
+    "label": "Privat-Ende / überführt am (Cut: Privat-Objekt rechnet bis hier, dann eingefroren)"
+   },
+   {
+    "id": "erbbauzins",
+    "kind": "text",
+    "label": "Erbbauzins (€ pro Jahr)"
+   },
+   {
+    "id": "erb_restlz",
+    "kind": "text",
+    "label": "Restlaufzeit (Jahre)"
+   },
+   {
+    "id": "erb_zs_ang",
+    "kind": "text",
+    "label": "Angemessener Erbbauzinssatz (%)"
+   },
+   {
+    "id": "erb_entsch",
+    "kind": "text",
+    "label": "Entschädigung bei Zeitablauf (%)"
+   },
+   {
+    "id": "baustatus",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "bestand",
+      "text": "Bestand"
+     },
+     {
+      "wert": "bestand_erstbezug_saniert",
+      "text": "Bestand – Erstbezug nach Sanierung"
+     },
+     {
+      "wert": "neubau_erstbezug",
+      "text": "Neubau – Erstbezug"
+     },
+     {
+      "wert": "neubau_im_bau",
+      "text": "Neubau – im Bau"
+     },
+     {
+      "wert": "geplant",
+      "text": "Geplant / Bauträger"
+     }
+    ],
+    "label": "Baustatus"
+   },
+   {
+    "id": "bgf",
+    "kind": "text",
+    "label": "Bruttogrundfläche (m²)"
+   },
+   {
+    "id": "standardstufe",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1 · sehr einfach (nur Häuser)"
+     },
+     {
+      "wert": "2",
+      "text": "2 · einfach (nur Häuser)"
+     },
+     {
+      "wert": "3",
+      "text": "3 · Standard"
+     },
+     {
+      "wert": "4",
+      "text": "4 · gehoben"
+     },
+     {
+      "wert": "5",
+      "text": "5 · stark gehoben"
+     }
+    ],
+    "label": "Standardstufe (NHK 2010)"
+   },
+   {
+    "id": "grundriss",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "einspaenner",
+      "text": "Einspänner · 1 Wohnung je Treppenhaus (× 1,05)"
+     },
+     {
+      "wert": "zweispaenner",
+      "text": "Zweispänner · 2 Wohnungen (× 1,00)"
+     },
+     {
+      "wert": "dreispaenner",
+      "text": "Dreispänner · 3 Wohnungen (× 0,97)"
+     },
+     {
+      "wert": "vierspaenner",
+      "text": "Vierspänner · 4 Wohnungen (× 0,95)"
+     }
+    ],
+    "label": "Grundrissart"
+   },
+   {
+    "id": "mod_punkte",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "0",
+      "text": "nicht modernisiert"
+     },
+     {
+      "wert": "4",
+      "text": "kleine Modernisierungen im Rahmen der Instandhaltung"
+     },
+     {
+      "wert": "8",
+      "text": "mittlerer Modernisierungsgrad"
+     },
+     {
+      "wert": "14",
+      "text": "überwiegend modernisiert"
+     },
+     {
+      "wert": "19",
+      "text": "umfassend modernisiert"
+     }
+    ],
+    "label": "Modernisierungsgrad (Anlage 2)"
+   },
+   {
+    "id": "sachwertfaktor",
+    "kind": "text",
+    "label": "Sachwertfaktor"
+   },
+   {
+    "id": "stellplatz_miete_monat",
+    "kind": "text",
+    "label": "Stellplatzmiete (€/Monat)"
+   },
+   {
+    "id": "sonstige_jahr",
+    "kind": "text",
+    "label": "Sonstige Einnahmen (€/Jahr)"
+   },
+   {
+    "id": "nhk_haus",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "freistehendes Ein-/Zweifamilienhaus"
+     },
+     {
+      "wert": "2",
+      "text": "Doppelhaus / Reihenendhaus"
+     },
+     {
+      "wert": "3",
+      "text": "Reihenmittelhaus"
+     }
+    ],
+    "label": "Hausform"
+   },
+   {
+    "id": "nhk_geschosse",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "0",
+      "text": "Keller- und Erdgeschoss"
+     },
+     {
+      "wert": "1",
+      "text": "Keller-, Erd- und Obergeschoss"
+     },
+     {
+      "wert": "2",
+      "text": "Erdgeschoss, nicht unterkellert"
+     },
+     {
+      "wert": "3",
+      "text": "Erd- und Obergeschoss, nicht unterkellert"
+     }
+    ],
+    "label": "Geschosse und Unterkellerung"
+   },
+   {
+    "id": "nhk_dach",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "Dachgeschoss voll ausgebaut"
+     },
+     {
+      "wert": "2",
+      "text": "Dachgeschoss nicht ausgebaut"
+     },
+     {
+      "wert": "3",
+      "text": "Flachdach oder flach geneigtes Dach"
+     }
+    ],
+    "label": "Dachausbildung"
+   },
+   {
+    "id": "hinterland_qm",
+    "kind": "text",
+    "label": "Zusätzliche Fläche / Hinterland (m²)"
+   },
+   {
+    "id": "hinterland_eur_qm",
+    "kind": "text",
+    "label": "Wertansatz Hinterland (€/m²)"
+   },
+   {
+    "id": "hinterland_rentierlich",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "ja",
+      "text": "ja · wird vermietet oder verpachtet"
+     }
+    ],
+    "label": "Zusatzfläche ist rentierlich"
+   },
+   {
+    "id": "garagen_bgf_qm",
+    "kind": "text",
+    "label": "Garage / Carport – Bruttogrundfläche (m²)"
+   },
+   {
+    "id": "garagen_stufe",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "3",
+      "text": "3 · Fertiggarage"
+     },
+     {
+      "wert": "4",
+      "text": "4 · Massivbauweise"
+     },
+     {
+      "wert": "5",
+      "text": "5 · Massiv mit besonderer Ausführung"
+     }
+    ],
+    "label": "Garage – Standardstufe"
+   },
+   {
+    "id": "aussenanlagen_pct",
+    "kind": "text",
+    "label": "Außenanlagen (% des Gebäudesachwerts)"
+   },
+   {
+    "id": "aussenanlagen",
+    "kind": "text",
+    "label": "Außenanlagen (€)"
+   },
+   {
+    "id": "ausst_aussenwaende",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Außenwände · 23 %"
+   },
+   {
+    "id": "ausst_dach",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Dach · 15 %"
+   },
+   {
+    "id": "ausst_fenster",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Fenster/Außentüren · 11 %"
+   },
+   {
+    "id": "ausst_innenwaende",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Innenwände · 11 %"
+   },
+   {
+    "id": "ausst_decken",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Decken/Treppen · 11 %"
+   },
+   {
+    "id": "ausst_fussboeden",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Fußböden · 5 %"
+   },
+   {
+    "id": "ausst_sanitaer",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Sanitär · 9 %"
+   },
+   {
+    "id": "ausst_heizung",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "Heizung · 9 %"
+   },
+   {
+    "id": "ausst_technik",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "1",
+      "text": "1"
+     },
+     {
+      "wert": "1.5",
+      "text": "1,5"
+     },
+     {
+      "wert": "2",
+      "text": "2"
+     },
+     {
+      "wert": "2.5",
+      "text": "2,5"
+     },
+     {
+      "wert": "3",
+      "text": "3"
+     },
+     {
+      "wert": "3.5",
+      "text": "3,5"
+     },
+     {
+      "wert": "4",
+      "text": "4"
+     },
+     {
+      "wert": "4.5",
+      "text": "4,5"
+     },
+     {
+      "wert": "5",
+      "text": "5"
+     }
+    ],
+    "label": "sonst. Technik · 6 %"
+   },
+   {
+    "id": "bes_bauteile",
+    "kind": "text",
+    "label": "Besondere Bauteile (€)"
+   },
+   {
+    "id": "btl_gauben",
+    "kind": "text",
+    "label": "Dachgauben (€)"
+   },
+   {
+    "id": "btl_balkone",
+    "kind": "text",
+    "label": "Balkone (€)"
+   },
+   {
+    "id": "btl_vordach",
+    "kind": "text",
+    "label": "Vordächer / Eingangsvorbau (€)"
+   },
+   {
+    "id": "btl_terrassen",
+    "kind": "text",
+    "label": "Terrassen (€)"
+   },
+   {
+    "id": "btl_sonstige",
+    "kind": "text",
+    "label": "Weitere Bauteile (€)"
+   },
+   {
+    "id": "lzs_pct",
+    "kind": "text",
+    "label": "Liegenschaftszinssatz (%)"
+   },
+   {
+    "id": "brw_manuell",
+    "kind": "text",
+    "label": "Bodenrichtwert manuell (€/m²)"
+   },
+   {
+    "id": "brw_anpassung_pct",
+    "kind": "text",
+    "label": "Bodenwert-Anpassung (%)"
+   },
+   {
+    "id": "brw_anpassung_grund",
+    "kind": "text",
+    "label": "Begründung der Anpassung"
+   },
+   {
+    "id": "brw_stichtag",
+    "kind": "text",
+    "label": "Stichtag Bodenrichtwert"
+   }
+  ],
+  "grest": {
+   "saetze": {
+    "BW": 5,
+    "BY": 3.5,
+    "BE": 6,
+    "BB": 6.5,
+    "HB": 5,
+    "HH": 5.5,
+    "HE": 6,
+    "MV": 6,
+    "NI": 5,
+    "NW": 6.5,
+    "RP": 5,
+    "SL": 6.5,
+    "SN": 5.5,
+    "ST": 5,
+    "SH": 6.5,
+    "TH": 6.5
+   },
+   "namen": {
+    "BW": "Baden-Württemberg",
+    "BY": "Bayern",
+    "BE": "Berlin",
+    "BB": "Brandenburg",
+    "HB": "Bremen",
+    "HH": "Hamburg",
+    "HE": "Hessen",
+    "MV": "Mecklenburg-Vorpommern",
+    "NI": "Niedersachsen",
+    "NW": "Nordrhein-Westfalen",
+    "RP": "Rheinland-Pfalz",
+    "SL": "Saarland",
+    "SN": "Sachsen",
+    "ST": "Sachsen-Anhalt",
+    "SH": "Schleswig-Holstein",
+    "TH": "Thüringen"
+   },
+   "plz_bereiche": [
+    [
+     1000,
+     2999,
+     "SN"
+    ],
+    [
+     3000,
+     3999,
+     "BB"
+    ],
+    [
+     4900,
+     4938,
+     "BB"
+    ],
+    [
+     4000,
+     4999,
+     "SN"
+    ],
+    [
+     6000,
+     6999,
+     "ST"
+    ],
+    [
+     7000,
+     7999,
+     "TH"
+    ],
+    [
+     8000,
+     9999,
+     "SN"
+    ],
+    [
+     10000,
+     13999,
+     "BE"
+    ],
+    [
+     14000,
+     14199,
+     "BE"
+    ],
+    [
+     14200,
+     16999,
+     "BB"
+    ],
+    [
+     17000,
+     17499,
+     "MV"
+    ],
+    [
+     17500,
+     17999,
+     "MV"
+    ],
+    [
+     18000,
+     19999,
+     "MV"
+    ],
+    [
+     20000,
+     21149,
+     "HH"
+    ],
+    [
+     21150,
+     21449,
+     "NI"
+    ],
+    [
+     21450,
+     21929,
+     "SH"
+    ],
+    [
+     21930,
+     22113,
+     "SH"
+    ],
+    [
+     22114,
+     22529,
+     "HH"
+    ],
+    [
+     22530,
+     22999,
+     "SH"
+    ],
+    [
+     23000,
+     23999,
+     "SH"
+    ],
+    [
+     24000,
+     25999,
+     "SH"
+    ],
+    [
+     26000,
+     26999,
+     "NI"
+    ],
+    [
+     27000,
+     27499,
+     "HB"
+    ],
+    [
+     27500,
+     27999,
+     "NI"
+    ],
+    [
+     28000,
+     28999,
+     "HB"
+    ],
+    [
+     29000,
+     29999,
+     "NI"
+    ],
+    [
+     30000,
+     31999,
+     "NI"
+    ],
+    [
+     32000,
+     32849,
+     "NW"
+    ],
+    [
+     32850,
+     32849,
+     "NW"
+    ],
+    [
+     33000,
+     33999,
+     "NW"
+    ],
+    [
+     34000,
+     34329,
+     "HE"
+    ],
+    [
+     34330,
+     34399,
+     "NI"
+    ],
+    [
+     34400,
+     34629,
+     "HE"
+    ],
+    [
+     34630,
+     36399,
+     "HE"
+    ],
+    [
+     36400,
+     36469,
+     "TH"
+    ],
+    [
+     36470,
+     37199,
+     "HE"
+    ],
+    [
+     37200,
+     37999,
+     "NI"
+    ],
+    [
+     38000,
+     38489,
+     "NI"
+    ],
+    [
+     38490,
+     38559,
+     "ST"
+    ],
+    [
+     38560,
+     38879,
+     "NI"
+    ],
+    [
+     38880,
+     38899,
+     "ST"
+    ],
+    [
+     38900,
+     39999,
+     "ST"
+    ],
+    [
+     40000,
+     48999,
+     "NW"
+    ],
+    [
+     49000,
+     49509,
+     "NW"
+    ],
+    [
+     49510,
+     49849,
+     "NI"
+    ],
+    [
+     49850,
+     49999,
+     "NI"
+    ],
+    [
+     50000,
+     53999,
+     "NW"
+    ],
+    [
+     54000,
+     54439,
+     "RP"
+    ],
+    [
+     54440,
+     54559,
+     "RP"
+    ],
+    [
+     54560,
+     54669,
+     "RP"
+    ],
+    [
+     54670,
+     54699,
+     "RP"
+    ],
+    [
+     55000,
+     55299,
+     "RP"
+    ],
+    [
+     55300,
+     55999,
+     "RP"
+    ],
+    [
+     56000,
+     56999,
+     "RP"
+    ],
+    [
+     57000,
+     57489,
+     "NW"
+    ],
+    [
+     57500,
+     57647,
+     "RP"
+    ],
+    [
+     57648,
+     57939,
+     "RP"
+    ],
+    [
+     58000,
+     59999,
+     "NW"
+    ],
+    [
+     60000,
+     65999,
+     "HE"
+    ],
+    [
+     66000,
+     66459,
+     "SL"
+    ],
+    [
+     66460,
+     66509,
+     "RP"
+    ],
+    [
+     66510,
+     66839,
+     "SL"
+    ],
+    [
+     66840,
+     66999,
+     "SL"
+    ],
+    [
+     67000,
+     67999,
+     "RP"
+    ],
+    [
+     68000,
+     68309,
+     "BW"
+    ],
+    [
+     68310,
+     68649,
+     "HE"
+    ],
+    [
+     68650,
+     69240,
+     "BW"
+    ],
+    [
+     69241,
+     69434,
+     "BW"
+    ],
+    [
+     69435,
+     69517,
+     "HE"
+    ],
+    [
+     69518,
+     69999,
+     "BW"
+    ],
+    [
+     70000,
+     79999,
+     "BW"
+    ],
+    [
+     80000,
+     87999,
+     "BY"
+    ],
+    [
+     88000,
+     88099,
+     "BW"
+    ],
+    [
+     88100,
+     88499,
+     "BW"
+    ],
+    [
+     88500,
+     88799,
+     "BW"
+    ],
+    [
+     88800,
+     88899,
+     "BW"
+    ],
+    [
+     89000,
+     89089,
+     "BY"
+    ],
+    [
+     89090,
+     89099,
+     "BW"
+    ],
+    [
+     89100,
+     89299,
+     "BY"
+    ],
+    [
+     89300,
+     89619,
+     "BW"
+    ],
+    [
+     89620,
+     89999,
+     "BY"
+    ],
+    [
+     90000,
+     96999,
+     "BY"
+    ],
+    [
+     97000,
+     97999,
+     "BY"
+    ],
+    [
+     98000,
+     99999,
+     "TH"
+    ]
+   ],
+   "hinweis": "Saetze je Bundesland in Prozent. plz_bereiche ist [von, bis, Landeskuerzel] und wird der Reihe nach geprueft — der erste Treffer gilt, wie im Frontend."
+  }
+ }
+}

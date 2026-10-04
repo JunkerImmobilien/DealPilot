@@ -20,20 +20,20 @@
     
     {
       tab: 'sidebar',
-      selector: '#sb-list, #sidebar',
+      selector: '.dpl-teil-objekte, #sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
-      body: 'In der **Sidebar links** siehst du **alle deine Objekte**. Hier startest du jede Analyse.',
+      body: 'Hier liegen **alle deine Objekte**. In der Standardansicht in der Sidebar links — in Aktenmappe, Kanzlei und Tower klappst du dafür links die **Portfolio-Schiene** auf. Von hier startet jede Analyse.',
       bodyMore: 'Was die Sidebar dir zeigt:\n\n• **Jedes Objekt als Card** mit Adresse, Kaufpreis, DealScore-Ampel\n• **Kennzahlen** im Mini-Format: DSCR, Cashflow, Bruttomietrendite\n• **Sortier- und Filter-Funktion** nach Score, Lage, Plan\n• **Demo-Objekte** mit grüner Markierung\n\n**Limits nach Plan:**\n• **Free**: 3 Objekte\n• **Starter**: 15 Objekte\n• **Investor**: 50 Objekte\n• **Pro**: unlimited\n\nKlick einfach auf ein Objekt um es zu öffnen und in die Vollanalyse zu starten.',
       placement: 'right'
     },
     
     {
       tab: 'sidebar',
-      selector: '#sb-list > *:first-child, #sb-list button:first-of-type, #sb-list',
+      selector: '.dpl-teil-objekte .sb-card, #sb-list .sb-card, .dpl-schiene .sb-card, .sb-card, #sb-list',
       icon: 'i-home',
       title: 'Objekt auswählen',
-      body: '**Klick auf ein Objekt** in der Sidebar — sofort siehst du alle Details, Tabs und Kennzahlen.',
+      body: '**Klick auf ein Objekt** in der Liste — sofort siehst du alle Details, Tabs und Kennzahlen. Ganz oben steht **„Neues Objekt hinzufügen"**: damit legst du ein leeres Objekt von Hand an.',
       bodyMore: 'Was passiert wenn du ein Objekt anklickst:\n\n• **Alle 8 Tabs** werden mit den Objekt-Daten gefüllt\n• **DealScore** wird live berechnet\n• **Bewertungs-Cockpit** zeigt DSCR + LTV im 15-Jahres-Verlauf\n• **Änderungen** werden automatisch gespeichert\n\n**Tipp:** Du kannst zwischen Objekten jederzeit hin- und herwechseln — DealPilot speichert deinen Stand. Auch unfertige Bewertungen bleiben in der Sidebar.\n\nFür die Tour zeigen wir dir jetzt die wichtigsten Funktionen am Beispiel des aktuellen Objekts.',
       placement: 'right'
     },
@@ -63,7 +63,7 @@
       subTargets: ['Quick Boarding'],
       subClimb: 150,
       title: 'Quick-Boarding Score',
-      body: '**Links oben im Panel**: der Live-Tacho. Während du Daten eingibst, wandert die Bewertung von rot zu grün.',
+      body: 'Im Quick-Boarding läuft ein **Live-Tacho** mit: während du Daten eingibst, wandert die Bewertung von rot zu grün. Je nach Ansicht steht er oben im Panel oder im dunklen Streifen daneben.',
       bodyMore: 'Was im Score-Bereich passiert:\n\n• **DealScore-Donut** zeigt Wert 0-100 in Echtzeit\n• **5 Hauptkennzahlen** werden live aktualisiert: Bruttomietrendite, Nettomietrendite, Cashflow, DSCR, LTV\n• **Ampel-Farben**: Grün ab DealScore 70, Gelb 40-69, Rot unter 40\n\nDie Berechnung passiert ohne dass du speichern musst — sofort sichtbar nach jeder Eingabe.\n\n**Tipp:** Spiel mit Kaufpreis, Miete und Eigenkapital — du siehst sofort wie sich die Bewertung ändert. Perfekt für Verhandlungs-Vorbereitung.',
       placement: 'auto'
     },
@@ -78,7 +78,7 @@
       placementHintV866: 1,
       icon: 'i-qr',
       title: 'Boarding-Pass — direkt beim Quick-Boarding',
-      body: '**Rechts oben im Panel** klebt der **Quickboarding-Pass** (der weisse Abriss mit „SCAN › ÜBERNEHMEN“) — dein teilbarer Kurz-Steckbrief. Er entsteht direkt hier beim Quick-Boarding.',
+      body: 'Im Quick-Boarding entsteht nebenbei der **Quickboarding-Pass** — dein teilbarer Kurz-Steckbrief mit QR-Code. Du erkennst ihn am **dunklen Streifen** mit dem Code; je nach Ansicht sitzt er seitlich oder unten.',
       bodyMore: 'Was der Boarding-Pass ist:\n\n• Eine **öffentliche Kurz-Ansicht** deines Objekts: Adresse, Eckdaten, Score — hübsch aufbereitet wie eine echte Bordkarte\n• Erreichbar über **Link oder QR-Code** — ideal für Partner, Mitinvestoren oder die Bank\n• **Zeitlich begrenzt gültig** und jederzeit widerrufbar — du behältst die Kontrolle\n\n**So entsteht er:**\n• Während du das Quick-Boarding befüllst, baut sich der Pass **rechts oben im Panel** automatisch mit auf\n• Beim **Speichern als Objekt** kannst du ihn direkt **mit übernehmen** — inklusive Link + QR-Code\n• Später erstellst/teilst du ihn jederzeit neu über „Quick Boarding teilen“ beim Objekt\n• Der QR-Code erscheint dann auch im **Deal-Aktion-Tab** direkt neben dem Deal-Status',
       placement: 'auto'
     },
@@ -91,9 +91,9 @@
       subTargets: ['Als Objekt speichern', 'speichern'],
       icon: 'i-piggy-bank',
       title: 'Als Objekt speichern',
-      body: 'Vielversprechend? **Ein Klick** übernimmt alle Daten in die Vollanalyse mit 8 Tabs.',
+      body: 'Vielversprechend? Der Knopf **„Als Objekt speichern"** am Ende des Quick-Boardings übernimmt alle Daten in die Vollanalyse mit 8 Tabs — scroll im Panel nach unten, falls du ihn nicht siehst.',
       bodyMore: 'Was beim Speichern passiert:\n\n• Alle Quick-Check-Daten landen in **Tab Objekt + Investition + Miete**\n• Wohnfläche, Adresse, Baujahr werden vorbefüllt — kein doppeltes Tippen\n• Das Objekt erscheint dauerhaft in deiner **Sidebar links**\n• Du landest direkt in der Vollanalyse\n\nJetzt zeigen wir dir die 8 Tabs einzeln — das ist die eigentliche Bewertungs-Tiefe.',
-      placement: 'auto'
+      placement: 'center'   /* v1744 · der Knopf liegt am Ende eines scrollbaren Panels; ohne Treffer wurde der Schritt still uebersprungen */
     },
 
     // ═══ Phase 2b: PRE-FLIGHT-Karte (v865) ═════════════════════
@@ -104,8 +104,8 @@
       selector: '#obj-action-bar, .obj-action-bar',
       icon: 'i-rocket',
       title: 'PRE-FLIGHT — dein Daten-Cockpit',
-      body: 'Die **PRE-FLIGHT-Karte** oben im Objekt-Tab bringt Daten in Sekunden ins Objekt: Import, Sprache, Schnittstelle, Marktbewertung.',
-      bodyMore: 'Vier Wege, wie deine Daten ins Objekt kommen:\n\n• **Dokument-Import** — Exposés und Marktberichte hochladen, DealPilot liest die Felder aus\n• **Sprachaufzeichnung** — Objekt einfach einsprechen\n• **ImmoMetrica-Import** — Objekte direkt aus deinem ImmoMetrica-Konto ziehen\n• **Marktbewertung** — professionelle Marktwert- und Mietpreis-Einschätzung abrufen\n\nDie nächsten Schritte zeigen dir jeden Weg einzeln.',
+      body: 'Die **PRE-FLIGHT-Karte** oben im Objekt-Tab bringt Daten in Sekunden ins Objekt: Import, Sprache, geführte Eingabe, Schnittstelle, Marktbewertung.',
+      bodyMore: 'Fünf Wege, wie deine Daten ins Objekt kommen:\n\n• **Dokument-Import** — Exposés und Marktberichte hochladen, DealPilot liest die Felder aus\n• **Sprachaufzeichnung** — Objekt einfach einsprechen\n• **Geführte Eingabe** — DealPilot fragt der Reihe nach, du tippst oder sprichst\n• **ImmoMetrica-Import** — Objekte direkt aus deinem ImmoMetrica-Konto ziehen\n• **Marktbewertung** — professionelle Marktwert- und Mietpreis-Einschätzung abrufen\n\nDie nächsten Schritte zeigen dir jeden Weg einzeln.',
       placement: 'auto'
     },
 
@@ -113,7 +113,7 @@
       id: 'pf-import',
       tab: 's0',
       selector: '#obj-action-bar, .obj-action-bar',
-      subTargets: ['Exposé'],
+      subTargets: ['Exposé / Marktbericht'],   /* v1743 · war nur 'Exposé' — im Tower gewinnt damit 'Exposé / Gesamt-PDF' aus der Ausgaben-Schiene, weil _findByText den KUERZESTEN Treffer nimmt (19 statt 21 Zeichen) */
       icon: 'i-file-text',
       title: 'Import aus Exposés & Marktberichten',
       body: '**PDFs oder Dokumente hochladen** — DealPilot liest die wichtigsten Felder automatisch aus.',
@@ -130,6 +130,21 @@
       title: 'Sprachaufzeichnung',
       body: 'Objekt **einfach einsprechen** — mit allen wichtigen Informationen. DealPilot übernimmt den Rest.',
       bodyMore: 'So nutzt du die Sprachaufzeichnung:\n\n• **Aufnahme starten** und das Objekt beschreiben: Adresse, Grösse, Preis, Miete, Zustand, Besonderheiten\n• DealPilot **erkennt die Angaben** und ordnet sie den richtigen Feldern zu\n• Perfekt **unterwegs nach der Besichtigung** oder beim Telefonat mit dem Makler\n\n**Tipp:** Sprich Zahlen klar aus („Kaufpreis zweihundertfünfzigtausend Euro“) — dann sitzt die Zuordnung am besten.',
+      placement: 'auto'
+    },
+
+    /* v1742 · Eigener Schritt für die geführte Eingabe. Sie stand bis
+       hierher nur HINTER dem Knopf „Sprache" — wer die Tour sah, erfuhr
+       nie, dass es einen Weg ohne Formular und ohne Mikrofon gibt. */
+    {
+      id: 'pf-gefuehrt',
+      tab: 's0',
+      selector: '#obj-action-bar, .obj-action-bar',
+      subTargets: ['Geführte Eingabe'],
+      icon: 'i-list',
+      title: 'Geführte Eingabe',
+      body: 'Kein Formular, kein Mikrofon: DealPilot **fragt der Reihe nach** — Preis, Miete, Fläche, Adresse und den Rest. Antworten kannst du **tippen oder sprechen**.',
+      bodyMore: 'Wann dieser Weg der richtige ist:\n\n• Du willst **nichts vergessen** — gefragt wird jedes Feld, das für die Rechnung zählt\n• Du sitzt im **Büro oder Zug** und möchtest nicht sprechen\n• Das Objekt ist **neu** und es gibt noch kein Exposé\n\n**Wie es läuft:**\n• Eine Frage nach der anderen, mit kurzer Erklärung, wozu die Zahl dient\n• **Weiss ich nicht** überspringt eine Frage — nichts wird erfunden\n• **Fertig** springt jederzeit zur Übernahme-Tabelle\n• Unterwegs rechnet DealPilot schon mit und zeigt, wohin es läuft\n\n**Kombinierbar:** erst ein Exposé einlesen, dann die Lücken per geführter Eingabe schliessen — was bereits gefüllt ist, wird nicht noch einmal gefragt.',
       placement: 'auto'
     },
 
@@ -161,7 +176,8 @@
       id: 'pass-obj',
       tab: 's0',
       selector: '#obj-action-bar, .tab[data-target-sec="s0"]',
-      subTargets: ['PASS'],
+      /* v1747e · der QR selbst, nicht das Wort PASS irgendwo im Dokument */
+      subSelectors: ['#oab-pf-qr', '.dp-pf-qr'],
       icon: 'i-qr',
       title: 'Boarding-Pass zum Objekt',
       body: 'Auch hier im **Tab Objekt** erstellst du jederzeit einen **Boarding-Pass** — und teilst ihn per Link oder QR-Code.',
@@ -271,22 +287,50 @@
     
     {
       tab: 's6',
-      selector: '#bc-cockpit, #s6',
+      selector: '#bc-cockpit',
+      /* v1789 · Derselbe Notnagel wie beim Stress-Test, derselbe Befund:
+         hier stand `subTargets: ['Cockpit']`, weil "#bc-cockpit im Tab
+         0x0" sei. Gemessen am 02.10.2026: 1280 x 628 px, 1 Kind, Inhalt
+         "Bank-Cockpit · Risiko-Kennzahlen". Auch dieser Ersatz ist weg. */
       icon: 'i-gauge',
       title: 'Bewertungs-Cockpit',
       body: '**DSCR & LTV im 15-Jahres-Verlauf** — was die Bank zürst sieht.',
       bodyMore: '**DSCR (Schuldendienstdeckung):**\n• über 1,2 = solide\n• 1,0-1,2 = knapp\n• unter 1,0 = kritisch\n\n**LTV (Beleihungsauslauf):**\n• unter 85% = solide, beste Konditionen\n• 85-100% = erhöhter Zins\n• über 100% = Vollfinanzierung, schwierig\n\n**Wertpuffer:** Differenz Verkehrswert vs. Kaufpreis. Je grösser, desto mehr Sicherheit.\n\nDie Bank schaut sich zürst diese Zahlen an, bevor sie überhaupt das Objekt anschaut.',
-      placement: 'auto'
+      placement: 'auto'   /* v1789 · war 'center' - das galt dem angeblich leeren Ziel. Die Karte ist da und wird gerahmt, also sitzt die Blase wieder daneben. */
     },
     
     {
       tab: 's6',
-      selector: '#bc-stress, #s6',
+      selector: '#bc-stress',
+      /* v1789 · HIER STAND `subTargets: ['Stress']` MIT DER BEGRUENDUNG
+         "#bc-stress ist ein voellig leerer div (0 Kinder)". GEMESSEN am
+         02.10.2026 auf Staging stimmt das nicht mehr:
+
+           #bc-stress   1280 x 883 px, 1 Kind (.bc-card)
+                        > .bc-head  "Stress-Test · DSCR-Resilienz"
+                        > .bc-body  746 px Szenarien-Matrix
+
+         Der Notnagel traf damit per _findByText den KUERZESTEN Knoten mit
+         dem Wort - ein Chip von 29 x 16 px irgendwo im Formular. Und weil
+         _applySubHl 420 ms NACH dem Spot laeuft und auf sein Unterziel
+         scrollt, wanderte das Bild unter dem fertig gesetzten Rahmen weg.
+         GENAU DAS war Schritt 24, vier Anlaeufe lang.
+
+         > Zweimal habe ich das Scrollen repariert (v1782, v1782b) und
+         > beide Male zurueckgenommen. Repariert gehoerte nicht das
+         > Scrollen, sondern der Grund, warum ueberhaupt ein zweites Mal
+         > gescrollt wurde: ein Ersatzziel fuer ein Ziel, das es laengst
+         > wieder gibt. Ein Notnagel, den niemand nachmisst, ueberlebt den
+         > Defekt, gegen den er gebaut wurde - und wird selbst zu einem.
+
+         Ohne subTargets laeuft _applySubHl gar nicht erst an. Der Spot
+         bleibt, wo _scrollIntoView ihn gesetzt hat, und die Karte passt
+         mit 883 px in den sichtbaren Bereich (gemessen 988 px). */
       icon: 'i-cpu',
       title: 'Stress-Test',
       body: 'Was passiert wenn **Zinsen steigen** oder **Miete ausfällt**? Der Stress-Test simuliert es.',
       bodyMore: 'Standard-Szenarien:\n\n• **Anschlusszins +2 Prozentpunkte** — was kostet das Darlehen in 10 Jahren?\n• **Mietausfall 3 Monate** — bleibt der Cashflow stabil?\n• **Leerstand 10 %** dauerhaft — kippt die Finanzierung?\n• **Marktwertverlust 15 %** — wie steht der LTV dann?\n\nFür jedes Szenario zeigt DealPilot den **neuen DSCR** und ob die Finanzierung weiter trägt. **Banken lieben diese Analyse** — sie zeigt dass du das Risiko verstanden hast. Print direkt mit ins Business-Case-PDF.',
-      placement: 'auto'
+      placement: 'auto'   /* v1789 · war 'center' - das galt dem angeblich leeren Ziel. Die Karte ist da und wird gerahmt, also sitzt die Blase wieder daneben. */
     },
 
     // ═══ Phase 5: Deal-Aktion ═════════════════════════════════════════
@@ -388,12 +432,42 @@
     },
     
     {
-      tab: 'header',
-      selector: '.hdr-pdf-btn, button[onclick*="exportPDF"]',
+      /* v1739 · HIER ZEIGTE DIE TOUR AUF EINEN KNOPF, DEN ES NICHT GIBT.
+         Gemessen in allen vier Ansichten (Standard, Aktenmappe, Kanzlei,
+         Tower): `.hdr-pdf-btn` und `button[onclick*="exportPDF"]` finden
+         NULL Elemente - als einziger der 37 Schritte. Der Knopf sass
+         einmal oben rechts im Kopf; heute steht er im Deal-Aktion-Tab in
+         der Liste „Ausgabe" (`.dab-doc-btn`, sechs Stueck).
+
+         > Ein Tour-Schritt, dessen Ziel es nicht mehr gibt, zeigt ins
+         > Leere und erzaehlt dabei weiter. Der Text beschrieb eine Stelle,
+         > an der der Nutzer nichts findet - und fuer einen, der die App
+         > zum ersten Mal sieht, ist das nicht „veraltet", sondern falsch. */
+      tab: 's8',
+      /* v1789 · DER SELEKTOR TRAF ZWAR, ABER ZU KLEIN. Gemessen am
+         02.10.2026 fand er genau ein Element: den Knopf "PDF", 82 x 39 px.
+         Der Tour-Text davor sagt "unter Ausgabe steht das bank-fertige
+         Investment-PDF" - gespotlightet wurde dann ein Knoepfchen ohne
+         Beschriftung, zwischen fuenf gleich aussehenden Geschwistern
+         (.dab-doc-btn gibt es sechsmal, der erste heisst "Fassung").
+
+           button.dab-doc-btn.gold    82 x 39    "PDF"
+           div.dab-doc-act           173 x 39    "Fassung PDF"
+           div.dab-doc-row          1240 x 73    "Investment-PDF Empfohlen -
+                                                  Business-Case, bank-fertig"   <- das ist die Stelle
+
+         > Ein Spot ist eine Antwort auf "wo?". Ein 82-px-Knopf ohne
+         > seine Zeile beantwortet die Frage nicht - der Name der Sache
+         > steht daneben, und genau der faellt aus dem Rahmen.
+
+         Erster Teil mit :has() auf die Zeile; _findElementWithRetry
+         splittet bei Komma und probiert jeden Teil einzeln in try/catch,
+         also faellt es notfalls sauber auf den Knopf zurueck. */
+      selector: '.dab-doc-row:has([onclick*="exportDoc(\'invest\')"]), [onclick*="exportDoc(\'invest\')"], .dab-doc-btn.gold',
       icon: 'i-file-text',
       title: 'Investment-PDF',
-      body: 'Der **Investment-PDF-Button oben rechts im Header** (gespotlightet) erstellt das bank-fertige Investment-PDF mit allen aktuellen Daten.',
-      bodyMore: '**Wo finden:** Sidebar links unter "Aktionen" -> "Business-Case-PDF". Oder direkt im Deal-Aktion-Tab.\n\n**Wie generieren:** Ein Klick. DealPilot baut das PDF mit allen aktuellen Daten und öffnet einen Download-Link. Dauer 5-30 Sekunden.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsübersicht\n• Cashflow-Tabelle über 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n• Werbungskosten-Anlage für Finanzamt\n\n**Tipp vor PDF-Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
+      body: 'Im Deal-Aktion-Tab unter **Ausgabe** steht das bank-fertige Investment-PDF (gespotlightet). Ein Klick fragt, welche **Fassung** du brauchst — Bankfassung, hell oder Obsidian.',
+      bodyMore: '**Wo finden:** Deal-Aktion-Tab, Abschnitt "Ausgabe", erste Zeile.\n\n**Wie generieren:** Ein Klick auf "PDF". DealPilot fragt nach der Fassung und baut das Dokument mit allen aktuellen Daten. Dauer 5-30 Sekunden.\n\n**Drei Fassungen:**\n• **Bankfassung** — weisses Papier, Kennzahlen als Tabelle. Für Bank, Finanzierung, Steuerberater.\n• **Hell** — volles Dokument, helles Deckblatt. Für Miteigentümer und Ausdruck.\n• **Obsidian** — volles Dokument, dunkles Deckblatt. Für den eigenen Gebrauch.\n\nÜber den Knopf **"Fassung"** daneben lässt sich die Wahl jederzeit ändern.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsübersicht\n• Cashflow-Tabelle über 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n\nDas Finanzamt-PDF und die Kaufpreisaufteilung stehen als **eigene Zeilen** darunter.\n\n**Tipp vor dem Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
       placement: 'auto'
     },
     
@@ -402,7 +476,7 @@
     {
       id: 'actions-menu',
       tab: 'sidebar',
-      selector: '#sb-actions-accordion',
+      selector: '#sb-actions-accordion, .dpl-schiene',
       icon: 'i-menu',
       title: 'Das Aktionen-Menü',
       body: 'Über **Aktionen** in der Sidebar erreichst du alles Zentrale: Neues Objekt, Quick Boarding, Portfolio-Cockpit, Marktbericht, Import & Export.',
@@ -413,7 +487,7 @@
     {
       id: 'cockpit-offer',
       tab: 'sidebar',
-      selector: '#sb-actions-accordion',
+      selector: '#sb-actions-accordion, .dpl-schiene',
       subTargets: ['Portfolio-Cockpit'],
       icon: 'i-portfolio',
       title: 'Portfolio-Cockpit — alles auf einen Blick',
@@ -445,7 +519,7 @@
     {
       id: 'finish',
       tab: 'sidebar',
-      selector: '#sb-actions-accordion',
+      selector: '#sb-actions-accordion, .dpl-schiene',
       icon: 'i-help',
       title: 'Tool-Tips: Anfänger, Profi oder Aus?',
       body: 'DealPilot zeigt **Tool-Tips** bei vielen Feldern (kleine ?-Icons). Welcher Modus passt zu dir? **Probier es direkt aus:**',
@@ -472,7 +546,7 @@
     // Sidebar mit Onboarding-Hinweis
     {
       tab: 'sidebar',
-      selector: '#sb-list, #sidebar',
+      selector: '.dpl-teil-objekte, #sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'In der **Sidebar links** sammelst du deine Objekte. **Du hast noch keins** — lass uns dein erstes anlegen!',

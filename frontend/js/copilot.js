@@ -75,6 +75,12 @@
     return d;
   }
 
+  /* v1760: copilot-aenderungen.js schreibt in denselben Verlauf — es soll
+     seine Rueckfrage dort zeigen, wo auch die Antworten stehen, und nicht
+     in einem zweiten Fenster. Nur diese eine Funktion geht nach aussen;
+     send() bleibt intern, der Einhaengepunkt dort ist der Klick. */
+  window.__dpCpAddMsg = addMsg;
+
   function context() {
     var c = {};
     try { if (typeof _buildAIPayload === 'function') c = _buildAIPayload(); } catch (e) {}
@@ -284,10 +290,51 @@
       allowWeb: allowWeb
     }, userKeyExtra());
 
+    /* v1764: der Feldkatalog geht MIT. Damit entscheidet das Modell selbst,
+       ob eine Nachricht eine Frage oder eine Anweisung ist - in EINEM
+       Aufruf. Vorher brauchte es dafuer einen zweiten Weg, und ein Muster
+       im Frontend musste raten. */
+    try {
+      if (window._currentObjKey && window.DealPilotCopilotAenderungen
+          && typeof window.DealPilotCopilotAenderungen.katalog === 'function') {
+        body.felder = window.DealPilotCopilotAenderungen.katalog();
+        /* v1766: der Guthabenstand reist mit, damit das Modell die Kosten
+           nennen kann, ohne sie zu schaetzen. */
+        if (typeof window.DealPilotCopilotAenderungen.abrufe === 'function') {
+          body.abrufe = window.DealPilotCopilotAenderungen.abrufe();
+        }
+      }
+    } catch (e) {}
+
+    /* v1769 · DER MARKTBERICHT ZUM OBJEKT REIST MIT (Backlog V6).
+       Aus dem Zwischenspeicher, nicht frisch geholt - der Abruf laeuft
+       beim Objektwechsel, nicht vor jeder Frage. Ist nichts da, geht
+       nichts mit, und das Modell behauptet auch nichts. */
+    try {
+      if (window.DealPilotPilotBerichte
+          && typeof window.DealPilotPilotBerichte.standObjekt === 'function') {
+        var _mb = window.DealPilotPilotBerichte.standObjekt();
+        if (_mb) body.marktberichte = _mb;
+      }
+    } catch (e) {}
+
     Auth.apiCall('/ai/copilot', { method: 'POST', body: body }).then(function (data) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);
       var reply = (data && data.reply) ? data.reply : 'Keine Antwort erhalten.';
-      addMsg('assistant', reply);
+      /* Enthaelt die Antwort einen Feldblock, zeigt das Aenderungsmodul die
+         Rueckfrage und gibt den Text OHNE Block zurueck. */
+      try {
+        if (window.DealPilotCopilotAenderungen
+            && typeof window.DealPilotCopilotAenderungen.ausAntwort === 'function') {
+          /* v1767: BEWUSST OHNE Nutzersatz. Der dritte Parameter loest im
+             Portfolio-Piloten einen Objektwechsel aus - hier waere das
+             falsch: im Co-Pilot ist immer das geladene Objekt gemeint, und
+             eine nebenbei genannte andere Adresse duerfte es nicht
+             wegschieben. */
+          reply = window.DealPilotCopilotAenderungen.ausAntwort(reply, addMsg, null);
+        }
+      } catch (e) {}
+      if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
     }).catch(function (err) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);

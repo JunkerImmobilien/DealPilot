@@ -485,7 +485,12 @@ router.post('/location-finder', async (req, res) => {
 // GET /objects — Liste aller Objekte (gruppiert) mit dem jeweils neuesten Snapshot.
 router.get('/objects', async (req, res) => {
   /* v942-userbind: user_id kommt vom DealPilot-Proxy (nie vom Browser). Ohne -> 400. */
-  const uid = parseInt(req.query.user_id, 10);
+  /* v1769: war parseInt(). users.id ist eine UUID — parseInt stuempelt
+     sie zu ihrem Ziffernpraefix oder zu NaN, und dann sucht die Abfrage
+     eine Zahl, die in der Spalte nicht steht. _uidAus() prueft auf
+     Unbedenklichkeit statt auf Zahligkeit und ist seit v1601 gebaut —
+     an diesen fuenf Stellen wurde es nur nicht gerufen. */
+  const uid = _uidAus(req);
   if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
   try {
     const r = await q(
@@ -506,7 +511,12 @@ router.get('/objects', async (req, res) => {
 router.get('/objects/history', async (req, res) => {
   /* v942-userbind: user_id Pflicht. key/ref sind jetzt OPTIONAL -> ohne beides
      liefert die Route ALLE Berichte des Users ("Alle"-Filter der Liste). */
-  const uid = parseInt(req.query.user_id, 10);
+  /* v1769: war parseInt(). users.id ist eine UUID — parseInt stuempelt
+     sie zu ihrem Ziffernpraefix oder zu NaN, und dann sucht die Abfrage
+     eine Zahl, die in der Spalte nicht steht. _uidAus() prueft auf
+     Unbedenklichkeit statt auf Zahligkeit und ist seit v1601 gebaut —
+     an diesen fuenf Stellen wurde es nur nicht gerufen. */
+  const uid = _uidAus(req);
   if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
   const key = req.query.key, ref = req.query.ref;
   const cond = key ? ' AND object_key = $2' : (ref ? ' AND external_ref = $2' : '');
@@ -528,7 +538,12 @@ router.get('/objects/history', async (req, res) => {
 });
 
 router.post('/verlauf-text', async (req, res) => {
-  const uid = parseInt(req.query.user_id, 10);
+  /* v1769: war parseInt(). users.id ist eine UUID — parseInt stuempelt
+     sie zu ihrem Ziffernpraefix oder zu NaN, und dann sucht die Abfrage
+     eine Zahl, die in der Spalte nicht steht. _uidAus() prueft auf
+     Unbedenklichkeit statt auf Zahligkeit und ist seit v1601 gebaut —
+     an diesen fuenf Stellen wurde es nur nicht gerufen. */
+  const uid = _uidAus(req);
   if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
   try {
     const out = await generateVerlaufText(req.body || {});
@@ -742,7 +757,8 @@ router.get('/reports/one', async (req, res) => {
     const id = parseInt(req.query.id, 10);
     if (!id) return res.status(400).json({ error: 'id erforderlich' });
     /* v942-userbind: nur der Besitzer. 404 statt 403 -> verraet nicht, dass es die id gibt. */
-    const uid = parseInt(req.query.user_id, 10);
+    /* v1769: war parseInt() — siehe _uidAus(). */
+    const uid = _uidAus(req);
     if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
     const r = await q1('SELECT id, property_id, ai_mode, payload, report_md FROM mb.market_reports WHERE id = $1 AND user_id = $2', [id, uid]);
     if (!r) return res.status(404).json({ error: 'kein Bericht (id=' + id + ')' });
@@ -772,7 +788,12 @@ router.get('/reports/one', async (req, res) => {
  * ohne diesen Nachweis waere die Route ein Loeschknopf fuer fremde Berichte.
  */
 router.delete('/reports/:id', async (req, res) => {
-  const uid = parseInt(req.query.user_id, 10);
+  /* v1769: war parseInt(). users.id ist eine UUID — parseInt stuempelt
+     sie zu ihrem Ziffernpraefix oder zu NaN, und dann sucht die Abfrage
+     eine Zahl, die in der Spalte nicht steht. _uidAus() prueft auf
+     Unbedenklichkeit statt auf Zahligkeit und ist seit v1601 gebaut —
+     an diesen fuenf Stellen wurde es nur nicht gerufen. */
+  const uid = _uidAus(req);
   if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
   const rid = parseInt(req.params.id, 10);
   if (!Number.isFinite(rid) || rid <= 0) return res.status(400).json({ error: 'report_id ungültig' });

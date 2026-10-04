@@ -54,7 +54,7 @@ var WM_FIELDS = [
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
-  'vermstand','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
+  'vermstand','nutzungsart','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V291.1-storage-cleanup: kp_kueche deprecated — Eingabe komplett über inv_* Felder
   // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
   'san','moebl','inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst', /* V291-inventar-fields-applied */
@@ -142,9 +142,30 @@ var _objCache = {};         // Cache of full object data when in API mode
 
 function collectData() {
   var d = {};
+  /* ── v1815 · EINE CHECKBOX HAT KEIN .value, DAS ETWAS BEDEUTET ─────────
+   *
+   * GEMESSEN am 03.10.2026 ueber alle 18 Objekte auf Staging: genau EIN
+   * Feld wich zwischen Datensatz und Formular ab, und zwar bei JEDEM
+   * Objekt — `san_tax_active` stand als "on" im Datensatz und war im
+   * Formular nicht angehakt.
+   *
+   * Ursache: hier stand `d[id] = e.value`. Bei einer Checkbox ist `.value`
+   * immer "on", egal ob sie angehakt ist. Gespeichert wurde also in jedem
+   * Fall "on" — eine Angabe ohne Aussage. Und `loadData` setzte spiegel-
+   * bildlich `e.value = d[id]`, also wieder das Attribut statt des Hakens.
+   *
+   *   > Zwei Schreibweisen, die zueinander passen, koennen gemeinsam
+   *   > falsch sein. Dass Lesen und Schreiben sich einig sind, beweist
+   *   > nichts — nur dass niemand nachgesehen hat.
+   *
+   * Betroffen sind die zwei Werbungskosten-Haken (san_tax_active,
+   * moebl_tax_active). Der Nutzer hakte "Sanierung als Werbungskosten
+   * ansetzen" an, die Steuerrechnung folgte sofort — und nach dem
+   * naechsten Laden war der Haken weg. Das ist STEUERRELEVANT. */
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e) d[id] = e.value;
+    if (!e) return;
+    d[id] = (e.type === 'checkbox') ? !!e.checked : e.value;
   });
   // V187-h2: KI-Lage-Cache aus currentDeal mit speichern (falls vorhanden)
   try {
@@ -240,7 +261,27 @@ function collectData() {
   d._at = new Date().toISOString();
   d._v = '9.0';
   // Snapshot key KPIs for backend indexing
-  if (typeof State !== 'undefined' && State.kpis) {
+  /* v1814 · NUR MIT PASSENDER HERKUNFT. `State.kpis._fuer` traegt den
+     Objektschluessel, fuer den gerechnet wurde (calc.js). Stimmt er nicht
+     mit dem geladenen Objekt ueberein, wird NICHT gestempelt — dann
+     stehen keine Kennzahlen am Datensatz, und das ist richtiger als die
+     eines anderen Hauses.
+
+       > Eine Luecke sieht man. Eine falsche Zahl nicht. */
+  var _kpiPasst = (typeof State !== 'undefined' && State.kpis)
+    && (State.kpis._fuer === undefined
+        || String(State.kpis._fuer || '') === String(window._currentObjKey || ''));
+  if (!_kpiPasst && typeof State !== 'undefined' && State.kpis) {
+    console.warn('[storage v1814] Kennzahlen NICHT gestempelt: gerechnet fuer '
+      + State.kpis._fuer + ', geladen ist ' + window._currentObjKey);
+    /* Was schon am Objekt steht, bleibt — es ist aelter, aber es gehoert
+       diesem Objekt. Ueberschrieben wird nur mit einer passenden Rechnung. */
+    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y']
+      .forEach(function (f) {
+        if (window._currentObjData && window._currentObjData[f] != null) d[f] = window._currentObjData[f];
+      });
+  }
+  if (_kpiPasst) {
     d._kpis_bmy = State.kpis.bmy;
     d._kpis_cf_ns = State.kpis.cf_ns;
     d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
@@ -331,7 +372,26 @@ function loadData(d) {
   });
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e && d[id] !== undefined) e.value = d[id];
+    if (!e || d[id] === undefined) return;
+    if (e.type === 'checkbox') {
+      /* v1815 · Den HAKEN setzen, nicht das Attribut.
+       *
+       * ALTBESTAND: bis v1814 wurde "on" gespeichert, OHNE Ruecksicht auf
+       * den Haken — bei allen 18 Objekten auf Staging steht es. Diese "on"
+       * bedeuten NICHTS. Sie jetzt als "angehakt" zu lesen, wuerde bei
+       * jedem Altobjekt eine steuerliche Annahme aktivieren, die niemand
+       * getroffen hat.
+       *
+       *   > Eine Angabe ohne Aussage darf nicht nachtraeglich zur
+       *   > Zustimmung werden. Lieber die Luecke als eine erfundene
+       *   > Entscheidung — bei Steuern erst recht.
+       *
+       * Darum gilt nur echtes true/false. Ab jetzt wird die Wahrheit
+       * geschrieben, und ab dann traegt sie. */
+      e.checked = (d[id] === true || d[id] === 'true');
+      return;
+    }
+    e.value = d[id];
   });
   // V187-h2: KI-Lage-Cache aus data ins currentDeal-Object übernehmen
   try {
@@ -437,9 +497,18 @@ function loadData(d) {
   if (window.MietEntwicklung && typeof MietEntwicklung.refresh === 'function') {
     var mMode = (d.me_modus === 'detail') ? 'detail' : 'prog';
     MietEntwicklung.setMode(mMode);  // ruft intern auch calc()
-  } else if (typeof calc === 'function') {
-    calcNow();  /* V29: direkt — nach loadObject */
   }
+  /* v1814 · UND IMMER SOFORT RECHNEN.
+     Hier stand `else if` — und MietEntwicklung ist immer da, also war
+     dieser Zweig unerreichbar. `setMode` ruft `calc()`, und das ist um
+     300 ms verzoegert; der Stempel unten lief vorher und trug deshalb die
+     Kennzahlen des VORGAENGERS. Gemessen an drei Objektpaaren mit
+     byte-identischem Cashflow bei verschiedenen Mieten.
+
+       > Ein else-Zweig hinter einer Bedingung, die immer zutrifft, ist
+       > toter Code, der aussieht wie eine Absicherung. */
+  if (typeof calcNow === 'function') calcNow();
+  else if (typeof calc === 'function') calc();
   if (typeof updHeader === 'function') updHeader();
   // V37: Sterne-Bewertung re-rendern nach Load
   if (window.StarRating && typeof StarRating.refresh === 'function') {
@@ -453,7 +522,12 @@ function loadData(d) {
   // damit die Sidebar (gecacht) = geladene Bewertung (live) ist — ohne manuelles Speichern.
   try {
     var _o351 = window._currentObjData;
-    if (_o351 && typeof State !== 'undefined' && State.kpis) {
+    /* v1814 · auch hier die Herkunft pruefen — dieser Block war die
+       Stelle, die den Cashflow des Vorgaengers aufgestempelt hat. */
+    var _passt351 = (typeof State !== 'undefined' && State.kpis)
+      && (State.kpis._fuer === undefined
+          || String(State.kpis._fuer || '') === String(window._currentObjKey || ''));
+    if (_o351 && _passt351) {
       _o351._kpis_bmy  = State.kpis.bmy;
       _o351._kpis_cf_ns = State.kpis.cf_ns;
       _o351._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs */
@@ -766,7 +840,12 @@ async function saveObj(opts) {
 function _clearFormForNewObject() {
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e) e.value = '';
+    if (!e) return;
+    /* v1815 · Eine Checkbox wird nicht durch e.value='' leer. Beide
+       Leer-Wege (neues Objekt, Formular zuruecksetzen) liessen den Haken
+       des vorigen Objekts stehen. */
+    if (e.type === 'checkbox') { e.checked = false; return; }
+    e.value = '';
   });
   var qcIds = ['qc_kp','qc_nkm','qc_nkm_grund','qc_nkm_stp','qc_nkm_garage','qc_nkm_sonst',
                'qc_ek','qc_knk','qc_knk_eur','qc_san','qc_zins','qc_tilg','qc_d1','qc_d1z','qc_d1t',
@@ -842,7 +921,12 @@ function newObj() {
 function _newObjLeeren() {
   FIELDS.forEach(function(id) {
     var e = document.getElementById(id);
-    if (e) e.value = '';
+    if (!e) return;
+    /* v1815 · Eine Checkbox wird nicht durch e.value='' leer. Beide
+       Leer-Wege (neues Objekt, Formular zuruecksetzen) liessen den Haken
+       des vorigen Objekts stehen. */
+    if (e.type === 'checkbox') { e.checked = false; return; }
+    e.value = '';
   });
   // V63.22: Auch QC-Felder explizit leeren (waren nicht in FIELDS)
   // Sonst behalten qc_kp / qc_nkm_grund / qc_nkm_stp / qc_nkm_garage / qc_nkm_sonst /
@@ -1592,8 +1676,12 @@ async function loadSaved(k) {
         imgs = (obj.photos || []).map(function(src, i){ return { src: src, name: 'photo_' + i + '.jpg' }; });
         if (typeof renderImgs === 'function') renderImgs();
       }
+      /* v1814 · DER SCHLUESSEL ZUERST. Hier stand er NACH loadData —
+          damit rechnete calc() noch unter dem Schluessel des Vorgaengers,
+          und der Stempel konnte seine Herkunft nicht pruefen. */
+      _currentObjKey = k;
       loadData(d);
-      _currentObjKey = k; _dpFireObjectReady(k); /* v946 */
+      _dpFireObjectReady(k); /* v946 */
 
       // Load bemerkungen for this object (Migration 006)
       try {
@@ -1629,8 +1717,9 @@ async function loadSaved(k) {
       imgs = d._photos.map(function(src, i){ return { src: src, name: 'photo_' + i + '.jpg' }; });
       if (typeof renderImgs === 'function') renderImgs();
     }
+    _currentObjKey = k;                 /* v1814 · Schluessel zuerst */
     loadData(d);
-    _currentObjKey = k; _dpFireObjectReady(k); /* v946 */
+    _dpFireObjectReady(k); /* v946 */
     // V63.8: QC-Host als nicht-gerendert markieren — beim nächsten QC-Besuch wird neu gerendert
       var __qcH = document.getElementById('qc-tab-host'); if (__qcH) __qcH.dataset.rendered = '0';
       // V63.48: Erst auf Einzelobjekt-View wechseln, dann auf Tab Objekt + WF-Update
@@ -3630,16 +3719,39 @@ window._checkObjIdConflict = _checkObjIdConflict;
 })();
 
 /**
- * V198: Score → menschenlesbares Label
- * Konsistent mit dealscore2.js calcDealScore2:
- * 85+: Sehr gut · 70+: Gut · 50+: Okay · sonst: Schwach
+ * V198 · v1734: Score → menschenlesbares Label für die Pille auf der Objektkarte
+ *
+ * HIER STANDEN VIER STUFEN: „Sehr gut · Gut · Okay · Schwach", begründet
+ * mit „Konsistent mit dealscore2.js calcDealScore2". Die Konsistenz bestand
+ * also zu einem anderen Modul — nicht zu der Kette, die CLAUDE.md als die
+ * gültige führt:
+ *
+ *     >= 85  TOP        >= 70  GUT        >= 50  SOLIDE
+ *     >= 35  SCHWACH    <  35  KRITISCH
+ *
+ * Drei Abweichungen, gemessen an frisch angelegten Objekten (Score 41, 56,
+ * 62, 64, 68, 79):
+ *   · „Okay" statt „SOLIDE"        — kommt in der Doktrin gar nicht vor
+ *   · „Sehr gut" statt „TOP"
+ *   · KRITISCH fehlte ganz: alles unter 50 hiess „Schwach", auch eine 12
+ *
+ * > Eine Stufe, die es nicht gibt, kann niemand lesen. Ein Objekt mit Score
+ * > 12 und ein Objekt mit Score 49 sahen auf der Karte gleich aus.
+ *
+ * CLAUDE.md nannte als Quelle `js/dashboard.js:390` — dort stimmt die Kette.
+ * Die Objektkarte baut aber `_renderRichCard()` in DIESER Datei, und sie
+ * ruft diese Funktion hier (Z. 1243). Die dritte Fundstelle desselben
+ * Musters nach `dashboard.js:1283` und dem Marktbericht-ScoringService.
+ *
+ * Versalien: CLAUDE.md schreibt „Auf der Karte als Versalien-Pille".
  */
 function _scoreLabel(s) {
   if (s == null || isNaN(s)) return '–';
-  if (s >= 85) return 'Sehr gut';
-  if (s >= 70) return 'Gut';
-  if (s >= 50) return 'Okay';
-  return 'Schwach';
+  if (s >= 85) return 'TOP';
+  if (s >= 70) return 'GUT';
+  if (s >= 50) return 'SOLIDE';
+  if (s >= 35) return 'SCHWACH';
+  return 'KRITISCH';
 }
 
 // V62.2: Auto-saved Indikator im Header zeigen + nach 4s ausblenden

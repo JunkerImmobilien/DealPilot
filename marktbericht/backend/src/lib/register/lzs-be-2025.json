@@ -1,0 +1,2999 @@
+[
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_suedost",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete (netto kalt) in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "4": 2.6,
+    "6": 2.9,
+    "7": 3,
+    "8": 3.2,
+    "9": 3.3,
+    "10": 3.4,
+    "11": 3.6,
+    "12": 3.7,
+    "20": 4.7
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen; die Stützstellen sind die abgedruckte Auswertung einer stetigen Regressionsgeraden, Interpolation ist deshalb modellkonform",
+   "funktion": {
+    "wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+    "a_konstante": 0.644,
+    "b_je_eur_miete": 0.132,
+    "c_je_tag": 0.0013304,
+    "tage": 1096,
+    "zuschlag_gebietsgruppe": 0,
+    "hinweis": "Die Stützstellen lassen sich mit dieser Funktion exakt reproduzieren (siehe belege.pruefprotokoll). Wer sie braucht, soll die Funktion rechnen und nicht interpolieren."
+   },
+   "hinweis": "Ergebnis in PROZENT (2,6 bedeutet 2,6 %), nicht als Dezimalbruch. Der Berliner Liegenschaftszinssatz ist keine Konstante, sondern eine Funktion der Objektkaltmiete — und seit dem Jahrgang 2025 zusätzlich eine Funktion der GEBIETSGRUPPE."
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahresgruppe",
+    "art": "kategorial",
+    "werte": {
+     "Altbauten (Baujahre vor 1919)": 0,
+     "Zwischenkriegsbauten (Baujahre 1919 bis 1948)": 0,
+     "Baujahre 1949 bis 1972": 0,
+     "Baujahre 1973 bis 1990 im Westteil": 0.3,
+     "Baujahre 1973 bis 1990 im Ostteil": 0,
+     "Baujahre 1991 bis 2002": 0,
+     "Baujahr nach 2002": 0
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten. Nur „1973 bis 1990 im Westteil\" trägt einen Wert, und zwar +0,3 (Jahrgang 2024: +0,2). Die Unterscheidung West-/Ostteil setzt die Lage im ehemaligen West- bzw. Ostteil Berlins voraus — dafür führt Tabelle 1 des Dokuments die Spalte „Stadtlage\", die in geltungsbereich.ortsteile je Ortsteil mitsteht. ART „kategorial\" mit werte, NICHT „stufen_kategorial\": der Auswerter liest bei stufen_kategorial zwei Größen (eine Zahl und eine Kategorie) und gibt ohne die Zahl gar nichts zurück — am 01.10.2026 gemessen, die Korrektur feuerte dann nie. Das Eingabefeld heißt baujahresgruppe und erwartet eine der sieben Schreibweisen unten; eine nackte Jahreszahl trifft keine davon und erscheint dann in korrekturen_offen.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   },
+   {
+    "bez": "Gewerblicher Anteil am Nettojahresrohertrag",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0,
+     "10": 0.08,
+     "20": 0.16,
+     "30": 0.24,
+     "40": 0.32,
+     "50": 0.4,
+     "60": 0.48,
+     "70": 0.56,
+     "80": 0.64
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 2,
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten, exakt linear mit 0,008 Prozentpunkten je Prozent Gewerbeanteil. Gegenüber dem Jahrgang 2024 (0,003 je Prozent, Spanne 0,00 bis 0,24) hat sich der Faktor mehr als verdoppelt. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Objektartdefinition und bekommt keinen Wert.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich (Vorbemerkung 2, S. 2): „Die Verwendung der ermittelten Liegenschaftszinssätze führt nur dann zu einem marktgerechten Ergebnis, wenn die wertbestimmenden Ansätze (grundstückswirtschaftliche Rahmenbedingungen) in der Ertragswertermittlung nach dem Modell des Gutachterausschusses zugrunde gelegt werden – Modellkonformität.\"",
+   "rohertrag": "Jahresnettokaltmieten (Objektkaltmiete einschließlich nutzflächenbezogener gewerblicher Mieterträge)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 zu § 12 Abs. 5 ImmoWertV, fortgeschrieben mit dem Verbraucherpreisindex für Deutschland (2020=100), Oktober 2001 = 77,1 gegenüber Oktober 2023 = 117,8",
+   "bewirtschaftungskosten_gilt_fuer": "Kaufvertragsjahr 2024; für die Kaufvertragsjahre 2022 und 2023 wurden die Ansätze mit dem jeweils gültigen Verbraucherpreisindex angepasst (die dortigen Zahlen druckt das Dokument nicht ab)",
+   "instandhaltung_eur_qm_wohnflaeche": 13.8,
+   "instandhaltung_garage_eur_platz": 104,
+   "instandhaltung_offener_stellplatz_eur_platz": 52,
+   "instandhaltung_gewerbe_anteil": "100 % des Wohnansatzes für Büros, Praxen, Geschäfte und vergleichbare Nutzungen; 30 % für Nebennutzungen wie Werkstatt oder Lager im Keller",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_gewerbe": "3 % vom jeweiligen Mietertrag; zum Sonstigen zählen insbesondere Stellplätze und Garagen",
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze. Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Das Dokument arbeitet ausschließlich mit Restnutzungsdauer-Tabellen (Tabellen 2 bis 5) und beziffert KEINE Gesamtnutzungsdauer. Das ist eine echte Lücke für den Modellvermerk: die Restnutzungsdauer darf hier nicht ersatzweise aus einer angenommenen Gesamtnutzungsdauer minus Alter gebildet werden, und die Rückfallzahl 80 des Rechenkerns ist nicht belegt.",
+   "restnutzungsdauer_tabellen": {
+    "hinweis": "Vollständig erfasst, anders als beim Jahrgang 2024 (dort fehlten die Tabellen 1 bis 4).",
+    "altbauten_und_zwischenkriegsbauten": {
+     "geltung": "Baujahre bis 1918 (Altbauten) und 1919 bis 1948 (Zwischenkriegsbauten), Abschnitt 2.8.1",
+     "basis_nach_bauzustand_jahre": {
+      "gut": 55,
+      "normal": 40,
+      "schlecht": 25
+     },
+     "abschlag_altbauten": {
+      "Normalausstattung: vollständig mit Zentralheizung (Sammel-/Etagenheizung) und Bädern ausgestattet": 0,
+      "vollständig mit Zentralheizung ODER Bädern ausgestattet": -5,
+      "weder vollständig mit Zentralheizung noch vollständig mit Bädern ausgestattet": -10
+     },
+     "abschlag_zwischenkriegsbauten": {
+      "Normalausstattung: Zentralheizung, Bäder": 0,
+      "nicht vollständig mit Zentralheizung ausgestattet": -5
+     },
+     "fundstelle": "Tabellen 2, 3 und 4, S. 10"
+    },
+    "ab_1949": {
+     "geltung": "Baujahre ab 1949, Abschnitt 2.8.2",
+     "achse_baualter_jahre": [
+      "bis 2",
+      "3-7",
+      "8-12",
+      "13-17",
+      "18-22",
+      "23-27",
+      "28-32",
+      "33-37",
+      "38-42",
+      "43-47",
+      "48-52",
+      "53-57",
+      "ab 58"
+     ],
+     "zellen_schluessel": "Baualtersklasse -> [gut, normal, schlecht]; null = der Bericht führt hier keinen Wert",
+     "zellen": {
+      "bis 2": [
+       80,
+       null,
+       null
+      ],
+      "3-7": [
+       75,
+       70,
+       null
+      ],
+      "8-12": [
+       70,
+       65,
+       60
+      ],
+      "13-17": [
+       65,
+       60,
+       55
+      ],
+      "18-22": [
+       60,
+       55,
+       50
+      ],
+      "23-27": [
+       55,
+       50,
+       45
+      ],
+      "28-32": [
+       55,
+       45,
+       40
+      ],
+      "33-37": [
+       55,
+       40,
+       35
+      ],
+      "38-42": [
+       55,
+       40,
+       30
+      ],
+      "43-47": [
+       55,
+       40,
+       25
+      ],
+      "48-52": [
+       55,
+       40,
+       25
+      ],
+      "53-57": [
+       55,
+       40,
+       25
+      ],
+      "ab 58": [
+       55,
+       40,
+       25
+      ]
+     },
+     "fundstelle": "Tabelle 5, S. 11"
+    }
+   },
+   "baulicher_zustand": "drei Zustandsnoten: gut, normal, schlecht. Kriterien unter https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial; Variable monatliche Objektkaltmiete und Zeitachse",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "marktmiete_eur_qm": 8.42,
+   "bezug": "Liegenschaftszinssätze 2025, Gutachterausschuss für Grundstückswerte in Berlin, Abschnitte 2.7 und 2.8 (S. 8-11): Instandhaltung 13,80 €/m² Wohnfläche, Verwaltung 351 €/Wohnung, Mietausfallwagnis 2 % Wohnen / 4 % Gewerbe, Restnutzungsdauer nach den Tabellen 2 bis 5. Keine Bewirtschaftungskostenquote, keine Gesamtnutzungsdauer. marktmiete_eur_qm ist die durchschnittliche monatliche Objektkaltmiete der Stichprobe (8,42 €/m²), nicht eine Vorgabe.",
+   "formel_wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+   "stichprobe": {
+    "anzahl": 651,
+    "nettoreinertragsanteil_pct": {
+     "mittel": 78.8,
+     "p5_p95": [
+      70.9,
+      85.2
+     ],
+     "min_max": [
+      54.9,
+      89.9
+     ]
+    },
+    "kaufpreis_eur_qm_geschossflaeche": {
+     "mittel": 1999,
+     "p5_p95": [
+      1090,
+      3443
+     ],
+     "min_max": [
+      758,
+      6385
+     ]
+    },
+    "kaufpreis_eur_qm_wohn_nutzflaeche": {
+     "mittel": 2644,
+     "p5_p95": [
+      1634,
+      4247
+     ],
+     "min_max": [
+      1208,
+      5975
+     ]
+    },
+    "kaufpreis_je_nettojahresrohertrag": {
+     "mittel": 26.6,
+     "p5_p95": [
+      18,
+      39.3
+     ],
+     "min_max": [
+      14,
+      51.4
+     ]
+    },
+    "objektkaltmiete_eur_qm_monat": {
+     "mittel": 8.42,
+     "p5_p95": [
+      5.6,
+      12.1
+     ]
+    },
+    "gewerblicher_mietanteil_pct": {
+     "mittel": 13.8,
+     "p5_p95": [
+      0,
+      49.2
+     ],
+     "min_max": [
+      0,
+      78
+     ]
+    },
+    "verwaltungskosten_pct_pa": {
+     "mittel": 5.1,
+     "p5_p95": [
+      2.8,
+      8
+     ],
+     "min_max": [
+      1.8,
+      14.5
+     ]
+    },
+    "bodenrichtwert_eur_qm": {
+     "mittel": 2700,
+     "p5_p95": [
+      600,
+      6500
+     ]
+    },
+    "fundstelle": "Tabellen 12 und 13, S. 15-16"
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Gebietsgruppe Südost",
+   "sachlich": "Mietwohnhäuser und Mietwohngeschäftshäuser mit einem gewerblichen Mietanteil bis 80 % und mindestens vier Mieteinheiten",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflagen: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" (S. 12) — die Korrekturen sind PFLICHT, nicht Kür. „Die Liegenschaftszinssätze sind für Objekte mit mindestens vier Mieteinheiten anzuwenden. Sie gelten nicht für Ein-, Zwei- oder Dreifamilienhäuser und Wohnungs-/Teileigentum.\" (Vorbemerkung 3, S. 2) „Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.\" (Fußnote zur Formel) „Die Verwendung der nachfolgenden Liegenschaftszinssätze ersetzt nicht automatisch die nach ImmoWertV erforderliche Marktanpassung ermittelter Ertragswerte.\" (Vorbemerkung 4, S. 2)",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     4,
+     20
+    ],
+    "objektkaltmiete_hinweis": "Die Randstützstellen 4,00 und 20,00 EUR/m² sind im Dokument als Minimum-/Maximum-Werte der Stichprobe gekennzeichnet (Fußnoten 7 bis 12), nicht als Modellgrenzen. Verlässlich ist nach dem Dokument nur der Bereich zwischen dem 5%- und dem 95%-Perzentil der Stichprobe, also 5,60 bis 12,10 EUR/m².",
+    "objektkaltmiete_verlaesslich_eur_m2_monat": [
+     5.6,
+     12.1
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4
+   },
+   "ortsteile": [
+    [
+     "Mariendorf",
+     "West"
+    ],
+    [
+     "Marienfelde",
+     "West"
+    ],
+    [
+     "Lichtenrade",
+     "West"
+    ],
+    [
+     "Britz",
+     "West"
+    ],
+    [
+     "Buckow",
+     "West"
+    ],
+    [
+     "Rudow",
+     "West"
+    ],
+    [
+     "Gropiusstadt",
+     "West"
+    ],
+    [
+     "Alt-Treptow",
+     "Ost"
+    ],
+    [
+     "Plänterwald",
+     "Ost"
+    ],
+    [
+     "Baumschulenweg",
+     "Ost"
+    ],
+    [
+     "Johannisthal",
+     "Ost"
+    ],
+    [
+     "Niederschöneweide",
+     "Ost"
+    ],
+    [
+     "Altglienicke",
+     "Ost"
+    ],
+    [
+     "Adlershof",
+     "Ost"
+    ],
+    [
+     "Bohnsdorf",
+     "Ost"
+    ],
+    [
+     "Oberschöneweide",
+     "Ost"
+    ],
+    [
+     "Köpenick",
+     "Ost"
+    ],
+    [
+     "Friedrichshagen",
+     "Ost"
+    ],
+    [
+     "Rahnsdorf",
+     "Ost"
+    ],
+    [
+     "Grünau",
+     "Ost"
+    ],
+    [
+     "Müggelheim",
+     "Ost"
+    ],
+    [
+     "Schmöckwitz",
+     "Ost"
+    ]
+   ],
+   "ortsteile_schluessel": "[Ortsteilname nach Tabelle 1 des Dokuments, Stadtlage Ost/West]. Die Stadtlage wird für die Baujahreskorrektur 1973–1990 gebraucht.",
+   "ortsteile_anzahl": 22,
+   "ortsteile_hinweis": "Tabelle 1 (S. 4-7) ordnet jeden Ortsteil genau einer Gebietsgruppe zu. Insgesamt 98 Zeilen gelesen, davon diese 22; die Quersumme über alle sechs Gebietsgruppen (City 14 · Nord 26 · Südost 22 · Ost 15 · Südwest 11 · West 10 = 98) stimmt mit der Zeilenzahl. Eine Zeile trägt im Dokument ein Sternchen — „(West-Staaken)*\" in der Gebietsgruppe West — und ist ein historischer Ortsteil; die Fußnote dazu wurde nicht mitgelesen. Die Schreibweise „Tiergarten-Süd\" weicht vom amtlichen Ortsteilnamen „Tiergarten\" ab; sie steht so im Dokument und wurde NICHT stillschweigend korrigiert."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Tabelle 6, S. 12",
+    "wortlaut": "Liegenschaftszinssätze für Objekte in der Gebietsgruppe Südost. Neun Stützstellen über die durchschnittliche monatliche Objektkaltmiete (4,00 · 6,00 · 7,00 · 8,00 · 9,00 · 10,00 · 11,00 · 12,00 · 20,00 EUR/m²) mit den Werten 2,6 · 2,9 · 3,0 · 3,2 · 3,3 · 3,4 · 3,6 · 3,7 · 4,7 Prozent. Zusatz des Dokuments: „Die Liegenschaftszinssätze sind zum Stichtag, für Objekte ohne gewerblichen Anteil am Nettojahresrohertrag und für die Baujahre vor 1919, 1919 bis 1972, 1973-1990 Ost und ab 2003 berechnet.\"",
+    "amtsblatt": "Veröffentlicht im Amtsblatt für Berlin Nr. 39 vom 19.09.2025, Seite 2477 ff. Dokumentstand 09.09.2025.",
+    "pruefprotokoll": "ANWENDUNGSBEISPIEL NACHGERECHNET am 01.10.2026 — das Dokument druckt die Regressionsgleichung selbst ab, sie ist damit der Prüfmaßstab. Gerechnet: p = 0,644 + 0,132 × Miete + 0,0013304 × 1.096 und auf eine Nachkommastelle gerundet. Ergebnis: ALLE NEUN abgedruckten Stützstellen dieser Tabelle werden exakt getroffen. Über beide Formelvarianten zusammen (mit und ohne den Zuschlag von 0,167) sind es 18 von 18 Stützstellen — ein Zahlendreher oder eine vertauschte Spalte hätte das gebrochen. Die Einzelwerte stehen in belege.formelprobe.",
+    "formelprobe": [
+     {
+      "miete": 4,
+      "basis_soll": 2.6,
+      "basis_ist": 2.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 2.8,
+      "mit_zuschlag_ist": 2.8,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 6,
+      "basis_soll": 2.9,
+      "basis_ist": 2.9,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.1,
+      "mit_zuschlag_ist": 3.1,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 7,
+      "basis_soll": 3,
+      "basis_ist": 3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.2,
+      "mit_zuschlag_ist": 3.2,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 8,
+      "basis_soll": 3.2,
+      "basis_ist": 3.2,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.3,
+      "mit_zuschlag_ist": 3.3,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 9,
+      "basis_soll": 3.3,
+      "basis_ist": 3.3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.5,
+      "mit_zuschlag_ist": 3.5,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 10,
+      "basis_soll": 3.4,
+      "basis_ist": 3.4,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.6,
+      "mit_zuschlag_ist": 3.6,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 11,
+      "basis_soll": 3.6,
+      "basis_ist": 3.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.7,
+      "mit_zuschlag_ist": 3.7,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 12,
+      "basis_soll": 3.7,
+      "basis_ist": 3.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.9,
+      "mit_zuschlag_ist": 3.9,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 20,
+      "basis_soll": 4.7,
+      "basis_ist": 4.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 4.9,
+      "mit_zuschlag_ist": 4.9,
+      "mit_zuschlag_ok": true
+     }
+    ],
+    "zaehlpruefung": "Neun Stützstellen je Tabelle, sechs Tabellen (6 bis 11), zwei Wertesätze — Südost, Südwest und Nord tragen identische Werte, City, Ost und West tragen identische Werte. Genau so steht es im Dokument: der Unterschied zwischen den beiden Wertesätzen ist der Zuschlag von 0,167 in der Formel, und er erscheint im Dokument nur bei City, Ost und West."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 651,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "Liegenschaftszinssätze 2025 GAA Berlin (sechs Gebietsgruppen)",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2500.pdf",
+  "quelle_parser": "v1768-BELZS25",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Liegenschaftszinssätze 2025, Amtsblatt für Berlin Nr. 39 vom 19.09.2025, S. 2477 ff.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
+  "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
+  "fundstelle": "Tabelle 6, S. 12; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Südost\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_suedwest",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete (netto kalt) in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "4": 2.6,
+    "6": 2.9,
+    "7": 3,
+    "8": 3.2,
+    "9": 3.3,
+    "10": 3.4,
+    "11": 3.6,
+    "12": 3.7,
+    "20": 4.7
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen; die Stützstellen sind die abgedruckte Auswertung einer stetigen Regressionsgeraden, Interpolation ist deshalb modellkonform",
+   "funktion": {
+    "wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+    "a_konstante": 0.644,
+    "b_je_eur_miete": 0.132,
+    "c_je_tag": 0.0013304,
+    "tage": 1096,
+    "zuschlag_gebietsgruppe": 0,
+    "hinweis": "Die Stützstellen lassen sich mit dieser Funktion exakt reproduzieren (siehe belege.pruefprotokoll). Wer sie braucht, soll die Funktion rechnen und nicht interpolieren."
+   },
+   "hinweis": "Ergebnis in PROZENT (2,6 bedeutet 2,6 %), nicht als Dezimalbruch. Der Berliner Liegenschaftszinssatz ist keine Konstante, sondern eine Funktion der Objektkaltmiete — und seit dem Jahrgang 2025 zusätzlich eine Funktion der GEBIETSGRUPPE."
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahresgruppe",
+    "art": "kategorial",
+    "werte": {
+     "Altbauten (Baujahre vor 1919)": 0,
+     "Zwischenkriegsbauten (Baujahre 1919 bis 1948)": 0,
+     "Baujahre 1949 bis 1972": 0,
+     "Baujahre 1973 bis 1990 im Westteil": 0.3,
+     "Baujahre 1973 bis 1990 im Ostteil": 0,
+     "Baujahre 1991 bis 2002": 0,
+     "Baujahr nach 2002": 0
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten. Nur „1973 bis 1990 im Westteil\" trägt einen Wert, und zwar +0,3 (Jahrgang 2024: +0,2). Die Unterscheidung West-/Ostteil setzt die Lage im ehemaligen West- bzw. Ostteil Berlins voraus — dafür führt Tabelle 1 des Dokuments die Spalte „Stadtlage\", die in geltungsbereich.ortsteile je Ortsteil mitsteht. ART „kategorial\" mit werte, NICHT „stufen_kategorial\": der Auswerter liest bei stufen_kategorial zwei Größen (eine Zahl und eine Kategorie) und gibt ohne die Zahl gar nichts zurück — am 01.10.2026 gemessen, die Korrektur feuerte dann nie. Das Eingabefeld heißt baujahresgruppe und erwartet eine der sieben Schreibweisen unten; eine nackte Jahreszahl trifft keine davon und erscheint dann in korrekturen_offen.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   },
+   {
+    "bez": "Gewerblicher Anteil am Nettojahresrohertrag",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0,
+     "10": 0.08,
+     "20": 0.16,
+     "30": 0.24,
+     "40": 0.32,
+     "50": 0.4,
+     "60": 0.48,
+     "70": 0.56,
+     "80": 0.64
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 2,
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten, exakt linear mit 0,008 Prozentpunkten je Prozent Gewerbeanteil. Gegenüber dem Jahrgang 2024 (0,003 je Prozent, Spanne 0,00 bis 0,24) hat sich der Faktor mehr als verdoppelt. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Objektartdefinition und bekommt keinen Wert.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich (Vorbemerkung 2, S. 2): „Die Verwendung der ermittelten Liegenschaftszinssätze führt nur dann zu einem marktgerechten Ergebnis, wenn die wertbestimmenden Ansätze (grundstückswirtschaftliche Rahmenbedingungen) in der Ertragswertermittlung nach dem Modell des Gutachterausschusses zugrunde gelegt werden – Modellkonformität.\"",
+   "rohertrag": "Jahresnettokaltmieten (Objektkaltmiete einschließlich nutzflächenbezogener gewerblicher Mieterträge)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 zu § 12 Abs. 5 ImmoWertV, fortgeschrieben mit dem Verbraucherpreisindex für Deutschland (2020=100), Oktober 2001 = 77,1 gegenüber Oktober 2023 = 117,8",
+   "bewirtschaftungskosten_gilt_fuer": "Kaufvertragsjahr 2024; für die Kaufvertragsjahre 2022 und 2023 wurden die Ansätze mit dem jeweils gültigen Verbraucherpreisindex angepasst (die dortigen Zahlen druckt das Dokument nicht ab)",
+   "instandhaltung_eur_qm_wohnflaeche": 13.8,
+   "instandhaltung_garage_eur_platz": 104,
+   "instandhaltung_offener_stellplatz_eur_platz": 52,
+   "instandhaltung_gewerbe_anteil": "100 % des Wohnansatzes für Büros, Praxen, Geschäfte und vergleichbare Nutzungen; 30 % für Nebennutzungen wie Werkstatt oder Lager im Keller",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_gewerbe": "3 % vom jeweiligen Mietertrag; zum Sonstigen zählen insbesondere Stellplätze und Garagen",
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze. Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Das Dokument arbeitet ausschließlich mit Restnutzungsdauer-Tabellen (Tabellen 2 bis 5) und beziffert KEINE Gesamtnutzungsdauer. Das ist eine echte Lücke für den Modellvermerk: die Restnutzungsdauer darf hier nicht ersatzweise aus einer angenommenen Gesamtnutzungsdauer minus Alter gebildet werden, und die Rückfallzahl 80 des Rechenkerns ist nicht belegt.",
+   "restnutzungsdauer_tabellen": {
+    "hinweis": "Vollständig erfasst, anders als beim Jahrgang 2024 (dort fehlten die Tabellen 1 bis 4).",
+    "altbauten_und_zwischenkriegsbauten": {
+     "geltung": "Baujahre bis 1918 (Altbauten) und 1919 bis 1948 (Zwischenkriegsbauten), Abschnitt 2.8.1",
+     "basis_nach_bauzustand_jahre": {
+      "gut": 55,
+      "normal": 40,
+      "schlecht": 25
+     },
+     "abschlag_altbauten": {
+      "Normalausstattung: vollständig mit Zentralheizung (Sammel-/Etagenheizung) und Bädern ausgestattet": 0,
+      "vollständig mit Zentralheizung ODER Bädern ausgestattet": -5,
+      "weder vollständig mit Zentralheizung noch vollständig mit Bädern ausgestattet": -10
+     },
+     "abschlag_zwischenkriegsbauten": {
+      "Normalausstattung: Zentralheizung, Bäder": 0,
+      "nicht vollständig mit Zentralheizung ausgestattet": -5
+     },
+     "fundstelle": "Tabellen 2, 3 und 4, S. 10"
+    },
+    "ab_1949": {
+     "geltung": "Baujahre ab 1949, Abschnitt 2.8.2",
+     "achse_baualter_jahre": [
+      "bis 2",
+      "3-7",
+      "8-12",
+      "13-17",
+      "18-22",
+      "23-27",
+      "28-32",
+      "33-37",
+      "38-42",
+      "43-47",
+      "48-52",
+      "53-57",
+      "ab 58"
+     ],
+     "zellen_schluessel": "Baualtersklasse -> [gut, normal, schlecht]; null = der Bericht führt hier keinen Wert",
+     "zellen": {
+      "bis 2": [
+       80,
+       null,
+       null
+      ],
+      "3-7": [
+       75,
+       70,
+       null
+      ],
+      "8-12": [
+       70,
+       65,
+       60
+      ],
+      "13-17": [
+       65,
+       60,
+       55
+      ],
+      "18-22": [
+       60,
+       55,
+       50
+      ],
+      "23-27": [
+       55,
+       50,
+       45
+      ],
+      "28-32": [
+       55,
+       45,
+       40
+      ],
+      "33-37": [
+       55,
+       40,
+       35
+      ],
+      "38-42": [
+       55,
+       40,
+       30
+      ],
+      "43-47": [
+       55,
+       40,
+       25
+      ],
+      "48-52": [
+       55,
+       40,
+       25
+      ],
+      "53-57": [
+       55,
+       40,
+       25
+      ],
+      "ab 58": [
+       55,
+       40,
+       25
+      ]
+     },
+     "fundstelle": "Tabelle 5, S. 11"
+    }
+   },
+   "baulicher_zustand": "drei Zustandsnoten: gut, normal, schlecht. Kriterien unter https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial; Variable monatliche Objektkaltmiete und Zeitachse",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "marktmiete_eur_qm": 8.42,
+   "bezug": "Liegenschaftszinssätze 2025, Gutachterausschuss für Grundstückswerte in Berlin, Abschnitte 2.7 und 2.8 (S. 8-11): Instandhaltung 13,80 €/m² Wohnfläche, Verwaltung 351 €/Wohnung, Mietausfallwagnis 2 % Wohnen / 4 % Gewerbe, Restnutzungsdauer nach den Tabellen 2 bis 5. Keine Bewirtschaftungskostenquote, keine Gesamtnutzungsdauer. marktmiete_eur_qm ist die durchschnittliche monatliche Objektkaltmiete der Stichprobe (8,42 €/m²), nicht eine Vorgabe.",
+   "formel_wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+   "stichprobe": {
+    "anzahl": 651,
+    "nettoreinertragsanteil_pct": {
+     "mittel": 78.8,
+     "p5_p95": [
+      70.9,
+      85.2
+     ],
+     "min_max": [
+      54.9,
+      89.9
+     ]
+    },
+    "kaufpreis_eur_qm_geschossflaeche": {
+     "mittel": 1999,
+     "p5_p95": [
+      1090,
+      3443
+     ],
+     "min_max": [
+      758,
+      6385
+     ]
+    },
+    "kaufpreis_eur_qm_wohn_nutzflaeche": {
+     "mittel": 2644,
+     "p5_p95": [
+      1634,
+      4247
+     ],
+     "min_max": [
+      1208,
+      5975
+     ]
+    },
+    "kaufpreis_je_nettojahresrohertrag": {
+     "mittel": 26.6,
+     "p5_p95": [
+      18,
+      39.3
+     ],
+     "min_max": [
+      14,
+      51.4
+     ]
+    },
+    "objektkaltmiete_eur_qm_monat": {
+     "mittel": 8.42,
+     "p5_p95": [
+      5.6,
+      12.1
+     ]
+    },
+    "gewerblicher_mietanteil_pct": {
+     "mittel": 13.8,
+     "p5_p95": [
+      0,
+      49.2
+     ],
+     "min_max": [
+      0,
+      78
+     ]
+    },
+    "verwaltungskosten_pct_pa": {
+     "mittel": 5.1,
+     "p5_p95": [
+      2.8,
+      8
+     ],
+     "min_max": [
+      1.8,
+      14.5
+     ]
+    },
+    "bodenrichtwert_eur_qm": {
+     "mittel": 2700,
+     "p5_p95": [
+      600,
+      6500
+     ]
+    },
+    "fundstelle": "Tabellen 12 und 13, S. 15-16"
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Gebietsgruppe Südwest",
+   "sachlich": "Mietwohnhäuser und Mietwohngeschäftshäuser mit einem gewerblichen Mietanteil bis 80 % und mindestens vier Mieteinheiten",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflagen: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" (S. 12) — die Korrekturen sind PFLICHT, nicht Kür. „Die Liegenschaftszinssätze sind für Objekte mit mindestens vier Mieteinheiten anzuwenden. Sie gelten nicht für Ein-, Zwei- oder Dreifamilienhäuser und Wohnungs-/Teileigentum.\" (Vorbemerkung 3, S. 2) „Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.\" (Fußnote zur Formel) „Die Verwendung der nachfolgenden Liegenschaftszinssätze ersetzt nicht automatisch die nach ImmoWertV erforderliche Marktanpassung ermittelter Ertragswerte.\" (Vorbemerkung 4, S. 2)",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     4,
+     20
+    ],
+    "objektkaltmiete_hinweis": "Die Randstützstellen 4,00 und 20,00 EUR/m² sind im Dokument als Minimum-/Maximum-Werte der Stichprobe gekennzeichnet (Fußnoten 7 bis 12), nicht als Modellgrenzen. Verlässlich ist nach dem Dokument nur der Bereich zwischen dem 5%- und dem 95%-Perzentil der Stichprobe, also 5,60 bis 12,10 EUR/m².",
+    "objektkaltmiete_verlaesslich_eur_m2_monat": [
+     5.6,
+     12.1
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4
+   },
+   "ortsteile": [
+    [
+     "Westend",
+     "West"
+    ],
+    [
+     "Schmargendorf",
+     "West"
+    ],
+    [
+     "Grunewald",
+     "West"
+    ],
+    [
+     "Steglitz",
+     "West"
+    ],
+    [
+     "Lichterfelde",
+     "West"
+    ],
+    [
+     "Lankwitz",
+     "West"
+    ],
+    [
+     "Zehlendorf",
+     "West"
+    ],
+    [
+     "Dahlem",
+     "West"
+    ],
+    [
+     "Nikolassee",
+     "West"
+    ],
+    [
+     "Wannsee",
+     "West"
+    ],
+    [
+     "Schlachtensee",
+     "West"
+    ]
+   ],
+   "ortsteile_schluessel": "[Ortsteilname nach Tabelle 1 des Dokuments, Stadtlage Ost/West]. Die Stadtlage wird für die Baujahreskorrektur 1973–1990 gebraucht.",
+   "ortsteile_anzahl": 11,
+   "ortsteile_hinweis": "Tabelle 1 (S. 4-7) ordnet jeden Ortsteil genau einer Gebietsgruppe zu. Insgesamt 98 Zeilen gelesen, davon diese 11; die Quersumme über alle sechs Gebietsgruppen (City 14 · Nord 26 · Südost 22 · Ost 15 · Südwest 11 · West 10 = 98) stimmt mit der Zeilenzahl. Eine Zeile trägt im Dokument ein Sternchen — „(West-Staaken)*\" in der Gebietsgruppe West — und ist ein historischer Ortsteil; die Fußnote dazu wurde nicht mitgelesen. Die Schreibweise „Tiergarten-Süd\" weicht vom amtlichen Ortsteilnamen „Tiergarten\" ab; sie steht so im Dokument und wurde NICHT stillschweigend korrigiert."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Tabelle 7, S. 12",
+    "wortlaut": "Liegenschaftszinssätze für Objekte in der Gebietsgruppe Südwest. Neun Stützstellen über die durchschnittliche monatliche Objektkaltmiete (4,00 · 6,00 · 7,00 · 8,00 · 9,00 · 10,00 · 11,00 · 12,00 · 20,00 EUR/m²) mit den Werten 2,6 · 2,9 · 3,0 · 3,2 · 3,3 · 3,4 · 3,6 · 3,7 · 4,7 Prozent. Zusatz des Dokuments: „Die Liegenschaftszinssätze sind zum Stichtag, für Objekte ohne gewerblichen Anteil am Nettojahresrohertrag und für die Baujahre vor 1919, 1919 bis 1972, 1973-1990 Ost und ab 2003 berechnet.\"",
+    "amtsblatt": "Veröffentlicht im Amtsblatt für Berlin Nr. 39 vom 19.09.2025, Seite 2477 ff. Dokumentstand 09.09.2025.",
+    "pruefprotokoll": "ANWENDUNGSBEISPIEL NACHGERECHNET am 01.10.2026 — das Dokument druckt die Regressionsgleichung selbst ab, sie ist damit der Prüfmaßstab. Gerechnet: p = 0,644 + 0,132 × Miete + 0,0013304 × 1.096 und auf eine Nachkommastelle gerundet. Ergebnis: ALLE NEUN abgedruckten Stützstellen dieser Tabelle werden exakt getroffen. Über beide Formelvarianten zusammen (mit und ohne den Zuschlag von 0,167) sind es 18 von 18 Stützstellen — ein Zahlendreher oder eine vertauschte Spalte hätte das gebrochen. Die Einzelwerte stehen in belege.formelprobe.",
+    "formelprobe": [
+     {
+      "miete": 4,
+      "basis_soll": 2.6,
+      "basis_ist": 2.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 2.8,
+      "mit_zuschlag_ist": 2.8,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 6,
+      "basis_soll": 2.9,
+      "basis_ist": 2.9,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.1,
+      "mit_zuschlag_ist": 3.1,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 7,
+      "basis_soll": 3,
+      "basis_ist": 3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.2,
+      "mit_zuschlag_ist": 3.2,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 8,
+      "basis_soll": 3.2,
+      "basis_ist": 3.2,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.3,
+      "mit_zuschlag_ist": 3.3,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 9,
+      "basis_soll": 3.3,
+      "basis_ist": 3.3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.5,
+      "mit_zuschlag_ist": 3.5,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 10,
+      "basis_soll": 3.4,
+      "basis_ist": 3.4,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.6,
+      "mit_zuschlag_ist": 3.6,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 11,
+      "basis_soll": 3.6,
+      "basis_ist": 3.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.7,
+      "mit_zuschlag_ist": 3.7,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 12,
+      "basis_soll": 3.7,
+      "basis_ist": 3.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.9,
+      "mit_zuschlag_ist": 3.9,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 20,
+      "basis_soll": 4.7,
+      "basis_ist": 4.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 4.9,
+      "mit_zuschlag_ist": 4.9,
+      "mit_zuschlag_ok": true
+     }
+    ],
+    "zaehlpruefung": "Neun Stützstellen je Tabelle, sechs Tabellen (6 bis 11), zwei Wertesätze — Südost, Südwest und Nord tragen identische Werte, City, Ost und West tragen identische Werte. Genau so steht es im Dokument: der Unterschied zwischen den beiden Wertesätzen ist der Zuschlag von 0,167 in der Formel, und er erscheint im Dokument nur bei City, Ost und West."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 651,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "Liegenschaftszinssätze 2025 GAA Berlin (sechs Gebietsgruppen)",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2500.pdf",
+  "quelle_parser": "v1768-BELZS25",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Liegenschaftszinssätze 2025, Amtsblatt für Berlin Nr. 39 vom 19.09.2025, S. 2477 ff.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
+  "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
+  "fundstelle": "Tabelle 7, S. 12; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Südwest\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_nord",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete (netto kalt) in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "4": 2.6,
+    "6": 2.9,
+    "7": 3,
+    "8": 3.2,
+    "9": 3.3,
+    "10": 3.4,
+    "11": 3.6,
+    "12": 3.7,
+    "20": 4.7
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen; die Stützstellen sind die abgedruckte Auswertung einer stetigen Regressionsgeraden, Interpolation ist deshalb modellkonform",
+   "funktion": {
+    "wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+    "a_konstante": 0.644,
+    "b_je_eur_miete": 0.132,
+    "c_je_tag": 0.0013304,
+    "tage": 1096,
+    "zuschlag_gebietsgruppe": 0,
+    "hinweis": "Die Stützstellen lassen sich mit dieser Funktion exakt reproduzieren (siehe belege.pruefprotokoll). Wer sie braucht, soll die Funktion rechnen und nicht interpolieren."
+   },
+   "hinweis": "Ergebnis in PROZENT (2,6 bedeutet 2,6 %), nicht als Dezimalbruch. Der Berliner Liegenschaftszinssatz ist keine Konstante, sondern eine Funktion der Objektkaltmiete — und seit dem Jahrgang 2025 zusätzlich eine Funktion der GEBIETSGRUPPE."
+  },
+  "korrekturen": [
+   {
+    "bez": "Altbezirk",
+    "feld": "altbezirk",
+    "art": "kategorial",
+    "werte": {
+     "Reinickendorf": 0.2
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten, GILT NUR in der Gebietsgruppe Nord — das Dokument druckt die Altbezirkskorrektur unter der jeweiligen Gebietsgruppentabelle ab, nicht stadtweit. Für Altbezirke, die hier nicht stehen, nennt das Dokument keinen Korrekturwert; angesetzt wird dann nichts, nicht der Wert eines anderen Altbezirks. Der Jahrgang 2024 führte dagegen eine stadtweite Altbezirkstabelle mit 23 Einträgen (siehe berlin.json) — das Modell hat sich geändert. ART „kategorial\" mit werte, aus demselben Grund wie bei der Baujahresgruppe.",
+    "fundstelle": "Tabelle 8, S. 13"
+   },
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahresgruppe",
+    "art": "kategorial",
+    "werte": {
+     "Altbauten (Baujahre vor 1919)": 0,
+     "Zwischenkriegsbauten (Baujahre 1919 bis 1948)": 0,
+     "Baujahre 1949 bis 1972": 0,
+     "Baujahre 1973 bis 1990 im Westteil": 0.3,
+     "Baujahre 1973 bis 1990 im Ostteil": 0,
+     "Baujahre 1991 bis 2002": 0,
+     "Baujahr nach 2002": 0
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten. Nur „1973 bis 1990 im Westteil\" trägt einen Wert, und zwar +0,3 (Jahrgang 2024: +0,2). Die Unterscheidung West-/Ostteil setzt die Lage im ehemaligen West- bzw. Ostteil Berlins voraus — dafür führt Tabelle 1 des Dokuments die Spalte „Stadtlage\", die in geltungsbereich.ortsteile je Ortsteil mitsteht. ART „kategorial\" mit werte, NICHT „stufen_kategorial\": der Auswerter liest bei stufen_kategorial zwei Größen (eine Zahl und eine Kategorie) und gibt ohne die Zahl gar nichts zurück — am 01.10.2026 gemessen, die Korrektur feuerte dann nie. Das Eingabefeld heißt baujahresgruppe und erwartet eine der sieben Schreibweisen unten; eine nackte Jahreszahl trifft keine davon und erscheint dann in korrekturen_offen.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   },
+   {
+    "bez": "Gewerblicher Anteil am Nettojahresrohertrag",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0,
+     "10": 0.08,
+     "20": 0.16,
+     "30": 0.24,
+     "40": 0.32,
+     "50": 0.4,
+     "60": 0.48,
+     "70": 0.56,
+     "80": 0.64
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 2,
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten, exakt linear mit 0,008 Prozentpunkten je Prozent Gewerbeanteil. Gegenüber dem Jahrgang 2024 (0,003 je Prozent, Spanne 0,00 bis 0,24) hat sich der Faktor mehr als verdoppelt. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Objektartdefinition und bekommt keinen Wert.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich (Vorbemerkung 2, S. 2): „Die Verwendung der ermittelten Liegenschaftszinssätze führt nur dann zu einem marktgerechten Ergebnis, wenn die wertbestimmenden Ansätze (grundstückswirtschaftliche Rahmenbedingungen) in der Ertragswertermittlung nach dem Modell des Gutachterausschusses zugrunde gelegt werden – Modellkonformität.\"",
+   "rohertrag": "Jahresnettokaltmieten (Objektkaltmiete einschließlich nutzflächenbezogener gewerblicher Mieterträge)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 zu § 12 Abs. 5 ImmoWertV, fortgeschrieben mit dem Verbraucherpreisindex für Deutschland (2020=100), Oktober 2001 = 77,1 gegenüber Oktober 2023 = 117,8",
+   "bewirtschaftungskosten_gilt_fuer": "Kaufvertragsjahr 2024; für die Kaufvertragsjahre 2022 und 2023 wurden die Ansätze mit dem jeweils gültigen Verbraucherpreisindex angepasst (die dortigen Zahlen druckt das Dokument nicht ab)",
+   "instandhaltung_eur_qm_wohnflaeche": 13.8,
+   "instandhaltung_garage_eur_platz": 104,
+   "instandhaltung_offener_stellplatz_eur_platz": 52,
+   "instandhaltung_gewerbe_anteil": "100 % des Wohnansatzes für Büros, Praxen, Geschäfte und vergleichbare Nutzungen; 30 % für Nebennutzungen wie Werkstatt oder Lager im Keller",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_gewerbe": "3 % vom jeweiligen Mietertrag; zum Sonstigen zählen insbesondere Stellplätze und Garagen",
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze. Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Das Dokument arbeitet ausschließlich mit Restnutzungsdauer-Tabellen (Tabellen 2 bis 5) und beziffert KEINE Gesamtnutzungsdauer. Das ist eine echte Lücke für den Modellvermerk: die Restnutzungsdauer darf hier nicht ersatzweise aus einer angenommenen Gesamtnutzungsdauer minus Alter gebildet werden, und die Rückfallzahl 80 des Rechenkerns ist nicht belegt.",
+   "restnutzungsdauer_tabellen": {
+    "hinweis": "Vollständig erfasst, anders als beim Jahrgang 2024 (dort fehlten die Tabellen 1 bis 4).",
+    "altbauten_und_zwischenkriegsbauten": {
+     "geltung": "Baujahre bis 1918 (Altbauten) und 1919 bis 1948 (Zwischenkriegsbauten), Abschnitt 2.8.1",
+     "basis_nach_bauzustand_jahre": {
+      "gut": 55,
+      "normal": 40,
+      "schlecht": 25
+     },
+     "abschlag_altbauten": {
+      "Normalausstattung: vollständig mit Zentralheizung (Sammel-/Etagenheizung) und Bädern ausgestattet": 0,
+      "vollständig mit Zentralheizung ODER Bädern ausgestattet": -5,
+      "weder vollständig mit Zentralheizung noch vollständig mit Bädern ausgestattet": -10
+     },
+     "abschlag_zwischenkriegsbauten": {
+      "Normalausstattung: Zentralheizung, Bäder": 0,
+      "nicht vollständig mit Zentralheizung ausgestattet": -5
+     },
+     "fundstelle": "Tabellen 2, 3 und 4, S. 10"
+    },
+    "ab_1949": {
+     "geltung": "Baujahre ab 1949, Abschnitt 2.8.2",
+     "achse_baualter_jahre": [
+      "bis 2",
+      "3-7",
+      "8-12",
+      "13-17",
+      "18-22",
+      "23-27",
+      "28-32",
+      "33-37",
+      "38-42",
+      "43-47",
+      "48-52",
+      "53-57",
+      "ab 58"
+     ],
+     "zellen_schluessel": "Baualtersklasse -> [gut, normal, schlecht]; null = der Bericht führt hier keinen Wert",
+     "zellen": {
+      "bis 2": [
+       80,
+       null,
+       null
+      ],
+      "3-7": [
+       75,
+       70,
+       null
+      ],
+      "8-12": [
+       70,
+       65,
+       60
+      ],
+      "13-17": [
+       65,
+       60,
+       55
+      ],
+      "18-22": [
+       60,
+       55,
+       50
+      ],
+      "23-27": [
+       55,
+       50,
+       45
+      ],
+      "28-32": [
+       55,
+       45,
+       40
+      ],
+      "33-37": [
+       55,
+       40,
+       35
+      ],
+      "38-42": [
+       55,
+       40,
+       30
+      ],
+      "43-47": [
+       55,
+       40,
+       25
+      ],
+      "48-52": [
+       55,
+       40,
+       25
+      ],
+      "53-57": [
+       55,
+       40,
+       25
+      ],
+      "ab 58": [
+       55,
+       40,
+       25
+      ]
+     },
+     "fundstelle": "Tabelle 5, S. 11"
+    }
+   },
+   "baulicher_zustand": "drei Zustandsnoten: gut, normal, schlecht. Kriterien unter https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial; Variable monatliche Objektkaltmiete und Zeitachse",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "marktmiete_eur_qm": 8.42,
+   "bezug": "Liegenschaftszinssätze 2025, Gutachterausschuss für Grundstückswerte in Berlin, Abschnitte 2.7 und 2.8 (S. 8-11): Instandhaltung 13,80 €/m² Wohnfläche, Verwaltung 351 €/Wohnung, Mietausfallwagnis 2 % Wohnen / 4 % Gewerbe, Restnutzungsdauer nach den Tabellen 2 bis 5. Keine Bewirtschaftungskostenquote, keine Gesamtnutzungsdauer. marktmiete_eur_qm ist die durchschnittliche monatliche Objektkaltmiete der Stichprobe (8,42 €/m²), nicht eine Vorgabe.",
+   "formel_wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+   "stichprobe": {
+    "anzahl": 651,
+    "nettoreinertragsanteil_pct": {
+     "mittel": 78.8,
+     "p5_p95": [
+      70.9,
+      85.2
+     ],
+     "min_max": [
+      54.9,
+      89.9
+     ]
+    },
+    "kaufpreis_eur_qm_geschossflaeche": {
+     "mittel": 1999,
+     "p5_p95": [
+      1090,
+      3443
+     ],
+     "min_max": [
+      758,
+      6385
+     ]
+    },
+    "kaufpreis_eur_qm_wohn_nutzflaeche": {
+     "mittel": 2644,
+     "p5_p95": [
+      1634,
+      4247
+     ],
+     "min_max": [
+      1208,
+      5975
+     ]
+    },
+    "kaufpreis_je_nettojahresrohertrag": {
+     "mittel": 26.6,
+     "p5_p95": [
+      18,
+      39.3
+     ],
+     "min_max": [
+      14,
+      51.4
+     ]
+    },
+    "objektkaltmiete_eur_qm_monat": {
+     "mittel": 8.42,
+     "p5_p95": [
+      5.6,
+      12.1
+     ]
+    },
+    "gewerblicher_mietanteil_pct": {
+     "mittel": 13.8,
+     "p5_p95": [
+      0,
+      49.2
+     ],
+     "min_max": [
+      0,
+      78
+     ]
+    },
+    "verwaltungskosten_pct_pa": {
+     "mittel": 5.1,
+     "p5_p95": [
+      2.8,
+      8
+     ],
+     "min_max": [
+      1.8,
+      14.5
+     ]
+    },
+    "bodenrichtwert_eur_qm": {
+     "mittel": 2700,
+     "p5_p95": [
+      600,
+      6500
+     ]
+    },
+    "fundstelle": "Tabellen 12 und 13, S. 15-16"
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Gebietsgruppe Nord",
+   "sachlich": "Mietwohnhäuser und Mietwohngeschäftshäuser mit einem gewerblichen Mietanteil bis 80 % und mindestens vier Mieteinheiten",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflagen: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" (S. 12) — die Korrekturen sind PFLICHT, nicht Kür. „Die Liegenschaftszinssätze sind für Objekte mit mindestens vier Mieteinheiten anzuwenden. Sie gelten nicht für Ein-, Zwei- oder Dreifamilienhäuser und Wohnungs-/Teileigentum.\" (Vorbemerkung 3, S. 2) „Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.\" (Fußnote zur Formel) „Die Verwendung der nachfolgenden Liegenschaftszinssätze ersetzt nicht automatisch die nach ImmoWertV erforderliche Marktanpassung ermittelter Ertragswerte.\" (Vorbemerkung 4, S. 2)",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     4,
+     20
+    ],
+    "objektkaltmiete_hinweis": "Die Randstützstellen 4,00 und 20,00 EUR/m² sind im Dokument als Minimum-/Maximum-Werte der Stichprobe gekennzeichnet (Fußnoten 7 bis 12), nicht als Modellgrenzen. Verlässlich ist nach dem Dokument nur der Bereich zwischen dem 5%- und dem 95%-Perzentil der Stichprobe, also 5,60 bis 12,10 EUR/m².",
+    "objektkaltmiete_verlaesslich_eur_m2_monat": [
+     5.6,
+     12.1
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4
+   },
+   "ortsteile": [
+    [
+     "Wedding",
+     "West"
+    ],
+    [
+     "Gesundbrunnen",
+     "West"
+    ],
+    [
+     "Weißensee",
+     "Ost"
+    ],
+    [
+     "Blankenburg",
+     "Ost"
+    ],
+    [
+     "Heinersdorf",
+     "Ost"
+    ],
+    [
+     "Karow",
+     "Ost"
+    ],
+    [
+     "Stadtrandsiedlung Malchow",
+     "Ost"
+    ],
+    [
+     "Pankow",
+     "Ost"
+    ],
+    [
+     "Blankenfelde",
+     "Ost"
+    ],
+    [
+     "Buch",
+     "Ost"
+    ],
+    [
+     "Französisch Buchholz",
+     "Ost"
+    ],
+    [
+     "Niederschönhausen",
+     "Ost"
+    ],
+    [
+     "Rosenthal",
+     "Ost"
+    ],
+    [
+     "Wilhelmsruh",
+     "Ost"
+    ],
+    [
+     "Charlottenburg-Nord",
+     "West"
+    ],
+    [
+     "Reinickendorf",
+     "West"
+    ],
+    [
+     "Tegel",
+     "West"
+    ],
+    [
+     "Konradshöhe",
+     "West"
+    ],
+    [
+     "Heiligensee",
+     "West"
+    ],
+    [
+     "Frohnau",
+     "West"
+    ],
+    [
+     "Hermsdorf",
+     "West"
+    ],
+    [
+     "Waidmannslust",
+     "West"
+    ],
+    [
+     "Lübars",
+     "West"
+    ],
+    [
+     "Wittenau",
+     "West"
+    ],
+    [
+     "Märkisches Viertel",
+     "West"
+    ],
+    [
+     "Borsigwalde",
+     "West"
+    ]
+   ],
+   "ortsteile_schluessel": "[Ortsteilname nach Tabelle 1 des Dokuments, Stadtlage Ost/West]. Die Stadtlage wird für die Baujahreskorrektur 1973–1990 gebraucht.",
+   "ortsteile_anzahl": 26,
+   "ortsteile_hinweis": "Tabelle 1 (S. 4-7) ordnet jeden Ortsteil genau einer Gebietsgruppe zu. Insgesamt 98 Zeilen gelesen, davon diese 26; die Quersumme über alle sechs Gebietsgruppen (City 14 · Nord 26 · Südost 22 · Ost 15 · Südwest 11 · West 10 = 98) stimmt mit der Zeilenzahl. Eine Zeile trägt im Dokument ein Sternchen — „(West-Staaken)*\" in der Gebietsgruppe West — und ist ein historischer Ortsteil; die Fußnote dazu wurde nicht mitgelesen. Die Schreibweise „Tiergarten-Süd\" weicht vom amtlichen Ortsteilnamen „Tiergarten\" ab; sie steht so im Dokument und wurde NICHT stillschweigend korrigiert."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Tabelle 8, S. 13",
+    "wortlaut": "Liegenschaftszinssätze für Objekte in der Gebietsgruppe Nord. Neun Stützstellen über die durchschnittliche monatliche Objektkaltmiete (4,00 · 6,00 · 7,00 · 8,00 · 9,00 · 10,00 · 11,00 · 12,00 · 20,00 EUR/m²) mit den Werten 2,6 · 2,9 · 3,0 · 3,2 · 3,3 · 3,4 · 3,6 · 3,7 · 4,7 Prozent. Zusatz des Dokuments: „Die Liegenschaftszinssätze sind zum Stichtag, für Objekte ohne gewerblichen Anteil am Nettojahresrohertrag und für die Baujahre vor 1919, 1919 bis 1972, 1973-1990 Ost und ab 2003 berechnet.\"",
+    "amtsblatt": "Veröffentlicht im Amtsblatt für Berlin Nr. 39 vom 19.09.2025, Seite 2477 ff. Dokumentstand 09.09.2025.",
+    "pruefprotokoll": "ANWENDUNGSBEISPIEL NACHGERECHNET am 01.10.2026 — das Dokument druckt die Regressionsgleichung selbst ab, sie ist damit der Prüfmaßstab. Gerechnet: p = 0,644 + 0,132 × Miete + 0,0013304 × 1.096 und auf eine Nachkommastelle gerundet. Ergebnis: ALLE NEUN abgedruckten Stützstellen dieser Tabelle werden exakt getroffen. Über beide Formelvarianten zusammen (mit und ohne den Zuschlag von 0,167) sind es 18 von 18 Stützstellen — ein Zahlendreher oder eine vertauschte Spalte hätte das gebrochen. Die Einzelwerte stehen in belege.formelprobe.",
+    "formelprobe": [
+     {
+      "miete": 4,
+      "basis_soll": 2.6,
+      "basis_ist": 2.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 2.8,
+      "mit_zuschlag_ist": 2.8,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 6,
+      "basis_soll": 2.9,
+      "basis_ist": 2.9,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.1,
+      "mit_zuschlag_ist": 3.1,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 7,
+      "basis_soll": 3,
+      "basis_ist": 3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.2,
+      "mit_zuschlag_ist": 3.2,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 8,
+      "basis_soll": 3.2,
+      "basis_ist": 3.2,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.3,
+      "mit_zuschlag_ist": 3.3,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 9,
+      "basis_soll": 3.3,
+      "basis_ist": 3.3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.5,
+      "mit_zuschlag_ist": 3.5,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 10,
+      "basis_soll": 3.4,
+      "basis_ist": 3.4,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.6,
+      "mit_zuschlag_ist": 3.6,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 11,
+      "basis_soll": 3.6,
+      "basis_ist": 3.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.7,
+      "mit_zuschlag_ist": 3.7,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 12,
+      "basis_soll": 3.7,
+      "basis_ist": 3.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.9,
+      "mit_zuschlag_ist": 3.9,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 20,
+      "basis_soll": 4.7,
+      "basis_ist": 4.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 4.9,
+      "mit_zuschlag_ist": 4.9,
+      "mit_zuschlag_ok": true
+     }
+    ],
+    "zaehlpruefung": "Neun Stützstellen je Tabelle, sechs Tabellen (6 bis 11), zwei Wertesätze — Südost, Südwest und Nord tragen identische Werte, City, Ost und West tragen identische Werte. Genau so steht es im Dokument: der Unterschied zwischen den beiden Wertesätzen ist der Zuschlag von 0,167 in der Formel, und er erscheint im Dokument nur bei City, Ost und West."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 651,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "Liegenschaftszinssätze 2025 GAA Berlin (sechs Gebietsgruppen)",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2500.pdf",
+  "quelle_parser": "v1768-BELZS25",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Liegenschaftszinssätze 2025, Amtsblatt für Berlin Nr. 39 vom 19.09.2025, S. 2477 ff.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
+  "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
+  "fundstelle": "Tabelle 8, S. 13; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Nord\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_city",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete (netto kalt) in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "4": 2.8,
+    "6": 3.1,
+    "7": 3.2,
+    "8": 3.3,
+    "9": 3.5,
+    "10": 3.6,
+    "11": 3.7,
+    "12": 3.9,
+    "20": 4.9
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen; die Stützstellen sind die abgedruckte Auswertung einer stetigen Regressionsgeraden, Interpolation ist deshalb modellkonform",
+   "funktion": {
+    "wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+    "a_konstante": 0.644,
+    "b_je_eur_miete": 0.132,
+    "c_je_tag": 0.0013304,
+    "tage": 1096,
+    "zuschlag_gebietsgruppe": 0.167,
+    "hinweis": "Die Stützstellen lassen sich mit dieser Funktion exakt reproduzieren (siehe belege.pruefprotokoll). Wer sie braucht, soll die Funktion rechnen und nicht interpolieren."
+   },
+   "hinweis": "Ergebnis in PROZENT (2,6 bedeutet 2,6 %), nicht als Dezimalbruch. Der Berliner Liegenschaftszinssatz ist keine Konstante, sondern eine Funktion der Objektkaltmiete — und seit dem Jahrgang 2025 zusätzlich eine Funktion der GEBIETSGRUPPE."
+  },
+  "korrekturen": [
+   {
+    "bez": "Altbezirk",
+    "feld": "altbezirk",
+    "art": "kategorial",
+    "werte": {
+     "Mitte": -0.6,
+     "Charlottenburg": -0.3
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten, GILT NUR in der Gebietsgruppe City — das Dokument druckt die Altbezirkskorrektur unter der jeweiligen Gebietsgruppentabelle ab, nicht stadtweit. Für Altbezirke, die hier nicht stehen, nennt das Dokument keinen Korrekturwert; angesetzt wird dann nichts, nicht der Wert eines anderen Altbezirks. Der Jahrgang 2024 führte dagegen eine stadtweite Altbezirkstabelle mit 23 Einträgen (siehe berlin.json) — das Modell hat sich geändert. ART „kategorial\" mit werte, aus demselben Grund wie bei der Baujahresgruppe.",
+    "fundstelle": "Tabelle 9, S. 13-14"
+   },
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahresgruppe",
+    "art": "kategorial",
+    "werte": {
+     "Altbauten (Baujahre vor 1919)": 0,
+     "Zwischenkriegsbauten (Baujahre 1919 bis 1948)": 0,
+     "Baujahre 1949 bis 1972": 0,
+     "Baujahre 1973 bis 1990 im Westteil": 0.3,
+     "Baujahre 1973 bis 1990 im Ostteil": 0,
+     "Baujahre 1991 bis 2002": 0,
+     "Baujahr nach 2002": 0
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten. Nur „1973 bis 1990 im Westteil\" trägt einen Wert, und zwar +0,3 (Jahrgang 2024: +0,2). Die Unterscheidung West-/Ostteil setzt die Lage im ehemaligen West- bzw. Ostteil Berlins voraus — dafür führt Tabelle 1 des Dokuments die Spalte „Stadtlage\", die in geltungsbereich.ortsteile je Ortsteil mitsteht. ART „kategorial\" mit werte, NICHT „stufen_kategorial\": der Auswerter liest bei stufen_kategorial zwei Größen (eine Zahl und eine Kategorie) und gibt ohne die Zahl gar nichts zurück — am 01.10.2026 gemessen, die Korrektur feuerte dann nie. Das Eingabefeld heißt baujahresgruppe und erwartet eine der sieben Schreibweisen unten; eine nackte Jahreszahl trifft keine davon und erscheint dann in korrekturen_offen.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   },
+   {
+    "bez": "Gewerblicher Anteil am Nettojahresrohertrag",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0,
+     "10": 0.08,
+     "20": 0.16,
+     "30": 0.24,
+     "40": 0.32,
+     "50": 0.4,
+     "60": 0.48,
+     "70": 0.56,
+     "80": 0.64
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 2,
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten, exakt linear mit 0,008 Prozentpunkten je Prozent Gewerbeanteil. Gegenüber dem Jahrgang 2024 (0,003 je Prozent, Spanne 0,00 bis 0,24) hat sich der Faktor mehr als verdoppelt. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Objektartdefinition und bekommt keinen Wert.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich (Vorbemerkung 2, S. 2): „Die Verwendung der ermittelten Liegenschaftszinssätze führt nur dann zu einem marktgerechten Ergebnis, wenn die wertbestimmenden Ansätze (grundstückswirtschaftliche Rahmenbedingungen) in der Ertragswertermittlung nach dem Modell des Gutachterausschusses zugrunde gelegt werden – Modellkonformität.\"",
+   "rohertrag": "Jahresnettokaltmieten (Objektkaltmiete einschließlich nutzflächenbezogener gewerblicher Mieterträge)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 zu § 12 Abs. 5 ImmoWertV, fortgeschrieben mit dem Verbraucherpreisindex für Deutschland (2020=100), Oktober 2001 = 77,1 gegenüber Oktober 2023 = 117,8",
+   "bewirtschaftungskosten_gilt_fuer": "Kaufvertragsjahr 2024; für die Kaufvertragsjahre 2022 und 2023 wurden die Ansätze mit dem jeweils gültigen Verbraucherpreisindex angepasst (die dortigen Zahlen druckt das Dokument nicht ab)",
+   "instandhaltung_eur_qm_wohnflaeche": 13.8,
+   "instandhaltung_garage_eur_platz": 104,
+   "instandhaltung_offener_stellplatz_eur_platz": 52,
+   "instandhaltung_gewerbe_anteil": "100 % des Wohnansatzes für Büros, Praxen, Geschäfte und vergleichbare Nutzungen; 30 % für Nebennutzungen wie Werkstatt oder Lager im Keller",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_gewerbe": "3 % vom jeweiligen Mietertrag; zum Sonstigen zählen insbesondere Stellplätze und Garagen",
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze. Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Das Dokument arbeitet ausschließlich mit Restnutzungsdauer-Tabellen (Tabellen 2 bis 5) und beziffert KEINE Gesamtnutzungsdauer. Das ist eine echte Lücke für den Modellvermerk: die Restnutzungsdauer darf hier nicht ersatzweise aus einer angenommenen Gesamtnutzungsdauer minus Alter gebildet werden, und die Rückfallzahl 80 des Rechenkerns ist nicht belegt.",
+   "restnutzungsdauer_tabellen": {
+    "hinweis": "Vollständig erfasst, anders als beim Jahrgang 2024 (dort fehlten die Tabellen 1 bis 4).",
+    "altbauten_und_zwischenkriegsbauten": {
+     "geltung": "Baujahre bis 1918 (Altbauten) und 1919 bis 1948 (Zwischenkriegsbauten), Abschnitt 2.8.1",
+     "basis_nach_bauzustand_jahre": {
+      "gut": 55,
+      "normal": 40,
+      "schlecht": 25
+     },
+     "abschlag_altbauten": {
+      "Normalausstattung: vollständig mit Zentralheizung (Sammel-/Etagenheizung) und Bädern ausgestattet": 0,
+      "vollständig mit Zentralheizung ODER Bädern ausgestattet": -5,
+      "weder vollständig mit Zentralheizung noch vollständig mit Bädern ausgestattet": -10
+     },
+     "abschlag_zwischenkriegsbauten": {
+      "Normalausstattung: Zentralheizung, Bäder": 0,
+      "nicht vollständig mit Zentralheizung ausgestattet": -5
+     },
+     "fundstelle": "Tabellen 2, 3 und 4, S. 10"
+    },
+    "ab_1949": {
+     "geltung": "Baujahre ab 1949, Abschnitt 2.8.2",
+     "achse_baualter_jahre": [
+      "bis 2",
+      "3-7",
+      "8-12",
+      "13-17",
+      "18-22",
+      "23-27",
+      "28-32",
+      "33-37",
+      "38-42",
+      "43-47",
+      "48-52",
+      "53-57",
+      "ab 58"
+     ],
+     "zellen_schluessel": "Baualtersklasse -> [gut, normal, schlecht]; null = der Bericht führt hier keinen Wert",
+     "zellen": {
+      "bis 2": [
+       80,
+       null,
+       null
+      ],
+      "3-7": [
+       75,
+       70,
+       null
+      ],
+      "8-12": [
+       70,
+       65,
+       60
+      ],
+      "13-17": [
+       65,
+       60,
+       55
+      ],
+      "18-22": [
+       60,
+       55,
+       50
+      ],
+      "23-27": [
+       55,
+       50,
+       45
+      ],
+      "28-32": [
+       55,
+       45,
+       40
+      ],
+      "33-37": [
+       55,
+       40,
+       35
+      ],
+      "38-42": [
+       55,
+       40,
+       30
+      ],
+      "43-47": [
+       55,
+       40,
+       25
+      ],
+      "48-52": [
+       55,
+       40,
+       25
+      ],
+      "53-57": [
+       55,
+       40,
+       25
+      ],
+      "ab 58": [
+       55,
+       40,
+       25
+      ]
+     },
+     "fundstelle": "Tabelle 5, S. 11"
+    }
+   },
+   "baulicher_zustand": "drei Zustandsnoten: gut, normal, schlecht. Kriterien unter https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial; Variable monatliche Objektkaltmiete und Zeitachse",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "marktmiete_eur_qm": 8.42,
+   "bezug": "Liegenschaftszinssätze 2025, Gutachterausschuss für Grundstückswerte in Berlin, Abschnitte 2.7 und 2.8 (S. 8-11): Instandhaltung 13,80 €/m² Wohnfläche, Verwaltung 351 €/Wohnung, Mietausfallwagnis 2 % Wohnen / 4 % Gewerbe, Restnutzungsdauer nach den Tabellen 2 bis 5. Keine Bewirtschaftungskostenquote, keine Gesamtnutzungsdauer. marktmiete_eur_qm ist die durchschnittliche monatliche Objektkaltmiete der Stichprobe (8,42 €/m²), nicht eine Vorgabe.",
+   "formel_wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+   "stichprobe": {
+    "anzahl": 651,
+    "nettoreinertragsanteil_pct": {
+     "mittel": 78.8,
+     "p5_p95": [
+      70.9,
+      85.2
+     ],
+     "min_max": [
+      54.9,
+      89.9
+     ]
+    },
+    "kaufpreis_eur_qm_geschossflaeche": {
+     "mittel": 1999,
+     "p5_p95": [
+      1090,
+      3443
+     ],
+     "min_max": [
+      758,
+      6385
+     ]
+    },
+    "kaufpreis_eur_qm_wohn_nutzflaeche": {
+     "mittel": 2644,
+     "p5_p95": [
+      1634,
+      4247
+     ],
+     "min_max": [
+      1208,
+      5975
+     ]
+    },
+    "kaufpreis_je_nettojahresrohertrag": {
+     "mittel": 26.6,
+     "p5_p95": [
+      18,
+      39.3
+     ],
+     "min_max": [
+      14,
+      51.4
+     ]
+    },
+    "objektkaltmiete_eur_qm_monat": {
+     "mittel": 8.42,
+     "p5_p95": [
+      5.6,
+      12.1
+     ]
+    },
+    "gewerblicher_mietanteil_pct": {
+     "mittel": 13.8,
+     "p5_p95": [
+      0,
+      49.2
+     ],
+     "min_max": [
+      0,
+      78
+     ]
+    },
+    "verwaltungskosten_pct_pa": {
+     "mittel": 5.1,
+     "p5_p95": [
+      2.8,
+      8
+     ],
+     "min_max": [
+      1.8,
+      14.5
+     ]
+    },
+    "bodenrichtwert_eur_qm": {
+     "mittel": 2700,
+     "p5_p95": [
+      600,
+      6500
+     ]
+    },
+    "fundstelle": "Tabellen 12 und 13, S. 15-16"
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Gebietsgruppe City (annähernd das innerstädtische Gebiet innerhalb des S-Bahnrings)",
+   "sachlich": "Mietwohnhäuser und Mietwohngeschäftshäuser mit einem gewerblichen Mietanteil bis 80 % und mindestens vier Mieteinheiten",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflagen: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" (S. 12) — die Korrekturen sind PFLICHT, nicht Kür. „Die Liegenschaftszinssätze sind für Objekte mit mindestens vier Mieteinheiten anzuwenden. Sie gelten nicht für Ein-, Zwei- oder Dreifamilienhäuser und Wohnungs-/Teileigentum.\" (Vorbemerkung 3, S. 2) „Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.\" (Fußnote zur Formel) „Die Verwendung der nachfolgenden Liegenschaftszinssätze ersetzt nicht automatisch die nach ImmoWertV erforderliche Marktanpassung ermittelter Ertragswerte.\" (Vorbemerkung 4, S. 2)",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     4,
+     20
+    ],
+    "objektkaltmiete_hinweis": "Die Randstützstellen 4,00 und 20,00 EUR/m² sind im Dokument als Minimum-/Maximum-Werte der Stichprobe gekennzeichnet (Fußnoten 7 bis 12), nicht als Modellgrenzen. Verlässlich ist nach dem Dokument nur der Bereich zwischen dem 5%- und dem 95%-Perzentil der Stichprobe, also 5,60 bis 12,10 EUR/m².",
+    "objektkaltmiete_verlaesslich_eur_m2_monat": [
+     5.6,
+     12.1
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4
+   },
+   "ortsteile": [
+    [
+     "Mitte",
+     "Ost"
+    ],
+    [
+     "Moabit",
+     "West"
+    ],
+    [
+     "Hansaviertel",
+     "West"
+    ],
+    [
+     "Tiergarten-Süd",
+     "West"
+    ],
+    [
+     "Friedrichshain",
+     "Ost"
+    ],
+    [
+     "Kreuzberg",
+     "West"
+    ],
+    [
+     "Prenzlauer Berg",
+     "Ost"
+    ],
+    [
+     "Charlottenburg",
+     "West"
+    ],
+    [
+     "Wilmersdorf",
+     "West"
+    ],
+    [
+     "Halensee",
+     "West"
+    ],
+    [
+     "Schöneberg",
+     "West"
+    ],
+    [
+     "Friedenau",
+     "West"
+    ],
+    [
+     "Tempelhof",
+     "West"
+    ],
+    [
+     "Neukölln",
+     "West"
+    ]
+   ],
+   "ortsteile_schluessel": "[Ortsteilname nach Tabelle 1 des Dokuments, Stadtlage Ost/West]. Die Stadtlage wird für die Baujahreskorrektur 1973–1990 gebraucht.",
+   "ortsteile_anzahl": 14,
+   "ortsteile_hinweis": "Tabelle 1 (S. 4-7) ordnet jeden Ortsteil genau einer Gebietsgruppe zu. Insgesamt 98 Zeilen gelesen, davon diese 14; die Quersumme über alle sechs Gebietsgruppen (City 14 · Nord 26 · Südost 22 · Ost 15 · Südwest 11 · West 10 = 98) stimmt mit der Zeilenzahl. Eine Zeile trägt im Dokument ein Sternchen — „(West-Staaken)*\" in der Gebietsgruppe West — und ist ein historischer Ortsteil; die Fußnote dazu wurde nicht mitgelesen. Die Schreibweise „Tiergarten-Süd\" weicht vom amtlichen Ortsteilnamen „Tiergarten\" ab; sie steht so im Dokument und wurde NICHT stillschweigend korrigiert."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Tabelle 9, S. 13-14",
+    "wortlaut": "Liegenschaftszinssätze für Objekte in der Gebietsgruppe City. Neun Stützstellen über die durchschnittliche monatliche Objektkaltmiete (4,00 · 6,00 · 7,00 · 8,00 · 9,00 · 10,00 · 11,00 · 12,00 · 20,00 EUR/m²) mit den Werten 2,8 · 3,1 · 3,2 · 3,3 · 3,5 · 3,6 · 3,7 · 3,9 · 4,9 Prozent. Zusatz des Dokuments: „Die Liegenschaftszinssätze sind zum Stichtag, für Objekte ohne gewerblichen Anteil am Nettojahresrohertrag und für die Baujahre vor 1919, 1919 bis 1972, 1973-1990 Ost und ab 2003 berechnet.\"",
+    "amtsblatt": "Veröffentlicht im Amtsblatt für Berlin Nr. 39 vom 19.09.2025, Seite 2477 ff. Dokumentstand 09.09.2025.",
+    "pruefprotokoll": "ANWENDUNGSBEISPIEL NACHGERECHNET am 01.10.2026 — das Dokument druckt die Regressionsgleichung selbst ab, sie ist damit der Prüfmaßstab. Gerechnet: p = 0,644 + 0,132 × Miete + 0,0013304 × 1.096 + 0,167 und auf eine Nachkommastelle gerundet. Ergebnis: ALLE NEUN abgedruckten Stützstellen dieser Tabelle werden exakt getroffen. Über beide Formelvarianten zusammen (mit und ohne den Zuschlag von 0,167) sind es 18 von 18 Stützstellen — ein Zahlendreher oder eine vertauschte Spalte hätte das gebrochen. Die Einzelwerte stehen in belege.formelprobe.",
+    "formelprobe": [
+     {
+      "miete": 4,
+      "basis_soll": 2.6,
+      "basis_ist": 2.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 2.8,
+      "mit_zuschlag_ist": 2.8,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 6,
+      "basis_soll": 2.9,
+      "basis_ist": 2.9,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.1,
+      "mit_zuschlag_ist": 3.1,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 7,
+      "basis_soll": 3,
+      "basis_ist": 3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.2,
+      "mit_zuschlag_ist": 3.2,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 8,
+      "basis_soll": 3.2,
+      "basis_ist": 3.2,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.3,
+      "mit_zuschlag_ist": 3.3,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 9,
+      "basis_soll": 3.3,
+      "basis_ist": 3.3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.5,
+      "mit_zuschlag_ist": 3.5,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 10,
+      "basis_soll": 3.4,
+      "basis_ist": 3.4,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.6,
+      "mit_zuschlag_ist": 3.6,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 11,
+      "basis_soll": 3.6,
+      "basis_ist": 3.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.7,
+      "mit_zuschlag_ist": 3.7,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 12,
+      "basis_soll": 3.7,
+      "basis_ist": 3.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.9,
+      "mit_zuschlag_ist": 3.9,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 20,
+      "basis_soll": 4.7,
+      "basis_ist": 4.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 4.9,
+      "mit_zuschlag_ist": 4.9,
+      "mit_zuschlag_ok": true
+     }
+    ],
+    "zaehlpruefung": "Neun Stützstellen je Tabelle, sechs Tabellen (6 bis 11), zwei Wertesätze — Südost, Südwest und Nord tragen identische Werte, City, Ost und West tragen identische Werte. Genau so steht es im Dokument: der Unterschied zwischen den beiden Wertesätzen ist der Zuschlag von 0,167 in der Formel, und er erscheint im Dokument nur bei City, Ost und West."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 651,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "Liegenschaftszinssätze 2025 GAA Berlin (sechs Gebietsgruppen)",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2500.pdf",
+  "quelle_parser": "v1768-BELZS25",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Liegenschaftszinssätze 2025, Amtsblatt für Berlin Nr. 39 vom 19.09.2025, S. 2477 ff.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
+  "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
+  "fundstelle": "Tabelle 9, S. 13-14; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"City\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_ost",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete (netto kalt) in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "4": 2.8,
+    "6": 3.1,
+    "7": 3.2,
+    "8": 3.3,
+    "9": 3.5,
+    "10": 3.6,
+    "11": 3.7,
+    "12": 3.9,
+    "20": 4.9
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen; die Stützstellen sind die abgedruckte Auswertung einer stetigen Regressionsgeraden, Interpolation ist deshalb modellkonform",
+   "funktion": {
+    "wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+    "a_konstante": 0.644,
+    "b_je_eur_miete": 0.132,
+    "c_je_tag": 0.0013304,
+    "tage": 1096,
+    "zuschlag_gebietsgruppe": 0.167,
+    "hinweis": "Die Stützstellen lassen sich mit dieser Funktion exakt reproduzieren (siehe belege.pruefprotokoll). Wer sie braucht, soll die Funktion rechnen und nicht interpolieren."
+   },
+   "hinweis": "Ergebnis in PROZENT (2,6 bedeutet 2,6 %), nicht als Dezimalbruch. Der Berliner Liegenschaftszinssatz ist keine Konstante, sondern eine Funktion der Objektkaltmiete — und seit dem Jahrgang 2025 zusätzlich eine Funktion der GEBIETSGRUPPE."
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahresgruppe",
+    "art": "kategorial",
+    "werte": {
+     "Altbauten (Baujahre vor 1919)": 0,
+     "Zwischenkriegsbauten (Baujahre 1919 bis 1948)": 0,
+     "Baujahre 1949 bis 1972": 0,
+     "Baujahre 1973 bis 1990 im Westteil": 0.3,
+     "Baujahre 1973 bis 1990 im Ostteil": 0,
+     "Baujahre 1991 bis 2002": 0,
+     "Baujahr nach 2002": 0
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten. Nur „1973 bis 1990 im Westteil\" trägt einen Wert, und zwar +0,3 (Jahrgang 2024: +0,2). Die Unterscheidung West-/Ostteil setzt die Lage im ehemaligen West- bzw. Ostteil Berlins voraus — dafür führt Tabelle 1 des Dokuments die Spalte „Stadtlage\", die in geltungsbereich.ortsteile je Ortsteil mitsteht. ART „kategorial\" mit werte, NICHT „stufen_kategorial\": der Auswerter liest bei stufen_kategorial zwei Größen (eine Zahl und eine Kategorie) und gibt ohne die Zahl gar nichts zurück — am 01.10.2026 gemessen, die Korrektur feuerte dann nie. Das Eingabefeld heißt baujahresgruppe und erwartet eine der sieben Schreibweisen unten; eine nackte Jahreszahl trifft keine davon und erscheint dann in korrekturen_offen.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   },
+   {
+    "bez": "Gewerblicher Anteil am Nettojahresrohertrag",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0,
+     "10": 0.08,
+     "20": 0.16,
+     "30": 0.24,
+     "40": 0.32,
+     "50": 0.4,
+     "60": 0.48,
+     "70": 0.56,
+     "80": 0.64
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 2,
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten, exakt linear mit 0,008 Prozentpunkten je Prozent Gewerbeanteil. Gegenüber dem Jahrgang 2024 (0,003 je Prozent, Spanne 0,00 bis 0,24) hat sich der Faktor mehr als verdoppelt. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Objektartdefinition und bekommt keinen Wert.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich (Vorbemerkung 2, S. 2): „Die Verwendung der ermittelten Liegenschaftszinssätze führt nur dann zu einem marktgerechten Ergebnis, wenn die wertbestimmenden Ansätze (grundstückswirtschaftliche Rahmenbedingungen) in der Ertragswertermittlung nach dem Modell des Gutachterausschusses zugrunde gelegt werden – Modellkonformität.\"",
+   "rohertrag": "Jahresnettokaltmieten (Objektkaltmiete einschließlich nutzflächenbezogener gewerblicher Mieterträge)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 zu § 12 Abs. 5 ImmoWertV, fortgeschrieben mit dem Verbraucherpreisindex für Deutschland (2020=100), Oktober 2001 = 77,1 gegenüber Oktober 2023 = 117,8",
+   "bewirtschaftungskosten_gilt_fuer": "Kaufvertragsjahr 2024; für die Kaufvertragsjahre 2022 und 2023 wurden die Ansätze mit dem jeweils gültigen Verbraucherpreisindex angepasst (die dortigen Zahlen druckt das Dokument nicht ab)",
+   "instandhaltung_eur_qm_wohnflaeche": 13.8,
+   "instandhaltung_garage_eur_platz": 104,
+   "instandhaltung_offener_stellplatz_eur_platz": 52,
+   "instandhaltung_gewerbe_anteil": "100 % des Wohnansatzes für Büros, Praxen, Geschäfte und vergleichbare Nutzungen; 30 % für Nebennutzungen wie Werkstatt oder Lager im Keller",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_gewerbe": "3 % vom jeweiligen Mietertrag; zum Sonstigen zählen insbesondere Stellplätze und Garagen",
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze. Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Das Dokument arbeitet ausschließlich mit Restnutzungsdauer-Tabellen (Tabellen 2 bis 5) und beziffert KEINE Gesamtnutzungsdauer. Das ist eine echte Lücke für den Modellvermerk: die Restnutzungsdauer darf hier nicht ersatzweise aus einer angenommenen Gesamtnutzungsdauer minus Alter gebildet werden, und die Rückfallzahl 80 des Rechenkerns ist nicht belegt.",
+   "restnutzungsdauer_tabellen": {
+    "hinweis": "Vollständig erfasst, anders als beim Jahrgang 2024 (dort fehlten die Tabellen 1 bis 4).",
+    "altbauten_und_zwischenkriegsbauten": {
+     "geltung": "Baujahre bis 1918 (Altbauten) und 1919 bis 1948 (Zwischenkriegsbauten), Abschnitt 2.8.1",
+     "basis_nach_bauzustand_jahre": {
+      "gut": 55,
+      "normal": 40,
+      "schlecht": 25
+     },
+     "abschlag_altbauten": {
+      "Normalausstattung: vollständig mit Zentralheizung (Sammel-/Etagenheizung) und Bädern ausgestattet": 0,
+      "vollständig mit Zentralheizung ODER Bädern ausgestattet": -5,
+      "weder vollständig mit Zentralheizung noch vollständig mit Bädern ausgestattet": -10
+     },
+     "abschlag_zwischenkriegsbauten": {
+      "Normalausstattung: Zentralheizung, Bäder": 0,
+      "nicht vollständig mit Zentralheizung ausgestattet": -5
+     },
+     "fundstelle": "Tabellen 2, 3 und 4, S. 10"
+    },
+    "ab_1949": {
+     "geltung": "Baujahre ab 1949, Abschnitt 2.8.2",
+     "achse_baualter_jahre": [
+      "bis 2",
+      "3-7",
+      "8-12",
+      "13-17",
+      "18-22",
+      "23-27",
+      "28-32",
+      "33-37",
+      "38-42",
+      "43-47",
+      "48-52",
+      "53-57",
+      "ab 58"
+     ],
+     "zellen_schluessel": "Baualtersklasse -> [gut, normal, schlecht]; null = der Bericht führt hier keinen Wert",
+     "zellen": {
+      "bis 2": [
+       80,
+       null,
+       null
+      ],
+      "3-7": [
+       75,
+       70,
+       null
+      ],
+      "8-12": [
+       70,
+       65,
+       60
+      ],
+      "13-17": [
+       65,
+       60,
+       55
+      ],
+      "18-22": [
+       60,
+       55,
+       50
+      ],
+      "23-27": [
+       55,
+       50,
+       45
+      ],
+      "28-32": [
+       55,
+       45,
+       40
+      ],
+      "33-37": [
+       55,
+       40,
+       35
+      ],
+      "38-42": [
+       55,
+       40,
+       30
+      ],
+      "43-47": [
+       55,
+       40,
+       25
+      ],
+      "48-52": [
+       55,
+       40,
+       25
+      ],
+      "53-57": [
+       55,
+       40,
+       25
+      ],
+      "ab 58": [
+       55,
+       40,
+       25
+      ]
+     },
+     "fundstelle": "Tabelle 5, S. 11"
+    }
+   },
+   "baulicher_zustand": "drei Zustandsnoten: gut, normal, schlecht. Kriterien unter https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial; Variable monatliche Objektkaltmiete und Zeitachse",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "marktmiete_eur_qm": 8.42,
+   "bezug": "Liegenschaftszinssätze 2025, Gutachterausschuss für Grundstückswerte in Berlin, Abschnitte 2.7 und 2.8 (S. 8-11): Instandhaltung 13,80 €/m² Wohnfläche, Verwaltung 351 €/Wohnung, Mietausfallwagnis 2 % Wohnen / 4 % Gewerbe, Restnutzungsdauer nach den Tabellen 2 bis 5. Keine Bewirtschaftungskostenquote, keine Gesamtnutzungsdauer. marktmiete_eur_qm ist die durchschnittliche monatliche Objektkaltmiete der Stichprobe (8,42 €/m²), nicht eine Vorgabe.",
+   "formel_wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+   "stichprobe": {
+    "anzahl": 651,
+    "nettoreinertragsanteil_pct": {
+     "mittel": 78.8,
+     "p5_p95": [
+      70.9,
+      85.2
+     ],
+     "min_max": [
+      54.9,
+      89.9
+     ]
+    },
+    "kaufpreis_eur_qm_geschossflaeche": {
+     "mittel": 1999,
+     "p5_p95": [
+      1090,
+      3443
+     ],
+     "min_max": [
+      758,
+      6385
+     ]
+    },
+    "kaufpreis_eur_qm_wohn_nutzflaeche": {
+     "mittel": 2644,
+     "p5_p95": [
+      1634,
+      4247
+     ],
+     "min_max": [
+      1208,
+      5975
+     ]
+    },
+    "kaufpreis_je_nettojahresrohertrag": {
+     "mittel": 26.6,
+     "p5_p95": [
+      18,
+      39.3
+     ],
+     "min_max": [
+      14,
+      51.4
+     ]
+    },
+    "objektkaltmiete_eur_qm_monat": {
+     "mittel": 8.42,
+     "p5_p95": [
+      5.6,
+      12.1
+     ]
+    },
+    "gewerblicher_mietanteil_pct": {
+     "mittel": 13.8,
+     "p5_p95": [
+      0,
+      49.2
+     ],
+     "min_max": [
+      0,
+      78
+     ]
+    },
+    "verwaltungskosten_pct_pa": {
+     "mittel": 5.1,
+     "p5_p95": [
+      2.8,
+      8
+     ],
+     "min_max": [
+      1.8,
+      14.5
+     ]
+    },
+    "bodenrichtwert_eur_qm": {
+     "mittel": 2700,
+     "p5_p95": [
+      600,
+      6500
+     ]
+    },
+    "fundstelle": "Tabellen 12 und 13, S. 15-16"
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Gebietsgruppe Ost",
+   "sachlich": "Mietwohnhäuser und Mietwohngeschäftshäuser mit einem gewerblichen Mietanteil bis 80 % und mindestens vier Mieteinheiten",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflagen: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" (S. 12) — die Korrekturen sind PFLICHT, nicht Kür. „Die Liegenschaftszinssätze sind für Objekte mit mindestens vier Mieteinheiten anzuwenden. Sie gelten nicht für Ein-, Zwei- oder Dreifamilienhäuser und Wohnungs-/Teileigentum.\" (Vorbemerkung 3, S. 2) „Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.\" (Fußnote zur Formel) „Die Verwendung der nachfolgenden Liegenschaftszinssätze ersetzt nicht automatisch die nach ImmoWertV erforderliche Marktanpassung ermittelter Ertragswerte.\" (Vorbemerkung 4, S. 2)",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     4,
+     20
+    ],
+    "objektkaltmiete_hinweis": "Die Randstützstellen 4,00 und 20,00 EUR/m² sind im Dokument als Minimum-/Maximum-Werte der Stichprobe gekennzeichnet (Fußnoten 7 bis 12), nicht als Modellgrenzen. Verlässlich ist nach dem Dokument nur der Bereich zwischen dem 5%- und dem 95%-Perzentil der Stichprobe, also 5,60 bis 12,10 EUR/m².",
+    "objektkaltmiete_verlaesslich_eur_m2_monat": [
+     5.6,
+     12.1
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4
+   },
+   "ortsteile": [
+    [
+     "Marzahn",
+     "Ost"
+    ],
+    [
+     "Biesdorf",
+     "Ost"
+    ],
+    [
+     "Kaulsdorf",
+     "Ost"
+    ],
+    [
+     "Mahlsdorf",
+     "Ost"
+    ],
+    [
+     "Hellersdorf",
+     "Ost"
+    ],
+    [
+     "Friedrichsfelde",
+     "Ost"
+    ],
+    [
+     "Karlshorst",
+     "Ost"
+    ],
+    [
+     "Lichtenberg",
+     "Ost"
+    ],
+    [
+     "Fennpfuhl",
+     "Ost"
+    ],
+    [
+     "Rummelsburg",
+     "Ost"
+    ],
+    [
+     "Falkenberg",
+     "Ost"
+    ],
+    [
+     "Malchow",
+     "Ost"
+    ],
+    [
+     "Wartenberg",
+     "Ost"
+    ],
+    [
+     "Neu-Hohenschönhausen",
+     "Ost"
+    ],
+    [
+     "Alt-Hohenschönhausen",
+     "Ost"
+    ]
+   ],
+   "ortsteile_schluessel": "[Ortsteilname nach Tabelle 1 des Dokuments, Stadtlage Ost/West]. Die Stadtlage wird für die Baujahreskorrektur 1973–1990 gebraucht.",
+   "ortsteile_anzahl": 15,
+   "ortsteile_hinweis": "Tabelle 1 (S. 4-7) ordnet jeden Ortsteil genau einer Gebietsgruppe zu. Insgesamt 98 Zeilen gelesen, davon diese 15; die Quersumme über alle sechs Gebietsgruppen (City 14 · Nord 26 · Südost 22 · Ost 15 · Südwest 11 · West 10 = 98) stimmt mit der Zeilenzahl. Eine Zeile trägt im Dokument ein Sternchen — „(West-Staaken)*\" in der Gebietsgruppe West — und ist ein historischer Ortsteil; die Fußnote dazu wurde nicht mitgelesen. Die Schreibweise „Tiergarten-Süd\" weicht vom amtlichen Ortsteilnamen „Tiergarten\" ab; sie steht so im Dokument und wurde NICHT stillschweigend korrigiert."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Tabelle 10, S. 14",
+    "wortlaut": "Liegenschaftszinssätze für Objekte in der Gebietsgruppe Ost. Neun Stützstellen über die durchschnittliche monatliche Objektkaltmiete (4,00 · 6,00 · 7,00 · 8,00 · 9,00 · 10,00 · 11,00 · 12,00 · 20,00 EUR/m²) mit den Werten 2,8 · 3,1 · 3,2 · 3,3 · 3,5 · 3,6 · 3,7 · 3,9 · 4,9 Prozent. Zusatz des Dokuments: „Die Liegenschaftszinssätze sind zum Stichtag, für Objekte ohne gewerblichen Anteil am Nettojahresrohertrag und für die Baujahre vor 1919, 1919 bis 1972, 1973-1990 Ost und ab 2003 berechnet.\"",
+    "amtsblatt": "Veröffentlicht im Amtsblatt für Berlin Nr. 39 vom 19.09.2025, Seite 2477 ff. Dokumentstand 09.09.2025.",
+    "pruefprotokoll": "ANWENDUNGSBEISPIEL NACHGERECHNET am 01.10.2026 — das Dokument druckt die Regressionsgleichung selbst ab, sie ist damit der Prüfmaßstab. Gerechnet: p = 0,644 + 0,132 × Miete + 0,0013304 × 1.096 + 0,167 und auf eine Nachkommastelle gerundet. Ergebnis: ALLE NEUN abgedruckten Stützstellen dieser Tabelle werden exakt getroffen. Über beide Formelvarianten zusammen (mit und ohne den Zuschlag von 0,167) sind es 18 von 18 Stützstellen — ein Zahlendreher oder eine vertauschte Spalte hätte das gebrochen. Die Einzelwerte stehen in belege.formelprobe.",
+    "formelprobe": [
+     {
+      "miete": 4,
+      "basis_soll": 2.6,
+      "basis_ist": 2.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 2.8,
+      "mit_zuschlag_ist": 2.8,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 6,
+      "basis_soll": 2.9,
+      "basis_ist": 2.9,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.1,
+      "mit_zuschlag_ist": 3.1,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 7,
+      "basis_soll": 3,
+      "basis_ist": 3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.2,
+      "mit_zuschlag_ist": 3.2,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 8,
+      "basis_soll": 3.2,
+      "basis_ist": 3.2,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.3,
+      "mit_zuschlag_ist": 3.3,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 9,
+      "basis_soll": 3.3,
+      "basis_ist": 3.3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.5,
+      "mit_zuschlag_ist": 3.5,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 10,
+      "basis_soll": 3.4,
+      "basis_ist": 3.4,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.6,
+      "mit_zuschlag_ist": 3.6,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 11,
+      "basis_soll": 3.6,
+      "basis_ist": 3.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.7,
+      "mit_zuschlag_ist": 3.7,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 12,
+      "basis_soll": 3.7,
+      "basis_ist": 3.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.9,
+      "mit_zuschlag_ist": 3.9,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 20,
+      "basis_soll": 4.7,
+      "basis_ist": 4.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 4.9,
+      "mit_zuschlag_ist": 4.9,
+      "mit_zuschlag_ok": true
+     }
+    ],
+    "zaehlpruefung": "Neun Stützstellen je Tabelle, sechs Tabellen (6 bis 11), zwei Wertesätze — Südost, Südwest und Nord tragen identische Werte, City, Ost und West tragen identische Werte. Genau so steht es im Dokument: der Unterschied zwischen den beiden Wertesätzen ist der Zuschlag von 0,167 in der Formel, und er erscheint im Dokument nur bei City, Ost und West."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 651,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "Liegenschaftszinssätze 2025 GAA Berlin (sechs Gebietsgruppen)",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2500.pdf",
+  "quelle_parser": "v1768-BELZS25",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Liegenschaftszinssätze 2025, Amtsblatt für Berlin Nr. 39 vom 19.09.2025, S. 2477 ff.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
+  "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
+  "fundstelle": "Tabelle 10, S. 14; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"Ost\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_west",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "objektkaltmiete_eur_m2_monat",
+   "achse_bez": "durchschnittliche monatliche Objektkaltmiete (netto kalt) in EUR/m² Wohn-/Nutzfläche",
+   "liefert": "prozent",
+   "stufen": {
+    "4": 2.8,
+    "6": 3.1,
+    "7": 3.2,
+    "8": 3.3,
+    "9": 3.5,
+    "10": 3.6,
+    "11": 3.7,
+    "12": 3.9,
+    "20": 4.9
+   },
+   "rundung_stellen": 1,
+   "interpolation": "linear zwischen den Stützstellen; die Stützstellen sind die abgedruckte Auswertung einer stetigen Regressionsgeraden, Interpolation ist deshalb modellkonform",
+   "funktion": {
+    "wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+    "a_konstante": 0.644,
+    "b_je_eur_miete": 0.132,
+    "c_je_tag": 0.0013304,
+    "tage": 1096,
+    "zuschlag_gebietsgruppe": 0.167,
+    "hinweis": "Die Stützstellen lassen sich mit dieser Funktion exakt reproduzieren (siehe belege.pruefprotokoll). Wer sie braucht, soll die Funktion rechnen und nicht interpolieren."
+   },
+   "hinweis": "Ergebnis in PROZENT (2,6 bedeutet 2,6 %), nicht als Dezimalbruch. Der Berliner Liegenschaftszinssatz ist keine Konstante, sondern eine Funktion der Objektkaltmiete — und seit dem Jahrgang 2025 zusätzlich eine Funktion der GEBIETSGRUPPE."
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahresgruppe",
+    "art": "kategorial",
+    "werte": {
+     "Altbauten (Baujahre vor 1919)": 0,
+     "Zwischenkriegsbauten (Baujahre 1919 bis 1948)": 0,
+     "Baujahre 1949 bis 1972": 0,
+     "Baujahre 1973 bis 1990 im Westteil": 0.3,
+     "Baujahre 1973 bis 1990 im Ostteil": 0,
+     "Baujahre 1991 bis 2002": 0,
+     "Baujahr nach 2002": 0
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 1,
+    "hinweis": "Additiv in Prozentpunkten. Nur „1973 bis 1990 im Westteil\" trägt einen Wert, und zwar +0,3 (Jahrgang 2024: +0,2). Die Unterscheidung West-/Ostteil setzt die Lage im ehemaligen West- bzw. Ostteil Berlins voraus — dafür führt Tabelle 1 des Dokuments die Spalte „Stadtlage\", die in geltungsbereich.ortsteile je Ortsteil mitsteht. ART „kategorial\" mit werte, NICHT „stufen_kategorial\": der Auswerter liest bei stufen_kategorial zwei Größen (eine Zahl und eine Kategorie) und gibt ohne die Zahl gar nichts zurück — am 01.10.2026 gemessen, die Korrektur feuerte dann nie. Das Eingabefeld heißt baujahresgruppe und erwartet eine der sieben Schreibweisen unten; eine nackte Jahreszahl trifft keine davon und erscheint dann in korrekturen_offen.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   },
+   {
+    "bez": "Gewerblicher Anteil am Nettojahresrohertrag",
+    "feld": "gewerbeanteil_prozent",
+    "art": "stufen",
+    "stufen": {
+     "0": 0,
+     "10": 0.08,
+     "20": 0.16,
+     "30": 0.24,
+     "40": 0.32,
+     "50": 0.4,
+     "60": 0.48,
+     "70": 0.56,
+     "80": 0.64
+    },
+    "einheit": "prozentpunkte",
+    "rundung_stellen": 2,
+    "hinweis": "Additiv in Prozentpunkten, 9 Stufen in 10-%-Schritten, exakt linear mit 0,008 Prozentpunkten je Prozent Gewerbeanteil. Gegenüber dem Jahrgang 2024 (0,003 je Prozent, Spanne 0,00 bis 0,24) hat sich der Faktor mehr als verdoppelt. Über 80 % Gewerbeanteil liegt das Objekt außerhalb der Objektartdefinition und bekommt keinen Wert.",
+    "fundstelle": "Korrekturen zu den Tabellen 6 bis 11, S. 15"
+   }
+  ],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Wörtlich (Vorbemerkung 2, S. 2): „Die Verwendung der ermittelten Liegenschaftszinssätze führt nur dann zu einem marktgerechten Ergebnis, wenn die wertbestimmenden Ansätze (grundstückswirtschaftliche Rahmenbedingungen) in der Ertragswertermittlung nach dem Modell des Gutachterausschusses zugrunde gelegt werden – Modellkonformität.\"",
+   "rohertrag": "Jahresnettokaltmieten (Objektkaltmiete einschließlich nutzflächenbezogener gewerblicher Mieterträge)",
+   "bewirtschaftungskosten_quelle": "Anlage 3 zu § 12 Abs. 5 ImmoWertV, fortgeschrieben mit dem Verbraucherpreisindex für Deutschland (2020=100), Oktober 2001 = 77,1 gegenüber Oktober 2023 = 117,8",
+   "bewirtschaftungskosten_gilt_fuer": "Kaufvertragsjahr 2024; für die Kaufvertragsjahre 2022 und 2023 wurden die Ansätze mit dem jeweils gültigen Verbraucherpreisindex angepasst (die dortigen Zahlen druckt das Dokument nicht ab)",
+   "instandhaltung_eur_qm_wohnflaeche": 13.8,
+   "instandhaltung_garage_eur_platz": 104,
+   "instandhaltung_offener_stellplatz_eur_platz": 52,
+   "instandhaltung_gewerbe_anteil": "100 % des Wohnansatzes für Büros, Praxen, Geschäfte und vergleichbare Nutzungen; 30 % für Nebennutzungen wie Werkstatt oder Lager im Keller",
+   "verwaltungskosten_wohnung_eur": 351,
+   "verwaltungskosten_gewerbe": "3 % vom jeweiligen Mietertrag; zum Sonstigen zählen insbesondere Stellplätze und Garagen",
+   "mietausfallwagnis_pct_wohnen": 2,
+   "mietausfallwagnis_pct_gewerblich": 4,
+   "bewirtschaftungskostenquote": null,
+   "bewirtschaftungskostenquote_hinweis": "Berlin nennt KEINE pauschale Quote, sondern Einzelansätze. Wer mit einer Prozentquote rechnet, verlässt das Modell.",
+   "gnd_jahre": null,
+   "gnd_hinweis": "Das Dokument arbeitet ausschließlich mit Restnutzungsdauer-Tabellen (Tabellen 2 bis 5) und beziffert KEINE Gesamtnutzungsdauer. Das ist eine echte Lücke für den Modellvermerk: die Restnutzungsdauer darf hier nicht ersatzweise aus einer angenommenen Gesamtnutzungsdauer minus Alter gebildet werden, und die Rückfallzahl 80 des Rechenkerns ist nicht belegt.",
+   "restnutzungsdauer_tabellen": {
+    "hinweis": "Vollständig erfasst, anders als beim Jahrgang 2024 (dort fehlten die Tabellen 1 bis 4).",
+    "altbauten_und_zwischenkriegsbauten": {
+     "geltung": "Baujahre bis 1918 (Altbauten) und 1919 bis 1948 (Zwischenkriegsbauten), Abschnitt 2.8.1",
+     "basis_nach_bauzustand_jahre": {
+      "gut": 55,
+      "normal": 40,
+      "schlecht": 25
+     },
+     "abschlag_altbauten": {
+      "Normalausstattung: vollständig mit Zentralheizung (Sammel-/Etagenheizung) und Bädern ausgestattet": 0,
+      "vollständig mit Zentralheizung ODER Bädern ausgestattet": -5,
+      "weder vollständig mit Zentralheizung noch vollständig mit Bädern ausgestattet": -10
+     },
+     "abschlag_zwischenkriegsbauten": {
+      "Normalausstattung: Zentralheizung, Bäder": 0,
+      "nicht vollständig mit Zentralheizung ausgestattet": -5
+     },
+     "fundstelle": "Tabellen 2, 3 und 4, S. 10"
+    },
+    "ab_1949": {
+     "geltung": "Baujahre ab 1949, Abschnitt 2.8.2",
+     "achse_baualter_jahre": [
+      "bis 2",
+      "3-7",
+      "8-12",
+      "13-17",
+      "18-22",
+      "23-27",
+      "28-32",
+      "33-37",
+      "38-42",
+      "43-47",
+      "48-52",
+      "53-57",
+      "ab 58"
+     ],
+     "zellen_schluessel": "Baualtersklasse -> [gut, normal, schlecht]; null = der Bericht führt hier keinen Wert",
+     "zellen": {
+      "bis 2": [
+       80,
+       null,
+       null
+      ],
+      "3-7": [
+       75,
+       70,
+       null
+      ],
+      "8-12": [
+       70,
+       65,
+       60
+      ],
+      "13-17": [
+       65,
+       60,
+       55
+      ],
+      "18-22": [
+       60,
+       55,
+       50
+      ],
+      "23-27": [
+       55,
+       50,
+       45
+      ],
+      "28-32": [
+       55,
+       45,
+       40
+      ],
+      "33-37": [
+       55,
+       40,
+       35
+      ],
+      "38-42": [
+       55,
+       40,
+       30
+      ],
+      "43-47": [
+       55,
+       40,
+       25
+      ],
+      "48-52": [
+       55,
+       40,
+       25
+      ],
+      "53-57": [
+       55,
+       40,
+       25
+      ],
+      "ab 58": [
+       55,
+       40,
+       25
+      ]
+     },
+     "fundstelle": "Tabelle 5, S. 11"
+    }
+   },
+   "baulicher_zustand": "drei Zustandsnoten: gut, normal, schlecht. Kriterien unter https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php",
+   "verfahren": "multiple lineare Regression auf dem Berliner Kaufpreismaterial; Variable monatliche Objektkaltmiete und Zeitachse",
+   "gesamtnutzungsdauer": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten_quote": null,
+   "marktmiete_eur_qm": 8.42,
+   "bezug": "Liegenschaftszinssätze 2025, Gutachterausschuss für Grundstückswerte in Berlin, Abschnitte 2.7 und 2.8 (S. 8-11): Instandhaltung 13,80 €/m² Wohnfläche, Verwaltung 351 €/Wohnung, Mietausfallwagnis 2 % Wohnen / 4 % Gewerbe, Restnutzungsdauer nach den Tabellen 2 bis 5. Keine Bewirtschaftungskostenquote, keine Gesamtnutzungsdauer. marktmiete_eur_qm ist die durchschnittliche monatliche Objektkaltmiete der Stichprobe (8,42 €/m²), nicht eine Vorgabe.",
+   "formel_wortlaut": "Liegenschaftszinssatz zum Stichtag 31.12.2024 = 0,644 + 0,132 × Objektmiete pro m² WF-NF/Monat + 0,0013304 × 1.096 (Anzahl der Tage vom 01.01.2022 bis zum 31.12.2024) [+ 0,167 in den Gebietsgruppen City, Ost und West]",
+   "stichprobe": {
+    "anzahl": 651,
+    "nettoreinertragsanteil_pct": {
+     "mittel": 78.8,
+     "p5_p95": [
+      70.9,
+      85.2
+     ],
+     "min_max": [
+      54.9,
+      89.9
+     ]
+    },
+    "kaufpreis_eur_qm_geschossflaeche": {
+     "mittel": 1999,
+     "p5_p95": [
+      1090,
+      3443
+     ],
+     "min_max": [
+      758,
+      6385
+     ]
+    },
+    "kaufpreis_eur_qm_wohn_nutzflaeche": {
+     "mittel": 2644,
+     "p5_p95": [
+      1634,
+      4247
+     ],
+     "min_max": [
+      1208,
+      5975
+     ]
+    },
+    "kaufpreis_je_nettojahresrohertrag": {
+     "mittel": 26.6,
+     "p5_p95": [
+      18,
+      39.3
+     ],
+     "min_max": [
+      14,
+      51.4
+     ]
+    },
+    "objektkaltmiete_eur_qm_monat": {
+     "mittel": 8.42,
+     "p5_p95": [
+      5.6,
+      12.1
+     ]
+    },
+    "gewerblicher_mietanteil_pct": {
+     "mittel": 13.8,
+     "p5_p95": [
+      0,
+      49.2
+     ],
+     "min_max": [
+      0,
+      78
+     ]
+    },
+    "verwaltungskosten_pct_pa": {
+     "mittel": 5.1,
+     "p5_p95": [
+      2.8,
+      8
+     ],
+     "min_max": [
+      1.8,
+      14.5
+     ]
+    },
+    "bodenrichtwert_eur_qm": {
+     "mittel": 2700,
+     "p5_p95": [
+      600,
+      6500
+     ]
+    },
+    "fundstelle": "Tabellen 12 und 13, S. 15-16"
+   }
+  },
+  "geltungsbereich": {
+   "raeumlich": "Gebietsgruppe West",
+   "sachlich": "Mietwohnhäuser und Mietwohngeschäftshäuser mit einem gewerblichen Mietanteil bis 80 % und mindestens vier Mieteinheiten",
+   "extrapolation": "gesperrt",
+   "hinweis": "Wörtliche Auflagen: „Die Liegenschaftszinssätze gelten zum Stichtag unter Anwendung untenstehender Korrekturfaktoren.\" (S. 12) — die Korrekturen sind PFLICHT, nicht Kür. „Die Liegenschaftszinssätze sind für Objekte mit mindestens vier Mieteinheiten anzuwenden. Sie gelten nicht für Ein-, Zwei- oder Dreifamilienhäuser und Wohnungs-/Teileigentum.\" (Vorbemerkung 3, S. 2) „Nur innerhalb der 5% und 95% Perzentilen statistisch verlässlich anwendbar.\" (Fußnote zur Formel) „Die Verwendung der nachfolgenden Liegenschaftszinssätze ersetzt nicht automatisch die nach ImmoWertV erforderliche Marktanpassung ermittelter Ertragswerte.\" (Vorbemerkung 4, S. 2)",
+   "spannen": {
+    "objektkaltmiete_eur_m2_monat": [
+     4,
+     20
+    ],
+    "objektkaltmiete_hinweis": "Die Randstützstellen 4,00 und 20,00 EUR/m² sind im Dokument als Minimum-/Maximum-Werte der Stichprobe gekennzeichnet (Fußnoten 7 bis 12), nicht als Modellgrenzen. Verlässlich ist nach dem Dokument nur der Bereich zwischen dem 5%- und dem 95%-Perzentil der Stichprobe, also 5,60 bis 12,10 EUR/m².",
+    "objektkaltmiete_verlaesslich_eur_m2_monat": [
+     5.6,
+     12.1
+    ],
+    "gewerbeanteil_prozent": [
+     0,
+     80
+    ],
+    "mieteinheiten_min": 4
+   },
+   "ortsteile": [
+    [
+     "Spandau",
+     "West"
+    ],
+    [
+     "Haselhorst",
+     "West"
+    ],
+    [
+     "Siemensstadt",
+     "West"
+    ],
+    [
+     "Staaken",
+     "West"
+    ],
+    [
+     "Gatow",
+     "West"
+    ],
+    [
+     "Kladow",
+     "West"
+    ],
+    [
+     "Hakenfelde",
+     "West"
+    ],
+    [
+     "Falkenhagener Feld",
+     "West"
+    ],
+    [
+     "Wilhelmstadt",
+     "West"
+    ],
+    [
+     "(West-Staaken)*",
+     "Ost"
+    ]
+   ],
+   "ortsteile_schluessel": "[Ortsteilname nach Tabelle 1 des Dokuments, Stadtlage Ost/West]. Die Stadtlage wird für die Baujahreskorrektur 1973–1990 gebraucht.",
+   "ortsteile_anzahl": 10,
+   "ortsteile_hinweis": "Tabelle 1 (S. 4-7) ordnet jeden Ortsteil genau einer Gebietsgruppe zu. Insgesamt 98 Zeilen gelesen, davon diese 10; die Quersumme über alle sechs Gebietsgruppen (City 14 · Nord 26 · Südost 22 · Ost 15 · Südwest 11 · West 10 = 98) stimmt mit der Zeilenzahl. Eine Zeile trägt im Dokument ein Sternchen — „(West-Staaken)*\" in der Gebietsgruppe West — und ist ein historischer Ortsteil; die Fußnote dazu wurde nicht mitgelesen. Die Schreibweise „Tiergarten-Süd\" weicht vom amtlichen Ortsteilnamen „Tiergarten\" ab; sie steht so im Dokument und wurde NICHT stillschweigend korrigiert."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Tabelle 11, S. 15",
+    "wortlaut": "Liegenschaftszinssätze für Objekte in der Gebietsgruppe West. Neun Stützstellen über die durchschnittliche monatliche Objektkaltmiete (4,00 · 6,00 · 7,00 · 8,00 · 9,00 · 10,00 · 11,00 · 12,00 · 20,00 EUR/m²) mit den Werten 2,8 · 3,1 · 3,2 · 3,3 · 3,5 · 3,6 · 3,7 · 3,9 · 4,9 Prozent. Zusatz des Dokuments: „Die Liegenschaftszinssätze sind zum Stichtag, für Objekte ohne gewerblichen Anteil am Nettojahresrohertrag und für die Baujahre vor 1919, 1919 bis 1972, 1973-1990 Ost und ab 2003 berechnet.\"",
+    "amtsblatt": "Veröffentlicht im Amtsblatt für Berlin Nr. 39 vom 19.09.2025, Seite 2477 ff. Dokumentstand 09.09.2025.",
+    "pruefprotokoll": "ANWENDUNGSBEISPIEL NACHGERECHNET am 01.10.2026 — das Dokument druckt die Regressionsgleichung selbst ab, sie ist damit der Prüfmaßstab. Gerechnet: p = 0,644 + 0,132 × Miete + 0,0013304 × 1.096 + 0,167 und auf eine Nachkommastelle gerundet. Ergebnis: ALLE NEUN abgedruckten Stützstellen dieser Tabelle werden exakt getroffen. Über beide Formelvarianten zusammen (mit und ohne den Zuschlag von 0,167) sind es 18 von 18 Stützstellen — ein Zahlendreher oder eine vertauschte Spalte hätte das gebrochen. Die Einzelwerte stehen in belege.formelprobe.",
+    "formelprobe": [
+     {
+      "miete": 4,
+      "basis_soll": 2.6,
+      "basis_ist": 2.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 2.8,
+      "mit_zuschlag_ist": 2.8,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 6,
+      "basis_soll": 2.9,
+      "basis_ist": 2.9,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.1,
+      "mit_zuschlag_ist": 3.1,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 7,
+      "basis_soll": 3,
+      "basis_ist": 3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.2,
+      "mit_zuschlag_ist": 3.2,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 8,
+      "basis_soll": 3.2,
+      "basis_ist": 3.2,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.3,
+      "mit_zuschlag_ist": 3.3,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 9,
+      "basis_soll": 3.3,
+      "basis_ist": 3.3,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.5,
+      "mit_zuschlag_ist": 3.5,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 10,
+      "basis_soll": 3.4,
+      "basis_ist": 3.4,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.6,
+      "mit_zuschlag_ist": 3.6,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 11,
+      "basis_soll": 3.6,
+      "basis_ist": 3.6,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.7,
+      "mit_zuschlag_ist": 3.7,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 12,
+      "basis_soll": 3.7,
+      "basis_ist": 3.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 3.9,
+      "mit_zuschlag_ist": 3.9,
+      "mit_zuschlag_ok": true
+     },
+     {
+      "miete": 20,
+      "basis_soll": 4.7,
+      "basis_ist": 4.7,
+      "basis_ok": true,
+      "mit_zuschlag_soll": 4.9,
+      "mit_zuschlag_ist": 4.9,
+      "mit_zuschlag_ok": true
+     }
+    ],
+    "zaehlpruefung": "Neun Stützstellen je Tabelle, sechs Tabellen (6 bis 11), zwei Wertesätze — Südost, Südwest und Nord tragen identische Werte, City, Ost und West tragen identische Werte. Genau so steht es im Dokument: der Unterschied zwischen den beiden Wertesätzen ist der Zuschlag von 0,167 in der Formel, und er erscheint im Dokument nur bei City, Ost und West."
+   }
+  ],
+  "stufe": "A",
+  "fallzahl": 651,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2025,
+  "modellversion": "Liegenschaftszinssätze 2025 GAA Berlin (sechs Gebietsgruppen)",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-02-010-2500.pdf",
+  "quelle_parser": "v1768-BELZS25",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Liegenschaftszinssätze 2025, Amtsblatt für Berlin Nr. 39 vom 19.09.2025, S. 2477 ff.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Dieselbe Lizenz wie beim Jahrgang 2024 (siehe berlin.json). Die Verlinkungsseite des Gutachterausschusses verweist allgemein auf „Nutzungsbestimmungen\"; eine dl-de-Kennzeichnung IM Dokument wurde nicht gefunden. Unter dl-de/zero-2-0 ist keine Namensnennung verlangt — der Quellenvermerk steht trotzdem dabei, weil der Wert sonst keine Herkunft trägt.",
+  "auflagen": "MODELLWECHSEL: Dieser Satz ersetzt den Jahrgang 2024 (berlin.json) NICHT stillschweigend — dort gilt eine stadtweite Tabelle mit einer Altbezirkskorrektur über 23 Altbezirke, hier sechs Gebietsgruppentabellen mit Altbezirkskorrekturen nur in Nord und City. Wer einen Stichtag im Jahr 2023 bewertet, braucht weiterhin den Satz 2024. — Berlin leitet Liegenschaftszinssätze NUR für Mietwohn- und Mietwohngeschäftshäuser ab; für Eigentumswohnungen und Ein-/Zweifamilienhäuser gibt es in Berlin keinen amtlichen Liegenschaftszinssatz (am 01.10.2026 an der Übersichtsseite des Ausschusses gemessen: dort stehen nur die Jahrgänge 2021, 2022, 2024 und 2025 dieser einen Objektart). — Die Gesamtnutzungsdauer ist im Dokument nicht beziffert, siehe modellansaetze.gnd_hinweis.",
+  "fundstelle": "Tabelle 11, S. 15; Gebietsgruppenzuordnung Tabelle 1, S. 4-7; Bewirtschaftungskosten Abschnitt 2.7, S. 8-9; Restnutzungsdauer Tabellen 2-5, S. 10-11; Korrekturen S. 15; Stichprobe Tabellen 12-13, S. 15-16",
+  "zweig_hinweis": "v1768b: die Gebietsgruppe (\"West\") gehoert in den zweig. Vorher trugen alle sechs Saetze \"mfh\" und dieselbe quelle_url — der Konfliktschluessel war damit fuer alle derselbe, und fuenf Saetze ueberschrieben sich gegenseitig (gemessen: 1 eindeutiger Schluessel von 6)."
+ }
+]
