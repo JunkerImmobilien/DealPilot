@@ -1764,6 +1764,11 @@ window.DealPilotDealAction = (function() {
       if (_fenster) prefill.fenster = _fenster;
       if (_heizung) prefill.heizungsart = _heizung;
       if (_bad) prefill.anzahl_baeder = _bad;
+      /* Schritt 4 „Gebäudetechnik" verlangt Brennstoff und Warmwasser — beide
+         folgen der Heizungsart (Gas-Zentral → Erdgas, zentral über Kessel);
+         die Energieklasse heißt im Wizard `energieklasse`, nicht ds2_energie. */
+      if (_heizung) { prefill.brennstoff = 'Erdgas'; prefill.warmwasser = 'zentral über Heizkessel'; }
+      var _ek = _g('ds2_energie'); if (_ek) prefill.energieklasse = _ek;
       if (window.DealPilotRND && typeof DealPilotRND.mapDealPilotObject === 'function' && typeof collectData === 'function') {
         var _m = DealPilotRND.mapDealPilotObject(collectData());
         if (_m && _m.gewerkeBewertung) prefill.gewerke = _m.gewerkeBewertung;
