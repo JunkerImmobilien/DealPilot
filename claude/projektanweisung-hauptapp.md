@@ -30218,3 +30218,15 @@ Ebenen, Gewerke-Tabelle, Automatik-Leiste, Pakete P1–P5, vier
 Bewertungsfragen an Marcel). **Nicht gebaut** — Demo-first.
 
 **Nachweis v1849.** Prüfer im Container, siehe unten.
+
+```
+pruef-pilot-analyse.js, Staging-Container, Stand a0785a0d
+  19 Pruefungen, 19 gruen, 0 rot
+  Waechter: Hermannstr. ohne Verdacht · Gohliser Str. -> fremd_verdacht + "neu erstellen"
+  Daten: 6 Objekte teilen EINE Analyse (Westerfeldstr. 140 Bielefeld, Lindenhof 14,
+         Gohliser Str. 42, Ravensberger Weg 38, Bismarckstr. 27, Hauptstr. 51)
+         - sie nennt Bielefeld, gehoert also vermutlich zur Westerfeldstrasse
+         2 Objekte teilen EINE Analyse (Am Markt 9 Kabelsketal, zweimal)
+```
+
+**Prod:** v1847–v1849 liegen nur auf Staging. Prod steht auf v1846b.
