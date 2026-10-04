@@ -1523,11 +1523,27 @@ function renderAssessment(d) {
     if (z.nettokaltmiete_qm != null) extra += card('Ø Nettokaltmiete (Zensus 2022)', de(z.nettokaltmiete_qm, 2) + ' €/m²');
   }
 
-  if (!rows.length && !extra) { grid.classList.add('hide'); title.classList.add('hide'); return; }
+  /* v1853 · N4-P1b: die Einschaetzung des NUTZERS (aus dem Reiter Objekt)
+     steht NEBEN der Datenlage — getrennt beschriftet, nie vermischt. Der
+     Orchestrator liefert sie als `nutzer_einschaetzung`; `assessment`
+     bleibt, was gemessen wurde (GeoMap, Zensus, Makro). */
+  const n = d.nutzer_einschaetzung;
+  const nrows = n ? [
+    ['Mikrolage', n.mikrolage], ['Makrolage', n.makrolage], ['Bevölkerung', n.bevoelkerung],
+    ['Nachfrage', n.nachfrage], ['Entwicklung', n.entwicklung], ['Wertsteigerung', n.wertsteigerung],
+    ['Mietausfallrisiko', n.mietausfallrisiko],
+  ].filter(([, v]) => v != null && v !== '').map(([l, v]) => [l, String(v).replace(/_/g, ' ')]) : [];
+  const nutzerHtml = nrows.length
+    ? `<div class="assess rate-neutral" style="grid-column:1/-1;padding:4px 0 0;border:0;background:transparent"><div class="l">Ihre Einschätzung (aus DealPilot, Reiter Objekt) — keine Messung</div></div>`
+      + nrows.map(([l, v]) => `<div class="assess rate-${rateClass(l, v)} assess-nutzer"><div class="l">${l} · Ihre Angabe</div>
+       <div class="v"><span class="dot"></span>${v}</div></div>`).join('')
+    : '';
+
+  if (!rows.length && !extra && !nutzerHtml) { grid.classList.add('hide'); title.classList.add('hide'); return; }
   title.classList.remove('hide'); grid.classList.remove('hide');
   grid.innerHTML = rows.map(([l, v]) =>
     `<div class="assess rate-${rateClass(l, v)}"><div class="l">${l}</div>
-       <div class="v"><span class="dot"></span>${v}</div></div>`).join('') + extra;
+       <div class="v"><span class="dot"></span>${v}</div></div>`).join('') + extra + nutzerHtml;
 }
 function rateClass(label, val) {
   const v = String(val || '').toLowerCase();
@@ -4542,7 +4558,8 @@ async function exportPdf(out) {
   // ---------- Lage-/Potenzialbewertung ----------
   const _z = d.zensus;
   const _arProbe = d.assessment ? Object.values(d.assessment).filter((v) => v != null && v !== '').length : 0;
-  if ((_arProbe >= 2) || (_z && _z.available)) {
+  const _nProbe = d.nutzer_einschaetzung ? Object.values(d.nutzer_einschaetzung).filter((v) => v != null && v !== '').length : 0;
+  if ((_arProbe >= 2) || (_z && _z.available) || _nProbe >= 1) {
     lageSektion();
     blockTitle("Bewertung & Potenzial", 30);
     const A = d.assessment || {}; const ar = [
@@ -4582,6 +4599,28 @@ async function exportPdf(out) {
       doc.text('Zensus-Kennzahlen: ' + _z.license, M, y); y += 5; }
     if (A.marktmiete_eur_qm != null) { need(8); doc.setFontSize(9); doc.setTextColor(...MUT);
       doc.text('Eingeschätzte Marktmiete: ' + A.marktmiete_eur_qm + ' €/m²' + (A.marktfaktor != null ? '   ·   Marktfaktor: ' + A.marktfaktor : ''), M, y); y += 8; }
+    /* v1853 · N4-P1b: die Einschaetzung des Nutzers als EIGENE Tabelle unter
+       der Datenlage — getrennt beschriftet, damit niemand eine Angabe aus
+       dem Reiter Objekt fuer eine Messung haelt. */
+    const N = d.nutzer_einschaetzung || {}; const nr = [
+      ['Mikrolage', N.mikrolage], ['Makrolage', N.makrolage], ['Bevölkerungsentwicklung', N.bevoelkerung],
+      ['Nachfrage', N.nachfrage], ['Entwicklungsmöglichkeiten', N.entwicklung], ['Wertsteigerungspotenzial', N.wertsteigerung],
+      ['Mietausfallrisiko', N.mietausfallrisiko],
+    ].filter((r) => r[1] != null && r[1] !== '').map((r) => [r[0], String(r[1]).replace(/_/g, ' ')]);
+    if (nr.length) {
+      need(14); doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...MUT);
+      doc.text('Ihre Einschätzung (aus DealPilot, Reiter Objekt) — keine Messung', M, y); y += 4;
+      doc.autoTable({
+        startY: y, margin: { left: M, right: M }, theme: 'plain',
+        body: nr,
+        styles: { fontSize: 9, cellPadding: 2.2, textColor: TXT },
+        columnStyles: { 0: { textColor: MUT, cellWidth: 72 }, 1: { fontStyle: 'bold' } },
+        didParseCell: (data) => {
+          if (data.section === 'body' && data.column.index === 1) data.cell.styles.textColor = rateCol(nr[data.row.index][0], nr[data.row.index][1]);
+        },
+      });
+      y = doc.lastAutoTable.finalY + 6;
+    }
   }
 
   // ---------- Makrolage & Sozioökonomie (echte Destatis-Subscores) ----------
