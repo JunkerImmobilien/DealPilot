@@ -153,17 +153,27 @@
     if (lauf !== _quellenLauf) return;
     var NAME = { lzs: 'Liegenschaftszins', liegenschaftszins: 'Liegenschaftszins', swf: 'Sachwertfaktor', sachwertfaktor: 'Sachwertfaktor', brw: 'Bodenrichtwert', bodenrichtwert: 'Bodenrichtwert', vergleichsfaktor: 'Vergleichsfaktor', gnd: 'Gesamtnutzungsdauer' };
     var zeilen = [];
-    var hinterlegt = (q && q.hinterlegt) || [], fehlt = (q && q.fehlt) || [];
+    /* Nur die drei Kennzahlen, die der Bericht rechnet — Erbbau-Koeffizienten,
+       Preisentwicklung und Durchschnittspreise bleiben im Register, nicht hier. */
+    var relevant = function (e) { var k = String(e.kennzahl || '') + ' ' + String(e.name || ''); return /liegenschaft|lzs|sachwert|swf|bodenricht/i.test(k); };
+    var hinterlegt = ((q && q.hinterlegt) || []).filter(relevant), fehlt = ((q && q.fehlt) || []).filter(relevant);
+    var kurz = function (s) { return String(s || '').replace(/^Der Gutachterausschuss für Grundstückswerte /, 'GAA ').split(',')[0]; };
+    var swfOhneArt = _leiste && !_leiste.swf;
     hinterlegt.forEach(function (e) {
-      var link = e.quelle_url ? '<a href="' + esc(e.quelle_url) + '" target="_blank" rel="noopener">' + (/\.pdf(\?|$)/i.test(e.quelle_url) ? 'Bericht (PDF) öffnen' : 'Quelle öffnen') + '</a>' : '<span class="oe-leer">kein Link hinterlegt</span>';
-      zeilen.push('<div class="oe-qz"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>' + esc(e.ausschuss || q.ausschuss || '') + (e.jahrgang || e.berichtsjahr ? ' · ' + esc(e.jahrgang || e.berichtsjahr) : '') + (e.gebiet ? ' · ' + esc(e.gebiet) : '') + '</span>' + link + '</div>');
+      var istSwf = /sachwert|swf/i.test(String(e.kennzahl) + e.name);
+      var link = e.quelle_url ? '<a href="' + esc(e.quelle_url) + '" target="_blank" rel="noopener">' + (/\.pdf(\?|$)/i.test(e.quelle_url) ? 'Bericht (PDF)' : 'Quelle öffnen') + '</a>' : '<span class="oe-leer">kein Link hinterlegt</span>';
+      var text = esc(kurz(e.ausschuss || q.ausschuss)) + (e.jahrgang || e.berichtsjahr ? ' · ' + esc(e.jahrgang || e.berichtsjahr) : '') + (e.gebiet ? ' · ' + esc(e.gebiet) : '');
+      /* Faktor hinterlegt, aber nicht für diese Objektart (Lippe: nur EZFH) — EINE Zeile, nicht zwei */
+      if (istSwf && swfOhneArt) { text += ' · <span title="' + esc(_leiste.swfHinweis || '') + '">nicht für diese Objektart</span>'; swfOhneArt = false; }
+      zeilen.push('<div class="oe-qz' + (istSwf && /nicht für diese Objektart/.test(text) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
     });
     fehlt.forEach(function (e) {
-      zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — beim Gutachterausschuss' + (q && q.ausschuss ? ' (' + esc(q.ausschuss) + ')' : '') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
+      zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — ' + esc(kurz(q && q.ausschuss) || 'Gutachterausschuss') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     });
-    if (_leiste && !_leiste.swf && !fehlt.some(function (e) { return /swf|sachwert/.test(e.kennzahl); })) {
-      zeilen.push('<div class="oe-qz fehlt"><b>Sachwertfaktor</b><span>' + esc(_leiste.swfHinweis || 'für diese Objektart nicht hinterlegt') + '</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
+    if (swfOhneArt) {
+      zeilen.push('<div class="oe-qz fehlt"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet — ' + esc(kurz(_leiste.ausschuss || (q && q.ausschuss)) || 'Gutachterausschuss') + ' anfragen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     }
+    if (zeilen.some(function (z) { return /fehlt/.test(z); })) zeilen.push('<div class="oe-qz"><b></b><span class="oe-q">Unterlagen und Grundstücksmarktbericht anfragen:</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">beim Amt anfragen</button></div>');
     var brauchtAnfrage = fehlt.length > 0 || (_leiste && (!_leiste.zins || !_leiste.swf));
     if (hint) hint.innerHTML = brauchtAnfrage
       ? st('x', 'nötig') + 'Für dieses Objekt fehlt eine amtliche Kennzahl — Quelle unten, Anfrage mit einem Klick.'
