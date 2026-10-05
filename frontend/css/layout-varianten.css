@@ -6835,6 +6835,38 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     background:none !important; border:0 !important; border-radius:0 !important;
     box-shadow:none !important; padding:0 !important; margin:0 !important;
   }
+  /* ── v1889c · DER GRUND KAM MIT, DIE BEZIEHUNG NICHT ──────────────────────
+     Nachgemessen, nachdem das Register offen stand: `#sb-actions-accordion`
+     traegt in der Seitenleiste eine EIGENE weisse Flaeche - als zugeklapptes
+     Ueberlagerungsfeld faellt das nicht auf, offen ist es ein weisses Blatt
+     mitten im Obsidian. Gemessen im Grund-Leser:
+
+       .sb-act-l       rgb(205,175,90)  auf rgb(255,255,255)   k = 2,13
+       .sb-act-ico     rgb(201,168,76)  auf rgb(255,255,255)   k = 2,29
+       Gruppentitel    rgb(107,100,90)  auf rgb(255,255,255)   k = 5,84
+
+     > Genau die Falle aus CLAUDE.md: beim VERSCHIEBEN eines Blocks wandert
+     > die Farbbeziehung nicht mit. Der Block war fuer hellen Grund gebaut.
+
+     Die Sollwerte stehen nicht in meinem Kopf, sondern in der Schiene auf dem
+     Schreibtisch - dieselbe Ansicht, dieselbe Aufgabe. Dort gemessen:
+     Akkordeon und innerer Behaelter durchsichtig, Gruppentitel Gold
+     rgb(201,168,76), Eintraege rgb(191,183,169). Gegen rgb(14,13,11) ergibt
+     das k = 8,3 und k = 9,8. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion{
+    background:transparent !important; background-image:none !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-section-title{
+    color:var(--wl-c9a84c, #C9A84C) !important; background:transparent !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-item,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-l,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-ico{
+    color:#BFB7A9 !important; background:transparent !important; border-color:#26231E !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-item:hover{
+    background:#1A1815 !important;
+  }
   /* Der Aufklapper hat nichts mehr aufzuklappen - wie in der Schiene. */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn{
     display:none !important;
