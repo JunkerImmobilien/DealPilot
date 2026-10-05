@@ -31451,5 +31451,58 @@ bei 89, Reiter bei 197. Der Score bleibt auf der Objektkarte und im Reiter Bewer
 `tools/saat-pruefen.mjs` (Pflichtfelder und Dubletten einer Saatdatei, nennt seine Deckung).
 Auf Prod gezogen.
 
-**Rest.** Prod v1879c; Staging v1879c. Drei Erntelinien (HE-Zins, NW-Faktoren,
-ST/TH/SH/NI-Zins) laufen als Prüfläufe; Saat und Journal folgen.
+**Rest (Stand 12:15).** siehe (41).
+
+### (41) 05.10.2026 — v1880–v1880c: Handy-Menü, Aktenmappe als Standard, Modul Portfolio-Strategie, Ernte Hessen + NRW
+
+**Was.** Marcel (iPhone, Aktenmappe): „wenn du auf das Burger-Menü klickst, öffnet sich
+da was, wo nichts geöffnet wird. Da steht Quick Check und Marktbericht, sonst nichts …
+oben das Portfolio … alles nicht richtig skaliert … oben ist schwarz, dann so ein Braun.“
+Entscheidung: nur noch „Heute“ und „Aktenmappe“, Standard Aktenmappe. Dazu: „leg das
+modul portfolio strategie an nach dem zweiten weg“, und der Investor Deal Score soll auf
+dem Handy aus dem Kopf.
+
+**Gemessen (390 px, v1b).** Die Schiene NAHM Objekte, Suche, Aktionen und Nutzer aus der
+Seitenleiste (`nimmt`) — die Seitenleiste hatte nur Kopf und zwei Knöpfe, die Objektliste
+lag mit ihrer Sortierleiste in der 390-px-Schiene. Ton `dunkel` = Braun gegen den
+Obsidian-Kopf. Nach v1879 stand `#hdr-badges` wieder im Kopf (255 px), weil
+`html[data-dp-layout] body header.hdr #hdr-badges{display:flex}` (1,1,3) die Handy-Regel
+(1,0,1) schlug.
+
+**Gebaut (`ed6a04c` v1880, `499ee9b` v1880a, `53761ad` v1880b, `3a44851` v1880c).**
+- layout-varianten.js: unter 900 px nimmt die Schiene NICHTS (Marke + Portfolio-Knopf, der
+  die normale Seitenleiste öffnet); Schiene in Obsidian; ohne gemerkte Wahl `setze('v1b')`,
+  eine bewusste Wahl merkt `dp_layout_gewaehlt`; das Panel zeigt nur Heute und Aktenmappe
+  (Kanzlei/Tower bleiben im Code). Score-Kacheln auf dem Handy mit ID-Kette aus.
+- Modul Portfolio-Strategie: `portfolio-strategie.js` (Sektion neben dem Cockpit, Bestand
+  mit Spekulationsfrist § 23 und 15-%-Fenster § 6 Abs. 1 Nr. 1a aus dem Kaufdatum, Liste
+  der zehn Arbeitspakete, Platz für Versuchsreihen), Knopf in der Seitenleiste mit
+  `data-feature="portfolio_strategie"`, Migration 085 (Schlüssel in jedem Plan false,
+  Tabelle `portfolio_strategie_laeufe`). Auf Staging für den Partner-Plan per SQL an; Prod
+  bleibt aus (business/enterprise/free/investor/partner/pro/starter alle false — gemessen).
+  Die Liste `/objects` liefert nur eine Zusammenfassung (name, kaufpreis „780000.00“,
+  kaufdat, halter) — der Zahlenleser nahm „780000.00“ erst deutsch (78.000.000).
+- Ernte: `lzs-he-2026.json` (137 Sätze, 28 Gebiete, 14 Berichte aus dem gds.hessen.de-
+  Downloadcenter, 128 Werte + 9 Sperreinträge, Lizenz je Bericht: 11× zero-2-0, Frankfurt
+  und Kassel by-2-0) und `swf-nw-2026-block2.json` (69 Sätze, 19 Ausschüsse, Prüfstrecke
+  48 Modelle / 115 ok / 0 Fehler, Maschinenvergleich 1.112 Zellen; Aachen ohne gedrucktes
+  Anwendungsbeispiel → `abnahme: plausibilitaet_ohne_soll`, Marcels Entscheidung).
+  `tools/saat-pruefen.mjs` prüft Pflichtfelder und Dubletten einer Saatdatei.
+- swf_modelle.js `verzweigt`: `tabellenwert` ist jetzt der Dokumentwert (Prozent wurde
+  zweimal durch 100 geteilt, Heppenheim ETW 0,034 → 0), und `kennzahl` reist ins Untermodell.
+
+**Nachweis.** Handy 390 (Messkabine): Schiene 87 px Obsidian, Teile `[]`, Burger → Seitenleiste
+mit 19 Karten (x = 0), Portfolio-Knopf → Seitenleiste, `#hdr-badges` 0 px, Kopf bei 89, Reiter
+bei 197; ohne gemerkte Wahl `data-dp-layout="v1b"`. Staging-Register: HE Zins 145 Sätze / 28
+AGS (vorher 9), NW Faktoren 103 Sätze / 41 AGS / 35 Ausschüsse (vorher 16); Frankfurt 60311
+liefert die Lage-Zweige über `/marktbericht/quellen`. **Prod-Rollout v1880c:** Sicherungen
+`prod-*-20261005-1211-vor-v1880` (11 MB/70 Tabellen, 1,2 MB/26), Migration 085 angewandt,
+beide Backends neu gebaut, HE und NW gesät (Prod = Staging: 145/28, 103/41).
+
+**Offen.** Herford und Minden-Lübbecke erreichen das Register nicht — `zustaendig(ags)`
+schickt beide an handgeschriebene Module (`sachwertfaktoren_herford.js`,
+`sachwertfaktoren_nrw.js` mit GMB 2025); das ML-Modul verdeckt den 2026-Satz (Hüllhorst 300k/
+RND 60: 0,80 statt 0,90). Kreissätze ohne Ausschluss decken Städte mit eigenem Ausschuss
+(Moers, Dinslaken, Rheine, Bocholt, Minden). Frankfurts negative Bandwerte lehnt der
+Auswerter ab (≤ 0). Kassel 2026 Sachwertfaktoren (Tab. 29–31) ersetzen den 2024er Stand —
+eigene Nachernte. Dritte Erntelinie (ST/TH/SH/NI) läuft noch.

@@ -265,7 +265,20 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
-### N20 · Aktenmappe auf dem Handy unbrauchbar (05.10.2026) — erledigt v1879/v1879a, auf Prod
+### N22 · Modul Portfolio-Strategie (05.10.2026) — angelegt v1880, hinter Feature-Schlüssel
+
+Weg 2 (Marcels Wahl): im Repo, hinter `portfolio_strategie` (Migration 085, überall false;
+Staging Partner-Plan an). Heute: Bestand mit Fristen (AP 7), AP-Liste, Tabelle für Läufe.
+**Nächste Schritte:** volles Objekt je Zeile (Sanierungsquote, AfA-Reihe), Investorprofil (AP 9),
+erste Versuchsreihe AP 6 mit vorab gesetzter Schwelle (< 2 % zum Referenzoptimum kleiner Bestände).
+
+### N23 · Ernte 05.10.2026 — Hessen-Zins (137) und NRW-Faktoren Block 2 (69) auf Staging und Prod
+
+Offen: Herford/Minden-Lübbecke werden von Hand-Modulen verdeckt (Register nie erreicht);
+Kreissätze decken Städte mit eigenem Ausschuss; Aachen ohne Soll; Kassel SWF 2026 nachernten;
+negative Zinssätze (Frankfurt) lehnt der Auswerter ab. Dritte Linie ST/TH/SH/NI folgt.
+
+### N20 · Aktenmappe auf dem Handy unbrauchbar (05.10.2026) — erledigt v1879–v1880c, auf Prod; nur Heute + Aktenmappe, Standard Aktenmappe
 
 Feste Schiene 187 px über 146 px Polster deckte Menü-Knopf und Kopfzeile ab,
 Score-Leiste 808 px breit. Jetzt im Fluss, kompakt. **Offen:** die anderen
