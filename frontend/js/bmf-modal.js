@@ -2057,6 +2057,36 @@ function _bmfModVorbelegen(){
   return n;
 }
 
+/* v1872 · DER STILLE VORLAUF. Marcel: „wenn man Pro hat und alle Werte da
+   sind, dass wir das schon mal ausrechnen vorher und nicht jedes Mal nur beim
+   Aufruf." Sechs Sekunden nach dem Laden eines Objekts, nur mit Pro
+   (bmf_advanced), nur wenn keine Pflichtangabe fehlt, einmal je Objekt und
+   Sitzung: die Vorlage wird unsichtbar geladen, aus dem Reiter Investition
+   gefüllt und die Pipeline läuft. Der Server merkt sich das Ergebnis je
+   Eingabe-Hash (bmf_cache) — beim Öffnen kommt es dann in Millisekunden.
+   Läuft gerade ein Lauf, lässt der Server den Vorlauf aus (202). */
+var _bmfVorgewaermt = {};
+function _bmfVorwaermen(){
+  try {
+    if (!_hasBmfAdvanced()) return;
+    var key = window._currentObjKey; if (!key || _bmfVorgewaermt[key]) return;
+    var ov = $('bmfOverlay'); if (ov && ov.getBoundingClientRect().height > 0) return;   /* offen → der Nutzer rechnet selbst */
+    _ensureModalLoaded(function(ok){
+      if (!ok) return;
+      try { if (typeof syncFromTabInvest === 'function') syncFromTabInvest(); } catch(e) {}
+      try { _bmfModVorbelegen(); } catch(e) {}
+      var fehlt = (typeof _bmfFehlend === 'function') ? _bmfFehlend() : [];
+      if (fehlt.length) return;
+      if (window._currentObjKey !== key) return;
+      _bmfVorgewaermt[key] = 1;
+      window._bmfPrewarm = true;
+      try { if (typeof window._v292Pipeline === 'function') window._v292Pipeline(); } catch(e) {}
+      setTimeout(function(){ window._bmfPrewarm = false; }, 4000);
+    });
+  } catch(e) {}
+}
+window.addEventListener('dp:object-ready', function(){ setTimeout(_bmfVorwaermen, 6000); });
+
 function openBMFModal(){
   /* v1493: nach dem Vorbefuellen den Reiterzustand setzen. Ohne das stand
      die Sperre aus dem Moment des Oeffnens, als die Felder noch leer waren. */

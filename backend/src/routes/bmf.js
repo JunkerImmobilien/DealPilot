@@ -20,6 +20,41 @@ const express = require('express');
 const { authenticate } = require('../middleware/auth');
 const { requireFeature } = require('../middleware/planLimits');
 const bmfPipelineService = require('../services/bmfPipelineService');  /* V290-pipeline-require */
+/* v1872 · Der Lauf wird je Eingabe-Hash gemerkt (Tabelle bmf_cache, Migration 084).
+   Gemessen an der Parkstr. 9: 40 s je Lauf, weil LibreOffice die
+   BMF-Arbeitshilfe neu rechnet. Gleiche Eingaben, gleiches Ergebnis — der
+   zweite Aufruf kommt in Millisekunden. `prewarm` ist der stille Vorlauf aus
+   dem Frontend (Objekt geladen, Pro, alles da): er stellt sich hinten an,
+   wenn gerade ein Lauf arbeitet, statt einen zweiten LibreOffice zu starten. */
+const crypto = require('crypto');
+const { query: dbQuery } = require('../db/pool');
+let _bmfLaufend = 0;
+function _stabil(v) {
+  if (Array.isArray(v)) return v.map(_stabil);
+  if (v && typeof v === 'object') { const o = {}; Object.keys(v).sort().forEach((k) => { o[k] = _stabil(v[k]); }); return o; }
+  return v;
+}
+function _bmfHash(inputs) {
+  return crypto.createHash('sha256').update(JSON.stringify(_stabil(inputs))).digest('hex');
+}
+async function _cacheLesen(hash) {
+  try {
+    const r = await dbQuery('SELECT result, created_at FROM bmf_cache WHERE hash = $1', [hash]);
+    if (!r.rows.length) return null;
+    dbQuery('UPDATE bmf_cache SET letzter_zugriff = now() WHERE hash = $1', [hash]).catch(() => {});
+    return r.rows[0];
+  } catch (e) { return null; }   /* Tabelle fehlt (Migration nicht gelaufen) → ohne Cache weiter */
+}
+async function _cacheSchreiben(hash, userId, inputs, result, dauerMs) {
+  try {
+    await dbQuery(
+      `INSERT INTO bmf_cache (hash, user_id, inputs, result, dauer_ms)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (hash) DO UPDATE SET result = EXCLUDED.result, dauer_ms = EXCLUDED.dauer_ms, letzter_zugriff = now()`,
+      [hash, userId || null, JSON.stringify(inputs), JSON.stringify(result), dauerMs]);
+    if (Math.random() < 0.05) dbQuery(`DELETE FROM bmf_cache WHERE created_at < now() - interval '60 days'`).catch(() => {});
+  } catch (e) { /* kein Cache ist kein Fehler */ }
+}
 const bmfService = require('../services/bmfService');
 
 const router = express.Router();
@@ -157,8 +192,26 @@ router.post('/pipeline', authenticate, requireFeature('bmf_advanced'), async (re
       });
     }
 
-    const result = await bmfPipelineService.runPipeline(body);
-    res.json(result);
+    /* v1872 · Cache vor dem Lauf */
+    const prewarm = !!body.prewarm;
+    /* gehasht wird genau das, was runPipeline liest (phase1_inputs oder der Body) — ohne die Vorlauf-Markierung */
+    const eingaben = body.phase1_inputs || Object.assign({}, body, { prewarm: undefined });
+    const hash = _bmfHash(eingaben);
+    const treffer = await _cacheLesen(hash);
+    if (treffer && treffer.result) {
+      return res.json(Object.assign({}, treffer.result, { _cache: { hit: true, created_at: treffer.created_at, hash: hash.slice(0, 12) } }));
+    }
+    if (prewarm && _bmfLaufend > 0) {
+      return res.status(202).json({ ok: false, queued: false, grund: 'LibreOffice rechnet gerade — Vorlauf übersprungen' });
+    }
+    _bmfLaufend++;
+    const t0 = Date.now();
+    let result;
+    try { result = await bmfPipelineService.runPipeline(body); }
+    finally { _bmfLaufend--; }
+    const dauer = Date.now() - t0;
+    if (result && result.ok !== false) await _cacheSchreiben(hash, req.user && req.user.id, eingaben, result, dauer);
+    res.json(Object.assign({}, result, { _cache: { hit: false, dauer_ms: dauer, hash: hash.slice(0, 12) } }));
   } catch (err) {
     if (err && err.code === 'LIBREOFFICE_ERROR') {
       return res.status(500).json({

@@ -81,9 +81,16 @@
       + (!d.gepflegt && !d.body && !w ? '<div class="dp-feldhilfe-body dp-feldhilfe-leer">Zu diesem Feld gibt es noch keinen Hilfetext.</div>' : '');
     document.body.appendChild(pop);
     var r = f.getBoundingClientRect(), pr = pop.getBoundingClientRect();
-    var top = r.bottom + window.scrollY + 4, left = r.left + window.scrollX;
-    var maxLeft = window.innerWidth + window.scrollX - pr.width - 12; if (left > maxLeft) left = maxLeft; if (left < 8) left = 8;
-    if (r.bottom + pr.height + 16 > window.innerHeight) top = r.top + window.scrollY - pr.height - 4;
+    /* v1871a · Marcel (BMF-Rechner): „wenn ich mit der Maus über ein Feld fahre,
+       kann man das teilweise nicht richtig lesen." Gemessen: das Popup stand
+       bei (8, 0) — Seitenkoordinaten (scrollY) für ein Feld in einem
+       position:fixed-Modal. Jetzt fixed im Viewport, ohne Scroll-Versatz,
+       und in den Rand geklemmt. */
+    pop.style.position = 'fixed';
+    var top = r.bottom + 4, left = r.left;
+    var maxLeft = window.innerWidth - pr.width - 12; if (left > maxLeft) left = maxLeft; if (left < 8) left = 8;
+    if (r.bottom + pr.height + 16 > window.innerHeight) top = r.top - pr.height - 4;
+    if (top < 8) top = 8;
     pop.style.top = top + 'px'; pop.style.left = left + 'px';
     _pop = pop; _aktiv = f;
   }

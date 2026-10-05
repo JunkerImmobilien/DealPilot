@@ -227,7 +227,8 @@
     fetch('/api/v1/bmf/pipeline', {
       method: 'POST',
       headers: _authHeaders(),
-      body: JSON.stringify(inputs)
+      /* v1872 · stiller Vorlauf (bmf-modal.js _bmfVorwaermen): der Server weiss, dass niemand wartet */
+      body: JSON.stringify(window._bmfPrewarm ? Object.assign({}, inputs, { prewarm: true }) : inputs)
     })
     .then(function(r){
       if (!r.ok) {
