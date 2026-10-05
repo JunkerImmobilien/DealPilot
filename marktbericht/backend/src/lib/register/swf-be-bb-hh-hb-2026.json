@@ -1,0 +1,450 @@
+[
+ {
+  "land_code": "HB",
+  "ags": "04012",
+  "ebene": "kreis",
+  "gebiet_name": "Bremerhaven, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Gutachterausschuss Bremerhaven führt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (Grundstücksmarktbericht 2026, Kapitel 5.4.2 (S. 34)). Frei ist nur der „allgemeine Teil“ (17 Blatt: S. 1–13 und 42–43; am 05.10.2026 per pdftotext gemessen — die Kapitel 5.4 Sachwertfaktoren S. 31–37 und 5.5 Liegenschaftszinssätze S. 38–40 fehlen darin). Der vollständige Bericht ist über die Geschäftsstelle zu bestellen (Gutachterausschuss@magistrat.bremerhaven.de, Tel. 0471 590-3334/-3354; Gebühr nach VermWertKostV) und darf laut Impressum nur mit Genehmigung des Herausgebers vervielfältigt und verbreitet werden. Entscheidung für Marcel: Vollbericht bestellen und Genehmigung einholen."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modellbeschreibungen (Kap. 5.4.1, 5.5.1) stehen im kostenpflichtigen vollständigen Bericht; nicht gelesen."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Bremerhaven",
+   "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+   "kauffaelle_zeitraum": "2025",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "GMB Bremerhaven 2026, Kap. 5.4.2 (S. 34) — nicht im freien Teil",
+    "wert": null,
+    "fallzahl": null,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Bremerhaven 2026",
+  "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite Inhaltsverzeichnis (Blatt 5) des freien Teils, am 05.10.2026 gelesen)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Bremerhaven, Grundstücksmarktbericht 2026 (Berichtszeitraum 01.01.2025–31.12.2025)",
+  "lizenz": "alle Rechte vorbehalten (Vervielfältigung, Nachdruck und Verbreitung nur mit Genehmigung des Herausgebers)",
+  "lizenz_hinweis": "Impressum S. 1 des freien Teils: „Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung, Nachdruck und Verbreitung auch auszugsweise nur mit Genehmigung des Herausgebers und unter Angabe der Quelle gestattet.“ Gebühr: „gemäß VermWertKostV in der aktuellen Fassung“.",
+  "auflagen": "",
+  "fundstelle": "GMB Bremerhaven 2026, Kap. 5.4.2 (S. 34) — nicht im freien Teil",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Gutachterausschuss Bremerhaven führt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (Grundstücksmarktbericht 2026, Kapitel 5.4.2 (S. 34)). Frei ist nur der „allgemeine Teil“ (17 Blatt: S. 1–13 und 42–43; am 05.10.2026 per pdftotext gemessen — die Kapitel 5.4 Sachwertfaktoren S. 31–37 und 5.5 Liegenschaftszinssätze S. 38–40 fehlen darin). Der vollständige Bericht ist über die Geschäftsstelle zu bestellen (Gutachterausschuss@magistrat.bremerhaven.de, Tel. 0471 590-3334/-3354; Gebühr nach VermWertKostV) und darf laut Impressum nur mit Genehmigung des Herausgebers vervielfältigt und verbreitet werden. Entscheidung für Marcel: Vollbericht bestellen und Genehmigung einholen.",
+  "unvollstaendig_grund": "Der Gutachterausschuss Bremerhaven führt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (Grundstücksmarktbericht 2026, Kapitel 5.4.2 (S. 34)). Frei ist nur der „allgemeine Teil“ (17 Blatt: S. 1–13 und 42–43; am 05.10.2026 per pdftotext gemessen — die Kapitel 5.4 Sachwertfaktoren S. 31–37 und 5.5 Liegenschaftszinssätze S. 38–40 fehlen darin). Der vollständige Bericht ist über die Geschäftsstelle zu bestellen (Gutachterausschuss@magistrat.bremerhaven.de, Tel. 0471 590-3334/-3354; Gebühr nach VermWertKostV) und darf laut Impressum nur mit Genehmigung des Herausgebers vervielfältigt und verbreitet werden. Entscheidung für Marcel: Vollbericht bestellen und Genehmigung einholen."
+ },
+ {
+  "land_code": "HB",
+  "ags": "04012",
+  "ebene": "kreis",
+  "gebiet_name": "Bremerhaven, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Gutachterausschuss Bremerhaven führt Sachwertfaktoren für Reihenhäuser und Doppelhaushälften (Grundstücksmarktbericht 2026, Kapitel 5.4.3 (S. 36)). Frei ist nur der „allgemeine Teil“ (17 Blatt: S. 1–13 und 42–43; am 05.10.2026 per pdftotext gemessen — die Kapitel 5.4 Sachwertfaktoren S. 31–37 und 5.5 Liegenschaftszinssätze S. 38–40 fehlen darin). Der vollständige Bericht ist über die Geschäftsstelle zu bestellen (Gutachterausschuss@magistrat.bremerhaven.de, Tel. 0471 590-3334/-3354; Gebühr nach VermWertKostV) und darf laut Impressum nur mit Genehmigung des Herausgebers vervielfältigt und verbreitet werden. Entscheidung für Marcel: Vollbericht bestellen und Genehmigung einholen."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Modellbeschreibungen (Kap. 5.4.1, 5.5.1) stehen im kostenpflichtigen vollständigen Bericht; nicht gelesen."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadt Bremerhaven",
+   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+   "kauffaelle_zeitraum": "2025",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "GMB Bremerhaven 2026, Kap. 5.4.3 (S. 36) — nicht im freien Teil",
+    "wert": null,
+    "fallzahl": null,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Bremerhaven 2026",
+  "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite Inhaltsverzeichnis (Blatt 5) des freien Teils, am 05.10.2026 gelesen)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Bremerhaven, Grundstücksmarktbericht 2026 (Berichtszeitraum 01.01.2025–31.12.2025)",
+  "lizenz": "alle Rechte vorbehalten (Vervielfältigung, Nachdruck und Verbreitung nur mit Genehmigung des Herausgebers)",
+  "lizenz_hinweis": "Impressum S. 1 des freien Teils: „Der Grundstücksmarktbericht ist urheberrechtlich geschützt. Vervielfältigung, Nachdruck und Verbreitung auch auszugsweise nur mit Genehmigung des Herausgebers und unter Angabe der Quelle gestattet.“ Gebühr: „gemäß VermWertKostV in der aktuellen Fassung“.",
+  "auflagen": "",
+  "fundstelle": "GMB Bremerhaven 2026, Kap. 5.4.3 (S. 36) — nicht im freien Teil",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Gutachterausschuss Bremerhaven führt Sachwertfaktoren für Reihenhäuser und Doppelhaushälften (Grundstücksmarktbericht 2026, Kapitel 5.4.3 (S. 36)). Frei ist nur der „allgemeine Teil“ (17 Blatt: S. 1–13 und 42–43; am 05.10.2026 per pdftotext gemessen — die Kapitel 5.4 Sachwertfaktoren S. 31–37 und 5.5 Liegenschaftszinssätze S. 38–40 fehlen darin). Der vollständige Bericht ist über die Geschäftsstelle zu bestellen (Gutachterausschuss@magistrat.bremerhaven.de, Tel. 0471 590-3334/-3354; Gebühr nach VermWertKostV) und darf laut Impressum nur mit Genehmigung des Herausgebers vervielfältigt und verbreitet werden. Entscheidung für Marcel: Vollbericht bestellen und Genehmigung einholen.",
+  "unvollstaendig_grund": "Der Gutachterausschuss Bremerhaven führt Sachwertfaktoren für Reihenhäuser und Doppelhaushälften (Grundstücksmarktbericht 2026, Kapitel 5.4.3 (S. 36)). Frei ist nur der „allgemeine Teil“ (17 Blatt: S. 1–13 und 42–43; am 05.10.2026 per pdftotext gemessen — die Kapitel 5.4 Sachwertfaktoren S. 31–37 und 5.5 Liegenschaftszinssätze S. 38–40 fehlen darin). Der vollständige Bericht ist über die Geschäftsstelle zu bestellen (Gutachterausschuss@magistrat.bremerhaven.de, Tel. 0471 590-3334/-3354; Gebühr nach VermWertKostV) und darf laut Impressum nur mit Genehmigung des Herausgebers vervielfältigt und verbreitet werden. Entscheidung für Marcel: Vollbericht bestellen und Genehmigung einholen."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "etw",
+  "objektart": "etw",
+  "objektart_bez": "Eigentumswohnungen",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Gutachterausschuss Berlin leitet Sachwertfaktoren NUR für Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser ab (Sachwertfaktoren 2025, Tabellen 1 und 4–6; swf-be.json). Für Eigentumswohnungen gibt es keinen amtlichen Berliner Sachwertfaktor. Weg: amtliche Vergleichsfaktoren für Wohnungseigentum (artikel.1377983.php); Sachwertverfahren ist für ETW in Berlin nicht das amtliche Modell."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Siehe swf-be.json (Ein-/Zweifamilienhäuser, DHH, REH, RMH in drei Gebietsgruppen)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Land Berlin",
+   "objektart_bez": "Eigentumswohnungen",
+   "kauffaelle_zeitraum": "2022–2024",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Sachwertfaktoren 2025, S. 1 (Objektarten: Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser); am 05.10.2026 geprüft: Koeffizienten 1,398 / 0,000000280 / 0,0002759 unverändert, kein Jahrgang 2026 veröffentlicht",
+    "wert": null,
+    "fallzahl": null,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "Sachwertfaktoren 2025 GAA Berlin",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-03-010-2500.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite 1, 7, am 05.10.2026 gelesen)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Sachwertfaktoren 2025 zum Stichtag 31.12.2024, Amtsblatt für Berlin Nr. 29 vom 11.07.2025 S. 1852 ff. (Stand 04.02.2026)",
+  "lizenz": "amtliche Veröffentlichung im Amtsblatt, frei zugänglich",
+  "lizenz_hinweis": "Wie swf-be.json.",
+  "auflagen": "",
+  "fundstelle": "Sachwertfaktoren 2025, S. 1 (Objektarten: Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser); am 05.10.2026 geprüft: Koeffizienten 1,398 / 0,000000280 / 0,0002759 unverändert, kein Jahrgang 2026 veröffentlicht",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Gutachterausschuss Berlin leitet Sachwertfaktoren NUR für Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser ab (Sachwertfaktoren 2025, Tabellen 1 und 4–6; swf-be.json). Für Eigentumswohnungen gibt es keinen amtlichen Berliner Sachwertfaktor. Weg: amtliche Vergleichsfaktoren für Wohnungseigentum (artikel.1377983.php); Sachwertverfahren ist für ETW in Berlin nicht das amtliche Modell.",
+  "unvollstaendig_grund": "Der Gutachterausschuss Berlin leitet Sachwertfaktoren NUR für Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser ab (Sachwertfaktoren 2025, Tabellen 1 und 4–6; swf-be.json). Für Eigentumswohnungen gibt es keinen amtlichen Berliner Sachwertfaktor. Weg: amtliche Vergleichsfaktoren für Wohnungseigentum (artikel.1377983.php); Sachwertverfahren ist für ETW in Berlin nicht das amtliche Modell."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser (Mietwohnhäuser)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Gutachterausschuss Berlin leitet Sachwertfaktoren NUR für Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser ab (Sachwertfaktoren 2025, Tabellen 1 und 4–6; swf-be.json). Für Mehrfamilienhäuser (Mietwohnhäuser) gibt es keinen amtlichen Berliner Sachwertfaktor. Weg: Ertragswertverfahren mit den Liegenschaftszinssätzen 2025 (lzs-be-2025.json)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Siehe swf-be.json (Ein-/Zweifamilienhäuser, DHH, REH, RMH in drei Gebietsgruppen)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Land Berlin",
+   "objektart_bez": "Mehrfamilienhäuser (Mietwohnhäuser)",
+   "kauffaelle_zeitraum": "2022–2024",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Sachwertfaktoren 2025, S. 1 (Objektarten: Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser); am 05.10.2026 geprüft: Koeffizienten 1,398 / 0,000000280 / 0,0002759 unverändert, kein Jahrgang 2026 veröffentlicht",
+    "wert": null,
+    "fallzahl": null,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "Sachwertfaktoren 2025 GAA Berlin",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-03-010-2500.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite 1, 7, am 05.10.2026 gelesen)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Sachwertfaktoren 2025 zum Stichtag 31.12.2024, Amtsblatt für Berlin Nr. 29 vom 11.07.2025 S. 1852 ff. (Stand 04.02.2026)",
+  "lizenz": "amtliche Veröffentlichung im Amtsblatt, frei zugänglich",
+  "lizenz_hinweis": "Wie swf-be.json.",
+  "auflagen": "",
+  "fundstelle": "Sachwertfaktoren 2025, S. 1 (Objektarten: Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser); am 05.10.2026 geprüft: Koeffizienten 1,398 / 0,000000280 / 0,0002759 unverändert, kein Jahrgang 2026 veröffentlicht",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Gutachterausschuss Berlin leitet Sachwertfaktoren NUR für Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser ab (Sachwertfaktoren 2025, Tabellen 1 und 4–6; swf-be.json). Für Mehrfamilienhäuser (Mietwohnhäuser) gibt es keinen amtlichen Berliner Sachwertfaktor. Weg: Ertragswertverfahren mit den Liegenschaftszinssätzen 2025 (lzs-be-2025.json).",
+  "unvollstaendig_grund": "Der Gutachterausschuss Berlin leitet Sachwertfaktoren NUR für Ein- und Zweifamilienhäuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser ab (Sachwertfaktoren 2025, Tabellen 1 und 4–6; swf-be.json). Für Mehrfamilienhäuser (Mietwohnhäuser) gibt es keinen amtlichen Berliner Sachwertfaktor. Weg: Ertragswertverfahren mit den Liegenschaftszinssätzen 2025 (lzs-be-2025.json)."
+ },
+ {
+  "land_code": "HB",
+  "ags": "04011",
+  "ebene": "kreis",
+  "gebiet_name": "Bremen, Stadtgemeinde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Es gibt keinen Wert — nicht kostenpflichtig, sondern gar nicht: GMB Bremen 2026, Kap. 8.4 (S. 130, im freien Auszug): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen. Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen.“ Weg: Auskunft aus der Kaufpreissammlung (240 € bis 15 Kauffälle, gutachterausschuss@geo.bremen.de). Kein Nachbarwert aus Niedersachsen (verboten). Wiedervorlage jährlich am neuen Auszug (verfuegbarkeit-hb.json)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "entfällt — der Ausschuss ermittelt keine Sachwertfaktoren."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgemeinde Bremen",
+   "objektart_bez": "Ein- und Zweifamilienhäuser",
+   "kauffaelle_zeitraum": "2025",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Grundstücksmarktbericht Bremen 2026 (Auszug), Kap. 8.4 Sachwertfaktoren, S. 130",
+    "wert": null,
+    "fallzahl": null,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Bremen 2026",
+  "quelle_url": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite 130, am 05.10.2026 gelesen)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Bremen, Grundstücksmarktbericht 2026 (Auszug), Kap. 8.4",
+  "lizenz": "alle Rechte vorbehalten (Website: CC BY-NC-ND; Vervielfältigung nur mit Genehmigung)",
+  "lizenz_hinweis": "Auszug S. 135: Vervielfältigung und Verbreitung nur mit Genehmigung; Website: CC BY-NC-ND.",
+  "auflagen": "",
+  "fundstelle": "Grundstücksmarktbericht Bremen 2026 (Auszug), Kap. 8.4 Sachwertfaktoren, S. 130",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Es gibt keinen Wert — nicht kostenpflichtig, sondern gar nicht: GMB Bremen 2026, Kap. 8.4 (S. 130, im freien Auszug): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen. Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen.“ Weg: Auskunft aus der Kaufpreissammlung (240 € bis 15 Kauffälle, gutachterausschuss@geo.bremen.de). Kein Nachbarwert aus Niedersachsen (verboten). Wiedervorlage jährlich am neuen Auszug (verfuegbarkeit-hb.json).",
+  "unvollstaendig_grund": "Es gibt keinen Wert — nicht kostenpflichtig, sondern gar nicht: GMB Bremen 2026, Kap. 8.4 (S. 130, im freien Auszug): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen. Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen.“ Weg: Auskunft aus der Kaufpreissammlung (240 € bis 15 Kauffälle, gutachterausschuss@geo.bremen.de). Kein Nachbarwert aus Niedersachsen (verboten). Wiedervorlage jährlich am neuen Auszug (verfuegbarkeit-hb.json)."
+ },
+ {
+  "land_code": "HB",
+  "ags": "04011",
+  "ebene": "kreis",
+  "gebiet_name": "Bremen, Stadtgemeinde",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Es gibt keinen Wert — nicht kostenpflichtig, sondern gar nicht: GMB Bremen 2026, Kap. 8.4 (S. 130, im freien Auszug): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen. Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen.“ Weg: Auskunft aus der Kaufpreissammlung (240 € bis 15 Kauffälle, gutachterausschuss@geo.bremen.de). Kein Nachbarwert aus Niedersachsen (verboten). Wiedervorlage jährlich am neuen Auszug (verfuegbarkeit-hb.json)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "entfällt — der Ausschuss ermittelt keine Sachwertfaktoren."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtgemeinde Bremen",
+   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+   "kauffaelle_zeitraum": "2025",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Grundstücksmarktbericht Bremen 2026 (Auszug), Kap. 8.4 Sachwertfaktoren, S. 130",
+    "wert": null,
+    "fallzahl": null,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2026,
+  "modellversion": "GMB Bremen 2026",
+  "quelle_url": "https://www.gutachterausschuss.bremen.de/sixcms/media.php/13/Auszug_Grundst%C3%BCcksmarktbericht%20Bremen%202026_gesichert.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite 130, am 05.10.2026 gelesen)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Bremen, Grundstücksmarktbericht 2026 (Auszug), Kap. 8.4",
+  "lizenz": "alle Rechte vorbehalten (Website: CC BY-NC-ND; Vervielfältigung nur mit Genehmigung)",
+  "lizenz_hinweis": "Auszug S. 135: Vervielfältigung und Verbreitung nur mit Genehmigung; Website: CC BY-NC-ND.",
+  "auflagen": "",
+  "fundstelle": "Grundstücksmarktbericht Bremen 2026 (Auszug), Kap. 8.4 Sachwertfaktoren, S. 130",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Es gibt keinen Wert — nicht kostenpflichtig, sondern gar nicht: GMB Bremen 2026, Kap. 8.4 (S. 130, im freien Auszug): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen. Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen.“ Weg: Auskunft aus der Kaufpreissammlung (240 € bis 15 Kauffälle, gutachterausschuss@geo.bremen.de). Kein Nachbarwert aus Niedersachsen (verboten). Wiedervorlage jährlich am neuen Auszug (verfuegbarkeit-hb.json).",
+  "unvollstaendig_grund": "Es gibt keinen Wert — nicht kostenpflichtig, sondern gar nicht: GMB Bremen 2026, Kap. 8.4 (S. 130, im freien Auszug): „Aufgrund unzureichender Personalausstattung seiner Geschäftsstelle sieht sich der Gutachterausschuss Bremen derzeit nicht in der Lage, dieser zusätzlichen Aufgabe nachzukommen. Sachverständigen wird daher empfohlen, für Verkehrswertableitungen einzelfallbezogene Vergleichskaufpreise (Auskünfte aus der Kaufpreissammlung) einzuholen.“ Weg: Auskunft aus der Kaufpreissammlung (240 € bis 15 Kauffälle, gutachterausschuss@geo.bremen.de). Kein Nachbarwert aus Niedersachsen (verboten). Wiedervorlage jährlich am neuen Auszug (verfuegbarkeit-hb.json)."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12071",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Spree-Neiße",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Einfamilienhäuser",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der jüngste Bericht ist der GMB 2024 (ein GMB 2025 lag am 05.10.2026 nicht vor). Kap. 8.3.1 (S. 78–79) druckt KEINE Funktion und KEINE Tabelle nach vorläufigem Sachwert, sondern Stichproben-Mittelwerte des Sachwertfaktors je Baujahrsklasse × Standardstufe × Modernisierung × Bauart (2 bis 13 Fälle je Zelle, Spannen bis 0,55–1,36; Stichtag 01.01.2024; 149 Datensätze 2023/2024) mit dem Hinweis, die Einflussgrößen „überlagern sich“. Ein Faktor aus diesen Gruppenmitteln wäre eine eigene Ableitung, keine amtliche. Weg: GMB 2024 S. 78–79 (Gruppenmittel als Orientierung) oder Auskunft der Geschäftsstelle (gaa-spn-osl@lkspn.de, 0355 / 49 91 – 22 47)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Anlage 8 des GMB 2024 (Sachwertmodell nach VV EW-SW); nicht im Detail gelesen."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreise Spree-Neiße und Oberspreewald-Lausitz gemeinsam",
+   "objektart_bez": "Einfamilienhäuser",
+   "kauffaelle_zeitraum": "2023–2024",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 8.3.1 Sachwertfaktoren für Einfamilienhäuser, S. 77–79",
+    "wert": null,
+    "fallzahl": 149,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": 149,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024 Spree-Neiße/OSL",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite 77–79, am 05.10.2026 gelesen)",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2024, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de — Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Impressum des Berichts: „Für den Grundstücksmarktbericht gilt die Lizenz Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)“ — Quellenvermerk mit Lizenz, Lizenztext-Link und Internetadresse ist PFLICHT.",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). ",
+  "fundstelle": "Kap. 8.3.1 Sachwertfaktoren für Einfamilienhäuser, S. 77–79",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der jüngste Bericht ist der GMB 2024 (ein GMB 2025 lag am 05.10.2026 nicht vor). Kap. 8.3.1 (S. 78–79) druckt KEINE Funktion und KEINE Tabelle nach vorläufigem Sachwert, sondern Stichproben-Mittelwerte des Sachwertfaktors je Baujahrsklasse × Standardstufe × Modernisierung × Bauart (2 bis 13 Fälle je Zelle, Spannen bis 0,55–1,36; Stichtag 01.01.2024; 149 Datensätze 2023/2024) mit dem Hinweis, die Einflussgrößen „überlagern sich“. Ein Faktor aus diesen Gruppenmitteln wäre eine eigene Ableitung, keine amtliche. Weg: GMB 2024 S. 78–79 (Gruppenmittel als Orientierung) oder Auskunft der Geschäftsstelle (gaa-spn-osl@lkspn.de, 0355 / 49 91 – 22 47).",
+  "unvollstaendig_grund": "Der jüngste Bericht ist der GMB 2024 (ein GMB 2025 lag am 05.10.2026 nicht vor). Kap. 8.3.1 (S. 78–79) druckt KEINE Funktion und KEINE Tabelle nach vorläufigem Sachwert, sondern Stichproben-Mittelwerte des Sachwertfaktors je Baujahrsklasse × Standardstufe × Modernisierung × Bauart (2 bis 13 Fälle je Zelle, Spannen bis 0,55–1,36; Stichtag 01.01.2024; 149 Datensätze 2023/2024) mit dem Hinweis, die Einflussgrößen „überlagern sich“. Ein Faktor aus diesen Gruppenmitteln wäre eine eigene Ableitung, keine amtliche. Weg: GMB 2024 S. 78–79 (Gruppenmittel als Orientierung) oder Auskunft der Geschäftsstelle (gaa-spn-osl@lkspn.de, 0355 / 49 91 – 22 47)."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12066",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Oberspreewald-Lausitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Einfamilienhäuser",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der jüngste Bericht ist der GMB 2024 (ein GMB 2025 lag am 05.10.2026 nicht vor). Kap. 8.3.1 (S. 78–79) druckt KEINE Funktion und KEINE Tabelle nach vorläufigem Sachwert, sondern Stichproben-Mittelwerte des Sachwertfaktors je Baujahrsklasse × Standardstufe × Modernisierung × Bauart (2 bis 13 Fälle je Zelle, Spannen bis 0,55–1,36; Stichtag 01.01.2024; 149 Datensätze 2023/2024) mit dem Hinweis, die Einflussgrößen „überlagern sich“. Ein Faktor aus diesen Gruppenmitteln wäre eine eigene Ableitung, keine amtliche. Weg: GMB 2024 S. 78–79 (Gruppenmittel als Orientierung) oder Auskunft der Geschäftsstelle (gaa-spn-osl@lkspn.de, 0355 / 49 91 – 22 47)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "Anlage 8 des GMB 2024 (Sachwertmodell nach VV EW-SW); nicht im Detail gelesen."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreise Spree-Neiße und Oberspreewald-Lausitz gemeinsam",
+   "objektart_bez": "Einfamilienhäuser",
+   "kauffaelle_zeitraum": "2023–2024",
+   "extrapolation": "gesperrt",
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. "
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 8.3.1 Sachwertfaktoren für Einfamilienhäuser, S. 77–79",
+    "wert": null,
+    "fallzahl": 149,
+    "wortlaut": null
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des örtlichen Gutachterausschusses nach dem Landesmodell (VV EW-SW), Fallzahl und Spanne ausgewiesen",
+  "fallzahl": 149,
+  "streuung": null,
+  "stichtag": "2024-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2024,
+  "modellversion": "GMB 2024 Spree-Neiße/OSL",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf",
+  "quelle_parser": "v1884-hand (pdftotext, Seite 77–79, am 05.10.2026 gelesen)",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2024, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de — Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Impressum des Berichts: „Für den Grundstücksmarktbericht gilt die Lizenz Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)“ — Quellenvermerk mit Lizenz, Lizenztext-Link und Internetadresse ist PFLICHT.",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). ",
+  "fundstelle": "Kap. 8.3.1 Sachwertfaktoren für Einfamilienhäuser, S. 77–79",
+  "hinweis": null,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der jüngste Bericht ist der GMB 2024 (ein GMB 2025 lag am 05.10.2026 nicht vor). Kap. 8.3.1 (S. 78–79) druckt KEINE Funktion und KEINE Tabelle nach vorläufigem Sachwert, sondern Stichproben-Mittelwerte des Sachwertfaktors je Baujahrsklasse × Standardstufe × Modernisierung × Bauart (2 bis 13 Fälle je Zelle, Spannen bis 0,55–1,36; Stichtag 01.01.2024; 149 Datensätze 2023/2024) mit dem Hinweis, die Einflussgrößen „überlagern sich“. Ein Faktor aus diesen Gruppenmitteln wäre eine eigene Ableitung, keine amtliche. Weg: GMB 2024 S. 78–79 (Gruppenmittel als Orientierung) oder Auskunft der Geschäftsstelle (gaa-spn-osl@lkspn.de, 0355 / 49 91 – 22 47).",
+  "unvollstaendig_grund": "Der jüngste Bericht ist der GMB 2024 (ein GMB 2025 lag am 05.10.2026 nicht vor). Kap. 8.3.1 (S. 78–79) druckt KEINE Funktion und KEINE Tabelle nach vorläufigem Sachwert, sondern Stichproben-Mittelwerte des Sachwertfaktors je Baujahrsklasse × Standardstufe × Modernisierung × Bauart (2 bis 13 Fälle je Zelle, Spannen bis 0,55–1,36; Stichtag 01.01.2024; 149 Datensätze 2023/2024) mit dem Hinweis, die Einflussgrößen „überlagern sich“. Ein Faktor aus diesen Gruppenmitteln wäre eine eigene Ableitung, keine amtliche. Weg: GMB 2024 S. 78–79 (Gruppenmittel als Orientierung) oder Auskunft der Geschäftsstelle (gaa-spn-osl@lkspn.de, 0355 / 49 91 – 22 47)."
+ }
+]
