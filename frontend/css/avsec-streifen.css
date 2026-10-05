@@ -79,3 +79,13 @@
 #avsec .mc.dp .avs-sp:hover { border-color: var(--wl-b8932f, #b8932f); }
 #avsec .mc.dp .avs-sp.on { border-color: var(--wl-c9a84c, #C9A84C); box-shadow: inset 0 0 0 1px var(--wl-c9a84c, #C9A84C); background: #fff; }
 #avsec .mc.dp .avs-sp.on small { color: var(--wl-b8932f, #b8932f); }
+
+/* v1875c · Die Sammelregel `.mbody > *` (Z. 33) macht jedes Kind zur SPALTE (column + ::before-Beschriftung);
+   die drei Kacheln standen deshalb untereinander (gemessen: 190 × 174 px, Streifen 234 px hoch).
+   Hier als eigene Spalte mit Beschriftung, die Kacheln darin in einer Reihe. */
+#avsec .av-cards.single .mc.dp .mbody .avs-spanne { flex-direction: column !important; justify-content: flex-end !important; gap: 3px !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-spanne::before { content: "Spanne · anklicken = übernehmen"; }
+#avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-lab { display: none !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-reihe { display: flex !important; flex-direction: row !important; gap: 4px !important; }
+#avsec .mc.dp .avs-sp { flex: 0 0 auto; padding: 4px 8px; gap: 2px; }
+#avsec .mc.dp .avs-sp b { font-size: 12px; }

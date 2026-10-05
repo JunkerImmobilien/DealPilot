@@ -38,11 +38,11 @@
     var body = card.querySelector('.mbody'); if (!body) return;
     var span = (A._state && A._state.span) || 'mid';
     var row = document.createElement('div'); row.className = 'avs-spanne';
-    row.innerHTML = '<span class="avs-sp-lab">Spanne · anklicken = übernehmen</span>' + ORDER.map(function (o) {
+    row.innerHTML = '<span class="avs-sp-lab">Spanne · anklicken = übernehmen</span><span class="avs-sp-reihe">' + ORDER.map(function (o) {
       var v = _D.mw[o[2]]; if (v == null) return '';
       return '<button type="button" class="avs-sp' + (span === o[0] ? ' on' : '') + '" data-spanne="' + o[0] + '" title="' + o[1] + ' übernehmen">' +
         '<small>' + o[1] + '</small><b>' + fmt(v) + '</b></button>';
-    }).join('');
+    }).join('') + '</span>';
     var mw = body.querySelector('.mw');
     if (mw && mw.nextSibling) body.insertBefore(row, mw.nextSibling); else body.appendChild(row);
   }
@@ -55,8 +55,14 @@
     var k = t.getAttribute('data-spanne');
     var sb = host.querySelector('.av-bar [data-span="' + k + '"]');
     if (sb) sb.click();                       /* Spanne setzen → avm-section rendert neu */
-    var ap = host.querySelector('.mc.dp [data-apply="dp"]');
-    if (ap) ap.click();                       /* und übernehmen, wie der Knopf unten */
+    /* v1875c · render() ersetzt #avsec als Ganzes — der alte Griff zeigt danach auf einen
+       abgehängten Baum, und ein Klick dort erreicht keinen Handler (gemessen: Spanne wechselte,
+       Verkehrswert blieb 471.000). Deshalb neu greifen, und erst im nächsten Tick. */
+    setTimeout(function () {
+      var h2 = document.getElementById('avsec');
+      var ap = h2 && h2.querySelector('.mc.dp [data-apply="dp"]');
+      if (ap) ap.click();                     /* und übernehmen, wie der Knopf unten */
+    }, 0);
   }, true);
 
   var _raf = 0;
