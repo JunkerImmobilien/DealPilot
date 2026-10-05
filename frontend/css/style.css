@@ -38464,3 +38464,20 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 .avb.collapsed .avb-strip b.mw { font-family: "Cormorant Garamond", Georgia, serif; font-size: 21px; font-weight: 700; line-height: 1; }
 .avb.collapsed .avb-strip .muted { color: #6b655f; }
 .avb.collapsed .avb-strip .avb-apply { margin-left: auto; padding: 6px 10px; font-size: 11px; }
+
+/* ===== v1868a · Marktbewertung als Streifen (Marcel: „schmaleren Streifen … ein bisschen mehr Platz").
+   Der Block kommt aus avm-section.js (nicht anfassen) - gemessen: .mc.dp = Kopf 46 + Body 142 + Fuss 57 +
+   Legal 21 = 270 px. Hier nur CSS mit ID-Spezifitaet: Kopf, Kennzahlen und Knopf in EINER Zeile. ===== */
+#avsec .av-cards.single .mc.dp { display: grid !important; grid-template-columns: auto minmax(0, 1fr) auto !important; grid-template-areas: "head body foot" "legal legal legal" !important; align-items: center !important; column-gap: 12px !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead { grid-area: head; height: auto !important; min-height: 0 !important; padding: 6px 10px !important; gap: 8px !important; }
+#avsec .av-cards.single .mc.dp .mperf { display: none !important; }
+#avsec .av-cards.single .mc.dp .mbody { grid-area: body; display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 2px 14px !important; padding: 4px 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw { font-size: 20px !important; line-height: 1.1 !important; margin: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { margin: 0 !important; min-height: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 { display: flex !important; gap: 12px !important; margin: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 { display: flex !important; align-items: baseline !important; gap: 5px !important; padding: 0 !important; border: 0 !important; background: none !important; width: auto !important; flex: 0 0 auto !important; }
+#avsec .av-cards.single .mc.dp .mbody .spacer { display: none !important; }
+#avsec .av-cards.single .mc.dp .mfoot { grid-area: foot; padding: 6px 10px !important; }
+#avsec .av-cards.single .mc.dp .mfoot .av-btn.full { width: auto !important; padding: 6px 10px !important; font-size: 11px !important; }
+#avsec .av-cards.single .mc.dp .legal { grid-area: legal; padding: 0 10px 4px !important; font-size: 9px !important; line-height: 1.2 !important; }
+@media (max-width: 900px) { #avsec .av-cards.single .mc.dp { grid-template-columns: 1fr !important; grid-template-areas: "head" "body" "foot" "legal" !important; } }
