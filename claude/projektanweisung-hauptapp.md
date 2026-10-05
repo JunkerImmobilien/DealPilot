@@ -31000,8 +31000,8 @@ gekürzt — Kopf 191 px (−53 %). Dazu in `object-actions.js` ein
 eingeklappt) — heute unsichtbar, weil die Partner-Kacheln aus sind.
 `6055782`/v1868b: die DealPilot-Karte rein per CSS mit ID-Spezifität zum
 Streifen — Kopf, Kennzahlen und Knopf in einer Zeile, Legal darunter;
-Ergebnisblock 373 → rund 130 px. Nachweis: `#avsec` 194 px vor dem
+Ergebnisblock 373 → 143 px (v1868c: `flex-direction: row`, avm-section setzt column). Nachweis: `#avsec` 143 px, Karte 54 px, Body 30 px — eine Zeile; vorher
 letzten Feinschliff, `.mc.dp` 105 px, Text vollständig („199.000 € · 466
 €/m² · −74,5 % · Miete 740 € · Einordnung · Genauigkeit · übernehmen").
 
-**Rest.** Prod v1846b; Staging v1868b.
+**Rest.** Prod v1846b; Staging v1868c (`6c19707`).
