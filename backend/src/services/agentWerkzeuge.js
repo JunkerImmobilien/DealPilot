@@ -1501,7 +1501,19 @@ async function objekt_schnellblick(ctx, args) {
     kein_score: 'Dies ist KEIN DealPilot-Score und kein Investor Deal Score. '
       + 'Die beiden werden in DealPilot gerechnet; hier stehen nur die drei '
       + 'Groessen, die sich aus Kaufpreis und Miete unmittelbar ergeben.',
-    hinweis: 'Gib dem Nutzer die Zahlen MIT ihrem Rechenweg, so wie sie hier '
+    /* v1887 · Die Adresse steht hier seit jeher im Ergebnis — der Hinweis
+       hat nie verlangt, sie auch hinzuschreiben. GEMESSEN am 05.10.2026:
+       der Bot gab die Kennzahlen der Löhner Str. 278 (233 m², 350.000 €,
+       1.400 €/Monat) unter der Ueberschrift "Sachsenstraße 18" aus. Jede
+       einzelne Zahl war richtig gerechnet; nur das Haus war ein anderes.
+
+         > Eine Zahl ohne ihr Objekt ist nicht pruefbar. Und eine Zahl
+         > unter dem FALSCHEN Objekt sieht genauso aus wie eine richtige. */
+    hinweis: 'Schreibe die Adresse aus "adresse" WOERTLICH ueber die Zahlen — '
+      + 'nicht die, die der Nutzer gesagt hat. Weichen beide voneinander ab, '
+      + 'nennst du die Zahlen NICHT, sondern sagst, welches Objekt du gefunden '
+      + 'hast, und fragst nach. '
+      + 'Gib dem Nutzer die Zahlen MIT ihrem Rechenweg, so wie sie hier '
       + 'stehen — sie sind fertig formatiert. Sag ausdruecklich, dass das noch '
       + 'kein Score ist und dass der Score kommt, sobald das Objekt in DealPilot '
       + 'gerechnet wurde. '
@@ -1804,6 +1816,54 @@ async function objekt_anlegen(ctx, args) {
     return { ok: false, unbekannte_felder: unbekannt,
       hinweis: 'Keine verwertbaren Felder. Frag nach Adresse, Objektart und Flaeche.' };
   }
+
+  /* ── v1887 · DASSELBE HAUS ZWEIMAL ───────────────────────────────────
+   *
+   * GEMESSEN am 05.10.2026 in Marcels Dialog, nachgezaehlt in der
+   * Staging-Datenbank:
+   *
+   *   2304bf0f  Sachsenstraße 18 Herford  angelegt 13:48:10  (ohne Miete)
+   *   bad5ad8a  Sachsenstraße 18 Herford  angelegt 13:50:01  (nkm 940)
+   *
+   * Der Nutzer wollte EIN Objekt. Seine zweite Nachricht war eine
+   * ERGAENZUNG ("wir haben 940 Euro Kaltmiete"), das Modell rief aber
+   * wieder `objekt_anlegen` — und bekam ein zweites Haus.
+   *
+   * Der Schaden hoert nicht bei der Dublette auf: ab da loest dieselbe
+   * Adresse MEHRDEUTIG auf, und genau das hat den Nummern-Waechter aus
+   * v1813c ausgehebelt (siehe `_findeObjekt`). Eine Dublette ist also
+   * nicht nur unordentlich, sie macht die Objektzuordnung blind.
+   *
+   *   > Eine Ergaenzung ist kein zweites Haus. Wer das verwechselt,
+   *   > verliert danach auch das erste.
+   *
+   * Es gibt echte Faelle mit gleicher Anschrift (zwei Einheiten im selben
+   * Haus). Deshalb wird nicht verhindert, sondern GEFRAGT — und die
+   * Rueckfrage nennt die Kennung des vorhandenen Objekts, damit der
+   * naechste Zug `felder_aendern` sein kann. */
+  const _schl = (v) => String(v == null ? '' : v).toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/stra(ss|s)e\b/g, 'str').replace(/[^a-z0-9]/g, '');
+  if (!(args && args.bestaetigt) && sauber.str && (sauber.plz || sauber.ort)) {
+    const vorhanden = (await dialog.objekteListe(ctx.userId, 60)).filter((o) => {
+      const d = o.adresse || '';
+      return _schl(d) === _schl([sauber.str, sauber.hnr].filter(Boolean).join(' ')
+        + ', ' + [sauber.plz, sauber.ort].filter(Boolean).join(' '));
+    });
+    if (vorhanden.length) {
+      ctx.merkeObjekt(vorhanden[0].id);
+      return { ok: false, rueckfrage: true, bereits_vorhanden: vorhanden.map((o) => ({
+          id: o.id, adresse: o.adresse })),
+        hinweis: 'Unter dieser Anschrift gibt es bereits ein Objekt. NICHTS wurde '
+               + 'angelegt. Wollte der Nutzer nur ETWAS ERGAENZEN (Miete, Baujahr, '
+               + 'Finanzierung), dann nimm felder_aendern mit der genannten id — '
+               + 'das ist der Normalfall. Nur wenn er ausdruecklich ein ZWEITES, '
+               + 'eigenes Objekt an derselben Anschrift meint (zwei Einheiten im '
+               + 'selben Haus), frag ihn das und rufe danach objekt_anlegen erneut '
+               + 'mit bestaetigt: true. Frag NICHT nach Daten, die du schon hast.' };
+    }
+  }
+
   /* ── v1804 · NICHT SELBST INSERTEN ───────────────────────────────────
    *
    * Hier stand ein direktes `INSERT INTO objects (user_id, data)`. Das
@@ -1915,9 +1975,33 @@ async function marktbericht_preis(ctx, args) {
       });
     }
     return {
-      objekt_id: id, stufen: alle,
+      objekt_id: id,
+      /* ── v1887 · DIE PREISANSAGE NENNT IHREN GEGENSTAND AUCH DEM MODELL ──
+       *
+       * v1821 hat das Objekt der Preisansage festgehalten (merkeAngebot),
+       * damit ein spaeteres „ja" nicht woanders landet. Dem MODELL wurde
+       * es trotzdem nie gesagt: hier stand nur `objekt_id`, eine UUID, die
+       * kein Mensch wiedererkennt.
+       *
+       * GEMESSEN am 05.10.2026: der Bot listete die drei Stufen unter der
+       * Ueberschrift „Sachsenstraße 18, 32052 Herford" — angesagt und als
+       * Angebot abgelegt war die Löhner Str. 278 (nachgelesen in
+       * telegram_dialog.angebot). Das Modell konnte es nicht besser
+       * wissen; es hatte nur die Adresse, die der NUTZER gesagt hatte.
+       *
+       *   > Eine Herkunftsangabe gehoert an den Ort, nie an den Wert. Wer
+       *   > dem Modell nur eine UUID gibt, zwingt es, die Adresse aus dem
+       *   > Gespraech zu nehmen — und das ist genau die, die stimmen
+       *   > soll, nicht die, die stimmt. */
+      gilt_fuer: _adr,
+      stufen: alle,
       hinweis: 'Hier stehen alle drei Stufen mit Preis und Inhalt.\n'
-             + 'HAT DER NUTZER EINE GENANNT (z.B. "erweiterte", "vollstaendige '
+             + 'SCHREIBE DIE ADRESSE AUS "gilt_fuer" WOERTLICH in deine Antwort. '
+             + 'Nimm NICHT die Adresse, die der Nutzer gesagt hat — weicht sie ab, '
+             + 'ist das kein Schoenheitsfehler, sondern das falsche Haus. Sag ihm '
+             + 'in dem Fall ausdruecklich, dass du ein anderes Objekt gefunden hast, '
+             + 'und frage nach.\n'
+             + 'HAT DER NUTZER EINE STUFE GENANNT (z.B. "erweiterte", "vollstaendige '
              + 'Wertermittlung", "Marktpreisindikation")? Dann nenne NUR DIESE, mit '
              + 'ihrem so_sagen-Satz, und frage, ob du sie abrufen sollst.\n'
              + 'HAT ER KEINE GENANNT? Dann zeige ihm alle drei mit dem, was sie '
@@ -2224,9 +2308,60 @@ function _ordneOption(wert, optionen) {
    zuletzt besprochene. Die Reihenfolge ist dieselbe wie im Webhook. */
 async function _findeObjekt(ctx, args) {
   const a = args || {};
+
+  /* ── v1887 · DIE ERFUNDENE NUMMER, ZUM ZWEITEN MAL ───────────────────
+   *
+   * GEMESSEN am 05.10.2026 an Marcels Bot-Dialog (Sachsenstraße 18,
+   * 32052 Herford), nachgelesen in `telegram_dialog` auf Staging:
+   *
+   *   letzte_liste[1]      = 3fbb754c  ->  Löhner Str. 278, Hiddenhausen
+   *   angebot.adresse      = "Löhner Str. 278, 32120 Hiddenhausen"
+   *   letztes_objekt       = 3fbb754c
+   *
+   * Der Nutzer hat in KEINER seiner vier Nachrichten eine Nummer genannt.
+   * Trotzdem galt die ganze Auskunft der Löhner Str. 278: der Schnellblick
+   * meldete "Jahreskaltmiete 16.800 EUR / 1.502 EUR je m² / 6,01 EUR je m²"
+   * unter der Überschrift "Sachsenstraße 18" — das sind exakt die Werte des
+   * Löhner-Objekts (wfl 233, kp 350.000, nkm 1.400), auf den Cent
+   * nachgerechnet. Keine Einheitenverwechslung: das falsche Haus.
+   *
+   * Der Wächter aus v1813c war da und griff nicht. Er greift nur, wenn die
+   * genannte Adresse EINDEUTIG auflöst. Hier war sie `mehrdeutig` (das
+   * Objekt war versehentlich zweimal angelegt), also war `perAdr` null,
+   * also fiel der Vergleich aus — und die erfundene Nummer gewann still.
+   *
+   *   > Ein Wächter, der nur beim eindeutigen Fall aufwacht, schläft
+   *   > genau dann, wenn es unübersichtlich wird.
+   *
+   * Zwei Lehren, beide hier umgesetzt:
+   *
+   *   1. Eine Nummer gilt nur, wenn der NUTZER eine genannt hat. Das
+   *      entscheidet `absicht.bezug()` im Webhook deterministisch; von
+   *      dort kommt `ctx.nummerErfunden`. Regel 7h im Prompt verbietet die
+   *      erfundene Nummer bereits — und wurde trotzdem gebrochen. Was
+   *      gefragt werden soll, darf nicht wählbar sein.
+   *   2. Auch wenn die Nummer gelten darf: eine genannte Adresse, die
+   *      MEHRDEUTIG ist, ist eine Rückfrage — keine Freigabe für die
+   *      Nummer.
+   *
+   * Prüfläufe (tools/agent-pruefung) rufen die Werkzeuge direkt mit
+   * `{nummer: N}` und setzen die Fahne nicht. Deshalb gilt die Sperre nur
+   * bei ausdrücklichem `nummerErfunden === true`. */
+  if (a.nummer != null && ctx.nummerErfunden === true) {
+    delete a.nummer;
+  }
+
   if (a.nummer != null && ctx.letzteListe && ctx.letzteListe.length) {
     const n = Number(a.nummer);
-    if (!(n >= 1 && n <= ctx.letzteListe.length)) return null;
+    /* v1887 · Eine Nummer ausserhalb der Liste darf eine mitgegebene
+       ADRESSE nicht mit ins Nichts reissen. Hier stand `return null`, und
+       das Werkzeug meldete darauf "Kein Objekt gefunden" — auch dann,
+       wenn die Adresse danebenstand und sauber aufgeloest haette. */
+    if (!(n >= 1 && n <= ctx.letzteListe.length)) {
+      if (!a.adresse || _istPlatzhalter(a.adresse)) return null;
+      delete a.nummer;
+      return await _findeObjekt(ctx, a);
+    }
     const perNr = ctx.letzteListe[n - 1];
 
     /* ── v1813c · EINE GERATENE NUMMER SCHLUG DIE GENANNTE ADRESSE ──────
@@ -2245,6 +2380,29 @@ async function _findeObjekt(ctx, args) {
     if (a.adresse && !_istPlatzhalter(a.adresse)) {
       const liste = await dialog.objekteListe(ctx.userId, 60);
       const t = dialog.objektRaten(String(a.adresse), liste);
+
+      /* ── v1887 · MEHRDEUTIGE ADRESSE IST KEINE FREIGABE FUER DIE NUMMER ──
+       *
+       * GEMESSEN: zwei Objekte "Sachsenstraße 18, 32052 Herford" (der Bot
+       * hatte dasselbe Objekt zweimal angelegt). `objektRaten` meldete
+       * `mehrdeutig`, der Wächter unten prüfte auf `eindeutig` und liess
+       * die erfundene `nummer: 1` durch — Antwort zur Löhner Str. 278.
+       *
+       *   > Zwei Treffer auf die genannte Adresse sind eine Frage nach
+       *   > DIESER Adresse. Sie sind kein Grund, ein drittes Haus zu
+       *   > nehmen, das gar nicht genannt wurde. */
+      if (t.art === 'mehrdeutig') {
+        const ids = t.kandidaten.map((o) => o.id);
+        if (ctx.letztesObjekt && ids.some((i) => String(i) === String(ctx.letztesObjekt))) {
+          return ctx.letztesObjekt;
+        }
+        if (ctx.merkeListe) ctx.merkeListe(ids);
+        const e = new Error('mehrdeutig');
+        e.mehrdeutig = t.kandidaten.map((o, i) => ({ nummer: i + 1, adresse: o.adresse }));
+        e.grund = 'Auf die genannte Adresse passen mehrere Objekte.';
+        throw e;
+      }
+
       const perAdr = (t.art === 'eindeutig') ? t.objekt.id : null;
       if (perAdr && String(perAdr) !== String(perNr)) {
         const nrAdr = (liste.find((o) => o.id === perNr) || {}).adresse || '';

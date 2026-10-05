@@ -172,8 +172,59 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
    *
    * Die Sperre sitzt damit AUSSERHALB des Modells. Es kann sie nicht
    * uebergehen, auch wenn es die Zustimmung missversteht. */
-  const sagtJa = /^(ja|jo|jep|ok|okay|mach|los|gern|bitte|passt|einverstanden|hol|zieh)\b/i
-    .test(String(text || '').trim());
+  /* ── v1888 · DIE ZUSTIMMUNG STAND NICHT AM SATZANFANG ────────────────
+   *
+   * GEMESSEN an Marcels Dialog vom 05.10.2026, 15:51. Er diktierte:
+   *
+   *   „Die Marge ist 3,57 Prozent und ja, ich möchte die
+   *    Marktbreitindikation jetzt abrufen."
+   *
+   * Der Ausdruck hier war mit `^` am Satzanfang verankert. Der Satz
+   * beginnt mit „Die" — `sagtJa` war FALSE, `darfKosten` damit auch, und
+   * `marktbericht_abrufen` wurde gesperrt. Das Modell befolgte darauf den
+   * Sperrhinweis („nenne den Preis"), rief `marktbericht_preis` ein
+   * zweites Mal und listete dieselben drei Stufen erneut auf.
+   *
+   *   > Wer diktiert, sagt sein Ja im Nebensatz. Eine Zustimmung, die nur
+   *   > als erstes Wort zählt, erkennt genau die Zustimmungen nicht, die
+   *   > per Sprachnachricht kommen — und der Nutzer sieht keinen Fehler,
+   *   > sondern dieselbe Frage noch einmal.
+   *
+   * Jetzt zählt das Zustimmungswort ÜBERALL im Satz, aber als eigenes
+   * Wort — und eine Verneinung im selben Satz hebt es auf. „ja, aber
+   * nicht jetzt" ist keine Freigabe.
+   *
+   * DIE DREI ANDEREN SCHRANKEN BLEIBEN UNVERÄNDERT: es braucht zusätzlich
+   * eine Preisansage davor UND ein frisches Angebot mit Gegenstand
+   * (v1821). Gelockert wird nur, WO das Ja stehen darf — nicht, wofür es
+   * gilt. */
+  /* ── v1888a · „abrufen" IST KEINE ZUSTIMMUNG, SONDERN DIE HANDLUNG ───
+   *
+   * In der Wortliste von v1888 stand `abrufen` als eigenes Ja-Wort. Damit
+   * haette „was kostet das Abrufen?" als Freigabe gezaehlt: die Frage
+   * nennt die Handlung, die Botzeile davor nennt einen Abruf (standPreis),
+   * und ein frisches Angebot liegt nach jeder Preisansage vor. Alle drei
+   * Schranken waeren offen gewesen — auf eine FRAGE hin.
+   *
+   *   > Ein Wort, das die Handlung benennt, sagt nichts darueber, ob sie
+   *   > gewollt ist. In einer Geldsperre ist das der teure Unterschied.
+   *
+   * Marcels gemessener Satz braucht es nicht: „… und ja, ich möchte die
+   * Marktbreitindikation jetzt abrufen." trifft bereits ueber das „ja". */
+  const _t = String(text || '').trim();
+  const _jaWort = /(^|\W)(ja|jo|jep|jawohl|okay|ok|klar|gern(e)?|passt|einverstanden|mach(e)?\s+das|leg\s+los|zieh(\s+durch)?|hol(e)?\s+(sie|ihn|es|mir))(\W|$)/i
+    .test(_t);
+  const _neinWort = /(^|\W)(nein|nicht|kein(e|en|s)?|noch\s+nicht|sp(ä|ae)ter|warte|stopp?|abbrechen|lieber\s+nicht)(\W|$)/i
+    .test(_t);
+  /* v1888b · EINE FRAGE IST KEINE FREIGABE.
+   * Gemessen an der Wortliste: "ok, aber was kostet das?" zaehlte als Ja —
+   * das Wort "ok" steht darin, eine Verneinung nicht. Wer nach dem Preis
+   * fragt, hat ihn noch nicht zugesagt. Ein Satz, der mit einem Fragezeichen
+   * endet, gilt deshalb nie als Zustimmung; das VERSCHAERFT die Geldsperre
+   * und kann nichts aufmachen, was vorher zu war.
+   * Marcels gemessener Satz endet auf einen Punkt und bleibt ein Ja. */
+  const _istFrage = /\?\s*$/.test(_t);
+  const sagtJa = _jaWort && !_neinWort && !_istFrage;
   const letzteBotzeile = (((z && z.verlauf) || []).filter((e) => e.rolle !== 'user').slice(-1)[0] || {}).text || '';
   const standPreis = /kostet|Kontingent|Abruf|Guthaben|Soll ich/i.test(letzteBotzeile);
   /* ── v1821 · DIE ZUSTIMMUNG BRAUCHT EINEN GEGENSTAND ────────────────
@@ -197,9 +248,29 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     } catch (_) {}
   }
 
+  /* ── v1887 · HAT DER NUTZER UEBERHAUPT EINE NUMMER GENANNT? ──────────
+   *
+   * GEMESSEN am 05.10.2026: in Marcels Dialog zur Sachsenstraße 18 stand
+   * in keiner der vier Nachrichten eine Listennummer — und trotzdem galt
+   * die ganze Auskunft `letzte_liste[1]`, der Löhner Str. 278. Das Modell
+   * hatte sich eine Nummer gedacht (Regel 7h verbietet das ausdruecklich)
+   * und das Werkzeug hat sie befolgt.
+   *
+   *   > Bei einem Modell gewinnt das Werkzeugschema gegen den Prompt. Was
+   *   > nicht erfunden werden darf, darf nicht waehlbar sein.
+   *
+   * `absicht.bezug()` entscheidet deterministisch, ob im Satz wirklich
+   * eine Listennummer steht ("die 3", "Objekt 5", "das erste"). Nur dann
+   * darf `_findeObjekt` den Parameter `nummer` ueberhaupt ansehen; der
+   * aufgeloeste Bezug steht ohnehin schon in `letztesObjekt`. */
+  const nutzerNannteNummer = Boolean(bezugObjektId)
+    || Boolean(z && z.letzte_liste && z.letzte_liste.length
+               && absicht.bezug(text, z.letzte_liste));
+
   const protokoll = [];
   const ctx = {
     userId: userId,
+    nummerErfunden: !nutzerNannteNummer,
     letzteListe: (z && z.letzte_liste) || null,
     letztesObjekt: bezugObjektId || (z && z.letztes_objekt) || null,
     entwurf: (z && z.modus === 'anlegen' && z.entwurf) ? _ohneMarker(z.entwurf) : null,
@@ -262,9 +333,31 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
   await sendenLang(token, chatId, out);
   await verlaufMerken(chatId, userId, 'assistant', out);
 
+  /* ── v1887 · DAS PROTOKOLL FUEHRT SCHON DIE ARGUMENTE — DER LOG NICHT ──
+   *
+   * `agentLauf` legt seit v1813c zu jedem Aufruf auch die Argumente in
+   * `ctx.protokoll` ab, mit der Begruendung: "Ein Protokoll, das nur das
+   * Werkzeug nennt, sagt nicht, was getan wurde." Diese Zeile hier hat sie
+   * trotzdem weggeworfen.
+   *
+   * GEMESSEN am 05.10.2026: um herauszufinden, WARUM der Bot zur falschen
+   * Adresse antwortete, stand im Log nur
+   *
+   *     [agent] 2 Werkzeuge in 2 Runden: marktbericht_preis, objekt_schnellblick
+   *
+   * Welches Objekt gemeint war, liess sich nur ueber `telegram_dialog`,
+   * `objects` und eine Rueckrechnung der Kennzahlen rekonstruieren.
+   *
+   *   > Wer die Argumente erhebt und dann nicht schreibt, hat den Aufwand
+   *   > bezahlt und den Nutzen verschenkt.
+   *
+   * Argumente koennen keine Geheimnisse tragen: es sind Objektnummern,
+   * Adressen und Stufen — dieselben Angaben, die der Nutzer selbst
+   * geschrieben hat. */
   try {
     console.debug('[agent] ' + protokoll.length + ' Werkzeuge in ' + r.runden
-      + ' Runden: ' + protokoll.map((p) => p.werkzeug).join(', '));
+      + ' Runden: ' + protokoll.map((p) =>
+          p.werkzeug + (p.args ? '(' + String(p.args).slice(0, 120) + ')' : '')).join(', '));
   } catch (e) {}
 }
 
