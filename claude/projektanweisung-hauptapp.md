@@ -31209,4 +31209,17 @@ Parkstr. 9 spricht von „Westerfeldstraße 140, 33613 Bielefeld“ — der Text
 hängt am Objekt (Musterstraße zeigt „Dealhausen“), er stammt also aus einem
 Lauf vor der Adressänderung oder einer Kopie. Neu laufen lassen behebt es.
 
-**Rest.** Prod v1846b; Staging v1876.
+**Nachtrag v1876a/v1876b (`14fe802`, `a72b928`).** Marcel: „die Karte mit der
+Markteinschätzung ist viel zu hoch … nicht schön aufgeteilt und formatiert.“
+Gemessen in der Messkabine: Handy 345 px (Kopf 66, Kacheln 65, Knopf 56),
+1366 px 125 px mit versetzten Spalten (flex-wrap). Jetzt ein Raster nach
+KARTENBREITE (`@container` auf `.av-cards.single`, nicht nach Fenster): ab
+1180 px eine Zeile, darunter zwei (Marktwert · Spanne · je m² / Marktmiete ·
+Einordnung · Genauigkeit), unter 700 px gestapelt mit schmalem Kopf (27 px)
+und drei gleich breiten Kacheln. Die Kacheln sind Pillen; der Knopf
+„übernehmen“ entfällt, weil die Kacheln übernehmen (Marcel: „das sollte
+reichen“). Nachweis: 1900 px → 84 px (eine Zeile), 1366 → 105 (zwei Zeilen,
+Spalten fluchten), 1024 → 203 (gestapelt), Handy 390 → unter 260 statt 345;
+Bilder gespeichert. Gilt im QuickBoarding mit.
+
+**Rest.** Prod v1846b; Staging v1876b.

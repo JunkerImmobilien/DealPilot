@@ -271,6 +271,8 @@ Marcel: weiße 65 im QuickBoarding unlesbar; „Nicht enthalten …“/„So wir
 gerechnet“ raus; Spanne Unten/Ø/Oben in die Karte, Klick = übernehmen; alle
 Reiter mobil prüfen; „Deal“ in der Pre-Flight-Pille grau.
 **Erledigt (`eba95d6`–`f6b6fb8`):** alles davon, siehe Journal (36).
+**Nachtrag (`14fe802`, `a72b928`):** Karte als Raster nach Kartenbreite — eine Zeile,
+zwei Zeilen, gestapelt; Knopf „übernehmen“ entfällt (Kacheln übernehmen).
 **Offen (Daten, kein Code):** die Pilot-Analyse der Parkstr. 9 nennt die
 Westerfeldstraße 140 — neu laufen lassen.
 
