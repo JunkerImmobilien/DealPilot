@@ -125,3 +125,14 @@
   #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-reihe { flex-wrap: wrap !important; }
   #avsec .av-cards.single .mc.dp .legal { padding-left: 12px !important; }
 }
+
+/* v1876b · Handy nachgemessen (390 px): Karte 289 px - die dritte Pille brach um (Spanne 106 px hoch), Marktmiete
+   brach neben je m² zweizeilig um. Jetzt drei gleich breite Kacheln (Beschriftung über dem Betrag) und je m²,
+   Marktmiete, Einordnung untereinander in voller Breite. */
+@container (max-width: 699px) {
+  #avsec .av-cards.single .mc.dp .mbody { grid-template-areas: "mw mw" "sp sp" "sub sub" "miete miete" "row3 row3" !important; row-gap: 3px !important; }
+  #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-reihe { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
+  #avsec .mc.dp .avs-sp { flex-direction: column !important; align-items: center !important; gap: 1px !important; padding: 3px 4px !important; border-radius: 8px !important; }
+  #avsec .mc.dp .avs-sp b { font-size: 11.5px !important; }
+  #avsec .av-cards.single .mc.dp .mbody .miete { white-space: nowrap !important; }
+}
