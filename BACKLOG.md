@@ -265,6 +265,23 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N17 · Marktbericht-Übernahme, QuickBoarding-Ring, Quick-Check-Durchlauf (05.10.2026) — erledigt v1877; drei Entscheidungen offen
+
+**Erledigt (`36511ca`):** brw, Energieklasse G/H, Zusatzeinnahmen → sonstige_jahr
+(Formular und Backend-Mapper); QuickBoarding-Score als Ring mit Pille;
+Quick-Check → „Als Objekt speichern“ sauber durchgelaufen (Testobjekt
+Teststraße 5 im Staging-Portfolio).
+
+**Offen, Marcels Entscheidung (Details Journal 37):**
+- Speichern-Modal entschlacken (qc-bridge.js qcpm — „nicht anfassen“): Quelle-
+  Zeile „Konsens“ und „Keine AVM-Daten“ raus, Kopftext neu.
+- Steuer: vier Rechenfehler (AfA-Basis ohne NK; Projektion mit Jahr-1-AfA für
+  50 Jahre; § 7b gezwölftelt; Degressiv-Wechsel auf AHK statt Restwert) und
+  sechs fragliche Punkte (Soli/KiSt, BWK-Schätzung 55 %, ein zvE in der
+  Projektion, überlappende Zeiträume, Sprach-Import 3 %).
+- Ernte-Automatik: nur NRW-LZS vollautomatisch; Vorschlag „Auto-Ernte-Vorschlag
+  mit Freigabe“ in 4 Stufen (10–17 Tage).
+
 ### N16 · QuickBoarding-Karte, Spanne in der Karte, Handy-Durchgang (05.10.2026) — erledigt v1875–v1876
 
 Marcel: weiße 65 im QuickBoarding unlesbar; „Nicht enthalten …“/„So wird

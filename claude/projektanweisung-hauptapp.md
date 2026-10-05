@@ -31223,3 +31223,86 @@ Spalten fluchten), 1024 → 203 (gestapelt), Handy 390 → unter 260 statt 345;
 Bilder gespeichert. Gilt im QuickBoarding mit.
 
 **Rest.** Prod v1846b; Staging v1876b.
+
+### (37) 05.10.2026 — v1877: Marktbericht-Übernahme, QuickBoarding-Score als Ring, Quick-Check-Durchlauf, zwei Prüfberichte
+
+**Was.** Marcel: Werden alle Felder aus dem Reiter Objekt in den Marktbericht
+übernommen, sind dort alle Felder da, läuft die automatische Abfrage? Score-
+Bereich der QuickBoarding-Karte wie die Bewertungs-Karten. Ein Objekt im
+Quick-Check anlegen und „Als Objekt speichern“ durchgehen; das Modal auf das
+Nötige kürzen. Alle Steuer-Rechnungen prüfen (§ 7b, Vorteilsbetrachtung,
+Steuerzeiträume). Ernte automatisieren, wenn ein Ort fehlt?
+
+**Gemessen (Parkstr. 9, Marktbericht-Reiter, Objekt aus Bestand laden).**
+Von 46 belegten Feldern des Reiters Objekt kamen drei nicht oder falsch an:
+Bodenrichtwert 250 (Objekt führt `brw`, die Liste in mb-objektwahl.js kannte
+nur `brw_manuell`), Energieklasse G (Auswahl im Marktbericht endete bei F),
+Kaltmiete 2.411 statt 2.321 (Zusatzeinnahmen 90 €/Monat wurden in die
+Kaltmiete gerechnet; auf dem DealPilot-Abrufweg fehlten sie ganz). Die
+automatische Abfrage (BORIS-Bodenrichtwert, Gemarkung, Register-Zins) läuft
+im Backend je Bericht und ist nicht Teil des Formulars — dort steht nur der
+manuelle Bodenrichtwert mit Stichtag.
+
+**Gebaut (`36511ca` v1877).**
+- mb-objektwahl.js: `brw` → `brw_manuell` (Rückfall am Datensatz wie `mea`),
+  Kaltmiete = `nkm`, `ze` × 12 → `sonstige_jahr` (eigenes Feld „Sonstige
+  Einnahmen/Jahr“). marktbericht-app/index.html: Energieklasse A+, G, H.
+- DealPilotObjectMapper.js (mb-backend, Rebuild): `sonstige_jahr` aus `ze` × 12.
+- quickcheck-app.html `dial()`: Ring, Zahl, „/ 100“, Stufen-Pille — nach dem
+  Muster von `ringHtml()` in dpsh-score-hero.js; der Tacho mit Zeiger ist weg.
+- Buster: Marktbericht-App `?v=1877` (marktbericht-view.js), mb-objektwahl
+  1877, qc-bridge/IFRAME_SRC v1877.
+
+**Nachweis (Staging).** Marktbericht-Formular nach dem Laden: brwManuell 250,
+energy G, rent 2321, sonstEinnahmen 1080. Quick-Check: neues Objekt
+„Teststraße 5, 32545 Bad Oeynhausen“ (ETW, 65 m², Bj 1995, 150.000 €, 520 €
+Miete, 180 € Hausgeld, 30.000 € EK, 3,8 %/2 %) → Ring „19 / 100 · KRITISCH“,
+Modal „Welche Daten übernehmen?“ mit 11 ausgelesenen Feldern, „Speichern &
+übernehmen“ → POST /objects 201, Objekt in der Liste, Adresse/Fläche/Kaufpreis/
+Miete im Reiter Objekt. **Das Testobjekt liegt im Staging-Portfolio.** Ein
+erster Durchlauf, bei dem der Marktbericht-Reiter noch offen war und das
+QuickBoarding verdeckt lief, endete mit „Neues Objekt“ ohne Daten (Konsole:
+„saveObj: Objektwechsel während des Speicherns → abgebrochen“, 6×) — im
+sauberen Lauf nicht reproduziert.
+
+**Offen — braucht Marcels Entscheidung.**
+1. Das Speichern-Modal (`qc-bridge.js`, qcpm-Overlay, laut CLAUDE.md „nicht
+   anfassen“) trägt noch die Anbieter-Zeit: Zeile „Quelle: Konsens (Ø)“,
+   Hinweis „Keine AVM-Daten.“, Text „Wähle Quelle & Spanne — Lage &
+   Wertentwicklung liefert nur DealPilot“. Nötig bleiben: die Liste
+   „Ausgelesene Daten“, die Spanne (nur wenn eine DealPilot-Markteinschätzung
+   vorliegt) und „Speichern & übernehmen“. Vorschlag: Quelle-Zeile und
+   AVM-Hinweis entfernen, Kopftext „Diese Daten werden übernommen“.
+2. Steuer-Prüfung (eigener Prüflauf gegen § 7 / § 7b EStG, gesetze-im-internet
+   05.10.2026) — vier echte Fehler, alle mit Zahlenbeispiel:
+   a) AfA-Basis ohne Erwerbsnebenkosten, sobald keine Küche aktiv ist
+      (calc.js:1163-1169): KP 780.000 × 54,31 % × 2,5 % = 10.590 € statt
+      (780.000 + 62.400 NK) × 54,31 % × 2,5 % = 11.438 € — 848 €/Jahr zu wenig.
+   b) Die Cashflow-Projektion rechnet 50 Jahre mit der Jahr-1-AfA
+      (calc.js:2911/3063): § 7b läuft ewig statt 4 Jahre, degressive AfA
+      fällt nie — ab Jahr 5 bei Basis 400.000 je 8.400 € zu viel Erstattung.
+      Steuer-Reiter (tax.js) ist davon nicht betroffen → zwei Ansichten, zwei
+      Zahlen.
+   c) § 7b wird im Anschaffungsjahr gezwölftelt (calc.js:1250-1252); § 7b
+      kennt keine Zwölftelung — Kauf 01.10., Basis 400.000: 5.000 statt 20.000.
+   d) Wechsel degressiv → linear mit 3 % der ursprünglichen AHK statt
+      Restwert ÷ Restnutzungsdauer (afa-engine.js:66-93; § 7 Abs. 5a S. 8).
+   Fraglich: kein Soli (≈ 12 % der Ersparnis fehlt), keine Kirchensteuer, kein
+   Splitting; Steuerformular schätzt nicht umlagefähige Kosten als 55 % der
+   Gesamt-BWK statt der echten `nul`; Cashflow nutzt EIN zvE für alle Jahre,
+   der Steuer-Reiter zieht je Jahr den Steuerzeitraum; überlappende
+   Steuerzeiträume erlaubt, `find()` nimmt still den ersten. Stimmt: Tarif
+   2026, Zwölftelung der Normal-AfA, § 7b-Cap 4.000 €/m² und 5 % × 4 Jahre,
+   15-%-Grenze netto, eigener AfA-Satz, Steuerzeiträume im Steuer-Reiter.
+   **Nichts davon geändert** — Rechenkern, Marcels Entscheidung je Punkt.
+3. Ernte-Automatik (eigener Prüflauf über Register, quellen_links,
+   laender-registry, Ernter): vollautomatisch nur NRW-Liegenschaftszins (GMD-
+   CSV, dl-de/zero-2-0, gemeindescharf); Sachwertfaktoren gibt es nirgends
+   maschinenlesbar — höchstens ein „Auto-Ernte-Vorschlag“ (Dokument holen,
+   Rezept-Parser mit Prüfstand, Satz ungeprüft ablegen, Freigabe durch Marcel
+   am Anwendungsbeispiel). In 7 Ländern (BW, BY, SL, HB, RP, SN, MV) sperren
+   Lizenz, Gebühr, Captcha oder Diagrammform. Skizze mit vier Stufen und 10–17
+   Tagen steht im Prüfbericht; Doktrin bleibt: kein Nachbarkreis, kein
+   Landesmittel, keine Zahl ohne Beleg im Rechenweg.
+
+**Rest.** Prod v1846b; Staging v1877.
