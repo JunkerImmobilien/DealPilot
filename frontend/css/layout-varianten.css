@@ -6719,7 +6719,25 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss]{ background:#050505 !important; border-bottom:1px solid #1f1c17 !important; padding:4px 10px !important; gap:8px !important; min-height:0 !important; }
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-marke{ background:transparent !important; }
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-wm{ color:#F2EDE3 !important; }
-  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-portfolio{ background:#141210 !important; color:#F2EDE3 !important; border-color:#2a2622 !important; margin-left:auto !important; }
+  /* v1889: die Lage gilt in jedem Ton - sie ist Anordnung, keine Farbe. */
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-portfolio{ margin-left:auto !important; }
+  /* ── v1889 · DIE FARBE HING AM LAYOUT STATT AM TON ───────────────────────
+     Hier stand `html[data-dp-layout] … .dpl-portfolio{background:#141210}` -
+     der Anker ist das blosse Vorhandensein eines Layouts, also JEDES. Der
+     Knopf trug damit in der Aktenmappe, in der Kanzlei und im Tower dasselbe
+     Obsidian, egal welchen Ton die Schiene fuehrt.
+
+     > Eine Farbe, die zu jeder Ansicht gehoert, gehoert zu keiner.
+
+     Die Schiene traegt ihren Ton schon als Attribut (`data-ton`, gesetzt aus
+     der Layout-Beschreibung in layout-varianten.js). Der Knopf haengt jetzt
+     daran - dunkle Schiene, dunkler Knopf; helle Schiene, heller Knopf.
+     Fuer die Aktenmappe (ton: dunkel) aendert sich heute nichts am Bild;
+     geaendert hat sich, WORAN die Farbe haengt. */
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss][data-ton="dunkel"] .dpl-portfolio{
+    background:#141210 !important; color:#F2EDE3 !important; border-color:#2a2622 !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss][data-ton="hell"] .dpl-portfolio{
+    background:#FDFCFA !important; color:#2A2727 !important; border-color:#E6E0D2 !important; }
 }
 
 /* v1880a · Die Score-Kacheln standen auf dem Handy doch wieder im Kopf (255 px): seit die Schiene nichts
@@ -6750,6 +6768,76 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 @media (max-width: 900px){
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss]{ background:#0E0D0B !important; border-bottom-color:#26231E !important; }
   html[data-dp-layout][data-dp-layout] body:not(.qc-standalone-active) #dp-sb-toggle{ display:none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════
+   v1889 · DIE SCHUBLADE ZEIGT DAS REGISTER DER AKTENMAPPE (06.10.2026)
+
+   Marcel: „Wenn ich jetzt auf Portfolio gehe, habe ich den Hintergrund von Heute mit den
+   Objektkarteien von der Aktenansicht. Das ist ja ein kompletter Misch." Und: „Die muss wirklich
+   so aussehen wie halt auch bei der Web-Ansicht."
+
+   GEMESSEN am 06.10.2026, dieselbe Anmeldung, beide Breiten:
+
+     Schreibtisch 2133 px, Aktenmappe, Schiene         Handy 390 px, Aktenmappe, Schublade
+     ─────────────────────────────────────────────     ──────────────────────────────────────
+     #sb-actions-accordion  230 x 599, offen           #sb-actions-accordion  0 x 0, display:none
+     sichtbare Gruppen      5 (Ansichten … System)     sichtbare Gruppen      0
+     #sb-actions-trigger-btn  display:none             #sb-actions-trigger-btn  333 x 43, sichtbar
+     .dpl-teil-objekte      display:none (Zustand zu)  #sb-list               333 x 562, immer da
+
+   Das ist der Misch, und er ist kein Farbfehler: auf dem Schreibtisch zeigt die Aktenmappe ihr
+   REGISTER (fuenf Gruppen, dreizehn Eintraege) und blendet die Objektliste erst auf Knopfdruck
+   ein - auf dem Handy ist es genau umgekehrt. Dort stand die unveraenderte Seitenleiste der
+   Ansicht „Heute": Objektliste offen, Register hinter einem zusaetzlichen Tipp versteckt.
+
+   > **Dieselbe Ansicht darf auf zwei Geraeten nicht zwei verschiedene Dinge zeigen.** Wer die
+   > Aktenmappe waehlt, waehlt das Register; dass es auf dem kleinen Schirm hinter einem
+   > Aufklapper verschwindet, ist keine Anpassung, sondern eine andere Ansicht.
+
+   Hier bekommt die Schublade beides, untereinander: erst die Objektliste, dann das Register -
+   zusammen genau das, was die Schiene auf dem Schreibtisch in ihren zwei Zustaenden zeigt. Ein
+   zweiter Umschalter waere ein neuer Bedienweg auf einem Schirm, auf dem der vorhandene
+   (`.dpl-portfolio` in der Schiene) hinter der offenen Schublade liegt und nicht erreichbar ist.
+
+   KEINE FARBE wird hier gesetzt. Der Ton der Schublade (Obsidian) bleibt, wie er seit v1653e
+   ist - das ist eine Produktentscheidung und gehoert Marcel, nicht dieser Datei.
+
+   Spezifitaet: (1,4,3) wie der Block v1653e, und spaeter in der Datei - damit schlaegt er die
+   geklonten Regeln aus dem v1885-Block (1,2,2) und die Aufklapp-Regeln aus style.css.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px){
+  /* Das Register steht offen - in der Seitenleiste ist es ein Ueberlagerungsfeld
+     (position:absolute, z-index:50). In der Schublade gehoert es in den Fluss, genau wie in der
+     Schiene auf dem Schreibtisch (siehe v1649c weiter oben in dieser Datei). */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion{
+    display:block !important;
+    position:static !important; top:auto !important; left:auto !important; right:auto !important;
+    width:auto !important; z-index:auto !important;
+    height:auto !important; max-height:none !important; overflow:visible !important;
+    box-shadow:none !important; border:0 !important;
+    /* Flex-Kind in einem scrollenden Behaelter: ohne das schrumpft es auf null und der Inhalt
+       wird still abgeschnitten (CLAUDE.md). */
+    flex:0 0 auto !important;
+  }
+  /* Der Aufklapper hat nichts mehr aufzuklappen - wie in der Schiene. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn{
+    display:none !important;
+  }
+  /* Jetzt scrollt die Schublade als Ganzes, nicht die Liste in sich. Sonst stuende das Register
+     unter der Kante und niemand wuesste, dass es da ist. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar{
+    overflow-y:auto !important; -webkit-overflow-scrolling:touch;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-user-box,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user{
+    flex:0 0 auto !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list{
+    overflow:visible !important; max-height:none !important;
+  }
 }
 
 /* ═══ v1885 · DIE AKTENMAPPE AUF DEM HANDY (05.10.2026) ════════════════════════════════════════

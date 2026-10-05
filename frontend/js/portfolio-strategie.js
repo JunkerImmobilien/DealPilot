@@ -133,6 +133,34 @@
         + '#' + SEC_ID + ' .pst-kopf p{max-width:760px;font-size:13.5px;line-height:1.55}'
         + '#' + SEC_ID + ' .pst-h3{font:700 11px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;margin:22px 0 10px}'
         + '#' + SEC_ID + ' .pst-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}'
+        /* ── v1889 · DIE TABELLE WAR ABGESCHNITTEN, NICHT WISCHBAR ──────────
+           Marcel am 06.10.2026: „die Portfoliostrategie wird nicht richtig
+           dargestellt."
+
+           GEMESSEN auf 390 px (Aktenmappe, Messkabine):
+
+             .pst-scroll     clientWidth 335 · scrollWidth 335   -> nichts zu wischen
+             letzte Zelle    x = 535 .. 625
+             Kartenkante     x = 373                            -> 252 px rechts davon
+
+           Vier Spalten (Kauf, Spekulationsfrist, 15-%-Fenster,
+           Sanierungsquote) lagen ausserhalb und waren NICHT erreichbar - es
+           gab auch keinen Balken, der darauf hingewiesen haette.
+
+           Ursache ist `.cft{width:100%}` (style.css:120). In einem
+           `overflow-x:auto`-Behaelter heisst das: die Tabelle waechst nicht
+           mit ihrem Inhalt, ihre `nowrap`-Zellen laufen ueber den Tabellen-
+           kasten hinaus und werden geklippt. Der Behaelter sieht dabei
+           `scrollWidth == clientWidth` und zeigt folgerichtig keinen Balken.
+
+           > **Ein Ueberlauf, der keinen Balken erzeugt, ist kein Ueberlauf -
+           > er ist ein Verlust.** Geprueft wird deshalb am klippenden
+           > Vorfahren, nicht am Fenster.
+
+           `width:max-content` laesst die Tabelle ihre echte Breite nehmen,
+           `min-width:100%` haelt sie auf dem Schreibtisch so breit wie die
+           Karte. Keine Farbe, keine Schrift - nur Breite. */
+        + '#' + SEC_ID + ' .pst-scroll > table{width:max-content !important;min-width:100%}'
         + '#' + SEC_ID + ' .pst-hint{font-size:12px;opacity:.75;margin:8px 0}'
         + '#' + SEC_ID + ' .pst-ap{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}'
         + '#' + SEC_ID + ' .pst-ap-k{padding:10px 12px;display:flex;flex-direction:column;gap:3px}'

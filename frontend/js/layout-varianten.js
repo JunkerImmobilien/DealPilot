@@ -1353,7 +1353,23 @@
       + '<p class="dpuv-hint">Wo Menü, Aktionen, Score und Ausgaben liegen. '
       + 'Die Arbeitsfläche bleibt in allen gleich — es wechselt nur der Rahmen. '
       + 'Farben, Formen und Schrift stehen darunter und lassen sich frei '
-      + 'dazu kombinieren. Jede Ansicht ausser „Heute" schaltet auf <b>hell</b>.</p>'
+      /* ── v1889 · HIER STAND: „Jede Ansicht ausser ‚Heute' schaltet auf hell." ──
+         Das hat der Code zuletzt in v1698 getan. v1699 hat den Hell-Zwang
+         ausdruecklich ENTFERNT (siehe `setze()`), auf Marcels Ansage, den
+         Dunkelmodus als Auslieferungszustand zu behalten. Der Satz blieb
+         stehen und versprach seitdem etwas, das nicht passiert.
+
+         > Ein Hinweistext ist eine Zusage. Wer ihn nicht mit zurueckbaut,
+         > hinterlaesst keine Doku, sondern eine Luege - und wer ihr folgt,
+         > sucht den Fehler an einer Stelle, an der keiner ist.
+
+         Nachgemessen am 06.10.2026: mit `dp_chrome_hell=1` VOR dem Laden
+         bleiben `#sidebar`, `.dpl-schiene`, `header.hdr` und `nav.tabs` auf
+         rgb(14,13,11) - der helle Anstrich wuerde den Rahmen der Layouts
+         ohnehin nicht erreichen (layout-varianten.css:1643 und :1737 heben
+         sich mit (1,4,3) ausdruecklich ueber `body.dp-chrome-hell`). Der
+         Satz war also doppelt falsch. */
+      + 'dazu kombinieren. Hell und Dunkel wählst du getrennt unter <b>Modus</b>.</p>'
       + '<div class="dpuv-seg" id="dpl-seg">'
       + kacheln.map(function (o) {
           return '<button type="button" class="dpuv-sgb' + (o.key === aktuell ? ' on' : '')
