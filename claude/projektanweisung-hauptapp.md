@@ -31052,3 +31052,44 @@ Leuchtschatten — Haupt-App und QuickBoarding (`html.qc-app`).
 `#avsec` 114 px, sichtbare Leistenknöpfe nur Unten/Ø/Oben.
 
 **Rest.** Prod v1846b; Staging v1870a (`673dba7`).
+
+### (33) 05.10.2026 — v1871/v1872: Steuer-Reiter entschlackt, BMF-Rechner mit Objekt-Modernisierungen, Cache und Vorlauf
+
+**Was.** Marcels Liste zum BMF-Rechner und Reiter Steuer: Badezimmer-Hinweis
+hellgrau; Anschaffungskosten laden lange, „vorher ausrechnen"; Gebäudeanteil
+aggressiv 65 % — kann das sein?; Hover-Text im Modal nicht lesbar;
+Modernisierungen aus dem Reiter Objekt übernehmen; gutachten.org raus;
+Knöpfe „Gutachten anfragen" und „Eigenen Satz entfernen" weg; oben zu viel
+Text.
+
+**Gemessen (Parkstr. 9).** Der Lauf dauert ~40 s: `bmfService.calculateKpa`
+lässt LibreOffice die BMF-Arbeitshilfe neu rechnen. Ergebnis amtlich
+**54,31 % Gebäude** (Boden 45,69 %), konservativ 61,16, optimiert 63,45,
+aggressiv 65,73 — plausibel: Baujahr 1905, keine Modernisierung erfasst,
+Bodenwert 180.000 € bei 780.000 € Kaufpreis; die Arbeitshilfe teilt nach
+Sachwert, nicht nach Bodenwert/Kaufpreis, und die Varianten senken den
+Bodenanteil um 15/20/25 %. Die Modal-Felder `mod_dach`/`mod_fenster`
+hießen wie die Felder im Reiter Objekt — `getElementById` traf den Reiter
+(„Keine/Nie", „> 20 Jahre" gingen roh ans Backend), die anderen sechs
+standen auf „nein". Das Hover-Popup stand bei (8, 0): Seitenkoordinaten in
+einem `position:fixed`-Modal. MEA gibt es weiter (ETW Hüllhorst: 50 %).
+
+**Gebaut (`8053448` v1871, `1b645f9` v1872).**
+- Reiter Steuer: Haftungshinweis und „Was mit diesen Werten passiert" hinter
+  „Wichtige Hinweise" (`details#steuer-hinweise`, Kern „Keine
+  Steuerberatung" bleibt sichtbar); afa-eigen.js ohne gutachten.org, ohne
+  „Gutachten anfragen" und „Eigenen Satz entfernen".
+- BMF-Modal: Ids `bmf_mod_dach`/`bmf_mod_fenster`; `_bmfModVorbelegen()`
+  überträgt acht Felder aus dem Reiter Objekt (Keine/>20 → nein, 10–20 →
+  teilweise, <10/Kernsanierung → ja) und schreibt „5 von 8 übernommen" an
+  die Zusammenfassung.
+- Cache: Migration 084 `bmf_cache`; `/bmf/pipeline` hasht die
+  `phase1_inputs` (stabil sortiert), liest zuerst, schreibt nach dem Lauf
+  (`_cache.hit`, `dauer_ms`), räumt nach 60 Tagen. Vorlauf: sechs Sekunden
+  nach `dp:object-ready`, nur bmf_advanced, nur ohne fehlende Pflicht,
+  einmal je Objekt (`_bmfVorwaermen`), `prewarm:true`; bei laufendem Lauf
+  antwortet der Server 202.
+- feld-hilfe.js: Popup `position:fixed` im Viewport.
+- „passt nicht zu dieser Objektart" im Hinweis-Stil (Mono, #6b655f).
+
+**Rest.** Prod v1846b; Staging v1872.
