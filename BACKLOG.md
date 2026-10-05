@@ -265,6 +265,24 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N24 · Handy- und Tablet-Durchgang 05.10.2026 — erledigt v1881–v1882a, auf Prod
+
+Gemessen 390 und 820 px, Aktenmappe: alle 9 Reiter, Menü, Akkordeon, Einstellungen, QuickBoarding,
+Marktbericht, Tour. Behoben: Gewerke-Tabelle, KPI-Tabelle (Zeilenraster), Partner-Bordkarten,
+Info-Knöpfe auf Touch (rund, 18 px), Rechtliches in der Schublade, Kopf-Kacheln in einer Zeile,
+Markteinschätzung 700–899, Marktbericht-Bordkarte. **Offen:** Marktbericht-Ansicht auf dem Handy
+hat keinen eigenen Zurück-Knopf (nur Menü/Objektwahl); die Reiterleiste zeigt am Desktop-Kabinen-
+Bildschirm einen Scrollbalken (auf Touch unsichtbar) — beides bewerten, nicht dringend.
+
+### N25 · Ernte 05.10.2026 — NRW Faktoren Block 3 (47) + Block 4 Kreise (30) + Kassel 2026, auf Staging und Prod
+
+**Marcel entscheidet:** Rheine rhdhh (Beispiel 0,98 gegen Formel 0,9748) freigeben? Kassel 2024
+neben 2026 — jüngstes Jahr bevorzugen oder 2024 streichen. **Nächste Blöcke:** Stadt Wesel
+(GMB 29400), restliche NRW-Kreise, dann BY/BW-Ausschüsse mit Genehmigung. **Feldbrücke:** sieben
+neue Eingabefelder (bodenwertanteil_prozent, bodenwert, sachwert_bauliche_anlagen,
+ortsteil_einwohner, mietsituation, ortsteil, wohnlageklasse) fehlen in CrossCheckService →
+diese Sätze antworten bis dahin `feld_fehlt`.
+
 ### N22 · Modul Portfolio-Strategie (05.10.2026) — angelegt v1880, hinter Feature-Schlüssel
 
 Weg 2 (Marcels Wahl): im Repo, hinter `portfolio_strategie` (Migration 085, überall false;

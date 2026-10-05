@@ -31539,3 +31539,78 @@ auf dem Staging-Host (PDF-Kopf per `head -c 5`), boris.nrw ist vom Server erreic
 (Notiz „gesperrt" veraltet).
 
 **Rest.** Prod v1880d; Staging v1880d; `main` = `staging` bis auf Journal.
+
+### (43) 05.10.2026 — v1881–v1882a: Handy- und Tablet-Durchgang, Ernte NRW Block 3 + 4 und Kassel 2026, Prod nachgezogen
+
+**Was.** Marcel: „nochmal die App auf dem Handy und Tablet prüfen. das muss wirklich passen.
+alle ansichten, alle reiter, alle felder, sind die Icons für Info alle richtig? nicht Oval
+sondern rund … geht die erstanmeldung mit der Tour und den Grundeingaben … alle reiter tabs,
+aktionen, modale. alles". Dazu „weiter ernten".
+
+**Gemessen und gebaut — Handy 390 px, Aktenmappe (`080af69` v1881, `00ec20d` v1881a,
+`a07c21b`/`99b1c98` v1881b).**
+- Gewerke-Tabelle (Reiter Objekt): die Regel v1862c machte die TABELLE zum Scrollkasten, der
+  Inhalt schrumpfte trotzdem auf 60-px-Auswahlen („– k", „Kei"). Jetzt ist die Karte der
+  Scrollkasten, die Tabelle behält 620 px und wischt; Auswahlen 196 px.
+- KPI-Tabelle (Bewertung): 493 px breit, Ampel abgeschnitten. Enger setzen reichte NICHT
+  (nachgemessen 426 px in 331) — jede Zeile ist jetzt ein Raster Name | Wert | Ampel, der
+  Hinweis darunter über die volle Breite; rechter Rand 356 < 390.
+- Partner-Bordkarten (Deal-Aktion): 448/352 px in einer 293-px-Schiene → 281 px, die Schiene
+  `.dab-rail` wischt waagerecht.
+- Info-Knöpfe: mit Hover-Hilfe (`body.dp-feldhilfe-an`) waren die „?"-Knöpfe aus — auf Touch
+  gibt es dann keine Hilfe. Unter `(hover: none)` bleiben sie da, 18 × 18, rund (Regel am
+  Desktop per eingespritztem Blatt gegengeprüft: 8 Knöpfe 18x18, Radius 50 %).
+- Rechtliches: der schwebende Link lag über Eingabefeldern. Unter 900 px (Schublade) wandert er
+  als stille Zeile ans Ende der Seitenleiste. Zwei Anläufe: `#sidebar .sb-user` gibt es nicht
+  (heißt `#sb-user`), und `#sb-user` entsteht erst in auth.js NACH DOMContentLoaded — Anker ist
+  der statische Fuß `#sb-footer-spacer`. Dazu der helle Kasten der Desktop-Regel
+  (`#dp-app-legal-footer{background:…0.94}`) im dunklen Menü → mit ID-Kette aus.
+- Tour-Text Schritt 1 ohne „Kanzlei und Tower".
+- Menü-Akkordeon „Aktionen" auf dem Handy: 13 Einträge je 306 × 44, alle erreichbar.
+
+**Tablet 820 px (`fefabcc8`/`dd8725a` v1881c, `2017aa1` v1881d, `60201fa` v1882a).**
+- Kopf: sechs Score-Kacheln als flex-wrap 4 + 2 (die letzten zwei auf 387 px gestreckt), Kopf
+  270 px. Erst 3 + 3 (gab 354 px, weil `.sc-main` per `grid-column` die ganze Zeile nahm),
+  dann EINE Zeile `minmax(150px,auto) repeat(5,1fr)`: Score 184 + fünf Kacheln je 111 px,
+  nichts läuft über, Kopf 190 px.
+- Markteinschätzung: in der Stufe ≤ 1179 (Container) bekam „je m²" die Restspalte — 69 px für
+  „466 €/m² · −74,5 %", der Prozentwert ragte aus der Karte. Neue Container-Stufe 700–899:
+  Marktwert · je m² · Marktmiete, Spanne darunter, Einordnung zuletzt.
+- Marktbericht-Bordkarte: `.mbv-rz` (min-width 150) trug QR + PDF-Knopf nebeneinander, Knopf
+  41 px aus der Karte → bis 1024 gestapelt (Styles sitzen IN marktbericht-view.js).
+- In Ordnung: alle 9 Reiter ohne Überlauf (Cashflow-Tabelle 997 px in eigenem Scroller),
+  Burger → Schublade 360 × 1180 mit 19 Karten und Backdrop, Einstellungen 760 × 1086,
+  QuickBoarding-iframe 752 px ohne Überlauf, Marktbericht-iframe 731 px, Tour-Blase 368 × 396
+  im Bild.
+
+**Ernte (`f7a7dce` v1882).** Zwei Agenten parallel, je mit echtem `swf_modelle.js` als
+Prüfer: `swf-nw-2026-block3.json` (47 Sätze, 36 mit Wert, 11 Sperren; 17 Ausschüsse:
+Bottrop, Hagen, Hamm, Herne, Leverkusen, Mülheim, Oberhausen, Solingen, Siegen-Wittgenstein,
+Bocholt, Dinslaken, Moers, Recklinghausen, Rheine, Siegen; Dorsten/Gladbeck/Marl und Minden
+als Sperre — nur Punktwolken bzw. Grafik) und `swf-nw-he-2026-block4.json` (30 Sätze, 27 mit
+Wert; Kreise Coesfeld, Düren, Ennepe-Ruhr, Euskirchen, Heinsberg, HSK, Kleve, Oberberg, Soest,
+Viersen, Warendorf; Rheinisch-Bergischer Kreis Sperre; Kassel IMB 2026 Tab. 29–31).
+Prüfstrecke 41 + 30 Modelle, 0 Fehler; Maschinenvergleich 515 + 257 Tabellenzellen; echte
+Anwendungsbeispiele getroffen bei Herne, Rheine, Coesfeld (6), HSK, Soest (2), Warendorf (2).
+Register danach (Staging = Prod): NW Faktoren 176/72 (vorher 103/41), HE Faktoren 164/92,
+77 Sätze `v1881-hand` in 32 AGS, gesamt 3.157.
+
+**Verworfen / Marcel entscheidet:** Rheine rhdhh — gedrucktes Beispiel 0,98, Formel ergibt
+0,9748 (Rundung des Berichts?), nicht gesät. Kassel 2026 liegt NEBEN dem 2024er Stand
+(Upsert-Schlüssel führt Jahr + URL) — der Leser muss das jüngste Jahr bevorzugen, sonst 2024
+aus `swf-he.json` entfernen. Neue Eingabefelder, die `CrossCheckService` noch nicht liefert
+(dann `feld_fehlt` statt Wert): `bodenwertanteil_prozent` (Rheine), `bodenwert` +
+`sachwert_bauliche_anlagen` (Ennepe-Ruhr), `ortsteil_einwohner` (HSK), `mietsituation`
+(Warendorf), `ortsteil` (Coesfeld), `wohnlageklasse`/`modernisierungsgrad_herne` (Herne).
+Stadt Wesel (GMB 29400) hat einen eigenen Ausschuss — Kandidat für Block 5.
+
+**Prod-Rollout v1882a.** Sicherungen `prod-haupt-20261005-1303-vor-v1882` (11 MB, 71
+Tabellen) und `prod-mb-…` (1,4 MB, 26), `main` ff auf `60201fa`, mb-backend neu gebaut, NW
+und HE gesät (0 Fehler), Buster per curl (`layout-varianten.css?v=v1881d` → 200 text/css).
+
+**Messfalle dieses Durchgangs:** im Hintergrund-Tab laufen `setTimeout`-Wartezeiten in der
+Kabine auf > 45 s (CDP-Timeout) — eine Bildschirmaufnahme weckt den Tab, danach nur kurze
+Wartezeiten (≤ 300 ms) und Zustände per Klick-Rückgabe lesen. Ein Iframe, dessen `src` sich
+nicht ändert (beforeunload), wird ersetzt statt neu geladen.
+
+**Rest.** Prod v1882a; Staging v1882a; `main` = `staging` bis auf Journal.
