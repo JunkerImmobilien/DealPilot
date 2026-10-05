@@ -851,7 +851,9 @@ function _renderWertverfahren(d) {
                   return ' \u00b7 Faktor ' + String(z).replace('.', ',')
                        + (s ? ' \u00b7 Stufe ' + s : '');
                 })())
-              : 'vorl\u00e4ufig \u00b7 ohne Sachwertfaktor, kein Marktwert')
+              : (sw.sachwertfaktor_standard
+                  ? 'vorl\u00e4ufig \u00b7 Sachwertfaktor ' + String(sw.sachwertfaktor_standard).replace('.', ',') + ' (Standard, ohne Marktanpassung)'
+                  : 'vorl\u00e4ufig \u00b7 ohne Sachwertfaktor, kein Marktwert'))
           : (sw.grund || 'nicht ausgewiesen'),
         'sach', sw.staffel,
         (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
@@ -3831,6 +3833,10 @@ async function exportPdf(out) {
        * Sachwertfaktor" ist eine Feststellung, keine Begruendung — bei einer
        * Eigentumswohnung leitet der Gutachterausschuss naemlich gar keinen
        * ab. Der Bildschirm zeigt den Grund seit v1143, das PDF nicht. */
+      /* v1867 · der Standardwert steht als Zahl im PDF, nicht nur „ohne Faktor" */
+      (sw.available && !sw.marktangepasst && sw.sachwertfaktor_standard)
+        ? ('Sachwertfaktor ' + String(sw.sachwertfaktor_standard).replace('.', ',') + ' · Standard, ohne Marktanpassung (§ 7 Abs. 2 ImmoWertV)')
+        : null,
       (sw.available && !sw.marktangepasst && sw.sachwertfaktor_grund)
         ? ({ objektart_nicht_abgeleitet: 'Ausschuss leitet f\u00fcr diese Objektart keinen Faktor ab',
              kein_ausschuss_hinterlegt: 'kein Gutachterausschuss hinterlegt',

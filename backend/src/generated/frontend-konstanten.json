@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-05T05:42:14.108Z",
+ "erzeugt_am": "2026-10-05T06:05:48.288Z",
  "quellen": {
   "voice-import": "66d9de8cca907ef8",
   "objektart-felder": "b1481ff1f7c0b04d",
   "storage": "a3c486485f6eaf61",
-  "index-html": "1ad27e59e0089ca6",
+  "index-html": "7dc070cb0918efd8",
   "grest": "9c0a4587759b4148"
  },
  "daten": {
@@ -764,7 +764,7 @@
       "text": "Sehr gut"
      }
     ],
-    "label": "Makrolage"
+    "label": "Makrolage DS2"
    },
    {
     "id": "mikrolage",
@@ -791,7 +791,7 @@
       "text": "Sehr gut"
      }
     ],
-    "label": "Mikrolage"
+    "label": "Mikrolage DS2"
    },
    {
     "id": "vermstand",
@@ -911,12 +911,12 @@
    {
     "id": "wertstg",
     "kind": "text",
-    "label": "Entwicklungs-Opportunität"
+    "label": "Entwicklungs-Opportunität DS2"
    },
    {
     "id": "kostenstg",
     "kind": "text",
-    "label": "Entwicklungs-Opportunität"
+    "label": "Entwicklungs-Opportunität DS2"
    },
    {
     "id": "leerstand",
@@ -1048,17 +1048,17 @@
    {
     "id": "hg_nul",
     "kind": "text",
-    "label": "Hausgeld (nicht umlagefähig)"
+    "label": "Hausgeld (nicht umlagefähig) DS2"
    },
    {
     "id": "weg_r",
     "kind": "text",
-    "label": "WEG-Rücklage / Jahr ℹ Info"
+    "label": "WEG-Rücklage / Jahr ℹ Info DS2"
    },
    {
     "id": "eigen_r",
     "kind": "text",
-    "label": "Eigene Instandhaltungsrücklage"
+    "label": "Eigene Instandhaltungsrücklage DS2"
    },
    {
     "id": "mietausfall",
@@ -1583,7 +1583,7 @@
       "text": "Stark fallend"
      }
     ],
-    "label": "Bevölkerungsentwicklung"
+    "label": "Bevölkerungsentwicklung DS2"
    },
    {
     "id": "ds2_nachfrage",
@@ -1610,7 +1610,7 @@
       "text": "Sehr schwach"
      }
     ],
-    "label": "Nachfrage-Indikatoren"
+    "label": "Nachfrage-Indikatoren DS2"
    },
    {
     "id": "ds2_wertsteigerung",
@@ -1637,7 +1637,7 @@
       "text": "Keines"
      }
     ],
-    "label": "Wertsteigerungs-Potenzial"
+    "label": "Wertsteigerungs-Potenzial DS2"
    },
    {
     "id": "ds2_entwicklung",
@@ -1664,7 +1664,7 @@
       "text": "Keine"
      }
     ],
-    "label": "Entwicklungsmöglichkeiten"
+    "label": "Entwicklungsmöglichkeiten DS2"
    },
    {
     "id": "zimmer",

@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1866"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v1867"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -993,7 +993,7 @@ label.dp-required.qc-required::after {
 <!-- ═══════════ TAB 1: OBJEKT ═══════════ -->
 <div class="sec active" id="s0">
   <div id="obj-action-bar"></div>
-  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v1866: die Eingabetiefe wird in der Pre-Flight-Karte gewaehlt (Pillen an der DealPilot-Kachel); hier nur noch der Stand --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Eingabetiefe</span><span id="oe-ziel-status" class="oe-ziel-status"></span><button type="button" class="oe-btn" id="oe-ziel-aendern" title="Die Eingabetiefe steht in der Pre-Flight-Karte oben">ändern ↑</button></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p></div>
+  <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v1867: Eingabetiefe mit Pillen 1/2/3 (dieselbe Wahl wie in der Pre-Flight-Karte), Stand, Haken - und darunter die Abruf-Box --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Eingabetiefe</span><span class="dp-pf-stufen oe-pillen" data-oe-pillen title="Einfach · Mittel · Ausgiebig"></span><span id="oe-ziel-status" class="oe-ziel-status"></span></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-abruf-box" class="oe-abruf-box"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die gewählte Eingabetiefe ist vorgemerkt</span></div><div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div></div>
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_immometrica_id" value="">
@@ -1275,10 +1275,10 @@ label.dp-required.qc-required::after {
 </div>
 <div class="card oe-karte" id="oe-karte-lage"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage &amp; Einschätzung <span class="oe-ct-hint">geht in den Investor Deal Score — immer sichtbar</span></div>
 <div class="g3">
-          <div class="f"><label>Makrolage</label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
-      <div class="f"><label>Mikrolage</label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
+          <div class="f"><label>Makrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
+      <div class="f"><label>Mikrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">
-        <label>Bevölkerungsentwicklung</label>
+        <label>Bevölkerungsentwicklung <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label>
         <select id="ds2_bevoelkerung" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="stark_wachsend">Stark wachsend</option>
@@ -1289,7 +1289,7 @@ label.dp-required.qc-required::after {
         </select>
       </div>
       <div class="f">
-        <label>Nachfrage-Indikatoren</label>
+        <label>Nachfrage-Indikatoren <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label>
         <select id="ds2_nachfrage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="sehr_stark">Sehr stark (Uni, ÖPNV, Top-Arbeitgeber)</option>
@@ -1300,7 +1300,7 @@ label.dp-required.qc-required::after {
         </select>
       </div>
       <div class="f">
-        <label>Wertsteigerungs-Potenzial <button type="button" class="dp-tip" data-tip-id="tab3.wertsteigerung" tabindex="-1" aria-label="Hilfe zu tab3.wertsteigerung"></button></label>
+        <label>Wertsteigerungs-Potenzial <button type="button" class="dp-tip" data-tip-id="tab3.wertsteigerung" tabindex="-1" aria-label="Hilfe zu tab3.wertsteigerung"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label>
         <select id="ds2_wertsteigerung" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="sehr_hoch">Sehr hoch</option>
@@ -1311,7 +1311,7 @@ label.dp-required.qc-required::after {
         </select>
       </div>
       <div class="f">
-        <label>Entwicklungsmöglichkeiten</label>
+        <label>Entwicklungsmöglichkeiten <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label>
         <select id="ds2_entwicklung" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="mehrere">Mehrere klare Möglichkeiten</option>
@@ -1392,7 +1392,7 @@ label.dp-required.qc-required::after {
     <div class="card-title">Grundlagen</div>
     <div class="g3">
       
-      <div class="f"><label title="Bruttogrundflaeche nach DIN 277: alle Grundflaechen aller Grundrissebenen, aussen gemessen. NICHT die Wohnflaeche — die BGF ist regelmaessig deutlich groesser und ist die Bezugsgroesse der NHK.">Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label title="Bruttogrundflaeche nach DIN 277: alle Grundflaechen aller Grundrissebenen, aussen gemessen. NICHT die Wohnflaeche — die BGF ist regelmaessig deutlich groesser und ist die Bezugsgroesse der NHK.">Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div><button type="button" class="oe-btn oe-btn-klein" id="oe-bgf-schaetzen" title="Grobe Näherung: Wohnfläche × 1,35 — der Faustwert, mit dem auch der Bericht rechnet, wenn die BGF fehlt. Kein Ersatz für die Bauzeichnung (DIN 277).">aus Wohnfläche schätzen</button><span class="hint oe-bgf-hint" id="oe-bgf-hint"></span></div>
       
       <div class="f"><label>Grundrissart</label><div class="iw"><select id="grundriss">
         <option value="">— keine Angabe —</option>
@@ -1862,7 +1862,7 @@ label.dp-required.qc-required::after {
               <div class="iw"><input id="me_pct" type="text" inputmode="decimal" step="0.1" value="18.0" class="tr" oninput="calc()"><span class="sfx">%</span></div>
               <span class="hint">Gesamt über alle Erhöhungen verteilt</span>
             </div>
-            <div class="f s2"><label>Entwicklungs-Opportunität</label><div class="cf" id="me_opp">—</div>
+            <div class="f s2"><label>Entwicklungs-Opportunität <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="cf" id="me_opp">—</div>
               <span class="hint">IST-Miete vs. Soll-Mietspiegel — negativ = unter Markt</span>
             </div>
           </div>
@@ -2906,9 +2906,9 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Summe umlagefähig</label><div class="cf" id="ul_sum">—</div></div>
       </div>
       <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Nicht umlagefähige Kosten / Jahr</div>
-        <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
-        <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>Hausgeld (nicht umlagefähig) <button type="button" class="dp-tip" data-tip-id="tab6.hg_nicht_umlagefaehig" tabindex="-1" aria-label="Hilfe zu Hausgeld nicht umlagefähig"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="hg_nul" type="text" inputmode="decimal" placeholder="1539" class="trl" oninput="calc()"></div></div>
+        <div class="f"><label>WEG-Rücklage / Jahr <span class="info-tag" title="Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)">ℹ Info</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="weg_r" type="text" inputmode="decimal" placeholder="798" class="trl" oninput="calc()"></div><div class="dp-tip-infobox" data-tip-id="tab6.weg_ruecklage"></div><span class="hint">Anteil der Rücklage am Hausgeld - nur zur Information, fließt nicht doppelt in die Bewirtschaftung ein.</span></div>
+        <div class="f"><label>Eigene Instandhaltungsrücklage <button type="button" class="dp-tip" data-tip-id="tab6.eigene_irl" tabindex="-1" aria-label="Hilfe zu tab6.eigene_irl"></button> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="iw"><span class="pfx">€</span><input id="eigen_r" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Kalkulat. Mietausfall / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.kalkulat_mietausfall" tabindex="-1" aria-label="Hilfe zu tab6.kalkulat_mietausfall"></button></label><div class="iw"><span class="pfx">€</span><input id="mietausfall" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label>Sonderverwaltung / Jahr <button type="button" class="dp-tip" data-tip-id="tab6.sonderverwaltung" tabindex="-1" aria-label="Hilfe zu tab6.sonderverwaltung"></button></label><div class="iw"><span class="pfx">€</span><input id="nul_sonst" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
@@ -3552,7 +3552,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1840"></script>
-<script src="js/objekt-reiter.js?v=v1866"></script>
+<script src="js/objekt-reiter.js?v=v1867"></script>
 <script src="js/feld-hilfe.js?v=v1858"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1738"></script>
@@ -3614,7 +3614,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v1740d"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v1866"></script>
+  <script src="js/object-actions.js?v=v1867"></script>
   <script src="js/dpsh-score-hero.js?v=v1640"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
   <script src="js/voice-import.js?v=v1863"></script>

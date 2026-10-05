@@ -139,7 +139,17 @@
          eben keine für diese Objektart (Lippe: nur EZFH). Eintragen geht
          immer, als eigener Ansatz. */
       else if (sq && sq.verfuegbar) html += zeile('Sachwertfaktor', 'Tabelle vorhanden', st('a', 'Ausschuss') + '<span title="' + esc(sq.ausschuss || '') + '">' + esc((sq.ausschuss || r.ausschuss || '').split(',')[0]) + '</span>' + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eintragen', 'sachwertfaktor'));
-      else html += zeile('Sachwertfaktor', '—', st('x', 'kein Wert') + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.') + (sq && sq.ausschuss ? ' <span class="oe-q" title="' + esc(sq.ausschuss) + '">(' + esc(String(sq.ausschuss).split(',')[0]) + ')</span>' : ''), knopf('eintragen', 'sachwertfaktor'));
+      else {
+        /* v1867 · Marcel: „dass der fehlt, aber auch warum und dass man den nicht
+           braucht … und mit welchem Standardwert gerechnet wird". Der Bericht
+           rechnet dann mit 1,0 (ohne Marktanpassung, § 7 Abs. 2 ImmoWertV). */
+        var _artS = _v('objart').toUpperCase(), _mfh = /MFH|GESCH|BUERO/.test(_artS) || parseInt(_v('einheiten'), 10) >= 3;
+        html += zeile('Sachwertfaktor', '1,00', st('b', 'Standard') + 'ohne Marktanpassung — ' + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.')
+          + (sq && sq.ausschuss ? ' <span class="oe-q" title="' + esc(sq.ausschuss) + '">(' + esc(String(sq.ausschuss).split(',')[0]) + ')</span>' : '')
+          + (_mfh ? ' Für Mehrfamilienhäuser ist der Ertragswert das Verfahren, der Sachwert dient nur der Plausibilität — der Faktor wird nicht gebraucht.'
+                  : ' Der vorläufige Sachwert ist damit eine Herstellungskostenrechnung, kein Marktwert.')
+          + ' Eigener Ansatz möglich:', knopf('eintragen', 'sachwertfaktor'));
+      }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
       html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + (r.rnd_jahre != null ? r.rnd_jahre : '—') + ' J.',
         gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV') + ' · Restnutzungsdauer aus Baujahr' + (mp ? ' — mit ' + mp.total + ' Modernisierungspunkten rechnet der Bericht nach Anlage 2 neu' : ''), '');
@@ -345,7 +355,7 @@
     if (stat) {
       var NAMEN = { 1: 'Einfach · Stufe 1', 2: 'Mittel · Stufe 2', 3: 'Ausgiebig · Stufe 3' };
       var fz = fehltFuer(z).length;
-      stat.innerHTML = '<b>' + NAMEN[z] + '</b> ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">Klick auf ein rotes Feld-Schild unten oder auf „' + fz + ' fehlt" in der Abruf-Box oben.</span>' : st('a', 'bereit'));
+      stat.innerHTML = '<b>' + NAMEN[z] + '</b> ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">„' + fz + ' fehlt" in der Zeile unten zeigt die Felder.</span>' : st('a', 'bereit'));
     }
     var hint = $('oe-ziel-hint');
     if (hint) hint.textContent = z === 1 ? 'Einfach — eine Marktpreisindikation: Adresse, Objektart, Wohnfläche, Baujahr. Lage & Einschätzung bleiben sichtbar, sie gehen in den Deal Score.'
@@ -416,8 +426,14 @@
   }
   /* v1858 · dieselbe Eingabetiefe als drei Pillen in der Pre-Flight-Kachel
      „DealPilot" (object-actions.js, #oab-dp-stufen). Klick setzt sie. */
+  /* v1867 · dieselben Pillen an zwei Orten: Pre-Flight-Kachel (#oab-dp-stufen)
+     und Reiter-Kopf ([data-oe-pillen]). Eine Wahl, ein Merker. */
   function preflightPillen() {
-    var host = $('oab-dp-stufen'); if (!host) return;
+    var hosts = [].slice.call(document.querySelectorAll('#oab-dp-stufen, [data-oe-pillen]'));
+    hosts.forEach(pillenIn);
+  }
+  function pillenIn(host) {
+    if (!host) return;
     var z = zielstufe();
     host.innerHTML = [1, 2, 3].map(function (s) {
       var fehlt = fehltFuer(s).length;
@@ -560,6 +576,20 @@
     if (_verdrahtet || !$('oe-auto')) return;
     _verdrahtet = true;
     document.addEventListener('click', function (e) {
+      /* v1867 · BGF grob aus der Wohnfläche: × 1,35 ist der EFH-Faustwert, mit dem
+         der Bericht selbst rechnet, wenn die BGF fehlt (CrossCheckService
+         BGF_FAKTOR). Als Schätzung gekennzeichnet, nie still. */
+      if (e.target.closest('#oe-bgf-schaetzen')) {
+        var wfl = parseFloat(String(_v('wfl')).replace(/\./g, '').replace(',', '.'));
+        var bgfEl = $('bgf'), bh = $('oe-bgf-hint');
+        if (!(wfl > 0) || !bgfEl) { if (bh) bh.textContent = 'Dafür braucht es erst die Wohnfläche.'; return; }
+        var bgf = Math.round(wfl * 1.35);
+        bgfEl.value = String(bgf);
+        bgfEl.dispatchEvent(new Event('input', { bubbles: true })); bgfEl.dispatchEvent(new Event('change', { bubbles: true }));
+        try { var hk = $('_dp_herkunft'); if (hk) { var o = {}; try { o = JSON.parse(hk.value || '{}'); } catch (e2) {} o.bgf = 'geschätzt (Wohnfläche × 1,35, EFH-Faustwert)'; hk.value = JSON.stringify(o); hk.dispatchEvent(new Event('change', { bubbles: true })); } } catch (e3) {}
+        if (bh) bh.textContent = 'Schätzung: ' + deNum(wfl, 0) + ' m² × 1,35 = ' + deNum(bgf, 0) + ' m² BGF — grobe Näherung (DIN 277 misst außen, alle Grundrissebenen). Die Bauzeichnung ist genauer.';
+        return;
+      }
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }
       var zb = e.target.closest('[data-oe-ziel]'); if (zb) { zielSetzen(parseInt(zb.getAttribute('data-oe-ziel'), 10)); return; }
       if (e.target.closest('#oe-vw-btn')) { verkehrswertSetzen(); return; }

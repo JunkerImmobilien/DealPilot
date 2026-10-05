@@ -507,6 +507,19 @@ export const CrossCheckService = {
            * Feststellung — der Grund unterscheidet, ob der Ausschuss keinen
            * abgeleitet hat, ob das Objekt aus der Spanne faellt oder ob es
            * gar nicht sein Zustaendigkeitsbereich ist. */
+          /* v1867 · Marcel: „default vielleicht 1,0 mit Hinweis ohne Marktanpassung".
+           * Bleibt der Sachwert vorläufig, rechnet er faktisch mit 1,0 — das steht
+           * jetzt als Zahl da, mit dem Grund, warum kein amtlicher Faktor greift
+           * (§ 7 Abs. 2 ImmoWertV: ohne Faktor, wenn keine wesentliche
+           * Marktabweichung zu erwarten ist — hier mangels Ableitung). */
+          sachwertfaktor_standard: (!_sw.marktangepasst && !_sw.sachwertfaktor) ? 1.0 : null,
+          sachwertfaktor_standard_grund: (!_sw.marktangepasst && !_sw.sachwertfaktor)
+            ? ('Standardwert 1,0 — ohne Marktanpassung. '
+               + ((_swfTab && !_swfTab.verfuegbar && _swfTab.hinweis) ? String(_swfTab.hinweis) + ' ' : '')
+               + (/mehrfamilien|mfh|drei/i.test(String(ref.property_type || '')) || Number(ref.units) >= 3
+                   ? 'Für Mehrfamilienhäuser ist der Ertragswert das Verfahren; der Sachwert dient nur der Plausibilität.'
+                   : 'Der vorläufige Sachwert ist eine Herstellungskostenrechnung, kein Marktwert.'))
+            : null,
           sachwertfaktor_grund: (_swfTab && !_swfTab.verfuegbar) ? _swfTab.grund : null,
           sachwertfaktor_hinweis: (_swfTab && !_swfTab.verfuegbar) ? (_swfTab.hinweis || null)
             : (_swfTab && _swfTab.verfuegbar ? _swfTab.hinweis : null),

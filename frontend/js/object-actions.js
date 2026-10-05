@@ -378,10 +378,8 @@
          Eingabetiefe … ein bisschen viel." Ein Ort: die Abruf-Box steht
          jetzt UNTER der Pre-Flight-Karte, gefüllt von objekt-reiter.js
          (stufen()), die Pillen oben wählen die Stufe. */
-      '<div id="oe-abruf-box" class="oe-abruf-box dp-pf-abruf"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die oben gewählte Eingabetiefe ist vorgemerkt</span></div>'
-        + '<div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div>'
-        + '<div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span>'
-        + '<button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div>' +
+      /* v1867 · Marcel: die Box gehört doch unter „Objekt & Fotos", zusammen mit
+         der Eingabetiefe — hier bleiben nur die Pillen an der Kachel. */
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
       (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Die externe Marktbewertung ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
       /* v1637 · Hier stand ein Hinweis, der die beiden Partner NAMENTLICH nannte. Er erschien nur zu den 'coming soon'-Kacheln, und die gibt es nicht mehr. */ '' +
