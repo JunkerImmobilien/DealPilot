@@ -31506,3 +31506,36 @@ RND 60: 0,80 statt 0,90). Kreissätze ohne Ausschluss decken Städte mit eigenem
 (Moers, Dinslaken, Rheine, Bocholt, Minden). Frankfurts negative Bandwerte lehnt der
 Auswerter ab (≤ 0). Kassel 2026 Sachwertfaktoren (Tab. 29–31) ersetzen den 2024er Stand —
 eigene Nachernte. Dritte Erntelinie (ST/TH/SH/NI) läuft noch.
+
+### (42) 05.10.2026 — v1880d: Zinssätze ST/TH/SH/NI, Prod nachgezogen
+
+**Was.** Dritte Erntelinie: `lzs-st-th-sh-ni-2025.json`, 229 Sätze (nach Bereinigung),
+aus 9 niedersächsischen Regionalberichten (GMD 2026), 11 thüringischen
+Ausschussblättern (tlbg.thueringen.de gibt dem Server 403 — alle Blätter aus dem
+ThULB-JPortal, dieselben PDFs), LVermGeo Sachsen-Anhalt und Kiel/Dithmarschen.
+
+**Bereinigt vor der Saat (Doktrin: keine Zahl ohne Beleg, keine ohne Lizenz in den
+Kundenbericht).** Kiel MFH (Formelwerk, Anwendungsbeispiel 2,3 nachgerechnet) ist
+GESPERRT: das Impressum erlaubt nur nicht-kommerzielle Vervielfältigung — Formelwerk
+liegt in `formel_zurueckgehalten`, bis Marcel die Lizenz klärt. Der Aurich-Block
+(Emden, Aurich, Leer, Wittmund × ezfh/rhdhh/we_v) ist GESPERRT: das 2026-Blatt nennt
+Stichtag 01.01.2025 und dieselbe Fallzahl wie 2024, aber andere Werte (1,8/2,3/2,3
+gegen 1,2/1,7/1,9) — am 2025er-PDF gegenlesen, bis dahin gilt der 2024er Satz.
+Sachsen-Anhalt nennt keine Lizenz → im Satz „ungeklärt, vor Kundeneinsatz klären".
+Ein Landes-Beleg mit `ags: 03` gestrichen (kein Ortsbezug).
+
+**Gebaut (`aea8a6e` v1880d).** Datei in `SAATDATEIEN`; Saat auf Staging und Prod.
+Register danach (Zinssätze, Sätze/AGS): NI 248/42 (vorher 93/36), TH 50/20 (1/1),
+ST 5/3 (1/1), SH 18/5 (12/3). Prod-Register gesamt 3.080 Sätze, Sicherung
+`prod-mb-…-vor-v1880d` (1,3 MB, 26 Tabellen).
+
+**Ernte-Stand 05.10.2026 abends, alle drei Linien.** Hessen Zins 145/28 (vorher 9),
+NRW Faktoren 103/41 in 35 Ausschüssen (16), NI/TH/ST/SH wie oben. Was fehlt und
+warum: BW (Genehmigung je Ausschuss), BY (Werte nur beim örtlichen Ausschuss, teils
+Gebühr), SL/HB/RP (kostenpflichtig), SN (Erlaubnis), MV (Belegexemplar), SH-Rest
+(Diagramme/Gebühr/Formular), NI-Landesmodell MFH (nur Tableau-Mouseover), Erfurt ETW
+(Gruppenzuordnung unklar), Ilm-Kreis Gemarkungsliste. Werkzeugbefund: `file` fehlt
+auf dem Staging-Host (PDF-Kopf per `head -c 5`), boris.nrw ist vom Server erreichbar
+(Notiz „gesperrt" veraltet).
+
+**Rest.** Prod v1880d; Staging v1880d; `main` = `staging` bis auf Journal.

@@ -272,7 +272,11 @@ Staging Partner-Plan an). Heute: Bestand mit Fristen (AP 7), AP-Liste, Tabelle f
 **Nächste Schritte:** volles Objekt je Zeile (Sanierungsquote, AfA-Reihe), Investorprofil (AP 9),
 erste Versuchsreihe AP 6 mit vorab gesetzter Schwelle (< 2 % zum Referenzoptimum kleiner Bestände).
 
-### N23 · Ernte 05.10.2026 — Hessen-Zins (137) und NRW-Faktoren Block 2 (69) auf Staging und Prod
+### N23 · Ernte 05.10.2026 — Hessen-Zins (137), NRW-Faktoren Block 2 (69), Zins ST/TH/SH/NI (229) auf Staging und Prod
+
+**Marcels Entscheidungen:** Kiel MFH (Lizenz nur nicht-kommerziell) und Aurich-Block (Werte
+widersprüchlich) sind gesperrt; ST ohne Lizenz. Freigeben = Sperre im Satz lösen, neu säen.
+
 
 Offen: Herford/Minden-Lübbecke werden von Hand-Modulen verdeckt (Register nie erreicht);
 Kreissätze decken Städte mit eigenem Ausschuss; Aachen ohne Soll; Kassel SWF 2026 nachernten;
