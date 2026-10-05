@@ -31025,6 +31025,6 @@ und vs. Kaufpreis · Marktmiete · Einordnung · Genauigkeit), rechts
 
 **Nachweis (Parkstr. 9).** Anfragen-Block zeigt nur noch den
 Liegenschaftszins (Stufe A, Bericht als PDF), Hinweis „vollständig". Streifen
-184 px gesamt, Karte 96 px, Kopfblock 168 × 79, fünf Spalten à 67 px.
+173 px gesamt, Karte 84 px (v1869c: Wertspalten als Block — die Flex-Spalte hatte den Text in Einzelzeilen zerlegt), eine Zeile „Marktwert · je m² · Marktmiete · Einordnung · Genauigkeit · übernehmen".
 
-**Rest.** Prod v1846b; Staging v1869a.
+**Rest.** Prod v1846b; Staging v1869c (`422e965`).
