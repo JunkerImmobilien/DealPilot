@@ -38631,3 +38631,10 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-top { min-height: 122px !important; }
   html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-address { padding-right: 72px !important; }
 }
+
+/* v1888 · Der Dashboard-Umschalter .dp-sidebar-toggle traegt keine eigene Gestaltung und erschien auf dem
+   Handy als grauer Browser-Standardknopf (gemessen 30 x 44 bei 0/250, border:outset). Dort ist die
+   Seitenleiste eine Schublade hinter dem Burger - der Knopf hat keine Aufgabe und verschwindet. */
+@media (max-width: 900px) {
+  body .dp-sidebar-toggle { display: none !important; }
+}

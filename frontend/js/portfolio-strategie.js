@@ -96,13 +96,13 @@
         var san = fr.san_rest_tage == null ? '–' : (fr.san_rest_tage <= 0 ? 'abgelaufen' : Math.ceil(fr.san_rest_tage / 30.44) + ' Mon.');
         var quote = fr.san_quote == null ? '–' : (Math.round(fr.san_quote * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
         var warn = (fr.san_quote != null && fr.san_quote > 0.15 && fr.san_rest_tage > 0) ? ' pst-warn' : '';
-        return '<tr><td>' + esc(adr || o.seq || o.id) + '</td><td>' + esc(halter) + '</td><td class="r">' + eur(num(d.kp)) + '</td>'
-          + '<td>' + fmtDatum(fr.kauf) + '</td><td>' + esc(spek) + '</td><td>' + esc(san) + '</td><td class="r' + warn + '">' + quote + '</td></tr>';
+        return '<tr><td class="tal">' + esc(adr || o.seq || o.id) + '</td><td class="tal">' + esc(halter) + '</td><td>' + eur(num(d.kp)) + '</td>'
+          + '<td>' + fmtDatum(fr.kauf) + '</td><td>' + esc(spek) + '</td><td>' + esc(san) + '</td><td class="' + (warn ? 'pst-warn' : '') + '">' + quote + '</td></tr>';
       }).join('');
-      host.innerHTML = '<table class="pst-tab"><thead><tr><th>Objekt</th><th>Halter</th><th class="r">Kaufpreis</th><th>Kauf</th>'
+      host.innerHTML = '<div class="card"><div class="ct">Bestand mit Fristen</div><div class="pst-scroll"><table class="cft"><thead><tr><th class="tal">Objekt</th><th class="tal">Halter</th><th>Kaufpreis</th><th>Kauf</th>'
         + '<th title="§ 23 EStG: Veräußerung erst nach zehn Jahren steuerfrei">Spekulationsfrist</th>'
-        + '<th title="§ 6 Abs. 1 Nr. 1a EStG: drei Jahre ab Anschaffung">15-%-Fenster</th><th class="r" title="Sanierung ÷ Gebäude-AK">Sanierungsquote</th></tr></thead><tbody>' + rows + '</tbody></table>'
-        + '<p class="pst-hint">' + list.length + ' Objekte · Fristen aus dem Kaufdatum gerechnet · Sanierungsquote erst mit dem vollen Objekt (folgt mit der Versuchsreihe). Das ist der Zustand, den AP 7 als Budget führt.</p>';
+        + '<th title="§ 6 Abs. 1 Nr. 1a EStG: drei Jahre ab Anschaffung">15-%-Fenster</th><th title="Sanierung ÷ Gebäude-AK">Sanierungsquote</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+        + '</div><p class="pst-hint">' + list.length + ' Objekte · Fristen aus dem Kaufdatum gerechnet · Sanierungsquote erst mit dem vollen Objekt (folgt mit der Versuchsreihe). Das ist der Zustand, den AP 7 als Budget führt.</p>';
     }).catch(function (e) { host.innerHTML = '<p class="pst-hint">Bestand konnte nicht geladen werden: ' + esc(e && e.message) + '</p>'; });
   }
 
@@ -116,7 +116,7 @@
       + 'Dieses Modul ist nur mit dem Feature-Schlüssel <code>portfolio_strategie</code> sichtbar und läuft auf Prod nicht mit.</p></div>'
       + '<h3 class="pst-h3">Bestand mit Fristen (AP 7, Stand aus den Objektdaten)</h3><div id="pst-bestand"></div>'
       + '<h3 class="pst-h3">Arbeitspakete (Anlage 1 des Antrags)</h3><div class="pst-ap">'
-      + AP.map(function (a) { return '<div class="pst-ap-k"><b>' + a[0] + ' · ' + esc(a[1]) + '</b><span>' + esc(a[2]) + '</span></div>'; }).join('')
+      + AP.map(function (a) { return '<div class="card pst-ap-k"><b>' + a[0] + ' · ' + esc(a[1]) + '</b><span>' + esc(a[2]) + '</span></div>'; }).join('')
       + '</div>'
       + '<h3 class="pst-h3">Versuchsreihen</h3><p class="pst-hint">Jeder Lauf des Verfahrens landet in <code>portfolio_strategie_laeufe</code> (Hypothese, Eingabe, Ergebnis, Befund). Noch kein Lauf.</p>';
     mcol.appendChild(s);
@@ -124,12 +124,21 @@
       var st = document.createElement('style'); st.id = 'pst-style';
       /* v1880c · Der Objekt-Lader stellt jede .sec wieder auf display:'' — die Sektion stand dann unter dem
          Objekt. Sichtbar ist sie nur mit data-pst-offen am <html>; das schlägt jeden Lader. */
-      st.textContent = 'html:not([data-pst-offen]) #' + SEC_ID + '{display:none !important}#' + SEC_ID + '{padding:18px 22px}#' + SEC_ID + ' .pst-kicker{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:#8a8378}'
-        + '#' + SEC_ID + ' h2{font-family:"Cormorant Garamond",serif;font-size:28px;margin:6px 0 8px;color:#1A1A18}#' + SEC_ID + ' .pst-kopf p{max-width:760px;color:#4a4540;font-size:13.5px;line-height:1.55}'
-        + '#' + SEC_ID + ' .pst-h3{font:700 11px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin:22px 0 10px}'
-        + '#' + SEC_ID + ' .pst-tab{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden}#' + SEC_ID + ' .pst-tab th,#' + SEC_ID + ' .pst-tab td{padding:8px 10px;border-bottom:1px solid #EFEAE0;text-align:left}#' + SEC_ID + ' .pst-tab th{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8378;background:#FBF6E9}#' + SEC_ID + ' .pst-tab .r{text-align:right}#' + SEC_ID + ' .pst-tab .pst-warn{color:#B8625C;font-weight:700}'
-        + '#' + SEC_ID + ' .pst-hint{font-size:12px;color:#6b655f;margin:8px 0}#' + SEC_ID + ' .pst-ap{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}#' + SEC_ID + ' .pst-ap-k{background:#fff;border:1px solid #E6E0D3;border-radius:10px;padding:10px 12px;font-size:12.5px}#' + SEC_ID + ' .pst-ap-k b{display:block;margin-bottom:4px;color:#1A1A18}#' + SEC_ID + ' .pst-ap-k span{color:#6b655f}'
-        + '@media (max-width:700px){#' + SEC_ID + '{padding:12px}#' + SEC_ID + ' .pst-tab{display:block;overflow-x:auto}}';
+      st.textContent = 'html:not([data-pst-offen]) #' + SEC_ID + '{display:none !important}'
+        /* v1888: nur noch Anordnung. Farben, Flaechen und Schrift kommen aus der Ansicht (.card/.ct/.cft),
+           damit die Aktenmappe wie die Aktenmappe aussieht und Heute wie Heute. Die Warnfarbe bleibt hart -
+           Statusfarben sind in jeder Marke gleich (CLAUDE.md). */
+        + '#' + SEC_ID + '{padding:18px 22px}'
+        + '#' + SEC_ID + ' .pst-kicker{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-bottom:4px}'
+        + '#' + SEC_ID + ' .pst-kopf p{max-width:760px;font-size:13.5px;line-height:1.55}'
+        + '#' + SEC_ID + ' .pst-h3{font:700 11px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;margin:22px 0 10px}'
+        + '#' + SEC_ID + ' .pst-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}'
+        + '#' + SEC_ID + ' .pst-hint{font-size:12px;opacity:.75;margin:8px 0}'
+        + '#' + SEC_ID + ' .pst-ap{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}'
+        + '#' + SEC_ID + ' .pst-ap-k{padding:10px 12px;display:flex;flex-direction:column;gap:3px}'
+        + '#' + SEC_ID + ' .pst-ap-k b{font-size:12px}#' + SEC_ID + ' .pst-ap-k span{font-size:11.5px;opacity:.8;line-height:1.4}'
+        + '#' + SEC_ID + ' .pst-warn{color:#B8625C;font-weight:700}'
+        + '@media (max-width:700px){#' + SEC_ID + '{padding:12px}}';
       document.head.appendChild(st);
     }
     return s;
