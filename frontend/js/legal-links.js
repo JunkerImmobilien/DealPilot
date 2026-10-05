@@ -47,15 +47,17 @@
        Seitenleiste - erreichbar ueber das Menue, nie ueber dem Inhalt. */
     try {
       if (window.matchMedia('(max-width: 700px)').matches) {
-        var sbUser = document.querySelector('#sb-user, #sidebar .sb-user-box, #sidebar .sb-user'); /* v1881a: heisst #sb-user */
-        if (sbUser && sbUser.parentElement) {
+        /* v1881b: #sb-user entsteht erst in auth.js NACH DOMContentLoaded (vor .sb-footer eingehaengt) -
+           Anker ist der statische Fuss #sb-footer-spacer, der danach kommt. */
+        var sbUser = document.getElementById('sb-footer-spacer') || document.querySelector('#sidebar .sb-footer');
+        if (sbUser) {
           var z = document.createElement('div');
           z.id = 'dp-app-legal-footer';
           z.style.cssText = 'padding:10px 14px 14px;font-size:11px;color:#8a8378;letter-spacing:0.3px;text-align:center';
           z.innerHTML = '<a href="/impressum.html" target="_blank" style="color:#8a8378;text-decoration:none;margin:0 6px;display:inline-block;padding:8px 0">Impressum</a>'
             + '<span style="color:#555">·</span>'
             + '<a href="/datenschutz.html" target="_blank" style="color:#8a8378;text-decoration:none;margin:0 6px;display:inline-block;padding:8px 0">Datenschutz</a>';
-          sbUser.parentElement.insertBefore(z, sbUser.nextSibling);
+          sbUser.appendChild(z);
           return;
         }
       }
