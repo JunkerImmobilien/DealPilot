@@ -54,9 +54,9 @@ const korrektur = [
   '',
   '  /* (1) Der Kopf der Ansicht "Heute" gehoert nicht in die Aktenmappe: das gerahmte Logo (303 x 78) steht',
   '         doppelt, die Marke traegt schon die Schiene daruber (78 x 78), und die Knopfzeile Quick-Check /',
-  '         Marktbericht ist in der Aktenmappe der Aktionsblock. Beides weg - die Liste beginnt oben. */',
-  '     Die Kette braucht zwei Attribute und `body`: `body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar',
-  '     .sb-header{display:flex!important}` in style.css ist (1,3,2) und schlug die kuerzere Fassung. */',
+  '         Marktbericht ist in der Aktenmappe der Aktionsblock. Beides weg - die Liste beginnt oben.',
+  '         Die Kette braucht zwei Attribute und body: die Regel in style.css traegt eine ID und drei',
+  '         Klassen (1,3,2) und schlug die kuerzere Fassung. */',
   '  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-header,',
   '  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row { display: none !important; }',
   '',
@@ -97,4 +97,20 @@ const block = [
 ].join(nl);
 
 fs.writeFileSync(P, s + nl + block + nl);
-console.log('Grundregeln:', grund.length, '· Stilregeln:', stile.length);
+
+/* ── Selbstpruefung: zaehlt der Parser so viele Regeln, wie geschrieben wurden? ──
+   Klammern zaehlen reicht NICHT: ein Kommentar, der im Block wieder aufgeht (ein
+   Satz hinter dem schliessenden Sternchen-Schraegstrich), frisst still die naechste
+   Regel - genau so verschwand am 05.10.2026 die Kopf-Regel, obwohl sie in der Datei
+   stand und die Klammerbilanz stimmte. */
+const geschrieben = grund.length + stile.length + korrektur.split(nl).filter(z => /\{.*\}/.test(z)).length;
+const text = fs.readFileSync(P, 'utf8');
+const ab = text.indexOf(MARKE);
+const meinBlock = text.slice(ab);
+const offen = (meinBlock.match(/\/\*/g) || []).length;
+const zu = (meinBlock.match(/\*\//g) || []).length;
+const regeln = (meinBlock.replace(/\/\*[\s\S]*?\*\//g, '').match(/\{[^{}]*\}/g) || []).length;
+console.log('Grundregeln:', grund.length, '· Stilregeln:', stile.length, '· Korrekturen:', geschrieben - grund.length - stile.length);
+console.log('Kommentare auf/zu:', offen, zu, offen === zu ? 'ok' : 'FEHLER');
+console.log('Regeln im Block nach Kommentar-Abzug:', regeln, '(erwartet', geschrieben + ')', regeln === geschrieben ? 'ok' : 'FEHLER');
+if (offen !== zu || regeln !== geschrieben) process.exit(1);

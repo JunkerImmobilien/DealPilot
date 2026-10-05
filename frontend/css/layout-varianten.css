@@ -6961,9 +6961,9 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 
   /* (1) Der Kopf der Ansicht "Heute" gehoert nicht in die Aktenmappe: das gerahmte Logo (303 x 78) steht
          doppelt, die Marke traegt schon die Schiene daruber (78 x 78), und die Knopfzeile Quick-Check /
-         Marktbericht ist in der Aktenmappe der Aktionsblock. Beides weg - die Liste beginnt oben. */
-     Die Kette braucht zwei Attribute und `body`: `body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar
-     .sb-header{display:flex!important}` in style.css ist (1,3,2) und schlug die kuerzere Fassung. */
+         Marktbericht ist in der Aktenmappe der Aktionsblock. Beides weg - die Liste beginnt oben.
+         Die Kette braucht zwei Attribute und body: die Regel in style.css traegt eine ID und drei
+         Klassen (1,3,2) und schlug die kuerzere Fassung. */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-header,
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row { display: none !important; }
 
