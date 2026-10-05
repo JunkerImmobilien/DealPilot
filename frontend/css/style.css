@@ -38468,3 +38468,17 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 
 
 body .dp-pf-tile.on .dp-pf-led { background: #3FA56C !important; border-color: #3FA56C !important; box-shadow: 0 0 0 2px rgba(63,165,108,.28), 0 0 10px rgba(63,165,108,.9) !important; opacity: 1 !important; }
+
+/* ===== v1871 · Reiter Steuer: Hinweise hinter einem Knopf (Marcel: "oben ist relativ textlastig"); und
+   "passt nicht zu dieser Objektart" (objektart-felder.js) im Stil der uebrigen Hinweise statt hellgrau-kursiv. ===== */
+.dp-steuer-hinweise { margin: 0 0 14px; }
+.dp-steuer-hinweise > summary { list-style: none; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 12px; border: 1px solid var(--border-g, #e9dcb3); border-radius: 10px; background: var(--karte, #FBF6E9); cursor: pointer; font-size: 12.5px; }
+.dp-steuer-hinweise > summary::-webkit-details-marker { display: none; }
+.dp-steuer-hinweise .dp-sh-warn { font-weight: 700; color: #B8625C; }
+.dp-steuer-hinweise .dp-sh-txt { color: #5f5955; flex: 1 1 260px; }
+.dp-steuer-hinweise .dp-sh-btn { margin-left: auto; }
+.dp-steuer-hinweise[open] .dp-sh-btn { background: var(--wl-C9A84C, #C9A84C); color: #050505; }
+.dp-steuer-hinweise[open] > summary { margin-bottom: 10px; }
+body .f.dp-oa-aus { opacity: .62; }
+body .f.dp-oa-aus:hover, body .f.dp-oa-aus:focus-within { opacity: 1; }
+body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important; font-style: normal !important; color: #6b655f !important; opacity: 1 !important; letter-spacing: .02em; }

@@ -520,7 +520,7 @@
        Darum: fehlen Angaben, oeffnet sich derselbe Wizard wie im Reiter
        Steuer - mit derselben Vorbefuellung - und sein Ergebnis kommt zurueck
        in die Felder. */
-    var GEWERKE = { mod_dach: 'dach', mod_fenster: 'fenster', mod_leit: 'leitungen',
+    var GEWERKE = { bmf_mod_dach: 'dach', bmf_mod_fenster: 'fenster', mod_leit: 'leitungen',
                     mod_heiz: 'heizung', mod_daemm: 'aussenwand', mod_bad: 'baeder',
                     mod_innen: 'innenausbau', mod_grdr: 'grundriss' };
     var bewertung = {}, punkte = 0, gezaehlt = 0, bewertet = 0;

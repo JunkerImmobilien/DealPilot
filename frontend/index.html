@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1870">
+<link rel="stylesheet" href="css/style.css?v=v1871">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1870a"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
@@ -1890,6 +1890,8 @@ label.dp-required.qc-required::after {
 <div class="sec" id="s3-tax">
   <h2 class="sec-title">Steuer-Details</h2><p class="sec-desc">Vollständige Steuerlogik – AfA, Progression, jährliche Werbungskosten und Finanzamt-PDFs</p>
 
+  <!-- v1871: Marcel: "oben ist relativ textlastig" - Haftungshinweis und Erklaerung liegen hinter einem Knopf; der Kern des Hinweises bleibt in der Zeile sichtbar. -->
+  <details class="dp-steuer-hinweise" id="steuer-hinweise"><summary><span class="dp-sh-warn">⚠ Keine Steuerberatung</span><span class="dp-sh-txt">Rechenhilfe, keine Beratung (§ 6 StBerG) · wie die Werte in die Steuer eingehen</span><span class="oe-btn dp-sh-btn">Wichtige Hinweise</span></summary>
   <div class="disclaimer-box">
     <strong>⚠ Hinweis · Keine Steuerberatung:</strong> Diese Anwendung bietet lediglich allgemeine Rechenhilfen
     und stellt keine steuerliche oder rechtliche Beratung dar. Für individuelle steuerliche Einschätzungen
@@ -1969,6 +1971,7 @@ label.dp-required.qc-required::after {
     </details>
   </div>
 
+  </details>
   <div class="card" id="tax-personal-card" style="margin-top:14px">
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
     <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
@@ -3441,9 +3444,9 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
 <script src="js/pdf-investment-bank.js?v=v1733b"></script>
-<script src="js/bmf-modal.js?v=v1860a"></script>
+<script src="js/bmf-modal.js?v=v1871"></script>
 <script src="js/bmf-modal-v292.js?v=v1859"></script>
-<script src="js/bmf-bodenabschlag.js?v=v1859"></script>
+<script src="js/bmf-bodenabschlag.js?v=v1871"></script>
 <script src="js/pdf-kaufpreisaufteilung.js?v=v1634b"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3579,7 +3582,7 @@ label.dp-required.qc-required::after {
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
 <script src="js/deal-action.js?v=v1860b"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
-<script src="js/afa-eigen.js?v=v1599"></script>
+<script src="js/afa-eigen.js?v=v1871"></script>
 <script src="js/deal-action-readycheck.js?v=v1851"></script>
 <script src="js/deal-action-boarding.js?v=v1834"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>

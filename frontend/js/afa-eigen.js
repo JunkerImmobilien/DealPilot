@@ -34,14 +34,12 @@
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 12px">' +
         '<label style="font-size:12px">Restnutzungsdauer (Jahre)<input id="afa_rnd_jahre" type="text" inputmode="decimal" placeholder="z. B. 34" class="tr" style="width:100%"></label>' +
         '<label style="font-size:12px">AfA-Satz (%)<input id="afa_eigen" type="text" inputmode="decimal" placeholder="z. B. 2,94" class="tr" style="width:100%"></label>' +
-        '<label style="font-size:12px;grid-column:1/-1">Grundlage<input id="afa_eigen_grundlage" type="text" placeholder="z. B. Gutachten Gutachten.org vom 03/2026" style="width:100%"></label>' +
+        '<label style="font-size:12px;grid-column:1/-1">Grundlage<input id="afa_eigen_grundlage" type="text" placeholder="z. B. Restnutzungsdauer-Gutachten vom 03/2026" style="width:100%"></label>' +
       '</div>' +
       '<div class="cf-hint" id="afa-eigen-hinweis" style="margin-top:6px">Eine eingetragene Restnutzungsdauer ergibt den Satz: 100 ÷ RND. Das Finanzamt verlangt dafür einen Nachweis (Gutachten).</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-ermitteln">Restnutzungsdauer ermitteln</button>' +
         '<button type="button" class="btn btn-outline btn-sm" id="afa-rnd-letzte" hidden>Letzte Ermittlung übernehmen</button>' +
-        '<button type="button" class="btn btn-outline btn-sm" id="afa-gutachten">Gutachten anfragen (Gutachten.org)</button>' +
-        '<button type="button" class="btn btn-outline btn-sm" id="afa-eigen-weg" style="margin-left:auto">Eigenen Satz entfernen</button>' +
       '</div>';
     (f || sel.parentNode).appendChild(box);
 
@@ -50,12 +48,12 @@
     el('afa_eigen').addEventListener('input', anwenden);
     el('afa_eigen_grundlage').addEventListener('input', anwenden);
     el('afa-rnd-ermitteln').onclick = function () { var D = window.DealPilotDealAction; if (D && D.openExpertWithRnd) D.openExpertWithRnd(); };
-    el('afa-gutachten').onclick = function () { if (window.DpGutachtenOrg) window.DpGutachtenOrg.anfragen(window._lastRndResult || { result: { final_rnd: zahl(el('afa_rnd_jahre').value) } }); };
     el('afa-rnd-letzte').onclick = function () {
       var r = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd;
       if (r) { el('afa_rnd_jahre').value = fmt(r, 0); el('afa_eigen').value = fmt(100 / r, 2); if (!el('afa_eigen_grundlage').value) el('afa_eigen_grundlage').value = 'RND-Ermittlung DealPilot (indikativ)'; anwenden(); }
     };
-    el('afa-eigen-weg').onclick = function () {
+    /* v1871 · Marcel: Knopf 'Eigenen Satz entfernen' und 'Gutachten anfragen (Gutachten.org)' raus - die Auswahl oben genuegt. Handler bleibt fuer einen eventuellen Rest-Knopf unschaedlich. */
+    var _weg = el('afa-eigen-weg'); if (_weg) _weg.onclick = function () {
       ['afa_eigen', 'afa_eigen_grundlage', 'afa_rnd_jahre'].forEach(function (id) { el(id).value = ''; });
       entfernen(); sel.value = '2.0'; box.hidden = true; sel.dispatchEvent(new Event('change', { bubbles: true }));
       if (typeof window.calc === 'function') window.calc();

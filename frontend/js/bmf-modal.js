@@ -573,7 +573,7 @@ function loadDemo(key){
   $('bmf_mea').value = d.mea;
   $('bmf_miete').value = d.miete;
   // Reset modernisierungs-Selects
-  ['mod_dach','mod_fenster','mod_leit','mod_heiz','mod_daemm','mod_bad','mod_innen','mod_grdr'].forEach(function(id){
+  ['bmf_mod_dach','bmf_mod_fenster','mod_leit','mod_heiz','mod_daemm','mod_bad','mod_innen','mod_grdr'].forEach(function(id){
     if($(id)) $(id).value = 'nein';
   });
   $('bmfResult').style.display = 'none';
@@ -663,8 +663,8 @@ function runBmf(){
     vergleichsfaktor_vorhanden: (parseDe(($('bmf_vergl') || {}).value) > 0) ? 'Ja' : 'Nein',
     vergleichsfaktor: parseDe(($('bmf_vergl') || {}).value) || '',
     bezugsmassstab: 'Wohn- bzw. Nutzfl\u00e4che',
-    mod_dach:          (($('mod_dach')  || {}).value) || 'nein',
-    mod_fenster:       (($('mod_fenster')|| {}).value) || 'nein',
+    mod_dach:          (($('bmf_mod_dach')  || {}).value) || 'nein',
+    mod_fenster:       (($('bmf_mod_fenster')|| {}).value) || 'nein',
     mod_leitungen:     (($('mod_leit')  || {}).value) || 'nein',
     mod_heizung:       (($('mod_heiz')  || {}).value) || 'nein',
     mod_waermedaemmung:(($('mod_daemm') || {}).value) || 'nein',
@@ -2009,7 +2009,7 @@ function _ensureModalLoaded(callback){
      offen ist — davon der Abruf der Vorlage mit `no-store` bei JEDEM
      ersten Öffnen. Der Buster in der URL macht den Cache sicher; der
      Browser darf die Vorlage behalten. */
-  fetch('/js/bmf-modal-html.html?v=v1859')
+  fetch('/js/bmf-modal-html.html?v=v1871')
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
@@ -2029,6 +2029,32 @@ function _ensureModalLoaded(callback){
       toast('Fehler: Modal-HTML konnte nicht geladen werden (' + err.message + ')');
       callback(false);
     });
+}
+
+/* v1871 · Modernisierungen aus dem Reiter Objekt (RND-Felder, Anlage 2) ins
+   Modal: „Keine/Nie" und „> 20 Jahre" → nein · „10 - 20 Jahre" → teilweise ·
+   „5 - 10 Jahre", „< 5 Jahre", „Kernsanierung" → ja. Leer bleibt leer (nein
+   als Vorbelegung ist keine Aussage). Die Zusammenfassung sagt, was kam. */
+function _bmfModVorbelegen(){
+  var PAARE = [['mod_dach','bmf_mod_dach'],['mod_fenster','bmf_mod_fenster'],['mod_leitungen','mod_leit'],['mod_heizung','mod_heiz'],
+               ['mod_aussenwand','mod_daemm'],['mod_baeder','mod_bad'],['mod_innenausbau','mod_innen'],['mod_grundriss','mod_grdr']];
+  var n = 0;
+  PAARE.forEach(function(p){
+    var q = $(p[0]), z = $(p[1]); if(!q || !z || !z.closest('#bmfOverlay')) return;
+    var v = String(q.value || '').trim(); if(!v) return;
+    var ziel = /kernsan|< ?5|5 ?- ?10/i.test(v) ? 'ja' : /10 ?- ?20/i.test(v) ? 'teilweise' : 'nein';
+    z.value = ziel; n++;
+  });
+  try {
+    var sum = document.querySelector('#bmfOverlay details.fold summary');
+    if(sum && !sum.querySelector('.bmf-mod-src')){
+      var tag = document.createElement('span'); tag.className = 'bmf-mod-src';
+      tag.style.cssText = 'margin-left:8px;font:500 10px/1 "JetBrains Mono",monospace;color:#5f5955';
+      tag.textContent = n ? '· ' + n + ' von 8 aus dem Reiter Objekt übernommen' : '· im Reiter Objekt (Gewerke) noch nicht erfasst';
+      sum.appendChild(tag);
+    }
+  } catch(e){}
+  return n;
 }
 
 function openBMFModal(){
@@ -2083,6 +2109,14 @@ function openBMFModal(){
     setTimeout(function(){ if(!document.querySelector('.bmfmo-pane.active')) _paneSetzen(); }, 400);
 
     // Auto-Sync beim Öffnen
+    /* v1871 · Marcel: „diese Modernisierungsgeschichten für Dach und so, können
+       wir das nicht aus dem Tab Objekt übernehmen?" Gemessen: die Felder
+       `mod_dach`/`mod_fenster` gab es doppelt (Reiter Objekt UND Modal) — das
+       Modal las die Objekt-Werte („Keine/Nie", „5 - 10 Jahre") und schickte sie
+       roh, die anderen sechs standen auf „nein". Jetzt: eigene Ids im Modal
+       (bmf_mod_*) und eine Vorbelegung aus dem Reiter Objekt mit Umschlüsselung
+       der Zeiträume auf nein / teilweise / ja. */
+    setTimeout(_bmfModVorbelegen, 120);
     if(typeof syncFromTabInvest === 'function'){
       setTimeout(syncFromTabInvest, 50);
     }
