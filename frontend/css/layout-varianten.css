@@ -6711,3 +6711,13 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 @media (max-width: 700px){
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score{ display:none !important; }
 }
+
+/* v1880 · Handy: die Schiene nimmt nichts mehr (layout-varianten.js), ist nur Marke + Portfolio-Knopf
+   und traegt den Obsidian des Kopfes - Marcel: "oben ist schwarz, dann irgendwie so ein Braun, farblich
+   passt es gar nicht". Der Knopf oeffnet die normale Seitenleiste. */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss]{ background:#050505 !important; border-bottom:1px solid #1f1c17 !important; padding:4px 10px !important; gap:8px !important; min-height:0 !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-marke{ background:transparent !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-wm{ color:#F2EDE3 !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-portfolio{ background:#141210 !important; color:#F2EDE3 !important; border-color:#2a2622 !important; margin-left:auto !important; }
+}

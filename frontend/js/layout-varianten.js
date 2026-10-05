@@ -827,8 +827,14 @@
        Schiene, nach dem Scrollen unerreichbar. Auf dem Handy bleiben die Reiter deshalb dort,
        wo sie gebaut sind: klebend unter der Kopfzeile. */
     var handyOben = window.matchMedia('(max-width: 900px)').matches && S.stellung === 'links';
+    /* v1880 · Marcel (iPhone): "wenn du auf das Burger-Menue klickst, oeffnet sich da was, wo nichts
+       geoeffnet wird. Da steht Quick Check und Marktbericht, sonst nichts." Gemessen: die Schiene
+       hatte Objekte, Suche, Aktionen und Nutzer aus der Seitenleiste GENOMMEN - die Seitenleiste
+       war leer, und die Objektliste lag in der Schiene mit 390-px-Sortierleiste. Auf dem Handy nimmt
+       die Schiene deshalb NICHTS: nur Marke und Portfolio-Knopf; der Knopf oeffnet die normale
+       Seitenleiste, die auf dem Handy seit jeher funktioniert. */
     S.nimmt.forEach(function (art) {
-      if (art === 'tabs' && handyOben) return;
+      if (handyOben) return;
       var k = hole(KNOTEN[art]);
       if (k) {
         var h = document.createElement('div');
@@ -935,6 +941,11 @@
      nur die CSS dahinter ist eine andere - und der Knopf zeigt seinen
      Zustand an, statt ihn zu verstecken. */
   function portfolio(zu) {
+    /* v1880 · Auf dem Handy nimmt die Schiene nichts (baueSchienen); der Portfolio-Knopf oeffnet
+       deshalb die normale Seitenleiste mit Objektliste, Suche und Aktionen. */
+    if (window.matchMedia('(max-width: 900px)').matches && typeof window.toggleMobileSidebar === 'function') {
+      window.toggleMobileSidebar(); return;
+    }
     var auf = zu === undefined
       ? document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf'
       : !zu;
@@ -1329,7 +1340,8 @@
        Wort, das er sucht. Eine Reihenfolge braucht keine Nummer, wenn
        die Reihenfolge schon sichtbar ist. */
     var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
-      Object.keys(LAYOUTS).map(function (k) {
+      /* v1880 · Marcel: nur Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im Code. */
+      Object.keys(LAYOUTS).filter(function (k) { return k === 'v1b'; }).map(function (k) {
         return { key: k, name: LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
       }));
     /* v1690 — „Aussehen" statt „Aufbau". Marcel sucht diesen Abschnitt
@@ -1356,6 +1368,7 @@
 
     g.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('.dpuv-sgb') : null;
+      try { if (b && b.hasAttribute('data-v')) localStorage.setItem('dp_layout_gewaehlt', '1'); } catch (x) {}   /* v1880: eine bewusste Wahl schlaegt den Standard */
       if (!b) return;
       setze(b.dataset.v);
       [].forEach.call(g.querySelectorAll('.dpuv-sgb'), function (x) {
@@ -1386,6 +1399,7 @@
 
     gs.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('.dpuv-sgb') : null;
+      try { if (b && b.hasAttribute('data-v')) localStorage.setItem('dp_layout_gewaehlt', '1'); } catch (x) {}   /* v1880: eine bewusste Wahl schlaegt den Standard */
       if (!b) return;
       seitenTauschen(b.dataset.s === '1');
       seitenKachelnNachziehen();
@@ -1420,7 +1434,8 @@
     host.setAttribute('data-gefuellt', '1');
 
     var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
-      Object.keys(LAYOUTS).map(function (k) {
+      /* v1880 · Marcel: nur Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im Code. */
+      Object.keys(LAYOUTS).filter(function (k) { return k === 'v1b'; }).map(function (k) {
         return { key: k, name: LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
       }));
 
@@ -1497,6 +1512,11 @@
       try { localStorage.setItem('dp_layout_schalter', '1'); } catch (e) {}
     } else if (gemerkt) {
       setze(gemerkt);
+    } else {
+      /* v1880 · Marcel: "defaultmaessig wird dann die Aktenmappe genommen" - wer nie gewaehlt hat,
+         bekommt die Aktenmappe; "Heute" bleibt waehlbar (dp_layout_gewaehlt merkt die Wahl). */
+      var _gew = ''; try { _gew = localStorage.getItem('dp_layout_gewaehlt') || ''; } catch (e) {}
+      if (!_gew) setze('v1b');
     }
 
     var zeigen = false;

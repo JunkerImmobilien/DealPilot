@@ -115,7 +115,7 @@ function indizieren(saetze) {
 
    Der Abgleich unten (`fehlendeSaatdateien`) sorgt dafuer, dass die
    Luecke beim naechsten Mal AUFFAELLT, statt still zu bleiben. */
-export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json',
+export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', /* v1880: Hessen regional, 14 Berichte */
                             /* v1866: Liegenschaftszins Drei-/Mehrfamilienhaeuser Kreis
                                Minden-Luebbecke aus dem Grundstuecksmarktbericht 2025
                                (S. 64) - die GMD-CSV des Landes fuehrt fuer 05770 keinen

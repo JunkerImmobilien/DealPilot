@@ -725,7 +725,13 @@ function verzweigt(m, e) {
   /* Die Einheit der aeusseren Ebene gilt, wenn das Untermodell keine
      eigene nennt - sonst koennte ein Untermodell still eine andere
      Einheit liefern als der Registersatz verspricht. */
-  const r = auswerten({ ...unter, liefert: unter.liefert || m.liefert }, e);
+  /* v1880 · Gemessen an Heppenheim (ETW nach Einheiten, Prozent): die aeussere Ebene rechnet ab
+     `tabellenwert` weiter und teilt Prozent noch einmal durch 100 - 0,034 wurde zu 0. Das
+     Untermodell liefert in `dokumentwert` die Zahl, wie der Bericht sie druckt; DIE ist der
+     Tabellenwert dieser Ebene. Und die Kennzahl reist mit, sonst weiss das Untermodell nicht,
+     dass es einen Zinssatz und keinen Faktor liefert. */
+  const r = auswerten({ ...unter, liefert: unter.liefert || m.liefert,
+                        kennzahl: unter.kennzahl || m.kennzahl }, e);
   if (!r.verfuegbar) return { ...r, kategorie: schluessel };
 
   /* GEMESSEN an Havelland: das Untermodell hatte richtig gerechnet -
@@ -737,7 +743,8 @@ function verzweigt(m, e) {
      unten passiert ist, ist von hier aus die Tabelle. Die Korrekturen
      des Untermodells wandern nach `korrekturen_kategorie`, damit sie im
      Rechenweg sichtbar bleiben statt still ueberschrieben zu werden. */
-  return { ...r, kategorie: schluessel, tabellenwert: r.wert,
+  return { ...r, kategorie: schluessel,
+           tabellenwert: (r.dokumentwert != null ? r.dokumentwert : r.wert),
            korrekturen_kategorie: r.korrekturen || [],
            rechenweg_kategorie: r.rechenweg || null,
            korrekturen: [] };

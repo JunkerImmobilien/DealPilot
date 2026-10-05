@@ -18,11 +18,12 @@ for (const f of process.argv.slice(2)) {
   const fehler = []; const schl = new Map();
   arr.forEach((s, i) => {
     const wo = `#${i} ${s.gebiet_name || s.ags || '?'} ${s.kennzahl || ''}/${s.zweig || ''}`;
-    for (const k of PFLICHT) if (s[k] == null || s[k] === '' || (Array.isArray(s[k]) && !s[k].length)) fehler.push(`${wo}: ${k} fehlt`);
+    const sperre = s.vollstaendig === false || !!s.warum_kein_wert;   /* Sperreintrag: Weg ohne Zahl, erlaubt */
+    for (const k of PFLICHT) if (!(sperre && (k === 'formel' || k === 'belege')) && s[k] == null || s[k] === '' || (Array.isArray(s[k]) && !s[k].length)) fehler.push(`${wo}: ${k} fehlt`);
     if (s.kennzahl && !KENNZAHLEN.has(s.kennzahl)) fehler.push(`${wo}: unbekannte kennzahl ${s.kennzahl}`);
     if (s.stufe && !/^[A-E]$/.test(s.stufe)) fehler.push(`${wo}: stufe ${s.stufe}`);
-    if (s.formel && s.formel.form === 'konstante' && !(typeof s.formel.wert === 'number' && isFinite(s.formel.wert))) fehler.push(`${wo}: formel.wert keine Zahl`);
-    if (s.formel && s.kennzahl === 'liegenschaftszinssatz' && typeof s.formel.wert === 'number' && (s.formel.wert <= 0 || s.formel.wert > 12)) fehler.push(`${wo}: Zins ${s.formel.wert} außerhalb 0–12 %`);
+    if (!sperre && s.formel && s.formel.form === 'konstante' && !(typeof s.formel.wert === 'number' && isFinite(s.formel.wert))) fehler.push(`${wo}: formel.wert keine Zahl`);
+    if (s.formel && s.kennzahl === 'liegenschaftszinssatz' && typeof s.formel.wert === 'number' && (s.formel.wert < -2 || s.formel.wert > 12)) fehler.push(`${wo}: Zins ${s.formel.wert} außerhalb -2–12 %`);   /* Frankfurt druckt negative Saetze (EFH zentral -0,1) */
     (s.belege || []).forEach((b, j) => { if (!b.fundstelle || !/\d/.test(String(b.fundstelle))) fehler.push(`${wo}: beleg[${j}] ohne Seite/Fundstelle`); });
     if (s.quelle_url && !/^https?:\/\//.test(s.quelle_url)) fehler.push(`${wo}: quelle_url keine URL`);
     if (s.ags && !/^\d{5}(\d{3})?$/.test(String(s.ags))) fehler.push(`${wo}: ags ${s.ags} nicht 5- oder 8-stellig`);
