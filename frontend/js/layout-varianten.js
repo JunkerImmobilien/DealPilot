@@ -822,7 +822,13 @@
       schiene.appendChild(pb);
     }
 
+    /* v1879b · Unter 900 px steht die linke Schiene im Fluss und scrollt weg (v1879). Nimmt sie
+       die Reiter mit (Kanzlei), scrollen die Reiter mit weg - gemessen: nav.tabs bei y=91 in der
+       Schiene, nach dem Scrollen unerreichbar. Auf dem Handy bleiben die Reiter deshalb dort,
+       wo sie gebaut sind: klebend unter der Kopfzeile. */
+    var handyOben = window.matchMedia('(max-width: 900px)').matches && S.stellung === 'links';
     S.nimmt.forEach(function (art) {
+      if (art === 'tabs' && handyOben) return;
       var k = hole(KNOTEN[art]);
       if (k) {
         var h = document.createElement('div');
@@ -897,8 +903,7 @@
        146 px. Die ersten 41 px der Kopfzeile samt #hdr-mobile-menu lagen darunter, und die
        Score-Leiste darin war 808 px breit. Deshalb steht die Schiene auf dem Handy jetzt IM
        FLUSS am Anfang der .main-col: sie scrollt mit weg, Kopfzeile und Reiter bleiben kleben. */
-    var obenImFluss = window.matchMedia('(max-width: 900px)').matches
-                  && S.stellung === 'links';
+    var obenImFluss = handyOben;
     var mcol = (imFluss || obenImFluss) ? document.querySelector('.main-col') : null;
     if (mcol && obenImFluss) {
       mcol.insertBefore(schiene, mcol.firstChild);
