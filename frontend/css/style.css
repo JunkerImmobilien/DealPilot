@@ -38516,3 +38516,5 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 #avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { white-space: nowrap !important; }
 #avsec .av-cards.single .mc.dp .mbody .miete b { font-size: 13px !important; }
 #avsec .av-cards.single .mc.dp .mbody .avs-sub > *, #avsec .av-cards.single .mc.dp .mbody .miete > * { display: inline !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw, #avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { display: block !important; white-space: nowrap !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw::before, #avsec .av-cards.single .mc.dp .mbody .avs-sub::before, #avsec .av-cards.single .mc.dp .mbody .miete::before { display: block; margin-bottom: 3px; }
