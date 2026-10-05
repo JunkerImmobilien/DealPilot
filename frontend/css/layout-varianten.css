@@ -6962,8 +6962,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   /* (1) Der Kopf der Ansicht "Heute" gehoert nicht in die Aktenmappe: das gerahmte Logo (303 x 78) steht
          doppelt, die Marke traegt schon die Schiene daruber (78 x 78), und die Knopfzeile Quick-Check /
          Marktbericht ist in der Aktenmappe der Aktionsblock. Beides weg - die Liste beginnt oben. */
-  html[data-dp-layout] aside#sidebar .sb-header,
-  html[data-dp-layout] aside#sidebar .sb-neu-row { display: none !important; }
+     Die Kette braucht zwei Attribute und `body`: `body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar
+     .sb-header{display:flex!important}` in style.css ist (1,3,2) und schlug die kuerzere Fassung. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-header,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row { display: none !important; }
 
   /* (2) Die Suchzeile: das Eingabefeld ist 44 px hoch (iOS-Zoomschutz erzwingt 16 px Schrift und 40 px
          Hoehe), seine Umrahmung .sb-search-box aber 30 - das Feld stand sichtbar ausserhalb seines Rahmens
