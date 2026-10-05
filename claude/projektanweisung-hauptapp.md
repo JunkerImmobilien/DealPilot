@@ -31005,3 +31005,26 @@ letzten Feinschliff, `.mc.dp` 105 px, Text vollständig („199.000 € · 466
 €/m² · −74,5 % · Miete 740 € · Einordnung · Genauigkeit · übernehmen").
 
 **Rest.** Prod v1846b; Staging v1868c (`6c19707`).
+
+### (31) 05.10.2026 — v1869/v1869a: kein Sachwertfaktor im Anfragen-Block bei MFH, Streifen gegliedert
+
+**Was.** Marcel: „Bei der Parkstraße steht unten immer noch Sachwertfaktor
+… den brauchen wir ja nicht … rausnehmen." Und: „der Streifen … besser
+gliedern … den Anfang vernünftig darstellen und besser darauf skalieren."
+
+**Gebaut (`a72a89f`, v1869a).** `quellen()` kennt die Objektart: bei MFH,
+Geschäftshaus, Büro, Hotel, Gewerbe oder ab drei Einheiten fallen die
+Sachwertfaktor-Zeilen (hinterlegt wie fehlt) und die Anfrage dafür weg;
+`brauchtAnfrage` zählt ihn dort nicht mehr. Die Leiste oben erklärt den
+Standard 1,0 weiterhin. Streifen: Kopfblock links fest (168 px, Obsidian,
+„DealPilot" in hellem Gold, „MARKTEINSCHÄTZUNG" in Creme-Mono, Chip
+„Hoch"), dann Spalten mit Beschriftung über dem Wert (Marktwert · je m²
+und vs. Kaufpreis · Marktmiete · Einordnung · Genauigkeit), rechts
+„übernehmen", Legal-Zeile darunter; unter 900 px stapelt sich der Kopf
+über die Spalten. Nur CSS mit ID-Spezifität, `avm-section.js` unberührt.
+
+**Nachweis (Parkstr. 9).** Anfragen-Block zeigt nur noch den
+Liegenschaftszins (Stufe A, Bericht als PDF), Hinweis „vollständig". Streifen
+184 px gesamt, Karte 96 px, Kopfblock 168 × 79, fünf Spalten à 67 px.
+
+**Rest.** Prod v1846b; Staging v1869a.
