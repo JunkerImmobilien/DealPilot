@@ -38638,3 +38638,8 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
 @media (max-width: 900px) {
   body .dp-sidebar-toggle { display: none !important; }
 }
+
+/* v1890 · Die Donut-Beschriftung ("FELDER 14 / 14" in der Deal-Aktion) ist im Quelltext 6,5 px gross. Der Fix aus
+   v1883 galt nur unter 480 px — auf dem Tablet (820 gemessen) stand sie weiter in 6,5 px da. Zu klein ist sie auf
+   JEDEM Geraet; die Regel gilt jetzt ueberall. */
+.dab-donut-v small { font-size: 8.5px !important; letter-spacing: .04em !important; }
