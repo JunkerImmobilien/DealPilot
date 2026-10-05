@@ -42,6 +42,24 @@
   function _injectFooterLink() {
     // Sidebar oder App-Footer — falls Element vorhanden
     if (document.getElementById('dp-app-legal-footer')) return;
+    /* v1881 · Auf dem Handy lag der schwebende Link ueber Eingabefeldern (gemessen 390 px: ueber
+       "Renovierungsbeduerftig", ueber Grundbuchamt). Dort wandert er als stille Zeile ans Ende der
+       Seitenleiste - erreichbar ueber das Menue, nie ueber dem Inhalt. */
+    try {
+      if (window.matchMedia('(max-width: 700px)').matches) {
+        var sbUser = document.querySelector('#sidebar .sb-user');
+        if (sbUser && sbUser.parentElement) {
+          var z = document.createElement('div');
+          z.id = 'dp-app-legal-footer';
+          z.style.cssText = 'padding:10px 14px 14px;font-size:11px;color:#8a8378;letter-spacing:0.3px;text-align:center';
+          z.innerHTML = '<a href="/impressum.html" target="_blank" style="color:#8a8378;text-decoration:none;margin:0 6px;display:inline-block;padding:8px 0">Impressum</a>'
+            + '<span style="color:#555">·</span>'
+            + '<a href="/datenschutz.html" target="_blank" style="color:#8a8378;text-decoration:none;margin:0 6px;display:inline-block;padding:8px 0">Datenschutz</a>';
+          sbUser.parentElement.insertBefore(z, sbUser.nextSibling);
+          return;
+        }
+      }
+    } catch (e) {}
     var sidebar = document.querySelector('.sb-bottom, .sidebar-footer, .dp-sidebar-bottom');
     if (!sidebar) {
       // Fallback: minimal footer unten an die Seite hängen

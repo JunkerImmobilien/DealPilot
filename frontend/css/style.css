@@ -38498,3 +38498,35 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   body:not(.hdr-collapsed) #hdr-badges, body #hdr-badges{ display:none !important; }
   body #hdr-toggle-btn{ display:none !important; }
 }
+
+/* ═══ v1881 · HANDY-DURCHGANG 05.10.2026 (Marcel: "alle ansichten, alle reiter, alle felder ... das muss sitzen") ═══
+   (1) Gewerke-Tabelle im Reiter Objekt: die Regel v1862c (Z. 38348) macht die TABELLE zum Scrollkasten
+       (display:block) — der Inhalt schrumpfte trotzdem auf 60-px-Auswahlen ("– k", "Kei", "> 2"), gemessen
+       auf 390 px. Scrollkasten ist jetzt die Karte, die Tabelle behaelt ihre Breite und wischt. */
+@media (max-width: 520px) {
+  #oe-karte-gewerke { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #oe-karte-gewerke #oe-gewerke { display: table !important; min-width: 620px !important; max-width: none !important; overflow: visible !important; }
+  #oe-karte-gewerke #oe-gewerke select, #oe-karte-gewerke #oe-gewerke input { min-width: 110px; }
+}
+/* (2) Bewertung: die KPI-Tabelle war 493 px breit (Kennzahl 158 + Wert 80 + Ampel 132 + Kommentar 123) und
+       schnitt die Ampel ("STARK NEGA…") ab. Enger gesetzt passt sie in 390. */
+@media (max-width: 480px) {
+  .kpi-eval-table th, .kpi-eval-table td { padding: 8px 5px !important; font-size: 12px !important; }
+  .kpi-eval-table .kpi-eval-name { white-space: normal !important; }
+  .kpi-eval-table .kpi-eval-light { font-size: 9px !important; padding: 2px 6px !important; white-space: nowrap; }
+  .kpi-eval-table .kpi-eval-comment { font-size: 11px !important; }
+}
+/* (3) Deal-Aktion: die Bordkarten der Partner (.dab-bp) sind 448/352 px breit in einer 293-px-Schiene —
+       rechts abgeschnitten ("Antwort in 48 h"). Auf dem Handy so breit wie die Schiene. */
+@media (max-width: 480px) {
+  #s8 .dab-bp { flex: 0 0 calc(100% - 8px) !important; }
+}
+/* (4) Info-Knoepfe: mit eingeschalteter Hover-Hilfe (body.dp-feldhilfe-an) sind die runden "?"-Knoepfe
+       ausgeblendet — auf einem Geraet OHNE Maus gibt es dann keine Hilfe. Auf Touch bleiben sie da,
+       rund, 18 px (Marcel: "nicht Oval sondern rund"). */
+@media (hover: none) {
+  .dp-feldhilfe-an .dp-tip { display: inline-flex !important; }
+  .dp-tip { width: 18px !important; height: 18px !important; min-width: 18px !important; border-radius: 50% !important; padding: 0 !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; vertical-align: middle !important; }
+}
+

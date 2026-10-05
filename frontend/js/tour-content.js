@@ -23,7 +23,7 @@
       selector: '.dpl-teil-objekte, #sb-list, .dpl-schiene, #sidebar',
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
-      body: 'Hier liegen **alle deine Objekte**. In der Standardansicht in der Sidebar links — in Aktenmappe, Kanzlei und Tower klappst du dafür links die **Portfolio-Schiene** auf. Von hier startet jede Analyse.',
+      body: 'Hier liegen **alle deine Objekte**. In der Ansicht „Heute“ in der Sidebar links — in der Aktenmappe klappst du dafür links die **Portfolio-Schiene** auf, auf dem Handy öffnet der Portfolio-Knopf das Menü. Von hier startet jede Analyse.',
       bodyMore: 'Was die Sidebar dir zeigt:\n\n• **Jedes Objekt als Card** mit Adresse, Kaufpreis, DealScore-Ampel\n• **Kennzahlen** im Mini-Format: DSCR, Cashflow, Bruttomietrendite\n• **Sortier- und Filter-Funktion** nach Score, Lage, Plan\n• **Demo-Objekte** mit grüner Markierung\n\n**Limits nach Plan:**\n• **Free**: 3 Objekte\n• **Starter**: 15 Objekte\n• **Investor**: 50 Objekte\n• **Pro**: unlimited\n\nKlick einfach auf ein Objekt um es zu öffnen und in die Vollanalyse zu starten.',
       placement: 'right'
     },
