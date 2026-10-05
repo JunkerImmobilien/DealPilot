@@ -265,6 +265,35 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N30 · Ernte Linie 7 (TH/ST/SN/MV) und die Aurich-Korrektur — v1886–v1887a, auf Prod
+
+**Marcel entscheidet:** Lizenz Sachsen-Anhalt ist ungeklärt (45 neue Sätze tragen „ungeklärt, vor
+Kundeneinsatz klären") — **und das Register widerspricht sich**: `swf-st.json` führt 28 Sätze als
+„frei zugänglich". Eine Mail ans LVermGeo klärt 73 Sätze auf einmal. **MV-Sachwertfaktoren stehen
+unter einer Lizenz, die es nicht gibt** (`swf-mv.json`: „Wiedergabe mit Quellenangabe", gemessen
+verlangen MSE und VR eine Genehmigung) — Genehmigung einholen oder sechs Sätze zurückziehen.
+**Dresden und Leipzig (64 Sätze)** stehen im Register, obwohl ihre Lizenz eine Erlaubnis verlangt.
+Sachsen: fünf Ausschüsse brauchen nur einen Brief, sechs kosten 60–167 €.
+
+### N31 · Linie 8 (NI/SH/RP/SL) liegt ungesät — Entscheidung über 280 Sperren
+
+411 Sätze im Arbeitsbaum, 16 Werte (Hameln-Hannover, Sulingen-Verden; darunter Spezialobjekte wie
+Altenpflegeheim und Wochenendhaus), 395 Sperren. 280 davon sagen dasselbe: RP und SL sind
+kostenpflichtig und genehmigungspflichtig. **Frage:** je Gebiet eine Sperre (so wie geliefert) oder
+eine je Land? Dazu aus demselben Lauf: Otterndorf-Resthöfe 2024 → 2026 fortschreiben? Ostfriesische
+Ferienwohnungen auf Gemeindeebene ernten (Inseln sind eigene Gemeinden)?
+
+### N32 · Befunde am Rechenkern aus den Ernteläufen (05.10.2026)
+
+**`warum_kein_wert` erreicht den Nutzer nicht:** `gutachterausschuss.js:438` liest
+`unvollstaendig_grund`; von 86 Altsperren tragen 34 nur das andere Feld — ihre Begründung fällt
+still auf den Boden. **Sperren mit `zweig:"alle"` sind unerreichbar**, sobald der Aufrufer eine
+Objektart nennt (betrifft die SH-Zinssperren und Northeim). **`EBENE_GESPERRT` filtert auch
+Sperren** — eine Landes-Sperre für den Sachwertfaktor kann es nicht geben. **Die Prüfstrecke
+stürzt ab**, sobald ein Sperrsatz mit `formel: null` in der Datei liegt, und sie liest nur
+`belege[0]`. **`formelwerk` kennt der Auswerter nicht** (Hamburg komplett, Magdeburg, Kiel) —
+Auswerter in Arbeit.
+
 ### N29 · Aktenmappe auf dem Handy trägt die Aktenmappe (05.10.2026) — erledigt v1885–v1885c, auf Prod
 
 141 Schienen-Regeln per Generator (`tools/schublade-regeln.mjs`) auf die Schublade geklont, Heute-Kopf

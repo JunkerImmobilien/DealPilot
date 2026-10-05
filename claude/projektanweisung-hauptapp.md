@@ -31772,3 +31772,66 @@ kein `#dp-app-legal-footer` im Dokument. Klick auf eine Karte lädt das Objekt u
 die Schublade (Parkstr. 9, 9 Reiter). Gold-Audit RC=0. Prod-Rollout v1885c, Buster per curl.
 
 **Rest.** Prod v1885c; Staging v1885c; `main` = `staging` bis auf Journal.
+
+### (46) 05.10.2026 — v1886–v1888a: Ernte Linie 7, eine falsche Zahlenreihe korrigiert, Portfolio-Strategie im Hausstil
+
+**Ernte Linie 7 (`86ff8fa` v1886).** Thüringen, Sachsen-Anhalt, Sachsen, Mecklenburg-Vorpommern.
+115 Sätze, 48 Werte, 67 Sperren. Die Ausbeute liegt fast ganz in **Sachsen-Anhalt**: ein
+Landesblatt führt Zinssätze für 23 Mittelzentren einzeln, dazu Grundzentren und Dörfer je
+Landkreis — 45 Werte. Die Ortszuordnung war nicht lesbar, sondern musste gemessen werden: das
+Blatt druckt den Zinssatz EINMAL, vertikal zentriert über einer Gruppe von Ortszeilen. Die
+Zentrierung allein ist mehrdeutig; eindeutig wird sie erst mit der zweiten Bedingung, dass die
+Gruppen die 23 Zeilen lückenlos kacheln — genau eine Zerlegung erfüllt beides. Dazu Erfurt
+(Eigentumswohnung nach Baujahr, 1,4 % / 2,3 %) und Ludwigslust-Parchim (Sachwertfaktor 2025
+statt 2018). **Sachsen ist flächendeckend genehmigungspflichtig** — alle 13 Ausschüsse mit
+derselben Klausel, auch die, die ihren Bericht frei ins Netz stellen; der Unterschied zwischen
+ZUGANG und LIZENZ hat hier schon einmal vier Ausschüsse ein Jahr lang falsch geführt. 44
+Sperren mit Kontakt und Gebühr. Register danach (Prod = Staging): ST Zins 73/15 (vorher 5/3),
+gesamt 3.413.
+
+**Eine falsche Zahlenreihe im Bestand (`78c2737` v1887, `3f7cddc` v1887a).** Beim Messen fiel
+auf, dass die Liegenschaftszinssätze des Ausschusses Aurich **um einen Abschnitt verschoben**
+im Register standen: jeder Zweig trug den Wert des NÄCHSTEN Abschnitts. Am Dokument selbst
+nachgemessen (pdftotext -layout, Seite für Seite):
+
+| Druckseite | Abschnitt | richtig | stand im Register |
+|---|---|---|---|
+| 42 | Wohn- und Geschäftshäuser | 4,2 % | 3,3 % |
+| 43 | Verkaufshallen | 3,3 % | 3,5 % |
+| 44 | Bürogebäude | 3,5 % | 3,9 % |
+| 45 | Lager- und Produktionsgebäude | 3,9 % | 3,5 % |
+
+Betroffen waren 6 Kreise × 4 Zweige = 24 Sätze (Emden, Wilhelmshaven, Aurich, Friesland, Leer,
+Wittmund). Ein Wohn- und Geschäftshaus in Ostfriesland bekam 3,3 statt 4,2 Prozent — bei
+gleichem Rohertrag ein deutlich zu hoher Ertragswert.
+
+> **Die erste Korrektur war unvollständig, und das ist die eigentliche Lehre.** Ich hatte Wert,
+> Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt — **die Spanne
+> und die Umrechnungstabelle aber nicht**. Die blieben vom falschen Abschnitt stehen: ein
+> Wohn- und Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte den Umrechnungsfaktor 0,41
+> statt 1,00 bekommen (die 0,41 gehört zu den Verkaufshallen). **Wer einen verschobenen Satz
+> geraderückt, muss JEDEN Teil mitnehmen** — Wert, Seite, Spanne, Bestimmtheitsmaß,
+> Umrechnungskoeffizienten, Bezugsgrößen, Fallzahl. Eine halbe Korrektur sieht richtiger aus
+> als gar keine und ist gefährlicher, weil niemand mehr nachsieht.
+
+**Portfolio-Strategie im Hausstil (`4a14b85` v1888, `4be319b` v1888a).** Marcel: „die
+Portfoliostrategie wird nicht richtig dargestellt … Aktenansicht muss Aktenansicht sein, die
+Heute-Version muss Heute die Version sein." Gemessen: das Modul brachte einen **eigenen
+Stilblock mit harten Farben** mit (#fff, #E6E0D3, #1A1A18, #4a4540, #6b655f) und eigener
+Schrift. Dadurch sah es in JEDER Ansicht gleich aus — und passte zu keiner. Jetzt trägt es
+`.card`, `.ct` und `.cft`, dieselben Bausteine wie die Reiter; damit erbt es Aktenmappe/Heute,
+Hell/Dunkel, die Kartenstile und die Handy-Behandlung der Tabellen (stehende erste Spalte).
+Im Stilblock stehen nur noch Anordnungen, keine Farben — einzige Ausnahme ist die Warnfarbe,
+denn Statusfarben sind in jeder Marke gleich.
+
+**Dazu ein Fremdkörper, den ein Prüfer fand:** `.dp-sidebar-toggle` (ein Dashboard-Umschalter
+aus `index.html`) hat in `style.css` **keine einzige Gestaltungsregel** und erschien auf dem
+Handy als grauer Browser-Standardknopf mit `border:outset` (30 × 44 px, in jedem Reiter und im
+Cockpit). Der Prüfer sucht nach Browser-Standardwerten (`outset`/`inset`-Rahmen,
+`rgb(240,240,240)`) und fand genau diesen einen — unter 900 px ist er jetzt aus, dort öffnet
+der Burger die Seitenleiste.
+
+**Rest.** Prod v1888a; Staging v1888a. **Linie 8 (NI/SH/RP/SL) liegt ungesät im Arbeitsbaum:**
+411 Sätze, aber nur 16 Werte und 395 Sperren, davon 280 gleichlautend für Rheinland-Pfalz und
+das Saarland (beide kostenpflichtig UND genehmigungspflichtig). Ob 280 Sperren ins Register
+sollen oder ein Satz je Land genügt, entscheidet Marcel.
