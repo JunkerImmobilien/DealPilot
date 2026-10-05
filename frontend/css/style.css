@@ -38584,3 +38584,41 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   .bc-matrix-axis-y-label { font-size: 7.5px !important; letter-spacing: .2px !important; white-space: nowrap !important; }
   .bc-matrix-axis-x-cell .bc-delta { font-size: 8px !important; white-space: nowrap !important; letter-spacing: 0 !important; }
 }
+
+/* v1883a · Der Vollbild-Knopf #dp-sb-toggle (v625: FAB unten links, klappt die Seitenleiste zur 66-px-Schiene) lag im Layout
+   Heute auf dem Handy ueber dem Inhalt (42 x 44 bei 16/828, in jeder Aufnahme als schwarzer Kreis). Die Seitenleiste ist dort
+   eine Schublade hinter dem Burger - der Knopf hat keine Aufgabe mehr. Er bleibt nur, solange eine alte Einklappung
+   (body.dp-sidebar-collapsed) aktiv ist, damit man sie loesen kann. v1883 hatte ihn nur in der Aktenmappe entfernt. */
+@media (max-width: 900px) {
+  body:not(.qc-standalone-active):not(.dp-dash-fullscreen):not(.dp-sidebar-collapsed) #dp-sb-toggle { display: none !important; }
+}
+
+/* v1883a · Objektdaten auf dem Handy: das 4-Spalten-Raster (Z. 36416, <=768) gibt der PLZ EINE Spalte = 61 px bei 390 px -
+   mit 16-px-Schrift (iOS-Zoomschutz) zeigt das Feld "3254" und schneidet die 5 ab (gemessen, Kartenstil Zeile, Hell).
+   Unter 480: PLZ und Ort je zwei Spalten, Strasse drei, Hausnummer eine. */
+@media (max-width: 480px) {
+  .body .g2:has(> .f #plz) > .f:has(#plz) { grid-column: span 2 !important; }
+  .body .g2:has(> .f #plz) > .f:has(#ort) { grid-column: span 2 !important; }
+}
+
+/* v1883a · Objektkarten-Varianten Kompakt / Wallet / Stapel (ui-varianten.css, v1095 nach Vorlage handy2.jpg) auf dem Handy
+   nachgemessen (390 px, Schublade): die spaeter gebauten Baender (.sbc-investor-ribbon, .sbc-won-ribbon, v17xx) lagen ueber
+   Nummer und Band, der Score-Ring ueber der Adresse (Kompakt), die Stufen-Pille ueber den Knoepfen (Stapel), die Nummer
+   gruen auf Gold (Wallet, Stapel). Nur unter 900 px, nur in der Schublade. */
+@media (max-width: 900px) {
+  html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-address { padding-right: 132px !important; white-space: normal !important; }
+  html[data-ui-cards="kompakt"] body aside.sidebar .sb-card .sbc-mini-score-num { color: #F2EDE3 !important; }
+  html:not([data-dp-layout])[data-ui-cards="kompakt"] body.dp-chrome-hell aside.sidebar .sb-card .sbc-mini-score-num { color: #1a1a1a !important; }
+  html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-investor-ribbon { top: auto !important; bottom: -9px !important; left: auto !important; right: 92px !important; }
+  html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-won-ribbon { top: auto !important; bottom: -9px !important; left: 10px !important; }
+  html[data-ui-cards="wallet"] body aside.sidebar .sb-card .sbc-seq,
+  html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-seq { background: #141310 !important; color: var(--wl-e8cc7a, #E8CC7A) !important; border-color: transparent !important; }
+  html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-investor-ribbon,
+  html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-won-ribbon { display: none !important; }
+  /* Die Stufen-Pille: ui-varianten.css setzt sie erst absolut, dann wieder statisch (zwei Regeln, Z. 1811 und spaeter) -
+     sie haengt damit im Ring-Container und landete ueber den Knoepfen. Zwei IDs, damit die Kette gewinnt; Datum weg,
+     dafuer die Pille in Zeile 2 rechts neben der Nummer (gemessen 190/397, Karte 64 px hoch). */
+  html[data-dp-layout][data-ui-cards="stapel"] body aside.sidebar#sidebar .sb-card .sbc-score-overlay .sbc-score-label { position: absolute !important; left: auto !important; right: 66px !important; top: 30px !important; }
+  html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-date { display: none !important; }
+  html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-address { padding-right: 70px !important; }
+}

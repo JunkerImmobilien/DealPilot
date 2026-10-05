@@ -101,7 +101,7 @@
                    '</button>';
           }).join('') +
         '</div>' +
-        '<div class="dp-okw-fuss">Wirkt in den Layouts Aktenmappe, Kanzlei und Tower — ' +
+        '<div class="dp-okw-fuss">Wirkt in der Aktenmappe — ' +
         'die normale Ansicht bleibt, wie sie ist.</div>' +
       '</div>';
     host.addEventListener('click', function (e) {
