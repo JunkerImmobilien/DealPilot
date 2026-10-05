@@ -1826,6 +1826,7 @@
     }
     if (snapshot.wfl)  set('wfl', String(snapshot.wfl));
     if (snapshot.bj)   set('baujahr', String(snapshot.bj));
+    if (snapshot.zimmer) set('zimmer', String(snapshot.zimmer));   /* v1877a: der Snapshot trug die Zimmer, zurueckgeschrieben wurden sie nie (gemessen 05.10.2026) */
     if (snapshot.ek)   set('ek', String(snapshot.ek));
     if (snapshot.d1z)  set('d1z', String(snapshot.d1z));
     if (snapshot.d1t)  set('d1t', String(snapshot.d1t));
