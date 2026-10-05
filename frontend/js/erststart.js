@@ -155,12 +155,29 @@
     return true;
   }
 
+  function angemeldet() {
+    try { return !!(window.Auth && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn()); }
+    catch (e) { return false; }
+  }
+
   function start() {
-    /* Erst nach einem Moment: die Anmeldung, das Plan-Ereignis und die
-       Objektliste laufen beim Start noch. Eine Karte, die mitten in den
-       Aufbau springt, wirkt wie ein Fehler. */
+    /* v1874 · Marcel am 05.10.2026: „ich gehe auf Kostenlos starten, dann
+       kommt das Anmeldefenster und dann erscheint schon ein Willkommen an
+       Bord … das soll erst nach der Anmeldung kommen." Gemessen: der Timer
+       lief ab dem Laden der Seite und kannte die Anmeldung nicht — die Karte
+       legte sich ÜBER das Anmeldefenster. Jetzt wartet sie auf
+       `dp:plan-ready` (subscription.js:154): das Ereignis gibt es nur mit
+       Sitzung, weil der Plan über Auth.apiCall geholt wird. Wer schon
+       angemeldet die Seite lädt, bekommt sie wie bisher nach 2,6 s. */
     if (!faellig()) return;
-    setTimeout(function () { if (faellig()) zeige(); }, 2600);
+    function los() {
+      setTimeout(function () { if (faellig() && angemeldet()) zeige(); }, 2600);
+    }
+    if (window.DealPilotPlanReady && angemeldet()) { los(); return; }
+    window.addEventListener('dp:plan-ready', function einmal() {
+      window.removeEventListener('dp:plan-ready', einmal);
+      los();
+    });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
