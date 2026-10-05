@@ -99,7 +99,7 @@
         return '<tr><td class="tal">' + esc(adr || o.seq || o.id) + '</td><td class="tal">' + esc(halter) + '</td><td>' + eur(num(d.kp)) + '</td>'
           + '<td>' + fmtDatum(fr.kauf) + '</td><td>' + esc(spek) + '</td><td>' + esc(san) + '</td><td class="' + (warn ? 'pst-warn' : '') + '">' + quote + '</td></tr>';
       }).join('');
-      host.innerHTML = '<div class="card"><div class="ct">Bestand mit Fristen</div><div class="pst-scroll"><table class="cft"><thead><tr><th class="tal">Objekt</th><th class="tal">Halter</th><th>Kaufpreis</th><th>Kauf</th>'
+      host.innerHTML = '<div class="card"><div class="ct">Bestand mit Fristen · AP 7, Stand aus den Objektdaten</div><div class="pst-scroll"><table class="cft"><thead><tr><th class="tal">Objekt</th><th class="tal">Halter</th><th>Kaufpreis</th><th>Kauf</th>'
         + '<th title="§ 23 EStG: Veräußerung erst nach zehn Jahren steuerfrei">Spekulationsfrist</th>'
         + '<th title="§ 6 Abs. 1 Nr. 1a EStG: drei Jahre ab Anschaffung">15-%-Fenster</th><th title="Sanierung ÷ Gebäude-AK">Sanierungsquote</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
         + '</div><p class="pst-hint">' + list.length + ' Objekte · Fristen aus dem Kaufdatum gerechnet · Sanierungsquote erst mit dem vollen Objekt (folgt mit der Versuchsreihe). Das ist der Zustand, den AP 7 als Budget führt.</p>';
@@ -114,7 +114,7 @@
       + '<h2>Portfolio-Strategie</h2>'
       + '<p>Verfahren zur automatisierten, investorprofil-abhängigen steuerlich-strukturellen Optimierung von Immobilien-Bestandsportfolios. '
       + 'Dieses Modul ist nur mit dem Feature-Schlüssel <code>portfolio_strategie</code> sichtbar und läuft auf Prod nicht mit.</p></div>'
-      + '<h3 class="pst-h3">Bestand mit Fristen (AP 7, Stand aus den Objektdaten)</h3><div id="pst-bestand"></div>'
+      + '<div id="pst-bestand"></div>'   /* v1888a: die Ueberschrift traegt die Karte selbst (.ct) - sonst steht sie doppelt */
       + '<h3 class="pst-h3">Arbeitspakete (Anlage 1 des Antrags)</h3><div class="pst-ap">'
       + AP.map(function (a) { return '<div class="card pst-ap-k"><b>' + a[0] + ' · ' + esc(a[1]) + '</b><span>' + esc(a[2]) + '</span></div>'; }).join('')
       + '</div>'
