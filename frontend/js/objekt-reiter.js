@@ -340,6 +340,13 @@
   function zielAnwenden() {
     var z = zielstufe();
     document.querySelectorAll('[data-oe-ziel]').forEach(function (b) { b.classList.toggle('on', parseInt(b.getAttribute('data-oe-ziel'), 10) === z); });
+    /* v1866 · im Reiter Objekt nur noch der Stand; gewählt wird oben (Pre-Flight) */
+    var stat = $('oe-ziel-status');
+    if (stat) {
+      var NAMEN = { 1: 'Einfach · Stufe 1', 2: 'Mittel · Stufe 2', 3: 'Ausgiebig · Stufe 3' };
+      var fz = fehltFuer(z).length;
+      stat.innerHTML = '<b>' + NAMEN[z] + '</b> ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">Klick auf ein rotes Feld-Schild unten oder auf „' + fz + ' fehlt" in der Abruf-Box oben.</span>' : st('a', 'bereit'));
+    }
     var hint = $('oe-ziel-hint');
     if (hint) hint.textContent = z === 1 ? 'Einfach — eine Marktpreisindikation: Adresse, Objektart, Wohnfläche, Baujahr. Lage & Einschätzung bleiben sichtbar, sie gehen in den Deal Score.'
       : z === 2 ? 'Mittel — die erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe. Die Karten Gewerke und Bauteile werden eingeblendet.'
@@ -611,6 +618,18 @@
 
   /* v1862b · ein Bericht, der aus dem Dialog (geführte Eingabe, Sprechlauf)
      kam: Verkehrswert-Übernahme und Leiste nachziehen. */
+  /* v1866 · die Pre-Flight-Karte wird neu gebaut (render in object-actions.js):
+     Abruf-Box und Pillen dort neu füllen. „ändern ↑" im Reiter springt hoch. */
+  window.addEventListener('dp:preflight-rendered', function () {
+    try { zielAnwenden(); } catch (e) {}
+    try { stufen(); } catch (e) {}
+  });
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#oe-ziel-aendern')) return;
+    var bar = $('oab-bar') || $('oab-dp-stufen'); if (!bar) return;
+    bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var p = $('oab-dp-stufen'); if (p) { p.classList.add('oe-blink'); setTimeout(function () { p.classList.remove('oe-blink'); }, 2400); }
+  });
   window.addEventListener('dp:mb-ready', function () {
     setTimeout(function () { try { verkehrswertUebernahme(); } catch (e) {} try { automatik(); } catch (e) {} }, 1500);
   });

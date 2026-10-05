@@ -374,6 +374,14 @@
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
+      /* v1866 · Marcel: „Marktbericht abrufen unten, dann oben nochmal die
+         Eingabetiefe … ein bisschen viel." Ein Ort: die Abruf-Box steht
+         jetzt UNTER der Pre-Flight-Karte, gefüllt von objekt-reiter.js
+         (stufen()), die Pillen oben wählen die Stufe. */
+      '<div id="oe-abruf-box" class="oe-abruf-box dp-pf-abruf"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die oben gewählte Eingabetiefe ist vorgemerkt</span></div>'
+        + '<div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div>'
+        + '<div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span>'
+        + '<button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div>' +
       '<div class="oab-credit-hint" id="oab-credit-hint" style="display:none"></div>' +
       (avmOff ? '<div class="oab-note" style="margin:-6px 0 12px">Die externe Marktbewertung ist derzeit deaktiviert \u2014 Import funktioniert.</div>' : '') +
       /* v1637 · Hier stand ein Hinweis, der die beiden Partner NAMENTLICH nannte. Er erschien nur zu den 'coming soon'-Kacheln, und die gibt es nicht mehr. */ '' +
@@ -391,6 +399,8 @@
     } catch (e) {}
     /* v570-pf: alter qc7-src-Listener ersetzt durch dp-pf-tile-Bind im Render */
     $('oab-run').addEventListener('click', _v754ConfirmRun); /* v754-confirm */
+    /* v1866 · die Abruf-Box und die Stufen-Pillen werden von objekt-reiter.js gefüllt — nach jedem Neuaufbau */
+    try { window.dispatchEvent(new CustomEvent('dp:preflight-rendered')); } catch (e) {}
     /* F1/qb-objqr: aktiver Shared-Pass fuers aktuelle Objekt -> echten QR in .dp-pf-qr rendern */
     function _updateShareQr(){
       var a = document.getElementById('oab-pf-qr'); if (!a) return;
