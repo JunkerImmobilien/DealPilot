@@ -31614,3 +31614,86 @@ Wartezeiten (≤ 300 ms) und Zustände per Klick-Rückgabe lesen. Ein Iframe, de
 nicht ändert (beforeunload), wird ersetzt statt neu geladen.
 
 **Rest.** Prod v1882a; Staging v1882a; `main` = `staging` bis auf Journal.
+
+### (44) 05.10.2026 — v1883–v1883b: Endabnahme Handy (alle Darstellungen), Ernte NRW Block 5, Prod nachgezogen
+
+**Was.** Marcel: „teste die handy version nochmal, noch genauer. header gleiche farben,
+passende formatierung, alles passend skaliert, nichts verzerrt. seh es als wäre es deine
+endabnahme und du müsstest jedesmal 2 euro bezahlen wenn jemand einen fehler oder bug
+findet" — und danach: „bitte die anderen designs bzw. ui aussehen auch durchtesten auf
+handy und tablet, also alle die auch für handy freigegeben sind, in der gleichen tiefe".
+
+**Werkzeug.** Ein Prüfläufer in der Kabine (390 px, Parkstr. 9 geladen) fährt alle neun
+Reiter und meldet je Reiter: Elemente rechts außerhalb (ohne wischbare Schienen),
+abgeschnittenen Text (overflow hidden ohne Ellipse), Schrift unter 8 px, verzerrte Bilder
+(Seitenverhältnis), Transformationen, zu schmale Eingabefelder. Dazu je Reiter
+Bildausschnitte. Jede Korrektur zuerst als eingespritztes Blatt im iframe geprüft, dann in
+die Datei.
+
+**Gebaut, Aktenmappe/Obsidian (`213a194` v1883).**
+- Kopf: Schiene rgb(5,5,5) gegen Kopf und Reiter rgb(14,13,11) — drei Flächen, zwei
+  Schwarz. Schiene trägt jetzt den Kopfton.
+- Vollbild-Knopf `#dp-sb-toggle` (v625: FAB unten links, klappt zur 66-px-Schiene) lag in
+  jeder Aufnahme als schwarzer Kreis über dem Inhalt. Unter 900 px aus, in allen Layouts
+  (`v1883a`); bleibt nur, solange `body.dp-sidebar-collapsed` steht, damit man es lösen kann.
+- Finanzierung, Pre-Flight-Kopf: „KONDI-TIONEN" brach am weichen Trennstrich, „LTV ≤ 80 %"
+  zweizeilig. Einzeilig.
+- Deal-Aktion, Donut: „FELDER 14 / 14" in 6,5 px (58 × 6 px gemessen) → 8,5 px.
+- Bewertung: Zwischentitel „So setzt sich der Score zusammen" füllt die Spalte, die
+  Schmucklinie (::after, 80 px) lief durch „ZUSAMMEN" → Linie unter 480 aus (ID-Kette, das
+  Blatt ist in dpsh-score-hero.js eingespritzt). KPI-Zeilenraster: Ampel saß bündig am
+  Kartenrand → 8 px Luft.
+- Bewertungstext: `parts.join(' ')` ergab „von -896 €/Mon DSCR unter 1 … nicht LTV über",
+  ohne Satzzeichen. Kleinbuchstabe = Fortsetzung, sonst neuer Satz (dealscore.js).
+- Vergleichstabellen `.phase-table`/`.zaer-table` (Zinsänderungsrisiko-Detail und
+  Kennzahlen-Vergleich, 495/584 px in 331): Heute/Ende Zinsbindung/Anschluss lagen rechts
+  außerhalb, sichtbar war „+2". Festes Raster 37 % + 3 Spalten, Hinweis als Zeile darunter.
+- Cashflow-Projektion `.cft` (15 Spalten, 997 px): wischt, die Jahresspalte bleibt stehen.
+- Stress-Matrix: Achsenbeschriftung brach Wörter („Kri se", „Stre ss", „Mitt el"), Rahmen
+  nahm 255 von 335 px. Polster 20/12, Achse 84 px, Zahl und Wort untereinander, X-Achse 8 px.
+
+**Darstellungen (`7980dfa` v1883a, `3db5e88` v1883b).** Das Panel bietet auf dem Handy:
+Aussehen (Heute/Aktenmappe), Datenaufnahme (Automatisch/Zeile/Kartei/Buetten), Seiten,
+Modus (Dunkel/Hell), Objektkarten (Kompakt/Standard/Wallet/Stapel), Objektkarten in der
+Liste (7 Stile), Kartenfläche, Form, Schrift A−/A/A+. Je Variante Prüfläufer + Bilder:
+- Heute (390/820), Hell (390/820, Heute und Aktenmappe), A+: sauber. Im Hell-Modus bleibt
+  der Kopf der Aktenmappe dunkel (Layoutregel), in Heute wird er weiß — beides stimmig.
+- PLZ-Feld: das 4-Spalten-Raster (style.css 36416) gab der PLZ 61 px, mit 16-px-Schrift
+  (iOS-Zoomschutz) stand „3254" und die 5 war weg. Unter 480: PLZ und Ort je zwei Spalten.
+- **Die sieben Listen-Stile wirkten auf dem Handy gar nicht:** alle 56 Regeln sind an
+  `.dpl-schiene :is(#sb-list)` verankert, die Liste liegt dort aber in `aside#sidebar`
+  (seit v1880 nimmt die Schiene nichts). 48 Regeln maschinell geklont mit dem Anker
+  `aside#sidebar`, nur unter 900 px (layout-varianten.css, Block v1883a). Danach gemessen:
+  Datenzeile, Ampel, Kennzahlen und Minimal setzen den Ring bei top:38 in einen 84-px-Kopf,
+  die Stufen-Pille lag über den Kacheln → Kopf min 122 px, Adresse lässt dem Ring Platz.
+  Bordkarte setzt das Investor-Band unten rechts (Schienen-Design) → in der Schublade oben.
+- Kompakt/Wallet/Stapel (ui-varianten.css, v1095): die später gebauten Bänder
+  (.sbc-investor-ribbon/.sbc-won-ribbon) lagen über Nummer und Band, der Ring über der
+  Adresse (Kompakt), die Stufen-Pille über den Knöpfen (Stapel), die Nummer grün auf Gold.
+  Kompakt: Adresse bricht neben dem Ring, Ringzahl hell. Wallet: Bänder an die Bandkante
+  unten, Nummer dunkel. Stapel: Bänder aus, Datum aus, Pille in Zeile 2 — die Pille hing
+  statisch im Ring-Container, weil ui-varianten.css sie erst absolut und dann wieder
+  statisch setzt; die Kette braucht zwei IDs.
+- Datenaufnahme-Stile und Seiten wirken auf dem Handy nicht sichtbar (Zeile = die kleine
+  Karte „Quellen wählen", Kartei/Buetten nur im aufgeklappten Blatt — beide sauber).
+  Hinweistext „Wirkt in den Layouts Aktenmappe, Kanzlei und Tower" → „Wirkt in der
+  Aktenmappe".
+
+**Ernte NRW Block 5 (`7980dfa`).** Agent über die vollständige boris.nrw-Liste (59 PDFs per
+HEAD-Probe): `swf-nw-2026-block5.json`, 26 Sätze, 9 Ausschüsse (Remscheid, Arnsberg,
+Bergisch Gladbach, Stadt Düren, Lippstadt, Lüdenscheid, Ratingen, Velbert, Wesel), 416
+Tabellenzellen maschinell, 21 Beispiele getroffen, 5 nur Verfügbarkeit, 0 Fehler. Register
+danach (Staging = Prod): NW Faktoren 202/81 (vorher 176/72), gesamt 3.183. Nebenbefunde:
+Gütersloh 2026 liegt unter NEUER Kennziffer 33300 (Block 2 hielt ihn für fehlend) —
+Nachtrag liegt bereit (`scratchpad/nw5/swf-nw-2026-guetersloh-nachtrag.json`); Olpe in
+`laender2.json` trägt `berichtsjahr 2025` bei 2026-Quelle; Ratingen-AGS korrigiert
+(05158028, nicht Mettmann). Linie 6 (Berlin/Brandenburg/Hamburg/Bremen) läuft.
+
+**Prod-Rollout v1883b.** Sicherungen `prod-*-20261005-1410-vor-v1883` (11 MB/71, 1,4 MB/26),
+Gold-Audit RC=0, `main` ff auf `3db5e88`, mb-backend neu gebaut, NW gesät, Buster per curl.
+
+**Messfalle.** `_setVariant` öffnete das Panel im alten iframe, dann war der Stil im neuen
+gesetzt — und das Panel stand im neuen offen (Merker). Vor jedem Bild das Panel schließen,
+und die Kartenstile nur über das Panel klicken (Bedienweg), nie per Attribut.
+
+**Rest.** Prod v1883b; Staging v1883b; `main` = `staging` bis auf Journal.

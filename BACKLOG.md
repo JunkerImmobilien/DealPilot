@@ -265,6 +265,24 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N26 · Endabnahme Handy, alle Darstellungen (05.10.2026) — erledigt v1883–v1883b, auf Prod
+
+Prüfläufer + Bilder je Reiter und je Darstellungsvariante (Heute/Aktenmappe, Hell/Dunkel, A+,
+4 Datenaufnahme-Stile, 4 Karten-Varianten, 7 Listen-Stile, Form). 19 Funde behoben, darunter:
+Listen-Stile wirkten auf dem Handy nie, Stapel/Wallet/Kompakt mit Überlagerungen, Vergleichs-
+tabellen abgeschnitten, Stress-Matrix mit Wortbrüchen, PLZ-Feld zu schmal, Vollbild-Knopf über
+dem Inhalt. **Offen/bewerten:** Heute-Kopf bei A+ mit Objekt 117 px (Zähler-Pille rutscht in
+eine eigene Zeile); Investor-Band in der Schublade bei aktiver Karte kontrastarm; Panel-Text
+„In der Kanzlei tauschen Navigation und Aktionen" (Seiten) veraltet.
+
+### N27 · Ernte NRW Block 5 (26) auf Staging und Prod — Marcel entscheidet
+
+Arnsberg/Lippstadt: log-Funktionen ohne Gültigkeitsspanne im Bericht (rechnen überall) —
+Spanne aus Stichprobe als Sperre oder „Anwender würdigt"? Gütersloh 2026 (Nachtrag bereit, zwei
+2025-Sätze aus Block 2 ersetzen; vorher prüfen, was `gutachterausschuss.js` bei zwei Jahrgängen
+tut). Olpe `berichtsjahr 2025` bei 2026-Quelle korrigieren? Velbert nur als Tabelle (Formel im
+PDF als Symbolschrift). Bergisch Gladbach braucht `baujahr_fiktiv` (Verzweigung liest Baujahr).
+
 ### N24 · Handy- und Tablet-Durchgang 05.10.2026 — erledigt v1881–v1882a, auf Prod
 
 Gemessen 390 und 820 px, Aktenmappe: alle 9 Reiter, Menü, Akkordeon, Einstellungen, QuickBoarding,
