@@ -31831,7 +31831,86 @@ Cockpit). Der Prüfer sucht nach Browser-Standardwerten (`outset`/`inset`-Rahmen
 `rgb(240,240,240)`) und fand genau diesen einen — unter 900 px ist er jetzt aus, dort öffnet
 der Burger die Seitenleiste.
 
-**Rest.** Prod v1888a; Staging v1888a. **Linie 8 (NI/SH/RP/SL) liegt ungesät im Arbeitsbaum:**
+**Rest (Stand 20:30).** siehe (47).
+
+### (47) 05.10.2026 — v1888b/v1889: der Bot beauskunftete das falsche Haus, und `formelwerk` rechnet
+
+**Der Telegram-Bot hat eine ganze Unterhaltung lang ein anderes Haus beauskunftet (`e3ecbb4` v1888b).**
+Marcel fragte nach der Sachsenstraße 18 in Herford; die Kennzahlen, die der Bot zurückgab, gehören
+zur Löhner Straße 278 in Hiddenhausen. Die „16.800 €" sind deren Jahreskaltmiete (1.400 × 12), auf
+den Cent nachgerechnet — **keine Einheitenfalle, der Rechenweg war richtig, das Objekt war falsch.**
+
+Die Kette, aus `telegram_dialog` belegt: Marcel nannte in keiner seiner vier Nachrichten eine
+Listennummer. Das Modell dachte sich `nummer: 1` (die Prompt-Regel verbietet das ausdrücklich), und
+die Werkzeugschicht befolgte sie.
+
+> **Warum der Wächter aus v1813c nicht griff:** er vergleicht die genannte Adresse mit der Nummer —
+> aber nur, wenn die Adresse EINDEUTIG auflöst. Das Objekt war inzwischen doppelt angelegt (das
+> Modell rief `objekt_anlegen` ein zweites Mal, als Marcel die Miete nachreichte), die Adresse war
+> damit mehrdeutig, der Vergleich fiel aus, und die erfundene Nummer gewann still.
+> **Ein Wächter, der nur im eindeutigen Fall aufwacht, schläft genau dann, wenn es unübersichtlich
+> wird** — und unübersichtlich wird es durch einen Fehler, den derselbe Lauf erzeugt hat.
+
+Gebaut: eine Listennummer darf nur gelesen werden, wenn im Satz wirklich eine steht (der Webhook
+entscheidet das deterministisch, nicht das Modell — „Werkzeug schlägt Hinweis"); eine mehrdeutige
+Adresse wird zur Rückfrage über diese Adresse; eine Nummer außerhalb der Liste reißt die danebenstehende
+Adresse nicht mehr mit ins Nichts; Dublettenprüfung vor dem Anlegen (gefragt, nicht verhindert — zwei
+Einheiten im selben Haus gibt es wirklich); und die Preisansage nennt jetzt das Objekt, auf das sie
+sich bezieht. Vorher gab sie nur eine Kennung zurück, und das Modell musste die Adresse aus dem
+Gespräch nehmen — also die, die stimmen SOLL.
+
+**Die Geldfreigabe hat eine Fehlbuchung verhindert, weil sie kaputt war.** `sagtJa` prüfte nur den
+Satzanfang; Marcels Satz begann mit „Die Marge ist 3,57 Prozent und ja, …" → keine Freigabe → der
+Abruf wurde gesperrt. Hätte sie gegriffen, wäre die **Löhner Straße abgerufen und abgebucht** worden.
+Jetzt gilt das Ja überall im Satz, eine Verneinung hebt es auf, `abrufen` zählt nicht als Zustimmung
+(sonst wäre „was kostet das Abrufen?" eine Freigabe gewesen), und **ein Satz mit Fragezeichen am Ende
+ist nie eine Zustimmung** (v1888b; sonst hätte „ok, aber was kostet das?" gezählt). Acht Prüfsätze,
+die Regeln dafür aus der echten Datei gelesen, nicht im Test nachgebaut. **Das ist Geld — vor Prod
+ausdrücklich freigeben.**
+
+**`formelwerk` rechnet (`596b8dc` v1889).** Acht Registersätze trugen eine Modellform, die der
+Auswerter nicht kannte, und lieferten ausnahmslos `form_unbekannt`: **Hamburg komplett** (5
+Zinssätze + 1 Sachwertfaktor), Magdeburg MFH, Kiel MFH. Ein ganzes Bundesland war damit stumm, und
+der Satz sah dabei aus wie ein Wert.
+
+| Ausschuss | rechnet jetzt | Prüfmaßstab |
+|---|---|---|
+| Magdeburg | 2,49 % | Normobjekt + **13 Kurvenpunkte zeichengleich** + 10 Umrechnungskoeffizienten |
+| Kiel | 2,3 % | Anwendungsbeispiel S. 52 getroffen |
+| Dresden | 1,0988 | `regression_log`, war an derselben Stelle stumm |
+| Hamburg | kein Wert — **mit Namen** | nennt die fehlenden EINGABEN statt eines Fehlercodes |
+
+> **Zwei Annahmen im Auftrag waren falsch, und beide Male war die Diagnose teurer als die Lücke.**
+> Hamburgs Teiltabellen fehlen NICHT — 101 Stadtteile und 11 Stichtage stehen im Satz; der
+> Rechenkern bekam `modellansaetze` nur nie zu sehen. Und die Fehlliste aus v1819 („im Register
+> fehlen Lagefaktor, Altersfaktor, Erstbezugsfaktor") war falsch: alle drei liegen mit Zahlen im
+> Satz, die Heuristik suchte an der falschen Stelle. **Eine falsche Fehlmeldung schickt den nächsten
+> Leser Daten ernten, die schon da sind.**
+
+Der Auswerter setzt **nie** einen Faktor auf 1. Jede Lücke trägt Faktorname, Status und die
+beizubringende Eingabe. Zwei Fallen wehrt er aktiv ab: `a`/`b` bedeuten in einem Hamburger Satz
+zweierlei (jede lineare Regel wird gegen die Normstelle des Blattes geprüft), und ein Prozentzeichen
+ist eine Einheit (Bodenwertanteil 60 statt 0,60 wird nachgefragt, nicht um den Faktor 100
+danebengerechnet).
+
+**Die Prüfstrecken prüften weniger, als sie meldeten.** `pruefstrecke-swf.mjs` las nur `belege[0]` —
+**fünf Anwendungsbeispiele** standen an zweiter Stelle und wurden nie gerechnet, der Lauf meldete
+trotzdem „0 Fehler". Dazu suchte sie eine Belegart `formel_gegen_tabelle`, die es im Register **null**
+mal gibt (sie heißt dort `funktion_gegen_tabelle` und in vier weiteren Schreibweisen) — **13 Belege**
+mit Soll-Werten hat nie jemand angefasst. Sie stürzte an Sperrsätzen mit `formel: null` ab, und ihr
+Einheitenwächter war auf Sachwertfaktoren geeicht und hätte jeden Zinssatz verworfen. Jetzt
+entscheidet der INHALT des Belegs, nicht sein Name; 589 Prüfungen, 158 von 158 Anwendungsbeispielen
+gerechnet, **und unter jedem Lauf steht die Deckung** samt drei namentlichen Listen für das, was er
+NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heißen.
+
+> **Gemessen und wichtig für jede spätere Zählung:** der laufende Dienst liest das Register aus dem
+> ORDNER (`ladeSaat()` beim ersten Zugriff), nicht aus `mb.param_modell`. Die Tabelle ist der
+> Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
+> Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
+
+**Rest.** Staging v1889. **Prod bewusst NICHT nachgezogen** — der Bot-Commit enthält die Änderung
+an der Geldfreigabe, und Geld geht nur mit ausdrücklicher Freigabe raus. **Linie 8 (NI/SH/RP/SL) ist
+inzwischen mitgesät:**
 411 Sätze, aber nur 16 Werte und 395 Sperren, davon 280 gleichlautend für Rheinland-Pfalz und
 das Saarland (beide kostenpflichtig UND genehmigungspflichtig). Ob 280 Sperren ins Register
 sollen oder ein Satz je Land genügt, entscheidet Marcel.
