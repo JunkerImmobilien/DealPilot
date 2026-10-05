@@ -38482,3 +38482,11 @@ body .dp-pf-tile.on .dp-pf-led { background: #3FA56C !important; border-color: #
 body .f.dp-oa-aus { opacity: .62; }
 body .f.dp-oa-aus:hover, body .f.dp-oa-aus:focus-within { opacity: 1; }
 body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important; font-style: normal !important; color: #6b655f !important; opacity: 1 !important; letter-spacing: .02em; }
+
+/* v1876 · Handy-Durchgang 05.10.2026 (Marcel: "alle Tabs auf die mobile Ansicht testen"): der
+   schwebende Impressum/Datenschutz-Link (legal-links.js, position:fixed) lag beim Scrollen
+   ueber dem Text - gemessen auf 390 px bei 215/788, 159 x 48. Er bekommt einen eigenen Grund,
+   damit er den Text nicht zerschneidet; die 44-px-Tipphoehe (v650d/e) bleibt. */
+@media (max-width: 600px) {
+  #dp-app-legal-footer { background: rgba(253,252,250,.94) !important; border-radius: 8px !important; right: 8px !important; bottom: 6px !important; box-shadow: 0 0 0 1px rgba(5,5,5,.06) !important; }
+}
