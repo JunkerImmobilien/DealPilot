@@ -30980,3 +30980,28 @@ Zweifamilienhäuser …"; Hinweis `rgb(95,89,85)` 11,5 px; BGF-Knopf: 427 m²
 × 1,35 = 576 m², Herkunft „geschätzt", danach zurückgesetzt.
 
 **Rest.** Prod v1846b; Staging v1867 (`1335c67`).
+
+### (30) 05.10.2026 — v1868–v1868b: Eingabetiefe kompakt, Marktbewertung als Streifen
+
+**Was.** Marcel: „die Eingabetiefe ein bisschen schmaler … und oben die
+Karte für die Marktpreisindikation als schmaleren Streifen … dass wir ein
+bisschen mehr Platz bekommen."
+
+**Gemessen (Parkstr. 9).** Kopf „Eingabetiefe" 405 px — drei Abruf-Zeilen
+à 76 px mit je einem Satz. Ergebnisblock `#avsec` 373 px: Leiste 59 +
+Karte `.mc.dp` 270 (Kopf 46, Body 142, Fuß 57, Legal 21). Der Block kommt
+aus `avm-section.js` (nicht anfassen); sein „▲ min" blendet den Body ganz
+aus, die Zahlen wären weg.
+
+**Gebaut.** `cba344a`: Abruf-Box als drei Kacheln nebeneinander (Name,
+frei, Pille; der Satz steckt im Tooltip), Hinweise auf einen Satz je Stufe
+gekürzt — Kopf 191 px (−53 %). Dazu in `object-actions.js` ein
+`.avb-strip` für die Partner-Karten (eingeklappt mit Kennzahlen, Standard
+eingeklappt) — heute unsichtbar, weil die Partner-Kacheln aus sind.
+`6055782`/v1868b: die DealPilot-Karte rein per CSS mit ID-Spezifität zum
+Streifen — Kopf, Kennzahlen und Knopf in einer Zeile, Legal darunter;
+Ergebnisblock 373 → rund 130 px. Nachweis: `#avsec` 194 px vor dem
+letzten Feinschliff, `.mc.dp` 105 px, Text vollständig („199.000 € · 466
+€/m² · −74,5 % · Miete 740 € · Einordnung · Genauigkeit · übernehmen").
+
+**Rest.** Prod v1846b; Staging v1868b.
