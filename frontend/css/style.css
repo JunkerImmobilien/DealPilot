@@ -38483,3 +38483,4 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 @media (max-width: 900px) { #avsec .av-cards.single .mc.dp { grid-template-columns: 1fr !important; grid-template-areas: "head" "body" "foot" "legal" !important; } }
 #avsec .av-cards.single .mc.dp .mbody > * { width: auto !important; flex: 0 0 auto !important; text-align: left !important; margin: 0 !important; }
 #avsec .av-cards.single .mc.dp .mbody .row3 .f3 > * { display: inline !important; }
+#avsec .av-cards.single .mc.dp .mbody { flex-direction: row !important; }
