@@ -136,3 +136,13 @@
   #avsec .mc.dp .avs-sp b { font-size: 11.5px !important; }
   #avsec .av-cards.single .mc.dp .mbody .miete { white-space: nowrap !important; }
 }
+
+/* v1881c · Tablet nachgemessen (Karte 731 px, Koerper 606): in der Stufe ≤1179 bekommt "je m²" die Restspalte -
+   69 px fuer "466 €/m² · -74.5%", der Prozentwert ragt aus der Karte. Zwischen 700 und 899 px Kartenbreite:
+   Marktwert · je m² · Marktmiete in einer Zeile, die Spanne darunter, Einordnung/Genauigkeit zuletzt. */
+@container (min-width: 700px) and (max-width: 899px) {
+  #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sub miete" "sp sp sp" "row3 row3 row3" !important; row-gap: 6px !important; }
+  #avsec .av-cards.single .mc.dp .mbody .miete { border-left: 1px solid var(--border-g, #ece2c8) !important; }
+  #avsec .av-cards.single .mc.dp .mbody .avs-spanne, #avsec .av-cards.single .mc.dp .mbody .row3 { border-left: 0 !important; }
+  #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child { border-left: 0 !important; padding-left: 10px !important; }
+}

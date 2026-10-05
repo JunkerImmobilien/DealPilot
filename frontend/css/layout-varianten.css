@@ -6729,3 +6729,12 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout] body header.hdr #hdr-badges{ display:none !important; }
   html[data-dp-layout] body #hdr-toggle-btn{ display:none !important; }
 }
+
+/* v1881c · Tablet 820 px (Aktenmappe) nachgemessen: die sechs Score-Kacheln im Kopf liegen als flex-wrap -
+   vier in der ersten Zeile (194 px), die letzten zwei gestreckt auf 387 px, Kopf 270 px hoch. Zwischen Handy
+   (ab 701 px sichtbar) und 1024 px ein Raster 3 + 3. */
+@media (min-width: 701px) and (max-width: 1024px) {
+  html[data-dp-layout] body header.hdr #hdr-badges .scores { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 4px !important; }
+  html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-main,
+  html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-pill { width: auto !important; max-width: none !important; min-width: 0 !important; }
+}
