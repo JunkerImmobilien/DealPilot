@@ -100,7 +100,29 @@ async function voranschlag(userId, objektId, stufe) {
   if (r.status !== 200) {
     return { moeglich: false, grund: (r.body && r.body.error) || ('HTTP ' + r.status) };
   }
-  const kosten = (r.body.kosten && r.body.kosten[s]) || { anzahl: 0, art: null };
+  /* ── v1888b · DER RUECKFALL FIEL IN DIE GESCHENKTE RICHTUNG ───────────
+   *
+   * Hier stand `|| { anzahl: 0, art: null }`. Fehlt `kosten` in der
+   * Antwort — ein alter Stand der Route, ein geaenderter Vertrag, ein
+   * Body, der aus einem anderen Grund anders aussieht —, dann hiess das
+   * stillschweigend "anzahl 0", und `so_sagen` sagte darauf dem Nutzer:
+   * "Diese Tiefe ist fuer dieses Objekt bereits bezahlt."
+   *
+   * Die Schwesterstelle in `routes/marktbericht.js` (Zeile 286-289) macht
+   * es genau andersherum und nennt auch den Grund: "Im Fehlerfall den
+   * vollen Preis melden — lieber zu viel angekuendigt als eine
+   * Ermaessigung versprochen, die es nicht gibt."
+   *
+   *   > Zwei Stellen, die denselben Preis ankuendigen, duerfen nicht in
+   *   > verschiedene Richtungen zurueckfallen. Die eine warnt dann, waehrend
+   *   > die andere verschenkt — und welche der Nutzer zu sehen bekommt,
+   *   > entscheidet der Weg, nicht die Lage.
+   *
+   * Ein fehlendes Feld ist keine Auskunft. Wer nicht weiss, ob etwas
+   * bezahlt ist, sagt NICHT "bereits bezahlt". */
+  const _k = r.body && r.body.kosten;
+  const kosten = (_k && _k[s]) || (_k ? { anzahl: 0, art: null }
+                                      : { anzahl: 1, art: STUFEN[s].art });
   let bestand = null;
   try {
     const st = await aiCreditsService.getStatus(userId);
