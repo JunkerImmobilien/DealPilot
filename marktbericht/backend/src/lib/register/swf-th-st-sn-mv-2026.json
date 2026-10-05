@@ -1,0 +1,770 @@
+[
+  {
+    "land_code": "SN",
+    "ags": "14511000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Chemnitz, Stadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Chemnitz, Stadt gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Der Bericht wird gegen Gebühr von 65,00 € abgegeben (PDF oder Druck). Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@stadt-chemnitz.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Chemnitz, Stadt",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Suche nach einem Online-Bericht am 05.10.2026 ergebnislos",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Nicht gemessen, weil kein Bericht vorliegt.",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Webseite/Satzung",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Chemnitz, Stadt gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Der Bericht wird gegen Gebühr von 65,00 € abgegeben (PDF oder Druck). Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@stadt-chemnitz.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Chemnitz, Stadt gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Der Bericht wird gegen Gebühr von 65,00 € abgegeben (PDF oder Druck). Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@stadt-chemnitz.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14521",
+    "ebene": "kreis",
+    "gebiet_name": "Erzgebirgskreis",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Erzgebirgskreis",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Erzgebirgskreis gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid; Höhe der Gebühr vorab zu erfragen. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@kreis-erz.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Erzgebirgskreis",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Suche nach einem Online-Bericht am 05.10.2026 ergebnislos",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Erzgebirgskreis — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Nicht gemessen, weil kein Bericht vorliegt.",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Webseite/Satzung",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Erzgebirgskreis gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid; Höhe der Gebühr vorab zu erfragen. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@kreis-erz.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Erzgebirgskreis gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Abgabe nur auf schriftlichen Antrag gegen Gebührenbescheid; Höhe der Gebühr vorab zu erfragen. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@kreis-erz.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14522",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Mittelsachsen",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Mittelsachsen gilt: Grundstücksmarktbericht 2026 (Berichtszeitraum 2023–2025) am 21.05.2026 beschlossen, aber NICHT online — nur Einsicht in der Geschäftsstelle (Döbeln) oder schriftliche Anfrage gegen Gebühr nach Gebührenordnung. Mündliche Auskunft ist kostenfrei. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@landkreis-mittelsachsen.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Mittelsachsen",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Suche nach einem Online-Bericht am 05.10.2026 ergebnislos",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Mittelsachsen — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Nicht gemessen, weil kein Bericht vorliegt.",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Webseite/Satzung",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Mittelsachsen gilt: Grundstücksmarktbericht 2026 (Berichtszeitraum 2023–2025) am 21.05.2026 beschlossen, aber NICHT online — nur Einsicht in der Geschäftsstelle (Döbeln) oder schriftliche Anfrage gegen Gebühr nach Gebührenordnung. Mündliche Auskunft ist kostenfrei. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@landkreis-mittelsachsen.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Mittelsachsen gilt: Grundstücksmarktbericht 2026 (Berichtszeitraum 2023–2025) am 21.05.2026 beschlossen, aber NICHT online — nur Einsicht in der Geschäftsstelle (Döbeln) oder schriftliche Anfrage gegen Gebühr nach Gebührenordnung. Mündliche Auskunft ist kostenfrei. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@landkreis-mittelsachsen.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14523",
+    "ebene": "kreis",
+    "gebiet_name": "Vogtlandkreis",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Vogtlandkreis gilt: Grundstücksmarktbericht Vogtlandkreis 2025 (Berichtszeitraum 2023/2024) ist kostenfrei und VOLLSTÄNDIG herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Liegenschaftszinssätze Kapitel 6.3 (Tabelle 76), Sachwertfaktoren Kapitel 6.4 (Tabelle 77). Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Vogtlandkreis), Bericht: https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Vogtlandkreis",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Impressum/Copyright des aktuellen Jahrgangs, am 05.10.2026 im pdftotext-Volltext gelesen",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": "Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten."
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Wörtlich: „Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\"",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Impressum, Abschnitt Copyright",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Vogtlandkreis gilt: Grundstücksmarktbericht Vogtlandkreis 2025 (Berichtszeitraum 2023/2024) ist kostenfrei und VOLLSTÄNDIG herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Liegenschaftszinssätze Kapitel 6.3 (Tabelle 76), Sachwertfaktoren Kapitel 6.4 (Tabelle 77). Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Vogtlandkreis), Bericht: https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Vogtlandkreis gilt: Grundstücksmarktbericht Vogtlandkreis 2025 (Berichtszeitraum 2023/2024) ist kostenfrei und VOLLSTÄNDIG herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Liegenschaftszinssätze Kapitel 6.3 (Tabelle 76), Sachwertfaktoren Kapitel 6.4 (Tabelle 77). Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Copyright: Der Grundstücksmarktbericht 2025 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Vogtlandkreis), Bericht: https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14524",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Zwickau",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Zwickau gilt: ZWEI HÜRDEN AUF EINMAL. Der kostenfreie Grundstücksmarktbericht 2026 ist ausdrücklich „- öffentliche Fassung - in gekürzter Version\", und gekürzt sind genau die Wertetabellen: im Textstrom springt die Seitenzählung von 113 auf 117 (Liegenschaftszinssätze) und von 119 auf 132 (Sachwertfaktoren). Das ist keine Bild- oder OCR-Frage, sondern eine Auslassung im Dokument. Die Vollversion kostet 140,00 €. Dazu kommt die Genehmigungspflicht. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gaa@landkreis-zwickau.de), Bericht: https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Zwickau",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Impressum/Copyright des aktuellen Jahrgangs, am 05.10.2026 im pdftotext-Volltext gelesen",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": "Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten."
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Wörtlich: „Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\"",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Impressum, Abschnitt Copyright",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Zwickau gilt: ZWEI HÜRDEN AUF EINMAL. Der kostenfreie Grundstücksmarktbericht 2026 ist ausdrücklich „- öffentliche Fassung - in gekürzter Version\", und gekürzt sind genau die Wertetabellen: im Textstrom springt die Seitenzählung von 113 auf 117 (Liegenschaftszinssätze) und von 119 auf 132 (Sachwertfaktoren). Das ist keine Bild- oder OCR-Frage, sondern eine Auslassung im Dokument. Die Vollversion kostet 140,00 €. Dazu kommt die Genehmigungspflicht. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gaa@landkreis-zwickau.de), Bericht: https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Zwickau gilt: ZWEI HÜRDEN AUF EINMAL. Der kostenfreie Grundstücksmarktbericht 2026 ist ausdrücklich „- öffentliche Fassung - in gekürzter Version\", und gekürzt sind genau die Wertetabellen: im Textstrom springt die Seitenzählung von 113 auf 117 (Liegenschaftszinssätze) und von 119 auf 132 (Sachwertfaktoren). Das ist keine Bild- oder OCR-Frage, sondern eine Auslassung im Dokument. Die Vollversion kostet 140,00 €. Dazu kommt die Genehmigungspflicht. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Copyright: Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gaa@landkreis-zwickau.de), Bericht: https://www.landkreis-zwickau.de/uploads/formulare/GrundstuecksmarktberichtLKZwickau2026_4741.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14625",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Bautzen",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Bautzen gilt: Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2024 (beschlossen 30.07.2024), ist kostenfrei und VOLLSTÄNDIG herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Sachwertfaktoren Kapitel 17.3 (Tab. 84 ff.), Liegenschaftszinssätze Kapitel 17.4 (Tab. 88 ff., getrennt nach Ein- und Zweifamilienhäusern, Mehrfamilienhäusern und Wohnungseigentum im Weiterverkauf). Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen), Bericht: https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Bautzen",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Impressum/Copyright des aktuellen Jahrgangs, am 05.10.2026 im pdftotext-Volltext gelesen",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": "Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten."
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Wörtlich: „Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.\"",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Impressum, Abschnitt Copyright",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Bautzen gilt: Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2024 (beschlossen 30.07.2024), ist kostenfrei und VOLLSTÄNDIG herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Sachwertfaktoren Kapitel 17.3 (Tab. 84 ff.), Liegenschaftszinssätze Kapitel 17.4 (Tab. 88 ff., getrennt nach Ein- und Zweifamilienhäusern, Mehrfamilienhäusern und Wohnungseigentum im Weiterverkauf). Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen), Bericht: https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Bautzen gilt: Grundstücksmarktbericht Landkreis Bautzen, Stand 01.01.2024 (beschlossen 30.07.2024), ist kostenfrei und VOLLSTÄNDIG herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Sachwertfaktoren Kapitel 17.3 (Tab. 84 ff.), Liegenschaftszinssätze Kapitel 17.4 (Tab. 88 ff., getrennt nach Ein- und Zweifamilienhäusern, Mehrfamilienhäusern und Wohnungseigentum im Weiterverkauf). Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Der Grundstücksmarktbericht ist urheberrechtlich geschützt, die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen), Bericht: https://www.landkreis-bautzen.de/download/boden/GrundstuecksmarktberichtLandkreisBautzen_Stand01012024.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14626",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Görlitz",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Görlitz",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Görlitz gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht); frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de. Auch die Gebühr ist unbekannt — sie ist der erste zu klärende Punkt. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@kreis-gr.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Görlitz",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Suche nach einem Online-Bericht am 05.10.2026 ergebnislos",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Görlitz — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Nicht gemessen, weil kein Bericht vorliegt.",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Webseite/Satzung",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Görlitz gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht); frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de. Auch die Gebühr ist unbekannt — sie ist der erste zu klärende Punkt. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@kreis-gr.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Görlitz gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht); frei sind nur die Bodenrichtwerte im Geoportal gis-lkgr.de. Auch die Gebühr ist unbekannt — sie ist der erste zu klärende Punkt. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@kreis-gr.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14627",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Meißen",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Meißen",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Meißen gilt: Die frei herunterladbare „Marktinformation 2026\" (Stichtag 01.01.2026, beschlossen 21.05.2026) enthält KEINE Werte: zu Liegenschaftszinssätzen und Sachwertfaktoren stehen dort nur die Definitionen nach § 193 BauGB, keine Tabellen. Hier fehlt also nicht nur die Erlaubnis, sondern die Zahl selbst — ob es eine kostenpflichtige Vollfassung mit Wertetabellen gibt, ist noch nicht geklärt. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Meißen), Bericht: https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Meißen",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Impressum/Copyright des aktuellen Jahrgangs, am 05.10.2026 im pdftotext-Volltext gelesen",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": "Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten."
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Meißen — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Wörtlich: „Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\"",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Impressum, Abschnitt Copyright",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Meißen gilt: Die frei herunterladbare „Marktinformation 2026\" (Stichtag 01.01.2026, beschlossen 21.05.2026) enthält KEINE Werte: zu Liegenschaftszinssätzen und Sachwertfaktoren stehen dort nur die Definitionen nach § 193 BauGB, keine Tabellen. Hier fehlt also nicht nur die Erlaubnis, sondern die Zahl selbst — ob es eine kostenpflichtige Vollfassung mit Wertetabellen gibt, ist noch nicht geklärt. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Meißen), Bericht: https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Meißen gilt: Die frei herunterladbare „Marktinformation 2026\" (Stichtag 01.01.2026, beschlossen 21.05.2026) enthält KEINE Werte: zu Liegenschaftszinssätzen und Sachwertfaktoren stehen dort nur die Definitionen nach § 193 BauGB, keine Tabellen. Hier fehlt also nicht nur die Erlaubnis, sondern die Zahl selbst — ob es eine kostenpflichtige Vollfassung mit Wertetabellen gibt, ist noch nicht geklärt. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Die Marktinformation 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke sowie die öffentliche Wiedergabe sind nur mit Quellenangabe und Genehmigung des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes oder der Vervielfältigung von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Meißen), Bericht: https://www.kreis-meissen.de/loadDocument.phtml?FID=3697.3941.1&Ext=PDF. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14628",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Sächsische Schweiz-Osterzgebirge",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Sächsische Schweiz-Osterzgebirge gilt: Grundstücksmarktbericht 2026 (164 Seiten) ist kostenfrei und vollständig herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Liegenschaftszinssätze Kapitel 6.5 (Modellparameter 6.5.1, Tabelle aller Objektarten 6.5.2, Grafiken je Objektart 6.5.3), Sachwertfaktoren für Ein- und Zweifamilienhäuser Kapitel 6.6. Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Pirna), Bericht: https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Sächsische Schweiz-Osterzgebirge",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Impressum/Copyright des aktuellen Jahrgangs, am 05.10.2026 im pdftotext-Volltext gelesen",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": "Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet."
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Wörtlich: „Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.\"",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Impressum, Abschnitt Copyright",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Sächsische Schweiz-Osterzgebirge gilt: Grundstücksmarktbericht 2026 (164 Seiten) ist kostenfrei und vollständig herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Liegenschaftszinssätze Kapitel 6.5 (Modellparameter 6.5.1, Tabelle aller Objektarten 6.5.2, Grafiken je Objektart 6.5.3), Sachwertfaktoren für Ein- und Zweifamilienhäuser Kapitel 6.6. Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Pirna), Bericht: https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Sächsische Schweiz-Osterzgebirge gilt: Grundstücksmarktbericht 2026 (164 Seiten) ist kostenfrei und vollständig herunterladbar, die Zahlen liegen maschinenlesbar als Text vor: Liegenschaftszinssätze Kapitel 6.5 (Modellparameter 6.5.1, Tabelle aller Objektarten 6.5.2, Grafiken je Objektart 6.5.3), Sachwertfaktoren für Ein- und Zweifamilienhäuser Kapitel 6.6. Es fehlt nur die Erlaubnis. Lizenzwortlaut aus dem Impressum, am 05.10.2026 im Volltext gelesen: „Irrtum vorbehalten. Nachdruck, Vervielfältigung oder Weitergabe jeder Art sind nur mit Quellenangaben und Genehmigung des Herausgebers gestattet.\" Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (Geschäftsstelle des Gutachterausschusses im Landratsamt Pirna), Bericht: https://www.landratsamt-pirna.de/download/Grundstuecksmarktbericht_LK_SOE_2026.pdf. Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14729",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Leipzig",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Leipzig",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Leipzig gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Abgabe auf schriftlichen Antrag; die Gutachterausschusssatzung nennt für den aktuellen Bericht 70 bis 167 €, für ältere Jahrgänge die Hälfte. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@lk-l.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Leipzig",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Suche nach einem Online-Bericht am 05.10.2026 ergebnislos",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Leipzig — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Nicht gemessen, weil kein Bericht vorliegt.",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Webseite/Satzung",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Leipzig gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Abgabe auf schriftlichen Antrag; die Gutachterausschusssatzung nennt für den aktuellen Bericht 70 bis 167 €, für ältere Jahrgänge die Hälfte. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@lk-l.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Leipzig gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Abgabe auf schriftlichen Antrag; die Gutachterausschusssatzung nennt für den aktuellen Bericht 70 bis 167 €, für ältere Jahrgänge die Hälfte. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@lk-l.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "SN",
+    "ags": "14730",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Nordsachsen",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart": "ezfh",
+    "objektart_bez": "Ein- und Zweifamilienhäuser",
+    "formel": {
+      "form": "konstante",
+      "liefert": "faktor",
+      "wert": null,
+      "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Nordsachsen gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Gebühr nach Amtsblatt Nordsachsen: aktueller Bericht 60,00 €, ältere Jahrgänge 30,00 €. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@lra-nordsachsen.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gebaeudestandard": "nicht erhoben — Bericht genehmigungspflichtig",
+      "gnd_jahre": null,
+      "baupreisindex_stichtag": null,
+      "hinweis": "Ohne Erlaubnis des Herausgebers wird auch die Modellbeschreibung nicht wiedergegeben. Ein Sachwertfaktor ohne sein Modell ist nach § 10 ImmoWertV ohnehin nicht anwendbar."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Nordsachsen",
+      "extrapolation": "gesperrt",
+      "hinweis": "KEIN TREFFER HEISST KEIN WERT."
+    },
+    "belege": [
+      {
+        "art": "Lizenzpruefung",
+        "fundstelle": "Suche nach einem Online-Bericht am 05.10.2026 ergebnislos",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": null
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Die Sperre selbst ist gemessen.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "modellversion": "Lizenzpruefung Sachsen 05.10.2026",
+    "quelle_url": "https://www.boris.sachsen.de/marktinformationen-4042.html",
+    "quelle_parser": "v1885-hand (Impressum im pdftotext-Volltext, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Landkreis Nordsachsen — Angabe der Quelle; eine Wiedergabe der Werte ist genehmigungspflichtig und erfolgt nicht.",
+    "lizenz": "genehmigungspflichtig — Verwertung fuer nichteigene oder wirtschaftliche Zwecke und oeffentliche Wiedergabe nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Nicht gemessen, weil kein Bericht vorliegt.",
+    "auflagen": "Erlaubnis des Herausgebers einholen.",
+    "fundstelle": "Webseite/Satzung",
+    "seite": 1,
+    "verwendung": "produkt",
+    "vollstaendig": false,
+    "warum_kein_wert": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Nordsachsen gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Gebühr nach Amtsblatt Nordsachsen: aktueller Bericht 60,00 €, ältere Jahrgänge 30,00 €. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@lra-nordsachsen.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt.",
+    "unvollstaendig_grund": "Sachsen ist bei dieser Kennzahl flächendeckend GENEHMIGUNGSPFLICHTIG. Für Landkreis Nordsachsen gilt: Kein Bericht online auffindbar (am 05.10.2026 gesucht). Gebühr nach Amtsblatt Nordsachsen: aktueller Bericht 60,00 €, ältere Jahrgänge 30,00 €. Ein Lizenzwortlaut konnte nicht gemessen werden, weil kein Bericht vorliegt. Ein Sachwertfaktor aus diesem Gebiet darf deshalb nicht in einen Kundenbericht — und kein Wert eines Nachbarkreises und kein Landesmittel an seine Stelle. Der Grundstücksmarktbericht des Freistaates Sachsen (Oberer Gutachterausschuss für Grundstückswerte, c/o Landesamt für Geobasisinformation Sachsen, oga@geosn.sachsen.de) ist ebenfalls gesperrt — Copyright-Hinweis wörtlich: „Der Grundstücksmarktbericht 2024 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.\" Kostenfrei abrufbar über www.boris.sachsen.de bzw. als Pflichtexemplar bei der SLUB (Qucosa, Rechteangabe „In Copyright\"). Kostenfreier Zugang ist keine Lizenz. WEG: Erlaubnis bei der Geschäftsstelle des zuständigen Gutachterausschusses einholen (gutachterausschuss@lra-nordsachsen.de). Danach ist die Übernahme in einem Arbeitsgang möglich, wo der Bericht vorliegt."
+  },
+  {
+    "land_code": "MV",
+    "ags": "13076",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Ludwigslust-Parchim",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "objektart": "rhdhh",
+    "objektart_bez": "Reihenhäuser und Doppelhaushälften (individueller Wohnungsbau)",
+    "formel": {
+      "form": "baender_1d",
+      "achse_feld": "sachwert",
+      "achse_bez": "vorläufiger Sachwert in Euro",
+      "liefert": "faktor",
+      "rundung_stellen": 2,
+      "baender": [
+        {
+          "bis": 150000,
+          "wert": 1,
+          "streuung": [
+            0.85,
+            1.11
+          ],
+          "schluessel": "bis_150_t_eur",
+          "bez": "vorläufiger Sachwert bis 150.000 €"
+        },
+        {
+          "von": 150000,
+          "wert": 1.02,
+          "streuung": [
+            0.83,
+            1.21
+          ],
+          "schluessel": "ueber_150_t_eur",
+          "bez": "vorläufiger Sachwert über 150.000 €"
+        }
+      ],
+      "normobjekt": "Grundstücke des individuellen Wohnungsbaus, Baujahre 1888 bis 2020, üblicher Bau- und Unterhaltungszustand, schadensfrei, lagetypische Grundstücksgröße. Außerhalb der abgedruckten Klassen gibt es keinen Wert.",
+      "hinweis": "DER VORLÄUFIGE SACHWERT IST IN EURO EINZUSETZEN; der Bericht druckt die Klassengrenzen in Tausend Euro (bis 150 / bis 200 / 200–300 / > 300). DIE KLASSENGRENZEN UNTERSCHEIDEN SICH JE OBJEKTART: Ein- und Zweifamilienhäuser 200 und 300 T€, Reihenhäuser und Doppelhaushälften 150 T€. EIN EINFLUSS DES BODENWERTES IST AUSDRÜCKLICH NICHT NACHGEWIESEN, wörtlich S. 64: „Getrennt nach der Objektart zeigt sich ein Zusammenhang zwischen Marktanpassungsfaktor und vorläufigem Sachwert. Ein Einfluss des Bodenwertes auf die Marktanpassung konnte nicht nachgewiesen werden.\" Es gibt hier also KEINE Bodenrichtwertklassen — anders als bei den übrigen MV-Ausschüssen. Die gedruckte Spanne ist Ø ± Standardabweichung. ABWEICHUNG IM DRUCK: bei „bis 150\" ergibt die Mitte der Spanne 0,98, gedruckt ist Ø 1,00. Hinterlegt ist der gedruckte Ø-Faktor; die übrigen vier Zeilen reproduzieren ihren Ø aus der Spannenmitte zeichengleich."
+    },
+    "korrekturen": [],
+    "modellansaetze": {
+      "nhk": "Normalherstellungskosten 2010 (NHK 2010)",
+      "bruttogrundflaeche": "BGF nach DIN 277-1: 2016-01 bzw. 2021-08",
+      "baupreisindex": "Baupreisindex des Statistischen Bundesamtes, STICHTAGSBEZOGEN",
+      "baupreisindex_stichtag": null,
+      "baupreisindex_hinweis": "Der Bericht nennt den Baupreisindex nur dem Namen nach („Baupreisindex des Statistischen Bundesamtes\") und sagt zugleich „stichtagsbezogen\" — eine ZAHL steht nicht im Blatt. Damit bleibt modellansaetze.baupreisindex_stichtag leer und der Rechenkern arbeitet mit seiner Konstanten (1,91 seit v1407). Das ist die bekannte Lücke: der Index gehört als Zahl ins Feld, sonst rechnet das System mit der Konstanten und nichts widerspricht.",
+      "baujahresklasse": "ohne Berücksichtigung der Baujahresklasse",
+      "alterswertminderung": "linear",
+      "gnd": "Gesamtnutzungsdauer nach Anlage 1 (zu § 12 Absatz 5 Satz 1 ImmoWertV)",
+      "gnd_jahre": null,
+      "gnd_hinweis": "Verweis auf Anlage 1 ImmoWertV, im Blatt NICHT beziffert.",
+      "rnd": "Restnutzungsdauer nach Anlage 2 (zu § 12 Absatz 5 Satz 1 ImmoWertV)",
+      "bodenwert": "stichtagsbezogen",
+      "aussenanlagen": "Wert der Außenanlagen pauschal 2 bis 4 %",
+      "auswahl": "nur schadensfreie Objekte mit lagetypischen Grundstücksgrößen; Baujahre 1888 bis 2020 mit üblichem Bau- und Unterhaltungszustand",
+      "modell_quelle": "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim, Grundstücksmarktbericht 2025, Tabelle 28 (S. 63)"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Landkreis Ludwigslust-Parchim",
+      "extrapolation": "verboten",
+      "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+      "hinweis": "Keine Lageklassen und keine Bodenrichtwertklassen — der Ausschuss hat einen Einfluss des Bodenwertes ausdrücklich nicht nachweisen können."
+    },
+    "belege": [
+      {
+        "art": "anwendungsbeispiel",
+        "fundstelle": "Grundstücksmarktbericht 2025, Tabelle 29, S. 64, Zeile „vorläufiger Sachwert bis 150.000 €“ (Ø Faktor 1,00)",
+        "eingabe": {
+          "sachwert": 75000
+        },
+        "soll_wert": 1,
+        "soll_tabellenwert": 1,
+        "wortlaut": "Ein vorläufiger Sachwert von 75.000 € fällt in die Klasse „vorläufiger Sachwert bis 150.000 €“; der Bericht druckt dort den Ø-Faktor 1,00 (Spanne 0,85 – 1,11)."
+      },
+      {
+        "art": "anwendungsbeispiel",
+        "fundstelle": "Grundstücksmarktbericht 2025, Tabelle 29, S. 64, Zeile „vorläufiger Sachwert über 150.000 €“ (Ø Faktor 1,02)",
+        "eingabe": {
+          "sachwert": 250000
+        },
+        "soll_wert": 1.02,
+        "soll_tabellenwert": 1.02,
+        "wortlaut": "Ein vorläufiger Sachwert von 250.000 € fällt in die Klasse „vorläufiger Sachwert über 150.000 €“; der Bericht druckt dort den Ø-Faktor 1,02 (Spanne 0,83 – 1,21)."
+      },
+      {
+        "art": "amtliche Veroeffentlichung",
+        "fundstelle": "Grundstücksmarktbericht 2025 für den Bereich des Landkreises Ludwigslust-Parchim, Abschnitt 5.1 „Sachwertfaktoren\", Tabelle 29, S. 64",
+        "wert": 1,
+        "fallzahl": null,
+        "wortlaut": "Marktanpassungsfaktoren, Objektart / vorläufiger Sachwert in Tausend € / Ø Faktor / Spanne Ø (+/-STAW): vorläufiger Sachwert bis 150.000 € → 1,00 (0,85 – 1,11); vorläufiger Sachwert über 150.000 € → 1,02 (0,83 – 1,21)"
+      },
+      {
+        "art": "kontext",
+        "fundstelle": "ebd., Abbildung 71, S. 64 (Vergleich der Auswertezeiträume 2022 zu 2023)",
+        "wert": null,
+        "fallzahl": null,
+        "wortlaut": "Die Säulenreihe 2023 der Abbildung nennt dieselben Faktoren wie Tabelle 29 (1,00 / 1,02) — Gegenprobe zur zerrissenen Tabellenausgabe von pdftotext."
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtlich, ausschussscharf und mit Streuung abgedruckt, aber OHNE Fallzahl je Klasse — der Bericht nennt keine. Der Ausschuss weist zudem selbst auf die Streuung hin, wörtlich S. 64: „Wie der nachfolgenden Graphik zu entnehmen ist, ist die Streubreite der Kaufpreise immer noch sehr groß.\" Deshalb keine Stufe A.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": "2025-01-01",
+    "stichtag_hinweis": "Auswertezeitraum 2023 (Vergleichsreihe 2022), Grundstücksmarktbericht 2025 zum Stichtag 01.01.2025.",
+    "berichtsjahr": 2025,
+    "modellversion": "GMB 2025 Ludwigslust-Parchim, Tabelle 29",
+    "quelle_url": "https://www.geocms.com/geoshop-lk-ludwigslust-parchim/de/mod/2,8,810/ajax/1/GetProduct/con=1125,810&method=store/GMB_2025.pdf",
+    "quelle_parser": "v1885-hand (pdftotext, Seite 64, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Grundstücksmarktbericht 2025 für den Bereich des Landkreises Ludwigslust-Parchim © Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim",
+    "lizenz": "auszugsweise Wiedergabe mit eindeutigen Quellenangaben und Belegexemplar, ohne Genehmigung gestattet",
+    "lizenz_hinweis": "Wörtlich aus dem Impressum des Jahrgangs 2025: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Vervielfältigungen sind nur mit Genehmigung des Herausgebers gestattet. Auszugsweise Wiedergabe mit eindeutigen Quellenangaben verbunden mit der Zusendung eines Belegexemplars an den Herausgeber ist ohne Genehmigung gestattet.\" Am 05.10.2026 am aktuellen Jahrgang gemessen. DAS BELEGEXEMPLAR IST BEDINGUNG, NICHT HÖFLICHKEIT — es steht noch aus, zusammen mit dem aus den Zinssätzen 2025 und dem Schweriner Satz.",
+    "auflagen": "Eindeutige Quellenangabe UND Zusendung eines Belegexemplars an den Herausgeber. Modellkonformität nach § 10 ImmoWertV: NHK 2010, BGF nach DIN 277-1, lineare Alterswertminderung, GND nach Anlage 1 / RND nach Anlage 2 ImmoWertV, Außenanlagen pauschal 2–4 %, Baupreisindex stichtagsbezogen (im Blatt nicht beziffert). Nur schadensfreie Objekte mit lagetypischer Grundstücksgröße.",
+    "fundstelle": "Grundstücksmarktbericht 2025, Abschnitt 5.1 „Sachwertfaktoren\", Tabelle 28 (Modellparameter, S. 63) und Tabelle 29 (Faktoren, S. 64), Abbildungen 70/71",
+    "seite": 64,
+    "verwendung": "produkt"
+  }
+]

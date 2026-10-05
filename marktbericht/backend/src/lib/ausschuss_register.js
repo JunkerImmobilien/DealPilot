@@ -116,10 +116,38 @@ function indizieren(saetze) {
    Der Abgleich unten (`fehlendeSaatdateien`) sorgt dafuer, dass die
    Luecke beim naechsten Mal AUFFAELLT, statt still zu bleiben. */
 export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', /* v1880: Hessen regional, 14 Berichte */ 'swf-nw-2026-block2.json', /* v1880b: NRW Sachwertfaktoren Block 2, 19 Ausschuesse */ 'lzs-st-th-sh-ni-2025.json', /* v1880d: Zinssaetze ST/TH/SH/NI */ 'swf-nw-2026-block3.json', /* v1882: NRW Sachwertfaktoren Block 3, 17 Ausschuesse */ 'swf-nw-he-2026-block4.json', /* v1882: NRW-Kreise Block 4 + Kassel 2026 */ 'swf-nw-2026-block5.json', /* v1884: NRW Rest - Remscheid, Arnsberg, Bergisch Gladbach, Dueren, Lippstadt, Luedenscheid, Ratingen, Velbert, Wesel */ 'lzs-be-bb-hh-hb-2026.json', /* v1884: Zinssaetze Brandenburg regional (15 Ausschuesse), Berlin/Bremen Sperren */ 'swf-be-bb-hh-hb-2026.json', /* v1884: Sachwertfaktor-Sperren BE/HB/SPN/OSL */
-                            /* v1866: Liegenschaftszins Drei-/Mehrfamilienhaeuser Kreis
-                               Minden-Luebbecke aus dem Grundstuecksmarktbericht 2025
-                               (S. 64) - die GMD-CSV des Landes fuehrt fuer 05770 keinen
-                               MFH-Zweig; von Hand gelesen, dl-de/zero-2-0. */
+                            /* v1885 (Linie 7): Sachsen-Anhalt Landkreise - 45
+                               Zinssaetze fuer Mehrfamilienhaeuser aus dem Blatt des
+                               EINEN Landes-Gutachterausschusses (23 ortsscharfe
+                               Mittelzentren plus Grundzentrum und Dorf je Landkreis),
+                               Erfurt Eigentumswohnung 2025 (loest die Sperre we_v),
+                               23 ST-Sperren (neun Orte mit Spanne statt Zahl, 14x
+                               Eigentumswohnung ohne Wertblatt) und 33 Sperren fuer
+                               Sachsen - dort ist JEDER Bericht genehmigungspflichtig. */
+                            'lzs-th-st-sn-mv-2026.json',
+                            /* v1885 (Linie 7): Sachwertfaktor Ludwigslust-Parchim
+                               Jahrgang 2025 (Reihenhaus/Doppelhaushaelfte - der Zweig
+                               ezfh ist ZURUECKGEHALTEN, weil swf-mv.json dort noch den
+                               Jahrgang 2018 fuehrt und zwei Saetze zum selben Zweig
+                               ohne Lage eine Rueckfrage statt eines Wertes ergeben)
+                               plus 11 Sachwertfaktor-Sperren fuer Sachsen. */
+                            'swf-th-st-sn-mv-2026.json',
+                            /* v1885 (Linie 8): Niedersachsen-Rest, Schleswig-Holstein-
+                               Rest, Rheinland-Pfalz, Saarland.
+                               ZINS: zwoelf Werte, die die erste NI-Ernte uebersprang
+                               (Reihenhaus/Doppelhaushaelfte Region Hannover und die
+                               drei Landkreise Hameln-Pyrmont/Hildesheim/Schaumburg —
+                               Kapitel 7.1 wertet beide Objektarten in EINER Stichprobe
+                               aus; Altenpflegeheime 2,3 % und Seniorenresidenzen 2,9 %
+                               des GAG Sulingen-Verden mit GND 50, nicht 80), dazu zehn
+                               NI-Sperren und 41 Sperren fuer RP und SL.
+                               SACHWERTFAKTOR: Wochenendhaeuser Sulingen-Verden 0,86
+                               (ohne Duemmer See) plus 53 Sperren — zwoelf fuer die
+                               SH-Ausschuesse, die kein Faktorenblatt fuehren, 35 fuer
+                               Rheinland-Pfalz (Kapitel 4 des LGMB 2025 ist
+                               kostenpflichtig UND genehmigungspflichtig) und sechs fuer
+                               das Saarland, das bis dahin ueberhaupt nicht im Register
+                               stand. */
                             'lzs-nrw-gmb-2025.json',
                             'berlin.json',           /* v1085 */
                             'lzs-nrw-2023.json',     /* v1086 · Zeitreihe */
