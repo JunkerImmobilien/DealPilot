@@ -45,7 +45,14 @@
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function eur(n) { return (n == null || !isFinite(n)) ? '–' : Math.round(n).toLocaleString('de-DE') + ' €'; }
-  function num(v) { if (v == null || v === '') return null; var s = String(v).replace(/\./g, '').replace(',', '.'); var n = parseFloat(s); return isFinite(n) ? n : null; }
+  /* v1880c · Die API liefert "780000.00" (Punkt als Dezimaltrenner) — die deutsche Lesart machte daraus
+     78.000.000. Reine Zahlen mit höchstens einem Punkt und zwei Nachkommastellen sind englisch. */
+  function num(v) {
+    if (v == null || v === '') return null;
+    var t = String(v).trim();
+    if (/^-?\d+(\.\d{1,2})?$/.test(t)) { var e = parseFloat(t); return isFinite(e) ? e : null; }
+    var s = t.replace(/\./g, '').replace(',', '.'); var n = parseFloat(s); return isFinite(n) ? n : null;
+  }
   function datum(s) {
     if (!s) return null;
     var m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
@@ -102,7 +109,7 @@
   function sektion() {
     var s = $(SEC_ID); if (s) return s;
     var mcol = document.querySelector('.main-col'); if (!mcol) return null;
-    s = document.createElement('section'); s.className = 'sec'; s.id = SEC_ID; s.style.display = 'none';
+    s = document.createElement('section'); s.className = 'sec'; s.id = SEC_ID;
     s.innerHTML = '<div class="pst-kopf"><div class="pst-kicker">Forschungsvorhaben 827-757-583 · BSFZ-Bescheinigung vom 05.10.2026</div>'
       + '<h2>Portfolio-Strategie</h2>'
       + '<p>Verfahren zur automatisierten, investorprofil-abhängigen steuerlich-strukturellen Optimierung von Immobilien-Bestandsportfolios. '
@@ -115,7 +122,9 @@
     mcol.appendChild(s);
     if (!$('pst-style')) {
       var st = document.createElement('style'); st.id = 'pst-style';
-      st.textContent = '#' + SEC_ID + '{padding:18px 22px}#' + SEC_ID + ' .pst-kicker{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:#8a8378}'
+      /* v1880c · Der Objekt-Lader stellt jede .sec wieder auf display:'' — die Sektion stand dann unter dem
+         Objekt. Sichtbar ist sie nur mit data-pst-offen am <html>; das schlägt jeden Lader. */
+      st.textContent = 'html:not([data-pst-offen]) #' + SEC_ID + '{display:none !important}#' + SEC_ID + '{padding:18px 22px}#' + SEC_ID + ' .pst-kicker{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:#8a8378}'
         + '#' + SEC_ID + ' h2{font-family:"Cormorant Garamond",serif;font-size:28px;margin:6px 0 8px;color:#1A1A18}#' + SEC_ID + ' .pst-kopf p{max-width:760px;color:#4a4540;font-size:13.5px;line-height:1.55}'
         + '#' + SEC_ID + ' .pst-h3{font:700 11px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin:22px 0 10px}'
         + '#' + SEC_ID + ' .pst-tab{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden}#' + SEC_ID + ' .pst-tab th,#' + SEC_ID + ' .pst-tab td{padding:8px 10px;border-bottom:1px solid #EFEAE0;text-align:left}#' + SEC_ID + ' .pst-tab th{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8378;background:#FBF6E9}#' + SEC_ID + ' .pst-tab .r{text-align:right}#' + SEC_ID + ' .pst-tab .pst-warn{color:#B8625C;font-weight:700}'
@@ -136,15 +145,14 @@
     try { if (global._currentObjKey && typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {}
     var tabs = document.querySelector('.tabs'); if (tabs) tabs.style.display = 'none';
     var wf = document.querySelector('.tabs-workflow-bar'); if (wf) wf.style.display = 'none';
-    document.querySelectorAll('.sec').forEach(function (x) { x.style.display = (x.id === SEC_ID) ? 'block' : 'none'; });
     document.documentElement.setAttribute('data-pst-offen', '1');
+    document.querySelectorAll('.sec').forEach(function (x) { x.style.display = (x.id === SEC_ID) ? 'block' : 'none'; });
     bestandLaden();
     try { var mc = document.querySelector('.main-col'); if (mc) mc.scrollTop = 0; } catch (e) {}
   }
   function schliessen() {
     if (document.documentElement.getAttribute('data-pst-offen') !== '1') return;
     document.documentElement.removeAttribute('data-pst-offen');
-    var s = $(SEC_ID); if (s) s.style.display = 'none';
     var tabs = document.querySelector('.tabs'); if (tabs) tabs.style.display = '';
     var wf = document.querySelector('.tabs-workflow-bar'); if (wf) wf.style.display = '';
   }
