@@ -31439,5 +31439,10 @@ nicht). **Rekonstruktion, kein Beleg** — Marcel prüft, trägt Tage ohne Commi
 nach und unterschreibt. September steht bei 242 h gesamt (27 Tage), über den
 40 h/Woche der Eigenleistung — zu kürzen.
 
+**Nachtrag v1879b (`1c07d11`).** Kanzlei (v2) nimmt die Reiter in die Schiene; im Fluss
+scrollten sie mit weg (nav.tabs bei y = 91 in der Schiene). Unter 900 px bleiben die Reiter
+jetzt in der .main-col und kleben unter der Kopfzeile — gemessen für v2 und v1b: nach 600 px
+Scroll Kopfzeile bei 0, Reiter bei 108, Menü-Knopf trifft. Auch auf Prod gezogen.
+
 **Rest.** Prod v1879a; Staging v1879a. Drei Erntelinien (HE-Zins, NW-Faktoren,
 ST/TH/SH/NI-Zins) laufen als Prüfläufe; Saat und Journal folgen.
