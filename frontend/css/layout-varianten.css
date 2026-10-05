@@ -6867,6 +6867,29 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-item:hover{
     background:#1A1815 !important;
   }
+  /* ── v1889e · SICHTBAR IST NICHT BEDIENBAR - ZUM ZWEITEN MAL ──────────────
+     Nachgemessen mit `elementFromPoint` auf die Mitte von „Einzelobjekt":
+     dort lag nicht der Knopf, sondern `ASIDE#sidebar`. Alle dreizehn
+     Eintraege waren sichtbar und tot.
+
+       pointer-events  #sb-actions-accordion = none
+                       .sb-actions-accordion-inner = none (geerbt)
+                       .sb-act-item = none (geerbt)
+
+     Das Akkordeon setzt das im ZUGEKLAPPTEN Zustand. Ich hatte display,
+     height, max-height, overflow, opacity und visibility gesetzt - und
+     pointer-events vergessen. **Genau derselbe Fehler steht 800 Zeilen weiter
+     oben in dieser Datei unter „10 · SICHTBAR IST NICHT BEDIENBAR (v1649)".**
+     Ich habe ihn wiederholt, obwohl die Lehre hier aufgeschrieben stand -
+     weil ich die Regel fuer die Schiene gelesen und nicht gefragt habe, was
+     sie fuer die Schublade heisst.
+
+     > Eine Regel aendert nicht mit, was sie nicht nennt. Und eine Lehre,
+     > die man nur liest, hat man nicht angewandt. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion *{
+    pointer-events:auto !important;
+  }
   /* Der Aufklapper hat nichts mehr aufzuklappen - wie in der Schiene. */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn{
     display:none !important;
