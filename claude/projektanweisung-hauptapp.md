@@ -31312,3 +31312,45 @@ Testobjekt „Teststraße 6“: zimmer = 3.
 
 **Rest.** Prod v1846b; Staging v1877a. Zwei Testobjekte (Teststraße 5 und 6) liegen
 im Staging-Portfolio.
+
+### (38) 05.10.2026 — v1878: vier Steuerfehler korrigiert, Speichern-Modal schlank
+
+**Was.** Marcel: „ja mach das modal schlank und korrigiere die 4 steuerfehler“ —
+die Freigabe für das qcpm-Overlay in qc-bridge.js („nicht anfassen“) und für
+den Rechenkern.
+
+**Gebaut (`f000302`).**
+- (a) calc.js: `afa_geb_basis = gebAHK` immer — Gebäude ohne Küche plus
+  Erwerbsnebenkosten × Gebäudequote (§ 255 HGB). Vorher nur bei aktiver Küche,
+  sonst kp × geb_ant ohne NK.
+- (b) calc.js: die Cashflow-Projektion zieht je Jahr `_afaJahr(y)` aus
+  `State._afaSeries` (Normal + § 7b, Jahr 1 monatsanteilig, Küche zehn Jahre)
+  statt 50-mal die Jahr-1-AfA; beide Aufrufstellen (2911, 3063).
+- (c) calc.js: § 7b wird im Erstjahr nicht mehr gezwölftelt — § 7 Abs. 1 S. 4
+  trifft die AfA nach Satz 1, § 7b kennt keine Zeitanteiligkeit.
+- (d) afa-engine.js `degressivSeries`: Wechsel degressiv → linear, sobald
+  Restwert ÷ Restnutzungsdauer über 5 % des Restwerts liegt (also Rest-ND
+  < 20 Jahre), danach fester linearer Betrag — § 7 Abs. 5a S. 8. Vorher 3 % der
+  ursprünglichen AHK ab dem Jahr, in dem das rechnerisch mehr war.
+- qc-bridge.js Modal: Kopf „Diese Daten werden übernommen“, Quelle-Zeile
+  (Konsens / Anbieter) raus, Spanne nur wenn DealPilot-Daten vorliegen, Hinweis
+  „Keine Markteinschätzung im QuickBoarding — Marktwert und Miete holst du im
+  Objekt über ‚Abrufen‘“ statt „Keine AVM-Daten“; Fußzeile ohne Quellenname.
+
+**Nachweis.** Rechenkern (node, echte Datei): AHK 400.000, 5 % degressiv,
+Fallback 3 % → Wechsel Jahr 15, danach 10.090 €/J, Summe exakt 400.000; ohne
+Wechsel Jahr 30 = 4.519; § 7b 20.000 × 4, dann 0. Staging: Testobjekt
+Teststraße 6 (KP 160.000, NK 17.120, Gebäudeanteil 80 %) → AfA-Basis 141.696
+und AfA 2 % = 2.833,92 statt 128.000 / 2.560,00 (gemessen in `State._ahk.gebAhk`
+und `afa_kalk`). Parkstr. 9 unverändert, weil
+dort keine Nebenkosten erfasst sind (725.400 = 780.000 × 93 %). Modal: ohne
+Markteinschätzung nur Kopf, „Alle übernehmen“, Hinweis, zwei Knöpfe. (b) und
+(c) sind am Rechenkern und im Code geprüft; ein § 7b-Objekt gab es auf Staging
+nicht — Abnahmepunkt für Marcel.
+
+**Nicht geändert (fraglich, Marcels Entscheidung):** Soli/Kirchensteuer/
+Splitting fehlen; Steuerformular schätzt nicht umlagefähige Kosten als 55 %
+der Gesamt-BWK; Projektion mit einem zvE; überlappende Steuerzeiträume;
+Sprach-Import kennt 3 % nicht.
+
+**Rest.** Prod v1846b; Staging v1878.

@@ -265,7 +265,17 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
-### N17 · Marktbericht-Übernahme, QuickBoarding-Ring, Quick-Check-Durchlauf (05.10.2026) — erledigt v1877; drei Entscheidungen offen
+### N18 · Vier Steuerfehler und das Speichern-Modal (05.10.2026) — erledigt v1878
+
+Marcel: „mach das modal schlank und korrigiere die 4 steuerfehler“.
+**Erledigt (`f000302`):** AfA-Basis mit NK, Projektion mit AfA je Jahr, § 7b
+ungezwölftelt, Degressiv-Wechsel auf Restwert ÷ Rest-ND; Modal ohne Quelle/
+Konsens/AVM-Text. **Abnahme offen:** ein § 7b-Objekt auf Staging anlegen und
+Cashflow-Projektion Jahr 4 → 5 (Sonder-AfA fällt weg) gegen den Reiter Steuer
+halten. **Noch offen (fraglich):** Soli/KiSt/Splitting, BWK-Schätzung 55 %,
+ein zvE in der Projektion, überlappende Steuerzeiträume, Sprach-Import 3 %.
+
+### N17 · Marktbericht-Übernahme, QuickBoarding-Ring, Quick-Check-Durchlauf (05.10.2026) — erledigt v1877; Modal und Steuer in N18 erledigt, Ernte-Automatik offen
 
 **Erledigt (`36511ca`):** brw, Energieklasse G/H, Zusatzeinnahmen → sonstige_jahr
 (Formular und Backend-Mapper); QuickBoarding-Score als Ring mit Pille;
