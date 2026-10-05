@@ -44,7 +44,24 @@
   function zeile(k, w, q, aktion) {
     return '<div class="oe-row"><span class="oe-k">' + k + '</span><span class="oe-w">' + w + '</span><span class="oe-q">' + q + '</span><span>' + (aktion || '') + '</span></div>';
   }
-  function st(cls, txt) { return '<span class="oe-st ' + cls + '">' + esc(txt) + '</span>'; }
+  /* v1865 · Marcel: „nirgendwo ist beschrieben, wofür welche Stufe steht." Die
+     Bedeutung kommt aus WertParameterService (A/B/C/D/E), hier als Tooltip
+     an jeder Pille und als Legende unter der Leiste. */
+  var STUFEN = {
+    A: 'Stufe A — amtlich: vom zuständigen Gutachterausschuss für dieses Gebiet und diese Objektart abgeleitet.',
+    B: 'Stufe B — amtlich, aber übergeordnet (Kreis- oder Landesebene) oder Modellansatz des Ausschusses; indikativ.',
+    C: 'Stufe C — amtlicher Wert einer anderen Gemeinde desselben Ausschusses; indikativ.',
+    D: 'Stufe D — gesetzlicher Auffangwert nach § 256 BewG, nicht marktabgeleitet.',
+    E: 'Stufe E — eigene Angabe des Nutzers.'
+  };
+  function st(cls, txt) {
+    var m = String(txt || '').match(/^Stufe ([A-E])$/);
+    var tip = m && STUFEN[m[1]] ? ' title="' + esc(STUFEN[m[1]]) + '"' : '';
+    return '<span class="oe-st ' + cls + '"' + tip + '>' + esc(txt) + '</span>';
+  }
+  var LEGENDE = '<div class="oe-legende"><b>Stufen:</b> A amtlich für Gebiet und Objektart · B amtlich, übergeordnet oder Modellansatz · '
+    + 'C amtlich aus einer Nachbargemeinde desselben Ausschusses · D gesetzlicher Auffangwert (§ 256 BewG) · E eigene Angabe. '
+    + 'Eingabetiefe 1/2/3 = Marktpreisindikation / erweiterte Indikation / Sach- und Ertragswert.</div>';
   function knopf(txt, feld) { return '<button type="button" class="oe-btn" data-oe-feld="' + feld + '">' + txt + '</button>'; }
 
   function brwZeile() {
@@ -130,9 +147,15 @@
       if (bpi && bpi.wert) html += zeile('Baupreisindex', deNum(bpi.wert, 2), st('b', 'Konstante') + '2010 → ' + esc(bpi.stichtag || '') + ' · noch nicht je Ausschuss (Backlog B1)', '');
     }
     html += mpZeile;
+    html += LEGENDE;   /* v1865 */
     box.innerHTML = html;
     /* v1855 · was der Anfragen-Block wissen muss: fehlt der Zins, fehlt der Faktor? */
-    _leiste = { zins: !!(r && r.verfuegbar), swf: !!(r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.verfuegbar),
+    /* v1865 · Stufe D ist der gesetzliche Auffangwert (§ 256 BewG) — ein Wert,
+       aber keiner aus dem Register. Der Anfragen-Block muss das wissen, sonst
+       nennt er eine Quelle, die der Bericht gar nicht benutzt (Parkstr. 9, MFH). */
+    _leiste = { zins: !!(r && r.verfuegbar && r.stufe && r.stufe !== 'D' && r.stufe !== 'E'), zinsStufe: (r && r.stufe) || null,
+                zinsGrund: (r && (r.quelle || r.grund)) || null,
+                swf: !!(r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.verfuegbar),
                 ausschuss: (r && (r.ausschuss || r.quelle)) || null, swfHinweis: (r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.hinweis) || null };
     quellen();
   }
@@ -171,7 +194,15 @@
       var text = esc(kurz(e.ausschuss || q.ausschuss)) + (e.jahrgang || e.berichtsjahr ? ' · ' + esc(e.jahrgang || e.berichtsjahr) : '') + (e.gebiet ? ' · ' + esc(e.gebiet) : '');
       /* Faktor hinterlegt, aber nicht für diese Objektart (Lippe: nur EZFH) — EINE Zeile, nicht zwei */
       if (istSwf && swfOhneArt) { text += ' · <span title="' + esc(_leiste.swfHinweis || '') + '">nicht für diese Objektart</span>'; swfOhneArt = false; }
-      zeilen.push('<div class="oe-qz' + (istSwf && /nicht für diese Objektart/.test(text) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
+      /* v1865 · dasselbe für den Zins: Register führt ihn, aber nicht für diese
+         Objektart (Minden-Lübbecke: ETW, EFH, ZFH — kein MFH) — der Bericht
+         rechnet dann mit dem Auffangwert. Die Zeile sagt das, statt „hinterlegt". */
+      var istZins = /liegenschaft|lzs/i.test(String(e.kennzahl) + e.name);
+      if (istZins && _leiste && !_leiste.zins && _leiste.zinsStufe) {
+        text += ' · <span title="' + esc(_leiste.zinsGrund || '') + '">nicht für die Objektart ' + esc(_v('objart').toUpperCase() || '?')
+              + ' — der Bericht nimmt den gesetzlichen Auffangwert (Stufe ' + esc(_leiste.zinsStufe) + ')</span>';
+      }
+      zeilen.push('<div class="oe-qz' + ((istSwf && /nicht für diese Objektart/.test(text)) || (istZins && /Auffangwert/.test(text)) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
     });
     fehlt.forEach(function (e) {
       zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — ' + esc(kurz(q && q.ausschuss) || 'Gutachterausschuss') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');

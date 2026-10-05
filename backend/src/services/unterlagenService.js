@@ -366,6 +366,39 @@ async function amtSuchen(art, ort, opts = {}) {
  *
  * `erzwingen: true` sucht neu, auch wenn ein Satz da ist. Sonst wird der
  * hinterlegte genommen — das ist der Sinn der Tabelle. */
+/* v1865 · Der zuständige Gutachterausschuss aus dem Register des Marktberichts
+   (GET /quellen?plz=): Name, Link des amtlichen Datensatzes, Jahrgang. Liefert
+   null, wenn das Register nichts führt — dann bleibt es bei der Websuche. */
+const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
+async function ausschussAusRegister(ort) {
+  if (!ort || !ort.plz) return null;
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 8000);
+  let q;
+  try {
+    const r = await fetch(MB_BASE + '/quellen?plz=' + encodeURIComponent(ort.plz)
+      + (ort.ort ? '&ort=' + encodeURIComponent(ort.ort) : ''), { signal: ctrl.signal });
+    if (!r.ok) return null;
+    q = await r.json();
+  } finally { clearTimeout(t); }
+  const name = _s(q && q.ausschuss);
+  if (!name) return null;
+  const saetze = Array.isArray(q.hinterlegt) ? q.hinterlegt : [];
+  const mitLink = saetze.filter((e) => _link(e.quelle_url));
+  const pdf = mitLink.find((e) => /\.pdf(\?|$)/i.test(e.quelle_url));
+  const erster = pdf || mitLink[0] || null;
+  const jahre = [...new Set(saetze.map((e) => e.jahrgang || e.berichtsjahr).filter(Boolean))].sort();
+  const kennzahlen = [...new Set(saetze.map((e) => e.name || e.kennzahl).filter(Boolean))];
+  return {
+    behoerde: name,
+    quelle_url: erster ? erster.quelle_url : null,
+    kreis: _s(q.ort) || null, bundesland: _s(q.bundesland) || null,
+    hinweis: 'Zuständig laut DealPilot-Register' + (kennzahlen.length ? ' (' + kennzahlen.slice(0, 4).join(', ') + ')' : '')
+      + (jahre.length ? ', Jahrgang ' + jahre[jahre.length - 1] : '') + '. Die Geschäftsstelle sitzt meist beim Kataster- und '
+      + 'Vermessungsamt; der Grundstücksmarktbericht ist dort oft kostenpflichtig.'
+  };
+}
+
 async function amtHolen(userId, art, ort, opts = {}) {
   const schluessel = gemeindeSchluessel(ort.plz, ort.ort);
   if (!schluessel || schluessel === '-') {
@@ -381,12 +414,44 @@ async function amtHolen(userId, art, ort, opts = {}) {
   }
 
   let gefunden;
+  /* v1865 · Marcel (Parkstr. 9): „der Text zum Grundstücksmarktbericht passt
+     nicht, auch die Quelle passt nicht." Gemessen: die KI-Suche lieferte
+     „Gutachterausschuss für Grundstüctswerte", „Gebühr: email" und eine
+     Allerweltsquelle. Dabei WISSEN wir den Ausschuss: er steht mit Link,
+     Jahrgang und Lizenz im Register des Marktberichts. Register zuerst;
+     die KI-Suche darf danach nur noch E-Mail und Telefon beisteuern. */
+  let register = null;
+  if (art === 'gutachterausschuss') {
+    try { register = await ausschussAusRegister(ort); } catch (e) { register = null; }
+  }
   try { gefunden = await amtSuchen(art, ort); }
   catch (e) {
-    return { gefunden: false, grund: e.message || String(e), rohtext: e.rohtext || null };
+    if (!register) return { gefunden: false, grund: e.message || String(e), rohtext: e.rohtext || null };
+    gefunden = { behoerde: '', abteilung: '', email: '', telefon: '', kanal: 'post', seiten: [], hinweis: '' };
+  }
+  if (register) {
+    const alt = gefunden;
+    gefunden = {
+      behoerde: register.behoerde,
+      abteilung: 'Geschäftsstelle des Gutachterausschusses',
+      email: alt.email || '', telefon: alt.telefon || '',
+      kanal: alt.email ? 'email' : 'post',
+      antrag_url: alt.antrag_url || null,
+      quelle_url: register.quelle_url || alt.quelle_url || null,
+      seiten: [].concat(register.quelle_url ? [register.quelle_url] : [], alt.seiten || []),
+      gebuehr: (alt.gebuehr && !/@|email|mail/i.test(String(alt.gebuehr))) ? alt.gebuehr : null,
+      hinweis: register.hinweis + (alt.hinweis ? ' — Kontakt laut Websuche: ' + alt.hinweis : ''),
+      kreis: register.kreis || alt.kreis || null, bundesland: register.bundesland || alt.bundesland || null,
+      _beleg_quelle: alt.quelle_url || null
+    };
   }
 
-  const beleg = await belegPruefen(gefunden.email, gefunden.quelle_url);
+  const beleg = await belegPruefen(gefunden.email, gefunden._beleg_quelle || gefunden.quelle_url);
+  if (register) {
+    beleg.grund = 'Zuständigkeit und Quelle aus dem DealPilot-Register (amtlicher Datensatz)'
+      + (gefunden.email ? (beleg.ok ? '; E-Mail wörtlich auf der Quellseite gefunden' : '; E-Mail aus der Websuche, nicht belegt') : '; keine E-Mail-Adresse ermittelt');
+    beleg.ok = beleg.ok || !gefunden.email;
+  }
 
   const r = await query(
     `INSERT INTO unterlagen_aemter

@@ -38397,3 +38397,12 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 #s6 .kpi-grid-eval .kpi-val.rd { color: #B8625C !important; }
 #s6 .kpi-grid-eval .kpi-sub { color: #8a837c !important; }
 #s6 .kpi-grid-eval .kpi-label .dp-tip { filter: none !important; }
+
+/* ===== v1865 · Marcel (Parkstr. 9): „Die Texte für Bodenwert, Sachwertfaktor, Liegenschaftszins sind
+   abgekürzt, die kann man nicht komplett lesen." Gemessen: .oe-auto .oe-q stand seit v1855 auf nowrap +
+   ellipsis (Z. 38272). Jetzt umbrechen - die Zeile wird höher, der Satz lesbar. ===== */
+.oe-auto .oe-q { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.35; }
+.oe-auto .oe-row { align-items: start; }
+.oe-auto .oe-row > .oe-k, .oe-auto .oe-row > .oe-w { padding-top: 2px; }
+.oe-auto .oe-legende { padding: 8px 12px 10px; font-size: 11px; line-height: 1.4; color: var(--muted, #7A7370); border-top: 1px dashed var(--border-g, #e9dcb3); }
+.oe-auto .oe-legende b { color: var(--ch, #2A2727); }
