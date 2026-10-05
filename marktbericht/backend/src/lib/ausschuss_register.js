@@ -252,7 +252,74 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                vor den Worten "ist ohne Genehmigung gestattet". Am
                                Originalimpressum nachgelesen - erlaubt, wortgleich mit
                                Schwerin (gemeinsame Geschaeftsstelle). */
-                            'ludwigslust-parchim.json' /* MV · 7 */
+                            'ludwigslust-parchim.json', /* MV · 7 */
+                            /* v1888 (Linie 9): Ferienwohnen des GAG Aurich auf
+                               GEMEINDEEBENE. 14 Werte (Ferienwohnungen 1,0 % und
+                               Apartmenthaeuser/Pensionen 3,2 %, je sieben
+                               Inselgemeinden) und 56 Sperren.
+                               WARUM GEMEINDE UND NICHT KREIS: der raeumliche
+                               Anwendungsbereich dieser Saetze ist eine Liste von ORTEN
+                               ("ostfriesische Inseln", Druckseiten 40 und 47), kein
+                               Kreis. Auf den Kreisschluessel gelegt bekaeme ein
+                               Binnenhaus im Landkreis Aurich den Inselzins von 1,0 %.
+                               WARUM DIE 56 SPERREN DAZUGEHOEREN: `finde()` nimmt die
+                               feinste Kaskadenstufe mit Treffer und bricht dort ab, sie
+                               mischt die Stufen nicht. Gemessen am 05.10.2026 lieferte
+                               finde('03452020') vorher sieben Saetze der Ebene "kreis",
+                               danach nur noch die beiden Gemeindesaetze. Das ist hier
+                               RICHTIG: alle acht Zinssatz-Abschnitte des GAG Aurich
+                               tragen "Zustaendigkeitsbereich des GAG Aurich (ohne
+                               Inseln)" - Dauerwohnen auf 36/37/38 genauso wie Gewerbe
+                               auf 42 bis 45. Der Kreissatz galt auf den Inseln also nie;
+                               die Kaskade hat ihn stillschweigend uebertragen. Die
+                               Sperren setzen an die Stelle dieses Schweigens eine
+                               Begruendung mit Weg. */
+                            'lzs-ni-aurich-inseln-2026.json', /* NI · 70 */
+                            /* v1885 (Linie 8): Niedersachsen-Rest, Schleswig-Holstein-
+                               Rest, Rheinland-Pfalz, Saarland.
+                               ZINS (195): zwoelf Werte, die die erste NI-Ernte
+                               uebersprang - Reihenhaus/Doppelhaushaelfte Region Hannover
+                               und die drei Landkreise Hameln-Pyrmont/Hildesheim/
+                               Schaumburg (Kapitel 7.1 wertet beide Objektarten in EINER
+                               Stichprobe aus), Altenpflegeheime 2,3 % und
+                               Seniorenresidenzen 2,9 % des GAG Sulingen-Verden mit
+                               GND 50 statt 80; dazu 19 NI-Sperren und 164 fuer RP und SL.
+                               SACHWERTFAKTOR (216): Wochenendhaeuser Sulingen-Verden 0,86
+                               (ohne Duemmer See) plus 212 Sperren - zwoelf SH-Ausschuesse
+                               ohne Faktorenblatt, Rheinland-Pfalz (Kapitel 4 des LGMB 2025
+                               ist kostenpflichtig UND genehmigungspflichtig) und das
+                               Saarland, das bis dahin ueberhaupt nicht im Register stand.
+
+                               DIESE ZWEI ZEILEN STANDEN SCHON EINMAL HIER und waren am
+                               05.10.2026 wieder weg - eine parallel laufende Erntelinie
+                               hat die Datei als Ganzes neu geschrieben und sie dabei
+                               verloren. Gemessen hat es `fehlendeSaatdateien()`: 411
+                               Saetze lagen im Repo und erreichten keinen Bericht. Genau
+                               davor warnt der Abschnitt v1778 weiter oben. Wer diese
+                               Liste anfasst, aendert sie ZEILENWEISE - nie als Block. */
+                            'lzs-ni-sh-rp-sl-2026.json',
+                            'swf-ni-sh-rp-sl-2026.json',
+                            /* v1888 (Linie 9): BAYERN wird erreichbar. 748 Sperren -
+                               94 Ausschuesse x 2 Kennzahlen x 4 Zweige.
+                               verfuegbarkeit-by.json liegt seit v1613 im Register, ist
+                               aber ein OBJEKT und keine Array-Datei: ladeSaat()
+                               ueberspringt sie. Gemessen am 05.10.2026 lieferte
+                               finde('liegenschaftszinssatz', <jeder BY-Kreis>) deshalb
+                               0 Saetze - ganz Bayern war im Rechenweg stumm, obwohl der
+                               Wegweiser als Dokument existierte.
+                               Am Portal gegengeprueft: neun PDF-Links, alle
+                               Landesberichte. Im Landesbericht 2026 (20 MB, 1,38 Mio.
+                               Zeichen) kommt "Liegenschaftszinssatz" EINMAL vor - im
+                               Abkuerzungsverzeichnis. Keine Tabelle, kein Wert; der
+                               Bericht verweist selbst auf die oertlichen Ausschuesse.
+                               Jede Sperre traegt den Meldestand DIESES Ausschusses
+                               (hat er Werte abgeleitet? hat er einen eigenen Bericht?),
+                               weil davon abhaengt, ob eine Anfrage sich lohnt.
+                               Muenchen ist beim SACHWERTFAKTOR ausgelassen:
+                               sued-nord.json fuehrt dort auf dem Gemeindeschluessel
+                               09162000 schon ezfh und rmh, und eine Kreis-Sperre koennte
+                               sie verdecken. */
+                            'lzs-swf-by-2026-sperren.json' /* BY · 748 Sperren */
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

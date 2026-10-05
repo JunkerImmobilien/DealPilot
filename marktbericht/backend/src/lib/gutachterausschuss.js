@@ -585,8 +585,20 @@ function ausRegisterRechnen(o, ags) {
   const luecke = unvollstaendig(satz);        /* v1085-WVOL */
   if (luecke) { luecke.zweig = satz.zweig; return luecke; }
 
+  /* ═══ v1886-WFW · DIE MODELLANSAETZE REISEN MIT ════════════════════════
+     GEMESSEN an Hamburg: der Sachwertfaktor ist ein Produkt aus 19
+     Faktoren, und zwei davon — Stadtteilfaktor und Aktualisierungsfaktor —
+     liegen NICHT in `formel`, sondern in `modellansaetze`
+     (`stadtteilfaktoren`, `aktualisierung`). Der Auswerter bekam bisher nur
+     `formel` und konnte sie deshalb nicht finden.
+
+     > Eine Teiltabelle, die im Satz liegt und den Rechenkern nie erreicht,
+     > sieht genauso aus wie eine, die fehlt.
+
+     Fuer alle anderen Formen aendert das nichts: sie lesen das Feld nicht. */
   const r = auswerten({ ...(satz.formel || {}),
                         kennzahl: 'sachwertfaktor',
+                        modellansaetze: satz.modellansaetze || null,
                         korrekturen: satz.korrekturen || [] },
                       eingabeBruecke(o));
 
@@ -740,11 +752,52 @@ export function liegenschaftszinssatz(arg = {}) {
   let wertPct = f.wert;
   let rechenweg = null;
   if (wertPct == null && f.form && f.form !== 'konstante') {
+    /* ═══ v1886-WFW · EINE FORMEL, DIE AN EINEM ANDEREN ZWEIG HAENGT ═════
+       Hamburg leitet Eigentumswohnung und Einfamilienhaus AUS dem
+       Mehrfamilienhaus-Zinssatz ab:
+
+         etw:  Liegenschaftszinssatz = 1,16 × LIZI(MFH) − 2,30
+         efh:  Liegenschaftszinssatz = 0,85 × LIZI(MFH) − 0,53
+
+       Der Auswerter kennt das Register nicht; er kann den Wert des anderen
+       Zweiges nicht holen. DIESE Stelle kann es — sie hat das Register
+       schon in der Hand. Gerechnet wird GENAU EINE Stufe tief: ein Bezug
+       auf einen Satz, der selbst einen Bezug traegt, wird nicht verfolgt.
+       Zwei Blaetter, die sich gegenseitig ableiten, gaebe es nur als
+       Erntefehler, und eine Endlosschleife ist die schlechteste Art, ihn
+       zu melden. */
+    const eingabeLzs = eingabeBruecke({ ...arg });
+    const _bezZweig = /zweig\s*=\s*([a-z0-9_]+)/i.exec(String(f.bezug || ''));
+    if (_bezZweig && eingabeLzs.bezugswert_pct == null) {
+      const quelle = (finde('liegenschaftszinssatz', ags) || [])
+        .find((x) => String(x.zweig || '').toLowerCase() === _bezZweig[1].toLowerCase());
+      const qf = (quelle || {}).formel || {};
+      if (quelle && !qf.bezug) {
+        const qw = (qf.wert != null) ? qf.wert
+          : (() => {
+              const q = auswerten({ ...qf, kennzahl: 'liegenschaftszinssatz',
+                                    modellansaetze: quelle.modellansaetze || null,
+                                    korrekturen: quelle.korrekturen || [] },
+                                  eingabeLzs);
+              return q.verfuegbar
+                ? (q.dokumentwert != null ? q.dokumentwert : q.wert * 100) : null;
+            })();
+        if (qw != null) eingabeLzs.bezugswert_pct = qw;
+      }
+    }
     const rr = auswerten({ ...f, kennzahl: 'liegenschaftszinssatz',
+                           modellansaetze: s.modellansaetze || null,
                            korrekturen: s.korrekturen || [] },
-                         eingabeBruecke({ ...arg }));
+                         eingabeLzs);
     if (!rr.verfuegbar) {
       return { verfuegbar: false, grund: rr.grund, hinweis: rr.hinweis,
+        /* v1886-WFW · Welche EINGABE fehlt und welcher Faktor schon steht.
+         * Ohne diese zwei Zeilen bleibt von einer Auskunft, die jeden
+         * Faktor einzeln ausweist, nichts uebrig als ein Fehlercode — und
+         * `zinssatzFuerObjekt` muesste wieder raten, was fehlt. */
+        fehlende_eingaben: rr.fehlende_eingaben || null,
+        teilergebnisse: rr.teilergebnisse || null,
+        haengt_an_zweig: rr.haengt_an_zweig || null,
         /* v1093-WSPN2 · DIE SPANNE REIST MIT.
          *
          * Saarbruecken druckt je Grundstuecksart nur eine Spanne ab, kein

@@ -451,6 +451,37 @@ export function zinssatzFuerObjekt(deps, ags, obj = {}) {
      * aus ihm gelesen und gegen die Modellansätze gehalten — und heraus
      * kommt eine Ernte-Aufgabe statt einer Fehlermeldung. Das gilt für
      * jeden Ausschuss mit Faktormodell, nicht nur für Hamburg. */
+    /* ═══ v1886-WFW · DER AUSWERTER WEISS ES BESSER ALS DIE WORTSUCHE ════
+     *
+     * Die Heuristik darunter (v1819) liest die FAKTORNAMEN aus dem
+     * Ausdruck und haelt jeden fuer fehlend, der nicht in
+     * `modellansaetze` auftaucht. GEMESSEN am 05.10.2026 an Hamburg
+     * meldete sie damit:
+     *
+     *     Im Register fehlen noch: Lagefaktor, Altersfaktor, Erstbezugsfaktor
+     *
+     * Und das ist FALSCH. Alle drei liegen im Satz, mit Zahlen:
+     * `formel.faktoren.lagefaktor.exponent` = −0,282,
+     * `altersfaktor` a/b = 1,36/−0,012, `erstbezugsfaktor.wert` = 0,83.
+     * Was wirklich fehlt, ist keine Ernte, sondern eine EINGABE: der
+     * normierte Bodenrichtwert 2019, der Stadtteil, der Stichtag.
+     *
+     *   > Eine falsche Diagnose ist teurer als keine: sie schickt den
+     *   > naechsten Leser Daten ernten, die schon da sind.
+     *
+     * Seit v1886 rechnet der Auswerter das Formelwerk selbst und nennt
+     * Faktor fuer Faktor, was ihm fehlt. Diese Auskunft gewinnt; die
+     * Wortsuche bleibt nur als Rueckfall fuer Formen, die sie nicht
+     * kennt. */
+    if (Array.isArray(r.fehlende_eingaben) && r.fehlende_eingaben.length) {
+      return { verfuegbar: false, rueckfrage: r.grund || 'kein_wert',
+        zweig: w.zweig, fehlende_eingaben: r.fehlende_eingaben,
+        teilergebnisse: r.teilergebnisse || null,
+        haengt_an_zweig: r.haengt_an_zweig || null,
+        fehlt: r.fehlende_eingaben[0],
+        auswahl: [], hinweis: r.hinweis };
+    }
+
     let fehlende = null, _quelleZweig = null;
     try {
       /* Der Ausdruck steht im REGISTERSATZ, nicht im Rückgabewert des
@@ -491,7 +522,14 @@ export function zinssatzFuerObjekt(deps, ags, obj = {}) {
       const genannt = [...new Set((ausdruck.match(/[A-ZÄÖÜ][a-zäöüß]*faktor/g) || []))];
 
       if (genannt.length) {
-        const da = Object.keys(satz.modellansaetze || {});
+        /* v1886-WFW · Ein Faktor gilt als VORHANDEN, wenn er irgendwo im
+           Satz steht — auch in `formel.faktoren` bzw.
+           `formel.koeffizienten`. Hier stand nur `modellansaetze`, und
+           genau daran log die Heuristik. */
+        const _f = (satz.formel || {});
+        const da = Object.keys(satz.modellansaetze || {})
+          .concat(Object.keys(_f.faktoren || {}))
+          .concat(Object.keys(_f.koeffizienten || {}));
         const flach = da.map((k) => String(k).toLowerCase().replace(/en$/, ''));
         fehlende = genannt.filter((f) => {
           const stamm = f.toLowerCase().replace(/faktor$/, '');

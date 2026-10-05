@@ -750,6 +750,991 @@ function verzweigt(m, e) {
            korrekturen: [] };
 }
 
+/* ═══ v1886-WFW · formelwerk — EIN BLATT, DAS SEINE RECHNUNG IN FAKTOREN SCHREIBT
+ *
+ * GEMESSEN am 05.10.2026 am laufenden Abruf:
+ *
+ *     15003000 mfh  ->  nicht verfuegbar: form_unbekannt
+ *
+ * Acht Registersaetze tragen `form: "formelwerk"`, und der Auswerter kannte
+ * die Form nicht — `auswerten()` fiel auf `form_unbekannt`. Betroffen sind
+ * Magdeburg (mfh), Kiel (mfh) und GANZ HAMBURG: fuenf Liegenschaftszinssaetze
+ * (mfh, efh, etw, buero, produktion_logistik) und ein Sachwertfaktor (efh).
+ *
+ *   > `form_unbekannt` ist eine Aussage ueber den Auswerter, keine ueber die
+ *   > Quelle. Wer sie liest, sucht den Fehler im Register und findet nichts.
+ *
+ * ── DREI BAUARTEN, GELESEN STATT GERATEN ────────────────────────────────
+ *
+ * Die drei Blaetter schreiben dieselbe Sache verschieden auf:
+ *
+ *   linearkombination  Magdeburg: LZ = ( k0 + k1*(1/RND) + k2*WNF + k3*Jahr )²
+ *                      Koeffizienten unter `koeffizienten`, Grenzen unter
+ *                      `gueltigkeit`, die Jahresstufe diskret.
+ *   produkt            Kiel und Hamburg: ein Basiswert mal benannte Faktoren,
+ *                      bei Kiel zusaetzlich additive Korrekturwerte danach.
+ *   bezug_linear       Hamburg efh/etw: a * LIZI(MFH) + b — die Rechnung
+ *                      haengt am ERGEBNIS eines anderen Zweiges.
+ *
+ * Welche Bauart gilt, sagt `bauart` im Rezept; fehlt es, entscheidet die
+ * STRUKTUR des Satzes (Bezug > Basiswert > Koeffizienten). Keine Bauart
+ * heisst kein Wert, mit Nennung der gefundenen Schluessel — nicht
+ * `form_unbekannt` zum zweiten Mal.
+ *
+ * ── WAS HIER AUSDRUECKLICH NICHT PASSIERT ───────────────────────────────
+ *
+ * KEIN FAKTOR WIRD ERFUNDEN. Ein Faktor, dessen Zahl das Blatt nicht nennt,
+ * wird nicht auf 1 gesetzt — er macht das ganze Modell unvollstaendig, und
+ * der Satz liefert dann KEINEN Wert, sondern eine Liste: welcher Faktor,
+ * welche Eingabe fehlt, was im Blatt woertlich dazu steht.
+ *
+ *   > Ein Faktor, den man auf 1 setzt, ist eine Erfindung mit
+ *   > Nachkommastelle. Sie faellt nie auf, weil das Ergebnis plausibel
+ *   > bleibt.
+ *
+ * Ein bedingter Faktor (Erstbezug, eingeschossiger Laden) ist der eine
+ * Sonderfall: trifft seine Bedingung NACHWEISLICH nicht zu, faellt er aus
+ * dem Produkt heraus — das ist keine Erfindung, sondern die Bedingung des
+ * Blattes. Ist die Bedingung NICHT entscheidbar, weil die Angabe fehlt,
+ * gibt es keinen Wert. Und wo das Blatt ausdruecklich festhaelt, dass es
+ * den Normalfall nicht beziffert (Hamburg, Gebaeudeartfaktor Buero), gilt
+ * auch der Normalfall als unbelegt.
+ *
+ * ── EINE FALLE, DIE ZWEI NAMEN HAT ──────────────────────────────────────
+ *
+ * In EINEM Hamburger Satz bedeuten `a` und `b` zweierlei:
+ *
+ *     bodenwertanteilsfaktor   0,67318 + 0,5447 * Anteil      a + b*x
+ *     restnutzungsdauerfaktor  -0,0013 * RND + 1,065          b + a*x
+ *
+ * Wer stumpf `a + b*x` rechnet, bekommt beim zweiten 53 statt 1,00 — oder,
+ * schlimmer, einen Wert, der im Band bleibt. Deshalb wird jede lineare
+ * Regel gegen die NORMSTELLE geprueft, die das Blatt selbst angibt
+ * ("bei Restnutzungsdauer 50 Jahre: 1"). Reproduziert sie keine Lesart,
+ * wird nicht gerechnet. Der Pruefmassstab ist das Dokument.
+ *
+ * ── TEILERGEBNISSE SIND EINE AUSKUNFT ───────────────────────────────────
+ *
+ * Auch ohne Endwert wird jeder Faktor einzeln ausgewiesen: gerechnet,
+ * Eingabe fehlt, Teiltabelle fehlt, nicht maschinenlesbar. Das ist der
+ * Unterschied zwischen "geht nicht" und "es fehlt genau das".
+ */
+
+/* Welche Eingabenamen zu einer Groesse gehoeren. Die Reihenfolge ist
+ * Rangfolge; der erste belegte Name gewinnt. Die kurzen Namen (`rnd`,
+ * `wohnflaeche`, `brw`, `baujahr`, `ortsteil`) sind die, die die
+ * FELDBRUECKE in gutachterausschuss.js wirklich liefert — alles andere
+ * muss der Aufrufer ausdruecklich mitgeben. */
+const FW_EINGANG = {
+  restnutzungsdauer: ['restnutzungsdauer_jahre', 'rnd_jahre', 'rnd',
+                      'restnutzungsdauer'],
+  wohn_nutzflaeche_qm: ['wohn_nutzflaeche_qm', 'wohnflaeche_qm', 'wohnflaeche',
+                        'wfl', 'nutzflaeche_qm'],
+  /* Der normierte Bodenrichtwert ist NICHT der Bodenrichtwert: Hamburg
+     normiert auf eine WGFZ von 1,0 und den 31.12.2019, Kiel auf WGFZ 1,5
+     und den 31.12.2020. Er faellt deshalb ausdruecklich NICHT auf `brw`
+     zurueck — eine Normierung, die man nicht gerechnet hat, darf man nicht
+     unterstellen. */
+  norm_brw: ['norm_brw_eur_qm', 'normbrw_eur_qm', 'norm_brw', 'normbrw',
+             'nbrw_eur_qm'],
+  brw: ['brw_eur_qm', 'brw_sqm', 'brw', 'bodenrichtwert_eur_qm'],
+  nettokaltmiete: ['nettokaltmiete_eur_m2_monat', 'nettokaltmiete_eur_qm_monat',
+                   'nkm_eur_qm', 'nettokaltmiete'],
+  alter: ['alter_jahre', 'alter'],
+  baujahr: ['baujahr', 'build_year'],
+  stadtteil: ['stadtteil', 'ortsteil'],
+  stichtag: ['stichtag', 'wertermittlungsstichtag', 'bewertungsstichtag'],
+  jahr: ['jahr', 'jahr_klasse', 'wertermittlungsjahr', 'jahrgang'],
+  sachwert: ['sachwert', 'sachwert_eur', 'vorlaeufiger_sachwert_eur'],
+  bodenwertanteil: ['bodenwertanteil', 'bodenwertanteil_pct'],
+  grundstuecksflaeche: ['grundstuecksflaeche_qm', 'flaeche_qm', 'flaeche', 'gsfl'],
+  erstbezug: ['erstbezug'],
+  gebaeudeart: ['gebaeudeart_laden', 'eingeschossiger_laden'],
+  bezugswert: ['bezugswert_pct', 'bezugswert', 'lizi_mfh_pct'],
+};
+
+/* Welche Groesse ein benannter Faktor liest. Jede Zeile ist am WORTLAUT des
+ * Blattes belegt — der Hinweis des Satzes nennt sie selbst:
+ *   lagefaktor      "NormBRW19 = ... bei einer WGFZ von 1,0"  (Hamburg)
+ *   af_nbrw         "normiertes Bodenrichtwertniveau 2020"     (Kiel)
+ *   af_nkm          "Anpassungsfaktor Nettokaltmiete"          (Kiel)
+ *   af_zeit         "Anpassungsfaktor Wertermittlungszeitpunkt"(Kiel)
+ *   altersfaktor    "Alter = Kalenderjahr des Wertermittlungs-
+ *                    stichtages - Baujahr"                     (Hamburg)
+ * Ein Faktor, der hier nicht steht und im Satz kein `feld` traegt, wird
+ * NICHT geraten: er kommt als `faktor_ohne_feld` in die Auskunft. */
+const FW_FAKTOR_FELD = {
+  lagefaktor: 'norm_brw',            /* ueberschrieben, wenn der Satz BRW nennt */
+  af_nbrw: 'norm_brw',
+  af_nkm: 'nettokaltmiete',
+  af_zeit: 'jahr',
+  altersfaktor: 'alter',
+  baujahrsfaktor: 'baujahr',
+  erstbezugsfaktor: 'erstbezug',
+  gebaeudeartfaktor: 'gebaeudeart',
+  stadtteilfaktor: 'stadtteil',
+  aktualisierungsfaktor: 'stichtag',
+  sachwerthoehenfaktor: 'sachwert',
+  bodenwertanteilsfaktor: 'bodenwertanteil',
+  grundstuecksgroessenfaktor: 'grundstuecksflaeche',
+  wohnflaechenfaktor: 'wohn_nutzflaeche_qm',
+  restnutzungsdauerfaktor: 'restnutzungsdauer',
+};
+
+/* Schluessel, die eine BESCHREIBUNG sind und keine Stuetzstelle. Ohne diese
+ * Liste liest der Klassenleser `basis: "bei Baujahr ab 1980 bis 1989: 1"`
+ * als Klasse und trifft sie nie. */
+const FW_META = new Set(['basis', 'hinweis', 'bez', 'formel', 'bedingung',
+  'gueltig_wenn', 'interpolation', 'anmerkung', 'anmerkung_erfassung',
+  'fussnote', 'sonderfall', 'alter_definition', 'kappung', 'a', 'b',
+  'exponent', 'wert', 'stufen', 'norm_brw', 'norm_brw_stichtag', 'brw',
+  'norm', 'normstelle', 'baujahrstypische_punktzahl', 'feld',
+  'rundung_stellen', 'quelle', 'fundstelle', 'sonst']);
+
+const fwNorm = (s) => String(s == null ? '' : s).toLowerCase().trim()
+  .replace(/\s+/g, ' ');
+
+/** Den Stamm eines Registerfeldnamens auf eine Groesse der Bruecke abbilden.
+ *
+ * GEMESSEN an Dresden: der Term heisst dort `ln_vorlaeufiger_sachwert`, das
+ * Eingabefeld `vorlaeufiger_sachwert_eur`. Ein Vergleich nur gegen die
+ * STAMMNAMEN findet das nicht — `sachwert` steckt mitten im Wort. Deshalb
+ * wird gegen alle Namen der Bruecke verglichen, und zwar in dieser
+ * Rangfolge: genauer Name, dann Name mit Einheitenanhang
+ * (`..._eur`, `..._jahre`, `..._eur_qm`), dann Stamm.
+ *
+ * Was auch dann nicht passt, bleibt wie es ist und fuehrt zu `feld_fehlt`
+ * MIT NENNUNG der gesuchten Namen — besser eine Luecke, die sagt, wonach
+ * sie gesucht hat, als ein Treffer auf der falschen Groesse. */
+function fwStamm(feld) {
+  const f = fwNorm(feld).replace(/ /g, '_');
+  if (FW_EINGANG[f]) return f;
+  for (const [k, namen] of Object.entries(FW_EINGANG)) {
+    if (namen.includes(f)) return k;
+  }
+  for (const [k, namen] of Object.entries(FW_EINGANG)) {
+    if (namen.some((n) => n.startsWith(f + '_') || f.startsWith(n + '_'))) return k;
+  }
+  for (const k of Object.keys(FW_EINGANG)) {
+    if (f.startsWith(k) || k.startsWith(f)) return k;
+  }
+  return f;
+}
+
+/** Einen Eingabewert holen. Gibt IMMER Auskunft, welcher Name gesucht wurde. */
+function fwWert(e, stamm) {
+  const namen = FW_EINGANG[stamm] || [stamm];
+  for (const n of namen) {
+    const v = (e || {})[n];
+    if (v !== undefined && v !== null && v !== '') {
+      return { da: true, wert: v, feld: n, namen };
+    }
+  }
+  return { da: false, wert: null, feld: namen[0], namen };
+}
+
+/** Das Jahr einer Eingabe: aus `jahr` oder aus dem Stichtag. */
+function fwJahr(e) {
+  const j = fwWert(e, 'jahr');
+  if (j.da) {
+    const n = zahl(j.wert);
+    if (n !== null && n > 1900 && n < 2200) return { da: true, jahr: n, feld: j.feld };
+    return { da: true, jahr: null, text: String(j.wert), feld: j.feld };
+  }
+  const s = fwWert(e, 'stichtag');
+  if (s.da) {
+    const m = /(\d{4})/.exec(String(s.wert));
+    if (m) return { da: true, jahr: Number(m[1]), feld: s.feld };
+  }
+  return { da: false, jahr: null, feld: 'jahr' };
+}
+
+/** Das Alter: direkt, oder aus Baujahr und Stichtagsjahr — so, wie das Blatt
+ *  es selbst definiert ("Alter = Kalenderjahr des Wertermittlungsstichtages
+ *  minus Baujahr"). OHNE Stichtag wird es nicht geschaetzt. */
+function fwAlter(e) {
+  const a = fwWert(e, 'alter');
+  if (a.da && zahl(a.wert) !== null) {
+    return { da: true, wert: zahl(a.wert), herkunft: a.feld };
+  }
+  const bj = fwWert(e, 'baujahr');
+  const j = fwJahr(e);
+  if (bj.da && zahl(bj.wert) !== null && j.da && j.jahr) {
+    return { da: true, wert: j.jahr - zahl(bj.wert),
+             herkunft: `${j.feld} (${j.jahr}) − ${bj.feld}` };
+  }
+  return { da: false, wert: null,
+           fehlt: bj.da ? 'stichtag (fuer das Kalenderjahr)'
+                        : 'alter_jahre, oder baujahr und stichtag' };
+}
+
+/** Eine Teiltabelle des Satzes finden, auf die ein Faktor verweist
+ *  ("siehe stadtteile_lzs"). Gesucht wird in `modellansaetze` — dort liegen
+ *  sie bei Hamburg, unter einem ANDEREN Namen als im Verweis
+ *  (`stadtteilfaktoren` gegen `stadtteile_lzs`). Verglichen wird deshalb
+ *  ueber den Stamm des FAKTORNAMENS, und der kuerzeste Treffer gewinnt:
+ *  `aktualisierung` vor `aktualisierung_untersuchungszeitraum`. */
+function fwTeiltabelle(m, faktorname) {
+  const ma = (m && m.modellansaetze) || {};
+  const stamm = fwNorm(faktorname).replace(/faktor(en)?$/, '').replace(/s$/, '');
+  if (!stamm) return null;
+  const treffer = Object.keys(ma)
+    .filter((k) => fwNorm(k).includes(stamm) && ma[k] && typeof ma[k] === 'object')
+    .sort((p, q) => p.length - q.length);
+  if (!treffer.length) return null;
+  return { tab: ma[treffer[0]], quelle: 'modellansaetze.' + treffer[0] };
+}
+
+const FW_ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Aus einer Tabelle den Wert holen. Die FORM der Schluessel sagt, womit
+ *  nachgeschlagen wird — Datum, Zahl oder Name. Kein Nachbar, kein Mittel.
+ *  Zwischen Stuetzstellen wird nur interpoliert, wo das Blatt es ausdruecklich
+ *  erlaubt (`interpolation`); sonst zaehlt allein der Treffer. */
+function fwAusTabelle(tab, name, e, stamm, opt = {}) {
+  const schluessel = Object.keys(tab || {}).filter((k) => !FW_META.has(k));
+  if (!schluessel.length) return { status: 'teiltabelle_leer' };
+  const alleDatum = schluessel.every((k) => FW_ISO.test(k));
+  const alleZahl = schluessel.every((k) => zahl(k) !== null);
+  const holen = (v) => {
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      return zahl(v.faktor !== undefined ? v.faktor : v.wert);
+    }
+    return zahl(v);
+  };
+
+  if (alleDatum) {
+    const s = fwWert(e, 'stichtag');
+    if (!s.da) {
+      return { status: 'eingabe_fehlt', benoetigt: 'stichtag', auswahl: schluessel };
+    }
+    const tag = String(s.wert).slice(0, 10);
+    if (!Object.prototype.hasOwnProperty.call(tab, tag)) {
+      return { status: 'stichtag_ohne_faktor', benoetigt: 'stichtag',
+        auswahl: schluessel, gegeben: tag };
+    }
+    const w = holen(tab[tag]);
+    if (w === null) return { status: 'tabelle_ohne_wert', gegeben: tag };
+    return { status: 'gerechnet', wert: w, auspraegung: tag };
+  }
+
+  if (alleZahl) {
+    let x = null, feld = stamm;
+    if (stamm === 'jahr') {
+      const j = fwJahr(e);
+      if (!j.da || j.jahr === null) {
+        return { status: 'eingabe_fehlt', benoetigt: 'jahr oder stichtag' };
+      }
+      x = j.jahr; feld = j.feld;
+    } else {
+      const f = fwWert(e, stamm);
+      if (!f.da || zahl(f.wert) === null) {
+        return { status: 'eingabe_fehlt', benoetigt: stamm };
+      }
+      x = zahl(f.wert); feld = f.feld;
+    }
+    const achse = schluessel.map(Number).sort((p, q) => p - q);
+    const genau = achse.find((v) => v === x);
+    if (genau !== undefined) {
+      const w = holen(beiZahl(tab, genau));
+      if (w === null) return { status: 'tabelle_ohne_wert', gegeben: x };
+      return { status: 'gerechnet', wert: w, auspraegung: `${x} (${feld})` };
+    }
+    if (!opt.interpolieren) {
+      return { status: 'zwischen_den_stuetzstellen', gegeben: x,
+        auswahl: achse,
+        hinweis_fw: 'Das Blatt erlaubt keine Interpolation; zwischen den '
+          + 'Stuetzstellen gibt es keinen Wert.' };
+    }
+    const n = nachbarn(achse, x);
+    if (!n) {
+      return { status: 'ausserhalb_der_tabelle', gegeben: x,
+        spanne: [achse[0], achse[achse.length - 1]] };
+    }
+    const a0 = holen(beiZahl(tab, n[0])), a1 = holen(beiZahl(tab, n[1]));
+    if (a0 === null || a1 === null) return { status: 'tabelle_ohne_wert', gegeben: x };
+    return { status: 'gerechnet', wert: zwischen(x, n[0], n[1], a0, a1),
+      auspraegung: `${x} (${feld}, zwischen ${n[0]} und ${n[1]})`, stuetzstellen: n };
+  }
+
+  /* Namenstabelle: Stadtteile. Ohne Beachtung der Gross-/Kleinschreibung,
+     aber nicht unscharf — wer einen Namen falsch schreibt, bekommt keinen
+     Faktor statt eines falschen. */
+  const f = fwWert(e, stamm);
+  if (!f.da) {
+    return { status: 'eingabe_fehlt', benoetigt: stamm, auswahl_zahl: schluessel.length };
+  }
+  const gesucht = fwNorm(f.wert);
+  const k = schluessel.find((x) => fwNorm(x) === gesucht);
+  if (k === undefined) {
+    return { status: 'name_unbekannt', gegeben: String(f.wert),
+      auswahl_zahl: schluessel.length };
+  }
+  const w = holen(tab[k]);
+  if (w === null) {
+    /* Hamburg: Neuwerk traegt in keiner Stadtteiltabelle einen Faktor —
+       der Geltungsbereich lautet ueberall "ganz Hamburg ohne Neuwerk". */
+    return { status: 'ohne_wert', gegeben: k };
+  }
+  return { status: 'gerechnet', wert: w, auspraegung: k };
+}
+
+/** Eine einfache Zahlenbedingung aus dem Wortlaut lesen ("Alter < 30 Jahre").
+ *  Was sich nicht so lesen laesst, gilt als NICHT maschinenlesbar — es wird
+ *  nicht sinngemaess ausgelegt. */
+function fwBedingung(text) {
+  const m = /(<=|>=|<|>)\s*([0-9]+(?:[.,][0-9]+)?)/.exec(String(text || ''));
+  if (!m) return null;
+  return { op: m[1], schwelle: Number(String(m[2]).replace(',', '.')) };
+}
+
+/** Der Normalfall eines bedingten Faktors. Belegt ist er, wenn das Blatt ihn
+ *  nennt — `sonst: <zahl>` oder eine Basisangabe, die auf ": 1" endet
+ *  ("bei Alter 30 Jahre: 1", "keine Ecklage: 1").
+ *
+ *  EIN BEDINGTER EINZELWERT ist der Sonderfall, und zwar ein belegter: ein
+ *  Faktor, den das Blatt NUR fuer eine Bedingung beziffert (Erstbezug 0,83),
+ *  steht in einer Formel, die fuer JEDES Objekt dieser Art gelten soll. Fuer
+ *  ein Objekt ohne Erstbezug kommt er im Produkt gar nicht vor — das ist
+ *  rechnerisch die Eins und keine Erfindung. Entscheidend ist, dass die
+ *  Bedingung NACHWEISLICH nicht zutrifft; ist sie unbekannt, wird nicht
+ *  gerechnet (das entscheidet der Aufrufer in `fwFaktor`).
+ *
+ *  Haelt der Satz dagegen ausdruecklich fest, dass der Normalfall NICHT
+ *  beziffert ist — Hamburg, Gebaeudeartfaktor Buero: „Ein Wert fuer den
+ *  Normalfall (sonst) ist im Bericht nicht beziffert" —, dann bleibt er
+ *  unbelegt. Diese Zeile hat ein Mensch beim Ernten hingeschrieben, weil es
+ *  ihm auffiel; sie wird nicht uebergangen. */
+function fwNormalfall(def, opt = {}) {
+  const s = zahl(def && def.sonst);
+  if (s !== null) return { da: true, wert: s, beleg: 'sonst' };
+  const txt = String((def && (def.anmerkung_erfassung || def.hinweis)) || '');
+  if (/nicht\s+bezif/i.test(txt)) {
+    return { da: false, grund: 'normalfall_nicht_beziffert', wortlaut: txt };
+  }
+  const basis = String((def && def.basis) || '');
+  if (/:\s*1(?:[.,]0+)?\s*$/.test(basis)) {
+    return { da: true, wert: 1, beleg: basis };
+  }
+  if (opt.bedingt) {
+    return { da: true, wert: 1,
+      beleg: 'bedingter Faktor; ausserhalb seiner Bedingung kommt er im '
+        + 'Produkt des Blattes nicht vor' };
+  }
+  return { da: false, grund: 'normalfall_nicht_belegt' };
+}
+
+/** Die NORMSTELLE aus der Basisangabe: die Stelle, an der das Blatt den Wert
+ *  des Faktors ausdruecklich nennt.
+ *  "bei Restnutzungsdauer 50 Jahre: 1" -> { x: 50,  soll: 1 }
+ *  "bei Bodenwertanteil von 60%: 1"    -> { x: 0.6, soll: 1, prozent: true }
+ *
+ *  EIN PROZENTZEICHEN IST EINE EINHEIT, KEINE ZIERDE: in die Gleichung geht
+ *  der Anteil als Dezimalbruch ein (0,67318 + 0,5447 · 0,60 = 1,00), nicht
+ *  die Zahl 60. Wer die 60 einsetzt, bekommt 33 — das haelt kein Band aus,
+ *  aber beim naechsten Faktor derselben Art faellt es vielleicht nicht auf. */
+function fwNormstelle(def) {
+  const t = String((def && def.basis) || '');
+  const m = /([0-9]+(?:[.,][0-9]+)?)\s*(%|Prozent)?[^:]*:\s*([0-9]+(?:[.,][0-9]+)?)\s*$/.exec(t);
+  if (!m) return null;
+  const roh = Number(m[1].replace(',', '.'));
+  return { x: m[2] ? roh / 100 : roh, x_roh: roh, prozent: !!m[2],
+    soll: Number(m[3].replace(',', '.')), wortlaut: t };
+}
+
+/** Klassenschluessel wie "bis 1939", "1940 bis 1959", "ab 1980". */
+function fwKlasse(schluessel, x) {
+  for (const k of schluessel) {
+    const t = fwNorm(k);
+    let m = /^bis\s+(-?\d+(?:[.,]\d+)?)$/.exec(t);
+    if (m && x <= Number(m[1].replace(',', '.'))) return k;
+    m = /^ab\s+(-?\d+(?:[.,]\d+)?)$/.exec(t);
+    if (m && x >= Number(m[1].replace(',', '.'))) return k;
+    m = /^(-?\d+(?:[.,]\d+)?)\s*(?:bis|-|–)\s*(-?\d+(?:[.,]\d+)?)$/.exec(t);
+    if (m && x >= Number(m[1].replace(',', '.'))
+           && x <= Number(m[2].replace(',', '.'))) return k;
+  }
+  return null;
+}
+
+/**
+ * EINEN Faktor aufloesen. Gibt immer dieselbe Form zurueck, damit die
+ * Auskunft jeden Faktor einzeln ausweisen kann:
+ *   { faktor, status, wert?, benoetigt?, wortlaut?, art }
+ * `status: 'gerechnet'` ist der einzige, der einen Wert traegt.
+ */
+function fwFaktor(name, def, m, e) {
+  const aus = { faktor: name, status: 'nicht_maschinenlesbar', art: null,
+    wortlaut: null };
+  let stamm = (def && def.feld) ? fwStamm(def.feld)
+    : (FW_FAKTOR_FELD[fwNorm(name)] || null);
+
+  /* 1 · eine nackte Zahl */
+  if (typeof def === 'number') {
+    return { ...aus, status: 'gerechnet', wert: def, art: 'konstante' };
+  }
+
+  /* 2 · ein Verweis auf eine Teiltabelle ("siehe stadtteile_lzs") */
+  if (typeof def === 'string') {
+    aus.art = 'verweis';
+    aus.wortlaut = def;
+    const t = fwTeiltabelle(m, name);
+    if (!t) {
+      return { ...aus, status: 'teiltabelle_fehlt', verweis: def,
+        benoetigt: 'Teiltabelle "' + def.replace(/^siehe\s*/i, '')
+          + '" im Registersatz' };
+    }
+    if (!stamm) {
+      return { ...aus, status: 'faktor_ohne_feld', quelle: t.quelle,
+        benoetigt: 'Angabe im Rezept, welche Groesse diese Tabelle liest (`feld`)' };
+    }
+    const r = fwAusTabelle(t.tab, name, e, stamm);
+    return { ...aus, ...r, art: 'tabelle', quelle: t.quelle };
+  }
+
+  if (!def || typeof def !== 'object') {
+    return { ...aus, status: 'faktor_ohne_regel' };
+  }
+
+  aus.wortlaut = def.formel || def.bedingung || def.bez || def.hinweis || null;
+
+  /* 3 · Stufentabelle im Faktor selbst (Kiel: af_zeit, af_nbrw, af_nkm) */
+  if (def.stufen && typeof def.stufen === 'object') {
+    if (!stamm) {
+      return { ...aus, status: 'faktor_ohne_feld',
+        benoetigt: 'Angabe im Rezept, welche Groesse dieser Faktor liest (`feld`)' };
+    }
+    const r = fwAusTabelle(def.stufen, name, e, stamm,
+      { interpolieren: !!def.interpolation });
+    return { ...aus, ...r, art: 'stufen' };
+  }
+
+  /* 4 · Potenz um eine Normstelle: (x / norm) ^ exponent */
+  const exp = zahl(def.exponent);
+  if (exp !== null) {
+    aus.art = 'potenz';
+    let norm = null, normFeld = null;
+    for (const k of ['norm_brw', 'brw', 'norm', 'normstelle']) {
+      if (zahl(def[k]) !== null) { norm = zahl(def[k]); normFeld = k; break; }
+    }
+    if (norm === null || !(norm > 0)) {
+      /* Zwei verschiedene Luecken, und sie brauchen verschiedene Namen:
+         Hamburgs Grundstuecksgroessenfaktor nennt seine Normstelle (600 m²)
+         NUR im Formeltext — da fehlt eine Zahl. Der Miethoehenfaktor
+         (MM/RM)^0,0948 hat dagegen gar keine Normstelle: er teilt zwei
+         GROESSEN, und die zweite (Referenzmiete) ist selbst ein Modell. */
+      if (/\([^()\/]*\/\s*[A-Za-zÄÖÜäöü][^()\/\d]*\)/.test(String(def.formel || ''))) {
+        return { ...aus, status: 'quotient_nicht_maschinenlesbar',
+          benoetigt: 'beide Groessen des Quotienten als Felder im Rezept '
+            + '(hier: marktuebliche Miete und Referenzmiete)' };
+      }
+      return { ...aus, status: 'normstelle_nicht_beziffert',
+        benoetigt: 'Normstelle als Zahl im Rezept (`norm`)' };
+    }
+    /* Welche Groesse gemessen wird, sagt der Satz mit dem Namen der
+       Normstelle: `brw` heisst Bodenrichtwert, `norm_brw` heisst der
+       NORMIERTE. Hamburgs Produktions-/Logistikzweig rechnet mit dem
+       nackten BRW22, der Wohnzweig mit dem normierten. */
+    if (normFeld === 'brw') stamm = 'brw';
+    else if (normFeld === 'norm_brw') stamm = 'norm_brw';
+    if (!stamm) {
+      return { ...aus, status: 'faktor_ohne_feld',
+        benoetigt: 'Angabe im Rezept, welche Groesse dieser Faktor liest (`feld`)' };
+    }
+    const f = fwWert(e, stamm);
+    if (!f.da || zahl(f.wert) === null) {
+      return { ...aus, status: 'eingabe_fehlt', benoetigt: stamm };
+    }
+    const x = zahl(f.wert);
+    if (!(x > 0)) {
+      return { ...aus, status: 'eingabe_unbrauchbar', benoetigt: stamm, gegeben: x };
+    }
+    /* Eine Kappung gehoert zum Modell. Steht sie nur als Satz da, wird der
+       Faktor NICHT gerechnet — ungekappt waere er ausserhalb dessen, was
+       das Blatt zulaesst. */
+    if (def.kappung && zahl(def.kappung.schwelle) === null) {
+      return { ...aus, status: 'kappung_nicht_maschinenlesbar',
+        wortlaut: def.kappung.bedingung || null,
+        benoetigt: 'Kappungsschwelle als Zahl im Rezept (`kappung.schwelle`)' };
+    }
+    let v = Math.pow(x / norm, exp);
+    if (def.kappung) {
+      const sw = zahl(def.kappung.schwelle), kw = zahl(def.kappung.wert);
+      if (sw !== null && kw !== null && x / norm >= sw) v = kw;
+    }
+    if (!Number.isFinite(v)) return { ...aus, status: 'term_unbestimmt' };
+    return { ...aus, status: 'gerechnet', wert: v,
+      auspraegung: `${x} (${f.feld})`, rechnung: `(${x} / ${norm})^${exp}` };
+  }
+
+  /* 5 · linear: a + b * x bzw. b + a * x — welche Lesart gilt, entscheidet
+   *     die Normstelle des Blattes, nicht die Reihenfolge der Buchstaben. */
+  const ka = zahl(def.a), kb = zahl(def.b);
+  if (ka !== null && kb !== null) {
+    aus.art = 'linear';
+    /* Eine lineare Regel, die NUR in einem Abschnitt gilt (Hamburg:
+       "RND <= 15 Jahre" / "RND 16 bis 50 Jahre" / "RND > 50 Jahre"), ist
+       kein linearer Faktor, sondern eine Verzweigung. Sie halb zu rechnen
+       traefe den mittleren Abschnitt und waere in den beiden anderen
+       falsch — unauffaellig falsch. */
+    const zweige = Object.keys(def).filter((k) => !FW_META.has(k)
+      && /(<=|>=|<|>|\bbis\b)/i.test(k));
+    if (zweige.length) {
+      return { ...aus, status: 'verzweigung_nicht_maschinenlesbar',
+        zweige, benoetigt: 'die Abschnitte als Regeln im Rezept' };
+    }
+    if (!stamm) {
+      return { ...aus, status: 'faktor_ohne_feld',
+        benoetigt: 'Angabe im Rezept, welche Groesse dieser Faktor liest (`feld`)' };
+    }
+    const w = (stamm === 'alter') ? fwAlter(e) : (() => {
+      const f = fwWert(e, stamm);
+      return { da: f.da && zahl(f.wert) !== null, wert: zahl(f.wert),
+               herkunft: f.feld };
+    })();
+    if (!w.da) {
+      return { ...aus, status: 'eingabe_fehlt', benoetigt: w.fehlt || stamm };
+    }
+    const bed = def.gueltig_wenn ? fwBedingung(def.gueltig_wenn) : null;
+    if (def.gueltig_wenn && !bed) {
+      return { ...aus, status: 'bedingung_nicht_maschinenlesbar',
+        wortlaut: String(def.gueltig_wenn) };
+    }
+    if (bed) {
+      const x0 = w.wert;
+      const trifft = bed.op === '<' ? x0 < bed.schwelle
+                   : bed.op === '<=' ? x0 <= bed.schwelle
+                   : bed.op === '>' ? x0 > bed.schwelle
+                   : x0 >= bed.schwelle;
+      if (!trifft) {
+        const nf = fwNormalfall(def);
+        if (!nf.da) {
+          return { ...aus, status: nf.grund,
+            wortlaut: nf.wortlaut || def.basis || null };
+        }
+        return { ...aus, status: 'gerechnet', wert: nf.wert, art: 'normalfall',
+          auspraegung: `${x0} — "${def.gueltig_wenn}" trifft nicht zu`,
+          rechnung: `Normalfall ${nf.wert} laut Blatt: ${nf.beleg}` };
+      }
+    }
+    /* Die Lesart gegen die Normstelle pruefen. Hamburg nennt sie zu jedem
+       linearen Faktor ("bei Bodenwertanteil von 60%: 1"). */
+    const ns = fwNormstelle(def);
+    const lesarten = [
+      { bez: 'a + b*x', f: (x) => ka + kb * x },
+      { bez: 'b + a*x', f: (x) => kb + ka * x },
+    ];
+    let gewaehlt = lesarten[0], geprueft = false;
+    if (ns) {
+      const treffer = lesarten.filter((l) => Math.abs(l.f(ns.x) - ns.soll) <= 0.005);
+      if (!treffer.length) {
+        return { ...aus, status: 'normstelle_nicht_reproduzierbar',
+          wortlaut: ns.wortlaut,
+          benoetigt: 'eine Lesart von a und b, die die Normstelle trifft' };
+      }
+      gewaehlt = treffer[0]; geprueft = true;
+      /* Nennt das Blatt seine Normstelle in Prozent, geht in die Gleichung
+         der Dezimalbruch ein. Eine Eingabe von 62 statt 0,62 waere dann um
+         den Faktor 100 daneben — und das wird nicht stillschweigend
+         zurechtgebogen, sondern gefragt. */
+      if (ns.prozent && w.wert > 1) {
+        return { ...aus, status: 'eingang_einheit_unklar', wortlaut: ns.wortlaut,
+          gegeben: w.wert,
+          benoetigt: `${stamm} als Dezimalbruch (Normstelle laut Blatt: `
+            + `${ns.x_roh} % = ${ns.x})` };
+      }
+    }
+    const v = gewaehlt.f(w.wert);
+    if (!Number.isFinite(v)) return { ...aus, status: 'term_unbestimmt' };
+    return { ...aus, status: 'gerechnet', wert: v,
+      auspraegung: String(w.wert) + (w.herkunft ? ` (${w.herkunft})` : ''),
+      rechnung: `${gewaehlt.bez} mit a=${ka}, b=${kb}, x=${w.wert}`,
+      normstelle_geprueft: geprueft,
+      eingang_einheit: (ns && ns.prozent) ? 'Dezimalbruch (Blatt nennt Prozent)' : null };
+  }
+
+  /* 6 · bedingter Einzelwert (Erstbezug, eingeschossiger Laden) */
+  const wz = zahl(def.wert);
+  if (wz !== null && def.bedingung) {
+    aus.art = 'bedingt';
+    if (!stamm) {
+      return { ...aus, status: 'faktor_ohne_feld',
+        benoetigt: 'Angabe im Rezept, welches Merkmal die Bedingung '
+          + 'entscheidet (`feld`)' };
+    }
+    const f = fwWert(e, stamm);
+    if (!f.da) {
+      return { ...aus, status: 'eingabe_fehlt', benoetigt: stamm,
+        wortlaut: String(def.bedingung) };
+    }
+    const ja = f.wert === true || /^(1|ja|true|wahr|j)$/i.test(String(f.wert));
+    if (ja) {
+      return { ...aus, status: 'gerechnet', wert: wz,
+        auspraegung: 'Bedingung trifft zu' };
+    }
+    const nf = fwNormalfall(def, { bedingt: true });
+    if (!nf.da) {
+      return { ...aus, status: nf.grund,
+        wortlaut: nf.wortlaut || String(def.bedingung) };
+    }
+    return { ...aus, status: 'gerechnet', wert: nf.wert, art: 'normalfall',
+      auspraegung: 'Bedingung trifft nicht zu' };
+  }
+  if (wz !== null) {
+    return { ...aus, status: 'gerechnet', wert: wz, art: 'konstante' };
+  }
+
+  /* 7 · Klassentabelle ("bis 1939", "1940 bis 1959", "ab 1980") */
+  const kl = Object.keys(def).filter((k) => !FW_META.has(k)
+    && zahl(def[k]) !== null);
+  if (kl.length) {
+    aus.art = 'klassen';
+    if (!stamm) {
+      return { ...aus, status: 'faktor_ohne_feld', auswahl: kl,
+        benoetigt: 'Angabe im Rezept, welche Groesse dieser Faktor liest (`feld`)' };
+    }
+    const f = fwWert(e, stamm);
+    if (!f.da || zahl(f.wert) === null) {
+      return { ...aus, status: 'eingabe_fehlt', benoetigt: stamm };
+    }
+    const x = zahl(f.wert);
+    const k = fwKlasse(kl, x);
+    if (k === null) {
+      /* Zwischen Klassen wird NICHT interpoliert und ueber sie hinaus nicht
+         fortgeschrieben: ein Baujahr faellt in genau eine Klasse. */
+      return { ...aus, status: 'ausserhalb_der_klassen', gegeben: x, auswahl: kl };
+    }
+    return { ...aus, status: 'gerechnet', wert: zahl(def[k]),
+      auspraegung: `${k} (${f.feld} = ${x})` };
+  }
+
+  return { ...aus, status: 'faktor_ohne_regel',
+    benoetigt: 'Zahl oder Regel im Rezept',
+    gefundene_schluessel: Object.keys(def) };
+}
+
+/** Die additiven Korrekturwerte eines Formelwerks (Kiel: Prozentpunkte NACH
+ *  den multiplikativen Faktoren). Angewandt wird nur, was BENANNT ist —
+ *  ein Stadtteil, den niemand angegeben hat, bekommt keine Korrektur und
+ *  erscheint stattdessen in `korrekturen_offen`. Das ist dieselbe Regel wie
+ *  bei `art: 'kategorial'`: wer einen Namen nicht nennt, bekommt keine
+ *  Korrektur statt einer falschen — aber die Luecke steht im Rechenweg. */
+function fwKorrekturen(tab, e) {
+  const an = [], offen = [];
+  const merkmale = new Set();
+  for (const k of ['nutzungsart', 'objektart', 'objektart_bez', 'zweig',
+                   'gebaeudeart']) {
+    if (e && e[k]) merkmale.add(fwNorm(e[k]));
+  }
+  if (Array.isArray(e && e.merkmale)) e.merkmale.forEach((x) => merkmale.add(fwNorm(x)));
+  const st = fwWert(e || {}, 'stadtteil');
+  const stadtteil = st.da ? fwNorm(st.wert) : null;
+
+  for (const [name, roh] of Object.entries(tab || {})) {
+    const w = zahl(roh);
+    if (w === null) continue;                 /* `hinweis` ist kein Korrekturwert */
+    const mSt = /^stadtteil\s+(.+)$/i.exec(name);
+    if (mSt) {
+      if (stadtteil && fwNorm(mSt[1]) === stadtteil) an.push({ merkmal: name, wert: w });
+      else if (!stadtteil) offen.push(name + ' (Stadtteil nicht angegeben)');
+      continue;
+    }
+    if (merkmale.has(fwNorm(name))
+        || (/gesch[äa]ftshaus/i.test(name) && merkmale.has('wgh'))) {
+      an.push({ merkmal: name, wert: w });
+    } else if (!merkmale.size) {
+      offen.push(name + ' (Nutzungsart nicht angegeben)');
+    }
+  }
+  return { an, offen };
+}
+
+/** Bauart `linearkombination` — Magdeburg. */
+function fwLinearkombination(m, e) {
+  const ko = m.koeffizienten || {};
+  const namen = Object.keys(ko);
+  if (!namen.length) {
+    return nichts('kein_koeffizient', 'Der Satz fuehrt keine Koeffizienten.');
+  }
+
+  /* Der Geltungsbereich steht VOR der Rechnung. Ohne die Angabe wird nicht
+     gerechnet: eine Grenze, die man nicht pruefen kann, ist nicht gewahrt. */
+  for (const [feld, spanne] of Object.entries(m.gueltigkeit || {})) {
+    if (!Array.isArray(spanne) || spanne.length !== 2) continue;
+    const stamm = fwStamm(feld);
+    const f = fwWert(e, stamm);
+    if (!f.da || zahl(f.wert) === null) {
+      return nichts('feld_fehlt',
+        `${feld} ist nicht erfasst. Die Regressionsfunktion gilt nur fuer `
+        + `${feld} von ${spanne[0]} bis ${spanne[1]}; ohne die Angabe laesst `
+        + `sich das nicht pruefen, und ohne Pruefung wird nicht gerechnet. `
+        + `Gesucht wurde unter: ${(FW_EINGANG[stamm] || [stamm]).join(', ')}.`);
+    }
+    const x = zahl(f.wert);
+    if (x < spanne[0] || x > spanne[1]) {
+      return nichts('ausserhalb_der_stichprobe',
+        `${feld} = ${x} liegt ausserhalb von ${spanne[0]} bis ${spanne[1]}. `
+        + 'Der Bericht hat dort nichts abgeleitet; extrapoliert wird nicht.');
+    }
+  }
+
+  let summe = 0;
+  const teile = [];
+  for (const name of namen) {
+    const c = zahl(ko[name]);
+    if (c === null) return nichts('kein_koeffizient', `${name} ohne Zahl.`);
+    if (/^(konstante|intercept|achsabschnitt)$/i.test(name)) {
+      summe += c; teile.push(`${c}`); continue;
+    }
+    let art = 'linear', feld = name;
+    if (/^inv_/.test(name)) { art = 'inv'; feld = name.slice(4); }
+    else if (/^ln_/.test(name)) { art = 'ln'; feld = name.slice(3); }
+    else if (/^log10_/.test(name)) { art = 'log10'; feld = name.slice(6); }
+    else if (/_diskret$/.test(name)) { art = 'diskret'; feld = name.replace(/_diskret$/, ''); }
+
+    let x = null, ausp = null;
+    if (art === 'diskret') {
+      /* Die diskrete Stufe steht als TABELLE im Satz. `_anwendung` gewinnt
+         gegen `_laut_blatt`: Magdeburgs Blatt druckt seine Jahresbasis
+         VERTAUSCHT, und das steht dort ausdruecklich (`formel.hinweis`,
+         `auflagen`). Eine Korrektur, die nur im Fliesstext steht, rechnet
+         niemand mit — sie gehoert als ZAHL ins Feld. */
+      const tab = m[feld + '_basis_anwendung'] || m[feld + '_basis']
+               || m[feld + '_basis_laut_blatt'] || null;
+      if (!tab || typeof tab !== 'object') {
+        return nichts('stufentabelle_fehlt',
+          `Der Term "${name}" ist diskret, der Satz fuehrt aber keine Tabelle `
+          + `${feld}_basis_anwendung.`);
+      }
+      const schluessel = Object.keys(tab);
+      const j = fwJahr(e);
+      if (!j.da) {
+        return nichts('feld_fehlt',
+          `Die Jahresstufe ist nicht erfasst. Der Bericht fuehrt `
+          + `${schluessel.join(' · ')}; anzugeben ist "jahr" (Klasse oder `
+          + `Kalenderjahr) oder "stichtag".`);
+      }
+      let k = schluessel.find((s) => fwNorm(s) === fwNorm(j.text || j.jahr));
+      if (k === undefined && j.jahr) {
+        k = schluessel.find((s) => (String(s).match(/\d{4}/g) || [])
+          .some((y) => Number(y) === j.jahr));
+      }
+      if (k === undefined) {
+        return nichts('ausserhalb_der_jahresklassen',
+          `Fuer ${j.text || j.jahr} fuehrt der Bericht keine Jahresstufe. `
+          + `Gefuehrt werden: ${schluessel.join(' · ')}. Eine Stufe `
+          + `fortzuschreiben waere eine Ableitung, die der Ausschuss nicht `
+          + `vorgenommen hat.`);
+      }
+      x = zahl(tab[k]);
+      ausp = k;
+      if (x === null) {
+        return nichts('stufe_ohne_wert', `Die Jahresstufe "${k}" traegt keine Zahl.`);
+      }
+    } else {
+      const stamm = fwStamm(feld);
+      const f = fwWert(e, stamm);
+      if (!f.da || zahl(f.wert) === null) {
+        return nichts('feld_fehlt',
+          `${feld} ist nicht erfasst. Die Gleichung ist als Ganzes abgeleitet; `
+          + `ein weggelassener Term waere ein anderes Modell. Gesucht wurde `
+          + `unter: ${(FW_EINGANG[stamm] || [stamm]).join(', ')}.`);
+      }
+      x = zahl(f.wert);
+      ausp = `${x} (${f.feld})`;
+    }
+
+    let basiswert = x;
+    if (art === 'inv') {
+      if (x === 0) {
+        return nichts('term_unbestimmt', `${feld} = 0; 1/${feld} ist nicht erklaert.`);
+      }
+      basiswert = 1 / x;
+    } else if (art === 'ln') {
+      if (!(x > 0)) {
+        return nichts('term_unbestimmt', `${feld} = ${x}; ln ist dort nicht erklaert.`);
+      }
+      basiswert = Math.log(x);
+    } else if (art === 'log10') {
+      if (!(x > 0)) {
+        return nichts('term_unbestimmt', `${feld} = ${x}; log10 ist dort nicht erklaert.`);
+      }
+      basiswert = Math.log10(x);
+    }
+    const anteil = c * basiswert;
+    if (!Number.isFinite(anteil)) {
+      return nichts('term_unbestimmt', `Der Term "${name}" ergibt keinen endlichen Wert.`);
+    }
+    summe += anteil;
+    teile.push(`${anteil >= 0 ? '+' : '−'} ${Math.abs(anteil).toFixed(6)} `
+      + `(${name} = ${ausp})`);
+  }
+
+  /* ── WAS AUSSEN UM DIE KLAMMER STEHT, IST TEIL DES MODELLS ───────────
+     Magdeburg druckt ( … )² ab; ohne das Quadrat kaeme 1,58 statt 2,49
+     heraus. Dresden schreibt den Logarithmus LINKS —
+     `ln(SWF) = …` —, da ist der Faktor e hoch der Summe: ohne das kaeme
+     0,09 statt 1,10. Beide Zahlen bleiben im plausiblen Band, und beide
+     sind falsch. Deshalb: nennt der Ausdruck ein Aussenherum und das
+     Rezept nicht, wird NICHT gerechnet. */
+  let ergebnis = summe;
+  if (m.aussen_funktion === 'exp') {
+    ergebnis = Math.exp(summe);
+    teile.push(`= e^(${summe.toFixed(6)})`);
+    if (!Number.isFinite(ergebnis)) {
+      return nichts('term_unbestimmt', 'Die Gleichung ergibt keinen endlichen Wert.');
+    }
+    const w0 = gerundet(m, ergebnis);
+    return { verfuegbar: true, wert: w0, tabellenwert: w0, korrekturen: [],
+      bauart: 'linearkombination', rechenweg_terme: teile,
+      rechenweg_formelwerk: teile.join(' ') + ` = ${w0}` };
+  }
+  if (!m.aussen_funktion && /\bln\s*\(\s*[A-Za-z]/.test(String(m.ausdruck || ''))
+      && /^\s*ln\s*\(/.test(String(m.ausdruck || ''))) {
+    return nichts('aussen_funktion_fehlt',
+      'Der abgedruckte Ausdruck hat den Logarithmus auf der LINKEN Seite '
+      + '(ln(…) = …). Die Summe ist dann nicht das Ergebnis, sondern sein '
+      + 'Logarithmus; das Rezept muss `aussen_funktion: "exp"` fuehren.');
+  }
+  const aexp = zahl(m.aussen_exponent);
+  if (aexp === null) {
+    if (/[²³]/.test(String(m.ausdruck || ''))) {
+      return nichts('exponent_nicht_beziffert',
+        'Der abgedruckte Ausdruck traegt einen Exponenten auf der Klammer, '
+        + 'das Rezept nennt ihn aber nicht als Zahl (`aussen_exponent`). '
+        + 'Ohne ihn waere es eine andere Gleichung.');
+    }
+  } else if (aexp !== 1) {
+    if (summe < 0 && !Number.isInteger(aexp)) {
+      return nichts('term_unbestimmt',
+        `Die Klammersumme ist ${summe.toFixed(4)}; mit dem Exponenten ${aexp} `
+        + 'ergibt das keinen reellen Wert.');
+    }
+    ergebnis = Math.pow(summe, aexp);
+    teile.push(`= (${summe.toFixed(6)})^${aexp}`);
+  }
+  if (!Number.isFinite(ergebnis)) {
+    return nichts('term_unbestimmt', 'Die Gleichung ergibt keinen endlichen Wert.');
+  }
+
+  const w = gerundet(m, ergebnis);
+  return { verfuegbar: true, wert: w, tabellenwert: w, korrekturen: [],
+    bauart: 'linearkombination', rechenweg_terme: teile,
+    rechenweg_formelwerk: teile.join(' ') + ` = ${w}` };
+}
+
+/** Bauart `produkt` — Kiel und Hamburg. */
+function fwProdukt(m, e) {
+  const pct = zahl(m.basiswert_pct);
+  const basis = pct !== null ? pct : zahl(m.basiswert);
+  if (basis === null) {
+    return nichts('kein_basiswert', 'Der Satz nennt keinen Basiswert.');
+  }
+  const tab = m.faktoren || m.koeffizienten || {};
+  const namen = Object.keys(tab);
+  if (!namen.length) return nichts('keine_faktoren', 'Der Satz nennt keine Faktoren.');
+
+  const teil = [], offenFw = [];
+  let produkt = basis;
+  const weg = [`Basiswert ${basis}`];
+  let korr = { an: [], offen: [] };
+
+  for (const name of namen) {
+    /* Kiel: "ADDITIV, erst NACH den multiplikativen Faktoren a-c." — der
+       Satz sagt es selbst, deshalb steht dieser Block nicht im Produkt. */
+    if (/^korrektur/i.test(name)) { korr = fwKorrekturen(tab[name], e); continue; }
+    const r = fwFaktor(name, tab[name], m, e);
+    teil.push(r);
+    if (r.status === 'gerechnet') {
+      produkt *= r.wert;
+      weg.push(`× ${Number(r.wert.toFixed(5))} (${name}`
+        + (r.auspraegung ? `: ${r.auspraegung}` : '') + ')');
+    } else {
+      offenFw.push(r);
+    }
+  }
+
+  if (offenFw.length) {
+    const fehlende = [...new Set(offenFw.map((r) => r.benoetigt).filter(Boolean))];
+    const liste = offenFw.map((r) => `${r.faktor} (${r.status}`
+      + (r.benoetigt ? `, noetig: ${r.benoetigt}` : '') + ')').join(' · ');
+    return { ...nichts('modell_unvollstaendig',
+      'Dieser Gutachterausschuss rechnet ueber ein Faktormodell. '
+      + `${offenFw.length} von ${teil.length} Faktoren sind nicht auswertbar: `
+      + `${liste}. `
+      + (fehlende.length ? `Beizubringen waere: ${fehlende.join(', ')}. ` : '')
+      + 'Gerechnet wird damit nicht — ein Faktor, den man auf 1 setzt, ist '
+      + 'eine Erfindung mit Nachkommastelle.'),
+      bauart: 'produkt', teilergebnisse: teil, fehlende_eingaben: fehlende,
+      faktoren_gerechnet: teil.filter((r) => r.status === 'gerechnet').length,
+      faktoren_gefuehrt: teil.length };
+  }
+
+  let ergebnis = produkt;
+  for (const k of korr.an) {
+    ergebnis += k.wert;
+    weg.push(`${k.wert >= 0 ? '+' : '−'} ${Math.abs(k.wert)} (${k.merkmal})`);
+  }
+
+  const w = gerundet(m, ergebnis);
+  return { verfuegbar: true, wert: w, tabellenwert: w, korrekturen: [],
+    bauart: 'produkt', teilergebnisse: teil,
+    faktoren_gerechnet: teil.length, faktoren_gefuehrt: teil.length,
+    korrekturen_formelwerk: korr.an,
+    korrekturen_offen_formelwerk: korr.offen,
+    rechenweg_formelwerk: weg.join(' ') + ` = ${w}` };
+}
+
+/** Bauart `bezug_linear` — Hamburg efh/etw: a * LIZI(MFH) + b.
+ *
+ * Der Bezugswert ist das ERGEBNIS eines anderen Zweiges. Er wird hier nicht
+ * beschafft — der Auswerter kennt das Register nicht — sondern erwartet:
+ * `bezugswert_pct`. Fehlt er, sagt die Auskunft, AN WELCHEM Zweig die
+ * Rechnung haengt. Eine Luecke, die eine Stufe tiefer liegt, ist keine
+ * andere Luecke; sie gehoert mit demselben Namen gemeldet. */
+function fwBezugLinear(m, e) {
+  const a = zahl(m.a), b = zahl(m.b);
+  if (a === null || b === null) {
+    return nichts('kein_koeffizient', 'Der Satz fuehrt a oder b nicht.');
+  }
+  const mz = /zweig\s*=\s*([a-z0-9_]+)/i.exec(String(m.bezug || ''));
+  const quelle = mz ? mz[1] : null;
+  const f = fwWert(e, 'bezugswert');
+  const x = f.da ? zahl(f.wert) : null;
+  if (x === null) {
+    return { ...nichts('bezugswert_fehlt',
+      `Dieser Zweig wird AUS dem Zweig "${quelle || 'eines anderen Zweiges'}" `
+      + `abgeleitet (${m.ausdruck || `${a} * Bezugswert + ${b}`}). Der Wert `
+      + 'dieses Zweiges liegt nicht vor; beizubringen ist "bezugswert_pct" — '
+      + `oder der Zweig "${quelle || '?'}" muss selbst erst rechnen.`),
+      bauart: 'bezug_linear', haengt_an_zweig: quelle,
+      fehlende_eingaben: ['bezugswert_pct (Ergebnis des Zweiges '
+        + (quelle || '?') + ')'] };
+  }
+  const w = gerundet(m, a * x + b);
+  return { verfuegbar: true, wert: w, tabellenwert: w, korrekturen: [],
+    bauart: 'bezug_linear', haengt_an_zweig: quelle,
+    rechenweg_formelwerk: `${a} * ${x} (${quelle || 'Bezug'}) `
+      + `${b >= 0 ? '+' : '−'} ${Math.abs(b)} = ${w}` };
+}
+
+/** formelwerk — der Einstieg. Waehlt die Bauart und gibt die Hausform zurueck. */
+function formelwerk(m, e) {
+  const bauart = m.bauart
+    || (m.bezug ? 'bezug_linear'
+      : (m.basiswert != null || m.basiswert_pct != null) ? 'produkt'
+      : (m.koeffizienten && Object.keys(m.koeffizienten).length)
+        ? 'linearkombination' : null);
+  if (bauart === 'linearkombination') return fwLinearkombination(m, e);
+  if (bauart === 'produkt') return fwProdukt(m, e);
+  if (bauart === 'bezug_linear') return fwBezugLinear(m, e);
+  return nichts('formelwerk_bauart_unbekannt',
+    'Der Satz traegt die Form "formelwerk", aber keine erkennbare Bauart. '
+    + 'Gefunden wurden: ' + Object.keys(m).filter((k) => k !== 'form').join(', ')
+    + '. Gefuehrt werden: produkt (Basiswert mal Faktoren), '
+    + 'linearkombination (Koeffizienten) und bezug_linear (a * anderer Zweig + b).');
+}
+
 const AUSWERTER = {
 
 
@@ -769,6 +1754,17 @@ const AUSWERTER = {
   spanne_kategorial: spanneKategorial,   /* v1093-WSPN */
   baender_kategorial: baenderKategorial, /* v1101-WBKAT */
   verzweigt: verzweigt,                 /* v1103-WVERZ */
+  formelwerk,                           /* v1886-WFW */
+  /* v1886-WFW · `regression_log` ist dieselbe BAUART wie Magdeburgs
+     Formelwerk: Koeffizienten auf transformierte Groessen, aussen eine
+     Funktion. Dresden fuehrt sie unter diesem Namen (1 Satz,
+     efh_regression, Stufe A) und war damit genauso stumm wie die acht
+     Formelwerke — `form_unbekannt`, obwohl sein Anwendungsbeispiel im
+     Satz nachgerechnet daneben steht (1,0988).
+
+     Ein ZWEITER Auswerter dafuer waere eine Dublette; Dubletten laufen
+     auseinander. Also derselbe Rechenweg unter beiden Namen. */
+  regression_log: (m, e) => fwLinearkombination(m, e),
 };
 
 /* ── Additive Korrekturen ──────────────────────────────────────────────── */

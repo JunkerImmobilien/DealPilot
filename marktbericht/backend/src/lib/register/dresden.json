@@ -25,6 +25,9 @@
     "ln_restnutzungsdauer": 0.1754,
     "konstante": 3.9573
    },
+   "aussen_funktion": "exp",
+   "aussen_funktion_beleg": "Der Logarithmus steht LINKS: ln(SWF) = ... Der Sachwertfaktor ist e hoch der Summe. Ohne diese Angabe käme 0,09 statt 1,0988 heraus — eine Zahl, die kein Band auffängt.",
+   "rundung_stellen": 4,
    "ergebnis": "SWF = e^ln(SWF)",
    "bestimmtheitsmass": 0.28
   },
@@ -62,6 +65,8 @@
      "bodenrichtwert_eur_qm": 270,
      "rnd_jahre": 40
     },
+    "soll_wert": 1.0988,
+    "soll_faktor": 1.0988,
     "soll": {
      "ln_swf": 0.0942,
      "sachwertfaktor": 1.0988,

@@ -17,6 +17,8 @@
   "zweig": "mfh",
   "formel": {
    "form": "formelwerk",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
    "ausdruck": "Liegenschaftszinssatz = 4,37 % * Lagefaktor * Altersfaktor * Erstbezugsfaktor * Stadtteilfaktor * Aktualisierungsfaktor",
    "basiswert_pct": 4.37,
    "faktoren": {
@@ -220,6 +222,8 @@
   "zweig": "buero",
   "formel": {
    "form": "formelwerk",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
    "ausdruck": "Liegenschaftszinssatz = 3,10 [%] * Lagefaktor * Baujahrsfaktor * Gebaeudeartfaktor * Aktualisierungsfaktor",
    "basiswert_pct": 3.1,
    "faktoren": {
@@ -301,6 +305,8 @@
   "zweig": "produktion_logistik",
   "formel": {
    "form": "formelwerk",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
    "ausdruck": "Liegenschaftszinssatz = 4,11 [%] * Lagefaktor * Miethoehenfaktor * Erstbezugsfaktor * Aktualisierungsfaktor",
    "basiswert_pct": 4.11,
    "faktoren": {
@@ -396,6 +402,8 @@
   "zweig": "efh",
   "formel": {
    "form": "formelwerk",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
    "ausdruck": "Liegenschaftszinssatz = 0,85 * LIZI(MFH) - 0,53",
    "a": 0.85,
    "b": -0.53,
@@ -446,6 +454,8 @@
   "zweig": "etw",
   "formel": {
    "form": "formelwerk",
+   "liefert": "prozent",
+   "rundung_stellen": 2,
    "ausdruck": "Liegenschaftszinssatz = 1,16 * LIZI(MFH) - 2,30",
    "a": 1.16,
    "b": -2.3,
