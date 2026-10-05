@@ -265,6 +265,19 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N20 · Aktenmappe auf dem Handy unbrauchbar (05.10.2026) — erledigt v1879/v1879a, auf Prod
+
+Feste Schiene 187 px über 146 px Polster deckte Menü-Knopf und Kopfzeile ab,
+Score-Leiste 808 px breit. Jetzt im Fluss, kompakt. **Offen:** die anderen
+Layouts (Kanzlei v2b, v3–v5) auf 390 px mit derselben Messkabine durchgehen;
+Marcels Blick aufs echte iPhone.
+
+### N21 · Forschungszulage: Stundennachweise (05.10.2026) — angelegt, Prüfung durch Marcel offen
+
+`Forschungszulage/Stundennachweise/` + Generator. Marcel: Blätter prüfen,
+Januar–April von Hand, Tage ohne Commit nachtragen, 40-h-Wochen kürzen,
+unterschreiben; ab jetzt täglich fortschreiben.
+
 ### N19 · Prod-Rollout v1846b → v1878 (05.10.2026) — erledigt
 
 Fast-Forward über 107 Commits, Migration 084, beide Backends neu gebaut, NRW-Register

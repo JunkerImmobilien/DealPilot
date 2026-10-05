@@ -31390,3 +31390,54 @@ Anmeldung auf Prod — das bleibt Marcels Blick.
 
 **Rest.** Prod v1878 (`8444535`); Staging v1878. `main` und `staging` sind
 gleich.
+
+### (40) 05.10.2026 — v1879/v1879a: Aktenmappe auf dem Handy, Stundennachweise für die Forschungszulage
+
+**Was.** Marcel (Bild `Dateien/Dealpilot · Junker Immobilien.png`, iPhone, Prod):
+„ich habe die app mit aktenmappe ausgewählt und das design und die auflösung
+auf meinem Handy passte garnicht. nichts erreichbar alles falsch skaliert. Menü
+ging nicht … wir gehen jetzt live und die app geht auf dem Handy nicht.“
+
+**Gemessen (Messkabine 390 px, `dp_layout=v1b`).** Unter 900 px macht
+layout-varianten.css (v1658) die linke Schiene zum FESTEN Kopfstreifen und
+gibt `.app-wrap` 146 px Polster. Die Schiene war aber 187 px hoch (Marke 78,
+Portfolio-Knopf 44, Score-Block 86), weil der Score-Block aus `#hdr-badges`
+mit in die Schiene wandert. Folge: die ersten 41 px der Kopfzeile — und damit
+`#hdr-mobile-menu` — lagen unter der Schiene (`elementsFromPoint` über dem
+Knopf: `.si .sc-main .scores #hdr-badges`), die Score-Leiste war 808 px breit.
+Auf 820 px dasselbe mit 162 gegen 146. Das Menü ging also nicht, weil der
+Knopf nicht erreichbar war, nicht weil er kaputt war.
+
+**Gebaut (`a8e9a06` v1879, `af913bb` v1879a).**
+- layout-varianten.js `baueSchienen`: unter 900 px und Stellung `links` steht
+  die Schiene IM FLUSS als erstes Kind der `.main-col` (`data-dpl-oben-im-fluss`)
+  — sie scrollt mit weg, Kopfzeile und Reiter bleiben kleben. Zweiter
+  `matchMedia`-Beobachter auf 900 px baut beim Überschreiten neu.
+- layout-varianten.css: Schiene statisch, `.app-wrap` ohne Polster (`:has`),
+  Score-Leiste umbrechend; unter 700 px nur Ring, Pille und Satz, die
+  Kennzahl-Pillen aus. **Die Pillen-Regel brauchte `#hdr-badges` im eigenen
+  Selektor**: `… .dpl-teil-score #hdr-badges .sc-pill{display:grid}` trägt eine
+  ID und schlug jede Klassenkette (Kaskaden-Walker, nicht geraten).
+
+**Nachweis (Staging, Messkabine).** 390 px: Schiene statisch 189 px, Kopfzeile
+bei 189, Reiter bei 297, `elementFromPoint` über dem Menü-Knopf =
+`hdr-mobile-menu`, Klick öffnet die Seitenleiste (x = 0), nach 400 px Scroll
+klebt die Kopfzeile bei 0 und die Schiene ist bei −400, keine Pille sichtbar,
+`scrollWidth` 390. Portfolio-Knopf öffnet die Objektliste (19 Karten, oberstes
+Element `sb-add-new` trifft). 820 px: Schiene statisch 195, Kopfzeile darunter.
+Bild `screenshot-1791200271840-81.png`. **Auf Prod gezogen** (nur Frontend,
+`git pull`), `layout-varianten.css?v=v1879a` wird mit dem neuen Marker
+ausgeliefert.
+
+**Forschungszulage.** Neuer Ordner `Forschungszulage/Stundennachweise/`
+(README mit Vorhaben 827-757-583/2026-1/1, Laufzeit 01.01.2026–31.12.2028,
+Eigenleistung 900/980/1.470 h, AP-Liste; Vorlagen Januar–April; Blätter
+Mai–Oktober aus den Commit-Zeitstempeln abgeleitet, je Tag Stunden, FuE-Anteil
+per Stichwortregel, Tätigkeit; `uebersicht.csv`) und
+`tools/stundennachweis-generator.mjs` (überschreibt unterschriebene Blätter
+nicht). **Rekonstruktion, kein Beleg** — Marcel prüft, trägt Tage ohne Commit
+nach und unterschreibt. September steht bei 242 h gesamt (27 Tage), über den
+40 h/Woche der Eigenleistung — zu kürzen.
+
+**Rest.** Prod v1879a; Staging v1879a. Drei Erntelinien (HE-Zins, NW-Faktoren,
+ST/TH/SH/NI-Zins) laufen als Prüfläufe; Saat und Journal folgen.
