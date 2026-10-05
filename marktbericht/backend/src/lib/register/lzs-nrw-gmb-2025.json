@@ -1,0 +1,50 @@
+[
+  {
+    "land_code": "NW",
+    "ags": "05770",
+    "ebene": "kreis",
+    "gebiet_name": "Minden-Lübbecke, Kreis",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke",
+    "gaa_kennz": "31700",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "mfh",
+    "formel": { "form": "konstante", "wert": 2.9, "einheit": "prozent" },
+    "korrekturen": null,
+    "modellansaetze": {
+      "gesamtnutzungsdauer": 80,
+      "gnd_jahre": 80,
+      "restnutzungsdauer_mittel": 39,
+      "bewirtschaftungskosten_quote": 28,
+      "marktmiete_eur_qm": 6.01,
+      "kaufpreis_eur_qm": 1364,
+      "objektgroesse_qm": 310,
+      "bezug": "Grundstücksmarktbericht 2025 des Kreises Minden-Lübbecke, Abschnitt 5.2.2 (Rohertrag aus der Mietpreisübersicht Abschnitt 9 des Vorjahres, GND 80 Jahre) / ImmoWertV Anlage 3"
+    },
+    "geltungsbereich": {
+      "objektart_bez": "Drei- und Mehrfamilienhäuser (bis 15 Wohneinheiten)",
+      "region": "Kreis Minden-Lübbecke ohne Stadt Minden",
+      "ausgewertete_geschaeftsjahre": 3,
+      "kauffaelle_zeitraum": "2022-2024"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veroeffentlichung",
+        "fundstelle": "Grundstücksmarktbericht 2025 des Kreises Minden-Lübbecke, Abschnitt 5.2.2 Liegenschaftszinssätze, Seite 64, Tabelle Drei- und Mehrfamilienhäuser (bis 15 Wohneinheiten): LZ 2,9 % ± 1,12, N 33, Ø Wfl. 310 m², Ø ber. KP 1.364 EUR/m², Ø Miete 6,01 EUR/m², BWK 28 %, RND 39 Jahre",
+        "wert": 2.9,
+        "standardabweichung": 1.12,
+        "fallzahl": 33
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "amtlich, gutachterausschussscharf - aus dem Grundstücksmarktbericht, nicht in der GMD-CSV des Landes (dort fuehrt 05770 nur we_s, we_v, zfh, efh)",
+    "fallzahl": 33,
+    "streuung": 1.12,
+    "stichtag": "2024-12-31",
+    "berichtsjahr": 2025,
+    "modellversion": "GMB-MiLu-2025",
+    "quelle_url": "https://www.gars.nrw/images/user/GA_Minden-Luebbecke/pdf/MiLu_GMB25.pdf",
+    "quelle_parser": "v1866-hand (pdftotext, Seite 64, am 05.10.2026 gelesen)",
+    "quellenvermerk": "Grundstücksmarktbericht 2025 des Kreises Minden-Lübbecke, Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke, dl-de/zero-2-0",
+    "lizenz": "dl-de/zero-2-0"
+  }
+]
