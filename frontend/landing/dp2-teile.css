@@ -265,7 +265,7 @@
 
 /* ── Vertrauensband direkt unter dem Laufband ─────────────────────────── */
 .tband{background:var(--ob1);border-bottom:1px solid var(--line)}
-.tband-in{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.tband-in{display:grid;grid-template-columns:repeat(5,1fr);gap:0}  /* v1873: fuenf Eintraege (FuE-Siegel) */
 .tband-in > div{display:flex;gap:13px;align-items:center;padding:20px 24px;
   border-right:1px solid var(--line)}
 .tband-in > div:first-child{padding-left:0}
@@ -273,6 +273,8 @@
 .tband .ico{width:21px;height:21px;color:var(--gdh);flex:none}
 .tband b{display:block;font:600 13.6px/1.3 var(--body);color:#fff}
 .tband span{display:block;font-size:11.8px;color:var(--ddk);margin-top:2px}
+/* v1873 - FuE-Siegel 2026 (BSFZ): das Bild ist farbig und rund, deshalb kein Gold-Icon, sondern das Siegel selbst in 52 px */
+.tband-siegel img{width:52px;height:52px;flex:none;border-radius:50%;background:#fff;padding:2px;box-shadow:0 0 0 1px var(--line)}
 
 /* ── Was DealPilot macht: ein Satz, vier Punkte ───────────────────────── */
 .satz{max-width:940px;margin:0 auto 40px;text-align:center}
@@ -308,6 +310,7 @@
 
 @media(max-width:1080px){
   .tband-in,.vier{grid-template-columns:repeat(2,1fr)}
+  .tband-siegel{grid-column:1 / -1;border-right:0}  /* v1873: fuenfter Eintrag allein in der letzten Zeile */
   .bpslide .bp{flex:0 0 calc(50% - 8px)}
 }
 @media(max-width:700px){

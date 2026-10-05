@@ -2070,7 +2070,11 @@ function _bmfVorwaermen(){
   try {
     if (!_hasBmfAdvanced()) return;
     var key = window._currentObjKey; if (!key || _bmfVorgewaermt[key]) return;
-    var ov = $('bmfOverlay'); if (ov && ov.getBoundingClientRect().height > 0) return;   /* offen → der Nutzer rechnet selbst */
+    /* document.getElementById, nicht $(): der v292-Wrapper liefert für ein fehlendes
+       Element ein Platzhalter-Objekt — getBoundingClientRect warf, der Vorlauf
+       starb still im try. Gemessen am 05.10.2026: Vorlauf lief nie. */
+    var ov = document.getElementById('bmfOverlay');
+    if (ov && ov.getBoundingClientRect && ov.getBoundingClientRect().height > 0) return;   /* offen → der Nutzer rechnet selbst */
     _ensureModalLoaded(function(ok){
       if (!ok) return;
       try { if (typeof syncFromTabInvest === 'function') syncFromTabInvest(); } catch(e) {}
