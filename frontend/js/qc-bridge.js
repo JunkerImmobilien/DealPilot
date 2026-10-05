@@ -431,7 +431,7 @@
       // uebrige items dieses Providers (Lage/Rendite/Konfidenz ...)
       items.filter(function(it){ return it.source===p && kindOf(it.target)===''; }).forEach(function(it){
         h+='<label class="qcpm-item'+(dp?' dpband':'')+'"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked><span class="l"><span class="nm">'+_qcpmEsc(it.label||'')+'</span><span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span><span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>'; });
-      h+='</div>'; }); return h||'<p class="qcpm-empty">Keine AVM-Daten.</p>'; }
+      h+='</div>'; }); return h||'<p class="qcpm-empty">Keine Markteinsch\u00e4tzung im QuickBoarding \u2014 Marktwert und Miete holst du im Objekt \u00fcber \u201eAbrufen\u201c.</p>'; }
 
     function srcHtml(){ var qh=''; /* v893k-overview */
       if(qcSet&&qcSet.length){ qh='<div class="qcpm-sec"><div class="qcpm-sec-h"><span class="qcpm-logo qcpm-l-x">\u2713</span><span class="qcpm-sec-t">Bereits im Quickboarding gesetzt</span></div>';
@@ -449,12 +449,13 @@
     var ov=document.createElement('div'); ov.id='qcpm-ov';
     ov.innerHTML='<div class="qcpm-box">'
       +'<div class="qcpm-head"><div class="qcpm-hbar"><span class="qcpm-brand">Deal<b>Pilot</b></span><button class="qcpm-x" id="qcpm-x">\u2715</button></div>'
-      +'<div class="qcpm-band"><h3>Welche Daten \u00fcbernehmen?</h3><p>W\u00e4hle Quelle &amp; Spanne \u2014 Marktwert/Marktmiete richten sich danach. Lage &amp; Wertentwicklung liefert nur DealPilot.</p></div>'
+      /* v1878 · Marcel: "nur noch die notwendigen Sachen" — es gibt nur noch DealPilot, keine Quelle zu waehlen */
+      +'<div class="qcpm-band"><h3>Diese Daten werden \u00fcbernommen</h3><p>Aus dem QuickBoarding ins Objekt. Liegt eine DealPilot-Markteinsch\u00e4tzung vor, w\u00e4hlst du hier die Spanne.</p></div>'
       +'<div class="qcpm-tabs"><button class="qcpm-tab active" data-tab="avm">\u00dcbernahme</button><button class="qcpm-tab" data-tab="src">Ausgelesene Daten <span class="cnt">'+(srcItems.length+((qcSet&&qcSet.length)||0))+'</span></button></div></div>'
       +'<div class="qcpm-body">'
       +'<div class="qcpm-pane active" data-pane="avm">'
-      +'<div class="qcpm-ctrls"><span class="qcpm-cl">Quelle</span><div class="qcpm-srcs">'+srcChips+'</div>'
-      +'<span class="qcpm-cl">Spanne</span><div class="qcpm-seg" id="qcpm-span"><button data-span="low">Unten</button><button data-span="mid" class="on">\u00d8</button><button data-span="high">Oben</button></div></div>'
+      +(provs.length?'<div class="qcpm-ctrls">'
+      +'<span class="qcpm-cl">Spanne</span><div class="qcpm-seg" id="qcpm-span"><button data-span="low">Unten</button><button data-span="mid" class="on">\u00d8</button><button data-span="high">Oben</button></div></div>':'')
       +'<label class="qcpm-all"><input type="checkbox" id="qcpm-all" checked> Alle \u00fcbernehmen</label>'
       +'<div id="qcpm-secs">'+secHtml()+'</div></div>'
       +'<div class="qcpm-pane" data-pane="src">'+srcHtml()+'</div>'
@@ -467,8 +468,7 @@
       [].forEach.call(ov.querySelectorAll('span.v[data-k]'),function(el){ var p=el.getAttribute('data-p'), k=el.getAttribute('data-k'); el.textContent=fmt(val(p,k), k==='mw'?'\u20ac':'\u20ac/Mo'); });
       [].forEach.call(ov.querySelectorAll('.qcpm-sec[data-prov]'),function(sec){ sec.classList.toggle('winner', state.src!=='konsens' && sec.getAttribute('data-prov')===state.src); });
       var lbl={low:'Unten',mid:'\u00d8',high:'Oben'}[state.span];
-      var sn=(state.src==='konsens')?'Konsens (\u00d8)':state.src;
-      var fh=ov.querySelector('#qcpm-fh'); if(fh) fh.textContent=sn+' \u00b7 '+lbl;
+      var fh=ov.querySelector('#qcpm-fh'); if(fh) fh.textContent=provs.length?('Spanne '+lbl):'';   /* v1878: keine Quelle mehr */
     }
     recompute();
 

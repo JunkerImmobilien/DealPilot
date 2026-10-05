@@ -70,25 +70,28 @@
     var restbuch = ahk;
     var inLinearPhase = false;
     var wechselJahr = null;
+    /* v1878 · Steuerfehler (d): der Wechsel rechnete mit linearFallback × URSPRUENGLICHER AHK.
+       § 7 Abs. 5a S. 8 EStG: nach dem Wechsel bemisst sich die AfA vom RESTWERT und dem nach
+       Abs. 4 unter Beruecksichtigung der RESTNUTZUNGSDAUER massgebenden Satz — also Restwert ÷
+       Restnutzungsdauer. GND aus dem linearen Satz (3 % → 33,3 Jahre), Rest-ND = GND − Jahre.
+       Beispiel AHK 400.000: alt Wechsel Jahr 11 auf 12.000/J, neu Jahr 14 auf 10.264/J. */
+    var gndJahre = 100 / linearFallback;
+    var linFix = 0;
 
     for (var i = 0; i < jahre; i++) {
       var degBetrag = restbuch * rateDeg;
-      var linBetrag = ahk * (linearFallback / 100);
+      var restND = Math.max(1, gndJahre - i);
+      var linBetrag = restbuch / restND;
 
-      // Wechsel-Logik: wenn linearer Betrag (auf URSPRÜNGLICHE AHK!) höher
-      // als degressiver auf Restbuch → wechseln. Klassische Steuerregel.
-      // Alternativ: linear auf Restbuch über Restlaufzeit — aber das ist
-      // bei Wohngebäuden untypisch.
       var betrag;
-      if (wechsel && !inLinearPhase && linBetrag > degBetrag) {
+      if (wechsel && !inLinearPhase && linBetrag > degBetrag && restbuch > 0) {
         inLinearPhase = true;
         wechselJahr = i + 1;
+        linFix = linBetrag;          /* ab hier linear: fester Betrag bis zum Ende der Rest-ND */
       }
 
       if (inLinearPhase) {
-        // Linear weiter ab hier — Restbuch / Restjahre wäre korrekter
-        // Wir nehmen den linearen Standardbetrag
-        betrag = Math.min(linBetrag, restbuch);
+        betrag = Math.min(linFix, restbuch);
       } else {
         betrag = Math.min(degBetrag, restbuch);
       }

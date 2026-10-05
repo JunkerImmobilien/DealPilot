@@ -1160,7 +1160,13 @@ function _calcImmediate(){
   // V113: Küche läuft per UI-Sync ins Möblierung-Feld → afa_kueche bleibt 0
   var afa_geb_basis;
   var afa_kueche = 0;
-  if (window.State && State._ahk && State._ahk.kuecheActive && State._ahk.kuecheVal > 0) {
+  /* v1878 · Steuerfehler (a): ohne aktive Kueche stand hier kp × geb_ant — OHNE die anteiligen
+     Erwerbsnebenkosten. Die gehoeren zu den Anschaffungskosten (§ 255 Abs. 1 HGB), und gebAHK
+     (oben, V292.6.1) fuehrt sie bereits: Gebaeude ohne Kueche + NK × Gebaeudequote. Gemessen an
+     der Parkstr. 9: 423.618 × 2,5 % = 10.590 statt 457.527 × 2,5 % = 11.438 EUR im Jahr. */
+  if (typeof gebAHK === 'number' && isFinite(gebAHK) && gebAHK > 0) {
+    afa_geb_basis = gebAHK;
+  } else if (window.State && State._ahk && State._ahk.kuecheActive && State._ahk.kuecheVal > 0) {
     afa_geb_basis = State._ahk.gebAhk;
   } else {
     afa_geb_basis = kp * (v('geb_ant') / 100);
@@ -1207,6 +1213,14 @@ function _calcImmediate(){
   var afa_geb = afaResult.normal[0] || 0;
   var afa_geb_sonder = afaResult.sonder[0] || 0;
   var afa = afa_geb + afa_kueche + afa_geb_sonder;
+  /* v1878 · Steuerfehler (b): die Cashflow-Projektion rechnete 50 Jahre mit dieser Jahr-1-AfA —
+     § 7b lief ewig statt vier Jahre, die degressive AfA fiel nie. Jetzt je Jahr aus der Reihe
+     (Normal + § 7b, Jahr 1 monatsanteilig), die Kueche zehn Jahre. tax.js las die Reihe schon. */
+  var _afaJahr = function (y) {
+    var s = (window.State && State._afaSeries) || null;
+    var g = (s && s.length) ? ((y - 1) < s.length ? (s[y - 1] || 0) : 0) : (afa_geb + afa_geb_sonder);
+    return g + ((y <= 10) ? afa_kueche : 0);
+  };
 
   // Anzeige
   var anzeige = fE(afa, 2);
@@ -1247,9 +1261,9 @@ function _calcImmediate(){
             if (State._afaSeriesNormal && State._afaSeriesNormal.length > 0) {
               State._afaSeriesNormal[0] = Math.round(State._afaSeriesNormal[0] * _v268_mf);
             }
-            if (State._afaSeriesSonder && State._afaSeriesSonder.length > 0 && State._afaSeriesSonder[0]) {
-              State._afaSeriesSonder[0] = Math.round(State._afaSeriesSonder[0] * _v268_mf);
-            }
+            /* v1878 · Steuerfehler (c): die Sonder-AfA § 7b wurde hier mit gezwoelftelt. § 7 Abs. 1 S. 4
+               gilt der AfA nach Satz 1; § 7b kennt keine Zeitanteiligkeit — im Anschaffungsjahr voll.
+               Kauf 01.10., Basis 400.000: 20.000 statt 5.000. Nur die Normal-AfA bleibt anteilig. */
             if (State._afaSeries && State._afaSeries.length > 0) {
               var _v268_n = (State._afaSeriesNormal && State._afaSeriesNormal[0]) || 0;
               var _v268_s = (State._afaSeriesSonder && State._afaSeriesSonder[0]) || 0;
@@ -2908,7 +2922,7 @@ function _calcImmediate(){
     // Begründung: Vorher griff in der Projektion das Yearly-Total mit potenziell anderen Schuldzinsen
     // (z.B. nach Anschluss-Phase) oder unfertigen cfRows-Daten → produzierte inkonsistente Werte.
     // Nun ist Frontend Cashflow-Vergleich-Heute, Cashflow-Projektion und PDF überall identisch.
-    var taxEffect_y = _mtxYear(cfop_y_operativ - afa, _v268_baseYear + y - 1);
+    var taxEffect_y = _mtxYear(cfop_y_operativ - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878: AfA des Jahres y */
     var cfns_y = cfop_y - taxEffect_y;                     // V63.40: nach Tilgung, BSV & Steuer
     // V63.65: Wertsteigerung ausgehend vom besten Wert-Anker (svw > bankval > kp)
     // V63.83 KOMMENTAR: wert_y zeigt Stand ANFANG Jahr y → Jahr 1 = heute = ^0
@@ -3060,7 +3074,7 @@ function _calcImmediate(){
     if (_v353_anteilig_hit || _v354_d2_active) {
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
-      taxEffect_y     = _mtxYear(cfop_y_operativ - afa, _v268_baseYear + y - 1);
+      taxEffect_y     = _mtxYear(cfop_y_operativ - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878 */
       cfns_y          = cfop_y - taxEffect_y;
       // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
       var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);
