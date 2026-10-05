@@ -31305,4 +31305,10 @@ sauberen Lauf nicht reproduziert.
    Tagen steht im Prüfbericht; Doktrin bleibt: kein Nachbarkreis, kein
    Landesmittel, keine Zahl ohne Beleg im Rechenweg.
 
-**Rest.** Prod v1846b; Staging v1877.
+**Nachtrag v1877a (`b3048ed`).** Die Zimmerzahl aus dem QuickBoarding kam im Reiter
+Objekt nie an: der Snapshot in quick-check.js trug `zimmer`, zurückgeschrieben wurde
+es nicht (wfl, baujahr, ek, d1z, d1t schon). Eine Zeile; Nachweis am zweiten
+Testobjekt „Teststraße 6“: zimmer = 3.
+
+**Rest.** Prod v1846b; Staging v1877a. Zwei Testobjekte (Teststraße 5 und 6) liegen
+im Staging-Portfolio.
