@@ -319,7 +319,7 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                sued-nord.json fuehrt dort auf dem Gemeindeschluessel
                                09162000 schon ezfh und rmh, und eine Kreis-Sperre koennte
                                sie verdecken. */
-                            'lzs-swf-by-2026-sperren.json' /* BY · 748 Sperren */
+                            'lzs-swf-by-2026-sperren.json', 'lzs-by-bw-2026.json', /* v1891: Zinssaetze Baden-Wuerttemberg (Singen, Horb, Wangen, Pfullingen, Bruchsal) */ 'swf-by-bw-2026.json', /* v1891: Sachwertfaktoren Singen, dazu die Sperren mit Bezugsweg */ /* BY · 748 Sperren */
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
