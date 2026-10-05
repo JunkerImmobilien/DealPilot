@@ -6697,7 +6697,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 }
 @media (max-width: 700px){
   /* Auf dem Handy nur Ring, Pille und Satz - die Kennzahl-Pillen stehen im Reiter Bewertung. */
-  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score .sc-pill{ display:none !important; }
-  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score .sc-main{ display:flex !important; }
+  /* v1879a: die Regel `… .dpl-teil-score #hdr-badges .sc-pill{display:grid}` traegt eine ID — ohne #hdr-badges
+     im eigenen Selektor verliert jede Klassenkette (gemessen mit dem Kaskaden-Walker). */
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score #hdr-badges .sc-pill{ display:none !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score #hdr-badges .sc-main{ display:flex !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score #hdr-badges .scores{ justify-content:flex-start !important; }
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score{ padding:2px 0 4px !important; }
 }
