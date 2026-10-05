@@ -6752,69 +6752,229 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout][data-dp-layout] body:not(.qc-standalone-active) #dp-sb-toggle{ display:none !important; }
 }
 
-/* v1883a · Objektkarten-Stile in der Liste (Aktenreiter, Bordkarte, Score-Kante, Datenzeile, Ampel, Kennzahlen, Minimal) sind
-   oben mit `.dpl-schiene :is(#sb-list)` verankert. Auf dem Handy nimmt die Schiene nichts (v1880) - die Liste liegt in
-   aside#sidebar, und das Panel bot sieben Stile an, von denen KEINER wirkte (gemessen 05.10.2026: data-dp-objkarte=kante
-   gesetzt, 0 Treffer). Die 48 Regeln hier sind maschinell erzeugte Kopien mit dem Anker aside#sidebar, nur unter 900 px,
-   damit der Desktop unberuehrt bleibt. Bei Aenderungen an den Originalen diesen Block neu erzeugen (Journal 44). */
+/* ═══ v1885 · DIE AKTENMAPPE AUF DEM HANDY (05.10.2026) ════════════════════════════════════════
+   Erzeugt von tools/schublade-regeln.mjs - NICHT von Hand aendern, sondern das Skript laufen lassen.
+
+   Die Aktenmappe gestaltet ihre Objektliste ueber `.dpl-schiene`. Auf dem Handy nimmt die Schiene seit
+   v1880 nichts mehr, die Liste liegt in `aside#sidebar` - also griff dort KEINE dieser Regeln, und die
+   Liste sah aus wie in der Ansicht "Heute" (Foto, grosse Kacheln, Heute-Kopf). Marcel am 05.10.2026:
+   "das ist irgendeine Mischung aus einer Objektkartei von unserer heutigen Ansicht und dieser
+   Aktenansicht. Also das ist ja mal gar nichts." Hier stehen dieselben Regeln mit dem Anker
+   `aside#sidebar`: 93 fuer die Grundgestaltung, 48 fuer die sieben Objektkarten-Stile
+   (spaeter, damit sie bei Gleichstand gewinnen), dazu die gemessenen Handy-Korrekturen.
+   ════════════════════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card {padding:0 !important; }
-  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {position:absolute !important; top:0 !important; bottom:0 !important; left:0 !important; right:auto !important; width:16px !important; max-width:16px !important; display:flex !important; align-items:center !important; justify-content:center !important; writing-mode:vertical-rl !important; border-radius:5px 0 0 5px !important; border:0 !important; border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important; background:transparent !important; font-size:7.5px !important; letter-spacing:.14em !important; padding:0 !important; }
-  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-top {border-radius:0 5px 5px 0 !important; margin-left:16px !important; }
-  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon {top:auto !important; bottom:4px !important; right:4px !important; border-radius:3px !important; font-size:7.5px !important; border-bottom:1px solid !important; }
-  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-top {border:0 !important; border-left:3px solid var(--wl-c9a84c, #C9A84C) !important; border-radius:0 4px 4px 0 !important; background-color:#17160F !important; }
-  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-top {border-left-color:#3FA56C !important; }
-  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-top {border-left-color:#B8625C !important; }
-  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay {display:none !important; }
-  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-body {padding-right:6px !important; }
-  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {border:0 !important; background:transparent !important; padding:1px 0 1px 8px !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card {padding:0 !important; margin-bottom:1px !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {position:static !important; display:inline-block !important; border:0 !important; background:transparent !important; padding:0 !important; margin:0 !important; font-size:9px !important; /* v1714d: Marcel: "Bei der Datenzeile fehlt die angabe der kompleten id". Die 38 px waren fuer "999" gerechnet - die Nummer heisst aber "2026-999" und wurde abgeschnitten. > Eine feste Breite fuer eine Zeichenkette, deren Laenge man nicht > kennt, schneidet sie irgendwann ab. Hier traegt der Inhalt die > Breite, und nur die Adresse daneben gibt nach. */ width:auto !important; max-width:none !important; flex:0 0 auto !important; padding-right:8px !important; vertical-align:middle !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-top {border:0 !important; border-radius:3px !important; background-color:transparent !important; padding:4px 7px !important; align-items:center !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top {background-color:#1A1815 !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top {background-color:#221F1A !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-address {font-family:var(--dpl-mono, 'JetBrains Mono', monospace) !important; font-size:11px !important; font-weight:400 !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-kp-row {display:none !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon {display:none !important; }
-  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-line1 {display:inline-block !important; width:auto !important; vertical-align:middle !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card {padding:0 !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top {border:0 !important; border-radius:4px !important; background-color:transparent !important; padding:6px 8px 6px 20px !important; position:relative !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top {background-color:#1A1815 !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top {background-color:#221F1A !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top::before {content:'' !important; position:absolute !important; left:7px !important; top:50% !important; transform:translateY(-50%) !important; width:8px !important; height:8px !important; border-radius:50% !important; background:var(--wl-c9a84c, #C9A84C) !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-top::before {background:#3FA56C !important; }
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-top::before {background:#B8625C !important; }
+  html[data-dp-layout] aside#sidebar .sb-card { min-height:0 !important; height:auto !important; margin:0 0 2px !important; padding:5px 8px !important; border-radius:4px !important; background:transparent !important; border:1px solid transparent !important; box-shadow:none !important; display:block !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover { background:#1A1815 !important; border-color:#2A2622 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active { background:#221F1A !important; border-color:#3A352E !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-thumb,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-mini-grid,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-halter,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-arrow,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-score-label { display:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top { display:flex !important; align-items:center !important; gap:7px !important; padding:0 !important; margin:0 !important; min-height:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top-body { min-width:0 !important; flex:1 1 auto !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-address { font-size:12px !important; line-height:1.25 !important; color:#E9E3D6 !important; font-weight:500 !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; margin:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top-line1 { gap:5px !important; margin:0 0 1px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq { font-size:9.5px !important; color:#8C8578 !important; background:none !important; padding:0 !important; border:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-kp-row { margin:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-kp { font-size:10.5px !important; color:#BFB7A9 !important; font-variant-numeric:tabular-nums; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-score-overlay { position:static !important; float:right !important; margin:0 0 0 6px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-mini-score { width:26px !important; height:26px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-mini-score svg { width:26px !important; height:26px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-mini-score-num { font-size:10px !important; }
+  html[data-dp-layout] aside#sidebar .dpl-teil-suche .sb-section-title { padding:4px 8px !important; margin:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-ds2-hint,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-ai-badge { display:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq { color:#8C8578 !important; font-size:9.5px !important; letter-spacing:.04em !important; font-variant-numeric:tabular-nums; }
+  html[data-dp-layout] aside#sidebar .sb-card { border-left-width:2px !important; border-left-style:solid !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-score-top),
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-score-green) { border-left-color:#3FA56C !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-score-gold) { border-left-color:var(--wl-c9a84c, #C9A84C) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-score-red) { border-left-color:#B8625C !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:not(:has(.sbc-mini-score)) { border-left-color:#2A2622 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq.sbc-seq.sbc-seq { color:#8C8578 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.sb-card.sb-card { border-left-width:2px !important; border-left-style:solid !important; }
+  html[data-dp-layout] aside#sidebar .sb-card { position:relative !important;   /* Anker fuer die absoluten Knoepfe */ }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions { position:absolute !important; right:6px !important; top:50% !important; transform:translateY(-50%) !important; display:flex !important; gap:3px !important; opacity:0 !important; pointer-events:none !important; transition:opacity .12s ease !important; z-index:8 !important; background:linear-gradient(90deg, transparent, #1A1815 22%) !important; padding:2px 0 2px 16px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-actions,
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-actions,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-actions,
+  html[data-dp-layout] aside#sidebar .sb-card:focus-within .sbc-actions { opacity:1 !important; pointer-events:auto !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-actions,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-actions { background:linear-gradient(90deg, transparent, #221F1A 22%) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions .sbc-btn { width:20px !important; height:20px !important; min-width:0 !important; min-height:0 !important; padding:0 !important; border-radius:4px !important; display:flex !important; align-items:center !important; justify-content:center !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions .sbc-btn svg { width:12px !important; height:12px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-actions,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-actions { opacity:1 !important; pointer-events:auto !important; }
+  html[data-dp-layout] aside#sidebar .sb-card { position:relative !important; background:transparent !important; border:0 !important; border-radius:0 !important; padding:13px 0 0 0 !important;   /* Platz fuer die Lasche */ margin:0 0 5px 0 !important; min-height:0 !important; height:auto !important; overflow:visible !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover,
+  html[data-dp-layout] aside#sidebar .sb-card.active,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active { background:transparent !important; border-color:transparent !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq { position:absolute !important; top:0 !important; left:0 !important; z-index:3 !important; display:inline-block !important; width:auto !important; min-width:0 !important; padding:2px 8px 2px 7px !important; margin:0 !important; background:var(--wl-c9a84c, #C9A84C) !important; color:#0E0D0B !important; font:700 8px/1.35 var(--dpl-mono, 'JetBrains Mono', monospace) !important; letter-spacing:.1em !important; border-radius:3px 3px 0 0 !important; white-space:nowrap !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-seq { background:var(--wl-e8cc7a, #E8CC7A) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top { display:flex !important; align-items:center !important; gap:8px !important; padding:7px 9px !important; margin:0 !important; min-height:0 !important; background:var(--dpl-flaeche2, #15140F) !important; border:1px solid var(--dpl-linie, #2A2622) !important; border-radius:0 5px 5px 5px !important; transition:border-color .12s ease, background .12s ease !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-top { border-color:var(--wl-b8932f, #b8932f) !important; background:#1A1815 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-top { border-color:var(--wl-c9a84c, #C9A84C) !important; background:#221F1A !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top-body { flex:1 1 auto !important; min-width:0 !important; display:block !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-address { font:600 12px/1.3 'Inter', sans-serif !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; margin:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-kp-row { display:block !important; margin:2px 0 0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-kp { font:600 10.5px/1 var(--dpl-mono, 'JetBrains Mono', monospace) !important; color:var(--dpl-tinte-leise, #B5AE9F) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top-line1 { display:block !important; min-height:0 !important; margin:0 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top-line1 > *:not(.sbc-seq) { display:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-score-overlay { position:absolute !important; right:9px !important; top:auto !important; bottom:0 !important; height:calc(100% - 13px) !important; display:flex !important; align-items:center !important; z-index:2 !important; pointer-events:none !important;   /* der Klick gehoert der Karte */ }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-score-label { display:none !important;          /* die Stufe steht im Titel */ }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top-body { padding-right:30px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions { top:auto !important; bottom:0 !important; height:calc(100% - 13px) !important; transform:none !important; align-items:center !important; right:8px !important; padding:0 0 0 18px !important; background:linear-gradient(90deg, transparent, #15140F 24%) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-actions { background:linear-gradient(90deg, transparent, #1A1815 24%) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-actions,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-actions { background:linear-gradient(90deg, transparent, #221F1A 24%) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-score-overlay,
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-score-overlay,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-score-overlay { opacity:0 !important; transition:opacity .12s ease !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq:empty { display:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-seq:empty) .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card:not(:has(.sbc-seq)) .sbc-top { border-radius:5px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-won-ribbon,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon { position:absolute !important; top:0 !important; bottom:auto !important; left:auto !important; z-index:3 !important; width:auto !important; min-width:0 !important; max-width:none !important; padding:2px 7px !important; margin:0 !important; font:700 7.5px/1.35 var(--dpl-mono, 'JetBrains Mono', monospace) !important; letter-spacing:.1em !important; border-radius:3px 3px 0 0 !important; white-space:nowrap !important; display:inline-flex !important; align-items:center !important; gap:3px !important; border:0 !important; box-shadow:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-won-ribbon { right:0 !important; background:#3FA56C !important; color:#06170D !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon { right:0 !important; background:var(--wl-e8cc7a, #E8CC7A) !important; color:#0E0D0B !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon { right:64px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-won-ribbon svg,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon svg { width:8px !important; height:8px !important; flex:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq { max-width:calc(100% - 132px) !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top { position:static !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top { background-color:#17160F !important; border-style:solid !important; border-width:1px !important; border-color:#332E26 !important; border-top-color:#332E26 !important; border-right-color:#332E26 !important; border-bottom-color:#332E26 !important; border-left-color:#332E26 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-top { background-color:#1E1B15 !important; border-color:var(--wl-b8932f, #b8932f) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-top { background-color:#26221A !important; border-color:var(--wl-c9a84c, #C9A84C) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-score-overlay,
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-score-overlay,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-score-overlay { opacity:1 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions { right:42px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-won-ribbon { display:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon { position:absolute !important; top:0 !important; bottom:auto !important; z-index:3 !important; display:inline-flex !important; align-items:center !important; gap:3px !important; width:auto !important; min-width:0 !important; max-width:none !important; padding:2px 8px !important; margin:0 !important; background:var(--wl-c9a84c, #C9A84C) !important; color:#0E0D0B !important; font:700 9.5px/1.4 var(--dpl-mono, 'JetBrains Mono', monospace) !important; letter-spacing:.08em !important; border:0 !important; box-shadow:none !important; border-radius:3px 3px 0 0 !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq { left:0 !important; right:auto !important; max-width:calc(100% - 92px) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon { right:0 !important; left:auto !important; max-width:88px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-investor-ribbon,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-investor-ribbon { background:var(--wl-e8cc7a, #E8CC7A) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon svg { width:9px !important; height:9px !important; flex:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-top { border-color:var(--wl-8a7332, #8a7332) !important; border-top-color:var(--wl-8a7332, #8a7332) !important; border-right-color:var(--wl-8a7332, #8a7332) !important; border-bottom-color:var(--wl-8a7332, #8a7332) !important; border-left-color:var(--wl-8a7332, #8a7332) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won .sbc-top { border-color:#3FA56C !important; border-top-color:#3FA56C !important; border-right-color:#3FA56C !important; border-bottom-color:#3FA56C !important; border-left-color:#3FA56C !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost .sbc-top { border-color:#B8625C !important; border-top-color:#B8625C !important; border-right-color:#B8625C !important; border-bottom-color:#B8625C !important; border-left-color:#B8625C !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won .sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won .sbc-investor-ribbon { background:#3FA56C !important; color:#04140A !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost .sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost .sbc-investor-ribbon { background:#B8625C !important; color:#190706 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-top { border-color:var(--wl-c9a84c, #C9A84C) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won:hover .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won.active .sbc-top { border-color:#5FC98A !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost:hover .sbc-top,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost.active .sbc-top { border-color:#D8564C !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon.sbc-investor-ribbon { background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent) !important; color:var(--wl-e2c97e, #E2C97E) !important; border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent) !important; border-bottom:0 !important; font-weight:700 !important; padding:2px 8px 3px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq.sbc-seq *,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon.sbc-investor-ribbon * { color:inherit !important; stroke:currentColor !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won .sbc-investor-ribbon.sbc-investor-ribbon { background:rgba(63,165,108,.17) !important; color:#6FD79A !important; border-color:rgba(63,165,108,.5) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost .sbc-investor-ribbon.sbc-investor-ribbon { background:rgba(184,98,92,.17) !important; color:#E08C86 !important; border-color:rgba(184,98,92,.5) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.active .sbc-investor-ribbon.sbc-investor-ribbon,
+  html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-investor-ribbon.sbc-investor-ribbon { background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent) !important; color:var(--wl-e8cc7a, #E8CC7A) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won.active .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-won.active .sbc-investor-ribbon.sbc-investor-ribbon { background:rgba(63,165,108,.28) !important; color:#8FE7B4 !important; }
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost.active .sbc-seq.sbc-seq,
+  html[data-dp-layout] aside#sidebar .sb-card.deal-lost.active .sbc-investor-ribbon.sbc-investor-ribbon { background:rgba(184,98,92,.28) !important; color:#F0A9A4 !important; }
+  html[data-dp-layout] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { color:var(--wl-e2c97e, #E2C97E) !important; }
+  html[data-dp-layout] aside#sidebar :is(#sb-list) .sb-card .sbc-address { color:#F2ECDF !important; }
+  html[data-dp-layout] aside#sidebar :is(#sb-list) .sb-card .sbc-kp { color:var(--wl-cdaf5a, #CDAF5A) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card:has(.sbc-won-ribbon) .sbc-investor-ribbon { right:0 !important; }
+  html[data-dp-objkarte] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { display:none !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-investor-ribbon,
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-seq { font-size:11px !important; }
+
+  /* ── die sieben Objektkarten-Stile (Aktenreiter, Bordkarte, Score-Kante, Datenzeile, Ampel,
+     Kennzahlen, Minimal) ─────────────────────────────────────────────────────────────────── */
+  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; }
+  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { position:absolute !important; top:0 !important; bottom:0 !important; left:0 !important; right:auto !important; width:16px !important; max-width:16px !important; display:flex !important; align-items:center !important; justify-content:center !important; writing-mode:vertical-rl !important; border-radius:5px 0 0 5px !important; border:0 !important; border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important; background:transparent !important; font-size:7.5px !important; letter-spacing:.14em !important; padding:0 !important; }
+  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border-radius:0 5px 5px 0 !important; margin-left:16px !important; }
+  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { top:auto !important; bottom:4px !important; right:4px !important; border-radius:3px !important; font-size:7.5px !important; border-bottom:1px solid !important; }
+  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-left:3px solid var(--wl-c9a84c, #C9A84C) !important; border-radius:0 4px 4px 0 !important; background-color:#17160F !important; }
+  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-top { border-left-color:#3FA56C !important; }
+  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-top { border-left-color:#B8625C !important; }
+  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay { display:none !important; }
+  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-body { padding-right:6px !important; }
+  html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { border:0 !important; background:transparent !important; padding:1px 0 1px 8px !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; margin-bottom:1px !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { position:static !important; display:inline-block !important; border:0 !important; background:transparent !important; padding:0 !important; margin:0 !important; font-size:9px !important; /* v1714d: Marcel: "Bei der Datenzeile fehlt die angabe der kompleten id". Die 38 px waren fuer "999" gerechnet - die Nummer heisst aber "2026-999" und wurde abgeschnitten. > Eine feste Breite fuer eine Zeichenkette, deren Laenge man nicht > kennt, schneidet sie irgendwann ab. Hier traegt der Inhalt die > Breite, und nur die Adresse daneben gibt nach. */ width:auto !important; max-width:none !important; flex:0 0 auto !important; padding-right:8px !important; vertical-align:middle !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-radius:3px !important; background-color:transparent !important; padding:4px 7px !important; align-items:center !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top { background-color:#1A1815 !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top { background-color:#221F1A !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-address { font-family:var(--dpl-mono, 'JetBrains Mono', monospace) !important; font-size:11px !important; font-weight:400 !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-kp-row { display:none !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { display:none !important; }
+  html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-line1 { display:inline-block !important; width:auto !important; vertical-align:middle !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-radius:4px !important; background-color:transparent !important; padding:6px 8px 6px 20px !important; position:relative !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top { background-color:#1A1815 !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top { background-color:#221F1A !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top::before { content:'' !important; position:absolute !important; left:7px !important; top:50% !important; transform:translateY(-50%) !important; width:8px !important; height:8px !important; border-radius:50% !important; background:var(--wl-c9a84c, #C9A84C) !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-top::before { background:#3FA56C !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-top::before { background:#B8625C !important; }
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq,
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon,
-  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-kp-row {display:none !important; }
-  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-mini-grid {display:flex !important; gap:7px !important; padding:0 9px 7px !important; margin:-1px 0 0 !important; border:1px solid var(--wl-8a7332, #8a7332) !important; border-top:0 !important; border-radius:0 0 5px 5px !important; background-color:#17160F !important; }
-  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-mini-grid {border-color:#3FA56C !important; }
-  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-mini-grid {border-color:#B8625C !important; }
-  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbcm {flex:1 1 0 !important; min-width:0 !important; font-size:9px !important; display:block !important; }
-  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-top {border-radius:0 5px 0 0 !important; border-bottom:0 !important; }
-  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card {padding:0 !important; }
-  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-top {border:0 !important; border-radius:4px !important; background-color:transparent !important; padding:8px 9px !important; }
-  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top {background-color:#1A1815 !important; }
-  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top {background-color:#221F1A !important; }
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-kp-row { display:none !important; }
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-mini-grid { display:flex !important; gap:7px !important; padding:0 9px 7px !important; margin:-1px 0 0 !important; border:1px solid var(--wl-8a7332, #8a7332) !important; border-top:0 !important; border-radius:0 0 5px 5px !important; background-color:#17160F !important; }
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-mini-grid { border-color:#3FA56C !important; }
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-mini-grid { border-color:#B8625C !important; }
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbcm { flex:1 1 0 !important; min-width:0 !important; font-size:9px !important; display:block !important; }
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border-radius:0 5px 0 0 !important; border-bottom:0 !important; }
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; }
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-radius:4px !important; background-color:transparent !important; padding:8px 9px !important; }
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top { background-color:#1A1815 !important; }
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top { background-color:#221F1A !important; }
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq,
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon,
-  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-kp-row {display:none !important; }
-  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-address {font-weight:500 !important; }
-  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {font-size:7.5px !important; letter-spacing:.12em !important; }
-  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {font-size:0 !important; }
-  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq::after {content:'IN ARBEIT' !important; font-size:9px !important; letter-spacing:.1em !important; }
-  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-seq::after {content:'GEWONNEN' !important; }
-  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-seq::after {content:'VERLOREN' !important; }
-  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay {left:9px !important; right:auto !important; }
-  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-mini-score {border:1px solid var(--wl-3a352e, #3A352E) !important; border-top-color:currentColor !important; border-radius:50% !important; background:#0B0A08 !important; }
-  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-body {padding-left:32px !important; padding-right:6px !important; }
-  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {left:auto !important; right:0 !important; border-radius:3px 3px 0 0 !important; }
-  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon {right:auto !important; left:0 !important; }
-}
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-kp-row { display:none !important; }
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-address { font-weight:500 !important; }
+  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { font-size:7.5px !important; letter-spacing:.12em !important; }
+  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { font-size:0 !important; }
+  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq::after { content:'IN ARBEIT' !important; font-size:9px !important; letter-spacing:.1em !important; }
+  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card.deal-won .sbc-seq::after { content:'GEWONNEN' !important; }
+  html[data-dp-objkarte="status"] aside#sidebar :is(#sb-list) .sb-card.deal-lost .sbc-seq::after { content:'VERLOREN' !important; }
+  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay { left:9px !important; right:auto !important; }
+  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-mini-score { border:1px solid var(--wl-3a352e, #3A352E) !important; border-top-color:currentColor !important; border-radius:50% !important; background:#0B0A08 !important; }
+  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-body { padding-left:32px !important; padding-right:6px !important; }
+  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { left:auto !important; right:0 !important; border-radius:3px 3px 0 0 !important; }
+  html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { right:auto !important; left:0 !important; }
 
-/* v1883b · Bordkarte in der Schublade: die geklonte Regel setzt das Investor-Band wie in der Schiene unten rechts
-   (bottom:4px) - dort liegt auf dem Handy die Kachelzeile (gemessen 526-546 ueber 472-550). In der Schublade bleibt das
-   Band oben mittig, wie bei den anderen Stilen. */
-@media (max-width: 900px) {
-  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { top: -9px !important; bottom: auto !important; right: auto !important; left: 50% !important; transform: translateX(-50%) !important; }
+  /* (1) Der Kopf der Ansicht "Heute" gehoert nicht in die Aktenmappe: das gerahmte Logo (303 x 78) steht
+         doppelt, die Marke traegt schon die Schiene daruber (78 x 78), und die Knopfzeile Quick-Check /
+         Marktbericht ist in der Aktenmappe der Aktionsblock. Beides weg - die Liste beginnt oben. */
+  html[data-dp-layout] aside#sidebar .sb-header,
+  html[data-dp-layout] aside#sidebar .sb-neu-row { display: none !important; }
+
+  /* (2) Die Suchzeile: das Eingabefeld ist 44 px hoch (iOS-Zoomschutz erzwingt 16 px Schrift und 40 px
+         Hoehe), seine Umrahmung .sb-search-box aber 30 - das Feld stand sichtbar ausserhalb seines Rahmens
+         (Marcel: "das Suchfeld ist viel groesser, dann ist da gar keine Umrahmung drum"). Die Zeile wird
+         zweizeilig: Titel und Werkzeuge oben, die Suche darunter ueber die volle Breite. */
+  html[data-dp-layout] aside#sidebar .sb-section-title { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: center !important; row-gap: 8px !important; padding: 12px 14px !important; }
+  html[data-dp-layout] aside#sidebar .sb-section-title > span { grid-row: 1 !important; grid-column: 1 !important; }
+  html[data-dp-layout] aside#sidebar .sb-section-title .sb-tools-group { grid-row: 1 !important; grid-column: 2 !important; }
+  html[data-dp-layout] aside#sidebar .sb-section-title .sb-search-box { grid-row: 2 !important; grid-column: 1 / -1 !important; height: auto !important; min-height: 44px !important; width: auto !important; max-width: none !important; box-sizing: border-box !important; padding: 0 12px !important; display: flex !important; align-items: center !important; gap: 8px !important; }
+  html[data-dp-layout] aside#sidebar .sb-section-title .sb-search-box input { height: 42px !important; min-height: 42px !important; width: 100% !important; max-width: none !important; background: transparent !important; border: 0 !important; padding: 0 !important; }
+
+  /* (3) Der Aktionsblock traegt in der Schublade den Platz, den in der Schiene die Teile haben. */
+  html[data-dp-layout] aside#sidebar #sb-actions-trigger-btn { margin: 8px 12px !important; }
 }

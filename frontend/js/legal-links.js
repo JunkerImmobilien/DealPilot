@@ -79,7 +79,18 @@
 
   function init() {
     _injectIntoModals();
-    _injectFooterLink();
+    /* v1885 · Impressum und Datenschutz stehen NICHT mehr in der App.
+       Marcel am 05.10.2026: "und dann staendig unten Impressum und Datenschutz.
+       Also das kann da generell raus. Das musst du da nicht anzeigen. Wir haben
+       Einstellungen und dann kann man das dort finden. Das reicht voll und ganz."
+       Der Weg dorthin: Einstellungen -> Rechtliches (Reiter `rechtliches`).
+
+       Die Anmelde- und Registrierfenster behalten ihre Links (_injectIntoModals) -
+       dort sind sie Pflicht, bevor jemand ein Konto anlegt.
+
+       `_injectFooterLink` bleibt als Funktion stehen, ohne Aufrufer: sie hat zwei
+       Wege (Zeile in der Seitenleiste, schwebender Kasten), und wer sie wieder
+       braucht, soll nicht beide neu bauen muessen. */
     // Observer für nachträglich auftauchende Modals
     if (typeof MutationObserver !== 'undefined') {
       var mo = new MutationObserver(_injectIntoModals);
