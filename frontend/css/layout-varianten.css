@@ -6811,3 +6811,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq {left:auto !important; right:0 !important; border-radius:3px 3px 0 0 !important; }
   html[data-dp-objkarte="cockpit"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon {right:auto !important; left:0 !important; }
 }
+
+/* v1883b · Bordkarte in der Schublade: die geklonte Regel setzt das Investor-Band wie in der Schiene unten rechts
+   (bottom:4px) - dort liegt auf dem Handy die Kachelzeile (gemessen 526-546 ueber 472-550). In der Schublade bleibt das
+   Band oben mittig, wie bei den anderen Stilen. */
+@media (max-width: 900px) {
+  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { top: -9px !important; bottom: auto !important; right: auto !important; left: 50% !important; transform: translateX(-50%) !important; }
+}

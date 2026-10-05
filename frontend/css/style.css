@@ -38622,3 +38622,12 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-date { display: none !important; }
   html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-address { padding-right: 70px !important; }
 }
+
+/* v1883b · Listen-Stil Datenzeile in der Handy-Schublade (gemessen 390 px): der Kopf (.sbc-top) ist 84 px hoch, der
+   Score-Ring sitzt bei top:38 und ragt mit seiner Stufen-Pille (447-469) in die Kacheln (ab 450); die Adresse lief unter
+   dem Ring hindurch. Kopf hoch genug fuer Ring + Pille, Adresse laesst dem Ring Platz. */
+@media (max-width: 900px) {
+  /* v1883b: gilt genauso fuer Ampel, Kennzahlen und Minimal (gemessen: gleiche Ueberlagerung). */
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-top { min-height: 122px !important; }
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-address { padding-right: 72px !important; }
+}
