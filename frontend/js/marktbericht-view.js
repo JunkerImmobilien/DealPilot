@@ -54,7 +54,9 @@
       '.mbv-pdf{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(26,20,7,.55);background:#0a0a0a;color:var(--wl-e8cc7a, #E8CC7A);border-radius:10px;padding:9px 15px;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit}',
       '.mbv-pdf:hover{background:#161310}',
       '.mbv-frame{width:100%;border:0;display:block;height:640px;background:#fff;border-radius:14px;overflow:hidden}',
-      '@media (max-width:760px){.mbv-band{flex-direction:column}.mbv-stub{border-right:0;border-bottom:2px dashed rgba(255,255,255,.30);flex-direction:row;align-items:center;gap:10px;border-radius:16px 16px 0 0}.mbv-stub .k{font-size:22px}.mbv-bandmain{padding:14px 16px}.mbv-bandmain .ttl{font-size:24px}.mbv-bc{display:none}.mbv-stub::before,.mbv-stub::after,.mbv-rz::before,.mbv-rz::after{display:none}.mbv-rz{border-left:0;border-top:2px dashed rgba(26,20,7,.32);border-radius:0 0 16px 16px;justify-content:center;padding:12px 16px}}'
+      '@media (max-width:760px){.mbv-band{flex-direction:column}.mbv-stub{border-right:0;border-bottom:2px dashed rgba(255,255,255,.30);flex-direction:row;align-items:center;gap:10px;border-radius:16px 16px 0 0}.mbv-stub .k{font-size:22px}.mbv-bandmain{padding:14px 16px}.mbv-bandmain .ttl{font-size:24px}.mbv-bc{display:none}.mbv-stub::before,.mbv-stub::after,.mbv-rz::before,.mbv-rz::after{display:none}.mbv-rz{border-left:0;border-top:2px dashed rgba(26,20,7,.32);border-radius:0 0 16px 16px;justify-content:center;padding:12px 16px}}',
+      /* v1882a: Tablet 820 gemessen - der Abriss (.mbv-rz, min-width 150) trug QR + PDF-Knopf nebeneinander, der Knopf ragte 41 px aus der Karte. Bis 1024 gestapelt. */
+      '@media (min-width:761px) and (max-width:1024px){.mbv-rz{flex-direction:column;gap:8px;padding:10px 12px;min-width:0;justify-content:center}.mbv-pdf{padding:7px 11px;font-size:12px}}'
     ].join('\n');
     document.head.appendChild(s);
   }
