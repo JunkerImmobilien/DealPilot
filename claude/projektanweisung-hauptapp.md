@@ -30858,3 +30858,53 @@ Entscheidung.
 **v1864a (`bd34c87`).** Marcels „bis Break-Even" meinte auch die acht Kennzahl-Kacheln darunter (`#s6 .kpi-grid-eval .kpi`, Obsidian-Verlauf aus Z. 31543 mit ID-Spezifität) — jetzt weiß, Rand Gold, Werte Grün/Rot; gemessen `rgb(255,255,255)`, Bild bis Break-Even hell.
 
 **Rest.** Prod v1846b; Staging v1864a (`bd34c87`).
+
+### (27) 05.10.2026 — v1865–v1865b: Parkstr. 9 — lesbare Leiste, Stufen-Legende, Zins kennt die Objektart, Grundstücksmarktbericht aus dem Register
+
+**Was.** Marcel an der Parkstr. 9 (32545 Bad Oeynhausen, MFH): Text und
+Quelle zum Grundstücksmarktbericht passen nicht; die Texte zu Bodenwert,
+Sachwertfaktor, Liegenschaftszins sind abgekürzt; nirgends steht, wofür
+welche Stufe steht; warum kein Sachwertfaktor; der Workflow aus
+Eingabetiefe oben, Anfragen und „Marktbericht abrufen" unten ist zu viel.
+
+**Gemessen.**
+- `.oe-auto .oe-q` stand seit v1855 auf `nowrap + ellipsis`, darunter lag
+  noch eine Regel mit `-webkit-line-clamp: 2` — die Sätze waren abgeschnitten.
+- Anfragen-Block: „Liegenschaftszinssatz · GAA Minden-Lübbecke · 2024 ·
+  Quelle öffnen" als hinterlegt, die Leiste daneben „4,00 % · Stufe D ·
+  § 256 BewG". Das Register führt für 05770 die Zweige `we_s`, `we_v`,
+  `zfh`, `efh` — kein `mfh`; der Bericht nimmt für das MFH den
+  Auffangwert. `_leiste.zins` prüfte nur `verfuegbar`, nicht die Stufe.
+- Sachwertfaktor: Minden-Lübbecke leitet nur für EFH/ZFH/DHH/RH ab
+  (Abschnitt 5.1.4). Bundesweit führt das Register 8 MFH-Faktoren, in NRW
+  einen. Für die Parkstr. gibt es nichts zu ernten.
+- Unterlagen-Modal „Grundstücksmarktbericht": aus der KI-Websuche kam
+  „Gutachterausschuss für Grundstüctswerte", „Gebühr: email", Quelle eine
+  Allerweltsseite — obwohl der Ausschuss mit Link, Jahrgang und Lizenz im
+  Register steht.
+
+**Gebaut (`c2c6b39`, `7de043f`, `904d71e`).** Leiste: Hinweis in eigener
+voller Zeile unter Kennzahl/Wert/Knopf (Grid-Areas), kein Clamp; Stufen
+A–E als Tooltip an jeder Pille und als Legende unter der Leiste (Bedeutung
+aus `WertParameterService`: A amtlich für Gebiet und Objektart, B
+übergeordnet/Modell, C Nachbargemeinde desselben Ausschusses, D § 256
+BewG, E eigene Angabe) plus Eingabetiefe 1/2/3. Anfragen-Block: die
+Zins-Zeile sagt „nicht für die Objektart MFH — der Bericht nimmt den
+gesetzlichen Auffangwert (Stufe D)". `unterlagenService.amtHolen`: für
+`gutachterausschuss` zuerst das Register (`GET /quellen?plz=` am
+MB-Backend) — Name des Ausschusses, Berichtsseite oder PDF vor dem
+CSV-Archiv, Jahrgang; die Websuche steuert nur E-Mail und Telefon bei
+(„nicht belegt", wenn nicht wörtlich gefunden). Backend auf Staging neu
+gebaut. Nachweis: API-Lauf mit `erzwingen` liefert „Der Gutachterausschuss
+für Grundstückswerte im Kreis Minden-Lübbecke", Jahrgang 2024,
+Beleg-Grund „aus dem DealPilot-Register"; Leiste sechs Zeilen ohne
+Überlauf (74/76/91/73/58/58 px), Abruf-Box drei Zeilen ohne Überlauf.
+
+**Offen, Marcels Entscheidung.** (1) Standard- oder interpolierter
+Sachwertfaktor mit Hinweis „Standard" — widerspricht „Kein Treffer heißt
+kein Wert, nie ein Nachbarkreis"; heute gibt es den eigenen Ansatz (Feld
+`sachwertfaktor`, Stufe E). (2) Workflow: Eingabetiefe nur noch in der
+Pre-Flight-Karte, die Abruf-Box aus dem Reiter Objekt dorthin — Vorschlag
+im Backlog N13.
+
+**Rest.** Prod v1846b; Staging v1865b (`904d71e`).

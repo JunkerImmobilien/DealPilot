@@ -265,6 +265,40 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N13 · Parkstr. 9: Quellen, Stufen, Sachwertfaktor, Workflow (05.10.2026) — teils erledigt v1865–v1865b
+
+Marcel: Unterlagen-Text und Quelle zum Grundstücksmarktbericht passen
+nicht; Texte abgekürzt; Stufen nirgends erklärt; kein Sachwertfaktor —
+ernten? Standardwert mit Hinweis? Workflow (Eingabetiefe oben, Anfragen,
+„Marktbericht abrufen" unten, Pre-Flight-Pillen) ist zu viel.
+
+**Erledigt (`c2c6b39`, `7de043f`, `904d71e`):** Leiste lesbar (Hinweis in
+eigener Zeile), Stufen-Legende A–E und 1/2/3, Zins-Zeile kennt die
+Objektart, Grundstücksmarktbericht-Eintrag aus dem Register statt
+Websuche.
+
+**Offen — Marcels Entscheidung:**
+- **Sachwertfaktor-Standardwert.** Minden-Lübbecke leitet für MFH keinen
+  ab (nur EFH/ZFH/DHH/RH); bundesweit 8 MFH-Sätze im Register, NRW 1 —
+  für die Parkstr. nichts zu ernten. Ein Standard- oder interpolierter
+  Faktor wäre ein Nachbarkreis- oder Annahmewert (Doktrin: „nie ein
+  Nachbarkreis"). Heute: eigener Ansatz im Feld `sachwertfaktor` (Leiste
+  „eintragen"), im Bericht Stufe E „eigene Angabe". Falls gewollt: als
+  „Standard (Annahme)" klar gekennzeichnet, Stufe E, nie ohne Hinweis — und
+  welche Zahl? Das ist Marcels Bewertungsentscheidung.
+- **Workflow, Vorschlag A (empfohlen):** die Eingabetiefe lebt nur in der
+  Pre-Flight-Karte (Pillen 1/2/3 an der DealPilot-Kachel); die Abruf-Box
+  „Marktbericht abrufen" wandert als dritte Zeile in die Pre-Flight-Karte
+  (Stufe · frei · fehlt · Abrufen); im Reiter Objekt bleibt statt des
+  Kopf-Wählers eine Statuszeile „Eingabetiefe Ausgiebig (Pre-Flight) · 1
+  Angabe fehlt → zeigen"; der Block „Sach- und Ertragswert" folgt der
+  Pre-Flight-Wahl. Ein Ort zum Wählen, ein Ort zum Abrufen.
+  **Vorschlag B:** Kopf-Wähler raus, Abruf-Box bleibt unten und trägt die
+  Wahl selbst.
+- **LZS für MFH im Kreis Minden-Lübbecke:** der NRW-Datensatz (GMD CSV)
+  führt für 05770 keinen MFH-Zweig; der Wert steht nur im Bericht des
+  Ausschusses (kostenpflichtig). Ernte nur per Hand aus dem Bericht.
+
 ### N12 · Gesamtdurchgang: Score-Wörter, geführte Eingabe, Handy (04.10.2026) — erledigt v1861–v1862c
 
 Marcels Auftrag: „geh alles komplett nochmal durch … Bitte geh die Geführte
