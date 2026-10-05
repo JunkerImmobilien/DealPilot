@@ -194,7 +194,17 @@
        Ausschusses) — je Kennzahl eine Zeile, die erste gewinnt. */
     (function () { var gesehen = {}; hinterlegt = hinterlegt.filter(function (e) { var n = NAME[e.kennzahl] || e.name || e.kennzahl; if (gesehen[n]) return false; gesehen[n] = true; return true; }); })();
     var kurz = function (s) { return String(s || '').replace(/^Der Gutachterausschuss für Grundstückswerte /, 'GAA ').split(',')[0]; };
-    var swfOhneArt = _leiste && !_leiste.swf;
+    /* v1869 · Marcel (Parkstr. 9): „den brauchen wir ja nicht … dann könnten wir
+       es auch rausnehmen." Für Mehrfamilien- und Gewerbeobjekte ist der
+       Ertragswert das Verfahren — der Sachwertfaktor ist dort keine Lücke,
+       also keine Zeile und keine Anfrage. Die Leiste oben erklärt den Standard. */
+    var _artQ = _v('objart').toUpperCase();
+    var swfRelevant = !(/MFH|GESCH|BUERO|HOTEL|GEW/.test(_artQ) || parseInt(_v('einheiten'), 10) >= 3);
+    if (!swfRelevant) {
+      var _ohneSwf = function (e) { return !/sachwert|swf/i.test(String(e.kennzahl) + String(e.name)); };
+      hinterlegt = hinterlegt.filter(_ohneSwf); fehlt = fehlt.filter(_ohneSwf);
+    }
+    var swfOhneArt = swfRelevant && _leiste && !_leiste.swf;
     /* v1858c · steht der Sachwertfaktor schon in „fehlt" (Register führt
        keinen), kommt keine zweite Zeile dazu — Parkstr. 9 hatte zwei. */
     if (fehlt.some(function (e) { return /sachwert|swf/i.test(String(e.kennzahl) + String(e.name)); })) swfOhneArt = false;
@@ -221,7 +231,7 @@
       zeilen.push('<div class="oe-qz fehlt"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet — ' + esc(kurz(_leiste.ausschuss || (q && q.ausschuss)) || 'Gutachterausschuss') + ' anfragen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     }
     if (zeilen.some(function (z) { return /fehlt/.test(z); })) zeilen.push('<div class="oe-qz"><b></b><span class="oe-q">Unterlagen und Grundstücksmarktbericht anfragen:</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">beim Amt anfragen</button></div>');
-    var brauchtAnfrage = fehlt.length > 0 || (_leiste && (!_leiste.zins || !_leiste.swf));
+    var brauchtAnfrage = fehlt.length > 0 || (_leiste && (!_leiste.zins || (swfRelevant && !_leiste.swf)));
     if (hint) hint.innerHTML = brauchtAnfrage
       ? st('x', 'nötig') + 'Für dieses Objekt fehlt eine amtliche Kennzahl — Quelle unten, Anfrage mit einem Klick.'
       : (q && q.ausschuss ? st('a', 'vollständig') + 'Alle Kennzahlen liegen im Register (' + esc(q.ausschuss) + ').' : '');
