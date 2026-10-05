@@ -30943,3 +30943,40 @@ Mehrfamilienhäuser gibt es keinen; dort ist der Ertragswert das
 Verfahren, der Sachwert bleibt vorläufig (Quercheck).
 
 **Rest.** Prod v1846b; Staging v1866a (`fad6fb4`).
+
+### (29) 05.10.2026 — v1867: Kopf mit Pillen und Abruf-Box, Standard-Sachwertfaktor 1,0, lesbare Hinweise, DS2-Schilder, BGF-Schätzung
+
+**Was.** Marcels zweite Runde an der Parkstr. 9: Eingabetiefe wieder unter
+„Objekt & Fotos", mit den runden Stufen-Kreisen und der Abruf-Box darunter,
+der „ändern"-Knopf tat nichts; Sachwertfaktor-Standard 1,0 mit Hinweis
+„ohne Marktanpassung" und Grund; Hinweise „zu transparent"; DS2-Schilder an
+allen DS2-relevanten Feldern; BGF aus der Wohnfläche ableiten.
+
+**Gebaut (`1335c67`).** Kopf: Pillen 1/2/3 (`[data-oe-pillen]`, dieselbe
+Funktion füllt auch `#oab-dp-stufen` an der Pre-Flight-Kachel — ein Merker
+`dp_zielstufe`), Stand, Haken, darunter `#oe-abruf-box` mit den drei
+Zeilen; aus der Pre-Flight-Karte ist die Box wieder raus. Leiste:
+„Sachwertfaktor 1,00 · Standard · ohne Marktanpassung — <Grund des
+Ausschusses> · bei MFH: Ertragswert ist das Verfahren, der Faktor wird
+nicht gebraucht · eigener Ansatz möglich". `CrossCheckService` führt
+`sachwertfaktor_standard` (1,0) und `sachwertfaktor_standard_grund`;
+Web-Ansicht und PDF nennen „Sachwertfaktor 1,0 · Standard, ohne
+Marktanpassung (§ 7 Abs. 2 ImmoWertV)" — mb-backend neu gebaut, im
+Bericht erst am nächsten Stufe-3-Lauf sichtbar (Staging-Abnahmepunkt).
+Hinweise: `.oe-ct-hint` 10 px → 11,5 px, `.oe-opt` 9,5 → 10,5 px, beide
+`#5f5955` statt `#7A7370`. DS2-Schilder an Leerstand, Mietsteigerung,
+Hausgeld n. u., WEG-/Eigen-Rücklage, Mikro-/Makrolage, Bevölkerung,
+Nachfrage, Wertsteigerung, Entwicklung, Marktfaktor (der Investor Deal
+Score liest 23 Felder; Kaufpreis, Miete, Fläche, Darlehen bleiben ohne
+Schild — Grunddaten). BGF: Knopf „aus Wohnfläche schätzen" (× 1,35, der
+Faustwert des Berichts, `BGF_FAKTOR`), Schätzung in `_dp_herkunft`
+vermerkt, Hinweis zur DIN 277.
+
+**Nachweis (Parkstr. 9).** Pillen im Kopf und an der Kachel beide „3"
+aktiv; drei Zeilen 24 frei · 8 frei · 7 frei; keine Box mehr in der
+Pre-Flight-Karte; Leiste „Sachwertfaktor 1,00 · Standard · ohne
+Marktanpassung — Der Gutachterausschuss leitet … nur für Ein- und
+Zweifamilienhäuser …"; Hinweis `rgb(95,89,85)` 11,5 px; BGF-Knopf: 427 m²
+× 1,35 = 576 m², Herkunft „geschätzt", danach zurückgesetzt.
+
+**Rest.** Prod v1846b; Staging v1867 (`1335c67`).

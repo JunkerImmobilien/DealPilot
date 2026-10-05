@@ -283,7 +283,12 @@ der Stand). Liegenschaftszins Drei-/Mehrfamilienhäuser Kreis
 Minden-Lübbecke aus dem GMB 2025 (S. 64, 2,9 %, N 33) als Stufe A geerntet
 — die Parkstr. rechnet nicht mehr mit dem Auffangwert.
 
-**Offen — Marcels Entscheidung:**
+**Erledigt am 05.10.2026 (`1335c67`):** Sachwertfaktor-Standard 1,0 „ohne
+Marktanpassung" mit Grund in Leiste, Bericht und PDF (Marcels
+Entscheidung); Kopf mit Pillen und Abruf-Box; lesbare Hinweise;
+DS2-Schilder; BGF-Schätzung × 1,35.
+
+**Entschieden (Sachwertfaktor) — Rest zur Historie:**
 - **Sachwertfaktor-Standardwert.** Minden-Lübbecke leitet für MFH keinen
   ab (nur EFH/ZFH/DHH/RH); bundesweit 8 MFH-Sätze im Register, NRW 1 —
   für die Parkstr. nichts zu ernten. Ein Standard- oder interpolierter
