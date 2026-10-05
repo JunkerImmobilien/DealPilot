@@ -31721,3 +31721,54 @@ kein Wert ohne freie Lizenz (gegengemessen). Register danach (Staging = Prod): B
 > Berliner Umland fehlt), `objektkaltmiete_eur_m2_monat`, `baujahr` für Cottbus/Oberhavel-ETW.
 
 **Rest.** Prod v1884; Staging v1884; `main` = `staging` bis auf Journal.
+
+### (45) 05.10.2026 — v1885–v1885c: die Aktenmappe trägt auf dem Handy die Aktenmappe
+
+**Was.** Marcel, nach dem Blick in den Browser: „man hat Portfolio, dann ist die Suche, das
+Suchfeld ist viel größer, dann ist da gar keine Umrahmung drum, dann ist das irgendeine
+Mischung aus einer Objektkartei von unserer heutigen Ansicht und dieser Aktenansicht. Also
+das ist ja mal gar nichts. Und dann ständig unten Impressum und Datenschutz. Also das kann
+da generell raus." Und nachgeschoben: „das Menü von Aktenmappe muss auch das Design von der
+Aktenmappe tragen."
+
+**Die Ursache, gemessen.** Die Aktenmappe gestaltet ihre Objektliste über **141 Regeln, die
+alle an `.dpl-schiene` hängen** (93 Grundgestaltung, 48 Objektkarten-Stile). Seit v1880 nimmt
+die Schiene auf dem Handy NICHTS mehr — die Liste liegt in `aside#sidebar`. Dort griff keine
+einzige dieser Regeln, also fiel die Liste auf die Gestaltung der Ansicht „Heute" zurück:
+gerahmtes Logo 303 × 78, Knopfzeile Quick-Check/Marktbericht, Karten mit Foto und
+Kennzahl-Kacheln. Genau die Mischung, die Marcel sah. In v1883a hatte ich nur die 48
+Stil-Regeln geklont — die Grundgestaltung fehlte weiter, deshalb blieb es eine Mischung.
+
+**Gebaut (`5b2fed5` v1885, `92d36b1` v1885a, `84c9a91` v1885b, `50b3d16` v1885c).**
+- **`tools/schublade-regeln.mjs`** erzeugt den Block neu: es liest die Schienen-Regeln aus
+  `layout-varianten.css`, ersetzt den Anker `.dpl-schiene` durch `aside#sidebar` und schreibt
+  sie in EIN `@media (max-width: 900px)` — erst die 93 Grundregeln, dann die 48 Stil-Regeln
+  (später = gewinnt bei Gleichstand), dann die gemessenen Korrekturen. Regeln mit
+  `[data-stellung=…]` bleiben außen vor, das sind andere Schienen-Stellungen.
+- Heute-Kopf und Quick-Check-Zeile in der Aktenmappe aus (die Marke steht schon in der
+  Schiene darüber, die Aktionen im Akkordeon).
+- Suchzeile zweizeilig: Titel und Werkzeuge oben, die Suche darunter über die volle Breite.
+  Das Feld ist 44 px hoch (iOS-Zoomschutz erzwingt 16 px Schrift), seine Umrahmung war 30 —
+  das Feld stand sichtbar außerhalb seines Rahmens. Jetzt 283 × 42 in 330 × 44.
+- **Impressum und Datenschutz stehen nicht mehr in der App.** Marcel: „Wir haben Einstellungen
+  und dann kann man das dort finden." Der Aufruf von `_injectFooterLink()` ist raus, die
+  Funktion bleibt dokumentiert stehen. Die Anmelde- und Registrierfenster behalten ihre Links.
+
+**Zwei Fehler auf dem Weg, beide lehrreich.**
+1. **Ein Kommentar, der im Block wieder aufging.** Mein eingefügter Satz stand hinter dem
+   schließenden `*/`, dadurch las der Parser `.sb-header{display:flex!important}` aus dem
+   Kommentartext als Regel und verschluckte die echte. **Die Klammerbilanz stimmte dabei.**
+   Der Generator prüft sich jetzt selbst: Kommentare auf/zu UND Regelzahl nach
+   Kommentar-Abzug gegen die Zahl der geschriebenen Regeln; bei Abweichung `exit 1`.
+2. **Die Karten hatten Höhe 0 und waren nicht anklickbar.** `#sb-list` ist ein Flex-Behälter
+   in Spaltenrichtung mit `overflow-y:auto`; die Schienen-Regeln nehmen den Karten die feste
+   Höhe, und ohne eigene Flex-Angabe schrumpfen sie darin auf null — gemessen 323 × 0, der
+   Inhalt quoll heraus, die Liste SAH richtig aus. Die Falle steht in CLAUDE.md („Flex-Kinder
+   in overflow:auto-Containern schrumpfen"). `flex:0 0 auto` setzt sie auf ihre 44 px.
+
+**Nachweis (390 px, frisch geladen, ohne eingespritztes Blatt).** 21 Karten à 44 px, kein
+Überlauf, `.sb-header` und `.sb-neu-row` auf `none`, Suchfeld innerhalb seiner Umrahmung,
+kein `#dp-app-legal-footer` im Dokument. Klick auf eine Karte lädt das Objekt und schließt
+die Schublade (Parkstr. 9, 9 Reiter). Gold-Audit RC=0. Prod-Rollout v1885c, Buster per curl.
+
+**Rest.** Prod v1885c; Staging v1885c; `main` = `staging` bis auf Journal.

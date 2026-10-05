@@ -265,6 +265,14 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N29 · Aktenmappe auf dem Handy trägt die Aktenmappe (05.10.2026) — erledigt v1885–v1885c, auf Prod
+
+141 Schienen-Regeln per Generator (`tools/schublade-regeln.mjs`) auf die Schublade geklont, Heute-Kopf
+raus, Suchfeld in eigener Zeile, Rechtliches nur noch in den Einstellungen. **Bei jeder Änderung an den
+Schienen-Regeln den Generator erneut laufen lassen** — er prüft sich selbst (Kommentarbilanz, Regelzahl).
+**Noch anzusehen:** dasselbe Muster könnte den Aktionsblock und den Nutzerblock betreffen (dort sind die
+Schienen-Regeln nach `[data-stellung]` gefiltert und bewusst nicht geklont).
+
 ### N26 · Endabnahme Handy, alle Darstellungen (05.10.2026) — erledigt v1883–v1883b, auf Prod
 
 Prüfläufer + Bilder je Reiter und je Darstellungsvariante (Heute/Aktenmappe, Hell/Dunkel, A+,
