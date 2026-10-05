@@ -385,8 +385,11 @@ async function ausschussAusRegister(ort) {
   if (!name) return null;
   const saetze = Array.isArray(q.hinterlegt) ? q.hinterlegt : [];
   const mitLink = saetze.filter((e) => _link(e.quelle_url));
+  const istArchiv = (u) => /\.(zip|csv|xlsx?|gz)(\?|$)/i.test(u);
   const pdf = mitLink.find((e) => /\.pdf(\?|$)/i.test(e.quelle_url));
-  const erster = pdf || mitLink[0] || null;
+  const seite = mitLink.find((e) => !istArchiv(e.quelle_url) && !/\.pdf(\?|$)/i.test(e.quelle_url));
+  const erster = pdf || seite || mitLink[0] || null;
+  const archiv = erster && istArchiv(erster.quelle_url);
   const jahre = [...new Set(saetze.map((e) => e.jahrgang || e.berichtsjahr).filter(Boolean))].sort();
   const kennzahlen = [...new Set(saetze.map((e) => e.name || e.kennzahl).filter(Boolean))];
   return {
@@ -396,6 +399,8 @@ async function ausschussAusRegister(ort) {
     hinweis: 'Zuständig laut DealPilot-Register' + (kennzahlen.length ? ' (' + kennzahlen.slice(0, 4).join(', ') + ')' : '')
       + (jahre.length ? ', Jahrgang ' + jahre[jahre.length - 1] : '') + '. Die Geschäftsstelle sitzt meist beim Kataster- und '
       + 'Vermessungsamt; der Grundstücksmarktbericht ist dort oft kostenpflichtig.'
+      + (archiv ? ' Der verlinkte Datensatz ist die amtliche Veröffentlichung des Landes (CSV), aus der unser Register liest — '
+                + 'den Bericht selbst gibt der Ausschuss heraus.' : '')
   };
 }
 
