@@ -31696,4 +31696,28 @@ Gold-Audit RC=0, `main` ff auf `3db5e88`, mb-backend neu gebaut, NW gesät, Bust
 gesetzt — und das Panel stand im neuen offen (Merker). Vor jedem Bild das Panel schließen,
 und die Kartenstile nur über das Panel klicken (Bedienweg), nie per Attribut.
 
-**Rest.** Prod v1883b; Staging v1883b; `main` = `staging` bis auf Journal.
+**Nachtrag (44a) — v1884: Ernte Linie 6, Brandenburg regional.** Agent über Berlin, Brandenburg,
+Hamburg (nur Lücken) und Bremen. Bestand gemessen: Berlin ist aktuell (kein Jahrgang 2026,
+SWF-PDF „Stand 04.02.2026" mit unveränderten Koeffizienten), Hamburg IMB 2026 vollständig,
+Brandenburg hatte NUR die 14 OGA-Landessätze — die regionalen Zinssätze aus 15 Kreisberichten
+(GMB 2025, Mai/Juni 2026; SPN/OSL GMB 2024) fehlten komplett. `lzs-be-bb-hh-hb-2026.json`: 107
+Sätze, 86 Werte (Barnim, Brandenburg a. d. H., Cottbus, Frankfurt (Oder), Potsdam,
+Dahme-Spreewald, Havelland, Märkisch-Oderland, Oberhavel, Spree-Neiße/OSL, Oder-Spree,
+Ostprignitz-Ruppin, Potsdam-Mittelmark, Prignitz, Teltow-Fläming), alle dl-de/by-2-0 mit
+Quellenvermerk; Lage als Zweigschlüssel `…_lage_berliner_umland` / `…_lage_weiterer_metropolenraum`
+mit Gemeindelisten aus LIZI 2025 Anlage 2; Havelland und Oberhavel mit Tabellen (Wohnfläche,
+Nettokaltmiete). 21 Sperren mit Weg: Elbe-Elster/Uckermark (keine eigenen Sätze), Berlin
+ETW/EFH (nur Mietwohnhäuser), Bremen (Vollbericht 50 €, CC BY-NC-ND, „nur mit Genehmigung",
+Sachwertfaktoren werden dort gar nicht ermittelt), Bremerhaven (freier Teil ohne Kap. 5.4/5.5).
+`swf-be-bb-hh-hb-2026.json`: 8 Sperren. Prüfung: 276 gedruckte Zahlen maschinell, 145 Proben am
+echten `swf_modelle.js`, 38/38 Proben über den echten Weg `zinssatzFuerObjekt`, 0 Überschneidung;
+kein Wert ohne freie Lizenz (gegengemessen). Register danach (Staging = Prod): BB Zins 113/19
+(vorher 14/1), gesamt 3.298.
+
+> **Befund über die Ernte hinaus:** die 14 OGA-Landessätze in `lzs-bb.json` sind heute
+> UNERREICHBAR — Zweige `mfh_bu`, `we_wm` passen zu keiner ART_RANG-Zeile von `zweigwahl.js`
+> (gemessen: `keine_art`). Umzug auf die Grammatik `mfh_lage_berliner_umland` gehört ins
+> Backlog. Neue Eingabefelder ohne Lieferant: `lage` (Raumkategorie, Resolver Gemeinde →
+> Berliner Umland fehlt), `objektkaltmiete_eur_m2_monat`, `baujahr` für Cottbus/Oberhavel-ETW.
+
+**Rest.** Prod v1884; Staging v1884; `main` = `staging` bis auf Journal.

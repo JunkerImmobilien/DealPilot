@@ -275,6 +275,16 @@ dem Inhalt. **Offen/bewerten:** Heute-Kopf bei A+ mit Objekt 117 px (Zähler-Pil
 eine eigene Zeile); Investor-Band in der Schublade bei aktiver Karte kontrastarm; Panel-Text
 „In der Kanzlei tauschen Navigation und Aktionen" (Seiten) veraltet.
 
+### N28 · Ernte Linie 6 (BB regional 86 Werte, BE/HB Sperren) auf Staging und Prod — v1884
+
+**Marcel entscheidet:** Bremen Vollbericht (50 €) kaufen und Genehmigung einholen (CC BY-NC-ND)
+oder Sperre belassen; Bremerhaven Vollbericht bestellen; Sätze mit ≤ 5 Kauffällen (Barnim ETW WM,
+Frankfurt MFH, Prignitz EFH, LDS WGH, Oberhavel ETW WM mit Minimum −1,81) als Stufe A ausliefern?
+Berlin ETW/EFH: Vergleichsfaktoren als eigene Kennzahl ernten?
+**Technisch offen:** OGA-Landessätze in lzs-bb.json unerreichbar (Zweige mfh_bu/we_wm passen zu
+keiner ART_RANG-Zeile) → auf `mfh_lage_berliner_umland` umziehen; Resolver Gemeinde → Raumkategorie
+(`lage`) fehlt; `liegenschaftszinssatz()` ruft findeZweig ohne `lage`.
+
 ### N27 · Ernte NRW Block 5 (26) auf Staging und Prod — Marcel entscheidet
 
 Arnsberg/Lippstadt: log-Funktionen ohne Gültigkeitsspanne im Bericht (rechnen überall) —
