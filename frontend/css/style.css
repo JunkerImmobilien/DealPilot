@@ -38515,3 +38515,4 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 @media (max-width: 900px) { #avsec .av-cards.single .mc.dp .mhead.dphead { border-radius: 11px 11px 0 0 !important; min-width: 0 !important; } #avsec .av-cards.single .mc.dp .legal { padding-left: 14px !important; } }
 #avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { white-space: nowrap !important; }
 #avsec .av-cards.single .mc.dp .mbody .miete b { font-size: 13px !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub > *, #avsec .av-cards.single .mc.dp .mbody .miete > * { display: inline !important; }
