@@ -72,6 +72,13 @@ const korrektur = [
   '',
   '  /* (3) Der Aktionsblock traegt in der Schublade den Platz, den in der Schiene die Teile haben. */',
   '  html[data-dp-layout] aside#sidebar #sb-actions-trigger-btn { margin: 8px 12px !important; }',
+  '',
+  '  /* (4) `#sb-list` ist ein Flex-Behaelter in Spaltenrichtung mit `overflow-y:auto`. Die Schienen-Regeln',
+  '         nehmen den Karten die feste Hoehe (`height:auto`), und ohne eigene Flex-Angabe SCHRUMPFEN sie',
+  '         darin auf null: gemessen 323 x 0 px, der Inhalt quoll sichtbar heraus - die Liste sah richtig aus',
+  '         und war nicht anklickbar. Genau die Falle aus CLAUDE.md ("Flex-Kinder in overflow:auto-Containern',
+  '         schrumpfen, statt zu scrollen"). Mit `flex:0 0 auto` steht jede Karte auf ihren 44 px. */',
+  '  html[data-dp-layout] aside#sidebar #sb-list .sb-card { flex: 0 0 auto !important; }',
 ].join(nl);
 
 const block = [
