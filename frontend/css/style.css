@@ -38424,7 +38424,7 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 .oe-ziel-status .oe-q { font-size: 11.5px; }
 .dp-pf-abruf { margin: 10px 0 14px; }
 .dp-pf-abruf .card-title { margin-top: 0; }
-@keyframes oe-blink { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); } 50% { box-shadow: 0 0 0 4px rgba(201,168,76,.55); } }
+@keyframes oe-blink { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent); } }  /* v1875a: Gold-Audit */
 .oe-blink { animation: oe-blink .8s ease-in-out 3; border-radius: 999px; }
 
 /* ===== v1867 · Marcel: Hinweise "etwas zu transparent, man kann das nicht richtig lesen" (gemessen:

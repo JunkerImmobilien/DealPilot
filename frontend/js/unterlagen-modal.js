@@ -140,7 +140,7 @@
       + '<div style="color:#f3ead0;opacity:.78;font-size:12.5px;margin-top:2px">'
       + (o.strasse || o.ort
           ? _esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(' ')].filter(Boolean).join(', '))
-          : '<span style="color:#E8CC7A">Kein Objekt geladen — Adresse fehlt</span>')
+          : '<span style="color:var(--wl-e8cc7a, #E8CC7A)">Kein Objekt geladen — Adresse fehlt</span>')
       + '</div></div>'
       + '<button type="button" style="' + _KNOPF_DUNKEL + '"'
       + ' onclick="DealPilotUnterlagen.schliessen()">Schließen</button>'
@@ -235,7 +235,7 @@
     h += '<div style="display:flex;flex-direction:column;gap:10px">';
     _arten.forEach(function (a) {
       var amt = _amtJeArt[a.id];
-      h += '<div style="background:#FFFFFF;border:1px solid rgba(201,168,76,.35);'
+      h += '<div style="background:#FFFFFF;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);'
         + 'border-radius:10px;padding:12px 14px">'
         + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
         + '<div style="flex:1 1 220px;min-width:0">'
@@ -257,7 +257,7 @@
     h += '</div>';
 
     h += '<div style="color:#6f6960;font-size:12px;line-height:1.6;margin-top:16px;'
-      + 'padding-top:12px;border-top:1px solid rgba(201,168,76,.35)">'
+      + 'padding-top:12px;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)">'
       + 'DealPilot <b>verschickt nichts</b>. Es erzeugt das Anschreiben und legt es '
       + 'in die Zwischenablage — gesendet wird aus deinem eigenen Mailprogramm.'
       + '</div>';

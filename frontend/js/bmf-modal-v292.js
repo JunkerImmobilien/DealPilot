@@ -430,7 +430,7 @@
       if (!host) {
         host = document.createElement('div');
         host.id = 'bmfJacobyZeile';
-        host.style.cssText = 'margin-top:8px;padding:10px 12px;border:1px solid rgba(201,168,76,.35);'
+        host.style.cssText = 'margin-top:8px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);'
           + 'border-radius:8px;font-size:12.5px;line-height:1.55;color:#2A2727;background:#FFFFFF';
         if (elHint && elHint.parentNode) elHint.parentNode.insertBefore(host, elHint.nextSibling);
       }

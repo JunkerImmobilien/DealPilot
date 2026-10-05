@@ -568,7 +568,7 @@
 .rnd-wiz-close:hover {
   border-color: var(--wl-C9A84C, #C9A84C);
   color: var(--wl-C9A84C, #C9A84C);
-  background: rgba(201,168,76,.14);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);  /* v1875a: Gold-Audit */
 }
 
 /* Progress-Sektion — Gold-Akzent statt grau */

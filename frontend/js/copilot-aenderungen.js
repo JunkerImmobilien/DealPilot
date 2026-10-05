@@ -470,11 +470,11 @@
       '.' + MARKE + '-liste{margin:6px 0 10px;padding-left:18px}',
       '.' + MARKE + '-liste li{margin:2px 0}',
       '.' + MARKE + '-konflikte{margin:6px 0 10px;display:grid;gap:7px}',
-      '.' + MARKE + '-k{padding:7px 9px;border:1px solid rgba(201,168,76,.35);border-radius:7px}',
+      '.' + MARKE + '-k{padding:7px 9px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:7px}',
       '.' + MARKE + '-k-name{font-size:11.5px;opacity:.78;margin-bottom:5px}',
       '.' + MARKE + '-k-wahl{display:flex;gap:6px;flex-wrap:wrap}',
       '.' + MARKE + '-w{flex:1 1 auto;padding:5px 9px;border-radius:5px;cursor:pointer;'
-        + 'border:1px solid rgba(201,168,76,.4);background:transparent;color:inherit;font-size:12px}',
+        + 'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);background:transparent;color:inherit;font-size:12px}',
       '.' + MARKE + '-w.an{background:var(--wl-c9a84c,#C9A84C);color:#0A0A09;'
         + 'border-color:var(--wl-c9a84c,#C9A84C)}',
       '.' + MARKE + '-kosten{margin:6px 0 2px;font-size:12.5px;opacity:.85}',
