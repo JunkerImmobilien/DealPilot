@@ -31353,4 +31353,40 @@ Splitting fehlen; Steuerformular schätzt nicht umlagefähige Kosten als 55 %
 der Gesamt-BWK; Projektion mit einem zvE; überlappende Steuerzeiträume;
 Sprach-Import kennt 3 % nicht.
 
-**Rest.** Prod v1846b; Staging v1878.
+**Rest.** Staging v1878.
+
+### (39) 05.10.2026 — Prod-Rollout v1846b → v1878
+
+**Was.** Marcel: „jetzt machen wir erstmal einen prod rollout“. Gemessen vorher:
+`main` hatte keinen Commit, der nicht auf `staging` lag → Fast-Forward über
+107 Commits (v1847–v1878). Eine neue Migration (084 `bmf_cache`), 14 Backend-
+Dateien (8 Haupt-Backend, 6 Marktbericht-Backend), eine neue Saatdatei
+(`lzs-nrw-gmb-2025.json`), eine neue Umgebungsvariable `MB_BACKEND_URL` mit
+eingebautem Standard (weder Staging noch Prod setzen sie). Prod stand sauber
+auf `dac3f86` (v1846b), Platte 19 %.
+
+**Ablauf.** (1) Sicherung beider Datenbanken auf Prod und angesehen:
+`prod-haupt-20261005-1101-vor-v1878.sql.gz` 11 MB / 69 Tabellen,
+`prod-mb-20261005-1101-vor-v1878.sql.gz` 1,2 MB / 26 Tabellen (`zcat | head`,
+`grep -c "CREATE TABLE"`). (2) `git merge --ff-only origin/staging` auf `main`,
+Push. (3) Auf Prod `git pull`, `docker compose up -d --build backend
+mb-backend`. (4) Backend-Log: „Applying migration 84: 084_bmf_cache.sql ✓“,
+`schema_migrations` 84/83/82, `bmf_cache` leer, Container healthy.
+(5) `register-saat.mjs --nur=NW` erst trocken (2026 Schlüssel, keine Dublette),
+dann echt — der Lauf meldete „ABWEICHUNG: 2026 hätten ankommen müssen, in der
+Tabelle stehen 2663“. Das ist ein blinder Fleck des Wächters: mit `--nur` liest
+er nur ein Land, zählt aber die ganze Tabelle (637 = die anderen 13 Länder).
+Gegengemessen je Land: Prod und Staging identisch (NW 2026, HE 169, NI 138 …),
+Minden-Lübbecke MFH-Zins 2025 Stufe A liegt auf Prod. (6) Frontend liegt im Volume und war mit dem Pull live: calc.js
+v1878, qc-bridge v1878, erststart v1874, avsec-spanne v1875c, Marktbericht-App
+1877, Landing-Siegel als `image/svg+xml` 5.102 Byte — alle per `curl` mit
+`content_type` geprüft, nicht nur mit 200.
+
+**Nachweis-Lücken, ehrlich.** Der interne Health-Aufruf lief gegen Port 3000
+statt 3001 (000) — Docker meldet `healthy`, der Fehler lag im Prüfbefehl.
+Die Landing-Knöpfe „Kostenlos starten“ zeigen auf die Prod-App, dort greift
+v1874 (Willkommen-Karte erst nach Anmeldung) jetzt. Kein Rauchtest mit
+Anmeldung auf Prod — das bleibt Marcels Blick.
+
+**Rest.** Prod v1878 (`8444535`); Staging v1878. `main` und `staging` sind
+gleich.

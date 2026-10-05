@@ -265,6 +265,11 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N19 · Prod-Rollout v1846b → v1878 (05.10.2026) — erledigt
+
+Fast-Forward über 107 Commits, Migration 084, beide Backends neu gebaut, NRW-Register
+gesät, Sicherungen `prod-*-20261005-1101-vor-v1878.sql.gz`. Prod = Staging = v1878.
+
 ### N18 · Vier Steuerfehler und das Speichern-Modal (05.10.2026) — erledigt v1878
 
 Marcel: „mach das modal schlank und korrigiere die 4 steuerfehler“.
