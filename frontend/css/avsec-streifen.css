@@ -1,0 +1,66 @@
+/* avsec-streifen.css · v1870 · Die Marktbewertung als Streifen - fuer die Haupt-App UND das QuickBoarding (eigenes
+   Dokument, erbt kein style.css). Das Ergebnis-Modul avm-section.js bleibt unberuehrt; hier nur CSS mit ID-Spezifitaet. */
+/* ===== v1868a · Marktbewertung als Streifen (Marcel: „schmaleren Streifen … ein bisschen mehr Platz").
+   Der Block kommt aus avm-section.js (nicht anfassen) - gemessen: .mc.dp = Kopf 46 + Body 142 + Fuss 57 +
+   Legal 21 = 270 px. Hier nur CSS mit ID-Spezifitaet: Kopf, Kennzahlen und Knopf in EINER Zeile. ===== */
+#avsec .av-cards.single .mc.dp { display: grid !important; grid-template-columns: auto minmax(0, 1fr) auto !important; grid-template-areas: "head body foot" "legal legal legal" !important; align-items: center !important; column-gap: 12px !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead { grid-area: head; height: auto !important; min-height: 0 !important; padding: 6px 10px !important; gap: 8px !important; }
+#avsec .av-cards.single .mc.dp .mperf { display: none !important; }
+#avsec .av-cards.single .mc.dp .mbody { grid-area: body; display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 2px 14px !important; padding: 4px 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw { font-size: 20px !important; line-height: 1.1 !important; margin: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { margin: 0 !important; min-height: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 { display: flex !important; gap: 12px !important; margin: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 { display: flex !important; align-items: baseline !important; gap: 5px !important; padding: 0 !important; border: 0 !important; background: none !important; width: auto !important; flex: 0 0 auto !important; }
+#avsec .av-cards.single .mc.dp .mbody .spacer { display: none !important; }
+#avsec .av-cards.single .mc.dp .mfoot { grid-area: foot; padding: 6px 10px !important; }
+#avsec .av-cards.single .mc.dp .mfoot .av-btn.full { width: auto !important; padding: 6px 10px !important; font-size: 11px !important; }
+#avsec .av-cards.single .mc.dp .legal { grid-area: legal; padding: 0 10px 4px !important; font-size: 9px !important; line-height: 1.2 !important; }
+@media (max-width: 900px) { #avsec .av-cards.single .mc.dp { grid-template-columns: 1fr !important; grid-template-areas: "head" "body" "foot" "legal" !important; } }
+#avsec .av-cards.single .mc.dp .mbody > * { width: auto !important; flex: 0 0 auto !important; text-align: left !important; margin: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 > * { display: inline !important; }
+#avsec .av-cards.single .mc.dp .mbody { flex-direction: row !important; }
+/* ===== v1869 · Streifen gegliedert (Marcel: „Markteinschätzung ist einfach nur so ein bisschen Gold …
+   den Anfang vernünftig darstellen und besser darauf skalieren"). Kopfblock links fest (Obsidian, Logo
+   und Zeile), dann Spalten mit Beschriftung über dem Wert, rechts der Knopf. Nur CSS, avm-section.js
+   bleibt unberührt. ===== */
+#avsec .av-cards.single .mc.dp { column-gap: 0 !important; border-left-width: 0 !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead { flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; gap: 3px !important; min-width: 168px !important; align-self: stretch !important; padding: 8px 14px !important; background: #0D0D0D !important; border-radius: 11px 0 0 11px !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead::after { display: none !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead .dplogo { font: 700 15px/1.1 "Space Grotesk", system-ui, sans-serif !important; color: var(--wl-e8cc7a, #E8CC7A) !important; background: none !important; -webkit-text-fill-color: var(--wl-e8cc7a, #E8CC7A) !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead .dplogo small, #avsec .av-cards.single .mc.dp .mhead.dphead .dplogo > * { display: block !important; font: 500 8.5px/1.2 "JetBrains Mono", monospace !important; letter-spacing: .12em !important; text-transform: uppercase !important; color: #f3ead0 !important; -webkit-text-fill-color: #f3ead0 !important; opacity: .85 !important; margin-top: 2px !important; }
+#avsec .av-cards.single .mc.dp .mhead.dphead .avs-cf { margin-top: 4px !important; }
+#avsec .av-cards.single .mc.dp .mbody { gap: 0 !important; padding: 6px 4px !important; align-items: stretch !important; }
+#avsec .av-cards.single .mc.dp .mbody > * { display: flex !important; flex-direction: column !important; justify-content: flex-end !important; gap: 3px !important; padding: 2px 14px !important; border-left: 1px solid var(--border-g, #ece2c8) !important; min-height: 0 !important; font: 12.5px/1.2 "JetBrains Mono", monospace !important; color: #2A2727 !important; }
+#avsec .av-cards.single .mc.dp .mbody > *:first-child { border-left: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody > *::before { font: 700 7.5px/1 "Space Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #9a8f72; }
+#avsec .av-cards.single .mc.dp .mbody .mw::before { content: "Marktwert"; }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub::before { content: "je m² · vs. Kaufpreis"; }
+#avsec .av-cards.single .mc.dp .mbody .miete::before { content: "Marktmiete"; }
+#avsec .av-cards.single .mc.dp .mbody .mw { font-size: 22px !important; font-weight: 700 !important; font-family: "Space Grotesk", system-ui, sans-serif !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 { flex-direction: row !important; padding: 0 !important; border-left: 0 !important; gap: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3::before { display: none !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 { display: flex !important; flex-direction: column !important; gap: 3px !important; padding: 2px 14px !important; border-left: 1px solid var(--border-g, #ece2c8) !important; border-radius: 0 !important; align-items: flex-start !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 > * { display: block !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 .fk { font-size: 7.5px !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 .fv { font-size: 12.5px !important; margin: 0 !important; }
+#avsec .av-cards.single .mc.dp .mfoot { padding: 6px 14px !important; }
+#avsec .av-cards.single .mc.dp .legal { padding: 0 14px 5px 182px !important; }
+@media (max-width: 1100px) { #avsec .av-cards.single .mc.dp .mbody > * { padding: 2px 10px !important; } }
+@media (max-width: 900px) { #avsec .av-cards.single .mc.dp .mhead.dphead { border-radius: 11px 11px 0 0 !important; min-width: 0 !important; } #avsec .av-cards.single .mc.dp .legal { padding-left: 14px !important; } }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { white-space: nowrap !important; }
+#avsec .av-cards.single .mc.dp .mbody .miete b { font-size: 13px !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub > *, #avsec .av-cards.single .mc.dp .mbody .miete > * { display: inline !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw, #avsec .av-cards.single .mc.dp .mbody .avs-sub, #avsec .av-cards.single .mc.dp .mbody .miete { display: block !important; white-space: nowrap !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw::before, #avsec .av-cards.single .mc.dp .mbody .avs-sub::before, #avsec .av-cards.single .mc.dp .mbody .miete::before { display: block; margin-bottom: 3px; }
+/* ===== v1870 · Marcel: Spanne (Unten · Ø · Oben) zum Übernehmen-Knopf, „Karten / Tabelle / min" weg,
+   und die Lampe an den Pre-Flight-Kacheln „richtig schön in Grün". Ergebnisleiste und Karte kommen aus
+   avm-section.js (nicht anfassen) - hier nur CSS: #avsec wird ein Raster, die Leiste wandert rechts
+   neben die Karte, Konsens-Text und Ansichts-Schalter verschwinden. ===== */
+#avsec { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: center !important; column-gap: 8px !important; }
+#avsec .av-body { order: 1 !important; padding-right: 0 !important; }
+#avsec .av-bar { order: 2 !important; border-bottom: 0 !important; background: transparent !important; padding: 0 14px 0 0 !important; flex-wrap: nowrap !important; }
+#avsec .av-bar .av-kons, #avsec .av-bar .av-vsw { display: none !important; }
+#avsec .av-bar .av-right { margin-left: 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 4px !important; }
+#avsec .av-bar .av-right .lab { font-size: 7.5px !important; letter-spacing: .08em !important; color: #9a8f72 !important; }
+#avsec.av-min-on .av-body { display: block !important; }
+@media (max-width: 900px) { #avsec { grid-template-columns: 1fr !important; } #avsec .av-bar { padding: 0 14px 8px !important; } }
