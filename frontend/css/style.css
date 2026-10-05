@@ -38406,3 +38406,13 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 .oe-auto .oe-row > .oe-k, .oe-auto .oe-row > .oe-w { padding-top: 2px; }
 .oe-auto .oe-legende { padding: 8px 12px 10px; font-size: 11px; line-height: 1.4; color: var(--muted, #7A7370); border-top: 1px dashed var(--border-g, #e9dcb3); }
 .oe-auto .oe-legende b { color: var(--ch, #2A2727); }
+
+/* ===== v1865a · gemessen: zwischen v1855 und v1865 lag noch eine Regel mit -webkit-line-clamp:2 auf
+   .oe-q - mit overflow:visible lief der Text ueber die naechste Zeile. Jetzt: der Hinweis bekommt eine
+   eigene, volle Zeile unter Kennzahl/Wert/Knopf (Grid-Areas), kein Clamp, kein Ueberlauf. ===== */
+.oe-auto .oe-row { grid-template-columns: 150px 92px minmax(0, 1fr) 118px; grid-template-areas: "k w . a" "q q q q"; row-gap: 4px; align-items: center; }
+.oe-auto .oe-row > .oe-k { grid-area: k; }
+.oe-auto .oe-row > .oe-w { grid-area: w; }
+.oe-auto .oe-row > .oe-q { grid-area: q; display: block; -webkit-line-clamp: unset; -webkit-box-orient: unset; white-space: normal; overflow: visible; line-height: 1.35; }
+.oe-auto .oe-row > span:last-child { grid-area: a; }
+@media (max-width: 700px) { .oe-auto .oe-row { grid-template-columns: 1fr 1fr; grid-template-areas: "k w" "q q" "a a"; } }
