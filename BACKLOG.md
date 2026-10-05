@@ -265,6 +265,15 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N15 · „Willkommen an Bord“ erschien vor der Anmeldung (05.10.2026) — erledigt v1874
+
+Marcel: „ich gehe auf Kostenlos starten, dann kommt das Anmeldefenster und
+dann erscheint schon ein Willkommen an Bord … das soll erst nach der
+Anmeldung kommen.“ **Erledigt (`cf6c5df`):** erststart.js wartet auf
+`dp:plan-ready` und prüft `Auth.isLoggedIn()`. Damit ist auch die offene
+Gestaltungsfrage aus N13 (Registrier-Modal mit Standardwerten dahinter)
+erledigt — es war dieselbe Karte.
+
 ### N14 · FuE-Siegel 2026 (BSFZ) auf der Landing (05.10.2026) — erledigt v1873/v1873a
 
 Marcel: „zip mit bsfz siegel … auf der Landingpage ergänzen such das passende foto aus“.
@@ -304,8 +313,8 @@ entschlackt (kein gutachten.org, Hinweise hinter Aufklapper); BMF-Rechner
 
 **Noch offen (klein):** „KI-Lauf“ statt „Stufe 3“ in der
 Verkehrswert-Übernahme; Register-Lücken (BY ohne LZS, HB/SL ohne SWF, drei
-tote Links); Hintergrund des Registrier-Modals auf der Landing (Standardwerte
-sichtbar — Gestaltungsfrage).
+tote Links). Das Registrier-Modal mit „Standardwerten“ dahinter war die
+Erststart-Karte vor der Anmeldung — erledigt in N15 (v1874).
 
 **Entschieden (Sachwertfaktor) — Rest zur Historie:**
 - **Sachwertfaktor-Standardwert.** Minden-Lübbecke leitet für MFH keinen

@@ -31126,3 +31126,31 @@ Bildausschnitt gespeichert. 52 px war zu klein, deshalb v1873a.
 
 **Rest.** Prod v1846b; Staging v1873a. Das Siegel liegt nur auf der Landing —
 Impressum/Über-uns-Seiten führen es nicht.
+
+### (35) 05.10.2026 — v1874: „Willkommen an Bord“ erst nach der Anmeldung
+
+**Was.** Marcel (mit Bild `Dateien/wilkommen an board.png`): „ich gehe auf
+Kostenlos starten, dann kommt das Anmeldefenster und dann erscheint schon
+ein Willkommen an Bord mit Standardwerten prüfen … das soll erst nach der
+Anmeldung kommen.“
+
+**Gemessen.** `erststart.js` (v1638) startete seinen Timer 2,6 s nach dem
+Laden der Seite und fragte nie nach der Sitzung — bei `?register=1` legte
+sich die Karte über das Anmeldefenster. Die Sperre war nur „schon gesehen“
+oder „Tour fertig“.
+
+**Gebaut (`cf6c5df` v1874).** Die Karte wartet auf `dp:plan-ready`
+(subscription.js:154). Das Ereignis gibt es nur mit Sitzung, weil der Plan
+über `Auth.apiCall` kommt; dazu prüft `angemeldet()` vor dem Zeigen
+`Auth.isLoggedIn()`. Wer schon angemeldet lädt (`DealPilotPlanReady` steht
+bereits), bekommt sie wie bisher nach 2,6 s.
+
+**Nachweis (Staging, echte Datei).** Abgemeldet (Stub `Auth.isLoggedIn → false`,
+Skript neu geladen): keine Karte nach dem Laden, keine Karte nach einem
+ausgelösten `dp:plan-ready`. Angemeldet, Merker gelöscht, Seite neu geladen:
+Karte „Willkommen an Bord.“ steht 2,6 s nach `plan-ready` — Bild geprüft.
+Hinweis für Tests: `dp_tour_completed_v1` sperrt die Karte ebenfalls (wer die
+Tour kennt, ist nicht neu) — Marcels Konto zeigt sie deshalb nicht.
+
+**Rest.** Prod v1846b; Staging v1874. Die Landing-Knöpfe „Kostenlos starten“
+zeigen auf `app.dealpilot.immo/?register=1` — auch auf Staging auf Prod.
