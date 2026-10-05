@@ -229,7 +229,7 @@ body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
    KEIN --wl-Token. Der Gold-Waechter kennt diese beiden Toene nicht. */
 body.dp-pfzeile .dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
 body.dp-pfzeile .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
-body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-led{ background:#2A2622 !important; }
+body:not(.dp-chrome-hell) .dp-pfbar .dp-pf-tile:not(.on) .dp-pf-led{ background:#2A2622 !important; } /* v1870a: nur AUS - die Regel galt auch fuer gewaehlte Kacheln, Marcel: "die Lampe ist schwarz" */
 
 /* Auf dem Handy steht die erste Kachel allein in ihrer Gruppe - sie soll
    dann die volle Breite nehmen wie die Gruppe darunter, sonst sieht es
@@ -2247,4 +2247,14 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
    dort wurde bei 387 px kein einziger Ueberlauf gemessen. */
 @media (min-width:701px) and (max-width:1100px){
   .dp-pfbar{ flex-wrap:wrap !important; }
+}
+
+/* v1870a · Die Lampe einer gewaehlten Kachel leuchtet gruen - in der Haupt-App und im QuickBoarding.
+   Gemessen: Z. 232 faerbte JEDE Lampe dunkel (ohne Ruecksicht auf .on) und schlug per Spezifitaet die
+   gruene Regel aus style.css. Statusfarbe, deshalb Literal und kein Token. */
+body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-pfzeile .dp-pfbar .dp-pf-tile.on .dp-pf-led {
+  background: radial-gradient(circle at 35% 30%, #5BD98E, #3FA56C 70%) !important;
+  border-color: rgba(5,5,5,.35) !important;
+  box-shadow: 0 0 0 2px rgba(63,165,108,.25), 0 0 10px 1px rgba(63,165,108,.9) !important;
+  opacity: 1 !important;
 }

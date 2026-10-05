@@ -64,3 +64,4 @@
 #avsec .av-bar .av-right .lab { font-size: 7.5px !important; letter-spacing: .08em !important; color: #9a8f72 !important; }
 #avsec.av-min-on .av-body { display: block !important; }
 @media (max-width: 900px) { #avsec { grid-template-columns: 1fr !important; } #avsec .av-bar { padding: 0 14px 8px !important; } }
+#avsec .av-bar .av-min, #avsec .av-bar button[data-view] { display: none !important; }
