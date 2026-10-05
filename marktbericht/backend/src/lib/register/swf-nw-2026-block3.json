@@ -1,0 +1,3595 @@
+[
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": "Datenquelle: Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop, Grundstücksmarktbericht 2026, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). Kauffälle 2024 und 2025 gemeinsam ausgewertet (keine signifikanten Jahresunterschiede). Keine Lagedifferenzierung.",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+  },
+  "korrekturen": [],
+  "ags": "05512000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "zweig": "rmh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "75000": 1.53,
+    "100000": 1.5,
+    "150000": 1.43,
+    "200000": 1.37,
+    "250000": 1.31,
+    "300000": 1.25,
+    "350000": 1.19
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktoren zum Stichtag 01.01.2026 in Abhängigkeit vom vorläufigen Sachwert, Spalte \"Reihenmittelhäuser\" (45 Kauffälle), Tabelle Druck-S. 55."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Ein- und Zweifamilienhäuser, Kauffälle 2024–2025; Regression (Legende \"Kauffälle (blau), Regression (schwarz)\"), Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 55",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.25,
+    "soll_wert": 1.25,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,25."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.25,
+   "quelle": "Kap. 5.1.4, Druck-S. 55 (abgedruckter Tabellenwert)",
+   "ist": 1.25,
+   "ist_rechenweg": "Tabellenwert 1,25 = 1,25",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 45,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 54 (Druck 55), Modell 88 (Druck 89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 55"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": "Datenquelle: Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop, Grundstücksmarktbericht 2026, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). Kauffälle 2024 und 2025 gemeinsam ausgewertet (keine signifikanten Jahresunterschiede). Keine Lagedifferenzierung.",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+  },
+  "korrekturen": [],
+  "ags": "05512000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "100000": 1.29,
+    "150000": 1.26,
+    "200000": 1.23,
+    "250000": 1.21,
+    "300000": 1.18,
+    "350000": 1.15,
+    "400000": 1.12,
+    "450000": 1.1,
+    "500000": 1.07,
+    "550000": 1.04,
+    "600000": 1.01
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktoren zum Stichtag 01.01.2026 in Abhängigkeit vom vorläufigen Sachwert, Spalte \"Doppel-/Reihenendhäuser\" (108 Kauffälle), Tabelle Druck-S. 55."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Ein- und Zweifamilienhäuser, Kauffälle 2024–2025; Regression (Legende \"Kauffälle (blau), Regression (schwarz)\"), Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 55",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.18,
+    "soll_wert": 1.18,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,18."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.18,
+   "quelle": "Kap. 5.1.4, Druck-S. 55 (abgedruckter Tabellenwert)",
+   "ist": 1.18,
+   "ist_rechenweg": "Tabellenwert 1,18 = 1,18",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 108,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 54 (Druck 55), Modell 88 (Druck 89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 55"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": "Datenquelle: Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop, Grundstücksmarktbericht 2026, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). Kauffälle 2024 und 2025 gemeinsam ausgewertet (keine signifikanten Jahresunterschiede). Keine Lagedifferenzierung.",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+  },
+  "korrekturen": [],
+  "ags": "05512000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "zweig": "efh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.07,
+    "250000": 1.06,
+    "300000": 1.04,
+    "350000": 1.02,
+    "400000": 1.01,
+    "450000": 0.99,
+    "500000": 0.98,
+    "550000": 0.96,
+    "600000": 0.95,
+    "650000": 0.93,
+    "700000": 0.91,
+    "750000": 0.88
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktoren zum Stichtag 01.01.2026 in Abhängigkeit vom vorläufigen Sachwert, Spalte \"freistehende Einfamilienhäuser\" (41 Kauffälle), Tabelle Druck-S. 55."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Ein- und Zweifamilienhäuser, Kauffälle 2024–2025; Regression (Legende \"Kauffälle (blau), Regression (schwarz)\"), Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 55",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.04,
+    "soll_wert": 1.04,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,04."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.04,
+   "quelle": "Kap. 5.1.4, Druck-S. 55 (abgedruckter Tabellenwert)",
+   "ist": 1.04,
+   "ist_rechenweg": "Tabellenwert 1,04 = 1,04",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 41,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 54 (Druck 55), Modell 88 (Druck 89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 55"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": "Datenquelle: Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop, Grundstücksmarktbericht 2026, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). Kauffälle 2024 und 2025 gemeinsam ausgewertet (keine signifikanten Jahresunterschiede). Keine Lagedifferenzierung.",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindizes für die Bauwirtschaft, Destatis (Neubauten konventioneller Bauart; keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "1–5 % des vorläufigen Sachwerts der baulichen Anlagen",
+   "wortlaut": "Kap. 8.2 Modell zur Ableitung der Sachwertfaktoren (Druck-S. 89): Normgrundstück beitragsfrei, Tiefe 35 m, selbstständige Teilflächen abgezogen (§ 41); NHK 2010 Anlage 4; Bezugsmaßstab BGF; Baupreisindex Destatis; Regionalfaktor 1,0; fiktives Baujahr nach Modernisierung; RND = GND nach Anlage 1 abzüglich Alter unter Berücksichtigung Anlage 2 (keine GND beziffert); Alterswertminderung linear (§ 38); Standardstufe Anlage 4; werthaltige Bauteile nach Zeitwert; Außenanlagen 1–5 % des vorl. Sachwerts der baulichen Anlagen."
+  },
+  "korrekturen": [],
+  "ags": "05512000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "zweig": "zfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 1.23,
+    "200000": 1.18,
+    "250000": 1.14,
+    "300000": 1.1,
+    "350000": 1.06,
+    "400000": 1.01,
+    "450000": 0.97,
+    "500000": 0.93,
+    "550000": 0.89,
+    "600000": 0.85,
+    "650000": 0.8,
+    "700000": 0.76,
+    "750000": 0.72
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktoren zum Stichtag 01.01.2026 in Abhängigkeit vom vorläufigen Sachwert, Spalte \"Zweifamilienhäuser\" (50 Kauffälle), Tabelle Druck-S. 55."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Ein- und Zweifamilienhäuser, Kauffälle 2024–2025; Regression (Legende \"Kauffälle (blau), Regression (schwarz)\"), Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 55",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.1,
+    "soll_wert": 1.1,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,1."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.1,
+   "quelle": "Kap. 5.1.4, Druck-S. 55 (abgedruckter Tabellenwert)",
+   "ist": 1.1,
+   "ist_rechenweg": "Tabellenwert 1,10 = 1,10",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 50,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 54 (Druck 55), Modell 88 (Druck 89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 55"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Alle Wohnlagen; Vertragsjahre 2024/2025; \"sachverständig auf den Wertermittlungsstichtag anzupassen\". ",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+  },
+  "korrekturen": [],
+  "ags": "05914000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "zweig": "rmh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert VSW (Gebäude- und Bodenwert) in Euro",
+   "stufen": {
+    "125000": 1.54,
+    "150000": 1.45,
+    "175000": 1.4,
+    "200000": 1.34,
+    "225000": 1.29,
+    "250000": 1.24,
+    "275000": 1.18,
+    "300000": 1.13,
+    "325000": 1.07,
+    "350000": 1.02
+   },
+   "rundung_stellen": 2,
+   "hinweis": "\"Sachwertfaktoren SWF nach Gebäudetyp (alle Wohnlagen)\", Spalte \"Reihenmittelhaus\", Tabelle Druck-S. 46 (identisch Druck-S. 88, Kap. 11.3). Stichprobenmittel: BGF 238 m², WF 120 m², RND 34 J., Grundstück 221 m²."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "rd. 400 Kauffälle 2024/2025 insgesamt; Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 46",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.13,
+    "soll_wert": 1.13,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,13."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.13,
+   "quelle": "Kap. 5.1.4, Druck-S. 46 (abgedruckter Tabellenwert)",
+   "ist": 1.13,
+   "ist_rechenweg": "Tabellenwert 1,13 = 1,13",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 77,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 44-45 (Druck 45-46), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 45–46; Übersicht Kap. 11.3 Druck-S. 88–89"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Alle Wohnlagen; Vertragsjahre 2024/2025; \"sachverständig auf den Wertermittlungsstichtag anzupassen\". Bei 225.000 € druckt der Bericht \"1,224\" (offenkundiger Druckfehler zwischen 1,27 und 1,20); hinterlegt wie gedruckt, der Auswerter rundet auf 1,22.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+  },
+  "korrekturen": [],
+  "ags": "05914000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert VSW (Gebäude- und Bodenwert) in Euro",
+   "stufen": {
+    "150000": 1.34,
+    "175000": 1.3,
+    "200000": 1.27,
+    "225000": 1.224,
+    "250000": 1.2,
+    "275000": 1.17,
+    "300000": 1.14,
+    "325000": 1.1,
+    "350000": 1.07,
+    "375000": 1.04,
+    "400000": 1,
+    "425000": 0.97,
+    "450000": 0.94
+   },
+   "rundung_stellen": 2,
+   "hinweis": "\"Sachwertfaktoren SWF nach Gebäudetyp (alle Wohnlagen)\", Spalte \"Doppelhaushälfte / Reihenendhaus\", Tabelle Druck-S. 46 (identisch Druck-S. 88, Kap. 11.3). Stichprobenmittel: BGF 254 m², WF 131 m², RND 34 J., Grundstück 378 m²."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "rd. 400 Kauffälle 2024/2025 insgesamt; Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 46",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.14,
+    "soll_wert": 1.14,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,14."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.14,
+   "quelle": "Kap. 5.1.4, Druck-S. 46 (abgedruckter Tabellenwert)",
+   "ist": 1.14,
+   "ist_rechenweg": "Tabellenwert 1,14 = 1,14",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 135,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 44-45 (Druck 45-46), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 45–46; Übersicht Kap. 11.3 Druck-S. 88–89"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Alle Wohnlagen; Vertragsjahre 2024/2025; \"sachverständig auf den Wertermittlungsstichtag anzupassen\". ",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+  },
+  "korrekturen": [],
+  "ags": "05914000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "zweig": "efh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert VSW (Gebäude- und Bodenwert) in Euro",
+   "stufen": {
+    "150000": 1.18,
+    "175000": 1.17,
+    "200000": 1.16,
+    "225000": 1.15,
+    "250000": 1.14,
+    "275000": 1.12,
+    "300000": 1.11,
+    "325000": 1.1,
+    "350000": 1.09,
+    "375000": 1.08,
+    "400000": 1.07,
+    "425000": 1.05,
+    "450000": 1.04,
+    "475000": 1.03,
+    "500000": 1.02,
+    "525000": 1.01,
+    "550000": 1,
+    "575000": 0.99,
+    "600000": 0.97,
+    "625000": 0.96,
+    "650000": 0.95,
+    "675000": 0.94,
+    "700000": 0.93
+   },
+   "rundung_stellen": 2,
+   "hinweis": "\"Sachwertfaktoren SWF nach Gebäudetyp (alle Wohnlagen)\", Spalte \"Einfamilienhaus freistehend, EFH mit Einlieger\", Tabelle Druck-S. 46 (identisch Druck-S. 88, Kap. 11.3). Stichprobenmittel: BGF 327 m², WF 159 m², RND 29 J., Grundstück 704 m²."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "rd. 400 Kauffälle 2024/2025 insgesamt; Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 46",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.11,
+    "soll_wert": 1.11,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,11."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.11,
+   "quelle": "Kap. 5.1.4, Druck-S. 46 (abgedruckter Tabellenwert)",
+   "ist": 1.11,
+   "ist_rechenweg": "Tabellenwert 1,11 = 1,11",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 166,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 44-45 (Druck 45-46), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 45–46; Übersicht Kap. 11.3 Druck-S. 88–89"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Alle Wohnlagen; Vertragsjahre 2024/2025; \"sachverständig auf den Wertermittlungsstichtag anzupassen\". ",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis, Basis 2010 = 100 (keine Stichtagszahl abgedruckt)",
+   "aussenanlagen_prozent": "2–6 % des Gebäudezeitwerts",
+   "wortlaut": "Kap. 5.1.4 / 11.3 (Druck-S. 45, 89): SW-Modell der AGVGA.NRW; NHK 2010 inkl. Baunebenkosten; Baupreisindex Bund Basis 2010 = 100; GND 80 Jahre (Fertighäuser in Leichtbauweise 60); wirtschaftliche RND modifiziert nach Modernisierung (Kap. 8); Alterswertminderung linear; Außenanlagen rd. 2–6 % des Gebäudezeitwerts; Bodenwert aus ebf zonalem BRW, Übergrößen abgespalten. Ausgeschlossen: RND < 20 Jahre, sehr schlechter Bauzustand, Außenbereich."
+  },
+  "korrekturen": [],
+  "ags": "05914000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "zweig": "zfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert VSW (Gebäude- und Bodenwert) in Euro",
+   "stufen": {
+    "200000": 1.08,
+    "225000": 1.08,
+    "250000": 1.07,
+    "275000": 1.06,
+    "300000": 1.05,
+    "325000": 1.04,
+    "350000": 1.04,
+    "375000": 1.03,
+    "400000": 1.02,
+    "425000": 1.01,
+    "450000": 1,
+    "475000": 1,
+    "500000": 0.99,
+    "525000": 0.98,
+    "550000": 0.97
+   },
+   "rundung_stellen": 2,
+   "hinweis": "\"Sachwertfaktoren SWF nach Gebäudetyp (alle Wohnlagen)\", Spalte \"Zweifamilienhaus\", Tabelle Druck-S. 46 (identisch Druck-S. 88, Kap. 11.3). Stichprobenmittel: BGF 408 m², WF 194 m², RND 24 J., Grundstück 762 m²."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "rd. 400 Kauffälle 2024/2025 insgesamt; Streuung nicht beziffert."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 46",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.05,
+    "soll_wert": 1.05,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,05."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.05,
+   "quelle": "Kap. 5.1.4, Druck-S. 46 (abgedruckter Tabellenwert)",
+   "ist": 1.05,
+   "ist_rechenweg": "Tabellenwert 1,05 = 1,05",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 59,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 44-45 (Druck 45-46), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 45–46; Übersicht Kap. 11.3 Druck-S. 88–89"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Der Bericht druckt die Marktanpassung als prozentualen Zu-/Abschlag auf den vorläufigen Sachwert (liefert zuschlag_prozent); Faktor = 1 + Zuschlag/100. \"Durchschnittswerte\" — Marktanpassungskurve des durchschnittlichen Käuferverhaltens.",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "wortlaut": "Kap. 7.1 Modell (Druck-S. 64–65): bereinigter normierter Kaufpreis (§§ 7, 8; typische Nebengebäude enthalten, untypische wie Scheunen ausgeschlossen); NHK 2010 (Anlage 4), Baunebenkosten enthalten; Regionalfaktor 1,0; Mischkalkulation bei teilweisem DG-Ausbau/Teilunterkellerung; Gebäudestandard nach Fragebogen (Anlage 4); Bezugsmaßstab BGF DIN 277-1:2005-02. Eine Gesamtnutzungsdauer ist im gelesenen Modellblock nicht beziffert."
+  },
+  "korrekturen": [],
+  "ags": "05915000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "log_1d",
+   "a": -43.58,
+   "b": 564.26,
+   "liefert": "zuschlag_prozent",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    175000,
+    650000
+   ],
+   "rundung_stellen": 0,
+   "hinweis": "Marktanpassung[%] = -43.58 × ln(Sachwert) + 564.26 (Diagramm Druck-S. 42, R² 0.3314) für freistehende Ein- und Zweifamilienhäuser; Gültigkeit = abgedruckte Wertetabelle 175–650 Tsd. €. Alle 20 Tabellenzellen folgen der Formel (maschinell geprüft). Datenmaterial 2024 und 2025."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "Stichprobe: vorl. Sachwert Ø 410.938 € (99.536–933.600), Bodenwertanteil Ø 39 % (21–59), Bodenwert Ø 232 €/m² (122–330), RND Ø 39 J. (12–76); Baujahre 1915–2020; 32 Fälle 2024, 26 Fälle 2025. Ausgeschlossen: Bodenwertanteil > 60 % bei RND < 25 J., Bodenwertanteil < 20 %, Bodenwert < 100 €/m².",
+   "statistik": {
+    "bestimmtheitsmass": 0.3314
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle und Diagramm Druck-S. 42",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 15,
+    "soll_wert": 15,
+    "soll_faktor": 1.15,
+    "wortlaut": "ERSATZPRÜFUNG — kein Anwendungsbeispiel im Bericht; Soll ist der abgedruckte Tabellenwert: Sachwert 300.000 € → Marktanpassung +15 % (Faktor 1,15)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 15,
+   "soll_einheit": "zuschlag_prozent",
+   "quelle": "Kap. 5.1.4, Tabelle und Diagramm Druck-S. 42 (abgedruckter Tabellenwert, Marktanpassung in %)",
+   "ist": 15,
+   "ist_rechenweg": "Tabellenwert 15 = 15 % → Faktor 1,150",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 58,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 41 (Druck 42), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4, Tabelle und Diagramm Druck-S. 42"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Der Bericht druckt die Marktanpassung als prozentualen Zu-/Abschlag auf den vorläufigen Sachwert (liefert zuschlag_prozent); Faktor = 1 + Zuschlag/100. \"Durchschnittswerte\" — Marktanpassungskurve des durchschnittlichen Käuferverhaltens.",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "wortlaut": "Kap. 7.1 Modell (Druck-S. 64–65): bereinigter normierter Kaufpreis (§§ 7, 8; typische Nebengebäude enthalten, untypische wie Scheunen ausgeschlossen); NHK 2010 (Anlage 4), Baunebenkosten enthalten; Regionalfaktor 1,0; Mischkalkulation bei teilweisem DG-Ausbau/Teilunterkellerung; Gebäudestandard nach Fragebogen (Anlage 4); Bezugsmaßstab BGF DIN 277-1:2005-02. Eine Gesamtnutzungsdauer ist im gelesenen Modellblock nicht beziffert."
+  },
+  "korrekturen": [],
+  "ags": "05915000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "log_1d",
+   "a": -46.06,
+   "b": 584.57,
+   "liefert": "zuschlag_prozent",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    60000,
+    475000
+   ],
+   "rundung_stellen": 0,
+   "hinweis": "Marktanpassung[%] = -46.06 × ln(Sachwert) + 584.57 (Diagramm Druck-S. 43, R² 0.4458) für Doppelhaushälften und Reihenhäuser; Gültigkeit = abgedruckte Wertetabelle 60–475 Tsd. €. Alle 20 Tabellenzellen folgen der Formel (maschinell geprüft). Datenmaterial 2024 und 2025."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "Baujahre 1898–2019, Kaufpreise rd. 160.000–450.000 €; 37 Fälle 2024, 36 Fälle 2025. Ausgeschlossen: Bodenwertanteil > 60 % bei RND < 25 J., Bodenwertanteil < 16 %, Bodenwert < 50 €/m².",
+   "statistik": {
+    "bestimmtheitsmass": 0.4458
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle und Diagramm Druck-S. 43",
+    "eingabe": {
+     "sachwert": 200000
+    },
+    "soll_tabellenwert": 22,
+    "soll_wert": 22,
+    "soll_faktor": 1.22,
+    "wortlaut": "ERSATZPRÜFUNG — kein Anwendungsbeispiel im Bericht; Soll ist der abgedruckte Tabellenwert: Sachwert 200.000 € → Marktanpassung +22 % (Faktor 1,22)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 200000
+   },
+   "soll": 22,
+   "soll_einheit": "zuschlag_prozent",
+   "quelle": "Kap. 5.1.4, Tabelle und Diagramm Druck-S. 43 (abgedruckter Tabellenwert, Marktanpassung in %)",
+   "ist": 22,
+   "ist_rechenweg": "Tabellenwert 22 = 22 % → Faktor 1,220",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 73,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 42 (Druck 43), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4, Tabelle und Diagramm Druck-S. 43"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gilt für Ausstattungsklasse 4 (mittlerer bis guter Wohnkomfort, Ziffer 8.1); \"bei anderen Ausstattungsmerkmalen ist der Wert entsprechend zu erhöhen bzw. zu senken\" — nicht beziffert, nicht hinterlegt. Grundstücksgröße = Feld flaeche (Grundstücksfläche m²).",
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "regionalfaktor": 1,
+   "baupreisindex": "Baupreisindex gemäß Veröffentlichung des Statistischen Bundesamtes (keine Stichtagszahl abgedruckt)",
+   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort)."
+  },
+  "korrekturen": [],
+  "ags": "05916000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "regression_additiv",
+   "liefert": "faktor",
+   "rundung_stellen": 3,
+   "intercept": 2.780936,
+   "terme": [
+    {
+     "feld": "baujahr",
+     "bez": "tatsächliches Baujahr",
+     "koeffizient": -0.000722,
+     "exponent": 1,
+     "gueltig": [
+      1880,
+      2020
+     ],
+     "zentrum_im_bericht": 1960
+    },
+    {
+     "feld": "bgf",
+     "bez": "Bruttogrundfläche in m²",
+     "koeffizient": -0.0004737,
+     "exponent": 1,
+     "gueltig": [
+      121,
+      660
+     ],
+     "zentrum_im_bericht": 280
+    },
+    {
+     "feld": "flaeche",
+     "bez": "Grundstücksgröße in m²",
+     "koeffizient": -0.0001404,
+     "exponent": 1,
+     "gueltig": [
+      83,
+      1756
+     ],
+     "zentrum_im_bericht": 450
+    }
+   ],
+   "hinweis": "Der Bericht druckt (Druck-S. 41): KP/SW = 1,17 − 0,000722 × (Baujahr − 1960) − 0,0004737 × (Bruttogrundfläche − 280 m²) − 0,0001404 × (Grundstücksgröße − 450 m²); r² 0,2652; unabhängig von der Lage im Stadtgebiet. Hier algebraisch ausmultipliziert (intercept = 1,17 + 0,000722·1960 + 0,0004737·280 + 0,0001404·450 = 2,780936); Zentren in zentrum_im_bericht. Gültigkeit = Min–Max der Stichprobe (Kap. 8.4.1)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Stichprobenspannen Baujahr 1880–2020, Grundstück 83–1.756 m², BGF 121–660 m²)",
+   "interpolation": "Funktion",
+   "hinweis": "Multiple lineare Regression, 323 Kauffälle 2023–2025, r² 0,2652; Stichprobenmittel Baujahr 1960, Grundstück 450 m², BGF 280 m².",
+   "statistik": {
+    "bestimmtheitsmass": 0.2652
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4 \"Beispiel\", Druck-S. 41",
+    "eingabe": {
+     "baujahr": 1975,
+     "flaeche": 500,
+     "bgf": 220
+    },
+    "soll_tabellenwert": 1.181,
+    "soll_wert": 1.181,
+    "soll_sachwert_eur": 354300,
+    "wortlaut": "Baujahr 1975, Grundstücksgröße 500 m², BGF 220 m², frei von Baumängeln: KP/SW = 1,181 (Zuschlag 18,1 %); 300.000 € × 1,181 = ca. 354.300 €."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "baujahr": 1975,
+    "flaeche": 500,
+    "bgf": 220
+   },
+   "soll": 1.181,
+   "soll_stellen": 3,
+   "quelle": "Beispiel Druck-S. 41: KP/SW = 1,181; 300.000 € × 1,181 = ca. 354.300 €",
+   "ist": 1.181,
+   "ist_rechenweg": "Tabellenwert 1,181 = 1,181",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 323,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11300_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 40 (Druck 41), Modell 68 (Druck 69), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 41; Modell Kap. 8.4.1 Druck-S. 69"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Wohnlageklasse (Ziffer 8.2) und Modernisierungsgrad (Ziffer 8.3) sind Herner Skalen, nicht Anlage 2 ImmoWertV — Felder wohnlageklasse und modernisierungsgrad_herne; ohne sie rechnet der Satz nicht (Gleichung als Ganzes).",
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "regionalfaktor": 1,
+   "baupreisindex": "Baupreisindex gemäß Veröffentlichung des Statistischen Bundesamtes (keine Stichtagszahl abgedruckt)",
+   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort)."
+  },
+  "korrekturen": [],
+  "ags": "05916000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+  "zweig": "dreifh",
+  "formel": {
+   "form": "regression_additiv",
+   "liefert": "faktor",
+   "rundung_stellen": 3,
+   "intercept": 1.505479,
+   "terme": [
+    {
+     "feld": "wohnlageklasse",
+     "bez": "Wohnlageklasse nach Ziffer 8.2 (Normobjekt 5)",
+     "koeffizient": -0.03938,
+     "exponent": 1,
+     "gueltig": [
+      3,
+      7
+     ],
+     "zentrum_im_bericht": 5
+    },
+    {
+     "feld": "bgf",
+     "bez": "Bruttogrundfläche in m²",
+     "koeffizient": -0.0004741,
+     "exponent": 1,
+     "gueltig": [
+      336,
+      808
+     ],
+     "zentrum_im_bericht": 490
+    },
+    {
+     "feld": "modernisierungsgrad_herne",
+     "bez": "Modernisierungsgrad nach Ziffer 8.3 (Normobjekt 3)",
+     "koeffizient": -0.06309,
+     "exponent": 1,
+     "gueltig": [
+      2,
+      4
+     ],
+     "zentrum_im_bericht": 3
+    }
+   ],
+   "hinweis": "Der Bericht druckt (Kap. 5.2.2, Druck-S. 46): KP/SW = 0,887 − 0,03938 × (Wohnlage − 5) − 0,0004741 × (Bruttogrundfläche − 490 m²) − 0,06309 × (Modernisierungsgrad − 3); r² 0,2236; 37 nicht geförderte Dreifamilienhäuser 2023–2025. Algebraisch ausmultipliziert, Zentren in zentrum_im_bericht."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Stichprobenspannen Wohnlage 3–7, BGF 336–808 m², Modernisierungsgrad 2–4)",
+   "interpolation": "Funktion",
+   "hinweis": "Gebäude mit drei eigenständigen Wohnungen; Stichprobenmittel Wohnlage 5, BGF 490 m², Modernisierungsgrad 3.",
+   "statistik": {
+    "bestimmtheitsmass": 0.2236
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.2.2, Druck-S. 46; Kap. 8.4.1 Druck-S. 70",
+    "eingabe": {
+     "wohnlageklasse": 5,
+     "bgf": 490,
+     "modernisierungsgrad_herne": 3
+    },
+    "soll_tabellenwert": 0.887,
+    "soll_wert": 0.887,
+    "wortlaut": "ERSATZPRÜFUNG — kein Anwendungsbeispiel; am Normobjekt (Wohnlage 5, BGF 490 m², Modernisierungsgrad 3 = Stichprobenmittel) ergibt die Gleichung den abgedruckten Grundwert 0,887."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "wohnlageklasse": 5,
+    "bgf": 490,
+    "modernisierungsgrad_herne": 3
+   },
+   "soll": 0.887,
+   "soll_stellen": 3,
+   "quelle": "ERSATZ: Grundwert der Gleichung am Normobjekt (Druck-S. 46)",
+   "ist": 0.887,
+   "ist_rechenweg": "Tabellenwert 0,887 = 0,887",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 37,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11300_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 45 (Druck 46), Modell 68 (Druck 70), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.2.2, Druck-S. 46; Modell Kap. 8.4.1 Druck-S. 70"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Nur Mietwohngebäude mit Gewerbeanteil unter 20 % (Feld gewerbeanteil_prozent ist Pflicht, Bedingung < 20). Baujahrsklasse aus dem Baujahr: bis 1944 Mittelwert 0,830; ab 1946 Regression; für das Baujahr 1945 trifft der Bericht keine Aussage (\"vor\"/\"nach\" 1945). Modernisierungsgrad nach Herner Ziffer 8.3.",
+  "modellansaetze": {
+   "gnd_jahre": null,
+   "regionalfaktor": 1,
+   "baupreisindex": "Baupreisindex gemäß Veröffentlichung des Statistischen Bundesamtes (keine Stichtagszahl abgedruckt)",
+   "wortlaut": "Kap. 8.4.1 Modellparameter Sachwertfaktoren (Druck-S. 69): Bodenwert nach ggf. angepasstem BRW; NHK 2010 Anlage 4; Bezugsgröße BGF DIN 277 (Ziffer 8.7); Baupreisindex Destatis; Regionalfaktor 1,0; GND nach Anlage 1 (nicht beziffert); RND nach Anlage 2; Alterswertminderung § 38 (linear). Ausstattungsklasse nach Ziffer 8.1 (Normobjekt Klasse 4 = mittlerer bis guter Wohnkomfort)."
+  },
+  "korrekturen": [],
+  "ags": "05916000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+  "zweig": "mfh",
+  "formel": {
+   "form": "verzweigt",
+   "liefert": "faktor",
+   "rundung_stellen": 3,
+   "achse_k_feld": "baujahrsklasse",
+   "achse_k_bez": "Baujahrsklasse (vor 1945 / nach 1945)",
+   "kategorien": [
+    "vor_1945",
+    "nach_1945"
+   ],
+   "zuordnung_feld": "baujahr",
+   "kategorie_baender": [
+    {
+     "von": null,
+     "bis": 1944,
+     "kategorie": "vor_1945"
+    },
+    {
+     "von": 1946,
+     "bis": null,
+     "kategorie": "nach_1945"
+    }
+   ],
+   "bedingungen": [
+    {
+     "feld": "gewerbeanteil_prozent",
+     "bez": "Gewerbeanteil am marktüblichen Rohertrag in %",
+     "kleiner_als": 20,
+     "text": "unter 20 % liegt (Mietwohngebäude)"
+    }
+   ],
+   "modell_je_kategorie": {
+    "vor_1945": {
+     "form": "konstante",
+     "wert": 0.83,
+     "rundung_stellen": 3,
+     "fallzahl": 80,
+     "streuung": 0.0832,
+     "fundstelle": "Druck-S. 45",
+     "hinweis": "KP/SW = 0,830 (Mittelwert, Streuung 0,0832; keine Abhängigkeiten per Regression feststellbar); Kap. 8.4.1: 80 Kauffälle 2023–2025, Spanne 0,62–1,16."
+    },
+    "nach_1945": {
+     "form": "regression_additiv",
+     "liefert": "faktor",
+     "rundung_stellen": 3,
+     "intercept": 0.8831053,
+     "terme": [
+      {
+       "feld": "bgf",
+       "bez": "Bruttogrundfläche in m²",
+       "koeffizient": -0.0002542,
+       "exponent": 1,
+       "gueltig": [
+        472,
+        1628
+       ],
+       "zentrum_im_bericht": 870
+      },
+      {
+       "feld": "bodenwert_eur",
+       "bez": "Bodenwert in Euro",
+       "koeffizient": -5.151e-7,
+       "exponent": 1,
+       "gueltig": [
+        76300,
+        340200
+       ],
+       "zentrum_im_bericht": 173000
+      },
+      {
+       "feld": "modernisierungsgrad_herne",
+       "bez": "Modernisierungsgrad nach Ziffer 8.3 (Normobjekt 3)",
+       "koeffizient": -0.04063,
+       "exponent": 1,
+       "gueltig": [
+        2,
+        4
+       ],
+       "zentrum_im_bericht": 3
+      },
+      {
+       "feld": "rohertrag_eur",
+       "bez": "Rohertrag in Euro/Jahr",
+       "koeffizient": 0.00001009,
+       "exponent": 1,
+       "gueltig": [
+        16800,
+        66100
+       ],
+       "zentrum_im_bericht": 33900
+      }
+     ],
+     "fallzahl": 68,
+     "bestimmtheitsmass": 0.2811,
+     "fundstelle": "Druck-S. 45",
+     "hinweis": "KP/SW = 0,793 − 0,0002542 × (BGF − 870 m²) − 0,0000005151 × (Bodenwert − 173.000 €) − 0,04063 × (Modernisierungsgrad − 3) + 0,00001009 × (Rohertrag − 33.900 €); r² 0,2811; 68 Kauffälle 2023–2025. Algebraisch ausmultipliziert, Zentren in zentrum_im_bericht."
+    }
+   },
+   "hinweis": "Kap. 5.2.2 (Druck-S. 45): Verhältnis Kaufpreis/Sachwert für Mietwohngebäude (Gewerbeanteil unter 20 %), getrennt nach Baujahren vor und nach 1945. Mietgebäude mit Gewerbeanteil über 20 % führen eine eigene Gleichung (nicht hinterlegt)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Stichprobenspannen der Regression; Mittelwert ohne Spanne)",
+   "interpolation": "Funktion",
+   "hinweis": "Nicht öffentlich geförderte Objekte, Verkaufsjahre 2023–2025."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.2.2, Druck-S. 45",
+    "eingabe": {
+     "baujahr": 1930,
+     "gewerbeanteil_prozent": 0
+    },
+    "soll_tabellenwert": 0.83,
+    "soll_wert": 0.83,
+    "wortlaut": "ERSATZPRÜFUNG — Mittelwert vor 1945: KP/SW = 0,830 (abgedruckt). Zweite Probe im Generator: Normobjekt nach 1945 (BGF 870, Bodenwert 173.000, Modg 3, Rohertrag 33.900) ergibt den Grundwert 0,793."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "baujahr": 1930,
+    "gewerbeanteil_prozent": 0
+   },
+   "soll": 0.83,
+   "soll_stellen": 3,
+   "quelle": "Kap. 5.2.2 Druck-S. 45: KP/SW = 0,830 (Mittelwert vor 1945)",
+   "ist": 0.83,
+   "ist_rechenweg": "Tabellenwert 0,830 = 0,830",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 148,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11300_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 44 (Druck 45), Modell 68 (Druck 70), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.2.2, Druck-S. 45; Modell Kap. 8.4.1 Druck-S. 70"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.11,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Standardstufe (Ausstattung, Anlage 4) ist Pflichteingabe. Der Bericht führt genau vier Klassen (1 bis 2 · 2,5 · 3 · 3,5 bis 4,5); Zwischenwerte (z. B. 2,7) ordnet er keiner Klasse zu — dann kein Wert, keine Rundung auf die Nachbarklasse. SF(%) ist der prozentuale Zuschlag (liefert zuschlag_prozent): 27,39 → Faktor 1,27.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "aussenanlagen_prozent": 5,
+   "korrekturfaktor_zfh": 1.05,
+   "baupreisindex": "Preisindex Destatis für den Neubau von Wohngebäuden in konventioneller Bauart einschl. USt (ehemals Fachserie 17 Reihe 4; keine Stichtagszahl abgedruckt)",
+   "wortlaut": "Kap. 8.1 (Druck-S. 53): BGF nach DIN 277 (1987, Teilflächen a und b); NHK 2010 Anlage 4, Baunebenkosten enthalten; Regionalfaktor 1,0; Alterswertminderung linear (§ 38); Preisindex Destatis; GND 80 Jahre (Anlage 1); Bodenwert wie unbebaut, selbstständige Teile herausgerechnet; nicht erfasste Bauteile nach Anlage 7 AGVGA-Modell (7/2017); Zeitwert Nebengebäude; Außenanlagen Ø 5 % des Sachwerts der baulichen Anlagen; Modernisierung nach Anlage 2; Dachgeschoss nach Anlage 5 AGVGA; Faktor freistehende ZFH 1,05; durchschnittlicher altersgemäßer Zustand."
+  },
+  "korrekturen": [],
+  "ags": "05316000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "liefert": "zuschlag_prozent",
+   "rundung_stellen": 4,
+   "achse_k_feld": "standardstufe_klasse",
+   "achse_k_bez": "Standardstufenklasse (1 bis 2 · 2,5 · 3 · 3,5 bis 4,5)",
+   "kategorien": [
+    "1_bis_2",
+    "2_5",
+    "3",
+    "3_5_bis_4_5"
+   ],
+   "zuordnung_feld": "standardstufe",
+   "kategorie_baender": [
+    {
+     "von": 1,
+     "bis": 2,
+     "kategorie": "1_bis_2"
+    },
+    {
+     "von": 2.5,
+     "bis": 2.5,
+     "kategorie": "2_5"
+    },
+    {
+     "von": 3,
+     "bis": 3,
+     "kategorie": "3"
+    },
+    {
+     "von": 3.5,
+     "bis": 4.5,
+     "kategorie": "3_5_bis_4_5"
+    }
+   ],
+   "modell_je_kategorie": {
+    "3": {
+     "form": "log_1d",
+     "a": -54.037,
+     "b": 721.674,
+     "liefert": "zuschlag_prozent",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "eingang_bez": "vorläufiger Sachwert in Euro",
+     "gueltig": [
+      210000,
+      870000
+     ],
+     "rundung_stellen": 4,
+     "hinweis": "Standardstufe 3: SF(%) = 708,881 − 54,037 × ln(SW) + 12.793 (Zu-/Abschlag der Klasse); Gültigkeit = Tabellenspalte 210–870 Tsd. €."
+    },
+    "1_bis_2": {
+     "form": "log_1d",
+     "a": -54.037,
+     "b": 695.292,
+     "liefert": "zuschlag_prozent",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "eingang_bez": "vorläufiger Sachwert in Euro",
+     "gueltig": [
+      150000,
+      510000
+     ],
+     "rundung_stellen": 4,
+     "hinweis": "Standardstufe 1 bis 2: SF(%) = 708,881 − 54,037 × ln(SW) − 13.589 (Zu-/Abschlag der Klasse); Gültigkeit = Tabellenspalte 150–510 Tsd. €."
+    },
+    "2_5": {
+     "form": "log_1d",
+     "a": -54.037,
+     "b": 708.881,
+     "liefert": "zuschlag_prozent",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "eingang_bez": "vorläufiger Sachwert in Euro",
+     "gueltig": [
+      150000,
+      870000
+     ],
+     "rundung_stellen": 4,
+     "hinweis": "Standardstufe 2,5: SF(%) = 708,881 − 54,037 × ln(SW) + 0 (Zu-/Abschlag der Klasse); Gültigkeit = Tabellenspalte 150–870 Tsd. €."
+    },
+    "3_5_bis_4_5": {
+     "form": "log_1d",
+     "a": -54.037,
+     "b": 731.48,
+     "liefert": "zuschlag_prozent",
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "eingang_bez": "vorläufiger Sachwert in Euro",
+     "gueltig": [
+      210000,
+      870000
+     ],
+     "rundung_stellen": 4,
+     "hinweis": "Standardstufe 3,5 bis 4,5: SF(%) = 708,881 − 54,037 × ln(SW) + 22.599 (Zu-/Abschlag der Klasse); Gültigkeit = Tabellenspalte 210–870 Tsd. €."
+    }
+   },
+   "hinweis": "Funktionsgleichung SF(%) = 708,881 − 54,037 × ln(SW) mit Zu-/Abschlägen je Standardstufe (1 bis 2: −13,589; 2,5: ±0; 3: +12,793; 3,5–4,5: +22,599), Druck-S. 39; abhängige Größen vorl. Sachwert und Standardstufe (multiple Regression); Standardabweichung ± 0,11. Alle Zellen der Tabelle \"Sachwertfaktor für Ein- und Zweifamilienhäuser auf Basis NHK 2010\" (Druck-S. 39) folgen der Formel (maschinell geprüft)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (je Klasse die Tabellenspalte)",
+   "interpolation": "Funktion",
+   "hinweis": "223 Kaufpreise 2024–2025: Kaufpreis 225.000–1.006.000 € (Ø 477.513), vorl. Sachwert 107.112–1.068.000 € (Ø 438.380), Grundstück 113–1.197 m², Wohnfläche 55–280 m², Baujahr 1911–2021 (Ø 1973), RND 20–77 J. (Ø 37), Standardstufe 1,7–4,5 (Ø 2,7).",
+   "statistik": {
+    "swf_standardabweichung": 0.11
+   },
+   "spannen": {
+    "baujahr": [
+     1911,
+     2021
+    ],
+    "wohnflaeche_m2": [
+     55,
+     280
+    ],
+    "rnd_jahre": [
+     20,
+     77
+    ],
+    "standardstufe": [
+     1.7,
+     4.5
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 39",
+    "eingabe": {
+     "sachwert": 300000,
+     "standardstufe": 3
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": null,
+    "soll_faktor": 1.4,
+    "wortlaut": "ERSATZPRÜFUNG — kein Anwendungsbeispiel im Bericht; Tabellenwert 300.000 €, Standardstufe 3 = 1,40 (Formel: 708,881 − 54,037 × ln 300.000 + 12,793 = 40,18 % → 1,40)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000,
+    "standardstufe": 3
+   },
+   "soll": 1.4,
+   "soll_einheit": "faktor",
+   "quelle": "Kap. 5.1.4, Tabelle Druck-S. 39 (abgedruckter Tabellenwert; Formel 40,18 % → 1,40)",
+   "ist": 1.4018,
+   "ist_rechenweg": "Tabellenwert 40,1843 = 40,1843 % → Faktor 1,402",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 223,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11600_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 38 (Druck 39), Modell 52 (Druck 53), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren für Ein- und Zweifamilienhäuser, Druck-S. 39; Modell Kap. 8.1 Druck-S. 53"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit und Plausibilität am Stichprobenmittel): der Bericht druckt die Trendlinie nur als Formel im Diagramm. Der Ausgangswert ist \"objektspezifisch anzupassen\" (§ 39): gute Lagen höher, einfache Lagen niedriger; bei ZFH ggf. Abschläge für nicht zeitgemäße Aufteilung.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05117000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.311,
+   "b": 5.1447,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    231000,
+    1223000
+   ],
+   "rundung_stellen": 2,
+   "hinweis": "Ausgeglichene Funktion im Diagramm \"Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser\" (Druck-S. 47, Reihe 2024/2025): y = -0,311ln(x) + 5,1447, R² 0,2704. Zuordnung zur aktuellen Reihe gemessen: der GMB 2025 druckt für dieselbe Objektart eine andere Formel. Gültigkeit = Sachwertspanne der Stichprobe (Kennzahlentabelle Druck-S. 49)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Sachwertspanne der Stichprobe)",
+   "interpolation": "Funktion",
+   "hinweis": "342 Kauffälle 2024/2025 insgesamt; freistehende Ein- und Zweifamilienhäuser: 96 Fälle, mittlerer vorl. Sachwert 589.681 €, Spanne 231.000–1.223.000 €; RND ≥ 25 Jahre.",
+   "statistik": {
+    "bestimmtheitsmass": 0.2704
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Diagramm Druck-S. 47, Kennzahlen Druck-S. 49",
+    "eingabe": {
+     "sachwert": 589681
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": null,
+    "wortlaut": "KEIN Anwendungsbeispiel und keine Tabelle im Bericht. Nur Verfügbarkeitsprüfung am mittleren vorläufigen Sachwert 589.681 €."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 589681
+   },
+   "soll": null,
+   "quelle": "kein Anwendungsbeispiel im Bericht",
+   "abnahme": "plausibilitaet_ohne_soll",
+   "bemerkung": "Formel am Stichprobenmittel 589.681 €; der Bericht nennt keinen mittleren Sachwertfaktor.",
+   "ist": 1.01,
+   "ist_rechenweg": "Tabellenwert 1,01 = 1,01",
+   "ergebnis": "nur_verfuegbarkeit (kein Soll im Bericht)"
+  },
+  "fallzahl": 96,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11800_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 46 (Druck 47), Kennzahlen 48 (Druck 49), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Diagramme Druck-S. 47–48, Kennzahlen Druck-S. 49"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit und Plausibilität am Stichprobenmittel): der Bericht druckt die Trendlinie nur als Formel im Diagramm. Der Ausgangswert ist \"objektspezifisch anzupassen\" (§ 39): gute Lagen höher, einfache Lagen niedriger; bei ZFH ggf. Abschläge für nicht zeitgemäße Aufteilung.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05117000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.32,
+   "b": 5.2907,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    120000,
+    874000
+   ],
+   "rundung_stellen": 2,
+   "hinweis": "Ausgeglichene Funktion im Diagramm \"Sachwertfaktoren für Doppelhaushälften und Reihenendhäuser\" (Druck-S. 47, Reihe 2024/2025): y = -0,32ln(x) + 5,2907, R² 0,1429. Zuordnung zur aktuellen Reihe gemessen: der GMB 2025 druckt für dieselbe Objektart eine andere Formel. Gültigkeit = Sachwertspanne der Stichprobe (Kennzahlentabelle Druck-S. 49)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Sachwertspanne der Stichprobe)",
+   "interpolation": "Funktion",
+   "hinweis": "342 Kauffälle 2024/2025 insgesamt; Doppelhaushälften und Reihenendhäuser: 170 Fälle, mittlerer vorl. Sachwert 374.117 €, Spanne 120.000–874.000 €; RND ≥ 25 Jahre.",
+   "statistik": {
+    "bestimmtheitsmass": 0.1429
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Diagramm Druck-S. 47, Kennzahlen Druck-S. 49",
+    "eingabe": {
+     "sachwert": 374117
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": null,
+    "wortlaut": "KEIN Anwendungsbeispiel und keine Tabelle im Bericht. Nur Verfügbarkeitsprüfung am mittleren vorläufigen Sachwert 374.117 €."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 374117
+   },
+   "soll": null,
+   "quelle": "kein Anwendungsbeispiel im Bericht",
+   "abnahme": "plausibilitaet_ohne_soll",
+   "bemerkung": "Formel am Stichprobenmittel 374.117 €; der Bericht nennt keinen mittleren Sachwertfaktor.",
+   "ist": 1.18,
+   "ist_rechenweg": "Tabellenwert 1,18 = 1,18",
+   "ergebnis": "nur_verfuegbarkeit (kein Soll im Bericht)"
+  },
+  "fallzahl": 170,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11800_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 46 (Druck 47), Kennzahlen 48 (Druck 49), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Diagramme Druck-S. 47–48, Kennzahlen Druck-S. 49"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit und Plausibilität am Stichprobenmittel): der Bericht druckt die Trendlinie nur als Formel im Diagramm. Der Ausgangswert ist \"objektspezifisch anzupassen\" (§ 39): gute Lagen höher, einfache Lagen niedriger; bei ZFH ggf. Abschläge für nicht zeitgemäße Aufteilung.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 8.1 (Druck-S. ~75): Handlungsempfehlung AGVGA.NRW; GND 80 Jahre gemäß Anlage 1 ImmoWertV; RND = GND abzüglich Alter (§ 4 Abs. 3) ggf. modifiziert; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05117000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+  "zweig": "rmh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.469,
+   "b": 7.2026,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    112000,
+    492000
+   ],
+   "rundung_stellen": 2,
+   "hinweis": "Ausgeglichene Funktion im Diagramm \"Sachwertfaktoren für Reihenmittelhäuser\" (Druck-S. 47, Reihe 2024/2025): y = -0,469ln(x) + 7,2026, R² 0,2913. Zuordnung zur aktuellen Reihe gemessen: der GMB 2025 druckt für dieselbe Objektart eine andere Formel. Gültigkeit = Sachwertspanne der Stichprobe (Kennzahlentabelle Druck-S. 49)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Sachwertspanne der Stichprobe)",
+   "interpolation": "Funktion",
+   "hinweis": "342 Kauffälle 2024/2025 insgesamt; Reihenmittelhäuser: 76 Fälle, mittlerer vorl. Sachwert 270.970 €, Spanne 112.000–492.000 €; RND ≥ 25 Jahre.",
+   "statistik": {
+    "bestimmtheitsmass": 0.2913
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Diagramm Druck-S. 47, Kennzahlen Druck-S. 49",
+    "eingabe": {
+     "sachwert": 270970
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": null,
+    "wortlaut": "KEIN Anwendungsbeispiel und keine Tabelle im Bericht. Nur Verfügbarkeitsprüfung am mittleren vorläufigen Sachwert 270.970 €."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 270970
+   },
+   "soll": null,
+   "quelle": "kein Anwendungsbeispiel im Bericht",
+   "abnahme": "plausibilitaet_ohne_soll",
+   "bemerkung": "Formel am Stichprobenmittel 270.970 €; der Bericht nennt keinen mittleren Sachwertfaktor.",
+   "ist": 1.34,
+   "ist_rechenweg": "Tabellenwert 1,34 = 1,34",
+   "ergebnis": "nur_verfuegbarkeit (kein Soll im Bericht)"
+  },
+  "fallzahl": 76,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11800_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 46 (Druck 47), Kennzahlen 48 (Druck 49), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Diagramme Druck-S. 47–48, Kennzahlen Druck-S. 49"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": "Datenquelle: Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen, Grundstücksmarktbericht 2026, Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0)",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung nach dl-de/by-2-0 (quellenvermerk). Ein Modell für alle Ein- und Zweifamilienwohngrundstücke (keine Trennung nach Anbauweise; für Zweifamilienhäuser keine separaten Werte). Gilt für mittlere Wohnlagen: gute Lagen höher, einfache niedriger (nicht beziffert); freistehende EFH und Reihenmittelhäuser erzielten im Mittel höhere Verhältnisse. Fallzahl nicht abgedruckt.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindex für die Bauwirtschaft, Destatis (keine Stichtagszahl abgedruckt)",
+   "wortlaut": "Kap. 9.4 (Druck-S. 43–44): NHK 2010; Bezugsmaßstab BGF in Anlehnung an DIN 277-1:2005-02; Regionalfaktor 1,0 (§ 36 Abs. 3); Preisindex Destatis; GND in der Regel 80 Jahre (Anlage 1); RND = GND − Alter, ggf. modifiziert nach Modernisierungszustand (Anlage 2); lineare Wertminderung; Fragebogenerhebung der Käufer."
+  },
+  "korrekturen": [],
+  "ags": "05119000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "125000": 1.55,
+    "150000": 1.48,
+    "175000": 1.42,
+    "200000": 1.36,
+    "225000": 1.32,
+    "250000": 1.27,
+    "275000": 1.24,
+    "300000": 1.2,
+    "325000": 1.17,
+    "350000": 1.14,
+    "375000": 1.11,
+    "400000": 1.09,
+    "425000": 1.06,
+    "450000": 1.04,
+    "475000": 1.02,
+    "500000": 1,
+    "525000": 0.98,
+    "550000": 0.96,
+    "575000": 0.94,
+    "600000": 0.92,
+    "625000": 0.91,
+    "650000": 0.89,
+    "675000": 0.88,
+    "700000": 0.86
+   },
+   "rundung_stellen": 2,
+   "hinweis": "\"Anpassung an die Marktlage — Verhältnis Kaufpreis zu Sachwert\", Sachwertfaktoren für 1- und 2-Familienwohngrundstücke, Tabelle Druck-S. 45 (Regressionsrechnung, Kaufpreise 2024 und 2025, mittlere Wohnlagen)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich 125.000–700.000 €)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Durchschnittliches Marktverhalten für Objekte in mittleren Wohnlagen; Streuung und Fallzahl nicht abgedruckt."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 9.4, Tabelle Druck-S. 45",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.2,
+    "soll_wert": 1.2,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,2."
+   },
+   {
+    "art": "zaehlpruefung",
+    "fundstelle": "Tabelle Druck-S. 45",
+    "soll_zeilen": 24
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.2,
+   "quelle": "Kap. 9.4, Druck-S. 45 (abgedruckter Tabellenwert)",
+   "ist": 1.2,
+   "ist_rechenweg": "Tabellenwert 1,20 = 1,20",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": null,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12000_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 45 (Druck 45), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 9.4 Sachwertfaktoren, Tabelle Druck-S. 45"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Signifikanter Einfluss nur des vorläufigen Sachwerts (Wohnlage, EFH/ZFH, Gebäudestandard, Gebäudeart nicht signifikant). Kaufpreise 2025 mit Indexreihen und BRW/Baukostenindex auf den 01.01.2026 umgerechnet. Stichprobe enthält energetisch sanierte wie unsanierte Gebäude.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 8.1 Marktanpassung – Sachwertfaktoren (Druck-S. 45): GND 80 Jahre bei Wohngebäuden unter Berücksichtigung eines fiktiven Alters; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05122000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "300000": 1.15,
+    "400000": 1.07,
+    "500000": 1.01,
+    "600000": 0.97,
+    "700000": 0.93,
+    "800000": 0.89
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Kap. 5.1.5.1 \"freistehende Ein- und Zweifamilienhäuser\", Tabelle Druck-S. 30: Sachwertfaktoren zum 01.01.2026 nach vorläufigem Sachwert (43 Kauffälle 2025, R² 0.26)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Stichprobe 2025 (auf 01.01.2026 umgerechnet): Kaufpreis Ø 519.000 €, Bodenwertanteil Ø 55,2 %, Baujahr Ø 1970, RND Ø 42, Wohnfläche Ø 169 m², Gebäudestandardkennzahl Ø 2,9, vorl. Sachwert Ø 521.500 €, SWF Ø 1,03 (± 0,18, Median 1,00). Teilmarkt \"sehr inhomogen\" — Tabelle zusammen mit dem Streudiagramm sachverständig anzuwenden.",
+   "statistik": {
+    "bestimmtheitsmass": 0.26
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.5.1, Tabelle Druck-S. 30",
+    "eingabe": {
+     "sachwert": 400000
+    },
+    "soll_tabellenwert": 1.07,
+    "soll_wert": 1.07,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,07."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 400000
+   },
+   "soll": 1.07,
+   "quelle": "Kap. 5.1.5.1, Druck-S. 30 (abgedruckter Tabellenwert)",
+   "ist": 1.07,
+   "ist_rechenweg": "Tabellenwert 1,07 = 1,07",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 43,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 31 (Druck 30), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.5.1 Sachwertfaktoren zum 01.01.2026, Druck-S. 30"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Signifikanter Einfluss nur des vorläufigen Sachwerts (Wohnlage, EFH/ZFH, Gebäudestandard, Gebäudeart nicht signifikant). Kaufpreise 2025 mit Indexreihen und BRW/Baukostenindex auf den 01.01.2026 umgerechnet. Stichprobe enthält energetisch sanierte wie unsanierte Gebäude.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 8.1 Marktanpassung – Sachwertfaktoren (Druck-S. 45): GND 80 Jahre bei Wohngebäuden unter Berücksichtigung eines fiktiven Alters; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05122000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.24,
+    "300000": 1.13,
+    "400000": 1.06,
+    "500000": 1
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Kap. 5.1.5.2 \"Reihenmittel- und Reihenendhäuser sowie Doppelhaushälften\", Tabelle Druck-S. 32: Sachwertfaktoren zum 01.01.2026 nach vorläufigem Sachwert (43 Kauffälle 2025, R² 0.27)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Stichprobe 2025 (auf 01.01.2026 umgerechnet): Kaufpreis Ø 513.000 €, Bodenwertanteil Ø 55,2 %, Baujahr Ø 1974, RND Ø 37, Wohnfläche Ø 129 m², Gebäudestandardkennzahl Ø 2,7; Stichprobe weicht stark von 2024 ab (deutlich mehr höherpreisige Objekte). Gilt ausdrücklich auch für Reihenmittelhäuser.",
+   "statistik": {
+    "bestimmtheitsmass": 0.27
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.5.2, Tabelle Druck-S. 32",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.13,
+    "soll_wert": 1.13,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,13."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.13,
+   "quelle": "Kap. 5.1.5.2, Druck-S. 32 (abgedruckter Tabellenwert)",
+   "ist": 1.13,
+   "ist_rechenweg": "Tabellenwert 1,13 = 1,13",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 43,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 33 (Druck 32), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.5.2 Sachwertfaktoren zum 01.01.2026, Druck-S. 32"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Universitätsstadt Siegen hat einen eigenen Gutachterausschuss (eigener Satz, AGS 05970040) — dieser Kreissatz gilt dort NICHT; der Ort (Feld ort) ist Pflicht und muss einer der zehn Kreisgemeinden sein. Die Kaufpreisauswertung 2025 war bei Redaktionsschluss nicht abgeschlossen; der Ausschuss kündigt eine Überprüfung an.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 8 (Druck-S. ~55): ImmoWertV 2021/ImmoWertA; durchschnittliche Gesamtnutzungsdauer 80 Jahre; Bodenwert nach BRW, Übergrößen auf das Bodenrichtwertgrundstück (700 m²) bereinigt; Gebäudedaten aus Fragebögen/Bauakten; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05970",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "verzweigt",
+   "liefert": "faktor",
+   "achse_k_feld": "altkreis",
+   "achse_k_bez": "Altkreis (Siegen / Wittgenstein), zugeordnet über die Gemeinde",
+   "kategorien": [
+    "siegen",
+    "wittgenstein"
+   ],
+   "zuordnung_feld": "ort",
+   "kategorie_zuordnung": {
+    "siegen": [
+     "Burbach",
+     "Freudenberg",
+     "Hilchenbach",
+     "Kreuztal",
+     "Netphen",
+     "Neunkirchen",
+     "Wilnsdorf"
+    ],
+    "wittgenstein": [
+     "Bad Berleburg",
+     "Bad Laasphe",
+     "Erndtebrück"
+    ]
+   },
+   "modell_je_kategorie": {
+    "siegen": {
+     "form": "potenz",
+     "a": 8.0239,
+     "b": -0.169,
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "rundung_stellen": 2,
+     "gueltig_von": 50000,
+     "gueltig_bis": 700000,
+     "fallzahl": 204,
+     "bestimmtheitsmass": 0.6,
+     "swf_mittel": 0.99,
+     "swf_standardabweichung": 0.1,
+     "fundstelle": "Druck-S. 43",
+     "hinweis": "Sachwertfaktor Altkreis Siegen = 8.0239 × vorläufiger Sachwert^(-0.169); R² 0.6; 204 Kauffälle 2025 (Burbach, Freudenberg, Hilchenbach, Kreuztal, Netphen, Neunkirchen, Wilnsdorf); Stichprobe: SWF Ø 0,99 ± 0,10. Gültigkeit = Wertetabelle 50–700 Tsd. € (Druck-S. 45)."
+    },
+    "wittgenstein": {
+     "form": "potenz",
+     "a": 9.3968,
+     "b": -0.191,
+     "achse_feld": "sachwert",
+     "achse_bez": "vorläufiger Sachwert in Euro",
+     "rundung_stellen": 2,
+     "gueltig_von": 50000,
+     "gueltig_bis": 700000,
+     "fallzahl": 59,
+     "bestimmtheitsmass": 0.57,
+     "swf_mittel": 0.93,
+     "swf_standardabweichung": 0.13,
+     "fundstelle": "Druck-S. 44",
+     "hinweis": "Sachwertfaktor Altkreis Wittgenstein = 9.3968 × vorläufiger Sachwert^(-0.191); R² 0.57; 59 Kauffälle 2025 (Bad Berleburg, Bad Laasphe, Erndtebrück); Stichprobe: SWF Ø 0,93 ± 0,13. Gültigkeit = Wertetabelle 50–700 Tsd. € (Druck-S. 45)."
+    }
+   },
+   "hinweis": "Kap. 5.1.4 (Druck-S. 42–45): getrennte Regressionsfunktionen für Altkreis Siegen und Altkreis Wittgenstein; alle 26 × 2 Tabellenwerte (\"Einige Tabellenwerte\", Druck-S. 45) folgen den Funktionen (maschinell geprüft)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle 50.000–700.000 €)",
+   "interpolation": "Funktion",
+   "hinweis": "Altkreis Siegen: BRW Ø 103 €/m², Wfl Ø 150 m², BGF Ø 323 m², Gebäudestandard Ø 2,4, RND Ø 30 J., vorl. Sachwert Ø 261.585 €; Altkreis Wittgenstein: BRW Ø 60 €/m², vorl. Sachwert Ø 219.248 €. Durchschnittliche Faktoren je Zuständigkeitsbereich."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle \"Einige Tabellenwerte\" Druck-S. 45",
+    "eingabe": {
+     "sachwert": 300000,
+     "ort": "Kreuztal"
+    },
+    "soll_tabellenwert": 0.95,
+    "soll_wert": 0.95,
+    "wortlaut": "ERSATZPRÜFUNG — kein Anwendungsbeispiel; Tabellenwert Altkreis Siegen 300.000 € = 0,95 (− 5 %); Wittgenstein 300.000 € = 0,84 wird im Generator als zweite Probe gerechnet."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000,
+    "ort": "Kreuztal"
+   },
+   "soll": 0.95,
+   "quelle": "Tabelle Druck-S. 45 (abgedruckter Tabellenwert Altkreis Siegen)",
+   "ist": 0.95,
+   "ist_rechenweg": "Tabellenwert 0,95 = 0,95",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 263,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32500_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 42-44 (Druck 43-45), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 42–45"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gilt für Bocholt OHNE die Ortsteile Barlo, Hemden, Liedern, Spork und Suderwick (Feld ortsteil; dort kein Wert). 256 Kauffälle 2024/2025 insgesamt, keine Fallzahl je Gebäudetyp abgedruckt. \"Im Randbereich der Kurven nimmt die Aussagegenauigkeit ab.\"",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert."
+  },
+  "korrekturen": [],
+  "ags": "05554008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 1.3,
+    "175000": 1.26,
+    "200000": 1.22,
+    "225000": 1.19,
+    "250000": 1.16,
+    "275000": 1.13,
+    "300000": 1.11,
+    "325000": 1.08,
+    "350000": 1.06,
+    "375000": 1.04,
+    "400000": 1.03,
+    "425000": 1.01,
+    "450000": 0.99,
+    "475000": 0.98,
+    "500000": 0.96,
+    "525000": 0.95,
+    "550000": 0.94,
+    "575000": 0.92,
+    "600000": 0.91,
+    "625000": 0.9,
+    "650000": 0.89
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Tabelle \"Sachwertfaktoren in Abhängigkeit vom vorläufigen Sachwert\", Spalte \"Freistehende Ein- und Zweifamilienhäuser\", Druck-S. 58 (Kauffälle 2024 und 2025; signifikante Abhängigkeit vom Gebäudetyp)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Orientierungshilfe für die Marktanpassung; Streuung nicht beziffert (Abb. 31–33 Streudiagramme)."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 58",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.11,
+    "soll_wert": 1.11,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,11."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.11,
+   "quelle": "Kap. 5.1.4, Druck-S. 58 (abgedruckter Tabellenwert)",
+   "ist": 1.11,
+   "ist_rechenweg": "Tabellenwert 1,11 = 1,11",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": null,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 57 (Druck 58), Modell 87-88 (Druck 88-89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Tabelle Druck-S. 58; Modell Kap. 8.1 Druck-S. 88"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gilt für Bocholt OHNE die Ortsteile Barlo, Hemden, Liedern, Spork und Suderwick (Feld ortsteil; dort kein Wert). 256 Kauffälle 2024/2025 insgesamt, keine Fallzahl je Gebäudetyp abgedruckt. \"Im Randbereich der Kurven nimmt die Aussagegenauigkeit ab.\"",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert."
+  },
+  "korrekturen": [],
+  "ags": "05554008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "100000": 1.61,
+    "125000": 1.51,
+    "150000": 1.44,
+    "175000": 1.37,
+    "200000": 1.31,
+    "225000": 1.26,
+    "250000": 1.22,
+    "275000": 1.18,
+    "300000": 1.14,
+    "325000": 1.1,
+    "350000": 1.07,
+    "375000": 1.04,
+    "400000": 1.02,
+    "425000": 0.99,
+    "450000": 0.97,
+    "475000": 0.94,
+    "500000": 0.92
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Tabelle \"Sachwertfaktoren in Abhängigkeit vom vorläufigen Sachwert\", Spalte \"Doppelhaushälften und Reihenendhäuser\", Druck-S. 58 (Kauffälle 2024 und 2025; signifikante Abhängigkeit vom Gebäudetyp)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Orientierungshilfe für die Marktanpassung; Streuung nicht beziffert (Abb. 31–33 Streudiagramme)."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 58",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.14,
+    "soll_wert": 1.14,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,14."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.14,
+   "quelle": "Kap. 5.1.4, Druck-S. 58 (abgedruckter Tabellenwert)",
+   "ist": 1.14,
+   "ist_rechenweg": "Tabellenwert 1,14 = 1,14",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": null,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 57 (Druck 58), Modell 87-88 (Druck 88-89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Tabelle Druck-S. 58; Modell Kap. 8.1 Druck-S. 88"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gilt für Bocholt OHNE die Ortsteile Barlo, Hemden, Liedern, Spork und Suderwick (Feld ortsteil; dort kein Wert). 256 Kauffälle 2024/2025 insgesamt, keine Fallzahl je Gebäudetyp abgedruckt. \"Im Randbereich der Kurven nimmt die Aussagegenauigkeit ab.\"",
+  "modellansaetze": {
+   "regionalfaktor": 1,
+   "wortlaut": "Kap. 8.1 (Druck-S. 88–89): Handlungsempfehlung AGVGA.NRW Dez. 2023; bereinigter normierter Kaufpreis (§§ 6, 9; typische Nebengebäude enthalten, untypische abgesetzt); NHK 2010 (§ 12 Abs. 5, Anlage 4), Baunebenkosten enthalten; Garagen pauschal (Kap. 5.4); Regionalfaktor 1,0; Mischkalkulation gemischter Gebäudearten/Keller. Eine Gesamtnutzungsdauer ist im gelesenen Block nicht beziffert."
+  },
+  "korrekturen": [],
+  "ags": "05554008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "zweig": "rmh",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "100000": 1.78,
+    "125000": 1.64,
+    "150000": 1.53,
+    "175000": 1.43,
+    "200000": 1.34,
+    "225000": 1.27,
+    "250000": 1.2,
+    "275000": 1.14,
+    "300000": 1.08,
+    "325000": 1.03,
+    "350000": 0.99
+   },
+   "rundung_stellen": 2,
+   "hinweis": "Tabelle \"Sachwertfaktoren in Abhängigkeit vom vorläufigen Sachwert\", Spalte \"Reihenmittelhäuser\", Druck-S. 58 (Kauffälle 2024 und 2025; signifikante Abhängigkeit vom Gebäudetyp)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Tabellenbereich)",
+   "interpolation": "linear zwischen den Stützstellen (vom Bericht nicht ausdrücklich geregelt)",
+   "hinweis": "Orientierungshilfe für die Marktanpassung; Streuung nicht beziffert (Abb. 31–33 Streudiagramme)."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 58",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.08,
+    "soll_wert": 1.08,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,08."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.08,
+   "quelle": "Kap. 5.1.4, Druck-S. 58 (abgedruckter Tabellenwert)",
+   "ist": 1.08,
+   "ist_rechenweg": "Tabellenwert 1,08 = 1,08",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": null,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 57 (Druck 58), Modell 87-88 (Druck 88-89), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Tabelle Druck-S. 58; Modell Kap. 8.1 Druck-S. 88"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "zweig": "efh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.262,
+   "b": 4.571,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    280000,
+    680000
+   ],
+   "rundung_stellen": 3,
+   "hinweis": "Regressionsgleichung SWF = -0.262 × Ln(vorl. SW) + 4.571 für freistehende Einfamilienhäuser (R 0.269; 51 Vergleichskauffälle 2023 bis 2025), Druck-S. 103–104; alle 21 Zellen der Wertetabelle folgen der Formel (maschinell geprüft). Wertebereich lt. Bericht 280–680 Tsd. €. \"Zwischenwerte interpoliert, Extrapolation nicht empfohlen.\""
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertebereich des Berichts)",
+   "interpolation": "Funktion",
+   "hinweis": "freistehende Einfamilienhäuser: 51 Kauffälle 2023 bis 2025; Kennzahlentabelle Druck-S. 103 (SWF Mittel/Median, Bodenwertanteil, RND).",
+   "statistik": {
+    "korrelationskoeffizient": 0.269
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.6, Wertetabelle Druck-S. 104",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.267,
+    "soll_wert": 1.267,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,267."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.267,
+   "quelle": "Kap. 5.1.6, Druck-S. 104 (abgedruckter Tabellenwert)",
+   "soll_stellen": 3,
+   "ist": 1.267,
+   "ist_rechenweg": "Tabellenwert 1,267 = 1,267",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 51,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 102-103 (Druck 103–104), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.6 Sachwertfaktoren, Druck-S. 103–104"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.329,
+   "b": 5.427,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    180000,
+    570000
+   ],
+   "rundung_stellen": 3,
+   "hinweis": "Regressionsgleichung SWF = -0.329 × Ln(vorl. SW) + 5.427 für Doppelhaushälften und Reihenendhäuser (R 0.456; 60 Vergleichskauffälle 2024 und 2025), Druck-S. 105–106; alle 22 Zellen der Wertetabelle folgen der Formel (maschinell geprüft). Wertebereich lt. Bericht 180–570 Tsd. €. \"Zwischenwerte interpoliert, Extrapolation nicht empfohlen.\""
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertebereich des Berichts)",
+   "interpolation": "Funktion",
+   "hinweis": "Doppelhaushälften und Reihenendhäuser: 60 Kauffälle 2024 und 2025; Kennzahlentabelle Druck-S. 105 (SWF Mittel/Median, Bodenwertanteil, RND).",
+   "statistik": {
+    "korrelationskoeffizient": 0.456
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.6, Wertetabelle Druck-S. 106",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.278,
+    "soll_wert": 1.278,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,278."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.278,
+   "quelle": "Kap. 5.1.6, Druck-S. 106 (abgedruckter Tabellenwert)",
+   "soll_stellen": 3,
+   "ist": 1.278,
+   "ist_rechenweg": "Tabellenwert 1,278 = 1,278",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 60,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 104-105 (Druck 105–106), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.6 Sachwertfaktoren, Druck-S. 105–106"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "zweig": "rmh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.785,
+   "b": 11.052,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    180000,
+    300000
+   ],
+   "rundung_stellen": 3,
+   "hinweis": "Regressionsgleichung SWF = -0.785 × Ln(vorl. SW) + 11.052 für Reihenmittelhäuser (R 0.578; 25 Vergleichskauffälle 2023 bis 2025), Druck-S. 107–108; alle 19 Zellen der Wertetabelle folgen der Formel (maschinell geprüft). Wertebereich lt. Bericht 180–300 Tsd. €. \"Zwischenwerte interpoliert, Extrapolation nicht empfohlen.\""
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertebereich des Berichts)",
+   "interpolation": "Funktion",
+   "hinweis": "Reihenmittelhäuser: 25 Kauffälle 2023 bis 2025; Kennzahlentabelle Druck-S. 107 (SWF Mittel/Median, Bodenwertanteil, RND).",
+   "statistik": {
+    "korrelationskoeffizient": 0.578
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.6, Wertetabelle Druck-S. 108",
+    "eingabe": {
+     "sachwert": 200000
+    },
+    "soll_tabellenwert": 1.47,
+    "soll_wert": 1.47,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,47."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 200000
+   },
+   "soll": 1.47,
+   "quelle": "Kap. 5.1.6, Druck-S. 108 (abgedruckter Tabellenwert)",
+   "soll_stellen": 3,
+   "ist": 1.47,
+   "ist_rechenweg": "Tabellenwert 1,470 = 1,470",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 25,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 106-107 (Druck 107–108), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.6 Sachwertfaktoren, Druck-S. 107–108"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Gesamtes Stadtgebiet OHNE Außenbereich und OHNE Stadtteil Lohberg (Feld ortsteil; dort kein Wert); nur Objekte mit RND ≥ 25 Jahre, keine Neubauten, keine Bauträger-/Firmenverkäufe. Außerhalb des Wertebereichs \"statistisch nicht gesichert, nur hilfsweise\" — hier als Gültigkeitsgrenze hinterlegt. Vier getrennte Gebäudearten (EFH freistehend, DHH/REH, RMH, ZFH).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.3 (Druck-S. ~174): \"AGVGA.NRW-Modelle zur Ableitung der Liegenschaftszinssätze und der Sachwertfaktoren (Stand Dezember 2023)\"; NHK 2010; Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170008",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "zweig": "zfh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.402,
+   "b": 6.371,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    280000,
+    680000
+   ],
+   "rundung_stellen": 3,
+   "hinweis": "Regressionsgleichung SWF = -0.402 × Ln(vorl. SW) + 6.371 für Zweifamilienhäuser (R 0.538; 27 Vergleichskauffälle 2023 bis 2025), Druck-S. 109–110; alle 3 Zellen der Wertetabelle folgen der Formel (maschinell geprüft). Wertebereich lt. Bericht 280–680 Tsd. €. \"Zwischenwerte interpoliert, Extrapolation nicht empfohlen.\""
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertebereich des Berichts)",
+   "interpolation": "Funktion",
+   "hinweis": "Zweifamilienhäuser: 27 Kauffälle 2023 bis 2025; Kennzahlentabelle Druck-S. 109 (SWF Mittel/Median, Bodenwertanteil, RND).",
+   "statistik": {
+    "korrelationskoeffizient": 0.538
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.6, Wertetabelle Druck-S. 110",
+    "eingabe": {
+     "sachwert": 640000
+    },
+    "soll_tabellenwert": 0.997,
+    "soll_wert": 0.997,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 0,997."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 640000
+   },
+   "soll": 0.997,
+   "quelle": "Kap. 5.1.6, Druck-S. 110 (abgedruckter Tabellenwert)",
+   "soll_stellen": 3,
+   "ist": 0.997,
+   "ist_rechenweg": "Tabellenwert 0,997 = 0,997",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 27,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 108-109 (Druck 109–110), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.6 Sachwertfaktoren, Druck-S. 109–110"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"freistehende Ein- und Zweifamilienhäuser\" (Druck-S. 52, 65 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562012",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+   "region": "Stadt Dorsten (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+    "wert": null,
+    "fallzahl": 65
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 65,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"Doppelhaushälften und Reihenendhäuser\" (Druck-S. 53, 155 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562012",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Doppelhaushälften und Reihenendhäuser",
+   "region": "Stadt Dorsten (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–53",
+    "wert": null,
+    "fallzahl": 155
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 155,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–53",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"Reihenmittelhäuser\" (Druck-S. 54, 76 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562012",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Reihenmittelhäuser",
+   "region": "Stadt Dorsten (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–54",
+    "wert": null,
+    "fallzahl": 76
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 76,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–54",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"freistehende Ein- und Zweifamilienhäuser\" (Druck-S. 52, 65 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562014",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+   "region": "Stadt Gladbeck (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+    "wert": null,
+    "fallzahl": 65
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 65,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"Doppelhaushälften und Reihenendhäuser\" (Druck-S. 53, 155 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562014",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Doppelhaushälften und Reihenendhäuser",
+   "region": "Stadt Gladbeck (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–53",
+    "wert": null,
+    "fallzahl": 155
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 155,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–53",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"Reihenmittelhäuser\" (Druck-S. 54, 76 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562014",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Reihenmittelhäuser",
+   "region": "Stadt Gladbeck (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–54",
+    "wert": null,
+    "fallzahl": 76
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 76,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–54",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"freistehende Ein- und Zweifamilienhäuser\" (Druck-S. 52, 65 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+   "region": "Stadt Marl (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+    "wert": null,
+    "fallzahl": 65
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 65,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"Doppelhaushälften und Reihenendhäuser\" (Druck-S. 53, 155 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Doppelhaushälften und Reihenendhäuser",
+   "region": "Stadt Marl (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–53",
+    "wert": null,
+    "fallzahl": 155
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 155,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–53",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Kaufpreissammlung des Ausschusses (Auskunft) oder sachverständige Einschätzung im Streuungsbereich des Diagramms \"Reihenmittelhäuser\" (Druck-S. 54, 76 Kauffälle 2025).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8 Modellbeschreibung (Sachwertmodell Dorsten/Gladbeck/Marl); nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Reihenmittelhäuser",
+   "region": "Stadt Marl (gemeinsamer Ausschuss Dorsten, Gladbeck, Marl; Märkte \"nachweislich nicht relevant\" verschieden)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–54",
+    "wert": null,
+    "fallzahl": 76
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 76,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-54 (Druck 51-54), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–54",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) druckt nur Streudiagramme: \"In den vergangenen Jahren wurde mehrfach versucht, aus den statistischen Auswertungen der Sachwertfaktoren verlässliche Kennzahlen oder Funktionen abzuleiten. Die ermittelten Ergebnisse konnten keine zufriedenstellende Präzision der Vorhersagekraft liefern. Daher wird auf die Veröffentlichung eines Sachwertfaktors, einer tabellarischen Aufstellung oder einer Funktionsgleichung verzichtet.\" Ein Wert aus den Punktwolken wäre erfunden.",
+  "hinweis": "Nachernte: GMB 2027 prüfen, ob der Ausschuss wieder einen Wert veröffentlicht."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Grafik Druck-S. 51 des GMB 2026 Minden (freistehende Ein- und Zweifamilienhäuser, 357 Kauffälle 2022–2025, NHK 2010, GND 80 Jahre, linear) sachverständig ablesen oder Auskunft des Ausschusses.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Datengrundlage Druck-S. 52: NHK 2010, Geschäftsjahre 2022–2025, Baujahre 1900–2025, GND 80 Jahre, Alterswertminderung linear; Sachwertmodell der AGVGA.NRW (Kap. 8, Druck-S. ~75)."
+  },
+  "korrekturen": [],
+  "ags": "05770024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) verweist für die Sachwertfaktoren nur auf eine Grafik (\"sind aus der untenstehenden Grafik zu entnehmen\"); die Grafik ist ein Bild ohne Funktionsgleichung und ohne Wertetabelle (pdftotext liefert keine Zahl). Ein Wert abgelesen aus einer Kurve wäre geschätzt, nicht amtlich."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+   "region": "Stadt Minden (eigener Ausschuss; der Kreissatz Minden-Lübbecke gilt hier nicht)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+    "wert": null,
+    "fallzahl": 357
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 357,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26100_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-52 (Druck 51-52), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) verweist für die Sachwertfaktoren nur auf eine Grafik (\"sind aus der untenstehenden Grafik zu entnehmen\"); die Grafik ist ein Bild ohne Funktionsgleichung und ohne Wertetabelle (pdftotext liefert keine Zahl). Ein Wert abgelesen aus einer Kurve wäre geschätzt, nicht amtlich.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) verweist für die Sachwertfaktoren nur auf eine Grafik (\"sind aus der untenstehenden Grafik zu entnehmen\"); die Grafik ist ein Bild ohne Funktionsgleichung und ohne Wertetabelle (pdftotext liefert keine Zahl). Ein Wert abgelesen aus einer Kurve wäre geschätzt, nicht amtlich.",
+  "hinweis": "Nachernte: prüfen, ob der Ausschuss die Kurvenfunktion auf Anfrage nennt oder im GMB 2027 abdruckt."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Weg zum Wert: Grafik Druck-S. 52 des GMB 2026 Minden (Doppel- und Reihenhäuser, 115 Kauffälle 2022–2025, NHK 2010, GND 80 Jahre, linear) sachverständig ablesen oder Auskunft des Ausschusses.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Datengrundlage Druck-S. 52: NHK 2010, Geschäftsjahre 2022–2025, Baujahre 1900–2025, GND 80 Jahre, Alterswertminderung linear; Sachwertmodell der AGVGA.NRW (Kap. 8, Druck-S. ~75)."
+  },
+  "korrekturen": [],
+  "ags": "05770024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": null,
+   "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) verweist für die Sachwertfaktoren nur auf eine Grafik (\"sind aus der untenstehenden Grafik zu entnehmen\"); die Grafik ist ein Bild ohne Funktionsgleichung und ohne Wertetabelle (pdftotext liefert keine Zahl). Ein Wert abgelesen aus einer Kurve wäre geschätzt, nicht amtlich."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Doppel- und Reihenhäuser",
+   "region": "Stadt Minden (eigener Ausschuss; der Kreissatz Minden-Lübbecke gilt hier nicht)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+    "wert": null,
+    "fallzahl": 115
+   }
+  ],
+  "pruefbeispiel": null,
+  "fallzahl": 115,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26100_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 51-52 (Druck 51-52), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 51–52",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) verweist für die Sachwertfaktoren nur auf eine Grafik (\"sind aus der untenstehenden Grafik zu entnehmen\"); die Grafik ist ein Bild ohne Funktionsgleichung und ohne Wertetabelle (pdftotext liefert keine Zahl). Ein Wert abgelesen aus einer Kurve wäre geschätzt, nicht amtlich.",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 (Kap. 5.1.4, Druck-S. 51–52) verweist für die Sachwertfaktoren nur auf eine Grafik (\"sind aus der untenstehenden Grafik zu entnehmen\"); die Grafik ist ein Bild ohne Funktionsgleichung und ohne Wertetabelle (pdftotext liefert keine Zahl). Ein Wert abgelesen aus einer Kurve wäre geschätzt, nicht amtlich.",
+  "hinweis": "Nachernte: prüfen, ob der Ausschuss die Kurvenfunktion auf Anfrage nennt oder im GMB 2027 abdruckt."
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.19,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Keine Lagedifferenzierung (einfache bis sehr gute Wohnlagen ohne signifikanten Unterschied); ZFH gemeinsam mit EFH ausgewertet. \"Wichtiger Hinweis\": die Faktoren schwanken mit dem Kaufzeitpunkt (Hypothekenzinsen) — § 7 Abs. 2 ImmoWertV, ggf. Marktanpassung durch Zu-/Abschläge.",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.317,
+   "b": 5.1158,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    150000,
+    600000
+   ],
+   "rundung_stellen": 2,
+   "hinweis": "y = -0.317 · ln(x) + 5.1158 für freistehende Ein- und Zweifamilienhäuser (N = 88, s = 0.19; Kauffälle 2025), Tabelle Druck-S. 36; alle 19 Tabellenzellen (150–600 Tsd. €) folgen der Formel (maschinell geprüft)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "226 Vergleichskauffälle insgesamt; Streudiagramme Druck-S. 37–38.",
+   "statistik": {
+    "swf_standardabweichung": 0.19
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.5, Tabelle Druck-S. 36",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.12,
+    "soll_wert": 1.12,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,12."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.12,
+   "quelle": "Kap. 5.1.5, Druck-S. 36 (abgedruckter Tabellenwert)",
+   "ist": 1.12,
+   "ist_rechenweg": "Tabellenwert 1,12 = 1,12",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 88,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 35 (Druck 36), Modell 49-50 (Druck 50-51), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.5 Sachwertfaktoren, Tabelle Druck-S. 36"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.22,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Keine Lagedifferenzierung (einfache bis sehr gute Wohnlagen ohne signifikanten Unterschied); ZFH gemeinsam mit EFH ausgewertet. \"Wichtiger Hinweis\": die Faktoren schwanken mit dem Kaufzeitpunkt (Hypothekenzinsen) — § 7 Abs. 2 ImmoWertV, ggf. Marktanpassung durch Zu-/Abschläge.",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.287,
+   "b": 4.797,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    150000,
+    500000
+   ],
+   "rundung_stellen": 2,
+   "hinweis": "y = -0.287 · ln(x) + 4.797 für Doppel- und Reihenendhäuser (N = 104, s = 0.22; Kauffälle 2025), Tabelle Druck-S. 36; alle 15 Tabellenzellen (150–500 Tsd. €) folgen der Formel (maschinell geprüft)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "226 Vergleichskauffälle insgesamt; Streudiagramme Druck-S. 37–38.",
+   "statistik": {
+    "swf_standardabweichung": 0.22
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.5, Tabelle Druck-S. 36",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.18,
+    "soll_wert": 1.18,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,18."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.18,
+   "quelle": "Kap. 5.1.5, Druck-S. 36 (abgedruckter Tabellenwert)",
+   "ist": 1.18,
+   "ist_rechenweg": "Tabellenwert 1,18 = 1,18",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 104,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 35 (Druck 36), Modell 49-50 (Druck 50-51), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.5 Sachwertfaktoren, Tabelle Druck-S. 36"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.29,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Keine Lagedifferenzierung (einfache bis sehr gute Wohnlagen ohne signifikanten Unterschied); ZFH gemeinsam mit EFH ausgewertet. \"Wichtiger Hinweis\": die Faktoren schwanken mit dem Kaufzeitpunkt (Hypothekenzinsen) — § 7 Abs. 2 ImmoWertV, ggf. Marktanpassung durch Zu-/Abschläge.",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.1 (Druck-S. 50–51): Handlungsempfehlung AGVGA.NRW 2023; NHK 2010; bereinigter normierter Kaufpreis (§§ 6, 9); weitere Parameter (Druck-S. 51 ff.) nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05170024",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "zweig": "rmh",
+  "formel": {
+   "form": "log_1d",
+   "a": -0.798,
+   "b": 11.204,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "eingang_bez": "vorläufiger Sachwert in Euro",
+   "gueltig": [
+    125000,
+    350000
+   ],
+   "rundung_stellen": 2,
+   "hinweis": "y = -0.798 · ln(x) + 11.204 für Reihenmittelhäuser (N = 34, s = 0.29; Kauffälle 2025), Tabelle Druck-S. 36; alle 10 Tabellenzellen (125–350 Tsd. €) folgen der Formel (maschinell geprüft)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "226 Vergleichskauffälle insgesamt; Streudiagramme Druck-S. 37–38.",
+   "statistik": {
+    "swf_standardabweichung": 0.29
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.5, Tabelle Druck-S. 36",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 1.14,
+    "soll_wert": 1.14,
+    "wortlaut": "ERSATZPRÜFUNG — der Bericht druckt kein Anwendungsbeispiel zum Sachwertfaktor; Soll ist der abgedruckte Tabellenwert 1,14."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 1.14,
+   "quelle": "Kap. 5.1.5, Druck-S. 36 (abgedruckter Tabellenwert)",
+   "ist": 1.14,
+   "ist_rechenweg": "Tabellenwert 1,14 = 1,14",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 34,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 35 (Druck 36), Modell 49-50 (Druck 50-51), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.5 Sachwertfaktoren, Tabelle Druck-S. 36"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.21,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Mittelwert ohne Abhängigkeit vom vorläufigen Sachwert (\"gesicherter Zusammenhang nicht nachweisbar\"); wegen der großen Streuung sind die Streudiagramme (Höhe des Sachwerts, Verkaufsjahr) sachverständig zu würdigen. Nur RND ≥ 20 Jahre, keine sanierungsbedürftigen Objekte.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": 0.88,
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktor freistehende Häuser: Mittelwert 0,88 ± 0,21 (23 Kauffälle 2024/2025), Tabelle Druck-S. 37. Kein Sachwertbezug — der Bericht gibt ausdrücklich Mittelwerte an."
+  },
+  "geltungsbereich": {
+   "extrapolation": "Stichprobe: vorl. Sachwert 254.635–929.380 € (zum Kaufzeitpunkt)",
+   "interpolation": "keine (Mittelwert)",
+   "hinweis": "Wfl Ø 174 m², RND Ø 36 J., BRW Ø 275 €/m²; 99 geeignete Kauffälle 2024/2025 insgesamt.",
+   "spannen": {
+    "sachwert_eur": [
+     254635,
+     929380
+    ]
+   },
+   "statistik": {
+    "swf_mittel": 0.88,
+    "swf_standardabweichung": 0.21
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 37",
+    "eingabe": {},
+    "soll_tabellenwert": 0.88,
+    "soll_wert": 0.88,
+    "wortlaut": "Abgedruckter Mittelwert freistehende Häuser: 0,88 (Standardabweichung ± 0,21, 23 Fälle)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {},
+   "soll": 0.88,
+   "quelle": "Tabelle Druck-S. 37 (abgedruckter Mittelwert)",
+   "ist": 0.88,
+   "ist_rechenweg": "Tabellenwert 0,88 = 0,88",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 23,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 36 (Druck 37), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Tabelle Druck-S. 37"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.2,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Mittelwert ohne Abhängigkeit vom vorläufigen Sachwert (\"gesicherter Zusammenhang nicht nachweisbar\"); wegen der großen Streuung sind die Streudiagramme (Höhe des Sachwerts, Verkaufsjahr) sachverständig zu würdigen. Nur RND ≥ 20 Jahre, keine sanierungsbedürftigen Objekte.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": 1.11,
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktor Doppelhaushälften / Reihenendhäuser: Mittelwert 1,11 ± 0,2 (46 Kauffälle 2024/2025), Tabelle Druck-S. 37. Kein Sachwertbezug — der Bericht gibt ausdrücklich Mittelwerte an."
+  },
+  "geltungsbereich": {
+   "extrapolation": "Stichprobe: vorl. Sachwert 142.446–497.945 € (zum Kaufzeitpunkt)",
+   "interpolation": "keine (Mittelwert)",
+   "hinweis": "Wfl Ø 132 m², RND Ø 39 J., BRW Ø 277 €/m²; 99 geeignete Kauffälle 2024/2025 insgesamt.",
+   "spannen": {
+    "sachwert_eur": [
+     142446,
+     497945
+    ]
+   },
+   "statistik": {
+    "swf_mittel": 1.11,
+    "swf_standardabweichung": 0.2
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 37",
+    "eingabe": {},
+    "soll_tabellenwert": 1.11,
+    "soll_wert": 1.11,
+    "wortlaut": "Abgedruckter Mittelwert Doppelhaushälften / Reihenendhäuser: 1,11 (Standardabweichung ± 0,2, 46 Fälle)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {},
+   "soll": 1.11,
+   "quelle": "Tabelle Druck-S. 37 (abgedruckter Mittelwert)",
+   "ist": 1.11,
+   "ist_rechenweg": "Tabellenwert 1,11 = 1,11",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 46,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 36 (Druck 37), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Tabelle Druck-S. 37"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.27,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Mittelwert ohne Abhängigkeit vom vorläufigen Sachwert (\"gesicherter Zusammenhang nicht nachweisbar\"); wegen der großen Streuung sind die Streudiagramme (Höhe des Sachwerts, Verkaufsjahr) sachverständig zu würdigen. Nur RND ≥ 20 Jahre, keine sanierungsbedürftigen Objekte.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "wortlaut": "Kap. 5.1.4 Modellparameter (Druck-S. 35–36): Handlungsempfehlungen AGVGA.NRW zur ImmoWertV 2021; GND 80 Jahre; weitere Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05562032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "zweig": "rmh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "faktor",
+   "wert": 1.31,
+   "rundung_stellen": 2,
+   "hinweis": "Sachwertfaktor Reihenmittelhäuser: Mittelwert 1,31 ± 0,27 (30 Kauffälle 2024/2025), Tabelle Druck-S. 37. Kein Sachwertbezug — der Bericht gibt ausdrücklich Mittelwerte an."
+  },
+  "geltungsbereich": {
+   "extrapolation": "Stichprobe: vorl. Sachwert 108.499–589.852 € (zum Kaufzeitpunkt)",
+   "interpolation": "keine (Mittelwert)",
+   "hinweis": "Wfl Ø 105 m², RND Ø 35 J., BRW Ø 261 €/m²; 99 geeignete Kauffälle 2024/2025 insgesamt.",
+   "spannen": {
+    "sachwert_eur": [
+     108499,
+     589852
+    ]
+   },
+   "statistik": {
+    "swf_mittel": 1.31,
+    "swf_standardabweichung": 0.27
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Tabelle Druck-S. 37",
+    "eingabe": {},
+    "soll_tabellenwert": 1.31,
+    "soll_wert": 1.31,
+    "wortlaut": "Abgedruckter Mittelwert Reihenmittelhäuser: 1,31 (Standardabweichung ± 0,27, 30 Fälle)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {},
+   "soll": 1.31,
+   "quelle": "Tabelle Druck-S. 37 (abgedruckter Mittelwert)",
+   "ist": 1.31,
+   "ist_rechenweg": "Tabellenwert 1,31 = 1,31",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 30,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 36 (Druck 37), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Tabelle Druck-S. 37"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Bodenwertanteil (Bodenwert ÷ vorläufiger Sachwert) ist Pflichteingabe als Feld bodenwertanteil_prozent (der Bericht setzt ihn DEZIMAL ein: 0,60; hier Koeffizient ÷ 100). Baujahr = Baujahr der Formel (der Bericht nennt kein fiktives Baujahr). Regionalfaktor seit 01.01.2023 beschlossen (1,0 zum 01.01.2026).",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "wortlaut": "Kap. 8.3 (Druck-S. 61–62): Regionalfaktor 1,0 (beschlossen zum 01.01.2026); Modell ab 01.01.2014: NHK 2010, Baunebenkosten enthalten, GND 80 Jahre für massive Wohngebäude, Alterswertminderung linear, Garagen pauschal 5.113–10.226 €, Außenanlagen (einschl. Ver-/Entsorgung) pauschal 3.068–7.669 €; objektspezifische Besonderheiten bei der Kaufpreisbereinigung."
+  },
+  "korrekturen": [],
+  "ags": "05566076",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "regression_additiv",
+   "liefert": "faktor",
+   "rundung_stellen": 2,
+   "intercept": 5.4,
+   "terme": [
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": -3.62e-7,
+     "exponent": 1,
+     "gueltig": [
+      200000,
+      550000
+     ]
+    },
+    {
+     "feld": "baujahr",
+     "bez": "Baujahr",
+     "koeffizient": -0.0021,
+     "exponent": 1
+    },
+    {
+     "feld": "bodenwertanteil_prozent",
+     "bez": "Bodenwertanteil am vorläufigen Sachwert in % (Bericht: dezimal × 0.49)",
+     "koeffizient": -0.0049,
+     "exponent": 1
+    }
+   ],
+   "hinweis": "Der Bericht druckt (Druck-S. 43): MAF = 5,40 − (3,62·10⁻⁷ × vorläufiger Sachwert) − (0,0021 × Baujahr) − (0,49 × Bodenwertanteil, dezimal) für freistehende Ein- und Zweifamilienhäuser (168 Kauffälle 2025). Gültigkeit = Wertetabelle 200–550 Tsd. €; alle 13 Tabellenwerte (Bodenwertanteil 50 %, Baujahr 1970) folgen der Formel (maschinell geprüft)."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle des Sachwerts; Baujahr und Bodenwertanteil ohne abgedruckte Spanne)",
+   "interpolation": "Funktion",
+   "hinweis": "freistehende Ein- und Zweifamilienhäuser, 168 Kauffälle 2025; Streuung nicht beziffert (Diagramm Druck-S. 43)."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4 \"Beispiel\", Druck-S. 43",
+    "eingabe": {
+     "sachwert": 250000,
+     "baujahr": 1990,
+     "bodenwertanteil_prozent": 60
+    },
+    "soll_tabellenwert": 0.84,
+    "soll_wert": 0.84,
+    "wortlaut": "Vorläufiger Sachwert 250.000 €, Bodenwertanteil 60 %, Baujahr 1990: MAF = 5,40 − (0,000000362 × 250.000) − (0,0021 × 1990) − (0,49 × 0,6) = 0,84."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 250000,
+    "baujahr": 1990,
+    "bodenwertanteil_prozent": 60
+   },
+   "soll": 0.84,
+   "quelle": "Beispiel Druck-S. 43: MAF = 5,40 − (0,000000362 × 250.000) − (0,0021 × 1990) − (0,49 × 0,6) = 0,84.",
+   "ist": 0.84,
+   "ist_rechenweg": "Tabellenwert 0,84 = 0,84",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 168,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 43 (Druck 43), Modell 61 (Druck 61-62), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 43; Modell Kap. 8.3 Druck-S. 61–62"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": 0.12,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "OHNE Anwendungsbeispiel und OHNE Wertetabelle abgenommen (nur Verfügbarkeit): der Bericht druckt die Funktion und ihr Konfidenzintervall. Durchschnittlicher Faktor für das gesamte Stadtgebiet; leicht signifikante Einflüsse (Kernstadtlagen Siegen-Stadt/Weidenau/Geisweid höher, Gebäudestandard und BRW positiv) sind NICHT als Umrechnungskoeffizienten beziffert — Zu-/Abschläge sachverständig an der Standardabweichung (1σ ± 0,12).",
+  "modellansaetze": {
+   "wortlaut": "Kap. 8.2 (Druck-S. ~56): Sachwertmodell §§ 35–39 ImmoWertV, Regelungslücken nach Handlungsempfehlung AGVGA.NRW (Stand 12/2023); Parameter nicht im Detail gelesen."
+  },
+  "korrekturen": [],
+  "ags": "05970040",
+  "ebene": "gemeinde",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "potenz",
+   "a": 8.0663,
+   "b": -0.167,
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "rundung_stellen": 2,
+   "gueltig_von": 100000,
+   "gueltig_bis": 800000,
+   "hinweis": "Sachwertfaktor = 8,0663 × vorläufiger Sachwert^(−0,167) (Diagramm und Formelzeile Druck-S. 38); 1σ = ± 0,12 (68 %), 1,5σ = ± 0,18 (87 %). Anwendungsbereich lt. Bericht ca. 100.000–800.000 € (Druck-S. 39), außerhalb \"nur hilfsweise\"."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Anwendungsbereich 100.000–800.000 €)",
+   "interpolation": "Funktion",
+   "hinweis": "rd. 73 Kauffälle EZFH 2025; Stichprobe: Bauland Ø 500 m² (180–600), BRW Ø 140 €/m² (75–250), Wfl Ø 142 m² (70–302), RND Ø 31 J. (15–66), vorl. Sachwert Ø 275.000 € (110.000–1.139.000), Gebäudestandard Ø 2,5 (1,5–4,5).",
+   "statistik": {
+    "swf_standardabweichung": 0.12
+   },
+   "spannen": {
+    "sachwert_eur": [
+     110000,
+     1139000
+    ],
+    "rnd_jahre": [
+     15,
+     66
+    ],
+    "standardstufe": [
+     1.5,
+     4.5
+    ]
+   }
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4, Druck-S. 38–39",
+    "eingabe": {
+     "sachwert": 275000
+    },
+    "soll_tabellenwert": null,
+    "soll_wert": null,
+    "wortlaut": "KEIN Anwendungsbeispiel und keine Tabelle im Bericht. Nur Verfügbarkeitsprüfung am mittleren vorläufigen Sachwert 275.000 € (Funktion: 8,0663 × 275.000^−0,167 = 1,00)."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 275000
+   },
+   "soll": null,
+   "quelle": "kein Anwendungsbeispiel im Bericht",
+   "abnahme": "plausibilitaet_ohne_soll",
+   "bemerkung": "Funktion am Stichprobenmittel 275.000 € ≈ 1,00; der Bericht nennt keinen mittleren Sachwertfaktor.",
+   "ist": 1,
+   "ist_rechenweg": "Tabellenwert 1,00 = 1,00",
+   "ergebnis": "nur_verfuegbarkeit (kein Soll im Bericht)"
+  },
+  "fallzahl": 73,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28200_2026.pdf",
+  "quelle_parser": "v1881-hand (pdftotext, Seite 37-38 (Druck 38-39), am 05.10.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4 Sachwertfaktoren, Druck-S. 38–39"
+ }
+]

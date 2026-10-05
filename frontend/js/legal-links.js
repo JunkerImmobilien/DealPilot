@@ -46,7 +46,7 @@
        "Renovierungsbeduerftig", ueber Grundbuchamt). Dort wandert er als stille Zeile ans Ende der
        Seitenleiste - erreichbar ueber das Menue, nie ueber dem Inhalt. */
     try {
-      if (window.matchMedia('(max-width: 700px)').matches) {
+      if (window.matchMedia('(max-width: 900px)').matches /* v1882: bis 900 ist die Seitenleiste eine Schublade (Tablet 820 gemessen: Link lag fest unten rechts ueber dem Inhalt) */) {
         /* v1881b: #sb-user entsteht erst in auth.js NACH DOMContentLoaded (vor .sb-footer eingehaengt) -
            Anker ist der statische Fuss #sb-footer-spacer, der danach kommt. */
         var sbUser = document.getElementById('sb-footer-spacer') || document.querySelector('#sidebar .sb-footer');

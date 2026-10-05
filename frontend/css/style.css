@@ -38544,7 +38544,7 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
 
 /* v1881b · Rechtliches in der Seitenleiste: die Regel fuer den schwebenden Kasten (#dp-app-legal-footer, Creme 0.94,
    Radius 8) faerbte die Zeile im dunklen Menue als hellen Block (gemessen 390 px). Im Menue: kein Kasten, volle Breite. */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   #sidebar #dp-app-legal-footer { background: transparent !important; border-radius: 0 !important; width: 100% !important; text-align: center !important; box-shadow: none !important; }
   #sidebar #dp-app-legal-footer a { color: #8a8378 !important; }
 }
