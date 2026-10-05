@@ -6704,3 +6704,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score #hdr-badges .scores{ justify-content:flex-start !important; }
   html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score{ padding:2px 0 4px !important; }
 }
+
+/* v1879c · Marcel: "wir koennen den investor deal score in der handy ansicht aus dem header auch
+   rausnehmen oder sperren bzw. dauerhaft zugeklappt lassen" — auf dem Handy ist der Score-Block der
+   Schiene weg; der Score steht auf der Objektkarte und im Reiter Bewertung. */
+@media (max-width: 700px){
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score{ display:none !important; }
+}

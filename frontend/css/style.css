@@ -38490,3 +38490,11 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
 @media (max-width: 600px) {
   #dp-app-legal-footer { background: rgba(253,252,250,.94) !important; border-radius: 8px !important; right: 8px !important; bottom: 6px !important; box-shadow: 0 0 0 1px rgba(5,5,5,.06) !important; }
 }
+
+/* v1879c · Handy: kein Investor Deal Score im Kopf (Marcel, 05.10.2026). Die Zeile
+   `body:not(.hdr-collapsed) #hdr-badges{display:block !important}` steht weiter oben mit derselben
+   Spezifitaet - hier gewinnt die spaetere Regel. Der Aufklapp-Knopf hat dann nichts mehr zu zeigen. */
+@media (max-width: 700px){
+  body:not(.hdr-collapsed) #hdr-badges, body #hdr-badges{ display:none !important; }
+  body #hdr-toggle-btn{ display:none !important; }
+}
