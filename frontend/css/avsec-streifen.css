@@ -65,3 +65,17 @@
 #avsec.av-min-on .av-body { display: block !important; }
 @media (max-width: 900px) { #avsec { grid-template-columns: 1fr !important; } #avsec .av-bar { padding: 0 14px 8px !important; } }
 #avsec .av-bar .av-min, #avsec .av-bar button[data-view] { display: none !important; }
+
+/* ===== v1875 · Marcel: „die Spanne unten, durchschnittlich und oben einfach mit in die Karte setzen,
+   nicht direkt daneben … und das direkt übernehmen, indem wir das anklicken." Die Kacheln baut
+   js/avsec-spanne.js nach jedem render(); die Leiste rechts hat damit keinen Inhalt mehr. ===== */
+#avsec .av-bar { display: none !important; }
+#avsec { grid-template-columns: minmax(0, 1fr) !important; }
+#avsec .mc.dp .avs-spanne { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; margin: 8px 0 4px; }
+#avsec .mc.dp .avs-spanne .avs-sp-lab { flex: 1 0 100%; font: 600 8px/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: #9a8f72; }
+#avsec .mc.dp .avs-sp { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 6px 9px; border: 1px solid #E6E0D3; border-radius: 8px; background: #FFFDF8; cursor: pointer; font-family: inherit; text-align: left; }
+#avsec .mc.dp .avs-sp small { font: 600 8px/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: #9a8f72; }
+#avsec .mc.dp .avs-sp b { font: 700 12.5px/1.1 "Space Grotesk", sans-serif; color: #1A1A18; white-space: nowrap; }
+#avsec .mc.dp .avs-sp:hover { border-color: var(--wl-b8932f, #b8932f); }
+#avsec .mc.dp .avs-sp.on { border-color: var(--wl-c9a84c, #C9A84C); box-shadow: inset 0 0 0 1px var(--wl-c9a84c, #C9A84C); background: #fff; }
+#avsec .mc.dp .avs-sp.on small { color: var(--wl-b8932f, #b8932f); }

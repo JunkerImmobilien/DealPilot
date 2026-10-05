@@ -198,7 +198,7 @@ body.dp-chrome-hell .dp-pfbar .dp-pf-tile{
   background:#FDFCFA !important; border-color:#E6E1D6 !important; color:#1A1A18 !important;
 }
 body.dp-chrome-hell .dp-pfbar .dp-pf-tile.on{ background:#FFFDF8 !important; }
-body.dp-chrome-hell .dp-pfbar .dp-pf-logo.dp{ color:#1A1A18 !important; }
+body.dp-chrome-hell .dp-pfbar .dp-pf-logo.dp{ color:#F2EDE3 !important; }  /* v1875: die Pille bleibt schwarz, #1A1A18 löschte „Deal" (Kontrast 1,02) */
 body.dp-chrome-hell .dp-pfbar .dp-pf-qr svg rect{ fill:#fff; }
 
 /* ── Tablet und Handy ────────────────────────────────────────────────
@@ -331,7 +331,7 @@ html.qc-app .dp-pfbar .dp-pf-tile{
   background:#FDFCFA !important; border-color:#E6E1D6 !important; color:#1A1A18 !important;
 }
 html.qc-app .dp-pfbar .dp-pf-tile.on{ background:#FFFDF8 !important; }
-html.qc-app .dp-pfbar .dp-pf-logo.dp{ color:#1A1A18 !important; }
+html.qc-app .dp-pfbar .dp-pf-logo.dp{ color:#F2EDE3 !important; }  /* v1875: Marcel „da ist das Deal in Grau" — dasselbe wie oben, im QuickBoarding */
 html.qc-app .dp-pfbar .dp-pf-led{ background:#CEC6B6 !important; }
 html.qc-app .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; }
 

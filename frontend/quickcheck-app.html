@@ -3286,7 +3286,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
   };
 })();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link rel="stylesheet" href="css/avsec-streifen.css?v=v1870a">
+<link rel="stylesheet" href="css/avsec-streifen.css?v=v1875">
 </head>
 <body class="dp-neue-karte"><!-- qb-rename-v699 · v1645: die Marke fest - dieses Dokument ist IMMER hell -->
 
@@ -6288,6 +6288,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/score-tiers.js?v=v1863"></script>
   <script src="js/dealscore.js?v=v1863"></script>
   <script src="js/avm-section.js?v=W33"></script>
+  <script src="js/avsec-spanne.js?v=v1875"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
      kommt hier nicht rein. Deshalb laedt der iframe die Override-Ebene selbst
      und holt sein Branding ueber ji_token (same-origin). -->
@@ -6521,7 +6522,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       (has?'<path d="'+aP(c,c,r,D0,dv)+'" fill="none" stroke="'+col+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round" filter="url(#qbg'+z+')"/>':'')+o+
       (has?'<polygon points="'+np[0].toFixed(1)+','+np[1].toFixed(1)+' '+b1[0].toFixed(1)+','+b1[1].toFixed(1)+' '+b2[0].toFixed(1)+','+b2[1].toFixed(1)+'" fill="'+colh+'" filter="url(#qbg'+z+')"/>':'')+
       '<circle cx="'+c+'" cy="'+c+'" r="'+(z*0.055)+'" fill="#0a0a0a" stroke="'+col+'" stroke-width="1.6"/>'+
-      '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.24)+'" fill="#fff">'+(has?s:'\u2013')+'</text>'+
+      '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.26)+'" fill="#1A1A18">'+(has?s:'\u2013')+'</text>'+
       '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+colh+'">'+(has?tl(s):'')+'</text></svg>';
   }
   function gatherInputs(){ var o={},els=document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]'); for(var i=0;i<els.length;i++){var el=els[i],k=el.id.slice(3); if(k) o[k]=el.value;} return o; }
@@ -6603,14 +6604,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
              aber der Block ist im eingebetteten Modus display:none, und der
              Hinweis stand dann frei ueber der Karte. Gemessen im Browser:
              .kpis hat Hoehe 0, die sichtbare Reihe ist #qb-kt in .qb-main. */
-          '<div class="qcb-hinweis" id="qcb-hinweis" hidden>'+
-            '<p class="qcb-hinweis-satz">Nicht enthalten: <b>Sanierung, Möblierung, Umlagen</b>. '+
-            'Das Darlehen ist aus Gesamtinvestition minus Eigenkapital abgeleitet, nicht aus '+
-            'einem Darlehensfeld. Im vollen Objekt rechnen alle Posten mit — die Zahlen dort '+
-            'weichen deshalb ab.</p>'+
-            '<details class="qcb-rechenweg"><summary>So wird gerechnet</summary>'+
-            '<div class="qcb-rows" id="qcb-rows"></div></details>'+
-          '</div>'+
+          /* v1875 · Marcel: „Nicht enthalten … / So wird gerechnet — das brauchen wir da nicht.“
+             Der Block ist weg; _qcbRechenweg() findet #qcb-hinweis nicht mehr und kehrt still zurück. */
         '</div>'+
         '<div class="qb-tear"></div>'+
         '<div class="qb-stub" id="qb-stub"><span class="bp">QUICKBOARDING PASS</span>'+
@@ -6746,7 +6741,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   <!-- v1641 · Der Quick-Check ist ein eigenes Dokument im iframe - die
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
-  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1870a">
+  <link rel="stylesheet" href="css/datenaufnahme.css?v=v1875">
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."
