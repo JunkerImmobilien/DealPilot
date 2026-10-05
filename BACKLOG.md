@@ -265,7 +265,13 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
-### N13 · Parkstr. 9: Quellen, Stufen, Sachwertfaktor, Workflow (05.10.2026) — teils erledigt v1865–v1865b
+### N14 · FuE-Siegel 2026 (BSFZ) auf der Landing (05.10.2026) — erledigt v1873/v1873a
+
+Marcel: „zip mit bsfz siegel … auf der Landingpage ergänzen such das passende foto aus“.
+**Erledigt (`712192f`, `66bdf1c`):** SVG aus dem Zip als fünfter Eintrag im
+Vertrauensband, 64 px, Band auf fünf Spalten. Nur auf der Landing.
+
+### N13 · Parkstr. 9: Quellen, Stufen, Sachwertfaktor, Workflow (05.10.2026) — teils erledigt v1865–v1873
 
 Marcel: Unterlagen-Text und Quelle zum Grundstücksmarktbericht passen
 nicht; Texte abgekürzt; Stufen nirgends erklärt; kein Sachwertfaktor —
@@ -287,6 +293,19 @@ Minden-Lübbecke aus dem GMB 2025 (S. 64, 2,9 %, N 33) als Stufe A geerntet
 Marktanpassung" mit Grund in Leiste, Bericht und PDF (Marcels
 Entscheidung); Kopf mit Pillen und Abruf-Box; lesbare Hinweise;
 DS2-Schilder; BGF-Schätzung × 1,35.
+
+**Erledigt am 05.10.2026 (v1866–v1873, bis `712192f`):** Eingabetiefe
+kompakt mit Abruf-Box als Kacheln; Marktbewertung als schmaler, gegliederter
+Streifen (Kopfblock, Spalten, Spanne neben Übernehmen; Karten/Tabelle/min
+weg), auch im QuickBoarding; Pre-Flight-Lampe grün; Steuer-Reiter
+entschlackt (kein gutachten.org, Hinweise hinter Aufklapper); BMF-Rechner
+übernimmt Modernisierungen aus dem Reiter Objekt, Lauf wird gemerkt
+(`bmf_cache`) und bei Pro still vorgerechnet — Modal nach 4 s statt 40 s.
+
+**Noch offen (klein):** „KI-Lauf“ statt „Stufe 3“ in der
+Verkehrswert-Übernahme; Register-Lücken (BY ohne LZS, HB/SL ohne SWF, drei
+tote Links); Hintergrund des Registrier-Modals auf der Landing (Standardwerte
+sichtbar — Gestaltungsfrage).
 
 **Entschieden (Sachwertfaktor) — Rest zur Historie:**
 - **Sachwertfaktor-Standardwert.** Minden-Lübbecke leitet für MFH keinen

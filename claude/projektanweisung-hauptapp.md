@@ -31092,4 +31092,37 @@ einem `position:fixed`-Modal. MEA gibt es weiter (ETW Hüllhorst: 50 %).
 - feld-hilfe.js: Popup `position:fixed` im Viewport.
 - „passt nicht zu dieser Objektart" im Hinweis-Stil (Mono, #6b655f).
 
-**Rest.** Prod v1846b; Staging v1872.
+**Nachtrag v1873 (`712192f`).** Der Vorlauf lief nie: `_bmfVorwaermen` fragte
+`$('bmfOverlay')` — der v292-Wrapper liefert für ein fehlendes Element ein
+Platzhalter-Objekt, der Vorlauf hielt das Modal für offen und brach still ab.
+Jetzt `document.getElementById`. Gemessen (Parkstr. 9): sechs Sekunden nach
+dem Laden steht der Schlüssel in `_bmfVorgewaermt`, der Server antwortet aus
+`bmf_cache` (`_cache.hit:true`), das Modal zeigt die Anschaffungskosten nach
+**4 s statt 40 s**. Hover-Popup im Modal unter dem Feld (528/759), lesbar.
+QuickBoarding-Lampe der gewählten Kachel ist grün (Bild; `getComputedStyle`
+im iframe meldete weiter Beige — bekannte Werkzeuglüge).
+
+**Rest.** Prod v1846b; Staging v1873a.
+
+### (34) 05.10.2026 — v1873/v1873a: FuE-Siegel 2026 (BSFZ) auf der Landing
+
+**Was.** Marcel: „ich habe noch in unseren Ordner ein zip mit bsfz siegel.
+kannst du das im dealpilot auf der Landingpage ergänzen such das passende
+foto aus.“ Das Zip (`Dateien/bsfz-siegel_2026.zip`) enthält das Siegel der
+Bescheinigungsstelle Forschungszulage in PNG 1x/2x/3x und SVG; genommen
+wurde das **SVG** (7 KB, skaliert verlustfrei, Retina ohne Zweitdatei).
+
+**Gebaut (`712192f` v1873, `66bdf1c` v1873a).** Fünfter Eintrag im
+Vertrauensband (`.tband`) unter dem Laufband: Siegel 64 px rund auf Weiß
+neben „FuE-Siegel 2026 · Bescheinigungsstelle Forschungszulage (BSFZ)“.
+Band von vier auf fünf Spalten (`dp2-teile.css`, Buster v1873a); unter
+1080 px zwei Spalten, der fünfte Eintrag allein über die volle Breite.
+Datei `frontend/landing/assets/bsfz-siegel-2026.svg`.
+
+**Nachweis.** `curl -I` liefert `image/svg+xml`, 5.102 Byte (nicht die
+index.html — beide Domains antworten sonst auf jeden Pfad mit 200). Im
+Browser: fünf Spalten à 119 px, Bild 64 × 64 geladen (`naturalWidth 150`),
+Bildausschnitt gespeichert. 52 px war zu klein, deshalb v1873a.
+
+**Rest.** Prod v1846b; Staging v1873a. Das Siegel liegt nur auf der Landing —
+Impressum/Über-uns-Seiten führen es nicht.
