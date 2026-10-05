@@ -31908,6 +31908,53 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (49) 05.10.2026 — v1891: Ernte Linie 9, und eine falsche Diagnose von mir
+
+**Baden-Württemberg liefert 121 Werte, Bayern null (`13b17ee` v1891).** Fünf Ausschüsse neu:
+Singen (Hegau-Hochrhein, 12 Gemeinden, Zins und Faktor), Horb (Zins über 66 Stützstellen der
+Restnutzungsdauer), Wangen im Allgäu (Matrix Baujahr × Wohnfläche, 22 belegte Zellen),
+Pfullingen und Bruchsal. 253 gedruckte Zahlen maschinell gegen pdftotext, 206 Prüfungen über den
+echten Weg, keine Überschneidung. Dazu 32 Sperren mit Bezugsweg, Preis und Lizenzwortlaut.
+
+**Bayern ist gemessen leer — aber nicht aus dem Grund, der im Register stand.** Der Landesbericht
+nennt „Liegenschaftszins" zweimal, beide Male im Verzeichnis; er führt keine Werte. Die örtlichen
+Ausschüsse führen sehr wohl welche (Landkreis Augsburg mit vollständigen Regressionskoeffizienten,
+München mit 16 Tabellen) — **gesperrt sind sie durch die LIZENZ, nicht durch fehlende
+Veröffentlichung.** Der Sperrtext in den 748 bayerischen Einträgen sagte
+„BAYERN VERÖFFENTLICHT LANDESWEIT KEINE ZAHLENWERTE"; das ist richtiggestellt. Wer die
+Überschrift liest und nicht den Rest, sucht in Bayern sonst nie wieder.
+
+> **Ich habe eine falsche Diagnose gestellt und nehme sie zurück.** Ich hatte gemeldet, die 45
+> Sachsen-Anhalt-Werte aus Linie 7 seien „im Register, aber unerreichbar — selbst mit gesetzter
+> Lage". Das stimmt nicht. Gemessen über den Weg, den `WertParameterService` wirklich verdrahtet
+> (`zinssatzFuerObjekt` mit `finde`, `lagenFuer` und `liegenschaftszinssatz` als Abhängigkeiten):
+>
+> | Probe | Ergebnis |
+> |---|---|
+> | Wernigerode MFH **ohne** Lage | Rückfrage „Der Gutachterausschuss staffelt nach Lage" — richtig |
+> | Wernigerode MFH **mit** Lage | **3,0 %** |
+> | Erfurt ETW Baujahr 2000 | **2,3 %** |
+> | Potsdam MFH | **2,5 %** |
+> | Magdeburg MFH | `feld_fehlt` mit Namen der fehlenden Jahresstufe |
+>
+> **Mein Fehler war der Aufbau der Probe**, nicht die App: ich hatte
+> `gutachterausschuss.liegenschaftszinssatz({ags, objart})` direkt gerufen. Diese Funktion geht
+> über `zustaendig(ags)`, und diese Liste trägt **genau zwei** handgeschriebene Einträge (Herford,
+> Minden-Lübbecke) — alles andere läuft über das Register. Mein zweiter Anlauf war genauso falsch:
+> dort habe ich die Abhängigkeiten selbst verdrahtet und damit meine eigene Verdrahtung geprüft.
+> **Ein Prüfer, der sich die Abhängigkeiten selbst baut, misst sich selbst** — dieselbe Falle wie
+> in v1083a, nur eine Ebene höher. Der echte Aufrufer steht in `WertParameterService.js:282`; von
+> dort gehören die drei Abhängigkeiten abgeschrieben, nicht nachgebaut.
+
+**Was davon übrig bleibt, ist ein echter Punkt:** `CrossCheckService` setzt `objekt.lage` nicht.
+Für Sachsen-Anhalt kommt deshalb bei jedem Objekt die Rückfrage statt des Wertes. Die Rückfrage
+ist richtig gebaut und nennt die geführten Lagen; was fehlt, ist das Formularfeld und — besser —
+eine Ableitung aus dem Ort, denn `geltungsbereich.zuordnung` trägt je Satz die Gemeindeliste.
+Steht im Backlog unter N28/N30.
+
+**Register nach der Saat (Staging):** BW 98 Zinssätze + 49 Faktoren, 3.564 Sätze in der Tabelle,
+52 Saatdateien im Ordner. Parser-Kennung der Linie 9 auf `v1891-hand` vereindeutigt — `v1889` war
+bereits zweimal vergeben.
 ### (48) 05.10.2026 — v1890: die Abnahme der vier Kombinationen
 
 Marcel: „dass die Aktenmappe mit dem Design auf dem Handy geht und auch passend skaliert wird.
