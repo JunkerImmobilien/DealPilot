@@ -79,9 +79,12 @@
       var list = (r && (r.objects || r.items || r.data)) || (Array.isArray(r) ? r : []);
       if (!list.length) { host.innerHTML = '<p class="pst-hint">Kein Objekt im Bestand.</p>'; return; }
       var rows = list.map(function (o) {
-        var d = o.data || o; var fr = fristen(d);
-        var adr = [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : '');
-        var halter = d.halter || '–';
+        /* v1880a · GET /objects liefert eine ZUSAMMENFASSUNG (name, ort, kaufpreis, halter, kaufdat, seq_no),
+           nicht das Objekt - gemessen am 05.10.2026. Fuer Sanierungsquote und Gebaeudeanteil braeuchte es
+           das volle Objekt (/objects/:id); das holt die Versuchsreihe spaeter je Objekt. */
+        var d = o.data || o; d.kp = d.kp != null ? d.kp : o.kaufpreis; d.kaufdat = d.kaufdat || o.kaufdat; var fr = fristen(d);
+        var adr = o.name || ([d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : ''));
+        var halter = d.halter || o.halter || '–';
         var spek = fr.spekulation_rest_tage == null ? '–' : (fr.spekulation_rest_tage <= 0 ? 'frei' : Math.ceil(fr.spekulation_rest_tage / 30.44) + ' Mon.');
         var san = fr.san_rest_tage == null ? '–' : (fr.san_rest_tage <= 0 ? 'abgelaufen' : Math.ceil(fr.san_rest_tage / 30.44) + ' Mon.');
         var quote = fr.san_quote == null ? '–' : (Math.round(fr.san_quote * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
@@ -92,7 +95,7 @@
       host.innerHTML = '<table class="pst-tab"><thead><tr><th>Objekt</th><th>Halter</th><th class="r">Kaufpreis</th><th>Kauf</th>'
         + '<th title="§ 23 EStG: Veräußerung erst nach zehn Jahren steuerfrei">Spekulationsfrist</th>'
         + '<th title="§ 6 Abs. 1 Nr. 1a EStG: drei Jahre ab Anschaffung">15-%-Fenster</th><th class="r" title="Sanierung ÷ Gebäude-AK">Sanierungsquote</th></tr></thead><tbody>' + rows + '</tbody></table>'
-        + '<p class="pst-hint">' + list.length + ' Objekte · Fristen aus Kaufdatum bzw. wirtschaftlichem Übergang gerechnet · rot: 15-%-Grenze überschritten, Frist läuft noch. Das ist der Zustand, den AP 7 als Budget führt.</p>';
+        + '<p class="pst-hint">' + list.length + ' Objekte · Fristen aus dem Kaufdatum gerechnet · Sanierungsquote erst mit dem vollen Objekt (folgt mit der Versuchsreihe). Das ist der Zustand, den AP 7 als Budget führt.</p>';
     }).catch(function (e) { host.innerHTML = '<p class="pst-hint">Bestand konnte nicht geladen werden: ' + esc(e && e.message) + '</p>'; });
   }
 
