@@ -31028,3 +31028,27 @@ Liegenschaftszins (Stufe A, Bericht als PDF), Hinweis „vollständig". Streifen
 173 px gesamt, Karte 84 px (v1869c: Wertspalten als Block — die Flex-Spalte hatte den Text in Einzelzeilen zerlegt), eine Zeile „Marktwert · je m² · Marktmiete · Einordnung · Genauigkeit · übernehmen".
 
 **Rest.** Prod v1846b; Staging v1869c (`422e965`).
+
+### (32) 05.10.2026 — v1870/v1870a: Spanne neben Übernehmen, Karten/Tabelle/min weg, Streifen auch im QuickBoarding, grüne Lampe
+
+**Was.** Marcel: Spanne (Unten · Ø · Oben) zum Übernehmen-Knopf, „Karten,
+Tabelle" raus, dasselbe Aussehen im Quick-Check, und die Lampe an den
+Pre-Flight-Kacheln „richtig schön in Grün".
+
+**Gebaut.** `c027ed8`: alle `#avsec`-Regeln aus style.css in eine eigene
+Datei `css/avsec-streifen.css`, die Haupt-App UND `quickcheck-app.html`
+laden (das iframe erbt kein style.css; es lädt `avm-section.js` selbst).
+`#avsec` ist ein Raster: Karte links, die Leiste rechts daneben mit nur
+noch „SPANNE Unten · Ø · Oben"; Konsens-Text, Karten/Tabelle und „min"
+sind ausgeblendet (v1870a). `673dba7`: die Lampe — gemessen mit dem
+Kaskaden-Walker: `datenaufnahme.css:232` färbte JEDE Lampe `#2A2622
+!important` (ohne `.on`), Spezifität (0,3,1) gegen (0,2,1) der grünen
+Regel in style.css. Jetzt gilt sie nur für `.dp-pf-tile:not(.on)`, und
+eine Regel am Dateiende setzt bei `.on` den grünen Radialverlauf mit
+Leuchtschatten — Haupt-App und QuickBoarding (`html.qc-app`).
+
+**Nachweis.** Haupt-App: Kachel „Exposé" gewählt → Lampe
+`radial-gradient(… rgb(91,217,142), rgb(63,165,108))`, Schatten grün;
+`#avsec` 114 px, sichtbare Leistenknöpfe nur Unten/Ø/Oben.
+
+**Rest.** Prod v1846b; Staging v1870a (`673dba7`).
