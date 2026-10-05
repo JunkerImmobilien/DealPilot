@@ -6816,9 +6816,24 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     width:auto !important; z-index:auto !important;
     height:auto !important; max-height:none !important; overflow:visible !important;
     box-shadow:none !important; border:0 !important;
+    /* v1889a: nachgemessen - `height:auto` allein liess den Block auf 0 px. Der zugeklappte
+       Zustand haengt NICHT nur an der Hoehe, sondern auch an `opacity:0` am aeusseren Knoten
+       UND an `display:none` am INNEREN (.sb-actions-accordion-inner, style.css:25488).
+       Genau dieselbe Lehre steht zwanzig Zeilen weiter oben in dieser Datei: „Eine Regel am
+       Elternteil ordnet nicht, was im Kind steht." */
+    opacity:1 !important; visibility:visible !important;
     /* Flex-Kind in einem scrollenden Behaelter: ohne das schrumpft es auf null und der Inhalt
        wird still abgeschnitten (CLAUDE.md). */
     flex:0 0 auto !important;
+  }
+  /* Der innere Behaelter traegt den `display:none` des zugeklappten Zustands (0,4,1) und die
+     Umrahmung des Ueberlagerungsfeldes. In der Schublade steht er im Fluss - ohne Kasten,
+     wie das Register in der Schiene auf dem Schreibtisch. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-actions-accordion-inner{
+    display:block !important;
+    max-height:none !important; height:auto !important; overflow:visible !important;
+    background:none !important; border:0 !important; border-radius:0 !important;
+    box-shadow:none !important; padding:0 !important; margin:0 !important;
   }
   /* Der Aufklapper hat nichts mehr aufzuklappen - wie in der Schiene. */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn{
