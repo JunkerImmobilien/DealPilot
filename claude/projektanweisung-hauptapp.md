@@ -31908,6 +31908,37 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (48) 05.10.2026 — v1890: die Abnahme der vier Kombinationen
+
+Marcel: „dass die Aktenmappe mit dem Design auf dem Handy geht und auch passend skaliert wird.
+Und die anderen müssen auch passen." Ein Prüfläufer fährt alle neun Reiter und meldet je Reiter:
+Elemente rechts außerhalb des Schirms (wischbare Vorfahren ausgenommen), abgeschnittenen Text,
+Schrift unter 7,4 px, ungestaltete Elemente (Browser-Standardrahmen) und zu schmale Eingabefelder.
+
+| | Aktenmappe | Heute |
+|---|---|---|
+| Handy 390 | sauber · Kopf 93 · ein Ton für Schiene, Kopf und Reiter | sauber · Kopf 61 · keine Schiene |
+| Tablet 820 | sauber · Kopf 190 (eine Zeile Score-Kacheln, v1881d) | sauber · Kopf 309 (Kacheln mehrzeilig) |
+
+Kein Seitenüberlauf in keiner Kombination (`scrollWidth == clientWidth`). Die Schublade trägt die
+Aktenmappe: 21 Karten à 55 px, die Liste auf 42vh gedeckelt und in sich scrollend, das Register
+steht darunter im selben Schirm (v1889d/e).
+
+**Ein echter Fund, zwei Fehlalarme.** Gefunden: die Donut-Beschriftung der Deal-Aktion stand auf
+dem Tablet weiter in **6,5 px** — der Fix aus v1883 galt nur unter 480 px. Zu klein ist sie auf
+jedem Gerät; die Regel gilt jetzt überall (`5f49d1e` v1890).
+
+Fehlalarm 1: die Partner-Bordkarten ragen über den Schirm, liegen aber in `.dab-rail`, einem
+wischbaren Karussell (scrollWidth 875 bei 293 sichtbar) — **ein Überlauf in einem Karussell ist
+dessen Zweck**; der Prüfer nimmt wischbare Vorfahren jetzt aus. Fehlalarm 2: vier
+Gewerke-Auswahlfelder sind 78 px breit; gemessen enthalten sie nur Ziffern („–", „1", „1,5" …
+„4,5"), der längste Eintrag passt ohne Abschneiden.
+
+> **Die Lehre für den Prüfer:** eine Faustregel („Auswahlfeld unter 80 px") meldet Fälle, die
+> keine sind. Erst der INHALT entscheidet — `scrollWidth > clientWidth` am gefüllten Feld, nicht
+> die Breite allein. Sonst erzeugt der Prüfer Arbeit, statt sie zu sparen.
+
+**Rest.** Staging v1890.
 **Rest.** Staging v1889. **Prod bewusst NICHT nachgezogen** — der Bot-Commit enthält die Änderung
 an der Geldfreigabe, und Geld geht nur mit ausdrücklicher Freigabe raus. **Linie 8 (NI/SH/RP/SL) ist
 inzwischen mitgesät:**
