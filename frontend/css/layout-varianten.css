@@ -6734,7 +6734,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
    vier in der ersten Zeile (194 px), die letzten zwei gestreckt auf 387 px, Kopf 270 px hoch. Zwischen Handy
    (ab 701 px sichtbar) und 1024 px ein Raster 3 + 3. */
 @media (min-width: 701px) and (max-width: 1024px) {
-  html[data-dp-layout] body header.hdr #hdr-badges .scores { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 4px !important; }
+  html[data-dp-layout] body header.hdr #hdr-badges .scores { display: grid !important; grid-template-columns: minmax(150px, auto) repeat(5, minmax(0, 1fr)) !important; gap: 4px !important; }
+  /* v1881d: nachgemessen - 3+3 gab 178 px (sc-main sprang per grid-column auf die volle Zeile, 258 px). EINE Zeile:
+     Score 184 + fuenf Kacheln je 111 px, nichts laeuft ueber, Kopf 190 statt 354 px. */
+  html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-main { grid-column: auto !important; grid-row: auto !important; }
   html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-main,
   html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-pill { width: auto !important; max-width: none !important; min-width: 0 !important; }
 }
