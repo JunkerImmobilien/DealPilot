@@ -6741,3 +6741,13 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-main,
   html[data-dp-layout] body header.hdr #hdr-badges .scores > .sc-pill { width: auto !important; max-width: none !important; min-width: 0 !important; }
 }
+
+/* v1883 · Endabnahme Handy (Marcel: "header gleiche farben, passende formatierung, nichts verzerrt").
+   Gemessen 390 px: Schiene rgb(5,5,5), Kopf und Reiterleiste rgb(14,13,11) - zwei Schwarz uebereinander.
+   Die Schiene traegt jetzt den Ton des Kopfes. Dazu lag der Vollbild-Knopf #dp-sb-toggle (42 x 44, fest
+   unten links) auf dem Handy ueber dem Inhalt: style.css zeigt ihn unter 900 mit (1,2,1), die Regel hier
+   hatte nur (1,1,1). */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss]{ background:#0E0D0B !important; border-bottom-color:#26231E !important; }
+  html[data-dp-layout][data-dp-layout] body:not(.qc-standalone-active) #dp-sb-toggle{ display:none !important; }
+}

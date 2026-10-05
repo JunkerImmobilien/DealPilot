@@ -238,7 +238,13 @@ var DealScore = (function() {
       if ((K.ltv || 0) > 105) parts.push('LTV über 105% deutet auf Vollfinanzierung hin');
     }
 
-    return parts.join(' ') + '.';
+    /* v1883: die Teile sind teils Satzfortsetzungen ('mit deutlich negativem Cashflow ...'), teils eigene Saetze
+       ('DSCR unter 1 ...', 'LTV ueber 105% ...'). Mit join(' ') stand 'von -896 EUR/Mon DSCR unter 1 ... nicht LTV ueber' ohne
+       Satzzeichen auf der Bewertungskarte (Handy-Endabnahme 05.10.2026). Kleinbuchstabe = Fortsetzung, sonst neuer Satz. */
+    return parts.reduce(function (acc, part, i) {
+      if (i === 0) return part;
+      return /^[a-zäöüß]/.test(part) ? acc + ' ' + part : acc + '. ' + part;
+    }, '') + '.';
   }
 
   function setWeights(newWeights) {

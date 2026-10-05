@@ -38548,3 +38548,39 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   #sidebar #dp-app-legal-footer { background: transparent !important; border-radius: 0 !important; width: 100% !important; text-align: center !important; box-shadow: none !important; }
   #sidebar #dp-app-legal-footer a { color: #8a8378 !important; }
 }
+
+/* ═══ v1883 · ENDABNAHME HANDY 05.10.2026 (Marcel: "header gleiche farben, passende formatierung, alles passend
+   skaliert, nichts verzerrt ... als waere es deine endabnahme"). Jeder Block ist ein Messbefund bei 390 px. ═══ */
+@media (max-width: 480px) {
+  /* (1) Finanzierung, Pre-Flight-Kopf: "KONDI-TIONEN" brach am weichen Trennstrich, "LTV ≤ 80 %" zweizeilig mit
+         einsamem Prozentzeichen (Stub 331 px, Teile 56+111+42+56 bei 12 px Luecke). Nichts bricht mehr. */
+  .dpfk-stub { gap: 8px !important; }
+  .dpfk-stub .dpfk-bp, .dpfk-stub .dpfk-fl, .dpfk-stub .dpfk-pf { white-space: nowrap !important; }
+  .dpfk-stub .dpfk-pf { letter-spacing: .12em !important; font-size: 12px !important; }
+  /* (2) Deal-Aktion, Donut: "FELDER 14 / 14" in 6,5 px - unlesbar, gemessen 58 x 6 px. */
+  .dab-donut-v small { font-size: 8.5px !important; letter-spacing: .04em !important; }
+  /* (3) Bewertung, Score-Karten: der Zwischentitel "So setzt sich der Score zusammen" fuellt die ganze Spalte
+         (254 px), die goldene Schmucklinie (::after, 80 px, absolut rechts) lief durch "ZUSAMMEN". */
+  #s6 .dpsh-sectitle::after { display: none !important; }
+  /* (4) Bewertung, KPI-Zeilenraster (v1881a): die Ampel sass buendig am Kartenrand (rechts 356 = Kartenkante). */
+  .kpi-eval-table tbody tr { padding-right: 8px !important; }
+  /* (5) Bewertung, Kennzahlen-Vergleich (.zaer-table): 495 px breit in 331 - Heute / Ende Zinsbindung / Anschluss
+         lagen rechts ausserhalb, sichtbar war nur "+2". Jetzt festes Raster, Beschriftung bricht um, Hinweis darunter. */
+  /*     Gilt fuer beide 4-spaltigen Vergleichstabellen (.phase-table: Zinsaenderungsrisiko-Detail UND Kennzahlen-Vergleich, 584 px). */
+  .phase-table, .zaer-table { display: table !important; table-layout: fixed !important; width: 100% !important; white-space: normal !important; overflow: visible !important; }
+  .phase-table th, .phase-table td, .zaer-table th, .zaer-table td { white-space: normal !important; word-break: break-word !important; padding: 6px 3px !important; font-size: 10.5px !important; vertical-align: top !important; }
+  .phase-table th:first-child, .phase-table td:first-child, .zaer-table th:first-child, .zaer-table td:first-child { width: 37% !important; }
+  .phase-table td .cf-hint, .zaer-table td .cf-hint { display: block !important; font-size: 9px !important; line-height: 1.25 !important; opacity: .75; }
+  /* (6) Bewertung, Cashflow-Projektion (.cft, 15 Spalten, 997 px): wischt - die Jahresspalte bleibt dabei stehen. */
+  .cft th:first-child, .cft td:first-child { position: sticky !important; left: 0 !important; z-index: 2 !important; background: #FDFCFA !important; box-shadow: 2px 0 0 rgba(42,39,39,.08) !important; }
+  .cft th:first-child { background: var(--ch, #2A2727) !important; }
+  /* (7) Bewertung, Stress-Matrix: die Achsenbeschriftung links brach Woerter ("Kri se", "Stre ss", "Mitt el");
+         der Matrixrahmen (.bc-matrix-wrap) nahm nur 255 von 335 px. */
+  .bc-body.bc-body-pad { padding: 20px 12px !important; }
+  .bc-matrix-wrap { width: 100% !important; max-width: none !important; margin-left: 0 !important; margin-right: 0 !important; grid-template-columns: 84px minmax(0, 1fr) !important; }
+  .bc-matrix-axis-y { width: 84px !important; }
+  .bc-matrix-axis-y-row { font-size: 10.5px !important; white-space: nowrap !important; flex-direction: column !important; align-items: flex-end !important; justify-content: center !important; gap: 1px !important; }
+  .bc-matrix-axis-y-row .bc-delta { display: block !important; white-space: nowrap !important; font-size: 9.5px !important; }
+  .bc-matrix-axis-y-label { font-size: 7.5px !important; letter-spacing: .2px !important; white-space: nowrap !important; }
+  .bc-matrix-axis-x-cell .bc-delta { font-size: 8px !important; white-space: nowrap !important; letter-spacing: 0 !important; }
+}
