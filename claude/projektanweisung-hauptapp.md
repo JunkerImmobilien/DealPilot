@@ -30908,3 +30908,38 @@ Pre-Flight-Karte, die Abruf-Box aus dem Reiter Objekt dorthin — Vorschlag
 im Backlog N13.
 
 **Rest.** Prod v1846b; Staging v1865b (`904d71e`).
+
+### (28) 05.10.2026 — v1866/v1866a: ein Ort für die Eingabetiefe, Ernte Minden-Lübbecke MFH
+
+**Was.** Marcel: „setz das mal so um mit der Variante, die du für richtig
+hältst" und „zum Liegenschaftszins und Sachwertfaktor … was wir dort
+annehmen müssten … vielleicht können wir dazu was ernten".
+
+**Variante A (`79eecbd`).** Die drei Pillen an der DealPilot-Kachel der
+Pre-Flight-Karte wählen die Stufe; die Box „Marktbericht abrufen" (Stufe ·
+frei · fehlt · abrufen) steht direkt unter der Pre-Flight-Karte —
+`object-actions.js` baut den Rahmen, `objekt-reiter.js` füllt ihn nach
+`dp:preflight-rendered`. Im Reiter Objekt bleibt eine Statuszeile
+„Eingabetiefe Ausgiebig · Stufe 3 · 1 fehlt" mit „ändern ↑" (springt
+hoch, Pillen blinken); der Kopf-Wähler und die Box unten sind weg, der
+Haken „weitere Objektdetails" bleibt. Nachweis im Bild an der Parkstr. 9:
+Karte, darunter drei Zeilen (24 frei · 8 frei · 7 frei, Stufe 3 „1
+fehlt"), Pillen 1 · 2 · 3 mit 3 aktiv, keine alten Knöpfe mehr im Reiter.
+
+**Ernte (`fad6fb4`).** Der Grundstücksmarktbericht 2025 des Kreises
+Minden-Lübbecke liegt frei auf gars.nrw (dl-de/zero-2-0, PDF
+gebührenfrei, gedruckt 54 €). Mit `pdftotext` auf dem Staging-Host
+gelesen: Abschnitt 5.2.2, Seite 64 — Drei- und Mehrfamilienhäuser bis
+15 WE, LZ **2,9 % ± 1,12**, N 33, Ø Wfl. 310 m², Ø KP 1.364 €/m², Ø Miete
+6,01 €/m², BWK 28 %, RND 39 J., GND 80, Kauffälle 2022–2024. Als Stufe A
+in `register/lzs-nrw-gmb-2025.json` (Fundstelle, Lizenz, Modellansätze),
+in `SAATDATEIEN` eingetragen, mb-backend neu gebaut, `register-saat
+--nur=NW` gelaufen (Trockenlauf 2026 Schlüssel ohne Dublette; danach
+2663 Zeilen, Zeile 58372). MB-Datenbank vorher gesichert
+(`/root/backups/mb-20261005-0546.sql.gz`, 2,6 MB, Kopf geprüft).
+Sachwertfaktoren leitet der Ausschuss nur für Ein-/Zweifamilienhäuser ab
+(5.1.4, S. 61, Tabelle nach RND und vorläufigem Sachwert) — für
+Mehrfamilienhäuser gibt es keinen; dort ist der Ertragswert das
+Verfahren, der Sachwert bleibt vorläufig (Quercheck).
+
+**Rest.** Prod v1846b; Staging v1866a (`fad6fb4`).

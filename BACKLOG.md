@@ -277,6 +277,12 @@ eigener Zeile), Stufen-Legende A–E und 1/2/3, Zins-Zeile kennt die
 Objektart, Grundstücksmarktbericht-Eintrag aus dem Register statt
 Websuche.
 
+**Erledigt am 05.10.2026 (`79eecbd`, `fad6fb4`):** Workflow-Variante A
+gebaut (Eingabetiefe und Abruf-Box in der Pre-Flight-Karte, im Reiter nur
+der Stand). Liegenschaftszins Drei-/Mehrfamilienhäuser Kreis
+Minden-Lübbecke aus dem GMB 2025 (S. 64, 2,9 %, N 33) als Stufe A geerntet
+— die Parkstr. rechnet nicht mehr mit dem Auffangwert.
+
 **Offen — Marcels Entscheidung:**
 - **Sachwertfaktor-Standardwert.** Minden-Lübbecke leitet für MFH keinen
   ab (nur EFH/ZFH/DHH/RH); bundesweit 8 MFH-Sätze im Register, NRW 1 —
