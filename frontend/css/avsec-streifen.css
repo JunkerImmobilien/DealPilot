@@ -89,3 +89,39 @@
 #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-reihe { display: flex !important; flex-direction: row !important; gap: 4px !important; }
 #avsec .mc.dp .avs-sp { flex: 0 0 auto; padding: 4px 8px; gap: 2px; }
 #avsec .mc.dp .avs-sp b { font-size: 12px; }
+
+/* ===== v1876a · Marcel: „die Karte mit der Markteinschätzung ist viel zu hoch … nicht schön aufgeteilt
+   und formatiert". Gemessen: Handy 345 px (Kopf 66, Kacheln 65, Knopf 56), Desktop 125 px mit versetzten
+   Spalten (flex-wrap). Jetzt ein RASTER mit drei Stufen nach KARTENBREITE (@container, nicht Fenster):
+   ab 1180 px eine Zeile, darunter zwei (Marktwert · Spanne · je m² / Marktmiete · Einordnung · Genauigkeit),
+   unter 700 px gestapelt mit schmalem Kopf. Die Kacheln sind Pillen in einer Zeile; sie übernehmen per
+   Klick, der Knopf „übernehmen" entfällt (Marcel: „das sollte reichen"). ===== */
+#avsec .av-cards.single { container-type: inline-size; }
+#avsec .av-cards.single .mc.dp .mfoot { display: none !important; }
+#avsec .av-cards.single .mc.dp { grid-template-columns: auto minmax(0, 1fr) !important; grid-template-areas: "head body" "legal legal" !important; }
+#avsec .mc.dp .avs-sp { flex-direction: row !important; align-items: baseline !important; gap: 5px !important; padding: 3px 9px !important; border-radius: 999px !important; }
+#avsec .mc.dp .avs-sp b { font-size: 12px !important; }
+#avsec .mc.dp .avs-sp small { font-size: 7.5px !important; }
+#avsec .av-cards.single .mc.dp .mbody .avs-spanne::before { content: "Spanne · Klick übernimmt"; }
+#avsec .av-cards.single .mc.dp .mbody { display: grid !important; grid-template-columns: max-content max-content max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp sub miete row3" !important; align-items: end !important; column-gap: 0 !important; row-gap: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .mw { grid-area: mw; }
+#avsec .av-cards.single .mc.dp .mbody .avs-spanne { grid-area: sp; }
+#avsec .av-cards.single .mc.dp .mbody .avs-sub { grid-area: sub; }
+#avsec .av-cards.single .mc.dp .mbody .miete { grid-area: miete; }
+#avsec .av-cards.single .mc.dp .mbody .row3 { grid-area: row3; }
+@container (max-width: 1179px) {
+  #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp sub" "miete row3 row3" !important; row-gap: 6px !important; }
+  #avsec .av-cards.single .mc.dp .mbody .miete { border-left: 0 !important; }
+}
+@container (max-width: 699px) {
+  #avsec .av-cards.single .mc.dp { grid-template-columns: 1fr !important; grid-template-areas: "head" "body" "legal" !important; }
+  #avsec .av-cards.single .mc.dp .mhead.dphead { flex-direction: row !important; align-items: center !important; gap: 10px !important; padding: 6px 12px !important; min-height: 0 !important; border-radius: 11px 11px 0 0 !important; }
+  #avsec .av-cards.single .mc.dp .mhead.dphead .dplogo { font-size: 13px !important; }
+  #avsec .av-cards.single .mc.dp .mhead.dphead .dplogo small { display: inline !important; margin-left: 6px !important; }
+  #avsec .av-cards.single .mc.dp .mhead.dphead .avs-cf { margin: 0 0 0 auto !important; }
+  #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: 1fr 1fr !important; grid-template-areas: "mw mw" "sp sp" "sub miete" "row3 row3" !important; row-gap: 4px !important; }
+  #avsec .av-cards.single .mc.dp .mbody > * { border-left: 0 !important; padding: 2px 12px !important; }
+  #avsec .av-cards.single .mc.dp .mbody .miete { white-space: normal !important; }
+  #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-reihe { flex-wrap: wrap !important; }
+  #avsec .av-cards.single .mc.dp .legal { padding-left: 12px !important; }
+}
