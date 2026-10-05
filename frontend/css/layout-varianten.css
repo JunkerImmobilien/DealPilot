@@ -6678,3 +6678,26 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-investor-ribbon,
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   font-size:11px !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   v1879 · DIE SCHIENE AUF DEM HANDY IM FLUSS
+   Marcel (Aktenmappe auf dem iPhone, 05.10.2026): "nichts erreichbar, alles falsch skaliert,
+   Menue ging nicht." Gemessen auf 390 px: feste Schiene 187 px, Polster 146 px, Kopfzeile samt
+   Menue-Knopf 41 px darunter, Score-Leiste 808 px breit. layout-varianten.js setzt die Schiene
+   unter 900 px jetzt an den Anfang der .main-col (data-dpl-oben-im-fluss); hier ihre Geometrie.
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 900px){
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss]{
+    position:static !important; top:auto !important; left:auto !important; right:auto !important;
+    z-index:auto !important; max-height:none !important; overflow:visible !important;
+  }
+  html[data-dp-layout] .app-wrap:has(.dpl-schiene[data-dpl-oben-im-fluss]){ padding-top:env(safe-area-inset-top, 0) !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score{ flex:1 0 100% !important; width:100% !important; min-width:0 !important; overflow:hidden !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score .scores{ flex-wrap:wrap !important; width:auto !important; max-width:100% !important; }
+}
+@media (max-width: 700px){
+  /* Auf dem Handy nur Ring, Pille und Satz - die Kennzahl-Pillen stehen im Reiter Bewertung. */
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score .sc-pill{ display:none !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score .sc-main{ display:flex !important; }
+  html[data-dp-layout] .dpl-schiene[data-dpl-oben-im-fluss] .dpl-teil-score{ padding:2px 0 4px !important; }
+}

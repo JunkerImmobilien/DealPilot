@@ -891,9 +891,22 @@
        Behaelters lag. Eine mitscrollende liegt darin.                */
     var imFluss = window.matchMedia('(max-width: 1100px)').matches
                   && S.stellung === 'rechts';
-    var mcol = imFluss ? document.querySelector('.main-col') : null;
-    (mcol || document.body).appendChild(schiene);
-    if (mcol) schiene.setAttribute('data-dpl-im-fluss', '1');
+    /* v1879 · Marcel (Handy, Aktenmappe, 05.10.2026): "nichts erreichbar, alles falsch
+       skaliert, Menue ging nicht." Gemessen auf 390 px: die linke Schiene wird unter 900 px
+       zum FESTEN Kopfstreifen (CSS v1658), 187 px hoch - das Polster der .app-wrap sind aber
+       146 px. Die ersten 41 px der Kopfzeile samt #hdr-mobile-menu lagen darunter, und die
+       Score-Leiste darin war 808 px breit. Deshalb steht die Schiene auf dem Handy jetzt IM
+       FLUSS am Anfang der .main-col: sie scrollt mit weg, Kopfzeile und Reiter bleiben kleben. */
+    var obenImFluss = window.matchMedia('(max-width: 900px)').matches
+                  && S.stellung === 'links';
+    var mcol = (imFluss || obenImFluss) ? document.querySelector('.main-col') : null;
+    if (mcol && obenImFluss) {
+      mcol.insertBefore(schiene, mcol.firstChild);
+      schiene.setAttribute('data-dpl-oben-im-fluss', '1');
+    } else {
+      (mcol || document.body).appendChild(schiene);
+      if (mcol) schiene.setAttribute('data-dpl-im-fluss', '1');
+    }
     schienen.push(schiene);
   }
   function zahlNachziehen() {
@@ -1509,6 +1522,7 @@
      `resize`-Listener wuerde das Layout hundertfach neu bauen. */
   try {
     var mq = window.matchMedia('(max-width: 1100px)');
+    var mq900 = window.matchMedia('(max-width: 900px)');   /* v1879: die Handy-Schwelle der Schiene */
     var umbau = function () {
       /* `aktuell` direkt, nicht ueber `window.DealPilotLayout` — dieser
          Block steht VOR der Zuweisung der API. Beim Feuern waere sie
@@ -1518,6 +1532,8 @@
     };
     if (mq.addEventListener) mq.addEventListener('change', umbau);
     else if (mq.addListener) mq.addListener(umbau);   /* aeltere Browser */
+    if (mq900.addEventListener) mq900.addEventListener('change', umbau);
+    else if (mq900.addListener) mq900.addListener(umbau);
   } catch (e) { /* ohne Beobachter bleibt es beim Stand des Aufbaus */ }
 
   window.DealPilotLayout = {
