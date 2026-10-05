@@ -60,7 +60,9 @@
   }, true);
 
   var _raf = 0;
-  function schedule() { if (_raf) return; _raf = requestAnimationFrame(function () { _raf = 0; inject(); }); }
+  /* v1875b · setTimeout statt requestAnimationFrame: im verborgenen Tab feuert rAF nie,
+     und die Kacheln fehlten dann bis zum naechsten Render (gemessen beim ersten Laden). */
+  function schedule() { if (_raf) return; _raf = setTimeout(function () { _raf = 0; inject(); }, 0); }
   function arm() {
     try { new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
     schedule();
