@@ -265,6 +265,15 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N16 · QuickBoarding-Karte, Spanne in der Karte, Handy-Durchgang (05.10.2026) — erledigt v1875–v1876
+
+Marcel: weiße 65 im QuickBoarding unlesbar; „Nicht enthalten …“/„So wird
+gerechnet“ raus; Spanne Unten/Ø/Oben in die Karte, Klick = übernehmen; alle
+Reiter mobil prüfen; „Deal“ in der Pre-Flight-Pille grau.
+**Erledigt (`eba95d6`–`f6b6fb8`):** alles davon, siehe Journal (36).
+**Offen (Daten, kein Code):** die Pilot-Analyse der Parkstr. 9 nennt die
+Westerfeldstraße 140 — neu laufen lassen.
+
 ### N15 · „Willkommen an Bord“ erschien vor der Anmeldung (05.10.2026) — erledigt v1874
 
 Marcel: „ich gehe auf Kostenlos starten, dann kommt das Anmeldefenster und

@@ -31154,3 +31154,59 @@ Tour kennt, ist nicht neu) — Marcels Konto zeigt sie deshalb nicht.
 
 **Rest.** Prod v1846b; Staging v1874. Die Landing-Knöpfe „Kostenlos starten“
 zeigen auf `app.dealpilot.immo/?register=1` — auch auf Staging auf Prod.
+
+### (36) 05.10.2026 — v1875–v1876: QuickBoarding-Karte lesbar, Spanne in der DealPilot-Karte, Handy-Durchgang
+
+**Was.** Marcel: im QuickBoarding „kann man die Zahlen nicht richtig lesen …
+eine weiße 65“; „Nicht enthalten: Sanierung, Möbel, Umlagen“ und „So wird
+gerechnet“ raus; die Spanne (Unten · Ø · Oben) „einfach mit in die Karte
+setzen, nicht direkt daneben“ und per Klick übernehmen; alle Reiter auf dem
+Handy prüfen; in der Pre-Flight-Karte ist „Deal“ grau statt weiß.
+
+**Gemessen.** Die QuickBoarding-Karte ist seit dem hellen Satz weiß
+(`#qb-bp .qb-main{background:#FFFFFF}`), die Ziffer im Tacho stand aber hart
+auf `fill="#fff"` — eine weiße Zahl auf Weiß. Der Hinweisblock kam aus
+`boot()` des Quickboarding-Passes. „Deal“ war `#1A1A18` auf der schwarzen
+Pille (Kontrast 1,02) — v1667 hatte das nur für `html[data-dp-kartenstil]`
+behoben, `html.qc-app` und `body.dp-chrome-hell` trugen die alte Regel weiter.
+
+**Gebaut (`eba95d6` v1875, `450f5df` v1875a, `0d50690` v1875b, `4873bb2` v1875c, `f6b6fb8` v1876).**
+- quickcheck-app.html: Tacho-Ziffer `#1A1A18`, 26 % statt 24 % der Größe;
+  Hinweisblock entfernt (`_qcbRechenweg` findet nichts mehr und kehrt zurück).
+- `js/avsec-spanne.js` (neu, Haupt-App UND QuickBoarding-iframe): Aufsatz auf
+  `avm-section.js` (nicht anfassen) — hüllt `setDealpilot` ein, liest die
+  Bänder low/med/high mit, setzt nach jedem Render drei Kacheln als eigene
+  Spalte „Spanne · anklicken = übernehmen“ in die Karte; Klick drückt den
+  versteckten Spannen-Knopf und dann „übernehmen“ der Karte. Die Leiste
+  `.av-bar` ist ausgeblendet, `#avsec` einspaltig.
+- datenaufnahme.css: `.dp-pf-logo.dp` in Hell und qc-app `#F2EDE3`.
+- Gold-Audit war rot (acht Literale aus v1844–v1872, `rgba(201,168,76,…)`
+  und ein `#E8CC7A`) → `color-mix(in srgb, var(--wl-c9a84c, #C9A84C) x%, transparent)`;
+  RC=0, Basislinie 438 in 54 Dateien.
+- style.css: Impressum/Datenschutz-Link unter 600 px mit eigenem Grund.
+
+**Drei Anläufe, drei Gründe (alle gemessen).** (1) Die Kacheln fehlten beim
+ersten Laden: `requestAnimationFrame` feuert im verborgenen Tab nie →
+`setTimeout 0`. (2) Die Spanne wechselte, der Verkehrswert blieb 471.000:
+`render()` ersetzt `#avsec` als Ganzes, der alte Griff zeigte auf einen
+abgehängten Knoten → nach dem Klick neu greifen, im nächsten Tick.
+(3) Die Kacheln standen untereinander (190 × 174 px): die Sammelregel
+`.mbody > * {flex-direction:column}` trifft auch eingefügte Kinder → eigene
+Spalte mit `::before`-Beschriftung, Reihe darin.
+
+**Nachweis (Staging).** QuickBoarding Musterstraße: Tacho „20“ dunkel lesbar,
+kein Hinweisblock, Pille „DealPilot“ creme/gold, Lampe grün. Parkstr. 9:
+Kachel „Unten“ → Verkehrswert 157.000, Streifen 155 px (vorher 234);
+Verkehrswert danach auf 471.000 zurückgestellt. QuickBoarding nach Abruf:
+Kacheln 196.000 · 228.000 · 261.000, Leiste weg. Handy 390 px
+(Messkabine `impressum.html`): alle neun Reiter ohne Überlauf
+(`scrollWidth` 390), `.main-col` endet bei 844, letztes Element erreichbar;
+Streifen stapelt sauber. Fund: der schwebende Rechtliches-Link lag über dem
+Text → v1876.
+
+**Beobachtung, kein Code-Fehler:** die gespeicherte Pilot-Analyse der
+Parkstr. 9 spricht von „Westerfeldstraße 140, 33613 Bielefeld“ — der Text
+hängt am Objekt (Musterstraße zeigt „Dealhausen“), er stammt also aus einem
+Lauf vor der Adressänderung oder einer Kopie. Neu laufen lassen behebt es.
+
+**Rest.** Prod v1846b; Staging v1876.
