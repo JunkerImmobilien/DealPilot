@@ -31444,5 +31444,12 @@ scrollten sie mit weg (nav.tabs bei y = 91 in der Schiene). Unter 900 px bleiben
 jetzt in der .main-col und kleben unter der Kopfzeile — gemessen für v2 und v1b: nach 600 px
 Scroll Kopfzeile bei 0, Reiter bei 108, Menü-Knopf trifft. Auch auf Prod gezogen.
 
-**Rest.** Prod v1879a; Staging v1879a. Drei Erntelinien (HE-Zins, NW-Faktoren,
+**Nachtrag v1879c (`7e573a0`).** Marcel: „wir können den investor deal score in der handy
+ansicht aus dem header auch rausnehmen.“ Unter 700 px sind der Score-Block der Schiene und
+`#hdr-badges` samt Aufklapp-Knopf aus; die Schiene ist damit 89 px (Marke + Portfolio), Kopfzeile
+bei 89, Reiter bei 197. Der Score bleibt auf der Objektkarte und im Reiter Bewertung. Dazu
+`tools/saat-pruefen.mjs` (Pflichtfelder und Dubletten einer Saatdatei, nennt seine Deckung).
+Auf Prod gezogen.
+
+**Rest.** Prod v1879c; Staging v1879c. Drei Erntelinien (HE-Zins, NW-Faktoren,
 ST/TH/SH/NI-Zins) laufen als Prüfläufe; Saat und Journal folgen.
