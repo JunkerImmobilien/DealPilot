@@ -4973,6 +4973,37 @@ Schalter ändert **niemals Farben**, die gehören dem Partner).
 
 ## Offen
 
+### N33 · ENTSCHEIDUNG MARCEL: Ist die Aktenmappe hell oder dunkel? (eingebaut 06.10.2026)
+
+**Nur Marcel kann das entscheiden, und solange es offen ist, wird keine Farbe
+angefasst.** Beide Seiten sind gemessen, nicht geraten:
+
+| | spricht dafür |
+|---|---|
+| **hell** | Die Vorlage, aus der die Aktenmappe stammt, heißt `frontend/entwurf-hell-bankfaehig.html` („Heller Modus — fünf Entwürfe", Entwurf 1 — Aktenmappe) und ist durchgehend hell: Schiene weiß mit dunkler Schrift, Fläche rgb(232,229,222). Marcel nennt das Obsidian der Schublade „den Hintergrund von Heute". Der Panel-Text versprach bis v1889 „Jede Ansicht ausser ‚Heute' schaltet auf hell". |
+| **dunkel** | Seit v1653e ist genau das Gegenteil gebaut und über zwanzig Versionen abgenommen: Obsidian-Schiene auf heller Arbeitsfläche. `layout-varianten.css:1643` und `:1737` heben sich mit (1,4,3) `!important` **ausdrücklich über** `body.dp-chrome-hell` — der dunkle Rahmen ist eine Entscheidung, kein Versehen. v1699 hat den Hell-Zwang auf Marcels Ansage entfernt. |
+
+**Was es kostet, wenn „hell" gewinnt** (gemessen, nicht geschätzt): der helle
+Skin allein reicht **nicht**. Mit `dp_chrome_hell=1` **vor** dem Laden bleiben
+`#sidebar`, `.dpl-schiene`, `header.hdr` und `nav.tabs` auf `rgb(14,13,11)`.
+Zu tun wären dann:
+
+1. die beiden Sperrblöcke `layout-varianten.css:1643` (Seitenleiste) und
+   `:1737` (Kopf) dem Ton unterordnen statt ihn zu überschreiben,
+2. elf farbtragende Flächen der Handy-Schublade einzeln benennen (Rahmen,
+   `.sb-section-title`, `.sb-search-box` + `input`, `.sb-sort-toggle`,
+   `.sb-add-new`, `.sb-card` + hover/active, `.sbc-top`, `.sbc-address`,
+   `.sbc-seq`, `.sbc-kp`, `.sbc-btn`, Registerfarben),
+3. der generierte Block aus `tools/schublade-regeln.mjs` (93 Grund- + 48
+   Stilregeln) klont **tonfreie, hart dunkle** Werte — er müsste eine helle
+   Fassung mitbekommen, sonst zieht er die dunkle zurück.
+
+**Kein eigener Umbau ohne Marcels Wort.** Die strukturelle Trennung
+(Register in der Schublade, Zustände, wischbare Tabelle) steht seit
+`v1889`–`v1889e` und ist unabhängig davon richtig.
+
+
+
 ### MARCELS ANTWORTEN VOM 2026-08-14 — hier steht, was jetzt gebaut werden darf
 
 **Vier Entscheidungen sind gefallen und eine Auskunft ist da.** Damit sind

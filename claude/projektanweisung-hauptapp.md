@@ -31914,3 +31914,128 @@ inzwischen mitgesät:**
 411 Sätze, aber nur 16 Werte und 395 Sperren, davon 280 gleichlautend für Rheinland-Pfalz und
 das Saarland (beide kostenpflichtig UND genehmigungspflichtig). Ob 280 Sperren ins Register
 sollen oder ein Satz je Land genügt, entscheidet Marcel.
+
+### (48) 06.10.2026 — v1889–v1889e (Frontend): die Aktenmappe und „Heute" auf dem Handy getrennt
+
+Marcel: „Wir haben jetzt auf Aktenansicht gestellt, die Portfoliostrategie wird nicht richtig
+dargestellt. Wenn du aufs Portfolio gehst, hast du einen Misch mit der heutigen Ansicht im Obsidian
+Look. … Aktenansicht muss Aktenansicht sein, die Heute-Version muss die Heute-Version sein." Und
+davor: „Die muss wirklich so aussehen wie halt auch bei der Web-Ansicht."
+
+> **Die Nummer `v1889` ist an diesem Tag zweimal vergeben worden.** Der Marktbericht-Strang trägt
+> sie für `formelwerk` (`596b8dc`, Journal 47), dieser Strang für das Frontend (`ccd5430e`). Die
+> Cache-Buster kollidieren nicht (`layout-varianten.css?v=v1889e` gibt es nur hier), die NAMEN
+> schon. Wer in zwei Wochen „v1889" greppt, findet zwei verschiedene Pakete. **Zwei Chats, ein
+> Nummernkreis — wer als Nächster eine Nummer vergibt, sieht vorher im anderen Strang nach.**
+
+#### Was gemessen wurde, bevor gebaut wurde
+
+Beide Breiten, dieselbe Anmeldung, Staging:
+
+| | Schreibtisch 2133 px (Schiene) | Handy 390 px (Schublade) |
+|---|---|---|
+| `#sb-actions-accordion` | 230 × 599, offen | 0 × 0, `display:none` |
+| sichtbare Registergruppen | 5 (Ansichten … System) | **0** |
+| `#sb-actions-trigger-btn` | `display:none` | 333 × 43, sichtbar |
+| Objektliste | nur im Zustand „auf" | immer offen, 562 px |
+
+**Das ist der Misch, und er ist kein Farbfehler.** Auf dem Schreibtisch zeigt die Aktenmappe ihr
+Register und blendet die Objektliste erst auf Knopfdruck ein — auf dem Handy war es genau umgekehrt:
+dort stand die **unveränderte Seitenleiste der Ansicht „Heute"**. Gemessen trennten die beiden
+Schubladen nur neun Helligkeitsstufen: Heute `rgb(5,5,5)`, Aktenmappe `rgb(14,13,11)`. Für das Auge
+dasselbe Bild.
+
+Die Ursache dafür, dass die Schiene auf dem Handy nichts zeigt, steht in `layout-varianten.js:829`
+(`handyOben` → `S.nimmt` wird übersprungen, v1880) und `:946` (`portfolio()` reicht unter 900 px an
+`toggleMobileSidebar()` weiter und kehrt zurück — `data-dpl-portfolio` blieb nachweislich auf `zu`).
+
+**Zweiter, unabhängiger Befund — die Portfolio-Strategie war abgeschnitten.** Auf 390 px:
+`.pst-scroll` clientWidth 335, **scrollWidth 335** → nichts zu wischen; die letzte Zelle einer Zeile
+lag bei x = 535…625, die Kartenkante bei 373. **Vier Spalten (Kauf, Spekulationsfrist, 15-%-Fenster,
+Sanierungsquote) lagen 252 px außerhalb und waren nicht erreichbar**, ohne dass ein Balken darauf
+hingewiesen hätte. Ursache: `.cft{width:100%}` (`style.css:120`) in einem `overflow-x:auto`-Behälter
+— die Tabelle wächst nicht, ihre `nowrap`-Zellen laufen über den Tabellenkasten hinaus und werden
+geklippt, und der Behälter sieht folgerichtig keinen Überlauf.
+
+> **Ein Überlauf, der keinen Balken erzeugt, ist kein Überlauf — er ist ein Verlust.**
+
+#### Was gebaut wurde
+
+- **`js/portfolio-strategie.js`** — `.pst-scroll > table{width:max-content;min-width:100%}`.
+  Nachgemessen: Tabelle 600 px, scrollWidth 601 > clientWidth 335, 265 px Wischweg; nach dem Wischen
+  steht die letzte Spalte bei 270…360, also **innerhalb** der Karte (373).
+- **`css/layout-varianten.css`, Block v1889** — die Schublade trägt das Register: Akkordeon offen und
+  im Fluss, Aufklapper weg, Schublade scrollt als Ganzes. Spezifität (1,4,3) wie der Block v1653e.
+- **Der Portfolio-Knopf hängt an `data-ton` der Schiene statt an `html[data-dp-layout]`.** Vorher
+  trug er in JEDEM Layout dasselbe `#141210`. *Eine Farbe, die zu jeder Ansicht gehört, gehört zu
+  keiner.* Am Bild ändert sich für die Aktenmappe (ton: dunkel) nichts — geändert hat sich, **woran**
+  die Farbe hängt.
+- **`js/layout-varianten.js`, Panel-Text.** Dort stand „Jede Ansicht ausser ‚Heute' schaltet auf
+  hell." Das tut der Code seit **v1699** nicht mehr (der Hell-Zwang wurde dort ausdrücklich
+  entfernt). Nachgemessen: mit `dp_chrome_hell=1` **vor** dem Laden bleiben `#sidebar`,
+  `.dpl-schiene`, `header.hdr` und `nav.tabs` auf `rgb(14,13,11)` — der helle Anstrich würde den
+  Rahmen der Layouts ohnehin nicht erreichen, weil `layout-varianten.css:1643` und `:1737` sich mit
+  (1,4,3) `!important` **ausdrücklich über** `body.dp-chrome-hell` heben. Der Satz war doppelt
+  falsch. Jetzt: „Hell und Dunkel wählst du getrennt unter Modus."
+
+#### Vier Nachbesserungen, alle am eigenen Werk gemessen
+
+1. **`v1889b`** — `height:auto` allein ließ das Register auf **0 px**. Der zugeklappte Zustand hängt
+   auch an `opacity:0` am äußeren Knoten **und** an `display:none` am INNEREN
+   (`.sb-actions-accordion-inner`, `style.css:25488`). *Eine Regel am Elternteil ordnet nicht, was im
+   Kind steht* — derselbe Satz steht weiter oben in derselben Datei.
+2. **`v1889c`** — offen saß das Register auf der **weißen Eigenfläche** des Überlagerungsfeldes.
+   Gemessen mit dem Grund-Leser: `.sb-act-l` rgb(205,175,90) auf **rgb(255,255,255)**, k = **2,13**;
+   die Ikonen k = 2,29. *Beim Verschieben eines Blocks wandert die Farbbeziehung nicht mit.* Die
+   Sollwerte kamen nicht aus meinem Kopf, sondern aus der Schiene auf dem Schreibtisch: Akkordeon und
+   innerer Behälter durchsichtig, Gruppentitel Gold rgb(201,168,76), Einträge rgb(191,183,169) →
+   gegen rgb(14,13,11) **k = 8,5 und 9,77**.
+3. **`v1889d`** — offen, aber unerreichbar: der erste Eintrag begann bei **y = 1886** in einer 844 px
+   hohen Schublade, hinter 21 Objektkarten. *Offen und erreichbar sind nicht dasselbe.* Die Liste
+   bekommt 42vh Deckel und scrollt in sich; das Register beginnt jetzt bei y = 518, fünf Einträge
+   ohne Wischen sichtbar. `flex:0 0 auto` bleibt — ohne das schrumpfen die Karten im scrollenden
+   Behälter wieder auf null (der Fehler aus v1885c).
+4. **`v1889e`** — **sichtbar ist nicht bedienbar, zum zweiten Mal.** `elementFromPoint` auf die Mitte
+   von „Einzelobjekt" gab `ASIDE#sidebar`. `pointer-events:none` des zugeklappten Akkordeons wird an
+   den inneren Behälter und an jeden Knopf vererbt; **alle dreizehn Einträge waren sichtbar und
+   tot.** Genau dieser Fehler steht seit **v1649** in derselben Datei unter der Überschrift
+   „10 · SICHTBAR IST NICHT BEDIENBAR". *Eine Lehre, die man nur liest, hat man nicht angewandt.*
+
+#### Eine Diagnose, die ich ausdrücklich zurücknehme
+
+Mitten in der Messung zeigten die Vollbild-Aufnahmen die Portfolio-Strategie **obsidian**, während
+`getComputedStyle` und der 1:1-Ausschnitt derselben Stelle **weiß** meldeten. Ich habe daraus
+zeitweise auf einen Darstellungsfehler der Ansicht geschlossen. **Das war falsch, und die Ursache war
+ich selbst:** ich hatte aus dem zweiten Tab `localStorage.dp_chrome_hell` gesetzt;
+`darstellung-reseller.js:33` horcht auf genau diesen Schlüssel und rief im ersten Tab zur Laufzeit
+`_dpDispSkin('hell')` — und ein Skinwechsel im laufenden Tab hinterlässt Inline-Variablen und löscht
+die Vorlage (v1661). Nach einem Neuladen war die Ansicht einwandfrei. **Genau davor warnt die Notiz
+„Skin messen nur nach Neuladen" — und `localStorage` wirkt über Tabs hinweg, auch über den Tab, in
+dem man gerade misst.**
+
+#### Nachweis nach dem Ausrollen (Staging `1d9fea8d`, Messkabine 390 × 844)
+
+| Fläche | Soll | Ist |
+|---|---|---|
+| Schublade Aktenmappe | Register wie auf dem Schreibtisch | 5 Gruppen, 13 Einträge, alle `treffbar` |
+| Gruppentitel | Gold wie in der Schiene | rgb(201,168,76) auf rgb(14,13,11) · **k = 8,5** |
+| Registereintrag | #BFB7A9 wie in der Schiene | rgb(191,183,169) auf rgb(14,13,11) · **k = 9,77** |
+| Objektkarte | lesbar und klickbar | rgb(242,236,223) auf rgb(23,22,15) · **k = 15,4** · 311 × 55, `treffbar` |
+| Objekt laden | Karte öffnet das Objekt | „Musterstraße 12, Leipzig", 2026-999, Schublade schließt |
+| Strategie-Tabelle | wischbar, nichts außerhalb | scrollWidth 601 / clientWidth 335, letzte Spalte nach dem Wischen bei 270…360 |
+| **Heute, Handy** | **unverändert** | rgb(5,5,5), Akkordeon `display:none`, Aufklapper 43 px, 0 Gruppen, Liste ohne Deckel |
+| **Aktenmappe, Schreibtisch** | **unverändert** | Schiene 247 × 987 rgb(14,13,11), Akkordeon 230 × 599, 5 Gruppen |
+| Gold-Audit | RC = 0 | „Genau auf der Basislinie. Kein neues Hartgold." |
+
+#### Was offen bleibt — und Marcel gehört
+
+**Der TON der Aktenmappe ist nicht entschieden.** Marcel nennt das Obsidian der Schublade „den
+Hintergrund von Heute". Die Vorlage, aus der die Aktenmappe stammt
+(`frontend/entwurf-hell-bankfaehig.html`, „Entwurf 1 — Aktenmappe"), ist **durchgehend hell**: Schiene
+weiß mit dunkler Schrift, Fläche rgb(232,229,222). Gebaut ist seit v1653e das Gegenteil — Obsidian-
+Schiene auf heller Arbeitsfläche, und `layout-varianten.css:1643/1737` heben das ausdrücklich über
+den hellen Skin. **Beides ist begründet, und keines von beidem lässt sich aus den Messungen
+entscheiden.** Deshalb ist hier **keine Farbe** der Schublade angefasst worden; die Trennung ist über
+die STRUKTUR hergestellt (Register, Zustände, Wischbarkeit). Wenn Marcel sagt „die Aktenmappe ist
+hell", ist das ein eigenes Paket: elf farbtragende Flächen in der Schublade plus die beiden
+Sperrblöcke `:1643` und `:1737`.
