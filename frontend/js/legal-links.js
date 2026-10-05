@@ -47,7 +47,7 @@
        Seitenleiste - erreichbar ueber das Menue, nie ueber dem Inhalt. */
     try {
       if (window.matchMedia('(max-width: 700px)').matches) {
-        var sbUser = document.querySelector('#sidebar .sb-user');
+        var sbUser = document.querySelector('#sb-user, #sidebar .sb-user-box, #sidebar .sb-user'); /* v1881a: heisst #sb-user */
         if (sbUser && sbUser.parentElement) {
           var z = document.createElement('div');
           z.id = 'dp-app-legal-footer';
