@@ -273,7 +273,7 @@
       "wert": 4.2,
       "rundung_stellen": 2,
       "bezeichnung": "Wohn- und Geschäftshäuser — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (4,2 bedeutet 4,2 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42. Vorher stand hier die 80-%-Spanne 2,7–3,9 % (das ist die Spanne der Verkaufshallen, Druckseite 43).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 13.4,
@@ -293,14 +293,45 @@
         "art": "stufen_1d",
         "einheit": "faktor",
         "stufen": {
-          "10": 1.59,
-          "15": 1.3,
-          "20": 1,
-          "25": 0.7,
-          "30": 0.41
+          "20": 1.14,
+          "30": 1,
+          "40": 0.91,
+          "50": 0.84
         },
-        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient verwendet werden“",
-        "hinweis": "UK-Tabelle S. 43. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+        "interpolation": "nicht gedruckt — Blatt sagt „können folgende Umrechnungskoeffizienten (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Hier stand bis zum 05.10.2026 die UK-Tabelle der VERKAUFSHALLEN (10/15/20/25/30 Jahre → 1,59/1,30/1,00/0,70/0,41, Druckseite 43) — ein Wohn-/Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte damit den Faktor 0,41 statt 1,00 ausgewiesen bekommen. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Nutzflächenanteil (multiplikativ auf den Zinssatz)",
+        "feld": "nutzflaechenanteil_pct",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 0.91,
+          "30": 0.97,
+          "40": 1,
+          "50": 1.02,
+          "70": 1.06,
+          "90": 1.09
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 40 % = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert (40 %), nicht die Tabelle."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Bodenrichtwert (multiplikativ auf den Zinssatz)",
+        "feld": "bodenrichtwert_eur_m2",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.07,
+          "70": 1.02,
+          "120": 1,
+          "200": 0.98,
+          "400": 0.94,
+          "800": 0.9
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 120 €/m² (Bodenrichtwert-Stichtag 01.01.2026) = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert, nicht die Tabelle."
       }
     ],
     "modellansaetze": {
@@ -352,16 +383,17 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 256,
     "streuung": {
-      "min_pct": 2.7,
-      "max_pct": 3.9,
-      "spannen_art": "80-%-Spanne (10. bis 90. Perzentil)"
+      "min_pct": 2.8,
+      "max_pct": 5.7,
+      "spannen_art": "90-%-Spanne",
+      "bestimmtheitsmass": 0.29
     },
     "stichtag": "2026-01-01",
     "stichtag_hinweis": null,
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 42, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -370,7 +402,7 @@
     "auflagen": [
       "Die Abfolge Modellblock → Stichprobe → Beschlusswert → Erläuterung ist im Textstrom von pdftotext an den Gewerbeteilmärkten (Verkaufshallen, Büro, Lager) nicht eindeutig zuzuordnen; beim WGH-Block ist sie es (Regression, GND 80, N 256, RND-Normierung 20 Jahre)."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Wohn- und Geschäftshäuser“, Druckseite 42: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42."
   },
   {
     "land_code": "NI",
@@ -387,7 +419,7 @@
       "wert": 3.3,
       "rundung_stellen": 2,
       "bezeichnung": "Verkaufshallen — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43. Vorher stand hier die 80-%-Spanne 2,5–4,5 % (das ist die Spanne der Bürogebäude, Druckseite 44).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 14,
@@ -399,7 +431,23 @@
         "30": 0.41
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 1.59,
+          "15": 1.3,
+          "20": 1,
+          "25": 0.7,
+          "30": 0.41
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 43, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 20 Jahre = 1,00. Diese Tabelle stand bis zum 05.10.2026 fälschlich am Satz für Wohn- und Geschäftshäuser und fehlte hier ganz. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -427,8 +475,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 22,
     "streuung": {
-      "min_pct": 2.5,
-      "max_pct": 4.5,
+      "min_pct": 2.7,
+      "max_pct": 3.9,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -436,7 +484,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -445,7 +493,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Verkaufshallen“, Druckseite 43: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43."
   },
   {
     "land_code": "NI",
@@ -462,7 +510,7 @@
       "wert": 3.5,
       "rundung_stellen": 2,
       "bezeichnung": "Bürogebäude — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44. Vorher stand hier die 80-%-Spanne 2,9–5,0 % (das ist die Spanne der Lager- und Produktionsgebäude, Druckseite 45).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 16,
@@ -473,7 +521,22 @@
         "50": 0.6
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.2,
+          "30": 1,
+          "40": 0.8,
+          "50": 0.6
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 44, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Neu erfasst am 05.10.2026 — die Tabelle fehlte an diesem Satz ganz. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -501,8 +564,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 27,
     "streuung": {
-      "min_pct": 2.9,
-      "max_pct": 5,
+      "min_pct": 2.5,
+      "max_pct": 4.5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -510,7 +573,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -519,7 +582,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Bürogebäude“, Druckseite 44: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44."
   },
   {
     "land_code": "NI",
@@ -536,13 +599,29 @@
       "wert": 3.9,
       "rundung_stellen": 2,
       "bezeichnung": "Lager- und Produktionsgebäude — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45. Vorher stand hier die 80-%-Spanne 2,4–4,5 % (das ist die Spanne der Apartmenthäuser und Pensionen im Küstenbereich, Druckseite 46 — ein ganz anderer Markt).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 12.8,
       "miete_eur_m2_monat": 4.5
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Miethöhe (multiplikativ auf den Zinssatz)",
+        "feld": "miete_eur_m2_monat",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "3": 1.14,
+          "6": 0.86,
+          "1.5": 1.28,
+          "4.5": 1,
+          "7.5": 0.72
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 45, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 4,50 €/m² = 1,00. Beim Zinssatz ist die MIETHÖHE die Einflussgröße, nicht die Restnutzungsdauer: das Blatt sagt „Als Einflussgrößen wurden die Restnutzungsdauer (nur Rohertragsfaktor) und die Miethöhe ermittelt“, und die RND-Tabelle auf Druckseite 45 führt ausschließlich eine Zeile „UK Rohertragsfaktor“. Eine RND-Korrektur auf den Zinssatz wäre hier also erfunden."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -570,8 +649,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 61,
     "streuung": {
-      "min_pct": 2.4,
-      "max_pct": 4.5,
+      "min_pct": 2.9,
+      "max_pct": 5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -579,7 +658,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 46, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -588,7 +667,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Lager- und Produktionsgebäude“, Druckseite 45: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45."
   },
   {
     "land_code": "NI",
@@ -849,7 +928,7 @@
       "wert": 4.2,
       "rundung_stellen": 2,
       "bezeichnung": "Wohn- und Geschäftshäuser — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (4,2 bedeutet 4,2 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42. Vorher stand hier die 80-%-Spanne 2,7–3,9 % (das ist die Spanne der Verkaufshallen, Druckseite 43).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 13.4,
@@ -869,14 +948,45 @@
         "art": "stufen_1d",
         "einheit": "faktor",
         "stufen": {
-          "10": 1.59,
-          "15": 1.3,
-          "20": 1,
-          "25": 0.7,
-          "30": 0.41
+          "20": 1.14,
+          "30": 1,
+          "40": 0.91,
+          "50": 0.84
         },
-        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient verwendet werden“",
-        "hinweis": "UK-Tabelle S. 43. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+        "interpolation": "nicht gedruckt — Blatt sagt „können folgende Umrechnungskoeffizienten (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Hier stand bis zum 05.10.2026 die UK-Tabelle der VERKAUFSHALLEN (10/15/20/25/30 Jahre → 1,59/1,30/1,00/0,70/0,41, Druckseite 43) — ein Wohn-/Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte damit den Faktor 0,41 statt 1,00 ausgewiesen bekommen. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Nutzflächenanteil (multiplikativ auf den Zinssatz)",
+        "feld": "nutzflaechenanteil_pct",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 0.91,
+          "30": 0.97,
+          "40": 1,
+          "50": 1.02,
+          "70": 1.06,
+          "90": 1.09
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 40 % = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert (40 %), nicht die Tabelle."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Bodenrichtwert (multiplikativ auf den Zinssatz)",
+        "feld": "bodenrichtwert_eur_m2",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.07,
+          "70": 1.02,
+          "120": 1,
+          "200": 0.98,
+          "400": 0.94,
+          "800": 0.9
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 120 €/m² (Bodenrichtwert-Stichtag 01.01.2026) = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert, nicht die Tabelle."
       }
     ],
     "modellansaetze": {
@@ -928,16 +1038,17 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 256,
     "streuung": {
-      "min_pct": 2.7,
-      "max_pct": 3.9,
-      "spannen_art": "80-%-Spanne (10. bis 90. Perzentil)"
+      "min_pct": 2.8,
+      "max_pct": 5.7,
+      "spannen_art": "90-%-Spanne",
+      "bestimmtheitsmass": 0.29
     },
     "stichtag": "2026-01-01",
     "stichtag_hinweis": null,
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 42, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -946,7 +1057,7 @@
     "auflagen": [
       "Die Abfolge Modellblock → Stichprobe → Beschlusswert → Erläuterung ist im Textstrom von pdftotext an den Gewerbeteilmärkten (Verkaufshallen, Büro, Lager) nicht eindeutig zuzuordnen; beim WGH-Block ist sie es (Regression, GND 80, N 256, RND-Normierung 20 Jahre)."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Wohn- und Geschäftshäuser“, Druckseite 42: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42."
   },
   {
     "land_code": "NI",
@@ -963,7 +1074,7 @@
       "wert": 3.3,
       "rundung_stellen": 2,
       "bezeichnung": "Verkaufshallen — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43. Vorher stand hier die 80-%-Spanne 2,5–4,5 % (das ist die Spanne der Bürogebäude, Druckseite 44).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 14,
@@ -975,7 +1086,23 @@
         "30": 0.41
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 1.59,
+          "15": 1.3,
+          "20": 1,
+          "25": 0.7,
+          "30": 0.41
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 43, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 20 Jahre = 1,00. Diese Tabelle stand bis zum 05.10.2026 fälschlich am Satz für Wohn- und Geschäftshäuser und fehlte hier ganz. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -1003,8 +1130,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 22,
     "streuung": {
-      "min_pct": 2.5,
-      "max_pct": 4.5,
+      "min_pct": 2.7,
+      "max_pct": 3.9,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -1012,7 +1139,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1021,7 +1148,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Verkaufshallen“, Druckseite 43: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43."
   },
   {
     "land_code": "NI",
@@ -1038,7 +1165,7 @@
       "wert": 3.5,
       "rundung_stellen": 2,
       "bezeichnung": "Bürogebäude — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44. Vorher stand hier die 80-%-Spanne 2,9–5,0 % (das ist die Spanne der Lager- und Produktionsgebäude, Druckseite 45).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 16,
@@ -1049,7 +1176,22 @@
         "50": 0.6
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.2,
+          "30": 1,
+          "40": 0.8,
+          "50": 0.6
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 44, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Neu erfasst am 05.10.2026 — die Tabelle fehlte an diesem Satz ganz. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -1077,8 +1219,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 27,
     "streuung": {
-      "min_pct": 2.9,
-      "max_pct": 5,
+      "min_pct": 2.5,
+      "max_pct": 4.5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -1086,7 +1228,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1095,7 +1237,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Bürogebäude“, Druckseite 44: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44."
   },
   {
     "land_code": "NI",
@@ -1112,13 +1254,29 @@
       "wert": 3.9,
       "rundung_stellen": 2,
       "bezeichnung": "Lager- und Produktionsgebäude — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45. Vorher stand hier die 80-%-Spanne 2,4–4,5 % (das ist die Spanne der Apartmenthäuser und Pensionen im Küstenbereich, Druckseite 46 — ein ganz anderer Markt).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 12.8,
       "miete_eur_m2_monat": 4.5
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Miethöhe (multiplikativ auf den Zinssatz)",
+        "feld": "miete_eur_m2_monat",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "3": 1.14,
+          "6": 0.86,
+          "1.5": 1.28,
+          "4.5": 1,
+          "7.5": 0.72
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 45, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 4,50 €/m² = 1,00. Beim Zinssatz ist die MIETHÖHE die Einflussgröße, nicht die Restnutzungsdauer: das Blatt sagt „Als Einflussgrößen wurden die Restnutzungsdauer (nur Rohertragsfaktor) und die Miethöhe ermittelt“, und die RND-Tabelle auf Druckseite 45 führt ausschließlich eine Zeile „UK Rohertragsfaktor“. Eine RND-Korrektur auf den Zinssatz wäre hier also erfunden."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -1146,8 +1304,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 61,
     "streuung": {
-      "min_pct": 2.4,
-      "max_pct": 4.5,
+      "min_pct": 2.9,
+      "max_pct": 5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -1155,7 +1313,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 46, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1164,7 +1322,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Lager- und Produktionsgebäude“, Druckseite 45: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45."
   },
   {
     "land_code": "NI",
@@ -1440,7 +1598,7 @@
       "wert": 4.2,
       "rundung_stellen": 2,
       "bezeichnung": "Wohn- und Geschäftshäuser — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (4,2 bedeutet 4,2 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42. Vorher stand hier die 80-%-Spanne 2,7–3,9 % (das ist die Spanne der Verkaufshallen, Druckseite 43).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 13.4,
@@ -1460,14 +1618,45 @@
         "art": "stufen_1d",
         "einheit": "faktor",
         "stufen": {
-          "10": 1.59,
-          "15": 1.3,
-          "20": 1,
-          "25": 0.7,
-          "30": 0.41
+          "20": 1.14,
+          "30": 1,
+          "40": 0.91,
+          "50": 0.84
         },
-        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient verwendet werden“",
-        "hinweis": "UK-Tabelle S. 43. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+        "interpolation": "nicht gedruckt — Blatt sagt „können folgende Umrechnungskoeffizienten (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Hier stand bis zum 05.10.2026 die UK-Tabelle der VERKAUFSHALLEN (10/15/20/25/30 Jahre → 1,59/1,30/1,00/0,70/0,41, Druckseite 43) — ein Wohn-/Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte damit den Faktor 0,41 statt 1,00 ausgewiesen bekommen. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Nutzflächenanteil (multiplikativ auf den Zinssatz)",
+        "feld": "nutzflaechenanteil_pct",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 0.91,
+          "30": 0.97,
+          "40": 1,
+          "50": 1.02,
+          "70": 1.06,
+          "90": 1.09
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 40 % = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert (40 %), nicht die Tabelle."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Bodenrichtwert (multiplikativ auf den Zinssatz)",
+        "feld": "bodenrichtwert_eur_m2",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.07,
+          "70": 1.02,
+          "120": 1,
+          "200": 0.98,
+          "400": 0.94,
+          "800": 0.9
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 120 €/m² (Bodenrichtwert-Stichtag 01.01.2026) = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert, nicht die Tabelle."
       }
     ],
     "modellansaetze": {
@@ -1519,16 +1708,17 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 256,
     "streuung": {
-      "min_pct": 2.7,
-      "max_pct": 3.9,
-      "spannen_art": "80-%-Spanne (10. bis 90. Perzentil)"
+      "min_pct": 2.8,
+      "max_pct": 5.7,
+      "spannen_art": "90-%-Spanne",
+      "bestimmtheitsmass": 0.29
     },
     "stichtag": "2026-01-01",
     "stichtag_hinweis": null,
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 42, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1537,7 +1727,7 @@
     "auflagen": [
       "Die Abfolge Modellblock → Stichprobe → Beschlusswert → Erläuterung ist im Textstrom von pdftotext an den Gewerbeteilmärkten (Verkaufshallen, Büro, Lager) nicht eindeutig zuzuordnen; beim WGH-Block ist sie es (Regression, GND 80, N 256, RND-Normierung 20 Jahre)."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Wohn- und Geschäftshäuser“, Druckseite 42: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42."
   },
   {
     "land_code": "NI",
@@ -1554,7 +1744,7 @@
       "wert": 3.3,
       "rundung_stellen": 2,
       "bezeichnung": "Verkaufshallen — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43. Vorher stand hier die 80-%-Spanne 2,5–4,5 % (das ist die Spanne der Bürogebäude, Druckseite 44).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 14,
@@ -1566,7 +1756,23 @@
         "30": 0.41
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 1.59,
+          "15": 1.3,
+          "20": 1,
+          "25": 0.7,
+          "30": 0.41
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 43, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 20 Jahre = 1,00. Diese Tabelle stand bis zum 05.10.2026 fälschlich am Satz für Wohn- und Geschäftshäuser und fehlte hier ganz. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -1594,8 +1800,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 22,
     "streuung": {
-      "min_pct": 2.5,
-      "max_pct": 4.5,
+      "min_pct": 2.7,
+      "max_pct": 3.9,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -1603,7 +1809,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1612,7 +1818,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Verkaufshallen“, Druckseite 43: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43."
   },
   {
     "land_code": "NI",
@@ -1629,7 +1835,7 @@
       "wert": 3.5,
       "rundung_stellen": 2,
       "bezeichnung": "Bürogebäude — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44. Vorher stand hier die 80-%-Spanne 2,9–5,0 % (das ist die Spanne der Lager- und Produktionsgebäude, Druckseite 45).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 16,
@@ -1640,7 +1846,22 @@
         "50": 0.6
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.2,
+          "30": 1,
+          "40": 0.8,
+          "50": 0.6
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 44, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Neu erfasst am 05.10.2026 — die Tabelle fehlte an diesem Satz ganz. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -1668,8 +1889,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 27,
     "streuung": {
-      "min_pct": 2.9,
-      "max_pct": 5,
+      "min_pct": 2.5,
+      "max_pct": 4.5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -1677,7 +1898,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1686,7 +1907,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Bürogebäude“, Druckseite 44: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44."
   },
   {
     "land_code": "NI",
@@ -1703,13 +1924,29 @@
       "wert": 3.9,
       "rundung_stellen": 2,
       "bezeichnung": "Lager- und Produktionsgebäude — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45. Vorher stand hier die 80-%-Spanne 2,4–4,5 % (das ist die Spanne der Apartmenthäuser und Pensionen im Küstenbereich, Druckseite 46 — ein ganz anderer Markt).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 12.8,
       "miete_eur_m2_monat": 4.5
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Miethöhe (multiplikativ auf den Zinssatz)",
+        "feld": "miete_eur_m2_monat",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "3": 1.14,
+          "6": 0.86,
+          "1.5": 1.28,
+          "4.5": 1,
+          "7.5": 0.72
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 45, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 4,50 €/m² = 1,00. Beim Zinssatz ist die MIETHÖHE die Einflussgröße, nicht die Restnutzungsdauer: das Blatt sagt „Als Einflussgrößen wurden die Restnutzungsdauer (nur Rohertragsfaktor) und die Miethöhe ermittelt“, und die RND-Tabelle auf Druckseite 45 führt ausschließlich eine Zeile „UK Rohertragsfaktor“. Eine RND-Korrektur auf den Zinssatz wäre hier also erfunden."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -1737,8 +1974,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 61,
     "streuung": {
-      "min_pct": 2.4,
-      "max_pct": 4.5,
+      "min_pct": 2.9,
+      "max_pct": 5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -1746,7 +1983,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 46, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -1755,7 +1992,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Lager- und Produktionsgebäude“, Druckseite 45: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45."
   },
   {
     "land_code": "NI",
@@ -2016,7 +2253,7 @@
       "wert": 4.2,
       "rundung_stellen": 2,
       "bezeichnung": "Wohn- und Geschäftshäuser — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (4,2 bedeutet 4,2 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42. Vorher stand hier die 80-%-Spanne 2,7–3,9 % (das ist die Spanne der Verkaufshallen, Druckseite 43).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 13.4,
@@ -2036,14 +2273,45 @@
         "art": "stufen_1d",
         "einheit": "faktor",
         "stufen": {
-          "10": 1.59,
-          "15": 1.3,
-          "20": 1,
-          "25": 0.7,
-          "30": 0.41
+          "20": 1.14,
+          "30": 1,
+          "40": 0.91,
+          "50": 0.84
         },
-        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient verwendet werden“",
-        "hinweis": "UK-Tabelle S. 43. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+        "interpolation": "nicht gedruckt — Blatt sagt „können folgende Umrechnungskoeffizienten (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Hier stand bis zum 05.10.2026 die UK-Tabelle der VERKAUFSHALLEN (10/15/20/25/30 Jahre → 1,59/1,30/1,00/0,70/0,41, Druckseite 43) — ein Wohn-/Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte damit den Faktor 0,41 statt 1,00 ausgewiesen bekommen. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Nutzflächenanteil (multiplikativ auf den Zinssatz)",
+        "feld": "nutzflaechenanteil_pct",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 0.91,
+          "30": 0.97,
+          "40": 1,
+          "50": 1.02,
+          "70": 1.06,
+          "90": 1.09
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 40 % = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert (40 %), nicht die Tabelle."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Bodenrichtwert (multiplikativ auf den Zinssatz)",
+        "feld": "bodenrichtwert_eur_m2",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.07,
+          "70": 1.02,
+          "120": 1,
+          "200": 0.98,
+          "400": 0.94,
+          "800": 0.9
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 120 €/m² (Bodenrichtwert-Stichtag 01.01.2026) = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert, nicht die Tabelle."
       }
     ],
     "modellansaetze": {
@@ -2095,16 +2363,17 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 256,
     "streuung": {
-      "min_pct": 2.7,
-      "max_pct": 3.9,
-      "spannen_art": "80-%-Spanne (10. bis 90. Perzentil)"
+      "min_pct": 2.8,
+      "max_pct": 5.7,
+      "spannen_art": "90-%-Spanne",
+      "bestimmtheitsmass": 0.29
     },
     "stichtag": "2026-01-01",
     "stichtag_hinweis": null,
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 42, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2113,7 +2382,7 @@
     "auflagen": [
       "Die Abfolge Modellblock → Stichprobe → Beschlusswert → Erläuterung ist im Textstrom von pdftotext an den Gewerbeteilmärkten (Verkaufshallen, Büro, Lager) nicht eindeutig zuzuordnen; beim WGH-Block ist sie es (Regression, GND 80, N 256, RND-Normierung 20 Jahre)."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Wohn- und Geschäftshäuser“, Druckseite 42: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42."
   },
   {
     "land_code": "NI",
@@ -2130,7 +2399,7 @@
       "wert": 3.3,
       "rundung_stellen": 2,
       "bezeichnung": "Verkaufshallen — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43. Vorher stand hier die 80-%-Spanne 2,5–4,5 % (das ist die Spanne der Bürogebäude, Druckseite 44).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 14,
@@ -2142,7 +2411,23 @@
         "30": 0.41
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 1.59,
+          "15": 1.3,
+          "20": 1,
+          "25": 0.7,
+          "30": 0.41
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 43, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 20 Jahre = 1,00. Diese Tabelle stand bis zum 05.10.2026 fälschlich am Satz für Wohn- und Geschäftshäuser und fehlte hier ganz. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -2170,8 +2455,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 22,
     "streuung": {
-      "min_pct": 2.5,
-      "max_pct": 4.5,
+      "min_pct": 2.7,
+      "max_pct": 3.9,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -2179,7 +2464,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2188,7 +2473,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Verkaufshallen“, Druckseite 43: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43."
   },
   {
     "land_code": "NI",
@@ -2205,7 +2490,7 @@
       "wert": 3.5,
       "rundung_stellen": 2,
       "bezeichnung": "Bürogebäude — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44. Vorher stand hier die 80-%-Spanne 2,9–5,0 % (das ist die Spanne der Lager- und Produktionsgebäude, Druckseite 45).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 16,
@@ -2216,7 +2501,22 @@
         "50": 0.6
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.2,
+          "30": 1,
+          "40": 0.8,
+          "50": 0.6
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 44, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Neu erfasst am 05.10.2026 — die Tabelle fehlte an diesem Satz ganz. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -2244,8 +2544,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 27,
     "streuung": {
-      "min_pct": 2.9,
-      "max_pct": 5,
+      "min_pct": 2.5,
+      "max_pct": 4.5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -2253,7 +2553,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2262,7 +2562,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Bürogebäude“, Druckseite 44: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44."
   },
   {
     "land_code": "NI",
@@ -2279,13 +2579,29 @@
       "wert": 3.9,
       "rundung_stellen": 2,
       "bezeichnung": "Lager- und Produktionsgebäude — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45. Vorher stand hier die 80-%-Spanne 2,4–4,5 % (das ist die Spanne der Apartmenthäuser und Pensionen im Küstenbereich, Druckseite 46 — ein ganz anderer Markt).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 12.8,
       "miete_eur_m2_monat": 4.5
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Miethöhe (multiplikativ auf den Zinssatz)",
+        "feld": "miete_eur_m2_monat",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "3": 1.14,
+          "6": 0.86,
+          "1.5": 1.28,
+          "4.5": 1,
+          "7.5": 0.72
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 45, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 4,50 €/m² = 1,00. Beim Zinssatz ist die MIETHÖHE die Einflussgröße, nicht die Restnutzungsdauer: das Blatt sagt „Als Einflussgrößen wurden die Restnutzungsdauer (nur Rohertragsfaktor) und die Miethöhe ermittelt“, und die RND-Tabelle auf Druckseite 45 führt ausschließlich eine Zeile „UK Rohertragsfaktor“. Eine RND-Korrektur auf den Zinssatz wäre hier also erfunden."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -2313,8 +2629,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 61,
     "streuung": {
-      "min_pct": 2.4,
-      "max_pct": 4.5,
+      "min_pct": 2.9,
+      "max_pct": 5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -2322,7 +2638,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 46, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2331,7 +2647,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Lager- und Produktionsgebäude“, Druckseite 45: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45."
   },
   {
     "land_code": "NI",
@@ -2607,7 +2923,7 @@
       "wert": 4.2,
       "rundung_stellen": 2,
       "bezeichnung": "Wohn- und Geschäftshäuser — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (4,2 bedeutet 4,2 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42. Vorher stand hier die 80-%-Spanne 2,7–3,9 % (das ist die Spanne der Verkaufshallen, Druckseite 43).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 13.4,
@@ -2627,14 +2943,45 @@
         "art": "stufen_1d",
         "einheit": "faktor",
         "stufen": {
-          "10": 1.59,
-          "15": 1.3,
-          "20": 1,
-          "25": 0.7,
-          "30": 0.41
+          "20": 1.14,
+          "30": 1,
+          "40": 0.91,
+          "50": 0.84
         },
-        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient verwendet werden“",
-        "hinweis": "UK-Tabelle S. 43. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+        "interpolation": "nicht gedruckt — Blatt sagt „können folgende Umrechnungskoeffizienten (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Hier stand bis zum 05.10.2026 die UK-Tabelle der VERKAUFSHALLEN (10/15/20/25/30 Jahre → 1,59/1,30/1,00/0,70/0,41, Druckseite 43) — ein Wohn-/Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte damit den Faktor 0,41 statt 1,00 ausgewiesen bekommen. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Nutzflächenanteil (multiplikativ auf den Zinssatz)",
+        "feld": "nutzflaechenanteil_pct",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 0.91,
+          "30": 0.97,
+          "40": 1,
+          "50": 1.02,
+          "70": 1.06,
+          "90": 1.09
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 40 % = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert (40 %), nicht die Tabelle."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Bodenrichtwert (multiplikativ auf den Zinssatz)",
+        "feld": "bodenrichtwert_eur_m2",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.07,
+          "70": 1.02,
+          "120": 1,
+          "200": 0.98,
+          "400": 0.94,
+          "800": 0.9
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 120 €/m² (Bodenrichtwert-Stichtag 01.01.2026) = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert, nicht die Tabelle."
       }
     ],
     "modellansaetze": {
@@ -2686,16 +3033,17 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 256,
     "streuung": {
-      "min_pct": 2.7,
-      "max_pct": 3.9,
-      "spannen_art": "80-%-Spanne (10. bis 90. Perzentil)"
+      "min_pct": 2.8,
+      "max_pct": 5.7,
+      "spannen_art": "90-%-Spanne",
+      "bestimmtheitsmass": 0.29
     },
     "stichtag": "2026-01-01",
     "stichtag_hinweis": null,
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 42, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2704,7 +3052,7 @@
     "auflagen": [
       "Die Abfolge Modellblock → Stichprobe → Beschlusswert → Erläuterung ist im Textstrom von pdftotext an den Gewerbeteilmärkten (Verkaufshallen, Büro, Lager) nicht eindeutig zuzuordnen; beim WGH-Block ist sie es (Regression, GND 80, N 256, RND-Normierung 20 Jahre)."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Wohn- und Geschäftshäuser“, Druckseite 42: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42."
   },
   {
     "land_code": "NI",
@@ -2721,7 +3069,7 @@
       "wert": 3.3,
       "rundung_stellen": 2,
       "bezeichnung": "Verkaufshallen — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43. Vorher stand hier die 80-%-Spanne 2,5–4,5 % (das ist die Spanne der Bürogebäude, Druckseite 44).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 14,
@@ -2733,7 +3081,23 @@
         "30": 0.41
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 1.59,
+          "15": 1.3,
+          "20": 1,
+          "25": 0.7,
+          "30": 0.41
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 43, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 20 Jahre = 1,00. Diese Tabelle stand bis zum 05.10.2026 fälschlich am Satz für Wohn- und Geschäftshäuser und fehlte hier ganz. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -2761,8 +3125,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 22,
     "streuung": {
-      "min_pct": 2.5,
-      "max_pct": 4.5,
+      "min_pct": 2.7,
+      "max_pct": 3.9,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -2770,7 +3134,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2779,7 +3143,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Verkaufshallen“, Druckseite 43: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43."
   },
   {
     "land_code": "NI",
@@ -2796,7 +3160,7 @@
       "wert": 3.5,
       "rundung_stellen": 2,
       "bezeichnung": "Bürogebäude — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44. Vorher stand hier die 80-%-Spanne 2,9–5,0 % (das ist die Spanne der Lager- und Produktionsgebäude, Druckseite 45).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 16,
@@ -2807,7 +3171,22 @@
         "50": 0.6
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.2,
+          "30": 1,
+          "40": 0.8,
+          "50": 0.6
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 44, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Neu erfasst am 05.10.2026 — die Tabelle fehlte an diesem Satz ganz. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -2835,8 +3214,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 27,
     "streuung": {
-      "min_pct": 2.9,
-      "max_pct": 5,
+      "min_pct": 2.5,
+      "max_pct": 4.5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -2844,7 +3223,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2853,7 +3232,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Bürogebäude“, Druckseite 44: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44."
   },
   {
     "land_code": "NI",
@@ -2870,13 +3249,29 @@
       "wert": 3.9,
       "rundung_stellen": 2,
       "bezeichnung": "Lager- und Produktionsgebäude — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45. Vorher stand hier die 80-%-Spanne 2,4–4,5 % (das ist die Spanne der Apartmenthäuser und Pensionen im Küstenbereich, Druckseite 46 — ein ganz anderer Markt).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 12.8,
       "miete_eur_m2_monat": 4.5
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Miethöhe (multiplikativ auf den Zinssatz)",
+        "feld": "miete_eur_m2_monat",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "3": 1.14,
+          "6": 0.86,
+          "1.5": 1.28,
+          "4.5": 1,
+          "7.5": 0.72
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 45, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 4,50 €/m² = 1,00. Beim Zinssatz ist die MIETHÖHE die Einflussgröße, nicht die Restnutzungsdauer: das Blatt sagt „Als Einflussgrößen wurden die Restnutzungsdauer (nur Rohertragsfaktor) und die Miethöhe ermittelt“, und die RND-Tabelle auf Druckseite 45 führt ausschließlich eine Zeile „UK Rohertragsfaktor“. Eine RND-Korrektur auf den Zinssatz wäre hier also erfunden."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -2904,8 +3299,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 61,
     "streuung": {
-      "min_pct": 2.4,
-      "max_pct": 4.5,
+      "min_pct": 2.9,
+      "max_pct": 5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -2913,7 +3308,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 46, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -2922,7 +3317,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Lager- und Produktionsgebäude“, Druckseite 45: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45."
   },
   {
     "land_code": "NI",
@@ -3198,7 +3593,7 @@
       "wert": 4.2,
       "rundung_stellen": 2,
       "bezeichnung": "Wohn- und Geschäftshäuser — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (4,2 bedeutet 4,2 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42. Vorher stand hier die 80-%-Spanne 2,7–3,9 % (das ist die Spanne der Verkaufshallen, Druckseite 43).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 13.4,
@@ -3218,14 +3613,45 @@
         "art": "stufen_1d",
         "einheit": "faktor",
         "stufen": {
-          "10": 1.59,
-          "15": 1.3,
-          "20": 1,
-          "25": 0.7,
-          "30": 0.41
+          "20": 1.14,
+          "30": 1,
+          "40": 0.91,
+          "50": 0.84
         },
-        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient verwendet werden“",
-        "hinweis": "UK-Tabelle S. 43. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+        "interpolation": "nicht gedruckt — Blatt sagt „können folgende Umrechnungskoeffizienten (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Hier stand bis zum 05.10.2026 die UK-Tabelle der VERKAUFSHALLEN (10/15/20/25/30 Jahre → 1,59/1,30/1,00/0,70/0,41, Druckseite 43) — ein Wohn-/Geschäftshaus mit 30 Jahren Restnutzungsdauer hätte damit den Faktor 0,41 statt 1,00 ausgewiesen bekommen. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Nutzflächenanteil (multiplikativ auf den Zinssatz)",
+        "feld": "nutzflaechenanteil_pct",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 0.91,
+          "30": 0.97,
+          "40": 1,
+          "50": 1.02,
+          "70": 1.06,
+          "90": 1.09
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 40 % = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert (40 %), nicht die Tabelle."
+      },
+      {
+        "bez": "Umrechnungskoeffizient Bodenrichtwert (multiplikativ auf den Zinssatz)",
+        "feld": "bodenrichtwert_eur_m2",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.07,
+          "70": 1.02,
+          "120": 1,
+          "200": 0.98,
+          "400": 0.94,
+          "800": 0.9
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 42, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 120 €/m² (Bodenrichtwert-Stichtag 01.01.2026) = 1,00. Neu erfasst am 05.10.2026 — v1887 hatte nur den Bezugswert, nicht die Tabelle."
       }
     ],
     "modellansaetze": {
@@ -3277,16 +3703,17 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 256,
     "streuung": {
-      "min_pct": 2.7,
-      "max_pct": 3.9,
-      "spannen_art": "80-%-Spanne (10. bis 90. Perzentil)"
+      "min_pct": 2.8,
+      "max_pct": 5.7,
+      "spannen_art": "90-%-Spanne",
+      "bestimmtheitsmass": 0.29
     },
     "stichtag": "2026-01-01",
     "stichtag_hinweis": null,
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 42, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -3295,7 +3722,7 @@
     "auflagen": [
       "Die Abfolge Modellblock → Stichprobe → Beschlusswert → Erläuterung ist im Textstrom von pdftotext an den Gewerbeteilmärkten (Verkaufshallen, Büro, Lager) nicht eindeutig zuzuordnen; beim WGH-Block ist sie es (Regression, GND 80, N 256, RND-Normierung 20 Jahre)."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Wohn- und Geschäftshäuser“, Druckseite 42: Liegenschaftszinssatz 4,2 %, 90-%-Spanne 2,8–5,7 %, Bestimmtheitsmaß 0,29, auf Druckseite 42."
   },
   {
     "land_code": "NI",
@@ -3312,7 +3739,7 @@
       "wert": 3.3,
       "rundung_stellen": 2,
       "bezeichnung": "Verkaufshallen — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,3 bedeutet 3,3 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43. Vorher stand hier die 80-%-Spanne 2,5–4,5 % (das ist die Spanne der Bürogebäude, Druckseite 44).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 14,
@@ -3324,7 +3751,23 @@
         "30": 0.41
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "10": 1.59,
+          "15": 1.3,
+          "20": 1,
+          "25": 0.7,
+          "30": 0.41
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 43, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 20 Jahre = 1,00. Diese Tabelle stand bis zum 05.10.2026 fälschlich am Satz für Wohn- und Geschäftshäuser und fehlte hier ganz. Bei 30 Jahren fällt der Zinssatz auf 41 % des Beschlusswerts — vor Anwendung außerhalb 10–30 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -3352,8 +3795,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 22,
     "streuung": {
-      "min_pct": 2.5,
-      "max_pct": 4.5,
+      "min_pct": 2.7,
+      "max_pct": 3.9,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -3361,7 +3804,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 43, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -3370,7 +3813,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Verkaufshallen“, Druckseite 43: Liegenschaftszinssatz 3,3 %, 80-%-Spanne 2,7–3,9 %, auf Druckseite 43."
   },
   {
     "land_code": "NI",
@@ -3387,7 +3830,7 @@
       "wert": 3.5,
       "rundung_stellen": 2,
       "bezeichnung": "Bürogebäude — Beschlusswert zum 01.01.2026, bezogen auf 30 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44. Vorher stand hier die 80-%-Spanne 2,9–5,0 % (das ist die Spanne der Lager- und Produktionsgebäude, Druckseite 45).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 30,
       "rohertragsfaktor": 16,
@@ -3398,7 +3841,22 @@
         "50": 0.6
       }
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Restnutzungsdauer (multiplikativ auf den Zinssatz)",
+        "feld": "restnutzungsdauer",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "20": 1.2,
+          "30": 1,
+          "40": 0.8,
+          "50": 0.6
+        },
+        "interpolation": "nicht gedruckt — Blatt sagt „kann folgender Umrechnungskoeffizient (UK) verwendet werden“",
+        "hinweis": "UK-Tabelle Druckseite 44, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 30 Jahre = 1,00. Neu erfasst am 05.10.2026 — die Tabelle fehlte an diesem Satz ganz. Vor Anwendung außerhalb 20–50 Jahre sachverständig prüfen."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -3426,8 +3884,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 27,
     "streuung": {
-      "min_pct": 2.9,
-      "max_pct": 5,
+      "min_pct": 2.5,
+      "max_pct": 4.5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -3435,7 +3893,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 44, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -3444,7 +3902,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Bürogebäude“, Druckseite 44: Liegenschaftszinssatz 3,5 %, 80-%-Spanne 2,5–4,5 %, auf Druckseite 44."
   },
   {
     "land_code": "NI",
@@ -3461,13 +3919,29 @@
       "wert": 3.9,
       "rundung_stellen": 2,
       "bezeichnung": "Lager- und Produktionsgebäude — Beschlusswert zum 01.01.2026, bezogen auf 20 Jahre Restnutzungsdauer",
-      "hinweis": "Ergebnis in PROZENT (3,5 bedeutet 3,5 %), nicht als Dezimalbruch.",
+      "hinweis": "Ergebnis in PROZENT (3,9 bedeutet 3,9 %), nicht als Dezimalbruch. Hier stand bis zum 05.10.2026 die Spanne bzw. die Umrechnungstabelle des NÄCHSTEN Abschnitts — v1887 hatte Wert, Seite, Bezugs-Restnutzungsdauer, Rohertragsfaktor und Fallzahl richtiggestellt, die Streuung und die Umrechnungskoeffizienten aber nicht mitgenommen. Am PDF gemessen (pdftotext -layout) gilt: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45. Vorher stand hier die 80-%-Spanne 2,4–4,5 % (das ist die Spanne der Apartmenthäuser und Pensionen im Küstenbereich, Druckseite 46 — ein ganz anderer Markt).",
       "wert_art": "beschluss_normiert",
       "bezug_restnutzungsdauer_jahre": 20,
       "rohertragsfaktor": 12.8,
       "miete_eur_m2_monat": 4.5
     },
-    "korrekturen": [],
+    "korrekturen": [
+      {
+        "bez": "Umrechnungskoeffizient Miethöhe (multiplikativ auf den Zinssatz)",
+        "feld": "miete_eur_m2_monat",
+        "art": "stufen_1d",
+        "einheit": "faktor",
+        "stufen": {
+          "3": 1.14,
+          "6": 0.86,
+          "1.5": 1.28,
+          "4.5": 1,
+          "7.5": 0.72
+        },
+        "interpolation": "nicht gedruckt",
+        "hinweis": "UK-Tabelle Druckseite 45, Zeile „UK Liegenschaftszinssatz“. Bezugsfall 4,50 €/m² = 1,00. Beim Zinssatz ist die MIETHÖHE die Einflussgröße, nicht die Restnutzungsdauer: das Blatt sagt „Als Einflussgrößen wurden die Restnutzungsdauer (nur Rohertragsfaktor) und die Miethöhe ermittelt“, und die RND-Tabelle auf Druckseite 45 führt ausschließlich eine Zeile „UK Rohertragsfaktor“. Eine RND-Korrektur auf den Zinssatz wäre hier also erfunden."
+      }
+    ],
     "modellansaetze": {
       "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
       "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
@@ -3495,8 +3969,8 @@
     "stufe_grund": "amtlich, ausschussscharf, Fallzahl und 80-%-Spanne ausgewiesen",
     "fallzahl": 61,
     "streuung": {
-      "min_pct": 2.4,
-      "max_pct": 4.5,
+      "min_pct": 2.9,
+      "max_pct": 5,
       "spannen_art": "80-%-Spanne"
     },
     "stichtag": "2026-01-01",
@@ -3504,7 +3978,7 @@
     "berichtsjahr": 2025,
     "modellversion": "GMD 2026 Aurich",
     "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 46, am 05.10.2026 gelesen)",
+    "quelle_parser": "v1888-hand (pdftotext, Seite 45, am 05.10.2026 gelesen)",
     "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
@@ -3513,7 +3987,7 @@
     "auflagen": [
       "ZUORDNUNG UNSICHER: Die Umrechnungstabellen und Normierungs-Restnutzungsdauern (20/30 Jahre, Miete 4,50 €/m²) stehen im pdftotext-Strom zwischen den Blöcken; die Zuordnung von Wert und Fallzahl zum Teilmarkt folgt der Reihenfolge Verkaufshallen → Bürogebäude → Lager-/Produktionsgebäude (Überschriften S. 44/45/46). Vor Verwendung am PDF gegenlesen."
     ],
-    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout)."
+    "korrekturvermerk": "v1887 · Korrektur am 05.10.2026: dieser Satz trug den Wert des NÄCHSTEN Abschnitts (gemessen: ggg 3,3/S43, handel 3,5/S44, buero 3,9/S45, produktion_logistik 3,5/S46). Wert, Seite, Restnutzungsdauer-Bezug und Beleg stammen jetzt aus dem richtigen Abschnitt, direkt am PDF nachgelesen (pdftotext -layout). v1888 · Nachkorrektur am 05.10.2026: v1887 hatte die Streuung und die Umrechnungskoeffizienten nicht mitgenommen — beide trugen weiter den Stand des nächsten Abschnitts. Jetzt gemessen am Abschnitt „Lager- und Produktionsgebäude“, Druckseite 45: Liegenschaftszinssatz 3,9 %, 80-%-Spanne 2,9–5,0 %, auf Druckseite 45."
   },
   {
     "land_code": "NI",
