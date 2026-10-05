@@ -6882,8 +6882,21 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user{
     flex:0 0 auto !important;
   }
+  /* ── v1889d · DAS REGISTER LAG HINTER 21 OBJEKTKARTEN ────────────────────
+     Nachgemessen, nachdem es offen stand: der erste Eintrag („Einzelobjekt")
+     begann bei y = 1886 in einer 844 px hohen Schublade - man haette zweimal
+     ueber die ganze Liste wischen muessen, um ihn zu sehen, und nichts haette
+     darauf hingewiesen, dass er da ist.
+
+     > Offen und erreichbar sind nicht dasselbe. Ein Menue, das erst nach
+     > 1886 px kommt, ist genauso versteckt wie eines hinter einem Aufklapper.
+
+     Die Objektliste bekommt einen Deckel und scrollt in sich - darunter steht
+     das Register, beides in einem Schirm. `flex:0 0 auto` muss dabei bleiben:
+     ohne das schrumpft die Liste im scrollenden Behaelter auf null und die
+     Karten sind nicht mehr anklickbar (genau der Fehler aus v1885c). */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list{
-    overflow:visible !important; max-height:none !important;
+    max-height:42vh !important; overflow-y:auto !important; overflow-x:hidden !important;
   }
 }
 
