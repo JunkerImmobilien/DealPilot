@@ -235,6 +235,9 @@ export const DealPilotObjectMapper = {
       brw_anpassung_pct: dez(pick(d, ['brw_anpassung_pct'])),
       brw_anpassung_grund: pick(d, ['brw_anpassung_grund']),
       stellplatz_miete_monat: num(pick(d, ['stellplatz_miete_monat'])),
+      /* v1877 · Zusatzeinnahmen aus dem Reiter Miete (`ze`, je Monat) kamen auf diesem Weg gar nicht
+         an - der Rohertrag fehlte um 90 EUR/Monat (Parkstr. 9). Der Bericht kennt sie als sonstige_jahr. */
+      sonstige_jahr: (function () { const sj = num(pick(d, ['sonstige_jahr'])); if (sj) return sj; const ze = num(pick(d, ['ze'])); return ze ? Math.round(ze * 12) : null; })(),
     };
   },
 

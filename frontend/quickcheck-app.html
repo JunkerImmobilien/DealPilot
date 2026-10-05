@@ -6350,6 +6350,17 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .mbody{ padding:16px 18px;display:flex;align-items:center;gap:20px; }
 @media(max-width:640px){ #qb-bp .mbody{flex-direction:column;gap:10px} }
 #qb-bp .dialwrap{ flex:none; }
+/* v1877 · Score-Bereich wie die Bewertungs-Karten (Ring, Zahl, / 100, Stufen-Pille) */
+#qb-bp .dialwrap{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+#qb-bp .qb-ring{ position:relative; display:inline-block; }
+#qb-bp .qb-rov{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#qb-bp .qb-n{ font-family:"Space Grotesk",sans-serif; font-weight:700; color:#1A1A18; line-height:1; letter-spacing:-1px; }
+#qb-bp .qb-d{ font-size:10px; color:#8a8378; margin-top:2px; font-family:"JetBrains Mono",monospace; }
+#qb-bp .qb-badge{ font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:700; letter-spacing:1px; padding:5px 14px; border-radius:20px; text-transform:uppercase; display:inline-flex; align-items:center; }
+#qb-bp .qb-badge.g{ background:rgba(63,165,108,.16); color:#3FA56C; box-shadow:0 0 0 1px rgba(63,165,108,.35); }
+#qb-bp .qb-badge.o{ background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent); color:var(--wl-b8932f, #b8932f); box-shadow:0 0 0 1px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent); }
+#qb-bp .qb-badge.r{ background:rgba(184,98,80,.16); color:#B86250; box-shadow:0 0 0 1px rgba(184,98,80,.4); }
+#qb-bp .qb-badge.x{ background:#F3EFE6; color:#8a8378; box-shadow:0 0 0 1px #E6E0D3; }
 #qb-bp .cbars{ flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;width:100%; }
 #qb-bp .cb{ display:flex;align-items:center;gap:10px; }
 #qb-bp .cb .cl{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut);width:74px;flex:none; }
@@ -6510,20 +6521,18 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   function num(el){ if(!el)return null; var t=(el.textContent||'').replace(/\s/g,''); if(t===''||t==='-'||t==='\u2013')return null; var m=t.match(/-?\d+/); if(!m)return null; var n=parseInt(m[0],10); return isNaN(n)?null:n; }
   function pt(cx,cy,r,d){var a=(d-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
   function aP(cx,cy,r,d0,d1){var p=[],N=Math.max(8,Math.round(Math.abs(d1-d0)/4));for(var i=0;i<=N;i++){var d=d0+(d1-d0)*i/N,q=pt(cx,cy,r,d);p.push((i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1));}return p.join(' ');}
+  /* v1877 · Marcel: "auf der Quickboarding-Karte … einfach so einen Score-Bereich wie auf der
+     Investor-Deal-Score-Karte oder auf der Deal-Score-Karte, dann haben wir das vereinheitlicht."
+     Gebaut wie ringHtml() in dpsh-score-hero.js: Ring (10 px, Stufenfarbe), Zahl dunkel, "/ 100",
+     darunter die Stufen-Pille (SEHR GUT … KRITISCH aus ScoreTier). Der Tacho mit Zeiger ist weg. */
   function dial(s,z){
-    var c=z/2,r=z*0.38,D0=225,D1=495; var has=(s!=null);
-    var dv=D0+(D1-D0)*(has?s:0)/100,o='';
-    for(var t=0;t<=100;t+=5){var dd=D0+(D1-D0)*t/100,p1=pt(c,c,r,dd),p2=pt(c,c,r-(t%25===0?z*0.07:z*0.04),dd);
-      o+='<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'" stroke="'+(t%25===0?window._qcGold('--gold', '#C9A84C'):'rgba('+window._qcGoldRGB()+',.4)')+'" stroke-width="'+(t%25===0?2:1)+'"/>';}
-    var np=pt(c,c,r-z*0.1,dv),b1=pt(c,c,z*0.045,dv+90),b2=pt(c,c,z*0.045,dv-90);
-    var col=has?tc(s):'#8d7430', colh=has?th(s):'#8d7430';
-    return '<svg viewBox="0 0 '+z+' '+z+'" width="'+z+'" height="'+z+'"><defs><filter id="qbg'+z+'"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
-      '<path d="'+aP(c,c,r,D0,D1)+'" fill="none" stroke="'+'rgba('+window._qcGoldRGB()+',.16)'+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round"/>'+
-      (has?'<path d="'+aP(c,c,r,D0,dv)+'" fill="none" stroke="'+col+'" stroke-width="'+(z*0.07)+'" stroke-linecap="round" filter="url(#qbg'+z+')"/>':'')+o+
-      (has?'<polygon points="'+np[0].toFixed(1)+','+np[1].toFixed(1)+' '+b1[0].toFixed(1)+','+b1[1].toFixed(1)+' '+b2[0].toFixed(1)+','+b2[1].toFixed(1)+'" fill="'+colh+'" filter="url(#qbg'+z+')"/>':'')+
-      '<circle cx="'+c+'" cy="'+c+'" r="'+(z*0.055)+'" fill="#0a0a0a" stroke="'+col+'" stroke-width="1.6"/>'+
-      '<text x="'+c+'" y="'+(c-z*0.03)+'" text-anchor="middle" dominant-baseline="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="'+(z*0.26)+'" fill="#1A1A18">'+(has?s:'\u2013')+'</text>'+
-      '<text x="'+c+'" y="'+(c+z*0.14)+'" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="'+(z*0.058)+'" letter-spacing="1.2" fill="'+colh+'">'+(has?tl(s):'')+'</text></svg>';
+    var has=(s!=null), sw=10, r=(z-sw-6)/2, c=2*Math.PI*r, off=has?c*(1-Math.max(0,Math.min(100,s))/100):c;
+    var col=has?tc(s):'#cfc3a0', cls=has?(s>=70?'g':s>=50?'o':'r'):'x';
+    return '<div class="qb-ring" style="width:'+z+'px;height:'+z+'px"><svg width="'+z+'" height="'+z+'" viewBox="0 0 '+z+' '+z+'" style="transform:rotate(-90deg)">'+
+      '<circle cx="'+(z/2)+'" cy="'+(z/2)+'" r="'+r+'" fill="none" stroke="#EDE7D8" stroke-width="'+sw+'"/>'+
+      (has?'<circle cx="'+(z/2)+'" cy="'+(z/2)+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(2)+'" stroke-dashoffset="'+off.toFixed(2)+'"/>':'')+
+      '</svg><div class="qb-rov"><div class="qb-n" style="font-size:'+(z*0.32)+'px">'+(has?s:'–')+'</div><div class="qb-d">/ 100</div></div></div>'+
+      (has?'<div class="qb-badge '+cls+'">'+tl(s)+'</div>':'<div class="qb-badge x">OFFEN</div>');
   }
   function gatherInputs(){ var o={},els=document.querySelectorAll('input[id^="qc_"],select[id^="qc_"],textarea[id^="qc_"]'); for(var i=0;i<els.length;i++){var el=els[i],k=el.id.slice(3); if(k) o[k]=el.value;} return o; }
   function gatherPhotos(){ var out=[],imgs=document.querySelectorAll('#photo-grid img'); for(var i=0;i<imgs.length&&out.length<6;i++){ var src=imgs[i].getAttribute('src')||''; if(src) out.push(src); } return out; }

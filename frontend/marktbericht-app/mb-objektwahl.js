@@ -345,8 +345,11 @@
     setVal('floor', d.etage);
     // Kaufpreis
     setVal('price', d.kp);
-    // Kaltmiete gesamt = nkm + ze
-    var rent = num(d.nkm) + num(d.ze);
+    /* v1877 · Bis hier stand "Kaltmiete gesamt = nkm + ze": die Zusatzeinnahmen (Stellplatz,
+       Garage, Sonstiges; Reiter Miete `ze`, je Monat) wanderten in die Kaltmiete - gemessen an der
+       Parkstr. 9: 2.411 statt 2.321. Der Marktbericht hat dafuer ein eigenes Feld (sonstEinnahmen,
+       je JAHR); die Kaltmiete bleibt die Kaltmiete. Den Jahreswert setzt fuelleWertermittlung(). */
+    var rent = num(d.nkm);
     if (rent > 0) setVal('rent', rent);
     // Grundstueck
     setVal('plot', d.gsfl);
@@ -483,6 +486,15 @@
      * Sprung auf Stufe 3 alle. Der Originalname behaelt Vorrang. */
     if ((d.mea_pct == null || d.mea_pct === '') && d.mea != null && d.mea !== '') {
       d.mea_pct = d.mea;
+    }
+    /* v1877 · Dasselbe fuer den Bodenrichtwert: das Hauptprogramm fuehrt ihn als `brw`, die Liste
+       unten kennt nur `brw_manuell` - gemessen an der Parkstr. 9 (brw 250) blieb das Feld leer.
+       Und die Zusatzeinnahmen je Monat (`ze`) werden zum Jahreswert `sonstige_jahr`. */
+    if ((d.brw_manuell == null || d.brw_manuell === '') && d.brw != null && d.brw !== '') {
+      d.brw_manuell = d.brw;
+    }
+    if ((d.sonstige_jahr == null || d.sonstige_jahr === '') && num(d.ze) > 0) {
+      d.sonstige_jahr = Math.round(num(d.ze) * 12);
     }
     var offen = [];
     _vorrat = {};
