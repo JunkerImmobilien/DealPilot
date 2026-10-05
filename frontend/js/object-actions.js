@@ -1211,7 +1211,10 @@
     var mw = pickMW(r), mm = pickMM(r);
     var mwSqm = wfl ? (mw / wfl) : (r.eurPerSqm || null);
     var mmSqm = (mm && wfl) ? (mm / wfl) : (r.marktmieteEurSqm || null);
-    var coll = !!_collapsed[prov];
+    /* v1868 · Marcel: „als schmaleren Streifen" — eingeklappt ist der Standard,
+       auch direkt nach dem Abruf; der Streifen trägt die Kennzahlen, der
+       Pfeil holt die ganze Karte. */
+    var coll = (prov in _collapsed) ? !!_collapsed[prov] : true;
     /* Feld 1 — Preis-Einordnung (fairpriceLabel hat Vorrang, sonst KP vs Marktwert) */
     var diff = (kp && mw) ? ((mw - kp) / kp * 100) : null;
     var pcLabel, pcCol;
@@ -1269,6 +1272,16 @@
       '<button type="button" data-span="high"' + (_span === 'high' ? ' class="sel"' : '') + '>Oben</button></span>';
     return '<div class="avb avb-' + (isPh ? 'ph' : isSpr ? 'spr' : 'x') + (coll ? ' collapsed' : '') + '" style="border-left-color:' + pri + '">' +
       head +
+      /* v1868 · der Streifen: sichtbar nur eingeklappt (CSS), dieselben Zahlen wie die Karte */
+      '<div class="avb-strip">' +
+        '<b class="mw">' + fmt0(mw) + ' €</b>' +
+        (mwSqm ? '<span class="muted">' + fmt0(mwSqm) + ' €/m²</span>' : '') +
+        (diff != null ? '<span style="color:' + pcCol + '">' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + ' %</span>' : '') +
+        '<span>Miete <b>' + fmt0(mm) + ' €</b>' + (mmSqm ? ' <span class="muted">' + mmSqm.toFixed(2).replace('.', ',') + ' €/m²</span>' : '') + '</span>' +
+        '<span style="color:' + pcCol + '">' + escH(pcLabel) + '</span>' +
+        '<span class="muted">Genauigkeit ' + escH(accLabel) + '</span>' +
+        '<button type="button" class="avb-apply" data-apply="' + escH(prov) + '">' + svg('download', 12, '#2c2410') + ' übernehmen (' + spanLabel() + ')</button>' +
+      '</div>' +
       '<div class="avb-perf"></div>' +
       '<div class="avb-body">' +
         '<div class="avb-mw">' + fmt0(mw) + ' \u20ac</div>' +

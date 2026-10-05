@@ -38440,3 +38440,27 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 .oe-bgf-hint { display: block; font-size: 11px; margin-top: 3px; }
 .oe-pillen .dp-pf-pille { border-color: #b9b2aa; color: #2A2727; opacity: 1; }
 .oe-pillen .dp-pf-pille.on { color: #050505; }
+
+/* ===== v1868 · Marcel: „die Eingabetiefe ein bisschen schmaler … und die Marktpreis-Karte als
+   schmaleren Streifen". Gemessen: Kopf 405 px (drei Abruf-Zeilen à 76 px), Ergebnisblock 371 px.
+   Kopf: drei Kacheln nebeneinander, Satz im Tooltip. Ergebnis: eingeklappt zeigt der Streifen die
+   Kennzahlen, aufklappen holt die Karte. ===== */
+.oe-kopf { padding: 8px 12px; margin: 4px 0 10px; gap: 10px; }
+.oe-kopf .oe-ziel-hint { font-size: 11.5px; }
+.oe-kopf .oe-abruf-box { margin-top: 6px; padding-top: 6px; }
+.oe-kopf .oe-abruf-box .card-title { margin: 0 0 4px; font-size: 11px; }
+.oe-kopf .oe-abruf-zeilen { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border: 0 !important; background: none !important; border-radius: 0; }
+.oe-kopf .oe-abruf-zeilen .oe-row { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "k a" "w a" !important; gap: 2px 8px !important; padding: 6px 10px !important; border: 1px solid var(--border-g, #e9dcb3) !important; border-radius: 8px; background: #fff; align-items: center !important; }
+.oe-kopf .oe-abruf-zeilen .oe-row.on { border-color: var(--wl-C9A84C, #C9A84C) !important; background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 8%, #fff); }
+.oe-kopf .oe-abruf-zeilen .oe-k { font-size: 12px; padding: 0; }
+.oe-kopf .oe-abruf-zeilen .oe-w { font-size: 11px; padding: 0; display: flex; align-items: center; gap: 6px; }
+.oe-kopf .oe-abruf-zeilen .oe-q-kompakt { display: none; }
+.oe-kopf .oe-abruf-zeilen .oe-btn { width: auto; padding: 4px 8px; font-size: 11px; }
+.oe-kopf .oe-abruf-foot { margin-top: 6px; font-size: 11px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.oe-kopf .oe-abruf-foot .oe-btn { padding: 4px 8px; font-size: 11px; }
+@media (max-width: 760px) { .oe-kopf .oe-abruf-zeilen { grid-template-columns: 1fr; } }
+.avb .avb-strip { display: none; }
+.avb.collapsed .avb-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 8px 14px 9px; font: 12px Inter, system-ui, sans-serif; color: #2A2727; }
+.avb.collapsed .avb-strip b.mw { font-family: "Cormorant Garamond", Georgia, serif; font-size: 21px; font-weight: 700; line-height: 1; }
+.avb.collapsed .avb-strip .muted { color: #6b655f; }
+.avb.collapsed .avb-strip .avb-apply { margin-left: auto; padding: 6px 10px; font-size: 11px; }

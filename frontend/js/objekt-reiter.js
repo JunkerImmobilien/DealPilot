@@ -358,9 +358,10 @@
       stat.innerHTML = '<b>' + NAMEN[z] + '</b> ' + (fz ? st('x', fz + ' fehlt') + '<span class="oe-q">„' + fz + ' fehlt" in der Zeile unten zeigt die Felder.</span>' : st('a', 'bereit'));
     }
     var hint = $('oe-ziel-hint');
-    if (hint) hint.textContent = z === 1 ? 'Einfach — eine Marktpreisindikation: Adresse, Objektart, Wohnfläche, Baujahr. Lage & Einschätzung bleiben sichtbar, sie gehen in den Deal Score.'
-      : z === 2 ? 'Mittel — die erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe. Die Karten Gewerke und Bauteile werden eingeblendet.'
-      : 'Ausgiebig — Sach- und Ertragswert nach ImmoWertV: dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ. Der Block „Sach- und Ertragswert" unten erscheint.';
+    /* v1868 · ein Satz je Stufe — Marcel: „ein bisschen schmaler, dass wir alles draufkriegen" */
+    if (hint) hint.textContent = z === 1 ? 'Einfach: Adresse, Objektart, Wohnfläche, Baujahr — Marktpreisindikation.'
+      : z === 2 ? 'Mittel: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe — erweiterte Indikation, Gewerke sichtbar.'
+      : 'Ausgiebig: dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ — Sach- und Ertragswert, Block unten.';
     var e3 = document.querySelector('.card[data-oe-stufe-min="3"]');
     if (e3) {
       e3.classList.toggle('oe-stufe-aus', z < 3);
@@ -415,10 +416,11 @@
       var fehlt = fehltFuer(s).length, r = konto[s], k = kacheln[s];
       var aus = r === 0;
       var title = aus ? ('Kontingent aufgebraucht — ' + (ab[s] || '')) : fehlt ? (fehlt + ' Feld(er) fehlen — Klick zeigt sie') : 'abrufen';
-      return '<div class="oe-row' + (s === z ? ' on' : '') + '">'
+      /* v1868 · kompakt: Name, frei, Pille — der Satz dazu steckt im Tooltip */
+      return '<div class="oe-row' + (s === z ? ' on' : '') + '" title="' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '">'
         + '<span class="oe-k">' + k.name + '</span>'
-        + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + '</span>'
-        + '<span class="oe-q" title="' + esc(k.sub) + '">' + (fehlt ? st('x', fehlt + ' fehlt') : st('a', 'bereit')) + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
+        + '<span class="oe-w">' + (r == null ? '—' : r + ' frei') + ' ' + (fehlt ? st('x', fehlt + ' fehlt') : st('a', 'bereit')) + '</span>'
+        + '<span class="oe-q oe-q-kompakt">' + esc(k.sub) + (aus && ab[s] ? ' · ' + ab[s] : '') + '</span>'
         + '<span><button type="button" class="oe-btn' + (s === z ? ' solid' : '') + (fehlt ? ' oe-unvollstaendig' : '') + '" data-oe-stufe="' + s + '"' + (aus ? ' disabled' : '') + ' title="' + esc(title) + '">' + (fehlt ? 'was fehlt' : 'abrufen') + '</button></span>'
         + '</div>';
     }).join('') + '</div>';
