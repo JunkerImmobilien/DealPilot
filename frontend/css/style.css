@@ -38823,3 +38823,23 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
     background-color: inherit;
   }
 }
+
+/* ═══ v1897 · DIE AKTENMAPPE AUF DEM HANDY OHNE OBSIDIAN-BLOCK (06.10.2026) ═══════════════════
+   Marcel: "die Aktenmappe, da darf ueberhaupt gar kein Obsidian, also kein Misch sein. Das muss
+   wirklich genauso aussehen wie in der grossen Browser-Variante."
+
+   Gemessen, Desktop gegen Handy: die FLAECHEN sind zeichengleich (Schiene, Kopf und Reiter alle
+   rgb(14,13,11), Arbeitsflaeche rgb(244,242,237)). Der Unterschied ist die ANORDNUNG — am
+   Schreibtisch liegt das Dunkle seitlich und schmal, auf dem Handy oben als Block: Schiene 87 +
+   Kopf 93 + Reiter 57 = 238 px, also 28 Prozent der Hoehe, bevor der erste Inhalt kommt. Genau
+   das liest sich als "Obsidian-Misch".
+
+   Die Schiene traegt auf dem Handy seit v1880 nur noch zwei Dinge: die Marke und einen
+   Portfolio-Knopf, der  ruft — also dasselbe wie der Burger im Kopf
+   daneben. Ein zweiter Weg zum selben Ziel, der ein Drittel des dunklen Blocks kostet. Er faellt
+   weg; damit beginnt die Arbeitsflaeche bei 151 px statt 238 (18 statt 28 Prozent).
+
+   Am Schreibtisch bleibt die Schiene unveraendert — dort ist sie die Navigation. */
+@media (max-width: 900px) {
+  html[data-dp-layout][data-dp-layout] body .dpl-schiene[data-dpl-oben-im-fluss] { display: none !important; }
+}
