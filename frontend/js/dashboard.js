@@ -2034,19 +2034,32 @@
     if(_presize) window.removeEventListener('resize',_presize);
     _presize=function(){ if(_pctx) size(); };
     window.addEventListener('resize',_presize);
-    /* v1900 · Die Hoehe des Cockpits waechst, waehrend die Karten und Diagramme
-       nachrendern — ohne dass das Fenster sich aendert. Ein Horcher nur auf
-       `resize` bekommt davon nichts mit, und der Puffer bliebe auf dem Stand
-       der ersten Sekunde stehen. Deshalb zusaetzlich am Canvas selbst horchen.
-       Nur EIN Beobachter je Canvas (am Element gemerkt), sonst sammeln sie sich
-       bei jedem Oeffnen des Cockpits an. */
-    try{
-      if(cv._dpRo) cv._dpRo.disconnect();
-      cv._dpRo = new ResizeObserver(function(){ if(_pctx) size(); });
-      cv._dpRo.observe(cv);
-    }catch(e){}
+    /* ── v1900b · DER PUFFER WIRD IM ZEICHENLAUF NACHGEZOGEN ───────────────
+       Die Hoehe des Cockpits waechst, waehrend Karten und Diagramme nachrendern
+       — ohne dass das Fenster sich aendert. Ein Horcher nur auf `resize`
+       bekommt davon nichts mit.
+
+       Hier stand bis v1900a ein `ResizeObserver`. GEMESSEN am 06.10.2026 auf
+       Staging bei 387 px blieb der Puffer damit auf 8499 stehen, waehrend die
+       Flaeche 9026 war, und holte das auch nach Minuten nicht nach: das Setzen
+       von `cv.height` IM Rueckruf aendert die Eigengroesse des Canvas, der
+       Browser wertet das als Schleife und verwirft die letzte Meldung
+       stillschweigend.
+
+         > Ein Beobachter, den die eigene Antwort auf seine Meldung zum
+         > Schweigen bringt, meldet genau den letzten Schritt nicht.
+
+       Statt dessen alle 30 Bilder (rund eine halbe Sekunde) nachsehen und nur
+       bei echter Abweichung neu setzen. Das kann nicht in eine Schleife laufen,
+       heilt sich selbst und kostet zwei Layout-Lesungen je Sekunde. */
+    var _ptick=0;
     function draw(){
-      if(!_pctx)return; _pctx.clearRect(0,0,_pw,_ph);
+      if(!_pctx)return;
+      if((++_ptick % 30)===0){                       /* v1900b, siehe Block oben */
+        var rr=cv.getBoundingClientRect();
+        if(rr.height>0 && (Math.abs(rr.width-cv.width)>1 || Math.abs(rr.height-cv.height)>1)) size();
+      }
+      _pctx.clearRect(0,0,_pw,_ph);
       var col=isDark()?'201,168,76':'167,139,54';
       _particles.forEach(function(p){
         p.x+=p.vx;p.y+=p.vy;p.tw+=0.03;
@@ -2059,8 +2072,9 @@
     }
   }
   function stopParticles(){ cancelAnimationFrame(_praf); _pctx=null; if(_presize){window.removeEventListener('resize',_presize);_presize=null;}
-    /* v1900: den Flaechen-Horcher mit abraeumen — sonst laeuft er weiter, wenn
-       die Teilchen laengst stehen. */
+    /* v1900b: einen etwaigen Beobachter aus v1900/v1900a abraeumen — die
+       Nachfuehrung laeuft seitdem im Zeichenlauf, aber ein Tab, der die alte
+       Fassung noch im Speicher hat, soll ihn nicht behalten. */
     try{ var _cv=$('dp-particles'); if(_cv&&_cv._dpRo){ _cv._dpRo.disconnect(); _cv._dpRo=null; } }catch(e){} }
 
   /* ════ RENDER-ORCHESTRIERUNG ════ */
