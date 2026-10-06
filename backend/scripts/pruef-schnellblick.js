@@ -109,9 +109,13 @@ let PROBE_ID = null;
       svwert: '220000', ek_inkl_nk: 'false', mietstg: '2',
       _bwk_mode: 'detail', _bwk_pct_mode: 'nkm'
     };
+    /* `objects.name` ist NOT NULL — gemessen beim ersten Lauf, nicht aus
+       dem Schema abgelesen. Der Name sagt, was es ist, damit niemand ein
+       liegengebliebenes Pruefobjekt fuer ein echtes haelt. */
     const ins = await query(
-      `INSERT INTO objects (user_id, data) VALUES ($1, $2) RETURNING id`,
-      [u.rows[0].user_id, JSON.stringify(probe)]);
+      `INSERT INTO objects (user_id, name, data) VALUES ($1, $2, $3) RETURNING id`,
+      ['' + u.rows[0].user_id, 'PRUEFOBJEKT pruef-schnellblick (loeschbar)',
+        JSON.stringify(probe)]);
     probeId = ins.rows[0].id;
     PROBE_ID = probeId;
     console.log('\n[--neu] Pruefobjekt angelegt: ' + probeId
