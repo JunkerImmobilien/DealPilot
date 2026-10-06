@@ -299,7 +299,22 @@ Objektkarte nachgemessen.
 
 Commits `5d9c280e` (v1904), `aa3cadd8` + `a277419c` (v1904a).
 
-### N38 · „Portfolio-Strategie" räumt das Cockpit nicht ab (06.10.2026) — OFFEN, gemessen
+### N38 · „Portfolio-Strategie" räumt das Cockpit nicht ab (06.10.2026) — erledigt v1905, auf Staging
+
+**Erledigt am 06.10.2026 mit `v1905` (Commit `d3e7ff22`).** Nicht als Sonderregel
+für `#dashboard-main`, sondern als **Register der Hauptansichten** in
+`js/ui.js`: jede Vollbild-Ansicht meldet dort ihren Schließer an, und wer
+umschaltet, ruft `DealPilotAnsichten.abraeumen(ziel)`. Gemessen steht das
+Register auf `single, all, strategie, dashboard`. Der zweite Mount
+`#all-objects-main` war genauso betroffen und ist mitbehoben. Nachweis in allen
+vier Aussehen bei 390 px **und** 1180 px, zehn Wege je Lauf: die Strategie
+beginnt überall bei y = 163,3 (Handy) bzw. 168,1 (Schreibtisch), `#dashboard-main`
+und `#all-objects-main` stehen dabei auf `display:none`, `data-pst-offen` geht
+beim Verlassen sauber weg. Nebenbefund mitbehoben: `closeDashboard()` setzte
+`#s-quick` blind auf `display:''` zurück — ein Schließer, der etwas anderes
+öffnet; jetzt mit gemerktem Vorzustand.
+
+<details><summary>Der ursprüngliche Befund</summary>
 
 Gemessen am 06.10.2026, 390 px, Aktenmappe **und** „Heute", Bedienweg Menü →
 Aktionen:
@@ -316,8 +331,25 @@ sie liegt nur unter einem Cockpit, das nicht abgeräumt wurde.
 räumt das Cockpit die Strategie ab, nicht andersherum. Wer im Cockpit war und
 dann auf Strategie tippt, sieht weiter das Cockpit und müsste gut 8.000 px
 scrollen. **Nicht gebaut — Marcel hat es nicht beauftragt.**
+</details>
 
-### N39 · Kartenstil „Kennzahlen": die Knopfzeile liegt auf der dritten Kachel (06.10.2026) — OFFEN, gemessen
+### N39 · Kartenstil „Kennzahlen": die Knopfzeile liegt auf der dritten Kachel (06.10.2026) — erledigt v1905, auf Staging
+
+**Erledigt am 06.10.2026 mit `v1905` (Commit `d3e7ff22`).** Ursache war die
+Zentrierregel `style.css:38711/38715` (v1903): sie hängt Ring und Knopfzeile an
+die MITTE der Karte. Das stimmt für die drei einzeiligen Stile — „Kennzahlen"
+ist aber zweiteilig (`.sbc-top` 43,2 + `.sbc-mini-grid` 66,6), die Mitte liegt
+dort im Raster. „Kennzahlen" fällt aus der Regel heraus und geht auf `top:6px`
+zurück; die Adresse bekommt 82 statt 72 px Innenabstand rechts.
+
+Am TEXT nachgemessen (Range-Rechtecke, nicht Elementkästen) war mehr verdeckt
+als gedacht: Löschknopf über `.sbcm-label` „BMR" 19×12 px **und Ring über
+`.sbcm-toggle-ico` „⇅" 9×14 px** — also auch ein **Bedienelement**, nicht nur
+eine Beschriftung. Nach der Änderung: keine Textüberdeckung, beide Knöpfe per
+`elementFromPoint` erreichbar, alle drei Kachel-Umschalter erreichbar, Karte
+weiter 121,8 px. Alle sieben Stile nachgemessen, keiner trägt eine Überdeckung.
+
+<details><summary>Der ursprüngliche Befund</summary>
 
 Gemessen, Aktenmappe, 390 px, Menü offen:
 
@@ -333,8 +365,32 @@ der dritten Kachel. Die Mitte der Kachel trifft noch `.sbcm-val`, der Wert ist
 also erreichbar — die Beschriftung darüber liegt unter den Knöpfen. Die 122 px
 sind richtig (das Raster trägt 67 px Inhalt, siehe `CLAUDE.md`); falsch ist
 die **Lage** der Knopfzeile. **Nicht gebaut.**
+</details>
 
-### N40 · Kartenstil „Ampel": 28 px Zeilenhöhe auf dem Finger (06.10.2026) — OFFEN, gemessen
+### N40 · Kartenstil „Ampel": 28 px Zeilenhöhe auf dem Finger (06.10.2026) — erledigt v1905, auf Staging
+
+**Marcel hat am 06.10.2026 entschieden:** „dann etwas höher" (Ampel) und auf
+die Rückfrage zu „Minimal" „ja klar". Beide stehen seit `v1905` auf **40,6 px**
+— 40 px ist die Schwelle des eigenen Maßstabs („unter 40 px auf dem Finger
+schwer zu treffen") und damit der kleinste Wert, der sich verteidigen lässt.
+Gemessen, 390 px, Aktenmappe:
+
+| Stil | vorher | nachher | ganz sichtbar von 20 |
+|---|---:|---:|---|
+| Ampel | 27,6 | **40,6** | 8 → **6** |
+| Minimal | 31,6 | **40,6** | 7 → **6** |
+
+> **Ehrlich dazu: der Inhalt trägt die 40 px nicht.** Beide Stile führen nur die
+> Adresse, gemessen 15,6 px; `.sbc-seq`, `.sbc-kp-row` und das Band sind dort
+> `display:none`. Die zusätzlichen 25 px sind **Trefferfläche, nicht Inhalt** —
+> hier ist das der Zweck, es soll aber nicht als Inhalt ausgegeben werden.
+
+Nur am Handy-Anker (`aside#sidebar` im `@media (max-width:900px)`-Block von
+`layout-varianten.css`). **Der Schreibtisch bleibt unberührt** — nachgemessen
+bei 1180 px: die Medienfrage ist `false` und alle 20 Karten hängen dort unter
+`.dpl-schiene`, `aside#sidebar #sb-list .sb-card` trifft null Elemente.
+
+<details><summary>Der ursprüngliche Befund</summary>
 
 Gemessen, Aktenmappe, 390 px: `.sb-card` **323 x 28**. Acht von zwanzig Karten
 ganz sichtbar — der dichteste Stil, und genau deshalb liegt die Trefferfläche
@@ -343,6 +399,7 @@ der Karte bei 28 px. Die beiden `.sbc-btn` bleiben bewusst 26 x 26
 die anderen sechs: Minimal 32, Datenzeile 45, Bordkarte 44, Score-Kante 55,
 Aktenreiter 57, Kennzahlen 122. **Keine Entscheidung getroffen** — ob ein
 dichter Stil eine kleine Trefferfläche haben darf, ist Marcels Produktfrage.
+</details>
 
 ### N36 · Das Portfolio-Menü der Aktenmappe auf dem Handy (06.10.2026) — erledigt v1903/v1903a, auf Staging
 

@@ -33180,3 +33180,204 @@ den Weg, den `sbActionsAction('cockpit')` tatsächlich nimmt, entsteht er bei 39
 bei 1182 px. Die Gegenprobe im selben Dokument (Layout-Attribut abnehmen, Partikel
 anstoßen) zeigte außerdem, dass auch die „Heute"-Bedingung dort keinen Canvas erzeugt —
 der Unterschied stammte aus zwei verschiedenen Ladevorgängen, nicht aus dem Attribut.
+
+---
+
+### (59) 06.10.2026 — v1905: ein Register für die Hauptansichten, und die Knopfzeile der Kennzahlen-Karte zurück in die Kopfzone
+
+**Was · v1905 · Commit `d3e7ff22`**
+
+Zwei Befunde aus dem Handy-Durchgang (Backlog N38, N39) und zwei Kartenhöhen,
+die Marcel im selben Zug entschieden hat (N40).
+
+#### N38 — „Portfolio-Strategie" räumte das Cockpit nicht ab
+
+**Gemessen** (Messkabine, iframe 390 px, Aktenmappe, echter Bedienweg über die
+Knöpfe `.sb-act-item` im Aktionsblock — nicht über `PortfolioStrategie.open()`):
+
+| Reihenfolge | `#dashboard-main` | `#portfolio-strategie` | Scrollstand |
+|---|---|---|---|
+| frisch → Strategie | `none` | `block`, y = **163,3** | 0 |
+| Cockpit → Strategie | `block`, **9.013,9** hoch | `block`, y = **9.133,2** | 0 |
+
+`data-pst-offen` stand **beide Male** auf `1` — die Sektion war also offen und
+lag nur unter einem Cockpit, das niemand abgeräumt hatte.
+
+**Die Ursache war nicht das eine Element.** `openPortfolioStrategie()` blendete
+`.sec` aus; `#dashboard-main` (`index.html:3434`) und `#all-objects-main`
+(`:3439`) sind keine `.sec`. Dahinter steckte die eigentliche Bauart: **jeder
+Öffner führte seine EIGENE Liste der anderen Ansichten** — `openDashboard()`
+kannte `.sec`, `#s-quick` und `#all-objects-main`, `openPortfolioStrategie()`
+nur `.sec`, `setMainView()` `.sec` und `#all-objects-main`. Drei Listen für
+dieselbe Frage, und jede war eine Ansicht hinterher.
+
+> **Eine Ansicht, die ihre Geschwister selbst aufzählt, vergisst die nächste.
+> Ein Register vergisst keine.**
+
+Gebaut ist deshalb ein **Register der Hauptansichten** in `js/ui.js`:
+`DealPilotAnsichten.melde(name, schliesser)` und `.abraeumen(ziel)`. `ui.js`
+meldet `single` und `all`, `dashboard.js` meldet `dashboard`,
+`portfolio-strategie.js` meldet `strategie`. `setMainView()` räumt am Anfang ab,
+der `'dashboard'`-Zweig des Wraps (der `orig` nie erreicht) tut es selbst, und
+`openPortfolioStrategie()` tut es statt seiner alten `.sec`-Schleife. Gemessen
+trägt das Register danach `single,all,strategie,dashboard`.
+
+**Nebenbefund, mitbehoben:** `closeDashboard()` setzte `#s-quick` blind auf
+`display:''` zurück — **ein Schließer, der etwas anderes öffnet.** Solange ihn
+nur `setMainView` rief, fiel das nicht auf; über das Register ruft ihn jetzt auch
+die Strategie, und `.sec-hidden.active{display:block}` (style.css:4049) hätte den
+Quick-Check wieder aufgemacht. Jetzt wird der Vorzustand gemerkt und
+zurückgegeben, wie es `_dpHiddenSiblings` daneben schon tat.
+
+**Nachweis nach dem Ausrollen** — vier Aussehen × zwei Breiten, zehn Wege je Lauf
+(Start · Cockpit · Cockpit→Strategie · Strategie→Cockpit · Cockpit→Einzel ·
+Einzel→Strategie · Strategie→Einzel · Alle · Alle→Strategie · Strategie→Einzel):
+
+| | 390 px | 1180 px |
+|---|---|---|
+| Heute | Strategie y **163,3**, dash/all `none` | y **168,1** |
+| Aktenmappe | y **163,3** | y **168,1** |
+| Kanzlei | y **163,3** | y **168,1** |
+| Tower | y **163,3** | y **168,1** |
+
+In allen 80 Messpunkten: beim Öffnen der Strategie stehen `#dashboard-main` und
+`#all-objects-main` auf `display:none`, beim Verlassen ist `data-pst-offen` weg
+und die Reiterleiste wieder auf 57,3 px. **Auch `Alle Objekte → Strategie` ist
+jetzt sauber** — der zweite Mount, den der ursprüngliche Befund nicht genannt
+hatte.
+
+> Dieser Weg hat in der Schublade **keinen Knopf** (`view-all` steht nicht in
+> `.sb-act-item`, nur `view-single`). Gemessen wurde er deshalb über
+> `setMainView('all')` — den Router selbst, nicht an ihm vorbei.
+
+#### N39 — die Knopfzeile lag auf der dritten Kachel
+
+**Gemessen** (390 px, Aktenmappe, Schublade offen, erste Karte):
+
+```
+.sb-card            322,6 x 121,8  @ 12 / 214,4
+.sbc-top             321,5 x 43,2  @ 13,1 / 227,3
+.sbc-mini-grid       321,5 x 66,6  @ 13,1 / 269,5
+.sbc-actions           73 x 26     @ 219,6 / 262,3
+.sbc-score-overlay     26 x 26     @ 299,6 / 262,3
+```
+
+Die Ursache ist die Zentrierregel aus v1903 (`style.css:38711/38715`): sie hängt
+Ring und Knopfzeile an die **Mitte der Karte**. Das stimmt, solange die Karte
+eine Zeile ist — Datenzeile 44,8 · Ampel 27,6 · Minimal 31,6. „Kennzahlen" ist
+das nicht: zwei Blöcke übereinander, zusammen 121,8 px. Die Mitte liegt dann
+mitten im Raster.
+
+**Am TEXT nachgemessen war mehr verdeckt als der Befund sagte.** Nicht die
+Elementkästen (die sind durch Innenabstände breiter als ihre Schrift), sondern
+die Range-Rechtecke der Textknoten:
+
+```
+KNOPF  über .sbcm-label      „BMR"   19 x 12
+RING   über .sbcm-toggle-ico „⇅"      9 x 14
+```
+
+> Das zweite ist das schwerere: `⇅` schaltet die Kachel um. Verdeckt war damit
+> **ein Bedienelement**, nicht nur eine Beschriftung.
+
+„Kennzahlen" fällt aus der Zentrierregel heraus und geht auf `top:6px` zurück —
+den Wert, den `.sbc-actions` in derselben Datei ohnehin führt. Die Kopfzone ist
+frei: `.sbc-seq` liegt links, der Preis beginnt erst bei 253 und damit unter den
+Knöpfen, die bei 246,4 enden. Die Adresse bekommt 82 statt 72 px Innenabstand
+rechts (gemessen: bei 72 blieben 2,9 px Überlappung). **`button.sbc-btn` bleibt
+26 × 26** (v1191, Z. 37455 ff.).
+
+**Die 121,8 px bleiben** — das Raster trägt 66,6 px echten Inhalt. Falsch war die
+Lage, nicht die Höhe.
+
+#### N40 — „Ampel" und „Minimal" gehen auf 40 px
+
+Marcels Entscheidung vom 06.10.2026: „dann etwas höher" (Ampel) und auf die
+Rückfrage zu Minimal „ja klar". 40 px ist die Schwelle des eigenen Maßstabs und
+damit der **kleinste** Wert, der sich verteidigen lässt.
+
+> **Ehrlich dazu: der Inhalt trägt die 40 px nicht.** Beide Stile führen nur die
+> Adresse (gemessen 15,6 px); `.sbc-seq`, `.sbc-kp-row` und das Band sind dort
+> `display:none`. Die zusätzlichen 25 px sind **Trefferfläche, nicht Inhalt.**
+> Hier ist das der Zweck — es soll nur nicht als Inhalt ausgegeben werden.
+
+Geändert **nur am Handy-Anker** (`aside#sidebar` im `@media (max-width:900px)`-
+Block von `layout-varianten.css`). Die Schienen-Fassung für den Schreibtisch
+bleibt, wie sie war: dort zeigt eine Maus, kein Finger.
+
+#### Alle sieben Kartenstile nach der Änderung (390 px, Aktenmappe)
+
+| Stil | Höhe vorher | nachher | ganz sichtbar von 20 | Text verdeckt | Knöpfe treffbar |
+|---|---:|---:|---|---|---|
+| Aktenreiter | 57,3 | 57,3 | 5 → 5 | – | 26×26 ✓ |
+| Bordkarte | 44,3 | 44,3 | 6 → 6 | – | ✓ |
+| Score-Kante | 55,1 | 55,1 | 5 → 5 | – | ✓ |
+| Datenzeile | 44,8 | 44,8 | 6 → 6 | – | ✓ |
+| **Ampel** | 27,6 | **40,6** | 8 → **6** | – | ✓ |
+| **Kennzahlen** | 121,8 | 121,8 | 2 → 2 | **2 Stellen → keine** | ✓ + 3× Umschalter ✓ |
+| **Minimal** | 31,6 | **40,6** | 7 → **6** | – | ✓ |
+
+Geprüft wurde je Stil: Textüberdeckung über Range-Rechtecke, `elementFromPoint`
+auf der Mitte **jedes** Knopfs und **jedes** Kachel-Umschalters. Kopieren und
+Löschen sind in allen sieben Stilen erreichbar — die Funktion ist beim Umbau
+nicht mitgefallen.
+
+#### „Heute" und der Schreibtisch sind unverändert — nachgewiesen, nicht behauptet
+
+**Schreibtisch (1180 px), zwei unabhängige Gründe:**
+
+```
+matchMedia('(max-width: 900px)').matches   ->  false
+aside#sidebar #sb-list .sb-card            ->  0 Treffer
+.dpl-schiene  #sb-list .sb-card            ->  20 Treffer
+```
+
+Alle vier neuen Selektoren tragen `aside#sidebar` **und** stehen im
+900-px-Block. Beides trifft dort nicht zu; gemessen stehen `.sbc-actions` auf
+`top:auto`, `transform:none` — die unveränderten Grundwerte.
+
+**„Heute" (390 px):** `data-dp-objkarte` ist **`null`**, obwohl der Merker
+`dp_objkarte_stil` auf `kennzahlen` steht — `objektkarten-stil.js` setzt das
+Attribut nur bei aktivem Layout. Alle neuen Regeln verlangen
+`html[data-dp-objkarte=…]` und greifen dort folglich nirgends. Gemessen:
+`.sbc-actions` `top:6px` / `transform:none`, `.sbc-score-overlay` `top:38px`,
+`.sbc-address` `padding-right:50px`, Karte 207,6 px — alles die alten Werte,
+keine Textüberdeckung, beide Knöpfe treffbar.
+
+#### Prüfstrecke
+
+`node --check` auf `ui.js`, `dashboard.js`, `portfolio-strategie.js`;
+Klammerbilanz `style.css` 7737/7737 und `layout-varianten.css` 1078/1078;
+`node tools/frontend-konstanten.mjs` nachgezogen und mitcommittet;
+`python3 tools/gold-audit.py /opt/dealpilot/frontend` → **225 Dateien gelesen,
+„Genau auf der Basislinie. Kein neues Hartgold."**; Cache-Buster auf `v1905` für
+`style.css`, `layout-varianten.css`, `ui.js`, `dashboard.js` und
+`portfolio-strategie.js`.
+
+#### Werkzeugnotiz: das Erzwingen des Bildes ist nicht ersetzbar
+
+Der Versuch, das Bild billig über eine Größenänderung des iframe-Rahmens zu
+erzwingen (`rahmen.style.height` um 1 px hoch und zurück, dazu `offsetHeight`
+auf beiden Dokumenten), hat **nicht zuverlässig** gewirkt: zweimal meldete
+`elementFromPoint` danach `null` und `.sb-card` die Lage von vorher, und erst
+ein echter Screenshot brachte die richtigen Werte. **Die Reihenfolge aus (58) —
+bedienen → Bild erzwingen → messen — braucht ein ECHTES Bild.**
+
+Zweite Falle, neu: **zwei Messläufe dürfen sich nicht überlappen.** Ein Aufruf,
+der in die 45-s-Grenze des Werkzeugs lief, lief im Dokument weiter; der nächste
+setzte `iframe.src` gleichzeitig, und beide maßen durcheinander. Danach stand
+der Lauf scheinbar 60 s auf dem ersten Stil. Lange Läufe gehören deshalb
+angestoßen und **über eine Markierung im Fenster abgefragt**, nicht erwartet.
+
+#### Was offen bleibt
+
+- **Abnahmepunkt Quick-Check → Strategie.** Der reparierte `#s-quick`-Merker ist
+  am Code begründet und über `node --check` abgesichert, aber nicht am laufenden
+  Quick-Check durchgespielt — der Weg „Quick Boarding offen, dann
+  Portfolio-Strategie" ist nicht gemessen.
+- **Kanzlei am Schreibtisch lässt die Reiterleiste stehen** (`tabs: flex`) — auch
+  im Cockpit, also unabhängig von v1905 und schon vorher so. Nicht angefasst,
+  gehört gemessen, bevor jemand es für einen Rückschritt hält.
+- Das Register kennt heute vier Ansichten. **Quick-Check und Marktbericht melden
+  sich noch nicht an** — sie laufen weiter über `.sec`/`body`-Klassen. Wer dort
+  die nächste Vollbild-Ansicht baut, meldet sie am besten mit an.
