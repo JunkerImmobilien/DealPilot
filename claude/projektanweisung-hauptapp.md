@@ -31908,6 +31908,56 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (62) 06.10.2026 — v1917/v1918/v1918a: was wie ein Hintergrund aussah, war der Abstand
+
+**Marcel:** „wenn du auf Portfolio klickst, ist der Hintergrund Obsidian. Wir haben so Partikel,
+die durchs Feld gehen. Da muss der Hintergrund rein, wie wenn du das Aktionsmenü dann öffnest."
+
+**Ich habe zuerst nach Partikeln gesucht und keine gefunden.** Vier Canvas im Dokument, alle 0 × 0,
+kein `#dp-particles`, kein Verlauf auf Schublade, Backdrop, `app-wrap`, `body` oder `html`. Der
+Grund ist in BEIDEN Zuständen `rgb(14,13,11)`. Erst der Vergleich der Karten brachte es:
+
+| | Schreibtisch (Schiene) | Handy (Schublade) |
+|---|---|---|
+| Karte | 216 × 44 | 321 × 44 |
+| Rahmen | **transparent** | **`rgb(42,38,34)`, sichtbar** |
+| Abstand | **5 px** | **23 px** |
+
+Zwanzig Karten mit 23 px Luft und je einer Kante sehen aus wie Kästen, die auf einer dunklen Fläche
+schwimmen — und dazwischen schimmert der Grund durch. Am Schreibtisch stehen dieselben Karten dicht
+und ohne Rahmen: eine ruhige Liste. **Dieselben Farben, zwei verschiedene Bilder.**
+
+> **Was wie ein Hintergrund aussieht, kann der Abstand sein.** Nicht die Fläche war falsch, sondern
+> das, was auf ihr liegt. Bei 23 px gingen auf zwanzig Karten rund 460 px allein für Luft drauf.
+
+**Der letzte strukturelle Unterschied war die Marke** (v1918). In der Schiene steht `.dpl-marke`
+mit 247 × 100 ganz oben, `Deal<i>Pilot</i>` in Space Grotesk 42px. Auf dem Handy gab es sie
+nirgends — auch nicht in der Kopfzeile, dort steht kein Element mit dem Markennamen. Sie ist jetzt
+in der Schublade, in derselben Schriftgröße („zu klein" war der Einwand, also wird nicht
+verkleinert), auf 72 px Höhe statt 100.
+
+**Und dann der Fehler, den der Einbau erzeugt hat** (v1918a). Wechselt man von der Aktenmappe auf
+„Heute", blieben Marke, Umschalter und das offene Register STEHEN — ungestylt, weil alle CSS-Regeln
+an `[data-dp-layout="v1b"]` hängen und das Attribut dort fehlt.
+
+> **Wer beim Betreten etwas aufbaut, muss es beim Verlassen abbauen. Ein Zustand, der nur eine
+> Richtung kennt, ist kein Zustand.** Ein Beobachter am `data-dp-layout` entscheidet jetzt in beide
+> Richtungen; die Bauer prüfen auf die Aktenmappe statt auf irgendein Layout, damit sie auch in
+> Kanzlei und Tower nicht erscheinen. Dazu eine CSS-Regel als zweite Sicherung.
+
+**Abnahme, Staging bei 387 px, beide Ansichten im Wechsel:**
+
+```
+Aktenmappe   Marke da · Umschalter da · 11 Eintraege sichtbar, 11 treffbar
+             Tour und Feedback display:none · kein Ueberlauf
+             Karten ohne Rahmen, 6 px Abstand, 9 von 21 im Blick
+Heute        keine Marke · kein Umschalter · Register zu · Aufklapper sichtbar
+             Karte 208 px mit Kachelband — unveraendert
+```
+
+**Die Struktur ist damit auf beiden Breiten dieselbe:** Marke, Portfolio-Knopf, Register oder
+Objektliste, Anmeldung am Fuß.
+
 ### (61) 06.10.2026 — v1913–v1916a: das Menü wird bedienbar, und die Bordkarte wird Standard
 
 Marcels Durchgang durch die Messkabine, Punkt für Punkt abgearbeitet. **Der erste Befund war kein
