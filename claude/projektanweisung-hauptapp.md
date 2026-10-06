@@ -31908,6 +31908,100 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (60) 06.10.2026 — v1906–v1912: das Menü der Aktenmappe auf dem Handy
+
+**Marcel:** „die Aktenmappe das menü passt immer noch nicht auf der handy ansicht" · „schalt mal
+um in den desktop modus und schau dir das menü an wie es da aussieht. dann schalt in den handy
+modus und sieh welchen unterschied du siehst" · „die darstellung sollte schon so aussehen wie das
+layout, design was man gewählt hat."
+
+**Der Unterschied war nicht die Farbe.** Beide Menüs stehen auf `rgb(14,13,11)` mit Text
+`rgb(233,227,214)` — zweimal unabhängig gemessen. Es war die STRUKTUR, und zwar genau umgekehrt:
+
+| | Schreibtisch 1277 px | Handy 387 px (vorher) |
+|---|---|---|
+| Marke | `dpl-marke` 100 px | — (trägt die Kopfzeile) |
+| Portfolio | Knopf 33 px, **zu** | Block 126 px, **offen** |
+| Objektliste | **aus** | 476 px, offen |
+| Register | **491 px, offen** | **zugeklappt** hinter einem Knopf |
+| Nutzer | 112 px am Fuß | 81 px, wanderte mit |
+
+Deshalb wirkte das Handy-Menü wie „Heute": eine Liste von Objekten statt einer Navigation.
+
+> **Zwei Flächen können Farbe für Farbe gleich sein und trotzdem nichts miteinander zu tun haben.**
+> Was eine Ansicht ausmacht, ist was zuerst dasteht.
+
+**Die Ursache lag unter drei Anläufen** (v1910). `display:block` auf dem Akkordeon ergab 356 × 0;
+zusätzlich `max-height:none` ergab 356 × 154 und immer noch nichts Sichtbares. Dann gemessen:
+**das Akkordeon trägt `opacity: 0`.** Der Inhalt war die ganze Zeit vollständig da — fünf Rubriken,
+dreizehn Einträge, Inner 345 × 702. Nur der Behälter war durchsichtig.
+
+> **`opacity` schluckt alles, was darin steht, und meldet dabei weder Höhe null noch `display:none`.**
+> Wer nach „warum sehe ich nichts" sucht, prüft Höhe, `display` und `visibility` — und läuft an
+> `opacity` vorbei, weil das Element in jeder dieser drei Messungen normal aussieht.
+
+**Was gebaut wurde, in der Reihenfolge:**
+
+| Paket | Was |
+|---|---|
+| v1906 | im Menü fallen Kachelband (67 von 122 px) und Nummernlasche weg → sichtbare Objekte 3 → 5 |
+| v1907 | Steuer-Jahrestabelle: Wischkante und feste Jahresspalte (734 px in 301 px Fenster) |
+| v1908 | **zurückgenommen** — siehe unten |
+| v1909 | die Rücknahme |
+| v1910 | das Register steht im Fluss und ganz oben, der Aufklapper fällt weg |
+| v1910a | zwei eigene Fehler: weißer Grund eine Ebene tiefer, Suchzeile aus dem Schirm |
+| v1911 | Anmeldeinformationen und Portfolio-Kopf nach der Schiene, Nutzer klebt am Fuß |
+| v1912 | die letzten drei Abweichungen: zwei Goldrahmen und die Polster |
+
+**v1908 habe ich gebaut und sofort zurückgenommen.** Marcel sagte „kein obsidean", ich habe das
+Menü aufgehellt — gegen meine eigene Messung, die zweimal `rgb(14,13,11)` für die Schreibtisch-
+Schiene ergeben hatte. Seine nächste Nachricht war „aber die muss doch nicht hell sein".
+
+> **Die Messung lag vor, ich habe sie dem Wortlaut untergeordnet.** Wenn eine Vorgabe der eigenen
+> Messung widerspricht, gehört die Messung auf den Tisch — vor dem Bauen, nicht danach. Ein
+> Paket, das in die falsche Richtung läuft, kostet zwei Rollouts und das Vertrauen in die nächste
+> Aussage.
+
+**Zwei Fehler in v1910, beide beim Nachmessen gefunden:** `background: transparent` auf dem
+Akkordeon zeigte nicht die Schiene, sondern das nächste Kind — `.sb-actions-accordion-inner` stand
+auf Weiß, Kontrast 1,99. Und mit dem Register im Fluss wuchs die Schublade auf scrollHeight 944 bei
+clientHeight 758, stand aber auf `overflow-y: hidden`: Suchfeld und Nutzer-Knöpfe lagen außerhalb,
+186 px unerreichbar.
+
+> **Wer den Inhalt einer Fläche verdoppelt, muss ihr Überlaufverhalten mitprüfen.** Solange nur das
+> Register dastand, war `hidden` richtig.
+
+**Der sichtbarste Rest waren zwei Goldrahmen** (v1912): die Schublade zog um das Register einen
+Goldrahmen mit 40 % und unter jede Rubrik eine goldene Linie — die Schiene hat beides nicht. Gold
+ist in dieser App der Akzent der AKTIVEN Sache; als Dauerrahmen um eine Navigation behauptet es
+eine Wichtigkeit, die die Schiene bewusst nicht vergibt.
+
+**Die Plan-Pille war der schwerste Einzelfall:** `rgb(42,39,39)` auf `rgb(0,0,0)` — Kontrast 1,42,
+das schlechteste Paar der ganzen Ansicht. Das Wort „Partner" stand da und war nicht zu lesen.
+
+**Bewusste Abweichung, die bleibt:** die Einträge sind 40 px hoch statt der 29 px der Schiene. Am
+Schreibtisch zielt eine Maus, auf dem Handy ein Finger. Ebenso fehlt die Marke im Menü — die
+Kopfzeile trägt sie dort schon, ein zweites Mal kostete 100 px.
+
+**Nachweis, Staging, Messkabine bei 387 px nach vollem Neuladen:**
+
+```
+Register       345x682, Radius 14, ohne Kante, Polster 4/8/8   (Schiene: 247x491, r14, 4/8/8)
+Rubrik         329x21, ohne Linie, Polster 4/9/5               (Schiene: 220x18, 4/9/5)
+Eintrag        329x40, Polster 7/9                             (Schiene: 220x29, 7/9)
+Nutzerbox      345x83, transparent, Rahmen rgb(230,225,214)    (Schiene: 247x112, dto.)
+Plan-Pille     rgb(191,183,169) auf transparent                (vorher 1,42 Kontrast)
+Prüfer         Überlauf keiner · alle treffbar · alle erreichbar
+```
+
+**Heute ist unberührt, gegengemessen:** Karte 208 px mit Kachelband, Liste oben, Aufklapper
+sichtbar. Alle Regeln hängen an `html[data-dp-layout="v1b"]` und einer Medienabfrage unter 900 px —
+Kanzlei und Tower bleiben außen vor, auf Marcels ausdrücklichen Wunsch.
+
+**Noch ein Werkzeugfehler, der mir selbst passiert ist:** mein Generator schrieb die Datei, BEVOR er
+seine Selbstprüfung fuhr. Als die Regelzahl nicht stimmte, warf er — und ließ den Block trotzdem in
+der Datei zurück. Seit v1912 wird gegen eine Probe geprüft und erst danach geschrieben.
+
 ### (55) 06.10.2026 — v1896–v1900: die Partikel liefen nie, und zwei Ansichten tragen jetzt ihr eigenes Gesicht
 
 **Was · v1896, v1896a, v1897, v1899, v1899a, v1900 · Commits 8737f39e, b1e44264, 1db1c40a,
