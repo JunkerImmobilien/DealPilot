@@ -1619,6 +1619,25 @@
       if (!_gew) setze('v1b');
     }
 
+    /* ── v1893 · DAS ABZEICHEN GEHOERT AUCH IN „HEUTE" IN DEN KOPF ──────────
+       Gemessen am 06.10.2026 bei 390 px in der Ansicht „Heute": das Abzeichen
+       („0 / 6 Bereiche", mit geladenem Objekt „Vollstaendig") steht als letztes
+       Kind der Reiterleiste bei x=518 — 128 px ausserhalb des Schirms. Die Leiste
+       wischt zwar, aber niemand wischt nach einer Anzeige, von der er nicht weiss,
+       dass es sie gibt. In der Aktenmappe, Kanzlei und Tower holt `badgeInDenKopf()`
+       es in die Kopfzeile (gemessen dort bei 188/101, sichtbar).
+
+       „Heute" laeuft ohne Layout, also ruft `setze()` die Funktion nie. Auf dem
+       Handy wird sie deshalb unabhaengig vom Layout gerufen — und beim Wechsel der
+       Schwelle erneut, weil `zurueck()` das Abzeichen in die Leiste zurueckstellt. */
+    function badgeHandy() {
+      if (!window.matchMedia('(max-width: 900px)').matches) return;
+      var b = document.getElementById('tabs-status-badge');
+      if (!b || b.closest('header.hdr')) return;      /* schon oben, nichts zu tun */
+      badgeInDenKopf();
+    }
+    badgeHandy();
+    try { window.matchMedia('(max-width: 900px)').addEventListener('change', badgeHandy); } catch (e) {}
     var zeigen = false;
     try { zeigen = localStorage.getItem('dp_layout_schalter') === '1'; } catch (e) {}
     if (zeigen) { baueSchalter(); schalterNachziehen(); }
