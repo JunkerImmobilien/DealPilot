@@ -653,11 +653,61 @@
   }
 
   /* ── Die Schienen bauen ─────────────────────────────────────────── */
+  /* ── v1892 · AUF DEM HANDY GIBT ES NUR EINE SCHIENE ────────────────
+     `handyOben` in `baueEine()` (eine Funktion tiefer) laesst die
+     Schiene unter 900 px NICHTS aus der Seitenleiste nehmen - das war
+     die v1880-Reparatur fuer die Aktenmappe. Die Bedingung lautet aber
+     `S.stellung === 'links'`, und damit greift sie **fuer die rechte
+     Schiene nicht**. Solange nur die Aktenmappe waehlbar war, fiel das
+     nicht auf: sie hat nur eine Schiene, und die steht links.
+
+     Gemessen am Code, bevor Tower und Kanzlei zurueckkommen:
+
+       Kanzlei (v2)  rechte Schiene  ton: hell   nimmt: aktionen, ausgaben
+       Tower   (v2b) rechte Schiene  ton: hell   nimmt: ausgaben, score
+
+     Auf 390 px haette das zwei Folgen gehabt, beide genau der „Misch",
+     ueber den Marcel sich beschwert:
+
+       1. `#sb-actions-accordion` (Kanzlei) bzw. `#hdr-badges` (Tower)
+          wandert aus der Schublade/Kopfzeile heraus in eine Schiene am
+          Ende der `.main-col`. In der Kanzlei waere die Schublade damit
+          wieder leer - genau der Befund aus v1880 („oeffnet sich da
+          was, wo nichts geoeffnet wird").
+       2. Diese Schiene traegt `ton="hell"`. Ein heller Kasten in einem
+          dunklen Aussehen, auf dem Handy quer ueber die ganze Breite.
+
+     Marcel am 06.10.2026 ausdruecklich: „Das muss erstmal nicht hell
+     werden." Unter 900 px wird die rechte Schiene deshalb **gar nicht
+     gebaut**. Nicht „leer gebaut": eine Schiene ohne Inhalt waere eine
+     Ueberschrift ueber nichts, und `marke`/`portfolio` stehen bei ihr
+     auf `false` - es blieben ein Titel und eine Linie.
+
+     Damit sieht das Handy in allen drei Layouts gleich aus: dunkler
+     Streifen mit Marke und Portfolio-Knopf, alles andere an seinem
+     gebauten Platz (Reiter klebend im Kopf, Suche/Liste/Aktionen in der
+     Seitenleiste). Das ist der Weg, der fuer die Aktenmappe in
+     v1889-v1889e abgenommen wurde - Tower und Kanzlei erben ihn, statt
+     einen eigenen zu bekommen.
+
+     > Was die rechte Schiene auf dem Handy verliert, ist die
+     > Ausgaben-Box. Sie fuehrt keine eigene Logik: jeder ihrer sieben
+     > Knoepfe ruft `sbActionsAction(...)`, denselben Weg wie die
+     > Aktionsliste in der Schublade (siehe `baueAusgaben()`). Es geht
+     > eine Gruppierung verloren, keine Funktion.
+
+     Ueber 900 px bleibt alles, wie es war - der Schreibtisch wird hier
+     nicht angefasst. `umbau` am `mq900`-Horcher (unten) baut beim
+     Ueberschreiten der Schwelle neu, die Schiene kommt also zurueck. */
   function baueSchienen(v) {
     var L = LAYOUTS[v];
     var mc = el('.main-col');
     if (!mc || !L.schienen) return;
-    L.schienen.forEach(function (S) { baueEine(L, S, mc); });
+    var handy = window.matchMedia('(max-width: 900px)').matches;
+    L.schienen.forEach(function (S) {
+      if (handy && S.stellung !== 'links') return;
+      baueEine(L, S, mc);
+    });
     badgeInDenKopf();
     zahlNachziehen();
   }
@@ -1340,8 +1390,25 @@
        Wort, das er sucht. Eine Reihenfolge braucht keine Nummer, wenn
        die Reihenfolge schon sichtbar ist. */
     var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
-      /* v1880 · Marcel: nur Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im Code. */
-      Object.keys(LAYOUTS).filter(function (k) { return k === 'v1b'; }).map(function (k) {
+      /* ── v1892 · DIE AUSBLENDUNG AUS v1880 IST ZURUECKGENOMMEN ──────
+         Hier stand `.filter(k => k === 'v1b')` mit dem Vermerk „nur
+         Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im
+         Code." Das war v1880 auf Marcels Ansage richtig.
+
+         **Am 06.10.2026 will er sie zurueck:** „Unter Einstellungen
+         fehlen nun die anderen Aussehen wie Tower und das andere was
+         wir hatten."
+
+         Es gibt genau DREI Eintraege in `LAYOUTS` (v1b Aktenmappe,
+         v2 Kanzlei, v2b Tower) plus „Heute" als Schluessel `''` —
+         also vier Kacheln. Der Filter ist ersatzlos weg, damit die
+         Liste wieder aus `LAYOUTS` kommt und nicht aus einer zweiten
+         Aufzaehlung, die beim naechsten Layout schon falsch waere.
+
+         > Dieselbe Stelle steht ein zweites Mal in `inEinstellungen()`.
+         > Beide gehoeren zusammen geaendert - sonst zeigt das
+         > Darstellungs-Panel etwas anderes als die Einstellungen. */
+      Object.keys(LAYOUTS).map(function (k) {
         return { key: k, name: LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
       }));
     /* v1690 — „Aussehen" statt „Aufbau". Marcel sucht diesen Abschnitt
@@ -1450,8 +1517,10 @@
     host.setAttribute('data-gefuellt', '1');
 
     var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
-      /* v1880 · Marcel: nur Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im Code. */
-      Object.keys(LAYOUTS).filter(function (k) { return k === 'v1b'; }).map(function (k) {
+      /* v1892 · Zweite Stelle derselben Ausblendung - zurueckgenommen wie
+         oben in `inPanel()`. Marcel am 06.10.2026 will Tower und Kanzlei
+         zurueck in der Wahl. */
+      Object.keys(LAYOUTS).map(function (k) {
         return { key: k, name: LAYOUTS[k].name, sub: LAYOUTS[k].beschreibung };
       }));
 
