@@ -31908,6 +31908,57 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (64) 06.10.2026 — v1921/v1922: dreizehn Pakete lang an der falschen Bedingung gebaut
+
+**Marcel:** „ich möchte gerne, dass, wenn wir Tower oder wenn wir auch die Kanzlei als Aussehen
+ausgewählt haben, dass die Handyansicht bitte dann die Ansicht von der Aktenmappe annimmt. … da
+hast du irgendwie totalen Senf gemacht … du ignorierst mich jetzt den ganzen Abend schon."
+
+**Er hatte recht, und der Fehler war eindeutig meiner.** Alle 63 CSS-Anker und die JS-Weiche aus
+v1906 bis v1920 hingen an `[data-dp-layout="v1b"]` — an der Aktenmappe allein. **In Kanzlei (`v2`)
+und Tower (`v2b`) griff auf dem Handy keine einzige Regel davon:** kein Register, kein Umschalter,
+keine Marke, keine Farben, keine Kartenform. Dort stand weiter die Fassung von „Heute" — genau das
+Mischmasch, das er gemeldet hat.
+
+**Woher die falsche Bedingung kam:** Marcel sagte früher am Abend „lass dieses kanzlei-modus mockup
+wo du immer dran denkst raus". Ich habe daraus gemacht, dass Kanzlei und Tower von allen Änderungen
+ausgenommen bleiben. **Er meinte ein MOCKUP, nicht die Ansicht.**
+
+> **Eine Einschränkung, die ich mir selbst gebe, gehört nachgefragt, bevor sie dreizehn Pakete lang
+> mitläuft.** Ich habe sie sogar in jede Commit-Botschaft geschrieben — „Kanzlei und Tower bleiben
+> unberührt" — und dabei nie gemerkt, dass ich das Gegenteil dessen baue, was „auf dem Handy sieht
+> alles gleich aus" bedeutet. Eine Zeile, die man oft genug wiederholt, prüft man irgendwann nicht
+> mehr.
+
+**Umgestellt in `v1921`:** 63 Anker von `[data-dp-layout="v1b"][data-dp-layout]` auf
+`[data-dp-layout][data-dp-layout]` — gleiche Spezifität (zwei Attribute), aber sie treffen jedes
+Layout. Die Ansicht „Heute" trägt gar kein Attribut und bleibt unberührt; das war und bleibt der
+Punkt. Dazu die JS-Weiche `nurAktenmappe()`: aus `=== 'v1b'` wird `hasAttribute`.
+
+**Und die Reiter** (`v1922`). Gemessen in der Aktenmappe am Schreibtisch: **alle zehn tragen
+dieselbe Goldfarbe** `rgb(201,168,76)`, der aktive ist nur an einer 2,2-px-Unterkante zu erkennen.
+Auf dem Handy derselbe Wert — kein Unterschied zwischen den Breiten, sondern überall dasselbe.
+
+> **Ein Akzent, den alle tragen, ist kein Akzent.** Er wird zur Grundfarbe, und das Element, das
+> wirklich hervorsticht, hat nichts mehr übrig. `CLAUDE.md` sagt es direkt: Gold ist der AKZENT,
+> die Textfarbe auf dunklem Kopf ist Creme.
+
+**Abnahme, alle drei Layouts bei 387 px, Menü offen:**
+
+```
+Aktenmappe v1b   Marke da · Umschalter „Portfolio 22" · 11 Eintraege · bg rgb(14,13,11)
+Kanzlei    v2    Marke da · Umschalter „Portfolio 22" · 11 Eintraege · bg rgb(14,13,11)
+Tower      v2b   Marke da · Umschalter „Portfolio 22" · 11 Eintraege · bg rgb(14,13,11)
+Heute            kein Attribut -> unveraendert, gegengemessen
+Ueberlauf        keiner in allen dreien
+```
+
+> **Eine Messfalle, die mich hier fast in die Irre geführt hätte:** `getComputedStyle` meldete die
+> Reiter nach dem Ausrollen weiter als golden — und ein inline gesetztes `color` mit `!important`
+> änderte den gemeldeten Wert ebenfalls nicht. **Im iframe lügt die Messung**, die Bildaufnahme
+> zeigte die Symbolleiste hell. Siehe [[getcomputedstyle-im-iframe-luegt]]: wenn ein erzwungener
+> Inline-Wert nicht ankommt, ist nicht die App schuld, sondern das Werkzeug.
+
 ### (63) 06.10.2026 — v1919/v1920: N41 einzeln abgearbeitet, und zwei Schwarz sind schlimmer als eines
 
 Marcel wollte seine vier Punkte **ins Backlog und einzeln** abgearbeitet (N41). Das war die
