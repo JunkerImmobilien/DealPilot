@@ -32246,9 +32246,39 @@ Zuweisung geht still ins Leere, `top` bleibt ein `Window`, und der nächste `con
   **alle sieben** auch über das Akkordeon erreichbar sind, ist **nicht nachgemessen**.
 - **Die rechte Schiene bei 901 px** lässt rechnerisch 453 px Arbeitsfläche. Gemessen ist 1024 px
   (576 px). Die schmale Kante des Bandes gehört angesehen.
-- **`nav.tabs` ragt auf dem Handy 21 px über** (`clientWidth 383 / scrollWidth 404`). Es ist eine
-  Scrollfläche, also wischbar — aber ohne sichtbaren Balken. Gleiche Medizin wie Punkt 4 möglich.
 - **`div#oe-karte-gewerke`** meldet bei 390 px `clientWidth 325 / scrollWidth 648`, die Tabelle
-  darin ist 620 px breit. Wischbar, aber 323 px über der Kante — ungeprüft, ob das auffällt.
+  darin ist 620 px breit. Die KARTE wischt (`overflow-x: auto`, 323 px), nicht die Tabelle: die
+  v1862c-Regel `#oe-karte-gewerke #oe-gewerke { display:block; overflow-x:auto }` kommt nicht an,
+  gemessen steht die Tabelle auf `display: table`. Nichts ist abgeschnitten, aber es wischt die
+  falsche Ebene. Ungeprüft, ob das auffällt.
+
+#### Nachtrag · die Reiterleiste ist nachgemessen — und sie ist in Ordnung
+
+Hier stand: „`nav.tabs` ragt auf dem Handy 21 px über, wischbar aber ohne sichtbaren Balken."
+**Das war ungenau, und es hat die Ursache am falschen Ort gesucht.** Marcel nennt die Reiter
+ausdrücklich („alle Menüs und **Tabs** passend angezeigt"), also sind sie bei 390 px in allen vier
+Aussehen Kind für Kind vermessen worden:
+
+| | `nav.tabs` | Überlauf | `#tabs-status-badge` |
+|---|---|---|---|
+| **Heute** | `clientWidth 383 / scrollWidth 583` | **200 px** | 171 × 29 **in der Reiterleiste**, bei x = 390 — ganz außerhalb |
+| **Aktenmappe · Kanzlei · Tower** | `383 / 404` | **21 px** | 171 × 29 **im Kopf** (`hdr-v61-row1` @ 186,101) — sichtbar |
+
+**In allen vier Aussehen stehen neun Reiter à 40 px von x = 22 bis x = 382** — sie passen
+vollständig in die 383 px und sind ohne Wischen sichtbar und treffbar. `scrollbar-width` steht auf
+`thin`, der Balken erscheint also beim Wischen.
+
+> **Die 21 px sind kein Inhalt, sondern `padding-right: 22px`.** Da ist nichts zu erreichen, und
+> die „Medizin aus Punkt 4" hätte an einer Stelle gewirkt, an der kein Fehler ist.
+
+Die **200 px in „Heute" sind vollständig das Status-Abzeichen** („0 / 6 Bereiche"). In den drei
+Layouts holt `badgeInDenKopf()` es in die Kopfzeile, wo es sichtbar steht — dort bleiben nur die
+21 px Polster. Nur in „Heute" steht es weiter in der Reiterleiste und liegt bei 390 px komplett
+rechts außerhalb.
+
+**Nicht geändert, und zwar mit Absicht.** Wohin das Abzeichen auf einem Telefon gehört, ist eine
+Optik-Entscheidung, und „Heute" ist genau die Ansicht, zu der Marcel gesagt hat, sie sei gut so.
+CLAUDE.md: Optik ohne klare Vorgabe → nicht raten. **Gehört Marcel vorgelegt**, nicht von mir
+entschieden.
 - Der **Ton** der Aktenmappe bleibt unangetastet (Journal 48, Backlog N33). Marcel ausdrücklich:
   „Das muss erstmal nicht hell werden."
