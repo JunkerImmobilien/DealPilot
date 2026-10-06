@@ -31908,6 +31908,64 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (65) 06.10.2026 — v1923–v1923b: sechs Punkte aus Marcels Liste, und ein Umschalter, der kein Befehl ist
+
+| Punkt | Befund | Paket |
+|---|---|---|
+| Doppelrahmen an der Suche | **meiner aus v1911** — der Kasten hatte schon einen | v1923 |
+| „zuletzt bearbeitet" in Gold | `.sb-sort-btn` Gold mit Goldgrund, beide Knöpfe | v1923 |
+| goldener Scrollbalken | `scrollbar-color: Gold/0,25`, 64 Regeln dazu | v1923 |
+| Datenzeile sieht anders aus | nur die Score-Anzeige: Gold gegen Weiss/Grün | v1923 |
+| Score/Aktionen mittig | **war bereits mittig** (y=22 von 22), nachgemessen | — |
+| Objekt antippen schliesst das Menü | drei Anläufe, siehe unten | v1923b |
+
+**Den Doppelrahmen hatte ich selbst gebaut.** `.sb-search-box` trägt einen Goldrahmen; mein v1911
+legte den Knopf-Stil der Schiene auf das Feld DARIN und damit einen zweiten.
+
+> **Wer einem Element einen Rahmen gibt, muss nachsehen, ob sein Behälter schon einen hat.**
+
+**Die Datenzeile unterschied sich nur an einer Stelle.** Gegeneinander gemessen, derselbe Stil,
+dieselbe Karte:
+
+```
+Element              Schreibtisch 1180     Handy 387
+.sbc-mini-score-num  10px/800 Gold         10px/700 Weiss
+.sbc-score-label     10,5px/700 Gold       9,5px/700 Gruen
+.sbc-seq             gleich                gleich
+.sbc-address         gleich                gleich
+```
+
+**Und dann der Punkt, der drei Anläufe gekostet hat.** Ein Objekt im Menü antippen soll die
+Schublade schliessen:
+
+| | Weg | Ergebnis |
+|---|---|---|
+| v1923 | `toggleMobileSidebar()` nach 60 ms | blieb offen |
+| v1923a | gezielt schliessen, wenn offen | blieb offen |
+| v1923b | fünf Versuche über 600 ms | **schliesst** |
+
+Die Diagnose dazwischen, Schritt für Schritt: mein Schliess-Code wirkt, wenn ich ihn von Hand rufe,
+und die Schublade bleibt dann zu. Der Horcher feuert auch — ein Probe-Horcher an derselben Stelle
+zählte den Klick. **Dazwischen liegt das Laden des Objekts: es schliesst die Schublade KURZ selbst
+und öffnet sie beim Neuaufbau wieder.** Mein Eingriff traf genau dieses Loch. In v1923 schaltete er
+die bereits geschlossene wieder auf, in v1923a sah er „ist schon zu" und tat nichts.
+
+> **Ein Umschalter ist kein Befehl.** Wer einen Zustand HERSTELLEN will, darf nicht umschalten — er
+> muss setzen. Und: **wer einen Zustand gegen eine laufende Neuzeichnung durchsetzen will, trifft
+> mit einem einzigen Zeitpunkt fast immer daneben. Nicht präziser zielen — länger halten.**
+
+**Nachgemessen auf Staging, Aktenmappe bei 387 px, Stil Datenzeile:**
+
+```
+Suche        Kasten 1 Rahmen rgb(230,225,214) · Feld 0px · Lupe rgb(191,183,169)
+Sortierung   rgb(191,183,169), kein Goldgrund
+Scrollbalken rgba(191,183,169,.38) — ohne Medienabfrage, also auch am Schreibtisch
+Score        Zahl und Stufenwort rgb(201,168,76) wie am Schreibtisch
+Objektklick  Menue ZU, Backdrop none, Objekt geladen
+```
+
+Der Scrollbalken gilt ausdrücklich auf beiden Breiten — Marcel hat den Schreibtisch eingeschlossen.
+
 ### (64) 06.10.2026 — v1921/v1922: dreizehn Pakete lang an der falschen Bedingung gebaut
 
 **Marcel:** „ich möchte gerne, dass, wenn wir Tower oder wenn wir auch die Kanzlei als Aussehen
