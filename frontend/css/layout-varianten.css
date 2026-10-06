@@ -7492,3 +7492,95 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     -webkit-overflow-scrolling: touch;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1911 · ANMELDEINFORMATIONEN UND PORTFOLIO-KOPF NACH DER SCHIENE
+
+   Marcel am 06.10.2026: „die Aktenmappe das menü passt immer noch nicht auf der
+   handy ansicht. Anmeldeinformationen, portfolio ansicht schriftfarben und form
+   passt nicht."
+
+   BEIDE BEREICHE GEGENEINANDER GEMESSEN — links die Schiene bei 1277 px, die
+   das Vorbild ist, rechts die Schublade bei 387 px:
+
+     ANMELDEINFORMATIONEN      Schreibtisch              Handy (vorher)
+     ─────────────────────     ───────────────────────   ─────────────────────
+     Kasten                    transparent, Rahmen       **bg rgb(0,0,0)**,
+                               rgb(230,225,214), r=14    Goldrahmen 30 %, r=9
+     Name                      rgb(191,183,169) 12px     **rgb(255,255,255)**
+     E-Mail                    rgb(191,183,169) 10px     rgba(168,162,153,.75)
+     Plan-Pille                rgb(191,183,169),         **rgb(42,39,39)**,
+                               Rahmen rgb(38,35,30)      ohne Rahmen
+
+   **Die Plan-Pille war der schwerste Fall: dunkelgraues `rgb(42,39,39)` auf
+   schwarzem `rgb(0,0,0)` ergibt Kontrast 1,42** — der Pruefer meldete sie als
+   schlechtestes Paar der ganzen Ansicht. Das Wort „Partner" stand da und war
+   nicht zu lesen.
+
+     PORTFOLIO                 Schreibtisch              Handy (vorher)
+     ─────────────────────     ───────────────────────   ─────────────────────
+     Form                      EIN Knopf 231 x 33,       ein Block 345 x 126
+                               Rahmen hell, r=10         mit Suchfeld und
+                                                         Neu-Knopf darunter
+     Schrift                   rgb(191,183,169) 12,5px   rgb(191,183,169) 11px,
+                                                         fett (700)
+     Suchfeld                  (gibt es dort nicht)      **bg rgb(23,21,18)**,
+                                                         fuellende Flaeche
+
+   > Die Schiene arbeitet mit RAHMEN auf durchsichtigem Grund, die Schublade mit
+   > gefuellten dunklen Kaesten. Dasselbe Schwarz, zwei verschiedene Sprachen —
+   > und darum sieht dasselbe Menue an zwei Orten verschieden aus.
+
+   Beides folgt jetzt der Schiene: durchsichtiger Grund, heller Rahmen, dieselben
+   zwei Schriftfarben. Das Suchfeld und der Neu-Knopf behalten ihre Aufgabe — auf
+   dem Handy ist die Schublade der einzige Weg zum Bestand —, tragen aber die
+   Form der Schiene statt der gefuellten Kaesten.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* ── 1 · Anmeldeinformationen ─────────────────────────────────────────── */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user {
+    background: transparent !important;
+    border: 1px solid rgb(230,225,214) !important;
+    border-radius: 14px !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-name,
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-email {
+    color: rgb(191,183,169) !important;
+  }
+  /* Die Pille bekommt die Schrift- und Rahmenfarbe der Schiene zurueck. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-plan-pill {
+    color: rgb(191,183,169) !important;
+    border: 1px solid rgb(38,35,30) !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+  }
+
+  /* ── 2 · Portfolio-Kopf: Rahmen statt Fuellung ────────────────────────── */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
+    color: rgb(191,183,169) !important;
+    font-size: 12.5px !important;
+    font-weight: 400 !important;
+    padding: 8px 14px !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-search-input,
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-add-new {
+    background: transparent !important;
+    border: 1px solid rgb(230,225,214) !important;
+    border-radius: 10px !important;
+    color: rgb(191,183,169) !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-search-input::placeholder {
+    color: rgba(191,183,169,.55) !important;
+  }
+
+  /* ── 3 · und die Anmeldung klebt unten ────────────────────────────────── */
+  /* In der Schiene sitzt der Nutzerteil am Fuss (y=645 von 758). In der
+     Schublade hing er bisher direkt unter der Liste und wanderte mit ihr.
+     `margin-top:auto` holt ihn an den Fuss — und zwar NUR hier: zwei
+     Flex-Geschwister mit `auto` teilen sich den freien Platz, dann steht
+     nichts mehr dort, wo es soll. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user {
+    margin-top: auto !important;
+  }
+}
