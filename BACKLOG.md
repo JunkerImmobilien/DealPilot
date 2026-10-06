@@ -265,6 +265,40 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N34 · Vier Fehler in der Steuer- und Bewirtschaftungsrechnung (06.10.2026) — erledigt v1898, auf Staging
+
+Marcel: „Ja, natürlich möchte ich, dass du die Steuerkorrekturen machst. Das muss passen.
+Die [Miet]ausfallwagnis ist natürlich im Cashflow, muss aber nicht mit in die
+Werbungskosten. … Wortlaut 15 Prozent Hinweis, klar wie vorgeschlagen."
+
+**Erledigt (`3ae5c06c`, `d2a7bc83`):** der 55-%-Split lief auf die GESAMT-Bewirtschaftung
+statt auf den nicht umlagefähigen Teil (`tax.js:1208`, −242,52 €/Jahr Werbungskosten); das
+Mietausfallwagnis stand in den Werbungskosten (−225,60 €/Jahr, Cashflow unverändert); das
+Cockpit rechnete mit einer zweiten Pauschale von 20 % auf zwei nie gesetzte Feldnamen
+(`dashboard.js:758`, 0 von 20 Objekten — jetzt zwei gestempelte Kennzahlen plus Rückfall
+auf den Profilwert 16 %); `weg_r` wurde doppelt gezählt (`tax.js:261`); Fußzeile im
+15-%-Kasten mit den echten Zahlen und ausgelesener Nutzungsdauer (50/40/33 statt fest 50).
+Zahlen und Messwege im Journal (54). Damit sind zwei der sechs „fraglichen" Punkte aus
+**N18** geschlossen (BWK-Schätzung 55 %, ein zvE in der Projektion).
+
+**Offen:**
+- **Abzunehmen oder zurückzunehmen:** `kontofuehrung` 8 € und `porto` 5 € stehen jetzt auf
+  0 (−13 €/Jahr Werbungskosten) — lag im Arbeitsbaum, nicht von Marcel entschieden.
+- **12 von 20 Objekten tragen einen `steuer_snapshot`** mit den alten, zu hohen
+  Werbungskosten. Er erneuert sich beim nächsten Öffnen des Steuer-Reiters. Kein
+  Datenbankeingriff gemacht.
+- **Kein Objekt trägt die zwei neuen Kennzahlen** (0 von 20) — im Cockpit gilt bis zur
+  Neuberechnung jedes Objekts der Rückfall auf 16 %.
+- **`dashboard.js:482` und `quick-check-tab.js:87`** rufen `DealKpis.compute()` ohne
+  `bwk_nul_st` — dort rechnet die Steuerzeile weiter mit dem Wagnis.
+- **Der Telegram-Bot** rechnet seit `v1899` mit dem gespiegelten Kern (Spiegel aktuell,
+  trägt `bwk_nul_st`), gibt das Feld aber noch nicht mit. `main.js` (Pauschalen aus dem
+  Profil) ist ebenfalls `v1899`, nicht v1898.
+- **`Tax.calcImmoResult`/`calculateForObject`** und der ganze **Quick-Check-UI-Weg** haben
+  repoweit keinen Aufrufer (gemessen) — tote Wege, gehören weg, wenn sie ohnehin
+  angefasst werden.
+- **Marcels Abnahme im Browser** und ein Prod-Rollout.
+
 ### N30 · Ernte Linie 7 (TH/ST/SN/MV) und die Aurich-Korrektur — v1886–v1887a, auf Prod
 
 **Marcel entscheidet:** Lizenz Sachsen-Anhalt ist ungeklärt (45 neue Sätze tragen „ungeklärt, vor

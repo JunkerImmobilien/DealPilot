@@ -362,26 +362,31 @@
     // V63.28: Echte User-BWK speichern BEVOR Defaults greifen — für NMR
     var nulOrig = nul || 0;
     var ulOrig  = ul || 0;
-    /* ═══ v1898 · DER STEUERLICH ABZIEHBARE TEIL IM QUICK-CHECK ═══════════
+    /* ═══ v1898 · WARUM HIER KEIN `bwk_nul_st` MITGEHT ════════════════════
+     *
      * Das Mietausfallwagnis gehoert in den Cashflow, nicht in die
      * Werbungskosten (§ 9 Abs. 1 Satz 1 EStG verlangt eine Aufwendung).
-     * Der Quick-Check kennt es nur dann getrennt, wenn `_qcSyncFromMain`
-     * es aus den Hauptfeldern mitgebracht hat und der Nutzer die Zahl
-     * seitdem NICHT angefasst hat — genau das prueft `dpMawFuer`.
-     * Sonst bleibt `nulSt` gleich `nulOrig` und die Rechnung ist bitgleich
-     * zu vorher. */
-    var nulSt = nulOrig;
-    try {
-      var _ne = document.getElementById('qc_nul');
-      if (_ne && _ne.dataset && _ne.dataset.dpMawAnteil != null
-          && _ne.dataset.dpMawFuer === _ne.value
-          && bewirtMode !== 'pct' && bewirtMode !== 'hg') {
-        var _a = parseFloat(_ne.dataset.dpMawAnteil);
-        /* Ein Anteil zwischen 0 und 1 — alles andere ist kein Anteil und
-           wird verworfen, statt eine Zahl zu verbiegen. */
-        if (isFinite(_a) && _a > 0 && _a < 1) nulSt = nulOrig * (1 - _a);
-      }
-    } catch (_eMaw) {}
+     * `DealKpis.compute()` nimmt dafuer seit v1898 ein optionales
+     * `bwk_nul_st` — der Quick-Check gibt es NICHT mit, und das ist kein
+     * Versehen:
+     *
+     * `nul` entsteht hier in drei Modi (% der NKM, Hausgeld-Split, direkt)
+     * und ist in JEDEM davon EINE Zahl ohne benannten Mietausfall. Es gibt
+     * nichts herauszurechnen. Eine Zahl aus einem anderen Formular davon
+     * abzuziehen waere eine stille Verschiebung in einer Steuerzeile.
+     *
+     * GEMESSEN am 06.10.2026, und es aendert die Lage: von den Feldern, die
+     * diese Funktion liest, existiert im ganzen Repo KEINES —
+     * `qc_ul`, `qc_nul`, `qc_bewirt_mode`, `qc_bewirt_period`, `qc_hg`
+     * stehen in keiner HTML-Datei, es gibt keinen Quick-Check-Reiter und
+     * kein Quick-Check-iframe im Hauptdokument. Der Kommentar bei
+     * `_qcSyncFromMain` sagt das seit Langem („unbenutzt im neuen UI"), und
+     * `_qcSyncFromMain` selbst hat ausser seinem window-Export keinen
+     * Aufrufer. Dieser Weg erreicht also keinen Nutzer.
+     *
+     *   > Ein Weg ohne Felder rechnet nicht falsch — er rechnet gar nicht.
+     *     Hier etwas einzubauen, das sich nicht nachmessen laesst, waere
+     *     teurer als die Luecke. */
     if (!nul && kp > 0) nul = kp * 0.01;
     if (!ul && nkm > 0) ul = nkm * 12 * 0.10;
     var nulReal = nulOrig;
@@ -536,7 +541,9 @@
       uf:      0,
       bwk_ul:  ulOrig  || 0,
       bwk_nul: nulOrig || 0,
-      bwk_nul_st: nulSt,   /* v1898: Steuerzeile ohne Mietausfallwagnis */
+      /* v1898: KEIN `bwk_nul_st` — Begruendung am Block oben. Ohne das Feld
+         rechnet DealKpis die Steuerzeile gegen `bwk_nul`, also bitgleich zu
+         vorher. */
       d1:      darlehen,
       d1z:     zinsP,
       d1t:     tilgP,
@@ -2336,33 +2343,16 @@ function _qcSyncFromMain() {
   var ulSum  = _n('hg_ul')  + _n('grundsteuer') + _n('ul_sonst')
              + _n('kp1') + _n('kp2') + _n('kp3') + _n('kp4');
   var nulSum = _n('hg_nul') + _n('eigen_r') + _n('mietausfall') + _n('nul_sonst');
-  /* v1898 · DAS WAGNIS BLEIBT IM QC-CASHFLOW, FEHLT ABER DER QC-STEUERZEILE.
-   * `qc_nul` ist EINE Zahl; der Quick-Check kennt in keinem seiner drei Modi
-   * (% der NKM, Hausgeld-Split, direkt) einen getrennten Mietausfall. Es gibt
-   * dort also nichts herauszurechnen - AUSSER genau hier, wo der Betrag aus
-   * den Hauptfeldern kommt und das Wagnis bekannt ist. Deshalb wird es am
-   * Element vermerkt, zusammen mit dem Wert, zu dem es gehoert: aendert der
-   * Nutzer `qc_nul` von Hand, passt der Merker nicht mehr und qcCalc
-   * ignoriert ihn. Eine Zahl aus einem fremden Formular von einem
-   * handgeaenderten Wert abzuziehen waere genau die stille Verschiebung,
-   * die hier nicht passieren darf. */
-  var _mawSum = _n('mietausfall');
+  /* v1898 · GEMESSEN: DIESE FUNKTION ERREICHT KEINEN NUTZER.
+   * `qc_ul` und `qc_nul` stehen in KEINER HTML-Datei des Repos, und
+   * `_qcSyncFromMain` hat ausser seinem window-Export keinen Aufrufer
+   * (beides am 06.10.2026 geprueft). Der Feldsatz oben ist trotzdem
+   * geradegezogen - eine Summe, die falsch ist, bleibt falsch, auch wenn
+   * sie gerade niemand liest. Gebaut wird hier aber nichts Neues. */
   var qcUlEl  = document.getElementById('qc_ul');
   var qcNulEl = document.getElementById('qc_nul');
   if (qcUlEl  && ulSum  > 0 && qcUlEl.value !== '') qcUlEl.value  = (ulSum / 12).toFixed(0);
-  if (qcNulEl && nulSum > 0 && qcNulEl.value !== '') {
-    qcNulEl.value = (nulSum / 12).toFixed(0);
-    /* v1898: Merker fuer qcCalc — der ANTEIL des Wagnisses an der Summe, und
-       der Wert, zu dem er gehoert. Ein Anteil und kein Betrag, weil der
-       Quick-Check seine Zahl je nach Perioden-Umschalter als Monats- ODER
-       Jahreswert liest; ein Anteil gilt in beiden Faellen. Stimmt
-       `dpMawFuer` nicht mehr mit `value` ueberein, hat der Nutzer die Zahl
-       angefasst und der Merker gilt nicht. */
-    try {
-      qcNulEl.dataset.dpMawAnteil = String(_mawSum / nulSum);
-      qcNulEl.dataset.dpMawFuer   = qcNulEl.value;
-    } catch (_e) {}
-  }
+  if (qcNulEl && nulSum > 0 && qcNulEl.value !== '') qcNulEl.value = (nulSum / 12).toFixed(0);
 
   // Nach dem Sync neuen QC-Score berechnen
   if (typeof qcCalc === 'function') {

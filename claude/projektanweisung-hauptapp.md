@@ -32523,3 +32523,142 @@ Trag deinen eigenen Wert ein, dann rechne ich damit.*" Score-Karte, Formular (ne
 - `agentWerkzeuge.js:923` (Backend) bildet die NUL-Summe für die KI-Antwort **eigenständig**
   aus den Rohfeldern — der Vermerk fehlt dort.
 - `quickcheck-app.html` hat einen eigenen Hausgeld-Split und ist von v1895 nicht berührt.
+
+---
+
+### (54) 06.10.2026 — v1898: vier gemessene Fehler in der Steuerrechnung, und der Satz, der die 15-%-Grenze beantwortet
+
+**Was.** Die drei offenen Punkte am Ende von (53) sind abgearbeitet, und zwei weitere kamen
+beim Messen dazu. Marcel am 06.10.: „Ja, natürlich möchte ich, dass du die
+Steuerkorrekturen machst. Das muss passen. Die [Miet]ausfallwagnis ist natürlich im
+Cashflow, muss aber nicht mit in die Werbungskosten. … Wortlaut 15 Prozent Hinweis, klar
+wie vorgeschlagen."
+
+| # | Was war falsch | Wo |
+|---|---|---|
+| 1 | 30 + 20 + 5 % der **Gesamt**-Bewirtschaftung als Werbungskosten — der umlagefähige Teil steht schon als `nk_umlf` in der Summe und als `einnahmen_nk` dagegen, wurde also **zweimal** abgezogen | `tax.js:1208` |
+| 2 | Das **Mietausfallwagnis** stand in den Werbungskosten. § 9 Abs. 1 Satz 1 EStG verlangt eine *Aufwendung*; ein kalkulatorisches Wagnis (§ 19 Abs. 2 Nr. 4 ImmoWertV) wird nie gezahlt | `calc.js`, `deal-kpis.js`, `tax.js`, `voice-import.js` |
+| 3 | Das Cockpit rechnete mit einer **zweiten Pauschale** von 20 % auf zwei Feldnamen, die es nirgends gibt | `dashboard.js:758` |
+| 4 | `weg_r` doppelt gezählt, obwohl das UI am Feld sagt „wird NICHT zusätzlich summiert" | `tax.js:261` |
+| 5 | Der 15-%-Kasten nannte nur Zahlen, nicht die Antwort — und „50 Jahre" fest, statt sie auszulesen | `index.html:1655/1668`, `calc.js:1033/1075` |
+
+**Der Cashflow ist nicht angefasst.** `nul` und `bwk_cf` sind unverändert; nur die
+Steuerzeile rechnet gegen `nul_st`. Im Prozent-Modus wird **nichts** abgezogen — dort
+steckt kein benannter Mietausfall in der Quote (v1895 rechnet sie aus den 16 % heraus).
+
+**Commit** · `3ae5c06c` (v1898) · `d2a7bc83` (v1898a, Frontend-Konstanten) ·
+`<v1898b>` (Quick-Check nachgezogen) · `<v1898c>` (dieses Journal).
+Cache-Buster: `calc.js` · `tax.js` · `deal-kpis.js` · `voice-import.js` · `dashboard.js` ·
+`storage.js` · `quick-check.js` alle auf `?v=v1898`.
+
+> **v1897 war schon vergeben** (Darstellungs-Strang, `style.css?v=v1897`, Commit `1db1c40a`).
+> Deshalb v1898 und nicht die rechnerisch nächste Nummer — am 06.10. wurden dreimal
+> Nummern doppelt vergeben.
+
+**Nachweis.** Im Browser auf Staging an den **echten** Rechenkernen gemessen
+(`window._computeYearTotal`, `_calcImmediate`, `collectData`, `projectAll` über die
+gerenderte Tabelle). Beispielobjekt: 180.000 € / 940 € NKM / 100 m² / Bj 1998 /
+36.000 € EK / 3,8 % / 1,5 %; Bewirtschaftung im Detail-Modus mit
+`hg_ul` 1.200 + `grundsteuer` 400 + `ul_sonst` 317,60 = **1.917,60 €** umlagefähig und
+`hg_nul` 1.200 + `eigen_r` 300 + `mietausfall` 225,60 + `nul_sonst` 79,20 = **1.804,80 €**
+nicht umlagefähig.
+
+*Anlage V, Jahr 1 (zvE 68.000 aus dem Steuerzeitraum, in beiden Messungen gleich):*
+
+| | vorher | nachher | Δ/Jahr |
+|---|---:|---:|---:|
+| Bewirtschaftung als Werbungskosten | 2.047,32 | **1.579,20** | −468,12 |
+| … davon Aufgabe 1 (umlagefähiger Teil raus) | | | −242,52 |
+| … davon Aufgabe 2 (Wagnis raus) | | | −225,60 |
+| Einnahmen | 13.197,60 | 13.197,60 | 0 |
+| Werbungskosten gesamt | 13.170,08 | **12.688,96** | −481,12 |
+| Ergebnis V+V | +27,52 | **+508,64** | +481,12 |
+| Steuer | 11 | **210** | +199 |
+
+*Über 20 Jahre:* Werbungskosten 218.645,33 → **210.850,06** (−7.795,28 €), Ergebnis
+126.676,13 → **134.471,41**, Steuer 52.745 → **55.997** (**+3.252 €**). Der Fehler ging
+immer in dieselbe Richtung: zu viele Werbungskosten, zu hohe Erstattung.
+
+*Cashflow, Jahr 1 — unverändert, wie entschieden:* `nul_sum` 1.805 €, `bwk` 3.722 €,
+`cf_op` 1.101,20 € vorher **und** nachher. Nur `cf_ns` verschiebt sich (1.007,20 → 928,20),
+weil die Steuer sich verschiebt — und genau das soll sie.
+
+*Cockpit-Projektion (20 Objekte, 20 Jahre):*
+
+| | vorher | nachher | Δ |
+|---|---:|---:|---:|
+| BWK 2026 | 57.845 | **46.276** | −11.569 |
+| BWK Summe 20 J. | 1.405.476 | **1.124.379** | −281.097 |
+| CF nach St. 2026 | −29.695 | **−22.055** | +7.640 |
+| Kum. CF 2045 | −462.223 | **−297.024** | +165.199 |
+
+46.276 / 289.224 = **16,0 %** — der Profilwert `bwk_anteil_default`, nicht mehr die
+erfundenen 20.
+
+*Die Kette bis zum Objekt ist geschlossen* (`collectData()` gemessen, ohne zu speichern):
+`_kpis_bwk_y` 3.902,40 (gesamt, wie bisher) · `_kpis_bwk_nul_y` **1.804,80** (Cashflow) ·
+`_kpis_bwk_nul_st_y` **1.579,20** (Steuer).
+
+*Der 15-%-Satz, mit den echten Zahlen und ausgelesener Nutzungsdauer:*
+
+| AfA-Satz | Nutzungsdauer | Fußzeile |
+|---|---|---|
+| 2,0 % | 50 | „Bis hierhin kannst du sanieren: 28.454 € an bezahlten Handwerkerrechnungen in den ersten drei Jahren nach dem Kauf. Was darüber geht, darfst du nicht mehr sofort absetzen, sondern erst über **50** Jahre." |
+| 2,5 % | 40 | … über **40** Jahre |
+| 3,0 % | 33 | … über **33** Jahre |
+| 2,0 %, Eingabe netto | 50 | „… 23.911 € an Handwerkerrechnungen **ohne Umsatzsteuer** …" |
+
+Die Status-Pille und der Absatz darüber tragen jetzt dieselbe Zahl — vorher stand dort
+dreimal „50", auch bei 3,0 %.
+
+**Rest.**
+
+- **`kontofuehrung` 8 € und `porto` 5 € stehen jetzt auf 0.** Das lag schon im
+  Arbeitsbaum, als die Sitzung übernommen wurde, und ist **nicht** von Marcel entschieden.
+  Wirkung: −13 € Werbungskosten im Jahr, rund −5 € Steuer. Fachlich richtig (erfundene
+  Pauschalen, v646 hat `steuerber` und `telefon` aus demselben Grund auf 0 gesetzt), aber
+  abzunehmen oder zurückzunehmen.
+- **Die Projektion nimmt seit v1898 das zvE des jeweiligen Jahres** (`_zveJahr`,
+  `State.zveHerkunft`) statt für alle Jahre das Feld `zve`. Lag ebenfalls schon im
+  Arbeitsbaum, mit Marcels Zitat („zur Projektion … dass es zu meinen Einstellungen
+  passt"), aber ohne Messung. Gemessen am Beispielobjekt: 2026 und 2027 kommen aus einem
+  **Steuerzeitraum** (68.000 € statt 65.891 €), ab 2028 aus dem Feld; bei 500 € Ergebnis
+  sind das 207 statt 203 € Steuer, also **+4 €/Jahr** in den beiden betroffenen Jahren.
+  Für einen Nutzer mit deutlich abweichendem Steuerzeitraum ist der Unterschied größer.
+- **`main.js` zieht jetzt `mietsteigerung_pct`, `wertsteigerung_pct` und `leerstand_pct`
+  aus dem Profil** statt hart 3,0 / 1,5 / 0,0. Lag ebenfalls im Arbeitsbaum, als diese
+  Sitzung übernommen wurde — **inzwischen von einem anderen Strang als `v1899`
+  (`5f3987ff`) committet**, nicht von v1898. `kostenstg` bleibt hart bei 1,0 %, weil es
+  dafür keine Einstellung gibt.
+  > **Hier stand erst „nicht committet".** Das stimmte zum Zeitpunkt des Messens und war
+  > eine halbe Stunde später falsch — zwei Stränge im selben Arbeitsbaum. Nachgemessen
+  > und zurückgenommen.
+- **12 von 20 Objekten tragen einen `steuer_snapshot`** mit den ALTEN, zu hohen
+  Werbungskosten. Er wird neu geschrieben, sobald der Steuer-Reiter des Objekts einmal
+  geöffnet wird (`tax.js`, `_scheduleTaxSnapshotPost`). Bis dahin rechnet der
+  Verlustvortrag anderer Objekte (`_bestandSaldo`, `wk-aggregate`) mit den alten Zahlen.
+  **Nicht angefasst** — das wäre ein Datenbankeingriff.
+- **Kein Objekt trug die zwei neuen Kennzahlen am Tag der Umstellung** (0 von 20
+  gemessen). Für sie gilt im Cockpit der Rückfall auf 16 %, bis jedes Objekt einmal neu
+  gerechnet und gespeichert ist.
+- **`Tax.calcImmoResult` und `Tax.calculateForObject` haben keinen Aufrufer** — repoweit
+  geprüft, auch Backend und PDF-Erzeuger. Die `weg_r`-Zeile ist gestrichen, die beiden
+  Funktionen stehen noch. Sie gehören weg, sobald jemand sie anfasst.
+- **Der ganze Quick-Check-UI-Weg ist unerreichbar.** Gemessen: `qc_ul`, `qc_nul`,
+  `qc_bewirt_mode`, `qc_bewirt_period`, `qc_hg` stehen in **keiner** HTML-Datei des Repos,
+  es gibt keinen Quick-Check-Reiter und kein Quick-Check-iframe im Hauptdokument, und
+  `_qcSyncFromMain` hat außer seinem window-Export keinen Aufrufer. Der Feldsatz ist
+  trotzdem gegen `calc.js:1345` geradegezogen (`eigen_r`, `grundsteuer`, `kp1`–`kp4`
+  fehlten), aber dort ist **nichts Neues** gebaut worden.
+- **`agentWerkzeuge.js` ist von `v1899` (`5f3987ff`) erledigt**, nicht von v1898: der Bot
+  rechnet jetzt mit dem wörtlich gespiegelten Kern
+  (`backend/src/generated/rechenkerne/deal-kpis.js`). Gemessen: der Spiegel ist aktuell
+  (`tools/rechenkerne-spiegeln.mjs --pruefen` RC=0) und trägt `bwk_nul_st` an sechs
+  Stellen. Der Bot gibt das Feld noch **nicht** mit — ohne es rechnet der Kern bitgleich
+  zu vorher, die Steuerzeile des Bots führt also weiter das Wagnis. Einzeiler, wenn dort
+  jemand ist.
+- **`dashboard.js:482` und `quick-check-tab.js:87`** rufen `DealKpis.compute()` ebenfalls,
+  ohne `bwk_nul_st`. Dort rechnet die Steuerzeile also weiter mit dem Wagnis. Nicht
+  angefasst, weil nicht gemessen.
+- **`dashboard.js:727` trägt ein Ersetzungszeichen** (`v1704b <U+FFFD>`), `index.html:3627`
+  ebenfalls. Beide vorbestehend, nicht von v1898.
