@@ -31908,6 +31908,88 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (55) 06.10.2026 — v1896–v1900: die Partikel liefen nie, und zwei Ansichten tragen jetzt ihr eigenes Gesicht
+
+**Was · v1896, v1896a, v1897, v1899, v1899a, v1900 · Commits 8737f39e, b1e44264, 1db1c40a,
+5f3987ff, 9261b016 (+ v1900)**
+
+Marcel am 06.10.2026: „Heute muss aussehen wie der DealPilot mit den Objektkarteien und allem,
+also vernünftig, mit den Obsidianen und den bewegten Partikeln im Hintergrund. Und die
+Aktenmappe, da darf überhaupt gar kein Obsidian, also kein Misch sein. … Und wenn wir Heute
+auswählen, dann konnte man ja unten auch das Aussehen der Objektkarteien verändern. Das geht
+natürlich bei Heute nicht."
+
+**Die Partikel sind nie gelaufen — seit es sie gibt.** `initParticles()` suchte `#dp-particles`
+und kehrte in der ERSTEN Zeile zurück, weil dieses Element im ganzen Frontend nicht vorkam:
+null Treffer in `index.html`, in allen `js/` und in allen `css/`. Die vollständige Routine
+darunter — 90 goldene Teilchen, Funkeln über einen Sinus, Randumlauf, Neuberechnung bei
+Fenstergröße — war all die Zeit da und wurde nie erreicht.
+
+> **Ein stiller Rückfall sieht aus wie eine Gestaltungsentscheidung.** Niemand hat je gemeldet,
+> dass die Partikel fehlen, weil niemand wusste, dass es sie geben sollte. Erst Marcels Satz hat
+> die Lücke sichtbar gemacht. Der Canvas wird jetzt in der Routine SELBST angelegt, nicht im
+> Markup — so kann er nicht wieder verloren gehen, wenn jemand das HTML umbaut.
+
+**Und ihr einziger Aufruf hing am falschen Faden** (v1896a): er lag in einer
+`loadSummaries().then(...)`-Kette. Die Teilchen starten jetzt mit der FLÄCHE, nicht mit den
+Zahlen — `setTimeout(initParticles, 120)` direkt nachdem der Mount auf sichtbar geht.
+
+**Beim ersten echten Lauf fiel sofort der nächste Fehler auf** (v1900). Gemessen auf Staging:
+CSS-Fläche 893 × 5703, Pixelpuffer **946 × 5379**. Der Browser zieht den Puffer auf die Fläche,
+also liefen die Teilchen 6 % zu breit und 6 % zu flach, und was rechts von 893 gezeichnet wurde,
+lag ausserhalb. Ursache war die alte Rückfallkette (`window.innerWidth-380`, `scrollHeight` zu
+früh). Seit v1896 trägt der Canvas `width:100%;height:100%` — er KENNT seine Fläche selbst, und
+die wird jetzt zuerst gefragt. Dazu ein `ResizeObserver` am Canvas: die Höhe des Cockpits wächst
+beim Nachrendern der Karten, ohne dass das Fenster sich ändert; ein Horcher nur auf `resize`
+bekommt davon nichts mit.
+
+> **Eine Zahl, die nie gelesen wurde, ist nie falsch gewesen.** Beide Fehler — der tote Canvas
+> und der schiefe Puffer — standen jahrelang im Code und waren bis zur ersten Messung unsichtbar.
+> Der zweite war nur zu finden, weil der erste behoben war.
+
+**Die Objektkarten-Wahl fällt in „Heute" weg.** Die sieben Listenstile (`.dp-objkarte-wahl-host`)
+waren dort schon ausgeblendet — die DICHTE daneben (Kompakt · Standard · Wallet · Stapel) aber
+nicht, und sie wirkte auch. Der Kommentar begründete das ausdrücklich: „Die Gestalt teilt sich den
+Block mit der Dichte, die ueberall wirkt." Jetzt fällt der ganze Abschnitt (`#dpuv-cards`), sobald
+kein Layout aktiv ist. **Gegengemessen auf Staging:** in Heute `display:none`, Höhe 0; in der
+Aktenmappe `display:block`, Höhe 501 px.
+
+**Die Aktenmappe auf dem Handy ohne den doppelten Kopf** (v1897). Gemessen: Desktop- und
+Handy-Aktenmappe sind flächengleich identisch (Schiene, Kopf, Reiter alle `rgb(14,13,11)`,
+Arbeitsfläche `rgb(244,242,237)`). Der Unterschied ist die ANORDNUNG — am Schreibtisch liegt das
+Dunkle seitlich als 248 px breite Schiene, auf dem Handy oben als Block. Dort trug die Schiene nur
+noch die Marke und einen Portfolio-Knopf, der `toggleMobileSidebar()` ruft, also dasselbe wie der
+Burger daneben.
+
+| | dunkler Block oben |
+|---|---|
+| Handy vorher | Schiene 87 + Kopf 93 + Reiter 57 = 238 px (28 % der Höhe) |
+| Handy jetzt | Kopf 93 + Reiter 56 = 151 px (18 %) |
+| Schreibtisch | Kopf 57 + Reiter 50, Schiene seitlich |
+
+Nach dem Ausrollen nachgemessen: `.dpl-schiene` steht auf `display:none`, Kopf 0–93, Reiter
+134–190, darunter Creme. **Die Struktur ist damit dieselbe wie am Schreibtisch** — auch der helle
+Streifen zwischen Kopf und Reitern gibt es dort (57–134). Was bleibt, ist der 36 px höhere Kopf.
+
+**Nachweis · Staging, Messkabine im gleich-Origin-iframe, nach vollem Neuladen:**
+
+```
+Partikel (Heute, 1280 px)  Canvas da · 893x5703 · 4.395 gefüllte Bildpunkte
+Kartenwahl Heute           #dpuv-cards display:none, h=0
+Kartenwahl Aktenmappe      #dpuv-cards display:block, h=501 · Gestalt-Host h=339
+Aktenmappe Handy 388 px    .dpl-schiene display:none · Kopf 93 · Reiter 134–190
+gold-audit (Server)        RC=0, genau auf der Basislinie (438 in 54 Dateien)
+```
+
+> **Eine Falle beim Messen, die zweimal zugeschlagen hat:** `localStorage.removeItem('dp_layout')`
+> und neu laden ergibt NICHT „Heute". Die App stellt die gewählte Ansicht selbst wieder her, und
+> der Schlüssel stand nach dem Neuladen wieder auf `v1b` — was wie ein fremder Eingriff aussah.
+> Der Weg ist der Schalter (`.dpl-schalter` → Knopf „Heute"), nicht der Speicher. Siehe
+> [[bedienweg-statt-attribut]].
+
+**Rest:** der Kopf ist auf dem Handy 93 px gegen 57 px am Schreibtisch; ob die Marke auf dem Handy
+klein in die Kopfzeile zurück soll, liegt bei Marcel.
+
 ### (51) 06.10.2026 — v1893: alle vier Ansichten auf dem Handy abgenommen
 
 **Ein echter Fund, und er lag in „Heute".** Das Abzeichen mit dem Füllstand („0 / 6 Bereiche",

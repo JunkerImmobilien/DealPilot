@@ -1984,9 +1984,22 @@
     }
     _pctx=cv.getContext('2d');
     function size(){
-      // v452.6: Layout kann beim ersten Aufruf 0 sein -> Fallback auf scroll/Fenster
-      _pw=cv.width=Math.max(m.clientWidth||0, m.scrollWidth||0, window.innerWidth-380, 600);
-      _ph=cv.height=Math.max(m.clientHeight||0, m.scrollHeight||0, window.innerHeight, 600);
+      /* v1900 · DER PUFFER MUSS DIE FLAECHE SEIN, DIE DER CANVAS EINNIMMT.
+         Gemessen am 06.10.2026 auf Staging, erster Lauf ueberhaupt (bis v1896
+         kehrte die Routine in Zeile 1 um): CSS-Flaeche 893x5703, Pixelpuffer
+         946x5379. Der Browser zieht den Puffer dann auf die Flaeche — die
+         Teilchen liefen 6 % zu breit und 6 % zu flach, und alles, was rechts
+         von 893 gezeichnet wurde, lag ausserhalb.
+
+         Ursache war die alte Rueckfallkette: sie nahm `window.innerWidth-380`
+         (die Schiene am Schreibtisch) und `scrollHeight` zu einem Zeitpunkt,
+         an dem das Markup noch nicht fertig war. Seit v1896 traegt der Canvas
+         `width:100%;height:100%` — er KENNT seine Flaeche also selbst, sobald
+         er im Dokument haengt. Die wird jetzt zuerst gefragt; die alte Kette
+         bleibt als Rueckfall fuer den Fall, dass noch nichts gelayoutet ist. */
+      var rc = cv.getBoundingClientRect();
+      _pw = cv.width  = Math.round(rc.width)  || Math.max(m.clientWidth||0,  m.scrollWidth||0,  window.innerWidth-380, 600);
+      _ph = cv.height = Math.round(rc.height) || Math.max(m.clientHeight||0, m.scrollHeight||0, window.innerHeight,    600);
     }
     size();
     _particles=[]; var N=Math.min(90,Math.max(40,Math.round(_pw*_ph/16000)));
@@ -1997,6 +2010,17 @@
     if(_presize) window.removeEventListener('resize',_presize);
     _presize=function(){ if(_pctx) size(); };
     window.addEventListener('resize',_presize);
+    /* v1900 · Die Hoehe des Cockpits waechst, waehrend die Karten und Diagramme
+       nachrendern — ohne dass das Fenster sich aendert. Ein Horcher nur auf
+       `resize` bekommt davon nichts mit, und der Puffer bliebe auf dem Stand
+       der ersten Sekunde stehen. Deshalb zusaetzlich am Canvas selbst horchen.
+       Nur EIN Beobachter je Canvas (am Element gemerkt), sonst sammeln sie sich
+       bei jedem Oeffnen des Cockpits an. */
+    try{
+      if(cv._dpRo) cv._dpRo.disconnect();
+      cv._dpRo = new ResizeObserver(function(){ if(_pctx) size(); });
+      cv._dpRo.observe(cv);
+    }catch(e){}
     function draw(){
       if(!_pctx)return; _pctx.clearRect(0,0,_pw,_ph);
       var col=isDark()?'201,168,76':'167,139,54';
@@ -2010,7 +2034,10 @@
       _pctx.shadowBlur=0; _praf=requestAnimationFrame(draw);
     }
   }
-  function stopParticles(){ cancelAnimationFrame(_praf); _pctx=null; if(_presize){window.removeEventListener('resize',_presize);_presize=null;} }
+  function stopParticles(){ cancelAnimationFrame(_praf); _pctx=null; if(_presize){window.removeEventListener('resize',_presize);_presize=null;}
+    /* v1900: den Flaechen-Horcher mit abraeumen — sonst laeuft er weiter, wenn
+       die Teilchen laengst stehen. */
+    try{ var _cv=$('dp-particles'); if(_cv&&_cv._dpRo){ _cv._dpRo.disconnect(); _cv._dpRo=null; } }catch(e){} }
 
   /* ════ RENDER-ORCHESTRIERUNG ════ */
   function renderAll(){
