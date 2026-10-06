@@ -32796,3 +32796,111 @@ dreimal „50", auch bei 3,0 %.
   angefasst, weil nicht gemessen.
 - **`dashboard.js:727` trägt ein Ersetzungszeichen** (`v1704b <U+FFFD>`), `index.html:3627`
   ebenfalls. Beide vorbestehend, nicht von v1898.
+
+### (56) 06.10.2026 — v1901–v1902: die Messkabine zählte Phantome, und ein Akkordeon schnitt auf dem Handy ab
+
+**Was · v1901, v1901a–h, v1902 · Commits 418a2be8, af75548c, c99976b7, 9ff951b6,
+a70c4ac2, a60d851e, 1a8d937c, 0cb6f98f, edd355c8**
+
+Auftrag war die Restabnahme auf dem Handy — Kanzlei und Tower mit ihren neun
+Reitern, die vier Inhaltsseiten je Aussehen, Stichproben bei 360 und 430 px —
+und der Zähler der Messkabine, der ohne `checkVisibility()` zu viele
+Klickflächen „unter 40 px" meldete.
+
+**Der Zähler ist nachgezogen** (`v1901`). Gemessen mit dem alten Selektorsatz,
+derselbe Stand, derselbe Reiter:
+
+| Reiter | alt gesamt / unter 40 | neu gesamt / unter 40 | Phantome |
+|---|---|---|---|
+| Pilot-Analyse | 27 / **14** | 15 / **2** | 12 × `input#ai-pdf-sec-*` |
+| Steuer | 76 / 4 | 75 / 3 | 1 × `input#afa_sonder7b_aktiv` |
+| Bewertung | 17 / 1 | 17 / 1 | – |
+| Deal-Aktion | 50 / 1 | 50 / 1 | – |
+| Objekt | 123 / 3 | 123 / 3 | – |
+
+Es sind **zwölf** Haken, nicht sechs, und sie liegen in
+`details#afa_sonder7b_wrap` beziehungsweise im PDF-Block. **Über
+`getComputedStyle` ist der Zustand nicht lesbar** — gemessen stehen alle zwölf
+auf `content-visibility: visible`, `visibility: visible`, `opacity: 1`,
+`display: block` und 16×16 px. `checkVisibility()` ist das einzige Werkzeug,
+das sie kennt.
+
+**Der eine echte Befund der ganzen Abnahme steht im Reiter Deal-Aktion**
+(`v1902`). `deal-action-boarding.js:1358` lässt das Unterlagen-Akkordeon über
+`max-height` auffahren und setzt im offenen Zustand `560px` bei
+`overflow:hidden`. Die Zahl ist am Schreibtisch gemessen, wo der Inhalt
+hineinpasst; auf dem Handy bricht derselbe Inhalt um:
+
+| Breite | scrollHeight | abgeschnitten | unerreichbare Knöpfe |
+|---:|---:|---:|---:|
+| 360 px | 813 px | 253 px | 3 |
+| 390 px | 702 px | 142 px | 1 |
+| 430 px | 684 px | 124 px | 1 |
+| 1180 px | 336 px | 0 px | 0 |
+
+Entscheidend ist, was darüber steht: `overflow:hidden` und **kein Scroller
+dazwischen**. Das Abgeschnittene ist nicht durch Wischen zu erreichen, sondern
+weg — bei 390 px der letzte Eintrag „Track Record" samt PDF-Knopf. Der Deckel
+wird unter 900 px auf 1100 px angehoben statt entfernt (ohne Zahl fährt das
+Akkordeon nicht mehr auf). Nachweis nach dem Rollout: bei 360/390/430 ist
+`scrollHeight == clientHeight`, null unerreichbar; bei 1180 px steht weiter
+`max-height: 560px` und `scrollHeight 336`.
+
+**Alles andere ist in Ordnung.** Vier Aussehen × neun Reiter × 390 px, dazu
+Portfolio, Portfolio-Cockpit, Portfolio-Strategie und
+Einstellungen/Darstellung je Aussehen, dazu 360 und 430 px: Seitenüberlauf 0,
+nichts ragt ohne klippenden Vorfahren heraus, null verdeckte und null
+unerreichbare Bedienelemente. Kanzlei und Tower messen sich dabei Zahl für
+Zahl wie die Aktenmappe — der offene Punkt aus (55) bestätigt sich.
+
+> **Der teuerste Teil dieser Sitzung war nicht die App, sondern der Prüfer.**
+> Sieben Familien von Scheinbefunden, jede gefunden, indem eine auffällige
+> Zahl gegen die Seite geprüft wurde statt geglaubt:
+>
+> 1. `checkOpacity:true` nahm **219 von 230** Bedienelementen aus der Prüfung.
+>    Im Bild war die Fläche vollständig gemalt; `getComputedStyle(#s5).opacity`
+>    meldete dauerhaft `0` — eine Transition, die im nicht beachteten Dokument
+>    auf ihrem Startwert einfriert.
+> 2. Der Farbparser las `color(srgb 0.788 0.659 0.298 / 0.8)` als 0–255 und
+>    machte aus Gold Schwarz: **308** Scheinbefunde im Reiter Bewertung. Farben
+>    werden jetzt auf einen 1×1-Canvas **gemalt** statt gelesen.
+> 3. `overflow-x: visible` klippt nicht → 27 gemeldet, 2 echt.
+> 4. `label.oe-sr` hat `clientWidth: 1` (Vorleseprogramm) → 23 Scheinbefunde.
+> 5. Die Kante des Klippers auf `innerWidth` gekürzt → jede Karte einer
+>    Querschiene ab der zweiten „unerreichbar".
+> 6. `div.kc-body` im Cockpit ist 0 px hoch — **zugeklappt, nicht kaputt** → 61.
+> 7. `#sidebar` in „Heute" steht auf `fixed` mit `translateX(-351px)` —
+>    **eingefahren, nicht kaputt** → 8.
+>
+> **Und der größte:** im verborgenen Tab meldete `checkVisibility()`
+> **0 von 7.883** Elementen als gemalt, und `setTimeout(…, 200)` dauerte
+> **12.071 ms**. Beides zusammen erklärt jede Zeitgrenze, in die diese
+> Prüfstrecke gelaufen ist — und es hätte die Abnahme grün gemacht, ohne dass
+> etwas geprüft worden wäre. `gemalt()` stützt sich jetzt zuerst auf
+> Geometrie und `<details>`, gewartet wird über einen `MessageChannel`
+> (202 ms statt 12.071), und `DPM.lage()` sagt, welcher Weg gerade gilt.
+
+**Nachweis.** `node --check` auf dem herausgezogenen Skriptblock bei jedem
+Schritt; `DPM.selbsttest()` malt vier bekannte Farben gegen von Hand
+nachgerechnete Werte und prüft Kontrast Weiß/Schwarz = 21; die
+Erreichbarkeitsprüfung hat eine Gegenprobe (ein eigens eingehängter Knopf bei
+`left:3000px` wird gefunden, sein Entfernen senkt die Zahl um genau eins).
+Schreibtisch bei 1180 px vorher und nachher bitgleich: `.dpl-schiene`
+248×758@0 `rgb(14,13,11)`, `.main-col` 932×758@248 `rgb(244,242,237)`,
+`header.hdr` 928×57, `nav.tabs` 928 bei `scrollWidth` 1160.
+
+**Rest.**
+- `button.set-modal-close` ist **36×36** und der einzige Weg aus den
+  Einstellungen zurück — der Burger liegt dort unter `span.dp-mtb-logo`.
+  Treffbar, aber unter der 44-px-Schwelle.
+- `button.sbc-btn` misst in der Schublade **20×20**; CLAUDE.md nennt 26×26,
+  und in „Heute" sind es auch 26×26. Die Doktrin beschreibt also nur den
+  einen Fall.
+- `button.sb-sort-btn` 26×44, zwei Stück in `.sb-sort-toggle` (63 px) — die
+  bekannte Abstandsfrage, unverändert offen.
+- Die Kontrastpaare unter der Schwelle sind **Markenfarben** (Gold auf Creme
+  2,12 · `#3FA56C` 2,62) und am Schreibtisch identisch — kein Handy-Befund,
+  sondern eine Markenentscheidung.
+- `messkabine.html` steht in **keinem** Lauf des `gold-audit`: das Skript liest
+  nur die Dokumente, die die App ausliefert. Die sieben Gold-Literale darin
+  sind Prüfwerte, keine Flächen.
