@@ -52,6 +52,7 @@ const markt = require('./telegramMarktService');
 const objectService = require('./objectService');
 const voiceExtract = require('./voiceExtractService');
 const vorgaben = require('./botVorgabenService');   /* v1824 */
+const rechenkerne = require('./rechenkerne');       /* v1899: DealKpis/Dscr der App */
 const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
@@ -1376,8 +1377,32 @@ async function objekt_schnellblick(ctx, args) {
   ctx.merkeObjekt(id);
   const d = o.daten || {};
 
+  /* Betraege: der Punkt ist ein TAUSENDERtrennzeichen ("180.000"). */
   const z = (v) => {
     const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+  };
+  /* ── v1899 · PROZENTSAETZE BRAUCHEN EINEN ANDEREN PARSER ──────────────
+   *
+   * GEMESSEN am 06.10.2026 am Objekt d65ed5cb (Staging): das Formular
+   * speichert die Saetze GEMISCHT — `gest_p` als "6.50", `notar_p` als
+   * "2.2", `d1z` dagegen als "3,9". Durch `z()` gelesen wurde daraus
+   * 650 % Grunderwerbsteuer und 22 % Notar; der Schnellblick meldete
+   * "Grunderwerbsteuer 650,00 % = 1.267.500 EUR", ein Darlehen von
+   * 1.481.375 EUR und einen Kapitaldienst von 87.401 EUR. Jede Zahl
+   * danach war Unsinn, und keine sah wie ein Tippfehler aus.
+   *
+   * Beim Zins fiel es nie auf, weil dort zufaellig ein Komma stand.
+   *
+   *   > Ein Punkt in einem Prozentsatz ist nie ein Tausendertrennzeichen.
+   *     Kein Satz dieser App hat vier Stellen.
+   *
+   * Dieselbe Trennung fuehrt `objekt_kennzahlen` weiter oben schon
+   * (`num` fuer Betraege, `dez` fuer Dezimalzahlen, Z. 170/171) — hier
+   * fehlte sie. */
+  const dez = (v) => {
+    if (v == null || String(v).trim() === '') return null;
+    const n = Number(String(v).replace(',', '.'));
     return Number.isFinite(n) ? n : null;
   };
   const eur = (x) => Math.round(x).toLocaleString('de-DE') + ' EUR';
@@ -1400,10 +1425,59 @@ async function objekt_schnellblick(ctx, args) {
     };
   }
 
-  /* ── Die drei Dreisatzrechnungen, offen ─────────────────────────────── */
-  const mieteJahr = (nkm + ze) * 12;
-  const bmr = mieteJahr / kp * 100;
-  const faktor = kp / mieteJahr;
+  /* ── Die drei Dreisatzrechnungen, offen ───────────────────────────────
+   *
+   * ── v1899 · SIE KOMMEN AUS DEM KERN DER APP, NICHT VON HIER ──────────
+   *
+   * Marcel am 06.10.2026: „den Telegram-Bot, der soll auch nicht seine
+   * eigenen so bilden. Also wenn, dann soll das schon Hand und Fuss haben,
+   * was wir da machen."
+   *
+   * Hier standen bis dahin vier eigene Formeln:
+   *
+   *     mieteJahr     = (nkm + ze) * 12
+   *     bmr           = mieteJahr / kp * 100
+   *     faktor        = kp / mieteJahr
+   *     kapitaldienst = darlehen * (zins + tilg) / 100
+   *
+   * GEMESSEN am Objekt d65ed5cb (Staging): sie trafen dieselben Zahlen wie
+   * `DealKpis.compute()` — bmy 4,953846 %, Faktor 20,186335, und der
+   * Kapitaldienst stimmt bis auf die Rundung (gegengemessen: 10.004,748
+   * gegen 10.004,75; die Eurozahl haengt an Nebenkosten und Eigenkapital,
+   * deshalb steht hier keine). Das macht die Formeln nicht richtig, nur
+   * momentan gleich. CLAUDE.md
+   * sagt: „Rechenkerne — nie duplizieren", und zwei Formeln, die heute
+   * dasselbe ergeben, sind genau die Stelle, an der morgen zwei Zahlen
+   * stehen, von denen keine falsch aussieht.
+   *
+   * Gerechnet wird deshalb mit `DealKpis.compute()` aus
+   * `services/rechenkerne.js` — der WOERTLICH gespiegelten
+   * `frontend/js/deal-kpis.js`, derselben Datei, die der Browser laedt.
+   * Der Rechenweg darunter bleibt ausgeschrieben: der Bot soll die Zahl
+   * weiterhin vorrechnen koennen.
+   *
+   * KEIN RUECKFALL AUF EIGENE FORMELN: fehlt die Spiegelung, sagt der
+   * Schnellblick das und rechnet nicht. Eine zweite Meinung ueber denselben
+   * Deal ist schlimmer als eine fehlende Auskunft. */
+  if (!rechenkerne.vorhanden()) {
+    return {
+      gefunden: true, id: id, adresse: _adrVon(o),
+      geht_noch_nicht: ['Rechenkern'],
+      hinweis: 'Der Rechenkern der App ist im Backend gerade nicht ladbar '
+             + '(src/generated/rechenkerne). Ich rechne NICHT mit einer '
+             + 'eigenen Formel — sag dem Nutzer, dass die Kennzahlen im '
+             + 'Moment nur in DealPilot selbst stehen, und melde den Fehler.'
+    };
+  }
+
+  /* Die Kaufnebenkosten stehen weiter unten — fuer Bruttomietrendite und
+     Kaufpreisfaktor braucht der Kern sie nicht (sie haengen am Kaufpreis).
+     Der Kapitaldienst wird im Finanzierungszweig mit der dann bekannten
+     Gesamtinvestition noch einmal gerufen. */
+  const K0 = rechenkerne.kpis({ kp: kp, nkm: nkm, ze: ze });
+  const mieteJahr = K0.nkm_j;
+  const bmr = K0.bmy;
+  const faktor = K0.fak;
 
   const rechnung = {
     jahreskaltmiete: eur(mieteJahr)
@@ -1419,7 +1493,9 @@ async function objekt_schnellblick(ctx, args) {
 
   /* ── Kaufnebenkosten, soweit belegbar ───────────────────────────────── */
   const satzVon = (id2) => {
-    if (erg.vorhanden[id2] != null) return { wert: z(erg.vorhanden[id2]), quelle: 'am Objekt' };
+    /* v1899: `dez` statt `z` — ein Prozentsatz fuehrt kein
+       Tausendertrennzeichen (siehe Block oben). */
+    if (erg.vorhanden[id2] != null) return { wert: dez(erg.vorhanden[id2]), quelle: 'am Objekt' };
     if (erg.vom_nutzer[id2] != null) return { wert: Number(erg.vom_nutzer[id2]), quelle: 'deine Vorgabe' };
     if (erg.vorschlag[id2]) return { wert: Number(erg.vorschlag[id2].wert), quelle: erg.vorschlag[id2].herkunft };
     return null;
@@ -1465,7 +1541,17 @@ async function objekt_schnellblick(ctx, args) {
     const gi = kp + knkSumme;
     const ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
     const darlehen = Math.max(0, gi - ek);
-    const kapitaldienst = darlehen * (zins.wert + tilg.wert) / 100;
+    /* v1899: Kapitaldienst und Ueberschuss aus DealKpis.compute() — dem
+       gespiegelten Kern der App. `rate_j` ist Zins + Tilgung des Jahres,
+       `cf_op` ist Jahreskaltmiete minus Bewirtschaftung minus Zins minus
+       Tilgung; ohne Bewirtschaftungsangabe (bwk_nul bleibt 0) ist das genau
+       der „Ueberschuss vor BWK und Steuer", der hier gemeint ist — und der
+       Hinweis darunter sagt es weiterhin ausdruecklich. */
+    const K = rechenkerne.kpis({
+      kp: kp, nk: knkSumme, nkm: nkm, ze: ze,
+      d1: darlehen, d1z: zins.wert, d1t: tilg.wert, ek: ek
+    });
+    const kapitaldienst = K.rate_j;
     finanzierung = {
       eigenkapital: eur(ek) + (ekQuote != null ? '  (' + pct(ekQuote) + ' deiner Vorgabe)' : ''),
       darlehen: eur(darlehen),
@@ -1473,7 +1559,7 @@ async function objekt_schnellblick(ctx, args) {
       tilgung: pct(tilg.wert) + '  (' + tilg.quelle + ')',
       kapitaldienst_jahr: eur(kapitaldienst)
         + '  = ' + eur(darlehen) + ' x ' + pct(zins.wert + tilg.wert),
-      ueberschuss_vor_bwk_und_steuer: eur(mieteJahr - kapitaldienst),
+      ueberschuss_vor_bwk_und_steuer: eur(K.cf_op),   /* v1899: aus dem Kern */
       hinweis_ueberschuss: 'Das ist die Miete MINUS Kapitaldienst — ohne '
         + 'Bewirtschaftungskosten und ohne Steuer. Der echte Cashflow liegt '
         + 'darunter und wird in DealPilot gerechnet.',

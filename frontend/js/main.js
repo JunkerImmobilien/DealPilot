@@ -66,10 +66,40 @@ function setDefaults() {
   sv('d1z',     3.50);
   sv('d1t',     _dpProfilWert('tilgung_default', 1.00));
   sv('d1_bindj',_dpProfilWert('zinsbindung_default', 10));
-  sv('mietstg', 3.0);
-  sv('wertstg', 1.5);
-  sv('kostenstg', 1.0);
-  sv('leerstand', 0.0);
+  /* ══ v1899 · DIE PROJEKTION NIMMT MARCELS PAUSCHALEN ══════════════════
+   *
+   * Marcel am 06.10.2026: „zur Projektion, das musst du natuerlich so
+   * machen, dass es zu meinen Einstellungen passt, dass wir es eintragen,
+   * wenn wir dort Pauschalen haben."
+   *
+   * GEMESSEN am 06.10.2026: genau diese drei Werte standen hier HART und
+   * widersprachen den Einstellungen, in denen sie seit v1328 gepflegt
+   * werden (config.js:1019ff):
+   *
+   *     Feld         hart hier   Einstellung              Differenz
+   *     mietstg          3,0 %   mietsteigerung_pct 1,5 %  doppelt so hoch
+   *     wertstg          1,5 %   wertsteigerung_pct 1,5 %  gleich
+   *     leerstand        0,0 %   leerstand_pct      2,0 %  gar nicht gefuehrt
+   *
+   * Die 3,0 % Mietsteigerung ueber 15 Jahre sind der Unterschied zwischen
+   * +55 % und +25 % Miete am Ende der Projektion. Der Kommentar in
+   * config.js nennt die 1,5 % ausdruecklich „bewusst VORSICHTIG und keine
+   * Prognose" — eine Vorsicht, die nie ankam.
+   *
+   *   > Eine hinterlegte Angabe, die beim Anlegen nicht gezogen wird, ist
+   *   > keine Einstellung. Sie ist eine Notiz, die niemand liest.
+   *     (steht vier Zeilen weiter unten schon, fuer das zvE)
+   *
+   * `kostenstg` hat in den Einstellungen KEINE Entsprechung. Dort wird
+   * deshalb nichts geraten und nichts umbenannt — der bisherige Wert
+   * bleibt, und der offene Punkt steht im Bericht.
+   *
+   * Die Rueckfallwerte sind exakt die bisherigen. Wer nichts einstellt,
+   * bekommt wie bisher 3,0 / 1,5 / 0,0. */
+  sv('mietstg',   _dpProfilWert('mietsteigerung_pct', 3.0));
+  sv('wertstg',   _dpProfilWert('wertsteigerung_pct', 1.5));
+  sv('kostenstg', 1.0);   /* keine Einstellung dafuer — siehe Block oben */
+  sv('leerstand', _dpProfilWert('leerstand_pct', 0.0));
   sv('exit_bmy', 5.0);
   sv('anschl_z', 5.0);
   sv('anschl_t', 1.0);

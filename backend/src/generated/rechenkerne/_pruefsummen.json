@@ -1,0 +1,12 @@
+{
+ "erzeugt_am": "2026-10-06T07:10:08.713Z",
+ "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
+ "reihenfolge": [
+  "dscr-engine.js",
+  "deal-kpis.js"
+ ],
+ "quellen": {
+  "dscr-engine.js": "ab327062ab08aed97c5ab8cad760496d10c7538c309818ec4f8a942922ed6f53",
+  "deal-kpis.js": "76db645f899ef5c07634a8368ed07d3a719bf2559dc82ba14b4c983a85ac26b9"
+ }
+}
