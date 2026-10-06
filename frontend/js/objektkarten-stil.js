@@ -138,8 +138,22 @@
     var gemerkt = '';
     try { gemerkt = localStorage.getItem(LS) || ''; } catch (e) {}
 
+    /* ── v1915 · OHNE EIGENE WAHL GILT DIE BORDKARTE ──────────────────────
+       Marcel am 06.10.2026: „die Aktenmappe würde ich erst mal standardmäßig
+       mit der Bordkarte anzeigen.“
+
+       Der Ruecfall war '' (Aktenreiter). Geprueft wird auf ABWESENHEIT des
+       Schluessels, nicht auf seinen Wahrheitswert: wer sich bewusst fuer den
+       Aktenreiter entscheidet, speichert '' — und `gemerkt || 'bordkarte'`
+       haette ihm die Bordkarte zurueckgegeben, Wahl hin oder her.
+
+       Das Attribut wird ohnehin nur bei aktivem Layout gesetzt (siehe `setze`),
+       die normale Ansicht „Heute“ bleibt also unberuehrt. */
+    var hatMerker = false;
+    try { hatMerker = localStorage.getItem(LS) !== null; } catch (e) {}
+
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
-    else setze(gemerkt);
+    else setze(hatMerker ? gemerkt : 'bordkarte');
 
     /* v1715: der Merker des alten Schwebefensters wird abgeräumt. Wer ihn
        noch trägt, bekäme sonst nie etwas zu sehen und wüsste nicht,

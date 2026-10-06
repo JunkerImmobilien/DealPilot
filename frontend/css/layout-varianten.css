@@ -7779,3 +7779,69 @@ html body .sb-act-item.sb-act-tour,
 html body .sb-act-item.sb-act-feedback {
   display: none !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1915 · DIE KARTEN IM MENUE — UND EIN FEHLER AUS v1906, DEN ICH ZURUECKNEHME
+
+   Marcel am 06.10.2026: „Die Karten, also die Objektkarten, sind irgendwie nicht
+   schön dargestellt. Auch das Löschen und Duplizieren und auch der Discord sind
+   da gar nicht auf der Karte, sondern hängen da irgendwie drüber." Und: „die
+   Aktenmappe würde ich erst mal standardmäßig mit der Bordkarte anzeigen … und
+   die werden aber auch ganz anders dargestellt, wenn ich auf die Handy-App
+   umstelle."
+
+   ── A · DIE NUMMERNLASCHE KOMMT ZURUECK ───────────────────────────────────
+
+   **v1906 hat `.sbc-seq` im Menue ausgeblendet — und damit das Merkmal der
+   BORDKARTE abgeschaltet.** Gemessen am Schreibtisch: `.sbc-seq` ist dort
+   16 x 44 mit `writing-mode: vertical-rl` — die hochkant stehende Nummer am
+   linken Abriss, also genau das, was die Bordkarte ausmacht („Abriss links,
+   Nummer hochkant"). Auf dem Handy stand sie auf `display:none`, und die Karte
+   sah deshalb aus wie eine nackte Zeile.
+
+   > Eine Regel, die fuer EINEN Kartenstil gedacht war, traf alle sieben. Der
+   > Anker war die Flaeche, nicht der Stil — und damit zu grob.
+
+   Die Lasche kommt zurueck. Das Kachelband (`.sbc-mini-grid`) bleibt
+   ausgeblendet: es gehoert zum Stil „Kennzahlen" und trug im Menue 67 von
+   122 px, ohne dort etwas zu beantworten.
+
+   ── B · SCORE UND AKTIONEN LAGEN AUF DEM TEXT ─────────────────────────────
+
+   GEMESSEN bei 387 px, Portfolio offen:
+
+     Adresse endet bei   x = 292
+     Aktionen beginnen   x = 218   ->  75 px UEBERLAPPUNG
+     Score beginnt       x = 298
+
+   Beide sind `position:absolute` mit `z-index: 8` und liegen damit UEBER der
+   Adresse. Bei 321 px Kartenbreite und 44 px Hoehe laeuft der Text schlicht
+   darunter durch. Am Schreibtisch faellt es nicht auf, weil die Karte dort nur
+   216 px breit ist und der Text frueher umbricht.
+
+   > Zwei Dinge auf derselben Flaeche sind kein Entwurf, sondern ein Zufall, der
+   > bisher gut ging.
+
+   Der Kartenkopf bekommt rechts so viel Polster, wie Score und Aktionen
+   zusammen brauchen (115 px): 73 fuer die beiden Knoepfe, 26 fuer den Ring,
+   dazu die Abstaende. Nichts wird verschoben, nichts verdeckt.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* A · die Lasche der Bordkarte zurueck (nimmt v1906 an dieser Stelle zurueck) */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-seq {
+    display: block !important;
+  }
+
+  /* B · rechts Platz fuer Ring und Knoepfe */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top {
+    padding-right: 115px !important;
+  }
+
+  /* Die Adresse darf dann umbrechen statt zu ueberlaufen. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-address {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
