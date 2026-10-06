@@ -8421,3 +8421,48 @@ html[data-dp-layout][data-dp-layout] .sb-sort-toggle {
     padding-right: 7px !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1928 · SCORE UND KNOEPFE SENKRECHT MITTIG — IN ALLEN STILEN
+
+   Marcel am 06.10.2026: „koennen wir die objektkarten noch das duplizieren und
+   loeschen mittig auf die karte setzen und auch den score?"
+
+   GEMESSEN, alle sieben Stile bei 427 px, Abstand der Elementmitte zur
+   Kartenmitte:
+
+     Stil            Hoehe   Score            Aktionen
+     ─────────────   ─────   ──────────────   ──────────────
+     Aktenreiter      58     **13 px tief**   **13 px tief**
+     Bordkarte        45     **7 px tief**    **7 px tief**
+     Score-Kante      58     (kein Ring)      **13 px tief**
+     Datenzeile       45     mittig           mittig
+     Ampel            45     mittig           mittig
+     Kennzahlen       58     **7 px hoch**    **7 px hoch**
+     Minimal          45     mittig           mittig
+
+   **Drei von sieben sassen schon mittig, vier nicht** — und zwar in beide
+   Richtungen: der Aktenreiter 13 px zu tief, die Kennzahlen 7 px zu hoch. Die
+   Werte stammen aus festen `top`-Angaben je Stil, die zur jeweiligen Kartenhoehe
+   passten, als der Stil gebaut wurde.
+
+   > **Eine feste Position ist nur so lange richtig, wie die Hoehe sich nicht
+   > aendert.** Sieben Stile mit zwei Hoehen (45 und 58 px) und je eigenen
+   > `top`-Werten ergeben sieben Gelegenheiten, dass einer nicht mitgezogen wird.
+
+   Statt sieben Zahlen zu pflegen, rechnet die Mitte sich jetzt selbst aus:
+   `top: 50%` und `translateY(-50%)`. Das gilt fuer jede Hoehe, auch fuer die,
+   die noch kommt.
+
+   SCORE-KANTE bleibt ohne Ring — dort ersetzt ein farbiger Strich den Score,
+   das ist der Zweck des Stils („Farbiger Strich statt Ring"). Die Regel trifft
+   ihn trotzdem; wo kein Ring ist, bewegt sie nichts.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+  }
+}
