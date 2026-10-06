@@ -7958,3 +7958,50 @@ html body .sb-act-item.sb-act-feedback {
     flex: 0 0 auto !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1917 · DIE LISTE WAR EINE REIHE VON KAESTEN, KEINE LISTE
+
+   Marcel am 06.10.2026: „wenn du auf Portfolio klickst, ist der Hintergrund
+   Obsidian. Wir haben so Partikel, die durchs Feld gehen. Da muss der
+   Hintergrund rein, wie wenn du das Aktionsmenü dann öffnest."
+
+   **Ich habe zuerst nach Partikeln gesucht und keine gefunden** — vier
+   Canvas im Dokument, alle 0 x 0, kein `#dp-particles`, kein Verlauf auf
+   Schublade, Backdrop, `app-wrap`, `body` oder `html`. Der Grund ist in beiden
+   Zustaenden derselbe: `rgb(14,13,11)`.
+
+   **Der Eindruck kam von den Karten, nicht vom Grund.** Gegeneinander gemessen:
+
+     Schreibtisch (Schiene)        Handy (Schublade)
+     ───────────────────────────   ──────────────────────────
+     Karte 216 x 44                321 x 44
+     Rahmen  TRANSPARENT           **rgb(42,38,34), sichtbar**
+     Abstand zwischen Karten 5 px  **23 px**
+
+   Zwanzig Karten mit 23 px Luft und je einem Rahmen sehen aus wie einzelne
+   Kaesten, die auf einer dunklen Flaeche schwimmen — und zwischen ihnen
+   schimmert der Grund durch. Am Schreibtisch stehen dieselben Karten dicht und
+   ohne Kante: eine ruhige Liste. Dieselben Farben, zwei verschiedene Bilder.
+
+   > **Was wie ein Hintergrund aussieht, kann der Abstand sein.** Nicht die
+   > Flaeche war falsch, sondern das, was auf ihr liegt.
+
+   Die Karten bekommen den Rahmen der Schiene (keinen) und ihren Abstand. 6 px
+   statt 5, weil auf dem Handy ein Finger zielt — bei 23 px gingen auf zwanzig
+   Karten rund 460 px allein fuer Luft drauf.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card {
+    border-color: transparent !important;
+    margin-bottom: 6px !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+  }
+  /* Der Abstand kam teils aus der Liste selbst (row-gap), nicht nur von der
+     Karte — sonst bliebe die Haelfte stehen. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list {
+    row-gap: 0 !important;
+    gap: 0 !important;
+  }
+}
