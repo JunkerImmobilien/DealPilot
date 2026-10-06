@@ -8063,3 +8063,46 @@ html:not([data-dp-layout="v1b"]) .dpl-marke-handy,
 html:not([data-dp-layout="v1b"]) .dpl-portfolio-handy {
   display: none !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1919 · N41.1 — EIN TON STATT ZWEIER
+
+   Marcel: „wenn du auf Portfolio klickst, ist der Hintergrund Obsidian … Da muss
+   der Hintergrund rein, wie wenn du das Aktionsmenü dann öffnest. So, das ist ja
+   nur so ein Schwarz- oder Schwarzgrauton, den wir dort ausgesucht haben."
+
+   **Diesmal je Rasterpunkt gemessen, nicht am Container** — eine Fläche kann an
+   verschiedenen Stellen verschieden aussehen, und genau das war hier der Fall.
+   Effektiver Grund bei x = 180, Aktenmappe, 387 px:
+
+     y      Zustand AKTIONEN      Zustand PORTFOLIO
+     ────   ───────────────────   ───────────────────
+     100    rgb(14,13,11)         rgb(14,13,11)
+     200    rgb(14,13,11)         rgb(14,13,11)
+     300    rgb(14,13,11)         **rgb(23,22,15)**  .sbc-top
+     400    rgb(14,13,11)         **rgb(23,22,15)**
+     500    rgb(14,13,11)         **rgb(23,22,15)**
+     600    rgb(14,13,11)         **rgb(23,22,15)**
+     700    rgb(14,13,11)         rgb(14,13,11)
+
+   **Im Aktionen-Zustand ist die ganze Schublade EIN Ton. Im Portfolio-Zustand
+   sind es zwei:** der Grund `rgb(14,13,11)` oben und unten, dazwischen die
+   Kartenköpfe auf `rgb(23,22,15)`. Zwei Schwarztöne, die sich um neun Punkte
+   unterscheiden — zu wenig, um als Absicht zu lesen, zu viel, um unsichtbar zu
+   sein. Genau das sieht aus wie „da liegt etwas darunter".
+
+   > **Zwei Schwarz sind schlimmer als eines.** Ein klarer Kontrast ist eine
+   > Aussage, ein knapper ist ein Fehler, den man nicht benennen kann.
+
+   AM SCHREIBTISCH IST DER TON DERSELBE (`rgb(23,22,15)`, gegengemessen) — dort
+   füllt die Liste aber nur 216 von 248 px in einer schmalen Spalte neben dem
+   Inhalt. Auf dem Handy liegt sie als 357 px breite Fläche vor dem ganzen
+   Schirm, und der Wechsel wird zur Bank. **Deshalb weicht das Handy hier
+   bewusst ab:** die Kartenköpfe nehmen den Grund der Schublade.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top,
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-mini-grid {
+    background: transparent !important;
+  }
+}
