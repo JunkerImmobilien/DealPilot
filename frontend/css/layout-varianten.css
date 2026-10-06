@@ -7645,3 +7645,79 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     min-height: 40px !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1913 · DAS MENUE IST EIN UMSCHALTER — PORTFOLIO ODER AKTIONEN
+
+   Marcel am 06.10.2026: „man kann garnicht das portfolio oeffnen und das layout
+   passt immer noch nicht. bitte render das dass die aktenmappe passend
+   dargestellt wird im handy modus und auch passend benutzt werden kann."
+
+   **Der eigentliche Befund war eine FUNKTION, keine Farbe.** Am Schreibtisch
+   tauscht `button.dpl-portfolio` die untere Haelfte der Schiene: entweder die
+   Objektliste oder das Register, nie beides (so seit v1666 — „man kann oben
+   wechseln, von Portfolio auf Aktionen und wieder zurueck"). Gesteuert wird das
+   ueber `data-dpl-portfolio` am `<html>`.
+
+   Auf dem Handy gab es diesen Tausch nicht. Seit v1910 stand das Register fest
+   oben, die Objektliste darunter — bei 682 px Register auf 758 px Schirm war das
+   Portfolio praktisch unerreichbar, und der Knopf, der am Schreibtisch tauscht,
+   rief hier nur `toggleMobileSidebar()`: bei offener Schublade schloss er sie,
+   statt umzuschalten.
+
+   > Ein Knopf, der im einen Zustand oeffnet und im anderen schliesst, hat keinen
+   > zweiten Zustand — er hat nur einen und macht ihn rueckgaengig.
+
+   Jetzt gilt in der Schublade dieselbe Regel wie in der Schiene:
+
+     data-dpl-portfolio = „zu"  (Standard)   ->  REGISTER sichtbar
+     data-dpl-portfolio = „auf"              ->  SUCHE und OBJEKTLISTE sichtbar
+
+   Der Umschalter sitzt als `button.dpl-portfolio-handy` ganz oben in der
+   Schublade (eingefuegt in `layout-varianten.js`, v1913) und ruft DIESELBE
+   Funktion `portfolio()` wie der Knopf der Schiene — kein zweiter Weg zum
+   gleichen Zustand. Seine Beschriftung nennt das Ziel, nicht die Herkunft.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* Der Umschalter: die Form des Schienen-Knopfs, die Trefferflaeche des Handys. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-portfolio-handy {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    order: -2 !important;
+    width: calc(100% - 16px) !important;
+    margin: 8px 8px 4px !important;
+    min-height: 44px !important;
+    padding: 8px 12px !important;
+    background: transparent !important;
+    border: 1px solid rgb(230,225,214) !important;
+    border-radius: 10px !important;
+    color: rgb(191,183,169) !important;
+    font-size: 12.5px !important;
+    font-weight: 400 !important;
+    text-align: left !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-portfolio-handy .dpl-n {
+    margin-left: auto !important;
+    font-size: 10.5px !important;
+  }
+
+  /* Zustand „zu": das Register steht, Suche und Objektliste ruhen. */
+  html[data-dp-layout="v1b"][data-dp-layout]:not([data-dpl-portfolio="auf"]) body aside.sidebar#sidebar .sb-section-title,
+  html[data-dp-layout="v1b"][data-dp-layout]:not([data-dpl-portfolio="auf"]) body aside.sidebar#sidebar #sb-list {
+    display: none !important;
+  }
+
+  /* Zustand „auf": die Objektliste steht, das Register ruht. */
+  html[data-dp-layout="v1b"][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar #sb-actions-accordion {
+    display: none !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar .sb-section-title {
+    order: 0 !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar #sb-list {
+    order: 1 !important;
+    flex: 1 1 auto !important;
+  }
+}

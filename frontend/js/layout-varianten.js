@@ -1006,10 +1006,35 @@
      nur die CSS dahinter ist eine andere - und der Knopf zeigt seinen
      Zustand an, statt ihn zu verstecken. */
   function portfolio(zu) {
-    /* v1880 · Auf dem Handy nimmt die Schiene nichts (baueSchienen); der Portfolio-Knopf oeffnet
-       deshalb die normale Seitenleiste mit Objektliste, Suche und Aktionen. */
-    if (window.matchMedia('(max-width: 900px)').matches && typeof window.toggleMobileSidebar === 'function') {
-      window.toggleMobileSidebar(); return;
+    /* ── v1913 · AUF DEM HANDY SCHALTET DER KNOPF UM, SOBALD DIE SCHUBLADE OFFEN IST ──
+
+       Hier stand seit v1880: „Auf dem Handy nimmt die Schiene nichts; der Portfolio-Knopf
+       oeffnet deshalb die normale Seitenleiste.“ Das war richtig, solange die Schublade
+       die Objektliste zeigte. Seit v1910 traegt sie das REGISTER der Aktenmappe, und
+       damit fehlte der Weg zurueck:
+
+       Marcel am 06.10.2026: „man kann garnicht das portfolio oeffnen.“
+
+       Gemessen: `portfolio()` rief auf dem Handy IMMER `toggleMobileSidebar()`. Bei
+       geschlossener Schublade oeffnet das — richtig. Bei OFFENER Schublade schliesst es
+       sie wieder, statt auf die Objektliste umzuschalten. Am Schreibtisch tauscht
+       derselbe Knopf die untere Haelfte der Schiene (Objekte gegen Aktionen, v1666); auf
+       dem Handy gab es diesen Tausch gar nicht.
+
+         > Ein Knopf, der im einen Zustand oeffnet und im anderen schliesst, hat keinen
+         > zweiten Zustand — er hat nur einen und macht ihn rueckgaengig.
+
+       Jetzt: ist die Schublade ZU, oeffnet der Knopf sie (wie bisher). Ist sie OFFEN,
+       faellt der Aufruf durch und schaltet `data-dpl-portfolio` um — derselbe Weg, den
+       der Schreibtisch nimmt, und damit auch dieselbe Beschriftung. */
+    if (window.matchMedia('(max-width: 900px)').matches) {
+      var _aw = document.querySelector('.app-wrap');
+      var _offen = !!(_aw && _aw.classList.contains('sb-mobile-open'));
+      if (!_offen) {
+        if (typeof window.toggleMobileSidebar === 'function') window.toggleMobileSidebar();
+        return;
+      }
+      /* offen -> durchfallen und umschalten */
     }
     var auf = zu === undefined
       ? document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf'
@@ -1029,11 +1054,13 @@
 
        > Eine Beschriftung, die sich nicht aendert, beschreibt einen
        > Knopf. Eine, die sich aendert, beschreibt einen Weg. */
-    var t = k && k.querySelector('.dpl-t');
-    if (t) {
-      var wort = auf ? 'Aktionen' : 'Portfolio';
+    /* v1913: beide Knoepfe beschriften — den der Schiene und den der Schublade. */
+    var wort = auf ? 'Aktionen' : 'Portfolio';
+    [].forEach.call(document.querySelectorAll('.dpl-portfolio .dpl-t'), function (t) {
       if (t.textContent !== wort) t.textContent = wort;
-    }
+    });
+    var kh = document.querySelector('.dpl-portfolio-handy');
+    if (kh) kh.setAttribute('aria-expanded', auf ? 'true' : 'false');
   }
 
   /* Ein Klick auf eine Objektkarte klappt die Liste zu - man hat ja
@@ -1637,6 +1664,36 @@
       badgeInDenKopf();
     }
     badgeHandy();
+
+    /* ── v1913 · DER UMSCHALTER GEHOERT IN DIE SCHUBLADE ──────────────────────
+       Am Schreibtisch sitzt `button.dpl-portfolio` in der Schiene und tauscht
+       Objektliste gegen Register. Auf dem Handy ist die Schiene ausgeblendet
+       (v1897), der Knopf war damit weg — und seit v1910 das Register fest oben.
+       Der Knopf wird deshalb in die Schublade gesetzt, als erstes Kind, und
+       bedient DENSELBEN Umschalter. Kein zweiter Weg zum gleichen Zustand. */
+    function portfolioKnopfHandy() {
+      if (!window.matchMedia('(max-width: 900px)').matches) return;
+      var sb = document.getElementById('sidebar');
+      if (!sb || sb.querySelector('.dpl-portfolio-handy')) return;
+      if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+      var pb = document.createElement('button');
+      pb.type = 'button';
+      pb.className = 'dpl-portfolio dpl-portfolio-handy';
+      var zu = document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf';
+      pb.innerHTML = '<span class="dpl-i">▣</span><span class="dpl-t">'
+        + (zu ? 'Portfolio' : 'Aktionen') + '</span>'
+        + '<span class="dpl-n" id="dpl-obj-zahl-handy"></span>';
+      pb.addEventListener('click', function () { portfolio(); });
+      sb.insertBefore(pb, sb.firstChild);
+      /* Die Zahl aus der Schiene mitfuehren, falls sie dort schon steht. */
+      try {
+        var q = document.getElementById('dpl-obj-zahl');
+        var n = pb.querySelector('.dpl-n');
+        if (q && n) n.textContent = q.textContent;
+      } catch (e) {}
+    }
+    portfolioKnopfHandy();
+    try { window.matchMedia('(max-width: 900px)').addEventListener('change', portfolioKnopfHandy); } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', badgeHandy); } catch (e) {}
     var zeigen = false;
     try { zeigen = localStorage.getItem('dp_layout_schalter') === '1'; } catch (e) {}
