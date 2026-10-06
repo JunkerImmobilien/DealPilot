@@ -1990,11 +1990,22 @@
      Ein schon vorhandener Canvas wird dabei abgeraeumt — wer das Aussehen zur Laufzeit
      wechselt, soll ihn nicht behalten.
 
+     NUR AUF DEM HANDY (<= 900 px), und das ist eine GRENZE, keine halbe Sache: Marcel hat
+     zur Web-Ansicht am Computer gesagt „die Optik die wir aktuell haben ist gut so". Die
+     Begruendung oben gilt zwar breitenunabhaengig, aber am Schreibtisch hat er die Teilchen
+     in der Aktenmappe bisher und will nichts anders. Gemessen bei 1180 px: Schiene, Register
+     und Typografie sind vor und nach v1903 Zeile fuer Zeile dieselben - das soll so bleiben.
+
+     > Eine Aufraeumung, die ueber ihren Auftrag hinausgeht, ist keine Aufraeumung mehr.
+
      OFFEN UND ABSICHTLICH NICHT HIER: der Obsidian-GRUND von `#dashboard-main` bleibt, wie
      er ist. Welche Farbe die Arbeitsflaeche der Aktenmappe traegt, ist eine Produkt- und
      Markenentscheidung und gehoert Marcel, nicht dieser Datei. */
   function layoutAktiv(){
-    try{ return document.documentElement.hasAttribute('data-dp-layout'); }catch(e){ return false; }
+    try{
+      return document.documentElement.hasAttribute('data-dp-layout')
+          && window.matchMedia('(max-width: 900px)').matches;
+    }catch(e){ return false; }
   }
   function initParticles(){
     var m=$(MOUNT_ID); if(!m) return;
