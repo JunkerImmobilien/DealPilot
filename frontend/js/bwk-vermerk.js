@@ -40,12 +40,29 @@
     s.id = 'dpbv-stil';
     /* Gold als `var(--wl-<hex>, #<hex>)` — Whitelabel-Pflicht. Das Grau
        der Schrift ist keine Statusfarbe und keine Marke, es bleibt hart. */
+    /* ── Warum `color:inherit` und nicht ein fester Grauton ──────────────
+       GEMESSEN am 06.10.2026 auf Staging: ein fester `#8A837E` ergab auf
+       dem weissen Formulargrund einen Kontrast von **3,73** — bei 10,5 px
+       zu wenig (AA verlangt 4,5). Ein Vermerk, den man nicht liest, ist
+       kein Vermerk.
+
+       Ein einfach dunklerer Hexwert waere aber die naechste Falle: er
+       gilt nur zu SEINEM Grund. Im Obsidian-Skin ist der Grund dunkel,
+       und derselbe Ton waere dort unlesbar — `--ch=#2A2727` darf laut
+       CLAUDE.md nie auf Obsidian. Deshalb erbt der Vermerk die Textfarbe
+       seines Umfelds (`.f` traegt hier `rgb(42,39,39)`, Kontrast 14,81)
+       und tritt nur ueber die Deckkraft zurueck: 14,81 x 0,72 = **5,95**
+       auf hell, und auf dunkel folgt er automatisch mit.
+
+       Derselbe Grund fuer den Chip: eine GOLDENE Schrift kam auf dem
+       cremefarbenen Chip-Grund nur auf 2,93. Gold traegt jetzt den Rahmen
+       und den Grund — also die Marke —, die Schrift bleibt lesbar. */
     s.textContent =
       '.dpbv{display:block;margin:4px 0 0;font:400 10.5px/1.45 Inter,system-ui,sans-serif;' +
-        'color:#8A837E;font-style:normal}' +
+        'color:inherit;opacity:.72;font-style:normal}' +
       '.dpbv-k{display:inline-block;margin-right:5px;padding:1px 5px;border-radius:3px;' +
         'font:600 9px/1.5 "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase;' +
-        'color:var(--wl-b8932f, #b8932f);border:1px solid var(--wl-c9a84c, #C9A84C);' +
+        'color:inherit;opacity:1;border:1px solid var(--wl-c9a84c, #C9A84C);' +
         /* KEIN `rgba(201,168,76,…)` — das ist Gold in RGB-Notation und damit
            hartes Gold, das sich beim Mandanten nicht umfaerbt (gold-audit.py
            sucht genau dieses Muster, Regel RGBA). `--gold-bg` setzt
@@ -53,7 +70,7 @@
            die Marke und der Grund bleibt neutral. */
         'background:var(--gold-bg, rgba(255,255,255,.04))}' +
       '.dpbv-sum{display:block;margin:6px 0 0;font:400 10.5px/1.45 Inter,system-ui,sans-serif;' +
-        'color:#8A837E}';
+        'color:inherit;opacity:.72}';
     (document.head || document.documentElement).appendChild(s);
   }
 
