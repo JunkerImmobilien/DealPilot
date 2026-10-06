@@ -265,6 +265,37 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N36 · Das Portfolio-Menü der Aktenmappe auf dem Handy (06.10.2026) — erledigt v1903/v1903a, auf Staging
+
+Marcel: „Auch das kombinierte Menü finde ich nicht gut gelöst. **Standard sollte dann das
+Portfolio angezeigt werden und unten Aktionen, und dann wird das auf Knopfdruck hochgezogen**
+— quasi Aufbau wie beim Stand ‚Heute', nur halt im Layout und Design und Schriftart und
+Schriftgröße wie Aktenmappe." Dazu: „Die Karten werden dort nicht richtig dargestellt" und
+„immer noch in der Portfolio-Ansicht den Obsidian-Hintergrund mit den Partikeln".
+
+**Erledigt (`6bf9df08`, `ac4bf93a`, `878bbd0d`):** v1889 abgelöst — die Liste ist der
+Standardinhalt (318 → 484 px, scrollt in sich), der Aufklapper steht unten (0×0 → 338×44),
+das Register wird auf Knopfdruck hochgezogen; die Mechanik aus `js/ui.js` wurde nicht
+nachgebaut, sondern losgelassen. Die vier kompakten Kartenstile trugen seit v1883b
+`min-height:122px` — die Höhe der großen „Heute"-Karte — und fielen auf 45 px (Datenzeile),
+sichtbare Karten von 2 auf 6. Die Teilchen des Portfolio-Cockpits laufen in der Aktenmappe
+auf dem Handy nicht mehr. `button.sbc-btn` 20 → 26 px, `.sb-sort-btn` Mittenabstand 31 → 44 px.
+
+**Nachgemessen auf Staging** (390 px, Aktenmappe, Datenzeile, Menü offen): alle sieben
+Kartenstile greifen in der neuen Fläche und sind bedienbar, keiner ragt heraus; Register
+offen 335 × 544 ganz in der Schublade, Gruppentitel JetBrains Mono 10px/12px w700 ls1,4px wie
+in der Schiene. „Heute" (390 px) und Schreibtisch (1180 px) Zeile für Zeile unverändert,
+Partikel dort weiter deckungsgleich mit ihrem Mount. gold-audit: genau auf der Basislinie.
+Die vollständige Messreihe steht im Journal (57).
+
+**Offen:**
+- **`button.sb-sort-btn` ist nur in der Aktenmappe gelöst.** In „Heute" überlappen die beiden
+  44-px-Trefferflächen weiter um 13 px (gap 5px, Mittenabstand 31). Nicht angefasst wegen der
+  Grenze „Heute bleibt unverändert" — ein Wort von Marcel, und die Regel gilt überall unter 900 px.
+- **Der Obsidian-Grund von `#dashboard-main`** bleibt in der Aktenmappe, nur die Teilchen sind
+  weg. Die übrige Arbeitsfläche führt dort `rgb(244,242,237)`. Produktentscheidung.
+- **Marcels Abnahme im Browser** und ein Prod-Rollout.
+
 ### N35 · Heute, Aktenmappe und die Objektkarten-Wahl (06.10.2026) — erledigt v1896–v1900, auf Staging
 
 Marcel: „Heute muss aussehen wie der DealPilot mit den Objektkarteien und allem, also

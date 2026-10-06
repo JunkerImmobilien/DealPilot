@@ -68,7 +68,7 @@ for f in marktbericht/backend/src/services/*.js \
          marktbericht/backend/src/connectors/boris/*.js \
          frontend/marktbericht-app/app.js \
          frontend/marktbericht-app/wertermittlung.js; do
-  M=$(grep -o 'v1[01][0-9][0-9][a-z]*-W[A-Z0-9]*' $f 2>/dev/null | sort -u | tr '\n' ' ')
+  M=$(grep -o 'v1[01][0-9][0-9][a-z]*-W[A-Z0-9]*'f 2>/dev/null | sort -u | tr '\n' ' ')
   [ -n "$M" ] && printf '%-30s %s\n' "$(basename $f)" "$M"
 done
 grep -o "v=1[01][0-9][0-9]" frontend/marktbericht-app/index.html
@@ -32904,3 +32904,155 @@ Schreibtisch bei 1180 px vorher und nachher bitgleich: `.dpl-schiene`
 - `messkabine.html` steht in **keinem** Lauf des `gold-audit`: das Skript liest
   nur die Dokumente, die die App ausliefert. Die sieben Gold-Literale darin
   sind Prüfwerte, keine Flächen.
+
+
+### (57) 06.10.2026 — v1903/v1903a: das Portfolio-Menü der Aktenmappe, Aufbau von „Heute", Gestaltung von der Aktenmappe
+
+**Was.** Marcel: „In der Messkabine habe ich Aktenmappe und Datenzeile eingestellt.
+Wir haben, wenn man das Menü aufmacht, immer noch in der Portfolio-Ansicht den
+Obsidian-Hintergrund mit den Partikeln. Die Karten werden dort nicht richtig
+dargestellt. Auch das kombinierte Menü finde ich nicht gut gelöst. **Standard
+sollte dann das Portfolio angezeigt werden und unten Aktionen, und dann wird das
+auf Knopfdruck hochgezogen** — quasi Aufbau wie beim Stand ‚Heute', nur halt im
+Layout und Design und Schriftart und Schriftgröße wie Aktenmappe."
+
+**Ausgangszustand**, gemessen im gleich-Origin-iframe bei 390 px, Aktenmappe
+(`v1b`), Kartenstil Datenzeile, Menü offen — genau seine Kombination:
+
+| | vorher | nachher |
+|---|---:|---:|
+| `aside#sidebar` | 359 × 758 | 359 × 758 |
+| `#sb-list` | 358 × **318** (Deckel 42vh) | 358 × **484** |
+| Liste scrollt in sich | nein | 1360 in 484 |
+| `#sb-actions-accordion` | 347 × **759** ab y=445 → Unterkante **1204** | **zu**, offen 335 × 544 |
+| `#sb-actions-trigger-btn` | **0 × 0** (`display:none`) | **338 × 44** bei y=614, unten |
+| `.sb-card` (Datenzeile) | 311 × **122** | 323 × **45** |
+| Karten ganz sichtbar (von 20) | 2 | **6** |
+| `button.sbc-btn` | 20 × 20 | **26 × 26** |
+| `.sb-sort-btn` Mittenabstand | 31 px | **44 px** |
+| Gruppentitel Register | Inter 9,5px w700 | **JetBrains Mono 10px/12px w700 ls1,4px** |
+
+Das Register ragte **446 px unter die Kante der Schublade**, und die Liste, die es
+zu bedienen gilt, hatte für zwanzig Objekte 318 px.
+
+**v1889 wird abgelöst, nicht nachgebessert.** Der Block hielt Liste und Register
+gemeinsam offen, mit meiner Begründung „dieselbe Ansicht darf auf zwei Geräten
+nicht zwei verschiedene Dinge zeigen". Der Satz stimmt, die Schlussfolgerung war
+falsch: beides in einen 758-px-Schirm zu legen heißt, dass keines ganz da ist.
+
+> Die Doktrin war meine, die Entscheidung ist Marcels. Sie gilt.
+
+**Die Mechanik wird dabei nicht nachgebaut.** Es genügte, die drei Griffe von
+v1889 loszulassen — Zwangsöffnung, `position:static`, `display:none` am
+Aufklapper — und der Schublade die Spaltenordnung zu geben, in der nur `#sb-list`
+wächst (`flex:1 1 auto` plus `min-height:0`). `sbActionsToggle()` und
+`_sbActionsDock()` aus `js/ui.js` tun den Rest, wie in „Heute".
+
+**Die Gestaltung ist gemessen, nicht geraten** — an der Schiene bei 1180 px:
+Gruppentitel JetBrains Mono 10px/12px w700 ls 1,4px `rgb(201,168,76)` VERSAL,
+Einträge Inter 12,5px/16,875px w500 `rgb(191,183,169)`. Die Zeilenhöhe bleibt bei
+40 px statt der 29 px der Schiene: Marcel hat Schriftart und Schriftgröße genannt,
+nicht die Trefferfläche, und 29 px auf dem Finger wäre v1892 noch einmal.
+
+**Die Karten: v1883b hatte die Karte an den Ring gesetzt statt umgekehrt.**
+`style.css:38637` trug für alle vier KOMPAKTEN Stile (Datenzeile, Ampel,
+Kennzahlen, Minimal) `min-height:122px` auf `.sbc-top` — die Höhe der großen
+„Heute"-Karte, eingeführt, weil der Score-Ring bei `top:38px` in die Kacheln ragte.
+Von 122 px trug der Inhalt 37. Jetzt steht die Karte auf ihrer eigenen Höhe, Ring
+und Knopfzeile hängen mittig an ihr.
+
+> **Der Nachweis war ein Versuch, kein Walker.** Der Walker meldete auf `.sbc-top`
+> nur zwei Regeln mit `min-height:0 !important` und sonst nichts, während
+> `getComputedStyle` dort 122 px zurückgab. Erst `min-height` inline auf 0 und die
+> Geometrie abgelesen — 122 → 45 — zeigte, dass es die Regel ist. Im iframe und im
+> verborgenen Tab lügt dieser Kanal; der Versuch tut es nicht.
+
+**Die Partikel: zwei frühere Diagnosen nehme ich ausdrücklich zurück.**
+
+1. „Der Canvas ist layoutblind" — widerlegt, er war in der gemessenen Ansicht gar
+   nicht im DOM.
+2. „Seine Höhe ist die Ursache" — behoben in v1900a/v1900b, und **die Reparatur
+   hält**: gemessen 383 × 9014 bei einem Mount von 383 × 9014, auf den Pixel.
+
+Marcel sieht sie trotzdem, weil sie **überhaupt da sind**: `#dashboard-main` ist
+der Mount des Portfolio-Cockpits, und das Cockpit bringt seinen Obsidian-Grund und
+seine Teilchen auch in die Aktenmappe mit, wo die übrige Arbeitsfläche
+`rgb(244,242,237)` führt. `initParticles()` kehrt jetzt um, wenn ein Layout gesetzt
+ist, und räumt einen vorhandenen Canvas ab — im JS, nicht per CSS: ein
+`display:none` ließe den Zeichenlauf auf einem Handy weiterlaufen.
+
+**v1903a war mein eigener Übergriff.** Der Stopp hing nur am Layout-Attribut, und
+das steht am `<html>`, nicht an der Breite — damit waren die Teilchen auch am
+Schreibtisch weg. Marcel zur Web-Ansicht am Computer: „Die Optik die wir aktuell
+haben ist gut so." Der Stopp gilt seither nur unter 901 px.
+
+> Eine Aufräumung, die über ihren Auftrag hinausgeht, ist keine Aufräumung mehr.
+
+**Commits.** `6bf9df08` (v1903) · `ac4bf93a` + `878bbd0d` (v1903a).
+
+**Nachweis.** Klammer- und Kommentarbilanz beider CSS-Dateien ausgeglichen
+(layout-varianten 387/387 und 1055/1055, style.css 2586/2586 und 7686/7686);
+`node --check` auf `dashboard.js`; `tools/schublade-regeln.mjs` meldet seine eigene
+Prüfung grün (93 Grund-, 48 Stil-, 12 Korrekturregeln, 153 von 153 im Block
+wiedergefunden); `python3 tools/gold-audit.py /opt/dealpilot/frontend` → **„Genau
+auf der Basislinie. Kein neues Hartgold."**
+
+**Alle sieben Kartenstile in der neuen Fläche** (390 px, Aktenmappe, Menü offen;
+„Regeln greifen" heißt: Stil-Selektor trifft wirklich ein Element in `aside#sidebar`,
+nicht nur „Attribut gesetzt"):
+
+| Stil | Karte | ganz sichtbar | Regeln greifen | bedienbar | ragt heraus |
+|---|---:|---:|---:|---|---:|
+| Aktenreiter | 323 × 57 | 5 | — (ohne Attribut) | ok | 0 |
+| Bordkarte | 323 × 44 | 6 | 4 von 8 | ok | 0 |
+| Score-Kante | 323 × 55 | 5 | 5 von 12 | ok | 0 |
+| Datenzeile | 323 × 45 | 6 | 7 von 18 | ok | 0 |
+| Ampel | 323 × 28 | 8 | 5 von 20 | ok | 0 |
+| Kennzahlen | 323 × 122 | 2 | greift | ok | 0 |
+| Minimal | 323 × 32 | 7 | greift | ok | 0 |
+
+> **Kennzahlen bleibt bei 122 px, und das ist richtig:** nachgemessen trägt
+> `.sbc-mini-grid` dort 67 px (drei Kacheln Preis · Rendite · Cashflow), und
+> `min-height:0` inline ändert nichts. Hier ist die Höhe INHALT, nicht Regel —
+> genau der Unterschied, den v1883b nicht gemacht hat.
+
+**„Heute" unverändert** (390 px): `#sb-list` 350 × 364, Trigger 326 × 44 bei y=612,
+`.sb-card` 315 × 208, `button.sbc-btn` 26 × 26, `.sb-sort-toggle` gap 5px. Die
+Teilchen laufen dort weiter: Canvas 386 × 9026, Puffer 386 × 9026, Mount
+386 × 9026 — deckungsgleich.
+
+**Schreibtisch unverändert** (1180 px, Aktenmappe), vorher und nachher Zeile für
+Zeile dieselbe Messung: `.dpl-schiene` 248 × 758 bei (0,0) · `#sb-actions-accordion`
+220 × 538 bei (8,151) · Trigger und `#sb-list` je 0 × 0 · Eintrag 220 × 29 in
+Inter 12,5px/16,875px w500 `rgb(191,183,169)` · Gruppentitel 220 × 18 in JetBrains
+Mono 10px/12px w700 ls 1,4px `rgb(201,168,76)` · Partikel im Cockpit 928 × 5680 mit
+deckungsgleichem Puffer.
+
+**Rest.**
+- **`button.sb-sort-btn` ist nur in der Aktenmappe gelöst.** In „Heute" stehen die
+  beiden Knöpfe weiter mit `gap:5px`, Mittenabstand 31 px, und ihre 44-px-Flächen
+  überlappen dort um 13 px. Nicht angefasst wegen der Grenze „Heute bleibt
+  unverändert" — ein Wort von Marcel, und die Regel gilt für alle Ansichten
+  unter 900 px.
+- **Der Obsidian-Grund von `#dashboard-main` bleibt.** Nur die Teilchen sind weg.
+  Welche Farbe die Arbeitsfläche der Aktenmappe trägt, ist eine Produkt- und
+  Markenentscheidung; die übrige Fläche führt dort `rgb(244,242,237)`.
+- **Das Register scrollt in sich**: 701 px Inhalt in 542 px Panel, Balken 13 px
+  breit, also nicht stumm. Zehn der dreizehn Einträge stehen sofort, die letzten
+  drei nach einem Wisch — nachgemessen: nach `scrollTop = scrollHeight` liegt der
+  letzte Eintrag bei y=554 und damit im Panel. Dass sie vorher als „verdeckt"
+  gemeldet wurden, war **meine Messung, nicht der Zustand**: ein herausgescrolltes
+  Element meldet seine ungescrollte Lage.
+- `button.set-modal-close` bleibt bei 36 × 36 — Marcel: „bleibt so."
+- Die Kontrastpaare unter der Schwelle sind weiterhin **Markenfarben** (Gold auf
+  Creme 2,12) und am Schreibtisch identisch. Kein Handy-Befund.
+
+> **Eine Messfalle, die mich zwei Anläufe gekostet hat und die hier stehen bleibt:**
+> nach dem Klick auf `.dpl-portfolio` meldete `getBoundingClientRect()` die
+> Schublade dreimal hintereinander bei `x = -359`, also eingefahren — bei gesetztem
+> `.sb-mobile-open` und ohne Konsolenfehler. Ich hielt sie für kaputt und hatte den
+> Verdacht schon auf meine eigene Regel gelenkt. **Der Screenshot zeigte sie offen.**
+> Der Tab stand im Hintergrund (`visibilityState: hidden`), dort friert die
+> `transform`-Transition auf ihrem Startwert ein, und die Geometrie meldet genau den.
+> Gegenmittel, das jetzt in jedem Lauf steht: ein eingehängtes
+> `*{transition:none !important}` im Prüfling, **bevor** gemessen wird.
