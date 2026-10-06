@@ -792,6 +792,12 @@
   #dashboard-main .chart,
   #dashboard-main .chart-box { min-width: 0 !important; max-width: 100% !important; }
   #dashboard-main .chart-box { width: 100% !important; }
+  /* ACHTUNG (v1900a): diese Sammelregel trifft JEDES canvas im Cockpit, auch
+     solche, die es 2025 noch nicht gab. Der Partikel-Canvas `#dp-particles`
+     (seit v1896, angelegt in `js/dashboard.js` in `initParticles`) wurde von
+     `height:auto` auf seine Attributhoehe zurueckgeworfen und fror bei 192 px
+     ein, waehrend der Mount 9026 px hoch war. Er setzt seine Geometrie deshalb
+     INLINE mit !important — wer hier etwas aendert, sucht die Gegenstelle dort. */
   #dashboard-main canvas,
   #dashboard-main .chart svg { max-width: 100% !important; height: auto !important; }
 

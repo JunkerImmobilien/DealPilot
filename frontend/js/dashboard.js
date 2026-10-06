@@ -1973,8 +1973,32 @@
     if(!cv){
       cv=document.createElement('canvas');
       cv.id='dp-particles';
-      /* Hinter den Inhalt, ohne Klicks zu fangen. Die Flaeche traegt der Mount selbst. */
-      cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none';
+      /* Hinter den Inhalt, ohne Klicks zu fangen. Die Flaeche traegt der Mount selbst.
+         ── v1900a · MIT !important, UND ZWAR WEGEN EINER FREMDEN REGEL ──────
+         Gemessen am 06.10.2026 auf Staging bei 387 px: der Canvas war 383x192,
+         obwohl der Mount 9026 px hoch ist. Ursache ist eine Sammelregel in
+         `css/dashboard.css:795` (@media max-width:768px):
+
+             #dashboard-main canvas,
+             #dashboard-main .chart svg { max-width:100% !important; height:auto !important }
+
+         Sie ist fuer die DIAGRAMM-Canvas gedacht, die sonst ueber die Spalte
+         hinauslaufen — der Partikel-Canvas ist seit v1896 nur ein neues Mitglied
+         derselben Menge. `height:auto` laesst ihn auf seine Attributhoehe fallen,
+         und die hatte `size()` gerade aus seiner Flaeche genommen: eine
+         Rueckkopplung, die ihn auf dem ersten gemessenen Wert einfriert.
+
+           > Eine Sammelregel auf Container-Kinder trifft auch die Kinder, die es
+           > bei ihrer Entstehung noch nicht gab.
+
+         Inline mit `important` gesetzt, nicht als zweite CSS-Regel: der Canvas
+         entsteht hier, also gehoert seine Geometrie hierher, und so haengt sie
+         nicht an Ladereihenfolge oder Cache-Buster eines Stylesheets. */
+      ['position:absolute','top:0','right:0','bottom:0','left:0','width:100%','height:100%',
+       'max-width:none','z-index:0','pointer-events:none'].forEach(function(paar){
+        var i=paar.indexOf(':');
+        cv.style.setProperty(paar.slice(0,i), paar.slice(i+1), 'important');
+      });
       if(getComputedStyle(m).position==='static') m.style.position='relative';
       m.insertBefore(cv, m.firstChild);
       /* Alles, was der Mount sonst enthaelt, gehoert ueber die Teilchen. */
