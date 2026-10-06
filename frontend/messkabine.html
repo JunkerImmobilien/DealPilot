@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Messkabine · DealPilot</title>
 <!--
-  messkabine.html · v1591
+  messkabine.html · v1901
 
   Die Fenstergröße des Browsers wirkt in dieser Umgebung NICHT auf den
   Viewport der Seite — gemessen am 24.09.2026: resize_window auf 390 px
@@ -19,6 +19,43 @@
   Der Träger muss eine Seite OHNE laufende App sein: sonst läuft die
   Anwendung zweimal, teilt sich localStorage und Service Worker, und man
   misst am Ende die Störung statt die Seite.
+
+  ── v1901 · ZWEI ÄNDERUNGEN ─────────────────────────────────────────────
+
+  (1) DER ZÄHLER HAT PHANTOME GEMELDET.
+
+  Bis v1591 zählte die Klickflächen-Schleife jedes Element, dessen
+  `getBoundingClientRect()` eine Fläche von mehr als null ergab. Das ist
+  nicht dasselbe wie „wird gemalt": die sechs Haken `#ai-pdf-sec-*` im
+  Reiter Pilot-Analyse liegen in einem zugeklappten `<details>`. Chrome gibt
+  dessen Inhalt `content-visibility:hidden` — **der Kasten bleibt, gemalt
+  und treffbar ist nichts.** Sie wurden deshalb als „unter 40 px" gemeldet,
+  und wer dem Befund folgte, suchte tote Knöpfe, die es nicht gibt.
+
+  `checkVisibility()` ist das einzige Werkzeug, das das mitnimmt — es kennt
+  `display:none` im Vorfahren, `visibility`, `opacity:0`, `content-visibility`
+  und das `hidden`-Attribut. Jede Schleife hier filtert jetzt darüber.
+
+  **Der Zähler nennt dabei seine Deckung** (`… übersprungen`), statt still
+  weniger zu melden. Ein Prüfer, der grün wird, ohne zu sagen wie viel er
+  gelesen hat, ist der teure Fehler — derselbe Befund wie beim gold-audit,
+  der 6 statt 181 Dateien las und „sauber" meldete.
+
+  (2) EIN HARNESS, DAMIT EINE PRÜFSTRECKE NICHT AM TAB HÄNGT.
+
+  Eine Abnahme über vier Aussehen, neun Reiter und drei Breiten sind rund
+  110 Messungen. Ein Renderer-Aufruf je Klick läuft in die Zeitgrenze, und
+  ein Harness, der nur im `window` lebt, ist beim nächsten geschlossenen Tab
+  weg. Er steht deshalb HIER, in der Datei.
+
+      await DPM.lauf({ breite: 390, layout: 'v1b' })   // ein Aufruf, neun Reiter
+      await DPM.lauf({ breite: 390, layout: '' })      // '' = Ansicht "Heute"
+      DPM.messe(DPM.ziel().d, DPM.ziel().win, 'Portfolio')
+
+  `layout` ist der Merker `dp_layout`: '' Heute · v1b Aktenmappe ·
+  v2 Kanzlei · v2b Tower. Gesetzt wird er VOR dem Laden, und der iframe
+  lädt danach ganz neu — nie im laufenden Dokument umschalten, sonst
+  hinterlässt der Skin-Wechsel Inline-Variablen und man misst die Störung.
 -->
 <style>
   :root{color-scheme:dark}
@@ -40,13 +77,13 @@
   .werte{flex:1;min-width:260px;font:12px/1.7 ui-monospace,monospace;
     background:#131211;border:1px solid #2a2724;padding:14px}
   .werte h2{font-size:12px;margin:0 0 8px;letter-spacing:.1em;color:#C9A84C}
-  .ok{color:#5BD98E} .warn{color:#E8CC7A} .bad{color:#E4A89E}
+  .ok{color:#5BD98E} .warn{color:#E8CC7A} .bad{color:#E4A89E} .leise{color:#8b857b}
 </style>
 </head>
 <body>
 <header>
   <h1>Messkabine</h1>
-  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar.</span>
+  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar. Harness: <code>DPM.lauf()</code></span>
   <div class="geraete" id="g"></div>
 </header>
 <main>
@@ -57,18 +94,289 @@
 (function(){
   'use strict';
   var GERAETE = [
-    ['iPhone SE',        375,  667],
+    ['iPhone SE',        360,  780],
+    ['iPhone SE 2',      375,  667],
     ['iPhone 14',        390,  844],
     ['iPhone 14 Pro Max',430,  932],
     ['iPad mini',        768, 1024],
     ['iPad Pro 11"',     834, 1194],
-    ['Desktop',         1280,  800]
+    ['Desktop',         1180,  800],
+    ['Desktop breit',   1280,  800]
   ];
   var ZIEL = new URLSearchParams(location.search).get('ziel') || '/';
   var f = document.getElementById('f'), rahmen = document.getElementById('rahmen');
   var lbl = document.getElementById('lbl'), w = document.getElementById('w');
   var aktuell = null;
 
+  /* ── Was wird GEMALT? ───────────────────────────────────────────────────
+     Der Kasten aus getBoundingClientRect() beweist das nicht: in einem
+     zugeklappten <details> bleibt er stehen, obwohl Chrome den Inhalt per
+     content-visibility:hidden überspringt. Siehe Kopf dieser Datei. */
+  var SICHT = { checkOpacity: true, checkVisibilityCSS: true, contentVisibilityAuto: true };
+  function gemalt(el){
+    if (typeof el.checkVisibility !== 'function') return null;  // null = unbekannt
+    try { return el.checkVisibility(SICHT); } catch (e) { return null; }
+  }
+
+  /* ── Farbe: Text und sein EFFEKTIVER Grund als Paar ────────────────────
+     Einzeln ist jede Farbe immer richtig. Gemessen wird der erste Vorfahr
+     mit Fläche, und Alpha wird ausgerechnet, nicht geschätzt. */
+  function parse(c){
+    var m = String(c).match(/[\d.]+/g);
+    if (!m) return null;
+    return { r:+m[0], g:+m[1], b:+m[2], a: m.length > 3 ? +m[3] : 1 };
+  }
+  function mix(vorn, hinten){
+    var a = vorn.a;
+    return { r: vorn.r*a + hinten.r*(1-a), g: vorn.g*a + hinten.g*(1-a),
+             b: vorn.b*a + hinten.b*(1-a), a: 1 };
+  }
+  function effGrund(el, win){
+    var p = el, stapel = [];
+    while (p) {
+      var c = parse(win.getComputedStyle(p).backgroundColor);
+      if (c && c.a > 0) { stapel.push(c); if (c.a >= 1) break; }
+      p = p.parentElement;
+    }
+    if (!stapel.length) return { r:255, g:255, b:255, a:1 };
+    var out = stapel[stapel.length - 1];
+    if (out.a < 1) out = mix(out, { r:255, g:255, b:255, a:1 });
+    for (var i = stapel.length - 2; i >= 0; i--) out = mix(stapel[i], out);
+    return out;
+  }
+  function lum(c){
+    function k(v){ v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
+    return 0.2126*k(c.r) + 0.7152*k(c.g) + 0.0722*k(c.b);
+  }
+  function kontrast(a, b){
+    var l1 = lum(a), l2 = lum(b);
+    return Math.round(((Math.max(l1,l2)+0.05) / (Math.min(l1,l2)+0.05)) * 100) / 100;
+  }
+  function rgbTxt(c){ return 'rgb(' + Math.round(c.r) + ',' + Math.round(c.g) + ',' + Math.round(c.b) + ')'; }
+  function nam(el){
+    var k = (typeof el.className === 'string' ? el.className : '').trim();
+    return el.tagName.toLowerCase() + (el.id ? '#' + el.id : '')
+         + (k ? '.' + k.split(/\s+/).slice(0, 2).join('.') : '');
+  }
+
+  /* ── Der Messkern. Gibt ein Objekt zurück, nicht Text — damit ein
+        gebündelter Lauf sammeln kann, statt je Fläche einen Aufruf zu
+        kosten. ─────────────────────────────────────────────────────────── */
+  function messe(d, win, label){
+    var body = d.body, W = win.innerWidth, H = win.innerHeight;
+    var alle = [].slice.call(d.querySelectorAll('body *'));
+    var r = { flaeche: label || '', vw: W, vh: H };
+    r.ueberlauf = Math.max(d.documentElement.scrollWidth, body ? body.scrollWidth : 0) - W;
+
+    /* (1) ragt heraus OHNE klippenden Vorfahren — gegen den Vorfahren
+           prüfen, nicht gegen den Viewport: ein herausgescrolltes Element
+           meldet seine ungescrollte Lage. */
+    var raus = [], uebersprungen = 0;
+    alle.forEach(function(el){
+      if (gemalt(el) === false) { uebersprungen++; return; }
+      var b = el.getBoundingClientRect();
+      if (b.width === 0 || b.height === 0) return;
+      if (b.right <= W + 1) return;
+      var p = el.parentElement, klippt = false;
+      while (p && p !== body) {
+        var ov = win.getComputedStyle(p).overflowX;
+        if (ov === 'auto' || ov === 'scroll' || ov === 'hidden') { klippt = true; break; }
+        p = p.parentElement;
+      }
+      if (!klippt) raus.push({ t: nam(el).slice(0, 34), px: Math.round(b.right - W) });
+    });
+    raus.sort(function(a, b){ return b.px - a.px; });
+    r.raus = raus.slice(0, 8); r.rausN = raus.length;
+    r.uebersprungen = uebersprungen;
+
+    /* (2) Scrollflächen: entweder passt der Inhalt, oder er ist wischbar
+           UND der Balken ist sichtbar. Eine stumme Scrollfläche schneidet
+           ab, ohne es zu sagen. scrollbar-width:none nimmt den Balken weg. */
+    var scroll = [];
+    alle.forEach(function(el){
+      if (gemalt(el) === false) return;
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+      var cs = win.getComputedStyle(el), ov = cs.overflowX;
+      scroll.push({
+        t: nam(el).slice(0, 30), sw: el.scrollWidth, cw: el.clientWidth,
+        wischbar: ov === 'auto' || ov === 'scroll',
+        balken: el.offsetHeight - el.clientHeight,
+        sbw: cs.scrollbarWidth || 'auto'
+      });
+    });
+    r.scroll = scroll.slice(0, 10); r.scrollN = scroll.length;
+    r.stumm = scroll.filter(function(s){
+      return !s.wischbar || s.sbw === 'none' || s.balken === 0;
+    }).length;
+
+    /* (3) Bedienelemente: Größe UND Treffbarkeit. Eine Fläche, die groß
+           genug ist, aber unter einem Nachbarn liegt, ist nicht bedienbar —
+           das sagt nur elementFromPoint. Auf dem Finger gibt es kein
+           :hover, also wird nichts aufgedeckt. */
+    var bed = [].slice.call(d.querySelectorAll('a,button,input,select,textarea,[role=button],[role=tab],label'));
+    var klein = [], verdeckt = [], gesamt = 0, bedUeber = 0;
+    bed.forEach(function(el){
+      if (gemalt(el) === false) { bedUeber++; return; }
+      var b = el.getBoundingClientRect();
+      if (b.width === 0 || b.height === 0) { bedUeber++; return; }
+      gesamt++;
+      if (b.height < 40 || b.width < 40) {
+        klein.push(nam(el).slice(0, 30) + ' ' + Math.round(b.width) + '×' + Math.round(b.height));
+      }
+      var cx = b.left + b.width/2, cy = b.top + b.height/2;
+      if (cx < 0 || cy < 0 || cx > W || cy > H) return;
+      var hit = d.elementFromPoint(cx, cy);
+      if (!hit) { verdeckt.push(nam(el).slice(0, 26) + ' → nichts'); return; }
+      if (hit !== el && !el.contains(hit) && !hit.contains(el)) {
+        verdeckt.push(nam(el).slice(0, 26) + ' ' + Math.round(b.width) + '×' + Math.round(b.height)
+                      + ' → ' + nam(hit).slice(0, 22));
+      }
+    });
+    r.bedGesamt = gesamt; r.bedUeber = bedUeber;
+    r.klein = klein.slice(0, 12); r.kleinN = klein.length;
+    r.verdeckt = verdeckt.slice(0, 12); r.verdecktN = verdeckt.length;
+
+    /* (4) Kontrast als Paar, über ALLE Texträger — nicht mit dem Auge.
+           Nur eigene Textknoten, sonst zählt jeder Behälter den Text seiner
+           Kinder noch einmal mit. */
+    var schwach = [];
+    alle.forEach(function(el){
+      if (gemalt(el) === false) return;
+      var txt = '';
+      for (var i = 0; i < el.childNodes.length; i++) {
+        if (el.childNodes[i].nodeType === 3) txt += el.childNodes[i].nodeValue;
+      }
+      txt = txt.trim();
+      if (txt.length < 2) return;
+      var b = el.getBoundingClientRect();
+      if (b.width < 4 || b.height < 4) return;
+      var cs = win.getComputedStyle(el), fg0 = parse(cs.color);
+      if (!fg0) return;
+      var grund = effGrund(el, win);
+      var fg = fg0.a < 1 ? mix(fg0, grund) : fg0;
+      var k = kontrast(fg, grund);
+      var fs = parseFloat(cs.fontSize);
+      var gross = fs >= 24 || (fs >= 18.66 && +cs.fontWeight >= 700);
+      if (k < (gross ? 3 : 4.5)) {
+        schwach.push({ t: nam(el).slice(0, 26), txt: txt.slice(0, 20),
+                       fg: rgbTxt(fg), grund: rgbTxt(grund), k: k, fs: cs.fontSize });
+      }
+    });
+    schwach.sort(function(a, b){ return a.k - b.k; });
+    r.kontrast = schwach.slice(0, 8); r.kontrastN = schwach.length;
+    return r;
+  }
+
+  /* ── Darstellung eines Messobjekts ────────────────────────────────────── */
+  function zeige(r){
+    var t = '<h2>MESSWERTE · ' + (aktuell ? aktuell[0] : '') + '</h2>';
+    t += 'Viewport      ' + r.vw + ' × ' + r.vh + '\n';
+    t += 'Überlauf      ' + (r.ueberlauf > 1
+      ? '<span class="bad">' + r.ueberlauf + ' px zu breit</span>'
+      : '<span class="ok">keiner</span>') + '\n';
+    t += 'Klickflächen  ' + r.bedGesamt + ', davon ' + (r.kleinN
+      ? '<span class="warn">' + r.kleinN + ' unter 40 px</span>'
+      : '<span class="ok">keine zu klein</span>')
+      + '\n              <span class="leise">' + r.bedUeber + ' ungemalt übersprungen '
+      + '(zugeklappte &lt;details&gt;, display:none)</span>\n';
+    t += 'Treffbarkeit  ' + (r.verdecktN
+      ? '<span class="bad">' + r.verdecktN + ' verdeckt</span>'
+      : '<span class="ok">alle treffbar</span>') + '\n';
+    t += 'Scrollflächen ' + r.scrollN + (r.stumm
+      ? ', <span class="bad">' + r.stumm + ' stumm</span>'
+      : (r.scrollN ? ', <span class="ok">alle wischbar mit Balken</span>' : '')) + '\n';
+    t += 'Kontrast      ' + (r.kontrastN
+      ? '<span class="bad">' + r.kontrastN + ' Paare unter der Schwelle</span>'
+      : '<span class="ok">alle Paare halten</span>') + '\n';
+    if (r.raus.length) {
+      t += '\n<span class="bad">RAGT HERAUS</span>\n';
+      r.raus.forEach(function(x){ t += '  ' + x.t + '  +' + x.px + ' px\n'; });
+      if (r.rausN > r.raus.length) t += '  … und ' + (r.rausN - r.raus.length) + ' weitere\n';
+    }
+    if (r.verdeckt.length) {
+      t += '\n<span class="bad">VERDECKT</span>\n';
+      r.verdeckt.forEach(function(x){ t += '  ' + x + '\n'; });
+    }
+    if (r.kontrast.length) {
+      t += '\n<span class="bad">KONTRAST</span>\n';
+      r.kontrast.forEach(function(x){
+        t += '  ' + x.k + '  ' + x.t + '  „' + x.txt + '"\n        '
+           + x.fg + ' auf ' + x.grund + '\n';
+      });
+    }
+    if (r.stumm) {
+      t += '\n<span class="warn">SCROLLFLÄCHEN</span>\n';
+      r.scroll.forEach(function(s){
+        t += '  ' + s.t + '  ' + s.sw + '>' + s.cw
+           + (s.wischbar ? '' : '  nicht wischbar')
+           + (s.sbw === 'none' ? '  Balken aus' : '')
+           + (s.balken === 0 ? '  kein Balkenplatz' : '') + '\n';
+      });
+    }
+    w.innerHTML = t.replace(/\n/g, '<br>');
+  }
+
+  /* ── Harness: EIN Aufruf je Aussehen und Breite ───────────────────────── */
+  function ziel(){ return { d: f.contentDocument, win: f.contentWindow }; }
+
+  function setzeMerker(layout){
+    try {
+      if (layout === '' || layout === null) window.localStorage.removeItem('dp_layout');
+      else window.localStorage.setItem('dp_layout', layout);
+      window.localStorage.setItem('dp_layout_gewaehlt', '1');
+    } catch (e) {}
+  }
+
+  function lade(breite, layout, hoehe){
+    setzeMerker(layout);
+    rahmen.style.width  = (breite + 2) + 'px';          /* +2 für den Rahmen */
+    rahmen.style.height = Math.min(hoehe || 780, 760) + 'px';
+    lbl.textContent = breite + ' px · ' + (layout === '' ? 'Heute' : layout);
+    aktuell = [ (layout === '' ? 'Heute' : layout) + ' @ ' + breite, breite, hoehe || 780 ];
+    return new Promise(function(fertig){
+      var los = false;
+      function da(){ if (los) return; los = true; setTimeout(fertig, 3600); }
+      f.addEventListener('load', da, { once: true });
+      setTimeout(da, 22000);
+      f.src = ZIEL + (ZIEL.indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
+    });
+  }
+
+  function schlaf(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  /* Über die Reiter schleifen mit einem ECHTEN Klickweg (el.click() löst das
+     Ereignis aus — der Unterschied zu setAttribute, vor dem die Doktrin
+     warnt, ist genau dieser). Alles in EINEM Lauf: zwölf Aufrufe statt 110. */
+  async function reiterLauf(warte){
+    var z = ziel(), out = [];
+    var btns = [].slice.call(z.d.querySelectorAll('nav.tabs button.tab'));
+    for (var i = 0; i < btns.length; i++) {
+      var b = btns[i];
+      var name = (b.getAttribute('data-tab') || b.textContent || '?').trim().slice(0, 22);
+      b.click();
+      await schlaf(warte || 160);
+      out.push(messe(z.d, z.win, 'Reiter ' + name));
+    }
+    return out;
+  }
+
+  async function lauf(opt){
+    opt = opt || {};
+    await lade(opt.breite || 390, opt.layout === undefined ? '' : opt.layout, opt.hoehe);
+    var z = ziel();
+    var erg = {
+      breite: opt.breite || 390,
+      layout: opt.layout === undefined ? '' : opt.layout,
+      gesetzt: z.d.documentElement.getAttribute('data-dp-layout'),
+      iw: z.win.innerWidth,
+      start: messe(z.d, z.win, 'Start')
+    };
+    if (opt.reiter !== false) erg.reiter = await reiterLauf(opt.warte);
+    zeige(erg.start);
+    return erg;
+  }
+
+  /* ── Knöpfe ───────────────────────────────────────────────────────────── */
   GERAETE.forEach(function(g, i){
     var b = document.createElement('button');
     b.textContent = g[0] + ' · ' + g[1];
@@ -78,75 +386,28 @@
 
   function waehle(i){
     var g = GERAETE[i];
-    aktuell = g;
     [].forEach.call(document.querySelectorAll('#g button'), function(b, k){
       b.className = k === i ? 'an' : '';
     });
-    rahmen.style.width = g[1] + 'px';
+    aktuell = g;
+    rahmen.style.width  = g[1] + 'px';
     rahmen.style.height = Math.min(g[2], 760) + 'px';
     lbl.textContent = g[0] + ' — ' + g[1] + '×' + g[2];
     f.src = ZIEL + (ZIEL.indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
   }
 
-  f.addEventListener('load', function(){ setTimeout(messen, 1400); });
+  f.addEventListener('load', function(){ setTimeout(function(){
+    var z = ziel();
+    if (!z.d) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Dokument</span>'; return; }
+    try { zeige(messe(z.d, z.win, 'Start')); }
+    catch (e) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">' + e.message + '</span>'; }
+  }, 2400); });
 
-  function messen(){
-    var d, win;
-    try { d = f.contentDocument; win = f.contentWindow; }
-    catch(e){ w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Zugriff: ' + e.message + '</span>'; return; }
-    if (!d) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Dokument</span>'; return; }
+  window.DPM = { messe: messe, zeige: zeige, lade: lade, lauf: lauf,
+                 reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
+                 kontrast: kontrast, gemalt: gemalt, geraete: GERAETE };
 
-    var de = d.documentElement, body = d.body;
-    var breite = win.innerWidth;
-    var ueberlauf = Math.max(de.scrollWidth, body ? body.scrollWidth : 0) - breite;
-
-    /* Was ragt heraus? Gegen den klippenden Vorfahren prüfen, nicht gegen
-       den Viewport — sonst zählt jedes Element in einem Scrollcontainer mit. */
-    var raus = [];
-    if (body) [].forEach.call(d.querySelectorAll('body *'), function(el){
-      var r = el.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      if (r.right > breite + 1) {
-        var p = el.parentElement, klippt = false;
-        while (p && p !== body) {
-          var ov = win.getComputedStyle(p).overflowX;
-          if (ov === 'auto' || ov === 'scroll' || ov === 'hidden') { klippt = true; break; }
-          p = p.parentElement;
-        }
-        if (!klippt) raus.push({
-          t: (el.tagName.toLowerCase() + '.' + (el.className || '').toString().split(' ')[0]).slice(0, 34),
-          px: Math.round(r.right - breite)
-        });
-      }
-    });
-    raus.sort(function(a,b){ return b.px - a.px; });
-
-    /* Klickflächen unter 44 px sind auf dem Finger schwer zu treffen. */
-    var klein = 0, gesamt = 0;
-    if (body) [].forEach.call(d.querySelectorAll('a,button,input,select,[role=button]'), function(el){
-      var r = el.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return;
-      gesamt++;
-      if (r.height < 40 || r.width < 40) klein++;
-    });
-
-    var txt = '<h2>MESSWERTE · ' + aktuell[0] + '</h2>';
-    txt += 'Viewport      ' + breite + ' × ' + win.innerHeight + '\n';
-    txt += 'Überlauf      ' + (ueberlauf > 1
-      ? '<span class="bad">' + ueberlauf + ' px zu breit</span>'
-      : '<span class="ok">keiner</span>') + '\n';
-    txt += 'Klickflächen  ' + gesamt + ', davon ' + (klein
-      ? '<span class="warn">' + klein + ' unter 40 px</span>'
-      : '<span class="ok">keine zu klein</span>') + '\n';
-    if (raus.length) {
-      txt += '\n<span class="bad">RAGT HERAUS</span>\n';
-      raus.slice(0, 8).forEach(function(r){ txt += '  ' + r.t + '  +' + r.px + ' px\n'; });
-      if (raus.length > 8) txt += '  … und ' + (raus.length - 8) + ' weitere\n';
-    }
-    w.innerHTML = txt.replace(/\n/g, '<br>');
-  }
-
-  waehle(1);
+  waehle(2);   /* iPhone 14 */
 })();
 </script>
 </body>
