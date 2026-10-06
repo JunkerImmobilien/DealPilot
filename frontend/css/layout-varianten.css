@@ -8380,3 +8380,44 @@ html[data-dp-layout][data-dp-layout] .sb-sort-toggle {
   background: transparent !important;
   border-color: rgba(191,183,169,.18) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1927 · DIE ADRESSE WURDE GEKUERZT, WEIL ICH ZWEIMAL PLATZ FREIGEHALTEN HABE
+
+   Marcel hat zwei Bilder nebeneinandergelegt — `Objektkarte_Desktop_1180.png`
+   und `Objektkarte_IPhone14.png`. Der Unterschied ist auf einen Blick da:
+
+     Schreibtisch   „Sachsenstraße 18, Herford"   vollständig, keine Knöpfe
+     iPhone 14      „Sachsenstraße …"             gekürzt, zwei Knöpfe daneben
+
+   GEMESSEN, und die Ursache ist meine eigene:
+
+     .sbc-address   clientWidth 167 · scrollWidth 223  ->  gekürzt
+     .sbc-address   padding-right  **72 px**   (gab es vorher schon)
+     .sbc-top       padding-right  **115 px**  (von mir, v1915)
+     reiner Text    151 px in 11px JetBrains Mono (nachgemessen)
+
+   **Der Text braucht 151 px. Die Karte ist 321 breit. Es war nie zu wenig
+   Platz — ich habe ihn zweimal weggenommen.** Die Adresse hielt bereits 72 px
+   für die Aktionsknöpfe frei; in v1915 habe ich dieselbe Lücke ein zweites Mal
+   am Elternteil reserviert, weil ich die Überlappung gesehen, aber nicht
+   nachgesehen hatte, ob sie schon versorgt ist.
+
+   > **Bevor man Platz freihält, nachsehen, ob ihn jemand schon freihält.**
+   > Zwei Polster für dasselbe Element addieren sich — und das Ergebnis sieht
+   > aus wie zu wenig Raum, obwohl das Gegenteil der Fall ist.
+
+   Mein Polster fällt weg. Die Adresse bekommt damit 321 − 8 − 72 = **241 px**
+   für 151 px Text und steht vollständig da, wie am Schreibtisch.
+
+   DIE KNOEPFE BLEIBEN SICHTBAR. Am Schreibtisch erscheinen sie erst beim
+   Zeigen mit der Maus — auf dem Handy gibt es kein Zeigen, und sie waren
+   deshalb schon einmal unerreichbar (behoben am 06.10., „Kopieren/Löschen auf
+   dem Handy tot"). Eine Optik zurückzuholen, die eine Funktion kostet, wäre
+   der schlechtere Tausch.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top {
+    padding-right: 7px !important;
+  }
+}
