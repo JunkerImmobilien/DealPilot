@@ -8259,3 +8259,76 @@ html[data-dp-layout][data-dp-layout] aside.sidebar#sidebar::-webkit-scrollbar-th
 html[data-dp-layout][data-dp-layout] .dpl-schiene::-webkit-scrollbar-thumb {
   background: rgba(191,183,169,.38) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1924 · DIE SUCHE AUCH AM SCHREIBTISCH, UND DIE KARTEN AUF EINE HOEHE
+
+   Marcel am 06.10.2026: „wenn wir jetzt auf die Desktop-Version wechseln, dann
+   haben wir das Gleiche mit diesem Doppelrahmen und der Suche. Und da könnten
+   wir es auch umstellen in dieser Optik. … wenn du einmal umstellst auf Desktop,
+   1180, dann siehst du, wie die Objektkarteien angegeben werden. So sollten sie
+   halt auch angezeigt werden, wenn ich dann auf iPhone 14 umstelle."
+
+   ── A · DER DOPPELRAHMEN GIBT ES AM SCHREIBTISCH GENAUSO ─────────────────
+
+   GEMESSEN bei 1177 px in der Schiene:
+
+     .sb-search-box   Rahmen **Gold/0,25**, Text Gold/0,55
+     #sb-search-input Rahmen **rgb(42,38,34)**   <- der zweite
+     svg (Lupe)       **Gold/0,55**
+
+   **Ich hatte das in v1923 nur unter 900 px behoben.** Marcel hat den
+   Schreibtisch ausdrücklich eingeschlossen — der Block kommt deshalb aus der
+   Medienabfrage heraus.
+
+   > Eine Abweichung, die auf beiden Breiten gleich ist, ist kein
+   > Handy-Problem. Sie gehört an beiden Stellen behoben oder an keiner.
+
+   ── B · SCORE UND AKTIONEN AUF DIE HOEHE DES SCHREIBTISCHS ───────────────
+
+   Die Datenzeile, Element für Element gegeneinander gelegt:
+
+     Element     Schreibtisch 1180        Handy 387
+     ─────────   ──────────────────────   ──────────────────────
+     Karte       216 x 45                 321 x 43
+     Nummer      59 x 13, links 7, ob 11  59 x 13, links 8, ob 10   gleich
+     Adresse     172 x 14, links 7, ob 27 167 x 14, links 8, ob 25  gleich
+     Score       26 x **32**, oben 13     26 x **26**, oben 9
+     Aktionen    **61** x **32**, oben 13 **73** x **26**, oben 9
+
+   **Text und Nummer sitzen bereits auf dem Pixel gleich.** Was abweicht, sind
+   Score und Aktionen: sechs Pixel flacher, die Knopfgruppe zwölf Pixel breiter.
+   Die Karte ist dadurch 43 statt 45 px hoch.
+
+   Dass die Knöpfe auf dem Handy breiter sind, hat einen Grund — ein Finger
+   braucht mehr als ein Mauszeiger. **Die HOEHE angleichen kostet nichts**, die
+   Breite behalte ich. Damit stehen beide Karten auf 45 px.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── A · Suche: ein Rahmen, keine goldene Lupe — auf BEIDEN Breiten ──────── */
+html[data-dp-layout][data-dp-layout] .sb-search-box {
+  border-color: rgb(230,225,214) !important;
+  background: transparent !important;
+  color: rgb(191,183,169) !important;
+}
+html[data-dp-layout][data-dp-layout] #sb-search-input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+html[data-dp-layout][data-dp-layout] .sb-search-box svg {
+  color: rgb(191,183,169) !important;
+  stroke: rgb(191,183,169) !important;
+}
+
+/* ── B · Score und Aktionen auf die Hoehe des Schreibtischs ──────────────── */
+@media (max-width: 900px) {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top {
+    min-height: 45px !important;
+  }
+}
