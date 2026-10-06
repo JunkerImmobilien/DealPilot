@@ -320,6 +320,17 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                09162000 schon ezfh und rmh, und eine Kreis-Sperre koennte
                                sie verdecken. */
                             'lzs-swf-by-2026-sperren.json', 'lzs-by-bw-2026.json', /* v1891: Zinssaetze Baden-Wuerttemberg (Singen, Horb, Wangen, Pfullingen, Bruchsal) */ 'swf-by-bw-2026.json', /* v1891: Sachwertfaktoren Singen, dazu die Sperren mit Bezugsweg */ /* BY · 748 Sperren */
+                            /* v1926 (Ernte-Durchsicht der 139 amtlichen PDFs): Landkreis
+                               Rostock, sechs Sperren (vier Zinssatz-Gebaeudetypen, zwei
+                               Sachwertfaktor-Zweige). Der Bericht ist KOSTENLOS abrufbar und
+                               fuehrt die Werte vollstaendig in den Tabellen 11 bis 13 und
+                               Tabelle 18 — er erlaubt die Verbreitung aber nur mit Genehmigung
+                               des Herausgebers (S. 3). Also dieselbe Sperre wie Kiel: die
+                               LIZENZ sperrt, nicht die Verfuegbarkeit, und der Satz traegt den
+                               Weg dorthin (gaa@lkros.de) statt einer Zahl.
+                               13072 war die letzte Luecke unter den im Register gefuehrten
+                               MV-Landkreisen (13071, 13073, 13076 liegen). */
+                            'lzs-swf-mv-rostock-2026-sperren.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

@@ -53,8 +53,22 @@ Kennzahlen im Register liegen — Liegenschaftszinssatz (§ 21 Abs. 2) und
 Sachwertfaktor (§ 21 Abs. 3) — und für jeden Ausschuss soll **in der Datenbank
 stehen, woher die Zahl kommt**: Link, Jahrgang, Lizenz, Stichtag, Seite. Ohne
 diese Liste fängt die jährliche Nachernte jedes Mal bei der Recherche an.
-Stand: **6 von 16 Ländern**, rund 40 % der Einwohner beim Zins, 25 % beim
-Faktor. Ablauf, Datenbankstruktur und Quellenregister stehen in
+
+**Stand 06.10.2026, am Register gemessen (58 Dateien, 4.813 Sätze): alle 16
+Länder sind vertreten.** 2.528 Zinssatz- und 1.257 Sachwertfaktor-Sätze,
+davon rund 2.540 mit Wert und rund 1.250 als Sperre. Ohne einen einzigen
+**Zinssatz**-Wert sind nur noch **BY** (376 Sperren) und **SL** (24). Unter
+drei **Faktor**-Werten liegen BY (2), HH (2), RP (1), SL (0).
+
+> **Hier stand bis zum 06.10.2026 „6 von 16 Ländern, rund 40 % der
+> Einwohner beim Zins, 25 % beim Faktor".** Das wies Arbeit als offen aus,
+> die längst erledigt war — gefunden bei der Durchsicht der 139 amtlichen
+> PDFs auf Staging. **Die Einwohnerquote ist bewusst gestrichen und nicht
+> ersetzt:** sie war nicht nachgemessen, und eine Prozentzahl ohne Messung
+> ist schlimmer als keine. Wer sie braucht, rechnet sie über die `ags` je
+> Land aus und schreibt die Methode dazu.
+
+Ablauf, Datenbankstruktur und Quellenregister stehen in
 `claude/projektanweisung-marktbericht-20260812-abend.md`; die offenen Punkte im
 Backlog unter „MARKTBERICHT / ERNTE — Workstream (D)".
 
@@ -501,12 +515,29 @@ zeigt sie als Block „Quellennachweis", das PDF druckt sie mit Kennzahl und URL
 wirklich steckt. Eine Namensnennung für einen Ausschuss, der gar nicht
 vorkommt, ist genauso falsch wie eine fehlende — sie behauptet eine Herkunft.
 
-**Offen ist nur noch eine Kleinigkeit:** 28 Sätze führen keinen Vermerk. 17
-davon stehen unter `zero-2-0`, wo keine Namensnennung verlangt ist — das ist
-richtig so. Bei **elf** (Dortmund 3, Duisburg 4, Essen 2, München 2) fehlt
-dagegen die **Lizenzangabe selbst**. Ohne sie lässt sich nicht entscheiden, ob
-ein Vermerk nötig wäre. Nachzutragen, wenn diese Sätze ohnehin angefasst
-werden.
+**Offen ist eine Kleinigkeit, am 06.10.2026 neu gemessen:** von den
+LZS/SWF-**Werten** führen **172 keinen Quellenvermerk** — aber **169 davon
+stehen unter `zero-2-0`**, wo keine Namensnennung verlangt ist. Das ist
+richtig so und kein offener Punkt.
+
+Echt offen sind zwei kleine Listen:
+- **19 Werte ohne jede Lizenzangabe:** 14× BB Oberer Gutachterausschuss
+  (`lzs-bb.json`), 2× BY (`sued-nord.json`), 2× NW (`swf-nrw.json`),
+  1× ST (`ost.json`). Ohne Lizenz lässt sich nicht entscheiden, ob ein
+  Vermerk nötig wäre.
+- **5 Werte, die weder Lizenz noch Vermerk führen** — die Schnittmenge der
+  Liste oben.
+
+Nachzutragen, wenn diese Sätze ohnehin angefasst werden.
+
+> **Hier stand bis zum 06.10.2026 „28 Sätze … bei elf (Dortmund 3,
+> Duisburg 4, Essen 2, München 2) fehlt die Lizenzangabe selbst".** Keine
+> der vier Städte steht heute auf der Liste, und es sind 19, nicht 11 —
+> die Zahlen sind seit der Messung durch mehrere Erntelinien gewandert.
+> **Eine namentliche Liste in CLAUDE.md veraltet schneller als die
+> Messung**, deshalb steht jetzt die Datei dabei: `lzs-bb.json`,
+> `sued-nord.json`, `swf-nrw.json`, `ost.json` sind der Einstieg, die
+> aktuelle Liste liefert ein Lauf über das Register.
 
 ---
 

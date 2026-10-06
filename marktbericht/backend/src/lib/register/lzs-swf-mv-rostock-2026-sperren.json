@@ -1,0 +1,254 @@
+[
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "Einfamilienhäuser: Einfamilien- und Zweifamilienhäuser, Reihenmittel- und Reihenendhäuser und Doppelhaushälften",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Berichtszeitraum 01.01.2024 bis 31.12.2024, Redaktionsschluss 03.01.2025. Kein Stichtag hinterlegt, weil kein Wert übernommen wird.",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.landkreis-rostock.de/de/gutachterausschuss.html",
+  "quelle_parser": "v1926-hand (pdftotext -layout, Abschnitte/Seiten siehe belege, am 06.10.2026 gelesen)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Wörtlich S. 3: \"Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.\" Keine offene Datenlizenz. Hier wird kein Wert übernommen, nur die Angabe, DASS keiner frei verwendbar vorliegt — und der Weg dorthin.",
+  "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3",
+  "seite": null,
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel (§ 10 ImmoWertV): die drei übrigen im Register geführten MV-Landkreise (13071, 13073, 13076) führen eigene Modelle mit eigenen Parametern."
+  ],
+  "warum_kein_wert": "HIER SPERRT DIE LIZENZ, NICHT DIE VERFÜGBARKEIT. Der Grundstücksmarktbericht 2025 des Landkreises Rostock ist kostenlos im Geoshop des Landkreises abrufbar (gedruckt 60,00 EUR) und führt die Werte vollständig — er erlaubt aber wörtlich nur eine Vervielfältigung und Verbreitung \"mit Genehmigung des Herausgebers\" (S. 3, Abschnitt \"Vervielfältigung und Verbreitung\"). Ein DealPilot-Kundenbericht ist eine Verbreitung und damit nicht freigegeben. Dieselbe Sperre wie bei Kiel und beim Dresdner Bericht vor der Erlaubnis. WEG ZUM WERT: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Rostock einholen (gaa@lkros.de). Liegt sie vor, ist die Ernte eine Lesearbeit von wenigen Stunden — am 06.10.2026 am Dokument gemessen stehen die Zahlen fertig in Tabelle 11 (Sachwertfaktoren im regionalen Teilmarkt, 5 Teilmärkte), Tabelle 12 (freistehende Ein- und Zweifamilienhäuser, abgeleitet aus 675 Kauffällen), Tabelle 13 (Doppelhaushälften und Reihenhäuser) und in Abschnitt 3.6.5 mit Tabelle 18 (Modellparameter, 232 Kauffälle, vier Gebäudetypen). KEIN Nachbarkreis und kein Landesmittel: Mecklenburg-Vorpommern führt für 13071, 13073 und 13076 eigene Modelle mit eigenen Parametern — eine Übertragung wäre nach § 10 ImmoWertV falsch.",
+  "unvollstaendig_grund": "Lizenzsperre, keine Verfügbarkeitslücke: der Bericht ist kostenlos abrufbar und führt die Werte, erlaubt die Verbreitung aber nur mit Genehmigung des Herausgebers (S. 3). Weg zum Wert: Genehmigung einholen (gaa@lkros.de).",
+  "vollstaendig": false
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser: Dreifamilienhäuser, Mehrfamilienhäuser, Wohn- und Geschäftshäuser mit überwiegender Wohnnutzung",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Berichtszeitraum 01.01.2024 bis 31.12.2024, Redaktionsschluss 03.01.2025. Kein Stichtag hinterlegt, weil kein Wert übernommen wird.",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.landkreis-rostock.de/de/gutachterausschuss.html",
+  "quelle_parser": "v1926-hand (pdftotext -layout, Abschnitte/Seiten siehe belege, am 06.10.2026 gelesen)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Wörtlich S. 3: \"Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.\" Keine offene Datenlizenz. Hier wird kein Wert übernommen, nur die Angabe, DASS keiner frei verwendbar vorliegt — und der Weg dorthin.",
+  "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3",
+  "seite": null,
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel (§ 10 ImmoWertV): die drei übrigen im Register geführten MV-Landkreise (13071, 13073, 13076) führen eigene Modelle mit eigenen Parametern."
+  ],
+  "warum_kein_wert": "HIER SPERRT DIE LIZENZ, NICHT DIE VERFÜGBARKEIT. Der Grundstücksmarktbericht 2025 des Landkreises Rostock ist kostenlos im Geoshop des Landkreises abrufbar (gedruckt 60,00 EUR) und führt die Werte vollständig — er erlaubt aber wörtlich nur eine Vervielfältigung und Verbreitung \"mit Genehmigung des Herausgebers\" (S. 3, Abschnitt \"Vervielfältigung und Verbreitung\"). Ein DealPilot-Kundenbericht ist eine Verbreitung und damit nicht freigegeben. Dieselbe Sperre wie bei Kiel und beim Dresdner Bericht vor der Erlaubnis. WEG ZUM WERT: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Rostock einholen (gaa@lkros.de). Liegt sie vor, ist die Ernte eine Lesearbeit von wenigen Stunden — am 06.10.2026 am Dokument gemessen stehen die Zahlen fertig in Tabelle 11 (Sachwertfaktoren im regionalen Teilmarkt, 5 Teilmärkte), Tabelle 12 (freistehende Ein- und Zweifamilienhäuser, abgeleitet aus 675 Kauffällen), Tabelle 13 (Doppelhaushälften und Reihenhäuser) und in Abschnitt 3.6.5 mit Tabelle 18 (Modellparameter, 232 Kauffälle, vier Gebäudetypen). KEIN Nachbarkreis und kein Landesmittel: Mecklenburg-Vorpommern führt für 13071, 13073 und 13076 eigene Modelle mit eigenen Parametern — eine Übertragung wäre nach § 10 ImmoWertV falsch.",
+  "unvollstaendig_grund": "Lizenzsperre, keine Verfügbarkeitslücke: der Bericht ist kostenlos abrufbar und führt die Werte, erlaubt die Verbreitung aber nur mit Genehmigung des Herausgebers (S. 3). Weg zum Wert: Genehmigung einholen (gaa@lkros.de).",
+  "vollstaendig": false
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart_bez": "Wohnungseigentum: Eigentumswohnungen mit Dauerwohnnutzung",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Berichtszeitraum 01.01.2024 bis 31.12.2024, Redaktionsschluss 03.01.2025. Kein Stichtag hinterlegt, weil kein Wert übernommen wird.",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.landkreis-rostock.de/de/gutachterausschuss.html",
+  "quelle_parser": "v1926-hand (pdftotext -layout, Abschnitte/Seiten siehe belege, am 06.10.2026 gelesen)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Wörtlich S. 3: \"Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.\" Keine offene Datenlizenz. Hier wird kein Wert übernommen, nur die Angabe, DASS keiner frei verwendbar vorliegt — und der Weg dorthin.",
+  "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3",
+  "seite": null,
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel (§ 10 ImmoWertV): die drei übrigen im Register geführten MV-Landkreise (13071, 13073, 13076) führen eigene Modelle mit eigenen Parametern."
+  ],
+  "warum_kein_wert": "HIER SPERRT DIE LIZENZ, NICHT DIE VERFÜGBARKEIT. Der Grundstücksmarktbericht 2025 des Landkreises Rostock ist kostenlos im Geoshop des Landkreises abrufbar (gedruckt 60,00 EUR) und führt die Werte vollständig — er erlaubt aber wörtlich nur eine Vervielfältigung und Verbreitung \"mit Genehmigung des Herausgebers\" (S. 3, Abschnitt \"Vervielfältigung und Verbreitung\"). Ein DealPilot-Kundenbericht ist eine Verbreitung und damit nicht freigegeben. Dieselbe Sperre wie bei Kiel und beim Dresdner Bericht vor der Erlaubnis. WEG ZUM WERT: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Rostock einholen (gaa@lkros.de). Liegt sie vor, ist die Ernte eine Lesearbeit von wenigen Stunden — am 06.10.2026 am Dokument gemessen stehen die Zahlen fertig in Tabelle 11 (Sachwertfaktoren im regionalen Teilmarkt, 5 Teilmärkte), Tabelle 12 (freistehende Ein- und Zweifamilienhäuser, abgeleitet aus 675 Kauffällen), Tabelle 13 (Doppelhaushälften und Reihenhäuser) und in Abschnitt 3.6.5 mit Tabelle 18 (Modellparameter, 232 Kauffälle, vier Gebäudetypen). KEIN Nachbarkreis und kein Landesmittel: Mecklenburg-Vorpommern führt für 13071, 13073 und 13076 eigene Modelle mit eigenen Parametern — eine Übertragung wäre nach § 10 ImmoWertV falsch.",
+  "unvollstaendig_grund": "Lizenzsperre, keine Verfügbarkeitslücke: der Bericht ist kostenlos abrufbar und führt die Werte, erlaubt die Verbreitung aber nur mit Genehmigung des Herausgebers (S. 3). Weg zum Wert: Genehmigung einholen (gaa@lkros.de).",
+  "vollstaendig": false
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "objektart_bez": "Gewerbliche Objekte: Büro-, Verwaltungs- und Geschäftshäuser, Industrie- und Gewerbeobjekte, Einzelhandelseinrichtungen",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Berichtszeitraum 01.01.2024 bis 31.12.2024, Redaktionsschluss 03.01.2025. Kein Stichtag hinterlegt, weil kein Wert übernommen wird.",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.landkreis-rostock.de/de/gutachterausschuss.html",
+  "quelle_parser": "v1926-hand (pdftotext -layout, Abschnitte/Seiten siehe belege, am 06.10.2026 gelesen)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Wörtlich S. 3: \"Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.\" Keine offene Datenlizenz. Hier wird kein Wert übernommen, nur die Angabe, DASS keiner frei verwendbar vorliegt — und der Weg dorthin.",
+  "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitt 3.6.5 \"Liegenschaftszinssatz\" (S. 51) mit Tabelle 18 \"Modellparameter zur Ableitung von Liegenschaftszinsätzen\"; Lizenzvermerk S. 3",
+  "seite": null,
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel (§ 10 ImmoWertV): die drei übrigen im Register geführten MV-Landkreise (13071, 13073, 13076) führen eigene Modelle mit eigenen Parametern."
+  ],
+  "warum_kein_wert": "HIER SPERRT DIE LIZENZ, NICHT DIE VERFÜGBARKEIT. Der Grundstücksmarktbericht 2025 des Landkreises Rostock ist kostenlos im Geoshop des Landkreises abrufbar (gedruckt 60,00 EUR) und führt die Werte vollständig — er erlaubt aber wörtlich nur eine Vervielfältigung und Verbreitung \"mit Genehmigung des Herausgebers\" (S. 3, Abschnitt \"Vervielfältigung und Verbreitung\"). Ein DealPilot-Kundenbericht ist eine Verbreitung und damit nicht freigegeben. Dieselbe Sperre wie bei Kiel und beim Dresdner Bericht vor der Erlaubnis. WEG ZUM WERT: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Rostock einholen (gaa@lkros.de). Liegt sie vor, ist die Ernte eine Lesearbeit von wenigen Stunden — am 06.10.2026 am Dokument gemessen stehen die Zahlen fertig in Tabelle 11 (Sachwertfaktoren im regionalen Teilmarkt, 5 Teilmärkte), Tabelle 12 (freistehende Ein- und Zweifamilienhäuser, abgeleitet aus 675 Kauffällen), Tabelle 13 (Doppelhaushälften und Reihenhäuser) und in Abschnitt 3.6.5 mit Tabelle 18 (Modellparameter, 232 Kauffälle, vier Gebäudetypen). KEIN Nachbarkreis und kein Landesmittel: Mecklenburg-Vorpommern führt für 13071, 13073 und 13076 eigene Modelle mit eigenen Parametern — eine Übertragung wäre nach § 10 ImmoWertV falsch.",
+  "unvollstaendig_grund": "Lizenzsperre, keine Verfügbarkeitslücke: der Bericht ist kostenlos abrufbar und führt die Werte, erlaubt die Verbreitung aber nur mit Genehmigung des Herausgebers (S. 3). Weg zum Wert: Genehmigung einholen (gaa@lkros.de).",
+  "vollstaendig": false
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser (Tabelle 12)",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitte 3.6.1.2 \"Sachwertfaktoren\" (S. 41) und 3.6.1.3 \"Sachwertfaktoren nach vorläufigem Sachwert und Bodenrichtwertniveau\" (S. 42) mit Tabellen 11 bis 13; Lizenzvermerk S. 3"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Berichtszeitraum 01.01.2024 bis 31.12.2024, Redaktionsschluss 03.01.2025. Kein Stichtag hinterlegt, weil kein Wert übernommen wird.",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.landkreis-rostock.de/de/gutachterausschuss.html",
+  "quelle_parser": "v1926-hand (pdftotext -layout, Abschnitte/Seiten siehe belege, am 06.10.2026 gelesen)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Wörtlich S. 3: \"Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.\" Keine offene Datenlizenz. Hier wird kein Wert übernommen, nur die Angabe, DASS keiner frei verwendbar vorliegt — und der Weg dorthin.",
+  "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitte 3.6.1.2 \"Sachwertfaktoren\" (S. 41) und 3.6.1.3 \"Sachwertfaktoren nach vorläufigem Sachwert und Bodenrichtwertniveau\" (S. 42) mit Tabellen 11 bis 13; Lizenzvermerk S. 3",
+  "seite": null,
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel (§ 10 ImmoWertV): die drei übrigen im Register geführten MV-Landkreise (13071, 13073, 13076) führen eigene Modelle mit eigenen Parametern."
+  ],
+  "warum_kein_wert": "HIER SPERRT DIE LIZENZ, NICHT DIE VERFÜGBARKEIT. Der Grundstücksmarktbericht 2025 des Landkreises Rostock ist kostenlos im Geoshop des Landkreises abrufbar (gedruckt 60,00 EUR) und führt die Werte vollständig — er erlaubt aber wörtlich nur eine Vervielfältigung und Verbreitung \"mit Genehmigung des Herausgebers\" (S. 3, Abschnitt \"Vervielfältigung und Verbreitung\"). Ein DealPilot-Kundenbericht ist eine Verbreitung und damit nicht freigegeben. Dieselbe Sperre wie bei Kiel und beim Dresdner Bericht vor der Erlaubnis. WEG ZUM WERT: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Rostock einholen (gaa@lkros.de). Liegt sie vor, ist die Ernte eine Lesearbeit von wenigen Stunden — am 06.10.2026 am Dokument gemessen stehen die Zahlen fertig in Tabelle 11 (Sachwertfaktoren im regionalen Teilmarkt, 5 Teilmärkte), Tabelle 12 (freistehende Ein- und Zweifamilienhäuser, abgeleitet aus 675 Kauffällen), Tabelle 13 (Doppelhaushälften und Reihenhäuser) und in Abschnitt 3.6.5 mit Tabelle 18 (Modellparameter, 232 Kauffälle, vier Gebäudetypen). KEIN Nachbarkreis und kein Landesmittel: Mecklenburg-Vorpommern führt für 13071, 13073 und 13076 eigene Modelle mit eigenen Parametern — eine Übertragung wäre nach § 10 ImmoWertV falsch.",
+  "unvollstaendig_grund": "Lizenzsperre, keine Verfügbarkeitslücke: der Bericht ist kostenlos abrufbar und führt die Werte, erlaubt die Verbreitung aber nur mit Genehmigung des Herausgebers (S. 3). Weg zum Wert: Genehmigung einholen (gaa@lkros.de).",
+  "vollstaendig": false
+ },
+ {
+  "land_code": "MV",
+  "ags": "13072",
+  "ebene": "kreis",
+  "gebiet_name": "Rostock, Landkreis",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Rostock",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Doppelhaushälften und Reihenhäuser (Tabelle 13)",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitte 3.6.1.2 \"Sachwertfaktoren\" (S. 41) und 3.6.1.3 \"Sachwertfaktoren nach vorläufigem Sachwert und Bodenrichtwertniveau\" (S. 42) mit Tabellen 11 bis 13; Lizenzvermerk S. 3"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Berichtszeitraum 01.01.2024 bis 31.12.2024, Redaktionsschluss 03.01.2025. Kein Stichtag hinterlegt, weil kein Wert übernommen wird.",
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.landkreis-rostock.de/de/gutachterausschuss.html",
+  "quelle_parser": "v1926-hand (pdftotext -layout, Abschnitte/Seiten siehe belege, am 06.10.2026 gelesen)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "Wörtlich S. 3: \"Dieser Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Die Vervielfältigung und Verbreitung, auch auszugsweise, ist nur mit Genehmigung des Herausgebers erlaubt.\" Keine offene Datenlizenz. Hier wird kein Wert übernommen, nur die Angabe, DASS keiner frei verwendbar vorliegt — und der Weg dorthin.",
+  "fundstelle": "Grundstücksmarktbericht 2025 Landkreis Rostock, Abschnitte 3.6.1.2 \"Sachwertfaktoren\" (S. 41) und 3.6.1.3 \"Sachwertfaktoren nach vorläufigem Sachwert und Bodenrichtwertniveau\" (S. 42) mit Tabellen 11 bis 13; Lizenzvermerk S. 3",
+  "seite": null,
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel (§ 10 ImmoWertV): die drei übrigen im Register geführten MV-Landkreise (13071, 13073, 13076) führen eigene Modelle mit eigenen Parametern."
+  ],
+  "warum_kein_wert": "HIER SPERRT DIE LIZENZ, NICHT DIE VERFÜGBARKEIT. Der Grundstücksmarktbericht 2025 des Landkreises Rostock ist kostenlos im Geoshop des Landkreises abrufbar (gedruckt 60,00 EUR) und führt die Werte vollständig — er erlaubt aber wörtlich nur eine Vervielfältigung und Verbreitung \"mit Genehmigung des Herausgebers\" (S. 3, Abschnitt \"Vervielfältigung und Verbreitung\"). Ein DealPilot-Kundenbericht ist eine Verbreitung und damit nicht freigegeben. Dieselbe Sperre wie bei Kiel und beim Dresdner Bericht vor der Erlaubnis. WEG ZUM WERT: Genehmigung beim Gutachterausschuss für Grundstückswerte im Landkreis Rostock einholen (gaa@lkros.de). Liegt sie vor, ist die Ernte eine Lesearbeit von wenigen Stunden — am 06.10.2026 am Dokument gemessen stehen die Zahlen fertig in Tabelle 11 (Sachwertfaktoren im regionalen Teilmarkt, 5 Teilmärkte), Tabelle 12 (freistehende Ein- und Zweifamilienhäuser, abgeleitet aus 675 Kauffällen), Tabelle 13 (Doppelhaushälften und Reihenhäuser) und in Abschnitt 3.6.5 mit Tabelle 18 (Modellparameter, 232 Kauffälle, vier Gebäudetypen). KEIN Nachbarkreis und kein Landesmittel: Mecklenburg-Vorpommern führt für 13071, 13073 und 13076 eigene Modelle mit eigenen Parametern — eine Übertragung wäre nach § 10 ImmoWertV falsch.",
+  "unvollstaendig_grund": "Lizenzsperre, keine Verfügbarkeitslücke: der Bericht ist kostenlos abrufbar und führt die Werte, erlaubt die Verbreitung aber nur mit Genehmigung des Herausgebers (S. 3). Weg zum Wert: Genehmigung einholen (gaa@lkros.de).",
+  "vollstaendig": false
+ }
+]

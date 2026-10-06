@@ -8332,3 +8332,51 @@ html[data-dp-layout][data-dp-layout] .sb-search-box svg {
     min-height: 45px !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1925 · DIE SORTIERUNG AUCH AM SCHREIBTISCH, UND DAS KOFFER-SYMBOL
+
+   Marcel am 06.10.2026: „auf der Desktop-Version steht da immer noch in Gold
+   Portfolio und auch so ein Koffer vor. Und auch zuletzt bearbeitet zuerst und
+   auch nach ID sortieren ist auch noch golden."
+
+   GEMESSEN bei 1177 px in der Schiene, beide Zustände durchgeschaltet:
+
+     .dpl-portfolio  „▣ Portfolio 22"   rgb(191,183,169)   bereits grau
+     .dpl-i (Symbol) „▣"                rgb(191,183,169)   bereits grau
+     .sb-sort-btn 1  „Zuletzt bearbeitet zuerst"  **bg rgb(201,168,76)**
+     .sb-sort-btn 2  „Nach ID sortieren"          rgba(255,255,255,.5)
+
+   **Der Portfolio-Knopf und sein Symbol sind schon grau** — das war v1911 und
+   gilt auch am Schreibtisch, weil die Regel nie in einer Medienabfrage stand.
+   Golden ist genau EIN Element: der AKTIVE Sortierknopf, und zwar flächig,
+   nicht nur in der Schrift.
+
+   **Meine Regel dafür lag in `@media (max-width: 900px)`** (v1923) — auf dem
+   Handy wirkte sie, am Schreibtisch nicht. Derselbe Fehler wie bei der Suche in
+   v1924, zwei Stunden später noch einmal.
+
+   > **Wenn eine Abweichung auf beiden Breiten dieselbe ist, gehört die Regel
+   > nicht in eine Medienabfrage.** Ich habe zweimal hintereinander aus einer
+   > Handy-Meldung ein Handy-Problem gemacht, ohne am Schreibtisch nachzusehen.
+
+   Der aktive Knopf behält seine Hervorhebung — er muss sich vom inaktiven
+   unterscheiden —, aber im Ton des Registers statt in voller Goldfläche.
+   ══════════════════════════════════════════════════════════════════════════════ */
+html[data-dp-layout][data-dp-layout] .sb-sort-btn {
+  color: rgb(191,183,169) !important;
+  background: transparent !important;
+  border-color: rgba(191,183,169,.22) !important;
+}
+/* Der aktive bleibt unterscheidbar: etwas heller und mit fester Kante. */
+html[data-dp-layout][data-dp-layout] .sb-sort-btn.an,
+html[data-dp-layout][data-dp-layout] .sb-sort-btn.active,
+html[data-dp-layout][data-dp-layout] .sb-sort-btn[aria-pressed="true"] {
+  color: rgb(233,227,214) !important;
+  background: rgba(191,183,169,.12) !important;
+  border-color: rgba(191,183,169,.45) !important;
+}
+html[data-dp-layout][data-dp-layout] .sb-sort-toggle {
+  background: transparent !important;
+  border-color: rgba(191,183,169,.18) !important;
+}
