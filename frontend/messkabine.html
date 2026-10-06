@@ -281,14 +281,33 @@
            Fehler: Chrome gibt überlagernde Balken ohne reservierten Platz,
            `offsetHeight - clientHeight === 0` beweist also nichts.
            `scrollbar-width:none` schaltet ihn dagegen wirklich ab — das ist
-           einen Hinweis wert, weil dann nichts anzeigt, dass es weitergeht. */
+           einen Hinweis wert, weil dann nichts anzeigt, dass es weitergeht.
+
+           v1901c · ZWEI WEITERE SCHEINBEFUNDE, beide gemessen in der Kanzlei
+           bei 390 px. Der Zähler stand auf 27 „stumm"; echt waren zwei.
+
+           (a) `overflow-x: visible` KLIPPT NICHT. Ein solcher Behälter malt
+               über seine Kante hinaus, statt abzuschneiden — ob das stört,
+               beantwortet allein die Prüfung (1) gegen den ersten klippenden
+               Vorfahren, und die stand auf null. Gezählt wird deshalb nur
+               noch `hidden` und `clip`. (Gemessen: von 29 überbreiten
+               Flächen 25 hidden, 2 auto, 2 visible.)
+
+           (b) `label.oe-sr` × 23, jedes mit `clientWidth: 1`. Das ist das
+               übliche Muster für Text, der nur dem Vorleseprogramm gilt:
+               ein 1×1-Kasten mit `overflow:hidden`. Der Inhalt SOLL dort
+               verschwinden. Unter 24 px Innenbreite wird deshalb nicht
+               gezählt — ein Kasten dieser Größe trägt ohnehin nichts
+               Sichtbares. */
     var scroll = [];
     alle.forEach(function(el){
       if (gemalt(el) === false) return;
       if (el.scrollWidth - el.clientWidth < 4) return;
+      if (el.clientWidth < 24) return;                 /* sr-only und Ähnliches */
       var cs = win.getComputedStyle(el), ov = cs.overflowX;
+      if (ov === 'visible') return;                    /* malt hinaus, klippt nicht */
       scroll.push({
-        t: nam(el).slice(0, 30), sw: el.scrollWidth, cw: el.clientWidth,
+        t: nam(el).slice(0, 30), sw: el.scrollWidth, cw: el.clientWidth, ov: ov,
         wischbar: ov === 'auto' || ov === 'scroll',
         balken: el.offsetHeight - el.clientHeight,
         sbw: cs.scrollbarWidth || 'auto'
