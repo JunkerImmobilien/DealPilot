@@ -7927,3 +7927,34 @@ html body .sb-act-item.sb-act-feedback {
     height: 40px !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1916a · DIE LEERE ZEILE, DIE DAS LABEL HINTERLASSEN HAT
+
+   v1916 hat die doppelte Beschriftung „Portfolio" ausgeblendet. Die Kopfzeile
+   ist aber ein GRID mit drei Zeilen — und eine ausgeblendete Zelle gibt ihre
+   Zeile nicht zurueck. Gemessen danach: 356 x 114 statt der erhofften 80, mit
+   einer leeren Zeile ueber dem Suchfeld, in der rechts die beiden
+   Sortierknoepfe allein standen.
+
+   > `display:none` nimmt ein Element aus dem Fluss, aber eine Grid-Zeile ist
+   > kein Fluss. Sie steht in der Vorlage, nicht im Inhalt.
+
+   Aus dem Grid wird deshalb eine Zeile: Suchfeld und Sortierknoepfe nebeneinander,
+   das Feld nimmt den Rest. Damit faellt die Kopfzeile auf rund 56 px.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 6px 14px 8px !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title .sb-search-box {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title .sb-tools-group {
+    flex: 0 0 auto !important;
+  }
+}
