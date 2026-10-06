@@ -38696,6 +38696,12 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
     padding-bottom: 6px !important;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+    /* v1893b · Hier fehlte die Farbe. Gemessen am 06.10.2026 an der Gewerke-Karte, die
+       dieselbe Medizin bekommen hat: sobald `scrollbar-width` gesetzt ist, ignoriert
+       Chrome die `::-webkit-scrollbar`-Regeln darunter VOLLSTAENDIG - der Balken war
+       also der graue Standardbalken, nicht der goldene aus den Zeilen weiter unten.
+       Die webkit-Regeln bleiben fuer Browser ohne `scrollbar-color` stehen. */
+    scrollbar-color: var(--wl-c9a84c, #C9A84C) color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
   }
   /* EINE Zeile, und auf ihre echte Breite wachsen - sonst sieht der Wrapper keinen Ueberlauf. */
   .dp-pf-scroll .dp-pfbar {
@@ -38765,7 +38771,28 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
 @media (max-width: 520px) {
   /* Dass gewischt werden KANN, muss man sehen. Hoehe und Farben wie im Pre-Flight-Balken
      (v1892/v1892b), damit beide Wischflaechen auf dem Handy gleich aussehen. */
-  #oe-karte-gewerke { scrollbar-width: thin; }
+  /* ── v1893b · NACHGEMESSEN AUF STAGING, UND MEINE EIGENE MEDIZIN WAR HALB ──────
+     Nach dem Ausrollen von v1893 gemessen (Chrome 153, 390 px):
+
+       scrollbar-width = thin   scrollbar-color = auto   Balken = 11,8 px
+
+     Gesetzt hatte ich 6 px und einen goldenen Daumen. Beides kam nicht an.
+     **`scrollbar-width` und `::-webkit-scrollbar` schliessen sich aus:** sobald die
+     Standard-Eigenschaft gesetzt ist, ignoriert Chrome die webkit-Pseudoelemente
+     vollstaendig. Uebrig blieb der graue Standard-Thin-Balken - sichtbarer als der
+     4,8-px-Balken vorher, aber nicht die Marke.
+
+     > Das ist kein Tippfehler, sondern der Grund, warum man einen Balken NACH dem
+     > Ausrollen nachmisst und nicht beim Schreiben fuer erledigt haelt. Der gleiche
+     > Griff steht in v1892 am Pre-Flight-Balken; er ist dort mitkorrigiert.
+
+     `scrollbar-color` ist der Weg, der zu `scrollbar-width` gehoert. Die webkit-Regeln
+     bleiben darunter stehen - fuer Browser, die `scrollbar-color` nicht koennen, ist
+     dann der webkit-Zweig der, der greift. */
+  #oe-karte-gewerke {
+    scrollbar-width: thin;
+    scrollbar-color: var(--wl-c9a84c, #C9A84C) color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+  }
   #oe-karte-gewerke::-webkit-scrollbar { height: 6px; }
   #oe-karte-gewerke::-webkit-scrollbar-thumb {
     background: var(--wl-c9a84c, #C9A84C); border-radius: 99px;
