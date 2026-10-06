@@ -7458,3 +7458,37 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list { order: 2 !important; }
   html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user { order: 3 !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1910a · ZWEI FEHLER AUS v1910, BEIDE GEMESSEN
+
+   Direkt nach dem Ausrollen von v1910 in der Messkabine nachgemessen:
+
+   1. **Der Grund war weiss.** Ich hatte `background: transparent` auf das
+      Akkordeon gesetzt und dabei uebersehen, dass der weisse Grund eine Ebene
+      tiefer sitzt: `.sb-actions-accordion-inner` steht auf rgb(255,255,255).
+      Ergebnis war graue Schrift auf Weiss — der Pruefer meldete fuenf Paare mit
+      Kontrast 1,99 (`rgb(191,183,169)` auf `rgb(255,255,255)`).
+
+      > Eine Flaeche transparent zu machen zeigt, was darunter liegt — und das
+      > war hier nicht die Schiene, sondern das naechste Kind.
+
+   2. **Die Suchzeile war nicht mehr erreichbar.** Mit dem Register im Fluss
+      waechst die Schublade auf scrollHeight 944 bei clientHeight 758, und sie
+      stand auf `overflow-y: hidden`. Gemessen als „geklippt von aside#sidebar
+      [-364..-7 / 0..758]": `input#sb-search-input` und die beiden
+      Nutzer-Knoepfe lagen ausserhalb und waren weder sichtbar noch wischbar.
+      186 px fielen weg.
+
+      > Solange nur das Register dastand, war `hidden` richtig. Wer den Inhalt
+      > einer Flaeche verdoppelt, muss ihr Ueberlaufverhalten mitprüfen.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
+    background: transparent !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
