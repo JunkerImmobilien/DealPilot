@@ -23,9 +23,25 @@
  *
  *   docker exec dealpilot-backend node scripts/pruef-schnellblick.js
  *   docker exec dealpilot-backend node scripts/pruef-schnellblick.js <objekt-id>
+ *   docker exec dealpilot-backend node scripts/pruef-schnellblick.js --neu
  *
  * Ohne Angabe nimmt es die fuenf zuletzt geaenderten Objekte mit
  * gespeichertem Deal-Score. RC=1, wenn eine Kennzahl abweicht.
+ *
+ * ── WARUM ES EINEN `--neu`-LAUF BRAUCHT ──────────────────────────────────
+ *
+ * Objekte MIT gespeichertem Score pruefen nur die halbe Strecke: dort gibt
+ * der Schnellblick den gespeicherten Wert durch. Der eigentliche
+ * Quick-Check-Fall — rechnen, weil noch nichts gerechnet ist — laeuft
+ * einen anderen Zweig, und GEMESSEN am 06.10.2026 gab es auf Staging kein
+ * einziges Objekt ohne Score, mit dem man ihn haette ausloesen koennen.
+ *
+ *   > Ein Zweig, den kein Pruefstueck trifft, ist ungeprueft — auch wenn
+ *   > der Pruefer gruen wird.
+ *
+ * `--neu` legt deshalb EIN Objekt an (NUR auf Staging benutzen), rechnet
+ * darueber, und loescht es im selben Lauf wieder — auch wenn der Lauf
+ * scheitert.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 const { query } = require('../src/db/pool');
@@ -52,6 +68,9 @@ function ausText(s) {
   return m ? Number(m[0]) : null;
 }
 
+/* Modulweit, damit der Fehlerfang unten das Pruefobjekt noch loeschen kann. */
+let PROBE_ID = null;
+
 (async () => {
   let fehler = 0;
 
@@ -67,12 +86,45 @@ function ausText(s) {
   console.log('Werkzeug gefunden: ' + eintrag.name + ' (Stufe ' + eintrag.stufe + ')');
   console.log('Rechenkerne: ' + JSON.stringify(rechenkerne.herkunft()));
 
-  const wunsch = process.argv[2];
+  const wunsch = process.argv[2] && process.argv[2] !== '--neu' ? process.argv[2] : null;
+  const neu = process.argv.includes('--neu');
+
+  /* ── Der Quick-Check-Fall: ein Objekt OHNE gerechneten Score ───────────
+   * Angelegt, gerechnet, geloescht. Die Zahlen sind dieselben wie am
+   * Objekt ef9d0eb4, nur ohne `_dealpilot_score` und ohne `_kpis_*` —
+   * damit das Ergebnis mit dem dort gespeicherten Score 77 vergleichbar
+   * ist. Die Soll-Herkunft ist „Quick-Check-Score". */
+  let probeId = null;
+  if (neu) {
+    const u = await query('SELECT user_id FROM objects ORDER BY updated_at DESC LIMIT 1');
+    if (!u.rows.length) { console.error('Kein Nutzer zum Anhaengen gefunden.'); process.exit(1); }
+    const probe = {
+      str: 'Pruefstrasse', hnr: '1', plz: '32052', ort: 'Herford', objart: 'ETW',
+      wfl: '95', baujahr: '1994',
+      kp: '180000', nkm: '850', ze: '90', moebl: '7000',
+      hg_ul: '1391', grundsteuer: '336', hg_nul: '1599,46',
+      gest_p: '6,5', notar_p: '2,2', gba_p: '0', makler_p: '0',
+      d1: '200000', d1z: '3,5', d1t: '1', ek: '0',
+      geb_ant: '80', afa_satz: '2.0', grenz: '38.70',
+      svwert: '220000', ek_inkl_nk: 'false', mietstg: '2',
+      _bwk_mode: 'detail', _bwk_pct_mode: 'nkm'
+    };
+    const ins = await query(
+      `INSERT INTO objects (user_id, data) VALUES ($1, $2) RETURNING id`,
+      [u.rows[0].user_id, JSON.stringify(probe)]);
+    probeId = ins.rows[0].id;
+    PROBE_ID = probeId;
+    console.log('\n[--neu] Pruefobjekt angelegt: ' + probeId
+      + '  (wird am Ende geloescht)');
+  }
+
   const r = wunsch
     ? await query('SELECT id, user_id, data FROM objects WHERE id = $1', [wunsch])
-    : await query(`SELECT id, user_id, data FROM objects
-                    WHERE data::jsonb->>'_dealpilot_score' IS NOT NULL
-                    ORDER BY updated_at DESC LIMIT 5`);
+    : probeId
+      ? await query('SELECT id, user_id, data FROM objects WHERE id = $1', [probeId])
+      : await query(`SELECT id, user_id, data FROM objects
+                      WHERE data::jsonb->>'_dealpilot_score' IS NOT NULL
+                      ORDER BY updated_at DESC LIMIT 5`);
   if (!r.rows.length) {
     console.error('Kein Objekt gefunden.');
     process.exit(1);
@@ -176,13 +228,51 @@ function ausText(s) {
       vgl('cf_vs', ausText(erg.finanzierung.ueberschuss_jahr), soll.cf_vs, 0.51);
     }
 
+    /* ── Der Quick-Check-Zweig, gegen eine Zahl von aussen ───────────────
+     * Das Pruefobjekt traegt dieselben Angaben wie ef9d0eb4, dessen
+     * Browser-Score 77 in der Datenbank steht. Derselbe Rechenweg muss
+     * also 77 ergeben — und die Herkunft muss sagen, dass gerechnet wurde. */
+    if (zeile.id === probeId) {
+      const SOLL = 77;
+      console.log('    ' + (b.dealpilot_score === SOLL ? 'OK ' : 'ABW')
+        + ' score   Kern ' + b.dealpilot_score
+        + '   Sollwert ' + SOLL + ' (Browser-Score des gleich bestueckten Objekts ef9d0eb4)');
+      if (b.dealpilot_score !== SOLL) fehler++;
+      const istGerechnet = String(b.herkunft || '').indexOf('Quick-Check-Score') === 0;
+      console.log('    ' + (istGerechnet ? 'OK ' : 'ABW') + ' zweig   '
+        + (istGerechnet ? 'selbst gerechnet' : 'FALSCHER ZWEIG: ' + b.herkunft));
+      if (!istGerechnet) fehler++;
+      if (!b.empfehlung) { console.error('    ABW keine Kaufempfehlung'); fehler++; }
+      if (!b.teilnoten || b.teilnoten.length !== 5) {
+        console.error('    ABW Teilnoten: ' + (b.teilnoten || []).length); fehler++;
+      }
+    }
+
     if (gemerkt.length !== 1 || gemerkt[0] !== zeile.id) {
       console.error('    ABW merkeObjekt: ' + JSON.stringify(gemerkt));
       fehler++;
     }
   }
 
+  if (probeId) {
+    const del = await query('DELETE FROM objects WHERE id = $1 RETURNING id', [probeId]);
+    console.log('\n[--neu] Pruefobjekt geloescht: ' + (del.rows.length ? 'ja' : 'NEIN — ' + probeId));
+    if (!del.rows.length) fehler++;
+  }
+
   console.log('\n═══════════════════════════════════════════════════════════');
   console.log(fehler ? (fehler + ' Abweichung(en)') : 'Keine Abweichung.');
   process.exit(fehler ? 1 : 0);
-})().catch((e) => { console.error(e); process.exit(1); });
+})().catch(async (e) => {
+  console.error(e);
+  /* Auch bei einem Absturz darf das Pruefobjekt nicht stehenbleiben. */
+  if (PROBE_ID) {
+    try {
+      await query('DELETE FROM objects WHERE id = $1', [PROBE_ID]);
+      console.error('[--neu] Pruefobjekt nach dem Fehler geloescht: ' + PROBE_ID);
+    } catch (e2) {
+      console.error('[--neu] Pruefobjekt NICHT geloescht, von Hand entfernen: ' + PROBE_ID);
+    }
+  }
+  process.exit(1);
+});
