@@ -1832,6 +1832,30 @@ window.sbActionsAction = sbActionsAction;
       sb.classList.remove('sb-mobile-open');
     }
     if (ov) ov.classList.remove('active');
+    /* ── v1904a · DER KNOPF MUSS MITGEHEN ────────────────────────────────
+       Marcel am 06.10.2026: „das ‚X' neben Neues Objekt sieht auch nicht gut
+       aus. Es ruft ja auch die Menüleiste auf."
+
+       GEMESSEN bei 390 px, „Heute", Bedienweg Menue auf -> Aktionen ->
+       Einzelobjekt antippen:
+
+         vor der Aktion   .app-wrap sb-mobile-open   #hdr-mobile-menu active
+         nach der Aktion  .app-wrap                  #hdr-mobile-menu active
+
+       Die Schublade ist zu, der Knopf zeigt weiter das X. Ein X heisst
+       „schliessen" — hier OEFFNET es. Genau der Satz, den Marcel gesagt hat.
+
+       URSACHE: `toggleMobileSidebar()` (main.js:365) fuehrt den Zustand an ZWEI
+       Stellen - `.app-wrap.sb-mobile-open` UND `#hdr-mobile-menu.active`. Diese
+       Routine hier kannte nur die erste. Sie laeuft bei jedem Klick auf
+       `.sb-act-item`, `.tab` und `.sb-card`, also auf dem haeufigsten Weg
+       ueberhaupt aus dem Menue heraus.
+
+       > Ein Zustand, der an zwei Stellen steht, muss an beiden Stellen
+       > zurueckgenommen werden - sonst zeigt das Bild etwas anderes an als
+       > die Mechanik tut. */
+    var hmb = document.getElementById('hdr-mobile-menu');
+    if (hmb) hmb.classList.remove('active');
   }
   // V100: Expose damit andere Stellen (z.B. loadSaved nach Card-Klick) das auch nutzen können
   window.closeMobileSidebarOnAction = closeMobileSidebarOnAction;

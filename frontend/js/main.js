@@ -385,6 +385,11 @@ document.addEventListener('DOMContentLoaded', function() {
         aw.classList.remove('sb-mobile-open');
         if (bd) bd.style.display = 'none';
         document.body.style.overflow = '';
+        /* v1904a: derselbe Fehler wie in ui.js - der Knopf fuehrt den Zustand
+           mit und muss mitgehen, sonst steht beim Zurueckwechseln aufs Handy
+           ein X ueber einem geschlossenen Menue. */
+        var hmb2 = document.getElementById('hdr-mobile-menu');
+        if (hmb2) hmb2.classList.remove('active');
       }
     }
   });
