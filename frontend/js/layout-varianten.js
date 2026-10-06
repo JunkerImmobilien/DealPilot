@@ -1802,9 +1802,35 @@
 
        `setze()` ruft diese Funktion bei jedem Layoutwechsel; sie entscheidet
        jetzt in beide Richtungen. */
+    /* ── v1921 · AUF DEM HANDY GILT DIE AKTENMAPPE FUER JEDES LAYOUT ─────────
+
+       Marcel am 06.10.2026: „ich moechte gerne, dass, wenn wir Tower oder wenn
+       wir auch die Kanzlei als Aussehen ausgewaehlt haben, dass die Handyansicht
+       bitte dann die Ansicht von der Aktenmappe annimmt.“
+
+       Hier stand `=== 'v1b'`, und genauso hingen alle 63 CSS-Anker an der
+       Aktenmappe allein. In Kanzlei und Tower griff auf dem Handy KEINE EINZIGE
+       Regel aus v1906 bis v1920: kein Register, kein Umschalter, keine Marke,
+       keine Farben. Dort stand weiter die Fassung von „Heute“ — genau das
+       Mischmasch, das Marcel gemeldet hat.
+
+       Begonnen hat es mit einem Missverstaendnis: er sagte „lass dieses
+       kanzlei-modus mockup wo du immer dran denkst raus“, und ich habe daraus
+       gemacht, dass Kanzlei und Tower von allen Aenderungen ausgenommen
+       bleiben. Er meinte ein MOCKUP, nicht die Ansicht.
+
+         > Eine Einschraenkung, die ich mir selbst gebe, gehoert nachgefragt,
+         > bevor sie dreizehn Pakete lang mitlaeuft. Ich habe sie sogar in jede
+         > Commit-Botschaft geschrieben und dabei nie gemerkt, dass ich das
+         > Gegenteil dessen baue, was „auf dem Handy sieht alles gleich aus“
+         > bedeutet.
+
+       Der Name der Funktion bleibt: er beschreibt WAS gilt (die Fassung der
+       Aktenmappe), nicht mehr WANN. „Heute“ traegt kein `data-dp-layout` und
+       faellt weiter heraus. */
     function nurAktenmappe() {
       return window.matchMedia('(max-width: 900px)').matches
-          && document.documentElement.getAttribute('data-dp-layout') === 'v1b';
+          && document.documentElement.hasAttribute('data-dp-layout');
     }
     function registerOffenHalten() {
       var acc = document.getElementById('sb-actions-accordion');

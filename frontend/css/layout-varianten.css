@@ -3894,7 +3894,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-pill .sc-bar{
 }
 /* Der Kopf verliert damit seine zweite Zeile - ohne das behielte er
    die Hoehe des Bandes als leere Flaeche. */
-html[data-dp-layout="v1b"] body header.hdr{
+html[data-dp-layout][data-dp-layout] body header.hdr{
   min-height:0 !important;
 }
 
@@ -4147,38 +4147,38 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-score #hdr-badges .sc-sub{
 
    Gilt nur fuer v1b: in der Aktenmappe 1 stehen die Reiter IN der
    Schiene und sind dort laengst dunkel. */
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs,
-html[data-dp-layout="v1b"] body:has(#sb-user) header.hdr + nav.tabs,
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs.tabs{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs,
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) header.hdr + nav.tabs,
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs.tabs{
   background:#0E0D0B !important;
   border-bottom:1px solid var(--dpl-linie) !important;
   box-shadow:none !important;
 }
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab,
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab *{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab,
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab *{
   color:#BFB7A9 !important;
   background:transparent !important;
 }
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab:hover,
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab:hover *{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab:hover,
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab:hover *{
   color:#F2EDE3 !important;
 }
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab.active,
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab.active *{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab.active,
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab.active *{
   color:#F5EFE2 !important;
 }
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab.active{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab.active{
   border-bottom-color:var(--wl-c9a84c, #C9A84C) !important;
 }
 /* Die Symbole der Reiter tragen denselben Ton wie die des Menues. */
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab svg,
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs .tab svg *{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab svg,
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab svg *{
   color:var(--wl-c9a84c, #C9A84C) !important;
   stroke:var(--wl-c9a84c, #C9A84C) !important;
 }
 /* Das Fortschrittsband am rechten Rand der Leiste steht sonst als
    heller Block in der neuen dunklen Flaeche. */
-html[data-dp-layout="v1b"] body:has(#sb-user) nav.tabs #tabs-status-badge{
+html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs #tabs-status-badge{
   background:transparent !important;
   border:1px solid var(--dpl-linie) !important;
   color:#BFB7A9 !important;
@@ -7427,7 +7427,7 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   /* Das Register: aus dem aufklappbaren Panel wird ein Teil der Schiene.
      `position:static` nimmt ihm die Dock-Rechnung, `opacity` und `max-height`
      die beiden Fesseln des geschlossenen Zustands. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion {
     display: block !important;
     position: static !important;
     opacity: 1 !important;
@@ -7440,23 +7440,23 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     border: 0 !important;
     margin: 0 !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
     display: block !important;
     max-height: none !important;
     overflow: visible !important;
   }
 
   /* Der Aufklapper hat keine Aufgabe mehr, wenn das Register offen dasteht. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn {
     display: none !important;
   }
 
   /* Die Suchzeile und die Objektliste ruecken hinter das Register — dieselbe
      Reihenfolge wie in der Schiene, wo das Portfolio unter der Marke sitzt und
      die Navigation den Platz bekommt. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title { order: 1 !important; }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list { order: 2 !important; }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user { order: 3 !important; }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title { order: 1 !important; }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list { order: 2 !important; }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user { order: 3 !important; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -7484,10 +7484,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
       > einer Flaeche verdoppelt, muss ihr Ueberlaufverhalten mitprüfen.
    ══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
     background: transparent !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }
@@ -7539,17 +7539,17 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 @media (max-width: 900px) {
 
   /* ── 1 · Anmeldeinformationen ─────────────────────────────────────────── */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user {
     background: transparent !important;
     border: 1px solid rgb(230,225,214) !important;
     border-radius: 14px !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-name,
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-email {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-name,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-email {
     color: rgb(191,183,169) !important;
   }
   /* Die Pille bekommt die Schrift- und Rahmenfarbe der Schiene zurueck. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-plan-pill {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-plan-pill {
     color: rgb(191,183,169) !important;
     border: 1px solid rgb(38,35,30) !important;
     border-radius: 999px !important;
@@ -7557,20 +7557,20 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   }
 
   /* ── 2 · Portfolio-Kopf: Rahmen statt Fuellung ────────────────────────── */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
     color: rgb(191,183,169) !important;
     font-size: 12.5px !important;
     font-weight: 400 !important;
     padding: 8px 14px !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-search-input,
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-add-new {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-search-input,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-add-new {
     background: transparent !important;
     border: 1px solid rgb(230,225,214) !important;
     border-radius: 10px !important;
     color: rgb(191,183,169) !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-search-input::placeholder {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-search-input::placeholder {
     color: rgba(191,183,169,.55) !important;
   }
 
@@ -7580,7 +7580,7 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
      `margin-top:auto` holt ihn an den Fuss — und zwar NUR hier: zwei
      Flex-Geschwister mit `auto` teilen sich den freien Platz, dann steht
      nichts mehr dort, wo es soll. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user {
     margin-top: auto !important;
   }
 }
@@ -7626,21 +7626,21 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 @media (max-width: 900px) {
 
   /* Die Einfassung des Registers: Radius und Polster der Schiene, keine Kante. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
     border: 0 !important;
     border-radius: 14px !important;
     padding: 4px 8px 8px !important;
   }
 
   /* Die Rubriken: ohne Linie, mit den Abstaenden der Schiene. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-act-section-title {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-act-section-title {
     border: 0 !important;
     padding: 4px 9px 5px !important;
     margin: 7px 0 2px !important;
   }
 
   /* Die Eintraege: Polster der Schiene, Hoehe aber fingergerecht. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-act-item {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-act-item {
     padding: 7px 9px !important;
     min-height: 40px !important;
   }
@@ -7681,7 +7681,7 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 @media (max-width: 900px) {
 
   /* Der Umschalter: die Form des Schienen-Knopfs, die Trefferflaeche des Handys. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-portfolio-handy {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .dpl-portfolio-handy {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
@@ -7698,25 +7698,25 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     font-weight: 400 !important;
     text-align: left !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-portfolio-handy .dpl-n {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .dpl-portfolio-handy .dpl-n {
     margin-left: auto !important;
     font-size: 10.5px !important;
   }
 
   /* Zustand „zu": das Register steht, Suche und Objektliste ruhen. */
-  html[data-dp-layout="v1b"][data-dp-layout]:not([data-dpl-portfolio="auf"]) body aside.sidebar#sidebar .sb-section-title,
-  html[data-dp-layout="v1b"][data-dp-layout]:not([data-dpl-portfolio="auf"]) body aside.sidebar#sidebar #sb-list {
+  html[data-dp-layout][data-dp-layout]:not([data-dpl-portfolio="auf"]) body aside.sidebar#sidebar .sb-section-title,
+  html[data-dp-layout][data-dp-layout]:not([data-dpl-portfolio="auf"]) body aside.sidebar#sidebar #sb-list {
     display: none !important;
   }
 
   /* Zustand „auf": die Objektliste steht, das Register ruht. */
-  html[data-dp-layout="v1b"][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar #sb-actions-accordion {
+  html[data-dp-layout][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar #sb-actions-accordion {
     display: none !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar .sb-section-title {
+  html[data-dp-layout][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar .sb-section-title {
     order: 0 !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar #sb-list {
+  html[data-dp-layout][data-dp-layout][data-dpl-portfolio="auf"] body aside.sidebar#sidebar #sb-list {
     order: 1 !important;
     flex: 1 1 auto !important;
   }
@@ -7829,17 +7829,17 @@ html body .sb-act-item.sb-act-feedback {
 @media (max-width: 900px) {
 
   /* A · die Lasche der Bordkarte zurueck (nimmt v1906 an dieser Stelle zurueck) */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-seq {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-seq {
     display: block !important;
   }
 
   /* B · rechts Platz fuer Ring und Knoepfe */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top {
     padding-right: 115px !important;
   }
 
   /* Die Adresse darf dann umbrechen statt zu ueberlaufen. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-address {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-address {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
@@ -7892,37 +7892,37 @@ html body .sb-act-item.sb-act-feedback {
 @media (max-width: 900px) {
 
   /* ── A · Anmeldung ─────────────────────────────────────────────────────── */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user {
     color: rgb(191,183,169) !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-avatar {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-avatar {
     color: rgb(191,183,169) !important;
     border: 1px solid rgb(38,35,30) !important;
     background: transparent !important;
   }
   /* Die Version ist eine Angabe, kein Zustand: leichtes Grau, kein Grund. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-version-badge {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-version-badge {
     color: rgb(110,103,92) !important;
     background: transparent !important;
     border: 0 !important;
     font-size: 9px !important;
   }
   /* Die Wolke meldet nur, dass gespeichert wurde — kein Gruen, kein Gold. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-mode-badge {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-mode-badge {
     color: rgb(191,183,169) !important;
     background: transparent !important;
     border: 1px solid rgb(38,35,30) !important;
   }
 
   /* ── B · die doppelte Beschriftung faellt weg ──────────────────────────── */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title > span:first-child {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title > span:first-child {
     display: none !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
     padding: 6px 14px 8px !important;
     row-gap: 6px !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-search-input {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-search-input {
     min-height: 40px !important;
     height: 40px !important;
   }
@@ -7944,17 +7944,17 @@ html body .sb-act-item.sb-act-feedback {
    das Feld nimmt den Rest. Damit faellt die Kopfzeile auf rund 56 px.
    ══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
     padding: 6px 14px 8px !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title .sb-search-box {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title .sb-search-box {
     flex: 1 1 auto !important;
     min-width: 0 !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title .sb-tools-group {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title .sb-tools-group {
     flex: 0 0 auto !important;
   }
 }
@@ -7992,7 +7992,7 @@ html body .sb-act-item.sb-act-feedback {
    Karten rund 460 px allein fuer Luft drauf.
    ══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card {
     border-color: transparent !important;
     margin-bottom: 6px !important;
     margin-top: 0 !important;
@@ -8000,7 +8000,7 @@ html body .sb-act-item.sb-act-feedback {
   }
   /* Der Abstand kam teils aus der Liste selbst (row-gap), nicht nur von der
      Karte — sonst bliebe die Haelfte stehen. */
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list {
     row-gap: 0 !important;
     gap: 0 !important;
   }
@@ -8022,7 +8022,7 @@ html body .sb-act-item.sb-act-feedback {
    — „zu klein" war der Einwand, also wird sie nicht verkleinert.
    ══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy {
     display: flex !important;
     align-items: center !important;
     order: -3 !important;
@@ -8034,7 +8034,7 @@ html body .sb-act-item.sb-act-feedback {
     border: 0 !important;
     flex: 0 0 auto !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm {
     font-family: "Space Grotesk", system-ui, sans-serif !important;
     font-size: 42px !important;
     font-weight: 700 !important;
@@ -8042,7 +8042,7 @@ html body .sb-act-item.sb-act-feedback {
     line-height: 1 !important;
     color: rgb(242,237,227) !important;
   }
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm i {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm i {
     font-style: normal !important;
     color: var(--wl-A98D40, #A98D40) !important;
   }
@@ -8059,8 +8059,8 @@ html body .sb-act-item.sb-act-feedback {
    > Zwei Sicherungen fuer dieselbe Sache sind eine zu viel — ausser die eine
    > haengt am Zeitpunkt und die andere nicht.
    ══════════════════════════════════════════════════════════════════════════════ */
-html:not([data-dp-layout="v1b"]) .dpl-marke-handy,
-html:not([data-dp-layout="v1b"]) .dpl-portfolio-handy {
+html:not([data-dp-layout]) .dpl-marke-handy,
+html:not([data-dp-layout]) .dpl-portfolio-handy {
   display: none !important;
 }
 
@@ -8101,8 +8101,8 @@ html:not([data-dp-layout="v1b"]) .dpl-portfolio-handy {
    bewusst ab:** die Kartenköpfe nehmen den Grund der Schublade.
    ══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top,
-  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-mini-grid {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-top,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-mini-grid {
     background: transparent !important;
   }
 }
