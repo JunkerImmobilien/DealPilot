@@ -38843,3 +38843,100 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
 @media (max-width: 900px) {
   html[data-dp-layout][data-dp-layout] body .dpl-schiene[data-dpl-oben-im-fluss] { display: none !important; }
 }
+
+/* ═══ v1899 · DAS HAEKCHEN DRAENGT DEAL-AKTION VOM SCHIRM (06.10.2026) ════════
+   Marcel: "Mir ist wichtig, dass es auf dem Handy richtig gerendert ist."
+
+   GEMESSEN bei 390 px (Messkabine, iframe, iPhone 14), Ansicht "Heute", und in
+   allen vier Aussehen gleich:
+
+     ohne geladenes Objekt   Reiter 40,0 px   Streifen 404 / 383   Deal-Aktion 321-361   treffbar
+     mit  geladenem Objekt   Reiter 65,0 px   Streifen 554 / 383   Deal-Aktion 470-510   NICHT treffbar
+                                                                   (elementFromPoint = false)
+
+   URSACHE, nicht Symptom: `workflow.js:220` haengt an jeden erfuellten Reiter
+   ein zusaetzliches Kind `<span class="tab-wf-check">`. Dessen Regel steht in
+   dieser Datei bei Z. 26024 und traegt `width:14px` + `margin-left:5px` — OHNE
+   Media-Query. Mit dem `gap:6px` des Reiters sind das +25 px je Haken; sechs
+   erfuellte Bereiche ergeben +150 px. 554 - 404 = 150. Die Rechnung geht genau
+   auf, das ist der ganze Befund.
+
+   Der Grund, warum es auffaellt: unter 720 px wird die BESCHRIFTUNG versteckt
+   (Z. 12315, `.tab .tab-lbl{display:none}`) — genau damit die neun Reiter in
+   den Schirm passen. Das Haekchen wurde bei dieser Verschlankung vergessen.
+   Es ist dieselbe Klasse Fehler wie "Gestaltung nimmt Funktion mit", nur
+   andersherum: eine Funktion wurde beim Verschlanken NICHT mitgenommen.
+
+   Ueber den Reiter "Deal-Aktion" laufen vier der sieben Ausgaben. Ist er nicht
+   erreichbar, kommt niemand auf dem Telefon an seine PDFs.
+
+   REPARATUR an der Ursache: unter 720 px — also an derselben Schwelle, die die
+   Beschriftung versteckt — verlaesst das Haekchen den Fluss und setzt sich in
+   die obere rechte Ecke des Reiters. Die Information bleibt sichtbar, kostet
+   aber keine Breite mehr. KEIN Gegengewicht, keine neue Gegenregel.
+
+   Spezifitaet gemessen, nicht geschaetzt: `nav.tabs .tab .tab-wf-check` ist
+   0-3-2 und schlaegt damit `.tab .tab-wf-check` (0-2-0, Z. 26024),
+   `body[data-dp-skin="hell"] .tab .tab-wf-check` (0-3-0, Z. 35399) und
+   `.tab .tab-wf-check.tab-wf-check-ungeprueft` (0-3-0, Z. 37493). `!important`
+   ist deshalb nicht noetig. In `layout-varianten.css` (laedt spaeter) kommt
+   `tab-wf-check` nicht vor — gegrept, null Treffer.
+
+   `position:relative` am Reiter ist PFLICHT: auf `.tab` steht in dieser Datei
+   keine einzige position-Regel (gegrept), der Reiter ist also statisch. Ohne
+   ihn haengte sich das Haekchen an `nav.tabs` (das traegt `position:sticky`)
+   und alle sechs lagen uebereinander in der Ecke der Leiste.
+
+   Die Farbe bleibt geerbt — kein neues Gold-Literal, der Waechter sieht nichts. */
+@media (max-width: 720px) {
+  nav.tabs .tab {
+    position: relative;
+  }
+  nav.tabs .tab .tab-wf-check {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 9px;
+    height: 9px;
+    margin-left: 0;
+    /* Der Schein um den Haken ist bei 9 px nur noch Unschaerfe. */
+    filter: none;
+  }
+  nav.tabs .tab .tab-wf-check svg {
+    width: 9px;
+    height: 9px;
+  }
+}
+
+/* ═══ v1899 · DER BURGER WAR 32 PX BREIT ═════════════════════════════════════
+   GEMESSEN: `#hdr-mobile-menu` ist 32,0 x 44,0 px (l=12, t=6). Die Messkabine
+   zaehlt alles unter 40 px als "auf dem Finger schwer zu treffen" — nach
+   unserem eigenen Massstab also 8 px zu schmal.
+
+   ZURUECKGENOMMEN, eigene Fehldiagnose: ich hielt das `::after` bei Z. 36363
+   zuerst fuer verrutscht, weil `getComputedStyle` dort `top:21px right:-29px
+   left:15px` meldet. Das ist der GEBRAUCHTE Wert von `left:50%/top:50%`, und
+   das `transform: translate(-50%,-50%)` holt es zurueck in die Mitte. Am
+   Bedienweg nachgemessen (`elementFromPoint` ueber x = Mitte -8 bis +20 px):
+   JEDER Punkt trifft den Knopf. Die TREFFERFLAECHE ist also laengst 44 x 44.
+
+   Zu schmal ist nur das BILD. Und genau das ist der Fehler, den Marcel
+   beschreibt: wer 32 px sieht, zielt auf 32 px — dass unsichtbar 44 da sind,
+   hilft dem Daumen nur zufaellig. Der sichtbare Knopf wird deshalb so breit
+   wie seine Trefferflaeche.
+
+   Die 32 kommen aus `.hdr-v61-row1 .hdr-mobile-menu` (Z. 13495, 0-2-0, ohne
+   !important). `header.hdr .hdr-v61-row1 .hdr-mobile-menu` ist 0-3-1 und
+   schlaegt sie. Die Hoehe 44 steht schon (Z. 22840, `min-height:44px
+   !important` fuer `button` unter 640 px) und bleibt unberuehrt.
+
+   Platz ist da: die Kopfzeile misst 383 px, Streifen 383, kein Ueberlauf; der
+   Knopf endet bei 44, der naechste Inhalt (`#hdr-obj`) beginnt bei 58. Die
+   zusaetzlichen 12 px passen in die Luecke, ohne etwas zu schieben — nach dem
+   Ausrollen nachgemessen. */
+@media (max-width: 768px) {
+  header.hdr .hdr-v61-row1 .hdr-mobile-menu {
+    width: 44px;
+    min-width: 44px;
+  }
+}
