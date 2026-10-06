@@ -38344,7 +38344,7 @@ body.hdr-collapsed .hdr-score-mini-red span { color: #e8a09a; }
    die Tabelle ist 396 px breit (Gewerk 132 · Art 78 · modernisiert 90 · Standardstufe 97),
    die Karte klippt bei 311 px - die Standardstufen-Spalte war abgeschnitten. Auf 820 px
    (Tablet) passt alles. Unter 520 px wischt die Tabelle statt zu klippen. ===== */
-/* > v1893 · ACHTUNG BEIM LESEN: von diesem Block wirkt nur noch die ZWEITE Zeile.
+/* > v1894 · ACHTUNG BEIM LESEN: von diesem Block wirkt nur noch die ZWEITE Zeile.
    > `display`, `overflow-x` und `max-width` werden weiter unten von v1881 (Z. 38509)
    > absichtlich zurueckgenommen - gleicher Selektor, gleiche Media-Query, spaeter und
    > mit `!important`. Gemessen am 06.10.2026 bei 390 px: die Tabelle steht auf
@@ -38696,7 +38696,7 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
     padding-bottom: 6px !important;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    /* v1893b · Hier fehlte die Farbe. Gemessen am 06.10.2026 an der Gewerke-Karte, die
+    /* v1894a · Hier fehlte die Farbe. Gemessen am 06.10.2026 an der Gewerke-Karte, die
        dieselbe Medizin bekommen hat: sobald `scrollbar-width` gesetzt ist, ignoriert
        Chrome die `::-webkit-scrollbar`-Regeln darunter VOLLSTAENDIG - der Balken war
        also der graue Standardbalken, nicht der goldene aus den Zeilen weiter unten.
@@ -38736,7 +38736,7 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   }
 }
 
-/* ═══ v1893 · DIE GEWERKE-KARTE WISCHT, OHNE ES ZU ZEIGEN (390 px) ═══════════════════════
+/* ═══ v1894 · DIE GEWERKE-KARTE WISCHT, OHNE ES ZU ZEIGEN (390 px) ═══════════════════════
    Auftrag aus der Handy-Abnahme: `div#oe-karte-gewerke` misst bei 390 px
    `clientWidth 325 / scrollWidth 648`. Der Verdacht war "die Haelfte fehlt".
 
@@ -38771,8 +38771,8 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
 @media (max-width: 520px) {
   /* Dass gewischt werden KANN, muss man sehen. Hoehe und Farben wie im Pre-Flight-Balken
      (v1892/v1892b), damit beide Wischflaechen auf dem Handy gleich aussehen. */
-  /* ── v1893b · NACHGEMESSEN AUF STAGING, UND MEINE EIGENE MEDIZIN WAR HALB ──────
-     Nach dem Ausrollen von v1893 gemessen (Chrome 153, 390 px):
+  /* ── v1894a · NACHGEMESSEN AUF STAGING, UND MEINE EIGENE MEDIZIN WAR HALB ──────
+     Nach dem Ausrollen von v1894 gemessen (Chrome 153, 390 px):
 
        scrollbar-width = thin   scrollbar-color = auto   Balken = 11,8 px
 

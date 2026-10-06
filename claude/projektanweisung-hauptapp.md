@@ -31937,6 +31937,141 @@ ein Überlauf darin ist dessen Zweck (siehe Journal 48).
 > ältere Regel machte die Tabelle zum Scrollkasten, worauf ihr Inhalt auf 60-px-Auswahlfelder
 > schrumpfte („– k", „Kei"). Seitdem behält die Tabelle ihre Breite und die Karte wischt. Nichts
 > ist abgeschnitten; gemessen sind die Auswahlfelder 196 px breit.
+
+### (52) 06.10.2026 — v1894/v1894a: die Gewerke-Karte wischt, ohne es zu zeigen
+
+> **Zuerst die Nummer: `v1893` ist ZUM ZWEITEN MAL doppelt vergeben.** Dieser Strang lief
+> auf dem Stand `7f6a2eeb` los und nahm `v1893`, wie es ihm aufgetragen war. Während der
+> Arbeit kam `bd8c4f3b` (Abzeichen in „Heute", Journal 51) per Pull herein — mit derselben
+> Nummer. **`v1893` gehört dem Abzeichen**, meine drei Commits `87a902b9`, `7327ca56`,
+> `740d9d65` tragen sie im Titel fälschlich mit. Marker im Quelltext und Cache-Buster sind
+> auf **`v1894` / `v1894a`** gehoben; die Commit-Titel bleiben, sie sind schon gepusht.
+> Dasselbe war am 05.10. mit `v1889` passiert. **Zwei Chats, ein Nummernkreis, keine
+> Reservierung — das passiert so lange weiter, bis die Nummer vor dem Loslegen aus dem
+> frisch gezogenen `main`/`staging` gelesen wird, nicht aus dem Auftrag.**
+
+**Was gemessen war:** `#oe-karte-gewerke` steht bei 390 px auf `clientWidth 325 / scrollWidth
+648`. Der Verdacht aus der Abnahme war „die Hälfte fehlt".
+
+**Der Verdacht stimmt nicht.** Die Karte ist wischbar, `maxScrollLeft` = 323, nichts ist
+abgeschnitten — so wie Journal 51 es für v1881 beschreibt. Zwei andere Dinge fehlten, beide
+gemessen und beide behoben:
+
+| | vorher | nachher |
+|---|---|---|
+| Wischbalken | 4,8 px in `--border` (der globale aus `style.css:9`) | 6 px, Daumen und Spur in Gold |
+| Überschrift `.ct` beim Wischen | wandert **−318 px** aus der Karte | **0,0 px**, bleibt stehen |
+| Hinweistext `.oe-gew-hint` | wandert **−318 px** | **0,0 px** |
+| Tabelle | wandert | wandert (−323,3 — so soll es sein) |
+
+Die Tabelle ist **direktes Kind** der Karte (`.ct` 301 · `table` 620 · `p.oe-gew-hint` 301,
+kein Behälter dazwischen) — deshalb wischte die ganze Karte samt Kopf. `position:sticky;
+left:0` hält Kopf und Hinweis, ohne einen zweiten Behälter zu bauen.
+
+**Drei eigene Fehler, zwei davon vor dem Ausrollen bemerkt, einer erst danach:**
+
+1. Ich hatte den Kopfgrund auf `var(--card, #FBF6E9)` gesetzt. **Gemessen ist der Grund der
+   Karte `rgb(255,255,255)`, und `--card` ist am `<html>` gar nicht gesetzt** — der Fallback
+   hätte also IMMER gegriffen und einen cremefarbenen Kasten auf eine weiße Karte gelegt.
+   Jetzt `background-color: inherit`: das nimmt den Grund, den die Karte wirklich hat, in
+   jeder Marke und in jedem Aussehen.
+2. Ich hatte `width: calc(100vw - 65px)` gesetzt. Geraten, und im iframe falsch. `sticky` ist
+   in-flow, beide behalten ihre 301 px von allein.
+3. **Nach dem Ausrollen gemessen: der Balken war grau, nicht gold.** `scrollbar-width: thin`
+   und `::-webkit-scrollbar` schließen sich aus — sobald die Standard-Eigenschaft gesetzt
+   ist, ignoriert Chrome (153) die webkit-Pseudoelemente vollständig. Von meinen 6 px und
+   dem goldenen Daumen kam nichts an; übrig blieb der graue Standard-Thin-Balken (11,8 px).
+   Behoben über `scrollbar-color`.
+
+   > **Derselbe Griff steht in v1892 am Pre-Flight-Balken** und ist dort mitkorrigiert. Er
+   > war als „wischbar mit sichtbarem Balken" abgenommen — sichtbar war er, golden nicht.
+   > **Das ist der Grund, aus dem ein Balken NACH dem Ausrollen nachgemessen wird.**
+
+**Abnahme bei 390 px, alle vier Aussehen, Stand `740d9d65`+:**
+
+| Aussehen | Karte | wischbar | Balken | Drift Kopf / Hinweis / Tabelle |
+|---|---|---|---|---|
+| Heute | 325 / 648 | 323 | **GOLD** | 0,0 · 0,0 · −323,3 |
+| Aktenmappe | 325 / 648 | 323 | **GOLD** | 0,0 · 0,0 · −323,3 |
+| Kanzlei | 325 / 648 | 323 | **GOLD** | 0,0 · 0,0 · −323,3 |
+| Tower | 325 / 648 | 323 | **GOLD** | 0,0 · 0,0 · −323,3 |
+
+`scrollbar-color` misst `rgb(201, 168, 76)` — das Gold-Token, nicht ein Literal.
+
+**Der Schreibtisch ist unverändert**, und zwar gemessen, nicht behauptet:
+
+| Breite | Karte | `overflow-x` | meine Regel | `.ct` |
+|---|---|---|---|---|
+| 375 | 310 / 648 | `auto` | **an** | `sticky` |
+| 390 | 325 / 648 | `auto` | **an** | `sticky` |
+| 768 | 691 / 691 | `visible` | **aus** | `relative` |
+| 1280 | 851 / 851 | `visible` | **aus** | `relative` |
+
+Die Regel hängt an `@media (max-width: 520px)` — ab 521 px ist sie nicht mehr im Spiel.
+
+**Ein Hinweis an einer toten Regel.** Von v1862c (`style.css:38348`) wirkt nur noch die
+zweite Zeile; `display`, `overflow-x` und `max-width` nimmt v1881 weiter unten absichtlich
+zurück (gleicher Selektor, gleiche Media-Query, später, mit `!important`). Wer dort liest und
+aufhört, hält die Tabelle für den Scrollkasten und sucht den Fehler an der falschen Stelle.
+Der Hinweis steht jetzt darüber — **gelöscht wird nichts**, die zweite Zeile wirkt.
+
+#### Was ich NICHT angefasst habe, und warum
+
+- **`nav.tabs`.** Mein erster Befund („21 px Überlauf, Reiter ragen über") war falsch und ist
+  zurückgenommen: mein `scrollLeft` stand beim Messen auf 20. Real liegen die neun Reiter bei
+  x = 21…381 und passen in die 383 px — wie Journal 50/51 es schon festgestellt hatten.
+  **Die 21 px sind `padding-right`, kein Inhalt.**
+- **Das Status-Abzeichen in „Heute".** Gehört Marcel vorgelegt (Journal 51), nicht geraten.
+- **Die Ausgaben-Box.** Wo ein Knopf hingehört, ist eine Produktfrage — siehe unten.
+
+#### Punkt 3 nachgemessen: die Behauptung stimmt nicht, die Folge ist kleiner als befürchtet
+
+v1892 hat die Ausgaben-Box unter 901 px nicht gebaut, mit der Begründung: „jeder ihrer sieben
+Knöpfe ruft `sbActionsAction(...)` … es geht eine Gruppierung verloren, keine Funktion."
+**Das ist nachgemessen falsch.** Der Satz stammt aus dem v1679-Kommentar; **v1683 hat die
+Logik ersetzt**, seither geht alles über `DealActionBoarding.exportDoc(...)`. Nur **einer**
+der sieben (`hub-export`) ruft noch `sbActionsAction`.
+
+Gemessen auf dem Handy in Kanzlei und Tower (390 px): Ausgaben-Box fehlt wie beschrieben, die
+Akkordeon-Gruppe **„Ausgeben" steht aber da** — 344 px breit, `elementFromPoint` meldet
+TREFFER für Track Record, Bankexport und Export. Die Ausblendregel fragt mit
+`:has(.dpl-teil-ausgaben)` nach, ob es die zweite Stelle wirklich gibt, und greift deshalb
+korrekt nicht. Im Reiter Deal-Aktion liegen `invest`, `bmf`, `kpa_ak`, `kpa`, `track` als
+echte Knöpfe.
+
+| Ausgaben-Box | zweiter Weg auf dem Handy | derselbe Befehl? |
+|---|---|---|
+| Exposé / Gesamt-PDF (`invest`) | Deal-Aktion → PDF | **ja** |
+| **Bankfassung (`invest_bank`)** | **keiner** | **— gar kein Weg** |
+| Marktbericht (`mb`) | Akkordeon → öffnet den **Bereich** | nein (v1683 nennt das ausdrücklich den anderen Weg) |
+| Kaufpreisaufteilung (`kpa`) | Deal-Aktion → PDF | ja |
+| Finanzamt-PDF (`bmf`) | Deal-Aktion → PDF | ja |
+| Track Record (`track`) | Deal-Aktion → PDF · Akkordeon | ja |
+| Export (`hub-export`) | Akkordeon → `openExportHub()` | ja |
+
+> **Genau eine Ausgabe hat auf dem Handy überhaupt keinen Weg: die Bankfassung.**
+> `exportPDFBank` ist geladen, aber im ganzen Dokument steht **null** Knopf dafür — und
+> „Bankexport" im Akkordeon ist etwas anderes (`showBankexportView`, das
+> Mehrobjekt-A3-Modal). **Nicht gebaut**: wo ein Knopf hingehört, ist Marcels Entscheidung.
+
+#### Offen, mit Zahlen statt Gefühl
+
+`nav.tabs` misst in Tower reproduzierbar **zwei** Zustände: frisch geladen neun Reiter à
+**39,9 px** (`404 / 383`, Deal-Aktion rechte Kante 361, treffbar) — und nach längerem Messen
+neun à **48,0 px** (`476 / 383`, Deal-Aktion beginnt bei x = 383, `elementFromPoint` sagt
+NEIN). Gewinner ist dann `header.hdr.has-v64-score + nav.tabs .tab { padding:11px 12px
+!important }` (`style.css:24558`) gegen `.tabs .tab { padding:6px 8px !important }`
+@`max-width:420px`.
+
+**Den Auslöser habe ich in drei Anläufen nicht dingfest gemacht** und nach der Regel
+abgebrochen. Ausgeschlossen sind: Reiterwechsel (gemessen, bleibt 39,9), Schublade auf/zu
+(bleibt 39,9), Gerätebreite 430 (ergibt 44,0, nicht 48,0). In beiden Zuständen sind
+`has-v64-score`, die `<html>`-Attribute, die `<body>`-Klassen, die Zahl der Stylesheets, die
+Media-Query und die Inline-`style` identisch — und `getComputedStyle` widerspricht im iframe
+der Geometrie (bekannte Falle). **Verdacht, nicht Befund:** beide Male trat der Zustand auf,
+nachdem ein paralleler Lauf das Browserfenster auf 381 × 252 verkleinert und die Messkabine
+auf ein anderes Gerät gestellt hatte. **Zu prüfen an einem Gerät, das niemand sonst bedient.**
+
 ### (49) 05.10.2026 — v1891: Ernte Linie 9, und eine falsche Diagnose von mir
 
 **Baden-Württemberg liefert 121 Werte, Bayern null (`13b17ee` v1891).** Fünf Ausschüsse neu:
