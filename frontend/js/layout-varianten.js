@@ -1795,10 +1795,36 @@
         if (!t || !t.closest || !t.closest('.sb-card')) return;
         var aw = document.querySelector('.app-wrap');
         if (!aw || !aw.classList.contains('sb-mobile-open')) return;
-        /* erst das Objekt oeffnen lassen, dann zumachen */
+        /* ── v1923a · SCHLIESSEN, NICHT UMSCHALTEN ──────────────────────────
+
+           v1923 rief `toggleMobileSidebar()`. GEMESSEN: alle Bedingungen waren
+           erfuellt (Breite, Layout, Menue offen, Klick auf der Karte, Blase
+           erreicht die Liste, Funktion vorhanden) — und das Menue blieb
+           trotzdem offen.
+
+           Der Grund liegt im Wort TOGGLE: das Laden des Objekts schliesst die
+           Schublade bereits selbst. Mein Aufruf 60 ms spaeter traf sie
+           geschlossen an und machte sie damit wieder auf.
+
+             > Ein Umschalter ist kein Befehl. Wer einen Zustand HERSTELLEN
+             > will, darf nicht umschalten — er muss setzen.
+
+           Deshalb wird jetzt gezielt geschlossen, und nur, wenn zu diesem
+           Zeitpunkt wirklich offen ist. Die vier Schritte sind dieselben, die
+           `toggleMobileSidebar()` in `main.js:365` im Schliess-Zweig geht:
+           Klasse weg, Backdrop aus, Knopf aus, Koerper-Scrollsperre loesen. */
         setTimeout(function () {
-          try { if (typeof window.toggleMobileSidebar === 'function') window.toggleMobileSidebar(); } catch (e2) {}
-        }, 60);
+          try {
+            var aw2 = document.querySelector('.app-wrap');
+            if (!aw2 || !aw2.classList.contains('sb-mobile-open')) return;   /* schon zu */
+            aw2.classList.remove('sb-mobile-open');
+            var bd = document.getElementById('sb-backdrop');
+            if (bd) bd.style.display = 'none';
+            var hmb = document.getElementById('hdr-mobile-menu');
+            if (hmb) hmb.classList.remove('active');
+            document.body.style.overflow = '';
+          } catch (e2) {}
+        }, 80);
       });
     }
     objektWahlSchliesstMenue();
