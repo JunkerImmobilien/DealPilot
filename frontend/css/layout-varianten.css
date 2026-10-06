@@ -7748,3 +7748,34 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 .sb-act-item.sb-act-feedback {
   display: none !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1914a · DIESELBEN ZWEI PUNKTE, DIESMAL MIT GENUG SPEZIFITAET
+
+   Die Regel aus v1914 war geladen und wirkte nicht. Gemessen mit dem
+   Kaskaden-Walker am Tour-Eintrag:
+
+     ! [20] aside.sidebar .sb-act-item                                 -> flex
+     ! [40] .sb-act-item.sb-act-tour, .sb-act-item.sb-act-feedback     -> none   (meine)
+     ! [80] aside.sidebar .sb-act-item, … .sb-act-accent, … :first-…   -> flex
+
+   **Die Sammelregel mit 80 gewinnt, und zwar ueber einen Teilselektor, der mit
+   meinem gar nichts zu tun hat.** Bei einer Regel mit mehreren Selektoren zaehlt
+   der STAERKSTE, der passt — nicht der, der dem Auge am naechsten liegt.
+
+   > Eine Regel, die nicht wirkt, ist nicht unbedingt ueberschrieben worden. Sie
+   > kann auch nie stark genug gewesen sein.
+
+   Jetzt mit ID-Kontext (120) und fuer alle drei Orte, an denen die Eintraege
+   auftauchen: Schublade, Schiene und die allgemeine Fassung.
+   ══════════════════════════════════════════════════════════════════════════════ */
+#sidebar .sb-act-item.sb-act-tour,
+#sidebar .sb-act-item.sb-act-feedback,
+#sb-actions-accordion .sb-act-item.sb-act-tour,
+#sb-actions-accordion .sb-act-item.sb-act-feedback,
+.dpl-schiene .sb-act-item.sb-act-tour,
+.dpl-schiene .sb-act-item.sb-act-feedback,
+html body .sb-act-item.sb-act-tour,
+html body .sb-act-item.sb-act-feedback {
+  display: none !important;
+}
