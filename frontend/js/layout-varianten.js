@@ -1759,6 +1759,52 @@
       sb.insertBefore(m, sb.firstChild);
     }
     markeHandy();
+
+    /* ── v1923 · EIN OBJEKT ANTIPPEN SCHLIESST DAS MENUE ──────────────────────
+
+       Marcel am 06.10.2026: „wenn ich ein Objekt anklicke aus dem Portfolio im
+       Menü, dass sich dann das Menü schließt und wir direkt das Objekt geöffnet
+       haben.“
+
+       Am Schreibtisch steht die Schiene dauerhaft neben dem Inhalt — dort gibt
+       es nichts zu schliessen. Auf dem Handy liegt die Schublade VOR der
+       Arbeitsflaeche: wer ein Objekt waehlt, sieht danach weiter das Menue und
+       muss von Hand zumachen. Zwei Handgriffe fuer einen Vorgang.
+
+         > Ein Menue hat seine Aufgabe erfuellt, sobald die Wahl getroffen ist.
+
+       Der Horcher haengt an der LISTE, nicht an jeder Karte: die Karten werden
+       von `_renderRichCard()` per innerHTML neu gebaut, ein Horcher an der Karte
+       waere nach dem naechsten Rendern weg (siehe [[griff-nach-render-neu-greifen]]).
+       Er laeuft in der BLASENphase, also NACH dem Klick-Handler der Karte — das
+       Objekt ist dann schon am Oeffnen.
+
+       Nicht geschlossen wird, wenn der Klick den Aktionsknoepfen galt
+       (Kopieren, Loeschen): wer loescht, will in der Liste bleiben. Dieselbe
+       Unterscheidung trifft v1705b weiter oben schon fuer das Zuklappen der
+       Liste am Schreibtisch. */
+    function objektWahlSchliesstMenue() {
+      var liste = document.getElementById('sb-list');
+      if (!liste || liste.getAttribute('data-dpl-schliesser') === '1') return;
+      liste.setAttribute('data-dpl-schliesser', '1');
+      liste.addEventListener('click', function (e) {
+        if (!window.matchMedia('(max-width: 900px)').matches) return;
+        if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+        var t = e.target;
+        if (t && t.closest && t.closest('.sbc-actions')) return;   /* Kopieren/Loeschen */
+        if (!t || !t.closest || !t.closest('.sb-card')) return;
+        var aw = document.querySelector('.app-wrap');
+        if (!aw || !aw.classList.contains('sb-mobile-open')) return;
+        /* erst das Objekt oeffnen lassen, dann zumachen */
+        setTimeout(function () {
+          try { if (typeof window.toggleMobileSidebar === 'function') window.toggleMobileSidebar(); } catch (e2) {}
+        }, 60);
+      });
+    }
+    objektWahlSchliesstMenue();
+    /* Die Liste wird neu gebaut, der Horcher haengt aber am Behaelter und
+       ueberlebt das. Nach einem Ansichtswechsel steht sie neu im DOM — deshalb
+       der Aufruf auch dort. */
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', markeHandy); } catch (e) {}
 
     portfolioKnopfHandy();
@@ -1852,7 +1898,7 @@
     registerOffenHalten();
     handyTeileAufraeumen();
     try {
-      new MutationObserver(function () { registerOffenHalten(); handyTeileAufraeumen(); markeHandy(); portfolioKnopfHandy(); })
+      new MutationObserver(function () { registerOffenHalten(); handyTeileAufraeumen(); markeHandy(); portfolioKnopfHandy(); objektWahlSchliesstMenue(); })
         .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dp-layout'] });
     } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', registerOffenHalten); } catch (e) {}

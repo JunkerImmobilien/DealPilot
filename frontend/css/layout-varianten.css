@@ -8144,3 +8144,118 @@ html[data-dp-layout][data-dp-layout] body nav.tabs button.tab {
 html[data-dp-layout][data-dp-layout] body nav.tabs button.tab.active {
   color: var(--wl-C9A84C, #C9A84C) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1923 · VIER PUNKTE AUS MARCELS LISTE, ALLE GEMESSEN
+
+   ── A · DER DOPPELRAHMEN AN DER SUCHE ────────────────────────────────────
+
+   Marcel: „dann haben wir die Suche. Da haben wir einen Doppelrahmen, den habe
+   ich dir auch gesagt, dass ich das nicht haben will und eine goldene Suchlupe,
+   die möchte ich da auch so nicht haben."
+
+   GEMESSEN: `.sb-search-box` trägt einen Goldrahmen (0,788/0,659/0,298 bei 25 %)
+   — und das Feld darin trägt seit **meinem** v1911 einen zweiten in
+   `rgb(230,225,214)`. Zwei Rahmen ineinander, der innere von mir.
+
+   > **Wer einem Element einen Rahmen gibt, muss nachsehen, ob sein Behälter
+   > schon einen hat.** Ich habe den Knopf-Stil der Schiene auf das Feld gelegt,
+   > ohne den Kasten zu prüfen, in dem es steckt.
+
+   Der Rahmen bleibt am KASTEN (er ist das sichtbare Element), das Feld gibt
+   seinen ab. Der Kasten bekommt den hellen Ton statt Gold, die Lupe ebenso.
+
+   ── B · „ZULETZT BEARBEITET" IN GOLD ─────────────────────────────────────
+
+   Marcel: „dass bitte das zuletzt bearbeitet nicht mehr in Gold sein soll,
+   sondern bitte in dem Design wie oben die Aktionen."
+
+   GEMESSEN: `.sb-sort-btn` steht auf `rgb(201,168,76)` mit Goldgrund (8 %) und
+   Goldrahmen — beide Knöpfe, nicht nur der aktive. Die Einträge des Registers
+   darüber stehen auf `rgb(191,183,169)` ohne Grund und ohne Kante.
+
+   ── C · DER GOLDENE SCROLLBALKEN ─────────────────────────────────────────
+
+   Marcel: „dann haben wir einen goldenen Scrollbalken, den könnten wir auch
+   umstellen in diesem Ton … Das könnten wir auch machen, wenn wir die
+   Aktenmappe in der Gesamtansicht haben, also auf der Desktop-Breite."
+
+   GEMESSEN: `#sb-list` trägt `scrollbar-color: Gold/0,25 transparent`, dazu gibt
+   es 64 Regeln mit `::-webkit-scrollbar` im Stylesheet. **Gilt deshalb OHNE
+   Medienabfrage** — Marcel hat den Schreibtisch ausdrücklich eingeschlossen.
+
+   ── D · DIE DATENZEILE SIEHT AUF DEM HANDY ANDERS AUS ────────────────────
+
+   Marcel: „Datenzeile ist gerade ausgewählt. Sieht nicht so aus in der
+   Handy-Darstellung … wie wenn ich die Desktop-Version mit 1180 nehme."
+
+   GEMESSEN, derselbe Stil, dieselbe Karte, beide Breiten:
+
+     Element              Schreibtisch 1180       Handy 387
+     ──────────────────   ─────────────────────   ─────────────────────
+     .sbc-mini-score-num  10px/800 **Gold**       10px/700 **Weiss**
+     .sbc-score-label     10,5px/700 **Gold**     9,5px/700 **Gruen**
+     .sbc-arrow           rgba(255,255,255,.4)    rgba(168,162,153,.45)
+     .sbc-seq             gleich                  gleich
+     .sbc-address         gleich                  gleich
+
+   **Die Score-Anzeige ist der ganze Unterschied.** Am Schreibtisch trägt sie
+   Gold — Zahl und Stufenwort —, auf dem Handy Weiss und das Stufen-Gruen. Das
+   ist dieselbe Karte in zwei Sprachen.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── A · Suche: ein Rahmen, keine goldene Lupe ───────────────────────────── */
+@media (max-width: 900px) {
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-search-box {
+    border-color: rgb(230,225,214) !important;
+    background: transparent !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-search-input {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-search-box svg {
+    color: rgb(191,183,169) !important;
+    stroke: rgb(191,183,169) !important;
+  }
+
+/* ── B · die Sortierknoepfe tragen den Ton der Register-Eintraege ─────────── */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-sort-btn {
+    color: rgb(191,183,169) !important;
+    background: transparent !important;
+    border-color: rgba(191,183,169,.22) !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-sort-toggle {
+    background: transparent !important;
+    border-color: rgba(191,183,169,.18) !important;
+  }
+
+/* ── D · die Score-Anzeige wie am Schreibtisch ───────────────────────────── */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-mini-score-num {
+    color: var(--wl-C9A84C, #C9A84C) !important;
+    fill: var(--wl-C9A84C, #C9A84C) !important;
+    font-weight: 800 !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-label {
+    color: var(--wl-C9A84C, #C9A84C) !important;
+    font-size: 10.5px !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-arrow {
+    color: rgba(255,255,255,.4) !important;
+  }
+}
+
+/* ── C · der Scrollbalken, auf BEIDEN Breiten ────────────────────────────── */
+html[data-dp-layout][data-dp-layout] aside.sidebar#sidebar #sb-list,
+html[data-dp-layout][data-dp-layout] .dpl-schiene #sb-list,
+html[data-dp-layout][data-dp-layout] aside.sidebar#sidebar,
+html[data-dp-layout][data-dp-layout] .dpl-schiene {
+  scrollbar-color: rgba(191,183,169,.38) transparent !important;
+}
+html[data-dp-layout][data-dp-layout] aside.sidebar#sidebar #sb-list::-webkit-scrollbar-thumb,
+html[data-dp-layout][data-dp-layout] .dpl-schiene #sb-list::-webkit-scrollbar-thumb,
+html[data-dp-layout][data-dp-layout] aside.sidebar#sidebar::-webkit-scrollbar-thumb,
+html[data-dp-layout][data-dp-layout] .dpl-schiene::-webkit-scrollbar-thumb {
+  background: rgba(191,183,169,.38) !important;
+}
