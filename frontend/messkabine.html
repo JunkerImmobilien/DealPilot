@@ -26,15 +26,18 @@
 
   Bis v1591 zählte die Klickflächen-Schleife jedes Element, dessen
   `getBoundingClientRect()` eine Fläche von mehr als null ergab. Das ist
-  nicht dasselbe wie „wird gemalt": die sechs Haken `#ai-pdf-sec-*` im
-  Reiter Pilot-Analyse liegen in einem zugeklappten `<details>`. Chrome gibt
-  dessen Inhalt `content-visibility:hidden` — **der Kasten bleibt, gemalt
-  und treffbar ist nichts.** Sie wurden deshalb als „unter 40 px" gemeldet,
-  und wer dem Befund folgte, suchte tote Knöpfe, die es nicht gibt.
+  nicht dasselbe wie „wird gemalt": die Haken `#ai-pdf-sec-*` im Reiter
+  Pilot-Analyse liegen in einem zugeklappten `<details>`. Chrome überspringt
+  dessen Inhalt — **der Kasten bleibt mit 16×16 px stehen, gemalt und
+  treffbar ist nichts.** Sie wurden deshalb als „unter 40 px" gemeldet, und
+  wer dem Befund folgte, suchte tote Knöpfe, die es nicht gibt.
 
-  `checkVisibility()` ist das einzige Werkzeug, das das mitnimmt — es kennt
-  `display:none` im Vorfahren, `visibility`, `opacity:0`, `content-visibility`
-  und das `hidden`-Attribut. Jede Schleife hier filtert jetzt darüber.
+  **Über `getComputedStyle` ist das nicht zu sehen** — gemessen stehen alle
+  zwölf auf `content-visibility: visible`, `visibility: visible`,
+  `opacity: 1`, `display: block`. `checkVisibility()` ist das einzige
+  Werkzeug, das sie kennt, und es gibt für alle zwölf `false` zurück.
+  Jede Schleife hier filtert jetzt darüber — ohne Zusatzoptionen, die
+  Begründung steht unten an `gemalt()`.
 
   **Der Zähler nennt dabei seine Deckung** (`… übersprungen`), statt still
   weniger zu melden. Ein Prüfer, der grün wird, ohne zu sagen wie viel er
@@ -110,12 +113,39 @@
 
   /* ── Was wird GEMALT? ───────────────────────────────────────────────────
      Der Kasten aus getBoundingClientRect() beweist das nicht: in einem
-     zugeklappten <details> bleibt er stehen, obwohl Chrome den Inhalt per
-     content-visibility:hidden überspringt. Siehe Kopf dieser Datei. */
-  var SICHT = { checkOpacity: true, checkVisibilityCSS: true, contentVisibilityAuto: true };
+     zugeklappten <details> bleibt er stehen, obwohl Chrome den Inhalt
+     überspringt. Siehe Kopf dieser Datei.
+
+     OHNE Zusatzoptionen. Gemessen am 06.10.2026, warum:
+
+       checkVisibility()                     -> 230 von 230 (Schublade offen)
+       checkVisibility({checkOpacity:true})  ->  11 von 230
+
+     Die 219 fielen alle über `opacity`. Nachgesehen im Bild: der Reiter
+     Pilot-Analyse ist auf dem Schirm vollständig gemalt — Überschrift,
+     Knopf „Pilot-Analyse starten", Schalter, Co-Pilot-Block. Trotzdem
+     meldet `getComputedStyle(#s5).opacity` dort dauerhaft `0`, auch nach
+     3,4 Sekunden. Das ist die bekannte Falle: **im iframe meldet
+     getComputedStyle teils veraltete Werte** — eine Transition, die im
+     nicht beachteten Dokument auf ihrem Startwert einfriert.
+
+     > `checkOpacity` und `checkVisibilityCSS` lesen genau den Kanal, der
+     > hier lügt. `checkVisibility()` ohne Optionen stützt sich dagegen
+     > darauf, ob der Browser das Element überhaupt rendert — und das
+     > stimmte an der Stichprobe.
+
+     Die zwölf Haken `#ai-pdf-sec-*` im zugeklappten `<details>` gibt schon
+     die Grundform mit `false` zurück (gemessen: alle zwölf, bei
+     `getComputedStyle` ständen sie auf `content-visibility: visible`,
+     `visibility: visible`, `opacity: 1`, `display: block` und 16×16 px).
+     **Die Eigenschaft ist über getComputedStyle gar nicht lesbar** —
+     `checkVisibility()` ist das einzige Werkzeug, das sie kennt.
+
+     `contentVisibilityAuto` ändert an der Zahl nichts (gemessen: 0 von
+     230) und steht deshalb auch nicht hier. */
   function gemalt(el){
     if (typeof el.checkVisibility !== 'function') return null;  // null = unbekannt
-    try { return el.checkVisibility(SICHT); } catch (e) { return null; }
+    try { return el.checkVisibility(); } catch (e) { return null; }
   }
 
   /* ── Farbe: Text und sein EFFEKTIVER Grund als Paar ────────────────────
