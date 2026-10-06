@@ -7377,3 +7377,84 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     min-height: 0 !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1910 · DAS MENUE DER AKTENMAPPE TRAEGT AUF DEM HANDY IHR REGISTER
+
+   Marcel am 06.10.2026: „ziel ist dass du genau das menü der aktenmappe passend
+   renderst damit es in der handy ansicht passend dargestellt wird." Vorher:
+   „schalt mal um in den desktop modus und schau dir das menü an wie es da
+   aussieht. dann schalt in den handy modus und sieh welchen unterschied du
+   siehst."
+
+   DEN UNTERSCHIED GEMESSEN, beide Male in der Aktenmappe:
+
+     Schreibtisch 1277 px      Handy 387 px, Menue offen
+     ─────────────────────     ────────────────────────────
+     dpl-marke        100 px   (keine Marke)
+     dpl-portfolio     33 px   sb-section-title (Suche)  126 px
+     dpl-teil-suche    AUS     sb-list  OFFEN            476 px
+     dpl-teil-objekte  AUS     sb-actions-accordion  AUS
+     dpl-teil-aktionen 491 px  sb-actions-trigger (Knopf) 44 px
+     dpl-teil-nutzer  112 px   sb-user-box               81 px
+
+   **Es ist nicht die Farbe — beide stehen auf rgb(14,13,11) mit Text
+   rgb(233,227,214). Es ist die Struktur, und zwar genau umgekehrt:** am
+   Schreibtisch ist das Register offen und das Portfolio zugeklappt, auf dem
+   Handy das Portfolio offen und das Register zugeklappt. Deshalb wirkt das
+   Handy-Menue wie „Heute": eine Liste von Objekten statt einer Navigation.
+
+   > Zwei Flaechen koennen Farbe fuer Farbe gleich sein und trotzdem nichts
+   > miteinander zu tun haben. Was eine Ansicht ausmacht, ist was zuerst
+   > dasteht.
+
+   DREI ANLAEUFE, bis die Ursache dastand — hier, damit es der naechste nicht
+   noch einmal durchlaeuft:
+     1. `display:block` auf dem Akkordeon  ->  356 x 0, nichts zu sehen.
+     2. zusaetzlich `max-height:none` am Inner  ->  356 x 154, immer noch leer.
+     3. gemessen: **das Akkordeon traegt `opacity: 0`.** Der Inhalt war die
+        ganze Zeit da (5 Rubriken, 13 Eintraege, Inner 345 x 702) — nur der
+        Behaelter war durchsichtig. `opacity` schluckt alles, was darin steht,
+        und meldet dabei weder Hoehe null noch `display:none`.
+
+   Das Register steht jetzt im Fluss und ganz oben (`order:-1`), der Aufklapper
+   darunter faellt weg, und der weisse Grund des Akkordeons weicht dem Ton der
+   Schiene. Die Objektliste bleibt darunter erreichbar — am Schreibtisch ist sie
+   zugeklappt, auf dem Handy waere das ein Weg weniger zum eigenen Bestand.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* Das Register: aus dem aufklappbaren Panel wird ein Teil der Schiene.
+     `position:static` nimmt ihm die Dock-Rechnung, `opacity` und `max-height`
+     die beiden Fesseln des geschlossenen Zustands. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion {
+    display: block !important;
+    position: static !important;
+    opacity: 1 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    order: -1 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    margin: 0 !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Der Aufklapper hat keine Aufgabe mehr, wenn das Register offen dasteht. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn {
+    display: none !important;
+  }
+
+  /* Die Suchzeile und die Objektliste ruecken hinter das Register — dieselbe
+     Reihenfolge wie in der Schiene, wo das Portfolio unter der Marke sitzt und
+     die Navigation den Platz bekommt. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title { order: 1 !important; }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-list { order: 2 !important; }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user { order: 3 !important; }
+}
