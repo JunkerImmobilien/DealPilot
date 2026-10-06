@@ -2136,6 +2136,13 @@
       if(typeof window._updateHdrHeight==='function') window._updateHdrHeight();
     }
     m.style.display='block'; m.classList.add('dp-active');
+    /* v1896a · Die Teilchen haengen nicht mehr am Laden der Daten.
+       Vorher stand ihr einziger Aufruf in loadSummaries().then(...) — schlug der Abruf fehl
+       oder kam die Kette nicht dorthin, lief die Animation nie, und niemand sah einen Fehler.
+       Teilchen brauchen keine Zahlen; sie starten, sobald die Flaeche steht. Der spaetere
+       Aufruf in der Kette bleibt stehen und ist dann ein billiger Nachzieher (initParticles
+       legt den Canvas nur an, wenn es ihn noch nicht gibt). */
+    setTimeout(initParticles, 120);
     var tog=document.querySelector('.dp-sidebar-toggle'); if(tog)tog.classList.add('dp-show');
     applyTheme();
     startPlanWatch();   // v452.6: Plan-Wechsel automatisch spiegeln
