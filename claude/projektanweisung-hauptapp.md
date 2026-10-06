@@ -32117,3 +32117,138 @@ entscheiden.** Deshalb ist hier **keine Farbe** der Schublade angefasst worden; 
 die STRUKTUR hergestellt (Register, Zustände, Wischbarkeit). Wenn Marcel sagt „die Aktenmappe ist
 hell", ist das ein eigenes Paket: elf farbtragende Flächen in der Schublade plus die beiden
 Sperrblöcke `:1643` und `:1737`.
+
+---
+
+### (50) 06.10.2026 — v1892–v1892c: Tower und Kanzlei zurück, und das Tablet-Band repariert
+
+**Was** · Marcel: „Unter Einstellungen fehlen nun die anderen Aussehen wie Tower und das andere was
+wir hatten. Ich möchte dass wir das Aussehen ‚heute' und ‚Aktenmappe' auf dem Handy passend skaliert
+wird. **Das muss erstmal nicht hell werden.** … Du musst aber genau schauen dass das Menü im
+passendem Design angezeigt wird wenn man Aktenmappe auswählt und alle Menüs und Tabs passend
+angezeigt werden." Dazu aus dem Parallelstrang: „die Pre-Flight-Karte nicht richtig formatiert …
+in der Tablet-Ansicht."
+
+**Commit** · `2eda9d23` (v1892) · `7d518308` (v1892b) · `864b0b9e` (v1892c)
+
+**Die Versionsnummer** · v1889 war **zweimal** vergeben (Marktbericht und Frontend), v1890 und v1891
+sind weg. Dieses Paket heißt **v1892**. Cache-Buster: `style.css?v=v1892c`,
+`layout-varianten.css?v=v1892b`, `layout-varianten.js?v=v1892b`.
+
+#### 1 · Die Ausblendung aus v1880 ist zurückgenommen
+
+`layout-varianten.js` filterte an **zwei** Stellen (`inPanel()`, `inEinstellungen()`) auf den einen
+Schlüssel `v1b`. Beide Filter sind ersatzlos weg; die Liste kommt wieder aus `LAYOUTS` selbst. Es
+gibt genau drei Einträge — `v1b` Aktenmappe, `v2` Kanzlei, `v2b` Tower — plus „Heute" als Schlüssel
+`''`. Die Beschreibungstexte stimmen unverändert.
+
+#### 2 · Der Befund, der beim Zurückholen auffiel: die RECHTE Schiene
+
+`handyOben` (die v1880-Reparatur) prüft `S.stellung === 'links'` und **greift für die rechte Schiene
+nicht**. Solange nur die Aktenmappe wählbar war, fiel das nicht auf — sie hat nur eine Schiene.
+Kanzlei und Tower haben eine zweite, `ton="hell"`, die auf dem Handy `#sb-actions-accordion` bzw.
+`#hdr-badges` aus Schublade und Kopfzeile genommen hätte: ein heller Kasten quer über das dunkle
+Aussehen, und die Kanzlei-Schublade wieder leer — genau der Befund aus v1880. Unter 901 px wird sie
+seit v1892 **gar nicht gebaut**.
+
+#### 3 · Die Schwelle 1100 hat das Tablet verloren
+
+Gemessen im gleich-Origin-iframe bei **1024 px**, nachdem die Layouts zurück waren:
+
+| | rechte Schiene vorher | nachher |
+|---|---|---|
+| Kanzlei `v2` | `@248, y = 9975` · `position:relative` | `@782, y = 0` · `position:fixed` |
+| Tower `v2b` | `@248, y = 10037` · `position:relative` | `@782, y = 0` · `position:fixed` |
+
+„Im Fluss unter den Inhalt" (v1681b) heißt **am Ende der `.main-col`** — und die ist auf dem
+Objekt-Tab rund zehntausend Pixel hoch. Gemessen wurde die Regel damals bei 817 px an einer kurzen
+Spalte; dort stimmte sie. **Offen ist nicht erreichbar.** Die Schwelle steht jetzt auf 900 — in der
+JS (`imFluss`) und in den drei zugehörigen `@media`-Blöcken in `layout-varianten.css`.
+
+#### 4 · Die Pre-Flight-Karte hatte im Band 641–1100 px gar keine Fassung
+
+Gemessen bei 1024 px: `.dp-pfbar` **690 × 190** in **drei** Zeilen, `flex-wrap: wrap`,
+`.dp-pf-scroll` auf `overflow-x: visible` — nicht wischbar. Der Abrufen-Knopf stand linksbündig in
+der dritten Zeile. Die Bordkarte ist als **eine** Zeile gebaut (`min-height: 78px`, v593).
+
+Ursache sind drei Generationen, die sich widersprechen: **v577** schaltete das Wischen ab
+(`overflow-x:visible !important`), **v578** wollte `nowrap`, **v593** gab der Leiste
+`overflow:hidden`. Unter 641 px gibt es die fertige Schubladen-Fassung (v619), über 1100 px passt
+eine Zeile — **nur dazwischen gab es keine.** Jetzt: `width:max-content`, `nowrap`, wischbar mit
+sichtbarem Balken. Nachher bei 1024 px: **1213 × 78, eine Zeile, 751 px wischbar.**
+
+> `width:100%` in einem `overflow-x:auto`-Behälter lässt den Behälter **keinen** Überlauf sehen —
+> dieselbe Falle wie bei der Portfolio-Strategie-Tabelle in v1889.
+
+Die Pre-Flight-Karte steht in **zwei** Dokumenten: `object-actions.js:375` baut sie im Hauptdokument
+(`#oab-run`), `quickcheck-app.html:3424` im iframe (`qc6-run`). Beide tragen dieselben `dp-pf-*`
+Klassen und werden von `style.css` versorgt — gemessen wurde die des Hauptdokuments.
+
+#### 5 · Kopieren und Löschen waren auf dem Handy tot
+
+`.sbc-actions` steht auf `opacity:0 / pointer-events:none` und wird nur von `:hover`, `.active` und
+`:focus-within` eingeschaltet. **Auf einem Finger gibt es kein `:hover`** — erreichbar war nur die
+ohnehin ausgewählte Zeile. Derselbe Befund wie v1705b, andere Ursache. Korrektur (5) in
+`tools/schublade-regeln.mjs`, Block neu erzeugt (93 Grund-, 48 Stil-, 9 Korrekturregeln,
+Selbstprüfung ok).
+
+#### Nachweis — 20 Läufe, vier Aussehen × fünf Breiten, je frisch geladen
+
+| | 390 | 768 | 820 | 1024 | 1180 |
+|---|---|---|---|---|---|
+| **Heute** | keine Schiene · Überlauf 1 | keine · 1 | keine · 1 | keine · 0 | keine · 1 |
+| **Aktenmappe** | links/dunkel 383×87 ohne Teile | 761×87 | 813×87 | 248×758 `fixed` | 248×758 `fixed` |
+| **Kanzlei** | links/dunkel 383×87 ohne Teile | 761×87 | 813×87 | + rechts `@782,0 fixed` | + rechts `@938,0 fixed` |
+| **Tower** | links/dunkel 383×87 ohne Teile | 761×87 | 813×87 | + rechts `@782,0 fixed` | + rechts `@938,0 fixed` |
+
+Kein Lauf meldet ein Element, das ohne klippenden Vorfahren über den Rand ragt.
+
+**Schublade bei 390 px, über den echten Knopf geöffnet** — Aktenmappe, Kanzlei und Tower sind
+Messwert für Messwert gleich: `357 × 842`, Grund `rgb(14,13,11)`, Kopf `383 × 93` `rgb(14,13,11)`,
+Reiter `rgb(14,13,11)` mit 9 Reitern. **Keines fällt auf den Heute-Ton zurück.**
+Bedienbare Einträge **20, tot 0** (vorher 14 bedienbar / 20 tot).
+
+**Der Schreibtisch ist unverändert** — 1180 px vorher und nachher identisch: Kanzlei
+`rechts/hell 240×758 @938,0 fixed`, Tower dito, Pre-Flight `645 × 89`, `overflow-x: visible`,
+nicht wischbar. Der neue Block endet bei 1100 px.
+
+**Einstellungen → Darstellung → Aussehen**, geklickt statt gesetzt: vier Kacheln à 194 × 79,
+alle bedienbar — Heute · Aktenmappe · Kanzlei · Tower. Klick auf Tower ergibt
+`data-dp-layout="v2b"`, API `v2b`, `dp_layout` gemerkt, Kachel `on`, beide Schienen gebaut.
+
+**Gold-Audit** · zuerst **rot**: `css/style.css 0 → 1`. Das war meine eigene Zeile
+`rgba(201, 168, 76, .14)` — Gold in **Zahlenform**, derselbe Griff daneben wie v1699e, wo ich beim
+Suchen nur nach Hex geschaut hatte. Nach v1892c: **„Genau auf der Basislinie. Kein neues Hartgold."**
+
+#### Zurückgenommen
+
+**Ich hatte gemeldet, Objektliste und Aktionsmenü würden sich in der Schublade überlappen** — zehn
+Karten meldeten „VERDECKT von `button.sb-act-item`". **Das war mein eigener Messfehler.** `#sb-list`
+trägt `overflow: hidden auto` und `max-height: 353,7 px`; die herausgescrollten Karten melden ihre
+**ungescrollte** Lage, und die liegt im Bereich des Akkordeons. Gemessen stoßen beide bei y = 480
+exakt aneinander. Nicht die App war falsch, die Prüfung war es — genau die Falle, vor der der
+Auftrag gewarnt hatte: gegen den klippenden Vorfahren prüfen, nicht gegen den Viewport. Der Prüfer
+tut das jetzt.
+
+**Und eine Werkzeugfalle dazu:** `var top = …` im Seitenkontext kollidiert mit `window.top`. Die
+Zuweisung geht still ins Leere, `top` bleibt ein `Window`, und der nächste `contains()`-Aufruf wirft
+„parameter 1 is not of type 'Node'". Prüfvariablen nie `top` nennen.
+
+#### Was offen bleibt — Staging-Abnahmepunkte
+
+- **„Heute" auf 390 px, Hamburger.** In zwei Messungen schob `#hdr-mobile-menu` die Schublade nicht
+  sichtbar auf (`aside#sidebar` blieb bei x = −349); in einer dritten lag der Knopf unter
+  `div.sb-backdrop`, was eher für „offen" spricht. **Widersprüchlich, nach drei Anläufen
+  abgebrochen.** Von diesem Paket **nicht angefasst** — „Heute" ist vorher wie nachher messgleich.
+  Gehört am echten Gerät abgenommen.
+- **Kanzlei und Tower auf dem Handy verlieren die Ausgaben-Box.** Sie führt keine eigene Logik —
+  jeder ihrer sieben Knöpfe ruft `sbActionsAction(...)`, denselben Weg wie die Aktionsliste. Dass
+  **alle sieben** auch über das Akkordeon erreichbar sind, ist **nicht nachgemessen**.
+- **Die rechte Schiene bei 901 px** lässt rechnerisch 453 px Arbeitsfläche. Gemessen ist 1024 px
+  (576 px). Die schmale Kante des Bandes gehört angesehen.
+- **`nav.tabs` ragt auf dem Handy 21 px über** (`clientWidth 383 / scrollWidth 404`). Es ist eine
+  Scrollfläche, also wischbar — aber ohne sichtbaren Balken. Gleiche Medizin wie Punkt 4 möglich.
+- **`div#oe-karte-gewerke`** meldet bei 390 px `clientWidth 325 / scrollWidth 648`, die Tabelle
+  darin ist 620 px breit. Wischbar, aber 323 px über der Kante — ungeprüft, ob das auffällt.
+- Der **Ton** der Aktenmappe bleibt unangetastet (Journal 48, Backlog N33). Marcel ausdrücklich:
+  „Das muss erstmal nicht hell werden."
