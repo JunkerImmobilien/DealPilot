@@ -432,6 +432,39 @@ Die vollständige Messreihe steht im Journal (57).
   weg. Die übrige Arbeitsfläche führt dort `rgb(244,242,237)`. Produktentscheidung.
 - **Marcels Abnahme im Browser** und ein Prod-Rollout.
 
+### N42 · Quick-Check: Bewertungsbox im Browser abnehmen (06.10.2026)
+
+Der Telegram-Weg ist fertig und gegengemessen: `objekt_schnellblick` liefert Deal-Score, Stufe,
+Empfehlung, Einschätzung und die fünf Teilnoten; Score und Kennzahlen stimmen über fünf Objekte
+auf die Nachkommastelle mit den Werten überein, die der Browser geschrieben hat.
+
+**Was NICHT nachgewiesen ist: der Klick-Durchlauf im Quick-Check der App.** Belegt ist:
+
+```
+qc-heuristik.js geladen          ja, VOR quick-check.js (richtige Reihenfolge)
+window.QcHeuristik               object · einschaetzung, empfehlung, zielKaufpreis,
+                                 bewerten, SCHWELLE
+Probe empfehlung(score 77 …)     KAUFEN · Begruendung · ziel_kp 180.000
+                                 — wortgleich zur Bot-Ausgabe
+Identitaetspruefung (Agent)      2520 Faelle, null Abweichungen
+```
+
+**Nicht belegt:** dass die Box nach einem echten Rechenlauf im Browser auch erscheint. Drei
+Anläufe mit von Hand gefüllten Feldern haben sie nicht erzeugt — ich kenne die Pflichtfelder des
+Quick-Checks nicht und habe aufgehört zu raten.
+
+> **Ein Werkzeug, dessen Eingaben ich nicht kenne, bediene ich nicht blind.** Drei Versuche mit
+> geratenen Feldern beweisen nichts — weder dass es geht, noch dass es nicht geht.
+
+**Dabei gemessen, als eigener Punkt:** der Quick-Check der App läuft in einem eigenen Rahmen
+(`quickcheck-app.html`), und dort ist `qc-heuristik.js` NICHT geladen — der Rahmen lädt nur
+`dscr-engine`, `deal-kpis`, `score-tiers` und `dealscore`. Die Bewertungsbox gehört zu
+`quick-check.js` im Hauptdokument. **Ob beide Wege dieselbe Bewertung zeigen, ist offen.** Siehe
+[[iframe-erbt-nichts]].
+
+**Für Marcel:** einmal durchklicken, 30 Sekunden. Zeigt die Box unten Einschätzung und
+Kaufempfehlung?
+
 ### N41 · Aktenmappe auf dem Handy — Marcels vier Einzelpunkte (06.10.2026) — alle vier erledigt
 
 Marcel, wörtlich, mit der Bitte sie **einzeln** abzuarbeiten:
