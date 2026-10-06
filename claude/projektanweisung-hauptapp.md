@@ -31987,6 +31987,58 @@ gold-audit (Server)        RC=0, genau auf der Basislinie (438 in 54 Dateien)
 > Der Weg ist der Schalter (`.dpl-schalter` → Knopf „Heute"), nicht der Speicher. Siehe
 > [[bedienweg-statt-attribut]].
 
+**Und auf dem Handy standen die Teilchen trotzdem still** (v1900a). Gemessen bei 387 px: der Canvas
+war 383 × 192, obwohl der Mount 9.026 px hoch ist. Ursache ist eine Sammelregel in
+`css/dashboard.css:795` unter `@media (max-width: 768px)`:
+
+```
+#dashboard-main canvas,
+#dashboard-main .chart svg { max-width:100% !important; height:auto !important }
+```
+
+Sie ist für die DIAGRAMM-Canvas gedacht, die sonst über die Spalte hinauslaufen. Der
+Partikel-Canvas ist seit v1896 nur ein neues Mitglied derselben Menge — `height:auto` liess ihn
+auf seine Attributhöhe fallen, und die hatte `size()` gerade aus seiner Fläche genommen: eine
+Rückkopplung, die ihn auf dem ersten gemessenen Wert einfriert.
+
+> **Eine Sammelregel auf Container-Kinder trifft auch die Kinder, die es bei ihrer Entstehung noch
+> nicht gab.** Am Schreibtisch war nichts zu sehen, weil die Regel in einer Medienabfrage unter
+> 768 px steht. Gefunden nur, weil ich „Heute" auch auf dem Handy nachgemessen habe — nicht nur
+> die Aktenmappe. Der Canvas setzt seine Geometrie seitdem INLINE mit `!important`; an der
+> Sammelregel steht ein Hinweis auf die Gegenstelle.
+
+**Der Nachzieher war danach noch falsch gebaut** (v1900b). Der `ResizeObserver` aus v1900 liess den
+Puffer bei 8.499 stehen, während die Fläche 9.026 war, und holte das auch nach Minuten nicht nach:
+`cv.height` IM Rückruf zu setzen ändert die Eigengrösse des Canvas, der Browser wertet das als
+Schleife und verwirft die letzte Meldung stillschweigend.
+
+> **Ein Beobachter, den die eigene Antwort auf seine Meldung zum Schweigen bringt, meldet genau den
+> letzten Schritt nicht.** Jetzt sieht der Zeichenlauf alle 30 Bilder nach und setzt nur bei echter
+> Abweichung neu — das kann nicht in eine Schleife laufen und heilt sich selbst.
+
+**Alle vier Ansichten bei 387 px nachgemessen, nach vollem Neuladen:**
+
+| Ansicht | Schiene | Kopf | Reiter | Überlauf | Kartenwahl |
+|---|---|---|---|---|---|
+| Heute | — | 0–93 | 134–190 | keiner | **weg** (h=0) |
+| Aktenmappe | `display:none` | 0–93 | 134–190 | keiner | da (h=501) |
+| Kanzlei | `display:none` | 0–93 | 134–191 | keiner | da (h=520) |
+| Tower | `display:none` | 0–93 | 134–191 | keiner | da (h=520) |
+
+```
+Partikel Handy 387 px      383x9026, Puffer gleich, 4.915 Bildpunkte
+Partikel Schreibtisch      893x5703, Puffer gleich, 5.362 Bildpunkte
+Diagramm-Canvas Handy      306x220 · 300x132 · 300x132 · 300x172 (unversehrt)
+Bot im Container           Grunderwerbsteuer 5,50 % · Bruttomietrendite 4,95 %
+                           — dieselbe Zahl wie auf der Objektkarte
+```
+
+> **Kanzlei und Tower sind auf dem Handy jetzt nicht mehr von der Aktenmappe zu unterscheiden** —
+> dieselbe Kopfhöhe, dieselben Farben, dieselbe Reiterleiste. Was sie trennt, ist die seitliche
+> Schiene, und die gibt es unter 900 px nicht. **Das ist eine Produktfrage, keine technische:**
+> entweder sie bekommen auf dem Handy ein eigenes Merkmal, oder die Auswahl bietet dort nur zwei
+> Ansichten an. Marcels Entscheidung.
+
 **Rest:** der Kopf ist auf dem Handy 93 px gegen 57 px am Schreibtisch; ob die Marke auf dem Handy
 klein in die Kopfzeile zurück soll, liegt bei Marcel.
 
