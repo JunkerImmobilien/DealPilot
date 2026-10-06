@@ -432,35 +432,62 @@ Die vollständige Messreihe steht im Journal (57).
   weg. Die übrige Arbeitsfläche führt dort `rgb(244,242,237)`. Produktentscheidung.
 - **Marcels Abnahme im Browser** und ein Prod-Rollout.
 
-### N41 · Aktenmappe auf dem Handy — Marcels vier Einzelpunkte (06.10.2026)
+### N41 · Aktenmappe auf dem Handy — Marcels vier Einzelpunkte (06.10.2026) — alle vier erledigt
 
 Marcel, wörtlich, mit der Bitte sie **einzeln** abzuarbeiten:
 
 > „Wir haben die Aktenmappe ausgewählt und wenn du auf Portfolio klickst, ist der Hintergrund
-> Obsidian. Wir haben so Partikel, die durchs Feld gehen. Da muss der Hintergrund rein, wie wenn du
-> das Aktionsmenü dann öffnest. So, das ist ja nur so ein Schwarz- oder Schwarzgrauton, den wir dort
-> ausgesucht haben. … auch meine ich die Angabe Portfolio und allem. Das ist sonst auch weiß
-> umrahmt. Auch die Menüs sind anders. Auch unten die Anmeldung ist anders mit der Pille und der
-> Version. Das ist dann in so einem leichten Grau."
+> Obsidian. … Da muss der Hintergrund rein, wie wenn du das Aktionsmenü dann öffnest. … auch meine
+> ich die Angabe Portfolio und allem. Das ist sonst auch weiß umrahmt. Auch die Menüs sind anders.
+> Auch unten die Anmeldung ist anders mit der Pille und der Version. Das ist dann in so einem
+> leichten Grau."
 
-**N41.1 · Der Hintergrund im Portfolio-Zustand**
-Soll derselbe Schwarzgrau-Ton sein wie im Aktionen-Zustand. Status: offen, wird je Rasterpunkt
-gemessen (nicht nur am Container — eine Fläche kann an verschiedenen Stellen verschieden aussehen).
+**N41.1 · Der Hintergrund im Portfolio-Zustand — BEHOBEN in `v1919`**
+Je Rasterpunkt gemessen, nicht am Container. Im Aktionen-Zustand war die Schublade ein Ton, im
+Portfolio-Zustand zwei: `rgb(14,13,11)` oben und unten, dazwischen die Kartenköpfe auf
+`rgb(23,22,15)`. Neun Punkte Unterschied — zu wenig für eine Aussage, zu viel für unsichtbar.
+Jetzt durchgehend ein Ton, an sieben Rasterpunkten gegengemessen.
 
-**N41.2 · Die Angabe „Portfolio" ist weiß umrahmt**
-Am Schreibtisch trägt `.dpl-portfolio` einen Rahmen `rgb(230,225,214)`. Status: offen, der
-Umschalter auf dem Handy ist zu prüfen.
+**N41.2 · „Portfolio" weiß umrahmt — war schon erfüllt (`v1911`), nachgemessen**
 
-**N41.3 · Die Menüs sind anders**
-Rubriken und Einträge gegen die Schiene halten. Status: offen.
+```
+            Schreibtisch                      Handy
+Umschalter  1,11 px rgb(230,225,214), r 10    1,11 px rgb(230,225,214), r 10
+Suchfeld    —                                 dieselben Werte
+Neu-Knopf   —                                 dieselben Werte
+```
 
-**N41.4 · Anmeldung: Pille und Version in leichtem Grau**
-Schreibtisch: Version `rgb(110,103,92)`, alles andere `rgb(191,183,169)`. Status: offen.
+**N41.3 · Die Menüs — war schon erfüllt (`v1912`), nachgemessen**
 
-> **Warum einzeln:** an diesem Menü sind heute elf Pakete gelaufen (v1906–v1918a). Mehrfach habe
-> ich mehrere Punkte in einem Paket behandelt und dabei einen vierten beschädigt — die
-> Nummernlasche der Bordkarte (v1906 → zurückgenommen in v1915) und die Reste in „Heute" (v1918 →
-> v1918a). Ein Punkt, ein Nachweis, dann der nächste.
+```
+            Schreibtisch                      Handy
+Rubrik      rgb(201,168,76) 10px/700          gleich · Polster 4/9/5 gleich
+Eintrag     rgb(191,183,169) 12,5px/500       gleich · Polster 7/9 gleich
+Einfassung  Polster 4/8/8, ohne Kante         gleich
+```
+
+Einzige Abweichung, bewusst: Einträge 40 px statt 29 — am Schreibtisch zielt eine Maus, auf dem
+Handy ein Finger.
+
+**N41.4 · Anmeldung in leichtem Grau — war schon erfüllt (`v1916`), nachgemessen**
+
+```
+            Schreibtisch        Handy
+Box         rgb(191,183,169)    rgb(191,183,169)
+Avatar      rgb(191,183,169)    rgb(191,183,169)
+Pille       rgb(191,183,169)    rgb(191,183,169)
+Version     rgb(110,103,92)     rgb(110,103,92)
+Wolke       rgb(191,183,169)    rgb(191,183,169)
+```
+
+> **Drei von vier Punkten waren beim Melden schon behoben, aber noch nicht bei ihm angekommen.**
+> Zwischen v1911 und v1919 liegen zehn Pakete; wer dazwischen hinsieht, sieht einen Zwischenstand.
+> Lehre für den nächsten Durchgang: nach jedem Rollout die Punkte EINZELN mit Messwert melden,
+> nicht gesammelt am Ende — dann weiß er, worauf er schaut.
+
+**Offen bleibt nichts aus N41.** Die Partikel, die Marcel beschrieb, gibt es im ganzen Dokument
+nicht (vier Canvas, alle 0 × 0); der Eindruck kam von den beiden Schwarztönen und ist mit N41.1
+weg.
 
 ### N35 · Heute, Aktenmappe und die Objektkarten-Wahl (06.10.2026) — erledigt v1896–v1900, auf Staging
 
