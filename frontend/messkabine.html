@@ -151,28 +151,76 @@
   /* ── Farbe: Text und sein EFFEKTIVER Grund als Paar ────────────────────
      Einzeln ist jede Farbe immer richtig. Gemessen wird der erste Vorfahr
      mit Fläche, und Alpha wird ausgerechnet, nicht geschätzt. */
-  function parse(c){
-    var m = String(c).match(/[\d.]+/g);
-    if (!m) return null;
-    return { r:+m[0], g:+m[1], b:+m[2], a: m.length > 3 ? +m[3] : 1 };
+  /* v1901b · DIE FARBE WIRD GEMALT, NICHT GELESEN.
+
+     Bis v1901a stand hier ein Parser über `String(c).match(/[\d.]+/g)`. Er
+     hat 308 angebliche Kontrastfehler im Reiter Bewertung erzeugt, und
+     keiner davon war einer. Chrome gibt computed colors heute in CSS Color 4
+     zurück:
+
+         color(srgb 0.788235 0.658824 0.298039 / 0.8)
+
+     Das ist Gold #C9A84C bei 80 %. Der Parser las `0.79, 0.66, 0.30` als
+     0–255 und machte daraus rgb(1,1,0) — Schwarz. Gegen den Grund
+     rgb(42,39,39) ergab das 1,35, und die Tabelle sah im Bericht aus wie
+     unlesbar, während sie in Wahrheit goldene Kopfzeilen hat.
+
+     > **Eine Zahlenliste in Klammern sagt nicht, in welcher Einheit sie
+     > steht.** Dieselbe Falle wie `marktmieteCold`.
+
+     Statt die Syntaxen nachzubauen (rgb, rgba, color(srgb), oklch, lab …)
+     wird die Farbe jetzt auf einen 1×1-Canvas GEMALT und das Pixel gelesen.
+     Der Browser normalisiert dabei alles, was er selbst akzeptiert, und die
+     Komposition über dem Grund fällt im selben Schritt mit an — kein
+     eigenes Alpha-Rechnen mehr. */
+  var cvs = document.createElement('canvas');
+  cvs.width = cvs.height = 1;
+  var ctx = cvs.getContext('2d', { willReadFrequently: true });
+
+  /* Malt `farbe` über `hinter` (ein {r,g,b}) und gibt das Ergebnis zurück.
+     Nimmt der Canvas die Angabe nicht an, behält fillStyle den alten Wert —
+     daran ist ein Fehlschlag erkennbar, und dann wird null gemeldet statt
+     geraten. */
+  function male(farbe, hinter){
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillStyle = 'rgb(' + hinter.r + ',' + hinter.g + ',' + hinter.b + ')';
+    ctx.fillRect(0, 0, 1, 1);
+    ctx.fillStyle = '#000000';
+    ctx.fillStyle = farbe;
+    if (ctx.fillStyle === '#000000' && !/^(#000000|black|rgb\(0,\s*0,\s*0\))/i.test(String(farbe).trim())) return null;
+    ctx.fillRect(0, 0, 1, 1);
+    var p = ctx.getImageData(0, 0, 1, 1).data;
+    return { r: p[0], g: p[1], b: p[2], a: 1 };
   }
-  function mix(vorn, hinten){
-    var a = vorn.a;
-    return { r: vorn.r*a + hinten.r*(1-a), g: vorn.g*a + hinten.g*(1-a),
-             b: vorn.b*a + hinten.b*(1-a), a: 1 };
+  /* Ist die Farbe überhaupt sichtbar, also nicht vollständig durchsichtig?
+     Über zwei verschiedenen Gründen gemalt: kommt zweimal der Grund heraus,
+     ist sie durchsichtig. */
+  function deckt(farbe){
+    var a = male(farbe, { r:0, g:0, b:0 }), b = male(farbe, { r:255, g:255, b:255 });
+    if (!a || !b) return false;
+    return !(a.r === 0 && a.g === 0 && a.b === 0 && b.r === 255 && b.g === 255 && b.b === 255);
   }
   function effGrund(el, win){
+    /* Erster Vorfahr mit Fläche; durchsichtige Schichten werden von hinten
+       nach vorn übereinandergemalt. Weiß ist der Anfang — das Blatt. */
     var p = el, stapel = [];
     while (p) {
-      var c = parse(win.getComputedStyle(p).backgroundColor);
-      if (c && c.a > 0) { stapel.push(c); if (c.a >= 1) break; }
+      var c = win.getComputedStyle(p).backgroundColor;
+      if (deckt(c)) { stapel.push(c); if (ist_deckend(c)) break; }
       p = p.parentElement;
     }
-    if (!stapel.length) return { r:255, g:255, b:255, a:1 };
-    var out = stapel[stapel.length - 1];
-    if (out.a < 1) out = mix(out, { r:255, g:255, b:255, a:1 });
-    for (var i = stapel.length - 2; i >= 0; i--) out = mix(stapel[i], out);
+    var out = { r:255, g:255, b:255, a:1 };
+    for (var i = stapel.length - 1; i >= 0; i--) {
+      var n = male(stapel[i], out);
+      if (n) out = n;
+    }
     return out;
+  }
+  /* Deckend heißt: über Schwarz und über Weiß kommt dasselbe heraus. */
+  function ist_deckend(farbe){
+    var a = male(farbe, { r:0, g:0, b:0 }), b = male(farbe, { r:255, g:255, b:255 });
+    if (!a || !b) return false;
+    return Math.abs(a.r-b.r) < 2 && Math.abs(a.g-b.g) < 2 && Math.abs(a.b-b.b) < 2;
   }
   function lum(c){
     function k(v){ v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
@@ -219,13 +267,25 @@
     r.raus = raus.slice(0, 8); r.rausN = raus.length;
     r.uebersprungen = uebersprungen;
 
-    /* (2) Scrollflächen: entweder passt der Inhalt, oder er ist wischbar
-           UND der Balken ist sichtbar. Eine stumme Scrollfläche schneidet
-           ab, ohne es zu sagen. scrollbar-width:none nimmt den Balken weg. */
+    /* (2) Scrollflächen: entweder passt der Inhalt, oder er ist wischbar.
+           **Stumm** heißt: der Inhalt ist breiter, aber overflow-x lässt
+           kein Wischen zu — dann wird abgeschnitten, ohne es zu sagen. Das
+           ist der Befund, der zählt.
+
+           v1901b · Die Schwelle steht auf 4 px, nicht auf 1. Bei 1 px zählte
+           jede Rundung mit: `button#hdr-credits-pill` mit 110 gegen 108 und
+           `div.dp-kg-panel` mit 367 gegen 364 standen als Scrollflächen in
+           der Liste, und 29 der 31 Meldungen waren solche Reste.
+
+           Der Balken wird MITGEMELDET, aber er macht eine Fläche nicht zum
+           Fehler: Chrome gibt überlagernde Balken ohne reservierten Platz,
+           `offsetHeight - clientHeight === 0` beweist also nichts.
+           `scrollbar-width:none` schaltet ihn dagegen wirklich ab — das ist
+           einen Hinweis wert, weil dann nichts anzeigt, dass es weitergeht. */
     var scroll = [];
     alle.forEach(function(el){
       if (gemalt(el) === false) return;
-      if (el.scrollWidth <= el.clientWidth + 1) return;
+      if (el.scrollWidth - el.clientWidth < 4) return;
       var cs = win.getComputedStyle(el), ov = cs.overflowX;
       scroll.push({
         t: nam(el).slice(0, 30), sw: el.scrollWidth, cw: el.clientWidth,
@@ -235,9 +295,8 @@
       });
     });
     r.scroll = scroll.slice(0, 10); r.scrollN = scroll.length;
-    r.stumm = scroll.filter(function(s){
-      return !s.wischbar || s.sbw === 'none' || s.balken === 0;
-    }).length;
+    r.stumm = scroll.filter(function(s){ return !s.wischbar; }).length;
+    r.ohneBalken = scroll.filter(function(s){ return s.wischbar && s.sbw === 'none'; }).length;
 
     /* (3) Bedienelemente: Größe UND Treffbarkeit. Eine Fläche, die groß
            genug ist, aber unter einem Nachbarn liegt, ist nicht bedienbar —
@@ -280,10 +339,10 @@
       if (txt.length < 2) return;
       var b = el.getBoundingClientRect();
       if (b.width < 4 || b.height < 4) return;
-      var cs = win.getComputedStyle(el), fg0 = parse(cs.color);
-      if (!fg0) return;
+      var cs = win.getComputedStyle(el);
       var grund = effGrund(el, win);
-      var fg = fg0.a < 1 ? mix(fg0, grund) : fg0;
+      var fg = male(cs.color, grund);     /* Text ÜBER seinem Grund gemalt */
+      if (!fg) return;
       var k = kontrast(fg, grund);
       var fs = parseFloat(cs.fontSize);
       var gross = fs >= 24 || (fs >= 18.66 && +cs.fontWeight >= 700);
@@ -313,8 +372,9 @@
       ? '<span class="bad">' + r.verdecktN + ' verdeckt</span>'
       : '<span class="ok">alle treffbar</span>') + '\n';
     t += 'Scrollflächen ' + r.scrollN + (r.stumm
-      ? ', <span class="bad">' + r.stumm + ' stumm</span>'
-      : (r.scrollN ? ', <span class="ok">alle wischbar mit Balken</span>' : '')) + '\n';
+      ? ', <span class="bad">' + r.stumm + ' stumm (schneidet ab)</span>'
+      : (r.scrollN ? ', <span class="ok">alle wischbar</span>' : ''))
+      + (r.ohneBalken ? ', <span class="warn">' + r.ohneBalken + ' ohne Balken</span>' : '') + '\n';
     t += 'Kontrast      ' + (r.kontrastN
       ? '<span class="bad">' + r.kontrastN + ' Paare unter der Schwelle</span>'
       : '<span class="ok">alle Paare halten</span>') + '\n';
@@ -334,7 +394,7 @@
            + x.fg + ' auf ' + x.grund + '\n';
       });
     }
-    if (r.stumm) {
+    if (r.stumm || r.ohneBalken) {
       t += '\n<span class="warn">SCROLLFLÄCHEN</span>\n';
       r.scroll.forEach(function(s){
         t += '  ' + s.t + '  ' + s.sw + '>' + s.cw
@@ -433,9 +493,34 @@
     catch (e) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">' + e.message + '</span>'; }
   }, 2400); });
 
+  /* Ein Prüfer, der sich nicht selbst prüft, wird irgendwann grün, ohne
+     hinzusehen. `DPM.selbsttest()` malt bekannte Farben und rechnet gegen
+     Werte, die von Hand nachgerechnet sind. Gold auf Obsidian ist der Fall,
+     an dem der alte Parser gescheitert ist. */
+  function selbsttest(){
+    var w = { r:255, g:255, b:255 }, s = { r:0, g:0, b:0 };
+    var f = [
+      ['#C9A84C deckend',        male('#C9A84C', s),                           [201,168,76]],
+      ['color(srgb) = Gold',     male('color(srgb 0.788235 0.658824 0.298039)', s), [201,168,76]],
+      ['Gold 80% auf Obsidian',  male('color(srgb 0.788235 0.658824 0.298039 / 0.8)', { r:42,g:39,b:39 }), [169,142,69]],
+      ['rgba halb auf Weiß',     male('rgba(0,0,0,0.5)', w),                   [128,128,128]]
+    ];
+    var zeilen = f.map(function(x){
+      var got = x[1], soll = x[2];
+      var ok = got && Math.abs(got.r-soll[0])<=2 && Math.abs(got.g-soll[1])<=2 && Math.abs(got.b-soll[2])<=2;
+      return (ok ? 'ok   ' : 'FEHL ') + x[0] + '  ' + (got ? got.r+','+got.g+','+got.b : 'null')
+             + '  soll ' + soll.join(',');
+    });
+    /* Kontrast Weiß gegen Schwarz muss 21 sein, Weiß gegen Weiß 1. */
+    zeilen.push((kontrast(w, s) === 21 ? 'ok   ' : 'FEHL ') + 'Kontrast Weiß/Schwarz = ' + kontrast(w, s));
+    zeilen.push((kontrast(w, w) === 1 ? 'ok   ' : 'FEHL ') + 'Kontrast Weiß/Weiß = ' + kontrast(w, w));
+    return zeilen;
+  }
+
   window.DPM = { messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
-                 kontrast: kontrast, gemalt: gemalt, geraete: GERAETE };
+                 kontrast: kontrast, gemalt: gemalt, male: male,
+                 selbsttest: selbsttest, geraete: GERAETE };
 
   waehle(2);   /* iPhone 14 */
 })();
