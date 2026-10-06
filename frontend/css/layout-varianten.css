@@ -8047,3 +8047,19 @@ html body .sb-act-item.sb-act-feedback {
     color: var(--wl-A98D40, #A98D40) !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1918a · MARKE UND UMSCHALTER NUR IN DER AKTENMAPPE
+
+   Gegenstueck zum Aufraeumer in `js/layout-varianten.js` (v1918a). Das JS
+   entfernt die beiden beim Wechsel; diese Regel faengt den Fall ab, dass sie
+   aus irgendeinem Grund noch dastehen — etwa weil ein anderer Weg die
+   Seitenleiste neu rendert, bevor der Beobachter anschlaegt.
+
+   > Zwei Sicherungen fuer dieselbe Sache sind eine zu viel — ausser die eine
+   > haengt am Zeitpunkt und die andere nicht.
+   ══════════════════════════════════════════════════════════════════════════════ */
+html:not([data-dp-layout="v1b"]) .dpl-marke-handy,
+html:not([data-dp-layout="v1b"]) .dpl-portfolio-handy {
+  display: none !important;
+}

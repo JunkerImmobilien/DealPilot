@@ -1675,7 +1675,7 @@
       if (!window.matchMedia('(max-width: 900px)').matches) return;
       var sb = document.getElementById('sidebar');
       if (!sb || sb.querySelector('.dpl-portfolio-handy')) return;
-      if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+      if (!nurAktenmappe()) return;
       var pb = document.createElement('button');
       pb.type = 'button';
       pb.className = 'dpl-portfolio dpl-portfolio-handy';
@@ -1716,7 +1716,7 @@
        Mandanten nicht um. */
     function markeHandy() {
       if (!window.matchMedia('(max-width: 900px)').matches) return;
-      if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+      if (!nurAktenmappe()) return;
       var sb = document.getElementById('sidebar');
       if (!sb || sb.querySelector('.dpl-marke-handy')) return;
       var m = document.createElement('div');
@@ -1754,13 +1754,47 @@
        Klasse, die sein Zustand ohnehin verlangt. Damit greifen alle Regeln des
        offenen Zustands — pointer-events, Farben, Abstaende — und nicht nur die,
        an die ich gedacht haette. */
+    /* ── v1918a · UND BEIM WECHSEL ZURUECK WIEDER ABRAEUMEN ──────────────────
+
+       GEMESSEN nach v1918: wechselt man von der Aktenmappe auf „Heute“, bleiben
+       Marke, Umschalter und das offene Register STEHEN. Die drei werden beim
+       Aufbau gesetzt, solange ein Layout aktiv ist — und niemand nimmt sie
+       zurueck, wenn es verschwindet. In „Heute“ standen sie dann ungestylt da:
+       die CSS-Regeln haengen an `[data-dp-layout="v1b"]`, das Attribut fehlt,
+       also griff keine einzige.
+
+         > Wer beim Betreten etwas aufbaut, muss es beim Verlassen abbauen.
+         > Ein Zustand, der nur eine Richtung kennt, ist kein Zustand.
+
+       `setze()` ruft diese Funktion bei jedem Layoutwechsel; sie entscheidet
+       jetzt in beide Richtungen. */
+    function nurAktenmappe() {
+      return window.matchMedia('(max-width: 900px)').matches
+          && document.documentElement.getAttribute('data-dp-layout') === 'v1b';
+    }
     function registerOffenHalten() {
-      if (!window.matchMedia('(max-width: 900px)').matches) return;
-      if (!document.documentElement.hasAttribute('data-dp-layout')) return;
       var acc = document.getElementById('sb-actions-accordion');
-      if (acc && !acc.classList.contains('sb-actions-open')) acc.classList.add('sb-actions-open');
+      if (!acc) return;
+      if (nurAktenmappe()) {
+        if (!acc.classList.contains('sb-actions-open')) acc.classList.add('sb-actions-open');
+      } else {
+        acc.classList.remove('sb-actions-open');
+      }
+    }
+    /* Marke und Umschalter gehoeren nur in die Aktenmappe auf dem Handy. */
+    function handyTeileAufraeumen() {
+      if (nurAktenmappe()) return;
+      ['.dpl-marke-handy', '.dpl-portfolio-handy'].forEach(function (sel) {
+        var e = document.querySelector(sel);
+        if (e && e.parentNode) e.parentNode.removeChild(e);
+      });
     }
     registerOffenHalten();
+    handyTeileAufraeumen();
+    try {
+      new MutationObserver(function () { registerOffenHalten(); handyTeileAufraeumen(); markeHandy(); portfolioKnopfHandy(); })
+        .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dp-layout'] });
+    } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', registerOffenHalten); } catch (e) {}
     /* Nach jedem Umschalten erneut: `portfolio()` baut die Schublade nicht neu,
        aber andere Wege (Mandantenwechsel, Plan-Gates) rendern sie durchaus. */
