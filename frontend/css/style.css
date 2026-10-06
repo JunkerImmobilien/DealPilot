@@ -38344,6 +38344,12 @@ body.hdr-collapsed .hdr-score-mini-red span { color: #e8a09a; }
    die Tabelle ist 396 px breit (Gewerk 132 · Art 78 · modernisiert 90 · Standardstufe 97),
    die Karte klippt bei 311 px - die Standardstufen-Spalte war abgeschnitten. Auf 820 px
    (Tablet) passt alles. Unter 520 px wischt die Tabelle statt zu klippen. ===== */
+/* > v1893 · ACHTUNG BEIM LESEN: von diesem Block wirkt nur noch die ZWEITE Zeile.
+   > `display`, `overflow-x` und `max-width` werden weiter unten von v1881 (Z. 38509)
+   > absichtlich zurueckgenommen - gleicher Selektor, gleiche Media-Query, spaeter und
+   > mit `!important`. Gemessen am 06.10.2026 bei 390 px: die Tabelle steht auf
+   > `display:table`, Scrollkasten ist die KARTE. Wer hier liest und aufhoert, haelt die
+   > Tabelle fuer den Scrollkasten und sucht den Fehler an der falschen Stelle. */
 @media (max-width: 520px) {
   #oe-karte-gewerke #oe-gewerke { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
   #oe-karte-gewerke #oe-gewerke td.oe-g { white-space: normal; }
@@ -38721,5 +38727,72 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   .dp-pf-scroll::-webkit-scrollbar-track {
     background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
     border-radius: 99px;
+  }
+}
+
+/* ═══ v1893 · DIE GEWERKE-KARTE WISCHT, OHNE ES ZU ZEIGEN (390 px) ═══════════════════════
+   Auftrag aus der Handy-Abnahme: `div#oe-karte-gewerke` misst bei 390 px
+   `clientWidth 325 / scrollWidth 648`. Der Verdacht war "die Haelfte fehlt".
+
+   > **Der Verdacht stimmt nicht - gemessen am 06.10.2026 in der Messkabine bei 390 px:**
+   > die Karte IST wischbar, `maxScrollLeft` = 323 px, kein Inhalt wird geklippt. v1881
+   > hat das so gebaut und begruendet (Z. 38509): Scrollkasten ist die KARTE, die Tabelle
+   > behaelt ihre 620 px und ihre 110-px-Auswahlfelder. Das ist richtig und bleibt.
+
+   Zwei Dinge fehlen trotzdem, beide gemessen:
+
+   (1) **Man sieht nicht, dass gewischt werden kann.** Der Balken ist da, aber es ist der
+       globale aus Z. 9 - 5 px hoch in `--border`. Auf der Karte ist das nichts. Gemessen:
+       `offsetHeight 816 - clientHeight 809 - 2 px Rahmen` = 4,8 px Balken, ungefaerbt.
+       Dieselbe Falle wie bei der Strategie-Tabelle (v1889) und der Pre-Flight-Karte
+       (v1892): ein Ueberlauf ohne sichtbaren Balken sieht aus wie abgeschnittener Inhalt.
+       Deshalb hier dieselbe Medizin - 6 px, goldener Daumen, goldene Spur.
+
+   (2) **Beim Wischen wandert die Ueberschrift mit hinaus.** Die Tabelle ist DIREKTES Kind
+       der Karte (gemessen: `.ct` 301 px, `table#oe-gewerke` 620 px, `p.oe-gew-hint` 301 px
+       - kein Behaelter dazwischen). Also wischt die ganze Karte. Gemessen bei
+       `scrollLeft = 323`: `.ct` ("GEWERKE & AUSSTATTUNG") und der Hinweistext wandern um
+       **318 px nach links aus der Karte heraus**. Wer die rechte Spalte ansieht, hat die
+       Ueberschrift nicht mehr - und der Hinweis, der die Spalte erklaert, ist auch weg.
+
+       `position:sticky; left:0` haelt beide stehen, waehrend die Tabelle laeuft. Kein
+       zweiter Behaelter, kein JS, kein Eingriff ins DOM - und `.oe-gew-hint` traegt dabei
+       die Breite der Karte, nicht die der Tabelle, sonst waere der Text 620 px breit.
+
+   Der Ton bleibt, wie er ist. Marcel ausdruecklich: "Das muss erstmal nicht hell werden."
+   Es wird keine Flaechenfarbe angefasst - nur Balken und Haftung.
+   ══════════════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 520px) {
+  /* Dass gewischt werden KANN, muss man sehen. Hoehe und Farben wie im Pre-Flight-Balken
+     (v1892/v1892b), damit beide Wischflaechen auf dem Handy gleich aussehen. */
+  #oe-karte-gewerke { scrollbar-width: thin; }
+  #oe-karte-gewerke::-webkit-scrollbar { height: 6px; }
+  #oe-karte-gewerke::-webkit-scrollbar-thumb {
+    background: var(--wl-c9a84c, #C9A84C); border-radius: 99px;
+  }
+  /* Die Spur als `color-mix` auf dasselbe Token, NICHT als rgba-Tripel: Gold in
+     Zahlenform faerbt sich beim Mandanten nicht um und wird vom gold-audit gezaehlt
+     (der Griff daneben aus v1699e und v1892b). */
+  #oe-karte-gewerke::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+    border-radius: 99px;
+  }
+  /* Ueberschrift und Hinweis bleiben stehen, die Tabelle laeuft darunter weg.
+     KEINE `width`-Angabe: `position:sticky` ist in-flow, beide behalten ihre 301 px
+     (gemessen: Karte clientWidth 325 minus 2x12 Polster). Hier stand in meinem ersten
+     Entwurf `width: calc(100vw - 65px)` - geraten, und im iframe ausserdem falsch. */
+  #oe-karte-gewerke > .ct,
+  #oe-karte-gewerke > .oe-gew-hint {
+    position: sticky; left: 0; z-index: 2;
+    /* Der Kopf steht, die Tabelle laeuft darunter weg - er braucht also einen eigenen
+       Grund, sonst scheint die Tabelle durch die Schrift.
+
+       > `background-color: inherit` statt eines Literals, und zwar GEMESSEN: der Grund
+       > der Karte ist `rgb(255,255,255)`, NICHT das Markencreme #FBF6E9 - und `--card`
+       > ist am `<html>` gar nicht gesetzt (leerer String). Mein erster Entwurf stand auf
+       > `var(--card, #FBF6E9)`; der Fallback haette also IMMER gegriffen und einen
+       > cremefarbenen Kasten auf eine weisse Karte gelegt. `inherit` nimmt den Grund,
+       > den die Karte wirklich hat - in jeder Marke und in jedem Aussehen. */
+    background-color: inherit;
   }
 }
