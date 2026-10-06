@@ -5492,6 +5492,192 @@
 
   function _pz(n) { return String(Math.round(n * 100) / 100).replace('.', ','); }
 
+  /* ═══ v1895 · BEWIRTSCHAFTUNG POSTEN FUER POSTEN ═══════════════════
+     Marcels Entscheidung vom 06.10.2026: „ne a und dann text hinter wenn
+     pauschal" — Variante (a) heisst: was der Nutzer nennt, gilt; was er
+     NICHT nennt, bleibt pauschal, statt auf null zu fallen.
+
+     HIER STAND BIS v1894 „alles oder nichts":
+
+         var bwkQuelle = (ul || nul) ? 'gesagt' : 'profil';
+         if (!ul && !nul) { ...Pauschalquoten... }
+
+     Die Pauschale griff also nur, wenn BEIDE Seiten leer waren. Der
+     Sprechlauf fragt aber genau `hg_ul`/`hg_nul` ab (RFRAGEN, Etappe 4)
+     und sonst keinen einzigen der sieben Posten. Wer sein Hausgeld nennt
+     — der Normalfall bei einer ETW — verlor damit das kalkulatorische
+     Mietausfallwagnis, die eigene Ruecklage und die Sonderverwaltung
+     stillschweigend auf 0.
+
+     GEMESSEN an den echten Rechenkernen (DealKpis + Dscr, 180.000 EUR /
+     940 EUR Kaltmiete / 36.000 EUR EK / 3,8 % / 1,5 %):
+
+       nichts gesagt        -> nul 1.805    cf n.St.  1.065 EUR/J
+       nur hg_ul 2.880 gesagt -> nul     0  cf n.St.  2.140 EUR/J
+
+     1.075 EUR im Jahr, und zwar nach OBEN: wer den umlagefaehigen Teil
+     seines Hausgelds nennt, stand danach ohne jede Eigentuemerkosten da.
+
+     ── WAS DECKT WELCHER POSTEN (fachliche Begruendung der Weiche) ──
+     Das Hausgeld einer WEG deckt ueber `hg_nul` die VERWALTERGEBUEHR und
+     die INSTANDHALTUNGSRUECKLAGE ab — deshalb fuehrt das Formular die
+     WEG-Ruecklage ausdruecklich als Info-Feld, das NICHT mitsummiert wird
+     (index.html:2918, calc.js:1346). Es deckt NICHT:
+
+       · das MIETAUSFALLWAGNIS — eine kalkulatorische Position nach
+         Anlage 3 ImmoWertV. Sie steckt in keiner Hausgeldabrechnung,
+         weil ihr keine Zahlung gegenuebersteht. Also wird sie immer
+         pauschal angesetzt, wenn der Nutzer sie nicht nennt.
+       · die SONDERVERWALTUNG (`nul_sonst`) und die EIGENE Ruecklage
+         (`eigen_r`) — beides freiwillige Zusatzpositionen OBERHALB des
+         Hausgelds. Pauschal anzusetzen hiesse einen SEV-Vertrag bzw.
+         eine Spar-Entscheidung zu behaupten, die es nicht geben muss.
+         Sie bleiben 0 — ihr Platzhalter im Formular ist ebenfalls 0.
+
+     ── DOPPELZAEHLUNG: WARUM DIE QUOTE EIN DECKEL IST, KEIN AUFSCHLAG ──
+     `bwk_anteil_default` (16 %) ist eine SUMMENQUOTE fuer die ganze nicht
+     umlagefaehige Seite — der Einstellungsdialog sagt es wortgleich:
+     „Verwaltung, Ruecklagen" (investment-profile.js:212). Wuerde das
+     Wagnis mit seinem eigenen Satz (`mietausfall_pct`, 1 %) ZUSAETZLICH
+     obendrauf kommen, rechnete ein Objekt ohne jede Angabe plötzlich mit
+     17 % statt 16 % — jede bestehende Kalkulation haette sich verschoben.
+     Deshalb: das Wagnis wird aus der Quote HERAUSGERECHNET, der Rest geht
+     an `hg_nul`. Ohne jede Angabe steht die Summe damit auf den Cent da,
+     wo sie vor v1895 stand.
+
+     ── DIE GRUNDSTEUER BEWEGT DEN CASHFLOW NICHT ──
+     Gemessen: 336 EUR Grundsteuer zusaetzlich eingetragen aenderten
+     cf n.St. um 0 EUR. Sie laeuft als UMLAGEFAEHIG (§ 2 Nr. 1 BetrKV)
+     und ist damit ein durchlaufender Posten — `DealKpis` rechnet
+     `bwk_cf = bwk_nul` (deal-kpis.js:83). Sie bewegt nur die
+     Anzeige-Summe. Einen eigenen Pauschalsatz hat sie nicht; sie steckt
+     im umlagefaehigen Rest.
+
+     Rueckgabe: { ul, nul, quelle, posten: [...] }, wobei jeder Posten
+     `quelle` 'gesagt' | 'pauschal' | 'nicht_angesetzt' traegt und die
+     pauschalen einen fertigen Klartext-Vermerk (`vermerk`) fuer die
+     Anzeige — Marcels „Text hinter". */
+  var BWK_POSTEN = [
+    { id: 'hg_ul',       seite: 'ul',  label: 'Hausgeld, umlagefähiger Teil',
+      rest: 1 },
+    { id: 'grundsteuer', seite: 'ul',  label: 'Grundsteuer' },
+    { id: 'ul_sonst',    seite: 'ul',  label: 'Sonstiges umlagefähig' },
+    { id: 'hg_nul',      seite: 'nul', label: 'Hausgeld, dein eigener Teil',
+      rest: 1 },
+    { id: 'eigen_r',     seite: 'nul', label: 'Eigene Instandhaltungsrücklage' },
+    { id: 'mietausfall', seite: 'nul', label: 'Kalkulatorischer Mietausfall',
+      satz: 'mietausfall_pct' },
+    { id: 'nul_sonst',   seite: 'nul', label: 'Sonderverwaltung' }
+  ];
+
+  function _rfBwkPosten(nkmMonat) {
+    /* Einheit am Anzeigecode ausgelesen, nicht angenommen: `nkm` ist die
+       MONATS-Nettokaltmiete (index.html fuehrt das Feld als „Nettokaltmiete
+       / Monat", calc.js rechnet durchgaengig `nkm*12`). Die Quoten in den
+       Einstellungen stehen auf der JAHRES-Kaltmiete. */
+    var nkm = (nkmMonat == null) ? _rfNum(_rfFeld('nkm')) : nkmMonat;
+    var nkmJ = (nkm != null && nkm > 0) ? nkm * 12 : 0;
+
+    var qUl  = _profilZahl('bwk_ul_pct_default');
+    var qNul = _profilZahl('bwk_anteil_default');
+
+    var posten = [], gesagt = 0, pauschal = 0;
+    var deckel = { ul: (qUl  != null && nkmJ > 0) ? nkmJ * qUl  / 100 : null,
+                   nul: (qNul != null && nkmJ > 0) ? nkmJ * qNul / 100 : null };
+    var genannt = { ul: 0, nul: 0 }, vorab = { ul: 0, nul: 0 };
+    var restPosten = {};
+
+    /* Erster Durchgang: ABWESENHEIT pruefen, nicht Zahlenwert.
+       `_rfNum` gibt null zurueck, wenn nichts dasteht — nie 0. „Nicht
+       angegeben" und „angegeben als 0" bleiben damit zwei verschiedene
+       Dinge, und wer bewusst eine 0 eintraegt, bekommt keine Pauschale
+       darueber. (Ein `|| 0`-Fallback wie vor v1895 kann das nicht
+       unterscheiden: `Number(null)` ist 0 und besteht `isFinite`.) */
+    BWK_POSTEN.forEach(function (p) {
+      var n = _rfNum(_rfFeld(p.id));
+      if (n != null) {
+        posten.push({ id: p.id, label: p.label, seite: p.seite,
+                      betrag: n, quelle: 'gesagt' });
+        genannt[p.seite] += n;
+        gesagt++;
+        return;
+      }
+      if (p.rest) { restPosten[p.seite] = p; return; }   /* Rest kommt zuletzt */
+      /* Ein Posten mit EIGENEM Satz in den Einstellungen wird pauschal
+         angesetzt — unabhaengig davon, was sonst gesagt wurde. Das
+         Mietausfallwagnis ist genau dieser Fall. */
+      if (p.satz) {
+        var s = _profilZahl(p.satz);
+        if (s != null && s > 0 && nkmJ > 0) {
+          var b = nkmJ * s / 100;
+          posten.push({ id: p.id, label: p.label, seite: p.seite, betrag: b,
+                        quelle: 'pauschal', satz: s,
+                        vermerk: _bwkVermerk(p.label, b, s) });
+          vorab[p.seite] += b;
+          pauschal++;
+          return;
+        }
+      }
+      /* Alles andere: ausdruecklich NICHT angesetzt, mit Begruendung —
+         kein stilles 0, aber auch keine erfundene Zahl. */
+      posten.push({ id: p.id, label: p.label, seite: p.seite, betrag: 0,
+                    quelle: 'nicht_angesetzt' });
+    });
+
+    /* Zweiter Durchgang: der Rest-Posten je Seite traegt, was die
+       Summenquote noch nicht abgedeckt hat. */
+    ['ul', 'nul'].forEach(function (seite) {
+      var p = restPosten[seite];
+      if (!p) return;
+      var d = deckel[seite];
+      if (d == null) {
+        posten.push({ id: p.id, label: p.label, seite: seite, betrag: 0,
+                      quelle: 'nicht_angesetzt' });
+        return;
+      }
+      var b = Math.max(0, d - genannt[seite] - vorab[seite]);
+      if (b <= 0) {
+        posten.push({ id: p.id, label: p.label, seite: seite, betrag: 0,
+                      quelle: 'nicht_angesetzt' });
+        return;
+      }
+      var satz = nkmJ > 0 ? Math.round(b / nkmJ * 1000) / 10 : null;
+      posten.push({ id: p.id, label: p.label, seite: seite, betrag: b,
+                    quelle: 'pauschal', satz: satz,
+                    vermerk: _bwkVermerk(p.label, b, satz) });
+      pauschal++;
+    });
+
+    var ul = 0, nul = 0;
+    posten.forEach(function (p) { if (p.seite === 'ul') ul += p.betrag; else nul += p.betrag; });
+
+    return {
+      ul: ul, nul: nul, posten: posten,
+      pauschale: posten.filter(function (p) { return p.quelle === 'pauschal'; }),
+      quelle: pauschal ? (gesagt ? 'gemischt' : 'profil') : 'gesagt'
+    };
+  }
+
+  /* Marcels „Text hinter" — ein Satz, den ein Kunde versteht. Kein
+     „pauschal (Profil)": das sagt dem Nicht-Techniker nichts darueber,
+     dass er die Zahl selbst ersetzen kann. */
+  function _bwkVermerk(label, betrag, satz) {
+    var s = (satz != null && isFinite(satz))
+      ? (' — ' + String(Math.round(satz * 10) / 10).replace('.', ',') + ' % deiner Jahresmiete')
+      : '';
+    return 'Diese Zahl habe ich geschätzt' + s +
+           ', weil du dazu nichts gesagt hast. Trag deinen eigenen Wert ein, dann rechne ich damit.';
+  }
+
+  /* Eine Zeile fuer die Score-Karte: „X und Y habe ich geschaetzt". */
+  function _bwkVermerkZeile(B) {
+    if (!B || !B.pauschale || !B.pauschale.length) return '';
+    var teile = B.pauschale.map(function (p) {
+      return p.label + ' ' + _euroKurz(p.betrag);
+    });
+    return 'Geschätzt, weil du dazu nichts gesagt hast: ' + teile.join(' · ');
+  }
+
   /* ── Die Kennzahlen aus dem Gespraech ───────────────────────────────
      Gibt null zurueck, wenn Kaufpreis oder Miete fehlen. Kein halber
      Score: „Wo die Quelle endet, endet die Rechnung." */
@@ -5531,17 +5717,11 @@
     }
     if (d1t == null) { d1t = _profilZahl('tilgung_default'); if (d1t != null) zinsQuelle = (zinsQuelle === 'gesagt' ? 'gemischt' : zinsQuelle); }
 
-    /* Bewirtschaftung — dieselbe Aufteilung wie calc.js:1157/1158.
-       Steht nichts, greifen die Quoten aus den Einstellungen. */
-    var ul  = (_rfNum(_rfFeld('hg_ul'))  || 0) + (_rfNum(_rfFeld('grundsteuer')) || 0) + (_rfNum(_rfFeld('ul_sonst')) || 0);
-    var nul = (_rfNum(_rfFeld('hg_nul')) || 0) + (_rfNum(_rfFeld('eigen_r'))     || 0) +
-              (_rfNum(_rfFeld('mietausfall')) || 0) + (_rfNum(_rfFeld('nul_sonst')) || 0);
-    var bwkQuelle = (ul || nul) ? 'gesagt' : 'profil';
-    if (!ul && !nul) {
-      var qUl = _profilZahl('bwk_ul_pct_default'), qNul = _profilZahl('bwk_anteil_default');
-      if (qUl != null)  ul  = nkm * 12 * qUl / 100;
-      if (qNul != null) nul = nkm * 12 * qNul / 100;
-    }
+    /* Bewirtschaftung — POSTEN FUER POSTEN (v1895, siehe _rfBwkPosten). */
+    var _B = _rfBwkPosten(nkm);
+    var ul  = _B.ul;
+    var nul = _B.nul;
+    var bwkQuelle = _B.quelle;
 
     var afaSatz = _rfNum(_rfFeld('afa_satz'));
     var gebAnt  = _rfNum(_rfFeld('geb_ant'));
@@ -5566,7 +5746,8 @@
     return {
       K: K, kp: kp, nkm: nkm, ze: ze, gi: gi, ek: ek, d1: d1,
       d1z: d1z, d1t: d1t, nk: nk, nkEur: nkEur, wp: wp, svw: svw,
-      quellen: { ek: ekQuelle, zins: zinsQuelle, bwk: bwkQuelle }
+      quellen: { ek: ekQuelle, zins: zinsQuelle, bwk: bwkQuelle },
+      bwk: _B                      /* v1895: die Posten samt Vermerken */
     };
   }
 
@@ -6001,7 +6182,11 @@
     var annahmen = [Z.nk.text];
     if (Z.quellen.ek === 'profil')   annahmen.push('Eigenkapital aus deiner Standard-Quote');
     if (Z.quellen.zins !== 'gesagt') annahmen.push('Zins und Tilgung aus deinen Einstellungen');
-    if (Z.quellen.bwk === 'profil')  annahmen.push('Bewirtschaftung als Quote der Kaltmiete');
+    /* v1895 · Bis hierher stand hier ein pauschales „Bewirtschaftung als
+       Quote der Kaltmiete" — und zwar nur, wenn ALLE sieben Posten leer
+       waren. Jetzt wird jeder geschaetzte Posten mit Namen und Betrag
+       genannt, auch wenn der Nutzer sein Hausgeld selbst gesagt hat. */
+    var bwkZeile = _bwkVermerkZeile(Z.bwk);
     annahmen.push('Darlehen = Gesamtinvestition minus Eigenkapital');
 
     /* v1292: Break-even — „ab wann lohnt es sich" ist die Frage, die ein
@@ -6031,7 +6216,9 @@
         _zeile('Gesamtinvestition', _euroKurz(Z.gi)) +
       '</div>' + beZeile +
       '<div class="vi-sc-text">' + escH(S.interpretation || '') + '</div>' +
-      '<div class="vi-sc-annahmen"><b>Gerechnet mit:</b> ' + escH(annahmen.join(' · ')) + '</div>' +
+      '<div class="vi-sc-annahmen"><b>Gerechnet mit:</b> ' + escH(annahmen.join(' · ')) +
+        (bwkZeile ? '<div class="vi-rf-zaehler" style="margin-top:6px">' + escH(bwkZeile) + '</div>' : '') +
+      '</div>' +
     '</div>';
   }
 
@@ -9861,6 +10048,24 @@
     /* v1288: Die Herkunft je Feld geht mit in die Tabelle. Ohne sie stuende
        dort „Sprachaufzeichnung" an Zahlen, die der Co-Pilot selbst geholt
        hat — und genau das war der Vorbehalt im Backlog. */
+    /* ═══ v1895 · Die pauschal angesetzten Posten gehen MIT ════════════
+       Sonst rechnete der Sprechlauf-Score mit 1.805 EUR Eigentuemerkosten
+       und der Tab Kennzahlen danach mit 0 — dieselbe Wohnung, zwei
+       Zahlen, und niemand koennte sagen, welche gilt. `_rfSetzen`
+       ueberschreibt nichts, was gesagt wurde, und jeder Posten nimmt
+       seinen Klartext-Vermerk als Herkunft mit: der landet ueber
+       `_herkunftMerken` in `_dp_herkunft` und von dort in der
+       Pilot-Analyse (ui.js:783) und im Formular (bwk-vermerk.js).
+
+       Die Posten erscheinen damit in der Uebernahme-Tabelle und sind dort
+       abwaehlbar — eine Schaetzung, die sich nicht abwaehlen laesst, waere
+       keine Schaetzung, sondern eine Ansage. */
+    try {
+      var _bwkP = _rfBwkPosten();
+      (_bwkP.pauschale || []).forEach(function (p) {
+        _rfSetzen(p.id, String(Math.round(p.betrag)), p.vermerk);
+      });
+    } catch (e) {}
     if (_rf.quelle) _rf.data.quellen = _rf.quelle;
     /* ═══ v1311 · Die Herkunft überlebt den Dialog ═════════════════════
        Marcels Vorgabe: „dass all das was wir ausgearbeitet haben auch
@@ -11536,6 +11741,11 @@
                          _kennzahlen: _rfKennzahlen,
                          _score1: _rfScore1, _score2: _rfScore2,
                          _nkAnnahme: _rfNkAnnahme,
+                         /* v1895: die Bewirtschaftung posten-weise -
+                            von aussen nicht messbar, wenn sie nicht
+                            heraussieht. */
+                         _bwkPosten: _rfBwkPosten,
+                         _bwkVermerkZeile: _bwkVermerkZeile,
                          _hebel: _rfHebel,             /* v1292b */
                          _breakEven: function () { return _rfBreakEven(_rfKennzahlen()); },
                          _mietPotenzial: function () { return _rfMietPotenzial(_rfKennzahlen()); },

@@ -949,17 +949,50 @@
 
     platz(34);
     abschnitt('Bewirtschaftung');
-    zeile('Hausgeld umlagefähig / Jahr', eur(num('hg_ul')));
-    zeile('Grundsteuer / Jahr', eur(num('grundsteuer')));
-    if (num('ul_sonst')) zeile('Sonstiges umlagefähig', eur(num('ul_sonst')));
+    /* ═══ v1895 · Jede geschaetzte Zahl sagt es im PDF selbst ══════════
+       Ein Bankexposé, das eine angesetzte Pauschale wie eine vorgelegte
+       Zahl ausweist, behauptet eine Herkunft. Die Herkunft liegt in
+       `_dp_herkunft` (der Sprechlauf schreibt sie, ui.js:783 liest sie
+       fuer die Pilot-Analyse). `(geschätzt)` haengt am LABEL, damit die
+       Zahlenspalte rechts ausgerichtet bleibt — und die Fussnote darunter
+       sagt einmal in ganzen Worten, was das heisst.
+
+       Marke: jsPDF kennt kein `var()`, hier wird deshalb auch keine
+       Farbe gesetzt — der Hinweis traegt sich ueber den Text. */
+    var _hk1895 = (function () {
+      try {
+        var e = document.getElementById('_dp_herkunft');
+        if (!e || !e.value) return {};
+        var o = JSON.parse(e.value);
+        return (o && typeof o === 'object') ? o : {};
+      } catch (e2) { return {}; }
+    })();
+    var _gs1895 = [];
+    function _lbl1895(id, label) {
+      var t = _hk1895[id];
+      if (t == null || String(t).trim() === '') return label;
+      if (!/geschätzt|geschaetzt|angesetzt|pauschal|Einstellungen|angenommen/i.test(String(t))) return label;
+      if (_gs1895.indexOf(label) < 0) _gs1895.push(label);
+      return label + '  (geschätzt)';
+    }
+    zeile(_lbl1895('hg_ul', 'Hausgeld umlagefähig / Jahr'), eur(num('hg_ul')));
+    zeile(_lbl1895('grundsteuer', 'Grundsteuer / Jahr'), eur(num('grundsteuer')));
+    if (num('ul_sonst')) zeile(_lbl1895('ul_sonst', 'Sonstiges umlagefähig'), eur(num('ul_sonst')));
     zeile('Summe umlagefähig (durchlaufend)', eur(K.bwk_ul), { fett: true });
-    zeile('Hausgeld nicht umlagefähig / Jahr', eur(num('hg_nul')));
+    zeile(_lbl1895('hg_nul', 'Hausgeld nicht umlagefähig / Jahr'), eur(num('hg_nul')));
     if (num('weg_r')) zeile('WEG-Rücklage / Jahr (nachrichtlich)', eur(num('weg_r')), { klein: true });
-    if (num('eigen_r')) zeile('Eigene Instandhaltungsrücklage', eur(num('eigen_r')));
-    if (num('mietausfall')) zeile('Kalkulatorischer Mietausfall', eur(num('mietausfall')));
+    if (num('eigen_r')) zeile(_lbl1895('eigen_r', 'Eigene Instandhaltungsrücklage'), eur(num('eigen_r')));
+    if (num('mietausfall')) zeile(_lbl1895('mietausfall', 'Kalkulatorischer Mietausfall'), eur(num('mietausfall')));
+    if (num('nul_sonst')) zeile(_lbl1895('nul_sonst', 'Sonderverwaltung'), eur(num('nul_sonst')));
     zeile('Summe nicht umlagefähig (im Cashflow)', eur(K.bwk_cf), { summe: true });
     zeile('Bewirtschaftungskosten gesamt / Jahr', eur(K.bwk));
     zeile('davon Anteil an der Kaltmiete', (da(K.nkm_j) && K.nkm_j > 0) ? pct(K.bwk / K.nkm_j * 100, 1) : '-', { klein: true });
+    if (_gs1895.length) {
+      einleitung('Die mit (geschätzt) bezeichneten Posten hat DealPilot angesetzt, weil dazu keine '
+        + 'Angabe vorlag — als Anteil der Jahresmiete nach den hinterlegten Standardwerten. '
+        + 'Das kalkulatorische Mietausfallwagnis steckt in keiner Hausgeldabrechnung und wird '
+        + 'deshalb immer angesetzt. Alle übrigen Zahlen dieses Abschnitts sind vorgelegte Werte.');
+    }
     y += 2;
 
     platz(30);

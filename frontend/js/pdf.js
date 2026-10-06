@@ -1446,19 +1446,55 @@ async function _exportPDFInner() {
     cy += 4;
   }
   cy = secH(doc, cy, 'Bewirtschaftungskosten (BWK)', M, CW);
-  kvT(doc, M, cy, CW, [
-    ['Hausgeld umlagef\u00e4hig / Jahr',       pE(v('hg_ul'))],
-    ['Grundsteuer / Jahr',                     pE(v('grundsteuer'))],
-    ['Sonstiges umlagef\u00e4hig',             pE(v('ul_sonst'))],
+  /* v1895 \u00b7 Dieselbe Kennzeichnung wie im Bank-Expos\u00e9: was DealPilot
+     angesetzt hat, traegt `(gesch\u00e4tzt)` am Label. Die Herkunft kommt aus
+     `_dp_herkunft`, geschrieben vom Sprechlauf. */
+  var _hk1895 = (function () {
+    try {
+      var e = document.getElementById('_dp_herkunft');
+      if (!e || !e.value) return {};
+      var o = JSON.parse(e.value);
+      return (o && typeof o === 'object') ? o : {};
+    } catch (e2) { return {}; }
+  })();
+  var _gs1895 = 0;
+  function _lbl1895(id, label) {
+    var t = _hk1895[id];
+    if (t == null || String(t).trim() === '') return label;
+    if (!/gesch\u00e4tzt|geschaetzt|angesetzt|pauschal|Einstellungen|angenommen/i.test(String(t))) return label;
+    _gs1895++;
+    return label + '  (gesch\u00e4tzt)';
+  }
+  cy = kvT(doc, M, cy, CW, [
+    [_lbl1895('hg_ul', 'Hausgeld umlagef\u00e4hig / Jahr'),       pE(v('hg_ul'))],
+    [_lbl1895('grundsteuer', 'Grundsteuer / Jahr'),               pE(v('grundsteuer'))],
+    [_lbl1895('ul_sonst', 'Sonstiges umlagef\u00e4hig'),          pE(v('ul_sonst'))],
     ['Summe umlagef\u00e4hig',                 pE(v('hg_ul') + v('grundsteuer') + v('ul_sonst'))],
-    ['Hausgeld nicht umlagef\u00e4hig / Jahr', pE(v('hg_nul'))],
+    [_lbl1895('hg_nul', 'Hausgeld nicht umlagef\u00e4hig / Jahr'), pE(v('hg_nul'))],
     ['WEG-R\u00fccklage / Jahr (Info)',        pE(v('weg_r'))],
-    ['Eigene Instandhaltungsr\u00fccklage',    pE(v('eigen_r'))],
-    ['Kalkulat. Mietausfall',                  pE(v('mietausfall'))],
+    [_lbl1895('eigen_r', 'Eigene Instandhaltungsr\u00fccklage'),  pE(v('eigen_r'))],
+    [_lbl1895('mietausfall', 'Kalkulat. Mietausfall'),            pE(v('mietausfall'))],
+    [_lbl1895('nul_sonst', 'Sonderverwaltung'),                   pE(v('nul_sonst'))],
     ['Summe nicht umlagef\u00e4hig',           pE(v('hg_nul') + v('eigen_r') + v('mietausfall') + v('nul_sonst'))],
     ['BWK Gesamt / Jahr',                      pE(K.bwk)],
     ['BWK als % der NKM',                      pP(K.nkm_j > 0 ? K.bwk / K.nkm_j * 100 : 0, 1)]
-  ], [3, 8, 9]);
+  ], [3, 9, 10]);
+  /* Der Satz steht nur da, wenn wirklich etwas geschaetzt wurde. Ein
+     Hinweis an einer Tabelle ohne Schaetzung behauptet eine Unsicherheit,
+     die es nicht gibt. */
+  if (_gs1895 > 0 && typeof cy === 'number') {
+    try {
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(7.4); doc.setTextColor(120);
+      doc.splitTextToSize('Die mit (gesch\u00e4tzt) bezeichneten Posten hat DealPilot angesetzt, '
+        + 'weil dazu keine Angabe vorlag \u2014 als Anteil der Jahresmiete nach den hinterlegten '
+        + 'Standardwerten. Das kalkulatorische Mietausfallwagnis steckt in keiner '
+        + 'Hausgeldabrechnung und wird deshalb immer angesetzt.', CW).forEach(function (z) {
+        cy += 3.4; doc.text(z, M, cy);
+      });
+      cy += 3;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
+    } catch (e) {}
+  }
 
   setPdfProgress(50);
 
