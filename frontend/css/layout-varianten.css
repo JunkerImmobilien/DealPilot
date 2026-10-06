@@ -7323,3 +7323,57 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
          > Marcel: "ja auch anpassen dass es auf dem Handy passt." */
   html[data-dp-layout] aside#sidebar .sb-section-title .sb-sort-toggle { gap: 18px !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1906 · DAS MENUE DER AKTENMAPPE ZEIGT OBJEKTE, NICHT KENNZAHLEN
+
+   Marcel am 06.10.2026: „die Objektkarte Kennzahlen und aktenreiter kann erstmal
+   raus" — „oder du passt sie richtig an das es richtig dargestellt wird."
+
+   GEMESSEN am 06.10.2026 auf Staging, Aktenmappe bei 387 px, Menue offen:
+
+     Schublade          357 x 758
+     Liste  #sb-list    356 x 476   (wischbar, scrollHeight 3003)
+     eine Karte         321 x 122
+       .sbc-score-overlay   26 px   (absolut, oben rechts)
+       .sbc-top             43 px   Adresse, Preis, Halter
+       .sbc-mini-grid       67 px   die drei Kennzahlen-Kacheln
+       .sbc-actions         26 px   (absolut)
+
+   **67 der 122 px traegt das Kachelband.** Bei 476 px Listenhoehe sind das DREI
+   sichtbare Objekte von zwanzig — die dritte endet mitten im Kachelband, und
+   darunter beginnt schon die Aktionen-Zeile. Ein Menue, das von zwanzig Eintraegen
+   drei zeigt, ist kein Menue mehr, sondern ein Ausschnitt.
+
+   > Was im Cockpit die Hauptsache ist, ist im Menue Beiwerk. Dieselbe Karte an
+   > zwei Orten heisst nicht, dass sie an beiden dasselbe leisten muss.
+
+   Die drei Kacheln und die Nummernlasche fallen deshalb NUR HIER weg — in der
+   Schublade, nur unter 900 px, nur wenn ein Layout aktiv ist. Uebrig bleibt, was
+   ein Menue braucht: Score-Ring, Adresse, Preis, Halter und die beiden
+   Aktionsknoepfe. Die Karte faellt damit von 122 auf rund 55 px.
+
+   NICHT BETROFFEN und absichtlich so:
+     · die Ansicht „Heute" — sie traegt kein `data-dp-layout`
+     · der Schreibtisch — dort greift die Medienabfrage nicht, und die Schiene
+       haelt das Portfolio ohnehin zugeklappt (gemessen: `dpl-teil-objekte` AUS)
+     · das Cockpit und jede andere Flaeche, auf der dieselbe Karte steht
+
+   Die Objektnummer steht damit im Menue nicht mehr auf der Karte. Sie ist dort
+   Anzeige, kein Bedienelement; der Eintrag bleibt ueber Adresse und Preis
+   eindeutig. Wenn sie gebraucht wird, gehoert sie in die Adresszeile, nicht
+   zurueck auf den Rahmen.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Die doppelte Attributangabe hebt die Spezifitaet ueber die Stil-Regeln der
+     sieben Kartenstile, ohne einen ID-Selektor auf Container-Kinder zu legen. */
+  html[data-dp-layout][data-dp-layout] body aside#sidebar #sb-list .sb-card .sbc-mini-grid,
+  html[data-dp-layout][data-dp-layout] body aside#sidebar #sb-list .sb-card .sbc-seq {
+    display: none !important;
+  }
+  /* Ohne das Kachelband braucht die Karte ihre Mindesthoehe nicht mehr; mehrere
+     Stile setzen sie, deshalb hier ausdruecklich zurueck. */
+  html[data-dp-layout][data-dp-layout] body aside#sidebar #sb-list .sb-card {
+    min-height: 0 !important;
+  }
+}
