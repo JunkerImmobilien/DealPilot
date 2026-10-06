@@ -8005,3 +8005,45 @@ html body .sb-act-item.sb-act-feedback {
     gap: 0 !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1918 · DIE MARKE IN DER SCHUBLADE
+
+   Gegenstueck zu `markeHandy()` in `js/layout-varianten.js` (v1918). Die Werte
+   sind die der Schiene, am Schreibtisch abgelesen:
+
+     .dpl-marke   247 x 100, padding 0 14px, Inhalt mittig
+     .dpl-wm      Space Grotesk 42px/700, rgb(242,237,227), letter-spacing -0.84px
+     i („Pilot")  rgb(169,141,64), 42px, nicht kursiv
+
+   Auf dem Handy wird die Hoehe auf 72 px genommen statt 100: die Schublade hat
+   758 px fuer Marke, Umschalter, Register und Anmeldung, und die Schiene steht
+   am Schreibtisch neben dem Inhalt statt darueber. Die SCHRIFT bleibt bei 42px
+   — „zu klein" war der Einwand, also wird sie nicht verkleinert.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy {
+    display: flex !important;
+    align-items: center !important;
+    order: -3 !important;
+    height: 72px !important;
+    min-height: 72px !important;
+    padding: 0 14px !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    flex: 0 0 auto !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm {
+    font-family: "Space Grotesk", system-ui, sans-serif !important;
+    font-size: 42px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.84px !important;
+    line-height: 1 !important;
+    color: rgb(242,237,227) !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm i {
+    font-style: normal !important;
+    color: var(--wl-A98D40, #A98D40) !important;
+  }
+}

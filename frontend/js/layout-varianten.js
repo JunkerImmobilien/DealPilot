@@ -1692,6 +1692,41 @@
         if (q && n) n.textContent = q.textContent;
       } catch (e) {}
     }
+    /* ── v1918 · DIE MARKE GEHOERT AUCH IN DIE SCHUBLADE ──────────────────────
+
+       Marcel am 06.10.2026: „dann ist das Logo zu klein und auch noch
+       goldfarbend“ — und als Grundsatz: „Wenn ich die Aktenmappe anmache, dann
+       muss die auch auf der Handy-Darstellung auch genauso aussehen.“
+
+       GEMESSEN: in der Schiene steht `.dpl-marke` mit 247 x 100 px ganz oben,
+       darin `.dpl-wm` als `Deal<i>Pilot</i>` in Space Grotesk 42px — „Deal“ in
+       rgb(242,237,227), „Pilot“ in rgb(169,141,64). **Auf dem Handy gab es sie
+       nirgends:** weder in der Schublade noch in der Kopfzeile (geprueft, dort
+       steht kein Element mit dem Markennamen).
+
+       Damit fehlte der erste Block der Schiene ganz — und das war der letzte
+       strukturelle Unterschied zwischen den beiden Fassungen:
+
+         Schreibtisch   Marke · Portfolio-Knopf · Register/Liste · Nutzer
+         Handy vorher          Portfolio-Knopf · Register/Liste · Nutzer
+
+       Sie wird in derselben Groesse gesetzt wie am Schreibtisch (42px): „zu
+       klein“ war Marcels Einwand, also wird sie nicht verkleinert. Die Farben
+       stehen im CSS, nicht hier — eine Marke, die im JS klebt, faerbt sich beim
+       Mandanten nicht um. */
+    function markeHandy() {
+      if (!window.matchMedia('(max-width: 900px)').matches) return;
+      if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+      var sb = document.getElementById('sidebar');
+      if (!sb || sb.querySelector('.dpl-marke-handy')) return;
+      var m = document.createElement('div');
+      m.className = 'dpl-marke dpl-marke-handy';
+      m.innerHTML = '<span class="dpl-wm">Deal<i>Pilot</i></span>';
+      sb.insertBefore(m, sb.firstChild);
+    }
+    markeHandy();
+    try { window.matchMedia('(max-width: 900px)').addEventListener('change', markeHandy); } catch (e) {}
+
     portfolioKnopfHandy();
 
     /* ── v1914 · DAS REGISTER WAR SICHTBAR, ABER TOT ──────────────────────────
