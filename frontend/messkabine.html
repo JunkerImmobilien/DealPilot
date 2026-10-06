@@ -424,6 +424,60 @@
     r.klein = klein.slice(0, 12); r.kleinN = klein.length;
     r.verdeckt = verdeckt.slice(0, 12); r.verdecktN = verdeckt.length;
 
+    /* (3b) v1901f · IST DAS BEDIENELEMENT ÜBERHAUPT ERREICHBAR?
+
+           `elementFromPoint` oben beantwortet nur, was im Schirm liegt. Die
+           teurere Frage ist, ob ein Element, das AUSSERHALB seines
+           klippenden Behälters liegt, durch Wischen noch zu erreichen ist.
+
+           Der Weg nach oben, Schritt für Schritt — und die vier Irrtümer,
+           die auf diesem Weg je einen Anlauf gekostet haben:
+
+           · Ein Vorfahr mit `overflow-x: visible` klippt NICHT.
+           · Liegt zwischen Element und Klipper ein Behälter mit `auto` oder
+             `scroll`, der mehr Inhalt hat als Platz, ist alles erreichbar —
+             er wird gewischt. Die sieben Partnerkarten in `#dab-rail-…`
+             sahen ohne diese Regel wie acht tote Knöpfe aus.
+           · Die Kante des Klippers ist SEINE Kante, nicht der Schirm. Wer
+             sie auf `innerWidth` kürzt, erklärt jede Karte einer
+             Querschiene für unerreichbar.
+           · **Ein Behälter ohne eigene Fläche ist ZUGEKLAPPT, nicht kaputt.**
+             `div.kc-body` im Cockpit ist 0 px hoch, seine Kinder sind es
+             nicht — das ergab 61 Scheinbefunde. Dieselbe Familie wie das
+             zugeklappte `<details>`: der Inhalt ist nicht verloren, er ist
+             zu. Solche Fälle werden getrennt gezählt (`inZugeklapptem`). */
+    var unerr = [], zuN = 0;
+    bed.forEach(function(el){
+      var b = el.getBoundingClientRect();
+      if (b.width === 0 || b.height === 0) return;
+      var p = el.parentElement, sc = false, grund = null, fertig = false;
+      while (p && p !== body && !fertig) {
+        var cs2 = win.getComputedStyle(p), ox = cs2.overflowX, oy = cs2.overflowY;
+        if ((ox === 'auto' || ox === 'scroll') && p.scrollWidth  > p.clientWidth  + 1) sc = true;
+        if ((oy === 'auto' || oy === 'scroll') && p.scrollHeight > p.clientHeight + 1) sc = true;
+        if (ox === 'hidden' || ox === 'clip' || oy === 'hidden' || oy === 'clip') {
+          var pr = p.getBoundingClientRect();
+          if (pr.width === 0 || pr.height === 0) { zuN++; fertig = true; break; }
+          var draussen = b.left >= pr.right - 1 || b.right <= pr.left + 1
+                      || b.top  >= pr.bottom - 1 || b.bottom <= pr.top + 1;
+          if (draussen) {
+            if (!sc) grund = nam(el).slice(0, 26) + ' — geklippt von ' + nam(p).slice(0, 24)
+                   + ' [' + Math.round(pr.left) + '..' + Math.round(pr.right) + ' / '
+                   + Math.round(pr.top) + '..' + Math.round(pr.bottom) + ']';
+            fertig = true;
+          }
+        }
+        p = p.parentElement;
+      }
+      if (!grund && !fertig && !sc) {
+        var cx2 = b.left + b.width / 2;
+        if (cx2 < 0 || cx2 > W) grund = nam(el).slice(0, 26) + ' — außerhalb des Schirms, kein Scroller';
+      }
+      if (grund) unerr.push(grund);
+    });
+    r.unerreichbar = unerr.slice(0, 8); r.unerreichbarN = unerr.length;
+    r.inZugeklapptem = zuN;
+
     /* (4) Kontrast als Paar, über ALLE Texträger — nicht mit dem Auge.
            Nur eigene Textknoten, sonst zählt jeder Behälter den Text seiner
            Kinder noch einmal mit. */
@@ -476,6 +530,10 @@
     t += 'Treffbarkeit  ' + (r.verdecktN
       ? '<span class="bad">' + r.verdecktN + ' verdeckt</span>'
       : '<span class="ok">alle treffbar</span>') + '\n';
+    t += 'Erreichbar    ' + (r.unerreichbarN
+      ? '<span class="bad">' + r.unerreichbarN + ' geklippt ohne Wischweg</span>'
+      : '<span class="ok">alle erreichbar</span>')
+      + (r.inZugeklapptem ? ' <span class="leise">(' + r.inZugeklapptem + ' in Zugeklapptem)</span>' : '') + '\n';
     t += 'Scrollflächen ' + r.scrollN + (r.stumm
       ? ', <span class="bad">' + r.stumm + ' stumm (schneidet ab)</span>'
       : (r.scrollN ? ', <span class="ok">alle wischbar</span>' : ''))
@@ -491,6 +549,10 @@
     if (r.verdeckt.length) {
       t += '\n<span class="bad">VERDECKT</span>\n';
       r.verdeckt.forEach(function(x){ t += '  ' + x + '\n'; });
+    }
+    if (r.unerreichbar.length) {
+      t += '\n<span class="bad">NICHT ERREICHBAR</span>\n';
+      r.unerreichbar.forEach(function(x){ t += '  ' + x + '\n'; });
     }
     if (r.kontrast.length) {
       t += '\n<span class="bad">KONTRAST</span>\n';
