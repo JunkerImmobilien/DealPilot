@@ -951,7 +951,22 @@
        ans Ende von `.main-col`. Geklippt wird sie dort nicht — Klippen
        war das Problem der FIXIERTEN Schiene, die ausserhalb ihres
        Behaelters lag. Eine mitscrollende liegt darin.                */
-    var imFluss = window.matchMedia('(max-width: 1100px)').matches
+    /* v1892 · Die Schwelle war 1100 und hat das Tablet verloren. Gemessen
+       bei 1024 px (gleich-Origin-iframe, 06.10.2026): die rechte Schiene
+       lag in der Kanzlei bei **y=9975**, im Tower bei **y=10037** - am
+       Ende der `.main-col`, und die ist auf dem Objekt-Tab rund
+       zehntausend Pixel hoch. Der Satz oben („dorthin, wo auch gescrollt
+       wird") war an einer KURZEN Spalte bei 817 px gemessen; dort stimmte
+       er. An einer langen heisst „ans Ende" unerreichbar.
+
+       Unter 901 px gibt es die rechte Schiene seit v1892 gar nicht mehr
+       (`baueSchienen()`). Die Mitscroll-Fassung hat damit keinen
+       Anwendungsfall mehr - die Schwelle steht jetzt auf 900, womit die
+       Schiene ueberall, wo sie existiert, am `<body>` schwebt. Die drei
+       zugehoerigen `@media`-Bloecke in `layout-varianten.css` sind
+       mitgezogen (sonst traefe sie dort `position:relative` am `<body>`,
+       und das ist der Befund aus v1681b). */
+    var imFluss = window.matchMedia('(max-width: 900px)').matches
                   && S.stellung === 'rechts';
     /* v1879 · Marcel (Handy, Aktenmappe, 05.10.2026): "nichts erreichbar, alles falsch
        skaliert, Menue ging nicht." Gemessen auf 390 px: die linke Schiene wird unter 900 px

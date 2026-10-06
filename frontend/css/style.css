@@ -38643,3 +38643,77 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
    v1883 galt nur unter 480 px — auf dem Tablet (820 gemessen) stand sie weiter in 6,5 px da. Zu klein ist sie auf
    JEDEM Geraet; die Regel gilt jetzt ueberall. */
 .dab-donut-v small { font-size: 8.5px !important; letter-spacing: .04em !important; }
+
+/* ═══ v1892 · DIE PRE-FLIGHT-KARTE IM TABLET-BAND (641-1100 px) ═══════════════════════════
+   Marcel am 06.10.2026: "ich sehe auch schon dass die Pre-Flight-Karte nicht richtig
+   formatiert und angezeigt wird in der Tablet-Ansicht. Das passt auch nicht."
+
+   GEMESSEN im gleich-Origin-iframe bei 1024 px, Ansicht "Heute", Objekt-Tab:
+
+     .dp-pf-scroll   690x190  overflow-x: VISIBLE   clientWidth 690  scrollWidth 690
+     .dp-pfbar       690x190  flex-wrap: WRAP       overflow: auto hidden
+
+   Die Leiste ist als Bordkarte EINE Zeile (`min-height:78px`, v593-boardingpass). Bei
+   1024 px stand sie in DREI Zeilen und war 190 px hoch:
+
+     Zeile 1   .dp-pf-lead 149 px  ·  .dp-pf-perf (Perforation)  ·  .dp-pf-seg 175 px   -> endet bei 651
+     Zeile 2   .dp-pf-seg 602 px   ·  a#oab-pf-qr 54 px                                 -> endet bei 967
+     Zeile 3   span.dp-pf-rz 208 px mit dem Abrufen-Knopf bei x=372, y=289
+
+   Der Abrufen-Knopf stand damit in einer eigenen dritten Zeile linksbuendig, und die
+   Perforationslinie trennte nur noch die erste. Das ist keine Bordkarte mehr.
+
+   > **Die Ursache sind drei Generationen, die sich widersprechen.** v577 ("umbrechen statt
+   > scrollen") hat `.dp-pf-scroll{overflow-x:visible !important}` gesetzt und damit das
+   > Wischen abgeschaltet; v578 ("eine Zeile kompakt") wollte `flex-wrap:nowrap`, gemessen
+   > gewinnt aber `wrap`; v593 gab der Leiste `overflow:hidden`. Uebrig blieb: nicht wischbar,
+   > umbrechend, und was dabei ueberstehen wuerde, waere geklippt.
+
+   Unter 641 px gibt es eine eigene, fertige Fassung - die Leiste wird dort zur Schublade von
+   unten (v619-boarding-mobile, `.dp-pf-scroll.dp-pf-open`). Ueber 1100 px passt sie in eine
+   Zeile. **Nur das Band dazwischen hatte keine Fassung** - genau das Tablet.
+
+   Hier bekommt es eine: die Bordkarte bleibt EINE Zeile und wird gewischt. Dieselbe Medizin
+   wie bei der Portfolio-Strategie-Tabelle in v1889 - und derselbe Grund, aus dem sie dort
+   noetig war: `width:100%` in einem `overflow-x:auto`-Behaelter laesst den Behaelter keinen
+   Ueberlauf sehen. `width:max-content` laesst die Leiste auf ihre echte Breite wachsen, erst
+   dann hat der Wrapper etwas zu scrollen. `min-width:100%` haelt sie bei viel Platz voll.
+
+   Der Ton bleibt, wie er ist - Marcel ausdruecklich: "Das muss erstmal nicht hell werden."
+   Es wird keine Farbe angefasst, nur die Geometrie.
+   ══════════════════════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 641px) and (max-width: 1100px) {
+  /* Der Wrapper darf wieder wischen. v577 hatte ihn mit `visible !important` stillgelegt. */
+  .dp-pf-scroll {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 6px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  /* EINE Zeile, und auf ihre echte Breite wachsen - sonst sieht der Wrapper keinen Ueberlauf. */
+  .dp-pf-scroll .dp-pfbar {
+    flex-wrap: nowrap !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    row-gap: 0 !important;
+  }
+  /* Kein Kind darf unter seinen Inhalt gedrueckt werden; sonst stauchen sie sich wieder
+     gegenseitig, statt die Leiste zu verlaengern. Die Perforation (.dp-pf-perf) ist
+     ABSICHTLICH 0 px breit (Bordkarten-Stanzung) und bleibt ausgenommen. */
+  .dp-pf-scroll .dp-pfbar > *:not(.dp-pf-perf):not(.dp-pf-stripe) {
+    flex: 0 0 auto !important;
+  }
+  /* Der Streifen liegt absolut ueber der ganzen Leiste und waechst mit ihr. */
+  .dp-pf-scroll .dp-pfbar > .dp-pf-stripe { flex: 0 0 auto !important; }
+  /* `margin-left:auto` schiebt den Knopf bei `max-content` nicht mehr - er sitzt jetzt
+     dort, wo er in der Reihe steht, und das ist rechts hinter dem QR. */
+  .dp-pf-scroll .dp-pf-launch { margin-left: 0 !important; align-self: center !important; }
+  /* Dass gewischt werden KANN, muss man sehen - sonst sieht ein Ueberlauf wie ein
+     abgeschnittener Inhalt aus (Marcels Befund bei der Strategie-Tabelle). */
+  .dp-pf-scroll::-webkit-scrollbar { height: 6px; }
+  .dp-pf-scroll::-webkit-scrollbar-thumb {
+    background: var(--wl-c9a84c, #C9A84C); border-radius: 99px;
+  }
+  .dp-pf-scroll::-webkit-scrollbar-track { background: rgba(201, 168, 76, .14); border-radius: 99px; }
+}
