@@ -39098,3 +39098,63 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(1) {
 header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
   transform: translateY(-4.5px) rotate(-45deg);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1907 · DIE JAHRESTABELLE DER STEUER AUF DEM HANDY
+
+   Marcel am 06.10.2026: „und pass das noch für das steuerformular an."
+
+   GEMESSEN auf Staging, Reiter Steuer bei 387 px:
+
+     table.ytf-table      734 px breit, 8 Spalten, 15 Zeilen
+     div.ytf-quick-wrap   301 px Fenster, overflow-x:auto, scrollWidth 734
+
+   Die Tabelle IST wischbar — 83 Elemente ragen rechnerisch über den Rand, aber
+   kein einziges ist unerreichbar. Zwei Dinge fehlen trotzdem:
+
+   1. **Nichts sagt, dass dort etwas weitergeht.** Der Wrapper hat keinen Balken
+      und keine Kante; auf 301 von 734 px sieht man 41 Prozent und hält sie für
+      alles. Ein Verlauf am rechten Rand zeigt die Fortsetzung an und
+      verschwindet nicht beim Wischen — er ist kein Zustand, sondern ein
+      Hinweis auf die Bauart.
+
+   2. **Beim Wischen verliert die Zeile ihren Namen.** Die erste Spalte trägt
+      das Jahr (40 px). Schiebt man zur Spalte „Steuer-Effekt", steht die Zahl
+      ohne Jahr da. `position:sticky` hält die Jahresspalte am linken Rand.
+
+   > Eine Tabelle, die breiter ist als der Schirm, braucht zwei Dinge: einen
+   > Hinweis, dass sie weitergeht, und eine Spalte, die stehen bleibt.
+
+   Beides gilt nur unter 900 px. Am Schreibtisch passt die Tabelle in ihre
+   Spalte, dort wäre der Verlauf eine Behauptung über einen Überlauf, den es
+   nicht gibt.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .ytf-quick-wrap {
+    position: relative;
+    /* Der Verlauf hängt am Wrapper selbst, nicht an einem Pseudoelement der
+       Tabelle: ein ::after im scrollenden Kasten wandert beim Wischen mit und
+       stünde dann mitten im Inhalt. `background-attachment: local` auf dem
+       ersten Verlauf lässt die Kante genau dann verschwinden, wenn das Ende
+       erreicht ist. */
+    /* Neutraler Schatten, KEIN Gold: eine Wischkante ist Bauart, keine Marke —
+       und ein Gold-Literal hier wuerde beim Mandanten nicht mitfaerben
+       (Whitelabel-Pflicht, siehe CLAUDE.md). */
+    background-image:
+      linear-gradient(to left, rgba(5,5,5,0) 0, rgba(5,5,5,0) 100%),
+      linear-gradient(to left, rgba(5,5,5,.20), rgba(5,5,5,0) 28px);
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 28px 100%;
+    background-position: right center, right center;
+    background-attachment: local, scroll;
+  }
+  /* Die Jahresspalte bleibt stehen. Sie braucht einen eigenen Grund, sonst
+     scheinen die Zahlen der Nachbarspalte durch. */
+  .ytf-quick-wrap .ytf-table th:first-child,
+  .ytf-quick-wrap .ytf-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--wl-FBF6E9, #FBF6E9);
+  }
+}
