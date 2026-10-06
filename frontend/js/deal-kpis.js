@@ -59,6 +59,25 @@ window.DealKpis = (function() {
     var uf     = +i.uf     || 0;
     var bwk_ul  = +i.bwk_ul  || 0;
     var bwk_nul = +i.bwk_nul || 0;
+    /* ── v1898 · DER STEUERLICHE BEWIRTSCHAFTUNGSABZUG ──────────────────
+     *
+     * Marcel am 06.10.2026: „das Mietausfallrisiko, das darf nicht mit in
+     * die Werbungskosten."
+     *
+     * Das Mietausfallwagnis steckt in `bwk_nul` und gehoert dort hin: fuer
+     * Cashflow, DSCR und Nettomietrendite ist es ein Liquiditaetspuffer.
+     * Steuerlich ist es KEIN Werbungskostenabzug — § 9 Abs. 1 Satz 1 EStG
+     * verlangt eine Aufwendung, und ein kalkulatorisches Wagnis
+     * (§ 19 Abs. 2 Nr. 4 ImmoWertV) wird nie gezahlt.
+     *
+     * `bwk_nul_st` ist deshalb OPTIONAL: wer es nicht mitgibt, rechnet wie
+     * bisher (die Zahl ist dann dieselbe). Wer einen getrennt erfassten
+     * Mietausfall hat, gibt `bwk_nul` MINUS Wagnis mit — und nur die
+     * Steuerzeile aendert sich. `Number(null)` ist 0 und bestaende
+     * `isFinite`, darum wird hier auf ABWESENHEIT geprueft, nicht auf
+     * Wahrheitswert. */
+    var bwk_nul_st = (i.bwk_nul_st == null || !isFinite(+i.bwk_nul_st))
+      ? bwk_nul : (+i.bwk_nul_st);
     var d1     = +i.d1     || 0;
     var d1z    = (+i.d1z   || 0) / 100;
     var d1t    = (+i.d1t   || 0) / 100;
@@ -114,8 +133,11 @@ window.DealKpis = (function() {
     // CF n.St. = CF v.St. − Steuer (Banker-Cashflow nach Steuereffekt)
     // Steuerberechnung läuft auf den OPERATIVEN CF (vor Tilgung), weil Tilgung steuerlich
     // nicht abziehbar ist — Standard-Logik.
-    var cf_operativ = nkm_j - bwk_cf - zins_j;        // intern: vor Tilg, für Steuer-Bemessung
-    var zve_immo    = cf_operativ - afa;
+    var cf_operativ = nkm_j - bwk_cf - zins_j;        // intern: vor Tilg, für den Cashflow
+    /* v1898: die Steuerbemessung laeuft gegen bwk_nul_st (ohne Wagnis),
+       der Cashflow gegen bwk_cf. Ohne getrennten Mietausfall sind beide
+       Zahlen identisch und das Ergebnis bitgleich zu vorher. */
+    var zve_immo    = (nkm_j - bwk_nul_st - zins_j) - afa;
     var steuer      = zve_immo * grenz;               // negativ = Erstattung
     // Öffentliche CF-Werte (in der App immer nach Tilgung)
     var cf_op    = cf_operativ - tilg_j;              // = Banker-CF v.St., NACH Tilgung
@@ -175,6 +197,7 @@ window.DealKpis = (function() {
       wm_m: wm_m, wm_j: wm_j, nkm_j: nkm_j,
       // BWK
       bwk: bwk, bwk_cf: bwk_cf, bwk_ul: bwk_ul, bwk_nul: bwk_nul,
+      bwk_nul_st: bwk_nul_st,   /* v1898: der steuerlich abziehbare Teil */
       // Finanzierung
       d_total: d_total, ltv: ltv,
       zins_j: zins_j, tilg_j: tilg_j, rate_j: rate_j,

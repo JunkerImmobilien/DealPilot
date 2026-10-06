@@ -722,7 +722,11 @@
        wurde sie ohnehin nie. Ersatzlos entfernt: toter Code, der aussieht,
        als werde hier das steuerliche Ergebnis aggregiert. */
     for(var i=0;i<years;i++){
-      var yr=2026+i, miete=0,bwk=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
+      /* v1898: `bwkSt` ist die Bewirtschaftung der STEUERZEILE (ohne
+         Mietausfallwagnis). `bwk` bleibt die des Cashflows. Ohne getrennt
+         erfassten Mietausfall sind beide gleich und die Tabelle rechnet
+         bitgleich zu vorher. */
+      var yr=2026+i, miete=0,bwk=0,bwkSt=0,zins=0,tilg=0,afa=0,rest=0,wert=0;
       arr.forEach(function(o){
         /* -- v1704b � DIE PROJEKTION RECHNETE IN CENT ----------------
            Hier stand `num(o._kaufpreis)`. Der Kommentar an der SSoT
@@ -755,7 +759,46 @@
            ist eine Modellannahme ehrlicher als eine Null. */
         var mieteJ=num(o._kpis_miete_j)||((num(o.nkm)+num(o.ze))*12)
                  ||num(o.ist_miete_j)||num(o.kaltmiete_j)||num(o.jahresmiete)||kp*0.05;
-        var bwkJ=num(o.bwk_j)||num(o.bewirtschaftung_j)||mieteJ*0.2;
+        /* ═══ v1898 · DIE ZWEITE BEWIRTSCHAFTUNGS-PAUSCHALE ═══════════════
+           Hier stand:  num(o.bwk_j) || num(o.bewirtschaftung_j) || mieteJ*0.2
+
+           BEIDE Feldnamen gibt es NIRGENDS. Gemessen am 06.10.2026 ueber die
+           API: `bwk_j` 0 von 20 Objekten, `bewirtschaftung_j` 0 von 20, und
+           repoweit ist diese Zeile der einzige Treffer. Der Notnagel griff
+           also IMMER - wie schon bei der Miete eine Zeile darueber (v1704c),
+           dieselbe Falle zweimal in derselben Funktion.
+
+           Was er anrichtete: 20 % der Miete, wo der Objekt-Reiter 16 %
+           rechnet. Gemessen im Cockpit Jahr 1: Miete 289.224, BWK 57.845 -
+           exakt 289.224 x 0,2. Zwei Zahlen fuer dieselbe Bewirtschaftung in
+           einer Anwendung, und die geschaetzte war die sichtbare.
+
+           DIE KETTE, von gemessen nach geschaetzt:
+             1. `_kpis_bwk_nul_st_y` / `_kpis_bwk_nul_y` - vom Rechenkern
+                gestempelt (storage.js). Steuerzeile und Cashflowzeile
+                getrennt, genau wie im Objekt-Reiter.
+             2. Profilwert `bwk_anteil_default` (16 %, Marcels Einstellung)
+                statt der erfundenen 20. `_dpProfilWert` ist global (main.js).
+
+           `_kpis_bwk_y` steht BEWUSST NICHT in der Kette: das ist die
+           GESAMT-BWK inklusive umlagefaehigem Teil. Die von der Miete
+           abzuziehen waere doppelt falsch - den Teil zahlt der Mieter.
+
+           ALTBESTAND: kein Objekt trug die neuen Felder am Tag der
+           Umstellung (0 von 20 gemessen). Fuer sie gilt Zweig 2, bis sie
+           einmal neu gerechnet und gespeichert sind. `Number(null)` ist 0
+           und bestaende `isFinite` - darum wird auf ABWESENHEIT geprueft,
+           nicht per `||`: eine Bewirtschaftung von 0 ist eine Angabe. */
+        var _bwkQuote=(typeof window._dpProfilWert==='function')
+          ? (num(window._dpProfilWert('bwk_anteil_default',16))||16)/100 : 0.16;
+        function _bwkFeld(k){ var x=o[k]; return (x==null||x==='')?null:(isFinite(num(x))?num(x):null); }
+        var _bwkSt=_bwkFeld('_kpis_bwk_nul_st_y');
+        var _bwkCf=_bwkFeld('_kpis_bwk_nul_y');
+        /* Der Cashflow nimmt den Wagnis-Betrag mit, die Steuer nicht.
+           Fehlt die eine Zahl, gilt die andere - lieber die benachbarte
+           gemessene als die Quote. */
+        var bwkJ   =(_bwkCf!=null)?_bwkCf:((_bwkSt!=null)?_bwkSt:mieteJ*_bwkQuote);
+        var bwkStJ =(_bwkSt!=null)?_bwkSt:((_bwkCf!=null)?_bwkCf:mieteJ*_bwkQuote);
         var zinsJ=num(o.zins_j)||(kp*(num(o._kpis_ltv)/100||0.8)*ASSUMP.zinsApprox);
         var tilgJ=num(o.tilg_j)||(kp*(num(o._kpis_ltv)/100||0.8)*0.02);
         /* Auch hier war die Einheit gemischt: der erste Zweig liefert EURO,
@@ -768,11 +811,16 @@
         var tilgI=Math.min(restStart,Math.max(0,rate-zinsI));
         miete+=mieteJ*Math.pow(1+ASSUMP.mietWg,i);
         bwk+=bwkJ*Math.pow(1+ASSUMP.bwkWg,i);
+        bwkSt+=bwkStJ*Math.pow(1+ASSUMP.bwkWg,i);   /* v1898 */
         zins+=zinsI; tilg+=tilgI; afa+=kp*ASSUMP.gebAnteil*ASSUMP.afaRate;
         rest+=Math.max(0,restStart-tilgI); wert+=kp*Math.pow(1+ASSUMP.wertWg,i);
       });
       var cfVor=miete-bwk-zins-tilg;
-      var vuv=miete-bwk-zins-afa;
+      /* v1898: das V+V-Ergebnis zieht `bwkSt` ab, nicht `bwk` - das
+         Mietausfallwagnis ist kein Werbungskostenabzug (§ 9 Abs. 1 Satz 1
+         EStG verlangt eine Aufwendung). Der Cashflow eine Zeile darueber
+         behaelt es. Dieselbe Trennung wie calc.js und tax.js. */
+      var vuv=miete-bwkSt-zins-afa;
       /* v1397: zvE des JEWEILIGEN Jahres, nicht ein fester Wert fuers Cockpit. */
       var _zveJ=zveFuer(yr);
       var estgOhne=estg2026(_zveJ);

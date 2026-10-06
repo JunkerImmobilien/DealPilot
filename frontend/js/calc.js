@@ -1031,6 +1031,22 @@ function _calcImmediate(){
   st('san_limit_max', fE(sanLimit, 0));
   st('san_limit_actual', fE(sanIstNetto, 0));
   var sanPct = sanLimit > 0 ? (sanIstNetto / sanLimit * 100) : 0;
+  /* ═══ v1898 · DIE NUTZUNGSDAUER WIRD AUSGELESEN, NICHT ANGENOMMEN ════════
+   * Hier stand „50 Jahre AfA" als feste Zahl in der Status-Pille. tax.js
+   * leitet sie aber aus dem AfA-Satz ab (`afa_nutzungsdauer`, tax.js:1127):
+   * 2,0 % -> 50 Jahre, 2,5 % -> 40, 3,0 % -> 33, degressiv -> 33 (Wohnbau-
+   * Neubau). Bei jedem anderen Satz als 2,0 widersprach der Kasten dem
+   * eigenen Steuer-Reiter. Dieselbe Zahl traegt jetzt die Pille, der Absatz
+   * darueber (`#san_nd_jahre`) und die Fusszeile darunter. */
+  var _sanNd = (function () {
+    var _sel = (el('afa_satz') || {}).value || '2.0';
+    var _p = (window.Afa && Afa.parseSelectValue)
+      ? Afa.parseSelectValue(_sel)
+      : { methode: 'linear', satzPct: parseDe(_sel) || 2 };
+    if (_p.methode !== 'linear') return 33;
+    var _s = _p.satzPct;
+    return (_s > 0) ? Math.round(100 / _s) : 50;
+  })();
   var sanStatusEl = el('san_limit_status');
   if (sanStatusEl) {
     if (sanIst === 0) {
@@ -1038,7 +1054,7 @@ function _calcImmediate(){
     } else if (sanIstNetto <= sanLimit) {
       sanStatusEl.innerHTML = '<span class="badge badge-green">✓ Unter Grenze ('+sanPct.toFixed(1)+'%) – voll abzugsfähig</span>';
     } else {
-      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15% ('+sanPct.toFixed(1)+'%) – anschaffungsnahe HK (50 Jahre AfA)</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15% ('+sanPct.toFixed(1)+'%) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }
   }
   /* Die USt-Zeilen nur zeigen, wenn brutto gerechnet wird — sonst stünde
@@ -1055,6 +1071,47 @@ function _calcImmediate(){
   var hint = el('san_limit_hint');
   if (hint) hint.textContent = 'Max. ' + fE(sanLimit, 0) + ' netto in 3 Jahren'
     + (_sanUst === 'netto' ? '' : ' (= ' + fE(sanLimit * 1.19, 0) + ' brutto)');
+
+  /* ═══ v1898 · DER SATZ, DER DIE 15-%-GRENZE BEANTWORTET ═══════════════════
+   *
+   * Marcel am 06.10.2026: „Wortlaut 15 Prozent Hinweis, klar wie
+   * vorgeschlagen."
+   *
+   * Der Kasten nennt bisher nur Zahlen (Grenze netto, Grenze brutto, Status).
+   * Die Frage dahinter ist aber eine andere: WIE VIEL darf ich verbauen?
+   * Genau die beantwortet dieser Satz, in der Sprache des Nutzers.
+   *
+   * ZWEI DINGE WERDEN AUSGELESEN, NICHT ANGENOMMEN:
+   *
+   * 1 · DER BETRAG. Es ist die BRUTTO-Grenze (`#san_limit_max_brutto`), weil
+   *     „bezahlte Handwerkerrechnungen" brutto sind. Rechnet der Nutzer
+   *     ausdruecklich netto (`san_ust = 'netto'`), nennt der Satz die
+   *     Netto-Grenze und sagt das auch - sonst stuende dort eine Zahl, die
+   *     nicht zu seinen Eingaben passt.
+   *
+   * 2 · DIE NUTZUNGSDAUER. Nicht „50 Jahre" als feste Zahl - `_sanNd` weiter
+   *     oben leitet sie aus dem AfA-Satz ab. Dieselbe Zahl traegt die
+   *     Status-Pille und der Absatz darueber.
+   *
+   * KEINE FACHSPRACHE: „anschaffungsnahe Herstellungskosten" steht weiter im
+   * Absatz darueber und in der Pille - dort gehoert der Begriff hin. Im
+   * Fliesstext steht, was passiert, nicht wie es heisst. */
+  var _ndSpan = el('san_nd_jahre');
+  /* `String()`, nicht `fE()`: Jahreszahlen laufen nie durch
+     Intl.NumberFormat (CLAUDE.md). Bei 33 und 50 faellt es nicht auf, aber
+     die Regel gilt fuer die Stelle, nicht fuer den heutigen Wert. */
+  if (_ndSpan) _ndSpan.textContent = String(_sanNd);
+  var _sanFuss = el('san_15pct_fuss');
+  if (_sanFuss) {
+    var _grenzeNetto = (_sanUst === 'netto');
+    var _betrag = _grenzeNetto ? sanLimit : (sanLimit * 1.19);
+    _sanFuss.innerHTML = '<b>Bis hierhin kannst du sanieren:</b> '
+      + fE(_betrag, 0)
+      + ' an bezahlten Handwerkerrechnungen'
+      + (_grenzeNetto ? ' ohne Umsatzsteuer' : '')
+      + ' in den ersten drei Jahren nach dem Kauf. Was darüber geht, darfst du '
+      + 'nicht mehr sofort absetzen, sondern erst über ' + _sanNd + ' Jahre.';
+  }
 
   // V63.99: Aufschlüsselung der AHK-Berechnung in der Info-Box
   var ahkDetailBlock = el('ahk_detail_block');
@@ -1367,6 +1424,34 @@ function _calcImmediate(){
   } catch (_e) {}
   if (erbZins > 0) { nul += erbZins; bwk += erbZins; }
   st('erb_zins_j', erbZins > 0 ? fE(erbZins) : '–');st('r-erb-zins', erbZins > 0 ? fE(erbZins) : '–');
+  /* ═══ v1898 · DAS MIETAUSFALLWAGNIS IST KEIN WERBUNGSKOSTENABZUG ═══════
+   *
+   * Marcel am 06.10.2026: „das Mietausfallrisiko, das darf nicht mit in die
+   * Werbungskosten, wie du schon gesagt hast."
+   *
+   * FACHLICH: § 9 Abs. 1 Satz 1 EStG laesst nur AUFWENDUNGEN zum Abzug zu —
+   * etwas, das abgeflossen ist. Das Mietausfallwagnis ist das Gegenteil: eine
+   * KALKULATORISCHE Groesse der Ertragswertrechnung (§ 19 Abs. 2 Nr. 4
+   * ImmoWertV), ein Puffer fuer Leerstand und Zahlungsausfall, der nie
+   * gezahlt wird. Faellt Miete wirklich aus, sinkt die EINNAHME — es
+   * entstehen keine Kosten. Wer beides abzieht, zieht denselben Euro
+   * zweimal ab.
+   *
+   * WO ES BLEIBT: `nul` und `bwk` bleiben unveraendert. Cashflow, DSCR,
+   * Nettomietrendite und Bewirtschaftungsquote rechnen weiter damit — dort
+   * gehoert es hin, denn dort ist es ein Liquiditaetspuffer und keine
+   * Steuerposition. NUR der Steuerweg rechnet ab hier mit `nul_st`.
+   *
+   * NUR IM DETAIL-MODUS abziehbar: in den Quoten-Modi (% der NKM, % vom
+   * Kaufpreis) steckt kein getrennter Mietausfall in der Zahl. Marcels
+   * Einstellungen fuehren `mietausfall_pct` ausdruecklich NEBEN
+   * `bwk_anteil_default` (config.js:1005ff) — die Quote ist also die
+   * Bewirtschaftung ohne Wagnis, und es gibt nichts herauszurechnen.
+   */
+  var _mawSteuer = (bwkMode === 'detail') ? v('mietausfall') : 0;
+  var nul_st = nul - _mawSteuer;
+  State.nulSteuer = nul_st;
+  State.mietausfallWagnis = _mawSteuer;
   State.bwk=bwk;
   st('ul_sum',fE(ul));st('nul_sum',fE(nul));st('r-ul',fE(ul));st('r-nul',fE(nul));
   st('r-bwk',fE(bwk));st('r-bwk-pct',nkm_j>0?fP(bwk/nkm_j*100,1):'—');st('r-hg-ges',fE(v('hg_ul')+v('hg_nul')));
@@ -1668,6 +1753,45 @@ function _calcImmediate(){
   var _progAktiv = false;
   var _progEff   = null;   /* effektiver Satz der Immobilienwirkung, fuer die Anzeige */
 
+  /* ═══ v1898 · DIE PROJEKTION NIMMT DAS zvE DES JAHRES ══════════════════
+   *
+   * Marcel am 06.10.2026: „zur Projektion, das musst du natuerlich so
+   * machen, dass es zu meinen Einstellungen passt, dass wir es eintragen,
+   * wenn wir dort Pauschalen haben."
+   *
+   * GEMESSEN vorher: `_estDelta` rechnete fuer JEDES der bis zu 50 Jahre
+   * gegen `_zveBasis` — das EINE Feld `zve`, also das Einkommen von heute.
+   * Der Reiter Steuern tut das Richtige schon: `_computeYearTotal`
+   * (tax.js:1329) holt sich je Jahr `DealPilotTaxPeriods.getForDateSync()`.
+   * Damit zeigten Cashflow-Projektion und Steuer-Reiter fuer dasselbe Jahr
+   * verschiedene Steuerwirkungen, sobald Marcel einen Steuerzeitraum
+   * eintraegt — und genau dafuer gibt es die Zeitraeume.
+   *
+   * ES WIRD NICHTS GERATEN: liegt fuer ein Jahr kein Zeitraum vor, gilt
+   * weiter das Feld `zve`, und `State.zveHerkunft` haelt fest, welches
+   * Jahr aus welcher Quelle kam. Eine Fortschreibung des Einkommens mit
+   * irgendeinem Prozentsatz waere eine erfundene Zahl — die gibt es hier
+   * nicht; das Einkommen kuenftiger Jahre weiss nur Marcel.
+   *
+   * Der Stichtag 15.06. ist derselbe, den tax.js verwendet — ein zweiter
+   * waere ein zweites Ergebnis. */
+  var _zveQuellen = {};
+  function _zveJahr(jahr) {
+    var _j = (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
+    try {
+      if (window.DealPilotTaxPeriods
+          && typeof DealPilotTaxPeriods.getForDateSync === 'function') {
+        var _p = DealPilotTaxPeriods.getForDateSync(_j + '-06-15');
+        if (_p && typeof _p.zve === 'number' && _p.zve > 0) {
+          _zveQuellen[_j] = 'steuerzeitraum';
+          return _p.zve;
+        }
+      }
+    } catch (_e) {}
+    _zveQuellen[_j] = (_zveBasis > 0) ? 'feld-zve' : 'keine';
+    return _zveBasis;
+  }
+
   /* ═══ v1397 · DIE ANDEREN OBJEKTE SENKEN DIE BASIS — HIER AUCH ════════
    *
    * MARCELS FRAGE: "warum steht das noch drin? wollten wir das nicht
@@ -1754,13 +1878,17 @@ function _calcImmediate(){
   }
   function _estDelta(base, jahr) {
     var _lin = base * grenz;
-    if (!(_zveBasis > 0)) return _lin;
+    /* v1898: das zvE DIESES Jahres, aus den Steuerzeitraeumen wenn
+       hinterlegt, sonst das Feld `zve`. Siehe Block „DIE PROJEKTION NIMMT
+       DAS zvE DES JAHRES". */
+    var _zveJ = _zveJahr(jahr);
+    if (!(_zveJ > 0)) return _lin;
     if (typeof Tax === 'undefined' || !Tax || typeof Tax.calcEStG !== 'function') return _lin;
     try {
       var _sal = _bestandSaldo(jahr);
       /* Uebersteigt der Verlust der Vorobjekte das zvE, ist die Basis null —
          nicht negativ. Ein negatives zvE gibt es im Tarif nicht. */
-      var _bas = _zveBasis + _sal;
+      var _bas = _zveJ + _sal;
       if (!(_bas > 0)) _bas = 0;
       var _vor  = Tax.calcEStG(_bas, jahr);
       var _nach = Tax.calcEStG(_bas + base, jahr);
@@ -1816,10 +1944,16 @@ function _calcImmediate(){
   // CF rechnet auf NKM+ZE (nkm_j) gegen NUR den nicht-umlagef. Anteil der BWK.
   // bwk = ul + nul bleibt für NMR-Anzeige & Bewirt-Quote erhalten.
   var bwk_cf = nul;
+  /* v1898: der STEUERLICHE Bewirtschaftungsabzug — ohne Mietausfallwagnis.
+     Begruendung oben am Block „DAS MIETAUSFALLWAGNIS IST KEIN
+     WERBUNGSKOSTENABZUG". */
+  var bwk_st = nul_st;
   // V63.40: User-Wunsch — CF v.St. ist IMMER nach Tilgung (Banker-Sicht).
   // cf_operativ wird intern für Steuerbemessung gebraucht (Tilgung steuerlich nicht abziehbar).
-  var cf_operativ = nkm_j - bwk_cf - zins_j;          // intern: vor Tilg, für Steuer
-  var zve_immo = cf_operativ - afa;
+  var cf_operativ = nkm_j - bwk_cf - zins_j;          // intern: vor Tilg, für CF
+  /* v1898: die Steuerbemessung laeuft gegen bwk_st, nicht gegen bwk_cf.
+     Ohne Mietausfall sind beide Zahlen identisch. */
+  var zve_immo = (nkm_j - bwk_st - zins_j) - afa;
   var steuer   = _mtxYear(zve_immo, _calYearBase);
 
   /* v1379-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
@@ -1991,6 +2125,8 @@ function _calcImmediate(){
     /* v816-ef: Anteilsfaktor nur im letzten Jahr wenn Cut aktiv, sonst 1 (bit-identisch). */
     var _ef = (_v816cut.active && y === btj) ? _v816cut.factor : 1;
     var nkm_y=_nkmJYear(y-1)*_ef,bwk_cf_y=bwk_cf*Math.pow(1+kstg,y-1)*_ef;
+    /* v1898: der steuerliche Abzug derselben Jahresscheibe, ohne Wagnis. */
+    var bwk_st_y=nul_st*Math.pow(1+kstg,y-1)*_ef;
     // V121: rate_anschl_v am Übergang Bindung→Anschluss auf rs am EZB setzen
     if (y === bindj + 1 && rate_anschl_v === 0) {
       rate_anschl_v = rs_loop * (az_eff_v + at_eff_v);
@@ -2044,7 +2180,8 @@ function _calcImmediate(){
     /* v816-ef-zins: Zins + AfA im letzten Jahr anteilig (Privatier zahlt nur bis Stichtag). */
     var _zy_eff = zy * _ef, _afa_eff = afa * _ef;
     var cf_y_op=nkm_y-bwk_cf_y-_zy_eff;
-    var tax_y_loop = _mtxYear(cf_y_op-_afa_eff, _calYearBase + y - 1);
+    /* v1898: Steuer auf den Steuer-Abzug, Cashflow auf den Cashflow-Abzug. */
+    var tax_y_loop = _mtxYear((nkm_y-bwk_st_y-_zy_eff)-_afa_eff, _calYearBase + y - 1);
     // V63.58: BSV-Sparrate ist CF-Abfluss (gebundenes Geld), gehört in CF-Berechnung
     var cf_y_ns=cf_y_op-tax_y_loop-bspar_y_loop;
     cfkum+=cf_y_ns;
@@ -2202,8 +2339,9 @@ function _calcImmediate(){
   // V63.52: Bei Aussetzung Bauspar-Rate als Liquiditätsabfluss
   var bspar_y_ezb = _d1IsAussetzung ? bspar_y : 0;
   // V63.40: CF v.St. = nach Tilgung (Banker-Sicht)
-  var cf_op_ezb_operativ = nkm_ezb - bwk_cf_ezb - zins_ezb;     // intern für Steuer
-  var ster_ezb = _mtx(cf_op_ezb_operativ - afa, _calYearBase);
+  var cf_op_ezb_operativ = nkm_ezb - bwk_cf_ezb - zins_ezb;     // intern für CF
+  /* v1898: Steuerbemessung ohne Mietausfallwagnis (siehe Block oben). */
+  var ster_ezb = _mtx((nkm_ezb - nul_st*Math.pow(1+kstg,bindj) - zins_ezb) - afa, _calYearBase);
   var cf_op_ezb = cf_op_ezb_operativ - tilg_ezb - bspar_y_ezb;  // V63.52: nach Tilg & BSV
   var cf_ns_ezb = cf_op_ezb - ster_ezb;                          // Banker-CF n.St.
   var cf_ezb = cf_ns_ezb;
@@ -2312,8 +2450,9 @@ function _calcImmediate(){
       tilg_an += Math.max(0, d2_rate_m * 12 - _rs2_an * d2z);
     }
   }
-  var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für Steuer
-  var ster_an = _mtx(cf_op_an_operativ - afa, _calYearBase);
+  var cf_op_an_operativ = nkm_an - bwk_cf_an - zins_an;          // intern für CF
+  /* v1898: Steuerbemessung ohne Mietausfallwagnis (siehe Block oben). */
+  var ster_an = _mtx((nkm_an - nul_st*Math.pow(1+kstg,bindj) - zins_an) - afa, _calYearBase);
   var cf_op_an = cf_op_an_operativ - tilg_an - bspar_y_an;       // V63.52
   var cf_ns_an = cf_op_an - ster_an;                             // Banker-CF n.St.
   // KPI color coding
@@ -2678,7 +2817,13 @@ function _calcImmediate(){
 
        > Wer eine Rechnung abholt, muss wissen, zu wem sie gehoert. */
   State.kpis={_fuer:(window._currentObjKey||null),bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
-    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
+    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
+  /* v1898 · `bwk_nul_st` wird hier MITGEFUEHRT, damit storage.js es am Objekt
+     stempeln kann (`_kpis_bwk_nul_st_y`). Das Cockpit rechnet seine
+     Projektion aus den gespeicherten Kennzahlen und kann `_calcImmediate()`
+     nicht fuer 20 Objekte fahren — die gestempelte Zahl ist dort der einzige
+     Weg zum Rechenkern. Ohne sie bleibt dem Cockpit nur eine Pauschale, und
+     genau die war der Fehler (dashboard.js:758). */
 
   // V258-07: WK-Snapshot + andere Objekte beruecksichtigen
   try {
@@ -2800,6 +2945,10 @@ function _calcImmediate(){
     // Vorher: y=1 → _mFac(1) → schon +1 Jahr Steigerung → CF v.St. höher als 'Heute'-Karte
     var nkm_y2=nkm_j*_mFac(y-1),wm_y2=wm_j*_mFac(y-1),bwk_y2=bwk*Math.pow(1+kstg,y-1);
     var bwk_cf_y2=bwk_cf*Math.pow(1+kstg,y-1);
+    /* v1898: derselbe Jahresbetrag OHNE Mietausfallwagnis — das ist der
+       Abzug, den der Steuerweg sehen darf. Er wird unten in cfRows
+       mitgeschrieben, damit tax.js ihn nicht zweimal ableiten muss. */
+    var bwk_st_y2=nul_st*Math.pow(1+kstg,y-1);
 
     // ═══════════════════════════════════════════════════════════════
     // V269c-mietBwkY1: Mieten + BWK Jahr 1 anteilig nach WU/kaufdat
@@ -2816,6 +2965,7 @@ function _calcImmediate(){
           wm_y2      *= _v269c_factor;
           bwk_y2     *= _v269c_factor;
           bwk_cf_y2  *= _v269c_factor;
+          bwk_st_y2  *= _v269c_factor;   /* v1898 */
           State._v269c_wu_months = _v269c_wuMonths;
         }
       } catch(_v269c_e) {
@@ -2913,7 +3063,8 @@ function _calcImmediate(){
       rs3 = Math.max(0, rs3 - ty2);
     }
 
-    var cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;       // intern: für Steuerbemessung
+    var cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;       // intern: für den Cashflow
+    var zve_op_y = nkm_y2 - bwk_st_y2 - zy2;              // v1898: intern für die Steuer
     var cfop_y = cfop_y_operativ - ty2 - bspar_y2;         // V63.40/51/54: CF v.St. = nach Tilgung & BSV
     // V63.83: KONSISTENZ-FIX
     // Cashflow-Projektion zeigt jetzt EINHEITLICH die Quick-Methode (Steuer auf V+V-Ergebnis nach AfA),
@@ -2922,7 +3073,7 @@ function _calcImmediate(){
     // Begründung: Vorher griff in der Projektion das Yearly-Total mit potenziell anderen Schuldzinsen
     // (z.B. nach Anschluss-Phase) oder unfertigen cfRows-Daten → produzierte inkonsistente Werte.
     // Nun ist Frontend Cashflow-Vergleich-Heute, Cashflow-Projektion und PDF überall identisch.
-    var taxEffect_y = _mtxYear(cfop_y_operativ - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878: AfA des Jahres y */
+    var taxEffect_y = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878: AfA des Jahres y · v1898: ohne Mietausfallwagnis */
     var cfns_y = cfop_y - taxEffect_y;                     // V63.40: nach Tilgung, BSV & Steuer
     // V63.65: Wertsteigerung ausgehend vom besten Wert-Anker (svw > bankval > kp)
     // V63.83 KOMMENTAR: wert_y zeigt Stand ANFANG Jahr y → Jahr 1 = heute = ^0
@@ -3073,8 +3224,9 @@ function _calcImmediate(){
     //   neu rechnen, wenn D1-Y1 anteilig ODER D2 aktiv ist.
     if (_v353_anteilig_hit || _v354_d2_active) {
       cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;
+      zve_op_y        = nkm_y2 - bwk_st_y2 - zy2;   /* v1898 */
       cfop_y          = cfop_y_operativ - ty2 - bspar_y2;
-      taxEffect_y     = _mtxYear(cfop_y_operativ - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878 */
+      taxEffect_y     = _mtxYear(zve_op_y - _afaJahr(y), _v268_baseYear + y - 1);   /* v1878 · v1898 */
       cfns_y          = cfop_y - taxEffect_y;
       // eq_y/ltv_y mit aktueller kombinierter RS aktualisieren (rs3_d2 ggf. Y1-reduziert)
       var _rs_comb2 = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);
@@ -3083,8 +3235,14 @@ function _calcImmediate(){
     }
     var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354: kombinierte RS fuer Anzeige
     var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y});
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y});
   }
+  /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
+     dass eine Zahl ohne Vermerk dasteht. 'steuerzeitraum' = aus Marcels
+     Einstellungen, 'feld-zve' = aus dem Feld im Reiter Steuern,
+     'keine' = es gibt keine Basis, es wurde linear mit dem Grenzsatz
+     gerechnet (und nichts geschaetzt). */
+  State.zveHerkunft = _zveQuellen;
   // V111 STEUER-KONSISTENZ-FIX (V113 erweitert): Cashflow-Tabelle, CF-Projektion, Steuerverlauf,
   //   Vermögenszuwachs-Aufschlüsselung und CF-Vergleich-Heute/EZB/Anschluss müssen identische
   //   Steuer-Werte zeigen. Single Source of Truth: _computeYearTotal() (= das was auch

@@ -345,7 +345,13 @@ function collectData() {
       + State.kpis._fuer + ', geladen ist ' + window._currentObjKey);
     /* Was schon am Objekt steht, bleibt — es ist aelter, aber es gehoert
        diesem Objekt. Ueberschrieben wird nur mit einer passenden Rechnung. */
-    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y']
+    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y',
+     /* v1898: die zwei neuen Bewirtschaftungs-Kennzahlen gehoeren in DIESE
+        Rettungsliste. Sie steht hier, weil collectData() ein frisches {} aus
+        der FIELDS-Whitelist baut und das Backend `data` als VOLLEN Ersatz
+        setzt — ein Feld, das hier fehlt, ist nach dem naechsten Speichern
+        eines FREMDEN Objekts weg. */
+     '_kpis_bwk_nul_y','_kpis_bwk_nul_st_y']
       .forEach(function (f) {
         if (window._currentObjData && window._currentObjData[f] != null) d[f] = window._currentObjData[f];
       });
@@ -357,6 +363,34 @@ function collectData() {
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
     d._kpis_bwk_y = (State.kpis && State.kpis.bwk != null) ? Math.abs(State.kpis.bwk) : 0; /*v899b-bwk: volle BWK Gesamt/Jahr (State.kpis.bwk) statt Y1-anteilig*/
+    /* ── v1898 · DIE BEWIRTSCHAFTUNG, DIE DAS COCKPIT BRAUCHT ──────────────
+     *
+     * `_kpis_bwk_y` ist die GESAMT-Bewirtschaftung (umlagefaehig PLUS nicht
+     * umlagefaehig). Fuer eine Projektion, die sie von der Miete abzieht, ist
+     * das die falsche Zahl: den umlagefaehigen Teil zahlt der Mieter.
+     * Gemessen am 06.10.2026 auf Staging: dashboard.js:758 las zwei
+     * Feldnamen, die es NIRGENDS gibt (`bwk_j`, `bewirtschaftung_j` — 0 von
+     * 20 Objekten), und fiel immer auf `mieteJ * 0.2` zurueck. Das Cockpit
+     * zeigte 57.845 EUR Bewirtschaftung, wo der Objekt-Reiter 16 % rechnet.
+     *
+     * Deshalb zwei neue Zahlen, nicht eine:
+     *   `_kpis_bwk_nul_y`    — nicht umlagefaehig, MIT Mietausfallwagnis.
+     *                          Das ist der CASHFLOW-Abzug (calc.js `bwk_cf`).
+     *   `_kpis_bwk_nul_st_y` — dieselbe Zahl OHNE Wagnis. Das ist der
+     *                          STEUER-Abzug (calc.js `nul_st`).
+     * Genau diese Trennung macht calc.js seit v1898 im Objekt-Reiter; eine
+     * einzige Zahl im Cockpit wuerde sie dort wieder einreissen.
+     *
+     * `Number(null)` ist 0 und bestaende `isFinite` — darum wird auf
+     * ABWESENHEIT geprueft. Eine Bewirtschaftung von 0 ist eine Angabe,
+     * `undefined` ist keine, und nur im zweiten Fall darf das Cockpit
+     * schaetzen. */
+    if (State.kpis && State.kpis.bwk_nul != null && isFinite(State.kpis.bwk_nul)) {
+      d._kpis_bwk_nul_y = Math.abs(State.kpis.bwk_nul);
+    }
+    if (State.kpis && State.kpis.bwk_nul_st != null && isFinite(State.kpis.bwk_nul_st)) {
+      d._kpis_bwk_nul_st_y = Math.abs(State.kpis.bwk_nul_st);
+    }
   }
   // V276.6-snapshot-in-save: steuer_snapshot mitspeichern damit Backend wk-aggregate ihn sieht
   try {

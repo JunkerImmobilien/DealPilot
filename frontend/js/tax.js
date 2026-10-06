@@ -258,11 +258,36 @@ var Tax = (function() {
     var d2z = (parseFloat(fields.d2z) || 0) / 100;
     var schuldzinsen = (d1 * d1z) + (d2 * d2z);
 
-    // Bewirtschaftung - nicht-umlagefähig + Verwaltung etc.
+    /* ── v1898 · DIE BEWIRTSCHAFTUNG, DIE WIRKLICH WERBUNGSKOSTEN IST ──
+     *
+     * Hier standen bis zum 06.10.2026 FUENF Summanden, und zwei davon
+     * gehoeren nicht hinein. Gemessen am Objekt d65ed5cb (Staging, ETW
+     * 78 m², Bj 1928): 2.810 EUR statt der 1.910 EUR, mit denen calc.js
+     * rechnet — 900 EUR Unterschied in derselben App.
+     *
+     * (1) `weg_r` — die WEG-Rücklage steckt BEREITS im Hausgeld. calc.js
+     *     sagt das an seiner Summenzeile ausdruecklich („WEG-Rücklage: nur
+     *     Info-Anzeige, NICHT summieren") und zaehlt sie deshalb nicht.
+     *     Hier wurde sie zusaetzlich addiert: derselbe Euro zweimal.
+     *     Marcel am 06.10.2026 zu Punkt zwei der Liste: „da musst du
+     *     schauen, was jetzt passt. Also doppelt gezaehlt werden soll das
+     *     nicht." Gegenprobe am Objekt: 900 EUR Rücklage, bei 37 %
+     *     Grenzsatz 333 EUR zu viel Erstattung im Jahr.
+     *     (Dass eine Zuführung zur Erhaltungsrücklage überhaupt erst im
+     *     Jahr der VERAUSGABUNG abziehbar ist — BFH IX R 19/24 —
+     *     verstaerkt das nur: zweimal ist auf jeden Fall falsch.)
+     *
+     * (2) `mietausfall` — das Mietausfallwagnis ist kein Werbungskosten-
+     *     abzug. § 9 Abs. 1 Satz 1 EStG verlangt eine AUFWENDUNG; das
+     *     Wagnis ist eine kalkulatorische Groesse der Ertragswertrechnung
+     *     (§ 19 Abs. 2 Nr. 4 ImmoWertV) und wird nie gezahlt. Faellt Miete
+     *     wirklich aus, sinkt die EINNAHME. Marcel am 06.10.2026: „das
+     *     Mietausfallrisiko, das darf nicht mit in die Werbungskosten."
+     *     Im Cashflow bleibt es, wo es war (calc.js `nul`, `bwk_cf`).
+     *
+     * Damit ist diese Zeile identisch zu `nul_st` in calc.js. */
     var bwk_nul = parseFloat(fields.hg_nul || 0) +
-                   parseFloat(fields.weg_r || 0) +
                    parseFloat(fields.eigen_r || 0) +
-                   parseFloat(fields.mietausfall || 0) +
                    parseFloat(fields.nul_sonst || 0);
 
     // V227: AfA aus State._afaBreakdown (Jahr 1, inkl. § 7b wenn aktiv)
@@ -1180,12 +1205,58 @@ function _computeAutoForYear(yearIdx, year) {
 
   // Schuldzinsen aus cfRows
   var schuldzinsen = row ? (row.zy || 0) : 0;
-  // Bewirtschaftung
+  /* ═══ v1898 · DIE BEWIRTSCHAFTUNG KOMMT AUS DEM RECHENKERN ═════════════
+   *
+   * Hier stand bis zum 06.10.2026 eine SCHAETZUNG:
+   *
+   *     bwk_total = row.bwk_y              // ul + nul, die GESAMT-BWK
+   *     nk_n_umlf    = bwk_total * 0.30
+   *     hausverwaltung = bwk_total * 0.20
+   *     betr_sonst   = bwk_total * 0.05    // zusammen 55 %
+   *
+   * Zwei Dinge waren daran falsch, und das zweite ist das teurere:
+   *
+   * 1 · Die 55 % liefen auf die GESAMT-BWK, also auch auf den
+   *     UMLAGEFAEHIGEN Teil. Der steht aber schon als `nk_umlf` in der
+   *     Werbungskostensumme (und als `einnahmen_nk` dagegen) — der
+   *     durchlaufende Posten, den der Kommentar an der Summenformel
+   *     ausdruecklich so beschreibt. 55 % des umlagefaehigen Teils wurden
+   *     damit ein ZWEITES Mal abgezogen. Gemessen am Objekt d65ed5cb
+   *     (Staging): ul = 1.681 EUR, davon 55 % = 924,55 EUR zusaetzlich.
+   *     Marcel am 06.10.2026 zu Punkt zwei der Liste: „da musst du
+   *     schauen, was jetzt passt. Also doppelt gezaehlt werden soll das
+   *     nicht."
+   *
+   * 2 · Es war eine Schaetzung, obwohl die echte Zahl zwei Felder weiter
+   *     liegt. `cfRows` fuehrt je Jahr `bwk_st_y` — die nicht
+   *     umlagefaehige Bewirtschaftung dieses Jahres OHNE
+   *     Mietausfallwagnis, gebildet vom Rechenkern in calc.js und mit der
+   *     Kostensteigerung fortgeschrieben. Genau das ist der Betrag, den
+   *     § 9 EStG abziehen laesst.
+   *
+   * RUECKFALL: aeltere `cfRows` (vor v1898) kennen `bwk_st_y` nicht. Dann
+   * gilt `bwk_cf_y` — die nicht umlagefaehige BWK MIT Wagnis, immer noch
+   * naeher an der Wahrheit als 55 % der Gesamtsumme. Geprueft wird auf
+   * ABWESENHEIT, nicht auf Wahrheitswert: eine Bewirtschaftung von 0 ist
+   * eine Angabe, `undefined` ist keine.
+   *
+   * KEINE AUFTEILUNG MEHR AUF DREI ZEILEN: der Detail-Modus erfasst den
+   * eigenen Hausgeldanteil als EINEN Posten. Welcher Euro darin
+   * Verwalterhonorar ist, weiss die App nicht — und eine 20/30/5-Quote
+   * waere wieder eine erfundene Zahl. Alles steht deshalb in
+   * `nk_n_umlf`; wer es auf die Anlage-V-Zeilen verteilen will, kann die
+   * Zeilen ueberschreiben (`_getYearOverride` greift unveraendert). */
   var bwk_total = row ? (row.bwk_y || 0) : 0;
-  // Anteil "nicht umlagefähig" und Verwaltung schätzen wir je 30/20% von BWK
-  var betriebskosten_n_umlf = bwk_total * 0.30;
-  var verwaltung = bwk_total * 0.20;
-  var sonst_bewirt = bwk_total * 0.05;
+  var betriebskosten_n_umlf = 0;
+  if (row && row.bwk_st_y != null && isFinite(row.bwk_st_y)) {
+    betriebskosten_n_umlf = row.bwk_st_y;
+  } else if (row && row.bwk_cf_y != null && isFinite(row.bwk_cf_y)) {
+    betriebskosten_n_umlf = row.bwk_cf_y;
+  } else {
+    betriebskosten_n_umlf = bwk_total * 0.55;   /* nur ohne cfRows */
+  }
+  var verwaltung = 0;
+  var sonst_bewirt = 0;
 
   return {
     year: year,
@@ -1193,7 +1264,12 @@ function _computeAutoForYear(yearIdx, year) {
 
     // 1.0 Finanzierungskosten
     schuldzinsen: schuldzinsen,
-    kontofuehrung: 8,             // typisch
+    /* v1898: war 8 EUR „typisch" — eine erfundene Zahl. In Marcels
+       Einstellungen gibt es dafuer keine Pauschale, und die Doktrin sagt:
+       wo keine Quelle ist, wird nicht geschaetzt. Das Feld bleibt
+       ueberschreibbar, es schlaegt nur nichts mehr vor. (v646 hat
+       `steuerber` und `telefon` aus demselben Grund auf 0 gesetzt.) */
+    kontofuehrung: 0,
     bereitstellung: 0,
     notar_grundschuld: 0,
     vermittlung: 0,
@@ -1207,7 +1283,7 @@ function _computeAutoForYear(yearIdx, year) {
     // 3.0 Verwaltungskosten
     hausverwaltung: verwaltung,
     steuerber: 0,  /* v646: kein Auto-Vorschlag */
-    porto: 5,
+    porto: 0,      /* v1898: war 5 EUR ohne Quelle — siehe kontofuehrung */
     verw_sonst: 0,
 
     // 4.0 Sonstige Kosten

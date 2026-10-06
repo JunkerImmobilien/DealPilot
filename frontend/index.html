@@ -1652,12 +1652,19 @@ label.dp-required.qc-required::after {
 
             <div class="hint" style="margin-top:10px">
               Werden innerhalb der ersten 3 Jahre nach Kauf mehr als 15&nbsp;% der Gebäude-Anschaffungskosten für Sanierung aufgewendet,
-              gelten diese als <b>anschaffungsnahe Herstellkosten</b> und müssen über 50 Jahre abgeschrieben werden (statt sofort als Werbungskosten).
-            </div>
+              gelten diese als <b>anschaffungsnahe Herstellkosten</b> und müssen über <span id="san_nd_jahre">50</span> Jahre abgeschrieben werden (statt sofort als Werbungskosten).
+            </div><!-- v1898: die Jahreszahl kommt aus dem AfA-Satz (calc.js `_sanNd`), nicht fest 50 -->
             <div class="hint" style="margin-top:6px;padding:8px 10px;background:rgba(70,130,180,0.08);border-left:3px solid #4682B4;border-radius:4px">
               <b>ℹ Gebäudeanteil:</b> Standardmäßig wird 80&nbsp;% Gebäudeanteil angenommen. Im Tab <b>Steuer-Details</b> kannst du den exakten Gebäudeanteil über den BMF-Rechner ermitteln — das wirkt sich rückwirkend auf die 15&nbsp;%-Grenze aus.
               Wenn du eine Küche im Kaufpreis ausweist, gilt sie als <b>separates Wirtschaftsgut</b> mit eigener AfA über 10 Jahre und zählt nicht zum Gebäude.
             </div>
+            <!-- v1898: die Fußzeile des Kastens — beantwortet die Frage, die der
+                 Nutzer wirklich hat, mit den echten Zahlen seines Objekts.
+                 Text und Betrag setzt calc.js (Block „DER SATZ, DER DIE
+                 15-%-GRENZE BEANTWORTET"). Keine neuen Farbliterale: `hint`
+                 und `--gold` sind bestehende Tokens, der Gold-Audit bleibt
+                 damit unberührt. -->
+            <div class="hint" id="san_15pct_fuss" style="margin-top:10px;padding-top:9px;border-top:1px dashed color-mix(in srgb, var(--gold) 30%, transparent)"></div>
           </div>
         </details>
 
@@ -3458,7 +3465,7 @@ label.dp-required.qc-required::after {
 <script src="js/dscr-engine.js?v=231"></script>
 <script src="js/dp-qr.js?v=721"></script>
 <script src="js/hausgeld-engine.js?v=717"></script>
-<script src="js/deal-kpis.js?v=231"></script>
+<script src="js/deal-kpis.js?v=v1898"></script>
 <script src="js/afa-engine.js?v=v1878"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
@@ -3477,13 +3484,13 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v1878"></script>
+  <script src="js/calc.js?v=v1898"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v1457"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v1406"></script>
+<script src="js/tax.js?v=v1898"></script>
 <script src="js/config.js?v=v1740b"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -3525,7 +3532,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1700d"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1863"></script>
+<script src="js/storage.js?v=v1898"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=W33"></script>
@@ -3555,7 +3562,7 @@ label.dp-required.qc-required::after {
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
-<script src="js/quick-check.js?v=v1877a"></script>
+<script src="js/quick-check.js?v=v1898"></script>
 <script src="js/qc-bridge.js?v=v1878"></script>
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
@@ -3614,7 +3621,7 @@ label.dp-required.qc-required::after {
 <script src="js/free-lock.js?v=495"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v1783"></script>
-<script src="js/dashboard.js?v=v1896a"></script>
+<script src="js/dashboard.js?v=v1898"></script>
 <script src="js/portfolio-strategie.js?v=v1889"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
@@ -3627,7 +3634,7 @@ label.dp-required.qc-required::after {
   <script src="js/object-actions.js?v=v1868"></script>
   <script src="js/dpsh-score-hero.js?v=v1640"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v1895"></script>
+  <script src="js/voice-import.js?v=v1898"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

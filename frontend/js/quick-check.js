@@ -362,6 +362,26 @@
     // V63.28: Echte User-BWK speichern BEVOR Defaults greifen — für NMR
     var nulOrig = nul || 0;
     var ulOrig  = ul || 0;
+    /* ═══ v1898 · DER STEUERLICH ABZIEHBARE TEIL IM QUICK-CHECK ═══════════
+     * Das Mietausfallwagnis gehoert in den Cashflow, nicht in die
+     * Werbungskosten (§ 9 Abs. 1 Satz 1 EStG verlangt eine Aufwendung).
+     * Der Quick-Check kennt es nur dann getrennt, wenn `_qcSyncFromMain`
+     * es aus den Hauptfeldern mitgebracht hat und der Nutzer die Zahl
+     * seitdem NICHT angefasst hat — genau das prueft `dpMawFuer`.
+     * Sonst bleibt `nulSt` gleich `nulOrig` und die Rechnung ist bitgleich
+     * zu vorher. */
+    var nulSt = nulOrig;
+    try {
+      var _ne = document.getElementById('qc_nul');
+      if (_ne && _ne.dataset && _ne.dataset.dpMawAnteil != null
+          && _ne.dataset.dpMawFuer === _ne.value
+          && bewirtMode !== 'pct' && bewirtMode !== 'hg') {
+        var _a = parseFloat(_ne.dataset.dpMawAnteil);
+        /* Ein Anteil zwischen 0 und 1 — alles andere ist kein Anteil und
+           wird verworfen, statt eine Zahl zu verbiegen. */
+        if (isFinite(_a) && _a > 0 && _a < 1) nulSt = nulOrig * (1 - _a);
+      }
+    } catch (_eMaw) {}
     if (!nul && kp > 0) nul = kp * 0.01;
     if (!ul && nkm > 0) ul = nkm * 12 * 0.10;
     var nulReal = nulOrig;
@@ -516,6 +536,7 @@
       uf:      0,
       bwk_ul:  ulOrig  || 0,
       bwk_nul: nulOrig || 0,
+      bwk_nul_st: nulSt,   /* v1898: Steuerzeile ohne Mietausfallwagnis */
       d1:      darlehen,
       d1z:     zinsP,
       d1t:     tilgP,
@@ -2294,12 +2315,54 @@ function _qcSyncFromMain() {
     if (!e) return 0;
     return (typeof parseDe === 'function') ? parseDe(e.value) : (parseFloat((e.value||'').replace(',','.')) || 0);
   }
-  var ulSum  = _n('hg_ul')  + _n('ul_sonst');
-  var nulSum = _n('hg_nul') + _n('mietausfall') + _n('nul_sonst');
+  /* ═══ v1898 · DERSELBE FELDSATZ WIE DER RECHENKERN ════════════════════════
+   *
+   * Hier standen zwei unvollstaendige Summen. Gemessen am 06.10.2026 gegen
+   * `calc.js:1345` - das ist die Stelle, die `ul` und `nul` wirklich bildet:
+   *
+   *     ul  = hg_ul + grundsteuer + ul_sonst + kp1 + kp2 + kp3 + kp4
+   *     nul = hg_nul + eigen_r + mietausfall + nul_sonst
+   *
+   * FEHLTEN beim Sync in den Quick-Check: `eigen_r` auf der nicht
+   * umlagefaehigen Seite (die eigene Ruecklage - bei Marcels Objekten 14 von
+   * 20 gefuellt) und `grundsteuer` plus die vier `kp*`-Posten auf der
+   * umlagefaehigen. Sie verschwanden lautlos: der Quick-Check zeigte eine
+   * niedrigere Bewirtschaftung als der Objekt-Reiter, mit demselben Objekt
+   * im selben Fenster.
+   *
+   * `weg_r` steht BEWUSST NICHT dabei - das Feld sagt am UI „nur Info, wird
+   * NICHT zusaetzlich summiert", weil die Ruecklage schon im Hausgeld
+   * steckt. calc.js laesst sie ebenfalls weg. */
+  var ulSum  = _n('hg_ul')  + _n('grundsteuer') + _n('ul_sonst')
+             + _n('kp1') + _n('kp2') + _n('kp3') + _n('kp4');
+  var nulSum = _n('hg_nul') + _n('eigen_r') + _n('mietausfall') + _n('nul_sonst');
+  /* v1898 · DAS WAGNIS BLEIBT IM QC-CASHFLOW, FEHLT ABER DER QC-STEUERZEILE.
+   * `qc_nul` ist EINE Zahl; der Quick-Check kennt in keinem seiner drei Modi
+   * (% der NKM, Hausgeld-Split, direkt) einen getrennten Mietausfall. Es gibt
+   * dort also nichts herauszurechnen - AUSSER genau hier, wo der Betrag aus
+   * den Hauptfeldern kommt und das Wagnis bekannt ist. Deshalb wird es am
+   * Element vermerkt, zusammen mit dem Wert, zu dem es gehoert: aendert der
+   * Nutzer `qc_nul` von Hand, passt der Merker nicht mehr und qcCalc
+   * ignoriert ihn. Eine Zahl aus einem fremden Formular von einem
+   * handgeaenderten Wert abzuziehen waere genau die stille Verschiebung,
+   * die hier nicht passieren darf. */
+  var _mawSum = _n('mietausfall');
   var qcUlEl  = document.getElementById('qc_ul');
   var qcNulEl = document.getElementById('qc_nul');
   if (qcUlEl  && ulSum  > 0 && qcUlEl.value !== '') qcUlEl.value  = (ulSum / 12).toFixed(0);
-  if (qcNulEl && nulSum > 0 && qcNulEl.value !== '') qcNulEl.value = (nulSum / 12).toFixed(0);
+  if (qcNulEl && nulSum > 0 && qcNulEl.value !== '') {
+    qcNulEl.value = (nulSum / 12).toFixed(0);
+    /* v1898: Merker fuer qcCalc — der ANTEIL des Wagnisses an der Summe, und
+       der Wert, zu dem er gehoert. Ein Anteil und kein Betrag, weil der
+       Quick-Check seine Zahl je nach Perioden-Umschalter als Monats- ODER
+       Jahreswert liest; ein Anteil gilt in beiden Faellen. Stimmt
+       `dpMawFuer` nicht mehr mit `value` ueberein, hat der Nutzer die Zahl
+       angefasst und der Merker gilt nicht. */
+    try {
+      qcNulEl.dataset.dpMawAnteil = String(_mawSum / nulSum);
+      qcNulEl.dataset.dpMawFuer   = qcNulEl.value;
+    } catch (_e) {}
+  }
 
   // Nach dem Sync neuen QC-Score berechnen
   if (typeof qcCalc === 'function') {

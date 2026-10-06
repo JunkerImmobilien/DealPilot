@@ -5650,9 +5650,17 @@
 
     var ul = 0, nul = 0;
     posten.forEach(function (p) { if (p.seite === 'ul') ul += p.betrag; else nul += p.betrag; });
+    /* ── v1898 · DAS WAGNIS GEHOERT NICHT IN DIE WERBUNGSKOSTEN ────────
+     * Marcel am 06.10.2026: „das Mietausfallrisiko, das darf nicht mit in
+     * die Werbungskosten." § 9 Abs. 1 Satz 1 EStG verlangt eine
+     * Aufwendung; ein kalkulatorisches Wagnis (§ 19 Abs. 2 Nr. 4
+     * ImmoWertV) wird nie gezahlt. Im Cashflow bleibt es (`nul`), fuer
+     * die Steuerzeile wird `nul_st` mitgegeben. */
+    var _maw = 0;
+    posten.forEach(function (p) { if (p.id === 'mietausfall') _maw += p.betrag; });
 
     return {
-      ul: ul, nul: nul, posten: posten,
+      ul: ul, nul: nul, nul_st: nul - _maw, mietausfall: _maw, posten: posten,
       pauschale: posten.filter(function (p) { return p.quelle === 'pauschal'; }),
       quelle: pauschal ? (gesagt ? 'gemischt' : 'profil') : 'gesagt'
     };
@@ -5731,7 +5739,7 @@
     var K = window.DealKpis.compute({
       kp: kp, nk: nkEur, san: san, moebl: moebl,
       nkm: nkm, ze: ze,
-      bwk_ul: ul, bwk_nul: nul,
+      bwk_ul: ul, bwk_nul: nul, bwk_nul_st: _B.nul_st,   /* v1898 */
       d1: d1, d1z: d1z || 0, d1t: d1t || 0,
       ek: ek, afa: afa, grenz: _rfNum(_rfFeld('grenz')) || 0
     });
