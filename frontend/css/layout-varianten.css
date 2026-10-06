@@ -7721,3 +7721,30 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     flex: 1 1 auto !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1914 · ZWEI PUNKTE AUS DEM REGISTER, DAUERHAFT UND UEBERALL
+
+   Marcel am 06.10.2026: „bei unter System könnte der Rundgang starten raus und
+   Feedback und Support kann raus. Also auch dauerhaft, auch in der
+   Desktop-Ansicht und allem. Das müssen wir da nicht drin haben."
+
+   Beide tragen seit v1705 eine eigene Anker-Klasse, genau fuer diesen Fall:
+   `.sb-act-tour` und `.sb-act-feedback`. Deshalb reicht eine Regel, und sie
+   zielt nicht auf den `onclick` — der aendert sich, die Klasse nicht.
+
+   AUSGEBLENDET, NICHT GELOESCHT: der Rundgang wird an drei weiteren Stellen
+   angeboten (Erststart, Tour-Angebot nach dem ersten Objekt, `startTour()`),
+   und das Feedback-Modal haengt an `sbActionsAction('feedback')`, das auch die
+   Kachelansicht ruft. Ein Loeschen im Markup haette diese Wege mitgenommen.
+
+   > Ein Menuepunkt ist ein Weg zu einer Funktion, nicht die Funktion. Wer den
+   > Weg zumacht, soll nicht das Ziel abreissen.
+
+   Gilt OHNE Medienabfrage und ohne Layout-Bedingung — Schreibtisch wie Handy,
+   in jeder Ansicht. Das ist ausdruecklich so gewuenscht.
+   ══════════════════════════════════════════════════════════════════════════════ */
+.sb-act-item.sb-act-tour,
+.sb-act-item.sb-act-feedback {
+  display: none !important;
+}

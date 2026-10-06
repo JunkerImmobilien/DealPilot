@@ -1693,6 +1693,43 @@
       } catch (e) {}
     }
     portfolioKnopfHandy();
+
+    /* ── v1914 · DAS REGISTER WAR SICHTBAR, ABER TOT ──────────────────────────
+
+       Marcel am 06.10.2026: „Unter System kann ich nichts anklicken, also weder
+       Marktbericht, Portfolio, Einzelobjekt. Das geht alles nicht.“
+
+       GEMESSEN: alle dreizehn Eintraege standen lesbar da und trugen ihren
+       `onclick` — und waren trotzdem nicht zu treffen. `elementsFromPoint` auf
+       der Mitte von „Einzelobjekt“ gab `aside#sidebar`, nicht den Knopf.
+
+       Ursache war eine Regel mit Spezifitaet 500:
+
+         html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar
+           #sb-actions-accordion:not(.sb-actions-open) { pointer-events: none }
+
+       Sie ist richtig: ein zugeklapptes Panel soll keine Klicks fangen. Nur hat
+       v1910 das Register per CSS geoeffnet, OHNE ihm den Zustand zu geben, den
+       die App dafuer fuehrt. Fuer das Auge war es offen, fuer die Kaskade zu.
+
+         > Wer eine Flaeche sichtbar macht, ohne ihren Zustand mitzusetzen, baut
+         > ein Bild von einem Bedienelement.
+
+       Statt die Spezifitaet weiter hochzudrehen bekommt das Akkordeon jetzt die
+       Klasse, die sein Zustand ohnehin verlangt. Damit greifen alle Regeln des
+       offenen Zustands — pointer-events, Farben, Abstaende — und nicht nur die,
+       an die ich gedacht haette. */
+    function registerOffenHalten() {
+      if (!window.matchMedia('(max-width: 900px)').matches) return;
+      if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+      var acc = document.getElementById('sb-actions-accordion');
+      if (acc && !acc.classList.contains('sb-actions-open')) acc.classList.add('sb-actions-open');
+    }
+    registerOffenHalten();
+    try { window.matchMedia('(max-width: 900px)').addEventListener('change', registerOffenHalten); } catch (e) {}
+    /* Nach jedem Umschalten erneut: `portfolio()` baut die Schublade nicht neu,
+       aber andere Wege (Mandantenwechsel, Plan-Gates) rendern sie durchaus. */
+    try { document.addEventListener('dp:plan-ready', registerOffenHalten); } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', portfolioKnopfHandy); } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', badgeHandy); } catch (e) {}
     var zeigen = false;
