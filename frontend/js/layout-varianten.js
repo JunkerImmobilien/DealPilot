@@ -1685,11 +1685,45 @@
         + '<span class="dpl-n" id="dpl-obj-zahl-handy"></span>';
       pb.addEventListener('click', function () { portfolio(); });
       sb.insertBefore(pb, sb.firstChild);
-      /* Die Zahl aus der Schiene mitfuehren, falls sie dort schon steht. */
+      /* ── v1920 · DIE ZAHL MUSS DER QUELLE FOLGEN, NICHT SIE EINMAL ABSCHREIBEN ──
+
+         Hier stand: „Die Zahl aus der Schiene mitfuehren, falls sie dort schon
+         steht.“ Genau daran ist es gescheitert — GEMESSEN am 06.10.2026:
+
+           #dpl-obj-zahl (Schiene)        "22"
+           .dpl-n im Handy-Umschalter     ""   (0 x 0)
+
+         Der Knopf wird beim Aufbau der Schublade gesetzt; die Zahl steht dort
+         erst, wenn die Objektliste geladen ist. Ein einmaliges Abschreiben
+         trifft deshalb fast immer den leeren Zustand — und danach schaut
+         niemand mehr hin.
+
+           > Ein Wert, der sich spaeter aendert, will beobachtet werden, nicht
+           > kopiert. Wer einmal abschreibt, haelt den Anfangszustand fuer das
+           > Ergebnis.
+
+         Zwei Wege, damit es in jedem Fall stimmt: ein Beobachter auf der Quelle
+         (sie steht im DOM, auch wenn die Schiene auf dem Handy ausgeblendet
+         ist), und als Rueckfall die Zahl der Karten in der Liste. */
+      function zahlNachziehen() {
+        try {
+          var n2 = pb.querySelector('.dpl-n');
+          if (!n2) return;
+          var q2 = document.getElementById('dpl-obj-zahl');
+          var wert = q2 && q2.textContent.trim();
+          if (!wert) {
+            var karten = document.querySelectorAll('#sb-list .sb-card').length;
+            wert = karten ? String(karten) : '';
+          }
+          if (n2.textContent !== wert) n2.textContent = wert;
+        } catch (e) {}
+      }
+      zahlNachziehen();
       try {
-        var q = document.getElementById('dpl-obj-zahl');
-        var n = pb.querySelector('.dpl-n');
-        if (q && n) n.textContent = q.textContent;
+        var quelle = document.getElementById('dpl-obj-zahl');
+        if (quelle) new MutationObserver(zahlNachziehen).observe(quelle, { childList: true, characterData: true, subtree: true });
+        var liste = document.getElementById('sb-list');
+        if (liste) new MutationObserver(zahlNachziehen).observe(liste, { childList: true });
       } catch (e) {}
     }
     /* ── v1918 · DIE MARKE GEHOERT AUCH IN DIE SCHUBLADE ──────────────────────
