@@ -142,10 +142,78 @@
      `checkVisibility()` ist das einzige Werkzeug, das sie kennt.
 
      `contentVisibilityAuto` ändert an der Zahl nichts (gemessen: 0 von
-     230) und steht deshalb auch nicht hier. */
+     230) und steht deshalb auch nicht hier.
+
+     ── v1901e · UND WARUM DAS ALLEIN NICHT REICHT ──────────────────────
+
+     **Im verborgenen Tab meldet `checkVisibility()` fast alles als
+     ungemalt.** Gemessen am 06.10.2026, dasselbe Dokument, dieselbe Stelle:
+
+         Fenster im Vordergrund   1.093 von 7.814 gemalt
+         Fenster im Hintergrund       0 von 7.883 gemalt  (später 418)
+
+     Ein Prüfer, der so filtert, findet im Hintergrund **nichts** und meldet
+     deshalb auch keinen Fehler. Das ist der teuerste Zustand überhaupt: er
+     wird grün, weil er blind ist.
+
+     `gemalt()` prüft deshalb zuerst das, was von der Sichtbarkeit des
+     Fensters UNABHÄNGIG ist — Geometrie und ein zugeklapptes `<details>` —
+     und zieht `checkVisibility()` nur hinzu, wenn das Dokument wirklich
+     angezeigt wird. `DPM.lage()` sagt, welcher Weg gerade gilt, und die
+     Anzeige schreibt es dazu. */
   function gemalt(el){
-    if (typeof el.checkVisibility !== 'function') return null;  // null = unbekannt
+    var r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return false;
+    /* Zugeklapptes <details>: der Inhalt wird übersprungen, der Kasten
+       bleibt. Das ist auch im Hintergrund eindeutig ablesbar. */
+    var det = el.closest ? el.closest('details') : null;
+    while (det) {
+      if (!det.open) {
+        var sum = det.querySelector(':scope > summary');
+        if (!(sum && sum.contains(el))) return false;
+      }
+      det = det.parentElement && det.parentElement.closest ? det.parentElement.closest('details') : null;
+    }
+    if (el.hasAttribute && el.hasAttribute('hidden')) return false;
+    var d = el.ownerDocument;
+    if (d && d.hidden) return true;        /* im Hintergrund nur Geometrie */
+    if (typeof el.checkVisibility !== 'function') return null;
     try { return el.checkVisibility(); } catch (e) { return null; }
+  }
+
+  /* Wie zuverlässig ist diese Messung gerade? */
+  function lage(){
+    var z = ziel();
+    return {
+      fensterSichtbar: !document.hidden,
+      zielSichtbar: z.d ? !z.d.hidden : null,
+      weg: (z.d && z.d.hidden) ? 'nur Geometrie (Fenster im Hintergrund)'
+                               : 'Geometrie + checkVisibility()',
+      hinweis: (z.d && z.d.hidden)
+        ? 'Zeitgeber sind gedrosselt und checkVisibility() meldet im Hintergrund '
+          + 'fast alles als ungemalt. Gewartet wird deshalb über MessageChannel, '
+          + 'und gefiltert wird nur über Geometrie und <details>. Farbwerte aus '
+          + 'getComputedStyle sind hier NICHT verlässlich (eingefrorene Übergänge).'
+        : 'voll messbar'
+    };
+  }
+
+  /* Warten, das die Hintergrund-Drosselung nicht trifft.
+     `setTimeout(…, 200)` dauerte im verborgenen Tab gemessen 12.071 ms —
+     neun Reiter liefen damit in jede Zeitgrenze. Eine Nachricht über einen
+     MessageChannel ist dagegen eine gewöhnliche Aufgabe und wird nicht
+     geklemmt; der Ereignislauf bleibt frei, die App kann dazwischen
+     rendern. */
+  function warte(ms){
+    return new Promise(function(fertig){
+      var bis = Date.now() + ms;
+      var k = new MessageChannel();
+      k.port1.onmessage = function(){
+        if (Date.now() >= bis) { k.port1.close(); fertig(); }
+        else k.port2.postMessage(0);
+      };
+      k.port2.postMessage(0);
+    });
   }
 
   /* ── Farbe: Text und sein EFFEKTIVER Grund als Paar ────────────────────
@@ -390,6 +458,12 @@
   /* ── Darstellung eines Messobjekts ────────────────────────────────────── */
   function zeige(r){
     var t = '<h2>MESSWERTE · ' + (aktuell ? aktuell[0] : '') + '</h2>';
+    var lg = lage();
+    if (!lg.zielSichtbar) {
+      t += '<span class="bad">FENSTER IM HINTERGRUND</span> — gefiltert wird nur über\n'
+         + '              Geometrie und &lt;details&gt;; Farbwerte sind hier nicht\n'
+         + '              verlässlich (eingefrorene Übergänge).\n\n';
+    }
     t += 'Viewport      ' + r.vw + ' × ' + r.vh + '\n';
     t += 'Überlauf      ' + (r.ueberlauf > 1
       ? '<span class="bad">' + r.ueberlauf + ' px zu breit</span>'
@@ -456,26 +530,26 @@
     aktuell = [ (layout === '' ? 'Heute' : layout) + ' @ ' + breite, breite, hoehe || 780 ];
     return new Promise(function(fertig){
       var los = false;
-      function da(){ if (los) return; los = true; setTimeout(fertig, 3600); }
+      function da(){ if (los) return; los = true; warte(3600).then(fertig); }
       f.addEventListener('load', da, { once: true });
-      setTimeout(da, 22000);
+      setTimeout(da, 22000);   /* Notbremse - darf gedrosselt sein */
       f.src = ZIEL + (ZIEL.indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
     });
   }
 
-  function schlaf(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function schlaf(ms){ return warte(ms); }   /* v1901e: nicht gedrosselt */
 
   /* Über die Reiter schleifen mit einem ECHTEN Klickweg (el.click() löst das
      Ereignis aus — der Unterschied zu setAttribute, vor dem die Doktrin
      warnt, ist genau dieser). Alles in EINEM Lauf: zwölf Aufrufe statt 110. */
-  async function reiterLauf(warte){
+  async function reiterLauf(pause){
     var z = ziel(), out = [];
     var btns = [].slice.call(z.d.querySelectorAll('nav.tabs button.tab'));
     for (var i = 0; i < btns.length; i++) {
       var b = btns[i];
       var name = (b.getAttribute('data-tab') || b.textContent || '?').trim().slice(0, 22);
       b.click();
-      await schlaf(warte || 160);
+      await schlaf(pause || 160);
       out.push(messe(z.d, z.win, 'Reiter ' + name));
     }
     return out;
@@ -551,6 +625,7 @@
   window.DPM = { messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
                  kontrast: kontrast, gemalt: gemalt, male: male,
+                 lage: lage, warte: warte,
                  selbsttest: selbsttest, geraete: GERAETE };
 
   waehle(2);   /* iPhone 14 */
