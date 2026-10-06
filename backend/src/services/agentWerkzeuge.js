@@ -1643,15 +1643,39 @@ async function objekt_schnellblick(ctx, args) {
    * Also ein Lauf mit allem, was belegt ist, und die Beschriftung sagt,
    * was drinsteckt. */
   let K = null, darlehen = null, ek = null;
+  /* Steht hier und nicht erst beim Score: ob das Objekt in DealPilot schon
+     gerechnet wurde, entscheidet AUCH ueber die Finanzierung (Block
+     darunter). */
+  const sGespeichert = dialog.scoreLesen(d);
   if (zins && tilg) {
     const gi = kp + knkSumme;
     ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
-    /* Das Darlehen am Objekt schlaegt die Ableitung — es ist die gemessene
-       Zahl, nicht eine aus Gesamtinvestition minus Eigenkapital. Nur wenn
-       keins hinterlegt ist, wird abgeleitet (so rechnet auch der
-       Quick-Check der App, der kein Darlehensfeld hat). */
+    /* ── v1925 · WANN EIN DARLEHEN ABGELEITET WERDEN DARF ──────────────
+     *
+     * Das Darlehen am Objekt schlaegt jede Ableitung — es ist die
+     * eingetragene Zahl. Fehlt es, hing es bisher an den Vorgaben:
+     * `Gesamtinvestition minus Eigenkapital`. So macht es der Quick-Check
+     * der App, der kein Darlehensfeld hat, und so soll es bleiben, solange
+     * ein Objekt noch nicht gerechnet ist.
+     *
+     * GEMESSEN am 06.10.2026 auf Staging, und es war falsch: die Objekte
+     * 18ecfdd8 (Sachsenstr. 18) und 2c14c9b3 fuehren Zins und Tilgung,
+     * aber KEIN Darlehen — `_kpis_dscr` steht dort auf 0, DealPilot
+     * rechnet sie also als Barkauf. Der Schnellblick leitete trotzdem
+     * 196.560 EUR Darlehen ab und meldete 972 EUR Ueberschuss, wo die App
+     * 10.800 EUR zeigt. Daneben stand der gespeicherte Score 68 — eine
+     * richtige Zahl und eine erfundene in derselben Antwort.
+     *
+     *   > Ein Objekt, das in DealPilot gerechnet wurde, hat seine
+     *   > Finanzierung dort. Was dort fehlt, fehlt absichtlich.
+     *
+     * Also: abgeleitet wird nur, wenn das Objekt noch KEINEN gerechneten
+     * Score hat. Sonst gilt, was eingetragen ist — auch die Null. */
     const d1Objekt = z(d.d1);
-    darlehen = (d1Objekt != null && d1Objekt > 0) ? d1Objekt : Math.max(0, gi - ek);
+    const darlehenGesetzt = d1Objekt != null && d1Objekt > 0;
+    const darlehenAbgeleitet = !darlehenGesetzt && sGespeichert.dealscore == null;
+    darlehen = darlehenGesetzt ? d1Objekt
+      : (darlehenAbgeleitet ? Math.max(0, gi - ek) : 0);
 
     /* AfA und Grenzsteuersatz nur, wenn sie am Objekt stehen — sonst 0,
        dann ist der Cashflow vor Steuer gleich dem nach Steuer. */
@@ -1674,8 +1698,14 @@ async function objekt_schnellblick(ctx, args) {
     finanzierung = {
       eigenkapital: eur(ek) + (ekQuote != null ? '  (' + pct(ekQuote) + ' deiner Vorgabe)' : ''),
       darlehen: eur(darlehen)
-        + ((d1Objekt != null && d1Objekt > 0) ? '  (am Objekt hinterlegt)'
-            : '  (Gesamtinvestition minus Eigenkapital)'),
+        + (darlehenGesetzt ? '  (am Objekt hinterlegt)'
+            : darlehenAbgeleitet
+              ? '  ANGENOMMEN: Gesamtinvestition minus Eigenkapital. Am Objekt '
+                + 'steht kein Darlehen. Sag das dem Nutzer.'
+              : '  Am Objekt steht KEIN Darlehen, und das Objekt ist in '
+                + 'DealPilot schon gerechnet — dort gilt es als Barkauf. '
+                + 'Es wird keins angenommen. Frag den Nutzer, ob ein Darlehen '
+                + 'fehlt.'),
       zins: pct(zins.wert) + '  (' + zins.quelle + ')',
       tilgung: pct(tilg.wert) + '  (' + tilg.quelle + ')',
       kapitaldienst_jahr: eur(K.rate_j)
@@ -1726,7 +1756,6 @@ async function objekt_schnellblick(ctx, args) {
    * mit den gespeicherten `_kpis_*` ueberein.
    *
    * ── WAS FEHLEN DARF UND WAS NICHT ────────────────────────────────── */
-  const sGespeichert = dialog.scoreLesen(d);
   let bewertung = null;
   const scoreFehlt = [];
   if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
