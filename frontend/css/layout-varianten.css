@@ -7584,3 +7584,64 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
     margin-top: auto !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1912 · DIE LETZTEN DREI ABWEICHUNGEN ZUR SCHIENE
+
+   Marcel am 06.10.2026: „kannst du dir da mal mühe geben dass das vernünftig
+   gemacht wird? schau dir die app im browser an und dann im handy modus. die
+   darstellung sollte schon so aussehen wie das layout, design was man gewählt
+   hat."
+
+   Diesmal NICHT stueckweise, sondern Element fuer Element gegeneinander gelegt.
+   Nach v1910 und v1911 blieben genau drei Unterschiede uebrig:
+
+     Element        Schreibtisch (Vorbild)        Handy (vorher)
+     ───────────    ───────────────────────────   ──────────────────────────
+     Einfassung     .dpl-teil-aktionen r=14,      Inner r=10 und
+                    pad 4/8/8, OHNE Rahmen        **Goldrahmen 40 %**
+     Rubrik         220x18, pad 4/9/5,            330x27, pad 10/12/4,
+                    margin 7/0/2, OHNE Linie      **goldene Linie unten 10 %**
+     Eintrag        220x29, pad 7/9               330x40, pad 6/12
+
+   **Die beiden Goldrahmen sind der Grund, warum es weiter nach „Heute" aussah.**
+   Die Schiene fasst ihr Register in einen stillen Teil mit Radius 14 und ganz
+   ohne Kante; die Schublade zog um dasselbe Element einen goldenen Rahmen und
+   unter jede Rubrik eine goldene Linie. Gold ist in dieser App der Akzent der
+   AKTIVEN Sache — als Dauerrahmen um eine Navigation behauptet es eine Wichtig-
+   keit, die die Schiene bewusst nicht vergibt.
+
+   > Zwei Flaechen tragen dieselben Farben und wirken doch verschieden, wenn die
+   > eine Linien zieht, wo die andere keine hat.
+
+   DIE HOEHE DER EINTRAEGE BLEIBT bei 40 px und wird NICHT auf die 29 px der
+   Schiene gezogen: am Schreibtisch zielt eine Maus, auf dem Handy ein Finger.
+   40 px ist knapp unter der Trefferflaeche von 44 px, 29 waeren deutlich zu
+   wenig. Das ist der einzige Punkt, an dem das Handy bewusst abweicht.
+
+   WAS FEHLT UND FEHLEN SOLL: die Marke `.dpl-marke` (247x100 mit „DealPilot")
+   steht nur in der Schiene. Auf dem Handy traegt die Kopfzeile sie bereits —
+   ein zweites Mal im Menue waere sie doppelt und kostete 100 px.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* Die Einfassung des Registers: Radius und Polster der Schiene, keine Kante. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-actions-accordion-inner {
+    border: 0 !important;
+    border-radius: 14px !important;
+    padding: 4px 8px 8px !important;
+  }
+
+  /* Die Rubriken: ohne Linie, mit den Abstaenden der Schiene. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-act-section-title {
+    border: 0 !important;
+    padding: 4px 9px 5px !important;
+    margin: 7px 0 2px !important;
+  }
+
+  /* Die Eintraege: Polster der Schiene, Hoehe aber fingergerecht. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion .sb-act-item {
+    padding: 7px 9px !important;
+    min-height: 40px !important;
+  }
+}
