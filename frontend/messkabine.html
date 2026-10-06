@@ -477,7 +477,26 @@
       }
       if (!grund && !fertig && !sc) {
         var cx2 = b.left + b.width / 2;
-        if (cx2 < 0 || cx2 > W) grund = nam(el).slice(0, 26) + ' — außerhalb des Schirms, kein Scroller';
+        if (cx2 < 0 || cx2 > W) {
+          /* v1901h · EINE EINGEFAHRENE SCHUBLADE IST ZU, NICHT KAPUTT.
+             In „Heute" steht `#sidebar` bei 390 px auf `position:fixed`,
+             `left:0` und `transform: translateX(-350.99px)` — die Lade ist
+             geschlossen, ihr Inhalt liegt links neben dem Schirm. Er wird
+             gerendert, `checkVisibility()` sagt true, und ohne diese Regel
+             zählte er als acht unerreichbare Bedienelemente.
+             Erkennbar ist der Zustand am Vorfahren mit `position:fixed`,
+             dessen eigener Kasten vollständig neben dem Schirm liegt. */
+          var q = el.parentElement, eingefahren = false;
+          while (q && q !== body) {
+            if (win.getComputedStyle(q).position === 'fixed') {
+              var qr = q.getBoundingClientRect();
+              if (qr.right <= 1 || qr.left >= W - 1) { eingefahren = true; break; }
+            }
+            q = q.parentElement;
+          }
+          if (eingefahren) zuN++;
+          else grund = nam(el).slice(0, 26) + ' — außerhalb des Schirms, kein Scroller';
+        }
       }
       if (grund) unerr.push(grund);
     });
