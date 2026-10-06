@@ -744,14 +744,21 @@
       '• IVD-Empfehlung ETW: 18-35% gesamt\n' +
       '• Formel: (BWK_NUL + BWK_UL) / NKM_jährlich × 100');
 
-    var msgs = [];
-    if (bmr < 4) msgs.push('Bruttorendite unter 4% — preislich teuer für die Region oder Miete zu niedrig.');
-    if (nmr < 2) msgs.push('Nettorendite unter 2% — nach Bewirtschaftungskosten bleibt sehr wenig.');
-    if (cfMon < 0) msgs.push('Negativer Cashflow von ' + Math.round(cfMon) + ' €/Mon — Deal kostet dich Geld jeden Monat.');
-    if (dscr > 0 && dscr < 1.0) msgs.push('DSCR < 1,0 — Mieteinnahmen decken nicht mal die Bankrate.');
-    if (bewirtPctNkm > 35) msgs.push('Bewirtschaftungskosten über 35% der NKM — IVD-Empfehlung wäre 18-35%.');
-    if (ekr > 8 && cfMon > 100) msgs.push('Sehr starke EK-Rendite und positiver Cashflow — solider Deal.');
-    if (msgs.length === 0) msgs.push('Solide Eckdaten ohne offensichtliche Probleme. Im vollen Objekt-Modus siehst du den vollständigen Investor Deal Score 2.0 mit ~22 KPIs.');
+    /* ── v1925 · DIE EINSCHAETZUNG KOMMT AUS EINEM KERN ──────────────────
+     *
+     * Hier standen die sieben Satzbausteine der Bewertungsbox im
+     * Zeichencode. Fuer das Backend — und damit fuer den Telegram-Bot, der
+     * dieselbe Einschaetzung aussprechen soll — waren sie unerreichbar.
+     * Sie liegen jetzt in `js/qc-heuristik.js`, WOERTLICH unveraendert.
+     *
+     * KEIN RUECKFALL: fehlt das Modul, sagt die Box das. Eine zweite,
+     * hier nachgebaute Einschaetzung waere eine zweite Meinung. */
+    var msgs = (window.QcHeuristik && QcHeuristik.einschaetzung)
+      ? QcHeuristik.einschaetzung({
+          bmr: bmr, nmr: nmr, cfMon: cfMon, dscr: dscr,
+          ekr: ekr, bewirtPctNkm: bewirtPctNkm
+        })
+      : ['Die Bewertung ist gerade nicht ladbar (js/qc-heuristik.js). Die Zahlen oben stimmen.'];
 
     if (evalBox) {
       evalBox.innerHTML = msgs.map(function(m) {
@@ -862,99 +869,27 @@
       return;
     }
 
-    // V63.25 NEU: Schmerzschwellen-KP korrekt berechnen.
-    // Vorher: kpFor55 = nkmYear / 0.055 (= BMR-5,5%-Ziel) — Bug: bei hoher Ist-BMR
-    // empfahl das System einen HÖHEREN KP mit "negativem Nachlass". Sinnlos.
-    //
-    // Neue Logik: Finde KP bei dem die Rechnung "wenigstens halbwegs trägt":
-    //   - Ziel BMR ≥ 6% (klar besser als der typische schwache Deal)
-    //   - Cashflow ≥ 0 €/Mon (Annuität wird mindestens gedeckt)
-    //   - DSCR ≥ 1.1 (Sicherheitspolster)
-    // Wir nehmen den HÖCHSTEN KP, der ALLE drei erfüllt — das ist der echte Schmerzschwellen-Preis.
-    var nkmYear = d.nkm * 12;
-    var kpForBmr = nkmYear / 0.06;                   // KP bei BMR=6%
-    // Annuität pro Jahr aus Zins+Tilg (von qc_zins/qc_tilg in d nicht direkt — nähern):
-    // Wenn d.cfMon und d.kp bekannt sind, bestimmen wir Annuität implizit:
-    //   nkm * 12 - bewirt - annuität = cfMon * 12
-    //   → annuität ≈ nkm*12 - bewirt - cfMon*12
-    // KP bei CF=0 → annuitätsBudget = nkm*12 - bewirt
-    // Vereinfacht: aus DSCR rückwärts (DSCR = nkmJahr / annuitätJahr)
-    var annuitaetJahr;
-    if (d.dscr && d.dscr > 0) {
-      annuitaetJahr = nkmYear / d.dscr;
-    } else {
-      annuitaetJahr = nkmYear * 0.6;                 // Fallback ~60% der NKM
+    /* ── v1925 · DIE EMPFEHLUNG KOMMT AUS EINEM KERN ─────────────────────
+     *
+     * Hier standen die Schmerzschwellen-Rechnung (V63.25) und die vier
+     * Urteile KAUFEN / VERHANDELN / KRITISCH / PASS samt ihren Texten.
+     * Sie liegen jetzt WOERTLICH in `js/qc-heuristik.js` — damit der
+     * Telegram-Bot dieselbe Empfehlung aussprechen kann, ohne sie
+     * nachzubauen. Die Betonung des Kaufpreises ist Anzeige und bleibt
+     * hier: `<strong>` im Browser, nackt im Chat.
+     *
+     * KEIN RUECKFALL auf eine eigene Empfehlung — fehlt das Modul, bleibt
+     * die Box leer und sagt warum. */
+    if (!(window.QcHeuristik && QcHeuristik.empfehlung)) {
+      body.innerHTML = '<div class="qc-rec-text">Die Kaufempfehlung ist gerade nicht '
+        + 'ladbar (js/qc-heuristik.js). Die Kennzahlen und der Score oben stimmen.</div>';
+      return;
     }
-    // Bei CF=0 darf annuität so groß sein wie (nkmJahr - bewirtAnteil). Nähern: ~70% der NKM verfügbar.
-    var annBudget = nkmYear * 0.70;
-    // Annuitätsfaktor (Zins+Tilg gesamt). Aus heutiger Annuität / heutigem Darlehen.
-    var heutigeKnk = d.kp * 0.105;
-    var heutigesDarlehen = Math.max(1, d.kp + heutigeKnk - (d.kp * 0.05)); // grobe EK-Annahme 5%
-    // Verbessert: nutze CF-Differenz als Lever
-    // KP bei CF=0:  delta_kp = cfMon * 12 / annuitätsfaktor_jahr
-    var annuitaetsFaktor = annuitaetJahr / heutigesDarlehen;   // z.B. 0.058 (5,8%)
-    if (annuitaetsFaktor < 0.04) annuitaetsFaktor = 0.058;
-    var deltaKp = (d.cfMon < 0)
-      ? Math.abs(d.cfMon) * 12 / annuitaetsFaktor
-      : 0;
-    var kpForCf0 = d.kp - deltaKp;
-
-    // Schmerzschwelle = Maximum aus (BMR-Ziel-KP, CF=0-KP) — also der STRENGERE
-    // Aber nur wenn er TATSÄCHLICH UNTER dem aktuellen KP liegt (sonst Empfehlung sinnlos)
-    var ziel = Math.min(kpForBmr, kpForCf0);
-    if (!isFinite(ziel) || ziel <= 0 || ziel >= d.kp) {
-      // Wenn KP schon unter den Zielen → keine Preissenkung nötig
-      ziel = d.kp;
-    }
-    var verdict, color, advice;
-
-    if (d.score >= 75) {
-      verdict = 'KAUFEN';
-      color = 'qc-rec-green';
-      advice = 'Die Kennzahlen passen — Kauf bei <strong>' + _fmtEur(d.kp) + '</strong> ist gerechtfertigt. ' +
-               'Vor Kaufvertrag noch: Bonität checken, Hausgeld-Aufstellung anfordern, ' +
-               'Eigentümerprotokolle der letzten 3 Jahre prüfen, Energieausweis verifizieren.';
-    } else if (d.score >= 60) {
-      verdict = 'VERHANDELN';
-      color = 'qc-rec-gold';
-      if (ziel < d.kp) {
-        var diffPct = Math.round((1 - ziel / d.kp) * 100);
-        var diffEur = Math.round(d.kp - ziel);
-        advice = 'Aktuell solide aber mit Spielraum. Bei einem Kaufpreis von <strong>' + _fmtEur(ziel) + '</strong> ' +
-                 '(' + diffPct + '% Nachlass = ' + _fmtEur(diffEur) + ' weniger) wäre der Deal klar gut. ' +
-                 'Empfehlung: Verhandle den KP runter oder schau ob du die Miete steigern kannst.';
-      } else {
-        advice = 'Solide Kennzahlen — am aktuellen Preis brauchst du nicht viel Verhandlungs-Spielraum. ' +
-                 'Trotzdem: Hausgeld-Aufstellung, Protokolle, Energieausweis prüfen.';
-      }
-    } else if (d.score >= 40) {
-      verdict = 'KRITISCH';
-      color = 'qc-rec-red';
-      if (ziel < d.kp) {
-        var diffPct2 = Math.round((1 - ziel / d.kp) * 100);
-        var diffEur2 = Math.round(d.kp - ziel);
-        advice = 'Die Kennzahlen sind zu schwach. Damit es ein Investment wird, müsste der Kaufpreis auf ' +
-                 '<strong>' + _fmtEur(ziel) + '</strong> (' + diffPct2 + '% Nachlass = ' + _fmtEur(diffEur2) + ' weniger) runter — ' +
-                 'oder die Miete deutlich steigen. ' +
-                 (d.cfMon < 0 ? 'Negativer Cashflow von ' + Math.round(d.cfMon) + ' €/Mon ist ein klares Warnsignal. ' : '') +
-                 'Eher passen oder hart verhandeln.';
-      } else {
-        advice = 'Die Kennzahlen sind schwach trotz angemessenem Preis — die Schwäche kommt aus anderen Faktoren ' +
-                 '(Bewirtschaftung, Finanzierung, LTV). ' +
-                 (d.cfMon < 0 ? 'Negativer Cashflow von ' + Math.round(d.cfMon) + ' €/Mon. ' : '') +
-                 'Empfehlung: EK erhöhen, bessere Konditionen verhandeln oder anderes Objekt suchen.';
-      }
-    } else {
-      verdict = 'PASS';
-      color = 'qc-rec-red';
-      advice = 'Klares Pass. Die Kennzahlen sind so weit weg von solide, dass auch starkes Verhandeln das nicht rettet. ' +
-               (ziel < d.kp ? 'Bei einem Kaufpreis unter <strong>' + _fmtEur(ziel) + '</strong> könnte man drüber reden. ' : '') +
-               'Empfehlung: Such ein anderes Objekt mit besserer Substanz.';
-    }
+    var _emp = QcHeuristik.empfehlung(d, function (s) { return '<strong>' + s + '</strong>'; });
 
     body.innerHTML =
-      '<div class="qc-rec-verdict ' + color + '">' + verdict + '</div>' +
-      '<div class="qc-rec-text">' + advice + '</div>';
+      '<div class="qc-rec-verdict ' + _emp.farbklasse + '">' + _emp.verdict + '</div>' +
+      '<div class="qc-rec-text">' + _emp.text + '</div>';
 
     // V63.8: Empfehlung NICHT mehr im Tab Kennzahlen spiegeln (User-Wunsch).
     // Die Empfehlung erscheint nur noch im Quick-Check selbst.

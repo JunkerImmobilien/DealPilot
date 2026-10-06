@@ -1333,31 +1333,68 @@ async function pakete_und_preise(ctx, args) {
  *    würde unten, also eine Kaufempfehlung, diese Heuristik, den
  *    Deal-Score, die Werte dazu."
  *
- * ── WARUM DIESES WERKZEUG KEINEN DEAL-SCORE RECHNET ───────────────────
+ * ── v1925 · HIER STAND „WARUM DIESES WERKZEUG KEINEN DEAL-SCORE RECHNET"
  *
- * GEMESSEN am 04.10.2026: der DealPilot-Score und der Investor Deal Score
- * werden im BROWSER gerechnet (`dealscore.js`, `dealscore2.js`). Das
- * Backend liest nur, was dort entstanden ist — `objectService` nimmt
- * `_kpis_cf_ns` und `_dealpilot_score` aus dem Datensatz und rechnet
- * selbst nichts.
+ * Marcel am 06.10.2026, hörbar verärgert:
  *
- * Eine Score-Engine im Backend wäre ein zweiter Rechenkern. CLAUDE.md
- * verbietet das aus gutem Grund:
+ *   „Ich habe dir gesagt, ich möchte mit meinem Telegram-Bot, dass wir
+ *    auch, wenn wir den Quick-Check machen, dass dann natürlich der
+ *    Deal-Score berechnet wird und dann auch die Bewertung der Heuristik
+ *    mit angegeben wird. Das hast du auch nicht umgesetzt."
  *
- *   > Eine zweite Rechnung über denselben Deal ist eine zweite Meinung.
- *   > Im Chat stünde dann eine andere Zahl als auf der Karte, und keiner
- *   > von beiden wäre falsch — das ist schlimmer als ein Fehler.
+ * Er hat recht, und die Begründung, die hier stand, war der Grund dafür.
+ * Sie lautete:
  *
- * Deshalb liefert der Schnellblick, was sich OHNE Score sagen lässt, und
- * nennt es auch so. Drei Dreisatzrechnungen, jede offen vorgerechnet:
+ *   > GEMESSEN am 04.10.2026: der DealPilot-Score wird im BROWSER
+ *   > gerechnet (`dealscore.js`). Eine Score-Engine im Backend wäre ein
+ *   > zweiter Rechenkern. Deshalb liefert der Schnellblick, was sich OHNE
+ *   > Score sagen lässt, und nennt es auch so.
+ *
+ * DIE MESSUNG WAR RICHTIG, DER SCHLUSS WAR FALSCH. Aus „das Backend darf
+ * den Score nicht ANDERS rechnen" wurde „das Backend darf ihn nicht
+ * rechnen". Das ist nicht dasselbe, und der Unterschied ist genau die
+ * Spiegelung, die seit v1899 für DSCR und KPI schon da war. Sie zu
+ * erweitern war immer möglich; ich habe es nicht getan und stattdessen
+ * einen Verzicht dokumentiert, der nach Sorgfalt aussah.
+ *
+ *   > Ein begründeter Verzicht ist nur so lange eine Begründung, wie der
+ *   > Weg daran wirklich fehlt. Danach ist er eine Ausrede mit Fußnote.
+ *
+ * Seit v1925 spiegelt `tools/rechenkerne-spiegeln.mjs` fünf Kerne, und
+ * `services/rechenkerne.js` gibt sie dem Backend:
+ *
+ *     Dscr.compute()              dscr-engine.js
+ *     DealKpis.compute()          deal-kpis.js
+ *     ScoreTier.stufe()           score-tiers.js
+ *     DealScore.computeFromKpis() dealscore.js      <- der Deal-Score
+ *     QcHeuristik.bewerten()      qc-heuristik.js   <- die Heuristik
+ *
+ * Es ist WOERTLICH dieselbe Datei, die der Browser lädt, mit SHA-256 je
+ * Quelle. Keine zweite Rechnung, kein zweiter Dialekt.
+ *
+ * ── WAS DER SCHNELLBLICK JETZT LIEFERT ────────────────────────────────
+ *
+ * Drei Dreisatzrechnungen, jede offen vorgerechnet:
  *
  *     Bruttomietrendite   Jahreskaltmiete / Kaufpreis
  *     Kaufpreisfaktor     Kaufpreis / Jahreskaltmiete
  *     Kapitaldienst       Darlehen × (Zins + Tilgung)
  *
- * Das ist kein Score und heißt auch nicht so. Der Score kommt, sobald das
- * Objekt in DealPilot gerechnet wurde — und dann steht er über
- * `objekt_kennzahlen` zur Verfügung.
+ * dazu den DEAL-SCORE mit seinen fünf Teilnoten und seiner Stufe, und die
+ * HEURISTIK des Quick-Checks: die Einschätzungszeilen und die
+ * Kaufempfehlung (KAUFEN / VERHANDELN / KRITISCH / PASS) samt
+ * Schmerzschwellen-Kaufpreis.
+ *
+ * ── EINE ZAHL, NICHT ZWEI ─────────────────────────────────────────────
+ *
+ * Wurde das Objekt in DealPilot schon gerechnet, steht sein Score am
+ * Datensatz (`_dealpilot_score`). Dann gilt DIESER, und es wird kein
+ * zweiter gerechnet — der Quick-Check der App weicht vom Vollbild-Score
+ * bewusst ab (quick-check.js, V63.22: der Quick-Check kennt weniger
+ * Felder), und beide Zahlen nebeneinander im Chat wären genau die zweite
+ * Meinung, die hier nie entstehen soll. Erst wenn kein gespeicherter
+ * Score da ist, rechnet der Schnellblick selbst — und sagt, dass es der
+ * Quick-Check-Score ist.
  *
  * ── UND DIE FEHLENDEN ANGABEN ─────────────────────────────────────────
  *
@@ -1537,38 +1574,230 @@ async function objekt_schnellblick(ctx, args) {
    * welche Richtung das Ergebnis dadurch verschoben ist: fehlt ein
    * Kostenposten, ist das Darlehen zu klein und der Kapitaldienst zu
    * niedrig. */
+  /* ── v1925 · DIE BEWIRTSCHAFTUNG, GENAU WIE calc.js SIE BILDET ────────
+   *
+   * Der Deal-Score haengt am Cashflow, und der Cashflow haengt an den
+   * NICHT umlagefaehigen Bewirtschaftungskosten. Ohne sie faellt er zu
+   * gut aus — und zwar deutlich: gemessen am Objekt ef9d0eb4 sind es
+   * 1.599,46 EUR im Jahr, also 133 EUR im Monat, und der Score
+   * verschiebt sich dadurch um zehn Punkte.
+   *
+   * Gebildet wird sie WOERTLICH nach `calc.js:1361-1404`, inklusive der
+   * drei Modi, die das Formular kennt (der Modus steht am Datensatz, von
+   * `storage.js:276` geschrieben):
+   *
+   *     detail   ul  = hg_ul + grundsteuer + ul_sonst + kp1..kp4
+   *              nul = hg_nul + eigen_r + mietausfall + nul_sonst
+   *     percent  Quoten auf die Jahreskaltmiete bzw. den Kaufpreis
+   *
+   * Die WEG-Ruecklage (`weg_r`) wird NICHT mitsummiert — sie steckt
+   * bereits im Hausgeld; das Formular fuehrt sie als Infofeld
+   * (calc.js:1346). Wer sie addiert, zaehlt sie zweimal.
+   *
+   *   > Eine Bewirtschaftungszahl, die nicht da ist, wird nicht
+   *   > geschaetzt. Der Quick-Check der App zeigt ohne Hausgeld keinen
+   *   > Score, und hier gilt dasselbe. */
+  const bwkModus = d._bwk_mode || 'detail';
+  let bwkUl = 0, bwkNul = 0, bwkHerkunft = null;
+  if (bwkModus === 'percent') {
+    if ((d._bwk_pct_mode || 'nkm') === 'kp') {
+      const q = dez(d.bwk_kp_pct);
+      if (q != null && q > 0) {
+        bwkUl = kp * q / 100 * 0.5;
+        bwkNul = kp * q / 100 * 0.5;
+        bwkHerkunft = pct(q) + ' vom Kaufpreis (am Objekt, 50/50 geteilt)';
+      }
+    } else {
+      const qu = dez(d.bwk_ul_pct), qn = dez(d.bwk_nul_pct);
+      if ((qu != null && qu > 0) || (qn != null && qn > 0)) {
+        bwkUl = nkm * 12 * (qu || 0) / 100;
+        bwkNul = nkm * 12 * (qn || 0) / 100;
+        bwkHerkunft = 'Quoten der Jahreskaltmiete (am Objekt): '
+          + pct(qu || 0) + ' umlagefaehig, ' + pct(qn || 0) + ' nicht umlagefaehig';
+      }
+    }
+  } else {
+    const ulT = ['hg_ul', 'grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'];
+    const nulT = ['hg_nul', 'eigen_r', 'mietausfall', 'nul_sonst'];
+    const sum = (ids) => ids.reduce((a, k2) => a + (z(d[k2]) || 0), 0);
+    const hatEtwas = ulT.concat(nulT).some((k2) => z(d[k2]) != null && z(d[k2]) !== 0);
+    if (hatEtwas) {
+      bwkUl = sum(ulT);
+      bwkNul = sum(nulT);
+      bwkHerkunft = 'aus den Einzelposten am Objekt (Hausgeld, Grundsteuer, '
+        + 'Ruecklage, Mietausfallwagnis)';
+    }
+  }
+  const bwkDa = bwkHerkunft != null;
+
+  /* ── Finanzierung und Kennzahlen: EIN Lauf des Kerns ──────────────────
+   *
+   * v1925: hier liefen vorher zwei getrennte `rechenkerne.kpis()`-Aufrufe
+   * nebeneinander — einer ohne Bewirtschaftung fuer die Finanzierung, und
+   * der Score haette einen zweiten gebraucht. Zwei Laeufe desselben Kerns
+   * mit verschiedenen Eingaben liefern zwei verschiedene Cashflows, und
+   * im Chat staende dann beides.
+   *
+   *   > Dieselbe Kennzahl darf in einer Antwort nur EINMAL vorkommen.
+   *
+   * Also ein Lauf mit allem, was belegt ist, und die Beschriftung sagt,
+   * was drinsteckt. */
+  let K = null, darlehen = null, ek = null;
   if (zins && tilg) {
     const gi = kp + knkSumme;
-    const ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
-    const darlehen = Math.max(0, gi - ek);
-    /* v1899: Kapitaldienst und Ueberschuss aus DealKpis.compute() — dem
-       gespiegelten Kern der App. `rate_j` ist Zins + Tilgung des Jahres,
-       `cf_op` ist Jahreskaltmiete minus Bewirtschaftung minus Zins minus
-       Tilgung; ohne Bewirtschaftungsangabe (bwk_nul bleibt 0) ist das genau
-       der „Ueberschuss vor BWK und Steuer", der hier gemeint ist — und der
-       Hinweis darunter sagt es weiterhin ausdruecklich. */
-    const K = rechenkerne.kpis({
-      kp: kp, nk: knkSumme, nkm: nkm, ze: ze,
-      d1: darlehen, d1z: zins.wert, d1t: tilg.wert, ek: ek
+    ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
+    /* Das Darlehen am Objekt schlaegt die Ableitung — es ist die gemessene
+       Zahl, nicht eine aus Gesamtinvestition minus Eigenkapital. Nur wenn
+       keins hinterlegt ist, wird abgeleitet (so rechnet auch der
+       Quick-Check der App, der kein Darlehensfeld hat). */
+    const d1Objekt = z(d.d1);
+    darlehen = (d1Objekt != null && d1Objekt > 0) ? d1Objekt : Math.max(0, gi - ek);
+
+    /* AfA und Grenzsteuersatz nur, wenn sie am Objekt stehen — sonst 0,
+       dann ist der Cashflow vor Steuer gleich dem nach Steuer. */
+    const gebAnt = dez(d.geb_ant), afaSatz = dez(d.afa_satz);
+    const afa = (gebAnt != null && gebAnt > 0)
+      ? (kp + knkSumme) * (gebAnt / 100) * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
+    const svw = z(d.svwert) || z(d.bankval) || 0;
+
+    K = rechenkerne.kpis({
+      kp: kp, nk: knkSumme, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
+      nkm: nkm, ze: ze, uf: 0,
+      bwk_ul: bwkUl, bwk_nul: bwkNul,
+      d1: darlehen, d1z: zins.wert, d1t: tilg.wert, ek: ek,
+      afa: afa, grenz: dez(d.grenz) || 0,
+      ekInklNkLtv: d.ek_inkl_nk === true || d.ek_inkl_nk === 'true'
+                || d._ek_ist_nk === true || d._ek_ist_nk === 'true',
+      svw: svw
     });
-    const kapitaldienst = K.rate_j;
+
     finanzierung = {
       eigenkapital: eur(ek) + (ekQuote != null ? '  (' + pct(ekQuote) + ' deiner Vorgabe)' : ''),
-      darlehen: eur(darlehen),
+      darlehen: eur(darlehen)
+        + ((d1Objekt != null && d1Objekt > 0) ? '  (am Objekt hinterlegt)'
+            : '  (Gesamtinvestition minus Eigenkapital)'),
       zins: pct(zins.wert) + '  (' + zins.quelle + ')',
       tilgung: pct(tilg.wert) + '  (' + tilg.quelle + ')',
-      kapitaldienst_jahr: eur(kapitaldienst)
+      kapitaldienst_jahr: eur(K.rate_j)
         + '  = ' + eur(darlehen) + ' x ' + pct(zins.wert + tilg.wert),
-      ueberschuss_vor_bwk_und_steuer: eur(K.cf_op),   /* v1899: aus dem Kern */
-      hinweis_ueberschuss: 'Das ist die Miete MINUS Kapitaldienst — ohne '
-        + 'Bewirtschaftungskosten und ohne Steuer. Der echte Cashflow liegt '
-        + 'darunter und wird in DealPilot gerechnet.',
+      bewirtschaftung_jahr: bwkDa
+        ? eur(bwkUl + bwkNul) + ' gesamt, davon ' + eur(bwkNul)
+          + ' nicht umlagefaehig  (' + bwkHerkunft + ')'
+        : 'nicht hinterlegt',
+      /* v1925: die Beschriftung richtet sich danach, was wirklich drin
+         steckt. Vorher hiess diese Zeile immer „vor BWK und Steuer" —
+         mit hinterlegtem Hausgeld war das falsch beschriftet. */
+      ueberschuss_jahr: eur(K.cf_op)
+        + (bwkDa ? '  (nach Bewirtschaftung und Kapitaldienst, vor Steuer)'
+                 : '  (nach Kapitaldienst, OHNE Bewirtschaftung, vor Steuer)'),
+      hinweis_ueberschuss: bwkDa
+        ? 'Miete minus nicht umlagefaehige Bewirtschaftung minus Kapitaldienst, '
+          + 'vor Steuer. Die umlagefaehigen Kosten sind ein durchlaufender '
+          + 'Posten und stehen bewusst nicht drin.'
+        : 'Das ist die Miete MINUS Kapitaldienst — ohne '
+          + 'Bewirtschaftungskosten und ohne Steuer. Am Objekt ist kein '
+          + 'Hausgeld hinterlegt; der echte Cashflow liegt darunter.',
       /* Die Richtung der Verschiebung, wenn ein Kostenposten fehlt. */
       vorbehalt: knkVollstaendig ? undefined
         : 'Bei den Kaufnebenkosten fehlt noch ein Posten. Die Gesamtinvestition '
           + 'ist dadurch ZU KLEIN, also das Darlehen zu klein und der '
           + 'Kapitaldienst zu niedrig — der Überschuss sieht besser aus, als er '
           + 'ist. Sag das dem Nutzer und frag nach dem fehlenden Satz.',
+    };
+  }
+
+  /* ── v1925 · DER DEAL-SCORE UND DIE HEURISTIK ─────────────────────────
+   *
+   * Marcels Auftrag, woertlich: „dass dann natuerlich der Deal-Score
+   * berechnet wird und dann auch die Bewertung der Heuristik mit
+   * angegeben wird."
+   *
+   * Beides kommt aus den gespiegelten Kernen der App:
+   *   DealScore.computeFromKpis()  (dealscore.js)
+   *   QcHeuristik.bewerten()       (qc-heuristik.js)
+   *
+   * Der Weg ist derselbe, den der Quick-Check im Browser geht
+   * (quick-check.js Z. 534-606): DealKpis -> die fuenf Groessen
+   * cf_m / nmy / ltv / dscr / wp_kpi -> DealScore.
+   *
+   * GEMESSEN am 06.10.2026 am Objekt ef9d0eb4 (Staging): dieser Weg gibt
+   * Score 77 — bitgleich zum gespeicherten `_dealpilot_score`, und
+   * bmy, nmy, ltv, dscr, bwk, cf_op, cf_m stimmen auf die letzte Stelle
+   * mit den gespeicherten `_kpis_*` ueberein.
+   *
+   * ── WAS FEHLEN DARF UND WAS NICHT ────────────────────────────────── */
+  const sGespeichert = dialog.scoreLesen(d);
+  let bewertung = null;
+  const scoreFehlt = [];
+  if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
+  if (!bwkDa) scoreFehlt.push('Hausgeld bzw. Bewirtschaftungskosten');
+
+  if (sGespeichert.dealscore != null) {
+    /* Es gibt schon einen gerechneten Score. Dann gilt DIESER. */
+    bewertung = {
+      dealpilot_score: sGespeichert.dealscore,
+      stufe: rechenkerne.stufe(sGespeichert.dealscore).versal,
+      herkunft: 'in DealPilot gerechnet und am Objekt gespeichert',
+      investor_deal_score: sGespeichert.investor,
+      investor_stufe: sGespeichert.investorStufe,
+    };
+  } else if (scoreFehlt.length) {
+    bewertung = {
+      dealpilot_score: null,
+      geht_noch_nicht: scoreFehlt,
+      hinweis: 'Fuer den Deal-Score fehlt ' + scoreFehlt.join(' und ') + '. '
+        + 'Der Quick-Check der App zeigt ohne diese Angaben auch keinen Score — '
+        + 'es wird nichts geschaetzt. Frag genau danach, EINE Angabe auf einmal.'
+    };
+  } else {
+    const svw2 = z(d.svwert) || z(d.bankval) || 0;
+    /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
+       Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
+       ist eine ANNAHME und steht als solche im Ergebnis. */
+    const wp = svw2 > 0 ? svw2 - kp : kp * 0.05;
+    const mstg = dez(d.mietstg) != null ? dez(d.mietstg) : 1.5;
+    const S = rechenkerne.score({
+      kp: kp, cf_m: K.cf_m, nmy: K.nmy, ltv: K.ltv, dscr: K.dscr,
+      wp_kpi: wp, mstg: mstg
+    });
+    const st = rechenkerne.stufe(S.score);
+    const bwkQuote = K.nkm_j > 0 ? (K.bwk / K.nkm_j * 100) : 0;
+    const H = rechenkerne.heuristik({
+      score: S.score, kp: kp, nkm: nkm + ze,
+      bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
+      ekr: K.ekr, bewirtPctNkm: bwkQuote
+    });
+    bewertung = {
+      dealpilot_score: S.score,
+      stufe: st.versal,
+      herkunft: 'Quick-Check-Score — gerechnet mit demselben Kern wie die App '
+        + '(DealKpis + DealScore). Das Objekt wurde in DealPilot noch nicht '
+        + 'vollstaendig gerechnet; der Vollbild-Score kann abweichen, weil er '
+        + 'mehr Felder kennt.',
+      teilnoten: S.breakdown.map((b) => ({
+        was: b.label, punkte: Math.round(b.score) + ' von 100',
+        gewicht: b.weight + ' %', grundlage: b.input
+      })),
+      kennzahlen: {
+        cashflow_monat: Math.round(K.cf_m).toLocaleString('de-DE') + ' EUR vor Steuer',
+        nettomietrendite: pct(K.nmy),
+        ltv: pct(K.ltv),
+        dscr: K.dscr.toFixed(2).replace('.', ','),
+        bewirtschaftungsquote: pct(bwkQuote) + ' der Jahreskaltmiete',
+      },
+      wertpuffer: svw2 > 0
+        ? eur(wp) + '  (Verkehrswert ' + eur(svw2) + ' minus Kaufpreis)'
+        : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
+          + 'hinterlegt ist. Sag das dem Nutzer.',
+      /* ── DIE HEURISTIK ──────────────────────────────────────────────── */
+      empfehlung: H.empfehlung ? H.empfehlung.verdict : null,
+      empfehlung_text: H.empfehlung ? H.empfehlung.text : null,
+      einschaetzung: H.einschaetzung,
+      hinweis: 'Das ist die Bewertung, die der Quick-Check in DealPilot unten '
+        + 'anzeigt — dieselben Schwellen, dieselben Saetze. Nenne den Score MIT '
+        + 'seiner Stufe, dann die Empfehlung, dann die Einschaetzungszeilen. '
+        + 'Die Teilnoten nur, wenn der Nutzer nachfragt oder der Score schwach '
+        + 'ist. Texte UNVERAENDERT uebernehmen, nichts dazuerfinden.'
     };
   }
 
@@ -1583,10 +1812,8 @@ async function objekt_schnellblick(ctx, args) {
     fehlende_angaben: erg.fehlt.length
       ? erg.fehlt.map((f) => erg.beschriftung[f] || f) : undefined,
     vorgaben_hinterlegt: erg.hat_vorgaben,
-    /* ── KEIN SCORE, UND DAS STEHT IM ERGEBNIS ──────────────────────── */
-    kein_score: 'Dies ist KEIN DealPilot-Score und kein Investor Deal Score. '
-      + 'Die beiden werden in DealPilot gerechnet; hier stehen nur die drei '
-      + 'Groessen, die sich aus Kaufpreis und Miete unmittelbar ergeben.',
+    /* ── v1925 · DER SCORE UND DIE HEURISTIK STEHEN JETZT HIER ───────── */
+    bewertung,
     /* v1887 · Die Adresse steht hier seit jeher im Ergebnis — der Hinweis
        hat nie verlangt, sie auch hinzuschreiben. GEMESSEN am 05.10.2026:
        der Bot gab die Kennzahlen der Löhner Str. 278 (233 m², 350.000 €,
@@ -1600,9 +1827,15 @@ async function objekt_schnellblick(ctx, args) {
       + 'nennst du die Zahlen NICHT, sondern sagst, welches Objekt du gefunden '
       + 'hast, und fragst nach. '
       + 'Gib dem Nutzer die Zahlen MIT ihrem Rechenweg, so wie sie hier '
-      + 'stehen — sie sind fertig formatiert. Sag ausdruecklich, dass das noch '
-      + 'kein Score ist und dass der Score kommt, sobald das Objekt in DealPilot '
-      + 'gerechnet wurde. '
+      + 'stehen — sie sind fertig formatiert. '
+      /* v1925: hier stand „Sag ausdruecklich, dass das noch kein Score ist".
+         Es IST jetzt einer — und zwar der, den die App rechnet. */
+      + 'Der Block "bewertung" traegt den DEAL-SCORE mit seiner Stufe, die '
+      + 'KAUFEMPFEHLUNG und die EINSCHAETZUNGSZEILEN des Quick-Checks. Nenne '
+      + 'sie: Score mit Stufe, dann die Empfehlung, dann die Einschaetzung. '
+      + 'Steht dort "geht_noch_nicht", nennst du KEINEN Score und fragst nach '
+      + 'den genannten Angaben — erfinde keinen und schaetze nicht. '
+      + 'Steht dort "herkunft", sag auch, woher der Score kommt. '
       + (erg.hat_vorgaben
           ? 'Der Nutzer hat Vorgaben hinterlegt; sie sind eingesetzt und als '
             + '"deine Vorgabe" gekennzeichnet. '
@@ -1614,8 +1847,11 @@ async function objekt_schnellblick(ctx, args) {
           : '')
       + 'Biete am Ende die Marktpreisindikation an und sag, dass sie einen Abruf '
       + 'aus dem Kontingent kostet (marktbericht_preis nennt den Preis). '
-      + 'Behaupte KEINE Kaufempfehlung aus diesen drei Zahlen — sie reichen fuer '
-      + 'eine Richtung, nicht fuer ein Urteil.'
+      /* v1925: hier stand „Behaupte KEINE Kaufempfehlung". Jetzt gibt es
+         eine — aber nur die aus dem Kern, nie eine eigene. */
+      + 'Die Kaufempfehlung steht in "bewertung.empfehlung" und ihr Text in '
+      + '"bewertung.empfehlung_text". Nimm BEIDE woertlich. Steht dort nichts, '
+      + 'sprichst du KEINE Empfehlung aus — auch keine vorsichtige.'
   };
 }
 
@@ -2764,10 +3000,13 @@ const WERKZEUGE = [
       + 'die GRUNDERWERBSTEUER kommt aus der Postleitzahl (gesetzlicher Satz des '
       + 'Landes), Notar und Grundbuch sind gekennzeichnete Richtwerte. Und die '
       + 'Finanzierung, wenn der Nutzer Zinssatz und Tilgung hinterlegt hat. '
+      + 'DAZU DER DEAL-SCORE MIT SEINER STUFE, die KAUFEMPFEHLUNG (KAUFEN / '
+      + 'VERHANDELN / KRITISCH / PASS) und die EINSCHAETZUNGSZEILEN — genau das, '
+      + 'was der Quick-Check in DealPilot unten anzeigt, aus demselben Rechenkern. '
       + 'IMMER nehmen direkt nach dem Anlegen eines Objekts und bei "ist das ein '
-      + 'guter Deal", "was haelst du davon", "lohnt sich das". '
-      + 'ES IST KEIN SCORE: der DealPilot-Score und der Investor Deal Score werden '
-      + 'in DealPilot gerechnet und stehen danach in objekt_kennzahlen. Sag das.',
+      + 'guter Deal", "was haelst du davon", "lohnt sich das", "mach mal einen '
+      + 'Quick-Check". Fehlen Angaben fuer den Score, sagt das Werkzeug welche — '
+      + 'dann fragst du danach und nennst keinen Score.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
 
   { name: 'vorgaben_setzen', stufe: 'schreiben', fn: vorgaben_setzen,
