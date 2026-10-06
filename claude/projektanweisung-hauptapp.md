@@ -31908,6 +31908,79 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (66) 06.10.2026 — v1924–v1927: zwei Polster für dieselbe Lücke, und zweimal dieselbe Medienabfrage
+
+**Marcel hat zwei Bilder ins Repo gelegt** — `Dateien/Objektkarte_Desktop_1180.png` und
+`Dateien/Objektkarte_IPhone14.png` — und damit in einer Minute gezeigt, was ich in Stunden nicht
+gefunden hatte:
+
+```
+Schreibtisch   „Sachsenstraße 18, Herford"   vollstaendig
+iPhone 14      „Sachsenstraße …"             gekuerzt
+```
+
+**Die Ursache war meine eigene, und es war ein Polster zu viel:**
+
+| | |
+|---|---|
+| `.sbc-address` | `padding-right: 72px` — **gab es vorher schon** |
+| `.sbc-top` | `padding-right: 115px` — **von mir, v1915** |
+| reiner Text | 151 px in 11px JetBrains Mono (nachgemessen) |
+| Karte | 321 px breit |
+
+> **Es war nie zu wenig Platz — ich habe ihn zweimal weggenommen.** Die Adresse hielt die Lücke für
+> die Aktionsknöpfe bereits selbst frei; ich sah die Überlappung, reservierte dieselbe Lücke ein
+> zweites Mal am Elternteil und machte das Problem damit erst zu einem. **Bevor man Platz freihält,
+> nachsehen, ob ihn jemand schon freihält.**
+
+**Und zweimal hintereinander dieselbe falsche Eingrenzung** (v1924, v1925). Marcel meldete den
+Doppelrahmen an der Suche vom Handy — ich behob ihn in `@media (max-width: 900px)`. Dann meldete er
+die goldene Sortierung vom Handy — dasselbe. **Beide Abweichungen waren auf dem Schreibtisch
+identisch vorhanden**, gemessen bei 1177 px:
+
+```
+.sb-search-box    Rahmen Gold/0,25 + Feld-Rahmen rgb(42,38,34)  -> Doppelrahmen
+svg (Lupe)        Gold/0,55
+.sb-sort-btn      aktiver Knopf flaechig rgb(201,168,76)
+.dpl-portfolio    bereits rgb(191,183,169) — war nie golden
+```
+
+> **Wenn eine Abweichung auf beiden Breiten dieselbe ist, gehört die Regel nicht in eine
+> Medienabfrage.** Aus einer Handy-Meldung ein Handy-Problem zu machen, ohne am Schreibtisch
+> nachzusehen, kostet einen zweiten Rollout — und beim zweiten Mal das Vertrauen.
+
+**Abnahme über fünf Breiten und alle sieben Kartenstile, Aktenmappe, Portfolio offen:**
+
+```
+Breite              Karte       Adresse
+1180 Schreibtisch   216 x 45    172 / 172   vollstaendig
+ 430 14 Pro Max     324 x 45    279 / 279   vollstaendig
+ 390 iPhone 14      321 x 45    275 / 275   vollstaendig
+ 375 SE 2           307 x 45    262 / 262   vollstaendig
+ 360 SE             293 x 45    248 / 248   vollstaendig
+
+Stil           Karte       Adresse   ragt hinaus
+Aktenreiter    324 x 58    voll      0
+Bordkarte      324 x 45    voll      0
+Score-Kante    324 x 58    voll      0
+Datenzeile     324 x 45    voll      0
+Ampel          324 x 45    voll      0
+Kennzahlen     324 x 58    voll      0
+Minimal        324 x 45    voll      0
+```
+
+**Was bewusst abweicht:** die Aktionsknöpfe bleiben auf dem Handy sichtbar, am Schreibtisch
+erscheinen sie erst beim Zeigen mit der Maus. Auf dem Handy gibt es kein Zeigen, und sie waren
+deshalb schon einmal unerreichbar. **Eine Optik zurückzuholen, die eine Funktion kostet, wäre der
+schlechtere Tausch.** Dazu ist die Knopfgruppe 73 statt 61 px breit — ein Finger braucht mehr als
+ein Mauszeiger.
+
+> **⚠ Versionsnummer v1925 ist DOPPELT vergeben.** Während dieses Strangs lief der Bot-Strang
+> parallel und hatte v1925 bereits für den Quick-Check-Score verbraucht (`467d2c97`, davor meinem
+> `6a846bc6`). Die Dateien sind disjunkt und die Cache-Buster hängen je Datei, technisch bricht
+> nichts — aber wer v1925 sucht, findet zwei verschiedene Pakete. **Das ist der Prozessfehler aus
+> Journal (56) zum dritten Mal an einem Tag;** woher die Nummer kommt, gehört festgelegt.
+
 ### (65) 06.10.2026 — v1923–v1923b: sechs Punkte aus Marcels Liste, und ein Umschalter, der kein Befehl ist
 
 | Punkt | Befund | Paket |
