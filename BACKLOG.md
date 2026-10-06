@@ -291,6 +291,12 @@ Heute `display:none` h=0, in der Aktenmappe `display:block` h=501; Schiene `disp
   Klein in die Kopfzeile zurück? Nicht geraten.
 - **Kanzlei und Tower** auf 390 px in derselben Tiefe nachprüfen (bisher nur Überlauf und
   Abzeichen, nicht die Partikel- und Kartenfrage).
+- **Die Portfolio-Schublade auf dem Handy ist KEIN Mischzustand** (gemessen 06.10.2026, in der
+  Aktenmappe bei 388 px): sie steht auf `rgb(14,13,11)` mit Text `rgb(233,227,214)` — **exakt die
+  Werte der seitlichen Schiene am Schreibtisch** (248 px breit, dieselben zwei Farben). Dass die
+  Schublade dunkel ist, während die Arbeitsfläche daneben hell ist, ist die Anordnung der
+  Aktenmappe selbst, nicht ein durchgeschlagener Heute-Ton. **Hier ist nichts zu reparieren** —
+  wer sie heller will, trifft eine Gestaltungsentscheidung, die auch den Schreibtisch betrifft.
 - **Marcels Abnahme im Browser** und ein Prod-Rollout.
 
 ### N34 · Vier Fehler in der Steuer- und Bewirtschaftungsrechnung (06.10.2026) — erledigt v1898, auf Staging
@@ -338,6 +344,17 @@ verlangen MSE und VR eine Genehmigung) — Genehmigung einholen oder sechs Sätz
 Sachsen: fünf Ausschüsse brauchen nur einen Brief, sechs kosten 60–167 €.
 
 ### N31 · Linie 8 (NI/SH/RP/SL) liegt ungesät — Entscheidung über 280 Sperren
+
+> **Gemessen am 06.10.2026, und es verkleinert die Frage:** die beiden Dateien sind **je Gebiet**
+> gebaut (RP 35 Gebiete × 4 Zweige × 2 Kennzahlen = 280, SL 6 × 4 × 2 = 48), weil eine Sperre mit
+> `zweig: "alle"` von `zweigWaehlen()` **nicht getroffen wird, sobald der Aufrufer eine Objektart
+> nennt** — sie erreicht den Nutzer dann nicht. Eine Zusammenfassung „je Land" ginge deshalb
+> **nur für den Liegenschaftszinssatz, nicht für den Sachwertfaktor**: dort filtert
+> `EBENE_GESPERRT` die Landesebene heraus, bevor `unvollstaendig()` greift, und die Sperre wäre
+> unsichtbar. **Die Entscheidung lautet also nicht „je Gebiet oder je Land", sondern: beim
+> Zinssatz zusammenfassen, ja oder nein.** Der Generator liegt bereit und erzeugt beide Formen in
+> Minuten.
+
 
 411 Sätze im Arbeitsbaum, 16 Werte (Hameln-Hannover, Sulingen-Verden; darunter Spezialobjekte wie
 Altenpflegeheim und Wochenendhaus), 395 Sperren. 280 davon sagen dasselbe: RP und SL sind
