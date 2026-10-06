@@ -38708,13 +38708,57 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   /* Der Ring wird mittig an die Karte gehaengt, statt auf einem fuer die grosse Karte
      gemessenen `top:38px` zu stehen. `bottom:auto` muss dabei sein: die Regel, die ihn
      streckte, setzt beides, und eine Kurzschrift gibt es fuer top/bottom nicht. */
-  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay {
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay {
     top: 50% !important; bottom: auto !important; height: auto !important;
     transform: translateY(-50%) !important;
   }
-  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-actions {
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-actions {
     top: 50% !important; bottom: auto !important; height: auto !important;
     transform: translateY(-50%) !important;
+  }
+
+  /* ═══ v1905 · „KENNZAHLEN" IST KEINE EINZEILIGE KARTE  (Befund N39) ═════════════════════
+     Die Mitte der Karte ist der richtige Platz fuer Ring und Knopfzeile, SOLANGE die Karte
+     eine Zeile ist — Datenzeile 44,8 · Ampel 27,6 · Minimal 31,6 px. „Kennzahlen" ist das
+     nicht: sie traegt zwei Bloecke uebereinander, `.sbc-top` (43,2) und `.sbc-mini-grid`
+     (66,6), zusammen 121,8 px. Die Mitte liegt dann MITTEN IM RASTER.
+
+     GEMESSEN am 06.10.2026, Messkabine 390 px, Aktenmappe, Schublade offen, erste Karte:
+
+       .sb-card            322,6 x 121,8  @ 12 / 214,4
+       .sbc-top             321,5 x 43,2  @ 13,1 / 227,3
+       .sbc-mini-grid       321,5 x 66,6  @ 13,1 / 269,5   <- beginnt 55,1 px unter der Oberkante
+       .sbc-actions           73 x 26     @ 219,6 / 262,3  <- top:50%, also 47,9 px unter ihr
+       .sbc-score-overlay     26 x 26     @ 299,6 / 262,3
+
+     Ueber die Rechtecke hinaus am TEXT nachgemessen (Range-Rechtecke der Textknoten, nicht
+     die Elementkaesten — die sind durch Innenabstaende breiter als ihre Schrift):
+
+       KNOPF   ueber .sbcm-label „BMR"      19 x 12 px
+       RING    ueber .sbcm-toggle-ico „⇅"    9 x 14 px
+
+     Das zweite ist das schwerere: `⇅` schaltet die Kachel um. Verdeckt wurde hier also nicht
+     nur eine Beschriftung, sondern ein BEDIENELEMENT.
+
+     > Die 121,8 px sind richtig und bleiben: das Raster traegt 66,6 px echten Inhalt. Falsch
+     > war die LAGE der Knopfzeile, nicht die Hoehe der Karte.
+
+     Beide gehen deshalb in die Kopfzone zurueck — `top:6px`, der Wert, den `.sbc-actions`
+     in dieser Datei ohnehin fuehrt (Z. 4975 / 25321). Die Zone ist frei: `.sbc-seq` liegt
+     links (73,6 px breit), der Preis `.sbc-kp-row` erst bei 253 und damit unter den
+     Knoepfen, die bei 246,4 enden.
+
+     Die Adresse braucht dafuer mehr Luft als die 72 px von oben: gemessen beginnt die
+     Knopfzeile 115 px vor der rechten Kartenkante, der Adresskasten endet 40,1 px davor —
+     72 px Abstand lassen sie 2,9 px ueberlappen. 82 px halten 7 px Abstand.
+     `button.sbc-btn` bleibt dabei 26 x 26 (v1191, Z. 37455 ff. — bewusst, mit Messung). */
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay,
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-actions {
+    top: 6px !important; bottom: auto !important; height: auto !important;
+    transform: none !important;
+  }
+  html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-address {
+    padding-right: 82px !important;
   }
 }
 

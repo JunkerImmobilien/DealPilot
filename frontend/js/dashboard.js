@@ -2249,6 +2249,7 @@
   /* ════ DS2-Score-Leiste oben ausblenden (Handoff: gehoert im Dashboard weg) ════ */
   var _dpHidden = [];   // gemerkte Elemente fuer sauberes Restore
   var _dpHiddenSiblings = [];   // v452.12: ausgeblendete leere .body-Geschwister
+  var _dpQuickVorher = null;    // v1905: inline-display von #s-quick VOR dem Cockpit
   function hideDs2Bar(){
     _dpHidden = [];
     var dash = $(MOUNT_ID);
@@ -2285,7 +2286,14 @@
     var tabs=document.querySelector('.tabs'); if(tabs)tabs.style.display='none';
     var wf=document.querySelector('.tabs-workflow-bar'); if(wf)wf.style.display='none';
     document.querySelectorAll('.sec').forEach(function(s){ if(s.id!==MOUNT_ID){ s.style.display='none'; } });
-    var quick=$('s-quick'); if(quick)quick.style.display='none';   // v452.3: Quick-Check explizit weg
+    /* v452.3: Quick-Check explizit weg.
+       v1905: und zwar mit GEMERKTEM Vorzustand. `closeDashboard()` setzte ihn
+       blind auf '' zurueck — ein Schliesser, der etwas anderes OEFFNET. Solange
+       nur `setMainView` ihn rief, fiel das nicht auf; seit die Strategie ihn
+       ueber das Ansichts-Register mitruft, wuerde er den Quick-Check
+       (`.sec-hidden.active{display:block}`, style.css:4049) wieder aufmachen. */
+    var quick=$('s-quick');
+    if(quick){ if(_dpQuickVorher===null) _dpQuickVorher=quick.style.display; quick.style.display='none'; }
     var ao=$('all-objects-main'); if(ao)ao.style.display='none';
     // v452.12: leeres .body-Element VOR dem Dashboard (im .main-col) ausblenden.
     // Es haelt ~90px Hoehe durch sein Padding -> der "Leerraum oben". Diagnose:
@@ -2353,7 +2361,10 @@
       if(typeof window._updateHdrHeight==='function') window._updateHdrHeight();
     }
     var wrap=document.querySelector('.app-wrap'); if(wrap)wrap.classList.remove('dp-sidebar-collapsed');
-    var quick=$('s-quick'); if(quick)quick.style.display='';
+    /* v1905: zurueck auf den gemerkten Vorzustand statt pauschal auf '' — siehe
+       die Begruendung in openDashboard(). Ohne Merker ist nichts zu tun. */
+    var quick=$('s-quick');
+    if(quick && _dpQuickVorher!==null){ quick.style.display=_dpQuickVorher; _dpQuickVorher=null; }
     stopParticles(); destroyCharts();
   }
 
@@ -2363,10 +2374,19 @@
     var orig = window.setMainView;
     if(typeof orig!=='function'){ setTimeout(installWrap,300); return; }
     window.setMainView = function(view){
-      if(view==='dashboard'){ openDashboard(); return; }
+      if(view==='dashboard'){
+        /* v1905: Das Cockpit ist die EINZIGE Ansicht, die diesen Wrap nimmt und
+           `orig` nie erreicht — es muss die anderen deshalb selbst abraeumen.
+           Ueber das Register, nicht ueber eine eigene Liste. */
+        try{ if(window.DealPilotAnsichten) window.DealPilotAnsichten.abraeumen('dashboard'); }catch(e){}
+        openDashboard(); return;
+      }
       closeDashboard();          // bei single/all Dashboard ausblenden
       return orig.apply(this, arguments);
     };
+    /* v1905: …und damit JEDE andere Ansicht das Cockpit zumachen kann, ohne es
+       zu kennen (Befund N38: die Portfolio-Strategie konnte es nicht). */
+    try{ if(window.DealPilotAnsichten) window.DealPilotAnsichten.melde('dashboard', closeDashboard); }catch(e){}
     window._dpDashWrapInstalled = true;
   }
   function installLoadSavedWrap(){

@@ -178,12 +178,31 @@
       return;
     }
     var s = sektion(); if (!s) return;
-    /* wie openDashboard() in dashboard.js: Reiter und Objektbereiche weg, eigene Sektion zeigen */
     try { if (global._currentObjKey && typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {}
-    var tabs = document.querySelector('.tabs'); if (tabs) tabs.style.display = 'none';
-    var wf = document.querySelector('.tabs-workflow-bar'); if (wf) wf.style.display = 'none';
+    /* v1905 · Befund N38. Hier stand bis zum 06.10.2026:
+
+         document.querySelectorAll('.sec').forEach(…x.id===SEC_ID?'block':'none')
+
+       Das raeumte nur `.sec` ab. Gemessen (Messkabine 390 px, Aktenmappe,
+       echter Bedienweg): wer vorher im Cockpit war, hatte danach
+       `#dashboard-main` mit 9.013,9 px ueber der Strategie stehen, die
+       folglich bei y = 9.133,2 begann — bei Scrollstand 0. `#dashboard-main`
+       und `#all-objects-main` sind KEINE `.sec` (index.html:3434 / :3439).
+
+       Die Liste der anderen Ansichten fuehrt jetzt das Register in `ui.js`;
+       `abraeumen('strategie')` schliesst alles ausser dieser hier — auch
+       Ansichten, die es heute noch gar nicht gibt. */
+    if (global.DealPilotAnsichten) {
+      global.DealPilotAnsichten.abraeumen('strategie');
+    } else {
+      /* Rueckfall fuer den Fall, dass ui.js nicht geladen ist: wenigstens das,
+         was diese Datei frueher konnte. */
+      var tabsF = document.querySelector('.tabs'); if (tabsF) tabsF.style.display = 'none';
+      var wfF = document.querySelector('.tabs-workflow-bar'); if (wfF) wfF.style.display = 'none';
+      document.querySelectorAll('.sec').forEach(function (x) { if (x.id !== SEC_ID) x.style.display = 'none'; });
+    }
     document.documentElement.setAttribute('data-pst-offen', '1');
-    document.querySelectorAll('.sec').forEach(function (x) { x.style.display = (x.id === SEC_ID) ? 'block' : 'none'; });
+    s.style.display = 'block';
     bestandLaden();
     try { var mc = document.querySelector('.main-col'); if (mc) mc.scrollTop = 0; } catch (e) {}
   }
@@ -200,6 +219,14 @@
     var t = e.target && e.target.closest ? e.target.closest('.sb-card, .sb-act-item') : null;
     if (t && !(t.getAttribute('onclick') || '').match(/openPortfolioStrategie/)) schliessen();
   }, true);
+
+  /* v1905 · und umgekehrt: damit JEDE andere Hauptansicht die Strategie
+     zumachen kann, ohne sie zu kennen. Vorher hing das an zwei Seitentueren —
+     dem Ereignis `dp:object-ready` und einem Klick-Mithoerer auf
+     `.sb-card, .sb-act-item`. Beide bleiben stehen (sie fangen Faelle ab, die
+     ueber gar keinen Ansichtswechsel laufen), sind aber nicht mehr der einzige
+     Weg. `schliessen()` steigt selbst aus, wenn `data-pst-offen` fehlt. */
+  if (global.DealPilotAnsichten) global.DealPilotAnsichten.melde('strategie', schliessen);
 
   global.openPortfolioStrategie = openPortfolioStrategie;
   global.PortfolioStrategie = { open: openPortfolioStrategie, close: schliessen, fristen: fristen, AP: AP, FEATURE: FEATURE };

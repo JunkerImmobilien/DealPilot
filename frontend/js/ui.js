@@ -209,11 +209,79 @@ function switchTab(i) {
   // Saved-Objekte view (sec-hidden) is opened separately, not via tab
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   v1905 · DAS REGISTER DER HAUPTANSICHTEN   (Befund N38)
+
+   GEMESSEN am 06.10.2026, Messkabine 390 px, Aussehen Aktenmappe, ueber den
+   ECHTEN Bedienweg (die Knoepfe `.sb-act-item` im Aktionsblock):
+
+     erst Portfolio-Cockpit, dann Portfolio-Strategie
+       #dashboard-main        display:block   385,6 x 9.013,9  @ y   119,3
+       #portfolio-strategie   display:block   385,6 x 1.915    @ y 9.133,2
+       .main-col scrollTop    0
+       data-pst-offen         "1"  (also "offen" — und trotzdem unsichtbar)
+
+   Wer vorher im Cockpit war, sah nach dem Klick auf „Portfolio-Strategie"
+   weiter das Cockpit und muesste rund 9.000 px scrollen.
+
+   DIE URSACHE IST NICHT DAS EINE ELEMENT. `openPortfolioStrategie()`
+   (portfolio-strategie.js) blendete `.sec` aus — und die zwei grossen
+   Mounts sind keine `.sec`:
+
+     index.html:3434   <div id="dashboard-main" style="display:none">
+     index.html:3439   <div id="all-objects-main" class="ao-main" …>
+
+   Jeder Oeffner fuehrte bisher SEINE EIGENE Liste der anderen Ansichten:
+   `openDashboard()` kannte `.sec`, `#s-quick` und `#all-objects-main`,
+   `openPortfolioStrategie()` kannte nur `.sec`, `setMainView()` kannte
+   `.sec` und `#all-objects-main`. Drei Listen fuer dieselbe Frage.
+
+   > Eine Ansicht, die ihre Geschwister selbst aufzaehlt, vergisst das
+   > naechste. Ein Register vergisst keines.
+
+   Ab hier fuehrt die Liste EINE Stelle: jede Hauptansicht meldet hier
+   ihren Schliesser an, und wer umschaltet, ruft `abraeumen(ziel)` — das
+   schliesst alle anderen, ohne sie zu kennen.
+   ═══════════════════════════════════════════════════════════════════════ */
+window.DealPilotAnsichten = (function () {
+  var reg = {};
+  function melde(name, schliesser) {
+    if (name && typeof schliesser === 'function') reg[name] = schliesser;
+  }
+  /* Ein Schliesser, der wirft, darf die anderen nicht aufhalten — sonst
+     haengt beim ersten Fehler die halbe Umschaltung in der Luft. */
+  function abraeumen(ziel) {
+    Object.keys(reg).forEach(function (n) {
+      if (n === ziel) return;
+      try { reg[n](); } catch (e) {}
+    });
+  }
+  return { melde: melde, abraeumen: abraeumen, namen: function () { return Object.keys(reg); } };
+})();
+
+/* Die beiden Ansichten aus DIESER Datei melden sich selbst an:
+   `single` = Reiterleiste mit den Objektbereichen, `all` = die Tabelle.
+   `single` raeumt ALLE `.sec` ab (auch die `.sec-hidden`-Standalones
+   Quick-Check und Marktbericht) — genau das taten `openDashboard()` und
+   `openPortfolioStrategie()` vorher schon von Hand. */
+window.DealPilotAnsichten.melde('single', function () {
+  var tabs = document.querySelector('.tabs'); if (tabs) tabs.style.display = 'none';
+  var wf = document.querySelector('.tabs-workflow-bar'); if (wf) wf.style.display = 'none';
+  document.querySelectorAll('.sec').forEach(function (s) { s.style.display = 'none'; });
+});
+window.DealPilotAnsichten.melde('all', function () {
+  var ao = document.getElementById('all-objects-main'); if (ao) ao.style.display = 'none';
+});
+
 /**
  * V26: Hauptview-Switch zwischen Einzelobjekt und Alle-Objekte-Tabelle.
  * @param {'single' | 'all'} view
  */
 function setMainView(view) {
+  /* v1905: ERST alle fremden Hauptansichten abraeumen (Cockpit, Strategie,
+     …). Siehe das Register darueber — diese Datei muss nicht wissen,
+     welche es sind. */
+  try { if (window.DealPilotAnsichten) window.DealPilotAnsichten.abraeumen(view); } catch (e) {}
   var tabs = document.querySelector('.tabs');
   var wfBar = document.querySelector('.tabs-workflow-bar');
   var aoMain = document.getElementById('all-objects-main');

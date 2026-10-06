@@ -7182,6 +7182,18 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-objkarte="datenzeile"] aside#sidebar :is(#sb-list) .sb-card .sbc-top-line1 { display:inline-block !important; width:auto !important; vertical-align:middle !important; }
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; }
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-radius:4px !important; background-color:transparent !important; padding:6px 8px 6px 20px !important; position:relative !important; }
+  /* v1905 · Marcel am 06.10.2026 auf die Frage, ob die 28 px so bleiben: „dann etwas hoeher".
+     Gemessen (Messkabine 390 px, Aktenmappe): die Zeile stand auf 27,6 px, 8 von 20 Karten
+     waren ganz zu sehen. 40 px ist die Schwelle unseres eigenen Massstabs — unter 40 px ist
+     eine Flaeche auf dem Finger schwer zu treffen —, also der KLEINSTE Wert, der sich
+     verteidigen laesst; mehr naehme dem dichtesten Stil seinen Zweck.
+     > Ehrlich dazu: der INHALT traegt die 40 px nicht. Die Zeile fuehrt nur die Adresse,
+     > gemessen 15,6 px; `.sbc-seq`, `.sbc-kp-row` und das Band sind in diesem Stil
+     > `display:none`. Die zusaetzlichen 24 px sind Trefferflaeche, nicht Inhalt — das ist
+     > hier der Zweck, soll aber nicht als Inhalt ausgegeben werden.
+     NUR am Handy-Anker (`aside#sidebar`, dieser @media-Block). Die Schienen-Fassung fuer
+     den Schreibtisch bleibt unberuehrt: dort zeigt eine Maus, kein Finger. */
+  html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { padding-top:12.5px !important; padding-bottom:12.5px !important; }
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top { background-color:#1A1815 !important; }
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top { background-color:#221F1A !important; }
   html[data-dp-objkarte="ampel"] aside#sidebar :is(#sb-list) .sb-card .sbc-top::before { content:'' !important; position:absolute !important; left:7px !important; top:50% !important; transform:translateY(-50%) !important; width:8px !important; height:8px !important; border-radius:50% !important; background:var(--wl-c9a84c, #C9A84C) !important; }
@@ -7197,6 +7209,12 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-objkarte="kennzahlen"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border-radius:0 5px 0 0 !important; border-bottom:0 !important; }
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; }
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-radius:4px !important; background-color:transparent !important; padding:8px 9px !important; }
+  /* v1905 · dieselbe Entscheidung fuer „Minimal" (Marcel: „ja klar"). Gemessen 31,6 px,
+     7 von 20 Karten ganz sichtbar — ebenfalls unter der 40-px-Schwelle. Inhalt wie bei
+     „Ampel" nur die Adresse (15,6 px); auch hier ist der Zuwachs Trefferflaeche.
+     Kurzschrift verliert einzeln: `padding:` oben wuerde von einer spaeteren
+     Einzeleigenschaft geschlagen — deshalb steht die Korrektur selbst einzeln und NACH ihr. */
+  html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { padding-top:12.5px !important; padding-bottom:12.5px !important; }
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card:hover .sbc-top { background-color:#1A1815 !important; }
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card.active .sbc-top { background-color:#221F1A !important; }
   html[data-dp-objkarte="minimal"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq,
