@@ -32446,3 +32446,80 @@ CLAUDE.md: Optik ohne klare Vorgabe → nicht raten. **Gehört Marcel vorgelegt*
 entschieden.
 - Der **Ton** der Aktenmappe bleibt unangetastet (Journal 48, Backlog N33). Marcel ausdrücklich:
   „Das muss erstmal nicht hell werden."
+
+### (53) 06.10.2026 — v1895: die Bewirtschaftung rechnet Posten für Posten, und jede geschätzte Zahl sagt es
+
+**Was.** Die Pauschale in `voice-import.js` griff nur, wenn **beide** Hausgeld-Summen leer
+waren (`if (!ul && !nul)`). Der Sprechlauf fragt aber genau `hg_ul`/`hg_nul` ab und sonst
+keinen der sieben Posten — wer sein Hausgeld nennt, der Normalfall bei einer ETW, verlor
+damit das kalkulatorische Mietausfallwagnis, die eigene Rücklage und die Sonderverwaltung
+stillschweigend auf 0. Marcels Entscheidung am 06.10.: „ne a und dann text hinter wenn
+pauschal" — Variante (a), posten-weise, plus sichtbarer Vermerk.
+
+**Commit** · `5ccf2943` (v1895) · `24cb2f0e` (v1895a, Konstanten) · `85a25746` (v1895b,
+Kontrast) · `36f59ec2` (v1895c). Cache-Buster: `voice-import.js?v=v1895`,
+`bwk-vermerk.js?v=v1895b`, `pdf.js?v=v1895`, `pdf-investment-bank.js?v=v1895`.
+
+**Nachweis.** An den echten Rechenkernen gemessen (`DealKpis.compute` + `Dscr.compute`,
+geladen aus den echten Dateien; 180.000 € / 940 € Kaltmiete / 36.000 € EK / 3,8 % / 1,5 %):
+
+| Fall | ul/nul vorher | ul/nul nachher | cf n.St. vorher | nachher |
+|---|---|---|---|---|
+| nichts angegeben | 1918 / 1805 | 1918 / 1805 | 828 | **828** |
+| nur Hausgeld (beide Teile) | 1391 / 1539 | 1391 / 1652 | 986 | 919 |
+| **nur `hg_ul` 2.880** | **2880 / 0** | 2880 / 1805 | 1903 | **828** |
+| alle sieben Posten | 1777 / 2132 | 1777 / 2132 | 633 | **633** |
+
+**Die Zeile in Fett ist der Fehler:** wer den umlagefähigen Teil seines Hausgelds nannte,
+stand danach ohne jede Eigentümerkosten da — 1.075 € im Jahr zu günstig. Rückwärts­
+kompatibel sind die Fälle *nichts angegeben* und *alle Posten* auf den Cent.
+
+> **Die Summenquote ist ein DECKEL, kein Aufschlag.** `bwk_anteil_default` (16 %) ist die
+> Quote für die ganze nicht umlagefähige Seite („Verwaltung, Rücklagen",
+> `investment-profile.js:212`). Käme das Wagnis mit seinem eigenen Satz
+> (`mietausfall_pct`, 1 %) zusätzlich obendrauf, rechnete ein Objekt ohne jede Angabe
+> plötzlich mit 17 % statt 16 % — **jede bestehende Kalkulation hätte sich verschoben.**
+> Deshalb wird das Wagnis aus der Quote herausgerechnet, der Rest geht an `hg_nul`.
+
+> **`mietausfall_pct` stand seit v1257 in den Einstellungen und wurde von niemandem
+> gelesen** außer `main.js:128`, und dort nur, wenn beim Anlegen schon eine Miete im Feld
+> stand. Im Sprechlauf stand sie nie. Eine Einstellung, die nichts bewirkt, ist eine
+> Behauptung über das Produkt.
+
+> **Gegen die Annahme im Auftrag: die Grundsteuer bewegt den Cashflow nicht.** Gemessen:
+> 336 € zusätzlich änderten `cf_ns` um **0 €**. Sie läuft als umlagefähig (§ 2 Nr. 1
+> BetrKV) und ist damit durchlaufend — `deal-kpis.js:83` rechnet `bwk_cf = bwk_nul`. Sie
+> bewegt nur die Anzeigesumme. Wer sie als Cashflow-Treiber sucht, sucht am falschen Ort.
+
+**Der Vermerk.** Jeder geschätzte Posten trägt einen Satz in Kundensprache:
+„*Diese Zahl habe ich geschätzt — 1 % deiner Jahresmiete, weil du dazu nichts gesagt hast.
+Trag deinen eigenen Wert ein, dann rechne ich damit.*" Score-Karte, Formular (neues
+`js/bwk-vermerk.js`, liest nur `_dp_herkunft` und rechnet nichts), beide PDFs.
+
+> **Die Pauschalen gehen als FELDWERT mit in die Übernahme-Tabelle.** Sonst rechnete der
+> Sprechlauf-Score mit 1.805 € und der Tab Kennzahlen danach mit 0 — dieselbe Wohnung,
+> zwei Zahlen. Auf Staging nachgemessen: `nul_sum` zeigt 1.652 €, genau den Wert der
+> Prüfstrecke. Die Posten sind in der Tabelle abwählbar; eine Schätzung, die sich nicht
+> abwählen lässt, wäre keine Schätzung.
+
+> **Der Vermerk war im ersten Anlauf zu blass (v1895b).** Als fester `#8A837E` auf weißem
+> Grund kam er auf Kontrast **3,73**, bei 10,5 px zu wenig. Ein dunklerer Hexwert wäre die
+> nächste Falle gewesen — er gilt nur zu *seinem* Grund, und im Obsidian-Skin ist der
+> Grund dunkel. Jetzt erbt er die Textfarbe seines Umfelds und tritt nur über
+> `opacity:.72` zurück: **5,95** auf hell, auf dunkel folgt er mit. Beim Chip trägt Gold
+> Rahmen und Grund, die Schrift bleibt lesbar (13,59).
+
+**Rest — gemessen, offen, nicht angefasst:**
+- **`dashboard.js:653`** führt eine **zweite** BWK-Pauschale: `bwkWg` und ein
+  `bwk_j`-Rückfall von **20 % der Miete**, unabhängig von den Einstellungen. Die
+  Modellprojektion des Cockpits folgt damit nicht Marcels Quoten.
+- **`tax.js:262` addiert `weg_r` in die nicht umlagefähigen Werbungskosten.** `calc.js`
+  sagt an derselben Zahl ausdrücklich das Gegenteil („WEG-Rücklage: nur Info-Anzeige,
+  NICHT summieren — ist bereits Teil des Hausgeldes"). Verdacht auf Doppelzählung, noch
+  nicht am Ergebnis nachgerechnet.
+- **Das Mietausfallwagnis ist kalkulatorisch und damit keine Werbungskosten.** `tax.js`
+  nimmt das Feld `mietausfall` aber in die Werbungskosten. Das war vorher schon so; v1895
+  füllt das Feld nur bei deutlich mehr Objekten. Gehört geprüft.
+- `agentWerkzeuge.js:923` (Backend) bildet die NUL-Summe für die KI-Antwort **eigenständig**
+  aus den Rohfeldern — der Vermerk fehlt dort.
+- `quickcheck-app.html` hat einen eigenen Hausgeld-Split und ist von v1895 nicht berührt.
