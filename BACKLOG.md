@@ -265,6 +265,85 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N37 · Cockpit-Grund, Sortierknöpfe und der Menüknopf (06.10.2026) — erledigt v1904/v1904a, auf Staging
+
+Marcel: „ja fertig machen, wollte ich ja so" · „auch fertig machen" · „das ‚X'
+neben Neues Objekt sieht auch nicht gut aus. Es ruft ja auch die Menüleiste
+auf. das sollte angepasst werden."
+
+**Befund 1 — der Obsidian-Grund von `#dashboard-main` existiert nicht.** Die
+Behauptung stand seit v1903a in `dashboard.js:2001` und im Journal (57), war
+aber nie gemessen. Gemessen (390 px, Aktenmappe, Cockpit offen):
+`#dashboard-main` transparent, `#dp-stage.stage.fc.fc9` `rgb(253,252,250)`,
+`.main-col` `rgb(244,242,237)`; 23 Proben über die ganze Cockpit-Höhe trafen
+**einmal** Obsidian (`.hpass` im Hero). Diagnose zurückgenommen. Der echte
+Befund: das Cockpit bringt seinen eigenen hellen Ton mit und folgt der Fläche
+nicht. Gebunden über `--page-bg` in `layout-varianten.css`, `@media
+(max-width:900px)` und nur mit `data-dp-layout` — „Heute" und Schreibtisch
+unberührt (1182 px nachgemessen: weiter `#FDFCFA`).
+
+**Befund 2 — `button.sb-sort-btn` überlappte in „Heute" weiter um 13 px.**
+v1903 hatte nur die Aussehen mit Layout-Attribut gelöst. Jetzt `gap:18px` in
+`style.css` neben der `::after`-Regel, für jede Seitenleiste unter 768 px.
+Mittenabstand 31 → 44 px, Gruppe 63,2 → 76,2 px. Schreibtisch unverändert.
+
+**Befund 3 — das „X" war kein Kreuz.** Die ±6 px in `style.css:6838` stammen
+aus der Ur-Fassung (2 px Balken + 4 px Lücke); sichtbar ist `.hdr-v61-row1`
+mit 1,5 + 3 = 4,5 px. Mitten lagen bei 29,5 / 28,0 / 26,5 statt dreimal 28,0.
+
+**Befund 4 — das „X" blieb stehen, wenn die Schublade anders zuging.**
+`closeMobileSidebarOnAction()` (`ui.js:1815`) nahm `#hdr-mobile-menu.active`
+nicht mit; dasselbe im `resize`-Handler (`main.js:382`). Ein X, das öffnet —
+genau Marcels Satz. Beide Stellen nachgezogen, über Aktionseintrag und
+Objektkarte nachgemessen.
+
+Commits `5d9c280e` (v1904), `aa3cadd8` + `a277419c` (v1904a).
+
+### N38 · „Portfolio-Strategie" räumt das Cockpit nicht ab (06.10.2026) — OFFEN, gemessen
+
+Gemessen am 06.10.2026, 390 px, Aktenmappe **und** „Heute", Bedienweg Menü →
+Aktionen:
+
+| Reihenfolge | `#dashboard-main` | `#portfolio-strategie` |
+|---|---|---|
+| frisch geladen → Strategie | `display:none` | y = **163**, 1915 hoch — richtig |
+| erst Cockpit → dann Strategie | `display:block`, **7.977** hoch | y = **8.096**, Scrollstand 0 |
+
+`data-pst-offen` steht in beiden Fällen auf `1`, die Sektion ist also offen —
+sie liegt nur unter einem Cockpit, das nicht abgeräumt wurde.
+`openPortfolioStrategie()` (`js/portfolio-strategie.js:175`) blendet nur
+`.sec`-Elemente aus; der Cockpit-Mount `#dashboard-main` ist keines. Umgekehrt
+räumt das Cockpit die Strategie ab, nicht andersherum. Wer im Cockpit war und
+dann auf Strategie tippt, sieht weiter das Cockpit und müsste gut 8.000 px
+scrollen. **Nicht gebaut — Marcel hat es nicht beauftragt.**
+
+### N39 · Kartenstil „Kennzahlen": die Knopfzeile liegt auf der dritten Kachel (06.10.2026) — OFFEN, gemessen
+
+Gemessen, Aktenmappe, 390 px, Menü offen:
+
+```
+.sb-card        323 x 122  bei y = 214
+.sbc-actions     73 x  26  bei (220, 262), rechts 293
+.sbcm  (3.)      96 x  59  bei (229, 270), links 229
+.sbc-score-overlay 26 x 26 bei (300, 262)
+```
+
+Überlappung **64 px in X und 19 px in Y**; der Score-Ring liegt ebenfalls auf
+der dritten Kachel. Die Mitte der Kachel trifft noch `.sbcm-val`, der Wert ist
+also erreichbar — die Beschriftung darüber liegt unter den Knöpfen. Die 122 px
+sind richtig (das Raster trägt 67 px Inhalt, siehe `CLAUDE.md`); falsch ist
+die **Lage** der Knopfzeile. **Nicht gebaut.**
+
+### N40 · Kartenstil „Ampel": 28 px Zeilenhöhe auf dem Finger (06.10.2026) — OFFEN, gemessen
+
+Gemessen, Aktenmappe, 390 px: `.sb-card` **323 x 28**. Acht von zwanzig Karten
+ganz sichtbar — der dichteste Stil, und genau deshalb liegt die Trefferfläche
+der Karte bei 28 px. Die beiden `.sbc-btn` bleiben bewusst 26 x 26
+(`style.css:37479`, v1191); die **Zeile selbst** ist der Engpass. Zum Vergleich
+die anderen sechs: Minimal 32, Datenzeile 45, Bordkarte 44, Score-Kante 55,
+Aktenreiter 57, Kennzahlen 122. **Keine Entscheidung getroffen** — ob ein
+dichter Stil eine kleine Trefferfläche haben darf, ist Marcels Produktfrage.
+
 ### N36 · Das Portfolio-Menü der Aktenmappe auf dem Handy (06.10.2026) — erledigt v1903/v1903a, auf Staging
 
 Marcel: „Auch das kombinierte Menü finde ich nicht gut gelöst. **Standard sollte dann das

@@ -33056,3 +33056,127 @@ deckungsgleichem Puffer.
 > `transform`-Transition auf ihrem Startwert ein, und die Geometrie meldet genau den.
 > Gegenmittel, das jetzt in jedem Lauf steht: ein eingehängtes
 > `*{transition:none !important}` im Prüfling, **bevor** gemessen wird.
+
+### (58) 06.10.2026 — v1904/v1904a: der Obsidian-Grund, den es nicht gab, und ein „X", das öffnete
+
+**Was · v1904, v1904a · Commits `5d9c280e`, `aa3cadd8`, `a277419c`**
+
+**Die Diagnose aus (57) nehme ich ausdrücklich zurück.** Dort stand — und in
+`js/dashboard.js:2001` stand es seit v1903a wörtlich —, der **Obsidian-Grund** von
+`#dashboard-main` bleibe in der Aktenmappe stehen. **Diesen Grund gibt es nicht.**
+Gemessen im gleich-Origin-iframe, 390 px, Aktenmappe (`v1b`), Kartenstil Datenzeile,
+Portfolio-Cockpit offen:
+
+| | gemessen |
+|---|---|
+| `#dashboard-main` | `rgba(0,0,0,0)` — transparent |
+| `#dp-stage.stage.fc.fc9` | `rgb(253,252,250)` = Creme `#FDFCFA` |
+| `.main-col` (Arbeitsfläche) | `rgb(244,242,237)` |
+
+Dazu ein Grundprofil über die **ganze** Cockpit-Höhe: 23 Proben mit
+`elementFromPoint` bei x = 195, `.main-col` in 400-px-Schritten gescrollt — **eine
+einzige** traf Obsidian, nämlich das Band `.hpass` im Hero. Vierzehn trafen Weiß,
+sechs Creme.
+
+> Der Satz war eine Annahme, keine Messung. Er stand in einer Datei, die niemand
+> nachgerechnet hat, und wurde zweimal weitergereicht, bevor jemand hingesehen hat.
+
+**Der echte Befund ist kleiner und trifft trotzdem, was Marcel meint:** das Cockpit
+bringt seinen **eigenen** hellen Ton mit (`#FDFCFA` aus `dashboard.css:303`) und folgt
+damit in keinem Aussehen der Fläche, auf der es liegt. In „Heute" fällt das nicht auf
+(dort ist `.main-col` weiß, zwei Stufen Unterschied); in Aktenmappe, Kanzlei und Tower
+trägt die Arbeitsfläche `#F4F2ED`, und das Cockpit setzt sich als hellere Platte ab.
+
+Gebunden wird der **Ton**, nicht die Fläche — nur `--page-bg`, das `.stage` ohnehin
+liest (`css/layout-varianten.css`, nach der v1671-Regel):
+
+```
+@media (max-width: 900px){
+  html[data-dp-layout] #dashboard-main .stage{ --page-bg:#F4F2ED; }
+}
+```
+
+Spezifität 1-2-1 gegen 1-2-0 von `#dashboard-main .stage.fc` — kein `!important` nötig.
+Ohne Attribut („Heute") greift sie nicht, über 900 px auch nicht.
+
+**Nachweis nach dem Ausrollen**, je über den Bedienweg Menü → Aktionen →
+Portfolio-Cockpit:
+
+| | `#dp-stage` | `.main-col` | Partikel |
+|---|---|---|---|
+| Heute 390 px | `rgb(253,252,250)` | `rgb(255,255,255)` | ja |
+| Aktenmappe 390 px | **`rgb(244,242,237)`** | `rgb(244,242,237)` | nein |
+| Kanzlei 390 px | **`rgb(244,242,237)`** | `rgb(244,242,237)` | nein |
+| Tower 390 px | **`rgb(244,242,237)`** | `rgb(244,242,237)` | nein |
+| Aktenmappe **1182 px** | `rgb(253,252,250)` | `rgb(244,242,237)` | — |
+
+**Die Sortierknöpfe gelten jetzt überall.** v1903 hatte die 13-px-Überlappung der
+beiden 44-px-Trefferflächen nur für die Aussehen mit Layout-Attribut gelöst
+(`layout-varianten.css:7257`). „Heute" trägt keines und blieb bei 31 px Mittenabstand.
+Marcel: „auch fertig machen." Jetzt steht `gap: 18px` in `style.css` direkt neben der
+`::after`-Regel, die die Überlappung erzeugt, als
+`body aside.sidebar .sb-sort-toggle` (0-2-2, `!important`) — und damit in jeder
+Ansicht unter 768 px. Gemessen: Mittenabstand **31 → 44 px**, Gruppe 63,2 → 76,2 px,
+kein Überlauf. Am Schreibtisch (1182 px) unverändert `gap: 2px`.
+
+**Das „X" war kein Kreuz** (v1904). Gemessen, Mitten der drei Balken von
+`#hdr-mobile-menu`:
+
+```
+zu  (Burger)   23,5   28,0   32,5     Abstand 4,5 px
+auf (X)        29,5   28,0   26,5     die Striche 3 px auseinander
+```
+
+Die Verschiebung von ±6 px in `style.css:6838` ist der Balkenabstand der
+**ursprünglichen** Fassung (`height:2px` + `gap:4px`). Sichtbar ist aber
+`.hdr-v61-row1 .hdr-mobile-menu` mit 1,5 + 3 = **4,5 px**. Nachgezogen auf ±4,5 px;
+alle drei Mitten liegen jetzt auf 28,0.
+
+**Und das „X" blieb stehen, wenn die Schublade anders zuging** (v1904a). Marcels Satz
+„Es ruft ja auch die Menüleiste auf" ist wörtlich der Befund. Bedienweg Menü auf →
+Aktionen → Einzelobjekt:
+
+```
+vor der Aktion   .app-wrap sb-mobile-open   #hdr-mobile-menu active
+nach der Aktion  .app-wrap                  #hdr-mobile-menu active
+```
+
+`toggleMobileSidebar()` (`main.js:365`) führt den Zustand an **zwei** Stellen;
+`closeMobileSidebarOnAction()` (`ui.js:1815`) kannte nur die erste — und läuft bei
+jedem Klick auf `.sb-act-item`, `.tab` und `.sb-card`, also auf dem häufigsten Weg aus
+dem Menü heraus. Derselbe Fehler stand im `resize`-Handler (`main.js:382`). Beide
+nehmen den Knopf jetzt mit; nachgemessen über Aktionseintrag **und** Objektkarte, beide
+Wege stimmen.
+
+> Ein Zustand, der an zwei Stellen steht, muss an beiden zurückgenommen werden —
+> sonst zeigt das Bild etwas anderes an, als die Mechanik tut.
+
+**Nachweis.** Klammer- und Kommentarbilanz (style.css 7735/7735 und 2588/2588,
+layout-varianten 1076/1076 und 388/388), `node --check` auf `dashboard.js`, `ui.js`,
+`main.js`; `python3 tools/gold-audit.py /opt/dealpilot/frontend` → „Genau auf der
+Basislinie. Kein neues Hartgold."; `frontend-konstanten.json` nachgezogen.
+
+#### Zwei Fallen der Messkabine selbst, die heute Zeit gekostet haben
+
+**Im verborgenen Tab wird die Geometrie nach einer Bedienung nicht neu gerechnet.**
+`*{transition:none}` aus v1901 reicht dafür **nicht**. Gemessen: nach
+`#hdr-mobile-menu.click()` trug `.app-wrap` die Klasse `sb-mobile-open`, der Screenshot
+zeigte die Schiene offen — `getBoundingClientRect()` meldete `x = −358,8` und behielt
+den Wert über drei Messungen und 1,2 s. Erst ein **erzwungenes Bild** (Screenshot oder
+Fenstergrößenänderung) brachte `x = 0`. `offsetHeight`, `getComputedStyle` auf dem
+Wurzelelement und Warten über `MessageChannel` taten es alle nicht.
+
+> **Reihenfolge ab jetzt: bedienen → Bild erzwingen → messen.** Wer dazwischen misst,
+> liest den Zustand von vorher.
+
+Dasselbe gilt für Zustände, die aus der Geometrie abgeleitet werden: `APP.aktionen()`
+hing am `height > 10` des Akkordeons und schaltete dadurch verkehrt herum. Zustände
+werden an **Klassen** abgelesen (`sb-actions-open`, `sb-mobile-open`), nicht an Maßen.
+
+**Ein Prüfer, der einen anderen Weg nimmt als die App, misst sich selbst.** Ich habe
+`DealPilotDashboard.open()` statt `setMainView('dashboard')` gerufen und daraufhin
+gemeldet, der Partikel-Canvas entstehe am Schreibtisch nicht. **Zurückgenommen:** über
+den Weg, den `sbActionsAction('cockpit')` tatsächlich nimmt, entsteht er bei 392 px und
+bei 1182 px. Die Gegenprobe im selben Dokument (Layout-Attribut abnehmen, Partikel
+anstoßen) zeigte außerdem, dass auch die „Heute"-Bedingung dort keinen Canvas erzeugt —
+der Unterschied stammte aus zwei verschiedenen Ladevorgängen, nicht aus dem Attribut.
