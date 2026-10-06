@@ -31908,6 +31908,35 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (51) 06.10.2026 — v1893: alle vier Ansichten auf dem Handy abgenommen
+
+**Ein echter Fund, und er lag in „Heute".** Das Abzeichen mit dem Füllstand („0 / 6 Bereiche",
+mit geladenem Objekt „Vollständig") ist das letzte Kind der Reiterleiste. In der Aktenmappe, in
+Kanzlei und Tower holt `badgeInDenKopf()` es beim Aufbau der Schiene in die Kopfzeile. **„Heute"
+läuft ohne Layout — dort wurde die Funktion nie gerufen**, und das Abzeichen stand bei 390 px bei
+x=518: 128 px außerhalb des Schirms. Die Leiste wischt zwar, aber niemand wischt nach einer
+Anzeige, von der er nicht weiß, dass es sie gibt. Auf dem Handy wird die Umsetzung jetzt
+unabhängig vom Layout gerufen, und beim Überschreiten der 900-px-Schwelle erneut (`zurueck()`
+stellt das Abzeichen in die Leiste zurück). Am Schreibtisch bleibt alles, wie es war.
+
+**Die Abnahme, alle vier Ansichten bei 390 px, je neun Reiter mit geladenem Objekt:**
+
+| Ansicht | Überlauf | Abzeichen | Kopf |
+|---|---|---|---|
+| Heute | keiner | sichtbar (nach v1893) | 93 px |
+| Aktenmappe | keiner | sichtbar | 93 px · Schiene, Kopf und Reiter alle `rgb(14,13,11)` |
+| Kanzlei | keiner | sichtbar | 93 px |
+| Tower | keiner | sichtbar | 93 px |
+
+`scrollWidth == clientWidth` in allen vier. Die einzige verbleibende Meldung des Prüfers sind die
+Partner-Bordkarten in der Deal-Aktion — sie liegen in `.dab-rail`, einem wischbaren Karussell;
+ein Überlauf darin ist dessen Zweck (siehe Journal 48).
+
+> **Zur Gewerke-Karte, damit es nicht als Fehler wiederkommt:** dass bei 390 px die KARTE wischt
+> (`#oe-karte-gewerke`, `overflow-x:auto`) und nicht die Tabelle, ist **Absicht aus v1881**. Die
+> ältere Regel machte die Tabelle zum Scrollkasten, worauf ihr Inhalt auf 60-px-Auswahlfelder
+> schrumpfte („– k", „Kei"). Seitdem behält die Tabelle ihre Breite und die Karte wischt. Nichts
+> ist abgeschnitten; gemessen sind die Auswahlfelder 196 px breit.
 ### (49) 05.10.2026 — v1891: Ernte Linie 9, und eine falsche Diagnose von mir
 
 **Baden-Württemberg liefert 121 Werte, Bayern null (`13b17ee` v1891).** Fünf Ausschüsse neu:
