@@ -31998,6 +31998,44 @@ Prüfer         Überlauf keiner · alle treffbar · alle erreichbar
 sichtbar. Alle Regeln hängen an `html[data-dp-layout="v1b"]` und einer Medienabfrage unter 900 px —
 Kanzlei und Tower bleiben außen vor, auf Marcels ausdrücklichen Wunsch.
 
+**Und dann der eigentliche Befund — eine FUNKTION, keine Farbe** (v1913). Marcel: „man kann
+garnicht das portfolio oeffnen und das layout passt immer noch nicht … und auch passend benutzt
+werden kann."
+
+Am Schreibtisch tauscht `button.dpl-portfolio` die untere Hälfte der Schiene: entweder die
+Objektliste **oder** das Register, nie beides (so seit v1666). Gesteuert über
+`data-dpl-portfolio` am `<html>`. **Auf dem Handy gab es diesen Tausch nicht.** Seit v1910 stand
+das Register fest oben; bei 682 px Register auf 758 px Schirm war das Portfolio praktisch
+unerreichbar. Und `portfolio()` rief auf dem Handy immer `toggleMobileSidebar()` — bei
+geschlossener Schublade öffnet das, bei offener schließt es sie wieder.
+
+> **Ein Knopf, der im einen Zustand öffnet und im anderen schließt, hat keinen zweiten Zustand —**
+> **er hat nur einen und macht ihn rückgängig.**
+
+Drei Änderungen: die Handy-Weiche greift nur noch bei geschlossener Schublade; der Umschalter
+sitzt als `button.dpl-portfolio-handy` ganz oben in der Schublade und ruft **dieselbe** Funktion
+`portfolio()`; das CSS zeigt je nach Zustand das eine oder das andere. Beide Knöpfe werden
+gemeinsam beschriftet — der Text nennt das Ziel, nicht die Herkunft.
+
+**Gegengemessen auf Staging, beide Richtungen:**
+
+```
+Zustand „zu"   Register sichtbar (5 Rubriken), Suche und Liste aus, Knopf „Portfolio"
+Zustand „auf"  Liste sichtbar mit 6 Karten, Register aus, Knopf „Aktionen"
+Schublade      bleibt in beiden Fällen offen (app-wrap.sb-mobile-open)
+Umschalter     329 x 44 bei y=8 — Trefferfläche des Handys, Form der Schiene
+```
+
+> **Eine Messfalle, die mich beinahe in die Irre geführt hätte:** nach dem Ausrollen meldete das
+> iframe weiter `v=v1912`, obwohl der Server `v1913` auslieferte (per `fetch` mit `no-store`
+> gegengeprüft). `iframe.src = …` auf eine laufende App lädt nicht zuverlässig neu. Erst das
+> ERSETZEN des iframe-Elements holte den neuen Stand. Wer das übersieht, misst den alten Code und
+> hält die eigene Änderung für wirkungslos. Siehe [[cache-sieht-aus-wie-kaskade]].
+
+**Kein neuer Defekt, obwohl der Prüfer es meldet:** bei offener Schublade stehen 16 Elemente als
+„verdeckt", darunter der Burger und die Reiter. Die Schublade ist `position:fixed` mit z-index
+1060 und liegt bestimmungsgemäß darüber; der Backdrop (z 1055) trägt den Schließweg.
+
 **Noch ein Werkzeugfehler, der mir selbst passiert ist:** mein Generator schrieb die Datei, BEVOR er
 seine Selbstprüfung fuhr. Als die Regelzahl nicht stimmte, warf er — und ließ den Block trotzdem in
 der Datei zurück. Seit v1912 wird gegen eine Probe geprüft und erst danach geschrieben.
