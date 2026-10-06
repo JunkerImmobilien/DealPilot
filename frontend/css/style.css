@@ -36376,6 +36376,40 @@ body:not(.dp-sidebar-collapsed) aside.sidebar#sidebar .app-logo-simple-sidebar {
     pointer-events: auto;
   }
 
+  /* ── v1904 · DIE ZWEI SORTIERKNOEPFE UEBERLAPPTEN SICH — JETZT UEBERALL ──
+     Die Regel direkt darueber legt unter jeden `.sb-sort-btn` ein unsichtbares
+     `::after` von `max(100%, 44px)`. Der Knopf selbst ist 26 px breit
+     (`aside.sidebar .sb-sort-btn`, Z. 24970), die Gruppe haelt `gap: 5px`
+     (Z. 24966) — die Mitten liegen damit 31 px auseinander, waehrend jede
+     Trefferflaeche 44 px misst. **13 px gehoeren beiden**, und dort entscheidet
+     nicht der Finger, sondern die Stapelreihenfolge.
+
+     GEMESSEN am 06.10.2026, 390 px, Menue offen, Ansicht „Heute":
+
+       .sb-sort-toggle      63,2 x 50,2     gap 5px
+       .sb-sort-btn  je     26 x 44         Mitten 31 px auseinander
+       Ueberlappung                         13 px
+
+     v1903 hat das geloest — aber nur fuer die Aussehen mit Layout-Attribut
+     (`html[data-dp-layout] aside#sidebar …` in `layout-varianten.css:7257`).
+     „Heute" traegt kein Attribut und blieb deshalb bei 31 px. Marcel am
+     06.10.2026: „auch fertig machen." Damit ist die Ausnahme aufgehoben.
+
+     > Eine Trefferflaeche, die nur in drei von vier Ansichten stimmt, ist
+     > keine Regel, sondern ein Sonderfall.
+
+     Geloest wieder ueber den ABSTAND, nicht ueber kleinere Flaechen: `gap: 18px`
+     bringt die Mitten auf 26 + 18 = 44 px, die beiden Flaechen stossen aneinander
+     und ueberlappen nicht mehr. Die Gruppe wird dadurch 76,2 statt 63,2 px breit;
+     sie sitzt in der `auto`-Spalte neben der Ueberschrift und schiebt nichts.
+
+     Spezifitaet: `body aside.sidebar .sb-sort-toggle` ist 0-2-2 mit `!important`
+     und schlaegt damit `aside.sidebar .sb-sort-toggle` (0-2-1, ebenfalls
+     `!important`). Die v1903-Regel in `layout-varianten.css` ist 1-2-1 und
+     gewinnt in der Aktenmappe weiterhin — sie traegt denselben Wert, also
+     aendert sich dort nichts. */
+  body aside.sidebar .sb-sort-toggle { gap: 18px !important; }
+
   /* ── (3) Jedes :hover braucht ein :active ──────────────────────────
      Auf Touch gibt es kein Hover. Ohne Rueckmeldung wirkt jeder Tipp,
      als waere nichts passiert. Nur auf Geraeten ohne Hover. */
@@ -38985,4 +39019,38 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
     width: 44px;
     min-width: 44px;
   }
+}
+
+/* ═══ v1904 · DAS „X" WAR KEIN KREUZ ══════════════════════════════════════════
+   Marcel am 06.10.2026: „das ‚X' neben Neues Objekt sieht auch nicht gut aus.
+   Es ruft ja auch die Menüleiste auf. das sollte angepasst werden."
+
+   GEMESSEN im gleich-Origin-iframe bei 390 px, Menue offen, Mitten der drei
+   Balken von `#hdr-mobile-menu` (y, Viewport):
+
+     zu (Burger)    23,5   28,0   32,5      Abstand 4,5 px
+     auf (X)        29,5   28,0   26,5      die beiden Striche 3 px auseinander
+
+   Die beiden Diagonalen muessen BEIDE auf 28,0 landen, sonst kreuzen sie sich
+   nicht, sondern laufen versetzt aneinander vorbei. Genau das war zu sehen.
+
+   URSACHE, und sie ist eine Erbschaft: `.hdr-mobile-menu.active span` (Z. 6838)
+   verschiebt um ±6 px. Diese 6 px sind der Balkenabstand der URSPRUENGLICHEN
+   Fassung — `.hdr-mobile-menu` fuehrt `height:2px` + `gap:4px` (Z. 6814/6830).
+   Die heute sichtbare Fassung ist aber `.hdr-v61-row1 .hdr-mobile-menu`
+   (Z. 13495): `height:1,5px` + `gap:3px` = **4,5 px**. Die Verschiebung wurde
+   nie mitgezogen, also schiesst jeder Strich um 1,5 px ueber die Mitte hinaus.
+
+   > Ein Umschaltbild, das aus drei Teilen entsteht, haengt am ABSTAND dieser
+   > Teile. Wer die Teile verkleinert, muss die Verschiebung mitnehmen —
+   > sie ist keine Konstante, sondern eine Ableitung.
+
+   0-4-2 schlaegt die 0-2-2 der Originalregel; der mittlere Balken bleibt
+   unberuehrt (`opacity:0`), die Farbe wird nicht angefasst. Die Burger-Fassung
+   aendert sich nicht: die Regel greift nur mit `.active`. */
+header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(1) {
+  transform: translateY(4.5px) rotate(45deg);
+}
+header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
+  transform: translateY(-4.5px) rotate(-45deg);
 }

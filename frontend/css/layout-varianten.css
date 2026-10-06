@@ -4662,6 +4662,55 @@ html[data-dp-layout] body:has(#sb-user) .main-col{
   background:#F4F2ED !important;
 }
 
+/* ── v1904 · DER GRUND DES COCKPITS FOLGT JETZT DEM AUSSEHEN ─────────
+   Marcel am 06.10.2026: „ja fertig machen, wollte ich ja so."
+
+   ERST DIE DIAGNOSE, DIE ICH ZURUECKNEHME. In `js/dashboard.js:2001`
+   stand seit v1903a: „OFFEN UND ABSICHTLICH NICHT HIER: der
+   Obsidian-GRUND von `#dashboard-main` bleibt, wie er ist", und das
+   Journal (57) hat den Satz uebernommen. **Diesen Grund gibt es nicht.**
+   Gemessen am 06.10.2026 im gleich-Origin-iframe, 390 px, Aktenmappe
+   (`v1b`), Kartenstil Datenzeile, Portfolio-Cockpit offen:
+
+     #dashboard-main          rgba(0,0,0,0)      transparent
+     #dp-stage.stage.fc.fc9   rgb(253,252,250)   Creme #FDFCFA
+     .main-col                rgb(244,242,237)   die Arbeitsflaeche
+
+   Und ueber die ganze Hoehe des Cockpits (23 Proben, `elementFromPoint`
+   bei x=195, `.main-col` in 400-px-Schritten gescrollt) traf **eine
+   einzige** auf Obsidian — das Band `.hpass` im Hero. Alle anderen
+   lagen auf Weiss oder Creme.
+
+   > Ein Satz in einem Kommentar ist keine Messung. Er stand in einer
+   > Datei, die niemand mehr nachgerechnet hat, und wurde zweimal
+   > weitergereicht, bevor jemand hingesehen hat.
+
+   DER ECHTE BEFUND IST KLEINER UND TRIFFT TROTZDEM, WAS MARCEL MEINT:
+   das Cockpit bringt seinen EIGENEN hellen Ton mit (#FDFCFA aus
+   `dashboard.css:303`, `.stage.fc`) und folgt damit in keinem Aussehen
+   der Flaeche, auf der es liegt. In „Heute" faellt das nicht auf —
+   dort ist `.main-col` weiss, der Unterschied betraegt zwei Stufen. In
+   der Aktenmappe, Kanzlei und Tower traegt die Arbeitsflaeche #F4F2ED,
+   und dort setzt sich das Cockpit als hellere Platte davon ab.
+
+   Gebunden wird deshalb der TON, nicht die Flaeche: nur `--page-bg`
+   wird umgesetzt, das `.stage` in `dashboard.css:27` ohnehin liest.
+   Panels, Karten und Baender bleiben unberuehrt.
+
+     Spezifitaet  html[data-dp-layout] #dashboard-main .stage   1-2-1
+                  #dashboard-main .stage.fc                     1-2-0
+     kein !important noetig.
+
+   NUR UNTER 901 px, und das ist eine Grenze, keine halbe Sache: am
+   Schreibtisch hat Marcel zur Web-Ansicht gesagt „die Optik die wir
+   aktuell haben ist gut so". v1903a ist genau an dieser Stelle zu weit
+   gegangen, weil der Stopp nur am Layout-Attribut hing. Ohne Attribut
+   — also in „Heute" — aendert sich nichts, mit Attribut erst ab 900 px
+   abwaerts. */
+@media (max-width: 900px){
+  html[data-dp-layout] #dashboard-main .stage{ --page-bg:#F4F2ED; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    v1679 — DER SCORE SOLL AN DIE LINIE ANSCHLIESSEN
    -------------------------------------------------------------------

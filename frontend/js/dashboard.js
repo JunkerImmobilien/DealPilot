@@ -1998,9 +1998,23 @@
 
      > Eine Aufraeumung, die ueber ihren Auftrag hinausgeht, ist keine Aufraeumung mehr.
 
-     OFFEN UND ABSICHTLICH NICHT HIER: der Obsidian-GRUND von `#dashboard-main` bleibt, wie
-     er ist. Welche Farbe die Arbeitsflaeche der Aktenmappe traegt, ist eine Produkt- und
-     Markenentscheidung und gehoert Marcel, nicht dieser Datei. */
+     ── v1904 · DEN SATZ, DER HIER STAND, NEHME ICH ZURUECK ────────────────────────
+     Hier stand: „OFFEN UND ABSICHTLICH NICHT HIER: der Obsidian-GRUND von
+     `#dashboard-main` bleibt, wie er ist." **Diesen Grund gibt es nicht.** Gemessen
+     am 06.10.2026 bei 390 px in der Aktenmappe, Cockpit offen:
+
+       #dashboard-main          rgba(0,0,0,0)      transparent
+       #dp-stage.stage.fc.fc9   rgb(253,252,250)   Creme #FDFCFA
+       .main-col                rgb(244,242,237)   die Arbeitsflaeche
+
+     23 Proben ueber die ganze Cockpit-Hoehe trafen genau EINMAL auf Obsidian — das
+     Band `.hpass` im Hero. Der Satz war eine Annahme, keine Messung, und wurde von
+     v1903a ins Journal (57) weitergereicht.
+
+     Der echte Unterschied ist der eigene helle Ton des Cockpits; gebunden wird er in
+     `css/layout-varianten.css` ueber `--page-bg` (v1904), unter 901 px und nur mit
+     Layout-Attribut. Welche Farbe die Arbeitsflaeche traegt, bleibt Marcels
+     Entscheidung — sie steht jetzt an EINER Stelle, naemlich dort. */
   function layoutAktiv(){
     try{
       return document.documentElement.hasAttribute('data-dp-layout')
