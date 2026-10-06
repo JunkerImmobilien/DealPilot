@@ -31908,6 +31908,94 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (67) 06.10.2026 — v1926/v1926b: die Ernte der 135 PDFs, und zwei zurückgenommene Diagnosen
+
+**Zuerst die Rücknahme, weil sie an Marcel weitergereicht worden war.**
+
+> **Es gibt KEINEN stillen Rechenfehler bei Oberursel.** Der Satz führt die Gesamtnutzungsdauer 70
+> bereits als ZAHL — unter dem Feldnamen `gnd`, den `gutachterausschuss.js:675` seit v1130 als
+> dritten liest (`gnd_jahre > gesamtnutzungsdauer_jahre > gnd`). Mit der echten Funktion
+> nachgewiesen: `06434011/ezfh` gibt `modell_gnd_jahre = 70`, Faktor 1,029. Gegenprobe
+> `05120/efh` ohne Feld gibt `null`, dort greift die Rückfallzahl 80.
+
+**Wie der Fehlalarm entstand:** der Prüfer druckte `JSON.stringify(...).slice(0,160)` und schloss
+aus dem abgeschnittenen Text auf eine Abwesenheit.
+
+> **An einem abgeschnittenen Ausdruck kann man Abwesenheit nicht messen.** Dieselbe Familie wie
+> [[pruefer-baut-seine-verdrahtung]] und [[auskunft-nimmt-anderen-weg]]: der Prüfer misst sich
+> selbst, nicht die Maschine.
+
+**Auch die „239 Sätze ohne GND" sind keine Aufgabe.** Durchgezählt mit der echten Auflöseordnung:
+654 Sachwertfaktoren, davon 405 mit Zahl (70:7 · 80:397 · 100:1), 10 mit Textfeld (der Code gibt
+dort korrekt `null`), 239 ohne Feld. Von 37 Fließtext-Treffern sind 22 „GND 80" — identisch zur
+Rückfallzahl, also ohne Rechenwirkung. **Alle 15 abweichenden waren Regex-Artefakte:**
+
+| Treffer | Was dort wirklich steht |
+|---|---|
+| GND 25 | `rnd_min_jahre: 25` — eine RESTnutzungsdauer |
+| GND 35 | „Wörtlich S. 35" — eine Seitenzahl |
+| GND 70 | gilt der ABZINSUNG; für den Sachwert steht „einheitlich 80" |
+| GND 60 | „Gewerbe seit 2023 einheitlich 60" — andere Zweige |
+| GND 38 | „Alterswertminderung § 38" — eine Paragrafennummer |
+
+**Die Wirkung, falls eine abweichende GND je auftritt, ist trotzdem gemessen** (Reihenhaus 120 m²,
+Bj 1975, RND 40, Bodenwert 150.000 €, Index 1,91, am echten `nhk2010.js`): GND 80 → 370.089 €,
+GND 70 → 401.531 €, **Unterschied 31.442 € = 8,5 %.** Die Altersminderung fällt von 50 auf 42,9 %.
+
+**Linie C — eine von drei Sperren war offen.** Nürnberg hatte bereits 16, Stuttgart 2 (und steht
+auf dem neueren Jahrgang 2026). **Neu: Landkreis Rostock `13072`**, sechs Sätze — vier Zinssatz-
+Gebäudetypen und zwei Faktor-Zweige, Zweignamen aus dem für MV schon geführten `schwerin.json`.
+Hier sperrt die LIZENZ, nicht die Verfügbarkeit: der Bericht ist frei abrufbar und vollständig,
+erlaubt die Verbreitung aber nur mit Genehmigung. Jeder Satz trägt den Weg dorthin statt einer
+Zahl. Kettenprüfung im Container: 6/6 `verfuegbar=false`. Register jetzt **4.819 Sätze**.
+
+**Linie A — NICHT gesät, und der Grund ist nicht die Lizenz.** Marcel hatte die Lizenzfrage
+freigegeben; beim Lesen kamen zwei andere Blocker heraus:
+
+1. **Es gibt keinen verteidigbaren Wert.** Beide BW-Berichte veröffentlichen die Kennzahlen als
+   DIAGRAMME. Beim Bodensee haben alle fünf Sachwertfaktor-Abschnitte überhaupt keinen
+   Textinhalt — Punktwolken ohne Koeffizienten, ohne Tabelle, ohne Anwendungsbeispiel. Die
+   einzigen Gleichungen stehen in 7.5–7.7 mit **R² von 0,019 bis 0,18**. Eine Trendlinie mit
+   R² = 0,019 erklärt 1,9 % der Streuung. Blumberg sagt selbst, die Formeln stammten aus Excel
+   und dienten „der Orientierung".
+2. **Die Sätze lassen sich nicht platzieren.** BW sät je Gemeinde; keine der 18 betreuten
+   Gemeinden steht im Register, und Gemeindeschlüssel werden nicht geraten. Ein Kreissatz wäre
+   falsch, weil Überlingen zu einem ANDEREN Ausschuss gehört, der schon seine eigene Sperre hat.
+
+> **Eine Freigabe für die Lizenzfrage ist keine Freigabe für die Zahl.** Wer beides
+> zusammenwirft, sät eine abgelesene Diagrammzahl, die amtlich aussieht.
+
+**Aufgeräumt: 245,2 MB** (664 → 400 MB). 24 byte-identische Dubletten weg, 5 HTML-Fehlerseiten
+weg, 3 Forschungszulage-Dokumente VERSCHOBEN statt gelöscht — einen Bescheid löscht man nicht.
+
+**Die Umbenennung wurde nach zwei Fehlversuchen abgebrochen**, und die Begründung ist die
+wertvollste Zeile des ganzen Laufs:
+
+> **`pdftotext` verliert die Ligaturen tt/tf/ft/fh dieser Schrift als LEERZEICHEN** — „Gifhorn"
+> wird „Gi orn", „Salzgitter" wird „Salzgi er", „Sachwertfaktoren" wird „Sachwer aktoren". Der
+> Glyph hat im PDF keine Unicode-Zuordnung, die Bytes sind wirklich `47 69 20 6f 72 6e`; **kein
+> Modus** (`-raw`, `-layout`) stellt ihn her. Ein erster Zähler meldete daraufhin für 55 PDFs
+> „null Sachwertfaktor-Treffer" — bei Dokumenten, die nichts anderes enthalten.
+>
+> **Und die zweite Hälfte derselben Lehre:** ein zu großzügiger Teilfolgen-Abgleich auf 260
+> Zeichen Kopftext machte daraus „Goslar = Braunschweig", „Salzgitter = Delmenhorst". Ein falsch
+> umbenannter Ausdruck verliert seine einzige Kennung. Statt dessen liegt jetzt ein Index
+> (`00-INHALT-ni-tableau.md`): 47 Kreise bestimmt, 6 ehrlich als UNKLAR markiert.
+
+**Ein Prozessfehler, der mir gehört:** mein Commit `6a846bc6` („v1925: die Sortierknöpfe") hat
+drei Dateien des Ernte-Strangs mitgenommen, die in demselben Index lagen — `CLAUDE.md`,
+`ausschuss_register.js` und die Rostock-Saatdatei. 254 Zeilen Marktbericht-Register stehen jetzt
+in einem Commit über Sortierknöpfe. Inhaltlich heil, die Zuordnung falsch.
+
+> **`git add` + `git commit` nimmt den GANZEN Index, auch fremde Einträge.** Bei parallelen Läufen
+> in derselben Arbeitskopie gilt `git commit -- <pfade>`. Das ist heute der vierte Prozessunfall
+> aus Parallelarbeit (dreimal doppelte Versionsnummer, einmal überschriebene Saatliste).
+
+**CLAUDE.md fortgeschrieben:** „6 von 16 Länder / 40 % / 25 %" stimmte nicht mehr — alle 16 Länder
+sind vertreten. **Die Einwohnerquote wurde gestrichen und NICHT ersetzt**, weil sie nie
+nachgemessen war. Die Liste der elf Sätze ohne Lizenz (Dortmund/Duisburg/Essen/München) trifft
+keine der vier Städte mehr; es sind 19, und statt Namen stehen jetzt die Dateien da.
+
 ### (66) 06.10.2026 — v1924–v1927: zwei Polster für dieselbe Lücke, und zweimal dieselbe Medienabfrage
 
 **Marcel hat zwei Bilder ins Repo gelegt** — `Dateien/Objektkarte_Desktop_1180.png` und
