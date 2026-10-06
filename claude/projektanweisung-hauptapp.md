@@ -31908,6 +31908,94 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (61) 06.10.2026 — v1913–v1916a: das Menü wird bedienbar, und die Bordkarte wird Standard
+
+Marcels Durchgang durch die Messkabine, Punkt für Punkt abgearbeitet. **Der erste Befund war kein
+Gestaltungsfehler, sondern ein toter Knopf.**
+
+| Paket | Was |
+|---|---|
+| v1913 | das Menü ist ein Umschalter: Portfolio **oder** Aktionen, wie am Schreibtisch |
+| v1914 | das Register war sichtbar, aber nicht klickbar · Rundgang und Feedback raus |
+| v1914a | dieselbe Regel noch einmal, mit genug Spezifität |
+| v1915 | Bordkarte wird Standard · ihre Nummernlasche kommt zurück · Ring und Knöpfe weg vom Text |
+| v1916 | Anmeldung in den Grautönen des Schreibtischs · doppeltes „Portfolio" weg |
+| v1916a | die leere Grid-Zeile, die das Label hinterlassen hat |
+
+**Das Register war ein Bild von einem Bedienelement** (v1914). Alle dreizehn Einträge standen
+lesbar da und trugen ihren `onclick` — `elementsFromPoint` auf der Mitte von „Einzelobjekt" gab
+trotzdem `aside#sidebar`. Ursache war eine Regel mit Spezifität 500:
+
+```
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar
+  #sb-actions-accordion:not(.sb-actions-open) { pointer-events: none }
+```
+
+Sie ist richtig — ein zugeklapptes Panel soll keine Klicks fangen. Nur hatte v1910 das Register per
+CSS geöffnet, **ohne ihm den Zustand zu geben, den die App dafür führt.** Fürs Auge offen, für die
+Kaskade zu.
+
+> **Wer eine Fläche sichtbar macht, ohne ihren Zustand mitzusetzen, baut ein Bild von einem
+> Bedienelement.** Die Lösung war nicht mehr Spezifität, sondern die Klasse, die der Zustand
+> ohnehin verlangt — damit greifen alle Regeln des offenen Zustands, nicht nur die, an die ich
+> gedacht hätte.
+
+**Und eine Regel, die nie stark genug war** (v1914a). `.sb-act-item.sb-act-tour` mit `!important`
+wirkte nicht. Der Kaskaden-Walker zeigte, warum: eine Sammelregel mit Spezifität 80 gewinnt gegen
+die 40 — **über einen Teilselektor, der mit meinem gar nichts zu tun hat.**
+
+> Eine Regel, die nicht wirkt, ist nicht unbedingt überschrieben worden. Sie kann auch nie stark
+> genug gewesen sein. Bei mehreren Selektoren zählt der STÄRKSTE, der passt.
+
+**Einen eigenen Fehler zurückgenommen** (v1915): v1906 hatte `.sbc-seq` im Menü ausgeblendet — und
+damit das Merkmal der BORDKARTE abgeschaltet. Am Schreibtisch ist `.sbc-seq` 16 × 44 mit
+`writing-mode: vertical-rl`: die hochkante Nummer am linken Abriss, also genau das, was die
+Bordkarte ausmacht.
+
+> **Eine Regel, die für EINEN Kartenstil gedacht war, traf alle sieben.** Der Anker war die Fläche,
+> nicht der Stil — und damit zu grob.
+
+**Score und Aktionen lagen auf dem Text** (v1915). Gemessen bei 387 px: Adresse endet bei x = 292,
+die Aktionsknöpfe beginnen bei x = 218 — **75 px Überlappung.** Beide sind `position:absolute` mit
+`z-index: 8`. Am Schreibtisch fällt es nicht auf, weil die Karte dort nur 216 px breit ist.
+
+> Zwei Dinge auf derselben Fläche sind kein Entwurf, sondern ein Zufall, der bisher gut ging.
+
+**Die Anmeldung trug Akzentfarben ohne Aussage** (v1916):
+
+| | Schreibtisch | Handy vorher |
+|---|---|---|
+| Avatar „M" | `rgb(191,183,169)` | **`rgb(42,39,39)`** |
+| Version | `rgb(110,103,92)`, ohne Grund | **Goldgrund 8 %, Goldtext 70 %** |
+| Wolke | stiller Rahmen | **grüner Grund, Goldtext** |
+
+> **Eine Akzentfarbe an einer Stelle, die nichts meldet, macht die Stelle nicht wichtiger — sie
+> macht den Akzent wertlos.** Eine Versionsnummer ist kein Zustand.
+
+**Und eine Grid-Zeile gibt ihren Platz nicht zurück** (v1916a). Das ausgeblendete Label „Portfolio"
+ließ die Kopfzeile bei 114 px stehen, mit einer leeren Zeile über dem Suchfeld.
+
+> `display:none` nimmt ein Element aus dem Fluss, aber eine Grid-Zeile ist kein Fluss. Sie steht in
+> der Vorlage, nicht im Inhalt.
+
+**Nachweis, Staging bei 387 px, Aktenmappe:**
+
+```
+Register       13 Einträge sichtbar, 13 treffbar (vorher 0)
+Rundgang/Feedback  display:none, auch am Schreibtisch
+Umschalter     „Portfolio" ⇄ „Aktionen", Schublade bleibt offen
+Bordkarte      Lasche 16 × 44 zurück, Karte 321 × 44
+Kopfzeile      64 px (vorher 118) · Suchfeld 40 px
+Objektkarten   7 vollständig sichtbar (zu Beginn des Tages: 3)
+Anmeldung      Avatar/Version/Wolke in den Grautönen des Schreibtischs
+Überlauf       keiner
+```
+
+**Offen und ehrlich benannt:** Marcel meldete „beim Portfolio ist der Hintergrund Obsidian mit
+Partikeln". **Gemessen sind beide Zustände identisch** — `rgb(14,13,11)`, kein Verlauf, kein
+Partikel-Canvas im Dokument. Ebenso das Logo: im Handy-Menü gibt es keines, die Kopfzeile trägt die
+Marke. Beides gehört vor dem nächsten Eingriff gemeinsam angesehen.
+
 ### (60) 06.10.2026 — v1906–v1912: das Menü der Aktenmappe auf dem Handy
 
 **Marcel:** „die Aktenmappe das menü passt immer noch nicht auf der handy ansicht" · „schalt mal
