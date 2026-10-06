@@ -1963,8 +1963,46 @@
 
   /* ════ HINTERGRUND-PARTIKEL (Variante C) ════ */
   var _pctx,_pw,_ph,_particles=[],_praf,_presize;
+  /* ── v1903 · DIE TEILCHEN GEHOEREN ZU „HEUTE", NICHT ZU JEDER ANSICHT ─────────────
+     Marcel am 06.10.2026: „Wir haben, wenn man das Menue aufmacht, immer noch in der
+     Portfolio-Ansicht den Obsidian-Hintergrund mit den Partikeln."
+
+     ZWEI DIAGNOSEN VORHER WAREN FALSCH, UND BEIDE NEHME ICH HIERMIT ZURUECK:
+
+       (1) „Der Canvas ist layoutblind."  Widerlegt — er war in der gemessenen Ansicht
+           gar nicht im DOM.
+       (2) „Seine Hoehe ist die Ursache."  Behoben in v1900a/v1900b, und die Reparatur
+           HAELT: gemessen am 06.10.2026 auf Staging, 390 px, Aktenmappe,
+           Portfolio-Cockpit — Canvas 383 x 9014, Puffer 383 x 9014, Mount 383 x 9014.
+           Die Flaeche stimmt also auf den Pixel.
+
+     Marcel sieht es trotzdem, und der Grund ist ein anderer: die Teilchen sind ueberhaupt
+     da. `#dashboard-main` ist der Mount des Portfolio-Cockpits, und das Cockpit gibt es in
+     JEDER Ansicht — auch in der Aktenmappe, wo es seinen Obsidian-Grund und seine Teilchen
+     mitbringt, waehrend die uebrige Arbeitsflaeche dort rgb(244,242,237) fuehrt.
+
+     > Eine Gestaltung, die zu EINER Ansicht gehoert, darf nicht mitwandern, nur weil die
+     > Flaeche dieselbe ist. Das ist derselbe Befund wie bei den Objektkarten, die in der
+     > Aktenmappe wie „Heute" aussahen (v1885) — nur in die andere Richtung.
+
+     Abgeschaltet wird hier, nicht per CSS: ein `display:none` liesse den Zeichenlauf
+     weiterlaufen und auf einem Handy Strom kosten, ohne dass jemand etwas davon haette.
+     Ein schon vorhandener Canvas wird dabei abgeraeumt — wer das Aussehen zur Laufzeit
+     wechselt, soll ihn nicht behalten.
+
+     OFFEN UND ABSICHTLICH NICHT HIER: der Obsidian-GRUND von `#dashboard-main` bleibt, wie
+     er ist. Welche Farbe die Arbeitsflaeche der Aktenmappe traegt, ist eine Produkt- und
+     Markenentscheidung und gehoert Marcel, nicht dieser Datei. */
+  function layoutAktiv(){
+    try{ return document.documentElement.hasAttribute('data-dp-layout'); }catch(e){ return false; }
+  }
   function initParticles(){
     var m=$(MOUNT_ID); if(!m) return;
+    if(layoutAktiv()){
+      var alt=$('dp-particles');
+      if(alt){ try{ stopParticles(); }catch(e){} if(alt.parentNode) alt.parentNode.removeChild(alt); }
+      return;
+    }
     /* v1896 · Den Canvas gibt es im Markup nicht — er wird hier angelegt. Vorher stand hier
        `var cv=$('dp-particles'); if(!cv||!m)return;`, und weil das Element nirgends im Frontend
        vorkam (gemessen: null Treffer in index.html, allen js/ und allen css/), kehrte die

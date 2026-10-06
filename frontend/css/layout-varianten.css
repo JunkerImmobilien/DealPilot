@@ -6806,155 +6806,155 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════════════
-   v1889 · DIE SCHUBLADE ZEIGT DAS REGISTER DER AKTENMAPPE (06.10.2026)
+   v1903 · DAS PORTFOLIO-MENÜ DER AKTENMAPPE AUF DEM HANDY (06.10.2026)
 
-   Marcel: „Wenn ich jetzt auf Portfolio gehe, habe ich den Hintergrund von Heute mit den
-   Objektkarteien von der Aktenansicht. Das ist ja ein kompletter Misch." Und: „Die muss wirklich
-   so aussehen wie halt auch bei der Web-Ansicht."
+   Marcel: „Auch das kombinierte Menü finde ich nicht gut gelöst. Standard sollte dann das
+   Portfolio angezeigt werden und unten Aktionen, und dann wird das auf Knopfdruck hochgezogen —
+   quasi Aufbau wie beim Stand ‚Heute', nur halt im Layout und Design und Schriftart und
+   Schriftgröße wie Aktenmappe."
 
-   GEMESSEN am 06.10.2026, dieselbe Anmeldung, beide Breiten:
+   ── WAS HIER BIS HEUTE STAND, UND WARUM ES ABGELÖST WIRD ─────────────────────────────────────
 
-     Schreibtisch 2133 px, Aktenmappe, Schiene         Handy 390 px, Aktenmappe, Schublade
-     ─────────────────────────────────────────────     ──────────────────────────────────────
-     #sb-actions-accordion  230 x 599, offen           #sb-actions-accordion  0 x 0, display:none
-     sichtbare Gruppen      5 (Ansichten … System)     sichtbare Gruppen      0
-     #sb-actions-trigger-btn  display:none             #sb-actions-trigger-btn  333 x 43, sichtbar
-     .dpl-teil-objekte      display:none (Zustand zu)  #sb-list               333 x 562, immer da
+   An dieser Stelle lag der Block v1889: Objektliste und Register STANDEN BEIDE OFFEN,
+   untereinander im Fluss, der Aufklapper war abgeschaltet (`display:none`). Begründet war das
+   mit dem Satz „Dieselbe Ansicht darf auf zwei Geräten nicht zwei verschiedene Dinge zeigen" —
+   auf dem Schreibtisch zeigt die Schiene ihr Register, also sollte die Schublade es auch zeigen.
 
-   Das ist der Misch, und er ist kein Farbfehler: auf dem Schreibtisch zeigt die Aktenmappe ihr
-   REGISTER (fuenf Gruppen, dreizehn Eintraege) und blendet die Objektliste erst auf Knopfdruck
-   ein - auf dem Handy ist es genau umgekehrt. Dort stand die unveraenderte Seitenleiste der
-   Ansicht „Heute": Objektliste offen, Register hinter einem zusaetzlichen Tipp versteckt.
+   GEMESSEN am 06.10.2026, 390 px, Aktenmappe, Kartenstil Datenzeile, Menü offen:
 
-   > **Dieselbe Ansicht darf auf zwei Geraeten nicht zwei verschiedene Dinge zeigen.** Wer die
-   > Aktenmappe waehlt, waehlt das Register; dass es auf dem kleinen Schirm hinter einem
-   > Aufklapper verschwindet, ist keine Anpassung, sondern eine andere Ansicht.
+     aside#sidebar            359 x 758
+     #sb-list                 347 x 318   (Deckel 42vh aus v1889d)   20 Objekte darin
+     #sb-actions-accordion    347 x 759   ab y = 445  →  Unterkante y = 1204
+     #sb-actions-trigger-btn    0 x 0     (display:none)
 
-   Hier bekommt die Schublade beides, untereinander: erst die Objektliste, dann das Register -
-   zusammen genau das, was die Schiene auf dem Schreibtisch in ihren zwei Zustaenden zeigt. Ein
-   zweiter Umschalter waere ein neuer Bedienweg auf einem Schirm, auf dem der vorhandene
-   (`.dpl-portfolio` in der Schiene) hinter der offenen Schublade liegt und nicht erreichbar ist.
+   Das Register ragte damit **446 px unter die Kante der Schublade**, und die Objektliste, die
+   es eigentlich zu bedienen gilt, hatte für zwanzig Objekte 318 px — gut zweieinhalb Karten.
+   Beides zusammen in einen 758-px-Schirm zu legen heißt, dass keines von beidem ganz da ist.
 
-   KEINE FARBE wird hier gesetzt. Der Ton der Schublade (Obsidian) bleibt, wie er seit v1653e
-   ist - das ist eine Produktentscheidung und gehoert Marcel, nicht dieser Datei.
+   > Der Satz von v1889 stimmt — aber er war die falsche Schlussfolgerung. Dieselbe ANSICHT
+   > zeigt hier dieselben Dinge; nur der WEG dorthin ist auf einem 390-px-Schirm ein anderer.
+   > Die Doktrin von v1889 war meine, die Entscheidung ist Marcels. Sie gilt.
 
-   Spezifitaet: (1,4,3) wie der Block v1653e, und spaeter in der Datei - damit schlaegt er die
-   geklonten Regeln aus dem v1885-Block (1,2,2) und die Aufklapp-Regeln aus style.css.
+   ── WAS JETZT GILT ───────────────────────────────────────────────────────────────────────────
+
+   Der Aufbau von „Heute", mit der Gestaltung der Aktenmappe:
+
+     Standardinhalt   das Portfolio (#sb-list) — es bekommt den ganzen Raum und scrollt in sich
+     unten            der Aufklapper #sb-actions-trigger-btn, fest am Fuß, scrollt nicht mit
+     auf Knopfdruck   das Register wird hochgezogen (sbActionsToggle() in js/ui.js:1643,
+                      Klasse .sb-actions-open, _sbActionsDock() deckelt gegen die Trigger-
+                      Oberkante) — dieselbe Mechanik wie in „Heute", nicht nachgebaut
+
+   Dafür wird hier NICHTS an der Mechanik gesetzt. Es genügt, die drei Griffe aus v1889
+   loszulassen (Zwangsöffnung, `position:static`, `display:none` am Aufklapper) und der
+   Schublade die Spaltenordnung zu geben, in der nur die Liste wächst.
+
+   Die GESTALTUNG dagegen wird gesetzt, und zwar nach dem, was die Schiene auf dem Schreibtisch
+   tut — gemessen am 06.10.2026 bei 1180 px, Aktenmappe:
+
+     .sb-act-section-title   JetBrains Mono  10px/12px  w700  ls 1.4px   rgb(201,168,76)  VERSAL
+     .sb-act-item/.sb-act-l  Inter           12.5px/16.875px  w500       rgb(191,183,169)
+     Zeilenhöhe              29 px
+
+   Auf dem Handy stand dort vorher Inter 9.5px w700 für den Gruppentitel (also eine andere
+   SCHRIFTART) und 44 px Zeilenhöhe. Genau das meint „Schriftart und Schriftgröße wie
+   Aktenmappe".
+
+   KEINE FARBE der Marke wird hier neu erfunden: Gold und Creme stehen als `var(--wl-…)` bzw.
+   als die Werte, die die Schiene führt.
    ═══════════════════════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px){
-  /* Das Register steht offen - in der Seitenleiste ist es ein Ueberlagerungsfeld
-     (position:absolute, z-index:50). In der Schublade gehoert es in den Fluss, genau wie in der
-     Schiene auf dem Schreibtisch (siehe v1649c weiter oben in dieser Datei). */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion{
-    display:block !important;
-    position:static !important; top:auto !important; left:auto !important; right:auto !important;
-    width:auto !important; z-index:auto !important;
-    height:auto !important; max-height:none !important; overflow:visible !important;
-    box-shadow:none !important; border:0 !important;
-    /* v1889a: nachgemessen - `height:auto` allein liess den Block auf 0 px. Der zugeklappte
-       Zustand haengt NICHT nur an der Hoehe, sondern auch an `opacity:0` am aeusseren Knoten
-       UND an `display:none` am INNEREN (.sb-actions-accordion-inner, style.css:25488).
-       Genau dieselbe Lehre steht zwanzig Zeilen weiter oben in dieser Datei: „Eine Regel am
-       Elternteil ordnet nicht, was im Kind steht." */
-    opacity:1 !important; visibility:visible !important;
-    /* Flex-Kind in einem scrollenden Behaelter: ohne das schrumpft es auf null und der Inhalt
-       wird still abgeschnitten (CLAUDE.md). */
+  /* ── (1) Die Schublade ist eine Spalte, in der NUR die Liste wächst ──────────────────────
+     Vorher stand `overflow-y:auto` auf der Schublade selbst (v1889), weil das Register unter
+     der Liste im Fluss lag und sonst nicht erreichbar gewesen wäre. Jetzt scrollt die Liste
+     in sich, und der Aufklapper bleibt dadurch am Fuß stehen, statt wegzuwandern.
+     `min-height:0` muss dabei sein: ohne das weigert sich ein Flex-Kind zu schrumpfen und
+     die Liste schiebt den Aufklapper aus der Schublade heraus. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar{
+    display:flex !important; flex-direction:column !important;
+    overflow:hidden !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-user-box,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-footer-spacer{
     flex:0 0 auto !important;
   }
-  /* Der innere Behaelter traegt den `display:none` des zugeklappten Zustands (0,4,1) und die
-     Umrahmung des Ueberlagerungsfeldes. In der Schublade steht er im Fluss - ohne Kasten,
-     wie das Register in der Schiene auf dem Schreibtisch. */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-actions-accordion-inner{
-    display:block !important;
-    max-height:none !important; height:auto !important; overflow:visible !important;
-    background:none !important; border:0 !important; border-radius:0 !important;
-    box-shadow:none !important; padding:0 !important; margin:0 !important;
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list{
+    flex:1 1 auto !important;
+    min-height:0 !important; max-height:none !important; height:auto !important;
+    overflow-y:auto !important; overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch;
   }
-  /* ── v1889c · DER GRUND KAM MIT, DIE BEZIEHUNG NICHT ──────────────────────
-     Nachgemessen, nachdem das Register offen stand: `#sb-actions-accordion`
-     traegt in der Seitenleiste eine EIGENE weisse Flaeche - als zugeklapptes
-     Ueberlagerungsfeld faellt das nicht auf, offen ist es ein weisses Blatt
-     mitten im Obsidian. Gemessen im Grund-Leser:
-
-       .sb-act-l       rgb(205,175,90)  auf rgb(255,255,255)   k = 2,13
-       .sb-act-ico     rgb(201,168,76)  auf rgb(255,255,255)   k = 2,29
-       Gruppentitel    rgb(107,100,90)  auf rgb(255,255,255)   k = 5,84
-
-     > Genau die Falle aus CLAUDE.md: beim VERSCHIEBEN eines Blocks wandert
-     > die Farbbeziehung nicht mit. Der Block war fuer hellen Grund gebaut.
-
-     Die Sollwerte stehen nicht in meinem Kopf, sondern in der Schiene auf dem
-     Schreibtisch - dieselbe Ansicht, dieselbe Aufgabe. Dort gemessen:
-     Akkordeon und innerer Behaelter durchsichtig, Gruppentitel Gold
-     rgb(201,168,76), Eintraege rgb(191,183,169). Gegen rgb(14,13,11) ergibt
-     das k = 8,3 und k = 9,8. */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion{
-    background:transparent !important; background-image:none !important;
+  /* Der Fußabstand aus dem Markup (#sb-footer-spacer) frisst auf 758 px sonst Liste. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-footer-spacer{
+    height:0 !important; min-height:0 !important;
   }
+
+  /* ── (2) Der Aufklapper steht unten und ist da ───────────────────────────────────────────
+     v1889 hatte ihn mit `display:none` abgeschaltet („Der Aufklapper hat nichts mehr
+     aufzuklappen"). Er hat wieder etwas aufzuklappen. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn{
+    display:flex !important;
+    margin:8px 12px !important; width:calc(100% - 24px) !important;
+  }
+
+  /* ── (3) Das Register ist ZU, bis der Knopf es hochzieht ─────────────────────────────────
+     Hier wird die Mechanik nicht nachgebaut, sondern losgelassen: `sbActionsToggle()` setzt
+     `.sb-actions-open`, style.css:25488 schaltet den inneren Behälter darüber ein, und
+     `_sbActionsDock()` deckelt das Panel gegen die gemessene Trigger-Oberkante. Was hier
+     steht, sind nur die beiden Dinge, die v1889 festgehalten hatte und die wieder dem
+     Zustand folgen müssen.
+
+     `pointer-events` gehört ausdrücklich dazu: v1889e hatte es auf `auto !important`
+     gestellt, weil das Register dort dauerhaft offen war. Bliebe das so, finge ein
+     unsichtbares, zugeklapptes Panel die Klicks der Objektliste darunter ab — genau der
+     Fehler, den v1889e behoben hatte, nur andersherum. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion:not(.sb-actions-open),
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion:not(.sb-actions-open) *{
+    pointer-events:none !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion.sb-actions-open,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion.sb-actions-open *{
+    pointer-events:auto !important;
+  }
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion.sb-actions-open{
+    opacity:1 !important; visibility:visible !important;
+  }
+
+  /* ── (4) Schriftart und Schriftgröße wie Aktenmappe ──────────────────────────────────────
+     Die Werte sind die der Schiene bei 1180 px, oben im Kopf tabelliert. Der Gruppentitel
+     trägt JetBrains Mono — auf dem Handy stand dort Inter, und das ist der sichtbarste
+     Unterschied zwischen den beiden Geräten gewesen. */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-section-title{
+    font-family:'JetBrains Mono', ui-monospace, monospace !important;
+    font-size:10px !important; line-height:12px !important; font-weight:700 !important;
+    letter-spacing:1.4px !important; text-transform:uppercase !important;
     color:var(--wl-c9a84c, #C9A84C) !important; background:transparent !important;
+    padding:10px 12px 4px !important;
   }
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-item,
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-l,
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-l{
+    font-family:Inter, system-ui, -apple-system, sans-serif !important;
+    font-size:12.5px !important; line-height:16.875px !important; font-weight:500 !important;
+    letter-spacing:normal !important;
+    color:#BFB7A9 !important; background:transparent !important;
+  }
+  /* Die Zeilenhöhe der Schiene ist 29 px. Auf dem Finger wäre das zu knapp — 44 px ist die
+     Trefferfläche, auf die style.css unter 768 px alles bringt (v1883a). Die SCHRIFT ist
+     die der Aktenmappe, die FLÄCHE bleibt greifbar: Marcel hat Schriftart und Schriftgröße
+     genannt, nicht die Trefferfläche, und eine 29-px-Zeile auf dem Handy wäre der Fehler
+     aus v1892 noch einmal. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-item{
+    min-height:40px !important; padding:6px 12px !important;
+  }
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-ico{
-    color:#BFB7A9 !important; background:transparent !important; border-color:#26231E !important;
+    color:#BFB7A9 !important; background:transparent !important;
   }
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-act-item:hover{
     background:#1A1815 !important;
-  }
-  /* ── v1889e · SICHTBAR IST NICHT BEDIENBAR - ZUM ZWEITEN MAL ──────────────
-     Nachgemessen mit `elementFromPoint` auf die Mitte von „Einzelobjekt":
-     dort lag nicht der Knopf, sondern `ASIDE#sidebar`. Alle dreizehn
-     Eintraege waren sichtbar und tot.
-
-       pointer-events  #sb-actions-accordion = none
-                       .sb-actions-accordion-inner = none (geerbt)
-                       .sb-act-item = none (geerbt)
-
-     Das Akkordeon setzt das im ZUGEKLAPPTEN Zustand. Ich hatte display,
-     height, max-height, overflow, opacity und visibility gesetzt - und
-     pointer-events vergessen. **Genau derselbe Fehler steht 800 Zeilen weiter
-     oben in dieser Datei unter „10 · SICHTBAR IST NICHT BEDIENBAR (v1649)".**
-     Ich habe ihn wiederholt, obwohl die Lehre hier aufgeschrieben stand -
-     weil ich die Regel fuer die Schiene gelesen und nicht gefragt habe, was
-     sie fuer die Schublade heisst.
-
-     > Eine Regel aendert nicht mit, was sie nicht nennt. Und eine Lehre,
-     > die man nur liest, hat man nicht angewandt. */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion,
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-accordion *{
-    pointer-events:auto !important;
-  }
-  /* Der Aufklapper hat nichts mehr aufzuklappen - wie in der Schiene. */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-actions-trigger-btn{
-    display:none !important;
-  }
-  /* Jetzt scrollt die Schublade als Ganzes, nicht die Liste in sich. Sonst stuende das Register
-     unter der Kante und niemand wuesste, dass es da ist. */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar{
-    overflow-y:auto !important; -webkit-overflow-scrolling:touch;
-  }
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-section-title,
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list,
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-user-box,
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-user{
-    flex:0 0 auto !important;
-  }
-  /* ── v1889d · DAS REGISTER LAG HINTER 21 OBJEKTKARTEN ────────────────────
-     Nachgemessen, nachdem es offen stand: der erste Eintrag („Einzelobjekt")
-     begann bei y = 1886 in einer 844 px hohen Schublade - man haette zweimal
-     ueber die ganze Liste wischen muessen, um ihn zu sehen, und nichts haette
-     darauf hingewiesen, dass er da ist.
-
-     > Offen und erreichbar sind nicht dasselbe. Ein Menue, das erst nach
-     > 1886 px kommt, ist genauso versteckt wie eines hinter einem Aufklapper.
-
-     Die Objektliste bekommt einen Deckel und scrollt in sich - darunter steht
-     das Register, beides in einem Schirm. `flex:0 0 auto` muss dabei bleiben:
-     ohne das schrumpft die Liste im scrollenden Behaelter auf null und die
-     Karten sind nicht mehr anklickbar (genau der Fehler aus v1885c). */
-  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list{
-    max-height:42vh !important; overflow-y:auto !important; overflow-x:hidden !important;
   }
 }
 
@@ -7217,4 +7217,42 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
          nachweisen. Ein schmales Fenster am Schreibtisch zeigt die Knoepfe damit ebenfalls
          dauerhaft - das ist der ehrlichere Fehler. */
   html[data-dp-layout] aside#sidebar .sb-card .sbc-actions { opacity: 1 !important; pointer-events: auto !important; }
+
+  /* (6) v1903 · DER KARTENKNOPF WAR IN DER SCHUBLADE KLEINER ALS IN "HEUTE".
+         Gemessen am 06.10.2026, 390 px, Aktenmappe, Datenzeile, Menue offen:
+
+           Schublade (Aktenmappe)   button.sbc-btn   20 x 20   (geklont von .dpl-schiene, oben in diesem Block)
+           Ansicht "Heute"          button.sbc-btn   26 x 26
+
+         Marcel: "ja alles angleichen." Angeglichen wird auf 26 x 26 - den Wert, den V101
+         fuer Touch ausdruecklich gesetzt hatte.
+
+         > **NICHT auf 44 px.** style.css:37479 nimmt die 44-px-Trefferflaeche seit v1191
+         > bewusst zurueck, mit Messung begruendet: auf der 64-82 px hohen Karte legte sie
+         > den LOESCHKNOPF ueber drei andere Ziele. Eine groessere Flaeche fuer die
+         > gefaehrlichste Aktion ist der falsche Handel.
+
+         Geaendert wird nur die HANDY-Fassung. Die Originalregel an `.dpl-schiene` bleibt
+         bei 20 px - der Schreibtisch soll sich nicht aendern. */
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions .sbc-btn { width: 26px !important; height: 26px !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions .sbc-btn svg { width: 14px !important; height: 14px !important; }
+
+  /* (7) v1903 · ZWEI SORTIERKNOEPFE, DEREN TREFFERFLAECHEN EINANDER AUSSCHLOSSEN.
+         Gemessen am 06.10.2026, 390 px, Menue offen:
+
+           .sb-sort-toggle   63 x 50 bei x = 269      gap: 5px
+           button.sb-sort-btn  je 26 x 44, Mitten bei x = 285 und x = 316  ->  Abstand 31 px
+
+         style.css:36349 legt unter 768 px ein unsichtbares `::after` von `max(100%, 44px)`
+         unter jeden der beiden Knoepfe. Bei 26 px Breite ragt es je 9 px nach links und
+         rechts: Knopf A deckt 263..307, Knopf B deckt 294..338 - **13 px gehoeren beiden**,
+         und dort entscheidet nicht der Finger, sondern die Stapelreihenfolge.
+
+         Geloest ueber den ABSTAND, nicht ueber kleinere Flaechen: `gap: 18px` bringt die
+         Mitten auf 44 px auseinander, die beiden 44-px-Flaechen stossen aneinander und
+         ueberlappen nicht mehr. Die Gruppe wird dadurch 70 statt 63 px breit; sie sitzt in
+         der `auto`-Spalte des Rasters aus (2) und nimmt den Platz der Ueberschrift nicht.
+
+         > Marcel: "ja auch anpassen dass es auf dem Handy passt." */
+  html[data-dp-layout] aside#sidebar .sb-section-title .sb-sort-toggle { gap: 18px !important; }
 }

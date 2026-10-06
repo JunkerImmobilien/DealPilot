@@ -38629,13 +38629,59 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   html[data-ui-cards="stapel"] body aside.sidebar .sb-card .sbc-address { padding-right: 70px !important; }
 }
 
-/* v1883b · Listen-Stil Datenzeile in der Handy-Schublade (gemessen 390 px): der Kopf (.sbc-top) ist 84 px hoch, der
-   Score-Ring sitzt bei top:38 und ragt mit seiner Stufen-Pille (447-469) in die Kacheln (ab 450); die Adresse lief unter
-   dem Ring hindurch. Kopf hoch genug fuer Ring + Pille, Adresse laesst dem Ring Platz. */
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════
+   v1903 · DIE VIER KOMPAKTEN KARTENSTILE WAREN AUF DIE HOEHE DER GROSSEN KARTE AUFGEBLASEN
+
+   Marcel am 06.10.2026: „Die Karten werden dort nicht richtig dargestellt."
+
+   HIER STAND v1883b, und die Diagnose war richtig, der Griff nicht. Sein Kommentar lautete:
+   „Listen-Stil Datenzeile in der Handy-Schublade (gemessen 390 px): der Kopf (.sbc-top) ist
+   84 px hoch, der Score-Ring sitzt bei top:38 und ragt mit seiner Stufen-Pille (447-469) in
+   die Kacheln (ab 450); die Adresse lief unter dem Ring hindurch." Seine Regel lautete:
+
+     ... .sb-card .sbc-top { min-height: 122px !important; }
+
+   Der Ring ragte in die Kacheln, weil er bei `top:38px` sitzt - einem Wert, der fuer die
+   GROSSE Karte der Ansicht „Heute" gemessen ist. Statt den Ring an die kompakte Karte zu
+   setzen, hat v1883b die Karte auf die Hoehe des Rings gebracht: 122 px. Und zwar fuer alle
+   vier KOMPAKTEN Stile - Datenzeile, Ampel, Kennzahlen, Minimal -, also genau fuer die, deren
+   ganzer Zweck es ist, kurz zu sein. „Datenzeile: Mono, eine Zeile, buendig."
+
+   GEMESSEN am 06.10.2026 im gleich-Origin-iframe, 390 px, Aktenmappe, Datenzeile, Menue offen.
+   Der Nachweis ist ein Versuch, kein Kaskaden-Walker: `min-height` inline auf 0 gesetzt und die
+   Geometrie abgelesen.
+
+     .sb-card           mit der Regel  311 x 122      ohne sie  311 x 45
+     .sbc-top-body      Inhalt der Karte                         294 x 37
+
+   Von 122 px trug der Inhalt also 37. **Bei zwanzig Objekten passten zweieinhalb Karten in die
+   Liste**, und das war der sichtbare Teil von Marcels Satz.
+
+   > Ein Walker haette das nicht gefunden: er meldete auf `.sbc-top` nur die beiden Regeln
+   > `min-height:0 !important` aus layout-varianten.css und nichts sonst, waehrend
+   > `getComputedStyle` dort 122 px zurueckgab. Im iframe und im verborgenen Tab luegt dieser
+   > Kanal. Der Versuch hat recht behalten.
+
+   JETZT: die Karte steht auf ihrer eigenen Hoehe, und der Ring wird an sie gesetzt, statt sie
+   an den Ring. Die Pille (.sbc-score-label) ist in diesen vier Stilen ohnehin `display:none`
+   (gemessen) - die Hoehe, die v1883b fuer sie freigehalten hat, hielt sie fuer nichts frei.
+   Der Platzhalter der Adresse bleibt, der Ring steht ja weiter rechts.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  /* v1883b: gilt genauso fuer Ampel, Kennzahlen und Minimal (gemessen: gleiche Ueberlagerung). */
-  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-top { min-height: 122px !important; }
+  /* Gilt fuer alle vier kompakten Stile (gemessen: gleiche Ueberlagerung, gleiche Ursache). */
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-top { min-height: 0 !important; }
   html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-address { padding-right: 72px !important; }
+  /* Der Ring wird mittig an die Karte gehaengt, statt auf einem fuer die grosse Karte
+     gemessenen `top:38px` zu stehen. `bottom:auto` muss dabei sein: die Regel, die ihn
+     streckte, setzt beides, und eine Kurzschrift gibt es fuer top/bottom nicht. */
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-score-overlay {
+    top: 50% !important; bottom: auto !important; height: auto !important;
+    transform: translateY(-50%) !important;
+  }
+  html:is([data-dp-objkarte="datenzeile"],[data-dp-objkarte="ampel"],[data-dp-objkarte="kennzahlen"],[data-dp-objkarte="minimal"]) aside#sidebar :is(#sb-list) .sb-card .sbc-actions {
+    top: 50% !important; bottom: auto !important; height: auto !important;
+    transform: translateY(-50%) !important;
+  }
 }
 
 /* v1888 · Der Dashboard-Umschalter .dp-sidebar-toggle traegt keine eigene Gestaltung und erschien auf dem
