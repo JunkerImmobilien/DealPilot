@@ -38715,5 +38715,11 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   .dp-pf-scroll::-webkit-scrollbar-thumb {
     background: var(--wl-c9a84c, #C9A84C); border-radius: 99px;
   }
-  .dp-pf-scroll::-webkit-scrollbar-track { background: rgba(201, 168, 76, .14); border-radius: 99px; }
+  /* v1892b · Hier stand `rgba(201, 168, 76, .14)`. Das ist Gold in ZAHLENFORM und faerbt sich
+     beim Mandanten genauso wenig um wie ein Hex - gold-audit.py hat es sofort gemeldet
+     ("css/style.css 0 -> 1, Datei war sauber"). Derselbe Griff danebenn wie in v1699e. */
+  .dp-pf-scroll::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+    border-radius: 99px;
+  }
 }
