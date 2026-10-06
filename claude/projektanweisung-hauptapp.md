@@ -31908,6 +31908,66 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (63) 06.10.2026 — v1919/v1920: N41 einzeln abgearbeitet, und zwei Schwarz sind schlimmer als eines
+
+Marcel wollte seine vier Punkte **ins Backlog und einzeln** abgearbeitet (N41). Das war die
+richtige Ansage: an diesem Menü sind heute dreizehn Pakete gelaufen, und zweimal habe ich beim
+Beheben eines Punktes einen anderen beschädigt.
+
+| Punkt | Befund | Ergebnis |
+|---|---|---|
+| N41.1 Hintergrund | zwei Schwarztöne im Portfolio-Zustand | **behoben, `v1919`** |
+| N41.2 „Portfolio" weiß umrahmt | war seit `v1911` erfüllt | nachgemessen |
+| N41.3 Menüs | war seit `v1912` erfüllt | nachgemessen |
+| N41.4 Anmeldung in Grau | war seit `v1916` erfüllt | nachgemessen |
+| (dabei gefunden) | Objektzahl am Umschalter leer | **behoben, `v1920`** |
+
+**N41.1 fand ich erst, als ich je RASTERPUNKT gemessen habe statt am Container.** Effektiver Grund
+bei x = 180, Aktenmappe, 387 px:
+
+```
+y      Zustand AKTIONEN   Zustand PORTFOLIO
+100    rgb(14,13,11)      rgb(14,13,11)
+300    rgb(14,13,11)      rgb(23,22,15)   <- .sbc-top
+500    rgb(14,13,11)      rgb(23,22,15)
+700    rgb(14,13,11)      rgb(14,13,11)
+```
+
+> **Zwei Schwarz sind schlimmer als eines.** Ein klarer Kontrast ist eine Aussage, ein knapper ist
+> ein Fehler, den man nicht benennen kann. Neun Punkte Unterschied lesen sich nicht als Absicht,
+> sondern als „da liegt etwas darunter" — genau das, was Marcel als Partikel beschrieben hat.
+
+Am Schreibtisch trägt `.sbc-top` denselben Ton (gegengemessen), dort füllt die Liste aber nur 216
+von 248 px in einer schmalen Spalte. Auf dem Handy liegt sie als 357 px breite Fläche vor dem
+ganzen Schirm. **Deshalb weicht das Handy hier bewusst ab.**
+
+**Und ein Wert, der einmal abgeschrieben wurde** (v1920). Der Umschalter zeigte keine Objektzahl:
+`#dpl-obj-zahl` der Schiene trug „22", das `.dpl-n` im Handy-Knopf war leer und 0 × 0. Der Knopf
+entsteht beim Aufbau der Schublade, die Zahl steht dort erst nach dem Laden der Liste.
+
+> **Ein Wert, der sich später ändert, will beobachtet werden, nicht kopiert.** Wer einmal
+> abschreibt, hält den Anfangszustand für das Ergebnis.
+
+**Vollständiger Abgleich zum Schluss**, Element für Element, Schiene gegen Schublade — alles gleich
+bis auf drei Stellen, die bewusst abweichen:
+
+```
+Marke       42px, Deal rgb(242,237,227) / Pilot rgb(169,141,64)   gleich
+Umschalter  rgb(191,183,169), Rahmen rgb(230,225,214), r 10       gleich · Hoehe 44 statt 33
+Rubrik      rgb(201,168,76) 10px/700, Polster 4/9/5               gleich
+Eintrag     rgb(191,183,169) 12,5px/500, Polster 7/9              gleich · Hoehe 40 statt 29
+Anmeldung   Version rgb(110,103,92), Rest rgb(191,183,169)        gleich
+Hoehe Marke 100 px                                                72 px
+```
+
+Die drei Abweichungen: zweimal Trefferfläche für den Finger, einmal Platz in einer Schublade, die
+alles übereinander trägt statt nebeneinander.
+
+> **Die Lehre aus dem ganzen Tag steht im Backlog unter N41:** drei von vier Punkten waren beim
+> Melden schon behoben, aber noch nicht bei ihm angekommen. Zwischen Behebung und Meldung lagen
+> zehn Pakete. **Nach jedem Rollout den Punkt EINZELN mit Messwert melden**, nicht gesammelt am
+> Ende — sonst prüft er einen Zwischenstand und meldet Dinge, die längst stehen.
+
 ### (62) 06.10.2026 — v1917/v1918/v1918a: was wie ein Hintergrund aussah, war der Abstand
 
 **Marcel:** „wenn du auf Portfolio klickst, ist der Hintergrund Obsidian. Wir haben so Partikel,
