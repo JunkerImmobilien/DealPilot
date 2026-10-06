@@ -265,6 +265,34 @@ dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
 `storage.js` beim Duplizieren und beim Ändern der Adresse auf
 `ai_analysis` prüfen.
 
+### N35 · Heute, Aktenmappe und die Objektkarten-Wahl (06.10.2026) — erledigt v1896–v1900, auf Staging
+
+Marcel: „Heute muss aussehen wie der DealPilot mit den Objektkarteien und allem, also
+vernünftig, mit den Obsidianen und den bewegten Partikeln im Hintergrund. Und die Aktenmappe,
+da darf überhaupt gar kein Obsidian, also kein Misch sein. … Und wenn wir Heute auswählen,
+dann konnte man ja unten auch das Aussehen der Objektkarteien verändern. Das geht natürlich
+bei Heute nicht."
+
+**Erledigt (`8737f39e`, `b1e44264`, `1db1c40a`, `4ae4cc8e`):** die bewegten Partikel liefen nie —
+`initParticles()` suchte `#dp-particles`, das im ganzen Frontend nicht vorkam, und kehrte in
+Zeile 1 um; der Canvas wird jetzt in der Routine selbst angelegt und startet mit der Fläche
+statt mit dem Datenabruf. Beim ersten echten Lauf fiel auf, dass der Pixelpuffer (946×5379) nicht
+zur Fläche (893×5703) passte — behoben in v1900 samt `ResizeObserver`. Die Objektkarten-Wahl
+(Gestalt UND Dichte) fällt in Heute weg. Die Aktenmappe trägt auf dem Handy keine eigene Schiene
+mehr, der dunkle Block oben sinkt von 238 auf 151 px (28 → 18 % der Höhe).
+
+**Nachgemessen auf Staging:** Partikel 4.546 gefüllte Bildpunkte, Puffer = Fläche; Kartenwahl in
+Heute `display:none` h=0, in der Aktenmappe `display:block` h=501; Schiene `display:none`.
+
+**Offen:**
+- **Der Kopf ist auf dem Handy 93 px gegen 57 px am Schreibtisch** — ob er kompakter werden soll,
+  ist Marcels Entscheidung.
+- **Die Marke fehlt auf dem Handy in der Aktenmappe**, weil sie in der entfernten Schiene stand.
+  Klein in die Kopfzeile zurück? Nicht geraten.
+- **Kanzlei und Tower** auf 390 px in derselben Tiefe nachprüfen (bisher nur Überlauf und
+  Abzeichen, nicht die Partikel- und Kartenfrage).
+- **Marcels Abnahme im Browser** und ein Prod-Rollout.
+
 ### N34 · Vier Fehler in der Steuer- und Bewirtschaftungsrechnung (06.10.2026) — erledigt v1898, auf Staging
 
 Marcel: „Ja, natürlich möchte ich, dass du die Steuerkorrekturen machst. Das muss passen.
