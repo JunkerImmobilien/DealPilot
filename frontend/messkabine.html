@@ -448,6 +448,12 @@
              zu. Solche Fälle werden getrennt gezählt (`inZugeklapptem`). */
     var unerr = [], zuN = 0;
     bed.forEach(function(el){
+      /* v1901g · `bed` ist die UNGEFILTERTE Liste — gefiltert wird in (3)
+         erst in der Schleife. Ohne diese Zeile lief die Erreichbarkeits-
+         prüfung über alles und meldete den Haken `#afa_sonder7b_aktiv` aus
+         dem zugeklappten `<details>` als „geklippt von div.card": genau das
+         Phantom, gegen das v1901 gebaut wurde, durch die Hintertür zurück. */
+      if (gemalt(el) === false) return;
       var b = el.getBoundingClientRect();
       if (b.width === 0 || b.height === 0) return;
       var p = el.parentElement, sc = false, grund = null, fertig = false;
