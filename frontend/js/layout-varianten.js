@@ -1793,30 +1793,35 @@
         var t = e.target;
         if (t && t.closest && t.closest('.sbc-actions')) return;   /* Kopieren/Loeschen */
         if (!t || !t.closest || !t.closest('.sb-card')) return;
-        var aw = document.querySelector('.app-wrap');
-        if (!aw || !aw.classList.contains('sb-mobile-open')) return;
-        /* ── v1923a · SCHLIESSEN, NICHT UMSCHALTEN ──────────────────────────
+        /* ── v1923b · DEN WUNSCH DURCHSETZEN, NICHT DEN MOMENT ABPASSEN ─────
 
-           v1923 rief `toggleMobileSidebar()`. GEMESSEN: alle Bedingungen waren
-           erfuellt (Breite, Layout, Menue offen, Klick auf der Karte, Blase
-           erreicht die Liste, Funktion vorhanden) — und das Menue blieb
-           trotzdem offen.
+           Zwei Anlaeufe sind hier gescheitert, beide an derselben Annahme:
+           dass die Schublade zum Zeitpunkt meines Eingriffs noch offen ist.
 
-           Der Grund liegt im Wort TOGGLE: das Laden des Objekts schliesst die
-           Schublade bereits selbst. Mein Aufruf 60 ms spaeter traf sie
-           geschlossen an und machte sie damit wieder auf.
+             v1923   `toggleMobileSidebar()` nach 60 ms  ->  blieb offen
+             v1923a  gezielt schliessen, wenn offen      ->  blieb offen
 
-             > Ein Umschalter ist kein Befehl. Wer einen Zustand HERSTELLEN
-             > will, darf nicht umschalten — er muss setzen.
+           GEMESSEN: mein Schliess-Code wirkt, wenn ich ihn von Hand aufrufe,
+           und die Schublade bleibt dann auch zu. Der Horcher feuert auch (ein
+           Probe-Horcher an derselben Stelle zaehlte den Klick). Was dazwischen
+           liegt, ist das Laden des Objekts: es schliesst die Schublade KURZ
+           selbst und oeffnet sie beim Neuaufbau wieder. Mein Eingriff traf
+           genau das Loch — in v1923 schaltete er die geschlossene wieder auf,
+           in v1923a sah er 'ist schon zu' und tat nichts.
 
-           Deshalb wird jetzt gezielt geschlossen, und nur, wenn zu diesem
-           Zeitpunkt wirklich offen ist. Die vier Schritte sind dieselben, die
-           `toggleMobileSidebar()` in `main.js:365` im Schliess-Zweig geht:
-           Klasse weg, Backdrop aus, Knopf aus, Koerper-Scrollsperre loesen. */
-        setTimeout(function () {
+             > Wer einen Zustand gegen eine laufende Neuzeichnung durchsetzen
+             > will, trifft mit einem einzigen Zeitpunkt fast immer daneben.
+             > Nicht praeziser zielen — laenger halten.
+
+           Deshalb wird der Wunsch jetzt ueber ein kurzes Fenster GEHALTEN:
+           fuenf Versuche in 600 ms. Jeder prueft selbst, ob offen ist, und
+           schliesst dann. Sobald der Nutzer in dieser halben Sekunde wieder
+           selbst oeffnet, wuerde er dagegenarbeiten — das ist unrealistisch
+           und faellt nach 600 ms ohnehin weg. */
+        var zu = function () {
           try {
             var aw2 = document.querySelector('.app-wrap');
-            if (!aw2 || !aw2.classList.contains('sb-mobile-open')) return;   /* schon zu */
+            if (!aw2 || !aw2.classList.contains('sb-mobile-open')) return;
             aw2.classList.remove('sb-mobile-open');
             var bd = document.getElementById('sb-backdrop');
             if (bd) bd.style.display = 'none';
@@ -1824,7 +1829,8 @@
             if (hmb) hmb.classList.remove('active');
             document.body.style.overflow = '';
           } catch (e2) {}
-        }, 80);
+        };
+        [0, 80, 200, 350, 600].forEach(function (ms) { setTimeout(zu, ms); });
       });
     }
     objektWahlSchliesstMenue();
