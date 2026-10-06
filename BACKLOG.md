@@ -432,6 +432,65 @@ Die vollständige Messreihe steht im Journal (57).
   weg. Die übrige Arbeitsfläche führt dort `rgb(244,242,237)`. Produktentscheidung.
 - **Marcels Abnahme im Browser** und ein Prod-Rollout.
 
+### N43 · Diagramme auslesen — Marcels Entscheidung steht aus (06.10.2026)
+
+Marcel: „zur ernte. koennen wir die diagramme auslesen und daraus ernten?"
+
+**Die Antwort ist teils ja, teils nein — und die Trennung läuft nicht zwischen den Dokumenten,
+sondern zwischen den Kennzahlen.** Gemessen mit `pdfimages -list` je Seite:
+
+```
+Bodensee  Zinssatz 7.1-7.4  (Balken)     0 Bildobjekte   VEKTOR, Labels als Text
+Bodensee  Zinssatz 7.5-7.7  (Streuung)   0 Bildobjekte   Vektor, aber OHNE Labels
+Bodensee  Sachwertfaktor 8.1-8.5         4-6 je Seite    RASTER, 3637 x 3002 px
+Blumberg  alle Diagramme                 1596 x 1006     RASTER, 0 Textzahlen
+```
+
+**Der entscheidende Punkt, und er korrigiert meine eigene Fragestellung:** die Datenlabels sind
+**exakter Text im PDF**, keine gezeichneten Balkenhöhen. Die Zahl wird also **gelesen, nicht
+geschätzt**. Die Geometrie leistet nur die Zuordnung — welche Zahl zu welcher Wohnungsklasse und
+zu welcher Reihe (Maximum / gewogenes Mittel / Minimum) gehört. Beides steht ebenfalls als Text da.
+
+> Ich hatte als Prüfkriterium „die Rückrechnung muss die Nachkommastelle treffen" vorgegeben.
+> **Das wäre der falsche Test gewesen** und hätte die Methode zu Unrecht verworfen: Excel setzt
+> das Label mit festem Abstand ÜBER den Balken, die Rückrechnung weicht deshalb immer ab (3,81
+> gedruckt gegen 4,14 gerechnet = 10 pt Versatz). Das richtige Kriterium ist, **ob der Versatz
+> über das Diagramm konstant ist** — gemessen ±0,04 Einheiten.
+
+**Die Rückrechnung bleibt trotzdem wertvoll, als Wächter.** Sie hat einen Fehler des Auslesers
+gefangen: zwei Diagramme in einer Achsenspalte ergaben Abweichungen von ±2,5 statt ±0,27. Eine
+falsche Zuordnung wird rot, eine richtige grün.
+
+**Sicherheitsabstand, über alle 90 Labels:** engster Abstand zweier Labels in einer Kategorie
+27,1 pt, größter Labelversatz 11,7 pt → **Faktor 2,3**. Kategorien liegen 73,2 pt auseinander,
+also nie verwechselbar. Achsen-Linearität über alle Ticks: Abweichung 0,002 Einheiten.
+
+**Deckung: 22 Diagrammflächen gemessen, 8 lesbar** (Bodensee Zinssatz, Seiten 33–36).
+
+**Was der Ertrag wäre:** 90 Einzelwerte = **30 gewogene Mittel**, jedes mit Spanne, für
+Friedrichshafen · Immenstaad/Kressbronn/Langenargen · Eriskirch/Meckenbeuren/Neukirch/Tettnang ·
+Neubau Gesamtgebiet. Modellvermerke stehen vollständig als Text: Bewirtschaftung pauschal 18 %,
+Miete nach Mietpreisspiegel, Verkaufsjahr 2024, Wohnfläche nach WoFlV.
+
+> **Und genau hier greift die Oberursel-Lehre zwingend:** derselbe Teilmarkt ist in ZWEI
+> GND-Varianten veröffentlicht (70 und 80), und sie unterscheiden sich um bis zu 0,5
+> Prozentpunkte — Klasse „2-4 WE": 1,76 bei GND 70 gegen 2,29 bei GND 80. Ohne `gnd_jahre` als
+> ZAHL im Satz wäre nicht entscheidbar, welcher Wert gilt.
+
+**MARCELS ENTSCHEIDUNG, drei Punkte:**
+
+1. **Rang der Angabe.** Der Zahlenwert ist die gedruckte Angabe des Ausschusses. Die ZUORDNUNG zu
+   Klasse und Reihe ist eine Schlussfolgerung aus dem Layout, abgesichert mit Faktor 2,3 und einem
+   Wächter. Hat das den Rang einer amtlichen Angabe?
+2. **Was geerntet würde, ist eine Verteilung**, kein Einzelwert. Gewogenes Mittel als Ansatz, die
+   Spanne als Modellvermerk — oder gar nicht?
+3. **Die 7.5–7.7-Gleichungen bleiben draußen**, R² 0,019 bis 0,183. Dort gibt es auch keine
+   Labels, also keinen zweiten Weg.
+
+**Unabhängig davon bleibt ein zweiter Blocker:** die acht Gemeinden des Ausschusses stehen nicht
+mit Gemeindeschlüssel im Register, und die Kreisebene wäre falsch, weil Überlingen zu einem
+ANDEREN Ausschuss gehört. Die Schlüssel kommen aus einer belastbaren Quelle oder gar nicht.
+
 ### N42 · Quick-Check: Bewertungsbox im Browser abnehmen (06.10.2026)
 
 Der Telegram-Weg ist fertig und gegengemessen: `objekt_schnellblick` liefert Deal-Score, Stufe,
