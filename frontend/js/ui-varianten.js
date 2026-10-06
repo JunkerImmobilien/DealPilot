@@ -521,10 +521,24 @@
     var se = document.getElementById('dpl-seiten-seg');
     if (se && se.parentElement) se.parentElement.style.display = layout ? '' : 'none';
 
-    /* Die Gestalt teilt sich den Block mit der Dichte, die ueberall wirkt -
-       deshalb nur der Host, nicht der ganze Abschnitt. */
+    /* ── v1896 · IN „HEUTE" GILT DIE STANDARDKARTE ────────────────────────────
+       Hier stand: „Die Gestalt teilt sich den Block mit der Dichte, die ueberall
+       wirkt - deshalb nur der Host, nicht der ganze Abschnitt." Die Dichte wirkte
+       damit auch in „Heute", und dort ist sie nicht vorgesehen.
+
+       Marcel am 06.10.2026: „Das geht natuerlich bei Heute nicht. Da haben wir ja
+       einen Standard, das sind unsere standardmaessigen Objektkarteien und sonst
+       nichts. Das geht ja nur fuer die Aktenmappe, fuer den Tower und fuer die
+       andere Ansicht noch."
+
+       Deshalb faellt jetzt der GANZE Abschnitt weg, wenn kein Layout aktiv ist -
+       Gestalt und Dichte zusammen. Eine Wahl, die in einer Ansicht nichts bewirken
+       soll, darf dort nicht dastehen; sonst waehlt jemand und nichts passiert. */
     var og = document.querySelector('#dpuv-panel .dp-objkarte-wahl-host');
     if (og) og.style.display = layout ? '' : 'none';
+    var cardsSeg = document.getElementById('dpuv-cards');
+    var cardsG = cardsSeg && cardsSeg.closest('.dpuv-g');
+    if (cardsG) cardsG.style.display = layout ? '' : 'none';
 
     /* v1727: die Vorlagen gehoeren nicht in die neuen Ansichten - siehe
        die Begruendung am Beobachter weiter unten. Umgekehrt zu allen

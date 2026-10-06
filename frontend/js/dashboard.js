@@ -1916,7 +1916,24 @@
   /* ════ HINTERGRUND-PARTIKEL (Variante C) ════ */
   var _pctx,_pw,_ph,_particles=[],_praf,_presize;
   function initParticles(){
-    var cv=$('dp-particles'); var m=$(MOUNT_ID); if(!cv||!m)return;
+    var m=$(MOUNT_ID); if(!m) return;
+    /* v1896 · Den Canvas gibt es im Markup nicht — er wird hier angelegt. Vorher stand hier
+       `var cv=$('dp-particles'); if(!cv||!m)return;`, und weil das Element nirgends im Frontend
+       vorkam (gemessen: null Treffer in index.html, allen js/ und allen css/), kehrte die
+       Routine immer in ihrer ersten Zeile zurück. Die Teilchen liefen nie. */
+    var cv=$('dp-particles');
+    if(!cv){
+      cv=document.createElement('canvas');
+      cv.id='dp-particles';
+      /* Hinter den Inhalt, ohne Klicks zu fangen. Die Flaeche traegt der Mount selbst. */
+      cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none';
+      if(getComputedStyle(m).position==='static') m.style.position='relative';
+      m.insertBefore(cv, m.firstChild);
+      /* Alles, was der Mount sonst enthaelt, gehoert ueber die Teilchen. */
+      [].forEach.call(m.children, function(k){
+        if(k!==cv && getComputedStyle(k).position==='static') k.style.position='relative';
+      });
+    }
     _pctx=cv.getContext('2d');
     function size(){
       // v452.6: Layout kann beim ersten Aufruf 0 sein -> Fallback auf scroll/Fenster
