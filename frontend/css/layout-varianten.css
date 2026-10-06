@@ -8106,3 +8106,41 @@ html:not([data-dp-layout]) .dpl-portfolio-handy {
     background: transparent !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1922 · DIE REITER SIND CREME, NUR DER AKTIVE IST GOLD
+
+   Marcel am 06.10.2026: „Du hast auch oben die Reiter immer, sind immer noch auf
+   Gold, nicht auf Weiß."
+
+   GEMESSEN in der Aktenmappe, Schreibtisch 1277 px, alle zehn Reiter:
+
+     button.tab.active  „Objekt"        rgb(201,168,76)   Unterkante 2,2 px Gold
+     button.tab         „Investition"   rgb(201,168,76)
+     button.tab         „Miete"         rgb(201,168,76)
+     button.tab         „Finanzierung"  rgb(201,168,76)
+
+   **Alle zehn tragen dieselbe Goldfarbe — der aktive ist nur an seiner
+   Unterkante zu erkennen.** Auf dem Handy ist es derselbe Wert, es ist also
+   kein Unterschied zwischen den Breiten, sondern überall dasselbe.
+
+   Das widerspricht der Doktrin in `CLAUDE.md`: **Gold ist der AKZENT, die
+   Textfarbe auf dunklem Kopf ist Creme.** Wenn alle zehn Reiter Gold tragen,
+   sagt das Gold nichts mehr — und der aktive muss sich über eine 2-px-Kante
+   erklären, die auf dem Handy im Wischen untergeht.
+
+   > **Ein Akzent, den alle tragen, ist kein Akzent.** Er wird zur Grundfarbe,
+   > und das Element, das wirklich hervorsticht, hat nichts mehr übrig.
+
+   Jetzt: die Reiter stehen in Creme `rgb(233,227,214)`, der aktive behält Gold
+   UND seine Kante. Damit ist auf einen Blick zu sehen, wo man steht.
+
+   Gilt in den Layouts (Aktenmappe, Kanzlei, Tower) auf beiden Breiten — die
+   Ansicht „Heute" trägt kein `data-dp-layout` und bleibt, wie sie ist.
+   ══════════════════════════════════════════════════════════════════════════════ */
+html[data-dp-layout][data-dp-layout] body nav.tabs button.tab {
+  color: rgb(233, 227, 214) !important;
+}
+html[data-dp-layout][data-dp-layout] body nav.tabs button.tab.active {
+  color: var(--wl-C9A84C, #C9A84C) !important;
+}
