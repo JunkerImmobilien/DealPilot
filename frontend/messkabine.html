@@ -177,11 +177,23 @@
   cvs.width = cvs.height = 1;
   var ctx = cvs.getContext('2d', { willReadFrequently: true });
 
+  /* v1901d · GEMERKT, SONST LÄUFT DIE PRÜFSTRECKE IN DIE ZEITGRENZE.
+     Ein Lauf über neun Reiter malte rund 40.000 Mal auf den Canvas und
+     brach nach 45 Sekunden ab. Verschiedene Farben gibt es dabei keine
+     hundert — dieselbe Angabe über demselben Grund ergibt immer dasselbe
+     Pixel, also wird das Ergebnis gemerkt. */
+  var merk = Object.create(null);
+
   /* Malt `farbe` über `hinter` (ein {r,g,b}) und gibt das Ergebnis zurück.
      Nimmt der Canvas die Angabe nicht an, behält fillStyle den alten Wert —
      daran ist ein Fehlschlag erkennbar, und dann wird null gemeldet statt
      geraten. */
   function male(farbe, hinter){
+    var schl = farbe + '|' + hinter.r + ',' + hinter.g + ',' + hinter.b;
+    if (schl in merk) return merk[schl];
+    return (merk[schl] = male_roh(farbe, hinter));
+  }
+  function male_roh(farbe, hinter){
     ctx.clearRect(0, 0, 1, 1);
     ctx.fillStyle = 'rgb(' + hinter.r + ',' + hinter.g + ',' + hinter.b + ')';
     ctx.fillRect(0, 0, 1, 1);
