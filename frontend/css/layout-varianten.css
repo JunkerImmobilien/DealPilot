@@ -7845,3 +7845,85 @@ html body .sb-act-item.sb-act-feedback {
     white-space: nowrap !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1916 · DIE ANMELDUNG UND DIE PORTFOLIO-ZEILE NACH DEM SCHREIBTISCH
+
+   Marcel am 06.10.2026: „auch unten die Anmeldung ist anders mit der Pille und
+   der Version. Das ist dann in so einem leichten Grau. Also wenn du da in die
+   Desktop-Variante wechselst und dir mal anguckst, wie es dort angegeben ist,
+   dann … würdest du direkt sehen, dass es halt in der Handy-Version anders
+   aussieht." Und: „Dann ist das Suchfeld sehr groß. Das ist auch irgendwie
+   doppelt mit der Suche."
+
+   ── A · DIE ANMELDUNG, TEIL FUER TEIL GEGENEINANDER GELEGT ────────────────
+
+     Element       Schreibtisch                  Handy (vorher)
+     ───────────   ───────────────────────────   ──────────────────────────
+     Box-Text      rgb(191,183,169)              rgb(233,227,214)
+     Avatar „M“    rgb(191,183,169), 28 px       **rgb(42,39,39)**, 32 px
+     Version       rgb(110,103,92), 9 px,        **Goldgrund 8 %,**
+                   OHNE Grund, 16 x 13           **Goldtext 70 %**, 38 x 27
+     Wolke         rgb(191,183,169),             **gruener Grund 20 %,**
+                   Rahmen rgb(38,35,30)          **Goldtext**
+     Plan-Pille    rgb(191,183,169)              gleich (seit v1911)
+
+   **Das „leichte Grau“, das Marcel meint, ist `rgb(110,103,92)` bei der Version
+   und `rgb(191,183,169)` bei allem anderen.** Auf dem Handy trugen Version und
+   Wolke stattdessen Gold und Gruen — Akzentfarben, die hier nichts auszusagen
+   haben: eine Versionsnummer ist kein Zustand, und die Wolke meldet nur, dass
+   gespeichert wurde.
+
+   > Eine Akzentfarbe an einer Stelle, die nichts meldet, macht die Stelle nicht
+   > wichtiger — sie macht den Akzent wertlos.
+
+   ── B · „PORTFOLIO“ STAND ZWEIMAL DA ──────────────────────────────────────
+
+   Seit v1913 traegt der Umschalter ganz oben das Wort („Portfolio“, im anderen
+   Zustand „Aktionen“). Die Kopfzeile darunter wiederholte es als Beschriftung —
+   243 x 19 px fuer eine Angabe, die zwei Zeilen hoeher schon steht. Sie faellt
+   weg; Suche und Sortierknoepfe bleiben, wo sie sind.
+
+   Das Suchfeld war 44 px hoch in einer 118 px hohen Kopfzeile. Mit dem
+   Wegfall der Zeile und etwas weniger Polster bleibt es fingergerecht (40 px)
+   und die Kopfzeile schrumpft auf rund 80 px — das sind zwei Objektkarten mehr
+   im Blick.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* ── A · Anmeldung ─────────────────────────────────────────────────────── */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user {
+    color: rgb(191,183,169) !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-user-avatar {
+    color: rgb(191,183,169) !important;
+    border: 1px solid rgb(38,35,30) !important;
+    background: transparent !important;
+  }
+  /* Die Version ist eine Angabe, kein Zustand: leichtes Grau, kein Grund. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-version-badge {
+    color: rgb(110,103,92) !important;
+    background: transparent !important;
+    border: 0 !important;
+    font-size: 9px !important;
+  }
+  /* Die Wolke meldet nur, dass gespeichert wurde — kein Gruen, kein Gold. */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-user .sb-mode-badge {
+    color: rgb(191,183,169) !important;
+    background: transparent !important;
+    border: 1px solid rgb(38,35,30) !important;
+  }
+
+  /* ── B · die doppelte Beschriftung faellt weg ──────────────────────────── */
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title > span:first-child {
+    display: none !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar .sb-section-title {
+    padding: 6px 14px 8px !important;
+    row-gap: 6px !important;
+  }
+  html[data-dp-layout="v1b"][data-dp-layout] body aside.sidebar#sidebar #sb-search-input {
+    min-height: 40px !important;
+    height: 40px !important;
+  }
+}
