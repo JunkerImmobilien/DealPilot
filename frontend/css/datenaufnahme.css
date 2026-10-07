@@ -2408,3 +2408,53 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     text-overflow: ellipsis !important;
   }
 }
+
+/* ==============================================================================
+   v1941d - DIE ECHTE KETTE, NACH VIER ANLAEUFEN AUF DER FALSCHEN EBENE
+
+   v1941, a, b und c haben an `.dp-pf-tile` gearbeitet - den Kacheln. Erst die
+   Auszaehlung ALLER direkten Kinder der Leiste zeigte, dass die Kacheln gar
+   nicht dort liegen:
+
+     .dp-pf-stripe   753 px   (Hintergrundstreifen)
+     .dp-pf-lead     149 px   flex: 0 0 auto   <- kann nicht schrumpfen
+     .dp-pf-seg      175 px
+     .dp-pf-seg      602 px   <- HIER liegen die Kacheln
+     #oab-pf-qr       54 px
+     .dp-pf-rz       208 px   min-width: 208px <- fest verdrahtet
+
+   Zusammen 1188 px plus Luecken = 1267 bei 753 px Platz.
+
+   > **Vier Anlaeufe lang habe ich die Kacheln gemessen und die Leiste
+   > geaendert, ohne die Ebene dazwischen anzusehen.** Wer eine Breite sucht,
+   > zaehlt die DIREKTEN Kinder des Containers - nicht die Elemente, die er
+   > fuer die Ursache haelt. Die Summe haette den Irrtum beim ersten Mal
+   > gezeigt: 5 x 175 sind 875, gemessen waren 1267.
+
+   Geoeffnet wird jetzt die ganze Kette: Segmente duerfen schrumpfen, der
+   Abrufknopf verliert seine feste Mindestbreite, und alle Nachfahren geben
+   ihr `min-width: auto` auf. Der Abrufknopf bleibt lesbar - er behaelt sein
+   Polster und schrumpft nur so weit, wie die anderen auch.
+   ============================================================================== */
+@media (min-width: 901px) {
+  #oab-bar.dp-pfbar > .dp-pf-seg,
+  .dp-pf-scroll .dp-pfbar > .dp-pf-seg {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  #oab-bar.dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll .dp-pfbar > .dp-pf-lead {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+  }
+  #oab-bar.dp-pfbar > .dp-pf-rz,
+  .dp-pf-scroll .dp-pfbar > .dp-pf-rz {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+  }
+  /* Die ganze Kette darunter - min-width:auto wirkt sonst von unten durch. */
+  #oab-bar.dp-pfbar *,
+  .dp-pf-scroll .dp-pfbar * {
+    min-width: 0 !important;
+  }
+}
