@@ -31914,6 +31914,132 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (85) 07.10.2026 — v1955 bis v1957a: A-/B-/C-Lage, und ein Prüfer, wo ein Erzeuger stand
+
+#### A · v1955 · Ich habe einen Prüfer gebaut, wo ein Erzeuger stand
+
+**v1950 behauptete:** „Das Backend-Image kopiert `frontend/` nicht. Ein gemeinsames Modul zur
+Laufzeit gibt es ohne Bauschritt also nicht." Der erste Satz stimmt. **Der zweite nicht.**
+
+`tools/rechenkerne-spiegeln.mjs` gibt es seit v1899. Es spiegelt **fünf** Rechenkerne nach
+`backend/src/generated/rechenkerne/` — und `score-tiers.js` ist einer davon.
+`services/rechenkerne.js` reicht ihn als `stufe(wert)` heraus.
+
+> **Gefunden beim Messen für ein ganz anderes Paket.** Und dabei kam heraus, dass die
+> gespiegelte Kopie seit meiner v1950-Änderung **veraltet** war:
+>
+> ```
+> frontend/js/score-tiers.js              4962 Bytes  mit v1950
+> backend/.../score-tiers.js (gespiegelt) 2781 Bytes  ohne v1950
+> Pruefsummen erzeugt 08:20 Uhr - vor meiner Aenderung
+> ```
+>
+> **Eine zweite Quelle, die niemand nachzieht, ist genau das, was die Spiegelung verhindern
+> soll.** Mein Prüfer kannte sie nicht und wurde grün, während das Image mit einem alten Kern lief.
+
+`telegramDialogService` **liest** die Kette jetzt, statt sie zu führen. Der eigene Rückfall bleibt
+nur für den Fall, dass die Spiegelung fehlt — ein Bot, der wegen eines fehlenden Kerns gar nichts
+sagt, wäre schlimmer als einer, der die Wörter doppelt kennt.
+
+**Beweis, dass der Spiegelweg wirklich genommen wird:** die gespiegelte Datei verstimmt →
+`stufeZu(92)` antwortet mit dem verstimmten Wert. Der Prüfer führt sie als fünfte Stelle und
+vergleicht **Wort UND Versal**; eine veraltete Spiegelung ergibt 16 Abweichungen und RC=1.
+
+#### B · v1956/v1957 · Die Lageklassen
+
+Marcel: „Investoren gliedern das immer in A-, B- und C-Lagen und machen das an
+Bruttomietrenditen fest, die sie erreichen wollen." Sein Kollege schrieb dasselbe zweimal in
+`design/mockups/Anmerkungen.docx`.
+
+> **Der Satz des Kollegen stand längst in der App** — als toter Hinweis am Mietausfall-Feld:
+> „A-Lage eher 1 %, C-Lage eher 3 %". **Die Beziehung war dokumentiert und nie verdrahtet.**
+
+**Zwei Entscheidungen von Marcel, beide auf Nachfrage:**
+
+- **Vorbelegung marktüblich**, nicht nach seinem Beispiel: A 3,5 · B 5,0 · C 7,0. Er hatte
+  „A-Lage 8 %" gesagt; am Markt ist es umgekehrt. Seine 8 war ein Rechenbeispiel.
+- **Die Klasse wählt nur der Kunde.** Kein Vorschlag aus der Makrolage, auch wenn Marktdaten
+  vorliegen — die Einstufung ist eine Strategieentscheidung, keine Messung.
+- **Auf den Server** („ja auf den server damit"). Freigabeliste `['datenraum', 'lage_profil']`.
+
+**Der Rechenkern bleibt sauber.** `zielKaufpreis()` liest **keine** Einstellungen — die Zielrendite
+kommt als Parameter:
+
+```js
+var kpForBmr = nkmYear / (zielBmr / 100);     // vorher: nkmYear / 0.06
+```
+
+> **Warum nicht aus den Einstellungen lesen:** der Kern wird wörtlich ins Backend-Image
+> gespiegelt und läuft dort ohne Browser, ohne localStorage, ohne angemeldeten Nutzer. Ein Kern,
+> der sich seine Eingaben selbst holt, ist dort nicht mehr derselbe Kern. Fehlt `zielBmr`,
+> gilt der Rückfall 6 % — der Telegram-Bot rechnet unverändert weiter.
+
+Geprüft wird überall auf **Abwesenheit**: `Number(null)` ist 0 und besteht `isFinite`. Mit
+`||`-Rückfall hätte eine 0 die 6 % ersetzt und durch null geteilt.
+
+#### C · Die Kette, am lebenden Quick-Check nachgemessen
+
+```
+Objekt 180.000 EUR, 950 EUR Kaltmiete  ->  Bruttomietrendite 6,33 %
+
+ohne Lageklasse   "Kauf moeglich - genauer pruefen"
+                  "der Preis ist nicht das Problem"        (Ziel 6 %)
+
+mit C-Lage        "Kauf moeglich - verhandeln noetig"
+                  "Bei einem Kaufpreis von 162.857 EUR
+                   (10% Nachlass = 17.143 EUR weniger)"    (Ziel 7 %)
+
+Handrechnung      11.400 / 0,07 = 162.857 EUR              stimmt
+```
+
+**Der Lauf kostet nichts:** der eigenständige Quick-Check hat kein Elternfenster, das auf die
+KI-Anfrage hört — `qc-ai-bridge.js` liegt nur in der Haupt-App.
+
+**Server-Rundlauf gemessen:** lokal `4,25` gesetzt → vom Server zurückgelesen `A=4.25` mit
+Zeitstempel.
+
+#### D · v1957a · Eine Kurzschrift mit !important schlug die Einzeleigenschaft
+
+Das Pflichtfeld sollte golden umrandet sein und blieb grau. **Die Regel griff** —
+`font-weight: 600` aus derselben Regel kam an. Nur `border-color` nicht.
+
+Der Grund steht 2400 Zeilen weiter unten:
+
+```css
+.set-modal-v2 input[type="number"], ... {
+  border: 1px solid var(--border) !important;
+}
+```
+
+> **Eine KURZSCHRIFT mit `!important`.** Sie schlägt eine Einzeleigenschaft ohne `!important`
+> unabhängig von der Spezifität — und sie schlägt sogar einen **inline** gesetzten Wert ohne
+> `!important`. Die bekannte Notiz „Inline-!important schlägt alles" gilt hier in der Umkehrung.
+
+**Genau das hat die Fehlersuche gekostet:** der Inline-Versuch blieb grau, was zuerst wie ein
+ungültiges `color-mix()` aussah. Die Gegenprobe auf einem frischen Element lieferte dasselbe
+`color-mix()` sauber als `color(srgb 0.788 0.659 0.298 / 0.55)` — es lag nicht am Wert.
+
+#### E · style.css trägt ein defektes Byte
+
+Gemessen: **genau ein Byte**, das kein gültiges UTF-8 ist (Zeile 32944, in einem Kommentar). Ein
+Schreibvorgang als UTF-8 hätte es still ersetzt — eine Änderung an einer Stelle, die mit dem
+Paket nichts zu tun hat.
+
+> Deshalb wird `style.css` **byteweise** behandelt: latin1 lesen und schreiben (nachweislich
+> verlustfrei), und der eingefügte Text enthält **nur ASCII**. Ein Unicode-Zeichen würde beim
+> latin1-Schreiben zu einem Fragezeichen. Nach dem Schreiben gegengelesen: das Byte ist
+> unverändert da.
+
+#### F · Drei eigene Fehlzählungen, alle vor dem Schreiben gefangen
+
+> Rückfall-Konstante **3x statt 4x** · CSS-Blöcke **14 statt 11** (die Media-Queries und ihre
+> inneren Regeln vergessen) · Kommentar-Tiefenscanner meldete `settings.js` als kaputt — gegen
+> `HEAD` geprüft, dort schon vorher 4/5, der Scanner versteht keine Zeichenketten. Er vergleicht
+> jetzt **vorher gegen nachher** statt einen absoluten Wert zu fordern.
+
+**Offen aus dem Plan:** P2 (Speichern ins Objekt, Pille im Reiter Objekt, Zielrendite in die
+KI-Analyse) und P3 (Spalte und Sortierung, Filterpille, Schritt in der Ersteinrichtung).
+
 ### (84) 07.10.2026 — v1952 bis v1954a: Werbung als Bewegtbild, Bordkarte raus, zwei unlesbare Texte
 
 #### A · „und wo liegt mein video für die werbung?"
