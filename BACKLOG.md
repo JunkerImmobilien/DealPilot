@@ -36,7 +36,30 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N46 · ⚠ DER MAPPER MULTIPLIZIERT ZAHLEN MIT 10, 100 ODER 1000 (07.10.2026)
+### N46 · Der Mapper multiplizierte Zahlen mit 10, 100 oder 1000 (07.10.2026) — BEHOBEN v1962
+
+**N46-BEHOBEN · am echten Objekt nachgemessen, derselbe Lauf vor und nach der Reparatur:**
+
+```
+vorher   Vergleich 199.000 / Sachwert 1.717.808 / Ertrag 130.000
+nachher  Vergleich 199.000 / Sachwert   138.463 / Ertrag 130.000
+```
+
+Der Sachwert liegt jetzt in derselben Größenordnung wie Vergleichs- und Ertragswert — **die
+drei Verfahren klammern sich gegenseitig ein**, statt um Faktor 8,6 auseinanderzulaufen. Genau
+der Zustand, den Marcel beschreibt: „die Wahrheit wird wohl dazwischen liegen."
+
+17 Proben gegen die echte reparierte Funktion, alle grün.
+
+**Zweiter Fund beim Aufräumen:** `mandanten.js:645` trug einen **unmaskierten** Punkt im
+regulären Ausdruck — er trifft damit jedes Zeichen, `kpN` war immer `NaN`, und der Kaufpreis
+erschien in der Mandantenliste **nie**. Gemessen mit „180000", „180.000" und „1.234,56":
+dreimal `NaN`. Ebenfalls behoben.
+
+> **Noch offen:** die 25 Objekte mit Punkt-Dezimalzahlen tragen weiterhin falsch gerechnete
+> `_kpis_*`-Schnappschüsse aus früheren Läufen. Die werden beim nächsten Speichern neu gesetzt —
+> **ein Lauf über den Bestand wäre ehrlicher als zu warten.**
+
 
 **Gefunden beim Auslösen einer Stufe-3-Wertermittlung an echten Objekten** (N44). Der Lauf
 ergab für eine **100-m²-Eigentumswohnung einen Sachwert von 1.717.808 €** — das 8,6-fache des
