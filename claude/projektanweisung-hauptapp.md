@@ -31908,6 +31908,109 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (73) 07.10.2026 — v1935 bis v1938: ein Defekt zum zweiten Mal, und der Bot wird vollständig
+
+#### A · „Einstellungen kann man nicht anklicken" — wortgleich zum 28.09.
+
+**Marcel:** „wenn ich Objektkarten umstelle, dann gehe ich einmal auf Portfolio … stelle das
+wieder um auf Aktionen und dann kann ich Einstellungen nicht mehr anklicken."
+
+Seinen Weg nachgestellt (Einstellungen auf, Kartenstil per Knopf, zu, Portfolio, zurück),
+387 px:
+
+```
+.sb-act-item                 pointer-events=none
+.sb-actions-accordion-inner  pointer-events=none
+#sb-actions-accordion        pointer-events=none   <- Quelle
+#sidebar                     pointer-events=auto
+```
+
+**Betroffen war jede der elf Aktionen, nicht nur Einstellungen** — die Kinder erben
+`pointer-events`. Und v1649 hat genau das am **28.09.2026 schon behoben**, mit dem Anker
+`.dpl-schiene`.
+
+> **Eine Reparatur erbt den Anker, an dem sie geschrieben wurde.** `.dpl-schiene` gibt es nur am
+> Schreibtisch; auf dem Handy liegt dieselbe Liste in `aside#sidebar`, und dort lief der Defekt
+> **neun Tage** weiter. Beide Male hat Marcel ihn gefunden, nicht die Prüfstrecke. Wer eine
+> Fassung klont, muss jede Reparatur daran prüfen, die vor dem Klon geschrieben wurde.
+
+#### B · 44 px Mindestmaß (v1935 B)
+
+Marcel auf die Frage, in welche Richtung angeglichen wird: **„ja 44 ist gut. so machen."**
+Angeglichen wird **nach oben** — Ampel 28 → 44, Minimal 32 → 44.
+
+> **Eine Mindesthöhe ist keine Gestaltung, sondern eine Trefferfläche.** Wer zwei Fassungen
+> angleicht, nimmt die größere; sonst tauscht er Einheitlichkeit gegen Bedienbarkeit.
+
+`min-height` statt `height`, damit Kennzahlen seine 145 px behält. Abnahme am Schreibtisch: alle
+sieben Stile ≥ 44 px, Score und Knöpfe überall 0 px.
+
+#### C · Portfolio-Strategie an den Link (v1935c–e)
+
+Marcel: „kannst du erst mal aus Ansichten rausnehmen … über einen Link oder sowas erreichen.
+Dann verfälscht das erst mal das Bild nicht."
+
+Der Eintrag ist weg (10 statt 11 Aktionen), das Modul vollständig erreichbar über **`?strategie`**
+in der Adresse. Die Feature-Sperre bleibt unberührt — ein Link ersetzt den Knopf, nicht die
+Berechtigung. Gewartet wird auf `dp:plan-ready`, nicht auf einen Timer.
+
+**Zwei Fehlversuche auf dem Weg, beide lehrreich:**
+
+> **Ein inline-Stil auf einem Element, das ein fremdes Modul gestaltet, hält nicht.** Der erste
+> Versuch stand als `style="display:none"` im HTML; gemessen trug der Knopf danach
+> `style="border-radius: 10px !important"` — ein Skript hatte das Attribut neu gesetzt und den
+> Wert mitgenommen. Was bleiben soll, gehört in eine Regel.
+
+> **Und dann verlor die Regel mit 20 gegen 21.** `aside.sidebar .sb-act-item` ist um genau einen
+> Punkt stärker. Die Doppelklasse hebt auf 30, ohne einen Ortsanker zu brauchen.
+
+#### D · Der Telegram-Bot wird vollständig (v1935–v1938, Bot-Strang)
+
+**Marcel:** „wenn ich verhandeln soll, aber unten steht, brauchst du nicht viel
+Verhandlungsspielraum, das schließt sich gegenseitig aus."
+
+**Er hat keinen Ausreißer erwischt.** Das Urteil hing allein am **Score**, der Rat darunter am
+**Preis**. Gitter aus 15.150 Fällen: **990 Fälle (6,5 %)**, und sie betreffen die ganze Spanne
+60–74.
+
+> **„Verhandeln" ist eine Handlungsanweisung an den Preis.** Wo der Preis kein Hebel ist, ist sie
+> keine Empfehlung, sondern eine Aufforderung ins Leere.
+
+Jetzt: mit Preishebel `VERHANDELN`, ohne ihn `PRUEFEN`. **Schwellen und Score unverändert.**
+Abgrenzungsnachweis über 54.540 Fälle: 3.735 erwartete Änderungen, **0 unerwartete**.
+
+**Die Heuristik war zu zwei Fünfteln da.** Es fehlten der Stufensatz, die Ampel zu sieben
+Kennzahlen und die Skalen der fünf Kategorien — alles lag als Zeichencode in `quick-check.js`.
+
+> **Ein Teil der Heuristik sieht aus wie die Heuristik.** Wer nur das Urteil weitergibt, gibt die
+> Begründung nicht weiter — und genau die wollte der Nutzer.
+
+Liegt jetzt in `qc-heuristik.js`, und `quick-check.js` liest von dort. Eine Quelle.
+
+**Die Marktpreisindikation ist drin** — `avm_valuations` plus `svwert`/`bankval`, jede Quelle mit
+Datum und Herkunft. **Der Marktbericht wurde bewusst weggelassen: er kostet Guthaben**, und ihn
+nebenbei zu ziehen, weil jemand nach dem Score fragt, wäre ein Abruf ohne Freigabe. Die
+Abweichung rechnet der Code, nicht die KI (fünftes Prompt-Verbot).
+
+> **Ein Verbot ohne Prüfer ist eine Bitte.** `avm_valuations.provider` führt wörtlich einen
+> Anbieternamen; die Anbieter-Neutralität wird jetzt **aktiv geprüft** — taucht der Name im
+> Ergebnis oder im KI-Text auf, ist das ein Fehler.
+
+**Ein vierter Fehler beim Nachmessen gefunden (v1938):** „entfällt — kein Darlehen" und zwei
+Zeilen darunter „LTV 0 %", in derselben Antwort.
+
+> **Ein Befund ist erst behoben, wenn er an JEDER Stelle behoben ist, die dieselbe Zahl
+> anzeigt.** Das ist derselbe Fehler wie v1927a, eine Ebene weiter: beim Verschieben des Codes
+> ist die Beziehung „diese Zahl gilt nur unter dieser Bedingung" nicht mitgewandert. Die falsche
+> Hälfte sieht genauso sorgfältig aus wie die richtige.
+
+**Offen und bei Marcel, nicht im Code:**
+1. Die Pille zeigt jetzt bei manchen Objekten **PRUEFEN** — ein fünftes Wort in einer Kette, die
+   er kennt.
+2. Die Hermannstraße bekommt **KAUFEN bei 22 % über dem Marktwert**. Kein Widerspruch in der
+   Antwort (die KI benennt es), aber die Heuristik selbst kennt den Marktwert nicht. Ob er in die
+   Kaufempfehlung einfließen soll, ist eine **Bewertungsfrage**.
+
 ### (72) 07.10.2026 — v1932 bis v1934: die Partikel, der zurückgenommene Kopf und die sieben Kartenstile
 
 **Der teuerste Tag dieser Chronik, und die Schuld liegt bei der Messung, nicht beim Nutzer.**
