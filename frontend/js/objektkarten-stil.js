@@ -68,16 +68,65 @@
 
   var aktuell = '';
 
+  /* ══ v1949 · DIE WAHL GILT JETZT AUCH IN DER ANSICHT DEALPILOT ═══════
+     Marcel am 07.10.2026: "wenn ich die Objektkarten umstelle, das geht
+     in der Ansicht Heute … das greift gar nicht. Also man kann das
+     umstellen, aber es bleibt weiterhin bei diesen Objektkarteien, die
+     wir standardmaessig haben."
+
+     GEMESSEN am 07.10.2026 in der Messkabine, alle sieben Stile ueber den
+     Panel-Bedienweg durchgeklickt: data-dp-objkarte blieb jedes Mal null,
+     die Karte jedes Mal 344x211. Die Ursache stand eine Zeile weiter
+     unten in setze():
+
+         if (aktuell && layoutAktiv()) h.setAttribute(ATTR, aktuell);
+
+     v1940 hat 49 CSS-Regeln auf html:not([data-dp-layout])
+     [data-dp-objkarte="…"] geklont - fuer einen Zustand, den dieses JS
+     sich weigerte herzustellen. Die Regeln sind richtig und waren nie
+     erreichbar. Ein Stil, der an einem Attribut haengt, ist nur so weit
+     gebaut wie der Schreiber dieses Attributs.
+
+     > WARUM DIE BEDINGUNG DOCH NICHT EINFACH WEGFAELLT: ohne eigene Wahl
+     > gilt seit v1915 die Bordkarte (Marcels Entscheidung vom 06.10. fuer
+     > die Aktenmappe). Haette ich layoutAktiv() nur gestrichen, bekaeme
+     > JEDER, der nie etwas gewaehlt hat, ploetzlich Bordkarten in der
+     > DealPilot-Ansicht - ein Umbau, den niemand bestellt hat. Deshalb
+     > sind EIGENE WAHL und RUECKFALL ab hier zwei verschiedene Dinge:
+     >
+     >   eigene Wahl  ->  gilt ueberall, auch ohne Layout
+     >   Rueckfall    ->  Bordkarte nur in den Mappen, sonst Aktenreiter
+
+     gewaehlt === null heisst "hat sich nie entschieden". Geprueft wird
+     auf ABWESENHEIT, nicht auf den Wahrheitswert - wer sich bewusst fuer
+     den Aktenreiter entscheidet, speichert die leere Zeichenkette, und
+     das ist eine Wahl.
+     ══════════════════════════════════════════════════════════════════ */
+  var gewaehlt = null;
+
   function layoutAktiv() {
     return document.documentElement.hasAttribute('data-dp-layout');
   }
 
+  /* Was gilt gerade — aus eigener Wahl oder Rueckfall. */
+  function effektiv() {
+    if (gewaehlt !== null) return gewaehlt;
+    return layoutAktiv() ? 'bordkarte' : '';
+  }
+
+  /* Eine eigene Wahl. Sie wird gemerkt UND angewandt. */
   function setze(stil) {
-    aktuell = (stil && STILE[stil]) ? stil : '';
+    gewaehlt = (stil && STILE[stil]) ? stil : '';
+    try { localStorage.setItem(LS, gewaehlt); } catch (e) {}
+    anwenden();
+  }
+
+  /* Das Attribut ans <html> — ohne Layout-Bedingung (v1949). */
+  function anwenden() {
+    aktuell = effektiv();
     var h = document.documentElement;
-    if (aktuell && layoutAktiv()) h.setAttribute(ATTR, aktuell);
+    if (aktuell) h.setAttribute(ATTR, aktuell);
     else h.removeAttribute(ATTR);
-    try { localStorage.setItem(LS, aktuell); } catch (e) {}
     wahlNachziehen();
   }
 
@@ -101,8 +150,13 @@
                    '</button>';
           }).join('') +
         '</div>' +
-        '<div class="dp-okw-fuss">Wirkt in der Aktenmappe — ' +
-        'die normale Ansicht bleibt, wie sie ist.</div>' +
+        /* v1949: der Fusstext sagte "Wirkt in der Aktenmappe - die
+           normale Ansicht bleibt, wie sie ist." Das stimmte, war aber
+           genau der Defekt. Ein Hinweis, der einen Fehler beschreibt,
+           laesst ihn wie eine Absicht aussehen. */
+        '<div class="dp-okw-fuss">Wirkt in allen Ansichten. Ohne eigene ' +
+        'Wahl zeigt die Aktenmappe die Bordkarte, die Ansicht DealPilot ' +
+        'den Aktenreiter.</div>' +
       '</div>';
     host.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('.dp-okw') : null;
@@ -152,8 +206,14 @@
     var hatMerker = false;
     try { hatMerker = localStorage.getItem(LS) !== null; } catch (e) {}
 
+    /* v1949: ohne Merker wird NICHTS gewaehlt - gewaehlt bleibt null, und
+       effektiv() entscheidet je Ansicht. Vorher stand hier
+       setze("bordkarte"), was den Rueckfall sofort als eigene Wahl in den
+       Speicher schrieb; danach war er nicht mehr von einer echten
+       Entscheidung zu unterscheiden. */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
-    else setze(hatMerker ? gemerkt : 'bordkarte');
+    else if (hatMerker) { gewaehlt = gemerkt; anwenden(); }
+    else anwenden();
 
     /* v1715: der Merker des alten Schwebefensters wird abgeräumt. Wer ihn
        noch trägt, bekäme sonst nie etwas zu sehen und wüsste nicht,
@@ -169,7 +229,7 @@
     /* Wechselt das Layout, wird neu entschieden: ohne Layout keine
        Schiene, und dann darf das Attribut nicht stehen bleiben. */
     if (window.MutationObserver) {
-      new MutationObserver(function () { setze(aktuell); })
+      new MutationObserver(function () { anwenden(); })
         .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dp-layout'] });
     }
   }
@@ -180,6 +240,10 @@
   window.DealPilotObjektkarte = {
     setze: setze,
     stile: STILE,
-    aktuell: function () { return aktuell; }
+    aktuell: function () { return aktuell; },
+    /* v1949: ein Pruefer soll die ECHTE Entscheidung lesen koennen,
+       nicht nur das Ergebnis. */
+    gewaehlt: function () { return gewaehlt; },
+    anwenden: anwenden
   };
 })();
