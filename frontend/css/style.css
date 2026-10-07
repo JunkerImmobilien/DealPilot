@@ -39196,6 +39196,9 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
    Bewusst OHNE Layout-Anker: der Eintrag soll in jeder Ansicht weg sein, nicht
    nur in der Aktenmappe. Zum Zurueckholen reicht es, diesen Block zu loeschen.
    ============================================================================== */
-.sb-act-item[data-feature="portfolio_strategie"] {
+/* v1935e: Die Doppelklasse hebt die Spezifitaet von 20 auf 30 und schlaegt damit
+   `aside.sidebar .sb-act-item` (21), ohne einen Ortsanker zu brauchen - der
+   Eintrag soll in JEDER Ansicht weg sein, nicht nur in der Schublade. */
+.sb-act-item.sb-act-item[data-feature="portfolio_strategie"] {
   display: none !important;
 }
