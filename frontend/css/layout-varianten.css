@@ -8787,3 +8787,316 @@ html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-btn {
 html[data-dp-layout][data-dp-layout] body .dpl-schiene #sb-list .sb-card {
   min-height: 44px !important;
 }
+
+/* ==============================================================================
+   v1940 - DIE OBJEKTKARTEN-STILE GELTEN JETZT AUCH IN DER ANSICHT DEALPILOT
+
+   Marcel am 07.10.2026: "wenn ich die Objektkarten umstelle, das geht in der
+   Ansicht Heute, die ja jetzt bald DealPilot heissen soll, das greift gar
+   nicht. Also man kann das umstellen, aber es bleibt weiterhin bei diesen
+   Objektkarteien, die wir standardmaessig haben."
+
+   GEMESSEN, Schreibtisch, Ansicht ohne Layout-Attribut: von 112 Regeln der
+   sieben Stile greift dort **null**.
+
+     53 Regeln mit `.dpl-schiene`    - die gibt es nur in den drei Mappen
+     59 Regeln mit `aside#sidebar`   - alle in @media (max-width: 900px)
+
+   > Ein erster Messlauf zeigte je Stil andere Kartenhoehen und sah damit nach
+   > "greift teilweise" aus. Der Gegencheck, welche Regeln wirklich auf das
+   > Element passen, ergab null. **Ein Unterschied beweist keine Ursache.**
+
+   Hier stehen dieselben Regeln noch einmal mit einem Anker, der in der
+   Ansicht ohne Layout traegt. Erzeugt wurde der Block von einem Generator aus
+   dem Schienen-Block darueber, nicht von Hand - acht Entwuerfe von Hand zu
+   kopieren waere acht Gelegenheiten, eine Zeile zu verlieren.
+
+   > `:not([data-dp-layout])` schliesst die drei Mappen aus, damit sich die
+   > beiden Saetze nicht ins Gehege kommen. `:is(#sb-list)` bringt die 100
+   > Punkte, die es gegen die Grundregeln der Sidebar braucht - derselbe Grund
+   > wie im Block darueber (v1711b).
+   ============================================================================== */
+html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card {
+  padding:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-seq {
+  position:absolute !important;
+  top:0 !important;
+  bottom:0 !important;
+  left:0 !important;
+  right:auto !important;
+  width:16px !important;
+  max-width:16px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  writing-mode:vertical-rl !important;
+  border-radius:5px 0 0 5px !important;
+  border:0 !important;
+  border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important;
+  background:transparent !important;
+  font-size:7.5px !important;
+  letter-spacing:.14em !important;
+  padding:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-top {
+  border-radius:0 5px 5px 0 !important;
+  margin-left:16px !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-investor-ribbon {
+  top:auto !important;
+  bottom:4px !important;
+  right:4px !important;
+  border-radius:3px !important;
+  font-size:7.5px !important;
+  border-bottom:1px solid !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card .sbc-top {
+  border:0 !important;
+  border-left:3px solid var(--wl-c9a84c, #C9A84C) !important;
+  border-radius:0 4px 4px 0 !important;
+  background-color:#17160F !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card.deal-won .sbc-top {
+  border-left-color:#3FA56C !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card.deal-lost .sbc-top {
+  border-left-color:#B8625C !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card .sbc-score-overlay {
+  display:none !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card .sbc-top-body {
+  padding-right:6px !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card .sbc-seq {
+  border:0 !important;
+  background:transparent !important;
+  padding:1px 0 1px 8px !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card {
+  padding:0 !important;
+  margin-bottom:1px !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card .sbc-seq {
+  position:static !important;
+  display:inline-block !important;
+  border:0 !important;
+  background:transparent !important;
+  padding:0 !important;
+  margin:0 !important;
+  font-size:9px !important;
+  width:auto !important;
+  max-width:none !important;
+  flex:0 0 auto !important;
+  padding-right:8px !important;
+  vertical-align:middle !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card .sbc-top {
+  border:0 !important;
+  border-radius:3px !important;
+  background-color:transparent !important;
+  padding:4px 7px !important;
+  align-items:center !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card:hover .sbc-top {
+  background-color:#1A1815 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card.active .sbc-top {
+  background-color:#221F1A !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card .sbc-address {
+  font-family:var(--dpl-mono, 'JetBrains Mono', monospace) !important;
+  font-size:11px !important;
+  font-weight:400 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card .sbc-kp-row {
+  display:none !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card .sbc-investor-ribbon {
+  display:none !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="datenzeile"] :is(#sb-list) .sb-card .sbc-top-line1 {
+  display:inline-block !important;
+  width:auto !important;
+  vertical-align:middle !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card {
+  padding:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card .sbc-top {
+  border:0 !important;
+  border-radius:4px !important;
+  background-color:transparent !important;
+  padding:6px 8px 6px 20px !important;
+  position:relative !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card:hover .sbc-top {
+  background-color:#1A1815 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card.active .sbc-top {
+  background-color:#221F1A !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card .sbc-top::before {
+  content:'' !important;
+  position:absolute !important;
+  left:7px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  width:8px !important;
+  height:8px !important;
+  border-radius:50% !important;
+  background:var(--wl-c9a84c, #C9A84C) !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card.deal-won .sbc-top::before {
+  background:#3FA56C !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card.deal-lost .sbc-top::before {
+  background:#B8625C !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card .sbc-seq,
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card .sbc-investor-ribbon,
+html:not([data-dp-layout])[data-dp-objkarte="ampel"] :is(#sb-list) .sb-card .sbc-kp-row {
+  display:none !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card .sbc-mini-grid {
+  display:flex !important;
+  gap:7px !important;
+  padding:0 9px 7px !important;
+  margin:-1px 0 0 !important;
+  border:1px solid var(--wl-8a7332, #8a7332) !important;
+  border-top:0 !important;
+  border-radius:0 0 5px 5px !important;
+  background-color:#17160F !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card.deal-won .sbc-mini-grid {
+  border-color:#3FA56C !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card.deal-lost .sbc-mini-grid {
+  border-color:#B8625C !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card .sbcm {
+  flex:1 1 0 !important;
+  min-width:0 !important;
+  font-size:9px !important;
+  display:block !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card .sbc-top {
+  border-radius:0 5px 0 0 !important;
+  border-bottom:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card {
+  padding:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card .sbc-top {
+  border:0 !important;
+  border-radius:4px !important;
+  background-color:transparent !important;
+  padding:8px 9px !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card:hover .sbc-top {
+  background-color:#1A1815 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card.active .sbc-top {
+  background-color:#221F1A !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card .sbc-seq,
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card .sbc-investor-ribbon,
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card .sbc-kp-row {
+  display:none !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="minimal"] :is(#sb-list) .sb-card .sbc-address {
+  font-weight:500 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="status"] :is(#sb-list) .sb-card .sbc-seq {
+  font-size:7.5px !important;
+  letter-spacing:.12em !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="status"] :is(#sb-list) .sb-card .sbc-seq {
+  font-size:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="status"] :is(#sb-list) .sb-card .sbc-seq::after {
+  content:'IN ARBEIT' !important;
+  font-size:9px !important;
+  letter-spacing:.1em !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="status"] :is(#sb-list) .sb-card.deal-won .sbc-seq::after {
+  content:'GEWONNEN' !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="status"] :is(#sb-list) .sb-card.deal-lost .sbc-seq::after {
+  content:'VERLOREN' !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="cockpit"] :is(#sb-list) .sb-card .sbc-score-overlay {
+  left:9px !important;
+  right:auto !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="cockpit"] :is(#sb-list) .sb-card .sbc-mini-score {
+  border:1px solid var(--wl-3a352e, #3A352E) !important;
+  border-top-color:currentColor !important;
+  border-radius:50% !important;
+  background:#0B0A08 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="cockpit"] :is(#sb-list) .sb-card .sbc-top-body {
+  padding-left:32px !important;
+  padding-right:6px !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="cockpit"] :is(#sb-list) .sb-card .sbc-seq {
+  left:auto !important;
+  right:0 !important;
+  border-radius:3px 3px 0 0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte="cockpit"] :is(#sb-list) .sb-card .sbc-investor-ribbon {
+  right:auto !important;
+  left:0 !important;
+}
+
+html:not([data-dp-layout])[data-dp-objkarte] :is(#sb-list) .sb-card .sbc-investor-ribbon {
+  display:none !important;
+}

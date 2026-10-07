@@ -1096,6 +1096,32 @@
   });
 
   /* ── Setzen ─────────────────────────────────────────────────────── */
+  /* ── v1941 · DIE ERSTE KACHEL HEISST NACH DER MARKE ──────────────────
+     Marcel am 07.10.2026: "Erstmal wuerde ich die gerne umbenennen, dass die
+     nicht mehr Heute heisst, sondern dass die DealPilot heisst."
+
+     "Heute" war der Auslieferungszustand - ein Wort fuer "unveraendert". Als
+     Name neben Aktenmappe, Kanzlei und Tower liest es sich aber wie eine
+     Zeitangabe, nicht wie eine Ansicht.
+
+     > **Der Name wird gelesen, nicht gesetzt.** "DealPilot" fest einzutragen
+     > waere beim Whitelabel-Mandanten falsch - dort heisst die App anders
+     > (`brand_name` in `mandant-branding.js`). Deshalb fragt dieser Helfer
+     > zuerst die Marke und faellt erst dann auf DealPilot zurueck. */
+  function markenName() {
+    try {
+      var b = window.DealPilotConfig && window.DealPilotConfig.branding;
+      var g = b && typeof b.get === 'function' ? b.get() : null;
+      if (g && g.brand_name) return String(g.brand_name);
+    } catch (e) {}
+    try {
+      var wm = document.querySelector('.dpl-wm, .mt-title');
+      var t = wm && (wm.textContent || '').trim();
+      if (t) return t;
+    } catch (e) {}
+    return 'DealPilot';
+  }
+
   function setze(v) {
     v = String(v || '');
     /* v1666: `v1` gibt es nicht mehr — wer es gemerkt hat, bekommt die
@@ -1293,7 +1319,7 @@
       b.addEventListener('click', function () { setze(wert); });
       leiste.appendChild(b);
     };
-    mach('', 'Heute');
+    mach('', markenName());   /* v1941: war 'Heute' */
     Object.keys(LAYOUTS).forEach(function (k, i) { mach(k, (i + 1) + ' · ' + LAYOUTS[k].name); });
     var zu = document.createElement('button');
     zu.type = 'button'; zu.className = 'dpl-schalter-zu'; zu.textContent = '×';
@@ -1431,7 +1457,7 @@
        Namen — die Nummer half niemandem und stand zwischen ihm und dem
        Wort, das er sucht. Eine Reihenfolge braucht keine Nummer, wenn
        die Reihenfolge schon sichtbar ist. */
-    var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
+    var kacheln = [{ key: '', name: markenName(), sub: 'Unveränderte Ansicht' }].concat(
       /* ── v1892 · DIE AUSBLENDUNG AUS v1880 IST ZURUECKGENOMMEN ──────
          Hier stand `.filter(k => k === 'v1b')` mit dem Vermerk „nur
          Heute und Aktenmappe zur Wahl; Kanzlei und Tower bleiben im
@@ -1558,7 +1584,7 @@
     if (!host || host.getAttribute('data-gefuellt') === '1') return;
     host.setAttribute('data-gefuellt', '1');
 
-    var kacheln = [{ key: '', name: 'Heute', sub: 'Unveränderte Ansicht' }].concat(
+    var kacheln = [{ key: '', name: markenName(), sub: 'Unveränderte Ansicht' }].concat(
       /* v1892 · Zweite Stelle derselben Ausblendung - zurueckgenommen wie
          oben in `inPanel()`. Marcel am 06.10.2026 will Tower und Kanzlei
          zurueck in der Wahl. */

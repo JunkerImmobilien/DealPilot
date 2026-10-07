@@ -2258,3 +2258,60 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
   box-shadow: 0 0 0 2px rgba(63,165,108,.25), 0 0 10px 1px rgba(63,165,108,.9) !important;
   opacity: 1 !important;
 }
+
+/* ==============================================================================
+   v1941 - DIE QUELLEN-LEISTE BRICHT UM, STATT WAAGERECHT ZU SCROLLEN
+
+   Marcel am 07.10.2026: "Also auf der Desktop-Ansicht hat man da zum Beispiel
+   eine horizontale Scrollbar. Das moechte ich nicht. … wenn die in der
+   Handy-Ansicht sind, dann sind die Buttons manchmal zu gross. … vielleicht
+   anders rendern untereinander und auch huebscher darstellen."
+
+   GEMESSEN, Schreibtisch 1177 px, Breite von `#oab-bar` gegen den Platz:
+
+     Automatisch   1267 > 753    Ueberlauf
+     Zeile         1267 > 753    Ueberlauf
+     Buetten       1409 > 753    Ueberlauf
+     Kartei         751 = 751    ok
+     Bordkarte      ok
+     Trichter       ok
+
+   Drei von sechs Stilen schoben die Kacheln aus der Flaeche. Das Wischen war
+   fuer das Handy gedacht; am Schreibtisch wird daraus eine Scrollleiste, die
+   niemand sucht - und was rechts draussen steht, findet man dort auch nicht.
+
+   > **Eine Flaeche, die mehr tragen soll, als sie breit ist, hat zwei
+   > Antworten: schieben oder umbrechen.** Schieben versteckt; Umbrechen zeigt.
+   > Bei fuenf Kacheln, die alle gleich wichtig sind, ist Verstecken die
+   > falsche.
+
+   Auf dem Handy stehen sie dadurch untereinander statt nebeneinander - jede
+   ueber die volle Breite, mit 44 px Mindesthoehe fuer den Finger (dasselbe
+   Mass wie bei den Objektkarten in v1935).
+   ============================================================================== */
+
+/* Umbrechen statt schieben - auf jeder Breite. */
+.dp-pf-scroll,
+.dp-pf-scroll .dp-pfbar,
+#oab-bar.dp-pfbar {
+  overflow-x: visible !important;
+  flex-wrap: wrap !important;
+}
+
+/* Auf dem Handy untereinander, volle Breite, fingergerecht. */
+@media (max-width: 900px) {
+  #oab-bar.dp-pfbar,
+  .dp-pf-scroll .dp-pfbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+  #oab-bar.dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll .dp-pfbar .dp-pf-tile {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 44px !important;
+    flex: 0 0 auto !important;
+    justify-content: flex-start !important;
+  }
+}

@@ -760,8 +760,22 @@
   function setzen() {
     var bar = leiste();
     if (!bar) return;
-    /* Nur in der Kartei - in der Bordkarte ist kein Platz dafuer. */
-    var an = document.documentElement.getAttribute('data-dp-kartenstil') === 'kartei';
+    /* ── v1941 · DIE KACHEL IST RAUS ──────────────────────────────────
+       Marcel am 07.10.2026: "Dann hatte ich aber bei dem einen irgendwie noch
+       was drauf mit CoPilot. Das passt gar nicht."
+
+       Sie erschien nur in der Kartei und nur dort - ein sechster Knopf in
+       einer Reihe, die fuer fuenf gebaut ist.
+
+       > **Keine Funktion faellt mit.** Dieser Knopf war eine Abkuerzung fuer
+       > drei Schritte, die alle als eigene Kachel dastehen: "Sprache"
+       > anwaehlen, den Abruf ausloesen, im Fenster "Gefuehrte Eingabe"
+       > waehlen. Gemessen in derselben Leiste: beide Kacheln sind da.
+       > `starten()` bleibt erhalten und bleibt aufrufbar.
+
+       Zum Zurueckholen reicht es, `false` wieder durch die Stilpruefung zu
+       ersetzen. */
+    var an = false;   /* v1941: war `… === 'kartei'` */
     var da = bar.querySelector('#' + KACHEL_ID);
     if (!an) { if (da) da.remove(); return; }
     if (da) return;
