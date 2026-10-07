@@ -9134,3 +9134,41 @@ html:not([data-dp-layout])[data-dp-objkarte] :is(#sb-list) .sb-card .sbc-mini-gr
 html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card .sbc-mini-grid {
   display: flex !important;
 }
+
+/* ==============================================================================
+   v1943 - SCORE UND KNOEPFE MITTIG, AUCH IN DER DEALPILOT-ANSICHT
+
+   Marcel am 07.10.2026: "Den score und die schaltflaechen fuer duplizieren und
+   loeschen muessen immer mittig angeordnet sein." - IMMER.
+
+   v1928 und v1935 haben das hergestellt, aber an den Ankern der drei Mappen
+   (`.dpl-schiene` und `aside#sidebar` unter `[data-dp-layout]`). In der
+   Ansicht ohne Layout galt weiter, was in `style.css` steht:
+
+     ![31] top: 38px  <- .sbc-score-overlay
+     ![31] top:  6px  <- .sbc-actions
+
+   GEMESSEN, Handy 390 px, Abstand zur Kartenmitte:
+
+     Aktenreiter   87 px zu tief      Datenzeile   0 px
+     Bordkarte     30 px              Ampel        0 px
+     Score-Kante   42 px              Minimal      0 px
+     Kennzahlen    77 px
+
+   > **Zum dritten Mal heute dieselbe Form: eine Reparatur erbt den Anker, an
+   > dem sie geschrieben wurde.** v1935 hat den pointer-events-Defekt von der
+   > Schiene in die Schublade nachgezogen, v1940 die Kartenstile - und die
+   > Mitte blieb beide Male liegen, weil sie in einem anderen Paket stand.
+   > Wer eine Ansicht neu erschliesst, muss die Liste der Reparaturen durchgehen,
+   > nicht nur die Regeln, an die er gerade denkt.
+
+   Dieselbe Rechnung wie in v1928: die Mitte rechnet sich selbst aus und gilt
+   damit fuer jede Hoehe - auch fuer die 212 px der Karten mit Kachelband.
+   ============================================================================== */
+html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay,
+html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
+  top: 50% !important;
+  bottom: auto !important;
+  height: auto !important;
+  transform: translateY(-50%) !important;
+}
