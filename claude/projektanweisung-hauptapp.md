@@ -31914,6 +31914,64 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (77) 07.10.2026 — v1944 bis v1946: die KI-Bewertung im Browser abgenommen, und zwei Nummern doppelt
+
+#### A · Die Abnahme, die der Bot-Lauf nicht machen konnte
+
+Die KI-Automatik feuert echte OpenAI-Aufrufe. Ob sie im laufenden iframe so sparsam ist wie im
+Prüfer, war offen. **Im echten Browser nachgemessen**, Zähler auf  und :
+
+```
+55 Zeichen in 12 Feldern getippt      sofort 0 Aufrufe, danach lief sie
+Kaufpreis 180000 → 195000 (6 Zeichen) sofort 0 · nach 4,5 s genau 1   ✓
+20× neu zeichnen ohne Wertänderung    0 Aufrufe   ✓
+Pflichtfeld geleert                   0 Aufrufe   ✓
+```
+
+**Die Ruhepause hält auch im Browser.** Und die Box zeigt am Ende genau das, was fehlte:
+
+```
+Marke  : DealPilot · KI-Analyse
+Urteil : Nur mit Nachbesserung tragfähig
+Score  : Score 56/100 (Solide)
+```
+
+Zum Vergleich Marcels Bild von heute früh: *„Vorsicht — überdenken · Score 56/100 (Solide) · zu
+schwach"*. Eine Note neben ihrem Gegenteil. Jetzt steht eine **Handlung** neben einer **Note** —
+die beiden dürfen nebeneinander stehen, zwei Noten nicht.
+
+> **Mein Zähler saß zuerst im falschen Dokument.** Ich habe ihn im Quick-Check-iframe gesetzt,
+> der Aufruf läuft aber über  in der HAUPT-App. Beide Zähler meldeten 0,
+> während die Automatik längst gelaufen war — sichtbar nur daran, dass die Box
+> „DealPilot · KI-Analyse" trug. **Ein Zähler, der nichts zählt, sieht aus wie ein Befund.**
+
+#### B · Marcel hatte recht und zugleich unrecht — beides gehört gesagt
+
+> Er hat **richtig gesehen, dass es nicht zusammenpasst**, und **falsch zugeordnet, welcher Teil
+> falsch ist.** „Kaufpreis 180.000 ist marktgerecht" war der einzige der drei Blöcke, der den
+> Marktwert kannte und richtig rechnete. Wären wir seiner Zuordnung gefolgt, hätten wir das
+> Richtige weggemacht.
+
+#### C · Zwei Nummern doppelt — der sechste Prozessunfall aus Parallelarbeit
+
+```
+f9c5e09a  v1946  Starter-Preis auf der Landing Page   (ich)
+97656e42  v1946  KI-Automatik                         (Bot-Lauf)
+1a60df21  v1945a Menü-Schließen, zweiter Schalter     (ich)
+0e567efd  v1945  ein Urteil, eine Quelle              (Bot-Lauf)
+fa94891f  v1945  Menü schließt in jeder Ansicht       (ich)
+```
+
+Beide Läufe haben sauber gearbeitet: erst , dann die nächste freie Nummer. **Genau das
+ist der Fehler** — zwischen Pull und Commit vergibt der andere dieselbe.
+
+> **Eine Nummer, die aus dem Repo-Stand abgeleitet wird, ist bei Parallelarbeit kein Schlüssel,
+> sondern eine Wette.** Inhaltlich bricht nichts (die Dateien sind disjunkt), aber die Chronik
+> führt zwei verschiedene Dinge unter einem Namen — und genau dafür ist die Nummer da.
+
+Vorschlag an Marcel: getrennte Nummernkreise je Strang, wie es CLAUDE.md für Haupt-App und
+Marktbericht schon vorsieht. Dritter Prozessunfall derselben Art heute.
+
 ### (76) 07.10.2026 — v1943: die Mitte war zum dritten Mal am falschen Anker
 
 **Beim Nachmessen der eigenen Arbeit gefunden, nicht von Marcel gemeldet.** Nach v1942 greifen die
