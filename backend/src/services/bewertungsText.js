@@ -123,7 +123,9 @@ function bauePrompt(e) {
   }
   /* v1937 · Die Marktpreisindikation. FERTIG gerechnet — die Abweichung in
      Prozent steht da, damit das Modell sie nicht bildet. */
-  zeile('Marktwert (Indikation)', e.marktwert);
+  zeile('Marktwert (Indikation, nach Abschlag)', e.marktwert);
+  zeile('  Marktwert laut Quelle (vor Abschlag)', e.marktwert_roh);
+  zeile('  Angebotsabschlag', e.angebotsabschlag);
   zeile('  Herkunft des Marktwerts', e.marktwert_herkunft);
   zeile('  Kaufpreis zum Marktwert', e.kaufpreis_zu_marktwert);
   zeile('  Marktmiete je Monat (Indikation)', e.marktmiete_monat);
@@ -173,6 +175,9 @@ function bauePrompt(e) {
     '  und eine selbst eingetragene Zahl sind drei verschiedene Dinge. Steht',
     '  kein Marktwert da, sagst du NICHTS darueber, ob der Preis marktgerecht',
     '  ist — du weisst es dann nicht.',
+    '· Steht ein Angebotsabschlag dabei, nenne ihn, wenn du den Marktwert',
+    '  erwaehnst. Er ist eine ANNAHME, keine Messung, und eine bereinigte',
+    '  Zahl ohne ihren Abschlag sieht aus wie eine gemessene.',
     '· Die Zahlenliste NICHT wiederholen. Sie steht im selben Chat direkt',
     '  ueber deinem Text. Nimm einzelne Zahlen nur auf, wo du sie brauchst.',
     '· Steht oben ein Vorbehalt, nimm ihn ernst und sage, in welche Richtung',

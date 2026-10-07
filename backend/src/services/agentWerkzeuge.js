@@ -1446,7 +1446,7 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
   const tag = (x) => { try { return new Date(x).toISOString().slice(0, 10); } catch (e) { return null; } };
 
   const quellen = [];
-  let leitwert = null, leitquelle = null;
+  let leitwert = null, leitquelle = null, leitart = null;
 
   try {
     const liste = await avmHistorie.listForObject(userId, objektId);
@@ -1455,11 +1455,21 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
       if (!Number.isFinite(w) || w <= 0) return;
       /* Der Anbietername wird NICHT durchgereicht. */
       const istAbruf = String(zz.provider || '').toLowerCase() !== 'manuell';
+      /* v1939 · DIE PREISART ENTSCHEIDET UEBER DEN ABSCHLAG.
+         GEMESSEN am 07.10.2026: `pricehubble-client.js` ruft `dealType:
+         'sale'` ab, also einen Marktwert — ob dahinter Angebots- oder
+         Transaktionsdaten stehen, sagt unser Code NICHT. Und was eine
+         Maklerschaetzung ist, steht im Etikett, nicht in der Zahl.
+         Beides ist damit `unbekannt`, und der Kern behandelt es nach
+         Marcels Vorgabe vorsichtshalber wie ein Angebot — mit dem Satz
+         dazu, dass die Art nicht feststellbar war. Geraten wird nichts. */
+      const preisart = 'unbekannt';
       const herkunft = istAbruf
         ? 'Abruf bei einem unabhaengigen Bewertungspartner'
         : ('manuell eingetragen' + (zz.source_label ? ' (' + zz.source_label + ')' : ''));
       const e = {
         wert: eur(w), herkunft: herkunft, stand: tag(zz.created_at),
+        preisart: preisart, _roh: w,
         spanne: (Number(zz.low) > 0 && Number(zz.high) > 0)
           ? eur(Number(zz.low)) + ' bis ' + eur(Number(zz.high)) : null,
         je_qm: Number(zz.eur_per_sqm) > 0 ? eur(Number(zz.eur_per_sqm)) + '/m²' : null,
@@ -1470,12 +1480,12 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
       quellen.push(e);
       /* Leitwert ist der JUENGSTE Abruf — nicht der hoechste und nicht der
          bequemste. `listForObject` sortiert bereits absteigend. */
-      if (leitwert == null && istAbruf) { leitwert = w; leitquelle = e; }
+      if (leitwert == null && istAbruf) { leitwert = w; leitquelle = e; leitart = preisart; }
     });
     /* Gibt es gar keinen Abruf, gilt der juengste manuelle Eintrag. */
     if (leitwert == null && quellen.length) {
       const erste = (liste || []).find((zz) => Number(zz.marktwert) > 0);
-      if (erste) { leitwert = Number(erste.marktwert); leitquelle = quellen[0]; }
+      if (erste) { leitwert = Number(erste.marktwert); leitquelle = quellen[0]; leitart = quellen[0].preisart; }
     }
   } catch (e) {
     return { fehler: 'Die Bewertungshistorie war nicht lesbar: ' + e.message };
@@ -1494,6 +1504,9 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
   if (leitwert == null && svw) {
     leitwert = svw;
     leitquelle = { wert: eur(svw), herkunft: 'am Objekt eingetragener Verkehrswert', stand: null };
+    /* v1939: ein VERKEHRSWERT ist bereits ein Wert und kein Angebot — hier
+       waere ein Abschlag eine zweite Minderung derselben Sache. */
+    leitart = 'wert';
   }
 
   if (!quellen.length && !eigene.length) {
@@ -1506,21 +1519,45 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
     };
   }
 
-  /* Die Abweichung wird HIER gerechnet. */
+  /* ── v1939 · DER ABSCHLAG KOMMT VOR DEM VERGLEICH ────────────────────
+   *
+   * Marcel am 07.10.2026: „Immer bedenken dass es angebotspreise sind und
+   * meistens 10 % dadrunter verkauft wird."
+   *
+   * Also wird der Marktwert BEREINIGT, bevor „der Kaufpreis liegt X %
+   * darueber" gebildet wird — sonst steht die Abweichung auf einer Zahl,
+   * von der Marcel sagt, dass sie zu hoch ist. Der Satz selbst steht in
+   * `qc-heuristik.js` (`ANGEBOTSABSCHLAG`), nicht hier: er ist eine
+   * Bewertungsvorgabe und gehoert an EINE Stelle.
+   *
+   *   > Ein Abschlag, den man nicht sieht, macht aus einer Annahme eine
+   *   > Messung. Deshalb steht er in jeder Zeile dabei.
+   *
+   * Der ROHE Wert bleibt sichtbar — wer die Quelle nachschlagen will,
+   * findet dort diese Zahl und nicht unsere. */
+  const bereinigt = leitwert ? rechenkerne.heuristikTeil('marktwertBereinigt', leitwert, leitart) : null;
   let vergleich = null;
-  if (leitwert && kp > 0) {
-    const diff = kp - leitwert;
-    const q = diff / leitwert * 100;
+  if (bereinigt && kp > 0) {
+    const basis = bereinigt.bereinigt;
+    const diff = kp - basis;
+    const q = diff / basis * 100;
     vergleich = {
       kaufpreis: eur(kp),
-      marktwert: eur(leitwert),
+      marktwert_laut_quelle: eur(bereinigt.roh),
+      angebotsabschlag: bereinigt.abschlag_pct > 0
+        ? (pct(bereinigt.abschlag_pct) + ' — ' + bereinigt.grund)
+        : ('kein Abschlag — ' + bereinigt.grund),
+      marktwert: eur(basis),
       unterschied: (diff >= 0 ? '+' : '-') + eur(Math.abs(diff)),
       kaufpreis_zu_marktwert: diff >= 0
         ? 'Kaufpreis liegt ' + pct(Math.abs(q)) + ' UEBER dem Marktwert'
         : 'Kaufpreis liegt ' + pct(Math.abs(q)) + ' UNTER dem Marktwert',
       grundlage: leitquelle
         ? (leitquelle.herkunft + (leitquelle.stand ? ', Stand ' + leitquelle.stand : ''))
-        : null
+        : null,
+      /* Fuer die Heuristik — nicht zum Anzeigen. */
+      _basis: basis,
+      _abschlag_grund: bereinigt.abschlag_pct > 0 ? bereinigt.grund : null
     };
   }
 
@@ -2060,11 +2097,27 @@ async function objekt_schnellblick(ctx, args) {
       bwk: bwkDa ? null : 'am Objekt ist keine Bewirtschaftung hinterlegt',
       ekr: (ek > 0) ? null : 'ohne eingesetztes Eigenkapital nicht berechenbar'
     };
+    /* ── v1939 · DIE MARKTPREISINDIKATION GEHOERT IN DIE HEURISTIK ───────
+     *
+     * Marcel am 07.10.2026: „Wenn es einen Preis gibt dann sollte man
+     * diesen auch mit in die heuristic bauen. Marktpreisindikation die
+     * daten mit in die heuristic uebergeben und mit score zusammen
+     * auswerten."
+     *
+     * Deshalb wird sie hier GELESEN, bevor die Heuristik laeuft — nicht
+     * erst danach fuer die KI. Der uebergebene Wert ist der BEREINIGTE
+     * (Angebotsabschlag schon drin, siehe `_marktpreisIndikation`), damit
+     * der Abschlag genau einmal wirkt. */
+    const mpiFrueh = await _marktpreisIndikation(ctx.userId, id, d, kp);
+    const marktBasis = (mpiFrueh && mpiFrueh.vergleich) ? mpiFrueh.vergleich._basis : null;
+    const marktGrund = (mpiFrueh && mpiFrueh.vergleich) ? mpiFrueh.vergleich._abschlag_grund : null;
+
     const H = K ? rechenkerne.heuristik({
       score: score, kp: kp, nkm: nkm + ze,
       bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
-      ekr: K.ekr, bewirtPctNkm: bwkQuote || 0
-    }) : null;
+      ekr: K.ekr, bewirtPctNkm: bwkQuote || 0,
+      marktwert: marktBasis, marktwert_grund: marktGrund
+    }, undefined, nichtAnwendbar) : null;
 
     bewertung = {
       dealpilot_score: score,
@@ -2173,8 +2226,11 @@ async function objekt_schnellblick(ctx, args) {
     /* ── v1937 · DIE MARKTPREISINDIKATION, WENN ES EINE GIBT ─────────────
      * Sie wird GELESEN, nicht abgerufen — ein Abruf kostet und braucht
      * eine Freigabe. Steht nichts da, steht das auch so im Ergebnis. */
-    bewertung.marktpreisindikation = await _marktpreisIndikation(ctx.userId, id, d, kp);
-    const mpi = bewertung.marktpreisindikation;
+    /* v1939: EIN Aufruf. Die Indikation wurde oben schon gelesen, weil die
+       Heuristik sie braucht — ein zweiter Lauf waere ein zweiter DB-Zugriff
+       und, schlimmer, eine zweite Zahl. */
+    bewertung.marktpreisindikation = mpiFrueh;
+    const mpi = mpiFrueh;
 
     const einordnung = await bewertungsText.einordnung({
       adresse: _adrVon(o),
@@ -2196,6 +2252,8 @@ async function objekt_schnellblick(ctx, args) {
          gerechnet und anbieterneutral. Die KI ordnet sie ein; die
          Abweichung in Prozent hat sie nicht selbst gebildet. */
       marktwert: (mpi && mpi.vergleich) ? mpi.vergleich.marktwert : null,
+      marktwert_roh: (mpi && mpi.vergleich) ? mpi.vergleich.marktwert_laut_quelle : null,
+      angebotsabschlag: (mpi && mpi.vergleich) ? mpi.vergleich.angebotsabschlag : null,
       marktwert_herkunft: (mpi && mpi.vergleich) ? mpi.vergleich.grundlage : null,
       kaufpreis_zu_marktwert: (mpi && mpi.vergleich) ? mpi.vergleich.kaufpreis_zu_marktwert : null,
       marktmiete_monat: (mpi && mpi.quellen)

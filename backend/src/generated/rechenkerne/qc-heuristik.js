@@ -66,6 +66,93 @@ window.QcHeuristik = (function () {
      verschieben waere eine Produktaenderung ohne Ansage. */
   var SCHWELLE = { kaufen: 75, verhandeln: 60, kritisch: 40 };
 
+  /* ── v1939 · DER ANGEBOTSABSCHLAG ───────────────────────────────────────
+   *
+   * Marcel am 07.10.2026, als Bewertungsvorgabe:
+   *
+   *   „Immer bedenken dass es angebotspreise sind und meistens 10 %
+   *    dadrunter verkauft wird."
+   *
+   * Er ist DESAG-zertifizierter Sachverständiger; bei Bewertungsfragen gilt
+   * sein Wort. Ein Preis, der aus Angebotsdaten stammt, liegt systematisch
+   * über dem, was am Ende gezahlt wird.
+   *
+   * ── DER SATZ STEHT HIER UND NUR HIER ─────────────────────────────────
+   *
+   * Eine Zahl, die an drei Stellen steht, ist an zweien irgendwann falsch.
+   * `abschlagFuer()` ist die einzige Stelle, die ihn vergibt — und sie
+   * nimmt die PREISART entgegen, damit er später je Quelle oder Region
+   * unterschiedlich ausfallen kann, ohne dass jemand suchen muss.
+   *
+   * ── NICHT PAUSCHAL AUF ALLES ─────────────────────────────────────────
+   *
+   * GEMESSEN am 07.10.2026, woher unsere Werte kommen:
+   *
+   *   `svwert` am Objekt     ein VERKEHRSWERT. Das ist bereits ein Wert
+   *                          und kein Angebot — ein Abschlag darauf wäre
+   *                          eine zweite Minderung derselben Sache.
+   *   AVM-Abruf              `pricehubble-client.js` ruft `dealType:
+   *                          'sale'`, also einen Marktwert. OB dahinter
+   *                          Angebots- oder Transaktionsdaten stehen,
+   *                          sagt unser Code NICHT — die Art ist aus
+   *                          dem, was wir haben, nicht feststellbar.
+   *   manueller Eintrag      Makler, Gutachten, Notiz. Was davon, steht
+   *                          im Etikett, nicht in der Zahl.
+   *
+   *   > Wo die Art unbekannt ist, wird nicht geraten — aber auch nicht
+   *   > weggesehen. Marcels Vorgabe sagt „IMMER bedenken", und wie mit
+   *   > einer unsicheren Herkunft umzugehen ist, ist genau seine
+   *   > Entscheidung. Also gilt der Abschlag, UND es steht dabei, dass
+   *   > die Art nicht feststellbar war.
+   *
+   * Der Abschlag ist damit eine ANNAHME und wird überall als solche
+   * ausgewiesen. Eine bereinigte Zahl ohne ihren Abschlag sieht aus wie
+   * eine gemessene. */
+  var ANGEBOTSABSCHLAG = 0.10;
+
+  /** Welcher Abschlag gilt für diese Preisart?
+   *  'wert'        — Verkehrswert, Gutachten: kein Abschlag
+   *  'transaktion' — belegt aus Kaufpreissammlung: kein Abschlag
+   *  'angebot'     — Portal, Exposé, Vermarktung: voller Abschlag
+   *  'unbekannt'   — Art nicht feststellbar: Abschlag, und es steht dabei
+   */
+  function abschlagFuer(preisart) {
+    if (preisart === 'wert' || preisart === 'transaktion') return 0;
+    return ANGEBOTSABSCHLAG;
+  }
+
+  function _abschlagGrund(preisart) {
+    if (preisart === 'wert') return 'Verkehrswert — kein Angebotsabschlag, das ist bereits ein Wert.';
+    if (preisart === 'transaktion') return 'belegter Transaktionspreis — kein Angebotsabschlag nötig.';
+    if (preisart === 'angebot') {
+      return 'Angebotspreis — ' + Math.round(ANGEBOTSABSCHLAG * 100) + ' % Abschlag angesetzt, '
+        + 'weil erfahrungsgemäß darunter verkauft wird. Das ist eine ANNAHME, keine Messung.';
+    }
+    return 'Die Art dieser Quelle ist nicht feststellbar (Angebot oder Transaktion). '
+      + 'Vorsichtshalber wie ein Angebotspreis behandelt: ' + Math.round(ANGEBOTSABSCHLAG * 100)
+      + ' % Abschlag. Das ist eine ANNAHME, keine Messung.';
+  }
+
+  /**
+   * Der Marktwert, auf dem gerechnet wird — mit ausgewiesenem Abschlag.
+   *
+   * @param {number} wert      der Wert, wie die Quelle ihn nennt
+   * @param {string} preisart  'wert' | 'transaktion' | 'angebot' | 'unbekannt'
+   * @returns {object|null}    { roh, bereinigt, abschlag_pct, preisart, grund }
+   */
+  function marktwertBereinigt(wert, preisart) {
+    var w = +wert;
+    if (!isFinite(w) || w <= 0) return null;
+    var a = abschlagFuer(preisart);
+    return {
+      roh: w,
+      bereinigt: Math.round(w * (1 - a)),
+      abschlag_pct: Math.round(a * 1000) / 10,
+      preisart: preisart || 'unbekannt',
+      grund: _abschlagGrund(preisart)
+    };
+  }
+
   function _fmtEur(n) {
     if (!isFinite(n)) return '—';
     return Math.round(n).toLocaleString('de-DE') + ' €';
@@ -120,7 +207,29 @@ window.QcHeuristik = (function () {
     var deltaKp = (cfMon < 0) ? Math.abs(cfMon) * 12 / annuitaetsFaktor : 0;
     var kpForCf0 = kp - deltaKp;
 
+    /* ── v1939 · DER MARKT IST DIE DRITTE OBERGRENZE ───────────────────
+     *
+     * Marcel am 07.10.2026: „Wenn es einen Preis gibt dann sollte man
+     * diesen auch mit in die heuristic bauen. Marktpreisindikation die
+     * daten mit in die heuristic übergeben und mit score zusammen
+     * auswerten."
+     *
+     * Bis v1938 kannte die Heuristik nur zwei Deckel: den Preis, bei dem
+     * die Bruttomietrendite 6 % erreicht, und den, bei dem der Cashflow
+     * null wird. Beide kommen aus der MIETE. Was das Objekt am MARKT wert
+     * ist, kam gar nicht vor — deshalb konnte ein Deal „KAUFEN" heißen,
+     * während der Kaufpreis 22 % über dem Marktwert lag (gemessen an der
+     * Hermannstr. 9 am 07.10.2026).
+     *
+     *   > Ein Preis, der sich aus der Miete rechnet, sagt nichts darüber,
+     *   > ob man ihn am Markt auch wieder bekommt.
+     *
+     * `d.marktwert` ist der BEREINIGTE Wert (siehe `marktwertBereinigt`) —
+     * der Abschlag ist schon drin, damit hier nicht zweimal gerechnet
+     * wird. Fehlt er, bleibt alles wie vorher. */
+    var markt = +d.marktwert;
     var ziel = Math.min(kpForBmr, kpForCf0);
+    if (isFinite(markt) && markt > 0) ziel = Math.min(ziel, markt);
     if (!isFinite(ziel) || ziel <= 0 || ziel >= kp) {
       // Wenn KP schon unter den Zielen → keine Preissenkung nötig
       ziel = kp;
@@ -128,23 +237,93 @@ window.QcHeuristik = (function () {
     return ziel;
   }
 
+  /* ── v1939 · WORAN ES KONKRET LIEGT ─────────────────────────────────────
+   *
+   * Marcel am 07.10.2026: „wenn es geprüft werden muss soll es da stehen.
+   * aber wichtig ist der Grund."
+   *
+   * Der PRUEFEN-Rat sagte bis v1938 „die Schwäche steckt woanders
+   * (Bewirtschaftung, Finanzierung, LTV)" — eine Aufzählung aller
+   * Möglichkeiten ist kein Grund. Hier wird die SCHWÄCHSTE Größe gesucht
+   * und beim Namen genannt, mit ihrem Wert.
+   *
+   *   > „Irgendwo anders" ist kein Befund. Ein Befund zeigt auf eine Zahl.
+   *
+   * Gewertet wird über dieselben Skalen, die auch die Ampel benutzt —
+   * kein zweiter Maßstab. Was nicht anwendbar ist, kann auch nicht
+   * schwach sein und wird übersprungen.
+   */
+  function schwaechstePunkte(d, nichtAnwendbar, wieviele) {
+    var na = nichtAnwendbar || {};
+    var quelle = { bmr: d.bmr, nmr: d.nmr, ekr: d.ekr, cf: d.cfMon,
+                   dscr: d.dscr, ltv: d.ltv, bwk: d.bewirtPctNkm };
+    var liste = [];
+    KPI_SKALEN.forEach(function (s) {
+      if (na[s[0]]) return;
+      var v = +quelle[s[0]] || 0;
+      liste.push({ id: s[0], was: s[1], wert: _kpiText(s[2], v), guete: s[3](v) });
+    });
+    liste.sort(function (a, b) { return a.guete - b.guete; });
+    return liste.slice(0, wieviele || 2);
+  }
+
+  /** Die schwächsten Größen als Satzteil — „die Eigenkapitalrendite
+   *  (0,00 %) und der LTV (91 %)". */
+  function _schwachSatz(d, na) {
+    var s = schwaechstePunkte(d, na, 2).filter(function (x) { return x.guete < 0.75; });
+    if (!s.length) return null;
+    return s.map(function (x) { return x.was + ' (' + x.wert + ')'; })
+      .join(s.length > 1 ? ' und ' : '');
+  }
+
   /* ── 3 · DIE KAUFEMPFEHLUNG ─────────────────────────────────────────────
    * Woertlich aus quick-check.js (_renderQcRecommendation, Z. 909–953).
    * `betont` zeichnet den Kaufpreis aus — im Browser `<strong>`, im Chat
    * gar nicht. */
-  function empfehlung(d, betont) {
+  function empfehlung(d, betont, nichtAnwendbar) {
     var b = (typeof betont === 'function') ? betont : function (s) { return s; };
+    var na = nichtAnwendbar || {};
     var score = +d.score;
     var kp = +d.kp || 0, cfMon = +d.cfMon || 0;
     var ziel = zielKaufpreis(d);
+    var markt = +d.marktwert;
+    var ueberMarkt = (isFinite(markt) && markt > 0 && kp > markt);
     var verdict, farbklasse, advice;
 
-    if (score >= SCHWELLE.kaufen) {
+    if (score >= SCHWELLE.kaufen && !ueberMarkt) {
       verdict = 'KAUFEN';
       farbklasse = 'qc-rec-green';
       advice = 'Die Kennzahlen passen — Kauf bei ' + b(_fmtEur(kp)) + ' ist gerechtfertigt. ' +
+               (isFinite(markt) && markt > 0
+                 ? 'Der Preis liegt auch nicht über dem Marktwert. ' : '') +
                'Vor Kaufvertrag noch: Bonität checken, Hausgeld-Aufstellung anfordern, ' +
                'Eigentümerprotokolle der letzten 3 Jahre prüfen, Energieausweis verifizieren.';
+    } else if (score >= SCHWELLE.kaufen && ueberMarkt) {
+      /* ── v1939 · DER SCORE SAGT JA, DER MARKT SAGT ZU TEUER ──────────
+       *
+       * Marcel: „Marktpreisindikation … mit score zusammen auswerten."
+       *
+       * GEMESSEN an der Hermannstr. 9 (Score 83): Empfehlung KAUFEN, und
+       * der Kaufpreis lag 22 % über dem Marktwert. Beides stand in
+       * derselben Antwort, und keins war falsch gerechnet — der Score
+       * kennt den Markt nur nicht.
+       *
+       *   > Ein guter Score sagt, dass die Rechnung aufgeht. Er sagt
+       *   > nicht, dass der Preis stimmt. Wer über Markt kauft, zahlt die
+       *   > Differenz beim Wiederverkauf — unabhaengig vom Cashflow.
+       *
+       * Ein Preis über Markt ist ein PREISproblem, und dafür gibt es ein
+       * Wort: verhandeln. Der SCORE bleibt unangetastet; nur das Urteil
+       * nimmt den Markt dazu. */
+      verdict = 'VERHANDELN';
+      farbklasse = 'qc-rec-gold';
+      var ueber = Math.round((kp / markt - 1) * 100);
+      advice = 'Die Kennzahlen passen — aber der Preis nicht: ' + _fmtEur(kp) + ' liegen ' +
+               ueber + ' % über dem Marktwert von ' + b(_fmtEur(markt)) + '. ' +
+               (d.marktwert_grund ? d.marktwert_grund + ' ' : '') +
+               'Der laufende Ertrag trägt das, der Wiederverkauf nicht. ' +
+               'Empfehlung: auf ' + b(_fmtEur(ziel)) + ' oder darunter verhandeln — ' +
+               'bei diesen Kennzahlen hast du das Argument auf deiner Seite.';
     } else if (score >= SCHWELLE.verhandeln) {
       /* ── v1935 · EIN URTEIL, DAS SEINE EIGENE BEGRUENDUNG AUFHOB ──────
        *
@@ -189,13 +368,22 @@ window.QcHeuristik = (function () {
                  '(' + diffPct + '% Nachlass = ' + _fmtEur(diffEur) + ' weniger) wäre der Deal klar gut. ' +
                  'Empfehlung: Verhandle den KP runter oder schau ob du die Miete steigern kannst.';
       } else {
+        /* ── v1939 · DER GRUND IST DAS WICHTIGE ──────────────────────────
+         * Marcel: „wenn es geprüft werden muss soll es da stehen. aber
+         * wichtig ist der Grund." Hier stand bis v1938 „die Schwäche
+         * steckt woanders (Bewirtschaftung, Finanzierung, LTV)" — eine
+         * Aufzählung aller Möglichkeiten ist kein Grund. Jetzt wird die
+         * schwächste Größe beim Namen genannt, mit ihrem Wert. */
         verdict = 'PRUEFEN';
         farbklasse = 'qc-rec-gold';
+        var schwach = _schwachSatz(d, na);
         advice = 'Solide Kennzahlen, und der Preis ist nicht das Problem — er liegt schon ' +
-                 'unter dem, was dieser Deal tragen würde. Der Score bleibt trotzdem im ' +
-                 'Mittelfeld; die Schwäche steckt woanders (Bewirtschaftung, Finanzierung, LTV). ' +
-                 'Deshalb nicht am Preis ansetzen, sondern prüfen: Hausgeld-Aufstellung, ' +
-                 'Eigentümerprotokolle der letzten 3 Jahre, Energieausweis.';
+                 'unter dem, was dieser Deal tragen würde' +
+                 ((isFinite(markt) && markt > 0) ? ' und auch nicht über dem Marktwert' : '') + '. ' +
+                 'Der Score bleibt trotzdem im Mittelfeld, und zwar wegen ' +
+                 (schwach ? b(schwach) : 'des Zusammenspiels der Teilnoten — keine einzelne Größe fällt heraus') + '. ' +
+                 'Deshalb nicht am Preis ansetzen, sondern genau da nachsehen: ' +
+                 'Hausgeld-Aufstellung, Eigentümerprotokolle der letzten 3 Jahre, Energieausweis.';
       }
     } else if (score >= SCHWELLE.kritisch) {
       verdict = 'KRITISCH';
@@ -371,9 +559,9 @@ window.QcHeuristik = (function () {
   }
 
   /** Beides auf einmal — das, was der Quick-Check unten anzeigt. */
-  function bewerten(d, betont) {
+  function bewerten(d, betont, nichtAnwendbar) {
     var e = (d && isFinite(+d.score) && (+d.kp) && (+d.nkm))
-      ? empfehlung(d, betont)
+      ? empfehlung(d, betont, nichtAnwendbar)
       : null;
     return {
       einschaetzung: einschaetzung(d || {}),
@@ -387,6 +575,10 @@ window.QcHeuristik = (function () {
     zielKaufpreis: zielKaufpreis,
     bewerten: bewerten,
     stufensatz: stufensatz,         /* v1936 */
+    marktwertBereinigt: marktwertBereinigt, /* v1939 */
+    schwaechstePunkte: schwaechstePunkte,   /* v1939 */
+    abschlagFuer: abschlagFuer,             /* v1939 */
+    ANGEBOTSABSCHLAG: ANGEBOTSABSCHLAG,     /* v1939 */
     kennzahlenAmpel: kennzahlenAmpel, /* v1936 */
     kategorien: kategorien,         /* v1936 */
     SCHWELLE: SCHWELLE
