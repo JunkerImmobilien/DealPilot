@@ -24838,16 +24838,32 @@ aside.sidebar::before {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  background-image:
-    radial-gradient(1px 1px at 25% 15%, color-mix(in srgb, var(--gold) 60%, transparent) 50%, transparent 100%),
-    radial-gradient(1px 1px at 60% 8%,  color-mix(in srgb, var(--gold) 40%, transparent) 50%, transparent 100%),
-    radial-gradient(2px 2px at 80% 25%, color-mix(in srgb, var(--gold) 50%, transparent) 50%, transparent 100%),
-    radial-gradient(1px 1px at 15% 50%, color-mix(in srgb, var(--gold) 30%, transparent) 50%, transparent 100%),
-    radial-gradient(1px 1px at 70% 70%, color-mix(in srgb, var(--gold) 40%, transparent) 50%, transparent 100%),
-    radial-gradient(2px 2px at 30% 85%, color-mix(in srgb, var(--gold) 55%, transparent) 50%, transparent 100%),
-    radial-gradient(1px 1px at 90% 60%, color-mix(in srgb, var(--gold) 30%, transparent) 50%, transparent 100%);
+  /* ── v1933b · DIE SIEBEN PARTIKEL SIND AUS ────────────────────────────────
+
+     Marcel, sechs Runden lang und jedes Mal gleich: „im Hintergrund ist halt ein
+     schwarzer Obsidian-Hintergrund mit Partikeln … Ich will da auf jeden Fall
+     keine Animation oder sowas hinter haben." Zuletzt: „hintergrund hinter dem
+     dealpilot logo immer noch mit beweglichen partikeln wenn das menue offen ist."
+
+     Hier standen sieben `radial-gradient`-Punkte (1–2 px, Gold 30–60 %) auf
+     `background-size: 300px 400px`, die `dpV64PartFloat` 25 s lang nach oben zog.
+
+     > **Ich habe fuenfmal „keine Partikel" gemeldet, weil ich nach ELEMENTEN
+     > gesucht habe.** Ein Pseudoelement steht in keinem DOM-Baum,
+     > `querySelectorAll` findet es nicht und `elementsFromPoint` nennt es nicht.
+     > Nur `getComputedStyle(el, '::before')` zeigt es. Mein allererster Suchlauf
+     > suchte genau danach — und lief in den CDP-Timeout. **Ein abgebrochener
+     > Suchlauf ist kein negativer Befund, sondern gar keiner.**
+
+     Abgeschaltet an der QUELLE statt per Gegenregel: ein Versuch, das von
+     `layout-varianten.css` aus zu ueberschreiben (v1933a), kam im Browser gar
+     nicht an — und eine Schicht darueber haette ohnehin nur verdeckt, was hier
+     steht. Das Pseudoelement bleibt bestehen (es clippt das Akkordeon,
+     siehe V64.8 oben), es traegt nur nichts mehr.
+     ──────────────────────────────────────────────────────────────────────── */
+  background-image: none;
   background-size: 300px 400px;
-  animation: dpV64PartFloat 25s linear infinite;
+  animation: none;   /* v1933b: war dpV64PartFloat 25s linear infinite */
 }
 @keyframes dpV64PartFloat {
   0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
