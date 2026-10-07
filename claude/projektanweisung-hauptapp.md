@@ -31908,6 +31908,104 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (74) 07.10.2026 — v1936/v1939: die Stile waren gebaut und unerreichbar, der Markt wird dritter Deckel
+
+#### A · Die Datenaufnahme-Stile (v1936)
+
+**Marcel:** „Bitte prüf einmal, ob wir das für die anderen Aussehen auch umsetzen können. Und dann
+würde ich mir das wünschen, dass wir das dann auch direkt unter den Einstellungen packen."
+
+**Es war nichts umzusetzen.** Keine der 199 Regeln in `datenaufnahme.css` führt `data-dp-layout`
+im Anker — das CSS wirkt überall. Gesperrt hat der **Schalter**: `setze()` setzte das Attribut nur
+`if (aktuell && layoutAktiv())`, und `layoutAktiv()` heißt dort „hat ein Layout-Attribut". In der
+Ansicht „Heute" passierte also nichts.
+
+```
+Über den echten Schalter, 1177 px, Höhe der Datenaufnahme-Leiste:
+              Autom.  Zeile  Kartei  Bütten  Bordk.  Trichter
+vorher Heute     89     89      89      89      89       89     ← tot
+jetzt  Heute     97     97     306      93     288      307
+       Aktenm.   97     97     271      93     270      307
+       Kanzlei   97     97     307      93     311      348
+       Tower     97     97     307      93     311      348
+```
+
+Die Sperre war **nicht mehr begründet**: ihre Voraussetzung `body.dp-neue-karte` ist in allen vier
+Aussehen gesetzt, und die Gegenprobe bei „Heute" lieferte 295 px mit allen fünf Kacheln.
+
+> **Zwei fehlten ganz in der Auswahl.** Der Kommentar bei v1654 sagt wörtlich „Der Trichter bleibt
+> wählbar" — in der Liste `STILE` stand er nicht, Bordkarte auch nicht. Beide haben vollständige
+> Regelsätze (29 bzw. 35) und waren nur über `?karte=` in der Adresse erreichbar. **Ein Stil, der
+> gebaut ist und nicht in der Liste steht, ist für den Nutzer nicht vorhanden.** Der Kommentar hat
+> behauptet, was der Code nicht hergab.
+
+Die Wahl liegt jetzt in den **Einstellungen** unter der Objektkarten-Wahl, in derselben
+Markup-Sprache — zwei Wähler untereinander, die verschieden aussehen, sehen aus wie zwei
+verschiedene Dinge. Der Block im Panel bleibt; beide lesen denselben Merker, `setze()` färbt beide.
+Klicktest über den echten Bedienweg: vier von vier Knöpfen setzen und markieren richtig.
+
+#### B · Die Objektkarten bei „Heute" — gemessen, nicht gebaut
+
+**Marcels dritte Frage:** „ob auch die anderen Objektkarten, die wir jetzt unter den Einstellungen
+haben, für das Aussehen Heute auch funktionieren würden."
+
+**Antwort: nein, keine einzige.** Die sieben Stile haben 112 Regeln:
+
+```
+53 mit .dpl-schiene      → die gibt es bei „Heute" nicht
+59 mit aside#sidebar     → ALLE 59 stehen in @media (max-width: 900px)
+```
+
+Am Schreibtisch greift damit in „Heute" **null** davon — im Browser nachgezählt, nicht aus dem
+CSS geschlossen.
+
+> **Ein erster Messlauf zeigte Höhenunterschiede je Stil (247/231/210/197/201/236/205) und sah
+> damit nach „greift teilweise" aus.** Der Gegencheck über die wirklich passenden Regeln ergab
+> **0**. Die Unterschiede kamen nicht von den Stilen. **Ein Unterschied beweist keine Ursache** —
+> erst der Abgleich, welche Regel überhaupt trifft, trennt Wirkung von Zufall.
+
+Gebaut wurde hier **nichts**: „Heute" vollständig auf die sieben Stile zu heben hieße, 112 Regeln
+zu klonen und den Charakter dieser Ansicht zu ändern. Das ist eine Produktentscheidung.
+
+#### C · Der Markt wird dritter Deckel (v1939, Bot-Strang)
+
+**Marcels Bewertungsvorgabe:** „Immer bedenken dass es angebotspreise sind und meistens 10%
+dadrunter verkauft wird."
+
+Die Heuristik kannte zwei Obergrenzen — Preis bei 6 % BMR und Preis bei Cashflow null.
+
+> **Beide kommen aus der Miete.** Ein Preis, der sich aus der Miete rechnet, sagt nichts darüber,
+> ob man ihn am Markt auch wieder bekommt. Ein guter Score sagt, dass die Rechnung aufgeht; er
+> sagt nicht, dass der Preis stimmt.
+
+Der bereinigte Marktwert ist jetzt der dritte Deckel und wird **mit dem Score zusammen**
+ausgewertet. Hermannstraße 9: Score 83 (GUT), vorher KAUFEN, **jetzt VERHANDELN** — 200.000 €
+liegen 36 % über dem Marktwert.
+
+**Der Abschlag ist eine Annahme und wird als solche benannt.** `ANGEBOTSABSCHLAG = 0.10` an einer
+Stelle, vergeben allein von `abschlagFuer(preisart)`. Gemessen: `pricehubble-client.js` ruft
+`dealType: 'sale'` — das benennt die Abfrageart, **nicht die Datengrundlage**.
+
+> **Wo die Art unbekannt ist, wird nicht geraten — aber auch nicht weggesehen.** Der Abschlag
+> greift bei `angebot` und bei `unbekannt`, nicht beim Verkehrswert, und bei `unbekannt` steht
+> dabei, dass die Art nicht feststellbar war. Der rohe Wert bleibt sichtbar: wer die Quelle
+> nachschlägt, findet dort 163.900 und nicht unsere Zahl.
+
+**Abgrenzung über 45.450 Fälle:** ohne Marktpreisindikation verhält sich die Heuristik **bitgleich**
+wie vorher (0 geänderte Verdicts), mit Indikation wirkt sie in 10.920 Fällen, **0 unerwartet**.
+
+**Und der PRUEFEN-Grund zeigt jetzt auf eine Zahl.** Vorher stand dort eine Aufzählung aller
+Möglichkeiten („Bewirtschaftung, Finanzierung, LTV").
+
+> **„Irgendwo anders" ist kein Befund. Ein Befund zeigt auf eine Zahl.** `schwaechstePunkte()`
+> sucht über **dieselben Skalen, die auch die Ampel benutzt** — kein zweiter Maßstab — und nennt
+> die schwächste Größe mit ihrem Wert.
+
+**Zwei Fehler, die die eigenen Prüfer gefangen haben:** eine Freigabeliste, die die neue Funktion
+abwies (*eine Freigabeliste, die man zu pflegen vergisst, fällt beim Prüfer auf und nicht beim
+Kunden*), und eine KI, die den Abschlag im Satz wegließ, obwohl der Prompt ihn verlangt —
+**das Werkzeugschema schlägt den Prompt**, also trägt der Satz den Abschlag jetzt selbst.
+
 ### (73) 07.10.2026 — v1935 bis v1938: ein Defekt zum zweiten Mal, und der Bot wird vollständig
 
 #### A · „Einstellungen kann man nicht anklicken" — wortgleich zum 28.09.
