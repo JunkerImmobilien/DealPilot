@@ -121,6 +121,12 @@ function bauePrompt(e) {
     e.teilnoten.forEach((t) => zeile('  Teilnote ' + t.was,
       t.punkte + ', Gewicht ' + t.gewicht + ', Grundlage ' + t.grundlage));
   }
+  /* v1937 · Die Marktpreisindikation. FERTIG gerechnet — die Abweichung in
+     Prozent steht da, damit das Modell sie nicht bildet. */
+  zeile('Marktwert (Indikation)', e.marktwert);
+  zeile('  Herkunft des Marktwerts', e.marktwert_herkunft);
+  zeile('  Kaufpreis zum Marktwert', e.kaufpreis_zu_marktwert);
+  zeile('  Marktmiete je Monat (Indikation)', e.marktmiete_monat);
   zeile('Kaufempfehlung der Heuristik', e.empfehlung);
   zeile('Begruendung der Heuristik', e.empfehlung_text);
   if (Array.isArray(e.einschaetzung)) {
@@ -161,6 +167,12 @@ function bauePrompt(e) {
     '· Einer Einschaetzungszeile NICHT widersprechen. Beanstandet eine Zeile',
     '  eine Zahl, nenne sie nicht "hoch", "gut" oder "solide" — die Wertung',
     '  steht schon da und sie gilt.',
+    '· Beim Marktwert NIE einen Anbieter beim Namen nennen. Er heisst',
+    '  "unabhaengiger Bewertungspartner". Nenne die Herkunft so, wie sie',
+    '  oben steht, und verwisch sie nicht: ein Abruf, eine Maklerschaetzung',
+    '  und eine selbst eingetragene Zahl sind drei verschiedene Dinge. Steht',
+    '  kein Marktwert da, sagst du NICHTS darueber, ob der Preis marktgerecht',
+    '  ist — du weisst es dann nicht.',
     '· Die Zahlenliste NICHT wiederholen. Sie steht im selben Chat direkt',
     '  ueber deinem Text. Nimm einzelne Zahlen nur auf, wo du sie brauchst.',
     '· Steht oben ein Vorbehalt, nimm ihn ernst und sage, in welche Richtung',

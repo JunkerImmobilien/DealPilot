@@ -146,17 +146,56 @@ window.QcHeuristik = (function () {
                'Vor Kaufvertrag noch: Bonität checken, Hausgeld-Aufstellung anfordern, ' +
                'Eigentümerprotokolle der letzten 3 Jahre prüfen, Energieausweis verifizieren.';
     } else if (score >= SCHWELLE.verhandeln) {
-      verdict = 'VERHANDELN';
-      farbklasse = 'qc-rec-gold';
+      /* ── v1935 · EIN URTEIL, DAS SEINE EIGENE BEGRUENDUNG AUFHOB ──────
+       *
+       * Marcel am 07.10.2026 zur Sachsenstr. 18 (Score 68):
+       *
+       *   „wenn ich verhandeln soll, aber unten steht, brauchst du nicht
+       *    viel Verhandlungsspielraum, das schliesst sich gegenseitig aus."
+       *
+       * Er hat recht, und es war kein Formulierungsfehler. Das Urteil hing
+       * ALLEIN am Score, der Rat darunter aber am PREIS — und beide liefen
+       * auseinander, sobald der Kaufpreis schon unter beiden Zielpreisen
+       * lag (BMR >= 6 % und Cashflow >= 0). Dann stand woertlich:
+       *
+       *     VERHANDELN
+       *     Solide Kennzahlen — am aktuellen Preis brauchst du nicht viel
+       *     Verhandlungs-Spielraum.
+       *
+       * GEMESSEN ueber ein Gitter aus 15.150 Faellen (Score 0-100 x sechs
+       * Preis/Miete-Paare x fuenf Cashflows x fuenf DSCR): **990 Faelle,
+       * 6,5 %** — und die betreffen die GANZE Spanne 60 bis 74, nicht
+       * einen Rand.
+       *
+       *   > „Verhandeln" ist eine Handlungsanweisung an den PREIS. Wo der
+       *   > Preis kein Hebel ist, ist sie keine Empfehlung, sondern eine
+       *   > Aufforderung ins Leere.
+       *
+       * Deshalb richtet sich das Urteil jetzt nach dem, was der Rat
+       * tatsaechlich sagt: gibt es einen Preishebel, heisst es VERHANDELN;
+       * gibt es keinen, heisst es PRUEFEN — und der Rat nennt, was zu
+       * pruefen ist. Die SCHWELLEN sind unveraendert (75/60/40), der Score
+       * ist unveraendert, nur das Wort trifft jetzt zu.
+       *
+       *   ⚠ Das ist eine PRODUKTentscheidung an einer Stelle, die Marcel
+       *   kennt: die Pille im Quick-Check zeigt jetzt bei manchen Objekten
+       *   PRUEFEN statt VERHANDELN. Gemeldet, damit er widersprechen kann. */
       if (ziel < kp) {
+        verdict = 'VERHANDELN';
+        farbklasse = 'qc-rec-gold';
         var diffPct = Math.round((1 - ziel / kp) * 100);
         var diffEur = Math.round(kp - ziel);
         advice = 'Aktuell solide aber mit Spielraum. Bei einem Kaufpreis von ' + b(_fmtEur(ziel)) + ' ' +
                  '(' + diffPct + '% Nachlass = ' + _fmtEur(diffEur) + ' weniger) wäre der Deal klar gut. ' +
                  'Empfehlung: Verhandle den KP runter oder schau ob du die Miete steigern kannst.';
       } else {
-        advice = 'Solide Kennzahlen — am aktuellen Preis brauchst du nicht viel Verhandlungs-Spielraum. ' +
-                 'Trotzdem: Hausgeld-Aufstellung, Protokolle, Energieausweis prüfen.';
+        verdict = 'PRUEFEN';
+        farbklasse = 'qc-rec-gold';
+        advice = 'Solide Kennzahlen, und der Preis ist nicht das Problem — er liegt schon ' +
+                 'unter dem, was dieser Deal tragen würde. Der Score bleibt trotzdem im ' +
+                 'Mittelfeld; die Schwäche steckt woanders (Bewirtschaftung, Finanzierung, LTV). ' +
+                 'Deshalb nicht am Preis ansetzen, sondern prüfen: Hausgeld-Aufstellung, ' +
+                 'Eigentümerprotokolle der letzten 3 Jahre, Energieausweis.';
       }
     } else if (score >= SCHWELLE.kritisch) {
       verdict = 'KRITISCH';
@@ -186,6 +225,125 @@ window.QcHeuristik = (function () {
     return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel };
   }
 
+  /* ── 4 · DER SATZ ZUR STUFE ─────────────────────────────────────────────
+   * Woertlich aus quick-check.js (`#qc-top-deal-desc`, Z. 658-665). Er
+   * haengt an der FARBKLASSE aus `score-tiers.js` (top/green/gold/red),
+   * nicht am Score — deshalb nimmt er sie entgegen. */
+  function stufensatz(klasse) {
+    if (klasse === 'top') return 'Quick-Check zeigt sehr gute Kennzahlen. Im Objekt-Modus genauer prüfen für vollen Score.';
+    if (klasse === 'green') return 'Quick-Check signalisiert solide bis gute Eckwerte. Detail-Analyse empfohlen.';
+    if (klasse === 'gold') return 'Brauchbare Basis aber mit Schwächen. Genaue Prüfung notwendig.';
+    return 'Quick-Check zeigt Schwächen. Im Detail-Modus analysieren ob das Bild kippt.';
+  }
+
+  /* ── 5 · DIE SIEBEN KENNZAHLEN MIT IHRER AMPEL ──────────────────────────
+   *
+   * v1936. Marcel am 07.10.2026: „beim Quickcheck geben wir doch immer
+   * diese Heuristik aus, was dabei rauskommt. Das muss doch da
+   * vollumfaenglich stehen."
+   *
+   * GEMESSEN, was der Quick-Check unten WIRKLICH zeigt: nicht nur Urteil
+   * und Einschaetzung, sondern SIEBEN Kennzahlenkacheln mit einer Ampel
+   * (`qc-kpi-good` / `-mid` / `-bad`) und FUENF Kategorien mit Punkten und
+   * ausgeschriebener Skala. Davon lieferte der Bot bis v1935 nur einen
+   * Teil — die Ampel und die Skalen steckten im DOM-Code.
+   *
+   *   > Eine Ampel ist keine Verzierung. Sie sagt, welche der sieben
+   *   > Zahlen das Urteil traegt — und genau das fragt der Nutzer als
+   *   > Naechstes.
+   *
+   * Die Skalen sind WOERTLICH die aus `_setKpi()` (quick-check.js
+   * Z. 696-709), die Schwellen der Ampel die aus `_setKpi` selbst:
+   * >= 0,75 gruen, >= 0,40 gelb, sonst rot. */
+  var KPI_SKALEN = [
+    ['bmr',  'Bruttomietrendite',  'prozent', function (v) { return v <= 3 ? 0 : v >= 7 ? 1 : (v - 3) / 4; },      '3 % = 0 Pkt, 7 % = 100 Pkt'],
+    ['nmr',  'Nettomietrendite',   'prozent', function (v) { return v <= 1 ? 0 : v >= 5 ? 1 : (v - 1) / 4; },      '1 % = 0 Pkt, 5 % = 100 Pkt'],
+    ['ekr',  'Eigenkapitalrendite', 'prozent', function (v) { return v <= 0 ? 0 : v >= 12 ? 1 : v / 12; },          '0 % = 0 Pkt, 12 % = 100 Pkt'],
+    ['cf',   'Cashflow je Monat',  'euro',    function (v) { return v <= -200 ? 0 : v >= 300 ? 1 : (v + 200) / 500; }, '−200 €/Mon = 0 Pkt, +300 €/Mon = 100 Pkt'],
+    ['dscr', 'DSCR',               'zahl2',   function (v) { return v <= 0.9 ? 0 : v >= 1.5 ? 1 : (v - 0.9) / 0.6; }, '0,9 = 0 Pkt, 1,5 = 100 Pkt · Faustregel Bank: ab 1,2 guter Deckungsgrad'],
+    ['ltv',  'LTV',                'prozent0', function (v) { return v >= 100 ? 0 : v >= 90 ? 0.4 : v >= 80 ? 0.7 : 1; }, 'ab 100 % riskant, unter 80 % gut'],
+    ['bwk',  'Bewirtschaftungsquote', 'prozent0', function (v) { return v <= 18 ? 1 : v >= 40 ? 0 : (40 - v) / 22; }, '18 % = 100 Pkt, 40 % = 30 Pkt · IVD-Empfehlung ETW 18–35 %']
+  ];
+
+  function _kpiText(art, v) {
+    if (art === 'prozent') return v.toFixed(2).replace('.', ',') + ' %';
+    if (art === 'prozent0') return v.toFixed(0) + ' %';
+    if (art === 'zahl2') return v ? v.toFixed(2).replace('.', ',') : '—';
+    if (art === 'euro') return (v >= 0 ? '+' : '') + Math.round(v).toLocaleString('de-DE') + ' €';
+    return String(v);
+  }
+
+  function _ampel(q) {
+    if (q == null) return null;
+    if (q >= 0.75) return 'gruen';
+    if (q >= 0.4) return 'gelb';
+    return 'rot';
+  }
+
+  /**
+   * Die sieben Kennzahlen mit Wert, Ampel und Skala.
+   * Erwartet { bmr, nmr, ekr, cfMon, dscr, ltv, bewirtPctNkm }.
+   * Felder, die gar nicht anwendbar sind, uebergibt der Aufrufer als
+   * `null` — dann steht `wert: null` und ein Grund daneben.
+   */
+  function kennzahlenAmpel(d, nichtAnwendbar) {
+    var na = nichtAnwendbar || {};
+    var quelle = { bmr: d.bmr, nmr: d.nmr, ekr: d.ekr, cf: d.cfMon,
+                   dscr: d.dscr, ltv: d.ltv, bwk: d.bewirtPctNkm };
+    return KPI_SKALEN.map(function (s) {
+      var id = s[0];
+      if (na[id]) return { id: id, was: s[1], wert: null, ampel: null,
+                           skala: s[4], entfaellt: na[id] };
+      var v = +quelle[id] || 0;
+      var q = s[3](v);
+      return { id: id, was: s[1], wert: _kpiText(s[2], v), ampel: _ampel(q), skala: s[4] };
+    });
+  }
+
+  /* ── 6 · DIE FUENF KATEGORIEN MIT IHRER SKALA ───────────────────────────
+   * Woertlich die Rechenwege aus `_setQcCat()` (quick-check.js Z. 716-745).
+   * Die PUNKTE kommen von `DealScore.computeFromKpis()` und werden
+   * uebergeben — hier wird nichts nachgerechnet. */
+  function kategorien(d, punkte) {
+    var p = punkte || {};
+    /* Ohne Punkte bleibt der RECHENWEG trotzdem stehen — er haengt an den
+       Kennzahlen, nicht am Score. Das ist der Fall, wenn ein gespeicherter
+       Score gilt: dann hat hier keine Rechnung stattgefunden, und eine
+       erfundene Teilnote waere schlimmer als eine fehlende. */
+    var pz = function (v) {
+      return (v == null) ? 'nicht gerechnet (der Score kommt aus DealPilot)'
+                         : (Math.round(v) + ' von 100');
+    };
+    var zwei = function (v) { return (+v || 0).toFixed(2).replace('.', ','); };
+    var cf = +d.cfMon || 0;
+    return [
+      { id: 'rendite', was: 'Rendite', punkte: pz(p.rendite),
+        wert: zwei(d.bmr) + ' % BMR · ' + zwei(d.nmr) + ' % NMR',
+        rechenweg: 'Bruttomietrendite ' + zwei(d.bmr) + ' % (Skala 3 % = 0, 7 % = 100, Gewicht 40 %) · '
+          + 'Nettomietrendite ' + zwei(d.nmr) + ' % (Skala 1 % = 0, 5 % = 100, Gewicht 40 %) · '
+          + 'Eigenkapitalrendite ' + zwei(d.ekr) + ' % (Skala 0 % = 0, 12 % = 100, Gewicht 20 %)' },
+      { id: 'cashflow', was: 'Cashflow', punkte: pz(p.cashflow),
+        wert: (cf >= 0 ? '+' : '') + Math.round(cf).toLocaleString('de-DE') + ' €/Mon',
+        rechenweg: 'Cashflow vor Steuern ' + (cf >= 0 ? '+' : '') + Math.round(cf).toLocaleString('de-DE')
+          + ' €/Monat · Skala −200 €/Mon = 0 Pkt, +300 €/Mon = 100 Pkt (linear) · '
+          + 'Formel: NKM − Annuität − BWK_NUL/12' },
+      { id: 'sicherheit', was: 'Sicherheit', punkte: pz(p.risiko),
+        wert: 'DSCR ' + (d.dscr ? zwei(d.dscr) : '–'),
+        rechenweg: 'DSCR ' + (d.dscr ? zwei(d.dscr) : '–') + ' · Skala 0,9 = 0 Pkt, 1,5 = 100 Pkt · '
+          + 'Formel: (NKM × 12 − BWK_NUL) / Annuität · Faustregel Bank: ab 1,2 guter Deckungsgrad' },
+      { id: 'finanzierung', was: 'Finanzierung', punkte: pz(p.ltv),
+        wert: 'LTV ' + (+d.ltv || 0).toFixed(0) + ' %',
+        rechenweg: 'Loan-to-Value ' + (+d.ltv || 0).toFixed(0) + ' % · Stufen: ab 100 % → 30 Pkt '
+          + '(kein Eigenkapital eingesetzt = riskant), ab 90 % → 60 Pkt, ab 80 % → 80 Pkt, '
+          + 'unter 80 % → 90 Pkt' },
+      { id: 'bewirt', was: 'Effizienz', punkte: pz(p.potenzial),
+        wert: (+d.bewirtPctNkm || 0).toFixed(0) + ' % der NKM',
+        rechenweg: 'Bewirtschaftungskosten ' + (+d.bewirtPctNkm || 0).toFixed(0) + ' % der Nettokaltmiete · '
+          + 'Skala 18 % = 100 Pkt, 40 % = 30 Pkt (linear dazwischen) · IVD-Empfehlung ETW 18–35 % · '
+          + 'Formel: (BWK_NUL + BWK_UL) / NKM_jährlich × 100' }
+    ];
+  }
+
   /** Beides auf einmal — das, was der Quick-Check unten anzeigt. */
   function bewerten(d, betont) {
     var e = (d && isFinite(+d.score) && (+d.kp) && (+d.nkm))
@@ -202,6 +360,9 @@ window.QcHeuristik = (function () {
     empfehlung: empfehlung,
     zielKaufpreis: zielKaufpreis,
     bewerten: bewerten,
+    stufensatz: stufensatz,         /* v1936 */
+    kennzahlenAmpel: kennzahlenAmpel, /* v1936 */
+    kategorien: kategorien,         /* v1936 */
     SCHWELLE: SCHWELLE
   };
 })();

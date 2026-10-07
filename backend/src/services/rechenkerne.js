@@ -214,6 +214,31 @@ function heuristik(eingabe) {
   return _oder_wirf().QcHeuristik.bewerten(eingabe || {});
 }
 
+/** v1936 · Ein einzelner Teil der Heuristik — `stufensatz`,
+ *  `kennzahlenAmpel`, `kategorien`, `zielKaufpreis`.
+ *
+ *  Marcel am 07.10.2026: „beim Quickcheck geben wir doch immer diese
+ *  Heuristik aus … Das muss doch da vollumfaenglich stehen."
+ *
+ *  Ein eigener Export je Teil waere die vierte, fuenfte, sechste
+ *  Durchreichung derselben Sorte — und jede neue Funktion in
+ *  `qc-heuristik.js` braeuchte hier wieder eine. Deshalb EIN Zugang mit
+ *  Namen, und eine Liste, die sagt, was erlaubt ist: ein freier
+ *  Namenszugriff waere eine Tuer in jedes Modulinnere. */
+const HEURISTIK_TEILE = ['stufensatz', 'kennzahlenAmpel', 'kategorien', 'zielKaufpreis'];
+function heuristikTeil(name, ...argumente) {
+  if (HEURISTIK_TEILE.indexOf(name) < 0) {
+    throw new Error('QcHeuristik.' + name + '() ist nicht freigegeben — '
+      + 'erlaubt sind: ' + HEURISTIK_TEILE.join(', '));
+  }
+  const q = _oder_wirf().QcHeuristik;
+  if (typeof q[name] !== 'function') {
+    throw new Error('QcHeuristik.' + name + '() fehlt in der Spiegelung — '
+      + 'node tools/rechenkerne-spiegeln.mjs');
+  }
+  return q[name].apply(q, argumente);
+}
+
 /** Welche Quellen gespiegelt sind und wann — fuer Auskunft und Pruefung. */
 function herkunft() {
   _laden();
@@ -227,6 +252,7 @@ function herkunft() {
 
 module.exports = {
   kpis, dscr, score, stufe, heuristik,
+  heuristikTeil,               /* v1936 — stufensatz / kennzahlenAmpel / kategorien */
   vorhanden, herkunft,
   /* nur fuer tools/rechenkerne-spiegeln.mjs — damit der Stub einmal da ist */
   _fensterStub: fensterStub, _GEBRAUCHT: GEBRAUCHT

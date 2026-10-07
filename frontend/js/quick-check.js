@@ -656,12 +656,11 @@
       scoreTag.style.color = ringColor;
     }
     var topDescAct = document.getElementById('qc-top-deal-desc');
-    if (topDescAct) {
-      topDescAct.textContent =
-        _k === 'top' ? 'Quick-Check zeigt sehr gute Kennzahlen. Im Objekt-Modus genauer prüfen für vollen Score.' :
-        _k === 'green' ? 'Quick-Check signalisiert solide bis gute Eckwerte. Detail-Analyse empfohlen.' :
-        _k === 'gold' ? 'Brauchbare Basis aber mit Schwächen. Genaue Prüfung notwendig.' :
-                      'Quick-Check zeigt Schwächen. Im Detail-Modus analysieren ob das Bild kippt.';
+    /* v1936: der Satz steht in js/qc-heuristik.js — damit der Telegram-Bot
+       dieselbe Heuristik VOLLSTAENDIG ausgeben kann und nicht nur das
+       Urteil. Wortlaut unveraendert. */
+    if (topDescAct && window.QcHeuristik && QcHeuristik.stufensatz) {
+      topDescAct.textContent = QcHeuristik.stufensatz(_k);
     }
     if (scoreRing) {
       var dash = (score / 100 * 327).toFixed(1);
@@ -692,57 +691,53 @@
     }
 
     if (kp > 0 && nkm > 0) {
-      // Skalen wie im Score
-      _setKpi('bmr',  bmr.toFixed(2).replace('.', ',') + '%',
-              (bmr <= 3 ? 0 : bmr >= 7 ? 1 : (bmr - 3) / 4));
-      _setKpi('nmr',  nmr.toFixed(2).replace('.', ',') + '%',
-              (nmr <= 1 ? 0 : nmr >= 5 ? 1 : (nmr - 1) / 4));
-      _setKpi('ekr',  ekr.toFixed(2).replace('.', ',') + '%',
-              (ekr <= 0 ? 0 : ekr >= 12 ? 1 : ekr / 12));
-      _setKpi('cf',   (cfMon >= 0 ? '+' : '') + Math.round(cfMon) + ' €',
-              (cfMon <= -200 ? 0 : cfMon >= 300 ? 1 : (cfMon + 200) / 500));
-      _setKpi('dscr', dscr ? dscr.toFixed(2).replace('.', ',') : '—',
-              (dscr <= 0.9 ? 0 : dscr >= 1.5 ? 1 : (dscr - 0.9) / 0.6));  // V317-dscr-15
-      _setKpi('ltv',  ltvPct.toFixed(0) + '%',
-              (ltvPct >= 100 ? 0 : ltvPct >= 90 ? 0.4 : ltvPct >= 80 ? 0.7 : 1));
-      _setKpi('bwk',  bewirtPctNkm.toFixed(0) + '%',
-              (bewirtPctNkm <= 18 ? 1 : bewirtPctNkm >= 40 ? 0 : (40 - bewirtPctNkm) / 22));
+      /* ── v1936 · WERTE UND AMPEL AUS DEM KERN ──────────────────────────
+       * Die sieben Skalen standen hier als Zeichencode und waren fuer das
+       * Backend unerreichbar — der Bot konnte die Kennzahlen nennen, aber
+       * nicht sagen, WELCHE davon das Urteil traegt. Sie liegen jetzt
+       * WOERTLICH in `js/qc-heuristik.js`. Die Ampelklassen bleiben hier:
+       * sie sind Anzeige. */
+      var _amp = (window.QcHeuristik && QcHeuristik.kennzahlenAmpel)
+        ? QcHeuristik.kennzahlenAmpel({ bmr: bmr, nmr: nmr, ekr: ekr, cfMon: cfMon,
+            dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm })
+        : [];
+      /* Die Ampelstufe wird in die Quote zurueckuebersetzt, die `_setKpi`
+         erwartet — die Schwellen dort (>= 0,75 gruen, >= 0,40 gelb) sind
+         dieselben, die der Kern anwendet. Zwei kleine Anzeigeunterschiede
+         sind dabei bewusst in Kauf genommen und gemessen: der Kern setzt
+         ein Leerzeichen vor das Prozentzeichen ("6,00 %" statt "6,00%")
+         und gruppiert Tausender beim Cashflow ("+1.234 €" statt
+         "+1234 €"). Beides ist richtiger als vorher; mehr aendert sich
+         nicht. */
+      var _ampQuote = { gruen: 1, gelb: 0.5, rot: 0 };
+      _amp.forEach(function (k) {
+        _setKpi(k.id, k.wert == null ? '—' : k.wert,
+                k.ampel == null ? null : _ampQuote[k.ampel]);
+      });
     } else {
       ['bmr','nmr','ekr','cf','dscr','ltv','bwk'].forEach(function(k){ _setKpi(k, '—', null); });
     }
 
-    // V54: Score-Werte mit ausführlichen Tooltips — User sieht beim Hover welche
-    // Werte herangezogen werden und wie der Score zustande kommt.
-    _setQcCat('rendite',      Math.round(sRendite),    bmr.toFixed(2).replace('.', ',') + '% BMR · ' + nmr.toFixed(2).replace('.', ',') + '% NMR',
-      'Berechnung Rendite (' + Math.round(sRendite) + '/100):\n' +
-      '• Bruttomietrendite (BMR): ' + bmr.toFixed(2).replace('.', ',') + '% — Skala: 3% = 0 Pkt, 7% = 100 Pkt (Gewicht 40%)\n' +
-      '• Nettomietrendite (NMR): ' + nmr.toFixed(2).replace('.', ',') + '% — Skala: 1% = 0 Pkt, 5% = 100 Pkt (Gewicht 40%)\n' +
-      '• Eigenkapitalrendite (EKR): ' + ekr.toFixed(2).replace('.', ',') + '% — Skala: 0% = 0 Pkt, 12% = 100 Pkt (Gewicht 20%)');
-    _setQcCat('cashflow',     Math.round(sCashflow),   (cfMon >= 0 ? '+' : '') + Math.round(cfMon).toLocaleString('de-DE') + ' €/Mon',
-      'Berechnung Cashflow (' + Math.round(sCashflow) + '/100):\n' +
-      '• CF vor Steuern: ' + (cfMon >= 0 ? '+' : '') + Math.round(cfMon).toLocaleString('de-DE') + ' €/Monat\n' +
-      '• Skala: −200 €/Mon = 0 Pkt, +300 €/Mon = 100 Pkt (linear)\n' +
-      '• Formel: NKM − Annuität − BWK_NUL/12');
-    _setQcCat('sicherheit',   Math.round(sSicherheit), 'DSCR ' + (dscr ? dscr.toFixed(2).replace('.', ',') : '–'),
-      'Berechnung Sicherheit (' + Math.round(sSicherheit) + '/100):\n' +
-      '• DSCR (Debt Service Coverage Ratio): ' + (dscr ? dscr.toFixed(2).replace('.', ',') : '–') + '\n' +
-      '• Skala: 0,9 = 0 Pkt, 1,4 = 100 Pkt\n' +
-      '• Formel: (NKM × 12 − BWK_NUL) / Annuität\n' +
-      '• Faustregel Bank: ≥ 1,2 = guter Deckungsgrad');
-    _setQcCat('finanzierung', Math.round(sFinanz),     'LTV ' + ltvPct.toFixed(0) + '%',
-      'Berechnung Finanzierung (' + Math.round(sFinanz) + '/100):\n' +
-      '• Loan-to-Value (LTV): ' + ltvPct.toFixed(0) + '%\n' +
-      '• Stufen:\n' +
-      '   ≥ 100% LTV → 30 Pkt (kein EK eingesetzt = riskant)\n' +
-      '   ≥  90% LTV → 60 Pkt\n' +
-      '   ≥  80% LTV → 80 Pkt\n' +
-      '   <  80% LTV → 90 Pkt');
-    _setQcCat('bewirt',       Math.round(sBewirt),    bewirtPctNkm.toFixed(0) + '% der NKM',
-      'Berechnung Effizienz (' + Math.round(sBewirt) + '/100):\n' +
-      '• Bewirtschaftungskosten: ' + bewirtPctNkm.toFixed(0) + '% der Nettokaltmiete\n' +
-      '• Skala: 18% = 100 Pkt, 40% = 30 Pkt (linear, dazwischen)\n' +
-      '• IVD-Empfehlung ETW: 18-35% gesamt\n' +
-      '• Formel: (BWK_NUL + BWK_UL) / NKM_jährlich × 100');
+    /* ── v1936 · DIE FUENF KATEGORIEN AUS DEM KERN ───────────────────────
+     * Punkte, Wert und Rechenweg standen hier als Zeichencode. Sie liegen
+     * jetzt in `js/qc-heuristik.js`, damit der Bot dieselbe Heuristik
+     * VOLLSTAENDIG ausgeben kann. Die PUNKTE kommen weiterhin von
+     * `DealScore.computeFromKpis()` und werden nur durchgereicht — hier
+     * wird nichts nachgerechnet. */
+    var _kat = (window.QcHeuristik && QcHeuristik.kategorien)
+      ? QcHeuristik.kategorien(
+          { bmr: bmr, nmr: nmr, ekr: ekr, cfMon: cfMon, dscr: dscr,
+            ltv: ltvPct, bewirtPctNkm: bewirtPctNkm },
+          { rendite: sRendite, cashflow: sCashflow, risiko: sSicherheit,
+            ltv: sFinanz, potenzial: sBewirt })
+      : [];
+    var _katPunkte = { rendite: sRendite, cashflow: sCashflow, sicherheit: sSicherheit,
+                       finanzierung: sFinanz, bewirt: sBewirt };
+    _kat.forEach(function (k) {
+      _setQcCat(k.id, Math.round(_katPunkte[k.id]), k.wert,
+        'Berechnung ' + k.was + ' (' + Math.round(_katPunkte[k.id]) + '/100):\n• '
+          + k.rechenweg.split(' · ').join('\n• '));
+    });
 
     /* ── v1925 · DIE EINSCHAETZUNG KOMMT AUS EINEM KERN ──────────────────
      *

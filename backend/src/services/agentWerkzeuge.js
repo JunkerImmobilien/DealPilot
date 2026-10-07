@@ -54,6 +54,7 @@ const voiceExtract = require('./voiceExtractService');
 const vorgaben = require('./botVorgabenService');   /* v1824 */
 const rechenkerne = require('./rechenkerne');       /* v1899: DealKpis/Dscr der App */
 const bewertungsText = require('./bewertungsText'); /* v1927: die KI-Einordnung */
+const avmHistorie = require('./avmHistoryService');  /* v1937: Marktpreisindikation */
 const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
@@ -1400,6 +1401,141 @@ async function pakete_und_preise(ctx, args) {
   };
 }
 
+/* ═══ v1937 · DIE MARKTPREISINDIKATION ZUR BEWERTUNG ══════════════════════
+ *
+ * Marcel am 07.10.2026:
+ *
+ *   „Auch wenn wir zu dem Objekt eine Marktpreisindikation haben, dass wir
+ *    das mit reinarbeiten und allem. Also, dass wir es vollumfaenglich
+ *    ausgeben koennen. Haben wir die Moeglichkeit, das zu machen?"
+ *
+ * GEMESSEN am 07.10.2026 auf Staging — ja, an zwei Stellen, und sie sind
+ * NICHT dasselbe:
+ *
+ *   1. `avm_valuations` (avmHistoryService) — echte Abrufe bei einem
+ *      Bewertungspartner plus manuelle Eintraege (Makler, Gutachten).
+ *      Fuenf Saetze liegen dort, zu zwei Objekten.
+ *   2. `svwert` / `bankval` am Objekt — der Verkehrs- bzw. Beleihungswert,
+ *      den der Nutzer SELBST eingetragen hat.
+ *
+ * Der Marktbericht (eigene Datenbank, `marktbericht_abrufen`) ist bewusst
+ * NICHT dabei: er KOSTET Guthaben. Ihn nebenbei zu ziehen, weil jemand
+ * nach dem Score fragt, waere ein Abruf ohne Freigabe.
+ *
+ * ── DREI REGELN, DIE HIER GELTEN ──────────────────────────────────────
+ *
+ * · ANBIETER-NEUTRALITAET. `avm_valuations.provider` fuehrt woertlich
+ *   `pricehubble`. CLAUDE.md: „Sprengnetter und PriceHubble nie namentlich
+ *   nach aussen — unabhaengige Bewertungspartner." Der Name wird deshalb
+ *   hier uebersetzt und verlaesst die Funktion nicht. Ein Name, der im
+ *   Ergebnis steht, steht frueher oder spaeter im Chat.
+ * · DIE HERKUNFT WIRD NICHT VERWISCHT. Ein Abruf beim Bewertungspartner,
+ *   die Schaetzung eines Maklers und eine Zahl, die der Nutzer selbst ins
+ *   Formular geschrieben hat, sind drei verschiedene Dinge. Sie stehen
+ *   nebeneinander, jede mit ihrem Datum.
+ * · DIE ABWEICHUNG WIRD HIER GERECHNET, NICHT VON DER KI. „Kaufpreis
+ *   liegt 9,8 % ueber dem Marktwert" ist eine Rechnung. Das Modell darf
+ *   keine neue Zahl bilden — also bekommt es die fertige.
+ *
+ *   > Eine Marktpreisindikation ohne ihr Datum und ihre Herkunft ist eine
+ *   > Behauptung mit Nachkommastellen.
+ */
+async function _marktpreisIndikation(userId, objektId, d, kp) {
+  const eur = (x) => Math.round(x).toLocaleString('de-DE') + ' EUR';
+  const pct = (x) => x.toFixed(1).replace('.', ',') + ' %';
+  const tag = (x) => { try { return new Date(x).toISOString().slice(0, 10); } catch (e) { return null; } };
+
+  const quellen = [];
+  let leitwert = null, leitquelle = null;
+
+  try {
+    const liste = await avmHistorie.listForObject(userId, objektId);
+    (liste || []).forEach((zz) => {
+      const w = Number(zz.marktwert);
+      if (!Number.isFinite(w) || w <= 0) return;
+      /* Der Anbietername wird NICHT durchgereicht. */
+      const istAbruf = String(zz.provider || '').toLowerCase() !== 'manuell';
+      const herkunft = istAbruf
+        ? 'Abruf bei einem unabhaengigen Bewertungspartner'
+        : ('manuell eingetragen' + (zz.source_label ? ' (' + zz.source_label + ')' : ''));
+      const e = {
+        wert: eur(w), herkunft: herkunft, stand: tag(zz.created_at),
+        spanne: (Number(zz.low) > 0 && Number(zz.high) > 0)
+          ? eur(Number(zz.low)) + ' bis ' + eur(Number(zz.high)) : null,
+        je_qm: Number(zz.eur_per_sqm) > 0 ? eur(Number(zz.eur_per_sqm)) + '/m²' : null,
+        marktmiete_monat: Number(zz.marktmiete) > 0 ? eur(Number(zz.marktmiete)) : null,
+        sicherheit: zz.confidence || null,
+        notiz: zz.note || null
+      };
+      quellen.push(e);
+      /* Leitwert ist der JUENGSTE Abruf — nicht der hoechste und nicht der
+         bequemste. `listForObject` sortiert bereits absteigend. */
+      if (leitwert == null && istAbruf) { leitwert = w; leitquelle = e; }
+    });
+    /* Gibt es gar keinen Abruf, gilt der juengste manuelle Eintrag. */
+    if (leitwert == null && quellen.length) {
+      const erste = (liste || []).find((zz) => Number(zz.marktwert) > 0);
+      if (erste) { leitwert = Number(erste.marktwert); leitquelle = quellen[0]; }
+    }
+  } catch (e) {
+    return { fehler: 'Die Bewertungshistorie war nicht lesbar: ' + e.message };
+  }
+
+  /* Der eigene Eintrag am Objekt — eine andere Qualitaet, deshalb eigener
+     Block und NICHT in derselben Liste. */
+  const zahl = (v) => {
+    const n = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.'));
+    return Number.isFinite(n) && n > 0 ? n : null;
+  };
+  const svw = zahl(d.svwert), bank = zahl(d.bankval);
+  const eigene = [];
+  if (svw) eigene.push({ was: 'Verkehrswert', wert: eur(svw), herkunft: 'am Objekt eingetragen' });
+  if (bank && bank !== svw) eigene.push({ was: 'Beleihungswert', wert: eur(bank), herkunft: 'am Objekt eingetragen' });
+  if (leitwert == null && svw) {
+    leitwert = svw;
+    leitquelle = { wert: eur(svw), herkunft: 'am Objekt eingetragener Verkehrswert', stand: null };
+  }
+
+  if (!quellen.length && !eigene.length) {
+    return {
+      vorhanden: false,
+      hinweis: 'Zu diesem Objekt liegt KEINE Marktpreisindikation vor — weder ein '
+        + 'Abruf noch ein eingetragener Verkehrswert. Behaupte keinen Marktwert und '
+        + 'leite keinen aus dem Kaufpreis ab. Der Nutzer kann einen Abruf starten '
+        + '(marktbericht_preis nennt den Preis).'
+    };
+  }
+
+  /* Die Abweichung wird HIER gerechnet. */
+  let vergleich = null;
+  if (leitwert && kp > 0) {
+    const diff = kp - leitwert;
+    const q = diff / leitwert * 100;
+    vergleich = {
+      kaufpreis: eur(kp),
+      marktwert: eur(leitwert),
+      unterschied: (diff >= 0 ? '+' : '-') + eur(Math.abs(diff)),
+      kaufpreis_zu_marktwert: diff >= 0
+        ? 'Kaufpreis liegt ' + pct(Math.abs(q)) + ' UEBER dem Marktwert'
+        : 'Kaufpreis liegt ' + pct(Math.abs(q)) + ' UNTER dem Marktwert',
+      grundlage: leitquelle
+        ? (leitquelle.herkunft + (leitquelle.stand ? ', Stand ' + leitquelle.stand : ''))
+        : null
+    };
+  }
+
+  return {
+    vorhanden: true,
+    quellen: quellen.length ? quellen : undefined,
+    am_objekt: eigene.length ? eigene : undefined,
+    vergleich: vergleich || undefined,
+    hinweis: 'Das ist eine INDIKATION, kein Gutachten. Nenne den Bewertungspartner '
+      + 'NIE beim Namen — "unabhaengiger Bewertungspartner". Nenne zu jeder Zahl '
+      + 'ihre Herkunft und ihren Stand; eine selbst eingetragene Zahl ist etwas '
+      + 'anderes als ein Abruf. Rechne NICHTS nach — die Abweichung steht fertig da.'
+  };
+}
+
 /* ── v1824 · DER SCHNELLBLICK ────────────────────────────────────────────
  *
  * Marcel am 04.10.2026:
@@ -1876,7 +2012,7 @@ async function objekt_schnellblick(ctx, args) {
    * Deshalb gibt es im gespeicherten Fall auch KEINE Teilnoten: sie sind
    * die Zerlegung EINER Rechnung, und diese Rechnung hat hier nicht
    * stattgefunden. */
-  let score = null, herkunft = null, teilnoten = null;
+  let score = null, herkunft = null, teilnoten = null, teilnotenRoh = null;
   if (sGespeichert.dealscore != null) {
     score = sGespeichert.dealscore;
     herkunft = 'in DealPilot gerechnet und am Objekt gespeichert';
@@ -1895,6 +2031,10 @@ async function objekt_schnellblick(ctx, args) {
       was: b.label, punkte: Math.round(b.score) + ' von 100',
       gewicht: b.weight + ' %', grundlage: b.input
     }));
+    /* v1936: dieselben Punkte, aber nach Schluessel — `qc-heuristik.js`
+       traegt sie in die fuenf Kategorien ein und rechnet sie NICHT nach. */
+    teilnotenRoh = {};
+    S.breakdown.forEach((b) => { teilnotenRoh[b.key] = b.score; });
   }
 
   if (score == null) {
@@ -1957,16 +2097,59 @@ async function objekt_schnellblick(ctx, args) {
         ? eur(wp) + '  (Verkehrswert ' + eur(svw2) + ' minus Kaufpreis)'
         : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
           + 'hinterlegt ist. Sag das dem Nutzer.'),
-      /* ── DIE HEURISTIK ──────────────────────────────────────────────── */
+      /* ── DIE HEURISTIK, VOLLUMFAENGLICH ──────────────────────────────
+       *
+       * v1936. Marcel am 07.10.2026: „beim Quickcheck geben wir doch immer
+       * diese Heuristik aus, was dabei rauskommt. Das muss doch da
+       * vollumfaenglich stehen."
+       *
+       * GEMESSEN, was der Quick-Check unten WIRKLICH zeigt — und was der
+       * Bot bis v1935 davon lieferte:
+       *
+       *   Satz zur Stufe (#qc-top-deal-desc)   fehlte
+       *   7 Kennzahlen mit Ampel               nur 5, ohne Ampel
+       *   5 Kategorien mit Rechenweg           nur Punkte, ohne Skala
+       *   Einschaetzungszeilen                 war da
+       *   Kaufempfehlung                       war da
+       *
+       *   > Ein Teil der Heuristik sieht aus wie die Heuristik. Wer nur
+       *   > das Urteil weitergibt, gibt die Begruendung nicht weiter —
+       *   > und genau die wollte der Nutzer.
+       *
+       * Alle fuenf kommen jetzt aus `qc-heuristik.js`, also aus derselben
+       * Datei, die der Browser laedt. */
+      stufensatz: H ? rechenkerne.heuristikTeil('stufensatz',
+        rechenkerne.stufe(score).farbe) : undefined,
+      kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
+        { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
+          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
+        {
+          dscr: (darlehen > 0) ? null : 'ohne Kapitaldienst gibt es keinen Deckungsgrad',
+          ltv: (darlehen > 0) ? null : 'am Objekt ist kein Darlehen hinterlegt',
+          bwk: bwkDa ? null : 'am Objekt ist keine Bewirtschaftung hinterlegt',
+          ekr: (ek > 0) ? null : 'ohne eingesetztes Eigenkapital nicht berechenbar'
+        }) : undefined,
+      kategorien: K ? rechenkerne.heuristikTeil('kategorien',
+        { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
+          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
+        teilnotenRoh) : undefined,
       empfehlung: H && H.empfehlung ? H.empfehlung.verdict : null,
       empfehlung_text: H && H.empfehlung ? H.empfehlung.text : null,
       einschaetzung: H ? H.einschaetzung : undefined,
       hinweis: 'Das ist die Bewertung, die der Quick-Check in DealPilot unten '
-        + 'anzeigt — dieselben Schwellen, dieselben Saetze. Nenne den Score MIT '
-        + 'seiner Stufe, dann die Empfehlung, dann die Einschaetzungszeilen, '
-        + 'dann die Einordnung aus "ki_einordnung". ALLES IN EINER Nachricht. '
-        + 'Die Teilnoten nur, wenn der Nutzer nachfragt oder der Score schwach '
-        + 'ist. Texte UNVERAENDERT uebernehmen, nichts dazuerfinden.'
+        + 'anzeigt — dieselben Schwellen, dieselben Saetze, VOLLSTAENDIG. '
+        + 'Gib sie in EINER Nachricht aus, in dieser Reihenfolge: '
+        + '1. Score mit Stufe und "stufensatz". '
+        + '2. "kennzahlen_ampel" — alle sieben, je Zeile Wert und Ampel '
+        + '(gruen/gelb/rot); was "entfaellt" traegt, nennst du mit seinem Grund '
+        + 'und NICHT als Zahl. '
+        + '3. "kategorien" — die fuenf mit Punkten und Wert; den "rechenweg" nur, '
+        + 'wenn der Nutzer nachfragt. '
+        + '4. "empfehlung" und "empfehlung_text". '
+        + '5. "einschaetzung" — ALLE Zeilen, keine weglassen. '
+        + '6. "marktpreisindikation", wenn sie vorhanden ist. '
+        + '7. "ki_einordnung" zum Schluss. '
+        + 'Texte UNVERAENDERT uebernehmen, nichts dazuerfinden, nichts nachrechnen.'
     };
 
     /* ── v1927 · DIE EINORDNUNG DER KI ───────────────────────────────────
@@ -1981,6 +2164,12 @@ async function objekt_schnellblick(ctx, args) {
      *
      * KEIN STILLER AUSFALL: faellt die KI aus, kommt die Bewertung
      * trotzdem — mit dem Grund im Ergebnis, nicht mit einer Luecke. */
+    /* ── v1937 · DIE MARKTPREISINDIKATION, WENN ES EINE GIBT ─────────────
+     * Sie wird GELESEN, nicht abgerufen — ein Abruf kostet und braucht
+     * eine Freigabe. Steht nichts da, steht das auch so im Ergebnis. */
+    bewertung.marktpreisindikation = await _marktpreisIndikation(ctx.userId, id, d, kp);
+    const mpi = bewertung.marktpreisindikation;
+
     const einordnung = await bewertungsText.einordnung({
       adresse: _adrVon(o),
       objektart: d.objart || d.objektart || null,
@@ -1997,6 +2186,14 @@ async function objekt_schnellblick(ctx, args) {
       empfehlung: bewertung.empfehlung,
       empfehlung_text: bewertung.empfehlung_text,
       einschaetzung: bewertung.einschaetzung,
+      /* v1937 · Die Marktpreisindikation geht MIT hinein — fertig
+         gerechnet und anbieterneutral. Die KI ordnet sie ein; die
+         Abweichung in Prozent hat sie nicht selbst gebildet. */
+      marktwert: (mpi && mpi.vergleich) ? mpi.vergleich.marktwert : null,
+      marktwert_herkunft: (mpi && mpi.vergleich) ? mpi.vergleich.grundlage : null,
+      kaufpreis_zu_marktwert: (mpi && mpi.vergleich) ? mpi.vergleich.kaufpreis_zu_marktwert : null,
+      marktmiete_monat: (mpi && mpi.quellen)
+        ? (mpi.quellen.find((q) => q.marktmiete_monat) || {}).marktmiete_monat || null : null,
       /* Was die Rechnung traegt und was sie nicht traegt — damit die
          Einordnung nicht sicherer klingt als die Zahlen darunter. */
       vorbehalte: [
@@ -2011,6 +2208,9 @@ async function objekt_schnellblick(ctx, args) {
             + 'dadurch ZU HOCH — die nicht umlagefaehigen Kosten fehlen darin.',
         (K && !(darlehen > 0)) ? 'Am Objekt ist kein Darlehen hinterlegt; gerechnet '
           + 'ist das wie ein Barkauf. DSCR und LTV entfallen deshalb.' : null,
+        (mpi && mpi.vorhanden === false)
+          ? 'Es liegt KEINE Marktpreisindikation vor. Sage nichts darueber, ob der '
+            + 'Kaufpreis marktgerecht ist — du weisst es nicht.' : null,
         bewertung.kennzahlen_fehlen || null
       ].filter(Boolean)
     }, { userApiKey: ctx.userApiKey || null });
