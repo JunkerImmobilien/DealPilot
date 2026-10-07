@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Werbemittel 02 · "Die Abflugtafel" · 1920 × 1080 (16:9)
+     LinkedIn-Beitrag · auch als YouTube-/Website-Schleife brauchbar
+     ───────────────────────────────────────────────────────────────────────
+     MOCKUP. Im Browser öffnen, zusehen.
+
+     Warum 16:9 und nicht hochkant: LinkedIn wird überwiegend am
+     Schreibtisch gelesen, und eine Tafel ist von Natur aus breit. Ein
+     hochkantes Video müsste die Zeilen stapeln — dann ist es keine Tafel
+     mehr, sondern eine Liste.
+
+     Die Buchstaben würfeln sich durch, wie bei einer echten Fallblattanzeige.
+     Das braucht Zufall, also läuft die Schleife über JavaScript und nicht
+     über CSS-Keyframes. Takt: 9 s.
+
+     Kein Ton nötig — das Klappern ist ein BILD, kein Geräusch.
+     Der Rabattcode kommt nicht vor. Die Ticket-Codes auch nicht: dieser
+     Beitrag soll an den STAND führen, nicht zum Ticketshop.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Werbung 02 · Abflugtafel · 16:9</title>
+<style>
+:root{
+  --ob0:#050505; --ob1:#0a0a0a; --cream:#FDFCFA;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f;
+  --grn:#3FA56C; --grnh:#5BD98E;
+  --txtd:#ece6d6;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#232323;overflow:hidden}
+.rahmen{position:fixed;inset:0 0 54px 0;display:flex;align-items:center;
+  justify-content:center;overflow:hidden}
+.buehne{width:1920px;height:1080px;flex:none;position:relative;overflow:hidden;
+  background:var(--ob0);transform-origin:center center;
+  font:1rem/1.5 var(--body);color:var(--txtd);
+  display:flex;align-items:center;gap:80px;padding:0 110px}
+.schein{position:absolute;left:-10%;right:-10%;top:-30%;height:90%;
+  background:radial-gradient(ellipse at 40% 60%,rgba(201,168,76,.15),transparent 62%)}
+.bahn{position:absolute;left:0;right:0;bottom:0;height:62%;overflow:hidden}
+.bahn svg{position:absolute;left:-4%;bottom:-24%;width:108%;height:160%}
+
+/* ── Links: Marke und Satz ─────────────────────────────────────────── */
+.links{position:relative;z-index:2;flex:none;width:640px}
+.marke{font:700 72px/1 var(--disp);letter-spacing:-2.6px;color:#fff;margin-bottom:34px}
+.marke b{color:var(--gdh)}
+.kick{font:700 21px/1 var(--mono);letter-spacing:.24em;color:var(--gd);
+  display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.kick::before{content:'';width:40px;height:2px;background:var(--gd)}
+.links h1{margin:0;font:700 64px/1.08 var(--disp);letter-spacing:-2px;color:#fff}
+.links h1 em{font-style:normal;color:var(--gdh)}
+.links p{margin:26px 0 0;font-size:25px;line-height:1.5;color:rgba(255,255,255,.62);max-width:30ch}
+
+/* ── Rechts: die Tafel ─────────────────────────────────────────────── */
+.tafel{position:relative;z-index:2;flex:1;background:#0b0a08;
+  border:2px solid rgba(201,168,76,.3);padding:44px 48px}
+.reihe{display:flex;align-items:center;gap:26px;margin-bottom:18px}
+.reihe:last-of-type{margin-bottom:0}
+.lab{font:700 20px/1 var(--mono);letter-spacing:.17em;color:rgba(232,204,122,.5);
+  width:118px;flex:none;text-align:right}
+.flaps{display:flex;gap:7px}
+.flap{width:54px;height:74px;background:#171510;color:var(--gdh);
+  font:700 38px/74px var(--mono);text-align:center;position:relative;overflow:hidden;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.6)}
+/* der Spalt in der Mitte, der die Klappe verrät */
+.flap::after{content:'';position:absolute;left:0;right:0;top:50%;height:2px;
+  background:rgba(0,0,0,.55)}
+.flap.leer{background:transparent;box-shadow:none}
+.flap.leer::after{display:none}
+.flap.dreht{animation:klapp .085s linear}
+@keyframes klapp{
+  0%{transform:rotateX(0);filter:brightness(1)}
+  49%{transform:rotateX(-84deg);filter:brightness(.4)}
+  50%{transform:rotateX(84deg);filter:brightness(.4)}
+  100%{transform:rotateX(0);filter:brightness(1)}
+}
+.reihe.stat .flap{color:var(--grnh)}
+
+/* Fußzeile der Tafel */
+.tfuss{margin-top:38px;padding-top:26px;border-top:1px solid rgba(255,255,255,.1);
+  display:flex;gap:0}
+.tfuss > div{flex:1;padding:0 20px;border-right:1px solid rgba(255,255,255,.08)}
+.tfuss > div:first-child{padding-left:0}
+.tfuss > div:last-child{border-right:0;padding-right:0}
+.tfuss b{display:block;font:600 20px/1.25 var(--body);color:#fff}
+.tfuss span{display:block;margin-top:5px;font-size:16px;line-height:1.35;color:rgba(255,255,255,.42)}
+
+/* ── Steuerpult ───────────────────────────────────────────────────── */
+.pult{position:fixed;left:0;right:0;bottom:0;height:54px;background:var(--ob0);
+  border-top:1px solid rgba(201,168,76,.3);display:flex;align-items:center;
+  justify-content:center;gap:14px;font:700 11px/1 var(--mono);letter-spacing:.14em;
+  color:rgba(232,204,122,.72);padding:0 14px;flex-wrap:wrap}
+.pult button{background:none;border:1px solid rgba(201,168,76,.45);color:var(--gdh);
+  font:700 11px/1 var(--mono);letter-spacing:.1em;padding:9px 14px;cursor:pointer}
+.pult button:hover{background:rgba(201,168,76,.16)}
+.pult .fmt{color:rgba(255,255,255,.45)}
+
+@media(prefers-reduced-motion:reduce){
+  .flap.dreht{animation:none}
+}
+</style>
+</head><body>
+
+<div class="rahmen">
+<div class="buehne" id="buehne">
+  <div class="schein"></div>
+  <div class="bahn">
+    <svg viewBox="0 0 1900 700" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-40 690 C 400 650, 1000 440, 1960 40" fill="none" stroke="#C9A84C"
+            stroke-width="24" stroke-linecap="round" opacity=".26"/>
+    </svg>
+  </div>
+
+  <div class="links">
+    <div class="marke">Deal<b>Pilot</b></div>
+    <div class="kick">ABFLUGTAFEL</div>
+    <h1>Wir heben ab —<br><em>in Leipzig</em>.</h1>
+    <p>Zwei Tage immocation Festival. Am Stand liegt deine Bordkarte
+       mit Abriss — persönlich abzuholen.</p>
+  </div>
+
+  <div class="tafel">
+    <div class="reihe"><span class="lab">ZIEL</span><span class="flaps" data-wort="LEIPZIG"></span></div>
+    <!-- "31.10-01.11" statt "31.10+01.11": das Pluszeichen las sich
+         technisch. Der Bindestrich gehört dafür in den Zeichensatz. -->
+    <div class="reihe"><span class="lab">DATUM</span><span class="flaps" data-wort="31.10-01.11"></span></div>
+    <div class="reihe"><span class="lab">GATE</span><span class="flaps" data-wort="HALLE 3"></span></div>
+    <div class="reihe"><span class="lab">PLATZ</span><span class="flaps" data-wort="STAND 106"></span></div>
+    <div class="reihe stat"><span class="lab">STATUS</span><span class="flaps" data-wort="BOARDING"></span></div>
+
+    <div class="tfuss">
+      <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div>
+      <div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div>
+      <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pult">
+  <span>WERBUNG 02 · ABFLUGTAFEL</span>
+  <span class="fmt">1920 × 1080 (16:9) · LinkedIn · 9 s Schleife</span>
+  <button id="b-neu">VON VORN</button>
+  <button id="b-stop">SCHLEIFE AUS</button>
+</div>
+
+<script>
+(function(){
+  var B=1920, H=1080;
+  var buehne=document.getElementById('buehne'), rahmen=document.querySelector('.rahmen');
+  var ZEICHEN='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.- ';
+  var sanft=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var tmr=[], schleife=null;
+
+  function skalieren(){
+    var r=rahmen.getBoundingClientRect();
+    buehne.style.transform='scale('+Math.min(r.width/B, r.height/H)+')';
+  }
+  window.addEventListener('resize',skalieren);
+  skalieren();
+
+  /* Die Kästchen werden einmal gebaut: eins je Zeichen. */
+  Array.prototype.forEach.call(document.querySelectorAll('.flaps'),function(f){
+    var w=f.getAttribute('data-wort');
+    for(var i=0;i<w.length;i++){
+      var s=document.createElement('span');
+      s.className='flap'+(w[i]===' '?' leer':'');
+      s.textContent=w[i]===' '?'':' ';
+      f.appendChild(s);
+    }
+  });
+
+  function aufraeumen(){
+    tmr.forEach(function(t){ typeof t==='function'?t():clearTimeout(t); });
+    tmr=[];
+  }
+
+  /* Ein Kästchen würfelt sich zu seinem Zielzeichen durch. */
+  function rollen(el,ziel,verzug){
+    if(ziel===' ') return;
+    tmr.push(setTimeout(function(){
+      if(sanft){ el.textContent=ziel; return; }
+      var n=0, max=6+Math.floor(Math.random()*7);
+      var iv=setInterval(function(){
+        n++;
+        if(n>=max){ clearInterval(iv); el.textContent=ziel; el.classList.remove('dreht'); return; }
+        el.textContent=ZEICHEN[Math.floor(Math.random()*ZEICHEN.length)];
+        el.classList.remove('dreht'); void el.offsetWidth; el.classList.add('dreht');
+      },78);
+      tmr.push(function(){clearInterval(iv);});
+    },verzug));
+  }
+
+  function lauf(){
+    aufraeumen();
+    /* Die Bewegung beginnt sofort — kein Vorspann. Reihe für Reihe,
+       damit das Auge mitkommt; die letzte (STATUS) rastet zuletzt ein
+       und ist die Pointe. */
+    Array.prototype.forEach.call(document.querySelectorAll('.flaps'),function(f,ri){
+      var w=f.getAttribute('data-wort');
+      Array.prototype.forEach.call(f.children,function(el,ci){
+        if(w[ci]===' ') return;
+        el.textContent=' ';
+        rollen(el,w[ci],120+ri*300+ci*55);
+      });
+    });
+  }
+
+  document.getElementById('b-neu').addEventListener('click',lauf);
+  var an=true;
+  document.getElementById('b-stop').addEventListener('click',function(){
+    an=!an;
+    if(an){ schleife=setInterval(lauf,9000); lauf(); this.textContent='SCHLEIFE AUS'; }
+    else { clearInterval(schleife); schleife=null; this.textContent='SCHLEIFE AN'; }
+  });
+
+  lauf();
+  schleife=setInterval(lauf,9000);
+})();
+</script>
+</body></html>

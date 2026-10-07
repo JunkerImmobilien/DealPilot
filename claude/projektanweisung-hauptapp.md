@@ -31919,7 +31919,7 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 #### A · Die Abnahme, die der Bot-Lauf nicht machen konnte
 
 Die KI-Automatik feuert echte OpenAI-Aufrufe. Ob sie im laufenden iframe so sparsam ist wie im
-Prüfer, war offen. **Im echten Browser nachgemessen**, Zähler auf  und :
+Prüfer, war offen. **Im echten Browser nachgemessen**, Zähler auf `fetch` und `XMLHttpRequest`:
 
 ```
 55 Zeichen in 12 Feldern getippt      sofort 0 Aufrufe, danach lief sie
@@ -31941,7 +31941,7 @@ schwach"*. Eine Note neben ihrem Gegenteil. Jetzt steht eine **Handlung** neben 
 die beiden dürfen nebeneinander stehen, zwei Noten nicht.
 
 > **Mein Zähler saß zuerst im falschen Dokument.** Ich habe ihn im Quick-Check-iframe gesetzt,
-> der Aufruf läuft aber über  in der HAUPT-App. Beide Zähler meldeten 0,
+> der Aufruf läuft aber über `qc-ai-bridge.js` in der HAUPT-App. Beide Zähler meldeten 0,
 > während die Automatik längst gelaufen war — sichtbar nur daran, dass die Box
 > „DealPilot · KI-Analyse" trug. **Ein Zähler, der nichts zählt, sieht aus wie ein Befund.**
 

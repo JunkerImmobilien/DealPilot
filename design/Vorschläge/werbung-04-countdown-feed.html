@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Werbemittel 04 · "Der Countdown" · 1080 × 1080 (1:1)
+     Instagram-Feed · LinkedIn-Beitrag
+     ───────────────────────────────────────────────────────────────────────
+     MOCKUP. Im Browser öffnen, zusehen.
+
+     Das ist KEIN einzelner Beitrag, sondern EINE VORLAGE FÜR FÜNF:
+         NOCH 14 TAGE · NOCH 7 TAGE · NOCH 3 TAGE · MORGEN · HEUTE
+     Immer dasselbe Bild, nur die Zahl klappt um — wie auf der
+     Abflugtafel. Nach dem ersten Mal kostet jeder weitere Beitrag keine
+     Arbeit mehr, und der Wiedererkennungswert steigt mit jedem.
+
+     Quadratisch, weil der Feed quadratisch ist: ein 9:16-Video wird dort
+     beschnitten, ein 16:9 verschenkt die halbe Fläche.
+
+     ── Bedienung ─────────────────────────────────────────────────────────
+     Die Schleife spielt alle fünf Stufen durch, damit du die Serie am
+     Stück siehst. Für die Aufnahme EINES Beitrags: "SCHLEIFE AUS", dann
+     mit "NÄCHSTE STUFE" die gewünschte einstellen und "KLAPPEN" drücken.
+
+     Ab Stufe 3 trägt jede Stufe einen eigenen Satz — fünf fast gleiche
+     Beiträge wären sonst Tapete.
+
+     Der Rabattcode kommt nicht vor.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Werbung 04 · Countdown · 1:1</title>
+<style>
+:root{
+  --ob0:#050505; --ob1:#0a0a0a; --paper:#EDE7DA;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f;
+  --grnh:#5BD98E; --rd:#B86250; --txtd:#ece6d6;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#232323;overflow:hidden}
+.rahmen{position:fixed;inset:0 0 54px 0;display:flex;align-items:center;
+  justify-content:center;overflow:hidden}
+.buehne{width:1080px;height:1080px;flex:none;position:relative;overflow:hidden;
+  background:var(--ob0);transform-origin:center center;
+  font:1rem/1.5 var(--body);color:var(--txtd);
+  display:flex;flex-direction:column;justify-content:space-between;padding:70px 72px}
+.schein{position:absolute;left:-20%;right:-20%;top:-20%;height:86%;
+  background:radial-gradient(ellipse at 50% 56%,rgba(201,168,76,.17),transparent 64%)}
+.bahn{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.bahn svg{position:absolute;left:-8%;top:0;width:116%;height:100%}
+
+/* ── Kopf ──────────────────────────────────────────────────────────── */
+.kopf{position:relative;z-index:2;display:flex;justify-content:space-between;
+  align-items:baseline;gap:20px}
+.marke{font:700 48px/1 var(--disp);letter-spacing:-1.7px;color:#fff}
+.marke b{color:var(--gdh)}
+.kopf .re{font:700 19px/1.4 var(--mono);letter-spacing:.16em;
+  color:rgba(232,204,122,.62);text-align:right}
+
+/* ── Die Mitte: die klappende Anzeige ──────────────────────────────── */
+.mitte{position:relative;z-index:2;text-align:center;margin:-10px 0}
+.lab{font:700 23px/1 var(--mono);letter-spacing:.26em;color:var(--gd);
+  display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:40px}
+.lab::before,.lab::after{content:'';width:54px;height:2px;background:var(--gd)}
+
+.anzeige{display:flex;justify-content:center;gap:12px;min-height:220px;align-items:center}
+.kachel{min-width:150px;height:220px;background:#171510;color:var(--gdh);
+  font:700 148px/220px var(--disp);letter-spacing:-5px;text-align:center;
+  position:relative;overflow:hidden;box-shadow:inset 0 -3px 0 rgba(0,0,0,.6);
+  padding:0 10px}
+.kachel::after{content:'';position:absolute;left:0;right:0;top:50%;height:3px;
+  background:rgba(0,0,0,.55)}
+/* Wortstufen (MORGEN / HEUTE) brauchen eine breitere, flachere Kachel */
+.anzeige.wort .kachel{min-width:0;padding:0 44px;font-size:106px;letter-spacing:-3px}
+.anzeige.heute .kachel{color:var(--grnh)}
+.kachel.dreht{animation:klapp .09s linear}
+@keyframes klapp{
+  0%{transform:rotateX(0);filter:brightness(1)}
+  49%{transform:rotateX(-84deg);filter:brightness(.38)}
+  50%{transform:rotateX(84deg);filter:brightness(.38)}
+  100%{transform:rotateX(0);filter:brightness(1)}
+}
+.einheit{margin-top:34px;font:700 40px/1 var(--disp);letter-spacing:-1px;color:#fff}
+.satz{margin-top:26px;font:500 27px/1.45 var(--body);color:rgba(255,255,255,.66);
+  max-width:30ch;margin-left:auto;margin-right:auto}
+
+/* ── Fuß ───────────────────────────────────────────────────────────── */
+.fuss{position:relative;z-index:2}
+.wo{display:flex;align-items:center;justify-content:center;gap:20px;
+  background:var(--runway);color:#1a1407;padding:24px 20px;
+  font:700 31px/1 var(--disp);letter-spacing:-.6px}
+.wo .pin{font-size:26px}
+.unten{margin-top:24px;display:flex;justify-content:space-between;gap:16px;
+  font:700 17px/1.4 var(--mono);letter-spacing:.13em;color:rgba(255,255,255,.4);
+  flex-wrap:wrap}
+.unten .gold{color:rgba(232,204,122,.72)}
+
+/* ── Steuerpult ───────────────────────────────────────────────────── */
+.pult{position:fixed;left:0;right:0;bottom:0;height:54px;background:var(--ob0);
+  border-top:1px solid rgba(201,168,76,.3);display:flex;align-items:center;
+  justify-content:center;gap:12px;font:700 11px/1 var(--mono);letter-spacing:.14em;
+  color:rgba(232,204,122,.72);padding:0 14px;flex-wrap:wrap}
+.pult button{background:none;border:1px solid rgba(201,168,76,.45);color:var(--gdh);
+  font:700 11px/1 var(--mono);letter-spacing:.1em;padding:9px 13px;cursor:pointer}
+.pult button:hover{background:rgba(201,168,76,.16)}
+.pult .fmt{color:rgba(255,255,255,.45)}
+.pult .stufe{color:#fff}
+
+@media(prefers-reduced-motion:reduce){
+  .kachel.dreht{animation:none}
+}
+</style>
+</head><body>
+
+<div class="rahmen">
+<div class="buehne" id="buehne">
+  <div class="schein"></div>
+  <div class="bahn">
+    <svg viewBox="0 0 1080 1080" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-60 1040 C 220 960, 520 700, 1140 60" fill="none" stroke="#C9A84C"
+            stroke-width="28" stroke-linecap="round" opacity=".30"/>
+    </svg>
+  </div>
+
+  <div class="kopf">
+    <div class="marke">Deal<b>Pilot</b></div>
+    <div class="re">IMMOCATION<br>FESTIVAL 2026</div>
+  </div>
+
+  <div class="mitte">
+    <div class="lab" id="lab">NOCH</div>
+    <div class="anzeige" id="anzeige"></div>
+    <div class="einheit" id="einheit">Tage bis Leipzig</div>
+    <div class="satz" id="satz">Am Stand liegt deine Bordkarte — mit echtem Abriss.</div>
+  </div>
+
+  <div class="fuss">
+    <div class="wo"><span class="pin">✈</span><span>Halle 3 · Stand 106</span></div>
+    <div class="unten">
+      <span class="gold">31.10. &amp; 01.11.2026 · MESSE LEIPZIG</span>
+      <span>SERVER IN DEUTSCHLAND · FUE-SIEGEL 2026</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pult">
+  <span>WERBUNG 04 · COUNTDOWN</span>
+  <span class="fmt">1080 × 1080 (1:1) · Feed</span>
+  <span class="stufe" id="anzeigeStufe">1/5</span>
+  <button id="b-next">NÄCHSTE STUFE</button>
+  <button id="b-klapp">KLAPPEN</button>
+  <button id="b-stop">SCHLEIFE AUS</button>
+</div>
+
+<script>
+(function(){
+  var B=1080, H=1080;
+  var buehne=document.getElementById('buehne'), rahmen=document.querySelector('.rahmen');
+  var anz=document.getElementById('anzeige'), lab=document.getElementById('lab'),
+      einh=document.getElementById('einheit'), satz=document.getElementById('satz'),
+      stufeAnz=document.getElementById('anzeigeStufe');
+  var ZIFFERN='0123456789';
+  var BUCHST='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var sanft=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* Die fünf Stufen. Ab der dritten trägt jede einen eigenen Satz —
+     fünf fast gleiche Beiträge wären sonst Tapete. */
+  var STUFEN=[
+    {lab:'NOCH', zeichen:'14', art:'zahl',  einheit:'Tage bis Leipzig',
+     satz:'Am Stand liegt deine Bordkarte — mit echtem Abriss.'},
+    {lab:'NOCH', zeichen:'7',  art:'zahl',  einheit:'Tage bis Leipzig',
+     satz:'Noch kein Ticket? Mit dealpilot15 kommst du günstiger rein.'},
+    {lab:'NOCH', zeichen:'3',  art:'zahl',  einheit:'Tage bis Leipzig',
+     satz:'Bring dein Objekt mit — wir rechnen es am Stand gemeinsam durch.'},
+    {lab:'AB',   zeichen:'MORGEN', art:'wort', einheit:'sind wir in Halle 3',
+     satz:'Zwei Tage, ein Stand, und eine Bordkarte, die es nur dort gibt.'},
+    {lab:'',     zeichen:'HEUTE',  art:'heute', einheit:'Komm vorbei.',
+     satz:'Halle 3 · Stand 106. Wir sind da, bis die Halle zumacht.'}
+  ];
+  var i=0, schleife=null, tmr=[];
+
+  function skalieren(){
+    var r=rahmen.getBoundingClientRect();
+    buehne.style.transform='scale('+Math.min(r.width/B, r.height/H)+')';
+  }
+  window.addEventListener('resize',skalieren);
+  skalieren();
+
+  function aufraeumen(){
+    tmr.forEach(function(t){ typeof t==='function'?t():clearTimeout(t); });
+    tmr=[];
+  }
+
+  function bauen(s){
+    aufraeumen();
+    anz.innerHTML='';
+    anz.className='anzeige'+(s.art==='wort'?' wort':(s.art==='heute'?' wort heute':''));
+    lab.textContent=s.lab;
+    lab.style.visibility=s.lab?'visible':'hidden';
+    einh.textContent=s.einheit;
+    satz.textContent=s.satz;
+    /* Wortstufen stehen in EINER Kachel, Zahlen je Ziffer in einer -
+       sonst wird "MORGEN" sechs Kästchen breit und sprengt das Quadrat. */
+    if(s.art==='zahl'){
+      for(var n=0;n<s.zeichen.length;n++){
+        var k=document.createElement('span');
+        k.className='kachel'; k.textContent=s.zeichen[n];
+        anz.appendChild(k);
+      }
+    } else {
+      var k2=document.createElement('span');
+      k2.className='kachel'; k2.textContent=s.zeichen;
+      anz.appendChild(k2);
+    }
+    stufeAnz.textContent=(i+1)+'/5';
+  }
+
+  function klappen(){
+    if(sanft) return;
+    var s=STUFEN[i];
+    var kacheln=anz.querySelectorAll('.kachel');
+    Array.prototype.forEach.call(kacheln,function(el,ci){
+      var ziel=el.textContent;
+      var vorrat=(s.art==='zahl')?ZIFFERN:BUCHST;
+      tmr.push(setTimeout(function(){
+        var n=0, max=6+Math.floor(Math.random()*6);
+        var iv=setInterval(function(){
+          n++;
+          if(n>=max){ clearInterval(iv); el.textContent=ziel; el.classList.remove('dreht'); return; }
+          if(s.art==='zahl'){
+            el.textContent=vorrat[Math.floor(Math.random()*vorrat.length)];
+          } else {
+            /* bei Wörtern wird die ganze Kachel gewürfelt, Buchstabe
+               für Buchstabe in gleicher Länge */
+            var w=''; for(var q=0;q<ziel.length;q++) w+=vorrat[Math.floor(Math.random()*vorrat.length)];
+            el.textContent=w;
+          }
+          el.classList.remove('dreht'); void el.offsetWidth; el.classList.add('dreht');
+        },80);
+        tmr.push(function(){clearInterval(iv);});
+      },ci*90));
+    });
+  }
+
+  function zeige(n){ i=((n%STUFEN.length)+STUFEN.length)%STUFEN.length; bauen(STUFEN[i]); klappen(); }
+
+  document.getElementById('b-next').addEventListener('click',function(){ zeige(i+1); });
+  document.getElementById('b-klapp').addEventListener('click',klappen);
+  var an=true;
+  document.getElementById('b-stop').addEventListener('click',function(){
+    an=!an;
+    if(an){ schleife=setInterval(function(){ zeige(i+1); },3400); this.textContent='SCHLEIFE AUS'; }
+    else { clearInterval(schleife); schleife=null; this.textContent='SCHLEIFE AN'; }
+  });
+
+  zeige(0);
+  schleife=setInterval(function(){ zeige(i+1); },3400);
+})();
+</script>
+</body></html>

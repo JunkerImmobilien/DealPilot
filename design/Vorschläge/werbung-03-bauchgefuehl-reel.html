@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Werbemittel 03 · "Bauchgefühl → Daten" · 1080 × 1920 (9:16)
+     Instagram Reel / Story
+     ───────────────────────────────────────────────────────────────────────
+     MOCKUP. Im Browser öffnen, zusehen.
+
+     Das ist die Marken-Variante: sie verkauft nicht die Messe, sondern die
+     HALTUNG — und nimmt die Messe als Anlass mit. Deshalb ist sie die
+     einzige der vier, die nach dem Festival weiterlebt: letzte Einstellung
+     austauschen, fertig.
+
+     Die Bildfolge steht so schon auf der gedruckten Karte:
+         GUT ·········✈········· DAT
+         BAUCHGEFÜHL            DATEN & KLARHEIT
+         RÜCKFLUG: ············· ENTFÄLLT
+
+     ── Zeitachse: 11 s, Endlosschleife ───────────────────────────────────
+     0,0 s  GUT steht schon da (kein Vorspann)
+     0,7 s  das Flugzeug setzt sich in Bewegung — die erste Sekunde trägt
+     2,0 s  DAT rastet ein
+     3,2 s  RÜCKFLUG: ENTFÄLLT schreibt sich
+     4,6 s  die Runway-Kurve zieht hoch
+     5,8 s  die Messezeile kommt
+     10,2 s ausblenden, der Anfang passt wieder
+
+     Sichere Zonen: oben 150 px, unten 260 px bleiben frei (Instagram legt
+     dort Profilzeile, Beschriftung und Knöpfe darüber).
+
+     Der Rabattcode kommt nicht vor.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Werbung 03 · Bauchgefühl → Daten · 9:16</title>
+<style>
+:root{
+  --ob0:#050505; --ob1:#0a0a0a; --cream:#FDFCFA;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f;
+  --rd:#B86250; --txtd:#ece6d6;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  --takt:11s;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#232323;overflow:hidden}
+.rahmen{position:fixed;inset:0 0 54px 0;display:flex;align-items:center;
+  justify-content:center;overflow:hidden}
+.buehne{width:1080px;height:1920px;flex:none;position:relative;overflow:hidden;
+  background:var(--ob0);transform-origin:center center;
+  font:1rem/1.5 var(--body);color:var(--txtd)}
+.schein{position:absolute;left:-20%;right:-20%;top:4%;height:60%;
+  background:radial-gradient(ellipse at 50% 50%,rgba(201,168,76,.15),transparent 64%)}
+
+/* ── Kopf ──────────────────────────────────────────────────────────── */
+/* z-index:2 ist nötig, weil .bahn im Markup NACH diesen Blöcken steht —
+   ohne ihn läge die Kurve über der Schrift. */
+.kopf{position:absolute;top:150px;left:0;right:0;text-align:center;z-index:2}
+.marke{font:700 58px/1 var(--disp);letter-spacing:-2px;color:#fff}
+.marke b{color:var(--gdh)}
+
+/* ── Die Mitte: GUT → DAT ───────────────────────────────────────────
+   Gemessen am ersten Entwurf: zwischen Marke (oben) und der Mitte stand
+   ein knapper halber Meter Schwarz. Die Mitte sitzt jetzt höher und die
+   Wörter sind größer — auf einem Handy im Daumenabstand ist 122 px auf
+   1080 px Breite kleiner, als es am Schreibtisch aussieht. */
+.mitte{position:absolute;top:41%;left:60px;right:60px;transform:translateY(-50%);z-index:2}
+
+.paar{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.seite{flex:none;width:318px;text-align:center}
+.seite .wort{font:700 146px/1 var(--disp);letter-spacing:-6px}
+.seite .unter{margin-top:18px;font:700 22px/1.4 var(--mono);letter-spacing:.13em}
+
+.links .wort{color:rgba(255,255,255,.34)}
+.links .unter{color:rgba(255,255,255,.3)}
+.rechts .wort{color:#fff;opacity:0;transform:translateY(22px);
+  animation:datRein var(--takt) infinite}
+.rechts .unter{color:var(--gdh);opacity:0;animation:datRein var(--takt) infinite}
+@keyframes datRein{
+  0%,16%{opacity:0;transform:translateY(22px)}
+  20%{opacity:1;transform:translateY(0)}
+  91%{opacity:1;transform:translateY(0)}
+  95%,100%{opacity:0;transform:translateY(0)}
+}
+
+/* die Strecke dazwischen */
+.strecke{flex:1;position:relative;height:146px;min-width:0}
+.strich{position:absolute;left:0;right:0;top:68px;height:4px;
+  background:repeating-linear-gradient(to right,rgba(232,204,122,.5) 0 18px,transparent 18px 36px)}
+.flieger{position:absolute;top:32px;left:0;font-size:58px;color:var(--gdh);
+  animation:flug var(--takt) infinite}
+@keyframes flug{
+  0%,6%{left:0;opacity:0}
+  7%{left:0;opacity:1}
+  18%{left:calc(100% - 58px);opacity:1}
+  91%{left:calc(100% - 58px);opacity:1}
+  95%,100%{left:calc(100% - 58px);opacity:0}
+}
+
+/* RÜCKFLUG: ENTFÄLLT */
+.rueck{margin-top:54px;display:flex;align-items:center;gap:22px;
+  font:700 26px/1 var(--mono);letter-spacing:.12em;
+  opacity:0;animation:rueckRein var(--takt) infinite}
+.rueck .l{color:rgba(255,255,255,.4);flex:none}
+.rueck .p{flex:1;height:3px;
+  background:repeating-linear-gradient(to right,rgba(255,255,255,.26) 0 14px,transparent 14px 28px)}
+/* Rot ist eine Statusfarbe — sie bleibt in jeder Marke rot. */
+.rueck .r{color:var(--rd);flex:none}
+@keyframes rueckRein{
+  0%,27%{opacity:0}
+  31%{opacity:1}
+  91%{opacity:1}
+  95%,100%{opacity:0}
+}
+
+/* ── Die Runway-Kurve, die hochzieht ────────────────────────────────
+   Gemessen am ersten Entwurf: die Kurve lag in einem Kasten am unteren
+   Rand und war bei .42 Deckkraft auf Obsidian praktisch unsichtbar.
+   Sie zieht jetzt über die GANZE Bühne, hinter der Mitte hindurch, und
+   trägt die Bewegung, für die sie da ist. */
+.bahn{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.bahn svg{position:absolute;left:-10%;top:0;width:120%;height:100%}
+.bahn path{stroke-dasharray:3000;stroke-dashoffset:3000;
+  animation:ziehen var(--takt) infinite}
+@keyframes ziehen{
+  0%,40%{stroke-dashoffset:3000}
+  56%{stroke-dashoffset:0}
+  91%{stroke-dashoffset:0}
+  95%,100%{stroke-dashoffset:0;opacity:0}
+}
+
+/* ── Der Fuß: Claim und Messe ──────────────────────────────────────── */
+.fuss{position:absolute;left:66px;right:66px;bottom:260px;text-align:center;z-index:2}
+.claim{font:700 50px/1.14 var(--disp);letter-spacing:-1.5px;color:#fff;
+  opacity:0;animation:claimRein var(--takt) infinite}
+.claim em{font-style:normal;color:var(--gdh)}
+@keyframes claimRein{
+  0%,50%{opacity:0;transform:translateY(16px)}
+  56%{opacity:1;transform:translateY(0)}
+  91%{opacity:1;transform:translateY(0)}
+  95%,100%{opacity:0;transform:translateY(0)}
+}
+.messe{margin-top:40px;padding-top:30px;border-top:1px solid rgba(201,168,76,.3);
+  opacity:0;animation:messeRein var(--takt) infinite}
+@keyframes messeRein{
+  0%,54%{opacity:0}
+  60%{opacity:1}
+  91%{opacity:1}
+  95%,100%{opacity:0}
+}
+.messe .wo{font:700 38px/1.2 var(--disp);letter-spacing:-1px;color:#fff}
+.messe .wo b{color:var(--gdh)}
+.messe .wann{margin-top:14px;font:700 23px/1.4 var(--mono);letter-spacing:.15em;
+  color:rgba(232,204,122,.76)}
+
+.blende{position:absolute;inset:0;background:var(--ob0);opacity:0;pointer-events:none;
+  z-index:9;animation:blende var(--takt) infinite}
+@keyframes blende{0%,93%{opacity:0}97%{opacity:1}97.01%,100%{opacity:0}}
+
+/* ── Steuerpult ───────────────────────────────────────────────────── */
+.pult{position:fixed;left:0;right:0;bottom:0;height:54px;background:var(--ob0);
+  border-top:1px solid rgba(201,168,76,.3);display:flex;align-items:center;
+  justify-content:center;gap:14px;font:700 11px/1 var(--mono);letter-spacing:.14em;
+  color:rgba(232,204,122,.72);padding:0 14px;flex-wrap:wrap}
+.pult button{background:none;border:1px solid rgba(201,168,76,.45);color:var(--gdh);
+  font:700 11px/1 var(--mono);letter-spacing:.1em;padding:9px 14px;cursor:pointer}
+.pult button:hover{background:rgba(201,168,76,.16)}
+.pult .fmt{color:rgba(255,255,255,.45)}
+
+@media(prefers-reduced-motion:reduce){
+  .rechts .wort,.rechts .unter,.flieger,.rueck,.claim,.messe,.blende,.bahn path{animation:none}
+  .rechts .wort,.rechts .unter,.rueck,.claim,.messe{opacity:1;transform:none}
+  .flieger{left:calc(100% - 52px);opacity:1}
+  .bahn path{stroke-dashoffset:0}
+}
+</style>
+</head><body>
+
+<div class="rahmen">
+<div class="buehne" id="buehne">
+  <div class="schein"></div>
+
+  <div class="kopf"><div class="marke">Deal<b>Pilot</b></div></div>
+
+  <div class="mitte">
+    <div class="paar">
+      <div class="seite links">
+        <div class="wort">GUT</div>
+        <div class="unter">BAUCHGEFÜHL</div>
+      </div>
+      <div class="strecke">
+        <span class="strich"></span>
+        <span class="flieger">✈</span>
+      </div>
+      <div class="seite rechts">
+        <div class="wort">DAT</div>
+        <div class="unter">DATEN &amp;<br>KLARHEIT</div>
+      </div>
+    </div>
+
+    <div class="rueck">
+      <span class="l">RÜCKFLUG:</span>
+      <span class="p"></span>
+      <span class="r">ENTFÄLLT</span>
+    </div>
+  </div>
+
+  <div class="bahn">
+    <svg viewBox="0 0 1200 1920" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-60 1880 C 200 1700, 420 1180, 620 820 C 820 460, 1000 240, 1280 60"
+            fill="none" stroke="#C9A84C" stroke-width="30" stroke-linecap="round"
+            opacity=".62"/>
+    </svg>
+  </div>
+
+  <div class="fuss">
+    <div class="claim">Immobilienentscheidungen<br>sind zu groß für ein <em>Bauchgefühl</em>.</div>
+    <div class="messe">
+      <div class="wo">Triff uns in Leipzig.<br><b>Halle 3 · Stand 106.</b></div>
+      <div class="wann">IMMOCATION FESTIVAL · 31.10. &amp; 01.11.2026</div>
+    </div>
+  </div>
+
+  <div class="blende"></div>
+</div>
+</div>
+
+<div class="pult">
+  <span>WERBUNG 03 · BAUCHGEFÜHL → DATEN</span>
+  <span class="fmt">1080 × 1920 (9:16) · Reel / Story · 11 s Schleife</span>
+  <button id="b-neu">VON VORN</button>
+  <button id="b-pause">PAUSE</button>
+</div>
+
+<script>
+(function(){
+  var B=1080, H=1920;
+  var buehne=document.getElementById('buehne'), rahmen=document.querySelector('.rahmen');
+
+  function skalieren(){
+    var r=rahmen.getBoundingClientRect();
+    buehne.style.transform='scale('+Math.min(r.width/B, r.height/H)+')';
+  }
+  window.addEventListener('resize',skalieren);
+  skalieren();
+
+  var bewegt='.rechts .wort,.rechts .unter,.flieger,.rueck,.claim,.messe,.blende,.bahn path';
+
+  document.getElementById('b-neu').addEventListener('click',function(){
+    Array.prototype.forEach.call(buehne.querySelectorAll(bewegt),function(el){
+      var a=el.style.animation;
+      el.style.animation='none';
+      void el.offsetWidth;          /* Reflow erzwingen, sonst fasst der
+                                       Browser Aus und An zusammen */
+      el.style.animation=a||'';
+    });
+  });
+
+  var laeuft=true;
+  document.getElementById('b-pause').addEventListener('click',function(){
+    laeuft=!laeuft;
+    Array.prototype.forEach.call(buehne.querySelectorAll('*'),function(el){
+      el.style.animationPlayState=laeuft?'running':'paused';
+    });
+    this.textContent=laeuft?'PAUSE':'WEITER';
+  });
+})();
+</script>
+</body></html>

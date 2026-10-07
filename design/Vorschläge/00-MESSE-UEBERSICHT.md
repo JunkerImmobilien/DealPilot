@@ -27,17 +27,13 @@ kommen."*
 2. `Dateien/Messe/Instagram Post - personalisierbar.png` (Veranstalter) —
    *„Du findest uns an Stand 106 Halle 3"*, *„31.10. & 01.11.2026"*
 
-> **⚠ Ein Widerspruch, den du entscheiden musst.** Zwei ältere Stellen führen
-> noch **Stand 23**:
+> **✓ Erledigt — Marcel hat Stand 106 · Halle 3 bestätigt (07.10.2026).**
+> Alle Entwürfe und Werbemittel tragen diese Angabe ohne Vorbehalt.
+>
+> Drei ältere Stellen führten noch **Stand 23** und werden nachgezogen:
 > - `design/Messe/dealpilot-faltdisplay-151x225.html:454`
 > - `claude/projektanweisung-hauptapp.md:1583`
 > - `design/Vorschläge/messeplakat-2026-11.html:194` und `:246`
->
-> Die Entwürfe hier tragen **Stand 106 · Halle 3**, weil das die jüngere und
-> doppelt belegte Angabe ist — und weil der Veranstalter-Post ausdrücklich
-> *„Du findest uns an …"* sagt. **Sobald du es bestätigst, gehören die drei
-> Stellen oben nachgezogen.** An jeder Stelle im Markup steht ein Kommentar
-> dazu.
 
 ---
 
@@ -205,8 +201,8 @@ Alle vier Entwürfe laufen auf 390 px **ohne waagerechten Überlauf**
 
 ## Offene Punkte — das brauchst du zu entscheiden
 
-1. **Stand 106 oder Stand 23?** Siehe oben. Drei Stellen im Repo müssen danach
-   nachgezogen werden. **Das ist der einzige harte offene Punkt.**
+1. ~~**Stand 106 oder Stand 23?**~~ **Erledigt am 07.10.2026:** Stand 106 ·
+   Halle 3 ist bestätigt. Drei Stellen im Repo werden nachgezogen.
 2. **Darf `−15 %` auf der offenen Seite stehen?** Auf der Druckkarte steht es.
    Auf der Website war ein Dauerrabatt bisher bewusst **nicht** beworben
    (`promo-erstflug.js: ANZEIGE_AKTIV = false`, Entscheidung vom 07.09.2026).
@@ -225,10 +221,113 @@ Alle vier Entwürfe laufen auf 390 px **ohne waagerechten Überlauf**
 
 ---
 
+---
+
+# Werbemittel für Instagram und LinkedIn — vier laufende Animationen
+
+Marcel: *„und wo sind die video ideen? die sollen umgesetzt werden das ich die
+direkt sehen kann und auch die werbung für Insta und Linked In aus dem
+Abrissticket"*
+
+**Alle vier laufen im Browser.** Datei öffnen, zusehen. Unten sitzt eine
+schwarze Leiste mit Knöpfen (**VON VORN**, **PAUSE**) — die gehört nicht zum
+Beitrag, damit kannst du die Bewegung beliebig oft ansehen.
+
+**So wird ein Video daraus:** Fenster aufziehen, Bildschirmaufnahme starten,
+eine Schleife mitschneiden, zuschneiden, fertig. Die Flächen sind in echten
+Zielpixeln gebaut (1080 × 1920 usw.) und hier nur zum Ansehen kleingerechnet —
+auf dem Bildschirm aufgenommen stimmt das Format.
+
+| Datei | Format | wohin | Länge |
+|---|---|---|---|
+| `werbung-01-riss-reel.html` | **1080 × 1920** (9:16) | Instagram Reel / Story | 7 s Schleife |
+| `werbung-02-abflugtafel-linkedin.html` | **1920 × 1080** (16:9) | LinkedIn-Beitrag | 9 s Schleife |
+| `werbung-03-bauchgefuehl-reel.html` | **1080 × 1920** (9:16) | Instagram Reel / Story | 11 s Schleife |
+| `werbung-04-countdown-feed.html` | **1080 × 1080** (1:1) | Feed · beide Netzwerke | 5 Stufen |
+
+### 01 · Der Riss — aus dem Abrissticket, das dir gefallen hat
+
+Die Bordkarte groß im Bild, der goldene Abriss wird weggerissen, darunter
+steht *Halle 3 · Stand 106* und der Stempel **NUR AM STAND** knallt rein.
+**Für wen:** alle. Das ist der Beitrag, der die Botschaft nicht sagt, sondern
+spielt — den Abriss bekommt man hier eben nicht. **Wenn nur einer gebaut wird,
+dann dieser.**
+
+### 02 · Die Abflugtafel — der sachliche für LinkedIn
+
+Eine Fallblattanzeige würfelt sich Zeile für Zeile durch: `ZIEL LEIPZIG ·
+DATUM 31.10-01.11 · GATE HALLE 3 · PLATZ STAND 106 · STATUS BOARDING` (das
+letzte in Grün, als Pointe). **Für wen:** LinkedIn, wo nüchtern gelesen wird.
+Quer, weil eine Tafel breit ist — hochkant wäre sie eine Liste, keine Tafel.
+Mit anderem Status (`CHECK-IN OFFEN`, `LETZTER TAG`) wird eine Serie daraus.
+
+### 03 · Bauchgefühl → Daten — die Marken-Variante
+
+`GUT / BAUCHGEFÜHL` links, ein Flugzeug zieht hinüber, `DAT / DATEN &
+KLARHEIT` rastet ein, darunter schreibt sich `RÜCKFLUG: ENTFÄLLT`. Dann zieht
+die Runway-Kurve hoch und der Claim kommt. **Für wen:** die, die DealPilot noch
+nicht kennen. Sie verkauft die Haltung und nimmt die Messe als Anlass mit —
+**die einzige der vier, die nach dem Festival weiterlebt**: letzte Einstellung
+austauschen, fertig.
+
+### 04 · Der Countdown — eine Vorlage, fünf Beiträge
+
+`NOCH 14 TAGE → 7 → 3 → MORGEN → HEUTE`, immer dasselbe Bild, nur die Zahl
+klappt um. **Für wen:** den Vorlauf. Nach dem ersten Mal kostet jeder weitere
+Beitrag keine Arbeit mehr. **Ab Stufe 3 trägt jede Stufe einen eigenen Satz** —
+fünf fast gleiche Beiträge wären sonst Tapete. Für die Aufnahme eines
+einzelnen: *SCHLEIFE AUS*, mit *NÄCHSTE STUFE* einstellen, *KLAPPEN* drücken.
+
+### Was die vier richtig machen
+
+- **Kein Vorspann.** In allen vieren beginnt die Bewegung in der ersten
+  Sekunde — kein Logo, das erst wegblendet. Wer scrollt, entscheidet vorher.
+- **Ohne Ton verständlich.** Beide Netzwerke spielen stumm vor. Nichts hier
+  braucht Erklärung aus dem Lautsprecher; das Klappern der Tafel ist ein
+  **Bild**, kein Geräusch.
+- **Echte Schleifen.** Jede endet so, dass der Anfang wieder passt — wer
+  zweimal hinsieht, starrt nicht auf ein Standbild.
+- **`prefers-reduced-motion`** wird überall respektiert: wer Bewegung
+  abbestellt hat, sieht gleich das Ergebnis.
+
+### Die Ticket-Codes
+
+Nur in **04, Stufe 2** (*„Noch kein Ticket? Mit dealpilot15 kommst du günstiger
+rein."*). In 01, 02 und 03 bewusst nicht: diese drei sollen an den **Stand**
+führen, nicht in den Ticketshop. Der Code auf der Bordkarte kommt in keinem
+der vier vor.
+
+### Gemessen, nicht angenommen
+
+| Befund | Ursache | behoben |
+|---|---|---|
+| In 01 lag der Kopf **96 px** von oben, das Vertrauensband **92 px** von unten | Genau dort legt Instagram bei Reels Profilzeile, Beschriftung und Knöpfe darüber — beides wäre **verdeckt** gewesen. Jetzt bleiben oben 150 px und unten 260 px frei | ✓ |
+| In 03 war die Runway-Kurve so gut wie **unsichtbar** | Sie lag in einem Kasten am unteren Rand und hatte auf Obsidian zu wenig Deckkraft. Zieht jetzt über die ganze Fläche, hinter der Schrift hindurch | ✓ |
+| In 03 klaffte zwischen Marke und Mitte **ein halber Meter Schwarz** | Die Mitte saß auf 50 %. Jetzt 41 %, und die Wörter sind von 122 auf 146 px gewachsen — auf einem Handy ist 122 px kleiner, als es am Schreibtisch aussieht | ✓ |
+| In 02 las sich die Datumszeile `31.10+01.11` technisch | Das Pluszeichen. Jetzt `31.10-01.11`, der Bindestrich gehört dafür in den Zeichensatz | ✓ |
+
+Formate nachgemessen: 01/03 = 0,562 (9:16), 02 = 1,778 (16:9), 04 = 1,000 (1:1).
+Keine Überläufe, keine Überlappungen zwischen Kopf, Mitte und Fuß.
+
+### Eine Idee habe ich NICHT gebaut
+
+In `messe-video-ideen.md` steht als Idee 4 **„Acht Sekunden Cockpit"** — eine
+Bildschirmaufnahme aus der echten App: Objekt rein, Deal Score springt hoch,
+Kennzahlen laufen ein. **Die habe ich bewusst weggelassen.**
+
+Ich hätte sie nur nachbauen können, mit erfundenen Zahlen. Ein Werbevideo, das
+einen Deal Score und Kennzahlen zeigt, die so nie gerechnet wurden, ist eine
+Produktbehauptung — und das ist genau das, was wir sonst nirgends tun. **Diese
+Idee braucht eine echte Aufnahme aus der laufenden App**, mit einem sauberen
+Demo-Objekt und ohne Kundendaten im Bild. Das kann ich nicht herstellen, du
+schon. Vier, die tragen, sind besser als fünf, von denen eine schwindelt.
+
+---
+
 ## Dazu passend
 
-- **`messe-video-ideen.md`** — fünf Ideen für kurze Werbevideos auf LinkedIn
-  und Instagram, wie von dir angefragt. Noch nichts produziert.
+- **`messe-video-ideen.md`** — die Gedanken hinter den fünf Ideen, inklusive
+  der nicht gebauten, und wann welcher Beitrag gepostet werden sollte.
 - `design/Messe/dealpilot-faltdisplay-151x225.html` und
   `dealpilot-zipperwall-2x2.5m_6.html` — die Displays, die am Stand stehen.
   Die Entwürfe hier sind bewusst in derselben Bildsprache gehalten.

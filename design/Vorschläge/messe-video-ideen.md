@@ -4,8 +4,21 @@
 LinkedIn und Instagram bereitstellen. kleines Video. Auch mit Dealpilot?
 4-5 ideen erst."*
 
-Hier stehen die Ideen. **Noch ist nichts produziert** — das ist der nächste
-Schritt, wenn du eine oder zwei ausgewählt hast.
+> **Nachtrag 07.10.2026 — vier davon laufen jetzt.** Marcel: *„die sollen
+> umgesetzt werden das ich die direkt sehen kann."* Die Animationen liegen
+> als `werbung-01` bis `werbung-04` im selben Ordner, jede in ihrem echten
+> Format. Im Browser öffnen, zusehen. **Idee 4 (Cockpit) ist bewusst NICHT
+> gebaut** — Begründung unten bei der Idee.
+>
+> Welche Idee welche Datei wurde:
+>
+> | Idee | Datei | Format |
+> |---|---|---|
+> | 1 · Der Riss | `werbung-01-riss-reel.html` | 1080 × 1920 |
+> | 2 · Die Abflugtafel | `werbung-02-abflugtafel-linkedin.html` | 1920 × 1080 |
+> | 3 · Bauchgefühl → Daten | `werbung-03-bauchgefuehl-reel.html` | 1080 × 1920 |
+> | 4 · Cockpit | **nicht gebaut** | — |
+> | 5 · Der Countdown | `werbung-04-countdown-feed.html` | 1080 × 1080 |
 
 ---
 
@@ -142,6 +155,14 @@ zusammen durch.* Das ist ein Standgespräch, das sich von selbst ergibt.
 
 **Risiko:** Eine echte Aufnahme braucht ein echtes, vorzeigbares Objekt —
 und keine Kundendaten im Bild. Vorher ein sauberes Demo-Objekt anlegen.
+
+> **Diese Idee ist als einzige NICHT gebaut.** Ich hätte sie nur nachstellen
+> können, mit erfundenem Deal Score und erfundenen Kennzahlen. Ein Werbevideo,
+> das Zahlen zeigt, die so nie gerechnet wurden, ist eine Produktbehauptung —
+> genau das, was wir sonst nirgends tun („wir erfinden keine Zahl").
+> **Sie braucht eine echte Bildschirmaufnahme aus der laufenden App.** Das
+> kann ich nicht herstellen, du schon: ein sauberes Demo-Objekt anlegen,
+> aufnehmen, und die Bordkarte aus `werbung-01` als Abspann darüberlegen.
 
 ---
 
