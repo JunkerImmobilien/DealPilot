@@ -21136,6 +21136,85 @@ body.qc-standalone-active #s-quick::before {
 @media (max-width: 600px) {
   .set-modal-v2 .ip-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== v1957 - DIE DREI LAGEKLASSEN IN DEN EINSTELLUNGEN =============
+   Eine Zeile je Klasse: Kopf mit Name und Erklaerung, darunter vier
+   schmale Zahlenfelder. Die Zielrendite ist Pflicht und steht zuerst;
+   die drei daneben sind freiwillig und tragen den Platzhalter
+   "Standard", damit sichtbar ist: leer heisst NICHT null.
+
+   Gold nur ueber die Whitelabel-Tokens - jedes Gold-Literal steht als
+   var(--wl-<hex>, #<hex>), sonst faerbt es sich beim Mandanten nicht um
+   (CLAUDE.md). Gruen und Rot kommen hier nicht vor.
+
+   Dieser Block ist bewusst ASCII: style.css wird byteweise
+   geschrieben, damit ein defektes Byte an anderer Stelle unberuehrt
+   bleibt. ==================================================== */
+.set-modal-v2 .ip-lage-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.set-modal-v2 .ip-lage-zeile {
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent);
+  border-radius: 8px;
+  padding: 10px 12px 12px;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent);
+}
+.set-modal-v2 .ip-lage-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 9px;
+  flex-wrap: wrap;
+}
+.set-modal-v2 .ip-lage-kopf b {
+  font-size: 13px;
+  color: var(--wl-c9a84c, #C9A84C);
+  letter-spacing: .4px;
+}
+.set-modal-v2 .ip-lage-kopf span {
+  font-size: 11px;
+  opacity: .72;
+}
+.set-modal-v2 .ip-lage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.set-modal-v2 .ip-lage-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10.5px;
+  letter-spacing: .3px;
+  opacity: .9;
+  min-width: 0;             /* sonst sprengt ein langer Titel die Spalte */
+}
+.set-modal-v2 .ip-lage-grid .ip-suffix {
+  font-size: 9.5px;
+  opacity: .6;
+}
+.set-modal-v2 input.ip-lage-f {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 6px 7px;
+  font-size: 12.5px;
+}
+/* Die Pflichtzahl traegt die Markenfarbe, die freiwilligen nicht -
+   so sieht man ohne Erklaerung, worauf es ankommt. */
+.set-modal-v2 input.ip-lage-f[data-f="ziel_bmr"] {
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);
+  font-weight: 600;
+}
+@media (max-width: 760px) {
+  .set-modal-v2 .ip-lage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .set-modal-v2 .ip-lage-grid { grid-template-columns: 1fr; }
+}
 .set-modal-v2 .ip-field { display: flex; flex-direction: column; gap: 4px; }
 .set-modal-v2 .ip-field-row {
   display: flex;

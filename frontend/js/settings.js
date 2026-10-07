@@ -1284,6 +1284,9 @@ function _swSet(btn) {
       var host = document.getElementById('ip-pane-host');
       if (host) host.innerHTML = window.DealPilotInvestmentProfile.renderPaneHtml();
       try { if (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.wireMarketRate) DealPilotInvestmentProfile.wireMarketRate(); } catch(e){}
+      /* v1957: dieselbe Stelle, dieselbe Vorsicht - jeder Griff prueft
+         erst, ob es sein Ziel gibt. */
+      try { if (DealPilotInvestmentProfile.wireLageProfil) DealPilotInvestmentProfile.wireLageProfil(); } catch (e) {}
     }
     var sel = document.getElementById('set_startup_view');
     if (sel) {
