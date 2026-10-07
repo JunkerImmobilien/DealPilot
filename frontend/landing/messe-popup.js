@@ -273,7 +273,19 @@
       '#' + ID + ' .mp-leib.ruck .mp-abriss .zieh,#' + ID + ' .mp-leib.ab .mp-abriss .zieh{opacity:0}',
       /* Vertrauensband - woertlich wie .tband in index.html, nur leiser */
       '#' + ID + ' .mp-tband{background:#0a0a0a;border-top:1px solid rgba(201,168,76,.24);',
-      '  display:grid;grid-template-columns:repeat(5,1fr)}',
+      /* v1947b · DIE FUE-SPALTE BRAUCHT MEHR PLATZ ALS DIE ANDEREN
+         Marcel am 07.10.2026: "schau dass das fue auch komplett auf der karte ist."
+         GEMESSEN im Browser: der Eintrag lief 7 px ueber die Karte hinaus
+         (x 1224..1320 bei Kartenende 1313) und der Text war um 7 px
+         abgeschnitten (scrollWidth 151 > clientWidth 144).
+         Ursache: repeat(5,1fr) gibt allen Spalten dieselbe Breite - aber
+         der FuE-Eintrag traegt ein 34-px-SIEGEL, die vier anderen nur ein
+         16-px-Symbol. Gleiche Breite bei doppelt so breitem Bild heisst
+         halb so viel Platz fuer den Text.
+         Ein Band aus gleichen Spalten passt nur zu gleichen Inhalten. */
+      '  display:grid;grid-template-columns:repeat(4,1fr) 1.38fr}',
+      '#' + ID + ' .mp-tband > div:last-child{padding-right:14px}',
+      '#' + ID + ' .mp-tband b,#' + ID + ' .mp-tband span{overflow-wrap:anywhere}',
       '#' + ID + ' .mp-tband > div{display:flex;gap:9px;align-items:center;padding:13px 12px;',
       '  border-right:1px solid rgba(255,255,255,.06);min-width:0}',
       '#' + ID + ' .mp-tband > div:last-child{border-right:0}',
