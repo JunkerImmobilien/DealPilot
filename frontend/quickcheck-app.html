@@ -5154,68 +5154,61 @@ const QcApp = (function() {
     const verdictSub = document.getElementById('ai-verdict-sub');
     const negotiate = document.getElementById('ai-negotiate-v');
 
-    let negotiateText = '';
-    if (score.score >= 75) {
-      verdict.classList.remove('warn', 'bad');
-      verdictEmoji.textContent = '💚';
-      verdictHl.textContent = 'Starker Kauf — empfehlenswert';
-      verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ') · Investment-Profil stimmt';
-      if (priceGapPct > 5) {
-        negotiateText = `<strong>Nicht stark verhandeln</strong> — der Preis ist marktgerecht (Marktwert ${fmt0(_avmResults[0].marktwert)} € liegt über KP). Versuche <strong>2-3% Nachlass</strong> für kleinere Mängel oder schnellen Abschluss. Sicher die Konditionen schnell.`;
-      } else {
-        negotiateText = `Versuche <strong>3-5% Nachlass</strong> — kein Druck, der Deal ist auch so stark. Bei Erfolg bist du beim Top-Score.`;
-      }
-    } else if (score.score >= 60) {
-      verdict.classList.remove('bad');
-      verdict.classList.add('warn');
-      verdictEmoji.textContent = '⚖️';
-      verdictHl.textContent = 'Kauf möglich — verhandeln nötig';
-      verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ') · Optimierungspotenzial';
-      if (priceGapPct < -5) {
-        const targetReduction = Math.abs(priceGapPct) + 2;
-        negotiateText = `<strong>Hart verhandeln, mindestens ${targetReduction}% Nachlass</strong>. Argumentation: AVM zeigt Überpreis von ${Math.abs(priceGapPct)}%. Bei ${targetReduction}% Reduktion käme der Deal auf einen guten Score.`;
-      } else {
-        negotiateText = `<strong>5-8% Nachlass</strong> verhandeln. Schwachpunkte als Argumentation: ${cons.length > 0 ? cons.slice(0,2).map(c => c.replace(/<\/?strong>/g, '"')).join(' · ').substring(0,200) : 'Cashflow und DSCR'}.`;
-      }
-    } else {
-      verdict.classList.remove('warn');
-      verdict.classList.add('bad');
-      verdictEmoji.textContent = '🔴';
-      verdictHl.textContent = 'Vorsicht — überdenken';
-      verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ') · zu schwach';
-      negotiateText = `<strong>Mindestens 10-15% Nachlass erforderlich</strong> — sonst weitersuchen. Bei diesem Score-Niveau ist der Deal aktuell nicht tragfähig. Alternative: anderes Finanzierungs-Setup (mehr EK, längere Zinsbindung).`;
-    }
-    // V344: Verhandlungs-Empfehlung mit nachvollziehbarer Rechnung (Kaufpreis → Zielpreis + Begründung)
-    (function(){
-      var _kp = QcEngine.num(inputs.kp);
-      var _nkmJ = QcEngine.num(inputs.nkm) * 12;
-      var _mw = 0, _prov = 'AVM';
-      if (_avmResults.length) {
-        var _a = _avmResults[0]; _prov = _a.provider || 'AVM';
-        _mw = (_a.provider === 'Sprengnetter') ? _selectedValue(_a, 'marktwert') : _a.marktwert;
-      }
-      if (!_kp) return; // ohne Kaufpreis bleibt der allgemeine Text
-      var _ziel = null, _grund = '';
-      if (_mw && _mw < _kp * 0.98) {
-        _ziel = Math.round(_mw);
-        _grund = 'Das entspricht dem ' + _prov + '-Marktwert (' + fmt0(_mw) + ' €); der Kaufpreis liegt aktuell ' + Math.round((_kp - _mw) / _kp * 100) + ' % darüber.';
-      } else if (_nkmJ) {
-        var _kpBmr = Math.round(_nkmJ / 0.05);
-        if (_kpBmr < _kp * 0.99) {
-          _ziel = _kpBmr;
-          _grund = 'Bei diesem Preis erreicht die Bruttomietrendite die Zielmarke von 5,0 % (aktuell ' + String(k.bmr).replace('.', ',') + ' %; Rechnung: ' + fmt0(_nkmJ) + ' € Jahresnettokaltmiete ÷ 5,0 %).';
-        }
-      }
-      if (_ziel && _ziel < _kp) {
-        var _redPct = Math.round((_kp - _ziel) / _kp * 100);
-        negotiateText = 'Kaufpreis <strong>' + fmt0(_kp) + ' €</strong> → Zielpreis <strong>' + fmt0(_ziel) + ' €</strong> ' +
-          '(<strong>\u2212' + _redPct + ' %</strong>, ' + fmt0(_kp - _ziel) + ' € weniger). ' + _grund;
-      } else {
-        negotiateText = 'Kaufpreis <strong>' + fmt0(_kp) + ' €</strong> ist marktgerecht \u2014 kein nennenswerter Verhandlungsbedarf. ' +
-          'Versuche 2\u20133 % (' + fmt0(Math.round(_kp * 0.025)) + ' €) f\u00FCr kleinere M\u00E4ngel oder einen schnellen Abschluss.';
-      }
-    })();
-    negotiate.innerHTML = negotiateText;
+    /* ═══ v1945 · EIN URTEIL, EINE QUELLE ═══════════════════════════════
+     *
+     * Marcel am 07.10.2026 zu einem echten Objekt (Score 56, Kaufpreis
+     * 180.000, Markteinschaetzung im Mittel 230.000):
+     *
+     *   „Und unten bei der Heuristik kommen Vorsicht, Ueberdenken rein mit
+     *    Kaufpreis 180.000 und allem. Ich finde, das ist ueberhaupt nicht
+     *    plausibel."
+     *
+     * ── WAS HIER STAND, UND WARUM ES SICH WIDERSPRACH ──────────────────
+     *
+     * Drei Bloecke, drei Urteile, keiner wusste vom anderen:
+     *
+     *   1. diese Verdict-Kette mit EIGENEN Schwellen 75/60 — waehrend
+     *      `score.label` daneben aus `ScoreTier` kam (85/70/50/35). Bei
+     *      Score 50-59 sagte die Stufe SOLIDE und der Satz daneben
+     *      „zu schwach". In derselben Zeile.
+     *   2. ein IIFE (V344) direkt darunter, das `negotiateText`
+     *      VOLLSTAENDIG ueberschrieb — egal was oben gesetzt worden war.
+     *      So stand „Mindestens 10-15 % Nachlass erforderlich" dreissig
+     *      Zeilen ueber „ist marktgerecht, kein Verhandlungsbedarf".
+     *   3. `composeOpinion()` mit einer dritten Kopie derselben Schwellen.
+     *
+     *     > Der zweite Schreiber gewinnt immer und weiss nichts vom
+     *     > ersten. Ein Nachtrag, der einen Wert ueberschreibt statt ihn
+     *     > abzuloesen, laesst die alte Begruendung daneben stehen.
+     *
+     * ── WAS DABEI RICHTIG WAR ──────────────────────────────────────────
+     *
+     * Nachgerechnet: „marktgerecht" war der EINZIGE der drei Bloecke, der
+     * den Marktwert ueberhaupt kannte — und er rechnete richtig. 180.000
+     * gegen einen Zielpreis von 230.400 heisst: der Preis ist gut. Falsch
+     * waren das Verdict und die Experten-Meinung, die nur auf den nackten
+     * Score sahen.
+     *
+     *     > Der eine Block, der den Marktwert kennt, steht zwischen
+     *     > zweien, die ihn nicht kennen — deshalb wirkt er wie der
+     *     > Ausreisser, dabei ist er der einzige, der stimmt.
+     *
+     * ── WAS JETZT GILT ─────────────────────────────────────────────────
+     *
+     * `QcHeuristik.empfehlung()` — derselbe Kern, den der Quick-Check-Tab
+     * und der Telegram-Bot benutzen, seit v1939 mit Marktwert und
+     * Angebotsabschlag. Die Schwellen stehen dort, die Stufe kommt aus
+     * `ScoreTier`, und die Ueberschrift ist eine HANDLUNG, keine Note:
+     * „verhandeln noetig" widerspricht „Solide" nicht, „zu schwach"
+     * schon. */
+    var _urteil = _qcUrteil(score, inputs, k, cons);
+    verdict.classList.remove('warn', 'bad');
+    if (_urteil.ton === 'warn') verdict.classList.add('warn');
+    if (_urteil.ton === 'bad') verdict.classList.add('bad');
+    verdictEmoji.textContent = _urteil.zeichen;
+    verdictHl.textContent = _urteil.ueberschrift;
+    verdictSub.textContent = 'Score ' + score.score + '/100 (' + score.label + ')';
+    negotiate.innerHTML = _urteil.rat;
 
     // Experten-Meinung
     const opinionText = composeOpinion(score, inputs, avmAnalysis);
@@ -5308,6 +5301,107 @@ const QcApp = (function() {
 </div>`;
   }
 
+  /* ═══ v1945 · DAS URTEIL — EINMAL, FUER ALLE DREI BLOECKE ═══════════════
+   *
+   * Verdict-Ueberschrift, Verhandlungsrat und der Schlusssatz der
+   * Experten-Meinung kamen bis v1944 aus drei getrennten Schwellenketten.
+   * Sie stehen jetzt hier, und sie stehen nur hier.
+   *
+   * Gerechnet wird NICHTS: `QcHeuristik.empfehlung()` ist derselbe Kern,
+   * den der Quick-Check-Tab und der Telegram-Bot benutzen. Diese Funktion
+   * uebersetzt sein Urteil in die Worte dieses Dokuments.
+   *
+   * ── WARUM DIE UEBERSCHRIFT EINE HANDLUNG IST ──────────────────────────
+   *
+   * Die Empfehlungskette kennt KAUFEN / VERHANDELN / PRUEFEN / KRITISCH /
+   * PASS. „KRITISCH" ist aber auch ein STUFENwort (unter 35) — stuende es
+   * als Ueberschrift neben „Score 56 (Solide)", waere das genau der
+   * Widerspruch, den Marcel beanstandet hat, nur in neuer Form.
+   *
+   *   > Eine Note und eine Handlungsanweisung duerfen nebeneinander
+   *   > stehen. Zwei Noten nicht.
+   *
+   * Deshalb sagt die Ueberschrift, was zu TUN ist, und der Satz darunter
+   * nennt die Note. */
+  function _qcUrteil(score, inputs, k, cons) {
+    var kp = QcEngine.num(inputs.kp) || 0;
+
+    /* Der Marktwert, den der Nutzer auf dem Schirm GEWAEHLT hat (unten /
+       Durchschnitt / oben) — nicht der, der zufaellig im Datensatz vorn
+       steht. Bis v1944 nahm das IIFE fuer DealPilot `marktwert` direkt und
+       nur fuer Sprengnetter die Auswahl; das waren zwei Wege zu derselben
+       Zahl. */
+    var mwRoh = 0;
+    if (_avmResults.length) {
+      var a = _avmResults[0];
+      mwRoh = QcEngine.num(_selectedValue(a, 'marktwert')) || QcEngine.num(a.marktwert) || 0;
+    }
+    /* Marcels Bewertungsvorgabe vom 07.10.2026 gilt auch hier: der
+       Angebotsabschlag steckt in `QcHeuristik`, nicht in diesem Dokument. */
+    var mw = null, mwGrund = null;
+    if (mwRoh > 0 && window.QcHeuristik && QcHeuristik.marktwertBereinigt) {
+      var b = QcHeuristik.marktwertBereinigt(mwRoh, 'unbekannt');
+      if (b) { mw = b.bereinigt; mwGrund = b.abschlag_pct > 0 ? b.grund : null; }
+    }
+
+    var daten = {
+      score: score.score, kp: kp, nkm: QcEngine.num(inputs.nkm) || 0,
+      bmr: QcEngine.num(k.bmr) || 0, nmr: QcEngine.num(k.nmr) || 0,
+      ekr: QcEngine.num(k.ekr) || 0, cfMon: QcEngine.num(k.cfMon) || 0,
+      /* GEMESSEN, wie die Felder in `score.kpi` heissen: `ltvPct` und
+         `bwkPctOfNkm`, nicht `ltv` und `bewirtPct`. Eine angenommene
+         Feldbezeichnung ergibt hier keine Ausnahme, sondern eine stille
+         Null — und eine Null im LTV liest sich wie ein Barkauf. */
+      dscr: QcEngine.num(k.dscr) || 0, ltv: QcEngine.num(k.ltvPct) || 0,
+      bewirtPctNkm: QcEngine.num(k.bwkPctOfNkm) || 0,
+      marktwert: mw, marktwert_grund: mwGrund
+    };
+
+    /* KEIN RUECKFALL auf eine eigene Kette: fehlt der Kern, sagt die Box
+       das und urteilt nicht. Ein zweites Urteil waere genau der Zustand,
+       aus dem dieses Paket herausfuehrt. */
+    if (!(window.QcHeuristik && QcHeuristik.empfehlung) || !kp) {
+      return { ton: 'warn', zeichen: '⚖️', verdict: null,
+        ueberschrift: 'Bewertung nicht verfügbar',
+        ueberschrift_kurz: 'nicht verfügbar',
+        rat: 'Die Bewertung ist gerade nicht ladbar (js/qc-heuristik.js) oder es '
+           + 'fehlt der Kaufpreis. Die Kennzahlen oben stimmen.',
+        schluss: '' };
+    }
+
+    var e = QcHeuristik.empfehlung(daten, function (s) { return '<strong>' + s + '</strong>'; });
+
+    /* Handlung statt Note — Begruendung im Block darueber. */
+    var WORTE = {
+      KAUFEN:     { ton: '',     zeichen: '💚', kopf: 'Starker Kauf — empfehlenswert',
+                    kurz: 'sachlich gerechtfertigt' },
+      VERHANDELN: { ton: 'warn', zeichen: '⚖️', kopf: 'Kauf möglich — verhandeln nötig',
+                    kurz: 'vertretbar, wenn der Preis nachgibt' },
+      PRUEFEN:    { ton: 'warn', zeichen: '🔍', kopf: 'Kauf möglich — genauer prüfen',
+                    kurz: 'vertretbar, aber noch nicht geprüft' },
+      KRITISCH:   { ton: 'bad',  zeichen: '⚠️', kopf: 'Nur mit Nachbesserung tragfähig',
+                    kurz: 'so noch nicht tragfähig' },
+      PASS:       { ton: 'bad',  zeichen: '🔴', kopf: 'Finger weg — weitersuchen',
+                    kurz: 'nicht empfehlenswert' }
+    };
+    var w = WORTE[e.verdict] || WORTE.PRUEFEN;
+
+    /* Die Schwachpunkte als Verhandlungsargument — sie standen schon
+       vorher im Rat, nur in einem der drei Zweige. */
+    var argumente = (cons && cons.length)
+      ? cons.slice(0, 2).map(function (c) { return c.replace(/<\/?strong>/g, '"'); }).join(' · ')
+      : '';
+
+    return {
+      ton: w.ton, zeichen: w.zeichen, verdict: e.verdict,
+      ueberschrift: w.kopf, ueberschrift_kurz: w.kurz,
+      rat: e.text + (argumente && (e.verdict === 'VERHANDELN' || e.verdict === 'KRITISCH')
+        ? ' Argumente für das Gespräch: ' + argumente + '.' : ''),
+      ziel_kp: e.ziel_kp,
+      marktwert: mw
+    };
+  }
+
   function composeOpinion(score, inputs, avmAnalysis) {
     const k = score.kpi;
     const parts = [];
@@ -5320,9 +5414,12 @@ const QcApp = (function() {
     parts.push(`Eine <strong>${objArt}</strong> in <strong>${ort}</strong>${wfl ? ' mit ' + wfl + ' m²' : ''} für <strong>${fmt0(kp)} €</strong> zu kaufen ist`);
     
     // Bewertung
-    if (score.score >= 75) parts.push(`<strong>sachlich gerechtfertigt</strong>.`);
-    else if (score.score >= 60) parts.push(`<strong>vertretbar, aber nicht optimal</strong>.`);
-    else parts.push(`<strong>aktuell nicht empfehlenswert</strong>.`);
+    /* v1945: dieselbe Quelle wie Verdict und Verhandlungsrat. Hier stand
+       die DRITTE Kopie der Schwellen 75/60 - und sie sagte "aktuell nicht
+       empfehlenswert", waehrend zwei Zentimeter darueber "marktgerecht"
+       stand. Das Wort kommt jetzt aus _qcUrteil(). */
+    var _u = _qcUrteil(score, inputs, k, null);
+    parts.push(`<strong>${_u.ueberschrift_kurz}</strong>.`);
 
     // KPI-Analyse
     if (k.bmr) {
@@ -5350,13 +5447,14 @@ const QcApp = (function() {
     }
 
     // Schluss
-    if (score.score >= 75) {
-      parts.push(`<strong>Empfehlung:</strong> Konditionen zügig sichern, kleinere Verhandlungen versuchen.`);
-    } else if (score.score >= 60) {
-      parts.push(`<strong>Empfehlung:</strong> Verhandeln, dann nochmal nachrechnen. Bei Erfolg ist es ein guter Deal.`);
-    } else {
-      parts.push(`<strong>Empfehlung:</strong> Deutlich verhandeln oder weitersuchen. So wie es ist, ist die Rendite-Risiko-Relation nicht stimmig.`);
-    }
+    /* v1945: der Schlusssatz folgt demselben Urteil. Vorher war es eine
+       vierte Kette mit denselben Schwellen - und derselben Blindheit
+       gegenueber dem Marktwert. */
+    /* Nur der ERSTE Satz des Rats — der ganze steht zwei Zentimeter
+       darueber in der Verhandlungs-Empfehlung. Zweimal derselbe Text macht
+       die Box laenger und nicht klarer. */
+    var _ratKurz = String(_u.rat).replace(/<\/?strong>/g, '').split(/(?<=\.)\s/)[0];
+    parts.push(`<strong>Empfehlung:</strong> ` + _ratKurz);
 
     return parts.join(' ');
   }
@@ -6286,6 +6384,10 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/dscr-engine.js?v=969n"></script>
   <script src="js/deal-kpis.js?v=969n"></script>
   <script src="js/score-tiers.js?v=v1863"></script>
+  <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
+       Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
+       Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
+  <script src="js/qc-heuristik.js?v=v1945"></script>
   <script src="js/dealscore.js?v=v1863"></script>
   <script src="js/avm-section.js?v=W33"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
