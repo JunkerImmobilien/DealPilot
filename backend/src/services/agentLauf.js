@@ -228,6 +228,15 @@ async function laufen(frage, ctx, opts) {
   const apiKey = config.openai.apiKey || o.userApiKey;
   if (!apiKey) { const e = new Error('Kein OpenAI-Key verfuegbar.'); e.code = 'NO_API_KEY'; throw e; }
 
+  /* ── v1927 · DER SCHLUESSEL GEHOERT IN DEN KONTEXT ───────────────────
+   * Seit v1927 ruft ein Werkzeug selbst das Modell: `objekt_schnellblick`
+   * holt die KI-Einordnung zur gerechneten Bewertung. Es muss denselben
+   * Schluessel nehmen wie dieser Lauf — sonst laeuft die Einordnung ueber
+   * den Server-Key, waehrend der Dialog ueber den persoenlichen Key
+   * laeuft, und der Nutzer bezahlt die eine Haelfte seiner Antwort selbst
+   * und die andere nicht. */
+  if (o.userApiKey && !ctx.userApiKey) ctx.userApiKey = o.userApiKey;
+
   const eingabe = [];
   eingabe.push({ role: 'system', content: SYSTEM });
 

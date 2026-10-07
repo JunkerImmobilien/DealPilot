@@ -252,6 +252,48 @@ let PROBE_ID = null;
       }
     }
 
+    /* ── v1927 · DIE KI-EINORDNUNG ──────────────────────────────────────
+     * Sie darf fehlen — aber nie still. Entweder Text oder Grund. */
+    if (b.ki_einordnung) {
+      console.log('  KI-EINORDNUNG (' + (b.ki_modell || '?') + '):');
+      console.log('    ' + String(b.ki_einordnung).replace(/\n/g, '\n    '));
+    } else if (b.ki_einordnung_fehlt) {
+      console.log('  KI-EINORDNUNG fehlt, Grund genannt: ' + b.ki_einordnung_fehlt.slice(0, 90));
+    } else if (!b.geht_noch_nicht) {
+      console.error('    ABW KI-Einordnung: weder Text noch Grund — das waere der stille Ausfall');
+      fehler++;
+    }
+
+    /* ── v1927 · DAS WERKZEUG, DAS MARCEL HEUTE TRIFFT ──────────────────
+     * Auf „wie ist der Score von …" waehlt das Modell `objekt_kennzahlen`.
+     * Es muss DIESELBE Bewertung liefern — sonst ist der Befund aus dem
+     * Chat vom 06.10. nicht behoben, sondern nur verschoben. */
+    const kz = werkzeuge.finde('objekt_kennzahlen');
+    if (kz) {
+      const gemerkt2 = [];
+      const ctx2 = { userId: zeile.user_id, merkeObjekt: (x) => gemerkt2.push(x) };
+      let e2;
+      try { e2 = await kz.fn(ctx2, { id: zeile.id }); } catch (e) { e2 = null;
+        console.error('    ABW objekt_kennzahlen gescheitert: ' + e.message); fehler++; }
+      if (e2) {
+        const b2 = e2.bewertung;
+        if (!b2) {
+          console.error('    ABW objekt_kennzahlen liefert KEINE bewertung — '
+            + 'genau der Befund aus Marcels Chat'); fehler++;
+        } else {
+          const gleich = b2.dealpilot_score === b.dealpilot_score && b2.stufe === b.stufe;
+          console.log('    ' + (gleich ? 'OK ' : 'ABW') + ' kennzahlen-werkzeug  Score '
+            + b2.dealpilot_score + ' (' + b2.stufe + ')'
+            + '  Empfehlung ' + (b2.empfehlung || '–')
+            + '  Einordnung ' + (b2.ki_einordnung ? 'ja' : 'nein'));
+          if (!gleich) fehler++;
+          if (e2.dealpilot_score !== undefined) {
+            console.error('    ABW der alte Score steht doppelt im Ergebnis'); fehler++;
+          }
+        }
+      }
+    }
+
     if (gemerkt.length !== 1 || gemerkt[0] !== zeile.id) {
       console.error('    ABW merkeObjekt: ' + JSON.stringify(gemerkt));
       fehler++;

@@ -53,6 +53,7 @@ const objectService = require('./objectService');
 const voiceExtract = require('./voiceExtractService');
 const vorgaben = require('./botVorgabenService');   /* v1824 */
 const rechenkerne = require('./rechenkerne');       /* v1899: DealKpis/Dscr der App */
+const bewertungsText = require('./bewertungsText'); /* v1927: die KI-Einordnung */
 const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
@@ -517,6 +518,58 @@ async function objekt_kennzahlen(ctx, args) {
       + 'gerechnet. Sag das so — nenne keine Zahl dafür. Er entsteht in DealPilot, '
       + 'wenn das Objekt im Deal-Score-Modul durchgerechnet wird.';
   }
+  /* ── v1927 · DIE VOLLSTAENDIGE BEWERTUNG, AUS DEM GLEICHEN WERKZEUG ───
+   *
+   * GEMESSEN an Marcels Chat vom 06.10.2026, 22:22 Uhr: auf „Kannst du mir
+   * den DealPilot-Score nochmal nennen?" kam die Zahl 68, die Stufe SOLIDE
+   * und sonst nichts — obwohl `objekt_schnellblick` seit v1925 Score,
+   * Heuristik und Kennzahlen liefert.
+   *
+   * Der Grund stand in der BESCHREIBUNG dieses Werkzeugs: „IMMER nehmen bei
+   * … 'wie ist der Score von …'". Das Modell hat sich daran gehalten. Es
+   * hat nicht das falsche Werkzeug gewaehlt — ihm wurde das falsche
+   * vorgeschrieben.
+   *
+   *   > Wer zwei Werkzeuge fuer dieselbe Frage anbietet, bestimmt mit der
+   *   > Beschreibung, welches gilt. Ein Modell ist nicht ungehorsam, wenn
+   *   > es dem folgt, was dasteht.
+   *
+   * Zwei Wege waeren moeglich gewesen: die Beschreibung umhaengen, oder
+   * hier dasselbe liefern. Das Umhaengen haette die Frage nur verschoben —
+   * „wie ist der Cashflow bei …" fuehrt weiter hierher, und dort fehlte
+   * die Bewertung dann genauso.
+   *
+   * Also ruft dieses Werkzeug das andere. KEINE zweite Rechnung, keine
+   * kopierte Ableitung: buchstaeblich dieselbe Funktion. Schlaegt sie fehl,
+   * bleibt dieses Werkzeug stehen, was es immer war.
+   */
+  let sb = null;
+  try {
+    sb = await objekt_schnellblick(ctx, { id: id });
+  } catch (e) {
+    sb = null;
+  }
+  if (sb && sb.gefunden && sb.bewertung) {
+    ergebnis.bewertung = sb.bewertung;
+    /* Der Score steht jetzt an EINER Stelle im Ergebnis. Die beiden Felder
+       oben blieben sonst als zweite Fassung daneben stehen — und zwei
+       Felder mit demselben Namen laden dazu ein, das aeltere zu nehmen. */
+    delete ergebnis.dealpilot_score;
+    delete ergebnis.dealpilot_stufe;
+    ergebnis.score_siehe = 'bewertung.dealpilot_score und bewertung.stufe';
+  }
+  if (sb && sb.gefunden) {
+    /* Die gerechneten Groessen als ERSATZ, wenn der Portfolio-Stand nichts
+       hergibt — nie daneben. Steht der Spiegel, gilt der Spiegel: er ist in
+       DealPilot gerechnet und kennt Restschuld und Rate, die hier niemand
+       ableiten kann. */
+    if (!tr.eintrag) {
+      ergebnis.rechnung = sb.rechnung;
+      ergebnis.finanzierung = sb.finanzierung;
+      ergebnis.kaufnebenkosten = sb.kaufnebenkosten;
+    }
+  }
+
   if (!tr.eintrag) {
     /* Jeder Grund bekommt seinen eigenen Satz. Ein gemeinsamer wäre
        bequemer und in jedem Einzelfall ungenau. */
@@ -535,6 +588,30 @@ async function objekt_kennzahlen(ctx, args) {
         + 'DealPilot einmal öffnen, dann ist die Zuordnung eindeutig.'
     };
     ergebnis.kennzahlen_hinweis = saetze[tr.grund] || saetze.nicht_im_spiegel;
+
+    /* ── v1927 · DER SATZ STIMMTE NICHT MEHR ──────────────────────────
+     *
+     * Im Chat stand woertlich: „Kennzahlen wie Cashflow, DSCR, LTV und
+     * Rendite sind nicht verfuegbar, da das Objekt nicht im
+     * Portfolio-Stand ist." Das kam von hier — und es war seit v1925
+     * falsch: der Rechenkern liefert genau diese vier.
+     *
+     *   > Ein Hinweis, der eine Luecke beschreibt, muss mitfallen, wenn
+     *   > die Luecke geschlossen wird. Sonst behauptet er sie weiter.
+     *
+     * Was der Portfolio-Stand WIRKLICH allein hat, bleibt benannt:
+     * Restschuld heute und die Rate in Euro — die haengen am Tilgungslauf
+     * und lassen sich hier nicht ableiten. */
+    if (ergebnis.bewertung && ergebnis.bewertung.kennzahlen) {
+      ergebnis.kennzahlen_hinweis = (saetze[tr.grund] || saetze.nicht_im_spiegel)
+        .replace(' Dann stehen Cashflow, DSCR, LTV und Rendite hier.', '')
+        .replace(' Cashflow, DSCR, LTV und Rendite gibt es dafür deshalb nicht — '
+               + 'behaupte dafür keine Zahl.', '')
+        + ' ABER: Cashflow, DSCR, LTV und Nettomietrendite stehen trotzdem da — '
+        + 'in "bewertung.kennzahlen", gerechnet mit demselben Kern wie die App. '
+        + 'Sag NICHT, sie seien nicht verfuegbar. Was wirklich nur aus dem '
+        + 'Portfolio-Stand kommt, ist die Restschuld heute und die Rate in Euro.';
+    }
   }
   if (fehlen.length) ergebnis.nicht_gerechnet = fehlen;
   return ergebnis;
@@ -1756,21 +1833,71 @@ async function objekt_schnellblick(ctx, args) {
    * mit den gespeicherten `_kpis_*` ueberein.
    *
    * ── WAS FEHLEN DARF UND WAS NICHT ────────────────────────────────── */
+  /* ── v1927 · HIER FEHLTE DIE HEURISTIK GENAU DANN, WENN ES ZAEHLT ────
+   *
+   * GEMESSEN an Marcels Telegram-Chat vom 06.10.2026, 22:22 Uhr — also
+   * NACH dem Rollout von v1925:
+   *
+   *   „Der DealPilot-Score fuer die Wohnung in der Sachsenstrasse 18 …
+   *    betraegt 68 und ist in der Kategorie SOLIDE."
+   *
+   * Und sonst nichts. Keine Empfehlung, keine Einschaetzung, keine
+   * Kennzahl. Der Grund stand hier: der Zweig fuer den GESPEICHERTEN
+   * Score gab Zahl und Stufe zurueck und hoerte dort auf. Die Heuristik
+   * lief nur im anderen Zweig — also nur an Objekten, die in DealPilot
+   * noch NICHT gerechnet waren.
+   *
+   *   > Genau die Objekte, die der Nutzer am besten kennt, bekamen die
+   *   > duennste Antwort. Ein Zweig, der weniger kann als sein
+   *   > Geschwister, faellt nicht auf: er liefert ja etwas.
+   *
+   * Richtig ist: der SCORE hat eine Quelle (gespeichert ODER gerechnet,
+   * nie beides), die HEURISTIK laeuft immer — sie ist eine Funktion des
+   * Scores und der Kennzahlen, und die Kennzahlen kommen in beiden
+   * Faellen aus demselben Kern.
+   *
+   * ── WAS FEHLEN DARF UND WAS NICHT ────────────────────────────────── */
   let bewertung = null;
   const scoreFehlt = [];
   if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
   if (!bwkDa) scoreFehlt.push('Hausgeld bzw. Bewirtschaftungskosten');
 
+  const svw2 = z(d.svwert) || z(d.bankval) || 0;
+  /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
+     Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
+     ist eine ANNAHME und steht als solche im Ergebnis. */
+  const wp = svw2 > 0 ? svw2 - kp : kp * 0.05;
+
+  /* ── 1 · WELCHER SCORE GILT — genau einer ─────────────────────────────
+   * Liegt ein in DealPilot gerechneter vor, gilt DIESER, und es wird kein
+   * zweiter gerechnet. Der Quick-Check-Score weicht bewusst ab
+   * (quick-check.js V63.22: er kennt weniger Felder), und zwei Zahlen
+   * nebeneinander waeren die zweite Meinung, die hier nie entstehen soll.
+   * Deshalb gibt es im gespeicherten Fall auch KEINE Teilnoten: sie sind
+   * die Zerlegung EINER Rechnung, und diese Rechnung hat hier nicht
+   * stattgefunden. */
+  let score = null, herkunft = null, teilnoten = null;
   if (sGespeichert.dealscore != null) {
-    /* Es gibt schon einen gerechneten Score. Dann gilt DIESER. */
-    bewertung = {
-      dealpilot_score: sGespeichert.dealscore,
-      stufe: rechenkerne.stufe(sGespeichert.dealscore).versal,
-      herkunft: 'in DealPilot gerechnet und am Objekt gespeichert',
-      investor_deal_score: sGespeichert.investor,
-      investor_stufe: sGespeichert.investorStufe,
-    };
-  } else if (scoreFehlt.length) {
+    score = sGespeichert.dealscore;
+    herkunft = 'in DealPilot gerechnet und am Objekt gespeichert';
+  } else if (!scoreFehlt.length) {
+    const mstg = dez(d.mietstg) != null ? dez(d.mietstg) : 1.5;
+    const S = rechenkerne.score({
+      kp: kp, cf_m: K.cf_m, nmy: K.nmy, ltv: K.ltv, dscr: K.dscr,
+      wp_kpi: wp, mstg: mstg
+    });
+    score = S.score;
+    herkunft = 'Quick-Check-Score — gerechnet mit demselben Kern wie die App '
+      + '(DealKpis + DealScore). Das Objekt wurde in DealPilot noch nicht '
+      + 'vollstaendig gerechnet; der Vollbild-Score kann abweichen, weil er '
+      + 'mehr Felder kennt.';
+    teilnoten = S.breakdown.map((b) => ({
+      was: b.label, punkte: Math.round(b.score) + ' von 100',
+      gewicht: b.weight + ' %', grundlage: b.input
+    }));
+  }
+
+  if (score == null) {
     bewertung = {
       dealpilot_score: null,
       geht_noch_nicht: scoreFehlt,
@@ -1779,55 +1906,98 @@ async function objekt_schnellblick(ctx, args) {
         + 'es wird nichts geschaetzt. Frag genau danach, EINE Angabe auf einmal.'
     };
   } else {
-    const svw2 = z(d.svwert) || z(d.bankval) || 0;
-    /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
-       Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
-       ist eine ANNAHME und steht als solche im Ergebnis. */
-    const wp = svw2 > 0 ? svw2 - kp : kp * 0.05;
-    const mstg = dez(d.mietstg) != null ? dez(d.mietstg) : 1.5;
-    const S = rechenkerne.score({
-      kp: kp, cf_m: K.cf_m, nmy: K.nmy, ltv: K.ltv, dscr: K.dscr,
-      wp_kpi: wp, mstg: mstg
-    });
-    const st = rechenkerne.stufe(S.score);
-    const bwkQuote = K.nkm_j > 0 ? (K.bwk / K.nkm_j * 100) : 0;
-    const H = rechenkerne.heuristik({
-      score: S.score, kp: kp, nkm: nkm + ze,
+    /* ── 2 · DIE KENNZAHLEN UND DIE HEURISTIK — immer, wenn sie gehen ── */
+    const bwkQuote = (K && K.nkm_j > 0) ? (K.bwk / K.nkm_j * 100) : null;
+    const H = K ? rechenkerne.heuristik({
+      score: score, kp: kp, nkm: nkm + ze,
       bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
-      ekr: K.ekr, bewirtPctNkm: bwkQuote
-    });
+      ekr: K.ekr, bewirtPctNkm: bwkQuote || 0
+    }) : null;
+
     bewertung = {
-      dealpilot_score: S.score,
-      stufe: st.versal,
-      herkunft: 'Quick-Check-Score — gerechnet mit demselben Kern wie die App '
-        + '(DealKpis + DealScore). Das Objekt wurde in DealPilot noch nicht '
-        + 'vollstaendig gerechnet; der Vollbild-Score kann abweichen, weil er '
-        + 'mehr Felder kennt.',
-      teilnoten: S.breakdown.map((b) => ({
-        was: b.label, punkte: Math.round(b.score) + ' von 100',
-        gewicht: b.weight + ' %', grundlage: b.input
-      })),
-      kennzahlen: {
+      dealpilot_score: score,
+      stufe: rechenkerne.stufe(score).versal,
+      herkunft: herkunft,
+      investor_deal_score: sGespeichert.investor,
+      investor_stufe: sGespeichert.investorStufe,
+      teilnoten: teilnoten || undefined,
+      kennzahlen: K ? {
         cashflow_monat: Math.round(K.cf_m).toLocaleString('de-DE') + ' EUR vor Steuer',
         nettomietrendite: pct(K.nmy),
         ltv: pct(K.ltv),
         dscr: K.dscr.toFixed(2).replace('.', ','),
         bewirtschaftungsquote: pct(bwkQuote) + ' der Jahreskaltmiete',
-      },
-      wertpuffer: svw2 > 0
+      } : undefined,
+      kennzahlen_fehlen: K ? undefined
+        : 'Cashflow, DSCR, LTV und Nettomietrendite brauchen ' + scoreFehlt.join(' und ')
+          + '. Sie werden nicht geschaetzt — frag danach.',
+      wertpuffer: !K ? undefined : (svw2 > 0
         ? eur(wp) + '  (Verkehrswert ' + eur(svw2) + ' minus Kaufpreis)'
         : eur(wp) + '  ANGENOMMEN: 5 % vom Kaufpreis, weil kein Verkehrswert '
-          + 'hinterlegt ist. Sag das dem Nutzer.',
+          + 'hinterlegt ist. Sag das dem Nutzer.'),
       /* ── DIE HEURISTIK ──────────────────────────────────────────────── */
-      empfehlung: H.empfehlung ? H.empfehlung.verdict : null,
-      empfehlung_text: H.empfehlung ? H.empfehlung.text : null,
-      einschaetzung: H.einschaetzung,
+      empfehlung: H && H.empfehlung ? H.empfehlung.verdict : null,
+      empfehlung_text: H && H.empfehlung ? H.empfehlung.text : null,
+      einschaetzung: H ? H.einschaetzung : undefined,
       hinweis: 'Das ist die Bewertung, die der Quick-Check in DealPilot unten '
         + 'anzeigt — dieselben Schwellen, dieselben Saetze. Nenne den Score MIT '
-        + 'seiner Stufe, dann die Empfehlung, dann die Einschaetzungszeilen. '
+        + 'seiner Stufe, dann die Empfehlung, dann die Einschaetzungszeilen, '
+        + 'dann die Einordnung aus "ki_einordnung". ALLES IN EINER Nachricht. '
         + 'Die Teilnoten nur, wenn der Nutzer nachfragt oder der Score schwach '
         + 'ist. Texte UNVERAENDERT uebernehmen, nichts dazuerfinden.'
     };
+
+    /* ── v1927 · DIE EINORDNUNG DER KI ───────────────────────────────────
+     *
+     * Marcel am 07.10.2026: „dass wir … das Ganze in die KI werfen, dass
+     * wir da noch mal was dazu bekommen. … dass wir da einmal eine
+     * komplette Bewertung bekommen."
+     *
+     * ZULETZT, und nur zu dem, was oben gerechnet ist. Die Reihenfolge
+     * ist die Aussage: erst die Zahlen, dann die Regel, dann die Meinung.
+     * Begruendung steht in `services/bewertungsText.js`.
+     *
+     * KEIN STILLER AUSFALL: faellt die KI aus, kommt die Bewertung
+     * trotzdem — mit dem Grund im Ergebnis, nicht mit einer Luecke. */
+    const einordnung = await bewertungsText.einordnung({
+      adresse: _adrVon(o),
+      objektart: d.objart || d.objektart || null,
+      baujahr: d.baujahr || null,
+      wohnflaeche: wfl ? wfl + ' m²' : null,
+      kaufpreis: eur(kp),
+      jahreskaltmiete: rechnung.jahreskaltmiete,
+      bruttomietrendite: rechnung.bruttomietrendite,
+      kaufpreisfaktor: rechnung.kaufpreisfaktor,
+      kennzahlen: bewertung.kennzahlen,
+      score: bewertung.dealpilot_score,
+      stufe: bewertung.stufe,
+      teilnoten: bewertung.teilnoten,
+      empfehlung: bewertung.empfehlung,
+      empfehlung_text: bewertung.empfehlung_text,
+      einschaetzung: bewertung.einschaetzung,
+      /* Was die Rechnung traegt und was sie nicht traegt — damit die
+         Einordnung nicht sicherer klingt als die Zahlen darunter. */
+      vorbehalte: [
+        knkVollstaendig ? null
+          : 'Bei den Kaufnebenkosten fehlt ein Posten; Darlehen und Kapitaldienst '
+            + 'sind dadurch eher zu niedrig.',
+        (svw2 > 0) ? null
+          : 'Es ist kein Verkehrswert hinterlegt; der Wertpuffer ist mit 5 % vom '
+            + 'Kaufpreis ANGENOMMEN, nicht gemessen.',
+        bewertung.kennzahlen_fehlen || null
+      ].filter(Boolean)
+    }, { userApiKey: ctx.userApiKey || null });
+
+    if (einordnung.ok) {
+      bewertung.ki_einordnung = einordnung.text;
+      bewertung.ki_modell = einordnung.modell;
+    } else {
+      bewertung.ki_einordnung = null;
+      bewertung.ki_einordnung_fehlt = einordnung.grund
+        + ' Die Bewertung oben gilt trotzdem — sie ist gerechnet, nicht von der '
+        + 'KI. Sag dem Nutzer in EINEM Satz, dass die Einordnung diesmal fehlt, '
+        + 'und schreibe KEINE eigene an ihrer Stelle.';
+    }
   }
 
   return {
@@ -2955,11 +3125,17 @@ const WERKZEUGE = [
 
   { name: 'objekt_kennzahlen', stufe: 'lesen', fn: objekt_kennzahlen,
     beschreibung: 'Die GERECHNETEN Zahlen EINES Objekts: Cashflow (Jahr und Monat), '
-      + 'DSCR, LTV, Bruttomietrendite, Restschuld, Zins und Tilgung in Euro, '
-      + 'DealPilot-Score und Investor Deal Score mit Stufe. '
+      + 'DSCR, LTV, Bruttomietrendite, Restschuld, Zins und Tilgung in Euro — '
+      + 'DAZU die VOLLSTAENDIGE BEWERTUNG im Feld "bewertung": DealPilot-Score mit '
+      + 'Stufe, die Kaufempfehlung (KAUFEN / VERHANDELN / KRITISCH / PASS), die '
+      + 'Einschaetzungszeilen und die KI-Einordnung in "ki_einordnung". '
       + 'IMMER nehmen bei "wie ist der Cashflow bei ...", "wie ist der Score von ...", '
       + '"was bringt mir Objekt N" — NICHT portfolio_lesen und darin suchen: die '
-      + 'Nummern der beiden Listen stimmen nicht ueberein.',
+      + 'Nummern der beiden Listen stimmen nicht ueberein. '
+      + 'Rufe DANEBEN NICHT objekt_schnellblick — der steckt hier schon drin, und '
+      + 'ein zweiter Aufruf erzeugt nur eine zweite KI-Einordnung. '
+      + 'Antworte in EINER Nachricht: Score mit Stufe, Empfehlung, Einschaetzung, '
+      + 'Einordnung. Nicht in mehreren.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
 
   { name: 'objekte_rangliste', stufe: 'lesen', fn: objekte_rangliste,
@@ -3031,7 +3207,10 @@ const WERKZEUGE = [
       + 'Finanzierung, wenn der Nutzer Zinssatz und Tilgung hinterlegt hat. '
       + 'DAZU DER DEAL-SCORE MIT SEINER STUFE, die KAUFEMPFEHLUNG (KAUFEN / '
       + 'VERHANDELN / KRITISCH / PASS) und die EINSCHAETZUNGSZEILEN — genau das, '
-      + 'was der Quick-Check in DealPilot unten anzeigt, aus demselben Rechenkern. '
+      + 'was der Quick-Check in DealPilot unten anzeigt, aus demselben Rechenkern — '
+      + 'und zum Schluss die KI-EINORDNUNG in "bewertung.ki_einordnung". '
+      + 'Antworte in EINER Nachricht, in dieser Reihenfolge: Zahlen, Score mit '
+      + 'Stufe, Empfehlung, Einschaetzung, Einordnung. '
       + 'IMMER nehmen direkt nach dem Anlegen eines Objekts und bei "ist das ein '
       + 'guter Deal", "was haelst du davon", "lohnt sich das", "mach mal einen '
       + 'Quick-Check". Fehlen Angaben fuer den Score, sagt das Werkzeug welche — '
