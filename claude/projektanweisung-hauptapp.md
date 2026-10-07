@@ -31914,6 +31914,85 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (82) 07.10.2026 — Prod-Rollout v1948 bis v1950a
+
+**Marcel: „ja rollout."** Prod und Staging sind wieder gleichauf.
+
+#### Umfang, vor dem Anfassen gemessen
+
+```
+5 Commits · 11 Dateien   main 12aa975b -> 548a79a2
+
+KEINE Migration, kein Schemaeingriff
+Backend betroffen:  backend/src/services/telegramDialogService.js
+                    marktbericht/frontend/app.js   (statische Wurzel im mb-Image)
+-> beide Images neu gebaut
+```
+
+> **Die Bot-Aenderung ist nachweislich nur Kommentar.** Nicht behauptet, sondern geprueft: der
+> Diff ohne Kommentarzeilen ist leer, und `stufeZu` aus `main` gegen die neue Fassung
+> diffte **identisch**. Beim letzten Rollout hatte ich „nur Frontend" behauptet und musste es
+> zuruecknehmen, nachdem Marcel auf dieser Grundlage schon entschieden hatte — deshalb steht
+> die Pruefung diesmal vor der Auskunft.
+
+#### Sicherung — angelegt UND angesehen
+
+```
+/root/backups/haupt-20261007-1327.sql.gz    11M    71 Tabellen
+/root/backups/mb-20261007-1327.sql.gz      1.6M    26 Tabellen
+beide mit echtem Dump-Kopf ("PostgreSQL database dump")
+```
+
+Nutzer und Datenbanken wie dokumentiert: `dealpilot/dealpilot_db` und `mb/marktbericht` —
+nicht `postgres`, das hat am 08.09. eine 20-Byte-Attrappe erzeugt.
+
+#### Nachweis auf Prod — Inhalt, nicht Status
+
+```
+/js/score-tiers.js            4865B   v1950-Kopf ok
+/js/objektkarten-stil.js     11545B   v1949 ok (function anwenden)
+/marktbericht-app/app.js    323486B   v1950 ok
+Resttreffer "s >= 85 ? Top":      0
+```
+
+Im Browser auf `app.dealpilot.immo`, die **echten** Funktionen der Dokumente gerufen:
+
+```
+Marktbericht  92="Sehr gut" 85="Sehr gut" 78="Gut" 60="Solide" 40="Schwach" 12="Kritisch"
+              Ring(92) traegt "Sehr gut", kein "Top"
+
+Haupt-App     objektkarten-stil.js?v=v1949 · anwenden=function
+              (Aktenreiter) (nicht ges.)  315x204
+              bordkarte     bordkarte     325x100
+              kante         kante         325x124
+              datenzeile    datenzeile    325x80
+              ampel         ampel         325x97
+              kennzahlen    kennzahlen    325x189
+              minimal       minimal       325x97
+              zurueckgestellt: layout=v1b  gewaehlt=""  objkarte=null
+```
+
+> **Der Zustand wurde vor der Messung gemerkt und danach zurueckgestellt.** Eine Messung auf
+> Produktion, die den Zustand liegen laesst, ist ein Eingriff.
+
+**Container:** `dealpilot-backend` healthy, `dealpilot-mb-backend` laeuft (Register: 4.819
+Saetze, 930 Gebiete). API lebt: `/api/v1/auth/me` antwortet mit einem korrekten 401 und
+JSON — **kein SPA-Durchfall**, der auf jedem Pfad 200 und 330 kB liefert.
+
+#### Zwei Nebenbefunde
+
+- **Der Pruefer laeuft auf Prod nicht:** dort gibt es kein `node` auf dem Host (auf Staging seit
+  17.09. schon). `tools/score-ketten-pruefen.mjs` lief lokal und auf Staging gegen denselben
+  Commit, auf Prod traegt der gemessene Dateiinhalt den Nachweis.
+  > Dabei ist mir eine eigene Falle aufgefallen: mein Befehl gab `RC=0` aus, obwohl
+  > `node: command not found` dastand — der Rueckgabewert kam von der PIPE, nicht vom Lauf.
+  > **`$?` nach einer Pipe ist der des letzten Glieds.**
+- **Zwei EZB-Zeitueberschreitungen im Prod-Log** (`ecb-fm EURIBOR3MD`, `marketRates MIR`),
+  auf Staging null. Nachgemessen, weil genau hier ein statischer Notnagel liegt:
+  `getCurrentRates()` meldet `fallback_used: []`, Quelle **bundesbank**, Werte 4,40 / 4,03 /
+  3,81 / 4,04 %. **Die Zinsen sind live.** Betroffen war die EZB-HISTORIE, nicht der
+  aktuelle Satz. Kein Notnagel im Einsatz — aber die Historie gehoert angesehen.
+
 ### (81) 07.10.2026 — v1950/v1950a: vier Score-Ketten, und ein Kommentar, der die Doppelung erlaubt hat
 
 CLAUDE.md sagt: **„Die Kette steht an EINER Stelle: `js/score-tiers.js`."** Gemessen am
