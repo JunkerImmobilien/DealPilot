@@ -31908,6 +31908,84 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (69) 07.10.2026 — v1930: das Bild des Nutzers als Messgerät
+
+**Marcel:** „im Hintergrund ist halt ein schwarzer Obsidian-Hintergrund mit Partikeln. Den
+versuchen wir jetzt schon die ganze Zeit zu ändern. Der muss geändert werden in der Farbe der
+Aktenmappe … wenn du oben auf die Desktop-Version gehst und hinter dem DealPilot-Logo die Farbe,
+die du dort hast. Ich will da auf jeden Fall keine Animation oder sowas hinter haben."
+
+**Das war der dritte Anlauf an derselben Fläche** (v1919, v1929, v1929a). Zweimal hatte ich im
+Browser gemessen und jedesmal `rgb(14,13,11)` gefunden — und bin trotzdem wieder an die Fläche
+gegangen. Diesmal habe ich **sein Bild** gemessen statt die App.
+
+`Dateien/menü.png`, 371 × 697, PNG ohne Fremdbibliothek dekodiert (zlib + Paeth-Filter von Hand),
+dann ausgezählt:
+
+```
+rgb(14,13,11)   72,1 % der Schublade
+                in JEDEM der 18 Zeilenbänder der häufigste Ton
+Kartenzone      zu 95,0 % derselbe Ton
+Schreibtisch    zu 96,9 % derselbe Ton          <- sein eigenes Vorbild
+```
+
+> **Kein Verlauf, keine Animation, kein Partikel-Canvas — und die Farbe, die er haben wollte,
+> hatte er bereits.** Das Bild, mit dem der Nutzer die Beschwerde belegt, ist zugleich der
+> Beweis, dass die Beschwerde eine andere Ursache hat. Es ist das genaueste Messgerät in der
+> Sitzung, weil es den Zustand auf SEINEM Gerät festhält, nicht auf meinem.
+
+**Die drei Töne, die den Grund zerteilen** — aus dem Bild gerechnet, im Browser bestätigt:
+
+| Bildton | Element | Füllung | Rechnung auf 14,13,11 | Stück |
+|---|---|---|---|---|
+| rgb(42,36,20) | `.sbc-seq` | Gold #C9A84C / 15 % | → 42,36,21 | 22 |
+| rgb( 5, 5, 4) | `.sbc-btn` | Schwarz / 60 % | →  5, 5, 4 | 44 |
+| rgb(43,40,36) | `.sbc-top` | Rahmen 191,183,169 / .16 | → 42,40,36 | 22 |
+
+Jede Zeile stimmt auf ±1 — damit ist jedes Pixel seines Bildes erklärt.
+
+> **v1929a hat `border-color` angefasst und die FÜLLUNGEN stehen lassen.** Ein Rahmen ist eine
+> Linie, eine Füllung ist eine Fläche; die Lasche leuchtete danach unverändert goldbraun weiter.
+> Wer „den Rahmen leiser" macht, hat die Fläche nicht angefasst.
+
+> **Und die Knöpfe waren DUNKLER als ihr Grund.** `rgba(0,0,0,.6)` auf Obsidian ergibt rgb(5,5,4)
+> — 44 schwarze Flecken auf fast-schwarz. Ein abdunkelnder Schleier braucht etwas zum Abdunkeln;
+> auf Obsidian hat er nichts mehr und hinterlässt nur Löcher.
+
+**Zwei Werkzeugfallen auf dem Weg, beide aus der eigenen Sammlung:**
+
+> **Der Prüfer hat sich selbst gemessen.** Der Browser meldet die Laschenfüllung als
+> `color(srgb 0.749 0.717 0.662 / 0.08)`. Mein Regex `[\d.]+` nahm die **0–1-Werte als 0–255**
+> und rechnete rgb(13,12,10) statt rgb(28,27,24) — also „unsichtbar" statt „richtig". Die
+> srgb-Schreibweise muss erkannt und mit 255 multipliziert werden.
+
+> **Und `visibilityState: hidden` fror die Schublade bei x = −357 ein.** Vier Klicks auf den
+> Hamburger änderten nichts, weil die Transition im Hintergrundtab auf ihrem Startwert steht.
+> Erst die Bildaufnahme holt das Tab nach vorn. Das ist [[eingefrorener-uebergang]], diesmal an
+> einer Geometrie statt an einer Farbe.
+
+**Abnahme, alle sieben Kartenstile bei 390 px:**
+
+```
+Stil            .sbc-seq Fläche   .sbc-btn Rahmen   Kontrast Knopf/Grund
+Aktenreiter     28,27,24          98,98,96          3,18
+Bordkarte       14,13,11          98,98,96          3,18
+Score-Kante     14,13,11          98,98,96          3,18
+Datenzeile      14,13,11          98,98,96          3,18
+Ampel           28,27,24          98,98,96          3,18
+Kennzahlen      28,27,24          98,98,96          3,18
+Minimal         28,27,24          98,98,96          3,18
+```
+
+Die Knöpfe tragen ihr Rahmen allein und bleiben über der 3:1-Schwelle. Das grüne
+INVESTOR-Abzeichen bleibt unangetastet — **Statusfarben werden nicht beruhigt**, sie sind
+Information.
+
+**Der Ausrollversuch brach beim ersten Anlauf ab:** eine Änderung an `index.html` (der
+Cache-Buster) macht `backend/src/generated/frontend-konstanten.json` veraltet. `node
+tools/frontend-konstanten.mjs`, mitcommitten, dann läuft es. Der Wächter hat genau das getan,
+wofür er da ist.
+
 ### (68) 07.10.2026 — v1928/v1929/v1929a: ein Muster entsteht nicht aus der Fläche
 
 **Marcel:** „wenn man das Menü öffnet und Portfolio auswählt der Hintergrund in schwarz obsidean
