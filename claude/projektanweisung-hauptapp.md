@@ -31914,6 +31914,87 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (78) 07.10.2026 — v1947: Messe-Paket, Preiskorrektur und der erste Prod-Rollout seit v1878
+
+#### A · Das Messe-Pop-up ist auf der Landing Page
+
+**Marcel:** „ich würde mir dann wünschen, dass wir einmal die Werbung Messe Pop-up 01 Abriss auf
+der Landingpage platzieren … und dass wir dann alles, was wir bis jetzt gemacht haben, dann einen
+Rollout machen."
+
+immocation FESTIVAL 2026 · 31.10. & 01.11. · Messe Leipzig · **Halle 3 · Stand 106**. Das Modul
+weicht `erstflug-popup.js` aus, zeigt sich einmal je Sitzung und **schaltet sich nach dem 01.11.2026
+selbst ab** — eine Messe-Einblendung, die jemand von Hand entfernen muss, bleibt stehen.
+
+> **Eine Entscheidung von Marcel hat den Entwurf korrigiert.** Das Pop-up trug „−15 % · Dauerhaft.
+> Auf jedes Paket." auf der offenen Seite. Am 22.09.2026 hatte er entschieden: „Aber direkt
+> ausgewiesen, wenn man auf die Seite klickt, soll er nicht sein." Auf Nachfrage am 07.10.:
+> **„Zahl raus."** Ein Messeangebot mit Enddatum ändert daran nichts. Auf dem Abriss steht jetzt
+> „Dein Vorteil", der Code weiterhin nur am Stand.
+
+**Und ein Befund, den Marcel gesehen hat und ich nicht:** „schau dass das fue auch komplett auf
+der karte ist." Gemessen — der Eintrag lief **7 px** über die Karte hinaus (x 1224..1320 bei
+Kartenende 1313) und der Text war um 7 px abgeschnitten (151 > 144).
+
+> **Ein Band aus gleichen Spalten passt nur zu gleichen Inhalten.** `repeat(5,1fr)` gibt allen
+> dieselbe Breite — der FuE-Eintrag trägt aber ein **34-px-Siegel**, die vier anderen nur ein
+> 16-px-Symbol. Gleiche Breite bei doppelt so breitem Bild heißt halb so viel Platz für den Text.
+> Jetzt `repeat(4,1fr) 1.38fr`; auf dem Handy bleiben drei Einträge, das Siegel ist einer davon.
+
+#### B · Der Starter-Preis stand an VIER Stellen falsch
+
+**Marcel:** „Starter, fünf Marktpreisindikationen, fünf Euro und einzelne Marktpreisindikationen
+für 90 Cent. Das geht natürlich von den Preisen nicht auf. Ich meine auch, dass wir die Preise
+schon angepasst haben."
+
+**Beides stimmte.** Gegen Stripe live gelesen (`acct_1TWXFd`, livemode):
+
+```
+Posten                  Landing   Stripe
+Nachkauf Starter          5,00     4,00   <- Landing falsch
+Nachkauf Investor         8,75     8,75   stimmt
+Nachkauf Pro             12,50    12,50   stimmt
+Einzeln MPI/MPI+/WEV      0,90 / 1,90 / 3,90   stimmt
+Abo Starter/Inv/Pro      19,99 / 34,99 / 49,99 stimmt
+```
+
+`dp_nachkauf_starter` trägt in Stripe seit v1674 **400 Cent**. Mit 5,00 war das Paket **50 Cent
+teurer als fünf Einzelkäufe** (5 × 0,90 = 4,50) — genau der Widerspruch, den Marcel gesehen hat.
+
+> **Seine Mehrzahl „Landingpages" war berechtigt, und sie reichte weiter, als ich zuerst
+> gemessen habe.** Der falsche Preis stand an vier Stellen: einmal in der Paket-Kachel der
+> `index.html`, zweimal in `leistungsumfang.html` (Fließtext und Kachel) — und eine vierte fand
+> ich erst beim Gegenlesen auf dem Prod-Server, in einem Fließtext („Starter 5 Bewertungen für
+> 5,00 €"), den mein Suchmuster nicht traf. **Wer nach einer Zahl sucht, findet sie nur dort, wo
+> er sie erwartet.** `alt-original.html` führt sie auch, ist aber von keiner Seite verlinkt und
+> steht nicht im Caddyfile — eine Leiche, bewusst nicht angefasst.
+
+**Kein Preis wurde entschieden**, nur eine veraltete Angabe auf den Stand gezogen, der in Stripe
+live ist.
+
+#### C · Der Rollout — und eine Korrektur, die Marcels Entscheidung beeinflusst hatte
+
+Ich hatte ihm gesagt, es seien „nur Frontend-Änderungen, keine Migration", und darauf hat er
+„direkt ausrollen" gewählt. **Die erste Hälfte war falsch.**
+
+```
+174 Commits · 32 frontend · 15 backend · 18 marktbericht · 14 design
+davon 7 echte Backend-Quelldateien → Rebuild, nicht nur git pull
+```
+
+> **Eine falsche Auskunft, auf der eine Entscheidung beruht, muss zurück — auch wenn sie bequem
+> war.** Richtig blieb: keine Migration, kein Schemaeingriff. Marcel hat nach der Korrektur
+> „Rebuild, vorher sichern" gewählt.
+
+**Gesichert und angesehen** (`/root/backups/`): Haupt-DB 11 MB mit **71 Tabellen**, Marktbericht
+1,6 MB mit **26 Tabellen**, beide mit echtem Dump-Kopf. Nicht die 20-Byte-Attrappe vom 08.09.
+
+**Rollout:** `main` von `3f7cddca` auf `5d7b5d05`, Server-HEAD gleich, Rebuild beider Backends,
+`dealpilot-backend` nach 52 s **healthy**. Auf Prod gegengelesen: Pop-up eingebunden,
+`ZEIGE_PROZENT = false`, Starter-Preis 4,00 €.
+
+**Das ist der erste Prod-Rollout seit v1878 (05.10.).** Prod und Staging sind wieder gleichauf.
+
 ### (77) 07.10.2026 — v1944 bis v1946: die KI-Bewertung im Browser abgenommen, und zwei Nummern doppelt
 
 #### A · Die Abnahme, die der Bot-Lauf nicht machen konnte
