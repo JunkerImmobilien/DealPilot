@@ -31979,7 +31979,10 @@ jedes mit Empfehlung (VERHANDELN · VERHANDELN · KRITISCH · KAUFEN · PASS) un
 über den Quick-Check-Zweig: Score 77 = Browser-Score des gleich bestückten Objekts, Prüfobjekt
 gelöscht, 0 Reste. Commits `73db2465` · `bcab2345` · `1bbb2f6b` · `0775d388`.
 
-**Offen — und zwar bei Marcel, nicht im Code:**
+**Die Geldfrage ist entschieden — am 07.10.2026 von Marcel: „So lassen, kein Kerosin."**
+Damit ist die Einordnung ausdrücklich kostenlos und **kein offener Punkt mehr**. Wer sie später
+wieder aufmacht, braucht einen neuen Satz von Marcel, nicht dieses Journal. Der Befund, der zur
+Frage führte, steht trotzdem hier, weil er die Entscheidung trägt:
 
 > **Ob eine Leistung Geld kostet, entscheidet nicht der, der sie baut.** Gemessen: `agentLauf.js`
 > ruft für **jede** Nachricht dasselbe Modell und verrechnet dafür **kein Kerosin** — geprüft
