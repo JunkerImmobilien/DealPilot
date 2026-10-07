@@ -189,11 +189,41 @@ window.QcHeuristik = (function () {
    *   traegt" — Ziel BMR >= 6 %, Cashflow >= 0 EUR/Mon, DSCR >= 1,1. Es
    *   gilt der STRENGERE der beiden ableitbaren Preise, und nur dann, wenn
    *   er UNTER dem heutigen Kaufpreis liegt. */
+  /* ══ v1956 · DIE ZIELRENDITE KOMMT JETZT VON AUSSEN ══════════════════
+     Marcel am 07.10.2026: „wir nehmen eine A-Lage und da möchte ich 8
+     Prozent Bruttomietrendite haben, dann geht im Quick-Check in unsere
+     Bewertung mit ein, um wie viel ich den Kaufpreis verhandeln muss,
+     damit ich meinen 8-Prozenter bekomme."
+
+     Bis hierher stand da `nkmYear / 0.06` — SECHS PROZENT, fest
+     verdrahtet, für jeden Kunden und jede Lage dieselbe Zahl.
+
+     > WARUM DER WERT ALS PARAMETER KOMMT UND NICHT AUS DEN
+     > EINSTELLUNGEN GELESEN WIRD: das hier ist ein RECHENKERN. Er wird
+     > wörtlich ins Backend-Image gespiegelt
+     > (`tools/rechenkerne-spiegeln.mjs`) und läuft dort ohne Browser,
+     > ohne localStorage und ohne angemeldeten Nutzer. Ein Kern, der sich
+     > seine Eingaben selbst holt, ist in dem Moment nicht mehr derselbe
+     > Kern — und genau dafür gibt es die Spiegelung. Der AUFRUFER liest
+     > das Lage-Profil und reicht die Zahl herein.
+
+     Fehlt `zielBmr`, bleibt alles wie vorher: 6 %. Der Telegram-Bot
+     setzt heute nichts und rechnet damit unverändert weiter.
+
+     Geprüft wird auf ABWESENHEIT, nicht auf den Wahrheitswert.
+     `Number(null)` ist 0 und besteht `isFinite` — mit `||` als Rückfall
+     hätte eine 0 die 6 % ersetzt und durch null geteilt. */
+  var ZIEL_BMR_RUECKFALL = 6;     /* Prozent, wenn der Aufrufer nichts sagt */
+
   function zielKaufpreis(d) {
     var kp = +d.kp || 0, nkm = +d.nkm || 0;
     var cfMon = +d.cfMon || 0, dscr = +d.dscr || 0;
     var nkmYear = nkm * 12;
-    var kpForBmr = nkmYear / 0.06;                   // KP bei BMR=6%
+    var zielBmr = (d.zielBmr == null || d.zielBmr === '')
+      ? ZIEL_BMR_RUECKFALL
+      : Number(String(d.zielBmr).replace(',', '.'));
+    if (!isFinite(zielBmr) || zielBmr <= 0) zielBmr = ZIEL_BMR_RUECKFALL;
+    var kpForBmr = nkmYear / (zielBmr / 100);        // KP bei der Ziel-Bruttomietrendite
     var annuitaetJahr;
     if (dscr && dscr > 0) {
       annuitaetJahr = nkmYear / dscr;

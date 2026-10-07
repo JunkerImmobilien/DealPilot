@@ -21,8 +21,24 @@ const { authenticate } = require('../middleware/auth');
 const { query } = require('../db/pool');
 
 /* Erlaubte Schlüssel. Eine feste Liste, damit die Tabelle nicht mit der
-   Zeit zum Abstellraum wird. */
-const ERLAUBT = ['datenraum'];
+   Zeit zum Abstellraum wird.
+
+   v1956 · `lage_profil` kommt dazu — Marcels Entscheidung vom 07.10.2026
+   („ja auf den Server damit"). Es trägt die Zielrenditen je Lageklasse
+   A/B/C und optional abweichende Standardwerte je Klasse.
+
+   > WARUM ES HIERHER GEHÖRT UND NICHT IN DEN localStorage: an dieser
+   > Zahl hängt eine RECHNUNG — der Quick-Check leitet daraus ab, um
+   > wie viel der Kaufpreis sinken müsste. Ein Profil, das nur auf einem
+   > Gerät liegt, lässt denselben Kunden auf dem Handy ein anderes
+   > Ergebnis sehen als am Schreibtisch, ohne dass er den Unterschied
+   > erklären könnte. Beim Datenraum ging es um verlorene Links; hier
+   > geht es um zwei verschiedene Wahrheiten.
+
+   Das Investmentprofil (`dp_investment_profile`, 24 Schlüssel) bleibt
+   vorerst lokal. Es hier mitzunehmen wäre ein eigener Schritt — und
+   einer, der eine Vorrangregel zwischen beiden braucht. */
+const ERLAUBT = ['datenraum', 'lage_profil'];
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {

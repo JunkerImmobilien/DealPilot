@@ -3516,6 +3516,26 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <label for="qc_stellplatz">Stellplatz</label>
         <input type="text" id="qc_stellplatz" placeholder="Tiefgarage / Außen" autocomplete="off">
       </div>
+      <!-- ══ v1956 · DIE LAGEKLASSE ═══════════════════════════════════════
+           Marcel am 07.10.2026: „beim Quick-Check kann man dann angeben, ob
+           man A-, B- oder C-Lage investiert, und dann wird dieses
+           Parameterset gezogen."
+
+           NUR DER KUNDE WAEHLT. Kein Vorschlag aus der Makrolage, auch
+           wenn Marktdaten vorliegen - Marcels Entscheidung. Die Einstufung
+           ist eine Strategieentscheidung, keine Messung.
+
+           Leer ist ein gueltiger Zustand: dann rechnet die Heuristik mit
+           ihrem Rueckfall von 6 % weiter, genau wie vor v1956. -->
+      <div class="field">
+        <label for="qc_lageklasse">Lageklasse</label>
+        <select id="qc_lageklasse">
+          <option value="">– keine Angabe</option>
+          <option value="A">A-Lage</option>
+          <option value="B">B-Lage</option>
+          <option value="C">C-Lage</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -3782,7 +3802,11 @@ const QcEngine = (function() {
     { id: 'energieklasse', required: false }, { id: 'stellplatz', required: false },
     { id: 'kp', required: true }, { id: 'nkm', required: true },
     { id: 'hg', required: true }, { id: 'hg_split', required: true },
-    { id: 'ek', required: true }, { id: 'zins', required: true }, { id: 'tilg', required: true }
+    { id: 'ek', required: true }, { id: 'zins', required: true }, { id: 'tilg', required: true },
+    /* v1956: ohne diesen Eintrag liest `getInputs()` das Feld NIE - das
+       Praefix `qc_` ist die ganze Kopplung zwischen Liste und Markup.
+       Nicht pflichtig: ohne Lageklasse rechnet alles wie bisher. */
+    { id: 'lageklasse', required: false }
   ];
   function num(v) {
     if (v == null || v === '') return null;
@@ -5364,7 +5388,26 @@ const QcApp = (function() {
          Null — und eine Null im LTV liest sich wie ein Barkauf. */
       dscr: QcEngine.num(k.dscr) || 0, ltv: QcEngine.num(k.ltvPct) || 0,
       bewirtPctNkm: QcEngine.num(k.bwkPctOfNkm) || 0,
-      marktwert: mw, marktwert_grund: mwGrund
+      marktwert: mw, marktwert_grund: mwGrund,
+      /* ══ v1956 · DIE ZIELRENDITE DER GEWAEHLTEN LAGEKLASSE ═════════
+         Marcel: „dann geht im Quick-Check in unsere Bewertung mit ein,
+         um wie viel ich den Kaufpreis verhandeln muss, damit ich
+         meinen 8-Prozenter bekomme."
+
+         Der Rechenkern holt sich NICHTS selbst - er wird ins
+         Backend-Image gespiegelt und laeuft dort ohne Browser. Also
+         liest der AUFRUFER das Profil und reicht die Zahl herein.
+
+         `null` heisst: keine Klasse gewaehlt oder keine Zahl
+         hinterlegt. Dann rechnet der Kern mit seinen 6 % weiter, genau
+         wie vor v1956. */
+      zielBmr: (function () {
+        try {
+          if (!window.DealPilotLageProfil) return null;
+          return window.DealPilotLageProfil.zielBmr(inputs.lageklasse);
+        } catch (e) { return null; }
+      })(),
+      lageklasse: (inputs.lageklasse || null)
     };
 
     /* KEIN RUECKFALL auf eine eigene Kette: fehlt der Kern, sagt die Box
@@ -6528,11 +6571,14 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
   <script src="js/dscr-engine.js?v=969n"></script>
   <script src="js/deal-kpis.js?v=969n"></script>
+  <!-- v1956: das Lage-Profil. Eigenes Dokument, eigene Einbindung -
+       gleicher Ursprung, also derselbe Speicher wie im Hauptfenster. -->
+  <script src="js/lage-profil.js?v=v1956"></script>
   <script src="js/score-tiers.js?v=v1950"></script>
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v1945"></script>
+  <script src="js/qc-heuristik.js?v=v1956"></script>
   <script src="js/dealscore.js?v=v1863"></script>
   <script src="js/avm-section.js?v=W33"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
