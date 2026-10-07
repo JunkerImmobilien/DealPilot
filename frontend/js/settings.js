@@ -765,6 +765,18 @@ function showSettings(initialTab) {
            Karten ein." Die Reihenfolge ist Absicht: erst WO die Dinge
            liegen, dann WIE die Objektkarten darin aussehen. */
         '<div id="dp-objkarte-wahl-host" style="margin-bottom:12px"></div>' +
+        /* v1936: die Datenaufnahme-Wahl direkt unter der Objektkarten-Wahl.
+           Marcel am 07.10.2026: "dass wir das dann auch direkt unter den
+           Einstellungen packen, dass man das auswaehlen kann." Sie stand bis
+           dahin NUR im Darstellungs-Panel, also hinter einem zweiten Klick,
+           waehrend Aufbau und Objektkarten hier offen liegen.
+
+           Die Reihenfolge setzt die Kette fort: erst WO die Dinge liegen,
+           dann WIE die Objektkarten aussehen, dann WIE die Karte im Objekt
+           aussieht. Von der Flaeche zum Einzelnen. Der Block im Panel bleibt
+           - derselbe Schalter an einem feineren Ort, beide lesen denselben
+           Merker. */
+        '<div id="dp-kartenstil-wahl-host" style="margin-bottom:12px"></div>' +
         /* ── v1719 · DER WEG INS PANEL STEHT BEI DEM, WAS ER FEINER MACHT
            Marcel: „Darstellung oeffnen moechte ich bitte auch in den
            Einstellungen weiter oben bei der Layout auswahl haben."

@@ -81,13 +81,24 @@
 
      Wer einen der beiden gemerkt hat, faellt unten auf "kein Entwurf"
      zurueck: STILE[stil] ist dann undefined, und setze() setzt ''. */
+  /* ── v1936 · TRICHTER UND BORDKARTE STANDEN NICHT ZUR WAHL ──────────
+     Der Kommentar bei v1654 sagt woertlich "Der Trichter bleibt waehlbar" -
+     in dieser Liste stand er nicht. Beide haben vollstaendige Regelsaetze
+     (29 bzw. 35 Regeln in `datenaufnahme.css`) und wirken gemessen in allen
+     vier Aussehen; erreichbar waren sie nur ueber `?karte=` in der Adresse.
+
+     > Ein Stil, der gebaut ist und nicht in der Liste steht, ist fuer den
+     > Nutzer nicht vorhanden. Der Kommentar hat behauptet, was der Code
+     > nicht hergab. */
   var STILE = {
-    zeile:  { name: 'Zeile',  sub: 'Eine Leiste, 55 px' },
-    kartei: { name: 'Kartei', sub: 'Kopfzeile, Quellen, Fusszeile' },
+    zeile:     { name: 'Zeile',     sub: 'Eine Leiste, 55 px' },
+    kartei:    { name: 'Kartei',    sub: 'Kopfzeile, Quellen, Fusszeile' },
     /* v1713: Entwurf 21 aus preflight-varianten-v1425.html. Marcel hat
        das Bild geschickt (Dateien/karte.png) - schweres Papier, die
        Kacheln blindgepraegt statt gedruckt. */
-    buetten: { name: 'Buetten', sub: 'Papier, Kacheln blindgepraegt' }
+    buetten:   { name: 'Buetten',   sub: 'Papier, Kacheln blindgepraegt' },
+    bordkarte: { name: 'Bordkarte', sub: 'Abriss trennt Waehlen von Ausloesen' },
+    trichter:  { name: 'Trichter',  sub: 'Links die Quellen, rechts das Ergebnis' }
   };
 
   var aktuell = '';
@@ -161,7 +172,12 @@
        „Heute" heisst unveraendert; dazu gehoert auch, was NICHT da war.
        `aktuell` allein genuegt nicht: der Stil bleibt gemerkt, wenn das
        Layout faellt. */
-    if (aktuell !== 'bordkarte' || !layoutAktiv()) { if (z) z.remove(); return; }
+    /* v1936: die Bedingung `!layoutAktiv()` ist raus. Sie stand hier, solange
+       der Bordkarten-Stil in der Ansicht Heute gar nicht waehlbar war - dann
+       war "Heute heisst unveraendert" richtig. Seit v1936 kann man ihn dort
+       waehlen, und ein Stil, den jemand ausdruecklich waehlt, gehoert
+       vollstaendig dargestellt. Die Zahl ist Teil der Bordkarte. */
+    if (aktuell !== 'bordkarte') { if (z) z.remove(); return; }
     if (!z) {
       z = document.createElement('small');
       z.className = 'dpk-zahl';
@@ -277,14 +293,14 @@
   function setze(stil) {
     aktuell = STILE[stil] ? stil : '';
     var h = document.documentElement;
-    if (aktuell && layoutAktiv()) h.setAttribute('data-dp-kartenstil', aktuell);
+    if (aktuell) h.setAttribute('data-dp-kartenstil', aktuell);   /* v1936: war `aktuell && layoutAktiv()` */
     else h.removeAttribute('data-dp-kartenstil');
 
     /* Zeile, Trichter und Bordkarte sind alle drei die HELLE Karte -
        sie setzen alle `dp-neue-karte` voraus. Ohne diese Marke greift
        keine der 46 Grundregeln, und der Stil sähe aus wie ein halb
        aufgetragener Anstrich. */
-    if (document.body) document.body.classList.toggle('dp-neue-karte-stil', !!aktuell && layoutAktiv());
+    if (document.body) document.body.classList.toggle('dp-neue-karte-stil', !!aktuell);   /* v1936 */
 
     try { localStorage.setItem(LS, aktuell); } catch (e) {}
     anwenden();
@@ -294,6 +310,7 @@
     }
 
     rahmenNachziehen();
+    einstellungenNachziehen();   /* v1936 */
   }
 
   /* ── v1663d · DAS QUICKBOARDING IST EIN EIGENES DOKUMENT ───────────
@@ -330,7 +347,7 @@
     try { doc = f.contentDocument || (f.contentWindow && f.contentWindow.document); } catch (e) { return; }
     if (!doc || !doc.documentElement) return;
     var h = doc.documentElement;
-    if (aktuell && layoutAktiv()) h.setAttribute('data-dp-kartenstil', aktuell);
+    if (aktuell) h.setAttribute('data-dp-kartenstil', aktuell);   /* v1936 */
     else h.removeAttribute('data-dp-kartenstil');
 
     /* ── v1685 · WAS DIE HAUPT-APP GERADE ZEIGT ───────────────────────
@@ -463,9 +480,58 @@
 
   function panelBeobachten() {
     if (panelWache || !window.MutationObserver) return;
-    panelWache = new MutationObserver(function () { inPanel(); });
-    panelWache.observe(document.body, { childList: true });
+    panelWache = new MutationObserver(function () { inPanel(); inEinstellungen(); });
+    panelWache.observe(document.body, { childList: true, subtree: true });
     inPanel();
+    inEinstellungen();
+  }
+
+  /* ── v1936 · DERSELBE SCHALTER IN DEN EINSTELLUNGEN ──────────────────
+     `settings.js` legt dafuer `#dp-kartenstil-wahl-host` an, direkt unter der
+     Objektkarten-Wahl. Gebaut wird in der Markup-Sprache der NACHBARWAHL
+     (`.dp-okw-*` aus `objektkarten-stil.js`), nicht in der des Panels:
+     zwei Waehler untereinander, die verschieden aussehen, sehen aus wie zwei
+     verschiedene Dinge.
+
+     > Beide Orte schreiben denselben Merker. `setze()` faerbt deshalb BEIDE
+     > nach, sonst zeigt der eine eine Wahl, die der andere schon geaendert
+     > hat. */
+  function inEinstellungen() {
+    var host = document.getElementById('dp-kartenstil-wahl-host');
+    if (!host || host.getAttribute('data-gebaut') === '1') return;
+    host.setAttribute('data-gebaut', '1');
+    var kacheln = [{ key: '', name: 'Automatisch', sub: 'Passt sich dem Aussehen an' }]
+      .concat(Object.keys(STILE).map(function (x) {
+        return { key: x, name: STILE[x].name, sub: STILE[x].sub };
+      }));
+    host.innerHTML =
+      '<div class="dp-okw-box">'
+      + '<div class="dp-okw-kopf">Karte im Objekt (Datenaufnahme)</div>'
+      + '<div class="dp-okw-gitter">'
+      + kacheln.map(function (o) {
+          return '<button type="button" class="dp-okw" data-ks="' + o.key + '">'
+               + '<span class="dp-okw-n">' + o.name + '</span>'
+               + '<span class="dp-okw-s">' + o.sub + '</span>'
+               + '</button>';
+        }).join('')
+      + '</div>'
+      + '<div class="dp-okw-fuss">Wirkt in jedem Aussehen — die Quellen und der '
+      + 'Abruf sind in allen dieselben, es wechselt nur die Form.</div>'
+      + '</div>';
+    host.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.dp-okw') : null;
+      if (!b) return;
+      setze(b.getAttribute('data-ks'));
+    });
+    einstellungenNachziehen();
+  }
+
+  function einstellungenNachziehen() {
+    var host = document.getElementById('dp-kartenstil-wahl-host');
+    if (!host) return;
+    [].forEach.call(host.querySelectorAll('.dp-okw'), function (b) {
+      b.classList.toggle('an', b.getAttribute('data-ks') === aktuell);
+    });
   }
 
   /* ── Start ────────────────────────────────────────────────────────── */
