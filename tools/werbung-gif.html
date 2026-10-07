@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Werbung 01 · GIF bauen</title>
+<style>
+  body{margin:0;background:#050505;color:#f3ead0;font:14px/1.5 system-ui,sans-serif;padding:24px}
+  #log{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:#C9A84C}
+  canvas{border:1px solid #333;margin-top:12px;max-height:380px}
+  a.dl{display:inline-block;margin-top:12px;padding:10px 16px;background:#C9A84C;color:#050505;
+       text-decoration:none;font-weight:600;border-radius:4px}
+</style>
+</head>
+<body>
+<h1 style="font-size:16px;margin:0 0 8px">Werbung 01 · Der Riss — GIF bauen</h1>
+<div id="log">Start …</div>
+<canvas id="c"></canvas>
+<div id="fertig"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+<script>
+(function () {
+  var log = document.getElementById('log');
+  var zeilen = [];
+  function sag(t) { zeilen.push(t); log.textContent = zeilen.join('\n'); }
+
+  /* Die Ausgabegroesse. 1080x1920 waere als GIF zweistellig MB gross und
+     fuer eine Vorschau sinnlos - 432x768 behaelt 9:16 exakt (432/768 = .5625). */
+  var BREIT = 432, HOCH = 768;
+
+  var c = document.getElementById('c');
+  c.width = BREIT; c.height = HOCH;
+  var ctx = c.getContext('2d');
+
+  function bildLaden(src) {
+    return new Promise(function (ok, fehl) {
+      var i = new Image();
+      i.onload = function () { ok(i); };
+      i.onerror = function () { fehl(new Error('Bild nicht ladbar: ' + src)); };
+      i.src = src;
+    });
+  }
+
+  (async function () {
+    try {
+      /* Der BOM aus PowerShell bringt JSON.parse zu Fall - erst weg damit. */
+      var roh = await fetch('folge.json').then(function (r) { return r.text(); });
+      var folge = JSON.parse(roh.replace(/^﻿/, ''));
+      sag('Folge geladen: ' + folge.length + ' Bilder, '
+        + folge.reduce(function (s, f) { return s + f.dauer; }, 0) + ' ms gesamt');
+
+      /* Der Worker von gif.js liegt auf einem fremden Ursprung - ein Worker
+         darf das nicht. Deshalb den Quelltext holen und als Blob starten. */
+      var workerQuelle = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js')
+        .then(function (r) { return r.text(); });
+      var workerUrl = URL.createObjectURL(new Blob([workerQuelle], { type: 'application/javascript' }));
+      sag('Worker bereit (' + Math.round(workerQuelle.length / 1024) + ' kB)');
+
+      var gif = new GIF({
+        workers: 4, quality: 8, width: BREIT, height: HOCH,
+        workerScript: workerUrl, dither: false
+      });
+
+      for (var i = 0; i < folge.length; i++) {
+        var img = await bildLaden(folge[i].datei);
+        ctx.clearRect(0, 0, BREIT, HOCH);
+        ctx.drawImage(img, 0, 0, BREIT, HOCH);
+        gif.addFrame(ctx, { copy: true, delay: folge[i].dauer });
+        sag('Bild ' + (i + 1) + '/' + folge.length + ' (' + folge[i].dauer + ' ms)');
+      }
+
+      gif.on('progress', function (p) { sag('Kodieren: ' + Math.round(p * 100) + ' %'); });
+      gif.on('finished', function (blob) {
+        var url = URL.createObjectURL(blob);
+        sag('FERTIG · ' + (blob.size / 1024 / 1024).toFixed(2) + ' MB');
+        var a = document.createElement('a');
+        a.href = url; a.download = 'dealpilot-werbung-01-riss.gif';
+        a.className = 'dl'; a.textContent = 'GIF herunterladen';
+        document.getElementById('fertig').appendChild(a);
+        window.__gifFertig = { groesse: blob.size, url: url };
+      });
+      sag('Kodieren beginnt …');
+      gif.render();
+    } catch (e) {
+      sag('FEHLER: ' + e.message);
+      window.__gifFehler = e.message;
+    }
+  })();
+})();
+</script>
+</body>
+</html>
