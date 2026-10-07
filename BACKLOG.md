@@ -36,6 +36,51 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N44 · Stufe 3 (Wertermittlung ImmoWertV) am echten Objekt nachsehen (07.10.2026)
+
+Marcel am 07.10.2026, wörtlich ins Backlog gegeben:
+
+> „wir müssen nochmal bei mehreren Objekten die Stufe 3 Wertermittlung auslösen und schauen was
+> passiert im Tab Objekt. Wird das PDF dann erzeugt? Wo steht der Verkehrswert? Geben wir vorher
+> an, welche Stufe wir genau bei der Stufe 3 erreichen können? Also haben wir alle Werte für eine
+> vollständige ImmoWertV-Verkehrswertberechnung oder fehlt uns etwas? Das könnten wir mit der
+> Datenbank abgleichen. Das ist wichtig, dass wir schauen, was dort passiert. Irgendwie muss der
+> Kunde das ja sehen."
+
+**Der Kern ist nicht „funktioniert es", sondern „WAS BEKOMMT DER KUNDE ZU SEHEN".** Er hat nach
+einer Analyse zwei Zahlen aus zwei Verfahren:
+
+> „er hat bei der Analyse ja einen vollständigen Marktbericht mit Marktpreisindikation UND den
+> Verkehrswert, und **die Wahrheit wird wohl dazwischen liegen**."
+
+Das ist die eigentliche Aufgabe: die beiden Zahlen nebeneinanderstellen und die Spanne erklären,
+statt eine davon zu behaupten.
+
+**Zu messen, Objekt für Objekt (mehrere, nicht eines):**
+
+1. **Stufe 3 auslösen** und beobachten, was im Reiter Objekt geschieht. Kein Rückschluss aus dem
+   Code — der Lauf am echten Objekt.
+2. **Wird das PDF erzeugt?** Wo landet es, ist es erreichbar, trägt es den Rechenweg?
+3. **Wo steht der Verkehrswert** nach dem Lauf? In welchem Feld, an welcher Stelle sichtbar?
+4. **Vollständigkeit VORHER ansagen.** Bevor Stufe 3 läuft, muss dastehen, welche Tiefe damit
+   überhaupt erreichbar ist: liegen alle Pflichtangaben für eine vollständige
+   ImmoWertV-Verkehrswertermittlung vor, oder fehlt etwas? **Gegen die Datenbank abgleichen**
+   (Registerdatensatz: Liegenschaftszinssatz, Sachwertfaktor, GND, Baupreisindex, BWK-Modell).
+5. **Begründung in die Pilot-Analyse** übernehmen.
+6. **Marktbericht immer ins Objektwissen.**
+
+> **Warum Punkt 4 der wichtigste ist:** CLAUDE.md sagt „Kein Verfahren rechnet halb" und „Wo die
+> Quelle endet, endet die Rechnung". Eine Stufe 3, die startet und erst hinterher merkt, dass ihr
+> die Hälfte fehlt, verkauft dem Kunden eine Tiefe, die es nicht gibt — und Stufe 3 kostet. Die
+> Ansage gehört VOR den Abruf, nicht in die Fehlermeldung danach.
+
+**Bekannter Anknüpfungspunkt:** der Sammelweg `marktbericht_preis_alle` prüft bereits PLZ/Ort,
+Objektart und Wohnfläche je Objekt und meldet `fehlende_angaben` — der Weg für ein EINZELNES
+Objekt tut das nicht (gemessen am 07.10.2026). Dieselbe Prüfung existiert also schon, nur auf dem
+selteneren Pfad.
+
+---
+
 ## → NEU und OBERSTE PRIORITÄT: Der Reiter Objekt wird neu geordnet (04.10.2026)
 
 Marcel am 04.10.2026, abends. Sieben Punkte, von ihm selbst ins Backlog
