@@ -8466,3 +8466,53 @@ html[data-dp-layout][data-dp-layout] .sb-sort-toggle {
     transform: translateY(-50%) !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1929 · DIE GOLDRAHMEN DER KARTEN — AUF BEIDEN BREITEN ZURUECKGENOMMEN
+
+   Marcel am 07.10.2026: „wir haben den Aktenreiter eingestellt. Leider ist wenn
+   man das Menü öffnet und Portfolio auswählt der Hintergrund in schwarz obsidean
+   meine ich mit den partikeln. dort bitte den hintergrund setzen wie wenn man
+   auf Aktionen klickt und hinter dem aktionsmenü."
+
+   **Der Grund ist es nicht.** An sechs Rasterpunkten gemessen, Portfolio-Zustand,
+   Stil Aktenreiter: durchgehend `rgb(14,13,11)` — derselbe Ton wie im
+   Aktionen-Zustand, kein Verlauf, kein Partikel-Canvas im Dokument. Das hatte
+   schon v1919 hergestellt.
+
+   **Was Marcel sieht, sind die RAHMEN.** Je Karte:
+
+     .sbc-top    1,1 px  rgb(138,115,50)              dunkles Gold, ganze Breite
+     .sbc-seq    1,1 px  Gold 0,788/0,659/0,298       die Lasche
+     .sbc-btn    1,1 px  Gold                          zweimal je Karte
+
+   Bei zwanzig Karten sind das **achtzig goldene Linien auf schwarzem Grund**. Im
+   Aktionen-Zustand steht dort eine ruhige Textliste ganz ohne Kanten. Derselbe
+   Grund, zwei völlig verschiedene Flächen.
+
+   > **Ein Muster entsteht nicht aus der Fläche, sondern aus dem, was sie teilt.**
+   > „Der Hintergrund ist unruhig" heisst fast nie, dass der Hintergrund falsch
+   > ist.
+
+   GEMESSEN AM SCHREIBTISCH: dieselben Rahmen an `.sbc-top` und `.sbc-seq`,
+   **nur die Knöpfe weichen ab** — dort `rgba(255,255,255,.35)`, auf dem Handy
+   Gold. Das ist der einzige echte Unterschied zwischen den Breiten.
+
+   Marcel will beides: ruhiger UND überall gleich. Deshalb gilt der Block **ohne
+   Medienabfrage** — die Rahmen werden auf jeder Breite still, und die Knöpfe
+   bekommen überall denselben Ton. Die Lasche behält ihre Kante, nur leiser: sie
+   ist das Merkmal des Aktenreiters und darf nicht verschwinden.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Der Kartenkopf: die durchgehende Goldkante wird ein stiller Strich. */
+html[data-dp-layout][data-dp-layout] .sb-card .sbc-top {
+  border-color: rgba(191,183,169,.16) !important;
+}
+/* Die Lasche bleibt erkennbar, verliert aber das volle Gold. */
+html[data-dp-layout][data-dp-layout] .sb-card .sbc-seq {
+  border-color: rgba(191,183,169,.24) !important;
+}
+/* Die beiden Knoepfe: ueberall derselbe Ton wie bisher am Schreibtisch. */
+html[data-dp-layout][data-dp-layout] .sb-card .sbc-btn {
+  border-color: rgba(255,255,255,.35) !important;
+}
