@@ -36,6 +36,72 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N46 · ⚠ DER MAPPER MULTIPLIZIERT ZAHLEN MIT 10, 100 ODER 1000 (07.10.2026)
+
+**Gefunden beim Auslösen einer Stufe-3-Wertermittlung an echten Objekten** (N44). Der Lauf
+ergab für eine **100-m²-Eigentumswohnung einen Sachwert von 1.717.808 €** — das 8,6-fache des
+Vergleichswerts (199.000 €).
+
+**Die Ursache steht in einer Zeile:** `marktbericht/backend/src/services/DealPilotObjectMapper.js:17`
+
+```js
+parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''))
+```
+
+Der **Punkt wird als Tausendertrennzeichen gelöscht**. Richtig für „1.234,56" — zerstörend für
+jeden Wert, der mit Dezimalpunkt gespeichert ist. Gegen die **echte** Funktion gemessen:
+
+```
+"64.58"   -> 6458     Faktor 100    Garagen-BGF
+"3.5"     -> 35       Faktor 10     Zinssatz 3,5 % wird zu 35 %
+"0.5"     -> 5        Faktor 10     Grundbuchamt 0,5 % wird zu 5 %
+"1.91"    -> 191      Faktor 100    Baupreisindex
+"64,58"   -> 64.58    ok            mit KOMMA stimmt es
+"950"     -> 950      ok            ganze Zahlen sind unauffaellig
+```
+
+**Tragweite, gemessen auf Staging:**
+
+```
+37   Felder laufen im Mapper durch num()
+25   Objekte tragen Punkt-Dezimalzahlen
+365  Feldwerte insgesamt betroffen
+```
+
+Betroffene Felder, die der Mapper **wirklich liest** (Schnittmenge):
+`garagen_bgf_qm` · `_kpis_dscr` (23 Objekte) · `_kpis_ltv` (22) · `_kpis_cf_ns` (14) · `bgf` ·
+`brw` · `ds2_marktmiete` · `ds2_marktfaktor`.
+
+> **Warum es so lange unentdeckt blieb:** ganze Zahlen gehen unbeschädigt durch, und Werte mit
+> KOMMA auch. Nur die Punkt-Schreibweise kippt — und die entsteht, wenn ein Wert einmal durch
+> JavaScript gelaufen ist (`String(64.58)` ergibt `"64.58"`). **Der Fehler trifft also genau die
+> Werte, die die App selbst gerechnet hat**, nicht die, die jemand eingetippt hat.
+
+> Dieselbe Sorte Fehler wie der Cent-Faktor in `projectAll` (Faktor 100, Tabelle UND Charts).
+> **Die zweite Zahl verrät die erste:** hier war es der Sachwert neben dem Vergleichswert.
+
+**Gegenprobe, dass es kein Einzelfall ist** — derselbe 100-m²-Wohnung über fünf Wochen:
+
+```
+03.09.2026   ETW      242.274 EUR    2.423 EUR/m2   <- der Wert aus CLAUDE.md
+04.10.2026   wohnung   83.720 EUR      837 EUR/m2
+07.10.2026   wohnung 1.717.808 EUR   17.178 EUR/m2  <- dieser Lauf
+```
+
+**Mehrfamilienhäuser sind nicht betroffen** (Bad Oeynhausen 427 m², Bj 1905: Vergleich 491.000 /
+Sachwert 295.000 / Ertrag 364.000 — plausibel). Es trifft die Wohnungen, weil dort die
+Garagen-BGF in den Sachwert eingeht.
+
+**Zu tun:**
+1. `num()` reparieren: ein Punkt ist nur dann Tausendertrenner, wenn danach **genau drei**
+   Ziffern stehen UND kein Komma folgt. Sonst ist er das Dezimalzeichen.
+2. **Prüfer dazu**, der beide Schreibweisen gegeneinander hält — der Fehler ist unsichtbar,
+   solange man nur ganze Zahlen testet.
+3. Prüfen, ob derselbe Umwandler anderswo steht (`backend/src/`, Bot-Pfad).
+4. Danach die drei Sachwerte oben neu rechnen und gegen die 242.274 € aus CLAUDE.md halten.
+
+---
+
 ### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
 
 Marcel am 07.10.2026:
