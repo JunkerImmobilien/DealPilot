@@ -6929,5 +6929,99 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 #qc7-sources.dp-pfbar .dp-pf-qr + .dp-pf-rz{ margin-left:14px !important; }
 </style>
 
+
+<!-- ==============================================================================
+     v1944 · FEHLENDE PFLICHTFELDER ROT EINRAHMEN — WIE IM TAB OBJEKT
+
+     Marcel am 07.10.2026: "wenn wir die Datenaufnahme machen, dass wir da bitte
+     immer, wenn noch Felder fehlen, dass wir es so machen wie im Tab Objekt,
+     dass wir die dann rot einrahmen. Das haben wir im Tab Objekt genauso
+     gemacht bei den einzelnen Stufen."
+
+     GEMESSEN im Tab Objekt (`objekt-reiter.js:392`): leere Pflichtfelder
+     bekommen `border-color:#B8625C` plus einen 2-px-Schein, und zwar INLINE
+     mit `!important`. Der Kommentar dort nennt den Grund — v1852b hat gemessen,
+     dass die Stylesheet-Regel am Eingabefeld nicht ankam.
+
+     > Das Rezept wird uebernommen, nicht neu erfunden: dieselbe Farbe, derselbe
+     > Schein, derselbe Weg ueber inline. Zwei Stellen, die dasselbe zeigen
+     > sollen, duerfen nicht verschieden aussehen.
+
+     WARUM HIER UND NICHT IN EINER CSS-DATEI: der Quick-Check ist ein EIGENES
+     Dokument. Das Stylesheet der Haupt-App wirkt hier nicht (mehrfach teuer
+     gelernt), und ein eigener Block haelt die Regel bei dem Markup, das sie
+     meint.
+     ============================================================================== -->
+<script>
+(function () {
+  'use strict';
+  /* Die neun Pflichtfelder — ausgelesen aus den `.field`-Bloecken, die einen
+     `<span class="req">` tragen. Wer ein zehntes ergaenzt, traegt es hier nach;
+     die Liste steht bewusst sichtbar und wird nicht geraten. */
+  var PFLICHT = ['qc_plz', 'qc_ort', 'qc_wfl', 'qc_hg', 'qc_hg_split',
+                 'qc_kp', 'qc_ek', 'qc_zins', 'qc_tilg'];
+
+  var ROT = '#B8625C';
+  var SCHEIN = '0 0 0 2px rgba(184,98,92,.18)';
+
+  function leer(el) {
+    if (!el) return false;
+    var v = (el.value == null ? '' : String(el.value)).trim();
+    if (v === '') return true;
+    /* Eine 0 ist bei Kaufpreis, Wohnflaeche und Hausgeld keine Angabe,
+       sondern eine fehlende. Beim Eigenkapital und bei der Tilgung dagegen
+       ist 0 eine gueltige Entscheidung — deshalb die Trennung. */
+    if (['qc_kp', 'qc_wfl', 'qc_hg'].indexOf(el.id) >= 0 && Number(v.replace(/[^\d,.-]/g, '').replace(',', '.')) === 0) return true;
+    return false;
+  }
+
+  function markieren() {
+    PFLICHT.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var feld = el.closest ? el.closest('.field') : null;
+      if (leer(el)) {
+        el.style.setProperty('border-color', ROT, 'important');
+        el.style.setProperty('box-shadow', SCHEIN, 'important');
+        if (feld) feld.classList.add('qc-pflicht-fehlt');
+      } else {
+        el.style.removeProperty('border-color');
+        el.style.removeProperty('box-shadow');
+        if (feld) feld.classList.remove('qc-pflicht-fehlt');
+      }
+    });
+  }
+
+  /* Bei jeder Eingabe und bei jedem Verlassen — nicht nur beim Absenden.
+     Marcel soll sehen, was fehlt, WAEHREND er ausfuellt. */
+  function verdrahten() {
+    PFLICHT.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el || el._v1944) return;
+      el._v1944 = 1;
+      ['input', 'change', 'blur'].forEach(function (ev) {
+        el.addEventListener(ev, markieren);
+      });
+    });
+    markieren();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', verdrahten);
+  } else { verdrahten(); }
+
+  /* Felder koennen nachtraeglich entstehen (PDF-Import, Sprache, Vorlagen).
+     Ein Beobachter faengt das; er haengt sich nur an, was er noch nicht hat. */
+  if (window.MutationObserver) {
+    new MutationObserver(function () { verdrahten(); })
+      .observe(document.body, { childList: true, subtree: true });
+  }
+
+  /* Nach aussen sichtbar, damit ein Pruefer die ECHTE Funktion rufen kann
+     statt sie nachzubauen. */
+  window.QcPflicht = { markieren: markieren, FELDER: PFLICHT };
+})();
+</script>
+
 </body>
 </html>
