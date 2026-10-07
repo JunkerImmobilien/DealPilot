@@ -330,7 +330,7 @@ nicht erst. Lieber eine Lücke als eine Zahl, die niemand belegen kann."*
 │                                              │
 │  ✈ Erzähl uns dein Objekt — 4 Minuten.       │
 │                                              │
-│  [QR → app.dealpilot.immo]      Stand 23     │
+│  [QR → app.dealpilot.immo]      Stand 106     │
 └──────────────────────────────────────────────┘
 ```
 

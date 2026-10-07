@@ -1580,7 +1580,13 @@ falsch.) Rechtsformentwicklung Richtung UG/GmbH ist Ziel, nicht Ist-Stand.
 
 Claim: „Immobilienentscheidungen sind zu groß für ein Bauchgefühl."
 WZ-Klassifikation: **IT 62.01 / 63.11**, nicht 68 (Immobilien).
-immocation Festival 01.11.2026, Leipzig, **Stand 23**.
+immocation Festival 01.11.2026, Leipzig, **Halle 3 · Stand 106**.
+
+> **Hier stand bis zum 07.10.2026 "Stand 23".** Das war die aeltere Angabe. Zwei
+> unabhaengige Quellen sagen Halle 3 · Stand 106 — der Veranstalter-Post
+> ("Du findest uns an Stand 106 Halle 3") und die Druckkarte vom 22.09. Marcel
+> hat am 07.10.2026 bestaetigt: **Stand 106 gilt.** Faltdisplay, Messeplakat und
+> die USP-Sammlung sind mitgezogen.
 Instagram `@dealpilot.app` / `@getdealpilot`.
 
 **Domains (alle vier parallel live):**
