@@ -31914,6 +31914,66 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (79) 07.10.2026 — v1948: eine Matrixzeile, die im HTML nicht stand
+
+**Marcel:** „es steht unter der cockpit matrix noch [die Preisfussnote] … das muss geaendert
+werden und in der matrix unter pro den Migration & Setup-Service rausnehmen auch direkt auf
+staging und prod."
+
+**Zwei Dinge genannt, nur eines war offen.**
+
+Die Preisfussnote war bereits in v1947c korrigiert — `index.html:513` fuehrt seit dem Abend
+„5 Bewertungen fuer 4,00 €". Live gegen Prod gemessen, nicht angenommen: `.mx-foot` traegt
+534 Zeichen, darin „Starter 5 Bewertungen fuer 4,00 €, Investor 10 fuer 8,75 €, Pro 15 fuer
+12,50 €", und `5,00` kommt nicht mehr vor. **Marcel sah eine Seite aus dem Cache.**
+
+> **Deshalb bekommt `dp2-inhalt.js` in diesem Paket einen neuen Buster (v1570 → v1948),
+> obwohl die Fussnote in der `index.html` steht.** Die Datei wurde ohnehin angefasst; eine
+> geaenderte Datei unter altem Namen ist genau die Falle, wegen der ein Stand im Browser alt
+> bleibt, waehrend er auf dem Server neu ist.
+
+#### Die Zeile stand nicht dort, wo man sie sucht
+
+„Migration & Setup-Service" fand `grep` **nicht** in der `index.html`. Dort steht nur
+das leere Tabellengerippe:
+
+```html
+<table class="mx"><thead>…</thead><tbody id="mxBody"></tbody></table>
+```
+
+Gefuellt wird es zur Laufzeit von `frontend/landing/dp2-inhalt.js` — eine Liste `MX` mit 35
+Zeilen, `MX.map()` baut die `<tr>`.
+
+> **Wer eine sichtbare Zeile im HTML sucht und nicht findet, haelt sie fuer schon entfernt.**
+> Genau das haette hier passiert sein koennen: die Fussnote steht statisch im HTML, die
+> Tabelle direkt darueber wird aus JS gebaut. Zwei Dinge, die auf dem Bildschirm
+> uebereinander stehen, kommen aus zwei verschiedenen Quellen. **Bei „steht da noch" gehoert
+> zuerst gemessen, WER die Stelle schreibt** — nicht, wo sie im Markup liegen muesste.
+
+Entfernt wurde `['Migration &amp; Setup-Service', '-', '-', '-', '3 h']`. Vorher geprueft, dass
+niemand per Index in die Liste greift (nur `MX.map`, kein `MX[n]`, kein `MX.length`) —
+eine Zeile zu streichen ist nur dann folgenlos.
+
+> **Der Grund ist nicht Kosmetik.** Die Zeile versprach dem Pro-Plan drei Stunden
+> Einrichtungsleistung. Das ist eine Zusage, die jemand erbringen muss, und bei **einem**
+> Partner-Abo gibt es dafuer keine Strecke. Dieselbe Pruefung wie bei jeder Preisaussage:
+> hat die beworbene Leistung Code — oder jemanden, der sie leistet?
+
+#### Nachweis
+
+```
+Commit 17fc0634 · staging + main · kein Rebuild (Landing ist volume-mounted)
+
+Live gegen dealpilot.immo (Prod) im Browser gemessen:
+  Buster       dp2-inhalt.js?v=v1948
+  Matrixzeilen 34   (vorher 35)
+  Setup-Service 0 Treffer
+  letzte Zeile  API-Zugang | – | – | – | ✓
+  Fussnote      „…fuer 4,00 €, Investor 10 fuer 8,75 €, Pro 15 fuer 12,50 €"  ·  5,00: nein
+
+Datei live auf beiden Prod-Domains und auf Staging: 17.747 Bytes, Marker v1948.
+```
+
 ### (78) 07.10.2026 — v1947: Messe-Paket, Preiskorrektur und der erste Prod-Rollout seit v1878
 
 #### A · Das Messe-Pop-up ist auf der Landing Page
