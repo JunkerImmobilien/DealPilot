@@ -54,6 +54,12 @@
           kpi: d.kpi || {},
           score: d.score,
           label: d.label,
+          /* v1946: das gerechnete Urteil geht MIT. Der Prompt sagt der KI
+             damit, was schon entschieden ist — sie ordnet ein, statt ein
+             zweites Mal zu urteilen. Ohne diese zwei Felder entsteht genau
+             der Widerspruch, den Marcel am 07.10.2026 beanstandet hat. */
+          urteil: d.urteil || null,
+          urteil_text: d.urteil_text || null,
           avm: d.avm || null
           /* Der Nutzerschlüssel geht bewusst NICHT mit: wer einen eigenen
              hat, pflegt ihn in den Einstellungen, und von dort holt ihn

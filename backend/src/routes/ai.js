@@ -418,7 +418,15 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
         + ' %, Eigenkapitalrendite ' + (k.ekr != null ? k.ekr : '?')
         + ' %, Cashflow ' + (k.cfMon != null ? k.cfMon : '?') + ' EUR/Mon',
       'Score: ' + (p.score != null ? p.score : '?') + '/100'
-        + (p.label ? ' (' + p.label + ')' : ''),
+        + (p.label ? ' (Stufe: ' + p.label + ')' : ''),
+      /* v1946 · DAS URTEIL IST SCHON GEFAELLT.
+         Es kommt aus `qc-heuristik.js` — demselben Kern, den der
+         Quick-Check-Tab und der Telegram-Bot benutzen. Die KI ordnet ein,
+         sie urteilt nicht noch einmal. */
+      p.urteil
+        ? 'Gerechnetes Urteil (gilt, nicht widersprechen): ' + p.urteil
+          + (p.urteil_text ? '\n  Begruendung: ' + p.urteil_text : '')
+        : '',
       avm && avm.marktwert
         ? '\nMarktdaten eines unabhaengigen Bewertungspartners: Marktwert '
           + eur(z(avm.marktwert)) + ' EUR'
@@ -427,12 +435,26 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '',
       'Antworte ALS JSON (keine Markdown-Codebloecke, nur reines JSON):',
       '{',
-      '  "verdict": "Starker Kauf / Kauf moeglich / Vorsicht",',
       '  "negotiate": "konkrete Verhandlungsempfehlung mit Prozent",',
       '  "pros": ["Punkt 1", "Punkt 2", "Punkt 3", "Punkt 4"],',
       '  "cons": ["Punkt 1", "Punkt 2", "Punkt 3"],',
       '  "opinion": "Sachliche Experten-Meinung in 3-4 Saetzen"',
-      '}'
+      '}',
+      '',
+      /* v1946 · DIESELBEN VERBOTE WIE IN services/bewertungsText.js.
+         Jedes hat einen gemessenen Vorfall hinter sich; der erste und
+         der letzte sind der Grund fuer dieses Paket. */
+      'Was du NICHT darfst:',
+      '- Der STUFE oder dem gerechneten URTEIL widersprechen. Steht dort',
+      '  "Solide", schreibst du nicht "zu schwach". Siehst du einen Grund',
+      '  dagegen, nenne den Grund - das Urteil bleibt stehen.',
+      '- Eine neue Zahl bilden. Nicht ueberschlagen, nicht umrechnen, nicht',
+      '  hochrechnen. Nur die Zahlen oben.',
+      '- Etwas ueber LAGE, ZUSTAND oder AUSSTATTUNG behaupten, das oben',
+      '  nicht steht. "Attraktiv durch die Lage" ist erfunden, auch wenn es',
+      '  harmlos klingt.',
+      '- Einen Bewertungsanbieter beim Namen nennen. Er heisst',
+      '  "unabhaengiger Bewertungspartner".'
     ].filter(Boolean).join('\n');
 
     const roh = await openaiService.callOpenAI(prompt, {

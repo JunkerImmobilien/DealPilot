@@ -3723,7 +3723,10 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
     <div class="modal-foot">
       <button class="btn" onclick="QcApp.closeApiModal()">Abbrechen</button>
-      <button class="btn primary" onclick="QcApp.runRealAi()">Analyse starten</button>
+      <!-- v1946: der Knopf setzt den Merker zurueck. Ohne das waere
+           "neu berechnen" wirkungslos, sobald die Automatik denselben
+           Stand schon analysiert hat. -->
+      <button class="btn primary" onclick="QcApp.kiNeu()">Analyse starten</button>
     </div>
   </div>
 </div>
@@ -4271,6 +4274,13 @@ const QcApp = (function() {
 
     /* V8-BEWERTUNG: Bewertung anzeigen sobald ein Score existiert (nicht erst bei 'solid') */
     if (!gated && score.score != null) renderAI(score, inputs);
+
+    /* v1946 · Marcels Entscheidung (a): die KI-Bewertung laeuft von
+       selbst, sobald der Quick-Check vollstaendig ist. Angestossen wird
+       sie HIER, wo die Bewertung ohnehin neu gezeichnet wird — nicht aus
+       einem eigenen Lauscher: so gibt es genau einen Weg zur Bewertung,
+       und die Automatik kann nicht aus dem Tritt geraten. */
+    try { _kiAutomatikPruefen(score, inputs); } catch (_e) {}
 
     /* v529-no-green-confetti: kein Konfetti mehr beim Erreichen des gruenen Bereichs */
   }
@@ -5494,14 +5504,127 @@ const QcApp = (function() {
     fertig(d);
   });
 
-  async function runRealAi() {
+  /* ═══ v1946 · DIE KI-BEWERTUNG LAEUFT VON SELBST ════════════════════════
+   *
+   * Marcels Entscheidung vom 07.10.2026 zur Kostenfrage: Variante (a) —
+   * die KI-Bewertung laeuft IMMER automatisch, bei jedem vollstaendigen
+   * Quick-Check. Nicht nur mit Markteinschaetzung, nicht nur auf Knopfdruck.
+   *
+   * Sie hat ihm ausdruecklich die teuerste der drei Varianten vorgelegen:
+   * `/ai/quickcheck-analyse` bucht KEIN Kerosin (gemessen am 07.10.2026 in
+   * `backend/src/routes/ai.js:386` — kein `consumeArt`, kein `pruefeArt`,
+   * nur ein Rate-Limit), verursacht aber je Aufruf echte OpenAI-Kosten.
+   * Auch bei abgebrochenen Vorgaengen. Er hat sie trotzdem gewaehlt.
+   *
+   * ── ZWEI SPERREN, UND WARUM BEIDE NOETIG SIND ──────────────────────────
+   *
+   * 1. EIN MERKER UEBER DEN DATENSTAND. Dieselben Eingaben ergeben
+   *    dieselbe Analyse — ein zweiter Aufruf kostet Geld und bringt
+   *    nichts. `_kiStand` haelt den Fingerabdruck der Felder, die in die
+   *    Analyse eingehen.
+   *
+   * 2. EINE RUHEPAUSE. Der Merker allein reicht NICHT, und das ist der
+   *    Punkt, an dem man sich verrechnet: wer einen Kaufpreis von 180000
+   *    auf 190000 aendert, tippt sechs Zeichen. Nach jedem davon sind alle
+   *    Pflichtfelder gefuellt, nach jedem ist der Fingerabdruck neu — das
+   *    waeren SECHS Aufrufe fuer eine Aenderung.
+   *
+   *      > Ein Merker verhindert den gleichen Aufruf, keinen schnellen.
+   *      > Gegen Tippen hilft nur Warten.
+   *
+   *    Gewartet wird, bis die Eingabe RUHT (RUHE_MS). Das ist kein Timer,
+   *    der etwas abfragt, sondern eine verschobene Ausloesung: jede weitere
+   *    Taste schiebt sie nach hinten.
+   *
+   * ── WAS DIE AUTOMATIK NICHT TUT ────────────────────────────────────────
+   *
+   * Sie ruft nicht, solange Pflichtfelder fehlen (`hasAllRequired`), nicht
+   * ohne Score, nicht wenn schon eine Anfrage laeuft, und nicht, wenn das
+   * Dokument gar nicht in der App steckt — dort gibt es keinen Weg zum
+   * Server. Der Knopf bleibt daneben; er setzt den Merker zurueck und ist
+   * damit der Weg zum Neuberechnen.
+   *
+   * KEIN STILLER AUSFALL: scheitert der Aufruf, bleibt die gerechnete
+   * Heuristik stehen, die Marke faellt auf „Lokale Heuristik" zurueck und
+   * der Grund steht in der Box. */
+  /* v1946 · Die Marke sagt, WOHER der Text kommt. Faellt die KI aus,
+     steht darunter weiter die gerechnete Heuristik — dann muss die Marke
+     das auch sagen.
+
+       > Eine Herkunftsangabe, die einen Ausfall ueberlebt, behauptet
+       > eine Quelle, die nichts geliefert hat.
+
+     Der Grund steht in der Box, nicht nur im Toast: ein Toast ist nach
+     vier Sekunden weg, die Bewertung bleibt stehen. */
+  function _kiMarkeZurueck(grund) {
+    var q = document.getElementById('ai-source');
+    if (q) q.textContent = 'Lokale Heuristik';
+    var o = document.getElementById('ai-opinion');
+    if (o && grund && o.innerHTML.indexOf('keine KI-Einordnung') < 0) {
+      o.innerHTML += ' <em>(Diesmal ohne KI-Einordnung: ' + grund
+        + '. Die Zahlen und das Urteil oben sind gerechnet und gelten.)</em>';
+    }
+    /* Der Stand gilt als NICHT analysiert — sonst versucht es die
+       Automatik nie wieder, obwohl der naechste Versuch klappen koennte. */
+    _kiStand = null;
+  }
+
+  var RUHE_MS = 1800;
+  var _kiStand = null;      /* Fingerabdruck des zuletzt analysierten Standes */
+  var _kiUhr = null;        /* die verschobene Ausloesung */
+
+  function _kiFingerabdruck(inputs, score) {
+    /* Nur, was in die Analyse eingeht. Die Adresse gehoert dazu (die KI
+       benennt den Ort), der Marktwert auch — eine neue Markteinschaetzung
+       ist ein neuer Stand. */
+    var mw = 0;
+    if (_avmResults.length) {
+      var a = _avmResults[0];
+      mw = Math.round(QcEngine.num(_selectedValue(a, 'marktwert')) || QcEngine.num(a.marktwert) || 0);
+    }
+    return [inputs.plz, inputs.ort, inputs.str, inputs.hnr, inputs.objektart,
+            inputs.wfl, inputs.bj, inputs.kp, inputs.nkm, inputs.hg, inputs.hg_split,
+            inputs.ek, inputs.zins, inputs.tilg, score.score, mw].join('|');
+  }
+
+  function _kiAutomatikPruefen(score, inputs) {
+    /* Ohne Elternfenster gibt es keinen Weg zum Server — dann gar nicht
+       erst anfangen, sonst steht gleich ein Fehlertoast da. */
+    if (!window.parent || window.parent === window) return;
+    if (!score || score.score == null) return;
+    if (!QcEngine.completeness(inputs).hasAllRequired) return;
+
+    var stand = _kiFingerabdruck(inputs, score);
+    if (stand === _kiStand) return;     /* dieser Stand ist schon analysiert */
+    if (_aiWartet) return;              /* eine Anfrage laeuft bereits */
+
+    if (_kiUhr) clearTimeout(_kiUhr);
+    _kiUhr = setTimeout(function () {
+      _kiUhr = null;
+      /* Noch einmal pruefen: in der Ruhepause kann sich alles geaendert
+         haben — auch zurueck auf unvollstaendig. */
+      var jetztInputs = QcEngine.getInputs();
+      if (!QcEngine.completeness(jetztInputs).hasAllRequired) return;
+      var jetztScore = QcEngine.computeScore(jetztInputs, (_avmResults[0] || null));
+      if (!jetztScore || jetztScore.score == null) return;
+      var jetztStand = _kiFingerabdruck(jetztInputs, jetztScore);
+      if (jetztStand === _kiStand || _aiWartet) return;
+      _kiStand = jetztStand;
+      runRealAi({ automatisch: true });
+    }, RUHE_MS);
+  }
+
+  async function runRealAi(opt) {
+    var _auto = !!(opt && opt.automatisch);
     closeApiModal();
-    showToast('\u2728 Analyse laeuft \u2026');
+    showToast(_auto ? '\u2728 KI-Bewertung laeuft \u2026' : '\u2728 Analyse laeuft \u2026');
     document.getElementById('ai-source').textContent = 'DealPilot \u00b7 KI-Analyse';
 
     const inputs = QcEngine.getInputs();
     const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
     const avmData = _avmResults.length > 0 ? _avmResults[0] : null;
+    var _uFuerKi = null;
+    try { _uFuerKi = _qcUrteil(score, inputs, score.kpi || {}, null); } catch (_e) {}
 
     if (!window.parent || window.parent === window) {
       showToast('\u26a0 Analyse nur in der App verfuegbar');
@@ -5513,17 +5636,32 @@ const QcApp = (function() {
     if (_aiWartet) { showToast('\u23f3 Eine Analyse laeuft bereits'); return; }
 
     var abgelaufen = setTimeout(function () {
-      if (_aiWartet) { _aiWartet = null; showToast('\u26a0 Zeitueberschreitung'); }
+      if (_aiWartet) { _aiWartet = null; showToast('\u26a0 Zeitueberschreitung');
+        _kiMarkeZurueck('die KI hat nicht rechtzeitig geantwortet'); }
     }, 60000);
 
     _aiWartet = function (d) {
       clearTimeout(abgelaufen);
       if (!d.ok) {
+        /* v1946: KEIN STILLER AUSFALL. Bliebe die Marke auf
+           'DealPilot \u00b7 KI-Analyse' stehen, behauptete sie eine Herkunft,
+           die der Text darunter nicht hat — dort steht dann weiter die
+           gerechnete Heuristik. */
+        _kiMarkeZurueck(d.fehler || 'die KI war nicht erreichbar');
         showToast('\u26a0 ' + (d.fehler || 'Analyse fehlgeschlagen'));
         return;
       }
       var result = d.analyse || {};
-      document.getElementById('ai-verdict-headline').textContent = result.verdict || 'Analyse';
+      /* v1946 · HIER STAND `headline = result.verdict`.
+         Damit hatte die KI ein EIGENES Urteil neben dem gerechneten —
+         die vierte Quelle in derselben Box. Genau daraus entstand
+         "Vorsicht — überdenken" neben "Score 56 (Solide)".
+
+           > Wer die Überschrift schreiben darf, urteilt. Die KI ordnet
+           > ein; das Urteil ist vorher gefallen und bleibt stehen.
+
+         Überschrift, Ton und Stufe behält die Heuristik. Die KI füllt
+         Verhandlungsrat, Pro, Contra und Meinung. */
       document.getElementById('ai-negotiate-v').innerHTML = result.negotiate || '\u2014';
       document.getElementById('ai-pros').innerHTML =
         (result.pros || []).map(function (p) { return '<li>' + p + '</li>'; }).join('');
@@ -5539,10 +5677,14 @@ const QcApp = (function() {
         inputs: inputs,
         kpi: score.kpi || {},
         score: score.score, label: score.label,
+        /* v1946: damit der Prompt weiß, was schon entschieden ist. */
+        urteil: (_uFuerKi && _uFuerKi.ueberschrift) || null,
+        urteil_text: (_uFuerKi && String(_uFuerKi.rat).replace(/<\/?strong>/g, '')) || null,
         avm: avmData
       }, '*');
     } catch (e) {
       clearTimeout(abgelaufen); _aiWartet = null;
+      _kiMarkeZurueck(e.message);
       showToast('\u26a0 Fehler: ' + e.message);
     }
   }
@@ -6180,6 +6322,9 @@ function renderTransferList() {
     applyAvmNkm, dismissAvm, toggleAvmCard,
     handlePhotos, removePhoto, addExposePhotos,
     showApiKeyModal, closeApiModal, runRealAi,
+    /* v1946: der Weg zum Neuberechnen. Er setzt den Merker zurueck —
+       sonst sieht die Automatik denselben Stand und tut nichts. */
+    kiNeu: function () { _kiStand = null; return runRealAi(); },
     openSaveModal, closeSaveModal, confirmSave, toggleAllTransfer, setPdfPending,
     setSpanConfig, openQc6Settings, closeQc6Settings, toggleSource,
     openCreditModal, closeCreditModal, confirmCreditModal, registerDpmb, qbResetVorgang
