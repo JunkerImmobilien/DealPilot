@@ -3292,25 +3292,46 @@ html[data-dp-layout] .body :is(#s0,#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#s-qu
    sie sind.
 
    > Wenn alles hervorgehoben ist, ist nichts hervorgehoben. */
+/* ── v1932b · DIE DRITTE :has()-REGEL AM KOPF — UND DIE LETZTE ───────────
+
+   Nach v1932a stand `#hdr-credits-pill-label` bei 390 und 430 px noch auf
+   **1,45:1**, bei 1180 px dagegen sauber. Der Walker nennt den Grund:
+
+     ![ 223] rgb(191,183,169)  ← …body header.hdr:has(#hdr-badges) #hdr-credits-pill-label
+     ![ 143] rgb( 90, 83, 71)  ← meine Regel aus v1932
+
+   > **Das war der DRITTE `:has()`-Treffer mit 223 an diesem Kopf.** Einzeln
+   > hinterherzulaufen haette noch einen vierten gebracht. Deshalb hier alle
+   > Werte dieses Blocks auf einmal — er ist die Quelle fuer Knoepfe, Symbole
+   > und die Kerosin-Pille zusammen.
+
+   Die Werte stammen aus demselben hellen Skin wie v1932: Tinte #5A5347 /
+   #141310, Pillenflaeche #F6F2E9 auf Rand #D3CBB6.
+
+   NICHT ANGEFASST ist der gleichlautende Block rund 95 Zeilen weiter oben,
+   der dieselben Selektoren auf Gold setzt: er hat dieselbe Spezifitaet und
+   verliert als frueherer gegen diesen hier. Er ist damit wirkungslos — eine
+   Leiche, die beim naechsten Anfassen dieser Datei weg sollte, aber nicht
+   zusammen mit einer Farbkorrektur. */
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn svg,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn svg *,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn .ic{
-  color:#BFB7A9 !important;
+  color:#5A5347 !important;            /* v1932b: war #BFB7A9 (fuer Obsidian) */
   fill:currentColor !important; stroke:currentColor !important;
 }
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) .hdr-icon-btn:hover svg{
-  color:#F5EFE2 !important;
+  color:#141310 !important;            /* v1932b: war #F5EFE2 */
 }
 html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill{
-  background:#171512 !important;
-  border-color:#2A2622 !important;
+  background:#F6F2E9 !important;       /* v1932b: war #171512 */
+  border-color:#D3CBB6 !important;     /* v1932b: war #2A2622 */
 }
 html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill-label,
 html[data-dp-layout] body header.hdr:has(#hdr-badges) #hdr-credits-pill svg{
-  color:#BFB7A9 !important;
+  color:#5A5347 !important;            /* v1932b: war #BFB7A9 */
 }
 
 /* ── 4 · DAS LOGO ────────────────────────────────────────────────────
