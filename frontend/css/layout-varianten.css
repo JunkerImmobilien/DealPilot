@@ -9100,3 +9100,37 @@ html:not([data-dp-layout])[data-dp-objkarte="cockpit"] :is(#sb-list) .sb-card .s
 html:not([data-dp-layout])[data-dp-objkarte] :is(#sb-list) .sb-card .sbc-investor-ribbon {
   display:none !important;
 }
+
+/* ==============================================================================
+   v1942 - DIE GRUNDFORM GEHOERT ZUM STIL, NICHT NUR SEINE EINZELHEITEN
+
+   Nach v1940 griffen die Stile in der DealPilot-Ansicht messbar (Hoehen 181
+   bis 215 px statt durchgehend 247), aber das Kachelband blieb in ALLEN -
+   und damit die halbe Kartenhoehe:
+
+     .sbc-top         88 px
+     .sbc-mini-grid   83 px   <- der Standard dieser Ansicht
+
+   Der Generator aus v1940 hat diese Regel nicht mitgenommen, weil sie keinen
+   Stilnamen traegt: in den Mappen blendet
+   `html[data-dp-layout] .dpl-schiene … .sbc-mini-grid` pauschal aus, fuer
+   jeden Stil zugleich.
+
+   > **Ein Klon nach Selektor-Muster holt, was das Muster nennt - nicht, was
+   > dazugehoert.** Die Grundform einer Karte steckt in Regeln OHNE Stilnamen;
+   > wer nur die benannten klont, bekommt die Verzierung ohne den Zuschnitt.
+
+   Deshalb hier dieselbe Pauschale fuer die Ansicht ohne Layout - und wie in
+   den Mappen die Ausnahme fuer Kennzahlen, dessen Zweck gerade die Kacheln
+   sind (v1934).
+
+   NICHT betroffen ist der Aktenreiter: er ist der Standard und traegt KEIN
+   Attribut, ist also von "nichts gewaehlt" nicht unterscheidbar. Wer nichts
+   waehlt, bekommt die Ansicht unveraendert - das ist ihr Versprechen.
+   ============================================================================== */
+html:not([data-dp-layout])[data-dp-objkarte] :is(#sb-list) .sb-card .sbc-mini-grid {
+  display: none !important;
+}
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] :is(#sb-list) .sb-card .sbc-mini-grid {
+  display: flex !important;
+}
