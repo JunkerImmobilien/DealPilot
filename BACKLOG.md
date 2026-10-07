@@ -119,6 +119,77 @@ statt eine davon zu behaupten.
 > die Hälfte fehlt, verkauft dem Kunden eine Tiefe, die es nicht gibt — und Stufe 3 kostet. Die
 > Ansage gehört VOR den Abruf, nicht in die Fehlermeldung danach.
 
+#### N44-BEFUND · Am 07.10.2026 gegen die Datenbank gemessen
+
+Marcel: „das könnten wir mit der Datenbank abgleichen." Gemacht — `dealpilot-mb-db`,
+`mb.market_reports`, **156 Berichte**, nur gelesen.
+
+**Die Frage „haben wir alle Werte für eine vollständige ImmoWertV-Verkehrswertermittlung"
+ist damit beantwortet: nein, und zwar in der großen Mehrheit nicht.**
+
+```
+156  Berichte insgesamt
+115  tragen einen cross_check mit Ertrags- und Sachwert-Zweig
+
+ 95  Ertragswertverfahren laeuft                      61 %
+ 46  Sachwertverfahren laeuft                         29 %
+  3  davon MARKTANGEPASST (mit Sachwertfaktor)         2 %   <-- der Kern
+ 32  nur vorlaeufiger Sachwert, ohne Marktanpassung
+  5  Bodenwert fehlt ganz
+  0  amtlicher Vergleichsfaktor nach § 20 ImmoWertV    0 %
+
+  0  Schluessel "verkehrswert" - den gibt es im cross_check NICHT
+```
+
+> **In 3 von 156 Berichten ist der Sachwert marktangepasst.** Alles andere ist eine
+> Herstellungskostenrechnung — die Berichte sagen das selbst: „Ausgewiesen ist der vorläufige
+> Sachwert ohne Marktanpassung — das ist eine Herstellungskostenrechnung, kein Marktwert."
+
+**Und jeder einzelne der 115 trägt diesen Satz:**
+
+> „Vereinfachtes Sachwert-/Ertragswertverfahren nach ImmoWertV-Logik als
+> Plausibilitäts-Quercheck. **Indikativ, kein Gutachten n. § 194 BauGB.**"
+
+**Die häufigsten Lücken, gezählt über die `notes`:**
+
+| Berichte | Lücke |
+|---:|---|
+| 115 | „indikativ, kein Gutachten" — ausnahmslos |
+| 95 | Gesamtnutzungsdauer aus einer **nicht gegen Anlage 1 ImmoWertV verifizierten** Tabelle |
+| 65 | „Sachwert nicht ausgewiesen" — das Verfahren rechnet gar nicht |
+| 46 | kein Immobilienrichtwert beschlossen (Vergleichswert stützt sich auf **Angebotspreise**) |
+| 34 | kein Sachwertfaktor verfügbar |
+| 25 | Grundstück erheblich größer als das Richtwertgrundstück, § 41 **nicht angewandt** |
+| 24 | BWK-Ansätze nicht gegen Anlage 3 verifiziert |
+| 17 | Restnutzungsdauer nach Anlage 2 — mittlerer Modernisierungsgrad |
+| 7 | Sachwertfaktor 1,0 angesetzt → **keine** Marktanpassung |
+
+**Das PDF entsteht im Browser**, nicht auf dem Server: `frontend/marktbericht-app/app.js` mit
+jsPDF. Es wird **nicht gespeichert** — wer es später wieder braucht, muss den Bericht erneut
+öffnen.
+
+**Wo der Verkehrswert steht: nirgends.** Es gibt keinen Schlüssel `verkehrswert`. Vorhanden
+sind `sachwert.value_eur`, der Ertragswert-Zweig und die Marktpreisindikation
+(`market_value.estimated` mit Spanne) — **drei Zahlen, aus denen niemand automatisch einen
+Verkehrswert macht.** Genau das ist Marcels Punkt: „er hat die Marktpreisindikation UND den
+Verkehrswert, und die Wahrheit wird wohl dazwischen liegen."
+
+**Was daraus folgt — die Arbeit, nicht mehr die Messung:**
+
+1. **Die Vollständigkeits-Ansage VOR den Abruf.** Alle Angaben dafür liegen schon vor: ob ein
+   Sachwertfaktor im Register steht, ob ein Immobilienrichtwert beschlossen ist, ob eine GND
+   als Zahl hinterlegt ist. Heute erfährt der Kunde es erst **danach**, aus den `notes` — und
+   Stufe 3 kostet.
+2. **Die Spanne zeigen statt einer Zahl.** Marktpreisindikation und Sachwert nebeneinander, mit
+   dem Abstand dazwischen und der Begründung, warum er so groß ist.
+3. **Die Begründung in die Pilot-Analyse**, der Marktbericht ins Objektwissen.
+
+> **Noch nicht gemessen, weil es Geld kostet:** ein echter Stufe-3-Abruf an mehreren Objekten
+> und was dabei im Reiter Objekt passiert. Das braucht Marcels Freigabe — die Daten oben
+> stammen aus bereits bezahlten Läufen.
+
+---
+
 **Bekannter Anknüpfungspunkt:** der Sammelweg `marktbericht_preis_alle` prüft bereits PLZ/Ort,
 Objektart und Wohnfläche je Objekt und meldet `fehlende_angaben` — der Weg für ein EINZELNES
 Objekt tut das nicht (gemessen am 07.10.2026). Dieselbe Prüfung existiert also schon, nur auf dem
