@@ -480,7 +480,44 @@ window.DealPilotOnboarding = (function () {
             +   ' · LTV bis ' + t.ltv + ' % · EK ' + t.ek + ' %</span>'
             + '</button>';
         }).join('')
-      + '</div>';
+      + '</div>'
+      /* ══ v1961 · DIE LAGEKLASSEN IN DER ERSTEINRICHTUNG ═══════════════
+         Marcel am 07.10.2026: „das sollte man vielleicht auch, wenn man
+         sich neu anmeldet, bei der Ersteinrichtung mit berücksichtigen."
+
+         Hier stehen NUR die drei Zielrenditen. Die Zusatzwerte je Klasse
+         (Mietausfall, Bewirtschaftung, Eigenkapital) gehören nicht in
+         eine Ersteinrichtung: sie sind freiwillig, und ein Assistent, der
+         zwölf Felder zeigt, wird weggeklickt. Der Kollege schreibt genau
+         das in `Anmerkungen.docx`: „sehr viele Eingabefelder und teilweise
+         noch etwas verwirrend."
+
+         Die Werte stehen vorbelegt da (3,5 / 5,0 / 7,0) und sind sofort
+         gültig - wer nichts anfasst, hat trotzdem ein brauchbares Profil.
+         Gespeichert wird bei jeder Änderung sofort über
+         `DealPilotLageProfil`, nicht erst beim Abschluss: der Assistent
+         lässt sich abbrechen, und was eingetippt war, soll dann stehen. */
+      + (function () {
+          var LP = window.DealPilotLageProfil;
+          if (!LP) return '';
+          return '<p class="dpo-vor dpo-vor-klein" style="margin-top:18px">'
+            + '<b>Lageklassen.</b> Investoren gliedern Standorte in A, B und C '
+            + 'und knüpfen daran eine Mindestrendite. Im Quick-Check wählst du '
+            + 'die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du '
+            + 'verhandeln müsstest. Die Vorbelegung ist marktüblich — gute Lage, '
+            + 'wenig Rendite.</p>'
+            + '<div class="dpo-lage">'
+            + LP.KLASSEN.map(function (k) {
+                var z = LP.zielBmr(k);
+                return '<label class="dpo-lage-z">'
+                  + '<span>' + esc(LP.ETIKETT[k].name) + '</span>'
+                  + '<input type="number" step="any" class="dpo-lage-f" data-k="' + k + '" '
+                  +   'value="' + (z != null ? String(z).replace('.', ',') : '') + '">'
+                  + '<span class="dpo-lage-e">% brutto</span>'
+                  + '</label>';
+              }).join('')
+            + '</div>';
+        })();
   }
 
   var SCHRITTE = [
@@ -633,6 +670,16 @@ window.DealPilotOnboarding = (function () {
         return;
       }
       if (ev.target.id === 'dpo_zins_auto') { _zinsFeld(); return; }
+      /* v1961: die Lagefelder speichern sofort. Kein Sammeln bis zum
+         Abschluss - der Assistent laesst sich abbrechen. */
+      if (ev.target.classList && ev.target.classList.contains('dpo-lage-f')) {
+        try {
+          if (window.DealPilotLageProfil) {
+            window.DealPilotLageProfil.setze(ev.target.getAttribute('data-k'), 'ziel_bmr', ev.target.value);
+          }
+        } catch (e) {}
+        return;
+      }
       if (ev.target.id === 'dpo-rechnen') { _rechnen(); return; }
       if (ev.target.id === 'dpo-weiter') { _sichern(); _vor(); return; }
       if (ev.target.id === 'dpo-zurueck') { _sichern(); _zurueck(); return; }
@@ -937,6 +984,14 @@ window.DealPilotOnboarding = (function () {
       '.dpo-k-name{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:14.5px;color:#1b1815}',
       '.dpo-k-unter{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.4px;color:#8a837a;text-transform:uppercase}',
       '.dpo-k-fuer{font-size:12px;line-height:1.5;color:#55504a;margin-top:2px}',
+      /* v1961: die drei Lage-Zeilen. Schmal und ruhig - sie sollen den
+         Assistenten nicht dominieren, die Profilkacheln daruaber sind
+         die eigentliche Wahl des Schritts. */
+      '.dpo-lage{display:flex;flex-direction:column;gap:7px;margin-top:8px}',
+      '.dpo-lage-z{display:grid;grid-template-columns:1fr 84px auto;align-items:center;gap:10px;font-size:12.5px}',
+      '.dpo-lage-f{width:100%;box-sizing:border-box;padding:6px 8px;font-size:13px;text-align:right}',
+      '.dpo-lage-e{font-size:10.5px;opacity:.6;white-space:nowrap}',
+      '@media (max-width:420px){.dpo-lage-z{grid-template-columns:1fr 72px auto}}',
       '.dpo-k-werte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#6b6660;margin-top:4px}',
       '.dpo-k-zusatz{font-size:10.5px;color:var(--wl-b8932f,#b8932f);margin-top:4px;font-weight:600}',
       /* v1753c · 38 px war das eigentliche Problem.
