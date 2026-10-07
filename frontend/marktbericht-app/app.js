@@ -1304,9 +1304,33 @@ function _deZahl(v) {
   const n = Number(v);
   return (v == null || !isFinite(n)) ? '–' : n.toLocaleString('de-DE');
 }
+/* ══ v1950 · DAS OBERSTE WORT HIESS HIER NOCH "Top" ═══════════════════
+   Seit v1863 heisst die oberste Stufe "Sehr gut" - Marcels Entscheidung
+   vom 04.10.2026 ("mit gut, sehr gut und dann halt die anderen"). Die
+   Haupt-App fuehrt das Wort ueberall, der Marktbericht sagte weiter "Top":
+   in der Ring-Pille, im Fliesstext UND im PDF, am selben Score.
+
+   > v1203 hat hier schon einmal aufgeraeumt - damals hat `_scoreTier`
+   > den abweichenden `ds.rating` des mb-Backends verdraengt, weil es
+   > "sich mit der Haupt-App deckt". Das stimmte an dem Tag. Dann hat
+   > v1863 das oberste Wort geaendert, und diese Stelle ist stehen
+   > geblieben. **Wer eine Abweichung durch eine Kopie ersetzt, erbt die
+   > Pflicht, die Kopie nachzuziehen** - und niemand erinnert ihn daran.
+
+   Deshalb wird jetzt gelesen statt kopiert: `score-tiers.js` ist seit
+   v1950 in der `index.html` dieses Dokuments eingebunden. Der Marktbericht
+   ist ein EIGENES Dokument - die Skripte der Haupt-App wirken hier nicht,
+   das Blatt muss ausdruecklich geladen werden.
+
+   Der Rueckfall bleibt stehen, weil das PDF auch ohne die Datei richtig
+   drucken muss - er fuehrt dieselben fuenf Worte, nicht mehr "Top".
+   ══════════════════════════════════════════════════════════════════ */
 function _scoreTier(s) {
+  if (window.ScoreTier && typeof window.ScoreTier.stufe === 'function') {
+    return window.ScoreTier.stufe(s).wort;
+  }
   s = s || 0;
-  return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
+  return s >= 85 ? 'Sehr gut' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
 }
 function _kiRaet(s) { s = s || 0; return s >= 85 ? 'Aktiv ausbauen' : s >= 70 ? 'Kauf erwägen' : s >= 50 ? 'Genau prüfen' : 'Zurückhaltung'; }
 // Donut-Ring im DealPilot-Stil: dicker Ring, tier-farbig, Score gross, Tier-Pille unten.

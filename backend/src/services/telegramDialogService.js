@@ -116,10 +116,29 @@ async function objekteListe(userId, limit) {
  *
  * DIE STUFE steht nirgends gespeichert; sie entsteht erst bei der Anzeige.
  * Die Kette unten ist die aus CLAUDE.md, die fuer die Objektkarte gilt:
- * 85 / 70 / 50 / 35. (`score-tiers.js` kennt nur vier Baender und endet
- * bei 50 — die fuenfte Stufe KRITISCH ist dort nicht abgebildet. Die
- * Abweichung ist bekannt und dokumentiert; maßgeblich ist, was die App
- * dem Nutzer zeigt.)
+ * 85 / 70 / 50 / 35.
+ *
+ * v1950 · HIER STAND EINE FALSCHE BEGRUENDUNG. Der Satz lautete:
+ *
+ *   "`score-tiers.js` kennt nur vier Baender und endet bei 50 - die
+ *    fuenfte Stufe KRITISCH ist dort nicht abgebildet."
+ *
+ * Gemessen am 07.10.2026 stimmt das nicht: `stufe()` dort fuehrt seit
+ * v1859 alle fuenf Stufen, seit v1863 mit "Sehr gut" obenauf. Nur
+ * `classify()` hat vier Baender - das ist die FARBkette, nicht die
+ * Wortkette.
+ *
+ * > Eine falsche Begruendung ist schlimmer als keine: sie rechtfertigt
+ * > die Doppelung dauerhaft. Wer sie liest, prueft die andere Datei
+ * > nicht mehr nach.
+ *
+ * WARUM DIE KOPIE TROTZDEM BLEIBT: das Backend-Image kopiert `frontend/`
+ * nicht (backend/Dockerfile holt nur src, templates, migrations,
+ * seed-data, scripts). Ein gemeinsames Modul zur Laufzeit gibt es ohne
+ * Bauschritt also nicht. Statt einer Zusammenlegung gibt es seit v1950
+ * einen PRUEFER, der beide echten Dateien laedt und fuer jeden Score von
+ * 0 bis 100 vergleicht: tools/score-ketten-pruefen.mjs. Zwei Kopien sind
+ * erlaubt, solange sie nachweisbar gleich sind.
  */
 function stufeZu(score) {
   if (score == null) return null;

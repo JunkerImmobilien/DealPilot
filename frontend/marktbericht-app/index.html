@@ -689,7 +689,11 @@ if (!window._wlrgbaH) {
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
 <script src="vendor/jspdf.plugin.autotable.min.js"></script>
-<script src="app.js?v=1867"></script>
+<!-- v1950: die EINE Score-Kette. Eigenes Dokument - die Skripte der
+     Haupt-App wirken hier nicht, das Blatt muss ausdruecklich geladen
+     werden. VOR app.js, damit window.ScoreTier steht, wenn sie laeuft. -->
+<script src="../js/score-tiers.js?v=v1950"></script>
+<script src="app.js?v=v1950"></script>
 <script src="mb-objektwahl.js?v=1877"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
