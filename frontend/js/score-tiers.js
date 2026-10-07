@@ -81,8 +81,12 @@
     return                   { wort: 'Kritisch', versal: 'KRITISCH', farbe: 'red' };
   }
   /* v1950: zusaetzlich als CommonJS, damit ein Pruefer die ECHTE Kette
-     laden kann statt sie nachzubauen. Zur Laufzeit nutzt das niemand -
-     das Backend-Image enthaelt `frontend/` nicht. */
+     laden kann statt sie nachzubauen.
+     v1955 - HIER STAND "Zur Laufzeit nutzt das niemand". Das stimmt nicht:
+     `tools/rechenkerne-spiegeln.mjs` spiegelt diese Datei woertlich nach
+     `backend/src/generated/rechenkerne/score-tiers.js`, und der
+     Telegram-Dienst liest sie seitdem ueber `services/rechenkerne.js`.
+     **Wer diese Datei aendert, muss die Spiegelung neu laufen lassen.** */
   var API = {
     classify: classify,
     stufe: stufe,

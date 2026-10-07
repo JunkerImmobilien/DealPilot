@@ -132,16 +132,39 @@ async function objekteListe(userId, limit) {
  * > die Doppelung dauerhaft. Wer sie liest, prueft die andere Datei
  * > nicht mehr nach.
  *
- * WARUM DIE KOPIE TROTZDEM BLEIBT: das Backend-Image kopiert `frontend/`
- * nicht (backend/Dockerfile holt nur src, templates, migrations,
- * seed-data, scripts). Ein gemeinsames Modul zur Laufzeit gibt es ohne
- * Bauschritt also nicht. Statt einer Zusammenlegung gibt es seit v1950
- * einen PRUEFER, der beide echten Dateien laedt und fuer jeden Score von
- * 0 bis 100 vergleicht: tools/score-ketten-pruefen.mjs. Zwei Kopien sind
- * erlaubt, solange sie nachweisbar gleich sind.
+ * v1955 · UND HIER STAND DIE NAECHSTE FALSCHE BEGRUENDUNG. v1950 sagte:
+ *
+ *   "Das Backend-Image kopiert `frontend/` nicht. Ein gemeinsames Modul
+ *    zur Laufzeit gibt es ohne Bauschritt also nicht."
+ *
+ * Der erste Satz stimmt. Der zweite nicht: **den Bauschritt gibt es seit
+ * v1899** - `tools/rechenkerne-spiegeln.mjs` spiegelt fuenf Rechenkerne
+ * nach `backend/src/generated/rechenkerne/`, und `score-tiers.js` ist
+ * einer davon. `services/rechenkerne.js` reicht ihn als `stufe(wert)`
+ * heraus.
+ *
+ * > Ich habe einen PRUEFER gebaut, wo ein ERZEUGER stand. Gefunden erst,
+ * > als ich fuer ein anderes Paket nach der Spiegelung gesucht habe -
+ * > und dabei kam heraus, dass die gespiegelte Kopie seit meiner
+ * > v1950-Aenderung VERALTET war (2781 gegen 4962 Bytes). Eine zweite
+ * > Quelle, die niemand nachzieht, ist genau das, was die Spiegelung
+ * > verhindern soll.
+ *
+ * Ab jetzt LIEST diese Datei die Kette, sie fuehrt sie nicht mehr. Der
+ * eigene Rueckfall bleibt nur fuer den Fall, dass die Spiegelung fehlt -
+ * ein Bot, der wegen eines fehlenden Kerns gar nichts sagt, waere
+ * schlimmer als einer, der die Woerter doppelt kennt. Der Pruefer
+ * `tools/score-ketten-pruefen.mjs` haelt den Rueckfall auf Linie.
  */
 function stufeZu(score) {
   if (score == null) return null;
+  /* v1955: die EINE Kette, ueber die gespiegelte score-tiers.js. */
+  try {
+    const r = require('./rechenkerne').stufe(score);
+    if (r && r.versal) return r.versal;
+  } catch (e) { /* Rueckfall unten */ }
+  /* Rueckfall, nur wenn die Spiegelung fehlt. Gleich zu halten ist
+     Aufgabe von tools/score-ketten-pruefen.mjs. */
   if (score >= 85) return 'SEHR GUT';   /* v1863: Marcel - "mit gut, sehr gut und dann die anderen" */
   if (score >= 70) return 'GUT';
   if (score >= 50) return 'SOLIDE';
