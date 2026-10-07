@@ -485,135 +485,7 @@ html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-rz{
 }
 html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-launch{
   width:100% !important; justify-content:center !important;
-}
-
-/* ── ENTWURF 5 · BORDKARTE, ERNST GEMEINT ─────────────────────────────
-   Die Metapher bleibt - aber nur das, was ETWAS BEDEUTET: der Abriss
-   trennt „Quellen waehlen" von „Abrufen". Perforation als feine
-   Punktlinie, kein Strichcode, kein Streifen.
-
-   Hier ist kein einziges neues Element noetig. `.dp-pf-perf` IST die
-   Perforation; sie war in der Zeile nur versteckt. Ein Bauteil, das
-   schon dasteht, wieder einzublenden ist ehrlicher als ein zweites
-   danebenzustellen.
-
-   ── v1702: DER ENTWURF IST NICHT MEHR DIE VORGABE ───────────────────
-   Bis hierher stand an 35 Stellen `html[data-dp-layout]:not([data-dp-
-   kartenstil])` - also: sobald IRGENDEIN Layout aktiv ist und niemand
-   einen Entwurf gewaehlt hat, wird der Streifen zur hellen Bordkarte
-   umgebaut. Gemessen am 29.09.2026 in Kanzlei (v2): Grund `#FFFDF9`
-   statt Runway-Verlauf, 128 statt 78 px, `.dp-pf-stripe` und
-   `.dp-pf-perf` auf 0x0, `.dp-pf-lead` als volle Zeile 1278x38 statt
-   als Bordkarten-Kopf 149 px links.
-
-   Marcel: „jetzt sieht der Streifen bei Datenaufnahme im Tab Objekt bei
-   dem Layout Kanzlei und Tower und Arbeitsmappe nicht mehr so aus wie
-   aus unserer demo. Stand heute passt die pre flight Karte."
-
-   Der Anker heisst jetzt `data-dp-pfstil` und wird NIRGENDS gesetzt -
-   die Regeln bleiben lesbar stehen, greifen aber nicht mehr. Ein Layout
-   allein aendert den Streifen damit nicht: ohne gewaehlten Entwurf
-   sieht er in JEDEM Layout aus wie im Auslieferungszustand, also wie in
-   der Demo. Die vier Entwuerfe bleiben ueber `data-dp-kartenstil`
-   waehlbar - sie sind ein Angebot, keine Ansage. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar{
-  display:flex !important; flex-wrap:wrap !important;
-  align-items:stretch !important;
-  padding:0 !important; height:auto !important; min-height:0 !important;
-  background:#FFFDF9 !important;
-  border:1px solid #DCD4C2 !important; border-radius:3px !important;
-  overflow:hidden !important;
-}
-/* Der Vorspann kommt zurueck - aber als Markenzeile, nicht als
-   Versalien-Aufdruck. Der alte Text wird auf Schriftgrad 0 gesetzt und
-   der neue im Pseudoelement gefuehrt: so bleibt der Knoten, an dem
-   `object-actions.js` haengt, unangetastet. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
-  display:flex !important; order:1 !important;
-  flex:1 0 100% !important; align-items:baseline !important; gap:9px !important;
-  padding:12px 16px 0 !important; margin:0 !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .bp,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .bp{
-  display:inline !important;
-  font-family:"Space Grotesk",sans-serif; font-weight:700;
-  letter-spacing:0; text-transform:none; color:#2C2A26;
-  font-size:0 !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .bp::after,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .bp::after{
-  content:"DealPilot"; font-size:13px; letter-spacing:.01em;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .k,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .k{
-  display:inline !important; font-weight:700 !important; font-size:13px !important;
-  color:#2C2A26 !important; letter-spacing:0 !important; text-transform:none !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .s,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .s{ display:none !important; }
-
-/* Die Quellen in der Mitte. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg{
-  order:2 !important; padding:11px 16px 0 !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg:last-of-type,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg:last-of-type{
-  padding-bottom:13px !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-row,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-row{ flex-wrap:wrap !important; }
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-qr,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-qr{ display:none !important; }
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-sep,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-sep{ display:none !important; }
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-stripe,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-stripe,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-bc,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-bc{ display:none !important; }
-
-/* Die Perforation - zwischen Waehlen und Ausloesen, nicht als Zierat. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf{
-  display:block !important; order:8 !important;
-  flex:0 0 0 !important; width:0 !important; height:auto !important;
-  align-self:stretch !important;
-  margin:10px 0 !important; padding:0 !important;
-  background:none !important;
-  border-left:2px dotted #DCD4C2 !important;
-}
-
-/* Der Abschnitt rechts. Die einzige Farbflaeche der Karte - sie zieht
-   den Blick auf den Knopf, und genau das soll sie. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
-  order:9 !important;
-  flex:0 0 190px !important; width:190px !important; min-width:190px !important;
-  display:flex !important; flex-direction:column !important;
-  justify-content:center !important; gap:7px !important;
-  padding:13px 16px !important; margin:0 0 0 auto !important;
-  background:#FBF6E9 !important;
-  align-self:stretch !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz::before,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz::before{
-  display:block !important;
-  content:"Abschnitt";
-  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
-  text-transform:uppercase; color:#8C8578;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-launch,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-launch{
-  width:100% !important; justify-content:center !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dpk-zahl,
-html[data-dp-kartenstil="bordkarte"] .dpk-zahl{
-  font-size:11.5px; color:#8C8578; font-variant-numeric:tabular-nums;
-}
-
-/* ── SCHMALE SCHIRME ──────────────────────────────────────────────────
+}/* ── SCHMALE SCHIRME ──────────────────────────────────────────────────
    Der Trichter braucht Breite; unter 820 px bricht er auf zwei Bloecke
    um - so steht es schon im Entwurf. Die Bordkarte legt ihren Abschnitt
    unter die Quellen und behaelt die Perforation als WAAGERECHTE Linie:
@@ -624,19 +496,7 @@ html[data-dp-kartenstil="bordkarte"] .dpk-zahl{
     grid-column:1 !important; grid-row:auto !important;
     border-left:0 !important; border-top:1px solid #E6E0D2 !important;
     margin-top:12px !important;
-  }
-  html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf,
-  html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf{
-    flex:0 0 100% !important; width:auto !important; height:0 !important;
-    margin:10px 16px !important;
-    border-left:0 !important; border-top:2px dotted #DCD4C2 !important;
-  }
-  html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
-  html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
-    flex:0 0 100% !important; width:auto !important; min-width:0 !important;
-    margin:0 !important;
-  }
-}
+  }}
 
 /* ═══════════════════════════════════════════════════════════════════════
    v1651b · drei Nachbesserungen, alle gemessen
@@ -777,48 +637,7 @@ html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
 /* Der Kopf der linken Spalte darf nicht mitwachsen. */
 html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-lead{
   align-self:start !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   v1651e · drei Feinheiten, alle gemessen
-
-   ── DER FEHLER, DEN ICH JETZT ZUM DRITTEN MAL GEMACHT HABE ───────────
-   `.dp-pf-lead` stand in der Bordkarte UNTEREINANDER statt nebeneinander:
-   gemessen `flex-direction:column`, Kopf 55 px hoch statt 19.
-
-   Ich hatte `display:flex` und `align-items:baseline` gesetzt - und die
-   RICHTUNG vergessen. Dasselbe in v1640 bei `.dp-pf-seg`, dasselbe in
-   v1649 bei `.dpl-schiene`.
-
-   > **`display:flex` sagt nichts ueber die Richtung.** Wer ein Element
-   > zu einem Flex-Behaelter macht, das vorher schon einer war, erbt
-   > dessen `flex-direction` - und sie steht nicht da, wo man sie sucht.
-   > Ab jetzt gehoert `flex-direction` in jede Regel, die `display:flex`
-   > auf ein fremdes Element setzt, auch wenn `row` der Vorgabewert ist.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
-  flex-direction:row !important;
-  flex-wrap:wrap !important;
-  height:auto !important;
-}
-
-/* Die Perforation gehoert AN den Abschnitt, nicht irgendwohin.
-   Gemessen: sie stand bei x=1483, der Abschnitt bei x=1703 - 220 px
-   Luft dazwischen, weil `margin-left:auto` am Abschnitt hing und ihn
-   von ihr wegschob. Der Zwischenraum gehoert VOR die Trennung, nicht
-   hinter sie. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf{
-  margin-left:auto !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
-  margin-left:0 !important;
-}
-
-/* Der Trichter: der Abrufknopf klebte am unteren Rand, weit unter den
+}/* Der Trichter: der Abrufknopf klebte am unteren Rand, weit unter den
    drei Ergebniszeilen. `margin-top:auto` schiebt ihn ans Ende des
    Blocks - aber der Block ist so hoch wie die linke Spalte, nicht so
    hoch wie sein Inhalt. Ein fester Abstand haelt ihn dort, wo der
@@ -829,114 +648,7 @@ html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-rz{
 /* Und ein Atemzug zwischen dem Kopf und der ersten Gruppe. */
 html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{
   padding-top:11px !important;
-}
-
-/* v1651f · und die AUSRICHTUNG. Der Kopf stand mittig, weil
-   `.dp-pf-lead` aus der Basis `justify-content:center` traegt - in
-   einer 55-px-Leiste richtig, in einer Karte nicht. Derselbe Satz wie
-   oben, nur die naechste Eigenschaft: eine Regel aendert nur, was sie
-   benennt. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
-  justify-content:flex-start !important;
-  text-align:left !important;
-}
-
-/* ── v1657 · DIE BORDKARTE, ZEILE FUER ZEILE NACH DEM ENTWURF ────────
-   Marcel: „die Datenaufnahme-Karte sieht auch nicht aus wie in der
-   Demo."
-
-   Der Entwurf (`entwurf-aktionsbox.html`, „5 · Bordkarte neu"):
-
-     [links, flex:1, Polster 13/16]
-       Kopfzeile:  DealPilot · Datenaufnahme · „Objekt 2026-1637" rechts
-       Quellen:    flex, gap 7, umbrechend
-     [Perforation: 2px punktiert, Rand 10px oben/unten]
-     [rechts, 190 px, Creme #FBF6E9, mittig]
-       „Abschnitt" · [Abrufen] · „1 Quelle gewaehlt"
-
-   Zwei Abweichungen, gemessen:
-   1. Der Kopf traegt „BOARDING PASS · Datenaufnahme · DealPilot ·
-      Boarding" - drei Angaben, von denen zwei dasselbe sagen.
-   2. **Die Objektnummer fehlt.** Im Entwurf steht sie rechts im Kopf
-      und beantwortet die Frage, fuer welches Objekt hier abgerufen
-      wird - bei einer Karte, die man aus einer Liste heraus oeffnet,
-      ist das keine Zierde.
-
-   Die Nummer kommt aus `#hdr-obj-num` und wird per `attr()` nicht
-   erreichbar; `karten-stil.js` setzt sie deshalb als
-   `data-dpk-objekt` an die Leiste. Hier steht nur ihre Gestalt. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .s,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .s{
-  display:none !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead::after,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead::after{
-  content:attr(data-dpk-objekt);
-  margin-left:auto;
-  font-family:"JetBrains Mono",ui-monospace,monospace;
-  font-size:10px; letter-spacing:.07em; text-transform:uppercase;
-  color:#8C8578;
-  align-self:center;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   v1659 · DIE BORDKARTE, AN DER DEMO AUSGEMESSEN
-
-   Marcel: „die Datenaufnahme hast du noch nicht angepasst, das sollte
-   halt so sein wie in der Demo."
-
-   Die Demo im Browser geoeffnet (`entwurf-aktionsbox.html`,
-   „5 · Bordkarte neu") und jeden Wert ausgelesen:
-
-     Karte        flex · bg WEISS · Rahmen 1,11px rgb(206,198,182)
-                  radius 3px · overflow hidden · 1090x108
-     links        flex:1 · Polster 13px 16px · transparent
-     Perforation  1,11px DOTTED rgb(206,198,182) · Hoehe 86
-     Abschnitt    190px · bg rgb(251,246,233)
-
-   Meine Fassung wich in drei Werten ab: `#FFFDF9` statt Weiss,
-   `#DCD4C2` statt `#CEC6B6`, und die Perforation war 2 px statt 1.
-   Der Cremeblock rechts stimmte.
-   ═══════════════════════════════════════════════════════════════════════ */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar{
-  background:#FFFFFF !important;
-  border:1px solid #CEC6B6 !important;
-  border-radius:3px !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf{
-  border-left:1px dotted #CEC6B6 !important;
-  margin:11px 0 !important;
-}
-/* Der Abschnitt rechts: 190 px und Creme, wie gemessen. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz{
-  flex:0 0 190px !important; width:190px !important; min-width:190px !important;
-  background:#FBF6E9 !important;
-  padding:13px 16px !important;
-}
-/* Die linke Seite: Polster 13/16 wie im Entwurf. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg{
-  padding:0 16px !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead{
-  padding:13px 16px 0 !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg:last-of-type,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg:last-of-type{
-  padding-bottom:13px !important;
-}
-/* Die Quellkacheln: der Entwurf setzt sie mit 7 px Abstand nebeneinander. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-row,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-row{
-  gap:7px !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
+}/* ═══════════════════════════════════════════════════════════════════════
    v1659b · DIE KARTEI — ENTWURF 2, AN DER DEMO AUSGEMESSEN
 
    Marcel: „bei der Datenaufnahme haette ich eigentlich gerne die
@@ -2481,3 +2193,22 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     min-width: 0 !important;
   }
 }
+
+/* ══ v1953 · DIE BORDKARTE DER DATENAUFNAHME IST ENTFERNT ═══════════════
+   Marcel am 07.10.2026: "die kann wirklich raus."
+
+   Entfernt wurden 32 Regeln, die ausschliesslich an
+   html[data-dp-kartenstil="bordkarte"] hingen. GEMESSEN, nicht geschaetzt:
+   34 Regeln nannten den Wert, davon 32 nur ihn; die beiden anderen sind
+   TRICHTER-Regeln, die die Bordkarte per :not(...) ausschliessen. Die sind
+   geblieben - :not() traegt die Spezifitaet seines Arguments, ein Wegfall
+   haette die Kaskade des Trichters verschoben.
+
+   Der Wert ist auch ueber ?karte= nicht mehr erreichbar (karten-stil.js),
+   sonst holte die Adresszeile einen Stil zurueck, dessen Regeln es nicht
+   mehr gibt.
+
+   Die Objektkarten-Bordkarte (data-dp-objkarte="bordkarte") ist eine
+   ANDERE Sache und bleibt - sie ist seit v1915 der Rueckfall der
+   Aktenmappe.
+   ══════════════════════════════════════════════════════════════════ */

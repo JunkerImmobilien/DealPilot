@@ -97,7 +97,29 @@
        das Bild geschickt (Dateien/karte.png) - schweres Papier, die
        Kacheln blindgepraegt statt gedruckt. */
     buetten:   { name: 'Buetten',   sub: 'Papier, Kacheln blindgepraegt' },
-    bordkarte: { name: 'Bordkarte', sub: 'Abriss trennt Waehlen von Ausloesen' },
+    /* ══ v1953 · BORDKARTE IST RAUS ═══════════════════════════════════
+       Marcel am 07.10.2026: "Dann haben wir die Bordkarte, die koennen wir
+       rausnehmen. Die hatten wir auch schon mal rausgenommen, also die kann
+       wirklich raus."
+
+       GEMEINT IST DIE DATENAUFNAHME-BORDKARTE, nicht die der Objektkarte.
+       Es gibt zwei gleichnamige Stile in zwei Listen:
+
+         hier (karten-stil.js)        data-dp-kartenstil  Datenaufnahme
+         objektkarten-stil.js         data-dp-objkarte    Liste der Objekte
+
+       Die ANDERE Bordkarte ist seit v1915 der Rueckfall der Aktenmappe -
+       Marcels eigene Entscheidung vom 06.10. Haette ich die falsche Liste
+       angefasst, waere sein Standard stillschweigend verschwunden. Der
+       Zusammenhang, in dem er es gesagt hat, nennt Kartei, Zeile, Buetten
+       und Trichter - das ist eindeutig diese Liste.
+
+       Wer den Stil gespeichert hat, faellt weich zurueck: `STILE[stil]` ist
+       undefined, und `setze()` setzt dann (siehe Kommentar oben). Der
+       Weg ueber `?karte=bordkarte` ist unten ausdruecklich geschlossen -
+       sonst koennte die Adresszeile einen Stil zurueckholen, den es nicht
+       mehr gibt, und die CSS-Regeln dazu sind entfernt.
+       ════════════════════════════════════════════════════════════════ */
     trichter:  { name: 'Trichter',  sub: 'Links die Quellen, rechts das Ergebnis' }
   };
 
@@ -608,6 +630,9 @@
        > loescht `dp-neue-karte-stil`, also genau den
        > Auslieferungszustand. Der Vorbehalt von v1660 („KEIN Standard
        > per JS") bleibt gewahrt: '' ist kein Standard, sondern keiner. */
+    /* v1953: ein entfernter Stil darf auch ueber die Adresszeile nicht
+       zurueckkommen - seine Regeln sind weg, er saehe kaputt aus. */
+    if (ausUrl === 'bordkarte') ausUrl = 'aus';
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
     else setze(gemerkt);
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
