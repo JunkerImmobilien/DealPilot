@@ -8098,6 +8098,30 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
    Gutachterausschuss bis eigene Angabe - und hat mit der Lageklasse
    nichts zu tun. Ein A ist dort etwas voellig anderes als hier.
    ================================================================ */
+/* ===== v1960 - DIE LAGEKLASSE IN DER TABELLE =========================
+   A, B und C bekommen DIESELBE Farbe. Eine Ampel waere hier falsch: eine
+   C-Lage ist nicht schlechter als eine A-Lage, sie ist eine andere
+   Strategie mit anderer Zielrendite. Gruen fuer A und Rot fuer C wuerde
+   eine Wertung behaupten, die Marcel ausdruecklich nicht getroffen hat.
+   ================================================================= */
+.ao-lk {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);
+  color: var(--wl-c9a84c, #C9A84C);
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);
+}
+.ao-lk-leer {
+  opacity: .35;
+  font-size: 12px;
+}
+
 .oe-lk-tag {
   display: inline-block;
   background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
