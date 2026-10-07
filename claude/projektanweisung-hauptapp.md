@@ -31908,6 +31908,98 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (70) 07.10.2026 — v1927–v1927c: die vollständige Bewertung im Telegram-Bot
+
+**Marcel:** „er rechnet den Deal-Score nur so vorläufig und er gibt mir auch keinen Text aus …
+dass wir einmal den Deal-Score bekommen, aber auch die Bewertung komplett mit der Heuristik und
+dem Text, den die KI wieder zurückgibt."
+
+Der Chat vom 06.10., 22:22 Uhr lag **nach** dem v1925-Rollout (21:32). Das Werkzeug war da.
+
+> **Das Modell hat nicht das falsche Werkzeug gewählt — ihm wurde das falsche vorgeschrieben.**
+> In `agentWerkzeuge.js` stand an `objekt_kennzahlen`: „IMMER nehmen bei … 'wie ist der Score
+> von …'". Es hat sich daran gehalten. `objekt_kennzahlen` liest nur `scoreLesen()` und den
+> Portfolio-Spiegel; Rechenkern und Heuristik kennt es nicht. Dieselbe Familie wie
+> [[werkzeug-schlaegt-hinweis]]: **bei einem KI-Agenten gewinnt das Werkzeugschema gegen den
+> Prompt.**
+
+Beim Messen kamen zwei weitere Ursachen heraus, beide aus v1925:
+
+> **Ein Zweig, der weniger kann als sein Geschwister, fällt nicht auf — er liefert ja etwas.**
+> Die Heuristik lief nur im Zweig für Objekte **ohne** gespeicherten Score. Genau die Objekte,
+> die der Nutzer am besten kennt, bekamen die dünnste Antwort.
+
+> **Ein Hinweis, der eine Lücke beschreibt, muss mitfallen, wenn die Lücke geschlossen wird.**
+> „Cashflow, DSCR, LTV und Rendite nicht verfügbar" stand noch da, obwohl der Kern seit v1925
+> genau diese vier liefert. Verwandt mit [[notnagel-ueberlebt-defekt]].
+
+**Gebaut:** `objekt_kennzahlen` ruft jetzt **buchstäblich dieselbe Funktion** wie
+`objekt_schnellblick` — keine kopierte Ableitung, sonst stünde der Rechenkern zweimal da. Der
+Score hat genau eine Quelle (gespeichert **oder** gerechnet, nie beides), die Heuristik läuft
+immer. Teilnoten bleiben dem gerechneten Score vorbehalten: sie sind die Zerlegung *einer*
+Rechnung, und die hat im gespeicherten Fall nicht stattgefunden.
+
+**Neu `backend/src/services/bewertungsText.js`.** Die Reihenfolge ist die Aussage:
+**Zahlen → Score → Heuristik → dann die KI.** Die ersten drei sind nachrechenbar und bei
+gleichen Eingaben immer gleich; die vierte ist es nicht.
+
+> **Eine KI-Einordnung, die keine gerechnete Zahl neben sich hat, ist keine Bewertung — sie ist
+> ein Text über ein Haus.** Das Modul rechnet nichts.
+
+Vier Verbote im Prompt, jedes mit einem gemessenen Vorfall dahinter. Das vierte ist das
+interessante:
+
+> **Eine erfundene Zahl fällt auf. Ein erfundenes Adjektiv nicht — und es steht genauso im
+> Bericht.** Erster echter Lauf (Parkstr. 9): „Dieser Deal hat eine gewisse Attraktivität durch
+> die Lage und die Größe des Mehrfamilienhauses." **Von der Lage stand kein Wort in der
+> Eingabe.** Das Zahlen-Verbot hatte gehalten, die erfundene Qualität ging glatt daran vorbei.
+> Seit v1927b verboten: keine Aussage über Lage, Zustand, Ausstattung.
+
+Dazu v1927c: die Einordnung darf einer Einschätzungszeile nicht widersprechen — sie nannte
+3,71 % „hoch", direkt unter der Zeile „Bruttorendite unter 4 % — preislich teuer".
+
+Die **Vorbehalte der Rechnung** gehen in den Prompt (fehlender KNK-Posten, angenommener
+Wertpuffer, fehlende Bewirtschaftung, Barkauf), damit der Text nicht sicherer klingt als die
+Zahlen. **Kein stiller Ausfall:** mit leerem Schlüssel in einem Wegwerf-Prozess geprüft — die
+Bewertung kommt trotzdem, der Grund steht im Ergebnis, und das Modell wird angewiesen, keine
+eigene an ihrer Stelle zu schreiben.
+
+**v1927a, ein eigener Befund beim Messen:** ohne hinterlegtes Darlehen gab der Kern `dscr 0,00`
+und `ltv 0,00 %`.
+
+> **Eine Null behauptet eine Messung.** „DSCR 0,00" liest sich wie „deckt den Kapitaldienst
+> nicht" — und das Gegenteil ist der Fall. Eine Kennzahl, die nicht anwendbar ist, gehört
+> benannt und nicht beziffert. Der Rechenkern ist unberührt, nur die Beschriftung sagt jetzt die
+> Wahrheit. Dasselbe bei der Bewirtschaftungsquote (0,00 % hiess „nicht hinterlegt") und beim
+> Cashflow von 900 €, der ohne jeden Vorbehalt dastand.
+
+**Prüfstrecke:** `rechenkerne-spiegeln --pruefen` RC=0; `pruef-schnellblick.js` über **fünf echte
+Objekte** RC=0, Score und Stufe **bitgleich zur Datenbank** (68/68, 68/68, 55/55, 77/77, 3/3),
+jedes mit Empfehlung (VERHANDELN · VERHANDELN · KRITISCH · KAUFEN · PASS) und KI-Text. `--neu`
+über den Quick-Check-Zweig: Score 77 = Browser-Score des gleich bestückten Objekts, Prüfobjekt
+gelöscht, 0 Reste. Commits `73db2465` · `bcab2345` · `1bbb2f6b` · `0775d388`.
+
+**Offen — und zwar bei Marcel, nicht im Code:**
+
+> **Ob eine Leistung Geld kostet, entscheidet nicht der, der sie baut.** Gemessen: `agentLauf.js`
+> ruft für **jede** Nachricht dasselbe Modell und verrechnet dafür **kein Kerosin** — geprüft
+> wird allein `stufe === 'kostet'`, und das trifft nur `marktbericht_abrufen`. Die Einordnung
+> liegt in derselben Klasse. Deshalb wird **nichts** abgebucht. Soll sie Kerosin kosten, ist das
+> Marcels Entscheidung; der Weg steht im Modulkopf (`pruefeArt()` vor der Leistung, `consumeArt()`
+> danach, Reihenfolge aus v1251).
+
+**Nebenbei repariert:** der persönliche OpenAI-Schlüssel wandert jetzt in den Kontext. Sonst
+liefe der Dialog über den einen und die Einordnung über den anderen Schlüssel — der Nutzer
+bezahlte **eine Hälfte seiner Antwort selbst und die andere nicht**.
+
+**Noch nicht abgenommen:** gemessen wurde am direkt gerufenen Werkzeug, nicht an einer echten
+Chat-Nachricht. Dass das Modell jetzt wirklich **eine** Antwort baut, steht in der Beschreibung —
+bewiesen ist es erst, wenn Marcel einmal fragt. **Das ist der Punkt, den nur er abnehmen kann.**
+
+**Und ein Prozessunfall, der sich wiederholt:** `v1925` ist zweimal vergeben, einmal in diesem
+Strang und einmal im Bot-Strang; ausgewichen wurde auf v1927–v1927c. Das ist seit dem 06.10. der
+**fünfte** Unfall aus Parallelarbeit. Die Herkunft der Versionsnummer gehört festgelegt.
+
 ### (69) 07.10.2026 — v1930: das Bild des Nutzers als Messgerät
 
 **Marcel:** „im Hintergrund ist halt ein schwarzer Obsidian-Hintergrund mit Partikeln. Den
