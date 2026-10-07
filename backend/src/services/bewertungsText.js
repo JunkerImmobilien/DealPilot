@@ -86,6 +86,14 @@ function _mitFrist(versprechen, ms) {
  *   · neue Zahlen  — `projectAll` rechnete jahrelang in Cent, und das
  *     Modell hat Euro schon zweimal als Cent gelesen (v1803). Ein Modell,
  *     das rechnen darf, ist eine zweite Quelle.
+ *   · Aussagen ueber LAGE und ZUSTAND — gemessen im ersten echten Lauf am
+ *     07.10.2026 (Parkstr. 9, Score 3): „Dieser Deal hat eine gewisse
+ *     Attraktivitaet durch die Lage und die Groesse des Mehrfamilienhauses."
+ *     Von der Lage stand kein Wort in der Eingabe. Das Verbot gegen neue
+ *     ZAHLEN hatte gehalten; die erfundene Qualitaet ging daran vorbei.
+ *
+ *       > Eine erfundene Zahl faellt auf. Ein erfundenes Adjektiv nicht —
+ *       > und es steht genauso im Bericht.
  *   · die Empfehlung ueberstimmen — sie ist eine Regel mit Schwellen
  *     (75/60/40). Ein Text, der sie aufweicht, macht sie wertlos, ohne sie
  *     zu aendern.
@@ -143,6 +151,10 @@ function bauePrompt(e) {
     '· KEINE neue Zahl nennen, die oben nicht steht. Nicht ueberschlagen,',
     '  nicht umrechnen, nicht hochrechnen. Keine Marktpreise, keine',
     '  Mietspiegel, keine Zinsprognosen — du kennst sie nicht.',
+    '· KEINE Aussage ueber LAGE, ZUSTAND, AUSSTATTUNG, Mieterstruktur,',
+    '  Nachbarschaft oder Entwicklungspotenzial. Du kennst davon nichts —',
+    '  oben stehen nur Zahlen. Saetze wie "attraktiv durch die Lage" oder',
+    '  "gute Substanz" sind erfunden, auch wenn sie harmlos klingen.',
     '· Die Kaufempfehlung NICHT ueberstimmen und nicht abschwaechen. Wenn du',
     '  einen Grund siehst, der dagegen spricht, nenne den Grund — das Urteil',
     '  bleibt stehen.',
