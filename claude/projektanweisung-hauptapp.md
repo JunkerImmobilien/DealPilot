@@ -31908,6 +31908,101 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (75) 07.10.2026 — v1940 bis v1942: die Ansicht heißt DealPilot, und vier Anläufe auf der falschen Ebene
+
+#### A · Der Name (v1941)
+
+**Marcel:** „Erstmal würde ich die gerne umbenennen, dass die nicht mehr Heute heißt, sondern dass
+die DealPilot heißt."
+
+> **Der Name wird gelesen, nicht gesetzt.** „DealPilot" fest einzutragen wäre beim
+> Whitelabel-Mandanten falsch — dort heißt die App anders (`brand_name` in
+> `mandant-branding.js`). Ein Helfer fragt zuerst die Marke, dann die Wortmarke im DOM, und fällt
+> erst dann auf DealPilot zurück.
+
+#### B · Die Objektkarten greifen jetzt (v1940/v1942)
+
+Von 112 Regeln der sieben Stile griff in der Ansicht ohne Layout **null**. 49 Regeln per Generator
+geklont mit `html:not([data-dp-layout])[data-dp-objkarte] :is(#sb-list)` — nicht von Hand.
+
+Danach griffen sie messbar, aber das Kachelband blieb und damit die halbe Kartenhöhe.
+
+> **Ein Klon nach Selektor-Muster holt, was das Muster nennt — nicht, was dazugehört.** Die
+> Grundform einer Karte steckt in Regeln OHNE Stilnamen; in den Mappen blendet eine Pauschale das
+> `mini-grid` für jeden Stil zugleich aus. Wer nur die benannten klont, bekommt die Verzierung
+> ohne den Zuschnitt.
+
+```
+Ansicht DealPilot, Schreibtisch   vorher      nach v1940   nach v1942
+Aktenreiter (Standard)            215 px      215 px       215 px   (unverändert, gewollt)
+Bordkarte                         215 px      191 px       100 px
+Score-Kante                       215 px      215 px       124 px
+Datenzeile                        215 px      181 px        90 px
+Ampel                             215 px      185 px        94 px
+Kennzahlen                        215 px      196 px       196 px   (behält seine Kacheln)
+Minimal                           215 px      189 px        98 px
+```
+
+Der Aktenreiter bleibt unberührt: er trägt kein Attribut und ist von „nichts gewählt" nicht
+unterscheidbar. Wer nichts wählt, bekommt die Ansicht unverändert — das ist ihr Versprechen.
+
+#### C · Vier Anläufe auf der falschen Ebene (v1941 bis v1941e)
+
+**Marcel:** „auf der Desktop-Ansicht hat man da zum Beispiel eine horizontale Scrollbar. Das
+möchte ich nicht."
+
+Gemessen: `#oab-bar` mit `scrollWidth 1267` bei `clientWidth 753`. Ich habe **viermal** an
+`.dp-pf-tile` gearbeitet — den Kacheln: `flex-wrap`, `flex: 1 1 auto`, `min-width: 0`, `nowrap`.
+Nichts wirkte.
+
+Erst die Auszählung **aller direkten Kinder** zeigte, dass die Kacheln dort gar nicht liegen:
+
+```
+.dp-pf-stripe   753 px   (Hintergrundstreifen)
+.dp-pf-lead     149 px   flex: 0 0 auto      <- kann nicht schrumpfen
+.dp-pf-seg      175 px
+.dp-pf-seg      602 px   <- HIER liegen die Kacheln
+#oab-pf-qr       54 px
+.dp-pf-rz       208 px   min-width: 208px    <- fest verdrahtet
+```
+
+> **Die Summe hätte den Irrtum beim ersten Mal gezeigt:** 5 Kacheln × 175 px sind 875, gemessen
+> waren 1267. Wer einen Überlauf sucht, zählt die DIREKTEN Kinder des Containers und hält die
+> Summe gegen den Platz — nicht die Elemente, die er für die Ursache hält.
+
+**Drei Teillehren aus demselben Lauf:**
+
+> **`min-width: auto` ist der Standard jedes Flex-Kindes und wirkt nach unten durch.** Ein Element
+> auf `min-width: 0` zu setzen nützt nichts, solange seine eigenen Kinder sich weigern. Probe:
+> `width:80px !important` auf die Kachel erzwungen — sie blieb bei 92 px.
+
+> **Flexbox schrumpft nur INNERHALB einer Zeile.** Mit `flex-wrap: wrap` schiebt es erst um und
+> schrumpft dort gar nicht mehr — Umbrechen kommt VOR Teilen. Wer teilen will, braucht `nowrap`.
+
+> **Eine Diagnose gilt der Ursache, nicht der Breite, bei der man sie gestellt hat.** Die
+> Korrektur stand erst nur im 901-px-Block und fehlte im Handy-Block.
+
+**Abnahme, Schreibtisch 1177 px — kein Überlauf mehr in sechs von sechs Stilen:**
+
+```
+Automatisch   107 px   1 Reihe     Zeile        95 px   1 Reihe
+Kartei        263 px   2 Reihen    Bütten       95 px   1 Reihe
+Bordkarte     126 px   3 Reihen    Trichter    299 px   3 Reihen
+```
+
+Auf dem Handy stehen die Kacheln untereinander, jede mit **44 px Mindesthöhe**. Ein Rest von 14 px
+`scrollWidth` bleibt messbar, ohne dass ein Kind breiter wäre als der Platz — `overflow-x:hidden`
+verbirgt ihn, und sichtbar abgeschnitten wird nichts. **Das ist ehrlich offen**, aber es ist nicht
+das, was Marcel gemeldet hat.
+
+#### D · Die Co-Pilot-Kachel (v1941)
+
+Sie erschien nur in der Kartei — ein sechster Knopf in einer Reihe für fünf.
+
+> **Keine Funktion fällt mit.** Der Knopf war eine Abkürzung für drei Schritte, die alle als
+> eigene Kachel dastehen: „Sprache" anwählen, den Abruf auslösen, im Fenster „Geführte Eingabe"
+> wählen. `starten()` bleibt erhalten und bleibt aufrufbar.
+
 ### (74) 07.10.2026 — v1936/v1939: die Stile waren gebaut und unerreichbar, der Markt wird dritter Deckel
 
 #### A · Die Datenaufnahme-Stile (v1936)
