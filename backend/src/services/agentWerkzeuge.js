@@ -1921,12 +1921,34 @@ async function objekt_schnellblick(ctx, args) {
       investor_deal_score: sGespeichert.investor,
       investor_stufe: sGespeichert.investorStufe,
       teilnoten: teilnoten || undefined,
+      /* ── v1927 · NULL IST NICHT „NICHT GERECHNET" ────────────────────
+       *
+       * GEMESSEN am 07.10.2026 an der Sachsenstr. 18: ohne hinterlegtes
+       * Darlehen gab der Kern `dscr 0,00` und `ltv 0,00 %` aus, und so
+       * stand es im Ergebnis. Beides ist keine Null, sondern eine Groesse,
+       * die es ohne Schuldendienst gar nicht gibt — eine 0,00 beim DSCR
+       * liest sich wie „deckt den Kapitaldienst nicht", und das Gegenteil
+       * ist der Fall.
+       *
+       *   > Eine Kennzahl, die nicht anwendbar ist, gehoert benannt und
+       *   > nicht beziffert. Eine Null behauptet eine Messung.
+       *
+       * Dasselbe bei der Bewirtschaftungsquote: 0,00 % heisst hier nicht
+       * „keine Kosten", sondern „nicht hinterlegt". Und der Cashflow
+       * traegt dann einen Zusatz, weil er ohne Bewirtschaftung zu gut
+       * aussieht. Der KERN bleibt unberuehrt — gerechnet wird weiter mit
+       * dem, was er liefert; nur die Beschriftung sagt die Wahrheit. */
       kennzahlen: K ? {
-        cashflow_monat: Math.round(K.cf_m).toLocaleString('de-DE') + ' EUR vor Steuer',
+        cashflow_monat: Math.round(K.cf_m).toLocaleString('de-DE') + ' EUR vor Steuer'
+          + (bwkDa ? '' : '  — OHNE Bewirtschaftung, am Objekt ist keine hinterlegt. '
+                        + 'Der echte Wert liegt darunter.'),
         nettomietrendite: pct(K.nmy),
-        ltv: pct(K.ltv),
-        dscr: K.dscr.toFixed(2).replace('.', ','),
-        bewirtschaftungsquote: pct(bwkQuote) + ' der Jahreskaltmiete',
+        ltv: (darlehen > 0) ? pct(K.ltv)
+          : 'entfaellt — am Objekt ist kein Darlehen hinterlegt',
+        dscr: (darlehen > 0) ? K.dscr.toFixed(2).replace('.', ',')
+          : 'entfaellt — ohne Kapitaldienst gibt es keinen Deckungsgrad',
+        bewirtschaftungsquote: bwkDa ? (pct(bwkQuote) + ' der Jahreskaltmiete')
+          : 'nicht hinterlegt',
       } : undefined,
       kennzahlen_fehlen: K ? undefined
         : 'Cashflow, DSCR, LTV und Nettomietrendite brauchen ' + scoreFehlt.join(' und ')
@@ -1984,6 +2006,11 @@ async function objekt_schnellblick(ctx, args) {
         (svw2 > 0) ? null
           : 'Es ist kein Verkehrswert hinterlegt; der Wertpuffer ist mit 5 % vom '
             + 'Kaufpreis ANGENOMMEN, nicht gemessen.',
+        bwkDa ? null
+          : 'Am Objekt ist keine Bewirtschaftung hinterlegt. Der Cashflow ist '
+            + 'dadurch ZU HOCH — die nicht umlagefaehigen Kosten fehlen darin.',
+        (K && !(darlehen > 0)) ? 'Am Objekt ist kein Darlehen hinterlegt; gerechnet '
+          + 'ist das wie ein Barkauf. DSCR und LTV entfallen deshalb.' : null,
         bewertung.kennzahlen_fehlen || null
       ].filter(Boolean)
     }, { userApiKey: ctx.userApiKey || null });
