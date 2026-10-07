@@ -2369,6 +2369,38 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     flex: 1 1 auto !important;
     min-width: 0 !important;
   }
+
+  /* ── v1941c · DIE KINDER WAREN DER GRUND, NICHT DIE KACHEL ───────────
+     Dritter Anlauf an derselben Stelle, und die ersten beiden haben die
+     Kachel angesehen statt ihren Inhalt. GEMESSEN mit einer Probe:
+     `width:80px !important` auf die Kachel erzwungen - sie blieb bei 92 px.
+     Dort liegt ihre Mindestbreite, und sie kommt von unten:
+
+       .dp-pf-logo     61 px   min-width: auto
+       .dp-pf-stufen   60 px   min-width: auto
+       .dp-pf-led       9 px   min-width: auto
+
+     > **`min-width: auto` ist der Standard jedes Flex-Kindes, und er wirkt
+     > nach unten durch.** Eine Kachel auf `min-width: 0` zu setzen nuetzt
+     > nichts, solange ihre eigenen Kinder sich weigern. Wer eine Flaeche
+     > schrumpfbar machen will, muss die ganze Kette oeffnen, nicht ihren
+     > obersten Knoten.
+
+     Fuenf Kacheln a 92 px sind 460 px - das passt in die 753 px zweimal.
+     Damit reicht Teilen, und weder Schieben noch Umbrechen wird gebraucht. */
+  #oab-bar.dp-pfbar .dp-pf-tile > *,
+  .dp-pf-scroll .dp-pfbar .dp-pf-tile > * {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  /* Und die Leiste selbst darf nicht mehr scrollen - sonst bleibt die
+     Scrollleiste stehen, auch wenn nichts mehr ueberlaeuft. */
+  #oab-bar.dp-pfbar,
+  .dp-pf-scroll .dp-pfbar,
+  .dp-pf-scroll {
+    overflow-x: hidden !important;
+  }
   #oab-bar.dp-pfbar .dp-pf-tile .dp-pf-lbl,
   .dp-pf-scroll .dp-pfbar .dp-pf-tile .dp-pf-lbl {
     min-width: 0 !important;
