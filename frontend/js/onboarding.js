@@ -512,7 +512,13 @@ window.DealPilotOnboarding = (function () {
                 return '<label class="dpo-lage-z">'
                   + '<span>' + esc(LP.ETIKETT[k].name) + '</span>'
                   + '<input type="number" step="any" class="dpo-lage-f" data-k="' + k + '" '
-                  +   'value="' + (z != null ? String(z).replace('.', ',') : '') + '">'
+                  /* v1961a: KEIN Komma. <input type="number"> verwirft
+                     einen Wert mit Komma stillschweigend - das Feld stand
+                     dann LEER da. Gemessen im laufenden Assistenten: A
+                     (3,5) war leer, B (5) und C (7) nicht, weil ganze
+                     Zahlen kein Komma haben. Ein Fehler, der sich hinter
+                     runden Zahlen versteckt. */
+                  +   'value="' + (z != null ? z : '') + '">'
                   + '<span class="dpo-lage-e">% brutto</span>'
                   + '</label>';
               }).join('')
@@ -650,6 +656,25 @@ window.DealPilotOnboarding = (function () {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); }
     }, true);
 
+    /* ══ v1961a · DIE LAGEFELDER BRAUCHEN 'change', NICHT 'click' ══════
+       v1961 hat sie in den Klick-Faenger darunter gehaengt. Der faengt
+       Klicks - eine Eingabe erreicht ihn nie.
+
+       Dass das Haekchen daneben (dpo_zins_auto) dort funktioniert, hat
+       den Fehler verdeckt: ein Klick auf eine Checkbox IST ein Klick.
+
+       Gemessen im laufenden Assistenten: 4,75 getippt, im Profil stand
+       weiterhin 3,5. */
+    _ov.addEventListener('change', function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains('dpo-lage-f')) return;
+      try {
+        if (window.DealPilotLageProfil) {
+          window.DealPilotLageProfil.setze(t.getAttribute('data-k'), 'ziel_bmr', t.value);
+        }
+      } catch (e) {}
+    });
+
     _ov.addEventListener('click', function (ev) {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); return; }
       var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ]') : null;
@@ -670,16 +695,9 @@ window.DealPilotOnboarding = (function () {
         return;
       }
       if (ev.target.id === 'dpo_zins_auto') { _zinsFeld(); return; }
-      /* v1961: die Lagefelder speichern sofort. Kein Sammeln bis zum
-         Abschluss - der Assistent laesst sich abbrechen. */
-      if (ev.target.classList && ev.target.classList.contains('dpo-lage-f')) {
-        try {
-          if (window.DealPilotLageProfil) {
-            window.DealPilotLageProfil.setze(ev.target.getAttribute('data-k'), 'ziel_bmr', ev.target.value);
-          }
-        } catch (e) {}
-        return;
-      }
+      /* v1961a: hier stand die Behandlung der Lagefelder. Sie gehoert
+         nicht in den KLICK-Faenger - eine Eingabe ist kein Klick. Sie
+         sitzt jetzt in einem eigenen 'change'-Listener weiter oben. */
       if (ev.target.id === 'dpo-rechnen') { _rechnen(); return; }
       if (ev.target.id === 'dpo-weiter') { _sichern(); _vor(); return; }
       if (ev.target.id === 'dpo-zurueck') { _sichern(); _zurueck(); return; }
