@@ -36,6 +36,51 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
+
+Marcel am 07.10.2026:
+
+> „Die Datenaufnahme — da haben wir ja verschiedene Ansichten in Einstellungen unter Darstellung
+> und dann Karte im Objekt. Die werden alle **nicht passend gerendert**, wenn man auf die
+> verschiedenen iPhones oder Tablets oder Desktop-Größen umstellt. Teilweise **komplett
+> verformt** oder der **Button riesig groß**. Das musst du bitte komplett neu rendern und auch
+> anpassen auf die verschiedenen Größen, sodass alles schön dargestellt wird."
+
+**Betroffen sind die vier Datenaufnahme-Stile** (`data-dp-kartenstil`): Automatisch, Zeile,
+Kartei, Bütten, Trichter. Die Bordkarte ist seit `v1953` raus.
+
+**Was dagegen schon gemessen und in Ordnung ist** (07.10.2026, damit niemand zweimal sucht):
+
+- **Desktop 1180 px:** kein gemalter waagerechter Scrollbalken, in keinem der Stile.
+  `#oab-bar` misst 754/754, das Dokument 1179/1179.
+- **Handy 388 px:** `flex-direction: column`, sechs Zeilen untereinander, Knöpfe 324 × 44,
+  keiner unter 44 oder über 64 px.
+- **Lesbarkeit:** nach `v1954/v1954a` liegt keine Textstelle mehr unter Kontrast 4,5
+  (22 Stellen über fünf Stile gemessen).
+
+> **Das heißt: der Fehler liegt zwischen diesen beiden Breiten.** Gemessen wurde bisher bei
+> **388** und **1178** — Marcel nennt ausdrücklich „iPhones ODER TABLETS ODER Desktop-Größen".
+> Die Messkabine hat Knöpfe für 360 / 375 / 390 / 430 / 768 / 834 / 1180 / 1280; geprüft sind
+> bisher im Wesentlichen die Ränder. **Der Prüflauf muss ALLE acht Breiten × alle fünf Stile
+> abdecken — 40 Zustände.**
+
+**Was zu messen ist, je Zustand:**
+
+1. **Überlauf:** direkte Kinder der Leiste auflisten und ihre Summe gegen `clientWidth` halten.
+   Nicht am Kind messen, das überläuft — das war viermal die falsche Ebene (`v1941`).
+2. **Knopfgrößen:** `.dp-pf-tile` und `.dp-pf-launch` — Marcels „riesig groß" braucht eine Zahl.
+   Vorgabe von ihm: 44 px Mindesthöhe („ja 44 ist gut"), also ist die Obergrenze die Frage.
+3. **Verformung:** Seitenverhältnisse der Kacheln, abgeschnittener Text
+   (`scrollWidth > clientWidth` bei `overflow:hidden` ohne Ellipse).
+4. **Je Stil NEU LADEN, nicht umschalten.** Der Trichter baut die Leiste um; ein Umschalt-Lauf
+   hinterlässt einen Zwischenstand und liefert erfundene Zahlen (am 07.10.2026 genau so
+   passiert, siehe Journal (84)). Der Speicherschlüssel heißt `dp_karten_stil`.
+
+**Vorlagen:** `design/mockups/preflight-varianten-v1425.html` (die Entwürfe, aus denen die Stile
+stammen) und `Dateien/karte.png` (Marcels Bild zur Bütten-Fassung).
+
+---
+
 ### N44 · Stufe 3 (Wertermittlung ImmoWertV) am echten Objekt nachsehen (07.10.2026)
 
 Marcel am 07.10.2026, wörtlich ins Backlog gegeben:
