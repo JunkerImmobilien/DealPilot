@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Messe-Pop-up · Entwurf 03 · "Die Anzeigetafel"
+     MOCKUP. Nichts hiervon ist ausgeliefert.
+
+     Idee: Eine Abflugtafel, wie sie in jeder Halle haengt. Die Buchstaben
+     klappen um (Split-Flap) und rasten nacheinander ein:
+     ZIEL LEIPZIG · GATE HALLE 3 · PLATZ 106 · STATUS BOARDING.
+
+     Fuer wen: alle. Das ist die Variante, die ohne ein Wort Erklaerung
+     verstanden wird - eine Tafel sagt "da faehrt was ab, sei dabei".
+     Sie schiebt sich unter die Navigation statt die Seite zu verdecken.
+
+     Der Rabattcode wird NICHT genannt. Die Tafel zeigt den WEG.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Messe-Pop-up 03 · Die Anzeigetafel</title>
+<style>
+:root{
+  --ob:#070707; --ob0:#050505; --ob1:#0a0a0a; --stub:#0c0b09;
+  --paper:#EDE7DA; --cream:#FDFCFA; --cream2:#F4F0E7; --cream-line:rgba(20,18,15,.10);
+  --ink:#16130d; --inks:#3a2e08; --inkm:#4a4536; --mut:#6f685b;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f; --gdi:#8a6c1e; --gold-on:#5a4a14;
+  --grn:#3FA56C; --grnh:#5BD98E; --rd:#B86250;
+  --txtd:#ece6d6; --mdk:rgba(255,255,255,.66); --ddk:rgba(255,255,255,.42);
+  --perf:#d9cfb4; --line:rgba(201,168,76,.24);
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  --e-weich:cubic-bezier(.2,.7,.3,1); --e-hoch:cubic-bezier(.2,.72,.2,1);
+  --max:1240px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:16.5px/1.68 var(--body);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:var(--disp);font-weight:700;margin:0;line-height:1.1;letter-spacing:-.025em}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+.tb{background:var(--ob0);height:34px;display:flex;align-items:center;
+  font:700 10px/1 var(--mono);letter-spacing:.14em;color:rgba(232,204,122,.72);
+  border-bottom:1px solid rgba(201,168,76,.15)}
+.tb .wrap{display:flex;align-items:center;gap:26px;width:100%}
+.tb i{width:5px;height:5px;background:var(--gd);display:inline-block;margin-right:8px}
+.nav{height:80px;display:flex;align-items:center;background:rgba(253,252,250,.94);
+  border-bottom:1px solid var(--cream-line)}
+.nav .wrap{display:flex;align-items:center;gap:26px;width:100%}
+.mark{font:700 22px/1 var(--disp);letter-spacing:-.9px}.mark b{color:var(--gdd)}
+.nav .mn{margin-left:auto;display:flex;gap:4px;font-size:14.5px;color:var(--inkm)}
+.nav .mn span{padding:10px 13px}
+.b-cta{background:var(--runway);color:#14100a;padding:12px 22px;font-weight:600;font-size:15px}
+.hero{background:var(--ob0);color:var(--txtd);padding:84px 0 92px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;left:-10%;right:-10%;bottom:-40%;height:70%;
+  background:radial-gradient(ellipse at 50% 0,rgba(201,168,76,.13),transparent 68%)}
+.eye{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;color:var(--gdh);
+  display:flex;align-items:center;gap:11px;margin-bottom:22px}
+.eye::before{content:'';width:24px;height:1px;background:var(--gdh)}
+.hero h1{font-size:clamp(32px,5.4vw,58px);max-width:17ch}
+.hero h1 em{font-style:normal;color:var(--gdh)}
+.hero p{color:var(--mdk);max-width:52ch;margin:20px 0 0}
+
+/* ── Die Tafel ─────────────────────────────────────────────────────── */
+#tafel{background:#0b0a08;border-bottom:1px solid rgba(201,168,76,.3);
+  overflow:hidden;max-height:0;transition:max-height .55s var(--e-hoch)}
+#tafel.an{max-height:440px}
+#tafel .inner{max-width:var(--max);margin:0 auto;padding:20px 26px 18px;
+  display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+#tafel .links{flex:none}
+#tafel .kick{font:700 9.5px/1 var(--mono);letter-spacing:.24em;color:var(--gd);margin-bottom:9px;
+  display:flex;align-items:center;gap:9px}
+#tafel .kick::before{content:'';width:18px;height:1px;background:var(--gd)}
+#tafel h2{font-size:25px;color:var(--txtd);letter-spacing:-.6px}
+#tafel h2 em{font-style:normal;color:var(--gdh)}
+#tafel .u{margin:7px 0 0;font-size:13.6px;color:var(--mdk);max-width:34ch}
+
+/* die Reihen der Tafel */
+.reihen{flex:1;min-width:300px;display:flex;flex-direction:column;gap:5px}
+.reihe{display:flex;align-items:center;gap:12px}
+.reihe .lab{font:700 9px/1 var(--mono);letter-spacing:.17em;color:rgba(232,204,122,.5);
+  width:58px;flex:none;text-align:right}
+.flaps{display:flex;gap:3px;flex-wrap:wrap}
+.flap{width:23px;height:31px;background:#171510;color:var(--gdh);
+  font:700 15px/31px var(--mono);text-align:center;position:relative;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.6);overflow:hidden}
+/* der Spalt in der Mitte, der die Klappe verrät */
+.flap::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;
+  background:rgba(0,0,0,.55)}
+.flap.leer{background:transparent;box-shadow:none}
+.flap.leer::after{display:none}
+.flap.dreht{animation:klapp .09s linear}
+@keyframes klapp{
+  0%{transform:rotateX(0);filter:brightness(1)}
+  49%{transform:rotateX(-82deg);filter:brightness(.42)}
+  50%{transform:rotateX(82deg);filter:brightness(.42)}
+  100%{transform:rotateX(0);filter:brightness(1)}
+}
+.reihe.stat .flap{color:var(--grnh)}
+
+#tafel .akt{flex:none;display:flex;flex-direction:column;gap:9px;align-items:stretch}
+.btn{background:var(--runway);color:#14100a;padding:13px 24px;font:600 14.5px var(--body);
+  border:0;cursor:pointer;transition:.22s;text-align:center;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-l{border:1px solid rgba(236,230,214,.26);color:var(--mdk);padding:11px 20px;
+  font:500 13.5px var(--body);background:none;cursor:pointer;transition:.22s;text-align:center}
+.btn-l:hover{border-color:var(--gd);color:var(--txtd);background:rgba(201,168,76,.1)}
+
+/* ── Vertrauensband · woertlich aus frontend/landing/index.html (.tband)
+      Als Fussleiste der Tafel: kleiner und leiser als im Original, weil
+      die Tafel selbst die Hauptsache ist. ──────────────────────────── */
+.tband{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid rgba(255,255,255,.08)}
+@media(max-width:560px){
+  .tband > div{padding:10px 8px;gap:6px;flex-direction:column;align-items:flex-start}
+  .tband b{font-size:9.6px}.tband span{font-size:8.4px}
+  .tband img{width:24px;height:24px}
+}
+.tband > div{display:flex;gap:8px;align-items:center;padding:11px 14px;
+  border-right:1px solid rgba(255,255,255,.06);min-width:0}
+.tband > div:last-child{border-right:0}
+.tband .ico{width:15px;height:15px;color:var(--gdh);flex:none;
+  stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tband b{display:block;font:600 10.5px/1.25 var(--body);color:#fff}
+.tband span{display:block;font-size:9px;line-height:1.35;color:var(--ddk);margin-top:1px}
+.tband-siegel img{width:30px;height:30px;flex:none;border-radius:50%;background:#fff;
+  padding:2px;box-shadow:0 0 0 1px var(--line)}
+
+/* Die Zeile, die bleibt, wenn man die Tafel schließt */
+#rest{background:var(--ob0);border-bottom:1px solid rgba(201,168,76,.22);
+  display:none;cursor:pointer}
+#rest.an{display:block}
+#rest .inner{max-width:var(--max);margin:0 auto;padding:9px 26px;display:flex;
+  align-items:center;gap:14px;font:700 10px/1.5 var(--mono);letter-spacing:.15em;
+  color:rgba(232,204,122,.75);flex-wrap:wrap}
+#rest .pkt{width:6px;height:6px;background:var(--grnh);flex:none;
+  animation:blink 1.9s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+#rest .mehr{margin-left:auto;color:var(--gdh);text-decoration:underline;text-underline-offset:3px}
+
+.pult{position:fixed;left:14px;bottom:14px;z-index:9500;background:var(--ob0);
+  border:1px solid rgba(201,168,76,.35);padding:10px 12px;display:flex;gap:8px;align-items:center;
+  font:700 9px/1 var(--mono);letter-spacing:.12em;color:rgba(232,204,122,.7)}
+.pult button{background:none;border:1px solid rgba(201,168,76,.4);color:var(--gdh);
+  font:700 9px/1 var(--mono);letter-spacing:.1em;padding:7px 10px;cursor:pointer}
+.pult button:hover{background:rgba(201,168,76,.14)}
+
+@media(max-width:900px){
+  #tafel .inner{gap:20px}
+  #tafel .akt{flex-direction:row;width:100%}
+  #tafel .akt .btn,#tafel .akt .btn-l{flex:1}
+}
+@media(max-width:760px){
+  .nav .mn{display:none}
+  #tafel.an{max-height:860px}
+  /* Gemessen am 07.10.2026 bei 390 px: die Flaps standen SENKRECHT in
+     einer 40-px-Spalte. Ursache war nicht die Breite, sondern
+     `flex:1` = `flex:1 1 0%` — die flex-basis 0% schlaegt `width:100%`,
+     also brach die Zeile nie um und .reihen wurde zusammengequetscht.
+     `flex:1 1 100%` erzwingt den Umbruch. Zusaetzlich stellt sich
+     .inner auf dem Handy senkrecht. */
+  #tafel .inner{padding:17px 16px 16px;gap:16px;flex-direction:column;align-items:stretch}
+  #tafel h2{font-size:21px}
+  .reihen{flex:1 1 100%;min-width:0;width:100%}
+  .reihe .lab{width:50px;font-size:8px}
+  .flap{width:18px;height:25px;font-size:12px;line-height:25px}
+  .flap{gap:2px}
+  .pult{left:8px;right:8px;bottom:8px;justify-content:center}
+}
+@media(max-width:400px){
+  .flap{width:15.5px;height:22px;font-size:10.5px;line-height:22px}
+  .flaps{gap:2px}
+  .reihe .lab{width:44px}
+}
+@media(prefers-reduced-motion:reduce){
+  #tafel{transition:none}.flap.dreht{animation:none}#rest .pkt{animation:none}
+}
+</style>
+</head><body>
+
+<div class="tb"><div class="wrap">
+  <span><i></i>4 WOCHEN PRO — OHNE ZAHLUNGSDATEN</span>
+  <span><i></i>MONATLICH KÜNDBAR</span>
+</div></div>
+<nav class="nav"><div class="wrap">
+  <span class="mark">Deal<b>Pilot</b></span>
+  <span class="mn"><span>So funktioniert's</span><span>Funktionen</span><span>Preise</span><span>Partner</span></span>
+  <span class="b-cta">Kostenlos starten</span>
+</div></nav>
+
+<!-- ══ Entwurf 03 · Die Anzeigetafel ═════════════════════════════════ -->
+<div id="tafel" role="region" aria-label="DealPilot auf dem immocation Festival">
+  <div class="inner">
+    <div class="links">
+      <div class="kick">ABFLUGTAFEL · 31.10.–01.11.2026</div>
+      <h2>Wir heben ab —<br><em>in Leipzig</em>.</h2>
+      <p class="u">Zwei Tage immocation Festival. Am Stand liegt deine
+         Bordkarte mit Abriss.</p>
+    </div>
+
+    <div class="reihen" id="reihen">
+      <div class="reihe"><span class="lab">ZIEL</span><span class="flaps" data-wort="LEIPZIG"></span></div>
+      <div class="reihe"><span class="lab">GATE</span><span class="flaps" data-wort="HALLE 3"></span></div>
+      <div class="reihe"><span class="lab">PLATZ</span><span class="flaps" data-wort="106"></span></div>
+      <div class="reihe stat"><span class="lab">STATUS</span><span class="flaps" data-wort="BOARDING"></span></div>
+    </div>
+
+    <div class="akt">
+      <a class="btn" href="#">Am Stand treffen →</a>
+      <button class="btn-l" id="b-zu">Tafel einklappen</button>
+    </div>
+  </div>
+
+  <!-- Vertrauensband in der kurzen Form des Boarding-Pass-Streifens
+       (Dateien/Messe/dealpilot-leiste-boardingpass.png):
+       SERVER · DATENSCHUTZ · FORSCHUNG. Wortlaut wie in index.html. -->
+  <div class="tband">
+    <div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1"/><rect x="3" y="13" width="18" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+      <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
+    <div><svg class="ico" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>
+      <div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
+    <div class="tband-siegel"><img src="bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="30" height="30">
+      <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></div>
+  </div>
+</div>
+
+<div id="rest">
+  <div class="inner">
+    <span class="pkt"></span>
+    <span>LEIPZIG · HALLE 3 · STAND 106 · 31.10.–01.11.2026 · BOARDING</span>
+    <span class="mehr">Tafel zeigen</span>
+  </div>
+</div>
+
+<section class="hero"><div class="wrap">
+  <div class="eye">DEIN COCKPIT FÜR IMMOBILIEN-INVESTMENTS</div>
+  <h1>Immobilienentscheidungen sind zu groß für ein <em>Bauchgefühl</em>.</h1>
+  <p>Cashflow, DSCR, Steuer, Deal Score und bankfertige Unterlagen — in Minuten
+     statt Stunden. 19 Module, 24 Kennzahlen, Server in Deutschland.</p>
+</div></section>
+
+<div class="pult">
+  MOCKUP 03 · ANZEIGETAFEL
+  <button id="b-neu">NOCHMAL</button>
+</div>
+
+<script>
+(function(){
+  var ZEICHEN='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
+  var tafel=document.getElementById('tafel'), rest=document.getElementById('rest');
+  var tmr=[];
+
+  /* Die Flaps werden einmal gebaut: ein Kaestchen je Zeichen. */
+  Array.prototype.forEach.call(document.querySelectorAll('.flaps'),function(f){
+    var w=f.getAttribute('data-wort');
+    for(var i=0;i<w.length;i++){
+      var s=document.createElement('span');
+      s.className='flap'+(w[i]===' '?' leer':'');
+      s.textContent=w[i]===' '?'':' ';
+      f.appendChild(s);
+    }
+  });
+
+  /* Ein Kaestchen wuerfelt sich zu seinem Zielzeichen durch. */
+  function rollen(el,ziel,verzug){
+    if(ziel===' '){ return; }
+    tmr.push(setTimeout(function(){
+      var n=0, max=7+Math.floor(Math.random()*6);
+      var iv=setInterval(function(){
+        n++;
+        if(n>=max){ clearInterval(iv); el.textContent=ziel; el.classList.remove('dreht'); return; }
+        el.textContent=ZEICHEN[Math.floor(Math.random()*ZEICHEN.length)];
+        el.classList.remove('dreht'); void el.offsetWidth; el.classList.add('dreht');
+      },82);
+      tmr.push(function(){clearInterval(iv);});
+    },verzug));
+  }
+
+  function lauf(){
+    tmr.forEach(function(t){ typeof t==='function'?t():clearTimeout(t); }); tmr=[];
+    rest.classList.remove('an');
+    tafel.classList.add('an');
+    var basis=260;
+    Array.prototype.forEach.call(document.querySelectorAll('.flaps'),function(f,ri){
+      var w=f.getAttribute('data-wort');
+      Array.prototype.forEach.call(f.children,function(el,ci){
+        if(w[ci]===' '){ return; }
+        el.textContent=' ';
+        rollen(el,w[ci],basis+ri*210+ci*62);
+      });
+    });
+  }
+  function zu(){ tafel.classList.remove('an'); rest.classList.add('an'); }
+
+  document.getElementById('b-zu').addEventListener('click',zu);
+  rest.addEventListener('click',lauf);
+  document.getElementById('b-neu').addEventListener('click',lauf);
+  setTimeout(lauf,500);
+})();
+</script>
+</body></html>

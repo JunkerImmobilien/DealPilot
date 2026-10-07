@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     Messe-Pop-up · Entwurf 01 · "Der Abriss" (echter Riss)
+     ───────────────────────────────────────────────────────────────────────
+     MOCKUP. Nichts hiervon ist ausgeliefert.
+
+     Idee: Die gedruckte Messekarte IST ein Boarding-Pass mit Abriss.
+     ACHTUNG: Der Rabattcode darf nirgends auftauchen - auch nicht als
+     Zierwort auf dem Abriss. Er heisst wie die Karte, deshalb steht
+     hier ueberall "Bordkarte".
+     Dieses Pop-up zeigt diese Karte - und laesst den Besucher den Abriss
+     SELBST abreissen. Darunter liegt kein Code, sondern der Ort:
+     Halle 3, Stand 106.
+
+     ── Wie der Riss gebaut ist (Marcel am 07.10.: "koennen wir einen
+        echten abriss simulieren?") ──────────────────────────────────────
+     1 · ZWEI Elemente, nicht eines: .stamm und .abriss. Nur so koennen
+         sich beide Teile VERSCHIEDEN bewegen - eine einzige Bewegung auf
+         dem ganzen Element liest sich als Schieben, nicht als Reissen.
+     2 · Die Risskante ist unregelmaessig und KOMPLEMENTAER. Beide Teile
+         tragen ein clip-path-Polygon mit derselben Zackenfolge; die
+         Tiefen ergaenzen sich auf 9 px:
+             Stamm  x = calc(100% - D px)
+             Abriss x = (9 - D) px   bei margin-left:-9px
+         Gerechnet fuer D = 0,7,1,5,0,8,2,4,0,7,1,6,0,8,2,5,0,7,1,4,0
+         an Y = 0,5,10,…,100 %. Deshalb liegen sie vor dem Riss
+         zahnlueckengenau ineinander - und danach hat jedes Teil eine
+         echte Risskante. Die X-Tiefen stehen in px (Amplitude bleibt
+         gleich, egal wie breit die Karte ist), die Y-Stufen in Prozent
+         (die Zacken dehnen sich mit der Hoehe).
+     3 · Der Riss sitzt GENAU auf der Lochung: die Perforationsreihe liegt
+         in derselben 9-px-Zone und verschwindet im Moment des Risses.
+     4 · Der Ton: erst ein harter Ruck (110 ms, linear) - das ist das
+         Trennen -, dann faellt der Abriss beschleunigt weg
+         (cubic-bezier(.5,.02,.9,.4), ease-IN). Nichts federt zurueck.
+         Reissen ruckt, es schwingt nicht.
+     5 · Ausloeser: ziehen (Maus oder Finger) ODER klicken. Waehrend des
+         Ziehens folgt der Abriss dem Finger und kippt leicht; unter
+         54 px Weg geht er zurueck an seinen Platz.
+     6 · prefers-reduced-motion: der Endzustand ohne jede Bewegung.
+
+     Der Rabattcode wird NICHT genannt - weder vor noch nach dem Riss.
+     Gestaltung aus frontend/landing/dp2.css, Vertrauensband woertlich
+     aus frontend/landing/index.html (.tband, Z. 160).
+     ═══════════════════════════════════════════════════════════════════════ -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Messe-Pop-up 01 · Der Abriss</title>
+<style>
+:root{
+  --ob:#070707; --ob0:#050505; --ob1:#0a0a0a; --stub:#0c0b09;
+  --paper:#EDE7DA; --cream:#FDFCFA; --cream2:#F4F0E7; --cream-line:rgba(20,18,15,.10);
+  --ink:#16130d; --inks:#3a2e08; --inkm:#4a4536; --mut:#6f685b;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f; --gdi:#8a6c1e; --gold-on:#5a4a14;
+  --grn:#3FA56C; --grnh:#5BD98E; --rd:#B86250;
+  --txtd:#ece6d6; --mdk:rgba(255,255,255,.66); --ddk:rgba(255,255,255,.42);
+  --perf:#d9cfb4; --line:rgba(201,168,76,.24);
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+  --e-weich:cubic-bezier(.2,.7,.3,1); --e-hoch:cubic-bezier(.2,.72,.2,1);
+  --e-riss:cubic-bezier(.5,.02,.9,.4);
+  --max:1240px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:16.5px/1.68 var(--body);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:var(--disp);font-weight:700;margin:0;line-height:1.1;letter-spacing:-.025em}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+
+/* ── Landing-Attrappe (nur Kontext) ────────────────────────────────── */
+.tb{background:var(--ob0);height:34px;display:flex;align-items:center;
+  font:700 10px/1 var(--mono);letter-spacing:.14em;color:rgba(232,204,122,.72);
+  border-bottom:1px solid rgba(201,168,76,.15)}
+.tb .wrap{display:flex;align-items:center;gap:26px;width:100%}
+.tb i{width:5px;height:5px;background:var(--gd);display:inline-block;margin-right:8px}
+.nav{height:80px;display:flex;align-items:center;background:rgba(253,252,250,.94);
+  border-bottom:1px solid var(--cream-line)}
+.nav .wrap{display:flex;align-items:center;gap:26px;width:100%}
+.mark{font:700 22px/1 var(--disp);letter-spacing:-.9px}.mark b{color:var(--gdd)}
+.nav .mn{margin-left:auto;display:flex;gap:4px;font-size:14.5px;color:var(--inkm)}
+.nav .mn span{padding:10px 13px}
+.b-cta{background:var(--runway);color:#14100a;padding:12px 22px;font-weight:600;font-size:15px}
+.hero{background:var(--ob0);color:var(--txtd);padding:84px 0 92px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;left:-10%;right:-10%;bottom:-40%;height:70%;
+  background:radial-gradient(ellipse at 50% 0,rgba(201,168,76,.13),transparent 68%)}
+.eye{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;color:var(--gdh);
+  display:flex;align-items:center;gap:11px;margin-bottom:22px}
+.eye::before{content:'';width:24px;height:1px;background:var(--gdh)}
+.hero h1{font-size:clamp(32px,5.4vw,58px);max-width:17ch}
+.hero h1 em{font-style:normal;color:var(--gdh)}
+.hero p{color:var(--mdk);max-width:52ch;margin:20px 0 0}
+.laufband{background:var(--ob1);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:14px 0;font:700 10px/1 var(--mono);letter-spacing:.17em;color:rgba(232,204,122,.6);
+  text-align:center}
+
+/* ── Pop-up-Rahmen ─────────────────────────────────────────────────── */
+#pop{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;
+  padding:22px;background:rgba(5,5,5,.74);backdrop-filter:blur(3px);opacity:0;
+  transition:opacity .3s var(--e-weich);overflow-y:auto}
+#pop.an{opacity:1}
+#pop[hidden]{display:none}
+.karte{width:100%;max-width:720px;position:relative;margin:auto;
+  transform:translateY(20px) scale(.97);transition:transform .42s var(--e-hoch);
+  box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#pop.an .karte{transform:none}
+.zu{position:absolute;top:-15px;right:-7px;z-index:8;width:34px;height:34px;
+  background:var(--ob0);color:var(--gdh);font:400 18px/1 var(--body);cursor:pointer;
+  border:1px solid rgba(201,168,76,.4)}
+.zu:hover{background:var(--stub)}
+
+.kopf{background:var(--ob0);color:var(--gdh);padding:12px 20px;display:flex;
+  justify-content:space-between;gap:12px;flex-wrap:wrap;
+  font:700 10px/1.4 var(--mono);letter-spacing:.18em}
+.kopf .re{color:rgba(232,204,122,.62)}
+
+/* ── Der Pass: Stamm + Abriss ──────────────────────────────────────── */
+.leib{display:flex;background:var(--paper);position:relative;overflow:hidden;
+  touch-action:pan-y}
+
+/* Was unter dem Abriss liegt - wird erst sichtbar, wenn er weg ist */
+.darunter{position:absolute;top:0;right:0;bottom:0;width:206px;z-index:1;
+  background:var(--paper);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:22px 16px;gap:5px}
+.darunter .k{font:700 8.5px/1.5 var(--mono);letter-spacing:.16em;color:var(--mut)}
+.darunter .gross{font:700 25px/1.06 var(--disp);color:var(--ink);letter-spacing:-.8px}
+.darunter .gross b{color:var(--gdd)}
+.stempel{margin-top:10px;border:2px solid var(--rd);color:var(--rd);
+  font:700 9.5px/1.35 var(--mono);letter-spacing:.13em;padding:8px 10px;
+  transform:rotate(-7deg) scale(2.8);opacity:0;
+  transition:transform .3s var(--e-hoch),opacity .18s}
+.leib.ab .stempel{transform:rotate(-7deg) scale(1);opacity:.92;transition-delay:.34s}
+
+/* Der Stamm - zackige Kante rechts, Tiefen D (siehe Kopfkommentar) */
+.stamm{flex:1;min-width:0;padding:30px 30px 26px;position:relative;z-index:2;
+  background:#fff;
+  clip-path:polygon(
+    0 0, 100% 0,
+    calc(100% - 7px) 5%, calc(100% - 1px) 10%, calc(100% - 5px) 15%, 100% 20%,
+    calc(100% - 8px) 25%, calc(100% - 2px) 30%, calc(100% - 4px) 35%, 100% 40%,
+    calc(100% - 7px) 45%, calc(100% - 1px) 50%, calc(100% - 6px) 55%, 100% 60%,
+    calc(100% - 8px) 65%, calc(100% - 2px) 70%, calc(100% - 5px) 75%, 100% 80%,
+    calc(100% - 7px) 85%, calc(100% - 1px) 90%, calc(100% - 4px) 95%, 100% 100%,
+    0 100%)}
+.leib.ruck .stamm{animation:ruck .11s linear}
+@keyframes ruck{0%{transform:translateX(0)}40%{transform:translateX(-4px)}
+  70%{transform:translateX(2px)}100%{transform:translateX(0)}}
+.stamm .kurve{position:absolute;inset:0;z-index:-1;opacity:.45;pointer-events:none}
+.stamm .mini{font:700 9.5px/1 var(--mono);letter-spacing:.2em;color:var(--gdi);margin-bottom:14px}
+.stamm h2{font-size:clamp(23px,3.3vw,31px);margin-bottom:10px}
+.stamm h2 em{font-style:normal;color:var(--gdd)}
+.stamm .sub{margin:0;font-size:14.5px;color:var(--inkm);max-width:38ch}
+.felder{display:flex;gap:26px;flex-wrap:wrap;margin-top:24px}
+.feld .k{font:700 9px/1 var(--mono);letter-spacing:.17em;color:var(--mut);margin-bottom:6px}
+.feld .v{font:700 17px/1.15 var(--disp);color:var(--ink)}
+.feld .v.gold{color:var(--gdd)}
+
+/* Die Lochung - sitzt in derselben 9-px-Zone wie die Risskante.
+   right:196px ist GERECHNET, nicht geschaetzt: der Abriss ist 206 px breit
+   und rechtsbuendig, die Risszone liegt also bei W-206 … W-197. Mit
+   width:10px folgt right = 196. Mit 201 lag die Lochung 5 px daneben -
+   gemessen am 07.10.2026: Risszone 1114-1123, Lochung 1109-1119. */
+.lochung{position:absolute;top:0;bottom:0;right:196px;width:10px;z-index:3;pointer-events:none;
+  background:radial-gradient(circle at 5px 9px,rgba(0,0,0,.30) 2.3px,transparent 2.6px) 0 0/10px 18px repeat-y;
+  transition:opacity .09s linear}
+.leib.ruck .lochung,.leib.ab .lochung{opacity:0}
+
+/* Der Abriss - Gegenzacken, greift 9 px in den Stamm */
+.abriss{width:206px;flex:none;margin-left:-9px;position:relative;z-index:4;
+  background:var(--runway);color:#221a06;padding:26px 16px 24px 22px;text-align:center;
+  cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;
+  transform-origin:18% 12%;
+  clip-path:polygon(
+    9px 0, 100% 0, 100% 100%, 9px 100%,
+    5px 95%, 8px 90%, 2px 85%, 9px 80%, 4px 75%, 7px 70%, 1px 65%, 9px 60%,
+    3px 55%, 8px 50%, 2px 45%, 9px 40%, 5px 35%, 7px 30%, 1px 25%, 9px 20%,
+    4px 15%, 8px 10%, 2px 5%);
+  transition:transform .22s var(--e-weich)}
+.abriss:active{cursor:grabbing}
+.abriss.zieht{transition:none}
+.leib.ab .abriss{transform:translate(72px,330px) rotate(27deg);opacity:0;
+  transition:transform .4s var(--e-riss),opacity .24s linear .17s;pointer-events:none}
+.abriss .k{font:700 8.5px/1 var(--mono);letter-spacing:.15em;color:var(--gold-on);margin-bottom:10px}
+.abriss .pz{font:700 42px/1 var(--disp);letter-spacing:-2px;color:#1a1407}
+.abriss .pz small{font-size:25px}
+.abriss .s{font:600 12.8px/1.45 var(--body);color:#2c2208;margin-top:3px}
+.abriss .siegel{margin-top:13px;background:var(--ob0);color:var(--gdh);
+  font:700 10.5px/1 var(--mono);letter-spacing:.18em;padding:11px 8px}
+/* Der Griff-Hinweis - verschwindet, sobald gezogen wird.
+   Dunkles Band statt Goldtext auf Gold: gemessen war der Hinweis in
+   --gold-on auf dem Verlauf kaum zu lesen. */
+.abriss .zieh{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  font:700 8px/1 var(--mono);letter-spacing:.1em;color:var(--gdh);
+  background:rgba(10,9,7,.82);padding:5px 9px;
+  white-space:nowrap;animation:wink 2.4s ease-in-out infinite;transition:opacity .12s}
+@keyframes wink{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-46%,0)}}
+.abriss .zieh .q{display:none}   /* die Handy-Fassung des Hinweises */
+.leib.ruck .abriss .zieh,.leib.ab .abriss .zieh{opacity:0}
+
+/* ── Vertrauensband · woertlich aus frontend/landing/index.html (.tband)
+      Im Pop-up kleiner und leiser als im Original: hier ist es Fusszeile,
+      nicht Hauptsache. ───────────────────────────────────────────────── */
+.tband{background:var(--ob1);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr)}
+.tband > div{display:flex;gap:9px;align-items:center;padding:13px 12px;
+  border-right:1px solid rgba(255,255,255,.06);min-width:0}
+.tband > div:last-child{border-right:0}
+.tband .ico{width:16px;height:16px;color:var(--gdh);flex:none;
+  stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tband b{display:block;font:600 11px/1.25 var(--body);color:#fff}
+.tband span{display:block;font-size:9.6px;line-height:1.35;color:var(--ddk);margin-top:2px}
+.tband-siegel img{width:34px;height:34px;flex:none;border-radius:50%;background:#fff;
+  padding:2px;box-shadow:0 0 0 1px var(--line)}
+
+.fuss{background:var(--ob0);color:var(--txtd);padding:18px 22px;display:flex;
+  align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
+.fuss .wo{font:500 13px/1.5 var(--body);color:var(--mdk);max-width:46ch}
+.fuss .wo b{color:var(--gdh);font-weight:700}
+.btn{background:var(--runway);color:#14100a;padding:13px 24px;font:600 14.5px var(--body);
+  border:0;cursor:pointer;transition:.22s;display:inline-block}
+.btn:hover{transform:translateY(-2px)}
+.btn-l{border:1px solid rgba(236,230,214,.3);color:var(--txtd);padding:12px 20px;
+  font:500 14px var(--body);background:none;cursor:pointer;transition:.22s}
+.btn-l:hover{border-color:var(--gd);background:rgba(201,168,76,.1)}
+
+.pult{position:fixed;left:14px;bottom:14px;z-index:9500;background:var(--ob0);
+  border:1px solid rgba(201,168,76,.35);padding:10px 12px;display:flex;gap:8px;align-items:center;
+  font:700 9px/1 var(--mono);letter-spacing:.12em;color:rgba(232,204,122,.7)}
+.pult button{background:none;border:1px solid rgba(201,168,76,.4);color:var(--gdh);
+  font:700 9px/1 var(--mono);letter-spacing:.1em;padding:7px 10px;cursor:pointer}
+.pult button:hover{background:rgba(201,168,76,.14)}
+
+/* ── Handy: der Pass stapelt sich, der Riss wird waagerecht ────────── */
+@media(max-width:760px){
+  .nav .mn{display:none}
+  #pop{padding:12px;align-items:flex-start}
+  .leib{flex-direction:column}
+  .stamm{padding:22px 18px 20px;
+    clip-path:polygon(
+      0 0, 100% 0, 100% 100%,
+      95% calc(100% - 4px), 90% calc(100% - 1px), 85% calc(100% - 7px), 80% 100%,
+      75% calc(100% - 5px), 70% calc(100% - 2px), 65% calc(100% - 8px), 60% 100%,
+      55% calc(100% - 6px), 50% calc(100% - 1px), 45% calc(100% - 7px), 40% 100%,
+      35% calc(100% - 4px), 30% calc(100% - 2px), 25% calc(100% - 8px), 20% 100%,
+      15% calc(100% - 5px), 10% calc(100% - 1px), 5% calc(100% - 7px), 0 100%)}
+  .leib.ruck .stamm{animation:ruckQ .11s linear}
+  @keyframes ruckQ{0%{transform:translateY(0)}40%{transform:translateY(-3px)}
+    70%{transform:translateY(2px)}100%{transform:translateY(0)}}
+  /* Gemessen am 07.10.2026 bei 390 px: lag .darunter im normalen Fluss
+     UNTER dem Abriss, stand "Halle 3 · Stand 106" schon VOR dem Riss da -
+     die Pointe war verraten. Der Abriss liegt deshalb auf dem Handy
+     absolut ueber .darunter, genau wie am Schreibtisch. Er ragt 9 px
+     nach oben in den Stamm (200 statt 191), damit die Zacken greifen. */
+  .darunter{position:static;width:100%;padding:20px 18px;order:3;min-height:200px}
+  .lochung{display:none}
+  .abriss{position:absolute;left:0;right:0;bottom:0;top:auto;
+    width:auto;height:209px;margin-left:0;padding:18px 18px 30px;
+    transform-origin:50% 10%;
+    clip-path:polygon(
+      0 9px, 5% 2px, 10% 8px, 15% 4px, 20% 9px, 25% 1px, 30% 7px, 35% 5px,
+      40% 9px, 45% 2px, 50% 8px, 55% 3px, 60% 9px, 65% 1px, 70% 7px, 75% 4px,
+      80% 9px, 85% 2px, 90% 8px, 95% 5px, 100% 9px, 100% 100%, 0 100%)}
+  .leib.ab .abriss{transform:translate(-14px,250px) rotate(-13deg)}
+  /* Auf dem Handy wird nach UNTEN gerissen - der Hinweis muss das sagen. */
+  .abriss .zieh .d{display:none}
+  .abriss .zieh .q{display:inline}
+  .felder{gap:18px}
+  /* Auf dem Handy traegt das Band drei Eintraege. Welche fehlen und
+     warum, steht in 00-MESSE-UEBERSICHT.md. */
+  .tband{grid-template-columns:repeat(3,1fr)}
+  .tband .weg-handy{display:none}
+  .tband > div{padding:11px 8px;gap:7px;flex-direction:column;align-items:flex-start}
+  .tband b{font-size:10px}
+  .tband span{font-size:8.6px}
+  .tband-siegel img{width:26px;height:26px}
+  .fuss{flex-direction:column;align-items:stretch;padding:16px}
+  .fuss .btn,.fuss .btn-l{text-align:center}
+  .pult{left:8px;right:8px;bottom:8px;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){
+  #pop,.karte,.abriss,.stempel,.lochung{transition:none}
+  .leib.ruck .stamm{animation:none}
+  .abriss .zieh{animation:none}
+}
+</style>
+</head><body>
+
+<div class="tb"><div class="wrap">
+  <span><i></i>4 WOCHEN PRO — OHNE ZAHLUNGSDATEN</span>
+  <span><i></i>MONATLICH KÜNDBAR</span>
+</div></div>
+<nav class="nav"><div class="wrap">
+  <span class="mark">Deal<b>Pilot</b></span>
+  <span class="mn"><span>So funktioniert's</span><span>Funktionen</span><span>Preise</span><span>Partner</span></span>
+  <span class="b-cta">Kostenlos starten</span>
+</div></nav>
+<section class="hero"><div class="wrap">
+  <div class="eye">DEIN COCKPIT FÜR IMMOBILIEN-INVESTMENTS</div>
+  <h1>Immobilienentscheidungen sind zu groß für ein <em>Bauchgefühl</em>.</h1>
+  <p>Cashflow, DSCR, Steuer, Deal Score und bankfertige Unterlagen — in Minuten
+     statt Stunden. 19 Module, 24 Kennzahlen, Server in Deutschland.</p>
+</div></section>
+<div class="laufband">QUICK-CHECK · SPRECHLAUF · DEAL SCORE · IMMOWERTV · BANKEXPORT · ANLAGE V</div>
+
+<!-- ══ Entwurf 01 · Der Abriss ═══════════════════════════════════════ -->
+<div id="pop" hidden>
+  <div class="karte" role="dialog" aria-modal="true" aria-label="DealPilot auf dem immocation Festival">
+    <button class="zu" aria-label="Schließen">&times;</button>
+
+    <!-- Halle 3 · Stand 106 steht so auf der Druckkarte (22.09.2026) UND
+         auf dem Veranstalter-Post ("Du findest uns an Stand 106 Halle 3").
+         ⚠ design/Messe/dealpilot-faltdisplay-151x225.html:454 und
+         claude/projektanweisung-hauptapp.md:1583 sagen noch "Stand 23" —
+         die Zahl wird von Marcel bestätigt, dann dort nachziehen. -->
+    <div class="kopf">
+      <span>BOARDING PASS · IMMOCATION FESTIVAL 2026</span>
+      <span class="re">HALLE 3 · STAND 106</span>
+    </div>
+
+    <div class="leib" id="leib">
+      <div class="darunter">
+        <div class="k">DEIN ABRISS LIEGT</div>
+        <div class="gross">Halle&nbsp;3<br><b>Stand&nbsp;106</b></div>
+        <div class="k">PERSÖNLICH ABZUHOLEN</div>
+        <div class="stempel">NUR AM STAND</div>
+      </div>
+
+      <div class="stamm">
+        <svg class="kurve" viewBox="0 0 420 220" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M-10 215 C 120 205, 260 150, 410 22" fill="none" stroke="#C9A84C"
+                stroke-width="7" stroke-linecap="round" opacity=".35"/>
+        </svg>
+        <div class="mini">31.10.–01.11.2026 · LEIPZIGER MESSE</div>
+        <h2>Wir sind da. Und wir haben <em>etwas für dich dabei</em>.</h2>
+        <p class="sub">Am Stand liegt deine Bordkarte — mit echtem Abriss.
+           Den gibt es nur dort, von Hand.</p>
+        <div class="felder">
+          <div class="feld"><div class="k">BOARDING</div><div class="v">31.10.–01.11.26</div></div>
+          <div class="feld"><div class="k">ORT</div><div class="v">Leipziger Messe</div></div>
+          <div class="feld"><div class="k">GATE</div><div class="v gold">Halle 3 · 106</div></div>
+        </div>
+      </div>
+
+      <span class="lochung" aria-hidden="true"></span>
+
+      <div class="abriss" id="abriss" role="button" tabindex="0"
+           aria-label="Abriss abreißen — zeigt, wo du ihn bekommst">
+        <div class="k">ABRISS — DEIN VORTEIL</div>
+        <div class="pz">−15<small>%</small></div>
+        <div class="s">Dauerhaft.<br>Auf jedes Paket.</div>
+        <!-- Hier stand "ERSTFLUG" - das IST der Rabattcode. Marcel am
+             07.10.2026: "dort jetzt bitte nichts mit ERSTFLUG drauf weil
+             das ja unser Rabattcode ist." Der Abriss zeigt jetzt den WEG
+             zum Code, nie den Code. -->
+        <div class="siegel">CODE AM STAND</div>
+        <div class="zieh"><span class="d">← ZIEHEN ZUM ABREISSEN</span><span class="q">NACH UNTEN WISCHEN ↓</span></div>
+      </div>
+    </div>
+
+    <!-- Vertrauensband · wörtlich aus frontend/landing/index.html -->
+    <div class="tband">
+      <div><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1"/><rect x="3" y="13" width="18" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+        <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
+      <div class="weg-handy"><svg class="ico" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></svg>
+        <div><b>Aus der Gutachtenpraxis</b><span>DESAG-zertifizierter Sachverständiger</span></div></div>
+      <div><svg class="ico" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>
+        <div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
+      <div class="weg-handy"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+        <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
+      <div class="tband-siegel"><img src="bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="34" height="34">
+        <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></div>
+    </div>
+
+    <div class="fuss">
+      <div class="wo">Komm vorbei, hol dir die Karte — und wir rechnen dein
+        nächstes Objekt gemeinsam durch. <b>Halle 3 · Stand 106.</b></div>
+      <div>
+        <button class="btn-l" data-zu>Vielleicht später</button>
+        <a class="btn" href="#">In den Kalender →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pult">
+  MOCKUP 01 · ECHTER ABRISS
+  <button id="b-zeig">NOCHMAL</button>
+  <button id="b-reiss">REISSEN</button>
+</div>
+
+<script>
+(function(){
+  var pop=document.getElementById('pop'), leib=document.getElementById('leib'),
+      ab=document.getElementById('abriss');
+  var sanft=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var tmr=[], zieht=false, x0=0, y0=0, gerissen=false;
+  var SCHWELLE=54;
+
+  function stopp(){ tmr.forEach(clearTimeout); tmr=[]; }
+
+  function reiss(){
+    if(gerissen) return; gerissen=true;
+    ab.classList.remove('zieht'); ab.style.transform='';
+    if(sanft){ leib.classList.add('ab'); return; }
+    /* Erst der Ruck (das Trennen), dann der Fall. Zwei Schritte, weil
+       EINE Bewegung wie Schieben aussieht. */
+    leib.classList.add('ruck');
+    tmr.push(setTimeout(function(){ leib.classList.add('ab'); },110));
+  }
+
+  function zeig(){
+    stopp(); gerissen=false;
+    leib.classList.remove('ab'); leib.classList.remove('ruck');
+    ab.style.transform=''; ab.classList.remove('zieht');
+    pop.hidden=false;
+    requestAnimationFrame(function(){ pop.classList.add('an'); });
+  }
+  function zu(){ pop.classList.remove('an'); tmr.push(setTimeout(function(){pop.hidden=true;},300)); }
+
+  /* ── Ziehen ─────────────────────────────────────────────────────── */
+  function quer(){ return window.innerWidth<=760; }  /* gestapelt = nach unten reissen */
+
+  ab.addEventListener('pointerdown',function(e){
+    if(gerissen) return;
+    zieht=true; x0=e.clientX; y0=e.clientY;
+    ab.classList.add('zieht');
+    try{ ab.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  ab.addEventListener('pointermove',function(e){
+    if(!zieht||gerissen) return;
+    var dx=e.clientX-x0, dy=e.clientY-y0;
+    var weg = quer() ? dy : dx;
+    if(weg<0) weg=weg*0.25;                 /* gegen die Reissrichtung zaeh */
+    var w=Math.abs(weg);
+    if(quer()) ab.style.transform='translate('+(dx*0.3)+'px,'+weg+'px) rotate('+(-weg*0.035)+'deg)';
+    else       ab.style.transform='translate('+weg+'px,'+(dy*0.3)+'px) rotate('+(weg*0.05)+'deg)';
+    if(w>SCHWELLE) { zieht=false; reiss(); }
+  });
+  function los(){
+    if(!zieht) return;
+    zieht=false; ab.classList.remove('zieht'); ab.style.transform='';
+  }
+  ab.addEventListener('pointerup',los);
+  ab.addEventListener('pointercancel',los);
+  /* Klick reicht auch - eine Zieh-Geste, die hakt, waere schlechter als
+     ein Klick mit guter Animation. */
+  ab.addEventListener('click',function(){ if(!gerissen) reiss(); });
+  ab.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); reiss(); }
+  });
+
+  document.querySelector('.zu').addEventListener('click',zu);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-zu]'),function(b){b.addEventListener('click',zu);});
+  pop.addEventListener('click',function(e){ if(e.target===pop) zu(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') zu(); });
+  document.getElementById('b-zeig').addEventListener('click',zeig);
+  document.getElementById('b-reiss').addEventListener('click',function(){ if(pop.hidden) zeig(); setTimeout(reiss,60); });
+
+  setTimeout(zeig,600);
+})();
+</script>
+</body></html>
