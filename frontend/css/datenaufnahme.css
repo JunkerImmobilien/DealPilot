@@ -1772,8 +1772,30 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .k { color:#F5EEDC !imp
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .s { color:#A2977E !important; display:block !important; }
 
 /* Abschnittsbeschriftungen: MARKTBEWERTUNG, DATEN EINLESEN */
+/* ══ v1954 · ZWEI TEXTE WAREN NICHT LESBAR ════════════════════════════
+   Marcel am 07.10.2026: "Das Problem ist, dass bei Datenuebernahme aus
+   den Knoepfen alles in Dunkelgrau steht. Das muesste groesser sein."
+
+   GEMESSEN, Text gegen den EFFEKTIVEN Grund (erster Vorfahr mit Flaeche):
+
+     Gruppentitel      9px    #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+     QR-Beschriftung   7.5px  #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+
+   Das Minimum ist 4,5. Beide lagen bei 2,86 - und das bei 9 bzw. 7,5 px.
+   Die Kachelbeschriftung daneben hat 15,40; deshalb liest sich die Leiste
+   wie "alles dunkelgrau": die kraeftigen Stellen stehen neben ausgewaschenen.
+
+   > Marcel hat die Farbe genannt, nicht den Kontrast. Der Ausloeser ist
+   > eine Beobachtung, keine Diagnose - gemessen war nicht "zu dunkel",
+   > sondern ZU HELL auf hellem Papier.
+
+   #665C49 bringt 5,88 und bleibt ein warmer Grauton, also der
+   Buetten-Charakter. Die Groessen gehen auf 10 px und 9 px - Marcels
+   "muesste groesser sein".
+   ════════════════════════════════════════════════════════════════════ */
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-grouplbl{
-  color:#9A8F76 !important;
+  color:#665C49 !important;
+  font-size:10px !important;
 }
 
 /* Die Kacheln sind blindgepraegt, nicht gedruckt. */
@@ -1829,7 +1851,7 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr img,
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr svg{
   border-color:#2A2418 !important;
 }
-html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-scan{ color:#9A8F76 !important; }
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-scan{ color:#665C49 !important; font-size:9px !important; }  /* v1954 */
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
   background:radial-gradient(120% 100% at 50% 0%, #FFFDF7, #F4EDDD) !important;
   display:flex !important; align-items:center !important;
