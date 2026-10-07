@@ -8085,6 +8085,33 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 /* ═══════════════════════════════════════════════════
    V38: DS2-Tag Pille (z.B. „DS2" neben Labels)
 ═══════════════════════════════════════════════════ */
+/* ===== v1958b - DAS ABZEICHEN DER LAGEKLASSE =========================
+   Es sieht aus wie .ds2-tag, sagt aber etwas anderes: das DS2-Abzeichen
+   bedeutet "geht in den Investor Deal Score", dieses hier bedeutet
+   "bestimmt deine Zielrendite". Deshalb eine eigene Klasse und ein
+   eigenes Wort (Ziel) statt Wiederverwendung - zwei Dinge, die gleich
+   aussehen und Verschiedenes heissen, sind schlimmer als zwei, die sich
+   unterscheiden.
+
+   NICHT VERWECHSELN: objekt-reiter.js fuehrt eine Pille Stufe A-E
+   (.oe-st). Die meint die HERKUNFT eines Wertes - amtlich vom
+   Gutachterausschuss bis eigene Angabe - und hat mit der Lageklasse
+   nichts zu tun. Ein A ist dort etwas voellig anderes als hier.
+   ================================================================ */
+.oe-lk-tag {
+  display: inline-block;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+  color: var(--wl-c9a84c, #C9A84C);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+  cursor: help;
+}
+
 .ds2-tag {
   display: inline-block;
   background: color-mix(in srgb, var(--gold) 14%, transparent);

@@ -516,7 +516,11 @@
     var box = $('oe-lage-vergleich'); if (!box) return;
     var D = null;
     try { D = (window.DealPilotMB && typeof DealPilotMB.letzter === 'function') ? DealPilotMB.letzter() : null; } catch (e) {}
-    var eig = [['Makrolage', _v('makrolage')], ['Mikrolage', _v('mikrolage')], ['Bevölkerung', _v('ds2_bevoelkerung')], ['Nachfrage', _v('ds2_nachfrage')]]
+    /* v1958b: die Lageklasse zuerst - sie ist die Entscheidung, die
+       anderen sind Einschaetzungen. `_v()` liefert den rohen Wert (A/B/C),
+       daraus wird "A-Lage". Leer bleibt leer und faellt durch den
+       vorhandenen filter() heraus. */
+    var eig = [['Lageklasse', (_v('lageklasse') ? _v('lageklasse') + '-Lage' : '')], ['Makrolage', _v('makrolage')], ['Mikrolage', _v('mikrolage')], ['Bevölkerung', _v('ds2_bevoelkerung')], ['Nachfrage', _v('ds2_nachfrage')]]
       .filter(function (p) { return p[1]; }).map(function (p) { return p[0] + ' <b>' + esc(p[1].replace(/_/g, ' ')) + '</b>'; });
     if (!eig.length && !D) { box.style.display = 'none'; return; }
     var dat = [];

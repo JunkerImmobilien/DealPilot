@@ -1705,6 +1705,9 @@
       // Optional
       objektart:    v('qc_objektart'),
       energieklasse:v('qc_energieklasse'),
+      /* v1958: die Lageklasse aus dem Quick-Check. Der versteckte
+         Traeger `qc_lageklasse` kommt aus qc-bridge.js (v1956). */
+      lageklasse:   v('qc_lageklasse'),
       zimmer:       v('qc_zimmer'),
       stellplatz:   v('qc_stellplatz'),
       bewirt_mode:  v('qc_bewirt_mode') || 'hg',
@@ -1849,6 +1852,20 @@
       }
     }
     if (snapshot.energieklasse) set('ds2_energie', snapshot.energieklasse.toUpperCase());
+
+    /* ══ v1958 · DIE LAGEKLASSE WANDERT MIT ════════════════════════════
+       Marcel: „wenn ich das Objekt speichere aus dem Quick-Check, muss es
+       mit uebernommen werden in Tab Objekt."
+
+       Nur A, B oder C werden uebernommen. Alles andere - auch ein
+       Tippfehler aus einem Import - bleibt leer: eine Lageklasse zu RATEN
+       waere genau das, was Marcel ausgeschlossen hat ("nur der Kunde
+       waehlt"). Leer ist ein gueltiger Zustand, dann rechnet die
+       Heuristik mit ihrem Rueckfall weiter. */
+    if (snapshot.lageklasse) {
+      var _lk = String(snapshot.lageklasse).trim().toUpperCase();
+      if (_lk === 'A' || _lk === 'B' || _lk === 'C') set('lageklasse', _lk);
+    }
 
     // Zimmer + Stellplatz in 'thesis'
     var notesParts = [];

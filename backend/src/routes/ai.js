@@ -539,6 +539,32 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
             avm.wertentwicklung != null ? '- Wertentwicklung: ' + avm.wertentwicklung + ' % pro Jahr' : ''
           ].filter(Boolean).join('\n')
         : '',
+      /* ══ v1959 · DIE ZIELRENDITE DER LAGEKLASSE ═══════════════════════
+         Marcel: „je nachdem was man auswaehlt, zum Beispiel A-Lage und da
+         moechte ich 8 Prozent, dann geht im Quick-Check in unsere
+         Bewertung mit ein, um wie viel ich den Kaufpreis verhandeln muss."
+
+         Die Zahl ist NICHT nachgerechnet: `p.urteil_text` traegt den
+         Zielpreis schon, gerechnet von `qc-heuristik.js`. Hier steht nur,
+         WORAUF er sich bezieht - sonst liest die KI einen Zielpreis ohne
+         Begruendung und erfindet sich eine.
+
+         Der ABSTAND wird gebildet, nicht die Rendite: aus Kaufpreis und
+         Jahresmiete, beides steht oben. Das ist keine neue Zahl im Sinne
+         des Verbots weiter unten, sondern dieselbe in Prozent - und sie
+         kommt vom Server, nicht vom Modell. */
+      (function () {
+        const zb = p.zielBmr == null ? null : Number(String(p.zielBmr).replace(',', '.'));
+        if (zb == null || !isFinite(zb) || zb <= 0) return '';
+        const kl = i.lageklasse ? String(i.lageklasse).toUpperCase() : null;
+        const nkmJahr = (z(i.nkm) || 0) * 12;
+        const kp = z(i.kp) || 0;
+        const ist = (kp > 0) ? (nkmJahr / kp * 100) : null;
+        return '\nDeine Zielvorgabe: ' + (kl ? kl + '-Lage, ' : '')
+          + 'Ziel-Bruttomietrendite ' + zb.toString().replace('.', ',') + ' %'
+          + (ist != null ? ' (dieses Objekt liegt bei '
+              + ist.toFixed(2).replace('.', ',') + ' %)' : '');
+      })(),
       /* v1951: der Massstab fuer den eingegebenen Zins. Nur wenn echt. */
       zinsSatz
         ? '\nMarktzins zum Vergleich: ' + zinsSatz.wert + ' % fuer Zinsbindung '
@@ -572,6 +598,9 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '  einordnen - aber nur sie, und ohne eigene Note daraus zu machen.',
       '  "Attraktiv durch die Lage" ohne Zahl oben ist erfunden, auch wenn',
       '  es harmlos klingt.',
+      '- Die Zielrendite bewerten. Sie ist die Vorgabe des Nutzers, nicht',
+      '  dein Urteil. Du sagst, wie weit das Objekt davon entfernt ist -',
+      '  nicht, ob die Vorgabe klug ist.',
       '- Den Marktzins als Empfehlung ausgeben. Er ist ein Vergleichswert:',
       '  du darfst sagen, ob der eingegebene Zins darueber oder darunter',
       '  liegt, aber keinen Zins vorschlagen und keine Finanzierung raten.',

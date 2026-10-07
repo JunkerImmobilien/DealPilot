@@ -5723,7 +5723,18 @@ const QcApp = (function() {
         /* v1946: damit der Prompt weiß, was schon entschieden ist. */
         urteil: (_uFuerKi && _uFuerKi.ueberschrift) || null,
         urteil_text: (_uFuerKi && String(_uFuerKi.rat).replace(/<\/?strong>/g, '')) || null,
-        avm: avmData
+        avm: avmData,
+        /* v1959: die Zielrendite der gewaehlten Lageklasse geht MIT.
+           Die Lageklasse selbst steckt schon in `inputs`; die Zahl dazu
+           liegt im Lage-Profil und kennt nur der Browser. Ohne sie
+           koennte die KI zwar "A-Lage" lesen, aber nicht sagen, wie weit
+           der Preis davon entfernt ist. */
+        zielBmr: (function () {
+          try {
+            return window.DealPilotLageProfil
+              ? window.DealPilotLageProfil.zielBmr(inputs.lageklasse) : null;
+          } catch (e) { return null; }
+        })()
       }, '*');
     } catch (e) {
       clearTimeout(abgelaufen); _aiWartet = null;

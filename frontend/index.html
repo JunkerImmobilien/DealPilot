@@ -1295,6 +1295,13 @@ label.dp-required.qc-required::after {
 </div>
 <div class="card oe-karte" id="oe-karte-lage"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14"><use href="#i-pin"/></svg></span>Lage &amp; Einschätzung <span class="oe-ct-hint">geht in den Investor Deal Score — immer sichtbar</span></div>
 <div class="g3">
+          <!-- v1958b: die Lageklasse A/B/C. Sie steht VOR Makro- und
+               Mikrolage, weil sie etwas anderes ist: Makro- und Mikrolage
+               schaetzen den STANDORT, die Lageklasse ist die STRATEGIE des
+               Investors - an ihr haengt die Zielrendite und damit der
+               Verhandlungsspielraum. Kein DS2-Abzeichen: sie geht nicht in
+               den Investor Deal Score, sondern in die Heuristik. -->
+          <div class="f"><label>Lageklasse <span class="oe-lk-tag" title="Bestimmt deine Zielrendite aus den Einstellungen. Daraus rechnet DealPilot, auf welchen Kaufpreis du verhandeln muesstest.">Ziel</span></label><select id="lageklasse" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll()"><option value="" selected>- keine Angabe -</option><option value="A">A-Lage</option><option value="B">B-Lage</option><option value="C">C-Lage</option></select></div>
           <div class="f"><label>Makrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f"><label>Mikrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">

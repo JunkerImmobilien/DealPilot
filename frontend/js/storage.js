@@ -54,6 +54,13 @@ var WM_FIELDS = [
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
+  /* v1958 - Die Lageklasse A/B/C. Ohne diesen Eintrag faellt sie beim
+     Speichern LAUTLOS weg - genau der Fall, den diese Datei weiter oben
+     schon mehrfach protokolliert. Sie steht neben makrolage/mikrolage,
+     weil sie dieselbe Karte teilt, ist aber etwas anderes: Makro- und
+     Mikrolage sind Einschaetzungen des STANDORTS, die Lageklasse ist
+     eine STRATEGIE-Entscheidung des Investors. */
+  'lageklasse',
   'vermstand','nutzungsart','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V291.1-storage-cleanup: kp_kueche deprecated — Eingabe komplett über inv_* Felder
   // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
@@ -443,6 +450,9 @@ function loadData(d) {
   // Beispiel: Objekt A hat san=12000, Objekt B hat keinen san-Wert → ohne diesen Reset
   // bleibt san=12000 im DOM → GI von B = kp_B + nk_B + 12000 (falsch).
   var resetFields = [
+    /* v1958: ohne diesen Eintrag traegt Objekt B die Lageklasse von
+       Objekt A weiter - und an ihr haengt eine Rechnung. */
+    'lageklasse',
     'san', 'moebl',                              // GI-Aufschläge (calc.js Z.433)
     'umlagef', 'ze',                              // Mieten-Aufschläge (calc.js Z.509)
     'grundsteuer', 'ul_sonst',                    // BWK ul (calc.js Z.545)
