@@ -917,6 +917,47 @@ html[data-dp-layout] .dpl-schiene nav.tabs *{
   pointer-events:auto !important;
 }
 
+/* ── v1935 · DERSELBE DEFEKT, DIESMAL IN DER SCHUBLADE ──────────────────
+
+   Marcel am 07.10.2026: „wenn ich Objektkarten umstelle, dann gehe ich einmal
+   auf Portfolio und dann sehe ich die, stelle das wieder um auf Aktionen und
+   dann kann ich Einstellungen nicht mehr anklicken."
+
+   **Das ist WORTGLEICH der Befund vom 28.09.2026 oben** - und die Ursache ist
+   dieselbe Zeile: `#sb-actions-accordion { pointer-events: none }` aus dem
+   zugeklappten Zustand. Gemessen bei 387 px, Marcels Weg nachgestellt:
+
+     .sb-act-item                 pointer-events=none
+     .sb-actions-accordion-inner  pointer-events=none
+     #sb-actions-accordion        pointer-events=none   <- Quelle
+     #sidebar                     pointer-events=auto
+
+   Betroffen war nicht nur „Einstellungen", sondern JEDE der zwoelf Aktionen -
+   die Kinder erben `pointer-events` vom Akkordeon.
+
+   > **Eine Reparatur erbt den Anker, an dem sie geschrieben wurde.** Die Zeilen
+   > oben hat v1649 an `.dpl-schiene` gehaengt - die gibt es nur am Schreibtisch.
+   > Auf dem Handy liegt dieselbe Liste in `aside#sidebar`, und dort lief der
+   > Defekt neun Tage unbemerkt weiter. Beide Male hat Marcel ihn gefunden,
+   > nicht die Pruefstrecke.
+
+   > **Was aus einer Fassung mitgenommen wird, sind die REGELN, nicht ihre
+   > Anker.** Wer eine Fassung klont, muss jede Reparatur daran pruefen, die vor
+   > dem Klon geschrieben wurde.
+
+   Deshalb hier dieselben sechs Zeilen mit dem Schublade-Anker. Nicht als Kopie
+   nebeneinander, sondern bewusst als zweite Kette: die Schiene und die
+   Schublade sind zwei Orte, und keiner von beiden darf den anderen stillegen.
+   ──────────────────────────────────────────────────────────────────────── */
+html[data-dp-layout] aside#sidebar #sb-actions-accordion,
+html[data-dp-layout] aside#sidebar #sb-actions-accordion *,
+html[data-dp-layout] aside#sidebar .dpl-teil-nutzer,
+html[data-dp-layout] aside#sidebar .dpl-teil-nutzer *,
+html[data-dp-layout] aside#sidebar .sb-user-main,
+html[data-dp-layout] aside#sidebar .sb-user-main *{
+  pointer-events:auto !important;
+}
+
 /* ── Die Marke oben links groesser (Marcels Wunsch) ────────────────── */
 html[data-dp-layout] .dpl-marke{ height:58px !important; padding:0 14px !important; }
 html[data-dp-layout] .dpl-wm{ font-size:20px !important; }
@@ -8718,4 +8759,31 @@ html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-btn {
   html[data-dp-objkarte="kennzahlen"][data-dp-objkarte] body aside.sidebar#sidebar #sb-list .sb-card {
     height: auto !important;
   }
+}
+
+/* ==============================================================================
+   v1935 B - 44 PIXEL MINDESTMASS AUCH AM SCHREIBTISCH
+
+   Marcel am 07.10.2026 auf die Frage, ob die Hoehen angeglichen werden sollen:
+   "ja 44 ist gut. so machen".
+
+   Gemessen waren am Schreibtisch zwei Stile unter dem Touch-Mindestmass:
+
+     Stil        Handy   Schreibtisch
+     Ampel        45 px     28 px
+     Minimal      45 px     32 px
+
+   Angeglichen wird NACH OBEN: 44 px ist das Mass, das ein Finger sicher
+   trifft, und es schadet der Maus nicht. Der umgekehrte Weg haette die
+   Handy-Karten unter die Trefferschwelle gedrueckt.
+
+   > Eine Mindesthoehe ist kein Gestaltungswert, sondern eine Trefferflaeche.
+   > Wer zwei Fassungen angleicht, nimmt die groessere - sonst tauscht er
+   > Einheitlichkeit gegen Bedienbarkeit.
+
+   `min-height` statt `height`: die Stile, die mehr brauchen (Kennzahlen mit
+   145 px), behalten ihre Hoehe.
+   ============================================================================== */
+html[data-dp-layout][data-dp-layout] body .dpl-schiene #sb-list .sb-card {
+  min-height: 44px !important;
 }

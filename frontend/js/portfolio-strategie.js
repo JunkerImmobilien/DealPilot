@@ -230,4 +230,29 @@
 
   global.openPortfolioStrategie = openPortfolioStrategie;
   global.PortfolioStrategie = { open: openPortfolioStrategie, close: schliessen, fristen: fristen, AP: AP, FEATURE: FEATURE };
+
+  /* ── v1935c · DER WEG UEBER DIE ADRESSE ──────────────────────────────
+     Der Menueeintrag ist seit v1935c ausgeblendet (Marcel: "erst mal aus
+     Ansichten rausnehmen … ueber einen Link oder sowas erreichen"). Damit das
+     Modul nicht unerreichbar wird, oeffnet `?strategie` in der Adresse es
+     direkt:
+
+         https://app.staging.dealpilot.immo/?strategie
+
+     Die Sperre bleibt, wo sie war: `openPortfolioStrategie()` prueft den
+     Feature-Schluessel selbst. Ein Link umgeht sie NICHT - er ersetzt nur den
+     Knopf, nicht die Berechtigung.
+
+     Gewartet wird auf `dp:plan-ready` statt auf einen Timer: ohne den Plan
+     steht der Feature-Schluessel noch nicht fest, und die Funktion wuerde mit
+     einem Hinweis aussteigen, obwohl die Berechtigung da ist. Faellt das
+     Ereignis aus (es kommt einmal je Sitzung), bleibt der Aufruf aus - das ist
+     richtig so: lieber kein Fenster als eines ohne gepruefte Berechtigung. */
+  try {
+    if (/[?&]strategie(=|&|$)/.test(global.location.search)) {
+      global.addEventListener('dp:plan-ready', function () {
+        try { openPortfolioStrategie(); } catch (e) { console.warn('[PST] Link-Aufruf fehlgeschlagen', e); }
+      }, { once: true });
+    }
+  } catch (e) { /* kein location (Test-Umgebung) - dann gibt es auch keinen Link */ }
 })(window);
