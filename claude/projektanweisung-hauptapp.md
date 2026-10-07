@@ -31914,6 +31914,109 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (86) 07.10.2026 — v1958 bis v1961a: die Lageklasse geht durch die ganze Kette
+
+P2 und P3 des Lage-Pakets. Marcel: „ja auf den Server damit und dann alles umsetzen."
+
+#### A · Die drei Stellen, an denen ein Feld lautlos verschwindet
+
+Beide Messläufe hatten sie unabhängig voneinander genannt — und alle drei sind bedient:
+
+```
+storage.js  FIELDS        sonst faellt das Feld beim SPEICHERN weg
+storage.js  resetFields   sonst klebt Objekt As Klasse an Objekt B
+qc-bridge.js CARRIERS     sonst geht sie zwischen iframe und Fenster verloren
+```
+
+**Am lebenden Objekt nachgemessen**, nicht aus dem Code geschlossen:
+
+```
+collectData().lageklasse = "B"        -> im Feldkatalog: JA
+Objekt A auf B gesetzt, Objekt B ohne Klasse geladen
+  Feld danach: ""                     -> die Reset-Liste greift
+```
+
+#### B · Zwei Dinge, die gleich aussehen und Verschiedenes heißen
+
+> **Die vorhandene Stufenpille taugt nicht.** `objekt-reiter.js` führt `STUFEN A–E` — die
+> bedeuten die **Herkunft** eines Wertes („amtlich vom Gutachterausschuss" bis „eigene Angabe").
+> Ein „A" hätte dort einen Tooltip über Gutachterausschüsse gezeigt. Der Messbericht hatte sie
+> als „exakt das Muster" vorgeschlagen; das Muster stimmt, die **Bedeutung** nicht.
+
+Deshalb eine eigene Pille (`.oe-lk-tag` im Reiter, `.ao-lk` in der Tabelle) mit eigenem Wort
+(„Ziel") und eigenem Tooltip.
+
+**Und keine Ampel in der Liste:** A, B und C tragen dieselbe Farbe. Eine C-Lage ist nicht
+schlechter als eine A-Lage, sie ist eine andere Strategie. Grün für A und Rot für C würde eine
+Wertung behaupten, die Marcel ausdrücklich nicht getroffen hat.
+
+#### C · Die KI kennt jetzt das Ziel
+
+```
+Deine Zielvorgabe: C-Lage, Ziel-Bruttomietrendite 7 % (dieses Objekt liegt bei 5,33 %)
+```
+
+> **Die Zahl ist nicht nachgerechnet.** Den Zielpreis trägt `urteil_text` schon, gerechnet von
+> `qc-heuristik.js`. Hier steht nur, WORAUF er sich bezieht — sonst liest die KI einen Zielpreis
+> ohne Begründung und erfindet sich eine. Dazu ein neues Verbot: **die Zielrendite ist Marcels
+> Vorgabe, nicht das Urteil der KI.**
+
+#### D · Vier Dateien tragen defekte Bytes
+
+```
+storage.js    3 Bytes      index.html  2 Bytes      style.css  1 Byte
+```
+
+Alle drei werden **byteweise** behandelt (latin1 lesen und schreiben, nachweislich verlustfrei),
+und der eingefügte Text ist reines ASCII.
+
+> **Dabei habe ich selbst ein viertes Byte erzeugt.** Ein Mittelpunkt in meinem eigenen Kommentar
+> ist latin1 `0xB7` — für sich **kein gültiges UTF-8**. Der Rundlauf-Prüfer hat es gefangen
+> (3 → 4) und es ist zurückgenommen. **Die Schranke ist nicht „latin1-darstellbar", sondern
+> ASCII**, wenn die Datei später als UTF-8 gelesen wird.
+
+#### E · Zwei Fehler, die erst der Lauf im Assistenten zeigte
+
+> **1 · A-Lage stand leer da.** Ich hatte `3.5` als `"3,5"` ins Feld geschrieben — ein
+> `<input type="number">` **verwirft ein Komma stillschweigend**. B (5) und C (7) sind ganze
+> Zahlen und hatten keins, deshalb sah es richtig aus. **Ein Fehler, der sich hinter runden
+> Zahlen versteckt.**
+
+> **2 · Die Eingabe wurde nicht gespeichert.** v1961 hat die Lagefelder in den **Klick**-Fänger
+> gehängt. Der fängt Klicks — eine Eingabe erreicht ihn nie. **Dass das Häkchen daneben
+> (`dpo_zins_auto`) dort funktioniert, hat den Fehler verdeckt: ein Klick auf eine Checkbox IST
+> ein Klick.** Gemessen: 4,75 getippt, im Profil stand weiterhin 3,5.
+
+Keine Syntaxprüfung hätte eines von beiden gefunden.
+
+#### F · Meine Zählprüfungen waren heute fünfmal falsch
+
+Rückfall-Konstante 3 statt 4 · CSS-Blöcke 14 statt 11 · `zielBmr` 3 statt 2 · `p.zielBmr` 2 statt
+1 · `_th(` 10 statt 6 — und jedes Mal **stimmte der Patch**, nur meine Erwartung nicht.
+
+> **Eine absolute Zahl prüft mein Gedächtnis, kein Ergebnis.** Seitdem wird der UNTERSCHIED
+> geprüft (Kopfzellen +1, Datenzellen +1) oder das Vorhandensein eines eindeutigen Blocks. Und
+> gezählt werden nur echte Aufrufe (`_th(` mit Anführungszeichen) — der Zähler traf sonst die
+> Erwähnung im eigenen Kommentar.
+
+#### G · Abnahme
+
+```
+Einstellungen   3 Zeilen, 12 Felder, Pflichtfeld golden, kein Ueberlauf
+Server          lokal 4,25 gesetzt -> vom Server A=4.25 mit Zeitstempel
+Quick-Check     C-Lage -> "verhandeln noetig", Zielpreis 162.857 EUR
+                Handrechnung 11.400 / 0,07 = 162.857                 stimmt
+Reiter Objekt   Feld in der Karte Lage, vor Makrolage, Abzeichen gold
+Speicherweg     collectData liefert "B" · Reset leert beim Objektwechsel
+Tabelle         9 Koepfe = 9 Zellen, Spalte 3, sortierbar, leer als Strich
+Ersteinrichtung 3 Felder gefuellt, Eingabe speichert sofort
+KI-Prompt       Zielvorgabe und Abstand, 12 Kettenproben gruen
+```
+
+**CLAUDE.md ergänzt:** die fünf gespiegelten Kerne, die Pflicht,
+`tools/rechenkerne-spiegeln.mjs` nach jeder Änderung laufen zu lassen, und der Satz, dass ein
+Kern **nie** Einstellungen liest.
+
 ### (85) 07.10.2026 — v1955 bis v1957a: A-/B-/C-Lage, und ein Prüfer, wo ein Erzeuger stand
 
 #### A · v1955 · Ich habe einen Prüfer gebaut, wo ein Erzeuger stand

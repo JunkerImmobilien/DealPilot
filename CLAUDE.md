@@ -201,6 +201,22 @@ ein anderer Zweck, es darf nicht mitfallen.
 - **Score** → `DealScore.computeFromKpis()`
 - **Sachwertfaktor** → nur über `lib/gutachterausschuss.js`, nie ein Modul direkt
 
+**Fünf Kerne werden ins Backend-Image gespiegelt** (`frontend/` liegt dort
+nicht): `dscr-engine.js`, `deal-kpis.js`, `score-tiers.js`, `dealscore.js`,
+`qc-heuristik.js` → `backend/src/generated/rechenkerne/`.
+
+> **Wer einen davon ändert, lässt `node tools/rechenkerne-spiegeln.mjs`
+> laufen.** Sonst urteilt der Telegram-Bot anders als die App — und zwar
+> lautlos. Am 07.10.2026 ist genau das passiert: eine Änderung an
+> `score-tiers.js` blieb ungespiegelt, das Image lief stundenlang mit dem
+> alten Kern, und der Prüfer kannte die Spiegelung nicht und wurde grün.
+> Seitdem führt `tools/score-ketten-pruefen.mjs` sie als eigene Quelle.
+
+**Ein Kern liest NIE Einstellungen.** Er läuft im Backend ohne Browser, ohne
+`localStorage` und ohne angemeldeten Nutzer. Was er braucht, bekommt er als
+**Parameter** (so kam die Zielrendite in `zielKaufpreis()`, v1956). Ein Kern,
+der sich seine Eingaben selbst holt, ist dort nicht mehr derselbe Kern.
+
 ## Namensräume nie mischen
 
 `vNNN` Haupt-App · `MA` Mobile · `vNNN` Marktbericht · `P-NN`/`W-NN`
