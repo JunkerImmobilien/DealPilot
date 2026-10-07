@@ -31908,6 +31908,110 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (72) 07.10.2026 — v1932 bis v1934: die Partikel, der zurückgenommene Kopf und die sieben Kartenstile
+
+**Der teuerste Tag dieser Chronik, und die Schuld liegt bei der Messung, nicht beim Nutzer.**
+Marcel hat **sechsmal** dieselbe Beobachtung gemeldet; ich habe fünfmal „keine Partikel"
+geantwortet.
+
+#### Was es wirklich war (v1933b)
+
+`style.css:24834` — ein **Pseudoelement**:
+
+```css
+aside.sidebar::before {
+  background-image: radial-gradient(1px 1px at 25% 15%, …var(--gold) 60%…),
+                    … sieben Stück, 1–2 px, Gold 30–60 % …
+  animation: dpV64PartFloat 25s linear infinite;
+}
+```
+
+Sieben goldene Punkte auf 348 × 758 px, die 25 Sekunden lang nach oben ziehen — genau „Obsidian
+mit Partikeln", genau die Animation, die er ausdrücklich nicht wollte.
+
+> **Ein Pseudoelement steht in keinem DOM-Baum.** `querySelectorAll` findet es nicht,
+> `elementsFromPoint` nennt es nicht, `outerHTML` zeigt es nicht. Nur
+> `getComputedStyle(el, '::before')`. Ich habe Canvas gezählt, `#dp-particles` gesucht,
+> Rasterpunkte abgefragt und sogar sein Bild Pixel für Pixel ausgezählt — alles Verfahren, die
+> ein Pseudoelement systematisch nicht sehen können.
+
+> **Und der eigentliche Prozessfehler:** mein ALLERERSTER Suchlauf prüfte genau die
+> Pseudoelemente — und lief in den CDP-Timeout. Danach habe ich ihn nie wiederholt.
+> **Ein abgebrochener Suchlauf ist kein negativer Befund, sondern gar keiner.**
+
+#### Der Umweg, der zurückgenommen wurde (v1932 → v1933)
+
+Aus „oben neben dem DealPilot-Logo" hatte ich auf den **Kopf der App** geschlossen und ihn in
+v1932/a/b hell gemacht (`#EAE4D6`, 16 Textträger nachgezogen, drei `:has()`-Regeln mit
+Spezifität 223). Marcel: **„nein sorry jetzt ist der header hell. das soll so nicht sein."**
+Drei Commits revertiert, neue Buster-Nummer statt Rückkehr auf die alte.
+
+> **Eine plausible Herleitung ersetzt keine Nachfrage.** „Neben dem Logo" war mehrdeutig; ich
+> habe die Mehrdeutigkeit nicht gesehen, weil meine Deutung zu einem messbaren Befund führte.
+> **Ein Befund, der zur eigenen Deutung passt, bestätigt die Deutung nicht.**
+
+#### Ein Selbsttor in der eigenen Dokumentation (v1933a → v1933c)
+
+Meine erste Gegenregel kam im Browser **nie an**. Ursache war der Kommentar, in dem ich CSS
+zitiert hatte:
+
+```
+animation: dpV64PartFloat 25s linear infinite;   /* schwebt nach oben */
+```
+
+> **CSS kennt keine verschachtelten Kommentare.** Das innere `*/` beendete den äußeren, alles
+> danach wurde als CSS geparst, und die zitierte schließende Klammer machte die Klammertiefe
+> negativ. Ab da verlor der Parser die Spur — 846 Regeln kamen an, meine am Dateiende nicht.
+>
+> **Meine Prüfung zählte 452/452 Kommentarpaare und 1176/1176 Klammern — beides richtig
+> gezählt, die Struktur trotzdem kaputt.** Genau das, was Regel 1 sagt: *Zählen ist keine
+> Messung.* Der Prüfer verfolgt jetzt die TIEFE und verbietet verschachtelte Kommentare.
+
+#### Die sieben Kartenstile (v1934)
+
+**Marcel:** „sehen die Objektkarten immer gleich aus? wenn nein muss das angepasst werden."
+
+Gemessen, 7 Stile × 7 Breiten, Portfolio offen. **Score und Aktionsknöpfe: 0 px in 49 von 49
+Fällen.** Aber drei Stile zeigten auf dem Handy etwas anderes als am Schreibtisch:
+
+| Stil | Handy | Schreibtisch |
+|---|---|---|
+| Ampel | 45 px, **mit** Lasche | 28 px, ohne |
+| Minimal | 45 px, **mit** Lasche | 32 px, ohne |
+| Kennzahlen | 58 px, **ohne** Kacheln | 145 px, mit |
+
+Zwei Pauschalregeln schlugen die Stile, und zwar **in beide Richtungen zugleich**:
+
+```
+[253] …aside.sidebar#sidebar … .sbc-seq        -> block   Lasche IMMER an
+[243] …aside#sidebar #sb-list … .sbc-mini-grid -> none    Kacheln IMMER aus
+[232] html[data-dp-objkarte="ampel"] … .sbc-seq -> none   verliert
+```
+
+> **Eine Pauschalregel für eine Fläche überstimmt die Entscheidung des Stils.** Sie zwang die
+> Lasche an, wo der Stil sie abwählt, und die Kacheln aus, wo der Stil sie braucht. Am
+> schwersten wiegt Kennzahlen: **der Stil heißt nach den Kacheln und zeigte auf dem Handy keine
+> einzige.** Das ist kein Geschmack, sondern ein Stil, der sein Versprechen nicht halten konnte.
+
+**Abnahme nach v1934 — sechs Touch-Breiten, alle identisch:**
+
+```
+Stil           360  375  390  430  768  834     1180 (Maus)
+Aktenreiter     58   58   58   58   58   58       57
+Bordkarte       45   45   45   45   45   45       44
+Score-Kante     58   58   58   58   58   58       55
+Datenzeile      45   45   45   45   45   45       45
+Ampel           45   45   45   45   45   45       28
+Kennzahlen     128  128  128  128  128  128      145
+Minimal         45   45   45   45   45   45       32
+Score/Knöpfe: überall 0 px · sichtbare Teile je Stil überall gleich
+```
+
+Die **Teile** sind jetzt überall dieselben. Die **Höhen** bleiben zwischen Touch und Maus
+verschieden, und das ist Absicht: 45 px ist das Mindestmaß für einen Finger, 28 px reicht für
+einen Mauszeiger. Das Kachelband misst 319 px in einer 321-px-Karte, kein Text wird
+abgeschnitten.
+
 ### (71) 07.10.2026 — v1931: die Partikel gab es wirklich, ich habe nur am falschen Ort gesucht
 
 **Marcel:** „zudem ist immer noch dieser Partikel Hintergrund da. den möchte ich in der
