@@ -1815,7 +1815,28 @@
       liste.setAttribute('data-dpl-schliesser', '1');
       liste.addEventListener('click', function (e) {
         if (!window.matchMedia('(max-width: 900px)').matches) return;
-        if (!document.documentElement.hasAttribute('data-dp-layout')) return;
+        /* ── v1945 · DIE LAYOUT-BEDINGUNG IST RAUS ──────────────────────
+           Marcel am 07.10.2026: "wenn man im menue auf ein objekt klickt soll
+           automatisch das menue geschlossen werden sodass man direkt im Tab
+           Objekt ist und der angezeigt wird."
+
+           Hier stand `if (!…hasAttribute('data-dp-layout')) return;` - die
+           Schliess-Logik lief also nur in den drei Mappen. GEMESSEN bei 390 px
+           in der Ansicht DealPilot, Portfolio offen: nach dem Klick blieb die
+           Schublade bei x=0, also offen.
+
+           > **Zum vierten Mal an einem Tag dieselbe Form: eine Reparatur erbt
+           > den Anker, an dem sie geschrieben wurde.** v1923b hat das Schliessen
+           > fuer die Mappen durchgesetzt; dass es eine Ansicht gibt, in der es
+           > genauso gebraucht wird, stand nicht zur Debatte - sie war damals
+           > nicht gemeint. Wer eine Bedingung schreibt, die eine Ansicht
+           > ausschliesst, muss sagen WARUM sie ausgeschlossen ist. Steht dort
+           > kein Grund, ist es keine Bedingung, sondern ein Rest.
+
+           Das Schliessen gehoert zur Handy-Bedienung, nicht zu einem Layout:
+           auf 390 px verdeckt die Schublade die ganze Flaeche, und wer ein
+           Objekt waehlt, will es sehen. Die Breitenpruefung darueber bleibt -
+           sie ist die einzige, die hier etwas bedeutet. */
         var t = e.target;
         if (t && t.closest && t.closest('.sbc-actions')) return;   /* Kopieren/Loeschen */
         if (!t || !t.closest || !t.closest('.sb-card')) return;
