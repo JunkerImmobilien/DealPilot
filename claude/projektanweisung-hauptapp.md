@@ -31914,6 +31914,130 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (84) 07.10.2026 — v1952 bis v1954a: Werbung als Bewegtbild, Bordkarte raus, zwei unlesbare Texte
+
+#### A · „und wo liegt mein video für die werbung?"
+
+**Es gab keins.** Ich hatte „als Video ausgeben" dreimal als offenen Punkt notiert, statt es zu
+bauen. Marcel hat nicht nach einer Liste gefragt.
+
+Jetzt da: `design/Vorschläge/werbung-01-riss-reel.gif` — 432 × 768 (9:16 exakt), 22 Bilder,
+0,97 MB, Schleife 7000 ms.
+
+**Der Weg, weil weder ffmpeg noch Playwright auf dem Rechner liegen:** Chrome headless
+fotografiert die Vorlage bei **echten 1080 × 1920**, ein Start je Bild, die Animationszeit kommt
+per `?t=` aus der URL in eine Aufnahmekopie, die alle Animationen anhält.
+
+> **Von 70 Einzelbildern sind nur 21 verschieden** — die Vorlage hält lange still. Gleiche
+> Bilder werden zu einem mit Haltezeit zusammengefasst; aus 25,6 MB werden 7,7 MB, und das GIF
+> ist dadurch nicht schlechter, sondern kleiner. Gemessen per MD5, nicht nach Dateigröße
+> geschätzt.
+
+Das GIF setzt der **Browser** zusammen (`gif.js`), weil lokal kein Encoder da ist. Für ein
+echtes MP4 fehlt weiterhin ffmpeg — die Zeile dafür steht im Skript.
+
+**Zwei Fallen, beide im Werkzeug dokumentiert:**
+
+> **Chrome meldet ERFOLG auf stderr** („… bytes written to file …"). PowerShell 5.1 macht daraus
+> einen ErrorRecord; mit `$ErrorActionPreference='Stop'` bricht der Lauf **nach dem ersten Bild**
+> ab, obwohl alles geklappt hat. Die Erfolgskontrolle ist die DATEI, nicht der Rückgabewert.
+
+> **Ohne `--user-data-dir` entsteht gar kein Screenshot** — lautlos, ohne Fehlermeldung.
+
+Werkzeug: `tools/werbung-aufnehmen.ps1` und `tools/werbung-gif.html`. Die anderen drei
+Werbemittel sind damit ein Aufruf.
+
+#### B · v1953 · Die Bordkarte der Datenaufnahme ist raus
+
+**Es gibt zwei gleichnamige Stile in zwei Listen:**
+
+```
+karten-stil.js        data-dp-kartenstil   Datenaufnahme   <- gemeint
+objektkarten-stil.js  data-dp-objkarte     Objektliste     <- bleibt
+```
+
+> Die ANDERE Bordkarte ist seit v1915 der Rückfall der Aktenmappe — **Marcels eigene
+> Entscheidung vom 06.10.** Hätte ich die falsche Liste angefasst, wäre sein Standard
+> stillschweigend verschwunden. Der Zusammenhang, in dem er es gesagt hat, nennt Kartei, Zeile,
+> Bütten und Trichter: eindeutig die Datenaufnahme.
+
+Entfernt: der Eintrag und **32 CSS-Regeln**. Gemessen: 34 Regeln nannten den Wert, davon 32 nur
+ihn; die beiden anderen sind **Trichter**-Regeln, die die Bordkarte per `:not()` ausschließen —
+die bleiben, weil `:not()` die Spezifität seines Arguments trägt.
+
+Der Weg über `?karte=bordkarte` ist geschlossen; ein gespeicherter Merker fällt weich auf
+„Automatisch" zurück.
+
+**Nebenbefund:** „Zeile" hat **gar keine eigene Regel** — es ist die schlichte Grundleiste.
+Deshalb gefällt sie Marcel und war nie betroffen.
+
+#### C · v1954/v1954a · Zwei Texte unter dem Lesbarkeitsminimum
+
+Marcel: „bei Datenübernahme aus den Knöpfen alles in Dunkelgrau. Das müsste größer sein."
+
+```
+Buetten  Gruppentitel      9px    #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+Buetten  QR-Beschriftung   7.5px  #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+Kartei   Gruppentitel      9px    #9A9287 auf Weiss              Kontrast 3.07
+```
+
+Minimum ist 4,5. Die Kachelbeschriftung daneben hat 15,40 — **deshalb liest sich die Leiste wie
+„alles dunkelgrau": kräftige Stellen stehen neben ausgewaschenen.**
+
+> **Marcel hat die Farbe genannt, nicht den Kontrast.** Der genannte Auslöser ist eine
+> Beobachtung, keine Diagnose: gemessen war nicht „zu dunkel", sondern **zu hell auf hellem
+> Grund**.
+
+> **Kartei fand erst der Rundlauf.** Marcel hatte Bütten beschrieben; nach dessen Behebung habe
+> ich **alle fünf Stile** durchgemessen — derselbe Mangel, andere Stelle. Ein Durchlauf über
+> alle Fälle findet, was eine Einzelmeldung nicht nennt.
+
+Jetzt `#665C49` (5,88) und `#6E685F` (5,51), beide warmgrau, Größen 10 px und 9 px.
+
+#### D · Der QR — und zwei zurückgenommene Messungen
+
+Marcel: „der QR-Code sieht irgendwie künstlich aus."
+
+> **Rücknahme 1: „Das ist gar kein QR, nur ein `rect`."** Messfehler — die Module stecken in
+> einem `<path>`, das eine `<rect>` ist der weiße Hintergrund. Der feste Code war **echt und
+> gültig**: dieselben 431 Module wie ein frisch erzeugter.
+
+Der wirkliche Mangel war die **Ruhezone**: `viewBox 37` statt `31`, also Rand 4 statt 1. Von
+54 gerenderten Pixeln gingen rund 22 Prozent an weißen Rand. Jetzt erzeugt `window.DpQr` ihn
+mit `border:1` — dieselbe Einstellung, die `_updateShareQr` für geteilte Pässe längst benutzt,
+sonst springt die Ruhezone beim Wechsel.
+
+> **Rücknahme 2: „Der QR ist je Stil 137/136/54/44/308 px groß" und daraus „v1954 hat ihn auf 54
+> geschrumpft".** Beides falsch. Die Zahlen stammten aus einem Lauf, der die Stile
+> **umgeschaltet statt neu geladen** hat; der Trichter baut die Leiste dabei um und hinterlässt
+> einen Zwischenstand. `style.css:33016` setzt `.dp-pf-qr svg` auf feste **54 × 54** — das ist
+> die vorgesehene Größe, in jedem Stil. Die Lehre „nur nach Neuladen messen" galt bisher dem
+> Hell/Obsidian-Wechsel; **sie gilt genauso für die Datenaufnahme-Stile.**
+
+#### E · Der Prüfer hat sich dabei zweimal selbst verraten
+
+> **1 · Fünfmal „trichter".** Der Abnahmelauf meldete für jeden Stil denselben Namen — er hatte
+> jedes Mal das **alte** Dokument gemessen, weil `readyState` auch dort `'complete'` ist, bevor
+> das neue Laden beginnt. Aufgefallen nur, **weil der Prüfer den gemessenen Stil mitnennt.**
+> Seitdem prüft er die Ladekennung aus der URL und den erwarteten Stil.
+
+> **2 · Falscher Speicherschlüssel.** Ich habe `dp_kartenstil` geraten; er heißt
+> `dp_karten_stil` (`karten-stil.js:66`). Der Prüfer brach mit „erwartet automatisch, geladen
+> trichter" ab, statt grün zu werden.
+
+**Abnahme, jeder Stil einzeln neu geladen:**
+
+```
+Stil           QR    viewBox  schwaechster Text
+(automatisch)  54    31 31    scan     7.74
+zeile          54    31 31    scan     7.74
+kartei         54    31 31    grouplbl 5.51
+buetten        52    31 31    grouplbl 5.88
+trichter       54    31 31    scan     8.53
+
+Deckung: 5/5 Stile, 22 Textstellen · KEINE Stelle unter 4,5
+```
+
 ### (83) 07.10.2026 — v1951/v1951a: die Lage stand im Datensatz und nie im Prompt
 
 **Marcel:** „Es wäre super, wenn wir diese gesamte Heuristik da unten noch mal überdenken,
