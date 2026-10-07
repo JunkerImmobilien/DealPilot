@@ -31914,6 +31914,130 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (80) 07.10.2026 — v1949: die Kartenstile griffen nie, und drei Punkte waren schon erledigt
+
+**Dieser Eintrag nimmt eine eigene Meldung zurück.** Nach dem Rollout von v1940 habe ich
+gemeldet, die Objektkartenstile wirkten in der DealPilot-Ansicht. **Das war falsch.** Marcels
+fünf Punkte sind nachgemessen worden, einer nach dem anderen, und nur bei einem war die
+Meldung richtig.
+
+| Punkt | Stand nachgemessen |
+|---|---|
+| „Heute" soll „DealPilot" heißen | erledigt — Kachel trägt „DealPilot · Unveränderte Ansicht" |
+| Kartenstile greifen in der DealPilot-Ansicht | **war kaputt**, behoben in v1949 |
+| horizontale Scrollbar auf Desktop | erledigt (v1941) — kein gemalter Balken, alle sechs Stile |
+| CoPilot-Kachel | erledigt — `display:none`, 0×0 |
+| Handy: Knöpfe zu groß, untereinander | erledigt — `flex-direction:column`, 6 Zeilen, 324×44 |
+
+#### A · Der Defekt: 49 Regeln für einen Zustand, den das JS verweigert
+
+Alle sieben Stile über den Panel-Bedienweg durchgeklickt, Desktop 1178:
+
+```
+Aktenreiter  attr=null  karte=344x211   Bordkarte    attr=null  karte=344x211
+Score-Kante  attr=null  karte=344x211   Datenzeile   attr=null  karte=344x211
+Ampel        attr=null  karte=344x211   Kennzahlen   attr=null  karte=344x211
+Minimal      attr=null  karte=344x211
+```
+
+Nichts ändert sich, weil `data-dp-objkarte` **nie gesetzt wird**. Die Ursache stand in
+`objektkarten-stil.js` in einer Zeile:
+
+```js
+if (aktuell && layoutAktiv()) h.setAttribute(ATTR, aktuell);
+```
+
+> **v1940 hat 49 CSS-Regeln auf `html:not([data-dp-layout])[data-dp-objkarte="…"]` geklont —
+> für einen Zustand, den dieses JS sich weigerte herzustellen.** Die Regeln sind richtig und
+> waren nie erreichbar. **Ein Stil, der an einem Attribut hängt, ist nur so weit gebaut wie der
+> Schreiber dieses Attributs.** Die CSS-Seite zu prüfen und die JS-Seite anzunehmen hat einen
+> ganzen Ausrollzyklus gekostet — wie `#app` bei v1147, nur umgekehrt.
+
+**Der Fußtext im Panel sagte es selbst:** „Wirkt in der Aktenmappe — die normale Ansicht bleibt,
+wie sie ist." Das stimmte. **Ein Hinweis, der einen Fehler beschreibt, lässt ihn wie eine Absicht
+aussehen** — und genau deshalb habe ich ihn beim Gegenlesen nicht als Befund erkannt.
+
+#### B · Warum die Bedingung nicht einfach wegfällt
+
+Ohne eigene Wahl gilt seit v1915 die **Bordkarte** (Marcels Entscheidung vom 06.10. für die
+Aktenmappe). Hätte ich nur `layoutAktiv()` gestrichen, bekäme **jeder, der nie etwas gewählt
+hat**, plötzlich Bordkarten in der DealPilot-Ansicht — ein Umbau, den niemand bestellt hat.
+
+Deshalb sind eigene Wahl und Rückfall jetzt zwei verschiedene Dinge:
+
+```
+eigene Wahl  ->  gilt ueberall, auch ohne Layout
+Rueckfall    ->  Bordkarte nur in den Mappen, sonst Aktenreiter
+```
+
+`gewaehlt === null` heißt „hat sich nie entschieden". Geprüft wird auf **Abwesenheit**, nicht
+auf den Wahrheitswert — wer sich bewusst für den Aktenreiter entscheidet, speichert die leere
+Zeichenkette, und das **ist** eine Wahl. Vorher schrieb `start()` den Rückfall sofort als
+eigene Wahl in den Speicher; danach war er von einer echten Entscheidung nicht mehr zu
+unterscheiden.
+
+#### C · Nachweis
+
+Funktionslauf gegen die **echte** Datei (`vm`, echte Funktionen, Stub nur für DOM und Speicher):
+
+```
+Merker        Layout  ist           soll
+(keiner)      nein    (nicht ges.)  (nicht ges.)  ok   Auslieferungszustand
+(keiner)      ja      bordkarte     bordkarte     ok   v1915
+"kennzahlen"  nein    kennzahlen    kennzahlen    ok   <-- DER DEFEKT
+"kennzahlen"  ja      kennzahlen    kennzahlen    ok
+""            nein    (nicht ges.)  (nicht ges.)  ok   Aktenreiter IST eine Wahl
+""            ja      (nicht ges.)  (nicht ges.)  ok   und schlaegt den Rueckfall
++ Klick kommt an, Wahl wird gemerkt, Rueckweg raeumt das Attribut ab
+ALLE 9 PROBEN GRUEN
+```
+
+Im Browser auf Staging, 8 Breiten × 7 Stile:
+
+```
+DECKUNG: 56/56 (100%)
+Aktenreiter  206 206 206 206 206 206 211 211
+Bordkarte    102 102 102 102 102 102 104 104
+Score-Kante  126 126 126 126 126 126 128 128
+Datenzeile    82  82  82  82  82  82  92  92
+Ampel         99  99  99  99  99  99  96  96
+Kennzahlen   191 191 191 191 191 191 196 196
+Minimal       99  99  99  99  99  99 100 100
+ALLE 56 MITTIG (Abweichung 0 px)
+```
+
+#### D · Drei Fehler in meinen eigenen Prüfern, in einer Sitzung
+
+> **1 · Der Prüfer hat sich selbst gemessen.** Die Abnahme `/aktuell && layoutAktiv\(\)/` schlug
+> an — auf das **Zitat der alten Zeile im neuen Kommentar**. Erst die Kommentare raus, dann
+> suchen. Dazu die Gegenprobe, dass das Zitat noch da ist: fehlt es, ist die Begründung verloren.
+
+> **2 · „Ein Überlauf ist kein Scrollbalken."** Ich habe `nav.tabs` (794 → 1277 bei
+> `overflow-x:auto`) als Marcels Scrollbar diagnostiziert und war schon an der Ursache —
+> 9 Reiter plus ein 171-px-Zähler, dazu ein handgeführter Höhenvertrag
+> (`.tabs-workflow-bar{top:178px}`, Kommentar „+ ~44px Tabs"). **Der Gegencheck widerlegte es:**
+> `scrollHeight == clientHeight`, die 2 px Differenz sind der Rand (2 × 0,89 px), und
+> `.tabs::-webkit-scrollbar{display:none}` greift bei 1178. **Der Nachweis für einen gemalten
+> Balken ist, dass er HÖHE WEGNIMMT** — nicht `overflow-x` und nicht `scrollWidth`.
+> Ein Vergleichsstück ohne App-CSS zeigte, dass Chrome sonst 4 px reserviert.
+
+> **3 · Der Prüfer wurde grün und hat NULL gemessen.** „ALLE 0 MITTIG" — weil ein **synchroner**
+> Durchlauf nicht auf den `MutationObserver` warten kann, der die Panel-Kacheln baut. Das Panel
+> war neu und leer, die innere Schleife lief über null Knöpfe. **Seitdem nennt der Lauf seine
+> Deckung und bricht unter 90 % ab** — dieselbe Lehre wie beim Gold-Audit, das 6 statt 181
+> Dateien las. Ein vierter Nebenbefund: ein Klick auf ein 0×0-Element („Einstellungen" in der
+> geschlossenen Schublade) **meldet Erfolg und kommt nicht an**.
+
+#### E · Was dabei noch gemessen wurde und stimmt
+
+- **Score-Kante blendet den Ring absichtlich aus** (`display:none`, „farbiger Strich statt
+  Ring"). Meine erste Messung meldete dort „Score bei −310" — ein ausgeblendetes Element hat die
+  Box 0×0, dann lügt jede Mittenrechnung. **Sechs von sieben Stilen mittig, der siebte hat
+  keinen Ring.**
+- **Die sechs Datenaufnahme-Stile sind alle wählbar** und setzen `data-dp-kartenstil` (v1936).
+- **Am Handy (388 px)** steht die Leiste in 6 Zeilen untereinander, Knöpfe 324×44, kein Überlauf.
+  Marcel: „ja 44 ist gut."
+
 ### (79) 07.10.2026 — v1948: eine Matrixzeile, die im HTML nicht stand
 
 **Marcel:** „es steht unter der cockpit matrix noch [die Preisfussnote] … das muss geaendert
