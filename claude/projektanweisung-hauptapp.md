@@ -31908,6 +31908,68 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (68) 07.10.2026 — v1928/v1929/v1929a: ein Muster entsteht nicht aus der Fläche
+
+**Marcel:** „wenn man das Menü öffnet und Portfolio auswählt der Hintergrund in schwarz obsidean
+meine ich mit den partikeln. dort bitte den hintergrund setzen wie wenn man auf Aktionen klickt."
+
+**Der Grund war es zum zweiten Mal nicht.** An sechs Rasterpunkten im Stil Aktenreiter gemessen:
+durchgehend `rgb(14,13,11)`, derselbe Ton wie im Aktionen-Zustand, kein Verlauf, kein
+Partikel-Canvas im Dokument. Das hatte v1919 schon hergestellt.
+
+**Was Marcel sieht, sind die RAHMEN.** Je Karte drei Stück:
+
+```
+.sbc-top    1,1 px   rgb(138,115,50)          dunkles Gold, ueber die ganze Breite
+.sbc-seq    1,1 px   Gold .788/.659/.298      die Lasche
+.sbc-btn    1,1 px   Gold                     zweimal je Karte
+```
+
+Bei zwanzig Karten sind das **achtzig goldene Linien auf schwarzem Grund**. Im Aktionen-Zustand
+steht dort eine ruhige Textliste ganz ohne Kanten. Derselbe Grund, zwei völlig verschiedene
+Flächen.
+
+> **Ein Muster entsteht nicht aus der Fläche, sondern aus dem, was sie teilt.** „Der Hintergrund
+> ist unruhig" heisst fast nie, dass der Hintergrund falsch ist. Beim ersten Mal (v1919) waren es
+> zwei Schwarztöne, diesmal die Kanten — beide Male habe ich zuerst die Fläche verdächtigt.
+
+**Und zum dritten Mal heute eine Regel, die geladen war und nichts tat** (v1929 → v1929a). Von
+drei Regeln wirkte eine. Der Walker an `.sbc-top`:
+
+```
+! [ 40] html[data-dp-layout][data-dp-layout] .sb-card .sbc-top    (meine)
+! [130] html[data-dp-layout] aside#sidebar .sb-card .sbc-top      -> var(--wl-8a7332)
+```
+
+> **Eine ID in der Kette schlägt jede Zahl von Attributen und Klassen.** `aside#sidebar` bringt
+> allein 100 Punkte; meine doppelte Attributangabe bringt 20. Wer eine ID überstimmen will, muss
+> sie selbst mitführen — sonst zählt man Zehner gegen einen Hunderter.
+
+Dieselbe Familie wie v1914a (Tour/Feedback) und v1922 (Reiter), beide heute. **Konsequenz: vor
+jeder neuen Farbregel auf Kartenteile erst den Kaskaden-Walker, dann schreiben.**
+
+**Dazu v1928: Score und Knöpfe senkrecht mittig, in allen sieben Stilen.** Drei sassen schon
+mittig, vier nicht — und zwar in beide Richtungen (Aktenreiter 13 px zu tief, Kennzahlen 7 px zu
+hoch). Die Werte stammten aus festen `top`-Angaben je Stil.
+
+> **Eine feste Position ist nur so lange richtig, wie die Höhe sich nicht ändert.** Statt sieben
+> Zahlen zu pflegen rechnet die Mitte sich jetzt selbst aus (`top:50%` + `translateY(-50%)`) —
+> das gilt auch für jede Höhe, die noch kommt.
+
+**Abnahme über fünf Breiten, Stil Aktenreiter, Portfolio offen:**
+
+```
+Breite              Karte       top-Rahmen            seq-Rahmen            btn-Rahmen
+ 387 iPhone 14      321 x 58    rgba(191,183,169,.16) rgba(191,183,169,.24) rgba(255,255,255,.35)
+ 765 iPad mini      324 x 58    gleich                gleich                gleich
+ 832 iPad Pro 11    324 x 58    gleich                gleich                gleich
+1177 Schreibtisch   216 x 57    gleich                gleich                gleich
+1277 Schreibtisch   216 x 57    gleich                gleich                gleich
+```
+
+Die Lasche behält ihre Kante, nur leiser — sie ist das Merkmal des Aktenreiters und darf nicht
+verschwinden.
+
 ### (67) 06.10.2026 — v1926/v1926b: die Ernte der 135 PDFs, und zwei zurückgenommene Diagnosen
 
 **Zuerst die Rücknahme, weil sie an Marcel weitergereicht worden war.**
