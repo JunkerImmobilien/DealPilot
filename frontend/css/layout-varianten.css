@@ -8664,3 +8664,58 @@ html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-btn {
    Deshalb hier kein fuenfter Block mit mehr Spezifitaet, sondern der Eingriff
    an der Zahl selbst. Siehe die Notiz „eigene Regeln erschlagen sich".
    ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ==============================================================================
+   v1934 - DIE KARTEN SEHEN AUF ALLEN GERAETEN GLEICH AUS
+
+   Marcel am 07.10.2026: "sehen die Objektkarten immer gleich aus? wenn nein
+   muss das angepasst werden."
+
+   GEMESSEN, 7 Stile x 6 Breiten, Portfolio offen. Score und Aktionsknoepfe
+   sitzen ueberall mittig (0 px, 42 von 42). Aber DREI Stile zeigen auf dem
+   Handy etwas anderes als am Schreibtisch:
+
+     Stil          Handy                 Schreibtisch
+     Ampel         45 px, MIT Lasche     28 px, ohne Lasche
+     Minimal       45 px, MIT Lasche     32 px, ohne Lasche
+     Kennzahlen    58 px, OHNE Kacheln   145 px, mit Kacheln
+
+   Die Ursache sind zwei PAUSCHALREGELN, die staerker sind als die Stile:
+
+     [253] …aside.sidebar#sidebar … .sbc-seq       -> block   (Lasche IMMER an)
+     [243] …aside#sidebar #sb-list … .sbc-mini-grid -> none   (Kacheln IMMER aus)
+     [232] html[data-dp-objkarte="ampel"] … .sbc-seq -> none  (verliert)
+
+   > Eine Pauschalregel fuer die Flaeche ueberstimmt die Entscheidung des
+   > Stils - und zwar in BEIDE Richtungen gleichzeitig: sie zwingt die Lasche
+   > an, wo der Stil sie abwaehlt, und die Kacheln aus, wo der Stil sie
+   > braucht. Wer eine Flaeche pauschal regelt, muss die Faelle ausnehmen,
+   > deren Zweck genau daran haengt.
+
+   Am schwersten wiegt Kennzahlen: der Stil heisst nach den Kacheln und zeigte
+   auf dem Handy keine einzige. Das ist kein Geschmack, sondern ein Stil, der
+   sein Versprechen nicht halten konnte.
+
+   Die Pauschalen bleiben stehen - sie sind fuer den Standardfall richtig und
+   im Block v1915 begruendet. Hier werden nur die drei gemessenen Faelle
+   darueber gehoben. Der SCHREIBTISCH ist dabei der Massstab: dort ist jeder
+   Stil gebaut worden, das Handy zieht nach.
+   ============================================================================== */
+@media (max-width: 900px) {
+
+  /* Ampel und Minimal waehlen die Nummernlasche ab - auch auf dem Handy. */
+  html[data-dp-objkarte="ampel"][data-dp-objkarte] body aside.sidebar#sidebar #sb-list .sb-card .sbc-seq.sbc-seq,
+  html[data-dp-objkarte="minimal"][data-dp-objkarte] body aside.sidebar#sidebar #sb-list .sb-card .sbc-seq.sbc-seq {
+    display: none !important;
+  }
+
+  /* Kennzahlen zeigt seine Kacheln - das ist der Zweck des Stils. */
+  html[data-dp-objkarte="kennzahlen"][data-dp-objkarte] body aside.sidebar#sidebar #sb-list .sb-card .sbc-mini-grid {
+    display: flex !important;
+  }
+  /* Mit dem Kachelband braucht die Karte ihre Hoehe zurueck; der v1915-Block
+     setzt min-height:0 fuer die Schublade. */
+  html[data-dp-objkarte="kennzahlen"][data-dp-objkarte] body aside.sidebar#sidebar #sb-list .sb-card {
+    height: auto !important;
+  }
+}
