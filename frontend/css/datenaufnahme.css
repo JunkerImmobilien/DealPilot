@@ -2347,6 +2347,23 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
    gekuerztes Wort in der Reihe als ein vollstaendiges ausserhalb.
    ============================================================================== */
 @media (min-width: 901px) {
+  /* ── v1941b · NOWRAP, SONST BRICHT ES VOR DEM SCHRUMPFEN ─────────────
+     Nach v1941a stand `flex: 1 1 auto` und `min-width: 0` an den Kacheln -
+     und es brach trotzdem auf zwei Reihen um. Gemessen: Kachel weiterhin
+     175 px breit, obwohl sie haette nachgeben duerfen.
+
+     > **Flexbox schrumpft nur INNERHALB einer Zeile.** Mit `flex-wrap: wrap`
+     > schiebt es die Kachel erst in die naechste Reihe und schrumpft sie dort
+     > gar nicht mehr - das Umbrechen kommt VOR dem Teilen. Wer teilen will,
+     > muss das Umbrechen verbieten.
+
+     Deshalb am Schreibtisch `nowrap`. Auf dem Handy bleibt es dabei, dass die
+     Kacheln untereinander stehen (eigene Regel weiter unten) - dort ist
+     Umbrechen genau richtig. */
+  #oab-bar.dp-pfbar,
+  .dp-pf-scroll .dp-pfbar {
+    flex-wrap: nowrap !important;
+  }
   #oab-bar.dp-pfbar .dp-pf-tile,
   .dp-pf-scroll .dp-pfbar .dp-pf-tile {
     flex: 1 1 auto !important;
