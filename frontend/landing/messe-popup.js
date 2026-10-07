@@ -91,7 +91,13 @@
      Dauerbanner - deshalb an. Wer das anders will, setzt diese eine
      Zeile auf false; dann steht auf dem Abriss "Dein Vorteil" statt
      einer Zahl, und sonst aendert sich nichts. */
-  var ZEIGE_PROZENT = true;
+  /* v1947a · AUS. Marcel am 07.10.2026 auf die Frage, ob die Zahl offen
+     stehen darf: "Zahl raus". Damit bleibt seine Entscheidung vom
+     22.09.2026 unberuehrt - "direkt ausgewiesen, wenn man auf die Seite
+     klickt, soll er nicht sein". Ein Messeangebot mit Enddatum aendert
+     daran nichts: wer die Seite offen aufruft, sieht keine Rabattzahl.
+     Auf dem Abriss steht "Dein Vorteil", der Code weiterhin nur am Stand. */
+  var ZEIGE_PROZENT = false;
   var PROZENT = 15;
 
   function zeitVorbei() { return Date.now() > MESSE.endeMs; }
