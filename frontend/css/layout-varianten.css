@@ -7971,6 +7971,20 @@ html body .sb-act-item.sb-act-feedback {
    Schublade, Backdrop, `app-wrap`, `body` oder `html`. Der Grund ist in beiden
    Zustaenden derselbe: `rgb(14,13,11)`.
 
+   ┌─ ZURUECKGENOMMEN AM 07.10.2026 (v1931) ────────────────────────────────┐
+   │ **Der Satz „kein `#dp-particles`" ist FALSCH.** Er galt fuer die       │
+   │ Schublade bei 390 px — dort stimmt er bis heute. Am SCHREIBTISCH liegt │
+   │ das Canvas sehr wohl: 925 x 5843 px, opacity 1, in `#dashboard-main`.  │
+   │ `initParticles()` raeumte es nur unter 901 px ab.                      │
+   │                                                                        │
+   │ **Marcel hat es dreimal gesagt und ich habe dreimal am falschen Ort    │
+   │ gemessen.** Eine Verneinung ohne ihren Suchraum ist wertlos: richtig   │
+   │ waere „in `#sidebar` bei 390 px gibt es keine" gewesen.                │
+   │                                                                        │
+   │ Der Befund ueber die KARTEN unten bleibt richtig und gilt weiter —     │
+   │ es waren ZWEI Ursachen, nicht eine falsche.                            │
+   └────────────────────────────────────────────────────────────────────────┘
+
    **Der Eindruck kam von den Karten, nicht vom Grund.** Gegeneinander gemessen:
 
      Schreibtisch (Schiene)        Handy (Schublade)

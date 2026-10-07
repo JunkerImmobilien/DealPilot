@@ -31908,6 +31908,91 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (71) 07.10.2026 — v1931: die Partikel gab es wirklich, ich habe nur am falschen Ort gesucht
+
+**Marcel:** „zudem ist immer noch dieser Partikel Hintergrund da. den möchte ich in der
+Aktenmappe Ansicht nicht haben!"
+
+**Er hatte von Anfang an recht.** Gemessen am Schreibtisch (1177 px, Layout v1b, Cockpit offen):
+
+```
+#dp-particles   925 x 5843 px, opacity 1, z 0, in #dashboard-main
+layoutAktiv()   false      (Attribut = true, aber <=900px = FALSE)
+```
+
+`initParticles()` räumt den Canvas nur ab, wenn **Layout-Attribut UND `max-width:900px`**
+zutreffen. Am Schreibtisch zeichnete er in jeder Aktenmappen-Ansicht weiter — genau dort, wo
+Marcel ihn sah. Die Breitenbedingung stammte aus v1904, wo der helle Cockpit-Ton unter 901 px
+gebunden wurde; für die Partikel ist sie sachfremd.
+
+> **Die Aktenmappe ist eine ANSICHT, keine Bildschirmgröße.** Wer eine Ansicht abschaltet, darf
+> die Bedingung nicht an die Breite hängen.
+
+**Und jetzt der Fehler, der mir gehört.** Ich habe das dreimal gemessen (v1919, v1929, v1930)
+und jedesmal „keine Partikel" gemeldet — jedesmal in der **Schublade auf dem Handy**, wo keine
+sind. In v1930 steht sogar als Kommentar in der CSS-Datei: „kein Partikel-Canvas im Dokument".
+Das war für `#sidebar` bei 390 px wahr und für `#dashboard-main` bei 1177 px falsch.
+
+> **Eine Verneinung ohne ihren Suchraum ist wertlos.** „Es gibt keine Partikel" hätte heißen
+> müssen: „in `#sidebar` bei 390 px gibt es keine". Der Befund war wahr für die Fläche, die ich
+> angesehen hatte, und trotzdem falsch für den Schirm. Dieselbe Familie wie Falle 8 der
+> Werkzeugfallen (iframe gemessen, Rahmen vergessen) und wie [[pruefer-der-gruen-wird]].
+
+**Dass Marcel dreimal dasselbe sagen musste, ist der eigentliche Befund.** Ein Nutzer, der eine
+Beobachtung wiederholt, hat fast immer recht — korrigiert gehört die Messung, nicht er.
+
+---
+
+**Teil B — Score und Knöpfe mittig.** Marcel: „auf den Objektkarten muss der Score das
+duplizieren und löschen Button bzw. Schaltfläche **immer** mittig sitzen."
+
+```
+ 390 px  (aside#sidebar)   Score 0 px   Knopf 0 px   mittig
+1177 px  (.dpl-schiene)    Score 7 px   Knopf 7 px   ZU TIEF
+```
+
+Die Ursache stand **viermal** in `layout-varianten.css`: `height:calc(100% - 13px)` zusammen mit
+`align-items:center`. Der Inhalt zentriert dann in einer um 13 px verkürzten Fläche und sitzt
+6,5 px unter der Kartenmitte.
+
+> **v1928 hat das nicht behoben, sondern überdeckt.** `top:50%` plus `translateY(-50%)` lag
+> obendrauf und stellte die Mitte auf dem Handy her — die falsche Höhe blieb darunter stehen und
+> wirkte überall sonst weiter. **Eine Korrektur, die das Ergebnis richtigstellt statt der
+> Ursache, gilt nur dort, wo man sie hingeschrieben hat.** Deshalb fiel es am Schreibtisch nicht
+> auf: dort lag die Überdeckung nicht.
+
+Und die Falle beim Suchen: derselbe Selektor kommt in dieser Datei mehrfach mit **gleicher
+Spezifität (41)** vor — bei Gleichstand gewinnt die spätere. Der Kaskaden-Walker zeigte an
+`.sbc-actions` vier Treffer derselben Regelkette. Deshalb kein fünfter Block mit mehr
+Spezifität, sondern der Eingriff an der Zahl selbst ([[eigene-regeln-erschlagen-sich]]).
+
+**Abnahme — 14 Fälle, je 22 Karten, Höhen von 28 bis 145 px:**
+
+```
+Stil            1177 px        387 px
+Aktenreiter     57px  0 px     58px  0 px
+Bordkarte       44px  0 px     45px  0 px
+Score-Kante     55px  0 px     58px  0 px
+Datenzeile      45px  0 px     45px  0 px
+Ampel           28px  0 px     45px  0 px
+Kennzahlen     145px  0 px     58px  0 px
+Minimal         32px  0 px     45px  0 px
+```
+
+Dass es auch bei 28 px und bei 145 px stimmt, ist der Beweis, dass die Ursache getroffen ist und
+nicht sieben Zahlen gepflegt werden.
+
+**Gegenprobe, damit keine Funktion mitfällt:** Layout-Attribut entfernt („Heute") →
+`#dp-particles` ist mit 793 x 5901 px wieder da. Die Partikel sind nur in den drei Layouts aus,
+nicht abgeschafft. Im Cockpit der Aktenmappe bleiben 8 sichtbare Canvas übrig, **alle Diagramme**
+(`#dpc-kette-0`, `#dpc-cashflow`, …), keines flächig.
+
+**Zwei Messfallen auf dem Weg, beide aus der eigenen Sammlung:** die Schublade ließ sich im
+Hintergrundtab nicht öffnen (Transition friert auf dem Startwert ein → `transition:none`
+einspritzen), und ein Lauf mit sieben Wartezeiten lief in den 45-s-CDP-Timeout — synchron mit
+erzwungenem Reflow (`void body.offsetHeight`) statt `await` gemessen. Der abgebrochene Lauf
+hinterließ den Stil auf „minimal"; **der Läufer setzt ihn jetzt selbst zurück.**
+
 ### (70) 07.10.2026 — v1927–v1927c: die vollständige Bewertung im Telegram-Bot
 
 **Marcel:** „er rechnet den Deal-Score nur so vorläufig und er gibt mir auch keinen Text aus …
