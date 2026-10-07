@@ -1029,7 +1029,12 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-gro
   font-family:"JetBrains Mono",ui-monospace,monospace !important;
   font-size:9px !important; letter-spacing:.9px !important;
   text-transform:uppercase !important;
-  color:#9A9287 !important;
+  /* v1954a: #9A9287 auf Weiss ergab Kontrast 3.07 - unter dem Minimum von
+     4,5, und das bei 9 px Versalien mit 0.9 px Sperrung. Gefunden beim
+     Rundlauf ueber alle Stile, NACHDEM Buetten behoben war: derselbe Mangel,
+     andere Datei-Stelle. Ein Durchlauf ueber alle Faelle findet, was eine
+     Einzelmeldung nicht nennt. #6E685F bringt 5,51 und bleibt warmgrau. */
+  color:#6E685F !important;
 }
 /* Der Trennstrich zwischen den beiden Gruppen — dieselbe Haarlinie
    wie auf der Karte, nur auf die Höhe der Kartei gebracht. */
