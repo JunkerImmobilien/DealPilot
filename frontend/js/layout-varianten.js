@@ -1865,11 +1865,42 @@
            schliesst dann. Sobald der Nutzer in dieser halben Sekunde wieder
            selbst oeffnet, wuerde er dagegenarbeiten — das ist unrealistisch
            und faellt nach 600 ms ohnehin weg. */
+        /* ── v1945a · ZWEI SCHALTER HALTEN DIESE SCHUBLADE, NICHT EINER ──
+           Marcel am 07.10.2026: "ja die objekte laden in der handy ansicht aber
+           das Menue bleibt weiterhin im vordergrund."
+
+           Er hat recht, und mein Pruefer hat es uebersehen: er fragte
+           `classList.contains('sb-mobile-open')` und meldete "schliesst",
+           weil die Klasse weg war. GEMESSEN wurde erst danach, was WIRKLICH
+           obenauf liegt:
+
+             app-wrap hat sb-mobile-open: false
+             #sidebar  x=0..343 bei Fenster 0..373  → verdeckt die Flaeche
+             ![121] translateX(0px) ← html[data-dp-layout][data-dpl-portfolio="auf"] #sidebar
+
+           > **In den Mappen steuert ein ATTRIBUT die Schublade, nicht die
+           > Klasse.** `data-dpl-portfolio="auf"` haelt sie offen, ganz
+           > unabhaengig von `sb-mobile-open`. Wer nur den einen Schalter
+           > umlegt, hat nichts geschlossen - und ein Pruefer, der denselben
+           > Schalter abfragt, bestaetigt ihm das auch noch.
+
+           > **Eine Klasse zu pruefen ist keine Messung der Lage.** Richtig ist
+           > die Frage, wo das Element steht und was in der Bildschirmmitte
+           > obenauf liegt. Dieselbe Lehre wie bei den Kartenstilen: Attribut
+           > gesetzt ist kein Nachweis, der Treffer zaehlt. */
         var zu = function () {
           try {
+            var html = document.documentElement;
             var aw2 = document.querySelector('.app-wrap');
-            if (!aw2 || !aw2.classList.contains('sb-mobile-open')) return;
-            aw2.classList.remove('sb-mobile-open');
+            var warOffen = (aw2 && aw2.classList.contains('sb-mobile-open'))
+                        || html.getAttribute('data-dpl-portfolio') === 'auf';
+            if (!warOffen) return;
+            if (aw2) aw2.classList.remove('sb-mobile-open');
+            /* v1945a: der zweite Schalter. In den Mappen traegt er die
+               Schublade; ohne ihn bleibt sie bei translateX(0). */
+            if (html.getAttribute('data-dpl-portfolio') === 'auf') {
+              html.setAttribute('data-dpl-portfolio', 'zu');
+            }
             var bd = document.getElementById('sb-backdrop');
             if (bd) bd.style.display = 'none';
             var hmb = document.getElementById('hdr-mobile-menu');
