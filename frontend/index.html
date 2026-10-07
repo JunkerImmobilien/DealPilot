@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1933b">
+<link rel="stylesheet" href="css/style.css?v=v1935d">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
@@ -727,8 +727,14 @@ label.dp-required.qc-required::after {
            Der Eintrag ist ausgeblendet, das Modul bleibt vollstaendig da und
            laeuft weiter ueber ?strategie in der Adresse oder
            openPortfolioStrategie(). Der Feature-Schluessel bleibt unberuehrt -
-           wer ihn nicht hat, kommt auch ueber den Link nicht hinein. -->
-      <button class="sb-act-item" type="button" data-feature="portfolio_strategie" onclick="openPortfolioStrategie()" style="display:none">
+           wer ihn nicht hat, kommt auch ueber den Link nicht hinein.
+
+           v1935d: Ausgeblendet wird ueber CSS, NICHT ueber style="display:none".
+           Gemessen am 07.10.2026: ein Skript setzt das style-Attribut dieses
+           Knopfes neu (es trug danach "border-radius: 10px !important") und hat
+           den inline gesetzten Wert dabei weggeworfen. Ein inline-Stil auf einem
+           Element, das ein fremdes Modul gestaltet, haelt nicht. -->
+      <button class="sb-act-item" type="button" data-feature="portfolio_strategie" onclick="openPortfolioStrategie()">
         <span class="sb-act-ico" data-icon="cockpit"></span><span class="sb-act-l">Portfolio-Strategie</span>
       </button>
 

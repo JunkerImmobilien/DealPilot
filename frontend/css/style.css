@@ -39174,3 +39174,28 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
     background: var(--wl-FBF6E9, #FBF6E9);
   }
 }
+
+/* ==============================================================================
+   v1935d - PORTFOLIO-STRATEGIE AUS DEN ANSICHTEN, NICHT AUS DEM PRODUKT
+
+   Marcel am 07.10.2026: "die Portfolio-Strategie kannst du erst mal aus
+   Ansichten rausnehmen. Mir waere es wichtig, wenn ich den einfach nur ueber
+   einen Link oder sowas erreichen kann. Dann verfaelscht das erst mal das Bild
+   nicht."
+
+   Der Knopf verschwindet, das Modul bleibt vollstaendig: erreichbar ueber
+   ?strategie in der Adresse (v1935c in portfolio-strategie.js) und weiterhin
+   ueber openPortfolioStrategie(). Die Feature-Sperre bleibt unberuehrt.
+
+   > Ein inline-Stil auf einem Element, das ein fremdes Modul gestaltet, haelt
+   > nicht. Der erste Versuch stand als style="display:none" im HTML; gemessen
+   > trug der Knopf danach style="border-radius: 10px !important" - ein Skript
+   > hatte das Attribut neu gesetzt und den Wert mitgenommen. Was bleiben soll,
+   > gehoert in eine Regel, nicht an das Element.
+
+   Bewusst OHNE Layout-Anker: der Eintrag soll in jeder Ansicht weg sein, nicht
+   nur in der Aktenmappe. Zum Zurueckholen reicht es, diesen Block zu loeschen.
+   ============================================================================== */
+.sb-act-item[data-feature="portfolio_strategie"] {
+  display: none !important;
+}
