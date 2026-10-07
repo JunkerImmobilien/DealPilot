@@ -8556,3 +8556,69 @@ html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-bt
 html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-btn {
   border-color: rgba(255,255,255,.35) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1930 · DIE DREI FLAECHEN, DIE DEN GRUND ZERTEILEN
+
+   Marcel am 07.10.2026: „im Hintergrund ist halt ein schwarzer Obsidian-
+   Hintergrund mit Partikeln. Der muss geaendert werden in der Farbe der
+   Aktenmappe … wenn du oben auf die Desktop-Version gehst und hinter dem
+   DealPilot-Logo die Farbe, die du dort hast. Ich will da auf jeden Fall
+   keine Animation oder sowas hinter haben."
+
+   **SEIN EIGENES BILD widerlegt die Annahme.** `Dateien/menü.png` Pixel fuer
+   Pixel ausgezaehlt (371 x 697, PNG selbst dekodiert):
+
+     rgb(14,13,11)   72,1 % der Schublade, in JEDEM der 18 Zeilenbaender
+                     der haeufigste Ton — kein Verlauf, keine Animation,
+                     kein Partikel-Canvas.
+     Kartenzone      zu 95,0 % derselbe Ton.
+
+   Und am Schreibtisch, den er als Vorbild nennt: **ebenfalls rgb(14,13,11)**,
+   zu 96,9 %. **Die Farbe, die er haben will, hat er bereits.** Es gibt hier
+   nichts umzufaerben und nichts abzuschalten.
+
+   **Was die Flaeche wirklich zerteilt, sind drei FUELLUNGEN.** Jede ist aus
+   dem Bild heraus nachgerechnet und im Browser bestaetigt:
+
+     Bildton         Element       Fuellung                  Rechnung auf 14,13,11
+     ─────────────   ───────────   ───────────────────────   ─────────────────────
+     rgb(42,36,20)   .sbc-seq      Gold #C9A84C / 15 %       -> 42,36,21   22 Stueck
+     rgb( 5, 5, 4)   .sbc-btn      Schwarz / 60–75 %         ->  5, 5, 4   44 Stueck
+     rgb(43,40,36)   .sbc-top      Rahmen 191,183,169 / 16   -> 42,40,36   22 Stueck
+
+   > **v1929a hat `border-color` angefasst und die FUELLUNGEN stehen lassen.**
+   > Ein Rahmen ist eine Linie, eine Fuellung ist eine Flaeche — die Lasche
+   > leuchtete danach unveraendert goldbraun weiter. Wer „den Rahmen leiser"
+   > macht, hat die Flaeche nicht angefasst.
+
+   > **Und die Knoepfe sind DUNKLER als ihr Grund.** `rgba(0,0,0,.6)` auf
+   > Obsidian ergibt rgb(5,5,4) — 44 schwarze Flecken auf fast-schwarz. Ein
+   > abdunkelnder Schleier braucht etwas zum Abdunkeln; auf Obsidian hat er
+   > nichts mehr und hinterlaesst nur Loecher.
+
+   Deshalb hier: die Fuellungen an den Grund heranziehen, die Formen behalten.
+   Die Lasche bleibt als Flaeche erkennbar (sie ist das Merkmal des
+   Aktenreiters), die Knoepfe tragen ihr Rahmen aus v1929a allein.
+   ══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* Die Lasche: statt Gold/15 % ein neutrales Creme/8 % -> rgb(28,27,24).
+     Doppelte Klasse, weil die gewinnende Regel sie auch fuehrt (Spezifitaet 142). */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-seq.sbc-seq {
+    background: color-mix(in srgb, #BFB7A9 8%, transparent) !important;
+  }
+
+  /* Die Knoepfe: der abdunkelnde Schleier faellt weg. Sichtbar bleiben sie
+     ueber den Rahmen rgba(255,255,255,.35) aus v1929a. */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-btn {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  /* Der Kartenkopf: der Strich aus v1929a war mit .16 noch der hellste der
+     drei Stoertoene. Auf .10 -> rgb(32,30,27). */
+  html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-top {
+    border-color: rgba(191,183,169,.10) !important;
+  }
+}
