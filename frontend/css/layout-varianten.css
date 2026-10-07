@@ -8516,3 +8516,43 @@ html[data-dp-layout][data-dp-layout] .sb-card .sbc-seq {
 html[data-dp-layout][data-dp-layout] .sb-card .sbc-btn {
   border-color: rgba(255,255,255,.35) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1929a · DIESELBEN DREI RAHMEN, DIESMAL MIT GENUG SPEZIFITAET
+
+   Von den drei Regeln aus v1929 hat **eine** gewirkt (die Knöpfe), zwei nicht.
+   Mit dem Kaskaden-Walker an `.sbc-top` gemessen:
+
+     ! [ 40] html[data-dp-layout][data-dp-layout] .sb-card .sbc-top   (meine)
+     ! [130] html[data-dp-layout] aside#sidebar .sb-card .sbc-top     -> var(--wl-8a7332)
+
+   **Der ID-Anker `aside#sidebar` bringt allein 100 Punkte.** Meine doppelte
+   Attributangabe bringt 20 — das reicht gegen eine Klassenkette, nicht gegen
+   eine ID.
+
+   > **Eine ID in der Kette schlägt jede Zahl von Attributen und Klassen.** Wer
+   > sie überstimmen will, muss sie selbst mitführen; sonst zählt man Zehner
+   > gegen einen Hunderter.
+
+   Das ist heute das dritte Mal, dass eine Regel von mir „geladen und wirkungslos"
+   war (v1914a Tour/Feedback, v1922 Reiter, jetzt hier). **Konsequenz für den
+   Rest dieser Datei: vor jeder neuen Farbregel auf Kartenteile erst den Walker,
+   dann schreiben.**
+
+   Zwei Ketten, weil die Karten an zwei Orten stehen: in der Schublade unter
+   `aside#sidebar` (dort braucht es die ID) und in der Schiene unter
+   `.dpl-schiene` (dort greift die ID-Regel gar nicht erst).
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-top,
+html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-top {
+  border-color: rgba(191,183,169,.16) !important;
+}
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-seq,
+html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-seq {
+  border-color: rgba(191,183,169,.24) !important;
+}
+html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-card .sbc-btn,
+html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-btn {
+  border-color: rgba(255,255,255,.35) !important;
+}
