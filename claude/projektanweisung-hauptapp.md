@@ -31914,6 +31914,114 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (83) 07.10.2026 — v1951/v1951a: die Lage stand im Datensatz und nie im Prompt
+
+**Marcel:** „Es wäre super, wenn wir diese gesamte Heuristik da unten noch mal überdenken,
+vielleicht auch das direkt an unseren OpenAI-Dienst schicken, auch unser Projektwissen mit
+übernehmen" — Makro-/Mikrolage und Schnittstellen inbegriffen. Das war nach v1946 als eigenes
+Paket liegen geblieben.
+
+#### A · Der Befund: ein Feldname, der nur im Testdatensatz existiert
+
+Der Prompt in `routes/ai.js` las:
+
+```js
++ (avm.scoreLocation != null ? ', Lage ' + avm.scoreLocation + '/10' : '')
+```
+
+**`scoreLocation` gibt es nur an EINER Stelle im ganzen Haus** — im Testdatensatz
+`quickcheck-app.html:4496`. Der echte Eintrag des DealPilot-Bewertungswegs trägt
+`scoreMacro` und `scoreMicro` (dort gesetzt aus `d.macro/10` und `d.micro/10`).
+
+> **Die Lage-Zeile ist damit praktisch nie entstanden — und drei Zeilen weiter verbot der
+> Prompt, etwas über die Lage zu sagen.** Beides zusammen heißt: die KI DURFTE nichts zur Lage
+> sagen und HÄTTE auch nichts gewusst. Genau der Eindruck, den Marcel als „überhaupt nicht
+> plausibel" beschrieben hat.
+
+> **Es fehlte kein Feld.** Der Quick-Check schickt `_avmResults[0]` **komplett**
+> (`quickcheck-app.html:5625`); Makro, Mikro, Marktmiete und Wertentwicklung lagen die ganze
+> Zeit im Datensatz. Es wurde das falsche gelesen. **Ein Feldname, der nur im Testdatensatz
+> existiert, fällt beim Gegenlesen nicht auf — er sieht richtig aus und trifft nie.** Dieselbe
+> Sorte Fehler wie `#app` bei v1147: ein plausibler Anker ohne Treffer.
+
+#### B · Was jetzt im Prompt steht
+
+```
+Marktdaten eines unabhaengigen Bewertungspartners:
+- Marktwert: 230.000 EUR
+- Marktmiete: 850 EUR/Monat
+- Makrolage (Stadt/Region): 6.5 von 10
+- Mikrolage (Stadtteil, Umfeld): 7.1 von 10
+- Wertentwicklung: 1.8 % pro Jahr
+
+Marktzins zum Vergleich: 3.81 % fuer Zinsbindung 5 bis 10 Jahre
+                         (Quelle: Deutsche Bundesbank, Stand 08.2026)
+```
+
+**Die Einheit steht ausgeschrieben, weil der Feldname lügt:** `marktmieteCold` ist die
+MONATSmiete, nicht EUR/m². Wer das annimmt, baut einen Faktor-165-Fehler ein.
+
+**Der Zins kommt serverseitig** — er ist eine Tatsachenbehauptung im Bericht, und was der Client
+schickt, kann er erfunden haben. Genommen wird `getCurrentRates()`, **nicht**
+`getMarketContext()`: letzteres liefert EZB-LEITZINSEN (MRR, EURIBOR 3M), und das ist nicht
+der Satz, zu dem jemand ein Haus finanziert. `getCurrentRates()` führt die vier
+Zinsbindungs-Körbe der Bundesbank.
+
+> **Fällt die Quelle aus, fällt die Zeile weg.** `fallback_used` nennt die Körbe, die auf den
+> statischen Wert zurückgefallen sind; steht der benutzte Korb darin, kommt kein Satz in den
+> Prompt. **Ein statischer Wert von Februar 2026, als „aktueller Marktzins" angekündigt, wäre
+> eine Behauptung** — und ein Notnagel, der den Ausfall zudeckt, ist schlimmer als die Lücke.
+
+**Das Lage-Verbot bleibt, wird aber zur Grundlage:** steht die Lage oben, darf sie eingeordnet
+werden — „ohne eigene Note daraus zu machen". Dazu ein neues Verbot: der Marktzins ist ein
+Vergleichswert, **keine Finanzierungsempfehlung**.
+
+#### C · Drei Dinge, die erst der echte Lauf gezeigt hat
+
+> **1 · `marketRatesService` war in `ai.js` nicht eingebunden.** Ohne die `require`-Zeile wäre
+> der Aufruf ein ReferenceError **zur Laufzeit** gewesen — `node --check` findet das nicht,
+> die Syntax stimmt. Vor dem Benutzen einer Abhängigkeit prüfen, ob sie in DIESER Datei steht.
+
+> **2 · `mr.asOf` ist ein `Date`-Objekt.** Direkt verkettet hätte im deutschen Prompt
+> gestanden: „Stand Sat Aug 01 2026 00:00:00 GMT+0000 (Coordinated Universal Time)". Im
+> Container gemessen, nicht geraten. Jetzt MM.JJJJ — die Bundesbank-Statistik ist monatlich und
+> läuft dem Stichtag zwei Monate nach (gemessen: Stand 08.2026), ein Tagesdatum wäre genauer,
+> als die Zahl ist.
+
+> **3 · `getMonth()` rechnet in ORTSZEIT.** Ein UTC-Zeitstempel am Monatsende kippt dadurch in
+> den Folgemonat: 31.12. 23:00 UTC wurde unter CET zu **01.2027**. Jetzt `getUTCMonth()`.
+> **Der Server läuft auf UTC, ein Entwicklerrechner nicht** — der Fehler wäre nur auf dem Server
+> aufgefallen, und dort sieht niemand hin. Gefunden, weil meine Probe einen Grenzfall
+> mitgeführt hat, den ich zuerst für einen Prüferfehler hielt.
+
+#### D · Nachweis
+
+Der Prompt ist mit dem **echten** Handler gelesen worden, nicht mit einem Nachbau: Routenmodul
+geladen, Handler aus dem express-Stack geholt (3 Schichten, der letzte), `callOpenAI` vorher
+ersetzt — **kein OpenAI-Aufruf, keine Kosten**, und der gebaute Prompt sichtbar.
+
+```
+Handler gefunden (von 3 Schichten der letzte) · HTTP 200
+
+ok  Makrolage          ok  Marktzins mit Korb       ok  Lage darf eingeordnet werden
+ok  Mikrolage          ok  Quelle genannt           ok  Zins ist keine Empfehlung
+ok  Marktwert          ok  Stand als MM.JJJJ        ok  Urteil gilt weiter
+ok  Marktmiete/Monat   ok  kein englisches Datum    ok  Wertentwicklung
+
+ALLE 12 KETTENPROBEN GRUEN
+```
+
+Die Nutzlast der Probe ist genau die Form, die der Quick-Check schickt — **ohne**
+`scoreLocation`, weil es die im Echtbetrieb nicht gibt. Eine Probe mit dem Testfeld hätte
+den Fehler nicht gefunden.
+
+**Kleinigkeit, bewusst nicht nachgebaut:** der leere erste Eintrag des Marktdaten-Blocks wird
+von `.filter(Boolean)` entfernt, die gewünschte Leerzeile davor entsteht also nicht. Der
+Prompt ist dadurch dichter, nicht falsch — nicht wert, dafür ein Image neu zu bauen.
+
+**Staging: `1108ade8`, Backend neu gebaut, healthy. Prod noch nicht** — eine Änderung am
+KI-Prompt ändert, was zahlende Nutzer zu lesen bekommen.
+
 ### (82) 07.10.2026 — Prod-Rollout v1948 bis v1950a
 
 **Marcel: „ja rollout."** Prod und Staging sind wieder gleichauf.
