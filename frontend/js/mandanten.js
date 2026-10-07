@@ -642,7 +642,21 @@
           var d = o.data || o;
           var eingefroren = !!((d.ueberf_ende || '').toString().trim());
           var name = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || o.seq_no || 'Objekt';
-          var kpN = parseFloat(String(d.kp || '').replace(/[^0-9.,-]/g, '').replace(/./g, '').replace(',', '.'));
+          /* v1962: hier stand `.replace(/./g, '')` - der Punkt im
+             regulaeren Ausdruck war NICHT MASKIERT und trifft damit jedes
+             Zeichen. Die Zeichenkette war danach leer, `parseFloat` gab
+             NaN, `isFinite` war falsch - und der Kaufpreis erschien in
+             der Mandantenliste NIE. Gemessen am 07.10.2026 mit "180000",
+             "180.000" und "1.234,56": dreimal NaN.
+
+             Gefunden beim Aufraeumen desselben Fehlerbildes im
+             Marktbericht-Mapper (v1962, Faktor 100). Dieselbe Regel gilt
+             hier: Komma -> deutsche Schreibweise, reine Dreiergruppen ->
+             Tausendertrenner, sonst ist der Punkt das Dezimalzeichen. */
+          var kpRoh = String(d.kp == null ? '' : d.kp).trim().replace(/[^0-9.,-]/g, '');
+          if (kpRoh.indexOf(',') >= 0) kpRoh = kpRoh.replace(/\./g, '').replace(',', '.');
+          else if (/^-?\d{1,3}(\.\d{3})+$/.test(kpRoh)) kpRoh = kpRoh.replace(/\./g, '');
+          var kpN = parseFloat(kpRoh);
           var kp = isFinite(kpN) && kpN ? (' · ' + Math.round(kpN).toLocaleString('de-DE') + ' €') : '';
           return '<div style="padding:2px 0">'
             + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:10.5px;color:#8a8378">' + esc(o.seq_no || '') + '</span> '
