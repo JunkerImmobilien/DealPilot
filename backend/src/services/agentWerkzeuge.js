@@ -2048,6 +2048,18 @@ async function objekt_schnellblick(ctx, args) {
   } else {
     /* ── 2 · DIE KENNZAHLEN UND DIE HEURISTIK — immer, wenn sie gehen ── */
     const bwkQuote = (K && K.nkm_j > 0) ? (K.bwk / K.nkm_j * 100) : null;
+    /* ── v1938 · EINE LISTE FUER ALLE ANZEIGEN ───────────────────────────
+     * Welche Groesse an diesem Objekt gar nicht anwendbar ist, steht
+     * EINMAL da — und sowohl die Ampel als auch die fuenf Kategorien lesen
+     * sie. Gemessen an der Sachsenstr. 18: solange die beiden ihre eigene
+     * Fallunterscheidung fuehrten, sagte die Ampel „entfaellt" und die
+     * Kategorie zwei Zeilen darunter „LTV 0 %". */
+    const nichtAnwendbar = {
+      dscr: (darlehen > 0) ? null : 'ohne Kapitaldienst gibt es keinen Deckungsgrad',
+      ltv: (darlehen > 0) ? null : 'am Objekt ist kein Darlehen hinterlegt',
+      bwk: bwkDa ? null : 'am Objekt ist keine Bewirtschaftung hinterlegt',
+      ekr: (ek > 0) ? null : 'ohne eingesetztes Eigenkapital nicht berechenbar'
+    };
     const H = K ? rechenkerne.heuristik({
       score: score, kp: kp, nkm: nkm + ze,
       bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
@@ -2122,17 +2134,11 @@ async function objekt_schnellblick(ctx, args) {
         rechenkerne.stufe(score).farbe) : undefined,
       kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
-          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
-        {
-          dscr: (darlehen > 0) ? null : 'ohne Kapitaldienst gibt es keinen Deckungsgrad',
-          ltv: (darlehen > 0) ? null : 'am Objekt ist kein Darlehen hinterlegt',
-          bwk: bwkDa ? null : 'am Objekt ist keine Bewirtschaftung hinterlegt',
-          ekr: (ek > 0) ? null : 'ohne eingesetztes Eigenkapital nicht berechenbar'
-        }) : undefined,
+          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 }, nichtAnwendbar) : undefined,
       kategorien: K ? rechenkerne.heuristikTeil('kategorien',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
-        teilnotenRoh) : undefined,
+        teilnotenRoh, nichtAnwendbar) : undefined,
       empfehlung: H && H.empfehlung ? H.empfehlung.verdict : null,
       empfehlung_text: H && H.empfehlung ? H.empfehlung.text : null,
       einschaetzung: H ? H.einschaetzung : undefined,

@@ -304,8 +304,27 @@ window.QcHeuristik = (function () {
    * Woertlich die Rechenwege aus `_setQcCat()` (quick-check.js Z. 716-745).
    * Die PUNKTE kommen von `DealScore.computeFromKpis()` und werden
    * uebergeben — hier wird nichts nachgerechnet. */
-  function kategorien(d, punkte) {
+  function kategorien(d, punkte, nichtAnwendbar) {
     var p = punkte || {};
+    /* ── v1938 · DIESELBE NULL, ZWEITES MAL ────────────────────────────
+     *
+     * GEMESSEN am 07.10.2026 an der Sachsenstr. 18: die Ampel sagte
+     * „entfaellt — am Objekt ist kein Darlehen hinterlegt", und zwei
+     * Zeilen darunter stand in derselben Antwort „Finanzierung: LTV 0 %".
+     *
+     * Das ist derselbe Fehler, der in v1927a an den `kennzahlen` behoben
+     * wurde — nur eine Ebene weiter. Beim Verschieben des Codes ist die
+     * Beziehung „diese Zahl gilt nur unter dieser Bedingung" nicht
+     * mitgewandert.
+     *
+     *   > Ein Befund ist erst behoben, wenn er an JEDER Stelle behoben
+     *   > ist, die dieselbe Zahl anzeigt. Sonst widerspricht sich die
+     *   > Antwort selbst — und die falsche Haelfte sieht genauso
+     *   > sorgfaeltig aus wie die richtige.
+     *
+     * Die Liste der nicht anwendbaren Groessen ist deshalb DIESELBE, die
+     * `kennzahlenAmpel()` bekommt, und wird vom Aufrufer einmal gebildet. */
+    var na = nichtAnwendbar || {};
     /* Ohne Punkte bleibt der RECHENWEG trotzdem stehen — er haengt an den
        Kennzahlen, nicht am Score. Das ist der Fall, wenn ein gespeicherter
        Score gilt: dann hat hier keine Rechnung stattgefunden, und eine
@@ -321,26 +340,33 @@ window.QcHeuristik = (function () {
         wert: zwei(d.bmr) + ' % BMR · ' + zwei(d.nmr) + ' % NMR',
         rechenweg: 'Bruttomietrendite ' + zwei(d.bmr) + ' % (Skala 3 % = 0, 7 % = 100, Gewicht 40 %) · '
           + 'Nettomietrendite ' + zwei(d.nmr) + ' % (Skala 1 % = 0, 5 % = 100, Gewicht 40 %) · '
-          + 'Eigenkapitalrendite ' + zwei(d.ekr) + ' % (Skala 0 % = 0, 12 % = 100, Gewicht 20 %)' },
+          + 'Eigenkapitalrendite ' + (na.ekr ? ('entfällt — ' + na.ekr)
+              : (zwei(d.ekr) + ' % (Skala 0 % = 0, 12 % = 100, Gewicht 20 %)')) },
       { id: 'cashflow', was: 'Cashflow', punkte: pz(p.cashflow),
         wert: (cf >= 0 ? '+' : '') + Math.round(cf).toLocaleString('de-DE') + ' €/Mon',
         rechenweg: 'Cashflow vor Steuern ' + (cf >= 0 ? '+' : '') + Math.round(cf).toLocaleString('de-DE')
           + ' €/Monat · Skala −200 €/Mon = 0 Pkt, +300 €/Mon = 100 Pkt (linear) · '
           + 'Formel: NKM − Annuität − BWK_NUL/12' },
-      { id: 'sicherheit', was: 'Sicherheit', punkte: pz(p.risiko),
-        wert: 'DSCR ' + (d.dscr ? zwei(d.dscr) : '–'),
-        rechenweg: 'DSCR ' + (d.dscr ? zwei(d.dscr) : '–') + ' · Skala 0,9 = 0 Pkt, 1,5 = 100 Pkt · '
-          + 'Formel: (NKM × 12 − BWK_NUL) / Annuität · Faustregel Bank: ab 1,2 guter Deckungsgrad' },
-      { id: 'finanzierung', was: 'Finanzierung', punkte: pz(p.ltv),
-        wert: 'LTV ' + (+d.ltv || 0).toFixed(0) + ' %',
-        rechenweg: 'Loan-to-Value ' + (+d.ltv || 0).toFixed(0) + ' % · Stufen: ab 100 % → 30 Pkt '
-          + '(kein Eigenkapital eingesetzt = riskant), ab 90 % → 60 Pkt, ab 80 % → 80 Pkt, '
-          + 'unter 80 % → 90 Pkt' },
-      { id: 'bewirt', was: 'Effizienz', punkte: pz(p.potenzial),
-        wert: (+d.bewirtPctNkm || 0).toFixed(0) + ' % der NKM',
-        rechenweg: 'Bewirtschaftungskosten ' + (+d.bewirtPctNkm || 0).toFixed(0) + ' % der Nettokaltmiete · '
-          + 'Skala 18 % = 100 Pkt, 40 % = 30 Pkt (linear dazwischen) · IVD-Empfehlung ETW 18–35 % · '
-          + 'Formel: (BWK_NUL + BWK_UL) / NKM_jährlich × 100' }
+      { id: 'sicherheit', was: 'Sicherheit', punkte: na.dscr ? '–' : pz(p.risiko),
+        wert: na.dscr ? ('entfällt — ' + na.dscr) : ('DSCR ' + (d.dscr ? zwei(d.dscr) : '–')),
+        rechenweg: na.dscr
+          ? ('Ohne Kapitaldienst gibt es keinen Deckungsgrad — ' + na.dscr)
+          : ('DSCR ' + (d.dscr ? zwei(d.dscr) : '–') + ' · Skala 0,9 = 0 Pkt, 1,5 = 100 Pkt · '
+            + 'Formel: (NKM × 12 − BWK_NUL) / Annuität · Faustregel Bank: ab 1,2 guter Deckungsgrad') },
+      { id: 'finanzierung', was: 'Finanzierung', punkte: na.ltv ? '–' : pz(p.ltv),
+        wert: na.ltv ? ('entfällt — ' + na.ltv) : ('LTV ' + (+d.ltv || 0).toFixed(0) + ' %'),
+        rechenweg: na.ltv
+          ? ('Ohne Darlehen gibt es kein Loan-to-Value — ' + na.ltv)
+          : ('Loan-to-Value ' + (+d.ltv || 0).toFixed(0) + ' % · Stufen: ab 100 % → 30 Pkt '
+            + '(kein Eigenkapital eingesetzt = riskant), ab 90 % → 60 Pkt, ab 80 % → 80 Pkt, '
+            + 'unter 80 % → 90 Pkt') },
+      { id: 'bewirt', was: 'Effizienz', punkte: na.bwk ? '–' : pz(p.potenzial),
+        wert: na.bwk ? ('entfällt — ' + na.bwk) : ((+d.bewirtPctNkm || 0).toFixed(0) + ' % der NKM'),
+        rechenweg: na.bwk
+          ? ('Ohne hinterlegte Bewirtschaftung gibt es keine Quote — ' + na.bwk)
+          : ('Bewirtschaftungskosten ' + (+d.bewirtPctNkm || 0).toFixed(0) + ' % der Nettokaltmiete · '
+            + 'Skala 18 % = 100 Pkt, 40 % = 30 Pkt (linear dazwischen) · IVD-Empfehlung ETW 18–35 % · '
+            + 'Formel: (BWK_NUL + BWK_UL) / NKM_jährlich × 100') }
     ];
   }
 
