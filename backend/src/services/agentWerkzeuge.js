@@ -1549,9 +1549,18 @@ async function _marktpreisIndikation(userId, objektId, d, kp) {
         : ('kein Abschlag — ' + bereinigt.grund),
       marktwert: eur(basis),
       unterschied: (diff >= 0 ? '+' : '-') + eur(Math.abs(diff)),
-      kaufpreis_zu_marktwert: diff >= 0
-        ? 'Kaufpreis liegt ' + pct(Math.abs(q)) + ' UEBER dem Marktwert'
-        : 'Kaufpreis liegt ' + pct(Math.abs(q)) + ' UNTER dem Marktwert',
+      /* ── v1939b · DIE ZAHL TRAEGT IHREN ABSCHLAG SELBST ──────────────
+       * GEMESSEN am ersten echten Lauf: die KI schrieb „35,6 % ueber dem
+       * Marktwert" und liess den Abschlag weg — obwohl der Prompt ihn
+       * ausdruecklich verlangt. Das Werkzeugschema schlaegt den Prompt:
+       * was woertlich so heissen soll, gehoert als fertiger Wert ins
+       * Ergebnis, nicht als Bitte an das Modell. */
+      kaufpreis_zu_marktwert: 'Kaufpreis liegt ' + pct(Math.abs(q))
+        + (diff >= 0 ? ' UEBER' : ' UNTER') + ' dem Marktwert'
+        + (bereinigt.abschlag_pct > 0
+            ? ' (nach ' + pct(bereinigt.abschlag_pct) + ' Angebotsabschlag auf '
+              + eur(bereinigt.roh) + ' — eine Annahme, keine Messung)'
+            : ''),
       grundlage: leitquelle
         ? (leitquelle.herkunft + (leitquelle.stand ? ', Stand ' + leitquelle.stand : ''))
         : null,
