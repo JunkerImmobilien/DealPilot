@@ -2,22 +2,30 @@
    score-ketten-pruefen.mjs   (v1950)
 
    WOZU: CLAUDE.md sagt „Die Kette steht an EINER Stelle: js/score-tiers.js".
-   Tatsaechlich gibt es drei Kopien, und zwei davon MUESSEN es bleiben:
+   Tatsaechlich gibt es VIER Kopien, und drei davon MUESSEN es bleiben:
 
      frontend/js/score-tiers.js            die Quelle (Haupt-App, Quick-Check)
      frontend/marktbericht-app/app.js      eigenes Dokument, Rueckfall fuers PDF
      backend/src/services/
        telegramDialogService.js            eigenes Image ohne frontend/
+     marktbericht/frontend/app.js          statische Wurzel des mb-Backends;
+                                           heute von aussen NICHT erreichbar,
+                                           aber im Image und hinter
+                                           express.static - sie wird live,
+                                           sobald jemand dorthin routet
 
    Das Backend-Image kopiert `frontend/` NICHT (backend/Dockerfile holt nur
    src, templates, migrations, seed-data, scripts). Ein gemeinsames Modul zur
-   Laufzeit gibt es ohne Bauschritt also nicht. **Zwei Kopien sind erlaubt,
+   Laufzeit gibt es ohne Bauschritt also nicht. **Kopien sind erlaubt,
    solange sie nachweisbar gleich sind** - und das ist der Zweck hier.
 
    WIE: jede Kette wird aus ihrer ECHTEN Datei geholt, nicht nachgebaut.
    - score-tiers.js wird geladen (es exportiert seit v1950 auch nach node)
-   - die beiden anderen Funktionen werden als QUELLTEXT ausgeschnitten und
+   - die drei anderen Funktionen werden als QUELLTEXT ausgeschnitten und
      ausgefuehrt; der Schnitt wird gezaehlt, ein Fehlschnitt bricht ab.
+     Gemessen wird jeweils der RUECKFALL, also der Pfad ohne
+     window.ScoreTier - der Pfad MIT der Kette ist trivial richtig, der
+     ohne sie ist der, der im PDF auch ohne das Blatt drucken muss.
 
    Der Lauf nennt seine DECKUNG. Ein Pruefer, der nicht sagt, wie viel er
    gemessen hat, kann gruen werden, ohne etwas angesehen zu haben - so hat
@@ -53,7 +61,23 @@ vm.createContext(mbCtx);
 vm.runInContext(mbTreffer[0] + '; this.__f = _scoreTier;', mbCtx);
 const mbStufe = mbCtx.__f;
 
-/* ── Quelle 3 · stufeZu aus dem Telegram-Dienst ──────────────────────── */
+/* ── Quelle 3 · _scoreTier aus der statischen mb-Wurzel ──────────────── */
+/* Dieselbe Funktion, andere Datei. Sie wird heute von aussen nicht
+   ausgeliefert (gemessen: jeder Pfad faellt auf die index.html durch),
+   steht aber im mb-Backend-Image hinter express.static. Deshalb wird sie
+   mitgeprueft statt mitgeschleppt. */
+const mbAltQuelle = fs.readFileSync(new URL('../marktbericht/frontend/app.js', import.meta.url), 'utf8');
+const mbAltTreffer = mbAltQuelle.match(/function _scoreTier\(s\)\s*\{[\s\S]*?\n\}/g) || [];
+if (mbAltTreffer.length !== 1) {
+  console.error(rot('ABBRUCH: _scoreTier in marktbericht/frontend/app.js ' + mbAltTreffer.length + 'x gefunden, erwartet 1x.'));
+  process.exit(1);
+}
+const mbAltCtx = { window: undefined };
+vm.createContext(mbAltCtx);
+vm.runInContext(mbAltTreffer[0] + '; this.__f = _scoreTier;', mbAltCtx);
+const mbAltStufe = mbAltCtx.__f;
+
+/* ── Quelle 4 · stufeZu aus dem Telegram-Dienst ──────────────────────── */
 /* Die Datei verlangt ../db/pool und ./openaiService - ein require wuerde
    eine Datenbankverbindung aufbauen. Deshalb nur die Funktion, ebenfalls
    ausgeschnitten und gezaehlt. */
@@ -75,9 +99,11 @@ const abw = [];
 for (let s = 0; s <= 100; s++) {
   const soll = ScoreTier.stufe(s);
   const mb = mbStufe(s);
+  const mbAlt = mbAltStufe(s);
   const bot = botStufe(s);
   gemessen++;
   if (mb !== soll.wort) { fehler++; abw.push('  Score ' + s + ': Marktbericht "' + mb + '" statt "' + soll.wort + '"'); }
+  if (mbAlt !== soll.wort) { fehler++; abw.push('  Score ' + s + ': mb-Wurzel "' + mbAlt + '" statt "' + soll.wort + '"'); }
   if (bot !== soll.versal) { fehler++; abw.push('  Score ' + s + ': Bot "' + bot + '" statt "' + soll.versal + '"'); }
 }
 
@@ -86,9 +112,10 @@ for (let s = 0; s <= 100; s++) {
 const grenzen = [-1, 0, 34, 34.9, 35, 49.9, 50, 69.9, 70, 84.9, 85, 100, 101];
 for (const s of grenzen) {
   const soll = ScoreTier.stufe(s);
-  const mb = mbStufe(s), bot = botStufe(s);
+  const mb = mbStufe(s), mbAlt = mbAltStufe(s), bot = botStufe(s);
   gemessen++;
   if (s >= 0 && mb !== soll.wort) { fehler++; abw.push('  Grenze ' + s + ': Marktbericht "' + mb + '" statt "' + soll.wort + '"'); }
+  if (s >= 0 && mbAlt !== soll.wort) { fehler++; abw.push('  Grenze ' + s + ': mb-Wurzel "' + mbAlt + '" statt "' + soll.wort + '"'); }
   if (s >= 0 && bot !== soll.versal) { fehler++; abw.push('  Grenze ' + s + ': Bot "' + bot + '" statt "' + soll.versal + '"'); }
 }
 
@@ -99,7 +126,7 @@ if (leerSoll !== '–') { fehler++; abw.push('  score-tiers.js: stufe(null) ergi
 if (botStufe(null) !== null) { fehler++; abw.push('  Bot: stufeZu(null) ergibt "' + botStufe(null) + '", erwartet null'); }
 
 console.log('');
-console.log('Quellen: 3 (score-tiers.js, marktbericht-app/app.js, telegramDialogService.js)');
+console.log('Quellen: 4 (score-tiers.js, marktbericht-app/app.js, marktbericht/frontend/app.js, telegramDialogService.js)');
 console.log('DECKUNG: ' + gemessen + ' Vergleichspunkte (0..100 plus 13 Grenzen plus Abwesenheit)');
 console.log('');
 console.log('Die Kette aus score-tiers.js:');
@@ -115,4 +142,4 @@ if (fehler) {
   if (abw.length > 20) console.log('  … und ' + (abw.length - 20) + ' weitere');
   process.exit(1);
 }
-console.log(gruen('ALLE DREI KETTEN GLEICH (' + gemessen + ' Punkte)'));
+console.log(gruen('ALLE VIER KETTEN GLEICH (' + gemessen + ' Punkte)'));

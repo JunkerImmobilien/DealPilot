@@ -383,7 +383,33 @@ function confInfo(c) {
 // DealPilot-Statuslogik (aus Design-Handoff): >=70 gruen, 50-69 gold, <50 rot.
 const DP_GREEN = '#3FA56C', DP_GOLD = '#C9A84C', DP_RED = '#B86250';
 function _scoreCol(s) { s = s || 0; return s >= 70 ? DP_GREEN : s >= 50 ? DP_GOLD : DP_RED; }
-function _scoreTier(s) { s = s || 0; return s >= 85 ? 'Top' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : 'Schwach'; }
+/* v1950 · DIESE FASSUNG IST HEUTE NICHT ERREICHBAR - UND WIRD TROTZDEM
+   NACHGEZOGEN.
+
+   Gemessen am 07.10.2026: die Datei liegt im mb-Backend-Image und wird
+   dort von `express.static(FRONTEND_DIR)` unter `/` ausgeliefert, aber
+   der Caddyfile routet nichts auf diese Wurzel - jeder aeussere Pfad
+   (`/marktbericht/app.js`, `/mb/app.js`, `/app.js`) faellt auf die
+   index.html der Haupt-App durch (330 kB, derselbe Durchfall, der schon
+   einmal ein "200" wie einen Nachweis aussehen liess). Die LEBENDE
+   Marktbericht-App ist `frontend/marktbericht-app/app.js`.
+
+   > Eine Leiche hinter `express.static` ist keine Leiche, sondern eine
+   > Zeitbombe: sie wird live in der Sekunde, in der jemand eine Route auf
+   > die mb-Wurzel legt. Loeschen waere riskanter als nachziehen - das
+   > Verzeichnis ist das statische Wurzelverzeichnis eines laufenden
+   > Dienstes. Also traegt sie dieselbe Kette wie alle anderen, und der
+   > Pruefer `tools/score-ketten-pruefen.mjs` haelt sie ab jetzt fest.
+
+   Sie fuehrte VIER Stufen (kein KRITISCH) und "Top" statt "Sehr gut" -
+   zwei Abweichungen auf einmal. */
+function _scoreTier(s) {
+  if (typeof window !== 'undefined' && window.ScoreTier && typeof window.ScoreTier.stufe === 'function') {
+    return window.ScoreTier.stufe(s).wort;
+  }
+  s = s || 0;
+  return s >= 85 ? 'Sehr gut' : s >= 70 ? 'Gut' : s >= 50 ? 'Solide' : s >= 35 ? 'Schwach' : 'Kritisch';
+}
 function _kiRaet(s) { s = s || 0; return s >= 85 ? 'Aktiv ausbauen' : s >= 70 ? 'Kauf erwägen' : s >= 50 ? 'Genau prüfen' : 'Zurückhaltung'; }
 // Donut-Ring im DealPilot-Stil: dicker Ring, tier-farbig, Score gross, Tier-Pille unten.
 function svgDonut(score) {
@@ -444,7 +470,14 @@ function renderScore(d) {
   const box = document.querySelector('.scorebox');
   if (!box) return;
   const s = ds.score || 0, col = _scoreCol(s);
-  const ratingText = ds.rating || _scoreTier(s);
+  /* v1950: hier stand `ds.rating || _scoreTier(s)`. Genau das hat v1203
+     in der lebenden Fassung entfernt: `ds.rating` kommt vom mb-Backend
+     (ScoringService) mit einem eigenen Wortschatz - "Sehr attraktiv /
+     Attraktiv / Durchschnittlich / Unterdurchschnittlich" -, waehrend der
+     Ring daneben IMMER _scoreTier zeichnet. Am selben Score standen dann
+     zwei verschiedene Worte. Das Feld bleibt im Datensatz, es wird nur
+     nicht angezeigt. */
+  const ratingText = _scoreTier(s);
   box.innerHTML = `
     <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;width:100%;">
       ${svgDonut(ds.score)}
