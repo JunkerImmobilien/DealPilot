@@ -21204,9 +21204,25 @@ body.qc-standalone-active #s-quick::before {
   font-size: 12.5px;
 }
 /* Die Pflichtzahl traegt die Markenfarbe, die freiwilligen nicht -
-   so sieht man ohne Erklaerung, worauf es ankommt. */
+   so sieht man ohne Erklaerung, worauf es ankommt.
+
+   v1957a - WARUM HIER !important STEHT, OBWOHL DIE SPEZIFITAET REICHT:
+   gemessen am 07.10.2026 greift die Regel (font-weight:600 kommt an),
+   nur border-color nicht. Der Grund ist 2400 Zeilen weiter unten:
+
+     .set-modal-v2 input[type="number"], ... {
+       border: 1px solid var(--border) !important;
+     }
+
+   Eine KURZSCHRIFT mit !important. Sie schlaegt eine Einzeleigenschaft
+   ohne !important unabhaengig von der Spezifitaet - und sie schlaegt
+   sogar einen INLINE gesetzten Wert ohne !important. Genau das hat die
+   Fehlersuche gekostet: der Inline-Versuch im Browser blieb grau, was
+   zuerst wie ein ungueltiges color-mix() aussah. Auf einem frischen
+   Element lieferte dasselbe color-mix() sauber
+   color(srgb 0.788 0.659 0.298 / 0.55). */
 .set-modal-v2 input.ip-lage-f[data-f="ziel_bmr"] {
-  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
   font-weight: 600;
 }
 @media (max-width: 760px) {
