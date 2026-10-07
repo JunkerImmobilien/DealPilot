@@ -4465,17 +4465,35 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-nutzer{
    Die Statusflächen (grün für Auto-Save und Vollständigkeit) bleiben:
    CLAUDE.md sagt, Statusfarben werden nicht tokenisiert und nicht
    umgefärbt. Es geht nur um die NEUTRALEN Flächen. */
+/* ── v1932a · DIESELBEN ZWEI TEXTE, JETZT GEGEN SPEZIFITAET 223 ──────────
+
+   Nach v1932 waren 14 von 16 Texten im Kopf lesbar — zwei standen bei
+   **1,57:1**: `#hdr-obj-num` und `#tabs-status-text`. Beide hatte ich in v1932
+   benannt, beide wirkten nicht. Der Walker:
+
+     ![ 223] rgb(191,183,169)  ← html[data-dp-layout] body:has(#sb-user) header.hdr #hdr-obj-num
+     ![ 143] rgb( 90, 83, 71)  ← meine Regel aus v1932
+
+   > **`:has()` erbt die Spezifitaet seines staerksten Arguments.**
+   > `body:has(#sb-user)` bringt allein 100 Punkte, die zweite ID nochmal 100.
+   > Gegen 223 kommt man mit Attributen und Klassen nicht an — man muss
+   > dieselbe Form fuehren oder, wie hier, an die Quelle gehen.
+
+   Die Flaechen bleiben transparent und die Raender bleiben — geaendert wird
+   nur die Tinte, die fuer den dunklen Kopf gemacht war. Die gruenen
+   Statusflaechen unten sind ausdruecklich NICHT betroffen (CLAUDE.md:
+   Statusfarben werden nicht umgefaerbt). */
 html[data-dp-layout] body:has(#sb-user) header.hdr #hdr-obj-num,
 html[data-dp-layout] body:has(#sb-user) header.hdr #tabs-status-badge{
   background:transparent !important;
   border:1px solid var(--dpl-linie) !important;
-  color:#BFB7A9 !important;
+  color:#5A5347 !important;      /* v1932a: war #BFB7A9 (fuer Obsidian) */
 }
 html[data-dp-layout] body:has(#sb-user) header.hdr #tabs-status-badge *{
-  color:#BFB7A9 !important;
+  color:#5A5347 !important;      /* v1932a: war #BFB7A9 */
 }
 html[data-dp-layout] body:has(#sb-user) header.hdr .tabs-status-bar{
-  background:rgba(255,255,255,.10) !important;
+  background:rgba(20,19,16,.10) !important;   /* v1932a: war weiss auf dunkel */
 }
 html[data-dp-layout] body:has(#sb-user) header.hdr .tabs-status-fill,
 html[data-dp-layout] body:has(#sb-user) header.hdr .hdr-comp-fill{
