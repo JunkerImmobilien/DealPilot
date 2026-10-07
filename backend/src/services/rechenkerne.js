@@ -225,7 +225,12 @@ function heuristik(eingabe) {
  *  `qc-heuristik.js` braeuchte hier wieder eine. Deshalb EIN Zugang mit
  *  Namen, und eine Liste, die sagt, was erlaubt ist: ein freier
  *  Namenszugriff waere eine Tuer in jedes Modulinnere. */
-const HEURISTIK_TEILE = ['stufensatz', 'kennzahlenAmpel', 'kategorien', 'zielKaufpreis'];
+const HEURISTIK_TEILE = ['stufensatz', 'kennzahlenAmpel', 'kategorien', 'zielKaufpreis',
+  /* v1939 · Der Angebotsabschlag und die schwaechste Groesse. Die Sperre
+     hat beim ersten Lauf gegriffen und `marktwertBereinigt` abgewiesen —
+     so soll sie sich verhalten: eine Freigabeliste, die man vergisst zu
+     pflegen, faellt beim Pruefer auf und nicht beim Kunden. */
+  'marktwertBereinigt', 'schwaechstePunkte', 'abschlagFuer'];
 function heuristikTeil(name, ...argumente) {
   if (HEURISTIK_TEILE.indexOf(name) < 0) {
     throw new Error('QcHeuristik.' + name + '() ist nicht freigegeben — '
