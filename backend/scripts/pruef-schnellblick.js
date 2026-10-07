@@ -252,6 +252,56 @@ let PROBE_ID = null;
       }
     }
 
+    /* ── v1936 · IST DIE HEURISTIK VOLLSTAENDIG? ────────────────────────
+     * Marcel: „Das muss doch da vollumfaenglich stehen." Also wird
+     * nachgezaehlt, nicht gehofft. */
+    if (!b.geht_noch_nicht) {
+      console.log('  STUFENSATZ: ' + (b.stufensatz || 'FEHLT'));
+      if (!b.stufensatz) { console.error('    ABW stufensatz fehlt'); fehler++; }
+      const amp = b.kennzahlen_ampel || [];
+      console.log('  AMPEL (' + amp.length + ' von 7):');
+      amp.forEach((k) => console.log('    ' + String(k.id).padEnd(5)
+        + String(k.wert == null ? 'entfaellt — ' + k.entfaellt : k.wert).padEnd(40)
+        + (k.ampel || '—')));
+      if (amp.length !== 7) { console.error('    ABW Ampel hat ' + amp.length + ' statt 7'); fehler++; }
+      amp.forEach((k) => {
+        if (k.wert == null && !k.entfaellt) { console.error('    ABW ' + k.id + ': kein Wert UND kein Grund'); fehler++; }
+        if (k.wert != null && !k.ampel) { console.error('    ABW ' + k.id + ': Wert ohne Ampel'); fehler++; }
+        if (!k.skala) { console.error('    ABW ' + k.id + ': keine Skala'); fehler++; }
+      });
+      const kat = b.kategorien || [];
+      console.log('  KATEGORIEN (' + kat.length + ' von 5):');
+      kat.forEach((k) => console.log('    ' + String(k.was).padEnd(13)
+        + String(k.punkte).padEnd(46) + k.wert));
+      if (kat.length !== 5) { console.error('    ABW Kategorien ' + kat.length + ' statt 5'); fehler++; }
+      kat.forEach((k) => { if (!k.rechenweg) { console.error('    ABW ' + k.id + ': kein Rechenweg'); fehler++; } });
+    }
+
+    /* ── v1937 · DIE MARKTPREISINDIKATION ───────────────────────────────
+     * Und die Anbieter-Neutralitaet: kein Name darf durchkommen. */
+    const mpi = b.marktpreisindikation;
+    if (mpi) {
+      if (mpi.vorhanden) {
+        console.log('  MARKTPREIS: ' + ((mpi.quellen || []).length) + ' Quelle(n), '
+          + ((mpi.am_objekt || []).length) + ' am Objekt');
+        (mpi.quellen || []).forEach((q) => console.log('    ' + String(q.wert).padEnd(14)
+          + String(q.herkunft).padEnd(48) + (q.stand || '')));
+        (mpi.am_objekt || []).forEach((q) => console.log('    ' + String(q.wert).padEnd(14)
+          + q.was + ' (' + q.herkunft + ')'));
+        if (mpi.vergleich) console.log('    -> ' + mpi.vergleich.kaufpreis_zu_marktwert
+          + '  (' + mpi.vergleich.grundlage + ')');
+      } else {
+        console.log('  MARKTPREIS: keiner — ' + String(mpi.hinweis).slice(0, 60) + '…');
+      }
+      const roh = JSON.stringify(mpi) + String(b.ki_einordnung || '');
+      ['pricehubble', 'price hubble', 'sprengnetter'].forEach((n) => {
+        if (roh.toLowerCase().indexOf(n) >= 0) {
+          console.error('    ABW ANBIETERNAME im Ergebnis: ' + n
+            + ' — CLAUDE.md verbietet das nach aussen'); fehler++;
+        }
+      });
+    }
+
     /* ── v1927 · DIE KI-EINORDNUNG ──────────────────────────────────────
      * Sie darf fehlen — aber nie still. Entweder Text oder Grund. */
     if (b.ki_einordnung) {
