@@ -451,7 +451,24 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
           wert: wert,
           korb: (mr.labels && mr.labels[korb]) || korb,
           quelle: (mr.sourceInfo && mr.sourceInfo.name) || mr.source || 'unbekannt',
-          stand: mr.asOf || null
+          /* `asOf` ist ein Date-Objekt. Direkt verkettet landet es als
+             "Sat Aug 01 2026 00:00:00 GMT+0000 (Coordinated Universal Time)"
+             im deutschen Prompt - gemessen im Container, nicht geraten.
+             Deshalb MM.JJJJ: die Bundesbank-Statistik ist monatlich und
+             laeuft dem Stichtag zwei Monate nach, ein Tagesdatum waere
+             genauer, als die Zahl ist. */
+          stand: (function (d) {
+            if (!d) return null;
+            var t = (d instanceof Date) ? d : new Date(d);
+            if (isNaN(t.getTime())) return String(d);
+            /* UTC-Getter, nicht die oertlichen: der Stichtag kommt als
+               UTC-Zeitstempel, und `getMonth()` haette ihn am Monatsende
+               in den FOLGEmonat gekippt (gemessen: 31.12. 23:00 UTC wurde
+               unter CET zu 01.2027). Der Server laeuft auf UTC, ein
+               Entwicklerrechner nicht - der Fehler waere nur hier
+               aufgefallen, nicht dort. */
+            return String(t.getUTCMonth() + 1).padStart(2, '0') + '.' + t.getUTCFullYear();
+          })(mr.asOf)
         };
       }
     } catch (e) {
