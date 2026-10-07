@@ -328,12 +328,34 @@ auch die Farbketten (`top` / `green` / `gold` / `red`) brechen bei
 > zweimal ein anderes Wort zeigte (`v1203`). **Marcels Entscheidung: es
 > gilt, was die Haupt-App tut.**
 >
-> **Zwei Abweichungen sind gemessen und noch offen:**
-> `js/dashboard.js:1283` sagt `Sehr gut / Gut / Solide / Schwach` (vier
-> Stufen, „Sehr gut" statt „TOP"), und der Marktbericht-Backend
-> (`ScoringService`) führt ein eigenes Vokabular `Sehr attraktiv /
-> Attraktiv / Durchschnittlich / Unterdurchschnittlich`, das seit `v1203`
-> **nicht mehr angezeigt** wird. Beide gehören noch angeglichen.
+> **Hier standen bis zum 07.10.2026 „zwei Abweichungen, gemessen und noch
+> offen": `js/dashboard.js:1283` mit vier Stufen und der Marktbericht-Backend
+> (`ScoringService`) mit eigenem Vokabular. Beides war schon erledigt** —
+> `dashboard.js` liest `ScoreTier.stufe()` seit `v1861` (die Worte dort sind
+> nur noch Rückfall), und der `ScoringService`-Rating wird seit `v1203` nicht
+> mehr angezeigt. Die genannte Zeilennummer trug längst Steuer-Code. **Ein
+> offener Punkt, der nicht mehr offen ist, kostet jedes Mal eine Messung —
+> und wer ihm folgt, prüft die falsche Datei.**
+>
+> **Echt offen waren zwei andere, beide am 07.10.2026 behoben (`v1950`,
+> `v1950a`):** der Marktbericht sagte in Ring, Text und PDF weiter „Top"
+> statt „Sehr gut" (`frontend/marktbericht-app/app.js` — eigenes Dokument,
+> `score-tiers.js` war dort nie eingebunden), und `marktbericht/frontend/app.js`
+> führte nur vier Stufen ohne KRITISCH. Letztere liegt im mb-Backend-Image
+> hinter `express.static` und ist von außen **nicht** erreichbar — aber sie
+> wird live, sobald jemand auf die mb-Wurzel routet.
+>
+> **Die Ursache der Doppelung stand im Kopf von `score-tiers.js` selbst:**
+> er beschrieb vier Bänder und sagte „Label + Farbe bleiben pro Anzeige
+> lokal (gleiche Werte, andere Worte)" — die Doktrin, die dieser Abschnitt
+> aufhebt. Er hat die Doppelung nicht verschwiegen, sondern **erlaubt**.
+>
+> **Es gibt vier Kopien, und drei müssen es bleiben** (das Backend-Image
+> kopiert `frontend/` nicht, der Marktbericht ist ein eigenes Dokument).
+> Statt einer Zusammenlegung hält sie `tools/score-ketten-pruefen.mjs`
+> zusammen: er lädt alle vier **echten** Dateien und vergleicht 115 Punkte
+> (0–100, 13 Grenzen, Abwesenheit). RC=0 ist sauber. **Nach jeder Änderung
+> an einem Score-Wort laufen lassen.**
 >
 > **Eine dritte kam am 30.09.2026 dazu — auf der Karte selbst, also an
 > genau der Stelle, auf die dieser Abschnitt sich beruft.** `_scoreLabel()`

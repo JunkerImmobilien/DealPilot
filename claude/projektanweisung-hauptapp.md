@@ -31914,6 +31914,125 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (81) 07.10.2026 — v1950/v1950a: vier Score-Ketten, und ein Kommentar, der die Doppelung erlaubt hat
+
+CLAUDE.md sagt: **„Die Kette steht an EINER Stelle: `js/score-tiers.js`."** Gemessen am
+07.10.2026 gibt es **vier** — und drei davon müssen es bleiben.
+
+#### A · Was offen war, war nicht das, was dort stand
+
+CLAUDE.md führte zwei offene Abweichungen. **Beide waren erledigt:**
+
+| in CLAUDE.md | gemessen |
+|---|---|
+| `js/dashboard.js:1283` führt vier Stufen | liest `ScoreTier.stufe()` seit v1861; Zeile 1283 trägt längst Steuer-Code |
+| mb-Backend `ScoringService` eigenes Vokabular | wird seit v1203 nicht mehr angezeigt |
+
+> **Ein offener Punkt, der nicht mehr offen ist, kostet jedes Mal eine Messung — und wer der
+> Zeilennummer folgt, prüft die falsche Datei.** Beide Einträge sind in CLAUDE.md ausdrücklich
+> zurückgenommen, nicht stillschweigend ersetzt.
+
+**Echt offen waren zwei andere:**
+
+- **`frontend/marktbericht-app/app.js`** sagte bei ≥ 85 weiter **„Top"** statt „Sehr gut" — in der
+  Ring-Pille, im Fließtext **und** im PDF, am selben Score. Marcels Entscheidung vom 04.10.
+  („mit gut, sehr gut und dann halt die anderen") gilt seit v1863; diese Stelle ist stehen
+  geblieben.
+- **`marktbericht/frontend/app.js`** führte nur **vier** Stufen (kein KRITISCH), „Top", und
+  Zeile 447 nutzte noch `ds.rating || _scoreTier(s)` — genau den Widerspruch, den v1203
+  entfernt hatte.
+
+#### B · Die Ursache stand im Kopf der Quelldatei
+
+Bis heute sagte der Dateikopf von `score-tiers.js`:
+
+```
+Label + Farbe bleiben pro Anzeige lokal (gleiche Werte, andere Worte) -
+ZENTRAL ist nur die GRENZE.
+```
+
+und beschrieb vier Bänder, die bei 50 enden. **Beides war seit v1859 falsch** — `stufe()`
+zehn Zeilen darunter führt fünf Stufen MIT den Worten.
+
+> **Der Kopf hat die Doppelung nicht verschwiegen, er hat sie ERLAUBT.** Wer ihn las, durfte
+> guten Gewissens ein eigenes Wort erfinden — und genau das ist viermal passiert („Okay" in
+> `storage.js`, „Top" im Marktbericht, „Sehr attraktiv" im mb-Backend, „Durchschnittlich" in
+> `dealscore.js`). **Ein Kommentar, der eine alte Doktrin konserviert, ist teurer als gar
+> keiner:** er lässt die Abweichung wie eine Absicht aussehen, und beim Gegenlesen hält man sie
+> für geprüft.
+
+Dieselbe Sorte Fehler im Bot: `telegramDialogService` behauptete, `score-tiers.js` kenne
+„nur vier Bänder und endet bei 50". **Eine falsche Begründung ist schlimmer als keine** — sie
+rechtfertigt die Doppelung dauerhaft, und wer sie liest, prüft die andere Datei nicht mehr nach.
+
+#### C · Warum die Kopien bleiben — und was sie stattdessen zusammenhält
+
+```
+backend/Dockerfile:  COPY src ./src · templates · migrations · seed-data · scripts
+                     -> `frontend/` ist NICHT im Backend-Image
+Marktbericht:        eigenes Dokument, die Skripte der Haupt-App wirken dort nicht
+```
+
+Ein gemeinsames Modul zur **Laufzeit** gibt es ohne Bauschritt also nicht. **Kopien sind
+erlaubt, solange sie nachweisbar gleich sind** — dafür gibt es jetzt
+`tools/score-ketten-pruefen.mjs`:
+
+```
+Quellen: 4 (score-tiers.js, marktbericht-app/app.js,
+            marktbericht/frontend/app.js, telegramDialogService.js)
+DECKUNG: 115 Vergleichspunkte (0..100 plus 13 Grenzen plus Abwesenheit)
+ALLE VIER KETTEN GLEICH (115 Punkte)      RC=0
+```
+
+Er lädt jede Kette aus ihrer **echten** Datei: `score-tiers.js` per `require` (es exportiert
+seit v1950 auch nach node), die drei anderen als ausgeschnittenen Quelltext — **der Schnitt
+wird gezählt**, ein Fehlschnitt bricht ab. Gemessen wird jeweils der RÜCKFALL, also der Pfad
+ohne `window.ScoreTier`: der Pfad mit der Kette ist trivial richtig, der ohne sie ist der,
+der im PDF auch ohne das Blatt drucken muss.
+
+**Gegenprobe gefahren, zweimal** — „Sehr gut" → „Spitze" ergab 19 Abweichungen und RC=1,
+KRITISCH aus der mb-Wurzel entfernt ergab 38 und RC=1. **Ein Prüfer, der nur grün wird, ist
+nichts wert.**
+
+#### D · Die vierte Kopie: nicht erreichbar, trotzdem nachgezogen
+
+`marktbericht/frontend/app.js` liegt im mb-Backend-Image und wird dort von
+`express.static(FRONTEND_DIR)` unter `/` ausgeliefert. Der Caddyfile routet aber nichts auf
+diese Wurzel:
+
+```
+/marktbericht/app.js   330210B  index.html-Durchfall
+/mb/app.js             330210B  index.html-Durchfall
+/app.js                330210B  index.html-Durchfall
+/marktbericht-app/app.js  323486B  v1950 (Sehr gut)   <- die LEBENDE Fassung
+
+intern dagegen:  http://mb-backend:4000/app.js -> 200, 146025B, enthaelt "Sehr gut"
+```
+
+> **Eine Leiche hinter `express.static` ist keine Leiche, sondern eine Zeitbombe:** sie wird
+> live in der Sekunde, in der jemand eine Route auf die mb-Wurzel legt. Löschen wäre riskanter
+> als nachziehen — das Verzeichnis ist das statische Wurzelverzeichnis eines laufenden
+> Dienstes. Also trägt sie dieselbe Kette, und der Prüfer hält sie fest.
+
+**Und wieder die 200-Falle:** alle drei äußeren Pfade antworten mit **200** und 330 kB. Hätte
+ich den Status gelesen statt den Inhalt, wäre die Datei „erreichbar" gewesen.
+
+#### E · Drei Fehler beim Bauen, alle vor dem Ausrollen gefangen
+
+> **1 · Verschachtelter Kommentar — zweimal hintereinander.** Mein v1950-Hinweis stand als
+> eigener Block IM Dateikopf von `score-tiers.js`; JS kennt keine verschachtelten Kommentare,
+> das innere Ende schließt das äußere. **Dieselbe Falle wie v1933a in der CSS-Datei.** Beim
+> Aufschreiben der Lehre gleich noch einmal, weil der Erklärtext die beiden Zeichen selbst
+> enthielt. Gefangen von `node --check`, **nicht** von der Klammerbilanz — die stimmte.
+
+> **2 · Mein Tiefenscanner meldete einen Fehlalarm** an `marktbericht-app/app.js` („Kommentar
+> schließt ohne zu öffnen"). Er versteht keine Zeichenketten und keine regulären Ausdrücke.
+> Gegen `HEAD` geprüft: die Stelle lag schon vorher dort (Offset 154256, nach dem Einschub
+> 158178). **`node --check` ist maßgeblich, mein Scanner ist eine Beihilfe.**
+
+> **3 · Mein Rückstell-Befehl schlug zweimal zu** und zerlegte die Ternärkette in der
+> mb-Wurzel. Der Prüfer ist daran **laut gescheitert** statt grün zu werden — genau das soll er.
+
 ### (80) 07.10.2026 — v1949: die Kartenstile griffen nie, und drei Punkte waren schon erledigt
 
 **Dieser Eintrag nimmt eine eigene Meldung zurück.** Nach dem Rollout von v1940 habe ich
