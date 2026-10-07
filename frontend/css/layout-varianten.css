@@ -5806,7 +5806,7 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-score-overlay{
   position:absolute !important;
   right:9px !important;
   top:auto !important; bottom:0 !important;
-  height:calc(100% - 13px) !important;
+  height:100% !important;
   display:flex !important; align-items:center !important;
   z-index:2 !important;
   pointer-events:none !important;   /* der Klick gehoert der Karte */
@@ -5829,7 +5829,7 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-top-body{
 html[data-dp-layout] .dpl-schiene .sb-card .sbc-actions{
   top:auto !important;
   bottom:0 !important;
-  height:calc(100% - 13px) !important;
+  height:100% !important;
   transform:none !important;
   align-items:center !important;
   right:8px !important;
@@ -7081,10 +7081,10 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   html[data-dp-layout] aside#sidebar .sb-card .sbc-kp { font:600 10.5px/1 var(--dpl-mono, 'JetBrains Mono', monospace) !important; color:var(--dpl-tinte-leise, #B5AE9F) !important; }
   html[data-dp-layout] aside#sidebar .sb-card .sbc-top-line1 { display:block !important; min-height:0 !important; margin:0 !important; }
   html[data-dp-layout] aside#sidebar .sb-card .sbc-top-line1 > *:not(.sbc-seq) { display:none !important; }
-  html[data-dp-layout] aside#sidebar .sb-card .sbc-score-overlay { position:absolute !important; right:9px !important; top:auto !important; bottom:0 !important; height:calc(100% - 13px) !important; display:flex !important; align-items:center !important; z-index:2 !important; pointer-events:none !important;   /* der Klick gehoert der Karte */ }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-score-overlay { position:absolute !important; right:9px !important; top:auto !important; bottom:0 !important; height:100% !important; display:flex !important; align-items:center !important; z-index:2 !important; pointer-events:none !important;   /* der Klick gehoert der Karte */ }
   html[data-dp-layout] aside#sidebar .sb-card .sbc-score-label { display:none !important;          /* die Stufe steht im Titel */ }
   html[data-dp-layout] aside#sidebar .sb-card .sbc-top-body { padding-right:30px !important; }
-  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions { top:auto !important; bottom:0 !important; height:calc(100% - 13px) !important; transform:none !important; align-items:center !important; right:8px !important; padding:0 0 0 18px !important; background:linear-gradient(90deg, transparent, #15140F 24%) !important; }
+  html[data-dp-layout] aside#sidebar .sb-card .sbc-actions { top:auto !important; bottom:0 !important; height:100% !important; transform:none !important; align-items:center !important; right:8px !important; padding:0 0 0 18px !important; background:linear-gradient(90deg, transparent, #15140F 24%) !important; }
   html[data-dp-layout] aside#sidebar .sb-card:hover .sbc-actions { background:linear-gradient(90deg, transparent, #1A1815 24%) !important; }
   html[data-dp-layout] aside#sidebar .sb-card.active .sbc-actions,
   html[data-dp-layout] aside#sidebar .sb-card.is-active .sbc-actions { background:linear-gradient(90deg, transparent, #221F1A 24%) !important; }
@@ -8622,3 +8622,31 @@ html[data-dp-layout][data-dp-layout] body .dpl-schiene .sb-card .sbc-btn {
     border-color: rgba(191,183,169,.10) !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1931 · DIE 13 PIXEL SIND RAUS — AN ALLEN VIER STELLEN
+
+   Marcel am 07.10.2026: „auf den Objektkarten muss der Score das duplizieren
+   und loeschen Button bzw. Schaltflaeche immer mittig sitzen."
+
+   GEMESSEN, Portfolio offen, Stil Aktenreiter:
+     390 px  (aside#sidebar)   Score 0 px   Knopf 0 px   mittig
+    1177 px  (.dpl-schiene)    Score 7 px   Knopf 7 px   ZU TIEF
+
+   **Die Ursache ist an beiden Orten dieselbe** und stand viermal in dieser
+   Datei: `height:calc(100% - 13px)` zusammen mit `align-items:center`. Der
+   Inhalt zentriert dann in einer um 13 px VERKUERZTEN Flaeche und sitzt damit
+   6,5 px unter der Kartenmitte.
+
+   > **v1928 hat das nicht behoben, sondern ueberdeckt.** `top:50%` plus
+   > `translateY(-50%)` lag obendrauf und stellte die Mitte auf dem Handy her —
+   > die falsche Hoehe blieb darunter stehen und wirkte ueberall sonst weiter.
+   > Eine Korrektur, die das Ergebnis richtigstellt statt der Ursache, gilt nur
+   > dort, wo man sie hingeschrieben hat.
+
+   Und die Falle beim Suchen: der Selektor kommt in dieser Datei MEHRFACH mit
+   gleicher Spezifitaet (41) vor — bei Gleichstand gewinnt die spaetere. Der
+   Kaskaden-Walker zeigte an `.sbc-actions` vier Treffer derselben Regelkette.
+   Deshalb hier kein fuenfter Block mit mehr Spezifitaet, sondern der Eingriff
+   an der Zahl selbst. Siehe die Notiz „eigene Regeln erschlagen sich".
+   ══════════════════════════════════════════════════════════════════════════════ */

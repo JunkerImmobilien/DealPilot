@@ -2015,10 +2015,31 @@
      `css/layout-varianten.css` ueber `--page-bg` (v1904), unter 901 px und nur mit
      Layout-Attribut. Welche Farbe die Arbeitsflaeche traegt, bleibt Marcels
      Entscheidung — sie steht jetzt an EINER Stelle, naemlich dort. */
+  /* v1931 · DIE BREITENBEDINGUNG IST RAUS — und das war der ganze Fehler.
+
+     Marcel am 07.10.2026: „zudem ist immer noch dieser Partikel Hintergrund da.
+     den moechte ich in der Aktenmappe Ansicht nicht haben!"
+
+     Er hatte recht, und zwar seit drei Anlaeufen. Gemessen am Schreibtisch
+     (1177 px, Layout v1b, Cockpit offen):
+
+       #dp-particles   925 x 5843 px, opacity 1, z 0, in #dashboard-main
+       layoutAktiv()   false   (Attribut=true, aber <=900px=FALSE)
+
+     Die Abraeumung lief also NUR auf dem Handy. Am Schreibtisch zeichnete der
+     Canvas in jeder Aktenmappen-Ansicht weiter — genau dort, wo Marcel ihn sah.
+
+     > Ich habe dreimal in der Schublade auf dem Handy gemessen und jedesmal
+     > „keine Partikel" gemeldet. Der Befund war wahr fuer die Flaeche, die ich
+     > angesehen hatte, und trotzdem falsch fuer den Schirm. Wer eine Verneinung
+     > meldet, muss sagen WO er gesucht hat.
+
+     Die Breite stammte aus v1904, wo der helle Cockpit-Ton unter 901 px gebunden
+     wurde. Fuer die Partikel ist sie sachfremd: die Aktenmappe ist eine ANSICHT,
+     keine Bildschirmgroesse. Das Attribut allein entscheidet. */
   function layoutAktiv(){
     try{
-      return document.documentElement.hasAttribute('data-dp-layout')
-          && window.matchMedia('(max-width: 900px)').matches;
+      return document.documentElement.hasAttribute('data-dp-layout');
     }catch(e){ return false; }
   }
   function initParticles(){
