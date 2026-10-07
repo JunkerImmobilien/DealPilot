@@ -1762,13 +1762,91 @@ html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .sb-neu-row > *{
    hier an einer Stelle, kommentiert - nicht verteilt ueber die Datei.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   v1932 · DER KOPF TRAEGT JETZT DIE FARBE DER MAPPE — v1653g IST UMGEKEHRT
+
+   Marcel am 07.10.2026, nach VIER Fehlversuchen von mir: „sobald wir auf das
+   iPad Pro 11 wechseln … dann sehe ich schon direkt oben neben dem DealPilot-Logo
+   Obsidian Hintergrund Partikel. Ich will das da nicht haben."
+
+   **Er hat die ganze Zeit DIESE Flaeche gemeint.** Endlich am richtigen Ort
+   gemessen — Schublade offen, 832 px, Stapel rechts neben dem Logo:
+
+     (400,30)  #sb-backdrop[rgba(0,0,0,.45)]  <  .hdr[rgb(14,13,11)]  <  .main-col[rgb(244,242,237)]
+
+   Der Backdrop ist halbdurchsichtig, also sieht man durch ihn auf den KOPF —
+   und der ist Obsidian, waehrend die Arbeitsflaeche daneben hell ist. In allen
+   drei Mappen gleich:
+
+     Layout        .main-col            .hdr
+     Aktenmappe    rgb(244,242,237)     rgb(14,13,11)
+     Kanzlei       rgb(244,242,237)     rgb(14,13,11)
+     Tower         rgb(244,242,237)     rgb(14,13,11)
+
+   > **Ich habe viermal „keine Partikel" gemeldet, weil ich viermal in der
+   > Schublade auf dem Handy gemessen habe.** Marcel sagte jedesmal „oben neben
+   > dem Logo" — und genau dort habe ich nie hingesehen. Wer eine Verneinung
+   > meldet, muss seinen Suchraum nennen; sonst widerlegt er den Nutzer mit
+   > einer Messung, die dessen Frage gar nicht beruehrt.
+
+   WAS v1653g WOLLTE und warum es jetzt anders ist: damals war der Kopf
+   versehentlich WEISS (eine fremde Regel aus `ui-varianten.css` gewann), und
+   die Antwort war, ihn hart auf Obsidian zu setzen. Das stellte die Absicht
+   von damals her — einen dunklen Kopf —, erzeugte aber den Bruch zur hellen
+   Arbeitsflaeche, den Marcel jetzt sieht. **Die Regel wird deshalb an ihrem
+   Ort umgekehrt, nicht ueberdeckt** (die Lehre aus v1931).
+
+   Die Farben sind NICHT erfunden: sie stammen aus dem fertigen hellen Skin
+   `body.dp-chrome-hell` in `style.css:35612` — Flaeche #EAE4D6, Tinte #141310,
+   Pillen #F6F2E9 auf Rand #D3CBB6. Der Skin selbst wird NICHT eingeschaltet:
+   er faerbt auch `aside.sidebar`, und die Schublade bleibt dunkel (Marcel in
+   v1909: „aber die muss doch nicht hell sein").
+
+   > **Eine Flaeche umfaerben heisst, jede Schrift darauf mitzunehmen.** Im Kopf
+   > hingen 16 Texttraeger mit 6 verschiedenen HELLEN Toenen — die waeren auf
+   > #EAE4D6 samt und sonders unlesbar geworden. Sie stehen unten einzeln.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr,
 html[data-dp-layout][data-dp-layout] body.dp-chrome-hell header.hdr.hdr{
-  background:#0E0D0B !important;
+  background:#EAE4D6 !important;
   background-image:none !important;
-  border-bottom:1px solid #26231E !important;
-  color:#E9E3D6 !important;
+  border-bottom:1px solid #D3CBB6 !important;
+  color:#141310 !important;
   box-shadow:none !important;
+}
+
+/* Die Schriften im Kopf — einzeln, weil `color` nicht durch ein Kind erbt,
+   das selbst eine hat. Gemessen waren es sechs helle Toene. */
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-num,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr #hdr-obj-num,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .dp-kg-label,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr #hdr-credits-pill-label,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .dp-kg-v{
+  color:#5A5347 !important;             /* war rgb(191,183,169) — die leise Tinte */
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-sep,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-obj-name,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr #hdr-obj,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-crumb,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .dp-kg-h,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .dp-kg-n{
+  color:#141310 !important;             /* war rgb(227..237,…) — die Haupttinte */
+}
+/* Der Goldakzent bleibt Akzent, aber in der dunklen Marken-Variante:
+   #E8CC7A ist auf #EAE4D6 nicht lesbar. Whitelabel-pflichtig. */
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .dp-kg-s{
+  color:var(--wl-b8932f, #b8932f) !important;
+}
+/* Die beiden eigenen Flaechen im Kopf (Kerosin-Pille, Statusband). */
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-credits-pill,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr #hdr-credits-pill,
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .fuel-pill{
+  background:#F6F2E9 !important;
+  border-color:#D3CBB6 !important;
+}
+html[data-dp-layout][data-dp-layout] body header.hdr.hdr .tabs-status-bar{
+  background:rgba(20,19,16,.10) !important;   /* war rgba(255,255,255,.10) auf dunkel */
 }
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row2,
@@ -1783,7 +1861,7 @@ html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-crumb,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-sep,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > span,
 html[data-dp-layout][data-dp-layout] body header.hdr.hdr .hdr-v61-row1 > a{
-  color:#E9E3D6 !important;
+  color:#141310 !important;   /* v1932: war #E9E3D6, siehe Block oben */
 }
 
 /* ── v1653h · ZWEI KORREKTUREN, EINE DAVON AN MIR SELBST ─────────────
