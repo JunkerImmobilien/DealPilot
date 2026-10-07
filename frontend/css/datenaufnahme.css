@@ -2315,3 +2315,47 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     justify-content: flex-start !important;
   }
 }
+
+/* ==============================================================================
+   v1941a - DIE ZEILE BLEIBT FLACH: SCHRUMPFEN STATT UMBRECHEN
+
+   Marcel zum Stil Zeile: "Das passt soweit." Nach v1941 war sie von 89 auf
+   190 px gewachsen - der Umbruch hat die Scrollleiste beseitigt und dafuer
+   eine zweite Reihe erzeugt. Beides wollte er nicht.
+
+   GEMESSEN, warum es nicht passte:
+
+     Kachel                Breite   flex
+     DealPilot123          175 px   0 1 auto
+     Exposé / Marktbericht 183 px   0 1 auto
+     Sprache               107 px   0 1 auto
+     Gefuehrte Eingabe     158 px   0 1 auto
+     ImmoMetrica           136 px   0 1 auto
+     Summe                 759 px   bei 753 px Platz
+
+   **Sechs Pixel.** Die Kacheln standen auf `flex: 0 1 auto` - die 0 heisst
+   "waechst nicht", und weil der Text nicht umbricht, schrumpften sie auch
+   nicht. Fuenf Kacheln, die zusammen sechs Pixel zu breit sind, erzeugten
+   eine ganze zweite Reihe.
+
+   > **Zwischen Schieben und Umbrechen gibt es eine dritte Antwort: teilen.**
+   > Mit `flex: 1 1 auto` und `min-width: 0` nehmen sich die Kacheln den Platz
+   > gemeinsam und geben nach, wenn er knapp wird. Der Umbruch aus v1941
+   > bleibt als Rueckfall - er greift erst, wenn auch Teilen nicht mehr reicht.
+
+   Das Label bekommt dafuer eine Ellipse statt eines Ueberlaufs: lieber ein
+   gekuerztes Wort in der Reihe als ein vollstaendiges ausserhalb.
+   ============================================================================== */
+@media (min-width: 901px) {
+  #oab-bar.dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll .dp-pfbar .dp-pf-tile {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  #oab-bar.dp-pfbar .dp-pf-tile .dp-pf-lbl,
+  .dp-pf-scroll .dp-pfbar .dp-pf-tile .dp-pf-lbl {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
