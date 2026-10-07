@@ -2314,6 +2314,29 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     flex: 0 0 auto !important;
     justify-content: flex-start !important;
   }
+
+  /* ── v1941e · DIESELBE KETTE AUCH AUF DEM HANDY ──────────────────────
+     Nach v1941d standen die Kacheln untereinander und 44 px hoch - aber die
+     Leiste lief weiter um 14 px ueber (369 > 355). Der Grund ist derselbe wie
+     am Schreibtisch: die Zwischenebene (.dp-pf-lead, .dp-pf-seg, .dp-pf-rz)
+     und ihre Nachfahren tragen min-width:auto. Die Regel dafuer stand nur im
+     901px-Block.
+
+     > Eine Diagnose gilt fuer die Ursache, nicht fuer die Breite, bei der man
+     > sie gestellt hat. Wer sie in einem Medienblock anwendet, muss den
+     > anderen gleich mitnehmen. */
+  #oab-bar.dp-pfbar > *,
+  .dp-pf-scroll .dp-pfbar > *,
+  #oab-bar.dp-pfbar *,
+  .dp-pf-scroll .dp-pfbar * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  #oab-bar.dp-pfbar,
+  .dp-pf-scroll .dp-pfbar,
+  .dp-pf-scroll {
+    overflow-x: hidden !important;
+  }
 }
 
 /* ==============================================================================
