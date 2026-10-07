@@ -185,7 +185,12 @@
     ['Marktbericht-Import', '+', '+', '+', '+'],
     ['Excel-Import', '-', '+', '+', '+'],
     ['API-Zugang', '-', '-', '-', '+'],
-    ['Migration &amp; Setup-Service', '-', '-', '-', '3 h'],
+    /* v1948 · "Migration & Setup-Service" ist raus. Marcel am 07.10.2026:
+       "in der matrix unter pro den Migration & Setup-Service rausnehmen".
+       Die Zeile versprach 3 Stunden Einrichtungsleistung im Pro-Plan - eine
+       Zusage, die jemand erbringen muss. Vor jeder Preisaussage gehoert
+       geprueft, ob die beworbene Leistung gedeckt ist; hier ist die Antwort,
+       sie zu streichen statt sie zu erklaeren. */
   ];
   var body = document.getElementById('mxBody');
   if (body) {
