@@ -31908,6 +31908,38 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (76) 07.10.2026 — v1943: die Mitte war zum dritten Mal am falschen Anker
+
+**Beim Nachmessen der eigenen Arbeit gefunden, nicht von Marcel gemeldet.** Nach v1942 greifen die
+Objektkarten-Stile in der DealPilot-Ansicht — aber Score und Knöpfe saßen dort nicht mittig:
+
+```
+Handy 390 px, Abstand zur Kartenmitte
+Aktenreiter   87 px zu tief      Datenzeile   0 px
+Bordkarte     30 px              Ampel        0 px
+Score-Kante   42 px              Minimal      0 px
+Kennzahlen    77 px
+```
+
+Die Ursache waren feste Werte aus `style.css` (`top: 38px` am Score, `top: 6px` an den Knöpfen) —
+die Standardwerte dieser Ansicht. v1928 und v1935 hatten die Mitte hergestellt, aber an den Ankern
+der drei Mappen.
+
+> **Zum dritten Mal an einem Tag dieselbe Form: eine Reparatur erbt den Anker, an dem sie
+> geschrieben wurde.** v1935 zog den pointer-events-Defekt von der Schiene in die Schublade nach,
+> v1940 die Kartenstile — und die Mitte blieb beide Male liegen, weil sie in einem anderen Paket
+> stand. **Wer eine Ansicht neu erschließt, muss die Liste der Reparaturen durchgehen, nicht nur
+> die Regeln, an die er gerade denkt.**
+
+**Abnahme: 56 Fälle (7 Stile × 8 Breiten), alle 0 px.**
+
+```
+360 · 375 · 390 · 430 · 768 · 834 · 1180 · 1280    je 20 Karten, je 7 Stile
+```
+
+**Gegenprobe, dass nichts kaputtging:** die Aktenmappe am Schreibtisch unverändert — Höhen 44 bis
+145 px, alle 0 px Abweichung, genau wie nach v1935.
+
 ### (75) 07.10.2026 — v1940 bis v1942: die Ansicht heißt DealPilot, und vier Anläufe auf der falschen Ebene
 
 #### A · Der Name (v1941)
