@@ -81,6 +81,11 @@
     background:#131211;border:1px solid #2a2724;padding:14px}
   .werte h2{font-size:12px;margin:0 0 8px;letter-spacing:.1em;color:#C9A84C}
   .ok{color:#5BD98E} .warn{color:#E8CC7A} .bad{color:#E4A89E} .leise{color:#8b857b}
+  /* v1984 */
+  .standbild{display:inline-flex;align-items:center;gap:6px;margin-left:14px;
+    font:600 11px/1 ui-monospace,monospace;letter-spacing:.06em;color:#E8CC7A;cursor:pointer;
+    border:1px solid #3a352e;border-radius:6px;padding:6px 9px;background:#171614}
+  .standbild input{width:13px;height:13px;accent-color:#C9A84C;cursor:pointer;margin:0}
 </style>
 </head>
 <body>
@@ -88,6 +93,12 @@
   <h1>Messkabine</h1>
   <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar. Harness: <code>DPM.lauf()</code></span>
   <div class="geraete" id="g"></div>
+  <!-- v1984: Standbild-Schalter. Vorgabe EIN, weil eine Kabine, die
+       das erste Einzelbild eines Uebergangs zeigt, kein Messgeraet ist. -->
+  <label class="standbild" title="Setzt transition und animation im Pruefling auf none - INLINE mit !important, weil ein Blatt auf Spezifitaet verliert">
+    <input type="checkbox" id="sb" checked> Standbild
+  </label>
+  <span class="hin leise" id="sicht">Sichtbarkeit: ?</span>
 </header>
 <main>
   <div class="rahmen" id="rahmen"><b id="lbl"></b><iframe id="f" title="Prüfling"></iframe></div>
@@ -601,6 +612,143 @@
   /* ── Harness: EIN Aufruf je Aussehen und Breite ───────────────────────── */
   function ziel(){ return { d: f.contentDocument, win: f.contentWindow }; }
 
+  /* ══ v1984 · STANDBILD ═══════════════════════════════════════════════
+
+     Warum INLINE und nicht ein Blatt: `style.css` setzt
+
+         body #sidebar.sidebar{ … transition:transform .26s … !important }
+
+     Das ist Spezifitaet (1,1,1) mit `!important`. Ein Blatt mit `*`
+     ist (0,0,0) — es verliert, obwohl es ebenfalls `!important`
+     traegt. Gemessen am 08.10.2026: mit dem Blatt blieb der Uebergang
+     bei 0.26s und die Schublade bei x=-357; inline sprang sie auf x=0.
+
+     Inline-`!important` steht ueber jeder Autoren-Regel, auch ueber
+     einer wichtigen. Das ist die einzige Stufe, die hier reicht.
+
+     Pseudoelemente haben kein style-Attribut. Fuer die bleibt nur ein
+     Blatt, und das traegt deshalb absichtlich eine hohe Spezifitaet.
+
+     > Gemerkt wird, welche Elemente VORHER keinen Inline-Wert hatten.
+     > Nur die werden beim Abschalten geleert. Ein Messmittel, das
+     > Spuren hinterlaesst, misst beim naechsten Mal sich selbst. */
+  var SB_AN = true;              /* Vorgabe: Standbild ein */
+  var sbBeobachter = null;
+  var SB_BLATT_ID = 'dpm-standbild';
+
+  function sbElementStill(el){
+    if (!el || !el.style) return 0;
+    if (el.dataset && el.dataset.dpmSb === '1') return 0;
+    try {
+      var vorherT = el.style.getPropertyValue('transition');
+      var vorherA = el.style.getPropertyValue('animation');
+      el.setAttribute('data-dpm-sb', '1');
+      el.setAttribute('data-dpm-sb-alt', (vorherT ? 't' : '') + (vorherA ? 'a' : ''));
+      el.style.setProperty('transition', 'none', 'important');
+      el.style.setProperty('animation', 'none', 'important');
+      return 1;
+    } catch (e) { return 0; }
+  }
+
+  function standbild(an){
+    SB_AN = !!an;
+    var z = ziel();
+    if (!z.d || !z.d.body) return { fehler: 'kein Dokument' };
+    var d = z.d;
+    if (sbBeobachter) { sbBeobachter.disconnect(); sbBeobachter = null; }
+    var altesBlatt = d.getElementById(SB_BLATT_ID);
+    if (altesBlatt) altesBlatt.remove();
+
+    if (!SB_AN) {
+      /* zurueckdrehen - nur was wir selbst gesetzt haben */
+      var auf = 0;
+      [].forEach.call(d.querySelectorAll('[data-dpm-sb]'), function(el){
+        var alt = el.getAttribute('data-dpm-sb-alt') || '';
+        if (alt.indexOf('t') < 0) el.style.removeProperty('transition');
+        if (alt.indexOf('a') < 0) el.style.removeProperty('animation');
+        el.removeAttribute('data-dpm-sb');
+        el.removeAttribute('data-dpm-sb-alt');
+        auf++;
+      });
+      sichtNachziehen();
+      return { standbild: false, zurueckgedreht: auf };
+    }
+
+    /* Blatt NUR fuer Pseudoelemente - hohe Spezifitaet, damit es nicht
+       dasselbe Schicksal erleidet wie das alte `*`-Messblatt. */
+    var st = d.createElement('style');
+    st.id = SB_BLATT_ID;
+    st.textContent = 'html body *::before,html body *::after,'
+      + 'html body *::first-line,html body *::marker'
+      + '{transition:none !important;animation:none !important}';
+    d.head.appendChild(st);
+
+    var n = 0;
+    n += sbElementStill(d.documentElement);
+    n += sbElementStill(d.body);
+    [].forEach.call(d.querySelectorAll('*'), function(el){ n += sbElementStill(el); });
+
+    /* Was die App SPAETER baut, bekommt es auch. Die Objektliste baut
+       sich bei jeder Sortierung komplett neu - ohne diesen Beobachter
+       waere genau die Flaeche wieder animiert, die gemessen wird. */
+    try {
+      sbBeobachter = new z.win.MutationObserver(function(liste){
+        if (!SB_AN) return;
+        for (var i = 0; i < liste.length; i++) {
+          var hinzu = liste[i].addedNodes || [];
+          for (var j = 0; j < hinzu.length; j++) {
+            var k = hinzu[j];
+            if (!k || k.nodeType !== 1) continue;
+            sbElementStill(k);
+            if (k.querySelectorAll) [].forEach.call(k.querySelectorAll('*'), sbElementStill);
+          }
+        }
+      });
+      sbBeobachter.observe(d.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+
+    /* Ein Umbruch erzwingen, damit die Zielwerte sofort gelten */
+    void d.documentElement.offsetHeight;
+    sichtNachziehen();
+    return { standbild: true, elemente: n, beobachter: !!sbBeobachter };
+  }
+
+  /* Die Sichtbarkeit des Prueflings gehoert IN DIE KABINE, nicht in den
+     Kopf des Messenden: sie ist „hidden", solange das Browserfenster
+     nicht vorn liegt, und dann laeuft kein Uebergang von selbst. */
+  function sichtNachziehen(){
+    var e = document.getElementById('sicht');
+     if (!e) return;
+    var z = ziel();
+    var v = (z.d && z.d.visibilityState) || '?';
+    e.textContent = 'Sichtbarkeit: ' + v + ' · Standbild: ' + (SB_AN ? 'ein' : 'aus');
+    e.className = 'hin ' + (SB_AN ? 'ok' : (v === 'visible' ? 'leise' : 'warn'));
+  }
+
+  /* Eine Gegenprobe, die den Zweck des Schalters MESSBAR macht: eine
+     Flaeche mit Uebergang suchen und nachsehen, ob er wirklich still
+     ist. Ohne das waere „Standbild: ein" nur eine Behauptung. */
+  function standbildProbe(){
+    var z = ziel();
+    if (!z.d || !z.win) return ['kein Dokument'];
+    var out = [], laufen = 0, geprueft = 0;
+    var els = [].slice.call(z.d.querySelectorAll('*')).slice(0, 1200);
+    for (var i = 0; i < els.length; i++) {
+      var cs = z.win.getComputedStyle(els[i]);
+      var t = cs.transitionDuration || '', a = cs.animationName || '';
+      geprueft++;
+      var tLaeuft = t && t.split(',').some(function(x){ return parseFloat(x) > 0; });
+      var aLaeuft = a && a !== 'none';
+      if (tLaeuft || aLaeuft) {
+        laufen++;
+        if (out.length < 6) out.push(nam(els[i]) + '  dauer=' + t + '  anim=' + a);
+      }
+    }
+    return [(laufen === 0 ? 'ok   ' : 'FEHL ') + 'noch bewegt: ' + laufen
+            + ' von ' + geprueft + ' Elementen  (Standbild ' + (SB_AN ? 'ein' : 'aus') + ')']
+           .concat(out);
+  }
+
   function setzeMerker(layout){
     try {
       if (layout === '' || layout === null) window.localStorage.removeItem('dp_layout');
@@ -679,6 +827,10 @@
   }
 
   f.addEventListener('load', function(){ setTimeout(function(){
+    /* v1984: das Standbild gilt je DOKUMENT - nach jedem Laden neu
+       setzen, sonst misst der erste Lauf nach einem Geraetewechsel
+       wieder ein eingefrorenes Einzelbild. */
+    try { if (SB_AN) standbild(true); else sichtNachziehen(); } catch (e) {}
     var z = ziel();
     if (!z.d) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Dokument</span>'; return; }
     try { zeige(messe(z.d, z.win, 'Start')); }
@@ -709,10 +861,22 @@
     return zeilen;
   }
 
+  /* v1984: der Schalter wird GEKLICKT, nicht per Attribut gesetzt -
+     derselbe Bedienweg, den die Doktrin fuer Varianten verlangt. */
+  (function(){
+    var box = document.getElementById('sb');
+    if (!box) return;
+    box.addEventListener('change', function(){
+      try { standbild(box.checked); } catch (e) {}
+    });
+  })();
+
   window.DPM = { messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
                  kontrast: kontrast, gemalt: gemalt, male: male,
                  lage: lage, warte: warte,
+                 standbild: standbild, standbildProbe: standbildProbe,
+                 standbildAn: function(){ return SB_AN; },
                  selbsttest: selbsttest, geraete: GERAETE };
 
   waehle(2);   /* iPhone 14 */
