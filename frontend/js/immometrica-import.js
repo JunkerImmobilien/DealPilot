@@ -8,12 +8,30 @@
   function tok() { try { return localStorage.getItem('ji_token') || ''; } catch (e) { return ''; } }
   function hdr() { return { 'Authorization': 'Bearer ' + tok() }; }
 
-  /* v769-imo-stub: Demo-Modal bei AVM_MODE=stub (kein Key noetig). */
+  /* ══ v1993 · DIE DEMO-SCHRANKE HING AM AVM-SCHALTER ════════════════
+
+     Hier stand `/api/v1/avm/health`, und daraus wurde `mode` gelesen.
+     Das ist der Schalter der BEWERTUNGSanbieter: `AVM_MODE=live` gibt
+     Sprengnetter und PriceHubble frei, beide kostenpflichtig je Abruf.
+
+     GEMESSEN auf Staging am 08.10.2026:
+       IMMOMETRICA_MODE   nirgends gesetzt  -> Backend laeuft live
+       AVM_MODE=stub      in der .env       -> Frontend zeigte Demo
+
+     Marcel hatte einen Schluessel hinterlegt und sah trotzdem die drei
+     erfundenen Objekte (Leipzig, Dresden, Chemnitz) - weil die Schranke
+     eine ANDERE Schnittstelle fragte als die, um die es geht.
+
+     Jetzt fragt sie `/api/v1/immometrica/health`. ImmoMetrica geht
+     damit live, ohne dass ein bezahlter Anbieter angefasst wird.
+
+     v769-imo-stub bleibt als Demo-Weg erhalten - er greift jetzt bei
+     IMMOMETRICA_MODE=stub. */
   var _imoHealthCache=null,_imoHealthTs=0;
   function _imoHealth(cb){
     var now=Date.now();
     if(_imoHealthCache!==null && (now-_imoHealthTs)<60000){ cb(_imoHealthCache); return; }
-    fetch('/api/v1/avm/health',{headers:hdr()}).then(function(r){return r.json();})
+    fetch('/api/v1/immometrica/health',{headers:hdr()}).then(function(r){return r.json();})   /* v1993 */
       .then(function(h){ _imoHealthCache=h||{}; _imoHealthTs=Date.now(); cb(_imoHealthCache); })
       .catch(function(){ _imoHealthCache={}; _imoHealthTs=Date.now(); cb(_imoHealthCache); });
   }

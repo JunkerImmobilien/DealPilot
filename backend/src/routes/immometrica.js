@@ -14,6 +14,35 @@ const limiter = rateLimit({ windowMs: 60 * 1000, max: 30, standardHeaders: true,
 function uid(req) { return (req.user && (req.user.id || req.user.userId)) || null; }
 
 /* ---- Credentials ---- */
+/* ══ v1993 · IMMOMETRICA SAGT SELBST, IN WELCHEM MODUS ES LAEUFT ══════
+
+   Marcel am 08.10.2026: „kannst du mir auf staging immometrica einmal
+   wieder von demo auf live umschalten?"
+
+   GEMESSEN auf Staging: `IMMOMETRICA_MODE` steht weder in compose noch
+   in der .env noch im Container. Das Backend lief fuer ImmoMetrica also
+   laengst live. Die Demo-Inserate kamen aus dem FRONTEND — es fragte
+   `/api/v1/avm/health` und las daraus `mode`.
+
+   Das ist eine Kopplung, kein Schalter: `AVM_MODE=live` gibt daneben
+   Sprengnetter und PriceHubble frei (AVM_LIVE_PROVIDERS), beide
+   kostenpflichtig je Abruf. Wer ImmoMetrica live will, schaltet damit
+   zwei bezahlte Bewertungsanbieter mit ein.
+
+     > Ein Schalter, der zwei unabhaengige Schnittstellen steuert, ist
+     > kein Schalter, sondern eine Kopplung. Und Geld wird nicht
+     > nebenbei eingeschaltet.
+
+   Diese Auskunft ist OEFFENTLICH wie `/avm/health` — sie verraet nichts
+   ausser dem Betriebsmodus, keinen Token, keine Zugangsdaten. */
+router.get('/health', (req, res) => {
+  const stub = String(process.env.IMMOMETRICA_MODE || '').toLowerCase() === 'stub';
+  res.json({
+    mode: stub ? 'stub' : 'live',
+    base: (process.env.IMMOMETRICA_BASE || 'https://www.immometrica.com/searchapi/v1/'),
+  });
+});
+
 router.get('/credentials', authenticate, async (req, res, next) => {
   try { res.json({ immometrica: await creds.getMeta(uid(req), PROVIDER) }); } catch (e) { next(e); }
 });
