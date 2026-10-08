@@ -2279,7 +2279,47 @@
   function scan() { var b = document.querySelectorAll('.dp-pfbar'); for (var i = 0; i < b.length; i++) enhance(b[i]); }
   if (document.readyState !== 'loading') scan(); else document.addEventListener('DOMContentLoaded', scan);
   try {
-    var mo = new MutationObserver(function () { if (window._pfScanQ) return; window._pfScanQ = 1; requestAnimationFrame(function () { window._pfScanQ = 0; scan(); }); });
+    /* ══ v1987 · DER RIEGEL LOESTE SICH NUR IM rAF ════════════════════
+
+       Hier stand:
+
+         if (window._pfScanQ) return; window._pfScanQ = 1;
+         requestAnimationFrame(function(){ window._pfScanQ = 0; scan(); });
+
+       Der Riegel wird VOR dem rAF gesetzt und NUR im Rueckruf geloest.
+       Feuert das rAF nicht, bleibt er auf 1 - fuer die Lebensdauer der
+       Seite. Der Beobachter laeuft dann noch und kehrt in der ersten
+       Zeile immer um.
+
+       GEMESSEN am 08.10.2026: _pfScanQ === 1, bar._pfM === undefined,
+       null .dp-pf-mtrigger im DOM. Nach Hand-Entriegeln und einem
+       DOM-Anstoss erschien der Ausloeser sofort (331x52).
+
+       > Ohne Ausloeser steht das Blatt per translateY(110%) unter dem
+       > Bildrand. Die GANZE Datenaufnahme ist dann auf dem Handy
+       > unerreichbar - die Quellen und der Abruf-Knopf.
+
+       rAF feuert nicht, wenn das Dokument verborgen ist. Auf einem
+       echten Geraet heisst das: die Seite wird in einem
+       HINTERGRUND-Tab geladen (geteilter Link, „in neuem Tab",
+       Sparmodus). Wer dann nach vorn wechselt, findet die
+       Datenaufnahme nicht - und nichts deutet darauf hin, warum.
+
+       Das rAF BLEIBT: es buendelt die Mutationen, und genau dafuer ist
+       es da. Daneben steht jetzt ein Timer als Notnagel. Wer zuerst
+       kommt, raeumt den anderen ab - so laeuft scan() genau einmal je
+       Buendel, auch ohne Einzelbilder. */
+    var mo = new MutationObserver(function () {
+      if (window._pfScanQ) return;
+      window._pfScanQ = 1;
+      var los = function () {
+        if (!window._pfScanQ) return;
+        window._pfScanQ = 0;
+        scan();
+      };
+      var nagel = setTimeout(los, 120);
+      requestAnimationFrame(function () { clearTimeout(nagel); los(); });
+    });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
 })();

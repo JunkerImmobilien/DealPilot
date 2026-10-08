@@ -33450,7 +33450,34 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   .dp-pf-scroll .dp-pf-lead{display:none!important}
   .dp-pf-scroll .dp-pf-perf,.dp-pf-scroll .dp-pf-qr,.dp-pf-scroll .dp-pf-sep,.dp-pf-scroll .dp-pf-bc{display:none!important}
   .dp-pf-scroll .dp-pf-seg{width:100%!important;flex:0 0 auto!important;gap:8px!important}
-  .dp-pf-scroll .dp-pf-grouplbl{font-size:10px!important;margin-bottom:4px!important}
+  /* ── v1987 · DIE TEXTFARBEN SIND NICHT MITGEWANDERT ───────────────
+     Marcel am 08.10.2026: „Man sollte die Texte lesen koennen."
+
+     Dieser Block macht aus der HELLEN Pre-Flight-Karte ein DUNKLES
+     Bodenblatt (.dp-pf-scroll{background:#0c0c0e} weiter oben). Die
+     Schriftgroesse des Etiketts wurde dabei nachgezogen - die Farbe
+     nicht. Gemessen im geoeffneten Blatt auf 390 px gegen #0c0c0e:
+
+       span.dp-pf-grouplbl  „Marktbewertung"         #665c49  2,97
+       span.k-neu           „Daten uebernehmen aus"  #665c49  2,97
+       span.dp-pf-scan      „Scan ›"                 #665c49  2,97
+       small                „Datenquellen fuer …"    #6b645a  3,35
+
+     Alle vier unter AA fuer Kleintext (4,5). Das ist „Farbe gilt nur
+     zu ihrem Grund": beim Verschieben des Blocks in ein dunkles Blatt
+     wandert die Beziehung zwischen Text und Grund nicht mit.
+
+     Gesetzt wird die Gold-Familie der hellen Karte in ihrer HELLEN
+     Fassung - dort war das Etikett dunkles Gold, hier ist es helles.
+     Nachgerechnet (ohne Raute, damit kein Gold-Literal im Kommentar
+     steht): E8CC7A auf 0c0c0e = 12,42:1, c9c3b4 = 11,12:1.
+     Whitelabel-Pflicht: jedes Gold als var(--wl-<hex>, #<hex>). */
+  .dp-pf-scroll .dp-pf-grouplbl{font-size:10px!important;margin-bottom:4px!important;
+    color:var(--wl-e8cc7a, #E8CC7A)!important}
+  .dp-pf-scroll .dp-pf-grouplbl .k-neu,
+  .dp-pf-scroll .dp-pf-scan{color:var(--wl-e8cc7a, #E8CC7A)!important}
+  .dp-pf-scroll .dp-pf-mtitle small,
+  .dp-pf-scroll .dp-pf-msheet-head small{color:#c9c3b4!important}
   .dp-pf-scroll .dp-pf-row{flex-wrap:wrap!important;gap:8px!important}
   .dp-pf-scroll .dp-pf-tile{flex:1 1 100%!important;min-width:0!important;min-height:48px!important;justify-content:space-between!important}
   .dp-pf-scroll .dp-pf-rz{width:100%!important;display:block!important}
