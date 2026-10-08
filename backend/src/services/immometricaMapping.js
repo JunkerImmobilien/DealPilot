@@ -23,9 +23,22 @@
 const DP_OPTIONS = {
   vermstand: ['Vollvermietet', 'Teilweise leer', 'Leer'],
   ausst:     ['Einfach', 'Normal', 'Gehoben', 'Luxus'],
-  // PENDING – per Grep nachziehen (siehe README):
-  ds2_zustand: null,   // grep id="ds2_zustand" ... <option> in frontend/index.html
-  ds2_energie: null,   // grep id="ds2_energie" ... <option> in frontend/index.html
+  /* v1997 · GEMESSEN am 08.10.2026 an einer echten Antwort (Suchauftrag
+     110695, 50 Inserate) UND am Select in frontend/index.html:
+
+       Select  A+ A B C D E F G H
+       API     G  E  C  D  F  A+  H
+
+     Dieselbe Schreibweise - keine Umsetzung noetig. Die Sperre war eine
+     offene Frage, die vier Monate niemand gestellt hat. */
+  ds2_energie: ['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+  /* ds2_zustand BLEIBT offen: die API schickt deutschen Fliesstext
+     (gemessen: "Vollstaendig renoviert", "Saniert", "Modernisiert",
+     "Gepflegt", "Renovierungsbeduerftig"), das Select fuehrt
+     neubau / gut / normal / renovierungsbeduerftig /
+     stark_sanierungsbeduerftig. Welcher Wert auf welche Stufe faellt,
+     ist eine BEWERTUNGSfrage - die gehoert Marcel, nicht dem Code. */
+  ds2_zustand: null,
 };
 
 /* =========================================================================
@@ -85,7 +98,7 @@ const FIELD_MAP = {
   bath_rooms:          { target: 'dp', dp: 'bad_anz',    label: 'Badezimmer' },
   number_of_apartments:{ target: 'dp', dp: 'einheiten',  label: 'Wohneinheiten' },
   heating_type:        { target: 'note', label: 'Heizungsart' },
-  energy_efficiency_class:{ target: 'pendingDp', dp: 'ds2_energie', label: 'Energieklasse', note: 'PENDING: ds2_energie-Optionen noetig' },
+  energy_efficiency_class:{ target: 'dp', dp: 'ds2_energie', label: 'Energieklasse', note: 'v1997: Schreibweise der API gemessen, 1:1 uebernehmbar' },
 
   // ---- Status-Flag mit DealPilot-Zuhause ----
   rented_out:          { target: 'dp', dp: 'vermstand', label: 'Vermietungsstand', note: 'true->Vollvermietet, false->Leer' },
@@ -117,17 +130,31 @@ const FIELD_MAP = {
    Lookup von ImmoMetrica-Wert -> DealPilot-Option.
    ========================================================================= */
 const PENDING_MAPPINGS = {
-  ds2_zustand: {
-    needs: 'frontend/index.html  select#ds2_zustand <option>-Werte',
+  /* v1997 · DIE API-WERTE SIND JETZT GEMESSEN (08.10.2026, 50 Inserate):
+
+       Vollstaendig renoviert  ·  Saniert  ·  Modernisiert
+       Gepflegt  ·  Renovierungsbeduerftig
+
+     Das Select fuehrt: neubau / gut / normal /
+     renovierungsbeduerftig / stark_sanierungsbeduerftig
+
+     Die Zuordnung ist eine BEWERTUNGSentscheidung (der Zustand
+     fliesst in DealScore 2 ein) und gehoert Marcel. Sie steht hier
+     NICHT geraten - lieber offen als falsch. */
+ds2_zustand: {
+    needs: 'Zuordnung der 5 gemessenen API-Werte auf die 5 Stufen - Marcels Entscheidung',
     // Erst befuellen, wenn Optionen bekannt. Beispiel-Skizze:
     lookup: {
       // 'Erstbezug': '<dp-option>', 'Neuwertig': '...', 'Saniert': '...',
       // 'Modernisiert': '...', 'Gepflegt': '...', 'Renovierungsbeduerftig': '...'
     },
   },
+  /* v1997 · ERLEDIGT - steht nur noch als Spur hier. Die API schickt
+     genau die Schreibweise des Selects; die Zuordnung ist die Identitaet
+     und braucht keine Tabelle. Gemessene Werte: G E C D F A+ H. */
   ds2_energie: {
-    needs: 'frontend/index.html  select#ds2_energie <option>-Werte',
-    lookup: { /* z.B. 'A+':'...', 'A':'...', ... 'H':'...' – Format der API noch offen */ },
+    needs: 'erledigt in v1997 - Schreibweise gemessen, identisch',
+    lookup: null,
   },
   hg_ul: {
     needs: 'Einheit der API-maintenance (Monat vs Jahr) an einem echten Wert verifizieren',
@@ -236,6 +263,22 @@ function mapToDp(it) {
     einheiten: it.number_of_apartments,
     kuerzel: (it.title || '').slice(0, 40),
     vermstand: mapVermstand(it.rented_out),     // NEU (A, final)
+    /* v1997 · DIE ENERGIEKLASSE WIRD JETZT WIRKLICH GESETZT.
+
+       Die Feldtabelle oben ist DOKUMENTATION, nicht Mechanik - dieses
+       Objekt hier wird von Hand gebaut. Ein Eintrag mit target:"dp" in
+       der Tabelle bewirkt nichts, wenn die Zeile hier fehlt. Genau
+       daran ist mein erster Anlauf gescheitert: die Tabelle sagte ja,
+       mapToDp() lieferte undefined.
+
+       Gemessen am 08.10.2026 an einer echten Antwort (Suchauftrag
+       110695, 50 Inserate): die API schickt G E C D F A+ H - genau die
+       Schreibweise des Selects (A+ A B C D E F G H). Deshalb ohne
+       Umsetzungstabelle, aber MIT Schranke: was nicht im Select steht,
+       wird nicht gesetzt. Eine erfundene Energieklasse waere schlimmer
+       als keine. */
+    ds2_energie: ((DP_OPTIONS.ds2_energie || []).indexOf(String(it.energy_efficiency_class || '').trim()) >= 0
+      ? String(it.energy_efficiency_class).trim() : undefined),
     notizen: buildSummary(it),
     // Meta
     _immometrica_id: it.id,
