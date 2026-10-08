@@ -158,63 +158,21 @@
   var rzHeimat = null;
 
 
-  /* ══ v1990 · DER QR FAELLT UNTER 900 px - PER JS, NICHT PER CSS ═════
+  /* ══ v1992 · DER NOTNAGEL AUS v1990 IST RAUS ══════════════════════
 
-     Marcel am 08.10.2026: „Da kannst du dann, wenn das nicht passend
-     dargestellt wird, den Barcode fuer die Handy-Version oder auch
-     Tablet-Version rausnehmen."
+     Hier stand `qrNachziehen()`: es setzte unter 900 px ein inline
+     `display:none` auf den QR, weil ich CSS fuer machtlos hielt.
 
-     GEMESSEN, warum er weg soll:
-       390 px, Entwurf Kartei   Kasten 64x92, SVG darin 54x68
-       765 px, Entwurf Zeile    54x68
-     Ein QR, der nicht quadratisch ist, laesst sich nicht zuverlaessig
-     scannen. Er sieht aus wie ein Angebot und ist keins.
+     CSS war nicht machtlos - mir fehlte die ID. `datenaufnahme.css`
+     fuehrt 62 Selektoren mit `:is(#oab-bar,#qc7-sources)`, und `:is()`
+     erbt die Spezifitaet seines STAERKSTEN Arguments. Diese Regeln
+     liegen auf (1,3,2); meine lagen alle ohne ID darunter.
 
-     WARUM JS UND NICHT CSS - und das ist kein guter Grund, sondern ein
-     Eingestaendnis: vier Anlaeufe mit CSS sind gescheitert, und der
-     Befund ist unerklaert. Ein eingehaengtes
+     > Ein Notnagel, dessen Begruendung nicht mehr gilt, wird selbst zum
+     > Defekt. Er haengt jetzt in `datenaufnahme.css`, wo er hingehoert.
 
-       #oab-pf-qr{ outline:4px solid lime !important;
-                   display:none !important }
-
-     faerbt den Rahmen - die Regel kommt also an - und aendert `display`
-     NICHT. Geprueft bis auf die geparste Regel (ihr cssText traegt
-     beide Deklarationen), ohne Messkabine, ohne Standbild, aus <head>
-     wie aus <body>, mit ID- und Dreifach-Klassen-Selektoren. Kein
-     Inline-display, keine Animation, keine Transition, genau EIN
-     Element mit dieser Kennung.
-
-     Ein Inline-`display:none` wirkt dagegen sofort (64 px -> 0 px).
-     Genau das tut diese Funktion - und sie raeumt ihren Eingriff
-     wieder weg, wenn das Fenster breit genug ist. Was sie NICHT tut:
-     einen QR verbergen, den jemand anders schon verborgen hat.
-
-     > Das ist ein Notnagel auf einem unverstandenen Defekt. Der
-     > CSS-Befund bleibt in N45 offen - er gehoert verstanden, nicht
-     > zugedeckt. */
-  var QR_GRENZE = 900;
-
-  function qrNachziehen(bar) {
-    var leiste = bar || document.querySelector('.dp-pfbar');
-    if (!leiste) return 0;
-    var schmal = window.matchMedia('(max-width: ' + QR_GRENZE + 'px)').matches;
-    var n = 0;
-    [].forEach.call(leiste.querySelectorAll('.dp-pf-qr'), function (q) {
-      if (schmal) {
-        if (q.getAttribute('data-dpk-qr') === 'weg') return;
-        q.setAttribute('data-dpk-qr', 'weg');
-        q.style.setProperty('display', 'none', 'important');
-        n++;
-      } else if (q.getAttribute('data-dpk-qr') === 'weg') {
-        /* nur zuruecknehmen, was WIR gesetzt haben */
-        q.removeAttribute('data-dpk-qr');
-        q.style.removeProperty('display');
-        n++;
-      }
-    });
-    return n;
-  }
-  window.addEventListener('resize', function () { qrNachziehen(null); });
+     Mit ihm faellt auch der resize-Horcher - eine Medienabfrage
+     braucht keinen. */
 
   function ertragAbraeumen() {
     /* Erst den Knopf heimschicken, dann den Block entfernen - sonst
@@ -330,7 +288,7 @@
     try {
       var bar = document.getElementById('oab-bar');
       ertragAbraeumen();   /* v1985: der Trichter ist raus, es gibt nichts zu bauen */
-      qrNachziehen(bar);   /* v1990 */
+      /* v1992: qrNachziehen() ist raus - CSS kann es, mit ID-Spezifitaet */
       zaehlung(bar);
       objektnummerSetzen(bar);
       karteiZaehlung(bar);

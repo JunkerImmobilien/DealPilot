@@ -2191,9 +2191,51 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
 
    Dieselbe Hausform fuehrt diese Datei weiter oben schon einmal.
    ================================================================= */
-@media (max-width: 640px){
-  html[data-dp-kartenstil] .dp-pfbar > .dp-pf-qr.dp-pf-qr,
-  html[data-dp-kartenstil] .dp-pf-scroll .dp-pf-qr.dp-pf-qr{
+/* v1992 - DIE REGEL AUS v1989 HATTE KEINE ID UND WAR DAMIT WIRKUNGSLOS.
+
+   Hier stand eine @media (max-width:640px) mit
+     html[data-dp-kartenstil] .dp-pfbar > .dp-pf-qr.dp-pf-qr
+   also (0,4,1). Dagegen steht weiter oben in dieser Datei
+     html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources)
+       .dp-pfbar > .dp-pf-qr{display:flex !important}
+   und :is() erbt die Spezifitaet seines STAERKSTEN Arguments - hier
+   eine ID. Also (1,3,2). Die alte Regel konnte nie gewinnen.
+
+   Im Browser gegengeprueft (mit echter Wartezeit, sonst misst man den
+   Zustand VOR der eigenen Aenderung):
+     ohne ID -> 64x92, display flex   wirkungslos
+     mit ID  -> 0x0,   display none
+
+   Grenze 900 px: Marcels Freigabe nennt Handy UND Tablet. */
+@media (max-width: 900px){
+  html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-qr,
+  html[data-dp-kartenstil] .dp-pf-scroll :is(#oab-bar,#qc7-sources) .dp-pf-qr{
     display:none !important;
+  }
+}
+
+/* v1992 - DER KASTEN WAR 64 BREIT UND 92 HOCH
+
+   Zwei Regeln aus zwei Versionen, die nie zusammen gelesen wurden:
+     Z1182  :is(#oab-bar,..) > .dp-pf-qr{width:64px;height:64px}  (1,3,2)
+     Z1596  > .dp-pf-qr.dp-pf-qr{min-width:92px;min-height:92px}  (0,4,2)
+
+   Die ID-Regel gewinnt fuer height - aber min-height setzt NIEMAND mit
+   ID, also bleibt die 92 stehen. Und min-height schlaegt height.
+   Ergebnis: 64 breit, 92 hoch. Keine der beiden Regeln ist falsch;
+   zusammen ergeben sie einen schiefen Kasten.
+
+   Aufgeloest zu 92 x 92 - der Hoehe, die er ohnehin hat. Gemessen:
+   Kasten 92x92, der gezeichnete Code waechst von 54 auf 68 px, die
+   Leiste bleibt 132 px hoch.
+
+   > Der QR war uebrigens die ganze Zeit scannbar: sein viewBox ist
+   > 0 0 31 31 und ohne preserveAspectRatio gilt xMidYMid meet, das das
+   > Verhaeltnis WAHRT. Schief war der Kasten, nicht der Code. */
+@media (min-width: 901px){
+  html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+    width:92px !important; height:92px !important;
+    min-width:92px !important; min-height:92px !important;
   }
 }
