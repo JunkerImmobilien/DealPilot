@@ -36,6 +36,54 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
+
+Marcel: „dass du die Objekte alle nochmal durchgehst und auch die
+Lageklassen zuordnest."
+
+**Zwei Befunde, beide gemessen:**
+
+1. **Von 21 Objekten trägt kein einziges eine Lageklasse.** Nicht eines.
+2. **Die Ansicht, in der man sie nebeneinander sähe, war nicht
+   erreichbar** — behoben in `v2008`.
+
+| | Stand |
+|---|---|
+| `window.setMainView` | **da** |
+| `window.showAllObjectsView` | **da** |
+| `#all-objects-main` | **da** |
+| `case 'view-all'` in `ui.js` | **zweimal da** |
+| Symbolkarte `all: 'folder'` | **da** |
+| `_sbActionsSyncActive` erwartet `data-act="view-all"` | **da** |
+| `.sb-iconnav-btn[data-iconnav]` | **0 Treffer** |
+| `#vw-all` / `#vw-single` | **nicht da** |
+| Seitenleiste | 13 Einträge, keiner „Alle Objekte" |
+
+Von Hand gerufen rendert sie einwandfrei: 36 Zeilen, Spalte **Lage**,
+Sortierung über alle Spalten, Portfolio-Kopf. Gebaut, angemeldet,
+funktionsfähig — es fehlte ein `<button>`.
+
+> **`ui.js:294` greift bis heute nach `.sb-iconnav-btn[data-iconnav]`.**
+> Diesen Anker gibt es im Markup **null Mal**. Eine Zeile, die ins Leere
+> greift, fällt nicht auf: `querySelector` gibt `null` zurück und der
+> Rest der Funktion läuft weiter.
+
+**Die Kette der Lageklasse ist end-to-end geprüft** (an `2026-004`,
+Testobjekt Musterhausen): Feld leer → B gewählt → gespeichert → Server
+führt `"B"` → die Objektkarte sagt nicht mehr „ohne Lageklasse" → die
+Übersicht zeigt die Pille. **Sie trägt.** `2026-004` steht jetzt auf
+**B** — das ist der Prüfstand, nicht Marcels Einschätzung.
+
+**Bewusst NICHT getan: die Lageklassen der 20 echten Objekte eintragen.**
+A/B/C ist keine ableitbare Größe — es gibt im ganzen Repo **keine**
+Herleitung aus Makro-/Mikrolage, AVM-Score oder Ort. Sie ist eine
+Strategieentscheidung und hängt an der Zielrendite (A 3,75 % · B 5,0 %).
+Eine geratene Klasse verschiebt den Zielkaufpreis jedes Objekts still.
+**Das gehört Marcel.** Mit der Übersicht sind es jetzt 21 Klicks in
+einer Liste statt 21 Objektwechsel.
+
+---
+
 ### N58 · Marktbericht: Karte, Liste, Tablett — und ein Buster, der seit v1877 feststand (08.10.2026)
 
 Vier Befunde von Marcel, alle im Browser auf Staging nachgestellt.
