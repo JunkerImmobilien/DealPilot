@@ -742,6 +742,133 @@
     return neu;
   }
 
+  /* ══ v1995 · DER RIEGEL ════════════════════════════════════════════
+
+     Marcel am 08.10.2026: „Wenn wir ein Objekt angelegt haben und im
+     Objekt sind und das schon reingeladen ist, dann sollten wir diese
+     Werte wie ImmoMetrica, auch Exposé, oder auch geführte
+     Eingabe/Sprache ausgrauen … Das machen wir halt nur, wenn noch
+     nichts drin steht."
+
+     WORAN „SCHON REINGELADEN" ERKANNT WIRD - GEMESSEN, nicht gefuehlt.
+     Die Gesamtzahl gefuellter Felder taugt NICHT: auch ohne Objekt sind
+     64 Felder gefuellt (Vorgaben aus dem Investitionsprofil).
+
+       ohne Objekt        64 Felder gesamt,  0 von 11 KERNfeldern
+       Objekt 2026-1036   95 Felder gesamt, 10 von 11 KERNfeldern
+
+     Die Schwelle steht bei DREI - weit genug von beiden Messwerten,
+     dass weder ein frisches Objekt versehentlich sperrt noch ein halb
+     gefuelltes durchrutscht.
+
+     Gesperrt werden die QUELLEN, die Felder ueberschreiben koennen.
+     `dealpilot` bleibt immer frei - das sind die Stufen, und der
+     Marktbericht ist genau das, was Marcel ab hier noch will. */
+  var RIEGEL_KERN = ['plz', 'ort', 'str', 'hnr', 'wfl', 'kp', 'baujahr', 'nkm', 'grd', 'objart', 'zimmer'];
+  var RIEGEL_QUELLEN = ['import', 'immometrica', 'voice', 'gefuehrt'];
+  var RIEGEL_SCHWELLE = 3;
+  var _riegelFrei = null;   /* Schluessel des Objekts, fuer das freigegeben wurde */
+
+  function _riegelKernZahl() {
+    var n = 0;
+    for (var i = 0; i < RIEGEL_KERN.length; i++) {
+      var e = document.getElementById(RIEGEL_KERN[i]);
+      if (e && String(e.value || '').trim() !== '') n++;
+    }
+    return n;
+  }
+  function _riegelGreift() {
+    var key = window._currentObjKey || null;
+    if (_riegelFrei !== null && _riegelFrei === key) return false;   /* fuer dieses Objekt freigegeben */
+    return _riegelKernZahl() >= RIEGEL_SCHWELLE;
+  }
+
+  /* Die Freigabe gilt fuer EIN Objekt und verfaellt beim Wechsel. Ein
+     Umbau, der sich nicht abwaehlen laesst, ist kein Angebot, sondern
+     eine Ansage. */
+  function riegelFreigeben() {
+    _riegelFrei = window._currentObjKey || null;
+    riegelNachziehen();
+    try { toast('Quellen freigegeben - sie koennen jetzt Felder ueberschreiben'); } catch (e) {}
+  }
+  window.DealPilotRiegel = {
+    greift: _riegelGreift, kernZahl: _riegelKernZahl,
+    freigeben: riegelFreigeben,
+    nachziehen: function () { riegelNachziehen(); },
+  };
+
+  function riegelNachziehen() {
+    var bar = document.querySelector('.dp-pfbar');
+    if (!bar) return 0;
+    var zu = _riegelGreift();
+    var n = 0;
+    RIEGEL_QUELLEN.forEach(function (src) {
+      var tile = bar.querySelector('.dp-pf-tile[data-src="' + src + '"]');
+      if (!tile) return;
+      var box = tile.querySelector('input[type=checkbox]');
+      /* Was von Haus aus gesperrt ist (z. B. ImmoMetrica ohne Schluessel),
+         bleibt gesperrt - der Riegel merkt sich, was ER getan hat. */
+      if (zu) {
+        if (tile.getAttribute('data-riegel') === 'zu') return;
+        tile.setAttribute('data-riegel', 'zu');
+        tile.setAttribute('data-riegel-titel', tile.getAttribute('title') || '');
+        tile.classList.add('dp-pf-riegel-zu');
+        tile.setAttribute('title', 'Dieses Objekt ist schon gefuellt - diese Quelle wuerde Felder ueberschreiben');
+        if (box) { box.checked = false; box.disabled = true; }
+        tile.classList.remove('on');
+        n++;
+      } else if (tile.getAttribute('data-riegel') === 'zu') {
+        tile.removeAttribute('data-riegel');
+        var alt = tile.getAttribute('data-riegel-titel');
+        if (alt) tile.setAttribute('title', alt); else tile.removeAttribute('title');
+        tile.removeAttribute('data-riegel-titel');
+        tile.classList.remove('dp-pf-riegel-zu');
+        if (box) box.disabled = false;
+        n++;
+      }
+    });
+    _riegelHinweis(bar, zu);
+    return n;
+  }
+
+  /* Die Zeile sagt WARUM gesperrt ist und bietet den Ausweg an. Ohne sie
+     waere der Riegel eine Sperre, die niemand erklaert. */
+  function _riegelHinweis(bar, zu) {
+    var id = 'oab-riegel-hinweis';
+    var alt = document.getElementById(id);
+    if (!zu) { if (alt) alt.remove(); return; }
+    if (alt) return;
+    var seg = bar.querySelector('.dp-pf-tile[data-src="import"]');
+    seg = seg ? seg.closest('.dp-pf-seg') : null;
+    if (!seg) return;
+    var d = document.createElement('div');
+    d.id = id;
+    d.className = 'dp-pf-riegel-hinweis';
+    d.innerHTML = '<span>Quellen gesperrt \u2014 dieses Objekt ist schon gef\u00fcllt.</span>'
+      + ' <button type="button" class="dp-pf-riegel-frei">trotzdem freigeben</button>';
+    d.querySelector('.dp-pf-riegel-frei').addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation(); riegelFreigeben();
+    });
+    seg.appendChild(d);
+  }
+
+  /* Nachziehen, wenn sich etwas aendert: Objektwechsel, Formulareingabe,
+     und einmal nach dem Bau der Leiste. Ohne Beobachter steht der Riegel
+     nach dem ersten Klick auf ein anderes Objekt falsch. */
+  (function _riegelHorcher() {
+    var _letzter = null;
+    function pruefe() {
+      var k = window._currentObjKey || null;
+      if (k !== _letzter) { _letzter = k; _riegelFrei = (_riegelFrei === k) ? k : null; }
+      try { riegelNachziehen(); } catch (e) {}
+    }
+    document.addEventListener('input', function (e) {
+      if (e.target && RIEGEL_KERN.indexOf(e.target.id) >= 0) pruefe();
+    }, true);
+    document.addEventListener('dp:objekt-geladen', pruefe);
+    setInterval(pruefe, 1500);
+  })();
+
   async function runSelected() {
     var srcs = selectedSources();
     if (!srcs.length) { toast('Bitte mindestens eine Quelle auswählen'); return; }

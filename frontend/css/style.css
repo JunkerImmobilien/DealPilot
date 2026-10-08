@@ -39675,3 +39675,51 @@ body.dp-neue-karte-stil .dp-pfbar .dp-pf-tile.on .dp-pf-led {
   border-color: rgba(63,165,108,.55) !important;
   box-shadow: 0 0 0 2px rgba(63,165,108,.22), 0 0 8px rgba(63,165,108,.55) !important;
 }
+
+/* =================================================================
+   v1995 - DER RIEGEL: gesperrte Quellen bei einem gefuellten Objekt
+
+   Marcel: "dann sollten wir diese Werte wie ImmoMetrica, auch Expose,
+   oder auch gefuehrte Eingabe/Sprache ausgrauen ... dann haben wir da
+   schon mal einen Riegel drin."
+
+   EIGENE KLASSE, nicht .dp-pf-disabled. Gemessen: die vorhandene
+   Ausgrauung wird in style.css weiter unten wieder aufgehoben
+
+     .dp-pfbar .dp-pf-tile.dp-pf-disabled{opacity:1 !important}
+
+   Wer sie benutzt, baut eine Sperre, die man nicht sieht.
+   ================================================================= */
+.dp-pfbar .dp-pf-tile.dp-pf-riegel-zu,
+#qc7-sources .dp-pf-tile.dp-pf-riegel-zu {
+  opacity: .42 !important;
+  filter: grayscale(.5) !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.dp-pf-riegel-hinweis {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+  font: 11px/1.4 Inter, system-ui, sans-serif;
+  color: #6b6358;
+}
+.dp-pf-riegel-frei {
+  border: 1px solid #b9b2aa;
+  background: transparent;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font: 600 11px/1.4 Inter, system-ui, sans-serif;
+  color: #2A2727;
+  cursor: pointer;
+}
+.dp-pf-riegel-frei:hover { border-color: #2A2727; }
+/* Auf der DUNKLEN Leiste tragen Text und Knopf helle Tinten - die
+   Beziehung zwischen Schrift und Grund wandert nicht von selbst mit. */
+body:not(.dp-neue-karte-stil) .dp-pf-riegel-hinweis { color: #a39b8c; }
+body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
+  color: #f3ead0;
+  border-color: rgba(243,234,208,.45);
+}
