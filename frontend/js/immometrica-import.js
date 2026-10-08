@@ -238,6 +238,23 @@
       el.onclick = function () { state.active = parseInt(el.dataset.i, 10); renderList(total); renderDetail(); };
     });
   }
+  /* v1999 · Die Zeile sagt, was sonst niemand sagt: dass dieses
+     Inserat keine Anschrift fuehrt und der Bodenrichtwert deshalb vom
+     Ortsmittelpunkt kommt. Keine Rueckfrage, kein Schalter - Marcels
+     Entscheidung ist, den Ortskern zu nehmen. Es muss nur dastehen. */
+  function _ortskernZeile(dp) {
+    var ort = String(dp.ort || '').trim();
+    var plz = String(dp.plz || '').trim();
+    var wo = (plz + ' ' + ort).trim() || 'dem Ort';
+    return '<div class="imo-ortskern">'
+      + '<b>Adresse nicht ver\u00f6ffentlicht</b>'
+      + '<span>Das Inserat f\u00fchrt keine Stra\u00dfe. F\u00fcr Bodenrichtwert und '
+      + 'Marktpreis wird der <b>Ortskern von ' + esc(wo) + '</b> verwendet '
+      + '\u2014 das ist eine Einsch\u00e4tzung, keine Messung am Objekt. '
+      + 'Tr\u00e4gst du die Anschrift sp\u00e4ter nach, rechnet alles neu.</span>'
+      + '</div>';
+  }
+
   function renderDetail() {
     var host = document.getElementById('imo-detail');
     var confirm = document.getElementById('imo-confirm');
@@ -247,6 +264,19 @@
     }
     var dp = state.items[state.active].dp;
     var map = 'ImmoMetrica <span style="color:var(--muted,#7A7370)">\u2192</span> <b>' + targetLabel() + '</b>';
+    /* ══ v1999 · WENN DAS INSERAT KEINE STRASSE FUEHRT ═══════════════
+
+       Marcel: „da koennte man die fehlende Strasse etc anklicken,
+       dann wird das Zentrum genommen oder der Ortskern."
+
+       Der Ortskern wird ohnehin schon genommen - `bodenrichtwert.js`
+       faellt bei fehlender Strasse still auf „PLZ Ort" zurueck, und
+       die Geokodierung liefert dafuer den Ortsmittelpunkt. Was fehlte,
+       ist nicht die Rechnung, sondern die ANGABE.
+
+       Deshalb steht es hier, wo man das Inserat auswaehlt - nicht
+       erst hinterher am Bodenrichtwert. */
+    var _ohneStrasse = !dp.str && (dp.plz || dp.ort);
     var rows = FIELD_ORDER.filter(function (k) { return dp[k] != null && dp[k] !== ''; }).map(function (k) {
       var v = dp[k];
       var disp = (k === 'notizen') ? '<span style="color:var(--muted,#7A7370)">Zusammenfassung</span>' : (k === 'baujahr' ? fmtY(v) : (typeof v === 'number' ? fmt(v) : esc(v)));
@@ -258,14 +288,20 @@
         '</label>';
     }).join('');
     var summary = dp.notizen ? '<div class="imo-sum">' + esc(dp.notizen) + '</div>' : '';
-    host.innerHTML = '<div class="imo-dl">In ' + esc(targetLabel()) + ' \u00fcbernehmen</div>' + rows + summary;
+    host.innerHTML = '<div class="imo-dl">In ' + esc(targetLabel()) + ' \u00fcbernehmen</div>' + rows + (_ohneStrasse ? _ortskernZeile(dp) : '') + summary;
     if (confirm) confirm.disabled = false;
   }
   function confirmPick() {
     var it = state.items[state.active]; if (!it) return;
     var picked = {};
     document.querySelectorAll('#imo-ov .imo-cb').forEach(function (cb) { if (cb.checked) picked[cb.dataset.k] = it.dp[cb.dataset.k]; });
-    ['_immometrica_id', '_quelle', '_expose', '_immometrica_online_since', '_immometrica_portals'].forEach(function (k) {
+    /* v1999 · Diese Liste ist HANDGEFUEHRT - wer im Mapping ein neues
+       Meta-Feld anlegt und sie vergisst, baut ein Feld, das nie ankommt.
+       Genau das waere mir mit _immometrica_reaktiviert aus v1998
+       passiert: im Mapping gesetzt, hier nicht weitergereicht, also im
+       Objekt nie vorhanden. Aufgefallen beim Lesen, nicht beim Testen. */
+    ['_immometrica_id', '_quelle', '_expose', '_immometrica_online_since',
+     '_immometrica_portals', '_immometrica_reaktiviert'].forEach(function (k) {
       if (it.dp[k] != null) picked[k] = it.dp[k];
     });
     state.confirmed = true;

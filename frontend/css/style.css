@@ -39723,3 +39723,25 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
   color: #f3ead0;
   border-color: rgba(243,234,208,.45);
 }
+
+/* =================================================================
+   v1999 - "Adresse nicht veroeffentlicht" im ImmoMetrica-Fenster
+
+   Marcel: "da koennte man die fehlende Strasse etc anklicken, dann
+   wird das Zentrum genommen oder der Ortskern."
+
+   Kein Warnton: der Ortskern ist erlaubt, es ist kein Fehler. Aber
+   auch nicht unsichtbar - ein Wert ohne seine Herkunft wird wie eine
+   Messung behandelt.
+   ================================================================= */
+.imo-ortskern {
+  margin: 10px 0 2px;
+  padding: 9px 11px;
+  border-left: 3px solid #b9b2aa;
+  border-radius: 0 6px 6px 0;
+  background: rgba(0,0,0,.035);
+  font: 12px/1.45 Inter, system-ui, sans-serif;
+  color: #4a453d;
+}
+.imo-ortskern b { display: block; margin-bottom: 2px; color: #2A2727; }
+.imo-ortskern span b { display: inline; }
