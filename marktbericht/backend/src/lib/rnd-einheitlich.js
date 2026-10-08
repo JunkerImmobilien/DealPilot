@@ -97,10 +97,56 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
       : SCHAETZUNG_TEXT + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.';
     return erg('geschaetzt', _g, fallback, _h);
   }
-  return erg('anlage2', null, a2.rnd,
+  /* ══ v1969 · DIE UNTERGRENZE GILT DURCHGEHEND ════════════════════════
+
+     Marcels Entscheidung vom 08.10.2026: „die RND-Untergrenze lassen wir
+     auf 10." Die Alternative waeren die 30 Prozent aus Paragraf 185
+     Abs. 3 Satz 6 BewG gewesen (bei GND 80 also 24 Jahre) — Steuerrecht,
+     fuer den Verkehrswert nicht bindend und die unvorsichtigere Zahl.
+
+     HIER WAR SIE KEINE UNTERGRENZE. `RND_MIN` wirkte nur im
+     Schaetzungs-Zweig (`schaetzung()`), nicht im Anlage-2-Zweig. Gemessen
+     am 08.10.2026 ergab das einen SPRUNG NACH OBEN mit zunehmendem Alter:
+
+       GND 50, 1 Punkt, Alter 46  ->   8,4 Jahre   (Anlage 2, ohne Boden)
+       GND 50, 1 Punkt, Alter 51  ->  10,0 Jahre   (Rueckfall, mit Boden)
+
+     Das aeltere Gebaeude bekam mehr — derselbe Fehlertyp, der in v1966
+     hinter dem Scheitel der Parabel behoben wurde, nur eine Ebene hoeher.
+     Gefunden hat ihn tools/rnd-kerne-pruefen.mjs beim Pruefen des
+     Standalone-Moduls.
+
+     WIE VIEL ES AENDERT, nachgemessen am echten anlage2.js ueber 7.455
+     Faelle (Alter 1 bis GND-1, alle 21 Punktzahlen, GND 50/60/70/80/100):
+
+       24 Faelle liegen unter 10 Jahren — 0,32 Prozent
+       nur bei GND 60 (ab Alter 56) und GND 50 (ab Alter 43),
+       also bei 93 bzw. 86 Prozent der Gesamtnutzungsdauer
+       bei GND 70, 80 und 100 NIE
+
+     Es trifft also ausschliesslich den aeussersten Rand, unmittelbar
+     bevor das Modell ohnehin abgeschaltet wird, und hebt dort um
+     hoechstens 0,9 Jahre.
+
+     > WARUM DER BODEN HIER UND NICHT IN anlage2.js STEHT: anlage2.js ist
+     > das MODELL der Verordnung und soll es bleiben — es rechnet, was die
+     > Anlage 2 sagt, und verweigert, wo sie nicht gilt. Die Untergrenze
+     > ist dagegen eine HAUSENTSCHEIDUNG. Sie gehoert in die Schicht, die
+     > schon RND_MIN besitzt und die alle Verfahren fragen. So gibt es
+     > weiter EINE Untergrenze an EINER Stelle.
+
+     > Die Klammer nach oben (GND minus RND_MIN) gilt mit: bei einer
+     > Gesamtnutzungsdauer von 20 Jahren waeren 10 Jahre Restnutzung die
+     > Haelfte, was fuer ein Gebaeude an seiner Altersgrenze unsinnig
+     > ist. Dieselbe Klammer fuehrt `schaetzung()`. */
+  const _mitBoden = Math.min(GND - RND_MIN, Math.max(a2.rnd, RND_MIN));
+  const _gebodet = Math.abs(_mitBoden - a2.rnd) > 1e-9;
+  return erg('anlage2', null, _mitBoden,
     'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
     + GND + ' Jahren, aus ' + mp + ' Modernisierungspunkten'
-    + (kern ? ' (Kernsanierung)' : '') + '.');
+    + (kern ? ' (Kernsanierung)' : '') + '.'
+    + (_gebodet ? ' Das Modell ergibt ' + a2.rnd + ' Jahre; angesetzt ist die '
+        + 'Untergrenze von ' + RND_MIN + ' Jahren.' : ''));
 }
 
 export default { restnutzungsdauerEinheitlich, schaetzung, GND_JAHRE_STANDARD, RND_MIN };

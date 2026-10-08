@@ -260,10 +260,78 @@ if (nichtMonoton > 8) console.log('  ... und ' + (nichtMonoton - 8) + ' weitere'
 console.log('4 · Monotonie (aelter darf nie mehr RND geben): '
   + (nichtMonoton ? nichtMonoton + ' Verstoesse' : 'eingehalten'));
 
+/* ═══ 5 · DIE AUSGELIEFERTE ZAHL ═══════════════════════════════════════
+   Die Abschnitte 1 bis 4 pruefen die ROHEN Kerne. Beim Kunden kommt aber
+   an, was `rnd-einheitlich.js` zurueckgibt — mit Rueckfall und
+   Untergrenze. Genau dort sass der Sprung, den v1969 behoben hat:
+
+     GND 50, 1 Punkt, Alter 46  ->   8,4 Jahre  (Anlage 2, ohne Boden)
+     GND 50, 1 Punkt, Alter 51  ->  10,0 Jahre  (Rueckfall, mit Boden)
+
+   Ein Pruefer, der nur die Kerne ansieht, findet das nicht: die Kerne
+   verweigern jenseits der GND und werden damit „monoton" gerechnet,
+   waehrend die gelieferte Zahl springt. */
+const { restnutzungsdauerEinheitlich: EINHEITLICH, RND_MIN } =
+  await import('file://' + path.join(WURZEL, 'marktbericht/backend/src/lib/rnd-einheitlich.js')
+    .replace(/\\/g, '/'));
+
+/* EIN Sprung ist in der Verordnung selbst angelegt und KEIN Fehler:
+   Anlage 2 wechselt an der Schwelle (Tabelle 3, Spalte „relatives Alter")
+   von `RND = GND - Alter` auf die Formel, und die beiden Aeste treffen
+   sich dort nicht exakt. Gemessen bei GND 80 und 3 Punkten
+   (Schwelle 55 %): Alter 43 -> 37,00 Jahre (GND minus Alter),
+   Alter 44 -> 37,14 Jahre (Formel). 0,14 Jahre.
+
+   Dieser Lauf laesst ihn deshalb GENAU DORT zu — beim Ueberschreiten der
+   Schwelle, bis 0,5 Jahre — und zaehlt ihn gesondert mit, statt ihn zu
+   verstecken. Ueberall sonst ist jeder Anstieg rot. */
+const SCHWELLE_TOLERANZ = 0.5;
+let liefSpruenge = 0, liefUnterBoden = 0, liefFaelle = 0, schwellenKnick = 0;
+for (const gnd of GNDS) {
+  /* Punktzahl 0 laesst rnd-einheitlich bewusst auf die Schaetzung fallen
+     (0 gilt als „nicht erfasst", Backlog N47b) — deshalb ab 1. */
+  for (let p = 1; p <= 20; p++) {
+    const schwelle = tabFront[p] ? tabFront[p].rel : null;
+    let vorAlter = null, vorWert = null, vorRel = null;
+    for (let alter = 1; alter <= 170; alter++) {
+      const bj = JAHR - alter;
+      const r = EINHEITLICH({ build_year: bj, mod_punkte: p }, gnd);
+      if (!r || r.rnd == null) continue;
+      liefFaelle++;
+      const rel = (alter / gnd) * 100;
+      if (r.rnd < RND_MIN - 1e-9) {
+        liefUnterBoden++;
+        if (liefUnterBoden <= 3) rot('ausgeliefert: GND ' + gnd + ' P' + p + ' Alter ' + alter
+          + ' -> ' + r2(r.rnd) + ' Jahre, unter der Untergrenze ' + RND_MIN);
+      }
+      if (vorWert != null && r.rnd > vorWert + 1e-9) {
+        const anSchwelle = schwelle != null && vorRel < schwelle && rel >= schwelle;
+        if (anSchwelle && (r.rnd - vorWert) <= SCHWELLE_TOLERANZ) {
+          schwellenKnick++;
+        } else {
+          liefSpruenge++;
+          if (liefSpruenge <= 5) rot('ausgeliefert: GND ' + gnd + ' P' + p + ' — Alter ' + vorAlter
+            + ' -> ' + r2(vorWert) + ' Jahre, aber Alter ' + alter + ' -> ' + r2(r.rnd)
+            + ' Jahre. Das aeltere Gebaeude bekommt MEHR.');
+        }
+      }
+      vorAlter = alter; vorWert = r.rnd; vorRel = rel;
+    }
+  }
+}
+if (liefSpruenge > 5) console.log('  ... und ' + (liefSpruenge - 5) + ' weitere Spruenge');
+console.log('5 · Ausgelieferte Zahl (rnd-einheitlich, Untergrenze ' + RND_MIN + '): '
+  + liefFaelle + ' Faelle, '
+  + (liefSpruenge || liefUnterBoden
+      ? liefSpruenge + ' Spruenge, ' + liefUnterBoden + ' unter dem Boden'
+      : 'monoton und nie unter dem Boden')
+  + ' · ' + schwellenKnick + ' Knick(e) an der Schwelle der Anlage 2 (zugelassen, '
+  + 'bis ' + SCHWELLE_TOLERANZ + ' Jahre)');
+
 /* ═══ Ergebnis ═════════════════════════════════════════════════════════ */
 console.log('');
-console.log('DECKUNG: ' + faelle + ' Faelle, ' + (MODUL ? 3 : 2) + ' Kerne, '
-  + 'alle 21 Punktzahlen, ' + GNDS.length + ' Gesamtnutzungsdauern.');
+console.log('DECKUNG: ' + faelle + ' Kern-Faelle, ' + liefFaelle + ' Ausliefer-Faelle, '
+  + (MODUL ? 3 : 2) + ' Kerne, alle 21 Punktzahlen, ' + GNDS.length + ' Gesamtnutzungsdauern.');
 if (fehler) {
   console.log('ERGEBNIS: ' + fehler + ' Befund(e) — ROT');
   process.exit(1);
