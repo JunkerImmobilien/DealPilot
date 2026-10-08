@@ -36,6 +36,63 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N55 · ⚠ Eine korrigierte Quell-URL erzeugt eine ZWEITE Zeile (08.10.2026)
+
+**Gemessen, nicht vermutet — und zwar an einem Schaden, den ich selbst erzeugt habe.**
+
+In `v1983` habe ich bei den zwei Essener Sachwertfaktoren den `quelle_url` korrigiert:
+der alte Portal-Link gibt **403**, die BORIS-PDF **200**, und nur sie trägt den
+Lizenzblock. Nach dem Säen standen **vier** Zeilen in `mb.param_modell` statt zwei:
+
+```
+ezfh  lizenz=NULL            https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/
+ezfh  lizenz=dl-de/zero-2-0  https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_…pdf
+rmh   lizenz=NULL            https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/
+rmh   lizenz=dl-de/zero-2-0  https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_…pdf
+```
+
+**Die Ursache steht im Upsert-Schlüssel.** Er lautet
+
+```
+land_code | ags | kennzahl | zweig | berichtsjahr | quelle_url
+```
+
+Die URL ist Teil des Schlüssels. Wer sie korrigiert, trifft also nicht mehr dieselbe
+Zeile — die Saat **fügt eine neue hinzu und lässt die alte stehen**. Die alte Zeile
+kommt in keiner Saatdatei mehr vor, wird von keiner Prüfung erwähnt und ist von außen
+nicht zu sehen.
+
+> **Warum das teuer ist:** welche der beiden Zeilen ein Bericht erwischt, ist Zufall.
+> Erwischt er die alte, zitiert er eine Quelle, die 403 gibt, und **behauptet dabei
+> keine Lizenz** — genau das, was die Doktrin verbietet. Der Fehler ist dabei lautlos:
+> es fehlt nichts, es steht etwas Falsches zu viel da. Und er trifft jede
+> Linkkorrektur, also genau die Pflege, die das Register braucht.
+
+**Sofort erledigt (nur Staging):** die zwei Waisen gelöscht, nach eigener Sicherung
+(`/root/backups/mb-vor-essen-waisen-20261008-1034.sql.gz`, 3,4 MB, 40.014 Zeilen,
+nachgesehen). Ein `DELETE` auf den alten Link traf genau 2 Zeilen.
+Danach: 3.570 Sätze, Essen je Zweig **eine** Zeile mit Lizenz, und ohne Lizenz nur noch
+die **zwei BY-Sperren ohne Wert** — eine Sperre braucht keine Lizenz, weil sie keinen
+Wert trägt. **Damit führt jeder Wert im Register eine Lizenzangabe.**
+
+**Zu tun (die Ursache, nicht der Fall):**
+1. `register-saat.mjs` braucht einen **Aufräum-Lauf**: Zeilen, die zu keiner Saatdatei
+   mehr gehören, benennen und auf Verlangen löschen. Heute gibt es dafür nur
+   `--trocken` und `--nur=XX`.
+2. Oder — besser — **die URL aus dem Upsert-Schlüssel nehmen** und stattdessen die
+   `fundstelle` oder eine eigene Satzkennung führen. Die Quelle ist eine *Eigenschaft*
+   des Satzes, nicht seine *Identität*: derselbe Wert desselben Ausschusses für dasselbe
+   Berichtsjahr bleibt derselbe Satz, auch wenn das Amt seine Seite umzieht.
+3. Bis dahin: **wer eine `quelle_url` ändert, prüft danach auf Doppelzeilen.** Der
+   Prüfer `saat-pruefen.mjs` findet Dubletten nur *innerhalb* einer Datei, nicht in der
+   Datenbank.
+
+> Für Punkt 2 gilt die Gegenprobe: eine Schlüsseländerung lässt **alle** 3.570 Zeilen
+> neu entstehen. Das gehört in einem Zug mit einem Aufräum-Lauf gemacht, sonst
+> verdoppelt sich das Register einmal komplett.
+
+---
+
 ### N54 · Der Saatprüfer: 49 Restbefunde, einer davon echt (08.10.2026)
 
 **Vorgeschichte.** `node tools/saat-pruefen.mjs` **ohne Dateiargument prüfte null
