@@ -232,6 +232,37 @@ function mapObjart(it) {
   if (/einfamilien|\befh\b|housebuy|haus/.test(s)) return 'EFH';
   return 'ETW';
 }
+/* == v2001 - DAS BUNDESLAND RECHTS VOM KOMMA ========================
+
+   Hier stand ein Komma-Zweig, der links IMMER einen Strassennamen
+   annahm - "Strasse 9, 32609 Ort". ImmoMetrica schickt bei Inseraten
+   OHNE veroeffentlichte Anschrift aber die Form "Ort, Bundesland",
+   und dann landete gemessen die Stadt in der Strasse:
+
+     "Herford, Nordrhein-Westfalen"         -> str="Herford"
+     "32049 Herford, Nordrhein-Westfalen"   -> str="32049 Herford", plz leer
+     "Mitte, Berlin"                        -> str="Mitte"
+     "Bad Oeynhausen - Nordrhein-Westfalen" -> ort LEER (der Trenner nahm
+                                               das LETZTE Segment, und das
+                                               Land wurde danach geloescht)
+
+   Der Fehler war doppelt: der Bodenrichtwert suchte eine Strasse, die
+   es nicht gibt, UND die Ortskern-Zeile aus v1999 haengt an `!dp.str`
+   und konnte deshalb NIE erscheinen. Ein Inserat ohne Anschrift sah
+   aus wie eines mit.
+
+   Das Bundesland ist fuer uns Rauschen - es gibt in der Datenaufnahme
+   kein Feld dafuer (gemessen: kein #bundesland, kein address_state in
+   der API). Es wird erkannt und verworfen, der ORT bleibt. Ausnahme
+   sind die drei Stadtstaaten: dort IST das "Land" die Stadt und links
+   steht der Ortsteil - "Mitte, Berlin" wird zu "Berlin-Mitte". == */
+const LAENDER = ['Nordrhein-Westfalen', 'Bayern', 'Baden-W\u00fcrttemberg',
+  'Niedersachsen', 'Hessen', 'Sachsen-Anhalt', 'Sachsen', 'Rheinland-Pfalz',
+  'Schleswig-Holstein', 'Brandenburg', 'Th\u00fcringen', 'Mecklenburg-Vorpommern',
+  'Saarland', 'Berlin', 'Hamburg', 'Bremen'];
+const STADTSTAATEN = ['Berlin', 'Hamburg', 'Bremen'];
+const istLand = (t) => LAENDER.some((l) => l.toLowerCase() === String(t || '').trim().toLowerCase());
+
 function parseAddr(it) {
   const raw = (it.address_raw || '').trim();
   let plz = it.address_zipcode ? String(it.address_zipcode) : '';
@@ -241,6 +272,29 @@ function parseAddr(it) {
     const mm = seg.match(/^(.*?[^\s\d])\s+(\d+\s*[a-zA-Z]?(?:\s*[-+\/]\s*\d+\s*[a-zA-Z]?)?)$/);
     if (mm) return { str: mm[1].trim(), hnr: mm[2].replace(/\s+/g, '') };
     return { str: seg, hnr: '' };
+  }
+  /* v2001 - "32049 Herford" oder "Herford 32049" in PLZ und Ort trennen */
+  function plzOrt(seg) {
+    seg = String(seg || '').trim();
+    const m1 = seg.match(/^(\d{5})\s+(.+)$/);  if (m1) return { plz: m1[1], ort: m1[2].trim() };
+    const m2 = seg.match(/^(.+?)\s+(\d{5})$/);  if (m2) return { plz: m2[2], ort: m2[1].trim() };
+    return { plz: '', ort: seg };
+  }
+  /* v2001 - ZUERST die Form ohne Anschrift: endet der Rohtext auf ein
+     Bundesland, ist links kein Strassenname, sondern der Ort. Das muss
+     vor dem Komma-Zweig stehen - sonst greift der wieder zuerst. */
+  const teile = raw.split(/\s*,\s*|\s+-\s+|\s*\u2013\s*/).map((t) => t.trim()).filter(Boolean);
+  if (teile.length > 1 && istLand(teile[teile.length - 1])) {
+    const land = teile[teile.length - 1];
+    const po = plzOrt(teile.slice(0, -1).join(' '));
+    plz = plz || po.plz;
+    ort = po.ort;
+    if (STADTSTAATEN.some((s) => s.toLowerCase() === land.toLowerCase())) {
+      ort = (!ort || ort.toLowerCase() === land.toLowerCase()) ? land : (land + '-' + ort);
+    }
+    /* str und hnr bleiben LEER - genau daran erkennt die Oberflaeche,
+       dass der Bodenrichtwert vom Ortsmittelpunkt kommen muss. */
+    return { plz, str: '', hnr: '', ort };
   }
   if (raw.includes(',')) {
     const parts = raw.split(',');
@@ -255,9 +309,13 @@ function parseAddr(it) {
     const mo = raw.match(/\b\d{5}\b\s+(.+)$/); if (mo) ort = mo[1].trim();
   } else {
     const m = raw.match(/(\d{5})\b/); if (m) plz = plz || m[1];
-    const seg = raw.split(/\s-\s|\u2013/);
-    ort = (seg[seg.length - 1] || '').replace(/\d{5}/g, '')
-      .replace(/Nordrhein-Westfalen|Bayern|Niedersachsen|Hessen|Baden-W\u00fcrttemberg|Sachsen|Th\u00fcringen|Brandenburg|Rheinland-Pfalz|Saarland|Schleswig-Holstein|Mecklenburg-Vorpommern|Sachsen-Anhalt|Bremen|Hamburg|Berlin/gi, '').trim();
+    /* v2001 - hier stand `seg[seg.length - 1]` - das LETZTE Segment. Bei
+       "Bad Oeynhausen - Nordrhein-Westfalen" war das das Land, und nach
+       dem Loeschen der Laendernamen blieb LEER uebrig. Jetzt wird das
+       erste Segment genommen, das kein Bundesland ist. */
+    const seg = raw.split(/\s-\s|\u2013/).map((t) => t.trim()).filter(Boolean);
+    const ohneLand = seg.filter((t) => !istLand(t));
+    ort = (ohneLand[ohneLand.length - 1] || '').replace(/\d{5}/g, '').trim();
   }
   return { plz, str, hnr, ort };
 }

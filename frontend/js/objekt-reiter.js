@@ -579,7 +579,14 @@
   }
   var ZIEL_KEY = 'dp_zielstufe';
   function zielstufe() { try { var z = parseInt(localStorage.getItem(ZIEL_KEY), 10); return (z >= 1 && z <= 3) ? z : 1; } catch (e) { return 1; } }
-  function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} zielAnwenden(); stufen(); }
+  /* v2001 · Marcel: „wenn ich oben mit den kleinen Kreisen wechsle, dann
+     steht immer noch: fuer Stufe 3 fehlt noch." Gemessen: `_fehlStufe`
+     wurde NUR in stufeAbrufen() gesetzt - die Zeile unten zeigte die
+     zuletzt ABGERUFENE Stufe, nicht die gewaehlte. Jetzt folgt sie der
+     Wahl. Die Eingabetiefe selbst bleibt ein Merker je NUTZER (siehe
+     oben) - verwirrend war nicht die gemerkte Tiefe, sondern dass die
+     Zeile ihr nicht folgte. */
+  function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} fehlZeileSetzen(z); zielAnwenden(); stufen(); }
   function zielAnwenden() {
     var z = zielstufe();
     document.querySelectorAll('[data-oe-ziel]').forEach(function (b) { b.classList.toggle('on', parseInt(b.getAttribute('data-oe-ziel'), 10) === z); });
@@ -734,6 +741,10 @@
   }
   var _fehlStufe = null;   /* v1852: die zuletzt angefragte Stufe — die Fehlliste folgt der Eingabe */
   function fehlendeNachziehen() { if (_fehlStufe) fehlendeZeigen(_fehlStufe, fehltFuer(_fehlStufe)); }
+  /* v2001 · eine Stelle, die die Zeile auf eine Stufe stellt - gerufen
+     von den Kreisen UND beim Objektwechsel. Ohne den Objektwechsel blieb
+     nach dem Loeschen die Fehlliste des geloeschten Objekts stehen. */
+  function fehlZeileSetzen(z) { _fehlStufe = z; fehlendeZeigen(z, fehltFuer(z)); }
   function stufeAbrufen(s) {
     var fehlt = fehltFuer(s);
     _fehlStufe = s;
@@ -1012,7 +1023,9 @@
        nachziehen: sofort nach dem Befuellen und nach dem Bodenrichtwert-
        Autolauf, der etwas spaeter seinen Status schreibt. */
     window.addEventListener('dp:object-ready', function () {
-      setTimeout(function () { alles(); stufen(); }, 120);
+      /* v2001 · fehlZeileSetzen mit: ein frisches (leeres) Objekt trug
+         sonst die Fehlliste des vorigen weiter. */
+      setTimeout(function () { alles(); stufen(); fehlZeileSetzen(zielstufe()); }, 120);
       setTimeout(alles, 1800);
     });
     window.addEventListener('dp:plan-ready', function () { stufen(); });
