@@ -246,7 +246,22 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
     } catch (e) { console.warn('[ai] marktbericht attach:', e.message); }
     delete payload.objId;   /* gehoert nicht in den Prompt */
 
-    const result = await openaiService.analyze(payload, { userApiKey });
+    /* v2009 - HIER STAND `analyze(payload, { userApiKey })`.
+
+       aiOptions (Detailgrad, Tonalitaet, Fokus und Marcels eigene
+       Anweisungen bis 500 Zeichen) wurde vom Browser geschickt und
+       hier WEGGEWORFEN. `_analyzeStyleSuffix(opts)` im Dienst konnte
+       deshalb nie etwas finden. Die Einstellung war im UI sichtbar,
+       speicherbar - und ohne Wirkung.
+
+       Wie es geht, steht zwanzig Zeilen weiter unten in /ai/lage:
+       herausziehen, aus dem Payload loeschen (sie gehoeren nicht in
+       den Prompt-Text), als zweites Argument uebergeben. */
+    const aiOptions = (payload.aiOptions && typeof payload.aiOptions === 'object')
+      ? payload.aiOptions : null;
+    delete payload.aiOptions;
+
+    const result = await openaiService.analyze(payload, { userApiKey, aiOptions });
 
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {

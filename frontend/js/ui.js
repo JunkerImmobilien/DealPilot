@@ -825,6 +825,13 @@ function _buildAIPayload() {
     },
     finanzierung: {
       d1z_pct: k.d1z_pct, d1t_pct: k.d1t_pct, d1: k.d1,
+      /* v2009 - Zinsbindung und Anschlusskondition. Aufgabe 13 des
+         Prompts verlangt eine Anschlussfinanzierungs-Analyse; bis
+         hierher reiste nur die Restschuld mit, ohne das Jahr dazu.
+         Gelesen wird aus dem Formular, weil State.kpis diese drei
+         nicht fuehrt. */
+      d1_bindj: parseDe(g('d1_bindj')), anschl_z: parseDe(g('anschl_z')),
+      anschl_t: parseDe(g('anschl_t')), anschl_bj: parseDe(g('anschl_bj')),
       restschuld_ezb: (typeof State !== 'undefined' && State.rs1 != null) ? State.rs1 : ((typeof State !== 'undefined' && State.rs != null) ? State.rs : (parseDe(g('restschuld')) || null))
     },
     dealscore: dealscoreSnap || {},

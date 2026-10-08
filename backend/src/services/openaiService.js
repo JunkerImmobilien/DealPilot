@@ -41,6 +41,8 @@ function buildPrompt(payload) {
   const mr = payload.marktradar || [];
   const mbr = payload.marktbericht || null;   /* v947-mbsource: der echte Bericht */
   const isc = payload.investor_score || null;
+  /* v2009 - Vermarktungsdauer. Bis hierher gab es sie nur im Request. */
+  const vh = payload.verhandlung || null;
   /* ═══ v1311 · Woher die Zahlen kommen ════════════════════════════════
      Marcels Vorgabe vom 11.09.2026: der Co-Pilot soll das Wissen aus dem
      Sprechlauf mitnehmen. Die WERTE kamen schon an — was fehlte, war ihre
@@ -338,10 +340,61 @@ function buildPrompt(payload) {
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',
+    /* v2009 - hier stand nur `.total`. Die vier Teilscores reisen seit
+       jeher mit und wurden verworfen - waehrend das Antwortformat ein
+       Feld `score_vergleich` verlangt, das erklaeren soll, WELCHE
+       Zusatz-KPIs die Differenz treiben. Das Modell musste raten. */
     isc ? ('Investor Deal Score: ' + (isc.total != null ? isc.total : '–') + ' / 100 (beruecksichtigt zusaetzlich Lage/Substanz/Upside — 24 KPIs)') : '',
+    /* v2009 - die Aufschluesselung des Investor Deal Score. */
+    (isc && (isc.rendite != null || isc.finanzierung != null || isc.risiko != null || isc.lage != null))
+      ? ('  davon Rendite ' + (isc.rendite != null ? isc.rendite : '–')
+         + ' | Finanzierung ' + (isc.finanzierung != null ? isc.finanzierung : '–')
+         + ' | Risiko ' + (isc.risiko != null ? isc.risiko : '–')
+         + ' | Lage ' + (isc.lage != null ? isc.lage : '–')
+         + (isc.label ? ' | Stufe ' + isc.label : '')
+         + '  (nutze GENAU diese vier fuer score_vergleich - nicht raten)')
+      : '',
+
+    /* v2009 - VERMARKTUNGSDAUER. `verhandlung` wurde seit jeher
+       geschickt und kam im ganzen Dienst nur EINMAL vor: in der
+       Beschreibung der Ausgabe. Wie lange ein Objekt am Markt steht,
+       ist einer der staerksten Verhandlungshebel ueberhaupt. */
+    (vh && (vh.tage_online != null || vh.inseriert_seit))
+      ? ('\nVERMARKTUNGSDAUER\n'
+         + (vh.tage_online != null ? '- Seit ' + vh.tage_online + ' Tagen inseriert\n' : '')
+         + (vh.inseriert_seit ? '- Inseriert seit: ' + vh.inseriert_seit + '\n' : '')
+         + '- Lange Standzeit ist ein Verhandlungshebel, kurze mahnt zur Eile. '
+         + 'Nenne die Zahl in der Verhandlungsempfehlung, wenn sie etwas aussagt.')
+      : '',
+
+    /* v2009 - DIE GEMESSENEN LAGESCORES. Bisher wurden aus
+       `dealpilot_marktbewertung` nur `marktkontext` und `erbbaurecht`
+       gelesen. Die Lagescores kommen aus dem Marktbericht - also aus
+       einer MESSUNG - waehrend `makrolage`/`mikrolage` weiter oben
+       Marcels SELBSTeinschaetzung sind. Das Modell sah bisher nur die
+       Selbsteinschaetzung und nicht die Messung daneben. */
+    (_dpmb && (_dpmb.mikrolage || _dpmb.makrolage || _dpmb.wertentwicklung_pct_pa != null))
+      ? ('\nDEALPILOT-LAGESCORES (gemessen, nicht geschaetzt)\n'
+         + (_dpmb.mikrolage ? '- Mikrolage: ' + (_dpmb.mikrolage.label || '–')
+             + (_dpmb.mikrolage.score != null ? ' (' + _dpmb.mikrolage.score + '/100)' : '') + '\n' : '')
+         + (_dpmb.makrolage ? '- Makrolage: ' + (_dpmb.makrolage.label || '–')
+             + (_dpmb.makrolage.score != null ? ' (' + _dpmb.makrolage.score + '/100)' : '') + '\n' : '')
+         + (_dpmb.wertentwicklung_pct_pa != null ? '- Wertentwicklung: ' + _p(_dpmb.wertentwicklung_pct_pa) + ' p.a.\n' : '')
+         + (_dpmb.marktwert != null ? '- Marktwert laut Karte: ' + _z(_dpmb.marktwert) + ' EUR\n' : '')
+         + 'Diese Werte sind GEMESSEN. Weichen sie von der Selbsteinschaetzung '
+         + 'des Investors ab, sage es und begruende mit diesen Zahlen.')
+      : '',
+
     '',
     'Cashflow:',
-    '- Monatlich: ' + fmtEur(k.cf_m),
+    /* v2009 - `cf_m` ist der Cashflow VOR Steuer (calc.js:1970:
+       cf_m = cf_op/12, waehrend cf_ns = cf_op - steuer). Das stand
+       bisher nicht dran, und Aufgabe 8 verlangt eine Aussage zur
+       Steuererstattung. Jetzt steht beides da und ist benannt. */
+    '- Monatlich (VOR Steuer): ' + fmtEur(k.cf_m),
+    (k.cf_ns != null && isFinite(k.cf_ns)) ? ('- Jaehrlich NACH Steuer: ' + fmtEur(k.cf_ns)) : '',
+    (k.steuer != null && isFinite(k.steuer)) ? ('- Steuerwirkung p.a.: ' + fmtEur(-k.steuer) + ' (negativ = Erstattung)') : '',
+    (k.afa != null && isFinite(k.afa)) ? ('- AfA p.a.: ' + fmtEur(k.afa)) : '',
     '- Score: ' + cfScore + ' / 100',
     '',
     'Rendite (NMR):',
@@ -370,6 +423,12 @@ function buildPrompt(payload) {
     f.d1z_pct != null ? 'Sollzins D1: ' + Number(f.d1z_pct).toFixed(2) + ' %' : '',
     f.d1t_pct != null ? 'Tilgung D1: ' + Number(f.d1t_pct).toFixed(2) + ' %' : '',
     f.restschuld_ezb != null ? 'Restschuld am Ende der Zinsbindung: ' + fmtEur(f.restschuld_ezb) : '',
+    /* v2009 - Aufgabe 13 verlangt eine Anschlussfinanzierungs-Analyse.
+       Bis hierher reiste die Restschuld mit, aber nicht, WANN die
+       Zinsbindung endet. Eine Restschuld ohne Datum ist keine Basis. */
+    (f.d1_bindj != null && f.d1_bindj !== '') ? ('Zinsbindung: ' + f.d1_bindj + ' Jahre') : '',
+    (f.anschl_z != null && f.anschl_z !== '') ? ('Angenommener Anschlusszins: ' + f.anschl_z + ' %') : '',
+    (f.anschl_t != null && f.anschl_t !== '') ? ('Angenommene Anschlusstilgung: ' + f.anschl_t + ' %') : '',
     '',
     /* v947-mbsource: Der DealPilot-Marktbericht ist die BESTE Quelle im Prompt —
      * gemessene Vergleichsdaten statt Formularfelder. Er steht deshalb VOR der
