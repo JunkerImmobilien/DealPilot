@@ -39633,3 +39633,45 @@ body.dp-neue-karte-stil .dp-pfbar .dp-pf-pille {
 body.dp-neue-karte-stil .dp-pfbar .dp-pf-pille.on {
   color: #050505;
 }
+
+/* =================================================================
+   v1991 - DIE LAMPE DER AUSWAHL WIRD SICHTBAR GRUEN
+
+   Marcel am 08.10.2026: "oben auf der Datenaufnahme Karte darf die
+   Lampe der Auswahl gerne gruen sein."
+
+   SIE WAR SCHON GRUEN. .dp-pf-tile.on .dp-pf-led traegt seit Langem
+   radial-gradient(circle at 35% 30%, #5BD98E, #3FA56C 70%). Verdeckt
+   haben es zwei Dinge:
+
+     Groesse   9 x 9 px   (der Grundwert ist 11, ein v578-Block
+                           ueberschreibt ihn mit 9 !important)
+     Rand      rgba(5,5,5,.35) - ein dunkler Ring auf hellem Grund,
+               der bei 9 px fast die halbe Flaeche einnimmt
+
+   Auf Marcels Bild ist "Expose / Marktbericht" gewaehlt, und der Punkt
+   sieht trotzdem dunkel aus. Bei 9 px mit dunklem Ring liest niemand
+   eine Farbe.
+
+   > Eine Zustandsanzeige, die ihren Zustand nicht zeigt, ist keine.
+   > Ein richtiges Gruen, das man nicht sieht, richtet denselben
+   > Schaden an wie ein falsches.
+
+   Nur auf der HELLEN Karte (body.dp-neue-karte-stil). Auf der dunklen
+   Leiste ist der dunkle Ring richtig - dort traegt er die Tiefe.
+
+   Im Browser gegengeprueft, mit echter Wartezeit:
+     heute     9x9   Rand rgba(5,5,5,.35)
+     nachher  12x12  Rand rgba(63,165,108,.55)
+
+   Statusfarbe: Gruen bleibt in jeder Marke Gruen - kein var(--wl-..).
+   ================================================================= */
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-led {
+  width: 12px !important;
+  height: 12px !important;
+  border-color: rgba(5,5,5,.18) !important;
+}
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-tile.on .dp-pf-led {
+  border-color: rgba(63,165,108,.55) !important;
+  box-shadow: 0 0 0 2px rgba(63,165,108,.22), 0 0 8px rgba(63,165,108,.55) !important;
+}
