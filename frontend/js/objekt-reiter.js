@@ -160,7 +160,36 @@
     var v = String(p.total);
     var opt = Array.prototype.find.call(sel.options, function (o) { return o.value === v; });
     if (!opt) { opt = document.createElement('option'); opt.value = v; opt.textContent = v + ' Punkte (aus den Gewerken)'; opt.setAttribute('data-oe-auto', '1'); sel.appendChild(opt); }
-    if (sel.value !== v) { sel.value = v; }
+    /* ══ v1973 · GESETZT IST NICHT GESPEICHERT ═════════════════════════
+
+       Hier stand nur `sel.value = v;`.
+
+       Ein programmatisch gesetzter Wert loest KEIN `change`-Ereignis aus.
+       Die Punkte standen damit im Auswahlfeld, aber die Speicherung hat
+       sie nie gesehen — obwohl `storage.js:43` `mod_punkte` ausdruecklich
+       unter den gesicherten Feldern fuehrt.
+
+       GEMESSEN am 08.10.2026 in der Produktionsdatenbank:
+
+         21 Objekte fuehren die acht Modernisierungsfelder
+         10 davon haben ein LEERES `mod_punkte`
+
+       Bei diesen zehn faellt der Bericht auf die Schaetzung zurueck,
+       obwohl die Antworten vorliegen — und nichts widerspricht. Genau
+       der stille Rueckfall, den dieselbe Datei an anderer Stelle als
+       „schlimmer als ein Fehler" bezeichnet.
+
+       `mfh-einheiten.js:624` macht es seit Langem richtig und ist die
+       Vorlage: `dispatchEvent(new Event('change', { bubbles: true }))`.
+
+       > KEINE SCHLEIFE: die `change`-Listener fuer die Automatik haengen
+       > an den ACHT Gewerke-Feldern (`mod_dach` bis `mod_grundriss`),
+       > nicht an `mod_punkte`. Vorher gegengelesen — `mod_punkte` wird in
+       > dieser Datei von keinem Listener beobachtet. */
+    if (sel.value !== v) {
+      sel.value = v;
+      try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    }
   }
 
   async function automatik() {

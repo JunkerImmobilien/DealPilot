@@ -260,7 +260,31 @@ export const DealPilotObjectMapper = {
       bgf: num(pick(d, ['bgf'])),
       standardstufe: standardstufeAus(d),
       grundriss: pick(d, ['grundriss']),
+      /* ══ v1973 · 0 PUNKTE IST EINE ANTWORT, KEINE LEERE STELLE ═══════
+
+         `mod_punkte` allein kann nicht zwischen zwei Faellen
+         unterscheiden:
+
+           niemand hat hingesehen          -> Schaetzung ist richtig
+           alle acht mit „Keine/Nie"       -> 0 Punkte sind ein BEFUND,
+                                              und Anlage 2 gilt
+
+         GEMESSEN an der Parkstr. 9: fuenf der acht Bauteile sind
+         beantwortet (dreimal „Keine/Nie", zweimal „> 20 Jahre"), und es
+         kommen 0 Punkte heraus. Das ist richtig gerechnet — die Anlage 2
+         vergibt null, wenn die Massnahmen weit zurueckliegen. Der Bericht
+         schrieb daraus aber „Es wurde kein Modernisierungsgrad erfasst."
+
+         `mod_angaben` zaehlt deshalb, wie viele der acht Felder
+         ueberhaupt eine Antwort tragen. Das ist ZAEHLEN, kein Modell —
+         die Punktevergabe bleibt dort, wo sie hingehoert (Anlage 2,
+         Tabelle 1), und wird hier nicht nachgebaut. */
       mod_punkte: num(pick(d, ['mod_punkte'])),
+      mod_angaben: (function () {
+        const felder = ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung',
+                        'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'];
+        return felder.reduce((n, k) => n + (d[k] != null && String(d[k]).trim() !== '' ? 1 : 0), 0);
+      })(),
       sachwertfaktor: dez(pick(d, ['sachwertfaktor'])),
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);

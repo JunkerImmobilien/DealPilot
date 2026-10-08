@@ -70,12 +70,54 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
   const erg = (quelle, grund, rnd, hinweis) =>
     ({ rnd, quelle, grund, gnd_jahre: GND, hinweis });
 
-  const mp = _num(ref.mod_punkte);
+  /* ══ v1973 · DREI FAELLE, NICHT EINER ════════════════════════════════
+
+     Hier stand `_num(ref.mod_punkte)`, und `_num` verlangt `> 0`. Damit
+     landete JEDE Null im Zweig „kein Modernisierungsgrad erfasst" — auch
+     die Null, die aus acht Antworten „Keine/Nie" entsteht.
+
+     Die drei Faelle sind unterschiedlich und bekommen jetzt
+     unterschiedliche Auskunft:
+
+       Punkte da (auch 0) und Antworten da
+         -> Anlage 2 gilt. Die Verordnung sagt „zugrunde zu legen",
+            nicht „kann", und 0 Punkte sind der Modellwert fuer
+            „nicht modernisiert".
+
+       keine Punkte, aber Antworten da
+         -> `punkte_nicht_berechnet`. Gemessen am 08.10.2026: 10 von 21
+            Objekten. Ursache war, dass der gerechnete Wert nie
+            gespeichert wurde (v1973 im Frontend behoben) — der Bericht
+            sagt es jetzt, statt still zu schaetzen.
+
+       nichts da
+         -> `kein_modernisierungsgrad`, wie bisher.
+
+     > `_num` bleibt unveraendert: andere Felder (Baujahr,
+     > Sanierungsjahr) duerfen zu Recht keine Null sein. Fuer die Punkte
+     > gilt eine eigene Pruefung — eine Punktzahl darf 0 sein. */
+  const _mpRoh = Number(ref.mod_punkte);
+  const mp = Number.isFinite(_mpRoh) && _mpRoh >= 0 ? _mpRoh : null;
+  const _angaben = Number(ref.mod_angaben) || 0;
   if (mp == null) {
+    if (_angaben > 0) {
+      return erg('geschaetzt', 'punkte_nicht_berechnet', fallback,
+        SCHAETZUNG_TEXT + ' Für ' + _angaben + ' der acht Bauteile liegt eine '
+        + 'Angabe vor, die Modernisierungspunkte nach Anlage 2 sind dafür aber '
+        + 'nicht hinterlegt. Das Objekt einmal im Reiter Objekt öffnen und '
+        + 'speichern setzt sie; danach rechnet der Bericht nach Anlage 2.');
+    }
     return erg('geschaetzt', 'kein_modernisierungsgrad', fallback,
       SCHAETZUNG_TEXT + ' Es wurde kein Modernisierungsgrad erfasst. Mit '
       + 'Modernisierungspunkten fällt die Restnutzungsdauer regelmäßig höher '
       + 'aus, und mit ihr der Gebäudesachwert.');
+  }
+  if (_angaben === 0 && mp === 0) {
+    /* Punkte „0" ohne eine einzige Antwort ist kein Befund, sondern ein
+       Vorgabewert — hier gilt weiter die Schaetzung. */
+    return erg('geschaetzt', 'kein_modernisierungsgrad', fallback,
+      SCHAETZUNG_TEXT + ' Es wurde kein Modernisierungsgrad erfasst (0 Punkte '
+      + 'ohne Angabe zu den Bauteilen).');
   }
   const kern = /kernsaniert/i.test(String(ref.modernization || '')) && mp >= 18;
   const bj = kern && _num(ref.modernization_year) > 1500

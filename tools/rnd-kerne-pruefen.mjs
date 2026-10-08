@@ -43,8 +43,18 @@
  *  4. MONOTONIE: bei gleicher Punktzahl darf ein AELTERES Gebaeude nie mehr
  *     Restnutzungsdauer bekommen. Daran ist die Extrapolation hinter dem
  *     Scheitel der Parabel aufgefallen (28 Faelle).
+ *  5. DIE AUSGELIEFERTE ZAHL (v1969) — was `rnd-einheitlich.js` zurueckgibt,
+ *     mit Rueckfall und Untergrenze. Die Punkte 1 bis 4 pruefen die ROHEN
+ *     Kerne; beim Kunden kommt diese Zahl an. Dort sass ein zweiter Sprung,
+ *     den die Kerne nicht zeigen: sie verweigern jenseits der GND und
+ *     werden damit „monoton" gerechnet, waehrend die gelieferte Zahl
+ *     springt.
  *
  * RC=0 ist sauber. Jede Abweichung ist rot.
+ *
+ * Dieser Lauf prueft UEBEREINSTIMMUNG und PLAUSIBILITAET, nicht die
+ * Richtigkeit gegen den Verordnungstext — dafuer sind die Gutachten-Faelle
+ * in tools/rnd-pruefung/ da. Beide zusammen, nicht eines statt des anderen.
  */
 import fs from 'fs';
 import path from 'path';
@@ -288,14 +298,17 @@ const { restnutzungsdauerEinheitlich: EINHEITLICH, RND_MIN } =
 const SCHWELLE_TOLERANZ = 0.5;
 let liefSpruenge = 0, liefUnterBoden = 0, liefFaelle = 0, schwellenKnick = 0;
 for (const gnd of GNDS) {
-  /* Punktzahl 0 laesst rnd-einheitlich bewusst auf die Schaetzung fallen
-     (0 gilt als „nicht erfasst", Backlog N47b) — deshalb ab 1. */
-  for (let p = 1; p <= 20; p++) {
+  /* v1973: Punktzahl 0 ist seit N47b ein gueltiger Anlage-2-Fall, SOFERN
+     Angaben zu den Bauteilen vorliegen — deshalb wird jetzt ab 0 geprueft
+     und `mod_angaben: 8` mitgegeben. Vorher begann die Schleife bei 1, weil
+     0 pauschal auf die Schaetzung fiel; der Zweig war also ungeprueft, als
+     er erreichbar wurde. */
+  for (let p = 0; p <= 20; p++) {
     const schwelle = tabFront[p] ? tabFront[p].rel : null;
     let vorAlter = null, vorWert = null, vorRel = null;
     for (let alter = 1; alter <= 170; alter++) {
       const bj = JAHR - alter;
-      const r = EINHEITLICH({ build_year: bj, mod_punkte: p }, gnd);
+      const r = EINHEITLICH({ build_year: bj, mod_punkte: p, mod_angaben: 8 }, gnd);
       if (!r || r.rnd == null) continue;
       liefFaelle++;
       const rel = (alter / gnd) * 100;
