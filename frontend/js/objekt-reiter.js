@@ -66,6 +66,30 @@
     var tip = m && STUFEN[m[1]] ? ' title="' + esc(STUFEN[m[1]]) + '"' : '';
     return '<span class="oe-st ' + cls + '"' + tip + '>' + esc(txt) + '</span>';
   }
+  /* ══ v1967 · WELCHE RESTNUTZUNGSDAUER HIER STEHT ══════════════════════
+
+     Marcel am 08.10.2026: „Es koennte ja sein, dass die Leute, wenn sie
+     Restnutzungsdauer lesen, dann denken, dass sie sich auf ein
+     Restnutzungsdauergutachten bezieht. Das ist ja in diesem Fall nicht
+     so. Wenn das so ist, muesstest du mir das einmal sagen."
+
+     ES IST SO. Die Zahl in dieser Leiste ist die Restnutzungsdauer FUER
+     DIE VERKEHRSWERTERMITTLUNG: sie traegt die lineare
+     Alterswertminderung im Sachwertverfahren (Paragraf 38 Abs. 1
+     ImmoWertV) und den Vervielfaeltiger im Ertragswertverfahren
+     (Paragraf 34). Ein Restnutzungsdauergutachten nach Paragraf 7
+     Abs. 4 Satz 2 EStG verfolgt einen ANDEREN Zweck — die
+     Abschreibungsdauer gegenueber dem Finanzamt — und wird vom Modul
+     fuer Nutzungsdauergutachten erstellt, nicht hier.
+
+     Dieselbe Formel, zwei Zwecke. Deshalb steht es jetzt dran, statt
+     dass der Leser es sich zusammenreimt. */
+  var RND_HINWEIS = '<div class="oe-legende"><b>Restnutzungsdauer:</b> die hier '
+    + 'gezeigte Zahl gilt für die <b>Verkehrswertermittlung</b> — Alterswertminderung '
+    + 'im Sachwertverfahren (§ 38 ImmoWertV) und Vervielfältiger im Ertragswertverfahren '
+    + '(§ 34). Ein <b>Restnutzungsdauergutachten</b> für die Abschreibung '
+    + '(§ 7 Abs. 4 Satz 2 EStG) ist etwas anderes und entsteht nicht hier.</div>';
+
   var LEGENDE = '<div class="oe-legende"><b>Stufen:</b> A amtlich für Gebiet und Objektart · B amtlich, übergeordnet oder Modellansatz · '
     + 'C amtlich aus einer Nachbargemeinde desselben Ausschusses · D gesetzlicher Auffangwert (§ 256 BewG) · E eigene Angabe. '
     + 'Eingabetiefe 1/2/3 = Marktpreisindikation / erweiterte Indikation / Sach- und Ertragswert.</div>';
@@ -108,8 +132,33 @@
     var o = objektFuerApi();
     var mp = modPunkte();
     modPunkteSchreiben(mp);
-    var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—',
-      mp ? st('b', 'gerechnet') + mp.angaben + ' von 8 Bauteilen angegeben (Gewerke-Tabelle, Anlage 2)' : 'aus der Spalte „modernisiert" in der Gewerke-Tabelle', '');
+    /* ══ v1967 · 0 PUNKTE IST EIN BEFUND, KEIN LEERES FELD ═════════════
+
+       Gemessen an Parkstr. 9: 5 von 8 Bauteilen sind angegeben, und es
+       kommen 0 von 20 Punkten heraus. Das ist RICHTIG gerechnet — die
+       Anlage 2 vergibt weniger als die Maximalpunkte, wenn die
+       Massnahmen weiter zurueckliegen, und bei alten Jahrgaengen null.
+
+       Es ist aber nicht dasselbe wie „nichts angegeben", und der
+       Bericht schrieb bisher genau das: „Es wurde kein
+       Modernisierungsgrad erfasst." Deshalb steht hier jetzt, WAS die
+       Zahl bedeutet und was sie kostet.
+
+       Warum es der staerkste Hebel ist, am echten Kern gemessen
+       (Parkstr. 9, Baujahr 1905, GND 80):
+
+         0 Punkte   ->  10 Jahre   (Rueckfall: GND minus Alter, Untergrenze)
+         8 Punkte   ->  Anlage 2 greift
+        14 Punkte   ->  deutlich mehr
+
+       Und die Restnutzungsdauer traegt den Gebaeudesachwert linear
+       (Paragraf 38 Abs. 1 ImmoWertV). */
+    var mpQ = !mp ? 'aus der Spalte „modernisiert" in der Gewerke-Tabelle — ohne Angabe rechnet der Bericht die Restnutzungsdauer als Schätzung'
+      : mp.total === 0
+        ? st('x', '0 Punkte') + mp.angaben + ' von 8 Bauteilen angegeben, aber die Maßnahmen liegen zu weit zurück für Punkte (Anlage 2). '
+          + 'Die Restnutzungsdauer fällt damit auf die Schätzung zurück — das ist der stärkste Hebel auf den Sachwert.'
+        : st('b', 'gerechnet') + mp.angaben + ' von 8 Bauteilen angegeben (Gewerke-Tabelle, Anlage 2)';
+    var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
       box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
         + zeile('Sachwertfaktor', '—', 'PLZ eintragen', '') + zeile('GND / RND', '—', 'Baujahr und Objektart eintragen', '') + mpZeile;
@@ -186,7 +235,7 @@
       if (bpi && bpi.wert) html += zeile('Baupreisindex', deNum(bpi.wert, 2), st('b', 'Konstante') + '2010 → ' + esc(bpi.stichtag || '') + ' · noch nicht je Ausschuss (Backlog B1)', '');
     }
     html += mpZeile;
-    html += LEGENDE;   /* v1865 */
+    html += RND_HINWEIS + LEGENDE;   /* v1967 + v1865 */
     box.innerHTML = html;
     /* v1855 · was der Anfragen-Block wissen muss: fehlt der Zins, fehlt der Faktor? */
     /* v1865 · Stufe D ist der gesetzliche Auffangwert (§ 256 BewG) — ein Wert,
@@ -401,11 +450,23 @@
     if (hint) hint.textContent = z === 1 ? 'Einfach: Adresse, Objektart, Wohnfläche, Baujahr — Marktpreisindikation.'
       : z === 2 ? 'Mittel: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe — erweiterte Indikation, Gewerke sichtbar.'
       : 'Ausgiebig: dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ — Sach- und Ertragswert, Block unten.';
-    var e3 = document.querySelector('.card[data-oe-stufe-min="3"]');
-    if (e3) {
+    /* ══ v1967 · ALLE Stufe-3-Bereiche, nicht nur der erste ════════════
+
+       Hier stand `querySelector` — SINGULAR. Der Mechanismus war gebaut,
+       deckte aber genau ein Element ab, und ein zweites Element mit
+       demselben Attribut waere lautlos sichtbar geblieben.
+
+       Marcel am 08.10.2026: „wenn wir natuerlich einfache Stufe haben,
+       Stufe 1 oder Stufe 2, dann brauchen wir das ja gar nicht angeben,
+       ne?" — richtig. Die Leiste zeigt Bodenrichtwert,
+       Liegenschaftszins, Sachwertfaktor, GND/RND und Baupreisindex;
+       alles davon braucht erst die Wertermittlung nach ImmoWertV. Kein
+       einziges dieser Felder steht in pflichtFuer(1) oder
+       pflichtFuer(2) — `brw` kommt erst bei `stufe >= 3` dazu. */
+    document.querySelectorAll('[data-oe-stufe-min="3"]').forEach(function (e3) {
       e3.classList.toggle('oe-stufe-aus', z < 3);
       if (z === 3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
-    }
+    });
     /* v1854 · die Detailkarten (Gewerke, Bauteile) hängen am Haken; Mittel
        und Ausgiebig setzen ihn von selbst, Einfach lässt ihn, wie er war. */
     var cb = $('oe-details-cb');

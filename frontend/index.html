@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1960">
+<link rel="stylesheet" href="css/style.css?v=v1967">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
@@ -1140,7 +1140,7 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Stichtag Bodenrichtwert</label><div class="iw"><input id="brw_stichtag" type="text" placeholder="2024-01-01" class="tr" oninput="calc()"></div></div>
         <div class="f"><label>Grundstücksanteil (m²)</label><div class="cf" id="gs_ant">—</div></div>
         <div class="f s2"><label>Bodenwert</label><div class="cf" id="bodenwert">—</div></div>
-        <div class="f s2" id="oe-auto-wrap"><div id="oe-auto" class="oe-auto"></div></div>
+        <div class="f s2" id="oe-auto-wrap" data-oe-stufe-min="3"><label id="oe-auto-lbl">Parameter der Verkehrswertermittlung <span class="oe-q">&middot; nach ImmoWertV, nur f&uuml;r Stufe 3</span></label><div id="oe-auto" class="oe-auto"></div></div>
         <div id="oe-anfragen" class="oe-anfragen"><div class="oe-anfragen-kopf"><span class="oe-anfragen-lbl">Anfragen</span><button type="button" class="oe-btn" style="font-size:12.5px"
             onclick="if(window.DealPilotUnterlagen)DealPilotUnterlagen.oeffnen()">
             Unterlagen beim Amt anfordern
@@ -3570,8 +3570,6 @@ label.dp-required.qc-required::after {
        damit qc-bridge.js (Nicht-anfassen-Liste) unberuehrt bleibt -->
   <script src="js/qc-ai-bridge.js?v=v1959" defer></script>
 <script src="js/subscription.js?v=v1421"></script>
-<script src="js/bmf-data.js?v=166"></script>
-<script src="js/bmf-afa.js?v=287"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=v1863"></script>
 <script src="js/dealscore2-ui.js?v=v1851"></script>
@@ -3591,7 +3589,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v1842"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v1840"></script>
-<script src="js/objekt-reiter.js?v=v1965"></script>
+<script src="js/objekt-reiter.js?v=v1967"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v1738"></script>

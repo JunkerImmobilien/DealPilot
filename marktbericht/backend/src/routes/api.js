@@ -26,7 +26,11 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
    nachbaut, was hier schon steht. */
 import { WertParameterService } from '../services/WertParameterService.js';
 import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
-import { gnd as iwGnd, rnd as iwRnd } from '../lib/immowertv.js';
+/* v1968: `rnd as iwRnd` ist raus. Seit v1965 ruft diese Datei die
+   Restnutzungsdauer ueber rnd-einheitlich.js; der Name war nur noch
+   gebunden, nicht benutzt. `iwGnd` bleibt (Nutzung im Endpunkt
+   /wertparameter/zinssatz). */
+import { gnd as iwGnd } from '../lib/immowertv.js';
 /* v1965: die EINE Ableitung der Restnutzungsdauer. Siehe den Block am
    Endpunkt /wertparameter/zinssatz. */
 import { restnutzungsdauerEinheitlich } from '../lib/rnd-einheitlich.js';

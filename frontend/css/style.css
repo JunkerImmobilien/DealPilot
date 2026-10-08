@@ -38442,6 +38442,15 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
 .oe-anfragen-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
 .card[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
+/* v1967 - die Regel verlangte `.card`. Die Leiste der ImmoWertV-Parameter
+   ist aber ein Formularfeld (`div.f.s2#oe-auto-wrap`), kein Karten-Element,
+   und blieb deshalb bei Stufe 1 und 2 stehen.
+
+   Die bestehende Regel wird NICHT geschwaecht - sie bleibt, wie sie ist.
+   Daneben steht eine zweite mit derselben Spezifitaet (0,3,0) fuer `.f`.
+   Vorher gegengelesen: `oe-stufe-aus` kommt in dieser Datei genau einmal
+   vor, es gibt also keine zweite Regel, die sich damit erschlaegt. */
+.f[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
 
 /* v1852b · Eingabetiefe im Reiterkopf, Übernahme am Verkehrswert */
 .oe-kopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; padding: 10px 14px; border: 1px solid var(--border-g, #e9dcb3); border-left: 3px solid var(--wl-C9A84C, #C9A84C); border-radius: 10px; background: var(--karte, #FBF6E9); }

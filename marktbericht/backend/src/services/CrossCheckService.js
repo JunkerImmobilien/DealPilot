@@ -11,7 +11,20 @@ import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
-import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
+/* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
+
+     import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
+
+   `anlage2Rnd` kam in dieser Datei GENAU EINMAL vor: in der Importzeile.
+   Gerechnet wird seit v1816 ueber `rndEinheitlich` (Zeile darunter).
+
+   Er stand damit genau an der Stelle, die CLAUDE.md mit „Eine
+   Restnutzungsdauer fuer alle Verfahren" meint — und sah aus wie ein
+   zweiter Weg, der noch benutzt wird. Wer hier sucht, welchen Kern der
+   Sachwert fragt, fand zwei Kandidaten.
+
+   Die Zieldatei lib/anlage2.js bleibt: lib/rnd-einheitlich.js und
+   lib/immowertv.js importieren sie und rufen sie auch. */
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js'; /* v1816 */
 import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
 /* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
