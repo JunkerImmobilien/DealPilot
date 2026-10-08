@@ -800,6 +800,51 @@ Garagen-BGF in den Sachwert eingeht.
 
 ### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
 
+**N45-STAND 08.10.2026, 2. Durchgang — die offenen Punkte sind geklärt (v1990–v1992)**
+
+| Punkt | Stand |
+|---|---|
+| **Feldhilfe lesbar** (Marcels Bild `texte.png`) | **fertig** (v1990). Die eingekreiste Zeile von **1,36 auf 9,50 : 1**, die Überschrift von 2,29 auf 5,00. Ursache: die Sprechblase ist dunkel entworfen, ein Inline-Blatt macht sie weiß — der Fließtext hat den Wechsel mitgemacht, Titel und Aufzählung nicht |
+| **Stufen 1·2·3 lesbar** (Bild `aufnahme.png`) | **fertig** (v1990). Von **1,13 auf 14,81 : 1**. `.dp-pf-pille` trägt Creme bei 75 % Deckkraft — gemacht für die dunkle Leiste, in der hellen Karte steht Creme auf Creme. Gespiegelt von `.oe-pillen`, wo es schon gelöst war |
+| **Lampe der Auswahl grün** | **fertig** (v1991) — und sie war es schon. Verdeckt hat es die Größe: 9×9 px mit einem dunklen Ring, der bei der Größe die halbe Fläche einnimmt. Jetzt 12×12 mit grünem Schein |
+| **QR weg auf Handy und Tablet** | **fertig** (v1992), rein in CSS, Grenze 900 px. Der JS-Notnagel aus v1990 ist wieder raus |
+| **QR gerade** | **fertig** (v1992). 64×92 → **92×92**, der gezeichnete Code wächst von 54 auf 68 px, die Leiste bleibt 1280×132 wie vorher |
+
+> **Warum vier CSS-Anläufe gescheitert sind — und es stand in meiner eigenen Memory.**
+> `datenaufnahme.css` führt **62** Selektoren mit `:is(#oab-bar,#qc7-sources)`, und
+> `:is()` erbt die Spezifität seines **stärksten** Arguments — hier eine ID. Diese Regeln
+> liegen auf (1,3,2); meine lagen alle ohne ID darunter und konnten nie gewinnen.
+>
+> **Mein Kaskaden-Walker hat sie nie gezeigt:** er trennt Selektorlisten an Kommas und
+> zerreißt dabei `:is(#a,#b)` in zwei ungültige Hälften; `matches()` wirft, der Fehler
+> wird gefangen, die Regel gilt als „passt nicht". Dieselbe Bauart wie der
+> Verlaufs-Ebenentrenner aus v1988: ein Regex, der Verschachtelung nicht kennt.
+>
+> Die Erkennungsprobe steht in `is-erbt-id-spezifitaet` und hätte eine Minute gekostet:
+> matcht die Regel als **Ganzes**, aber keiner ihrer Komma-Teile, steckt ein `:is()`
+> dahinter.
+
+**Und warum der Kasten 64 breit und 92 hoch war:** eine ID-Regel setzt `width/height:64px`,
+eine Regel **ohne** ID setzt `min-width/min-height:92px`. Die ID gewinnt für `height` — aber
+`min-height` setzt niemand mit ID, also bleibt die 92 stehen, und **`min-height` schlägt
+`height`**. Keine der beiden Regeln ist falsch; zusammen ergeben sie einen schiefen Kasten.
+
+> **Eine Rücknahme:** ich hatte gemeldet, der QR sei „nicht quadratisch und damit nicht
+> zuverlässig scannbar". Das SVG trägt `viewBox="0 0 31 31"` und ohne `preserveAspectRatio`
+> gilt `xMidYMid meet`, das das Verhältnis **wahrt**. Gezeichnet wurde immer ein sauberes
+> Quadrat — schief war der Kasten, nicht der Code.
+
+**Noch offen aus N45:**
+1. **Der grüne Ring der Lampe.** `border-color` aus meiner Regel greift nicht, `box-shadow`
+   aus **derselben** Regel schon — auch mit ID-Spezifität. Rein kosmetisch (Füllung und
+   Schein tragen das Grün), aber unerklärt.
+2. **`span.bp "BOARDING PASS"` mit `font-size:0`** im DOM — ein Rest der entfernten
+   Bordkarte. Unsichtbar, aber für einen Screenreader vorhanden. Gehört zu N49e.
+3. **Drei `bordkarte`-Selektoren** stehen noch in `datenaufnahme.css`, seit v1953
+   unerreichbar. Ebenfalls N49e.
+
+---
+
 **N45-STAND 08.10.2026 — gemessen in der Messkabine, nach v1985–v1989**
 
 | Punkt | Stand |
