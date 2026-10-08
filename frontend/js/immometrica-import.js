@@ -291,8 +291,95 @@
     host.innerHTML = '<div class="imo-dl">In ' + esc(targetLabel()) + ' \u00fcbernehmen</div>' + rows + (_ohneStrasse ? _ortskernZeile(dp) : '') + summary;
     if (confirm) confirm.disabled = false;
   }
+  /* ══ v2000 · DER ABGLEICH ══════════════════════════════════════════
+
+     Marcel: „Wir muessen aber abgleichen, ob das mit ImmoMetrica auch
+     passt. Also passt dieses Objekt ueberhaupt dazu? Ist es die
+     richtige Adresse? … Gegebenenfalls muss das dann ueber eine
+     Bestaetigung laufen."
+
+     Verglichen wird gegen das FORMULAR, nicht gegen die geladenen
+     Dateien - `addressWarning()` in object-actions.js tut Letzteres
+     und kennt ImmoMetrica gar nicht.
+
+     Normalisiert wird so weit, dass die Schreibweise keinen Fehlalarm
+     erzeugt: „Musterstr. 12" und „Musterstrasse 12" sind dasselbe
+     Haus. Ein Vergleich, der an der Schreibweise scheitert, ist so
+     teuer wie keiner - man lernt, ihn wegzuklicken. */
+  function _formWert(id) {
+    var e = document.getElementById(id);
+    return e ? String(e.value || '').trim() : '';
+  }
+  function _normOrt(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/\u00df/g, 'ss').replace(/\u00e4/g, 'ae').replace(/\u00f6/g, 'oe').replace(/\u00fc/g, 'ue')
+      .replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+  function _normStr(s) {
+    /* str. / strasse / strassen -> ein Wort, damit die Abkuerzung
+       nicht zum Widerspruch wird. Die Endung sitzt IM Wort
+       ("musterstrasse"), deshalb keine Wortgrenze davor - mein erster
+       Anlauf nahm /\bstrasse\b/ und liess "musterstr" gegen
+       "musterstrasse" auflaufen. Die eigene Regelpruefung hat es
+       gefangen, bevor etwas geschrieben war. */
+    return _normOrt(s).replace(/([a-z]*?)(strassen|strasse|str)\b/g, '$1str')
+      .replace(/\s+/g, ' ').trim();
+  }
+  function _abgleich(dp) {
+    var oPlz = _formWert('plz'), oOrt = _formWert('ort');
+    var oStr = _formWert('str'), oHnr = _formWert('hnr');
+    if (!oPlz && !oOrt && !oStr) return { art: 'leer' };
+    var iPlz = String(dp.plz || '').trim(), iOrt = String(dp.ort || '').trim();
+    var iStr = String(dp.str || '').trim(), iHnr = String(dp.hnr || '').trim();
+    var weg = [];
+    if (oPlz && iPlz && oPlz !== iPlz) weg.push('PLZ');
+    if (oOrt && iOrt && _normOrt(oOrt) !== _normOrt(iOrt)) weg.push('Ort');
+    if (oStr && iStr && _normStr(oStr) !== _normStr(iStr)) weg.push('Stra\u00dfe');
+    if (oHnr && iHnr && _normOrt(oHnr) !== _normOrt(iHnr)) weg.push('Hausnummer');
+    if (weg.length) {
+      return { art: 'widerspruch', worin: weg,
+               objekt: [oStr, oHnr].filter(Boolean).join(' ') + (oStr || oHnr ? ', ' : '') + (oPlz + ' ' + oOrt).trim(),
+               inserat: [iStr, iHnr].filter(Boolean).join(' ') + (iStr || iHnr ? ', ' : '') + (iPlz + ' ' + iOrt).trim() };
+    }
+    /* Das Inserat weiss WENIGER (keine Strasse), aber nichts anderes.
+       Das ist kein Widerspruch und darf nicht fragen. */
+    if (!iStr && oStr) return { art: 'grober' };
+    return { art: 'passt' };
+  }
+
+  /* Die Rueckfrage steht IM Fenster, nicht als Browser-Dialog: ein
+     `confirm()` blockiert alles und sagt nichts ueber den Unterschied. */
+  function _abgleichFragen(erg, weiter) {
+    var ov = document.getElementById('imo-ov'); if (!ov) { weiter(); return; }
+    var alt = document.getElementById('imo-abgleich'); if (alt) alt.remove();
+    var d = document.createElement('div');
+    d.id = 'imo-abgleich';
+    d.className = 'imo-abgleich';
+    d.innerHTML = '<b>\u26A0 Andere Adresse als im Objekt</b>'
+      + '<span>Unterschied in: ' + esc(erg.worin.join(', ')) + '</span>'
+      + '<div class="imo-ab-paar"><span>Objekt</span><b>' + esc(erg.objekt || '\u2014') + '</b></div>'
+      + '<div class="imo-ab-paar"><span>Inserat</span><b>' + esc(erg.inserat || '\u2014') + '</b></div>'
+      + '<span class="imo-ab-frage">Geh\u00f6rt das Inserat zu diesem Objekt?</span>'
+      + '<div class="imo-ab-knoepfe">'
+      + '<button type="button" class="oabi-btn" id="imo-ab-nein">Nein, abbrechen</button>'
+      + '<button type="button" class="oabi-btn primary" id="imo-ab-ja">Ja, trotzdem \u00fcbernehmen</button>'
+      + '</div>';
+    var fuss = ov.querySelector('.oabi-foot');
+    if (fuss && fuss.parentNode) fuss.parentNode.insertBefore(d, fuss); else ov.appendChild(d);
+    d.querySelector('#imo-ab-nein').onclick = function () { d.remove(); };
+    d.querySelector('#imo-ab-ja').onclick = function () { d.remove(); weiter(); };
+    try { d.scrollIntoView({ block: 'nearest' }); } catch (e) {}
+  }
+
   function confirmPick() {
     var it = state.items[state.active]; if (!it) return;
+    /* v2000: erst abgleichen. Nur ein echter Widerspruch fragt. */
+    var _erg = _abgleich(it.dp || {});
+    if (_erg.art === 'widerspruch' && !confirmPick._durch) {
+      _abgleichFragen(_erg, function () { confirmPick._durch = true; confirmPick(); });
+      return;
+    }
+    confirmPick._durch = false;
     var picked = {};
     document.querySelectorAll('#imo-ov .imo-cb').forEach(function (cb) { if (cb.checked) picked[cb.dataset.k] = it.dp[cb.dataset.k]; });
     /* v1999 · Diese Liste ist HANDGEFUEHRT - wer im Mapping ein neues
