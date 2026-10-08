@@ -36,6 +36,151 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N60 · Marcels Paket vom 08.10.2026 — zehn Punkte, wörtlich aufgenommen
+
+**Marcel hat am 08.10.2026 ein ganzes Paket aufgegeben. Es steht hier
+vollständig, weil ein Paket, das nur in einem Chat lebt, beim nächsten
+Mal zur Hälfte fehlt.** Die Reihenfolge unten ist meine Einschätzung der
+Abhängigkeit, nicht seine Priorität.
+
+---
+
+#### N60.1 · Lageklassen ermitteln und vergeben — FREIGEGEBEN
+Marcel: „die Lageklassen kannst du selber ermitteln und vergeben, kannst
+auch im Netz nachschauen." Damit ist die Sperre aus **N59** aufgehoben.
+Vorgehen: je Objekt aus Ort und Lage eine Klasse A/B/C herleiten, die
+**Herleitung je Objekt mitschreiben** (sonst ist es wieder eine Zahl ohne
+Herkunft), eintragen, gegenmessen. A 3,75 % · B 5,0 % Zielrendite.
+
+#### N60.2 · Messkabine: ALLES, nicht nur der Marktbericht
+Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine geprüft?
+Auch den Marktbericht und alle anderen Tabs und Bereiche vollständig?
+Die App muss unter allen möglichen Designs passend auf Handy, Tablet und
+Desktop gerendert werden."
+
+**Ehrliche Antwort: nein.** Geprüft sind bisher nur der Marktbericht
+(N58) und einzelne Karten. Offen ist der systematische Durchlauf über
+**alle neun Reiter × acht Geräte × die Gestaltungsvarianten**
+(`data-dp-layout`, `data-dp-kartenstil`, `ui-theme`, Hell/Obsidian).
+
+> **Das braucht einen Läufer, keine Handarbeit.** 9 Reiter × 8 Geräte ×
+> mind. 3 Varianten = 216 Messpunkte. Der Läufer muss je Punkt nennen:
+> echter Überlauf (ohne beschnittene Elemente), `scrollWidth -
+> clientWidth`, und Kontrast der tragenden Flächen. Vorbild ist der
+> Läufer aus N58.
+
+#### N60.3 · Erstanmeldung: 6 Stunden Gnadenfrist
+Marcel: „Bei der Erstanmeldung besteht die Möglichkeit, dass der Kunde
+direkt Zugang zur App bekommt und spätestens 6 Stunden nach
+Erstanmeldung bestätigen muss, sonst wird der Account gesperrt. Der
+Hinweis muss natürlich mit der Erstanmeldung kommen, aber so kann ein
+User direkt, ohne dass er jetzt in seine Mails gehen muss, schon was
+sehen."
+
+Zu bauen: Zugang sofort, Frist 6 h ab Registrierung, sichtbarer
+Countdown/Hinweis in der App, Sperre bei Ablauf, Entsperrung durch
+Bestätigung. **Vorher messen**, was `email_verified` heute tatsächlich
+blockiert.
+
+#### N60.4 · Was macht die Pilot- und die Cockpit-Analyse wirklich?
+Marcel: „Auf welche Daten wird zugegriffen und wo ist das Wissen? Haben
+wir auf alles Zugriff oder können wir was besser machen?"
+→ Bestandsaufnahme läuft, Ergebnis gehört hierher.
+
+#### N60.5 · ⚠ Der Telegram-Bot rechnet mit Mieten, die niemand eingegeben hat
+Bilder: `Dateien/bot/IMG_1554.PNG` … `IMG_1559.PNG` (Sachsenstraße 18,
+32052 Herford, ETW 100 m², Bj 1998, KP 180.000, **Kaltmiete 940 €/Monat**).
+
+**Gemessen aus EINER Bot-Antwort — vier Zahlen, vier verschiedene
+Mieten, keine davon die eingegebene:**
+
+| im Bot | entspricht Monatsmiete | eingegeben |
+|---|---:|---:|
+| Jahreskaltmiete 16.800 € | 1.400 € | **940 €** |
+| Bruttomietrendite 4,80 % | 720 € | 940 € |
+| Kaufpreisfaktor 20,8 | 721 € | 940 € |
+| Miete je m² 6,01 € | 601 € | 940 € |
+
+Richtig wäre: 940 × 12 = **11.280 €**, Rendite **6,27 %**, Faktor
+**15,96**, Miete **9,40 €/m²**.
+
+> **Das Werkzeug ist nicht schuld.** `agentWerkzeuge.js` ab Z. 1740 ruft
+> ausdrücklich `DealKpis.compute()` aus der gespiegelten
+> `deal-kpis.js` und **verbietet sich einen Rückfall auf eigene
+> Formeln** („Eine zweite Meinung über denselben Deal ist schlimmer als
+> eine fehlende Auskunft"). Zu klären ist also: wurde es gerufen, mit
+> welchen Eingaben — oder hat das Modell die Zahlen im Fließtext
+> **neu geschrieben**? Siehe [[werkzeug-schlaegt-hinweis]]: was gerechnet
+> werden soll, darf nicht formulierbar sein.
+
+**Zweiter Befund aus denselben Bildern:** zweimal „**kein Objekt
+gefunden**" für die Sachsenstraße 18 — **unmittelbar nachdem der Bot
+dieses Objekt selbst angelegt hatte** (IMG_1554 und IMG_1558/1559).
+
+**Marcels dritter Punkt:** „Die Bewertung war erst schlecht mit 44 und
+danach auf einmal über 80. Warum?" — in diesen sechs Bildern nicht
+enthalten, aber die Zahlenbefunde oben sind ein starker Kandidat.
+
+#### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung
+Marcel: „Wenn ich nach wichtigen Daten frage, möchte ich immer, wenn
+verfügbar, **DealScore und Investor DealScore** sowie **alle beteiligten
+KPIs** haben und eine **textuelle Gesamtbewertung**. Der Abruf der in der
+Pilot-Analyse gegebenen Werte und Texte muss möglich sein. Wenn möglich
+auch immer den **Stand** nennen. Das Abrufen der Co-Pilot-Analyse muss
+aus Telegram möglich sein."
+
+Vier Teile: (a) Pflichtbestandteile jeder Auskunft, (b) Pilot-Analyse
+abrufbar, (c) Stand/Zeitpunkt immer dabei, (d) Co-Pilot aus Telegram.
+
+#### N60.7 · Datenraum je Objekt (OneDrive · Google Drive · Nextcloud)
+Marcel: „für jedes Objekt einen Datenraum über gängige Cloudanbieter
+anbinden können. Dort können Unterordner drin sein und die KI weiß
+genau, wo was liegt, und kann dann auch im Co-Piloten darauf zugreifen
+und Fragen zu Verträgen beantworten."
+
+Nötig: OAuth je Anbieter, Ordnerbindung je Objekt, Indexierung
+(Dateiname → Kategorie), Textauszug, und ein Abrufweg für den Co-Piloten.
+**Hier entsteht die erste echte Dokumentenrecherche der App.**
+
+#### N60.8 · Mietverträge — vor Schnittstellen und Exporten
+Marcel: „bevor wir Schnittstellen und Exporte machen. Es soll auch eine
+Angabe zu Mietverträgen gemacht werden können, also was für ein
+Mietvertrag, seit wann der besteht und wann die letzte Erhöhung gewesen
+ist. Das muss für jeden Objekttyp und auch für einzelne Wohnungen
+innerhalb eines MFH möglich sein."
+
+Mindestens: Vertragsart, Beginn, letzte Erhöhung. **Fachlich gehört
+dazu**, zur Prüfung mit Marcel: Staffel-/Indexmiete mit nächstem Termin,
+Kappungsgrenze, Mieterhöhungspotenzial zur ortsüblichen Vergleichsmiete,
+Kaution, Befristung, Kündigungsverzicht, Gewerbe mit Laufzeit und
+Option — das ist das, was den Ertragswert und die Bank interessiert.
+
+#### N60.9 · Einzelne Wohnungen im MFH: Liste + Modal, Bewertung je Einheit
+Marcel: „Zu den einzelnen Wohnungen sollte man auch Bilder hinterlegen
+können. Da bietet sich an, vielleicht nur eine Auflistung der einzelnen
+Wohnungen zu machen und im Detail ein In-Place-Modal zu öffnen mit
+erweiterten Daten. … Die Bewertung sollte auf jeden Fall für jede
+Wohnung möglich sein, und die Gesamtbewertung wird dann im Tab Objekt
+übertragen."
+
+**Marcel sagt selbst dazu:** „Wir haben den Tab Objekt extrem umgebaut.
+Es ist zu prüfen, ob das noch passt, und ggf. den MFH-Bereich dann
+anzupassen." → **erst messen, dann bauen.**
+
+#### N60.10 · RND-Gutachten je Wohnung, MFH als Unterbaum
+Marcel: „Prinzipiell muss es möglich sein, für jede einzelne Wohnung ein
+RND-Gutachten zu erstellen. Da könnte man zum Beispiel es so bauen, dass
+man dann im Menü ein MFH hat, und wenn das geteilt ist, kann man die
+Einheiten auch separieren und die werden dann als Unterbaum angezeigt.
+Mit Vererben und allem."
+
+Kernfrage für die Umsetzung: **Vererbung**. Was gilt je Einheit eigen
+(Fläche, Zustand, Miete, Vertrag, Bilder, RND) und was erbt sie vom
+Gebäude (Baujahr, Bodenrichtwert, Grundstück, Modernisierung am Dach)?
+Ohne diese Liste wird jede Einheit eine halbe Kopie.
+
+---
+
 ### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
 
 Marcel: „dass du die Objekte alle nochmal durchgehst und auch die
