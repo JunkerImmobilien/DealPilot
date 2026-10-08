@@ -1113,8 +1113,17 @@ export const CrossCheckService = {
        Fehlen beide, bleibt nur der Median aus Portalinseraten — und der
        ist ein ANGEBOTSPREIS. Dann gibt es kein fuehrendes Verfahren.
        Siehe den Block in lib/verfahrenswahl.js. */
+    /* v1977: DRITTE kaufpreisbasierte Grundlage — der amtliche
+       Vergleichsfaktor aus dem Register (§ 20 ImmoWertV, aus der
+       Kaufpreissammlung). Er wird in ReportOrchestrator gelesen und
+       trägt dort schon die `verwendung`-Prüfung: Sätze, die der
+       Ausschuss nur für die steuerliche Bewertung freigibt, kommen
+       bereits mit `verfuegbar: false` an. Hier wird deshalb nur noch
+       `verfuegbar` gefragt — die Entscheidung fällt an der Stelle, die
+       den Satz gelesen hat. */
     const _vglKaufpreise =
       !!(p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar)
+      || !!(p.register_vergleichsfaktor && p.register_vergleichsfaktor.verfuegbar)
       || !!(p.irw && p.irw.verfuegbar && Number(p.irw.wert_qm) > 0);
     out.verfahrenswahl = fuehrendesVerfahren({
       objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
@@ -1146,6 +1155,17 @@ export const CrossCheckService = {
         wohnflaeche_qm: ref.living_area, normobjekt_qm: p.normobjekt_qm || null,
       });
       if (_an && _an.verfuegbar) out.zins_anpassung = _an;
+    }
+
+    /* v1977: auch der zurueckgehaltene Satz gehoert in den Bericht. Dass
+       ein Ausschuss Vergleichsfaktoren fuehrt, sie aber nur fuer die
+       steuerliche Bewertung freigibt, ist selbst eine Auskunft — und
+       zwar die, die dem Leser sonst fehlt: er sieht kein fuehrendes
+       Verfahren und erfaehrt nicht, warum. */
+    if (p.register_vergleichsfaktor) {
+      out.register_vergleichsfaktor = p.register_vergleichsfaktor;
+      const _rv = p.register_vergleichsfaktor;
+      if (_rv.hinweis && out.notes.indexOf(_rv.hinweis) < 0) out.notes.push(_rv.hinweis);
     }
 
     if (p.amtlicher_vergleichsfaktor) {
