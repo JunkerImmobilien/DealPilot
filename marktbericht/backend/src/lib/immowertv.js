@@ -98,6 +98,31 @@ export const MOD_ELEMENTE = {
  * marktabgeleiteter Zinssatz. Er liegt systematisch unter dem Marktniveau und
  * erzeugt damit tendenziell zu hohe Ertragswerte — deshalb immer mit Warnung.
  * ──────────────────────────────────────────────────────────────────────────── */
+/* v2002 · DER RAHMEN, DER UEBER DIE VERWENDBARKEIT ENTSCHEIDET.
+
+   Marcels Unterscheidung, und sie ist die entscheidende: dieselbe Zahl
+   ist je Zweck verbindlich, ein Auffangwert oder unzulaessig.
+
+     § 256 BewG       Grundsteuer (Bundesmodell) - die Tabelle unten
+     § 188 BewG       Erbschaft- und Schenkungsteuer: MFH 3,5 %,
+                      EFH/ZFH und ETW regelmaessig Vergleichswertverfahren
+     § 21 Abs. 2 IWV  Verkehrswertgutachten: § 256 ist dort KEIN
+                      verbindlicher Auffangwert - anzusetzen ist der
+                      marktgerechte Zinssatz des Gutachterausschusses
+
+   Steht hier als Datenobjekt, nicht als Kommentar: der Hinweis unten
+   wird daraus GEBAUT. Wer den Rahmen aendert, aendert den Text - eine
+   `lzsNach188()` waere dagegen von nirgendwo gerufen und damit tot. */
+export const BEWG_RAHMEN = {
+  grundsteuer:  { norm: '§ 256 BewG', zweck: 'Grundsteuerbewertung (Bundesmodell)' },
+  erbschaft:    { norm: '§ 188 BewG', zweck: 'Erbschaft- und Schenkungsteuer', mfh_pct: 3.5,
+                  zusatz: 'Mehrfamilienhaeuser 3,5 %; Ein-/Zweifamilienhaeuser und '
+                        + 'Eigentumswohnungen regelmaessig im Vergleichswertverfahren' },
+  verkehrswert: { norm: '§ 21 Abs. 2 ImmoWertV', zweck: 'Verkehrswertgutachten',
+                  zusatz: 'kein gesetzlicher Auffangwert - anzusetzen ist der '
+                        + 'marktgerechte Liegenschaftszinssatz des Gutachterausschusses' },
+};
+
 export const BEWG_256 = {
   fassung: '§ 256 BewG',
   geprueft: true,
@@ -132,9 +157,19 @@ export function lzsNach256(objektart, brwSqm = null, anzahlWe = null) {
     pct = (Number(anzahlWe) > 6) ? BEWG_256.basis.mfh_ueber6 : BEWG_256.basis.mfh_bis6;
   } else pct = BEWG_256.default;
 
-  let hinweis = 'Gesetzlicher Auffangwert nach § 256 BewG — nicht marktabgeleitet. '
-    + 'Er liegt in der Regel unter dem oertlichen Liegenschaftszinssatz und fuehrt '
-    + 'damit zu einem eher hohen Ertragswert.';
+  /* v2002 · Hier stand nur, was der Wert NICHT ist ("nicht
+     marktabgeleitet"). Was fehlte, war der Zweck - und damit die
+     Antwort auf die Frage, die der Leser wirklich hat: darf ich ihn
+     in MEINEM Gutachten verwenden? Nein, und das steht jetzt da. */
+  const R = BEWG_RAHMEN;
+  let hinweis = `Gesetzlicher Auffangwert nach ${R.grundsteuer.norm} — er gilt der `
+    + `${R.grundsteuer.zweck} und ist NICHT marktabgeleitet. `
+    + `Fuer ein ${R.verkehrswert.zweck} ist er ${R.verkehrswert.zusatz} `
+    + `(${R.verkehrswert.norm}). `
+    + `Fuer die ${R.erbschaft.zweck} gilt stattdessen ${R.erbschaft.norm}: `
+    + `${R.erbschaft.zusatz}. `
+    + 'Weil der Satz unter dem oertlichen Liegenschaftszinssatz liegt, faellt '
+    + 'der Ertragswert mit ihm eher hoch aus.';
 
   const brw = Number(brwSqm);
   if (istEfh && Number.isFinite(brw) && brw > 500) {
