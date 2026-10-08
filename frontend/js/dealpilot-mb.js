@@ -534,6 +534,14 @@ if (!window._wlc) {
             mikro: (c.meta && c.meta.mikro) || '–', makro: (c.meta && c.meta.makro) || '–', trend: (c.meta && c.meta.trend) || '–',
             mw: c.marktwert || null, mm: c.miete || null, area: numDe(vIn('wfl')) || 0 };
     }
+    /* v1964a: eine WIEDERHERGESTELLTE Karte kam nie durch mapCard - sie
+       wurde beim Berichtslauf serialisiert. Die Herkunft steht deshalb
+       nicht drin, der ZEITSTEMPEL aber schon. Das Datum laesst sich also
+       nachtragen, die Quelle nicht: sie erscheint ab dem naechsten
+       Bericht. Lieber die halbe Angabe als eine erfundene. */
+    if (c && !c.bericht_datum && s.ts) {
+      try { c.bericht_datum = new Date(s.ts).toLocaleDateString('de-DE'); } catch (e) {}
+    }
     D = c; mode = s.mode || _prefSpan() || 'med'; collapsed = true; /* v564-collapsed-default; v969c */ render();
   }
 
