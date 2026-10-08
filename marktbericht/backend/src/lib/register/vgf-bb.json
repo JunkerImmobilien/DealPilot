@@ -1,0 +1,324 @@
+[
+ {
+  "land_code": "BB",
+  "ags": "12060",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro je Quadratmeter",
+   "achse_x": [75, 125, 175, 225, 275, 325, 375],
+   "achse_y_feld": "wohnflaeche",
+   "achse_y_bez": "Wohnfläche in Quadratmetern",
+   "achse_y": [70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190],
+   "zellen": {
+    "70":  [3590, 3720, 3890, 4080, 4300, 4530, 4790],
+    "80":  [3420, 3560, 3730, 3920, 4130, 4370, 4620],
+    "90":  [3270, 3410, 3570, 3760, 3980, 4220, 4470],
+    "100": [3120, 3260, 3430, 3620, 3840, 4070, 4330],
+    "110": [2990, 3120, 3290, 3480, 3700, 3930, 4190],
+    "120": [2850, 2990, 3160, 3350, 3570, 3800, 4060],
+    "130": [2730, 2860, 3030, 3220, 3440, 3670, 3930],
+    "140": [2610, 2740, 2910, 3100, 3320, 3550, 3810],
+    "150": [2490, 2630, 2790, 2980, 3200, 3440, 3690],
+    "160": [2380, 2510, 2680, 2870, 3090, 3320, 3580],
+    "170": [2380, 2400, 2570, 2760, 2980, 3210, 3470],
+    "180": [2270, 2290, 2460, 2650, 2870, 3100, 3360],
+    "190": [2050, 2190, 2360, 2550, 2770, 3000, 3260]
+   },
+   "rundung_stellen": 0,
+   "liefert": "wert_eur",
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "hinweis": "DIE EINHEIT IST EURO JE QUADRATMETER WOHNFLÄCHE, NICHT EIN FAKTOR. Die Zellen reichen von 2.050 bis 4.790 €/m²; der Objektwert entsteht erst durch Multiplikation mit der Wohnfläche und zwar NACH der Korrektur. Wer den Tabellenwert für einen Sachwertfaktor hält, verrechnet sich um drei Größenordnungen.\n\nDER WERT ENTHÄLT DEN BODENWERT: „In der nachfolgenden Auswertung werden die Vergleichsfaktoren auf den Quadratmeter Wohnfläche bezogen und beinhalten den Gebäude- und Bodenwert.\" Ein zusätzlicher Bodenwertansatz zählt ihn doppelt.\n\nZWEI ZEILEN LAUFEN FLACH, UND ZWAR SO ABGEDRUCKT: bei Bodenrichtwert 75 €/m² stehen für 160 m² und 170 m² Wohnfläche beide 2.380 €/m²; bei 180 m² stehen 2.270 und 2.290 €/m² fast gleich. Nachgelesen auf Seite 84 in zwei unabhängigen Textextraktionen (Layout- und Inhaltsstromreihenfolge) — kein Ablesefehler.",
+   "normobjekt": "Ein- bzw. Zweifamilienhaus im Landkreis Barnim mit Stichtag 01.07.2025 und Restnutzungsdauer 50 Jahre (Abbildung 93). Der Bericht nennt für diesen Zweig KEINE Normgrundstücksfläche und keinen Normstandard — die Stichprobe lag im Mittel bei 680 m² Grundstücksgröße, Standardstufe 3 und Modernisierungsgrad 8 (Abbildung 92). Gebrauchte, freistehende Ein- und Zweifamilienhäuser, Erstverkauf und vermietete Objekte sind ausgeschlossen."
+  },
+  "korrekturen": [
+   {
+    "art": "stufen",
+    "feld": "rnd",
+    "bez": "Anpassungsfaktor Restnutzungsdauer (Abbildung 94)",
+    "wirkung": "multiplikativ",
+    "rundung_stellen": 2,
+    "stufen": {
+     "20": 0.77,
+     "25": 0.8,
+     "30": 0.84,
+     "35": 0.87,
+     "40": 0.91,
+     "45": 0.96,
+     "50": 1.0,
+     "55": 1.05,
+     "60": 1.1,
+     "65": 1.15,
+     "70": 1.2,
+     "75": 1.26
+    },
+    "hinweis": "DER UMRECHNUNGSKOEFFIZIENT WIRKT MULTIPLIKATIV, nicht additiv — das Anwendungsbeispiel des Berichts rechnet 150 m² × 3.690 €/m² × 1,05. Bei der Normrestnutzungsdauer 50 Jahre ist er 1,00; das ist die Gegenprobe, dass die Zuordnung stimmt.\n\nACHTUNG BEIM ABLESEN AUS DER PDF-TEXTSCHICHT: in der Layout-Extraktion ist diese Tabelle um eine Zeile verschoben, so dass 20 Jahre auf 0,80 zu fallen scheint. Richtig ist 20 Jahre = 0,77. Belegt doppelt: die Inhaltsstromreihenfolge (`pdftotext -raw`, Seite 85) paart sie so, und nur so ergibt die Normrestnutzungsdauer 50 den Faktor 1,00 und das Anwendungsbeispiel mit 55 Jahren die abgedruckte 1,05."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "§ 20 ImmoWertV, Modellbeschreibung des Berichts Kapitel 13.7",
+   "berechnungsmodell": "Vergleichsfaktor = (Kaufpreis ± boG) / Wohnfläche",
+   "ermittlung": "multiple Regression, Ausreißer über 2,5facher Standardabweichung eliminiert",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche, einschließlich Gebäude- und Bodenwert",
+   "stichtag": "01.07.2025",
+   "bodenrichtwert_stichtag": "01.01.2025",
+   "gnd_jahre": 80,
+   "kauffaelle_gesamt": 123,
+   "bestimmtheitsmass": 0.7,
+   "variationskoeffizient": 0.15,
+   "standardstufe_grundlage": "Anlage 4 ImmoWertV bzw. Nummer 5.3.1 der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW)",
+   "nicht_beruecksichtigt": "Kleinhäuser bzw. Lauben · mehrere Wohnhäuser auf einem Grundstück · Außenbereichslagen · Objekte im Sanierungsgebiet · Bodenwertanteil über 80 Prozent vom Kaufpreis · vermietete Objekte · Erstverkauf · Erbbaurechte · Grundstücke mit direktem Wasserzugang · Objekte mit Restnutzungsdauer unter 20 Jahren · Objekte, deren Nutzflächenanteil an der Summe aus Wohn- und Nutzfläche 20 Prozent übersteigt",
+   "besonderheit": "Ortsbesichtigung bzw. Inaugenscheinnahme durchgeführt, KEINE Innenbesichtigung. Es wird auf das tatsächliche Baujahr Bezug genommen.",
+   "hinweis": "Die Modellbeschreibung in Kapitel 13.7 fasst Ein- und Zweifamilienhäuser, Doppelhaushälften und Reihenhäuser in EINEM Blatt zusammen und nennt 204 Objekte aus dem Jahr 2025. Die beiden Auswertungen trennen sie: 123 Kauffälle für Ein- und Zweifamilienhäuser (Kap. 8.2.3.1), 79 für Doppelhaushälften und Reihenhäuser (Kap. 8.3.3.1). 123 + 79 = 202 — die Differenz von zwei Kauffällen zu den 204 des Modellblatts erklärt der Bericht nicht."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Barnim, gesamtes Kreisgebiet ohne räumliche Untergliederung",
+   "sachlich": "gebrauchte, freistehende Ein- und Zweifamilienhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "wohnflaeche_qm": {
+     "min": 70,
+     "max": 190,
+     "hinweis": "Achse der Tabelle. Die Stichprobe selbst reicht von 60 bis 200 m² bei einem Mittel von 120 m²; die Tabelle ist enger abgedruckt als die Stichprobe und gilt nur, soweit sie abgedruckt ist."
+    },
+    "brw_eur_qm": {
+     "min": 75,
+     "max": 375,
+     "hinweis": "Achse der Tabelle. Die Stichprobe reicht von 38 bis 380 €/m² bei einem Mittel von 260 €/m²."
+    },
+    "rnd_jahre": {
+     "min": 20,
+     "max": 75,
+     "hinweis": "Bereich der Anpassungstabelle Abbildung 94. Die Stichprobe reicht von 21 bis 78 Jahren bei einem Mittel von 50 Jahren."
+    },
+    "normierter_kaufpreis_eur": {
+     "min": 163000,
+     "max": 780000,
+     "mittel": 425000
+    },
+    "flaeche_qm": {
+     "min": 360,
+     "max": 1060,
+     "mittel": 680
+    },
+    "baujahr": {
+     "min": 1900,
+     "max": 2023,
+     "mittel": 1984
+    },
+    "bgf_qm": {
+     "min": 125,
+     "max": 425,
+     "mittel": 230
+    },
+    "standardstufe": {
+     "min": 2,
+     "max": 4,
+     "mittel": 3
+    },
+    "mod_punkte": {
+     "min": 2,
+     "max": 20,
+     "mittel": 8
+    },
+    "kaufpreis_je_wohnflaeche_eur_qm": {
+     "min": 1440,
+     "max": 5990,
+     "mittel": 3620
+    }
+   },
+   "vorbehalt": "DER BERICHT SPERRT DIE ANWENDUNG AUSSERHALB SEINER SPANNEN SELBST: „Für Objekte, deren Eigenschaften außerhalb der in der Stichprobe angegebenen Wertebereiche (nachfolgende Abb.) liegen, sind diese Vergleichsfaktoren nicht zu verwenden.\"\n\nES GIBT NUR EINEN EINZIGEN UMRECHNUNGSKOEFFIZIENTEN — den für die Restnutzungsdauer. Für die GRUNDSTÜCKSFLÄCHE führt der Bericht bei den Ein- und Zweifamilienhäusern KEINEN, obwohl die Stichprobe von 360 bis 1.060 m² reicht und der Vergleichsfaktor den Bodenwert enthält. Beim Zweig `rhdhh` desselben Berichts gibt es diesen Koeffizienten (Abbildung 109). Ein Einfamilienhaus mit 1.000 m² Grundstück lässt sich hier also NICHT modellkonform anpassen; die Abweichung gehört als besonderes objektspezifisches Grundstücksmerkmal behandelt oder das Verfahren bleibt aus.\n\nDAS MODELL BERUHT AUF ÄUSSERER BESICHTIGUNG: „Ortsbesichtigung bzw. Inaugenscheinnahme durchgeführt (keine Innenbesichtigung).\" Der Modernisierungsgrad der Stichprobe ist also geschätzt.\n\nDIE MODERNISIERUNGSTABELLE DES BERICHTS WEICHT AB. Der Bericht warnt selbst: „Achtung: Die Modernisierungstabelle weicht von den ImmoWertA-Angaben hinsichtlich der Bepunktung und der Modernisierungszeiten ab.\" Wer den Modernisierungsgrad nach ImmoWertA ermittelt, trifft eine andere Restnutzungsdauer und damit einen anderen Anpassungsfaktor.",
+   "hinweis": "NICHT VERWECHSELN MIT DEN WOHNFLÄCHENPREISEN aus Kapitel 8.2.3.2. Der Bericht trennt sie ausdrücklich: „Die ermittelten Wohnflächenpreise stellen keine Vergleichsfaktoren für bebaute Grundstücke im Sinne des § 20 der ImmoWertV dar. Sie dienen der allgemeinen Orientierung.\" Sie sind hier bewusst NICHT erfasst.\n\nDieser Satz ist der erste `vergleichsfaktor`-Datensatz des Registers überhaupt — gemessen am 08.10.2026 führte keine Registerdatei diese Kennzahl, obwohl `gutachterausschuss.js` sie seit Langem auswertet."
+  },
+  "belege": [
+   "Grundstücksmarktbericht Landkreis Barnim 2025, Kap. 8.2.3.1, Abbildungen 92 bis 94, S. 83 bis 85: Vergleichsfaktoren für Ein- und Zweifamilienhäuser je m² Wohnfläche aus 123 Kauffällen des Zeitraums 1/2025 bis 12/2025, Tabelle 13 × 7 Stützstellen (Wohnfläche 70 bis 190 m², Bodenrichtwertniveau 75 bis 375 €/m²), Bestimmtheitsmaß 0,70, Variationskoeffizient 0,15, Stichtag 01.07.2025, Normrestnutzungsdauer 50 Jahre, Anpassungstabelle Restnutzungsdauer 20 bis 75 Jahre.",
+   "Anwendungsbeispiel des Berichts (S. 85) nachgerechnet: Einfamilienhaus mit Wohnfläche 150 m², Bodenwert 375 €/m², Restnutzungsdauer 55 Jahre. Vergleichsfaktor Abb. 93 = 3.690 €/m² (Zelle getroffen), Anpassungsfaktor Abb. 94 = 1,05 (Stufe getroffen). 150 × 3.690 × 1,05 = 581.175 €. Der Bericht druckt „rd. 582.000 €\" ab — 825 € bzw. 0,14 Prozent Unterschied, weil er mit dem ungerundeten Anpassungsfaktor rechnet (582.000 / 150 / 3.690 = 1,0515). Tabellenwert und Koeffizient sind damit zeichengleich bestätigt; die Abweichung liegt allein in der Rundung des Berichts, die er mit „rd.\" selbst kennzeichnet."
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtliche Tabelle mit vollständiger Stichprobenbeschreibung, eigenem Modellblatt (Kap. 13.7), ausgewiesenem Bestimmtheitsmaß 0,70 und einem nachgerechneten Anwendungsbeispiel, das Tabellenwert und Umrechnungskoeffizienten zeichengleich bestätigt. Stufe B statt A, weil das abgedruckte Endergebnis des Beispiels („rd. 582.000 €\") sich aus den abgedruckten gerundeten Zahlen nicht exakt reproduzieren lässt (581.175 €, 0,14 Prozent) und weil für die Grundstücksfläche kein Umrechnungskoeffizient vorliegt, obwohl der Faktor den Bodenwert enthält.",
+  "fallzahl": 123,
+  "streuung": null,
+  "stichtag": "2025-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BAR.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.2.3.1, Abbildungen 92 bis 94, S. 83 bis 85. Modellbeschreibung Kap. 13.7, S. 166. Lizenzbestimmung im Impressum, S. 2."
+ },
+ {
+  "land_code": "BB",
+  "ags": "12060",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro je Quadratmeter",
+   "achse_x": [50, 100, 150, 200, 250, 300, 350, 400, 450, 500],
+   "achse_y_feld": "wohnflaeche",
+   "achse_y_bez": "Wohnfläche in Quadratmetern",
+   "achse_y": [70, 80, 90, 100, 110, 120, 130, 140, 150],
+   "zellen": {
+    "70":  [2730, 2950, 3180, 3420, 3660, 3920, 4180, 4460, 4740, 5030],
+    "80":  [2560, 2780, 3000, 3230, 3470, 3720, 3980, 4240, 4520, 4800],
+    "90":  [2400, 2610, 2820, 3050, 3280, 3520, 3780, 4030, 4300, 4580],
+    "100": [2240, 2450, 2650, 2870, 3100, 3340, 3580, 3830, 4090, 4360],
+    "110": [2090, 2290, 2490, 2700, 2920, 3150, 3390, 3630, 3890, 4150],
+    "120": [1950, 2140, 2330, 2540, 2750, 2970, 3200, 3440, 3690, 3950],
+    "130": [1810, 1990, 2180, 2380, 2580, 2800, 3020, 3250, 3500, 3740],
+    "140": [1670, 1850, 2030, 2220, 2420, 2630, 2850, 3070, 3310, 3550],
+    "150": [1540, 1710, 1890, 2070, 2260, 2470, 2680, 2900, 3120, 3360]
+   },
+   "rundung_stellen": 0,
+   "liefert": "wert_eur",
+   "liefert_einheit": "Euro je Quadratmeter Wohnfläche",
+   "hinweis": "DIE EINHEIT IST EURO JE QUADRATMETER WOHNFLÄCHE, NICHT EIN FAKTOR. Die Zellen reichen von 1.540 bis 5.030 €/m². Derselbe Bericht führt für denselben Teilmarkt auch Sachwertfaktoren (Abbildung 105, 0,90 bis 1,58) — die beiden Kennzahlen stehen in verschiedenen Einheiten und dürfen nicht gegeneinander geprüft werden.\n\nDER WERT ENTHÄLT DEN BODENWERT: „In der nachfolgenden Auswertung werden die Vergleichsfaktoren auf den Quadratmeter Wohnfläche bezogen und beinhalten den Gebäude- und Bodenwert.\"\n\nZWEI UMRECHNUNGSKOEFFIZIENTEN, BEIDE PFLICHT: Restnutzungsdauer UND Grundstücksfläche. Das Anwendungsbeispiel des Berichts wendet beide gleichzeitig an.",
+   "normobjekt": "Doppelhaushälfte bzw. Reihenhaus im Landkreis Barnim mit Stichtag 01.07.2025, Restnutzungsdauer 45 Jahre und Grundstücksfläche 425 m² (Abbildung 108). Der Bericht nennt keinen Normstandard — die Stichprobe lag im Mittel bei Standardstufe 3 und Modernisierungsgrad 6 (Abbildung 107). Gebrauchte Objekte, Erstverkauf und vermietete Objekte sind ausgeschlossen."
+  },
+  "korrekturen": [
+   {
+    "art": "stufen",
+    "feld": "rnd",
+    "bez": "Anpassungsfaktor Restnutzungsdauer (Abbildung 109 links)",
+    "wirkung": "multiplikativ",
+    "rundung_stellen": 2,
+    "stufen": {
+     "20": 0.75,
+     "25": 0.8,
+     "30": 0.85,
+     "35": 0.9,
+     "40": 0.95,
+     "45": 1.01,
+     "50": 1.06,
+     "55": 1.12,
+     "60": 1.18
+    },
+    "hinweis": "DIE NORMRESTNUTZUNGSDAUER IST 45 JAHRE, IHR FAKTOR ABER 1,01 UND NICHT 1,00. So ist er abgedruckt (S. 101) und so bleibt er hier stehen — ein Prozent am Bezugspunkt ist eine Ungenauigkeit des Berichts, keine Ableseunsicherheit. Beim Zweig `ezfh` desselben Berichts trägt der Bezugspunkt korrekt 1,00. Nicht stillschweigend auf 1,00 korrigieren: der Prüfmaßstab ist das abgedruckte Dokument, und das Anwendungsbeispiel rechnet ebenfalls mit den abgedruckten Zahlen.\n\nDIE REIHE ENDET BEI 60 JAHREN. Darüber hinaus gilt der Randwert; eine Fortsetzung druckt der Bericht nicht ab."
+   },
+   {
+    "art": "stufen",
+    "feld": "flaeche",
+    "bez": "Anpassungsfaktor Grundstücksgröße (Abbildung 109 rechts)",
+    "wirkung": "multiplikativ",
+    "rundung_stellen": 2,
+    "stufen": {
+     "200": 0.93,
+     "300": 0.96,
+     "400": 0.99,
+     "500": 1.02,
+     "600": 1.05,
+     "700": 1.07,
+     "800": 1.09,
+     "900": 1.12,
+     "1000": 1.14,
+     "1100": 1.16
+    },
+    "hinweis": "DIE TABELLE FÜHRT KEINEN WERT FÜR DIE NORMFLÄCHE 425 m² — zwischen 400 (0,99) und 500 (1,02) interpoliert ergibt sie dort 1,0025, also rund 1,00. Das ist die Gegenprobe, dass diese Spalte richtig zugeordnet ist.\n\nDIE REIHE ENDET BEI 1.100 m², die Stichprobe bei 1.160 m². Darüber gilt der Randwert; extrapoliert wird nicht."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "§ 20 ImmoWertV, Modellbeschreibung des Berichts Kapitel 13.7",
+   "berechnungsmodell": "Vergleichsfaktor = (Kaufpreis ± boG) / Wohnfläche",
+   "ermittlung": "multiple Regression, Ausreißer über 2,5facher Standardabweichung eliminiert",
+   "bezugsmaßstab": "Euro je Quadratmeter Wohnfläche, einschließlich Gebäude- und Bodenwert",
+   "stichtag": "01.07.2025",
+   "bodenrichtwert_stichtag": "01.01.2025",
+   "gnd_jahre": 80,
+   "kauffaelle_gesamt": 79,
+   "bestimmtheitsmass": 0.79,
+   "variationskoeffizient": 0.15,
+   "standardstufe_grundlage": "Anlage 4 ImmoWertV bzw. Nummer 5.3.1 der Verwaltungsvorschrift Ertrags- und Sachwert (VV EW-SW)",
+   "nicht_beruecksichtigt": "Kleinhäuser bzw. Lauben · mehrere Wohnhäuser auf einem Grundstück · Außenbereichslagen · Objekte im Sanierungsgebiet · Bodenwertanteil über 80 Prozent vom Kaufpreis · vermietete Objekte · Erstverkauf · Erbbaurechte · Grundstücke mit direktem Wasserzugang · Objekte mit Restnutzungsdauer unter 20 Jahren · Objekte, deren Nutzflächenanteil an der Summe aus Wohn- und Nutzfläche 20 Prozent übersteigt",
+   "besonderheit": "Ortsbesichtigung bzw. Inaugenscheinnahme durchgeführt, KEINE Innenbesichtigung. Es wird auf das tatsächliche Baujahr Bezug genommen."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Barnim, gesamtes Kreisgebiet ohne räumliche Untergliederung",
+   "sachlich": "gebrauchte Doppelhaushälften und Reihenhäuser",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "wohnflaeche_qm": {
+     "min": 70,
+     "max": 150,
+     "hinweis": "Achse der Tabelle. Die Stichprobe reicht von 70 bis 155 m² bei einem Mittel von 110 m²."
+    },
+    "brw_eur_qm": {
+     "min": 50,
+     "max": 500,
+     "hinweis": "Achse der Tabelle. Die Stichprobe reicht von 12 bis 500 €/m² bei einem Mittel von 240 €/m². UNTERHALB VON 50 €/m² GIBT ES KEINE SPALTE, obwohl die Stichprobe bis 12 €/m² hinabreicht — dort führt der Bericht keinen Vergleichsfaktor."
+    },
+    "rnd_jahre": {
+     "min": 20,
+     "max": 60,
+     "hinweis": "Bereich der Anpassungstabelle Abbildung 109. Die Stichprobe reicht von 21 bis 61 Jahren bei einem Mittel von 45 Jahren."
+    },
+    "flaeche_qm": {
+     "min": 200,
+     "max": 1100,
+     "hinweis": "Bereich der Anpassungstabelle Abbildung 109. Die Stichprobe reicht von 120 bis 1.160 m² bei einem Mittel von 425 m² — UNTER 200 m² führt der Bericht keinen Anpassungsfaktor, obwohl die Stichprobe bis 120 m² hinabreicht."
+    },
+    "normierter_kaufpreis_eur": {
+     "min": 109000,
+     "max": 485000,
+     "mittel": 314000
+    },
+    "baujahr": {
+     "min": 1900,
+     "max": 2005,
+     "mittel": 1977
+    },
+    "bgf_qm": {
+     "min": 95,
+     "max": 290,
+     "mittel": 185
+    },
+    "standardstufe": {
+     "min": 2,
+     "max": 3,
+     "mittel": 3
+    },
+    "mod_punkte": {
+     "min": 4,
+     "max": 12,
+     "mittel": 6
+    },
+    "kaufpreis_je_wohnflaeche_eur_qm": {
+     "min": 1230,
+     "max": 5320,
+     "mittel": 2960
+    }
+   },
+   "vorbehalt": "DER BERICHT SPERRT DIE ANWENDUNG AUSSERHALB SEINER SPANNEN SELBST: „Für Objekte, deren Eigenschaften außerhalb der in der Stichprobe angegebenen Wertebereiche (nachfolgende Abb.) liegen, sind diese Vergleichsfaktoren nicht zu verwenden.\"\n\nBEIDE KOEFFIZIENTEN SIND GLEICHZEITIG ANZUWENDEN. Das Anwendungsbeispiel rechnet 100 m² × 3.580 €/m² × 1,06 × 0,99. Wer nur einen anwendet, rechnet das Modell halb — und das Ergebnis sieht trotzdem plausibel aus.\n\nDER BEZUGSPUNKT DER RESTNUTZUNGSDAUER TRÄGT 1,01 STATT 1,00 (siehe Korrektur). Bei einem Objekt, das in allen Merkmalen dem Normobjekt entspricht, liegt der Wert damit ein Prozent über dem Tabellenwert.\n\nDAS MODELL BERUHT AUF ÄUSSERER BESICHTIGUNG ohne Innenbesichtigung; der Modernisierungsgrad der Stichprobe ist geschätzt, und die Modernisierungstabelle des Berichts weicht von den ImmoWertA-Angaben ab.",
+   "hinweis": "NICHT VERWECHSELN MIT DEN WOHNFLÄCHENPREISEN aus Kapitel 8.3.3.2 (Kreisdurchschnitt rund 3.350 €/m²). Der Bericht trennt sie ausdrücklich: „Die ermittelten Wohnflächenpreise stellen keine Vergleichsfaktoren für bebaute Grundstücke im Sinne des § 20 der ImmoWertV dar.\" Sie sind hier bewusst NICHT erfasst.\n\nDER BERICHT UNTERSCHEIDET DOPPELHAUSHÄLFTE UND REIHENHAUS NICHT. Er führt beide als einen Teilmarkt („Doppelhaushälften/ Reihenhäuser\") — getrennte Zweige `dhh` und `rh` sind aus diesem Bericht NICHT belegbar und werden deshalb nicht gebildet. Auch eine Trennung nach Reihenend- und Reihenmittelhaus gibt es hier nicht (anders als bei der Stadt Brandenburg an der Havel, die `rhdhh` und `rmh` trennt)."
+  },
+  "belege": [
+   "Grundstücksmarktbericht Landkreis Barnim 2025, Kap. 8.3.3.1, Abbildungen 107 bis 109, S. 100 bis 102: Vergleichsfaktoren für Doppelhaushälften und Reihenhäuser je m² Wohnfläche aus 79 Kauffällen des Zeitraums 1/2025 bis 12/2025, Tabelle 9 × 10 Stützstellen (Wohnfläche 70 bis 150 m², Bodenrichtwertniveau 50 bis 500 €/m²), Bestimmtheitsmaß 0,79, Variationskoeffizient 0,15, Stichtag 01.07.2025, Normrestnutzungsdauer 45 Jahre, Normgrundstücksfläche 425 m², zwei Anpassungstabellen.",
+   "Anwendungsbeispiel des Berichts (S. 102) nachgerechnet und ZEICHENGLEICH: Doppelhaushälfte mit Wohnfläche 100 m², Bodenwert 350 €/m², Restnutzungsdauer 50 Jahre, Grundstücksfläche 400 m². Vergleichsfaktor Abb. 108 = 3.580 €/m² (Zelle getroffen), Anpassungsfaktor Restnutzungsdauer Abb. 109 = 1,06 (Stufe getroffen), Anpassungsfaktor Grundstücksfläche Abb. 109 = 0,99 (Stufe getroffen). 100 × 3.580 × 1,06 × 0,99 = 375.685,20 €, abgedruckt „rd. 376.000 €\" — dieselbe Zahl in der Rundung des Berichts."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle mit vollständiger Stichprobenbeschreibung, eigenem Modellblatt (Kap. 13.7), ausgewiesenem Bestimmtheitsmaß 0,79 und einem Anwendungsbeispiel, das sich aus den abgedruckten Zahlen VOLLSTÄNDIG reproduzieren lässt — Tabellenwert, beide Umrechnungskoeffizienten und das Endergebnis stimmen in der Rundung des Berichts überein. Der einzige Vorbehalt (Bezugspunkt der Restnutzungsdauer trägt 1,01 statt 1,00) ist eine Eigenschaft des Dokuments, keine Unsicherheit der Erfassung, und steht am Satz.",
+  "fallzahl": 79,
+  "streuung": null,
+  "stichtag": "2025-07-01",
+  "berichtsjahr": 2025,
+  "modellversion": "GMB 2025",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BAR.pdf",
+  "quelle_parser": "v1084-WREZ",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Namensnennung Pflicht, zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben.",
+  "fundstelle": "Kap. 8.3.3.1, Abbildungen 107 bis 109, S. 100 bis 102. Modellbeschreibung Kap. 13.7, S. 166. Lizenzbestimmung im Impressum, S. 2."
+ }
+]

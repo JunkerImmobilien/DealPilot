@@ -1,0 +1,1370 @@
+[
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "formel": {
+   "form": "entscheidungsbaum",
+   "liefert": "eur_qm",
+   "einheit": "EUR/m² Wohnfläche",
+   "wert": null,
+   "warum_kein_wert": "SPERRE MIT WEG, NICHT FEHLENDE ERNTE. Die Berliner Vergleichsfaktoren für Wohnungseigentum sind KEINE Tabelle und keine Formel, sondern NEUN GEZEICHNETE ENTSCHEIDUNGSBÄUME (Startbaum plus acht Bezirksbäume, Abbildungen 1 bis 9). Der anzuwendende Faktor ist der Wert des ENDKNOTENS, den der Objektpfad erreicht — das Blatt führt es selbst so vor („3. Vergleichsfaktor: Endknoten 3 ‚bezugsfrei' = 5.369 EUR/m² Wohnfläche\").\n\nAlle Endknotenwerte stehen in diesem Satz und sind nachgeprüft (siehe stufe_grund). Was NICHT maschinell belegt ist, ist die TOPOLOGIE: welche Split-Schwelle zu welchem Endknoten führt. Die Bäume sind Vektorgrafiken, deren Verbinder von deckenden Beschriftungsfeldern zerschnitten sind; drei verschiedene Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Das ist Tuning, keine Messung — deshalb steht hier kein geratener Pfad.\n\nWEG ZUM ECHTEN WERT: Altbezirk bestimmen (Zuordnung steht in kategorie_zuordnung dieses Satzes, gegen die Altbezirkstabelle des Blattes geprüft), dann im zugehörigen Bezirksbaum auf Seite (siehe baeume[*].seite_im_blatt) des amtlichen PDF den Pfad ablesen und den Endknoten aus endknoten[] nehmen. Das PDF ist frei abrufbar: https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf\n\nAUFLÖSBAR wird der Satz, sobald die Baumseiten gerastert gelesen werden können (poppler/pdftoppm oder Ghostscript waren am 08.10.2026 auf dem Arbeitsplatz nicht vorhanden). Die Ernte muss dafür NICHT wiederholt werden.",
+   "achse_k_feld": "bezirksbaum",
+   "achse_k_bez": "Bezirksbaum nach Altbezirk (Stand vor der Verwaltungsreform 2001)",
+   "kategorien": [
+    "I-1",
+    "I-2",
+    "II-1",
+    "II-2",
+    "III-1",
+    "III-2",
+    "III-3",
+    "IV"
+   ],
+   "zuordnung_feld": "altbezirk",
+   "kategorie_zuordnung": {
+    "I-1": [
+     "Wedding",
+     "Köpenick",
+     "Pankow",
+     "Neukölln"
+    ],
+    "I-2": [
+     "Steglitz",
+     "Zehlendorf",
+     "Lichtenberg"
+    ],
+    "II-1": [
+     "Spandau",
+     "Hellersdorf",
+     "Hohenschönhausen"
+    ],
+    "II-2": [
+     "Reinickendorf",
+     "Treptow",
+     "Tempelhof",
+     "Marzahn"
+    ],
+    "III-1": [
+     "Tiergarten",
+     "Weißensee",
+     "Schöneberg"
+    ],
+    "III-2": [
+     "Kreuzberg",
+     "Charlottenburg",
+     "Wilmersdorf"
+    ],
+    "III-3": [
+     "Prenzlauer Berg",
+     "Friedrichshain"
+    ],
+    "IV": [
+     "Mitte"
+    ]
+   },
+   "baeume": {
+    "I-1": {
+     "altbezirke": [
+      "Wedding",
+      "Köpenick",
+      "Pankow",
+      "Neukölln"
+     ],
+     "wurzel_eur_qm": 4493,
+     "abschlag_vermietet_prozent": 28,
+     "abschlag_gilt_fuer": [
+      "2"
+     ],
+     "fallzahl": 1460,
+     "seite_im_blatt": 11,
+     "endknoten": [
+      {
+       "knotennummer": "2",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6458,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 164,
+       "fallzahl_vermietet": 0
+      },
+      {
+       "knotennummer": "3",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5369,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3804,
+       "fallzahl_bezugsfrei": 368,
+       "fallzahl_vermietet": 108
+      },
+      {
+       "knotennummer": "7",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4957,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3491,
+       "fallzahl_bezugsfrei": 80,
+       "fallzahl_vermietet": 24
+      },
+      {
+       "knotennummer": "10",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3599,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2641,
+       "fallzahl_bezugsfrei": 27,
+       "fallzahl_vermietet": 61
+      },
+      {
+       "knotennummer": "11",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4950,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3633,
+       "fallzahl_bezugsfrei": 32,
+       "fallzahl_vermietet": 21
+      },
+      {
+       "knotennummer": "12",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4280,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3051,
+       "fallzahl_bezugsfrei": 177,
+       "fallzahl_vermietet": 90
+      },
+      {
+       "knotennummer": "13",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3641,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2776,
+       "fallzahl_bezugsfrei": 110,
+       "fallzahl_vermietet": 38
+      },
+      {
+       "knotennummer": "14",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4251,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2954,
+       "fallzahl_bezugsfrei": 100,
+       "fallzahl_vermietet": 60
+      }
+     ]
+    },
+    "I-2": {
+     "altbezirke": [
+      "Steglitz",
+      "Zehlendorf",
+      "Lichtenberg"
+     ],
+     "wurzel_eur_qm": 4889,
+     "abschlag_vermietet_prozent": 26,
+     "abschlag_gilt_fuer": [
+      "2"
+     ],
+     "fallzahl": 1306,
+     "seite_im_blatt": 12,
+     "endknoten": [
+      {
+       "knotennummer": "2",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6810,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 171,
+       "fallzahl_vermietet": 1
+      },
+      {
+       "knotennummer": "6",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6239,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4765,
+       "fallzahl_bezugsfrei": 94,
+       "fallzahl_vermietet": 18
+      },
+      {
+       "knotennummer": "9",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5684,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4162,
+       "fallzahl_bezugsfrei": 96,
+       "fallzahl_vermietet": 22
+      },
+      {
+       "knotennummer": "13",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5447,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3708,
+       "fallzahl_bezugsfrei": 62,
+       "fallzahl_vermietet": 7
+      },
+      {
+       "knotennummer": "14",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4461,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3632,
+       "fallzahl_bezugsfrei": 107,
+       "fallzahl_vermietet": 15
+      },
+      {
+       "knotennummer": "15",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4841,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3352,
+       "fallzahl_bezugsfrei": 102,
+       "fallzahl_vermietet": 30
+      },
+      {
+       "knotennummer": "16",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5144,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4395,
+       "fallzahl_bezugsfrei": 53,
+       "fallzahl_vermietet": 15
+      },
+      {
+       "knotennummer": "17",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4869,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3458,
+       "fallzahl_bezugsfrei": 100,
+       "fallzahl_vermietet": 24
+      },
+      {
+       "knotennummer": "18",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4538,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2814,
+       "fallzahl_bezugsfrei": 37,
+       "fallzahl_vermietet": 18
+      },
+      {
+       "knotennummer": "19",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4247,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3376,
+       "fallzahl_bezugsfrei": 187,
+       "fallzahl_vermietet": 89
+      },
+      {
+       "knotennummer": "20",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3742,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2652,
+       "fallzahl_bezugsfrei": 36,
+       "fallzahl_vermietet": 22
+      }
+     ]
+    },
+    "II-1": {
+     "altbezirke": [
+      "Spandau",
+      "Hellersdorf",
+      "Hohenschönhausen"
+     ],
+     "wurzel_eur_qm": 3238,
+     "abschlag_vermietet_prozent": 20,
+     "abschlag_gilt_fuer": [
+      "2",
+      "22"
+     ],
+     "fallzahl": 623,
+     "seite_im_blatt": 13,
+     "endknoten": [
+      {
+       "knotennummer": "2",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5983,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 11,
+       "fallzahl_vermietet": 0
+      },
+      {
+       "knotennummer": "7",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3679,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2843,
+       "fallzahl_bezugsfrei": 13,
+       "fallzahl_vermietet": 11
+      },
+      {
+       "knotennummer": "13",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3909,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2846,
+       "fallzahl_bezugsfrei": 10,
+       "fallzahl_vermietet": 7
+      },
+      {
+       "knotennummer": "14",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4436,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3763,
+       "fallzahl_bezugsfrei": 27,
+       "fallzahl_vermietet": 8
+      },
+      {
+       "knotennummer": "15",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 2940,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2449,
+       "fallzahl_bezugsfrei": 49,
+       "fallzahl_vermietet": 42
+      },
+      {
+       "knotennummer": "16",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3166,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2640,
+       "fallzahl_bezugsfrei": 36,
+       "fallzahl_vermietet": 23
+      },
+      {
+       "knotennummer": "17",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3460,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2414,
+       "fallzahl_bezugsfrei": 34,
+       "fallzahl_vermietet": 7
+      },
+      {
+       "knotennummer": "18",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 2894,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2453,
+       "fallzahl_bezugsfrei": 8,
+       "fallzahl_vermietet": 10
+      },
+      {
+       "knotennummer": "19",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3337,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3072,
+       "fallzahl_bezugsfrei": 10,
+       "fallzahl_vermietet": 14
+      },
+      {
+       "knotennummer": "20",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4248,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3125,
+       "fallzahl_bezugsfrei": 16,
+       "fallzahl_vermietet": 6
+      },
+      {
+       "knotennummer": "21",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3360,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2689,
+       "fallzahl_bezugsfrei": 168,
+       "fallzahl_vermietet": 75
+      },
+      {
+       "knotennummer": "22",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3424,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 36,
+       "fallzahl_vermietet": 2
+      }
+     ]
+    },
+    "II-2": {
+     "altbezirke": [
+      "Reinickendorf",
+      "Treptow",
+      "Tempelhof",
+      "Marzahn"
+     ],
+     "wurzel_eur_qm": 4022,
+     "abschlag_vermietet_prozent": 17,
+     "abschlag_gilt_fuer": [
+      "2"
+     ],
+     "fallzahl": 1424,
+     "seite_im_blatt": 14,
+     "endknoten": [
+      {
+       "knotennummer": "2",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5848,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 155,
+       "fallzahl_vermietet": 0
+      },
+      {
+       "knotennummer": "5",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4395,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3622,
+       "fallzahl_bezugsfrei": 86,
+       "fallzahl_vermietet": 21
+      },
+      {
+       "knotennummer": "7",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4458,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3236,
+       "fallzahl_bezugsfrei": 93,
+       "fallzahl_vermietet": 50
+      },
+      {
+       "knotennummer": "10",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4016,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3259,
+       "fallzahl_bezugsfrei": 44,
+       "fallzahl_vermietet": 9
+      },
+      {
+       "knotennummer": "11",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4847,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4448,
+       "fallzahl_bezugsfrei": 48,
+       "fallzahl_vermietet": 46
+      },
+      {
+       "knotennummer": "12",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5190,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4997,
+       "fallzahl_bezugsfrei": 40,
+       "fallzahl_vermietet": 21
+      },
+      {
+       "knotennummer": "13",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3647,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2834,
+       "fallzahl_bezugsfrei": 313,
+       "fallzahl_vermietet": 118
+      },
+      {
+       "knotennummer": "14",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 3791,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 2884,
+       "fallzahl_bezugsfrei": 289,
+       "fallzahl_vermietet": 91
+      }
+     ]
+    },
+    "III-1": {
+     "altbezirke": [
+      "Tiergarten",
+      "Weißensee",
+      "Schöneberg"
+     ],
+     "wurzel_eur_qm": 5610,
+     "abschlag_vermietet_prozent": 27,
+     "abschlag_gilt_fuer": [
+      "5",
+      "6"
+     ],
+     "fallzahl": 1217,
+     "seite_im_blatt": 15,
+     "endknoten": [
+      {
+       "knotennummer": "5",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 9403,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 85,
+       "fallzahl_vermietet": 0
+      },
+      {
+       "knotennummer": "6",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7487,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 56,
+       "fallzahl_vermietet": 0
+      },
+      {
+       "knotennummer": "7",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 8092,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 6593,
+       "fallzahl_bezugsfrei": 53,
+       "fallzahl_vermietet": 11
+      },
+      {
+       "knotennummer": "8",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5265,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3651,
+       "fallzahl_bezugsfrei": 39,
+       "fallzahl_vermietet": 19
+      },
+      {
+       "knotennummer": "11",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4649,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3234,
+       "fallzahl_bezugsfrei": 142,
+       "fallzahl_vermietet": 49
+      },
+      {
+       "knotennummer": "15",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5626,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3856,
+       "fallzahl_bezugsfrei": 98,
+       "fallzahl_vermietet": 24
+      },
+      {
+       "knotennummer": "16",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5212,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3700,
+       "fallzahl_bezugsfrei": 124,
+       "fallzahl_vermietet": 62
+      },
+      {
+       "knotennummer": "17",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5862,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4024,
+       "fallzahl_bezugsfrei": 87,
+       "fallzahl_vermietet": 20
+      },
+      {
+       "knotennummer": "18",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5514,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3908,
+       "fallzahl_bezugsfrei": 178,
+       "fallzahl_vermietet": 52
+      },
+      {
+       "knotennummer": "19",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5965,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4668,
+       "fallzahl_bezugsfrei": 59,
+       "fallzahl_vermietet": 6
+      },
+      {
+       "knotennummer": "20",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6552,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4937,
+       "fallzahl_bezugsfrei": 48,
+       "fallzahl_vermietet": 5
+      }
+     ]
+    },
+    "III-2": {
+     "altbezirke": [
+      "Kreuzberg",
+      "Charlottenburg",
+      "Wilmersdorf"
+     ],
+     "wurzel_eur_qm": 6005,
+     "abschlag_vermietet_prozent": 28,
+     "abschlag_gilt_fuer": [
+      "6"
+     ],
+     "fallzahl": 1863,
+     "seite_im_blatt": 16,
+     "endknoten": [
+      {
+       "knotennummer": "4",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7143,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4538,
+       "fallzahl_bezugsfrei": 124,
+       "fallzahl_vermietet": 18
+      },
+      {
+       "knotennummer": "5",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7906,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 6700,
+       "fallzahl_bezugsfrei": 119,
+       "fallzahl_vermietet": 32
+      },
+      {
+       "knotennummer": "6",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 10783,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 103,
+       "fallzahl_vermietet": 0
+      },
+      {
+       "knotennummer": "9",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 4447,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3289,
+       "fallzahl_bezugsfrei": 60,
+       "fallzahl_vermietet": 14
+      },
+      {
+       "knotennummer": "11",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5335,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4075,
+       "fallzahl_bezugsfrei": 84,
+       "fallzahl_vermietet": 33
+      },
+      {
+       "knotennummer": "13",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5196,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3702,
+       "fallzahl_bezugsfrei": 136,
+       "fallzahl_vermietet": 48
+      },
+      {
+       "knotennummer": "14",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5739,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4073,
+       "fallzahl_bezugsfrei": 264,
+       "fallzahl_vermietet": 96
+      },
+      {
+       "knotennummer": "15",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6181,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4040,
+       "fallzahl_bezugsfrei": 381,
+       "fallzahl_vermietet": 120
+      },
+      {
+       "knotennummer": "16",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6501,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4503,
+       "fallzahl_bezugsfrei": 194,
+       "fallzahl_vermietet": 37
+      }
+     ]
+    },
+    "III-3": {
+     "altbezirke": [
+      "Prenzlauer Berg",
+      "Friedrichshain"
+     ],
+     "wurzel_eur_qm": 6308,
+     "abschlag_vermietet_prozent": null,
+     "abschlag_gilt_fuer": [],
+     "fallzahl": 1412,
+     "seite_im_blatt": 17,
+     "endknoten": [
+      {
+       "knotennummer": "4",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7592,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5495,
+       "fallzahl_bezugsfrei": 89,
+       "fallzahl_vermietet": 15
+      },
+      {
+       "knotennummer": "5",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7352,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5177,
+       "fallzahl_bezugsfrei": 108,
+       "fallzahl_vermietet": 21
+      },
+      {
+       "knotennummer": "6",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 9237,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 6689,
+       "fallzahl_bezugsfrei": 154,
+       "fallzahl_vermietet": 5
+      },
+      {
+       "knotennummer": "9",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5680,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4054,
+       "fallzahl_bezugsfrei": 113,
+       "fallzahl_vermietet": 30
+      },
+      {
+       "knotennummer": "10",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5542,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3309,
+       "fallzahl_bezugsfrei": 75,
+       "fallzahl_vermietet": 55
+      },
+      {
+       "knotennummer": "12",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6710,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5009,
+       "fallzahl_bezugsfrei": 276,
+       "fallzahl_vermietet": 107
+      },
+      {
+       "knotennummer": "13",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5951,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4391,
+       "fallzahl_bezugsfrei": 262,
+       "fallzahl_vermietet": 50
+      },
+      {
+       "knotennummer": "14",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 5390,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 3468,
+       "fallzahl_bezugsfrei": 43,
+       "fallzahl_vermietet": 9
+      }
+     ]
+    },
+    "IV": {
+     "altbezirke": [
+      "Mitte"
+     ],
+     "wurzel_eur_qm": 7533,
+     "abschlag_vermietet_prozent": 29,
+     "abschlag_gilt_fuer": [
+      "2"
+     ],
+     "fallzahl": 474,
+     "seite_im_blatt": 18,
+     "endknoten": [
+      {
+       "knotennummer": "2",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 12409,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": null,
+       "fallzahl_bezugsfrei": 27,
+       "fallzahl_vermietet": 2
+      },
+      {
+       "knotennummer": "5",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 6422,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 4542,
+       "fallzahl_bezugsfrei": 43,
+       "fallzahl_vermietet": 17
+      },
+      {
+       "knotennummer": "7",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7941,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5719,
+       "fallzahl_bezugsfrei": 54,
+       "fallzahl_vermietet": 13
+      },
+      {
+       "knotennummer": "8",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 9123,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5210,
+       "fallzahl_bezugsfrei": 51,
+       "fallzahl_vermietet": 3
+      },
+      {
+       "knotennummer": "9",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7028,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5616,
+       "fallzahl_bezugsfrei": 95,
+       "fallzahl_vermietet": 20
+      },
+      {
+       "knotennummer": "10",
+       "vergleichsfaktor_bezugsfrei_eur_qm_wohnflaeche": 7862,
+       "vergleichsfaktor_vermietet_eur_qm_wohnflaeche": 5776,
+       "fallzahl_bezugsfrei": 117,
+       "fallzahl_vermietet": 32
+      }
+     ]
+    }
+   },
+   "startbaum": {
+    "gesamt_eur_qm": 5234,
+    "gesamt_fallzahl": 9779,
+    "bezirksbaum_I": {
+     "eur_qm": 4680,
+     "fallzahl": 2766,
+     "umfasst": [
+      "I-1",
+      "I-2"
+     ]
+    },
+    "bezirksbaum_II": {
+     "eur_qm": 3783,
+     "fallzahl": 2047,
+     "umfasst": [
+      "II-1",
+      "II-2"
+     ]
+    },
+    "bezirksbaum_III": {
+     "eur_qm": 5993,
+     "fallzahl": 4492,
+     "umfasst": [
+      "III-1",
+      "III-2",
+      "III-3"
+     ]
+    },
+    "bezirksbaum_IV": {
+     "eur_qm": 7533,
+     "fallzahl": 474,
+     "umfasst": [
+      "IV"
+     ]
+    },
+    "hinweis": "Das sind MITTELWERTE der Baumknoten, NICHT anwendbare Vergleichsfaktoren. Anzuwenden ist nach dem Blatt allein der Endknotenwert. Wer den Wurzel- oder Gruppenmittelwert als Faktor nimmt, rechnet ein anderes Modell als das veröffentlichte."
+   },
+   "splitvariablen": [
+    "Baujahr",
+    "Bodenrichtwert 01.01.2024",
+    "Wohnfläche",
+    "Altbezirk",
+    "stadträumliche Wohnlage",
+    "Wohnungsart",
+    "Geschosslage",
+    "Aufzug",
+    "Balkon",
+    "Verfügbarkeit (bezugsfrei / vermietet)"
+   ],
+   "splitvariablen_hinweis": "Nicht jeder Baum nutzt alle. Zwei Größen erhebt DealPilot heute nicht: AUFZUG und BALKON (in I-2, II-1, II-2, III-1, III-2 und IV als Split verwendet), und die BERLINER STADTRÄUMLICHE WOHNLAGE ist eine amtliche Einstufung (Glossar des Ausschusses), nicht die Lagenote eines Portals. Ohne diese Angaben ist der Pfad auch mit Topologie nicht in jedem Baum auflösbar.",
+   "beispiel_aus_dem_blatt": {
+    "quelle": "Abschnitt D, „Wie sind die Vergleichsfaktoren anzuwenden?\", S. 9 des Blattes",
+    "objekt": {
+     "altbezirk": "Neukölln",
+     "baujahr": 1905,
+     "geschosslage": "Obergeschoss",
+     "verfuegbarkeit": "bezugsfrei",
+     "wohnflaeche_qm": 80,
+     "brw_01_01_2024_eur_qm": 2200
+    },
+    "pfad": [
+     "Bezirksbaum I-1",
+     "Baujahr <=2020",
+     "Bodenrichtwert 1.500-7.999 / >=8.000",
+     "Endknoten 3 bezugsfrei"
+    ],
+    "vergleichsfaktor_eur_qm": 5369,
+    "grundbesitzwert_eur": 429520,
+    "nachgerechnet": "5.369 EUR/m² × 80 m² = 429.520 EUR — zeichengleich mit dem Blatt."
+   }
+  },
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB in Verbindung mit § 19 DVO BauGB, Vergleichsfaktoren nach § 12 ImmoWertV",
+   "stichtag": "31.12.2024",
+   "bodenrichtwert_stichtag": "01.01.2024",
+   "bodenrichtwert_modellvorgabe": "Im Rahmen der Modellkonformität ist der Bodenrichtwert zum 01.01.2024 anzusetzen — ohne Anpassung an Maß und Art der baulichen Nutzung oder an die Mikrolage.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "besonderheit": "Die Vergleichsfaktoren enthalten den Wert für Grund und Boden UND für die Gebäude. Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "berechnungsmodell": "Vergleichsfaktor = durchschnittlicher Kaufpreis je m² Wohnfläche im Endknoten der Baumanalyse",
+   "ermittlung": "Statistische Baumanalyse (sukzessive binäre Splits auf maximale, statistisch signifikante Mittelwertdifferenz und minimale Streuung), IBM SPSS Statistics Version 29",
+   "kauffaelle_gesamt": 9779,
+   "kauffaelle_ausgewertet": 9779,
+   "extremwerte": "Es wurden keine Extremwerte eliminiert.",
+   "auswertungszeitraum": "01.01.2024 bis 31.12.2024",
+   "veroeffentlicht": "Amtsblatt für Berlin Nr. 50 vom 5. Dezember 2025, Seite 3179 ff.",
+   "stand_des_blattes": "02.03.2026",
+   "garagen": "Bei ungetrenntem Kaufpreis von Wohnungseigentum und Garage/Sammelgarage/Wageneinstellplatz im Sondereigentum oder Sondernutzungsrecht wurde der Garagenanteil mit Hilfe der entsprechenden Bäume abgezogen. Die Durchschnittspreise der Endknoten enthalten daher KEINEN Preisanteil für Garagen oder Stellplätze.",
+   "nicht_beruecksichtigt": "Erwerbsumfang unter 100 %, typische Nutzungsart produzierendes Gewerbe und sonstige Flächen, Wohnungsart Ladenwohnung, Heizungsart ohne Beheizung, Einliegerwohnung, Atelier, Geschosslage Keller und Untergeschoss, Anzahl der Räume über 10, Miteigentumsanteil über 40 %, Zwangsversteigerung, Insolvenzverkauf und private Bindungen der Vertragsparteien.",
+   "baujahr": "Nur tatsächliche Baujahre. KEINE Korrektur wegen Modernisierung, Dachgeschossumbau oder -ausbau.",
+   "ausstattung": "Eine Besichtigung erfolgte nicht. Ausstattung und baulicher Unterhaltungszustand (auch Modernisierung und energetische Eigenschaften) sind NICHT bekannt und stecken damit auch nicht im Faktor."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berlin, acht Bezirksbäume über die 23 Altbezirke (Stand vor der Verwaltungsreform 2001). Alle 23 Altbezirke sind zugeordnet; es gibt keine Lücke.",
+   "sachlich": "Wohnungseigentum in Mehrfamilienhäusern ab 3 Wohneinheiten, Erst- und Weiterverkäufe.",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "kaufpreis_eur": [
+     25000,
+     8346500
+    ],
+    "kaufpreis_eur_qm": [
+     726,
+     22081
+    ],
+    "wohnflaeche_qm": [
+     15,
+     474
+    ],
+    "brw_eur_qm": [
+     380,
+     12000
+    ]
+   },
+   "spannen_hinweis": "Minimum/Maximum der verwendeten Einzelwerte (Tabelle 1 des Blattes, 3. Zeile). Die 5-%/95-%-Perzentile liegen bei Kaufpreis 124.000 bis 920.000 EUR, Kaufpreis 2.479 bis 8.912 EUR/m², Wohnfläche 34 bis 130 m², Bodenrichtwert 500 bis 5.000 EUR/m². Mittelwerte: 388.123 EUR, 5.234 EUR/m², 71 m², 2.500 EUR/m².",
+   "vorbehalt": "VERWENDUNGSZWECK IST DIE STEUERLICHE BEWERTUNG, NICHT DER VERKEHRSWERT. Das Blatt sagt es zweimal: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 2. Teil des 6. Abschnitts des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.\" und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.\" Für DealPilot heißt das: tragfähig für die Kaufpreisaufteilung und als amtlich belegte Vergleichsgröße, NICHT als amtlicher Verkehrswert. Wer daraus einen Verkehrswert macht, überschreitet die Quelle.\n\nZEITLICHE ANWENDBARKEIT: „Die zeitliche Anwendbarkeit der Vergleichsfaktoren richtet sich nach den steuerlichen Vorschriften.\" Das Blatt nennt KEINE Zeitanpassung und keinen Index — eine Fortschreibung auf einen späteren Stichtag ist nicht gedeckt.\n\nNICHT ENTHALTEN: Wohnungseigentum in Ein- und Zweifamilienhäusern, Teileigentum sowie Wohnungseigentum bei bestehenden Erbbaurechten oder Nießbrauch sind in der Analyse NICHT enthalten. Für diese Objekte gibt der Satz nichts aus.\n\nVERMIETET ODER BEZUGSFREI IST EIN EIGENES MERKMAL. Jeder Endknoten führt ZWEI Faktoren. Wo für die vermieteten Wohnungen kein eigener Mittelwert vorliegt (im Blatt „k. A.\"), hat der Ausschuss einen pauschalen Abschlag auf den bezugsfreien Wert ermittelt — je Bezirksbaum verschieden (17 % bis 29 %, siehe baeume[*].abschlag_vermietet_prozent) und ausdrücklich nur für die dort genannten Endknoten. Dieser Abschlag ist im Blatt mit „Empfehlung des Gutachterausschusses ausschließlich für die steuerliche Bewertung\" gekennzeichnet.",
+   "hinweis": "DIE ZUORDNUNG LÄUFT ÜBER DEN ALTBEZIRK, NICHT ÜBER DEN HEUTIGEN BEZIRK. Der heutige Bezirk Mitte umfasst die Altbezirke Mitte, Tiergarten und Wedding — und die liegen in DREI verschiedenen Bäumen (IV, III-1, I-1) mit Wurzelmitteln von 7.533, 5.610 und 4.493 EUR/m². Wer nur den heutigen Bezirk kennt, greift mit hoher Wahrscheinlichkeit den falschen Baum. Die Ortsteil-Zuordnung zu den Altbezirken steht in „Die Berliner Bezirke, Altbezirke und Ortsteile\" derselben Geschäftsstelle und liegt bereits in swf-be.json Ortsteil für Ortsteil vor."
+  },
+  "korrekturen": [],
+  "belege": [
+   "Geschäftsstelle des Gutachterausschuss für Grundstückswerte in Berlin, „Vergleichsfaktoren für den Teilmarkt des Wohnungseigentums zur Verwendung für steuerliche Zwecke zum Stichtag 31.12.2024\", Stand 02.03.2026, 9 Textseiten plus 9 Abbildungen; veröffentlicht im Amtsblatt für Berlin Nr. 50 vom 5. Dezember 2025, S. 3179 ff. 9.779 zur Analyse geeignete Kauffälle in der Rechtsform des Wohnungseigentums mit Vertragsdaten vom 01.01.2024 bis 31.12.2024.",
+   "Nachgeprüft am 08.10.2026: alle 73 Endknoten der acht Bezirksbäume wurden aus dem PDF ausgelesen; je Baum trifft die Summe der Endknoten-Fallzahlen (bezugsfrei plus vermietet) auf den Kopf die Fallzahl der Baumwurzel, und jede Wurzel trifft die Summe der Altbezirkszahlen aus Tabelle 2 des Blattes. Über alle acht Bäume: 9.779 = 9.779, ohne Rest.",
+   "Anwendungsbeispiel des Blattes (S. 9) nachgerechnet: Neukölln, Bj 1905, Obergeschoss, bezugsfrei, 80 m², BRW 2.200 EUR/m² → Bezirksbaum I-1, Baujahr <=2020, Bodenrichtwert 1.500-7.999 → Endknoten 3 bezugsfrei 5.369 EUR/m² → 5.369 × 80 = 429.520 EUR. Zeichengleich mit dem Blatt."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliches Blatt, im Amtsblatt für Berlin veröffentlicht. Stufe A für die ERFASSTEN GRÖSSEN: alle 73 Endknotenwerte, die Altbezirkszuordnung aller acht Bäume und das Anwendungsbeispiel sind gegen das Dokument geprüft und schließen ohne Rest (Fallzahlprobe 9.779 = 9.779). Der Satz liefert dennoch KEINEN Wert, weil die Baumtopologie nicht maschinell belegbar war — das ist eine Sperre aus Ehrlichkeit, nicht aus Datenmangel.",
+  "fallzahl": 9779,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2024,
+  "modellversion": "Vergleichsfaktoren Wohnungseigentum 2025, Stand 02.03.2026",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377983.php",
+  "quelle_parser": "vgf-be-2026-10-08 (pdfjs Textraster plus Vektorpfade)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren für den Teilmarkt des Wohnungseigentums zur Verwendung für steuerliche Zwecke zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 50 vom 05.12.2025 S. 3179 ff. © 2025, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — amtliche Veröffentlichung im Amtsblatt für Berlin mit Copyright-Vermerk der Senatsverwaltung. Im Blatt steht KEIN dl-de/by-2-0 und KEIN zero-2-0; am 08.10.2026 im Volltext beider PDF nachgesehen (einziger Lizenzbezug ist das ©-Zeichen).",
+  "verwendung": "intern",
+  "auflagen": "Quellenangabe und Copyright-Vermerk der Senatsverwaltung. NUR für steuerliche Bewertung und Kaufpreisaufteilung — das Blatt schließt den Ersatz einer Verkehrswertermittlung nach § 194 BauGB ausdrücklich aus. Die pauschalen Vermietungsabschläge sind im Blatt als „Empfehlung des Gutachterausschusses ausschließlich für die steuerliche Bewertung\" gekennzeichnet.",
+  "fundstelle": "Vergleichsfaktoren Wohnungseigentum (05-05-020-2500.pdf), Stand 02.03.2026: Abschnitt A1 Verwendungszweck (S. 1), A2 verwendete Daten (S. 1), A3 gebietsweise Anwendbarkeit mit der Altbezirkszuordnung der acht Bäume (S. 2–3), A5 Teilmarkt (S. 3), B1–B10 Grundsätze der Kaufvertragsauswertung (S. 4–5), C Tabellen 1–10 (S. 6–8), D Vergleichsfaktoren mit Anwendungsbeispiel (S. 9), Abbildungen 1–9 Startbaum und Bezirksbäume I-1 bis IV (S. 10–18).",
+  "vollstaendig": false,
+  "warum_kein_wert": "SPERRE MIT WEG, NICHT FEHLENDE ERNTE. Die Berliner Vergleichsfaktoren für Wohnungseigentum sind KEINE Tabelle und keine Formel, sondern NEUN GEZEICHNETE ENTSCHEIDUNGSBÄUME (Startbaum plus acht Bezirksbäume, Abbildungen 1 bis 9). Der anzuwendende Faktor ist der Wert des ENDKNOTENS, den der Objektpfad erreicht — das Blatt führt es selbst so vor („3. Vergleichsfaktor: Endknoten 3 ‚bezugsfrei' = 5.369 EUR/m² Wohnfläche\").\n\nAlle Endknotenwerte stehen in diesem Satz und sind nachgeprüft (siehe stufe_grund). Was NICHT maschinell belegt ist, ist die TOPOLOGIE: welche Split-Schwelle zu welchem Endknoten führt. Die Bäume sind Vektorgrafiken, deren Verbinder von deckenden Beschriftungsfeldern zerschnitten sind; drei verschiedene Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Das ist Tuning, keine Messung — deshalb steht hier kein geratener Pfad.\n\nWEG ZUM ECHTEN WERT: Altbezirk bestimmen (Zuordnung steht in kategorie_zuordnung dieses Satzes, gegen die Altbezirkstabelle des Blattes geprüft), dann im zugehörigen Bezirksbaum auf Seite (siehe baeume[*].seite_im_blatt) des amtlichen PDF den Pfad ablesen und den Endknoten aus endknoten[] nehmen. Das PDF ist frei abrufbar: https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf\n\nAUFLÖSBAR wird der Satz, sobald die Baumseiten gerastert gelesen werden können (poppler/pdftoppm oder Ghostscript waren am 08.10.2026 auf dem Arbeitsplatz nicht vorhanden). Die Ernte muss dafür NICHT wiederholt werden."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "matrix_interp",
+   "liefert": "eur_qm",
+   "einheit": "EUR/m² Brutto-Grundfläche",
+   "achse_x_feld": "bgf_qm",
+   "achse_x_bez": "Brutto-Grundfläche in m² (DIN 277-1:2005-02, Anlage 4 ImmoWertV)",
+   "achse_x": [
+    140,
+    200,
+    250,
+    300,
+    350,
+    400,
+    420
+   ],
+   "achse_y_feld": "brw_eur_qm",
+   "achse_y_bez": "Bodenrichtwert zum 01.01.2024 in EUR/m²",
+   "achse_y": [
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1100
+   ],
+   "zellen_schluessel": "Bodenrichtwert -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "400": [
+     2525,
+     2231,
+     1985,
+     1740,
+     1494,
+     1249,
+     1151
+    ],
+    "500": [
+     2709,
+     2415,
+     2169,
+     1924,
+     1679,
+     1433,
+     1335
+    ],
+    "600": [
+     2893,
+     2599,
+     2354,
+     2108,
+     1863,
+     1617,
+     1519
+    ],
+    "700": [
+     3078,
+     2783,
+     2538,
+     2292,
+     2047,
+     1802,
+     1703
+    ],
+    "800": [
+     3262,
+     2967,
+     2722,
+     2477,
+     2231,
+     1986,
+     1888
+    ],
+    "900": [
+     3446,
+     3152,
+     2906,
+     2661,
+     2415,
+     2170,
+     2072
+    ],
+    "1000": [
+     3630,
+     3336,
+     3090,
+     2845,
+     2600,
+     2354,
+     2256
+    ],
+    "1100": [
+     3814,
+     3520,
+     3275,
+     3029,
+     2784,
+     2538,
+     2440
+    ]
+   },
+   "rundung_stellen": 0,
+   "interpolation": "Kreuzinterpolation, linear in beiden Achsen. Das Blatt erlaubt es ausdrücklich: „Innerhalb der Tabellenwerte kann linear interpoliert werden.\" AUSSERHALB der Tabelle ist nichts erlaubt — kein Bodenrichtwert unter 400 oder über 1.100 EUR/m², keine Brutto-Grundfläche unter 140 oder über 420 m².",
+   "normobjekt": "Einfamilienhaus, Einfamilienhaus mit Einliegerwohnung oder Zweifamilienhaus in EINFACHER, MITTLERER oder GUTER stadträumlicher Wohnlage; freistehendes Einzelhaus, normaler Bauzustand, Baujahresgruppe bis 1919 oder 1920 bis 1948 oder 1991 bis 2009 oder ab 2020 (alle vier mit Zuschlag ±0). Abweichungen werden über die Korrekturen abgebildet. Der Faktor enthält Grund und Boden UND Gebäude; ein Bodenwert wird nicht zusätzlich angesetzt.",
+   "probe_innere_stimmigkeit": "Die 56 Tabellenwerte liegen auf einer Ebene: Vergleichsfaktor ≈ 2.474,9 + 1,842 × Bodenrichtwert − 4,905 × Brutto-Grundfläche. Größte Abweichung über alle 56 Zellen: 1 EUR. Das ist eine Gegenprobe gegen Tippfehler bei der Erfassung, NICHT die amtliche Formel — amtlich ist die Tabelle.",
+   "beispiel_aus_dem_blatt": {
+    "quelle": "„Wie sind die Vergleichsfaktoren anzuwenden?\", S. 17 des Blattes",
+    "objekt": {
+     "bgf_qm": 200,
+     "brw_01_01_2024_eur_qm": 1000,
+     "baujahr": 1936,
+     "gebaeudestellung": "Doppelhaushälfte",
+     "baulicher_zustand": "schlecht"
+    },
+    "rechenweg": [
+     {
+      "schritt": "Ausgangswert (Wertespalte 2, Wertezeile 7)",
+      "eur_qm_bgf": 3336
+     },
+     {
+      "schritt": "Baujahr 1936 (Gruppe 1920 bis 1948)",
+      "eur_qm_bgf": 0
+     },
+     {
+      "schritt": "Doppelhaushälfte",
+      "eur_qm_bgf": -278
+     },
+     {
+      "schritt": "schlechter Bauzustand",
+      "eur_qm_bgf": -566
+     },
+     {
+      "schritt": "Ergebnis",
+      "eur_qm_bgf": 2492
+     }
+    ],
+    "grundbesitzwert_eur": 498400,
+    "nachgerechnet": "3.336 + 0 − 278 − 566 = 2.492 EUR/m² BGF; 2.492 × 200 m² = 498.400 EUR — beide Zeilen zeichengleich mit dem Blatt."
+   }
+  },
+  "korrekturen": [
+   {
+    "bez": "Baujahresgruppe",
+    "feld": "baujahr",
+    "art": "band",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "baender": [
+     {
+      "von": 0,
+      "bis": 1919,
+      "zuschlag": 0,
+      "bez": "bis 1919"
+     },
+     {
+      "von": 1920,
+      "bis": 1948,
+      "zuschlag": 0,
+      "bez": "1920 bis 1948"
+     },
+     {
+      "von": 1949,
+      "bis": 1970,
+      "zuschlag": -310,
+      "bez": "1949 bis 1970"
+     },
+     {
+      "von": 1971,
+      "bis": 1990,
+      "zuschlag": -380,
+      "bez": "1971 bis 1990"
+     },
+     {
+      "von": 1991,
+      "bis": 2009,
+      "zuschlag": 0,
+      "bez": "1991 bis 2009"
+     },
+     {
+      "von": 2010,
+      "bis": 2019,
+      "zuschlag": 479,
+      "bez": "2010 bis 2019"
+     },
+     {
+      "von": 2020,
+      "bis": 2100,
+      "zuschlag": 0,
+      "bez": "ab 2020"
+     }
+    ],
+    "hinweis": "Additionskonstanten in EUR/m² Brutto-Grundfläche, im Blatt (S. 6) einzeln abgedruckt. BÄNDER, keine Stützstellen — zwischen ihnen wird NICHT interpoliert. Auffällig und so abgedruckt: vier der sieben Gruppen tragen ±0; den größten Abschlag trägt 1971 bis 1990 mit −380, den größten Zuschlag 2010 bis 2019 mit +479. Ab 2020 liegt der Zuschlag wieder bei null. Grundlage ist das TATSÄCHLICHE Baujahr — das Blatt korrigiert es ausdrücklich NICHT wegen Modernisierung."
+   },
+   {
+    "bez": "Gebäudestellung",
+    "feld": "gebaeudestellung",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "freistehend": 0,
+     "efh": 0,
+     "zfh": 0,
+     "einzelhaus": 0,
+     "dhh": -278,
+     "doppelhaushaelfte": -278,
+     "reh": -293,
+     "reihenendhaus": -293,
+     "rmh": -452,
+     "reihenmittelhaus": -452,
+     "reihenhaus": -452
+    },
+    "hinweis": "freistehendes Ein-/Zweifamilienhaus ±0, Doppelhaushälfte −278, Reihenendhaus −293, Reihenmittelhaus −452. ACHTUNG BENENNUNG: die Korrekturliste (S. 6) führt „Reihenmittelhaus\", die Häufigkeitstabelle 9 (S. 12) an derselben Stelle „Reihenhaus\" (318 Fälle). Beide meinen dasselbe; hier ist „reihenhaus\" auf −452 abgebildet."
+   },
+   {
+    "bez": "Baulicher Zustand",
+    "feld": "bauzustand",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "gut": 572,
+     "normal": 0,
+     "schlecht": -566
+    },
+    "hinweis": "Drei Zustandsnoten des Berliner Ausschusses (Glossar: https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156899.php): gut +572, normal ±0, schlecht −566. Fehlt die Angabe, gilt kein Zuschlag — das ist „normal\" und mit 2.408 von 2.859 Fällen der Regelfall des Blattes."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB in Verbindung mit § 19 DVO BauGB, Vergleichsfaktoren nach § 12 ImmoWertV",
+   "stichtag": "31.12.2024",
+   "bodenrichtwert_stichtag": "01.01.2024",
+   "bodenrichtwert_modellvorgabe": "Im Rahmen der Modellkonformität ist der Bodenrichtwert zum 01.01.2024 anzusetzen — ohne Anpassung an Maß und Art der baulichen Nutzung oder an die Mikrolage.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "besonderheit": "Die Vergleichsfaktoren enthalten den Wert für Grund und Boden UND für die Gebäude. Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "berechnungsmodell": "Vergleichsfaktor in EUR/m² Brutto-Grundfläche, Tabelle über Bodenrichtwert und Brutto-Grundfläche plus additive Korrekturen",
+   "ermittlung": "Regressionsanalyse mit den Variablen Bodenrichtwert, Bruttogrundfläche, Zeit (in Tagen) und den Dummyvariablen Baujahresgruppe, Bauzustand, Wohnlagen, Stadtlagen, Gebäudeart und Gebäudekonstruktion",
+   "kauffaelle_gesamt": 3104,
+   "kauffaelle_ausgewertet": 2859,
+   "kauffaelle_hinweis": "WIDERSPRUCH IM BLATT SELBST, nicht in der Ernte: der Text auf S. 2 nennt „3.104 Kauffälle für Ein- und Zweifamilienhausgrundstücke in den einfachen, mittleren, guten und sehr guten stadträumlichen Wohnlagen\". Die Statistiktabellen führen 2.859 (Tabellen 4 bis 9, einfache/mittlere/gute Lage) plus 26 (Tabellen 10 bis 15, sehr gute Lage) = 2.885. Es fehlen 219 Fälle. Dieser Satz führt die Zahl der TABELLE (2.859), weil sie an diesem Zweig hängt; 3.104 ist die Aussage des Textes.",
+   "auswertungszeitraum": "01.01.2022 bis 31.12.2024",
+   "veroeffentlicht": "Amtsblatt für Berlin Nr. 30 vom 18.07.2025, Seite 1968 ff.",
+   "stand_des_blattes": "04.07.2025",
+   "extremwerte": "Extremwerteliminierung: Kaufpreis über 3.500.000 EUR oder unter 180.000 EUR, Grundstücksfläche bis 120 m², Brutto-Grundfläche über 800 m², tatsächliche GFZ über 1,2, Bodenrichtwert über 2.100 EUR/m².",
+   "nicht_beruecksichtigt": "Erwerbsumfang unter 100 % (Anteilsverkäufe), vermietete Objekte, Nießbrauch, Wohnungsrechte, Mischbaujahre, Mietkauf, Sachenrechtsbereinigung, Grundstücke mit Wasserlage oder Denkmalschutz; Wertminderung wegen Baumängel/-schäden; Hinweise auf Wohn-, Miet- oder Nutzungsrechte, Ratenzahlung, Kaufpreis kleiner als der Bodenwert, Verkäufer bewohnt das Haus mehr als 1 Jahr nach Vertragsdatum, private Bindungen.",
+   "bgf_regeln": "Brutto-Grundfläche nach DIN 277-1:2005-02 (Anlage 4 ImmoWertV), in der Regel aus den Bauakten. Bei Giebelhöhe bis 1,50 m zählt das Dachgeschoss NICHT. Garagen zählen NICHT, Ausnahme: von Geschossen überbaute Garagen.",
+   "kaufpreisbereinigung": "Der Kaufpreis wurde um den Zeitwert der baulichen Nebenanlagen (Garagen, Geräteschuppen), der besonderen Außenanlagen, der besonderen Betriebseinrichtungen und den Kaufpreisanteil für Nebenflächen bereinigt, soweit bekannt.",
+   "gfz": "Keine GFZ-Anpassung des Bodenwerts. Berücksichtigt wurden nur Kauffälle mit tatsächlicher GFZ >= 0,07 und typischer GFZ bis 0,6.",
+   "baujahr": "Nur ursprüngliche Baujahre. KEINE Korrektur wegen Modernisierung. Eine Innenbesichtigung erfolgte nicht. Es fand keine Prüfung statt, ob Grundstücke rechtlich teilbar sind."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Berlin, aber NICHT in 22 namentlich ausgeschlossenen Ortsteilen. In allen übrigen Ortsteilen anwendbar.",
+   "ortsteile_ausgeschlossen": [
+    "Mitte",
+    "Moabit",
+    "Hansaviertel",
+    "Tiergarten-Süd",
+    "Wedding",
+    "Gesundbrunnen",
+    "Friedrichshain",
+    "Kreuzberg",
+    "Charlottenburg",
+    "Schmargendorf",
+    "Grunewald",
+    "Charlottenburg-Nord",
+    "Halensee",
+    "Schöneberg",
+    "Friedenau",
+    "Neukölln",
+    "Alt-Treptow",
+    "Plänterwald",
+    "Oberschöneweide",
+    "Malchow (Lichtenberg)",
+    "Fennpfuhl",
+    "Rummelsburg"
+   ],
+   "ortsteile_hinweis": "Das Blatt formuliert als Ausschlussliste und ergänzt: „Dagegen können diese Vergleichsfaktoren in allen nicht genannten Ortsteilen angewendet werden.\" Die 50 Ortsteile mit Fallzahl stehen in Tabelle 5 (S. 10–11). Schmargendorf und Grunewald sind hier ausgeschlossen und stattdessen vom Zweig ezfh_sehr_gut abgedeckt; Westend und Dahlem kommen in BEIDEN Zweigen vor — der Unterscheider ist die stadträumliche Wohnlage, nicht der Ortsteil.",
+   "sachlich": "Einfamilienhäuser, Einfamilienhäuser mit Einliegerwohnung und Zweifamilienhäuser in EINFACHER, MITTLERER oder GUTER stadträumlicher Wohnlage; Erst- und Weiterverkäufe.",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": [
+     400,
+     1100
+    ],
+    "bgf_qm": [
+     140,
+     420
+    ]
+   },
+   "spannen_hinweis": "Das sind die Tabellengrenzen und damit die Grenzen der erlaubten Interpolation. Die Streuung der zugrunde liegenden Kauffälle ist weiter (Tabelle 4, S. 9): Kaufpreis 190.000 bis 2.300.000 EUR (Mittel 616.848), Kaufpreis je m² BGF 752 bis 5.829 EUR (Mittel 2.500), Baugrundstücksfläche 124 bis 1.742 m² (Mittel 549), BGF 82 bis 664 m² (Mittel 254), tatsächliche GFZ 0,07 bis 1,18 (Mittel 0,27), Bodenrichtwert 280 bis 1.900 EUR/m² (Mittel 650). Die Tabelle reicht bis BRW 1.100 — darüber hinaus gibt dieser Satz nichts aus, obwohl Kauffälle bis 1.900 vorlagen.",
+   "vorbehalt": "VERWENDUNGSZWECK IST DIE STEUERLICHE BEWERTUNG, NICHT DER VERKEHRSWERT. Das Blatt sagt es zweimal: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 2. Teil des 6. Abschnitts des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.\" und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.\" Für DealPilot heißt das: tragfähig für die Kaufpreisaufteilung und als amtlich belegte Vergleichsgröße, NICHT als amtlicher Verkehrswert. Wer daraus einen Verkehrswert macht, überschreitet die Quelle.\n\nZEITLICHE ANWENDBARKEIT: „Die zeitliche Anwendbarkeit der Vergleichsfaktoren richtet sich nach den steuerlichen Vorschriften.\" Das Blatt nennt KEINE Zeitanpassung und keinen Index — eine Fortschreibung auf einen späteren Stichtag ist nicht gedeckt.\n\nNICHT ENTHALTEN: Wohnungseigentum, Wohnungseigentum bei bestehenden Erbbaurechten oder Nießbrauch, sowie Villen und Landhäuser. Für Villen und Landhäuser gilt der Zweig villa. Das Blatt sagt für die ausgeschlossenen Rechtsformen ausdrücklich: „Für diese Objekte kann das Modell keine Aussage treffen.\"\n\nWEITERE EINFLUSSGRÖSSEN GIBT ES NICHT: „Weitere signifikante Einflussgrößen liegen nicht vor.\" Außer Baujahresgruppe, Gebäudestellung und baulichem Zustand darf also NICHTS zugeschlagen oder abgezogen werden — keine Lagekorrektur, keine Energiekennwerte, keine Modernisierung.",
+   "hinweis": "Die stadträumliche Wohnlage entscheidet, WELCHE der drei Tabellen gilt: einfach/mittel/gut → dieser Zweig; sehr gut → ezfh_sehr_gut; Villa/Landhaus → villa. Das ist eine amtliche Berliner Einstufung (Glossar des Ausschusses), nicht die Lagenote eines Portals. Fehlt sie, ist keiner der drei Zweige modellkonform wählbar."
+  },
+  "belege": [
+   "Geschäftsstelle des Gutachterausschuss für Grundstückswerte in Berlin, „Vergleichsfaktoren 2025 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2024\", Stand 04.07.2025, 17 Seiten; veröffentlicht im Amtsblatt für Berlin Nr. 30 vom 18.07.2025, S. 1968 ff. Tabelle 1 (S. 5) mit 56 Werten über Bodenrichtwert 400 bis 1.100 EUR/m² und Brutto-Grundfläche 140 bis 420 m², Korrekturwerte S. 6, Statistik Tabellen 4 bis 9 (S. 9–12), Anwendungsbeispiel S. 17.",
+   "Anwendungsbeispiel des Blattes (S. 17) nachgerechnet: BGF 200 m², BRW 1.000 EUR/m², Bj 1936, Doppelhaushälfte, Bauzustand schlecht → 3.336 + 0 − 278 − 566 = 2.492 EUR/m² BGF; × 200 m² = 498.400 EUR. Beide Zeilen zeichengleich mit dem Blatt.",
+   "Gegenprobe gegen Erfassungsfehler: die 56 Tabellenwerte liegen auf einer Ebene (2.474,9 + 1,842 × BRW − 4,905 × BGF), größte Abweichung 1 EUR über alle 56 Zellen. Der Ausgangswert des Anwendungsbeispiels (3.336) ist damit zweifach bestätigt — als Tabellenzelle und über die Ebene."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle mit abgedruckten Korrekturwerten, im Amtsblatt für Berlin veröffentlicht. Geprüft am Anwendungsbeispiel des Dokuments (beide Zeilen zeichengleich) und an der inneren Stimmigkeit aller 56 Tabellenzellen (größte Abweichung von der Ebene: 1 EUR).",
+  "fallzahl": 2859,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2024,
+  "modellversion": "Vergleichsfaktoren 2025 (EZFH/Villen), Stand 04.07.2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2500.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+  "quelle_parser": "vgf-be-2026-10-08 (pdfjs Textraster)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren 2025 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 30 vom 18.07.2025 S. 1968 ff. © 2025, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — amtliche Veröffentlichung im Amtsblatt für Berlin mit Copyright-Vermerk der Senatsverwaltung. Im Blatt steht KEIN dl-de/by-2-0 und KEIN zero-2-0; am 08.10.2026 im Volltext beider PDF nachgesehen (einziger Lizenzbezug ist das ©-Zeichen).",
+  "verwendung": "intern",
+  "auflagen": "Quellenangabe und Copyright-Vermerk der Senatsverwaltung. NUR für steuerliche Bewertung und Kaufpreisaufteilung — das Blatt schließt den Ersatz einer Verkehrswertermittlung nach § 194 BauGB ausdrücklich aus. Modellkonformität: Bodenrichtwert zum 01.01.2024, keine GFZ- oder Mikrolage-Anpassung, keine weiteren Zu- oder Abschläge.",
+  "fundstelle": "Vergleichsfaktoren 2025 (05-05-010-2500.pdf), Stand 04.07.2025: A1 Verwendungszweck (S. 1), A3 räumliche Anwendbarkeit mit der Ausschlussliste (S. 1–2), A4 Daten und Methodik (S. 2–3), B Grundsätze der Kaufvertragsauswertung (S. 3–4), C1.1 Tabelle 1 (S. 5), Korrekturwerte (S. 6), Tabellen 4 bis 9 (S. 9–12), Anwendungsbeispiel (S. 17)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "ezfh_sehr_gut",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "eur_qm",
+   "einheit": "EUR/m² Brutto-Grundfläche",
+   "achse_feld": "brw_eur_qm",
+   "achse_bez": "Bodenrichtwert zum 01.01.2024 in EUR/m²",
+   "stufen": {
+    "1700": 4150,
+    "1800": 4516,
+    "2000": 5137,
+    "2200": 5646,
+    "2400": 6069,
+    "2600": 6428,
+    "2800": 6735,
+    "2900": 6872
+   },
+   "rundung_stellen": 0,
+   "interpolation": "linear zwischen den Stützstellen. Das Blatt erlaubt es ausdrücklich: „Innerhalb der Tabellenwerte kann linear interpoliert werden.\" Außerhalb von 1.700 bis 2.900 EUR/m² gibt der Satz nichts aus.",
+   "normobjekt": "Einfamilienhaus, Einfamilienhaus mit Einliegerwohnung oder Zweifamilienhaus in SEHR GUTER stadträumlicher Wohnlage, in den Ortsteilen Schmargendorf, Grunewald, Westend und Dahlem. Erst- und Weiterverkäufe. Der Faktor enthält Grund und Boden UND Gebäude.",
+   "keine_korrekturen": "Das Blatt sagt für diese Tabelle ausdrücklich: „Weitere signifikante Einflussgrößen liegen nicht vor.\" Es gibt KEINE Korrekturwerte — weder für Baujahr noch für Gebäudestellung noch für den Bauzustand. Die Korrekturen der Tabelle 1 dürfen hier NICHT angewendet werden; das wäre ein Modellbruch.",
+   "hinweis": "Die Kurve ist deutlich KONKAV, nicht linear: je 100 EUR/m² Bodenrichtwert steigt der Faktor von +366 (1.700 auf 1.800) auf nur noch +137 (2.800 auf 2.900). Eine lineare Fortschreibung über 2.900 hinaus würde kräftig überschätzen — darum ist Extrapolation gesperrt."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB in Verbindung mit § 19 DVO BauGB, Vergleichsfaktoren nach § 12 ImmoWertV",
+   "stichtag": "31.12.2024",
+   "bodenrichtwert_stichtag": "01.01.2024",
+   "bodenrichtwert_modellvorgabe": "Im Rahmen der Modellkonformität ist der Bodenrichtwert zum 01.01.2024 anzusetzen — ohne Anpassung an Maß und Art der baulichen Nutzung oder an die Mikrolage.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "besonderheit": "Die Vergleichsfaktoren enthalten den Wert für Grund und Boden UND für die Gebäude. Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "berechnungsmodell": "Vergleichsfaktor in EUR/m² Brutto-Grundfläche als Funktion des Bodenrichtwerts",
+   "ermittlung": "Regressionsanalyse mit den Variablen Bodenrichtwert, Grundstücksfläche, Zeit (in Tagen), tatsächliche GFZ und den Dummyvariablen Baujahresgruppe, Gebäudeart und Bauzustand",
+   "kauffaelle_gesamt": 26,
+   "kauffaelle_ausgewertet": 26,
+   "kauffaelle_hinweis": "NUR 26 KAUFFÄLLE. Die Verteilung (Tabellen 11 bis 15, S. 14): Schmargendorf 12, Grunewald 8, Westend 4, Dahlem 2; Bauzustand gut 4 / normal 19 / schlecht 3; Baujahr 1920–1948 11, 1949–1970 13, 1971–1990 1, 1991–2009 1; Einzelhaus 19, Doppelhaushälfte 5, Reihenhaus 1, Reihenendhaus 1. Bei dieser Besetzung trägt die Tabelle einen schmalen Markt — das ist kein Einwand gegen die Amtlichkeit, aber es gehört in jeden Bericht.",
+   "auswertungszeitraum": "01.01.2022 bis 31.12.2024",
+   "veroeffentlicht": "Amtsblatt für Berlin Nr. 30 vom 18.07.2025, Seite 1968 ff.",
+   "stand_des_blattes": "04.07.2025",
+   "extremwerte": "Extremwerteliminierung für die sehr gute Wohnlage: Kaufpreis über 10.000.000 EUR oder unter 520.000 EUR, tatsächliche GFZ über 0,6."
+  },
+  "geltungsbereich": {
+   "raeumlich": "nur die Ortsteile Schmargendorf, Grunewald, Westend und Dahlem",
+   "ortsteile": [
+    "Schmargendorf",
+    "Grunewald",
+    "Westend",
+    "Dahlem"
+   ],
+   "sachlich": "Ein- und Zweifamilienhausgrundstücke in SEHR GUTER stadträumlicher Wohnlage, Erst- und Weiterverkäufe",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": [
+     1700,
+     2900
+    ]
+   },
+   "spannen_hinweis": "Tabellengrenzen und damit Grenzen der erlaubten Interpolation. Streuung der Kauffälle (Tabelle 10, S. 13): Kaufpreis 690.000 bis 5.250.000 EUR (Mittel 2.487.308), Kaufpreis je m² BGF 2.985 bis 10.491 EUR (Mittel 5.820), Baugrundstücksfläche 371 bis 1.653 m² (Mittel 838), BGF 190 bis 950 m² (Mittel 426), tatsächliche GFZ 0,15 bis 0,45 (Mittel 0,28), Bodenrichtwert 1.600 bis 2.900 EUR/m² (Mittel 2.400). ACHTUNG: die Kauffälle reichen beim Bodenrichtwert bis 1.600 hinunter, die TABELLE beginnt erst bei 1.700 — zwischen 1.600 und 1.700 gibt dieser Satz nichts aus.",
+   "vorbehalt": "VERWENDUNGSZWECK IST DIE STEUERLICHE BEWERTUNG, NICHT DER VERKEHRSWERT. Das Blatt sagt es zweimal: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 2. Teil des 6. Abschnitts des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.\" und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.\" Für DealPilot heißt das: tragfähig für die Kaufpreisaufteilung und als amtlich belegte Vergleichsgröße, NICHT als amtlicher Verkehrswert. Wer daraus einen Verkehrswert macht, überschreitet die Quelle.\n\nZEITLICHE ANWENDBARKEIT: „Die zeitliche Anwendbarkeit der Vergleichsfaktoren richtet sich nach den steuerlichen Vorschriften.\" Das Blatt nennt KEINE Zeitanpassung und keinen Index — eine Fortschreibung auf einen späteren Stichtag ist nicht gedeckt.\n\nKEINE KORREKTUREN. „Weitere signifikante Einflussgrößen liegen nicht vor.\" Baujahr, Bauzustand und Gebäudestellung werden hier NICHT zugeschlagen, obwohl sie in der Ableitung als Dummyvariablen steckten. Wer die Korrekturwerte der Tabelle 1 hierher überträgt, rechnet ein anderes Modell.\n\nNICHT ENTHALTEN: Villen und Landhäuser (dafür der Zweig villa), Wohnungseigentum, Erbbaurechte, Nießbrauch.",
+   "hinweis": "In allen nicht genannten Ortsteilen kann dieser Faktor nach dem Blatt „keine Aussage treffen\" — anders formuliert als bei Tabelle 1, wo die nicht genannten Ortsteile gerade die erlaubten sind. Die beiden Listen laufen also in entgegengesetzte Richtung; das ist eine echte Verwechslungsgefahr."
+  },
+  "belege": [
+   "Geschäftsstelle des Gutachterausschuss für Grundstückswerte in Berlin, „Vergleichsfaktoren 2025 …\", Stand 04.07.2025: Abschnitt C1.2, Tabelle 2 (S. 7) mit acht Stützstellen über den Bodenrichtwert 1.700 bis 2.900 EUR/m² für die Ortsteile Schmargendorf, Grunewald, Westend und Dahlem in sehr guter stadträumlicher Wohnlage; Statistik Tabellen 10 bis 15 (S. 13–14), 26 Kauffälle.",
+   "Für diesen Zweig enthält das Blatt KEIN Anwendungsbeispiel — das einzige Beispiel (S. 17) rechnet ausdrücklich „für die Tabelle 1\". Geprüft ist daher nur die Übernahme der acht Stützstellen und der ausdrückliche Satz „Weitere signifikante Einflussgrößen liegen nicht vor.\""
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle, im Amtsblatt für Berlin veröffentlicht, acht Stützstellen zeichengleich übernommen. KEIN Anwendungsbeispiel im Blatt für diesen Zweig, daher nicht am Beispiel nachgerechnet — und nur 26 Kauffälle.",
+  "fallzahl": 26,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2024,
+  "modellversion": "Vergleichsfaktoren 2025 (EZFH/Villen), Stand 04.07.2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2500.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+  "quelle_parser": "vgf-be-2026-10-08 (pdfjs Textraster)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren 2025 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 30 vom 18.07.2025 S. 1968 ff. © 2025, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — amtliche Veröffentlichung im Amtsblatt für Berlin mit Copyright-Vermerk der Senatsverwaltung. Im Blatt steht KEIN dl-de/by-2-0 und KEIN zero-2-0; am 08.10.2026 im Volltext beider PDF nachgesehen (einziger Lizenzbezug ist das ©-Zeichen).",
+  "verwendung": "intern",
+  "auflagen": "Quellenangabe und Copyright-Vermerk. NUR für steuerliche Bewertung und Kaufpreisaufteilung. Keine Korrekturen anwenden. Bei 26 Kauffällen die Fallzahl im Bericht nennen.",
+  "fundstelle": "Vergleichsfaktoren 2025 (05-05-010-2500.pdf): A3 räumliche Anwendbarkeit sehr gute Wohnlage (S. 2), C1.2 Tabelle 2 (S. 7), Statistik 2.2 Tabellen 10 bis 15 (S. 13–14)."
+ },
+ {
+  "land_code": "BE",
+  "ags": "11000000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Berlin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "villa",
+  "formel": {
+   "form": "stufen_1d",
+   "liefert": "eur_qm",
+   "einheit": "EUR/m² Brutto-Grundfläche",
+   "achse_feld": "brw_eur_qm",
+   "achse_bez": "Bodenrichtwert zum 01.01.2024 in EUR/m²",
+   "stufen": {
+    "690": 4402,
+    "800": 4655,
+    "1000": 5117,
+    "1500": 6270,
+    "2000": 7423,
+    "2500": 8576,
+    "2900": 9498
+   },
+   "rundung_stellen": 0,
+   "interpolation": "linear zwischen den Stützstellen. Das Blatt erlaubt es ausdrücklich: „Innerhalb der Tabellenwerte kann linear interpoliert werden.\" Außerhalb von 690 bis 2.900 EUR/m² gibt der Satz nichts aus.",
+   "normobjekt": "Villa oder Landhaus in GUTER oder SEHR GUTER stadträumlicher Wohnlage, in den elf genannten Ortsteilen, bei GUTEM baulichem Zustand (Zuschlag ±0). Erst- und Weiterverkäufe. Das Blatt definiert: „Villen und Landhäuser sind aufwendig errichtete Gebäude auf entsprechendem Grundstück, die sich von ihrer Größe, ihrer Bauweise, ihrer Ausstattung sowie ihrer Außengestaltung (und ihrem Preis) vom Üblichen nach oben abheben.\" Der Faktor enthält Grund und Boden UND Gebäude.",
+   "probe_innere_stimmigkeit": "Die sieben Stützstellen liegen exakt auf einer Geraden: Vergleichsfaktor = 4.402 + 2,306 × (Bodenrichtwert − 690). Größte Abweichung über alle sieben Werte: 1 EUR. Gegenprobe gegen Erfassungsfehler, nicht die amtliche Formel.",
+   "hinweis": "ACHTUNG, DAS NORMOBJEKT IST HIER DER GUTE ZUSTAND, nicht der normale. Das ist umgekehrt zu Tabelle 1, wo „normal\" die Null trägt. Wer die Gewohnheit aus Tabelle 1 mitnimmt, rechnet 2.182 EUR/m² BGF zu hoch."
+  },
+  "korrekturen": [
+   {
+    "bez": "Baulicher Zustand",
+    "feld": "bauzustand",
+    "art": "kategorial",
+    "wirkung": "additiv",
+    "einheit": "EUR/m² BGF",
+    "werte": {
+     "gut": 0,
+     "normal": -2182
+    },
+    "hinweis": "NUR ZWEI NOTEN SIND BELEGT: gut ±0 und normal −2.182 EUR/m² BGF. Für „SCHLECHT\" FÜHRT DAS BLATT KEINEN WERT — und es kann keinen führen: unter den 38 Kauffällen ist kein einziger mit schlechtem Zustand (Tabelle 19, S. 16: gut 20, normal 18). Bei schlechtem Bauzustand gibt dieser Satz daher NICHTS aus; ein Weiterrechnen mit −2.182 wäre eine erfundene Zahl. Das Blatt ergänzt: „Weitere signifikante Einflussgrößen liegen nicht vor.\" — Baujahr und Gebäudestellung werden hier also NICHT zugeschlagen."
+   }
+  ],
+  "modellansaetze": {
+   "modellgrundlage": "§ 193 Abs. 5 BauGB in Verbindung mit § 19 DVO BauGB, Vergleichsfaktoren nach § 12 ImmoWertV",
+   "stichtag": "31.12.2024",
+   "bodenrichtwert_stichtag": "01.01.2024",
+   "bodenrichtwert_modellvorgabe": "Im Rahmen der Modellkonformität ist der Bodenrichtwert zum 01.01.2024 anzusetzen — ohne Anpassung an Maß und Art der baulichen Nutzung oder an die Mikrolage.",
+   "wohnlage_quelle": "https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php",
+   "besonderheit": "Die Vergleichsfaktoren enthalten den Wert für Grund und Boden UND für die Gebäude. Ein Bodenwert wird NICHT zusätzlich angesetzt.",
+   "berechnungsmodell": "Vergleichsfaktor in EUR/m² Brutto-Grundfläche als Funktion des Bodenrichtwerts, plus Korrektur für den baulichen Zustand",
+   "ermittlung": "Regressionsanalyse mit den Variablen Bodenrichtwert, Bruttogrundfläche, Zeit (in Tagen), tatsächliche GFZ und den Dummyvariablen Baujahresgruppe und Bauzustand",
+   "kauffaelle_gesamt": 38,
+   "kauffaelle_ausgewertet": 38,
+   "kauffaelle_hinweis": "ZAHLENWIDERSPRUCH IM BLATT: der Text auf S. 2 nennt „39 Kauffälle für Villen- und Landhausgrundstücke\", die Statistiktabellen 16 bis 20 (S. 15–16) führen durchgehend 38 (Anzahl 38, Ortsteile Gesamt 38, Wohnlage Gesamt 38, Bauzustand Gesamt 38, Baujahresgruppen Gesamt 38). Dieser Satz führt 38, weil vier Tabellen es so ausweisen und nur eine Textzeile 39 sagt. Verteilung: Zehlendorf 10, Dahlem 7, Schlachtensee 5, Lichterfelde 4, Frohnau 3, Westend 2, Nikolassee 2, Wannsee 2, Schmargendorf 1, Gatow 1, Hermsdorf 1. Wohnlage: gut 29, sehr gut 9. Baujahr: bis 1919 17, 1920–1948 20, 1949–1970 1.",
+   "auswertungszeitraum": "01.01.2020 bis 31.12.2024 (länger als bei den Ein- und Zweifamilienhäusern)",
+   "veroeffentlicht": "Amtsblatt für Berlin Nr. 30 vom 18.07.2025, Seite 1968 ff.",
+   "stand_des_blattes": "04.07.2025",
+   "extremwerte": "Für Villen und Landhäuser wurden KEINE Extremwerte eliminiert."
+  },
+  "geltungsbereich": {
+   "raeumlich": "nur die Ortsteile Schmargendorf, Westend, Gatow, Lichterfelde, Zehlendorf, Dahlem, Nikolassee, Wannsee, Schlachtensee, Frohnau und Hermsdorf",
+   "ortsteile": [
+    "Schmargendorf",
+    "Westend",
+    "Gatow",
+    "Lichterfelde",
+    "Zehlendorf",
+    "Dahlem",
+    "Nikolassee",
+    "Wannsee",
+    "Schlachtensee",
+    "Frohnau",
+    "Hermsdorf"
+   ],
+   "sachlich": "bebaute Villen- und Landhausgrundstücke in guter und sehr guter stadträumlicher Wohnlage, Erst- und Weiterverkäufe",
+   "extrapolation": "gesperrt",
+   "spannen": {
+    "brw_eur_qm": [
+     690,
+     2900
+    ]
+   },
+   "spannen_hinweis": "Tabellengrenzen. Streuung der Kauffälle (Tabelle 16, S. 15): Kaufpreis 850.000 bis 9.800.000 EUR (Mittel 3.810.460), Kaufpreis je m² BGF 1.950 bis 11.317 EUR (Mittel 5.749), Baugrundstücksfläche 827 bis 2.016 m² (Mittel 1.188), BGF 383 bis 1.201 m² (Mittel 654), tatsächliche GFZ 0,13 bis 0,56 (Mittel 0,31), Bodenrichtwert 670 bis 2.900 EUR/m² (Mittel 1.700). ACHTUNG: die Kauffälle beginnen beim Bodenrichtwert bei 670, die TABELLE erst bei 690.",
+   "vorbehalt": "VERWENDUNGSZWECK IST DIE STEUERLICHE BEWERTUNG, NICHT DER VERKEHRSWERT. Das Blatt sagt es zweimal: „Die nachfolgenden Vergleichsfaktoren dienen u.a. der steuerlichen Bedarfsbewertung nach dem 2. Teil des 6. Abschnitts des Bewertungsgesetzes sowie der Aufteilung eines Kaufpreises auf Grund und Boden und Gebäude.\" und „Die Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung des Verkehrswertes im Sinne des § 194 BauGB.\" Für DealPilot heißt das: tragfähig für die Kaufpreisaufteilung und als amtlich belegte Vergleichsgröße, NICHT als amtlicher Verkehrswert. Wer daraus einen Verkehrswert macht, überschreitet die Quelle.\n\nZEITLICHE ANWENDBARKEIT: „Die zeitliche Anwendbarkeit der Vergleichsfaktoren richtet sich nach den steuerlichen Vorschriften.\" Das Blatt nennt KEINE Zeitanpassung und keinen Index — eine Fortschreibung auf einen späteren Stichtag ist nicht gedeckt.\n\nBEI SCHLECHTEM BAUZUSTAND GIBT DIESER SATZ NICHTS AUS. Das Blatt führt nur „gut\" (±0) und „normal\" (−2.182); unter 38 Kauffällen ist kein Objekt mit schlechtem Zustand. Eine Fortschreibung des Abschlags wäre eine erfundene Zahl.\n\n38 KAUFFÄLLE SIND EINE SCHMALE BASIS, und sie stammen aus fünf Jahren (2020 bis 2024), nicht aus drei wie bei den Ein- und Zweifamilienhäusern. Der Stichtag bleibt 31.12.2024.\n\nIN ALLEN NICHT GENANNTEN ORTSTEILEN kann dieser Faktor nach dem Blatt „keine Aussage treffen\".",
+   "hinweis": "Ob ein Objekt eine Villa im Sinne des Blattes ist, ist eine BEWERTUNGSENTSCHEIDUNG nach der Definition auf S. 3, keine Formularangabe. Die Abgrenzung entscheidet zwischen 4.402 bis 9.498 EUR/m² BGF (dieser Satz) und 1.151 bis 3.814 EUR/m² BGF (Zweig ezfh) — sie ist der größte Hebel im ganzen Blatt und gehört begründet in den Bericht."
+  },
+  "belege": [
+   "Geschäftsstelle des Gutachterausschuss für Grundstückswerte in Berlin, „Vergleichsfaktoren 2025 …\", Stand 04.07.2025: Abschnitt C1.3, Tabelle 3 (S. 8) mit sieben Stützstellen über den Bodenrichtwert 690 bis 2.900 EUR/m², Korrektur baulicher Zustand (S. 8), Teilmarktdefinition (S. 3), Statistik Tabellen 16 bis 20 (S. 15–16), 38 Kauffälle der Vertragsjahre 2020 bis 2024.",
+   "Gegenprobe gegen Erfassungsfehler: die sieben Stützstellen liegen exakt auf der Geraden 4.402 + 2,306 × (BRW − 690); größte Abweichung 1 EUR. Für BRW 2.900 ergibt die Gerade 9.498 — genau der abgedruckte Wert.",
+   "Für diesen Zweig enthält das Blatt KEIN Anwendungsbeispiel; das einzige Beispiel (S. 17) rechnet ausdrücklich „für die Tabelle 1\"."
+  ],
+  "stufe": "A",
+  "stufe_grund": "Amtliche Tabelle mit abgedruckter Zustandskorrektur, im Amtsblatt für Berlin veröffentlicht, sieben Stützstellen zeichengleich übernommen und gegen die Gerade gegengeprüft (Abweichung 1 EUR). KEIN Anwendungsbeispiel im Blatt für diesen Zweig. 38 Kauffälle, und der bauliche Zustand „schlecht\" ist nicht belegt.",
+  "fallzahl": 38,
+  "streuung": null,
+  "stichtag": "2024-12-31",
+  "berichtsjahr": 2024,
+  "modellversion": "Vergleichsfaktoren 2025 (EZFH/Villen), Stand 04.07.2025",
+  "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-010-2500.pdf",
+  "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377900.php",
+  "quelle_parser": "vgf-be-2026-10-08 (pdfjs Textraster)",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren 2025 für bebaute Ein- und Zweifamilienhaus- und Villen- und Landhausgrundstücke zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 30 vom 18.07.2025 S. 1968 ff. © 2025, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+  "lizenz": "keine Datenlizenz angegeben — amtliche Veröffentlichung im Amtsblatt für Berlin mit Copyright-Vermerk der Senatsverwaltung. Im Blatt steht KEIN dl-de/by-2-0 und KEIN zero-2-0; am 08.10.2026 im Volltext beider PDF nachgesehen (einziger Lizenzbezug ist das ©-Zeichen).",
+  "verwendung": "intern",
+  "auflagen": "Quellenangabe und Copyright-Vermerk. NUR für steuerliche Bewertung und Kaufpreisaufteilung. Bei 38 Kauffällen die Fallzahl im Bericht nennen. Bei schlechtem Bauzustand keinen Wert ausgeben.",
+  "fundstelle": "Vergleichsfaktoren 2025 (05-05-010-2500.pdf): A3 räumliche Anwendbarkeit Villen (S. 2), A5 Teilmarktdefinition (S. 3), C1.3 Tabelle 3 nebst Zustandskorrektur (S. 8), Statistik 2.3 Tabellen 16 bis 20 (S. 15–16)."
+ }
+]
