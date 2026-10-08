@@ -36,6 +36,87 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N52 · ⚠ DIE GRUNDERWERBSTEUER FOLGT DER ADRESSE NUR BEI NRW-NUTZERN (08.10.2026)
+
+**Marcels Auftrag:** „Für Standort und Nebenkosten sollten wir die Möglichkeit geben,
+dass er immer prüft, wo wir kaufen, also die aktuelle Adresse nehmen. Das Bundesland
+geben wir hier nur an, das ist unser Standardbundesland, wo wir sesshaft sind, aber die
+Kaufnebenkosten passen sich immer die Zusammensetzung an mit dem Standort der Adresse."
+
+**Der Weg ist gebaut und greift fast nie.** `frontend/js/grest-plz-lookup.js` (V226)
+führt alle 16 Landessätze und hängt mit `change`, `blur` und einem Lauf nach 800 ms an
+`#plz`. Die Übernahme steht aber hinter dieser Sperre:
+
+```js
+if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || cur === 0) { … übernehmen … }
+```
+
+**6,5 ist der NRW-Satz.** Steht im Feld irgendein anderer Wert — also bei jedem Nutzer,
+dessen Standard-Bundesland nicht NRW ist — wird der Satz aus der Adresse **stillschweigend
+verworfen**. Am laufenden Stand gemessen:
+
+```
+PLZ     Land              Satz   wird uebernommen, wenn im Feld steht
+80331   Bayern            3,5    nur 0 oder 6,5
+10115   Berlin            6,0    nur 0 oder 6,5
+20095   Hamburg           5,5    nur 0 oder 6,5
+01067   Sachsen           5,5    nur 0 oder 6,5
+70173   Baden-Wuerttbg.   5,0    nur 0 oder 6,5
+32545   Nordrhein-Westf.  6,5    nur 0 oder 6,5   <- der einzige Fall, der laeuft
+```
+
+> **Das ist Geld, nicht Kosmetik.** Bayern-Vorgabe (3,5 %) und Objekt in NRW (6,5 %):
+> bei 400.000 € Kaufpreis fehlen **12.000 €** Grunderwerbsteuer. Der Cashflow, der LTV,
+> die Rendite und der Score hängen daran.
+
+> **Eine Rücknahme meiner eigenen Diagnose:** ich hatte zuerst gemeldet, die Datei werde
+> „von niemandem gerufen". Das war falsch — ich hatte nach `GrestPlz`/`grest_plz` gegrept,
+> der Global heißt `DealPilotGrest`. Er wird vom Sprechlauf genutzt
+> (`voice-import.js:3433`) und die Datei verdrahtet sich selbst. **Ein Negativbefund aus
+> dem falschen Suchbegriff ist kein Negativbefund.**
+
+**Zu tun:**
+1. Die Sperre ersetzen: übernommen wird, solange der Nutzer den Satz **für dieses Objekt**
+   nicht selbst geändert hat (`dataset.userEdited`) — nicht abhängig davon, welche Zahl
+   gerade dasteht. Der Vorgabewert aus dem Profil ist kein „selbst geändert".
+2. Der Hinweis „Aus PLZ ermittelt: Bayern 3,5 %" gibt es schon (`showGrestHint`), er wird
+   nur fast nie erreicht. Er gehört **immer** ans Feld, auch wenn der Nutzer übersteuert —
+   dann als „amtlich wäre 6,5 % (NRW), du rechnest mit 3,5 %".
+3. Makler und sonstige Nebenkosten bleiben Nutzerwerte, **je Objekt** änderbar.
+   Notar/Grundbuch bleibt Standard.
+4. In den Einstellungen muss dastehen, dass `ip_bundesland` das **Standard**-Bundesland
+   ist und die Grunderwerbsteuer der Objektadresse folgt — heute sagt die Beschriftung
+   „Bundesland (für Grunderwerbsteuer)", was das Gegenteil nahelegt.
+
+---
+
+### N53 · Einstellungen und Formatierungen durchgehen (08.10.2026)
+
+**Marcels Liste.** Die Felder liegen in `frontend/js/investment-profile.js`
+(Abschnitt „Standardwerte", `settings.js:1172`: „Vorgaben, die in jede Kalkulation
+einfliessen"). Gemessene Feld-Ids in Klammern.
+
+| Punkt | Befund |
+|---|---|
+| **Grünes Icon bei „DealPilot Score"** | noch nicht lokalisiert — Marcel: „gibt es noch bei Deal Pilot Score oben ein Icon, das ist irgendwie noch grün" |
+| **Mindest-Cashflow / Monat** (`ip_min_cashflow_vor_st`) | Hinweis sagt nur „vor Steuer" — wie der Wert in Score und Ampel eingeht, steht nirgends |
+| **Farbliche Marker** | Marcel: „diese Werte erscheinen ab V3-60-77 als farbliche Marker. Ich glaube, das interessiert den Kunden nicht." Die Zeichenfolge `V3-60-77` ist im Code **nicht** gefunden — am Bildschirm nachsehen, was er gesehen hat |
+| **A/B/C-Lagen** (v1956, `lageklasse`) | taucht in den Standardwerten **nicht** auf. Die Zielrenditen (A 3,5 / B 5,0 / C 7,0) liegen in `lage-profil.js`, getrennt von diesem Abschnitt — zwei Orte für dieselbe Sorte Vorgabe |
+| **Marktzins gegen eigenen Zins** (`ip_zins_margin`) | der Hinweis sagt bereits „nur bei indikativem Zins (eigener Zinssatz übersteuert)". Marcels Wunsch: eine **Checkbox** „Indikative Marktzinsen übernehmen" statt eines Hinweises, den man lesen muss |
+| **LTV-Schwelle** (`ip_max_ltv`) | Hinweis nur „Beleihungsauslauf" — keine Erklärung, was beim Überschreiten passiert |
+| **Bewirtschaftung** (`ip_bwk_ul_pct_default`, `ip_bwk_anteil_default`) | umlagefähig „typisch 15–20 %", nicht umlagefähig „typisch 15–22 %" — beide als % der NKM |
+| **Hausgeld-Annahme** (`ip_hausgeld_sel`, `ip_hausgeld_pct`) | Marcel: „Eigentlich setzt sich ja das Hausgeld aus den beiden Zahlen zusammen. Daher finde ich das komisch." Der Hinweis sagt schon „Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)". **Zu prüfen: wird es bei gesetzter Wohnfläche doppelt gezählt?** |
+| **Grenzsteuersatz** (`ip_grenzsteuersatz`) | Hinweis nur „für Steuer-Modul". Er hängt mit Mandanten → Privat → bearbeiten zusammen und kann sich dort ändern — welcher gewinnt, steht nirgends |
+
+**Zu tun:** jeden Punkt am Bildschirm messen (Kontrast, Beschriftung, Hinweis), die
+Doppelungen auflösen (Lage-Zielrenditen, Hausgeld), und je Feld einen Satz, der sagt
+**wohin der Wert fließt** — nicht nur was er ist.
+
+> **Die Checkbox ist der beste Teil des Auftrags:** „Indikative Marktzinsen übernehmen"
+> macht aus einer Regel, die man im Hinweistext findet, eine Entscheidung, die man sieht.
+
+---
+
 ### N49e · `rnd-styles.css`: 78 von 111 Klassen ohne Schreiber (08.10.2026)
 
 **Der Befund ist größer als N49 (e) behauptete.** Dort stand „`.rnd-result*` (17×),
@@ -607,6 +688,51 @@ Garagen-BGF in den Sachwert eingeht.
 ---
 
 ### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
+
+**N45-AUFTRAG, von Marcel am 08.10.2026 geschärft:**
+
+> „Wir haben in den Darstellungen Karte im Objekt Datenaufnahme. Dort haben wir einmal
+> gesagt, dass wir den Trichter auf jeden Fall rausnehmen und die Bordkarte auch. Die
+> fallen komplett raus und es muss in unserer Messkabine passend gerendert sein und auch
+> die Formatierung auf Handy und allem … Die Buttons sollen auch nicht riesig groß sein.
+> Da kannst du dann, wenn das nicht passend dargestellt wird, den Barcode für die
+> Handy-Version oder auch Tablet-Version rausnehmen. Man sollte die Texte lesen können."
+
+**Stand der beiden Stile, gemessen:**
+
+| Stil | Stand |
+|---|---|
+| **Bordkarte** | **schon raus** — v1953 am 07.10.2026, `karten-stil.js`. Dabei die Falle vermieden, dass es ZWEI gleichnamige Stile gibt: `data-dp-kartenstil` (Datenaufnahme) und `data-dp-objkarte` (Objektliste). Die zweite ist seit v1915 Marcels Rückfall der Aktenmappe und durfte nicht mitfallen |
+| **Trichter** | **steht noch** in `STILE` (`karten-stil.js:124`). Er braucht JS, weil er rechts drei Zeilen zeigt, die es im DOM nicht gibt, und den Abrufknopf umhängt — beim Ausbau muss der Knopf an seinen gemerkten Platz zurück |
+
+**Die Prüfstrecke, die dieser Punkt verlangt:**
+
+1. **Messkabine** (`messkabine.html?ziel=/`, iframe `#f`). Responsive ist NUR im
+   gleich-Origin-iframe messbar — die Fenstergröße zu ändern wirkt nicht.
+2. **Je Gerätegröße und je verbleibendem Stil** messen, nicht nur ansehen:
+   - Überlauf: die **direkten Kinder** auflisten und ihre Summe gegen `clientWidth`
+     halten. `overflow-x:auto` und `scrollWidth` sind **kein** Befund; der Nachweis ist,
+     dass ein Balken HÖHE WEGNIMMT (`offsetHeight − clientHeight` minus Rand).
+   - **Knopfgrößen**: Marcel nennt sie ausdrücklich („nicht riesig groß"). Je Knopf
+     `getBoundingClientRect()` und gegen die Zeilenhöhe halten.
+   - **Lesbarkeit**: Kontrast gegen den EFFEKTIVEN Grund (erster Vorfahr mit Fläche,
+     Alpha ausgerechnet). Text und Grund zusammen messen — einzeln war schon einmal
+     jede Farbe richtig und der Kontrast lag bei 1,19.
+3. **Der QR-Code darf auf Handy und Tablet fallen**, wenn der Platz sonst nicht reicht —
+   Marcels ausdrückliche Freigabe. `style.css:33016` setzt ihn fest auf 54×54.
+4. **Varianten nur über den Bedienweg schalten** (Panel klicken), nie per
+   `setAttribute`: sonst fehlt das Nachziehen des Skins und Fehler bleiben unsichtbar.
+   Und den Panel-Merker danach schließen.
+5. **Prüfläufer je Reiter**, nicht einmal für alles — die Stile wirken nur an ihrem
+   Anker, und ein Attribut zu setzen ist kein Nachweis, dass eine Regel trifft.
+
+> **Warum das kein Nebenbei-Schritt ist:** sieben Listen-Kartenstile haben auf dem Handy
+> nie gewirkt, weil der Anker `.dpl-schiene` hieß und die Liste in `aside#sidebar` lag.
+> Gemessen wurde das erst, als jemand die Treffer gezählt hat statt das Attribut zu
+> setzen.
+
+---
+
 
 Marcel am 07.10.2026:
 
