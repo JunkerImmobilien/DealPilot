@@ -36,6 +36,108 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N50 · Die Ernte holt die amtlichen Vergleichsfaktoren (08.10.2026)
+
+**Marcels Auftrag:** „Vielleicht sollten wir das mit in unseren Ernteparameter mit aufnehmen …
+dass wir die Vergleichswerte mit in unsere Datenbank legen, damit wir da auch was mit machen
+können."
+
+Das ist die Gegenseite von **N48**: seit v1971 führt das Vergleichswertverfahren nur noch mit
+kaufpreisbasierter Grundlage. Heute gibt es dafür **genau eine** Quelle im Code — eine fest
+einkodierte Tabelle für den Kreis Minden-Lübbecke (`vergleichsfaktoren_nrw.js`, AGS 05770).
+Überall sonst erscheint kein führendes Verfahren.
+
+**Gemessen am 08.10.2026 über das ganze Register (58 Dateien):**
+
+```
+2543  liegenschaftszinssatz
+1260  sachwertfaktor
+ 403  bodenpreisniveau
+ 386  durchschnittspreis        <- Kaufpreise, aber ausdruecklich indikativ
+ 215  preisentwicklung
+  15  erbbauzinssatz
+   8  erbbaurechtskoeffizient
+   0  vergleichsfaktor          <- die Luecke
+```
+
+**Die Wege stehen schon im Register** — in den Sperrtexten, nicht als Werte. Die vier
+belegten Einstiege:
+
+| Land / Ausschuss | Befund im Register |
+|---|---|
+| **Berlin** | für **Eigentumswohnungen gibt es weder Liegenschaftszinssatz noch Sachwertfaktor** — der amtliche Vergleichsfaktor ist der **einzige** Weg. URL steht in `laender*.json` (`artikel.1377983.php` für Wohnungseigentum, `artikel.1377900.php` für EZFH) |
+| **Brandenburg** | `swf-bb.json`: „Der Bericht führt zusätzlich … Vergleichsfaktoren (Kap. 8.2.3) — beides hier noch nicht erfasst" |
+| **Saarland** | Immobilienmarktbericht des Regionalverbands Saarbrücken enthält Vergleichsfaktoren, aber **nur für den Saarpfalz-Kreis** |
+| **Bayern** | Augsburg: der kostenpflichtige Bericht (50 €, boris-bayern.de) „enthält Vertragszahlen, Liegenschaftszinssätze und Sachwertfaktoren sowie Vergleichsfaktoren (Gebäude- und Ertragsfaktoren)" |
+
+> **Berlin ist der dringendste Fall.** Dort läuft heute für jede Eigentumswohnung gar nichts:
+> kein Zinssatz, kein Sachwertfaktor, und seit v1971 auch kein Vergleichswertverfahren. Ein
+> Berliner ETW-Bericht hat damit **kein einziges amtlich getragenes Verfahren** — und das ist,
+> gemessen, die richtige Auskunft, aber eine unbefriedigende.
+
+**Zu tun:**
+1. **`vergleichsfaktor` als Kennzahl in die Saat aufnehmen.** Die Einheit ist **€/m²** (nicht
+   dimensionslos wie der Sachwertfaktor, nicht Prozent wie der Erbbaurechtskoeffizient) — die
+   Verwechslungsprobe, die `swf-bb.json` schon führt, gehört in den Saat-Prüflauf.
+2. **Berlin zuerst**, dann Brandenburg (Kap. 8.2.3), dann Saarpfalz.
+3. **Modellvermerk mitführen:** ein Vergleichsfaktor gilt nur mit seinem Normobjekt (Größe,
+   Baujahr, Ausstattung) und seinen Umrechnungskoeffizienten. Ohne die ist er nicht anwendbar —
+   derselbe Modellzwang wie beim Sachwertfaktor (§ 21 Abs. 3 / § 20 ImmoWertV).
+4. **`gutachterausschuss.js` liest ihn schon** (`vergleichsfaktor()`, Zeile ~1339, über
+   `finde('vergleichsfaktor', ags)`) und liefert heute immer `kein_ausschuss_hinterlegt`. Die
+   Funktion muss also nicht gebaut, nur gefüttert werden — und dann an
+   `CrossCheckService` verdrahtet, wo seit v1971 `_vglKaufpreise` darauf wartet.
+5. Danach am echten Objekt nachmessen: ein Berliner ETW-Bericht muss dann
+   „Vergleichswert · amtlich" zeigen, mit Quellenvermerk.
+
+---
+
+### N51 · Unterlagen-Modul: Ansprechpartner 1 und 2 aus v6 übernehmen (08.10.2026)
+
+**Marcels Auftrag:** „im Dateien-Ordner diese Datei `unterlagen-app-v6-ansprechpartner` …
+In dem Modul gab es jetzt noch einige Verbesserungen mit den Ansprechpartnern 1 und 2 und
+teilweise gingen die Links nicht. Kannst du das noch einarbeiten bzw. abgleichen, was wir dort
+in unser Modul übernehmen können?"
+
+**Die Links sind mit v1971c schon behoben** — der Befund war messbar und klein:
+`unterlagen-modal.js` gab `antrag_url` nur als **Text** aus („nur über das Portal"), nie als
+Link, und das auch nur im `else if`-Zweig, also **ausschließlich wenn die E-Mail fehlte**. Hat
+ein Amt beides — bei Bauamt und Grundbuchamt der Normalfall — erschien der Portal-Link **gar
+nicht**. Das Backend liefert `antrag_url` seit v1833 geprüft (`unterlagenService.js:358`,
+durch `_link()`).
+
+**Was v6 gegenüber v5 bringt** (gemessen: 77 geänderte Zeilen in `server.js`, 38 in
+`public/index.html`):
+
+| Baustein | v6 |
+|---|---|
+| Datenhaltung | `ALTER TABLE behoerden ADD COLUMN ansprechpartner TEXT DEFAULT '[]'` — eine JSON-Liste je Amt |
+| KI-Auftrag | fragt die **ersten beiden** Ansprechpersonen **in der Reihenfolge der Seite**: Name, Funktion, E-Mail, Telefon. „Nur Personen, die dort wirklich stehen. Eine E-Mail nur, wenn sie dort wörtlich steht, sonst leer." |
+| Belegprüfung | `proSeite` — die gefundenen Adressen werden **je Quellseite** festgehalten, nicht nur als Gesamtmenge. Damit ist belegbar, auf welcher Seite eine Adresse steht |
+| Zusammenbau | zuerst die von der KI genannten Personen, dann **aufgefüllt** mit den persönlichen Postfächern der Quellseite (in Seitenreihenfolge), höchstens zwei; jede mit `bestaetigt` |
+| Kopie | `kopieAn` — nur **angehakte** Personen gehen ins CC, **nie** die Adresse, die ohnehin Empfänger ist (`istEmpfaenger`-Flagge verhindert das in der Oberfläche) |
+| Versand | `cc` im Mailversand, und der Protokolleintrag führt „Kopie an …" mit |
+
+> **Der Kern des Gewinns ist nicht die Person, sondern der BELEG.** v5 wusste nur, ob eine
+> Adresse irgendwo auf einer der gelesenen Seiten stand. v6 weiß, auf **welcher** — und kann
+> deshalb eine persönliche Adresse überhaupt als „belegt" ausweisen. Ohne `proSeite` wäre
+> „Ansprechpartner 1" eine Behauptung.
+
+**Zu tun:**
+1. Spalte `ansprechpartner` (JSONB) in unserer `unterlagen`-Tabelle — Migration, also Rebuild.
+2. Den KI-Auftrag in `unterlagenService.js` um `ansprechpartner` erweitern, **wörtlich mit der
+   Einschränkung aus v6** („nur wenn dort wörtlich steht"). Der Prompt ist die Stelle, an der
+   erfundene Namen entstehen würden.
+3. `proSeite` nachbauen: die Belegprüfung muss je Seite festhalten, was sie gefunden hat.
+4. Oberfläche: die zwei Personen anzeigen, je mit Beleg-Stand und einem Haken „in Kopie".
+5. Versand: CC setzen, Empfänger nie doppeln.
+
+> **Nicht übernehmen:** die SQLite-Eigenheiten (`db.exec("ALTER TABLE …")` im try/catch) —
+> wir haben Postgres und `schema_migrations`. Und `start.bat`/`.env.example` sind Beiwerk der
+> Standalone-App.
+
+---
+
 ### N48 · ⚠⚠ DER „VERGLEICHSWERT" IST EIN ANGEBOTSPREIS, DER BERICHT NENNT IHN KAUFPREIS (08.10.2026)
 
 **Marcels Frage:** „Eigentumswohnungen werden ja üblicherweise nach dem Vergleichswert

@@ -800,7 +800,23 @@ function _renderWertverfahren(d) {
           : null))
     + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
     + '<div class="wv-g">'
-    + karte('vgl', 'Vergleichswert', eur(v), 'f\u00fchrend bei Eigentumswohnungen', 'vergleich')
+    /* ══ v1971 · DIE KARTE HEISST, WAS SIE IST ══════════════════════════
+
+       Hier stand Titel „Vergleichswert" und Unterzeile „fuehrend bei
+       Eigentumswohnungen" — beides fest, unabhaengig davon, woraus die
+       Zahl gebildet ist und ob ueberhaupt ein Verfahren fuehrt.
+
+       Der Hinweis auf die Angebotsbasis stand nur im EINGEKLAPPTEN
+       Erklaertext. Was eingeklappt ist, wird nicht gelesen.
+
+       Marcel am 08.10.2026: „Vergleichswert muessen wir auf jeden Fall
+       umbenennen." */
+    + karte('vgl', (cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation',
+        eur(v),
+        ((cc.comparison && cc.comparison.basis) === 'kaufpreise'
+          ? 'amtliche Grundlage · § 20, § 25 ImmoWertV'
+          : 'Angebotspreise aus Portalen — keine Kaufpreise (§ 25 ImmoWertV)'),
+        'vergleich')
     /* ── v1200 · Die Karte verschwieg, WIE gerechnet wurde ─────────────────
        Sie zeigte nur „Reinertrag 3.767 € p. a.". Dass ohne Bodenwert
        gerechnet wurde — bei einer Eigentumswohnung ohne Miteigentumsanteil
@@ -3806,7 +3822,20 @@ async function exportPdf(out) {
      * das seit v1061 aus — es stand nur nirgends im Dokument. */
     const _vw = cc.verfahrenswahl || null;
     const _vwKey = (_vw && _vw.verfahren) ? _vw.verfahren : null;
-    const _fuehrt = (k) => (_vwKey ? _vwKey === k : k === 'vergleichswert');
+    /* ══ v1971 · OHNE FUEHRENDES VERFAHREN FUEHRT NICHTS ════════════════
+
+       Hier stand als Rueckfall `k === 'vergleichswert'`: liefert
+       `verfahrenswahl` kein Verfahren, galt der Vergleichswert als
+       fuehrend. Das war gedacht fuer den Fall „noch nicht gerechnet".
+
+       Seit v1971 gibt `verfahrenswahl` fuer Wohnungseigentum OHNE
+       kaufpreisbasierte Grundlage ABSICHTLICH kein Verfahren zurueck —
+       und dieser Rueckfall haette genau dort die Angebotskarte wieder zur
+       fuehrenden gemacht. Also das Gegenteil dessen, was der Patch im
+       Backend bewirkt.
+
+       Jetzt fuehrt nichts, wenn nichts fuehrt. */
+    const _fuehrt = (k) => (_vwKey ? _vwKey === k : false);
     const sw = cc.sachwert || {}, ew = cc.ertragswert || {};
     /* v1057-WVGL-1 · Oben steht die Marktpreisindikation aus Angeboten —
      * das ist richtig und aktuell. Hier unten steht der Verfahrensvergleich
@@ -3815,13 +3844,41 @@ async function exportPdf(out) {
      * oben und unten dieselbe Zahl aus derselben Quelle und bestaetigen
      * sich gegenseitig. */
     const _irwOk = cc.irw && cc.irw.verfuegbar && cc.irw.wert_qm > 0;
-    const _vglTitel = _irwOk ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
+    /* ══ v1971 · DER TITEL FOLGT DER BASIS DER ZAHL ═════════════════════
+
+       Hier stand:
+
+         const _vglTitel = _irwOk ? 'VERGLEICHSWERT · AMTLICH'
+                                  : 'MARKTPREIS AUS ANGEBOTEN';
+
+       Lag ein Immobilienrichtwert vor, hiess die Karte „VERGLEICHSWERT ·
+       AMTLICH" und die Zeile „Angebotspreise — keine beurkundeten
+       Kaufpreise" fiel weg. DIE ANGEZEIGTE ZAHL BLIEB DABEI UNVERAENDERT
+       `cc.comparison.vergleichswert_eur` — also der Median aus
+       Portalinseraten. Der Immobilienrichtwert fliesst nirgends in diese
+       Zahl ein (CrossCheckService schreibt ihn nur nach `out.irw`).
+
+       Der Hinweis verschwand damit genau dann, wenn er am meisten
+       taeuscht: ueber einer Angebotszahl stand „amtlich".
+
+       Jetzt entscheidet `cc.comparison.basis`, was das Backend seit
+       v1971 mitliefert und was die Zahl wirklich traegt. Der
+       Immobilienrichtwert wird weiter gezeigt — als eigene Zeile, nicht
+       als Titel. */
+    const _vglBasis = (cc.comparison && cc.comparison.basis) || 'angebote';
+    const _vglAmtlich = _vglBasis === 'kaufpreise';
+    const _vglTitel = _vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
     card3(M, _vglTitel, cc.comparison.vergleichswert_eur, [
       mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m² Median' : null,
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
-      /* v1057-WVGL-2 */
+      /* v1971: BEIDE Zeilen, nicht die eine ODER die andere. Der
+         Immobilienrichtwert ist eine Auskunft fuer sich; der
+         Paragraf-25-Hinweis haengt daran, woraus die ZAHL gebildet ist. */
       _irwOk
         ? 'Immobilienrichtwert ' + cc.irw.wert_qm + ' €/m² · Stichtag ' + (cc.irw.stichtag || '?')
+        : null,
+      _vglAmtlich
+        ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)'
         : 'Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)',
       /* v1061-WTXT-1 · Hier stand der rohe Bezeichner: "Immobilienrichtwerte:
        * nicht_beschlossen". Ein Datenbankwert im Kundenbericht. */

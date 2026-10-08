@@ -1100,13 +1100,36 @@ export const CrossCheckService = {
      * den Ertragswert, typisches Wohnungseigentum ueber den Vergleich.
      * Feste Regel, kein Gefuehl: derselbe Objekttyp bekommt immer dieselbe
      * Behandlung. */
+    /* ══ v1971 · DIE BASIS DES VERGLEICHS WIRD GEMESSEN ════════════════
+
+       Ein Vergleichswertverfahren darf nur fuehren, wenn KAUFPREISE
+       dahinterstehen (Paragraf 25 Abs. 1 ImmoWertV). Beide hier
+       moeglichen Grundlagen sind kaufpreisbasiert und sagen das selbst:
+
+         amtlicher Vergleichsfaktor  Paragraf 20, aus der
+                                     Kaufpreissammlung des Ausschusses
+         Immobilienrichtwert         beurkundete Kaufpreise, BORIS
+
+       Fehlen beide, bleibt nur der Median aus Portalinseraten — und der
+       ist ein ANGEBOTSPREIS. Dann gibt es kein fuehrendes Verfahren.
+       Siehe den Block in lib/verfahrenswahl.js. */
+    const _vglKaufpreise =
+      !!(p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar)
+      || !!(p.irw && p.irw.verfuegbar && Number(p.irw.wert_qm) > 0);
     out.verfahrenswahl = fuehrendesVerfahren({
       objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
+      vergleichsbasis: _vglKaufpreise ? 'kaufpreise' : null,
     });
     if (out.verfahrenswahl && out.verfahrenswahl.grund) {
-      out.notes.push('Führendes Verfahren: ' + ({ sachwert: 'Sachwertverfahren',
-        ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren' }
-        [out.verfahrenswahl.verfahren] || '—') + '. ' + out.verfahrenswahl.grund);
+      /* v1971: ohne fuehrendes Verfahren steht das AUCH im Bericht —
+         „—" als Verfahrensname war eine Leerstelle, die wie ein Fehler
+         aussah. */
+      const _vn = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
+        vergleichswert: 'Vergleichswertverfahren' }[out.verfahrenswahl.verfahren];
+      out.notes.push(_vn
+        ? 'Führendes Verfahren: ' + _vn + '. ' + out.verfahrenswahl.grund
+        : 'Kein führendes Verfahren ausgewiesen. ' + out.verfahrenswahl.grund
+          + (out.verfahrenswahl.weg ? ' ' + out.verfahrenswahl.weg : ''));
     }
 
     /* v1061-WVER-3 · Objektspezifisch angepasster Zinssatz nach Paragraf 33.
@@ -1168,8 +1191,33 @@ export const CrossCheckService = {
         ['ertragswert', out.ertragswert.available ? out.ertragswert.value_eur : null],
       ].filter(([, v]) => v != null);
       const nums = vals.map(([, v]) => v);
+      /* ══ v1971 · DIE AUSGABE NENNT IHRE BASIS ════════════════════════
+
+         `vergleichswert_eur` heisst aus Ruecksicht auf bestehende Leser
+         weiter so (Verlauf, Dropdown, gespeicherte Berichte), traegt aber
+         jetzt seine Herkunft mit. Beide Oberflaechen — Bildschirm und PDF
+         — beschriften danach, statt den Namen zu behaupten.
+
+           basis: 'kaufpreise'  amtlicher Vergleichsfaktor oder
+                                Immobilienrichtwert -> echter
+                                Vergleichswert nach Paragraf 24
+           basis: 'angebote'    Median aus Portalinseraten -> das ist
+                                eine MARKTPREISINDIKATION, kein
+                                Vergleichswert
+
+         > Eine Umbenennung des FELDES waere die groessere Reparatur, aber
+         > sie bricht jeden gespeicherten Bericht und das Wertanker-
+         > Dropdown. Die Beschriftung ist das, was der Kunde liest — sie
+         > wird korrigiert, der Schluessel bleibt. */
       out.comparison = {
         vergleichswert_eur: vgl,
+        basis: _vglKaufpreise ? 'kaufpreise' : 'angebote',
+        bezeichnung: _vglKaufpreise ? 'Vergleichswert' : 'Marktpreisindikation aus Angeboten',
+        basis_hinweis: _vglKaufpreise
+          ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 Abs. 1 ImmoWertV).'
+          : 'Angebotspreise aus Immobilienportalen, Median €/m². Keine beurkundeten '
+            + 'Kaufpreise — § 25 Abs. 1 ImmoWertV verlangt für das '
+            + 'Vergleichswertverfahren Kaufpreise.',
         sachwert_eur: out.sachwert.available ? out.sachwert.value_eur : null,
         ertragswert_eur: out.ertragswert.available ? out.ertragswert.value_eur : null,
         min_eur: nums.length ? Math.min(...nums) : null,

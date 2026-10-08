@@ -111,7 +111,11 @@
         return e;
       } },
     { num: 9, title: 'Ergebnis & Empfehlung',
-      sub: 'Restnutzungsdauer berechnet — Export oder direkt übernehmen',
+      /* v1970a: hier stand „Export oder direkt übernehmen". Einen Export
+         gibt es in der App seit V194 nicht mehr, und seit v1970 auch die
+         Module nicht — der Untertitel versprach einen Knopf, den niemand
+         findet. Das Gutachten entsteht über die Anfrage, nicht hier. */
+      sub: 'Restnutzungsdauer berechnet — Werte übernehmen oder Gutachten anfragen',
       render: renderStep9, validate: function () { return []; } }
   ];
 
