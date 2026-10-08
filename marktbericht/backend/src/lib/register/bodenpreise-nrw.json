@@ -4,7 +4,7 @@
   "ags": "05111000",
   "ebene": "gemeinde",
   "gebiet_name": "Düsseldorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -93,7 +93,7 @@
   "ags": "05112000",
   "ebene": "gemeinde",
   "gebiet_name": "Duisburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -164,7 +164,7 @@
   "ags": "05113000",
   "ebene": "gemeinde",
   "gebiet_name": "Essen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -253,7 +253,7 @@
   "ags": "05114000",
   "ebene": "gemeinde",
   "gebiet_name": "Krefeld",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -342,7 +342,7 @@
   "ags": "05116000",
   "ebene": "gemeinde",
   "gebiet_name": "Mönchengladbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -431,7 +431,7 @@
   "ags": "05117000",
   "ebene": "gemeinde",
   "gebiet_name": "Mülheim an der Ruhr",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -519,7 +519,7 @@
   "ags": "05119000",
   "ebene": "gemeinde",
   "gebiet_name": "Oberhausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -607,7 +607,7 @@
   "ags": "05120000",
   "ebene": "gemeinde",
   "gebiet_name": "Remscheid",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -678,7 +678,7 @@
   "ags": "05122000",
   "ebene": "gemeinde",
   "gebiet_name": "Solingen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -748,7 +748,7 @@
   "ags": "05124000",
   "ebene": "gemeinde",
   "gebiet_name": "Wuppertal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -818,7 +818,7 @@
   "ags": "05154004",
   "ebene": "gemeinde",
   "gebiet_name": "Bedburg-Hau",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -896,7 +896,7 @@
   "ags": "05154008",
   "ebene": "gemeinde",
   "gebiet_name": "Emmerich am Rhein",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -974,7 +974,7 @@
   "ags": "05154012",
   "ebene": "gemeinde",
   "gebiet_name": "Geldern",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1052,7 +1052,7 @@
   "ags": "05154016",
   "ebene": "gemeinde",
   "gebiet_name": "Goch",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1130,7 +1130,7 @@
   "ags": "05154020",
   "ebene": "gemeinde",
   "gebiet_name": "Issum",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1208,7 +1208,7 @@
   "ags": "05154024",
   "ebene": "gemeinde",
   "gebiet_name": "Kalkar",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1286,7 +1286,7 @@
   "ags": "05154028",
   "ebene": "gemeinde",
   "gebiet_name": "Kerken",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1364,7 +1364,7 @@
   "ags": "05154032",
   "ebene": "gemeinde",
   "gebiet_name": "Kevelaer",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1442,7 +1442,7 @@
   "ags": "05154036",
   "ebene": "gemeinde",
   "gebiet_name": "Kleve",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1520,7 +1520,7 @@
   "ags": "05154040",
   "ebene": "gemeinde",
   "gebiet_name": "Kranenburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1598,7 +1598,7 @@
   "ags": "05154044",
   "ebene": "gemeinde",
   "gebiet_name": "Rees",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1676,7 +1676,7 @@
   "ags": "05154048",
   "ebene": "gemeinde",
   "gebiet_name": "Rheurdt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1754,7 +1754,7 @@
   "ags": "05154052",
   "ebene": "gemeinde",
   "gebiet_name": "Straelen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1832,7 +1832,7 @@
   "ags": "05154056",
   "ebene": "gemeinde",
   "gebiet_name": "Uedem",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1910,7 +1910,7 @@
   "ags": "05154060",
   "ebene": "gemeinde",
   "gebiet_name": "Wachtendonk",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -1988,7 +1988,7 @@
   "ags": "05154064",
   "ebene": "gemeinde",
   "gebiet_name": "Weeze",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2066,7 +2066,7 @@
   "ags": "05158004",
   "ebene": "gemeinde",
   "gebiet_name": "Erkrath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2136,7 +2136,7 @@
   "ags": "05158008",
   "ebene": "gemeinde",
   "gebiet_name": "Haan",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2205,7 +2205,7 @@
   "ags": "05158012",
   "ebene": "gemeinde",
   "gebiet_name": "Heiligenhaus",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2273,7 +2273,7 @@
   "ags": "05158016",
   "ebene": "gemeinde",
   "gebiet_name": "Hilden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2341,7 +2341,7 @@
   "ags": "05158020",
   "ebene": "gemeinde",
   "gebiet_name": "Langenfeld (Rhld.)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2408,7 +2408,7 @@
   "ags": "05158024",
   "ebene": "gemeinde",
   "gebiet_name": "Mettmann",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2478,7 +2478,7 @@
   "ags": "05158026",
   "ebene": "gemeinde",
   "gebiet_name": "Monheim am Rhein",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2545,7 +2545,7 @@
   "ags": "05158028",
   "ebene": "gemeinde",
   "gebiet_name": "Ratingen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2615,7 +2615,7 @@
   "ags": "05158032",
   "ebene": "gemeinde",
   "gebiet_name": "Velbert",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2704,7 +2704,7 @@
   "ags": "05158036",
   "ebene": "gemeinde",
   "gebiet_name": "Wülfrath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2773,7 +2773,7 @@
   "ags": "05162004",
   "ebene": "gemeinde",
   "gebiet_name": "Dormagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2835,7 +2835,7 @@
   "ags": "05162008",
   "ebene": "gemeinde",
   "gebiet_name": "Grevenbroich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2897,7 +2897,7 @@
   "ags": "05162012",
   "ebene": "gemeinde",
   "gebiet_name": "Jüchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -2958,7 +2958,7 @@
   "ags": "05162016",
   "ebene": "gemeinde",
   "gebiet_name": "Kaarst",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3018,7 +3018,7 @@
   "ags": "05162020",
   "ebene": "gemeinde",
   "gebiet_name": "Korschenbroich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3079,7 +3079,7 @@
   "ags": "05162022",
   "ebene": "gemeinde",
   "gebiet_name": "Meerbusch",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3140,7 +3140,7 @@
   "ags": "05162024",
   "ebene": "gemeinde",
   "gebiet_name": "Neuss",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3227,7 +3227,7 @@
   "ags": "05162028",
   "ebene": "gemeinde",
   "gebiet_name": "Rommerskirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3288,7 +3288,7 @@
   "ags": "05166004",
   "ebene": "gemeinde",
   "gebiet_name": "Brüggen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3349,7 +3349,7 @@
   "ags": "05166008",
   "ebene": "gemeinde",
   "gebiet_name": "Grefrath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3410,7 +3410,7 @@
   "ags": "05166012",
   "ebene": "gemeinde",
   "gebiet_name": "Kempen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3472,7 +3472,7 @@
   "ags": "05166016",
   "ebene": "gemeinde",
   "gebiet_name": "Nettetal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3533,7 +3533,7 @@
   "ags": "05166020",
   "ebene": "gemeinde",
   "gebiet_name": "Niederkrüchten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3593,7 +3593,7 @@
   "ags": "05166024",
   "ebene": "gemeinde",
   "gebiet_name": "Schwalmtal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3653,7 +3653,7 @@
   "ags": "05166028",
   "ebene": "gemeinde",
   "gebiet_name": "Tönisvorst",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3714,7 +3714,7 @@
   "ags": "05166032",
   "ebene": "gemeinde",
   "gebiet_name": "Viersen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3776,7 +3776,7 @@
   "ags": "05166036",
   "ebene": "gemeinde",
   "gebiet_name": "Willich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3837,7 +3837,7 @@
   "ags": "05170004",
   "ebene": "gemeinde",
   "gebiet_name": "Alpen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3898,7 +3898,7 @@
   "ags": "05170008",
   "ebene": "gemeinde",
   "gebiet_name": "Dinslaken",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -3978,7 +3978,7 @@
   "ags": "05170012",
   "ebene": "gemeinde",
   "gebiet_name": "Hamminkeln",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4040,7 +4040,7 @@
   "ags": "05170016",
   "ebene": "gemeinde",
   "gebiet_name": "Hünxe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4102,7 +4102,7 @@
   "ags": "05170020",
   "ebene": "gemeinde",
   "gebiet_name": "Kamp-Lintfort",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4172,7 +4172,7 @@
   "ags": "05170024",
   "ebene": "gemeinde",
   "gebiet_name": "Moers",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4243,7 +4243,7 @@
   "ags": "05170028",
   "ebene": "gemeinde",
   "gebiet_name": "Neukirchen-Vluyn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4313,7 +4313,7 @@
   "ags": "05170032",
   "ebene": "gemeinde",
   "gebiet_name": "Rheinberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4383,7 +4383,7 @@
   "ags": "05170036",
   "ebene": "gemeinde",
   "gebiet_name": "Schermbeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4445,7 +4445,7 @@
   "ags": "05170040",
   "ebene": "gemeinde",
   "gebiet_name": "Sonsbeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4506,7 +4506,7 @@
   "ags": "05170044",
   "ebene": "gemeinde",
   "gebiet_name": "Voerde (Niederrhein)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4576,7 +4576,7 @@
   "ags": "05170048",
   "ebene": "gemeinde",
   "gebiet_name": "Wesel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4645,7 +4645,7 @@
   "ags": "05170052",
   "ebene": "gemeinde",
   "gebiet_name": "Xanten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4713,7 +4713,7 @@
   "ags": "05314000",
   "ebene": "gemeinde",
   "gebiet_name": "Bonn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4782,7 +4782,7 @@
   "ags": "05315000",
   "ebene": "gemeinde",
   "gebiet_name": "Köln",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4871,7 +4871,7 @@
   "ags": "05316000",
   "ebene": "gemeinde",
   "gebiet_name": "Leverkusen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -4959,7 +4959,7 @@
   "ags": "05334002",
   "ebene": "gemeinde",
   "gebiet_name": "Aachen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5048,7 +5048,7 @@
   "ags": "05334004",
   "ebene": "gemeinde",
   "gebiet_name": "Alsdorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5128,7 +5128,7 @@
   "ags": "05334008",
   "ebene": "gemeinde",
   "gebiet_name": "Baesweiler",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5207,7 +5207,7 @@
   "ags": "05334012",
   "ebene": "gemeinde",
   "gebiet_name": "Eschweiler",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5287,7 +5287,7 @@
   "ags": "05334016",
   "ebene": "gemeinde",
   "gebiet_name": "Herzogenrath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5367,7 +5367,7 @@
   "ags": "05334020",
   "ebene": "gemeinde",
   "gebiet_name": "Monschau",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5447,7 +5447,7 @@
   "ags": "05334024",
   "ebene": "gemeinde",
   "gebiet_name": "Roetgen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5525,7 +5525,7 @@
   "ags": "05334028",
   "ebene": "gemeinde",
   "gebiet_name": "Simmerath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5603,7 +5603,7 @@
   "ags": "05334032",
   "ebene": "gemeinde",
   "gebiet_name": "Stolberg (Rhld.)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5683,7 +5683,7 @@
   "ags": "05334036",
   "ebene": "gemeinde",
   "gebiet_name": "Würselen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5763,7 +5763,7 @@
   "ags": "05358004",
   "ebene": "gemeinde",
   "gebiet_name": "Aldenhoven",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5816,7 +5816,7 @@
   "ags": "05358008",
   "ebene": "gemeinde",
   "gebiet_name": "Düren",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5878,7 +5878,7 @@
   "ags": "05358012",
   "ebene": "gemeinde",
   "gebiet_name": "Heimbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5931,7 +5931,7 @@
   "ags": "05358016",
   "ebene": "gemeinde",
   "gebiet_name": "Hürtgenwald",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -5984,7 +5984,7 @@
   "ags": "05358020",
   "ebene": "gemeinde",
   "gebiet_name": "Inden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6037,7 +6037,7 @@
   "ags": "05358024",
   "ebene": "gemeinde",
   "gebiet_name": "Jülich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6090,7 +6090,7 @@
   "ags": "05358028",
   "ebene": "gemeinde",
   "gebiet_name": "Kreuzau",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6143,7 +6143,7 @@
   "ags": "05358032",
   "ebene": "gemeinde",
   "gebiet_name": "Langerwehe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6196,7 +6196,7 @@
   "ags": "05358036",
   "ebene": "gemeinde",
   "gebiet_name": "Linnich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6249,7 +6249,7 @@
   "ags": "05358040",
   "ebene": "gemeinde",
   "gebiet_name": "Merzenich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6302,7 +6302,7 @@
   "ags": "05358044",
   "ebene": "gemeinde",
   "gebiet_name": "Nideggen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6355,7 +6355,7 @@
   "ags": "05358048",
   "ebene": "gemeinde",
   "gebiet_name": "Niederzier",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6408,7 +6408,7 @@
   "ags": "05358052",
   "ebene": "gemeinde",
   "gebiet_name": "Nörvenich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6461,7 +6461,7 @@
   "ags": "05358056",
   "ebene": "gemeinde",
   "gebiet_name": "Titz",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6514,7 +6514,7 @@
   "ags": "05358060",
   "ebene": "gemeinde",
   "gebiet_name": "Vettweiß",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6567,7 +6567,7 @@
   "ags": "05362004",
   "ebene": "gemeinde",
   "gebiet_name": "Bedburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6636,7 +6636,7 @@
   "ags": "05362008",
   "ebene": "gemeinde",
   "gebiet_name": "Bergheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6707,7 +6707,7 @@
   "ags": "05362012",
   "ebene": "gemeinde",
   "gebiet_name": "Brühl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6776,7 +6776,7 @@
   "ags": "05362016",
   "ebene": "gemeinde",
   "gebiet_name": "Elsdorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6843,7 +6843,7 @@
   "ags": "05362020",
   "ebene": "gemeinde",
   "gebiet_name": "Erftstadt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6913,7 +6913,7 @@
   "ags": "05362024",
   "ebene": "gemeinde",
   "gebiet_name": "Frechen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -6982,7 +6982,7 @@
   "ags": "05362028",
   "ebene": "gemeinde",
   "gebiet_name": "Hürth",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7052,7 +7052,7 @@
   "ags": "05362032",
   "ebene": "gemeinde",
   "gebiet_name": "Kerpen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7122,7 +7122,7 @@
   "ags": "05362036",
   "ebene": "gemeinde",
   "gebiet_name": "Pulheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7189,7 +7189,7 @@
   "ags": "05362040",
   "ebene": "gemeinde",
   "gebiet_name": "Wesseling",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7258,7 +7258,7 @@
   "ags": "05366004",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Münstereifel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7320,7 +7320,7 @@
   "ags": "05366008",
   "ebene": "gemeinde",
   "gebiet_name": "Blankenheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7382,7 +7382,7 @@
   "ags": "05366012",
   "ebene": "gemeinde",
   "gebiet_name": "Dahlem",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7442,7 +7442,7 @@
   "ags": "05366016",
   "ebene": "gemeinde",
   "gebiet_name": "Euskirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7504,7 +7504,7 @@
   "ags": "05366020",
   "ebene": "gemeinde",
   "gebiet_name": "Hellenthal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7565,7 +7565,7 @@
   "ags": "05366024",
   "ebene": "gemeinde",
   "gebiet_name": "Kall",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7626,7 +7626,7 @@
   "ags": "05366028",
   "ebene": "gemeinde",
   "gebiet_name": "Mechernich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7688,7 +7688,7 @@
   "ags": "05366032",
   "ebene": "gemeinde",
   "gebiet_name": "Nettersheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7748,7 +7748,7 @@
   "ags": "05366036",
   "ebene": "gemeinde",
   "gebiet_name": "Schleiden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7810,7 +7810,7 @@
   "ags": "05366040",
   "ebene": "gemeinde",
   "gebiet_name": "Weilerswist",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7871,7 +7871,7 @@
   "ags": "05366044",
   "ebene": "gemeinde",
   "gebiet_name": "Zülpich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -7933,7 +7933,7 @@
   "ags": "05370004",
   "ebene": "gemeinde",
   "gebiet_name": "Erkelenz",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8013,7 +8013,7 @@
   "ags": "05370008",
   "ebene": "gemeinde",
   "gebiet_name": "Gangelt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8092,7 +8092,7 @@
   "ags": "05370012",
   "ebene": "gemeinde",
   "gebiet_name": "Geilenkirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8172,7 +8172,7 @@
   "ags": "05370016",
   "ebene": "gemeinde",
   "gebiet_name": "Heinsberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8252,7 +8252,7 @@
   "ags": "05370020",
   "ebene": "gemeinde",
   "gebiet_name": "Hückelhoven",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8332,7 +8332,7 @@
   "ags": "05370024",
   "ebene": "gemeinde",
   "gebiet_name": "Selfkant",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8412,7 +8412,7 @@
   "ags": "05370028",
   "ebene": "gemeinde",
   "gebiet_name": "Übach-Palenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8491,7 +8491,7 @@
   "ags": "05370032",
   "ebene": "gemeinde",
   "gebiet_name": "Waldfeucht",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8570,7 +8570,7 @@
   "ags": "05370036",
   "ebene": "gemeinde",
   "gebiet_name": "Wassenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8650,7 +8650,7 @@
   "ags": "05370040",
   "ebene": "gemeinde",
   "gebiet_name": "Wegberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8730,7 +8730,7 @@
   "ags": "05374004",
   "ebene": "gemeinde",
   "gebiet_name": "Bergneustadt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8792,7 +8792,7 @@
   "ags": "05374008",
   "ebene": "gemeinde",
   "gebiet_name": "Engelskirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8854,7 +8854,7 @@
   "ags": "05374012",
   "ebene": "gemeinde",
   "gebiet_name": "Gummersbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8916,7 +8916,7 @@
   "ags": "05374016",
   "ebene": "gemeinde",
   "gebiet_name": "Hückeswagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -8978,7 +8978,7 @@
   "ags": "05374020",
   "ebene": "gemeinde",
   "gebiet_name": "Lindlar",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9040,7 +9040,7 @@
   "ags": "05374024",
   "ebene": "gemeinde",
   "gebiet_name": "Marienheide",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9102,7 +9102,7 @@
   "ags": "05374028",
   "ebene": "gemeinde",
   "gebiet_name": "Morsbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9164,7 +9164,7 @@
   "ags": "05374032",
   "ebene": "gemeinde",
   "gebiet_name": "Nümbrecht",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9226,7 +9226,7 @@
   "ags": "05374036",
   "ebene": "gemeinde",
   "gebiet_name": "Radevormwald",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9288,7 +9288,7 @@
   "ags": "05374040",
   "ebene": "gemeinde",
   "gebiet_name": "Reichshof",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9350,7 +9350,7 @@
   "ags": "05374044",
   "ebene": "gemeinde",
   "gebiet_name": "Waldbröl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9412,7 +9412,7 @@
   "ags": "05374048",
   "ebene": "gemeinde",
   "gebiet_name": "Wiehl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9474,7 +9474,7 @@
   "ags": "05374052",
   "ebene": "gemeinde",
   "gebiet_name": "Wipperfürth",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9536,7 +9536,7 @@
   "ags": "05378004",
   "ebene": "gemeinde",
   "gebiet_name": "Bergisch Gladbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9625,7 +9625,7 @@
   "ags": "05378008",
   "ebene": "gemeinde",
   "gebiet_name": "Burscheid",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9685,7 +9685,7 @@
   "ags": "05378012",
   "ebene": "gemeinde",
   "gebiet_name": "Kürten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9745,7 +9745,7 @@
   "ags": "05378016",
   "ebene": "gemeinde",
   "gebiet_name": "Leichlingen (Rhld.)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9805,7 +9805,7 @@
   "ags": "05378020",
   "ebene": "gemeinde",
   "gebiet_name": "Odenthal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9865,7 +9865,7 @@
   "ags": "05378024",
   "ebene": "gemeinde",
   "gebiet_name": "Overath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9925,7 +9925,7 @@
   "ags": "05378028",
   "ebene": "gemeinde",
   "gebiet_name": "Rösrath",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -9985,7 +9985,7 @@
   "ags": "05378032",
   "ebene": "gemeinde",
   "gebiet_name": "Wermelskirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10045,7 +10045,7 @@
   "ags": "05382004",
   "ebene": "gemeinde",
   "gebiet_name": "Alfter",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10107,7 +10107,7 @@
   "ags": "05382008",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Honnef",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10168,7 +10168,7 @@
   "ags": "05382012",
   "ebene": "gemeinde",
   "gebiet_name": "Bornheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10228,7 +10228,7 @@
   "ags": "05382016",
   "ebene": "gemeinde",
   "gebiet_name": "Eitorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10289,7 +10289,7 @@
   "ags": "05382020",
   "ebene": "gemeinde",
   "gebiet_name": "Hennef (Sieg)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10350,7 +10350,7 @@
   "ags": "05382024",
   "ebene": "gemeinde",
   "gebiet_name": "Königswinter",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10411,7 +10411,7 @@
   "ags": "05382028",
   "ebene": "gemeinde",
   "gebiet_name": "Lohmar",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10472,7 +10472,7 @@
   "ags": "05382032",
   "ebene": "gemeinde",
   "gebiet_name": "Meckenheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10533,7 +10533,7 @@
   "ags": "05382036",
   "ebene": "gemeinde",
   "gebiet_name": "Much",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10593,7 +10593,7 @@
   "ags": "05382040",
   "ebene": "gemeinde",
   "gebiet_name": "Neunkirchen-Seelscheid",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10654,7 +10654,7 @@
   "ags": "05382044",
   "ebene": "gemeinde",
   "gebiet_name": "Niederkassel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10714,7 +10714,7 @@
   "ags": "05382048",
   "ebene": "gemeinde",
   "gebiet_name": "Rheinbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10776,7 +10776,7 @@
   "ags": "05382052",
   "ebene": "gemeinde",
   "gebiet_name": "Ruppichteroth",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10836,7 +10836,7 @@
   "ags": "05382056",
   "ebene": "gemeinde",
   "gebiet_name": "Sankt Augustin",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10898,7 +10898,7 @@
   "ags": "05382060",
   "ebene": "gemeinde",
   "gebiet_name": "Siegburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -10959,7 +10959,7 @@
   "ags": "05382064",
   "ebene": "gemeinde",
   "gebiet_name": "Swisttal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11020,7 +11020,7 @@
   "ags": "05382068",
   "ebene": "gemeinde",
   "gebiet_name": "Troisdorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11081,7 +11081,7 @@
   "ags": "05382072",
   "ebene": "gemeinde",
   "gebiet_name": "Wachtberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11141,7 +11141,7 @@
   "ags": "05382076",
   "ebene": "gemeinde",
   "gebiet_name": "Windeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11201,7 +11201,7 @@
   "ags": "05512000",
   "ebene": "gemeinde",
   "gebiet_name": "Bottrop",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11288,7 +11288,7 @@
   "ags": "05513000",
   "ebene": "gemeinde",
   "gebiet_name": "Gelsenkirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11377,7 +11377,7 @@
   "ags": "05515000",
   "ebene": "gemeinde",
   "gebiet_name": "Münster",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11448,7 +11448,7 @@
   "ags": "05554004",
   "ebene": "gemeinde",
   "gebiet_name": "Ahaus",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11509,7 +11509,7 @@
   "ags": "05554008",
   "ebene": "gemeinde",
   "gebiet_name": "Bocholt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11596,7 +11596,7 @@
   "ags": "05554012",
   "ebene": "gemeinde",
   "gebiet_name": "Borken",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11657,7 +11657,7 @@
   "ags": "05554016",
   "ebene": "gemeinde",
   "gebiet_name": "Gescher",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11716,7 +11716,7 @@
   "ags": "05554020",
   "ebene": "gemeinde",
   "gebiet_name": "Gronau (Westf.)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11777,7 +11777,7 @@
   "ags": "05554024",
   "ebene": "gemeinde",
   "gebiet_name": "Heek",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11837,7 +11837,7 @@
   "ags": "05554028",
   "ebene": "gemeinde",
   "gebiet_name": "Heiden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11896,7 +11896,7 @@
   "ags": "05554032",
   "ebene": "gemeinde",
   "gebiet_name": "Isselburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -11955,7 +11955,7 @@
   "ags": "05554036",
   "ebene": "gemeinde",
   "gebiet_name": "Legden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12015,7 +12015,7 @@
   "ags": "05554040",
   "ebene": "gemeinde",
   "gebiet_name": "Raesfeld",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12075,7 +12075,7 @@
   "ags": "05554044",
   "ebene": "gemeinde",
   "gebiet_name": "Reken",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12135,7 +12135,7 @@
   "ags": "05554048",
   "ebene": "gemeinde",
   "gebiet_name": "Rhede",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12196,7 +12196,7 @@
   "ags": "05554052",
   "ebene": "gemeinde",
   "gebiet_name": "Schöppingen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12255,7 +12255,7 @@
   "ags": "05554056",
   "ebene": "gemeinde",
   "gebiet_name": "Stadtlohn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12315,7 +12315,7 @@
   "ags": "05554060",
   "ebene": "gemeinde",
   "gebiet_name": "Südlohn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12374,7 +12374,7 @@
   "ags": "05554064",
   "ebene": "gemeinde",
   "gebiet_name": "Velen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12433,7 +12433,7 @@
   "ags": "05554068",
   "ebene": "gemeinde",
   "gebiet_name": "Vreden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12494,7 +12494,7 @@
   "ags": "05558004",
   "ebene": "gemeinde",
   "gebiet_name": "Ascheberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12554,7 +12554,7 @@
   "ags": "05558008",
   "ebene": "gemeinde",
   "gebiet_name": "Billerbeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12614,7 +12614,7 @@
   "ags": "05558012",
   "ebene": "gemeinde",
   "gebiet_name": "Coesfeld",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12676,7 +12676,7 @@
   "ags": "05558016",
   "ebene": "gemeinde",
   "gebiet_name": "Dülmen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12738,7 +12738,7 @@
   "ags": "05558020",
   "ebene": "gemeinde",
   "gebiet_name": "Havixbeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12800,7 +12800,7 @@
   "ags": "05558024",
   "ebene": "gemeinde",
   "gebiet_name": "Lüdinghausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12862,7 +12862,7 @@
   "ags": "05558028",
   "ebene": "gemeinde",
   "gebiet_name": "Nordkirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12922,7 +12922,7 @@
   "ags": "05558032",
   "ebene": "gemeinde",
   "gebiet_name": "Nottuln",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -12982,7 +12982,7 @@
   "ags": "05558036",
   "ebene": "gemeinde",
   "gebiet_name": "Olfen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13042,7 +13042,7 @@
   "ags": "05558040",
   "ebene": "gemeinde",
   "gebiet_name": "Rosendahl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13102,7 +13102,7 @@
   "ags": "05558044",
   "ebene": "gemeinde",
   "gebiet_name": "Senden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13162,7 +13162,7 @@
   "ags": "05562004",
   "ebene": "gemeinde",
   "gebiet_name": "Castrop-Rauxel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13233,7 +13233,7 @@
   "ags": "05562008",
   "ebene": "gemeinde",
   "gebiet_name": "Datteln",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13304,7 +13304,7 @@
   "ags": "05562012",
   "ebene": "gemeinde",
   "gebiet_name": "Dorsten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13391,7 +13391,7 @@
   "ags": "05562014",
   "ebene": "gemeinde",
   "gebiet_name": "Gladbeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13478,7 +13478,7 @@
   "ags": "05562016",
   "ebene": "gemeinde",
   "gebiet_name": "Haltern am See",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13548,7 +13548,7 @@
   "ags": "05562020",
   "ebene": "gemeinde",
   "gebiet_name": "Herten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13619,7 +13619,7 @@
   "ags": "05562024",
   "ebene": "gemeinde",
   "gebiet_name": "Marl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13706,7 +13706,7 @@
   "ags": "05562028",
   "ebene": "gemeinde",
   "gebiet_name": "Oer-Erkenschwick",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13776,7 +13776,7 @@
   "ags": "05562032",
   "ebene": "gemeinde",
   "gebiet_name": "Recklinghausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13865,7 +13865,7 @@
   "ags": "05562036",
   "ebene": "gemeinde",
   "gebiet_name": "Waltrop",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13936,7 +13936,7 @@
   "ags": "05566004",
   "ebene": "gemeinde",
   "gebiet_name": "Altenberge",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -13995,7 +13995,7 @@
   "ags": "05566008",
   "ebene": "gemeinde",
   "gebiet_name": "Emsdetten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14055,7 +14055,7 @@
   "ags": "05566012",
   "ebene": "gemeinde",
   "gebiet_name": "Greven",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14115,7 +14115,7 @@
   "ags": "05566016",
   "ebene": "gemeinde",
   "gebiet_name": "Hörstel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14173,7 +14173,7 @@
   "ags": "05566020",
   "ebene": "gemeinde",
   "gebiet_name": "Hopsten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14231,7 +14231,7 @@
   "ags": "05566024",
   "ebene": "gemeinde",
   "gebiet_name": "Horstmar",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14289,7 +14289,7 @@
   "ags": "05566028",
   "ebene": "gemeinde",
   "gebiet_name": "Ibbenbüren",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14349,7 +14349,7 @@
   "ags": "05566032",
   "ebene": "gemeinde",
   "gebiet_name": "Ladbergen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14408,7 +14408,7 @@
   "ags": "05566036",
   "ebene": "gemeinde",
   "gebiet_name": "Laer",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14466,7 +14466,7 @@
   "ags": "05566040",
   "ebene": "gemeinde",
   "gebiet_name": "Lengerich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14526,7 +14526,7 @@
   "ags": "05566044",
   "ebene": "gemeinde",
   "gebiet_name": "Lienen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14584,7 +14584,7 @@
   "ags": "05566048",
   "ebene": "gemeinde",
   "gebiet_name": "Lotte",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14642,7 +14642,7 @@
   "ags": "05566052",
   "ebene": "gemeinde",
   "gebiet_name": "Metelen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14700,7 +14700,7 @@
   "ags": "05566056",
   "ebene": "gemeinde",
   "gebiet_name": "Mettingen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14758,7 +14758,7 @@
   "ags": "05566060",
   "ebene": "gemeinde",
   "gebiet_name": "Neuenkirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14816,7 +14816,7 @@
   "ags": "05566064",
   "ebene": "gemeinde",
   "gebiet_name": "Nordwalde",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14874,7 +14874,7 @@
   "ags": "05566068",
   "ebene": "gemeinde",
   "gebiet_name": "Ochtrup",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14934,7 +14934,7 @@
   "ags": "05566072",
   "ebene": "gemeinde",
   "gebiet_name": "Recke",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -14992,7 +14992,7 @@
   "ags": "05566076",
   "ebene": "gemeinde",
   "gebiet_name": "Rheine",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15052,7 +15052,7 @@
   "ags": "05566080",
   "ebene": "gemeinde",
   "gebiet_name": "Saerbeck",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15111,7 +15111,7 @@
   "ags": "05566084",
   "ebene": "gemeinde",
   "gebiet_name": "Steinfurt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15170,7 +15170,7 @@
   "ags": "05566088",
   "ebene": "gemeinde",
   "gebiet_name": "Tecklenburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15222,7 +15222,7 @@
   "ags": "05566092",
   "ebene": "gemeinde",
   "gebiet_name": "Westerkappeln",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15280,7 +15280,7 @@
   "ags": "05566096",
   "ebene": "gemeinde",
   "gebiet_name": "Wettringen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15338,7 +15338,7 @@
   "ags": "05570004",
   "ebene": "gemeinde",
   "gebiet_name": "Ahlen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15391,7 +15391,7 @@
   "ags": "05570008",
   "ebene": "gemeinde",
   "gebiet_name": "Beckum",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15444,7 +15444,7 @@
   "ags": "05570012",
   "ebene": "gemeinde",
   "gebiet_name": "Beelen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15497,7 +15497,7 @@
   "ags": "05570016",
   "ebene": "gemeinde",
   "gebiet_name": "Drensteinfurt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15550,7 +15550,7 @@
   "ags": "05570020",
   "ebene": "gemeinde",
   "gebiet_name": "Ennigerloh",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15603,7 +15603,7 @@
   "ags": "05570024",
   "ebene": "gemeinde",
   "gebiet_name": "Everswinkel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15655,7 +15655,7 @@
   "ags": "05570028",
   "ebene": "gemeinde",
   "gebiet_name": "Oelde",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15708,7 +15708,7 @@
   "ags": "05570032",
   "ebene": "gemeinde",
   "gebiet_name": "Ostbevern",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15761,7 +15761,7 @@
   "ags": "05570036",
   "ebene": "gemeinde",
   "gebiet_name": "Sassenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15814,7 +15814,7 @@
   "ags": "05570040",
   "ebene": "gemeinde",
   "gebiet_name": "Sendenhorst",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15867,7 +15867,7 @@
   "ags": "05570044",
   "ebene": "gemeinde",
   "gebiet_name": "Telgte",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15920,7 +15920,7 @@
   "ags": "05570048",
   "ebene": "gemeinde",
   "gebiet_name": "Wadersloh",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -15973,7 +15973,7 @@
   "ags": "05570052",
   "ebene": "gemeinde",
   "gebiet_name": "Warendorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16026,7 +16026,7 @@
   "ags": "05711000",
   "ebene": "gemeinde",
   "gebiet_name": "Bielefeld",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16095,7 +16095,7 @@
   "ags": "05754004",
   "ebene": "gemeinde",
   "gebiet_name": "Borgholzhausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16155,7 +16155,7 @@
   "ags": "05754008",
   "ebene": "gemeinde",
   "gebiet_name": "Gütersloh",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16217,7 +16217,7 @@
   "ags": "05754012",
   "ebene": "gemeinde",
   "gebiet_name": "Halle (Westf.)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16277,7 +16277,7 @@
   "ags": "05754016",
   "ebene": "gemeinde",
   "gebiet_name": "Harsewinkel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16337,7 +16337,7 @@
   "ags": "05754020",
   "ebene": "gemeinde",
   "gebiet_name": "Herzebrock-Clarholz",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16397,7 +16397,7 @@
   "ags": "05754024",
   "ebene": "gemeinde",
   "gebiet_name": "Langenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16457,7 +16457,7 @@
   "ags": "05754028",
   "ebene": "gemeinde",
   "gebiet_name": "Rheda-Wiedenbrück",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16517,7 +16517,7 @@
   "ags": "05754032",
   "ebene": "gemeinde",
   "gebiet_name": "Rietberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16577,7 +16577,7 @@
   "ags": "05754036",
   "ebene": "gemeinde",
   "gebiet_name": "Schloß Holte-Stukenbrock",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16637,7 +16637,7 @@
   "ags": "05754040",
   "ebene": "gemeinde",
   "gebiet_name": "Steinhagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16697,7 +16697,7 @@
   "ags": "05754044",
   "ebene": "gemeinde",
   "gebiet_name": "Verl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16757,7 +16757,7 @@
   "ags": "05754048",
   "ebene": "gemeinde",
   "gebiet_name": "Versmold",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16817,7 +16817,7 @@
   "ags": "05754052",
   "ebene": "gemeinde",
   "gebiet_name": "Werther (Westf.)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16877,7 +16877,7 @@
   "ags": "05758004",
   "ebene": "gemeinde",
   "gebiet_name": "Bünde",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16937,7 +16937,7 @@
   "ags": "05758008",
   "ebene": "gemeinde",
   "gebiet_name": "Enger",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -16997,7 +16997,7 @@
   "ags": "05758012",
   "ebene": "gemeinde",
   "gebiet_name": "Herford",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17057,7 +17057,7 @@
   "ags": "05758016",
   "ebene": "gemeinde",
   "gebiet_name": "Hiddenhausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17117,7 +17117,7 @@
   "ags": "05758020",
   "ebene": "gemeinde",
   "gebiet_name": "Kirchlengern",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17177,7 +17177,7 @@
   "ags": "05758024",
   "ebene": "gemeinde",
   "gebiet_name": "Löhne",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17237,7 +17237,7 @@
   "ags": "05758028",
   "ebene": "gemeinde",
   "gebiet_name": "Rödinghausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17297,7 +17297,7 @@
   "ags": "05758032",
   "ebene": "gemeinde",
   "gebiet_name": "Spenge",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17357,7 +17357,7 @@
   "ags": "05758036",
   "ebene": "gemeinde",
   "gebiet_name": "Vlotho",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17417,7 +17417,7 @@
   "ags": "05762004",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Driburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17504,7 +17504,7 @@
   "ags": "05762008",
   "ebene": "gemeinde",
   "gebiet_name": "Beverungen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17591,7 +17591,7 @@
   "ags": "05762012",
   "ebene": "gemeinde",
   "gebiet_name": "Borgentreich",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17676,7 +17676,7 @@
   "ags": "05762016",
   "ebene": "gemeinde",
   "gebiet_name": "Brakel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17763,7 +17763,7 @@
   "ags": "05762020",
   "ebene": "gemeinde",
   "gebiet_name": "Höxter",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17850,7 +17850,7 @@
   "ags": "05762024",
   "ebene": "gemeinde",
   "gebiet_name": "Marienmünster",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -17935,7 +17935,7 @@
   "ags": "05762028",
   "ebene": "gemeinde",
   "gebiet_name": "Nieheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18020,7 +18020,7 @@
   "ags": "05762032",
   "ebene": "gemeinde",
   "gebiet_name": "Steinheim",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18107,7 +18107,7 @@
   "ags": "05762036",
   "ebene": "gemeinde",
   "gebiet_name": "Warburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18194,7 +18194,7 @@
   "ags": "05762040",
   "ebene": "gemeinde",
   "gebiet_name": "Willebadessen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18279,7 +18279,7 @@
   "ags": "05766004",
   "ebene": "gemeinde",
   "gebiet_name": "Augustdorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18350,7 +18350,7 @@
   "ags": "05766008",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Salzuflen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18417,7 +18417,7 @@
   "ags": "05766012",
   "ebene": "gemeinde",
   "gebiet_name": "Barntrup",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18488,7 +18488,7 @@
   "ags": "05766016",
   "ebene": "gemeinde",
   "gebiet_name": "Blomberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18549,7 +18549,7 @@
   "ags": "05766020",
   "ebene": "gemeinde",
   "gebiet_name": "Detmold",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18610,7 +18610,7 @@
   "ags": "05766024",
   "ebene": "gemeinde",
   "gebiet_name": "Dörentrup",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18681,7 +18681,7 @@
   "ags": "05766028",
   "ebene": "gemeinde",
   "gebiet_name": "Extertal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18740,7 +18740,7 @@
   "ags": "05766032",
   "ebene": "gemeinde",
   "gebiet_name": "Horn-Bad Meinberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18801,7 +18801,7 @@
   "ags": "05766036",
   "ebene": "gemeinde",
   "gebiet_name": "Kalletal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18862,7 +18862,7 @@
   "ags": "05766040",
   "ebene": "gemeinde",
   "gebiet_name": "Lage",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18923,7 +18923,7 @@
   "ags": "05766044",
   "ebene": "gemeinde",
   "gebiet_name": "Lemgo",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -18994,7 +18994,7 @@
   "ags": "05766048",
   "ebene": "gemeinde",
   "gebiet_name": "Leopoldshöhe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19065,7 +19065,7 @@
   "ags": "05766052",
   "ebene": "gemeinde",
   "gebiet_name": "Lügde",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19133,7 +19133,7 @@
   "ags": "05766056",
   "ebene": "gemeinde",
   "gebiet_name": "Oerlinghausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19203,7 +19203,7 @@
   "ags": "05766060",
   "ebene": "gemeinde",
   "gebiet_name": "Schieder-Schwalenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19271,7 +19271,7 @@
   "ags": "05766064",
   "ebene": "gemeinde",
   "gebiet_name": "Schlangen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19331,7 +19331,7 @@
   "ags": "05770004",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Oeynhausen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19392,7 +19392,7 @@
   "ags": "05770008",
   "ebene": "gemeinde",
   "gebiet_name": "Espelkamp",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19453,7 +19453,7 @@
   "ags": "05770012",
   "ebene": "gemeinde",
   "gebiet_name": "Hille",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19514,7 +19514,7 @@
   "ags": "05770016",
   "ebene": "gemeinde",
   "gebiet_name": "Hüllhorst",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19574,7 +19574,7 @@
   "ags": "05770020",
   "ebene": "gemeinde",
   "gebiet_name": "Lübbecke",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19635,7 +19635,7 @@
   "ags": "05770024",
   "ebene": "gemeinde",
   "gebiet_name": "Minden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19715,7 +19715,7 @@
   "ags": "05770028",
   "ebene": "gemeinde",
   "gebiet_name": "Petershagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19776,7 +19776,7 @@
   "ags": "05770032",
   "ebene": "gemeinde",
   "gebiet_name": "Porta Westfalica",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19837,7 +19837,7 @@
   "ags": "05770036",
   "ebene": "gemeinde",
   "gebiet_name": "Preußisch Oldendorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19898,7 +19898,7 @@
   "ags": "05770040",
   "ebene": "gemeinde",
   "gebiet_name": "Rahden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -19959,7 +19959,7 @@
   "ags": "05770044",
   "ebene": "gemeinde",
   "gebiet_name": "Stemwede",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20019,7 +20019,7 @@
   "ags": "05774004",
   "ebene": "gemeinde",
   "gebiet_name": "Altenbeken",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20079,7 +20079,7 @@
   "ags": "05774008",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Lippspringe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20141,7 +20141,7 @@
   "ags": "05774012",
   "ebene": "gemeinde",
   "gebiet_name": "Borchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20202,7 +20202,7 @@
   "ags": "05774016",
   "ebene": "gemeinde",
   "gebiet_name": "Büren",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20264,7 +20264,7 @@
   "ags": "05774020",
   "ebene": "gemeinde",
   "gebiet_name": "Delbrück",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20326,7 +20326,7 @@
   "ags": "05774024",
   "ebene": "gemeinde",
   "gebiet_name": "Hövelhof",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20388,7 +20388,7 @@
   "ags": "05774028",
   "ebene": "gemeinde",
   "gebiet_name": "Lichtenau",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20447,7 +20447,7 @@
   "ags": "05774032",
   "ebene": "gemeinde",
   "gebiet_name": "Paderborn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20527,7 +20527,7 @@
   "ags": "05774036",
   "ebene": "gemeinde",
   "gebiet_name": "Salzkotten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20589,7 +20589,7 @@
   "ags": "05774040",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Wünnenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20650,7 +20650,7 @@
   "ags": "05911000",
   "ebene": "gemeinde",
   "gebiet_name": "Bochum",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20739,7 +20739,7 @@
   "ags": "05913000",
   "ebene": "gemeinde",
   "gebiet_name": "Dortmund",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20828,7 +20828,7 @@
   "ags": "05914000",
   "ebene": "gemeinde",
   "gebiet_name": "Hagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20917,7 +20917,7 @@
   "ags": "05915000",
   "ebene": "gemeinde",
   "gebiet_name": "Hamm",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -20988,7 +20988,7 @@
   "ags": "05916000",
   "ebene": "gemeinde",
   "gebiet_name": "Herne",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21076,7 +21076,7 @@
   "ags": "05954000",
   "ebene": "gemeinde",
   "gebiet_name": "Ennepe-Ruhr-Kreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21165,7 +21165,7 @@
   "ags": "05954004",
   "ebene": "gemeinde",
   "gebiet_name": "Breckerfeld",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21248,7 +21248,7 @@
   "ags": "05954008",
   "ebene": "gemeinde",
   "gebiet_name": "Ennepetal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21333,7 +21333,7 @@
   "ags": "05954012",
   "ebene": "gemeinde",
   "gebiet_name": "Gevelsberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21422,7 +21422,7 @@
   "ags": "05954016",
   "ebene": "gemeinde",
   "gebiet_name": "Hattingen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21509,7 +21509,7 @@
   "ags": "05954020",
   "ebene": "gemeinde",
   "gebiet_name": "Herdecke",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21595,7 +21595,7 @@
   "ags": "05954024",
   "ebene": "gemeinde",
   "gebiet_name": "Schwelm",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21679,7 +21679,7 @@
   "ags": "05954028",
   "ebene": "gemeinde",
   "gebiet_name": "Sprockhövel",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21765,7 +21765,7 @@
   "ags": "05954032",
   "ebene": "gemeinde",
   "gebiet_name": "Wetter (Ruhr)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21852,7 +21852,7 @@
   "ags": "05954036",
   "ebene": "gemeinde",
   "gebiet_name": "Witten",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -21940,7 +21940,7 @@
   "ags": "05958000",
   "ebene": "gemeinde",
   "gebiet_name": "Hochsauerlandkreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22010,7 +22010,7 @@
   "ags": "05958004",
   "ebene": "gemeinde",
   "gebiet_name": "Arnsberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22090,7 +22090,7 @@
   "ags": "05958008",
   "ebene": "gemeinde",
   "gebiet_name": "Bestwig",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22152,7 +22152,7 @@
   "ags": "05958012",
   "ebene": "gemeinde",
   "gebiet_name": "Brilon",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22214,7 +22214,7 @@
   "ags": "05958016",
   "ebene": "gemeinde",
   "gebiet_name": "Eslohe (Sauerland)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22276,7 +22276,7 @@
   "ags": "05958020",
   "ebene": "gemeinde",
   "gebiet_name": "Hallenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22336,7 +22336,7 @@
   "ags": "05958024",
   "ebene": "gemeinde",
   "gebiet_name": "Marsberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22398,7 +22398,7 @@
   "ags": "05958028",
   "ebene": "gemeinde",
   "gebiet_name": "Medebach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22459,7 +22459,7 @@
   "ags": "05958032",
   "ebene": "gemeinde",
   "gebiet_name": "Meschede",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22521,7 +22521,7 @@
   "ags": "05958036",
   "ebene": "gemeinde",
   "gebiet_name": "Olsberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22583,7 +22583,7 @@
   "ags": "05958040",
   "ebene": "gemeinde",
   "gebiet_name": "Schmallenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22645,7 +22645,7 @@
   "ags": "05958044",
   "ebene": "gemeinde",
   "gebiet_name": "Sundern (Sauerland)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22707,7 +22707,7 @@
   "ags": "05958048",
   "ebene": "gemeinde",
   "gebiet_name": "Winterberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22768,7 +22768,7 @@
   "ags": "05962000",
   "ebene": "gemeinde",
   "gebiet_name": "Märkischer Kreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22837,7 +22837,7 @@
   "ags": "05962004",
   "ebene": "gemeinde",
   "gebiet_name": "Altena",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22905,7 +22905,7 @@
   "ags": "05962008",
   "ebene": "gemeinde",
   "gebiet_name": "Balve",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -22964,7 +22964,7 @@
   "ags": "05962012",
   "ebene": "gemeinde",
   "gebiet_name": "Halver",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23031,7 +23031,7 @@
   "ags": "05962016",
   "ebene": "gemeinde",
   "gebiet_name": "Hemer",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23100,7 +23100,7 @@
   "ags": "05962020",
   "ebene": "gemeinde",
   "gebiet_name": "Herscheid",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23166,7 +23166,7 @@
   "ags": "05962024",
   "ebene": "gemeinde",
   "gebiet_name": "Iserlohn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23237,7 +23237,7 @@
   "ags": "05962028",
   "ebene": "gemeinde",
   "gebiet_name": "Kierspe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23304,7 +23304,7 @@
   "ags": "05962032",
   "ebene": "gemeinde",
   "gebiet_name": "Lüdenscheid",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23374,7 +23374,7 @@
   "ags": "05962036",
   "ebene": "gemeinde",
   "gebiet_name": "Meinerzhagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23441,7 +23441,7 @@
   "ags": "05962040",
   "ebene": "gemeinde",
   "gebiet_name": "Menden (Sauerland)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23509,7 +23509,7 @@
   "ags": "05962044",
   "ebene": "gemeinde",
   "gebiet_name": "Nachrodt-Wiblingwerde",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23576,7 +23576,7 @@
   "ags": "05962048",
   "ebene": "gemeinde",
   "gebiet_name": "Neuenrade",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23643,7 +23643,7 @@
   "ags": "05962052",
   "ebene": "gemeinde",
   "gebiet_name": "Plettenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23711,7 +23711,7 @@
   "ags": "05962056",
   "ebene": "gemeinde",
   "gebiet_name": "Schalksmühle",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23779,7 +23779,7 @@
   "ags": "05962060",
   "ebene": "gemeinde",
   "gebiet_name": "Werdohl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23846,7 +23846,7 @@
   "ags": "05966000",
   "ebene": "gemeinde",
   "gebiet_name": "Olpe, Kreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23906,7 +23906,7 @@
   "ags": "05966004",
   "ebene": "gemeinde",
   "gebiet_name": "Attendorn",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -23966,7 +23966,7 @@
   "ags": "05966008",
   "ebene": "gemeinde",
   "gebiet_name": "Drolshagen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24027,7 +24027,7 @@
   "ags": "05966012",
   "ebene": "gemeinde",
   "gebiet_name": "Finnentrop",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24081,7 +24081,7 @@
   "ags": "05966016",
   "ebene": "gemeinde",
   "gebiet_name": "Kirchhundem",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24132,7 +24132,7 @@
   "ags": "05966020",
   "ebene": "gemeinde",
   "gebiet_name": "Lennestadt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24186,7 +24186,7 @@
   "ags": "05966024",
   "ebene": "gemeinde",
   "gebiet_name": "Olpe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24245,7 +24245,7 @@
   "ags": "05966028",
   "ebene": "gemeinde",
   "gebiet_name": "Wenden",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24298,7 +24298,7 @@
   "ags": "05970000",
   "ebene": "gemeinde",
   "gebiet_name": "Siegen-Wittgenstein, Kreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24360,7 +24360,7 @@
   "ags": "05970004",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Berleburg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24422,7 +24422,7 @@
   "ags": "05970008",
   "ebene": "gemeinde",
   "gebiet_name": "Burbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24484,7 +24484,7 @@
   "ags": "05970012",
   "ebene": "gemeinde",
   "gebiet_name": "Erndtebrück",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24546,7 +24546,7 @@
   "ags": "05970016",
   "ebene": "gemeinde",
   "gebiet_name": "Freudenberg",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24608,7 +24608,7 @@
   "ags": "05970020",
   "ebene": "gemeinde",
   "gebiet_name": "Hilchenbach",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24669,7 +24669,7 @@
   "ags": "05970024",
   "ebene": "gemeinde",
   "gebiet_name": "Kreuztal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24731,7 +24731,7 @@
   "ags": "05970028",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Laasphe",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24793,7 +24793,7 @@
   "ags": "05970032",
   "ebene": "gemeinde",
   "gebiet_name": "Netphen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24855,7 +24855,7 @@
   "ags": "05970036",
   "ebene": "gemeinde",
   "gebiet_name": "Neunkirchen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -24917,7 +24917,7 @@
   "ags": "05970040",
   "ebene": "gemeinde",
   "gebiet_name": "Siegen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25006,7 +25006,7 @@
   "ags": "05970044",
   "ebene": "gemeinde",
   "gebiet_name": "Wilnsdorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25068,7 +25068,7 @@
   "ags": "05974000",
   "ebene": "gemeinde",
   "gebiet_name": "Soest, Kreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25130,7 +25130,7 @@
   "ags": "05974004",
   "ebene": "gemeinde",
   "gebiet_name": "Anröchte",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25191,7 +25191,7 @@
   "ags": "05974008",
   "ebene": "gemeinde",
   "gebiet_name": "Bad Sassendorf",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25251,7 +25251,7 @@
   "ags": "05974012",
   "ebene": "gemeinde",
   "gebiet_name": "Ense",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25313,7 +25313,7 @@
   "ags": "05974016",
   "ebene": "gemeinde",
   "gebiet_name": "Erwitte",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25375,7 +25375,7 @@
   "ags": "05974020",
   "ebene": "gemeinde",
   "gebiet_name": "Geseke",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25437,7 +25437,7 @@
   "ags": "05974024",
   "ebene": "gemeinde",
   "gebiet_name": "Lippetal",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25498,7 +25498,7 @@
   "ags": "05974028",
   "ebene": "gemeinde",
   "gebiet_name": "Lippstadt",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25560,7 +25560,7 @@
   "ags": "05974032",
   "ebene": "gemeinde",
   "gebiet_name": "Möhnesee",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25620,7 +25620,7 @@
   "ags": "05974036",
   "ebene": "gemeinde",
   "gebiet_name": "Rüthen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25681,7 +25681,7 @@
   "ags": "05974040",
   "ebene": "gemeinde",
   "gebiet_name": "Soest",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25742,7 +25742,7 @@
   "ags": "05974044",
   "ebene": "gemeinde",
   "gebiet_name": "Warstein",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25804,7 +25804,7 @@
   "ags": "05974048",
   "ebene": "gemeinde",
   "gebiet_name": "Welver",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25864,7 +25864,7 @@
   "ags": "05974052",
   "ebene": "gemeinde",
   "gebiet_name": "Werl",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25926,7 +25926,7 @@
   "ags": "05974056",
   "ebene": "gemeinde",
   "gebiet_name": "Wickede (Ruhr)",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -25987,7 +25987,7 @@
   "ags": "05978000",
   "ebene": "gemeinde",
   "gebiet_name": "Unna, Kreis",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26049,7 +26049,7 @@
   "ags": "05978004",
   "ebene": "gemeinde",
   "gebiet_name": "Bergkamen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26111,7 +26111,7 @@
   "ags": "05978008",
   "ebene": "gemeinde",
   "gebiet_name": "Bönen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26172,7 +26172,7 @@
   "ags": "05978012",
   "ebene": "gemeinde",
   "gebiet_name": "Fröndenberg/Ruhr",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26232,7 +26232,7 @@
   "ags": "05978016",
   "ebene": "gemeinde",
   "gebiet_name": "Holzwickede",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26294,7 +26294,7 @@
   "ags": "05978020",
   "ebene": "gemeinde",
   "gebiet_name": "Kamen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26356,7 +26356,7 @@
   "ags": "05978024",
   "ebene": "gemeinde",
   "gebiet_name": "Lünen",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26418,7 +26418,7 @@
   "ags": "05978028",
   "ebene": "gemeinde",
   "gebiet_name": "Schwerte",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26480,7 +26480,7 @@
   "ags": "05978032",
   "ebene": "gemeinde",
   "gebiet_name": "Selm",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26542,7 +26542,7 @@
   "ags": "05978036",
   "ebene": "gemeinde",
   "gebiet_name": "Unna",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {
@@ -26604,7 +26604,7 @@
   "ags": "05978040",
   "ebene": "gemeinde",
   "gebiet_name": "Werne",
-  "gaa_name": null,
+  "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen",
   "kennzahl": "bodenpreisniveau",
   "zweig": "alle",
   "formel": {

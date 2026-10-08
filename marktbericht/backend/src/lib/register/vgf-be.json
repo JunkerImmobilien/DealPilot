@@ -11,8 +11,6 @@
    "form": "entscheidungsbaum",
    "liefert": "wert_eur",
    "einheit": "EUR/m² Wohnfläche",
-   "wert": null,
-   "warum_kein_wert": "SPERRE MIT WEG, NICHT FEHLENDE ERNTE. Die Berliner Vergleichsfaktoren für Wohnungseigentum sind KEINE Tabelle und keine Formel, sondern NEUN GEZEICHNETE ENTSCHEIDUNGSBÄUME (Startbaum plus acht Bezirksbäume, Abbildungen 1 bis 9). Der anzuwendende Faktor ist der Wert des ENDKNOTENS, den der Objektpfad erreicht — das Blatt führt es selbst so vor („3. Vergleichsfaktor: Endknoten 3 ‚bezugsfrei' = 5.369 EUR/m² Wohnfläche\").\n\nAlle Endknotenwerte stehen in diesem Satz und sind nachgeprüft (siehe stufe_grund). Was NICHT maschinell belegt ist, ist die TOPOLOGIE: welche Split-Schwelle zu welchem Endknoten führt. Die Bäume sind Vektorgrafiken, deren Verbinder von deckenden Beschriftungsfeldern zerschnitten sind; drei verschiedene Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Das ist Tuning, keine Messung — deshalb steht hier kein geratener Pfad.\n\nWEG ZUM ECHTEN WERT: Altbezirk bestimmen (Zuordnung steht in kategorie_zuordnung dieses Satzes, gegen die Altbezirkstabelle des Blattes geprüft), dann im zugehörigen Bezirksbaum auf Seite (siehe baeume[*].seite_im_blatt) des amtlichen PDF den Pfad ablesen und den Endknoten aus endknoten[] nehmen. Das PDF ist frei abrufbar: https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf\n\nAUFLÖSBAR wird der Satz, sobald die Baumseiten gerastert gelesen werden können (poppler/pdftoppm oder Ghostscript waren am 08.10.2026 auf dem Arbeitsplatz nicht vorhanden). Die Ernte muss dafür NICHT wiederholt werden.",
    "achse_k_feld": "bezirksbaum",
    "achse_k_bez": "Bezirksbaum nach Altbezirk (Stand vor der Verwaltungsreform 2001)",
    "kategorien": [
@@ -139,7 +137,331 @@
        "fallzahl_bezugsfrei": 100,
        "fallzahl_vermietet": 60
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 7,
+      "kanten": 14,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1460,
+        "mittel_eur_qm_wohnflaeche": 4493,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "e2",
+          "baujahr_klassen": [
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 1296,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1.500-7.999",
+           ">=8.000 2)"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e3",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 1500,
+            "bis": 7999,
+            "text": "1.500-7.999"
+           },
+           {
+            "op": "ab",
+            "von": 8000,
+            "text": ">=8.000 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<375 2)",
+           "375-1.499"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k3",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 375,
+            "text": "<375 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 375,
+            "bis": 1499,
+            "text": "375-1.499"
+           }
+          ]
+         }
+        ]
+       },
+       "e3": {
+        "art": "endknoten",
+        "knotennummer": "3"
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 820,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=1918",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k5",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "1919-1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "k4",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         }
+        ]
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Wohnfläche in m²",
+        "feld": "wohnflaeche_qm",
+        "fallzahl": 424,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<40",
+           "90-169"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "e7",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 40,
+            "text": "<40"
+           },
+           {
+            "op": "spanne",
+            "von": 90,
+            "bis": 169,
+            "text": "90-169"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "40-89",
+           ">=170"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k7",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 40,
+            "bis": 89,
+            "text": "40-89"
+           },
+           {
+            "op": "ab",
+            "von": 170,
+            "text": ">=170"
+           }
+          ]
+         }
+        ]
+       },
+       "e7": {
+        "art": "endknoten",
+        "knotennummer": "7"
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 320,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "750-999"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e11",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 750,
+            "bis": 999,
+            "text": "750-999"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<375 2)",
+           "375-749",
+           "1.000-1.499"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e12",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 375,
+            "text": "<375 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 375,
+            "bis": 749,
+            "text": "375-749"
+           },
+           {
+            "op": "spanne",
+            "von": 1000,
+            "bis": 1499,
+            "text": "1.000-1.499"
+           }
+          ]
+         }
+        ]
+       },
+       "e11": {
+        "art": "endknoten",
+        "knotennummer": "11"
+       },
+       "e12": {
+        "art": "endknoten",
+        "knotennummer": "12"
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 396,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Wedding",
+           "Neukölln",
+           "Pankow"
+          ],
+          "feld": "altbezirk",
+          "ziel": "k6",
+          "kategorien": [
+           "Wedding",
+           "Neukölln",
+           "Pankow"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Köpenick"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e10",
+          "kategorien": [
+           "Köpenick"
+          ]
+         }
+        ]
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 308,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Neukölln"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e13",
+          "kategorien": [
+           "Neukölln"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Wedding",
+           "Pankow"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e14",
+          "kategorien": [
+           "Wedding",
+           "Pankow"
+          ]
+         }
+        ]
+       },
+       "e13": {
+        "art": "endknoten",
+        "knotennummer": "13"
+       },
+       "e14": {
+        "art": "endknoten",
+        "knotennummer": "14"
+       },
+       "e10": {
+        "art": "endknoten",
+        "knotennummer": "10"
+       },
+       "e2": {
+        "art": "endknoten",
+        "knotennummer": "2"
+       }
+      }
+     }
     },
     "I-2": {
      "altbezirke": [
@@ -232,7 +554,421 @@
        "fallzahl_bezugsfrei": 36,
        "fallzahl_vermietet": 22
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 10,
+      "kanten": 20,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1306,
+        "mittel_eur_qm_wohnflaeche": 4889,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "e2",
+          "baujahr_klassen": [
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 1134,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1.500-7.999",
+           ">=8.000 2)"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k3",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 1500,
+            "bis": 7999,
+            "text": "1.500-7.999"
+           },
+           {
+            "op": "ab",
+            "von": 8000,
+            "text": ">=8.000 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<375 2)",
+           "375-1.499"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k4",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 375,
+            "text": "<375 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 375,
+            "bis": 1499,
+            "text": "375-1.499"
+           }
+          ]
+         }
+        ]
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Aufzug",
+        "feld": "aufzug",
+        "fallzahl": 430,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "k5",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e6",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 318,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Zehlendorf",
+           "Lichtenberg"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e9",
+          "kategorien": [
+           "Zehlendorf",
+           "Lichtenberg"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Steglitz"
+          ],
+          "feld": "altbezirk",
+          "ziel": "k8",
+          "kategorien": [
+           "Steglitz"
+          ]
+         }
+        ]
+       },
+       "e9": {
+        "art": "endknoten",
+        "knotennummer": "9"
+       },
+       "k8": {
+        "art": "split",
+        "variable": "Stadträumliche Wohnlage",
+        "feld": "wohnlage_stadtraeumlich",
+        "fallzahl": 200,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "einfach",
+           "mittel"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "e15",
+          "kategorien": [
+           "einfach",
+           "mittel"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "gut",
+           "sehr gut 2)"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "e16",
+          "kategorien": [
+           "gut",
+           "sehr gut"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "e15": {
+        "art": "endknoten",
+        "knotennummer": "15"
+       },
+       "e16": {
+        "art": "endknoten",
+        "knotennummer": "16"
+       },
+       "e6": {
+        "art": "endknoten",
+        "knotennummer": "6"
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Stadträumliche Wohnlage",
+        "feld": "wohnlage_stadtraeumlich",
+        "fallzahl": 704,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "einfach",
+           "mittel"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "k7",
+          "kategorien": [
+           "einfach",
+           "mittel"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "gut",
+           "sehr gut 2)"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "k6",
+          "kategorien": [
+           "gut",
+           "sehr gut"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 513,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1900-1918",
+           "1973-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k9",
+          "baujahr_klassen": [
+           "1900_1918",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1919-1972"
+          ],
+          "feld": "baujahr",
+          "ziel": "k10",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1919_1948",
+           "1949_1972"
+          ]
+         }
+        ]
+       },
+       "k9": {
+        "art": "split",
+        "variable": "Geschosslage",
+        "feld": "geschosslage",
+        "fallzahl": 179,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Hochparterre",
+           "Obergeschoss"
+          ],
+          "feld": "geschosslage",
+          "ziel": "e17",
+          "kategorien": [
+           "Hochparterre",
+           "Obergeschoss"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Erdgeschoss",
+           "Souterrain",
+           "Tiefparterre"
+          ],
+          "feld": "geschosslage",
+          "ziel": "e18",
+          "kategorien": [
+           "Erdgeschoss",
+           "Souterrain",
+           "Tiefparterre"
+          ]
+         }
+        ]
+       },
+       "e17": {
+        "art": "endknoten",
+        "knotennummer": "17"
+       },
+       "e18": {
+        "art": "endknoten",
+        "knotennummer": "18"
+       },
+       "k10": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 334,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "750-1.499"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e19",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 750,
+            "bis": 1499,
+            "text": "750-1.499"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<500 2)",
+           "500-749"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e20",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 500,
+            "text": "<500 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 500,
+            "bis": 749,
+            "text": "500-749"
+           }
+          ]
+         }
+        ]
+       },
+       "e19": {
+        "art": "endknoten",
+        "knotennummer": "19"
+       },
+       "e20": {
+        "art": "endknoten",
+        "knotennummer": "20"
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 191,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1900-1948",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "e13",
+          "baujahr_klassen": [
+           "1900_1918",
+           "1919_1948",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1949-1972",
+           "1973-1990 Westteil",
+           "1973-1990 Ostteil 2)"
+          ],
+          "feld": "baujahr",
+          "ziel": "e14",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "e13": {
+        "art": "endknoten",
+        "knotennummer": "13"
+       },
+       "e14": {
+        "art": "endknoten",
+        "knotennummer": "14"
+       },
+       "e2": {
+        "art": "endknoten",
+        "knotennummer": "2"
+       }
+      }
+     }
     },
     "II-1": {
      "altbezirke": [
@@ -333,7 +1069,514 @@
        "fallzahl_bezugsfrei": 36,
        "fallzahl_vermietet": 2
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 11,
+      "kanten": 22,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 623,
+        "mittel_eur_qm_wohnflaeche": 3238,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "e2",
+          "baujahr_klassen": [
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 612,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "500-749",
+           "1.000-1.499"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k3",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 500,
+            "bis": 749,
+            "text": "500-749"
+           },
+           {
+            "op": "spanne",
+            "von": 1000,
+            "bis": 1499,
+            "text": "1.000-1.499"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<375 2)",
+           "375-499",
+           "750-999",
+           "1.500-7.999",
+           ">=8.000 2)"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k4",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 375,
+            "text": "<375 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 375,
+            "bis": 499,
+            "text": "375-499"
+           },
+           {
+            "op": "spanne",
+            "von": 750,
+            "bis": 999,
+            "text": "750-999"
+           },
+           {
+            "op": "spanne",
+            "von": 1500,
+            "bis": 7999,
+            "text": "1.500-7.999"
+           },
+           {
+            "op": "ab",
+            "von": 8000,
+            "text": ">=8.000 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         }
+        ]
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Wohnfläche",
+        "feld": "wohnflaeche_qm",
+        "fallzahl": 536,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "40-59"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k5",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 40,
+            "bis": 59,
+            "text": "40-59"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<40",
+           "60-169",
+           ">=170 2)"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k7",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 40,
+            "text": "<40"
+           },
+           {
+            "op": "spanne",
+            "von": 60,
+            "bis": 169,
+            "text": "60-169"
+           },
+           {
+            "op": "ab",
+            "von": 170,
+            "text": ">=170 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         }
+        ]
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 209,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1919-1972",
+           "1973-1990 Westteil"
+          ],
+          "feld": "baujahr",
+          "ziel": "k11",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1918",
+           "1973-1990 Ostteil",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k10",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         }
+        ]
+       },
+       "k11": {
+        "art": "split",
+        "variable": "Balkon",
+        "feld": "balkon",
+        "fallzahl": 150,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e15",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e16",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e15": {
+        "art": "endknoten",
+        "knotennummer": "15"
+       },
+       "e16": {
+        "art": "endknoten",
+        "knotennummer": "16"
+       },
+       "k10": {
+        "art": "split",
+        "variable": "Balkon",
+        "feld": "balkon",
+        "fallzahl": 59,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e17",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e18",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e17": {
+        "art": "endknoten",
+        "knotennummer": "17"
+       },
+       "e18": {
+        "art": "endknoten",
+        "knotennummer": "18"
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 327,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1900-1918",
+           "1973-1990 Westteil"
+          ],
+          "feld": "baujahr",
+          "ziel": "k8",
+          "baujahr_klassen": [
+           "1900_1918",
+           "1973_1990_westteil"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1919-1972",
+           "1973-1990 Ostteil",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k9",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         }
+        ]
+       },
+       "k8": {
+        "art": "split",
+        "variable": "Balkon",
+        "feld": "balkon",
+        "fallzahl": 46,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e19",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e20",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e19": {
+        "art": "endknoten",
+        "knotennummer": "19"
+       },
+       "e20": {
+        "art": "endknoten",
+        "knotennummer": "20"
+       },
+       "k9": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 281,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Spandau",
+           "Hellersdorf"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e21",
+          "kategorien": [
+           "Spandau",
+           "Hellersdorf"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Hohenschönhausen"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e22",
+          "kategorien": [
+           "Hohenschönhausen"
+          ]
+         }
+        ]
+       },
+       "e21": {
+        "art": "endknoten",
+        "knotennummer": "21"
+       },
+       "e22": {
+        "art": "endknoten",
+        "knotennummer": "22"
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 76,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1919-1972"
+          ],
+          "feld": "baujahr",
+          "ziel": "e7",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1949_1972"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1918",
+           "1973-1990 Westteil",
+           "1973-1990 Ostteil 2)",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k6",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "e7": {
+        "art": "endknoten",
+        "knotennummer": "7"
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 52,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<375 2)",
+           "375-499",
+           "500-749 2)"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e13",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 375,
+            "text": "<375 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 375,
+            "bis": 499,
+            "text": "375-499"
+           },
+           {
+            "op": "spanne",
+            "von": 500,
+            "bis": 749,
+            "text": "500-749 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "750-999",
+           "1.500-7.999",
+           ">=8.000 2)"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e14",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 750,
+            "bis": 999,
+            "text": "750-999"
+           },
+           {
+            "op": "spanne",
+            "von": 1500,
+            "bis": 7999,
+            "text": "1.500-7.999"
+           },
+           {
+            "op": "ab",
+            "von": 8000,
+            "text": ">=8.000 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         }
+        ]
+       },
+       "e13": {
+        "art": "endknoten",
+        "knotennummer": "13"
+       },
+       "e14": {
+        "art": "endknoten",
+        "knotennummer": "14"
+       },
+       "e2": {
+        "art": "endknoten",
+        "knotennummer": "2"
+       }
+      }
+     }
     },
     "II-2": {
      "altbezirke": [
@@ -406,7 +1649,293 @@
        "fallzahl_bezugsfrei": 289,
        "fallzahl_vermietet": 91
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 7,
+      "kanten": 14,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1424,
+        "mittel_eur_qm_wohnflaeche": 4022,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "e2",
+          "baujahr_klassen": [
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 1269,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "500-999"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k4",
+          "regeln": [
+           {
+            "op": "spanne",
+            "von": 500,
+            "bis": 999,
+            "text": "500-999"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<375 2)",
+           "375-499",
+           "1.000-7.999",
+           ">=8.000 2)"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k3",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 375,
+            "text": "<375 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 375,
+            "bis": 499,
+            "text": "375-499"
+           },
+           {
+            "op": "spanne",
+            "von": 1000,
+            "bis": 7999,
+            "text": "1.000-7.999"
+           },
+           {
+            "op": "ab",
+            "von": 8000,
+            "text": ">=8.000 2)",
+            "nur_steuerliche_empfehlung": true
+           }
+          ]
+         }
+        ]
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 971,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "e5",
+          "baujahr_klassen": [
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "k5",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         }
+        ]
+       },
+       "e5": {
+        "art": "endknoten",
+        "knotennummer": "5"
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Wohnungsart",
+        "feld": "wohnungsart",
+        "fallzahl": 864,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Etagenwohnung"
+          ],
+          "feld": "wohnungsart",
+          "ziel": "k7",
+          "kategorien": [
+           "Etagenwohnung"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Penthouse",
+           "Dachgeschoss",
+           "Loft, Terrassenwhg.,",
+           "Maisonette"
+          ],
+          "feld": "wohnungsart",
+          "ziel": "e10",
+          "kategorien": [
+           "Penthouse",
+           "Dachgeschoss",
+           "Loft",
+           "Terrassenwhg.",
+           "Maisonette"
+          ]
+         }
+        ]
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Balkon",
+        "feld": "balkon",
+        "fallzahl": 811,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e13",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e14",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e13": {
+        "art": "endknoten",
+        "knotennummer": "13"
+       },
+       "e14": {
+        "art": "endknoten",
+        "knotennummer": "14"
+       },
+       "e10": {
+        "art": "endknoten",
+        "knotennummer": "10"
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Balkon",
+        "feld": "balkon",
+        "fallzahl": 298,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "e7",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "balkon",
+          "ziel": "k6",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e7": {
+        "art": "endknoten",
+        "knotennummer": "7"
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Aufzug",
+        "feld": "aufzug",
+        "fallzahl": 155,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e11",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e12",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e11": {
+        "art": "endknoten",
+        "knotennummer": "11"
+       },
+       "e12": {
+        "art": "endknoten",
+        "knotennummer": "12"
+       },
+       "e2": {
+        "art": "endknoten",
+        "knotennummer": "2"
+       }
+      }
+     }
     },
     "III-1": {
      "altbezirke": [
@@ -500,7 +2029,398 @@
        "fallzahl_bezugsfrei": 48,
        "fallzahl_vermietet": 5
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 10,
+      "kanten": 20,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1217,
+        "mittel_eur_qm_wohnflaeche": 5610,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1972",
+           "1973-1990 Westteil",
+           "1973-1990 Ostteil 2)",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ],
+          "nur_steuerliche_empfehlung": true
+         },
+         {
+          "bedingung_text": [
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "k3",
+          "baujahr_klassen": [
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1076,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k4",
+          "baujahr_klassen": [
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1972",
+           "1973-1990 Westteil",
+           "1973-1990 Ostteil 2)"
+          ],
+          "feld": "baujahr",
+          "ziel": "k5",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 122,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Schöneberg",
+           "Tiergarten"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e7",
+          "kategorien": [
+           "Schöneberg",
+           "Tiergarten"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Weißensee"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e8",
+          "kategorien": [
+           "Weißensee"
+          ]
+         }
+        ]
+       },
+       "e7": {
+        "art": "endknoten",
+        "knotennummer": "7"
+       },
+       "e8": {
+        "art": "endknoten",
+        "knotennummer": "8"
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Stadträumliche Wohnlage",
+        "feld": "wohnlage_stadtraeumlich",
+        "fallzahl": 954,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "einfach",
+           "mittel"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "k6",
+          "kategorien": [
+           "einfach",
+           "mittel"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "gut"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "k7",
+          "kategorien": [
+           "gut"
+          ]
+         }
+        ]
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 499,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1919-1972"
+          ],
+          "feld": "baujahr",
+          "ziel": "e11",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1949_1972"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1918",
+           "1973-1990 Westteil",
+           "1973-1990 Ostteil 2)"
+          ],
+          "feld": "baujahr",
+          "ziel": "k9",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "e11": {
+        "art": "endknoten",
+        "knotennummer": "11"
+       },
+       "k9": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 308,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Schöneberg"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e15",
+          "kategorien": [
+           "Schöneberg"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Tiergarten",
+           "Weißensee"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e16",
+          "kategorien": [
+           "Tiergarten",
+           "Weißensee"
+          ]
+         }
+        ]
+       },
+       "e15": {
+        "art": "endknoten",
+        "knotennummer": "15"
+       },
+       "e16": {
+        "art": "endknoten",
+        "knotennummer": "16"
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Wohnfläche",
+        "feld": "wohnflaeche_qm",
+        "fallzahl": 455,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<40",
+           "40-89"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k8",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 40,
+            "text": "<40"
+           },
+           {
+            "op": "spanne",
+            "von": 40,
+            "bis": 89,
+            "text": "40-89"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=90"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k10",
+          "regeln": [
+           {
+            "op": "ab",
+            "von": 90,
+            "text": ">=90"
+           }
+          ]
+         }
+        ]
+       },
+       "k8": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 337,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1900-1918"
+          ],
+          "feld": "baujahr",
+          "ziel": "e17",
+          "baujahr_klassen": [
+           "1900_1918"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1919-1972",
+           "1973-1990 Westteil",
+           "1973-1990 Ostteil 2)"
+          ],
+          "feld": "baujahr",
+          "ziel": "e18",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ],
+          "nur_steuerliche_empfehlung": true
+         }
+        ]
+       },
+       "e17": {
+        "art": "endknoten",
+        "knotennummer": "17"
+       },
+       "e18": {
+        "art": "endknoten",
+        "knotennummer": "18"
+       },
+       "k10": {
+        "art": "split",
+        "variable": "Aufzug",
+        "feld": "aufzug",
+        "fallzahl": 118,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e19",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e20",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e19": {
+        "art": "endknoten",
+        "knotennummer": "19"
+       },
+       "e20": {
+        "art": "endknoten",
+        "knotennummer": "20"
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 141,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Schöneberg",
+           "Tiergarten"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e5",
+          "kategorien": [
+           "Schöneberg",
+           "Tiergarten"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Weißensee"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e6",
+          "kategorien": [
+           "Weißensee"
+          ]
+         }
+        ]
+       },
+       "e5": {
+        "art": "endknoten",
+        "knotennummer": "5"
+       },
+       "e6": {
+        "art": "endknoten",
+        "knotennummer": "6"
+       }
+      }
+     }
     },
     "III-2": {
      "altbezirke": [
@@ -579,7 +2499,317 @@
        "fallzahl_bezugsfrei": 194,
        "fallzahl_vermietet": 37
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 8,
+      "kanten": 16,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1863,
+        "mittel_eur_qm_wohnflaeche": 6005,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=1991"
+          ],
+          "feld": "baujahr",
+          "ziel": "k3",
+          "baujahr_klassen": [
+           "1991_2020",
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Wohnfläche",
+        "feld": "wohnflaeche_qm",
+        "fallzahl": 1609,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=129"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k4",
+          "regeln": [
+           {
+            "op": "bis",
+            "bis": 129,
+            "text": "<=129"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=130"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "e4",
+          "regeln": [
+           {
+            "op": "ab",
+            "von": 130,
+            "text": ">=130"
+           }
+          ]
+         }
+        ]
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1467,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1919-1972"
+          ],
+          "feld": "baujahr",
+          "ziel": "k5",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1949_1972"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1900-1918",
+           "1973-1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "k6",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         }
+        ]
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Bodenrichtwert",
+        "feld": "brw_01_01_2024_eur_qm",
+        "fallzahl": 618,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<500 2)",
+           "500-1.499"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "e9",
+          "regeln": [
+           {
+            "op": "unter",
+            "bis_exklusiv": 500,
+            "text": "<500 2)",
+            "nur_steuerliche_empfehlung": true
+           },
+           {
+            "op": "spanne",
+            "von": 500,
+            "bis": 1499,
+            "text": "500-1.499"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=1.500"
+          ],
+          "feld": "brw_01_01_2024_eur_qm",
+          "ziel": "k7",
+          "regeln": [
+           {
+            "op": "ab",
+            "von": 1500,
+            "text": ">=1.500"
+           }
+          ]
+         }
+        ]
+       },
+       "e9": {
+        "art": "endknoten",
+        "knotennummer": "9"
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Aufzug",
+        "feld": "aufzug",
+        "fallzahl": 544,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e13",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e14",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e13": {
+        "art": "endknoten",
+        "knotennummer": "13"
+       },
+       "e14": {
+        "art": "endknoten",
+        "knotennummer": "14"
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Geschosslage",
+        "feld": "geschosslage",
+        "fallzahl": 849,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Erdgeschoss",
+           "Souterrain",
+           "Tiefparterre"
+          ],
+          "feld": "geschosslage",
+          "ziel": "e11",
+          "kategorien": [
+           "Erdgeschoss",
+           "Souterrain",
+           "Tiefparterre"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Hochparterre",
+           "Obergeschoss"
+          ],
+          "feld": "geschosslage",
+          "ziel": "k8",
+          "kategorien": [
+           "Hochparterre",
+           "Obergeschoss"
+          ]
+         }
+        ]
+       },
+       "e11": {
+        "art": "endknoten",
+        "knotennummer": "11"
+       },
+       "k8": {
+        "art": "split",
+        "variable": "Aufzug",
+        "feld": "aufzug",
+        "fallzahl": 732,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e15",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e16",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e15": {
+        "art": "endknoten",
+        "knotennummer": "15"
+       },
+       "e16": {
+        "art": "endknoten",
+        "knotennummer": "16"
+       },
+       "e4": {
+        "art": "endknoten",
+        "knotennummer": "4"
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 254,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "e5",
+          "baujahr_klassen": [
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "e6",
+          "baujahr_klassen": [
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "e5": {
+        "art": "endknoten",
+        "knotennummer": "5"
+       },
+       "e6": {
+        "art": "endknoten",
+        "knotennummer": "6"
+       }
+      }
+     }
     },
     "III-3": {
      "altbezirke": [
@@ -648,7 +2878,268 @@
        "fallzahl_bezugsfrei": 43,
        "fallzahl_vermietet": 9
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 7,
+      "kanten": 14,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1412,
+        "mittel_eur_qm_wohnflaeche": 6308,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=1991"
+          ],
+          "feld": "baujahr",
+          "ziel": "k3",
+          "baujahr_klassen": [
+           "1991_2020",
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Wohnungsart",
+        "feld": "wohnungsart",
+        "fallzahl": 1124,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Etagenwohnung"
+          ],
+          "feld": "wohnungsart",
+          "ziel": "k4",
+          "kategorien": [
+           "Etagenwohnung"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Penthouse",
+           "Dachgeschoss",
+           "Loft, Terrassenwhg.,",
+           "Maisonette"
+          ],
+          "feld": "wohnungsart",
+          "ziel": "e4",
+          "kategorien": [
+           "Penthouse",
+           "Dachgeschoss",
+           "Loft",
+           "Terrassenwhg.",
+           "Maisonette"
+          ]
+         }
+        ]
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 1020,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1919-1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "k5",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<=1918"
+          ],
+          "feld": "baujahr",
+          "ziel": "k6",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1900_1918"
+          ]
+         }
+        ]
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 273,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Friedrichshain"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e9",
+          "kategorien": [
+           "Friedrichshain"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Prenzlauer Berg"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e10",
+          "kategorien": [
+           "Prenzlauer Berg"
+          ]
+         }
+        ]
+       },
+       "e9": {
+        "art": "endknoten",
+        "knotennummer": "9"
+       },
+       "e10": {
+        "art": "endknoten",
+        "knotennummer": "10"
+       },
+       "k6": {
+        "art": "split",
+        "variable": "Altbezirk",
+        "feld": "altbezirk",
+        "fallzahl": 747,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Friedrichshain"
+          ],
+          "feld": "altbezirk",
+          "ziel": "k7",
+          "kategorien": [
+           "Friedrichshain"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Prenzlauer Berg"
+          ],
+          "feld": "altbezirk",
+          "ziel": "e12",
+          "kategorien": [
+           "Prenzlauer Berg"
+          ]
+         }
+        ]
+       },
+       "k7": {
+        "art": "split",
+        "variable": "Geschosslage",
+        "feld": "geschosslage",
+        "fallzahl": 364,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "Hochparterre",
+           "Obergeschoss"
+          ],
+          "feld": "geschosslage",
+          "ziel": "e13",
+          "kategorien": [
+           "Hochparterre",
+           "Obergeschoss"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "Erdgeschoss",
+           "Souterrain",
+           "Tiefparterre"
+          ],
+          "feld": "geschosslage",
+          "ziel": "e14",
+          "kategorien": [
+           "Erdgeschoss",
+           "Souterrain",
+           "Tiefparterre"
+          ]
+         }
+        ]
+       },
+       "e13": {
+        "art": "endknoten",
+        "knotennummer": "13"
+       },
+       "e14": {
+        "art": "endknoten",
+        "knotennummer": "14"
+       },
+       "e12": {
+        "art": "endknoten",
+        "knotennummer": "12"
+       },
+       "e4": {
+        "art": "endknoten",
+        "knotennummer": "4"
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Stadträumliche Wohnlage",
+        "feld": "wohnlage_stadtraeumlich",
+        "fallzahl": 288,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "einfach"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "e5",
+          "kategorien": [
+           "einfach"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "mittel",
+           "gut"
+          ],
+          "feld": "wohnlage_stadtraeumlich",
+          "ziel": "e6",
+          "kategorien": [
+           "mittel",
+           "gut"
+          ]
+         }
+        ]
+       },
+       "e5": {
+        "art": "endknoten",
+        "knotennummer": "5"
+       },
+       "e6": {
+        "art": "endknoten",
+        "knotennummer": "6"
+       }
+      }
+     }
     },
     "IV": {
      "altbezirke": [
@@ -704,7 +3195,211 @@
        "fallzahl_bezugsfrei": 117,
        "fallzahl_vermietet": 32
       }
-     ]
+     ],
+     "topologie": {
+      "wurzel": "k1",
+      "splits": 5,
+      "kanten": 10,
+      "knoten": {
+       "k1": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 474,
+        "mittel_eur_qm_wohnflaeche": 7533,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<1900",
+           "1919-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k2",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1919_1948",
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil",
+           "1991_2020"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "1900-1918",
+           ">=2021"
+          ],
+          "feld": "baujahr",
+          "ziel": "e2",
+          "baujahr_klassen": [
+           "1900_1918",
+           "ab_2021"
+          ]
+         }
+        ]
+       },
+       "k2": {
+        "art": "split",
+        "variable": "Wohnfläche",
+        "feld": "wohnflaeche_qm",
+        "fallzahl": 445,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<=89"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k4",
+          "regeln": [
+           {
+            "op": "bis",
+            "bis": 89,
+            "text": "<=89"
+           }
+          ]
+         },
+         {
+          "bedingung_text": [
+           ">=90"
+          ],
+          "feld": "wohnflaeche_qm",
+          "ziel": "k3",
+          "regeln": [
+           {
+            "op": "ab",
+            "von": 90,
+            "text": ">=90"
+           }
+          ]
+         }
+        ]
+       },
+       "k4": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 324,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "1949-1990"
+          ],
+          "feld": "baujahr",
+          "ziel": "e5",
+          "baujahr_klassen": [
+           "1949_1972",
+           "1973_1990_westteil",
+           "1973_1990_ostteil"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "<1900",
+           "1919-1948",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "k5",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1919_1948",
+           "1991_2020"
+          ]
+         }
+        ]
+       },
+       "e5": {
+        "art": "endknoten",
+        "knotennummer": "5"
+       },
+       "k5": {
+        "art": "split",
+        "variable": "Aufzug",
+        "feld": "aufzug",
+        "fallzahl": 264,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "nicht vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e9",
+          "kategorien": [
+           "nicht vorhanden"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "vorhanden"
+          ],
+          "feld": "aufzug",
+          "ziel": "e10",
+          "kategorien": [
+           "vorhanden"
+          ]
+         }
+        ]
+       },
+       "e9": {
+        "art": "endknoten",
+        "knotennummer": "9"
+       },
+       "e10": {
+        "art": "endknoten",
+        "knotennummer": "10"
+       },
+       "k3": {
+        "art": "split",
+        "variable": "Baujahr",
+        "feld": "baujahr",
+        "fallzahl": 121,
+        "zweige": [
+         {
+          "bedingung_text": [
+           "<1900",
+           "1949-1972"
+          ],
+          "feld": "baujahr",
+          "ziel": "e7",
+          "baujahr_klassen": [
+           "vor_1900",
+           "1949_1972"
+          ]
+         },
+         {
+          "bedingung_text": [
+           "1919-1949",
+           "1991-2020"
+          ],
+          "feld": "baujahr",
+          "ziel": "e8",
+          "baujahr_klassen": [
+           "1919_1948",
+           "1991_2020"
+          ],
+          "abweichung": [
+           {
+            "text": "1919-1949",
+            "befund": "greift in die Klasse 1949_1972 hinein (Beschriftung endet innerhalb der Klasse)"
+           }
+          ]
+         }
+        ]
+       },
+       "e7": {
+        "art": "endknoten",
+        "knotennummer": "7"
+       },
+       "e8": {
+        "art": "endknoten",
+        "knotennummer": "8"
+       },
+       "e2": {
+        "art": "endknoten",
+        "knotennummer": "2"
+       }
+      }
+     }
     }
    },
    "startbaum": {
@@ -756,29 +3451,110 @@
     "Balkon",
     "Verfügbarkeit (bezugsfrei / vermietet)"
    ],
-   "splitvariablen_hinweis": "Nicht jeder Baum nutzt alle. Zwei Größen erhebt DealPilot heute nicht: AUFZUG und BALKON (in I-2, II-1, II-2, III-1, III-2 und IV als Split verwendet), und die BERLINER STADTRÄUMLICHE WOHNLAGE ist eine amtliche Einstufung (Glossar des Ausschusses), nicht die Lagenote eines Portals. Ohne diese Angaben ist der Pfad auch mit Topologie nicht in jedem Baum auflösbar.",
+   "splitvariablen_hinweis": "Nicht jeder Baum nutzt alle. Fünf Größen erhebt DealPilot heute nicht: AUFZUG, BALKON, WOHNUNGSART, GESCHOSSLAGE und die BERLINER STADTRÄUMLICHE WOHNLAGE (amtliche Einstufung, nicht die Lagenote eines Portals). Dazu kommt eine sechste, die gar kein eigenes Merkmal ist, sondern in der Baujahrsklasse steckt: die Bäume II-1 und III-1 trennen 1973-1990 WESTTEIL von 1973-1990 OSTTEIL. Ohne diese Angaben ist der Pfad in den betroffenen Knoten nicht auflösbar — und dann endet die Rechnung, statt einen Zweig zu raten.",
    "beispiel_aus_dem_blatt": {
     "quelle": "Abschnitt D, „Wie sind die Vergleichsfaktoren anzuwenden?\", S. 9 des Blattes",
     "objekt": {
      "altbezirk": "Neukölln",
      "baujahr": 1905,
+     "baujahr_klasse": "vor_1900",
      "geschosslage": "Obergeschoss",
      "verfuegbarkeit": "bezugsfrei",
      "wohnflaeche_qm": 80,
      "brw_01_01_2024_eur_qm": 2200
     },
-    "pfad": [
-     "Bezirksbaum I-1",
-     "Baujahr <=2020",
-     "Bodenrichtwert 1.500-7.999 / >=8.000",
-     "Endknoten 3 bezugsfrei"
+    "pfad_im_blatt": [
+     "Bezirksbaum I-1 Baujahr „<=2020\"",
+     "Bodenrichtwert „1.500-7.999, >=8.000 2)\"",
+     "Vergleichsfaktor: Endknoten 3 „bezugsfrei\" = 5.369 EUR/m² Wohnfläche"
+    ],
+    "pfad_ueber_die_topologie_dieses_satzes": [
+     "k1 Baujahr -> \"<=2020\" -> k2",
+     "k2 Bodenrichtwert -> \"1.500-7.999 | >=8.000 2)\" -> e3"
     ],
     "vergleichsfaktor_eur_qm": 5369,
     "grundbesitzwert_eur": 429520,
-    "nachgerechnet": "5.369 EUR/m² × 80 m² = 429.520 EUR — zeichengleich mit dem Blatt."
+    "nachgerechnet": "Die hier hinterlegte Topologie wurde mit genau diesen Objektdaten durchlaufen und erreicht Endknoten 3; 5.369 EUR/m² × 80 m² = 429.520 EUR — zeichengleich mit dem Blatt."
    },
    "liefert_einheit": "EUR/m² Wohnfläche",
-   "bezugsgroesse": "wohnflaeche"
+   "bezugsgroesse": "wohnflaeche",
+   "rundung_stellen": 0,
+   "normobjekt": "Wohnungseigentum in einem MEHRFAMILIENHAUS ab 3 Wohneinheiten, Erst- oder Weiterverkauf, Erwerbsumfang 100 %, Miteigentumsanteil bis 40 %, bis 10 Räume, Geschosslage nicht Keller/Untergeschoss, mit Beheizung. Der Faktor enthält den anteiligen Wert für Grund und Boden UND für das Gebäude; ein Bodenwert wird NICHT zusätzlich angesetzt. Er enthält KEINEN Preisanteil für Garagen, Sammelgaragen oder Wageneinstellplätze im Sondereigentum oder Sondernutzungsrecht — die hat der Ausschuss über eigene Bäume abgezogen. NICHT enthalten: Teileigentum, Wohnungseigentum in Ein- und Zweifamilienhäusern, Wohnungseigentum bei bestehenden Erbbaurechten oder Nießbrauch, Ladenwohnung, Einliegerwohnung, Atelier, Zwangsversteigerung, Insolvenzverkauf, private Bindungen. Bodenrichtwert zum 01.01.2024 ohne Anpassung an Maß und Art der baulichen Nutzung oder an die Mikrolage. Baujahr = tatsächliches Baujahr, KEINE Korrektur wegen Modernisierung oder Dachgeschossausbau. Keine Extremwerteliminierung.",
+   "anwendung": "Drei Schritte, wie das Blatt sie auf S. 9 vorführt: (1) Altbezirk bestimmen (Stand VOR der Verwaltungsreform 2001) und darüber den Bezirksbaum wählen — kategorie_zuordnung bildet die 23 Altbezirke auf die acht Bäume ab. (2) Im Baum von der Wurzel absteigen: je Knoten die Splitvariable aus `feld` lesen und den Zweig nehmen, dessen Bedingung zutrifft. (3) Im Endknoten den Faktor nach Verfügbarkeit nehmen — `vergleichsfaktor_bezugsfrei_...` oder `vergleichsfaktor_vermietet_...` — und mit der Wohnfläche multiplizieren. Trifft kein Zweig, endet die Rechnung: es wird kein Nachbarzweig und kein Knotenmittelwert genommen.",
+   "auswerter_hinweis": "ACHTUNG: `swf_modelle.js` führt (Stand 08.10.2026) KEINEN Auswerter für die Form `entscheidungsbaum`. Die 15 vorhandenen Formen dispatchen entweder über eine Kategorie (`verzweigt`) oder liefern aus Bändern einen Wert (`baender_1d`); ein Baum mit gemischt kategorialen und numerischen Splits über mehrere Ebenen ist damit nicht abbildbar. Bis ein Auswerter dafür existiert, gibt `auswerten()` `form_unbekannt` zurück — also KEINEN Wert und keine falsche Zahl. Die Daten in diesem Satz sind vollständig; was fehlt, ist der Rechenweg im Code.",
+   "felder": {
+    "altbezirk": "Altbezirk Berlins VOR der Verwaltungsreform 2001 (23 Bezirke). Glossar: https://www.berlin.de/gutachterausschuss/service/glossar/artikel.156764.php",
+    "baujahr": "Baujahrsklasse nach Tabelle 3 des Blattes — KEINE Jahreszahl. Schlüssel siehe baujahr_klassen. Tatsächliches Baujahr, ohne Modernisierungskorrektur.",
+    "brw_01_01_2024_eur_qm": "Bodenrichtwert zum 01.01.2024 in EUR/m², ohne Anpassung an Maß und Art der baulichen Nutzung oder Mikrolage.",
+    "wohnflaeche_qm": "Wohnfläche in m² aus Teilungserklärung, Abgeschlossenheitsplänen oder Kaufvertrag.",
+    "wohnlage_stadtraeumlich": "amtliche Berliner Einstufung: einfach · mittel · gut · sehr gut. Glossar: https://www.berlin.de/gutachterausschuss/service/glossar/artikel.158011.php — NICHT die Lagenote eines Portals.",
+    "wohnungsart": "Etagenwohnung · Dachgeschoss · Penthouse · Loft · Maisonette · Terrassenwhg.",
+    "geschosslage": "Erdgeschoss · Souterrain · Tiefparterre · Hochparterre · Obergeschoss (Keller und Untergeschoss sind aus der Analyse ausgeschlossen).",
+    "aufzug": "vorhanden · nicht vorhanden",
+    "balkon": "vorhanden · nicht vorhanden",
+    "verfuegbarkeit": "bezugsfrei · vermietet — entscheidet NICHT über den Pfad, sondern über die Spalte im Endknoten."
+   },
+   "baujahr_klassen": [
+    {
+     "schluessel": "vor_1900",
+     "bez": "vor 1900",
+     "von": null,
+     "bis": 1899,
+     "fallzahl": 1461
+    },
+    {
+     "schluessel": "1900_1918",
+     "bez": "1900-1918",
+     "von": 1900,
+     "bis": 1918,
+     "fallzahl": 1982
+    },
+    {
+     "schluessel": "1919_1948",
+     "bez": "1919-1948",
+     "von": 1919,
+     "bis": 1948,
+     "fallzahl": 1033
+    },
+    {
+     "schluessel": "1949_1972",
+     "bez": "1949-1972",
+     "von": 1949,
+     "bis": 1972,
+     "fallzahl": 2476
+    },
+    {
+     "schluessel": "1973_1990_westteil",
+     "bez": "1973-1990 Westteil",
+     "von": 1973,
+     "bis": 1990,
+     "teil": "Westteil",
+     "fallzahl": 472
+    },
+    {
+     "schluessel": "1973_1990_ostteil",
+     "bez": "1973-1990 Ostteil",
+     "von": 1973,
+     "bis": 1990,
+     "teil": "Ostteil",
+     "fallzahl": 179
+    },
+    {
+     "schluessel": "1991_2020",
+     "bez": "1991-2020",
+     "von": 1991,
+     "bis": 2020,
+     "fallzahl": 1317
+    },
+    {
+     "schluessel": "ab_2021",
+     "bez": "größer 2020",
+     "von": 2021,
+     "bis": null,
+     "fallzahl": 859
+    }
+   ],
+   "topologie_herkunft": "Gemessen am 08.10.2026 aus dem amtlichen PDF, auf ZWEI unabhängigen Wegen. (1) VEKTORWEG: die Baumseiten 11 bis 18 mit `pdftocairo -svg` in Pfadkoordinaten zerlegt. Kästen sind gestrichene Rundrechtecke der Strichbreite 3,125, Verbinder achsparallele Striche der Breite 2,083, Beschriftungsfelder weiß gefüllte Rechtecke. Jede Kante wurde über die Deckung ihrer Strecke belegt: gezeichnet ODER von einem Beschriftungsfeld verdeckt. Teilt sich ein Niveau zwei Eltern, entscheidet der Abstand des Kindes zum Querbalken DIESES Elternteils; der gemessene Abstand zum zweitbesten Kandidaten lag über alle acht Bäume bei mindestens 22,5 pt. (2) BILDWEG: dieselben acht Seiten mit `pdftoppm` gerastert und Knoten für Knoten abgelesen. Beide Wege ergeben dieselben 130 Kanten. GEGENPROBE: die Fallzahlen gehen in JEDEM der 65 inneren Knoten auf (Elternfallzahl = Summe der Kinder), über alle acht Bäume 9.779 = 9.779 ohne Rest, und alle 73 Endknotenwerte sind zeichengleich mit der früheren Ernte über einen anderen Parser. ZWEI Eigenheiten der Zeichnung, die die Messung aufgedeckt hat und die kein Fehler der Lesung sind: auf S. 13 fällt ein Querbalken auf 207 pt um 2 pt ab (0,55 Grad), und an mehreren Stellen ist der Verbinder zwischen Kasten und Querbalken gar nicht durchgezogen — die größte unbelegte Teilstrecke misst 18 pt. Das Ergebnis ist zwischen 18 und 40 pt Toleranz unverändert; es hängt also nicht an der Toleranz."
   },
   "modellansaetze": {
    "modellgrundlage": "§ 193 Abs. 5 BauGB in Verbindung mit § 19 DVO BauGB, Vergleichsfaktoren nach § 12 ImmoWertV",
@@ -830,10 +3606,12 @@
   "belege": [
    "Geschäftsstelle des Gutachterausschuss für Grundstückswerte in Berlin, „Vergleichsfaktoren für den Teilmarkt des Wohnungseigentums zur Verwendung für steuerliche Zwecke zum Stichtag 31.12.2024\", Stand 02.03.2026, 9 Textseiten plus 9 Abbildungen; veröffentlicht im Amtsblatt für Berlin Nr. 50 vom 5. Dezember 2025, S. 3179 ff. 9.779 zur Analyse geeignete Kauffälle in der Rechtsform des Wohnungseigentums mit Vertragsdaten vom 01.01.2024 bis 31.12.2024.",
    "Nachgeprüft am 08.10.2026: alle 73 Endknoten der acht Bezirksbäume wurden aus dem PDF ausgelesen; je Baum trifft die Summe der Endknoten-Fallzahlen (bezugsfrei plus vermietet) auf den Kopf die Fallzahl der Baumwurzel, und jede Wurzel trifft die Summe der Altbezirkszahlen aus Tabelle 2 des Blattes. Über alle acht Bäume: 9.779 = 9.779, ohne Rest.",
-   "Anwendungsbeispiel des Blattes (S. 9) nachgerechnet: Neukölln, Bj 1905, Obergeschoss, bezugsfrei, 80 m², BRW 2.200 EUR/m² → Bezirksbaum I-1, Baujahr <=2020, Bodenrichtwert 1.500-7.999 → Endknoten 3 bezugsfrei 5.369 EUR/m² → 5.369 × 80 = 429.520 EUR. Zeichengleich mit dem Blatt."
+   "Anwendungsbeispiel des Blattes (S. 9) nachgerechnet: Neukölln, Bj 1905, Obergeschoss, bezugsfrei, 80 m², BRW 2.200 EUR/m² → Bezirksbaum I-1, Baujahr <=2020, Bodenrichtwert 1.500-7.999 → Endknoten 3 bezugsfrei 5.369 EUR/m² → 5.369 × 80 = 429.520 EUR. Zeichengleich mit dem Blatt.",
+   "Topologie nachgemessen am 08.10.2026 aus den Abbildungen 1 bis 9 (S. 10 bis 18) auf zwei unabhängigen Wegen — SVG-Pfadkoordinaten (pdftocairo) und Rasterbild (pdftoppm, 150 bis 600 dpi). Beide Wege ergeben dieselben 130 Kanten über 65 innere Knoten. Fallzahlprobe je Knoten ohne Rest; Anwendungsbeispiel S. 9 über die Topologie nachgerechnet (Endknoten 3, 5.369 EUR/m², 429.520 EUR).",
+   "Baujahrsklassen aus Tabelle 3 (S. 7) des Blattes: vor 1900 (1.461), 1900-1918 (1.982), 1919-1948 (1.033), 1949-1972 (2.476), 1973-1990 Westteil (472), 1973-1990 Ostteil (179), 1991-2020 (1.317), größer 2020 (859), Summe 9.779. Baujahr ist damit eine KLASSEN-, keine Jahresvariable; über diese acht Klassen sind alle 23 Baujahr-Splits der acht Bäume überschneidungsfrei — bis auf die eine in `offene_punkte` genannte Abweichung."
   ],
   "stufe": "A",
-  "stufe_grund": "Amtliches Blatt, im Amtsblatt für Berlin veröffentlicht. Stufe A für die ERFASSTEN GRÖSSEN: alle 73 Endknotenwerte, die Altbezirkszuordnung aller acht Bäume und das Anwendungsbeispiel sind gegen das Dokument geprüft und schließen ohne Rest (Fallzahlprobe 9.779 = 9.779). Der Satz liefert dennoch KEINEN Wert, weil die Baumtopologie nicht maschinell belegbar war — das ist eine Sperre aus Ehrlichkeit, nicht aus Datenmangel.",
+  "stufe_grund": "Amtliches Blatt, veröffentlicht im Amtsblatt für Berlin Nr. 50 vom 05.12.2025 (S. 3179 ff.). Geprüft am Anwendungsbeispiel des Dokuments (S. 9): die hinterlegte Topologie erreicht Endknoten 3 und rechnet 5.369 EUR/m² × 80 m² = 429.520 EUR — zeichengleich. Alle 73 Endknotenwerte, die Altbezirkszuordnung aller acht Bäume und die 130 Kanten sind gegen das Dokument geprüft; die Fallzahlen gehen in jedem der 71 inneren Knoten auf (9.779 = 9.779 ohne Rest).",
   "fallzahl": 9779,
   "streuung": null,
   "stichtag": "2024-12-31",
@@ -841,14 +3619,18 @@
   "modellversion": "Vergleichsfaktoren Wohnungseigentum 2025, Stand 02.03.2026",
   "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf",
   "quelle_seite": "https://www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/artikel.1377983.php",
-  "quelle_parser": "vgf-be-2026-10-08 (pdfjs Textraster plus Vektorpfade)",
+  "quelle_parser": "vgf-be-topologie-2026-10-08 (pdftocairo SVG-Pfade + pdftoppm Bild, Fallzahlprobe)",
   "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Berlin, Vergleichsfaktoren für den Teilmarkt des Wohnungseigentums zur Verwendung für steuerliche Zwecke zum Stichtag 31.12.2024, veröffentlicht im Amtsblatt für Berlin Nr. 50 vom 05.12.2025 S. 3179 ff. © 2025, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen, III E – Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
   "lizenz": "keine Datenlizenz angegeben — amtliche Veröffentlichung im Amtsblatt für Berlin mit Copyright-Vermerk der Senatsverwaltung. Im Blatt steht KEIN dl-de/by-2-0 und KEIN zero-2-0; am 08.10.2026 im Volltext beider PDF nachgesehen (einziger Lizenzbezug ist das ©-Zeichen).",
   "verwendung": "intern",
   "auflagen": "Quellenangabe und Copyright-Vermerk der Senatsverwaltung. NUR für steuerliche Bewertung und Kaufpreisaufteilung — das Blatt schließt den Ersatz einer Verkehrswertermittlung nach § 194 BauGB ausdrücklich aus. Die pauschalen Vermietungsabschläge sind im Blatt als „Empfehlung des Gutachterausschusses ausschließlich für die steuerliche Bewertung\" gekennzeichnet.",
   "fundstelle": "Vergleichsfaktoren Wohnungseigentum (05-05-020-2500.pdf), Stand 02.03.2026: Abschnitt A1 Verwendungszweck (S. 1), A2 verwendete Daten (S. 1), A3 gebietsweise Anwendbarkeit mit der Altbezirkszuordnung der acht Bäume (S. 2–3), A5 Teilmarkt (S. 3), B1–B10 Grundsätze der Kaufvertragsauswertung (S. 4–5), C Tabellen 1–10 (S. 6–8), D Vergleichsfaktoren mit Anwendungsbeispiel (S. 9), Abbildungen 1–9 Startbaum und Bezirksbäume I-1 bis IV (S. 10–18).",
-  "vollstaendig": false,
-  "warum_kein_wert": "SPERRE MIT WEG, NICHT FEHLENDE ERNTE. Die Berliner Vergleichsfaktoren für Wohnungseigentum sind KEINE Tabelle und keine Formel, sondern NEUN GEZEICHNETE ENTSCHEIDUNGSBÄUME (Startbaum plus acht Bezirksbäume, Abbildungen 1 bis 9). Der anzuwendende Faktor ist der Wert des ENDKNOTENS, den der Objektpfad erreicht — das Blatt führt es selbst so vor („3. Vergleichsfaktor: Endknoten 3 ‚bezugsfrei' = 5.369 EUR/m² Wohnfläche\").\n\nAlle Endknotenwerte stehen in diesem Satz und sind nachgeprüft (siehe stufe_grund). Was NICHT maschinell belegt ist, ist die TOPOLOGIE: welche Split-Schwelle zu welchem Endknoten führt. Die Bäume sind Vektorgrafiken, deren Verbinder von deckenden Beschriftungsfeldern zerschnitten sind; drei verschiedene Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Das ist Tuning, keine Messung — deshalb steht hier kein geratener Pfad.\n\nWEG ZUM ECHTEN WERT: Altbezirk bestimmen (Zuordnung steht in kategorie_zuordnung dieses Satzes, gegen die Altbezirkstabelle des Blattes geprüft), dann im zugehörigen Bezirksbaum auf Seite (siehe baeume[*].seite_im_blatt) des amtlichen PDF den Pfad ablesen und den Endknoten aus endknoten[] nehmen. Das PDF ist frei abrufbar: https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf\n\nAUFLÖSBAR wird der Satz, sobald die Baumseiten gerastert gelesen werden können (poppler/pdftoppm oder Ghostscript waren am 08.10.2026 auf dem Arbeitsplatz nicht vorhanden). Die Ernte muss dafür NICHT wiederholt werden."
+  "vollstaendig": true,
+  "offene_punkte": [
+   "ABWEICHUNG IM BLATT SELBST, nicht in der Ernte: Baum IV, Knoten k3 (Fallzahl 121) druckt als Zweig „1919-1949\"; eine Klasse dieses Namens gibt es in Tabelle 3 nicht. Die amtliche Klasse heißt „1919-1948\", und 1949 gehört zur Klasse „1949-1972\", die im ANDEREN Zweig desselben Knotens steht. Gelesen wird deshalb die Klasse 1919-1948; der abgedruckte Wortlaut steht unverändert in `bedingung_text`, der Befund in `abweichung`. Wer das anders entscheidet, ändert genau diese eine Stelle.",
+   "KEIN AUSWERTER: `swf_modelle.js` kennt die Form `entscheidungsbaum` nicht (Stand 08.10.2026). Der Satz trägt die vollständige Topologie, aber bis ein Auswerter dafür gebaut ist, gibt der Registerweg `form_unbekannt` zurück — keinen Wert, aber auch keine falsche Zahl. Siehe formel.auswerter_hinweis.",
+   "FÜNF MERKMALE FEHLEN IN DEALPILOT: Aufzug, Balkon, Wohnungsart, Geschosslage und die amtliche stadträumliche Wohnlage. Dazu die Unterscheidung Westteil/Ostteil innerhalb der Baujahrsklasse 1973-1990. Wo ein Pfad über eines dieser Merkmale führt und es nicht erhoben ist, endet die Rechnung — ein Zweig wird nicht geraten."
+  ]
  },
  {
   "land_code": "BE",

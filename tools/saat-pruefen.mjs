@@ -45,10 +45,40 @@ const SPANNEN = {
   erbbauzinssatz: [0, 12, 'Prozent'],
 };
 let rc = 0;
-for (const f of process.argv.slice(2)) {
+/* ══ v1981c · OHNE ARGUMENT PRUEFTE ER NULL SAETZE UND WAR GRUEN ══════
+
+   GEMESSEN am 08.10.2026, an mir selbst: ich rief
+   `node tools/saat-pruefen.mjs` ohne Datei, bekam EINE Zeile
+   („Handliste SAATDATEIEN: 56 Dateien") und RC=0 — und habe das als
+   „der neue Berliner Satz ist in Ordnung" gelesen. Geprueft hatte er
+   davon: nichts. Die Schleife lief ueber eine leere Liste.
+
+   Der Kommentar bei der Handliste nannte das ausdruecklich Absicht
+   („`node tools/saat-pruefen.mjs` allein prueft nur die Handliste").
+   Absicht oder nicht — ein Pruefer, der auf den bequemsten Aufruf
+   gruen wird, ohne etwas gemessen zu haben, ist derselbe Fehler wie
+   der gold-audit, der 6 statt 181 Dateien las.
+
+   Ohne Argument nimmt er jetzt den GANZEN Registerordner, und er nennt
+   in jedem Fall seine DECKUNG — Dateien und Saetze. Eine Null dort ist
+   ab sofort RC=1, nicht gruen. */
+const _ARGV = process.argv.slice(2);
+let _dateien = _ARGV;
+let _quelle = "Argumente";
+if (!_ARGV.length) {
+  const _ordner = "marktbericht/backend/src/lib/register";
+  _dateien = fs.readdirSync(_ordner)
+    .filter((f) => f.endsWith(".json") && !/^verfuegbarkeit-/.test(f))
+    .sort()
+    .map((f) => _ordner + "/" + f);
+  _quelle = "ganzer Registerordner";
+}
+let _saetzeGelesen = 0;
+for (const f of _dateien) {
   let arr;
   try { arr = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { console.log(`${f}: KEIN JSON — ${e.message}`); rc = 1; continue; }
   if (!Array.isArray(arr)) { console.log(`${f}: kein Array`); rc = 1; continue; }
+  _saetzeGelesen += arr.length;
   const fehler = []; const schl = new Map();
   arr.forEach((s, i) => {
     const wo = `#${i} ${s.gebiet_name || s.ags || '?'} ${s.kennzahl || ''}/${s.zweig || ''}`;
@@ -188,6 +218,13 @@ try {
   rc = 1;
   console.log(`Handliste NICHT geprüft: ${e.message}`);
   console.log('  -> dieser Abgleich darf nicht ausfallen; ohne ihn rutscht eine Ernte durch');
+}
+
+/* v1981c · DIE DECKUNG IST TEIL DES BEFUNDES, NICHT EIN ZUSATZ */
+console.log(`DECKUNG: ${_dateien.length} Datei(en) aus ${_quelle} · ${_saetzeGelesen} Sätze gelesen`);
+if (!_saetzeGelesen) {
+  rc = 1;
+  console.log("  -> NULL Sätze geprüft. Das ist kein grünes Ergebnis, sondern ein nicht gelaufener Prüfer.");
 }
 
 process.exit(rc);
