@@ -95,6 +95,87 @@ nichts geschrieben.
 
 ---
 
+### N50 · Die Ernte holt die amtlichen Vergleichsfaktoren (08.10.2026) — SCHRITTE 1–4 ERLEDIGT
+
+**N50-STAND nach drei parallelen Erntelinien, am laufenden Container nachgemessen:**
+
+```
+vorher   0 Saetze mit der Kennzahl vergleichsfaktor im ganzen Register
+jetzt    9 Saetze - 5 Werte, 4 Sperren
+```
+
+| Linie | Ergebnis | Nachweis |
+|---|---|---|
+| **Barnim (BB)** | 2 Werte, `ezfh` Stufe B und `rhdhh` Stufe A | beide Anwendungsbeispiele reproduziert: 3.690 × 1,05 = **3.875** und 3.580 × 1,06 × 0,99 = **3.757**, mit vollem Rechenweg |
+| **Berlin** | 3 Werte, 1 Sperre | `ezfh` gibt **3.336** — exakt der Ausgangswert des Beispiels S. 17. Alle vier `verwendung: intern` → **zurückgehalten** |
+| **Saarland** | 7 Sperren, kein Wert | Saarpfalz-Faktoren existieren, aber nur auf Antrag gegen Gebühr und ohne Erlaubnis zur Wiedergabe |
+
+**Was gebaut wurde (v1975–v1977b):** der Registerweg ist in
+`ReportOrchestrator` verdrahtet und zählt in `CrossCheckService` als
+kaufpreisbasierte Grundlage. Barnim trägt damit ein führendes
+Vergleichswertverfahren.
+
+> **Die wichtigste Entscheidung steckt in der Sperre, nicht in der Verdrahtung.** Die
+> Berliner Faktoren sind amtlich — aber amtlich für die **steuerliche** Bedarfsbewertung.
+> Die Blätter sagen wörtlich: *„Die Vergleichsfaktoren ersetzen nicht eine gutachterliche
+> Ermittlung des Verkehrswertes im Sinne des § 194 BauGB."* Sie tragen
+> `verwendung: "intern"` und werden mit dem Grund `nur_steuerliche_bewertung`
+> zurückgehalten — der Satz geht aber **in den Bericht**, weil „der Ausschuss führt
+> Faktoren, gibt sie aber nur steuerlich frei" selbst die Auskunft ist, die dem Leser
+> sonst fehlt.
+
+**Vier Defekte fielen dabei auf, drei davon in der eigenen Verdrahtung:**
+
+1. **Die Sperre war toter Code.** `verwendung === 'intern'` fragte ein Feld, das die
+   Leseroutine nicht zurückgab — 23 Felder in der Antwort, `verwendung` keines davon.
+   Behoben über einen Umschlag um `vergleichsfaktor()`, damit kein künftiger Austritt
+   es vergessen kann.
+2. **Jeder Ausschuss benennt seine Achsen anders.** Barnim `brw` × `wohnflaeche`,
+   Berlin `bgf_qm` × `brw_eur_qm`. Hartverdrahtete Namen gaben `achse_x_fehlt`, was wie
+   „kein Wert" aussieht. Jetzt wird unter **jedem** im Register vorkommenden Namen
+   geliefert.
+3. **Die Bezugsgröße ist nicht immer die Wohnfläche.** Barnim rechnet €/m² Wohnfläche,
+   Berlin €/m² **Brutto-Grundfläche**. Mit der Wohnfläche multipliziert wäre der
+   Berliner Wert bei einem Haus rund 25 % daneben — und nichts hätte widersprochen.
+4. **Ein Absturz im Auswerter, der älter ist:** `IN_FAKTOR[einheit](dokument)` mit einer
+   unbekannten Einheit wirft einen `TypeError`. `einheit` kommt aus einer
+   **Registerdatei** — ein Tippfehler im Feld `liefert` hätte jeden Bericht in diesem
+   Gebiet zerlegt. Die Doktrin sagt „kein Treffer heißt kein Wert", nicht „kein Bericht".
+
+**Zwei Wächter waren gebaut und nicht aufgestellt:**
+
+- `fehlendeSaatdateien()` gibt es seit v1778 mit dem Kommentar, die Lücke solle
+  „AUFFALLEN" — sie wurde **nirgends gerufen**. Läuft jetzt bei jedem `saat-pruefen` mit.
+- `saat-pruefen.mjs` kannte `vergleichsfaktor` gar nicht, und seine Beleg-Prüfung war
+  **seit immer falsch**: sie las `b.fundstelle` und scheiterte damit an allen 12
+  Registerdateien, die `belege` als String führen — auch an den längst abgenommenen.
+  *Ein Wächter, der auf richtige Daten rot wird, ist so schädlich wie einer, der auf
+  falsche grün wird.*
+
+**Was offen bleibt:**
+
+1. **Berlin ETW** — die neun „Tabellen" sind gezeichnete **Entscheidungsbäume**. Alle 73
+   Endknotenwerte und die Altbezirkszuordnung sind geerntet (Fallzahlprobe 9.779 = 9.779
+   ohne Rest), aber nicht, **welche Split-Schwelle zu welchem Endknoten führt** — die
+   Verbinderlinien sind von Beschriftungsfeldern zerschnitten, drei
+   Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Mit einem **Rasterizer**
+   (`pdftoppm`, Ghostscript) in einem Durchgang auflösbar, **ohne die Ernte zu
+   wiederholen**. Der Arbeitsplatz hat keinen.
+2. **Die Korrekturen `gebaeudestellung` und `bauzustand`** werden nicht geliefert.
+   DealPilot führt `haustyp` und `ds2_zustand`; eine Zuordnung wäre eine Entscheidung
+   über amtliche Klassen. Die Leseroutine meldet sie als `korrekturen_offen` — das
+   gehört in die Anzeige.
+3. **Weitere Länder.** Augsburg (kostenpflichtig, 50 €) und der Landesbericht Saarland
+   (75 €) führen Vergleichsfaktoren laut eigener Angabe; beide nicht gelesen.
+4. **Drei belegte Rücknahmen am Register**, die noch nicht eingetragen sind:
+   `quellen_links.js:716-723` nennt für alle sechs SL-Kreise den **falschen Herausgeber**
+   (Landeshauptstadt Saarbrücken, nicht Regionalverband) und behauptet einen
+   Dateninhalt, den das Dokument nicht hat — es *verweist* nur. Dazu zwei Aussagen in
+   `verfuegbarkeit-sl.json` (die 403-Angabe und die Tabellen-Angabe), beide am Dokument
+   widerlegt.
+
+---
+
 ### N50 · Die Ernte holt die amtlichen Vergleichsfaktoren (08.10.2026)
 
 **Marcels Auftrag:** „Vielleicht sollten wir das mit in unseren Ernteparameter mit aufnehmen …
