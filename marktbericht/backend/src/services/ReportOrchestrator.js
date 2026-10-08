@@ -640,11 +640,41 @@ export const ReportOrchestrator = {
       const _brwVf = (landValue && landValue.available && Number(landValue.value_sqm) > 0)
         ? Number(landValue.value_sqm) : null;
       if (_agsWert && _brwVf != null && Number(ref.living_area) > 0) {
+        /* ══ v1977a · JEDER AUSSCHUSS BENENNT SEINE ACHSEN ANDERS ═══════
+
+           Hier standen vier Namen: `brw`, `wohnflaeche`, `rnd`,
+           `flaeche`. Das sind die von BARNIM. Berlin fuehrt dieselbe
+           Kennzahl ueber `bgf_qm` x `brw_eur_qm` — der Aufruf bekam
+           dort `achse_x_fehlt` und sah aus wie „kein Wert".
+
+           Am Register gemessen, alle Achsen- und Korrekturnamen, die
+           ueberhaupt vorkommen:
+
+             Achsen       brw · brw_eur_qm · bodenwert · wohnflaeche ·
+                          wohnflaeche_qm · bgf_qm
+             Korrekturen  rnd · flaeche · baujahr · gebaeudestellung ·
+                          bauzustand
+
+           Geliefert wird deshalb, was vorliegt, unter JEDEM Namen, den
+           das Register benutzt. Der Satz nimmt sich, was er braucht.
+
+           > `gebaeudestellung` und `bauzustand` werden ABSICHTLICH NICHT
+           > abgebildet. DealPilot fuehrt `haustyp` und `ds2_zustand`, und
+           > eine Zuordnung waere eine Entscheidung ueber amtliche
+           > Klassen — also eine erfundene Einordnung. Der Leser erfaehrt
+           > sie als `korrekturen_offen`, das die Leseroutine schon
+           > zurueckgibt. */
+        const _bgfVf = Number(ref.bgf) > 0 ? Number(ref.bgf) : null;
         const _r = regVergleichsfaktor({
           ags: String(_agsWert), objektart: ref.property_type,
-          brw: _brwVf, wohnflaeche: Number(ref.living_area),
+          brw: _brwVf, brw_eur_qm: _brwVf, bodenwert: _brwVf,
+          wohnflaeche: Number(ref.living_area) || null,
+          wohnflaeche_qm: Number(ref.living_area) || null,
+          bgf_qm: _bgfVf,
           rnd: _rndVorab.rnd != null ? _rndVorab.rnd : null,
+          rnd_jahre: _rndVorab.rnd != null ? _rndVorab.rnd : null,
           flaeche: Number(ref.plot_area) > 0 ? Number(ref.plot_area) : null,
+          baujahr: Number(ref.build_year) > 0 ? Number(ref.build_year) : null,
         });
         if (_r && _r.verfuegbar && _r.wert != null) {
           if (String(_r.verwendung || '') === 'intern') {
@@ -657,7 +687,36 @@ export const ReportOrchestrator = {
               ausschuss: _r.ausschuss || null, quelle_url: _r.quelle_url || null };
             step('vergleichsfaktor-register: zurueckgehalten (nur steuerliche Bewertung)');
           } else {
-            const _wert = Number(_r.wert) * Number(ref.living_area);
+            /* ══ v1977a · DIE BEZUGSGROESSE IST NICHT IMMER DIE WOHNFLAECHE
+
+               Hier stand `* Number(ref.living_area)`. Barnim rechnet in
+               Euro je Quadratmeter WOHNFLAECHE, Berlin in Euro je
+               Quadratmeter BRUTTO-GRUNDFLAECHE. Mit der Wohnflaeche
+               multipliziert waere der Berliner Wert um den Faktor
+               Wfl/BGF daneben — bei einem Haus rund 25 Prozent, und
+               nichts haette widersprochen.
+
+               Die Leseroutine gibt `bezugsgroesse` zurueck; sie
+               entscheidet. Fehlt sie oder ist die passende Flaeche
+               nicht erfasst, gibt es KEINEN Objektwert — kein
+               Rateversuch mit der anderen Flaeche. */
+            const _bez = String(_r.bezugsgroesse || _r.einheit_bez || '');
+            const _istBgf = /bgf|brutto/i.test(_bez);
+            const _flaecheFuerWert = _istBgf ? _bgfVf : (Number(ref.living_area) || null);
+            if (_flaecheFuerWert == null) {
+              _regVf = { verfuegbar: false, grund: _istBgf ? 'bgf_fehlt' : 'wohnflaeche_fehlt',
+                faktor_qm: Number(_r.wert), bezugsgroesse: _bez || null,
+                hinweis: 'Für dieses Gebiet liegt ein amtlicher Vergleichsfaktor von '
+                  + _r.wert + ' €/m² vor, bezogen auf die '
+                  + (_istBgf ? 'Brutto-Grundfläche' : 'Wohnfläche')
+                  + '. Diese Fläche ist am Objekt nicht erfasst, deshalb wird kein '
+                  + 'Objektwert daraus gebildet.',
+                ausschuss: _r.ausschuss || null, quelle_url: _r.quelle_url || null };
+              step('vergleichsfaktor-register: Faktor da, aber Bezugsflaeche fehlt ('
+                + (_istBgf ? 'BGF' : 'Wohnflaeche') + ')');
+              throw { _abbruch: true };
+            }
+            const _wert = Number(_r.wert) * _flaecheFuerWert;
             _regVf = { verfuegbar: true, faktor_qm: Number(_r.wert),
               wert_eur: Math.round(_wert), einheit: _r.einheit || null,
               rechenweg: _r.rechenweg || null, ausschuss: _r.ausschuss || null,
@@ -674,7 +733,12 @@ export const ReportOrchestrator = {
           step('vergleichsfaktor-register: keiner (' + _r.grund + ')');
         }
       }
-    } catch (e) { _regVf = null; }
+    } catch (e) {
+      /* v1977a: der gezielte Abbruch oben hat `_regVf` absichtlich
+         gesetzt — ihn hier auf null zu werfen wuerde die Auskunft
+         wegwerfen, um die es gerade ging. */
+      if (!(e && e._abbruch)) _regVf = null;
+    }
 
     try {
       const _lzs = await WertParameterService.liegenschaftszins({

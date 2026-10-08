@@ -2386,7 +2386,39 @@ export function auswerten(modell, eingabe) {
     dokument = Math.round(dokument * p) / p;
   }
 
-  const faktor = IN_FAKTOR[einheit](dokument);
+  /* ══ v1977b · EINE UNBEKANNTE EINHEIT STUERZTE DEN AUSWERTER ═════════
+
+     Hier stand:
+
+       const faktor = IN_FAKTOR[einheit](dokument);
+
+     `einheit` kommt aus `modell.liefert` (Zeile ~2252) und damit aus
+     einer REGISTERDATEI. `IN_FAKTOR` kennt drei Werte: faktor, prozent,
+     zuschlag_prozent. Jeder andere ergibt `undefined` — und der Aufruf
+     `undefined(dokument)` wirft einen TypeError.
+
+     GEMESSEN am 08.10.2026 an den neuen Berliner Vergleichsfaktoren
+     (`liefert: "eur_qm"`):
+
+       TypeError: IN_FAKTOR[einheit] is not a function
+         at auswerten (swf_modelle.js:2389)
+
+     Das ist kein fehlender Wert, sondern ein ABBRUCH — ein
+     Registersatz mit einem Tippfehler im Feld `liefert` haette jeden
+     Bericht in diesem Gebiet zerlegt. Die Doktrin sagt „kein Treffer
+     heisst kein Wert", nicht „kein Treffer heisst kein Bericht".
+
+     Jetzt gibt es dafuer eine Auskunft: welche Einheit stand da, und
+     welche kennt der Auswerter. Damit ist der Fehler am Satz zu finden,
+     nicht im Stapelprotokoll. */
+  const _umrechner = IN_FAKTOR[einheit];
+  if (typeof _umrechner !== 'function') {
+    return nichts('einheit_unbekannt',
+      `Das Modell gibt die Einheit "${einheit}" an. Der Auswerter kennt `
+      + `${Object.keys(IN_FAKTOR).join(", ")} sowie wert_eur. Solange die `
+      + 'Einheit nicht zugeordnet ist, wird daraus kein Wert gebildet.');
+  }
+  const faktor = _umrechner(dokument);
   const [bMin, bMax] = BAND[modell.kennzahl] || BAND_STANDARD;   /* v1085-WBND */
 
   if (!(faktor > 0)) {

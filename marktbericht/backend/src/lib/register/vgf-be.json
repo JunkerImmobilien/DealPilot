@@ -9,7 +9,7 @@
   "zweig": "etw",
   "formel": {
    "form": "entscheidungsbaum",
-   "liefert": "eur_qm",
+   "liefert": "wert_eur",
    "einheit": "EUR/m² Wohnfläche",
    "wert": null,
    "warum_kein_wert": "SPERRE MIT WEG, NICHT FEHLENDE ERNTE. Die Berliner Vergleichsfaktoren für Wohnungseigentum sind KEINE Tabelle und keine Formel, sondern NEUN GEZEICHNETE ENTSCHEIDUNGSBÄUME (Startbaum plus acht Bezirksbäume, Abbildungen 1 bis 9). Der anzuwendende Faktor ist der Wert des ENDKNOTENS, den der Objektpfad erreicht — das Blatt führt es selbst so vor („3. Vergleichsfaktor: Endknoten 3 ‚bezugsfrei' = 5.369 EUR/m² Wohnfläche\").\n\nAlle Endknotenwerte stehen in diesem Satz und sind nachgeprüft (siehe stufe_grund). Was NICHT maschinell belegt ist, ist die TOPOLOGIE: welche Split-Schwelle zu welchem Endknoten führt. Die Bäume sind Vektorgrafiken, deren Verbinder von deckenden Beschriftungsfeldern zerschnitten sind; drei verschiedene Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Das ist Tuning, keine Messung — deshalb steht hier kein geratener Pfad.\n\nWEG ZUM ECHTEN WERT: Altbezirk bestimmen (Zuordnung steht in kategorie_zuordnung dieses Satzes, gegen die Altbezirkstabelle des Blattes geprüft), dann im zugehörigen Bezirksbaum auf Seite (siehe baeume[*].seite_im_blatt) des amtlichen PDF den Pfad ablesen und den Endknoten aus endknoten[] nehmen. Das PDF ist frei abrufbar: https://www.berlin.de/gutachterausschuss/_assets/amarktinformationen/adaten-zur-wertermittlung/05-05-020-2500.pdf\n\nAUFLÖSBAR wird der Satz, sobald die Baumseiten gerastert gelesen werden können (poppler/pdftoppm oder Ghostscript waren am 08.10.2026 auf dem Arbeitsplatz nicht vorhanden). Die Ernte muss dafür NICHT wiederholt werden.",
@@ -776,7 +776,9 @@
     "vergleichsfaktor_eur_qm": 5369,
     "grundbesitzwert_eur": 429520,
     "nachgerechnet": "5.369 EUR/m² × 80 m² = 429.520 EUR — zeichengleich mit dem Blatt."
-   }
+   },
+   "liefert_einheit": "EUR/m² Wohnfläche",
+   "bezugsgroesse": "wohnflaeche"
   },
   "modellansaetze": {
    "modellgrundlage": "§ 193 Abs. 5 BauGB in Verbindung mit § 19 DVO BauGB, Vergleichsfaktoren nach § 12 ImmoWertV",
@@ -858,7 +860,7 @@
   "zweig": "ezfh",
   "formel": {
    "form": "matrix_interp",
-   "liefert": "eur_qm",
+   "liefert": "wert_eur",
    "einheit": "EUR/m² Brutto-Grundfläche",
    "achse_x_feld": "bgf_qm",
    "achse_x_bez": "Brutto-Grundfläche in m² (DIN 277-1:2005-02, Anlage 4 ImmoWertV)",
@@ -995,7 +997,9 @@
     ],
     "grundbesitzwert_eur": 498400,
     "nachgerechnet": "3.336 + 0 − 278 − 566 = 2.492 EUR/m² BGF; 2.492 × 200 m² = 498.400 EUR — beide Zeilen zeichengleich mit dem Blatt."
-   }
+   },
+   "liefert_einheit": "EUR/m² Brutto-Grundfläche",
+   "bezugsgroesse": "bgf_qm"
   },
   "korrekturen": [
    {
@@ -1181,7 +1185,7 @@
   "zweig": "ezfh_sehr_gut",
   "formel": {
    "form": "stufen_1d",
-   "liefert": "eur_qm",
+   "liefert": "wert_eur",
    "einheit": "EUR/m² Brutto-Grundfläche",
    "achse_feld": "brw_eur_qm",
    "achse_bez": "Bodenrichtwert zum 01.01.2024 in EUR/m²",
@@ -1199,7 +1203,9 @@
    "interpolation": "linear zwischen den Stützstellen. Das Blatt erlaubt es ausdrücklich: „Innerhalb der Tabellenwerte kann linear interpoliert werden.\" Außerhalb von 1.700 bis 2.900 EUR/m² gibt der Satz nichts aus.",
    "normobjekt": "Einfamilienhaus, Einfamilienhaus mit Einliegerwohnung oder Zweifamilienhaus in SEHR GUTER stadträumlicher Wohnlage, in den Ortsteilen Schmargendorf, Grunewald, Westend und Dahlem. Erst- und Weiterverkäufe. Der Faktor enthält Grund und Boden UND Gebäude.",
    "keine_korrekturen": "Das Blatt sagt für diese Tabelle ausdrücklich: „Weitere signifikante Einflussgrößen liegen nicht vor.\" Es gibt KEINE Korrekturwerte — weder für Baujahr noch für Gebäudestellung noch für den Bauzustand. Die Korrekturen der Tabelle 1 dürfen hier NICHT angewendet werden; das wäre ein Modellbruch.",
-   "hinweis": "Die Kurve ist deutlich KONKAV, nicht linear: je 100 EUR/m² Bodenrichtwert steigt der Faktor von +366 (1.700 auf 1.800) auf nur noch +137 (2.800 auf 2.900). Eine lineare Fortschreibung über 2.900 hinaus würde kräftig überschätzen — darum ist Extrapolation gesperrt."
+   "hinweis": "Die Kurve ist deutlich KONKAV, nicht linear: je 100 EUR/m² Bodenrichtwert steigt der Faktor von +366 (1.700 auf 1.800) auf nur noch +137 (2.800 auf 2.900). Eine lineare Fortschreibung über 2.900 hinaus würde kräftig überschätzen — darum ist Extrapolation gesperrt.",
+   "liefert_einheit": "EUR/m² Brutto-Grundfläche",
+   "bezugsgroesse": "bgf_qm"
   },
   "korrekturen": [],
   "modellansaetze": {
@@ -1269,7 +1275,7 @@
   "zweig": "villa",
   "formel": {
    "form": "stufen_1d",
-   "liefert": "eur_qm",
+   "liefert": "wert_eur",
    "einheit": "EUR/m² Brutto-Grundfläche",
    "achse_feld": "brw_eur_qm",
    "achse_bez": "Bodenrichtwert zum 01.01.2024 in EUR/m²",
@@ -1286,7 +1292,9 @@
    "interpolation": "linear zwischen den Stützstellen. Das Blatt erlaubt es ausdrücklich: „Innerhalb der Tabellenwerte kann linear interpoliert werden.\" Außerhalb von 690 bis 2.900 EUR/m² gibt der Satz nichts aus.",
    "normobjekt": "Villa oder Landhaus in GUTER oder SEHR GUTER stadträumlicher Wohnlage, in den elf genannten Ortsteilen, bei GUTEM baulichem Zustand (Zuschlag ±0). Erst- und Weiterverkäufe. Das Blatt definiert: „Villen und Landhäuser sind aufwendig errichtete Gebäude auf entsprechendem Grundstück, die sich von ihrer Größe, ihrer Bauweise, ihrer Ausstattung sowie ihrer Außengestaltung (und ihrem Preis) vom Üblichen nach oben abheben.\" Der Faktor enthält Grund und Boden UND Gebäude.",
    "probe_innere_stimmigkeit": "Die sieben Stützstellen liegen exakt auf einer Geraden: Vergleichsfaktor = 4.402 + 2,306 × (Bodenrichtwert − 690). Größte Abweichung über alle sieben Werte: 1 EUR. Gegenprobe gegen Erfassungsfehler, nicht die amtliche Formel.",
-   "hinweis": "ACHTUNG, DAS NORMOBJEKT IST HIER DER GUTE ZUSTAND, nicht der normale. Das ist umgekehrt zu Tabelle 1, wo „normal\" die Null trägt. Wer die Gewohnheit aus Tabelle 1 mitnimmt, rechnet 2.182 EUR/m² BGF zu hoch."
+   "hinweis": "ACHTUNG, DAS NORMOBJEKT IST HIER DER GUTE ZUSTAND, nicht der normale. Das ist umgekehrt zu Tabelle 1, wo „normal\" die Null trägt. Wer die Gewohnheit aus Tabelle 1 mitnimmt, rechnet 2.182 EUR/m² BGF zu hoch.",
+   "liefert_einheit": "EUR/m² Brutto-Grundfläche",
+   "bezugsgroesse": "bgf_qm"
   },
   "korrekturen": [
    {

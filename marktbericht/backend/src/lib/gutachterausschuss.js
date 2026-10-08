@@ -1336,7 +1336,41 @@ function klasseAusBaujahr(bj) {
  * wenn die Bezugsgröße erfasst ist — den daraus folgenden Objektwert. Was
  * sie NICHT tut: die Bezugsgröße raten. Fehlt sie, gibt es keinen
  * Objektwert, nur den Wert je Einheit. */
+/* ══ v1977a · `verwendung` MUSS ZURUECKKOMMEN ══════════════════════════
+
+   Die Antwort fuehrte 23 Felder und `verwendung` war keines davon —
+   obwohl es im SATZ steht. Gemessen am 08.10.2026: der Berliner
+   Vergleichsfaktor traegt `verwendung: "intern"`, die Leseroutine gab
+   es nicht weiter.
+
+   Damit war die Sperre in ReportOrchestrator (v1977) TOTER CODE: sie
+   fragt `_r.verwendung === 'intern'` und bekam immer `undefined`. Ein
+   Waechter, der nie ausloest, und zwar fuer genau den Fall, fuer den er
+   gebaut wurde — die Berliner Faktoren duerfen keinen Verkehrswert
+   tragen (Paragraf 194 BauGB, ausdruecklich im Blatt).
+
+   Die Funktion hat mehrere Austritte. Statt jeden anzufassen liegt hier
+   ein Umschlag: er ruft den Kern und haengt `verwendung` und
+   `verwendung_grund` aus dem gefundenen Satz an. So kann kein kuenftiger
+   Austritt das Feld vergessen.
+   ══════════════════════════════════════════════════════════════════ */
 export function vergleichsfaktor(arg = {}) {
+  const _erg = _vergleichsfaktorKern(arg);
+  if (!_erg || typeof _erg !== 'object') return _erg;
+  if (_erg.verwendung !== undefined) return _erg;
+  try {
+    const _s = finde('vergleichsfaktor', String((arg && arg.ags) || ''));
+    const _l = Array.isArray(_s) ? _s : (_s ? [_s] : []);
+    const _t = _l.find((x) => x && x.zweig === _erg.zweig) || _l[0] || null;
+    if (_t) {
+      _erg.verwendung = _t.verwendung || null;
+      if (_t.auflagen) _erg.auflagen = _t.auflagen;
+    }
+  } catch (e) { /* ohne Satz bleibt das Feld weg - kein Rateversuch */ }
+  return _erg;
+}
+
+function _vergleichsfaktorKern(arg = {}) {
   const { ags, zweig, objektart } = arg;
   const reg = finde('vergleichsfaktor', ags);
   if (!reg.length) {
