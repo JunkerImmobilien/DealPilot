@@ -192,6 +192,76 @@
     }
   }
 
+  /* ══ v1979 · WORIN SICH ZWEI BERICHTE UNTERSCHEIDEN ══════════════════
+
+     Marcel: „man hat die hintereinander abgerufen und wuerde ja jetzt
+     erwarten, dass die gleich sind ... kann ja sein, dass er da wieder
+     was eingetippt hat, zwei unterschiedliche Sachen, und dann passt das
+     nicht mehr und er kann sich nicht mehr dran erinnern."
+
+     Verglichen wird mit dem naechstaelteren Bericht DERSELBEN ART —
+     einen Ertragswert gegen einen Sachwert zu stellen waere sinnlos.
+
+     Gezeigt wird die ZEILE des Rechenwegs, die sich unterscheidet, nicht
+     eine Prozentzahl. „9.256 EUR mehr" sagt nichts; „sonstige Ertraege
+     1.080 EUR x Barwertfaktor" sagt, was eingetippt war.
+
+     > Der Vergleich ueber die BESCHRIFTUNG, nicht ueber die Position:
+     > fehlt eine Zeile, verschieben sich alle folgenden um eins, und ein
+     > Vergleich nach Index meldet dann fuenf Unterschiede statt einem.
+     > Gemessen an den beiden Parkstr.-Berichten: 11 gegen 12 Zeilen. */
+  function _wegMap(weg) {
+    var m = {};
+    (weg || []).forEach(function (z) {
+      if (!z || !z.pos) return;
+      /* Die Beschriftung traegt teils Zahlen in Klammern. Fuer
+         den Vergleich zaehlt der Name davor, die Klammer steht
+         in der Anzeige. */
+      var name = String(z.pos).replace(/\s*\(.*$/, '').trim();
+      m[name] = { wert: z.wert, voll: String(z.pos) };
+    });
+    return m;
+  }
+  function _unterschiedZeigen(liste, i) {
+    var ziel = document.getElementById('oe-vw-diff');
+    if (!ziel) return;
+    var h = liste[i];
+    ziel.innerHTML = '';
+    if (!h || !h.weg || !h.weg.length) return;
+    /* den naechstaelteren Bericht DERSELBEN Art finden */
+    var vor = null;
+    for (var j = i + 1; j < liste.length; j++) {
+      if (liste[j].art === h.art && liste[j].weg && liste[j].weg.length) { vor = liste[j]; break; }
+    }
+    if (!vor) return;
+    var a = _wegMap(h.weg), b = _wegMap(vor.weg);
+    var zeilen = [];
+    Object.keys(b).forEach(function (k) {
+      if (!(k in a)) zeilen.push({ art: 'weg', k: k, voll: b[k].voll, wert: b[k].wert });
+    });
+    Object.keys(a).forEach(function (k) {
+      if (!(k in b)) zeilen.push({ art: 'neu', k: k, voll: a[k].voll, wert: a[k].wert });
+      else if (String(a[k].wert) !== String(b[k].wert)) {
+        zeilen.push({ art: 'anders', k: k, voll: a[k].voll, wert: a[k].wert, alt: b[k].wert });
+      }
+    });
+    if (!zeilen.length) {
+      ziel.innerHTML = '<span class="oe-q">Rechenweg identisch zum Bericht vom '
+        + _datum(vor.created_at) + '.</span>';
+      return;
+    }
+    var kopf = '<b>Unterschied zum Bericht vom ' + _datum(vor.created_at) + '</b>';
+    var txt = zeilen.slice(0, 6).map(function (z) {
+      var w = (z.wert == null || z.wert === '') ? '' : deNum(Number(z.wert)) + ' €';
+      if (z.art === 'weg') return '<span class="oe-d-weg">− ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' — damals dabei, jetzt nicht</span>';
+      if (z.art === 'neu') return '<span class="oe-d-neu">+ ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' — jetzt dabei, damals nicht</span>';
+      return '<span class="oe-d-and">' + esc(z.k) + ': ' + deNum(Number(z.alt)) + ' € → ' + w + '</span>';
+    }).join('<br>');
+    ziel.innerHTML = '<div class="oe-q oe-vw-diff-box">' + kopf + '<br>' + txt
+      + (zeilen.length > 6 ? '<br><span class="oe-q">… und ' + (zeilen.length - 6) + ' weitere</span>' : '')
+      + '</div>';
+  }
+
   async function automatik() {
     var box = $('oe-auto'); if (!box) return;
     var lauf = ++_autoLauf;
@@ -809,12 +879,14 @@
          Geschaeftsverkehr Ueblichen). Der MARKTWERT kann nie fuehrend
          sein - er ist eine Indikation aus Angebotspreisen, kein
          Verfahren nach ImmoWertV. */
+      /* v1979: der Rechenweg je Art wandert mit in den Eintrag, damit
+         zwei Berichte derselben Art verglichen werden koennen. */
       var basis = { created_at: h.created_at, ai_mode: h.ai_mode,
                     fuehrend_grund: h.fuehrend_grund, fuehrend_quelle: h.fuehrend_quelle };
       var fv = String(h.fuehrend || '');
       var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
-      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert' }));
-      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert' }));
+      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert', weg: h.ertrag_weg || null }));
+      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert', weg: h.sachwert_weg || null }));
       if (isFinite(m) && m > 0) liste.push(Object.assign({}, basis, { wert: m, art: 'Marktwert', fuehrend: false }));
     });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
@@ -834,7 +906,7 @@
         + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _f + '</option>';
     };
     box.innerHTML = (liste.length > 1
-      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'
+      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select><div id="oe-vw-diff"></div>'
       : '<span class="oe-q">' + (liste[0].art || 'Marktwert') + ' · '
         + _datum(liste[0].created_at) + ': <b>' + deNum(liste[0].wert) + ' €</b></span>')
       + '<button type="button" class="oe-btn" id="oe-vw-btn">als Verkehrswert übernehmen</button>'
@@ -845,6 +917,7 @@
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
     var sel = $('oe-vw-wahl'); var h = box._liste[sel ? parseInt(sel.value, 10) || 0 : 0]; if (!h) return;
+    _unterschiedZeigen(box._liste, sel ? parseInt(sel.value, 10) || 0 : 0);
     /* v1963: `wert` statt `market_value` - der Eintrag weiss selbst,
        welche Zahl er traegt (Ertrags-, Sach- oder Marktwert). */
     el.value = String(Math.round(Number(h.wert != null ? h.wert : h.market_value)));

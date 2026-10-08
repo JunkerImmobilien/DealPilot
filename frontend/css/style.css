@@ -38476,6 +38476,14 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
    Pflichtfeld, Bedeutung anders: ein Hebel, keine Sperre. Die eigene
    Klasse gibt es, damit das Aufraeumen beide auseinanderhalten kann. */
 .oe-hebel-leer > label, .oe-hebel-leer .oe-g { color: #7a3f3a; }
+
+/* v1979 - worin sich zwei Berichte unterscheiden. Nur ASCII in diesem
+   Block: style.css wird byteweise geschrieben. */
+.oe-vw-diff-box { margin-top: 6px; padding: 7px 9px; border-radius: 8px; border: 1px solid #E0DBD3; background: #fcfbf8; line-height: 1.5; }
+.oe-vw-diff-box b { color: #2A2727; }
+.oe-d-weg { color: #8a3f39; }
+.oe-d-neu { color: #2f6b4a; }
+.oe-d-and { color: #6b5a2a; }
 .oe-chips .oe-chip.fehlt::before { content: "+ "; }
 .f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }

@@ -557,6 +557,38 @@ router.get('/objects/history', async (req, res) => {
                  vollstaendigen Bericht mitschleppen. */
               (data->'cross_check'->'sachwert'->>'value_eur')::numeric    AS sachwert_eur,
               (data->'cross_check'->'ertragswert'->>'value_eur')::numeric AS ertragswert_eur,
+              /* ══ v1979 · DER RECHENWEG, VERDICHTET ════════════════════
+
+                 Marcel am 08.10.2026: „bei dem Auswahlmenue Ertragswert
+                 fuehrend haben wir zum Beispiel zwei Ertragswerte, einmal
+                 vom 7.10. und vom 8.10. ... Kriegt man das irgendwie hin
+                 zu sehen, wo der Unterschied ist, warum, dass der Kunde
+                 das weiss?"
+
+                 GEMESSEN an genau diesen zwei Berichten: 364.000 gegen
+                 355.000, bei IDENTISCHER Miete (6,52), identischem Zins
+                 und identischer Restnutzungsdauer. Der Unterschied steckt
+                 in EINER Zeile des Rechenwegs:
+
+                   7.10.  + sonstige Ertraege (1.080 EUR x Barwertfaktor)
+                          = 9.256    -> 363.909
+                   8.10.  diese Zeile fehlt           -> 354.653
+
+                 Jemand hatte 1.080 EUR sonstige Ertraege eingetragen und
+                 sie zwischen den Laeufen entfernt. Beide Rechenwege liegen
+                 vollstaendig im Bericht (ertragswert.staffel, 11 bzw. 12
+                 Zeilen) — sie haben den Server nur nie verlassen.
+
+                 Mitgeliefert wird NICHT der ganze Rechenweg: ein Verlauf
+                 mit 33 Staenden wuerde sonst 33 Staffeln mitschleppen.
+                 Verdichtet auf Beschriftung und Betrag je Zeile — genau
+                 das, was ein Vergleich braucht. */
+              (SELECT jsonb_agg(jsonb_build_object('pos', e->>'pos', 'wert', e->>'wert'))
+                 FROM jsonb_array_elements(coalesce(data->'cross_check'->'ertragswert'->'staffel', '[]'::jsonb)) e)
+                AS ertrag_weg,
+              (SELECT jsonb_agg(jsonb_build_object('pos', e->>'pos', 'wert', e->>'wert'))
+                 FROM jsonb_array_elements(coalesce(data->'cross_check'->'sachwert'->'staffel', '[]'::jsonb)) e)
+                AS sachwert_weg,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
                  „welcher ist jetzt der fuehrende? Vielleicht sollte man das
                  dann mit in dem Dropdown mit angeben."
