@@ -35,8 +35,15 @@
 
   /* ── Objekt, wie es der Dienst braucht (nur was den Zins bestimmt) ──── */
   function objektFuerApi() {
+    /* v1965: die MODERNISIERUNGSPUNKTE gehen mit. Ohne sie kann der
+       Endpunkt Anlage 2 nicht anwenden - er fiel still auf die Schaetzung
+       zurueck, waehrend die Oberflaeche „rechnet nach Anlage 2 neu"
+       versprach. Der Wert kommt aus derselben Quelle wie die Zeile
+       darunter (`modPunkte()`), damit nicht zwei Zahlen entstehen. */
+    var _mp = modPunkte();
     return { plz: _v('plz'), ort: _v('ort'), str: _v('str'), hnr: _v('hnr'), objart: _v('objart'),
-             baujahr: _v('baujahr'), einheiten: _v('einheiten'), nutzungsart: _v('nutzungsart'), wfl: _v('wfl') };
+             baujahr: _v('baujahr'), einheiten: _v('einheiten'), nutzungsart: _v('nutzungsart'), wfl: _v('wfl'),
+             mod_punkte: _mp ? _mp.total : null, modernis: _v('modernis') };
   }
 
   /* ═══ Automatik-Leiste ═══════════════════════════════════════════════ */
@@ -151,8 +158,30 @@
           + ' Eigener Ansatz möglich:', knopf('eintragen', 'sachwertfaktor'));
       }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
-      html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + (r.rnd_jahre != null ? r.rnd_jahre : '—') + ' J.',
-        gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV') + ' · Restnutzungsdauer aus Baujahr' + (mp ? ' — mit ' + mp.total + ' Modernisierungspunkten rechnet der Bericht nach Anlage 2 neu' : ''), '');
+      /* ══ v1965 · DIE RESTNUTZUNGSDAUER MIT IHRER HERKUNFT ════════════
+
+         Hier stand `r.rnd_jahre` ohne jede Einordnung, und dahinter die
+         feste Zusage „mit N Modernisierungspunkten rechnet der Bericht
+         nach Anlage 2 neu". Beides war an dieser Stelle nicht gedeckt:
+         der Endpunkt hat Anlage 2 nie angewandt (siehe api.js, v1965),
+         und eine 0 kam als Gedankenstrich an.
+
+         Jetzt steht da, welcher der beiden Wege gerechnet hat:
+
+           anlage2      das Modell der Anlage 2 aus den Punkten
+           geschaetzt   Gesamtnutzungsdauer minus Alter — der RUECKFALL
+
+         Beim Rueckfall steht auch, WARUM, denn das ist die Antwort auf
+         Marcels Frage „wo muss ich die Eingaben machen": die
+         Modernisierungspunkte sind der einzige Hebel. */
+      var rndTxt = (r.rnd_jahre == null) ? '—' : deNum(r.rnd_jahre, (r.rnd_jahre % 1 ? 1 : 0));
+      var rndQ = r.rnd_quelle === 'anlage2' ? st('a', 'Anlage 2')
+              : r.rnd_quelle === 'geschaetzt' ? st('b', 'geschätzt') : '';
+      var rndSatz = r.rnd_hinweis ? esc(r.rnd_hinweis)
+              : 'Restnutzungsdauer aus Baujahr und Modernisierungspunkten (Anlage 2 ImmoWertV).';
+      html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + rndTxt + ' J.',
+        gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV')
+        + ' · ' + rndQ + rndSatz, '');
       var bpi = r.baupreisindex;
       if (bpi && bpi.wert) html += zeile('Baupreisindex', deNum(bpi.wert, 2), st('b', 'Konstante') + '2010 → ' + esc(bpi.stichtag || '') + ' · noch nicht je Ausschuss (Backlog B1)', '');
     }
@@ -594,11 +623,20 @@
     var roh = (j && j.history) || [];
     var liste = [];
     roh.forEach(function (h) {
-      var basis = { created_at: h.created_at, ai_mode: h.ai_mode };
+      /* v1965: `fuehrend` kommt aus `cross_check.verfahrenswahl` des
+         Berichts - die Software entscheidet das nicht selbst, sie gibt
+         die Entscheidung des Berichts weiter (Paragraf 6 Abs. 1
+         ImmoWertV: das Verfahren richtet sich nach dem im gewoehnlichen
+         Geschaeftsverkehr Ueblichen). Der MARKTWERT kann nie fuehrend
+         sein - er ist eine Indikation aus Angebotspreisen, kein
+         Verfahren nach ImmoWertV. */
+      var basis = { created_at: h.created_at, ai_mode: h.ai_mode,
+                    fuehrend_grund: h.fuehrend_grund, fuehrend_quelle: h.fuehrend_quelle };
+      var fv = String(h.fuehrend || '');
       var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
-      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert' }));
-      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert' }));
-      if (isFinite(m) && m > 0) liste.push(Object.assign({}, basis, { wert: m, art: 'Marktwert' }));
+      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert' }));
+      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert' }));
+      if (isFinite(m) && m > 0) liste.push(Object.assign({}, basis, { wert: m, art: 'Marktwert', fuehrend: false }));
     });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     /* v1963: neueste zuerst. Innerhalb desselben Berichts bleibt die
@@ -607,8 +645,14 @@
     liste.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
     var opt = function (h, i) {
       /* v1963: die ART steht vorn - sie ist die Information, nicht das Datum. */
-      return '<option value="' + i + '">' + (h.art || 'Marktwert') + ' · '
-        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €</option>';
+      /* v1965: das Kennzeichen steht HINTEN und klein, wie Marcel es
+         wollte. Der Grund wandert in den Tooltip - im Dropdown ist kein
+         Platz fuer einen Satz. */
+      var _f = h.fuehrend ? ' · führend' : '';
+      var _t = h.fuehrend && h.fuehrend_grund
+        ? ' title="' + esc(h.fuehrend_grund + (h.fuehrend_quelle ? ' (' + h.fuehrend_quelle + ')' : '')) + '"' : '';
+      return '<option value="' + i + '"' + _t + '>' + (h.art || 'Marktwert') + ' · '
+        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _f + '</option>';
     };
     box.innerHTML = (liste.length > 1
       ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'

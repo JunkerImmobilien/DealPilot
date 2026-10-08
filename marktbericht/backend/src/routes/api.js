@@ -27,6 +27,9 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
 import { WertParameterService } from '../services/WertParameterService.js';
 import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
 import { gnd as iwGnd, rnd as iwRnd } from '../lib/immowertv.js';
+/* v1965: die EINE Ableitung der Restnutzungsdauer. Siehe den Block am
+   Endpunkt /wertparameter/zinssatz. */
+import { restnutzungsdauerEinheitlich } from '../lib/rnd-einheitlich.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import { GeoapifyConnector } from '../connectors/GeoapifyConnector.js';
 import { LocationFinderService } from '../services/LocationFinderService.js';
@@ -550,6 +553,22 @@ router.get('/objects/history', async (req, res) => {
                  vollstaendigen Bericht mitschleppen. */
               (data->'cross_check'->'sachwert'->>'value_eur')::numeric    AS sachwert_eur,
               (data->'cross_check'->'ertragswert'->>'value_eur')::numeric AS ertragswert_eur,
+              /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
+                 „welcher ist jetzt der fuehrende? Vielleicht sollte man das
+                 dann mit in dem Dropdown mit angeben."
+
+                 Der Bericht entscheidet das laengst und schreibt es nach
+                 cross_check.verfahrenswahl (Parkstr. 9: ertragswert, Grund
+                 „Renditeobjekt", Quelle Paragraf 6 Abs. 1 ImmoWertV).
+                 Es stand nur nirgends.
+
+                 KEINE BACKTICKS in diesem Kommentar: er steht INNERHALB
+                 eines Template-Literals. Ein Backtick beendet die
+                 Zeichenkette und zerlegt die Datei - in dieser Sitzung
+                 schon einmal passiert, an genau dieser Stelle. */
+              (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
+              (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
+              (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,
               (data ? 'cross_check')                                        AS hat_crosscheck
          FROM mb.object_snapshots
         WHERE user_id = $1${cond}
@@ -1062,11 +1081,57 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
        aus einer fertigen Zahl umgerechnet (v1338). */
     const gndJ = (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd))
                  || iwGnd(m.property_type);
-    let rndJ = null;
+    /* ══ v1965 · DIE DRITTE ABLEITUNG DERSELBEN ZAHL ═══════════════════
+
+       Hier stand:
+
+         const rr = iwRnd(gndJ, m.build_year, 'bestand', new Date().getFullYear());
+
+       Das ist ein DRITTER Weg zur Restnutzungsdauer. CLAUDE.md fuehrt als
+       Doktrin: „Eine Restnutzungsdauer fuer alle Verfahren", und seit
+       v1816 liegt sie in `lib/rnd-einheitlich.js`. Der Bericht fragt
+       dort. Dieser Endpunkt fragte `immowertv.js`.
+
+       GEMESSEN am 08.10.2026 an Parkstr. 9 in Bad Oeynhausen
+       (Baujahr 1905, GND 80, also Alter 121):
+
+         Endpunkt   iwRnd           ->  jahre 0   (linear, max(0, 80-121))
+         Bericht    rnd-einheitlich ->  10        (RND_MIN greift)
+         Frontend   calcPunktraster ->  nicht anwendbar (Scheitel bei 84)
+
+       Drei Wege, drei Zahlen fuer dasselbe Gebaeude.
+
+       ZWEI WEITERE FEHLER steckten in denselben vier Zeilen:
+
+       1. `iwRnd` nimmt die Modernisierungspunkte als FUENFTES Argument
+          (`opt.mod_punkte`) - es wurde nie uebergeben. Anlage 2 konnte an
+          diesem Endpunkt also GAR NICHT greifen, auch nicht bei 20
+          Punkten. Die Zeile „mit N Modernisierungspunkten rechnet der
+          Bericht nach Anlage 2 neu" stand in der Oberflaeche und war an
+          dieser Stelle unwahr.
+
+       2. Die Auslieferung lautete `Number(rndJ) || null`. Eine ECHTE
+          Null - rechnerisch aufgebrauchte Nutzungsdauer, ein Befund - 
+          wurde damit zu `null` und in der Oberflaeche zu einem
+          Gedankenstrich. CLAUDE.md warnt genau davor: nie ein
+          `||`-Rueckfall auf einem Wert, der 0 sein darf.
+
+       > Marcel sah deshalb bei Parkstr. 9 eine leere Zelle und fragte,
+       > wo er etwas eintragen muss. Die Antwort war: nirgends - die Zahl
+       > war da und ging auf dem Weg verloren.
+
+       Jetzt fragt der Endpunkt denselben Kern wie der Bericht und liefert
+       die Herkunft mit. `iwRnd` bleibt importiert, weil `iwGnd` aus
+       derselben Datei kommt und andere Routen sie nutzen. */
+    const _rndRef = Object.assign({}, m, {
+      mod_punkte: m.mod_punkte != null ? m.mod_punkte
+        : (d.mod_punkte != null && d.mod_punkte !== '' ? Number(d.mod_punkte) : null)
+    });
+    let rndJ = null, rndHerkunft = null;
     try {
-      const rr = iwRnd(gndJ, m.build_year, 'bestand', new Date().getFullYear());
-      rndJ = (rr && typeof rr === 'object') ? (rr.rnd ?? rr.jahre ?? null) : rr;
-    } catch (e) { rndJ = null; }
+      rndHerkunft = restnutzungsdauerEinheitlich(_rndRef, gndJ);
+      rndJ = rndHerkunft && rndHerkunft.rnd != null ? rndHerkunft.rnd : null;
+    } catch (e) { rndJ = null; rndHerkunft = null; }
 
     /* v1851 · Die Automatik-Leiste im Reiter Objekt zeigt neben dem Zins auch,
        ob der Ausschuss SACHWERTFAKTOREN fuehrt. Der Faktor selbst haengt am
@@ -1097,7 +1162,13 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       quelle_url: p.quelle_url || null, zweig: p.zweig || null, lage: p.lage || null,
       berichtsjahr: p.berichtsjahr || null, stichtag: p.stichtag || null,
       ausschuss: p.quelle || null,
-      gnd_jahre: Number(gndJ) || null, rnd_jahre: Number(rndJ) || null,
+      gnd_jahre: Number(gndJ) || null,
+      /* v1965: erst auf ABWESENHEIT pruefen, dann rechnen. `rnd_jahre: 0`
+         ist ein Befund und kein fehlender Wert. */
+      rnd_jahre: (rndJ == null || !Number.isFinite(Number(rndJ))) ? null : Number(rndJ),
+      rnd_quelle: (rndHerkunft && rndHerkunft.quelle) || null,
+      rnd_grund: (rndHerkunft && rndHerkunft.grund) || null,
+      rnd_hinweis: (rndHerkunft && rndHerkunft.hinweis) || null,
       gnd_quelle: (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd)) ? 'register' : 'anlage1',
       sachwertfaktor_quelle: swfQuelle,
       baupreisindex: BAUPREISINDEX_KONSTANTE,
