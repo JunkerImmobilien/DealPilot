@@ -88,6 +88,72 @@ export function restnutzungsdauer({ gnd, alter, punkte = 0, kernsaniert = false 
   const t = TAB3[p];
   const relAlter = (A / G) * 100;
 
+  /* ══ v1966 · HINTER DEM SCHEITEL WIRD NICHT EXTRAPOLIERT ═════════════
+
+     Die Formel der Anlage 2 ist eine nach oben geoeffnete Parabel. Ihr
+     Scheitel liegt bei
+
+       Alter = b * GND / (2a)
+
+     und DAHINTER STEIGT SIE WIEDER. Diese Funktion hat das nicht
+     geprueft und deshalb fuer sehr alte Gebaeude eine wachsende
+     Restnutzungsdauer geliefert.
+
+     GEMESSEN am 08.10.2026 an dieser Funktion selbst (GND 80, 0 Punkte):
+
+       Baujahr 1964 (62 Jahre alt)  ->  19,3 Jahre
+       Baujahr 1945 (81 Jahre alt)  ->  11,9
+       Baujahr 1930 (96 Jahre alt)  ->  14,0   steigt wieder
+       Baujahr 1905 (121 Jahre alt) ->  33,1   steigt weiter
+       Baujahr 1890 (136 Jahre alt) ->  54,0   mehr als das Haus von 1964
+
+     Ueber ein Raster aus 12 Baujahren x 6 Punktzahlen x 2 GND gab es
+     28 Faelle, in denen das AELTERE Gebaeude mehr Restnutzungsdauer
+     bekam. In einem Fall sank sie durch MEHR Modernisierung
+     (Baujahr 1890: 54,0 Jahre bei 0 Punkten, 43,4 bei 4 Punkten).
+
+     Das ist kein Grenzfall: die Zahl ging in den Gebaeudesachwert.
+
+     DIE SPERRE IST `A >= G`, und sie ist nachgerechnet sicher: der
+     Quotient Scheitel/GND ist b/(2a) und liegt bei JEDER der 21
+     Punktzahlen ueber 1 (Minimum 1,0500 bei 0 Punkten). Die Sperre
+     greift damit immer VOR dem Scheitel, nie danach.
+
+     WAS STATT DESSEN GILT: nichts aus diesem Modell. Die Funktion gibt
+     `rnd: null` mit Grund zurueck, und `rnd-einheitlich.js` faellt auf
+     die dokumentierte Schaetzung zurueck (Gesamtnutzungsdauer minus
+     Alter, Untergrenze RND_MIN = 10 Jahre) — als `geschaetzt`
+     gekennzeichnet, nicht als Anlage 2.
+
+     > Der Auffangwert wird hier ABSICHTLICH NICHT neu erfunden. Das
+     > System hat schon einen (RND_MIN = 10), er ist monoton, und er war
+     > nur durch die Extrapolation umgangen. Eine zweite Untergrenze
+     > waere eine dritte Zahl fuer dasselbe.
+
+     > Die Verordnung selbst nennt fuer diesen Fall NICHTS. Anlage 2
+     > regelt die Schwelle nach unten und den Deckel bei 70 bzw. 90
+     > Prozent, aber keinen Mindestwert und keinen Fall "Alter >= GND"
+     > (geprueft am Verordnungstext). Die uebliche Konvention ist
+     > Paragraf 185 Abs. 3 Satz 6 BewG — „Die Restnutzungsdauer eines
+     > noch nutzbaren Gebaeudes betraegt vorbehaltlich des Satzes 7
+     > mindestens 30 Prozent der Gesamtnutzungsdauer." Das sind bei
+     > GND 80 also 24 Jahre. Sie ist fuer den VERKEHRSWERT nicht
+     > bindend (BewG ist Steuerrecht), und ob DealPilot die Untergrenze
+     > von 10 auf 24 Jahre hebt, ist eine Bewertungsentscheidung — sie
+     > steht im Backlog, nicht in diesem Patch. */
+  if (A >= G) {
+    return { rnd: null, weg: null, grad: grad(p), punkte: p,
+             relatives_alter: Math.round(relAlter * 10) / 10,
+             grund: 'alter_ueber_gnd',
+             hinweis: 'Das Alter (' + A + ' Jahre) erreicht oder '
+               + 'überschreitet die Gesamtnutzungsdauer (' + G + ' Jahre). '
+               + 'Die Kurve der Anlage 2 liegt hier hinter ihrem Scheitel '
+               + '(Alter ' + (Math.round(t.b * G / (2 * t.a) * 10) / 10)
+               + ' Jahre) und würde wieder steigen — es wird nicht '
+               + 'extrapoliert. Die Restnutzungsdauer ist sachverständig zu '
+               + 'würdigen.' };
+  }
+
   let rnd;
   let weg;
   let ausFormel;

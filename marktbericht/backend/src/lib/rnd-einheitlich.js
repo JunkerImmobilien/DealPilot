@@ -86,9 +86,16 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
   }
   const a2 = anlage2Rnd({ gnd: GND, alter: Math.max(0, (new Date().getFullYear()) - bj),
                           punkte: mp, kernsaniert: kern });
+  /* v1966: den ECHTEN Grund weitergeben. Hier stand pauschal „lieferte
+     kein Ergebnis" — seit anlage2.js hinter dem Scheitel absichtlich
+     verweigert (Alter >= GND), ist das der haeufigste Fall, und der
+     Leser des Berichts hat ein Recht auf die Begruendung. */
   if (!(a2 && a2.rnd != null)) {
-    return erg('geschaetzt', 'anlage2_ohne_ergebnis', fallback,
-      SCHAETZUNG_TEXT + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.');
+    const _g = (a2 && a2.grund) || 'anlage2_ohne_ergebnis';
+    const _h = (a2 && a2.hinweis)
+      ? SCHAETZUNG_TEXT + ' ' + a2.hinweis
+      : SCHAETZUNG_TEXT + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.';
+    return erg('geschaetzt', _g, fallback, _h);
   }
   return erg('anlage2', null, a2.rnd,
     'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '

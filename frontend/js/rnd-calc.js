@@ -41,7 +41,39 @@
     { a: 0.4660, b: 1.0270, c: 0.9906, rel: 19 },
     { a: 0.4320, b: 0.9540, c: 0.9811, rel: 18 },
     { a: 0.3980, b: 0.8810, c: 0.9717, rel: 17 },
-    { a: 0.3640, b: 0.8810, c: 0.9622, rel: 16 },
+    /* ══ v1966 · HIER STAND b: 0.8810 — EIN TIPPFEHLER ══════════════════
+       Die 0.8810 der Zeile DARUEBER (11 Punkte) stand ein zweites Mal
+       hier bei 12 Punkten. Die b-Reihe der Tabelle 3 faellt ab 9 Punkten
+       um genau 0,0730 je Schritt:
+
+         P9 1.0270 · P10 0.9540 · P11 0.8810 · P12 0.8080 · P13 0.7350
+
+       BELEGT am Verordnungstext (gesetze-im-internet.de, Anlage 2
+       ImmoWertV, Tabelle 3): bei 12 Punkten gilt a=0,3640 b=0,8080
+       c=0,9622, relatives Alter 16 %. Beide anderen Kerne im Haus
+       (marktbericht anlage2.js und das Modul v4.2.2) fuehren 0.8080 —
+       nur diese Datei nicht.
+
+       WIRKUNG, am echten Kern gemessen (GND 80, 12 Punkte):
+
+         Baujahr 1995  54,04 statt 56,00 Jahre
+         Baujahr 1990  51,16 statt 53,78
+         Baujahr 1980  46,08 statt 49,44
+         Baujahr 1970  41,91 statt 46,00
+         Baujahr 1964  39,84 statt 44,37
+         Baujahr 1955  37,36 statt 42,54
+
+       Die Restnutzungsdauer fiel also bei genau EINER Punktzahl um bis zu
+       4,5 Jahre zu niedrig aus. Betroffen war nur P12 — P11 und P13 sind
+       richtig, deshalb sah die Tabelle beim Drueberlesen stimmig aus.
+
+       > Der Pruefer dieser Datei (tools/rnd-pruefung/, 22 Faelle gegen
+       > drei unterschriebene Gutachten) hat es nicht gefunden: unter den
+       > 22 Faellen war kein Objekt mit 12 Modernisierungspunkten. Ein
+       > Pruefer, der seine DECKUNG nicht nennt, wird gruen, ohne die
+       > Luecke zu zeigen. Deshalb gibt es jetzt
+       > tools/rnd-kerne-pruefen.mjs, der alle 21 Punktzahlen abfaehrt. */
+    { a: 0.3640, b: 0.8080, c: 0.9622, rel: 16 },
     { a: 0.3300, b: 0.7350, c: 0.9528, rel: 15 },
     { a: 0.3040, b: 0.6760, c: 0.9506, rel: 14 },
     { a: 0.2780, b: 0.6170, c: 0.9485, rel: 13 },
