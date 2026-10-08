@@ -408,33 +408,56 @@
        bezahlt. */
     var note = $('mbow-note');
     if (note) {
-      var _t = '\u2713 Objektdaten \u00fcbernommen';
-      var _farbe = '#3FA56C';
+      /* v2007 - DIE BESCHRIFTUNG OHNE DEN ANHANG DER FELDHILFE.
+
+         feldhilfe.js:616 haengt an JEDES <label> ein
+         <span class="fh">&#9432;</span> - das eingekreiste kleine i.
+         `label.textContent` nimmt Kindelemente MIT, also klebte
+         hinter jedem Feldnamen ein (i): "Baujahr(i), Kaufpreis(i)".
+         Marcels "mit einem I dahinter".
+
+         Gelesen wird deshalb aus einer KOPIE, aus der alles mit der
+         Klasse .fh entfernt ist - das wirkt auch, wenn die Feldhilfe
+         ihr Zeichen irgendwann aendert. */
+      var _beschriftung = function (id) {
+        try {
+          var el2 = $(id); if (!el2) return id;
+          var kasten = el2.closest ? el2.closest('div') : null;
+          var lb = kasten ? kasten.querySelector('label') : null;
+          if (!lb) return id;
+          var kopie = lb.cloneNode(true);
+          var anhang = kopie.querySelectorAll('.fh');
+          for (var i = 0; i < anhang.length; i++) anhang[i].remove();
+          var t = String(kopie.textContent || '').split('\u2014')[0];
+          t = t.replace(/[\s\u24d8\u2139:]+$/, '').trim();
+          return t || id;
+        } catch (e) { return id; }
+      };
+      var _esc = function (t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); };
+
+      /* v2007 - Drei getrennte Aussagen statt einer goldenen Wand.
+         Die Erfolgszeile BLEIBT gruen: die Uebernahme hat ja geklappt.
+         Vorher faerbte ein einziges ausgelassenes Feld die ganze
+         Meldung gold - der Erfolg sah aus wie eine Warnung. */
+      var _zeilen = ['<div class="mbow-ok">\u2713 Objektdaten \u00fcbernommen</div>'];
       if (_uebersprungen.length) {
-        var _namen = _uebersprungen.map(function (id) {
-          var l = null;
-          try {
-            var el2 = $(id);
-            var lab = el2 && el2.closest ? el2.closest('div') : null;
-            var lb = lab ? lab.querySelector('label') : null;
-            if (lb) l = String(lb.textContent || '').split('\u2014')[0].trim();
-          } catch (e) {}
-          return l || id;
-        });
-        _t += ' \u2014 <b>' + _namen.join(', ') + '</b> '
-            + (_namen.length === 1 ? 'blieb' : 'blieben')
-            + ' stehen, weil du das selbst eingetragen hast.';
-        _farbe = 'var(--wl-c9a84c, #C9A84C)';
+        var _namen = _uebersprungen.map(_beschriftung);
+        _zeilen.push('<div class="mbow-rest">' + _namen.length + ' '
+          + (_namen.length === 1 ? 'Feld blieb' : 'Felder blieben')
+          + ' stehen, weil du sie selbst eingetragen hast:</div>');
+        _zeilen.push('<div class="mbow-pillen">'
+          + _namen.map(function (nm) { return '<span class="mbow-pille">' + _esc(nm) + '</span>'; }).join('')
+          + '</div>');
       } else {
-        _t += ' \u2014 pr\u00fcfen und \u201eMarktbericht erstellen\u201c klicken.';
+        _zeilen.push('<div class="mbow-rest">Pr\u00fcfen und \u201eMarktbericht erstellen\u201c klicken.</div>');
       }
       if (_bezugGeloest) {
-        _t += '<br>Die Adresse geh\u00f6rt nicht zu diesem Objekt \u2014 der Bericht wird '
-            + '<b>keinem</b> Bestandsobjekt zugeordnet.';
-        _farbe = 'var(--wl-c9a84c, #C9A84C)';
+        _zeilen.push('<div class="mbow-warn">\u26a0 Die Adresse geh\u00f6rt nicht zu diesem Objekt \u2014 '
+          + 'der Bericht wird <b>keinem</b> Bestandsobjekt zugeordnet.</div>');
       }
-      note.innerHTML = _t;
-      note.style.color = _farbe;
+      note.innerHTML = _zeilen.join('');
+      note.style.color = '';   /* die Farben stehen jetzt je Zeile im Blatt */
+      _mbowStil();
     }
     _uebersprungen = [];
     _bezugGeloest = false;
@@ -644,6 +667,23 @@
 
       else if (note) { note.textContent = '\u2717 Konnte Objektdaten nicht laden.'; note.style.color = '#B8625C'; }
     }
+  }
+
+  /* v2007 - einmal eingehaengt, danach stumm. Gold als RAHMEN, nicht
+     als Flaeche: eine ausgelassene Angabe ist ein Hinweis, kein Alarm. */
+  function _mbowStil() {
+    if (document.getElementById('mbow-stil')) return;
+    var st = document.createElement('style'); st.id = 'mbow-stil';
+    st.textContent = 
+      '#mbow-note{font-size:11.5px;line-height:1.5}'
+      + '#mbow-note .mbow-ok{color:#3FA56C;font-weight:600}'
+      + '#mbow-note .mbow-rest{color:#8a8a93;margin-top:2px}'
+      + '#mbow-note .mbow-warn{color:var(--wl-c9a84c, #C9A84C);margin-top:5px}'
+      + '#mbow-note .mbow-pillen{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}'
+      + '#mbow-note .mbow-pille{display:inline-block;padding:2px 8px;border-radius:999px;'
+        + 'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);'
+        + 'color:var(--wl-c9a84c, #C9A84C);font-size:11px;white-space:nowrap}';
+    document.head.appendChild(st);
   }
 
   function mount() {
