@@ -291,20 +291,80 @@
     if (!a || !b) return false;
     return !(a.r === 0 && a.g === 0 && a.b === 0 && b.r === 255 && b.g === 255 && b.b === 255);
   }
+  /* ══ v1986 · EIN VERLAUF IST AUCH EIN GRUND ═══════════════════════════
+
+     Hier stand nur `backgroundColor`. Gemessen am Abruf-Knopf der
+     Datenaufnahme: er traegt `background-color: rgba(0,0,0,0)` und
+     `background-image: linear-gradient(#D5BB73, #C9A84C)`. Die alte
+     Fassung fiel also auf die Schicht DAHINTER durch (#0c0c0e) und
+     meldete Kontrast 1,07 fuer einen Knopf, der bei rund 8:1 liegt.
+
+     In dieser Marke ist das der Normalfall, nicht die Ausnahme: der
+     Runway ist die Hausfarbe jeder Handlungsflaeche.
+
+     Ein Verlauf wird ueber seine Farbstopps GEMITTELT. Jeder Stopp
+     wird mit `male()` ueber den bereits gesammelten Grund gemalt,
+     damit Alpha in den Stopps richtig faellt. Das ist eine Naeherung —
+     und sie ist als solche benannt: `quelle` sagt, woher der Grund
+     kommt.
+
+     > Ein `url(...)` kann niemand ausrechnen. Dann meldet die Funktion
+     > `unmessbar` statt einer Zahl, die nach Messung aussieht. Eine
+     > fehlende Messung ist ehrlich, eine falsche ist teuer. */
+  function stopps(bild){
+    /* Farbstopps aus einem CSS-Verlauf. Keine Prozente, keine Winkel —
+       nur die Farben. `color(srgb …)` ist dabei, weil `male()` sie kann
+       und der Selbsttest der Kabine genau daran einmal gescheitert ist. */
+    var re = /(rgba?\([^)]*\)|color\(\s*srgb[^)]*\)|#[0-9a-fA-F]{3,8}\b|\b(?:transparent|currentcolor)\b)/gi;
+    var out = [], m;
+    while ((m = re.exec(bild))) out.push(m[1]);
+    return out;
+  }
   function effGrund(el, win){
     /* Erster Vorfahr mit Fläche; durchsichtige Schichten werden von hinten
        nach vorn übereinandergemalt. Weiß ist der Anfang — das Blatt. */
-    var p = el, stapel = [];
+    var p = el, stapel = [], unmessbar = null, hatVerlauf = false;
     while (p) {
-      var c = win.getComputedStyle(p).backgroundColor;
+      var st = win.getComputedStyle(p);
+      var bild = st.backgroundImage;
+      if (bild && bild !== 'none') {
+        if (/url\(/i.test(bild)) {
+          /* Ein Bild als Grund - die Farbe daraus zu raten waere eine
+             Behauptung. Der Befund ist: nicht messbar, und warum. */
+          unmessbar = unmessbar || { grund: 'url() im background-image', bei: p };
+        } else {
+          var ss = stopps(bild);
+          if (ss.length) {
+            hatVerlauf = true;
+            stapel.push({ verlauf: ss });
+            /* Ein Verlauf ohne durchsichtige Stopps deckt - dann endet
+               die Suche hier, wie bei einer deckenden Farbe. */
+            var alleDeckend = ss.every(function (x) { return ist_deckend(x); });
+            if (alleDeckend) break;
+          }
+        }
+      }
+      var c = st.backgroundColor;
       if (deckt(c)) { stapel.push(c); if (ist_deckend(c)) break; }
       p = p.parentElement;
     }
     var out = { r:255, g:255, b:255, a:1 };
     for (var i = stapel.length - 1; i >= 0; i--) {
-      var n = male(stapel[i], out);
-      if (n) out = n;
+      var lage = stapel[i];
+      if (lage && lage.verlauf) {
+        var summe = { r:0, g:0, b:0 }, n = 0;
+        for (var j = 0; j < lage.verlauf.length; j++) {
+          var q = male(lage.verlauf[j], out);
+          if (q) { summe.r += q.r; summe.g += q.g; summe.b += q.b; n++; }
+        }
+        if (n) out = { r: summe.r/n, g: summe.g/n, b: summe.b/n, a: 1 };
+      } else {
+        var k = male(lage, out);
+        if (k) out = k;
+      }
     }
+    out.quelle = unmessbar ? 'unmessbar' : (hatVerlauf ? 'verlauf' : 'farbe');
+    if (unmessbar) out.warum = unmessbar.grund;
     return out;
   }
   /* Deckend heißt: über Schwarz und über Weiß kommt dasselbe heraus. */
@@ -713,6 +773,49 @@
     return { standbild: true, elemente: n, beobachter: !!sbBeobachter };
   }
 
+  /* ══ v1986 · rAF FEUERT IM VERBORGENEN DOKUMENT NICHT ════════════════
+
+     GEMESSEN mit einer Frist von 1200 ms: in der Kabine UND im
+     Pruefling kommt kein rAF-Rueckruf, solange das Browserfenster
+     nicht vorn liegt.
+
+     Das ist nicht kosmetisch. `object-actions.js` baut die
+     Pre-Flight-Karte auf dem Handy erst dann zum Bodenblatt um, wenn
+     ein MutationObserver `scan()` ruft — und der tut das in einem rAF.
+     Ohne rAF entsteht kein `.dp-pf-mtrigger`, das Blatt bleibt per
+     `translateY(110%)` unter dem Bildrand, und die Kabine zeigt eine
+     Datenaufnahme, die es auf einem echten Geraet so nie gibt.
+
+     > Ich habe das beinahe als Produktfehler gemeldet. Entschieden hat
+     > es eine rAF-Frist, nicht eine plausible Erklaerung. */
+  function rafErsatz(){
+    var z = ziel();
+    if (!z.win) return { fehler: 'kein Fenster' };
+    if (z.win.__dpmRafEcht) return { schon: true };
+    try {
+      z.win.__dpmRafEcht = z.win.requestAnimationFrame.bind(z.win);
+      z.win.requestAnimationFrame = function (cb) {
+        return z.win.setTimeout(function () { cb(z.win.performance.now()); }, 16);
+      };
+      return { umgelegt: true };
+    } catch (e) { return { fehler: e.message }; }
+  }
+
+  /* Eine Probe, die den Ersatz MESSBAR macht: feuert rAF jetzt? */
+  async function rafProbe(){
+    var z = ziel();
+    if (!z.win) return ['kein Fenster'];
+    var kam = await new Promise(function (res) {
+      var da = false;
+      try { z.win.requestAnimationFrame(function () { da = true; res(true); }); }
+      catch (e) { res(false); return; }
+      setTimeout(function () { if (!da) res(false); }, 1200);
+    });
+    return [(kam ? 'ok   ' : 'FEHL ') + 'rAF im Pruefling feuert: ' + kam
+            + '  (Sichtbarkeit ' + ((ziel().d && ziel().d.visibilityState) || '?') + ', Ersatz '
+            + (z.win.__dpmRafEcht ? 'aktiv' : 'aus') + ')'];
+  }
+
   /* Die Sichtbarkeit des Prueflings gehoert IN DIE KABINE, nicht in den
      Kopf des Messenden: sie ist „hidden", solange das Browserfenster
      nicht vorn liegt, und dann laeuft kein Uebergang von selbst. */
@@ -721,7 +824,10 @@
      if (!e) return;
     var z = ziel();
     var v = (z.d && z.d.visibilityState) || '?';
-    e.textContent = 'Sichtbarkeit: ' + v + ' · Standbild: ' + (SB_AN ? 'ein' : 'aus');
+    var raf = false;
+    try { raf = !!(ziel().win && ziel().win.__dpmRafEcht); } catch (x) {}
+    e.textContent = 'Sichtbarkeit: ' + v + ' · Standbild: ' + (SB_AN ? 'ein' : 'aus')
+      + ' · rAF-Ersatz: ' + (raf ? 'aktiv' : 'aus');
     e.className = 'hin ' + (SB_AN ? 'ok' : (v === 'visible' ? 'leise' : 'warn'));
   }
 
@@ -831,6 +937,13 @@
        setzen, sonst misst der erste Lauf nach einem Geraetewechsel
        wieder ein eingefrorenes Einzelbild. */
     try { if (SB_AN) standbild(true); else sichtNachziehen(); } catch (e) {}
+    /* v1986: rAF im Pruefling auf einen Timer umlegen, solange er
+       verborgen ist. Ohne das bleibt die Handy-Datenaufnahme ein
+       Bodenblatt ohne Ausloeser - gemessen, nicht vermutet. */
+    try {
+      var zz = ziel();
+      if (zz.d && zz.d.visibilityState !== 'visible') rafErsatz();
+    } catch (e) {}
     var z = ziel();
     if (!z.d) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Dokument</span>'; return; }
     try { zeige(messe(z.d, z.win, 'Start')); }
@@ -876,6 +989,8 @@
                  kontrast: kontrast, gemalt: gemalt, male: male,
                  lage: lage, warte: warte,
                  standbild: standbild, standbildProbe: standbildProbe,
+                 rafErsatz: rafErsatz, rafProbe: rafProbe,
+                 stopps: stopps,
                  standbildAn: function(){ return SB_AN; },
                  selbsttest: selbsttest, geraete: GERAETE };
 
