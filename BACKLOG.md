@@ -36,6 +36,87 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N47 · ⚠ ZWEI ANLAGE-2-KERNE, UND EINER EXTRAPOLIERT ÜBER DIE GND (08.10.2026)
+
+**Gefunden**, als Marcel fragte, warum bei Parkstr. 9 keine Restnutzungsdauer stand. Der
+Weg dorthin ist mit **v1965** behoben (eine Ableitung statt drei). Was bleibt, ist der
+Rechenweg selbst.
+
+**Es gibt zwei Umsetzungen der Anlage 2 ImmoWertV:**
+
+```
+Backend   marktbericht/backend/src/lib/anlage2.js    (rechnet immer)
+Frontend  frontend/js/rnd-calc.js  Kern 3.1.0        (prueft drei Grenzen)
+```
+
+**Gegen beide echten Kerne gemessen, GND 80, 0 Modernisierungspunkte:**
+
+```
+Baujahr  Alter   Frontend 3.1.0        Backend anlage2.js
+  1990     36    44                    44                  gleich
+  1968     58    22,31                 22,3                gleich
+  1964     62    19,31                 19,3                gleich
+  1905    121    nicht anwendbar       33,1                ABWEICHUNG
+```
+
+Sie sind sich **überall einig außer jenseits der Gesamtnutzungsdauer**. Dort rechnet das
+Backend weiter — und die Parabel der Anlage 2 hat ihren **Scheitel bei Alter 84**
+(`b·GND/2a` = 2,625 × 80 / 2,5) und steigt danach wieder:
+
+```
+Bj 1964 (62 J. alt)  ->  19,3 Jahre RND
+Bj 1905 (121 J. alt) ->  33,1 Jahre RND     <- das aeltere Haus bekommt MEHR
+```
+
+Der Frontend-Kern verweigert das ausdrücklich und begründet es im Code: *„ohne 3. bekam
+ein Haus von 1900 mehr RND als eines von 1964."* Er ist gegen **drei unterschriebene
+Gutachten geprüft** (`tools/rnd-pruefung/rnd-gutachten-test.mjs`, 22/22). Der
+Backend-Kern hat diese Prüfung nicht.
+
+> **Heute trifft es den Sachwert, nicht nur eine Anzeige.** `CrossCheckService` rechnet
+> über `rnd-einheitlich.js` → `anlage2.js`. An Parkstr. 9 mit 8 Modernisierungspunkten
+> kommen **38,4 Jahre** heraus statt eines Befundes „Modell nicht anwendbar" — bei einem
+> 121 Jahre alten Gebäude. Der Restwertfaktor und mit ihm der Gebäudesachwert hängen
+> daran.
+
+**Zu tun:**
+1. Entscheiden, welcher Kern gilt. **Fachlich spricht alles für den Frontend-Kern** —
+   er ist gegen Gutachten geprüft und begründet seine Grenzen aus dem Verordnungstext.
+   Das ist eine **Bewertungsentscheidung, keine Code-Entscheidung** → Marcel.
+2. Danach **einen** Kern führen. `tools/rechenkerne-spiegeln.mjs` gibt es seit v1899 und
+   spiegelt Frontend → Backend; diese beiden stehen nicht darin.
+3. Prüfer, der beide Kerne über ein Raster hält (Baujahre × Punkte) und bei der ersten
+   Abweichung rot wird — sonst laufen sie wieder auseinander.
+
+---
+
+### N47b · 0 Modernisierungspunkte gelten als „nicht erfasst" (08.10.2026)
+
+`rnd-einheitlich.js` prüft die Punkte mit einem Helfer, der **`> 0` verlangt**:
+
+```js
+const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+```
+
+Damit fällt **`mod_punkte: 0` auf den Zweig `kein_modernisierungsgrad`** — Anlage 2 wird
+nicht angewandt, es gilt die Schätzung.
+
+An Parkstr. 9 ist das sichtbar: die Gewerke-Tabelle meldet **„5 von 8 Bauteilen
+angegeben"** und errechnet daraus **0 von 20 Punkten**. Das ist ein **Befund** — nicht
+modernisiert — und nicht dasselbe wie „niemand hat hingesehen". Der Bericht schreibt
+aber „Es wurde kein Modernisierungsgrad erfasst."
+
+> Die Wirkung ist heute **zugunsten des Vorsichtigeren**: die Schätzung gibt 10 Jahre,
+> Anlage 2 mit 0 Punkten gäbe 33,1 (siehe N47 — und die 33,1 sind selbst fraglich).
+> **Erst N47 entscheiden, dann das hier** — sonst wird eine Zahl freigeschaltet, die
+> aus dem falschen Kern kommt.
+
+**Zu tun:** zwischen „0 Punkte erfasst" und „nichts erfasst" unterscheiden. Die
+Gewerke-Tabelle weiß, ob jemand etwas angegeben hat (`mp.angaben`); diese Zahl erreicht
+das Backend noch nicht.
+
+---
+
 ### N46 · Der Mapper multiplizierte Zahlen mit 10, 100 oder 1000 (07.10.2026) — BEHOBEN v1962
 
 **N46-BEHOBEN · am echten Objekt nachgemessen, derselbe Lauf vor und nach der Reparatur:**
