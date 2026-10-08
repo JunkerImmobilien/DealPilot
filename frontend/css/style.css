@@ -38438,6 +38438,19 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-fehlt b { color: #B8625C; }
 .oe-fehlt .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
 .oe-fehlt .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+/* v1972 - die Chip-Regel hing an `.oe-fehlt`. Die acht Modernisierungs-Chips
+   der Automatik-Leiste liegen aber in `.oe-chips` innerhalb einer `.oe-q`,
+   also NICHT unter diesem Anker - sie waeren unformatiert geblieben. Gemessen
+   vorher: `.oe-chip` kommt in style.css genau zweimal vor, beide Male unter
+   `.oe-fehlt`. Statt den bestehenden Anker zu weiten, steht hier ein eigener
+   mit gleicher Spezifitaet. */
+.oe-chips { display: inline-block; margin-top: 2px; }
+.oe-chips .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
+.oe-chips .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+/* Leer heisst: hier fehlt die Angabe, die die Anlage 2 braucht. Rot und Gruen
+   bleiben in jeder Marke gleich - Statusfarben werden nicht tokenisiert. */
+.oe-chips .oe-chip.fehlt { border-color: #D8954C; color: #8a5a1c; font-weight: 600; }
+.oe-chips .oe-chip.fehlt::before { content: "+ "; }
 .f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
 .oe-anfragen-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }

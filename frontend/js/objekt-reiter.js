@@ -105,6 +105,43 @@
     return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));
   }
 
+  /* ══ v1972 · DER WEG ZUR ANLAGE 2 ════════════════════════════════════
+
+     Marcel am 08.10.2026: „das brauchst du nicht weiter anzeigen, also
+     dass das gemacht wird. Aber es wäre schon gut, dass man signalisiert
+     bekommt: Wo ist denn die Anlage 2 und wo muss ich die aufstellen?
+     Dass der Weg klar ist. Vielleicht, ja, dass man da irgendwie einen
+     kleinen Absprung hat ... Oder wenigstens das rauslesen kann dann im
+     Tab Objekt, welche Felder da wo gefüllt werden müssten."
+
+     Die Zeile sagte bisher, wie viel schon erfasst IST („5 von 8
+     Bauteilen angegeben, gerechnet"). Das ist eine Auskunft über den
+     Stand, keine über den WEG. Jetzt stehen die acht Felder als Chips
+     da, die leeren hervorgehoben, und ein Klick springt hin.
+
+     Der Absprung ist nicht neu gebaut: `abweichend(feld)` gibt es seit
+     v1852 und macht genau das Richtige — es öffnet die Detailkarte
+     (`#oe-karte-gewerke`, `data-oe-detail="1"`), setzt die Eingabetiefe
+     auf Stufe 3, klappt auf, rollt hin und setzt den Fokus. Der
+     Klick-Verteiler auf `[data-oe-feld]` liegt schon. Es fehlte nur der
+     Knopf.
+
+     > Die Beschriftungen stehen HIER und nicht im HTML abgelesen: ein
+     > `<label class="oe-sr">` ist für Bildschirmleser gedacht und heißt
+     > „Außenwände · modernisiert" — in einem Chip ist der Zusatz
+     > Füllmaterial. Dafür sind es dieselben acht Schlüssel wie in
+     > `modPunkte()` darunter, damit nicht zwei Listen entstehen. */
+  var MOD_FELDER = [
+    ['mod_dach',        'Dach'],
+    ['mod_fenster',     'Fenster'],
+    ['mod_leitungen',   'Leitungen'],
+    ['mod_heizung',     'Heizung'],
+    ['mod_aussenwand',  'Außenwände'],
+    ['mod_baeder',      'Bäder'],
+    ['mod_innenausbau', 'Innenausbau'],
+    ['mod_grundriss',   'Grundriss'],
+  ];
+
   function modPunkte() {
     var W = window.DealPilotRND_Wizard;
     if (!W || typeof W.modPunkte !== 'function') return null;
@@ -153,11 +190,20 @@
 
        Und die Restnutzungsdauer traegt den Gebaeudesachwert linear
        (Paragraf 38 Abs. 1 ImmoWertV). */
-    var mpQ = !mp ? 'aus der Spalte „modernisiert" in der Gewerke-Tabelle — ohne Angabe rechnet der Bericht die Restnutzungsdauer als Schätzung'
-      : mp.total === 0
-        ? st('x', '0 Punkte') + mp.angaben + ' von 8 Bauteilen angegeben, aber die Maßnahmen liegen zu weit zurück für Punkte (Anlage 2). '
-          + 'Die Restnutzungsdauer fällt damit auf die Schätzung zurück — das ist der stärkste Hebel auf den Sachwert.'
-        : st('b', 'gerechnet') + mp.angaben + ' von 8 Bauteilen angegeben (Gewerke-Tabelle, Anlage 2)';
+    /* v1972: die Chips sind der Weg. Die LEEREN tragen `fehlt` und
+       stehen vorn — wer etwas nachtragen will, sieht zuerst, was fehlt. */
+    var mpChips = (function () {
+      var voll = [], leer = [];
+      MOD_FELDER.forEach(function (f) {
+        var c = '<span class="oe-chip' + (_v(f[0]) ? '' : ' fehlt')
+          + '" data-oe-feld="' + f[0] + '">' + esc(f[1]) + '</span>';
+        (_v(f[0]) ? voll : leer).push(c);
+      });
+      return '<span class="oe-chips">' + leer.concat(voll).join('') + '</span>';
+    })();
+    var mpQ = (mp && mp.total > 0 ? st('a', 'Anlage 2 greift') : st('x', 'Anlage 2 greift nicht'))
+      + 'Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle (Anlage 2 ImmoWertV) und tragen die Restnutzungsdauer. Klick springt zum Feld:'
+      + '<br>' + mpChips;
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
       box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
@@ -794,7 +840,9 @@
         if (typeof calc === 'function') { try { calc(); } catch (e) {} }
       });
     });
-    ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'].forEach(function (id) {
+    /* v1972: dieselbe Liste wie MOD_FELDER oben — sie stand hier ein
+       zweites Mal ausgeschrieben. */
+    MOD_FELDER.map(function (f) { return f[0]; }).forEach(function (id) {
       var el = $(id); if (el) el.addEventListener('change', function () { spaeter(automatik, 100); });
     });
     ['makrolage', 'mikrolage', 'ds2_bevoelkerung', 'ds2_nachfrage'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('change', function () { spaeter(lageVergleich, 100); }); });
