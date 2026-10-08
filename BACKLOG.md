@@ -45,12 +45,78 @@ Abhängigkeit, nicht seine Priorität.
 
 ---
 
-#### N60.1 · Lageklassen ermitteln und vergeben — FREIGEGEBEN
+#### N60.1 · Lageklassen ermitteln und vergeben — ✅ ERLEDIGT 08.10.2026
 Marcel: „die Lageklassen kannst du selber ermitteln und vergeben, kannst
-auch im Netz nachschauen." Damit ist die Sperre aus **N59** aufgehoben.
-Vorgehen: je Objekt aus Ort und Lage eine Klasse A/B/C herleiten, die
-**Herleitung je Objekt mitschreiben** (sonst ist es wieder eine Zahl ohne
-Herkunft), eintragen, gegenmessen. A 3,75 % · B 5,0 % Zielrendite.
+auch im Netz nachschauen." Damit war die Sperre aus **N59** aufgehoben.
+
+**Es musste nichts erfunden und nichts nachgeschlagen werden.** Gemessen
+trugen **17 von 21 Objekten bereits Makrolage, Mikrolage UND
+Bodenrichtwert** — alles Marcels eigene Angaben. Die Klasse ist daraus
+abgeleitet, nicht geschätzt.
+
+**Die Regel, nachrechenbar:**
+
+```
+Punkte  sehr_gut 5 · gut 4 · durchschnittlich 3 · schwach 2 · sehr_schwach 1
+P       = (Makrolage + Mikrolage) / 2
+A       wenn P >= 4,0  UND  BRW >= 500 EUR/m2
+C       wenn P <= 2,5  ODER BRW <  150 EUR/m2
+B       sonst
+```
+
+Ohne eigene Lagedaten: die **häufigste** Klasse der Objekte am selben
+Ort, bei Gleichstand das neutrale **B**. Ohne Ort: gar nichts.
+
+| Objekt | Ort | → | Herleitung |
+|---|---|:-:|---|
+| 2026-1052 | Leipzig | **A** | P 4,0 · BRW 1.200 |
+| 2026-1054 | Detmold | **A** | P 4,5 · BRW 700 |
+| 2026-1041 | Bielefeld | B | P 3,5 · BRW 450 |
+| 2026-1053 | Bielefeld | B | P 3,5 · BRW 390 |
+| 2026-1042 | Bielefeld | B | P 3,5 · BRW 320 |
+| 2026-004 | Musterhausen | B | P 3,0 · BRW 250 |
+| 2026-1055 | Ibbenbüren | B | P 3,5 · BRW 210 |
+| 2026-1008 | Bad Oeynhausen | B | P 3,0 · BRW 200 |
+| 2026-999 | Leipzig | B | P 3,5 · BRW 160 |
+| 2026-1006 | Hiddenhausen | B | P 3,0 · BRW 150 |
+| 2026-1082 | Herford | B\* | **keine Lagedaten, kein Geschwister** — neutral |
+| 2026-1079 | Bad Oeynhausen | B\* | aus Ort (1056=C, 1008=B), Gleichstand → B |
+| 2026-1078 | Bad Oeynhausen | B\* | dito |
+| 2026-1056 | Bad Oeynhausen | **C** | P 2,0 — Mikrolage sehr schwach |
+| 2026-1051 | Castrop-Rauxel | **C** | P 2,5 **und** BRW 90 |
+| 2026-001 | Hüllhorst | **C** | BRW 90 |
+| 2026-1036 | Rinteln | **C** | BRW 80 |
+| 2026-1040/1007/1002 | Kabelsketal | **C** | BRW 130 |
+| 2026-1086 | — | — | **ohne Adresse, keine Grundlage** |
+
+Verteilung: **A 2 · B 11 · C 7 · 1 ohne**. Die mit \* markierten drei
+sind die schwächsten Ableitungen — sie stehen auf der neutralen Klasse,
+weil keine eigenen Lagedaten vorliegen. **Marcel sollte genau diese drei
+gegenlesen.**
+
+> **⚠ Beim Schreiben wäre fast ein Schaden entstanden.**
+> `objectService.update()` setzt `ai_analysis = aiAnalysis || null` und
+> `photos = photos || []` bei **jedem** PUT. Ein naives
+> „Feld ergänzen und speichern" hätte **jede Pilot-Analyse und jedes
+> Foto gelöscht** — lautlos. Der Lauf schickt beides deshalb zurück und
+> misst nach jedem Objekt gegen: Analyse 14.849 → 14.849, Fotos 6 → 6.
+> **Alle 20 Schreibvorgänge mit unveränderter Analyse und Fotozahl.**
+
+#### N60.1b · ⚠ SIEBEN Objekte tragen dieselbe Pilot-Analyse
+Beim Nachmessen aufgefallen (08.10.2026), Länge in Zeichen:
+
+| Länge | Objekte |
+|---:|---|
+| **14.849** | **7**: 2026-1056, 1052, 1055, 1054, 1053, 1051, 1041 |
+| **11.187** | **2**: 2026-1007, 2026-1002 |
+| 9.807 / 9.926 / 11.012 | je 1 (2026-004, 2026-999, 2026-001) |
+
+Die sieben liegen in **Bad Oeynhausen, Leipzig, Ibbenbüren, Detmold,
+Bielefeld und Castrop-Rauxel** — und tragen byte-gleich denselben Text.
+Das deckt sich mit dem alten Befund weiter unten in dieser Datei (dort
+waren es sechs). **Eine Analyse, die zu einem anderen Objekt spricht,
+ist schlimmer als keine** — und sie ist ein starker Kandidat für
+Marcels Frage aus N60.5 („erst 44, dann über 80").
 
 #### N60.2 · Messkabine: ALLES, nicht nur der Marktbericht
 Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine geprüft?
