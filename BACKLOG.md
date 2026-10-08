@@ -148,10 +148,69 @@ Countdown/Hinweis in der App, Sperre bei Ablauf, Entsperrung durch
 Bestätigung. **Vorher messen**, was `email_verified` heute tatsächlich
 blockiert.
 
-#### N60.4 · Was macht die Pilot- und die Cockpit-Analyse wirklich?
+#### N60.4 · Was macht die Pilot- und die Cockpit-Analyse wirklich? — TEIL 1 ERLEDIGT (`v2009`)
 Marcel: „Auf welche Daten wird zugegriffen und wo ist das Wissen? Haben
 wir auf alles Zugriff oder können wir was besser machen?"
-→ Bestandsaufnahme läuft, Ergebnis gehört hierher.
+
+**Die Antwort war unangenehm konkret: vier Dinge reisen seit jeher mit
+und wurden im Backend nie gelesen.** Behoben in `v2009`, im laufenden
+Container am echten `buildPrompt()` nachgewiesen (8 von 8 Blöcken).
+
+| | gesendet | gelesen | jetzt |
+|---|---|---|---|
+| **`aiOptions`** — Detailgrad, Tonalität, Fokus, **eigene Anweisungen (500 Z.)** | `ui.js:932` | **nie** (`ai.js:249` gab nur `userApiKey` weiter) | durchgereicht |
+| **`verhandlung`** — `inseriert_seit`, `tage_online` | `ui.js:886` | **nie** — das Wort kam im Dienst 1× vor, in der *Ausgabe*-Beschreibung | eigener Block |
+| **`dealpilot_marktbewertung`** .mikrolage/.makrolage/.wertentwicklung/.marktwert | `ui.js:910` | nur `.marktkontext` + `.erbbaurecht` | eigener Block |
+| **`investor_score`** .rendite/.finanzierung/.risiko/.lage | `ui.js:949` | nur `.total` | aufgeschlüsselt |
+
+> **Die Einstellung „Eigene Anweisungen" war sichtbar, einstellbar,
+> gespeichert, gesendet — und wirkungslos.** Zwanzig Zeilen weiter macht
+> `/ai/lage` es richtig. Über der `dealpilot_marktbewertung`-Zeile steht
+> sogar ein Kommentar, dass dieses Feld „im ganzen Backend KEINEN Leser"
+> hatte — er wurde zur Hälfte behoben und zur Hälfte nicht.
+>
+> **Besonders teuer war Nr. 4:** das Antwortformat verlangt ein Feld
+> `score_vergleich`, das erklären soll, *welche* Zusatz-KPIs die Differenz
+> zwischen DealScore und Investor Deal Score treiben. Genau diese vier
+> Zahlen wurden geschickt und verworfen — **das Modell musste raten.**
+
+**Dazu zwei Felder aus dem Formular ergänzt:**
+
+- **Cashflow nach Steuer.** `calc.js:1969` `cf_ns = cf_op − steuer`,
+  `calc.js:1970` `cf_m = cf_op / 12`. Die Pilot-Analyse bekam **`cf_m`,
+  also VOR Steuer** — und sollte in Aufgabe 8 die Steuererstattung
+  beurteilen. Der Portfolio-Pilot bekommt beide Zahlen: **zwei
+  verschiedene Wahrheiten über dasselbe Objekt.** Jetzt stehen beide da
+  und sind **benannt**, dazu Steuerwirkung und AfA.
+- **Zinsbindung und Anschlusskondition.** Aufgabe 13 fordert eine
+  Anschlussfinanzierungs-Analyse; mitgereist war nur die Restschuld zum
+  Ende der Zinsbindung — **ohne zu wissen, wann das ist.**
+
+**NOCH OFFEN aus derselben Bestandsaufnahme — Teil 2:**
+
+1. **Das Produktwissen sitzt am falschen Ende.** `bot-wissen.md`
+   (186 Zeilen) ist **nur** am Telegram-Agenten verdrahtet
+   (`agentLauf.js:69`). Pilot-Analyse und Portfolio-Pilot sehen es
+   **nicht** — ihre Regeln stehen hartkodiert im Prompt.
+2. **Es gibt kein RAG.** Gesucht nach `embedding`, `pgvector`, `vector`,
+   `retrieval`: **0 Treffer** in `backend/src` und in allen 85
+   Migrationen. Der Datenraum speichert **nur Links**
+   (`datenraum.js:12`), serverseitig auf 200 KB gedeckelt mit dem
+   Kommentar „damit hier keine Dokumente landen". → **Grundlage für
+   N60.7.**
+3. **Mietvertragsfelder gibt es gar nicht** — kein Treffer in den 256
+   Feld-Ids. → **N60.8 ist Neubau, keine Erweiterung.**
+4. **Fotos werden nie ausgewertet** — `/analyze` ruft reinen Text.
+5. **Der Portfolio-Pilot sieht je Objekt nur 24 Zahlenfelder** — keine
+   Energieklasse, kein Zustand, kein Leerstand, keine Einheiten, keine
+   Steuer, als Ort nur `ort`. Ein Klumpenrisiko „Lage" ist damit nur auf
+   Ortsebene beantwortbar.
+6. **Das Investmentprofil (24 Schlüssel) liegt nur im `localStorage`** und
+   erreicht **keinen** Prompt — während Aufgabe 5 „Investor-Fit"
+   beurteilen soll, für wen der Deal passt.
+7. Weitere unsichtbare Blöcke: Steuerdaten, Bewirtschaftungsstruktur,
+   Mietentwicklungsplan, Wohnungsdetails, Bodenrichtwert/Sachwert,
+   RND/GND, Halter/Gesellschaft.
 
 #### N60.5 · ⚠ Der Telegram-Bot rechnet mit Mieten, die niemand eingegeben hat
 Bilder: `Dateien/bot/IMG_1554.PNG` … `IMG_1559.PNG` (Sachsenstraße 18,
