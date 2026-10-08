@@ -1576,24 +1576,14 @@ async function renderSaved(opts) {
         return;
       }
       // V63.27: Sortierung — aktives Objekt zuerst, dann nach Sort-Modus
-      var sortMode = (window.localStorage && localStorage.getItem('dp_sb_sort')) || 'recent';
+      var sortMode = _sbSortModus();
       // V98: items klonen damit Sort den Cache nicht mutiert
       items = items.slice();
-      items.sort(function(a, b) {
-        // Aktives Objekt IMMER zuerst
-        if (a.id === _currentObjKey && b.id !== _currentObjKey) return -1;
-        if (b.id === _currentObjKey && a.id !== _currentObjKey) return 1;
-        // Sonst nach gewähltem Modus
-        if (sortMode === 'id') {
-          // Nach seq_no ABsteigend (höchste/neueste ID zuerst)
-          var sa = (a.seq_no || ''), sb = (b.seq_no || '');
-          if (sa < sb) return 1;
-          if (sa > sb) return -1;
-          return 0;
-        } else {
-          // Default: zuletzt bearbeitet zuerst
-          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
-        }
+      items.sort(_sbVergleich(sortMode));
+      /* v1982: die Paare fuer die Gruppenkoepfe, aus DEMSELBEN Array wie die
+         Karten - sonst zeigt ein Kopf auf eine Karte, die woanders steht. */
+      _sbLagePaare = items.map(function(o) {
+        return { key: o.id, klasse: _sbLageVon(o) };
       });
 
       // V63.25: Duplikat-Detection — Set aller seq_no und markieren welche doppelt vorkommen
@@ -1709,6 +1699,7 @@ async function renderSaved(opts) {
           halter: _halterName(o.halter)
         });
       }).join('');   /* v1512: der Knopf steht jetzt OBEN */
+      _sbLageKoepfeEinsetzen(list);   /* v1982 */
       list.querySelectorAll('.sb-card').forEach(function(el) {
         el.addEventListener('click', function() {
           // V102: Burger-Menü auf Mobile sofort schließen wenn ein Objekt angeklickt wird
@@ -1729,7 +1720,30 @@ async function renderSaved(opts) {
         if (Auth.isLoggedIn()) return k.startsWith(prefix);
         return k.startsWith('ji_') && !k.startsWith('ji_u_') &&
                !['ji_ak','ji_ak_oai','ji_provider','ji_sb_collapsed','ji_users','ji_session','ji_token'].includes(k);
-      }).sort().reverse();
+      });
+      /* ══ v1982 · DER LOKALE PFAD SORTIERTE NUR NACH SCHLUESSELNAMEN ══
+
+         GEMESSEN: hier stand `.sort().reverse()` auf den
+         localStorage-Schluesseln. Der ID-Knopf aus V63.27 hatte in
+         diesem Pfad also noch NIE eine Wirkung - er sah aus wie ein
+         Schalter und war keiner. Aufgefallen beim Bau des Menues: ein
+         Modus mehr macht einen toten Schalter nicht sichtbarer.
+
+         Jetzt laeuft derselbe Vergleich wie im Server-Pfad. Dafuer muss
+         einmal geparst werden - bei einem lokalen Bestand ohne Konto ist
+         das eine Handvoll Objekte. */
+      var _lokal = keys.map(function (k) {
+        var d = {};
+        try { d = JSON.parse(localStorage.getItem(k) || '{}'); } catch (e) {}
+        return { id: k, seq_no: d.seq_no || d._seq || k, updated_at: d._at || 0,
+                 kaufdat: d.kaufdat || (d.data && d.data.kaufdat) || null,
+                 lageklasse: d.lageklasse || (d.data && d.data.lageklasse) || null };
+      });
+      _lokal.sort(_sbVergleich(_sbSortModus()));
+      _sbLagePaare = _lokal.map(function (o) {
+        return { key: o.id, klasse: _sbLageVon(o) };
+      });
+      keys = _lokal.map(function (o) { return o.id; });
 
     if (!keys.length) {
       list.innerHTML = _addNewBtn() + '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>';
@@ -1781,6 +1795,7 @@ async function renderSaved(opts) {
         halter: _halterName(d.halter || (d.data && d.data.halter))
       });
     }).join('');   /* v1512: der Knopf steht jetzt OBEN */
+    _sbLageKoepfeEinsetzen(list);   /* v1982 */
     list.querySelectorAll('.sb-card').forEach(function(el) {
       el.addEventListener('click', function() {
         // V102: Burger-Menü auf Mobile sofort schließen
@@ -4006,13 +4021,213 @@ window._toggleSbcDscr = function(card) {
 };
 
 // V63.27: Sortier-Modus für Sidebar-Liste
-function setSidebarSort(mode) {
-  if (mode !== 'id' && mode !== 'recent') return;
-  try { localStorage.setItem('dp_sb_sort', mode); } catch(e) {}
-  // Buttons-State
-  document.querySelectorAll('.sb-sort-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.getAttribute('data-sort') === mode);
+/* ══ v1982 · VIER SORTIERUNGEN STATT ZWEI ════════════════════════════
+
+   Marcel am 08.10.2026: „wenn man da draufklickt, eine Auswahl kommt,
+   dass man dann nach ID sortieren kann, nach Datum, also nach Kaufdatum
+   und vielleicht auch nach Lage? Und dass wir dann so Unterkategorien
+   machen: A-Lage, B-Lage, C-Lage."
+
+   Die vier Modi und was sie lesen:
+
+     recent   updated_at     (Vorgabe, wie bisher)
+     id       seq_no         absteigend, hoechste zuerst
+     kaufdat  data->>kaufdat jüngster Kauf zuerst, OHNE Datum nach hinten
+     lage     data->>lageklasse  A, B, C, dann ohne - mit Gruppenkoepfen
+
+   > EINE Abweichung von der bisherigen Regel, bewusst: im Modus `lage`
+   > steht das aktive Objekt NICHT mehr zwingend oben. Sonst erscheint
+   > seine Lageklasse zweimal als Gruppenkopf - einmal fuer die eine
+   > Karte oben und einmal fuer den eigentlichen Block. Ein Gruppenkopf,
+   > der zweimal dasteht, ist schlimmer als eine Karte, die nicht oben
+   > steht.
+
+   Kaufdatum: `kaufdat` kommt als TEXT aus dem JSON (data->>). Ein
+   deutsches „14.08.2026" sortiert als Text falsch, deshalb wird es
+   normalisiert. `Number(null)` ist 0 und besteht `Number.isFinite` -
+   also erst auf Abwesenheit pruefen, dann vergleichen. */
+var _SB_MODI = ['recent', 'id', 'kaufdat', 'lage'];
+var _SB_MODI_TEXT = {
+  recent:  { wort: 'Zuletzt bearbeitet', icon: 'i-clock' },
+  id:      { wort: 'Objekt-ID',          icon: 'i-hash' },
+  kaufdat: { wort: 'Kaufdatum',          icon: 'i-calendar' },
+  lage:    { wort: 'Lage (A/B/C)',       icon: 'i-pin' }
+};
+var _sbLagePaare = [];
+
+function _sbSortModus() {
+  var m = null;
+  try { m = localStorage.getItem('dp_sb_sort'); } catch (e) {}
+  return _SB_MODI.indexOf(m) >= 0 ? m : 'recent';
+}
+
+/* Die Lageklasse eines Listeneintrags. Server-Pfad: Spalte `lageklasse`
+   (seit v1982 in der Liste-API). Lokaler Pfad: direkt aus dem Datensatz.
+   Rueckgabe immer "A", "B", "C" oder "" - nie undefined, damit der
+   Gruppenkopf-Vergleich nicht an zwei Sorten Leere scheitert. */
+function _sbLageVon(o) {
+  if (!o) return "";
+  var v = o.lageklasse;
+  if (v == null && o.data) v = o.data.lageklasse;
+  v = (v == null) ? "" : String(v).trim().toUpperCase();
+  return (v === "A" || v === "B" || v === "C") ? v : "";
+}
+
+/* Kaufdatum als vergleichbare Zahl. Leer -> null (nicht 0!), damit
+   Objekte ohne Kaufdatum hinten landen statt 1970 zu behaupten. */
+function _sbKaufdatZahl(o) {
+  var v = (o && o.kaufdat != null) ? o.kaufdat : (o && o.data ? o.data.kaufdat : null);
+  if (v == null) return null;
+  var s = String(v).trim();
+  if (!s) return null;
+  var m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (m) return Number(m[3]) * 10000 + Number(m[2]) * 100 + Number(m[1]);
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return Number(m[1]) * 10000 + Number(m[2]) * 100 + Number(m[3]);
+  var t = Date.parse(s);
+  return isNaN(t) ? null : t;
+}
+
+function _sbVergleich(modus) {
+  return function (a, b) {
+    /* Aktives Objekt zuerst - ausser im Lage-Modus, siehe Kommentar oben */
+    if (modus !== 'lage') {
+      if (a.id === _currentObjKey && b.id !== _currentObjKey) return -1;
+      if (b.id === _currentObjKey && a.id !== _currentObjKey) return 1;
+    }
+    if (modus === 'id') {
+      var sa = (a.seq_no || ''), sb = (b.seq_no || '');
+      if (sa < sb) return 1;
+      if (sa > sb) return -1;
+      return 0;
+    }
+    if (modus === 'kaufdat') {
+      var ka = _sbKaufdatZahl(a), kb = _sbKaufdatZahl(b);
+      if (ka == null && kb == null) return 0;
+      if (ka == null) return 1;
+      if (kb == null) return -1;
+      return kb - ka;
+    }
+    if (modus === 'lage') {
+      var ra = { A: 0, B: 1, C: 2 }, la = _sbLageVon(a), lb = _sbLageVon(b);
+      var pa = (la in ra) ? ra[la] : 3, pb = (lb in ra) ? ra[lb] : 3;
+      if (pa !== pb) return pa - pb;
+      /* innerhalb einer Lageklasse: zuletzt bearbeitet zuerst */
+      return new Date(b.updated_at || b._at || 0) - new Date(a.updated_at || a._at || 0);
+    }
+    return new Date(b.updated_at || b._at || 0) - new Date(a.updated_at || a._at || 0);
+  };
+}
+
+/* ── Die Gruppenkoepfe ─────────────────────────────────────────────────
+   Sie werden NACH dem Rendern eingesetzt, nicht im Karten-Template:
+   die Karte baut `_renderRichCard()`, und die an zwei Stellen zu
+   erweitern hiesse, denselben Eingriff doppelt zu fuehren. */
+function _sbLageKoepfeEinsetzen(list) {
+  if (_sbSortModus() !== 'lage') return 0;
+  if (!list || !_sbLagePaare.length) return 0;
+  var map = {};
+  _sbLagePaare.forEach(function (p) { map[p.key] = p.klasse; });
+  var karten = list.querySelectorAll('.sb-card');
+  var letzte = null, gesetzt = 0;
+  for (var i = 0; i < karten.length; i++) {
+    var k = map[karten[i].getAttribute('data-key')];
+    if (k == null) k = "";
+    if (letzte !== null && k === letzte) continue;
+    letzte = k;
+    var h = document.createElement('div');
+    h.className = 'sb-lage-kopf' + (k ? ' sb-lage-kopf-' + k.toLowerCase() : ' sb-lage-kopf-ohne');
+    h.setAttribute('data-lage', k || 'ohne');
+    h.textContent = k ? (k + '-Lage') : 'ohne Lageklasse';
+    karten[i].parentNode.insertBefore(h, karten[i]);
+    gesetzt++;
+  }
+  return gesetzt;
+}
+window._sbLageKoepfeEinsetzen = _sbLageKoepfeEinsetzen;
+
+/* ── Das Menue am body ─────────────────────────────────────────────── */
+function _sbMenueZu() {
+  var m = document.getElementById('sb-sort-menu');
+  if (m) m.remove();
+  var t = document.getElementById('sb-sort-trigger');
+  if (t) t.setAttribute('aria-expanded', 'false');
+}
+window._sbMenueZu = _sbMenueZu;
+
+function toggleSidebarSortMenu(ev) {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  if (document.getElementById('sb-sort-menu')) { _sbMenueZu(); return; }
+  var t = document.getElementById('sb-sort-trigger');
+  if (!t) return;
+  var aktiv = _sbSortModus();
+  var r = t.getBoundingClientRect();
+  var m = document.createElement('div');
+  m.id = 'sb-sort-menu';
+  m.className = 'sb-sort-menu';
+  m.setAttribute('role', 'menu');
+  var html = '<div class="sb-sort-menu-kopf">Sortieren nach</div>';
+  _SB_MODI.forEach(function (k) {
+    var d = _SB_MODI_TEXT[k];
+    html += '<button type="button" class="sb-sort-opt' + (k === aktiv ? ' aktiv' : '')
+      + '" data-sort="' + k + '" role="menuitem">'
+      + '<svg width="13" height="13" aria-hidden="true"><use href="#' + d.icon + '"/></svg>'
+      + '<span>' + d.wort + '</span>'
+      + (k === aktiv ? '<svg class="sb-sort-haken" width="13" height="13"><use href="#i-check"/></svg>' : '')
+      + '</button>';
   });
+  m.innerHTML = html;
+  document.body.appendChild(m);
+  /* Lage erst NACH dem Anhaengen rechnen - vorher hat das Menue keine
+     Groesse, und eine Breite von 0 kappt man nirgends richtig. */
+  var mb = m.getBoundingClientRect();
+  var links = Math.min(r.left, window.innerWidth - mb.width - 8);
+  var oben = r.bottom + 6;
+  if (oben + mb.height > window.innerHeight - 8) oben = Math.max(8, r.top - mb.height - 6);
+  m.style.left = Math.max(8, links) + 'px';
+  m.style.top = oben + 'px';
+  t.setAttribute('aria-expanded', 'true');
+  m.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.sb-sort-opt') : null;
+    if (!b) return;
+    e.stopPropagation();
+    setSidebarSort(b.getAttribute('data-sort'));
+    _sbMenueZu();
+  });
+}
+window.toggleSidebarSortMenu = toggleSidebarSortMenu;
+
+document.addEventListener('click', function (e) {
+  if (!document.getElementById('sb-sort-menu')) return;
+  if (e.target.closest && (e.target.closest('#sb-sort-menu') || e.target.closest('#sb-sort-trigger'))) return;
+  _sbMenueZu();
+}, true);
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') _sbMenueZu();
+});
+
+/* Der Ausloeser zeigt, WONACH gerade sortiert wird - sonst ist das Menue
+   eine Entscheidung, die man nach dem Schliessen nicht mehr sieht. */
+function _sbAusloeserNachziehen() {
+  var t = document.getElementById('sb-sort-trigger');
+  if (!t) return;
+  var m = _sbSortModus(), d = _SB_MODI_TEXT[m];
+  if (!d) return;
+  t.setAttribute('data-sort', m);
+  t.setAttribute('title', 'Sortierung: ' + d.wort);
+  var u = t.querySelector('use');
+  if (u) u.setAttribute('href', '#' + d.icon);
+  t.classList.add('active');
+}
+window._sbAusloeserNachziehen = _sbAusloeserNachziehen;
+
+function setSidebarSort(mode) {
+  /* v1982: vier Modi statt zwei. Ein unbekannter Modus wird abgewiesen,
+     nicht stillschweigend zu `recent` - sonst sieht ein Tippfehler im
+     Aufruf wie eine funktionierende Vorgabe aus. */
+  if (_SB_MODI.indexOf(mode) < 0) return;
+  try { localStorage.setItem('dp_sb_sort', mode); } catch(e) {}
+  _sbAusloeserNachziehen();
   if (typeof renderSaved === 'function') renderSaved();
 }
 window.setSidebarSort = setSidebarSort;
@@ -4020,12 +4235,8 @@ window.setSidebarSort = setSidebarSort;
 // V63.27: Beim Laden den gespeicherten Sort-Modus visuell aktivieren
 (function _initSidebarSort() {
   document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      var mode = (window.localStorage && localStorage.getItem('dp_sb_sort')) || 'recent';
-      document.querySelectorAll('.sb-sort-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.getAttribute('data-sort') === mode);
-      });
-    }, 200);
+    /* v1982: der Ausloeser traegt jetzt das Symbol des aktiven Modus */
+    setTimeout(_sbAusloeserNachziehen, 200);
   });
 })();
 

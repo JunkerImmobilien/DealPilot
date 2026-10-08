@@ -39420,3 +39420,93 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
 .sb-act-item.sb-act-item[data-feature="portfolio_strategie"] {
   display: none !important;
 }
+
+/* =================================================================
+   v1982 - Sortiermenue der Portfolio-Liste und die Lage-Gruppenkoepfe
+
+   Das Menue haengt am <body> (position:fixed), weil die Seitenleiste
+   mehrere overflow-Vorfahren hat. z-index 9500: ueber allem in der
+   Seite, unter den Modalen (9990-10100).
+   ================================================================= */
+.sb-sort-menu {
+  position: fixed;
+  z-index: 9500;
+  min-width: 212px;
+  padding: 5px;
+  border-radius: 10px;
+  background: #161513;
+  border: 1px solid var(--wl-c9a84c, #C9A84C);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+  font-family: var(--font-main, system-ui, sans-serif);
+}
+.sb-sort-menu-kopf {
+  padding: 6px 9px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a39b8c;
+}
+.sb-sort-menu .sb-sort-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #f3ead0;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.sb-sort-menu .sb-sort-opt svg { fill: currentColor; flex: 0 0 auto; }
+.sb-sort-menu .sb-sort-opt span { flex: 1 1 auto; }
+.sb-sort-menu .sb-sort-opt:hover {
+  background: rgba(201,168,76,0.14);
+}
+.sb-sort-menu .sb-sort-opt.aktiv {
+  color: var(--wl-e8cc7a, #E8CC7A);
+  background: rgba(201,168,76,0.10);
+}
+.sb-sort-menu .sb-sort-haken { flex: 0 0 auto; }
+
+/* Die Gruppenkoepfe der A/B/C-Lagen. Marcel 08.10.2026: "dass wir dann
+   so Unterkategorien machen: A-Lage, B-Lage, C-Lage". Sie erscheinen NUR
+   im Sortiermodus `lage` und werden nach dem Rendern eingesetzt. */
+.sb-lage-kopf {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 2px 4px;
+  padding: 4px 8px 5px;
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C);
+  border-radius: 0 5px 5px 0;
+  background: rgba(201,168,76,0.07);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--wl-e8cc7a, #E8CC7A);
+}
+.sb-lage-kopf:first-child { margin-top: 2px; }
+.sb-lage-kopf-b { border-left-color: var(--wl-b8932f, #b8932f); opacity: 0.92; }
+.sb-lage-kopf-c { border-left-color: #6f6960; opacity: 0.86; color: #d8cfae; }
+.sb-lage-kopf-ohne {
+  border-left-color: #4a4540;
+  background: rgba(255,255,255,0.03);
+  color: #a39b8c;
+  text-transform: none;
+  letter-spacing: 0.03em;
+}
+
+/* Auf dem Handy darf das Menue die Breite nehmen, die es braucht, aber
+   nicht ueber den Rand - die Lage kappt storage.js, die Breite hier. */
+@media (max-width: 480px) {
+  .sb-sort-menu { min-width: 0; width: calc(100vw - 24px); max-width: 280px; }
+  .sb-sort-menu .sb-sort-opt { padding: 11px 10px; font-size: 14px; }
+}

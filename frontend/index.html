@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v1979a">
+<link rel="stylesheet" href="css/style.css?v=v1982">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
@@ -687,9 +687,14 @@ label.dp-required.qc-required::after {
     <span><svg width="13" height="13"><use href="#i-portfolio"/></svg>Portfolio</span>
     <!-- v816g-tools-group -->
     <div class="sb-tools-group">
+      <!-- v1982: ein Ausloeser, vier Sortierungen. Das Menue selbst baut
+           storage.js am <body> - in dieser Leiste kostet jeder
+           overflow-Vorfahr ein Ausklappmenue. -->
       <div class="sb-sort-toggle">
-        <button type="button" class="sb-sort-btn active" data-sort="recent" onclick="setSidebarSort('recent')" title="Zuletzt bearbeitet zuerst"><svg width="11" height="11"><use href="#i-clock"/></svg></button>
-        <button type="button" class="sb-sort-btn" data-sort="id" onclick="setSidebarSort('id')" title="Nach ID sortieren"><svg width="11" height="11"><use href="#i-hash"/></svg></button>
+        <button type="button" class="sb-sort-btn active" id="sb-sort-trigger" data-sort="recent"
+                aria-haspopup="true" aria-expanded="false"
+                onclick="toggleSidebarSortMenu(event)"
+                title="Sortierung: zuletzt bearbeitet"><svg width="11" height="11"><use href="#i-clock"/></svg></button>
       </div>
       <div id="sb-mand-filter" class="sb-mand-filter"></div>
     </div>
@@ -3556,7 +3561,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v1905"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v1959"></script>
+<script src="js/storage.js?v=v1982"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v1960"></script>
