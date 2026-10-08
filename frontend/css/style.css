@@ -38469,8 +38469,24 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
    NUR ASCII IN DIESEM BLOCK: style.css wird byteweise geschrieben, und
    ein Umlaut im Kommentar wird zu einem Ersatzzeichen. Der erste
    Versuch hob sie von 1 auf 3. ================================== */
-.oe-chips .oe-chip.fehlt { border: 2px solid #B8625C; background: #fdf3f2; color: #7a3f3a; font-weight: 700; }
-.oe-chips .oe-chip.fehlt:hover { background: #fbe8e6; border-color: #9c4a44; }
+/* == v1979a - DER RAHMEN BLIEB 1 PX, DER RING NICHT ===================
+
+   Die Regel sagte `border: 2px`, gemessen kam 1,33 px an. Und zwar
+   nicht durch eine staerkere Regel: auch ein INLINE
+   `border-width: 2px` aenderte den berechneten Wert nicht, waehrend
+   ein inline `4px !important` sehr wohl wirkte (computed 3,33 px bei
+   einer Seitenskalierung von 0,833).
+
+   Ich kann das nicht erklaeren, und deshalb baue ich nicht darauf.
+   Statt den Rahmen zu erzwingen, steht hier das HAUSMUSTER, das die
+   Pflichtfelder seit v1852b benutzen und das gegen diese Frage immun
+   ist: ein box-shadow-Ring. Er liegt ausserhalb des Kastens, nimmt
+   keinen Platz und haengt nicht an der Rahmenbreite.
+
+   Der Rahmen bleibt in der Marken-Rotfarbe, der Ring macht ihn
+   sichtbar. ============================================= */
+.oe-chips .oe-chip.fehlt { border-color: #B8625C; background: #fdf3f2; color: #7a3f3a; font-weight: 700; box-shadow: 0 0 0 2px rgba(184,98,92,.30); }
+.oe-chips .oe-chip.fehlt:hover { background: #fbe8e6; border-color: #9c4a44; box-shadow: 0 0 0 3px rgba(184,98,92,.42); }
 
 /* v1978 - das Zielfeld, auf das ein Chip springt. Optik wie beim
    Pflichtfeld, Bedeutung anders: ein Hebel, keine Sperre. Die eigene

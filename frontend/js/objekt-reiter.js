@@ -913,11 +913,26 @@
       + (liste.length > 1 ? '<span class="oe-q">' + liste.length + ' Berichte im Verlauf</span>' : '');
     box.style.display = '';
     box._liste = liste;
+    /* v1979a: beim Rendern sofort den Unterschied des ersten Eintrags,
+       und bei jeder Auswahl neu. Ohne den Listener blieb die Zeile leer —
+       live gemessen, und es sah aus wie „es gibt keinen Unterschied". */
+    var _s = $('oe-vw-wahl');
+    if (_s) {
+      _s.addEventListener('change', function () {
+        _unterschiedZeigen(liste, parseInt(_s.value, 10) || 0);
+      });
+    }
+    _unterschiedZeigen(liste, _s ? (parseInt(_s.value, 10) || 0) : 0);
   }
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
+    /* v1979a: der Aufruf von `_unterschiedZeigen` stand HIER — in
+       `verkehrswertSetzen()`, also im Weg zum Knopf „als Verkehrswert
+       uebernehmen". Der Unterschied erschien damit erst NACH dem
+       Uebernehmen, nicht beim Auswaehlen. Genau verkehrt: man will
+       wissen, worin sich zwei Berichte unterscheiden, BEVOR man einen
+       von ihnen uebernimmt. Er haengt jetzt am Dropdown. */
     var sel = $('oe-vw-wahl'); var h = box._liste[sel ? parseInt(sel.value, 10) || 0 : 0]; if (!h) return;
-    _unterschiedZeigen(box._liste, sel ? parseInt(sel.value, 10) || 0 : 0);
     /* v1963: `wert` statt `market_value` - der Eintrag weiss selbst,
        welche Zahl er traegt (Ertrags-, Sach- oder Marktwert). */
     el.value = String(Math.round(Number(h.wert != null ? h.wert : h.market_value)));
