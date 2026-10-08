@@ -46,6 +46,42 @@ function avmMode() { return String(process.env.AVM_MODE || 'stub').toLowerCase()
 // live-faehig (wuerde sonst 40 L abziehen und Demo-Daten als echt labeln). Bei echtem
 // PH-Client einfach pricehubble:true setzen.
 var AVM_CLIENT_READY = { sprengnetter: true, pricehubble: true }; /* v739-ph-ready */
+/* ══ v1994 · EINE LEERE LISTE SCHALTETE ALLE AN, NICHT AUS ════════════
+
+   Marcel am 08.10.2026: „Sprengnetter und auch PriceHubble koennen wir
+   ja erstmal stilllegen. Kannst du diesen sauberen Weg nehmen mit dem
+   Leeren."
+
+   Ich habe `AVM_LIVE_PROVIDERS=` auf Staging geleert, den Container neu
+   erzeugt und nachgemessen. Die Auskunft meldete danach WEITERHIN
+
+     Sprengnetter: enabled=true  coming_soon=false
+     PriceHubble : enabled=true  coming_soon=false
+
+   denn hier stand
+
+     if (!list.length) return true;   // keine Allowlist -> alle an
+
+   Eine leere Liste bedeutete also ALLE Anbieter frei, nicht keinen.
+
+     > Wer sie leert, um stillzulegen, erreicht das GEGENTEIL. Das ist
+     > nicht kosmetisch: an beiden Anbietern haengen kostenpflichtige
+     > Abrufe mit Credit-Abzug.
+
+   Unterschieden wird jetzt `undefined` gegen `''` - vorher war beides
+   dasselbe:
+
+     AVM_LIVE_PROVIDERS gar nicht gesetzt  -> wie bisher, alle fertigen
+                                              Clients duerfen live
+     AVM_LIVE_PROVIDERS=                    -> KEINER darf live
+     AVM_LIVE_PROVIDERS=sprengnetter        -> nur dieser
+
+   Der Code der Anbieter bleibt vollstaendig erhalten - Marcel will sie
+   spaeter vielleicht wieder. Stillgelegt wird ueber DIESE Liste, nicht
+   ueber AVM_MODE: der globale Modus steuert auch andere Wege. */
+function avmListeGesetzt() {
+  return Object.prototype.hasOwnProperty.call(process.env, 'AVM_LIVE_PROVIDERS');
+}
 function avmLiveProviders() {
   return String(process.env.AVM_LIVE_PROVIDERS || '').toLowerCase().split(',').map(function (s) { return s.trim(); }).filter(Boolean);
 }
@@ -53,7 +89,7 @@ function providerEnabled(provider) {
   var p = String(provider || '').toLowerCase();
   if (!AVM_CLIENT_READY[p]) return false;            // Client noch nicht echt -> coming soon
   var list = avmLiveProviders();
-  if (!list.length) return true;                      // keine Allowlist -> Legacy (alle ready-Clients an)
+  if (!list.length) return !avmListeGesetzt();        // v1994: gesetzt+leer = KEINER, gar nicht gesetzt = alle
   return list.indexOf(p) !== -1;
 }
 /* v1230 · Der Plan eines Nutzers wird nie aus `subscriptions` gelesen.
