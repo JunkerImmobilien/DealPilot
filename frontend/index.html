@@ -719,6 +719,17 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item" type="button" data-act="view-single" onclick="sbActionsAction('view-single')">
         <span class="sb-act-ico" data-icon="single"></span><span class="sb-act-l">Einzelobjekt</span>
       </button>
+      <!-- v2008 - Die Objektuebersicht hatte keinen Eingang mehr.
+           Gemessen: setMainView, showAllObjectsView, #all-objects-main,
+           case 'view-all' (zweimal in ui.js) und das Symbol all:'folder'
+           sind alle da - nur dieser Knopf fehlte, und damit die einzige
+           Ansicht, in der man Lageklasse, Rendite und DSCR aller Objekte
+           NEBENEINANDER sieht. ui.js:294 greift bis heute nach
+           .sb-iconnav-btn[data-iconnav] - diesen Anker gibt es im Markup
+           null Mal; querySelector gibt null und nichts faellt auf. -->
+      <button class="sb-act-item" type="button" data-act="view-all" onclick="sbActionsAction('view-all')">
+        <span class="sb-act-ico" data-icon="all"></span><span class="sb-act-l">Alle Objekte</span>
+      </button>
       <!-- v844-cockpit-action: Portfolio-Cockpit als Aktion -->
       <button class="sb-act-item" type="button" onclick="sbActionsAction('cockpit')">
         <span class="sb-act-ico" data-icon="cockpit"></span><span class="sb-act-l">Portfolio-Cockpit</span>
