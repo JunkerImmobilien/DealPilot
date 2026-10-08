@@ -38449,7 +38449,33 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-chips .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
 /* Leer heisst: hier fehlt die Angabe, die die Anlage 2 braucht. Rot und Gruen
    bleiben in jeder Marke gleich - Statusfarben werden nicht tokenisiert. */
-.oe-chips .oe-chip.fehlt { border-color: #D8954C; color: #8a5a1c; font-weight: 600; }
+/* == v1978 - DIE LEEREN CHIPS WAREN NICHT ZU ERKENNEN ================
+
+   Hier stand ein Orange (#D8954C Rahmen, #8a5a1c Text) auf einer Karte,
+   die selbst einen goldenen Rahmen hat. Marcel: "Die, die du jetzt
+   gemacht hast, kann man nicht richtig erkennen."
+
+   GEMESSEN am Bildschirm: der Chip war 101x22 px, Rahmen 1 px in
+   rgb(216,149,76) - gegen den Goldrahmen der Leiste daneben kaum zu
+   unterscheiden.
+
+   Jetzt dasselbe ROT wie die Pflichtfelder (#B8625C), 2 px Rahmen und
+   ein zarter Grund.
+
+   > Rot ist hier richtig und bleibt in jeder Marke gleich: CLAUDE.md
+   > "Statusfarben nie tokenisieren". Es ist dieselbe Aussage wie beim
+   > Pflichtfeld - hier fehlt etwas - nur ohne Sperre.
+
+   NUR ASCII IN DIESEM BLOCK: style.css wird byteweise geschrieben, und
+   ein Umlaut im Kommentar wird zu einem Ersatzzeichen. Der erste
+   Versuch hob sie von 1 auf 3. ================================== */
+.oe-chips .oe-chip.fehlt { border: 2px solid #B8625C; background: #fdf3f2; color: #7a3f3a; font-weight: 700; }
+.oe-chips .oe-chip.fehlt:hover { background: #fbe8e6; border-color: #9c4a44; }
+
+/* v1978 - das Zielfeld, auf das ein Chip springt. Optik wie beim
+   Pflichtfeld, Bedeutung anders: ein Hebel, keine Sperre. Die eigene
+   Klasse gibt es, damit das Aufraeumen beide auseinanderhalten kann. */
+.oe-hebel-leer > label, .oe-hebel-leer .oe-g { color: #7a3f3a; }
 .oe-chips .oe-chip.fehlt::before { content: "+ "; }
 .f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }

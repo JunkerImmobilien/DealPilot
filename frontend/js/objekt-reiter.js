@@ -558,12 +558,55 @@
       f.classList.remove('oe-pflicht-fehlt');
       f.querySelectorAll('input,select').forEach(function (el) { el.style.removeProperty('border-color'); el.style.removeProperty('box-shadow'); });
     });
+    /* v1978: die Hebel-Markierung MIT abräumen — sonst bleibt der Rahmen
+       stehen, wenn jemand das Feld gerade gefüllt hat. Gemessen am
+       Vorgänger: `oe-pflicht-fehlt` wurde abgeräumt, eine zweite Klasse
+       hätte überlebt. */
+    document.querySelectorAll('.oe-hebel-leer').forEach(function (f) {
+      f.classList.remove('oe-hebel-leer');
+      f.querySelectorAll('input,select').forEach(function (el) { el.style.removeProperty('border-color'); el.style.removeProperty('box-shadow'); });
+    });
+    /* ══ v1978 · DIE LEEREN MODERNISIERUNGSFELDER WERDEN MITMARKIERT ════
+
+       Marcel am 08.10.2026: „wenn wir Sachen haben, die noch fehlen, dann
+       kann man ja draufklicken. Da wäre es gut, wenn du auch so eine rote
+       Umrahmung um das Feld setzt. Die, die du jetzt gemacht hast, kann
+       man nicht richtig erkennen."
+
+       Die acht Gewerke-Felder sind seit v1972 als Chips verlinkt, das
+       ZIELFELD selbst blieb aber unmarkiert — wer hinsprang, landete auf
+       einem Feld wie jedem anderen.
+
+       Markiert wird mit DERSELBEN Farbe und demselben Schatten wie die
+       Pflichtfelder (`#B8625C`), nicht mit einer zweiten. Zwei Rottöne
+       für dieselbe Aussage wären genau die Verwirrung, die hier gerade
+       behoben wird.
+
+       > SIE ZÄHLEN NICHT ALS PFLICHT. `fehltFuer()` bleibt unberührt, die
+       > Stufen-Leiste sagt weiter „bereit". Marcels Entscheidung vom
+       > 08.10.2026 war ausdrücklich, dass ohne Modernisierungspunkte
+       > trotzdem ein Bericht entsteht — nur mit der Schätzung statt
+       > Anlage 2. Ein roter Rahmen zeigt den Hebel, er sperrt nicht.
+
+       Deshalb eine eigene Klasse `oe-hebel-leer` statt
+       `oe-pflicht-fehlt`: die Optik ist dieselbe, die BEDEUTUNG nicht,
+       und beim Aufräumen darf das eine nicht das andere mitnehmen. */
     fehltFuer(z).forEach(function (id) {
       var el = $(id); var f = el && el.closest('.f'); if (!f) return;
       f.classList.add('oe-pflicht-fehlt');
       el.style.setProperty('border-color', '#B8625C', 'important');
       el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
     });
+    if (z >= 3) {
+      MOD_FELDER.forEach(function (mf) {
+        if (_v(mf[0])) return;
+        var el = $(mf[0]); if (!el) return;
+        var f = el.closest('.f') || el.closest('td') || el.parentElement;
+        if (f) f.classList.add('oe-hebel-leer');
+        el.style.setProperty('border-color', '#B8625C', 'important');
+        el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
+      });
+    }
     optionalMarkieren();
     preflightPillen();
   }
