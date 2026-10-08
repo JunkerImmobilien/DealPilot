@@ -38,6 +38,112 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ### N56 · ImmoMetrica von Demo auf Live, und vier Fragen dazu (08.10.2026)
 
+**MARCELS ENTSCHEIDUNGEN ZU N56, 08.10.2026 — das ist keine Vorschlagsliste mehr.**
+
+**Erledigt noch am selben Tag:**
+
+| | |
+|---|---|
+| **ImmoMetrica live** | **fertig** (v1993). Es war nie das Backend: `IMMOMETRICA_MODE` war nirgends gesetzt, das Backend lief längst live. Die Demo kam aus dem Frontend, das `/api/v1/avm/health` fragte — den Schalter der **Bewertungsanbieter**. ImmoMetrica hat jetzt eine eigene Auskunft (`GET /api/v1/immometrica/health`), gemessen: `{"mode":"live"}` |
+| **Sprengnetter und PriceHubble stillgelegt** | **fertig** (v1994). Marcel: „können wir ja erstmal stilllegen … wir haben das aber trotzdem drin gelassen, weil es kann irgendwann mal sein, dass ich mit denen noch zusammenarbeite." Gemessen danach: `enabled:false`, `coming_soon:true`, **`configured:true`** — Zugangsdaten bleiben |
+
+> **⚠ Dabei fiel ein Fehler auf, der Geld gekostet hätte.** `AVM_LIVE_PROVIDERS=` zu
+> leeren schaltete bis v1994 **alle** Anbieter frei, nicht keinen (`if (!list.length)
+> return true`). Wer die Zeile leert, um stillzulegen, erreichte das Gegenteil — und an
+> beiden Anbietern hängen kostenpflichtige Abrufe mit Credit-Abzug. Jetzt wird
+> unterschieden: **gar nicht gesetzt** = alle (wie bisher), **gesetzt und leer** = keiner.
+
+---
+
+**1 · DER RIEGEL: bei einem schon gefüllten Objekt sind die Import-Quellen aus**
+
+Marcel: „Wenn wir ein Objekt angelegt haben und im Objekt sind und das schon reingeladen
+ist, dann sollten wir diese Werte wie ImmoMetrica, auch Exposé, oder auch geführte
+Eingabe/Sprache **ausgrauen** … ab da ist es ja eigentlich nur noch so, dass wir den
+Marktbericht erstellen können und über DealPilot die einzelnen Stufen abrufen. Das machen
+wir halt nur, wenn noch nichts drin steht. Das wäre erstmal einfacher, dann haben wir da
+schon mal einen Riegel drin."
+
+**Das ist die einfachste Lösung des Vorrangproblems und sie kommt zuerst.** Statt eine
+Rangfolge zu bauen, die bei jedem Feld entscheidet, wird die Frage gar nicht erst
+gestellt: wer schon Daten hat, bekommt keine Quelle mehr angeboten, die sie überschreiben
+könnte.
+
+| bleibt | wird ausgegraut |
+|---|---|
+| Marktbericht | Exposé |
+| DealPilot-Stufen (1·2·3) | ImmoMetrica |
+| | Geführte Eingabe |
+| | Sprache |
+
+**Zu klären beim Bauen — und das ist die eigentliche Arbeit:** woran erkennt man „schon
+reingeladen"? Ein leeres Objekt hat Kürzel und Objektart, ein gefülltes hat Adresse,
+Fläche, Kaufpreis. Die Schranke braucht eine **gemessene** Grenze, keine gefühlte, und
+sie muss sich übersteuern lassen — sonst ist sie eine Ansage statt eines Angebots.
+
+---
+
+**2 · DER ABGLEICH: passt das Inserat überhaupt zu diesem Objekt?**
+
+Marcel: „Wir können natürlich Exposé-Daten einlesen. Wir müssen aber abgleichen, ob das
+mit ImmoMetrica auch passt. Also passt dieses Objekt überhaupt dazu? Ist es die richtige
+Adresse? … wenn halt nur Ort und PLZ zur Verfügung steht, wir aber vielleicht einen
+Marktbericht oder ein Exposé schon zu diesem Objekt haben, müssen wir gucken, ob das auch
+zusammenpasst. Gegebenenfalls muss das dann über eine **Bestätigung** laufen."
+
+Es gibt dafür schon einen Ansatz: `addressWarning()` in `object-actions.js` vergleicht
+Ort, PLZ und Adresse der geladenen Dateien. **ImmoMetrica ist darin nicht enthalten** —
+es geht ja auch an der Zusammenführungstabelle vorbei.
+
+Die Fälle, die eine Bestätigung brauchen:
+- Inserat hat **nur PLZ und Ort**, das Objekt hat eine **vollständige Adresse** → passt
+  die PLZ? Wenn ja: übernehmen, aber die Adresse des Objekts **nicht** überschreiben.
+- Inserat hat eine **andere** Adresse als das Objekt → **immer** nachfragen.
+- Inserat hat eine Adresse, das Objekt noch keine → übernehmen, kein Rückfrage nötig.
+
+---
+
+**3 · ✅ ENTSCHIEDEN: ohne Adresse wird der ORTSKERN genommen**
+
+Marcel: „wenn keine Adresse da ist und wir Marktbericht angeklickt haben — ich sage jetzt
+einfach mal eine Marktpreisindikation — dann brauchen wir **keine genaue Adresse zu
+fragen, sondern den Ortskern nehmen**, weil uns keine Adresse vorliegt."
+
+> **Das ist Marcels Entscheidung als DESAG-Sachverständiger und steht über meinem
+> Vorschlag**, gar keine Koordinate zu setzen. Sie ist für die **Marktpreisindikation**
+> getroffen — also für eine Einschätzung, nicht für ein Gutachten.
+
+**Was daraus folgt und beim Bauen nicht wegfallen darf:**
+- Der Ortskern ist ein **Ersatzpunkt**, kein gemessener Ort. Jeder Wert, der daraus
+  entsteht, läuft als **indikativ** mit eigenem Vermerk („Bodenrichtwert am Ortskern,
+  keine Objektadresse hinterlegt").
+- Die Grenze zur **Wertermittlung nach ImmoWertV** bleibt: dort gilt weiter *kein Treffer
+  heißt kein Wert*. Ein Ortskern-Bodenrichtwert darf keinen Verkehrswert tragen.
+- Woher kommt der Ortskern? Erst prüfen, ob die ImmoMetrica-Antwort selbst eine
+  Koordinate führt — dann ist es kein Ersatz, sondern eine Angabe. (Eigene Erntelinie
+  läuft darauf.)
+
+---
+
+**4 · Die Rangfolge gilt, aber sie ist der zweite Schritt**
+
+Marcel: „Ansonsten ist die Rangfolge erstmal gut."
+
+```
+1. Marktbericht   amtliche und geprüfte Zahlen
+2. Exposé         Angaben des Verkäufers zum konkreten Objekt
+3. ImmoMetrica    Portaldaten, maschinell zusammengetragen
+4. Geführte Eingabe / Sprache
+```
+
+Zu bauen ist sie trotzdem — der Riegel aus Punkt 1 greift nur bei **gefüllten** Objekten.
+Bei einem leeren Objekt, in das nacheinander Exposé und ImmoMetrica laufen, entscheidet
+weiter die Reihenfolge, und heute gewinnt schlicht der Letzte.
+
+---
+
+
+
 **Marcels Auftrag:** „kannst du mir auf staging immometrica einmal wieder von demo auf
 live umschalten? ich habe eben einen api key hinterlegt und habe wieder zugang. bitte
 schau auch nochmal nach ob wir alles aus der schnittstelle auch abfragen und verwerten
