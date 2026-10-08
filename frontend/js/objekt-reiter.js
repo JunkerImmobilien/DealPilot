@@ -1040,6 +1040,49 @@
   window.addEventListener('dp:mb-ready', function () {
     setTimeout(function () { try { verkehrswertUebernahme(); } catch (e) {} try { automatik(); } catch (e) {} }, 1500);
   });
-  window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte,
+  /* ══ v1980 · DER VERLAUF GEHOERT ZUM OBJEKTWISSEN ════════════════════
+
+     Marcel am 08.10.2026: „wichtig ist auch, dass natuerlich dieser
+     Verlauf auch immer mit in das Objektwissen mit reingeht. Das haben
+     wir ja irgendwie mit der Pilotanalyse gemacht."
+
+     GEMESSEN, was der Co-Pilot heute bekommt (copilot.js, context()):
+
+       pilot_analyse           seit v1847
+       marktpreis_indikation   seit v1703
+       die WERTERMITTLUNG      gar nicht
+
+     Dabei liegt sie fertig da: die Wertanker-Liste fuehrt je Bericht
+     Art, Wert, das fuehrende Verfahren samt Grund und seit v1979 den
+     Rechenweg. An Parkstr. 9 sind das acht Eintraege aus vier Berichten.
+
+     Der Chat fragte das Modell also zu einem Objekt, dessen
+     Wertermittlung im Reiter daneben stand — genau der Befund, den v1847
+     fuer die Pilot-Analyse behoben hat.
+
+     Herausgegeben wird VERDICHTET: Art, Wert, Datum, fuehrend, Grund.
+     Der Rechenweg bleibt drin, weil er die Frage „warum zwei
+     verschiedene Ertragswerte?" beantwortet — aber nur die
+     Positionsnamen und Betraege, nicht die ganze Staffel.
+
+     > Gerechnet wird NICHTS. Nur gelesen, was die Leiste schon hat. */
+  function verlauf() {
+    var box = $('oe-vw');
+    if (!box || !box._liste || !box._liste.length) return null;
+    return box._liste.map(function (h) {
+      return {
+        art: h.art || null,
+        wert_eur: h.wert != null ? Math.round(Number(h.wert)) : null,
+        datum: h.created_at || null,
+        fuehrend: !!h.fuehrend,
+        fuehrend_grund: h.fuehrend || null ? (h.fuehrend_grund || null) : null,
+        rechenweg: (h.weg || []).map(function (z) {
+          return { pos: z && z.pos ? String(z.pos) : null, wert: z ? z.wert : null };
+        }),
+      };
+    });
+  }
+
+  window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte, verlauf: verlauf,
     zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen };
 })();
