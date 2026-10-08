@@ -36,6 +36,72 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N58 · Marktbericht: Karte, Liste, Tablett — und ein Buster, der seit v1877 feststand (08.10.2026)
+
+Vier Befunde von Marcel, alle im Browser auf Staging nachgestellt.
+
+**(a) „API Key required" auf der Karte** (`v2004`). Drei verschiedene
+Carto-Kacheln in drei Zoomstufen geholt: alle **HTTP 200, 2049 Byte,
+md5 `502fc5f6793fad87` — identisch**. Das Bild trägt den Aufdruck
+„API KEY REQUIRED". Carto verlangt jetzt einen Schlüssel.
+
+> **Es ist HTTP 200.** Kein `tileerror`, kein Konsoleneintrag — Leaflet
+> hat die Kachel brav gezeichnet. Ein Dienst, der seinen Ausfall mit 200
+> beantwortet, fällt nur dem auf, der hinsieht.
+
+Umgestellt auf OSM-Standard, vier Fassungen. **`tile.openstreetmap.org`
+führt weder `{s}` noch `{r}`** — beide Platzhalter mussten raus.
+
+**(b) Die Berichtsliste „kreuz und quer"** (`v2004`). Über volle Breite
+(918 px) saß jede Zeile sauber; **erst wenn ein Bericht geöffnet wird**,
+wandert das Panel in die 296-px-Spalte — und dort 455 px Inhalt auf
+318 px Platz. Eine Vorsorge war da: `@media(max-width:600px)`. Sie
+misst aber das **Fenster** (1568 px), nicht die Spalte.
+
+> **Eine Media-Query auf einer Fläche, die nicht das Fenster ist, prüft
+> die falsche Zahl.** Sie sieht richtig aus und ist tot. Ersetzt durch
+> `@container` auf der Liste selbst.
+
+**(c) Genau eine Breite war kaputt — und es war die des iPads** (`v2005`).
+Neun Breiten durchgemessen, gezählt nur echter Überlauf (was ein Vorfahr
+abschneidet, zählt nicht — Leaflet legt seine Kacheln bauartbedingt über
+den Kartenrand; ein erster Lauf meldete 213 Treffer, die keine waren):
+
+| Breite | Überläufe | Dokument scrollt |
+|---|---|---|
+| 1440 / 1200 | 0 | 0 |
+| **1024** | **196** | **160 px** |
+| 834 / 768 / 600 / 430 / 390 | 0 | 0 |
+
+Zwei Ursachen, die sich gegenseitig versteckten: `1fr` hat
+`min-width:auto` und kann nicht unter seine Inhaltsbreite schrumpfen
+(`#resultPanel` bestand auf 762 px bei 574 px Platz), und der
+Umschaltpunkt lag bei 880 px. Unter 880 griff die eine Spalte, über 1200
+war genug Platz — dazwischen lag das Loch, und darin liegt das iPad.
+`minmax(0,1fr)` stand in derselben Datei schon dreimal.
+
+**(d) ⚠ Der Buster der Marktbericht-SEITE stand seit v1877 fest**
+(`v2005a`). `frameSrc()` in `marktbericht-view.js:93` adressierte
+`/marktbericht-app/index.html?v=1877`. **Das CSS dieser Ansicht liegt
+inline in genau dieser Datei** — sie kam also samt CSS aus dem Cache.
+
+> **Alles, was seit v1877 am CSS oder Markup dieser Seite geändert
+> wurde, hat keinen Browser erreicht, der sie schon einmal geladen
+> hatte.** Gemessen: v2005 lag auf dem Server und war im iframe nicht
+> vorhanden. Der `app.js`-Buster INNERHALB der Seite half nicht — er
+> wird erst gelesen, wenn die Seite selbst neu geholt wird.
+> **Ein Buster eine Ebene zu tief wirkt nie.** Wer am CSS von
+> `marktbericht-app/index.html` etwas ändert, zieht die Zahl in
+> `marktbericht-view.js` mit hoch; ein Vermerk steht jetzt an der Zeile.
+
+**Noch offen aus derselben Meldung:**
+- Die Meldung „Objektdaten übernommen" samt goldener Feldliste besser
+  gliedern (Marcel: „in Gold mit einem I dahinter, nicht so schön").
+- `.mbrep-head` und `.mbrep-body` in `marktbericht-app/index.html`:
+  Schmalregeln auf zwei Klassen, die es im Markup **nicht gibt**.
+
+---
+
 ### N57 · Eingabetiefe und Liegenschaftszins — beides erledigt (08.10.2026)
 
 **Marcels Befund zur Eingabetiefe, behoben in `v2001`:** „wenn ich oben
