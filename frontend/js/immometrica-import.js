@@ -126,6 +126,14 @@
       '.imo-pill.on{border-color:var(--gold,#C9A84C);color:var(--ch,#2A2727);box-shadow:0 0 0 2px rgba(201,168,76,.18)}',
       '.imo-list{overflow:auto;padding:14px 18px;background:var(--surface,#F8F6F1)}',
       '.imo-note{font:11px ui-monospace,monospace;color:var(--muted,#7A7370);margin-bottom:9px}',
+      /* v2003 · der Knopf sitzt IM Hinweis, damit "50 von 1727 geladen" und
+         der Ausweg eine Zeile bleiben. Gold als Rahmen, nicht als Flaeche:
+         er ist ein Angebot, keine Hauptaktion. */
+      '.imo-mehr{font:11px ui-monospace,monospace;margin-left:6px;padding:3px 9px;cursor:pointer;'
+        + 'border:1px solid var(--gold,var(--wl-C9A84C,#C9A84C));border-radius:999px;'
+        + 'background:transparent;color:var(--ch2,#5B5550)}',
+      '.imo-mehr:hover{background:var(--gold-bg,rgba(201,168,76,.12))}',
+      '.imo-mehr[disabled]{opacity:.55;cursor:default}',
       '.imo-o{border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:12px 13px;margin-bottom:10px;cursor:pointer;background:#fff;transition:border-color .12s,box-shadow .12s}',
       '.imo-o:hover{border-color:var(--gold,#C9A84C)}',
       '.imo-o.on{border-color:var(--gold,#C9A84C);box-shadow:0 0 0 2px rgba(201,168,76,.18)}',
@@ -186,11 +194,18 @@
     fetch(API + '/searches', { headers: hdr() })
       .then(function (r) { return r.json(); })
       .then(function (searches) {
+        /* v2003 · Die Favoriten standen hier als LETZTE, und vorgewaehlt
+           wird `state.sources[0]` - also immer ein Suchauftrag. Marcels
+           Suchauftrag hat tausende Treffer; als Einstieg ist das die
+           schlechteste der vorhandenen Quellen. Jetzt stehen die
+           Favoriten vorn. Kein zusaetzlicher Abruf, um zu entscheiden,
+           ob es welche gibt - die Reihenfolge allein genuegt, und eine
+           leere Favoritenliste sagt das selbst. */
         state.sources = [];
+        state.sources.push({ key: 'favde', label: 'Favoriten \u00b7 DE', kind: 'fav', cc: 'de' });
         (Array.isArray(searches) ? searches : []).forEach(function (s) {
           state.sources.push({ key: 's' + s.id, label: 'Suche \u00b7 ' + (s.name || s.id), count: s.count, kind: 'search', id: s.id });
         });
-        state.sources.push({ key: 'favde', label: 'Favoriten \u00b7 DE', kind: 'fav', cc: 'de' });
         renderSources();
         if (state.sources[0]) selectSource(state.sources[0]);
       })
@@ -207,21 +222,31 @@
     });
   }
   function selectSource(s) {
-    state.source = s; state.active = null; renderSources(); renderDetail();
+    state.source = s; state.active = null; state.seite = 1; state.next = null; renderSources(); renderDetail();
     var list = document.getElementById('imo-list');
     list.innerHTML = '<div style="color:var(--muted,#7A7370);font-size:13px;padding:20px 0">Lade Objekte\u2026</div>';
     if (_imoStubSync()) { state.items=_imoStubData().items; state.items.forEach(function(it){ /* v1998: augmentDp ist entfallen */ }); renderList(state.items.length); return; }  /* v769-imo-stub */
     var url = s.kind === 'search' ? API + '/searches/' + s.id + '/results' : API + '/favorites/' + s.cc;
     fetch(url, { headers: hdr() })
       .then(function (r) { return r.json(); })
-      .then(function (d) { state.items = (d && d.items) || []; state.items.forEach(function (it) { /* v1998: augmentDp ist entfallen */ }); renderList(d && d.count); })
+      .then(function (d) {
+        state.items = (d && d.items) || [];
+        state.next = (d && d.next) || null;
+        state.gesamt = (d && d.count != null) ? d.count : state.items.length;
+        renderList(state.gesamt);
+      })
       .catch(function () { list.innerHTML = '<div style="color:var(--red,#B8625C);font-size:13px">Konnte Objekte nicht laden.</div>'; });
   }
   function renderList(total) {
     var list = document.getElementById('imo-list');
     if (!state.items.length) { list.innerHTML = '<div style="color:var(--muted,#7A7370);font-size:13px;padding:20px 0">Keine Objekte.</div>'; return; }
+    /* v2003 · Hier stand "N Treffer - Seite 1." und sonst nichts: eine
+       Feststellung ohne Ausweg. Die Seitenzahl geht im Backend schon
+       durch (immometrica.js, `req.query.page`), und der Dienst liefert
+       `next` mit - es fehlte nur der Knopf. */
+    var mehr = state.next && state.source && state.source.kind === 'search';
     var note = (total != null && total > state.items.length)
-      ? '<div class="imo-note">' + total + ' Treffer \u2013 Seite 1.</div>' : '';
+      ? '<div class="imo-note">' + state.items.length + ' von ' + total + ' geladen.' + (mehr ? ' <button type="button" id="imo-mehr" class="imo-mehr">weitere laden</button>' : ' Mehr liefert die Schnittstelle nicht.') + '</div>' : '';
     list.innerHTML = note + state.items.map(function (it, i) {
       var r = it.raw, dp = it.dp;
       var on = state.active === i;
@@ -237,6 +262,31 @@
     list.querySelectorAll('.imo-o').forEach(function (el) {
       el.onclick = function () { state.active = parseInt(el.dataset.i, 10); renderList(total); renderDetail(); };
     });
+    /* v2003 · ANHAENGEN, nicht ersetzen: wer auf Seite 3 etwas gesehen
+       hat, soll Seite 1 und 2 nicht verlieren. `state.active` zeigt auf
+       einen Index in `state.items` - deshalb darf nur hinten angebaut
+       werden, sonst springt die Auswahl auf ein anderes Objekt. */
+    var mb = document.getElementById('imo-mehr');
+    if (mb) mb.onclick = function () {
+      if (mb.disabled) return;
+      mb.disabled = true; mb.textContent = 'l\u00e4dt \u2026';
+      var s = state.source;
+      state.seite = (state.seite || 1) + 1;
+      fetch(API + '/searches/' + s.id + '/results?page=' + state.seite, { headers: hdr() })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (state.source !== s) return;   /* zwischendurch umgeschaltet */
+          var neue = (d && d.items) || [];
+          state.items = state.items.concat(neue);
+          state.next = (d && d.next) || null;
+          if (d && d.count != null) state.gesamt = d.count;
+          renderList(state.gesamt);
+        })
+        .catch(function () {
+          state.seite = Math.max(1, (state.seite || 2) - 1);
+          mb.disabled = false; mb.textContent = 'nochmal versuchen';
+        });
+    };
   }
   /* v1999 · Die Zeile sagt, was sonst niemand sagt: dass dieses
      Inserat keine Anschrift fuehrt und der Bodenrichtwert deshalb vom
