@@ -94,11 +94,40 @@ inline in genau dieser Datei** — sie kam also samt CSS aus dem Cache.
 > `marktbericht-app/index.html` etwas ändert, zieht die Zahl in
 > `marktbericht-view.js` mit hoch; ein Vermerk steht jetzt an der Zeile.
 
+**(e) Dieselbe Falle, sechs weitere Male** (`v2006`). In der Messkabine
+gefahren, acht Geräte, jeweils bis in den **geöffneten** Bericht hinein.
+Sieben sauber, das iPhone SE (360 px) meldete 20 Stellen, die schlimmste
++34 px — benannt: `div.assess` „Makrolage durchschnittlich" u. a.,
+146 px breit. Wieder `repeat(2,1fr)`: 2 × 146 + 10 = 302 px, verfügbar
+waren 267.
+
+> **Bei 390 px ragte dasselbe nur 4 px hinaus.** Knapp daneben sieht aus
+> wie „geht gerade noch" — es ist derselbe Defekt mit weniger Hebel.
+> Deshalb nicht die eine Stelle geflickt, sondern das Muster: 10
+> Ersetzungen auf `minmax(0,1fr)` in zwei Fassungen, plus eine Spalte
+> unter 420 px. `.row` blieb — `repeat(auto-fit,minmax(160px,1fr))` hat
+> seine Untergrenze schon stehen.
+
+**Abnahme, Messkabine nach `v2006`** (je bis in den geöffneten Bericht,
+Objekt 2026-001, 33 Berichte, Karte geladen):
+
+| Gerät | px | Überlauf | Dokument scrollt |
+|---|---|---|---|
+| iPhone SE | 360 | 0 *(vorher 20)* | 0 |
+| iPhone SE 2 | 375 | 0 | 0 |
+| iPhone 14 | 390 | 0 *(vorher 8)* | 0 |
+| iPhone 14 Pro Max | 430 | 0 | 0 |
+| iPad mini | 768 | 0 | 0 |
+| iPad Pro 11" | 834 | 0 | 0 |
+| Desktop | 1180 | 0 | 0 |
+| Desktop breit | 1280 | 0 | 0 |
+
 **Noch offen aus derselben Meldung:**
 - Die Meldung „Objektdaten übernommen" samt goldener Feldliste besser
   gliedern (Marcel: „in Gold mit einem I dahinter, nicht so schön").
 - `.mbrep-head` und `.mbrep-body` in `marktbericht-app/index.html`:
   Schmalregeln auf zwei Klassen, die es im Markup **nicht gibt**.
+- Lageklassen für alle Bestandsobjekte zuordnen und gegenprüfen.
 
 ---
 
