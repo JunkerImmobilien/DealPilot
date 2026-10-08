@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-07T10:01:35.738Z",
+ "erzeugt_am": "2026-10-08T05:44:56.750Z",
  "quellen": {
   "voice-import": "18cfa45f91d35c28",
   "objektart-felder": "b1481ff1f7c0b04d",
-  "storage": "95407334337b39ec",
-  "index-html": "f9852fde0103a8fc",
+  "storage": "d5cf8563baa07153",
+  "index-html": "722dc682414ea9d2",
   "grest": "9c0a4587759b4148"
  },
  "daten": {
@@ -370,6 +370,7 @@
    "svwert",
    "makrolage",
    "mikrolage",
+   "lageklasse",
    "vermstand",
    "nutzungsart",
    "exitstr",
@@ -792,6 +793,25 @@
      }
     ],
     "label": "Mikrolage DS2"
+   },
+   {
+    "id": "lageklasse",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "A",
+      "text": "A-Lage"
+     },
+     {
+      "wert": "B",
+      "text": "B-Lage"
+     },
+     {
+      "wert": "C",
+      "text": "C-Lage"
+     }
+    ],
+    "label": "Lageklasse Ziel"
    },
    {
     "id": "vermstand",
