@@ -36,6 +36,60 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N54 · Der Saatprüfer: 49 Restbefunde, einer davon echt (08.10.2026)
+
+**Vorgeschichte.** `node tools/saat-pruefen.mjs` **ohne Dateiargument prüfte null
+Sätze und gab RC=0** — eine Zeile Ausgabe, und ich habe sie als „der neue Satz ist in
+Ordnung" gelesen. Dasselbe Muster wie beim `gold-audit`, der mit relativem Pfad 6 statt
+181 Dateien las. Behoben in **v1981c**: ohne Argument der ganze Registerordner, und die
+**Deckung ist Teil des Befundes** (56 Dateien, 4.832 Sätze). Null geprüft ist jetzt RC=1.
+
+Danach fiel Schicht für Schicht auf, und zwar in dieser Reihenfolge — **weil die
+Fehlerliste je Datei bei 40 gekappt ist und die obere Schicht die untere verdeckt:**
+
+| gefunden | Art | behoben in |
+|---|---|---|
+| 1.019 Sätze mit `gaa_name: null` | **echt** — der Ausschuss stand im Nachbarfeld `quellenvermerk` | v1981d |
+| 17 Sätze ohne Lizenzangabe | **echt** — nachgeerntet und selbst nachgemessen | v1983 |
+| 129 Sätze „beleg ohne Seite/Fundstelle" | **Schein** — eine CSV-Ausleitung hat keine Seitenzahl | v1983a |
+| 17 Sätze „ags nicht 5- oder 8-stellig" | **Schein** — der Landesschlüssel ist zweistellig (12 = BB) | v1983b |
+
+> **Zweimal derselbe Fehler am selben Wächter.** `v1975` hatte schon einmal
+> Scheinbefunde an genau dieser Belege-Zeile behoben (Belege als String statt als
+> Objekt, sechs von acht Befunden waren keine), und die Lehre stand als Kommentar
+> daneben: *„Ein Wächter, der auf RICHTIGE Daten rot wird, ist so schädlich wie einer,
+> der auf falsche grün wird: man lernt, ihn zu ignorieren."* Genau das war eingetreten —
+> ich habe nach `fehlt` gegrept, 0 Treffer gelesen und **„0 Befunde" gemeldet, während
+> 129 Zeilen dastanden.** Mein Suchmuster kannte die Meldung nicht, die ich nicht
+> erwartet hatte.
+
+**Stand jetzt: RC=1 mit 49 Restbefunden, aufgeschlüsselt — und nur die erste Gruppe
+ist ein Datenfehler:**
+
+| Anzahl | Datei | Befund | Urteil |
+|---|---|---|---|
+| **24** | `swf-nw-2026-block2.json` | `fundstelle` ist **leer** | **echt.** Ein Beleg ohne jede Ortsangabe. Nachzutragen, wenn die Datei ohnehin angefasst wird — die Seite steht nur im Quell-PDF |
+| 18 | `lzs-st-th-sh-ni-2025.json` | „Dokument ohne Zahlenangabe, siehe `warum_kein_wert`" | Schein. Das sind **Sperren** ohne Wert; eine Seitenangabe gibt es dort nicht zu holen |
+| 5 | `ost.json` | „Sachwertfaktortabelle nebst zugehöriger Schätzfunktion" | Schein. Eine benannte Tabelle ist eine Fundstelle, auch ohne Ziffer |
+| 2 | `ost.json` | „Abschnitt I … Ortstabelle" | Schein. Römische Zahl |
+
+**Zu tun:**
+1. Die **24 leeren Fundstellen** in `swf-nw-2026-block2.json` nachtragen (aus dem
+   Quell-PDF je Ausschuss die Kapitelangabe).
+2. Dann die Regel schärfen, damit der Wächter wieder RC=0 erreichen **kann**: Sperren
+   (`vollstaendig: false`) von der Fundstellen-Pflicht ausnehmen — dort ist die
+   Abwesenheit der Wert — und eine benannte Tabelle oder einen römisch nummerierten
+   Abschnitt als Ortsangabe zulassen.
+3. **Die Kappung bei 40 Befunden je Datei abschaffen oder beziffern.** Sie hat die
+   `ags`-Schicht verborgen, bis die Lizenz-Schicht weg war. Mindestens muss dastehen,
+   wie viele nicht gezeigt werden — das tut sie heute nur, wenn mehr als 40 kommen.
+
+> **Der Grundsatz dahinter:** ein Wächter, der dauerhaft rot ist, wird nicht gelesen.
+> Entweder sind die 24 nachgetragen oder die Regel ist richtig — ein RC=1, das man
+> „kennt", ist derselbe stille Rückfall wie ein RC=0, das nichts geprüft hat.
+
+---
+
 ### N52 · ⚠ DIE GRUNDERWERBSTEUER FOLGT DER ADRESSE NUR BEI NRW-NUTZERN (08.10.2026)
 
 **Marcels Auftrag:** „Für Standort und Nebenkosten sollten wir die Möglichkeit geben,

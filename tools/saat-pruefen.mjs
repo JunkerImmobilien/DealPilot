@@ -162,12 +162,63 @@ for (const f of _dateien) {
        Geprueft wird jetzt, was gemeint war: steht in dem Beleg
        irgendwo eine ZAHL, also eine Seite, eine Abbildung, ein
        Kapitel? */
+    /* ══ v1983a · EINE TABELLENQUELLE HAT KEINE SEITENZAHL ════════════
+
+       Bis hierher musste im Beleg eine ZAHL stehen. Das trifft fuer ein
+       PDF ("Kap. 8.2.3.1, S. 83") und verfehlt jede CSV-Ausleitung:
+       die 1.019 NRW-Offendatensaetze fuehren "Grundstuecksmarktdaten
+       NRW, baulandpreise.csv" - eine vollstaendige Fundstelle ohne eine
+       einzige Ziffer. 129 Scheinbefunde, null echte.
+
+       Zweites Mal an derselben Zeile (v1975: Belege als String statt
+       Objekt, sechs von acht Befunden waren keine). Die Lehre von damals
+       steht oben und war schon eingetreten: ich habe die 129 Zeilen beim
+       Lesen uebersprungen, weil mein Suchmuster sie nicht kannte.
+
+       Jetzt gilt als Fundstelle: eine Zahl ODER ein benannter
+       Dateiname. Was gar nichts fuehrt, bleibt rot.
+
+       Gelesen werden ZWEI Felder: `fundstelle` und `feldbeschreibung`.
+       Beide sind Ortsangaben - marktdaten-nrw.json fuehrt die Datei in
+       `feldbeschreibung` ("allgemein_erlaeuterung.xlsx"), nicht in
+       `fundstelle`. `wortlaut` bleibt bewusst DRAUSSEN: das ist Prosa,
+       und eine Zahl in einem Satz ist keine Seitenangabe. Nimmt man ihn
+       mit, besteht fast jeder Beleg die Pruefung - dann ist der Waechter
+       zwar nie rot, prueft aber auch nichts mehr. */
+    const _FUNDSTELLE_DATEI = /\.(csv|xlsx?|json|txt|zip|gpkg|shp)\b/i;
     (s.belege || []).forEach((b, j) => {
-      const txt = (b && typeof b === 'object') ? String(b.fundstelle || '') : String(b || '');
-      if (!txt || !/\d/.test(txt)) fehler.push(`${wo}: beleg[${j}] ohne Seite/Fundstelle`);
+      const txt = (b && typeof b === 'object')
+        ? [b.fundstelle, b.feldbeschreibung].filter(Boolean).join(' ')
+        : String(b || '');
+      const taugt = txt && (/\d/.test(txt) || _FUNDSTELLE_DATEI.test(txt));
+      if (!taugt) fehler.push(`${wo}: beleg[${j}] ohne Seite, Kapitel oder Datei`);
     });
     if (s.quelle_url && !/^https?:\/\//.test(s.quelle_url)) fehler.push(`${wo}: quelle_url keine URL`);
-    if (s.ags && !/^\d{5}(\d{3})?$/.test(String(s.ags))) fehler.push(`${wo}: ags ${s.ags} nicht 5- oder 8-stellig`);
+    /* ══ v1983b · DER LANDESSCHLUESSEL IST ZWEISTELLIG ════════════════
+
+       Bis hierher waren nur 5 oder 8 Stellen erlaubt. Gemessen ueber
+       alle 56 Registerdateien kommen DREI Laengen amtlich vor:
+
+         2 Stellen   17x  ebene land   (12 = Brandenburg, 15 = ST)
+         5 Stellen 2655x  Kreise, dazu kreisfreie Staedte
+         8 Stellen 2160x  Gemeinden, Stadtstaaten, GAA-Bezirke
+
+       Die 14 Brandenburger Zinssaetze wurden also rot - mit dem
+       RICHTIGEN Landesschluessel. Aufgefallen erst, als die 17 fehlenden
+       Lizenzen behoben waren: die Fehlerliste je Datei ist bei 40
+       gekappt, und darunter lag diese Schicht verborgen. Ein Waechter,
+       der seine Befunde kappt, versteckt die naechste Schicht.
+
+       An `ebene` gebunden wird die Regel ausdruecklich NICHT: dort
+       verschwimmen die Stufen amtlich. Hamburg fuehrt auf ebene `land`
+       die 02000000 (Stadtstaat), Braunschweig und Schwerin auf ebene
+       `gemeinde` einen fuenfstelligen Schluessel (kreisfrei), Halle auf
+       ebene `kreis` einen achtstelligen. Eine strenge Zuordnung von
+       Ebene zu Laenge haette 18 neue Scheinbefunde erzeugt -
+       nachgemessen, nicht vermutet. */
+    if (s.ags && !/^(\d{2}|\d{5}|\d{8})$/.test(String(s.ags))) {
+      fehler.push(`${wo}: ags ${s.ags} ist nicht 2-, 5- oder 8-stellig`);
+    }
     const key = [s.land_code, s.ags, s.kennzahl, s.zweig, s.berichtsjahr, s.quelle_url].join('|');
     schl.set(key, (schl.get(key) || 0) + 1);
   });
