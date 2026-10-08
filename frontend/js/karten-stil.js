@@ -120,20 +120,36 @@
        sonst koennte die Adresszeile einen Stil zurueckholen, den es nicht
        mehr gibt, und die CSS-Regeln dazu sind entfernt.
        ════════════════════════════════════════════════════════════════ */
-    trichter:  { name: 'Trichter',  sub: 'Links die Quellen, rechts das Ergebnis' }
+    /* ══ v1985 · TRICHTER IST RAUS ════════════════════════════════════
+       Marcel am 08.10.2026: „den Trichter auf jeden Fall rausnehmen und
+       die Bordkarte auch. Die fallen komplett raus."
+
+       Damit ist die Liste wieder drei Entwuerfe lang: Zeile, Kartei,
+       Buetten. `STILE['trichter']` ist jetzt undefined, und `setze()`
+       faellt weich zurueck — wer ihn gemerkt hatte, bekommt keinen
+       Entwurf statt eines halben.
+
+       Sein JS fiel mit: `ertragBauen()` und `ERTRAG` konnten nach
+       diesem Schnitt nie mehr gerufen werden. `ertragAbraeumen()` und
+       `rzHeimat` BLEIBEN — sie sind das Netz fuer den Abrufknopf, der
+       im Trichter umgehaengt wurde. Baut ein alter Tab doch noch einen
+       `.dpk-ertrag`, wandert der Knopf an seinen gemerkten Platz
+       zurueck statt ans Ende der Leiste.
+
+       Die 26 reinen Trichter-Regeln in `datenaufnahme.css` sind
+       entfernt, bei zwei GEMISCHTEN Regeln nur der Trichter-Selektor:
+       sie trugen daneben `html[data-dp-pfstil]:not([data-dp-kartenstil])`,
+       und wer sie ganz loescht, nimmt dem pfstil-Zweig die Gestaltung
+       mit. Das faellt erst auf, wenn jemand diesen Zweig benutzt.
+       ════════════════════════════════════════════════════════════════ */
   };
 
   var aktuell = '';
   var wache = null;
 
-  /* ── Der Ertragsblock des Trichters ───────────────────────────────
-     Was dabei herauskommt. Drei Zeilen, keine Zahlen — Zahlen wären
-     eine Behauptung, solange nichts abgerufen wurde. */
-  var ERTRAG = [
-    ['Adresse, Fläche, Baujahr', 'Objektdaten'],
-    ['Kaufpreis und Miete',      'Investition'],
-    ['Marktwert und Spanne',     'Bewertung']
-  ];
+  /* v1985: `ERTRAG` und `ertragBauen()` sind mit dem Trichter gefallen -
+     nach dem Schnitt in STILE konnten sie nie mehr gerufen werden.
+     `rzHeimat` und `ertragAbraeumen()` bleiben als Netz, siehe dort. */
 
   /* Der Abrufknopf steckt in `.dp-pf-rz`. Im Trichter gehört er unter
      den Ertragsblock — also wird er umgehängt. Sein Platz wird exakt
@@ -141,23 +157,6 @@
      beim Zurückschalten irgendwo am Ende. */
   var rzHeimat = null;
 
-  function ertragBauen(bar) {
-    if (!bar || bar.querySelector('.dpk-ertrag')) return;
-    var e = document.createElement('div');
-    e.className = 'dpk-ertrag';
-    e.innerHTML = '<span class="dpk-ertrag-titel">Was dabei herauskommt</span>'
-      + ERTRAG.map(function (z) {
-          return '<span class="dpk-ertrag-zeile"><span>' + z[0]
-            + '</span><span class="dpk-ertrag-was">' + z[1] + '</span></span>';
-        }).join('');
-    bar.appendChild(e);
-
-    var rz = bar.querySelector('.dp-pf-rz');
-    if (rz) {
-      if (!rzHeimat) rzHeimat = { eltern: rz.parentNode, naechster: rz.nextSibling };
-      e.appendChild(rz);
-    }
-  }
 
   function ertragAbraeumen() {
     /* Erst den Knopf heimschicken, dann den Block entfernen - sonst
@@ -272,7 +271,7 @@
     if (wache) wache.disconnect();
     try {
       var bar = document.getElementById('oab-bar');
-      if (aktuell === 'trichter') { ertragBauen(bar); } else { ertragAbraeumen(); }
+      ertragAbraeumen();   /* v1985: der Trichter ist raus, es gibt nichts zu bauen */
       zaehlung(bar);
       objektnummerSetzen(bar);
       karteiZaehlung(bar);
@@ -633,6 +632,7 @@
     /* v1953: ein entfernter Stil darf auch ueber die Adresszeile nicht
        zurueckkommen - seine Regeln sind weg, er saehe kaputt aus. */
     if (ausUrl === 'bordkarte') ausUrl = 'aus';
+    if (ausUrl === 'trichter') ausUrl = 'aus';   /* v1985 */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
     else setze(gemerkt);
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die
