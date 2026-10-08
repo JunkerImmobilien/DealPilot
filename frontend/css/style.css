@@ -39556,3 +39556,80 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
   .sb-sort-menu { min-width: 0; width: calc(100vw - 24px); max-width: 280px; }
   .sb-sort-menu .sb-sort-opt { padding: 11px 10px; font-size: 14px; }
 }
+
+/* =================================================================
+   v1990 - ZWEI FLAECHEN, DEREN TEXTFARBEN NICHT MITGEWANDERT SIND
+
+   Marcel hat am 08.10.2026 zwei Bilder geschickt und auf dem einen die
+   Zeile eingekreist, die man nicht lesen kann: "Das betrifft viele
+   andere Felder auch."
+
+   -- A - DIE FELDHILFE -------------------------------------------
+
+   Gemessen am Feld lzs_pct (genau dem aus seinem Bild):
+
+     ul.dp-feldhilfe-wofuer   e8dcbf auf ffffff    1,36 : 1  <- eingekreist
+     div.dp-feldhilfe-titel   c9a84c auf ffffff    2,29 : 1
+     div.dp-feldhilfe-body    353232 auf ffffff   12,74 : 1  in Ordnung
+
+   Die Sprechblase ist als DUNKLE Flaeche entworfen
+   (.dp-feldhilfe-popup{background:#050505;color:#f3ead0}). Sie traegt
+   aber eine zweite Klasse, .dp-tip-popup, und ein Inline-Blatt setzt
+   die unbedingt auf WEISS. Der Grund ist hell geworden, die
+   Akzentfarben sind dunkel geblieben. Der Fliesstext hat den Wechsel
+   mitgemacht, Titel und Aufzaehlung nicht - genau die zwei.
+
+   > Grund und Schrift werden hier ALS PAAR gesetzt. Sonst laufen sie
+   > beim naechsten Eingriff am Inline-Blatt wieder auseinander.
+
+   -- B - DIE STUFEN 1 - 2 - 3 AUF DER KARTE ----------------------
+
+   Marcel: "Die Stufen auf der Karte, also 1, 2, 3, kann man nur bei
+   der richtig gut lesen, die gerade ausgewaehlt wurde."
+
+     nicht gewaehlt   f6efda auf fffdf7    1,13 : 1
+     gewaehlt (3)     050505 auf Gold      8,92 : 1
+
+   .dp-pf-pille traegt color:#f3ead0 bei opacity:.75 - entworfen fuer
+   die DUNKLE Leiste. In der hellen Karte steht Creme auf Creme.
+
+   Im Dokument gibt es einen ZWEITEN Satz derselben Pillen, und der ist
+   schon geloest: .oe-pillen .dp-pf-pille (gemessen 13,72 : 1). Hier
+   wird genau das gespiegelt, statt etwas Neues zu erfinden - und nur
+   dann, wenn die Leiste wirklich die helle Karte ist
+   (body.dp-neue-karte-stil). Auf der dunklen bleibt Creme richtig.
+
+   Alle Werte vor dem Schreiben gerechnet:
+     Titel 836d31 = 5,00  -  Liste 4a453d = 9,49  -  Mono 6b6358 = 5,91
+     Pille 2A2727 auf fffdf7 = 13,72
+   ================================================================= */
+
+/* A - die Sprechblase als PAAR: heller Grund, helle Tinten */
+.dp-feldhilfe-popup.dp-feldhilfe-popup {
+  background: #ffffff;
+  color: #353232;
+}
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-titel {
+  color: var(--wl-836d31, #836d31);
+}
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-wofuer,
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-wofuer li {
+  color: #4a453d;
+}
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-par {
+  color: #6b6358;
+}
+/* "leer" stand auf opacity .6 - auf hellem Grund ist das zu wenig */
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-leer {
+  opacity: .85;
+}
+
+/* B - die Stufenpillen der Leiste, wenn sie die HELLE Karte ist */
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-pille {
+  border-color: #b9b2aa;
+  color: #2A2727;
+  opacity: 1;
+}
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-pille.on {
+  color: #050505;
+}
