@@ -36,6 +36,150 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N56 · ImmoMetrica von Demo auf Live, und vier Fragen dazu (08.10.2026)
+
+**Marcels Auftrag:** „kannst du mir auf staging immometrica einmal wieder von demo auf
+live umschalten? ich habe eben einen api key hinterlegt und habe wieder zugang. bitte
+schau auch nochmal nach ob wir alles aus der schnittstelle auch abfragen und verwerten
+oder ob wir es noch besser umsetzen könnten? läuft immometrika api mit den anderen
+auswahlmöglichkeiten aus unserer Datenaufnahme? ist die reihenfolge richtig gewählt? es
+muss ja immer eins das führende sein … und wie gehen wir damit um wenn keine genaue
+Adresse in der schnittstelle angegeben ist? Ortkern nehmen oder zentrum?"
+
+Dokumentation: `https://www.immometrica.com/searchapi/v1/`
+
+**Der Bestand, gemessen am 08.10.2026** (722 Zeilen über vier Dateien):
+
+| Datei | Zeilen | was sie tut |
+|---|---|---|
+| `backend/src/services/immometricaService.js` | 100 | drei Aufrufe: `getSearches`, `getResults`, `getFavorites` |
+| `backend/src/services/immometricaMapping.js` | 302 | Inserat → DealPilot-Felder, **33 Rohfelder** |
+| `backend/src/routes/immometrica.js` | 66 | Token je Nutzer, `428` wenn keiner hinterlegt |
+| `frontend/js/immometrica-import.js` | 254 | die Auswahl-Oberfläche |
+
+---
+
+**1 · DER SCHALTER — und er ist eine Umgebungsvariable, kein Code**
+
+```
+IMMOMETRICA_MODE=stub   ->  Demo-Inserate, kein Live-Aufruf, kein Token
+(nicht gesetzt)         ->  Live gegen IMMOMETRICA_BASE
+```
+
+Zwei Stellen lesen sie: `immometricaService.js:8` (`_isStub()`) und
+`routes/immometrica.js:45` (gibt im Stub-Modus ein `stub-token` zurück, damit die
+`428`-Schranke nicht greift). **Beide fallen zusammen oder gar nicht.**
+
+Der Token steht **je Nutzer** in den Credentials (`creds.setCredential`), nicht in der
+Umgebung — Marcels hinterlegter Schlüssel liegt also schon richtig. Zum Umschalten muss
+nur `IMMOMETRICA_MODE` aus der Server-Umgebung verschwinden und der Container **neu
+erzeugt** werden (`--force-recreate`; `up -d` allein tauscht die Umgebung nicht).
+
+> **Danach `printenv` IM Container prüfen**, nicht die `.env` lesen — das ist die
+> Wahrheit. Und ein erster Live-Aufruf gegen `searches/` als Nachweis, nicht die
+> Abwesenheit einer Fehlermeldung.
+
+---
+
+**2 · HOLEN WIR ALLES? — 33 Felder, und die Lücke ist nicht die Zahl**
+
+Das Mapping liest heute: `address_raw`, `address_zipcode`, `appartement_type`,
+`bath_rooms`, `buying_price`, `buying_price_per_sqm`, `commission_text`, `condition`,
+`construction_year`, `energy_efficiency_class`, `floor`, `floor_act`, `floor_max`,
+`heating_type`, `house_type`, `id`, `includes`, `is_private`, `living_space`,
+`maintenance`, `match`, `number_of_apartments`, `online_since`, `platforms[]`,
+`property_area`, `real_estate_type`, `rent_cold`, `rent_total`, `rented_out`, `rooms`,
+`title`.
+
+**Zu prüfen ist nicht, ob es viele sind, sondern ob die Doku mehr führt.** Der Abgleich
+läuft gegen `searchapi/v1/` und muss drei Fragen beantworten:
+- Welche Felder liefert die Schnittstelle, die wir **nicht** lesen?
+- Welche lesen wir, die es **nicht mehr** gibt? (ein Zugriff, der nie trifft, sieht aus
+  wie ein leeres Feld — siehe `feldname-nur-im-testdatensatz`)
+- Gibt es **Blätterung** über `next`? `getResults` reicht sie durch, aber niemand ruft
+  die zweite Seite ab.
+
+---
+
+**3 · ⚠ DIE REIHENFOLGE — ImmoMetrica steht in GAR KEINER**
+
+Marcel fragt, ob die Reihenfolge stimmt. Gemessen: **ImmoMetrica nimmt einen ganz
+anderen Weg als alle übrigen Quellen.**
+
+Exposé und Marktbericht laufen über eine Zusammenführungstabelle (`_merged`), und dort
+gibt es genau **eine** Vorrangregel (`object-actions.js:1541`):
+
+```js
+if (_merged[id] && _merged[id].source === 'Marktbericht' && source !== 'Marktbericht') return;
+```
+
+Also: **Marktbericht schlägt alles, sonst gewinnt der zuletzt Geschriebene.** Eine
+Rangfolge gibt es nicht.
+
+ImmoMetrica geht an dieser Tabelle **vorbei**. `applyImmometrica()` schreibt direkt in
+die Felder (`object-actions.js:1646`):
+
+```js
+var el = $(id); if (!el) return;
+el.value = v;
+```
+
+Kein `emptyOnly`, kein Vergleich, kein Eintrag in `_merged`. Wer ImmoMetrica im
+Sprechlauf anhakt, **überschreibt damit alles, was vorher da war** — auch Werte aus dem
+Marktbericht, der eigentlich Vorrang hat. Und `recompute()` baut `_merged` nur aus
+Exposé- und Marktbericht-Dateien neu; ImmoMetrica kommt darin nicht vor.
+
+> **Das ist die Antwort auf Marcels Frage, und sie lautet nein.** Es gibt kein
+> führendes Verfahren, weil ImmoMetrica gar nicht am Wettbewerb teilnimmt. Der Fehler
+> fällt nur deshalb selten auf, weil die Reihenfolge im Sprechlauf ImmoMetrica meist
+> zuletzt aufruft — dann sieht „überschreibt alles" aus wie „ergänzt".
+
+**Zu tun:** ImmoMetrica über `addRow()` in dieselbe Tabelle führen, mit einem Rang. Der
+Rang ist eine **Bewertungsentscheidung** und gehört Marcel; der Vorschlag zur Abnahme:
+
+```
+1. Marktbericht   amtliche und geprüfte Zahlen
+2. Exposé         Angaben des Verkäufers zum konkreten Objekt
+3. ImmoMetrica    Portaldaten, maschinell zusammengetragen
+4. Geführte Eingabe / Sprache   was der Nutzer selbst sagt, füllt Lücken
+```
+
+---
+
+**4 · KEINE GENAUE ADRESSE — heute bleibt Straße und Hausnummer einfach leer**
+
+`parseAddr()` (`immometricaMapping.js:193`) kennt drei Fälle:
+
+| Rohtext | Ergebnis |
+|---|---|
+| `Musterstr. 12, 32545 Bad Oeynhausen` | Straße, Hausnummer, PLZ, Ort — vollständig |
+| `Musterstr. 12 32545 Bad Oeynhausen` | dasselbe, ohne Komma erkannt |
+| `32545 Bad Oeynhausen - Nordrhein-Westfalen` | nur PLZ und Ort, **`str` und `hnr` bleiben leer** |
+
+Der dritte Fall ist der Regelfall bei Portalinseraten — die Adresse wird dort bewusst
+verschwiegen.
+
+**Marcels Frage ist die richtige: Ortskern oder Zentrum?** Sie ist nicht kosmetisch,
+denn an der Koordinate hängt der **Bodenrichtwert** (BORIS) und damit der Sachwert.
+
+Was dafür entschieden werden muss — und das ist eine Bewertungsfrage, keine technische:
+1. **Welcher Punkt?** Ortsmittelpunkt der Gemeinde, geometrischer Schwerpunkt der PLZ,
+   oder gar keiner.
+2. **Wie wird es gekennzeichnet?** Ein Bodenrichtwert aus einem Ersatzpunkt ist keine
+   Messung am Objekt. Die Doktrin dazu steht schon: *„Kein Treffer heißt kein Wert —
+   nie ein Nachbarkreis, nie ein Landesmittel."* Ein Ortskern-Ersatz ist genau so ein
+   Fall und müsste als **indikativ** laufen, mit eigenem Vermerk.
+3. **Was zeigt die Oberfläche?** Heute steht das Adressfeld halb leer da, ohne zu sagen,
+   dass die Quelle keine Adresse führt.
+
+> **Mein Vorschlag zur Abnahme:** keine Koordinate erfinden. Stattdessen das Inserat mit
+> „Adresse nicht veröffentlicht" kennzeichnen, PLZ und Ort übernehmen, und den
+> Bodenrichtwert **nicht** automatisch ziehen — sondern den Weg dorthin anbieten, wie es
+> die Ernte-Doktrin für fehlende Werte ohnehin vorsieht. Wer die Adresse kennt, trägt
+> sie nach, und dann rechnet alles.
+
+---
+
 ### N55 · ⚠ Eine korrigierte Quell-URL erzeugt eine ZWEITE Zeile (08.10.2026)
 
 **Gemessen, nicht vermutet — und zwar an einem Schaden, den ich selbst erzeugt habe.**
