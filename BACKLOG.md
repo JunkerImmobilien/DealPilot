@@ -36,6 +36,65 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N49e · `rnd-styles.css`: 78 von 111 Klassen ohne Schreiber (08.10.2026)
+
+**Der Befund ist größer als N49 (e) behauptete.** Dort stand „`.rnd-result*` (17×),
+`.rnd-method*` (7×), `.rnd-afa*` (5×)". Gemessen über alle js- und html-Dateien unter
+`frontend/` sind es:
+
+```
+1.494  Zeilen in frontend/css/rnd-styles.css
+  111  rnd-Klassen insgesamt
+   33  haben einen Schreiber
+   78  haben KEINEN
+  706  Zeilen fielen bei einem Probelauf weg (rund 47 Prozent der Datei)
+```
+
+**Die Regel ist fast ein Präfix, aber nur fast.** Alle 33 lebenden Klassen heißen
+`rnd-wiz-*` — es ist die Oberfläche des Wizards. Die 78 toten gehören zur in **v1968**
+gelöschten `rnd-ui.js` (`rnd-root`, `rnd-card`, `rnd-btn`, `rnd-mod-*`, `rnd-ampel*`,
+`rnd-afa*`, `rnd-methods-table`, `rnd-gate*`, `rnd-vorteil*` …) und zum in **v1970**
+entfernten Ergebnis-Bildschirm.
+
+> **Ein Präfix-Lauf wäre falsch:** `rnd-wiz-result` lebt, aber
+> `rnd-wiz-result-hero`, `-grid`, `-card`, `-card-label`, `-card-value`, `-card-unit`
+> sind tot; `rnd-wiz-full` und `rnd-wiz-spreizung` ebenfalls. Es muss je KLASSENNAME
+> gemessen werden, nicht je Präfix.
+
+> **Und je Klassenname, nicht per grep auf das Präfix:** `deal-action.js` enthält
+> `rnd-result-modal` — eine ELEMENT-ID. Ein grep nach „rnd-result" hält damit die
+> ganze `.rnd-result-hero*`-Familie für lebend, obwohl keine einzige dieser Klassen
+> geschrieben wird.
+
+**Warum das nicht am 08.10.2026 mitgemacht wurde:** 706 Zeilen aus dem Stylesheet einer
+**lebenden** Oberfläche zu schneiden ist kein Nebenbei-Schritt. Ein Probelauf lief, und
+der eigene Prüfer meldete, dass die Entfernung unvollständig war (eine tote Klasse stand
+danach noch als Regelkopf) — also war die Schnittlogik selbst nicht fertig. Abgebrochen,
+nichts geschrieben.
+
+**Zu tun, in dieser Reihenfolge:**
+1. **Vorher** den Wizard in allen neun Schritten im Browser messen und festhalten:
+   Geometrie je Schritt, Farben der Knöpfe, die Fortschrittsleiste. Ohne Vorher-Bild ist
+   nachher nicht entscheidbar, ob etwas fehlt.
+2. Je Klassenname messen, welche Datei sie schreibt (nicht je Präfix, nicht per grep auf
+   die ID).
+3. Nur Regeln entfernen, deren Selektoren **ausschließlich** tote Klassen nennen.
+   `@media`-Blöcke nie als Ganzes.
+4. Klammertiefe verfolgen, nicht Paare zählen — ein zitiertes `*/` im Kommentar zerlegt
+   die Datei, und eine Bilanz findet das nie.
+5. Nachher dieselbe Messung und gegenhalten.
+
+> **Nebenbefund, mit v1974 erledigt:** `frontend/css/marktbewertung-card.css` war
+> **nicht** die reine Dublette, die N49 (c) beschrieb. Sie trug einen eigenen Block
+> `#dp-mb-host .dpmb-*` (v541, „Karte volle Breite im Objekt-Tab") und ein hartes
+> Gold-Literal, wo die benutzte Fassung `var(--wl-e8c766, …)` führt. Der Block war
+> gleichwohl unerreichbar: `#dp-mb-host` gibt es nur in der Hauptapp, die `dpmb-*`-
+> Klassen schreibt nur `marktbericht-app/marktbewertung-card.js`, und dort gibt es
+> kein `#dp-mb-host`. `dealpilot-mb-qc.js:226` sagt es selbst: „v832c: alte
+> dp-mb-host-Tacho-Karte deaktiviert". Beide Dateien sind raus.
+
+---
+
 ### N50 · Die Ernte holt die amtlichen Vergleichsfaktoren (08.10.2026)
 
 **Marcels Auftrag:** „Vielleicht sollten wir das mit in unseren Ernteparameter mit aufnehmen …
