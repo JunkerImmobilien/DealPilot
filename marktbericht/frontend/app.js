@@ -824,8 +824,16 @@ function fillInputsFromDpkt(o) {
 function drawMap(lat, lon, comps) {
   if (!map) {
     map = L.map('map', { zoomControl: true }).setView([lat, lon], 16);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap, © CARTO', maxZoom: 19,
+    /* v2004 · Carto verlangt seit Kurzem einen Schluessel und liefert
+       fuer JEDE Kachel dieselbe Grafik "API KEY REQUIRED" - gemessen:
+       drei verschiedene Kacheln, drei Zoomstufen, HTTP 200, 2049 Byte,
+       md5 502fc5f6793fad87, identisch. Ein Ausfall mit Statuscode 200
+       loest kein tileerror aus; Leaflet zeichnet ihn brav.
+       OSM-Standard braucht keinen Schluessel. ACHTUNG: dort gibt es
+       weder Subdomains ({s}) noch Retina-Kacheln ({r}) - beide
+       Platzhalter muessen raus, sonst laufen die Anfragen ins Leere. */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap-Mitwirkende', maxZoom: 19,
     }).addTo(map);
   } else {
     map.setView([lat, lon], 14);

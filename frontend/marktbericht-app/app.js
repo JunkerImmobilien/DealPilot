@@ -2146,7 +2146,7 @@ function _mbEnsureReportsPanel(){
      /* v944-collapse: KEINE zwei Spalten — ein Bericht pro Zeile. "Volle Breite"
         heisst volle Breite fuer die Zeile, nicht zwei Zeilen nebeneinander. */
      +'#mbReportsPanel .mbrep-list{display:none}'
-     +'#mbReportsPanel.open .mbrep-list{display:block}'
+     +'#mbReportsPanel.open .mbrep-list{display:block;container-type:inline-size;container-name:mbrep}'
      +'#mbReportsPanel .mbrep-tog{display:inline-flex;align-items:center;gap:7px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;font-weight:600;color:#8a8378;background:none;border:none;cursor:pointer;padding:6px 2px}'
      +'#mbReportsPanel .mbrep-tog:hover{color:var(--wl-9a7f33, #9a7f33)}'
      +'#mbReportsPanel .mbrep-tog .chev{display:inline-block;transition:transform .18s;font-size:9px}'
@@ -2156,7 +2156,25 @@ function _mbEnsureReportsPanel(){
         bleibt hart (keine WL_TINTS). */
      +'#mbReportsPanel .mbrep-del{width:34px;height:34px;flex:0 0 auto;border:1px solid rgba(42,39,39,.16);border-radius:9px;background:none;color:#9a9288;font-size:14px;line-height:1;cursor:pointer}'
      +'#mbReportsPanel .mbrep-del:hover{color:#B8625C;border-color:#B8625C;background:#FBF3F2}'
-     +'@media(max-width:600px){#mbReportsPanel .mbrep-row{flex-wrap:wrap}#mbReportsPanel .mbrep-mv{text-align:left}}';
+     /* v2004 · Hier stand @media(max-width:600px). Die Absicht war
+        richtig, der Massstab falsch: gemessen wird das FENSTER (1568 px),
+        waehrend die Liste nach dem Oeffnen eines Berichts in einer 290 px
+        schmalen Spalte sitzt. Die Regel sah vorhanden aus und war tot.
+        @container misst die Liste selbst. Bei schmaler Spalte wird aus
+        der Zeile ein Block: Kennung und Adresse oben, darunter Datum und
+        Wert, die Knoepfe in eigener Reihe - statt vier Spalten auf einer
+        Breite, die fuer eine reicht. */
+     +'@container mbrep (max-width:560px){'
+       +'#mbReportsPanel .mbrep-row{flex-wrap:wrap;gap:6px 10px;align-items:flex-start}'
+       +'#mbReportsPanel .mbrep-icb{display:none}'
+       +'#mbReportsPanel .mbrep-main{flex:1 1 100%}'
+       +'#mbReportsPanel .mbrep-l1{flex-wrap:wrap;gap:6px}'
+       +'#mbReportsPanel .mbrep-addr{white-space:normal;line-height:1.35}'
+       +'#mbReportsPanel .mbrep-mv{flex:0 0 auto;text-align:left;font-size:13px}'
+       +'#mbReportsPanel .mbrep-mv small{display:inline;margin-left:5px}'
+       +'#mbReportsPanel .mbrep-act{flex:1 1 auto;justify-content:flex-end;gap:5px}'
+       +'#mbReportsPanel .mbrep-act button{padding:6px 10px;font-size:11px}'
+     +'}';
     document.head.appendChild(st);
   }
   p=document.createElement('div'); p.className='panel'; p.id='mbReportsPanel'; p.style.display='none'; /* v942: wird von _mbLoadReportsList gesteuert */
@@ -2479,8 +2497,16 @@ function _mbMapTouch(m) {
 function drawMap(lat, lon, comps) {
   if (!map) {
     map = L.map('map', { zoomControl: true }).setView([lat, lon], 16);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap, © CARTO', maxZoom: 19,
+    /* v2004 · Carto verlangt seit Kurzem einen Schluessel und liefert
+       fuer JEDE Kachel dieselbe Grafik "API KEY REQUIRED" - gemessen:
+       drei verschiedene Kacheln, drei Zoomstufen, HTTP 200, 2049 Byte,
+       md5 502fc5f6793fad87, identisch. Ein Ausfall mit Statuscode 200
+       loest kein tileerror aus; Leaflet zeichnet ihn brav.
+       OSM-Standard braucht keinen Schluessel. ACHTUNG: dort gibt es
+       weder Subdomains ({s}) noch Retina-Kacheln ({r}) - beide
+       Platzhalter muessen raus, sonst laufen die Anfragen ins Leere. */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap-Mitwirkende', maxZoom: 19,
     }).addTo(map);
     _mbMapTouch(map);
   } else {
