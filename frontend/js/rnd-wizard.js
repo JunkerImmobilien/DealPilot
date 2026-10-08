@@ -573,346 +573,52 @@
     });
   }
 
-  function finishWizard() {
-    // Wizard-State in ein vom UI-Modul verständliches Format übersetzen
-    const result = buildResultPackage();
-    // Berechnung sofort durchführen für Ergebnis-Screen
-    const calc = computeRND(result);
-    showResultScreen(result, calc);
-  }
+  /* ══ v1970 · HIER LAG DAS RND-GUTACHTEN ══════════════════════════════
 
-  function buildResultPackage() {
-    return {
-      // Für DealPilotRND_UI.mount() — passt zu mount(selector, initial)
-      objekt_typ: state.objekt_typ,
-      objekt_adresse: [state.str, state.hnr].filter(Boolean).join(' ')
-                    + (state.plz || state.ort ? ', ' + state.plz + ' ' + state.ort : ''),
-      objekt_einheit: state.einheit,
-      baujahr: parseInt(state.baujahr, 10) || new Date().getFullYear(),
-      wohnflaeche: state.wohnflaeche,
-      stichtag: state.stichtag,
-      besichtigungsdatum: state.besichtigungsdatum,
-      aktenzeichen: state.aktenzeichen,
-      bauweise: state.bauweise,
-      unterkellerung: state.unterkellerung,
-      vollgeschosse: state.vollgeschosse,
-      einheiten_gesamt: state.einheiten_gesamt,
-      bedachung: state.bedachung,
-      fenster: state.fenster,
-      heizungsart: state.heizungsart,
-      anzahl_baeder: state.anzahl_baeder,
-      besonderheiten: state.besonderheiten,
-      bel: state.belueftung,
-      brennstoff: state.brennstoff,
-      warmwasser: state.warmwasser,
-      erneuerbare: state.erneuerbare,
-      energieklasse: state.energieklasse,
-      erschliessung: state.erschliessung,
-      mod_dach: state.mod.dach,
-      mod_fenster: state.mod.fenster,
-      mod_leitungen: state.mod.leitungen,
-      mod_heizung: state.mod.heizung,
-      mod_aussenwand: state.mod.aussenwand,
-      mod_baeder: state.mod.baeder,
-      mod_innenausbau: state.mod.innenausbau,
-      mod_technik: state.mod.technik,
-      mod_grundriss: state.mod.grundriss,
-      gewerkeBewertung: state.gewerke,
-      schaeden: state.schaeden_ids.slice(),
-      applySchadensAbschlag: state.applyAbschlag,
-      // Auftraggeber/Eigentümer
-      auftraggeber_name: state.auftraggeber_name,
-      auftraggeber_adresse: [state.auftraggeber_strasse, state.auftraggeber_plz + ' ' + state.auftraggeber_ort]
-                            .filter(function (s) { return s.trim().length > 0; }).join(', '),
-      eigentuemer_name: state.eigentuemer_abweichend ? state.eigentuemer_name : state.auftraggeber_name,
-      eigentuemer_adresse: state.eigentuemer_abweichend
-        ? [state.eigentuemer_strasse, state.eigentuemer_plz + ' ' + state.eigentuemer_ort]
-            .filter(function (s) { return s.trim().length > 0; }).join(', ')
-        : [state.auftraggeber_strasse, state.auftraggeber_plz + ' ' + state.auftraggeber_ort]
-            .filter(function (s) { return s.trim().length > 0; }).join(', '),
-      // Sachverständiger
-      sv_name: state.sv_name,
-      sv_titel: state.sv_titel,
-      sv_unternehmen: state.sv_unternehmen,
-      sv_adresse_z1: state.sv_adresse_z1,
-      sv_adresse_z2: state.sv_adresse_z2,
-      sv_email: state.sv_email,
-      erstellungsort: state.erstellungsort,
-      erstellungsdatum: state.erstellungsdatum,
-      // Punktraster auto-berechnen aus mod-Werten
-      modPoints: computeModPoints(state.mod).total,
-      modElements: computeModPoints(state.mod).elements,
-      // GND aus Objekttyp
-      gnd: gndFromObjektTyp(state.objekt_typ)
-    };
-  }
+     Marcels Entscheidung vom 08.10.2026: „Das RND-Gutachten-PDF, das
+     bauen wir hier gar nicht rein. Also das brauchen wir hier nicht. Die
+     Leute bekommen erst mal kein RND-Gutachten."
 
-  // Sofortige RND-Berechnung für Ergebnis-Screen
-  function computeRND(pkg) {
-    if (!global.DealPilotRND) return null;
-    const RND = global.DealPilotRND;
-    const result = RND.calcAll({
-      baujahr: pkg.baujahr,
-      stichtag: pkg.stichtag,
-      gnd: pkg.gnd,
-      modPoints: pkg.modPoints,
-      gewerkeBewertung: pkg.gewerkeBewertung,
-      schaeden: pkg.schaeden,
-      applySchadensAbschlag: pkg.applySchadensAbschlag
-    });
-    /* v1598 · Hier stand der Vergleich ein ZWEITES Mal, mit fest
-       verdrahteten 200.000 EUR Gebaeudeanteil und 42 % Grenzsteuersatz
-       ("Default-Annahme fuer Demo"). Weil dieser Weg den Ergebnisschirm
-       fuellt, sah JEDER Nutzer 200.000 EUR - auch bei einem Objekt fuer
-       743.000 EUR. Der richtige Wert lag daneben bereit: Z.291 rechnet
-       ihn aus Kaufpreis und Gebaeudeanteil, computeAfaEstimate liest ihn.
-       Jetzt gibt es nur noch diesen einen Weg. */
-    const afa = computeAfaEstimate(result);
-    return { result: result, afa: afa };
-  }
+     Entfernt wurden zwei geschlossene Teilbaeume, die seit V194
+     unerreichbar waren:
 
-  function showResultScreen(pkg, calc) {
-    // Header umbenennen
-    document.getElementById('rnd-wiz-step-title').textContent = '✓ Ergebnis';
-    document.getElementById('rnd-wiz-step-sub').textContent =
-      'Ihre Restnutzungsdauer-Analyse ist fertig';
+       finishWizard()         Wurzel, wurde NIRGENDS gerufen
+         buildResultPackage()
+         computeRND()
+         showResultScreen()   mit den alten Export-Knoepfen
+           generatePDF()      einziger Weg in rnd-pdf.js
+           generateDOCX()     einziger Weg in rnd-docx.js
+         fmtEUR()             Zwilling, die zweite Fassung lebt weiter
+         escapeHTML()         nur aus showResultScreen gerufen
 
-    // Progress 100%
-    document.getElementById('rnd-wiz-progress').style.width = '100%';
+       exportAsPDF()          keine Aufrufer
+       exportAsDOCX()         keine Aufrufer
+         slugify()            nur aus exportAsDOCX
+         buildExportPayload() nur aus den beiden
 
-    // Steps alle als done markieren
-    const stepsEl = document.getElementById('rnd-wiz-steps');
-    stepsEl.innerHTML = '';
-    STEPS.forEach(function () {
-      const dot = document.createElement('div');
-      dot.className = 'rnd-wiz-step done';
-      dot.textContent = '✓';
-      stepsEl.appendChild(dot);
-    });
+     Der lebende Weg endet seit V194 in `_submitWizardAsRequest()` — die
+     Datei sagte es selbst in renderStep9: „KEINE Export-Buttons mehr.
+     Der Submit erfolgt ueber den Wizard-Footer."
 
-    // Footer-Counter
-    document.getElementById('rnd-wiz-counter').textContent = 'Ergebnis';
+     Mit diesem Schnitt fallen `js/rnd-pdf.js` (2.365 Zeilen),
+     `js/rnd-docx.js` (680) und `js/rnd-bte-katalog.js` (190 Bauteile
+     DIN 276-1) weg — ihre einzigen Aufrufer standen hier.
 
-    const body = document.getElementById('rnd-wiz-body');
-    const r = calc.result;
-    const a = calc.afa;
+     > Die Fachlogik ist nicht verloren: das Standalone-Modul
+     > (Dateien/vw-modul-v4-2-5.zip) erstellt Restnutzungsdauer-,
+     > Verkehrswert- und Kaufpreisaufteilungs-Gutachten aus eigenen
+     > Vorlagen (master_rndg.docx). Zwei Wege zum selben Gutachten waeren
+     > genau die Dopplung, die hier schon zweimal auseinandergelaufen
+     > ist — es gab zuletzt ZWEI Export-Generationen nebeneinander, beide
+     > tot, mit doppelten Helfern (fmtEUR zweimal, escapeHTML neben
+     > escapeHtml).
 
-    let ampelClass, ampelLabel, ampelIcon;
-    if (a.ampel === 'gruen') {
-      ampelClass = 'green'; ampelLabel = 'Lohnt sich klar'; ampelIcon = '✓';
-    } else if (a.ampel === 'gelb') {
-      ampelClass = 'yellow'; ampelLabel = 'Lohnt sich bedingt'; ampelIcon = '!';
-    } else {
-      ampelClass = 'red'; ampelLabel = 'Lohnt sich nicht'; ampelIcon = '✗';
-    }
-
-    let html = '<div class="rnd-wiz-result">';
-
-    // Hauptergebnis: RND
-    html += '<div class="rnd-wiz-result-hero">'
-      + '<div class="rnd-wiz-result-hero-label">Restnutzungsdauer</div>'
-      + '<div class="rnd-wiz-result-hero-value">' + (r.verfahren === 'keines' ? '—' : (function () {
-          var sp = spanneAus(r);
-          if (!sp) return r.final_rnd + ' Jahre';
-          return (sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis)) + ' Jahre';
-        })()) + '</div>'
-      /* v1426 · Anwendungsgrenzen der Anlage 2 aus dem Kern 3.1.0 */
-      + ((r.grenzen || []).filter(function (x) { return x && x.greift; }).map(function (x) {
-          return '<div class="rnd-wiz-result-hero-sub" style="font-size:12px;opacity:.85">' + escapeHTML(x.text) + '</div>';
-        }).join(''))
-      + '<div class="rnd-wiz-result-hero-sub">'
-      +   'Objekt: ' + escapeHTML(pkg.objekt_adresse) + (pkg.objekt_einheit ? ' (' + escapeHTML(pkg.objekt_einheit) + ')' : '')
-      + '</div>'
-      + '</div>';
-
-    // Verfahrensübersicht
-    html += '<div class="rnd-wiz-result-grid">'
-      + '<div class="rnd-wiz-result-card">'
-      + '<div class="rnd-wiz-result-card-label">Linear</div>'
-      + '<div class="rnd-wiz-result-card-value">' + r.methods.linear.restnutzungsdauer + '</div>'
-      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
-      + '</div>'
-      /* v1676 — Vogels, Ross und Parabel wurden vom Kern immer gerechnet
-         (calcAll -> methods.*) und hier nie gezeigt. Sie brauchen KEINE
-         eigenen Eingaben, nur Alter und GND. An den drei Testobjekten
-         liegen die Verfahren 12,8 bis 19,2 Jahre auseinander - eine
-         Spreizung, die der Gutachter sehen muss, um sein Verfahren
-         begruenden zu koennen. Eine Zahl ohne ihre Alternativen sieht
-         nach Messung aus und ist eine Wahl.                             */
-      + '<div class="rnd-wiz-result-card">'
-      + '<div class="rnd-wiz-result-card-label">Vogels</div>'
-      + '<div class="rnd-wiz-result-card-value">' + r.methods.vogels.restnutzungsdauer + '</div>'
-      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
-      + '</div>'
-      + '<div class="rnd-wiz-result-card">'
-      + '<div class="rnd-wiz-result-card-label">Ross</div>'
-      + '<div class="rnd-wiz-result-card-value">' + r.methods.ross.restnutzungsdauer + '</div>'
-      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
-      + '</div>'
-      + '<div class="rnd-wiz-result-card">'
-      + '<div class="rnd-wiz-result-card-label">Parabel</div>'
-      + '<div class="rnd-wiz-result-card-value">' + r.methods.parabel.restnutzungsdauer + '</div>'
-      + '<div class="rnd-wiz-result-card-unit">Jahre</div>'
-      + '</div>'
-      + '<div class="rnd-wiz-result-card">'
-      + '<div class="rnd-wiz-result-card-label">Punktraster</div>'
-      + '<div class="rnd-wiz-result-card-value">' + r.methods.punktraster.restnutzungsdauer + '</div>'
-      + '<div class="rnd-wiz-result-card-unit">Jahre · ' + r.methods.punktraster.modernisierungspunkte + ' P.</div>'
-      + '</div>'
-      + '<div class="rnd-wiz-result-card highlight">'
-      + '<div class="rnd-wiz-result-card-label">Technisch ★</div>'
-      + '<div class="rnd-wiz-result-card-value">' + r.methods.technisch.restnutzungsdauer + '</div>'
-      + '<div class="rnd-wiz-result-card-unit">Jahre · maßgeblich</div>'
-      + '</div>'
-      + '</div>';
-
-    /* v1676 — Die Spreizung benennen. Sechs Verfahren nebeneinander zu
-       zeigen ohne zu sagen, wie weit sie auseinanderliegen, ueberlaesst
-       dem Leser das Rechnen. An den Testobjekten sind es 12,8 bis 19,2
-       Jahre - bei 1 % AfA-Unterschied je 20 Jahre ist das die halbe
-       Aussage des Gutachtens.                                          */
-    (function () {
-      var werte = ['linear', 'vogels', 'ross', 'parabel', 'punktraster', 'technisch']
-        .map(function (k) { return r.methods[k] && r.methods[k].restnutzungsdauer; })
-        .filter(function (v) { return typeof v === 'number' && isFinite(v) && v > 0; });
-      if (werte.length < 2) return;
-      var min = Math.min.apply(null, werte), max = Math.max.apply(null, werte);
-      var delta = Math.round((max - min) * 10) / 10;
-      if (delta <= 0) return;
-      html += '<div class="rnd-wiz-spreizung">'
-        + '<strong>Spreizung der Verfahren: ' + min + ' bis ' + max + ' Jahre</strong> ('
-        + String(delta).replace('.', ',') + ' Jahre Unterschied). '
-        + 'Maßgeblich ist ' + escapeHTML(r.final_source || '—') + '. '
-        + 'Die Wahl des Verfahrens gehört begründet — sie bewegt die '
-        + 'Abschreibung stärker als jede Einzelangabe.'
-        + '</div>';
-    })();
-
-    // Lohnt sich AfA?
-    html += '<div class="rnd-wiz-result-ampel rnd-wiz-ampel-' + ampelClass + '">'
-      + '<div class="rnd-wiz-ampel-icon">' + ampelIcon + '</div>'
-      + '<div class="rnd-wiz-ampel-content">'
-      + '<div class="rnd-wiz-ampel-title">' + ampelLabel + '</div>'
-      + '<div class="rnd-wiz-ampel-text">' + escapeHTML(a.empfehlung) + '</div>'
-      + '</div>'
-      + '</div>';
-
-    // AfA-Vorteil — Aufschlüsselung
-    html += '<details class="rnd-wiz-result-details" open>'
-      + '<summary>Steuerliche Auswirkung im Detail</summary>'
-      + '<table class="rnd-wiz-result-table">'
-      + '<tr><td>Standard-AfA (' + a.afa_standard.satz_pct + ' %)</td>'
-      +   '<td class="num">' + fmtEUR(a.afa_standard.jahresbetrag) + ' / Jahr</td></tr>'
-      + '<tr><td>RND-AfA (' + a.afa_kurz.satz_pct + ' %)</td>'
-      +   '<td class="num">' + fmtEUR(a.afa_kurz.jahresbetrag) + ' / Jahr</td></tr>'
-      + '<tr class="hi"><td>Mehr-AfA pro Jahr</td>'
-      +   '<td class="num pos">+ ' + fmtEUR(a.mehr_afa_jahr) + '</td></tr>'
-      + '<tr><td>Steuerersparnis/Jahr (42 % Grenz)</td>'
-      +   '<td class="num">' + fmtEUR(a.steuerersparnis_jahr) + '</td></tr>'
-      + '<tr><td>Barwert über ' + a.input.rnd + ' Jahre</td>'
-      +   '<td class="num">' + fmtEUR(a.steuerersparnis_barwert) + '</td></tr>'
-      + '<tr><td>- Gutachterkosten</td>'
-      +   '<td class="num neg">- ' + fmtEUR(a.gutachterkosten) + '</td></tr>'
-      + '<tr class="total"><td>Netto-Vorteil</td>'
-      +   '<td class="num">' + fmtEUR(a.netto_vorteil) + '</td></tr>'
-      + '</table>'
-      /* v1598 · Hier stand "Annahmen: Gebäudeanteil 200.000 €,
-         Grenzsteuersatz 42 %" als fester Text. Beides kommt jetzt aus
-         dem Objekt, also wird auch genannt, was wirklich gerechnet
-         wurde - sonst widerspricht die Fussnote der Tabelle darueber. */
-      + '<p class="rnd-wiz-result-hint">Annahmen: Gebäudeanteil '
-      +   fmtEUR(a.input.gebaeudeanteil) + ', Grenzsteuersatz '
-      +   String(a.input.grenzsteuersatz_pct).replace('.', ',') + ' %, '
-      + 'Diskontsatz 2 %. Exakte Berechnung im Rechner unten anpassbar.</p>'
-      + '</details>';
-
-    // Action-Buttons
-    html += '<div class="rnd-wiz-result-actions">'
-      + '<button class="rnd-wiz-btn rnd-wiz-btn-pri" id="rnd-wiz-action-pdf">📄 Gutachten als PDF</button>'
-      + '<button class="rnd-wiz-btn rnd-wiz-btn-pri" id="rnd-wiz-action-docx">📝 Gutachten als Word (DOCX)</button>'
-      + '<button class="rnd-wiz-btn rnd-wiz-btn-sec" id="rnd-wiz-action-edit">✏️ Im Rechner öffnen & anpassen</button>'
-      + '</div>';
-
-    html += '</div>';
-    body.innerHTML = html;
-
-    // Footer-Buttons umbauen
-    document.getElementById('rnd-wiz-back').style.visibility = 'visible';
-    document.getElementById('rnd-wiz-next').textContent = 'Fertig ✓';
-    document.getElementById('rnd-wiz-next').onclick = function () {
-      close();
-      // Daten dennoch ins UI laden (für späteres Anpassen)
-      if (onCompleteCb) onCompleteCb(pkg);
-    };
-
-    // Action-Handler
-    document.getElementById('rnd-wiz-action-pdf').onclick = function () {
-      generatePDF(pkg, calc);
-    };
-    document.getElementById('rnd-wiz-action-docx').onclick = function () {
-      generateDOCX(pkg, calc);
-    };
-    document.getElementById('rnd-wiz-action-edit').onclick = function () {
-      close();
-      if (onCompleteCb) onCompleteCb(pkg);
-    };
-  }
-
-  function generatePDF(pkg, calc) {
-    if (!global.DealPilotRND_PDF) {
-      alert('PDF-Modul nicht geladen.');
-      return;
-    }
-    try {
-      const gutachtenData = Object.assign({}, pkg);
-      gutachtenData.__gewerkeBewertung = pkg.gewerkeBewertung;
-      const doc = global.DealPilotRND_PDF.generateGutachten({
-        gutachtenData: gutachtenData,
-        result: calc.result,
-        afa: calc.afa
-      });
-      const filename = 'Restnutzungsdauer-Gutachten_'
-        + (pkg.objekt_adresse || 'Objekt').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40)
-        + '_' + new Date().toISOString().slice(0, 10) + '.pdf';
-      doc.save(filename);
-    } catch (e) {
-      console.error('PDF-Export-Fehler:', e);
-      alert('Fehler beim PDF-Export: ' + e.message);
-    }
-  }
-
-  function generateDOCX(pkg, calc) {
-    if (!global.DealPilotRND_DOCX) {
-      alert('DOCX-Modul nicht geladen. Bitte rnd-docx.js einbinden.');
-      return;
-    }
-    try {
-      global.DealPilotRND_DOCX.generate({
-        gutachtenData: pkg,
-        result: calc.result,
-        afa: calc.afa
-      });
-    } catch (e) {
-      console.error('DOCX-Export-Fehler:', e);
-      alert('Fehler beim DOCX-Export: ' + e.message);
-    }
-  }
-
-  function fmtEUR(n) {
-    if (typeof n !== 'number' || !isFinite(n)) return '–';
-    return n.toLocaleString('de-DE', {
-      style: 'currency', currency: 'EUR', maximumFractionDigits: 0
-    });
-  }
-
-  function escapeHTML(s) {
-    if (s == null) return '';
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;',
-               '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
+     Die FUENF Rechenverfahren in rnd-calc.js (linear, Vogels, Ross,
+     Parabel, Punktraster) bleiben absichtlich stehen, obwohl drei davon
+     hier keinen Abnehmer mehr haben: das Standalone-Modul fuehrt
+     dieselben fuenf, und tools/rnd-kerne-pruefen.mjs haelt beide
+     Tabellen gegeneinander. Wer sie hier entfernt, erzeugt einen
+     Unterschied, den der Pruefer dann meldet. */
   /* v1597 · Die Stufenbezeichnung stand nur im Render von Schritt 5.
      Sie wird jetzt von dort UND vom Live-Aktualisierer gebraucht, also
      steht sie an einer Stelle - sonst laufen die beiden auseinander. */
@@ -1625,112 +1331,6 @@
       gutachterkosten: 999,
       abzinsung: 0.02
     });
-  }
-
-  // ============================================================
-  // EXPORT-FUNKTIONEN
-  // ============================================================
-  function exportAsPDF(result, afa) {
-    if (!global.DealPilotRND_PDF) {
-      alert('PDF-Modul nicht geladen. Bitte rnd-pdf.js einbinden.');
-      return;
-    }
-    if (typeof global.jspdf === 'undefined') {
-      alert('jsPDF ist nicht geladen.');
-      return;
-    }
-    const data = buildExportPayload();
-    data.__gewerkeBewertung = state.gewerke;
-    try {
-      const doc = global.DealPilotRND_PDF.generateGutachten({
-        gutachtenData: data,
-        result: result,
-        afa: afa && afa.valid ? afa : null
-      });
-      const filename = 'Restnutzungsdauer-Gutachten_'
-        + slugify(data.objekt_adresse || 'Objekt')
-        + '_' + new Date().toISOString().slice(0, 10) + '.pdf';
-      doc.save(filename);
-    } catch (e) {
-      console.error('PDF-Export-Fehler:', e);
-      alert('PDF-Fehler: ' + e.message);
-    }
-  }
-
-  function exportAsDOCX(result, afa) {
-    if (!global.DealPilotRND_DOCX) {
-      alert('DOCX-Modul nicht geladen. Bitte rnd-docx.js einbinden.');
-      return;
-    }
-    const data = buildExportPayload();
-    try {
-      global.DealPilotRND_DOCX.generateGutachten({
-        gutachtenData: data,
-        result: result,
-        afa: afa && afa.valid ? afa : null
-      });
-    } catch (e) {
-      console.error('DOCX-Export-Fehler:', e);
-      alert('DOCX-Fehler: ' + e.message);
-    }
-  }
-
-  function slugify(s) {
-    return String(s).replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').substring(0, 40);
-  }
-
-  function buildExportPayload() {
-    // Identisch zum finishWizard-Output, aber direkt für Export
-    return {
-      objekt_typ: state.objekt_typ,
-      objekt_adresse: [state.str, state.hnr].filter(Boolean).join(' ')
-                    + (state.plz || state.ort ? ', ' + state.plz + ' ' + state.ort : ''),
-      objekt_einheit: state.einheit,
-      baujahr: parseInt(state.baujahr, 10) || new Date().getFullYear(),
-      wohnflaeche: state.wohnflaeche,
-      stichtag: state.stichtag,
-      besichtigungsdatum: state.besichtigungsdatum,
-      aktenzeichen: state.aktenzeichen,
-      bauweise: state.bauweise,
-      unterkellerung: state.unterkellerung,
-      vollgeschosse: state.vollgeschosse,
-      einheiten_gesamt: state.einheiten_gesamt,
-      bedachung: state.bedachung,
-      fenster: state.fenster,
-      heizungsart: state.heizungsart,
-      anzahl_baeder: state.anzahl_baeder,
-      besonderheiten: state.besonderheiten,
-      bel: state.belueftung,
-      brennstoff: state.brennstoff,
-      warmwasser: state.warmwasser,
-      erneuerbare: state.erneuerbare,
-      energieklasse: state.energieklasse,
-      erschliessung: state.erschliessung,
-      mod_dach: state.mod.dach, mod_fenster: state.mod.fenster,
-      mod_leitungen: state.mod.leitungen, mod_heizung: state.mod.heizung,
-      mod_aussenwand: state.mod.aussenwand, mod_baeder: state.mod.baeder,
-      mod_innenausbau: state.mod.innenausbau, mod_technik: state.mod.technik,
-      mod_grundriss: state.mod.grundriss,
-      auftraggeber_name: state.auftraggeber_name,
-      auftraggeber_adresse: [state.auftraggeber_strasse,
-        state.auftraggeber_plz + ' ' + state.auftraggeber_ort]
-        .filter(function (s) { return s.trim().length > 0; }).join(', '),
-      eigentuemer_name: state.eigentuemer_abweichend
-        ? state.eigentuemer_name : state.auftraggeber_name,
-      eigentuemer_adresse: state.eigentuemer_abweichend
-        ? [state.eigentuemer_strasse, state.eigentuemer_plz + ' ' + state.eigentuemer_ort]
-            .filter(function (s) { return s.trim().length > 0; }).join(', ')
-        : [state.auftraggeber_strasse, state.auftraggeber_plz + ' ' + state.auftraggeber_ort]
-            .filter(function (s) { return s.trim().length > 0; }).join(', '),
-      sv_name: state.sv_name,
-      sv_titel: state.sv_titel,
-      sv_unternehmen: state.sv_unternehmen,
-      sv_adresse_z1: state.sv_adresse_z1,
-      sv_adresse_z2: state.sv_adresse_z2,
-      sv_email: state.sv_email,
-      erstellungsort: state.erstellungsort,
-      erstellungsdatum: state.erstellungsdatum
-    };
   }
 
   // ============================================================
