@@ -36,9 +36,81 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N57 · Eingabetiefe und Liegenschaftszins — beides erledigt (08.10.2026)
+
+**Marcels Befund zur Eingabetiefe, behoben in `v2001`:** „wenn ich oben
+mit den kleinen Kreisen wechsle, dann steht immer noch: für Stufe 3 fehlt
+noch." Gemessen in `objekt-reiter.js`: `_fehlStufe` wurde **nur** in
+`stufeAbrufen()` gesetzt. Die Kreise rufen `zielSetzen()` →
+`zielAnwenden()` + `stufen()`, und keins von beiden fasst `#oe-fehlt` an —
+die Zeile zeigte die zuletzt **abgerufene** Stufe, nicht die gewählte.
+Bei `dp:object-ready` lief sie ebenfalls nicht nach, deshalb blieb nach
+dem Löschen die Fehlliste des gelöschten Objekts stehen. Beides geht
+jetzt über eine Stelle, `fehlZeileSetzen()`.
+
+> **Die Eingabetiefe selbst wird NICHT zurückgesetzt.** Sie ist ein
+> Merker je **Nutzer**, nicht je Objekt (so dokumentiert in
+> `objekt-reiter.js`) — wer ausgiebig arbeitet, will nicht bei jedem
+> Objekt wieder auf 1 anfangen. Verwirrend war nicht die gemerkte Tiefe,
+> sondern dass die Zeile unten ihr nicht folgte. **Wenn Marcel sie doch
+> je Objekt will, ist das eine Zeile — er muss es nur sagen.**
+
+**Liegenschaftszins § 256 BewG, erledigt in `v2002`:** Marcel: „ich
+glaube, wir haben sie, aber vielleicht können wir es textuell noch ein
+bisschen besser gestalten." **Er hat recht** — am echten `lzsNach256()`
+gemessen stimmt jede Zahl seiner Tabelle (16/16 Fälle):
+EFH/ZFH/DHH/RH 2,5 · ETW 3,0 · MFH bis 6 WE 4,0 · MFH über 6 WE 4,5,
+Degression `brw 600 → 2,4 | 1400 → 1,6 | ab 1500 → 1,5`.
+
+Gefehlt hat der **Zweck**. Der Hinweis sagte nur, was der Wert *nicht*
+ist („nicht marktabgeleitet") — nicht, ob man ihn verwenden darf. Marcels
+Unterscheidung steht jetzt im Text, der nachweislich in den Bericht geht
+(`WertParameterService` als `hinweis`, `ErtragswertService` als Warnung):
+
+| Norm | Zweck |
+|---|---|
+| § 256 BewG | Grundsteuer (Bundesmodell) — die Tabelle oben |
+| § 188 BewG | Erbschaft-/Schenkungsteuer: MFH **3,5 %**; EFH/ZFH und ETW regelmäßig Vergleichswertverfahren |
+| § 21 Abs. 2 ImmoWertV | Verkehrswertgutachten: § 256 ist dort **kein** verbindlicher Auffangwert — anzusetzen ist der marktgerechte Zinssatz des Gutachterausschusses |
+
+> `§ 188 BewG` kam im ganzen Repo **nicht** vor (gemessen: 0 Treffer).
+> Eine `lzsNach188()` gibt es trotzdem nicht: sie wäre von nirgendwo
+> gerufen, also gebaut und unerreichbar. Der Rahmen steht als
+> `BEWG_RAHMEN` da, und der Hinweis wird **daraus gebaut** — wer den
+> Rahmen ändert, ändert den Text.
+
+---
+
 ### N56 · ImmoMetrica von Demo auf Live, und vier Fragen dazu (08.10.2026)
 
 **MARCELS ENTSCHEIDUNGEN ZU N56, 08.10.2026 — das ist keine Vorschlagsliste mehr.**
+
+**Nachtrag 08.10.2026, nach Marcels Rückmeldung „den Ortskern konnte ich
+nicht finden" — er konnte nicht, die Zeile war unerreichbar (`v2001`,
+`eee0eec1`):**
+
+- **`parseAddr` steckte die STADT in die Straße.** Der Komma-Zweig nahm
+  links immer einen Straßennamen an; ImmoMetrica schickt bei Inseraten
+  ohne veröffentlichte Anschrift aber `"Ort, Bundesland"`. Gemessen:
+  `"Herford, Nordrhein-Westfalen"` → `str="Herford"`,
+  `"32049 Herford, …"` → `str="32049 Herford"` und **PLZ leer**,
+  `"Mitte, Berlin"` → `str="Mitte"`,
+  `"Bad Oeynhausen - Nordrhein-Westfalen"` → **Ort leer**.
+  Doppelt falsch: der Bodenrichtwert suchte eine Straße, die es nicht
+  gibt, UND die Ortskern-Zeile aus `v1999` hängt an `!dp.str` und konnte
+  deshalb **nie** erscheinen. Behoben: das Bundesland wird erkannt und
+  verworfen (es gibt kein Feld dafür), die Stadtstaaten werden zu
+  `Berlin-Mitte`. 11 Adressformen geprüft, im laufenden Container
+  nachgemessen.
+- **„Weitere laden" und die Favoriten zuerst** (`v2003`). Gemessen war
+  fast alles da: die Favoriten-Pille existierte, stand aber als letzte,
+  und vorgewählt wird `sources[0]`; `req.query.page` geht im Backend
+  längst durch, `count`/`next` kommen zurück. Das Frontend fragte Seite
+  2 nie an und schrieb nur „1727 Treffer – Seite 1." Jetzt stehen die
+  Favoriten vorn und der Hinweis trägt den Knopf.
+
+**Offen aus N56:** die Rangfolge für LEERE Objekte (der Riegel aus
+`v1995` deckt nur gefüllte).
 
 **Erledigt noch am selben Tag:**
 
