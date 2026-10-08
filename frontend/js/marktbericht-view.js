@@ -90,7 +90,17 @@
   }
 
   function frameSrc(query) {
-    return '/marktbericht-app/index.html?v=1877&theme=' + mbTheme() + (query ? '&' + query : '');
+    /* v2005a - DIES IST DER BUSTER DER SEITE, NICHT DER SKRIPTE DARIN.
+       Er stand auf 1877 fest. Alles, was seitdem am CSS oder Markup von
+       marktbericht-app/index.html geaendert wurde, hat damit KEINEN
+       Browser erreicht, der die Seite schon einmal geladen hatte - die
+       Datei selbst kam aus dem Cache, samt ihrem eingebetteten CSS.
+       Gemessen: das v2005-Raster (max-width:1080px) war im iframe nicht
+       vorhanden, obwohl es auf dem Server lag.
+       WER AM CSS IN marktbericht-app/index.html ETWAS AENDERT, ZIEHT
+       DIESE ZAHL HOCH. Der app.js-Buster INNERHALB der Seite reicht
+       nicht - er wird ja erst gelesen, wenn die Seite neu geholt wird. */
+    return '/marktbericht-app/index.html?v=2005&theme=' + mbTheme() + (query ? '&' + query : '');
   }
 
   // iframe waechst auf Content-Hoehe -> kein innerer Scrollbalken, Seite scrollt
