@@ -9172,3 +9172,32 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
   height: auto !important;
   transform: translateY(-50%) !important;
 }
+
+/* =================================================================
+   v1989 - DIE SAMMELREGEL AUF <small> REICHT INS DUNKLE BODENBLATT
+
+   Weiter oben steht in dieser Datei
+
+     html[data-dp-layout] .body small{ color:var(--dpl-leise) !important }
+
+   also eine Sammelregel auf JEDES <small> in `.body`. `--dpl-leise`
+   ist ein gedaempftes Grau fuer die HELLE Flaeche.
+
+   Auf dem Handy ist die Pre-Flight-Karte aber ein DUNKLES Bodenblatt
+   (.dp-pf-scroll{background:#0c0c0e}). Dort landet dasselbe Grau auf
+   fast schwarz. Gemessen am 08.10.2026 auf 390 px, „Datenquellen fuer
+   diesen Abruf", 11 px:
+
+     heute, aus der Sammelregel   #6b645a   3,35 : 1   unter AA
+     wie der Block es vorsah      #8A8A93   5,71 : 1   in Ordnung
+
+   > Eine Sammelregel auf ein Element wie `small` kennt den Grund
+   > nicht, auf dem es landet. Sie wirkt dort, wo niemand sie
+   > hingeschrieben hat - und ein !important macht daraus eine Ansage.
+
+   Hier wird NICHTS neu gestaltet: wiederhergestellt ist die Farbe,
+   die `style.css` fuer diesen Kopf selbst vorgesehen hat. Gleiche
+   Spezifitaet wie die Sammelregel (0,2,2), aber spaeter in derselben
+   Datei - bei gleicher Spezifitaet gewinnt die spaetere Regel.
+   ================================================================= */
+html[data-dp-layout] .dp-pf-scroll small{ color:#8A8A93 !important; }

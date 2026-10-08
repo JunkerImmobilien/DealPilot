@@ -2156,3 +2156,44 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
    ANDERE Sache und bleibt - sie ist seit v1915 der Rueckfall der
    Aktenmappe.
    ══════════════════════════════════════════════════════════════════ */
+
+/* =================================================================
+   v1989 - DER QR FAELLT UNTER 640 px
+
+   Marcel am 08.10.2026: „Da kannst du dann, wenn das nicht passend
+   dargestellt wird, den Barcode fuer die Handy-Version oder auch
+   Tablet-Version rausnehmen."
+
+   GEMESSEN auf 390 px, Entwurf Kartei:
+
+     QR-Kasten   64 x 92   nicht quadratisch
+     SVG darin   54 x 68   nicht quadratisch
+
+   Ursache, mit dem Kaskaden-Walker gefunden: diese Datei setzt
+   `width:92px !important` auf den Kasten - und unter
+   `@media (max-width:900px)` ein `max-width:100% !important` auf
+   JEDES Kind der Leiste. Die Breite wird gekappt, die HOEHE bleibt
+   bei 92. Also ein gestauchter Code.
+
+   > Ein QR, der nicht quadratisch ist, laesst sich nicht zuverlaessig
+   > scannen. Er sieht aus wie ein Angebot und ist keins.
+
+   Im Entwurf Buetten ist er 64x64 und damit quadratisch, nimmt aber
+   denselben knappen Platz. Marcels Freigabe deckt beide.
+
+   Die doppelte Klasse `.dp-pf-qr.dp-pf-qr` ist ABSICHT und steht
+   hier benannt, damit sie niemand fuer einen Tippfehler haelt:
+
+     vorhanden  html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr
+                {display:flex!important}              (0,3,2)
+     neu        html[data-dp-kartenstil] .dp-pfbar > .dp-pf-qr.dp-pf-qr
+                {display:none!important}              (0,4,2)
+
+   Dieselbe Hausform fuehrt diese Datei weiter oben schon einmal.
+   ================================================================= */
+@media (max-width: 640px){
+  html[data-dp-kartenstil] .dp-pfbar > .dp-pf-qr.dp-pf-qr,
+  html[data-dp-kartenstil] .dp-pf-scroll .dp-pf-qr.dp-pf-qr{
+    display:none !important;
+  }
+}
