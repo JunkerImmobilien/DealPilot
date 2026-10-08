@@ -800,6 +800,56 @@ Garagen-BGF in den Sachwert eingeht.
 
 ### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
 
+**N45-STAND 08.10.2026 — gemessen in der Messkabine, nach v1985–v1989**
+
+| Punkt | Stand |
+|---|---|
+| **Trichter raus** | **fertig** (v1985). `STILE` führt wieder drei Entwürfe: Zeile, Kartei, Bütten. 24 CSS-Regeln entfernt, 1 leere `@media`, 2 Selektorlisten gekürzt. Das Netz für den Abrufknopf (`ertragAbraeumen`) bleibt |
+| **Bordkarte raus** | fertig seit v1953 |
+| **Lesbarkeit 390 px** | **fertig** (v1989). Null Durchfaller in allen drei Entwürfen, kleinster Kontrast 4,80 / 5,51 / 4,86 — gemessen gegen den effektiven Grund mit aufgelösten Verläufen |
+| **Knopfgrößen** | **kein Befund.** 6 Knöpfe je Entwurf, höchster 42–50 px, Schrift 13–14 px. Das ist eine Tippfläche, nicht „riesig" |
+| **Überlauf** | **kein Befund.** `offsetHeight − clientHeight − Rand = 0` in allen drei Entwürfen, auf allen drei Größen |
+| **Datenaufnahme auf dem Handy erreichbar** | **behoben** (v1987). Der Riegel `_pfScanQ` löste sich nur im rAF; ohne rAF blieb das Bodenblatt unter dem Bildrand und die ganze Datenaufnahme unerreichbar |
+| **QR weg auf Handy** | **teilweise.** Zeile und Bütten: weg (0×0). **Kartei: hängt noch** — siehe unten |
+| **QR weg auf Tablet** | **offen.** Bei 765 px greift die 640er-Regel nicht, und der QR ist dort **54×68** — ebenfalls nicht quadratisch |
+
+**OFFEN 1 · Der QR im Entwurf Kartei lässt sich mit CSS nicht verbergen.**
+Nach vier Anläufen abgebrochen (CLAUDE.md: STOPP, Diagnose, melden). Der Befund ist
+anomal und deshalb hier vollständig notiert:
+
+- Der Kasten ist **64×92**, das SVG darin **54×68** — beides nicht quadratisch. Ein QR,
+  der nicht quadratisch ist, lässt sich nicht zuverlässig scannen.
+- Ursache der Stauchung: `datenaufnahme.css` setzt `width:92px !important`, und derselbe
+  Datei-Block setzt unter `@media (max-width:900px)` ein `max-width:100% !important` auf
+  **jedes** Kind der Leiste. Die Breite wird gekappt, die Höhe bleibt.
+- **Das Unerklärte:** ein eingehängtes `#oab-pf-qr{outline:4px solid red !important;
+  display:none !important}` färbt den Rahmen rot (die Regel kommt also an) und ändert
+  `display` **nicht**. Das ist für eine gewöhnliche Deklaration unmöglich.
+- Ausgeschlossen durch Messung: kein Inline-`display` (`getAttribute("style")` trägt nur
+  das Standbild der Messkabine), genau **ein** `.dp-pf-qr` im Dokument, `isConnected`,
+  direktes Kind von `#oab-bar.dp-pfbar`, Medienabfrage greift, und ein Inline-
+  `display:none` wirkt sofort (64 px → 0 px).
+- Nächster Schritt wäre, es **nicht** über CSS zu lösen: `karten-stil.js` baut die Leiste
+  ohnehin um und könnte den QR unter 900 px aushängen. Vorher aber verstehen, warum die
+  Regel nicht greift — sonst ist es ein Notnagel auf einem unverstandenen Defekt.
+
+**OFFEN 2 · Die Grenze muss auf Tablet erweitert werden.** Marcels Freigabe nennt
+ausdrücklich „Handy-Version oder auch Tablet-Version". Die Regel aus v1989 greift nur
+unter 640 px. Bei 765 px steht der QR mit 54×68 da.
+
+**OFFEN 3 · `span.bp "BOARDING PASS"` steht mit `font-size:0` im DOM** — ein Rest der
+entfernten Bordkarte. Unsichtbar, aber für einen Screenreader vorhanden. Gehört zu N49e.
+
+> **Was die Messung dieser Runde gekostet hat, und warum sie es wert war:** die
+> Messkabine hat an drei Stellen gelogen, und ich habe zweimal darauf gebaut, bevor ich
+> sie reparierte. `effGrund` las kein `background-image` (v1986) und dann alle
+> Hintergrund-Ebenen in einen Mittelwert (v1988); `requestAnimationFrame` feuert im
+> verborgenen Dokument nicht (v1986). Auf den falschen Zahlen habe ich in v1987 eine
+> Textfarbe geändert, die nie falsch war — zurückgenommen in v1988. **Erst messen, dann
+> bauen heißt auch: erst das Messgerät, dann das Produkt.**
+
+---
+
 **N45-AUFTRAG, von Marcel am 08.10.2026 geschärft:**
 
 > „Wir haben in den Darstellungen Karte im Objekt Datenaufnahme. Dort haben wir einmal
