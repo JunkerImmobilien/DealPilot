@@ -36,6 +36,147 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N48 · ⚠⚠ DER „VERGLEICHSWERT" IST EIN ANGEBOTSPREIS, DER BERICHT NENNT IHN KAUFPREIS (08.10.2026)
+
+**Marcels Frage:** „Eigentumswohnungen werden ja üblicherweise nach dem Vergleichswert
+bewertet. Und haben wir da überhaupt Vergleichswerte und sind das dann auch die
+Verkaufspreise? … Weil dann wäre es ja im Bericht nicht richtig."
+
+**Gemessen: es sind Angebotspreise.** Der ausgegebene Vergleichswert
+(`cross_check.comparison.vergleichswert_eur`) stammt zu 100 % aus **Portalinseraten**
+des Anbieters GeoMap, aggregiert als Median €/m².
+
+```
+MarketAnalysisService.js:2      „Primaerquelle: GeoMap (echte Angebotsdaten)"
+MarketAnalysisService.js:94-98  kpiCollection({ offerType, analyzedField: PREISPROQM })
+GeoMapConnector.js:83-87        onlineDateRange „(Angebote online verfuegbar)"
+GeoMapConnector.js:274          firstSeenDate — das Datum der Inserats-Einstellung
+GeoMapConnector.js:53           analyzedField TAGEONLINE — Inseratslaufzeit
+ValuationService.js:66,179      market_value.estimated aus median_per_sqm
+CrossCheckService.js:1058       vgl = valuation.market_value.estimated
+```
+
+**Der Code weiß es selbst und sagt es an drei Stellen wörtlich:**
+
+> `connectors/IrwConnector.js:13` — „**Unser bisheriger Vergleichswert stammt aus
+> Portalinseraten, das sind Angebotspreise. § 25 ImmoWertV verlangt Kaufpreise.**"
+>
+> `lib/vergleichsfaktoren_nrw.js:11-13` — „**Unser führendes Verfahren stützt sich auf
+> GeoMap-Portalinserate — das sind ANGEBOTSPREISE.**"
+>
+> `services/ReportOrchestrator.js:468` — „Anders als der Vergleichswert aus Inseraten
+> stammt er aus beurkundeten Kaufpreisen."
+
+**Der Widerspruch, auf den Marcel zeigt** — selbst nachgelesen, wörtlich:
+
+`lib/verfahrenswahl.js:81-90` gibt für Eigentumswohnungen `verfahren: vergleichswert`
+mit der Begründung *„Eigentumswohnungen lassen sich über den **Kaufpreis** je m²
+Wohnfläche … gut miteinander vergleichen"*, Quelle `§ 6 Abs. 1 ImmoWertV`. Der Bericht
+schreibt daraus „Führendes Verfahren: Vergleichswertverfahren"
+(`CrossCheckService.js:1094-1096`). **Die Zahl darunter ist ein Angebotspreis-Median.**
+
+**Die Offenlegung ist da, aber löchrig** — vier gemessene Lücken:
+
+1. **Der § 25-Hinweis verschwindet genau dann, wenn er am meisten täuscht.**
+   `frontend/marktbericht-app/app.js:3817-3825`: liegt ein Immobilienrichtwert vor,
+   heißt die PDF-Karte „VERGLEICHSWERT · AMTLICH" statt „MARKTPREIS AUS ANGEBOTEN",
+   und die Zeile „Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)"
+   fällt weg. **Die angezeigte Zahl bleibt dabei unverändert** `cc.comparison.
+   vergleichswert_eur` — der IRW fließt nirgends in `vgl` ein (nur `out.irw`,
+   `CrossCheckService.js:1066-1073`). Die Karte heißt „amtlich" und zeigt den
+   Inseratswert.
+2. **Die Bildschirm-Karte sagt es nicht.** `app.js:803`: Titel „Vergleichswert",
+   Unterzeile „führend bei Eigentumswohnungen". Der Hinweis steht nur im
+   eingeklappten Erklärtext (`app.js:588`).
+3. **Der KI-Berichtstext darf die Quelle nicht benennen.** `report_prompt.txt:9`
+   verbietet Anbieternamen (richtig, Anbieter-Neutralität) — aber damit fällt auch
+   „Angebotspreis" weg; der Text sagt nur „Vergleichsangebote".
+4. **Der PDF-Quellennachweis führt GeoMap nicht** (`CrossCheckService.js:1182-1240`
+   baut ihn nur aus Registersätzen).
+
+**Echte Kaufpreisdaten liegen da und gehen in keinen Rechenweg:**
+
+```
+386  Saetze „durchschnittspreis" (Grundstuecksmarktdaten NRW, marktdaten-nrw.json)
+       mit Vermerk „KEIN Vergleichswert nach § 24 ImmoWertV", indikativ: true,
+       im Report NICHT aufgerufen (gutachterausschuss.js:1205-1222, :1251)
+  0  Saetze „vergleichsfaktor" im Register -> finde() liefert immer kein_ausschuss
+  1  fest einkodierte Tabelle: vergleichsfaktoren_nrw.js, Kreis Minden-Luebbecke
+       (AGS 05770) aus der Kaufpreissammlung 2024 — laeuft als SEPARATES Feld
+       `amtlicher_vergleichsfaktor` NEBEN dem Vergleichswert, nicht hinein
+       (CrossCheckService.js:1146-1166 kennt nur vgl, sachwert, ertragswert)
+```
+
+> **Warum das anders wiegt als die übrigen Punkte:** bei allen anderen Befunden rechnet
+> etwas falsch. Hier rechnet alles richtig — und der Bericht **benennt die Grundlage
+> falsch**. Marcel ist DESAG-zertifiziert und zeichnet das. Eine Zahl, die „Vergleichswert
+> nach § 6 Abs. 1 ImmoWertV, abgeleitet über den Kaufpreis je m²" heißt und aus Inseraten
+> kommt, ist kein Rechenfehler, sondern eine falsche Herkunftsangabe — genau das, was die
+> Doktrin „jede Zahl trägt Herkunft" verhindern soll.
+
+**Marcels eigener Vorschlag ist der richtige Weg:** „Dann könnten wir ja nur angeben,
+dass wir die Vergleichswerte auf Angebotsbasis machen und nicht nach Verkaufsbasis."
+
+**Zu tun:**
+1. **Benennung überall gleichziehen.** Solange die Quelle Inserate sind, heißt die Zahl
+   nicht „Vergleichswert", sondern **Marktpreisindikation aus Angeboten**. Betrifft
+   `verfahrenswahl.js:81-90` (die Begründung nennt „Kaufpreis"), `app.js:803`
+   (Bildschirmkarte) und die Note in `CrossCheckService.js:1094`.
+2. **Lücke 1 schließen** — das ist die schärfste: „VERGLEICHSWERT · AMTLICH" darf nur
+   über einer Zahl stehen, die auch amtlich ist. Entweder den IRW wirklich einrechnen
+   oder den Titel nicht wechseln.
+3. **Angebotsbasis in den Quellennachweis**, anbieterneutral („Angebotsdaten aus
+   Immobilienportalen, Median €/m², N Angebote, Stand …").
+4. Prüfen, ob der Vergleichsfaktor Minden-Lübbecke und der IRW als **eigenes,
+   kaufpreisbasiertes Verfahren** ausgewiesen werden können — dann gibt es dort, wo die
+   Daten da sind, einen echten Vergleichswert nach § 24/25 ImmoWertV.
+
+---
+
+### N49 · Altlasten in der RND-/Verkehrswertrechnung — der Rest (08.10.2026)
+
+Drei sind in **v1968** raus (`bmf-afa.js`, `bmf-data.js`, `docs/abgeloest/rnd-ui.js`)
+plus zwei tote Importe. Was bleibt, braucht eine Entscheidung oder ist nicht risikofrei:
+
+**(a) `rnd-pdf.js` (2.365 Z.) · `rnd-docx.js` (680 Z.) · `rnd-bte-katalog.js` (190
+Bauteile DIN 276-1) — unerreichbar, aber viel Fachlogik.**
+Alle drei sind per Script-Tag geladen (`index.html:3640,3642,3643`). Ihre einzigen
+Aufrufer liegen in einem **toten Teilbaum von `rnd-wizard.js`**: `finishWizard()`
+(`:576`) wird nirgends gerufen, `goNext()` endet seit V194 in
+`_submitWizardAsRequest()` — die Datei sagt es selbst (`:1545`: „KEINE Export-Buttons
+mehr"). Tot sind damit `:576-899` und `:1633-1760`, dazu doppelte Helfer (`fmtEUR`
+zweimal, `escapeHTML`/`escapeHtml` parallel) — die Narbe zweier Generationen.
+
+> **Das ist das RND-Gutachten-PDF im Layout des Original-Gutachtens.** V150 hat es
+> absichtlich abgeschaltet („nur Anfrage senden"). Ob es wiederkommt, ist eine
+> **Produktentscheidung**, nicht aus dem Code ableitbar → Marcel. Das neue Modul
+> v4.2.2 kann es (`master_rndg.docx`), was dafür spricht, es hier nicht zu pflegen.
+
+**(b) `marktbericht/frontend/` — nicht löschen, ohne den Dienst mitzuziehen.**
+Von außen unerreichbar (der Caddyfile routet nichts auf diese Wurzel), aber es ist das
+**statische Wurzelverzeichnis eines laufenden Dienstes**: `server.js:33` macht
+`express.static(FRONTEND_DIR)`, der Dockerfile kopiert es hinein. Commit `d2354624` hat
+sich schon einmal bewusst dagegen entschieden: *„Eine Leiche hinter express.static ist
+keine Leiche, sondern eine Zeitbombe."* Löschen zieht `Dockerfile`, `server.js:15-33`
+und `tools/score-ketten-pruefen.mjs` (führt sie als vierte Quelle) nach.
+
+**(c) `frontend/js/marktbewertung-card.js` + CSS — byte-identische Dublette.**
+`diff -q` gegen `frontend/marktbericht-app/marktbewertung-card.js`: identisch, beide
+9.837 Bytes. In der Hauptapp geladen (`index.html:3631`) und **nie gemountet** — kein
+`DealPilotMarktbewertung.mount()` in `frontend/js/*`. Die genutzte Kopie liegt in
+`marktbericht-app/`. Risikofrei, aber eigenes Paket.
+
+**(d) Drei Verfahren in `rnd-calc.js` ohne Abnehmer:** `calcVogels`, `calcRoss`,
+`calcParabel` werden in `calcAll` gerechnet und exportiert, aber nur von
+`rnd-pdf.js:2309-2311` (tot) und `rnd-wizard.js:744-754` (tot) gelesen. Fällt mit (a).
+
+**(e) Toter CSS-Block in `rnd-styles.css`:** `.rnd-result*` (17×), `.rnd-method*` (7×),
+`.rnd-afa*` (5×) wurden nur von der gelöschten `rnd-ui.js` ausgegeben; der v1676-Block
+(`:1324 ff.`) bedient `showResultScreen` (tot). Lebend bleibt nur
+`.rnd-wiz-result-bar`.
+
+---
+
 ### N47 · ⚠ ZWEI ANLAGE-2-KERNE, UND EINER EXTRAPOLIERT ÜBER DIE GND (08.10.2026)
 
 **Gefunden**, als Marcel fragte, warum bei Parkstr. 9 keine Restnutzungsdauer stand. Der
