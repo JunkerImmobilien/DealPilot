@@ -279,6 +279,23 @@ und `tools/score-ketten-pruefen.mjs` (führt sie als vierte Quelle) nach.
 
 ---
 
+### MARCELS ENTSCHEIDUNGEN 08.10.2026 — was damit erledigt ist
+
+| Punkt | Entscheidung | Umsetzung |
+|---|---|---|
+| **N47** RND-Untergrenze | „die RND-Untergrenze lassen wir auf 10" — nicht die 24 Jahre aus § 185 Abs. 3 Satz 6 BewG | **v1969.** Dabei fiel auf, dass die 10 gar keine Untergrenze WAR: sie wirkte nur im Schätzungs-Zweig, nicht im Anlage-2-Zweig, und hob dort nach oben. Gemessen GND 50, 1 Punkt: Alter 46 → 8,4 J., Alter 51 → 10 J. Jetzt gilt sie in beiden Zweigen, an einer Stelle |
+| **N47** zwei Kerne | der geprüfte Kern gilt | **v1966/v1969.** Beide Kerne identisch über 1.764 Fälle, dazu 13.600 Ausliefer-Fälle monoton. `tools/rnd-kerne-pruefen.mjs`, RC=0 |
+| **N48** Vergleichswert | „müssen wir auf jeden Fall umbenennen … ansonsten den Vergleichswert einfach rausnehmen. Dann geben wir den Ertragswert an oder den Sachwert oder beides … Was wir nicht haben, können wir ja nicht angeben" | **v1971.** Ohne kaufpreisbasierte Grundlage kein Vergleichswertverfahren; die Zahl heißt „Marktpreisindikation aus Angeboten"; die PDF-Karte sagt „amtlich" nur noch über einer amtlichen Zahl |
+| **N49** RND-Gutachten-PDF | „das bauen wir hier gar nicht rein … Die Leute bekommen erst mal kein RND-Gutachten" | **v1970.** `rnd-pdf.js`, `rnd-docx.js`, `rnd-bte-katalog.js` und 400 Zeilen toter Teilbaum in `rnd-wizard.js` gelöscht — rund 3.800 Zeilen |
+| Modernisierungspunkte | „das brauchst du nicht weiter anzeigen … aber dass man signalisiert bekommt: Wo ist denn die Anlage 2 und wo muss ich die aufstellen" | **v1972.** Acht Chips mit Absprung in die Gewerke-Tabelle, die leeren vorn |
+| Unterlagen-Links | „teilweise gingen die Links nicht" | **v1971c.** `antrag_url` war reiner Text und stand im `else if` — bei einem Amt mit E-Mail UND Portal erschien der Link gar nicht |
+
+**Offen geblieben und absichtlich nicht gepatcht:** N47b — 0 Punkte gelten als „nicht
+erfasst"; N49 (b) bis (e); N50 — Ernte der Vergleichsfaktoren, **Berlin zuerst**; N51 —
+Ansprechpartner aus dem Unterlagen-Modul v6.
+
+---
+
 ### N47 · ⚠ ZWEI ANLAGE-2-KERNE, UND EINER EXTRAPOLIERT ÜBER DIE GND (08.10.2026)
 
 **Gefunden**, als Marcel fragte, warum bei Parkstr. 9 keine Restnutzungsdauer stand. Der
