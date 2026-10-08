@@ -64,20 +64,35 @@
     kuerzel: 'K\u00fcrzel', objart: 'Objektart', plz: 'PLZ', ort: 'Ort', str: 'Stra\u00dfe', hnr: 'Nr.',
     wfl: 'Wohnfl\u00e4che', gsfl: 'Grundst\u00fcck', baujahr: 'Baujahr', kp: 'Kaufpreis', nkm: 'Kaltmiete',
     zimmer: 'Zimmer', bad_anz: 'B\u00e4der', etage: 'Etage', etagen_ges: 'Etagen ges.',
-    einheiten: 'Einheiten', vermstand: 'Vermietung', erwerbsart: 'Erwerbsart',
-    anbietertyp: 'Anbietertyp', notizen: 'Sonstige Bemerkungen',
+    einheiten: 'Einheiten', vermstand: 'Vermietung',   /* v1998: erwerbsart raus */
+    notizen: 'Sonstige Bemerkungen',   /* v1998: anbietertyp raus */
   };
   var FIELD_ORDER = ['kuerzel', 'objart', 'plz', 'ort', 'str', 'hnr', 'wfl', 'gsfl', 'baujahr',
     'kp', 'nkm', 'zimmer', 'bad_anz', 'etage', 'etagen_ges', 'einheiten', 'vermstand',
-    'erwerbsart', 'anbietertyp', 'notizen'];
+    'notizen'];
 
-  function augmentDp(dp, raw) {
-    if (!dp || !raw) return;
-    if (raw.foreclosure) dp.erwerbsart = 'Zwangsversteigerung';
-    else if (raw.auction) dp.erwerbsart = 'Bieterverfahren';
-    if (raw.is_private === true) dp.anbietertyp = 'privat';
-    else if (raw.is_private === false) dp.anbietertyp = 'gewerblich';
-  }
+  /* ══ v1998 · ZWEI FELDER, DIE ES NIE GAB ═══════════════════════════
+
+     Hier standen `erwerbsart` und `anbietertyp` in der Liste und wurden
+     von `augmentDp()` gesetzt. Das Fenster zeigte sie als angehakte
+     Zeile „ImmoMetrica -> Objekt".
+
+     GEMESSEN: es gibt KEIN Eingabeelement mit diesen Kennungen in
+     index.html (0 Treffer). `applyImmometrica` endet bei
+     `var el = $(id); if (!el) return;`, und `collectData()` ueberspringt
+     jede Kennung ohne DOM-Element. Der Haken versprach eine Uebernahme,
+     die nie stattfand und auch nie haette gespeichert werden koennen.
+
+     Marcel am 08.10.2026: „brauchen wir die Erwerbsart? Ich glaube
+     nicht, weil das fuer uns unerheblich ist, genauso wie der
+     Anbietertyp."
+
+     Die Information geht NICHT verloren: Zwangsversteigerung,
+     Bieterverfahren und „Anbieter privat/gewerblich" stehen weiter im
+     Notiztext (`buildSummary`). Nur der Haken verschwindet.
+
+       > Ein Haken, der nichts tut, ist schlimmer als ein fehlendes
+       > Feld. Das fehlende Feld sieht man. */
 
   var state = { onConfirm: null, source: null, sources: [], items: [], active: null, target: 'obj', onClose: null, confirmed: false };
   function targetLabel() { return state.target === 'qc' ? 'Quick-Check' : 'Objekt'; }
@@ -195,11 +210,11 @@
     state.source = s; state.active = null; renderSources(); renderDetail();
     var list = document.getElementById('imo-list');
     list.innerHTML = '<div style="color:var(--muted,#7A7370);font-size:13px;padding:20px 0">Lade Objekte\u2026</div>';
-    if (_imoStubSync()) { state.items=_imoStubData().items; state.items.forEach(function(it){ augmentDp(it.dp,it.raw); }); renderList(state.items.length); return; }  /* v769-imo-stub */
+    if (_imoStubSync()) { state.items=_imoStubData().items; state.items.forEach(function(it){ /* v1998: augmentDp ist entfallen */ }); renderList(state.items.length); return; }  /* v769-imo-stub */
     var url = s.kind === 'search' ? API + '/searches/' + s.id + '/results' : API + '/favorites/' + s.cc;
     fetch(url, { headers: hdr() })
       .then(function (r) { return r.json(); })
-      .then(function (d) { state.items = (d && d.items) || []; state.items.forEach(function (it) { augmentDp(it.dp, it.raw); }); renderList(d && d.count); })
+      .then(function (d) { state.items = (d && d.items) || []; state.items.forEach(function (it) { /* v1998: augmentDp ist entfallen */ }); renderList(d && d.count); })
       .catch(function () { list.innerHTML = '<div style="color:var(--red,#B8625C);font-size:13px">Konnte Objekte nicht laden.</div>'; });
   }
   function renderList(total) {

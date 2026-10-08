@@ -38,7 +38,21 @@ const DP_OPTIONS = {
      neubau / gut / normal / renovierungsbeduerftig /
      stark_sanierungsbeduerftig. Welcher Wert auf welche Stufe faellt,
      ist eine BEWERTUNGSfrage - die gehoert Marcel, nicht dem Code. */
-  ds2_zustand: null,
+  /* v1998 · MARCELS ZUORDNUNG vom 08.10.2026, auf die gemessenen
+     API-Werte (50 Inserate, Suchauftrag 110695):
+
+       Vollstaendig renoviert / Saniert / Modernisiert -> gut
+       Gepflegt                                        -> normal
+       Renovierungsbeduerftig                          -> renovierungsbeduerftig
+
+     `neubau` steht NICHT hier: es ist keine Zustandsbeschreibung,
+     sondern eine Tatsache, und die API fuehrt sie als eigenes Feld
+     `new_building`. Marcel: „Neubau ist eigentlich extra."
+
+     `stark_sanierungsbeduerftig` bleibt leer - die API kennt keinen
+     Wert dafuer, und ihn aus „Renovierungsbeduerftig" abzuleiten
+     waere eine Verschaerfung, die niemand gesagt hat. */
+  ds2_zustand: ['neubau', 'gut', 'normal', 'renovierungsbeduerftig', 'stark_sanierungsbeduerftig'],
 };
 
 /* =========================================================================
@@ -99,6 +113,7 @@ const FIELD_MAP = {
   number_of_apartments:{ target: 'dp', dp: 'einheiten',  label: 'Wohneinheiten' },
   heating_type:        { target: 'note', label: 'Heizungsart' },
   energy_efficiency_class:{ target: 'dp', dp: 'ds2_energie', label: 'Energieklasse', note: 'v1997: Schreibweise der API gemessen, 1:1 uebernehmbar' },
+  reactivated_at:      { target: 'meta', dp: '_immometrica_reaktiviert', label: 'Wieder eingestellt am', note: 'v1998: war das EINZIGE der 57 Felder, das hier fehlte - geplatzter Verkauf, Verhandlungssignal' },
 
   // ---- Status-Flag mit DealPilot-Zuhause ----
   rented_out:          { target: 'dp', dp: 'vermstand', label: 'Vermietungsstand', note: 'true->Vollvermietet, false->Leer' },
@@ -248,6 +263,28 @@ function parseAddr(it) {
 }
 
 /* ---- Hauptfunktion: Inserat -> DealPilot-Felder ---- */
+/* v1998 · Der Zustandstext der API auf unsere Stufe. Unbekanntes wird
+   VERWORFEN, nicht geraten: der Zustand fliesst in DealScore 2 ein,
+   und eine erfundene Stufe faelscht eine Zahl, die wie eine Messung
+   aussieht. Verglichen wird klein und ohne Umlautstreit. */
+const ZUSTAND_TEXT = {
+  'vollstaendig renoviert': 'gut',
+  'vollständig renoviert':  'gut',
+  'saniert':                'gut',
+  'modernisiert':           'gut',
+  'gepflegt':               'normal',
+  'renovierungsbeduerftig': 'renovierungsbeduerftig',
+  'renovierungsbedürftig':  'renovierungsbeduerftig',
+};
+function mapZustand(it) {
+  /* Neubau schlaegt den Text: ein Neubau, der als „Gepflegt"
+     inseriert ist, bleibt ein Neubau. */
+  if (it && it.new_building === true) return 'neubau';
+  var t = String((it && it.condition) || '').trim().toLowerCase();
+  if (!t) return undefined;
+  return ZUSTAND_TEXT[t];   /* unbekannt -> undefined, also nicht gesetzt */
+}
+
 function mapToDp(it) {
   const a = parseAddr(it);
   const plist = it.platforms || [];
@@ -279,12 +316,16 @@ function mapToDp(it) {
        als keine. */
     ds2_energie: ((DP_OPTIONS.ds2_energie || []).indexOf(String(it.energy_efficiency_class || '').trim()) >= 0
       ? String(it.energy_efficiency_class).trim() : undefined),
+    /* v1998 · auch hier gilt: die Tabelle oben ist Dokumentation, die
+       Zeile hier ist die Mechanik. */
+    ds2_zustand: mapZustand(it),
     notizen: buildSummary(it),
     // Meta
     _immometrica_id: it.id,
     _quelle: p ? p.platform : '',
     _expose: p ? p.url : '',
     _immometrica_online_since: it.online_since || null,  // NEU (B1)
+    _immometrica_reaktiviert: it.reactivated_at || null,   // v1998
     _immometrica_portals: plist.length,                   // NEU (B1)
   };
   // PENDING: ds2_zustand / ds2_energie / hg_ul erst setzen, wenn Optionen/Einheit geklaert
