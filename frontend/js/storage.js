@@ -4096,10 +4096,21 @@ function _sbVergleich(modus) {
       if (b.id === _currentObjKey && a.id !== _currentObjKey) return 1;
     }
     if (modus === 'id') {
+      /* ── v1982b · ZAHLENBEWUSST, NICHT TEXTWEISE ────────────────────
+
+         Am Bildschirm gemessen: `2026-999` stand VOR `2026-1082`, weil
+         "9" groesser ist als "1". Der Vergleich war seit V63.27 ein
+         reiner Textvergleich und jahrelang richtig - solange keine
+         Objektnummer vierstellig wurde. Auf Staging sind 16 von 20
+         Nummern ueber 1000, und die hoechste stand an Platz zwei.
+
+         `numeric: true` vergleicht Ziffernblöcke als Zahlen und den
+         Rest als Text. Das Jahr vor dem Bindestrich zaehlt dabei mit:
+         `2025-1100` landet hinter allen 2026ern. Eine leere
+         Objektnummer faellt nach hinten statt nach vorn. */
       var sa = (a.seq_no || ''), sb = (b.seq_no || '');
-      if (sa < sb) return 1;
-      if (sa > sb) return -1;
-      return 0;
+      if (sa === sb) return 0;
+      return String(sb).localeCompare(String(sa), 'de', { numeric: true, sensitivity: 'base' });
     }
     if (modus === 'kaufdat') {
       var ka = _sbKaufdatZahl(a), kb = _sbKaufdatZahl(b);
