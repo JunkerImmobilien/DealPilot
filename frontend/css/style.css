@@ -33472,12 +33472,31 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
      Nachgerechnet (ohne Raute, damit kein Gold-Literal im Kommentar
      steht): E8CC7A auf 0c0c0e = 12,42:1, c9c3b4 = 11,12:1.
      Whitelabel-Pflicht: jedes Gold als var(--wl-<hex>, #<hex>). */
-  .dp-pf-scroll .dp-pf-grouplbl{font-size:10px!important;margin-bottom:4px!important;
-    color:var(--wl-e8cc7a, #E8CC7A)!important}
-  .dp-pf-scroll .dp-pf-grouplbl .k-neu,
-  .dp-pf-scroll .dp-pf-scan{color:var(--wl-e8cc7a, #E8CC7A)!important}
-  .dp-pf-scroll .dp-pf-mtitle small,
-  .dp-pf-scroll .dp-pf-msheet-head small{color:#c9c3b4!important}
+  /* ── v1988 · DIE FARBAENDERUNG AUS v1987 IST ZURUECKGENOMMEN ──────
+
+     In v1987 stand hier `color:var(--wl-e8cc7a,#E8CC7A)!important`
+     fuer `.dp-pf-grouplbl`, `.k-neu` und `.dp-pf-scan`. Begruendet war
+     das mit einem gemessenen Kontrast von 2,97 gegen #0c0c0e.
+
+     DIE MESSUNG WAR FALSCH. Das Messgeraet (Messkabine, effGrund) hat
+     die Hintergrund-EBENEN von `.dp-pfbar` in einen Mittelwert
+     geworfen. Die unterste Ebene ist aber
+
+       radial-gradient(120% 100% at 30% 0%, rgb(255,253,247),
+                                            rgb(246,240,226) 62%)
+
+     also CREME - die helle Karte. Die Etiketten liegen auf Creme, nie
+     auf #0c0c0e. Gegen den wirklichen Grund:
+
+       altes dunkles Gold  4A3C10 auf FBF6E9  =  10,0 : 1   gut
+       mein helles Gold    E8CC7A auf FBF6E9  =   1,2 : 1   unlesbar
+
+     Die Etiketten waren nie das Problem. Mein Instrument war es, und
+     ich habe das Produkt geaendert, bevor ich mit dem reparierten
+     Instrument nachgemessen habe (behoben in v1988).
+
+     Die Schriftgroesse bleibt, wie sie vor v1987 war. */
+  .dp-pf-scroll .dp-pf-grouplbl{font-size:10px!important;margin-bottom:4px!important}
   .dp-pf-scroll .dp-pf-row{flex-wrap:wrap!important;gap:8px!important}
   .dp-pf-scroll .dp-pf-tile{flex:1 1 100%!important;min-width:0!important;min-height:48px!important;justify-content:space-between!important}
   .dp-pf-scroll .dp-pf-rz{width:100%!important;display:block!important}

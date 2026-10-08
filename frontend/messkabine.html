@@ -320,6 +320,20 @@
     while ((m = re.exec(bild))) out.push(m[1]);
     return out;
   }
+  /* v1988 · Die Ebenen eines `background-image` trennen. Kommas auf
+     Klammertiefe 0 sind Ebenengrenzen, alle anderen gehoeren zu einer
+     Farbe oder einer Positionsangabe. */
+  function ebenenTrennen(bild){
+    var out = [], tief = 0, start = 0;
+    for (var i = 0; i < bild.length; i++) {
+      var c = bild[i];
+      if (c === '(') tief++;
+      else if (c === ')') tief--;
+      else if (c === ',' && tief === 0) { out.push(bild.slice(start, i)); start = i + 1; }
+    }
+    out.push(bild.slice(start));
+    return out.map(function (x) { return x.trim(); }).filter(Boolean);
+  }
   function effGrund(el, win){
     /* Erster Vorfahr mit Fläche; durchsichtige Schichten werden von hinten
        nach vorn übereinandergemalt. Weiß ist der Anfang — das Blatt. */
@@ -333,15 +347,47 @@
              Behauptung. Der Befund ist: nicht messbar, und warum. */
           unmessbar = unmessbar || { grund: 'url() im background-image', bei: p };
         } else {
-          var ss = stopps(bild);
-          if (ss.length) {
-            hatVerlauf = true;
-            stapel.push({ verlauf: ss });
-            /* Ein Verlauf ohne durchsichtige Stopps deckt - dann endet
-               die Suche hier, wie bei einer deckenden Farbe. */
-            var alleDeckend = ss.every(function (x) { return ist_deckend(x); });
-            if (alleDeckend) break;
+          /* ══ v1988 · EBENENWEISE, NICHT ALLE STOPPS IN EINEN TOPF ═══
+
+             v1986 hat hier ALLE Farbstopps ALLER Ebenen gemittelt.
+             Gemessen an `.dp-pfbar`: drei Ebenen, zehn Stopps —
+             zwei Schraffuren mit Alpha 0,03 (acht Stopps) und unten
+             eine radiale CREME-Flaeche (zwei Stopps). Der Mittelwert
+             ergab #3d3c3b statt der Wahrheit bei rund #FBF6E9, und
+             auf dieser falschen Zahl habe ich in v1987 eine Textfarbe
+             geaendert.
+
+             > CSS malt die Ebenen von der LETZTEN zur ersten: die
+             > letzte liegt unten, die erste oben. Eine deckende Ebene
+             > macht alles unter ihr bedeutungslos — und alles
+             > darueber liegt auf IHR.
+
+             Also je Ebene ein eigener Eintrag, in der Reihenfolge, in
+             der CSS sie malt. Deckt eine Ebene, endet die Suche dort.
+
+             Getrennt wird mit TIEFENVERFOLGUNG, nicht mit einem Regex:
+             mein erster Anlauf nahm /,(?![^()]*\))/ und zerlegte den
+             echten Wert in 13 Teile statt 3 - das Muster traegt nur
+             EINE Klammerebene, und `repeating-linear-gradient(0deg,
+             rgba(…))` hat zwei. Dieselbe Lehre wie bei der
+             CSS-Klammerbilanz: Paare zaehlen findet das nie, nur die
+             TIEFE verfolgen. */
+          var ebenen = ebenenTrennen(bild);
+          var tiefsteDeckend = -1;
+          for (var e = ebenen.length - 1; e >= 0; e--) {
+            var ss = stopps(ebenen[e]);
+            if (!ss.length) continue;
+            if (ss.every(function (x) { return ist_deckend(x); })) { tiefsteDeckend = e; break; }
           }
+          /* Von der untersten relevanten Ebene nach oben einreihen.
+             `stapel` wird spaeter von HINTEN nach vorn gemalt, also
+             kommt die unterste Ebene ZULETZT hinein. */
+          var vonUnten = (tiefsteDeckend >= 0) ? tiefsteDeckend : ebenen.length - 1;
+          for (var e2 = 0; e2 <= vonUnten; e2++) {
+            var s2 = stopps(ebenen[e2]);
+            if (s2.length) { hatVerlauf = true; stapel.push({ verlauf: s2 }); }
+          }
+          if (tiefsteDeckend >= 0) break;
         }
       }
       var c = st.backgroundColor;
