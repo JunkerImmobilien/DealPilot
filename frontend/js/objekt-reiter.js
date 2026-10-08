@@ -511,6 +511,26 @@
     if (hint && r && r.hinweise && r.hinweise.length) hint.setAttribute('title', r.hinweise.join(' '));
   }
 
+  /* ══ v1964 · WOHER DIE ZAHLEN STAMMEN ════════════════════════════════
+     Marcel am 08.10.2026: „Unter Lage und Einschaetzung muss die Quelle
+     dran, woher wir das bezogen haben und aus welchem Bericht."
+
+     Vorher stand dort eine feste Beschriftung: „(Marktdaten, Zensus,
+     Makro-Score)" - eine Aufzaehlung dessen, was es GEBEN KOENNTE, nicht
+     dessen, was in DIESEM Bericht steckt. Eine Herkunftsangabe, die
+     immer dieselbe ist, ist keine.
+
+     Jetzt kommt sie aus `meta.provenance` des tatsaechlichen Berichts,
+     mit seinem Datum. Fehlt beides, steht gar nichts da - lieber keine
+     Angabe als eine erfundene. */
+  function _lageHerkunft(D) {
+    if (!D) return '';
+    var teile = [];
+    if (D.quelle_lage) teile.push(esc(D.quelle_lage));
+    if (D.bericht_datum) teile.push('Bericht vom ' + esc(D.bericht_datum));
+    return teile.length ? ' <span class="oe-q">(' + teile.join(' · ') + ')</span>' : '';
+  }
+
   /* ═══ Lage: Einschätzung neben Datenlage (sobald ein Bericht da ist) ═ */
   function lageVergleich() {
     var box = $('oe-lage-vergleich'); if (!box) return;
@@ -531,7 +551,7 @@
       if (D.bevRaw != null) dat.push('Bevölkerung <b>' + (D.bevRaw >= 0 ? '+' : '') + esc(deNum(D.bevRaw, 1)) + ' %</b>');
     }
     box.innerHTML = '<div class="oe-box"><h5>IHRE EINSCHÄTZUNG</h5>' + (eig.length ? eig.join(' · ') : '<span class="oe-leer">noch keine</span>') + '</div>'
-      + '<div class="oe-box"><h5>DATENLAGE · GEMESSEN (Marktdaten, Zensus, Makro-Score)</h5>' + (dat.length ? dat.join(' · ') : '<span class="oe-leer">erscheint nach dem ersten Marktbericht</span>') + '</div>';
+      + '<div class="oe-box"><h5>DATENLAGE · GEMESSEN' + _lageHerkunft(D) + '</h5>' + (dat.length ? dat.join(' · ') : '<span class="oe-leer">erscheint nach dem ersten Marktbericht</span>') + '</div>';
     box.style.display = '';
   }
 
@@ -559,15 +579,41 @@
     var lauf = ++_vwLauf;
     var j = await api('/marktbericht/objects/history?ref=' + encodeURIComponent(ref));
     if (lauf !== _vwLauf) return;
-    var liste = ((j && j.history) || []).filter(function (h) { return Number(h.market_value) > 0; });
+    /* ══ v1963 · JEDE ZAHL IST EIN EIGENER EINTRAG ═══════════════════
+       Vorher stand hier nur der Marktwert je Bericht. Nach einer Stufe-3-
+       Wertermittlung gibt es aber DREI Zahlen, und welche als Verkehrswert
+       gilt, entscheidet der Sachverstaendige - nicht die Software.
+
+       Deshalb wird je Bericht fuer jede vorhandene Zahl ein eigener
+       Eintrag gebaut, benannt und datiert. Wer den Ertragswert will,
+       waehlt den Ertragswert.
+
+       > Die Reihenfolge ist Absicht: Ertragswert und Sachwert ZUERST,
+       > denn sie stammen aus einem Verfahren nach ImmoWertV. Der
+       > Marktwert ist eine Indikation aus Angebotspreisen. */
+    var roh = (j && j.history) || [];
+    var liste = [];
+    roh.forEach(function (h) {
+      var basis = { created_at: h.created_at, ai_mode: h.ai_mode };
+      var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
+      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert' }));
+      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert' }));
+      if (isFinite(m) && m > 0) liste.push(Object.assign({}, basis, { wert: m, art: 'Marktwert' }));
+    });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    /* v1963: neueste zuerst. Innerhalb desselben Berichts bleibt die
+       Einfuegereihenfolge (Ertrag, Sach, Markt) stehen - Array.sort ist
+       in modernen Browsern stabil. */
     liste.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
     var opt = function (h, i) {
-      return '<option value="' + i + '">' + _datum(h.created_at) + (_stufeAus(h) ? ' · ' + _stufeAus(h) : '') + ' · ' + deNum(h.market_value, 0) + ' €</option>';
+      /* v1963: die ART steht vorn - sie ist die Information, nicht das Datum. */
+      return '<option value="' + i + '">' + (h.art || 'Marktwert') + ' · '
+        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €</option>';
     };
     box.innerHTML = (liste.length > 1
       ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'
-      : '<span class="oe-q">Marktbericht ' + _datum(liste[0].created_at) + (_stufeAus(liste[0]) ? ' · ' + _stufeAus(liste[0]) : '') + ': <b>' + deNum(liste[0].market_value, 0) + ' €</b></span>')
+      : '<span class="oe-q">' + (liste[0].art || 'Marktwert') + ' · '
+        + _datum(liste[0].created_at) + ': <b>' + deNum(liste[0].wert) + ' €</b></span>')
       + '<button type="button" class="oe-btn" id="oe-vw-btn">als Verkehrswert übernehmen</button>'
       + (liste.length > 1 ? '<span class="oe-q">' + liste.length + ' Berichte im Verlauf</span>' : '');
     box.style.display = '';
@@ -576,7 +622,9 @@
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
     var sel = $('oe-vw-wahl'); var h = box._liste[sel ? parseInt(sel.value, 10) || 0 : 0]; if (!h) return;
-    el.value = String(Math.round(Number(h.market_value)));
+    /* v1963: `wert` statt `market_value` - der Eintrag weiss selbst,
+       welche Zahl er traegt (Ertrags-, Sach- oder Marktwert). */
+    el.value = String(Math.round(Number(h.wert != null ? h.wert : h.market_value)));
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }

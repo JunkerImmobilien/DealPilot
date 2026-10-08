@@ -201,6 +201,42 @@ if (!window._wlc) {
     }
     out.mikro = (d.micro && d.micro.score != null) ? _v746lbl(d.micro.score) : '–';
     out.makro = (d.macro && d.macro.score != null) ? _v746lbl(d.macro.score) : '–';
+    /* ══ v1964 · DIE HERKUNFT GEHOERT AN DEN WERT ══════════════════════
+       Marcel am 08.10.2026: „Unter Lage und Einschaetzung muss die Quelle
+       dran, woher wir das bezogen haben und aus welchem Bericht."
+
+       Beides liegt im Bericht und wurde bisher nur nicht mitgenommen:
+       `meta.provenance` fuehrt je Kategorie Beschriftung, Quelle und
+       Vertrauensgrad, und der Bericht hat ein Datum.
+
+       > Die Quelle wird am ORT mitgefuehrt, nicht am Wert allein -
+       > sonst verschwindet sie genau dann, wenn der Wert aus einem
+       > anderen Lauf stammt.
+
+       Die Quellennamen sind bewusst die ANONYMISIERTEN aus der
+       provenance ("Infrastrukturdaten", "Marktdaten"), nicht die
+       technischen aus `meta.sources` - CLAUDE.md: Bewertungspartner nie
+       namentlich nach aussen. */
+    out.quelle_lage = (function () {
+      try {
+        var pv = (d.meta && d.meta.provenance) || [];
+        var tr = pv.filter(function (x) {
+          return x && /mikrolage|standort|infrastruktur/i.test(String(x.label || ''));
+        });
+        var namen = [];
+        tr.forEach(function (x) {
+          var s = String(x.source || '').trim();
+          if (s && namen.indexOf(s) < 0) namen.push(s);
+        });
+        return namen.length ? namen.join(' · ') : null;
+      } catch (e) { return null; }
+    })();
+    out.bericht_datum = (function () {
+      try {
+        var r = (d.meta && (d.meta.created_at || d.meta.stand)) || d.created_at || null;
+        return r ? new Date(r).toLocaleDateString('de-DE') : null;
+      } catch (e) { return null; }
+    })();
     out.microRaw = (d.micro && d.micro.score != null) ? d.micro.score : null;
     out.macroRaw = (d.macro && d.macro.score != null) ? d.macro.score : null;
     out.trendRaw = (d.price_trend_pct != null) ? d.price_trend_pct : null;

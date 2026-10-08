@@ -533,7 +533,24 @@ router.get('/objects/history', async (req, res) => {
               property_type, living_area, build_year,
               market_value, market_value_low, market_value_high,
               median_sqm, gross_yield_pct, rent_multiplier, deal_score, micro_score, macro_score,
-              price_cagr_pct, confidence, comparable_group, ai_mode
+              price_cagr_pct, confidence, comparable_group, ai_mode,
+              /* ══ v1963 · DIE IMMOWERTV-WERTE GEHEN MIT ══════════════════
+                 Marcel am 08.10.2026: „wenn wir die Stufe 3 gerechnet haben,
+                 sollte der Verkehrswert bzw. Ertragswert auch unten in dem
+                 Dropdown erscheinen unter Wertanker."
+
+                 GEMESSEN: die Werte liegen laengst in data->cross_check
+                 (Parkstr. 9: Sachwert 295.000, Ertragswert 355.000) - diese
+                 SELECT-Liste hat sie nur nie mitgenommen. 23 Spalten, data
+                 nicht darunter. Der Cross-Check lag in der Zeile und hat den
+                 Server nie verlassen.
+
+                 Ausgeliefert werden GENAU DIE DREI ZAHLEN, nicht der ganze
+                 Datensatz: ein Verlauf mit 31 Staenden wuerde sonst jeden
+                 vollstaendigen Bericht mitschleppen. */
+              (data->'cross_check'->'sachwert'->>'value_eur')::numeric    AS sachwert_eur,
+              (data->'cross_check'->'ertragswert'->>'value_eur')::numeric AS ertragswert_eur,
+              (data ? 'cross_check')                                        AS hat_crosscheck
          FROM mb.object_snapshots
         WHERE user_id = $1${cond}
         ORDER BY created_at ASC`,
