@@ -26,8 +26,18 @@
     border:1px solid var(--line);border-radius:999px;padding:4px 10px;}
   h1{font-family:'Space Grotesk';font-weight:600;font-size:15px;letter-spacing:.4px;
     text-transform:uppercase;color:var(--muted);margin:0 0 14px;}
-  .grid{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start;}
-  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  /* v2005 · `1fr` hat min-width:auto und kann NICHT unter die Breite
+     seines Inhalts schrumpfen. Gemessen bei 1024 px (iPad quer):
+     #resultPanel bestand auf 762 px, obwohl 574 px Platz waren - das
+     Raster ist nicht umgebrochen, es ist hinausgewachsen (Dokument
+     scrollte 160 px waagerecht). minmax(0,1fr) heilt jede Breite und
+     steht in den Handy-Regeln weiter unten laengst dreimal. */
+  .grid{display:grid;grid-template-columns:380px minmax(0,1fr);gap:22px;align-items:start;}
+  /* v2005 · Umschaltpunkt 880 -> 1080. Bei 1024 galt vorher noch die
+     zweispaltige Fassung, und 380 px Seitenspalte + 22 px Abstand
+     liessen dem Bericht 574 px - zu wenig. Genau diese eine Breite war
+     als einzige kaputt, und es ist die des iPads im Querformat. */
+  @media(max-width:1080px){.grid{grid-template-columns:minmax(0,1fr)}}
   .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));
     border:1px solid var(--line);border-radius:16px;padding:20px;
     box-shadow:0 10px 40px rgba(0,0,0,.35);}
