@@ -4570,7 +4570,19 @@
          Das ist die Falle aus CLAUDE.md in der anderen Richtung: dort
          schrumpfen Flex-Kinder, statt zu scrollen. Hier schrumpfte
          eines NICHT und verdraengte die Bedienung aus dem Bild. */
-      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 0;min-height:110px;',
+      /* v2055a - 110px waren ZU WENIG. Gemessen nach v2055 auf 390x757:
+         der Chat fiel von 288 auf 66 px bei 1019 px Inhalt - die Chips
+         waren frei, dafuer das Gespraech erdrueckt. Eine Korrektur, die
+         an anderer Stelle einen neuen Schaden anrichtet, ist keine.
+
+         28vh statt einer festen Zahl: es waechst mit dem Geraet (757 ->
+         212, 664 -> 186, 568 -> 159) statt nur auf einem zu passen.
+
+         Mehr als 110 geht nur, WEIL die Chip-Leiste seit v2055 klebt:
+         laeuft die Summe jetzt ueber, legt sie sich ueber das Gespraech,
+         statt dahinter zu verschwinden. Das Sicherheitsnetz erlaubt die
+         groessere Buehne - ohne es waere 28vh wieder der alte Fehler. */
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 0;min-height:28vh;',
       '    display:flex;flex-direction:column}',
       '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{flex:1 1 0;min-height:0;height:auto;',
       '    max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
