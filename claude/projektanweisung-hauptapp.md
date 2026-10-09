@@ -35796,3 +35796,68 @@ welcher Knopf, welcher Satz, welche Blasen danach neu sind. Durchgespielt:
   Nachweis für `v2051`: am Schreibtisch ist der Fragestreifen nie nötig, weil
   die Frage-Blase (275 px) im 575-px-Chat nie ganz aus dem Bild kommt.
 - **Nicht durchgespielt:** Marktpreisindikation, tiefere Stufe, Kombinatorik.
+
+
+## Rollout-Journal 09.10.2026 (N60.15/2) — v2055–v2059: die Messkabine fand einen Priorität-1-Fehler
+
+**Was** · Marcels Auftrag: *„mach die Messkabine und auch die geführte
+Eingabe muss da geprüft werden."* Geprüft wurde nicht die Optik, sondern die
+**Erreichbarkeit** — je Knopf: liegt er auf *seinem eigenen Mittelpunkt* in
+`elementsFromPoint` obenauf?
+
+> **Auf dem Handy war die Tonfrage nicht zu beantworten.** Alle drei Chips
+> verdeckt — und `_rfEinstieg` wartet auf genau diese Antwort. Der Lauf hing
+> am zweiten Bildschirm fest.
+>
+> Mein erster Läufer meldete „3 von 3 sichtbar", geprüft über Geometrie.
+> **Keiner war anklickbar.** Geometrie sagt, dass ein Knopf gemalt wird; sie
+> sagt nicht, dass man ihn trifft.
+
+| | Befund | Fix |
+|---|---|---|
+| `v2055` | `#vi-rf-mikro` (`sticky`,`bottom:44`) und `.vi-rf-zeile` (`sticky`,`bottom:0`) klebten über der Chip-Leiste, sobald `#vi-frage` scrollte — 705 px Inhalt in 510 px | Bühne darf schrumpfen, Chip-Leiste klebt mit |
+| `v2055a` | **Mein eigener Fehler:** die neue Untergrenze von 110 px drückte den Chat von 288 auf **66 px** bei 1019 px Inhalt | `min-height:28vh` statt fester Zahl |
+| `v2055b` | 320×565: dritter Chip außerhalb der Leiste (217 nötig, 145 da) | `max-height:min(230px,40vh)` |
+| `v2056` | **601–767 px komplett unbedienbar** — die Bühne fiel auf **Höhe 0**, ihr Grid (220+180) quoll mit `overflow:visible` über alles | Handy-Block auch bei `(max-height:560px)` |
+| `v2057` | Nebenwirkung: Breiten-Regeln auf breiten flachen Fenstern | Gegenblock nimmt nur die Breiten-Regeln zurück |
+| `v2058` | 666×373: 191 px Bedienung in 145 px Port, **`sticky` schafft keinen Platz** | Chip-Leiste `z-index:7` über den Pegel |
+| `v2059` | **iPad hochkant 767×757: 1 von 3 Chips** — dieselbe Grid-Ursache, an der Breite | Handy-Block bis **900 px** |
+
+**Commit** · `c4efaf4b` · `e0ec32e0` · `fa749a4b` · `18044d97` · `6bb056da` ·
+`cf82b7f8` · `3babd58a` · `cfe09ee4`
+
+**Nachweis** · 13 Größen im gleich-Origin-iframe der Messkabine, je Größe
+Chips/Eingabe/Übernehmen auf eigenem Mittelpunkt, seitlicher Überlauf,
+Chathöhe vor und nach der Tonwahl. Vorher 0–2 von 3 erreichbaren Chips auf
+*jeder* Handy- und Tabletgröße, jetzt **3/3 überall**; Desktop unverändert.
+
+#### Drei Sätze, die der Lauf gelehrt hat
+
+- **`sticky` verdeckt, sobald der Container scrollt.** Zwei Flex-Geschwister
+  können sich nicht überlappen — ein sticky schon. Wer eine Überlappung
+  misst, liest zuerst `position`, `bottom`, `z-index` und `order` aller
+  Geschwister aus.
+- **`sticky` schafft keinen Platz.** Es hält ein Element an seiner
+  Flussposition fest, hebt es aber nicht darüber hinaus. Bei 145 px Port und
+  191 px Bedienung half kein `bottom`-Wert; eine Schicht musste davor.
+- **Ein Schwellenwert auf EINER Achse beschreibt kein Gerät, sondern eine
+  Haltung.** `max-width:600px` verfehlte jedes Handy im Querformat (667–932
+  px breit) und das iPad hochkant.
+
+#### Ein eigener Fehler, offen
+
+`v2055` hat die Chips freigelegt und dabei den Chat auf 66 px gedrückt — eine
+Korrektur, die an anderer Stelle einen neuen Schaden anrichtet, ist keine.
+`v2055a` hat es zurückgenommen. Ebenso `v2057`: `v2056` hat zwei verschiedene
+Anliegen (schmal UND flach) in eine Media-Query gesteckt und dadurch
+Umbruch-Regeln auf breite Fenster gezogen.
+
+#### Was NICHT geprüft ist
+
+- **Farbkontraste.** Das Browserfenster stand im Hintergrund; die Messkabine
+  sagt dann selbst, dass nur Geometrie gilt — `getComputedStyle` friert dort
+  Übergänge ein. Der Selbsttest der Kabine war grün (6/6).
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation.**
+- **Über 757 px Höhe** — so hoch ist das Browserfenster.
+- **Der Rest der App.** Geprüft wurde die geführte Eingabe, nicht Cockpit,
+  Portfolio, Objektkarten, Marktbericht oder Einstellungen.

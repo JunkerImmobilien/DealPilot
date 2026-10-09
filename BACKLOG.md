@@ -927,10 +927,51 @@ Commits `fcc866d8`, `121020e9`, `2fbcc881`, `49ec9858`, `8d9cfb23`,
 - **Prüfstrecke unvollständig:** durchgespielt sind *Profi* und *Erste
   Immobilie* am leeren Objekt und der Wiederkehrer mit Vorbefüllung.
   **Nicht durchgespielt:** Marktpreisindikation, tiefere Stufe, die
-  Kombinatorik — und die **Messkabine auf Handy und Tablet**, die Marcel
-  ausdrücklich verlangt hat. Der Fragestreifen aus `v2051` ist am
-  Schreibtisch nie nötig (die Blase ist im 575-px-Chat nie ganz aus dem
-  Bild); **sein Nachweis gehört genau dorthin.**
+  Kombinatorik.
+
+**Messkabine 09.10.2026 — und sie hat einen Priorität-1-Fehler gefunden**
+(`v2055`–`v2059`, Commits `c4efaf4b`, `e0ec32e0`, `fa749a4b`, `18044d97`,
+`6bb056da`, `3babd58a`, `cfe09ee4`):
+
+> **Auf dem Handy war die Tonfrage nicht zu beantworten.** Alle drei
+> Chips waren verdeckt — und `_rfEinstieg` wartet auf genau diese
+> Antwort. Der Lauf hing am zweiten Bildschirm fest.
+
+Gemessen wurde nicht „sieht eng aus", sondern je Knopf: liegt er auf
+**seinem eigenen Mittelpunkt** in `elementsFromPoint` obenauf? Der erste
+Läufer meldete „3 von 3 sichtbar" — über Geometrie. Keiner war
+anklickbar.
+
+| Paket | Befund | Fix |
+|---|---|---|
+| `v2055` | `#vi-rf-mikro` (`sticky`, `bottom:44`) und `.vi-rf-zeile` (`sticky`, `bottom:0`) klebten über der Chip-Leiste, sobald `#vi-frage` scrollte (705 px Inhalt in 510 px) | Bühne darf schrumpfen, Chip-Leiste klebt mit (`bottom:130px`) |
+| `v2055a` | **Mein eigener Fehler:** die neue Untergrenze von 110 px drückte den Chat von 288 auf **66 px** | `min-height:28vh` statt fester Zahl |
+| `v2055b` | Auf 320×565 lag der dritte Chip außerhalb der scrollenden Leiste (217 px nötig, 145 da) | `max-height:min(230px,40vh)` |
+| `v2056` | **601–767 px komplett unbedienbar** (0/3 Chips, auch Eingabe und Übernehmen): die Bühne fiel auf **Höhe 0**, ihr Grid (220+180 px) quoll mit `overflow:visible` über alles | Handy-Block greift auch bei `(max-height:560px)` |
+| `v2057` | Nebenwirkung von `v2056`: Breiten-Regeln auf breiten flachen Fenstern — der Vorspann (231 px) zwang die Chips (424 px) in zwei Zeilen, der Mikrofonkasten brach um | Gegenblock nimmt nur die Breiten-Regeln zurück |
+| `v2058` | Bei 666×373 passen 191 px Bedienung nicht in 145 px Port, und **`sticky` schafft keinen Platz** | Chip-Leiste legt sich mit `z-index:7` über den Pegel |
+| `v2059` | **iPad hochkant 767×757: 1 von 3 Chips** — dieselbe Grid-Ursache, nur an der Breite | Handy-Block bis **900 px** (dort ist die Bühne ohnehin schon einspaltig, Z. 3971) |
+
+**Abnahme, 13 Größen im gleich-Origin-iframe gemessen** — je Größe:
+Chips auf eigenem Mittelpunkt, Eingabefeld, Übernehmen, seitlicher
+Überlauf, Chathöhe vor und nach der Tonwahl:
+
+| | vorher | nachher |
+|---|---|---|
+| 320×565 · 374×664 · 390×757 · 430×757 | 0–2 von 3 | **3/3** |
+| 666×373 · 843×387 · 932×427 (quer) | 0 von 3 | **3/3** |
+| 766×494 · 767×757 (Tablet) | 0–1 von 3 | **3/3** |
+| 1023 · 1180 · 1440 · 1920 | 3/3 | **3/3** (unverändert) |
+
+Chat überall 61–260 px statt 66; kein seitliches Scrollen; Eingabefeld
+und Übernehmen überall erreichbar.
+
+> **Was dabei NICHT geprüft ist, und das gehört dazu:** Farbkontraste —
+> das Browserfenster stand im Hintergrund, und die Messkabine sagt dann
+> selbst, dass nur Geometrie gilt (`getComputedStyle` friert Übergänge
+> ein). Ebenso ungeprüft: Touch-Gesten, Bildschirmtastatur,
+> Tastaturnavigation. Und **über 757 px Höhe konnte nicht gemessen
+> werden** — so hoch ist das Browserfenster.
 
 ---
 
