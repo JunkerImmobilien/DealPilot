@@ -126,7 +126,7 @@
   function _datensatzJetzt() {
     if (typeof collectData !== 'function') throw new Error('collectData fehlt');
     var d = collectData();
-    if (!d || typeof d !== 'object') throw new Error('collectData gab nichts zurueck');
+    if (!d || typeof d !== 'object') throw new Error('collectData gab nichts zurück');
     /* Kopie, damit das Original unberuehrt bleibt */
     var kopie = {};
     for (var k in d) {
@@ -140,7 +140,7 @@
 
   function festschreiben(stichtag) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(stichtag || '')))
-      throw new Error('Kein gueltiger Stichtag');
+      throw new Error('Kein gültiger Stichtag');
     var daten = _datensatzJetzt();
     var neu = {
       stichtag: stichtag,
@@ -165,7 +165,7 @@
     if (!a) throw new Error('Es ist kein Ankauf-Stand festgeschrieben');
     if (was === 'stichtag') {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(String(neuerWert || '')))
-        throw new Error('Kein gueltiger Stichtag');
+        throw new Error('Kein gültiger Stichtag');
       if (neuerWert === a.stichtag) return a;   /* nichts zu tun, kein Eintrag */
       a.korrekturen = a.korrekturen || [];
       a.korrekturen.push({ am: new Date().toISOString(), was: 'stichtag', von: a.stichtag, auf: neuerWert });
@@ -245,14 +245,14 @@
     }
     if (!vorschlag) {
       return '<div class="ank-zeile ank-frage ank-fehlt">'
-        + '<div class="ank-txt"><b>Ankauf-Stand festschreiben?</b> Dafuer fehlt der '
+        + '<div class="ank-txt"><b>Ankauf-Stand festschreiben?</b> Dafür fehlt der '
         + '<i>Nutzen-/Lastenwechsel</i> im Reiter Objekt. Ohne Stichtag wird nichts '
         + 'eingefroren — ein Stand mit falschem Datum sieht richtig aus und ist es nicht.</div>'
         + '</div>';
     }
     return '<div class="ank-zeile ank-frage">'
       + '<div class="ank-txt"><b>Ankauf-Stand festschreiben?</b> Zum Nutzen-/Lastenwechsel am <b>'
-      + _datum(vorschlag) + '</b>. Danach laeuft das Objekt als <i>Bestand</i> weiter, '
+      + _datum(vorschlag) + '</b>. Danach läuft das Objekt als <i>Bestand</i> weiter, '
       + 'und DealPilot zeigt dir die Abweichung.</div>'
       + '<div class="ank-aktionen">'
       + '<button type="button" class="ank-btn" onclick="DealPilotAnkauf.jetzt()">Festschreiben</button>'
