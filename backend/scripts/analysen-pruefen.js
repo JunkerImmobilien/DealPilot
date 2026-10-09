@@ -29,7 +29,11 @@
  *
  * ══ AUFRUF ══════════════════════════════════════════════════════════
  *
- *   docker exec dealpilot-backend node /app/tools/analysen-pruefen.mjs
+ *   docker exec dealpilot-backend node /app/scripts/analysen-pruefen.js
+ *
+ * (In `scripts/`, nicht in `tools/` — gemessen am Dockerfile: `scripts`
+ * wird ins Image kopiert, `tools` nicht. Ein Prüfer, der dort nicht
+ * laufen kann, wo die Daten liegen, ist keiner.)
  *
  * RC=0 sauber · RC=1 mindestens ein sicherer Fremdbefund · RC=2 nur
  * Verdachtsfälle. Mit `--alle` werden auch die unauffälligen gelistet.
