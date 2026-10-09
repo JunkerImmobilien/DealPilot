@@ -39792,3 +39792,10 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 .dp-pa-stand-alt{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.40);color:#8a6d1f}
 .dp-pa-stand-fremd{background:rgba(184,98,92,.12);border-color:rgba(184,98,92,.40);color:#9d4b45}
 .dp-pa-stand-unbekannt{background:rgba(42,39,39,.05);border-color:rgba(42,39,39,.15);color:#6b645e}
+
+/* == v2018 - Stand der letzten Portfolio-Analyse ==================== */
+.dp-pp-stand{font:400 12px/1.5 Inter,system-ui,sans-serif;padding:8px 12px;
+  border-radius:9px;margin:0 0 10px;border:1px solid transparent}
+.dp-pp-stand b{font-weight:600}
+.dp-pp-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.30);color:#2F8E5A}
+.dp-pp-stand-alt{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.38);color:#8a6d1f}

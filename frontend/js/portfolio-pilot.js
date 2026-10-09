@@ -105,6 +105,9 @@
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
         '<button type="button" class="dp-pp-go" id="dp-pp-go">Portfolio-Analyse starten</button>' +
       '</div>' +
+      /* v2018 - der Stand der letzten Analyse. Wird nach dem Aufbau
+         gefuellt (standZeigen); leer ist er unsichtbar. */
+      '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
       '<div class="dp-pp-log" id="dp-pp-log">' +
         '<div class="dp-pp-hint">Ich kenne deine Vermoegensbilanz — Gesamtinvestition, Eigenkapital, Restschuld, ' +
         'Cashflow und die Entwicklung der naechsten zehn Jahre — und jedes einzelne Objekt darin. ' +
@@ -125,6 +128,8 @@
         '<button id="dp-pp-send" class="dp-pp-send" type="button">Senden</button>' +
       '</div>';
     ziel.appendChild(box);
+    /* v2018 - die Standzeile fuellen, sobald das Markup steht. */
+    try { standZeigen(); } catch (e) {}
 
     var w = el('dp-pp-web');
     if (w) w.addEventListener('change', function () { allowWeb = this.checked; });
@@ -280,7 +285,11 @@
          der Co-Pilot-Analyse muss aus Telegram moeglich sein."
          Still wie der Portfolio-Spiegel: ein Fehler hier darf dem
          Nutzer nichts anzeigen, die Analyse steht ja vor ihm. */
-      if (istAnalyse) { try { analyseAblegen(reply, ctx); } catch (e) {} }
+      if (istAnalyse) {
+        try { analyseAblegen(reply, ctx); } catch (e) {}
+        /* v2018 - die Standzeile zeigt sonst noch den alten Lauf. */
+        setTimeout(function () { try { standZeigen(); } catch (e) {} }, 1200);
+      }
     }).catch(function (err) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);
       var m = (err && err.data && (err.data.message || err.data.error)) || (err && err.message) || 'Fehler';
@@ -332,6 +341,42 @@
     Auth.apiCall('/user-settings/portfolio_analyse', { method: 'PUT', body: { wert: wert } })
       .then(function () { try { console.debug('[pp] Analyse abgelegt'); } catch (e) {} })
       .catch(function () { /* still - die Analyse steht ja vor dem Nutzer */ });
+  }
+
+  /* ══ v2018 · WANN LIEF DIE LETZTE ANALYSE, UND GILT SIE NOCH ═════
+
+     Beim Portfolio ist nicht die ZEIT der Massstab, sondern ob sich
+     der BESTAND geaendert hat. Drei Wochen ohne Zukauf sind
+     belanglos; ein Zukauf von gestern macht jede Aussage ueber
+     Klumpenrisiken ungueltig.
+
+     Dieselbe Haltung wie bei der Pilot-Analyse (v2017): gemessen
+     wird, woran die Aussage haengt - nicht das naechstliegende
+     Datum. */
+  function standZeigen() {
+    var host = el('dp-pp-stand'); if (!host) return;
+    Auth.apiCall('/user-settings/portfolio_analyse').then(function (r) {
+      var w = r && r.wert;
+      if (!w || !w.text) { host.style.display = 'none'; return; }
+      var d = new Date(w.stand || r.updated_at);
+      if (isNaN(d)) { host.style.display = 'none'; return; }
+      var tage = Math.max(0, Math.round((Date.now() - d.getTime()) / 86400000));
+      var wann = tage === 0 ? 'heute' : (tage === 1 ? 'gestern' : 'vor ' + tage + ' Tagen');
+      var jetzt = null;
+      try { var c = kontext(); jetzt = c && c.anzahl_objekte != null ? c.anzahl_objekte : null; } catch (e) {}
+      var damals = w.anzahl_objekte != null ? w.anzahl_objekte : null;
+      var txt = 'Letzte Portfolio-Analyse: <b>' + d.toLocaleDateString('de-DE') + '</b> (' + wann + ')'
+              + (damals != null ? ', ' + damals + ' Objekte' : '');
+      var klasse = 'ok';
+      if (damals != null && jetzt != null && damals !== jetzt) {
+        klasse = 'alt';
+        txt += ' \u2014 inzwischen sind es <b>' + jetzt + '</b>. Die Aussagen zu Klumpenrisiken '
+             + 'und Bilanz k\u00f6nnen \u00fcberholt sein \u2014 neu starten.';
+      }
+      host.className = 'dp-pp-stand dp-pp-stand-' + klasse;
+      host.innerHTML = txt;
+      host.style.display = '';
+    }).catch(function () { host.style.display = 'none'; });
   }
 
   function analyse() {
