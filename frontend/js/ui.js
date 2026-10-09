@@ -1042,6 +1042,45 @@ function _formatAIError(err) {
   }
   return '⚠ Pilot-Analyse fehlgeschlagen: ' + ((err && (err.message || err.error)) || err);
 }
+/* ══ v2013 · FOTOS FUER DIE KI ═══════════════════════════════════
+
+   Verkleinert im Browser - auf dem Geraet, das die Bilder ohnehin
+   schon hat. Der Server bekommt nur das Ergebnis.
+
+   Vier Stueck: mehr erklaert ein Objekt nicht besser, kostet aber
+   je Bild. 768 px lange Kante reicht fuer "wie sieht es aus";
+   fuer eine MESSUNG reicht auch das Original nicht, und genau das
+   steht als Regel im Prompt.
+
+   ZWEI DINGE GEMESSEN, BEVOR HIER ETWAS STAND:
+   - Einen Verkleinerer gibt es SCHON: `window._dpResizeDataUrl`
+     (ui.js:505), benutzt von storage.js beim Speichern. Ein zweiter
+     waere eine Dublette - CLAUDE.md verbietet das fuer Rechenkerne,
+     und fuer eine Bildumrechnung gilt dasselbe.
+   - Die Fotos stehen in `imgs` (ui.js:530), nicht in einem
+     `_objPhotos`. Mein erster Entwurf griff auf einen Namen zu, den
+     es nicht gibt, und haette IMMER leer zurueckgegeben - ohne Fehler,
+     ohne Meldung, einfach nie ein Bild. */
+var KI_FOTOS_MAX = 4;
+var KI_FOTO_KANTE = 768;
+async function _fotosFuerKi() {
+  var roh = [];
+  try {
+    var q = (typeof imgs !== 'undefined' && imgs) ? imgs : (window.imgs || []);
+    roh = q.map(function (i) { return i && i.src; });
+  } catch (e) { roh = []; }
+  roh = (roh || []).filter(function (x) { return typeof x === 'string' && x.indexOf('data:image') === 0; });
+  if (!roh.length || typeof window._dpResizeDataUrl !== 'function') return [];
+  var aus = [];
+  for (var i = 0; i < roh.length && aus.length < KI_FOTOS_MAX; i++) {
+    try {
+      var k = await window._dpResizeDataUrl(roh[i], KI_FOTO_KANTE, 0.72);
+      if (k && typeof k === 'string' && k.indexOf('data:image') === 0) aus.push(k);
+    } catch (e) { /* ein Bild weniger ist kein Grund abzubrechen */ }
+  }
+  return aus;
+}
+
 async function _runAIServer(btn) {
   var _orig = btn.innerHTML; /* v596-origbtn */
   btn.textContent = '⏳ Recherchiere Lage & analysiere...';
@@ -1053,6 +1092,11 @@ async function _runAIServer(btn) {
     '</div>';
   try {
     var payload = _buildAIPayload();
+    /* v2013 - die Fotos, verkleinert. Gemessen liegen sie als
+       data:image/jpeg;base64 im Objekt, bis 1,8 MB je Objekt - roh
+       mitzuschicken waere teuer und unnoetig. `_fotosFuerKi()` gibt
+       hoechstens vier zurueck, lange Kante 768 px, JPEG 72 %. */
+    try { payload.fotos = await _fotosFuerKi(); } catch (e) { payload.fotos = []; }
     var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
     var html;
     if (data && data.analysis) {

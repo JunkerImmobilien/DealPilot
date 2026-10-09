@@ -35,7 +35,7 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
  *
  * Web-Search bleibt aktiv für Lage-/Mietspiegel-Recherche.
  */
-function buildPrompt(payload) {
+function buildPrompt(payload, opts) {
   const o = payload.objekt || {};
   const k = payload.kennzahlen || {};
   const f = payload.finanzierung || {};
@@ -54,6 +54,10 @@ function buildPrompt(payload) {
   const _bo = payload.boden || null;
   const _ha = payload.halter || null;
   const _zu = payload.zustand || null;
+  /* v2013 - wie viele Fotos mitgehen. Sie stehen NICHT im Text (sie
+     waeren dort base64), aber das Modell muss wissen, dass es welche
+     hat und was es daraus NICHT schliessen darf. */
+  const _nFotos = (opts && Array.isArray(opts.fotos)) ? opts.fotos.length : 0;
   /* Nur Werte, die es WIRKLICH gibt - ein leerer Block waere eine
      Ueberschrift ohne Inhalt und kostet nur Aufmerksamkeit. */
   const _zeilen = function (titel, paare) {
@@ -417,6 +421,17 @@ function buildPrompt(payload) {
       ['Modernisierung', _zu.modernisierung],
       ['Modernisierungspunkte', _zu.modernisierungspunkte]
     ]) : '',
+    '',
+    /* v2013 - DIE FOTOS. Ein Bild zeigt einen EINDRUCK, keine Messung. */
+    _nFotos ? ('\n## FOTOS DES OBJEKTS\nDu bekommst ' + _nFotos + ' Foto(s) dieses Objekts mitgeliefert.'
+      + '\n- Beschreibe, was SICHTBAR ist: Bauweise, Fassade, Fenster, Dach, Umfeld, Pflegezustand.'
+      + '\n- Nenne es als visuellen Eindruck, nicht als Feststellung.'
+      + '\n- Leite aus einem Foto NIEMALS ab: Baujahr, Wohnflaeche, Sanierungsjahr, Energieklasse'
+      + '\n  oder einen Wert. Dafuer sind die erfassten Felder da.'
+      + '\n- Der Zustand steht als ERFASSTES Feld oben (Abschnitt ZUSTAND UND ENERGIE).'
+      + '\n  Widerspricht der Bildeindruck diesem Feld, SAGE DAS ausdruecklich und nenne beides -'
+      + '\n  ersetze das Feld nicht stillschweigend.'
+      + '\n- Zeigt ein Bild nichts Aussagekraeftiges, sage das statt etwas zu konstruieren.') : '',
     '',
     '## INPUT-DATEN',
     '',
@@ -1035,8 +1050,26 @@ const ANTI_RUECKFRAGE = [
 ].join('\n');
 
 async function analyze(payload, opts) {
-  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
-  const r = await callOpenAI(prompt, opts);
+  const prompt = buildPrompt(payload, opts) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
+  /* v2013 - MIT Fotos geht der ERSTE Anlauf ueber den Bildweg.
+
+     `callOpenAI` schickt `input: <string>`; Bilder brauchen
+     content-parts. Den Weg gab es schon (`_callOpenAIVision`), aber
+     nur fuer den Beleg-Import.
+
+     Ohne Fotos bleibt ALLES wie es war - gleiche Funktion, gleiche
+     Websuche. Und der zweite Anlauf weiter unten laeuft immer ueber
+     den Textweg: ein Wiederholversuch soll nicht auch noch die
+     Bilder bezahlen. */
+  const _fotos = (opts && Array.isArray(opts.fotos)) ? opts.fotos.slice(0, 4) : [];
+  let r;
+  if (_fotos.length) {
+    const teile = [{ type: 'input_text', text: prompt }].concat(
+      _fotos.map(function (f) { return { type: 'input_image', image_url: f }; }));
+    r = await _callOpenAIVision(teile, opts);
+  } else {
+    r = await callOpenAI(prompt, opts);
+  }
   let parsed = extractJson(r.text);
   let used = r;
 

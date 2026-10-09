@@ -257,11 +257,19 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
        Wie es geht, steht zwanzig Zeilen weiter unten in /ai/lage:
        herausziehen, aus dem Payload loeschen (sie gehoeren nicht in
        den Prompt-Text), als zweites Argument uebergeben. */
+    /* v2013 - die Fotos gehoeren NICHT in den Prompt-Text (sie waeren
+       dort 1,8 MB base64), sondern als eigene Bildteile an das Modell.
+       Deshalb hier heraus und als Option weiter. */
+    const fotos = Array.isArray(payload.fotos)
+      ? payload.fotos.filter(function (x) { return typeof x === 'string' && x.indexOf('data:image') === 0; }).slice(0, 4)
+      : [];
+    delete payload.fotos;
+
     const aiOptions = (payload.aiOptions && typeof payload.aiOptions === 'object')
       ? payload.aiOptions : null;
     delete payload.aiOptions;
 
-    const result = await openaiService.analyze(payload, { userApiKey, aiOptions });
+    const result = await openaiService.analyze(payload, { userApiKey, aiOptions, fotos });
 
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {
