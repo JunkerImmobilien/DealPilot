@@ -1557,6 +1557,63 @@ function _renderAIServerAnalysis(a) {
     return '<section class="dp-pa-panel' + (active ? ' active' : '') + '" id="dp-pa-' + id + '">' + inner + '</section>';
   }
 
+  /* v2042 - der Soll/Ist-Abgleich. Marcel: „zusaetzlich in der
+     Pilot-Analyse dann einen Reiter Soll/Ist-Abgleich mit passendem
+     Text."
+
+     Rechnet nichts: `DealPilotAnkauf.abweichung()` liefert die Zeilen
+     fertig, aus zwei Saetzen persistierter Kennzahlen. Und er nennt
+     die Deckung - eine Tafel, die vollstaendig aussieht und es nicht
+     ist, ist schlimmer als eine kurze. */
+  function _sollIstHtml() {
+    var AK = window.DealPilotAnkauf;
+    if (!AK || !AK.vorhanden()) return '';
+    var a = null;
+    try { a = AK.abweichung(); } catch (e) {}
+    if (!a) return '';
+    var gesamt = (AK.KENNZAHLEN || []).length;
+    function f(v, e) {
+      if (v === null || v === undefined || !isFinite(v)) return '\u2013';
+      if (e === 'eur') return Math.round(v).toLocaleString('de-DE') + ' \u20ac';
+      if (e === 'pct') return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
+      return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function d(z) {
+      var vz = z.diff > 0 ? '+' : '';
+      if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' \u20ac';
+      if (z.einheit === 'pct') return vz + f(z.diff, 'zahl') + ' %-Punkte';
+      return vz + f(z.diff, 'zahl');
+    }
+    var t = a.stichtag ? a.stichtag.split('-').reverse().join('.') : '';
+    var reihen = a.zeilen.map(function (z) {
+      return '<tr class="abw-' + z.richtung + '"><td class="abw-wort">' + z.wort + '</td>'
+        + '<td class="abw-zahl">' + f(z.ankauf, z.einheit) + '</td>'
+        + '<td class="abw-zahl">' + f(z.bestand, z.einheit) + '</td>'
+        + '<td class="abw-zahl abw-diff">' + d(z) + '</td></tr>';
+    }).join('');
+    var schlechter = a.zeilen.filter(function (z) { return z.richtung === 'schlechter'; }).length;
+    var besser = a.zeilen.filter(function (z) { return z.richtung === 'besser'; }).length;
+    return '<div class="abw-tafel-host" style="margin:0">'
+      + '<div class="abw-kopf"><h4>Soll/Ist-Abgleich <span class="abw-sub">Bestand gegen Ankauf</span></h4>'
+      + '<div class="abw-stand">Ankauf-Stand vom <b>' + t + '</b></div></div>'
+      + '<p style="margin:0 0 12px;font:400 12.5px/1.6 Inter,system-ui,sans-serif">'
+      + '<b>Ankauf</b> ist der Stand beim Nutzen-/Lastenwechsel \u2014 dein <b>Soll</b>. '
+      + '<b>Bestand</b> ist, wie das Objekt heute dasteht \u2014 dein <b>Ist</b>. '
+      + (besser || schlechter
+          ? ('Von ' + a.zeilen.length + ' vergleichbaren Kennzahlen stehen <b>' + besser
+             + '</b> besser und <b>' + schlechter + '</b> schlechter als beim Ankauf.')
+          : 'Es hat sich nichts bewegt.')
+      + '</p>'
+      + '<table class="abw-tafel"><thead><tr><th>Kennzahl</th><th>Ankauf</th><th>Bestand</th><th>Abweichung</th></tr></thead>'
+      + '<tbody>' + reihen + '</tbody></table>'
+      + '<div class="abw-deckung">' + a.zeilen.length + ' von ' + gesamt + ' Kennzahlen vergleichbar'
+      + (a.zeilen.length < gesamt
+          ? ' \u2014 die \u00fcbrigen lagen zu einem der beiden Zeitpunkte nicht vor und werden <b>nicht</b> gesch\u00e4tzt.'
+          : '.')
+      + '</div></div>';
+  }
+  var _siHtml = _sollIstHtml();
+
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
   /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
   var _kopf = '';
@@ -1606,6 +1663,9 @@ function _renderAIServerAnalysis(a) {
       tab('loc', 'Lage &amp; Markt', false) +
       tab('verh', 'Verhandlung &amp; Offerte', false) +
       tab('bank', 'Bank', false) +
+      /* v2042 - nur wenn ein Ankauf-Stand vorliegt: ohne ihn gibt es
+         nichts abzugleichen, und ein leerer Reiter verspricht etwas. */
+      (_siHtml ? tab('si', 'Soll/Ist-Abgleich', false) : '') +
       '<button type="button" class="dp-pa-tab" id="dp-pa-tab-verlauf" style="display:none" onclick="_dpPaTab(\'verlauf\',this)">Marktbericht-Verlauf</button>' +
     '</nav>' +
     '<div class="dp-pa-content">' +
@@ -1615,6 +1675,7 @@ function _renderAIServerAnalysis(a) {
       panel('loc', pL, false) +
       panel('verh', pV, false) +
       panel('bank', pK, false) +
+      (_siHtml ? panel('si', _siHtml, false) : '') +
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';

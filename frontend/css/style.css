@@ -40123,3 +40123,19 @@ aside.sidebar .dk-seg.aktiv{
   color:var(--gold) !important;
 }
 aside.sidebar .dk-hilfe{margin:0 10px 10px !important;width:calc(100% - 20px) !important}
+
+/* == v2042 - der Stand-Kasten gehoert ueber die volle Breite ======= */
+/* Gemessen am lebenden Element: .dp-pa-wrap ist ein Raster mit
+   204px 1fr, gebaut fuer ZWEI Kinder (Leiste schmal, Inhalt breit).
+   v2017 hat den Stand-Kasten als ERSTES Kind davorgesetzt und damit
+   alles um eine Zelle verschoben:
+
+     Zelle 1  .dp-pa-stand    204 px
+     Zelle 2  .dp-pa-rail    1010 px   <- deshalb gestapelte Vollzeilen
+     Zelle 3  .dp-pa-content  204 px   <- deshalb der Textstreifen
+
+   Ein Element in ein Raster einzufuegen ist nie neutral: das Raster
+   zaehlt Kinder, nicht Bedeutungen. */
+.dp-pa-wrap > .dp-pa-stand,
+.dp-pa-wrap > .dp-pa-stand-alt{grid-column:1 / -1;width:100%;box-sizing:border-box;
+  margin:0 0 4px}
