@@ -35861,3 +35861,111 @@ Umbruch-Regeln auf breite Fenster gezogen.
 - **Über 757 px Höhe** — so hoch ist das Browserfenster.
 - **Der Rest der App.** Geprüft wurde die geführte Eingabe, nicht Cockpit,
   Portfolio, Objektkarten, Marktbericht oder Einstellungen.
+
+
+## Rollout-Journal 09.10.2026 (N60.17) — v2060–v2060c: breite Tabellen werden auf dem Handy zu Karten
+
+**Was** · Marcels Master-Prompt, Abschnitt „Intelligente mobile Darstellung":
+*„Breite Tabellen · Smartphone: Kartenansicht oder vertikale Liste,
+Feldbezeichnung über oder neben dem Wert, wichtige Informationen zuerst,
+Zusatzdetails bei Bedarf aufklappbar."* Und: *„Verkleinere Desktop-Elemente
+nicht einfach proportional."*
+
+#### Die Bestandsaufnahme kam vor dem Umbau
+
+In der Messkabine bei 390 px, je Ansicht durchgescrollt, jedes Bedienelement
+per `elementsFromPoint` auf seinem eigenen Mittelpunkt, jeder Verdacht
+zweimal nachgeprüft:
+
+| Ansicht | geprüft | nicht erreichbar | echter Überlauf |
+|---|---:|---:|---:|
+| `single` (Objekt) | 298 | **0** | 0 |
+| `dashboard` (Cockpit) | 102 | **0** | 0 |
+| `all` (Alle Objekte) | 19 | **0** | 0 |
+
+> **Kein einziger funktionaler Fehler.** Was blieb, waren fünf Tabellen, die
+> waagerecht geschoben werden mussten — bis Faktor **2,8x**.
+
+Sie waren **kein Fehler**: jede liegt in einer Hülle mit `overflow-x:auto`,
+und der Balken nimmt dort messbar Höhe weg (4 bis 14 px). Nichts war
+abgeschnitten.
+
+> Aber 14 Spalten in 332 px waagerecht zu schieben heisst, eine Zahl zu lesen
+> und ihre Überschrift nicht mehr zu sehen. Das ist bedienbar und trotzdem
+> unbrauchbar.
+
+#### Ein Modul statt fünf Korrekturen
+
+`frontend/js/tabellen-karten.js` (neu). Gefiltert wird über die **Form**
+(`thead` + mindestens 5 Spalten), nicht über Namen — die nächste Tabelle
+bekommt den Kartenmodus geschenkt. Je `td` ein `data-dptk-spalte` aus dem
+`th`, eine Klasse an die Tabelle, sonst nichts: **keine Zelle entfernt, keine
+Zeile umsortiert.** Ein `MutationObserver` hängt die Beschriftung nach jedem
+`innerHTML`-Rendern wieder an.
+
+Drei Fenster, drei Verhalten:
+
+| Breite | Darstellung | gemessen |
+|---|---|---|
+| bis 600 px | Karten, 4 Spalten + Schalter „Alle 14 Spalten +10" | Tabelle 332 statt 926 px, Karte 124 px |
+| 601–1200 px | Tabelle ohne `min-width`, Umbruch erlaubt | 688 bei 767 px, 725 bei 1023 px |
+| ab 1201 px | unverändert | 1021 bei 1440 px |
+
+**Commit** · `c46820a3` · `10a10793` · `4b380cc7` · `bdcef11f`
+
+**Nachweis** · Acht Breiten von 320 bis 1920 px, `dashboard`:
+**Querscroller 0 auf allen acht.** Funktional nachgeprüft auf 320, 390 und
+768 px: 89 bis 103 Bedienelemente je Lauf, **0 nicht erreichbar**, 0
+Überlauf. Der Umschalter per echtem Klick: 4 → 14 Spalten und zurück, Tabelle
+bleibt bei 332 px.
+
+#### `v2060a` — der Befund, der den Schaden verhindert hat
+
+Von den fünf gefundenen Tabellen sind **zwei Eingabemasken**: `#oe-gewerke`
+mit 23 und `.ytf-table` mit **45** Feldern. Der Kartenmodus hätte sie
+zerquetscht.
+
+Und genau das ist hier schon einmal passiert. In `style.css` steht darüber:
+
+> *„v1881 · HANDY-DURCHGANG 05.10.2026 … die Regel v1862c macht die TABELLE
+> zum Scrollkasten (display:block) — der Inhalt schrumpfte trotzdem auf
+> 60-px-Auswahlen ('– k', 'Kei', '> 2'), gemessen auf 390 px."*
+
+Dort steht deshalb `min-width:620px !important` an einer ID-ID-Regel — sie
+hat meine Regel ohnehin geschlagen (2-0-0 gegen 0-1-1), der Schaden blieb
+aus. Gefunden habe ich es, **weil ich die Begründung der fremden Regel
+gelesen habe, statt sie mit mehr Spezifität zu überfahren.**
+
+> Eine Anzeigetabelle liest man. Eine Eingabetabelle bedient man, und ein
+> `<select>` mit 110 px Mindestbreite passt in keine Label-Wert-Zeile. Die
+> **Form** allein unterscheidet das nicht — die Felder darin schon.
+
+#### Acht Fassungen des Prüfers, bevor seine Befunde galten
+
+Jede Fehlfassung hätte zu einem Umbau an gesunder Stelle geführt:
+
+- **Das Fenster scrollt nicht** — `html`/`body` stehen auf `overflow:hidden`,
+  gescrollt wird `.main-col`. `window.scrollTo` bewegte nichts: **8 von 932**
+  Elementen gesehen.
+- **Gefangener Überlauf ist keiner** — die Projektionstabelle scrollt in
+  `div.pw` wirklich (Balken nimmt 5 px Höhe).
+- **`display:contents` hat Höhe 0** — `form#dp-noform` umschließt die ganze
+  App; die Prüfung „Höhe 0 = eingeklappt" verwarf **176 von 176** Elementen
+  und meldete 0 Befunde.
+- **Sticky lässt sich nicht hinscrollen** — `scrollIntoView` bewegt die
+  Reiterleiste nicht, alle neun Reiter galten als unbedienbar. Bei
+  `scrollTop=0` sind sie frei.
+
+Nach diesen vier Korrekturen blieben von 11 bzw. 20 „Befunden" **null** echte
+übrig. Deshalb trägt jedes Ergebnis seine **Deckung**: bricht sie ein, ist
+der Prüfer kaputt, nicht das Produkt.
+
+#### Was NICHT geprüft ist
+
+- **Farbkontraste** — das Fenster stand im Hintergrund; die Messkabine sagt
+  dann selbst, dass nur Geometrie gilt. Ihr Selbsttest war grün (6/6).
+- **Die Ansicht `strategie`** — `setMainView('strategie')` öffnet sie nicht;
+  das Register kennt sie, der Weg dorthin ist ein anderer.
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation.**
+- **Höhen über 757 px** — so hoch ist das Browserfenster.
+- **Quick-Check und Marktbericht** — eigene Dokumente im iframe.

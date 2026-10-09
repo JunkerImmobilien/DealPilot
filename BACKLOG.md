@@ -975,6 +975,58 @@ und Übernehmen überall erreichbar.
 
 ---
 
+#### N60.17 · Responsive-Durchgang der ganzen App (Master-Prompt)
+Marcel, 09.10.2026, Master-Prompt: vollständiger Responsive-, UI/UX- und
+Funktionalitätscheck über alle Ansichten und zehn Viewport-Größen, mit
+direkter Umsetzung statt Fehlerliste.
+
+**Prüfmatrix (das Ansichten-Register kennt vier):** `single` ·
+`dashboard` (Cockpit) · `all` (Alle Objekte) · `strategie`.
+Dazu die iframes **Quick-Check** und **Marktbericht** — eigene
+Dokumente, also eigene Durchgänge.
+
+**Erledigt (v2060–v2060c, Commits `c46820a3`, `10a10793`, `4b380cc7`,
+`bdcef11f`):** breite Tabellen werden auf dem Handy zu Karten.
+
+| Ansicht | geprüfte Bedienelemente | nicht erreichbar | echter Überlauf |
+|---|---:|---:|---:|
+| `single` | 298 | **0** | 0 |
+| `dashboard` | 102 | **0** | 0 |
+| `all` | 19 | **0** | 0 |
+
+**Kein funktionaler Fehler.** Was blieb, waren fünf Tabellen mit bis zu
+**2,8-fachem** Querlauf. Jetzt: bis 600 px Karten (4 Spalten +
+Schalter), 601–1200 px Tabelle ohne `min-width`, darüber unverändert.
+**Querscroller über acht Breiten von 320 bis 1920 px: 0.**
+
+`v2060a` nimmt **Eingabetabellen** aus (`#oe-gewerke` 23 Felder,
+`.ytf-table` 45) — der Kartenmodus hätte sie zerquetscht, und genau das
+hatte `v1881` schon einmal gemessen und behoben.
+
+**Noch offen in N60.17:**
+- **`strategie` ist nicht geprüft** — `setMainView('strategie')` öffnet
+  sie nicht; das Register kennt sie, der Weg dorthin ist ein anderer.
+  **Erst den Weg finden, dann messen.**
+- **Quick-Check und Marktbericht** (iframes) sind nicht angefasst.
+- **Farbkontraste** — das Browserfenster stand im Hintergrund, und die
+  Messkabine sagt dann selbst, dass nur Geometrie gilt. Ihr Selbsttest
+  war grün (6/6). Gehört mit Fenster im Vordergrund wiederholt.
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation**, und
+  **Höhen über 757 px** (Fenstergrenze der Kabine).
+- Die übrigen Punkte des Master-Prompts: Anmeldung/Registrierung,
+  Upload-Flächen, Lade-/Fehler-/Leerzustände, Diagramme, Kanban,
+  Einstellungen.
+
+> **Das Werkzeug steht und ist der eigentliche Gewinn.** Der Läufer in
+> der Messkabine sucht den echten Scroll-Container, scrollt abschnittweise
+> durch, prüft jedes Bedienelement per `elementsFromPoint` auf fünf
+> Punkten, verifiziert jeden Verdacht zweimal (zentriert **und** am
+> Seitenanfang) und nennt seine **Deckung**. Er brauchte acht Fassungen:
+> die ersten vier meldeten ausschließlich Artefakte, und jedes davon
+> hätte zu einem Umbau an gesunder Stelle geführt.
+
+---
+
 #### N60.16 · Portfolio-Cockpit und Kanban kennen Ankauf/Bestand noch nicht
 Marcel, 09.10.2026: *„im Portfolio-Cockpit müssen wir dann natürlich
 auch schauen, dass wir den Bestand passend ergänzen können, also auch
