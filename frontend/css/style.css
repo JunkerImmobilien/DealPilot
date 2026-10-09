@@ -39952,3 +39952,26 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 .dk-knopf-ankauf{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
   color:var(--wl-e8cc7a, #E8CC7A) !important}
 .dk-knopf-ankauf:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent) !important}
+
+/* == v2036 - der Modus-Dreher ueber der Objektliste ================ */
+/* Zwei Segmente, ausserhalb der Karte. Er muss deshalb in keiner der
+   vier Darstellungsachsen passen - das war der Grund fuer drei
+   Anlaeufe am Knopf JE KARTE. */
+.dk-schalter{display:flex;align-items:center;gap:4px;
+  width:calc(100% - 4px);margin:0 2px 10px;padding:3px;border-radius:9px;
+  background:rgba(42,39,39,.22);border:1px solid rgba(168,162,153,.18)}
+.dk-seg-titel{flex:0 0 auto;padding:0 7px 0 5px;
+  font:600 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;
+  color:var(--muted,#8A8272)}
+.dk-seg{flex:1 1 0;min-width:0;padding:5px 6px;border:0;border-radius:7px;cursor:pointer;
+  background:none;color:var(--dp-ink-30,#A8A299);
+  font:600 10.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.05em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-seg:hover{color:var(--dp-ink-1,#E8E3D8)}
+.dk-seg.aktiv{background:rgba(42,39,39,.55);color:var(--dp-ink-1,#E8E3D8)}
+.dk-seg[data-dk-modus="ankauf"].aktiv{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent);color:var(--wl-e8cc7a, #E8CC7A)}
+.dk-seg b{font-weight:700;opacity:.65;margin-left:2px}
+/* Karten ohne Ankauf-Stand im Ankauf-Modus: zurueckgenommen, nicht
+   versteckt - und mit Begruendung am Element. */
+.sb-card.dk-ohne-ankauf{opacity:.42}
+.sb-card.dk-ohne-ankauf:hover{opacity:.62}

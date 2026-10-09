@@ -191,6 +191,11 @@
      nach dem naechsten renderSaved() ins Leere gegangen. */
   function knopfSetzen() { /* absichtlich leer, siehe oben */ }
 
+  /* v2036 - dieser Faenger trifft nichts mehr: `.dk-knopf` wird seit
+     v2036 nicht mehr gebaut (der Modus-Dreher sitzt ueber der Liste).
+     Er bleibt stehen, weil er nichts kostet und der Weg zurueck zu
+     einem Knopf JE KARTE damit offen ist - entfernt wird er, wenn
+     feststeht, dass es dabei bleibt. */
   (function klickFangen() {
     function binden() {
       var liste = el('sb-list');
@@ -259,6 +264,13 @@
      Dreht alle Karten auf einmal - fuer den Blick ueber den Bestand.
      Er erscheint nur, wenn ueberhaupt eine Karte einen Ankauf-Stand
      hat; sonst waere er ein Schalter ohne Wirkung. */
+  /* ── Der Modus-Dreher ────────────────────────────────────────────
+     v2036 - zwei Segmente ueber der Liste statt eines Knopfes je
+     Karte. Er sitzt AUSSERHALB der Karte und muss deshalb in keiner
+     der vier Darstellungsachsen passen.
+
+     Er erscheint nur, wenn ueberhaupt eine Karte einen Ankauf-Stand
+     hat - ein Schalter ohne Wirkung ist ein Versprechen. */
   function schalterSetzen() {
     var liste = el('sb-list');
     if (!liste) return;
@@ -267,29 +279,46 @@
     var s = el('dk-schalter');
     if (!mit) { if (s) s.remove(); return; }
     if (!s) {
-      s = document.createElement('button');
-      s.type = 'button';
+      s = document.createElement('div');
       s.id = 'dk-schalter';
       s.className = 'dk-schalter';
       s.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('[data-dk-modus]') : null;
+        if (!b) return;
         ev.stopPropagation();
-        alle = !alle;
-        var ks = el('sb-list').querySelectorAll('.sb-card');
-        for (var j = 0; j < ks.length; j++) {
-          var kk = ks[j], kkey = kk.getAttribute('data-key');
-          if (!ankaufVon(kkey)) continue;
-          if (!!gedreht[kkey] !== alle) drehen(kk, alle);
-        }
-        schalterSetzen();
+        modusSetzen(b.getAttribute('data-dk-modus') === 'ankauf');
       });
       liste.insertBefore(s, liste.firstChild);
     }
-    s.textContent = (alle ? 'Alle auf Bestand' : 'Alle auf Ankauf') + ' (' + mit + ')';
-    s.title = alle
-      ? 'Alle Karten zurueck auf den laufenden Stand'
-      : 'Alle Karten mit Ankauf-Stand umdrehen';
+    s.innerHTML =
+      '<span class="dk-seg-titel">Stand</span>'
+      + '<button type="button" data-dk-modus="bestand" class="dk-seg' + (alle ? '' : ' aktiv') + '"'
+      + ' title="Die laufenden Zahlen von heute">Bestand</button>'
+      + '<button type="button" data-dk-modus="ankauf" class="dk-seg' + (alle ? ' aktiv' : '') + '"'
+      + ' title="Die Zahlen, wie sie beim Nutzen-/Lastenwechsel eingefroren wurden">Ankauf <b>' + mit + '</b></button>';
   }
 
+  /* Alle Karten mit Ankauf-Stand umschalten. Karten OHNE Stand bleiben
+     stehen - aber sie werden gekennzeichnet: eine Karte, die im
+     Ankauf-Modus ihre HEUTIGEN Zahlen zeigt, ohne das zu sagen, waere
+     eine Luege im Nebensatz. Halbe Deckkraft kann nichts verdecken. */
+  function modusSetzen(nachAnkauf) {
+    alle = !!nachAnkauf;
+    var liste = el('sb-list');
+    if (!liste) return;
+    var ks = liste.querySelectorAll('.sb-card');
+    for (var j = 0; j < ks.length; j++) {
+      var kk = ks[j], kkey = kk.getAttribute('data-key');
+      if (!ankaufVon(kkey)) {
+        kk.classList.toggle('dk-ohne-ankauf', alle);
+        if (alle) kk.setAttribute('data-dk-hinweis', 'Fuer dieses Objekt ist kein Ankauf-Stand festgeschrieben - du siehst die heutigen Zahlen.');
+        else kk.removeAttribute('data-dk-hinweis');
+        continue;
+      }
+      if (!!gedreht[kkey] !== alle) drehen(kk, alle);
+    }
+    schalterSetzen();
+  }
   /* `renderSaved` baut die Liste neu. Ein MutationObserver ist hier
      richtig und kein Polling: er feuert genau dann, wenn getauscht
      wurde, und nicht alle 300 ms ins Leere. */
@@ -321,6 +350,7 @@
     },
     zustand: function () { return { gedreht: gedreht, alle: alle }; },
     anlegen: anlegen,
+    modusSetzen: modusSetzen,
     ankaufVon: ankaufVon
   };
 })();

@@ -1528,40 +1528,6 @@ async function renderSaved(opts) {
        Karte nur halb im Blick hat, liest den Ankaufspreis als
        heutigen. Ein Band, das sagt was man sieht, ist hier keine
        Zierde. */
-    /* v2033 - der Tooltip der Doppelkarte. Als eigene Variable, nicht
-       als verketteter Ausdruck in der Knopfzeile: ein langer Text
-       zwischen zwanzig Anfuehrungszeichen ist eine Klammer, die man
-       verliert - mir genau hier passiert.
-
-       Er grenzt die beiden Wortpaare ausdruecklich voneinander ab.
-       Marcel hat das bestellt, und seine Rueckfrage welche ist dann
-       fuer was?" zeigt, warum. */
-    var dkTitel = '';
-    if (opts.ankaufKurz) {
-      dkTitel = opts.ankaufBand
-        ? ('Du siehst den ANKAUF-Stand, eingefroren zum ' + opts.ankaufBand + '.')
-        : 'Du siehst den BESTAND - den laufenden Stand von heute.';
-      dkTitel += '\n\nKlicken dreht die Karte um.'
-        + '\nAnkauf = wie das Objekt beim Nutzen-/Lastenwechsel dastand.'
-        + '\nBestand = wie es heute dasteht.'
-        + '\n\nNicht zu verwechseln mit Soll-Miete und Ist-Miete:'
-        + '\ndie beschreiben EINE Miete (was hereinkaeme gegen was'
-        + '\ngezahlt wird), nicht zwei Zeitpunkte.';
-    }
-    /* v2035 - HIER STAND DAS GOLDBAND. Es lag `position:absolute`
-       ueber der Karte und setzte voraus, dass oben Platz ist. Marcel
-       in Aktenmappe mit Kartei": der goldene Rahmen ueberschreibt
-       dann fast alles."
-
-       Es gibt VIER Darstellungsachsen, nicht eine: data-dp-objkarte,
-       data-ui-cards, data-ui-theme, data-dp-skin. Ich hatte vier
-       Kartenstile einer Achse geprueft und daraus geschlossen, es sei
-       durch.
-
-       Ersatzlos weg: der Chip in der Kopfzeile sagt seit v2033
-       ohnehin ANKAUF <Datum>" - in Gold, IM FLUSS, von jedem Stil
-       selbst eingeordnet. Das Band sagte dasselbe noch einmal, nur
-       als Schicht ueber fremdem Grund. */
     var ankaufBand = '';
     return '<div class="sb-card' + (opts.ankaufBand ? ' sb-card-ankauf' : '') + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
       ankaufBand +
@@ -1574,23 +1540,21 @@ async function renderSaved(opts) {
         '<div class="sbc-top-body">' +
           '<div class="sbc-top-line1">' +
             seqHtml +
-            /* v2032 - der Dreh-Knopf der Doppelkarte, IM FLUSS statt
-               obendrauf. Absolut gesetzt hatte er in fuenf Kartenstilen
-               keinen Platz, der in allen frei ist: gemessen lag er auf
-               dem Desktop ueber einer `.sbcm`-Kachel und war auf dem
-               Handy gar nicht zu sehen.
+            /* v2036 - HIER STAND DER DREH-KNOPF. Marcel: vielleicht
+               machen wir oben dann einen Umschalter ... dann bleiben die
+               Karten wie sie sind."
 
-               Nur wo ein Ankauf-Stand vorliegt - sonst gibt es nichts
-               zu drehen, und ein Knopf ohne Wirkung ist ein Versprechen. */
-            (opts.ankaufKurz
-              ? '<button type="button" class="dk-knopf' + (opts.ankaufBand ? ' dk-knopf-ankauf' : '') + '" data-dk-key="' + _esc(opts.key) + '"'
-                + ' title="' + _esc(dkTitel) + '">'
-                + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-                + ' stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
-                + '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'
-                + '<span>' + (opts.ankaufBand ? 'ANKAUF ' + _esc(opts.ankaufBand) : 'BESTAND') + '</span>'
-                + '</button>'
-              : '') +
+               Drei Anlaeufe hat der Knopf auf der Karte gekostet: absolut
+               gesetzt lag er ueber einer Kennzahl (v2031), im Fluss
+               ordnete ihn jede Fassung anders ein (v2032), und das
+               Goldband frass in der schmalen Fassung die ganze Zeile
+               (v2035). Grund ist immer derselbe: die Karte hat VIER
+               Darstellungsachsen, und jede Zugabe muss in allen
+               Kombinationen passen.
+
+               Ein Schalter AUSSERHALB der Karte muss das nicht. Die
+               Karte bleibt, wie sie gebaut ist; gewechselt werden nur
+               die Zahlen darin (doppelkarte.js). */
             aiHtml +
             ds2HintBadge +
             (opts.date ? '<span class="sbc-date">' + _esc(opts.date) + '</span>' : '') +
