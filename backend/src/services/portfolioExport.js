@@ -179,10 +179,10 @@ async function bauen(userId, opt) {
     lexikon: {
       /* v2043c - als NACHSCHLAGEWERK, nicht als Liste.
 
-         Gemessen:  ist ein ARRAY - im Export kamen die
-         Schluessel 0, 1, 2 an, und  ging ins Leere.
+         Gemessen: k.felder ist ein ARRAY - im Export kamen die
+         Schluessel 0, 1, 2 an, und lexikon.felder.kp ging ins Leere.
          Damit war das Lexikon zwar vorhanden, aber nicht benutzbar:
-         wer wissen will, was  bedeutet, schlaegt unter  nach
+         wer wissen will, was kp bedeutet, schlaegt unter kp nach
          und nicht unter 37.
 
          Ein Lexikon, das man nicht nachschlagen kann, ist ein
