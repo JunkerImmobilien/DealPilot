@@ -863,6 +863,42 @@ gar nicht, was er machen soll."*
 
 ---
 
+#### N60.16 · Portfolio-Cockpit und Kanban kennen Ankauf/Bestand noch nicht
+Marcel, 09.10.2026: *„im Portfolio-Cockpit müssen wir dann natürlich
+auch schauen, dass wir den Bestand passend ergänzen können, also auch
+zwischen Ankauf und allem sinnvoll aufsplitten … Und auch die
+Kanban-Ansicht passt. Ein gewonnenes Objekt ist ja sowieso dann
+wahrscheinlich im Bestand."*
+
+**Was es seit heute gibt** (v2030–v2042): je Objekt einen eingefrorenen
+Ankauf-Stand (`data._ankauf`), die Listenspalten `ankauf_kurz` und
+`ankauf_stichtag`, einen Modus-Dreher über der Objektliste, die
+Abweichung als Funktion (`DealPilotAnkauf.abweichung()`) und einen
+Reiter **Soll/Ist-Abgleich** in der Pilot-Analyse. Beide Piloten und der
+Telegram-Bot bekommen beide Stände im Prompt.
+
+**Was fehlt:**
+
+| Wo | Was |
+|---|---|
+| Portfolio-Cockpit | Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand** — heute rechnet es nur den laufenden Stand |
+| Portfolio-Cockpit | Die **Abweichung über den ganzen Bestand**: wie viele Objekte stehen besser, wie viele schlechter als beim Ankauf |
+| Kanban | Ein gewonnenes Objekt gehört in eine Spalte **Bestand**, nicht weiter in die Akquise-Strecke |
+| Sortierung | Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren, nicht nach den heutigen |
+
+> **Zur Sortierung, bewusst zurückgestellt:** sie ist erst messbar, wenn
+> mehr als zwei Objekte einen Ankauf-Stand haben. Eine Sortierung über
+> zwei Datenpunkte lässt sich nicht prüfen, und eine ungeprüfte
+> Sortierung ist schlimmer als keine — sie sieht richtig aus.
+
+**Eine Falle, die aus dieser Woche schon bekannt ist:** das Cockpit
+rechnet aus dem Portfolio-Spiegel, nicht aus dem Formular. Wer dort
+Ankauf-Werte zeigen will, braucht sie **im Spiegel** — sonst zeigt die
+eine Hälfte der Oberfläche etwas anderes als die andere, und niemand
+sieht, welche recht hat.
+
+---
+
 ### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
 
 Marcel: „dass du die Objekte alle nochmal durchgehst und auch die
