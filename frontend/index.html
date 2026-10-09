@@ -802,6 +802,13 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item sb-act-ausgeben" type="button" data-feature="export_csv" onclick="sbActionsAction('hub-export')">
         <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Export</span>
       </button>
+      <!-- v2043: das GANZE Portfolio als Datei - JSON (alles) und Tabelle
+           (das, womit man rechnet), dazu das Feld-Lexikon und das Wissen,
+           das die Piloten benutzen. Marcel: wichtig ist, dass wir das
+           gesamte Wissen mitgeben." -->
+      <button class="sb-act-item sb-act-ausgeben" type="button" data-feature="export_csv" onclick="exportPortfolioKomplett()">
+        <span class="sb-act-ico" data-icon="export-hub"></span><span class="sb-act-l">Portfolio komplett</span>
+      </button>
 
       <!-- V63.73: App-Bereich — Einstellungen, Hilfe, Feedback -->
       <div class="sb-act-section-title">System</div>
@@ -3645,6 +3652,7 @@ label.dp-required.qc-required::after {
 <script src="js/doppelkarte.js?v=v2040"></script>
 <script src="js/abweichung.js?v=v2034"></script>
 <script src="js/ankauf-ansicht.js?v=v2038"></script>
+<script src="js/portfolio-export.js?v=v2043"></script>
 <script src="js/deal-action.js?v=v2030a"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>

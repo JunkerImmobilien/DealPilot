@@ -7,6 +7,7 @@ const objectService = require('../services/objectService');
 const { HttpError } = require('../middleware/errors');
 const { requireUnderLimit } = require('../middleware/planLimits');
 const usageService = require('../services/usageService');
+const portfolioExport = require('../services/portfolioExport'); /* v2043 */
 
 const router = express.Router();
 
@@ -41,6 +42,27 @@ router.get('/', validate({ query: listQuerySchema }), async (req, res, next) => 
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     const items = await objectService.listForUser(req.user.id, req.query);
     res.json({ items, count: items.length });
+  } catch (err) { next(err); }
+});
+
+/**
+ * GET /objects/portfolio-export - das ganze Portfolio samt Lexikon
+ *
+ * v2043 - Marcel: „ich brauche dann ein Export ueber das gesamte
+ * Portfolio. Wichtig ist, dass wir das gesamte Wissen mitgeben."
+ *
+ * STEHT VOR `/:id` - und das ist kein Geschmack: Express nimmt die
+ * erste passende Route, und `/:id` passt auf `portfolio-export`
+ * genauso. Stuende sie danach, liefe der Aufruf in die Objekt-Abfrage
+ * und bekaeme „Invalid object id". Eine Route hinter einem Platzhalter
+ * ist keine Route, sondern ein toter Pfad mit plausibler Fehlermeldung.
+ */
+router.get('/portfolio-export', async (req, res, next) => {
+  try {
+    res.set('Cache-Control', 'no-store');
+    const mitFotos = String(req.query.fotos || '') === '1';
+    const paket = await portfolioExport.bauen(req.user.id, { fotos: mitFotos });
+    res.json(paket);
   } catch (err) { next(err); }
 });
 
