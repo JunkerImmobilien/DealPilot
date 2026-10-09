@@ -25388,12 +25388,17 @@ aside.sidebar .sb-card .sbc-score-label {
   color: var(--green-2, #5ed992) !important;
   border: 1px solid rgba(63,165,108,0.35) !important;
 }
-aside.sidebar .sb-card .sbc-score-label.tier-gold {
+/* v2028 - HIER STAND `.tier-gold`. Diese Klasse setzt niemand:
+   `storage.js:1686` schreibt `sbc-score-gold`. Die Regel hat nie
+   gegriffen, und die gruene Grundregel darueber galt fuer ALLE
+   Stufen - SOLIDE, GUT, SCHWACH und KRITISCH waren gleich gruen. */
+aside.sidebar .sb-card .sbc-score-label.sbc-score-gold {
   background: color-mix(in srgb, var(--gold) 18%, transparent) !important;
   color: var(--gold-2, #E8C964) !important;
   border-color: color-mix(in srgb, var(--gold) 40%, transparent) !important;
 }
-aside.sidebar .sb-card .sbc-score-label.tier-red {
+/* v2028 - dasselbe fuer rot: `.tier-red` statt `.sbc-score-red`. */
+aside.sidebar .sb-card .sbc-score-label.sbc-score-red {
   background: rgba(184,98,92,0.18) !important;
   color: #e8a09a !important;
   border-color: rgba(184,98,92,0.40) !important;
@@ -35747,6 +35752,15 @@ body[data-dp-skin="hell"] .sbc-verdict{ background:#1f2a22 !important; color:#7f
 body[data-dp-skin="hell"] .sbc-score-label.sbc-score-red,
 body[data-dp-skin="hell"] .sbc-score-label.tier-red,
 body[data-dp-skin="hell"] .sbc-verdict.tier-red{ background:#B8625C !important; color:#ffffff !important; border-color:#B8625C !important; }
+/* v2028 - GOLD fehlte in dieser Fassung ganz: SOLIDE fiel auf die
+   gruene Grundregel darueber zurueck. Dunkler Text auf Gold, weil
+   Gold auf hellem Grund sonst nicht liest.
+
+   Der lange Selektor ist Absicht: die Obsidian-Regel weiter oben
+   traegt (0,4,1) und wuerde eine kurze Hell-Regel (0,3,1) auch im
+   Hell-Modus schlagen - mit goldener Schrift auf hellem Grund.
+   Hier zaehlt Spezifitaet, nicht Reihenfolge. */
+body[data-dp-skin="hell"] aside.sidebar .sb-card .sbc-score-label.sbc-score-gold{ background:var(--gold) !important; color:#2A2727 !important; border-color:var(--gold) !important; }
 
 /* --- Score-Donut: weisse Mitte, dunkle Zahl (best effort) --- */
 body[data-dp-skin="hell"] .sc-donut-hole,
@@ -35855,6 +35869,14 @@ body.dp-chrome-hell .sbc-score-label.sbc-score-red,
 body.dp-chrome-hell .sbc-score-label.tier-red,
 body.dp-chrome-hell .sbc-verdict.tier-red{
   background:rgba(184,98,92,.10) !important; color:#a23c34 !important; border-color:rgba(184,98,92,.45) !important;
+}
+/* v2028 - und hier fehlte gold genauso. Gleiche duenne Machart wie
+   die rote Pille daneben, damit die Reihe ruhig bleibt. Langer
+   Selektor aus demselben Grund wie oben: (0,5,2) schlaegt die
+   Obsidian-Regel (0,4,1). */
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-gold{
+  background:color-mix(in srgb, var(--gold) 10%, transparent) !important; color:#8a6d1f !important;
+  border-color:color-mix(in srgb, var(--gold) 45%, transparent) !important;
 }
 
 /* Tabs: aktiver Tab dunkel + Gold-Unterstrich */
