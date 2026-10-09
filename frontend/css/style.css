@@ -39914,16 +39914,18 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 /* v2032 - die fruehere Regel .sb-card.dk-dreht .dk-knopf{opacity:0}
    ist entfallen: der Knopf gehoert jetzt zum Inhalt und dreht mit. */
 
-/* Das Goldband der Rueckseite. Ohne es saehe der Ankauf aus wie der
-   laufende Stand mit anderen Zahlen. */
-.sbc-ankauf-band{
-  position:absolute;top:0;left:0;right:0;z-index:3;
-  padding:3px 10px;border-radius:11px 11px 0 0;
-  font:700 9.5px/1.4 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;
-  background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));
-  color:#2A2727;text-align:center;
+/* v2035 - das Goldband ist entfallen. Es lag absolut ueber der Karte
+   und ueberschrieb in anderen Darstellungen (Aktenmappe, Kartei) fast
+   alles; `padding-top:24px !important` hat die Karte zusaetzlich
+   verzogen. Den Zustand sagt jetzt der Chip in der Kopfzeile.
+
+   Was bleibt, ist eine FARBE - die kann nichts verdecken: ein
+   zurueckhaltender Goldrand an der Karte, solange sie den Ankauf
+   zeigt. */
+.sb-card.sb-card-ankauf{
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
+  box-shadow:inset 3px 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent);
 }
-.sb-card.sb-card-ankauf{padding-top:24px !important}
 
 /* Der Schalter ueber der Liste - dreht alle Karten auf einmal. */
 .dk-schalter{

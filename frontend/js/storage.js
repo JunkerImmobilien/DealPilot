@@ -1548,9 +1548,21 @@ async function renderSaved(opts) {
         + '\ndie beschreiben EINE Miete (was hereinkaeme gegen was'
         + '\ngezahlt wird), nicht zwei Zeitpunkte.';
     }
-    var ankaufBand = opts.ankaufBand
-      ? '<div class="sbc-ankauf-band">ANKAUF \u00b7 ' + _esc(opts.ankaufBand) + '</div>'
-      : '';
+    /* v2035 - HIER STAND DAS GOLDBAND. Es lag `position:absolute`
+       ueber der Karte und setzte voraus, dass oben Platz ist. Marcel
+       in Aktenmappe mit Kartei": der goldene Rahmen ueberschreibt
+       dann fast alles."
+
+       Es gibt VIER Darstellungsachsen, nicht eine: data-dp-objkarte,
+       data-ui-cards, data-ui-theme, data-dp-skin. Ich hatte vier
+       Kartenstile einer Achse geprueft und daraus geschlossen, es sei
+       durch.
+
+       Ersatzlos weg: der Chip in der Kopfzeile sagt seit v2033
+       ohnehin ANKAUF <Datum>" - in Gold, IM FLUSS, von jedem Stil
+       selbst eingeordnet. Das Band sagte dasselbe noch einmal, nur
+       als Schicht ueber fremdem Grund. */
+    var ankaufBand = '';
     return '<div class="sb-card' + (opts.ankaufBand ? ' sb-card-ankauf' : '') + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
       ankaufBand +
       investorRibbon +
