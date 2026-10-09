@@ -304,6 +304,14 @@
      eine Luege im Nebensatz. Halbe Deckkraft kann nichts verdecken. */
   function modusSetzen(nachAnkauf) {
     alle = !!nachAnkauf;
+    /* v2037 - der Dreher gilt nicht nur der Liste. Das GEOEFFNETE
+       Objekt wechselt mit: im Ankauf-Modus zeigt es den eingefrorenen
+       Datensatz, gesperrt, mit Hinweis. Marcels Entscheidung vom
+       09.10.: die Sperre gilt NUR dort, im Bestand bleibt alles
+       editierbar - sonst koennte man nichts mehr pflegen. */
+    try {
+      if (window.DealPilotAnkaufAnsicht) DealPilotAnkaufAnsicht.setzen(alle);
+    } catch (e) { console.warn('[v2037] Ankauf-Ansicht:', e.message); }
     var liste = el('sb-list');
     if (!liste) return;
     var ks = liste.querySelectorAll('.sb-card');

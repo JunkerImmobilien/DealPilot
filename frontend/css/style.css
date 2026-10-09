@@ -39975,3 +39975,63 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
    versteckt - und mit Begruendung am Element. */
 .sb-card.dk-ohne-ankauf{opacity:.42}
 .sb-card.dk-ohne-ankauf:hover{opacity:.62}
+
+/* == v2037 - die Ankauf-Ansicht ==================================== */
+/* Gesperrt wird mit DECKKRAFT und pointer-events, nicht mit display.
+   Man soll sehen, was damals dastand - nur nicht hineinschreiben. */
+.ank-ansicht-kopf{display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin:0 0 14px;padding:12px 16px;border-radius:11px;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent)}
+.ank-ansicht-txt{flex:1 1 280px;min-width:0;font:400 12.5px/1.55 Inter,system-ui,sans-serif;
+  color:var(--dp-ink-1,#E8E3D8)}
+.ank-ansicht-txt b{display:block;font:700 11px/1.5 "JetBrains Mono",ui-monospace,monospace;
+  letter-spacing:.12em;color:var(--wl-e8cc7a, #E8CC7A);margin-bottom:3px}
+.ank-ansicht-txt span{display:block;color:var(--dp-ink-30,#A8A299)}
+.ank-frei{flex:0 0 auto;display:flex;align-items:center;gap:7px;cursor:pointer;
+  font:400 12px/1.4 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#A8A299)}
+.ank-frei input{cursor:pointer}
+
+/* Die Reiter und ihr Inhalt: zurueckgenommen und unberuehrbar.
+   Der Hinweis selbst bleibt voll da - er ist der einzige Weg zurueck. */
+body.dp-ankauf-ansicht .sec,
+body.dp-ankauf-ansicht nav.tabs{opacity:.52;pointer-events:none;
+  transition:opacity .18s ease}
+body.dp-ankauf-ansicht #ank-ansicht-host{opacity:1;pointer-events:auto}
+/* Freigegeben: voll sichtbar und bedienbar, aber der Rahmen bleibt. */
+body.dp-ankauf-frei .sec,
+body.dp-ankauf-frei nav.tabs{opacity:1;pointer-events:auto}
+body.dp-ankauf-frei .ank-ansicht-kopf{border-color:rgba(216,86,76,.55);
+  background:rgba(216,86,76,.10)}
+body.dp-ankauf-frei .ank-ansicht-txt b{color:#D8564C}
+
+/* == v2034 - die Abweichungstafel ================================== */
+/* Bestand gegen Ankauf. Gruen und Rot sind hier Statusfarben und
+   bleiben in jeder Marke gleich (CLAUDE.md: Statusfarben nie
+   tokenisieren) - nur der Rahmen traegt Gold. */
+.abw-tafel-host{margin:22px 0 10px;padding:14px 16px 12px;border-radius:12px;
+  background:rgba(42,39,39,.05);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}
+.abw-kopf{display:flex;align-items:baseline;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.abw-kopf h4{margin:0;font:600 14px/1.3 "Space Grotesk",system-ui,sans-serif;color:var(--dp-ink-1,#E8E3D8)}
+.abw-sub{font:400 12px/1.3 Inter,system-ui,sans-serif;color:var(--muted,#8A8272);margin-left:6px}
+.abw-stand{font:400 11.5px/1.4 "JetBrains Mono",ui-monospace,monospace;color:var(--muted,#8A8272)}
+.abw-tafel{width:100%;border-collapse:collapse;font:400 12.5px/1.5 Inter,system-ui,sans-serif}
+.abw-tafel th{text-align:right;padding:4px 8px;font:600 10px/1.4 "JetBrains Mono",ui-monospace,monospace;
+  letter-spacing:.08em;color:var(--muted,#8A8272);border-bottom:1px solid rgba(168,162,153,.22)}
+.abw-tafel th:first-child{text-align:left}
+.abw-tafel td{padding:5px 8px;border-bottom:1px solid rgba(168,162,153,.10)}
+.abw-tafel tr:last-child td{border-bottom:0}
+.abw-wort{text-align:left;color:var(--dp-ink-1,#E8E3D8)}
+.abw-zahl{text-align:right;font-variant-numeric:tabular-nums;color:var(--dp-ink-30,#A8A299)}
+.abw-diff{font-weight:600;white-space:nowrap}
+.abw-pct{display:block;font-size:10.5px;font-weight:400;opacity:.75}
+/* Statusfarben - in jeder Marke dieselben */
+.abw-besser .abw-diff{color:#6FCB91}
+.abw-schlechter .abw-diff{color:#E8A09A}
+.abw-gleich .abw-diff{color:var(--muted,#8A8272)}
+.abw-deckung{margin-top:9px;font:400 11.5px/1.5 Inter,system-ui,sans-serif;color:var(--muted,#8A8272)}
+@media (max-width:620px){
+  .abw-tafel{font-size:11.5px}
+  .abw-tafel th,.abw-tafel td{padding:4px 5px}
+  .abw-pct{display:none}
+}

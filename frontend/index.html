@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v2036">
+<link rel="stylesheet" href="css/style.css?v=v2037">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v1716d">
@@ -1027,6 +1027,9 @@ label.dp-required.qc-required::after {
 <div class="sec sec-hidden" id="s-marktbericht" data-mb-standalone="1"></div>
 
 <!-- ═══════════ TAB 1: OBJEKT ═══════════ -->
+<!-- v2037: Hinweis der Ankauf-Ansicht. Steht VOR dem ersten Reiter,
+     damit er ueber allen liegt - gefuellt von ankauf-ansicht.js. -->
+<div id="ank-ansicht-host"></div>
 <div class="sec active" id="s0">
   <div id="obj-action-bar"></div>
   <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v1867: Eingabetiefe mit Pillen 1/2/3 (dieselbe Wahl wie in der Pre-Flight-Karte), Stand, Haken - und darunter die Abruf-Box --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Eingabetiefe</span><span class="dp-pf-stufen oe-pillen" data-oe-pillen title="Einfach · Mittel · Ausgiebig"></span><span id="oe-ziel-status" class="oe-ziel-status"></span></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-abruf-box" class="oe-abruf-box"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die gewählte Eingabetiefe ist vorgemerkt</span></div><div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div></div>
@@ -1545,6 +1548,11 @@ label.dp-required.qc-required::after {
   </div>
 
     
+  <!-- v2034: Abweichungstafel (abweichung.js). Steht am FUSS des
+       Reiters: oben sind die Grunddaten, die man eintraegt - die
+       Abweichung ist ein Ergebnis. Erscheint nur, wenn ein
+       Ankauf-Stand vorliegt. -->
+  <div id="dp-abweichung" class="abw-tafel-host" style="display:none"></div>
   <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Investition</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s0');return false;">Weiter: Investition<span class="v235-next-btn-arrow">→</span></button></div>
 </div>
 
@@ -3634,7 +3642,9 @@ label.dp-required.qc-required::after {
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
 <script src="js/ankauf.js?v=v2030b"></script>
-<script src="js/doppelkarte.js?v=v2036"></script>
+<script src="js/doppelkarte.js?v=v2037"></script>
+<script src="js/abweichung.js?v=v2034"></script>
+<script src="js/ankauf-ansicht.js?v=v2037"></script>
 <script src="js/deal-action.js?v=v2030a"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>
