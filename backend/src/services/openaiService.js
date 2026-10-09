@@ -437,6 +437,27 @@ function buildPrompt(payload, opts) {
       + '\n  ersetze das Feld nicht stillschweigend.'
       + '\n- Zeigt ein Bild nichts Aussagekraeftiges, sage das statt etwas zu konstruieren.') : '',
     '',
+    /* ══ v2022 · MIETVERTRAEGE JE EINHEIT ════════════════════════
+       Ohne diese Regel waeren die neuen Felder weitere Zahlen. */
+    (ein && Array.isArray(ein.je_einheit) && ein.je_einheit.some(function (e) { return e && e.vertragsart; }))
+      ? ('\n## MIETVERTRAEGE JE EINHEIT'
+        + '\n- "vertragsart" steht je Einheit. Staffelmiete (\u00a7 557a BGB) und Indexmiete'
+        + '\n  (\u00a7 557b BGB) tragen ihre naechste Erhoehung SCHON im Vertrag: das ist ein'
+        + '\n  TERMIN, kein Mieterhoehungspotenzial. Behandle beides nicht gleich - sonst'
+        + '\n  rechnest du dieselbe Steigerung zweimal (einmal als Staffel, einmal als'
+        + '\n  Luft zur Marktmiete).'
+        + '\n- "naechste_anpassung" ist dieser Termin. Nenne ihn, wenn er in den naechsten'
+        + '\n  zwei Jahren liegt.'
+        + '\n- "letzte_erhoehung" sagt, wie lange die Miete schon steht. Je laenger, desto'
+        + '\n  eher ist Spielraum da - aber nur bei UNBEFRISTETEN Vertraegen ohne Staffel.'
+        + '\n- "befristet_bis" ist ein Leerstandsrisiko mit Datum, kein Vorteil.'
+        + '\n- Zeitmiete (\u00a7 575 BGB) braucht einen gesetzlichen Grund; moebliert/Kurzzeit'
+        + '\n  (\u00a7 549 Abs. 2 BGB) hat keinen Kuendigungsschutz; preisgebundene Wohnungen'
+        + '\n  folgen der Kostenmiete, nicht dem Mietspiegel.'
+        + '\n- "rnd_eigen": fuer diese Einheit liegt eine EIGENE Restnutzungsdauer vor'
+        + '\n  ("rnd_jahre"). Sie schlaegt die aus Zustand und Baujahr gerechnete - nimm sie.')
+      : '',
+    '',
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',

@@ -804,7 +804,21 @@ function _buildAIPayload() {
                 miete: zahl(e.ist) || null,
                 art: e.art || null,           /* wohnen | gewerbe */
                 status: e.status || null,     /* vermietet | leer  */
-                lage: e.lage || null
+                lage: e.lage || null,
+                /* v2022 - was eine BEURTEILUNG traegt. Nicht alle 28
+                   Felder der Wohnung: 28 x 20 waeren 560 Werte in einem
+                   Prompt, der ohnehin 23.000 Zeichen hat. Kaution,
+                   Mietername, Keller und Notiz bleiben draussen - der
+                   Mietername hat im Prompt ohnehin nichts verloren. */
+                etage: e.etage || null,
+                zimmer: zahl(e.zimmer) || null,
+                vertragsart: e.mv_art || null,
+                letzte_erhoehung: e.mv_letzte_erhoehung || null,
+                naechste_anpassung: e.mv_naechste_anpassung || null,
+                befristet_bis: e.mv_befristet_bis || null,
+                zustand: e.zustand || null,
+                rnd_eigen: e.rnd_eigen ? true : null,
+                rnd_jahre: e.rnd_eigen ? (zahl(e.rnd_jahre) || null) : null
               };
             }),
             /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
