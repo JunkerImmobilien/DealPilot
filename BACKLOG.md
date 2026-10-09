@@ -893,6 +893,45 @@ gar nicht, was er machen soll."*
 > Kleinstschritten wird hier unübersichtlich — das wird **ein** Paket,
 > mit Prüfstrecke vor der Auslieferung.
 
+**Stand 09.10.2026 — Punkte 1, 2, 4, 6 und 7 stehen** (v2049–v2054,
+Commits `fcc866d8`, `121020e9`, `2fbcc881`, `49ec9858`, `8d9cfb23`,
+`80216985`, `5d32215d`, alles auf Staging gemessen):
+
+| Paket | Was | Nachweis |
+|---|---|---|
+| `v2049` | Freisprechen-Schalter weg (Feld bleibt versteckt, zwei Leser), Fußzeile von drei Knöpfen auf **0 px**, „Fertig" in die Kopfzeile, die **dritte** Frage-Kopie in `#vi-rf-dran` entfernt | Fußzeile `#vi-rf-neben` gemessen 1314×**0** |
+| `v2050` | Reihenfolge: Begrüßung → Antwort → Bestätigung **und** Ansage in **einer** Blase → Frage. Markt­angebot und Vorlaufkarte wandern hinter den Einstieg | vorher 2 Blasen = 224 von 239 px vor der ersten Frage |
+| `v2050a` | Die erste Frage stand **zweimal**, eine davon **vor** der Antwort. `_rfModusSetzen` → `_rfFrageNochmal()` nur noch, wenn schon gefragt wurde (`_rf.gefragt` aus `_rfFrageAnheften`) | Verlauf: 5 Blasen → 4, abwechselnd |
+| `v2051` | Der feste Fragestreifen erscheint nur, **wenn die Frage-Blase nicht im Bild ist** (`IntersectionObserver`, Rückfall = v1619-Verhalten) | löst den Widerspruch v1619 ↔ N60.15, statt eine Seite zu opfern |
+| `v2052` | **„erklär mir das" hing nur am Chip.** Getippt ging der Satz an die freie KI-Frage — bei der *Adressfrage* kam eine **DSCR**-Erklärung. Der Co-Pilot empfiehlt diesen Satz dreimal selbst (Z. 994, 1094, 1100) | Muster gegen 24 Sätze geprüft: 14/14 gefasst, 10/10 durchgelassen |
+| `v2053` | Schalter „Alle Felder" weg — der Weg dahin (Angebot am Etappenende, Chip `tiefe`) bleibt | `vi-rf-alles` 3× → 0×, `_rfTiefeStarten` 3 → 2 Aufrufer |
+| `v2054` | **Die größte Lärmquelle:** „Das nehme ich gleich mit …" meldete auch Unverändertes (Liste wuchs mit jeder Antwort), und die Adressbestätigung kam **wortgleich** wieder, weil `_rfAdresseAntwort` `adresseGeprueft` bei *jeder* Antwort zurücksetzte | Läufer: 3. und 4. Antwort melden nur noch Neues |
+
+**Noch offen:**
+- **Punkt 3 (Tonfrage als eigene Frage)** ist nur halb: sie steht jetzt
+  allein, aber weiter als `.vi-rf-wozu`-Kasten **in** der Begrüßungsblase
+  statt als eigene Frage.
+- **Vorhandene Daten werden erkannt, aber nicht angesagt.** Gemessen am
+  09.10.2026 mit korrekt übergebenem `vorlaufFelder`-**Array** (ein
+  Objekt wäre der falsche Typ — `_rfVorbefuellt` iteriert mit `forEach`):
+  der Lauf zählt **16 statt 17** Fragen und setzt das ✓ an der
+  Wohnfläche, **sagt aber kein Wort** davon. `vorTxt` („Aus *Import*
+  stehen schon *n* Angaben") bleibt leer, also liefert `_rfVorbefuellt`
+  ein leeres Objekt. **Die Ursache ist nicht gemessen** — der Katalog
+  führt die Ids offenbar, sonst gäbe es das ✓ nicht. Genau Marcels
+  *„wenn schon Daten drinne stehen … das ist wichtig."*
+- **Bei jeder Antwort folgen weiter zwei bis drei Co-Blasen**
+  (Übernahme-Meldung, Hinweis zur Eingabetiefe, dann die Frage). Die
+  Regel „eine Nachricht, eine Antwort" gilt am Einstieg, noch nicht im
+  Lauf.
+- **Prüfstrecke unvollständig:** durchgespielt sind *Profi* und *Erste
+  Immobilie* am leeren Objekt und der Wiederkehrer mit Vorbefüllung.
+  **Nicht durchgespielt:** Marktpreisindikation, tiefere Stufe, die
+  Kombinatorik — und die **Messkabine auf Handy und Tablet**, die Marcel
+  ausdrücklich verlangt hat. Der Fragestreifen aus `v2051` ist am
+  Schreibtisch nie nötig (die Blase ist im 575-px-Chat nie ganz aus dem
+  Bild); **sein Nachweis gehört genau dorthin.**
+
 ---
 
 #### N60.16 · Portfolio-Cockpit und Kanban kennen Ankauf/Bestand noch nicht

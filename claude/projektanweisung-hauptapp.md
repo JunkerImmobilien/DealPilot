@@ -35721,3 +35721,78 @@ angestoßen und **über eine Markierung im Fenster abgefragt**, nicht erwartet.
 - Das Register kennt heute vier Ansichten. **Quick-Check und Marktbericht melden
   sich noch nicht an** — sie laufen weiter über `.sec`/`body`-Klassen. Wer dort
   die nächste Vollbild-Ansicht baut, meldet sie am besten mit an.
+
+
+## Rollout-Journal 09.10.2026 (N60.15/1) — v2049–v2054: die geführte Eingabe sagte dasselbe drei- bis viermal
+
+**Was** · Erster Teil des Dialog-Neubaus aus N60.15. Marcel am Bild
+`Dateien/geführteeingabe.png`: *„es ist total überladen … Der Kunde weiß ja gar
+nicht, was er machen soll."* Sieben Pakete, alle auf Staging nachgemessen.
+
+| | Was | Nachweis |
+|---|---|---|
+| `v2049` | Freisprechen-Schalter weg, Fußzeile leer, **dritte** Frage-Kopie entfernt | `#vi-rf-neben` 1314×**0** px |
+| `v2050` | Begrüßung → Antwort → Bestätigung **und** Ansage in **einer** Blase → Frage | vorher 2 Blasen = **224 von 239 px** vor der ersten Frage |
+| `v2050a` | Die erste Frage stand **zweimal**, eine **vor** der Antwort | 5 Blasen → 4, abwechselnd |
+| `v2051` | Fragestreifen nur, wenn die Blase **nicht im Bild** ist | löst v1619 ↔ N60.15 durch Messen statt Entscheiden |
+| `v2052` | „erklär mir das" hing nur am Chip → bei der **Adressfrage** kam eine **DSCR**-Erklärung | Muster gegen 24 Sätze: 14/14 und 10/10 |
+| `v2053` | Schalter „Alle Felder" weg, der Weg dahin bleibt | `vi-rf-alles` 3× → 0× |
+| `v2054` | Übernahme-Meldung und Adressbestätigung wiederholten sich bei **jeder** Antwort | Läufer: ab der 3. Antwort nur noch Neues |
+
+**Commit** · `fcc866d8` · `121020e9` · `2fbcc881` · `49ec9858` · `8d9cfb23` ·
+`80216985` · `5d32215d` (dazu `e57c5cf2` Frontend-Konstanten)
+
+**Nachweis** · Ein Prüfläufer im Browser, der **protokolliert, was er tut** —
+welcher Knopf, welcher Satz, welche Blasen danach neu sind. Durchgespielt:
+*Profi* und *Erste Immobilie* am leeren Objekt, Wiederkehrer mit Vorbefüllung.
+
+#### Drei Befunde, die nicht im Auftrag standen
+
+- **Der Co-Pilot verstand seinen eigenen Vorschlag nicht** (`v2052`). Er
+  empfiehlt „erklär mir das" an **drei** Stellen selbst (Z. 994, 1094, 1100),
+  und `_rfErklaerZeigen()` hing nur am Chip. Getippt fiel der Satz durch bis
+  `_rfIstFrage` und ging ohne Feldbezug an die KI. **Eine Anleitung, die das
+  Programm selbst gibt, ist ein Versprechen** — hier war sie eine Falle, denn
+  wer sie befolgte, bekam eine falsche Auskunft statt gar keiner.
+- **Ein Defekt, älter als dieser Umbau** (`v2050a`). `_rfModusSetzen` ruft
+  `_rfFrageNochmal()`, damit ein Ton-Wechsel sofort wirkt — richtig mitten im
+  Lauf, falsch beim Einstieg, wo es noch keine offene Frage gibt. Vorher
+  standen die beiden Kopien direkt untereinander und sahen aus wie Absicht.
+- **`adresseGeprueft` fiel bei jeder beliebigen Antwort** (`v2054`). Gemeint
+  war „wer die Adresse korrigiert, bestätigt die neue" — nur ist „165
+  Quadratmeter" keine Adresskorrektur, und an **jener** Stelle ist noch nicht
+  bekannt, was der Satz enthielt. Eine Vermutung dort, wo man sie noch nicht
+  prüfen kann, ist teurer als eine Prüfung dort, wo die Antwort schon vorliegt.
+
+#### Zwei Fehler im Werkzeug, nicht im Produkt
+
+- **`String.replace` deutet den ERSATZ.** Ein einzufügendes Muster endete auf
+  `[?.!,]*$'` — und `$'` heißt „alles nach dem Treffer". Die Ersetzung hätte
+  den **gesamten Dateirest** noch einmal eingefügt, und `node --check` hätte
+  nichts gemerkt: der duplizierte Rest ist gültiges JavaScript. Gefangen hat es
+  nur die Ankerzählung des **nächsten** Schritts (plötzlich 2 statt 1). Seitdem
+  ist der Ersatz eine **Funktion** (`() => neu`), und jedes Paket prüft die
+  **Längendifferenz**.
+- **Dreimal ein geratener Sollwert** (`_rfMarktAnbieten` 2 statt 3,
+  `_rfFrageNochmal` 1 statt 3, `adresseGeprueft = 0` 1 statt 2). Jedes Mal war
+  die Erwartung falsch, nicht der Code; beim dritten Mal widersprach der
+  Sollwert sogar einem **anderen Prüfer im selben Skript**. Ein Prüfer, der
+  eine Zahl behauptet, muss sie vorher **zählen** — oder prüfen, **wo** etwas
+  steht statt **wie oft**.
+
+#### Was offen bleibt
+
+- **Vorhandene Daten werden erkannt, aber nicht angesagt.** Mit korrekt
+  übergebenem `vorlaufFelder`-**Array** zählt der Lauf 16 statt 17 Fragen und
+  setzt das ✓ an der Wohnfläche — **sagt aber kein Wort davon**. `vorTxt`
+  bleibt leer, `_rfVorbefuellt` liefert also `{}`. **Die Ursache ist nicht
+  gemessen.** Genau Marcels *„wenn schon Daten drinne stehen … das ist
+  wichtig."*
+- **Im Lauf folgen weiter zwei bis drei Co-Blasen je Antwort.** Die Regel „eine
+  Nachricht, eine Antwort" gilt am Einstieg, noch nicht im Gespräch.
+- **Die Tonfrage steht allein, aber noch nicht als eigene Frage** — sie ist
+  weiter ein `.vi-rf-wozu`-Kasten **in** der Begrüßungsblase.
+- **Messkabine Handy und Tablet steht aus**, und mit ihr der eigentliche
+  Nachweis für `v2051`: am Schreibtisch ist der Fragestreifen nie nötig, weil
+  die Frage-Blase (275 px) im 575-px-Chat nie ganz aus dem Bild kommt.
+- **Nicht durchgespielt:** Marktpreisindikation, tiefere Stufe, Kombinatorik.
