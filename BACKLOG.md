@@ -366,6 +366,52 @@ Daten):** neun Objekte tragen eine fremde Analyse
 (7 × DEMO, 2 × Kabelsketal). Zwei Wege: **neu rechnen** (9 Abrufe) oder
 **entfernen**, damit dort ehrlich „noch keine Analyse" steht.
 
+#### N60.5c · Stand und Gültigkeit — ✅ GEBAUT (`v2017`, `v2018`)
+Marcel: „wichtig, dass wir den Stand mitgeben … bei der Pilotanalyse oben
+ein Feld hin machen, und wenn sich Zahlen geändert haben da drin, sollten
+wir angeben, dass eine Aktualisierung notwendig wäre."
+
+> **`objects.updated_at` wäre der naheliegende Vergleich — und der
+> falsche.** Es ändert sich bei **jedem** Speichern: ein Haken, eine
+> Notiz, ein Foto. Die Analyse hängt aber nur an den Zahlen, über die
+> sie urteilt. **Ein Banner, das nach jedem Klick „veraltet" ruft, wird
+> nach drei Tagen weggesehen.**
+
+Deshalb ein **Fingerabdruck über 20 benannte Felder** (Kaufpreis, Miete,
+Fläche, Baujahr, Objektart, Zimmer, Zins, Tilgung, EK, Grundstück, BRW,
+MEA, Zustand, Energieklasse, Makro-, Mikrolage, Lageklasse, Hausgeld,
+Leerstand, Einheiten). Benannt, nicht nur gehasht — dadurch steht oben,
+**was** sich geändert hat, nicht nur **dass**.
+
+| | Pilot-Analyse (`v2017`) | Portfolio-Pilot (`v2018`) |
+|---|---|---|
+| grün | Zahlen unverändert | Objektzahl unverändert |
+| gold | „seitdem haben sich **Kaufpreis, Nettokaltmiete** geändert" | „18 Objekte — inzwischen sind es **21**" |
+| rot | gehört zu einem anderen Objekt | — |
+| grau | kein Stempel → **nichts behauptet** | — |
+
+> **Der graue Fall ist der wichtige:** eine Analyse ohne Abdruck als
+> „aktuell" auszugeben wäre eine Behauptung ohne Grundlage. Dort steht
+> ausdrücklich, dass es *nicht feststellbar* ist.
+>
+> Beim Portfolio ist **nicht die Zeit** der Maßstab: drei Wochen ohne
+> Zukauf sind belanglos, ein Zukauf von gestern macht jede Aussage über
+> Klumpenrisiken ungültig.
+
+#### N60.5d · Neuberechnung aller Analysen (Marcel freigegeben, 09.10.2026)
+**Läuft.** Jedes Objekt wird über den echten Bedienweg neu gerechnet und
+trägt danach Stempel **und** Fingerabdruck. Gemessen 33–122 s je Objekt.
+
+> **⚠ Eigener Fehler, der Guthaben gekostet hat:** ein Läufer-Start,
+> dessen Antwort in den Zeitüberlauf lief (*„CDP timed out after
+> 45000ms"*), war **trotzdem ausgeführt**. Ich habe ihn als
+> fehlgeschlagen gelesen und über eine zweite Schiene erneut gestartet —
+> **zwei Läufer gleichzeitig**, `2026-1053` doppelt gerechnet.
+> **Der Zeitüberlauf betrifft nur den Antwortkanal, nicht die
+> Ausführung.** Seitdem: genau einmal starten, danach nur abfragen, und
+> vor einem Neustart den echten Zustand in der Datenbank messen statt
+> dem Protokoll zu glauben.
+
 #### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung — ✅ GEBAUT (`v2016`)
 **Die Werkzeuge lieferten es längst, die Regeln verlangten es nicht.**
 `objekt_kennzahlen`, `objekt_schnellblick` und `objekte_rangliste` geben
