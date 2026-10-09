@@ -66,25 +66,15 @@ const werkzeuge = require('./agentWerkzeuge');
    /app/bot-wissen.md. Lokal ist es backend/bot-wissen.md — derselbe
    relative Weg. EIN Ort, keine Kopie: eine handgepflegte Datei zweimal zu
    haben heisst, sie laeuft auseinander. */
-const WISSEN_PFAD = path.join(__dirname, '..', '..', 'bot-wissen.md');
-let _wissen = null;
-function wissen() {
-  if (_wissen !== null) return _wissen;
-  try {
-    const t = fs.readFileSync(WISSEN_PFAD, 'utf8');
-    /* Der Kopf der Datei richtet sich an Marcel, nicht an das Modell —
-       alles bis zum ersten `---` ist Anleitung zum Pflegen. */
-    const i = t.indexOf('\n---\n');
-    _wissen = (i > 0 ? t.slice(i + 5) : t).trim();
-  } catch (e) {
-    /* Fehlt die Datei, laeuft der Agent weiter — aber OHNE Produktwissen,
-       und die Regel unten verbietet ihm dann jede Produktaussage. Lieber
-       ein Agent, der "weiss ich nicht" sagt, als einer, der raet. */
-    _wissen = '';
-    try { console.warn('[agentLauf] Projektwissen nicht lesbar: ' + WISSEN_PFAD); } catch (_) {}
-  }
-  return _wissen;
-}
+/* v2010 - HIER STAND DER LADER. Er ist nach services/projektwissen.js
+   gezogen, weil er jetzt DREI Leser hat: diesen Agenten, die
+   Pilot-Analyse und den Portfolio-Piloten. Gemessen hatte
+   bot-wissen.md bis v2010 genau EINEN - die beiden Piloten im
+   Browser trugen ihr Produktwissen hartkodiert im Prompt.
+   Abgeschrieben wird er nicht: zwei Lader heisst zwei
+   Wissensstaende, von denen keiner falsch aussieht. */
+const projektwissen = require('./projektwissen');
+const wissen = projektwissen.wissen;
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const RUNDEN_MAX = 6;

@@ -15,6 +15,9 @@
  */
 
 const config = require('../config');
+/* v2010 - dasselbe Projektwissen, das der Telegram-Agent liest.
+   Bis v2010 war agentLauf.js sein einziger Leser. */
+const projektwissen = require('./projektwissen');
 const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
@@ -337,6 +340,12 @@ function buildPrompt(payload) {
     eb && eb.ok ? 'Wiederverkauf der wichtigste Einzelfaktor an diesem Objekt.' : '',
     eb && eb.ok && eb.annahmen.restlaufzeit < 30 ? 'ACHTUNG: unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll.' : '',
     eb && eb.ok ? '' : '',
+    /* v2010 - DAS PRODUKTWISSEN. Bis hierher kannte die Pilot-Analyse
+       die Begriffe der App nur aus hartkodierten Absaetzen weiter oben;
+       `bot-wissen.md` las ausschliesslich der Telegram-Agent. Jetzt
+       lesen alle drei dieselbe gepflegte Datei. */
+    projektwissen.block() ? ('\n' + projektwissen.block() + '\n') : '',
+
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',
@@ -2093,7 +2102,12 @@ async function copilotChat(payload, opts) {
     return Object.keys(b).length ? JSON.stringify(b) : '{"nkm":"850"}';
   })();
 
+  /* v2010 - auch der Co-Pilot und der Portfolio-Pilot lesen jetzt das
+     Projektwissen. Er steht als ERSTER Systemblock: ueber alle
+     Anfragen gleich, also die richtige Stelle fuer den Prompt-Cache. */
+  const _pw = projektwissen.block();
   const sys = [
+    _pw ? _pw : '',
     istPortfolio
       ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
       : 'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
