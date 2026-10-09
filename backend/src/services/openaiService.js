@@ -1066,7 +1066,15 @@ async function analyze(payload, opts) {
   if (_fotos.length) {
     const teile = [{ type: 'input_text', text: prompt }].concat(
       _fotos.map(function (f) { return { type: 'input_image', image_url: f }; }));
-    r = await _callOpenAIVision(teile, opts);
+    /* v2013a - GEMESSEN am ersten echten Lauf: die Analyse kam mit nur
+       5 von ~20 Schluesseln zurueck, 2.731 Zeichen, abgeschnitten.
+       Ursache: `_callOpenAIVision` deckelt bei `opts.maxTokens || 700`.
+       Die 700 stammen vom Beleg-Import, fuer den die Funktion gebaut
+       wurde - eine Rechnung braucht keine 8000 Tokens, eine
+       Pilot-Analyse schon. Der Textweg nimmt 8000, also muss der
+       Bildweg dieselben bekommen; sonst ist die Antwort je nach Weg
+       verschieden lang, und das sieht man ihr nicht an. */
+    r = await _callOpenAIVision(teile, Object.assign({}, opts, { maxTokens: 8000 }));
   } else {
     r = await callOpenAI(prompt, opts);
   }
