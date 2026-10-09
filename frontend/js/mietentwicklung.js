@@ -244,9 +244,25 @@ window.MietEntwicklung = (function() {
     var btnD = document.getElementById('me-mode-detail');
     var blkP = document.getElementById('me-block-prog');
     var blkD = document.getElementById('me-block-detail');
+    /* v2024a - der dritte Knopf. Gemessen nach dem Umschalten: der Modus
+       war `einheiten`, der Knopf trug aber weiter nur `me-mode-btn` -
+       _renderUI kannte nur zwei. Ein Umschalter, der nicht zeigt, was
+       gilt, laedt zum zweiten Klick ein. */
+    var btnE = document.getElementById('me-mode-einheiten');
     if (btnP && btnD) {
       btnP.classList.toggle('active', mode === 'prog');
       btnD.classList.toggle('active', mode === 'detail');
+    }
+    if (btnE) {
+      btnE.classList.toggle('active', mode === 'einheiten');
+      /* Ohne Wohnungen mit Haken ist der Modus nicht waehlbar - das sagt
+         der Knopf selbst, statt still auf Prognose zurueckzufallen. */
+      var nutzbar = einheitenNutzbar();
+      btnE.disabled = !nutzbar;
+      btnE.style.opacity = nutzbar ? '' : '.45';
+      btnE.title = nutzbar
+        ? ('Aus den Mietvertraegen der einzelnen Wohnungen (' + einheitenStand().mit + ' mit Staffel)')
+        : 'Keine Wohnung ist fuer die Mietentwicklung angehakt - im MFH-Konfigurator je Wohnung setzen.';
     }
     if (blkP && blkD) {
       blkP.style.display = mode === 'prog' ? '' : 'none';
