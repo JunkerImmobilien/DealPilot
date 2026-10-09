@@ -2084,6 +2084,46 @@ function _resetUiAfterDelete() {
 // ══════════════════════════════════════════════════
 // EXPORT / IMPORT
 // ══════════════════════════════════════════════════
+/* v2045 - EINE Beschaffung fuer beide Sicherungswege.
+
+   Marcel: pass die DealPilot-Sicherung an." Beide Wege - alle und
+   einzeln - holen dasselbe Paket vom Server: Objekte PLUS Lexikon,
+   Score-Stufen, Einheiten-Hinweise, Projektwissen und die eigene
+   Ergaenzung. Die Datei bleibt `.dpkt` und ist damit beides:
+   wiederherstellbar und lesbar.
+
+   `objektId` filtert auf ein Objekt - das Lexikon bleibt dabei
+   vollstaendig. Es kostet 60 KB und macht die Datei erst brauchbar;
+   eine Einzeldatei ohne Lexikon waere wieder nur eine Liste aus
+   Kuerzeln. */
+async function _dpSicherungsPaket(objektId) {
+  var mitFotos = _v893rExpPhotos();
+  var paket = await Auth.apiCall('/objects/portfolio-export' + (mitFotos ? '?fotos=1' : ''));
+  if (!paket || !Array.isArray(paket.objekte)) throw new Error('Der Export kam leer zurueck');
+  if (objektId) {
+    paket.objekte = paket.objekte.filter(function (o) { return o.id === objektId; });
+    paket.anzahl_objekte = paket.objekte.length;
+    paket.auswahl = 'einzelnes Objekt';
+  }
+  return paket;
+}
+
+/* v2045 - die Tabelle faellt zusaetzlich ab, aber NUR
+   unverschluesselt: eine verschluesselte Sicherung neben einer
+   offenen Tabelle waere ein Schloss an einer offenen Tuer. */
+function _dpSicherungCsv(paket) {
+  if (window._exportEncrypt) return;
+  if (!window.DealPilotPortfolioExport) return;
+  try {
+    var csv = DealPilotPortfolioExport._csvAus(paket);
+    var b = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'DealPilot_Portfolio_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.csv';
+    a.click();
+  } catch (e) { console.warn('[v2045] CSV:', e.message); }
+}
+
 function _v893rExpPhotos(){ try { return localStorage.getItem('dp_export_photos') !== '0'; } catch(e){ return true; } } /* v893r-expphotos */
 /* v893t-crypto: AES-GCM Passwort-Verschluesselung (Web-Crypto) */
 async function _dpDeriveKey(password, salt) {
@@ -2110,29 +2150,16 @@ async function exportAllJSON() {
     else alert('Objekt-Sicherung (Import/Export) ist im Pro-Plan enthalten.');
     return;
   }
-  var all = [];
-  if (Auth.isApiMode()) {
-    try {
-      var resp = await Auth.apiCall('/objects?limit=500');
-      // Need full objects, not just summaries
-      for (var i = 0; i < (resp.items || []).length; i++) {
-        var full = await Auth.apiCall('/objects/' + resp.items[i].id);
-        all.push({
-          data: full.data, ai_analysis: full.ai_analysis,
-          photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at
-        });
-      }
-    } catch (err) { toast('⚠ Export-Fehler: ' + err.message); return; }
-  } else {
-    var prefix = Auth.isLoggedIn() ? Auth.getStorageKey('obj_') : 'ji_';
-    var keys = Object.keys(localStorage).filter(function(k) {
-      if (Auth.isLoggedIn()) return k.startsWith(prefix);
-      return k.startsWith('ji_') && !k.startsWith('ji_u_') &&
-             !['ji_ak','ji_ak_oai','ji_provider','ji_sb_collapsed','ji_users','ji_session','ji_token'].includes(k);
-    });
-    all = keys.map(function(k) { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch(e) { return {}; } });
-  }
-  var _out = JSON.stringify(all, null, 2); /* v893t-crypto */
+  /* v2045 - das volle Paket statt einer blossen Objektliste.
+     Der alte Weg holte je Objekt einen Abruf und legte `data`,
+     `ai_analysis` und `photos` nebeneinander - ohne jede Angabe,
+     was die 280 Kuerzel darin bedeuten. */
+  var paket;
+  try { paket = await _dpSicherungsPaket(null); }
+  catch (err) { toast('\u26a0 Export-Fehler: ' + err.message); return; }
+  var all = paket;
+  var _anzahl = paket.objekte.length;
+  var _out = JSON.stringify(all, null, 2); /* v893t-crypto, v2045: `all` ist das Paket */
   if (window._exportEncrypt) {
     var _pw = window.prompt('Passwort für die Verschlüsselung vergeben — unbedingt merken! Ohne Passwort ist das Backup nicht wiederherstellbar.');
     if (!_pw) { toast('Export abgebrochen (kein Passwort)'); return; }
@@ -2143,7 +2170,8 @@ async function exportAllJSON() {
   a.href = URL.createObjectURL(blob);
   a.download = 'DealPilot_Objekte_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.dpkt';  // V251-05
   a.click();
-  toast('✓ ' + all.length + ' Objekte exportiert');
+  toast('✓ ' + _anzahl + ' Objekte gesichert - mit Feld-Lexikon und Wissen');
+  _dpSicherungCsv(paket);
 }
 
 // V63.44: Direkter Alias für die neue Sidebar-Aktion
@@ -2165,31 +2193,23 @@ async function exportSingleObjectJson(objId) {
     return;
   }
   if (!objId) { toast('⚠ Kein Objekt ausgewählt'); return; }
-  var single = null;
-  try {
-    if (Auth.isApiMode()) {
-      var full = await Auth.apiCall('/objects/' + objId);
-      single = {
-        data: full.data, ai_analysis: full.ai_analysis,
-        photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at
-      };
-    } else {
-      var raw = localStorage.getItem(objId);
-      if (raw) single = JSON.parse(raw);
-    }
-  } catch (e) {
-    toast('⚠ Objekt konnte nicht geladen werden: ' + e.message);
-    return;
-  }
-  if (!single) { toast('⚠ Objekt nicht gefunden'); return; }
+  /* v2045 - dasselbe Paket wie bei alle", nur auf ein Objekt
+     gefiltert. Das Lexikon bleibt dabei vollstaendig: eine
+     Einzeldatei ohne Lexikon waere wieder nur eine Liste aus
+     Kuerzeln. */
+  var paket = null;
+  try { paket = await _dpSicherungsPaket(objId); }
+  catch (e) { toast('\u26a0 Objekt konnte nicht geladen werden: ' + e.message); return; }
+  if (!paket.objekte.length) { toast('\u26a0 Objekt nicht gefunden'); return; }
+  var single = paket.objekte[0];
 
   // Dateiname aus Adresse / Kürzel
-  var d = single.data || {};
+  var d = single.daten || single.data || {};   /* v2045: das Paket nennt es `daten` */
   var nameSlug = (d.kuerzel || d.str || single.name || 'objekt')
     .toString()
     .replace(/[^a-zA-Z0-9_-]/g, '_')
     .substring(0, 40);
-  var _out = JSON.stringify([single], null, 2); /* v893t-crypto */
+  var _out = JSON.stringify(paket, null, 2); /* v2045: das ganze Paket, nicht nur das Objekt */
   if (window._exportEncrypt) {
     var _pw = window.prompt('Passwort für die Verschlüsselung vergeben — unbedingt merken! Ohne Passwort ist die Datei nicht wiederherstellbar.');
     if (!_pw) { toast('Export abgebrochen (kein Passwort)'); return; }
@@ -2218,6 +2238,26 @@ function _buildXlsxRowForObject(o) {
   var cfns = d._kpis_cf_ns != null ? d._kpis_cf_ns : '';
   var ds1 = d._dealpilot_score != null ? d._dealpilot_score : '';
   var ds2 = d._ds2_score != null ? d._ds2_score : '';
+  /* v2044 - die Felder aus dieser Woche. Sie standen bisher in der
+     App und in keiner Tabelle - genau der Fall, den N60.13
+     beschreibt: ein Feld ist erst fertig, wenn es auch exportiert
+     werden kann. */
+  var _ank = (d._ankauf && d._ankauf.stichtag) ? d._ankauf.stichtag : '';
+  var _status = (d._deal_won === true || d._deal_won === 'true') ? 'gewonnen'
+    : ((d._deal_lost === true || d._deal_lost === 'true') ? 'verloren' : 'offen');
+  var _me = d.me_modus === 'einheiten' ? 'Aus Wohnungen'
+    : (d.me_modus === 'detail' ? 'Stufenplan' : 'Gleichmaessige Steigerung');
+  /* Einheiten als ZAHLEN, nicht als Liste: verschachtelte Vertraege
+     in einer Zelle sind keine Tabelle. Wer sie einzeln braucht,
+     nimmt den JSON-Export - der traegt `_mfh` vollstaendig. */
+  var _eh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh.einheiten : [];
+  var _ehPlan = _eh.filter(function (e) { return e && e.mv_in_mietentwicklung; }).length;
+  var _ehIndex = _eh.filter(function (e) { return e && e.mv_art === 'index'; }).length;
+  var _analyseStand = '';
+  try {
+    var _a = o.ai_analysis ? JSON.parse(o.ai_analysis) : null;
+    if (_a && _a._fuer && _a._fuer.stand) _analyseStand = String(_a._fuer.stand).slice(0, 10);
+  } catch (e) {}
   return {
     Name: name,
     Kuerzel: d.kuerzel || '',
@@ -2244,6 +2284,16 @@ function _buildXlsxRowForObject(o) {
     Verkehrswert: d.svwert || '',
     Bankbewertung: d.bankval || '',
     Sanierungsbedarf: d.san || '',
+    /* v2044 - ab hier die Felder aus N60.13 */
+    Lageklasse: d.lageklasse || '',
+    Status: _status,
+    Lastenwechsel: d.wirtschaftlicher_uebergang || '',
+    Ankauf_Stand: _ank,
+    Mietentwicklung: _me,
+    Einheiten_erfasst: _eh.length || '',
+    Einheiten_im_Mietplan: _eh.length ? _ehPlan : '',
+    Einheiten_Indexmiete: _eh.length ? _ehIndex : '',
+    Analyse_Stand: _analyseStand,
     Anlage: o.created_at ? o.created_at.slice(0, 10) : ''
   };
 }
@@ -2391,7 +2441,26 @@ async function importJSON(inp) {
         try { var _dec = await _dpDecryptJson(data, _pw); data = JSON.parse(_dec); }
         catch (err) { toast('⚠ Falsches Passwort oder beschädigte Datei'); inp.value = ''; return; }
       }
-      var arr = Array.isArray(data) ? data : [data];
+      /* v2045 - das neue Sicherungsformat erkennen.
+
+         `Array.isArray(data) ? data : [data]` haette das umhuellte
+         Paket als EIN Objekt importiert - DealPilot haette ein
+         Objekt namens lexikon" angelegt.
+
+         Alte Dateien (reines Array) laufen unveraendert durch. Das
+         ist keine Hoeflichkeit, sondern Pflicht: es gibt
+         Sicherungen da draussen. */
+      var arr;
+      if (data && data.dealpilot_export === 'portfolio' && Array.isArray(data.objekte)) {
+        arr = data.objekte.map(function (o) {
+          return { data: o.daten || o.data || {},
+                   ai_analysis: o.analyse ? JSON.stringify(o.analyse) : null,
+                   photos: o.fotos || [],
+                   name: o.name || null };
+        });
+      } else {
+        arr = Array.isArray(data) ? data : [data];
+      }
       if (Auth.isApiMode()) {
         for (var i = 0; i < arr.length; i++) {
           var item = arr[i];
@@ -2695,30 +2764,44 @@ async function showPortfolioDetail() {
   document.body.appendChild(modal);
 }
 
-function exportPortfolioCSV() {
-  if (!window._portfolioCache) return;
-  var c = window._portfolioCache;
-  var rows = [['Objekt','Kaufpreis','Miete_Monat','CF_nSt_Monat','BMR_pct','DSCR','Darlehen_total']];
-  c.objects.forEach(function(o){
-    rows.push([
-      o.name,
-      o.kpis.kp.toFixed(0),
-      o.kpis.nkm_m.toFixed(0),
-      o.kpis.cf_ns_monthly.toFixed(0),
-      o.kpis.bmy.toFixed(2),
-      o.kpis.dscr.toFixed(2),
-      o.kpis.d_total.toFixed(0)
-    ]);
-  });
-  rows.push([]);
-  rows.push(['SUMME', c.totals.invest.toFixed(0), c.totals.miete_m.toFixed(0), c.totals.cf_m.toFixed(0), c.avgBmr.toFixed(2) + ' (Ø)', c.avgDscr.toFixed(2) + ' (Ø)', c.totals.rest_total.toFixed(0)]);
-  var csv = rows.map(function(r){ return r.map(function(x){return '"'+(''+x).replace(/"/g,'""')+'"';}).join(';'); }).join('\n');
-  var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+/* v2046 - EINE Tabelle, nicht zwei.
+
+   Hier standen SIEBEN Spalten aus `window._portfolioCache`: Name,
+   Kaufpreis, Miete, Cashflow, BMR, DSCR, Darlehen. Keine Lageklasse,
+   kein Status, kein Ankauf-Stand, keine Einheiten - und keine
+   Einheitenangabe am Spaltenkopf.
+
+   Statt sie um neun Spalten zu erweitern, baut sie jetzt dieselbe
+   Tabelle wie der Portfolio-Export. Zwei Tabellen ueber dieselbe
+   Sache laufen auseinander - nicht vielleicht, sondern beim naechsten
+   Feld, das nur eine von beiden bekommt. Dann stehen zwei Dateien
+   nebeneinander, beide plausibel, und niemand weiss, welche recht
+   hat.
+
+   Knopf und Dateiname bleiben. */
+async function exportPortfolioCSV() {
+  if (!window.DealPilotPortfolioExport) {
+    if (typeof toast === 'function') toast('\u26a0 Export-Modul nicht geladen');
+    return;
+  }
+  var paket;
+  try {
+    paket = await Auth.apiCall('/objects/portfolio-export');
+  } catch (e) {
+    if (typeof toast === 'function') toast('\u26a0 Export-Fehler: ' + (e.message || e));
+    return;
+  }
+  if (!paket || !Array.isArray(paket.objekte) || !paket.objekte.length) {
+    if (typeof toast === 'function') toast('\u26a0 Keine Objekte zum Exportieren');
+    return;
+  }
+  var csv = DealPilotPortfolioExport._csvAus(paket);
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'Junker_Portfolio_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download = 'Junker_Portfolio_' + new Date().toISOString().slice(0, 10) + '.csv';
   a.click();
-  toast('✓ Portfolio-CSV exportiert');
+  if (typeof toast === 'function') toast('\u2713 ' + paket.objekte.length + ' Objekte als Tabelle exportiert');
 }
 
 // ═══════════════════════════════════════════════════
