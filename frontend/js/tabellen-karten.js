@@ -138,7 +138,13 @@
 
          Keine Spalte faellt weg. Bei 7 Spalten auf 656 px sind das
          94 px je Spalte - genug fuer eine Zahl mit Tausenderpunkt. */
-      '@media(min-width:601px) and (max-width:900px){',
+      /* v2060c - Grenze 900 -> 1200. GEMESSEN bei 1023x757 (iPad quer,
+         kleiner Laptop): dort schoben beide Tabellen weiter, Faktor 1,2 -
+         die Projektionstabelle ist 926 px breit, ihr Kasten nur 820.
+         Ab 1200 px ist der Kasten breiter als die 926 und die Regel wird
+         nicht mehr gebraucht; darunter schon. Die Zahl ist also nicht
+         gegriffen, sondern die Breite der breitesten Tabelle plus Rand. */
+      '@media(min-width:601px) and (max-width:1200px){',
       '  table.dptk{width:100% !important;min-width:0 !important;table-layout:fixed}',
       '  table.dptk th,table.dptk td{white-space:normal;overflow-wrap:anywhere;',
       '    padding-left:5px !important;padding-right:5px !important;font-size:12px}',
