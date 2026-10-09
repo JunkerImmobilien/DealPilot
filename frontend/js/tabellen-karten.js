@@ -184,12 +184,36 @@
     huelle.parentNode.insertBefore(b, huelle);
   }
 
-  /* ── Eine Tabelle übernehmen ─────────────────────────────────────── */
+  /* ── Eine Tabelle übernehmen ───────────────────────────────────────
+     v2060a · EINGABETABELLEN BLEIBEN TABELLEN.
+
+     Gemessen am 09.10.2026: von den fünf Tabellen, die der Formfilter
+     fand, sind ZWEI Eingabemasken — `#oe-gewerke` mit 23 und
+     `.ytf-table` mit 45 Feldern. Die hätte der Kartenmodus zerquetscht.
+
+     Und genau das ist hier schon einmal passiert. In `style.css` steht
+     über `#oe-karte-gewerke`:
+
+       „v1881 · HANDY-DURCHGANG 05.10.2026 … die Regel v1862c macht die
+        TABELLE zum Scrollkasten (display:block) — der Inhalt schrumpfte
+        trotzdem auf 60-px-Auswahlen ('– k', 'Kei', '> 2'), gemessen auf
+        390 px. Scrollkasten ist jetzt die Karte, die Tabelle behält
+        ihre Breite und wischt."
+
+     Dort steht deshalb `min-width:620px !important` an einer ID-ID-Regel
+     — sie hat meine Regel ohnehin geschlagen, der Schaden blieb also
+     aus. Aber der Schalter stand sinnlos darüber.
+
+     > Eine Anzeigetabelle liest man. Eine Eingabetabelle bedient man,
+     > und ein `<select>` mit 110 px Mindestbreite passt in keine
+     > Label-Wert-Zeile. Die Form allein unterscheidet das nicht — die
+     > Felder darin schon. */
   function nimm(t) {
     if (!t || t.tagName !== 'TABLE') return false;
     if (!t.querySelector('thead')) return false;
     var tb = t.querySelector('tbody');
     if (!tb || !tb.querySelector('tr')) return false;
+    if (tb.querySelector('input, select, textarea')) return false;
     var kopfZeilen = t.querySelectorAll('thead tr');
     var spalten = kopfZeilen.length
       ? kopfZeilen[kopfZeilen.length - 1].children.length : 0;
