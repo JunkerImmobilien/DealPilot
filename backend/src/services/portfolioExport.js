@@ -87,6 +87,21 @@ const HINWEISE = [
  * @param {string} userId
  * @param {{ fotos?: boolean }} opt
  */
+/* v2043c - aus der Feld-LISTE ein Nachschlagewerk machen: Schluessel
+   ist die Feld-Id, Wert sind Beschriftung und Art. Die Reihenfolge
+   geht getrennt mit, falls sie jemand braucht. */
+function felderAlsLexikon(liste) {
+  if (!Array.isArray(liste)) return liste || null;
+  const aus = {};
+  liste.forEach(function (f) {
+    if (!f || !f.id) return;
+    const e = {};
+    Object.keys(f).forEach(function (n) { if (n !== 'id') e[n] = f[n]; });
+    aus[f.id] = e;
+  });
+  return aus;
+}
+
 async function bauen(userId, opt) {
   opt = opt || {};
   const mitFotos = !!opt.fotos;
@@ -162,7 +177,18 @@ async function bauen(userId, opt) {
        Mit ihm kann ein Mensch - oder ein fremdes Programm - damit
        rechnen, ohne zu raten. */
     lexikon: {
-      felder: k.felder || null,
+      /* v2043c - als NACHSCHLAGEWERK, nicht als Liste.
+
+         Gemessen:  ist ein ARRAY - im Export kamen die
+         Schluessel 0, 1, 2 an, und  ging ins Leere.
+         Damit war das Lexikon zwar vorhanden, aber nicht benutzbar:
+         wer wissen will, was  bedeutet, schlaegt unter  nach
+         und nicht unter 37.
+
+         Ein Lexikon, das man nicht nachschlagen kann, ist ein
+         Inhaltsverzeichnis. */
+      felder: felderAlsLexikon(k.felder),
+      felder_reihenfolge: Array.isArray(k.felder) ? k.felder.map(function (f) { return f.id; }) : null,
       objektarten: k.objektarten || null,
       etappen: k.etappen || null,
       score_stufen: SCORE_STUFEN,
