@@ -83,15 +83,90 @@
     window.saveObj = huelle;
   })();
 
+  /* ── Felder wirklich sperren ──────────────────────────────────────
+     v2038 - `pointer-events:none` nimmt ein Feld NICHT aus der
+     Tabulatorfolge und macht es nicht schreibgeschuetzt. Gemessen:
+     mit Tab hineingesprungen liess sich `kp` von 780000 auf 999999
+     setzen, waehrend das Speichern gesperrt war.
+
+     Eine Eingabe, die angenommen und still verworfen wird, ist
+     schlimmer als eine, die gar nicht erst moeglich ist. */
+  function felder() {
+    var raus = [];
+    var alle = document.querySelectorAll('.sec input, .sec select, .sec textarea, .sec button');
+    for (var i = 0; i < alle.length; i++) {
+      var f = alle[i];
+      /* Der Hinweis mit der Freigabe ist der einzige Weg zurueck. */
+      if (f.closest && f.closest('#ank-ansicht-host')) continue;
+      raus.push(f);
+    }
+    return raus;
+  }
+
+  function sperren() {
+    var f = felder();
+    for (var i = 0; i < f.length; i++) {
+      var e = f[i];
+      if (e.getAttribute('data-ank-lock')) continue;   /* schon von uns */
+      var tag = e.tagName.toLowerCase();
+      var typ = (e.getAttribute('type') || '').toLowerCase();
+      var schreibbar = (tag === 'textarea')
+        || (tag === 'input' && ['checkbox', 'radio', 'file', 'button', 'submit', 'reset'].indexOf(typ) < 0);
+      if (schreibbar) {
+        /* Schon vorher schreibgeschuetzt? Dann nicht anfassen - sonst
+           gibt das Verlassen etwas frei, das nie frei war. */
+        if (e.readOnly) continue;
+        e.readOnly = true;
+        e.setAttribute('data-ank-lock', 'ro');
+      } else {
+        if (e.disabled) continue;
+        e.disabled = true;
+        e.setAttribute('data-ank-lock', 'dis');
+      }
+      /* aus der Tabulatorfolge - sonst springt man weiter hinein */
+      if (e.getAttribute('tabindex') === null) {
+        e.setAttribute('tabindex', '-1');
+        e.setAttribute('data-ank-tab', '1');
+      }
+    }
+    return f.length;
+  }
+
+  function entsperren() {
+    var alle = document.querySelectorAll('[data-ank-lock]');
+    for (var i = 0; i < alle.length; i++) {
+      var e = alle[i];
+      if (e.getAttribute('data-ank-lock') === 'ro') e.readOnly = false;
+      else e.disabled = false;
+      e.removeAttribute('data-ank-lock');
+      if (e.getAttribute('data-ank-tab')) {
+        e.removeAttribute('tabindex');
+        e.removeAttribute('data-ank-tab');
+      }
+    }
+    return alle.length;
+  }
+
+  /* Reiterwechsel und Nachrendern bringen neue Felder. Solange die
+     Ansicht laeuft, wird nachgesperrt - sonst waere ein Reiter, den
+     man erst spaeter oeffnet, offen. */
+  var _wacht = null;
+  function wachen(an) {
+    if (_wacht) { clearInterval(_wacht); _wacht = null; }
+    if (an) _wacht = setInterval(function () { if (_aktiv && !_frei) sperren(); }, 900);
+  }
+
   /* ── Der Hinweis ueber den Reitern ────────────────────────────── */
   function banner(a) {
-    var felder = a.daten ? Object.keys(a.daten).length : 0;
+    /* v2038 - heisst bewusst NICHT felder: so hiesse die Funktion
+       darueber, und eine lokale Variable haette sie hier verdeckt. */
+    var felderZahl = a.daten ? Object.keys(a.daten).length : 0;
     var korr = (a.korrekturen || []).length;
     return '<div class="ank-ansicht-kopf">'
       + '<div class="ank-ansicht-txt">'
       + '<b>Ankauf abgeschlossen · ' + datum(a.stichtag) + '</b>'
       + '<span>Eingefroren zum Nutzen-/Lastenwechsel. Du siehst den Stand von damals — '
-      + felder + ' Felder'
+      + felderZahl + ' Felder'
       + (a.daten && a.daten._ai ? ', inklusive Pilot-Analyse' : '')
       + (korr ? ' · ' + korr + (korr === 1 ? ' Korrektur' : ' Korrekturen') : '')
       + '. Eingaben sind gesperrt, damit niemand Geschichte überschreibt.</span>'
@@ -110,6 +185,10 @@
     if (cb) cb.addEventListener('change', function () {
       _frei = !!cb.checked;
       document.body.classList.toggle('dp-ankauf-frei', _frei);
+      /* v2038 - die Freigabe muss die Felder WIRKLICH oeffnen, nicht
+         nur die Abblendung nehmen. */
+      if (_frei) { wachen(false); entsperren(); }
+      else { sperren(); wachen(true); }
       if (typeof toast === 'function') {
         toast(_frei
           ? '⚠ Der Ankauf-Stand ist zum Bearbeiten frei. Beim Speichern wird er überschrieben — mit Nachweis.'
@@ -154,6 +233,10 @@
       }
       window._dpAnkauf = merker;
       bannerZeichnen();
+      /* v2038 - und jetzt wirklich sperren, nicht nur abblenden. */
+      var n = sperren();
+      wachen(true);
+      try { console.info('[v2038] Ankauf-Ansicht: ' + n + ' Felder gesperrt'); } catch (e) {}
       return;
     }
 
@@ -176,6 +259,8 @@
        Deshalb: erst laden (die Sperre blockt den Save darin), dann
        loesen. */
     _frei = false;
+    wachen(false);
+    entsperren();
     document.body.classList.remove('dp-ankauf-ansicht', 'dp-ankauf-frei');
     var host = el('ank-ansicht-host');
     if (host) host.innerHTML = '';
@@ -201,6 +286,8 @@
     setzen: setzen,
     aktiv: function () { return _aktiv; },
     frei: function () { return _frei; },
-    bannerZeichnen: bannerZeichnen
+    bannerZeichnen: bannerZeichnen,
+    _sperren: sperren,
+    _entsperren: entsperren
   };
 })();
