@@ -522,7 +522,69 @@ Nötig: OAuth je Anbieter, Ordnerbindung je Objekt, Indexierung
 (Dateiname → Kategorie), Textauszug, und ein Abrufweg für den Co-Piloten.
 **Hier entsteht die erste echte Dokumentenrecherche der App.**
 
-#### N60.8 · Mietverträge — vor Schnittstellen und Exporten
+#### N60.8 + N60.9 + Kombinatorik — ✅ FERTIG (`v2021`, `v2022`, 09.10.2026)
+Marcel: „wenn wir auf die Wohnung klicken, dass da drin dann wieder ein
+Modal aufgeht … auch mit Bildern nochmal zusätzlich. Dann auch die
+N60.8 direkt mit abarbeiten, Mietverträge … und über eine Checkbox die
+RND der Wohnung … und dann auch die Kombinatorik dazu."
+
+**Was es schon gab:** der MFH-Konfigurator führt je Einheit **elf**
+Felder in einer Tabellenzeile. Eine Zeile ist der richtige Ort für den
+*Überblick* und der falsche für zwanzig weitere Felder. Die Tabelle
+bleibt also und bekommt **einen Knopf** je Zeile.
+
+> **Gemessen, bevor gebaut:** die Einheit wird als **ganzes Objekt** in
+> `d._mfh.einheiten` gespeichert (`storage.js:279`). Jedes neue Feld
+> fährt automatisch mit — keine Migration, keine Feldliste.
+
+**Das Fenster — 6 Abschnitte, 28 Felder** (am Objekt `2026-1056`
+abgenommen, 860 px breit):
+
+| Abschnitt | Felder |
+|---|---|
+| Stammdaten | Nr, Lage, Art, Fläche, Zimmer, **Etage**, **Balkon**, **Keller**, **Stellplatz** |
+| Miete | Ist, Soll, Status, **NK-Vorauszahlung**, **Stellplatzmiete** |
+| **Mietvertrag** | **Art, Beginn, letzte Erhöhung, nächste Anpassung, Kaution, befristet bis, Kündigungsverzicht, Mieter, Notiz** |
+| Zustand | Gesamtzustand, Maßnahme, Kosten |
+| **RND** | Haken „eigene Restnutzungsdauer" + Jahre + Begründung |
+| **Bilder** | bis 6 je Wohnung |
+
+**Die Vertragsarten** sind keine erfundene Liste, sondern die
+Vertragsformen des deutschen Mietrechts mit Fundstelle: unbefristet ·
+Staffel (§ 557a) · Index (§ 557b) · Zeitmiete (§ 575) ·
+Kündigungsverzicht · Gewerbe · möbliert/Kurzzeit (§ 549 Abs. 2) ·
+Werkswohnung (§ 576) · preisgebunden · Untermiete.
+
+> **Warum das zählt** — steht als Hinweis im Fenster und als Regel im
+> Prompt: **Staffel und Index tragen ihre nächste Erhöhung schon im
+> Vertrag.** Das ist ein **Termin**, kein Mieterhöhungspotenzial. Wer
+> beides gleich behandelt, **rechnet dieselbe Steigerung zweimal** —
+> einmal als Staffel, einmal als „Luft zur Marktmiete".
+
+**Die Bilder:** gemessen trägt ein Objekt bis **1,8 MB** Fotos. Je
+Wohnung unbegrenzt wäre bei zwanzig Einheiten ein Objekt, das nicht mehr
+speichert. Darum 6 je Wohnung, 1200 px, über den **vorhandenen**
+Verkleinerer. Beim **Duplizieren** einer Zeile wandern Bilder und
+Mietername **nicht** mit: eine Kopie ist eine ähnliche Wohnung, nicht
+dieselbe.
+
+**Die Kombinatorik (`v2022`):** neun der 28 Felder gehen in die
+Pilot-Analyse — nicht alle 28, denn 28 × 20 Einheiten wären 560 Werte in
+einem Prompt, der ohnehin 23.000 Zeichen hat. **Kaution, Keller, Notiz
+und der Mietername bleiben draußen**; der Mietername hat im Prompt
+nichts verloren, und ein Prüfer verbietet ihn jetzt ausdrücklich.
+
+**Abnahme am echten Objekt:** alle elf neuen Felder in der Datenbank
+nachgelesen, Pilot-Analyse (10.259 Zeichen) und Foto **unverändert**.
+
+> **⚠ `v2022a` — `ein` gab es in `buildPrompt` gar nicht.** Ich hatte
+> den Variablennamen **angenommen**; die Einheiten hängen an
+> `o.einheiten`. Der Container warf beim ersten echten Aufruf
+> `ReferenceError: ein is not defined`. **`node --check` sieht das
+> nicht** — es ist gültige Syntax, der Name fällt erst zur Laufzeit auf.
+> Genau dafür ist der Lauf im Container da.
+
+#### N60.8-alt · Mietverträge — vor Schnittstellen und Exporten
 Marcel: „bevor wir Schnittstellen und Exporte machen. Es soll auch eine
 Angabe zu Mietverträgen gemacht werden können, also was für ein
 Mietvertrag, seit wann der besteht und wann die letzte Erhöhung gewesen
