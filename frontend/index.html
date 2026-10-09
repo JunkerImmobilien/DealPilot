@@ -1864,6 +1864,10 @@ label.dp-required.qc-required::after {
           <div class="me-mode-toggle" role="tablist" aria-label="Mietentwicklungs-Modus">
             <button type="button" class="me-mode-btn active" id="me-mode-prog" onclick="setMietModus('prog')">Prognose</button>
             <button type="button" class="me-mode-btn" id="me-mode-detail" onclick="setMietModus('detail')">Detail</button>
+            <!-- v2024: dritter Modus - die Miete wird aus den einzelnen Wohnungen
+                 summiert, jede mit ihrer eigenen Staffel. Nur sinnvoll, wenn im
+                 MFH-Konfigurator Wohnungen mit Haken hinterlegt sind. -->
+            <button type="button" class="me-mode-btn" id="me-mode-einheiten" onclick="setMietModus('einheiten')" title="Aus den Mietvertraegen der einzelnen Wohnungen">Aus Wohnungen</button>
           </div>
         </div>
 
@@ -3526,7 +3530,7 @@ label.dp-required.qc-required::after {
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v1457"></script>
+<script src="js/mietentwicklung.js?v=v2024"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v1898"></script>
 <script src="js/config.js?v=v1740b"></script>
@@ -3608,7 +3612,7 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v2001"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2021"></script>
+<script src="js/mfh-einheiten.js?v=v2023"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->

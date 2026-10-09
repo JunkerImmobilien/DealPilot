@@ -29,15 +29,78 @@ window.MietEntwicklung = (function() {
     return isFinite(n) ? n : (fallback != null ? fallback : 0);
   }
 
+  /* ══ v2024 · DER DRITTE MODUS: AUS DEN WOHNUNGEN ════════════════
+
+     Die beiden bisherigen Modi rechnen auf der GESAMT-Miete. Bei
+     einem MFH mit fuenf Vertraegen, von denen zwei eine Staffel
+     tragen, ist jeder von beiden eine Schaetzung ueber etwas, das
+     in Wirklichkeit feststeht.
+
+     Hier wird die Miete jedes Jahres aus den EINZELNEN Wohnungen
+     summiert. Eine Wohnung ohne hinterlegte Staffel bekommt KEINE
+     erfundene Steigerung - lieber eine Entwicklung, die zu flach
+     ist und das sagt, als eine, die stimmt, weil sie geraten hat. */
+
+  function _einheiten() {
+    var m = window._dpMfh;
+    return (m && Array.isArray(m.einheiten)) ? m.einheiten : [];
+  }
+  /** Gibt es ueberhaupt Wohnungen mit Haken? */
+  function einheitenNutzbar() {
+    return _einheiten().some(function (e) {
+      return e && e.mv_in_mietentwicklung && _zahl(e.ist) > 0;
+    });
+  }
+  function _zahl(v) {
+    var n = parseFloat(String(v == null ? '' : v).replace(',', '.'));
+    return isFinite(n) ? n : 0;
+  }
+  /** Jahre bis zur ersten Erhoehung, aus dem hinterlegten Datum. */
+  function _jahreBis(datum) {
+    if (!datum) return null;
+    var d = new Date(datum);
+    if (isNaN(d)) return null;
+    var j = (d.getTime() - Date.now()) / (365.25 * 86400000);
+    return j < 0 ? 0 : j;
+  }
+  /** Monatsmiete EINER Einheit im Jahr y. */
+  function _mieteEinheit(e, y) {
+    var basis = _zahl(e.ist);
+    if (!basis) return 0;
+    if (!e.mv_in_mietentwicklung) return basis;   /* ohne Haken: unveraendert */
+    var wert = _zahl(e.mv_erhoehung_wert);
+    if (!wert) return basis;
+    var ersteIn = _jahreBis(e.mv_naechste_anpassung);
+    if (ersteIn == null) return basis;            /* ohne Termin keine Treppe */
+    var rhythmus = Math.max(1, Math.round(_zahl(e.mv_rhythmus_jahre)) || 1);
+    var offen = Math.round(_zahl(e.mv_stufen_offen));
+    if (offen <= 0) offen = 1;                    /* mindestens die naechste */
+    /* Wie viele Stufen sind bis Jahr y gelaufen? */
+    var stufen = 0;
+    if (y >= ersteIn) stufen = 1 + Math.floor((y - ersteIn) / rhythmus);
+    if (stufen > offen) stufen = offen;
+    if (stufen <= 0) return basis;
+    if (e.mv_erhoehung_art === 'betrag') return basis + wert * stufen;
+    return basis * Math.pow(1 + wert / 100, stufen);   /* Prozent, zinseszinslich */
+  }
+  /** Summe aller Einheiten im Jahr y. */
+  function _summeEinheiten(y) {
+    return _einheiten().reduce(function (s, e) { return s + _mieteEinheit(e, y); }, 0);
+  }
+
   function getMode() {
+    /* v2024 - drei Modi. `einheiten` faellt auf `prog` zurueck, wenn
+       keine Wohnung mit Haken da ist: ein Modus, der nichts zu rechnen
+       hat, darf nicht einfach 1,0 liefern und so aussehen, als gaebe es
+       keine Steigerung. */
     var el = document.getElementById('me_modus');
-    if (el && el.value) return el.value === 'detail' ? 'detail' : 'prog';
-    var m = localStorage.getItem('dp_miet_modus');
-    return m === 'detail' ? 'detail' : 'prog';
+    var w = el && el.value ? el.value : localStorage.getItem('dp_miet_modus');
+    if (w === 'einheiten') return einheitenNutzbar() ? 'einheiten' : 'prog';
+    return w === 'detail' ? 'detail' : 'prog';
   }
 
   function setMode(m) {
-    if (m !== 'detail' && m !== 'prog') m = 'prog';
+    if (m !== 'detail' && m !== 'prog' && m !== 'einheiten') m = 'prog';   /* v2024 */
     var el = document.getElementById('me_modus');
     if (el) el.value = m;
     localStorage.setItem('dp_miet_modus', m);
@@ -100,6 +163,15 @@ window.MietEntwicklung = (function() {
   function _basisFaktor(y) {
     if (y <= 0) return 1.0;
     var mode = getMode();
+    /* v2024 - aus den Wohnungen. Der Faktor ist Summe(y)/Summe(0),
+       damit er in dieselbe Schnittstelle passt wie die anderen beiden
+       Modi - alles, was factor(y) benutzt, rechnet ohne Aenderung
+       weiter. */
+    if (mode === 'einheiten') {
+      var jetzt = _summeEinheiten(0);
+      if (jetzt <= 0) return 1.0;
+      return _summeEinheiten(y) / jetzt;
+    }
     if (mode === 'prog') {
       var mstg = _v('mietstg') / 100;
       return Math.pow(1 + mstg, y);
@@ -120,6 +192,15 @@ window.MietEntwicklung = (function() {
   /**
    * Liefert eine Tabelle (für UI) und Meta-Infos zur Mietentwicklung.
    */
+  /* v2024 - fuer die Oberflaeche: wie viele Wohnungen zaehlen mit? */
+  function einheitenStand() {
+    var alle = _einheiten().filter(function (e) { return _zahl(e.ist) > 0; });
+    var mit = alle.filter(function (e) { return e.mv_in_mietentwicklung; });
+    var index = mit.filter(function (e) { return e.mv_art === 'index'; });
+    return { gesamt: alle.length, mit: mit.length, index: index.length,
+             miete_heute: _summeEinheiten(0) };
+  }
+
   function snapshot() {
     var mode = getMode();
     var includesZE = appliesToZE();
@@ -302,7 +383,11 @@ window.MietEntwicklung = (function() {
     setAppliesToZE: setAppliesToZE,
     factor: factor,
     snapshot: snapshot,
-    refresh: refresh
+    refresh: refresh,
+    /* v2024 - fuer die Oberflaeche: wie viele Wohnungen zaehlen mit?
+       Ohne diese Zeile waere der dritte Modus gebaut und unerreichbar. */
+    einheitenStand: einheitenStand,
+    einheitenNutzbar: einheitenNutzbar
   };
 })();
 

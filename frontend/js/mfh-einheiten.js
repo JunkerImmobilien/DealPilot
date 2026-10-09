@@ -368,7 +368,10 @@
           f('stellplatz_miete', 'Stellplatzmiete (\u20ac/Monat)', '', 'decimal') +
         '</div>' +
         '<h4>Mietvertrag</h4>' +
-        '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre n\u00e4chste Erh\u00f6hung schon im Vertrag \u2014 sie sind ein <b>Termin</b>, kein Potenzial.</p>' +
+        '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre n\u00e4chste Erh\u00f6hung schon im Vertrag \u2014 sie sind ein <b>Termin</b>, kein Potenzial.<br>' +
+          '<b>K\u00fcndigungsverzicht</b> hei\u00dft: <i>beide</i> Seiten verzichten bis zu diesem Datum auf die ordentliche K\u00fcndigung ' +
+          '(zul\u00e4ssig bis vier Jahre ab Vertragsschluss, bei Staffelmiete \u00a7 557a Abs. 3 BGB). F\u00fcr dich zweischneidig: ' +
+          'Mietsicherheit auf der einen Seite \u2014 keine Eigenbedarfs- oder Verwertungsk\u00fcndigung auf der anderen.</p>' +
         '<div class="mfh-we-raster">' +
           s('mv_art', 'Vertragsart', MIETVERTRAG_ARTEN) +
           d('mv_beginn', 'Mietbeginn') +
@@ -376,23 +379,54 @@
           d('mv_naechste_anpassung', 'N\u00e4chste Anpassung (Staffel/Index)') +
           f('mv_kaution', 'Kaution (\u20ac)', '', 'decimal') +
           d('mv_befristet_bis', 'Befristet bis') +
-          f('mv_kuendigungsverzicht_bis', 'K\u00fcndigungsverzicht bis', 'JJJJ-MM-TT') +
+          d('mv_kuendigungsverzicht_bis', 'K\u00fcndigungsverzicht bis') +
           f('mv_mieter', 'Mieter (Name, optional)', '') +
           f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
+        '</div>' +
+        /* v2023 - DIE ERHOEHUNG WIRD KONKRET.
+           Marcel: „bei all dem, wo wir feststellen koennen, wann wir
+           erhoehen und wie hoch die Erhoehung sein wird, waere es
+           super, wenn wir das mit angeben koennten."
+           Ein Datum ohne Betrag ist ein Termin ohne Inhalt - man kann
+           damit nichts fortschreiben. Die Felder erscheinen NUR bei
+           Staffel und Index: bei einem unbefristeten Vertrag waere
+           „naechste Erhoehung 3 %" eine Behauptung, keine Angabe. */
+        '<div id="mfh-we-erh-box" style="display:none">' +
+          '<h4>Geplante Erh\u00f6hungen</h4>' +
+          '<p class="mfh-we-hint">Nur bei <b>Staffel-</b> und <b>Indexmiete</b>: hier steht die Erh\u00f6hung vorher fest. ' +
+            'Mit diesen Angaben kann DealPilot die Ist-Miete fortschreiben \u2014 und sie in die ' +
+            '<b>Mietentwicklung</b> des Objekts einrechnen.</p>' +
+          '<div class="mfh-we-raster">' +
+            s('mv_erhoehung_art', 'Erh\u00f6hung angeben als', [['', '\u2013'], ['prozent', 'Prozent'], ['betrag', 'Euro je Monat']]) +
+            f('mv_erhoehung_wert', 'N\u00e4chste Erh\u00f6hung (H\u00f6he)', 'z.\u202fB. 3 oder 45', 'decimal') +
+            f('mv_rhythmus_jahre', 'Rhythmus (alle \u2026 Jahre)', 'z.\u202fB. 2', 'decimal') +
+            f('mv_stufen_offen', 'Noch offene Stufen', 'z.\u202fB. 3', 'decimal') +
+          '</div>' +
+          '<label class="mfh-we-haken"><input type="checkbox" data-wkb="mv_in_mietentwicklung"' +
+            (e.mv_in_mietentwicklung ? ' checked' : '') + '>' +
+            '<span>Diese Staffel in die <b>Mietentwicklung</b> des Objekts einrechnen</span></label>' +
         '</div>' +
         '<h4>Zustand</h4><div class="mfh-we-raster">' +
           s('zustand', 'Gesamtzustand', ZUSTAND) +
           f('massnahme', 'Geplante Ma\u00dfnahme', 'z.\u202fB. Bad neu') +
           f('kosten', 'Kosten (\u20ac)', '', 'decimal') +
         '</div>' +
-        '<h4>Restnutzungsdauer</h4>' +
-        '<label class="mfh-we-haken"><input type="checkbox" id="mfh-we-rnd"' + (e.rnd_eigen ? ' checked' : '') + '>' +
-          '<span>Eigene Restnutzungsdauer f\u00fcr diese Wohnung angeben</span></label>' +
-        '<div class="mfh-we-raster" id="mfh-we-rnd-box" style="' + (e.rnd_eigen ? '' : 'display:none') + '">' +
-          f('rnd_jahre', 'Restnutzungsdauer (Jahre)', '', 'decimal') +
-          f('rnd_grund', 'Begr\u00fcndung', 'woher die Zahl stammt', 'text', true) +
-        '</div>' +
-        '<p class="mfh-we-hint">Ohne Haken rechnet DealPilot die Restnutzungsdauer aus Zustand und Baujahr (Anlage 2 ImmoWertV) \u2014 wie bisher.</p>' +
+        /* v2023 - HIER STAND EIN FELD FUER EINE EIGENE RESTNUTZUNGSDAUER.
+
+           Marcel: „nimm mal bitte die Restnutzungsdauer bei den
+           Einheiten raus. Wir haben ja dann noch Zustand je Einheit.
+           Das wird passend uebertragen … also das ist alles valide."
+
+           Er hat recht. Schritt 3 des Konfigurators erfasst den Zustand
+           je Einheit nach Anlage 2 ImmoWertV, Schritt 4 rechnet daraus
+           Punkte und Restnutzungsdauer - je Einheit UND
+           flaechengewichtet aufs Gebaeude. Ein zweites Feld waere eine
+           ZWEITE Zahl zur selben Groesse.
+
+           Ich habe es gebaut, weil es gewuenscht war, ohne zu messen,
+           dass der Weg dafuer schon existiert. Das Feld war nicht
+           falsch - es war ueberfluessig, und bei einer Bewertung ist
+           das dasselbe. */
         '<h4>Bilder</h4>' +
         '<p class="mfh-we-hint">H\u00f6chstens ' + WOHNUNG_FOTOS_MAX + ' Bilder je Wohnung, automatisch verkleinert.</p>' +
         '<div id="mfh-we-bilder" class="mfh-we-bilder"></div>' +
@@ -412,11 +446,22 @@
       inp.addEventListener("input", function () { e[k] = inp.value; });
       inp.addEventListener("change", function () { e[k] = inp.value; });
     });
-    var hk = el("mfh-we-rnd");
-    hk.addEventListener("change", function () {
-      e.rnd_eigen = hk.checked;
-      var box = el("mfh-we-rnd-box"); if (box) box.style.display = hk.checked ? "" : "none";
+    /* v2023 - Haken schreiben true/false, nicht .value ("on"). */
+    ov.querySelectorAll("[data-wkb]").forEach(function (box) {
+      var k = box.getAttribute("data-wkb");
+      box.addEventListener("change", function () { e[k] = box.checked; });
     });
+    /* v2023 - der RND-Haken ist entfallen; dafuer schaltet die
+       Vertragsart die Erhoehungsfelder. */
+    var vArt = ov.querySelector('[data-wk="mv_art"]');
+    function erhoehungZeigen() {
+      var box = el('mfh-we-erh-box'); if (!box) return;
+      var a = vArt ? vArt.value : '';
+      var planbar = (a === 'staffel' || a === 'index');
+      box.style.display = planbar ? '' : 'none';
+    }
+    if (vArt) vArt.addEventListener("change", erhoehungZeigen);
+    erhoehungZeigen();
     bilderZeichnen(e);
     el("mfh-we-bild-neu").onclick = function () { el("mfh-we-datei").click(); };
     el("mfh-we-datei").onchange = function (ev) { bilderAufnehmen(e, ev.target.files); };
