@@ -4501,7 +4501,31 @@
          und Aufnahme. Ein Chat hat immer nur EINE Spalte: der Verlauf
          scrollt, die Eingabe steht unten fest. Genau das wird hier
          gebaut - ohne neue Maschinerie, nur mit Stil. */
-      '@media(max-width:600px){',
+      /* ═══ v2056 · NICHT NUR SCHMAL, AUCH FLACH ════════════════════════
+
+         GEMESSEN in der Messkabine bei 767x497 und 667x375 (Handy im
+         Querformat, kleines Tablet): die gefuehrte Eingabe war dort
+         KOMPLETT unbedienbar - 0 von 3 Chips erreichbar, Eingabefeld und
+         Uebernehmen ebenfalls nicht.
+
+         Die Ursache ist die Falle aus CLAUDE.md, wortwoertlich: ein
+         Flex-Kind in einem overflow-Container schrumpft, statt zu
+         scrollen. Die Buehne (.vi-rf-buehne) fiel auf HOEHE 0, waehrend ihr Grid
+         (grid-template-rows: 220px 180px) mit overflow:visible darueber
+         hinausquoll - die Merkliste lag damit auf der Eingabezeile.
+
+         Das Handy-Layout haette genau das verhindert (dort ist die Buehne
+         eine Flex-Spalte, kein Grid). Es hing nur an der BREITE - und ein
+         Handy im Querformat ist 667 bis 932 px breit.
+
+         Die zweite Bedingung (max-height:560px) fasst alle flachen Faelle:
+           667x375, 844x390, 932x430  Handys quer
+           767x497                    kleines Tablet
+           ein klein gezogenes Fenster am Schreibtisch
+
+         Ein Schwellenwert auf EINER Achse beschreibt kein Geraet - er
+         beschreibt eine Haltung des Geraets. */
+      '@media(max-width:600px),(max-height:560px){',
       /* 1 · Der Verlauf scrollt, statt zu quellen. min-height:0 ist
              Pflicht: ohne sie ignoriert ein Flex-Kind das overflow. */
       '  .oabi-ov.vi-mode .oabi-body{overflow-y:auto;-webkit-overflow-scrolling:touch}',
