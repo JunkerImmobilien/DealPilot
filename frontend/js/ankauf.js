@@ -231,9 +231,12 @@
     var vorschlag = stichtagVorschlag();
     if (vorhanden()) {
       var a = stand();
+      var auto = !!window._dpAnkaufAuto;
       return '<div class="ank-zeile ank-fest">'
-        + '<div class="ank-txt"><b>Ankauf-Stand festgeschrieben</b> zum '
+        + '<div class="ank-txt"><b>Ankauf-Stand '
+        + (auto ? 'automatisch festgeschrieben' : 'festgeschrieben') + '</b> zum '
         + _datum(a.stichtag) + '.'
+        + (auto ? ' Beim Setzen auf <i>gewonnen</i>.' : '')
         + (a.korrekturen && a.korrekturen.length
             ? ' <span class="ank-korr">' + a.korrekturen.length
               + (a.korrekturen.length === 1 ? ' Korrektur' : ' Korrekturen') + '</span>'
@@ -241,6 +244,7 @@
         + '</div>'
         + '<div class="ank-aktionen">'
         + '<button type="button" class="ank-btn-leise" onclick="DealPilotAnkauf.neuNehmen()">Stand neu nehmen</button>'
+        + (auto ? '<button type="button" class="ank-btn-leise" onclick="DealPilotAnkauf.zuruecknehmen()">r\u00fcckg\u00e4ngig</button>' : '')
         + '</div></div>';
     }
     if (!vorschlag) {
@@ -268,9 +272,53 @@
 
   var _spaeterGeklickt = false;
 
+  /* v2041 - von selbst einfrieren. Marcel: „ein gewonnenes Objekt ist
+     ja sowieso dann im Bestand ... wir sollten zusehen, dass wir es
+     dann automatisch einfrieren."
+
+     Am 09.10. hatte er entschieden: nie stillschweigend einfrieren.
+     Das ist kein Widerspruch - der Punkt war nicht der KLICK, sondern
+     dass nichts UNBEMERKT passiert. Automatisch heisst nicht heimlich:
+     es sagt, was es getan hat, mit Datum, und laesst sich in derselben
+     Zeile zuruecknehmen.
+
+     Ohne Stichtag passiert NICHTS. Ein eingefrorener Stand mit
+     falschem Datum sieht richtig aus und ist es nicht. */
+  var _autoLaeuft = false;
+  function vonSelbst() {
+    if (_autoLaeuft || vorhanden()) return false;
+    var t = stichtagVorschlag();
+    if (!t) return false;
+    _autoLaeuft = true;
+    try {
+      festschreiben(t);
+      window._dpAnkaufAuto = true;
+      if (typeof saveObj === 'function') saveObj(true);
+      if (typeof toast === 'function')
+        toast('\u2713 Ankauf-Stand automatisch festgeschrieben zum ' + _datum(t));
+      if (typeof renderSaved === 'function') { try { renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {} }
+      return true;
+    } catch (e) {
+      console.warn('[v2041] automatisch einfrieren:', e.message);
+      return false;
+    } finally { setTimeout(function () { _autoLaeuft = false; }, 1200); }
+  }
+
+  function zuruecknehmen() {
+    if (!confirm('Den automatisch festgeschriebenen Ankauf-Stand wieder entfernen?')) return;
+    verwerfen();
+    window._dpAnkaufAuto = false;
+    if (typeof saveObj === 'function') saveObj(true);
+    frageZeigen('won');
+    if (typeof toast === 'function') toast('\u2713 Ankauf-Stand entfernt.');
+    if (typeof renderSaved === 'function') { try { renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {} }
+  }
+
   function frageZeigen(status) {
     var host = document.getElementById('da-ankauf-frage');
     if (!host) return;
+    /* v2041 - bei „gewonnen" zuerst versuchen, von selbst einzufrieren. */
+    if (status === 'won') vonSelbst();
     /* Nur bei „gewonnen" - und wenn ein Stand da ist, auch bei den
        anderen, damit man ihn ueberhaupt wiederfindet. */
     if (status !== 'won' && !vorhanden()) { host.innerHTML = ''; return; }
@@ -342,6 +390,8 @@
     verwerfen: verwerfen,
     abweichung: abweichung,
     frageZeigen: frageZeigen,
+    vonSelbst: vonSelbst,
+    zuruecknehmen: zuruecknehmen,
     jetzt: jetzt,
     spaeter: spaeter,
     neuNehmen: neuNehmen,

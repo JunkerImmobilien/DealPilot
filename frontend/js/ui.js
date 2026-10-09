@@ -911,6 +911,27 @@ function _buildAIPayload() {
       }
       return aus;
     })(),
+    /* v2041 - der ANKAUF-STAND und die Abweichung. Marcel: „wenn wir
+       der Pilotanalyse eine Frage stellen wie: sind wir aktuell nach
+       Plan? Kannst du mir einen Soll-Ist-Vergleich machen."
+
+       Gerechnet wird hier nichts: `abweichung()` liefert die Zeilen
+       fertig, aus zwei Saetzen persistierter `_kpis_*` - jede von den
+       echten Kernen zu ihrer Zeit. Das Modell soll vergleichen, nicht
+       nachrechnen; sonst rechnete es alte Daten mit heutigen Regeln. */
+    ankauf: (function () {
+      var AK = window.DealPilotAnkauf;
+      if (!AK || !AK.vorhanden()) return null;
+      var st = AK.stand(), ab = null;
+      try { ab = AK.abweichung(); } catch (e) {}
+      return {
+        stichtag: st.stichtag,
+        festgeschrieben_am: st.am,
+        korrekturen: (st.korrekturen || []).length,
+        kennzahlen_damals: st.kurz,
+        abweichung: ab ? ab.zeilen : null
+      };
+    })(),
     wohnung: {
       zimmer: parseDe(g('zimmer')), baeder: parseDe(g('bad_anz')),
       etage: txt('etage'), etagen_gesamt: parseDe(g('etagen_ges')),

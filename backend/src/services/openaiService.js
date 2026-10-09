@@ -35,6 +35,46 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
  *
  * Web-Search bleibt aktiv für Lage-/Mietspiegel-Recherche.
  */
+/* v2041 - der Ankauf-Block fuer den Prompt.
+
+   Marcel: „sind wir aktuell nach Plan? Kannst du mir einen Soll-Ist-
+   Vergleich machen?" - in der App und ueber den Telegram-Bot; beide
+   laufen hier durch.
+
+   Die Tabelle geht FERTIG hinein. Das Modell soll vergleichen, nicht
+   nachrechnen: die beiden Saetze wurden jeweils zu ihrer Zeit
+   gerechnet. Eine Neuberechnung mit heutigen Regeln wuerde nicht das
+   Objekt messen, sondern unsere Regelaenderung. */
+function _ankaufBlock(ak) {
+  var z = [];
+  z.push('');
+  z.push('## ANKAUF-STAND (eingefroren) UND ABWEICHUNG');
+  z.push('Dieses Objekt ist gekauft. Der Stand beim Nutzen-/Lastenwechsel am '
+    + ak.stichtag + ' wurde eingefroren.');
+  if (ak.korrekturen) {
+    z.push('Davon ' + ak.korrekturen + ' spaetere Korrektur(en) - der Massstab wurde angepasst.');
+  }
+  if (Array.isArray(ak.abweichung) && ak.abweichung.length) {
+    z.push('');
+    z.push('Kennzahl | Ankauf | Bestand heute | Differenz | Richtung');
+    for (var i = 0; i < ak.abweichung.length; i++) {
+      var r = ak.abweichung[i];
+      var d = Math.round(r.diff * 100) / 100;
+      z.push(r.wort + ' | ' + r.ankauf + ' | ' + r.bestand + ' | '
+        + (d > 0 ? '+' : '') + d + ' | ' + r.richtung);
+    }
+  } else {
+    z.push('Keine Kennzahl ist zu beiden Zeitpunkten vergleichbar - sage das, statt zu schaetzen.');
+  }
+  z.push('');
+  z.push('ANKAUF ist der Soll-Stand (wie gekauft), BESTAND der Ist-Stand (heute).');
+  z.push('NICHT zu verwechseln mit Soll-Miete und Ist-Miete: die beschreiben EINE');
+  z.push('Miete (was hereinkaeme gegen was gezahlt wird), nicht zwei Zeitpunkte.');
+  z.push('Wird nach einem Soll-Ist-Vergleich gefragt oder danach, ob es nach Plan');
+  z.push('laeuft, antworte AUS DIESER TABELLE und rechne sie nicht nach.');
+  return z.join('\n');
+}
+
 function buildPrompt(payload, opts) {
   const o = payload.objekt || {};
   const k = payload.kennzahlen || {};
@@ -50,6 +90,8 @@ function buildPrompt(payload, opts) {
   const _st = payload.steuer || null;
   const _bw = payload.bewirtschaftung || null;
   const _me = payload.mietentwicklung || null;
+  /* v2041 - der eingefrorene Ankauf-Stand samt fertiger Abweichung. */
+  const _ak = payload.ankauf || null;
   const _wo = payload.wohnung || null;
   const _bo = payload.boden || null;
   const _ha = payload.halter || null;
@@ -414,6 +456,10 @@ function buildPrompt(payload, opts) {
               + '\ndiesen Teil ausdruecklich eine Annahme, kein vereinbartes Ergebnis.')
             : ''))
       : '',
+    /* v2041 - ANKAUF gegen BESTAND. Gebaut von `_ankaufBlock()` weiter
+       unten; hier steht nur der Aufruf, damit die Verkettung lesbar
+       bleibt. */
+    _ak ? _ankaufBlock(_ak) : '',
     _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
       ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
       ['Etage', _wo.etage], ['Etagen gesamt', _wo.etagen_gesamt],
