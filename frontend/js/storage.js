@@ -1542,6 +1542,23 @@ async function renderSaved(opts) {
         '<div class="sbc-top-body">' +
           '<div class="sbc-top-line1">' +
             seqHtml +
+            /* v2032 - der Dreh-Knopf der Doppelkarte, IM FLUSS statt
+               obendrauf. Absolut gesetzt hatte er in fuenf Kartenstilen
+               keinen Platz, der in allen frei ist: gemessen lag er auf
+               dem Desktop ueber einer `.sbcm`-Kachel und war auf dem
+               Handy gar nicht zu sehen.
+
+               Nur wo ein Ankauf-Stand vorliegt - sonst gibt es nichts
+               zu drehen, und ein Knopf ohne Wirkung ist ein Versprechen. */
+            (opts.ankaufKurz
+              ? '<button type="button" class="dk-knopf" data-dk-key="' + _esc(opts.key) + '"'
+                + ' title="' + (opts.ankaufBand ? 'Zur\u00fcck auf den laufenden Stand' : 'Den Stand beim Ankauf zeigen') + '">'
+                + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+                + ' stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
+                + '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'
+                + '<span>' + (opts.ankaufBand ? 'Bestand' : 'Ankauf') + '</span>'
+                + '</button>'
+              : '') +
             aiHtml +
             ds2HintBadge +
             (opts.date ? '<span class="sbc-date">' + _esc(opts.date) + '</span>' : '') +

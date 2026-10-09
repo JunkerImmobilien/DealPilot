@@ -39896,18 +39896,23 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 /* Der Dreh-Knopf. NICHT in .sbc-actions: die haengt am Hover
    (style.css:4982), und auf dem Handy gibt es keinen Hover - ein Knopf,
    den man dort nicht sieht, ist nicht vorhanden. */
+/* v2032 - IM FLUSS, nicht absolut. Gemessen lag der absolute Knopf auf
+   dem Desktop ueber einer .sbcm-Kennzahlkachel und war auf dem Handy
+   gar nicht zu sehen: in fuenf Kartenstilen ist keine Ecke in allen
+   frei. In .sbc-top-line1 ordnet ihn jeder Stil selbst ein. */
 .dk-knopf{
-  position:absolute;left:8px;bottom:8px;z-index:4;
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 8px 3px 6px;border-radius:7px;cursor:pointer;
-  font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;
+  display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;
+  margin-left:6px;vertical-align:middle;
+  padding:2px 7px 2px 5px;border-radius:6px;cursor:pointer;
+  font:600 9px/1.4 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.05em;
   background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);
   color:var(--wl-e8cc7a, #E8CC7A);
   opacity:.82;transition:opacity .15s ease,background .15s ease;
 }
 .dk-knopf:hover{opacity:1;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}
 .dk-knopf svg{flex:0 0 auto}
-.sb-card.dk-dreht .dk-knopf{opacity:0}
+/* v2032 - die fruehere Regel .sb-card.dk-dreht .dk-knopf{opacity:0}
+   ist entfallen: der Knopf gehoert jetzt zum Inhalt und dreht mit. */
 
 /* Das Goldband der Rueckseite. Ohne es saehe der Ankauf aus wie der
    laufende Stand mit anderen Zahlen. */

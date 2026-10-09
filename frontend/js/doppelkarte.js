@@ -184,32 +184,33 @@
   /* ── Der Knopf ────────────────────────────────────────────────────
      Eigenes Kind der Karte, dauerhaft sichtbar. Nicht in
      `.sbc-actions` - die haengt am Hover und ist auf dem Handy nie da. */
-  function knopfSetzen(karte) {
-    var key = karte.getAttribute('data-key');
-    var alt = karte.querySelector('.dk-knopf');
-    if (!ankaufVon(key)) { if (alt) alt.remove(); return; }
-    var zeigtAnkauf = !!gedreht[key];
-    if (!alt) {
-      alt = document.createElement('button');
-      alt.type = 'button';
-      alt.className = 'dk-knopf';
-      alt.addEventListener('click', function (ev) {
-        ev.stopPropagation();   /* nicht das Objekt oeffnen */
-        ev.preventDefault();
-        drehen(karte, !gedreht[key]);
-      });
-      karte.appendChild(alt);
-    }
-    alt.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-      + ' stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'
-      + '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'
-      + '<span>' + (zeigtAnkauf ? 'Bestand' : 'Ankauf') + '</span>';
-    alt.title = zeigtAnkauf
-      ? 'Zurueck auf den laufenden Stand'
-      : 'Den Stand beim Ankauf zeigen';
-    alt.setAttribute('aria-label', alt.title);
-  }
+  /* v2032 - knopfSetzen baut nichts mehr. Der Knopf kommt aus
+     `_renderRichCard` (im Fluss, nicht obendrauf); hier wird nur noch
+     der Klick abgefangen - per DELEGATION am Listencontainer, damit er
+     jeden Neuaufbau ueberlebt. Ein Griff auf einzelne Knoepfe waere
+     nach dem naechsten renderSaved() ins Leere gegangen. */
+  function knopfSetzen() { /* absichtlich leer, siehe oben */ }
 
+  (function klickFangen() {
+    function binden() {
+      var liste = el('sb-list');
+      if (!liste || liste._dkKlick) return;
+      liste._dkKlick = true;
+      liste.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('.dk-knopf') : null;
+        if (!b) return;
+        ev.stopPropagation();
+        ev.preventDefault();
+        var karte = b.closest('.sb-card');
+        var key = b.getAttribute('data-dk-key') || (karte && karte.getAttribute('data-key'));
+        if (karte && key) drehen(karte, !gedreht[key]);
+      }, true);
+    }
+    binden();
+    document.addEventListener('DOMContentLoaded', binden);
+    setTimeout(binden, 900);
+    setTimeout(binden, 2600);
+  })();
   /* ── Nach jedem Render neu greifen ────────────────────────────────
      `renderSaved()` ersetzt `#sb-list`.innerHTML komplett. Jeder Griff
      auf die alten Elemente ist danach ins Leere - deshalb wird nach
