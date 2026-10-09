@@ -10494,10 +10494,34 @@
           if (_m) v = _m[0];
         }
       } catch (e2) {}
+      /* ═══ v2054 · WAS SCHON SO DASTAND, IST KEINE NACHRICHT ════════
+
+         GEMESSEN im Pruefläufer: nach jeder Antwort meldete der
+         Co-Pilot „Das nehme ich gleich mit: Zinssatz = 3.5 · Tilgung =
+         1.5 · Notarkosten % = 2.2 ..." - dieselben Einstellungswerte,
+         die schon beim ersten Mal uebernommen worden waren. Die Liste
+         wuchs mit jeder Antwort, statt zu schrumpfen.
+
+         „Das nehme ich mit" ist eine Nachricht ueber eine AENDERUNG.
+         Wo sich nichts aendert, ist sie keine Nachricht, sondern Laerm.
+
+         `namen` bleibt unberuehrt: die GESTELLTE Frage gilt als
+         beantwortet, auch wenn der Wert derselbe war. */
+      var _alt = _rf.data.fields[id];
+      var _gleich = (_alt != null && _alt !== '' &&
+                     String(_alt).trim() === String(v).trim());
       _rf.data.fields[id] = v;
+      /* v2054 - die Adresse gilt wieder als unbestaetigt, wenn sie sich
+         WIRKLICH geaendert hat. `_rfAdresseAntwort` setzte den Merker
+         frueher bei jeder beliebigen Antwort zurueck - deshalb kam die
+         Bestaetigung nach „165 Quadratmeter" wortgleich noch einmal.
+         Hier liegt die Antwort schon vor, dort war es eine Vermutung. */
+      if (!_gleich && (id === 'str' || id === 'hnr' || id === 'plz' || id === 'ort')) {
+        _rf.adresseGeprueft = 0;
+      }
       var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
       var name = (kat ? kat.label : id) + ' = ' + v;
-      if (gefragt) namen.push(name); else extra.push(name);
+      if (gefragt) namen.push(name); else if (!_gleich) extra.push(name);
     });
     /* ═══ v1377b (C5) · Aus dem Einkommen wird der Steuersatz ══════════
        Wer sein zu versteuerndes Einkommen nennt, hat den Grenzsteuersatz
@@ -10748,8 +10772,19 @@
       return true;
     }
     /* Alles andere ist eine Korrektur — sie geht durch die normale
-       Auswertung und ueberschreibt, was dort steht. */
-    _rf.adresseFrage = 0; _rf.adresseGeprueft = 0;
+       Auswertung und ueberschreibt, was dort steht.
+
+       ═══ v2054 · NUR `adresseFrage` FAELLT HIER ═══════════════════
+       Hier stand auch `_rf.adresseGeprueft = 0`. Gemeint war: wer die
+       Adresse korrigiert, soll die neue bestaetigen. Richtig gedacht -
+       nur ist „165 Quadratmeter“ keine Adresskorrektur, und an DIESER
+       Stelle ist noch nicht bekannt, was der Satz wirklich enthielt.
+
+       GEMESSEN: die Bestaetigung kam danach wortgleich noch einmal.
+
+       Der Merker faellt jetzt in der Uebernahme-Schleife, und nur
+       wenn eines der vier Adressfelder einen ANDEREN Wert bekommt. */
+    _rf.adresseFrage = 0;
     _rfAktionWeg('adresse');
     return false;
   }
