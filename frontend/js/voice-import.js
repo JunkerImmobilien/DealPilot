@@ -8181,7 +8181,16 @@
   function _rfFrageAnheften(e) {
     var host = $('vi-rf-frage');
     if (!host) return;
+    /* v2050a - `_rfFrageAnheften(null)` raeumt nur ab. Der Merker
+       unten darf hier nicht gesetzt werden: abgeraeumt ist nicht
+       dasselbe wie gefragt. */
     if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    /* ═══ v2050a · AB HIER WURDE GEFRAGT ════════════════════════════
+       Der Merker sitzt hier, weil das die GEMEINSAME Stelle beider
+       Frage-Blasen ist - `_rfFrage` und `_rfFrageNochmal` rufen beide
+       direkt davor. An einer der beiden haette er die andere
+       verfehlt. Gelesen wird er in `_rfModusSetzen`. */
+    if (_rf) _rf.gefragt = 1;
     host.innerHTML =
       /* v2049 - nur der Fragetext. `_rfAntwortHilfe(e)` stand hier UND
          in der Blase (Z. 9176, dort zusammen mit `_rfPillen` und
@@ -10877,8 +10886,24 @@
     _rfTonKnopf();
     _rfDranZeichnen();
     /* Die offene Frage kommt mit dem neuen Ton wieder - sonst wirkt der
-       Wechsel erst bei der naechsten Frage, und das sieht nach nichts aus. */
-    if (_rf && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
+       Wechsel erst bei der naechsten Frage, und das sieht nach nichts aus.
+
+       ═══ v2050a · NUR, WENN SCHON GEFRAGT WURDE ═══════════════════
+       GEMESSEN am Verlauf: beim Einstieg stand die erste Frage
+       zweimal da, und die erste Kopie kam VOR der Antwort des
+       Nutzers - `_rfErfahrungGewaehlt` ruft `_rfModusSetzen`, und das
+       stellte hier eine Frage, die noch gar nicht an der Reihe war.
+       Danach stellte der regulaere Ablauf sie noch einmal.
+
+       `abschlussOffen`/`nachfassOffen` fassen den Fall nicht: am
+       Anfang ist beides falsch und `_rf.i` ist 0, genau wie bei der
+       ersten Frage. Aus dem Zustand allein ist nicht ablesbar, ob
+       schon gefragt WURDE - deshalb der Merker aus
+       `_rfFrageAnheften`.
+
+       Der Satz oben bleibt richtig: wer MITTEN im Lauf den Ton
+       wechselt, bekommt seine offene Frage weiter neu. */
+    if (_rf && _rf.gefragt && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
 
   }
 
