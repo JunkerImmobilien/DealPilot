@@ -166,11 +166,44 @@ async function bauen(userId, opt) {
   let eigenes = null;
   try { eigenes = await projektwissen.zusatzFuer(userId); } catch (e) { eigenes = null; }
 
+  /* v2047 - was NICHT an den Objekten haengt.
+
+     Marcel hat danach gefragt, und die ehrliche Antwort war: nur zur
+     Haelfte drin. Die Objekt-Analysen kommen aus `objects`, die
+     PORTFOLIO-Analyse liegt in `user_settings` unter
+     `portfolio_analyse` (v2012) - mein Export fragte nur die
+     Objekttabelle und hat sie nie gesehen.
+
+     Ein Export, der "alles" verspricht, muss wissen, wo alles liegt.
+
+     `updated_at` geht mit: eine Portfolio-Beurteilung ohne Datum ist
+     bei einem Bestand, der sich jeden Monat aendert, eine Falle -
+     dieselbe, gegen die der Stempel an der Objekt-Analyse gebaut
+     wurde. */
+  let einstellungen = {};
+  try {
+    const e = await query(
+      'SELECT schluessel, wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = ANY($2)',
+      [userId, ['portfolio_analyse', 'lage_profil', 'datenraum']]
+    );
+    e.rows.forEach((r) => {
+      let w = r.wert;
+      if (typeof w === 'string') { try { w = JSON.parse(w); } catch (x) { /* bleibt Text */ } }
+      einstellungen[r.schluessel] = { wert: w, stand: r.updated_at };
+    });
+  } catch (e) { einstellungen = {}; }
+
+  /* Wie viele Objekte tragen wirklich eine Analyse? Eine Datei, in
+     der zwanzig von zweiundzwanzig fehlen, sieht vollstaendig aus. */
+  const mitAnalyse = objekte.filter((o) => o.analyse).length;
+
   return {
     dealpilot_export: 'portfolio',
     format_version: 1,
     erzeugt_am: new Date().toISOString(),
     anzahl_objekte: objekte.length,
+    /* v2047 - die Deckung gehoert in den Kopf, nicht ins Kleingedruckte. */
+    objekte_mit_pilot_analyse: mitAnalyse,
     fotos_enthalten: mitFotos,
     /* ── Das Lexikon: was die Schluessel bedeuten ──────────────────
        Ohne diesen Block ist der Export eine Liste aus 280 Kuerzeln.
@@ -198,7 +231,14 @@ async function bauen(userId, opt) {
        Einmal, nicht je Objekt: es gilt fuer alle. */
     wissen: {
       projekt: projektwissen.wissen(),
-      eigenes: eigenes || null
+      eigenes: eigenes || null,
+      /* v2047 - die Beurteilung des PORTFOLIO-Piloten, mit Stand.
+         Sie entsteht im Cockpit und haengt an keinem Objekt. */
+      portfolio_analyse: einstellungen.portfolio_analyse || null,
+      /* worauf bei Lagen geachtet wird, und wo die Unterlagen liegen -
+         beides Wissen ueber das Portfolio, beides war bisher draussen. */
+      lage_profil: einstellungen.lage_profil || null,
+      datenraum: einstellungen.datenraum || null
     },
     objekte: objekte
   };
