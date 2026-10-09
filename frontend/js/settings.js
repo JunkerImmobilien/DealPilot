@@ -498,6 +498,34 @@ function showSettings(initialTab) {
           '<textarea id="set_ai_custom_instructions" rows="3" maxlength="500" placeholder="z.B. \'z.B. Berücksichtige meinen lokalen Markt und meine Investment-Strategie.\'">' + _esc(view.ai_custom_instructions || '') + '</textarea>' +
         '</div>' +
 
+        /* ══ v2020 · EIGENES WISSEN ════════════════════════════════
+
+           Marcel: „ist das irgendwo zugaenglich, diese Datei? Dass man
+           da auch was noch zuschreiben koennte."
+
+           NICHT dasselbe wie „Eigene Anweisungen" darueber:
+             Eigene Anweisungen -> WIE die KI antworten soll
+             Eigenes Wissen     -> WAS sie ueber das Produkt weiss
+           Das erste ist eine Vorliebe und liegt lokal. Das zweite ist
+           eine Quelle, liegt am Server und erreicht auch den
+           Telegram-Bot. Beides in ein Feld zu legen hiesse, eine
+           Vorliebe zur Quelle zu erklaeren. */
+        '<h3 class="set-section-h" style="margin-top:24px">Eigenes Wissen f\u00fcr alle Piloten</h3>' +
+        '<p class="hint" style="margin-top:-6px;margin-bottom:10px">Was hier steht, bekommen die ' +
+          '<b>Pilot-Analyse</b>, der <b>Portfolio-Pilot</b> und der <b>Telegram-Bot</b> ' +
+          'als eigenen Block mitgeliefert \u2014 zus\u00e4tzlich zum gepflegten Projektwissen. ' +
+          'Widerspricht es dem Projektwissen, gilt das Projektwissen, und die KI sagt es dir. ' +
+          '<b>Keine Zahlen, die sich \u00e4ndern</b> (Preise, Kontingente, Kennzahlen) \u2014 die holt ' +
+          'die KI aus der echten Quelle, sonst steht hier irgendwann die falsche.</p>' +
+        '<div class="f">' +
+          '<textarea id="set_eigenes_wissen" rows="8" maxlength="20000" ' +
+            'placeholder="z.\u202fB.: Junker Solution ist ein Einzelunternehmen (Kleinunternehmer \u00a7 19 UStG), keine UG. \u2014 DESAG-zertifiziert hei\u00dft: \u2026"></textarea>' +
+          '<div style="display:flex;align-items:center;gap:10px;margin-top:8px">' +
+            '<button type="button" class="btn" id="set_wissen_save">Wissen speichern</button>' +
+            '<span id="set_wissen_status" class="hint" style="margin:0"></span>' +
+          '</div>' +
+        '</div>' +
+
         // V63.96: Standard-Analyseparameter aus dem Profile-Tab hierher verschoben (Marcels Wunsch).
         // V63.99 BUG-FIX: get() benötigt einen Key. Vorher hieß es DealPilotInvestmentProfile.get()
         // ohne Argument → undefined. Das warf TypeError beim Zugriff auf .ai_strat und
@@ -1264,6 +1292,41 @@ function _swSet(btn) {
         if (_tph) window.DealPilotTaxPeriods.renderInline(_tph);
       }
     } catch (e) { console.warn('[v841-zve-inline] renderInline:', e.message); }
+  }
+
+  // v2020: Eigenes Wissen - eigener Pane-Zweig, wie der Datenraum darunter.
+  if (pane === 'api') {
+  /* v2020 - das eigene Wissen vom Server holen und den Knopf verdrahten.
+     Gespeichert wird auf Knopfdruck, nicht beim Tippen: ein Block, der
+     sich bei jedem Zeichen in den Prompt aller drei Piloten schiebt,
+     waere unheimlich. */
+  (function () {
+    var w = document.getElementById('set_eigenes_wissen');
+    var knopf = document.getElementById('set_wissen_save');
+    var stat = document.getElementById('set_wissen_status');
+    if (!w || !knopf) return;
+    function sagen(t, farbe) { if (stat) { stat.textContent = t; stat.style.color = farbe || ''; } }
+    Auth.apiCall('/user-settings/eigenes_wissen').then(function (r) {
+      var v = r && r.wert;
+      if (v && typeof v.text === 'string') {
+        w.value = v.text;
+        if (r.updated_at) sagen('zuletzt gespeichert am ' + new Date(r.updated_at).toLocaleDateString('de-DE'));
+      }
+    }).catch(function () { sagen('konnte nicht geladen werden', 'var(--red,#B8625C)'); });
+    knopf.addEventListener('click', function () {
+      knopf.disabled = true; sagen('speichere \u2026');
+      Auth.apiCall('/user-settings/eigenes_wissen', { method: 'PUT',
+        body: { wert: { text: String(w.value || '').slice(0, 20000) } } })
+        .then(function () {
+          sagen('\u2713 gespeichert \u2014 die Piloten lesen es ab sofort', '#3FA56C');
+        })
+        .catch(function (e) {
+          var m = (e && e.status === 413) ? 'zu lang' : 'nicht gespeichert';
+          sagen('\u2717 ' + m, 'var(--red,#B8625C)');
+        })
+        .then(function () { knopf.disabled = false; });
+    });
+  })();
   }
 
   // V140: Datenraum-Pane lazy rendern
