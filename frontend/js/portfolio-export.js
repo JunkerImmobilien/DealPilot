@@ -108,6 +108,58 @@
     return new Date().toISOString().replace(/[:T]/g, '-').slice(0, 16);
   }
 
+  /* ── Der Stand, bevor etwas geschrieben wird ──────────────────────
+     v2048 - Marcel: „vorher soll der Stand geprueft werden und wenn
+     veraltet gefragt werden, ob erst aktualisiert werden soll."
+
+     Eine exportierte Analyse traegt kein „ungefaehr". Wer die Datei
+     weitergibt, gibt eine Beurteilung weiter - und wenn sich der
+     Kaufpreis seitdem geaendert hat, beurteilt sie ein Objekt, das es
+     so nicht mehr gibt. In der App steht das Banner daneben, in der
+     Datei nicht. */
+  function standPruefen(paket) {
+    var ohne = [], veraltet = [], ohneStempel = [];
+    (paket.objekte || []).forEach(function (o) {
+      var titel = (o.nummer ? o.nummer + ' ' : '') + (o.name || o.ort || o.id);
+      if (!o.analyse) { ohne.push(titel); return; }
+      var f = o.analyse._fuer;
+      if (!f || !f.abdruck) { ohneStempel.push(titel); return; }
+      if (typeof window._analyseAbweichungAus !== 'function') return;
+      var ab = window._analyseAbweichungAus(o.daten, f.abdruck);
+      if (ab && ab.length) veraltet.push(titel + ' (' + ab.slice(0, 3).join(', ')
+        + (ab.length > 3 ? ' +' + (ab.length - 3) : '') + ')');
+    });
+    var pf = paket.wissen && paket.wissen.portfolio_analyse;
+    var pfStand = (pf && pf.stand) ? String(pf.stand).slice(0, 10) : null;
+    var pfAlt = null;
+    if (pfStand) {
+      var tage = Math.floor((Date.now() - Date.parse(pfStand)) / 86400000);
+      if (tage > 30) pfAlt = tage;
+    }
+    return { ohne: ohne, veraltet: veraltet, ohneStempel: ohneStempel,
+             portfolioFehlt: !pf, portfolioAlt: pfAlt, gesamt: (paket.objekte || []).length };
+  }
+
+  /* Gefragt wird, ob TROTZDEM exportiert wird - nicht, ob
+     aktualisiert werden soll. Das Aktualisieren kostet Guthaben und
+     laeuft je Objekt; eine Frage, die eine teure Handlung automatisch
+     ausloest, ist keine Frage. */
+  function nachfragen(b) {
+    var z = [];
+    if (b.veraltet.length) z.push('\u26a0 ' + b.veraltet.length + ' von ' + b.gesamt
+      + ' Pilot-Analysen sind VERALTET \u2014 die Zahlen haben sich seitdem geaendert:\n   \u2022 '
+      + b.veraltet.slice(0, 6).join('\n   \u2022 ')
+      + (b.veraltet.length > 6 ? '\n   \u2022 \u2026 und ' + (b.veraltet.length - 6) + ' weitere' : ''));
+    if (b.ohne.length) z.push('\u2139 ' + b.ohne.length + ' Objekte haben noch GAR KEINE Pilot-Analyse.');
+    if (b.ohneStempel.length) z.push('\u2139 ' + b.ohneStempel.length + ' Analysen tragen kein Datum (vor Oktober 2026).');
+    if (b.portfolioFehlt) z.push('\u2139 Es liegt KEINE Portfolio-Analyse vor (entsteht im Cockpit).');
+    else if (b.portfolioAlt) z.push('\u26a0 Die Portfolio-Analyse ist ' + b.portfolioAlt + ' Tage alt.');
+    if (!z.length) return true;
+    return window.confirm(z.join('\n\n')
+      + '\n\nTrotzdem exportieren?\n'
+      + 'Abbrechen = erst aktualisieren, dann noch einmal exportieren.');
+  }
+
   async function exportieren(opt) {
     opt = opt || {};
     if (typeof toast === 'function') toast('ℹ Portfolio wird zusammengestellt …');
@@ -125,6 +177,13 @@
       if (typeof toast === 'function') toast('⚠ Der Export kam leer zurück.');
       return null;
     }
+    /* v2048 - erst pruefen, dann schreiben. Nach einem Abbruch
+       entsteht KEINE Datei: eine halbe Antwort auf die Frage waere
+       schlimmer als keine. */
+    if (!nachfragen(standPruefen(paket))) {
+      if (typeof toast === 'function') toast('\u2139 Export abgebrochen \u2014 erst aktualisieren.');
+      return null;
+    }
     var t = stempel();
     speichern(JSON.stringify(paket, null, 2),
       'DealPilot_Portfolio_' + t + '.json', 'application/json');
@@ -139,6 +198,10 @@
   window.DealPilotPortfolioExport = {
     exportieren: exportieren,
     SPALTEN: SPALTEN,
+    _standPruefen: standPruefen,
+    /* v2048b - auch die Sicherung prueft den Stand. Sie IST der Export
+       (v2045), also gilt Marcels Bedingung dort genauso. */
+    standPruefenUndFragen: function (paket) { return nachfragen(standPruefen(paket)); },
     _csvAus: csvAus,
     _lies: lies
   };

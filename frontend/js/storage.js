@@ -2100,6 +2100,21 @@ async function _dpSicherungsPaket(objektId) {
   var mitFotos = _v893rExpPhotos();
   var paket = await Auth.apiCall('/objects/portfolio-export' + (mitFotos ? '?fotos=1' : ''));
   if (!paket || !Array.isArray(paket.objekte)) throw new Error('Der Export kam leer zurueck');
+  /* v2048b - der Stand wird geprueft, BEVOR eine Datei entsteht.
+
+     Marcel: "vorher soll der Stand geprueft werden und wenn veraltet
+     gefragt werden, ob erst aktualisiert werden soll vor dem Export."
+
+     Hier und nicht in den zwei Aufrufern: beide Sicherungswege - alle
+     und einzeln - laufen durch diese Funktion. Eine Pruefung je
+     Aufrufer waere eine Liste, die beim naechsten Weg unvollstaendig
+     ist. */
+  if (window.DealPilotPortfolioExport
+      && typeof DealPilotPortfolioExport.standPruefenUndFragen === 'function') {
+    if (!DealPilotPortfolioExport.standPruefenUndFragen(paket)) {
+      throw new Error('abgebrochen');
+    }
+  }
   if (objektId) {
     paket.objekte = paket.objekte.filter(function (o) { return o.id === objektId; });
     paket.anzahl_objekte = paket.objekte.length;

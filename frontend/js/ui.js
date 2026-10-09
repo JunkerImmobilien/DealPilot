@@ -1190,6 +1190,44 @@ function _analyseAbdruck() {
   } catch (e) { return null; }
   return o;
 }
+/* v2048 - derselbe Abdruck, andere Quelle.
+
+   `_analyseAbdruck()` liest aus dem FORMULAR - also nur fuer das
+   geoeffnete Objekt. Der Export prueft ALLE und hat nur Datensaetze.
+
+   Dieselbe Liste `ANALYSE_FELDER`, derselbe Vergleich, nur eine
+   andere Quelle. Eine zweite Feldliste waere beim naechsten Feld
+   auseinandergelaufen - lautlos, weil beide Seiten plausibel
+   bleiben. */
+function _analyseAbdruckAus(daten) {
+  if (!daten || typeof daten !== 'object') return null;
+  var o = {};
+  for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+    var id = ANALYSE_FELDER[i][0];
+    var v = daten[id];
+    o[id] = (v == null || String(v).trim() === '') ? null : String(v).trim();
+  }
+  return o;
+}
+
+/* v2048 - welche Felder haben sich seit der Analyse geaendert?
+   Gibt die BESCHRIFTUNGEN zurueck. Ohne Abdruck wird NICHTS
+   behauptet: eine alte Analyse ohne Stempel ist unbekannt, nicht
+   veraltet. */
+function _analyseAbweichungAus(daten, alt) {
+  if (!alt || typeof alt !== 'object') return null;
+  var jetzt = _analyseAbdruckAus(daten);
+  if (!jetzt) return null;
+  var raus = [];
+  for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+    var id = ANALYSE_FELDER[i][0];
+    if ((alt[id] || null) !== (jetzt[id] || null)) raus.push(ANALYSE_FELDER[i][1]);
+  }
+  return raus;
+}
+window._analyseAbdruckAus = _analyseAbdruckAus;
+window._analyseAbweichungAus = _analyseAbweichungAus;
+
 /* Was hat sich geaendert? Gibt die BESCHRIFTUNGEN zurueck, nicht die Ids. */
 function _analyseAbweichung(alt) {
   if (!alt || typeof alt !== 'object') return null;   /* ohne Abdruck wird nichts behauptet */
