@@ -288,10 +288,184 @@
       '<td>' + sel('zustand', ZUSTAND) + '</td>' +
       '<td>' + inp('massnahme', 110, 'z. B. Bad neu') + '</td>' +
       '<td>' + inp('kosten', 70, '€', 'decimal') + '</td>' +
-      '<td style="white-space:nowrap"><button type="button" data-dup="' + i + '" title="Zeile duplizieren" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer">⧉</button> ' +
+      /* v2021 - der Weg ins Wohnungsfenster. Die Zeile bleibt der
+         Ueberblick; alles Weitere steht dahinter. */
+      '<td style="white-space:nowrap"><button type="button" data-det="' + i + '" title="Alle Angaben zu dieser Wohnung" style="border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--wl-9a7f33, #9a7f33);margin-right:4px">\u2026</button>' +
+      '<button type="button" data-dup="' + i + '" title="Zeile duplizieren" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer">⧉</button> ' +
       '<button type="button" data-del="' + i + '" title="Zeile löschen" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:#B8625C">✕</button></td>' +
       '</tr>';
   }
+  /* ══ v2021 · DAS WOHNUNGSFENSTER ════════════════════════════════
+
+     Marcel: „wenn wir auf die Wohnung klicken, dass da drin dann
+     wieder ein Modal aufgeht, wo wir dann alle Angaben machen
+     können … auch mit Bildern nochmal zusätzlich."
+
+     Die Tabellenzeile bleibt der Ueberblick. Alles, was eine
+     einzelne Wohnung ausmacht, steht hier - und wird im selben
+     Einheiten-Objekt gespeichert, das es schon gibt. */
+
+  /* Die Vertragsformen des deutschen Mietrechts, mit Fundstelle.
+     Staffel und Index tragen ihre naechste Erhoehung SCHON im
+     Vertrag - sie sind kein Potenzial, sondern ein Termin. Wer
+     beides gleich behandelt, rechnet dieselbe Steigerung zweimal. */
+  var MIETVERTRAG_ARTEN = [
+    ['', '– keine Angabe –'],
+    ['unbefristet', 'Unbefristet (Regelfall)'],
+    ['staffel', 'Staffelmiete (\u00a7 557a BGB)'],
+    ['index', 'Indexmiete (\u00a7 557b BGB)'],
+    ['zeitmiete', 'Zeitmietvertrag, befristet (\u00a7 575 BGB)'],
+    ['kuendigungsverzicht', 'Mit K\u00fcndigungsverzicht'],
+    ['gewerbe', 'Gewerbemietvertrag'],
+    ['moebliert_kurz', 'M\u00f6bliert / Kurzzeit (\u00a7 549 Abs. 2 BGB)'],
+    ['werkswohnung', 'Werks-/Dienstwohnung (\u00a7 576 BGB)'],
+    ['sozial', 'Preisgebunden / Sozialwohnung'],
+    ['unter', 'Untermietvertrag']
+  ];
+  var WOHNUNG_FOTOS_MAX = 6;
+
+  function wSchliessen() { var a = el("mfh-we-ov"); if (a && a.parentNode) a.parentNode.removeChild(a); }
+
+  function wohnungOeffnen(i) {
+    var e = _arbeit[i]; if (!e) return;
+    wSchliessen();
+    function f(k, label, ph, typ, breit) {
+      return '<label class="mfh-we-f' + (breit ? ' mfh-we-breit' : '') + '"><span>' + esc(label) + '</span>'
+        + '<input data-wk="' + k + '" value="' + esc(e[k] == null ? '' : e[k]) + '" placeholder="' + esc(ph || '')
+        + '" inputmode="' + (typ || 'text') + '"></label>';
+    }
+    function s(k, label, opts) {
+      return '<label class="mfh-we-f"><span>' + esc(label) + '</span>'
+        + selHtml('data-wk="' + k + '"', e[k], opts) + '</label>';
+    }
+    function d(k, label) {
+      return '<label class="mfh-we-f"><span>' + esc(label) + '</span>'
+        + '<input type="date" data-wk="' + k + '" value="' + esc(e[k] || '') + '"></label>';
+    }
+    var titel = (e.lage || e.nr || (i + 1));
+    var ov = document.createElement("div"); ov.id = "mfh-we-ov";
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.60);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px';
+    ov.innerHTML = '<div class="mfh-we-karte">' +
+      '<div class="mfh-we-kopf"><b>Wohnung ' + esc(String(titel)) + '</b>'
+        + '<button type="button" id="mfh-we-zu" aria-label="Schlie\u00dfen">\u2715</button></div>' +
+      '<div class="mfh-we-leib">' +
+        '<h4>Stammdaten</h4><div class="mfh-we-raster">' +
+          f('nr', 'Nummer', String(i + 1)) +
+          f('lage', 'Lage im Haus', 'EG links') +
+          s('art', 'Art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) +
+          f('wfl', 'Wohnfl\u00e4che (m\u00b2)', '', 'decimal') +
+          f('zimmer', 'Zimmer', '', 'decimal') +
+          f('etage', 'Etage', 'z.\u202fB. 2. OG') +
+          f('balkon_qm', 'Balkon/Terrasse (m\u00b2)', '', 'decimal') +
+          f('keller', 'Keller / Abstellraum', 'z.\u202fB. Kellerabteil 4') +
+          f('stellplatz', 'Stellplatz / Garage', 'z.\u202fB. TG-Platz 7') +
+        '</div>' +
+        '<h4>Miete</h4><div class="mfh-we-raster">' +
+          f('ist', 'Ist-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
+          f('soll', 'Soll-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
+          s('status', 'Status', [['vermietet', 'vermietet'], ['leer', 'leer']]) +
+          f('nk_vorauszahlung', 'NK-Vorauszahlung (\u20ac/Monat)', '', 'decimal') +
+          f('stellplatz_miete', 'Stellplatzmiete (\u20ac/Monat)', '', 'decimal') +
+        '</div>' +
+        '<h4>Mietvertrag</h4>' +
+        '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre n\u00e4chste Erh\u00f6hung schon im Vertrag \u2014 sie sind ein <b>Termin</b>, kein Potenzial.</p>' +
+        '<div class="mfh-we-raster">' +
+          s('mv_art', 'Vertragsart', MIETVERTRAG_ARTEN) +
+          d('mv_beginn', 'Mietbeginn') +
+          d('mv_letzte_erhoehung', 'Letzte Erh\u00f6hung') +
+          d('mv_naechste_anpassung', 'N\u00e4chste Anpassung (Staffel/Index)') +
+          f('mv_kaution', 'Kaution (\u20ac)', '', 'decimal') +
+          d('mv_befristet_bis', 'Befristet bis') +
+          f('mv_kuendigungsverzicht_bis', 'K\u00fcndigungsverzicht bis', 'JJJJ-MM-TT') +
+          f('mv_mieter', 'Mieter (Name, optional)', '') +
+          f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
+        '</div>' +
+        '<h4>Zustand</h4><div class="mfh-we-raster">' +
+          s('zustand', 'Gesamtzustand', ZUSTAND) +
+          f('massnahme', 'Geplante Ma\u00dfnahme', 'z.\u202fB. Bad neu') +
+          f('kosten', 'Kosten (\u20ac)', '', 'decimal') +
+        '</div>' +
+        '<h4>Restnutzungsdauer</h4>' +
+        '<label class="mfh-we-haken"><input type="checkbox" id="mfh-we-rnd"' + (e.rnd_eigen ? ' checked' : '') + '>' +
+          '<span>Eigene Restnutzungsdauer f\u00fcr diese Wohnung angeben</span></label>' +
+        '<div class="mfh-we-raster" id="mfh-we-rnd-box" style="' + (e.rnd_eigen ? '' : 'display:none') + '">' +
+          f('rnd_jahre', 'Restnutzungsdauer (Jahre)', '', 'decimal') +
+          f('rnd_grund', 'Begr\u00fcndung', 'woher die Zahl stammt', 'text', true) +
+        '</div>' +
+        '<p class="mfh-we-hint">Ohne Haken rechnet DealPilot die Restnutzungsdauer aus Zustand und Baujahr (Anlage 2 ImmoWertV) \u2014 wie bisher.</p>' +
+        '<h4>Bilder</h4>' +
+        '<p class="mfh-we-hint">H\u00f6chstens ' + WOHNUNG_FOTOS_MAX + ' Bilder je Wohnung, automatisch verkleinert.</p>' +
+        '<div id="mfh-we-bilder" class="mfh-we-bilder"></div>' +
+        '<input type="file" id="mfh-we-datei" accept="image/*" multiple style="display:none">' +
+        '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-bild-neu">Bilder hinzuf\u00fcgen</button>' +
+      '</div>' +
+      '<div class="mfh-we-fuss"><button type="button" class="btn" id="mfh-we-ok">Fertig</button></div>' +
+    '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click", function (ev) { if (ev.target === ov) { wSchliessen(); zeichnen(); } });
+    el("mfh-we-zu").onclick = function () { wSchliessen(); zeichnen(); };
+    el("mfh-we-ok").onclick = function () { wSchliessen(); zeichnen(); };
+    /* Jede Eingabe landet sofort im Einheiten-Objekt - es wird als
+       Ganzes gespeichert, also braucht es keine Feldliste. */
+    ov.querySelectorAll("[data-wk]").forEach(function (inp) {
+      var k = inp.getAttribute("data-wk");
+      inp.addEventListener("input", function () { e[k] = inp.value; });
+      inp.addEventListener("change", function () { e[k] = inp.value; });
+    });
+    var hk = el("mfh-we-rnd");
+    hk.addEventListener("change", function () {
+      e.rnd_eigen = hk.checked;
+      var box = el("mfh-we-rnd-box"); if (box) box.style.display = hk.checked ? "" : "none";
+    });
+    bilderZeichnen(e);
+    el("mfh-we-bild-neu").onclick = function () { el("mfh-we-datei").click(); };
+    el("mfh-we-datei").onchange = function (ev) { bilderAufnehmen(e, ev.target.files); };
+  }
+
+  function bilderZeichnen(e) {
+    var host = el("mfh-we-bilder"); if (!host) return;
+    var b = Array.isArray(e.bilder) ? e.bilder : [];
+    if (!b.length) { host.innerHTML = '<span class="mfh-we-hint">Noch keine Bilder.</span>'; return; }
+    host.innerHTML = b.map(function (src, n) {
+      return '<span class="mfh-we-bild"><img src="' + src + '" alt="">'
+        + '<button type="button" data-bild-weg="' + n + '" title="Bild entfernen">\u2715</button></span>';
+    }).join("");
+    host.querySelectorAll("[data-bild-weg]").forEach(function (btn) {
+      btn.onclick = function () {
+        var n = parseInt(btn.getAttribute("data-bild-weg"), 10);
+        e.bilder.splice(n, 1); bilderZeichnen(e);
+      };
+    });
+  }
+
+  /* Verkleinert ueber den VORHANDENEN Verkleinerer (ui.js:505) - keine
+     zweite Umrechnung. Gemessen am Bestand traegt ein Objekt bis
+     1,8 MB Fotos; je Wohnung unbegrenzt waere bei zwanzig Einheiten
+     ein Objekt, das nicht mehr speichert. */
+  function bilderAufnehmen(e, dateien) {
+    if (!dateien || !dateien.length) return;
+    if (!Array.isArray(e.bilder)) e.bilder = [];
+    var frei = WOHNUNG_FOTOS_MAX - e.bilder.length;
+    if (frei <= 0) { alert("Mehr als " + WOHNUNG_FOTOS_MAX + " Bilder je Wohnung gehen nicht."); return; }
+    var liste = Array.prototype.slice.call(dateien, 0, frei);
+    var offen = liste.length;
+    liste.forEach(function (datei) {
+      var r = new FileReader();
+      r.onload = function () {
+        var roh = r.result;
+        function fertig(src) {
+          if (src) e.bilder.push(src);
+          if (--offen <= 0) bilderZeichnen(e);
+        }
+        if (typeof window._dpResizeDataUrl === "function") {
+          window._dpResizeDataUrl(roh, 1200, 0.78).then(fertig, function () { fertig(roh); });
+        } else { fertig(roh); }
+      };
+      r.onerror = function () { if (--offen <= 0) bilderZeichnen(e); };
+      r.readAsDataURL(datei);
+    });
+  }
+
   function schritt2() {
     return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
       /* v1628 · KEIN min-width MEHR. Es war die Ursache des
@@ -404,6 +578,41 @@
     var s = document.createElement('style');
     s.id = 'mfh-stil-v2';
     s.textContent = [
+      /* ══ v2021b · DAS WOHNUNGSFENSTER ══════════════════════════
+         Im selben Stilblock wie der Konfigurator - ein Fenster in
+         einem zweiten Blatt faellt beim naechsten Umbau als erstes
+         auseinander. Das Raster ohne feste Spaltenzahl: dieselbe
+         Lehre wie v2005/v2006, ein 1fr mit fester Zahl waechst aus
+         dem Fenster heraus statt umzubrechen. */
+      '#mfh-we-ov .mfh-we-karte{background:#fff;border-radius:14px;max-width:860px;width:100%;',
+      '  max-height:92vh;display:flex;flex-direction:column;overflow:hidden;color:#2A2727;',
+      '  font-family:Inter,sans-serif;box-shadow:0 24px 70px rgba(0,0,0,.34);',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent)}',
+      '#mfh-we-ov .mfh-we-kopf{display:flex;align-items:center;justify-content:space-between;',
+      '  padding:14px 18px;border-bottom:1px solid rgba(42,39,39,.10);font-size:15px}',
+      '#mfh-we-ov .mfh-we-kopf button{border:0;background:transparent;font-size:18px;cursor:pointer;color:#8A8272}',
+      '#mfh-we-ov .mfh-we-leib{padding:16px 18px;overflow:auto}',
+      '#mfh-we-ov h4{font:600 12px/1.2 "Space Grotesk",sans-serif;letter-spacing:.09em;',
+      '  text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin:20px 0 8px}',
+      '#mfh-we-ov h4:first-child{margin-top:0}',
+      '#mfh-we-ov .mfh-we-raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}',
+      '#mfh-we-ov .mfh-we-f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;min-width:0}',
+      '#mfh-we-ov .mfh-we-f.mfh-we-breit{grid-column:1/-1}',
+      '#mfh-we-ov .mfh-we-f span{color:#6B6356;font-size:11.5px}',
+      '#mfh-we-ov .mfh-we-f input,#mfh-we-ov .mfh-we-f select{width:100%;box-sizing:border-box;',
+      '  border:1px solid #E6E0D3;border-radius:8px;padding:7px 9px;font-size:13px;background:#fff;color:#2A2727}',
+      '#mfh-we-ov .mfh-we-f input:focus,#mfh-we-ov .mfh-we-f select:focus{outline:0;',
+      '  border-color:var(--wl-c9a84c, #C9A84C)}',
+      '#mfh-we-ov .mfh-we-hint{font-size:11.5px;color:#8A8272;margin:0 0 8px;line-height:1.5}',
+      '#mfh-we-ov .mfh-we-haken{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:0 0 10px;cursor:pointer}',
+      '#mfh-we-ov .mfh-we-bilder{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}',
+      '#mfh-we-ov .mfh-we-bild{position:relative;display:inline-block}',
+      '#mfh-we-ov .mfh-we-bild img{width:96px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #E6E0D3;display:block}',
+      '#mfh-we-ov .mfh-we-bild button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;',
+      '  border-radius:50%;border:1px solid #E6E0D3;background:#fff;color:#B8625C;cursor:pointer;',
+      '  font-size:11px;line-height:1;padding:0}',
+      '#mfh-we-ov .mfh-we-fuss{padding:12px 18px;border-top:1px solid rgba(42,39,39,.10);text-align:right}',
+      '@media(max-width:560px){#mfh-we-ov .mfh-we-raster{grid-template-columns:minmax(0,1fr)}}',
       '#mfh-modal .mfh-karte{background:#fff;border-radius:14px;max-width:1180px;width:100%;',
       '  max-height:92vh;display:flex;flex-direction:column;position:relative;',
       '  overflow:hidden;color:#2A2727;font-family:Inter,sans-serif;',
@@ -520,7 +729,10 @@
       if (t === m) schliessen();
       if (t.id === 'mfh-weg') { _weg = t.checked; }
       if (t.dataset && t.dataset.s != null) { _schritt = +t.dataset.s; zeichnen(); }
-      if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; _arbeit.splice(i + 1, 0, c); zeichnen(); }
+      if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; c.bilder = null; c.mv_mieter = ''; /* v2021 */ _arbeit.splice(i + 1, 0, c); zeichnen(); }
+      /* v2021 - der Weg ins Wohnungsfenster, im selben delegierten
+         Behandler wie dup und del. */
+      if (t.dataset && t.dataset.det != null) { wohnungOeffnen(+t.dataset.det); }
       if (t.dataset && t.dataset.del != null) { _arbeit.splice(+t.dataset.del, 1); zeichnen(); }
     });
     el('mfh-zu').onclick = schliessen;
