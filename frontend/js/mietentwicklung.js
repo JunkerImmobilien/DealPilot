@@ -286,10 +286,25 @@ window.MietEntwicklung = (function() {
          Bis v2026 gab es nur grau. An einer ETW stand damit dauerhaft
          ein toter Knopf, der etwas anbot, das dort nie eintreten kann. */
       var traegt = artTraegtEinheiten();
-      btnE.style.display = traegt ? '' : 'none';
+      /* v2027a - GEMESSEN: ein schlichtes `style.display = 'none'`
+         wirkt hier NICHT. Drei Regeln in style.css erzwingen
+         `display: inline-flex !important` auf diesem Knopf
+         (`.sec .me-mode-btn`, `.sec .btn…`, `.sec button:not(…)`).
+         Bei ETW stand im Attribut `display: none` und der Knopf war
+         trotzdem 131 px breit und sichtbar.
+
+         Inline gewinnt gegen alles - ausser gegen !important im
+         Blatt. Dagegen hilft nur Inline MIT !important.
+
+         Und das Gegenstueck: eine mit `important` gesetzte Inline-
+         Eigenschaft wird ENTFERNT, nicht auf '' gesetzt - sonst
+         bliebe die Prioritaet beim naechsten Schreiben stehen. */
+      if (traegt) btnE.style.removeProperty('display');
+      else btnE.style.setProperty('display', 'none', 'important');
       var nutzbar = traegt && einheitenNutzbar();
       btnE.disabled = !nutzbar;
-      btnE.style.opacity = nutzbar ? '' : '.45';
+      if (nutzbar) btnE.style.removeProperty('opacity');
+      else btnE.style.setProperty('opacity', '.45', 'important');
       btnE.title = nutzbar
         ? ('Aus den Mietvertraegen der einzelnen Wohnungen (' + einheitenStand().mit + ' mit Staffel)')
         : 'Keine Wohnung ist fuer die Mietentwicklung angehakt - im MFH-Konfigurator je Wohnung setzen.';
