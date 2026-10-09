@@ -39993,17 +39993,27 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 
 /* Die Reiter und ihr Inhalt: zurueckgenommen und unberuehrbar.
    Der Hinweis selbst bleibt voll da - er ist der einzige Weg zurueck. */
-/* v2037a - !important ist hier noetig, nicht Geschmack: auf .sec laeuft
-   die Animation "fi", und eine Animation schlaegt jede normale
-   Deklaration. Gemessen war die Deckkraft 0 statt .52 - der Inhalt war
-   unsichtbar statt ausgegraut. Author-!important schlaegt Animationen. */
+/* v2037c - GEDIMMT WIRD MIT filter, NICHT MIT opacity.
+
+   Gemessen: .sec.active traegt nur die Animation "fi"
+   (@keyframes fi: 0% opacity:0 -> 100% opacity:1), keine eigene
+   Deckkraft-Regel. Mein opacity-!important aus v2037a hat sich damit
+   verhakt: nach dem Zurueckschalten blieb der Inhalt dauerhaft auf 0
+   - sichtbar klickbar, aber leer.
+
+   filter beruehrt die Animation nicht. Beim Verlassen faellt es
+   ersatzlos weg, und "fi" spielt wieder wie vorher.
+
+     > Wer eine Eigenschaft ueberschreibt, die eine Animation fuehrt,
+     > uebernimmt ihren Endzustand mit. Eine ANDERE Eigenschaft zu
+     > nehmen ist kein Trick, sondern der Ausweg. */
 body.dp-ankauf-ansicht .sec,
-body.dp-ankauf-ansicht nav.tabs{opacity:.52 !important;pointer-events:none;
-  transition:opacity .18s ease}
+body.dp-ankauf-ansicht nav.tabs{filter:grayscale(.5) opacity(.55);pointer-events:none;
+  transition:filter .18s ease}
 body.dp-ankauf-ansicht #ank-ansicht-host{opacity:1;pointer-events:auto}
 /* Freigegeben: voll sichtbar und bedienbar, aber der Rahmen bleibt. */
 body.dp-ankauf-frei .sec,
-body.dp-ankauf-frei nav.tabs{opacity:1 !important;pointer-events:auto}
+body.dp-ankauf-frei nav.tabs{filter:none;pointer-events:auto}
 body.dp-ankauf-frei .ank-ansicht-kopf{border-color:rgba(216,86,76,.55);
   background:rgba(216,86,76,.10)}
 body.dp-ankauf-frei .ank-ansicht-txt b{color:#D8564C}
