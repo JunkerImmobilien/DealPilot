@@ -608,7 +608,21 @@ function loadData(d) {
   }
   // V23: Mietentwicklungs-Modus aus dem geladenen Wert übernehmen + UI synchen
   if (window.MietEntwicklung && typeof MietEntwicklung.refresh === 'function') {
-    var mMode = (d.me_modus === 'detail') ? 'detail' : 'prog';
+    /* v2026 - HIER STAND `(d.me_modus === 'detail') ? 'detail' : 'prog'`.
+
+       Seit v2024 gibt es DREI Modi. `me_modus` steht in der Feldliste
+       (Z. 150) und wird gespeichert - aber diese Zeile kannte den
+       dritten nicht und warf ihn beim Laden stumm auf `prog`.
+
+       Wer Aus Wohnungen" waehlte, speicherte und neu lud, bekam die
+       geometrische Progression zu sehen. Ohne Meldung, ohne Luecke -
+       nur eine andere Zahl.
+
+       Die Absicherung braucht es hier NICHT: `getMode()` prueft selbst
+       bei jedem Lesen, ob eine Wohnung mit Haken da ist, und faellt
+       sonst auf `prog`. Hier zu pruefen waere zu frueh - die Einheiten
+       sind beim Laden noch nicht gesetzt. */
+    var mMode = (d.me_modus === 'detail' || d.me_modus === 'einheiten') ? d.me_modus : 'prog';
     MietEntwicklung.setMode(mMode);  // ruft intern auch calc()
   }
   /* v1814 · UND IMMER SOFORT RECHNEN.

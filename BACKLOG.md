@@ -623,6 +623,91 @@ Ohne diese Liste wird jede Einheit eine halbe Kopie.
 
 ---
 
+#### N60.12 · Soll/Ist je Objekt — Konzept liegt vor, Entscheidung offen
+Marcel: „Später habe ich dieses Objekt dann gewonnen, dann würde ich das
+auf gewonnen setzen und dann möchte ich das ja weiter abgleichen … dass
+dieses Objekt dann erst mal als Soll festgelegt wird und wir dann ein
+Ist-Objekt duplizieren können." Und: „wäre es auch cool, wenn man so eine
+Doppelkarte hat … dort kann man immer zwischen Soll und Ist wechseln und
+die dreht sich dann quasi um."
+
+**Konzept als Dokument abgelegt (09.10.2026):**
+https://claude.ai/artifact/FdseTiFq1wK6ECrwHEAxGJ
+
+**Gemessen, bevor etwas gebaut wird:**
+- `duplicateObj()` (`frontend/js/ui.js:54`) gibt es schon — sie nullt
+  `_currentObjKey`/`_currentObjSeq` und speichert unter neuer Nummer.
+  **Die Kopie trägt keinen Rückverweis.** Zwei Objekte an einer Adresse,
+  und nichts im System kann sie vergleichen.
+- `setStatus('open'|'won'|'lost')` (`deal-action.js:2300`) ist der
+  richtige Auslöser und sitzt schon da.
+- `.sb-card` ist das am stärksten überschriebene Element der App: **245
+  Stellen** in `style.css`, **45 mit `!important`**, vier benannte
+  Kartenstile (`ampel`, `datenzeile`, `kennzahlen`, `minimal`), dazu die
+  eingeklappte Leiste (44 × 44 px). Der Dreh-Rahmen kommt **um** die
+  Karte, nicht in sie. Die Rückseite baut dieselbe `_renderRichCard()`
+  (`js/storage.js:1310`) mit anderen Zahlen — gleiche Struktur, gleiche
+  Höhe, keine springende Liste.
+- Auf dem Handy gibt es keinen Hover: `.sbc-actions` (`style.css:4982`)
+  erscheint dort nie. Der Dreh-Knopf muss dauerhaft sichtbar sein.
+- **Die Wörter kollidieren.** 19 Stellen Soll-Miete, 29 Ist-Miete, dazu
+  `istSoll()` (`mfh-einheiten.js:915`). „Die Ist-Miete im Soll-Objekt"
+  kann niemand lesen. Vorschlag im Konzept: **Ankauf · Bestand ·
+  Abweichung**.
+
+**Empfehlung: kein zweites Objekt, sondern ein eingefrorener Ankauf-Stand
+IM Objekt.** Begründung im Dokument; der kurze Grund steht in CLAUDE.md
+schon einmal teuer beschrieben (zwei gleichnamige Dateien nebeneinander
+haben nicht gefehlt, sie haben sich widersprochen) — und die sieben
+identischen Pilot-Analysen aus **N60.1b** kamen von Dubletten.
+
+**BLOCKIERT:** sechs Entscheidungen liegen bei Marcel (Bauart, Wörter,
+Stichtag, nachfragen oder automatisch, auch ohne „gewonnen" einfrierbar,
+nachträglich korrigierbar). Sie stehen im Dokument als Haken.
+
+---
+
+#### N60.13 · Export und Schnittstelle — ALLE neuen Felder müssen durch
+Marcel: „Wenn es da nichts gibt, dass wir die Exportdatei nochmal
+überarbeiten und die Schnittstelle, dann müssen wir das auf jeden Fall
+damit reinnehmen, ganz am Ende, dass alle Daten übergeben werden, dass
+wir das nicht vergessen."
+
+**Gemessen am 09.10.2026: er hat recht, es gibt keinen solchen Punkt.**
+Das Einzige ist der Rahmen unter **N4**: *„Feld-IDs bleiben alle
+bestehen"* — das schützt die **alten** Felder vor dem Reiter-Umbau und
+sagt **nichts** über die neuen. Ein Feld, das niemand in den Export
+einträgt, fällt lautlos heraus; genau das ist diese Woche zweimal
+passiert (vier stille Nutzlast-Verluste in `_buildAIPayload()`, und die
+Waise `rnd_eigen` in `v2023a`).
+
+**Dieser Punkt kommt bewusst ganz zum Schluss** — erst wenn die Felder
+stehen, sonst wird er zweimal gemacht.
+
+**Was durch muss (Stand 09.10.2026, fortschreiben):**
+
+| Woher | Felder |
+|---|---|
+| N59/N60.1 | `lageklasse` je Objekt (A/B/C/D), Herkunft und Datum |
+| N60.8/.9 (`v2021`/`v2022`) | je Einheit: Mietvertragsart (11 Arten mit § ), `mv_seit`, letzte Erhöhung, Kündigungsverzicht bis, Erhöhungstermin und -höhe, Staffel-/Indexstufen, Bilder je Wohnung, Zustand je Einheit |
+| N60.9 | `mv_in_mietentwicklung` — der Haken, der die Wohnung in die Mietentwicklung einrechnet |
+| `v2024`/`v2025` | Mietentwicklungs-**Modus** (`prog`/`detail`/`einheiten`) und die Herkunftszeile, inkl. **Indexmiete-Annahme** |
+| N60.11 (`v2019`) | `user_settings.eigenes_wissen` — gehört **nicht** in den Objektexport, aber in die Datensicherung |
+| N60.12 | Ankauf-Stand und Abweichung, falls gebaut |
+| N60.4/.4c | Stempel `_fuer` (`objekt_id`, `kuerzel`, `adresse`, `stand`, `abdruck`) an der Analyse |
+
+**Prüfstrecke (die Kette, nicht die Datei):** je Objektart einmal
+PDF-Export, `pdf-import`, `voice-import`, xlsx/docx, Bankexport,
+Telegram-Werkzeuge — und **nachmessen, ob der Wert ankommt**, nicht nur
+ob der Export läuft. `tools/feld-waechter.mjs` ist der Einstieg; er
+braucht die neuen IDs.
+
+> **Die Regel dahinter:** ein neues Feld ist erst fertig, wenn es
+> **eingegeben, gerechnet, angezeigt, exportiert und von der KI gelesen**
+> werden kann. Vier von fünf sind ein halbes Feld.
+
+---
+
 ### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
 
 Marcel: „dass du die Objekte alle nochmal durchgehst und auch die

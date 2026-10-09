@@ -387,8 +387,15 @@ function buildPrompt(payload, opts) {
       ['Eigene Ruecklage', _bw.eigene_ruecklage != null ? _z(_bw.eigene_ruecklage) + ' EUR' : null],
       ['Kalkulierter Mietausfall', _bw.mietausfall_pct != null ? _p(_bw.mietausfall_pct) : null]
     ]) : '',
+    /* v2026 - der Plan sagt jetzt, WORAUS er gerechnet ist, und
+       kennzeichnet die Indexmieten als Annahme. Die vier
+       Progressionsfelder kommen im Modus `einheiten` nicht mehr mit
+       (ui.js laesst sie dort weg), also faellt ihre Zeile von selbst. */
     _me ? _zeilen('## MIETENTWICKLUNGSPLAN (bereits geplant, nicht von dir zu erfinden)', [
-      ['Modus', _me.modus],
+      ['Woraus gerechnet', _me.herkunft || _me.modus],
+      ['Wohnungen mit Ist-Miete', _me.einheiten_gesamt],
+      ['davon im Plan', _me.einheiten_mit_plan],
+      ['davon Indexmiete (Hoehe = ANNAHME)', _me.einheiten_index],
       ['Zielmiete', _me.soll_eur_qm != null ? _me.soll_eur_qm + ' EUR/m2' : null],
       ['Schritte', _me.schritte],
       ['Intervall', _me.intervall_jahre != null ? _me.intervall_jahre + ' Jahre' : null],
@@ -396,6 +403,17 @@ function buildPrompt(payload, opts) {
       ['Mietspiegel', _me.mietspiegel_eur_qm != null ? _me.mietspiegel_eur_qm + ' EUR/m2' : null],
       ['Kalkulierter Leerstand', _me.leerstand_pct != null ? _p(_me.leerstand_pct) : null]
     ]) : '',
+    (_me && _me.modus === 'einheiten')
+      ? ('\nZUR MIETENTWICKLUNG: Die Tabelle ist aus den Mietvertraegen der einzelnen'
+        + '\nWohnungen gerechnet, nicht aus einer pauschalen Steigerung. Wohnungen ohne'
+        + '\nHaken bleiben auf ihrer Ist-Miete - fuer sie wird KEINE Steigerung'
+        + '\nangenommen. Rechne keine eigene Progression dagegen.'
+        + ((_me.einheiten_index > 0)
+            ? ('\nBei den Indexmietvertraegen (§ 557b BGB) steht der TERMIN im Vertrag, die'
+              + '\nHOEHE nicht - sie ergibt sich erst aus dem Verbraucherpreisindex. Nenne'
+              + '\ndiesen Teil ausdruecklich eine Annahme, kein vereinbartes Ergebnis.')
+            : ''))
+      : '',
     _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
       ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
       ['Etage', _wo.etage], ['Etagen gesamt', _wo.etagen_gesamt],

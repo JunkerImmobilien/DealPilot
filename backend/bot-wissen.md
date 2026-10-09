@@ -128,6 +128,50 @@ Werbungskostenüberschuss wirken wie eine Rückzahlung.
 
 ---
 
+## Mietvertraege und Mietentwicklung
+
+**Soll-Miete und Ist-Miete sind Mietbegriffe, keine Objektzustaende.**
+Ist-Miete = was heute gezahlt wird. Soll-Miete = was bei voller
+Vermietung zur vereinbarten Miete hereinkaeme. Der Unterschied ist
+Leerstand und Mietausfall, nicht Marktpotenzial.
+
+**Die Mietentwicklung hat drei Modi.** Sage immer, welcher gilt, wenn du
+ueber kuenftige Mieten sprichst:
+
+| Modus | Woraus gerechnet |
+|---|---|
+| Gleichmaessige Steigerung | ein Prozentsatz je Jahr, pauschal |
+| Stufenplan | von Hand gesetzte Stufen |
+| Aus Wohnungen | die Mietvertraege der einzelnen Einheiten |
+
+**Im Modus „Aus Wohnungen" gilt eine Regel, die oft missverstanden
+wird:** nur Wohnungen mit gesetztem Haken gehen in den Plan. Alle
+uebrigen bleiben auf ihrer Ist-Miete — fuer sie wird **keine** Steigerung
+angenommen. Das ist Absicht und kein fehlender Wert. Rechne fuer sie
+nichts dazu.
+
+**Staffelmiete und Indexmiete sind nicht dasselbe.**
+
+- **Staffelmiete (§ 557a BGB):** Termin und Betrag jeder Stufe stehen im
+  Vertrag. Was DealPilot fortschreibt, ist eine Rechnung.
+- **Indexmiete (§ 557b BGB):** der Termin steht im Vertrag, die **Hoehe
+  nicht** — sie ergibt sich erst aus dem Verbraucherpreisindex. Was im
+  Feld steht, ist eine **Annahme**. Nenne sie so. Eine Annahme als
+  Vereinbarung auszugeben ist der Fehler, der spaeter im Bankgespraech
+  steht und den niemand mehr zurueckverfolgen kann.
+
+**Kuendigungsverzicht bis** heisst: bis zu diesem Datum kann der Mieter
+nicht ordentlich kuendigen (§ 557a Abs. 3 BGB, hoechstens vier Jahre).
+Das ist **Mietsicherheit**, kein Nachteil — und es ist etwas anderes als
+ein Zeitmietvertrag (§ 575 BGB), bei dem das Mietverhaeltnis selbst
+endet.
+
+**Erfinde keine Mieterhoehung.** Wenn kein Termin und keine Hoehe
+hinterlegt sind, gibt es keine. Sage das, statt eine plausible Zahl
+anzunehmen.
+
+---
+
 ## Marktbericht und Wertermittlung
 
 Drei Stufen, aufsteigend:

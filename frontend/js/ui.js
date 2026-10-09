@@ -878,12 +878,39 @@ function _buildAIPayload() {
       grundsteuer: parseDe(g('grundsteuer')), weg_ruecklage: parseDe(g('weg_r')),
       eigene_ruecklage: parseDe(g('eigen_r')), mietausfall_pct: parseDe(g('mietausfall'))
     },
-    mietentwicklung: {
-      modus: txt('me_modus'), soll_eur_qm: parseDe(g('me_soll')),
-      schritte: parseDe(g('me_anz')), intervall_jahre: parseDe(g('me_int')),
-      schritt_pct: parseDe(g('me_pct')), mietspiegel_eur_qm: parseDe(g('mietspiegel')),
-      leerstand_pct: parseDe(g('leerstand')), umlagefaehig: parseDe(g('umlagef'))
-    },
+    /* v2026 - die Mietentwicklung sagt jetzt, WORAUS sie gerechnet ist.
+
+       Vorher ging `modus` roh raus („einheiten") und daneben die fuenf
+       Progressionsfelder, die in diesem Modus gar nicht gelten. Das
+       Modell haette aus `soll_eur_qm` und `schritt_pct` gerechnet,
+       waehrend die Tabelle etwas anderes zeigt.
+
+       Ein Wert, der nicht gilt, ist im Prompt schlimmer als kein Wert. */
+    mietentwicklung: (function () {
+      var ME = window.MietEntwicklung;
+      var m = (ME && typeof ME.getMode === 'function') ? ME.getMode() : txt('me_modus');
+      var aus = {
+        modus: m,
+        herkunft: m === 'einheiten'
+          ? 'Aus den Mietvertraegen der einzelnen Wohnungen'
+          : (m === 'detail' ? 'Stufenplan von Hand' : 'Gleichmaessige Steigerung je Jahr'),
+        mietspiegel_eur_qm: parseDe(g('mietspiegel')),
+        leerstand_pct: parseDe(g('leerstand')), umlagefaehig: parseDe(g('umlagef'))
+      };
+      if (m === 'einheiten' && ME && typeof ME.einheitenStand === 'function') {
+        var st = ME.einheitenStand();
+        aus.einheiten_gesamt = st.gesamt;
+        aus.einheiten_mit_plan = st.mit;
+        aus.einheiten_index = st.index;   /* deren Hoehe ist eine ANNAHME */
+      } else {
+        /* nur hier gelten die Progressionsfelder */
+        aus.soll_eur_qm = parseDe(g('me_soll'));
+        aus.schritte = parseDe(g('me_anz'));
+        aus.intervall_jahre = parseDe(g('me_int'));
+        aus.schritt_pct = parseDe(g('me_pct'));
+      }
+      return aus;
+    })(),
     wohnung: {
       zimmer: parseDe(g('zimmer')), baeder: parseDe(g('bad_anz')),
       etage: txt('etage'), etagen_gesamt: parseDe(g('etagen_ges')),
