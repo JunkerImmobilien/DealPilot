@@ -398,9 +398,78 @@ Leerstand, Einheiten). Benannt, nicht nur gehasht — dadurch steht oben,
 > Zukauf sind belanglos, ein Zukauf von gestern macht jede Aussage über
 > Klumpenrisiken ungültig.
 
-#### N60.5d · Neuberechnung aller Analysen (Marcel freigegeben, 09.10.2026)
-**Läuft.** Jedes Objekt wird über den echten Bedienweg neu gerechnet und
-trägt danach Stempel **und** Fingerabdruck. Gemessen 33–122 s je Objekt.
+#### N60.5d · Neuberechnung aller Analysen — ✅ FERTIG (09.10.2026)
+Alle Objekte über den echten Bedienweg neu gerechnet. **Abnahme:**
+
+| | |
+|---|---|
+| Marcels Objekte mit Analyse | **13 von 13 korrekt gestempelt** |
+| davon mit vollem Fingerabdruck (20 Felder) | **13** |
+| fremd oder ohne Stempel | **0** |
+| Prüfer über **alle** Nutzer (17 Analysen) | **RC=0 — nichts zu melden** |
+
+Dauer 33–180 s je Objekt. Acht Objekte haben weiterhin **keine** Analyse
+— die waren vorher auch ohne und wurden nicht erfunden.
+
+> **⚠ Eigener Fehler, der Guthaben gekostet hat:** ein Läufer-Start,
+> dessen Antwort in den Zeitüberlauf lief (*„CDP timed out after
+> 45000ms"*), war **trotzdem ausgeführt**. Ich habe ihn als
+> fehlgeschlagen gelesen und über eine zweite Schiene erneut gestartet —
+> **zwei Läufer gleichzeitig**, `2026-1053` doppelt gerechnet.
+> **Der Zeitüberlauf betrifft nur den Antwortkanal, nicht die
+> Ausführung.** Seitdem: genau einmal starten, danach nur abfragen, und
+> vor einem Neustart den echten Zustand in der Datenbank messen statt
+> dem Protokoll zu glauben. **Marcel kennt den Fehler auch — tritt er
+> wieder auf, ist die Ursache selbst zu untersuchen.**
+
+#### N60.5e · ⚠ Der Kopf zeigte „kein Datum", obwohl der Stempel saß (`v2017a`)
+Beim Durchlauf aufgefallen: nach einer frisch gerechneten Analyse stand
+oben *„Diese Analyse trägt noch kein Datum"* — während `_aiAnalysis._fuer`
+korrekt auf das Objekt zeigte. Ursache war die **Reihenfolge**:
+
+```
+html = _renderAIServerAnalysis(data.analysis);   <- zuerst gerendert
+window._aiAnalysis = _analyseStempeln(...);      <- danach gestempelt
+```
+
+Der Kopf liest `a._fuer` — und das gab es beim Rendern noch nicht. Erst
+ein Neuladen zeigte den Stand. **Zwanzig Zeilen weiter unten (`runMiniAI`)
+war die Reihenfolge von Anfang an richtig herum** — zwei Wege, eine
+Sache, und nur einer stimmte.
+
+> **Gefunden hat es nicht der Prüfer, sondern der Blick auf den
+> Bildschirm nach dem Lauf.** Der Stempel war da, die Anzeige nicht.
+
+#### N60.11 · Eigenes Wissen ergänzen — ✅ BACKEND FERTIG (`v2019`)
+Marcel: „ist das irgendwo zugänglich, diese Datei? Dass man da auch was
+noch zuschreiben könnte."
+
+**Bis v2019: nein.** `bot-wissen.md` liegt im Repo und im Image — ändern
+hieß committen, ausrollen, neu starten. Der Kopf der Datei behauptet
+„Marcel kann sie selbst ändern"; das stimmt nur mit Repo-Zugang.
+
+Jetzt **zwei Quellen, sauber getrennt**:
+
+```
+PROJEKTWISSEN DEALPILOT       <- die Datei, jeder Satz am Code belegt
+ERGÄNZUNGEN DES BETREIBERS    <- frei gepflegt, user_settings
+```
+
+> **Warum getrennt und nicht eingemischt:** der erste Block trägt die
+> Zusage „das Folgende ist die **einzige** Quelle für Aussagen über das
+> Produkt". Freien Text dazwischenzumischen hieße, diese Zusage auf
+> etwas auszudehnen, das niemand gegengelesen hat. Der Ergänzungsblock
+> sagt deshalb: **widerspricht er dem Block darüber, gilt der Block
+> darüber** — und der Bot nennt den Widerspruch. Dieselbe Warnung wie im
+> Dateikopf gilt mit: **keine Zahlen, die sich ändern.**
+
+Ein Lader (`zusatzFuer`/`blockFuer` in `projektwissen.js`, 60 s
+Zwischenspeicher), drei Piloten. Dabei eine Doppelung beseitigt:
+`agentLauf` baute die Einleitung inline, und seit `v2010` steckt sie
+auch im Block — nebeneinander hätte sie zweimal im Prompt gestanden.
+
+**OFFEN: das Eingabefeld in den Einstellungen.** Der Schlüssel ist
+erlaubt und wird gelesen; die Oberfläche dazu fehlt noch.
 
 > **⚠ Eigener Fehler, der Guthaben gekostet hat:** ein Läufer-Start,
 > dessen Antwort in den Zeitüberlauf lief (*„CDP timed out after
