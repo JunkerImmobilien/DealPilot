@@ -279,12 +279,33 @@ async function pilot_analyse_lesen(ctx, args) {
    * nirgends nennt, aber EINEN ANDEREN Ort aus dem Portfolio, ist mit hoher
    * Wahrscheinlichkeit kopiert — dann bekommt der Nutzer das gesagt, statt
    * dass der Bot dem falschen Haus die richtige Sprache gibt. */
+  /* ══ v2015 · ZUERST DER STEMPEL, DANN DIE HEURISTIK ═════════════
+
+     Seit v2015 traegt jede NEUE Analyse `_fuer.objekt_id` - die
+     Kennung des Objekts, fuer das sie gerechnet wurde. Damit ist der
+     Vergleich exakt: gleich oder nicht.
+
+     Die Heuristik darunter bleibt fuer die ALTEN Analysen ohne
+     Stempel - und sie sagt jetzt dazu, dass sie raet. Sonst liest
+     sich eine Vermutung wie eine Feststellung. */
+  const _st = (roh && typeof roh === 'object' && roh._fuer) ? roh._fuer : null;
+  if (_st && _st.objekt_id) {
+    aus.gehoert_zu = { objekt_id: _st.objekt_id, adresse: _st.adresse || null, stand: _st.stand || null };
+    if (String(_st.objekt_id) !== String(id)) {
+      aus.fremd_verdacht = true;
+      aus.fremd_sicher = true;
+      aus.so_sagen = 'Diese gespeicherte Pilot-Analyse wurde NACHWEISLICH fuer ein anderes '
+                   + 'Objekt gerechnet' + (_st.adresse ? ' (' + _st.adresse + ')' : '')
+                   + '. Stuetze dich NICHT darauf. In DealPilot im Reiter „Pilot-Analyse" neu erstellen.';
+    }
+  }
   const ort = String(o.daten.ort || '').trim();
-  if (ort) {
+  if (ort && !aus.gehoert_zu) {
     const text = (typeof roh === 'string') ? roh : JSON.stringify(roh);
     const nenntOrt = text.toLowerCase().includes(ort.toLowerCase());
     if (!nenntOrt) {
       aus.fremd_verdacht = true;
+      aus.fremd_sicher = false;   /* v2015 - das hier ist eine Vermutung */
       aus.so_sagen = 'Achtung: Die gespeicherte Pilot-Analyse nennt den Ort ' + ort + ' nirgends — '
                    + 'sie stammt vermutlich von einem anderen Objekt. Bitte in DealPilot im Reiter '
                    + '„Pilot-Analyse" neu erstellen, bevor du dich darauf stützt.';

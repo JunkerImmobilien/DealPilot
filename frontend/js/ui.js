@@ -1081,6 +1081,33 @@ async function _fotosFuerKi() {
   return aus;
 }
 
+/* ══ v2015 · DER STEMPEL AUF DER ANALYSE ═════════════════════════
+
+   Gemessen: sieben Objekte trugen byte-identisch dieselbe Analyse,
+   und sie sprach von einem achten. Der Bot hat es gemerkt - mit
+   einer Heuristik ("nennt der Text den Ort nicht?"), die raet und
+   nur im Telegram-Werkzeug sitzt.
+
+   Beim ERZEUGEN weiss der Browser genau, fuer welches Objekt er
+   rechnet. Diese eine Zeile fehlte. Jetzt kann jeder Leser exakt
+   vergleichen statt zu raten - im Bot, im PDF, im Co-Pilot.
+
+   Eine Herkunftsangabe gehoert an den ORT, an dem sie entsteht,
+   nicht an den, der sie spaeter braucht. */
+function _analyseStempeln(analyse) {
+  if (!analyse || typeof analyse !== 'object') return analyse;
+  try {
+    var adr = [g('str'), g('hnr')].filter(Boolean).join(' ');
+    var ort = [g('plz'), g('ort')].filter(Boolean).join(' ');
+    analyse._fuer = {
+      objekt_id: window._currentObjKey || null,
+      kuerzel: (typeof g === 'function' ? (g('kuerzel') || null) : null),
+      adresse: [adr, ort].filter(Boolean).join(', ') || null,
+      stand: new Date().toISOString()
+    };
+  } catch (e) { /* ohne Stempel ist sie nicht schlechter als vorher */ }
+  return analyse;
+}
 async function _runAIServer(btn) {
   var _orig = btn.innerHTML; /* v596-origbtn */
   btn.textContent = '⏳ Recherchiere Lage & analysiere...';
@@ -1101,8 +1128,10 @@ async function _runAIServer(btn) {
     var html;
     if (data && data.analysis) {
       html = _renderAIServerAnalysis(data.analysis);
-      window._aiAnalysis = data.analysis;
-      window._aiText = JSON.stringify(data.analysis, null, 2);
+      /* v2015 - stempeln, BEVOR gespeichert wird. Danach ist nicht
+         mehr feststellbar, fuer welches Objekt sie gerechnet wurde. */
+      window._aiAnalysis = _analyseStempeln(data.analysis);
+      window._aiText = JSON.stringify(window._aiAnalysis, null, 2);
       // V25: Mini-Block in Tab Kennzahlen mit aktualisieren
       var _mb = document.getElementById('ai-mini-body'); if (_mb) _mb.innerHTML = html; /* v596: Voll-Analyse in Bewertung */
       // V63.69: KI-Analyse direkt persistieren — User-Wunsch
@@ -1579,8 +1608,10 @@ async function _runMiniAIGuarded() {
 
     var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
     if (data && data.analysis) {
-      window._aiAnalysis = data.analysis;
-      window._aiText = JSON.stringify(data.analysis, null, 2);
+      /* v2015 - stempeln, BEVOR gespeichert wird. Danach ist nicht
+         mehr feststellbar, fuer welches Objekt sie gerechnet wurde. */
+      window._aiAnalysis = _analyseStempeln(data.analysis);
+      window._aiText = JSON.stringify(window._aiAnalysis, null, 2);
       _renderMiniAI(data.analysis);
       // Auch den großen Block in Tab s5 mit aktualisieren
       var aiContent = document.getElementById('ai-content');
