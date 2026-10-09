@@ -4729,6 +4729,40 @@
       '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:nowrap;row-gap:0}',
       '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 auto;order:0}',
       '}',
+      /* ═══ v2058 · SEHR FLACH: DIE ENTSCHEIDUNG SCHLAEGT DEN PEGEL ══════
+         GEMESSEN bei 666x373 nach v2057: die drei Chips standen jetzt in
+         EINER Zeile und der Mikrofonkasten war auf 54 px - trotzdem
+         blieben sie verdeckt.
+
+         Die Rechnung geht dort nicht auf, und zwar grundsaetzlich:
+
+           Scrollport            145 px
+           Chip-Leiste            97
+           Mikrofonkasten         54
+           Eingabezeile           40
+                                 ---
+           Bedienung zusammen    191 px
+
+         Und `sticky` schafft keinen Platz: es haelt ein Element an
+         seiner Flussposition fest, es hebt es nicht darueber hinaus.
+         `#vi-rf-dran` wollte mit bottom:130 auf Oberkante 61 - der Port
+         beginnt aber erst bei 143. Also klemmte es bei 157..254, und
+         der Mikrofonkasten (189..244) lag davor.
+
+         Wenn drei Schichten nicht nebeneinander passen, muss eine davor.
+         Die Chip-Leiste bekommt deshalb denselben Versatz wie der
+         Mikrofonkasten (bottom:44) und legt sich mit z-index:7 darueber.
+
+         Das ist eine Entscheidung ueber Vorrang, keine Platzierung:
+         solange eine Frage offen ist, ist die ANTWORT wichtiger als der
+         Aussteuerungspegel. Der Kasten kommt zurueck, sobald die Leiste
+         leer ist - sie wird dann ausgeblendet.
+
+         Die Eingabezeile (248..288) bleibt frei: die Chip-Leiste endet
+         bei 244. Sie wird also nicht verdeckt, nur der Pegel. */
+      '@media(max-height:420px){',
+      '  .oabi-ov.vi-mode #vi-rf-dran{bottom:44px;z-index:7}',
+      '}',
       '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
       '  background:rgba(42,39,39,.03)}',
       '.vi-rf-knf-z span{display:block;opacity:.55;text-transform:uppercase;letter-spacing:.04em;',
