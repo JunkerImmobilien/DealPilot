@@ -1256,11 +1256,23 @@
   async function pruefSelbsttest(){
     var z = ziel(), d = z.d, win = z.win;
     if (!d) return { urteil: 'kein Dokument' };
+    /* Das Opfer muss GANZ im Bild liegen - auch waagerecht. Beim ersten
+       Anlauf fehlte diese Haelfte der Bedingung, und gewaehlt wurde ein
+       Knopf des eingeklappten Seitenmenues bei x = -286. `elementsFromPoint`
+       gibt dort ein LEERES Array, die Decke konnte nichts verdecken, und
+       der Selbsttest meldete „DURCHGEFALLEN" - fuer einen Mangel, den er
+       selbst mitgebracht hatte.
+
+       Genau dafuer ist er da: er hat den Fehler gefunden, bevor eine
+       gruene Messung auf ihm aufgebaut wurde. */
     var opfer = [].slice.call(d.querySelectorAll('button,a[href]')).filter(function(e){
       var r = e.getBoundingClientRect();
-      return r.width > 30 && r.height > 20 && r.top > 0 && r.bottom < win.innerHeight;
+      return r.width > 30 && r.height > 20
+          && r.top > 0 && r.bottom < win.innerHeight
+          && r.left > 0 && r.right < win.innerWidth
+          && win.getComputedStyle(e).pointerEvents !== 'none';
     })[0];
-    if (!opfer) return { urteil: 'kein Testknopf im Bild - erst eine Ansicht laden' };
+    if (!opfer) return { urteil: 'kein Testknopf GANZ im Bild - erst eine Ansicht laden' };
     var vorher = apBedienbar(d, win).verdaechtig.length;
     var r = opfer.getBoundingClientRect();
     var decke = d.createElement('div');
