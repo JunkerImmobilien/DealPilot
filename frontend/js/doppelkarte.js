@@ -221,6 +221,17 @@
     var karten = liste.querySelectorAll('.sb-card');
     for (var i = 0; i < karten.length; i++) {
       var k = karten[i], key = k.getAttribute('data-key');
+      /* v2031c - eine laufende Drehung NICHT anfassen.
+
+         anlegen() laeuft nach jedem Listen-Neuaufbau und zusaetzlich
+         zweimal verzoegert (800 ms, 2500 ms). Faellt das in eine Drehung,
+         setzt es die Karte auf die gemerkte Seite zurueck - und der Klick
+         sieht aus, als waere er verschluckt worden.
+
+         Gemessen: bei 650 ms Klickabstand ging jeder ZWEITE Klick
+         verloren, bei 720 ms keiner. Ein Fehler, der nur im Takt
+         auftritt, ist trotzdem einer. */
+      if (k._dkLaeuft) continue;
       knopfSetzen(k);
       /* War diese Karte gedreht? Dann ohne Animation direkt auf die
          Rueckseite - eine Drehung bei jedem Listen-Neuaufbau waere
