@@ -157,15 +157,36 @@
       return;
     }
 
-    /* zurueck: Sperre loesen, dann den LAUFENDEN Stand neu holen.
-       Nicht aus dem Formular - dort steht gerade die Vergangenheit. */
-    _aktiv = false; _frei = false;
+    /* zurueck: den LAUFENDEN Stand neu holen - nicht aus dem Formular,
+       dort steht gerade die Vergangenheit.
+
+       v2037b - DIE SPERRE BLEIBT WAEHRENDDESSEN AN. Gemessen: beim
+       Zurueckschalten stieg die Objektversion von 310 auf 311 - es
+       wurde geschrieben. Ursache: loadSaved() ruft als ERSTES
+       dpTabSwitchSave(), und das sichert das Formular. Im Formular
+       stand noch die Vergangenheit.
+
+       Diesmal ist nichts verlorengegangen (die beiden Staende waren
+       ohnehin gleich), aber wer nach dem Festschreiben etwas gepflegt
+       haette, haette es damit verloren.
+
+         > Eine Sperre, die man loest, BEVOR der letzte Schreibweg
+         > durch ist, hat genau einen Augenblick zu frueh aufgehoert.
+
+       Deshalb: erst laden (die Sperre blockt den Save darin), dann
+       loesen. */
+    _frei = false;
     document.body.classList.remove('dp-ankauf-ansicht', 'dp-ankauf-frei');
     var host = el('ank-ansicht-host');
     if (host) host.innerHTML = '';
+    function loesen() { _aktiv = false; }
     if (_key && typeof loadSaved === 'function') {
-      try { loadSaved(_key); } catch (e) { console.warn('[v2037] zurueck:', e.message); }
-    }
+      try {
+        var p = loadSaved(_key);
+        if (p && typeof p.then === 'function') p.then(loesen, loesen);
+        else setTimeout(loesen, 400);
+      } catch (e) { console.warn('[v2037] zurueck:', e.message); loesen(); }
+    } else { loesen(); }
   }
 
   /* Objektwechsel beendet die Ankauf-Ansicht: der neue Stand gehoert
