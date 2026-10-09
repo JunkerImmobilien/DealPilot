@@ -4696,6 +4696,39 @@
       '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 100%;order:-1}',
       '  .oabi-ov.vi-mode .vi-rf-halt{margin-left:auto}',
       '}',
+      /* ═══ v2057 · BREIT UND FLACH IST NICHT SCHMAL ═════════════════════
+         v2056 hat den Handy-Block auf flache Fenster ausgeweitet, damit
+         das Querformat ueberhaupt bedienbar wird. Das war richtig fuer die
+         HOEHEN-Regeln (klebende Bedienleiste, kompakte Buehne) - aber es
+         hat die BREITEN-Regeln mitgenommen, und die sind bei 667 px
+         Breite falsch.
+
+         GEMESSEN bei 666x373, gleich nach v2056:
+           Chip-Leiste 574 px breit, die drei Chips zusammen 424 px -
+           sie passen locker nebeneinander, standen aber in zwei Zeilen.
+           Grund: der Vorspann "Damit ich den richtigen Ton treffe:"
+           belegt 231 px in DERSELBEN Zeile; 231 + 424 = 655 > 574.
+           Der Mikrofonkasten brach ebenso zweizeilig um (82 statt 40 px),
+           obwohl 666 px Breite da sind.
+
+         Zusammen waren das 129 + 82 = 211 px Bedienung in einem 145 px
+         hohen Scrollport - und sticky kann nicht mehr Platz schaffen,
+         als der Port hat. Deshalb blieben die Chips verdeckt.
+
+         Hier wird nur zurueckgenommen, was an der BREITE haengt:
+           · der Vorspann bekommt eine eigene Zeile, die Chips eine
+           · der Mikrofonkasten bleibt einzeilig
+
+         Ich habe zwei verschiedene Anliegen in eine Media-Query gesteckt
+         (schmal UND flach). Dieser Gegenblock trennt sie wieder, statt
+         v2056 zurueckzudrehen - der Nutzen dort ist gemessen: 767x497
+         ging von 0 auf 3 erreichbare Chips. */
+      '@media(min-width:601px) and (max-height:560px){',
+      '  .oabi-ov.vi-mode .vi-dran-lbl{flex:1 1 100%}',
+      '  .oabi-ov.vi-mode .vi-dran-a{row-gap:4px}',
+      '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:nowrap;row-gap:0}',
+      '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 auto;order:0}',
+      '}',
       '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
       '  background:rgba(42,39,39,.03)}',
       '.vi-rf-knf-z span{display:block;opacity:.55;text-transform:uppercase;letter-spacing:.04em;',
