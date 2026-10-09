@@ -246,6 +246,45 @@ dieses Objekt selbst angelegt hatte** (IMG_1554 und IMG_1558/1559).
 danach auf einmal über 80. Warum?" — in diesen sechs Bildern nicht
 enthalten, aber die Zahlenbefunde oben sind ein starker Kandidat.
 
+#### N60.4c · Bidirektional — ERSTE STUFE GEBAUT (09.10.2026)
+Marcel: „Ich möchte das bidirektional haben, dass der Telegram-Bot
+Zugriff auf die Daten der Pilotanalyse und die Daten der Portfolioanalyse
+hat und andersrum genauso. … Ziel ist, dass der Telegram-Bot auf alle
+Daten und Felder zugreifen kann und auch das gesamte Wissen vom Pilot
+und Cockpit-Analyse bekommt."
+
+| Richtung | vorher | jetzt |
+|---|---|---|
+| Produktwissen → Browser-Piloten | `bot-wissen.md` hatte **einen** Leser (Telegram) | `v2010`: ein gemeinsamer Lader, **drei** Piloten |
+| App-Felder → Pilot-Analyse | 21 Rohfelder von 256 | `v2011`: **sieben Blöcke**, 46 Felder dazu |
+| Cockpit-Analyse → Telegram | **gar nicht** — sie verfiel mit dem Reiter | `v2012`: abgelegt + `portfolio_analyse_lesen` |
+| Objekt-Analyse → Telegram | `pilot_analyse_lesen` | unverändert da |
+| Alle Rohfelder → Telegram | `_ohneIntern()` gibt sie schon aus | unverändert da |
+
+Nachgewiesen im laufenden Container: Projektwissen 6.602 Zeichen im
+Prompt, alle sieben Blöcke vorhanden, Promptlänge 15.650 → **23.377**;
+22 statt 21 Werkzeuge; die Kette Cockpit → `user_settings` → Bot-Werkzeug
+einmal durchgespielt (Stand, Alter in Tagen, Score kommen an).
+
+> **`v2012a` — gefunden beim Aufräumen, nicht beim Prüfen.** Das neue
+> Werkzeug prüfte `!r.rows[0].wert`; ein zurückgesetzter Eintrag ist aber
+> `{text:null}` — ein Objekt und damit truthy. Es meldete `vorhanden:
+> true` mit `analyse: null`, der Bot hätte eine Analyse **angekündigt,
+> die es nicht gibt**. Geprüft wird jetzt der Text, nicht die Zeile.
+> **Den Zustand erzeugt der erste Lauf gar nicht** — nur das Aufräumen
+> danach.
+
+**Noch offen für „alle Daten":**
+- **Fotos auswerten.** `/analyze` ruft das Modell mit reinem Text; Bilder
+  brauchen den content-parts-Weg, den es nur für den Beleg-Import gibt.
+  Eigener Umbau mit eigener Kostenfolge (Vision kostet mehr).
+- **Die sieben Blöcke auch für den Portfolio-Piloten** — er sieht je
+  Objekt weiter nur 24 Zahlenfelder.
+- **Das Investmentprofil** (24 Schlüssel) liegt nur im `localStorage` und
+  erreicht keinen Prompt.
+- **Pilot-Analyse ← Telegram:** der Bot kann sie lesen, aber nicht
+  auslösen.
+
 #### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung
 Marcel: „Wenn ich nach wichtigen Daten frage, möchte ich immer, wenn
 verfügbar, **DealScore und Investor DealScore** sowie **alle beteiligten
