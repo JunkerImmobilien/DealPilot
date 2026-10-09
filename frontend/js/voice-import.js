@@ -3764,6 +3764,13 @@
       '  background:linear-gradient(90deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
       '  transition:width .45s cubic-bezier(.22,.8,.3,1)}',
       '.vi-rf-schalter{display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
+      /* v2049 - der Fertig-Knopf in der Kopfzeile: ruhig, rechts, und
+         er verdeckt nichts. Kein Gold - er ist ein Ausgang, keine
+         Empfehlung. */
+      '.vi-rf-fertig{border:1px solid rgba(168,162,153,.30);background:none;',
+      '  color:#A8A299;border-radius:7px;padding:5px 11px;cursor:pointer;',
+      '  font:500 11.5px/1 Inter,system-ui,sans-serif;white-space:nowrap}',
+      '.vi-rf-fertig:hover{color:#E8E3D8;border-color:rgba(168,162,153,.55)}',
       '.vi-rf-fs{display:flex;align-items:center;gap:7px;cursor:pointer;',
       '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
       '.vi-rf-fs input{accent-color:var(--wl-c9a84c, #C9A84C)}',
@@ -7026,9 +7033,29 @@
 
     } else if (_rf.adresseFrage) {
       frage = '<b>Stimmt die Adresse?</b> Sag „ja" — oder nenn sie mir noch einmal.';
-    } else if (e) {
-      frage = '<b>Jetzt dran</b> · ' + escH(_rfKurzname(e)) + ' — ' + escH(e.frage);
     }
+    /* ═══ v2049 · DIE DRITTE KOPIE DERSELBEN FRAGE ══════════════════
+
+       Hier stand die Zeile mit dem Kurznamen und der Frage. GEMESSEN:
+       der Fragetext stand damit DREIMAL gleichzeitig auf dem Schirm -
+       als Blase im Verlauf (Z. 9176, dort mit Pillen und Skalen), im
+       festen Streifen darueber (`_rfFrageAnheften`, v1619) und hier
+       darunter.
+
+       Marcel: es ist total ueberladen, und: dass man das wirklich
+       eher im Chatverlauf hat.
+
+       Diese Kopie geht, nicht eine der anderen: die Blase IST der
+       Verlauf, und der Streifen traegt die Begruendung aus v1619 -
+       wer sich etwas erklaeren laesst, scrollt die Blase aus dem Bild.
+       Beides erfuellt, was diese Zeile auch tat; sie war die Kopie
+       ohne eigenen Zweck. Und sie war die teure: Z. 4443 hat
+       `#vi-rf-dran` auf dem Handy mit 337 px gemessen, ueber die
+       HAELFTE des Koerpers.
+
+       Die vier anderen Zweige oben bleiben - das sind ZUSTAENDE
+       (uebersprungen, fertig, Adressfrage), keine Wiederholung einer
+       Frage, die woanders steht. */
     if (!frage && !akt.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
     host.style.display = '';
     /* ═══ v1119-WPULS · Der Zustand steht am Rahmen ══════════════════════
@@ -8125,8 +8152,11 @@
     if (!host) return;
     if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = ''; return; }
     host.innerHTML =
-      '<div class="vi-rf-frage-txt">' + escH(e.frage) + '</div>' +
-      _rfAntwortHilfe(e);
+      /* v2049 - nur der Fragetext. `_rfAntwortHilfe(e)` stand hier UND
+         in der Blase (Z. 9176, dort zusammen mit `_rfPillen` und
+         `_rfSkalen`). Dieser Streifen ist die AUFGABE in einem Satz;
+         die Hilfe gehoert dorthin, wo auch die Pillen stehen. */
+      '<div class="vi-rf-frage-txt">' + escH(e.frage) + '</div>';
     host.style.display = '';
   }
 
@@ -8941,7 +8971,17 @@
       '<div class="vi-rf-kopfzeile">' +
         '<span class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen') + '</span>' +
         '<span class="vi-rf-schalter">' +
-          '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
+          /* ═══ v2049 · DER SCHALTER GEHT, DAS ZUHOEREN BLEIBT ═════════
+             Marcel: „das Freisprechen, das kann raus."
+
+             Das EINGABEFELD bleibt, nur versteckt: `#vi-rf-fs` wird an
+             zwei Stellen gelesen - Z. 9090 bindet den Wechsel, Z. 11588
+             schaltet es im Quick-Check ab. Ein entferntes Element haette
+             dort zwei Abstuerze ergeben.
+
+             Ein Schalter, den niemand mehr sieht, aber jeder Leser noch
+             findet, ist sicherer als ein entferntes Element. */
+          '<input type="checkbox" id="vi-rf-fs" checked hidden>' +
           /* v1282: Wer gleich alles will, muss nicht erst die Pflichtstrecke
              abwarten. Der Schalter haengt die Feinheiten sofort an. */
           /* ═══ v1311 · Im Quick-Check gibt es „Alle Felder" nicht ═══════
@@ -8957,6 +8997,10 @@
              Wer mehr will, legt ein Objekt an — dort steht der Schalter. */
           (_qcTarget ? '' :
             '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>') +
+          /* v2049 - „Fertig" zieht aus der Fusszeile hierher. Er faellt
+             NICHT weg: ohne ihn kaeme man aus dem Lauf nur noch ueber
+             Abbrechen heraus, und das ist etwas anderes - es verwirft. */
+          '<button type="button" id="vi-rf-ende" class="vi-rf-fertig">Fertig \u2014 zur \u00dcbersicht</button>' +
         '</span>' +
       '</div>' +
       /* v1288: das Etappenband - wo im Sprechlauf stehen wir gerade. */
@@ -9003,14 +9047,28 @@
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
       '<div class="vi-rf-neben" id="vi-rf-neben">' +
-        '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
+        /* ═══ v2049 · DIE FUSSZEILE TRAEGT NUR NOCH ANTWORTEN ════════
+           Marcel: „da ganz unten steht auch noch weiss ich nicht,
+           normal, fertig zur Uebersicht. Ich glaube, das braucht man
+           auch nicht."
+
+           „Weiss ich nicht" war der DRITTE Weg zu derselben Handlung.
+           GEMESSEN an `RF_NEIN` (Z. 4855): weiter, ueberspringen,
+           weiss nicht, weiss ich nicht, keine Ahnung sind alle
+           gefasst - gesprochen wie getippt. Ueberspringen bleibt also
+           erreichbar, nur nicht mehr als Knopf.
+
+           Der gewonnene Platz geht an die Felder und den Verlauf. */
         /* v1378 (C2): Der Ton steht bei den Nebenknoepfen, nicht in der
            Aktionsleiste. Dort stehen ENTSCHEIDUNGEN, die verschwinden,
            wenn sie getroffen sind - der Ton ist eine Dauereinstellung. */
-        '<button type="button" id="vi-rf-ton" title="Ton umschalten: Lernmodus · Normal · Investor-Modus"></button>' +
+        /* v2049 - der Ton bleibt umschaltbar, aber nicht als Dauerknopf
+           in der Fusszeile. `_rfTonKnopf()` und `_rfModusWeiter()`
+           lesen das Element weiter, deshalb bleibt es - versteckt. */
+        '<button type="button" id="vi-rf-ton" hidden></button>' +
 
         '<button type="button" id="vi-rf-passt" style="display:none"></button>' +
-        '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
+        /* v2049 - steht jetzt in der Kopfzeile. */
       '</div>' +
       '<div id="vi-rf-gesagt" style="display:none"></div>';
     h.style.display = '';
@@ -9026,7 +9084,9 @@
     /* v1381 · Anhalten und Weiter. */
     $('vi-rf-halt').addEventListener('click', function () { _fsPauseUm(); });
     _fsPauseKnopf();
-    $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
+    /* v2049 - `#vi-rf-nix` gibt es nicht mehr; ein nacktes $() darauf
+       waere ein Absturz beim Aufbau. Ueberspringen laeuft ueber die
+       Sprache (`RF_NEIN`, Z. 4855) und `_rf.aktionen`. */
     /* v1378 (C2) */
     $('vi-rf-ton').addEventListener('click', function () { _rfModusWeiter(); });
     _rfTonKnopf();
