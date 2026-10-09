@@ -460,8 +460,12 @@ function buildPrompt(payload, opts) {
         + '\n- Zeitmiete (\u00a7 575 BGB) braucht einen gesetzlichen Grund; moebliert/Kurzzeit'
         + '\n  (\u00a7 549 Abs. 2 BGB) hat keinen Kuendigungsschutz; preisgebundene Wohnungen'
         + '\n  folgen der Kostenmiete, nicht dem Mietspiegel.'
-        + '\n- "rnd_eigen": fuer diese Einheit liegt eine EIGENE Restnutzungsdauer vor'
-        + '\n  ("rnd_jahre"). Sie schlaegt die aus Zustand und Baujahr gerechnete - nimm sie.')
+        /* v2023a - die Regel zu `rnd_eigen` ist entfallen: das Feld gibt
+           es seit v2023 nicht mehr. Die Restnutzungsdauer je Einheit
+           kommt aus dem Zustand (Anlage 2 ImmoWertV, Schritt 3/4 des
+           MFH-Konfigurators) - EIN Weg, nicht zwei. */
+        + '\n- Die Restnutzungsdauer je Einheit steht NICHT hier: sie wird aus dem'
+        + '\n  Zustand gerechnet (Anlage 2 ImmoWertV). Leite sie nicht aus dem Vertrag ab.')
       : '',
     '',
     '## INPUT-DATEN',

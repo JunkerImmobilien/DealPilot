@@ -816,9 +816,13 @@ function _buildAIPayload() {
                 letzte_erhoehung: e.mv_letzte_erhoehung || null,
                 naechste_anpassung: e.mv_naechste_anpassung || null,
                 befristet_bis: e.mv_befristet_bis || null,
-                zustand: e.zustand || null,
-                rnd_eigen: e.rnd_eigen ? true : null,
-                rnd_jahre: e.rnd_eigen ? (zahl(e.rnd_jahre) || null) : null
+                /* v2023a - `rnd_eigen`/`rnd_jahre` sind hier entfallen.
+                   Das FELD ist in v2023 weggefallen (die RND kommt aus
+                   Zustand je Einheit); der Sender blieb stehen und haette
+                   nur noch Altdaten geliefert - die im Prompt aussehen wie
+                   gepflegte. Ein Feld entfernen heisst nicht, es
+                   loszuwerden. */
+                zustand: e.zustand || null
               };
             }),
             /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
