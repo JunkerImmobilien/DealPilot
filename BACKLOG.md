@@ -708,6 +708,50 @@ braucht die neuen IDs.
 
 ---
 
+#### N60.14 · VPI-Rechner für Indexmietverträge — Empfehlung liegt vor
+Marcel: „bei den Index-Mietverträgen haben wir da irgendwie die
+Möglichkeit, wenn wir Angaben gemacht haben zum Objekt, den VPI-Rechner
+mit zu verknüpfen? Also macht das Sinn?"
+
+**Ja, und es ist sogar die einzige Art, eine Indexmiete ehrlich zu
+rechnen.** § 557b BGB knüpft an den Verbraucherpreisindex für
+Deutschland (Destatis, Basis 2020 = 100). Die zulässige Erhöhung ist
+
+```
+neue Miete = alte Miete × (Index_heute / Index_bei_letzter_Anpassung)
+```
+
+Seit `v2025` steht an beiden Stellen dran, dass die hinterlegte Höhe eine
+**Annahme** ist. Ein VPI-Bezug macht aus der Annahme eine Rechnung —
+rückwirkend sogar eine exakte.
+
+**Empfehlung: die Indexreihe in die Datenbank, nicht live abfragen.**
+- Es sind zwölf Zahlen im Jahr, einmal jährlich nachzutragen — dieselbe
+  Pflege wie beim Register.
+- Eine Laufzeitabhängigkeit von einem fremden Dienst bricht genau dann,
+  wenn jemand einen Bericht erzeugt. `FALLEN.md` führt dafür schon den
+  Notnagel, der einen dauerhaft kaputten Abruf verdeckt.
+- **Die Reihe trägt einen Stichtag je Monat.** Genau hier sind der
+  Baupreisindex (`1.91` als Konstante) und die GND schon zweimal
+  danebengegangen: eine Zahl ohne Stichtagsbezug rechnet für einen
+  Stichtag in der Vergangenheit zwangsläufig falsch, und nichts
+  widerspricht.
+
+**Was es braucht:** eine Tabelle `vpi_monat (jahr, monat, index, basis,
+quelle, abgerufen_am)`, ein Feld je Mietvertrag für den Monat der letzten
+Anpassung (steht als `mv_letzte_erhoehung` schon da), und die Rechnung in
+`mietentwicklung.js` statt des angenommenen Prozentsatzes. Die
+Kennzeichnung aus `v2025` bleibt, wechselt aber den Text: aus „Annahme"
+wird „VPI-gerechnet, Stand <Monat>".
+
+**Vor dem Bauen zu klären (Bewertungsfrage, gehört Marcel):** viele
+Verträge erlauben die Anpassung erst ab einer Mindestveränderung oder
+nach frühestens zwölf Monaten (§ 557b Abs. 2). Ob DealPilot das aus dem
+Vertrag mitführt oder pauschal jährlich rechnet, ist eine fachliche
+Entscheidung, keine technische.
+
+---
+
 ### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
 
 Marcel: „dass du die Objekte alle nochmal durchgehst und auch die
