@@ -4554,7 +4554,23 @@
          GENAU die Hoehe der Buehne und scrollt in sich - und
          _rfAnsEnde() scrollt weiterhin das richtige Element ans Ende,
          was bei einem Scroller weiter oben nicht mehr stimmen wuerde. */
-      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:38vh;',
+      /* ═══ v2055 · DIE BUEHNE DARF SCHRUMPFEN ═══════════════════════
+         Hier stand `flex:1 1 auto` mit `min-height:38vh`. Das heisst:
+         sie gibt nichts ab. GEMESSEN auf 390 px summierten sich die
+         Mindesthoehen auf 659 px bei 510 verfuegbaren - der Container
+         scrollte, und dadurch KLEBTEN Mikrofonkasten und Eingabezeile
+         ueber der Chip-Leiste. Alle drei Chips der Tonfrage waren
+         unerreichbar, und der Lauf wartet auf genau diese Antwort.
+
+         `flex:1 1 0` mit kleiner fester Untergrenze: sie nimmt, was
+         uebrig ist, statt den Rest zu verdraengen. Der Chat darin hat
+         laengst `flex:1 1 0;min-height:0` und scrollt in sich - es
+         geht also nichts verloren.
+
+         Das ist die Falle aus CLAUDE.md in der anderen Richtung: dort
+         schrumpfen Flex-Kinder, statt zu scrollen. Hier schrumpfte
+         eines NICHT und verdraengte die Bedienung aus dem Bild. */
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 0;min-height:110px;',
       '    display:flex;flex-direction:column}',
       '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{flex:1 1 0;min-height:0;height:auto;',
       '    max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
@@ -4585,7 +4601,22 @@
       '    transform:rotate(180deg)}',
       /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
          Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
-      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto}',
+      /* ═══ v2055 · DIE CHIP-LEISTE KLEBT MIT ═══════════════════════
+         Sie stand als EINZIGE der drei Bedienschichten im Fluss,
+         waehrend Mikrofonkasten (bottom:44) und Eingabezeile
+         (bottom:0) darueber klebten. Sobald der Container scrollte,
+         verschwand sie dahinter - GEMESSEN: alle drei Chips der
+         Tonfrage unerreichbar.
+
+         `bottom:130px` ist Mikro (86) + Zeile (44). Damit sitzt sie
+         immer UEBER den beiden, nie darunter.
+
+         Der eigene Grund ist Pflicht, nicht Geschmack: ein klebendes
+         Element ohne Hintergrund laesst das Gespraech durchscheinen.
+         `z-index:4` haelt die Reihenfolge der drei Schichten -
+         darunter das Gespraech, darueber Mikro (5) und Zeile (6). */
+      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto;',
+      '    position:sticky;bottom:130px;z-index:4;background:var(--cr,#FDFCFA)}',
       /* Reihenfolge per order - ohne das DOM anzufassen. */
       '  .oabi-ov.vi-mode .vi-rf-kopfzeile{order:1}',
       '  .oabi-ov.vi-mode #vi-rf-band{order:2}',
