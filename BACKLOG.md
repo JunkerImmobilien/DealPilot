@@ -314,7 +314,79 @@ und sie hält.
 - **Pilot-Analyse ← Telegram:** der Bot kann sie lesen, aber nicht
   auslösen.
 
-#### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung
+#### N60.5b · Die Ursache der Fremdanalysen — gefunden und verriegelt (`v2015`)
+
+**Gemessen über alle Objekte:** sieben trugen byte-identisch dieselbe
+Pilot-Analyse (14.849 Zeichen), zwei weitere eine zweite (11.187).
+
+| Objekt | Kürzel | Ort | angelegt |
+|---|---|---|---|
+| 2026-1041 | **DEMO-LE1** | Bielefeld | 29.09. 05:54 |
+| 2026-1051…1056 | DEMO-HH1/BI3/DT4/IB5/LE2/BO6 | 5 Städte | 30.09. **14:46–14:49** |
+
+Alle sieben sind **DEMO-Objekte**, sechs davon in **drei Minuten**
+angelegt. Der Text spricht von „Westerfeldstraße 140, 33613 Bielefeld" —
+also von `2026-1041`. In Marcels Telegram-Bildern schlägt genau das
+durch: der Bot sagt zur Parkstraße 9 „stammt möglicherweise von einem
+anderen Objekt".
+
+**Geprüft, ob der App-Code das erzeugen kann:** `storage.js:603` setzt
+`_aiText` beim Objektwechsel auf den **eigenen** Wert, und drei weitere
+Stellen leeren ihn (`_clearFormForNewObject`, `_newObjLeeren`,
+`_resetUiAfterDelete`). Der normale Weg ist sauber.
+
+**Warum der vorhandene Wächter nicht genügte** (`v1849`): er ist eine
+**Heuristik** — „nennt der Text den Ort nirgends?" Er rät (eine echte
+Analyse ohne ausgeschriebenen Ortsnamen wird verdächtigt; eine Kopie
+zwischen zwei Objekten im selben Ort fällt durch) **und er sitzt nur im
+Telegram-Werkzeug**. Reiter Pilot-Analyse, PDF und Co-Pilot hatten gar
+keinen.
+
+> **Die Herkunft gehört an die Analyse, nicht an den Leser.** Beim
+> Erzeugen weiß der Browser genau, für welches Objekt er rechnet — diese
+> eine Zeile fehlte. Seit `v2015` trägt jede neue Analyse
+> `_fuer: { objekt_id, kuerzel, adresse, stand }`. Der Bot vergleicht
+> damit **exakt** (`fremd_sicher: true`) und fällt nur ohne Stempel auf
+> die Heuristik zurück — die sich jetzt als Vermutung kennzeichnet.
+
+**Dazu ein Prüfer:** `backend/scripts/analysen-pruefen.js` zählt es aus.
+Drei Stufen: **STEMPEL** (Beweis) · **DUBLETTE** (Befund) · **VERDACHT**
+(Heuristik). Nur der erste ist ein Beweis, und das steht in der Ausgabe.
+RC 0/1/2. Er liegt in `backend/scripts/`, **nicht** in `tools/` — am
+Dockerfile gemessen: `scripts` wird ins Image kopiert, `tools` nicht.
+
+> **Der erste Lauf meldete fünf Fehlalarme** (`v2015a`): fünf Objekte
+> `2026-999` als Dublette. Das ist das **Demo-Objekt verschiedener
+> Nutzer** samt Saat-Analyse — fünf Nutzer, fünfmal dieselbe Saat. Jetzt
+> wird je `user_id` gruppiert. **Ein Prüfer, der die Saat als Schaden
+> meldet, schickt den Leser an die falsche Stelle.**
+
+**OFFEN — braucht Marcels Entscheidung (kostet Guthaben oder löscht
+Daten):** neun Objekte tragen eine fremde Analyse
+(7 × DEMO, 2 × Kabelsketal). Zwei Wege: **neu rechnen** (9 Abrufe) oder
+**entfernen**, damit dort ehrlich „noch keine Analyse" steht.
+
+#### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung — ✅ GEBAUT (`v2016`)
+**Die Werkzeuge lieferten es längst, die Regeln verlangten es nicht.**
+`objekt_kennzahlen`, `objekt_schnellblick` und `objekte_rangliste` geben
+`dealscore`, `dealscore_stufe`, `investor_deal_score` und
+`investor_stufe` zurück — genannt werden musste nichts davon. In Marcels
+Bildern sieht man es: auf „gib mir alle Daten zur Parkstr" kommt eine
+lange Feldliste **und kein Score**.
+
+> Derselbe Fehler wie bei den Fotos: **die Daten reisen mit, und ohne
+> Auftrag passiert nichts damit.** Ein Modell beantwortet die Frage, die
+> gestellt wurde — nicht die, die der Nutzer jedes Mal mitdenkt.
+
+**Regel 7k — vier Pflichten:** (a) beide Scores mit Stufe, und wenn einer
+fehlt: **warum** · (b) die zugehörigen Kennzahlen · (c) eine
+Gesamtbewertung **in Worten** · (d) den **Stand**. Ausnahme: wer
+ausdrücklich nur eine Zahl will, bekommt eine kurze Antwort — sonst wäre
+aus der Vorgabe eine Plage geworden.
+**Regel 7l:** Fragen nach Gesamtbestand, Klumpenrisiken oder „was als
+Nächstes" gehen an `portfolio_analyse_lesen` — mit Stand.
+
+#### N60.6-alt · Auskunft: immer Score, KPIs und eine Gesamtbewertung
 Marcel: „Wenn ich nach wichtigen Daten frage, möchte ich immer, wenn
 verfügbar, **DealScore und Investor DealScore** sowie **alle beteiligten
 KPIs** haben und eine **textuelle Gesamtbewertung**. Der Abruf der in der
