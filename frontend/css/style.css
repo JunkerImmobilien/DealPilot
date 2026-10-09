@@ -39550,11 +39550,11 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
 .sb-sort-menu .sb-sort-opt svg { fill: currentColor; flex: 0 0 auto; }
 .sb-sort-menu .sb-sort-opt span { flex: 1 1 auto; }
 .sb-sort-menu .sb-sort-opt:hover {
-  background: rgba(201,168,76,0.14);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
 }
 .sb-sort-menu .sb-sort-opt.aktiv {
   color: var(--wl-e8cc7a, #E8CC7A);
-  background: rgba(201,168,76,0.10);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);
 }
 .sb-sort-menu .sb-sort-haken { flex: 0 0 auto; }
 
@@ -39569,7 +39569,7 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
   padding: 4px 8px 5px;
   border-left: 3px solid var(--wl-c9a84c, #C9A84C);
   border-radius: 0 5px 5px 0;
-  background: rgba(201,168,76,0.07);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 10px;
   font-weight: 700;
@@ -39827,7 +39827,7 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
   border-radius:10px;margin:0 0 14px;border:1px solid transparent}
 .dp-pa-stand b{font-weight:600}
 .dp-pa-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.35);color:#2F8E5A}
-.dp-pa-stand-alt{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.40);color:#8a6d1f}
+.dp-pa-stand-alt{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);color:#8a6d1f}
 .dp-pa-stand-fremd{background:rgba(184,98,92,.12);border-color:rgba(184,98,92,.40);color:#9d4b45}
 .dp-pa-stand-unbekannt{background:rgba(42,39,39,.05);border-color:rgba(42,39,39,.15);color:#6b645e}
 
@@ -39836,12 +39836,12 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
   border-radius:9px;margin:0 0 10px;border:1px solid transparent}
 .dp-pp-stand b{font-weight:600}
 .dp-pp-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.30);color:#2F8E5A}
-.dp-pp-stand-alt{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.38);color:#8a6d1f}
+.dp-pp-stand-alt{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);color:#8a6d1f}
 
 /* == v2025 - Herkunft der Mietentwicklung ========================== */
 .me-herkunft{font:400 12px/1.55 Inter,system-ui,sans-serif;margin:0 0 10px;padding:8px 12px;
   border-radius:9px;background:rgba(42,39,39,.05);border:1px solid rgba(42,39,39,.12);color:#6B6356}
 .me-herkunft b{font-weight:600;color:#2A2727}
-.me-herkunft-annahme{background:rgba(201,168,76,.12);color:#8a6d1f;
+.me-herkunft-annahme{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);color:#8a6d1f;
   border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}
 .me-herkunft-annahme b{color:#8a6d1f}

@@ -662,7 +662,10 @@
       /* v2025 - die Annahme-Warnung bei Indexmiete. Gold, nicht rot:
          es ist kein Fehler, nur eine Zahl mit anderer Herkunft. */
       '#mfh-we-ov .mfh-we-warn{font-size:12px;line-height:1.55;margin:0 0 10px;padding:9px 12px;',
-      '  border-radius:9px;background:rgba(201,168,76,.12);color:#8a6d1f;',
+      /* v2029 - war `rgba(201,168,76,.12)`. Der Gold-Audit zaehlt das
+         zu Recht als hartes Gold: beim Mandanten bliebe dieses Feld
+         DealPilot-golden, waehrend alles andere umfaerbt. */
+      '  border-radius:9px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);color:#8a6d1f;',
       '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}',
       '#mfh-we-ov .mfh-we-haken{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:0 0 10px;cursor:pointer}',
       '#mfh-we-ov .mfh-we-bilder{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}',
