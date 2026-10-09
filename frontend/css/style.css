@@ -39879,3 +39879,59 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
   .ank-zeile{flex-direction:column;align-items:stretch;gap:10px}
   .ank-aktionen{justify-content:flex-end}
 }
+
+/* == v2031 - die Doppelkarte ======================================= */
+/* Die Karte dreht sich SELBST und tauscht auf halbem Weg ihren Inhalt.
+   Kein Wrapper: .sb-list ist display:flex, ein Wrapper wuerde das
+   Flex-Kind ersetzen und 245 Regeln auf .sb-card ins Leere laufen
+   lassen. Dasselbe Element, dieselbe Stelle, nur gedreht. */
+.sb-card.dk-dreht{
+  transform:perspective(900px) rotateY(90deg) !important;
+  transition:transform .17s cubic-bezier(.4,0,.7,.2) !important;
+}
+/* Der Rueckweg nimmt die vorhandene Transition der Karte (25176).
+   Eine eigene waere eine zweite Quelle fuer dieselbe Bewegung. */
+.sb-card{transform-style:flat}
+
+/* Der Dreh-Knopf. NICHT in .sbc-actions: die haengt am Hover
+   (style.css:4982), und auf dem Handy gibt es keinen Hover - ein Knopf,
+   den man dort nicht sieht, ist nicht vorhanden. */
+.dk-knopf{
+  position:absolute;left:8px;bottom:8px;z-index:4;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 8px 3px 6px;border-radius:7px;cursor:pointer;
+  font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);
+  color:var(--wl-e8cc7a, #E8CC7A);
+  opacity:.82;transition:opacity .15s ease,background .15s ease;
+}
+.dk-knopf:hover{opacity:1;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}
+.dk-knopf svg{flex:0 0 auto}
+.sb-card.dk-dreht .dk-knopf{opacity:0}
+
+/* Das Goldband der Rueckseite. Ohne es saehe der Ankauf aus wie der
+   laufende Stand mit anderen Zahlen. */
+.sbc-ankauf-band{
+  position:absolute;top:0;left:0;right:0;z-index:3;
+  padding:3px 10px;border-radius:11px 11px 0 0;
+  font:700 9.5px/1.4 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;
+  background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f));
+  color:#2A2727;text-align:center;
+}
+.sb-card.sb-card-ankauf{padding-top:24px !important}
+
+/* Der Schalter ueber der Liste - dreht alle Karten auf einmal. */
+.dk-schalter{
+  display:block;width:calc(100% - 4px);margin:0 2px 10px;
+  padding:7px 10px;border-radius:8px;cursor:pointer;
+  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);
+  color:var(--wl-e8cc7a, #E8CC7A);
+}
+.dk-schalter:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 24%, transparent)}
+
+/* Wer Bewegung abbestellt hat, bekommt einen Schnitt statt einer
+   Drehung - aber denselben Inhaltswechsel. */
+@media (prefers-reduced-motion:reduce){
+  .sb-card.dk-dreht{transform:none !important;opacity:.25 !important;transition:opacity .12s linear !important}
+}

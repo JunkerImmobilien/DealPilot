@@ -1039,6 +1039,11 @@ function _clearFormForNewObject() {
     setTimeout(dpResetAllOutputs, 50);
   }
 }
+/* v2031 - `_renderRichCard` nach aussen. Die Doppelkarte baut ihre
+   Rueckseite mit DERSELBEN Funktion; ein zweiter Kartenbauer wuerde
+   beim naechsten Umbau der Vorderseite zurueckbleiben, ohne dass es
+   auffiele - man dreht ja selten um. */
+window._renderRichCard = _renderRichCard;
 window._clearFormForNewObject = _clearFormForNewObject;
 
 function newObj() {
@@ -1331,6 +1336,18 @@ async function renderSaved(opts) {
     } catch (e) { return String(v); }
   }
   function _renderRichCard(opts) {
+    /* v2031 - die Zutaten je Objekt merken. Die Doppelkarte baut ihre
+       Rueckseite daraus: dasselbe Objekt, dieselbe Adresse, dasselbe
+       Bild - nur die Zahlen vom Ankauf.
+
+       Das steht HIER und nicht an den zwei Aufrufstellen: so kann
+       keine vergessen werden, und eine dritte bekaeme es umsonst. */
+    try {
+      if (opts && opts.key) {
+        if (!window._dkOpts) window._dkOpts = {};
+        window._dkOpts[opts.key] = opts;
+      }
+    } catch (e) {}
     var addr = _shortAddr(opts.name);
     var seqHtml = opts.seq
       ? '<span class="sbc-seq' + (opts.isDuplicateSeq ? ' sbc-seq-dup' : '') + '"' +
@@ -1495,7 +1512,16 @@ async function renderSaved(opts) {
         '</div>'
       : '';
 
-    return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
+    /* v2031 - das Goldband der Rueckseite. Ohne es saehe der Ankauf
+       aus wie der laufende Stand mit anderen Zahlen - und wer die
+       Karte nur halb im Blick hat, liest den Ankaufspreis als
+       heutigen. Ein Band, das sagt was man sieht, ist hier keine
+       Zierde. */
+    var ankaufBand = opts.ankaufBand
+      ? '<div class="sbc-ankauf-band">ANKAUF \u00b7 ' + _esc(opts.ankaufBand) + '</div>'
+      : '';
+    return '<div class="sb-card' + (opts.ankaufBand ? ' sb-card-ankauf' : '') + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
+      ankaufBand +
       investorRibbon +
       wonRibbon +
       lostRibbon + /* V322-lost-ribbon-html */
@@ -1697,6 +1723,9 @@ async function renderSaved(opts) {
                    ds2Score >= 50 ? 'sbc-score-gold' : 'sbc-score-red';
         }
         return _renderRichCard({
+          /* v2031: die Ankauf-Spalten aus der Listenabfrage (v2030) */
+          ankaufKurz: o.ankauf_kurz || null,
+          ankaufStichtag: o.ankauf_stichtag || null,
           key: o.id,
           seq: o.seq_no || '',
           isDuplicateSeq: !!(o.seq_no && _dupSeqs[o.seq_no]),       // V63.25
@@ -1797,6 +1826,9 @@ async function renderSaved(opts) {
       }
       var showInvestorLs = !!(hasDs2FeatureLs && d._ds2_computed);
       return _renderRichCard({
+        /* v2031: im lokalen Pfad liegt der Stand im Datensatz selbst */
+        ankaufKurz: (d._ankauf && d._ankauf.kurz) ? d._ankauf.kurz : null,
+        ankaufStichtag: (d._ankauf && d._ankauf.stichtag) ? d._ankauf.stichtag : null,
         key: k,
         seq: d._obj_seq || '',
         name: d._name || 'Unbenannt',
