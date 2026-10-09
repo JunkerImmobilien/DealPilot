@@ -2738,6 +2738,24 @@
         name: o.name || o._name || null,
         ort: o.ort || null,
         objektart: o.objart || o.objektart || null,
+        /* == v2014 - SECHS FELDER ZUR SUBSTANZ ======================
+
+           Der Analyse-Auftrag des Cockpits verlangt woertlich
+           "Klumpenrisiken - Lage, Objektart, Finanzierung, auslaufende
+           Zinsbindungen". Dafuer standen hier bisher 24 Felder, alles
+           Zahlen und Namen: als "Lage" nur `ort`, kein Zustand, keine
+           Energieklasse, kein Leerstand, keine Einheitenzahl.
+
+           Nicht alle 46 Felder der Einzelanalyse (v2011): der Deckel
+           liegt bei 60 Objekten, das waeren 2.760 zusaetzliche Werte -
+           ein Auftrag, in dem man die Frage nicht mehr findet.
+           Diese sechs sind die, nach denen gefragt wird. */
+        lageklasse: o.lageklasse || null,
+        zustand: o.ds2_zustand || null,
+        energieklasse: o.ds2_energie || null,
+        leerstand_pct: _ppZahl(o.leerstand),
+        wohneinheiten: _ppZahl(o.einheiten),
+        bodenrichtwert_eur_qm: _ppZahl(o.brw),
         baujahr: _ppZahl(o.baujahr),
         wohnflaeche_qm: _ppZahl(o.wfl),
         kaufpreis_eur: kp || null,

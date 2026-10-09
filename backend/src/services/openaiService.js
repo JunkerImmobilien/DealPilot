@@ -2268,7 +2268,16 @@ async function copilotChat(payload, opts) {
           '- "projektion" ist eine Modellfortschreibung, keine Prognose: sie unterstellt gleichbleibende Miete,',
           '  Zins und Tilgung. Nenne sie so, wenn du sie verwendest.',
           '- Die Einheit steht IM Feldnamen (_eur, _eur_jahr, _prozent, _qm). Lies sie dort ab, rate sie nicht.',
-          '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.'
+          '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.',
+          /* v2014 - die sechs neuen Felder zur Substanz. Ohne diese Zeile
+             stehen sie zwar im Auftrag, werden aber als weitere Zahlen
+             gelesen statt als Risikotraeger. */
+          '- Je Objekt stehen jetzt auch "lageklasse" (A/B/C), "zustand", "energieklasse",',
+          '  "leerstand_pct", "wohneinheiten" und "bodenrichtwert_eur_qm". Nutze SIE fuer die',
+          '  Klumpenrisiken: Lage ueber lageklasse und bodenrichtwert (nicht nur ueber den Ort),',
+          '  Substanz ueber zustand und energieklasse, Ertragssicherheit ueber leerstand_pct.',
+          '- Haeufen sich schlechte Energieklassen oder renovierungsbeduerftige Objekte, ist das',
+          '  ein Sanierungs-Klumpen - benenne ihn mit Namen und Anzahl.'
         ].join('\n')
       : '',
 
