@@ -58,10 +58,20 @@ if (!r.rowCount) {
   process.exit(0);
 }
 
-/* ── Dubletten über die Länge UND den Inhalt ───────────────────────── */
+/* ── Dubletten über die Länge UND den Inhalt — ABER JE NUTZER ───────
+ *
+ * Der erste Lauf hat fünf Objekte mit der Nummer 2026-999 als Dublette
+ * gemeldet. Sie sind keine: das ist das DEMO-Objekt, das jeder Nutzer
+ * beim Start bekommt, samt der Analyse aus `demo-object.json`. Fünf
+ * Nutzer, fünfmal dieselbe Saat — das gehört so.
+ *
+ * Eine Dublette ist nur dann eine, wenn sie BEIM SELBEN NUTZER an zwei
+ * Objekten hängt. Sonst meldet der Prüfer die Saat als Schaden, und
+ * wer ihm folgt, sucht an der falschen Stelle.
+ */
 const nachText = new Map();
 for (const o of r.rows) {
-  const k = o.ai_analysis.length + ':' + o.ai_analysis.slice(0, 400);
+  const k = o.user_id + '|' + o.ai_analysis.length + ':' + o.ai_analysis.slice(0, 400);
   if (!nachText.has(k)) nachText.set(k, []);
   nachText.get(k).push(o);
 }
@@ -72,7 +82,7 @@ const zeilen = [];
 for (const o of r.rows) {
   const d = o.data || {};
   const text = o.ai_analysis;
-  const k = text.length + ':' + text.slice(0, 400);
+  const k = o.user_id + '|' + text.length + ':' + text.slice(0, 400);
   const gruppe = nachText.get(k);
 
   /* 1 · der Stempel (seit v2015) */
