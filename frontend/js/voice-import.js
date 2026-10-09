@@ -1029,13 +1029,17 @@
      Was hier NICHT passiert: eine neue Erklaerung erfinden. Es ist
      derselbe Text, den der Lernmodus zeigt, plus die Auskunft des
      Co-Piloten, wenn jemand mehr wissen will. */
-  function _rfErklaerZeigen() {
+  /* v2052 - `gesagt` ist der Satz, den der Nutzer wirklich benutzt hat.
+     Ueber den Chip bleibt es bei der Vorgabe; getippt oder gesprochen
+     steht jetzt im Verlauf, was gesagt wurde. Ein Verlauf, der die
+     eigenen Worte ersetzt, ist keiner. */
+  function _rfErklaerZeigen(gesagt) {
     if (!_rf) return;
     var e = _rf.offen && _rf.offen[_rf.i];
     if (!e) return;
     var w = _rfWozu(e);
     var name = _rfFeldName((e.ids && e.ids[0]) || '') || e.frage;
-    _rfBlase('ich', 'Erklär mir das.');
+    _rfBlase('ich', escH(String(gesagt || '').trim()) || 'Erklär mir das.');
     if (w) {
       _rfBlase('co', '<b>' + escH(name) + '</b>' +
         '<div class="vi-rf-wozu" style="margin-top:6px">' + escH(w) + '</div>' +
@@ -4891,6 +4895,36 @@
      Geschwindigkeitsgewinn: eine Verneinung, die früher 2 Sekunden und
      0,1 Cent gekostet hat, kostet jetzt nichts und dauert nichts. */
   var RF_NEIN = /^(nein|nee|ne|nichts|kein[es]?|keine[rs]?|gibt('s| es)? (hier )?(nicht|keine)|haben wir (nicht|keine)|hab(e)? ich (nicht|keine)|brauchen wir (nicht|keine)|kommt nicht in frage|entf(ä|ae)llt|weiter|(ü|ue)berspringen|(ü|ue)berspring|weiss nicht|wei(ß|ss) ich nicht|keine ahnung|passt so|passt|unbekannt|k\.?a\.?)\b[\s.!]*$/i;
+
+  /* ═══ v2052 · „ERKLAER MIR DAS" IST KEINE FREIE FRAGE ════════════════
+
+     GEMESSEN auf Staging: bei der Frage nach der ADRESSE antwortete der
+     Co-Pilot auf „erklaer mir das" mit einer Erklaerung des DSCR.
+
+     `_rfErklaerZeigen()` macht es richtig - es nimmt den Wozu-Satz der
+     laufenden Frage. Gerufen wurde es aber nur ueber den CHIP (Z. 7239).
+     Der getippte Satz fiel durch bis `_rfIstFrage` und ging als freie
+     Frage an die KI, die ohne Feldbezug raten musste.
+
+     Und genau diesen Satz empfiehlt der Co-Pilot dreimal selbst
+     (Z. 994, 1094, 1100). Eine Anleitung, die das Programm selbst gibt,
+     ist ein Versprechen - hier war sie eine Falle.
+
+     ENG GEFASST, UND DAS IST DER PUNKT: nur Saetze OHNE eigenes Thema.
+     „Erklaer mir den DSCR" geht weiter an die KI - dort NENNT jemand ein
+     Thema, und die Feld-Erklaerung waere die falsche Antwort. Das Muster
+     endet auf `$`: wer weiterredet, meint etwas anderes. */
+  var RF_ERKLAER = new RegExp(
+    '^\\s*(?:(?:kannst du|k(?:\u00f6|oe)nntest du|bitte|und|ja)\\s+)*' +
+    '(?:' +
+      'erkl(?:\u00e4|ae)r(?:e|st)?(?:\\s+mir)?(?:\\s+(?:das|es|die\\s+frage|bitte|mal))*' +
+      '|erkl(?:\u00e4|ae)rung(?:\\s+bitte)?' +
+      '|was\\s+(?:hei(?:\u00df|ss)t|bedeutet|soll)\\s+(?:das|es)' +
+      '|warum\\s+fragst\\s+du\\s+(?:das|danach|mich\\s+das)' +
+      '|wozu\\s+(?:brauchst\\s+du\\s+)?(?:das|die\\s+angabe|den)' +
+      '|was\\s+meinst\\s+du\\s+damit' +
+      '|(?:das\\s+)?versteh(?:e)?\\s+ich\\s+nicht' +
+    ')\\s*[?.!,]*$', 'i');
 
   /* ═══ v1288b · Eine Verneinung darf auch ein SATZ sein ═════════════════
      Gemessen am 10.09.2026 im Sprechlauf. Auf „Muss etwas saniert werden,
@@ -11312,6 +11346,14 @@
     if (_hoeflich && _istAbrufWunsch(t) && (_rf.aktionen || []).length) {
       /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
       if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
+    }
+    /* ═══ v2052 · ERST DIE FELD-ERKLAERUNG, DANN DIE FREIE FRAGE ══════
+       Steht VOR `_rfIstFrage`: „erklaer mir das" IST eine Frage, und
+       ohne diese Zeile faengt der freie Weg sie ab und raet ein Thema.
+       Gemessen: bei der Adressfrage kam eine DSCR-Erklaerung. */
+    if (RF_ERKLAER.test(t) && _rf.offen && _rf.offen[_rf.i]) {
+      _rfErklaerZeigen(t);
+      return true;
     }
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
