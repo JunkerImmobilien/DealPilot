@@ -39940,3 +39940,13 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 @media (prefers-reduced-motion:reduce){
   .sb-card.dk-dreht{transform:none !important;opacity:.25 !important;transition:opacity .12s linear !important}
 }
+
+/* == v2033 - der Knopf traegt den ZUSTAND ========================== */
+/* Vorderseite ruhig (Bestand ist der Normalfall), Rueckseite gold -
+   genau wie das Band darueber. Beide sagen dasselbe, damit die Frage
+   "welche ist fuer was" am Kartenrand beantwortet ist. */
+.dk-knopf{background:rgba(42,39,39,.18);border-color:rgba(168,162,153,.30);color:var(--dp-ink-30,#A8A299)}
+.dk-knopf:hover{background:rgba(42,39,39,.30);color:var(--dp-ink-1,#E8E3D8)}
+.dk-knopf-ankauf{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important}
+.dk-knopf-ankauf:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent) !important}

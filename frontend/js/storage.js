@@ -1528,6 +1528,26 @@ async function renderSaved(opts) {
        Karte nur halb im Blick hat, liest den Ankaufspreis als
        heutigen. Ein Band, das sagt was man sieht, ist hier keine
        Zierde. */
+    /* v2033 - der Tooltip der Doppelkarte. Als eigene Variable, nicht
+       als verketteter Ausdruck in der Knopfzeile: ein langer Text
+       zwischen zwanzig Anfuehrungszeichen ist eine Klammer, die man
+       verliert - mir genau hier passiert.
+
+       Er grenzt die beiden Wortpaare ausdruecklich voneinander ab.
+       Marcel hat das bestellt, und seine Rueckfrage welche ist dann
+       fuer was?" zeigt, warum. */
+    var dkTitel = '';
+    if (opts.ankaufKurz) {
+      dkTitel = opts.ankaufBand
+        ? ('Du siehst den ANKAUF-Stand, eingefroren zum ' + opts.ankaufBand + '.')
+        : 'Du siehst den BESTAND - den laufenden Stand von heute.';
+      dkTitel += '\n\nKlicken dreht die Karte um.'
+        + '\nAnkauf = wie das Objekt beim Nutzen-/Lastenwechsel dastand.'
+        + '\nBestand = wie es heute dasteht.'
+        + '\n\nNicht zu verwechseln mit Soll-Miete und Ist-Miete:'
+        + '\ndie beschreiben EINE Miete (was hereinkaeme gegen was'
+        + '\ngezahlt wird), nicht zwei Zeitpunkte.';
+    }
     var ankaufBand = opts.ankaufBand
       ? '<div class="sbc-ankauf-band">ANKAUF \u00b7 ' + _esc(opts.ankaufBand) + '</div>'
       : '';
@@ -1551,12 +1571,12 @@ async function renderSaved(opts) {
                Nur wo ein Ankauf-Stand vorliegt - sonst gibt es nichts
                zu drehen, und ein Knopf ohne Wirkung ist ein Versprechen. */
             (opts.ankaufKurz
-              ? '<button type="button" class="dk-knopf" data-dk-key="' + _esc(opts.key) + '"'
-                + ' title="' + (opts.ankaufBand ? 'Zur\u00fcck auf den laufenden Stand' : 'Den Stand beim Ankauf zeigen') + '">'
+              ? '<button type="button" class="dk-knopf' + (opts.ankaufBand ? ' dk-knopf-ankauf' : '') + '" data-dk-key="' + _esc(opts.key) + '"'
+                + ' title="' + _esc(dkTitel) + '">'
                 + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
                 + ' stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'
                 + '<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'
-                + '<span>' + (opts.ankaufBand ? 'Bestand' : 'Ankauf') + '</span>'
+                + '<span>' + (opts.ankaufBand ? 'ANKAUF ' + _esc(opts.ankaufBand) : 'BESTAND') + '</span>'
                 + '</button>'
               : '') +
             aiHtml +
