@@ -267,14 +267,12 @@ async function laufen(frage, ctx, opts) {
   /* v1817 · Das Projektwissen als eigener Block NACH den Regeln und VOR
      der Lage. Beide sind über alle Anfragen gleich, das ist für den
      Prompt-Cache die richtige Reihenfolge: stabil zuerst. */
-  const _w = wissen();
+  /* v2019b - jetzt mit Marcels Ergaenzung aus den Einstellungen, und
+     die Einleitung kommt aus projektwissen selbst. Sie stand hier
+     inline UND dort - nebeneinander waere sie doppelt im Prompt. */
+  const _w = await projektwissen.blockFuer(ctx && ctx.userId);
   if (_w) {
-    eingabe.push({ role: 'system', content:
-      'PROJEKTWISSEN DEALPILOT. Das Folgende ist die EINZIGE Quelle für '
-      + 'Aussagen über das Produkt, seine Begriffe und seine Kennzahlen. '
-      + 'Steht eine Antwort hier nicht drin und liefert sie auch kein '
-      + 'Werkzeug, sagst du das — du erfindest KEINE Erklärung für einen '
-      + 'DealPilot-Begriff.\n\n' + _w });
+    eingabe.push({ role: 'system', content: _w });
   }
 
   /* Was der Agent ueber die Lage wissen muss, OHNE ein Werkzeug zu rufen —

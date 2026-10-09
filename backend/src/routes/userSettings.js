@@ -53,7 +53,10 @@ const { query } = require('../db/pool');
    Begruendung "damit hier keine Dokumente landen" - eine Analyse ist
    kein Dokument, und der Text wird beim Schreiben zusaetzlich
    gekappt (die laengste gemessene Objekt-Analyse hat 14.849 Zeichen). */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse'];
+/* v2019 - `eigenes_wissen`: was Marcel dem Projektwissen hinzufuegt.
+   Es geht in den Prompt ALLER DREI Piloten, aber als eigener Block
+   mit eigener Ueberschrift - siehe services/projektwissen.js. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen'];
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {

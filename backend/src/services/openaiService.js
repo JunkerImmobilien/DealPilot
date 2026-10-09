@@ -363,7 +363,11 @@ function buildPrompt(payload, opts) {
        die Begriffe der App nur aus hartkodierten Absaetzen weiter oben;
        `bot-wissen.md` las ausschliesslich der Telegram-Agent. Jetzt
        lesen alle drei dieselbe gepflegte Datei. */
-    projektwissen.block() ? ('\n' + projektwissen.block() + '\n') : '',
+    /* v2019b - der Block kommt jetzt von aussen (mit Marcels
+       Ergaenzung). Ohne ihn bleibt der Basisblock - buildPrompt wird
+       auch von Pruefwerkzeugen ohne Nutzer gerufen. */
+    (function () { var _b = (opts && opts.wissensblock) || projektwissen.block();
+      return _b ? ('\n' + _b + '\n') : ''; })(),
 
     /* ══ v2011 · DIE SIEBEN BLOECKE ══════════════════════════════
        Sie stehen VOR den Input-Daten, weil sie beschreiben, WAS das
@@ -2227,7 +2231,8 @@ async function copilotChat(payload, opts) {
   /* v2010 - auch der Co-Pilot und der Portfolio-Pilot lesen jetzt das
      Projektwissen. Er steht als ERSTER Systemblock: ueber alle
      Anfragen gleich, also die richtige Stelle fuer den Prompt-Cache. */
-  const _pw = projektwissen.block();
+  /* v2019b - mit Marcels Ergaenzung, wenn der Aufrufer sie mitgibt. */
+  const _pw = (opts && opts.wissensblock) || projektwissen.block();
   const sys = [
     _pw ? _pw : '',
     istPortfolio

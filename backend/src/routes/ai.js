@@ -269,7 +269,11 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
       ? payload.aiOptions : null;
     delete payload.aiOptions;
 
-    const result = await openaiService.analyze(payload, { userApiKey, aiOptions, fotos });
+    /* v2019b - Marcels eigenes Wissen aus den Einstellungen gehoert
+       in denselben Block wie das Projektwissen, nur getrennt
+       ueberschrieben. Faellt die Abfrage aus, bleibt der Basisblock. */
+    const wissensblock = await require('../services/projektwissen').blockFuer(req.user.id);
+    const result = await openaiService.analyze(payload, { userApiKey, aiOptions, fotos, wissensblock });
 
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {
