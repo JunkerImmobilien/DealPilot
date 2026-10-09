@@ -35969,3 +35969,67 @@ der Prüfer kaputt, nicht das Produkt.
 - **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation.**
 - **Höhen über 757 px** — so hoch ist das Browserfenster.
 - **Quick-Check und Marktbericht** — eigene Dokumente im iframe.
+
+
+## Rollout-Journal 09.10.2026 (N60.17/2) — v2061–v2061b: der Ansichts-Prüfer wohnt jetzt in der Messkabine
+
+**Was** · Die drei offenen Ansichten aus N60.17 geprüft — und das Werkzeug,
+das dafür im Chat entstand, dauerhaft eingebaut, statt es wegzuwerfen.
+
+| Dokument / Ansicht | Weg dorthin | 320 | 390 | 768 |
+|---|---|---|---|---|
+| `strategie` | `PortfolioStrategie.open()` | 21 ✔ | 15 ✔ | 10 ✔ |
+| Quick-Check | `?ziel=/quickcheck-app.html` | 38 ✔ | 41 ✔ | 41 ✔ |
+| Marktbericht | `?ziel=/marktbericht-app/index.html` | 11 ✔ | 13 ✔ | 16 ✔ |
+
+Zahl = geprüfte Bedienelemente; ✔ = 0 nicht erreichbar, 0 echter Überlauf,
+0 Querscroller. **Kein einziger Befund.**
+
+**Der Weg zur Strategie stand nicht in `setMainView`.** Das Register meldet
+sie (`DealPilotAnsichten.namen()` → `single · all · strategie · dashboard`),
+geöffnet wird sie aber über `PortfolioStrategie.open()` aus
+`portfolio-strategie.js:231`. Vorher stand sie als „nicht erreichbar" im
+Backlog — sie war nur anders erreichbar.
+
+**Commit** · `1563e4f0` · `17d81dfc` · `ae480bd5`
+
+#### `DPM.pruefeAnsicht()` und `DPM.pruefSelbsttest()`
+
+Im Kopf des Blocks stehen die **vier Artefakte**, die er nicht mehr meldet —
+jedes hätte zu einem Umbau an einer gesunden Stelle geführt:
+
+- **Das Fenster scrollt nicht** (`html`/`body` auf `overflow:hidden`,
+  gescrollt wird `.main-col`) — der Prüfer sah 8 von 932 Elementen.
+- **Gefangener Überlauf ist keiner** — `div.pw` scrollt wirklich, der Balken
+  nimmt 5 px Höhe.
+- **`display:contents` hat Höhe 0** — `form#dp-noform` umschließt die ganze
+  App; die Regel „Höhe 0 = eingeklappt" verwarf 176 von 176 Elementen.
+- **Sticky lässt sich nicht hinscrollen** — `scrollIntoView` bewegt die
+  Reiterleiste nicht; jeder Verdacht wird deshalb zweimal geprüft,
+  zentriert **und** am Seitenanfang.
+
+#### Der Selbsttest ist beim ersten Lauf durchgefallen — und das war sein Wert
+
+`v2061` meldete „DURCHGEFALLEN". Die Ursache lag nicht im Prüfer, sondern in
+seiner **Opferwahl**: er nahm einen Knopf aus dem eingeklappten Seitenmenü bei
+**x = −286**. `elementsFromPoint` gibt dort ein leeres Array zurück — die
+Decke konnte nichts verdecken, also konnte nichts gefunden werden. Die
+Bedingung prüfte nur die senkrechte Lage.
+
+> Gefunden **bevor** eine grüne Messung auf ihm aufgebaut wurde. Genau dafür
+> ist er da: null Befunde heisst „nichts gefunden", nicht „nichts da".
+
+`v2061b` ergänzt die waagerechte Hälfte der Bedingung. Danach: ohne Decke 0
+Befunde, mit Decke genau 1 (der richtige Knopf), nach Entfernen wieder 0 —
+**BESTANDEN**.
+
+#### Was offen bleibt
+
+- **Nur die Startansicht der iframes ist geprüft.** Marktbericht (Formular,
+  fertiger Bericht, PDF-Vorschau) und Quick-Check haben weitere Zustände;
+  jeder ist ein eigener Durchgang.
+- **Farbkontraste** — Fenster im Hintergrund, die Kabine sagt dann selbst,
+  dass nur Geometrie gilt.
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation**, Höhen über
+  757 px, Anmeldung/Registrierung, Upload-Flächen, Lade-/Fehler-/
+  Leerzustände.

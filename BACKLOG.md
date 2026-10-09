@@ -1003,11 +1003,35 @@ Schalter), 601–1200 px Tabelle ohne `min-width`, darüber unverändert.
 `.ytf-table` 45) — der Kartenmodus hätte sie zerquetscht, und genau das
 hatte `v1881` schon einmal gemessen und behoben.
 
+**Nachgelegt am selben Tag (v2061–v2061b): die drei offenen Ansichten
+sind geprüft, und der Prüfer wohnt jetzt in der Messkabine.**
+
+| Dokument / Ansicht | Weg dorthin | 320 | 390 | 768 |
+|---|---|---|---|---|
+| `strategie` | `PortfolioStrategie.open()` (nicht `setMainView`) | 21 ✔ | 15 ✔ | 10 ✔ |
+| **Quick-Check** | `messkabine.html?ziel=/quickcheck-app.html` | 38 ✔ | 41 ✔ | 41 ✔ |
+| **Marktbericht** | `?ziel=/marktbericht-app/index.html` | 11 ✔ | 13 ✔ | 16 ✔ |
+
+(Zahl = geprüfte Bedienelemente, ✔ = 0 nicht erreichbar, 0 Überlauf,
+0 Querscroller.)
+
+**`DPM.pruefeAnsicht(breite, hoehe, oeffner, name)`** und
+**`DPM.pruefSelbsttest()`** stehen jetzt dauerhaft in
+`frontend/messkabine.html` — mit den vier Artefakten dokumentiert, die
+sie nicht mehr melden.
+
+> **Der Selbsttest hat sich sofort bewährt: er ist beim ersten Lauf
+> durchgefallen.** Er wählte als Testknopf einen aus dem eingeklappten
+> Seitenmenü bei **x = −286**; `elementsFromPoint` gibt dort ein leeres
+> Array, die Decke konnte nichts verdecken. Der Mangel lag in der
+> Opferwahl, nicht im Prüfer — gefunden, **bevor** eine grüne Messung
+> auf ihm aufgebaut wurde (`v2061b`). Danach: ohne Decke 0, mit Decke
+> genau 1, nach Entfernen wieder 0.
+
 **Noch offen in N60.17:**
-- **`strategie` ist nicht geprüft** — `setMainView('strategie')` öffnet
-  sie nicht; das Register kennt sie, der Weg dorthin ist ein anderer.
-  **Erst den Weg finden, dann messen.**
-- **Quick-Check und Marktbericht** (iframes) sind nicht angefasst.
+- **Nur die Startansicht der iframes ist geprüft.** Der Marktbericht hat
+  weitere Zustände (Formular, fertiger Bericht, PDF-Vorschau), der
+  Quick-Check ebenso. Jeder Zustand ist ein eigener Durchgang.
 - **Farbkontraste** — das Browserfenster stand im Hintergrund, und die
   Messkabine sagt dann selbst, dass nur Geometrie gilt. Ihr Selbsttest
   war grün (6/6). Gehört mit Fenster im Vordergrund wiederholt.
