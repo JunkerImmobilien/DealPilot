@@ -1000,6 +1000,21 @@
 
   var _rfEinstiegWeiter = null;
 
+  /* v2050 - die gemerkte Ansage HOLEN und dabei verbrauchen. Wer sie
+     angehaengt hat, bekommt sie kein zweites Mal: sonst stuende sie
+     beim Neuling zweimal da, und genau das war der Befund. */
+  function _rfAnsageHolen() {
+    if (!_rf || !_rf.ansage) return '';
+    var t = _rf.ansage; _rf.ansage = ''; return t;
+  }
+
+  /* Die Ansage als eigene Blase - fuer den, der die Tonfrage nicht
+     bekommt, weil er sie schon einmal beantwortet hat. */
+  function _rfAnsage() {
+    var t = _rfAnsageHolen();
+    if (t) _rfBlase('co', t);
+  }
+
   /* === v1115-WERK - ERKLAERUNG AUF ABRUF, AN JEDER FRAGE ==============
      Marcels Ansage: "Bei jedem Punkt kann man dann auch sagen: Erklaere
      mir das oder Erklaerung abgeben, oder man hat so ein Infofenster, wo
@@ -1050,27 +1065,43 @@
     _rfBlase('ich', art === 'erf_neu' ? 'Erste Immobilie.'
       : (art === 'erf_profi' ? 'Profi.' : 'Schon ein paar gemacht.'));
 
+    /* ═══ v2050 · EINE BLASE, NICHT ZWEI ════════════════════════════
+
+       Bestaetigung und Ansage stehen zusammen. Vorher war die Ansage
+       schon durch, bevor der Nutzer ueberhaupt gefragt worden war -
+       jetzt ist sie die ANTWORT auf seine Wahl.
+
+       Bei „Erste Immobilie“ sind die Punkte 1 und 4 der alten Liste
+       weg: sie sagten dasselbe wie die Ansage (der Reihe nach fragen,
+       am Ende eine Uebersicht), und im selben Absatz waere die
+       Wiederholung sichtbar gewesen.
+
+       Punkt 2 und 3 BLEIBEN. Punkt 3 ist seit v2049 sogar wichtiger:
+       dort ist der Knopf „Weiss ich nicht“ weggefallen, und dieser
+       Satz ist jetzt der einzige Ort, an dem der Weg erklaert wird. */
+    var _ans = _rfAnsageHolen();
+    var _vor = _ans ? '<div style="margin-top:8px">' + _ans + '</div>' : '';
+
     if (art === 'erf_neu') {
       _rfBlase('co',
-        'Alles klar — dann gehen wir es in Ruhe an. <b>So laeuft es ab:</b>' +
-        '<div class="vi-rf-wozu" style="margin-top:6px">' +
-        '<b>1.</b> Ich frage der Reihe nach — Adresse, Größe, Preis, Miete, Finanzierung. ' +
-        'Unter jeder Frage steht, wozu die Angabe dient.<br>' +
-        '<b>2.</b> Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
-        'Marktpreisindikation. Du sagst nur, ob ich soll.<br>' +
-        '<b>3.</b> Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage spaeter noch einmal ' +
-        'oder rechne ohne.<br>' +
-        '<b>4.</b> Am Ende siehst du eine Übersicht, und das Objekt wird angelegt.</div>' +
+        'Alles klar — dann gehen wir es in Ruhe an.' + _vor +
+        '<div class="vi-rf-wozu" style="margin-top:8px">' +
+        'Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
+        'Marktpreisindikation — du sagst nur, ob ich soll.<br>' +
+        'Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage später ' +
+        'noch einmal oder rechne ohne.</div>' +
         '<div style="margin-top:8px">Du kannst mich jederzeit unterbrechen: ' +
         '<b>"erklär mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
         'danach machen wir weiter, wo wir waren.</div>');
     } else if (art === 'erf_profi') {
-      _rfBlase('co', 'Verstanden — kurz und knapp. ' +
-        '<b>"weiß ich nicht"</b> überspringt, <b>"fertig"</b> bringt dich zur Übersicht, ' +
-        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.');
+      _rfBlase('co', 'Verstanden — kurz und knapp.' + _vor +
+        '<div style="margin-top:8px"><b>"weiß ich nicht"</b> überspringt, ' +
+        '<b>"fertig"</b> bringt dich zur Übersicht, ' +
+        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.</div>');
     } else {
-      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst — ' +
-        'sag einfach <b>"erklär mir das"</b>. <b>"weiß ich nicht"</b> überspringt.');
+      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst.' + _vor +
+        '<div style="margin-top:8px">Sag einfach <b>"erklär mir das"</b>. ' +
+        '<b>"weiß ich nicht"</b> überspringt.</div>');
     }
 
     var w = _rfEinstiegWeiter; _rfEinstiegWeiter = null;
@@ -11618,7 +11649,20 @@
     luecken.forEach(function (e) { if (e.et) etDa[e.et] = 1; });
     var etTxt = ETAPPEN.filter(function (E) { return etDa[E.nr]; })
                        .map(function (E) { return E.name; }).join(' · ');
-    _rfBlase('co', alle
+    /* ═══ v2050 · DIE ANSAGE IST EINE ANTWORT, KEINE DURCHSAGE ══════
+
+       Sie stand hier als erste Blase - noch vor der Begruessung, und
+       GEMESSEN fuellten die beiden zusammen 224 von 239 px Chathoehe,
+       bevor eine Frage gestellt war.
+
+       Marcel: immer nur eine Message vom Co-Piloten und dann eine
+       Antwort dazu.
+
+       Sie wird jetzt gemerkt und spaeter verbraucht: beim Neuling
+       haengt `_rfErfahrungGewaehlt` sie an seine Bestaetigung (eine
+       Blase statt zwei), beim Wiederkehrer blaest `_rfAnsage` sie
+       einzeln vor der ersten Frage. */
+    _rf.ansage = (alle
       ? vorTxt + 'Ich führe dich durch — <b>' + luecken.length + '</b> ' +
         (luecken.length === 1 ? 'Frage' : 'Fragen') + ' in ' +
         Object.keys(etDa).length + ' Etappen: <b>' + escH(etTxt) + '</b>. ' +
@@ -11629,8 +11673,11 @@
         (luecken.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
                               : 'Für die Rechnung fehlen mir noch ' + luecken.length + '.'));
 
-    /* v1308: Die übernommenen Werte zum Nachsehen — vor der ersten Frage. */
-    if (_rf.vorlaufZeigen) _rfVorlaufKarte(vorQuelle);
+    /* v1308: Die übernommenen Werte zum Nachsehen — vor der ersten Frage.
+       v2050: und NACH der Begruessung, nicht davor - sonst bestaetigt
+       der Nutzer eine Werteliste, bevor der Co-Pilot sich vorgestellt
+       hat. Der Quellenname wird dafuer mitgemerkt. */
+    _rf.vorlaufQuelle = vorQuelle;
 
     _fs.an = true;
     /* Das Kontingent wird MIT dem Mikrofon geladen, nicht danach: das
@@ -11649,18 +11696,38 @@
         _fs.an = false;
         _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Tippe deine Antworten — oder gib das Mikrofon im Browser frei und öffne neu.');
       }
-      /* v1288: Steht die Adresse schon (freier Weg, oder ein Objekt war
-         offen), fällt die Entscheidung über die Marktpreisindikation VOR
-         der ersten Frage — dann läuft sie über den ganzen Dialog. */
-      if (!_rf.marktGefragt && (_rfFeld('plz') || _rfFeld('ort'))) {
-        try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
-        _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
-      }
+      /* ═══ v2050 · ALLES ERST NACH DER BEGRUESSUNG ═══════════════
+
+         Marktangebot und Vorlaufkarte standen hier VOR dem Einstieg.
+         Mit Adresse und Vorlauf stapelten sich damit bis zu vier
+         unbeantwortete Blasen, und der Nutzer antwortete auf die
+         unterste - auf die Tonfrage, die als letzte kam.
+
+         Jetzt laeuft es der Reihe nach: vorstellen, Ton waehlen,
+         Ansage, uebernommene Werte, Marktangebot, erste Frage. Jeder
+         Schritt wartet auf den vorigen.
+
+         v1288 bleibt erfuellt: die Entscheidung ueber die
+         Marktpreisindikation faellt weiter VOR der ersten Frage, nur
+         nicht mehr vor der Begruessung. */
+      var _losgehts = function () {
+        if (!_rf) return;
+        _rfAnsage();   /* leer, wenn die Tonwahl sie schon angehaengt hat */
+        /* v1308: die uebernommenen Werte zum Nachsehen. */
+        if (_rf.vorlaufZeigen) {
+          try { _rfVorlaufKarte(_rf.vorlaufQuelle); } catch (ex) {}
+        }
+        if (!_rf.marktGefragt && (_rfFeld('plz') || _rfFeld('ort'))) {
+          try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
+          _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
+        }
+        _rfFrage();
+      };
       /* v1115-WEIN: Der Co-Pilot stellt sich vor und fragt EINMAL nach der
          Erfahrung - erst danach beginnt der Fragenlauf. Wer schon gewaehlt
          hat, merkt davon nichts. */
-      if (alle && !_rfErfahrung()) _rfEinstieg(_rfFrage);
-      else _rfFrage();
+      if (alle && !_rfErfahrung()) _rfEinstieg(_losgehts);
+      else _losgehts();
     });
   }
 
