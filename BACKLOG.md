@@ -696,6 +696,53 @@ stehen, sonst wird er zweimal gemacht.
 | N60.12 | Ankauf-Stand und Abweichung, falls gebaut |
 | N60.4/.4c | Stempel `_fuer` (`objekt_id`, `kuerzel`, `adresse`, `stand`, `abdruck`) an der Analyse |
 
+**Nachgetragen 09.10.2026 — Marcel will nicht nur Felder, sondern
+Dateien:** *„auch die Datenauswertung, Pilotanalyse, also das gesamte
+Projektwissen, was zu dem Objekt ist, und dass ich damit weiterarbeiten
+kann … dazu brauche ich dann halt auch eine aktuelle Datei oder mehrere
+Dateien von verschiedenen Objekten oder vielleicht auch einen gesamten
+Bestand … dass ich damit in meiner Portfolioanalyse weiterarbeiten
+kann."*
+
+Damit kommen **zwei Dinge** dazu, die über Felder hinausgehen:
+
+**(a) Die Auswertung gehört mit in den Export, nicht nur die Eingaben.**
+
+| Was | wo es heute liegt |
+|---|---|
+| Pilot-Analyse, volles JSON | `ai_analysis` am Objekt, 22 Schlüssel |
+| Stempel | `_fuer` = `objekt_id`, `kuerzel`, `adresse`, `stand`, `abdruck` |
+| Score und KPIs | gerechnet, nicht gespeichert → beim Export mit ausrechnen |
+| Cockpit-/Portfolio-Analyse | eigener Weg, muss mit |
+| Eigenes Wissen | `user_settings.eigenes_wissen` — gilt für alle Objekte, gehört **einmal** in die Datei, nicht je Objekt |
+
+> **Die Analyse ohne ihren Stempel zu exportieren wäre schlimmer als
+> sie wegzulassen.** Ein Urteil ohne Datum und Datenstand sieht aktuell
+> aus und ist es nicht — genau der Zustand, der die sieben identischen
+> Analysen (**N60.1b**) so teuer gemacht hat.
+
+**(b) Es muss eine Datei geben, die Marcel anfassen kann.**
+
+Nicht „der Export funktioniert", sondern: **eine Datei liegt vor, sie
+ist geöffnet worden, und die Zahlen darin stimmen mit der App überein.**
+
+- **Je Objekt** eine Datei, vollständig (Eingaben + Analyse + Stempel).
+- **Ein ganzer Bestand** in einer Datei, mit dem er in seiner eigenen
+  Portfolioanalyse weiterarbeiten kann. Das ist die eigentliche
+  Bestandsdatei — sie trägt alle Objekte eines Halters.
+- Format: **beides**. JSON trägt alles und ist die Wahrheit; eine
+  Tabelle (xlsx/csv) ist das, womit er tatsächlich rechnet. Die Tabelle
+  darf nur enthalten, was auch im JSON steht — zwei Exporte, die
+  auseinanderlaufen, sind schlimmer als einer.
+- **Abnahme:** die Dateien werden erzeugt, Marcel bekommt sie, und
+  **er** sagt, ob er damit arbeiten kann. Vorher ist der Punkt nicht
+  fertig.
+
+> **Warum das nicht „nur Export" ist:** eine Datei, die 90 % trägt,
+> merkt man erst, wenn man mit ihr rechnet — dann fehlt eine Spalte,
+> und die ganze Auswertung ist Makulatur. Deshalb steht die Abnahme an
+> der Datei, nicht am Knopf.
+
 **Prüfstrecke (die Kette, nicht die Datei):** je Objektart einmal
 PDF-Export, `pdf-import`, `voice-import`, xlsx/docx, Bankexport,
 Telegram-Werkzeuge — und **nachmessen, ob der Wert ankommt**, nicht nur
