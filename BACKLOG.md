@@ -274,10 +274,39 @@ einmal durchgespielt (Stand, Alter in Tagen, Score kommen an).
 > **Den Zustand erzeugt der erste Lauf gar nicht** — nur das Aufräumen
 > danach.
 
+#### N60.4d · Fotos werden ausgewertet — ✅ ERLEDIGT (`v2013`, 09.10.2026)
+Marcel: „und natürlich auch Fotos bekommen zum Auswerten."
+
+Gemessen über 25 Objekte: **17 haben Fotos**, bis zu 6 Stück, einzelne
+bis **720 KB**, zusammen bis **1,8 MB** je Objekt — als
+`data:image/jpeg;base64` direkt im Objekt. Verkleinert wird jetzt im
+**Browser** (max. 768 px, JPEG 72 %, höchstens vier), also auf dem Gerät,
+das die Bilder ohnehin hat. Gemessen: 6 → 4 Bilder, 30 % kleiner, 77 ms.
+
+**Vier Fehler, jeder einzeln gemessen:**
+
+| | Befund | Folge |
+|---|---|---|
+| 1 | Ich hatte einen **zweiten Verkleinerer** gebaut — `window._dpResizeDataUrl` (`ui.js:505`) gibt es längst | Dublette, von einem Prüfer verboten |
+| 2 | Mein Zugriff las `_objPhotos`/`getPhotos()` — **beides existiert nicht**, die Fotos stehen in `imgs` | hätte **immer leer** geliefert, ohne Fehler |
+| 3 | `_callOpenAIVision` deckelt bei **`opts.maxTokens \|\| 700`** (vom Beleg-Import) | Analyse kam mit **5 statt 22** Schlüsseln, 2.731 statt 9.375 Zeichen |
+| 4 | Kein **Ausgabefeld** für den Bildeindruck | 22 Schlüssel zurück, **kein Wort** zu den Fotos |
+
+> **Zu (3):** gültiges JSON, nur weniger darin — das sieht man der Antwort
+> nicht an. **„fertig: true" war kein Nachweis.**
+>
+> **Zu (4):** Ein Modell füllt die **definierten** Felder, nicht erfundene.
+> Eine Prompt-Anweisung ohne Zielfeld erzeugt gar nichts. Jetzt gibt es
+> `optischer_eindruck` — und zwar **nur**, wenn auch Fotos mitgehen; ein
+> Feld ohne Bilder lädt zum Raten ein.
+
+**Echter Lauf nach allen vier Korrekturen:** 23 Schlüssel, und der
+Eindruck beschreibt die tatsächlichen Bilder („gepflegte Fassade,
+Fenster in moderatem Zustand, Grünflächen") — **ohne** Baujahr, Fläche
+oder Wert daraus abzuleiten. Genau das verbietet die Regel im Prompt,
+und sie hält.
+
 **Noch offen für „alle Daten":**
-- **Fotos auswerten.** `/analyze` ruft das Modell mit reinem Text; Bilder
-  brauchen den content-parts-Weg, den es nur für den Beleg-Import gibt.
-  Eigener Umbau mit eigener Kostenfolge (Vision kostet mehr).
 - **Die sieben Blöcke auch für den Portfolio-Piloten** — er sieht je
   Objekt weiter nur 24 Zahlenfelder.
 - **Das Investmentprofil** (24 Schlüssel) liegt nur im `localStorage` und
