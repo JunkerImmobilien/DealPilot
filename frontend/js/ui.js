@@ -1173,11 +1173,24 @@ async function _runAIServer(btn) {
     var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
     var html;
     if (data && data.analysis) {
-      html = _renderAIServerAnalysis(data.analysis);
-      /* v2015 - stempeln, BEVOR gespeichert wird. Danach ist nicht
-         mehr feststellbar, fuer welches Objekt sie gerechnet wurde. */
+      /* v2017a - STEMPELN VOR DEM RENDERN.
+       *
+       * Hier stand `html = _renderAIServerAnalysis(data.analysis)` ZUERST
+       * und der Stempel danach. Gemessen am echten Lauf: die frisch
+       * gerechnete Analyse war korrekt gestempelt, und oben stand
+       * trotzdem „Diese Analyse trägt noch kein Datum" — der Kopf aus
+       * v2017 liest `a._fuer`, und das gab es zum Zeitpunkt des Renderns
+       * noch nicht. Erst ein Neuladen des Objekts zeigte den Stand.
+       *
+       * Zwanzig Zeilen weiter unten (runMiniAI) war die Reihenfolge von
+       * Anfang an richtig herum. Zwei Wege, eine Sache — und nur einer
+       * stimmte.
+       *
+       * Gefunden hat es nicht der Prüfer, sondern der Blick auf den
+       * Bildschirm nach dem Lauf. */
       window._aiAnalysis = _analyseStempeln(data.analysis);
       window._aiText = JSON.stringify(window._aiAnalysis, null, 2);
+      html = _renderAIServerAnalysis(window._aiAnalysis);
       // V25: Mini-Block in Tab Kennzahlen mit aktualisieren
       var _mb = document.getElementById('ai-mini-body'); if (_mb) _mb.innerHTML = html; /* v596: Voll-Analyse in Bewertung */
       // V63.69: KI-Analyse direkt persistieren — User-Wunsch
