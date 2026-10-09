@@ -4627,7 +4627,19 @@
          Element ohne Hintergrund laesst das Gespraech durchscheinen.
          `z-index:4` haelt die Reihenfolge der drei Schichten -
          darunter das Gespraech, darueber Mikro (5) und Zeile (6). */
-      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto;',
+      /* v2055b - 26vh reichten auf dem kleinsten Geraet nicht. GEMESSEN
+         auf 320x565: die Leiste brauchte 217 px und bekam 145, der Chip
+         'Profi' lag ausserhalb und war nur durch Scrollen in einer
+         147-px-Leiste erreichbar - ohne jeden Hinweis darauf.
+
+         flex-wrap ist gesetzt, half aber nicht: die drei Chips sind
+         148 + 190 + 85 px breit, und bei ~270 px nutzbarer Breite passen
+         keine zwei davon nebeneinander. Also braucht die Leiste Hoehe.
+
+         min(230px, 40vh) - der Deckel ist so wichtig wie die Untergrenze:
+         ohne ihn erschlaegt die klebende Leiste auf grossen Geraeten das
+         Gespraech. 565 -> 226 (217 noetig), 757 -> 230. */
+      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:min(230px,40vh);overflow-y:auto;min-height:0;flex:0 0 auto;',
       '    position:sticky;bottom:130px;z-index:4;background:var(--cr,#FDFCFA)}',
       /* Reihenfolge per order - ohne das DOM anzufassen. */
       '  .oabi-ov.vi-mode .vi-rf-kopfzeile{order:1}',
