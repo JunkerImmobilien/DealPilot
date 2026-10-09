@@ -35863,6 +35863,16 @@ body.dp-chrome-hell aside.sidebar .sb-card{ background:#F6F2E9 !important; borde
 body.dp-chrome-hell aside.sidebar .sb-price,
 body.dp-chrome-hell aside.sidebar [class*="price"]{ color:#241f18 !important; }
 
+/* v2028b - Gruen gehoerte dazu und fehlte. Die gruene Obsidian-
+   Grundregel (0,3,1) hat die duenne Pille hier (0,2,1) geschlagen:
+   gemessen rgb(94,217,146) auf der Cremekarte #F6F2E9, Kontrast 1,48.
+   Gleiche Machart wie Rot und Gold daneben, nur in Gruen. */
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-green,
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-green-strong{
+  background:rgba(46,158,99,.10) !important; color:#1f7a45 !important;
+  border-color:rgba(46,158,99,.45) !important;
+}
+
 /* EDLE Tier-Pills: duenn, getoent, gesperrt (nicht plumpes Vollflaechen-Pill) */
 body.dp-chrome-hell .sbc-score-label,
 body.dp-chrome-hell .sbc-verdict{
