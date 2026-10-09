@@ -301,6 +301,55 @@ async function pilot_analyse_lesen(ctx, args) {
   return aus;
 }
 
+/* ══ v2012 · DIE COCKPIT-ANALYSE, ABHOLBAR ═══════════════════════════
+
+   Eine OBJEKT-Analyse wird gespeichert und hat hier laengst ein
+   Werkzeug (`pilot_analyse_lesen`). Die PORTFOLIO-Analyse hatte
+   beides nicht: sie entstand im Chat des Cockpits und war mit dem
+   Schliessen des Reiters weg. Der Bot konnte die ZAHLEN lesen
+   (`portfolio_lesen`), nie die Beurteilung.
+
+   Seit v2012 legt der Portfolio-Pilot sie in `user_settings` unter
+   `portfolio_analyse` ab. Hier wird sie geholt - mit STAND, denn
+   eine Beurteilung ohne Datum ist bei einem Portfolio, das sich
+   jeden Monat aendert, eine Falle. */
+async function portfolio_analyse_lesen(ctx) {
+  const r = await query(
+    'SELECT wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = $2',
+    [ctx.userId, 'portfolio_analyse']
+  );
+  if (!r.rowCount || !r.rows[0].wert) {
+    return {
+      vorhanden: false,
+      hinweis: 'Es liegt keine Portfolio-Analyse vor. Sie entsteht in DealPilot im '
+             + 'Portfolio-Cockpit ueber den Knopf "Portfolio-Analyse starten". '
+             + 'Sag das - und erfinde KEINE eigene Gesamtbeurteilung. Die reinen '
+             + 'Zahlen kannst du mit portfolio_lesen holen.'
+    };
+  }
+  const w = r.rows[0].wert || {};
+  const stand = w.stand || r.rows[0].updated_at;
+  let alter = null;
+  try {
+    const t = new Date(stand).getTime();
+    if (Number.isFinite(t)) alter = Math.max(0, Math.round((Date.now() - t) / 86400000));
+  } catch (e) {}
+  return {
+    vorhanden: true,
+    analyse: w.text || null,
+    stand: stand || null,
+    stand_lesbar: stand ? new Date(stand).toLocaleDateString('de-DE') : null,
+    alter_tage: alter,
+    anzahl_objekte: w.anzahl_objekte != null ? w.anzahl_objekte : null,
+    objekte_im_payload: w.objekte_im_payload != null ? w.objekte_im_payload : null,
+    portfolio_score: w.portfolio_score != null ? w.portfolio_score : null,
+    hinweis: 'Das ist die gespeicherte Beurteilung aus dem Portfolio-Cockpit, nicht neu '
+           + 'gerechnet. NENNE DEN STAND. Ist sie aelter als 30 Tage, sage ausdruecklich, '
+           + 'dass sich das Portfolio seitdem geaendert haben kann, und biete an, die '
+           + 'aktuellen Zahlen mit portfolio_lesen dagegenzuhalten.'
+  };
+}
+
 async function portfolio_lesen(ctx) {
   const sp = await dialog.portfolioKontext(ctx.userId);
   if (!sp) {
@@ -3396,6 +3445,17 @@ const WERKZEUGE = [
     beschreibung: 'Alle Daten EINES Objekts: Kerndaten, Scores, Kennzahlen, Felder. '
       + 'Ohne Angabe wird das zuletzt besprochene Objekt genommen.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  /* v2012 · Die Cockpit-Analyse - das Gegenstueck zu pilot_analyse_lesen. */
+  { name: 'portfolio_analyse_lesen', stufe: 'lesen', fn: portfolio_analyse_lesen,
+    beschreibung: 'Die gespeicherte PORTFOLIO-Analyse (Cockpit-Analyse) des Nutzers: '
+      + 'Vermoegensbilanz, Ertragslage, welche Objekte tragen und welche belasten, '
+      + 'Klumpenrisiken, Entwicklung und die naechsten Schritte - als Fliesstext, so '
+      + 'wie der Portfolio-Pilot sie geschrieben hat. Nutze es, wenn nach der '
+      + 'Gesamtbeurteilung, der Einschaetzung des Bestands, Klumpenrisiken oder '
+      + '"was soll ich als naechstes tun" gefragt wird. Fuer reine ZAHLEN nimm '
+      + 'portfolio_lesen. Kostet nichts; rechnet nichts neu. NENNE IMMER DEN STAND.',
+    parameter: { type: 'object', properties: {}, additionalProperties: false } },
 
   { name: 'portfolio_lesen', stufe: 'lesen', fn: portfolio_lesen,
     beschreibung: 'Die Portfolio-Zahlen in EINEM Aufruf: Vermoegensbilanz, Projektion '

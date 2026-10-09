@@ -38,7 +38,22 @@ const { query } = require('../db/pool');
    Das Investmentprofil (`dp_investment_profile`, 24 Schlüssel) bleibt
    vorerst lokal. Es hier mitzunehmen wäre ein eigener Schritt — und
    einer, der eine Vorrangregel zwischen beiden braucht. */
-const ERLAUBT = ['datenraum', 'lage_profil'];
+/* v2012 - `portfolio_analyse`: die Beurteilung des Portfolio-Piloten.
+
+   Eine OBJEKT-Analyse wird gespeichert (objects.ai_analysis) und hat
+   im Telegram-Bot ein eigenes Werkzeug. Die PORTFOLIO-Analyse hatte
+   beides nicht - sie entstand im Chat des Cockpits und war mit dem
+   Schliessen des Reiters weg. Der Bot konnte die Zahlen lesen, nie
+   die Beurteilung. Eine Analyse, die nur im Fenster lebt, ist fuer
+   jeden anderen Weg nicht vorhanden - auch fuer den Nutzer selbst am
+   naechsten Tag nicht.
+
+   Hier und nicht in einer eigenen Tabelle, weil `updated_at` den
+   STAND gleich mitliefert. Die 200-KB-Grenze unten stand mit der
+   Begruendung "damit hier keine Dokumente landen" - eine Analyse ist
+   kein Dokument, und der Text wird beim Schreiben zusaetzlich
+   gekappt (die laengste gemessene Objekt-Analyse hat 14.849 Zeichen). */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse'];
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {

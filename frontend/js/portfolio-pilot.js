@@ -189,7 +189,11 @@
   }
 
   /* ── Der gemeinsame Weg ──────────────────────────────────────────── */
-  function senden(nachricht, sichtbar) {
+  /* v2012 - `istAnalyse`: nur die ANALYSE wird abgelegt, nicht jede
+     Rueckfrage. Eine Rueckfrage beantwortet einen Ausschnitt, und ein
+     Ausschnitt, der spaeter als "die Analyse" gelesen wird, ist
+     schlimmer als keine. */
+  function senden(nachricht, sichtbar, istAnalyse) {
     if (laeuft) return;
     var ctx = kontext();
 
@@ -271,6 +275,12 @@
       } catch (e) {}
       if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
+      /* v2012 - die ANALYSE (nicht jede Rueckfrage) wird abgelegt,
+         damit der Telegram-Bot sie abrufen kann. Marcel: "Das Abrufen
+         der Co-Pilot-Analyse muss aus Telegram moeglich sein."
+         Still wie der Portfolio-Spiegel: ein Fehler hier darf dem
+         Nutzer nichts anzeigen, die Analyse steht ja vor ihm. */
+      if (istAnalyse) { try { analyseAblegen(reply, ctx); } catch (e) {} }
     }).catch(function (err) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);
       var m = (err && err.data && (err.data.message || err.data.error)) || (err && err.message) || 'Fehler';
@@ -299,11 +309,36 @@
     'Rechne mit den gegebenen Zahlen. Erfinde nichts. Fehlt etwas, sag es.'
   ].join('\n');
 
+  /* v2012 - ABLAGE DER COCKPIT-ANALYSE ───────────────────────────
+
+     Gespeichert wird nur die ANALYSE, nicht jede Rueckfrage: eine
+     Rueckfrage beantwortet einen Ausschnitt, und ein Ausschnitt, der
+     spaeter als "die Analyse" gelesen wird, ist schlimmer als keine.
+
+     Mitgegeben wird der STAND und woraus sie entstand - sonst steht
+     beim Abrufen ein Text ohne Datum und ohne Umfang da. */
+  var ANALYSE_MAX = 60000;
+  function analyseAblegen(text, ctx) {
+    if (!text || typeof text !== 'string') return;
+    var t = text.length > ANALYSE_MAX ? (text.slice(0, ANALYSE_MAX) + "\n[gekuerzt]") : text;
+    var wert = {
+      text: t,
+      stand: new Date().toISOString(),
+      anzahl_objekte: (ctx && ctx.anzahl_objekte) != null ? ctx.anzahl_objekte : null,
+      objekte_im_payload: (ctx && ctx.objekte_im_payload) != null ? ctx.objekte_im_payload : null,
+      portfolio_score: (ctx && ctx.portfolio_score) != null ? ctx.portfolio_score : null,
+      stand_der_zahlen: (ctx && ctx.stand) || null
+    };
+    Auth.apiCall('/user-settings/portfolio_analyse', { method: 'PUT', body: { wert: wert } })
+      .then(function () { try { console.debug('[pp] Analyse abgelegt'); } catch (e) {} })
+      .catch(function () { /* still - die Analyse steht ja vor dem Nutzer */ });
+  }
+
   function analyse() {
     history = [];
     var log = el('dp-pp-log');
     if (log) log.innerHTML = '';
-    senden(ANALYSE_AUFTRAG, 'Portfolio-Analyse starten');
+    senden(ANALYSE_AUFTRAG, 'Portfolio-Analyse starten', true);   /* v2012 */
   }
 
   function frage() {
