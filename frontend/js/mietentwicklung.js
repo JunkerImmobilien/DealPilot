@@ -268,7 +268,9 @@ window.MietEntwicklung = (function() {
       blkP.style.display = mode === 'prog' ? '' : 'none';
       blkD.style.display = mode === 'detail' ? '' : 'none';
     }
-    if (mode === 'detail') {
+    /* v2025 - die Tabelle gilt auch fuer den dritten Modus. Vorher lief
+       sie nur bei `detail`, und „Aus Wohnungen" zeigte gar keine. */
+    if (mode === 'detail' || mode === 'einheiten') {
       _renderTable();
       _renderOpp();
     }
@@ -298,6 +300,33 @@ window.MietEntwicklung = (function() {
               '</tr>';
     });
     html += '</tbody></table>';
+    /* ══ v2025 · WORAUF DIE TABELLE BERUHT ═══════════════════════
+
+       Marcel: „auch bei Mietentwicklung musst du das vielleicht auch
+       kennzeichnen, wenn wir das irgendwie uebernehmen."
+
+       Im Modus „Aus Wohnungen" steht ueber der Tabelle, woraus sie
+       gerechnet ist - und bei Indexmieten ausdruecklich, dass deren
+       Hoehe eine ANNAHME ist. Wer die Tabelle liest, hat das
+       Wohnungsfenster meist nicht offen; eine Kennzeichnung nur dort
+       erreicht ihn nicht. */
+    if (getMode() === 'einheiten') {
+      var st = einheitenStand();
+      var kopf = '<div class="me-herkunft">Gerechnet aus <b>' + st.mit + '</b> von ' + st.gesamt
+        + ' Wohnungen mit hinterlegtem Mietvertrag.'
+        + (st.gesamt > st.mit
+            ? ' Die \u00fcbrigen ' + (st.gesamt - st.mit) + ' bleiben auf ihrer Ist-Miete \u2014 f\u00fcr sie'
+              + ' wird <b>keine</b> Steigerung angenommen.'
+            : '')
+        + '</div>';
+      if (st.index > 0) {
+        kopf += '<div class="me-herkunft me-herkunft-annahme">\u26a0 <b>' + st.index
+          + (st.index === 1 ? ' Wohnung hat' : ' Wohnungen haben') + ' eine Indexmiete (\u00a7 557b BGB).</b>'
+          + ' Der Termin steht im Vertrag, die H\u00f6he nicht \u2014 sie ergibt sich erst aus dem'
+          + ' Verbraucherpreisindex. Dieser Teil der Tabelle ist eine <b>Annahme</b>, keine Vereinbarung.</div>';
+      }
+      html = kopf + html;
+    }
     wrap.innerHTML = html;
   }
 

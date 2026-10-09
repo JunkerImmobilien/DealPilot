@@ -393,6 +393,12 @@
            „naechste Erhoehung 3 %" eine Behauptung, keine Angabe. */
         '<div id="mfh-we-erh-box" style="display:none">' +
           '<h4>Geplante Erh\u00f6hungen</h4>' +
+          /* v2025 - eine Indexmiete steht der HOEHE nach nicht fest. */
+          '<div id="mfh-we-index-warn" class="mfh-we-warn" style="display:none">' +
+            '<b>Indexmiete \u2014 die H\u00f6he ist eine Annahme.</b> Der <i>Termin</i> steht im Vertrag, ' +
+            'die H\u00f6he ergibt sich erst aus dem Verbraucherpreisindex. Was du hier eintr\u00e4gst, ' +
+            'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
+          '</div>' +
           '<p class="mfh-we-hint">Nur bei <b>Staffel-</b> und <b>Indexmiete</b>: hier steht die Erh\u00f6hung vorher fest. ' +
             'Mit diesen Angaben kann DealPilot die Ist-Miete fortschreiben \u2014 und sie in die ' +
             '<b>Mietentwicklung</b> des Objekts einrechnen.</p>' +
@@ -459,6 +465,10 @@
       var a = vArt ? vArt.value : '';
       var planbar = (a === 'staffel' || a === 'index');
       box.style.display = planbar ? '' : 'none';
+      /* v2025 - nur bei Index, nicht bei Staffel: die Staffel STEHT im
+         Vertrag, da ist nichts anzunehmen. */
+      var warn = el('mfh-we-index-warn');
+      if (warn) warn.style.display = (a === 'index') ? '' : 'none';
     }
     if (vArt) vArt.addEventListener("change", erhoehungZeigen);
     erhoehungZeigen();
@@ -649,6 +659,11 @@
       '#mfh-we-ov .mfh-we-f input:focus,#mfh-we-ov .mfh-we-f select:focus{outline:0;',
       '  border-color:var(--wl-c9a84c, #C9A84C)}',
       '#mfh-we-ov .mfh-we-hint{font-size:11.5px;color:#8A8272;margin:0 0 8px;line-height:1.5}',
+      /* v2025 - die Annahme-Warnung bei Indexmiete. Gold, nicht rot:
+         es ist kein Fehler, nur eine Zahl mit anderer Herkunft. */
+      '#mfh-we-ov .mfh-we-warn{font-size:12px;line-height:1.55;margin:0 0 10px;padding:9px 12px;',
+      '  border-radius:9px;background:rgba(201,168,76,.12);color:#8a6d1f;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}',
       '#mfh-we-ov .mfh-we-haken{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:0 0 10px;cursor:pointer}',
       '#mfh-we-ov .mfh-we-bilder{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}',
       '#mfh-we-ov .mfh-we-bild{position:relative;display:inline-block}',

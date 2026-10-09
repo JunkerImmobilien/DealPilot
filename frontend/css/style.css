@@ -39799,3 +39799,11 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 .dp-pp-stand b{font-weight:600}
 .dp-pp-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.30);color:#2F8E5A}
 .dp-pp-stand-alt{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.38);color:#8a6d1f}
+
+/* == v2025 - Herkunft der Mietentwicklung ========================== */
+.me-herkunft{font:400 12px/1.55 Inter,system-ui,sans-serif;margin:0 0 10px;padding:8px 12px;
+  border-radius:9px;background:rgba(42,39,39,.05);border:1px solid rgba(42,39,39,.12);color:#6B6356}
+.me-herkunft b{font-weight:600;color:#2A2727}
+.me-herkunft-annahme{background:rgba(201,168,76,.12);color:#8a6d1f;
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}
+.me-herkunft-annahme b{color:#8a6d1f}
