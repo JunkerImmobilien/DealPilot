@@ -799,6 +799,70 @@ Entscheidung, keine technische.
 
 ---
 
+#### N60.15 · Die geführte Eingabe ist überladen — Neubau des Dialogs
+**Bild: `Dateien/geführteeingabe.png`** (09.10.2026). Marcel:
+*„Das ist ja total überladen. Also alles auf einmal. Der Kunde weiß ja
+gar nicht, was er machen soll."*
+
+**Gemessen am Bild und am Code** (`frontend/js/voice-import.js`,
+**11.798 Zeilen, 669 KB** — ein einziges Modul):
+
+| Was | Befund |
+|---|---|
+| Co-Pilot-Blasen | **drei gleichzeitig** sichtbar, dazu ein vierter Block „Jetzt dran" |
+| „Damit ich den richtigen Ton treffe" | steht **zweimal** auf dem Schirm — Z. 988 **und** Z. 7078 |
+| Antwortreihe | **fünf Chips aus zwei verschiedenen Fragen** nebeneinander: Marktpreisindikation / Erweiterte MPI (ein Angebot) und Erste Immobilie / Schon ein paar gemacht / Profi (die Erfahrungsfrage) |
+| Rechte Hälfte | leeres Feld, rund die halbe Breite ungenutzt |
+| „Jetzt dran · Objekt & Größe" | klein, unten, unter den Blasen — die eigentliche Aufgabe |
+| Fußzeile | „Weiß ich nicht" (`#vi-rf-nix`, Z. 9006) · „Normal" · „Fertig — zur Übersicht" |
+| Kopfzeile | zwei Schalter: `#vi-rf-fs` **Freisprechen** (Z. 8944, vorbelegt an) und `#vi-rf-alles` **Alle Felder** (Z. 8959) |
+
+**Was gebaut wird:**
+
+1. **„Freisprechen" fällt weg.** Marcel: *„Das Freisprechen, das kann
+   raus. Es gibt immer nur alle Felder."* Der Schalter verschwindet,
+   das Zuhören bleibt — es ist dann der Normalfall, kein Modus.
+2. **Eine Nachricht, eine Antwort.** Immer **nur eine** Co-Pilot-Blase,
+   dann die Antwort dazu. Was heute als Stapel kommt, wird eine Folge.
+3. **Die Tonfrage ist eine eigene Frage**, nicht ein Anhängsel in der
+   Antwortreihe der nächsten. Eine Frage, eine Chip-Reihe.
+4. **„Jetzt dran" wandert in den Chat.** Marcel: *„Er sagt dann nach ein
+   paar Sekunden: Ach so, wir stehen jetzt immer noch im Objekt … Ich
+   bräuchte jetzt von dir Wohnfläche, Zimmer und Vollgeschosse."* Die
+   Fußzeile mit „Weiß ich nicht / Normal / Fertig — zur Übersicht"
+   entfällt; was sie konnte, sagt der Co-Pilot im Verlauf.
+5. **Mehr Platz.** Die leere rechte Hälfte und die weggefallenen
+   Fußzeilen gehen an die Felder (`Alle Felder`) und an den Verlauf.
+6. **Die Eingabetiefe kommt schrittweise** und wird erklärt, statt als
+   fertige Stufenleiste dazustehen.
+7. **Der Co-Pilot muss erklären können, was er tut.** Jede Frage soll
+   auf Nachfrage begründet werden — über die vorhandene
+   OpenAI-Schnittstelle, nicht über hinterlegte Textbausteine.
+
+**Prüfstrecke, die Marcel ausdrücklich verlangt:**
+- mehrere **Eingabetiefen**, nacheinander durchgespielt
+- mehrere **Objekte**: eines einfach, eines mit Marktpreisindikation,
+  eines mit einer tieferen Stufe
+- die **Kombinatorik** — kommt bei jeder Kombination alles an?
+- **ein Objekt mit schon vorhandenen Daten.** *„Dann aber auch, wenn
+  schon Daten drinne stehen und du anfängst, dass die Daten schon da
+  sind. Das ist wichtig."*
+- danach **Messkabine: Handy und Tablet** — ob der Verlauf dort
+  bedienbar und sauber gerendert ist
+
+> **Warum das kein Optik-Punkt ist:** ein Dialog, der alles gleichzeitig
+> zeigt, führt nicht — er listet auf. Marcel wusste nur deshalb, was zu
+> tun ist, weil er den Auftrag selbst gegeben hat. Das ist der härteste
+> Befund an dieser Stelle und er steht wörtlich im Auftrag.
+
+> **Risiko, vor dem Anfangen gemessen:** 11.798 Zeilen in einer Datei,
+> und der Dialog ist über mindestens sechs weit auseinanderliegende
+> Stellen verteilt (988, 1740, 7030, 7078, 8944, 9006). Ein Umbau in
+> Kleinstschritten wird hier unübersichtlich — das wird **ein** Paket,
+> mit Prüfstrecke vor der Auslieferung.
+
+---
+
 ### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
 
 Marcel: „dass du die Objekte alle nochmal durchgehst und auch die
