@@ -45,6 +45,25 @@ window.MietEntwicklung = (function() {
     var m = window._dpMfh;
     return (m && Array.isArray(m.einheiten)) ? m.einheiten : [];
   }
+  /* v2027 - KANN diese Objektart ueberhaupt Einheiten tragen?
+
+     Fuenf von elf tun es (MFH, ZFH, GESCH, BUERO, HOTEL). An einer
+     ETW oder einem EFH ist der Modus nicht „noch nicht gefuellt",
+     sondern sinnlos - und ein dauerhaft grauer Knopf verspricht
+     etwas, das dort nie eintreten kann.
+
+     Gefragt wird `DpMfhEinheiten.artMitEinheiten()`, nicht eine
+     eigene Liste. Ist das Modul noch nicht da (Ladereihenfolge),
+     entscheidet der Bestand: gibt es angehakte Wohnungen, traegt die
+     Art sie offensichtlich. Dieser Rueckfall kann den Knopf nie
+     faelschlich ZEIGEN, nur faelschlich verbergen - und das auch nur
+     fuer den Augenblick vor dem ersten `refresh()`. */
+  function artTraegtEinheiten() {
+    var M = window.DpMfhEinheiten;
+    if (M && typeof M.artMitEinheiten === 'function') return M.artMitEinheiten();
+    return _einheiten().some(function (e) { return e && e.mv_in_mietentwicklung; });
+  }
+
   /** Gibt es ueberhaupt Wohnungen mit Haken? */
   function einheitenNutzbar() {
     return _einheiten().some(function (e) {
@@ -95,7 +114,10 @@ window.MietEntwicklung = (function() {
        keine Steigerung. */
     var el = document.getElementById('me_modus');
     var w = el && el.value ? el.value : localStorage.getItem('dp_miet_modus');
-    if (w === 'einheiten') return einheitenNutzbar() ? 'einheiten' : 'prog';
+    /* v2027 - die ART zaehlt mit. Wer ein MFH auf ETW umstellt, haette
+       sonst einen gespeicherten Modus behalten, dessen Knopf gar nicht
+       mehr da ist: rechnend, aber unerreichbar. */
+    if (w === 'einheiten') return (artTraegtEinheiten() && einheitenNutzbar()) ? 'einheiten' : 'prog';
     return w === 'detail' ? 'detail' : 'prog';
   }
 
@@ -255,9 +277,17 @@ window.MietEntwicklung = (function() {
     }
     if (btnE) {
       btnE.classList.toggle('active', mode === 'einheiten');
-      /* Ohne Wohnungen mit Haken ist der Modus nicht waehlbar - das sagt
-         der Knopf selbst, statt still auf Prognose zurueckzufallen. */
-      var nutzbar = einheitenNutzbar();
+      /* v2027 - DREI Stufen, nicht zwei:
+
+           Art traegt keine Einheiten  ->  weg   (ETW, EFH, DHH, RH, GEW, GAR)
+           traegt, keine angehakt      ->  grau  (wie seit v2024a)
+           traegt und angehakt         ->  aktiv
+
+         Bis v2026 gab es nur grau. An einer ETW stand damit dauerhaft
+         ein toter Knopf, der etwas anbot, das dort nie eintreten kann. */
+      var traegt = artTraegtEinheiten();
+      btnE.style.display = traegt ? '' : 'none';
+      var nutzbar = traegt && einheitenNutzbar();
       btnE.disabled = !nutzbar;
       btnE.style.opacity = nutzbar ? '' : '.45';
       btnE.title = nutzbar
@@ -414,6 +444,22 @@ window.MietEntwicklung = (function() {
 
   // Re-render Tabelle bei jeder calc()-Aktualisierung
   function refresh() { _renderUI(); try { _renderSollHinweis(); } catch (e) {} }
+
+  /* v2027 - der Knopf muss mitgehen, wenn die Objektart wechselt.
+     Ohne das bliebe er nach einem Wechsel von MFH auf ETW stehen, bis
+     irgendetwas anderes ein `refresh()` ausloest - und genau dann
+     sieht man ihn, wenn man ihn nicht mehr haben darf. */
+  (function bindeObjektart() {
+    function binden() {
+      var a = document.getElementById('objart');
+      if (!a || a._meBound) return;
+      a._meBound = true;
+      a.addEventListener('change', function () { try { _renderUI(); } catch (e) {} });
+    }
+    binden();
+    document.addEventListener('DOMContentLoaded', binden);
+    window.addEventListener('dp:object-ready', function () { binden(); setTimeout(_renderUI, 60); });
+  })();
 
   // Initial-Setup nach DOMContentLoaded
   document.addEventListener('DOMContentLoaded', function() {

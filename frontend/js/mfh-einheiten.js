@@ -952,5 +952,14 @@
   }
   window.addEventListener('dp:object-ready', function () { setTimeout(knopf, 250); setTimeout(istSoll, 700); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
-  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten };
+  /* v2027 - `artMitEinheiten` ist die AUSKUNFT zu ARTEN_MIT_EINHEITEN
+     (Z. 32). Die Mietentwicklung braucht dieselbe Antwort, darf die
+     Liste aber nicht kopieren: eine zweite Liste waere beim naechsten
+     neuen Objekttyp veraltet - und sie wuerde lautlos falsch
+     antworten, nicht fehlen. Ohne Argument liest sie das Feld selbst. */
+  function artMitEinheiten(art) {
+    if (art == null) art = (el('objart') && el('objart').value) || '';
+    return !!ARTEN_MIT_EINHEITEN[art];
+  }
+  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten };
 })();
