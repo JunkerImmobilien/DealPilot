@@ -4525,7 +4525,25 @@
 
          Ein Schwellenwert auf EINER Achse beschreibt kein Geraet - er
          beschreibt eine Haltung des Geraets. */
-      '@media(max-width:600px),(max-height:560px){',
+      /* ═══ v2059 · AUCH 601-900 px BRAUCHT DAS HANDY-LAYOUT ════════════
+         GEMESSEN bei 767x757 (iPad hochkant): nur 1 von 3 Chips
+         erreichbar. Dieselbe Ursache wie bei 767x497 vor v2056 - die
+         Buehne ist dort ein Grid mit grid-template-rows: 220px 180px
+         (= 400 px) in einem 208 px hohen Kasten, bei overflow:visible.
+         Der Inhalt quillt heraus: die Merkliste lag bei 203..423, der
+         Chat bei 435..615, die Chip-Leiste bei 423..552 - alles
+         uebereinander.
+
+         v2056 hat nur die FLACHEN Faelle gefangen. Der Fehler haengt
+         aber an der BREITE: bis 900 px ist die zweispaltige Buehne zu
+         eng. Das stand schon im Code - Z. 3971 macht sie dort bereits
+         einspaltig. Ich folge dieser Entscheidung, statt eine zweite
+         danebenzustellen.
+
+         Ein iPad hochkant bekommt damit das Handy-Layout. Das ist
+         Absicht: 1 von 3 erreichbaren Knoepfen ist keine Bedienbarkeit,
+         und eine andere Anordnung ist erlaubt, wenn sie bedienbar ist. */
+      '@media(max-width:900px),(max-height:560px){',
       /* 1 · Der Verlauf scrollt, statt zu quellen. min-height:0 ist
              Pflicht: ohne sie ignoriert ein Flex-Kind das overflow. */
       '  .oabi-ov.vi-mode .oabi-body{overflow-y:auto;-webkit-overflow-scrolling:touch}',
@@ -4723,7 +4741,11 @@
          (schmal UND flach). Dieser Gegenblock trennt sie wieder, statt
          v2056 zurueckzudrehen - der Nutzen dort ist gemessen: 767x497
          ging von 0 auf 3 erreichbare Chips. */
-      '@media(min-width:601px) and (max-height:560px){',
+      /* v2059 - der Gegenblock gilt jetzt fuer BEIDE Wege in den
+         Handy-Block hinein: breit-und-flach wie bisher, und neu auch
+         601-900 px bei normaler Hoehe. Sonst braechen dort Chips und
+         Mikrofonkasten um, obwohl die Breite reicht. */
+      '@media(min-width:601px) and (max-width:900px),(min-width:601px) and (max-height:560px){',
       '  .oabi-ov.vi-mode .vi-dran-lbl{flex:1 1 100%}',
       '  .oabi-ov.vi-mode .vi-dran-a{row-gap:4px}',
       '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:nowrap;row-gap:0}',
