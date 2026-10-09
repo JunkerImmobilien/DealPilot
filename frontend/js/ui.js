@@ -1094,6 +1094,49 @@ async function _fotosFuerKi() {
 
    Eine Herkunftsangabe gehoert an den ORT, an dem sie entsteht,
    nicht an den, der sie spaeter braucht. */
+/* ══ v2017 · DER FINGERABDRUCK DER ZAHLEN ════════════════════════
+
+   Genau die Felder, ueber die die Analyse urteilt. `updated_at` des
+   Objekts waere der naheliegende Vergleich und der falsche: es
+   aendert sich bei jedem Speichern - ein Haken, eine Notiz, ein
+   Foto. Ein Banner, das nach jedem Klick "veraltet" ruft, wird nach
+   drei Tagen weggesehen.
+
+   Die Liste ist bewusst kurz und benannt: sie erlaubt es, dem Nutzer
+   zu SAGEN, WAS sich geaendert hat - nicht nur DASS. */
+var ANALYSE_FELDER = [
+  ['kp','Kaufpreis'], ['nkm','Nettokaltmiete'], ['wfl','Wohnflaeche'],
+  ['baujahr','Baujahr'], ['objart','Objektart'], ['zimmer','Zimmer'],
+  ['d1z','Sollzins'], ['d1t','Tilgung'], ['ek','Eigenkapital'],
+  ['gsfl','Grundstueck'], ['brw','Bodenrichtwert'], ['mea','Miteigentumsanteil'],
+  ['ds2_zustand','Zustand'], ['ds2_energie','Energieklasse'],
+  ['makrolage','Makrolage'], ['mikrolage','Mikrolage'], ['lageklasse','Lageklasse'],
+  ['hg_nul','Hausgeld'], ['leerstand','Leerstand'], ['einheiten','Wohneinheiten']
+];
+function _analyseAbdruck() {
+  var o = {};
+  try {
+    for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+      var id = ANALYSE_FELDER[i][0];
+      var v = (typeof g === 'function') ? g(id) : '';
+      o[id] = (v == null || String(v).trim() === '') ? null : String(v).trim();
+    }
+  } catch (e) { return null; }
+  return o;
+}
+/* Was hat sich geaendert? Gibt die BESCHRIFTUNGEN zurueck, nicht die Ids. */
+function _analyseAbweichung(alt) {
+  if (!alt || typeof alt !== 'object') return null;   /* ohne Abdruck wird nichts behauptet */
+  var jetzt = _analyseAbdruck();
+  if (!jetzt) return null;
+  var raus = [];
+  for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+    var id = ANALYSE_FELDER[i][0];
+    if ((alt[id] || null) !== (jetzt[id] || null)) raus.push(ANALYSE_FELDER[i][1]);
+  }
+  return raus;
+}
+
 function _analyseStempeln(analyse) {
   if (!analyse || typeof analyse !== 'object') return analyse;
   try {
@@ -1103,7 +1146,10 @@ function _analyseStempeln(analyse) {
       objekt_id: window._currentObjKey || null,
       kuerzel: (typeof g === 'function' ? (g('kuerzel') || null) : null),
       adresse: [adr, ort].filter(Boolean).join(', ') || null,
-      stand: new Date().toISOString()
+      stand: new Date().toISOString(),
+      /* v2017 - worauf sich die Analyse stuetzt. Ohne das laesst sich
+         spaeter nur das Alter sagen, nicht die Gueltigkeit. */
+      abdruck: _analyseAbdruck()
     };
   } catch (e) { /* ohne Stempel ist sie nicht schlechter als vorher */ }
   return analyse;
@@ -1433,7 +1479,47 @@ function _renderAIServerAnalysis(a) {
   }
 
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
-  return '<div class="dp-pa-wrap">' +
+  /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
+  var _kopf = '';
+  try {
+     var _f = a._fuer || null;
+     if (_f && _f.stand) {
+       var _d = new Date(_f.stand);
+       var _datum = isNaN(_d) ? '' : _d.toLocaleDateString('de-DE');
+       var _tage = isNaN(_d) ? null : Math.max(0, Math.round((Date.now() - _d.getTime()) / 86400000));
+       var _fremd = _f.objekt_id && window._currentObjKey && String(_f.objekt_id) !== String(window._currentObjKey);
+       var _ab = _fremd ? null : _analyseAbweichung(_f.abdruck);
+       var _klasse = 'ok', _text;
+       if (_fremd) {
+         _klasse = 'fremd';
+         _text = '<b>Diese Analyse geh\u00f6rt zu einem anderen Objekt</b>'
+               + (_f.adresse ? ' (' + _escClean(_f.adresse) + ')' : '')
+               + ' \u2014 bitte neu abrufen, bevor du dich darauf st\u00fctzt.';
+       } else if (_ab && _ab.length) {
+         _klasse = 'alt';
+         _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
+               + ' \u2014 seitdem ' + (_ab.length === 1 ? 'hat sich ' : 'haben sich ')
+               + '<b>' + _ab.map(_escClean).join(', ') + '</b> ge\u00e4ndert. '
+               + 'Die Texte unten k\u00f6nnen \u00fcberholt sein \u2014 neu abrufen.';
+       } else if (_ab) {
+         _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
+               + ' \u2014 die Zahlen haben sich seitdem nicht ge\u00e4ndert.';
+       } else {
+         /* Stempel ohne Abdruck: Alter ja, Gueltigkeit NICHT behauptet. */
+         _klasse = 'unbekannt';
+         _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
+               + ' \u2014 ob sich die Zahlen seitdem ge\u00e4ndert haben, ist nicht feststellbar.';
+       }
+       _kopf = '<div class="dp-pa-stand dp-pa-stand-' + _klasse + '">' + _text + '</div>';
+     } else {
+       /* v2017 - ALTE Analysen ohne Stempel. Hier wird NICHTS behauptet:
+          "aktuell" waere eine Aussage ohne Grundlage. */
+       _kopf = '<div class="dp-pa-stand dp-pa-stand-unbekannt">'
+             + 'Diese Analyse tr\u00e4gt noch kein Datum (vor Oktober 2026 erstellt). '
+             + 'Beim n\u00e4chsten Abruf steht hier, von wann sie ist und ob sie noch gilt.</div>';
+     }
+  } catch (e) { _kopf = ''; }
+  return '<div class="dp-pa-wrap">' + _kopf +
     '<nav class="dp-pa-rail">' +
       tab('briefing', 'Briefing', true) +
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +

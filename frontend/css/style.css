@@ -39781,3 +39781,14 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 .imo-ab-paar > b { flex: 1 1 auto; font-weight: 600; }
 .imo-ab-frage { margin-top: 10px; font-weight: 600; }
 .imo-ab-knoepfe { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
+
+/* == v2017 - Stand-Zeile ueber der Pilot-Analyse ===================
+   Vier Zustaende, vier Farben. Gruen nur, wenn die Gueltigkeit
+   WIRKLICH geprueft wurde - "unbekannt" ist grau, nicht gruen. */
+.dp-pa-stand{font:400 12.5px/1.5 Inter,system-ui,sans-serif;padding:9px 13px;
+  border-radius:10px;margin:0 0 14px;border:1px solid transparent}
+.dp-pa-stand b{font-weight:600}
+.dp-pa-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.35);color:#2F8E5A}
+.dp-pa-stand-alt{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.40);color:#8a6d1f}
+.dp-pa-stand-fremd{background:rgba(184,98,92,.12);border-color:rgba(184,98,92,.40);color:#9d4b45}
+.dp-pa-stand-unbekannt{background:rgba(42,39,39,.05);border-color:rgba(42,39,39,.15);color:#6b645e}
