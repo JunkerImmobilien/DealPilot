@@ -318,7 +318,14 @@ async function portfolio_analyse_lesen(ctx) {
     'SELECT wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = $2',
     [ctx.userId, 'portfolio_analyse']
   );
-  if (!r.rowCount || !r.rows[0].wert) {
+  /* v2012a - GEMESSEN beim Aufraeumen eines Prueflaufs: hier stand
+     `!r.rows[0].wert`. Ein zurueckgesetzter Eintrag ist aber
+     `{text:null,...}` - ein Objekt, und damit truthy. Das Werkzeug
+     meldete `vorhanden: true` mit `analyse: null`, und der Bot haette
+     eine Analyse angekuendigt, die es nicht gibt.
+     Geprueft wird deshalb der TEXT, nicht die Zeile. */
+  const _w = (r.rowCount && r.rows[0].wert) || null;
+  if (!_w || !_w.text || !String(_w.text).trim()) {
     return {
       vorhanden: false,
       hinweis: 'Es liegt keine Portfolio-Analyse vor. Sie entsteht in DealPilot im '
@@ -327,7 +334,7 @@ async function portfolio_analyse_lesen(ctx) {
              + 'Zahlen kannst du mit portfolio_lesen holen.'
     };
   }
-  const w = r.rows[0].wert || {};
+  const w = _w;   /* v2012a - oben schon geprueft und gehalten */
   const stand = w.stand || r.rows[0].updated_at;
   let alter = null;
   try {
