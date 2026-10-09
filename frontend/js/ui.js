@@ -725,6 +725,9 @@ async function _runAIGuarded() {
  * der User-Key wird nur als Fallback genutzt — wird vom Backend nie geloggt.
  */
 function _buildAIPayload() {
+  /* v2011 - ein leeres Textfeld ist NICHT erfasst, nicht "". Das
+     Modell soll "nicht erfasst" von "leer eingetragen" trennen. */
+  var txt = function (id) { var v = g(id); return (v == null || String(v).trim() === '') ? null : String(v).trim(); };
   var k = State.kpis || {};
   var dealscoreSnap = null;
   if (typeof DealScore !== 'undefined' && typeof DealScore.snapshot === 'function') {
@@ -833,6 +836,57 @@ function _buildAIPayload() {
       d1_bindj: parseDe(g('d1_bindj')), anschl_z: parseDe(g('anschl_z')),
       anschl_t: parseDe(g('anschl_t')), anschl_bj: parseDe(g('anschl_bj')),
       restschuld_ezb: (typeof State !== 'undefined' && State.rs1 != null) ? State.rs1 : ((typeof State !== 'undefined' && State.rs != null) ? State.rs : (parseDe(g('restschuld')) || null))
+    },
+    /* ══ v2011 · SIEBEN BLOECKE, DIE DIE KI NIE GESEHEN HAT ═══════
+
+       Alle 46 Felder stehen im Feldkatalog (256 Feld-Ids) - sie
+       reisten nur nie mit. Der Prompt stellt Aufgaben, fuer die er
+       die Daten nicht hatte: Aufgabe 8 verlangt eine Aussage zur
+       Steuererstattung ohne Grenzsteuersatz, der Marktkontext-Block
+       bietet den Energie-Abschlag an "wenn die Energieklasse bekannt
+       ist" - sie war nie bekannt. Eine Aufgabe ohne Datengrundlage
+       wird nicht unbeantwortet gelassen, sie wird GERATEN.
+
+       `null` statt `0`: ein nicht erfasstes Feld darf nicht wie eine
+       gemessene Null aussehen (CLAUDE.md: Number(null) ist 0 und
+       besteht Number.isFinite). `txt()` gibt leere Felder als null. */
+    steuer: {
+      zve: parseDe(g('zve')), grenzsteuersatz_pct: parseDe(g('grenz')),
+      afa_satz_pct: parseDe(g('afa_satz')), afa_rnd_jahre: parseDe(g('afa_rnd_jahre')),
+      gebaeudeanteil_pct: parseDe(g('geb_ant')), afa_eigen_pct: parseDe(g('afa_eigen'))
+    },
+    bewirtschaftung: {
+      hausgeld_umlagefaehig: parseDe(g('hg_ul')), hausgeld_nicht_umlagefaehig: parseDe(g('hg_nul')),
+      grundsteuer: parseDe(g('grundsteuer')), weg_ruecklage: parseDe(g('weg_r')),
+      eigene_ruecklage: parseDe(g('eigen_r')), mietausfall_pct: parseDe(g('mietausfall'))
+    },
+    mietentwicklung: {
+      modus: txt('me_modus'), soll_eur_qm: parseDe(g('me_soll')),
+      schritte: parseDe(g('me_anz')), intervall_jahre: parseDe(g('me_int')),
+      schritt_pct: parseDe(g('me_pct')), mietspiegel_eur_qm: parseDe(g('mietspiegel')),
+      leerstand_pct: parseDe(g('leerstand')), umlagefaehig: parseDe(g('umlagef'))
+    },
+    wohnung: {
+      zimmer: parseDe(g('zimmer')), baeder: parseDe(g('bad_anz')),
+      etage: txt('etage'), etagen_gesamt: parseDe(g('etagen_ges')),
+      garagen: parseDe(g('garagen')), stellplaetze_aussen: parseDe(g('stellpl_aussen')),
+      balkon_qm: parseDe(g('balkon_flae')), grundriss: txt('grundriss')
+    },
+    boden: {
+      bodenrichtwert_eur_qm: parseDe(g('brw')), brw_stichtag: txt('brw_stichtag'),
+      grundstueck_qm: parseDe(g('gsfl')), miteigentumsanteil_pct: parseDe(g('mea')),
+      bgf_qm: parseDe(g('bgf')), standardstufe: txt('standardstufe'),
+      sachwertfaktor: parseDe(g('sachwertfaktor')), liegenschaftszins_pct: parseDe(g('lzs_pct')),
+      nutzungsart: txt('nutzungsart')
+    },
+    halter: {
+      name: txt('halter'), seit: txt('halter_seit'), kaufdatum: txt('kaufdat'),
+      wirtschaftlicher_uebergang: txt('wirtschaftlicher_uebergang'),
+      vermietungsstand: txt('vermstand')
+    },
+    zustand: {
+      ds2_zustand: txt('ds2_zustand'), energieklasse: txt('ds2_energie'),
+      modernisierung: txt('modernis'), modernisierungspunkte: parseDe(g('mod_punkte'))
     },
     dealscore: dealscoreSnap || {},
     /* v947-mbsource: NUR die Objekt-ID. Den Marktbericht holt /ai/analyze selbst

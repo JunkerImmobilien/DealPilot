@@ -46,6 +46,21 @@ function buildPrompt(payload) {
   const isc = payload.investor_score || null;
   /* v2009 - Vermarktungsdauer. Bis hierher gab es sie nur im Request. */
   const vh = payload.verhandlung || null;
+  /* v2011 - die sieben Bloecke aus Marcels Liste. */
+  const _st = payload.steuer || null;
+  const _bw = payload.bewirtschaftung || null;
+  const _me = payload.mietentwicklung || null;
+  const _wo = payload.wohnung || null;
+  const _bo = payload.boden || null;
+  const _ha = payload.halter || null;
+  const _zu = payload.zustand || null;
+  /* Nur Werte, die es WIRKLICH gibt - ein leerer Block waere eine
+     Ueberschrift ohne Inhalt und kostet nur Aufmerksamkeit. */
+  const _zeilen = function (titel, paare) {
+    const da = paare.filter(function (p) { return p[1] != null && p[1] !== ''; });
+    if (!da.length) return '';
+    return '\n' + titel + '\n' + da.map(function (p) { return '- ' + p[0] + ': ' + p[1]; }).join('\n');
+  };
   /* ═══ v1311 · Woher die Zahlen kommen ════════════════════════════════
      Marcels Vorgabe vom 11.09.2026: der Co-Pilot soll das Wissen aus dem
      Sprechlauf mitnehmen. Die WERTE kamen schon an — was fehlte, war ihre
@@ -346,6 +361,63 @@ function buildPrompt(payload) {
        lesen alle drei dieselbe gepflegte Datei. */
     projektwissen.block() ? ('\n' + projektwissen.block() + '\n') : '',
 
+    /* ══ v2011 · DIE SIEBEN BLOECKE ══════════════════════════════
+       Sie stehen VOR den Input-Daten, weil sie beschreiben, WAS das
+       Objekt ist - die Kennzahlen sagen nur, wie es sich rechnet. */
+    _st ? _zeilen('## STEUER (fuer Aufgabe 8 - bisher musstest du raten)', [
+      ['Zu versteuerndes Einkommen', _st.zve != null ? _z(_st.zve) + ' EUR' : null],
+      ['Grenzsteuersatz', _st.grenzsteuersatz_pct != null ? _p(_st.grenzsteuersatz_pct) : null],
+      ['AfA-Satz', _st.afa_satz_pct != null ? _p(_st.afa_satz_pct) : null],
+      ['AfA ueber Restnutzungsdauer', _st.afa_rnd_jahre != null ? _st.afa_rnd_jahre + ' Jahre' : null],
+      ['Gebaeudeanteil', _st.gebaeudeanteil_pct != null ? _p(_st.gebaeudeanteil_pct) : null]
+    ]) : '',
+    _bw ? _zeilen('## BEWIRTSCHAFTUNG (Struktur, nicht nur die Summe)', [
+      ['Hausgeld umlagefaehig', _bw.hausgeld_umlagefaehig != null ? _z(_bw.hausgeld_umlagefaehig) + ' EUR' : null],
+      ['Hausgeld NICHT umlagefaehig', _bw.hausgeld_nicht_umlagefaehig != null ? _z(_bw.hausgeld_nicht_umlagefaehig) + ' EUR' : null],
+      ['Grundsteuer', _bw.grundsteuer != null ? _z(_bw.grundsteuer) + ' EUR' : null],
+      ['WEG-Ruecklage', _bw.weg_ruecklage != null ? _z(_bw.weg_ruecklage) + ' EUR' : null],
+      ['Eigene Ruecklage', _bw.eigene_ruecklage != null ? _z(_bw.eigene_ruecklage) + ' EUR' : null],
+      ['Kalkulierter Mietausfall', _bw.mietausfall_pct != null ? _p(_bw.mietausfall_pct) : null]
+    ]) : '',
+    _me ? _zeilen('## MIETENTWICKLUNGSPLAN (bereits geplant, nicht von dir zu erfinden)', [
+      ['Modus', _me.modus],
+      ['Zielmiete', _me.soll_eur_qm != null ? _me.soll_eur_qm + ' EUR/m2' : null],
+      ['Schritte', _me.schritte],
+      ['Intervall', _me.intervall_jahre != null ? _me.intervall_jahre + ' Jahre' : null],
+      ['Schritthoehe', _me.schritt_pct != null ? _p(_me.schritt_pct) : null],
+      ['Mietspiegel', _me.mietspiegel_eur_qm != null ? _me.mietspiegel_eur_qm + ' EUR/m2' : null],
+      ['Kalkulierter Leerstand', _me.leerstand_pct != null ? _p(_me.leerstand_pct) : null]
+    ]) : '',
+    _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
+      ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
+      ['Etage', _wo.etage], ['Etagen gesamt', _wo.etagen_gesamt],
+      ['Garagen', _wo.garagen], ['Stellplaetze aussen', _wo.stellplaetze_aussen],
+      ['Balkon/Terrasse', _wo.balkon_qm != null ? _wo.balkon_qm + ' m2' : null],
+      ['Grundriss', _wo.grundriss]
+    ]) : '',
+    _bo ? _zeilen('## BODEN UND SUBSTANZ', [
+      ['Bodenrichtwert', _bo.bodenrichtwert_eur_qm != null ? _z(_bo.bodenrichtwert_eur_qm) + ' EUR/m2' : null],
+      ['Stichtag', _bo.brw_stichtag],
+      ['Grundstueck', _bo.grundstueck_qm != null ? _z(_bo.grundstueck_qm) + ' m2' : null],
+      ['Miteigentumsanteil', _bo.miteigentumsanteil_pct != null ? _p(_bo.miteigentumsanteil_pct) : null],
+      ['Bruttogrundflaeche', _bo.bgf_qm != null ? _z(_bo.bgf_qm) + ' m2' : null],
+      ['Standardstufe', _bo.standardstufe],
+      ['Sachwertfaktor', _bo.sachwertfaktor],
+      ['Liegenschaftszins', _bo.liegenschaftszins_pct != null ? _p(_bo.liegenschaftszins_pct) : null],
+      ['Nutzungsart', _bo.nutzungsart]
+    ]) : '',
+    _ha ? _zeilen('## HALTER UND UEBERGANG (privat oder Gesellschaft aendert Steuer und Finanzierung)', [
+      ['Halter', _ha.name], ['Gehalten seit', _ha.seit],
+      ['Kaufdatum', _ha.kaufdatum],
+      ['Wirtschaftlicher Uebergang', _ha.wirtschaftlicher_uebergang],
+      ['Vermietungsstand', _ha.vermietungsstand]
+    ]) : '',
+    _zu ? _zeilen('## ZUSTAND UND ENERGIE (der Marktkontext oben bietet dafuer den gemessenen Abschlag an)', [
+      ['Zustand', _zu.ds2_zustand], ['Energieklasse', _zu.energieklasse],
+      ['Modernisierung', _zu.modernisierung],
+      ['Modernisierungspunkte', _zu.modernisierungspunkte]
+    ]) : '',
+    '',
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',
