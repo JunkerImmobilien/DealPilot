@@ -40139,3 +40139,27 @@ aside.sidebar .dk-hilfe{margin:0 10px 10px !important;width:calc(100% - 20px) !i
 .dp-pa-wrap > .dp-pa-stand,
 .dp-pa-wrap > .dp-pa-stand-alt{grid-column:1 / -1;width:100%;box-sizing:border-box;
   margin:0 0 4px}
+
+/* == v2042a - die Abweichungstafel IM hellen Pilot-Panel =========== */
+/* Gemessen: weiss auf rgb(244,244,244), Kontrast 1,1 - unlesbar.
+   Meine Farben aus v2034 sind fuer den dunklen Grund der App gebaut;
+   die Pilot-Analyse ist ein helles Panel und fuehrt dafuer EIGENE
+   Tintenvariablen (--ink, --ink2, --green, --red auf .dp-pa-wrap).
+   Die werden hier benutzt statt neuer Werte - so faerbt die Tafel mit,
+   wenn das Panel sich aendert.
+
+   Derselbe Fehlertyp wie bei der Creme-Tafel der Deal-Aktion: eine
+   Farbe gilt nur zu ihrem Grund. */
+.dp-pa-wrap .abw-tafel-host{background:#fff;border-color:var(--line,#E7E4DC)}
+.dp-pa-wrap .abw-kopf h4{color:var(--ink,#2A2826)}
+.dp-pa-wrap .abw-sub,
+.dp-pa-wrap .abw-stand,
+.dp-pa-wrap .abw-deckung{color:var(--ink3,#938B7F)}
+.dp-pa-wrap .abw-wort{color:var(--ink,#2A2826)}
+.dp-pa-wrap .abw-zahl{color:var(--ink2,#5C554E)}
+.dp-pa-wrap .abw-tafel th{color:var(--ink3,#938B7F);border-bottom-color:var(--line,#E7E4DC)}
+.dp-pa-wrap .abw-tafel td{border-bottom-color:var(--line,#E7E4DC)}
+.dp-pa-wrap .abw-besser .abw-diff{color:var(--green,#2F8E5A)}
+.dp-pa-wrap .abw-schlechter .abw-diff{color:var(--red,#B8625C)}
+.dp-pa-wrap .abw-gleich .abw-diff{color:var(--ink3,#938B7F)}
+.dp-pa-wrap .abw-deckung b{color:var(--ink,#2A2826)}
