@@ -439,7 +439,13 @@ function buildPrompt(payload, opts) {
     '',
     /* ══ v2022 · MIETVERTRAEGE JE EINHEIT ════════════════════════
        Ohne diese Regel waeren die neuen Felder weitere Zahlen. */
-    (ein && Array.isArray(ein.je_einheit) && ein.je_einheit.some(function (e) { return e && e.vertragsart; }))
+    /* v2022a - hier stand `ein`. Die Einheiten haengen an `o.einheiten`
+       (o = payload.objekt), nicht an einer Variablen `ein` - die gibt es
+       in buildPrompt gar nicht. Der Container hat es beim ersten echten
+       Aufruf geworfen: ReferenceError: ein is not defined. node --check
+       sieht so etwas nicht, es ist gueltige Syntax. */
+    (o.einheiten && Array.isArray(o.einheiten.je_einheit)
+      && o.einheiten.je_einheit.some(function (e) { return e && e.vertragsart; }))
       ? ('\n## MIETVERTRAEGE JE EINHEIT'
         + '\n- "vertragsart" steht je Einheit. Staffelmiete (\u00a7 557a BGB) und Indexmiete'
         + '\n  (\u00a7 557b BGB) tragen ihre naechste Erhoehung SCHON im Vertrag: das ist ein'
