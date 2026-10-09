@@ -43,6 +43,12 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             data::jsonb->>'halter' AS halter,  -- v815-halter: Mandanten-Filter Sidebar
             data::jsonb->>'kaufdat' AS kaufdat,  -- v844-kaufdat: Kaufdatum auf Sidebar-Card
             data::jsonb->>'lageklasse' AS lageklasse,  -- v1982: Sortierung nach A/B/C-Lage
+            -- v2030: Ankauf-Stand. NUR die Kurzfassung (neun Zahlen) und der
+            -- Stichtag - der eingefrorene Datensatz bleibt im Blob. Ohne diese
+            -- beiden Spalten haette die Rueckseite der Doppelkarte nichts zu
+            -- zeichnen und muesste je Objekt nachladen.
+            data::jsonb->'_ankauf'->'kurz' AS ankauf_kurz,
+            data::jsonb->'_ankauf'->>'stichtag' AS ankauf_stichtag,
             CASE WHEN ai_analysis IS NULL OR ai_analysis = '' THEN false ELSE true END AS has_ai,
             COALESCE((data::jsonb->>'_ds2_computed')::boolean, false) AS ds2_computed,
             (data::jsonb->>'_dealpilot_score')::int AS dealpilot_score,

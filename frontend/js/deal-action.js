@@ -540,6 +540,11 @@ window.DealPilotDealAction = (function() {
       '      <span class="da-stat-lbl">Verloren</span>',
       '    </div>',
       '  </div>',
+      /* v2030 - der Platz fuer die Ankauf-Frage. Sie steht hier und
+         nirgends sonst: gefragt wird im selben Augenblick, in dem der
+         Zuschlag eingetragen wird, nicht hinter einem Knopf, den man
+         erst finden muss. Gefuellt von ankauf.js. */
+      '  <div id="da-ankauf-frage"></div>',
       '  <input type="hidden" id="_deal_won_state" value="false">',
       '  <input type="hidden" id="_deal_won_at_state" value="">',
       '  <input type="hidden" id="_deal_lost_state" value="false">',
@@ -2374,6 +2379,13 @@ window.DealPilotDealAction = (function() {
       if (s === status) btn.classList.add('active');
       else btn.classList.remove('active');
     });
+    /* v2030 - die Ankauf-Frage folgt dem Status. Sie erscheint bei
+       `won`, und sie bleibt sichtbar, solange ein Stand da ist -
+       sonst waere ein festgeschriebener Ankauf nach einem Klick auf
+       „Offen" unauffindbar. */
+    try {
+      if (window.DealPilotAnkauf) DealPilotAnkauf.frageZeigen(status);
+    } catch (e) { console.warn('[v2030] Ankauf-Frage:', e.message); }
   }
 
   return {

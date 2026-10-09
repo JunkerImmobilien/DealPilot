@@ -277,6 +277,11 @@ function collectData() {
   if (ekNk) d['_ek_ist_nk'] = ekNk.checked;
   /* v1448: Einheitenliste des Mehrfamilienhauses (mfh-einheiten.js) */
   if (window._dpMfh && window._dpMfh.einheiten && window._dpMfh.einheiten.length) d._mfh = window._dpMfh;
+  /* v2030: der eingefrorene Ankauf-Stand (ankauf.js). Gleiches Muster
+     wie `_mfh` - der Zustand haengt an einem Fenster-Merker, nicht an
+     einem zweiten Ladeweg. `daten` wird mitgeschrieben, aber NIE hier
+     erzeugt: das macht `DealPilotAnkauf.festschreiben()`. */
+  if (window._dpAnkauf && window._dpAnkauf.daten) d._ankauf = window._dpAnkauf;
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -559,6 +564,10 @@ function loadData(d) {
   if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
   /* v1448: Einheitenliste - fehlt sie, ist sie leer (sonst erbte das Objekt die des vorigen) */
   window._dpMfh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh : null;
+  /* v2030: Ankauf-Stand. Fehlt er, ist er NULL - sonst erbte das
+     geladene Objekt den Stand des vorigen, und zwar einen, der auf
+     eine fremde Adresse zeigt. */
+  window._dpAnkauf = (d._ankauf && d._ankauf.daten) ? d._ankauf : null;
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
