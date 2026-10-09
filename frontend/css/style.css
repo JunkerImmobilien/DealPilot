@@ -39993,13 +39993,17 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 
 /* Die Reiter und ihr Inhalt: zurueckgenommen und unberuehrbar.
    Der Hinweis selbst bleibt voll da - er ist der einzige Weg zurueck. */
+/* v2037a - !important ist hier noetig, nicht Geschmack: auf .sec laeuft
+   die Animation "fi", und eine Animation schlaegt jede normale
+   Deklaration. Gemessen war die Deckkraft 0 statt .52 - der Inhalt war
+   unsichtbar statt ausgegraut. Author-!important schlaegt Animationen. */
 body.dp-ankauf-ansicht .sec,
-body.dp-ankauf-ansicht nav.tabs{opacity:.52;pointer-events:none;
+body.dp-ankauf-ansicht nav.tabs{opacity:.52 !important;pointer-events:none;
   transition:opacity .18s ease}
 body.dp-ankauf-ansicht #ank-ansicht-host{opacity:1;pointer-events:auto}
 /* Freigegeben: voll sichtbar und bedienbar, aber der Rahmen bleibt. */
 body.dp-ankauf-frei .sec,
-body.dp-ankauf-frei nav.tabs{opacity:1;pointer-events:auto}
+body.dp-ankauf-frei nav.tabs{opacity:1 !important;pointer-events:auto}
 body.dp-ankauf-frei .ank-ansicht-kopf{border-color:rgba(216,86,76,.55);
   background:rgba(216,86,76,.10)}
 body.dp-ankauf-frei .ank-ansicht-txt b{color:#D8564C}

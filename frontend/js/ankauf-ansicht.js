@@ -138,10 +138,21 @@
       document.body.classList.add('dp-ankauf-ansicht');
       document.body.classList.remove('dp-ankauf-frei');
       /* den eingefrorenen Datensatz ins Formular - ab hier ist alles,
-         was man sieht, Vergangenheit. */
-      try { if (typeof loadData === 'function') loadData(A.stand().daten); } catch (e) {
+         was man sieht, Vergangenheit.
+
+         v2037a - DER STAND MUSS DANACH ZURUECK. Gemessen: nach dem
+         Laden war window._dpAnkauf null, und der Hinweis blieb leer.
+         Ursache: loadData setzt _dpAnkauf aus d._ankauf - und der
+         eingefrorene Datensatz traegt kein _ankauf, weil wir es beim
+         Festschreiben bewusst entfernen (sonst Matrjoschka).
+
+         Das Laden der Vergangenheit loescht also die Kenntnis davon,
+         dass es eine gibt. */
+      var merker = A.stand();
+      try { if (typeof loadData === 'function') loadData(merker.daten); } catch (e) {
         console.warn('[v2037] laden:', e.message);
       }
+      window._dpAnkauf = merker;
       bannerZeichnen();
       return;
     }
