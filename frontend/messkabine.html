@@ -1030,7 +1030,266 @@
     });
   })();
 
-  window.DPM = { messe: messe, zeige: zeige, lade: lade, lauf: lauf,
+  /* ═══════════════════════════════════════════════════════════════════
+     v2061 · DER ANSICHTS-PRUEFER
+     ═══════════════════════════════════════════════════════════════════
+     Am 09.10.2026 im Chat gebaut, achtmal umgeworfen und danach
+     weggeworfen gewesen. Hier bleibt er.
+
+     Er beantwortet drei Fragen je Ansicht und Breite:
+       1. Ist jedes Bedienelement erreichbar?   (nicht: sichtbar)
+       2. Ragt etwas ungefangen aus dem Bild?
+       3. Was muss waagerecht geschoben werden?
+
+     ── DIE VIER ARTEFAKTE, DIE ER NICHT MEHR MELDET ──────────────────
+
+     Jedes davon haette zu einem Umbau an einer GESUNDEN Stelle gefuehrt:
+
+     (a) DAS FENSTER SCROLLT NICHT. `html`/`body` stehen in DealPilot auf
+         `overflow:hidden`; gescrollt wird `.main-col`. `window.scrollTo`
+         bewegte nichts - der Pruefer sah 8 von 932 Elementen.
+         -> `scroller()` sucht den echten Behaelter.
+
+     (b) GEFANGENER UEBERLAUF IST KEINER. Die Projektionstabelle (926 px)
+         liegt in `div.pw` mit `overflow-x:auto`, und der Balken nimmt
+         dort 5 px Hoehe weg - sie scrollt wirklich.
+         -> `gefangen()` geht die Elternkette hoch.
+
+     (c) `display:contents` HAT HOEHE 0. `form#dp-noform` umschliesst die
+         ganze App; die Regel "Vorfahr mit Hoehe 0 = eingeklappt" verwarf
+         176 von 176 Elementen und meldete stolz null Befunde.
+         -> eingeklappt ist nur Hoehe 0 MIT `overflow:hidden`.
+
+     (d) STICKY LAESST SICH NICHT HINSCROLLEN. `scrollIntoView` bewegt die
+         Reiterleiste nicht; sie bleibt unter dem sticky Kopf, und alle
+         neun Reiter galten als unbedienbar. Bei `scrollTop=0` sind sie
+         frei.
+         -> jeder Verdacht wird ZWEIMAL geprueft: zentriert und am
+            Seitenanfang.
+
+     ── WARUM FUENF PUNKTE JE KNOPF ───────────────────────────────────
+
+     "Kann ich das anklicken?" heisst: ist IRGENDEIN Punkt frei. Ein
+     sticky Kopf, der einen Knopf halb ueberlappt, macht ihn nicht
+     unbedienbar. Nur wer an allen fuenf Punkten verdeckt ist, zaehlt.
+
+     ── UND WARUM `selbsttest` PFLICHT IST ────────────────────────────
+
+     Null Befunde heisst "nichts gefunden", nicht "nichts da".
+     `DPM.pruefSelbsttest()` legt eine Decke ueber einen echten Knopf und
+     prueft, ob der Pruefer sie bemerkt - und ob er danach wieder
+     schweigt. Ohne dieses Paar ist eine gruene Messung wertlos.
+     ═══════════════════════════════════════════════════════════════════ */
+  function apNam(el){
+    if (!el) return '?';
+    return el.tagName.toLowerCase() + (el.id ? '#'+el.id : '')
+      + (el.className && typeof el.className === 'string'
+         ? '.' + el.className.trim().split(/\s+/).slice(0,2).join('.') : '');
+  }
+
+  /* (a) Der echte Scroll-Behaelter - nicht das Fenster. */
+  function apScroller(d, win){
+    var k = [].slice.call(d.querySelectorAll('div,main,section')).filter(function(e){
+      var cs = win.getComputedStyle(e);
+      return (cs.overflowY === 'auto' || cs.overflowY === 'scroll')
+          && e.scrollHeight > e.clientHeight + 40 && e.clientHeight > 200;
+    });
+    k.sort(function(a,b){ return (b.scrollHeight-b.clientHeight)-(a.scrollHeight-a.clientHeight); });
+    return k[0] || null;
+  }
+
+  /* (c) Eingeklappt ist nur Hoehe 0 MIT overflow:hidden. */
+  function apEingeklappt(el, win){
+    var p = el.parentElement;
+    while (p && p.nodeType === 1 && p.tagName !== 'BODY') {
+      var cs = win.getComputedStyle(p);
+      if (cs.display === 'contents') { p = p.parentElement; continue; }
+      var r = p.getBoundingClientRect();
+      if ((r.height < 2 || r.width < 2)
+          && (cs.overflow==='hidden' || cs.overflowY==='hidden' || cs.overflowX==='hidden'))
+        return apNam(p);
+      if (p.tagName === 'DETAILS' && !p.open) return apNam(p);
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  /* (b) Faengt ein Vorfahr den Ueberlauf ab? */
+  function apGefangen(el, win){
+    var p = el.parentElement;
+    while (p && p.nodeType === 1) {
+      var cs = win.getComputedStyle(p);
+      if ((cs.overflowX==='auto'||cs.overflowX==='scroll'||cs.overflowX==='hidden')
+          && p.scrollWidth > p.clientWidth) return apNam(p);
+      if (cs.overflow === 'hidden') return apNam(p);
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  function apUeberlauf(d, win){
+    var raus = [], gef = 0;
+    [].slice.call(d.querySelectorAll('body *')).forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return;
+      if (r.right <= win.innerWidth + 2) return;
+      if (r.left >= win.innerWidth) return;
+      if (win.getComputedStyle(el).position === 'fixed') return;
+      if (apGefangen(el, win)) { gef++; return; }
+      raus.push({ el: apNam(el), rausPx: Math.round(r.right - win.innerWidth),
+                  b: Math.round(r.width),
+                  txt: (el.textContent||'').trim().replace(/\s+/g,' ').slice(0,24) });
+    });
+    raus.sort(function(a,b){ return b.rausPx - a.rausPx; });
+    return { echt: raus.slice(0,6), echtZahl: raus.length, vonScrollerGefangen: gef };
+  }
+
+  /* Waagerechte Scroller sind kein Fehler, aber auf dem Handy ein
+     UX-Befund - deshalb getrennt gezaehlt und benannt. */
+  function apQuerScroller(d, win){
+    return [].slice.call(d.querySelectorAll('div,section,main,table')).filter(function(e){
+      var cs = win.getComputedStyle(e);
+      if (!(cs.overflowX==='auto'||cs.overflowX==='scroll')) return false;
+      if (e.scrollWidth <= e.clientWidth + 8) return false;
+      var r = e.getBoundingClientRect();
+      return r.width > 80 && r.height > 40 && e.offsetParent;
+    }).map(function(e){
+      return { el: apNam(e), sicht: e.clientWidth, inhalt: e.scrollWidth,
+               faktor: (e.scrollWidth/e.clientWidth).toFixed(1)+'x',
+               balkenNimmtHoehe: (e.offsetHeight-e.clientHeight)+'px' };
+    }).slice(0,6);
+  }
+
+  /* Fuenf Punkte je Knopf: frei ist frei, auch teilweise. */
+  function apPunkte(d, win, e, muster){
+    var r = e.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) return null;
+    var px = muster || [[.5,.5],[.25,.3],[.75,.3],[.25,.7],[.75,.7]];
+    var frei = 0, gezaehlt = 0, verdecker = null;
+    px.forEach(function(p){
+      var x = r.left + r.width*p[0], y = r.top + r.height*p[1];
+      if (x<1 || y<1 || x>win.innerWidth-1 || y>win.innerHeight-1) return;
+      gezaehlt++;
+      var o = d.elementsFromPoint(x, y)[0];
+      if (!o) return;
+      if (o===e || e.contains(o) || o.contains(e)) frei++;
+      else if (!verdecker) verdecker = apNam(o);
+    });
+    return { gezaehlt: gezaehlt, frei: frei, verdecker: verdecker, r: r };
+  }
+
+  function apBedienbar(d, win){
+    var alle = [].slice.call(d.querySelectorAll(
+      'button, a[href], input, select, textarea, [role=button], [onclick]'));
+    var gesehen = 0, verd = [], eingek = 0;
+    alle.forEach(function(e){
+      var r = e.getBoundingClientRect();
+      if (r.width<4 || r.height<4) return;
+      if (r.bottom<0 || r.top>win.innerHeight || r.right<0 || r.left>win.innerWidth) return;
+      var cs = win.getComputedStyle(e);
+      if (cs.visibility==='hidden' || cs.display==='none' || cs.pointerEvents==='none') return;
+      if (apEingeklappt(e, win)) { eingek++; return; }
+      gesehen++;
+      var p = apPunkte(d, win, e);
+      if (p && p.gezaehlt > 0 && p.frei === 0)
+        verd.push({ el: e, txt: (e.textContent||e.value||e.placeholder||'')
+                      .trim().replace(/\s+/g,' ').slice(0,26) });
+    });
+    return { gesehen: gesehen, verdaechtig: verd, eingeklappt: eingek };
+  }
+
+  /* (d) Jeder Verdacht zweimal: zentriert UND am Seitenanfang. */
+  async function apNachpruefen(d, win, verd){
+    var sc = apScroller(d, win), echt = [];
+    for (var i = 0; i < Math.min(verd.length, 25); i++) {
+      var e = verd[i].el;
+      try { e.scrollIntoView({ block: 'center' }); } catch (x) {}
+      await warte(200);
+      var a = apPunkte(d, win, e, [[.5,.5],[.3,.35],[.7,.35],[.3,.65],[.7,.65]]);
+      if (!a || a.gezaehlt === 0 || a.frei > 0) continue;
+      if (sc) sc.scrollTop = 0; else win.scrollTo(0,0);
+      await warte(250);
+      var b = apPunkte(d, win, e, [[.5,.5],[.3,.35],[.7,.35],[.3,.65],[.7,.65]]);
+      if (!b || b.gezaehlt === 0 || b.frei > 0) continue;
+      echt.push({ el: apNam(e), txt: verd[i].txt,
+                  gr: Math.round(b.r.width)+'x'+Math.round(b.r.height),
+                  verdecktVon: (b.verdecker || a.verdecker) });
+    }
+    return echt;
+  }
+
+  /* Der ganze Durchlauf. `vorher` darf eine Ansicht oeffnen. */
+  async function pruefeAnsicht(breite, hoehe, vorher, name){
+    await lade(breite, '', hoehe);
+    var z = ziel(), d = z.d, win = z.win;
+    var geoeffnet = null;
+    if (typeof vorher === 'function') { try { geoeffnet = vorher(win, d); } catch (e) { geoeffnet = 'Fehler: '+e; } }
+    await warte(1800);
+    var sc = apScroller(d, win);
+    var h = sc ? sc.clientHeight : win.innerHeight;
+    var ganz = sc ? sc.scrollHeight : d.documentElement.scrollHeight;
+    var schritte = Math.min(16, Math.max(1, Math.ceil(ganz/(h*0.9))));
+    var gesehen = 0, verd = [], seen = {}, eingek = 0;
+    for (var i = 0; i < schritte; i++) {
+      if (sc) sc.scrollTop = i*h*0.9; else win.scrollTo(0, i*h*0.9);
+      await warte(230);
+      var b = apBedienbar(d, win);
+      gesehen += b.gesehen; eingek += b.eingeklappt;
+      b.verdaechtig.forEach(function(x){
+        var k = apNam(x.el)+'|'+x.txt; if (seen[k]) return; seen[k] = 1; verd.push(x); });
+    }
+    var echt = await apNachpruefen(d, win, verd);
+    if (sc) sc.scrollTop = 0; else win.scrollTo(0,0);
+    var u = apUeberlauf(d, win);
+    return {
+      ansicht: name || d.title, v: win.innerWidth+'x'+win.innerHeight,
+      geoeffnet: geoeffnet, scroller: sc ? apNam(sc) : '(Fenster)',
+      deckung: gesehen+' geprueft / '+eingek+' eingeklappt / '+schritte+' Abschnitte',
+      verdaechtig: verd.length, nichtErreichbar: echt.length, liste: echt.slice(0,8),
+      echterUeberlauf: u.echtZahl, ueberlaufListe: u.echt,
+      vonScrollerGefangen: u.vonScrollerGefangen,
+      querScroller: apQuerScroller(d, win)
+    };
+  }
+
+  /* Null Befunde heisst "nichts gefunden", nicht "nichts da". */
+  async function pruefSelbsttest(){
+    var z = ziel(), d = z.d, win = z.win;
+    if (!d) return { urteil: 'kein Dokument' };
+    var opfer = [].slice.call(d.querySelectorAll('button,a[href]')).filter(function(e){
+      var r = e.getBoundingClientRect();
+      return r.width > 30 && r.height > 20 && r.top > 0 && r.bottom < win.innerHeight;
+    })[0];
+    if (!opfer) return { urteil: 'kein Testknopf im Bild - erst eine Ansicht laden' };
+    var vorher = apBedienbar(d, win).verdaechtig.length;
+    var r = opfer.getBoundingClientRect();
+    var decke = d.createElement('div');
+    decke.id = '_dpm-selbsttest';
+    decke.style.cssText = 'position:fixed;left:'+(r.left-4)+'px;top:'+(r.top-4)
+      + 'px;width:'+(r.width+8)+'px;height:'+(r.height+8)
+      + 'px;background:rgba(255,0,0,.35);z-index:99999';
+    d.body.appendChild(decke);
+    await warte(300);
+    var mit = apBedienbar(d, win);
+    var gefunden = mit.verdaechtig.some(function(x){ return x.el === opfer; });
+    decke.remove();
+    await warte(250);
+    var danach = apBedienbar(d, win).verdaechtig.length;
+    return {
+      testknopf: (opfer.textContent||'').trim().slice(0,24)
+                 + ' ' + Math.round(r.width)+'x'+Math.round(r.height),
+      ohneDecke: vorher, mitDecke: mit.verdaechtig.length,
+      knopfGefunden: gefunden, nachEntfernen: danach,
+      urteil: (vorher === 0 && gefunden && danach === 0)
+        ? 'BESTANDEN - findet einen echten Fehler und schweigt danach wieder'
+        : 'DURCHGEFALLEN - gruene Messungen sind nichts wert'
+    };
+  }
+
+  window.DPM = {
+                 pruefeAnsicht: pruefeAnsicht, pruefSelbsttest: pruefSelbsttest,
+                 apBedienbar: apBedienbar, apUeberlauf: apUeberlauf,
+                 apQuerScroller: apQuerScroller, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
                  kontrast: kontrast, gemalt: gemalt, male: male,
                  lage: lage, warte: warte,
