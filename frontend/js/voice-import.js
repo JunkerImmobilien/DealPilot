@@ -9121,21 +9121,32 @@
              Ein Schalter, den niemand mehr sieht, aber jeder Leser noch
              findet, ist sicherer als ein entferntes Element. */
           '<input type="checkbox" id="vi-rf-fs" checked hidden>' +
-          /* v1282: Wer gleich alles will, muss nicht erst die Pflichtstrecke
-             abwarten. Der Schalter haengt die Feinheiten sofort an. */
-          /* ═══ v1311 · Im Quick-Check gibt es „Alle Felder" nicht ═══════
-             Marcels Vorgabe vom 11.09.2026: „im QuickCheck sollte der
-             Sprechlauf natürlich reduziert sein."
+          /* ═══ v2053 · „ALLE FELDER“ GEHT, DER WEG DAHIN BLEIBT ═══════
 
-             Der Katalog ist dort schon begrenzt (19 Felder statt 192,
-             `QC_IDS`) — der Schalter daneben hätte ihn aber wieder
-             aufgebläht: `_rfTiefeStarten` hängt die Feinheiten an, und die
-             gehören nicht zum Quick-Check. Ein Schalter, der den schnellen
-             Weg in den langen verwandelt, nimmt ihm seinen Zweck.
+             Hier stand ein Schalter, der mit `_rfTiefeStarten()` alle
+             Feinheiten auf einen Schlag an die Liste haengte.
 
-             Wer mehr will, legt ein Objekt an — dort steht der Schalter. */
-          (_qcTarget ? '' :
-            '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>') +
+             Marcel: „Es gibt immer nur alle Felder und es ist total
+             ueberladen. ... Also alles auf einmal. Der Kunde weiss ja
+             gar nicht, was er machen soll. Das muss also Stueck fuer
+             Stueck kommen.“
+
+             STUECK FUER STUECK IST SCHON GEBAUT: am Ende der
+             Pflichtstrecke fragt der Co-Pilot nacheinander nach den
+             Feinheiten (`_rfTiefeAnbieten`, Z. 10214), der Eingabetiefe
+             (`_rfStufeStarten`, v1862) und der Wertermittlung (v1386).
+             Dazu der Chip `tiefe` in der Aktionsleiste (Z. 7335). Der
+             Schalter war die Abkuerzung fuer den, der den Weg schon
+             kennt - er stand aber da, wo der Neuling zuerst hinsieht.
+
+             v1311 hatte ihn im Quick-Check schon ausgeblendet, mit
+             genau diesem Satz: „Ein Schalter, der den schnellen Weg in
+             den langen verwandelt, nimmt ihm seinen Zweck.“ Das gilt
+             jetzt ueberall, und damit faellt auch die `_qcTarget`-
+             Unterscheidung - es gibt nichts mehr zu unterscheiden.
+
+             Anders als `#vi-rf-fs` (v2049) darf das Element ganz weg:
+             es hatte GENAU EINEN Leser, und der faellt mit. */
           /* v2049 - „Fertig" zieht aus der Fusszeile hierher. Er faellt
              NICHT weg: ohne ihn kaeme man aus dem Lauf nur noch ueber
              Abbrechen heraus, und das ist etwas anderes - es verwirft. */
@@ -9269,23 +9280,9 @@
       }
       _rfWeiter();
     });
-    /* v1282: „Alle Felder" haengt die Feinheiten sofort an - und wieder ab,
-       solange sie noch nicht dran waren. Wer schon mitten drin ist, behaelt
-       sie: eine Frage zurueckzunehmen, die gerade gestellt wird, waere
-       verwirrender als eine zu viel. */
-    var alles = $('vi-rf-alles');
-    if (alles) alles.addEventListener('change', function () {
-      if (this.checked) {
-        if (_rf.tiefeAn) return;
-        _rf.tiefeGefragt = 1;
-        _rfTiefeStarten();
-      } else if (_rf.tiefeAn) {
-        var vorher = _rf.offen.length;
-        _rf.offen = _rf.offen.filter(function (e, i) { return !e.tiefe || i <= _rf.i; });
-        _rf.tiefeAn = 0; _rf.tiefeGefragt = 0;
-        if (vorher !== _rf.offen.length) _rfStandZeichnen();
-      }
-    });
+    /* v2053 - der Horcher auf „Alle Felder“ faellt mit dem Schalter.
+       `_rf.tiefeAn` und `_rf.tiefeGefragt` BLEIBEN: der Angebotsweg am
+       Ende der Pflichtstrecke fuehrt sie weiter. */
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
       /* v1381: Ein Halt-Knopf ohne Freisprechen hat nichts anzuhalten.
