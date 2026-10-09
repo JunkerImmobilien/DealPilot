@@ -795,6 +795,15 @@ function buildPrompt(payload, opts) {
     '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
+    /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von
+       22 Schluesseln kamen zurueck), aber das Modell schrieb KEIN Wort
+       zum Bildeindruck. Der Grund stand im Antwortformat: es gab kein
+       Feld dafuer. Ich hatte "beschreibe, was sichtbar ist" verlangt
+       und keinen Ort dafuer gegeben - das Modell fuellt die definierten
+       Felder, nicht erfundene.
+       Das Feld erscheint nur, wenn auch Fotos mitgehen; sonst waere es
+       eine Zeile, die zum Raten einlaedt. */
+    _nFotos ? '  "optischer_eindruck": "Was die Fotos ZEIGEN: Bauweise, Fassade, Fenster, Dach, Umfeld, Pflegezustand. Als visueller Eindruck formuliert, nicht als Feststellung. KEIN Baujahr, keine Flaeche, kein Sanierungsjahr, kein Wert daraus ableiten. Widerspricht der Eindruck dem erfassten Zustandsfeld, nenne BEIDES und sage, dass sie auseinandergehen. 4-6 Saetze.",' : '',
     '  "quellen":             ["URL 1", "URL 2", "..."]',
     '}'
   ].filter(Boolean).join('\n');
