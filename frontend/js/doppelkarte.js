@@ -133,6 +133,9 @@
        beschreibt den LAUFENDEN Cashflow. Lieber keine Linie als eine,
        die zum falschen Zeitpunkt gehoert. */
     neu._cfTrend = null;
+    /* v2031b - abgeleitet: storage.js darf das NICHT als Zutaten des
+       Objekts merken, sonst ueberschreibt diese Zeile den Merker. */
+    neu._dkAbgeleitet = true;
     return window._renderRichCard(neu);
   }
 
@@ -143,6 +146,7 @@
     var neu = {};
     for (var n in o) if (Object.prototype.hasOwnProperty.call(o, n)) neu[n] = o[n];
     neu.ankaufBand = null;
+    neu._dkAbgeleitet = true;   /* v2031b - siehe rueckseite() */
     return window._renderRichCard(neu);
   }
 

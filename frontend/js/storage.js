@@ -1347,7 +1347,14 @@ async function renderSaved(opts) {
        Das steht HIER und nicht an den zwei Aufrufstellen: so kann
        keine vergessen werden, und eine dritte bekaeme es umsonst. */
     try {
-      if (opts && opts.key) {
+      /* v2031b - NICHT merken, wenn die Doppelkarte selbst gebaut hat.
+         Sonst ueberschreibt ihr eigener Aufruf den Merker mit den
+         Ankauf-Zutaten, und die Vorderseite wird danach aus ihnen
+         gebaut - die Karte liess sich nicht mehr zurueckdrehen.
+         Gemessen: nach einer Drehung trug _dkOpts[key].ankaufBand ein
+         Datum. Ein Merker, der von seinem eigenen Leser beschrieben
+         wird, ist keiner. */
+      if (opts && opts.key && !opts._dkAbgeleitet) {
         if (!window._dkOpts) window._dkOpts = {};
         window._dkOpts[opts.key] = opts;
       }
