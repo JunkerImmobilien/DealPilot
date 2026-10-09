@@ -39850,24 +39850,28 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
 /* Sie sitzt dort, wo der Zuschlag eingetragen wird. Gold, weil sie ein
    Angebot ist und keine Warnung - und abwaehlbar, weil ein Umbau ohne
    Abwahl eine Ansage waere. */
-.ank-zeile{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+.ank-zeile{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-left:14px;margin-right:14px;
   margin:12px 0 2px;padding:11px 14px;border-radius:10px;
   font:400 13px/1.5 Inter,system-ui,sans-serif;
   background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent)}
-.ank-zeile .ank-txt{flex:1 1 260px;min-width:0;color:var(--dp-ink-1,#E8E3D8)}
+/* v2030a - die Zeile sitzt auf der CREME-Tafel der Deal-Aktion
+   (#s8 .dab-tafel, background #FDFCFA), nicht auf Obsidian. Ihre
+   Textfarben sind deshalb die der Tafel: #2A2727 und #7A7370.
+   Mit --dp-ink-1 (hell) waere sie unsichtbar gewesen. */
+.ank-zeile .ank-txt{flex:1 1 260px;min-width:0;color:#2A2727}
 .ank-zeile b{font-weight:600}
 .ank-zeile i{font-style:italic;opacity:.85}
 .ank-aktionen{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-.ank-btn{border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
-  color:var(--wl-e8cc7a, #E8CC7A);border-radius:8px;padding:7px 15px;cursor:pointer;
+.ank-btn{border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent);background:var(--wl-c9a84c, #C9A84C);
+  color:#2A2727;border-radius:8px;padding:7px 15px;cursor:pointer;
   font:600 12.5px/1 Inter,system-ui,sans-serif;white-space:nowrap}
-.ank-btn:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent)}
+.ank-btn:hover{background:var(--wl-b8932f, #b8932f)}
 .ank-btn-leise{border:0;background:none;color:var(--muted,#8A8272);cursor:pointer;
   font:400 12.5px/1 Inter,system-ui,sans-serif;text-decoration:underline;white-space:nowrap}
-.ank-btn-leise:hover{color:var(--dp-ink-1,#E8E3D8)}
+.ank-btn-leise:hover{color:#2A2727}
 /* Festgeschrieben: ruhiger, kein Gold mehr - es ist erledigt. */
 .ank-zeile.ank-fest{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.32)}
-.ank-zeile.ank-fest b{color:#6FCB91}
+.ank-zeile.ank-fest b{color:#1F7A45}
 .ank-korr{font-size:11.5px;color:var(--muted,#8A8272)}
 /* Fehlt der Stichtag, ist es keine Frage sondern ein Hinweis. */
 .ank-zeile.ank-fehlt{background:rgba(42,39,39,.06);border-color:rgba(42,39,39,.22)}

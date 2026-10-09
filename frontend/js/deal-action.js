@@ -540,11 +540,12 @@ window.DealPilotDealAction = (function() {
       '      <span class="da-stat-lbl">Verloren</span>',
       '    </div>',
       '  </div>',
-      /* v2030 - der Platz fuer die Ankauf-Frage. Sie steht hier und
-         nirgends sonst: gefragt wird im selben Augenblick, in dem der
-         Zuschlag eingetragen wird, nicht hinter einem Knopf, den man
-         erst finden muss. Gefuellt von ankauf.js. */
-      '  <div id="da-ankauf-frage"></div>',
+      /* v2030a - hier STAND der Platz fuer die Ankauf-Frage, und das
+         war falsch: `renderWonCard()` wird nicht mehr gerufen. Die
+         sichtbaren Status-Kacheln baut `deal-action-boarding.js` in
+         `statusTafel()`; dort sitzt der Platz jetzt. Eine zweite ID
+         desselben Namens bleibt hier NICHT stehen - auch totes Markup
+         wird irgendwann wieder lebendig. */
       '  <input type="hidden" id="_deal_won_state" value="false">',
       '  <input type="hidden" id="_deal_won_at_state" value="">',
       '  <input type="hidden" id="_deal_lost_state" value="false">',

@@ -74,6 +74,12 @@
     return '<div class="dab-tafel">' +
       '<div class="dab-tafel-bar"><span class="l">DEPARTURES \u00b7 DEAL-STATUS</span><span class="r" id="da-status-sub">Markiere den Deal als gewonnen oder verloren.</span></div>' +
       '<div class="dab-tafel-rows">' + rows + '</div>' +
+      /* v2030a - der Platz fuer die Ankauf-Frage. Er stand bis hierher
+         in `renderWonCard()` (deal-action.js) - und das ist die ALTE,
+         nicht mehr gerufene Fassung. Gemessen: `.da-status-tile` x3 im
+         DOM, `.da-status-tiles` gar nicht. Ein grep-Treffer ist kein
+         Nachweis, dass die Seite ihn benutzt. */
+      '<div id="da-ankauf-frage" class="dab-ankauf"></div>' +
       '<span id="da-status-label" style="display:none">Status: In Pr\u00fcfung</span>' +
       '<input type="hidden" id="_deal_won_state" value="false">' +
       '<input type="hidden" id="_deal_won_at_state" value="">' +
