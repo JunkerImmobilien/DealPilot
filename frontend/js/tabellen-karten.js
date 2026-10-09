@@ -125,7 +125,27 @@
       '  .dptk-schalter:hover{opacity:1}',
       '  .dptk-schalter i{font-style:normal;margin-left:auto;opacity:.6}',
       '}',
-      /* Ausserhalb der Media-Query: nichts. Der Schalter darf am
+      /* ── v2060b · DAS TABLET BEKOMMT KEINE KARTEN, SONDERN PLATZ ────
+         GEMESSEN bei 767x757 nach v2060a: die beiden Anzeigetabellen
+         schoben dort weiter waagerecht, aber nur mit Faktor 1,2 und 1,3
+         (auf dem Handy waren es 2,6 und 2,8). Sie PASSEN fast.
+
+         Karten wären hier verschenkter Platz - Marcels Vorgabe für das
+         Tablet heisst „reduzierte oder sinnvoll gruppierte Spalten",
+         nicht Kartenansicht. Also bleibt die Tabelle eine Tabelle und
+         darf nur nicht breiter sein als ihr Platz: `min-width` weg,
+         Umbruch erlaubt, Zahlen etwas enger.
+
+         Keine Spalte faellt weg. Bei 7 Spalten auf 656 px sind das
+         94 px je Spalte - genug fuer eine Zahl mit Tausenderpunkt. */
+      '@media(min-width:601px) and (max-width:900px){',
+      '  table.dptk{width:100% !important;min-width:0 !important;table-layout:fixed}',
+      '  table.dptk th,table.dptk td{white-space:normal;overflow-wrap:anywhere;',
+      '    padding-left:5px !important;padding-right:5px !important;font-size:12px}',
+      '  table.dptk th{font-size:10.5px;line-height:1.25}',
+      '  .dptk-huelle{overflow-x:visible !important}',
+      '}',
+      /* Ausserhalb beider Fenster: nichts. Der Schalter darf am
          Schreibtisch nicht einmal Platz brauchen. */
       '@media(min-width:601px){.dptk-schalter{display:none}}'
     ].join('\n');
