@@ -668,6 +668,38 @@ nachträglich korrigierbar). Sie stehen im Dokument als Haken.
 ---
 
 #### N60.13 · Export und Schnittstelle — ALLE neuen Felder müssen durch
+
+**TEILWEISE ERLEDIGT 09.10.2026 (`v2043`, `v2043c`) — der
+Portfolio-Export steht.** Neuer Endpunkt `GET /objects/portfolio-export`
+und der Menüeintrag *Aktionen → Ausgeben → Portfolio komplett*. Er gibt
+zwei Dateien aus einem Abruf: **JSON** (alles) und **CSV** (das, womit
+man rechnet).
+
+Am echten Abruf nachgemessen: 22 Objekte, 607 KB, je Objekt 279 Felder
+(`_thumb` entfernt), Pilot-Analyse aufgelöst samt Stempel, Ankauf-Stand,
+Lageklasse, Status.
+
+**Das Wissen geht mit** — das war Marcels Bedingung:
+
+| | |
+|---|---|
+| `lexikon.felder` | 225 Feld-Ids mit Beschriftung, Art und Auswahloptionen |
+| `lexikon.objektarten` | 11 Arten mit ihren Pflichtfeldern |
+| `lexikon.score_stufen` | die Schwellen 85/70/50/35 mit Worten |
+| `lexikon.hinweise` | 10 Einheiten-Fallen (EUR nicht Cent, `nkm` ist Monatsmiete, DSCR ist kein Prozent …) |
+| `wissen.projekt` | `bot-wissen.md`, 8.462 Zeichen |
+| `wissen.eigenes` | Marcels eigene Ergänzung, **einmal** |
+
+> **Ein Lexikon, das man nicht nachschlagen kann, ist ein
+> Inhaltsverzeichnis.** Im ersten Wurf kam `lexikon.felder` als LISTE
+> an (Schlüssel 0, 1, 2) — `felder.kp` ging ins Leere. Behoben in
+> `v2043c`: jetzt `felder.kp = { kind, label }`.
+
+**Noch offen:** die Exporte JE OBJEKT (PDF, Bankexport, xlsx/docx,
+`pdf-import`, `voice-import`) tragen die neuen Felder noch nicht. Die
+Tabelle unten gilt weiter — und die Abnahme bleibt die: **Marcel
+bekommt die Dateien und sagt, ob er damit arbeiten kann.**
+
 Marcel: „Wenn es da nichts gibt, dass wir die Exportdatei nochmal
 überarbeiten und die Schnittstelle, dann müssen wir das auf jeden Fall
 damit reinnehmen, ganz am Ende, dass alle Daten übergeben werden, dass
