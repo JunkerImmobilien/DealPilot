@@ -288,14 +288,48 @@
         ev.stopPropagation();
         modusSetzen(b.getAttribute('data-dk-modus') === 'ankauf');
       });
-      liste.insertBefore(s, liste.firstChild);
+      /* v2040 - NICHT mehr in die Liste. Marcel: „das soll ganz nach
+         oben ... unter das DealPilot Logo."
+
+         Bisher steckte der Schalter in `#sb-list`, also mitten in der
+         Objektliste - er scrollte mit und stand zwischen den Karten.
+         Ein Schalter, der den Modus der ganzen Seitenleiste umlegt,
+         gehoert nicht in die Liste, die er umlegt.
+
+         Verankert am `.sb-header` (dem Block mit dem Logo), nicht an
+         einer Position in der Liste: ein Platz, der an einem
+         benannten Element haengt, ueberlebt jeden Neuaufbau. */
+      var kopf = document.querySelector('.sb-header');
+      if (kopf && kopf.parentNode) kopf.parentNode.insertBefore(s, kopf.nextSibling);
+      else liste.insertBefore(s, liste.firstChild);   /* Rueckfall */
     }
     s.innerHTML =
       '<span class="dk-seg-titel">Stand</span>'
+      /* v2039 - die Zahl ist raus (Marcel: „da steht eine 2 drinne"),
+         sie steht jetzt im Tooltip. Darunter eine Zeile, die beide
+         Woerter erklaert - mit Marcels eigener Bruecke Soll/Ist. */
       + '<button type="button" data-dk-modus="bestand" class="dk-seg' + (alle ? '' : ' aktiv') + '"'
-      + ' title="Die laufenden Zahlen von heute">Bestand</button>'
+      + ' title="Bestand = der laufende Stand von heute (das Ist).">Bestand</button>'
       + '<button type="button" data-dk-modus="ankauf" class="dk-seg' + (alle ? ' aktiv' : '') + '"'
-      + ' title="Die Zahlen, wie sie beim Nutzen-/Lastenwechsel eingefroren wurden">Ankauf <b>' + mit + '</b></button>';
+      + ' title="Ankauf = der Stand beim Nutzen-/Lastenwechsel, eingefroren (das Soll).'
+      + '\u000a' + mit + ' von ' + karten.length + ' Objekten haben einen Ankauf-Stand.">Ankauf</button>';
+    /* Die Erklaerzeile steht unter dem Schalter und nur im
+       Ankauf-Modus: im Bestand ist nichts zu erklaeren, das ist der
+       Normalfall. */
+    var hilfe = el('dk-hilfe');
+    if (!hilfe) {
+      hilfe = document.createElement('div');
+      hilfe.id = 'dk-hilfe';
+      hilfe.className = 'dk-hilfe';
+      if (s.parentNode) s.parentNode.insertBefore(hilfe, s.nextSibling);
+    }
+    hilfe.innerHTML = alle
+      ? '<b>Ankauf</b> = der Stand beim Nutzen-/Lastenwechsel, eingefroren \u2014 dein <b>Soll</b>.<br>'
+        + '<b>Bestand</b> = wie das Objekt heute dasteht \u2014 dein <b>Ist</b>.<br>'
+        + '<span>Nicht zu verwechseln mit Soll-Miete und Ist-Miete: die beschreiben EINE Miete,'
+        + ' nicht zwei Zeitpunkte.</span>'
+      : '';
+    hilfe.style.display = alle ? '' : 'none';
   }
 
   /* Alle Karten mit Ankauf-Stand umschalten. Karten OHNE Stand bleiben
