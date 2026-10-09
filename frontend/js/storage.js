@@ -1039,11 +1039,6 @@ function _clearFormForNewObject() {
     setTimeout(dpResetAllOutputs, 50);
   }
 }
-/* v2031 - `_renderRichCard` nach aussen. Die Doppelkarte baut ihre
-   Rueckseite mit DERSELBEN Funktion; ein zweiter Kartenbauer wuerde
-   beim naechsten Umbau der Vorderseite zurueckbleiben, ohne dass es
-   auffiele - man dreht ja selten um. */
-window._renderRichCard = _renderRichCard;
 window._clearFormForNewObject = _clearFormForNewObject;
 
 function newObj() {
@@ -1231,6 +1226,15 @@ function invalidateRenderCache() {
 window.invalidateRenderCache = invalidateRenderCache;
 
 async function renderSaved(opts) {
+  /* v2031a - HIER, nicht auf oberster Ebene. `_renderRichCard` ist in
+     DIESER Funktion deklariert (Z. 1333); ein Export davor lief gegen
+     ein undefiniertes Symbol. Funktionsdeklarationen werden im Bereich
+     hochgezogen, deshalb steht die Zeile sicher ganz oben.
+
+     `node --check` hat das NICHT gesehen - die Syntax war in Ordnung.
+     Gefangen hat es erst `tools/frontend-konstanten.mjs`, also ein
+     echter Lauf: "FEHLGESCHLAGEN: _renderRichCard is not defined". */
+  window._renderRichCard = _renderRichCard;
   // V314b-rendersaved-token-check: Vor Login KEIN /objects-Fetch.
   // Stille Rueckkehr — Sidebar bleibt im natuerlichen Zustand.
   if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
