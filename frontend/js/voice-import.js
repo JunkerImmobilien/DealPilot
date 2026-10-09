@@ -8184,7 +8184,9 @@
     /* v2050a - `_rfFrageAnheften(null)` raeumt nur ab. Der Merker
        unten darf hier nicht gesetzt werden: abgeraeumt ist nicht
        dasselbe wie gefragt. */
-    if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = '';
+      _rfStreifenAugeAus();   /* v2051 - kein Auge auf einer Frage, die es nicht mehr gibt */
+      return; }
     /* ═══ v2050a · AB HIER WURDE GEFRAGT ════════════════════════════
        Der Merker sitzt hier, weil das die GEMEINSAME Stelle beider
        Frage-Blasen ist - `_rfFrage` und `_rfFrageNochmal` rufen beide
@@ -8200,6 +8202,65 @@
     host.style.display = '';
   }
 
+  /* ═══ v2051 · DER STREIFEN ERSCHEINT ERST, WENN DIE FRAGE WEG IST ══
+
+     GEMESSEN im Bild nach v2050a: die Frage stand zweimal - oben im
+     festen Streifen und darunter als Blase.
+
+     Zwei richtige Forderungen widersprachen sich:
+       v1619  die Frage muss bleiben, wenn sie aus dem Bild scrollt
+       N60.15 dieselbe Frage zweimal ist eine Kopie zu viel
+
+     Der alte Kommentar hat den Widerspruch gesehen und eine Seite zur
+     Regel erklaert („Doppelt ist hier richtig"). Richtig ist es aber
+     nur, SOLANGE die eine nicht zu sehen ist - und genau das stand
+     nicht da.
+
+     Also wird es gemessen statt entschieden: der Streifen zeigt sich,
+     wenn die Frage-Blase NICHT im Bild ist. Kein Schaetzen am
+     Scrollstand, sondern ein `IntersectionObserver` mit dem Chat als
+     Bezugsrahmen.
+
+     OHNE `IntersectionObserver` bleibt der Streifen dauerhaft stehen -
+     also das Verhalten von v1619. Ein fehlendes Messgeraet darf die
+     Aufgabe nicht verschwinden lassen; die Doppelung ist das
+     harmlosere der beiden Versagen. */
+  var _rfStreifenAuge = null;
+
+  function _rfStreifenZeigen(ja) {
+    var f = $('vi-rf-frage'); if (!f) return;
+    /* Nur anfassen, wenn wirklich etwas drinsteht - sonst macht der
+       Beobachter einen leeren Streifen sichtbar. */
+    if (ja && f.innerHTML) f.style.display = '';
+    else if (!ja) f.style.display = 'none';
+  }
+
+  function _rfStreifenAugeAus() {
+    try { if (_rfStreifenAuge) _rfStreifenAuge.disconnect(); } catch (e) {}
+    _rfStreifenAuge = null;
+  }
+
+  function _rfStreifenBeobachten(blase) {
+    _rfStreifenAugeAus();
+    var chat = $('vi-rf-chat');
+    if (!blase || !chat || typeof IntersectionObserver !== 'function') {
+      _rfStreifenZeigen(true);   /* Rueckfall: wie v1619 */
+      return;
+    }
+    /* Die Blase ist gerade entstanden und steht unten im Bild -
+       deshalb faengt der Streifen versteckt an. Der Beobachter
+       korrigiert das beim ersten Lauf ohnehin selbst. */
+    _rfStreifenZeigen(false);
+    try {
+      _rfStreifenAuge = new IntersectionObserver(function (eintraege) {
+        var e = eintraege[eintraege.length - 1];
+        if (!e) return;
+        _rfStreifenZeigen(!e.isIntersecting);
+      }, { root: chat, threshold: 0.3 });
+      _rfStreifenAuge.observe(blase);
+    } catch (ex) { _rfStreifenZeigen(true); }
+  }
+
   function _rfDranBlase(b) {
     try {
       var chat = $('vi-rf-chat');
@@ -8207,6 +8268,10 @@
         .forEach(function (x) { x.classList.remove('vi-rf-dran-blase'); });
       if (b) b.classList.add('vi-rf-dran-blase');
     } catch (e) {}
+    /* v2051 - hier, nicht in `_rfFrageAnheften`: das laeuft VOR dem
+       `_rfBlase` (Z. 9257 und 8220), die Blase gibt es dort noch gar
+       nicht. Diese Stelle kennt beides. */
+    _rfStreifenBeobachten(b);
     return b;
   }
 
