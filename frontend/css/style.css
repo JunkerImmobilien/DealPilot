@@ -35749,6 +35749,10 @@ body[data-dp-skin="hell"] .sb-card [class*="price"]{ color:var(--gold-lo) !impor
 /* --- Tier-Pills: dunkel / rot (wie STARK/SCHWACH) --- */
 body[data-dp-skin="hell"] .sbc-score-label,
 body[data-dp-skin="hell"] .sbc-verdict{ background:#1f2a22 !important; color:#7fe0a6 !important; border-color:#1f2a22 !important; }
+/* v2028a - der lange Selektor ist noetig, seit v2028 die
+   Obsidian-Rotregel belebt hat: die traegt (0,4,1) und hat diese
+   hier (0,2,1) geschlagen - hellrot auf hellem Grund, Kontrast 1,1. */
+body[data-dp-skin="hell"] aside.sidebar .sb-card .sbc-score-label.sbc-score-red,
 body[data-dp-skin="hell"] .sbc-score-label.sbc-score-red,
 body[data-dp-skin="hell"] .sbc-score-label.tier-red,
 body[data-dp-skin="hell"] .sbc-verdict.tier-red{ background:#B8625C !important; color:#ffffff !important; border-color:#B8625C !important; }
@@ -35865,6 +35869,8 @@ body.dp-chrome-hell .sbc-verdict{
   background:rgba(46,158,99,.10) !important; color:#1f7a45 !important;
   border:1px solid rgba(46,158,99,.45) !important; font-weight:700 !important; letter-spacing:.08em !important;
 }
+/* v2028a - gleicher Grund wie eine Fassung darueber. */
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-red,
 body.dp-chrome-hell .sbc-score-label.sbc-score-red,
 body.dp-chrome-hell .sbc-score-label.tier-red,
 body.dp-chrome-hell .sbc-verdict.tier-red{
