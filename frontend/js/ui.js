@@ -1006,11 +1006,23 @@ function _buildAIPayload() {
        im RND-Wizard (`_getRndPrefill`, v1856) - gelesen wird dasselbe
        Feld, nicht ein zweites daneben.
 
-       Stufen: "0" nicht modernisiert · "h" teilweise erneuert ·
-       "v" erneuert/modern. Sie reisen als KLARTEXT mit, weil ein "h" im
-       Prompt nichts bedeutet. */
+       ── DIE WERTE SIND SCHON KLARTEXT ───────────────────────────────
+       Mein erster Anlauf uebersetzte "0"/"h"/"v" in Worte - die Stufen
+       des MFH-Konfigurators. GEMESSEN am Objektformular tragen die
+       `mod_*`-Felder aber FUENF Klartextstufen:
+
+         "Keine/Nie" · "> 20 Jahre" · "10 - 20 Jahre" ·
+         "5 - 10 Jahre" · "< 5 Jahre"
+
+       Das ist feiner als die Dreiteilung und schon lesbar. Die
+       Uebersetzungstabelle war also nicht nur ueberfluessig, sie haette
+       bei jedem Wert danebengegriffen und den Rohwert durchgereicht -
+       richtig aus Versehen.
+
+       `mfh-einheiten.js` fuehrt die Kurzcodes und uebersetzt sie selbst
+       (`STUFE_ZU_OBJEKT`). Zwei Schreibweisen fuer dieselbe Sache, und
+       wer sie verwechselt, merkt es nicht. */
     zustand: (function () {
-      var STUFE = { '0': 'nicht modernisiert', 'h': 'teilweise erneuert', 'v': 'erneuert/modern' };
       var TEILE = { mod_dach: 'Dach', mod_fenster: 'Fenster', mod_leitungen: 'Leitungen',
                     mod_heizung: 'Heizung', mod_aussenwand: 'Aussenwaende',
                     mod_baeder: 'Baeder', mod_innenausbau: 'Innenausbau',
@@ -1019,7 +1031,8 @@ function _buildAIPayload() {
       Object.keys(TEILE).forEach(function (id) {
         var v = String(g(id) || '').trim();
         if (!v) return;
-        bauteile[TEILE[id]] = STUFE[v] || v;
+        /* Der Wert ist die letzte Modernisierung als Zeitangabe. */
+        bauteile[TEILE[id]] = v;
         n++;
       });
       var z = {
