@@ -890,11 +890,21 @@
      GND-Liste (Wohngebäude 80 seit v1439, Anlage 1 ImmoWertV).
      ============================================================ */
 
-  /* Höchstpunkte je Bauteil nach Anlage 2 ImmoWertV, Summe 20. */
-  var MOD_MAX = {
-    dach: 4, fenster: 2, leitungen: 2, heizung: 2,
-    aussenwand: 4, baeder: 2, innenausbau: 2, grundriss: 2
-  };
+  /* Höchstpunkte je Bauteil nach Anlage 2 ImmoWertV, Summe 20.
+     ABGELEITET aus MOD_ELEMENTS, nicht daneben geschrieben.
+
+     v2075: In v2073 stand hier eine eigene Liste mit denselben acht
+     Zahlen. Gemessen waren sie identisch - also eine Doppelung, und
+     zwar genau die, die zwei Absaetze weiter unten kritisiert wird
+     ("vier Ableitungen derselben Zahl laufen auseinander"). Sie wurde
+     im selben Zug eingebaut, in dem der Kern die Punktevergabe
+     uebernahm. Eine zweite Liste ist nicht falsch, solange sie stimmt -
+     sie ist falsch, SOBALD jemand eine der beiden aendert. */
+  var MOD_MAX = (function () {
+    var m = {};
+    MOD_ELEMENTS.forEach(function (e) { m[e.id] = e.max; });
+    return m;
+  })();
 
   /**
    * Modernisierungspunkte aus den acht Bauteil-Angaben.
@@ -915,6 +925,50 @@
       total += p;
     });
     return { total: Math.min(20, total), elemente: elemente };
+  }
+
+  /**
+   * Modernisierungspunkte aus einer ja/teilweise/nein-Angabe je Bauteil.
+   *
+   * Dieselben Hoechstpunkte wie `punkteAusMod`, nur ein anderes
+   * Eingabeformat: der BMF-Rechner und die Wohnungsliste fragen nicht
+   * nach Zeitstufen, sondern nach "modernisiert ja / teilweise / nein".
+   *
+   * ── v2075 · WARUM DAS HIER STEHT UND NICHT DORT ─────────────────────
+   * `bmf-bodenabschlag.js` hat die Punkte selbst vergeben, mit PAUSCHAL
+   * 2 je Bauteil. Anlage 2 gibt Dach und Aussenwand aber je 4 - die
+   * Summe ist 20, nicht 16. Am 10.10.2026 gemessen:
+   *
+   *     Fall                 BMF alt   Anlage 2
+   *     alles modernisiert        16         20
+   *     nur Dach                   2          4
+   *     Dach + Aussenwand          4          8
+   *
+   * Wirkung auf die Restnutzungsdauer bei GND 80: bei Alter 64 sind das
+   * 3,11 Jahre. Dasselbe Objekt bekam im BMF-Rechner also eine andere
+   * Restnutzungsdauer als im Wizard, und zwar lautlos.
+   *
+   * Es war die VIERTE Stelle, die Punkte vergibt (Wizard, Kern,
+   * BMF-Rechner, deal-action aus `sanstand`). Vier Ableitungen derselben
+   * Zahl laufen auseinander - das hat `score-tiers.js` schon einmal
+   * gezeigt. Deshalb steht sie jetzt am Kern.
+   *
+   * Erkannt werden: ja / voll / v / true  -> volle Punkte
+   *                 teil / teilweise / h  -> halbe, aufgerundet
+   *                 alles andere          -> 0
+   */
+  function punkteAusJaTeilNein(werte) {
+    if (!werte) return { total: 0, elemente: {}, bewertet: 0 };
+    var elemente = {}, total = 0, bewertet = 0;
+    Object.keys(MOD_MAX).forEach(function (id) {
+      var v = String(werte[id] == null ? '' : werte[id]).toLowerCase().trim();
+      var p = 0;
+      if (v === 'ja' || v === 'voll' || v === 'v' || v === 'true') { p = MOD_MAX[id]; bewertet++; }
+      else if (v === 'teil' || v === 'teilweise' || v === 'h') { p = Math.round(MOD_MAX[id] * 0.5); bewertet++; }
+      elemente[id] = p;
+      total += p;
+    });
+    return { total: Math.min(20, total), elemente: elemente, bewertet: bewertet };
   }
 
   /** Kernsanierung an irgendeinem Bauteil? Dann gilt die Streckung auf 0,90·GND. */
@@ -1254,6 +1308,7 @@
        erlaubte Doppelung kostet (vier Kopien, drei davon abweichend). */
     MOD_MAX: MOD_MAX,
     punkteAusMod: punkteAusMod,
+    punkteAusJaTeilNein: punkteAusJaTeilNein,
     istKernsaniert: istKernsaniert,
     gndAusObjektTyp: gndAusObjektTyp,
     punkteToGrad: punkteToGrad,

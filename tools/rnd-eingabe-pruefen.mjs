@@ -202,5 +202,46 @@ const q2 = fs.readFileSync(KERN, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replac
 pruef('"technische ... (vorrangig)" raus', /technische Alterswertminderung \(vorrangig\)/.test(q2), false);
 pruef('aufschlagStandard ist 0', /aufschlagStandard = 0/.test(q2), true);
 
+
+/* ═══ 9 · v2075 · Eine Punktevergabe fuer alle Aufrufer ════════════════
+   Vier Stellen vergaben Anlage-2-Punkte: Wizard, Kern, BMF-Rechner und
+   deal-action aus `sanstand`. Der Kern vergibt sie jetzt. */
+console.log('\n=== 9 · v2075 · Punktevergabe und Doppelungen ===');
+
+/* a) MOD_MAX ist aus MOD_ELEMENTS abgeleitet, keine zweite Liste */
+let maxAbw = 0;
+RND.MOD_ELEMENTS.forEach(e => { if (RND.MOD_MAX[e.id] !== e.max) maxAbw++; });
+pruef('MOD_MAX == MOD_ELEMENTS[].max', maxAbw, 0);
+pruef('Summe der Hoechstpunkte', Object.values(RND.MOD_MAX).reduce((a, b) => a + b, 0), 20);
+
+/* b) ja/teilweise/nein nach Anlage 2, nicht pauschal 2 */
+const IDS = Object.keys(RND.MOD_MAX);
+const alleJTN = (v) => Object.fromEntries(IDS.map(i => [i, v]));
+pruef('alles "ja" = 20 (nicht 16)', RND.punkteAusJaTeilNein(alleJTN('ja')).total, 20);
+pruef('alles "nein" = 0', RND.punkteAusJaTeilNein(alleJTN('nein')).total, 0);
+pruef('nur Dach "ja" = 4 (nicht 2)', RND.punkteAusJaTeilNein({ dach: 'ja' }).total, 4);
+pruef('nur Aussenwand "ja" = 4', RND.punkteAusJaTeilNein({ aussenwand: 'ja' }).total, 4);
+pruef('nur Fenster "ja" = 2', RND.punkteAusJaTeilNein({ fenster: 'ja' }).total, 2);
+pruef('Dach "teilweise" = 2', RND.punkteAusJaTeilNein({ dach: 'teil' }).total, 2);
+pruef('bewertet wird gezaehlt', RND.punkteAusJaTeilNein({ dach: 'ja', fenster: 'nein' }).bewertet, 1);
+pruef('leer -> 0 bewertet', RND.punkteAusJaTeilNein({}).bewertet, 0);
+
+/* c) Beide Formate muessen bei gleicher Aussage gleich viel ergeben */
+const vollZeit = Object.fromEntries(IDS.map(i => [i, '< 5 Jahre']));
+pruef('Zeitstufen und ja/nein stimmen ueberein',
+  RND.punkteAusMod(vollZeit).total, RND.punkteAusJaTeilNein(alleJTN('ja')).total);
+
+/* d) Kein Aufrufer vergibt noch selbst Punkte */
+const nutztext = (pfad) => fs.readFileSync(pfad, 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+const bmf = nutztext('./frontend/js/bmf-bodenabschlag.js');
+pruef('bmf: kein "punkte += 2" mehr', /punkte \+= 2/.test(bmf), false);
+pruef('bmf: nutzt punkteAusJaTeilNein', /punkteAusJaTeilNein/.test(bmf), true);
+const da = nutztext('./frontend/js/deal-action.js');
+pruef('deal-action: modPoints nicht direkt aus sanstand', /modPoints: sanstand/.test(da), false);
+pruef('deal-action: liest die mod_*-Felder', /punkteAusMod/.test(da), true);
+pruef('mfh-einheiten: nutzt MOD_ELEMENTS',
+  /MOD_ELEMENTS/.test(fs.readFileSync('./frontend/js/mfh-einheiten.js', 'utf8')), true);
+
 console.log('\n' + (fehler === 0 ? 'GESAMT RC=0' : 'GESAMT RC=1 - ' + fehler + ' Abweichung(en)'));
 process.exit(fehler === 0 ? 0 : 1);
