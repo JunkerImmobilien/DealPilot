@@ -2073,6 +2073,119 @@ statt Elemente, `v2065` erkennt Pseudoelemente als Grund.
 Nötig wären 4,5 (bzw. 3,0 ab 24 px). **Das ist keine Geschmacksfrage
 mehr** — bei 9 px und 2,06 ist der Text nicht lesbar.
 
+> ### ERLEDIGT 10.10.2026 — `v2089` + `v2090`
+>
+> **Gemessen nach dem Eingriff: von 12 Mängelgruppen (21 Elemente) sind
+> 3 Gruppen (4 Elemente) übrig** — und die drei Reste sind genau die
+> zwei Goldtöne, die Marcel entscheiden muss (siehe N60.29 darunter).
+>
+> **`v2089` — das DS2-Etikett, in ZWEI Fassungen.** `.ds2-tag` trug Gold
+> auf 14 %-Gold über Weiß, k=2,06. Die zweite Fassung `.ct-pro .ds2-tag`
+> trug `#9a7f33` auf demselben Grund (k=3,47), **mit `!important`, später
+> und spezifischer** — sie hätte die Korrektur der ersten still
+> ausgehebelt. Gefunden nur, weil nach dem ersten Eingriff ALLE
+> `ds2-tag`-Regeln gegreppt wurden. Beide tragen jetzt Gold auf Tinte
+> `#1A1714`, **k=7,81**, nachgemessen an 102 Stellen über sechs Reiter
+> und fünf Chrome-Fassungen (Vorgabe plus die vier Hell-Themes, die ihre
+> eigene Fassung behalten: `#3B352D` auf `#F2EFE9`, k=10,56).
+>
+> **`v2090` — bei vier von sechs Stellen war die DECKKRAFT der Fehler,
+> nicht die Farbe.** Das ist der eigentliche Befund dieses Punkts:
+>
+> | Stelle | war | ist | Ursache |
+> |---|---:|---:|---|
+> | `.hint` u. 3 Geschwister | 3,52 | 4,84–5,22 | `rgba(42,39,39,.55)` |
+> | `.qc-hint-inline` | 3,21 | 4,97 | dieselbe, auf 0,50 |
+> | `.dk-seg-titel` | 3,23 | 6,1 | `color-mix(gold 55%)` |
+> | `.dk-seg` | 3,83 | 6,1 | `color-mix(gold 62%)` |
+> | `.sbc-won-ribbon` | **2,78** | 4,59 | fremdes Grün |
+> | `.dpl-schalter-k` | 3,00 | 4,56 | `#9A9287` |
+>
+> **Eine Deckkraft ist eine Farbentscheidung, die niemand als solche
+> trifft.** `rgba(42,39,39,.55)` liest sich wie „die Tinte, nur leiser" —
+> gerechnet ist es `rgb(138,136,136)`. Die Absicht der Zeile („Hinweis­texte
+> nie weiß") war richtig; geprüft wurde nie, was dabei herauskommt. Beim
+> `.hint` entschied die **dunkelste** der fünf Flächen, auf denen er sitzt:
+> 0,65 besteht auf vier und fällt auf `--surface2` durch, 0,68 hält überall.
+>
+> **Der Mittelwert hat das Won-Band verharmlost.** Die Kabine mittelt
+> einen Verlauf zu einer Farbe und meldete 3,73. Am **hellen Ende** steht
+> derselbe weiße Text, und dort waren es **2,78** — die schlechteste
+> Stelle der ganzen App, und die am wenigsten auffällige im Messprotokoll.
+> Das Band trug `#4CAF50 → #2e7d32`, zwei Material-Design-Grüns; das
+> Marken-Grün ist `#3FA56C`. Jetzt Marken-Grün −20 % / −46 %, beide Enden
+> einzeln nachgemessen (4,59 / 7,24). **Grün bleibt Grün** — CLAUDE.md
+> verbietet, Statusfarben zu *tokenisieren*, nicht sie lesbar zu machen.
+>
+> **Ein Fehler an meinem eigenen Messgerät, der dabei auffiel:**
+> `DPM.effGrund` gibt `{r,g,b,a,quelle}` zurück, **kein `.rgb`**. Vier
+> Suchläufe lasen `eg.rgb`, bekamen `undefined` und meldeten „null
+> Elemente auf grünem Grund", während `messe()` im selben Dokument acht
+> meldete. Ich habe daraufhin **zuerst `messe()` verdächtigt** — es war
+> mein Zugriff, und die acht Bänder waren die ganze Zeit da. Ein
+> Suchlauf mit null Treffern muss sagen, wie viele Elemente er geprüft hat.
+
+#### N60.29 · Die zwei Goldtöne `--gold-d` und `--gold-3` (Marcels Entscheidung)
+
+**Gemessen 10.10.2026, die letzten drei Mängelgruppen nach `v2090`:**
+
+| Token | Wert | auf | Kontrast | Stelle |
+|---|---|---|---:|---|
+| `--gold-d` | `#987b22` | Creme `#f8f4e9` | **3,68** | `summary.info-box-title`, 12,5 px |
+| `--gold-3` | `#957c38` | Weiß | **4,02** | `.ct.ct-pro` u. Geschwister, 11,5 px |
+
+Nötig sind 4,5. Die kleinste Korrektur, die hält: `--gold-d` → `#866c1e`
+(4,57), `--gold-3` → `#8b7334` (4,57). Beides ein Hauch dunkler, kein
+anderer Farbton.
+
+**Warum das nicht in `v2090` mitging:** das sind **Token**, nicht Stellen.
+Sie färben Überschriften und Kartentitel in der ganzen App, und
+`whitelabel-override.js` leitet sie beim Mandanten selbst ab
+(`_darken(akzent, 26)` für `--gold-3`). Wer sie ändert, ändert den Goldton
+überall **und** muss die Ableitung mitziehen, sonst laufen Haus und
+Mandant auseinander. Dazu kommen die `var(--wl-<hex>, #<hex>)`-Literale
+und die Basislinie des Gold-Audits.
+
+**Demo gebaut (`v2091`): `frontend/kontrast-cockpit.html`**, auf Staging
+unter `/kontrast-cockpit.html` erreichbar. Sie zeigt alle elf Toene mit
+heutigem und vorgeschlagenem Wert, einer Gegenueberstellung auf weissem
+Grund und der Begruendung je Ton.
+
+> **Beim Messen fuer die Demo kam heraus, dass der Befund GROESSER und
+> anders gelagert ist als hier beschrieben.** Im Cockpit liegen **234
+> Textstellen** unter der Schwelle, gebuendelt auf **elf Farbtoene** —
+> und **131 davon tragen eine Statusfarbe (Gruen/Rot) als Textfarbe**,
+> nur **53** tragen Gold. Ich war von einem Goldproblem ausgegangen; das
+> ist der kleinere Teil.
+>
+> Die schlechtesten: `#D5BB73` auf Creme = **1,71** (10 Stellen),
+> `#5CC187` auf Weiss = **2,23** (27 Stellen, `td.pos`), `#C9A84C` auf
+> Creme = **2,23** (14 Stellen). Der groesste Einzelposten ist
+> `#D98579` auf Weiss = 2,77 mit **54 Stellen** (`td.neg`).
+>
+> **Ein Fehler im Generator, den der eigene Pruefer gefangen hat:** er
+> prueft die Schwelle am UNGERUNDETEN Ton, veroeffentlicht aber den
+> gerundeten Hexwert. Drei Toene landeten dadurch auf 4,49 / 4,50 /
+> 4,51 — einer **unter** der Schwelle, die das Skript durchzusetzen
+> behauptete. Die Rundung auf acht Bit frisst bis zu einem halben
+> Prozent Leuchtkraft. Behoben, und `tools/kontrast-demo-pruefen.mjs`
+> rechnet jetzt jede Zahl der fertigen HTML unabhaengig nach: 95 Punkte,
+> 110 eigene Farbrechnungen, RC=0, Deckung 100 %.
+
+**Das ist eine Markenfrage, also Marcels.** Drei Wege:
+
+- **(a)** Die zwei Token um 7–12 % abdunkeln — kleinster Eingriff, Gold
+  bleibt Gold, wirkt überall. Ableitung in `whitelabel-override.js`
+  mitziehen, danach `gold-audit` und eine Messreihe.
+- **(b)** Nur die zwei betroffenen Stellen auf einen dunkleren Ton setzen
+  — ändert nichts anderes, erzeugt aber eine **weitere** Goldstufe neben
+  den vorhandenen. Genau so sind die vier `ds2-tag`-Fassungen entstanden.
+- **(c)** Die beiden Stellen auf dunklen Grund setzen, wie `v2089` beim
+  DS2-Etikett. Konsequent, aber es sind Überschriften, keine Pillen.
+
+**Mein Vorschlag ist (a)** — es ist die Ursache, und ein Token, das auf
+seinem eigenen Grund durchfällt, ist auch ohne diese zwei Stellen falsch.
+
 > **Entscheidung für Marcel, nicht für mich** (Optik/Marke): Gold ist
 > der **Akzent**, nicht die Textfarbe. Drei Wege, die die Marke
 > erhalten: (a) bei Tags/Pillen Gold als **Fläche** mit Obsidian-Schrift
