@@ -871,7 +871,7 @@ Zustände, die gehen nicht."*
 
 ---
 
-#### N60.20 · Prozesskarte für die Messe — Quick-Check bis Bestand
+#### N60.20 · ERLEDIGT 10.10.2026 (`v2088`) — design/Messe/prozesskarte.html
 Marcel, 10.10.2026: *„Dafür brauche ich dann einmal eine Prozesskarte.
 Eine richtig gut aufgearbeitete Prozesskarte in dem Pilot-Stil und
 Design, wo wir einmal die Prozesse aufmalen, vielleicht irgendwo wie so
@@ -887,6 +887,33 @@ ein Miro-Board oder dann auch so eine Prozesskette abbilden."*
 **Form:** im **Pilot-Stil und Design** — Obsidian, Gold, Runway,
 Luftfahrt-Bildsprache. Board-Charakter wie ein Miro-Board oder eine
 durchgezogene Prozesskette.
+
+> ### Gebaut: `design/Messe/prozesskarte.html` (`v2088`)
+>
+> **Drei Bahnen, neun Stationen** — Quick-Check (Pre-Flight) · Ankauf
+> (Boarding) · Bestand (Reiseflug). Je Station steht, **was man tun kann**,
+> und darunter abgesetzt **was dabei herauskommt** — Marcels eigene Frage.
+>
+> **Jede Zahl ist gemessen, nicht geschrieben:** die 8 Etappen mit Namen
+> und Zielen aus `frontend-konstanten.json`, die 3 Marktbericht-Stufen aus
+> `marktbericht.js:56`, die Schwellen 85/70/50/35 aus `score-tiers.js`,
+> die 286 Datenfelder am Portfolio-Export gezählt, die 6/13/20
+> Pflichtfelder aus `pflichtFuer()`.
+>
+> **Was NICHT draufsteht:** Zahlen, die niemand gemessen hat — keine
+> Zeitersparnis in Prozent, keine Nutzerzahlen, keine Treffergenauigkeit.
+> *Eine Prozesskarte, die eine Zahl behauptet, die das Produkt nicht
+> belegt, fällt am Stand genau dem auf, der sie prüft.*
+>
+> **Die Fußzeile trägt die Doktrin** in drei Sätzen: *„Kein Treffer heißt
+> kein Wert"*, *„Jede Zahl trägt ihre Herkunft"*, *„Wo die Quelle endet,
+> endet die Rechnung"*. Das ist der Unterschied, der sich nicht nachbauen
+> lässt — also gehört er auf die Karte.
+>
+> Gedruckt A3 quer in einer hellen Fassung, aus **derselben** Datei —
+> damit nicht zwei Stände entstehen. Bewacht von
+> `tools/prozesskarte-pruefen.mjs` (RC=0): Tag-Bilanz, CSS-Klammern,
+> abgeschaffte Begriffe, und jede Zahl gegen ihre Quelle.
 
 **Zweck:** *„Dass wir das dem Kunden auch zeigen können."* Also ein
 Stück, das am Messestand standhält, nicht eine Skizze für intern.
