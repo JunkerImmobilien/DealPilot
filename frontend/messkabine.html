@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092a</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092b</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1836,14 +1836,66 @@
              `ue.length` waere hier still immer undefined gewesen und der
              Laeufer haette nie einen Ueberlauf gemeldet - derselbe Fehler
              wie bei effGrund().rgb am 10.10.2026. */
+          /* ══ v2092b · EINE SCHIENE IST KEIN MANGEL ════════════════════
+             Der erste Lauf meldete 109 QUERSCROLL-Funde. Nachgesehen sind
+             ALLE FÜNF gewollt gebaut:
+
+               dab-rail         hat eigene Pfeiltasten (railScroll(id,±1))
+               oe-karte-gewerke overflow-x:auto MIT
+                                -webkit-overflow-scrolling:touch
+               ytf-quick-wrap   in style.css:39561 steht die Messung
+                                schon als Kommentar
+               dptk-huelle      Rahmen um eine 1021px breite Datentabelle
+               bc-svg-wrap      Rahmen um ein breites SVG
+
+             `apQuerScroller` sagt in seinem eigenen Kommentar: „Waagerechte
+             Scroller sind kein Fehler, aber auf dem Handy ein UX-Befund."
+             Ich habe sie trotzdem als Mangel gemeldet — und 109 Fehlalarme
+             begraben jeden echten Fund. **Ein Prüfer, der ruft wenn nichts
+             ist, ist so wertlos wie einer, der schweigt wenn etwas ist.**
+
+             Jetzt getrennt: wer seine Absicht ZEIGT, wird als `SCHIENE`
+             gezählt und nicht als Mangel. Als Absicht gilt nur, was im
+             DOM nachweisbar ist — Bedienknöpfe, Touch-Scrolling oder
+             Scroll-Snap. Eine Klassenliste wäre geraten.             */
           try {
             var qs = apQuerScroller(zz.d, zz.win) || [];
-            if (qs.length) {
-              z0.funde.push({ wo: wo, art: 'QUERSCROLL', n: qs.length,
-                text: qs.slice(0, 2).map(function(x){
-                  return x.el + ' ' + x.sicht + '->' + x.inhalt + ' (' + x.faktor
-                       + ', Balken ' + x.balkenNimmtHoehe + ')';
-                }).join(' | ') });
+            var mangel = [], schienen = [];
+            for (var qi = 0; qi < qs.length; qi++) {
+              var x = qs[qi];
+              var knoten = null;
+              /* Das gemessene Element wiederfinden, um es zu befragen */
+              try {
+                var kand = [].slice.call(zz.d.querySelectorAll('div,section,main,table'));
+                for (var ki = 0; ki < kand.length; ki++) {
+                  if (kand[ki].clientWidth === x.sicht && kand[ki].scrollWidth === x.inhalt) { knoten = kand[ki]; break; }
+                }
+              } catch (e2) {}
+              var gewollt = false, warum = '';
+              if (knoten) {
+                var kcs = zz.win.getComputedStyle(knoten);
+                if (kcs.webkitOverflowScrolling === 'touch') { gewollt = true; warum = 'touch-scrolling'; }
+                else if (kcs.scrollSnapType && kcs.scrollSnapType !== 'none') { gewollt = true; warum = 'scroll-snap'; }
+                else if (knoten.querySelector('button[onclick*="Scroll"],button[class*="arr"],[class*="rail-arr"]')
+                         || (knoten.parentElement && knoten.parentElement.querySelector('[class*="rail-arr"],button[class*="arr"]'))) {
+                  gewollt = true; warum = 'eigene Bedienknoepfe';
+                }
+                else if (knoten.querySelector('table') && knoten.children.length === 1) {
+                  gewollt = true; warum = 'Rahmen um eine Tabelle';
+                }
+              }
+              var zeile = x.el + ' ' + x.sicht + '->' + x.inhalt + ' (' + x.faktor
+                        + ', Balken ' + x.balkenNimmtHoehe + ')';
+              if (gewollt) schienen.push(zeile + ' [' + warum + ']');
+              else mangel.push(zeile + (knoten ? '' : ' [Element nicht wiedergefunden]'));
+            }
+            if (schienen.length) {
+              z0.funde.push({ wo: wo, art: 'SCHIENE', n: schienen.length,
+                              text: schienen.slice(0, 2).join(' | ') });
+            }
+            if (mangel.length) {
+              z0.funde.push({ wo: wo, art: 'QUERSCROLL', n: mangel.length,
+                              text: mangel.slice(0, 2).join(' | ') });
             }
           } catch (e) {
             z0.funde.push({ wo: wo, art: 'MESSFEHLER', text: 'apQuerScroller: ' + String(e && e.message || e) });
