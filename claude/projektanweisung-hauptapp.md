@@ -36105,3 +36105,81 @@ laden mit `?mk=<version>&ziel=…`.
 - Farbkontraste (Fenster im Hintergrund), Touch-Gesten,
   Bildschirmtastatur, Tastaturnavigation, Höhen über 757 px.
 - Anmeldung/Registrierung, Upload-Flächen, Lade- und Fehlerzustände.
+
+
+## Rollout-Journal 10.10.2026 (N60.17/4) — v2064–v2065a: die Farbkontraste, endlich messbar
+
+**Was** · Marcel: *„ja los browser fenster ist vorne."* Damit meldet die
+Messkabine `fensterSichtbar: true` und `weg: "Geometrie +
+checkVisibility()"` — **voll messbar**. Vorher galt dort nur Geometrie, und
+Farbwerte aus `getComputedStyle` sind im Hintergrund nicht verlässlich.
+
+| Ansicht | Paare | Stellen | unter 3,0 |
+|---|---:|---:|---:|
+| Objekt (`single`) | 57 | **22** | 5 |
+| Cockpit (`dashboard`) | 120 | **38** | 19 |
+| Alle Objekte (`all`) | 20 | 7 | **0** |
+
+**Commit** · `897a951a` · `01b2812e` · `da00e1fc`
+
+#### `v2064` — wie viele STELLEN, nicht wie viele Elemente
+
+`kontrastN` zählt Elemente, und die Liste war auf acht gekappt. 57 Paare
+klangen nach einem großen Befund; im ersten Blick waren es **zwei** Regeln
+(`span.ds2-tag`, `span.oe-lk-tag`), nur vielfach wiederholt.
+
+> Der Unterschied entscheidet über die Arbeit: zwei Regeln oder vierzig. Wer
+> nur `kontrastN` liest, schätzt den Aufwand um das Zwanzigfache falsch ein.
+
+`r.kontrastGruppen` und `r.kontrastStellen` stehen jetzt daneben.
+
+#### `v2065` — ein Pseudoelement kann der echte Grund sein
+
+Die **drei schwersten** Cockpit-Befunde (k 1,63 / 1,70 / 1,98) waren
+Score-Ringe. `div.sc` trägt `conic-gradient(rgb(169,141,64) 65%, …)`, und
+die Zahl darauf hat dieselbe Goldfarbe — Kontrast 1,7.
+
+Nur: `div.sc::before` legt einen **weißen Kern** (33×33 px, `inset:3.5px`,
+`border-radius:50%`), und die Zahl (13×13) steht darauf. Der echte Kontrast
+ist rund **3,1**.
+
+> Ein Pseudoelement findet kein DOM-Werkzeug — `getComputedStyle(el,
+> '::before')` findet es doch. Man muss nur daran denken, dass es den Grund
+> stellen kann.
+
+`pseudoGrund()` prüft jetzt die drei nächsten Vorfahren auf
+`::before`/`::after` mit **deckender** Hintergrundfarbe und `inset`, und ob
+der Text ganz darin liegt. Nach dem Fix: 21 → 19 unter 3,0, und die drei
+Score-Fälle sind raus. **Ohne ihn hätte ich Score-Farben geändert, die in
+Ordnung sind.**
+
+#### Der Befund selbst: Gold ist der Akzent, nicht die Textfarbe
+
+| Stelle | Schrift | Kontrast | Farbe auf Grund |
+|---|---|---:|---|
+| `span.ds2-tag` (8×) | 9 px | **2,06** | Gold `#C9A84C` auf Creme |
+| `div.card-title` (6×) | 9,5 px | **2,29** | Gold auf Weiß |
+| `span.badge` (7×) | 8,5 px | **1,71** | helles Gold auf Creme |
+| `div.sk-k-v` (2×) | 15 px | **2,23** | Gold auf Weiß |
+| `span` „Won" (8×) | 9 px | 3,73 | Weiß auf Grün |
+
+Nötig wären 4,5 (ab 24 px: 3,0). Bei 9 px und 2,06 ist der Text nicht
+lesbar — **das ist keine Geschmacksfrage mehr.**
+
+**Die Behebung ist aber eine Markenentscheidung und gehört Marcel.** Drei
+Wege, die die Marke erhalten: Gold als **Fläche** mit Obsidian-Schrift bei
+Tags und Pillen (~8,9, so sind die Score-Pillen schon gebaut); ein eigener
+dunklerer *Textton* (das vorhandene „Gold dunkel" `#b8932f` reicht mit ~2,8
+**nicht**); oder die kleinen Beschriftungen auf die normale Textfarbe und
+Gold nur für Rahmen und Linien. Demo zuerst.
+
+#### Ein Fehler, der mir ZWEIMAL unterlief
+
+`male(farbe, hinter)` braucht **zwei** Argumente. Mit einem stirbt es an
+`hinter.r`. Einmal beim Nachbau der Kontrastmessung (0 von 428 Textknoten
+gemessen), einmal beim Einbau von `pseudoGrund` (`v2065a`).
+
+> Eine fremde Aufrufhilfe schreibt man ab, man rekonstruiert sie nicht.
+
+Zwei gleiche Fehler hintereinander heißen nach Regel 4: abschließen und
+übergeben. Deshalb endet dieser Abschnitt hier und nicht bei der Behebung.

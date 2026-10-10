@@ -1066,9 +1066,52 @@ Zwei Dinge, die dabei **keine** Befunde waren, aber danach aussahen:
   gefüllten Platzhaltern, nicht ein wirklich abgerufener Bericht (das
   kostet Kerosin). `#genProgress` (Fortschritt) ist ebenfalls nur als
   Gerüst gesehen.
-- **Farbkontraste** — das Browserfenster stand im Hintergrund, und die
-  Messkabine sagt dann selbst, dass nur Geometrie gilt. Ihr Selbsttest
-  war grün (6/6). Gehört mit Fenster im Vordergrund wiederholt.
+**Farbkontraste gemessen (10.10.2026, Fenster im Vordergrund — „voll
+messbar", Kabinen-Selbsttest 6/6).** `v2064` gruppiert nach **Stellen**
+statt Elemente, `v2065` erkennt Pseudoelemente als Grund.
+
+| Ansicht | Paare | Stellen | davon unter 3,0 |
+|---|---:|---:|---:|
+| Objekt (`single`) | 57 | **22** | 5 |
+| Cockpit (`dashboard`) | 120 | **38** | 19 |
+| Alle Objekte (`all`) | 20 | 7 | **0** |
+
+> **Die Stellenzahl ist die nützliche.** 57 Paare klangen nach viel und
+> waren im ersten Blick zwei Regeln — `kontrastN` allein schätzt den
+> Aufwand um das Zwanzigfache falsch.
+
+**Das Muster ist eindeutig: Gold als TEXTFARBE auf hellem Grund.**
+
+| Stelle | Schrift | Kontrast | Farbe auf Grund |
+|---|---|---:|---|
+| `span.ds2-tag` (8×) | 9 px | **2,06** | Gold `#C9A84C` auf Creme |
+| `div.card-title` (6×) | 9,5 px | **2,29** | Gold auf Weiß |
+| `span.badge` (7×) | 8,5 px | **1,71** | helles Gold auf Creme |
+| `div.sk-k-v` (2×) | 15 px | **2,23** | Gold auf Weiß |
+| `span` „Won" (8×) | 9 px | 3,73 | Weiß auf Grün `#3D9641` |
+
+Nötig wären 4,5 (bzw. 3,0 ab 24 px). **Das ist keine Geschmacksfrage
+mehr** — bei 9 px und 2,06 ist der Text nicht lesbar.
+
+> **Entscheidung für Marcel, nicht für mich** (Optik/Marke): Gold ist
+> der **Akzent**, nicht die Textfarbe. Drei Wege, die die Marke
+> erhalten: (a) bei Tags/Pillen Gold als **Fläche** mit Obsidian-Schrift
+> — Kontrast dann ~8,9, so sind die Score-Pillen schon gebaut; (b) für
+> Fließtext ein dunkleres Gold eigens als *Textton* (das bisherige
+> „Gold dunkel" `#b8932f` reicht mit ~2,8 **nicht**); (c) die kleinen
+> Beschriftungen auf die vorhandene Textfarbe setzen und Gold nur für
+> Rahmen und Linien behalten. **Demo bauen, bevor etwas geändert wird.**
+
+**Ein Messfehler, der dabei aufflog und behoben ist:** die drei
+schwersten Cockpit-Befunde (k 1,63 / 1,70 / 1,98) waren **Score-Ringe**
+— `div.sc` trägt einen `conic-gradient` in Gold, aber `div.sc::before`
+legt einen **weißen Kern**, auf dem die Zahl steht. Echter Kontrast
+~3,1 statt 1,7. Ohne `v2065` hätte ich Score-Farben geändert, die in
+Ordnung sind.
+
+- ~~**Farbkontraste messen**~~ — erledigt (siehe oben). Offen ist die
+  **Behebung**: sie braucht Marcels Entscheidung über Gold als
+  Textfarbe, und davor eine Demo.
 - **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation**, und
   **Höhen über 757 px** (Fenstergrenze der Kabine).
 - Die übrigen Punkte des Master-Prompts: Anmeldung/Registrierung,
