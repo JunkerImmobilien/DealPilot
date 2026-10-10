@@ -198,19 +198,58 @@ router.post('/verkehrswert', async function (req, res) {
 
   try {
     const body = req.body || {};
-    if (!body.objekt && !body.dealpilot && !body.address) {
+    if (!body.object && !body.objekt && !body.dealpilot && !body.address) {
       return res.status(400).json({
         error: 'bad_request',
-        message: 'Erwartet { objekt: … } (ein DealPilot-Datensatz) oder { address: "…" }.'
+        message: 'Erwartet { objekt: … } (ein DealPilot-Datensatz, englisch '
+               + '`object` geht auch) oder { address: "…" }. Optional lat/lon, '
+               + 'wert_stufe (Vorgabe 3) und external_ref.'
       });
+    }
+
+    /* ══ v2076 · DAS FELD HEISST `object`, NICHT `objekt` ═══════════════
+       HIER WURDE `body` durchgereicht, also `{ objekt: … }` - deutsch.
+       Der Marktbericht-Dienst liest `object` und fand deshalb keine
+       Adresse. Gemessen am 10.10.2026 am Objekt 2026-001:
+
+         422 · "Keine Koordinaten - Adresse nicht geokodierbar und
+                keine lat/lon angegeben."
+
+       Der Fehler klang nach fehlenden Koordinaten und war ein
+       Feldname. Die Adresse war vollstaendig im Datensatz
+       (str "Hermannstrasse", hnr "9", plz "32609", ort "Huellhorst") -
+       sie kam nur nie an.
+
+       ABGESCHRIEBEN von den echten Aufrufern, nicht geraten:
+       `frontend/js/dealpilot-mb.js:603` schickt
+         { wert_stufe, external_ref, object: inputs() }
+       und `inputs()` (Z. 170) baut flache Felder, darunter
+       `objektart` UND `objart` - der Dienst liest `objektart`, der
+       DealPilot-Datensatz fuehrt `objart`. Wer nur durchreicht,
+       verliert die Objektart still.                                   */
+    const roh = body.object || body.objekt || body.dealpilot || null;
+    let objFeld = roh;
+    if (roh && typeof roh === 'object') {
+      objFeld = Object.assign({}, roh);
+      /* Der Dienst liest `objektart`; im Datensatz heisst sie `objart`. */
+      if (objFeld.objektart == null && objFeld.objart != null) objFeld.objektart = objFeld.objart;
+      if (objFeld.objart == null && objFeld.objektart != null) objFeld.objart = objFeld.objektart;
     }
 
     /* Die Stufe bestimmt, wie tief gerechnet wird. 3 = Wertermittlung
        nach ImmoWertV mit Boden-, Ertrags- und Sachwert. */
-    const nutzlast = Object.assign({}, body, {
+    const nutzlast = {
       wert_stufe: body.wert_stufe || 3,
       user_id: req.user.id
-    });
+    };
+    if (objFeld) nutzlast.object = objFeld;
+    if (body.external_ref) nutzlast.external_ref = body.external_ref;
+    if (body.address) nutzlast.address = body.address;
+    /* lat/lon durchreichen, damit ein Aufrufer mit eigenen Koordinaten
+       nicht am Geokodierer haengt (Backlog N60.26, Punkt 3). */
+    if (body.lat != null) nutzlast.lat = body.lat;
+    if (body.lon != null) nutzlast.lon = body.lon;
+    if (body.fast) nutzlast.fast = body.fast;
 
     const ctrl = new AbortController();
     const frist = setTimeout(function () { ctrl.abort(); }, 60000);
