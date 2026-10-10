@@ -51,10 +51,32 @@
     return s;
   }
 
+  /* ── v2084a · DIE STATUSFELDER LIEGEN FLACH, NICHT IN `data` ──────────
+   *
+   * HIER STAND NUR `obj.data._deal_won`. Gemessen am 10.10.2026 an der
+   * echten Antwort von `GET /objects?limit=500`: die 23 Einträge tragen
+   * **kein `data`-Feld** (0 von 23). Der Status steht flach und ohne
+   * Unterstrich:
+   *
+   *     deal_won: true/false      deal_lost: true/false
+   *     ankauf_kurz, ankauf_stichtag, lageklasse, dealpilot_score, …
+   *
+   * `obj.data || {}` ergab also immer `{}`, und damit war jedes Objekt
+   * **'open'** — alle 23, auch die acht gewonnenen.
+   *
+   * > Zusammen mit dem `items`-Fehler in `loadObjects()` war die Ansicht
+   * > doppelt kaputt: erst kam nichts an, und wäre etwas angekommen,
+   * > hätte alles in einer Spalte gelegen. Beides ohne Fehlermeldung.
+   *
+   * Beide Formen werden jetzt gelesen — flach zuerst, weil der Server
+   * so antwortet. Die `data`-Form bleibt, weil andere Aufrufer
+   * (`storage.js`-Spiegel, Einzelobjekt-Abruf) sie liefern. */
   function getStatus(obj) {
     const d = obj.data || {};
-    if (d._deal_won === true || d._deal_won === 'true') return 'won';
-    if (d._deal_lost === true || d._deal_lost === 'true') return 'lost';
+    const won  = (obj.deal_won  !== undefined) ? obj.deal_won  : d._deal_won;
+    const lost = (obj.deal_lost !== undefined) ? obj.deal_lost : d._deal_lost;
+    if (won === true || won === 'true') return 'won';
+    if (lost === true || lost === 'true') return 'lost';
     return 'open';
   }
 
@@ -126,7 +148,37 @@
         return [];
       }
       const data = await res.json();
-      _objects = Array.isArray(data.objects) ? data.objects : (Array.isArray(data) ? data : []);
+      /* ── v2084a · DIE ANTWORT HEISST `items`, NICHT `objects` ─────────
+       *
+       * HIER STAND `data.objects` mit `data` als Rückfall. Gemessen am
+       * 10.10.2026 an der echten Antwort von `GET /objects?limit=500`:
+       *
+       *     { "items": [ … 23 Objekte … ], "count": 23 }
+       *
+       * `data.objects` ist dort `undefined`, und `data` selbst ist kein
+       * Array — beide Zweige greifen nicht, `_objects` blieb **leer**.
+       *
+       * > Die ganze Ansicht „Alle Objekte" zeigte nichts: Karten, Liste
+       * > und Kanban. Und zwar ohne Fehler — `res.ok` war wahr, der
+       * > Rückfall lieferte ein gültiges leeres Array, und eine leere
+       * > Liste sieht aus wie ein leeres Portfolio. Aufgefallen beim
+       * > Nachmessen der neuen Kanban-Spalte: vier Spalten, alle mit
+       * > Anzahl 0, während die Seitenliste 23 Karten zeigte.
+       *
+       * Gesucht wird jetzt in dieser Reihenfolge, und `items` zuerst,
+       * weil der Server es so nennt. Die anderen Namen bleiben als
+       * Rückfall stehen — eine Antwortform, die sich einmal geändert
+       * hat, kann sich wieder ändern. */
+      _objects = Array.isArray(data.items) ? data.items
+        : Array.isArray(data.objects) ? data.objects
+        : Array.isArray(data.data) ? data.data
+        : Array.isArray(data) ? data : [];
+      if (!_objects.length && data && typeof data.count === 'number' && data.count > 0) {
+        /* Der Server zaehlt mehr, als hier ankommt — das ist ein Formfehler
+           und keine leere Liste. Sichtbar machen, nicht verschweigen. */
+        console.warn('[V260-01] Antwort trägt count=' + data.count
+          + ', aber keine erkannte Liste. Schlüssel: ' + Object.keys(data).join(','));
+      }
       return _objects;
     } catch(e) {
       console.warn('[V260-01] loadObjects:', e.message);
