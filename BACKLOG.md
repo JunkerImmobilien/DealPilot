@@ -1128,6 +1128,113 @@ man dann im Menü ein MFH hat, und wenn das geteilt ist, kann man die
 Einheiten auch separieren und die werden dann als Unterbaum angezeigt.
 Mit Vererben und allem."
 
+> ### Die Vererbung war SCHON GEBAUT — gemessen 10.10.2026
+>
+> Der Punkt sagt, ohne die Vererbungsliste werde *„jede Einheit eine
+> halbe Kopie"*. Die Liste existiert in `mfh-einheiten.js`, und sie ist
+> fachlich sauber getrennt:
+>
+> | | Gewerke |
+> |---|---|
+> | **nur Gebäude** (`GEB_IDS`) | Dach, Außenwand, Leitungen, Heizung |
+> | **Einheit eigen, sonst Gebäude** (`WE_IDS`) | Fenster, Bäder, Innenausbau, Grundriss |
+>
+> `punkteEinheit(e, geb)` rechnet damit und gibt sogar zurück, **wie
+> viele** Punkte geerbt wurden (`geerbt`); die Tabelle zeigt es als
+> „ganz geerbt" / „3 geerbt" / „eigen". Am echten `MOD_ELEMENTS` des
+> Kerns geprüft: **alle acht Gewerke sind genau einer Seite zugeordnet,
+> keine Überschneidung.** Die Trennung deckt sich mit § 5 WEG.
+>
+> *Ein offener Punkt, der nicht mehr offen ist, kostet jedes Mal eine
+> Messung — und wer ihn baut, baut doppelt.*
+>
+> ### Der echte Mangel lag woanders (`v2095`)
+>
+> `rndFuer()` übergab dem Kern **vier** Felder. `calcAll` liest **zehn**:
+> `baujahr, stichtag, gnd, modPoints, gewerkeBewertung, gewerkeWeights,
+> gewerkeRestlebensdauer, schaeden, applySchadensAbschlag, kernsaniert`.
+> Die sechs ungenannten liefen still in die Vorgaben. Zwei sind teuer,
+> am **echten** Kern nachgerechnet:
+>
+> | Fall (GND 80) | ohne `kernsaniert` | mit | Unterschied |
+> |---|---:|---:|---:|
+> | Bj 1975, 18 Punkte | 56,0 | 59,4 | **+3,4 Jahre** |
+> | Bj 1950, 20 Punkte | 56,0 | 56,4 | +0,4 Jahre |
+> | Bj 1960, 12 Punkte | 43,5 | 43,5 | kein |
+>
+> Der Kern sagt die Ursache selbst (`rnd-calc.js:896`): ohne die Angabe
+> gilt die Kappe **0,70 statt 0,90** der GND. Und der `stichtag` war auf
+> **heute** festgenagelt — sieben Jahre Stichtagsunterschied ergeben
+> 1,7 Jahre RND.
+>
+> Statt die Rangfolge ein **zweites** Mal zu schreiben, wird sie geholt:
+> `mapDealPilotObject(collectData())` — derselbe Weg, den
+> `deal-action.js:1813` nimmt. `rndBasis()` läuft **einmal je
+> Auswertung**, nicht je Einheit, weil `collectData()` das ganze
+> Formular liest. `rnd` bleibt eine Zahl (zwei Verbraucher rechnen
+> damit), die Herkunft reist als `rndInfo` daneben mit.
+>
+> Bewacht von `tools/mfh-rnd-eingabe-pruefen.mjs`: 16 Punkte, **14 echte
+> `calcAll`-Läufe** gegen den geladenen Kern, RC=0.
+>
+> ### Sichtbar gemacht (`v2095a`), im Browser nachgemessen
+>
+> Unter der Einheitentabelle steht jetzt:
+>
+> ```
+> Stichtag 10.10.2026 — heute (Verkehrswert-Stichtag) · GND 80 Jahre
+> ```
+>
+> Am laufenden Assistenten abgenommen (1280 px, Objektart MFH, Bj 1960,
+> dreimal „Weiter" per echtem Klickweg bis Schritt 4).
+>
+> ---
+>
+> ## ⚠ EINE FACHFRAGE, die Marcel gehört — nicht mir
+>
+> **Derselbe Wert wird unten per Haken angeboten als „Restnutzungsdauer
+> X Jahre in die AfA übernehmen (eigener Satz Y %)". Gerechnet ist er
+> aber mit `zweck='verkehrswert'`, also mit dem heutigen Stichtag.**
+> `mapDealPilotObject` nimmt den wirtschaftlichen Übergang nur bei
+> `zweck='afa'` — und der Kommentar im Kern sagt es selbst: *„Für
+> AfA-Gutachten ist der steuerlich relevante Betrachtungsbeginn zu
+> berücksichtigen."*
+>
+> Gerechnet (Bj 1960, GND 80, 12 Punkte, 400.000 € Gebäudeanteil):
+>
+> | Stichtag | RND | AfA-Satz | AfA je Jahr |
+> |---|---:|---:|---:|
+> | wirtschaftlicher Übergang 2021-09-01 | 44,62 J. | 2,24 % | 8.965 € |
+> | heute (Verkehrswert) | 43,47 J. | 2,30 % | 9.202 € |
+> | **Unterschied** | 1,15 J. | 0,06 %-Pkt. | **237 €** |
+>
+> **Bemerkenswert: der spätere Stichtag gibt den höheren AfA-Satz.** Die
+> Richtung ist also nicht zugunsten des Finanzamts, sondern des
+> Steuerpflichtigen — was die Frage nicht kleiner macht, nur anders.
+>
+> Zu entscheiden: rechnet der Assistent die RND für den **Verkehrswert**
+> oder für die **AfA** — oder zeigt er beide getrennt? Das ist eine
+> Bewertungsentscheidung. Bis dahin steht der Stichtag **sichtbar** da,
+> statt still zu wirken.
+>
+> ## Was noch fehlt
+>
+> - **Der Unterbaum im Menü.** Marcels Bild („wenn das geteilt ist, kann
+>   man die Einheiten auch separieren und die werden dann als Unterbaum
+>   angezeigt") ist nicht gebaut. Das Datenmodell trägt es schon:
+>   `window._dpMfh` führt `{ einheiten, gebaeude, gnd, aufgeteilt,
+>   sollAbJahr, stand }` — **`aufgeteilt`** ist genau sein „wenn das
+>   geteilt ist".
+> - **Ein RND-Gutachten je Einheit als Dokument.** Gerechnet wird je
+>   Einheit längst; was fehlt, ist die Ausgabe (PDF/Bericht) mit dem
+>   Modellvermerk je Einheit.
+> - **Kernsanierung je Einheit.** Sie erbt heute vom Gebäude. Eine
+>   einzelne kernsanierte Wohnung in einem sonst unsanierten Haus lässt
+>   sich nicht erfassen: `istKernsaniert()` sucht den Text „kernsanier"
+>   in den Werten, die MFH-Stufen heißen aber `0/h/v`. Auf den
+>   Einheitendaten wäre die Funktion also **immer `false`** — sie dort
+>   zu rufen hätte wie eine Prüfung ausgesehen und nie gegriffen.
+
 Kernfrage für die Umsetzung: **Vererbung**. Was gilt je Einheit eigen
 (Fläche, Zustand, Miete, Vertrag, Bilder, RND) und was erbt sie vom
 Gebäude (Baujahr, Bodenrichtwert, Grundstück, Modernisierung am Dach)?
