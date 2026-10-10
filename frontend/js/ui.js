@@ -1046,6 +1046,20 @@ function _buildAIPayload() {
          `steuer`. Beide hier noch einmal zu senden waere eine Doppelung,
          die beim naechsten Umbau auseinanderlaeuft - gepruefte Stelle
          schlaegt bequeme Stelle. */
+      /* v2068: das Ergebnis des RND-Wizards, falls er gelaufen ist. Es
+         ist etwas anderes als `steuer.afa_rnd_jahre`: dort steht, was
+         der Nutzer eingetragen hat, hier was die Bauteile hergeben.
+         Weichen beide ab, ist das ein Befund und keine Doppelung. */
+      try {
+        var _r = window._dpRnd;
+        if (_r && _r.rnd_jahre) {
+          z.restnutzungsdauer_berechnet = {
+            jahre: _r.rnd_jahre, gesamtnutzungsdauer: _r.gnd_jahre || null,
+            alter_jahre: _r.alter_jahre || null, verfahren: _r.verfahren || null,
+            stand: _r.stand || null
+          };
+        }
+      } catch (e) {}
       return z;
     })(),
     dealscore: dealscoreSnap || {},

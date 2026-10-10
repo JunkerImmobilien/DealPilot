@@ -2002,6 +2002,41 @@ window.DealPilotDealAction = (function() {
       }
     } catch (e) { console.warn('[RND] Result-Enrichment fehlgeschlagen:', e); }
 
+    /* ═══ v2068 · DAS ERGEBNIS WIRD FESTGEHALTEN, NICHT NUR GEZEIGT ════
+       Marcel, 10.10.2026: „sind alle rnd daten … mit drin? greift das
+       auch bei der pilot analyse?"
+
+       GEMESSEN am Export ueber 22 Objekte: `afa_rnd_jahre` war bei
+       NULL davon belegt. Der Wizard liest `mod_*` und `ausst_*`, rechnet
+       die Restnutzungsdauer nach Anlage 2 - und zeigte sie in einem
+       Fenster, das man wegklickt. Danach war sie weg.
+
+         > Eine Zahl, die nur im Fenster steht, ist fuer jeden anderen
+         > Weg nicht vorhanden: nicht im Export, nicht im Piloten, nicht
+         > im naechsten Jahr.
+
+       WAS HIER NICHT PASSIERT: `afa_rnd_jahre` wird NICHT ueberschrieben.
+       Das Feld ist eine Eingabe des Nutzers und kann eine andere Zahl
+       tragen - etwa aus einem echten Gutachten. Der Wizard ist ein
+       Vorschlag, und ein Vorschlag, der sich selbst einsetzt, ist keiner.
+
+       Festgehalten wird das ERGEBNIS mit seiner Herkunft, nach dem
+       Muster von `_mfh`: Fenster-Merker, den `storage.js` beim Speichern
+       mitnimmt. */
+    try {
+      window._dpRnd = {
+        rnd_jahre: result.final_rnd || null,
+        gnd_jahre: result.gnd || null,
+        alter_jahre: result.alter || null,
+        punkte: (result.modernisierung && result.modernisierung.punkte) || null,
+        verfahren: result.verfahren || 'Anlage 2 ImmoWertV',
+        /* Der AfA-Vergleich, falls er gerechnet werden konnte. */
+        afa_vorteil_eur: afa && afa.barwert_vorteil != null ? afa.barwert_vorteil : null,
+        stand: new Date().toISOString().slice(0, 10)
+      };
+      if (typeof window.markDirty === 'function') window.markDirty();
+    } catch (e) { try { console.warn('[RND] Ergebnis nicht gemerkt', e); } catch (x) {} }
+
     _renderRndResultModal(gutachtenState, result, afa);
   }
 

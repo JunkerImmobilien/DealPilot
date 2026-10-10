@@ -277,6 +277,12 @@ function collectData() {
   if (ekNk) d['_ek_ist_nk'] = ekNk.checked;
   /* v1448: Einheitenliste des Mehrfamilienhauses (mfh-einheiten.js) */
   if (window._dpMfh && window._dpMfh.einheiten && window._dpMfh.einheiten.length) d._mfh = window._dpMfh;
+  /* v2068: das Ergebnis des RND-Wizards (deal-action.js). Gleiches
+     Muster wie `_mfh` - es haengt an einem Fenster-Merker, nicht an
+     einem Formularfeld, und war deshalb nach dem Schliessen des
+     Fensters weg. `afa_rnd_jahre` bleibt unberuehrt: das ist die
+     EINGABE des Nutzers, dies hier der VORSCHLAG des Wizards. */
+  if (window._dpRnd && window._dpRnd.rnd_jahre) d._rnd = window._dpRnd;
   /* v2030: der eingefrorene Ankauf-Stand (ankauf.js). Gleiches Muster
      wie `_mfh` - der Zustand haengt an einem Fenster-Merker, nicht an
      einem zweiten Ladeweg. `daten` wird mitgeschrieben, aber NIE hier
@@ -564,6 +570,10 @@ function loadData(d) {
   if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
   /* v1448: Einheitenliste - fehlt sie, ist sie leer (sonst erbte das Objekt die des vorigen) */
   window._dpMfh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh : null;
+  /* v2068: RND-Ergebnis. Fehlt es, ist es NULL - sonst erbte das
+     geladene Objekt die Restnutzungsdauer des vorigen, und zwar eine,
+     die zu seinen Bauteilen gar nicht passt. */
+  window._dpRnd = (d._rnd && d._rnd.rnd_jahre) ? d._rnd : null;
   /* v2030: Ankauf-Stand. Fehlt er, ist er NULL - sonst erbte das
      geladene Objekt den Stand des vorigen, und zwar einen, der auf
      eine fremde Adresse zeigt. */

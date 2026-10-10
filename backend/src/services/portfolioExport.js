@@ -156,6 +156,22 @@ const STRUKTUREN = {
       _kpis_bwk_y: 'Bewirtschaftungskosten pro JAHR in Euro'
     }
   },
+  _rnd: {
+    was: 'Das Ergebnis des RND-Wizards nach Anlage 2 ImmoWertV - der VORSCHLAG '
+       + 'aus den Bauteilen, nicht die Eingabe des Nutzers.',
+    nicht_verwechseln_mit: '`afa_rnd_jahre` im Reiter Steuer: dort steht, was der '
+       + 'Nutzer angesetzt hat (etwa aus einem Gutachten). Weichen beide ab, '
+       + 'ist das ein Befund und kein Fehler.',
+    felder: {
+      rnd_jahre: 'Restnutzungsdauer in Jahren',
+      gnd_jahre: 'Gesamtnutzungsdauer in Jahren (Anlage 1)',
+      alter_jahre: 'Alter zum Stichtag',
+      punkte: 'Modernisierungspunkte nach Anlage 2',
+      verfahren: 'welches Verfahren gerechnet wurde',
+      afa_vorteil_eur: 'Barwertvorteil der kuerzeren AfA gegenueber dem Standardsatz',
+      stand: 'Datum der Berechnung'
+    }
+  },
   _ds2_: {
     was: 'Investor Deal Score 2.0 - Score, Kategorien und ob er gerechnet wurde.'
   },
