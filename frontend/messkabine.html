@@ -71,7 +71,20 @@
       dp_karten_stil        '' · zeile · kartei · buetten
       dp_objkarte_stil      '' · bordkarte · kante · datenzeile · ampel ·
                             kennzahlen · minimal
-      dp_karten_variante    '' · v1 … v6   (die Hell-Fassungen)
+      dp_karten_variante    '' · v1 … v6   (Hell-Fassungen der Karten)
+
+  v2085a · DREI ACHSEN LIEGEN IM JSON `dp_user_settings`, nicht in
+  eigenen Schlüsseln. v2085 hatte `theme` auf `dp_karten_variante`
+  geschrieben — der erste echte Lauf meldete `angefordert.theme=v2`
+  gegen `attribute.theme=null` und hat den Fehler selbst gezeigt.
+
+      ui_theme     '' · kontor · panel · kanzlei · boarding · konsole
+      ui_cards     kompakt · '' · wallet · …
+      ui_surface   (siehe ui-varianten.js)
+
+  Das JSON wird GEPATCHT, nicht ersetzt — dort stehen auch die
+  Nutzerdaten. Wer es überschreibt, löscht Einstellungen, die er
+  nicht prüft.
 
   `undefined` heißt NICHT ANFASSEN — alte Aufrufe bleiben gültig und
   die Wahl des Nutzers unberührt. `''` heißt ausdrücklich abwählen.
@@ -112,7 +125,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2085</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2085a</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1044,16 +1057,56 @@
    * ausdrücklich „abwählen" und entfernt den Merker.
    */
   var MERKER = {
-    layout:    'dp_layout',
-    kartenstil:'dp_karten_stil',
-    objkarte:  'dp_objkarte_stil',
-    theme:     'dp_karten_variante'
+    layout:         'dp_layout',
+    kartenstil:     'dp_karten_stil',
+    objkarte:       'dp_objkarte_stil',
+    kartenvariante: 'dp_karten_variante'
   };
 
   function setzeEinen(schluessel, wert){
     try {
       if (wert === '' || wert === null) window.localStorage.removeItem(schluessel);
       else window.localStorage.setItem(schluessel, wert);
+    } catch (e) {}
+  }
+
+  /* ── v2085a · DAS THEME LIEGT IM JSON, NICHT IN EINEM EIGENEN SCHLUESSEL
+   *
+   * v2085 hat `theme` auf `dp_karten_variante` geschrieben und die Werte
+   * `v1…v6` dokumentiert. Der erste echte Lauf hat gezeigt, dass das
+   * falsch war — und zwar durch das Feld, das genau dafuer eingebaut
+   * wurde:
+   *
+   *     angefordert: { theme: 'v2' }
+   *     attribute:   { theme: null }      <- kam nicht an
+   *
+   * Gemessen: `data-ui-theme` setzt `ui-varianten.js:217` aus dem Feld
+   * `ui_theme` in **`localStorage['dp_user_settings']`** (einem JSON),
+   * und die gueltigen Werte sind
+   *
+   *     '' · kontor · panel · kanzlei · boarding · konsole
+   *
+   * `dp_karten_variante` mit `v1…v6` ist etwas ANDERES: die Hell-
+   * Fassungen der Karten (`hell-varianten.js`). Zwei Begriffe, zwei
+   * Speicher, ein verwechselter Name.
+   *
+   * > Ein Merker, den man setzt, ohne das Attribut nachzusehen, ist eine
+   * > Behauptung. Der Lauf hat meinen eigenen Fehler in der ersten
+   * > Messung gemeldet — deshalb bleibt `attribute` im Ergebnis, auch
+   * > wenn jetzt alles ankommt.
+   *
+   * Das JSON wird GEPATCHT, nicht ersetzt: in `dp_user_settings` stehen
+   * auch `ui_cards`, `ui_surface`, `ui_form` und die Nutzerdaten. Wer es
+   * ueberschreibt, loescht Einstellungen, die er nicht prueft.
+   */
+  function setzeJsonFeld(feld, wert){
+    try {
+      var s = {};
+      try { s = JSON.parse(window.localStorage.getItem('dp_user_settings') || '{}') || {}; }
+      catch (e) { s = {}; }
+      if (wert === '' || wert === null) delete s[feld];
+      else s[feld] = wert;
+      window.localStorage.setItem('dp_user_settings', JSON.stringify(s));
     } catch (e) {}
   }
 
@@ -1065,11 +1118,17 @@
        in Ruhe - sonst wuerde jeder Lauf die Wahl des Nutzers loeschen. */
     if (extra.kartenstil !== undefined) setzeEinen(MERKER.kartenstil, extra.kartenstil);
     if (extra.objkarte   !== undefined) setzeEinen(MERKER.objkarte,   extra.objkarte);
-    if (extra.theme      !== undefined) {
-      setzeEinen(MERKER.theme, extra.theme);
+    if (extra.kartenvariante !== undefined) {
+      setzeEinen(MERKER.kartenvariante, extra.kartenvariante);
       /* hell-varianten.js zeigt sich nur mit gesetztem Schalter. */
-      try { window.localStorage.setItem('dp_karten_schalter', extra.theme ? '1' : '0'); } catch (e) {}
+      try {
+        window.localStorage.setItem('dp_karten_schalter', extra.kartenvariante ? '1' : '0');
+      } catch (e) {}
     }
+    /* Die drei Achsen aus `dp_user_settings`. */
+    if (extra.theme   !== undefined) setzeJsonFeld('ui_theme',   extra.theme);
+    if (extra.cards   !== undefined) setzeJsonFeld('ui_cards',   extra.cards);
+    if (extra.surface !== undefined) setzeJsonFeld('ui_surface', extra.surface);
   }
 
   /* Was gerade eingestellt ist - fuer die Beschriftung und das Protokoll.
@@ -1080,6 +1139,9 @@
       if (extra.kartenstil) t.push('ks:' + extra.kartenstil);
       if (extra.objkarte)   t.push('ok:' + extra.objkarte);
       if (extra.theme)      t.push('th:' + extra.theme);
+      if (extra.kartenvariante) t.push('kv:' + extra.kartenvariante);
+      if (extra.cards)      t.push('cd:' + extra.cards);
+      if (extra.surface)    t.push('sf:' + extra.surface);
     }
     return t.join(' · ');
   }
@@ -1126,6 +1188,9 @@
     if (opt.kartenstil !== undefined) extra.kartenstil = opt.kartenstil;
     if (opt.objkarte   !== undefined) extra.objkarte   = opt.objkarte;
     if (opt.theme      !== undefined) extra.theme      = opt.theme;
+    if (opt.kartenvariante !== undefined) extra.kartenvariante = opt.kartenvariante;
+    if (opt.cards      !== undefined) extra.cards      = opt.cards;
+    if (opt.surface    !== undefined) extra.surface    = opt.surface;
     await lade(opt.breite || 390, opt.layout === undefined ? '' : opt.layout, opt.hoehe, extra);
     var z = ziel();
     var erg = {
@@ -1142,7 +1207,10 @@
         layout:     z.d.documentElement.getAttribute('data-dp-layout'),
         kartenstil: z.d.documentElement.getAttribute('data-dp-kartenstil'),
         objkarte:   z.d.documentElement.getAttribute('data-dp-objkarte'),
-        theme:      z.d.documentElement.getAttribute('data-ui-theme')
+        theme:      z.d.documentElement.getAttribute('data-ui-theme'),
+        cards:      z.d.documentElement.getAttribute('data-ui-cards'),
+        surface:    z.d.documentElement.getAttribute('data-ui-surface'),
+        kartenvariante: z.d.documentElement.getAttribute('data-dp-karte')
       },
       iw: z.win.innerWidth,
       start: messe(z.d, z.win, 'Start')
