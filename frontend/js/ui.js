@@ -868,11 +868,49 @@ function _buildAIPayload() {
        `null` statt `0`: ein nicht erfasstes Feld darf nicht wie eine
        gemessene Null aussehen (CLAUDE.md: Number(null) ist 0 und
        besteht Number.isFinite). `txt()` gibt leere Felder als null. */
-    steuer: {
-      zve: parseDe(g('zve')), grenzsteuersatz_pct: parseDe(g('grenz')),
-      afa_satz_pct: parseDe(g('afa_satz')), afa_rnd_jahre: parseDe(g('afa_rnd_jahre')),
-      gebaeudeanteil_pct: parseDe(g('geb_ant')), afa_eigen_pct: parseDe(g('afa_eigen'))
-    },
+    /* ═══ v2067a · SANIERUNG, § 7b UND ERBPACHT REISTEN NICHT MIT ═══════
+       Marcel, 10.10.2026: „Was ist mit den daten aus dem tab Steuer?
+       werden diese uebergeben?"
+
+       GEMESSEN: die Grundlagen ja - zve, Grenzsteuersatz, AfA-Satz,
+       Restnutzungsdauer und der BMF-Gebaeudeanteil standen hier. Sechs
+       Felder aus demselben Reiter nicht:
+
+         san              Sanierungskosten
+         san_ust          brutto oder netto
+         san_tax_years    Verteilung (§ 82b EStDV: 2 bis 5 Jahre)
+         san_tax_active   ob sie steuerlich angesetzt werden
+         afa_sonder7b_aktiv   die Sonder-AfA nach § 7b
+         erbpacht / erbbauzins
+
+       Das sind keine Nebensaechlichkeiten: eine Sanierung ueber fuenf
+       Jahre verteilt aendert den Cashflow nach Steuer in jedem einzelnen
+       davon, und ein Erbbaurecht aendert, was man ueberhaupt kauft. Ein
+       Pilot, der beides nicht kennt, beurteilt ein anderes Objekt.
+
+       Die RECHNUNG bleibt unberuehrt - hier wird nur gelesen. */
+    steuer: (function () {
+      var an = function (id) { var e = document.getElementById(id); return !!(e && e.checked); };
+      var s = {
+        zve: parseDe(g('zve')), grenzsteuersatz_pct: parseDe(g('grenz')),
+        afa_satz_pct: parseDe(g('afa_satz')), afa_rnd_jahre: parseDe(g('afa_rnd_jahre')),
+        gebaeudeanteil_pct: parseDe(g('geb_ant')), afa_eigen_pct: parseDe(g('afa_eigen'))
+      };
+      var sanKosten = parseDe(g('san'));
+      if (sanKosten) {
+        s.sanierung = {
+          kosten_eur: sanKosten,
+          betrag_ist: txt('san_ust') || null,          /* brutto | netto */
+          steuerlich_angesetzt: an('san_tax_active'),
+          verteilung_jahre: txt('san_tax_years') || null   /* auto | 2 … 5 */
+        };
+      }
+      if (an('afa_sonder7b_aktiv')) s.sonder_afa_7b = true;
+      if (an('erbpacht')) {
+        s.erbbaurecht = { ja: true, erbbauzins_eur_jahr: parseDe(g('erbbauzins')) || null };
+      }
+      return s;
+    })(),
     bewirtschaftung: {
       hausgeld_umlagefaehig: parseDe(g('hg_ul')), hausgeld_nicht_umlagefaehig: parseDe(g('hg_nul')),
       grundsteuer: parseDe(g('grundsteuer')), weg_ruecklage: parseDe(g('weg_r')),
@@ -950,10 +988,53 @@ function _buildAIPayload() {
       wirtschaftlicher_uebergang: txt('wirtschaftlicher_uebergang'),
       vermietungsstand: txt('vermstand')
     },
-    zustand: {
-      ds2_zustand: txt('ds2_zustand'), energieklasse: txt('ds2_energie'),
-      modernisierung: txt('modernis'), modernisierungspunkte: parseDe(g('mod_punkte'))
-    },
+    /* ═══ v2067 · DIE ACHT BAUTEILE EINZELN, NICHT NUR IHRE SUMME ═══════
+       Marcel, 10.10.2026: „sind alle rnd daten und zustandsfelder sowie
+       auch alles aus dem bmf rechner mit drin? greift das auch bei der
+       pilot analyse und bei dem cockpit piloten?"
+
+       GEMESSEN: im EXPORT stehen 22 Zustandsfelder je Objekt (mod_* fuer
+       acht Bauteile, ausst_*, qual_*, standardstufe). Hier reisten vier:
+       Gesamtzustand, Energieklasse, ein Freitext und die PUNKTSUMME.
+
+       Eine Summe sagt nicht, WO die Punkte fehlen. 11 von 20 kann heissen
+       „Dach und Fenster neu, Leitungen von 1960" oder „alles mittelmaessig"
+       - fuer die Beurteilung eines Kaufpreises sind das zwei verschiedene
+       Objekte, und der Pilot konnte sie nicht unterscheiden.
+
+       Die acht Bauteile sind dieselben wie in Anlage 2 ImmoWertV und wie
+       im RND-Wizard (`_getRndPrefill`, v1856) - gelesen wird dasselbe
+       Feld, nicht ein zweites daneben.
+
+       Stufen: "0" nicht modernisiert · "h" teilweise erneuert ·
+       "v" erneuert/modern. Sie reisen als KLARTEXT mit, weil ein "h" im
+       Prompt nichts bedeutet. */
+    zustand: (function () {
+      var STUFE = { '0': 'nicht modernisiert', 'h': 'teilweise erneuert', 'v': 'erneuert/modern' };
+      var TEILE = { mod_dach: 'Dach', mod_fenster: 'Fenster', mod_leitungen: 'Leitungen',
+                    mod_heizung: 'Heizung', mod_aussenwand: 'Aussenwaende',
+                    mod_baeder: 'Baeder', mod_innenausbau: 'Innenausbau',
+                    mod_grundriss: 'Grundriss' };
+      var bauteile = {}, n = 0;
+      Object.keys(TEILE).forEach(function (id) {
+        var v = String(g(id) || '').trim();
+        if (!v) return;
+        bauteile[TEILE[id]] = STUFE[v] || v;
+        n++;
+      });
+      var z = {
+        ds2_zustand: txt('ds2_zustand'), energieklasse: txt('ds2_energie'),
+        modernisierung: txt('modernis'), modernisierungspunkte: parseDe(g('mod_punkte'))
+      };
+      /* Nur mitschicken, was wirklich ausgefuellt ist - ein leerer Block
+         sieht nach Angabe aus und ist keine. */
+      if (n) z.bauteile = bauteile;
+      /* `standardstufe` steht schon in `boden`, `afa_rnd_jahre` in
+         `steuer`. Beide hier noch einmal zu senden waere eine Doppelung,
+         die beim naechsten Umbau auseinanderlaeuft - gepruefte Stelle
+         schlaegt bequeme Stelle. */
+      return z;
+    })(),
     dealscore: dealscoreSnap || {},
     /* v947-mbsource: NUR die Objekt-ID. Den Marktbericht holt /ai/analyze selbst
      * aus dem mb-Backend — der Browser soll Marktdaten weder faelschen noch
