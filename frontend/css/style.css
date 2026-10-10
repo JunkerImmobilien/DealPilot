@@ -8136,10 +8136,56 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   cursor: help;
 }
 
+/* ── v2089 · DAS DS2-ETIKETT WAR UNLESBAR (Backlog N60.17) ─────────────
+ *
+ * HIER STAND `background: color-mix(in srgb, var(--gold) 14%, transparent)`
+ * mit `color: var(--gold)`. Auf einer weissen Karte ergibt 14 % Gold auf
+ * durchsichtig fast wieder Weiss — und Gold auf Weiss ist nicht lesbar.
+ *
+ * GEMESSEN am 10.10.2026 in der Messkabine, 1180 px, Reiter Objekt,
+ * acht sichtbare Etiketten mit dem Text „DS2":
+ *
+ *     Gold rgb(201,168,76) auf rgb(255,255,255)
+ *     Kontrast 2,29   ·   Schwelle 4,5   ·   9px/700
+ *
+ * Die Schwelle ist 4,5 und nicht 3,0, weil 9 px keine grosse Schrift
+ * sind (gross = ab 24 px, oder ab 18,66 px bei Fettung).
+ *
+ * ── ZWEIMAL AN DER FALSCHEN STELLE GESUCHT, BEIDES NOTIERT ───────────
+ *
+ * 1. Zuerst im Reiter Pilot-Analyse gemessen: 42 Etiketten gefunden,
+ *    NULL sichtbar. „Null sichtbar" war kein Befund, sondern der falsche
+ *    Ort — im Reiter Objekt sind es acht.
+ * 2. Dann angenommen, in der DealPilot-Ansicht liege das Etikett auf
+ *    Obsidian und sei dort lesbar. Gemessen: der Grund ist **auch dort
+ *    Weiss**, Kontrast ebenfalls 2,29. Die Etiketten sitzen in
+ *    FORMULARKARTEN, und die sind in beiden Ansichten hell — Obsidian
+ *    traegt Kopf, Menue und Seitenleiste, nicht die Karten.
+ *
+ * ── WARUM DER GRUND DUNKEL WIRD UND NICHT DIE SCHRIFT ────────────────
+ *
+ * Marcel am 10.10.2026: „die Pillen und Texts Gold". Gold dunkler zu
+ * faerben waere der naheliegende Weg, kostet aber genau das Gold: die
+ * hellste Toenung, die 4,5 auf Weiss haelt, ist #7a6220 — ein Oliv.
+ *
+ * Gerechnet, was Gold ERHAELT:
+ *     #C9A84C auf #1A1714   7,81   haelt
+ *     #C9A84C auf #2A2727   6,48   haelt
+ *     #7a6220 auf Weiss     5,84   haelt, ist aber kein Gold mehr
+ *
+ * Also traegt das Etikett jetzt einen dunklen Grund — dieselbe Anmutung
+ * wie die Pillen auf der Objektkarte, wo Gold auf dunkel immer stand.
+ * `#1A1714` ist die Tinte der Marke, nicht Obsidian: CLAUDE.md verbietet
+ * `--ch` AUF Obsidian, hier liegt es auf einer hellen Karte.
+ *
+ * Die Hell-Themes behalten ihre eigene Fassung (Z. 38142 ff.:
+ * `color:#3B352D` auf `#F2EFE9`) — dort ist die helle Gestaltung
+ * gewollt, und jene Regel ist spezifischer und steht spaeter.         */
 .ds2-tag {
   display: inline-block;
-  background: color-mix(in srgb, var(--gold) 14%, transparent);
-  color: var(--gold);
+  background: #1A1714;
+  color: var(--wl-c9a84c, #C9A84C);
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, transparent);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -27070,14 +27116,43 @@ aside.sidebar .sb-actions-trigger .sb-actions-arrow {
   display: block;
   color: var(--gold, #C9A84C);
 }
-/* DS2-Tag im Card-Titel passend zum hellen Card */
+/* ── v2089 · DIE ZWEITE FASSUNG DESSELBEN ETIKETTS (Backlog N60.17) ────
+ *
+ * HIER STAND „DS2-Tag im Card-Titel passend zum hellen Card" mit
+ * `background: color-mix(gold 14%, transparent)` und
+ * `color: var(--gold-3, #9a7f33)` — beides `!important`.
+ *
+ * DIESE REGEL HAETTE DIE KORREKTUR OBEN STILL AUSGEHEBELT, wo immer
+ * `.ct-pro` ein Vorfahr ist: sie ist spezifischer, steht spaeter UND
+ * traegt `!important`. Gefunden, weil ich nach dem ersten Eingriff alle
+ * `ds2-tag`-Regeln gegreppt habe statt nur die eine zu aendern.
+ *
+ * GERECHNET, bevor hier etwas stand (color-mix auf transparent heisst:
+ * 14 % Gold mit 86 % des darunterliegenden Grundes):
+ *
+ *     #9a7f33 auf rgb(247,243,230)  k=3,47   faellt
+ *     #9a7f33 auf rgb(244,235,211)  k=3,24   faellt   (Kartengrund)
+ *
+ * Also war die zweite Fassung ebenfalls unlesbar, nur etwas weniger.
+ * Und `--gold-3` ist ohne Whitelabel gar nicht gesetzt — es greift immer
+ * der Fallback `#9a7f33` (`whitelabel-override.js:526` setzt es erst beim
+ * Mandanten, als `_darken(akzent, 26)`).
+ *
+ * Jetzt traegt sie dieselbe Fassung wie die Regel oben: Gold auf Tinte,
+ * k=7,81. ZWEI Aussehen fuer dasselbe Etikett waren der eigentliche
+ * Fehler — ein Kuerzel, das je nach Karte anders aussieht, liest sich
+ * wie zwei verschiedene Dinge.
+ *
+ * Nicht angetastet: die Fassung der vier Hell-Themes (Z. 38209 ff.,
+ * `#3B352D` auf `#F2EFE9`). Die ist dunkel-auf-hell, besteht, und
+ * gewinnt dort auf Spezifitaet gegen beide Regeln hier.              */
 .ct-pro .ds2-tag {
   font-size: 9px !important;
   padding: 2px 6px !important;
   letter-spacing: 0.3px !important;
-  background: color-mix(in srgb, var(--gold) 14%, transparent) !important;
-  color: var(--gold-3, #9a7f33) !important;
-  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent) !important;
+  background: #1A1714 !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, transparent) !important;
   border-radius: 4px !important;
   margin-left: 6px;
   font-weight: 700;
