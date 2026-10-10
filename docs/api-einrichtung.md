@@ -17,7 +17,26 @@ Geheimnis wie ein Passwort.
 | Basis (Produktion) | `https://app.dealpilot.immo/api/v1` |
 | Kopfzeile | `x-api-key: <schlüssel>` |
 | Grenze | **120 Aufrufe je Minute** je Schlüssel |
-| Voraussetzung | aktiver **Pro-Plan** am Konto |
+| Voraussetzung | aktiver **Pro-Plan** am Konto — siehe Warnung unten |
+
+> ### ⚠ Gemessen am 10.10.2026: der Plan blockiert noch
+>
+> Ein frisch angelegter Schlüssel wird **erkannt**, der Aufruf endet aber
+> mit **403 · „API access requires an active Pro plan"**.
+>
+> Der Grund steht in `backend/src/middleware/auth.js`:
+> ```js
+> const PRO_PLAN_IDS = ['pro'];
+> ```
+> Das Konto trägt auf Staging den Plan **„Partner"**, und der steht nicht
+> in dieser Liste. **Ein 403 heißt hier also nicht „Schlüssel falsch".**
+>
+> Zwei Wege, beide sind eine Produktentscheidung:
+> 1. `'partner'` in `PRO_PLAN_IDS` aufnehmen (eine Zeile), oder
+> 2. das Konto auf `pro` setzen (Eingriff in die Datenbank).
+>
+> Bis das entschieden ist, laufen alle Aufrufe über die **angemeldete
+> Sitzung** statt über den Schlüssel.
 
 Der Schlüssel beginnt mit `dpk_live_`. Er ersetzt den
 `Authorization: Bearer …`-Kopf — **beides zusammen ist nicht nötig.**
