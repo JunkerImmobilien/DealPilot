@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092c</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092d</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -2000,6 +2000,12 @@
 
   window.DPM = {
                  matrix: matrix, matrixStand: matrixStand, varianten: VARIANTEN,
+                 /* v2092c: mitexportiert, damit der Erkenner EINZELN
+                    befragbar ist. Ein Erkenner, den man nur im Lauf sieht,
+                    laesst sich nicht von "findet nichts" unterscheiden -
+                    genau daran ist die tote webkitOverflowScrolling-Weiche
+                    so lange unentdeckt geblieben. */
+                 deklariertAbsichtlich: deklariertAbsichtlich,
                  pruefeAnsicht: pruefeAnsicht, pruefSelbsttest: pruefSelbsttest,
                  apBedienbar: apBedienbar, apUeberlauf: apUeberlauf,
                  apQuerScroller: apQuerScroller, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
