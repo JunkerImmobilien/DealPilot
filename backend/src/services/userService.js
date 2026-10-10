@@ -104,8 +104,10 @@ async function gewaehreTestphase(userId, email) {
  */
 async function authenticate({ email, plainPassword, ipAddress }) {
   const emailLower = email.toLowerCase().trim();
+  /* v2094: `email_verified_at` kommt mit, um die zwei Gruende fuer
+     is_active=false auseinanderzuhalten - siehe unten. */
   const r = await query(
-    `SELECT id, email, password_hash, name, role, is_active
+    `SELECT id, email, password_hash, name, role, is_active, email_verified_at
      FROM users WHERE email = $1`,
     [emailLower]
   );
@@ -134,8 +136,58 @@ async function authenticate({ email, plainPassword, ipAddress }) {
     } catch (e) { /* nicht kritisch */ }
     throw new HttpError(401, 'Invalid email or password');
   }
+  /* ── v2094 · „ACCOUNT IS DISABLED" WAR DIE FALSCHE AUSKUNFT ──────────
+   *
+   * Hier stand genau ein Satz fuer ZWEI voellig verschiedene Lagen, und
+   * dazu auf Englisch in einer deutschen App:
+   *
+   *     throw new HttpError(403, 'Account is disabled');
+   *
+   * GEMESSEN am 10.10.2026 fuer Backlog N60.3 („vorher messen, was
+   * email_verified heute tatsaechlich blockiert"):
+   *
+   *   · `email_verified_at` blockiert NICHTS. Die Spalte existiert seit
+   *     Migration 003, aber kein Pfad liest sie fuer die Zugangsgewaehrung
+   *     - nur Adminlisten und die Statistik.
+   *   · Der Riegel ist `users.is_active`. `registerWithVerify.js` legt den
+   *     Nutzer mit `is_active=false` an, und erst der Klick auf den
+   *     Bestaetigungslink setzt ihn auf true.
+   *   · Also bekommt JEDER frisch Registrierte, der sich vor dem Klick
+   *     anmeldet, „Account is disabled" zu lesen.
+   *
+   * Das klingt wie eine Sperre durch uns. Tatsaechlich fehlt nur ein
+   * Klick in einer Mail, die im Postfach liegt. Die Auskunft schickt den
+   * Nutzer damit in den Support statt in sein Postfach.
+   *
+   * Die beiden Lagen lassen sich unterscheiden, und zwar genau an der
+   * Spalte, die bisher nichts tat: wer **nie** bestaetigt hat, hat
+   * `email_verified_at IS NULL`. Wer bestaetigt hatte und jetzt inaktiv
+   * ist, wurde wirklich deaktiviert.
+   *
+   * Das ist zugleich die Grundlage, die N60.3 braucht: eine Gnadenfrist
+   * muss „noch nicht bestaetigt" von „abgeschaltet" trennen koennen.
+   * Ohne diese Unterscheidung kann sie nicht gebaut werden.            */
   if (!user.is_active) {
-    throw new HttpError(403, 'Account is disabled');
+    if (!user.email_verified_at) {
+      const err = new HttpError(403,
+        'Deine E-Mail-Adresse ist noch nicht bestätigt. Wir haben dir einen '
+        + 'Bestätigungslink geschickt — bitte sieh in dein Postfach, auch im Spam-Ordner.');
+      /* Maschinenlesbar, damit das Frontend den Knopf „Mail erneut senden"
+         zeigen kann statt den Text zu zerlegen.
+
+         `err.email` stand hier auch einmal — und waere ein TOTES FELD
+         gewesen: der Fehlerhandler reicht nur `error` und `code` weiter.
+         Die Adresse hat das Frontend ohnehin, sie stand im Anmeldeformular.
+
+         Die Reihenfolge ist Absicht: diese Auskunft kommt ERST NACH der
+         Passwortpruefung. Wer das Passwort nicht kennt, erfaehrt nicht,
+         ob die Adresse existiert oder nur unbestaetigt ist. */
+      err.code = 'EMAIL_NOT_VERIFIED';
+      throw err;
+    }
+    const err = new HttpError(403, 'Dieser Zugang ist deaktiviert. Bitte wende dich an den Support.');
+    err.code = 'ACCOUNT_DISABLED';
+    throw err;
   }
 
   // V204 H6: Erfolg → Fehlversuche zurücksetzen
