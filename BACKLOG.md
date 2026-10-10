@@ -740,7 +740,56 @@ nachgelesen, Pilot-Analyse (10.259 Zeichen) und Foto **unverändert**.
 > nicht** — es ist gültige Syntax, der Name fällt erst zur Laufzeit auf.
 > Genau dafür ist der Lauf im Container da.
 
-#### N60.8-alt · Mietverträge — vor Schnittstellen und Exporten
+#### N60.8-alt · MINIMUM ERLEDIGT 10.10.2026 (`v2087`) — die Fachliste bleibt
+
+> ### Drei Felder auf Objektebene (`v2087`)
+>
+> Marcels Minimum — **Vertragsart, Beginn, letzte Erhöhung** — steht jetzt
+> im Reiter Miete, für **jede** Objektart: `mv_art`, `mv_beginn`,
+> `mv_letzte_erhoehung`. Dieselben Feldnamen wie in `_mfh.einheiten[]`.
+>
+> **Der Befund vorher:** die Wohnungen im MFH hatten das seit `v2021`,
+> die Objektebene nicht — **null** Treffer für `mv_art` in `index.html`.
+> Für eine ETW, ein EFH oder ein einzelvermietetes Objekt gab es gar
+> keine Vertragsangabe.
+>
+> **Keine zweite Liste:** die elf Vertragsformen stehen in
+> `mfh-einheiten.js` (mit Fundstelle je Form) und werden seit `v2087`
+> mitexportiert; `mietvertrag-objekt.js` **liest** sie und füllt das
+> Select zur Laufzeit. Im Browser geprüft: 11 Optionen, Quelle hat 11.
+>
+> **Beim MFH sagt es, was gilt:** dort führen die Einheiten ihre
+> Verträge; der Hinweis nennt, wie viele davon schon eine Art tragen,
+> und dass die Angabe am Objekt für das Haus als Ganzes gilt. Die Felder
+> bleiben bedienbar — ein MFH **kann** im Ganzen vermietet sein.
+>
+> **Nachgewiesen, dass es gespeichert wird** (nicht nur sichtbar ist):
+> die drei IDs stehen in der Feldliste von `storage.js`, und
+> `collectData()` gibt sie im Browser zurück (`mv_art: "index"`,
+> Beginn, Erhöhung — 276 Felder gesamt). Ohne den Listeneintrag wären
+> sie sichtbar gewesen und beim Speichern lautlos verschwunden.
+>
+> **Ein eigener Fehler, vor dem Ausrollen gefunden:** der MFH-Hinweis
+> las zuerst `window.getFormData()` — die Funktion gibt es **nicht**,
+> einziger Treffer im Repo war mein eigener Aufruf. Der Hinweis wäre
+> immer in der Fassung „ohne Einheiten" erschienen, ohne Fehler. Echte
+> Quelle ist `window._dpMfh` (`mfh-einheiten.js:45`).
+>
+> ### Was offen bleibt: Marcels Fachliste
+>
+> Staffel/Index mit nächstem Termin, Kappungsgrenze,
+> Mieterhöhungspotenzial zur ortsüblichen Vergleichsmiete, Kaution,
+> Befristung, Kündigungsverzicht, Gewerbe mit Laufzeit und Option. **Die
+> MFH-Einheiten führen das meiste davon schon** (`mv_kaution`,
+> `mv_befristet_bis`, `mv_kuendigungsverzicht_bis`,
+> `mv_naechste_anpassung`, `mv_erhoehung_art/_wert`,
+> `mv_rhythmus_jahre`) — auf Objektebene steht bewusst nur das Minimum,
+> das Marcel ausdrücklich verlangt hat. Welche davon ein ETW-Formular
+> braucht, ist eine Produktfrage und seine Entscheidung.
+>
+> **Kappungsgrenze und Erhöhungspotenzial** gibt es nirgends (gesucht
+> nach `kappung` in `frontend/js` — null Treffer). Das hängt an N60.14
+> (VPI): ohne Indexwerte ist ein Potenzial zur Vergleichsmiete geraten.
 Marcel: „bevor wir Schnittstellen und Exporte machen. Es soll auch eine
 Angabe zu Mietverträgen gemacht werden können, also was für ein
 Mietvertrag, seit wann der besteht und wann die letzte Erhöhung gewesen
@@ -1453,7 +1502,38 @@ nachträglich korrigierbar). Sie stehen im Dokument als Haken.
 
 ---
 
-#### N60.13 · Export und Schnittstelle — ALLE neuen Felder müssen durch
+#### N60.13 · EXCEL ERLEDIGT 10.10.2026 (`v2086`) — PDF-Wege offen
+
+> ### Sechs Spalten mehr im Excel-Export (`v2086`)
+>
+> Gemessen: der Export führte **38** Spalten, darunter schon Lageklasse,
+> Marktwert, Marktberichte, Erster_Bericht, Wertentwicklung_Pct,
+> Ankauf_Stand, Lastenwechsel, Einheiten_Indexmiete. Es fehlten sechs,
+> jetzt ergänzt: `RND_Jahre`, `RND_Verfahren`, `RND_Stand`,
+> `AfA_RND_angesetzt`, `Vertragsart`, `Ankauf_Stichtag`.
+>
+> **Zwei RND-Spalten, nicht eine:** `_rnd` ist, was der Kern gerechnet
+> hat; `afa_rnd_jahre` ist, was der Nutzer angesetzt hat. Weichen sie ab,
+> ist das ein Befund — eine zusammengerechnete Spalte hätte ihn
+> verschluckt.
+>
+> ### Der Punkt führte die JSON-Sicherung falsch als Lücke
+>
+> Gesucht wurde in `import-export-modal.js`, `pdf.js`,
+> `pdf-investment-bank.js` — je null Treffer. **Die DealPilot-Sicherung
+> liegt aber in `storage.js:2214`** (`exportSingleObjectJson`) und ruft
+> `_dpSicherungsPaket` → `/objects/portfolio-export`. Sie trägt die
+> neuen Felder damit **schon** — Marktberichtsverlauf, `_mfh`, `_ankauf`,
+> `_rnd`, Lexikon.
+>
+> *Ein Negativbefund in drei Dateien ist keiner, wenn der Export in
+> einer vierten liegt.*
+>
+> **Offen:** die PDF-Wege (Investment-PDF, Bankexport). Dort stehen
+> ausgewählte Spalten, und welche davon ein Bankexport tragen soll, ist
+> eine Produktfrage. Ebenso `afa_rnd_jahre`, das `deal-action.js:2052`
+> bewusst leer lässt — eine Entscheidung, kein Versehen, die aber jede
+> Auswertung am Feld unterläuft.
 
 **Nachgemessen 10.10.2026 am echten Export (22 Objekte) und am echten
 Piloten-Payload (Abruf abgefangen, kein Kerosin).** Marcels Fragen:
