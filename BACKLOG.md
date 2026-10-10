@@ -210,6 +210,90 @@ Hinweis muss natürlich mit der Erstanmeldung kommen, aber so kann ein
 User direkt, ohne dass er jetzt in seine Mails gehen muss, schon was
 sehen."
 
+> ### VORMESSUNG ERLEDIGT 10.10.2026 (`v2094`) — und sie hat einen
+> ### Fehler gefunden, der heute jeden Neukunden trifft
+>
+> Der Punkt verlangte: *„Vorher messen, was `email_verified` heute
+> tatsächlich blockiert."* Gemessen:
+>
+> | Frage | Befund |
+> |---|---|
+> | Blockiert `email_verified_at` den Zugang? | **Nein, nichts.** |
+> | Was blockiert dann? | **`users.is_active`** |
+> | Wer setzt es auf `false`? | `registerWithVerify.js` bei der Anmeldung |
+> | Wer setzt es auf `true`? | nur der Klick auf den Bestätigungslink |
+>
+> Die Spalte `email_verified_at` existiert seit Migration 003, aber **kein
+> Pfad liest sie für die Zugangsgewährung** — nur Adminlisten und die
+> Statistik. `routes/auth.js` prüft sie beim Login gar nicht; die einzigen
+> `verified`-Treffer dort sind 2FA.
+>
+> **Daraus folgte ein Fehler, der nichts mit der Gnadenfrist zu tun hat
+> und sofort behoben wurde:** jeder frisch Registrierte, der sich vor dem
+> Klick anmeldet, bekam
+>
+> ```
+> 403  Account is disabled
+> ```
+>
+> Englisch, in einer deutschen App — und es klingt wie eine Sperre durch
+> uns. Tatsächlich fehlt nur ein Klick in einer Mail, die im Postfach
+> liegt. *Die Auskunft schickt den Nutzer in den Support statt in sein
+> Postfach.* Behoben in `v2094`, und zwar genau an der Spalte, die bisher
+> nichts tat: wer **nie** bestätigt hat, hat `email_verified_at IS NULL`.
+>
+> | Lage | Kennwort | Text |
+> |---|---|---|
+> | nie bestätigt | `EMAIL_NOT_VERIFIED` | nennt die Bestätigung und das Postfach samt Spam-Ordner |
+> | wirklich deaktiviert | `ACCOUNT_DISABLED` | verweist an den Support |
+>
+> **Ein zweiter Fund, der die Sache fast lautlos hätte scheitern lassen:**
+> `middleware/errors.js` reichte nur `{ error: err.message }` weiter und
+> warf `code` **weg**. Ein Kennwort am Fehler wäre nie im Frontend
+> angekommen. Jetzt wird es durchgelassen — aber nur ein ausdrückliches
+> `GROSSBUCHSTABEN_KENNWORT`, denn die PostgreSQL-Fehlercodes liegen auf
+> derselben Eigenschaft und gehören nicht nach außen.
+>
+> Die Reihenfolge ist Absicht: die neue Auskunft kommt **erst nach** der
+> Passwortprüfung. Wer das Passwort nicht kennt, erfährt weiterhin nur
+> `Invalid email or password` — am lebenden Staging nachgeprüft: HTTP 401,
+> kein `code`-Feld.
+>
+> **Damit steht die Grundlage, die dieser Punkt braucht:** eine
+> Gnadenfrist muss „noch nicht bestätigt" von „abgeschaltet" trennen
+> können. Ohne diese Unterscheidung war sie nicht baubar.
+>
+> Bewacht von `tools/anmeldung-auskunft-pruefen.mjs` (27 Punkte, RC=0).
+> Er lädt die **echten** Dateien und ruft die **echte** `authenticate()`
+> und den **echten** `errorHandler`; ersetzt sind nur `db/pool`,
+> `authFailuresService`, `utils/password` und `config`. `node --check`
+> hätte hier nichts gefunden — die Frage war nicht, ob die Datei parst,
+> sondern ob `code` ankommt.
+>
+> > **Ein Prüfpunkt bestand zuerst aus dem falschen Grund:** ich habe mit
+> > Code `23505` geprüft, ob ein Datenbankcode durchgelassen wird. Der
+> > wird aber zwei Weichen weiter oben als 409 abgefangen und erreicht
+> > die neue Zeile nie — der Test war grün und hat nichts geprüft. Jetzt
+> > prüft er mit `42P01` und hält in einer Gegenprobe fest, dass `23505`
+> > wirklich den anderen Weg nimmt.
+
+**Was noch offen ist — und es ist eine Produktentscheidung:**
+
+Der Zugang ist heute **nicht** sofort da: `is_active=false` sperrt bis zum
+Klick. Marcels Wunsch dreht das um. Zu entscheiden ist, **wie** gedreht
+wird, denn beide Wege haben einen Preis:
+
+- **(a) `is_active=true` sofort, Sperre per Frist.** Der Nutzer sieht die
+  App ohne Postfach. Preis: ein nicht bestätigter Zugang ist ein Zugang —
+  wer eine fremde Adresse einträgt, kann sechs Stunden arbeiten, und der
+  Inhaber der Adresse erfährt es nur aus der Mail.
+- **(b) `is_active=false` bleibt, ein eigenes Gnadenfrist-Merkmal gibt
+  Lesezugang.** Mehr Arbeit, aber der Riegel bleibt ein Riegel.
+
+Dazu gehört in jedem Fall: Countdown in der App, Sperre bei Ablauf,
+Entsperrung durch Bestätigung, und ein Weg „Mail erneut senden" — den
+`EMAIL_NOT_VERIFIED` jetzt ansteuerbar macht.
+
 Zu bauen: Zugang sofort, Frist 6 h ab Registrierung, sichtbarer
 Countdown/Hinweis in der App, Sperre bei Ablauf, Entsperrung durch
 Bestätigung. **Vorher messen**, was `email_verified` heute tatsächlich
