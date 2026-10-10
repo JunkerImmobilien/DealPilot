@@ -285,7 +285,13 @@ window.DealPilotOnboarding = (function () {
   function s1() {
     return ''
       + '<p class="dpo-vor">Womit möchtest du arbeiten? Du kannst das jederzeit '
-      + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.</p>'
+      + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.'
+      /* v2096: Der Hinweis steht NUR, wo er stimmt. Unter 900 px fuellt der
+         Kasten den Schirm, dann gibt es kein „dahinter" — ein Hinweis, der
+         auf etwas Unsichtbares zeigt, ist schlimmer als keiner. Die Grenze
+         ist dieselbe wie in der Regel `.dpo-ov-schau`. */
+      + '<span class="dpo-nur-breit"> <b>Die App dahinter wechselt sofort mit</b> '
+      + '— klick die vier Kacheln einmal durch.</span></p>'
       + '<div class="dpo-kacheln">'
       + AUSSEHEN.map(function (a) {
           return '<button type="button" class="dpo-kachel' + (_wahl.aussehen === a.id ? ' an' : '')
@@ -947,6 +953,10 @@ window.DealPilotOnboarding = (function () {
 
   function _zeichne() {
     var s = SCHRITTE[_schritt];
+    /* v2096: im Schritt „Aussehen" den Schleier wegnehmen und den Kasten
+       zur Seite legen, damit die App dahinter WAHRHEITSGEMAESS zu sehen
+       ist. Die Begruendung mit den gemessenen Zahlen steht am CSS. */
+    try { if (_ov) _ov.classList.toggle('dpo-ov-schau', _schritt === 0); } catch (e) {}
     el('dpo-titel').textContent = s.titel;
     el('dpo-inhalt').innerHTML = s.bau();
     el('dpo-schritte').innerHTML = SCHRITTE.map(function (x, i) {
@@ -1130,6 +1140,59 @@ window.DealPilotOnboarding = (function () {
       '.dpo-b-still{background:transparent;color:#7A7370;border-color:#E7E2D6}',
       '.dpo-b-still:hover{color:#1b1815;border-color:#C9C3B6}',
       '.dpo-b-gold{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1a1508;border:none}',
+      /* ══ v2096 · DER SCHLEIER HAT DIE VORSCHAU VERFAELSCHT ═══════════
+         Marcel, 10.10.2026: „Da sind irgendwie so ganz komische Bilder
+         drinne. Koennen wir da irgendwie vernuenftige Bilder nehmen? …
+         dann kann man das im Hintergrund einmal sehen, wie die App
+         aussehen wuerde … Kann man das irgendwie in place anzeigen?"
+
+         GEMESSEN am 10.10.2026, und der Befund war ein anderer als
+         erwartet: die Vorschau in place EXISTIERT. Ein Klick auf eine
+         Kachel ruft `_aussehenAnwenden()`, und das setzt wirklich um —
+
+           Aktenmappe -> dp-layout="v1b"  dp-objkarte="datenzeile"
+           Kanzlei    -> dp-layout="v2"   dp-objkarte="bordkarte"
+           Tower      -> dp-layout="v2b"  dp-objkarte="bordkarte"
+           DealPilot  -> dp-layout=null   dp-objkarte="bordkarte"
+
+         Und `.dpo-ov` ist kein deckender Vorhang, sondern ein Schleier:
+         `rgba(5,5,5,.34)`. Die App ist dahinter zu 66 % sichtbar.
+
+         DER FEHLER WAR SUBTILER UND SCHLIMMER. Ein DUNKLER Schleier
+         ueber der Wahl zwischen HELL und DUNKEL. Nachgerechnet, was er
+         mit den Flaechen macht, um die es geht:
+
+           Creme   #FDFCFA -> rgb(169,168,167)   -60 % Helligkeit
+           Weiss   #FFFFFF -> rgb(170,170,170)   -60 %
+           Gold    #C9A84C -> rgb(134,113,52)    -58 %
+           Obsidian#050505 -> rgb(5,5,5)           -0 %
+
+         Die hellen Fassungen verlieren 60 % ihrer Helligkeit, Obsidian
+         keine einzige. Unter dem Schleier sieht HELL grau aus und DUNKEL
+         unveraendert — die Vorschau verfaelscht genau den Unterschied,
+         den der Nutzer waehlen soll.
+
+         > Eine Vorschau, die das Gewaehlte dunkler zeigt als es ist, ist
+         > schlimmer als keine: sie laesst den Nutzer eine Entscheidung
+         > gegen etwas treffen, das er nie gesehen hat.
+
+         Deshalb KEIN neuer Mechanismus und kein zweites iframe (das
+         waere eine zweite App im Speicher und ein zweiter Zustand).
+         Im Schritt „Aussehen" wird der Schleier weggenommen und der
+         Kasten in die untere rechte Ecke gelegt, damit Kopf und
+         Seitenschienen frei liegen — genau die Teile, die sich zwischen
+         den vier Fassungen unterscheiden.
+
+         Erst ab 900 px: darunter fuellt der Kasten den Schirm ohnehin
+         (Regel unten), da gibt es kein „dahinter". Dort tragen die
+         Miniaturen die Entscheidung weiter — sie bleiben deshalb. */
+      '.dpo-nur-breit{display:none}',
+      '@media(min-width:900px){',
+      '  .dpo-nur-breit{display:inline}',
+      '  .dpo-ov.dpo-ov-schau{background:transparent;align-items:flex-end;justify-content:flex-end;padding:16px}',
+      '  .dpo-ov.dpo-ov-schau .dpo-kasten{width:min(620px,100%);max-height:min(74vh,660px);',
+      '    box-shadow:0 20px 64px rgba(5,5,5,.5),0 0 0 1px rgba(5,5,5,.18)}',
+      '}',
       /* Handy und Tablet: eine Spalte, Fussleiste bricht um */
       '@media(max-width:680px){',
       '  .dpo-ov{padding:0;align-items:stretch}',
