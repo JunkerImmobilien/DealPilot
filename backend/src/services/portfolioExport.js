@@ -45,6 +45,59 @@
 const { query } = require('../db/pool');
 const projektwissen = require('./projektwissen');
 
+/* ═══ v2069 · DIE MARKTBERICHTE KOMMEN AUS IHRER EIGENEN DATENBANK ════
+ *
+ * Marcel, 10.10.2026: „Wir sollten schon die Datenbank darauf anpassen,
+ * dass wenn wir einen Marktbericht machen … dann sollten wir ja auf
+ * diese Felder zugreifen koennen … Dass man auch den Verlauf sieht, was
+ * ueber die Jahre passiert ist. Ob das Objekt im Preis gestiegen ist."
+ *
+ * UND SEINE ANDERE HAELFTE, DIE GENAUSO WICHTIG IST: „Ich finde nicht,
+ * dass es diese Felder dann bei uns nochmal extra geben muss."
+ *
+ * Also KEINE neuen Spalten in `objects`. Die Daten liegen laengst - nur
+ * in einer anderen Datenbank:
+ *
+ *   mb.market_reports      160 Berichte, mit `payload` und `report_md`
+ *   mb.valuation_results   373 Bewertungen
+ *   mb.object_snapshots    160 Staende
+ *
+ * GEMESSEN am 10.10.2026: 139 der 160 Berichte tragen eine `user_id`
+ * (UUID, passt zu `users.id`), alle 160 einen Text ueber 100 Zeichen.
+ * Verbunden sind sie ueber `object_key = 'dp:' + objects.id`.
+ *
+ * Der Export fragte diese Datenbank NICHT. Er holte `objects` und war
+ * fertig - der ganze Marktbericht-Teil fehlte, obwohl zwei fertige
+ * Endpunkte dafuer existieren (v942).
+ *
+ *   > Ein Export, der „alles" verspricht, muss wissen, wo alles liegt.
+ *   > Dieselbe Lektion wie bei der Portfolio-Analyse in v2047 - diesmal
+ *   > eine ganze Datenbank weiter.
+ *
+ * Gefragt wird der Microservice, nicht die fremde Datenbank direkt:
+ * `marktbericht.js` macht es seit jeher so, und eine zweite
+ * Pool-Verbindung waere ein zweiter Ort, an dem Zugangsdaten stehen.
+ */
+const MB_BASE = (process.env.MB_BACKEND_URL
+  || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
+
+async function mbHolen(pfad, userId) {
+  const url = MB_BASE + pfad + '?user_id=' + encodeURIComponent(userId);
+  /* Der Export darf an einem langsamen Nachbarn nicht haengen bleiben.
+     Faellt der Dienst aus, fehlt der Marktbericht-Block - und das steht
+     dann auch drin, statt ihn stillschweigend wegzulassen. */
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal });
+    const text = await r.text();
+    if (r.status >= 400) return { fehler: 'HTTP ' + r.status };
+    try { return JSON.parse(text); } catch (e) { return { fehler: 'keine JSON-Antwort' }; }
+  } catch (e) {
+    return { fehler: String(e && e.message || e).slice(0, 120) };
+  } finally { clearTimeout(t); }
+}
+
 let _konst = null;
 function konstanten() {
   if (_konst) return _konst;
@@ -172,6 +225,20 @@ const STRUKTUREN = {
       stand: 'Datum der Berechnung'
     }
   },
+  marktbericht: {
+    was: 'Steht NEBEN `daten`, nicht darin: die Marktberichte liegen in einer '
+       + 'eigenen Datenbank (mb.market_reports) und werden ueber '
+       + '`object_key = "dp:" + id` zugeordnet.',
+    stand: 'der heutige Stand: Adresse, Objektart, Wohnflaeche, Baujahr, '
+         + 'Marktwert, Deal-Score, Zahl der Berichte, Datum des letzten',
+    verlauf: 'EIN EINTRAG JE BERICHT, nach Datum sortiert - daran liest man ab, '
+           + 'ob der Marktwert ueber die Jahre gestiegen oder gefallen ist. '
+           + 'Je Punkt: datum, bericht_id, marktwert_eur, marktwert_von/bis '
+           + '(die Spanne), eur_pro_qm, wohnflaeche, baujahr.',
+    hinweis: 'Fehlt der Block ganz, hat das Objekt keinen Marktbericht. Steht im '
+           + 'Kopf `marktbericht_fehler`, war der Dienst nicht erreichbar - dann '
+           + 'ist das Fehlen KEINE Aussage ueber die Objekte.'
+  },
   _ds2_: {
     was: 'Investor Deal Score 2.0 - Score, Kategorien und ob er gerechnet wurde.'
   },
@@ -296,6 +363,60 @@ async function bauen(userId, opt) {
      der zwanzig von zweiundzwanzig fehlen, sieht vollstaendig aus. */
   const mitAnalyse = objekte.filter((o) => o.analyse).length;
 
+  /* ── v2069 · Marktberichte und ihr Verlauf ───────────────────────── */
+  let mbObjekte = [], mbVerlauf = [], mbFehler = null;
+  try {
+    const [a, b] = await Promise.all([
+      mbHolen('/objects', userId),
+      mbHolen('/objects/history', userId)
+    ]);
+    if (a && a.fehler) mbFehler = a.fehler;
+    else mbObjekte = (a && (a.objects || a)) || [];
+    if (!mbFehler && b && b.fehler) mbFehler = b.fehler;
+    else if (!(b && b.fehler)) mbVerlauf = (b && (b.history || b)) || [];
+    if (!Array.isArray(mbObjekte)) mbObjekte = [];
+    if (!Array.isArray(mbVerlauf)) mbVerlauf = [];
+  } catch (e) { mbFehler = String(e && e.message || e).slice(0, 120); }
+
+  /* Je Objekt zuordnen. Der Schluessel ist `dp:<objects.id>` - so legt
+     der Marktbericht ihn seit v942 an. */
+  if (mbObjekte.length || mbVerlauf.length) {
+    const nachKey = {};
+    mbObjekte.forEach((m) => { if (m && m.object_key) nachKey[m.object_key] = m; });
+    const verlaufNachKey = {};
+    mbVerlauf.forEach((v) => {
+      if (!v || !v.object_key) return;
+      (verlaufNachKey[v.object_key] = verlaufNachKey[v.object_key] || []).push(v);
+    });
+    objekte.forEach((o) => {
+      const key = 'dp:' + o.id;
+      const m = nachKey[key];
+      const v = verlaufNachKey[key];
+      if (!m && !v) return;
+      o.marktbericht = {
+        /* Der heutige Stand … */
+        stand: m ? {
+          adresse: m.address || null, objektart: m.property_type || null,
+          wohnflaeche: m.living_area || null, baujahr: m.build_year || null,
+          marktwert_eur: m.market_value || null, deal_score: m.deal_score || null,
+          berichte: m.snapshots || null, zuletzt: m.created_at || null
+        } : null,
+        /* … und was ueber die Zeit daraus wurde. Genau danach hat Marcel
+           gefragt: „ob das Objekt im Preis gestiegen ist". */
+        verlauf: v ? v.slice()
+          .sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)))
+          .map((x) => ({
+            datum: x.created_at, bericht_id: x.report_id,
+            marktwert_eur: x.market_value || null,
+            marktwert_von: x.market_value_low || null,
+            marktwert_bis: x.market_value_high || null,
+            eur_pro_qm: x.median_sqm || null,
+            wohnflaeche: x.living_area || null, baujahr: x.build_year || null
+          })) : []
+      };
+    });
+  }
+
   return {
     dealpilot_export: 'portfolio',
     format_version: 1,
@@ -303,6 +424,12 @@ async function bauen(userId, opt) {
     anzahl_objekte: objekte.length,
     /* v2047 - die Deckung gehoert in den Kopf, nicht ins Kleingedruckte. */
     objekte_mit_pilot_analyse: mitAnalyse,
+    /* v2069 - und die des Marktberichts. Faellt der Dienst aus, steht
+       der Grund hier, statt dass der Block stillschweigend fehlt. */
+    objekte_mit_marktbericht: objekte.filter((o) => o.marktbericht).length,
+    marktbericht_verlaufspunkte: objekte.reduce(
+      (s, o) => s + ((o.marktbericht && o.marktbericht.verlauf) || []).length, 0),
+    marktbericht_fehler: mbFehler || undefined,
     fotos_enthalten: mitFotos,
     /* ── Das Lexikon: was die Schluessel bedeuten ──────────────────
        Ohne diesen Block ist der Export eine Liste aus 280 Kuerzeln.
