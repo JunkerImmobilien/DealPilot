@@ -39,14 +39,33 @@ window.DealPilotOnboarding = (function () {
 
   /* ── Die Aussehen-Wahl ──────────────────────────────────────────────
      Marcel: „Standardmäßig würde ich bei Aktenmappe, Kanzlei und Tower
-     dann halt einfach die Bordkarte dort nehmen als Objektkarten."       */
+     dann halt einfach die Bordkarte dort nehmen als Objektkarten."
+
+     ── v2083 · AKTENMAPPE IST DIE VORGABE (Backlog N60.21) ───────────
+     Marcel am 10.10.2026: „Ich würde gerne, dass wir das Standard-Design
+     … auf die Aktenmappe legen. Den könnte man dann auch oben
+     reinsetzen: Aktenmappe, Standard." Dazu die Objektkarte als
+     **Datenzeile**.
+
+     Geändert hat sich damit DREIERLEI:
+       1. Aktenmappe steht an ERSTER Stelle — die Reihenfolge ist die
+          erste Empfehlung, noch vor jeder Markierung.
+       2. Sie trägt `standard: true` und ist vorausgewählt (`_wahl`
+          startet auf 'v1b'). Vorher stand dort `null`, also musste der
+          Nutzer aktiv etwas wählen, bevor es weiterging.
+       3. Ihre Objektkarte ist `datenzeile`, nicht mehr `bordkarte`.
+
+     Die anderen drei behalten die Bordkarte — Marcels Satz von damals
+     galt für „Aktenmappe, Kanzlei und Tower", und für zwei davon gilt
+     er weiter. Für die Aktenmappe ist er durch die neue Vorgabe
+     ersetzt.                                                            */
   var AUSSEHEN = [
-    { id: '',    name: 'DealPilot',  karte: null,
-      unter: 'Obsidian und Gold, Reiter oben',
-      fuer: 'Die Standardansicht — dunkel, kompakt, alles auf einem Schirm.' },
-    { id: 'v1b', name: 'Aktenmappe', karte: 'bordkarte',
+    { id: 'v1b', name: 'Aktenmappe', karte: 'datenzeile', standard: true,
       unter: 'Menü links, Reiter oben im Kopf',
       fuer: 'Wie eine Mappe mit Registern. Ruhig und vertraut.' },
+    { id: '',    name: 'DealPilot',  karte: null,
+      unter: 'Obsidian und Gold, Reiter oben',
+      fuer: 'Dunkel und kompakt, alles auf einem Schirm.' },
     { id: 'v2',  name: 'Kanzlei',    karte: 'bordkarte',
       unter: 'Navigation links, Aktionen rechts',
       fuer: 'Zwei Schienen: links wo du bist, rechts was du tun kannst.' },
@@ -54,6 +73,26 @@ window.DealPilotOnboarding = (function () {
       unter: 'Aktionen links, Score und Ausgaben rechts',
       fuer: 'Alles im Blick wie im Cockpit — für den zweiten Bildschirm.' }
   ];
+
+  /* Die Vorgabe steht an EINER Stelle und wird nicht zweimal genannt. */
+  function _aussehenStandard() {
+    var s = AUSSEHEN.filter(function (a) { return a.standard; })[0];
+    return s ? s.id : '';
+  }
+
+  /* Die Beschriftung des Kartenstils kommt aus dem Modul, das ihn führt.
+     v2083: hier stand hartkodiert „Objektkarten als Bordkarte" — auch
+     für eine Variante, die etwas anderes setzt. Ein Text, der die
+     Einstellung nicht kennt, beschreibt sie irgendwann falsch. */
+  function _karteName(id) {
+    if (!id) return null;
+    try {
+      var OK = window.DealPilotObjektkarte;
+      if (OK && OK.stile && OK.stile[id] && OK.stile[id].name) return OK.stile[id].name;
+    } catch (e) {}
+    /* Rückfall: der Bezeichner selbst, groß geschrieben. */
+    return id.charAt(0).toUpperCase() + id.slice(1);
+  }
 
   /* ═══════════════════════════════════════════════════════════════════
      v1749 · DIE INVESTORTYPEN SIND DIE DEALSCORE-PROFILE
@@ -159,7 +198,9 @@ window.DealPilotOnboarding = (function () {
   }
 
   var _schritt = 0, _ov = null;
-  var _wahl = { aussehen: null, typ: _typDefault() };
+  /* v2083: die Vorauswahl ist der Standard (Aktenmappe), nicht null -
+     vorher musste der Nutzer erst klicken, bevor es weiterging. */
+  var _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };
 
   function _ls(k)      { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function _lsSet(k,v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -253,7 +294,10 @@ window.DealPilotOnboarding = (function () {
             + '<span class="dpo-k-name">' + esc(a.name) + '</span>'
             + '<span class="dpo-k-unter">' + esc(a.unter) + '</span>'
             + '<span class="dpo-k-fuer">' + esc(a.fuer) + '</span>'
-            + (a.karte ? '<span class="dpo-k-zusatz">Objektkarten als Bordkarte</span>' : '')
+            /* v2083: der Kartenstil wird beim Namen genannt, nicht geraten. */
+            + (a.karte ? '<span class="dpo-k-zusatz">Objektkarten als '
+                + esc(_karteName(a.karte)) + '</span>' : '')
+            + (a.standard ? '<span class="dpo-k-std">Standard</span>' : '')
             + '</button>';
         }).join('')
       + '</div>';
@@ -996,7 +1040,7 @@ window.DealPilotOnboarding = (function () {
       '.dpo-hinweis{background:#F6F2E6;border:1px solid #E8E1CE;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.6;color:#4a453f;margin-bottom:16px}',
       '.dpo-kacheln{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}',
       '.dpo-kacheln-3{grid-template-columns:repeat(3,1fr)}',
-      '.dpo-kachel{text-align:left;background:#fff;border:1.5px solid #E7E2D6;border-radius:12px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:.14s;font:inherit}',
+      '.dpo-kachel{position:relative;text-align:left;background:#fff;border:1.5px solid #E7E2D6;border-radius:12px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:.14s;font:inherit}',
       '.dpo-kachel:hover{border-color:var(--wl-c9a84c,#C9A84C);transform:translateY(-1px)}',
       '.dpo-kachel.an{border-color:var(--wl-b8932f,#b8932f);box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 22%,transparent)}',
       '.dpo-k-name{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:14.5px;color:#1b1815}',
@@ -1012,6 +1056,18 @@ window.DealPilotOnboarding = (function () {
       '@media (max-width:420px){.dpo-lage-z{grid-template-columns:1fr 72px auto}}',
       '.dpo-k-werte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#6b6660;margin-top:4px}',
       '.dpo-k-zusatz{font-size:10.5px;color:var(--wl-b8932f,#b8932f);margin-top:4px;font-weight:600}',
+      /* v2083 · Die Standard-Markierung. Marcel: „Den könnte man dann auch
+         oben reinsetzen: Aktenmappe, Standard." Sie sitzt IN der Kachel,
+         nicht in der Überschrift — verglichen wird an den Kacheln, also
+         muss sie dort stehen. Die Kachel ist `position:relative` (eine
+         Hauptregel gesetzt), damit die Pille nicht wandert. Eine zweite
+         `.dpo-kachel`-Regel nur fuer `position` hatte ich zuerst daneben
+         geschrieben und wieder entfernt — zwei Regeln auf denselben
+         Selektor sind der Anfang jedes Kaskadenstreits. */
+      '.dpo-k-std{position:absolute;top:7px;right:7px;'
+        + 'background:var(--wl-c9a84c,#C9A84C);color:#0c0b09;'
+        + 'font:700 8.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;'
+        + 'text-transform:uppercase;padding:3px 6px;border-radius:3px}',
       /* v1753c · 38 px war das eigentliche Problem.
          Gemessen: 322 x 38 — ein Verhaeltnis von 8:1. Kein Bildschirm
          sieht so aus, und in einem so flachen Band ist jede Aufteilung
@@ -1177,7 +1233,7 @@ window.DealPilotOnboarding = (function () {
       var alt = document.getElementById('dp-onboarding');
       if (alt) alt.remove();
       _ov = null;
-      _wahl = { aussehen: null, typ: _typDefault() };   /* v1770 */
+      _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };   /* v1770, v2083 */
       zeige(0);
       return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls geloescht)' : '');
     },
