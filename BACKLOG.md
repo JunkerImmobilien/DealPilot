@@ -623,6 +623,96 @@ Ohne diese Liste wird jede Einheit eine halbe Kopie.
 
 ---
 
+#### N60.19 · Die Demodaten erzählen keine Geschichte — und einige Zustände gibt es nicht
+Marcel, 10.10.2026: *„Wir haben aktuell auch Häuser oder Wohnungen, die
+im Bestand stehen, aber gar nicht auf Gewonnen gesetzt sind. Das sind
+Zustände, die gehen nicht."*
+
+**(1) Unmögliche Zustände aufräumen**
+- Objekte **im Bestand ohne „gewonnen"** — den Widerspruch erst messen
+  (wie viele?), dann entscheiden: aufräumen oder die Regel durchsetzen.
+- **Nur zwei Objekte im Ankauf.** *„Das könnten wir besser auswiegen,
+  dass das besser passt."*
+
+**(2) Alle Felder füllen, damit die App zeigt, was sie kann**
+- **Restnutzungsdauer** abfragen und setzen (seit `v2068` wird das
+  Wizard-Ergebnis als `_rnd` festgehalten — die Objekte haben es noch
+  nicht)
+- **BMF-Rechner** bei Wohnungen *und* Häusern durchlaufen lassen
+- **MFH-Konfigurator** anpassen
+- **Marktberichte** bei den Objekten
+
+**(3) Beispiele, die eine Geschichte erzählen** (hängt an N60.18)
+- eine Wohnung **über Plan**, eine **unter Plan**
+- eine mit **drei Jahren** Historie, eine mit **sechs**
+- **ein Objekt, bei dem man steuerlich über den Verlauf sieht:**
+  *„Oh, wir müssen irgendwo im Jahr 5 oder 6 investieren und da was
+  machen."*
+
+> **Warum das kein Kosmetikpunkt ist:** *„dass wir auch für die Messe
+> dann gut vorbereitet sind."* Eine App, die auf dem Messestand leere
+> Felder zeigt, beweist nichts — und ein Soll/Ist-Vergleich, bei dem
+> alles passt, zeigt die Hälfte dessen, was er kann.
+
+---
+
+#### N60.20 · Prozesskarte für die Messe — Quick-Check bis Bestand
+Marcel, 10.10.2026: *„Dafür brauche ich dann einmal eine Prozesskarte.
+Eine richtig gut aufgearbeitete Prozesskarte in dem Pilot-Stil und
+Design, wo wir einmal die Prozesse aufmalen, vielleicht irgendwo wie so
+ein Miro-Board oder dann auch so eine Prozesskette abbilden."*
+
+**Was sie zeigen soll:**
+- die Kette **Quick-Check → Ankauf → Bestand**
+- *„Wie sind denn dort die Wege und was können wir bis dahin alles
+  machen und was kommt auch dabei raus?"*
+- also je Station: **was man tun kann** und **was dabei herauskommt**
+  (Score, Marktbericht, Pilot-Analyse, Bankexport, Soll/Ist …)
+
+**Form:** im **Pilot-Stil und Design** — Obsidian, Gold, Runway,
+Luftfahrt-Bildsprache. Board-Charakter wie ein Miro-Board oder eine
+durchgezogene Prozesskette.
+
+**Zweck:** *„Dass wir das dem Kunden auch zeigen können."* Also ein
+Stück, das am Messestand standhält, nicht eine Skizze für intern.
+
+---
+
+#### N60.21 · Standard-Design festlegen und die Vorschau ehrlich machen
+Marcel, 10.10.2026: *„Wenn sich ein User neu einloggt, dann kann er das
+Design wählen."*
+
+**(1) Vorgaben setzen**
+- **Darstellung: Aktenmappe** wird der Standard — *„Den könnte man dann
+  auch oben reinsetzen: Aktenmappe, Standard."*
+- **Objektkarte: Datenzeile**
+
+**(2) Die Vorschaubilder taugen nicht**
+*„Da sind irgendwie so ganz komische Bilder drinne. Können wir da
+irgendwie vernünftige Bilder nehmen? Also wirklich wie die App dann
+aussehen würde?"*
+
+**Vorschlag, den Marcel selbst nennt:** *„Oder dass man dann vielleicht
+sagt: Hier, so kannst du das sehen und dann kann man das im Hintergrund
+einmal sehen, wie die App aussehen würde … Kann man das irgendwie in
+place anzeigen?"*
+
+> **Der Grund steht in seinem letzten Satz:** *„weil der Kunde weiß ja
+> vorher nicht, was er da einstellt."* Eine Vorschau, die nicht zeigt,
+> was passiert, ist keine Vorschau — sie ist eine Behauptung über das
+> Ergebnis.
+
+**Zu prüfen, bevor gebaut wird:** die Darstellung schaltet über
+`DealPilotWhitelabel.apply()` und die Attribute am `<html>`
+(`data-dp-layout`, `data-ui-cards`, `data-dp-objkarte`, `data-ui-theme`).
+Eine Vorschau *in place* hieße, sie kurz umzuschalten und wieder
+zurück — **das ist genau der Weg, vor dem die Messkabine warnt**
+(`_dpDispSkin` hinterlässt Inline-Variablen, siehe
+`skin-messen-nur-nach-neuladen`). Also entweder sauber zurückdrehen
+oder im **iframe** vorschauen.
+
+---
+
 #### N60.18 · Der Soll/Ist-Abgleich muss bankfähig werden — und erklären
 Marcel, 10.10.2026: *„Ich finde, du hast das auch schon gut gemacht bei
 der Pilotanalyse mit dem Soll-Ist-Abgleich. Was aber vielleicht auch
