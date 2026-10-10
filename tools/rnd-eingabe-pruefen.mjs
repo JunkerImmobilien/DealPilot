@@ -153,5 +153,54 @@ for (const z of zeilen) console.log(
 console.log('\nObjekte mit Punkten > 0: ' + punkteJetzt + ' | mit GND 80: ' + gnd80
   + ' | Ergebnis geaendert: ' + geaendert + ' | unveraendert: ' + gleich);
 
-console.log('\n' + (fehler === 0 ? 'RC=0 - alle Pruefungen bestanden' : 'RC=1 - ' + fehler + ' Pruefung(en) gescheitert'));
+console.log('\n-- Abschnitte 1-7: ' + (fehler === 0 ? 'bestanden' : fehler + ' Abweichung(en)') + ', weiter mit 8 --');
+/* v2074: HIER STAND process.exit(). Es hat Abschnitt 8 nie erreicht -
+   der Pruefer meldete RC=0, ohne die neuen Punkte zu pruefen. Ein
+   Pruefer, der vor seinem letzten Abschnitt aussteigt, ist der
+   gefaehrlichste: er sagt gruen. */
+
+/* ═══ 8 · v2074 · Reihenfolge und Zeitgemaessheit ═══════════════════════
+   Marcels Festlegung vom 10.10.2026: das Anlage-2-Modell rechnet, die
+   Technik prueft, der Sachverstaendige entscheidet. Und: Zeitgemaessheit
+   wirkt ueber die PUNKTE, nicht als Aufschlag auf die technische RND. */
+console.log('\n=== 8 · v2074 · Reihenfolge und Zeitgemaessheit ===');
+const alleGrade = (g) => Object.fromEntries(RND.GEWERKE.map(x => [x.id, g]));
+
+/* a) Zeitgemaess darf die Basis NICHT ueberschreiten */
+for (const [alter, gnd] of [[10, 80], [28, 80], [48, 80]]) {
+  const basis = gnd - alter;
+  const t = RND.calcTechnisch(alter, gnd, alleGrade('standard'), null, null);
+  pruef('zeitgemaess(Alter ' + alter + ') = Basis ' + basis, t.restnutzungsdauer, basis);
+  if (t.alterswertminderung_pct <= 0) {
+    fehler++; console.log('  FEHLT  AWM ist 0 % bei Alter ' + alter + ' - das ist kein Ergebnis');
+  }
+}
+
+/* b) Fehlende Angabe ist nicht "zeitgemaess" und gibt keinen Aufschlag */
+const leer = RND.calcTechnisch(28, 80, {}, null, null);
+pruef('ohne Angabe = Basis 52', leer.restnutzungsdauer, 52);
+pruef('unbewertet wird ausgewiesen', leer.anteil_unbewertet_pct, 100);
+
+/* c) Der Deckel 0,90 x GND */
+const hoch = RND.calcTechnisch(5, 80, alleGrade('gehoben'), null, null);
+if (hoch.restnutzungsdauer > 80 * 0.90 + 0.01) {
+  fehler++; console.log('  FEHLT  Deckel 0,90 x GND greift nicht: ' + hoch.restnutzungsdauer);
+} else console.log('  ok     Deckel 0,90 x GND = ' + hoch.restnutzungsdauer + ' (max 72)');
+
+/* d) Liegt ein Modellergebnis vor, traegt es - nicht die Technik */
+const rMod = RND.calcAll({ baujahr: 1962, stichtag: '2026-10-10', gnd: 80, modPoints: 11,
+  gewerkeBewertung: alleGrade('veraltet'), schaeden: [] });
+pruef('Modell traegt den Endwert', rMod.verfahren, 'punktraster');
+if (rMod.methods.technisch == null) { fehler++; console.log('  FEHLT  technisch muss erhalten bleiben'); }
+else console.log('  ok     technisch bleibt ausgewiesen = ' + rMod.methods.technisch.restnutzungsdauer);
+const abwGrenze = (rMod.grenzen || []).find(g => g.art === 'technik_weicht_ab');
+console.log('  ' + (abwGrenze ? 'ok     ' : 'Hinweis') + ' Abweichungs-Grenze '
+  + (abwGrenze ? 'gemeldet' : 'nicht gemeldet (Abweichung unter 20 %)'));
+
+/* e) Die verbotene Reihenfolge-Formulierung darf nicht zurueckkehren */
+const q2 = fs.readFileSync(KERN, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+pruef('"technische ... (vorrangig)" raus', /technische Alterswertminderung \(vorrangig\)/.test(q2), false);
+pruef('aufschlagStandard ist 0', /aufschlagStandard = 0/.test(q2), true);
+
+console.log('\n' + (fehler === 0 ? 'GESAMT RC=0' : 'GESAMT RC=1 - ' + fehler + ' Abweichung(en)'));
 process.exit(fehler === 0 ? 0 : 1);

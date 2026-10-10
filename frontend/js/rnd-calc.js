@@ -300,42 +300,94 @@
   // VERFAHREN 6: Technische Restnutzungsdauer — KORRIGIERT V3
   // ============================================================
   /**
-   * Korrigierte Formel basierend auf beiden Original-Gutachten:
-   *   Niedrig/veraltet:    RND-Basis × Anteil/100 / 2  → ABZUG
-   *   Aktueller Standard:  RND-Basis × Anteil/100 / 2  → AUFSCHLAG (NICHT neutral!)
-   *   Zukunftsorientiert:  RND-Basis × Anteil/100      → AUFSCHLAG (volle Gewichtung)
+   * Technische Restnutzungsdauer aus dem Zustand der Gewerke.
+   *
+   *   veraltet:  RND-Basis × Anteil/100 / 2  → ABZUG
+   *   zeitgemaess (standard): NEUTRAL        → siehe unten
+   *   gehoben:   RND-Basis × Anteil/100 / 2  → maessiger AUFSCHLAG
+   *
+   * ── v2074 · ZEITGEMAESSHEIT IST KEIN AUFSCHLAG ──────────────────────
+   *
+   * HIER STAND "Aktueller Standard: AUFSCHLAG (NICHT neutral!)" mit
+   * halber und fuer `gehoben` mit VOLLER Gewichtung. Am 10.10.2026
+   * nachgemessen, was das bedeutet (GND 80, alle Gewerke zeitgemaess):
+   *
+   *     Alter 10 -> 80 Jahre von 80   =  0,00 % Alterswertminderung
+   *     Alter 28 -> 78 Jahre          =  2,50 %
+   *     Alter 48 -> 48 Jahre          = 40,00 %
+   *
+   * Ein zehn Jahre genutztes Gebaeude ohne jede Abnutzung ist kein
+   * Bewertungsergebnis. Und mit `gehoben` erreichte schon ein Alter von
+   * 10 die volle Gesamtnutzungsdauer.
+   *
+   * Marcels Festlegung 1 vom 10.10.2026 ordnet das richtig zu:
+   * "Ursprüngliche, aber nachweislich zeitgemäße Bauteile dürfen
+   * Modernisierungspunkte erhalten." Zeitgemaessheit wirkt also ueber
+   * die PUNKTE in Anlage 2 - dort ist sie ausdruecklich vorgesehen und
+   * modellkonform gedeckelt. Ein zweites Mal als Aufschlag auf die
+   * technische RND gerechnet, zaehlt sie doppelt.
+   *
+   * Deshalb: zeitgemaess = Normalfall = Basis (GND - Alter). Nur
+   * nachweislich gehobene, also erneuerte Gewerke geben einen
+   * Aufschlag, und zwar den halben statt den vollen.
+   *
+   * ── DER DECKEL ──────────────────────────────────────────────────────
+   * Zusaetzlich 0,90 × GND als Obergrenze. Begruendung: Anlage 2 streckt
+   * selbst bei vollstaendiger Kernsanierung nur auf 90 Prozent der GND -
+   * es bleibt ein Abschlag fuer die verbliebene Altsubstanz. Was nach
+   * einer Kernsanierung nicht erreichbar ist, kann ein Gebaeude ohne
+   * eine solche nicht ueberschreiten.
+   *
+   * > Die Zahlenwerte dieser Formel (halbe Gewichtung, 0,90-Deckel) sind
+   * > ein MODELLANSATZ und gehoeren sachverstaendig bestaetigt. Der
+   * > Befund, den sie behebt, ist dagegen gemessen: 0,00 Prozent
+   * > Alterswertminderung bei zehn Jahren Alter.
+   *
+   * ── FEHLENDE ANGABE IST NICHT "ZEITGEMAESS" ─────────────────────────
+   * HIER STAND `|| 'standard'`: ein Gewerk ohne Bewertung galt als
+   * zeitgemaess und bekam den Aufschlag. `calcTechnisch(28, 80, {})`
+   * ergab deshalb 78 statt 52 Jahre - ohne eine einzige Angabe. Nicht
+   * bewertete Gewerke werden jetzt gezaehlt und in `unbewertet_pct`
+   * ausgewiesen; sie wirken neutral, behaupten aber nichts.
    */
   function calcTechnisch(alter, gnd, gewerkeBewertung, gewerkeWeights, gewerkeRestlebensdauer) {
     const weights = gewerkeWeights || {};
-    let pctVeraltet = 0, pctStandard = 0, pctGehoben = 0, totalWeight = 0;
+    let pctVeraltet = 0, pctStandard = 0, pctGehoben = 0, pctUnbewertet = 0, totalWeight = 0;
 
     // Gewerke mit ihren prozentualen Anteilen aufaddieren (wie im Original-Gutachten Kap. 5.3.2)
     GEWERKE.forEach(function (g) {
       const w = (weights[g.id] != null) ? Number(weights[g.id]) : g.weight;
       totalWeight += w;
-      const grad = (gewerkeBewertung && gewerkeBewertung[g.id]) || 'standard';
+      const grad = (gewerkeBewertung && gewerkeBewertung[g.id]) || null;
       if (grad === 'veraltet') pctVeraltet += w;
       else if (grad === 'gehoben') pctGehoben += w;
-      else pctStandard += w;
+      else if (grad === 'standard') pctStandard += w;
+      else pctUnbewertet += w;   /* v2074: nicht bewertet, nicht "zeitgemaess" */
     });
 
     // Auf 100% normieren falls Gewichte abweichen
     if (totalWeight > 0 && totalWeight !== 100) {
-      pctVeraltet = (pctVeraltet / totalWeight) * 100;
-      pctStandard = (pctStandard / totalWeight) * 100;
-      pctGehoben  = (pctGehoben  / totalWeight) * 100;
+      pctVeraltet   = (pctVeraltet   / totalWeight) * 100;
+      pctStandard   = (pctStandard   / totalWeight) * 100;
+      pctGehoben    = (pctGehoben    / totalWeight) * 100;
+      pctUnbewertet = (pctUnbewertet / totalWeight) * 100;
     }
 
     // Lineare Basis (= Regelfallformel: GND - Alter)
     const rndBasis = Math.max(0, gnd - alter);
 
-    // Korrigierte Gutachter-Formel:
-    const abzugVeraltet    = rndBasis * pctVeraltet / 100 / 2;
-    const aufschlagStandard = rndBasis * pctStandard / 100 / 2;
-    const aufschlagGehoben  = rndBasis * pctGehoben  / 100;
+    /* v2074: zeitgemaess wirkt neutral (siehe Kopf), gehoben mit halber
+       Gewichtung, veraltet zieht ab. */
+    const abzugVeraltet     = rndBasis * pctVeraltet / 100 / 2;
+    const aufschlagStandard = 0;
+    const aufschlagGehoben  = rndBasis * pctGehoben  / 100 / 2;
 
     let rnd = rndBasis - abzugVeraltet + aufschlagStandard + aufschlagGehoben;
-    rnd = Math.max(0, Math.min(rnd, gnd));
+    /* v2074: Obergrenze 0,90 x GND - was eine Kernsanierung nach
+       Anlage 2 nicht erreicht, erreicht ein Gebaeude ohne sie nicht. */
+    const technischMax = gnd * 0.90;
+    const gedeckelt = rnd > technischMax;
+    rnd = Math.max(0, Math.min(rnd, technischMax, gnd));
 
     const awm = gnd > 0 ? ((gnd - rnd) / gnd) * 100 : 0;
 
@@ -356,12 +408,16 @@
 
     // Formel im Gutachter-Format (1:1 wie im Original):
     const formula = fmtNum2(rndBasis) + ' Jahre - ' + fmtNum2(abzugVeraltet) + ' Jahre + '
-                  + fmtNum2(aufschlagStandard) + ' Jahre + ' + fmtNum2(aufschlagGehoben)
-                  + ' Jahre = ' + fmtNum2(rnd) + ' Jahre';
+                  + fmtNum2(aufschlagGehoben) + ' Jahre = ' + fmtNum2(rnd) + ' Jahre'
+                  + (gedeckelt ? ' (gedeckelt auf 0,90 x GND = ' + fmtNum2(technischMax) + ')' : '');
 
     return {
       method: 'technisch',
       label: 'Technische Restnutzungsdauer',
+      /* v2074 - Deckung der Bewertung: ohne sie sieht ein Ergebnis aus
+         Annahmen genauso aus wie eines aus Angaben. */
+      anteil_unbewertet_pct: round2(pctUnbewertet),
+      gedeckelt_auf_90_prozent: gedeckelt,
       anteil_veraltet_pct: round2(pctVeraltet),
       anteil_standard_pct: round2(pctStandard),
       anteil_gehoben_pct: round2(pctGehoben),
@@ -456,13 +512,85 @@
     const grenzen = [];
     const basisTechnisch = Math.max(0, gnd - alter);
 
+    /* ══ v2074 · DIE BERECHNUNGSREIHENFOLGE ════════════════════════════
+       Marcels verbindliche Festlegung vom 10.10.2026, Schritt 3 bis 6:
+
+         3. Modernisierungspunkte nach Anlage 2 ImmoWertV
+         4. Berechnung der modellhaften wirtschaftlichen Restnutzungsdauer
+         5. Sachverstaendige Plausibilitaetspruefung anhand des
+            tatsaechlichen technischen Zustands
+         6. Festlegung der endgueltigen wirtschaftlichen RND
+
+       und Regel 3: "Die technische Restlebensdauer eines einzelnen
+       Bauteils darf die wirtschaftliche Gebaeude-RND nicht automatisch
+       begrenzen" sowie "Das rechnerische Modellergebnis darf nicht
+       ungeprueft als endgueltige wirtschaftliche Restnutzungsdauer
+       uebernommen werden."
+
+       HIER STAND DIE UMGEKEHRTE REIHENFOLGE: die technische
+       Alterswertminderung war "vorrangig" und wurde Endwert, das
+       Punktraster lief als Beiwerk mit. Das hat drei unplausible
+       Ergebnisse erzeugt, am 10.10.2026 am echten Portfolio gemessen:
+
+         Objekt    Bj    Alter  Basis  Punktraster  technisch  Endwert
+         2026-1002 1998  28     52     52,00        78         78
+         2026-1007 1998  28     52     52,00        78         78
+         2026-999  1998  28     52     52,00        78         78
+
+       78 Jahre bei einem 28 Jahre alten Gebaeude sind 2,5 Prozent
+       Alterswertminderung - praktisch ein Neubau. Bei Alter 10 kommt
+       dieselbe Formel auf 80 von 80 Jahren, also NULL Abnutzung.
+
+       Die Ursache liegt in calcTechnisch: ein als zeitgemaess
+       bewertetes Gewerk gibt dort einen AUFSCHLAG von 50 Prozent auf
+       die Basis-RND, ein fehlendes gilt als zeitgemaess und bekommt ihn
+       ebenfalls. Zeitgemaessheit gehoert nach Marcels Festlegung 1 aber
+       in die MODERNISIERUNGSPUNKTE nach Anlage 2 - dort darf ein nie
+       modernisiertes, aber zeitgemaesses Bauteil Punkte erhalten - und
+       nicht in einen Aufschlag auf die technische Restnutzungsdauer.
+
+       > Das Modell rechnet. Die Technik prueft. Der Sachverstaendige
+       > entscheidet. In dieser Reihenfolge.
+
+       Die technische RND bleibt vollstaendig in `methods.technisch`
+       erhalten und wird als Plausibilitaetspruefung ausgewiesen - sie
+       verschwindet nicht, sie urteilt nur nicht mehr allein.         */
     let final, finalSource, verfahren;
-    if (basisTechnisch > 0) {
+    if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
+      final = punktraster.restnutzungsdauer;
+      verfahren = 'punktraster';
+      finalSource = 'Punktrastermethode (Anlage 2 ImmoWertV) - Modellergebnis';
+      /* Schritt 5: die Technik prueft das Modell, ersetzt es nicht. */
+      if (basisTechnisch > 0 && recommendedNachSchaden != null) {
+        const abw = recommendedNachSchaden - final;
+        const abwPct = final > 0 ? Math.abs(abw / final) * 100 : 0;
+        if (abwPct >= 20) {
+          grenzen.push({
+            greift: true, art: 'technik_weicht_ab',
+            text: 'Die technische Alterswertminderung ergibt '
+                + round2(recommendedNachSchaden) + ' Jahre und weicht damit um '
+                + round2(abw) + ' Jahre (' + round2(abwPct) + ' %) vom Modellergebnis ab. '
+                + (abw < 0
+                   ? 'Der bauliche Zustand ist schlechter, als das Modell unterstellt - '
+                   + 'Erneuerungsbedarf und Instandhaltungsrueckstand pruefen.'
+                   : 'Der bauliche Zustand ist besser, als das Modell unterstellt - '
+                   + 'pruefen, ob zeitgemaesse Bauteile als Modernisierungspunkte '
+                   + 'anzusetzen sind (Anlage 2 laesst das zu).')
+                + ' Eine Abweichung wird sachverstaendig gewuerdigt und begruendet, '
+                + 'nicht automatisch uebernommen.',
+            quelle: 'Fachliche Festlegung 10.10.2026, Schritt 5 - Plausibilitaetspruefung'
+          });
+        }
+      }
+    } else if (basisTechnisch > 0) {
+      /* Kein Modellergebnis (relatives Alter unter der Schwelle der
+         Anlage 2, oder keine Punkte) - dann traegt die technische
+         Ermittlung, und das wird benannt. */
       final = recommendedNachSchaden;
       verfahren = 'technisch';
       finalSource = applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
         ? 'technische Alterswertminderung + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
-        : 'technische Alterswertminderung (vorrangig)';
+        : 'technische Alterswertminderung - kein Modellergebnis nach Anlage 2';
     } else if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
       final = punktraster.restnutzungsdauer;
       verfahren = 'punktraster';
