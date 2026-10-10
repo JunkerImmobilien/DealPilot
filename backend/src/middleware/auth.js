@@ -4,7 +4,23 @@ const { query } = require('../db/pool');
 /* mand v807: API-Key-Auth */
 const apiKeyService = require('../services/apiKeyService');
 const subscriptionService = require('../services/subscriptionService');
-const PRO_PLAN_IDS = ['pro'];
+/* v2072: welche Plaene die Schnittstelle duerfen.
+   Gemessen am 10.10.2026 fuehrt `subscriptions` auf Staging genau drei
+   Kennungen: partner (3x aktiv), free (1x), starter (1x gekuendigt).
+   "pro" kommt dort GAR NICHT vor — die Liste liess also niemanden durch,
+   und ihr 403 sah aus wie ein falscher Schluessel.
+   Marcel am 10.10.2026: "das soll auch mit dem partner plan funktionieren."
+
+   Den STATUS prueft diese Liste nicht und muss es nicht: getEffectivePlan
+   gibt fuer ein nicht aktives Abo `plan_id: 'free'` zurueck (downgraded).
+
+   Die TESTPHASE dagegen muss sie pruefen. getEffectivePlan gibt dort
+   `plan_id: 'pro'` mit `trial: true` zurueck — ein Tester haette damit
+   28 Tage volle Schnittstelle. Dieselbe Begruendung, aus der die
+   Testphase export_csv, json_backup und excel_import ausschaltet
+   ("Pro-Verkaufsargumente"), gilt fuer die API erst recht.
+   Marcels Entscheidung vom 10.10.2026: Variante b, Testphase draussen. */
+const PRO_PLAN_IDS = ['pro', 'partner'];
 const _apiKeyRate = new Map();
 function _rateOk(keyId) {
   const now = Date.now();
@@ -25,7 +41,20 @@ async function _authViaApiKey(req, res, next, plain) {
     try {
       const plan = await subscriptionService.getEffectivePlan(user.id);
       if (PRO_PLAN_IDS.indexOf(((plan && plan.plan_id) || '').toLowerCase()) < 0) {
-        return res.status(403).json({ error: 'API access requires an active Pro plan' });
+        return res.status(403).json({
+          error: 'API access requires an active Pro plan',
+          plan: (plan && plan.plan_id) || null,
+          erlaubt: PRO_PLAN_IDS
+        });
+      }
+      /* v2072: waehrend der Testphase bleibt die Schnittstelle zu — wie
+         export_csv/json_backup/excel_import. Der Plan heisst dort 'pro'
+         und wuerde die Liste oben sonst passieren. */
+      if (plan && plan.trial === true) {
+        return res.status(403).json({
+          error: 'API-Zugang ist in der Testphase nicht enthalten',
+          plan: plan.plan_id, trial: true, trial_ends_at: plan.trial_ends_at || null
+        });
       }
     } catch (e) { /* im Zweifel durchlassen statt Owner aussperren */ }
     req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
