@@ -90,7 +90,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2063</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2064</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -657,6 +657,26 @@
     });
     schwach.sort(function(a, b){ return a.k - b.k; });
     r.kontrast = schwach.slice(0, 8); r.kontrastN = schwach.length;
+    /* ═══ v2064 · WIE VIELE STELLEN, NICHT WIE VIELE ELEMENTE ═════════
+       `kontrastN` zaehlt Elemente. 57 Paare klingt nach einem grossen
+       Befund - gemessen am 09.10.2026 waren es ZWEI Stellen
+       (`span.ds2-tag` und `span.oe-lk-tag`, beide Gold auf Creme bei
+       9 px, Kontrast 2,06), nur vielfach wiederholt.
+
+       Der Unterschied entscheidet ueber die Arbeit: zwei Regeln oder
+       vierzig. Die Liste war auf acht gekappt und zeigte ihn nicht;
+       wer nur `kontrastN` liest, schaetzt den Aufwand um das
+       Zwanzigfache falsch ein. */
+    var gr = {};
+    schwach.forEach(function(x){
+      var key = x.t + '|' + x.fs + '|' + x.fg + '|' + x.grund;
+      if (!gr[key]) gr[key] = { sel: x.t, schrift: x.fs, kontrast: +x.k.toFixed(2),
+                                farbe: x.fg, grund: x.grund, txt: x.txt, n: 0 };
+      gr[key].n++;
+    });
+    r.kontrastGruppen = Object.keys(gr).map(function(k){ return gr[k]; })
+                              .sort(function(a,b){ return b.n - a.n; });
+    r.kontrastStellen = r.kontrastGruppen.length;
     return r;
   }
 
