@@ -36033,3 +36033,75 @@ Befunde, mit Decke genau 1 (der richtige Knopf), nach Entfernen wieder 0 —
 - **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation**, Höhen über
   757 px, Anmeldung/Registrierung, Upload-Flächen, Lade-/Fehler-/
   Leerzustände.
+
+
+## Rollout-Journal 09.10.2026 (N60.17/3) — v2062–v2063: die weiteren iframe-Zustände
+
+**Was** · Marcels Auftrag: *„ja mach die weiteren zustände der iframe."* Bisher
+war nur der erste Bildschirm von Quick-Check und Marktbericht gemessen.
+
+| Zustand | Weg dorthin | 320 | 390 | 768 |
+|---|---|---|---|---|
+| Marktbericht · Standort-Finder | `_lfSetView('finder')` | ✔ | ✔ | ✔ |
+| Marktbericht · fertiger Bericht | `#resultBody` entsperrt | ✔ | ✔ | ✔ |
+| …**mit langen Texten und großen Zahlen** | Platzhalter gefüllt | ✔ | ✔ | ✔ |
+| Quick-Check · `#transfer-modal` | Klasse `.show` (Z. 2042) | ✔ | ✔ | – |
+| Quick-Check · `#api-modal` | `.show` | ✔ | ✔ | – |
+| Quick-Check · `#qc6-credit-modal` | `.show` | – | ✔ | – |
+
+Alle Modal-Boxen passen vollständig ins Bild (320 px: 271×429 bei y 68),
+**alle Knöpfe treffen**. Der Bericht wächst mit langen Texten in die **Höhe**
+— 1321 → 1984 px bei 390 px Breite — nicht in die Breite: 0 Überlauf, kein
+seitliches Scrollen, auch auf 320 px.
+
+**Commit** · `d4cf4c01` · `f37f3d4d` · `e1479ce8` · `9bd2fe64`
+
+#### Zwei Dinge, die nach Befund aussahen und keiner waren
+
+- **`#mainTabs` im Marktbericht**: fünf Knöpfe (Marktbericht, PDF-Export,
+  Dunkel, Schließen) mit **Höhe 0** auf *allen* Breiten. Alle tragen
+  `display:none` inline, mit dem Vermerk `v647-mb hidden` — ausdrücklich
+  abgeschaltet, weil die Hauptapp die Leiste stellt. Deshalb führt auch kein
+  Knopf zum **Standort-Finder**; er ist nur über `_lfSetView('finder')`
+  erreichbar. Gebaut und erreichbar, aber ohne Weg dorthin.
+- **Vier „erdrückte" Knöpfe im Quick-Check** („Bestätigen & abrufen",
+  „Fertig" …) waren Knöpfe **geschlossener Modals**. Sie tragen selbst
+  `display:flex`; ihr Modal trägt `display:none`.
+
+#### Was der Prüfer dabei gelernt hat
+
+- **`v2062` · erdrückt ist nicht abgeschaltet.** Ein Knopf mit Höhe 0 wurde
+  bisher stillschweigend übersprungen. Das ist richtig bei `display:none`
+  (absichtlich weg) und falsch, wenn er gerendert wird und nur zusammenfällt
+  — dann ist er ein Befund. Beides sah vorher gleich aus.
+- **`v2062a` · das eigene `display` sagt nichts über die Vorfahren.**
+  `offsetParent === null` entscheidet, ob etwas gerendert wird. Ohne diese
+  Zeile meldet der Prüfer in *jedem* Dokument sämtliche Knöpfe geschlossener
+  Modals.
+- **`v2062b` · der Selbsttest sucht sein Opfer.** Am Seitenanfang des
+  Quick-Checks war von 23 Knöpfen **keiner** tauglich (8 unten
+  angeschnitten, 9 zu klein, 6 ohne Zeigerereignisse). Er meldete „kein
+  Testknopf im Bild" und lief gar nicht. Ein Selbsttest, der sich
+  regelmäßig selbst überspringt, wird nach dem dritten Mal ignoriert — und
+  ist damit wertlos. Jetzt scrollt er, bis er eines findet (im Quick-Check:
+  2. Abschnitt).
+
+#### `v2063` — die Kabine sagt, welche Fassung läuft
+
+`messkabine.html` trägt **keinen Cache-Buster**. Nach drei Änderungen lief im
+Tab noch die alte Fassung: `DPM.apBedienbar` gab `erdrueckt` nicht zurück,
+der Aufruf starb an `undefined.length` — und ich habe zuerst den **Prüfling**
+verdächtigt statt das Werkzeug.
+
+Die Fassung steht jetzt oben neben der Überschrift (`#mk-stand`). Wer etwas
+ändert, zieht die Zahl hoch und sieht sofort, ob sein Browser sie hat. Neu
+laden mit `?mk=<version>&ziel=…`.
+
+#### Was offen bleibt
+
+- **Der Marktbericht mit echten Daten.** Geprüft ist das Gerüst mit
+  gefüllten Platzhaltern, nicht ein wirklich abgerufener Bericht — das
+  kostet Kerosin. `#genProgress` ebenso.
+- Farbkontraste (Fenster im Hintergrund), Touch-Gesten,
+  Bildschirmtastatur, Tastaturnavigation, Höhen über 757 px.
+- Anmeldung/Registrierung, Upload-Flächen, Lade- und Fehlerzustände.

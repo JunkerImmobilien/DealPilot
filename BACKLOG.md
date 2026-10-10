@@ -1028,10 +1028,44 @@ sie nicht mehr melden.
 > auf ihm aufgebaut wurde (`v2061b`). Danach: ohne Decke 0, mit Decke
 > genau 1, nach Entfernen wieder 0.
 
+**Die weiteren iframe-Zustände sind geprüft (v2062–v2063):**
+
+| Zustand | Weg dorthin | 320 | 390 | 768 |
+|---|---|---|---|---|
+| Marktbericht · Standort-Finder | `_lfSetView('finder')` | ✔ | ✔ | ✔ |
+| Marktbericht · fertiger Bericht | `#resultBody` entsperren | ✔ | ✔ | ✔ |
+| …**mit langen Texten und großen Zahlen** | Platzhalter gefüllt | ✔ | ✔ | ✔ |
+| Quick-Check · `#transfer-modal` | `.show` (Z. 2042) | ✔ | ✔ | – |
+| Quick-Check · `#api-modal` | `.show` | ✔ | ✔ | – |
+| Quick-Check · `#qc6-credit-modal` | `.show` | – | ✔ | – |
+
+Alle Modal-Boxen passen vollständig ins Bild, **alle Knöpfe treffen**.
+Der Bericht wächst mit langen Texten in die **Höhe** (1321 → 1984 px bei
+390 px Breite), nicht in die Breite: 0 Überlauf, 0 seitliches Scrollen.
+
+Zwei Dinge, die dabei **keine** Befunde waren, aber danach aussahen:
+- **`#mainTabs` im Marktbericht** hat fünf Knöpfe (PDF-Export, Dunkel,
+  Schließen …) mit **Höhe 0** — alle mit `display:none` inline und dem
+  Vermerk `v647-mb hidden`. Ausdrücklich abgeschaltet, weil die Hauptapp
+  die Leiste stellt. Deshalb führt auch **kein Knopf zum
+  Standort-Finder**; er ist nur programmatisch erreichbar.
+- **Vier „erdrückte" Knöpfe im Quick-Check** waren Knöpfe geschlossener
+  Modals. Sie tragen `display:flex` — ihr *Modal* trägt `display:none`.
+
+> **Der Prüfer hat durch beides dazugelernt** (`v2062`/`v2062a`):
+> *erdrückt ist nicht abgeschaltet* (Höhe 0 bei sichtbarem `display` ist
+> ein Befund, bei `display:none` nicht), und *das eigene `display` sagt
+> nichts über die Vorfahren* (`offsetParent === null` entscheidet).
+> `v2062b` lässt den Selbsttest sein Opfer **suchen** — am Seitenanfang
+> des Quick-Checks war von 23 Knöpfen keiner tauglich, und ein
+> Selbsttest, der sich selbst überspringt, wird nach dem dritten Mal
+> ignoriert.
+
 **Noch offen in N60.17:**
-- **Nur die Startansicht der iframes ist geprüft.** Der Marktbericht hat
-  weitere Zustände (Formular, fertiger Bericht, PDF-Vorschau), der
-  Quick-Check ebenso. Jeder Zustand ist ein eigener Durchgang.
+- **Der Marktbericht mit echten Daten.** Geprüft ist das Gerüst mit
+  gefüllten Platzhaltern, nicht ein wirklich abgerufener Bericht (das
+  kostet Kerosin). `#genProgress` (Fortschritt) ist ebenfalls nur als
+  Gerüst gesehen.
 - **Farbkontraste** — das Browserfenster stand im Hintergrund, und die
   Messkabine sagt dann selbst, dass nur Geometrie gilt. Ihr Selbsttest
   war grün (6/6). Gehört mit Fenster im Vordergrund wiederholt.
