@@ -147,7 +147,9 @@ router.post('/checkout', userAuth, async (req, res) => {
   if (!pack.stripe_price_id) {
     return res.status(503).json({
       error: 'stripe_price_missing',
-      message: 'Kerosin-Kauf ist noch nicht freigeschaltet. (Stripe-Produkt fehlt — ENV STRIPE_PRICE_' + pack.id.toUpperCase() + ' setzen.)'
+      /* v2097: hier stand „Kerosin-Kauf". Den Begriff gibt es seit v1176
+         nicht mehr (CLAUDE.md), und diese Meldung geht LIVE an den Kunden. */
+      message: 'Dieses Kontingent-Paket ist noch nicht freigeschaltet. (Stripe-Produkt fehlt — ENV STRIPE_PRICE_' + pack.id.toUpperCase() + ' setzen.)'
     });
   }
 

@@ -1093,10 +1093,19 @@
       '<div class="kp-flight">' + flight + '</div>' +
       _kerosinGauge(off, deg) +
       '<div class="dp-credits-amount">' + liter + '</div>' +
-      '<div class="dp-credits-amount-label">Liter = ' + liter + ' Pilot-Anfragen</div>' +
+      /* v2097: hier stand „Liter = X Pilot-Anfragen". Die Einheit „Liter"
+         ist mit dem Begriff „Kerosin" gefallen (CLAUDE.md). Das steht im
+         PREIS-FENSTER — genau dort, wo Marcel den Begriff „die ganze Zeit"
+         gesehen hat. Mein eigener Waechter hatte die Zeile als Bezeichner
+         eingeordnet, weil zu wenige deutsche Woerter darin stehen; von
+         Hand nachgesehen ist sie kundensichtbar. */
+      '<div class="dp-credits-amount-label">= ' + liter + ' Pilot-Anfragen</div>' +
       '<div class="dp-credits-divider"></div>' +
       '<div class="dp-credits-price">' + price + ' €</div>' +
-      '<div class="dp-credits-perunit">' + perLiterStr + ' / Liter</div>' +
+      /* v2097: „/ Liter" -> „/ Anfrage". Dieselbe Begruendung wie oben;
+         `perLiter` rechnet den Preis je Anfrage, der Name der Variablen
+         stammt aus der alten Einheit und bleibt (Bezeichner, kein Text). */
+      '<div class="dp-credits-perunit">' + perLiterStr + ' / Anfrage</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<div class="kp-reach">' + reach + '</div>' +
       '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a>' +
