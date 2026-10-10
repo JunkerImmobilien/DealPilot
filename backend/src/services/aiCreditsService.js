@@ -3,14 +3,25 @@
  * V63.86 — KI-Credits-Service
  * ═══════════════════════════════════════════════════════════════
  * Verwaltet pro User:
- *   - Monatslimit aus Plan (Free=1, Starter=5, Investor=15, Pro=40)
- *   - aktueller Monats-Verbrauch (resettet beim Monatswechsel)
- *   - Bonus-Credits aus Käufen (verfallen erst nach Verbrauch)
+ *   - Monatslimit aus Plan, je Leistungsart (mpi | mpi_plus | wev)
+ *   - aktueller Monats-Verbrauch (`*_used`, resettet beim Monatswechsel)
+ *   - Testphasen-Paket (`testphase_*`, verfällt mit dem Testfenster)
+ *   - Bank (`*_bank`) aus Käufen — verfällt nie
  *
- * Reihenfolge der Verbrauch:
- *   1. Bonus-Credits zuerst (FIFO im Sinne dass die Anzeige sie reduziert)
- *   2. Wenn keine Bonus-Credits mehr → Monats-Credits
- *   3. Wenn beides leer → 402 Payment Required
+ * Reihenfolge des Verbrauchs — was zuerst verfällt, geht zuerst:
+ *   1. Monatskontingent  (`:337`, Log-Quelle `monthly`)
+ *   2. Testphase         (`:343`, Log-Quelle `trial`)
+ *   3. Bank, gekauft     (`:350`, Log-Quelle `bonus`)
+ *
+ * ── v2077 · HIER STAND DIE UMGEKEHRTE REIHENFOLGE ─────────────────────
+ * „1. Bonus-Credits zuerst … 2. Wenn keine mehr → Monats-Credits".
+ * Das war der Stand bis v1183. Der Code tut seit v1296 das Richtige
+ * (Monat zuerst), dieser Kopf behauptete weiter das Gegenteil.
+ *
+ * Ein Kommentar, der die Reihenfolge falsch nennt, ist gefährlicher als
+ * keiner: wer ihn liest, prüft den Code nicht nach — und wer eine
+ * Abrechnung darauf baut, rechnet mit der falschen Quelle.
+ * Gemessen am 10.10.2026 an `consumeArt` Zeile für Zeile.
  */
 const { query } = require('../db/pool');
 
@@ -306,11 +317,18 @@ async function getStatus(userId) {
    `art` ist 'mpi' | 'mpi_plus' | 'wev'.
 
    REIHENFOLGE: was zuerst verfaellt, wird zuerst verbraucht.
-     1. Monatskontingent — laeuft zum Monatsende ab (bei bezahlten Plaenen
-        wandert der Rest bis zum Deckel in die Bank, bei free verfaellt er)
+     1. Monatskontingent — laeuft zum Monatsende ab, fuer JEDEN Plan.
+        v2077: hier stand "bei bezahlten Plaenen wandert der Rest bis zum
+        Deckel in die Bank". Das galt bis v1183. Seit v1296 wandert
+        NICHTS mehr: `_monatsReset` setzt nur `*_used = 0` (Z. 226-232),
+        und der Monatsrest wird ohnehin gerechnet (`limit - used`,
+        Z. 261) statt gespeichert - er kann das Planlimit nie
+        ueberschreiten. Marcels Entscheidung vom 11.09.2026.
      2. Testphase (v1185) — laeuft mit dem Testfenster ab und wandert NIE
         in die Bank
-     3. Bank — angespart und gekauft, verfaellt nie
+     3. Bank — gekauft, verfaellt nie. Bei Bestandsnutzern liegt darin
+        noch Angespartes aus der Regel vor v1296; das bleibt bewusst
+        stehen (Z. 172-178) und ist von Gekauftem nicht trennbar.
 
    Das ist durchgehend die fuer den Nutzer guenstigere Richtung: sein
    Bestaendigstes bleibt am laengsten liegen.

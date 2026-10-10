@@ -180,8 +180,32 @@
                 '</div>';
     }
 
+    /* ── v2077 · HIER STAND DAS GEGENTEIL DER REGEL ─────────────────────
+       „Nicht genutzte Bewertungen verfallen nicht." — das war der Stand
+       bis v1183. Marcels Entscheidung vom 11.09.2026 hat ihn umgedreht:
+       das Monatskontingent verfällt, nur Gekauftes bleibt.
+
+       `v1296` hat diesen Satz korrigiert — aber nur im ZWEITEN Renderer
+       dieser Datei (Z. 319 ff.). Dieser hier blieb stehen und lief
+       seither im Tooltip-Panel mit, also genau dort, wo der Kunde sein
+       Guthaben nachsieht.
+
+       Am 10.10.2026 gegen den Code gemessen, und der Code hält die Regel
+       ein: `_monatsReset` setzt nur `*_used = 0` ohne Übertrag
+       (`aiCreditsService.js:226-232`), der Kauf geht in `*_bank`
+       (`:405-426`), und kein Schreiber leert die Bank je. Verbraucht
+       wird in der Reihenfolge Monat → Testphase → Gekauftes (`:337`,
+       `:343`, `:350`).
+
+       > Falsch war nie die Rechnung, sondern dieser Satz. Eine Zusage,
+       > die das Produkt nicht einhält, ist teurer als ein Rechenfehler —
+       > sie wird geglaubt.
+
+       Derselbe Wortlaut wie im zweiten Renderer, nur kürzer für den
+       Fuß. Zwei Fassungen desselben Satzes sind der Grund, warum er
+       einmal übersehen wurde. */
     var fuss = 'Zurücksetzung am ' + _datum(s.period_reset_at) + '. ' +
-               'Nicht genutzte Bewertungen verfallen nicht.';
+               'Was du bis dahin nicht nutzt, verfällt — zugekaufte Bewertungen nie.';
     /* v1185: Waehrend der Testphase stimmt der zweite Satz nicht — was aus
        dem Testpaket kommt, verfaellt sehr wohl. Ein Satz, der in einem
        Zustand falsch ist, gehoert ersetzt, nicht ergaenzt. */

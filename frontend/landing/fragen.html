@@ -151,9 +151,16 @@
   <details class="fq"><summary>Kann ich monatlich kündigen?</summary><div class="ant">
     <p>Ja, alle Pakete sind monatlich kündbar. Beim Jahrestarif zahlen Sie zwölf Monate im
       Voraus und sparen rund 17 Prozent.</p>
-    <p><b>Nicht genutzte Bewertungen verfallen nicht</b> — sie bleiben auf dem Konto, solange
-      das Abo läuft. Ist das Monatskontingent aufgebraucht, lässt es sich einmal nachkaufen:
-      dieselbe Menge für ein Viertel des Monatsbeitrags.</p></div></details>
+    <p><b>Das Monatskontingent gilt für den laufenden Monat</b> — was Sie bis zum Monatsende
+      nicht nutzen, verfällt. <b>Zugekaufte Bewertungen verfallen nie</b> und werden erst
+      verbraucht, wenn das Monatskontingent leer ist. Ist es aufgebraucht, lässt es sich
+      nachkaufen: dieselbe Menge für ein Viertel des Monatsbeitrags.</p></div></details>
+  <!-- v2077: Hier stand „Nicht genutzte Bewertungen verfallen nicht — sie bleiben
+       auf dem Konto, solange das Abo läuft." Das war der Stand bis v1183 und seit
+       Marcels Entscheidung vom 11.09.2026 das Gegenteil der Regel. Der Code hält die
+       Regel ein (aiCreditsService.js:226-232 setzt nur *_used zurück, ohne Übertrag);
+       falsch war nur dieser Satz — und er stand auf der Preisseite, also dort, wo er
+       zur Zusage wird. Wortlaut wie in frontend/js/ai-credits.js. -->
 </div>
 
 <!-- ══ 02 QUICK-CHECK ════════════════════════════════════════════════ -->

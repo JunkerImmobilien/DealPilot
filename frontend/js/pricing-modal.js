@@ -938,7 +938,7 @@
           '<p class="dp-sub"><strong>Gez\u00e4hlt werden Bewertungen, getrennt nach Art.</strong> Ein Pass, umschaltbar \u2014 Zugekauftes kommt obendrauf, wird zuletzt verbraucht und verf\u00e4llt nie.</p>' +
         '</div>' +
         _kerosinStripHtml() +
-        '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar \u00b7 verfallen nicht \u00b7 kein Abo.</p>' +
+        '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar \u00b7 zugekaufte verfallen nicht \u00b7 kein Abo.</p>' +
       '</div>' +
 
       // V63.82: Feature-Übersicht — vollständige Vergleichstabelle
