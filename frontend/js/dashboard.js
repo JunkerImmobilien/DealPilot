@@ -529,6 +529,57 @@
       {t:'Mietrendite', h:[ half('Bruttomietrendite', P2(s.brutto), rcol(s.brutto,5,3.5), 'Jahresmiete / KP'), half('Nettomietrendite', P2(s.netto), rcol(s.netto,4,2.5), (s.netto==null?'k.\u00a0A.':'nach BWK')) ]},
       {t:'Cashflow \u00b7 '+cfLabel, click:true, h:[ half('/ Monat', M(cfM), cfc(cfM), cfLabel), half('/ Jahr', M(cfJ), cfc(cfJ), 'Klick: '+(cfVor?'nach':'vor')+' Steuer') ]}
     ];
+
+    /* ── v2098 · SEIT ANKAUF, UEBER DEN GANZEN BESTAND ────────────────
+     * Backlog N60.16: „die Abweichung ueber den ganzen Bestand - wie
+     * viele Objekte stehen besser, wie viele schlechter als beim Ankauf".
+     *
+     * Gerechnet wird NICHT hier, sondern von
+     * `DealPilotAnkauf.abweichungFuer(daten)` - derselben Funktion, die
+     * der Reiter Soll/Ist benutzt. Eine zweite Fassung waere hier
+     * besonders teuer: `KENNZAHLEN` fuehrt die Richtung je Kennzahl, und
+     * bei ZWEI davon (Kaufpreis, LTV) ist KLEINER besser. Wer das
+     * nachbaut, erklaert einen gestiegenen Kaufpreis zur Verbesserung.
+     * `tools/ankauf-abweichung-pruefen.mjs` prueft alle 18 Richtungen.
+     *
+     * Das Urteil je Objekt haengt am DealScore - der eigenen
+     * Gesamtkennzahl. Kein erfundenes Gewicht ueber die neun Kennzahlen:
+     * welche davon schwerer zaehlt, ist eine Bewertungsfrage, und der
+     * Score ist die Antwort, die das Produkt ohnehin gibt. Die Kachel
+     * sagt das im Titel-Hinweis, damit niemand eine andere Rechnung
+     * dahinter vermutet.
+     *
+     * Die Kachel erscheint NUR, wenn es Objekte mit eingefrorenem
+     * Ankauf-Stand gibt. Eine Kachel mit „0 von 0" ist keine Auskunft,
+     * sondern eine leere Zeile. */
+    (function(){
+      var A = window.DealPilotAnkauf;
+      if (!A || typeof A.abweichungFuer !== 'function') return;
+      var besser = 0, schlechter = 0, gleich = 0, ohneScore = 0, mitStand = 0;
+      arr.forEach(function(o){
+        var r = null;
+        try { r = A.abweichungFuer(o); } catch (e) { return; }
+        if (!r) return;
+        mitStand++;
+        if (r.urteil === 'besser') besser++;
+        else if (r.urteil === 'schlechter') schlechter++;
+        else if (r.urteil === 'gleich') gleich++;
+        else ohneScore++;
+      });
+      if (!mitStand) return;
+      /* Die Methode steht im SICHTBAREN Untertitel, nicht in `ctitle`:
+         der Renderer gibt `title` nur bei `click:true` aus (Z. 533), ein
+         `ctitle` ohne Klick waere ein totes Feld. */
+      groups.push({
+        t: 'Seit Ankauf',
+        h: [ half('Besser', String(besser), green,
+                  'am DealScore · ' + mitStand + ' von ' + arr.length + ' mit Ankauf-Stand'),
+             half('Schlechter', String(schlechter), red,
+                  (gleich ? gleich + ' unverändert' : 'kein unverändertes')
+                  + (ohneScore ? ' · ' + ohneScore + ' ohne Score' : '')) ]
+      });
+    })();
+
     host.innerHTML=groups.map(function(g){
       var cl='ov-card ov-pair-card'+(g.click?' ov-clickable':'');
       var on=g.click?(' onclick="'+(g.fn||'DealPilotDashboard.toggleCf()')+'" title="'+esc(g.ctitle||'Klick wechselt vor/nach Steuer')+'"'):'';

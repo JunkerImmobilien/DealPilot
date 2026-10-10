@@ -196,11 +196,22 @@
 
      `null` heisst fehlt, nicht null. Eine fehlende Zahl erzeugt KEINE
      Zeile mit „0 %" - sie erzeugt gar keine. */
-  function abweichung() {
-    var a = stand();
-    if (!a) return null;
-    var jetzt;
-    try { jetzt = _kurzfassung(collectData()); } catch (e) { return null; }
+  /* ── v2098 · DIE ABWEICHUNG FUER EIN BELIEBIGES OBJEKT ────────────────
+   *
+   * `abweichung()` konnte nur das GERADE GELADENE Objekt: es liest
+   * `window._dpAnkauf` und `collectData()`. Fuer das Portfolio-Cockpit
+   * braucht es dieselbe Rechnung je Objekt aus der Liste (Backlog N60.16:
+   * „die Abweichung ueber den ganzen Bestand - wie viele Objekte stehen
+   * besser, wie viele schlechter als beim Ankauf").
+   *
+   * Die Schleife steht deshalb jetzt EINMAL in `_vergleich()`, und beide
+   * Wege rufen sie. Eine zweite Fassung im Cockpit waere genau der Fehler,
+   * den `score-tiers.js` vier Kopien gekostet hat - und hier waere er
+   * noch teurer, weil `KENNZAHLEN` die Richtung je Kennzahl fuehrt
+   * (`besser: 'kleiner'` beim Kaufpreis und beim LTV, `'groesser'` bei
+   * den anderen sieben). Wer das nachbaut, verdreht genau diese zwei.
+   */
+  function _vergleich(a, jetzt) {
     var zeilen = [];
     for (var i = 0; i < KENNZAHLEN.length; i++) {
       var k = KENNZAHLEN[i];
@@ -216,8 +227,40 @@
                 : ((diff > 0) === (k.besser === 'groesser') ? 'besser' : 'schlechter')
       });
     }
+    /* v2098: `urteil` ist der Stand am DealScore - der eigenen
+       Gesamtkennzahl des Produkts. KEIN erfundenes Gewicht ueber die neun
+       Kennzahlen: welche davon schwerer zaehlt, ist eine Bewertungsfrage.
+       Der Score ist die Antwort, die das Produkt ohnehin gibt. `null`
+       heisst: kein Score auf einer der beiden Seiten. */
+    var sc = null;
+    for (var j = 0; j < zeilen.length; j++) {
+      if (zeilen[j].wort === 'DealScore') { sc = zeilen[j]; break; }
+    }
     return { stichtag: a.stichtag, am: a.am, zeilen: zeilen,
+             urteil: sc ? sc.richtung : null,
+             urteilQuelle: sc ? 'DealScore' : null,
+             scoreAnkauf: sc ? sc.ankauf : null,
+             scoreJetzt: sc ? sc.bestand : null,
              korrekturen: (a.korrekturen || []).length };
+  }
+
+  function abweichung() {
+    var a = stand();
+    if (!a) return null;
+    var jetzt;
+    try { jetzt = _kurzfassung(collectData()); } catch (e) { return null; }
+    return _vergleich(a, jetzt);
+  }
+
+  /* Dieselbe Rechnung fuer ein Objekt aus der LISTE. `daten` ist das
+     flache Datenobjekt; der eingefrorene Stand liegt als `_ankauf` darin.
+     Gibt `null`, wenn das Objekt keinen Ankauf-Stand hat - das ist kein
+     Fehler, sondern die Mehrheit der Objekte. */
+  function abweichungFuer(daten) {
+    if (!daten || typeof daten !== 'object') return null;
+    var a = daten._ankauf;
+    if (!a || !a.kurz || typeof a.kurz !== 'object') return null;
+    return _vergleich(a, _kurzfassung(daten));
   }
 
   /* ── Die Frage unter „Gewonnen" ───────────────────────────────────
@@ -389,6 +432,8 @@
     korrigieren: korrigieren,
     verwerfen: verwerfen,
     abweichung: abweichung,
+    /* v2098: fuer das Portfolio-Cockpit - dieselbe Rechnung je Objekt */
+    abweichungFuer: abweichungFuer,
     frageZeigen: frageZeigen,
     vonSelbst: vonSelbst,
     zuruecknehmen: zuruecknehmen,
