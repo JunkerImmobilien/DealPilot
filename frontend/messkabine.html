@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092a</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1717,16 +1717,51 @@
      dass man es sieht.
      ═══════════════════════════════════════════════════════════════════ */
 
+  /* ── EINE VARIANTE NENNT ALLE ACHSEN, NICHT NUR DIE ABWEICHENDE ──────
+
+     v2092a. Im ERSTEN echten Lauf stand bei den ersten acht Punkten:
+
+         DealPilot @ iPhone SE: theme angefordert "", am <html> "kontor"
+
+     Die Variante „DealPilot" war als `opt: {}` geschrieben — und
+     `setzeMerker()` setzt mit Absicht nur, was ausdrücklich genannt ist
+     (sonst löschte jeder Lauf die Wahl des Nutzers). Also blieben
+     `ui_theme: kontor`, `ui_cards: wallet`, `dp_karten_stil: kartei` und
+     `dp_objkarte_stil: datenzeile` aus meinen vorherigen Achsen-Proben
+     **stehen**, und der Läufer hat acht Punkte als „DealPilot" gemeldet,
+     die Kontor waren.
+
+     **Damit war nicht nur der Name falsch, sondern der ganze Lauf:** die
+     Reste lagen in ALLEN 48 Punkten, weil keine Variante sie zurücksetzt.
+     Ein Prüfstand, der den Restzustand des vorigen Laufs mitnimmt, misst
+     nicht die Variante, sondern die Reihenfolge.
+
+     Gefunden hat es das `attribute`-Feld, das genau dafür gebaut wurde —
+     angefordert gegen das, was wirklich am `<html>` hängt. Ohne es hätte
+     der Läufer „48 Punkte, sechs Varianten" gemeldet und fünf gefahren.
+
+     Jede Variante trägt jetzt den VOLLEN Satz. `''` heißt ausdrücklich
+     „zurücksetzen", nicht „nicht erwähnt".                              */
+  var ACHSEN_LEER = { theme: '', cards: '', surface: '', kartenstil: '',
+                      objkarte: '', kartenvariante: '' };
+
+  function variante(name, abweichung){
+    var o = {};
+    for (var k in ACHSEN_LEER) if (Object.prototype.hasOwnProperty.call(ACHSEN_LEER, k)) o[k] = ACHSEN_LEER[k];
+    for (var j in abweichung) if (Object.prototype.hasOwnProperty.call(abweichung, j)) o[j] = abweichung[j];
+    return { name: name, opt: o };
+  }
+
   /* Die Achsenwerte stehen in ui-varianten.js (THEMES/CARDS/SURFACE) und
-     in layout-varianten.css. Hier nur die Vorauswahl für einen Lauf —
-     sechs Varianten, die sich in den TRAGENDEN FLÄCHEN unterscheiden. */
+     in layout-varianten.css. Hier die Vorauswahl für einen Lauf: sechs
+     Varianten, die sich in den TRAGENDEN FLÄCHEN unterscheiden. */
   var VARIANTEN = [
-    { name: 'DealPilot',  opt: {} },
-    { name: 'Kontor',     opt: { theme: 'kontor' } },
-    { name: 'Panel',      opt: { theme: 'panel' } },
-    { name: 'Kanzlei',    opt: { theme: 'kanzlei' } },
-    { name: 'Boarding',   opt: { theme: 'boarding' } },
-    { name: 'Konsole',    opt: { theme: 'konsole' } }
+    variante('DealPilot', {}),
+    variante('Kontor',    { theme: 'kontor' }),
+    variante('Panel',     { theme: 'panel' }),
+    variante('Kanzlei',   { theme: 'kanzlei' }),
+    variante('Boarding',  { theme: 'boarding' }),
+    variante('Konsole',   { theme: 'konsole' })
   ];
 
   async function matrix(opt){
@@ -1755,12 +1790,20 @@
           continue;
         }
 
-        /* (1) NACHWEIS DER VARIANTE - nicht glauben, dass sie wirkt */
-        var soll = v.opt.theme || '';
-        var ist  = (r.attribute && r.attribute.theme) || '';
-        if (String(soll) !== String(ist)) {
-          z0.achsen.push(v.name + ' @ ' + g[0] + ': theme angefordert "'
-                         + soll + '", am <html> "' + ist + '"');
+        /* (1) NACHWEIS DER VARIANTE über ALLE Achsen, nicht nur `theme`.
+               v2092a: zuerst stand hier nur `theme`. Das hat den Restzustand
+               bei `cards`, `kartenstil` und `objkarte` nicht gesehen - und
+               genau die lagen aus einem vorigen Lauf noch an. Wer eine
+               Achse nicht prüft, prüft sie nicht, und meldet trotzdem
+               „Variante gesetzt". */
+        for (var ax in ACHSEN_LEER) {
+          if (!Object.prototype.hasOwnProperty.call(ACHSEN_LEER, ax)) continue;
+          var soll = v.opt[ax] === undefined ? '' : v.opt[ax];
+          var ist  = (r.attribute && r.attribute[ax]) || '';
+          if (String(soll) !== String(ist)) {
+            z0.achsen.push(v.name + ' @ ' + g[0] + ': ' + ax + ' angefordert "'
+                           + soll + '", am <html> "' + ist + '"');
+          }
         }
 
         var zz = ziel();
