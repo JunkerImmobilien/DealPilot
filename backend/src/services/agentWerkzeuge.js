@@ -1861,7 +1861,26 @@ async function objekt_schnellblick(ctx, args) {
   };
   if (wfl) {
     rechnung.kaufpreis_je_qm = eur(kp / wfl) + '/m²';
-    rechnung.miete_je_qm = (nkm / wfl).toFixed(2).replace('.', ',') + ' EUR/m²';
+    /* ── v2081 · DIESELBE MIETE IN ZWEI GROESSEN ───────────────────────
+       HIER STAND `(nkm / wfl)` — also OHNE die Zusatzeinnahmen, waehrend
+       `jahreskaltmiete` und die Rendite eine Zeile darueber mit
+       `nkm + ze` rechnen (`K0.nkm_j`). Bei nkm 940 und ze 460 stand im
+       selben Block „Jahreskaltmiete 16.800 EUR" und „Miete je m² 9,40" —
+       16.800 entspricht aber 1.400 EUR/Monat, also 14,00 je m².
+
+       Zwei Zahlen zur selben Miete, und keine sagt, welche gemeint ist.
+       Genau so eine Ausgabe laedt dazu ein, sie „passend" neu zu
+       formulieren.
+
+       Jetzt wird die GESAMTE Kaltmiete je m² ausgewiesen — dieselbe
+       Grundlage wie Rendite und Faktor — und die Nettokaltmiete nur
+       zusaetzlich, wenn sie abweicht. Beide tragen ihren Namen. */
+    rechnung.miete_je_qm = ((nkm + ze) / wfl).toFixed(2).replace('.', ',') + ' EUR/m²'
+      + (ze ? '  (Gesamt-Kaltmiete inkl. Zusatzeinnahmen)' : '');
+    if (ze) {
+      rechnung.nettokaltmiete_je_qm = (nkm / wfl).toFixed(2).replace('.', ',') + ' EUR/m²'
+        + '  (ohne die ' + eur(ze) + '/Monat Zusatzeinnahmen)';
+    }
   }
 
   /* ── Kaufnebenkosten, soweit belegbar ───────────────────────────────── */
@@ -2398,12 +2417,52 @@ async function objekt_schnellblick(ctx, args) {
 
          > Eine Zahl ohne ihr Objekt ist nicht pruefbar. Und eine Zahl
          > unter dem FALSCHEN Objekt sieht genauso aus wie eine richtige. */
-    hinweis: 'Schreibe die Adresse aus "adresse" WOERTLICH ueber die Zahlen — '
+    /* ── v2081 · EIN BLOCK STATT EINZELNER ZAHLEN ──────────────────────
+     *
+     * GEMESSEN am 10.10.2026 (Backlog N60.5): der Bot gab zu einem
+     * Objekt mit KP 180.000 und 940 EUR Miete vier Kennzahlen aus, von
+     * denen keine zu einer gemeinsamen Miete passt — 16.800 Jahresmiete
+     * (= 1.400/Monat), aber 4,80 % Rendite (= 720) und Faktor 20,8
+     * (= 721). Der Kern rechnet alle vier richtig (11.280 / 6,27 % /
+     * 15,96 / 9,40), direkt nachgerufen.
+     *
+     * Verboten war es dreifach: `agentLauf.js:103` („ZAHLEN ERFINDEST DU
+     * NIE"), Regel 2 („Summen NUR aus Zahlen, die ein Werkzeug geliefert
+     * hat"), Regel 3 („rechnest KEINE Renditen selbst") — und der
+     * Hinweis hier sagte „so wie sie hier stehen". Vier Verbote, alle
+     * gebrochen.
+     *
+     * > Ein vierter Appell waere der falsche Schluss. Was gerechnet
+     * > werden soll, darf nicht formulierbar sein — und einzelne Felder
+     * > SIND formulierbar: das Modell setzt sie in einen eigenen Satz
+     * > und schreibt dabei die Zahl neu.
+     *
+     * `kennzahlen_block` ist deshalb EIN fertiger Mehrzeiler. Ihn kann
+     * das Modell kopieren oder weglassen, aber nicht halb uebernehmen.
+     * Der Hinweis dazu steht VORNE, nicht am Ende. */
+    kennzahlen_block: [
+      _adrVon(o),
+      '',
+      'Jahreskaltmiete:    ' + rechnung.jahreskaltmiete,
+      'Bruttomietrendite:  ' + rechnung.bruttomietrendite,
+      'Kaufpreisfaktor:    ' + rechnung.kaufpreisfaktor
+    ].concat(
+      rechnung.kaufpreis_je_qm ? ['Kaufpreis je m²:    ' + rechnung.kaufpreis_je_qm] : []
+    ).concat(
+      rechnung.miete_je_qm ? ['Miete je m²:        ' + rechnung.miete_je_qm] : []
+    ).concat(
+      rechnung.nettokaltmiete_je_qm ? ['davon netto:        ' + rechnung.nettokaltmiete_je_qm] : []
+    ).join('\n'),
+
+    hinweis: 'GIB "kennzahlen_block" WOERTLICH UND VOLLSTAENDIG AUS, Zeile fuer '
+      + 'Zeile, bevor du etwas dazu sagst. Formuliere die Zahlen daraus NICHT '
+      + 'neu und rechne nichts nach — sie sind fertig und stammen aus dem '
+      + 'Rechenkern der App. Brauchst du eine Zahl, die dort nicht steht, '
+      + 'sagst du, dass sie fehlt. '
+      + 'Schreibe die Adresse aus "adresse" WOERTLICH ueber die Zahlen — '
       + 'nicht die, die der Nutzer gesagt hat. Weichen beide voneinander ab, '
       + 'nennst du die Zahlen NICHT, sondern sagst, welches Objekt du gefunden '
       + 'hast, und fragst nach. '
-      + 'Gib dem Nutzer die Zahlen MIT ihrem Rechenweg, so wie sie hier '
-      + 'stehen — sie sind fertig formatiert. '
       /* v1925: hier stand „Sag ausdruecklich, dass das noch kein Score ist".
          Es IST jetzt einer — und zwar der, den die App rechnet. */
       + 'Der Block "bewertung" traegt den DEAL-SCORE mit seiner Stufe, die '
