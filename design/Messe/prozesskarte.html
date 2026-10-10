@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot · Prozesskarte</title>
+<!--
+  ════════════════════════════════════════════════════════════════════════
+  DealPilot v2088 — design/Messe/prozesskarte.html   ·   Backlog N60.20
+
+  Marcel, 10.10.2026: „Dafür brauche ich dann einmal eine Prozesskarte.
+  Eine richtig gut aufgearbeitete Prozesskarte in dem Pilot-Stil und
+  Design, wo wir einmal die Prozesse aufmalen, vielleicht irgendwo wie so
+  ein Miro-Board oder dann auch so eine Prozesskette abbilden."
+
+  Zweck: „Dass wir das dem Kunden auch zeigen können." Also ein Stück,
+  das am Messestand standhält — kein Interndiagramm.
+
+  ── JEDE ZAHL UND JEDER NAME IST GEMESSEN, NICHT GESCHRIEBEN ──────────
+
+  Was eine Prozesskarte am Messestand verspricht, muss die App halten.
+  Deshalb stammt alles hier aus einer Quelle im Repo:
+
+    8 Etappen, Namen und Ziele   backend/src/generated/frontend-konstanten.json
+                                 (abgeleitet aus index.html, Etappe 7+8
+                                  tragen `extra: true`)
+    3 Marktbericht-Stufen        backend/src/routes/marktbericht.js:56
+    Score-Schwellen 85/70/50/35  frontend/js/score-tiers.js (CLAUDE.md)
+    286 Datenfelder              Portfolio-Export, gemessen 10.10.2026
+    24 Analyse-Textfelder        dito
+    Pflichtfelder je Stufe       frontend/js/objekt-reiter.js pflichtFuer()
+                                 6 / 13 / bis 20
+    Verfahren der Wertermittlung CrossCheckService: Boden-, Ertrags-,
+                                 Sachwert + amtlicher Vergleichsfaktor
+    RND nach Anlage 2            frontend/js/rnd-calc.js, sechs Verfahren
+
+  Was NICHT draufsteht: Zahlen, die niemand gemessen hat. Keine
+  Zeitersparnis in Prozent, keine Nutzerzahlen, keine Treffergenauigkeit.
+  Eine Prozesskarte, die eine Zahl behauptet, die das Produkt nicht
+  belegt, fällt am Stand genau dem auf, der sie prüft.
+
+  ── FARBEN UND SCHRIFTEN NACH CLAUDE.md ──────────────────────────────
+  Obsidian #050505 · Gold #C9A84C (hell #E8CC7A, dunkel #b8932f) ·
+  Grün #3FA56C · Rot #B8625C · Creme #FDFCFA · Karte #FBF6E9
+  Runway: linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f)
+  Space Grotesk (Display) · JetBrains Mono (Labels) · Inter (Body) ·
+  Cormorant Garamond (Serif)
+
+  Die drei Bahnen tragen die Luftfahrt-Bildsprache: Pre-Flight (prüfen,
+  bevor man bietet), Boarding (der Deal wird verbindlich), Reiseflug
+  (der Bestand läuft). „Kerosin" kommt NICHT vor — der Begriff ist seit
+  v1176 abgeschafft (v2078).
+
+  ── DRUCKEN ──────────────────────────────────────────────────────────
+  A3 quer über @page. Am Stand hängt sie als Druck, am Monitor läuft sie
+  als Seite; beide aus dieser einen Datei, damit nicht zwei Stände
+  entstehen.
+  ════════════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#050505;
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --gruen:#3FA56C; --rot:#B8625C;
+    --creme:#FDFCFA; --karte:#FBF6E9;
+    --tinte:#1A1714; --grau:#8a8279;
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+    --f-disp:"Space Grotesk",system-ui,sans-serif;
+    --f-mono:"JetBrains Mono",ui-monospace,monospace;
+    --f-body:Inter,system-ui,sans-serif;
+    --f-serif:"Cormorant Garamond",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--obsidian); color:var(--creme);
+    font-family:var(--f-body); font-size:14px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* Ein ruhiger Lichtschein, kein Partikelfeld — gedruckt wäre das Grau. */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(120% 60% at 12% -10%, rgba(232,204,122,.10), transparent 60%),
+      radial-gradient(90% 50% at 92% 110%, rgba(201,168,76,.07), transparent 65%);
+  }
+  .blatt{position:relative; z-index:1; max-width:1760px; margin:0 auto; padding:30px 34px 48px}
+
+  /* ── Kopf ─────────────────────────────────────────────────── */
+  header{display:flex; align-items:flex-end; justify-content:space-between;
+    gap:24px; flex-wrap:wrap; padding-bottom:16px; border-bottom:1px solid rgba(201,168,76,.26)}
+  .marke{display:flex; align-items:center; gap:13px}
+  .marke .zeichen{width:42px;height:42px;border-radius:9px;background:var(--runway);
+    display:grid;place-items:center;flex:0 0 auto}
+  .marke .zeichen svg{width:24px;height:24px}
+  h1{margin:0; font-family:var(--f-disp); font-weight:700; font-size:27px; letter-spacing:-.015em}
+  .unter{margin:3px 0 0; font-family:var(--f-mono); font-size:10.5px;
+    letter-spacing:.17em; text-transform:uppercase; color:var(--gold)}
+  .kopf-satz{max-width:560px; font-family:var(--f-serif); font-size:17.5px;
+    line-height:1.45; color:#E9E2D2; text-align:right}
+
+  /* ── Die Runway unter dem Kopf: die drei Phasen ───────────── */
+  .runway{display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:0; margin:22px 0 4px; border-radius:7px; overflow:hidden;
+    border:1px solid rgba(201,168,76,.3)}
+  .runway div{padding:9px 14px; font-family:var(--f-mono); font-size:10px;
+    letter-spacing:.15em; text-transform:uppercase; text-align:center;
+    background:rgba(201,168,76,.07); color:var(--gold-hi)}
+  .runway div + div{border-left:1px solid rgba(201,168,76,.22)}
+  .runway b{display:block; font-family:var(--f-disp); font-size:13.5px;
+    letter-spacing:0; text-transform:none; color:var(--creme); margin-top:3px; font-weight:600}
+
+  /* ── Das Board: drei Bahnen ───────────────────────────────── */
+  .bahnen{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:18px}
+  .bahn{display:flex; flex-direction:column; gap:13px; position:relative}
+  .bahn-kopf{display:flex; align-items:center; gap:9px; padding:11px 14px;
+    border-radius:8px 8px 0 0; background:rgba(201,168,76,.1);
+    border:1px solid rgba(201,168,76,.3); border-bottom:none}
+  .bahn-nr{width:23px;height:23px;border-radius:50%;background:var(--runway);
+    color:var(--obsidian); font-family:var(--f-mono); font-weight:700; font-size:11px;
+    display:grid;place-items:center;flex:0 0 auto}
+  .bahn-kopf h2{margin:0; font-family:var(--f-disp); font-size:16px; font-weight:600}
+  .bahn-kopf .wann{margin-left:auto; font-family:var(--f-mono); font-size:9.5px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--grau)}
+
+  .station{background:rgba(255,255,255,.028); border:1px solid rgba(201,168,76,.19);
+    border-radius:9px; padding:13px 15px}
+  .station h3{margin:0 0 3px; font-family:var(--f-disp); font-size:14px; font-weight:600;
+    color:var(--creme); display:flex; align-items:center; gap:7px}
+  .station h3 .mk{font-family:var(--f-mono); font-size:8.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-lo); border:1px solid rgba(201,168,76,.4);
+    border-radius:3px; padding:2px 5px; font-weight:700}
+  .station .was{margin:7px 0 0; font-size:12.8px; color:#D8D2C6}
+  .station ul{margin:6px 0 0; padding-left:16px}
+  .station li{font-size:12.6px; color:#D8D2C6; margin:2px 0}
+
+  /* „Was dabei herauskommt" — das ist die Antwort auf Marcels Frage. */
+  .raus{margin-top:11px; padding-top:9px; border-top:1px dashed rgba(201,168,76,.3)}
+  .raus-lbl{font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--gold); display:block; margin-bottom:6px}
+  .pillen{display:flex; flex-wrap:wrap; gap:5px}
+  .pille{font-family:var(--f-body); font-size:11.4px; font-weight:500;
+    border:1px solid rgba(201,168,76,.45); color:var(--gold-hi);
+    border-radius:999px; padding:3px 9px; background:rgba(201,168,76,.07)}
+  .pille.gruen{border-color:rgba(63,165,108,.5); color:#8FD6AE; background:rgba(63,165,108,.08)}
+
+  /* Der Pfeil zwischen den Bahnen */
+  .pfeil{position:absolute; top:50%; right:-13px; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; background:var(--obsidian);
+    border:1px solid rgba(201,168,76,.45); display:grid; place-items:center; z-index:2}
+  .pfeil svg{width:11px;height:11px;fill:var(--gold)}
+
+  /* ── Fußzeile: die Doktrin, kurz ───────────────────────────── */
+  .fuss{margin-top:26px; padding-top:15px; border-top:1px solid rgba(201,168,76,.26);
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px}
+  .fuss div{font-size:12.4px; color:#C9C2B6}
+  .fuss b{display:block; font-family:var(--f-disp); font-size:13px; color:var(--gold-hi);
+    margin-bottom:3px; font-weight:600}
+  .stand{margin-top:18px; font-family:var(--f-mono); font-size:9px; letter-spacing:.1em;
+    color:#6b655c; text-transform:uppercase}
+
+  /* ── Schmal: Bahnen untereinander ──────────────────────────── */
+  @media (max-width:1180px){
+    .bahnen{grid-template-columns:minmax(0,1fr)}
+    .pfeil{top:auto; bottom:-15px; right:50%; transform:translateX(50%) rotate(90deg)}
+    .kopf-satz{text-align:left}
+    .runway{grid-template-columns:minmax(0,1fr)}
+    .runway div + div{border-left:none; border-top:1px solid rgba(201,168,76,.22)}
+    .fuss{grid-template-columns:minmax(0,1fr)}
+  }
+
+  /* ── Druck: A3 quer, helle Fassung ─────────────────────────── */
+  @page{ size:A3 landscape; margin:12mm }
+  @media print{
+    body{background:#fff; color:var(--tinte)}
+    body::before{display:none}
+    .blatt{max-width:none; padding:0}
+    header{border-color:rgba(26,23,20,.2)}
+    .kopf-satz{color:#3a352e}
+    .unter{color:var(--gold-lo)}
+    .runway{border-color:rgba(26,23,20,.25)}
+    .runway div{background:#F6F2E8; color:var(--gold-lo)}
+    .runway b{color:var(--tinte)}
+    .bahn-kopf{background:#F6F2E8; border-color:rgba(26,23,20,.22)}
+    .station{background:var(--karte); border-color:rgba(26,23,20,.18);
+      break-inside:avoid; page-break-inside:avoid}
+    .station h3,.station .was,.station li{color:var(--tinte)}
+    .pille{color:#6b5518; border-color:rgba(184,147,47,.6); background:#F6F2E8}
+    .pille.gruen{color:#215C3B; border-color:rgba(33,92,59,.45); background:#EDF5F0}
+    .pfeil{background:#fff}
+    .fuss div{color:#3a352e}
+    .fuss b{color:var(--gold-lo)}
+    .bahnen{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+</style>
+</head>
+<body>
+<div class="blatt">
+
+  <header>
+    <div class="marke">
+      <span class="zeichen" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#050505" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12h3l2-3h4l-1 3h5l3-4 2 1-2 3 2 3-2 1-3-4h-5l1 3H7l-2-3H2z"/>
+        </svg>
+      </span>
+      <div>
+        <h1>Von der Adresse zum Bestand</h1>
+        <p class="unter">DealPilot · Prozesskarte</p>
+      </div>
+    </div>
+    <p class="kopf-satz">Drei Phasen, neun Stationen. An jeder steht,
+      <em>was man tun kann</em> — und <em>was dabei herauskommt</em>.</p>
+  </header>
+
+  <!-- Die drei Phasen als Runway -->
+  <div class="runway">
+    <div>Phase 1 <b>Pre-Flight</b></div>
+    <div>Phase 2 <b>Boarding</b></div>
+    <div>Phase 3 <b>Reiseflug</b></div>
+  </div>
+
+  <div class="bahnen">
+
+    <!-- ══ BAHN 1 · QUICK-CHECK ══════════════════════════════ -->
+    <section class="bahn">
+      <div class="bahn-kopf">
+        <span class="bahn-nr">1</span>
+        <h2>Quick-Check</h2>
+        <span class="wann">vor dem Gebot</span>
+      </div>
+
+      <article class="station">
+        <h3>Adresse eintragen <span class="mk">Etappe 1</span></h3>
+        <p class="was">Objekt, Preis und Miete — mehr nicht. Die Adresse genügt,
+          um die Lage zu holen.</p>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille">Bodenrichtwert</span>
+            <span class="pille">Lagebewertung</span>
+            <span class="pille">erste Kennzahlen</span>
+          </div></div>
+      </article>
+
+      <article class="station">
+        <h3>Marktpreis einholen <span class="mk">Stufe 1</span></h3>
+        <p class="was">Eine Marktpreisindikation mit <b>Ober- und Untergrenze</b> —
+          statt einer Schein-Genauigkeit. Dazu die Mietpreis-Einschätzung.</p>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille">Marktwert mit Spanne</span>
+            <span class="pille">Miete je m²</span>
+            <span class="pille">Vertrauensgrad</span>
+          </div></div>
+      </article>
+
+      <article class="station">
+        <h3>Score lesen</h3>
+        <p class="was">Der Investor-Deal-Score aus den eigenen Angaben und den
+          Marktdaten. Fünf Stufen, feste Schwellen:</p>
+        <ul>
+          <li><b>Sehr gut</b> ab 85 · <b>Gut</b> ab 70 · <b>Solide</b> ab 50</li>
+          <li><b>Schwach</b> ab 35 · <b>Kritisch</b> darunter</li>
+        </ul>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille gruen">Entscheidung: weiterverfolgen?</span>
+          </div></div>
+      </article>
+      <span class="pfeil" aria-hidden="true">
+        <svg viewBox="0 0 12 12"><path d="M3 1l5 5-5 5z"/></svg></span>
+    </section>
+
+    <!-- ══ BAHN 2 · ANKAUF ═══════════════════════════════════ -->
+    <section class="bahn">
+      <div class="bahn-kopf">
+        <span class="bahn-nr">2</span>
+        <h2>Ankauf</h2>
+        <span class="wann">bis zum Notar</span>
+      </div>
+
+      <article class="station">
+        <h3>Datenaufnahme <span class="mk">Etappen 1–6</span></h3>
+        <p class="was">Vom Groben zum Feinen, geführt oder frei. <b>286 Felder</b>
+          stehen bereit — gebraucht werden je nach Eingabetiefe <b>6, 13 oder
+          bis 20</b> Pflichtangaben.</p>
+        <ul>
+          <li><b>Basis</b> · Objekt, Preis, Miete</li>
+          <li><b>Geld</b> · Finanzierung und Kaufnebenkosten</li>
+          <li><b>Lage &amp; Zustand</b> · wo es steht, wie es dasteht</li>
+          <li><b>Feinschliff</b> · Bewirtschaftung, Entwicklung, Steuer</li>
+          <li><b>Deine Sicht</b> · These und Risiken</li>
+        </ul>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille">DSCR</span><span class="pille">Cashflow n. St.</span>
+            <span class="pille">LTV</span><span class="pille">Rendite</span>
+            <span class="pille">Deal-Score</span>
+          </div></div>
+      </article>
+
+      <article class="station">
+        <h3>Wert ermitteln <span class="mk">Stufe 3</span></h3>
+        <p class="was">Die Wertermittlung nach <b>ImmoWertV</b> — mit den amtlichen
+          Zahlen des zuständigen Gutachterausschusses, nicht mit einem Landesmittel.</p>
+        <ul>
+          <li><b>Bodenwert</b> · Rechenweg Zeile für Zeile</li>
+          <li><b>Ertragswert</b> · Liegenschaftszins mit Herkunftsstufe</li>
+          <li><b>Sachwert</b> · NHK 2010, Restnutzungsdauer nach Anlage 2</li>
+        </ul>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille">Verkehrswert</span>
+            <span class="pille">Quellennachweis</span>
+            <span class="pille">Modellvermerk</span>
+          </div></div>
+      </article>
+
+      <article class="station">
+        <h3>Bereit für die Bank</h3>
+        <p class="was">Der Vollständigkeits-Check nennt jede fehlende Angabe als
+          Chip — ein Klick springt hin. Dann der Export.</p>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille gruen">Investment-PDF</span>
+            <span class="pille gruen">Bankexport</span>
+            <span class="pille">Kaufpreisaufteilung (BMF)</span>
+            <span class="pille">RND-Gutachten</span>
+          </div></div>
+      </article>
+      <span class="pfeil" aria-hidden="true">
+        <svg viewBox="0 0 12 12"><path d="M3 1l5 5-5 5z"/></svg></span>
+    </section>
+
+    <!-- ══ BAHN 3 · BESTAND ══════════════════════════════════ -->
+    <section class="bahn">
+      <div class="bahn-kopf">
+        <span class="bahn-nr">3</span>
+        <h2>Bestand</h2>
+        <span class="wann">nach dem Lastenwechsel</span>
+      </div>
+
+      <article class="station">
+        <h3>Ankaufstand einfrieren</h3>
+        <p class="was">Beim Lastenwechsel wird der Stand <b>festgeschrieben</b> —
+          nicht als zweites Objekt, sondern als eingefrorener Stand im Objekt.
+          Ab dann gibt es ein Soll und ein Ist.</p>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille">Soll (Ankauf)</span>
+            <span class="pille">Ist (heute)</span>
+            <span class="pille">Abweichung</span>
+          </div></div>
+      </article>
+
+      <article class="station">
+        <h3>Wert fortschreiben</h3>
+        <p class="was">Der Marktbericht lässt sich wiederholen. Jeder Abruf landet
+          im Verlauf — so entsteht eine Reihe statt einer Momentaufnahme.</p>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille">Wertverlauf</span>
+            <span class="pille">Entwicklung in %</span>
+            <span class="pille">Mietentwicklung</span>
+          </div></div>
+      </article>
+
+      <article class="station">
+        <h3>Portfolio steuern</h3>
+        <p class="was">Das Cockpit rechnet über alle Objekte. Der Co-Pilot
+          antwortet auf die Daten <em>dieses</em> Bestands — nicht aus
+          allgemeinem Wissen.</p>
+        <div class="raus"><span class="raus-lbl">Was dabei herauskommt</span>
+          <div class="pillen">
+            <span class="pille gruen">Portfolio-Analyse</span>
+            <span class="pille">Soll/Ist je Objekt</span>
+            <span class="pille">Excel &amp; Schnittstelle</span>
+            <span class="pille">Steuerunterlagen</span>
+          </div></div>
+      </article>
+    </section>
+
+  </div>
+
+  <!-- Die Doktrin — drei Sätze, die am Stand die Nachfragen beantworten -->
+  <div class="fuss">
+    <div><b>Kein Treffer heißt kein Wert</b>
+      Liegt für einen Kreis keine amtliche Zahl vor, wird keine erfunden —
+      kein Nachbarkreis, kein Landesmittel. Stattdessen steht da, welcher
+      Ausschuss zuständig ist und wo seine Quelle liegt.</div>
+    <div><b>Jede Zahl trägt ihre Herkunft</b>
+      Herkunftsstufe, Modellvermerk, Ausschuss und Stichtag stehen am Wert.
+      Ein Gutachten muss begründbar sein, nicht nur plausibel.</div>
+    <div><b>Wo die Quelle endet, endet die Rechnung</b>
+      Fehlt eine Pflichtangabe, erscheint das Verfahren nicht. Ein halb
+      gerechneter Wert sieht aus wie ein ganzer — und das ist teurer als
+      eine Lücke.</div>
+  </div>
+
+  <p class="stand">Junker Solution · DealPilot · Stand 10.10.2026 ·
+    alle Angaben aus dem laufenden Produkt gemessen</p>
+
+</div>
+</body>
+</html>
