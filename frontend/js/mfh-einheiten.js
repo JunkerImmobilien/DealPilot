@@ -686,6 +686,26 @@
       + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
       + '</div></div>'
+      /* ── v2095a · DIE ZAHL TRÄGT IHREN STICHTAG ──────────────────────
+       * Die Restnutzungsdauer hängt am Stichtag: sieben Jahre Unterschied
+       * ergeben rund 1,7 Jahre RND (am echten Kern gemessen). Bis v2095
+       * war der Stichtag auf HEUTE festgenagelt und stand nirgends — die
+       * Zahl sah damit aus, als gelte sie zeitlos.
+       *
+       * `rndInfo` reist seit v2095 an jeder Zeile mit. Hier wird sie
+       * gezeigt, weil jede Zahl ihre Herkunft trägt. Alle Zeilen haben
+       * denselben Stichtag (eine Basis je Auswertung), also steht er
+       * einmal unter der Tabelle statt elfmal darin. */
+      + (function () {
+          var i = (d.zeilen[0] || {}).rndInfo;
+          if (!i || !i.stichtag) return '';
+          return '<div class="cf-hint" style="margin-top:6px">Stichtag <b>'
+            + esc(i.stichtag.split('-').reverse().join('.')) + '</b>'
+            + (i.stichtag_herkunft ? ' — ' + esc(i.stichtag_herkunft) : '')
+            + ' · GND ' + esc(String(i.gnd)) + ' Jahre'
+            + (i.kernsaniert ? ' · Kernsanierung angesetzt' : '')
+            + '</div>';
+        })()
       + '<div class="cf-hint" style="margin-top:6px">Gerechnet mit dem Punktraster der Anlage 2 aus dem RND-Kern (DealPilotRND ' + ((window.DealPilotRND && window.DealPilotRND.VERSION) || '') + '). Die Zahl ist indikativ — den Nachweis fürs Finanzamt liefert ein Gutachten.</div>';
   }
 
