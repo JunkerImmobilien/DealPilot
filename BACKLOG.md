@@ -1324,7 +1324,7 @@ Stück, das am Messestand standhält, nicht eine Skizze für intern.
 
 ---
 
-#### N60.21 · TEIL 1 ERLEDIGT 10.10.2026 (`v2083`) — Vorschau (Teil 2) offen
+#### N60.21 · ERLEDIGT 10.10.2026 — Teil 1 `v2083`, Teil 2 `v2096`
 Marcel, 10.10.2026: *„Wenn sich ein User neu einloggt, dann kann er das
 Design wählen."*
 
@@ -1374,6 +1374,81 @@ place anzeigen?"*
 > vorher nicht, was er da einstellt."* Eine Vorschau, die nicht zeigt,
 > was passiert, ist keine Vorschau — sie ist eine Behauptung über das
 > Ergebnis.
+
+> ### Teil 2 gebaut (`v2096`) — und der Befund war ein anderer
+>
+> **Die Vorschau in place EXISTIERT.** Ein Klick auf eine Kachel ruft
+> `_aussehenAnwenden()`, und das setzt wirklich um — am laufenden System
+> nachgemessen:
+>
+> | Kachel | `data-dp-layout` | `data-dp-objkarte` |
+> |---|---|---|
+> | Aktenmappe | `v1b` | `datenzeile` |
+> | Kanzlei | `v2` | `bordkarte` |
+> | Tower | `v2b` | `bordkarte` |
+> | DealPilot | `null` | `bordkarte` |
+>
+> Und `.dpo-ov` war kein deckender Vorhang, sondern ein **Schleier**:
+> `rgba(5,5,5,.34)` — die App ist dahinter zu 66 % sichtbar. Es fehlte
+> also nicht die Vorschau.
+>
+> ### Der Fehler war subtiler und schlimmer
+>
+> **Ein dunkler Schleier über der Wahl zwischen hell und dunkel.**
+> Gerechnet, was er mit genau den Flächen macht, um die es geht:
+>
+> | Fläche | echt | unter dem Schleier | Helligkeit |
+> |---|---|---|---:|
+> | Creme `#FDFCFA` | `rgb(253,252,250)` | `rgb(169,168,167)` | **−60 %** |
+> | Weiß `#FFFFFF` | `rgb(255,255,255)` | `rgb(170,170,170)` | **−60 %** |
+> | Gold `#C9A84C` | `rgb(201,168,76)` | `rgb(134,113,52)` | −58 % |
+> | Obsidian `#050505` | `rgb(5,5,5)` | `rgb(5,5,5)` | **−0 %** |
+>
+> Die hellen Fassungen verlieren 60 % ihrer Helligkeit, Obsidian keine
+> einzige. Unter dem Schleier sieht **hell grau** aus und **dunkel
+> unverändert** — die Vorschau verfälschte genau den Unterschied, den
+> der Nutzer wählen soll.
+>
+> > **Eine Vorschau, die das Gewählte dunkler zeigt als es ist, ist
+> > schlimmer als keine:** sie lässt den Nutzer gegen etwas entscheiden,
+> > das er nie gesehen hat. Marcels Satz *„der Kunde weiß ja vorher
+> > nicht, was er da einstellt"* traf also zu — nur nicht aus dem Grund,
+> > den die Bilder vermuten ließen.
+>
+> ### Gebaut: kein neuer Mechanismus
+>
+> Im Schritt „Aussehen" fällt der Schleier weg (`.dpo-ov-schau`) und der
+> Kasten legt sich in die untere rechte Ecke. **Kein zweites iframe** —
+> das wäre eine zweite App im Speicher und ein zweiter Zustand, und die
+> Warnung oben in diesem Punkt (`_dpDispSkin` hinterlässt
+> Inline-Variablen) gilt für das Umschalten, nicht für das Hinsehen.
+>
+> **Im Browser abgenommen (1280 px):**
+>
+> | geprüft | Ergebnis |
+> |---|---|
+> | `.dpo-ov` Hintergrund | `rgba(0, 0, 0, 0)` — Schleier weg |
+> | optisch wirkungslos | ja (opacity 1, kein `backdrop-filter`, kein `filter`) |
+> | Kasten | 620×561 @ 644,181 — unten rechts |
+> | Kopf `896×57` verdeckt | **0 %** |
+> | Reiter `896×43` verdeckt | **0 %** |
+> | Seitenleiste `380×758` verdeckt | **0 %** |
+> | Umschaltung beobachtbar | Aktenmappe → Seitenleiste **0 px**, DealPilot → **380 px** |
+>
+> Die Schicht fängt weiter Klicks ab — das soll ein Fenster auch. Hier
+> ging es um **sichtbar**, nicht um bedienbar.
+>
+> **Erst ab 900 px**, denn darunter füllt der Kasten den Schirm ohnehin;
+> dort tragen die Miniaturen die Entscheidung weiter und bleiben deshalb.
+> Der Hinweis *„Die App dahinter wechselt sofort mit"* steht aus
+> demselben Grund nur ab 900 px — **ein Hinweis, der auf etwas
+> Unsichtbares zeigt, ist schlimmer als keiner.**
+>
+> > **Ein Wegwerf-Prüfer für die CSS-Klammerbilanz ist dreimal
+> > gescheitert** (erst las er die ganze Datei statt des Stilblocks, dann
+> > nur 52 % der Zeilen) und hat korrekt **abgebrochen** statt grün zu
+> > werden. Der Nachweis kam aus dem Browser, wo eine kaputte Klammer
+> > sofort sichtbar wäre.
 
 **Zu prüfen, bevor gebaut wird:** die Darstellung schaltet über
 `DealPilotWhitelabel.apply()` und die Attribute am `<html>`
