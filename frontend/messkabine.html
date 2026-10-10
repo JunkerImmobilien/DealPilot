@@ -1181,13 +1181,36 @@
   function apBedienbar(d, win){
     var alle = [].slice.call(d.querySelectorAll(
       'button, a[href], input, select, textarea, [role=button], [onclick]'));
-    var gesehen = 0, verd = [], eingek = 0;
+    var gesehen = 0, verd = [], eingek = 0, erdrueckt = [];
     alle.forEach(function(e){
       var r = e.getBoundingClientRect();
+      var cs = win.getComputedStyle(e);
+      /* ═══ ERDRUECKT IST NICHT ABGESCHALTET ═════════════════════════
+         Ein Knopf mit Hoehe 0 wurde hier frueher stillschweigend
+         uebersprungen. Das ist richtig, wenn er `display:none` traegt -
+         dann ist er ABSICHTLICH weg. Es ist falsch, wenn er gerendert
+         wird und nur zusammengefallen ist: dann ist er ein Befund.
+
+         Gemessen am 09.10.2026 an `#mainTabs` im Marktbericht: fuenf
+         Knoepfe (PDF-Export, Dunkel, Schliessen ...) mit Hoehe 0. Erst
+         der Blick auf `display` zeigte, dass sie `none` tragen - seit
+         v647 ausdruecklich abgeschaltet, weil die Hauptapp die Leiste
+         stellt. KEIN Befund also, aber der Pruefer konnte das vorher
+         gar nicht unterscheiden.
+
+         Die andere Haelfte dieses Falls ist teuer: ein Knopf, der
+         gerendert wird und auf 0 faellt, SIEHT aus wie nicht vorhanden. */
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      if ((r.width < 4 || r.height < 4) && cs.pointerEvents !== 'none'
+          && !apEingeklappt(e, win)) {
+        erdrueckt.push({ el: apNam(e),
+          txt: (e.textContent||e.value||e.placeholder||'').trim().replace(/\s+/g,' ').slice(0,26),
+          gr: Math.round(r.width)+'x'+Math.round(r.height), display: cs.display });
+        return;
+      }
       if (r.width<4 || r.height<4) return;
       if (r.bottom<0 || r.top>win.innerHeight || r.right<0 || r.left>win.innerWidth) return;
-      var cs = win.getComputedStyle(e);
-      if (cs.visibility==='hidden' || cs.display==='none' || cs.pointerEvents==='none') return;
+      if (cs.pointerEvents==='none') return;
       if (apEingeklappt(e, win)) { eingek++; return; }
       gesehen++;
       var p = apPunkte(d, win, e);
@@ -1195,7 +1218,8 @@
         verd.push({ el: e, txt: (e.textContent||e.value||e.placeholder||'')
                       .trim().replace(/\s+/g,' ').slice(0,26) });
     });
-    return { gesehen: gesehen, verdaechtig: verd, eingeklappt: eingek };
+    return { gesehen: gesehen, verdaechtig: verd, eingeklappt: eingek,
+             erdrueckt: erdrueckt };
   }
 
   /* (d) Jeder Verdacht zweimal: zentriert UND am Seitenanfang. */
@@ -1229,7 +1253,7 @@
     var h = sc ? sc.clientHeight : win.innerHeight;
     var ganz = sc ? sc.scrollHeight : d.documentElement.scrollHeight;
     var schritte = Math.min(16, Math.max(1, Math.ceil(ganz/(h*0.9))));
-    var gesehen = 0, verd = [], seen = {}, eingek = 0;
+    var gesehen = 0, verd = [], seen = {}, eingek = 0, erd = [], seenE = {};
     for (var i = 0; i < schritte; i++) {
       if (sc) sc.scrollTop = i*h*0.9; else win.scrollTo(0, i*h*0.9);
       await warte(230);
@@ -1237,6 +1261,8 @@
       gesehen += b.gesehen; eingek += b.eingeklappt;
       b.verdaechtig.forEach(function(x){
         var k = apNam(x.el)+'|'+x.txt; if (seen[k]) return; seen[k] = 1; verd.push(x); });
+      b.erdrueckt.forEach(function(x){
+        var k = x.el+'|'+x.txt; if (seenE[k]) return; seenE[k] = 1; erd.push(x); });
     }
     var echt = await apNachpruefen(d, win, verd);
     if (sc) sc.scrollTop = 0; else win.scrollTo(0,0);
@@ -1246,6 +1272,7 @@
       geoeffnet: geoeffnet, scroller: sc ? apNam(sc) : '(Fenster)',
       deckung: gesehen+' geprueft / '+eingek+' eingeklappt / '+schritte+' Abschnitte',
       verdaechtig: verd.length, nichtErreichbar: echt.length, liste: echt.slice(0,8),
+      erdrueckt: erd.length, erdruecktListe: erd.slice(0,8),
       echterUeberlauf: u.echtZahl, ueberlaufListe: u.echt,
       vonScrollerGefangen: u.vonScrollerGefangen,
       querScroller: apQuerScroller(d, win)
