@@ -194,21 +194,87 @@ Marcels Frage aus N60.5 („erst 44, dann über 80").
 > **vollen** Achsensatz, und der Nachweis prüft **alle sechs** Achsen
 > statt nur `theme`. Gefunden hat es das `attribute`-Feld aus `v2085`.
 >
-> ## Befund 1 — Überlauf: 109 Funde auf VIER Elemente
+> ## Befund 1 — ZURÜCKGENOMMEN: es gab keinen Überlauf-Defekt
 >
-> | Element | Funde | Geräte | Varianten | gemessen |
-> |---|---:|---:|---:|---|
-> | `div.oe-karte-gewerke.card` | **72** | **8/8** | **6/6** | 301 → 648 px (2,2×) |
-> | `div.ytf-quick-wrap` | 30 | 5/8 | 6/6 | 273 → 722 px (2,6×) |
-> | `div.dptk-huelle` | 6 | 1/8 | 6/6 | 813 → 1021 px (1,3×) |
-> | `div.bc-svg-wrap` | 1 | 1/8 | 1/6 | 311 → 680 px (2,2×) |
+> **Hier stand „Überlauf: 109 Funde auf VIER Elemente" mit
+> `div.oe-karte-gewerke` als größtem Posten (72×, 8/8 Geräte, 6/6
+> Varianten). Beides war falsch.**
 >
-> **Alle vier sind echte Scroller** — der Läufer prüft, ob ein Balken
-> Höhe wegnimmt (4–5 px), nicht bloß `scrollWidth`. Ein Querscroller ist
-> kein Fehler an sich, aber `oe-karte-gewerke` tritt auf **jedem** Gerät
-> und in **jeder** Variante auf, auch auf „Desktop breit" (1280 px) —
-> der Behälter ist dort ebenfalls nur 301 px breit. Das riecht nach
-> einer schmalen Spalte, nicht nach einem Handy-Problem.
+> **Fehler 1 — meine Auswertung.** Ich habe die Funde nach dem *ersten
+> Wort* des Textes gruppiert. `apNam()` liefert aber `div` +
+> **Leerzeichen** + Klassen, also landeten verschiedene Elemente
+> gemeinsam unter „div". Richtig sind **fünf** Elemente:
+>
+> | Element | Funde | Reiter | Geräte | Faktor |
+> |---|---:|---|---:|---:|
+> | `div#dab-rail-finanzierung` | 48 | Deal-Aktion | 8/8 | 3,0× |
+> | `div.ytf-quick-wrap` | 30 | Steuer | 5/8 | 2,6× |
+> | `div#oe-karte-gewerke` | 24 | Objekt | 4/8 | 2,2× |
+> | `div.dptk-huelle` | 6 | Bewertung | 1/8 | 1,3× |
+> | `div.bc-svg-wrap` | 1 | Bewertung | 1/8 | 2,2× |
+>
+> Das größte war also ein **anderes** Element, in einem **anderen**
+> Reiter.
+>
+> **Fehler 2 — die Bewertung, und der ist der teurere.** Alle fünf sind
+> **gewollt gebaut**, am Quelltext nachgelesen:
+>
+> | Element | Nachweis der Absicht |
+> |---|---|
+> | `dab-rail` | eigene Pfeiltasten `railScroll(id,±1)` + `scroll-snap-type:x proximity` (`deal-action-boarding.js:1429`) |
+> | `oe-karte-gewerke` | `overflow-x:auto` **mit** `-webkit-overflow-scrolling:touch` (`style.css:39008`) |
+> | `ytf-quick-wrap` | in `style.css:39561` steht **genau diese Messung** schon als Kommentar |
+> | `dptk-huelle` | von `tabellen-karten.js:249` **per JS** an das Elternelement einer Tabelle gehängt |
+> | `bc-svg-wrap` | Rahmen um ein SVG mit `min-width:680px` — „lesbar; Nutzer scrollt horizontal" steht als Kommentar daneben |
+>
+> Und `apQuerScroller` sagt es in seinem **eigenen** Kommentar:
+> *„Waagerechte Scroller sind kein Fehler, aber auf dem Handy ein
+> UX-Befund — deshalb getrennt gezählt und benannt."* Ich habe sie
+> trotzdem als Mangel gemeldet.
+>
+> **109 Fehlalarme begraben jeden echten Fund.** Ein Prüfer, der ruft,
+> wenn nichts ist, ist so wertlos wie einer, der schweigt, wenn etwas
+> ist — und der Fehler war diesmal nicht in der App, sondern in meinem
+> Bericht über sie.
+>
+> ### Behoben: die Absicht hängt jetzt am Element (`v2092b`–`v2092e`)
+>
+> Gewollte Scroller werden als **`SCHIENE`** gezählt, nicht als Mangel —
+> und zwar nur, wenn die Absicht **nachweisbar** ist. Nachweislauf nach
+> dem Umbau: **7 Schienen, 0 Mängel, 0 Messfehler**, jede Schiene mit
+> ihrem Grund benannt.
+>
+> **Der Weg dorthin brauchte drei Anläufe und dann die Diagnose:**
+>
+> 1. `getComputedStyle(el).webkitOverflowScrolling === "touch"` — tot,
+>    Chrome kennt die Eigenschaft nicht.
+> 2. Dieselbe Eigenschaft im CSSOM suchen — auch tot. **Gemessen:**
+>    11.954 Regeln durchgegangen, 45 von 48 Blättern lesbar, **null**
+>    Regeln mit `overflow-scrolling` im `cssText` — bei gleichzeitig
+>    **10** Regeln auf den Selektor `oe-karte-gewerke`. Der Durchlauf
+>    lief also, die Eigenschaft war nicht da.
+> 3. Gegenprobe: `setProperty("-webkit-overflow-scrolling","touch")`
+>    gibt `""` zurück. **Chrome verwirft sie beim Einlesen.**
+>
+> Die Absicht steht in der Datei und ist im Browser in **beide**
+> Richtungen unsichtbar. Also wird sie als eigene Variable notiert, die
+> Chrome behält: **`--dpm-schiene: 1`** an der Regel, die den Scroller
+> macht (drei Stellen in `style.css`). `dab-rail` und `dptk-huelle`
+> brauchen sie nicht — ihre Absicht ist über `scroll-snap-type` bzw.
+> über den JS-Aufruf nachweisbar.
+>
+> *Die Absicht hängt damit am **Element**, nicht an einer Liste im
+> Prüfer — eine Liste veraltet beim nächsten neuen Scroller, die
+> Variable wandert mit der Regel.*
+>
+> Bewusst in Kauf genommen: eigene Variablen **werden vererbt**. Ein
+> Scroller *innerhalb* einer markierten Schiene gilt damit auch als
+> gewollt. Das ist die harmlosere Richtung.
+>
+> `DPM.deklariertAbsichtlich(el, win)` ist mitexportiert, damit der
+> Erkenner **einzeln mit Gegenprobe** prüfbar ist (`#oe-karte-gewerke`
+> → `true`, eine andere `.card` → `false`). Genau das Fehlen dieser
+> Prüfbarkeit hat die tote Weiche zwei Fassungen lang getragen.
 >
 > ## Befund 2 — Kontrast: 432 von 432 Reitern, also ALLE
 >
