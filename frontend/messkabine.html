@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092b</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092c</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1764,6 +1764,38 @@
     variante('Konsole',   { theme: 'konsole' })
   ];
 
+  /* Steht fuer dieses Element irgendwo `-webkit-overflow-scrolling` in einem
+     Blatt? Das ist die DEKLARIERTE Absicht, waehrend getComputedStyle sie in
+     Chrome nie zeigt.
+
+     Rekursiv, weil die Regel in einer @media-Gruppe liegen kann (bei
+     #oe-karte-gewerke tut sie das). Und `rule.cssRules` wird nur betreten,
+     wenn es WIRKLICH Kinder hat - eine CSSStyleRule traegt heute selbst eine
+     leere Liste und sieht dadurch wie ein Behaelter aus. */
+  function deklariertAbsichtlich(el, d){
+    var treffer = false;
+    function gehe(regeln){
+      if (treffer || !regeln) return;
+      for (var i = 0; i < regeln.length; i++) {
+        var r = regeln[i];
+        if (r.cssRules && r.cssRules.length) { gehe(r.cssRules); if (treffer) return; continue; }
+        if (!r.selectorText || !r.style) continue;
+        if (!/overflow-scrolling/i.test(r.cssText || '')) continue;
+        /* Passt die Regel auf dieses Element? Teilselektoren einzeln pruefen,
+           weil `matches()` an einem zusammengesetzten Selektor scheitert. */
+        var teile = r.selectorText.split(',');
+        for (var j = 0; j < teile.length; j++) {
+          try { if (el.matches(teile[j].trim())) { treffer = true; return; } } catch (e) {}
+        }
+      }
+    }
+    for (var s = 0; s < d.styleSheets.length; s++) {
+      try { gehe(d.styleSheets[s].cssRules); } catch (e) { /* fremdes Blatt */ }
+      if (treffer) break;
+    }
+    return treffer;
+  }
+
   async function matrix(opt){
     opt = opt || {};
     var geraete  = opt.geraete  || GERAETE;
@@ -1874,7 +1906,20 @@
               var gewollt = false, warum = '';
               if (knoten) {
                 var kcs = zz.win.getComputedStyle(knoten);
-                if (kcs.webkitOverflowScrolling === 'touch') { gewollt = true; warum = 'touch-scrolling'; }
+                /* v2092c: HIER STAND `kcs.webkitOverflowScrolling === 'touch'`
+                   und der Test war TOT. `-webkit-overflow-scrolling` ist eine
+                   Alt-Eigenschaft von iOS-Safari; Chrome kennt sie nicht,
+                   also meldet getComputedStyle dort nie 'touch'.
+
+                   Aufgefallen im Nachweislauf: `#oe-karte-gewerke` wurde als
+                   Mangel gemeldet, obwohl style.css:38998 die Eigenschaft
+                   ausdruecklich setzt. Ein Erkenner, der nie feuert, sieht
+                   aus wie ein strenger Erkenner.
+
+                   Gemessen wird jetzt die DEKLARIERTE Absicht im Stylesheet,
+                   nicht der berechnete Wert - denn die Absicht steht dort,
+                   auch wenn dieser Browser sie nicht umsetzt. */
+                if (deklariertAbsichtlich(knoten, zz.d)) { gewollt = true; warum = 'overflow-scrolling im Stylesheet'; }
                 else if (kcs.scrollSnapType && kcs.scrollSnapType !== 'none') { gewollt = true; warum = 'scroll-snap'; }
                 else if (knoten.querySelector('button[onclick*="Scroll"],button[class*="arr"],[class*="rail-arr"]')
                          || (knoten.parentElement && knoten.parentElement.querySelector('[class*="rail-arr"],button[class*="arr"]'))) {
