@@ -669,6 +669,51 @@ nachträglich korrigierbar). Sie stehen im Dokument als Haken.
 
 #### N60.13 · Export und Schnittstelle — ALLE neuen Felder müssen durch
 
+**Nachgemessen 10.10.2026 am echten Export (22 Objekte) und am echten
+Piloten-Payload (Abruf abgefangen, kein Kerosin).** Marcels Fragen:
+Stufe 3, Wohnungskonfigurator, Mietverhältnis, RND, Zustandsfelder,
+BMF, Bodenrichtwert, Liegenschaftszins, Sachwert, Reiter Steuer.
+
+| | Export | Pilot-Analyse / Cockpit |
+|---|---|---|
+| Felder je Datensatz | **286** (273–281 belegt) | 18 Blöcke |
+| Wohnungen (`_mfh`) | **vollständig je Einheit** — nr, lage, art, wfl, zimmer, **ist/soll-Miete**, **status (Mietverhältnis)**, zustand, massnahme, kosten | zusammengefasst (Anzahl, Fläche, Schnitt, Miete) |
+| Stufe 3 / Sanierung | `san`, `san_ust`, `modernis`, `san_tax_years`, `san_tax_active` | **seit `v2067a`** |
+| Zustand / Gewerke | 22 Felder (8× `mod_*`, `ausst_*`, `qual_*`, `standardstufe`) | **seit `v2067` alle acht Bauteile einzeln** |
+| Bodenrichtwert + Stichtag | ✔ | ✔ |
+| Liegenschaftszins, Sachwertfaktor | ✔ | ✔ (leer, wo ungepflegt) |
+| BMF-Gebäudeanteil `geb_ant` | ✔ 22/22 | ✔ |
+| Reiter Steuer | ✔ | ✔ + **§ 7b und Erbpacht seit `v2067a`** |
+
+**Von 291 Formularfeldern fehlen 37 im Export** — 23 Schalter und
+Regler, 14 Bedien- oder Anzeigefelder (Suchfelder, PDF-Auswahlen, die
+**Euro**-Anzeigen der Kaufnebenkosten; die Prozentwerte `makler_p`,
+`notar_p`, `gba_p`, `gest_p`, `ji_p` sind drin). **Kein echtes
+Datenfeld fehlt.**
+
+**`v2066`: das Lexikon erklärte die Strukturen mit Unterstrich nicht.**
+Es führte 225 Felder — alle aus dem *Formular*. `_mfh`, `_ankauf` und
+sämtliche `_kpis_*` waren keines davon, obwohl sie die Erklärung am
+dringendsten brauchen. Jetzt steht unter `lexikon.strukturen`, was
+`ist`/`soll` (Monatsmieten) und `status` (Mietverhältnis) bedeuten.
+
+**Drei Lücken bleiben, gemessen und nicht behoben:**
+- **Das RND-Ergebnis fehlt überall.** Der Wizard liest `mod_*`/`ausst_*`
+  und *zeigt* die Restnutzungsdauer, schreibt sie aber nicht zurück:
+  `afa_rnd_jahre` ist bei **0 von 22** Objekten belegt.
+- **Die BMF-Detailrechnung bleibt im Modal.** Zurück ins Objekt kommt
+  nur `geb_ant`; Boden-, Ertrags- und Sachwert der Kaufpreisaufteilung
+  nicht.
+- **Die Wohnungen reisen zusammengefasst zum Piloten** — Status und
+  Zustand je Wohnung sieht er nicht.
+
+> **Ein Fehler in meinem eigenen Zusatz, vor dem Ausrollen gefunden**
+> (`v2067b`): ich übersetzte `"0"/"h"/"v"` in Klartext — das sind die
+> Stufen des *MFH-Konfigurators*. Die Objektfelder tragen **fünf**
+> Klartextstufen („Keine/Nie", „> 20 Jahre", „10 - 20 Jahre",
+> „5 - 10 Jahre", „< 5 Jahre"). Zwei Schreibweisen für dieselbe Sache,
+> und wer sie verwechselt, merkt es nicht.
+
 **TEILWEISE ERLEDIGT 09.10.2026 (`v2043`, `v2043c`) — der
 Portfolio-Export steht.** Neuer Endpunkt `GET /objects/portfolio-export`
 und der Menüeintrag *Aktionen → Ausgeben → Portfolio komplett*. Er gibt
