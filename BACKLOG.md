@@ -1359,6 +1359,48 @@ und `rfLabel()` (`dashboard.js:2591`, `:2607`). Das Objekt speichert in
 > beide gleich.
 
 **Zu tun, in dieser Reihenfolge:**
+> ### Vormessung erledigt 10.10.2026 — und sie ändert die Reihenfolge
+>
+> **Schritt 3 war: „prüfen, ob `halter` eine Kennung oder Freitext ist".
+> Antwort: eine KENNUNG.** `mandanten.js:117` baut das Select als
+> `<option value="m.id">m.name</option>` aus der Mandantenliste; nur
+> `'privat'` ist ein Festwert ohne Mandanten. Dass es eine ID ist, hat
+> die App schon einmal teuer gelernt: bis `v1234` zeigten die
+> Objektkarten `mmtlt8yq2fq` statt eines Namens
+> (`storage.js:1324`).
+>
+> ### Aber: die Mandanten liegen NUR im Browser
+>
+> `mandanten.js:14` → `LS_KEY = 'dp_mandanten'`, gelesen und geschrieben
+> über `localStorage` (`:60`, `:72`). **Im Backend: null Treffer** für
+> `dp_mandanten` (gesucht in ganz `backend/src/`). Der Server kennt die
+> Mandanten also nicht — weder ihren Namen noch ihre Rechtsform.
+>
+> **Damit ist Schritt 1 („den Mandanten mitexportieren") so nicht
+> machbar:** `portfolioExport.js` läuft serverseitig und kann nichts
+> ausgeben, was nur im Browser des Nutzers steht.
+>
+> ### Die Reihenfolge ist deshalb eine andere
+>
+> **0. Zuerst müssen die Mandanten auf den Server.** Das ist der
+>    eigentliche Punkt und eine Entscheidung für Marcel:
+>    - eigene Tabelle `mandanten` (sauber, Migration, Mehrgeräte-fähig), oder
+>    - ein Feld in `user_settings` (billig, aber eine Liste in einem
+>      JSON-Feld — dieselbe Bauart, die bei `ui_theme` heute schon
+>      Probleme macht, siehe N60.2).
+>
+>    **Daran hängt mehr als die Rechtsform:** eine Mandantenliste im
+>    `localStorage` ist auf einem zweiten Gerät leer. Wer dort ein
+>    Objekt öffnet, sieht `halter` als unbekannte ID — der Fall, den
+>    `v1234` behandelt, tritt dann wieder ein.
+>
+> **1. Danach** der Block `mandanten` neben `objekte`, mit `rechtsform`,
+>    `rfLabel`, `isCorp`; `daten.halter` verweist darauf.
+> **2. Danach** `lexikon.strukturen` und `docs/api-einrichtung.md`.
+>
+> *Die Rechtsform ist nicht das Problem — sie ist das Symptom. Das
+> Problem ist, dass die Mandanten den Server nie erreicht haben.*
+
 1. Den **Mandanten mitexportieren**, nicht die Rechtsform ans Objekt
    kopieren: Name, `rechtsform`, `rfLabel`, `isCorp`. Sonst entsteht die
    vierte Stelle, an der dieselbe Angabe steht — vgl. `N60.23`.
