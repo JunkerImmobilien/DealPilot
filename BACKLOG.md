@@ -2827,7 +2827,41 @@ Telegram-Bot bekommen beide Stände im Prompt.
 | Portfolio-Cockpit | Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand** — heute rechnet es nur den laufenden Stand |
 | ~~Portfolio-Cockpit~~ | ~~Die **Abweichung über den ganzen Bestand**~~ — **erledigt `v2098`**, siehe unten |
 | ~~Kanban~~ | ~~Spalte **Bestand**~~ — **erledigt `v2084`**, siehe unten |
-| Sortierung | Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren, nicht nach den heutigen |
+| ~~Sortierung~~ | ~~Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren~~ — **hat kein Ziel**, gemessen 10.10.2026, siehe unten |
+
+> ### Die Sortierung: der Punkt hatte keine Zielscheibe
+>
+> **Gemessen am 10.10.2026.** `storage.js:4349` führt genau **vier**
+> Sortiermodi, und keiner davon liest eine Kennzahl, die sich zwischen
+> Ankauf und Bestand unterscheidet:
+>
+> | Modus | liest | hat einen Ankauf-Wert? |
+> |---|---|---|
+> | `recent` „Zuletzt bearbeitet" | `updated_at` | **nein** — ein Zeitstempel, keine Kennzahl |
+> | `id` „Objekt-ID" | `seq_no` | **nein** |
+> | `kaufdat` „Kaufdatum" | `data->>kaufdat` | **nein** — per Definition in beiden Ständen gleich |
+> | `lage` „Lage (A/B/C)" | `data->>lageklasse` | **nein** — steht nicht in `KENNZAHLEN` und nicht im eingefrorenen `kurz` |
+>
+> Der Ankauf-Modus dreht die **Karten** (`doppelkarte.js`) und sperrt das
+> geöffnete Objekt — die **Reihenfolge** fasst er nicht an, und es gibt
+> auch keine, die er anfassen müsste.
+>
+> *Ein offener Punkt, dessen Voraussetzung nicht gilt, kostet jedes Mal
+> eine Messung — und wer ihn baut, baut gegen eine Annahme.*
+>
+> **Was dahinter steckt, ist ein anderes, neues Feature:** nach einer
+> KENNZAHL sortieren (DealScore, Rendite, Kaufpreis, DSCR). Erst dann
+> entsteht die Frage „welcher Stand?" überhaupt — und dann ist sie
+> **sofort** beantwortet, weil der eingefrorene `kurz` genau diese acht
+> Felder führt: `kp`, `nkm`, `_kpis_miete_j`, `_kpis_bmy`, `_kpis_nmy`,
+> `_kpis_dscr`, `_kpis_cf_ns`, `_kpis_ltv` plus `_ds2_score`.
+>
+> **Vorsicht bei zwei davon:** `KENNZAHLEN` führt `besser: 'kleiner'`
+> für **Kaufpreis** und **LTV**. Eine Sortierung „beste zuerst" muss
+> diese zwei umdrehen — dieselbe Falle, die `abweichungFuer()` in
+> `v2098` schon kapselt und die `tools/ankauf-abweichung-pruefen.mjs`
+> in 18 Fällen prüft.
+
 
 > ### „Seit Ankauf" gebaut (`v2098`) — mit EINER Rechnung
 >
