@@ -236,20 +236,43 @@ router.post('/verkehrswert', async function (req, res) {
       if (objFeld.objart == null && objFeld.objektart != null) objFeld.objart = objFeld.objektart;
     }
 
-    /* Die Stufe bestimmt, wie tief gerechnet wird. 3 = Wertermittlung
-       nach ImmoWertV mit Boden-, Ertrags- und Sachwert. */
+    /* ══ v2076a · DIE STUFE GEHOERT IN `overrides` ══════════════════════
+       Mit `wert_stufe` auf der obersten Ebene kam der Bericht als
+       STUFE 1 zurueck, obwohl 3 angefordert war:
+
+         cross_check: { available: false, nicht_im_umfang: true, stufe: 1,
+           grund: "Boden-, Ertrags- und Sachwert gehoeren zur
+                   Wertermittlung nach ImmoWertV (Stufe 3) und sind in
+                   dieser Marktpreisindikation nicht enthalten." }
+
+       Der Dienst liest sie unter `overrides`. Dieselbe Falle ist hier
+       schon einmal aufgetreten - `routes/marktbericht.js:376` traegt
+       den Vermerk: "v1435: bisher fehlte die Stufe hier ganz -
+       abgerechnet wurde Stufe 2, der Bericht hielt sich fuer Stufe 1."
+
+       > Eine Stufe, die am falschen Ort steht, wird nicht abgelehnt.
+       > Sie wird durch die Vorgabe ersetzt, und der Bericht sieht
+       > vollstaendig aus - nur ohne die drei Verfahren, die man wollte.
+
+       Nutzlast exakt wie `marktbericht.js:368-380`, nicht geraten. */
+    const stufe = (function () {
+      var s = parseInt(body.wert_stufe, 10);
+      return (s >= 1 && s <= 3) ? s : 3;    /* Vorgabe: volle Wertermittlung */
+    })();
     const nutzlast = {
-      wert_stufe: body.wert_stufe || 3,
-      user_id: req.user.id
+      object: objFeld,
+      overrides: Object.assign({}, body.overrides || {}, {
+        wert_stufe: stufe,
+        user_id: req.user.id
+      })
     };
-    if (objFeld) nutzlast.object = objFeld;
-    if (body.external_ref) nutzlast.external_ref = body.external_ref;
-    if (body.address) nutzlast.address = body.address;
+    if (body.external_ref) nutzlast.overrides.external_ref = body.external_ref;
+    if (body.fast) nutzlast.overrides.fast = body.fast;
+    if (body.address && !objFeld) { nutzlast.address = body.address; delete nutzlast.object; }
     /* lat/lon durchreichen, damit ein Aufrufer mit eigenen Koordinaten
        nicht am Geokodierer haengt (Backlog N60.26, Punkt 3). */
-    if (body.lat != null) nutzlast.lat = body.lat;
-    if (body.lon != null) nutzlast.lon = body.lon;
-    if (body.fast) nutzlast.fast = body.fast;
+    if (body.lat != null && nutzlast.object) nutzlast.object.lat = body.lat;
+    if (body.lon != null && nutzlast.object) nutzlast.object.lon = body.lon;
 
     const ctrl = new AbortController();
     const frist = setTimeout(function () { ctrl.abort(); }, 60000);
