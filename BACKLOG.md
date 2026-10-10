@@ -843,7 +843,7 @@ nächste Durchgang ihn wieder ein.
 
 ---
 
-#### N60.25 · Drei Texte versprechen das Gegenteil der Kontingent-Regel
+#### N60.25 · Texte ERLEDIGT 10.10.2026 (`v2077`) — drei tote Gutschrift-Pfade bleiben offen
 **Marcels Regel, von ihm am 10.10.2026 noch einmal bestätigt:** selbst
 dazugekauftes Kontingent verfällt nicht, monatlich zugeteiltes verfällt.
 
