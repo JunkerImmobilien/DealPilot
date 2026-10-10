@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092d</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092e</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1772,28 +1772,39 @@
      #oe-karte-gewerke tut sie das). Und `rule.cssRules` wird nur betreten,
      wenn es WIRKLICH Kinder hat - eine CSSStyleRule traegt heute selbst eine
      leere Liste und sieht dadurch wie ein Behaelter aus. */
-  function deklariertAbsichtlich(el, d){
-    var treffer = false;
-    function gehe(regeln){
-      if (treffer || !regeln) return;
-      for (var i = 0; i < regeln.length; i++) {
-        var r = regeln[i];
-        if (r.cssRules && r.cssRules.length) { gehe(r.cssRules); if (treffer) return; continue; }
-        if (!r.selectorText || !r.style) continue;
-        if (!/overflow-scrolling/i.test(r.cssText || '')) continue;
-        /* Passt die Regel auf dieses Element? Teilselektoren einzeln pruefen,
-           weil `matches()` an einem zusammengesetzten Selektor scheitert. */
-        var teile = r.selectorText.split(',');
-        for (var j = 0; j < teile.length; j++) {
-          try { if (el.matches(teile[j].trim())) { treffer = true; return; } } catch (e) {}
-        }
-      }
-    }
-    for (var s = 0; s < d.styleSheets.length; s++) {
-      try { gehe(d.styleSheets[s].cssRules); } catch (e) { /* fremdes Blatt */ }
-      if (treffer) break;
-    }
-    return treffer;
+  function deklariertAbsichtlich(el, win){
+    /* ── v2092e · DREI ANLAEUFE, DANN DIE DIAGNOSE ───────────────────────
+
+       Gesucht war ein Nachweis, dass ein Querscroller GEWOLLT ist.
+
+       1. Anlauf (v2092b): `getComputedStyle(el).webkitOverflowScrolling
+          === 'touch'`. Tot — Chrome kennt die Eigenschaft nicht.
+       2. Anlauf (v2092c): dieselbe Eigenschaft im CSSOM suchen. Auch tot.
+          GEMESSEN am 10.10.2026: 11.954 Regeln durchgegangen, 45 von 48
+          Blaettern lesbar, **NULL Regeln mit `overflow-scrolling` im
+          cssText** — bei gleichzeitig 10 Regeln auf den Selektor
+          `oe-karte-gewerke`. Der Durchlauf funktionierte also, die
+          Eigenschaft war nur nicht da.
+       3. Gegenprobe: `setProperty('-webkit-overflow-scrolling','touch')`
+          gibt `""` zurueck. **Chrome verwirft sie beim Einlesen.**
+
+       Die Absicht steht in der Datei und ist im Browser in BEIDE
+       Richtungen unsichtbar. Also wird sie als eigene Variable notiert,
+       die Chrome behaelt: `--dpm-schiene: 1` an der Regel, die den
+       Scroller macht (`style.css`, drei Stellen).
+
+       Das ist zugleich der richtige Ort: die Absicht haengt am ELEMENT,
+       nicht an einer Liste im Pruefer — eine Liste veraltet beim naechsten
+       neuen Scroller, die Variable wandert mit der Regel.
+
+       Nebenwirkung, bewusst in Kauf genommen: eigene Variablen WERDEN
+       VERERBT. Ein Scroller INNERHALB einer markierten Schiene gilt
+       damit ebenfalls als gewollt. Das ist selten und die harmlosere
+       Richtung — ein verpasster Mangel in einer Schiene wiegt leichter
+       als 109 Fehlalarme.                                              */
+    try {
+      return String(win.getComputedStyle(el).getPropertyValue('--dpm-schiene')).trim() === '1';
+    } catch (e) { return false; }
   }
 
   async function matrix(opt){
@@ -1919,7 +1930,7 @@
                    Gemessen wird jetzt die DEKLARIERTE Absicht im Stylesheet,
                    nicht der berechnete Wert - denn die Absicht steht dort,
                    auch wenn dieser Browser sie nicht umsetzt. */
-                if (deklariertAbsichtlich(knoten, zz.d)) { gewollt = true; warum = 'overflow-scrolling im Stylesheet'; }
+                if (deklariertAbsichtlich(knoten, zz.win)) { gewollt = true; warum = '--dpm-schiene gesetzt'; }
                 else if (kcs.scrollSnapType && kcs.scrollSnapType !== 'none') { gewollt = true; warum = 'scroll-snap'; }
                 else if (knoten.querySelector('button[onclick*="Scroll"],button[class*="arr"],[class*="rail-arr"]')
                          || (knoten.parentElement && knoten.parentElement.querySelector('[class*="rail-arr"],button[class*="arr"]'))) {

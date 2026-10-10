@@ -1994,7 +1994,17 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 
 /* Quick mode table */
-.ytf-quick-wrap { overflow-x: auto; }
+/* v2092e: `--dpm-schiene` sagt „dieser Querscroller ist gewollt". Die
+   Messkabine liest das Merkmal und zaehlt solche Behaelter als SCHIENE
+   statt als Mangel.
+
+   Warum nicht `-webkit-overflow-scrolling:touch` als Nachweis? Weil
+   CHROME DIE EIGENSCHAFT BEIM EINLESEN VERWIRFT — gemessen am 10.10.2026:
+   11.954 Regeln durchgegangen, NULL mit `overflow-scrolling` im cssText,
+   und `setProperty('-webkit-overflow-scrolling','touch')` gibt `""`
+   zurueck. Die Absicht steht in der Datei und ist im Browser in beide
+   Richtungen unsichtbar. Eine eigene Variable behaelt er. */
+.ytf-quick-wrap { overflow-x: auto; --dpm-schiene: 1; }
 .ytf-table {
   width: 100%;
   border-collapse: collapse;
@@ -33831,6 +33841,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   .bc-svg-wrap {
     height: auto !important;
     overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+    --dpm-schiene: 1;   /* v2092e: gewollter Querscroller, siehe .ytf-quick-wrap */
   }
   .bc-svg-wrap svg {
     min-width: 680px !important;   /* lesbar; Nutzer scrollt horizontal */
@@ -38995,7 +39006,12 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
        (display:block) — der Inhalt schrumpfte trotzdem auf 60-px-Auswahlen ("– k", "Kei", "> 2"), gemessen
        auf 390 px. Scrollkasten ist jetzt die Karte, die Tabelle behaelt ihre Breite und wischt. */
 @media (max-width: 520px) {
-  #oe-karte-gewerke { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* v2092e: `--dpm-schiene` ist der Nachweis der Absicht fuer die
+     Messkabine. `-webkit-overflow-scrolling` daneben bleibt stehen (es
+     wirkt in iOS-Safari), taugt aber NICHT als Nachweis: Chrome verwirft
+     die Eigenschaft beim Einlesen. Siehe die Begruendung an
+     `.ytf-quick-wrap`. */
+  #oe-karte-gewerke { overflow-x: auto; -webkit-overflow-scrolling: touch; --dpm-schiene: 1; }
   #oe-karte-gewerke #oe-gewerke { display: table !important; min-width: 620px !important; max-width: none !important; overflow: visible !important; }
   #oe-karte-gewerke #oe-gewerke select, #oe-karte-gewerke #oe-gewerke input { min-width: 110px; }
 }
