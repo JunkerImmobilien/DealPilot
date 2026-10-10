@@ -44,7 +44,7 @@ $env:DEALPILOT_KEY = "dpk_live_…"        # PowerShell
 |---|---|
 | `GET /rechenkerne/` | **200** · nennt beide Kerne |
 | `GET /objects/portfolio-export` | **200** · 655 KB · 23 Objekte, 13 Pilot-Analysen, 17 Marktberichte, 60 Verlaufspunkte |
-| `POST /rechenkerne/rnd` | **200** in **103 ms** · `final_rnd 10,5` am Objekt 2026-001 |
+| `POST /rechenkerne/rnd` | **200** · `final_rnd 28,0` am Objekt 2026-001 (seit v2073; vorher 10,5 mit falscher Eingabe) |
 | `POST /rechenkerne/verkehrswert` | **422** — siehe Abschnitt 5 |
 
 > **Bis `v2072a` gab jeder Aufruf 403 „requires an active Pro plan".**
@@ -242,36 +242,80 @@ Zwei Eingabeformen, beide gültig:
 Optional `{ "afa": { "gebaeudeanteil": 70, "grenzsteuersatz": 42 } }`
 für den steuerlichen Vergleich.
 
-Gemessen am Objekt `2026-001` (ETW, Baujahr 1962, 100 m²), **200 in
-103 ms**:
+Optional `{ "zweck": "afa" }` — dann gilt als Stichtag der
+**wirtschaftliche Übergang** (steuerlicher Betrachtungsbeginn) statt
+des heutigen Tages. Ebenfalls optional `{ "stichtag": "2024-01-01" }`
+und `{ "gnd": 70 }`; beide übersteuern die Ableitung.
+
+Gemessen am Objekt `2026-001` (ETW, Baujahr 1962, 100 m²) über die
+echte Schnittstelle, **Stand `v2073`**:
 
 ```jsonc
 {
   "kern": "restnutzungsdauer",
-  "eingabe_verwendet": { … },        // was der Kern wirklich gelesen hat
+  "eingabe_verwendet": {
+    "gnd": 80,
+    "gnd_herkunft": "Anlage 1 ImmoWertV, abgeleitet aus der Objektart \"ETW\"",
+    "modPoints": 11,
+    "modPoints_herkunft": "Feld mod_punkte im Objekt",
+    "stichtag": "2026-10-10",
+    "stichtag_herkunft": "heute (Verkehrswert-Stichtag)",
+    "kernsaniert": true
+  },
   "ergebnis": {
-    "final_rnd": 10.5,
+    "final_rnd": 28,
     "final_source": "technische Alterswertminderung (vorrangig)",
     "verfahren": "technisch",
-    "methods": { "linear": { … }, "vogels": { … }, … },
-    "grenzen": [ { "greift": true, "art": "unter_30_prozent", "text": "…",
-                   "quelle": "Paragraf 185 Abs. 3 Satz 5 BewG" } ],
-    "plausibilitaet": { "mindest_30_prozent": 21, "unterschritten": true,
-                        "afa_satz_pct": 9.52 }
+    "methods": { "punktraster": { "restnutzungsdauer": 41.73 }, "linear": { … }, … },
+    "grenzen": [ … ],
+    "plausibilitaet": { "mindest_30_prozent": 24, "unterschritten": false },
+    "pruefung": {
+      "erforderlich": false,
+      "grund": null,
+      "uebernahme_gesperrt": false,
+      "basis_rnd_jahre": 16,
+      "loest_die_sperre": "input.reelleRND (sachverstaendig, mit Begruendung)"
+    }
   }
 }
 ```
 
-> **`eingabe_verwendet` zuerst lesen, nicht das Ergebnis.** Dort steht,
-> was aus dem Datensatz geworden ist: die Gesamtnutzungsdauer hängt an
-> `objektTyp` (bei ETW **70**, nicht 80), und die Modernisierungspunkte
-> werden zu `gewerkeBewertung` übersetzt. Zwei Läufe mit verschiedener
-> GND ergeben verschiedene Zahlen, ohne dass einer falsch ist — ich habe
-> genau daran erst einen Rechenfehler vermutet, der keiner war.
+> ### ⚠ `pruefung.uebernahme_gesperrt` VOR dem Wert lesen
+>
+> Steht dort `true`, **darf `final_rnd` nicht übernommen werden.** Der
+> Fall tritt ein, wenn das Alter die Gesamtnutzungsdauer erreicht: die
+> rechnerische Basis ist dann 0, und **daraus folgt nicht, dass die
+> wirtschaftliche Restnutzungsdauer 0 ist** — sie ist sachverständig zu
+> beurteilen (Modernisierung, Sanierung, baulicher Zustand,
+> wirtschaftliche Nutzbarkeit; bei Kernsanierung ein fiktives Baujahr).
+> Die Sperre löst nur eine dokumentierte `reelleRND`.
+>
+> Der Kern rechnet die Formel der Anlage 2 dort **bewusst nicht fort**.
+> Am Gutachten-Modul V4.2 nachgemessen, warum: hinter ihrem
+> Scheitelpunkt (bei GND 80 zwischen Alter 84 und 88,6) steigt die
+> Parabel wieder. Ein 160 Jahre altes Gebäude bekäme dort 56 Jahre
+> Restnutzungsdauer — mehr als ein 56 Jahre altes mit 38.
+>
+> Fachliche Festlegung Marcels vom 10.10.2026. Sie besagt ausdrücklich
+> auch, dass Anlage 2 bei Alter ≥ GND **nicht gesetzlich ausgeschlossen**
+> ist; was dort endet, ist der fachlich plausible Bereich der Formel.
+
+> **`eingabe_verwendet` zuerst lesen, nicht das Ergebnis.** Dort steht
+> mit Herkunft, was aus dem Datensatz geworden ist. **Bis `v2073` kamen
+> drei Felder gar nicht an:** `gnd` lief in den Default 70 statt 80,
+> `modPoints` in 0 (obwohl das Objekt 11 trägt) und der Stichtag war
+> stillschweigend das Kaufdatum. Dasselbe Objekt rechnete deshalb
+> **10,5 statt 28,0 Jahre**. Wer gegen eine vor dem 10.10.2026
+> gezogene Zahl prüft, findet eine Abweichung, die eine ist.
 >
 > **`grenzen` ist kein Beiwerk.** Der Kern sagt selbst, wenn ein Wert
 > sachverständig gewürdigt werden muss. Wer nur `final_rnd` übernimmt,
 > verliert die Warnung — und damit die Begründbarkeit.
+>
+> **`final_rnd` ist nicht automatisch das Punktraster.** Hier gewinnt
+> die technische Alterswertminderung mit 28,0, während Anlage 2 auf
+> 41,73 kommt. Welches Verfahren gilt, ist eine Bewertungsentscheidung —
+> `methods` weist alle getrennt aus, `final_source` nennt das gewählte.
 
 ### `POST /rechenkerne/verkehrswert` — Wertermittlung
 
