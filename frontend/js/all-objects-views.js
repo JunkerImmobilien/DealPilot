@@ -58,6 +58,52 @@
     return 'open';
   }
 
+  /* ── v2084 · DIE KANBAN-SPALTE „BESTAND" (Backlog N60.16) ─────────────
+   *
+   * Marcel, 09.10.2026: „Ein gewonnenes Objekt gehört in eine Spalte
+   * Bestand, nicht weiter in die Akquise-Strecke."
+   *
+   * Bestand heißt: gewonnen UND der Ankauf-Stand ist festgeschrieben —
+   * also der Lastenwechsel vollzogen und der Stand eingefroren
+   * (`_ankauf`, seit v2030). Ein gewonnener Deal ohne diesen Stand ist
+   * noch nicht im Bestand; da fehlt der Stichtag.
+   *
+   * `ankauf_stichtag` ist eine LISTENSPALTE (`objectService.js:51`) und
+   * liegt auf der oberen Ebene, nicht in `data`. `loadObjects()` liest
+   * die rohe Serverantwort, also steht sie hier so zur Verfügung.
+   *
+   * ── WARUM getStatus() UNBERÜHRT BLEIBT ──────────────────────────────
+   * `getStatus()` speist auch `filterObjects()` und `getKPIs()`. Würde
+   * dort aus 'won' plötzlich 'bestand', sänke die angezeigte Gewinnquote,
+   * ohne dass ein Deal verloren ging — eine Kennzahl, die sich durch eine
+   * Ansichtsänderung bewegt, ist keine. Die Kanban-Ansicht bekommt
+   * deshalb ihre EIGENE Einteilung, und die Zählung bleibt, wie sie war.
+   *
+   * GEMESSEN am 10.10.2026 am echten Portfolio (23 Objekte):
+   *   gewonnen und Ankauf-Stand   3   -> Bestand
+   *   gewonnen ohne Ankauf-Stand  5   -> bleibt Gewonnen
+   *   Ankauf-Stand ohne gewonnen  0
+   *
+   * > Marcels Befund aus N60.19 („Objekte, die im Bestand stehen, aber
+   * > gar nicht auf Gewonnen gesetzt sind") trifft auf diesen Datenstand
+   * > NICHT zu — es gibt null davon. Die Richtung ist umgekehrt: fünf
+   * > gewonnene Deals ohne eingefrorenen Ankauf-Stand. Das ist auch ein
+   * > unvollständiger Zustand, aber ein anderer.
+   */
+  function istBestand(obj) {
+    if (getStatus(obj) !== 'won') return false;
+    /* Der Stichtag kann als Listenspalte oder im Datensatz stehen. */
+    if (obj.ankauf_stichtag) return true;
+    const a = (obj.data || {})._ankauf;
+    return !!(a && (a.stichtag || a.kurz));
+  }
+
+  function getKanbanSpalte(obj) {
+    const s = getStatus(obj);
+    if (s === 'won') return istBestand(obj) ? 'bestand' : 'won';
+    return s;
+  }
+
   function statusLabel(s) {
     return s === 'won' ? 'Gewonnen' : s === 'lost' ? 'Verloren' : 'Offen';
   }
@@ -242,18 +288,22 @@
   }
 
   function renderKanbanView(objs) {
+    /* v2084: vier Spalten. „Bestand" ist das Ende der Strecke, nicht
+       „Gewonnen" — ein gewonnener Deal ohne eingefrorenen Ankauf-Stand
+       steht noch dazwischen und wird genau dort sichtbar. */
     const cols = {
-      open: { label: 'Offen', cls: 'open', icon: '⏳', items: [] },
-      won: { label: 'Gewonnen', cls: 'won', icon: '✓', items: [] },
-      lost: { label: 'Verloren', cls: 'lost', icon: '✗', items: [] }
+      open:    { label: 'Offen',     cls: 'open',    icon: '⏳', items: [] },
+      won:     { label: 'Gewonnen',  cls: 'won',     icon: '✓', items: [] },
+      bestand: { label: 'Bestand',   cls: 'bestand', icon: '🏠', items: [] },
+      lost:    { label: 'Verloren',  cls: 'lost',    icon: '✗', items: [] }
     };
     objs.forEach(o => {
-      const s = getStatus(o);
+      const s = getKanbanSpalte(o);
       if (cols[s]) cols[s].items.push(o);
     });
-    
+
     let html = '<div class="ao-kanban">';
-    ['open', 'won', 'lost'].forEach(key => {
+    ['open', 'won', 'bestand', 'lost'].forEach(key => {
       const col = cols[key];
       html += '<div class="ao-kanban-col ao-kanban-col-' + col.cls + '">';
       html += '<div class="ao-kanban-col-header">';

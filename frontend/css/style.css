@@ -30787,8 +30787,20 @@ div.f div.cf#zaer_display,
 /* Kanban */
 .ao-kanban {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* v2084 · VIER Spalten (Offen · Gewonnen · Bestand · Verloren).
+     `minmax(0, 1fr)` statt `1fr`: ein Rasterfeld hat `min-width:auto`
+     und waechst sonst aus dem Raster HINAUS statt umzubrechen — bei
+     drei Spalten fiel das nicht auf, bei vier wird es eng. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+}
+/* Unter 1100 px zwei Reihen statt vier Spalten — vier Karten
+   nebeneinander sind auf dem iPad nicht mehr lesbar. */
+@media (max-width: 1100px) {
+  .ao-kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .ao-kanban { grid-template-columns: minmax(0, 1fr); }
 }
 .ao-kanban-col {
   background: color-mix(in srgb, var(--gold) 3%, transparent);
@@ -30815,6 +30827,15 @@ div.f div.cf#zaer_display,
 .ao-kanban-col-open .ao-kanban-col-title  { color: var(--gold, #C9A84C); }
 .ao-kanban-col-won .ao-kanban-col-title   { color: var(--green, #3FA56C); }
 .ao-kanban-col-lost .ao-kanban-col-title  { color: var(--red, #B8625C); }
+/* v2084 · Bestand. Dunkleres Gold: das Objekt ist nicht mehr „offen"
+   (helles Gold) und nicht nur „gewonnen" (gruen) — es gehoert zum
+   Besitz. VORSCHLAG, von Marcel zu bestaetigen; die Statusfarben
+   Gruen und Rot bleiben in jeder Marke unveraendert. */
+.ao-kanban-col-bestand .ao-kanban-col-title { color: var(--wl-b8932f, #b8932f); }
+.ao-kanban-col-bestand {
+  background: color-mix(in srgb, var(--gold) 6%, transparent);
+  border-color: color-mix(in srgb, var(--gold) 34%, transparent);
+}
 .ao-kanban-count {
   background: #fff;
   color: var(--ch, #2A2727);
