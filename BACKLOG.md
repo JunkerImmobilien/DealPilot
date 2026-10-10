@@ -134,7 +134,58 @@ Marcels Frage aus N60.5 („erst 44, dann über 80").
 
 </details>
 
-#### N60.2 · Messkabine: ALLES, nicht nur der Marktbericht
+#### N60.2 · WERKZEUG ERWEITERT 10.10.2026 (`v2085`) — die Matrix fehlt noch
+> ### Vier Achsen statt einer (`v2085`–`v2085b`)
+>
+> **Der Befund vorher:** die Kabine konnte genau EINE Variantenachse
+> setzen (`dp_layout`). Kartenstil und Theme waren über sie nicht
+> ansteuerbar — die Attribute existieren in der App, aber die Kabine
+> kannte ihre Merker nicht.
+>
+> *Ein Prüfstand, der eine Achse nicht verstellen kann, prüft sie nicht
+> — und meldet trotzdem „geprüft". Genau das hat N60.17 getan: vier
+> Ansichten protokolliert, alle beim Standard-Design.*
+>
+> | Achse | Merker | kommt an? |
+> |---|---|---|
+> | Layout | `dp_layout` | **ja** |
+> | Kartenstil | `dp_karten_stil` | **ja** (`kartei` gemessen) |
+> | Objektkarte | `dp_objkarte_stil` | **ja** (`datenzeile` gemessen) |
+> | Kartenvariante | `dp_karten_variante` | gesetzt, ungeprüft |
+> | Theme | `ui_theme` **im JSON** | **nein** — siehe unten |
+> | Karten/Oberfläche | `ui_cards`, `ui_surface` **im JSON** | **nein** |
+>
+> **Das Ergebnis nennt jetzt `angefordert` UND `attribute`** — was
+> gesetzt wurde und was am `<html>` wirklich hängt. Ein Merker im
+> Speicher ist kein Nachweis: das Modul kann ihn verwerfen oder an eine
+> Bedingung binden.
+>
+> ### Warum drei Achsen NICHT gehen (gemessen, nicht vermutet)
+>
+> `ui_theme`, `ui_cards` und `ui_surface` liegen als Felder im JSON
+> `dp_user_settings` — und das ist **servergespiegelt**. Die App lädt
+> die Einstellungen nach dem Start vom Server und schreibt denselben
+> Schlüssel. Im iframe gemessen, nach einem Lauf mit `theme: 'kontor'`:
+> dort stand `"ui_theme": ""` — der gesetzte Wert war weg.
+>
+> **Vor dem Laden zu setzen ist bei einem servergespiegelten Wert
+> wirkungslos, und zwar lautlos.** Der richtige Weg steht in der Doku
+> der Kabine: nach dem Laden über die Modul-API im iframe setzen, dann
+> das Attribut lesen.
+>
+> **Dass die Lücke im Ergebnis SICHTBAR ist, war der Zweck** — sie hat
+> im ersten echten Lauf meinen eigenen Fehler gemeldet (ich hatte
+> `theme` auf `dp_karten_variante` geschrieben, zwei verschiedene
+> Konzepte verwechselt). Ohne das Feld hätte die Kabine ab heute „vier
+> Achsen geprüft" gemeldet und drei geprüft.
+>
+> ### Was weiterhin fehlt
+>
+> Die **Matrix selbst**: 9 Reiter × 8 Geräte × Varianten tatsächlich
+> fahren und protokollieren. Das Werkzeug kann es jetzt — gelaufen ist
+> es noch nicht. Und die drei JSON-Achsen brauchen den Weg über die
+> Modul-API, bevor sie in eine Matrix gehören.
+
 Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine geprüft?
 Auch den Marktbericht und alle anderen Tabs und Bereiche vollständig?
 Die App muss unter allen möglichen Designs passend auf Handy, Tablet und
