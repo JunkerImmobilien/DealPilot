@@ -90,7 +90,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2065</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2065a</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -373,8 +373,16 @@
       if (!ps || ps.content === 'none' || ps.content === 'normal') return;
       var bg = ps.backgroundColor;
       if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') return;
-      var f = male(bg);
-      if (!f || !ist_deckend(bg)) return;
+      /* `male` braucht ZWEI Argumente - Farbe und den Grund darunter.
+         Mit einem Argument stirbt es an `hinter.r`. Mir ist dieser
+         Fehler in derselben Sitzung ZWEIMAL unterlaufen: einmal beim
+         Nachbau der Kontrastmessung, einmal hier. Eine fremde
+         Aufrufhilfe schreibt man ab, man rekonstruiert sie nicht.
+         Nur deckende Farben zaehlen, deshalb ist Weiss als Basis
+         beliebig - das Ergebnis haengt nicht davon ab. */
+      if (!ist_deckend(bg)) return;
+      var f = male(bg, { r: 255, g: 255, b: 255 });
+      if (!f) return;
       /* `inset` gibt an, wie weit es vom Rand des Elterns einrückt.
          Nur der gleichmäßige Fall wird gefasst - sonst müsste man die
          Position nachrechnen, und eine geratene Geometrie ist schlimmer
