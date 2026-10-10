@@ -90,7 +90,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2064</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2065</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -343,10 +343,67 @@
     out.push(bild.slice(start));
     return out.map(function (x) { return x.trim(); }).filter(Boolean);
   }
+  /* ═══ v2065 · EIN PSEUDOELEMENT KANN DER ECHTE GRUND SEIN ═══════════
+     Gemessen am 09.10.2026 an den Score-Ringen im Cockpit: `div.sc`
+     trägt `conic-gradient(rgb(169,141,64) 65%, …)` — den Ring. Die Zahl
+     darauf hat DIESELBE Goldfarbe, und die Kabine meldete Kontrast 1,7.
+
+     Sie stand damit unter den drei schwersten Befunden der ganzen App.
+
+     Nur: `div.sc::before` legt einen WEISSEN Kern (33×33 px, inset 3,5,
+     border-radius 50%), und die Zahl (13×13) steht darauf — nicht auf
+     dem Gold. Der echte Kontrast ist rund 3,1.
+
+     > Ein Pseudoelement findet kein DOM-Werkzeug. `getComputedStyle(el,
+     > '::before')` findet es doch — man muss nur daran denken, dass es
+     > den Grund stellen kann.
+
+     Gefasst wird der häufige Fall: ein Pseudoelement mit deckender
+     Hintergrundfarbe und `inset`, das den Textbereich überdeckt. Alles
+     andere (Verläufe im Pseudoelement, berechnete Positionen) bleibt
+     ungefasst und wird als solches gemeldet. */
+  function pseudoGrund(p, el, win){
+    var rEl = el.getBoundingClientRect();
+    var rP = p.getBoundingClientRect();
+    var treffer = null;
+    ['::before', '::after'].forEach(function(welches){
+      if (treffer) return;
+      var ps;
+      try { ps = win.getComputedStyle(p, welches); } catch (e) { return; }
+      if (!ps || ps.content === 'none' || ps.content === 'normal') return;
+      var bg = ps.backgroundColor;
+      if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') return;
+      var f = male(bg);
+      if (!f || !ist_deckend(bg)) return;
+      /* `inset` gibt an, wie weit es vom Rand des Elterns einrückt.
+         Nur der gleichmäßige Fall wird gefasst - sonst müsste man die
+         Position nachrechnen, und eine geratene Geometrie ist schlimmer
+         als keine. */
+      var ins = parseFloat(ps.insetBlockStart || ps.top);
+      if (!isFinite(ins)) return;
+      var k = { links: rP.left + ins, oben: rP.top + ins,
+                rechts: rP.right - ins, unten: rP.bottom - ins };
+      /* Liegt der Text GANZ darin? Sonst steht er teils daneben. */
+      if (rEl.left >= k.links - 0.5 && rEl.right <= k.rechts + 0.5
+          && rEl.top >= k.oben - 0.5 && rEl.bottom <= k.unten + 0.5) {
+        treffer = f;
+      }
+    });
+    return treffer;
+  }
+
   function effGrund(el, win){
     /* Erster Vorfahr mit Fläche; durchsichtige Schichten werden von hinten
        nach vorn übereinandergemalt. Weiß ist der Anfang — das Blatt. */
     var p = el, stapel = [], unmessbar = null, hatVerlauf = false;
+    /* v2065: Zuerst sehen, ob ein Vorfahr seinen Grund per Pseudoelement
+       stellt - das liegt ÜBER seinem eigenen Hintergrund. */
+    var pp = el.parentElement, tiefe = 0;
+    while (pp && tiefe++ < 3) {
+      var pg = pseudoGrund(pp, el, win);
+      if (pg) return pg;
+      pp = pp.parentElement;
+    }
     while (p) {
       var st = win.getComputedStyle(p);
       var bild = st.backgroundImage;
