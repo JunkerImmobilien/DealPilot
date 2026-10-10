@@ -1908,7 +1908,7 @@ Ordnung sind.
 
 ---
 
-#### N60.16 · Portfolio-Cockpit und Kanban kennen Ankauf/Bestand noch nicht
+#### N60.16 · Kanban ERLEDIGT 10.10.2026 (`v2084`) — Cockpit-Teil offen
 Marcel, 09.10.2026: *„im Portfolio-Cockpit müssen wir dann natürlich
 auch schauen, dass wir den Bestand passend ergänzen können, also auch
 zwischen Ankauf und allem sinnvoll aufsplitten … Und auch die
@@ -1928,8 +1928,51 @@ Telegram-Bot bekommen beide Stände im Prompt.
 |---|---|
 | Portfolio-Cockpit | Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand** — heute rechnet es nur den laufenden Stand |
 | Portfolio-Cockpit | Die **Abweichung über den ganzen Bestand**: wie viele Objekte stehen besser, wie viele schlechter als beim Ankauf |
-| Kanban | Ein gewonnenes Objekt gehört in eine Spalte **Bestand**, nicht weiter in die Akquise-Strecke |
+| ~~Kanban~~ | ~~Spalte **Bestand**~~ — **erledigt `v2084`**, siehe unten |
 | Sortierung | Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren, nicht nach den heutigen |
+
+> ### Kanban gebaut (`v2084`) — und dabei drei schwere Fehler gefunden
+>
+> **Vier Spalten:** Offen · Gewonnen · **Bestand** · Verloren. Bestand
+> heißt gewonnen **und** Ankauf-Stand festgeschrieben. Im Browser
+> abgenommen: **15 · 4 · 4 · 0 = 23**.
+>
+> `getStatus()` blieb unberührt — es speist auch Filter und KPIs. Würde
+> dort aus „won" „bestand", sänke die Gewinnquote, ohne dass ein Deal
+> verloren ginge. Die Kanban-Ansicht hat ihre eigene Einteilung.
+>
+> **Marcels Befund aus N60.19 trifft auf diesen Datenstand nicht zu:**
+> Objekte mit Ankauf-Stand ohne „gewonnen" gibt es **null**. Umgekehrt
+> sind es vier gewonnene Deals **ohne** eingefrorenen Ankauf-Stand —
+> auch unvollständig, aber anders. Die neue Spalte macht es sichtbar,
+> ohne dass jemand danach suchen muss.
+>
+> ### Die drei Fehler, die erst beim Nachmessen auffielen (`v2084a/b`)
+>
+> Vier Spalten, alle mit Anzahl **0** — während die Seitenliste 23
+> Karten zeigte. Das war nicht die neue Spalte, das war **die ganze
+> Ansicht „Alle Objekte"**:
+>
+> | | Fehler | Folge |
+> |---|---|---|
+> | 1 | `loadObjects()` las `data.objects`, die Antwort heißt `{items, count}` | `_objects` blieb **leer** — Karten, Liste und Kanban zeigten nichts |
+> | 2 | `getStatus()` las `obj.data._deal_won`, die Listenantwort trägt **kein `data`** (0 von 23) | jedes Objekt war **„open"**, auch die acht gewonnenen |
+> | 3 | `getKPIs()` las `o.data.kaufpreis` | *„Investitionsvolumen (gewonnen) **0 €**"* bei acht gewonnenen |
+>
+> **Keiner der drei warf einen Fehler.** `res.ok` war wahr, der Rückfall
+> lieferte ein gültiges leeres Array, und eine leere Liste sieht aus wie
+> ein leeres Portfolio. Eine Null sieht aus wie ein Ergebnis.
+>
+> **Nach der Reparatur im Browser gemessen:** Investitionsvolumen
+> **4.018.000 €** (gewonnen), 12.296.911 € alle Objekte, Ø 502.250 €
+> über 8 Objekte. Alle drei Werte standen vorher auf 0.
+>
+> *„Gebaut und unerreichbar" hätte auch die neue Spalte getroffen — sie
+> wäre in einer Ansicht gelandet, die niemandem etwas zeigt.*
+>
+> **Nebenbefund, nicht geklärt:** `ankauf_stichtag` tragen **vier**
+> Objekte, im Portfolio-Export haben **drei** einen `_ankauf`-Block.
+> Möglich ist ein Objekt mit Stichtag ohne Kurzfassung.
 
 > **Zur Sortierung, bewusst zurückgestellt:** sie ist erst messbar, wenn
 > mehr als zwei Objekte einen Ankauf-Stand haben. Eine Sortierung über
