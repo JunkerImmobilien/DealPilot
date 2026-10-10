@@ -592,7 +592,21 @@ aus der Vorgabe eine Plage geworden.
 **Regel 7l:** Fragen nach Gesamtbestand, Klumpenrisiken oder „was als
 Nächstes" gehen an `portfolio_analyse_lesen` — mit Stand.
 
-#### N60.6-alt · Auskunft: immer Score, KPIs und eine Gesamtbewertung
+#### N60.6-alt · WOHL ERLEDIGT — Regeln 7k/7l im Prompt (nachgemessen 10.10.2026)
+
+> **Gefunden:** `agentLauf.js:177-192` führt Regel **7k** mit vier
+> Pflichten (beide Scores mit Stufe, Begründung bei Fehlen, passende
+> KPIs, Gesamtbewertung in Worten, **Stand**) und eine Ausnahme für
+> Ein-Zahl-Fragen. Regel **7l** (`:194`) macht die Cockpit-Analyse
+> verpflichtend. Die Werkzeuge sind da: `pilot_analyse_lesen`
+> (`agentWerkzeuge.js:229`, registriert `:3518`) und
+> `portfolio_analyse_lesen` (`:337`, registriert `:3537`).
+>
+> **Die Einschränkung, die der Code nicht widerlegt:** die Pflicht liegt
+> im **Prompt**, nicht im Code — es gibt keinen Prüfer, der eine Antwort
+> ohne Score verwirft. **N60.5 hat gezeigt, was das wert ist:** dort
+> waren vier Verbote formuliert und alle vier wurden gebrochen. Eine
+> Abnahme am echten Bot steht hier also genauso aus.
 Marcel: „Wenn ich nach wichtigen Daten frage, möchte ich immer, wenn
 verfügbar, **DealScore und Investor DealScore** sowie **alle beteiligten
 KPIs** haben und eine **textuelle Gesamtbewertung**. Der Abruf der in der
@@ -688,7 +702,17 @@ Kappungsgrenze, Mieterhöhungspotenzial zur ortsüblichen Vergleichsmiete,
 Kaution, Befristung, Kündigungsverzicht, Gewerbe mit Laufzeit und
 Option — das ist das, was den Ertragswert und die Bank interessiert.
 
-#### N60.9 · Einzelne Wohnungen im MFH: Liste + Modal, Bewertung je Einheit
+#### N60.9 · WOHL ERLEDIGT (`v2021`, `v2022`) — nachgemessen 10.10.2026
+
+> Zeilenknopf `mfh-einheiten.js:268`/`:798`, Modal `:329` mit
+> Stammdaten/Miete/Mietvertrag/Zustand/Bildern (max 6, `:325`),
+> Bewertung je Einheit `:54`/`:72`, flächengewichtete Summe `:81`,
+> Übertragung in den Reiter Objekt `:138`/`:895`.
+>
+> Das separate RND-Feld je Einheit wurde in `v2023` **absichtlich
+> wieder entfernt** (`:421-435`) — die RND je Einheit kommt aus dem
+> Zustand. Offen ist nur Marcels Augenprüfung, ob der MFH-Bereich zum
+> umgebauten Reiter Objekt passt; das ist kein Codemangel.
 Marcel: „Zu den einzelnen Wohnungen sollte man auch Bilder hinterlegen
 können. Da bietet sich an, vielleicht nur eine Auflistung der einzelnen
 Wohnungen zu machen und im Detail ein In-Place-Modal zu öffnen mit
@@ -1315,7 +1339,26 @@ und ihre Sprache.**
 
 ---
 
-#### N60.12 · Soll/Ist je Objekt — Konzept liegt vor, Entscheidung offen
+#### N60.12 · GEBAUT — am 10.10.2026 nachgemessen (der Text sagte „Entscheidung offen")
+
+> **Gemessen am 10.10.2026:** die Bauart, die dieser Punkt empfiehlt
+> (*„kein zweites Objekt, sondern ein eingefrorener Stand IM Objekt"*),
+> steht vollständig — vier Module, alle in `index.html` geladen:
+>
+> | Datei | Zeilen | was darin steht |
+> |---|---:|---|
+> | `ankauf.js` | 400 | `festschreiben()`, `korrigieren()` mit Historie, `abweichung()`, `vonSelbst()` (automatisch bei „gewonnen", v2041) |
+> | `doppelkarte.js` | 398 | `drehen()`, Knopf nur bei vorhandenem Ankauf-Stand, Alle-auf-einmal |
+> | `abweichung.js` | 134 | die Abweichungstafel |
+> | `ankauf-ansicht.js` | 293 | Ankauf-Ansicht mit Schreibsperre und Sperrzähler |
+>
+> Ausgelöst wird es am Status (`deal-action.js:2452`), serverseitig
+> liefert `objectService.js:50` schon `ankauf_kurz`/`ankauf_stichtag`.
+>
+> **Ein Punkt, der sich selbst als blockiert ausweist, kostet jedes Mal
+> eine Messung** — und schlimmer: er lädt dazu ein, etwas ein zweites
+> Mal zu bauen. Der aktuelle Stand steht in **N60.16**, das später
+> geschrieben wurde und die vier echten Restlücken nennt.
 Marcel: „Später habe ich dieses Objekt dann gewonnen, dann würde ich das
 auf gewonnen setzen und dann möchte ich das ja weiter abgleichen … dass
 dieses Objekt dann erst mal als Soll festgelegt wird und wir dann ein
