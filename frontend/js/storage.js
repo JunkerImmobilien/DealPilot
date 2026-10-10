@@ -2347,8 +2347,59 @@ function _buildXlsxRowForObject(o) {
     Marktberichte: _mbV ? _mbV.length : ((_mb && _mb.stand && _mb.stand.berichte) || ''),
     Erster_Bericht: _mbV ? String(_mbV[0].datum).slice(0, 10) : '',
     Wertentwicklung_Pct: _mbDelta,
+
+    /* ── v2086 · DIE RESTNUTZUNGSDAUER UND DAS MIETVERHAELTNIS ────────
+       Backlog N60.13: "ALLE neuen Felder muessen durch".
+
+       RND: `_rnd` wird seit v2068 am Objekt festgehalten (der Wizard
+       schreibt es, `storage.js:285` nimmt es mit). In der Tabelle
+       stehen die Zahl und das Verfahren - nicht die sechs
+       Einzelverfahren, die gehoeren in die JSON-Sicherung.
+
+       NICHT zu verwechseln mit `afa_rnd_jahre` im Reiter Steuer: dort
+       steht, was der Nutzer ANGESETZT hat. Weichen beide ab, ist das
+       ein Befund und kein Fehler - deshalb stehen beide Spalten da und
+       nicht eine zusammengerechnete.
+
+       Vertragsart: es gibt KEIN Objektfeld dafuer - die Mietvertraege
+       haengen heute nur an den MFH-Einheiten (`_mfh.einheiten[].mv_art`,
+       Backlog N60.8-alt). Fuer ein MFH wird deshalb die haeufigste Art
+       genannt, mit der Zahl dahinter; fuer alle anderen Objektarten
+       bleibt die Spalte LEER statt eine Art zu erfinden, die nirgends
+       eingegeben wurde. */
+    RND_Jahre: (d._rnd && d._rnd.rnd_jahre != null) ? d._rnd.rnd_jahre : '',
+    RND_Verfahren: (d._rnd && d._rnd.verfahren) || '',
+    RND_Stand: (d._rnd && d._rnd.stand) || '',
+    AfA_RND_angesetzt: d.afa_rnd_jahre || '',
+    Vertragsart: _mietvertragsArt(d),
+    Ankauf_Stichtag: (d._ankauf && d._ankauf.stichtag)
+      || o.ankauf_stichtag || o.ankaufStichtag || '',
     Anlage: o.created_at ? o.created_at.slice(0, 10) : ''
   };
+}
+
+/* ── v2086 · Die Vertragsart eines Objekts, soweit es eine gibt ────────
+   Nur MFH-Einheiten fuehren `mv_art`. Genannt wird die haeufigste mit
+   ihrer Zahl ("Index 4 von 6"), weil eine einzelne Art bei sechs
+   Wohnungen nichts aussagt. Fuehrt keine Einheit eine Art, bleibt es
+   leer - eine leere Zelle ist ehrlicher als "unbekannt", das wie eine
+   erfasste Angabe aussieht. */
+function _mietvertragsArt(d) {
+  try {
+    var e = d && d._mfh && d._mfh.einheiten;
+    if (!Array.isArray(e) || !e.length) return '';
+    var zaehl = {}, mit = 0;
+    e.forEach(function (x) {
+      var a = x && x.mv_art ? String(x.mv_art).trim() : '';
+      if (!a) return;
+      mit++;
+      zaehl[a] = (zaehl[a] || 0) + 1;
+    });
+    if (!mit) return '';
+    var beste = '', n = 0;
+    Object.keys(zaehl).forEach(function (k) { if (zaehl[k] > n) { n = zaehl[k]; beste = k; } });
+    return beste + ' (' + n + ' von ' + e.length + ')';
+  } catch (x) { return ''; }
 }
 
 /**
