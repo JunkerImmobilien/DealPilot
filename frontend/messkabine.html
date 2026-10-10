@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2085b</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1670,7 +1670,196 @@
     };
   }
 
+  /* ═══ v2092 · DER MATRIX-LÄUFER (Backlog N60.2) ══════════════════════
+
+     Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine
+     geprüft? Auch den Marktbericht und alle anderen Tabs und Bereiche
+     vollständig? Die App muss unter allen möglichen Designs passend auf
+     Handy, Tablet und Desktop gerendert werden."
+
+     Bis heute lautete die ehrliche Antwort nein. Das Werkzeug konnte es
+     seit v2085, gelaufen ist es nie — und von Hand sind es zu viele
+     Punkte, um sie durchzuhalten.
+
+     ── EINE BEHAUPTUNG IM BACKLOG WAR FALSCH, GEMESSEN AM 10.10.2026 ──
+
+     Dort stand, drei Achsen kämen nicht an, weil `ui_theme`, `ui_cards`
+     und `ui_surface` im servergespiegelten `dp_user_settings` liegen.
+     Nachgemessen über das `attribute`-Feld von `lauf()`:
+
+         theme   -> data-ui-theme="kontor"     KOMMT AN
+         cards   -> data-ui-cards="wallet"     KOMMT AN
+         surface -> data-ui-surface=null       schien zu fehlen
+
+     Bei `surface` lag es an MIR: ich hatte `papier` angefordert, und
+     `SURFACE` kennt nur `''` und `'light'`. **Ein erfundener Wert sieht
+     wie eine kaputte Achse aus.** Es kommen also alle sechs Achsen an,
+     und der Läufer darf sie alle fahren.
+
+     Nebenbei kam ein SECHSTES Theme zum Vorschein: `konsole`. Die vier
+     in der CSS-Sammelregel sind nicht alle, die es gibt — wer nach dem
+     Stylesheet geht, prüft fünf von sechs.
+
+     ── WAS DER LÄUFER MELDET ─────────────────────────────────────────
+
+     Je Punkt (Gerät × Variante × Reiter):
+       · Nachweis der Variante: angefordert gegen das ATTRIBUT am <html>
+       · echter Querscroll der Seite (nimmt ein Balken Höhe weg?)
+       · DIREKTE Kinder, die aus ihrem Behälter ragen
+       · Kontraststellen, nach Farbpaar gebündelt
+     Gemeldet wird nur, was AUFFÄLLT, plus immer die DECKUNG: wie viele
+     Punkte wirklich gefahren wurden. Ein Läufer, der seine Deckung nicht
+     nennt, kann grün werden, ohne etwas angesehen zu haben.
+
+     Er läuft lange (rund 50 Neuladungen). Deshalb startet er im
+     HINTERGRUND und schreibt nach `window.DPM_MATRIX` — EINMAL starten,
+     danach nur abfragen. Ein zweiter Start verdoppelt die Arbeit, ohne
+     dass man es sieht.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* Die Achsenwerte stehen in ui-varianten.js (THEMES/CARDS/SURFACE) und
+     in layout-varianten.css. Hier nur die Vorauswahl für einen Lauf —
+     sechs Varianten, die sich in den TRAGENDEN FLÄCHEN unterscheiden. */
+  var VARIANTEN = [
+    { name: 'DealPilot',  opt: {} },
+    { name: 'Kontor',     opt: { theme: 'kontor' } },
+    { name: 'Panel',      opt: { theme: 'panel' } },
+    { name: 'Kanzlei',    opt: { theme: 'kanzlei' } },
+    { name: 'Boarding',   opt: { theme: 'boarding' } },
+    { name: 'Konsole',    opt: { theme: 'konsole' } }
+  ];
+
+  async function matrix(opt){
+    opt = opt || {};
+    var geraete  = opt.geraete  || GERAETE;
+    var varianten = opt.varianten || VARIANTEN;
+    var pause    = opt.pause || 320;
+
+    var z0 = { punkte: 0, soll: geraete.length * varianten.length, laeuft: true,
+               begonnen: new Date().toISOString(), funde: [], achsen: [],
+               reiterGesehen: 0, fertig: null };
+    window.DPM_MATRIX = z0;
+
+    for (var vi = 0; vi < varianten.length; vi++) {
+      var v = varianten[vi];
+      for (var gi = 0; gi < geraete.length; gi++) {
+        var g = geraete[gi];
+        var o = { breite: g[1], hoehe: g[2] };
+        for (var k in v.opt) if (Object.prototype.hasOwnProperty.call(v.opt, k)) o[k] = v.opt[k];
+
+        var r;
+        try { r = await lauf(o); }
+        catch (e) {
+          z0.funde.push({ wo: v.name + ' @ ' + g[0], art: 'ABBRUCH', text: String(e && e.message || e) });
+          z0.punkte++;
+          continue;
+        }
+
+        /* (1) NACHWEIS DER VARIANTE - nicht glauben, dass sie wirkt */
+        var soll = v.opt.theme || '';
+        var ist  = (r.attribute && r.attribute.theme) || '';
+        if (String(soll) !== String(ist)) {
+          z0.achsen.push(v.name + ' @ ' + g[0] + ': theme angefordert "'
+                         + soll + '", am <html> "' + ist + '"');
+        }
+
+        var zz = ziel();
+        var btns = [].slice.call(zz.d.querySelectorAll('nav.tabs button.tab'));
+        /* Kein Reiter heisst: die Seite ist nicht da. Das ist ein Fund,
+           kein leeres Ergebnis. */
+        if (!btns.length) {
+          z0.funde.push({ wo: v.name + ' @ ' + g[0], art: 'KEINE REITER',
+                          text: 'nav.tabs button.tab findet nichts - Seite nicht geladen?' });
+          z0.punkte++;
+          continue;
+        }
+
+        for (var bi = 0; bi < btns.length; bi++) {
+          var b = btns[bi];
+          var rname = (b.getAttribute('data-tab') || b.textContent || '?').trim().slice(0, 18);
+          b.click();
+          await warte(pause);
+          z0.reiterGesehen++;
+
+          var wo = v.name + ' @ ' + g[0] + ' · Reiter ' + rname;
+
+          /* (2) ECHTER Querscroll: ein Balken muss HOEHE/BREITE wegnehmen.
+                 scrollWidth allein ist kein Befund - ein beschnittenes
+                 Element erzeugt ihn auch. */
+          /* Die Rueckgaben sind NACHGELESEN, nicht angenommen:
+               apQuerScroller -> Array von {el, sicht, inhalt, faktor,
+                                            balkenNimmtHoehe}
+               apUeberlauf    -> OBJEKT {echt:[], echtZahl, vonScrollerGefangen}
+             `ue.length` waere hier still immer undefined gewesen und der
+             Laeufer haette nie einen Ueberlauf gemeldet - derselbe Fehler
+             wie bei effGrund().rgb am 10.10.2026. */
+          try {
+            var qs = apQuerScroller(zz.d, zz.win) || [];
+            if (qs.length) {
+              z0.funde.push({ wo: wo, art: 'QUERSCROLL', n: qs.length,
+                text: qs.slice(0, 2).map(function(x){
+                  return x.el + ' ' + x.sicht + '->' + x.inhalt + ' (' + x.faktor
+                       + ', Balken ' + x.balkenNimmtHoehe + ')';
+                }).join(' | ') });
+            }
+          } catch (e) {
+            z0.funde.push({ wo: wo, art: 'MESSFEHLER', text: 'apQuerScroller: ' + String(e && e.message || e) });
+          }
+
+          /* (3) Was aus seinem Behaelter ragt - `echtZahl`, nicht `length` */
+          try {
+            var ue = apUeberlauf(zz.d, zz.win) || {};
+            if (ue.echtZahl) {
+              z0.funde.push({ wo: wo, art: 'UEBERLAUF', n: ue.echtZahl,
+                text: ue.echtZahl + ' Element(e): ' + (ue.echt || []).slice(0, 2).join(' | ')
+                    + (ue.vonScrollerGefangen ? ' · ' + ue.vonScrollerGefangen + ' von einem Scroller gefangen' : '') });
+            }
+          } catch (e) {
+            z0.funde.push({ wo: wo, art: 'MESSFEHLER', text: 'apUeberlauf: ' + String(e && e.message || e) });
+          }
+
+          /* (4) Kontrast, nach Farbpaar gebuendelt - die STELLENZAHL ist
+                 die nuetzliche, nicht die Elementzahl. */
+          try {
+            var m = messe(zz.d, zz.win, wo);
+            var gr = (m.kontrastGruppen || []).filter(function(x){ return +x.kontrast < 4.5; });
+            if (gr.length) {
+              z0.funde.push({ wo: wo, art: 'KONTRAST',
+                text: gr.length + ' Stellen, schlechteste k=' +
+                      gr.map(function(x){ return +x.kontrast; }).sort(function(a,b){ return a-b; })[0] +
+                      ' (' + gr.slice(0, 2).map(function(x){ return x.sel; }).join(', ') + ')',
+                n: gr.length });
+            }
+          } catch (e) {}
+        }
+        z0.punkte++;
+      }
+    }
+    z0.laeuft = false;
+    z0.fertig = new Date().toISOString();
+    return z0;
+  }
+
+  /* Kurzbericht - damit die Abfrage nicht an der Ausgabegroesse scheitert */
+  function matrixStand(){
+    var m = window.DPM_MATRIX;
+    if (!m) return 'kein Lauf gestartet';
+    var nachArt = {};
+    m.funde.forEach(function(f){ nachArt[f.art] = (nachArt[f.art] || 0) + 1; });
+    return {
+      laeuft: m.laeuft,
+      punkte: m.punkte + ' von ' + m.soll,
+      deckung: Math.round((m.punkte / m.soll) * 100) + ' %',
+      reiterGesehen: m.reiterGesehen,
+      funde: m.funde.length,
+      nachArt: nachArt,
+      achsenAbweichungen: m.achsen.length,
+      achsen: m.achsen.slice(0, 6)
+    };
+  }
+
   window.DPM = {
+                 matrix: matrix, matrixStand: matrixStand, varianten: VARIANTEN,
                  pruefeAnsicht: pruefeAnsicht, pruefSelbsttest: pruefSelbsttest,
                  apBedienbar: apBedienbar, apUeberlauf: apUeberlauf,
                  apQuerScroller: apQuerScroller, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
