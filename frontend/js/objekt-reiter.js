@@ -1097,5 +1097,9 @@
   }
 
   window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte, verlauf: verlauf,
-    zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen };
+    zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen,
+    /* v2079: die Beschriftungen mit exportiert - der Readycheck in
+       deal-action-readycheck.js braucht sie, und eine zweite Namensliste
+       dort waere genau die Doppelung, die pflichtFuer vermeidet. */
+    FELDNAMEN: FELDNAMEN };
 })();

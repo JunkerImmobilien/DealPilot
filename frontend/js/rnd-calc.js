@@ -114,7 +114,31 @@
     gehoben:  { id: 'gehoben',  label: 'zukunftsorientiert / gehoben' }
   };
 
-  // Schadens-Katalog mit orientierenden RND-Abschlägen (BFH IX R 7/12)
+  /* ── Schadens-Katalog mit orientierenden RND-Abschlägen ──────────────
+   *
+   * v2080: HIER STAND „(BFH IX R 7/12)" als Quelle. Das Aktenzeichen
+   * belegt die Prozentsätze unten NICHT — kein BFH-Urteil nennt
+   * 5 % für einen feuchten Keller oder 25 % für Tragwerksmängel. Die
+   * Werte sind ein eigener Modellansatz.
+   *
+   * Gemeldet vom zweiten Chat am 10.10.2026: im Register steht das
+   * Urteil als „offen", der Leitsatz ist nicht geprüft. Nachgemessen:
+   * das Zitat steht **nur in diesem Kommentar** und in keinem Nutztext,
+   * erscheint also in keinem Gutachten und keiner Oberfläche. Das
+   * Risiko war damit nie der Kunde, sondern der nächste Entwickler —
+   * wer ein Aktenzeichen danebenstehen sieht, hält die Zahlen für
+   * belegt und prüft sie nicht nach.
+   *
+   * > Ein Aktenzeichen verleiht Autorität, auch wenn es die Zahl nicht
+   * > trägt. Das ist dieselbe Falle, die Marcel am Gutachten kritisiert
+   * > hat: dort stand „Anlage 1 ImmoWertV" unter einer GND, die aus
+   * > Anlage 22 BewG kam.
+   *
+   * Was die Abschläge WIRKLICH sind: sachverständige Orientierungswerte
+   * dieses Hauses, anzuwenden nur über `applySchadensAbschlag` und
+   * danach zu würdigen. Wird ein Urteil als Grundlage gebraucht, gehört
+   * es vorher geprüft und mit Leitsatz zitiert — im Backlog unter
+   * N60.27. */
   const SCHADEN_KATALOG = [
     { id: 'feuchte_keller',     label: 'Aufsteigende Feuchtigkeit im Keller',      abschlag: 5 },
     { id: 'feuchte_wand',       label: 'Feuchteschäden in Wohnräumen',             abschlag: 8 },
@@ -1029,6 +1053,10 @@
     if (!d) return {};
     if (d.data) d = d.data;  // ggf. wrapper auspacken
 
+    /* v2080: macht aus jedem Wert einen String - auch aus Zahlen, 0 und
+       false. Siehe die Begruendung bei `objekt_adresse` weiter unten. */
+    function _text(v) { return (v == null) ? '' : String(v); }
+
     function rateToGrad(rate) {
       const n = parseInt(rate, 10);
       if (isNaN(n) || n === 0) return null;
@@ -1037,12 +1065,50 @@
       return 'gehoben';
     }
 
+    /* ── v2080 · DIE VERGLEICHSWERTE PASSTEN ZU KEINER ECHTEN OPTION ────
+     *
+     * HIER STAND eine Prüfung auf `schlecht`, `veraltet`, `sehr gut`,
+     * `hochwertig`, `gehoben`. Gemessen am 10.10.2026 bietet
+     * `index.html` bei `ds2_zustand` aber genau diese fünf Werte an:
+     *
+     *     Neubau / kernsaniert
+     *     Guter Zustand
+     *     Normaler Zustand
+     *     Renovierungsbedürftig
+     *     Stark sanierungsbedürftig
+     *
+     * **Keiner davon enthielt eines der gesuchten Wörter.** „Guter
+     * Zustand" trägt „gut", gesucht wurde „sehr gut". Ergebnis: ALLE
+     * fünf Optionen ergaben `standard`. Das Feld hatte auf die
+     * Restnutzungsdauer praktisch keine Wirkung — ein stark
+     * sanierungsbedürftiges Objekt wurde wie ein normales gerechnet.
+     *
+     * Gemeldet vom zweiten Chat am 10.10.2026, hier nachgemessen und
+     * bestätigt. Dasselbe Muster wie `avm.scoreLocation`
+     * (`feldname-nur-im-testdatensatz`): ein plausibler Vergleich, der
+     * nie trifft, weil die Werte aus einer anderen Quelle stammen als
+     * die, die der Nutzer anklickt.
+     *
+     * > Ein Rückfall, der immer denselben Wert liefert, ist kein
+     * > Rückfall. Er ist eine Konstante mit Begründung.
+     *
+     * Die Zuordnung ist bewusst konservativ: „gut" ist nach Anlage 2
+     * kein gehobener Standard, sondern der zeitgemäße Normalfall —
+     * dieselbe Linie wie `calcTechnisch` seit v2074. Nur eine
+     * Kernsanierung hebt. Die alten Wörter bleiben als Rückfall für
+     * Altdatensätze stehen. */
     function zustandFallback(zustand) {
-      if (!zustand) return 'standard';
+      if (zustand == null || zustand === '') return 'standard';
       const z = String(zustand).toLowerCase();
-      if (z.indexOf('schlecht') >= 0 || z.indexOf('veraltet') >= 0) return 'veraltet';
+      /* Die echten Optionen des Formulars, zuerst geprüft. */
+      if (z.indexOf('sanierungsbed') >= 0 || z.indexOf('renovierungsbed') >= 0) return 'veraltet';
+      if (z.indexOf('kernsaniert') >= 0 || z.indexOf('neubau') >= 0) return 'gehoben';
+      if (z.indexOf('normal') >= 0 || z.indexOf('gut') >= 0) return 'standard';
+      /* Altdatensätze und freie Eingaben. */
+      if (z.indexOf('schlecht') >= 0 || z.indexOf('veraltet') >= 0
+          || z.indexOf('abgewohnt') >= 0) return 'veraltet';
       if (z.indexOf('sehr gut') >= 0 || z.indexOf('hochwertig') >= 0
-          || z.indexOf('gehoben') >= 0) return 'gehoben';
+          || z.indexOf('gehoben') >= 0 || z.indexOf('neuwertig') >= 0) return 'gehoben';
       return 'standard';
     }
 
@@ -1205,9 +1271,25 @@
       gewerkeBewertung: gewerkeBewertung,
       schaeden: schaeden,
       // Gutachten-Metadaten
-      objekt_adresse: ((d.str || '') + ' ' + (d.hnr || '')).trim()
+      /* ── v2080 · ZWEI ABSTURZSTELLEN BEI ZAHLEN ─────────────────────
+         HIER STAND `(d.plz || '').trim()` und `(d.ort || '').trim()`.
+         Kommt die PLZ als ZAHL statt als Text - und aus einer fremden
+         Datenquelle kommt sie so - gibt `32609 || ''` die Zahl zurueck,
+         und Zahlen haben kein `.trim`:
+
+             TypeError: (d.plz || "").trim is not a function
+
+         Der zweite Chat hat es an der PLZ gemeldet; nachgemessen trifft
+         es auch `d.ort`. `d.str` und `d.hnr` sind robust, weil sie nur
+         verkettet und erst am Ende getrimmt werden - derselbe Ausdruck,
+         andere Reihenfolge, anderer Ausgang.
+
+         `_text()` macht aus allem einen String, auch aus 0 und false.
+         Ein Absturz in der Abbildung nimmt den ganzen Aufruf mit, und
+         zwar bevor irgendetwas gerechnet wurde. */
+      objekt_adresse: (_text(d.str) + ' ' + _text(d.hnr)).trim()
                     + (d.plz || d.ort
-                       ? ', ' + (d.plz || '').trim() + ' ' + (d.ort || '').trim()
+                       ? ', ' + _text(d.plz).trim() + ' ' + _text(d.ort).trim()
                        : ''),
       objekt_einheit: d._name || '',
       wohnflaeche: parseGermanNum(d.wfl),

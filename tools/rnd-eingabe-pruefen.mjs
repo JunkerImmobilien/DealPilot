@@ -243,5 +243,64 @@ pruef('deal-action: liest die mod_*-Felder', /punkteAusMod/.test(da), true);
 pruef('mfh-einheiten: nutzt MOD_ELEMENTS',
   /MOD_ELEMENTS/.test(fs.readFileSync('./frontend/js/mfh-einheiten.js', 'utf8')), true);
 
+
+/* ═══ 10 · v2080 · Die drei Funde des zweiten Chats ════════════════════
+   Gemeldet am 10.10.2026, hier nachgemessen - zwei davon schwerer als
+   gemeldet. */
+console.log('\n=== 10 · v2080 · Robustheit und Zustands-Rueckfall ===');
+
+/* a) Zahlen in Textfeldern duerfen die Abbildung nicht abstuerzen lassen.
+      Gemeldet war die PLZ; `ort` traf es genauso. */
+const basis = { baujahr: 1962, objart: 'ETW', wfl: 100, str: 'X', hnr: '1', plz: '12345', ort: 'Y' };
+for (const [feld, wert] of [['plz', 32609], ['ort', 123], ['str', 5], ['hnr', 9],
+                            ['plz', 0], ['ort', false], ['str', null]]) {
+  const d = Object.assign({}, basis); d[feld] = wert;
+  let ok = true, msg = '';
+  try { RND.mapDealPilotObject(d); } catch (e) { ok = false; msg = e.message; }
+  if (!ok) { fehler++; console.log('  FEHLT  ' + feld + '=' + JSON.stringify(wert) + ' stuerzt ab: ' + msg); }
+  else console.log('  ok     ' + feld + '=' + JSON.stringify(wert) + ' -> kein Absturz');
+}
+
+/* b) Der Zustands-Rueckfall muss die ECHTEN Formular-Optionen treffen.
+      Vorher ergaben alle fuenf "standard" - das Feld war wirkungslos. */
+const ECHTE_ZUSTAENDE = [
+  ['Neubau / kernsaniert', 'gehoben'],
+  ['Guter Zustand', 'standard'],
+  ['Normaler Zustand', 'standard'],
+  ['Renovierungsbedürftig', 'veraltet'],
+  ['Stark sanierungsbedürftig', 'veraltet']
+];
+for (const [wert, soll] of ECHTE_ZUSTAENDE) {
+  const m = RND.mapDealPilotObject({ baujahr: 1962, objart: 'ETW', wfl: 100,
+    plz: '32609', ort: 'X', ds2_zustand: wert });
+  const grade = [...new Set(Object.values(m.gewerkeBewertung || {}))];
+  const ist = grade.length === 1 ? grade[0] : grade.join('+');
+  pruef('Zustand "' + wert + '"', ist, soll);
+}
+/* Gegenprobe: die Optionen stehen wirklich so im Formular */
+const htmlQ = fs.readFileSync('./frontend/index.html', 'utf8');
+const sel = htmlQ.match(/id="ds2_zustand"[\s\S]{0,900}?<\/select>/);
+if (!sel) { fehler++; console.log('  FEHLT  ds2_zustand nicht in index.html gefunden'); }
+else {
+  const opts = [...sel[0].matchAll(/<option[^>]*>([^<]*)<\/option>/g)]
+    .map(x => x[1].trim()).filter(t => t && !/bitte w/i.test(t));
+  const fehlend = opts.filter(o => !ECHTE_ZUSTAENDE.some(([w]) => w === o));
+  if (fehlend.length) {
+    fehler++;
+    console.log('  FEHLT  Formular-Optionen ohne Pruefung: ' + JSON.stringify(fehlend));
+    console.log('         -> der Rueckfall kennt sie nicht, sie ergeben "standard"');
+  } else console.log('  ok     alle ' + opts.length + ' Formular-Optionen sind geprueft');
+}
+
+/* c) Kein Aktenzeichen als Scheinquelle fuer die Schadens-Abschlaege */
+const kernQ = fs.readFileSync(KERN, 'utf8');
+const nutz = kernQ.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+pruef('BFH-Zitat nicht im Nutztext', /IX R 7\/12/.test(nutz), false);
+const katalogZeile = kernQ.split('\n').findIndex(l => /Schadens-Katalog mit orientierenden/.test(l));
+if (katalogZeile >= 0) {
+  const umfeld = kernQ.split('\n').slice(Math.max(0, katalogZeile - 2), katalogZeile + 2).join(' ');
+  pruef('Katalog-Zeile nennt kein Aktenzeichen', /IX R \d+\/\d+/.test(umfeld), false);
+}
+
 console.log('\n' + (fehler === 0 ? 'GESAMT RC=0' : 'GESAMT RC=1 - ' + fehler + ' Abweichung(en)'));
 process.exit(fehler === 0 ? 0 : 1);
