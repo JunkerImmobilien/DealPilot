@@ -804,7 +804,7 @@ oder im **iframe** vorschauen.
 
 ---
 
-#### N60.22 · Der Co-Pilot braucht Pillen mit Standardfragen — und eine Datentiefe-Auskunft
+#### N60.22 · ERLEDIGT 10.10.2026 (`v2082`) — sechs Pillen, zwei antwortet die App selbst
 Marcel, 10.10.2026: *„In der Pilotanalyse unten, wo dann halt auch der
 Co-Pilot sitzt, vielleicht noch ein paar Pillen machen, wo man
 draufklicken kann mit gewissen Standards."*
@@ -830,6 +830,50 @@ Datentiefe erreicht"* · *„welche Felder fehlen"*.
 
 **Feldänderungen direkt aus dem Dialog** nennt Marcel ausdrücklich als
 nachrangig: *„ist jetzt nicht ganz so erheblich."*
+
+> ### Gebaut und im Browser abgenommen (`v2082`)
+>
+> **Sechs Pillen in zwei Arten** — und darin steckt die Entscheidung:
+>
+> | Art | Pillen | Verhalten |
+> |---|---|---|
+> | **Antwort** (gefüllter Punkt) | Datentiefe · Was fehlt? | die **App** antwortet sofort, kostenlos |
+> | **Frage** (grau) | Soll/Ist · Mehr Tiefe? · Risiken · Bankgespräch | setzt den Text ins Eingabefeld |
+>
+> *„Welche Felder fehlen"* kann die App beantworten. Das an die KI zu
+> schicken wäre dreifach falsch: es kostet Kontingent, es dauert, und
+> die Antwort könnte daneben liegen — während der Zähler die Wahrheit
+> schon kennt. Lokale Antworten tragen deshalb die Zeile *„gemessen von
+> DealPilot · kein Kontingent verbraucht"*; sonst hält der Nutzer eine
+> gemessene Zahl für eine geschätzte.
+>
+> **Keine vierte Feldliste:** die Zahlen kommen aus
+> `DealPilotReadyCheck.getData()`, also seit `v2079` auch aus
+> `pflichtFuer(stufe)`. Nachgeprüft — das Modul enthält nur `getData()`
+> und `jump()`.
+>
+> **Im Browser abgenommen**, Objekt geladen, Reiter Pilot-Analyse:
+> alle 6 Pillen 76–124 × 39 px und **auf ihrem Mittelpunkt erreichbar**;
+> Klick auf *Datentiefe* erzeugt die Antwort *„20 von 22 Feldern sind
+> gefüllt (91 %). Eingabetiefe 1 ist gewählt; davon kommen 5
+> Pflichtfelder der Wertermittlung dazu … Für eine Wertermittlung nach
+> ImmoWertV braucht es Eingabetiefe 3"*; *Was fehlt?* nennt die zwei
+> offenen Felder mit **Sprung-Chips**; die Fragen-Pille setzt ihren Text
+> ins Eingabefeld. Alle Werte deckungsgleich mit `getData()`.
+>
+> **Ein Nebenbeweis für `v2079`:** die zwei fehlenden Felder sind
+> **Marktfaktor** und **Marktmiete** — zwei der drei Score-Felder, die
+> der Zähler vorher nicht kannte. Ohne `v2079` hätte hier *„20 von 20,
+> 100 %"* gestanden, und der Nutzer hätte nichts davon gewusst.
+>
+> **Eine Messfalle dabei, notiert:** vor dem Scrollen meldeten alle
+> Pillen `erreichbar: false` — sie lagen bei y 1380 in einem 1050 px
+> hohen Fenster, also **unter dem Falz**. `elementsFromPoint` gibt dort
+> ein leeres Array zurück. Das ist ein Artefakt, kein Befund.
+>
+> **Marcels nachrangiger Punkt** (*„Feldänderungen direkt aus dem
+> Dialog … ist jetzt nicht ganz so erheblich"*) ist **nicht** gebaut —
+> die Sprung-Chips führen zum Feld, geändert wird dort.
 
 **Vor dem Bauen zu klären:** die Datentiefe-Auskunft braucht eine
 Quelle, und die darf **nicht** die dritte Feldliste werden — siehe
