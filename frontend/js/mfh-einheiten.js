@@ -69,12 +69,89 @@
     var k = (art === 'GESCH' || art === 'BUERO') ? 'geschaeft' : 'mfh';
     try { return (T && typeof T.getDefault === 'function' ? T.getDefault(k) : 80) || 80; } catch (x) { return 80; }
   }
-  function rndFuer(punkte) {
+  /* ══ v2095 · DIE EINHEITEN-RND LIEF IN DIE DEFAULTS ═══════════════════
+   *
+   * HIER STAND:
+   *   calcAll({ baujahr: bj,
+   *             stichtag: new Date().toISOString().slice(0,10),
+   *             gnd: gnd(), modPoints: punkte })
+   *
+   * VIER Felder. `calcAll` liest ZEHN — gemessen am 10.10.2026:
+   * `baujahr, stichtag, gnd, modPoints, gewerkeBewertung, gewerkeWeights,
+   * gewerkeRestlebensdauer, schaeden, applySchadensAbschlag, kernsaniert`.
+   * Die sechs ungenannten liefen still in die Vorgaben.
+   *
+   * ZWEI DAVON SIND TEUER:
+   *
+   * · `kernsaniert` fehlte. Der Kern sagt es in seinem eigenen Kommentar
+   *   (`rnd-calc.js:896`): ohne diese Angabe gilt die Kappe **0,70 statt
+   *   0,90** der GND. Bei GND 80 sind das 56 statt 72 Jahre — sechzehn
+   *   Jahre Unterschied an jeder Einheit, und zwar lautlos.
+   *
+   * · `stichtag` war auf HEUTE festgenagelt. Das verstößt gegen Marcels
+   *   fachliche Festlegung vom 10.10.2026: der Wertermittlungsstichtag
+   *   ist der ausdrücklich gesetzte, nicht automatisch ein Datum, das
+   *   das Programm sich selbst nimmt. `mapDealPilotObject` führt dafür
+   *   eine Rangfolge (ausdrücklich gesetzt > wirtschaftlicher Übergang >
+   *   Kaufdatum > heute) und schreibt mit, welcher Weg gegriffen hat.
+   *
+   * Statt diese Rangfolge hier ein ZWEITES Mal zu schreiben, wird sie
+   * geholt: `mapDealPilotObject(collectData())` — derselbe Weg, den
+   * `deal-action.js:1813` nimmt. Eine zweite Ableitung wäre genau der
+   * Fehler, den `score-tiers.js` vier Kopien gekostet hat.
+   *
+   * Überschrieben wird nur, was an der EINHEIT anders ist: die Punkte
+   * (mit Vererbung gerechnet) und die GND des Wizards.
+   *
+   * ── WAS DAMIT NICHT GELÖST IST, und das gehört gesagt ───────────────
+   * `kernsaniert` erbt die Einheit vom GEBÄUDE. Eine einzelne
+   * kernsanierte Wohnung in einem sonst unsanierten Haus lässt sich
+   * heute nicht erfassen: `istKernsaniert()` sucht den Text
+   * „kernsanier" in den Werten, die MFH-Stufen heißen aber `0/h/v`.
+   * Auf den Einheitendaten wäre die Funktion also IMMER `false` — sie
+   * dort aufzurufen hätte wie eine Prüfung ausgesehen und nie gegriffen.
+   * Im Backlog unter N60.10 notiert.                                   */
+  function rndBasis() {
+    /* Einmal je Auswertung, nicht je Einheit: collectData() liest das
+       ganze Formular. */
+    try {
+      if (typeof window.collectData === 'function'
+          && window.DealPilotRND && window.DealPilotRND.mapDealPilotObject) {
+        return window.DealPilotRND.mapDealPilotObject(window.collectData()) || null;
+      }
+    } catch (x) {}
+    return null;
+  }
+
+  function rndFuer(punkte, basis) {
     var bj = zahl(el('baujahr') && el('baujahr').value);
     if (!bj || !window.DealPilotRND || !window.DealPilotRND.calcAll) return null;
+    var eingabe = {};
+    if (basis) {
+      for (var k in basis) {
+        if (Object.prototype.hasOwnProperty.call(basis, k)) eingabe[k] = basis[k];
+      }
+    }
+    /* Ohne Basis bleibt nur der alte Notweg — aber er wird BENANNT,
+       statt als vollwertige Rechnung durchzugehen. */
+    if (!basis) {
+      eingabe.stichtag = new Date().toISOString().slice(0, 10);
+      eingabe.stichtag_herkunft = 'Notweg: collectData() nicht erreichbar, heutiges Datum';
+    }
+    eingabe.baujahr = bj;
+    eingabe.gnd = gnd();
+    eingabe.modPoints = punkte;
+    eingabe.modPoints_herkunft = 'je Einheit gerechnet, Gebäudegewerke geerbt';
     try {
-      var r = window.DealPilotRND.calcAll({ baujahr: bj, stichtag: new Date().toISOString().slice(0, 10), gnd: gnd(), modPoints: punkte });
-      return (r && r.methods && r.methods.punktraster) ? r.methods.punktraster.restnutzungsdauer : (r ? r.final_rnd : null);
+      var r = window.DealPilotRND.calcAll(eingabe);
+      var jahre = (r && r.methods && r.methods.punktraster)
+        ? r.methods.punktraster.restnutzungsdauer
+        : (r ? r.final_rnd : null);
+      return { jahre: jahre,
+               stichtag: eingabe.stichtag || null,
+               stichtag_herkunft: eingabe.stichtag_herkunft || null,
+               kernsaniert: eingabe.kernsaniert === true,
+               gnd: eingabe.gnd };
     } catch (x) { return null; }
   }
 
@@ -557,9 +634,18 @@
   function auswerten(list, geb) {
     var s = summe(list), gp = 0;
     GEB_IDS.concat(WE_IDS).forEach(function (id) { gp += punkteVon(id, geb[id] || '0'); });
+    /* v2095: die Rangfolge fuer Stichtag/kernsaniert EINMAL holen, nicht
+       je Einheit - collectData() liest das ganze Formular. */
+    var basis = rndBasis();
     var zeilen = list.map(function (e) {
       var p = punkteEinheit(e, geb), fl = zahl(e.wfl);
-      return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt, rnd: rndFuer(p.punkte) };
+      var r = rndFuer(p.punkte, basis);
+      return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt,
+               /* `rnd` bleibt eine ZAHL - Z. 567 und 589 rechnen damit.
+                  Die Herkunft reist daneben mit, statt die Form zu
+                  aendern und zwei Verbraucher zu brechen. */
+               rnd: r ? r.jahre : null,
+               rndInfo: r || null };
     });
     var flSum = zeilen.reduce(function (a, z) { return a + z.fl; }, 0);
     var pGew = flSum > 0 ? zeilen.reduce(function (a, z) { return a + z.punkte * z.fl; }, 0) / flSum
