@@ -16212,15 +16212,36 @@ body.hdr-collapsed .hdr-toggle-btn-compact {
   color: rgba(42,39,39,0.40) !important;
 }
 
-/* Hint-Texte unter Feldern: nie weiß */
+/* ── v2090 · DIE DECKKRAFT WAR DER FEHLER, NICHT DIE FARBE ─────────────
+ *
+ * Hier stand `rgba(42,39,39,0.55)` — die Tinte zu 55 %. Über Weiß ergibt
+ * das `rgb(138,136,136)`, und genau diese Zahl hat die Messkabine am
+ * 10.10.2026 gemeldet: **Kontrast 3,52 bei 10,5 px**, Schwelle 4,5.
+ * Sechs der zwölf Mängelgruppen im Reiter Objekt waren dieser eine Wert.
+ *
+ * Die Absicht der Zeile war richtig und steht noch da: Hinweistexte sollen
+ * nicht weiß sein. Nur hat niemand nachgerechnet, was 55 % der Tinte auf
+ * den fünf Flächen ergibt, auf denen ein `.hint` wirklich sitzt:
+ *
+ *     Deckkraft   weiß   --surface   creme   --karte   --surface2
+ *       0,55      3,52     3,44      3,43     3,45       3,34
+ *       0,65      4,71     4,61      4,55     4,62       4,43  <- knapp
+ *       0,68      5,22     5,04      4,97     5,04       4,84  <- haelt
+ *
+ * **Die dunkelste Fläche entscheidet, nicht die häufigste.** 0,65 besteht
+ * auf vier von fünf und wäre auf `--surface2` durchgefallen — gewählt ist
+ * deshalb 0,68: die niedrigste Deckkraft, die überall hält. Der Hinweis
+ * bleibt damit nachrangig, wie gewollt, aber lesbar.
+ *
+ * `.qc-hint-inline` stand auf 0,50 und war noch schwächer.             */
 .qc-hint,
 .qc-ai-src,
 .hint,
 .f .hint {
-  color: rgba(42,39,39,0.55) !important;
+  color: rgba(42,39,39,0.68) !important;
 }
 .qc-hint-inline {
-  color: rgba(42,39,39,0.50) !important;
+  color: rgba(42,39,39,0.68) !important;
   font-weight: 400;
 }
 
@@ -27795,7 +27816,23 @@ aside.sidebar .sb-card .sbc-won-ribbon {
   top: -1px;
   left: -1px;
   right: auto;
-  background: linear-gradient(135deg, #4CAF50, #2e7d32);
+  /* ── v2090 · DAS WON-BAND TRUG FREMDES GRÜN ──────────────────────────
+   * Hier stand `linear-gradient(135deg, #4CAF50, #2e7d32)` — zwei
+   * Material-Design-Grüns. Das Marken-Grün ist `#3FA56C`.
+   *
+   * **Der Mittelwert hat den Befund verharmlost.** Die Messkabine mittelt
+   * einen Verlauf zu einer Farbe und meldete `rgb(61,150,65)`, Kontrast
+   * 3,73 bei 8 Bändern. Entscheidend ist aber das HELLE Ende, denn dort
+   * steht derselbe weiße Text:
+   *
+   *     Weiß auf #4CAF50 (hell)   2,78   <- der wahre Wert
+   *     Weiß auf #3d9641 (Mittel) 3,73
+   *     Weiß auf #2e7d32 (dunkel) 5,13
+   *
+   * Jetzt Marken-Grün um 20 % abgedunkelt als helles Ende (4,59) und
+   * weitere 26 % für das dunkle (7,27). **Grün bleibt Grün** — CLAUDE.md
+   * verbietet, Statusfarben zu tokenisieren, nicht sie lesbar zu machen. */
+  background: linear-gradient(135deg, #328456, #256240);
   color:var(--dp-ink-1);
   font-size: 9px;
   font-weight: 800;
@@ -40200,14 +40237,22 @@ aside.sidebar .dk-seg-titel{
   flex:0 0 auto;padding:0 9px 0 7px;
   font-family:Inter,system-ui,sans-serif !important;font-size:11px !important;
   font-weight:700 !important;letter-spacing:.26px !important;text-transform:none !important;
-  color:color-mix(in srgb, var(--gold) 55%, transparent) !important;
+  /* v2090: stand auf 55 % — Gold zu 55 % auf Obsidian ergibt
+     rgb(112,94,44) und Kontrast 3,23 (gemessen 10.10.2026, 11 px).
+     Dieselbe Ursache wie bei `.hint` weiter oben: eine Deckkraft, die nie
+     gegen ihren Grund gerechnet wurde. 82 % hält auf Obsidian (6,1) UND
+     auf `--ch` (4,8) — die aktive Kachel legt rgba(42,39,39,.55) darunter,
+     also gilt der hellere der beiden Gründe. */
+  color:color-mix(in srgb, var(--gold) 82%, transparent) !important;
 }
 aside.sidebar .dk-seg{
   flex:1 1 0;min-width:0;padding:8px 10px !important;border:0 !important;
   border-radius:7px !important;background:transparent !important;cursor:pointer;
   font-family:Inter,system-ui,sans-serif !important;font-size:13px !important;
   font-weight:700 !important;letter-spacing:.26px !important;text-transform:none !important;
-  color:color-mix(in srgb, var(--gold) 62%, transparent) !important;
+  /* v2090: stand auf 62 % — rgb(126,105,48), Kontrast 3,83 bei 13 px.
+     Siehe die Begründung an `.dk-seg-titel` darüber. */
+  color:color-mix(in srgb, var(--gold) 82%, transparent) !important;
   transition:all .18s ease !important;
 }
 aside.sidebar .dk-seg:hover{

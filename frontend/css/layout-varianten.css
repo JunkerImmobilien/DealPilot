@@ -420,7 +420,11 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
   font-family:'JetBrains Mono', ui-monospace, monospace;
 }
 .dpl-schalter-k{ font-size:9px; letter-spacing:.12em; text-transform:uppercase;
-  color:#9A9287; padding-right:4px; }
+  /* v2090: stand auf #9A9287 — auf dem hellen Grund rgb(253,252,250)
+     ergibt das Kontrast 3,00 bei 9 px (gemessen 10.10.2026), Schwelle 4,5.
+     #7A736B ist derselbe Ton um 21 % abgedunkelt: 4,56. Die Beschriftung
+     bleibt zurückgenommen, ist aber lesbar. */
+  color:#7A736B; padding-right:4px; }
 .dpl-schalter button{
   font-family:inherit; font-size:10.5px; letter-spacing:.05em;
   padding:5px 9px; border:1px solid #CEC6B6; background:#fff; color:#6B645A;
