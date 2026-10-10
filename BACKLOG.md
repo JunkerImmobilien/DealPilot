@@ -1611,7 +1611,113 @@ Chips mit Tab-Sprung und Gold-Flash (Z. 14–17). Das trägt.
 
 ---
 
-#### N60.24 · ERLEDIGT 10.10.2026 (`v2078`) — alle erreichbaren Texte umgestellt
+#### N60.24 · ERLEDIGT — `v2078` reichte nicht, nachgezogen in `v2097`
+
+> ### Nachgemessen am 10.10.2026: „alle erreichbaren Texte" war zu früh
+>
+> `tools/kerosin-nutztext-pruefen.mjs` (neu) liest **420 Dateien, 12,9 MB**
+> und blendet 26 % davon als Kommentar aus. Befund: **25 Treffer im**
+> **Nutztext.** *Eine Erledigt-Meldung ohne Messung hält sich nicht.*
+>
+> **Die meisten sind KEIN Verstoß** — und das ist der wichtigere Teil des
+> Befundes:
+>
+> | Stelle | was es ist |
+> |---|---|
+> | `_wireKerosinStrip` | Funktionsname |
+> | `/Kerosin\|\/ Monat/` | ein Filter, der den Begriff **entfernt** |
+> | `console.warn('[v1182c] Kerosin-Kasten …')` | Protokoll |
+> | `config.js` `kerosin_10`, `liter: 10` | **stillgelegte** Paketliste (v1183) |
+>
+> ### Fünf Textstellen behoben (`v2097`) — und wie LIVE sie wirklich sind
+>
+> Nachgemessen, nicht angenommen:
+>
+> | Stelle | Zustand |
+> |---|---|
+> | `quickcheck-app.html:6405/6406` | **wirklich live** — am Server nachgelesen, Text steht neu |
+> | `credits.js:150` (API-Meldung) | **latent** — nur über den gesperrten Alt-Kauf erreichbar (503 ohne `STRIPE_PRICE_*`) |
+> | `welcomeMail.js` (8 Stellen, Kauf-Mail) | **latent** — dieselbe Sperre |
+> | `pricing-modal.js:1096/1099` | **nicht gerendert** — gehört zum stillgelegten Paket-Streifen; im geöffneten Preis-Fenster gemessen: 0× „Liter" |
+> | `kerosin-confirm-lage.js` | **tote Datei** (siehe unten) |
+>
+> *Ich hatte sie im Commit „wirklich kundensichtbar" genannt. Gemessen ist
+> nur eine davon live; die anderen sind latent oder tot.* Behoben bleiben
+> sie trotzdem — latent heißt „eine Umgebungsvariable entfernt", nicht
+> „unmöglich".
+>
+> Die **Luftfahrt-Bildsprache bleibt** (CLAUDE.md: abgeschafft ist der
+> Name des Guthabens, nicht das Cockpit). Cockpit, „Gute Flüge" und der
+> Boarding-Ton stehen weiter.
+>
+> ### Drei Fehler im eigenen Wächter, alle behoben
+>
+> - Er **löschte** Kommentare und zählte die Zeilennummern danach im
+>   gekürzten Text — **jeder Verweis zeigte auf eine falsche Zeile**
+>   (gemeldet `config.js:455`, dort steht eine Leerzeile). Jetzt werden
+>   Kommentare **geleert**, die Länge bleibt, und er prüft selbst gegen,
+>   ob die Zeile im Original denselben Begriff trägt.
+> - Er meldete **„100 % Nutztext"**, weil er nach dem Leeren die Länge
+>   verglich. Jetzt zählt er die ausgeblendeten Zeichen (26 %).
+> - Er kann **Bezeichner nicht von Prosa** unterscheiden und meldete 150
+>   Anbieter-Treffer. Jetzt zwei Töpfe — und die zwei bekannten
+>   Fehlurteile stehen **namentlich im Bericht**, statt die Heuristik als
+>   Wahrheit auszugeben.
+>
+> > **Zwei `Edit`-Versuche an `quickcheck-app.html` sind gescheitert**, weil
+> > die Zeile **geschützte Leerzeichen** (U+00A0) zwischen Zahl und Einheit
+> > trägt. Der Fehler sah aus wie ein falsch kopierter Text.
+
+#### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
+
+**CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
+„unabhängige Bewertungspartner". ImmoMetrica darf genannt werden."*
+
+**Gefunden am 10.10.2026** vom Kerosin-Wächter, der die Regel jetzt
+mitbewacht. Zwei Kundensätze in `quickcheck-app.html` sind in `v2097`
+ersetzt. **Was bleibt, ist Marcels Entscheidung**, denn es sind drei
+verschiedene Dinge:
+
+| Art | Beispiel | meine Einschätzung |
+|---|---|---|
+| **Bezeichner** | `sprengnetter-client.js`, `avm-section.js`-Variablen, Prompt-Schlüssel in `openaiService.js` | **kein Verstoß** — darf so heißen |
+| **Partner-Logos** | `landing/index.html:562` `alt="PriceHubble"`, `alt="Sprengnetter"` | **kein Verstoß** — eine Logo-Wand ist Marketing, keine Herkunftsangabe. Marcels Entscheidung |
+| **Anzeige-Beschriftungen** | `quickcheck-app.html` Quellen-Chips (`name:'PriceHubble'`), `help.js:217/225` („Sprengnetter (aktiv)"), `tour-content.js:167`, `object-actions.js:1626` | **hier greift die Regel** |
+
+> **Die dritte Gruppe hängt zusammen:** die Produkttour (`tour-content.js`)
+> zeigt auf **Knöpfe**, und die `help.js`-Abschnitte erklären **genau**
+> **diese Knöpfe**. Wer die Knöpfe umbenennt, muss Tour und Hilfe
+> mitziehen — und umgekehrt ergibt es keinen Sinn, die Hilfe zu
+> anonymisieren, während der Knopf den Namen trägt.
+>
+> **Ich habe nichts davon still umbenannt.** Welche Anbieter der Kunde
+> namentlich sieht, ist eine Marken- und Vertragsfrage (manche Verträge
+> verlangen die Nennung, andere verbieten sie). Gemessen ist der Umfang:
+> **rund 60 Anzeige-Stellen**, der Rest Bezeichner.
+
+**Zu entscheiden:** anonymisieren (Knöpfe, Chips, Hilfe, Tour zusammen)
+oder die Regel in CLAUDE.md auf „nicht als Herkunft einer Zahl" schärfen.
+Der Wächter läuft ab jetzt mit und hält den Stand fest.
+
+#### N60.31 · `kerosin-confirm-lage.js` ist gebaut und nicht verdrahtet
+
+**Gemessen am 10.10.2026:** die Datei wird von **keiner** HTML und
+**keinem** JS geladen, ihre `kcl-`-Klassen kommen **nur in ihr selbst**
+vor, und ihr Aufsatz auf `window.runKiLage` läuft nie.
+
+Inhaltlich ist es ein **Bestätigungsfenster vor dem Verbrauch**: „Für die
+KI-Lagebewertung wird Kontingent verbraucht: 1 Anfrage — Möchtest du
+fortfahren?", mit einem Haken „Nicht mehr fragen".
+
+> **Nicht gelöscht.** CLAUDE.md: `js/bmf-modal-v292.js` wurde einmal
+> fälschlich als „Leiche" entfernt. Hier gilt dasselbe — und anders als
+> dort ist der Inhalt offensichtlich nützlich: ein Kunde, der versehentlich
+> Kontingent verbraucht, beschwert sich zu Recht.
+
+**Zu entscheiden:** verdrahten (ein `<script>`-Eintrag plus Buster) oder
+bewusst verwerfen. Ihre Texte sind in `v2097` schon richtiggestellt, falls
+sie verdrahtet wird.
+
 Marcel, 10.10.2026: *„ich sehe die ganze Zeit irgendwas mit Kerosin.
 Das haben wir schon lange nicht mehr."*
 
