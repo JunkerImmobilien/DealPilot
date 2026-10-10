@@ -623,6 +623,68 @@ Ohne diese Liste wird jede Einheit eine halbe Kopie.
 
 ---
 
+#### N60.18 · Der Soll/Ist-Abgleich muss bankfähig werden — und erklären
+Marcel, 10.10.2026: *„Ich finde, du hast das auch schon gut gemacht bei
+der Pilotanalyse mit dem Soll-Ist-Abgleich. Was aber vielleicht auch
+geil wäre, wäre Steuer. … Das muss halt bankfähig sein."*
+
+**Der Reiter gibt es seit `v2043` (N60.12). Er zeigt eine Tabelle. Was
+fehlt, ist der Satz dazu** — und mehrere Kennzahlen, die ein Banker
+zuerst sucht.
+
+**(1) Was zusätzlich in den Vergleich gehört**
+
+| Kennzahl | warum Marcel sie nennt |
+|---|---|
+| **Gesamtwerbungskosten / Verlust** | „die Gesamtwerbungskosten, die wir dort haben, also Verlust und allem" |
+| **Cashflow VOR Steuer** | „den normalen Cashflow mit rein" — bisher steht dort nur der nach Steuer |
+| **IRR** | „dass er was sagen kann zum IRR" |
+| **Break-Even** | „ob das dann tatsächlich gepasst hat … solche Fehler sind dann schon entscheidend" |
+| **Mietentwicklung** | „ob wir dort im Kurs sind, ob das passt, also ob wir unsere Ziele auch erreichen" |
+
+> **Vor dem Bauen die Liste vervollständigen:** *„Geh da noch mal alles
+> durch, was du hast, was noch in die Soll-Ist-Vergleich rein kann."*
+> Also erst alle vorhandenen Kennzahlen auflisten und je eine
+> Entscheidung treffen — nicht die fünf oben abarbeiten und aufhören.
+
+**(2) Der Text ist der eigentliche Auftrag**
+
+Nicht nur Zahlen gegenüberstellen, sondern **begründen** — in beide
+Richtungen:
+
+- **unter Plan:** was fehlt, und was wir tun müssten, um das Ziel noch
+  zu erreichen
+- **über Plan:** was wir besser gemacht haben, wo mehr herauszuholen war
+
+*„damit wir sowas auch begründen können. Das muss halt bankfähig
+sein."* Länge: ein paar Sätze, nicht immer sechs oder sieben — *„was
+das beschreibt"*.
+
+**(3) Testobjekte, ausdrücklich verlangt**
+
+*„da kannst du auch mal ein paar Objekte anlegen oder bestehende
+Objekte anpassen mit Mehrfamilienhäusern und wo du eine Mietentwicklung
+machst … der Ankauf irgendwie drei Jahre vorher"*
+
+- ein **MFH mit Mietentwicklung**, Ankauf-Stand rund **drei Jahre**
+  zurück
+- **eines, das nach Plan läuft** — der Text muss das auch sagen dürfen
+- **eines, das NICHT nach Plan läuft**
+- je ein Beispiel, wo der **Break-Even passt und wo nicht**
+
+> **Warum Testobjekte zum Auftrag gehören und nicht zur Kür:** ein
+> Abgleichstext, der nur an einem Objekt gesehen wurde, kennt nur
+> dessen Fall. „Alles nach Plan" und „wir hängen hinterher" sind zwei
+> verschiedene Texte, und der zweite ist der schwierigere.
+
+**Was dafür schon steht:** `ankauf.js` (eingefrorener Stand, neun
+Kennzahlen, `abweichung()`), der Reiter *Soll/Ist-Abgleich*, die
+Abweichungstafel im Objekt (`v2034`) und die Mietentwicklung mit
+Herkunft. **Die Kennzahlen liegen also vor — es fehlt die Auswertung
+und ihre Sprache.**
+
+---
+
 #### N60.12 · Soll/Ist je Objekt — Konzept liegt vor, Entscheidung offen
 Marcel: „Später habe ich dieses Objekt dann gewonnen, dann würde ich das
 auf gewonnen setzen und dann möchte ich das ja weiter abgleichen … dass
