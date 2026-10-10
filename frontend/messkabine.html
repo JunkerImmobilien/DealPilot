@@ -78,9 +78,27 @@
   geschrieben — der erste echte Lauf meldete `angefordert.theme=v2`
   gegen `attribute.theme=null` und hat den Fehler selbst gezeigt.
 
-      ui_theme     '' · kontor · panel · kanzlei · boarding · konsole
-      ui_cards     kompakt · '' · wallet · …
-      ui_surface   (siehe ui-varianten.js)
+      ui_theme     '' · kontor · panel · kanzlei · boarding · konsole  (*)
+      ui_cards     kompakt · '' · wallet · …                          (*)
+      ui_surface   (siehe ui-varianten.js)                             (*)
+
+  (*) v2085b · DIESE DREI UEBERSCHREIBT DER SERVER.
+  dp_user_settings ist servergespiegelt: die App laedt die Einstellungen
+  nach dem Start und schreibt denselben Schluessel. Vor dem Laden
+  gesetzt, sind sie wirkungslos - und zwar lautlos.
+
+  Gemessen am 10.10.2026: theme 'kontor' angefordert, attribute.theme
+  blieb null, und im iframe stand "ui_theme": "" - der gesetzte Wert
+  war weg, ueberschrieben von der Server-Antwort.
+
+  Wer sie pruefen will, setzt sie NACH dem Laden im iframe:
+      var z = DPM.ziel();
+      z.win.DealPilotUiVarianten.setze({ ui_theme: 'kontor' });
+  und liest danach z.d.documentElement.dataset.uiTheme.
+
+  Dass das Ergebnis die Luecke ZEIGT, ist der Zweck von `attribute`:
+  ein Lauf, der theme 'kontor' anfordert und null erhaelt, behauptet
+  keine Pruefung, die nicht stattgefunden hat.
 
   Das JSON wird GEPATCHT, nicht ersetzt — dort stehen auch die
   Nutzerdaten. Wer es überschreibt, löscht Einstellungen, die er
@@ -125,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2085a</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2085b</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1098,6 +1116,37 @@
    * Das JSON wird GEPATCHT, nicht ersetzt: in `dp_user_settings` stehen
    * auch `ui_cards`, `ui_surface`, `ui_form` und die Nutzerdaten. Wer es
    * ueberschreibt, loescht Einstellungen, die er nicht prueft.
+   */
+  /* ── v2085b · DIESE DREI ACHSEN UEBERSCHREIBT DER SERVER ─────────────
+   *
+   * ZWEITER Fehlversuch am Theme, deshalb Diagnose statt Nachbessern.
+   * Gemessen IM iframe, nach einem Lauf mit `theme: 'kontor'`:
+   *
+   *     localStorage['dp_user_settings'] -> { … "ui_theme": "" … }
+   *
+   * Der gesetzte Wert war weg. `dp_user_settings` ist **servergespiegelt**:
+   * die App laedt die Einstellungen nach dem Start vom Server und
+   * schreibt sie in denselben Schluessel. Die anderen vier Merker
+   * (`dp_layout`, `dp_karten_stil`, `dp_objkarte_stil`,
+   * `dp_karten_variante`) sind rein lokal - deshalb kommen die an und
+   * diese drei nicht.
+   *
+   * > Vor dem Laden zu setzen ist bei einem servergespiegelten Wert
+   * > wirkungslos, und zwar lautlos: der Merker steht da, bis die
+   * > Antwort kommt.
+   *
+   * Es BLEIBT hier, weil es ohne Server-Antwort (Abruf scheitert, offline)
+   * trotzdem greift - aber es ist kein verlaesslicher Weg. Wer diese drei
+   * Achsen prueefen will, setzt sie NACH dem Laden ueber die Modul-API im
+   * iframe und liest danach das Attribut:
+   *
+   *     var z = DPM.ziel();
+   *     z.win.DealPilotUiVarianten.setze({ ui_theme: 'kontor' });
+   *     // dann erst messen
+   *
+   * Dass `attribute` die Luecke zeigt, ist der Zweck des Feldes: ein
+   * Lauf, der `theme: 'kontor'` anfordert und `theme: null` erhaelt,
+   * behauptet keine Pruefung, die nicht stattgefunden hat.
    */
   function setzeJsonFeld(feld, wert){
     try {
