@@ -1872,6 +1872,40 @@ label.dp-required.qc-required::after {
     <!-- V63.26: KI-Mietpreis-Analyse — analog zur KI-Lage-Bewertung in Tab Objekt -->
     </div>
     <div>
+      <!-- v2087 · MIETVERTRAG AUF OBJEKTEBENE (Backlog N60.8-alt)
+           Marcel: „Es soll auch eine Angabe zu Mietvertraegen gemacht
+           werden koennen, also was fuer ein Mietvertrag, seit wann der
+           besteht und wann die letzte Erhoehung gewesen ist. Das muss
+           fuer JEDEN Objekttyp und auch fuer einzelne Wohnungen
+           innerhalb eines MFH moeglich sein."
+
+           Die Wohnungen im MFH hatten das seit v2021/v2022
+           (mfh-einheiten.js), die Objektebene nicht - gemessen am
+           10.10.2026: null Treffer fuer `mv_art` in index.html. Fuer
+           eine ETW, ein EFH oder ein einzelvermietetes Objekt gab es
+           gar keine Vertragsangabe.
+
+           Dieselben Feldnamen wie bei den Einheiten (`mv_art`,
+           `mv_beginn`, `mv_letzte_erhoehung`) - derselbe Begriff soll
+           nicht zweimal anders heissen. Die Optionsliste wird aus
+           `DpMfhEinheiten.vertragsarten` GEFUELLT, nicht hier
+           wiederholt: zwei Listen derselben elf Vertragsformen waeren
+           der Anfang der Abweichung.
+
+           Die Karte steht VOR der Mietentwicklung, weil der Vertrag
+           entscheidet, ob eine Erhoehung ueberhaupt geht - Staffel und
+           Index tragen ihren Termin schon im Vertrag. -->
+      <div class="card" id="mv-objekt-karte" style="margin-bottom:14px">
+        <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-doc"/></svg></span>Mietvertrag
+          <span class="oe-ct-hint" id="mv-objekt-hinweis">für dieses Objekt</span></div>
+        <div class="f"><label title="Die Vertragsform bestimmt, ob und wann erhoeht werden darf. Staffel- und Indexmiete tragen ihren naechsten Termin schon im Vertrag — sie sind kein Potenzial, sondern ein Datum.">Vertragsart</label>
+          <div class="iw"><select id="mv_art"><option value="">– keine Angabe –</option></select></div></div>
+        <div class="f"><label title="Seit wann das Mietverhaeltnis besteht. Bei Staffelmiete die Grundlage fuer die Stufen, bei Indexmiete fuer die Zwoelfmonatsfrist.">Mietverhältnis seit</label>
+          <div class="iw"><input id="mv_beginn" type="date"></div></div>
+        <div class="f"><label title="Wann die Miete zuletzt erhoeht wurde. Daran haengen die Kappungsgrenze und bei Indexmieten die Frist bis zur naechsten Anpassung.">Letzte Erhöhung</label>
+          <div class="iw"><input id="mv_letzte_erhoehung" type="date"></div></div>
+        <p class="hint" id="mv-objekt-mfh-hinweis" style="display:none"></p>
+      </div>
       <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
           <span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>Mietentwicklung
           <div class="me-mode-toggle" role="tablist" aria-label="Mietentwicklungs-Modus">
@@ -3589,7 +3623,7 @@ label.dp-required.qc-required::after {
 <script src="js/v10.js?v=110"></script>
 <script src="js/ui.js?v=v2068"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2086"></script>
+<script src="js/storage.js?v=v2087"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v1960"></script>
@@ -3625,7 +3659,8 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v2080"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2029"></script>
+<script src="js/mfh-einheiten.js?v=v2087"></script>
+<script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->

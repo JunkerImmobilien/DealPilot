@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-10T12:48:32.012Z",
+ "erzeugt_am": "2026-10-10T12:53:21.904Z",
  "quellen": {
   "voice-import": "4291e16d256080eb",
   "objektart-felder": "b1481ff1f7c0b04d",
-  "storage": "c036442fa7301a4f",
-  "index-html": "df253a3e33ba3401",
+  "storage": "28a29a7a201e0b2f",
+  "index-html": "be9591f7613c8ba6",
   "grest": "9c0a4587759b4148"
  },
  "daten": {
@@ -499,6 +499,9 @@
    "me_anz",
    "me_int",
    "me_pct",
+   "mv_art",
+   "mv_beginn",
+   "mv_letzte_erhoehung",
    "ds2_zustand",
    "ds2_energie",
    "ds2_mietausfall",
@@ -1475,6 +1478,21 @@
     "id": "me_pct",
     "kind": "text",
     "label": "Angestrebte Entwicklung"
+   },
+   {
+    "id": "mv_art",
+    "kind": "select",
+    "label": "Vertragsart"
+   },
+   {
+    "id": "mv_beginn",
+    "kind": "text",
+    "label": "Mietverhältnis seit"
+   },
+   {
+    "id": "mv_letzte_erhoehung",
+    "kind": "text",
+    "label": "Letzte Erhöhung"
    },
    {
     "id": "ds2_zustand",

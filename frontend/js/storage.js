@@ -148,6 +148,13 @@ var FIELDS = [
   'bspar_quote_min', 'bspar_dar_z', 'bspar_dar_t',
   // V23: Mietentwicklung Detail-Modus
   'mietspiegel','me_modus','me_soll','me_anz','me_int','me_pct',
+  /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
+     Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
+     nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
+     Felder im Formular sichtbar und wuerden NICHT gespeichert: diese
+     Liste ist die Einsammelstelle, und was hier fehlt, verschwindet
+     beim Speichern lautlos. */
+  'mv_art','mv_beginn','mv_letzte_erhoehung',
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',

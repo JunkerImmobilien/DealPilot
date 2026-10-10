@@ -964,5 +964,9 @@
     if (art == null) art = (el('objart') && el('objart').value) || '';
     return !!ARTEN_MIT_EINHEITEN[art];
   }
-  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten };
+  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
+       braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
+       eine zweite Liste dort waere der Anfang der Abweichung. */
+    vertragsarten: MIETVERTRAG_ARTEN };
 })();
