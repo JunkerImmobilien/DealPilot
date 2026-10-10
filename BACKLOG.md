@@ -795,7 +795,7 @@ Chips mit Tab-Sprung und Gold-Flash (Z. 14–17). Das trägt.
 
 ---
 
-#### N60.24 · „Kerosin" ist abgeschafft und steht noch 77-mal im Nutztext
+#### N60.24 · ERLEDIGT 10.10.2026 (`v2078`) — alle erreichbaren Texte umgestellt
 Marcel, 10.10.2026: *„ich sehe die ganze Zeit irgendwas mit Kerosin.
 Das haben wir schon lange nicht mehr."*
 
@@ -833,6 +833,36 @@ zuerst, weil der Kunde sie liest:
 > `script src`-Verweis und jeden Cache-Buster mitziehen. Billiger ist,
 > die Datei zu lassen und nur den **Nutztext** darin zu ändern — der
 > Dateiname steht in keiner Oberfläche.
+
+> ### Nachgemessen: es waren 23, nicht 77 — und nur 6 erreichbar
+>
+> Der erste Zähler hat **Funktionsnamen und IDs mitgezählt**
+> (`_kerosinStripHtml`, `_kerosinGauge`, `id="pm-kerosin-strip"`,
+> `kerosin_10`). Präzise gemessen: **23 Stellen Anzeigetext in 11
+> Dateien**, davon **6 erreichbar** — alle in `v2078` behoben:
+> `neues-objekt-quellen.js`, `tour-content.js`, `credits.js` und
+> **zweimal das Admin-Portal** (`admin-stats.js` zwei Kacheln,
+> `admin/index.html` zwei Spaltentitel). Das Admin-Portal ist die
+> wahrscheinliche Antwort auf Marcels *„die ganze Zeit"* — es sieht
+> nur er.
+>
+> **Die restlichen 16 sind nachweislich unerreichbar**, nicht
+> übersehen: `welcomeMail.js` (6) und `credit-pack-confirmation.html`
+> (4) hängen am stillgelegten Kaufweg `creditPackWebhook.js`;
+> `pricing-modal.js` filtert das Wort in Z. 169 sogar **aktiv heraus**
+> und die Liter-Karten in `_kerosinCard` ruft niemand;
+> `kerosin-confirm-lage.js` ist in keiner HTML eingebunden.
+>
+> **Ein Befund, der mehr wiegt als der Begriff:** jener Dialog
+> kündigt *„Für die KI-Lagebewertung wird Kerosin verbraucht: 1 L"*
+> an. Gemessen bucht `/ai/lage` **gar nichts** ab — `logExtract`
+> mit dem Vermerk *„v1183: im Plan enthalten"*. Der Dialog hätte
+> Nutzer von einer kostenlosen Funktion abgehalten. Er ist nicht
+> eingebunden, also harmlos; `object-actions.js` hat dasselbe für
+> sich in v1194 schon behoben.
+>
+> Nachmessen: `node tools/kerosin-reste-pruefen.mjs` — trennt
+> Anzeigetext von Bezeichnern und nennt die Stellen je Datei.
 
 **Was NICHT mitfallen darf:** die Luftfahrt-Bildsprache als Ganze.
 Cockpit, Runway, Pre-Flight, QuickBoarding, Co-Pilot und Score-Dial
