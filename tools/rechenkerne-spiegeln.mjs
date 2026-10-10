@@ -81,7 +81,24 @@ const KERNE = [
   { datei: 'deal-kpis.js', global: 'DealKpis' },
   { datei: 'score-tiers.js', global: 'ScoreTier' },
   { datei: 'dealscore.js', global: 'DealScore' },
-  { datei: 'qc-heuristik.js', global: 'QcHeuristik' }
+  { datei: 'qc-heuristik.js', global: 'QcHeuristik' },
+  /* ═══ v2071 · DER RND-KERN GEHT MIT INS IMAGE ═══════════════════════
+     Marcel, 10.10.2026: „wir haben ja den Rechenkern fuer
+     Restnutzungsdauergutachten … dass wir dort Sachen reingeben koennen
+     und Sachen wieder zurueckbekommen, dass wir dafuer auch zwei
+     Schnittstellen machen."
+
+     Ohne Spiegelung geht das nicht: `frontend/` liegt nicht im
+     Backend-Image, und eine Schnittstelle, die den Kern nicht erreicht,
+     muesste ihn nachbauen - genau die Dopplung, vor der der Kopf dieser
+     Datei warnt. Am 07.10.2026 urteilte der Telegram-Bot deshalb anders
+     als die App, und zwar lautlos.
+
+     Die Reihenfolge zaehlt: `rnd-gnd-table.js` stellt
+     `DealPilotRND_GND` und wird von `calcAll` fuer die
+     Gesamtnutzungsdauer gelesen - erst die Tabelle, dann der Rechner. */
+  { datei: 'rnd-gnd-table.js', global: 'DealPilotRND_GND' },
+  { datei: 'rnd-calc.js', global: 'DealPilotRND' }
 ];
 
 const nurPruefen = process.argv.includes('--pruefen');

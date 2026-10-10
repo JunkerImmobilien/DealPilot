@@ -381,6 +381,10 @@ app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Ste
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/credits', creditsRoutes);  // V197
 app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
+/* v2071 · Die Rechenkerne als Schnittstelle: Restnutzungsdauer (im Image)
+   und Verkehrswert (im Marktbericht-Dienst). Eigener Namensraum, damit
+   sie spaeter getrennt freigeschaltet und abgerechnet werden koennen. */
+app.use('/api/v1/rechenkerne', require('./routes/rechenkerne'));
 /* v1792 · DIE REIHENFOLGE DIESER ZWEI ZEILEN IST SICHERHEITSRELEVANT.
    routes/telegram.js beginnt mit router.use(authenticate). Stuende der
    Webhook dahinter, liefe er durch dieselbe Pruefung — und Telegram hat

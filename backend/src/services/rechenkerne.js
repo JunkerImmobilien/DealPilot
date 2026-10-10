@@ -113,6 +113,10 @@ const GEBRAUCHT = [
   ['ScoreTier', 'stufe'],
   ['DealScore', 'computeFromKpis'],
   ['QcHeuristik', 'bewerten'],
+  /* v2071 — der RND-Kern. `DealPilotRND_GND` stellt die
+     Gesamtnutzungsdauer-Tabelle und muss VOR `DealPilotRND` stehen. */
+  ['DealPilotRND_GND', 'getDefault'],
+  ['DealPilotRND', 'calcAll'],
 ];
 
 /* ── Der Stub, und zwar nur hier ─────────────────────────────────────────
@@ -161,7 +165,13 @@ function _laden() {
     }
     _kerne = {
       Dscr: ctx.Dscr, DealKpis: ctx.DealKpis, ScoreTier: ctx.ScoreTier,
-      DealScore: ctx.DealScore, QcHeuristik: ctx.QcHeuristik, manifest: manifest
+      DealScore: ctx.DealScore, QcHeuristik: ctx.QcHeuristik,
+      /* v2071 - der RND-Kern. Die Dateien wurden ueber `reihenfolge` schon
+         geladen und `GEBRAUCHT` hat sie geprueft; hier fehlten sie nur in
+         der Weitergabe. Eine Liste, die an zwei Stellen gefuehrt wird,
+         laeuft genau so auseinander. */
+      DealPilotRND: ctx.DealPilotRND, DealPilotRND_GND: ctx.DealPilotRND_GND,
+      manifest: manifest
     };
   } catch (e) {
     /* KEIN stiller Rueckfall auf eigene Formeln. Wer hier scheitert, soll
@@ -192,6 +202,34 @@ function kpis(eingabe) {
 /** Dscr.compute() der App. */
 function dscr(eingabe) {
   return _oder_wirf().Dscr.compute(eingabe || {});
+}
+
+/* ═══ v2071 · DER RND-KERN ALS DIENST ═══════════════════════════════════
+ * `DealPilotRND.calcAll()` der App - derselbe Kern, der im RND-Wizard
+ * laeuft. Er rechnet sechs Verfahren (linear, Vogels, Ross, Parabel,
+ * Punktraster nach Anlage 2, technisch) und gibt `final_rnd` plus die
+ * Einzelergebnisse zurueck.
+ *
+ *   > Er wird hier NICHT nachgebaut. Eine zweite Rechnung waere genau
+ *   > der Fehler vom 07.10.2026: der Bot urteilte anders als die App,
+ *   > und niemand sah es.
+ */
+function rnd(eingabe) {
+  return _oder_wirf().DealPilotRND.calcAll(eingabe || {});
+}
+
+/** Ein DealPilot-Datensatz wird zur RND-Eingabe. Dieselbe Abbildung,
+ *  die der Wizard benutzt - so kommt aus `objekte[].daten` des Exports
+ *  direkt eine gueltige Eingabe. */
+function rndAusObjekt(daten) {
+  return _oder_wirf().DealPilotRND.mapDealPilotObject(daten || {});
+}
+
+/** Der AfA-Vergleich: was eine kuerzere Restnutzungsdauer steuerlich
+ *  bringt. Erwartet { gebaeudeanteil, rnd, grenzsteuersatz,
+ *  standardAfaSatz, gutachterkosten, abzinsung }. */
+function rndAfaVergleich(eingabe) {
+  return _oder_wirf().DealPilotRND.calcAfaVergleich(eingabe || {});
 }
 
 /** DealScore.computeFromKpis() der App — der DealPilot-Score, 0 bis 100.
@@ -258,6 +296,7 @@ function herkunft() {
 module.exports = {
   kpis, dscr, score, stufe, heuristik,
   heuristikTeil,               /* v1936 — stufensatz / kennzahlenAmpel / kategorien */
+  rnd, rndAusObjekt, rndAfaVergleich,   /* v2071 — Restnutzungsdauer */
   vorhanden, herkunft,
   /* nur fuer tools/rechenkerne-spiegeln.mjs — damit der Stub einmal da ist */
   _fensterStub: fensterStub, _GEBRAUCHT: GEBRAUCHT
