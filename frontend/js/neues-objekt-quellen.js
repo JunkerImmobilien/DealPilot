@@ -121,7 +121,10 @@
         }).join('')
       + '</div>'
       + '<p class="dpnq-fuss">Die Auswahl wird auf der Datenaufnahme vorbereitet. '
-      + '<b>Abgerufen wird erst, wenn du auf „Abrufen" drückst</b> — dann erst wird Kerosin verbraucht.</p>'
+      /* v2078: hier stand „dann erst wird Kerosin verbraucht". Den Begriff
+         gibt es seit v1176 nicht mehr (config.js:238 „Kontingente statt
+         Kerosin"), und die Einheit Liter ist mit ihm gefallen. */
+      + '<b>Abgerufen wird erst, wenn du auf „Abrufen" drückst</b> — dann erst wird dein Kontingent belastet.</p>'
       + '<div class="dpnq-knoepfe">'
       + '<label class="dpnq-merk"><input type="checkbox" id="dpnq-merken"> Auswahl merken</label>'
       + '<button type="button" class="dpnq-b" id="dpnq-ohne">Nur anlegen</button>'

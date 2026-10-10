@@ -168,7 +168,7 @@
       icon: 'i-chart',
       title: 'Marktbewertung — Wert & Miete mit Spanne',
       body: 'Hol dir eine professionelle **Marktwert-** und **Mietpreis-Einschätzung** — jeweils mit **oberer und unterer Spanne**.',
-      bodyMore: 'Was die Marktbewertung liefert:\n\n• **Marktpreis-Indikation** für dein Objekt — mit Ober- und Untergrenze statt einer Schein-Genauigkeit\n• **Mietpreis-Einschätzung** — ebenfalls als Spanne\n• Basierend auf professionellen Bewertungsdaten und der genauen Adresse\n\n**Wofür du das nutzt:**\n• Kaufpreis **plausibilisieren** — liegt das Angebot in der Spanne?\n• **Verhandlungsargumente** — mit Daten statt Bauchgefühl\n• Miete nach Modernisierung **realistisch ansetzen**\n\nDie Einschätzung fliesst direkt in deine Bewertung ein. Abruf kostet Kerosin — der Preis wird vorher klar angezeigt.',
+      bodyMore: 'Was die Marktbewertung liefert:\n\n• **Marktpreis-Indikation** für dein Objekt — mit Ober- und Untergrenze statt einer Schein-Genauigkeit\n• **Mietpreis-Einschätzung** — ebenfalls als Spanne\n• Basierend auf professionellen Bewertungsdaten und der genauen Adresse\n\n**Wofür du das nutzt:**\n• Kaufpreis **plausibilisieren** — liegt das Angebot in der Spanne?\n• **Verhandlungsargumente** — mit Daten statt Bauchgefühl\n• Miete nach Modernisierung **realistisch ansetzen**\n\nDie Einschätzung fliesst direkt in deine Bewertung ein. Ein Abruf belastet dein Kontingent — der Preis wird vorher klar angezeigt.',
       placement: 'auto'
     },
 

@@ -130,8 +130,15 @@
         _kpiBox('Churn (30 T.)', _pct(cc.churn_pct), _n(cc.churned_30d) + ' gek\u00fcndigt', '#B86250') +
       '</div>' +
       '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
-        _kpiBox('Kerosin verbraucht', _n(ker.verbraucht) + ' L', 'letzte 30 Tage', '#3b82f6') +
-        _kpiBox('Kerosin gutgeschrieben', _n(ker.gutgeschrieben) + ' L', 'K\u00e4ufe + Gutschriften', '#888') +
+        /* v2078: hier stand \u201eKerosin verbraucht/gutgeschrieben" mit der
+           Einheit \u201eL". Den Begriff gibt es seit v1176 nicht mehr und die
+           Liter sind mit ihm gefallen. Gezaehlt wird die Summe von `cost`
+           aus `ai_credits_log` - das sind BUCHUNGEN, und seit v1183 ist
+           eine Buchung eine Bewertung, kein Liter. Aeltere Zeilen im Log
+           tragen noch Litermengen; deshalb steht die Einschraenkung in
+           der Unterzeile und nicht im Titel. */
+        _kpiBox('Kontingent verbraucht', _n(ker.verbraucht), 'letzte 30 Tage \u00b7 Buchungen', '#3b82f6') +
+        _kpiBox('Kontingent gutgeschrieben', _n(ker.gutgeschrieben), 'K\u00e4ufe + Gutschriften', '#888') +
       '</div>' +
       (cc.plan_distribution && cc.plan_distribution.length ?
         ('<div style="font-size:13px;color:#666;margin:14px 0 6px;">Aktive Pl\u00e4ne</div>' +
