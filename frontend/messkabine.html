@@ -59,6 +59,28 @@
   v2 Kanzlei · v2b Tower. Gesetzt wird er VOR dem Laden, und der iframe
   lädt danach ganz neu — nie im laufenden Dokument umschalten, sonst
   hinterlässt der Skin-Wechsel Inline-Variablen und man misst die Störung.
+
+  v2085 · DREI WEITERE ACHSEN (Backlog N60.2)
+
+      await DPM.lauf({ breite: 1180, layout: 'v1b',
+                       kartenstil: 'kartei', objkarte: 'datenzeile',
+                       theme: 'v2' })
+
+      Merker                gültige Werte
+      dp_layout             '' · v1b · v2 · v2b
+      dp_karten_stil        '' · zeile · kartei · buetten
+      dp_objkarte_stil      '' · bordkarte · kante · datenzeile · ampel ·
+                            kennzahlen · minimal
+      dp_karten_variante    '' · v1 … v6   (die Hell-Fassungen)
+
+  `undefined` heißt NICHT ANFASSEN — alte Aufrufe bleiben gültig und
+  die Wahl des Nutzers unberührt. `''` heißt ausdrücklich abwählen.
+
+  Das Ergebnis trägt `angefordert` UND `attribute`: was gesetzt wurde
+  und was am `<html>` wirklich hängt. Ein Merker im Speicher ist kein
+  Nachweis — das Modul kann ihn verwerfen (unbekannter Wert) oder an
+  eine Bedingung binden (`objektkarten-stil.js` setzt nur bei aktivem
+  Layout). Weichen beide ab, steht es im Protokoll.
 -->
 <style>
   :root{color-scheme:dark}
@@ -90,7 +112,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2065a</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2085</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -995,20 +1017,80 @@
            .concat(out);
   }
 
-  function setzeMerker(layout){
+  /* ── v2085 · VIER VARIANTENACHSEN, NICHT NUR DAS LAYOUT ───────────────
+   *
+   * Backlog N60.2 fordert den Lauf über „mindestens 3 Gestaltungs-
+   * varianten". Gemessen konnte die Kabine nur EINE setzen: `dp_layout`.
+   * Kartenstil und Theme waren über sie nicht ansteuerbar — die
+   * Attribute existieren in der App (`karten-stil.js:334` setzt
+   * `data-dp-kartenstil`, `hell-varianten.js:43` liest
+   * `data-ui-theme`), aber die Kabine kannte ihre Merker nicht.
+   *
+   * > Ein Prüfstand, der eine Achse nicht verstellen kann, prüft sie
+   * > nicht — und meldet trotzdem „geprüft". Genau das hat N60.17
+   * > getan: vier Ansichten protokolliert, alle beim Standard-Design.
+   *
+   * Die vier Merker, aus den Modulen abgeschrieben, nicht geraten:
+   *
+   *   dp_layout           layout-varianten.js:63    '' v1b v2 v2b
+   *   dp_karten_stil      karten-stil.js:66         '' zeile kartei buetten
+   *   dp_objkarte_stil    objektkarten-stil.js:43   '' bordkarte kante
+   *                                                 datenzeile ampel
+   *                                                 kennzahlen minimal
+   *   dp_karten_variante  hell-varianten.js:28      '' v1 … v6
+   *
+   * `undefined` heißt „nicht anfassen" — so bleiben alte Aufrufe
+   * (`lauf({breite, layout})`) unverändert gültig. `''` heißt
+   * ausdrücklich „abwählen" und entfernt den Merker.
+   */
+  var MERKER = {
+    layout:    'dp_layout',
+    kartenstil:'dp_karten_stil',
+    objkarte:  'dp_objkarte_stil',
+    theme:     'dp_karten_variante'
+  };
+
+  function setzeEinen(schluessel, wert){
     try {
-      if (layout === '' || layout === null) window.localStorage.removeItem('dp_layout');
-      else window.localStorage.setItem('dp_layout', layout);
-      window.localStorage.setItem('dp_layout_gewaehlt', '1');
+      if (wert === '' || wert === null) window.localStorage.removeItem(schluessel);
+      else window.localStorage.setItem(schluessel, wert);
     } catch (e) {}
   }
 
-  function lade(breite, layout, hoehe){
-    setzeMerker(layout);
+  function setzeMerker(layout, extra){
+    setzeEinen(MERKER.layout, layout);
+    try { window.localStorage.setItem('dp_layout_gewaehlt', '1'); } catch (e) {}
+    if (!extra) return;
+    /* Nur was ausdrücklich genannt ist. `undefined` laesst den Merker
+       in Ruhe - sonst wuerde jeder Lauf die Wahl des Nutzers loeschen. */
+    if (extra.kartenstil !== undefined) setzeEinen(MERKER.kartenstil, extra.kartenstil);
+    if (extra.objkarte   !== undefined) setzeEinen(MERKER.objkarte,   extra.objkarte);
+    if (extra.theme      !== undefined) {
+      setzeEinen(MERKER.theme, extra.theme);
+      /* hell-varianten.js zeigt sich nur mit gesetztem Schalter. */
+      try { window.localStorage.setItem('dp_karten_schalter', extra.theme ? '1' : '0'); } catch (e) {}
+    }
+  }
+
+  /* Was gerade eingestellt ist - fuer die Beschriftung und das Protokoll.
+     Ein Lauf, der seine Variante nicht nennt, ist nicht nachvollziehbar. */
+  function varianteKurz(layout, extra){
+    var t = [ (layout === '' || layout == null) ? 'Heute' : layout ];
+    if (extra) {
+      if (extra.kartenstil) t.push('ks:' + extra.kartenstil);
+      if (extra.objkarte)   t.push('ok:' + extra.objkarte);
+      if (extra.theme)      t.push('th:' + extra.theme);
+    }
+    return t.join(' · ');
+  }
+
+  function lade(breite, layout, hoehe, extra){
+    setzeMerker(layout, extra);
     rahmen.style.width  = (breite + 2) + 'px';          /* +2 für den Rahmen */
     rahmen.style.height = Math.min(hoehe || 780, 760) + 'px';
-    lbl.textContent = breite + ' px · ' + (layout === '' ? 'Heute' : layout);
-    aktuell = [ (layout === '' ? 'Heute' : layout) + ' @ ' + breite, breite, hoehe || 780 ];
+    var kurz = varianteKurz(layout, extra);
+    lbl.textContent = breite + ' px · ' + kurz;
+    aktuell = [ kurz + ' @ ' + breite, breite, hoehe || 780 ];
     return new Promise(function(fertig){
       var los = false;
       function da(){ if (los) return; los = true; warte(3600).then(fertig); }
@@ -1038,12 +1120,30 @@
 
   async function lauf(opt){
     opt = opt || {};
-    await lade(opt.breite || 390, opt.layout === undefined ? '' : opt.layout, opt.hoehe);
+    /* v2085: die drei neuen Achsen reisen als `extra` mit. Nur was
+       ausdruecklich genannt ist, wird gesetzt. */
+    var extra = {};
+    if (opt.kartenstil !== undefined) extra.kartenstil = opt.kartenstil;
+    if (opt.objkarte   !== undefined) extra.objkarte   = opt.objkarte;
+    if (opt.theme      !== undefined) extra.theme      = opt.theme;
+    await lade(opt.breite || 390, opt.layout === undefined ? '' : opt.layout, opt.hoehe, extra);
     var z = ziel();
     var erg = {
       breite: opt.breite || 390,
       layout: opt.layout === undefined ? '' : opt.layout,
       gesetzt: z.d.documentElement.getAttribute('data-dp-layout'),
+      /* v2085 · WAS WIRKLICH AM <html> HAENGT, nicht was gesetzt wurde.
+         Ein Merker im Speicher ist kein Nachweis: das Modul kann ihn
+         verwerfen (unbekannter Wert) oder an eine Bedingung binden
+         (`objektkarten-stil.js` setzt nur bei aktivem Layout). Deshalb
+         steht hier das ATTRIBUT - und bei Abweichung faellt es auf. */
+      angefordert: extra,
+      attribute: {
+        layout:     z.d.documentElement.getAttribute('data-dp-layout'),
+        kartenstil: z.d.documentElement.getAttribute('data-dp-kartenstil'),
+        objkarte:   z.d.documentElement.getAttribute('data-dp-objkarte'),
+        theme:      z.d.documentElement.getAttribute('data-ui-theme')
+      },
       iw: z.win.innerWidth,
       start: messe(z.d, z.win, 'Start')
     };
