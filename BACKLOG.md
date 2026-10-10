@@ -2825,9 +2825,71 @@ Telegram-Bot bekommen beide Stände im Prompt.
 | Wo | Was |
 |---|---|
 | Portfolio-Cockpit | Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand** — heute rechnet es nur den laufenden Stand |
-| Portfolio-Cockpit | Die **Abweichung über den ganzen Bestand**: wie viele Objekte stehen besser, wie viele schlechter als beim Ankauf |
+| ~~Portfolio-Cockpit~~ | ~~Die **Abweichung über den ganzen Bestand**~~ — **erledigt `v2098`**, siehe unten |
 | ~~Kanban~~ | ~~Spalte **Bestand**~~ — **erledigt `v2084`**, siehe unten |
 | Sortierung | Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren, nicht nach den heutigen |
+
+> ### „Seit Ankauf" gebaut (`v2098`) — mit EINER Rechnung
+>
+> `DealPilotAnkauf.abweichung()` konnte nur das **gerade geladene**
+> Objekt: es liest `window._dpAnkauf` und `collectData()`. Die Schleife
+> steht jetzt einmal in `_vergleich()`, und beide Wege rufen sie:
+>
+> | Funktion | wofür |
+> |---|---|
+> | `abweichung()` | das geladene Objekt (wie bisher) |
+> | `abweichungFuer(daten)` | ein Objekt aus der Liste (**neu**) |
+>
+> **Eine zweite Fassung im Cockpit wäre hier besonders teuer:**
+> `KENNZAHLEN` führt die Richtung je Kennzahl, und bei **zwei von neun**
+> ist *kleiner* besser — **Kaufpreis** und **LTV**. Wer das nachbaut,
+> erklärt einen gestiegenen Kaufpreis zur Verbesserung.
+>
+> `tools/ankauf-abweichung-pruefen.mjs` prüft deshalb jede der neun
+> Kennzahlen in **beide** Richtungen — 18 Fälle, plus die Sonderfälle:
+> **39 Punkte, RC=0**, am echten Modul geladen.
+>
+> ### Das Urteil hängt am DealScore, nicht an einer erfundenen Mehrheit
+>
+> Welche der neun Kennzahlen schwerer zählt, ist eine
+> **Bewertungsfrage** — der DealScore ist die Antwort, die das Produkt
+> ohnehin gibt. Die Kachel sagt das im **sichtbaren** Untertitel („am
+> DealScore"), und eine Gegenprobe im Prüfer hält fest, dass ein
+> schlechterer Kaufpreis das Urteil **nicht** dreht.
+>
+> ### Am laufenden Staging gegen ECHTE Daten abgenommen
+>
+> Kachel im Cockpit (1280 px): **Besser 0 · Schlechter 0 · „am DealScore ·
+> 4 von 8 mit Ankauf-Stand" · „4 unverändert"**. Nachgerechnet über
+> `GET /objects/portfolio-export` mit derselben Funktion:
+>
+> ```
+> MI BK 7      Stichtag 2026-06-09   Score 52 -> 52   7 Kennzahlen, alle gleich
+> KK AM 9 VV   Stichtag 2026-01-01   Score 84 -> 84   7 Kennzahlen, alle gleich
+> DEMO-DT4     Stichtag 2024-12-23   Score 69 -> 69   7 Kennzahlen, alle gleich
+> DEMO-BO6     Stichtag 2024-12-23   Score 49 -> 49   7 Kennzahlen, alle gleich
+> ```
+>
+> Die Werte sind **echt** (Kaufpreis 195.000, Miete 780) — alle gleich,
+> weil der Stand aus denselben Daten genommen wurde und sich seither
+> nichts geändert hat. *Eine Null, die man nachgerechnet hat, ist eine
+> Auskunft; eine, die man annimmt, ist keine.*
+>
+> **Zwei Grundmengen, bewusst verschieden:** die Kachel sagt „4 von **8**",
+> der Export hat **23** Objekte. Das Cockpit zählt nur die gewonnenen
+> Objekte mit geladenen Details — für eine Bestandsansicht richtig, aber
+> es ist nicht dieselbe Menge. Wer die Zahl mit dem Portfolio vergleicht,
+> findet eine Abweichung, die keine ist.
+>
+> **Zwei Fallen dabei vermieden:**
+> - `ctitle` gibt der Renderer **nur bei `click:true`** aus (`:533`). Mein
+>   erster Entwurf legte die Methode dorthin — ein **totes Feld**.
+> - Der Prüfer brach beim ersten Lauf ab, weil `ankauf.js` sich am Ende an
+>   `dp:object-ready` hängt und `window.addEventListener` fehlte. Genau das
+>   ist der Unterschied zwischen `node --check` und einem echten Lauf.
+>
+> **Noch offen an N60.16:** die Summen wahlweise auf Ankauf oder Bestand,
+> und die Sortierung im Ankauf-Modus nach den Ankaufs-Werten.
 
 > ### Kanban gebaut (`v2084`) — und dabei drei schwere Fehler gefunden
 >
