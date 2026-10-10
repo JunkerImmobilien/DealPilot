@@ -1201,6 +1201,17 @@
          Die andere Haelfte dieses Falls ist teuer: ein Knopf, der
          gerendert wird und auf 0 faellt, SIEHT aus wie nicht vorhanden. */
       if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      /* DAS EIGENE `display` SAGT NICHTS UEBER DIE VORFAHREN.
+         Gemessen am Quick-Check: `#qc6-credit-confirm` ("Bestaetigen &
+         abrufen") traegt `display:flex` - sein Modal `#qc6-credit-modal`
+         aber `display:none`. Der Knopf behaelt seinen eigenen Wert, wird
+         aber nicht gerendert. Ohne diese Zeile meldet der Pruefer in
+         JEDEM Dokument saemtliche Knoepfe geschlossener Modals als
+         "erdrueckt".
+         `offsetParent === null` heisst: ein Vorfahr ist `display:none`.
+         Ausnahme `position:fixed` - dort ist es immer null. */
+      var gerendert = e.offsetParent !== null || cs.position === 'fixed';
+      if (!gerendert) return;
       if ((r.width < 4 || r.height < 4) && cs.pointerEvents !== 'none'
           && !apEingeklappt(e, win)) {
         erdrueckt.push({ el: apNam(e),
