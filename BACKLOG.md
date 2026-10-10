@@ -893,7 +893,7 @@ die Vorlage.
 
 ---
 
-#### N60.26 · `/rechenkerne/verkehrswert` gibt 422 — keine Koordinaten
+#### N60.26 · ERLEDIGT 10.10.2026 (`v2076`, `v2076a`) — der 422 war ein Feldname
 **GEMESSEN am 10.10.2026** mit gültigem Schlüssel am Objekt `2026-001`:
 
 ```
@@ -923,6 +923,39 @@ Koordinaten — Felder dafür gibt es gar nicht.
 
 `/rechenkerne/rnd` (200 in 103 ms) und der Portfolio-Export (200,
 655 KB) sind davon **nicht** betroffen.
+
+> ### Behoben, zwei Ursachen hintereinander
+>
+> **1 · Das Feld heisst `object`, nicht `objekt`.** Der Endpunkt reichte
+> `body` durch, also deutsch. Die Adresse war vollstaendig im Datensatz
+> und kam nie an — die Meldung nannte das Symptom (keine Koordinaten),
+> nicht die Ursache (kein Feld). Abgeschrieben von
+> `frontend/js/dealpilot-mb.js:603`; `inputs()` (Z. 170) schickt
+> **`objektart` UND `objart`** — der Dienst liest `objektart`, der
+> Datensatz fuehrt `objart`. Wer nur durchreicht, verliert sie still.
+>
+> **2 · Die Stufe gehoert in `overrides`.** Danach kam HTTP 200, aber als
+> **Stufe 1**: *`nicht_im_umfang: true`* — Boden-, Ertrags- und Sachwert
+> fehlten. Dieselbe Falle traegt `routes/marktbericht.js:376` schon als
+> Vermerk (*v1435: der Bericht hielt sich fuer Stufe 1*). Eine Stufe am
+> falschen Ort wird nicht abgelehnt, sondern durch die Vorgabe ersetzt —
+> der Bericht sieht vollstaendig aus, nur ohne die drei Verfahren.
+>
+> **Gegengetestet**, Objekt 2026-001, HTTP 200 in 49 s:
+> `cross_check.available: true` mit `sachwert`, `ertragswert`
+> (Reinertrag 7.726 EUR/a, Liegenschaftszins 2,56 % Stufe E),
+> `bodenwert` **40.338 EUR** (die in CLAUDE.md nachgerechnete Zahl),
+> dazu `quellen_nachweis`, `verfahrenswahl`, `amtliche_miete`.
+>
+> **Und der Beleg, dass die Eingabe-Reparatur durchtraegt:** der
+> Sachwert vermerkt *"Restnutzungsdauer nach Anlage 2 ImmoWertV bei
+> einer Gesamtnutzungsdauer von 80 Jahren, aus 11
+> Modernisierungspunkten"* — RND 41,7. Vor `v2073` waeren es 0 Punkte
+> und GND 70 gewesen.
+>
+> **Ein Aufruf kostet 0,73 EUR GeoMap** (Restguthaben 227,39 EUR,
+> gemessen 10.10.2026); ein schon bezahlter Bericht kostet 0. Das
+> gehoert in die Bepreisung der Rechenkern-Schnittstelle.
 
 ---
 

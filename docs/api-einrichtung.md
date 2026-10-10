@@ -45,7 +45,7 @@ $env:DEALPILOT_KEY = "dpk_live_…"        # PowerShell
 | `GET /rechenkerne/` | **200** · nennt beide Kerne |
 | `GET /objects/portfolio-export` | **200** · 655 KB · 23 Objekte, 13 Pilot-Analysen, 17 Marktberichte, 60 Verlaufspunkte |
 | `POST /rechenkerne/rnd` | **200** · `final_rnd 28,0` am Objekt 2026-001 (seit v2073; vorher 10,5 mit falscher Eingabe) |
-| `POST /rechenkerne/verkehrswert` | **422** — siehe Abschnitt 5 |
+| `POST /rechenkerne/verkehrswert` | **200** in 49 s · Marktwert 199.000 EUR, Boden-/Ertrags-/Sachwert (seit v2076a) |
 
 > **Bis `v2072a` gab jeder Aufruf 403 „requires an active Pro plan".**
 > Der Grund war keine fehlende Berechtigung, sondern eine Namensliste
@@ -324,18 +324,63 @@ Gutachterausschüsse liegt (Liegenschaftszins § 21 Abs. 2,
 Sachwertfaktor § 21 Abs. 3, NHK 2010, Bodenrichtwerte).
 `wert_stufe` 3 ist die Wertermittlung nach ImmoWertV.
 
-> ### ⚠ Gemessen am 10.10.2026: **422, noch nicht nutzbar**
+```jsonc
+{ "objekt": { … }, "wert_stufe": 3 }      // 3 = volle Wertermittlung
+{ "objekt": { … }, "lat": 52.28, "lon": 8.65 }   // eigene Koordinaten
+```
+
+Gemessen am 10.10.2026 über die echte Schnittstelle, Objekt `2026-001`,
+**HTTP 200 in 49 s** (die Wertermittlung rechnet lange — Zeitüberschuss
+am Aufrufer auf mindestens 90 s setzen):
+
+```jsonc
+"ergebnis": {
+  "report_id": 175,
+  "object_key": "geo:52.2862:8.6561:wohnung:100:1962",
+  "cost": { "geomap_eur": 0, "geomap_balance_eur": 227.385 },
+  "data": {
+    "valuation": { "market_value": { "estimated": 199000, "low": 164000,
+                     "high": 234000, "confidence_pct": 66 } },
+    "cross_check": {
+      "available": true,
+      "sachwert":    { "gnd_jahre": 80, "restnutzungsdauer_herkunft": { … } },
+      "ertragswert": { "rohertrag_pa_eur": 10584, "bwk_pa_eur": 2858,
+                       "reinertrag_pa_eur": 7726,
+                       "liegenschaftszins_pct": 2.56,
+                       "liegenschaftszins_stufe": "E" },
+      "bodenwert":   { "wert": 40338, "schritte": [ … ], "vollstaendig": true },
+      "quellen_nachweis": [ … ], "verfahrenswahl": { … },
+      "amtlicher_vergleichsfaktor": { … }, "amtliche_miete": { … }
+    },
+    "land_value": { "source": "BORIS-NRW", "license": "dl-de/by-2-0",
+                    "quellenvermerk": "…" }
+  }
+}
+```
+
+> **`cross_check.available` zuerst prüfen.** Steht dort `false` mit
+> `nicht_im_umfang: true`, ist der Bericht eine Marktpreisindikation
+> ohne Boden-, Ertrags- und Sachwert — dann war die Stufe nicht 3.
 >
-> ```
-> "Keine Koordinaten – Adresse nicht geokodierbar und keine lat/lon angegeben."
-> ```
+> **`bodenwert.schritte` ist die Begründung**, nicht Zierde: dort steht
+> der Rechenweg Zeile für Zeile (950 m² × 90 €/m², + 828 m² × 5 €/m²,
+> −10 % Lärm, × 50 % MEA = 40.338 €). Wer nur die Zahl übernimmt,
+> verliert die Nachvollziehbarkeit.
 >
-> Die Adresse im Datensatz ist vollständig (`str` „Hermannstraße",
-> `hnr` „9", `plz` „32609", `ort` „Hüllhorst"), und **kein** Objekt im
-> Export führt Koordinaten — Felder dafür gibt es gar nicht. Der Fehler
-> liegt also an der Weitergabe oder am Geokodierer, nicht an den Daten.
-> **Offen und im Backlog**; `/rechenkerne/rnd` und der Export sind davon
-> nicht betroffen.
+> **`quellen_nachweis` und `land_value.quellenvermerk` sind Pflicht,
+> wenn der Bericht weitergegeben wird.** Sätze unter `dl-de/by-2-0`
+> verlangen eine Namensnennung — genannt wird nur, was in *diesem*
+> Bericht wirklich steckt.
+>
+> **Geld:** ein neuer Bericht kostet **0,73 €** GeoMap, ein schon
+> bezahlter 0 €. `cost.geomap_balance_eur` nennt das Restguthaben.
+
+> **Bis `v2076a` gab dieser Endpunkt 422 „Keine Koordinaten".** Zwei
+> Ursachen hintereinander, beide Feldnamen: der Dienst liest `object`
+> (englisch), nicht `objekt` — und die `wert_stufe` gehört in
+> `overrides`, sonst rechnet er Stufe 1 und lässt die drei Verfahren
+> weg, ohne das als Fehler zu melden. Wer gegen eine vor dem 10.10.2026
+> gezogene Antwort prüft, findet beides.
 
 ### Die spätere Bepreisung ist vorbereitet, nicht gebaut
 
