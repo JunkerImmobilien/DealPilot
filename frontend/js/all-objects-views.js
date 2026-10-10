@@ -200,9 +200,25 @@
     const open = total - won - lost;
     const decided = won + lost;
     const hitRate = decided > 0 ? Math.round((won / decided) * 100) : 0;
+    /* ── v2084a · DER KAUFPREIS LIEGT AUCH FLACH ──────────────────────
+       HIER STAND NUR `o.data.kaufpreis`. Dieselbe Ursache wie beim
+       Status: die Listenantwort traegt kein `data`. Gemessen steht dort
+       `kaufpreis: "1680000.00"` auf der oberen Ebene — und im
+       Objekt-Datensatz heisst dasselbe Feld `kp`.
+
+       Folge, im Browser gesehen: „Investitionsvolumen (gewonnen) 0 EUR"
+       und „Oe Kaufpreis (gewonnen) 0 EUR" bei acht gewonnenen Objekten.
+       Eine Null sieht aus wie ein Ergebnis.
+
+       Alle drei Namen werden gelesen. Der Wert ist ein String in EURO,
+       nicht in Cent (nachgesehen, nicht angenommen). */
     let totalKp = 0, wonKp = 0;
     objs.forEach(o => {
-      const kp = parseFloat((o.data && o.data.kaufpreis) || 0) || 0;
+      const d = o.data || {};
+      const roh = (o.kaufpreis !== undefined && o.kaufpreis !== null) ? o.kaufpreis
+        : (d.kaufpreis !== undefined && d.kaufpreis !== null) ? d.kaufpreis
+        : d.kp;
+      const kp = parseFloat(String(roh == null ? '' : roh).replace(',', '.')) || 0;
       totalKp += kp;
       if (getStatus(o) === 'won') wonKp += kp;
     });
