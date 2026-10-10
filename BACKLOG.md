@@ -179,7 +179,154 @@ Marcels Frage aus N60.5 („erst 44, dann über 80").
 > Konzepte verwechselt). Ohne das Feld hätte die Kabine ab heute „vier
 > Achsen geprüft" gemeldet und drei geprüft.
 >
+> ### DER LAUF IST GEFAHREN — 10.10.2026, `v2092`/`v2092a`
+>
+> `DPM.matrix()`, **48 von 48 Punkten, Deckung 100 %**, 6 Varianten × 8
+> Geräte × 9 Reiter = **432 Reiter-Messungen** in 12 Minuten
+> (14:04–14:16 UTC). Keine Ausnahme, kein Abbruch.
+>
+> **Der erste Lauf hat zuerst einen Fehler im LÄUFER gefunden** — die
+> Variante „DealPilot" war als `opt: {}` geschrieben, und `setzeMerker()`
+> setzt mit Absicht nur, was genannt ist. Also blieben `ui_theme=kontor`,
+> `ui_cards=wallet`, `kartenstil=kartei` und `objkarte=datenzeile` aus
+> vorherigen Proben **stehen**, in allen 48 Punkten. Der Lauf wurde
+> verworfen, nicht ausgewertet; jede Variante nennt seit `v2092a` den
+> **vollen** Achsensatz, und der Nachweis prüft **alle sechs** Achsen
+> statt nur `theme`. Gefunden hat es das `attribute`-Feld aus `v2085`.
+>
+> ## Befund 1 — Überlauf: 109 Funde auf VIER Elemente
+>
+> | Element | Funde | Geräte | Varianten | gemessen |
+> |---|---:|---:|---:|---|
+> | `div.oe-karte-gewerke.card` | **72** | **8/8** | **6/6** | 301 → 648 px (2,2×) |
+> | `div.ytf-quick-wrap` | 30 | 5/8 | 6/6 | 273 → 722 px (2,6×) |
+> | `div.dptk-huelle` | 6 | 1/8 | 6/6 | 813 → 1021 px (1,3×) |
+> | `div.bc-svg-wrap` | 1 | 1/8 | 1/6 | 311 → 680 px (2,2×) |
+>
+> **Alle vier sind echte Scroller** — der Läufer prüft, ob ein Balken
+> Höhe wegnimmt (4–5 px), nicht bloß `scrollWidth`. Ein Querscroller ist
+> kein Fehler an sich, aber `oe-karte-gewerke` tritt auf **jedem** Gerät
+> und in **jeder** Variante auf, auch auf „Desktop breit" (1280 px) —
+> der Behälter ist dort ebenfalls nur 301 px breit. Das riecht nach
+> einer schmalen Spalte, nicht nach einem Handy-Problem.
+>
+> ## Befund 2 — Kontrast: 432 von 432 Reitern, also ALLE
+>
+> | Variante | Reiter mit Mängeln | gemeldete Stellen | schlechteste |
+> |---|---:|---:|---:|
+> | DealPilot | 72/72 | 1.416 | k=1,21 |
+> | Kontor | 72/72 | 2.230 | k=1,07 |
+> | Panel | 72/72 | 2.010 | k=1,07 |
+> | Kanzlei | 72/72 | 1.726 | k=1,07 |
+> | Boarding | 72/72 | 2.254 | k=1,07 |
+> | **Konsole** | 72/72 | 1.996 | **k=1,01** |
+>
+> **Die vier Alternativ-Themes sind SCHLECHTER als die Hausfassung** —
+> Boarding und Kontor mit rund 60 % mehr Stellen als DealPilot. Das ist
+> das Gegenteil dessen, was man annimmt: man prüft die Hausfassung und
+> hält die anderen für Varianten davon.
+>
+> Häufigste Stellen über alle Läufe: `span.sbcm-label` (272×),
+> nacktes `span` (396×), `div.sb-lage-kopf` (60×), `div.ct.ct-pro` (32×).
+>
+> > **`v2089`–`v2091` haben einen kleinen Zipfel davon erwischt.** Die
+> > dort behobenen sechs Stellen sind echt behoben — aber die Annahme,
+> > das Kontrastthema sei damit „bis auf zwei Goldtöne" erledigt, war
+> > falsch. Sie beruhte auf EINER Ansicht in EINER Variante.
+>
+> ## Befund 3 — unsichtbarer Text, und die Ursache ist gefunden
+>
+> `k=1,01` ist kein schwacher Kontrast, das ist **unsichtbar**.
+> Nachgestellt (Konsole, 360 px, Reiter Miete):
+>
+> ```
+> span.me-incze-desc   Text rgb(40,38,38)    auf rgb(39,39,37)    k=1,01
+> span                 Text rgb(230,232,234) auf rgb(255,255,255) k=1,23
+> ```
+>
+> Einmal dunkel auf dunkel, einmal fast weiß auf weiß. **Dieselbe Stelle
+> in den anderen Fassungen gemessen:**
+>
+> | Fassung | Text | Grund | k |
+> |---|---|---|---:|
+> | DealPilot | `rgb(42,39,39)` | `rgb(251,248,241)` | 13,96 |
+> | Kontor | `rgb(42,39,39)` | `rgb(251,248,241)` | 13,96 |
+> | Boarding | `rgb(42,39,39)` | `rgb(251,248,241)` | 13,96 |
+> | **Konsole** | `rgb(42,39,39)` | **`rgb(39,39,37)`** | **1,01** |
+>
+> **Die Textfarbe ist überall dieselbe** — die Marken-Tinte `#2A2727`.
+> Was sich ändert, ist der **Grund**. Konsole macht die Fläche dunkel und
+> lässt den Text auf der Hell-Tinte stehen.
+>
+> **Die Ursache, gezählt:**
+>
+> | Theme | `style.css` | `ui-varianten.css` | `layout-varianten.css` | Summe |
+> |---|---:|---:|---:|---:|
+> | Kontor | 66 | 35 | 1 | **102** |
+> | Panel | 66 | · | · | 66+ |
+> | Kanzlei | 90 | · | · | 90+ |
+> | Boarding | 66 | · | · | 66+ |
+> | **Konsole** | **0** | **13** | **0** | **13** |
+>
+> **62 Sammelregeln in `style.css` listen `kontor, panel, kanzlei,
+> boarding` — und lassen `konsole` weg.** Genau in diesen Regeln stehen
+> die Textkorrekturen für die geänderten Gründe (eine davon ist die
+> `ds2-tag`-Fassung aus `v2089`). Konsole bekommt also die Flächen, aber
+> keine der Reparaturen.
+>
+> Im Umschalter steht es trotzdem als sechste, voll wählbare Fassung:
+> **„Konsole · Dicht, Mono"**. Die 13 Regeln machen Dichte und Mono —
+> es ist als DICHTE-Fassung gedacht, nicht als Farbfassung, und erbt
+> deshalb Farben, die niemand für sie geprüft hat. Derselbe Fall wie
+> „Reparatur erbt ihren Anker": eine weitere Variante kam dazu, die
+> Reparaturen wurden nicht mitgezogen.
+>
+> **`konsole` einfach in die 62 Selektorlisten aufzunehmen wäre falsch** —
+> die vier dort sind HELLE Fassungen („Kontor · Rein weiß"), ihre
+> Korrekturen setzen dunkle Schrift auf hellen Grund. Bei einer Fassung,
+> die Flächen abdunkelt, macht das alles schlimmer.
+>
+> ### Was zu entscheiden ist (Marcel, Produkt)
+>
+> **Eine Fassung, die unsichtbaren Text erzeugt, ist schlimmer als keine.**
+> Zwei Wege:
+>
+> - **(a) Konsole aus dem Umschalter nehmen**, bis sie eine eigene
+>   Textschicht hat. Eine Zeile in `THEMES` (`ui-varianten.js`, ~Z. 62),
+>   sofort wirksam, nichts geht kaputt.
+> - **(b) Konsole fertigbauen** — eigene Textschicht für ihre
+>   abgedunkelten Flächen, danach ein Matrix-Lauf nur über sie. Das ist
+>   ein eigenes Paket in der Größe von 60–90 Regeln.
+>
+> **Mein Vorschlag ist (a) jetzt und (b) später.** Heute kann jeder Kunde
+> die Fassung wählen und sieht dann Text, der nicht da ist.
+>
+> ## Was der Läufer NICHT gefunden hat (und das ist auch ein Befund)
+>
+> **32 Achsen-Abweichungen, alle dieselbe:** `kartenvariante angefordert
+> "", am <html> "v4"` — und zwar nur, wenn ein Theme gesetzt ist. Ohne
+> Theme trägt das `<html>` gar kein `data-dp-karte`. **Das Theme setzt es
+> selbst**, es ist also keine Verunreinigung, sondern eine Achse, die
+> unter einem Theme nicht frei ist. Der Nachweis kann das nicht
+> unterscheiden und meldet beides gleich — beim nächsten Ausbau gehört
+> `kartenvariante` als „fremdbestimmt" gekennzeichnet.
+>
+> Kein `MESSFEHLER`, kein `ABBRUCH`, kein `KEINE REITER` in 48 Punkten.
+
 > ### Was weiterhin fehlt
+>
+> **Der Marktbericht und der Quick-Check sind NICHT dabei.** Der Läufer
+> fährt `ziel=/` und damit die Hauptanwendung; beide anderen sind
+> **eigene Dokumente im iframe** und brauchen einen eigenen Lauf mit
+> `?ziel=`. Marcel hat sie ausdrücklich genannt.
+>
+> Die drei feineren Achsen (`cards`, `surface`, `kartenstil` je für sich)
+> sind gefahren worden, aber nicht als eigene Varianten ausgewertet —
+> der Lauf hielt sie auf `""`. 6 Themes × 4 Cards × 2 Surfaces wären
+> 48 Varianten und damit 384 Punkte; das ist ein Nachtlauf, kein
+> Sitzungslauf.
+
+
 >
 > Die **Matrix selbst**: 9 Reiter × 8 Geräte × Varianten tatsächlich
 > fahren und protokollieren. Das Werkzeug kann es jetzt — gelaufen ist
