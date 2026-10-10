@@ -82,6 +82,89 @@ const HINWEISE = [
   'Die Pilot-Analyse traegt in `_fuer` einen Stempel: fuer welches Objekt und welchen Datenstand sie gilt. Eine Analyse ohne passenden Abdruck ist veraltet.'
 ];
 
+/* ═══ v2066 · DIE STRUKTUREN MIT UNTERSTRICH ERKLAEREN ═══════════════
+ *
+ * Marcel, 10.10.2026: „Sind da auch alle Angaben von der Stufe 3 drin?
+ * Also wirklich alle Felder, die wir auch im Tab Objekt und auch im
+ * Wohnungskonfigurator fuer Mehrfamilienhaeuser haben, mit drinne? Also
+ * auch Mietverhaeltnis und die einzelnen Angaben zu den Wohnungen."
+ *
+ * GEMESSEN am echten Export (22 Objekte): ja, alles drin. 286 Feldnamen
+ * je Datensatz, davon 273-281 belegt. Die Wohnungen stehen unter `_mfh`
+ * bei 10 von 22 Objekten, mit 2 bis 24 Einheiten.
+ *
+ * ABER: das Lexikon fuehrte 225 Felder - alle aus dem FORMULAR. Die
+ * 35 internen Strukturen mit Unterstrich, die wirklich Inhalt tragen,
+ * waren KEINE davon. Darunter ausgerechnet `_mfh`, `_ankauf` und saemtliche
+ * `_kpis_*`.
+ *
+ *   > Der Kopf dieser Datei sagt: „Ein Export, der nur Werte traegt,
+ *   > gibt Daten weiter. Wissen gibt weiter, wer dazuschreibt, WAS die
+ *   > Werte bedeuten." Genau das galt fuer die Formularfelder und nicht
+ *   > fuer die Strukturen, die am meisten Erklaerung brauchen.
+ *
+ * Wer `_mfh` liest, muss sonst raten, ob `ist` und `soll` Monats- oder
+ * Jahresmieten sind und was `status` bedeutet. Beides steht jetzt dabei.
+ */
+const STRUKTUREN = {
+  _mfh: {
+    was: 'Der Wohnungskonfigurator fuer Mehrfamilienhaeuser - je Einheit eine Zeile.',
+    gilt_fuer: 'objart MFH, ZFH, GESCH, BUERO, HOTEL',
+    felder: {
+      gnd: 'Gesamtnutzungsdauer in Jahren (Anlage 2 ImmoWertV)',
+      stand: 'Datum der letzten Bearbeitung (JJJJ-MM-TT)',
+      aufgeteilt: 'true = nach WEG aufgeteilt, jede Einheit einzeln verkaeuflich',
+      sollAbJahr: 'ab welchem Jahr die Soll-Miete angesetzt wird',
+      gebaeude: 'Zustand der GEMEINSAMEN Bauteile: dach, aussenwand, leitungen, heizung. '
+              + 'Stufen: "0" nicht modernisiert, "h" teilweise erneuert, "v" erneuert/modern',
+      einheiten: 'Liste der Wohnungen - siehe `einheit` unten'
+    },
+    einheit: {
+      nr: 'laufende Nummer der Einheit',
+      lage: 'Freitext, z. B. "Nr. 10 - EG links"',
+      art: 'wohnen | gewerbe | stellplatz',
+      wfl: 'Wohnflaeche in m2 (deutsche Schreibweise, Komma als Dezimaltrenner)',
+      zimmer: 'Anzahl Zimmer',
+      ist: 'IST-Kaltmiete pro MONAT in Euro - was heute gezahlt wird',
+      soll: 'SOLL-Kaltmiete pro MONAT in Euro - was ab `sollAbJahr` angesetzt wird',
+      status: 'das MIETVERHAELTNIS: vermietet | leer | eigennutzung | gekuendigt',
+      zustand: 'Note 1-5: 5 neuwertig, 4 modernisiert, 3 gepflegt, 2 renovierungsbed., 1 sanierungsbed.',
+      massnahme: 'geplante Massnahme als Freitext, z. B. "Bad modernisieren"',
+      kosten: 'geschaetzte Kosten dieser Massnahme in Euro'
+    }
+  },
+  _ankauf: {
+    was: 'Der eingefrorene Stand beim Nutzen-/Lastenwechsel - das SOLL. '
+       + 'Der uebrige Datensatz ist der laufende Stand, das IST.',
+    felder: {
+      stichtag: 'Datum des Einfrierens (JJJJ-MM-TT)',
+      kennzahlen_damals: 'die neun Kennzahlen zum Stichtag',
+      daten: 'der vollstaendige Datensatz zum Stichtag (ohne Vorschaubild)'
+    }
+  },
+  _kpis_: {
+    was: 'Kennzahlen, gerechnet von den echten Kernen zu ihrer Zeit. '
+       + 'Sie werden hier NICHT neu gerechnet - alte Daten mit heutigen Regeln '
+       + 'zu messen waere eine andere Zahl.',
+    einheiten: {
+      _kpis_bmy: 'Bruttomietrendite in PROZENT',
+      _kpis_nmy: 'Nettomietrendite in PROZENT',
+      _kpis_dscr: 'Schuldendienstdeckung - ein VERHAELTNIS ohne Einheit',
+      _kpis_ltv: 'Beleihungsauslauf in PROZENT',
+      _kpis_cf_vs: 'Cashflow VOR Steuer pro JAHR in Euro',
+      _kpis_cf_ns: 'Cashflow NACH Steuer pro JAHR in Euro',
+      _kpis_bwk_y: 'Bewirtschaftungskosten pro JAHR in Euro'
+    }
+  },
+  _ds2_: {
+    was: 'Investor Deal Score 2.0 - Score, Kategorien und ob er gerechnet wurde.'
+  },
+  _deal_won: {
+    was: 'true = Objekt gewonnen. `_deal_won_at` traegt das Datum, '
+       + '`_deal_lost` das Gegenstueck.'
+  }
+};
+
 /**
  * Baut das Export-Paket fuer einen Nutzer.
  * @param {string} userId
@@ -224,6 +307,11 @@ async function bauen(userId, opt) {
       felder_reihenfolge: Array.isArray(k.felder) ? k.felder.map(function (f) { return f.id; }) : null,
       objektarten: k.objektarten || null,
       etappen: k.etappen || null,
+      /* v2066 - die Strukturen mit Unterstrich. `felder` oben kennt nur
+         die 225 Formularfelder; `_mfh`, `_ankauf` und die `_kpis_*`
+         stehen in KEINEM Formular und brauchen die Erklaerung am
+         dringendsten. */
+      strukturen: STRUKTUREN,
       score_stufen: SCORE_STUFEN,
       hinweise: HINWEISE
     },
