@@ -747,7 +747,7 @@ davon lesen.
 
 ---
 
-#### N60.23 · Pflichtfelder je Stufe statt einer Liste für alles
+#### N60.23 · ERLEDIGT 10.10.2026 (`v2079`) — die Staffel war gebaut, nur nicht gefragt
 Marcel, 10.10.2026: *„Wir haben jetzt auch unser Tab-Objekt umgebaut
 und haben dort drei Stufen … Unten unter Deal-Aktion haben wir dann
 Bereit für die Bank. Dort sind es aber nur 14 Grundfelder."*
@@ -788,6 +788,30 @@ Grundstufe sind es dann 28 und für die Stufe 3 so und so viele Felder."*
 was gebraucht wird — `DealPilotObjektart.pflicht()` ist der Anfang, den
 v1841 schon gemacht hat. N60.22 liest von dort, statt eine vierte
 Liste anzulegen.
+
+> ### Nachgemessen: die Staffel existierte schon
+>
+> `objekt-reiter.js` führt sie in **`pflichtFuer(stufe)`** und
+> exportiert sie über `window.DealPilotObjektReiter` — mit
+> `tools/objekt-vollständigkeit.mjs` als Gegenstück:
+>
+> | Stufe | Pflichtfelder |
+> |---|---|
+> | 1 | **6** — Adresse, Objektart, Wohnfläche, Baujahr |
+> | 2 | **13** — dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe, Zimmer (+Etage/Einheiten) |
+> | 3 | **bis 20** — dazu Grundstück, Bodenrichtwert, BGF, MEA, NHK-Typ, Garage |
+>
+> Der Readycheck zählte dagegen 15 feste Felder — die des
+> **Investor-Deal-Scores**. Das ist ein anderer Zweck als die
+> Wertermittlung, deshalb bleiben beide Listen; `v2079` fragt jetzt
+> beide und nennt die Stufe in der Überschrift
+> (*„Eingabetiefe 2 (+7)"*), weil sich die Gesamtzahl mit der Pille
+> ändert.
+>
+> Die drei fehlenden Score-Felder sind ergänzt. Die Beschriftungen
+> kommen aus `DealPilotObjektReiter.FELDNAMEN`, das dafür
+> mitexportiert wird — eine zweite Namensliste im Readycheck hatte
+> ich zuerst geschrieben und wieder entfernt.
 
 **Dazu Marcels Absprung:** *„und dann noch die Pillen, dass man den
 Absprung dahin hat"* — die fehlenden Felder sind heute schon klickbare
@@ -986,6 +1010,39 @@ Koordinaten — Felder dafür gibt es gar nicht.
 > **Ein Aufruf kostet 0,73 EUR GeoMap** (Restguthaben 227,39 EUR,
 > gemessen 10.10.2026); ein schon bezahlter Bericht kostet 0. Das
 > gehoert in die Bepreisung der Rechenkern-Schnittstelle.
+
+---
+
+#### N60.27 · BFH IX R 7/12 ist ungeprüft — Leitsatz oder Zitat weg
+Gemeldet vom zweiten Chat am 10.10.2026: *„`rnd-calc.js` zitiert BFH
+IX R 7/12 beim Schadenskatalog. Im Register steht das Urteil als
+‚offen‘, der Leitsatz ist nicht geprüft."*
+
+**Nachgemessen am 10.10.2026:** Das Zitat stand **nur im Kommentar**
+(`rnd-calc.js:117`) und in **keinem Nutztext** — es erschien also in
+keinem Gutachten und keiner Oberfläche. In `v2080` ist es dort
+entfernt und durch die ehrliche Herkunft ersetzt: die Abschläge sind
+sachverständige Orientierungswerte dieses Hauses.
+
+> **Das Risiko war nie der Kunde, sondern der nächste Entwickler.**
+> Kein BFH-Urteil nennt 5 % für einen feuchten Keller oder 25 % für
+> Tragwerksmängel. Wer ein Aktenzeichen danebenstehen sieht, hält die
+> Zahlen für belegt und prüft sie nicht nach — dieselbe Falle, die
+> Marcel am Gutachten kritisiert hat: dort stand „Anlage 1 ImmoWertV"
+> unter einer GND, die aus **Anlage 22 BewG** kam.
+
+**Offen bleibt die fachliche Frage**, und die gehört Marcel:
+1. Ist **IX R 7/12** für Schadensabschläge auf die Restnutzungsdauer
+   überhaupt einschlägig? Der Leitsatz ist nicht geprüft.
+2. Wenn ja: mit Leitsatz zitieren und **an der Stelle, die es trägt** —
+   also bei der Zulässigkeit der Berücksichtigung, nicht bei der Höhe.
+3. Wenn nein: die Abschläge bleiben Modellansatz und brauchen einen
+   Modellvermerk, sobald sie in einem Gutachten erscheinen (§ 10
+   ImmoWertV, Modellkonformität).
+
+**Bewacht:** `tools/rnd-eingabe-pruefen.mjs` Abschnitt 10 prüft, dass
+kein Aktenzeichen neben der Katalog-Zeile steht und keines im
+Nutztext landet.
 
 ---
 
