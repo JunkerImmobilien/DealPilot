@@ -4,23 +4,31 @@ const { query } = require('../db/pool');
 /* mand v807: API-Key-Auth */
 const apiKeyService = require('../services/apiKeyService');
 const subscriptionService = require('../services/subscriptionService');
-/* v2072: welche Plaene die Schnittstelle duerfen.
-   Gemessen am 10.10.2026 fuehrt `subscriptions` auf Staging genau drei
-   Kennungen: partner (3x aktiv), free (1x), starter (1x gekuendigt).
-   "pro" kommt dort GAR NICHT vor — die Liste liess also niemanden durch,
-   und ihr 403 sah aus wie ein falscher Schluessel.
-   Marcel am 10.10.2026: "das soll auch mit dem partner plan funktionieren."
+/* v2072a: die Schnittstelle haengt am MERKMAL `api_access`, nicht an
+   Plannamen. Die Berechtigung liegt damit an EINER Stelle — in der
+   Spalte plans.features — und ein neuer Plan braucht keine Codesuche.
 
-   Den STATUS prueft diese Liste nicht und muss es nicht: getEffectivePlan
-   gibt fuer ein nicht aktives Abo `plan_id: 'free'` zurueck (downgraded).
+   HIER STAND BIS v2072 `PRO_PLAN_IDS = ['pro']`, und v2072 hat daraus
+   `['pro','partner']` gemacht. BEIDES WAR FALSCH, das zweite nur
+   weniger auffaellig: genau diese Namensliste wurde am 02.10.2026 schon
+   einmal entfernt — eine Datei weiter, in routes/apiKeys.js, mit der
+   ausdruecklichen Begruendung "wer kuenftig einen Plan anlegt, setzt
+   ein Flag und muss keine Namensliste im Code suchen". Die Liste hier
+   war die DRITTE Stelle derselben Berechtigung und hat den behobenen
+   Fehler wiederholt.
 
-   Die TESTPHASE dagegen muss sie pruefen. getEffectivePlan gibt dort
-   `plan_id: 'pro'` mit `trial: true` zurueck — ein Tester haette damit
-   28 Tage volle Schnittstelle. Dieselbe Begruendung, aus der die
-   Testphase export_csv, json_backup und excel_import ausschaltet
-   ("Pro-Verkaufsargumente"), gilt fuer die API erst recht.
-   Marcels Entscheidung vom 10.10.2026: Variante b, Testphase draussen. */
-const PRO_PLAN_IDS = ['pro', 'partner'];
+   Gemessen am 10.10.2026 in der Tabelle plans:
+     free false · starter false · investor false · pro TRUE · partner TRUE
+   Und in subscriptions: partner 3x aktiv, free 1x, starter 1x gekuendigt
+   — "pro" kommt dort GAR NICHT vor. Die alte Liste liess also niemanden
+   durch, und ihr 403 sah aus wie ein falscher Schluessel.
+
+   Den STATUS prueft das nicht und muss es nicht: getEffectivePlan gibt
+   fuer ein nicht aktives Abo plan_id 'free' zurueck (downgraded), und
+   free traegt api_access false.
+
+   Die TESTPHASE dagegen braucht eine eigene Pruefung — siehe unten. */
+const API_FEATURE = 'api_access';
 const _apiKeyRate = new Map();
 function _rateOk(keyId) {
   const now = Date.now();
@@ -40,20 +48,32 @@ async function _authViaApiKey(req, res, next, plain) {
     if (!user.is_active) return res.status(403).json({ error: 'User account is disabled' });
     try {
       const plan = await subscriptionService.getEffectivePlan(user.id);
-      if (PRO_PLAN_IDS.indexOf(((plan && plan.plan_id) || '').toLowerCase()) < 0) {
+      /* v2072a: dasselbe Merkmal, das routes/apiKeys.js per
+         requireFeature('api_access') prueft. Dort geht es um das ANLEGEN
+         eines Schluessels, hier um sein BENUTZEN — beide muessen am
+         gleichen Massstab haengen, sonst entsteht wieder eine Tuer, die
+         sich zeigt und nicht oeffnet (so war es bis v1791).
+         Die Meldung nennt den gemessenen Plan MIT, damit ein 403 nicht
+         wieder als falscher Schluessel gelesen wird. */
+      if (!plan || !plan.plan_features || !plan.plan_features[API_FEATURE]) {
         return res.status(403).json({
-          error: 'API access requires an active Pro plan',
-          plan: (plan && plan.plan_id) || null,
-          erlaubt: PRO_PLAN_IDS
+          error: `Feature '${API_FEATURE}' is not available on your plan`,
+          plan_id: (plan && plan.plan_id) || null,
+          upgrade_required: true
         });
       }
-      /* v2072: waehrend der Testphase bleibt die Schnittstelle zu — wie
-         export_csv/json_backup/excel_import. Der Plan heisst dort 'pro'
-         und wuerde die Liste oben sonst passieren. */
-      if (plan && plan.trial === true) {
+      /* v2072: waehrend der Testphase bleibt die Schnittstelle zu — aus
+         demselben Grund, aus dem getEffectivePlan dort export_csv,
+         json_backup und excel_import ausschaltet ("Pro-Verkaufsargumente").
+         Das Merkmal oben allein reicht nicht: die Testphase liefert die
+         FEATURES des gewaehrten Plans, api_access ist darin true.
+         Marcels Entscheidung vom 10.10.2026 ("ja b"). */
+      if (plan.trial === true) {
         return res.status(403).json({
           error: 'API-Zugang ist in der Testphase nicht enthalten',
-          plan: plan.plan_id, trial: true, trial_ends_at: plan.trial_ends_at || null
+          plan_id: plan.plan_id, trial: true,
+          trial_ends_at: plan.trial_ends_at || null,
+          upgrade_required: true
         });
       }
     } catch (e) { /* im Zweifel durchlassen statt Owner aussperren */ }
