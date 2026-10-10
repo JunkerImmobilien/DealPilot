@@ -769,7 +769,7 @@ Stück, das am Messestand standhält, nicht eine Skizze für intern.
 
 ---
 
-#### N60.21 · Standard-Design festlegen und die Vorschau ehrlich machen
+#### N60.21 · TEIL 1 ERLEDIGT 10.10.2026 (`v2083`) — Vorschau (Teil 2) offen
 Marcel, 10.10.2026: *„Wenn sich ein User neu einloggt, dann kann er das
 Design wählen."*
 
@@ -777,6 +777,33 @@ Design wählen."*
 - **Darstellung: Aktenmappe** wird der Standard — *„Den könnte man dann
   auch oben reinsetzen: Aktenmappe, Standard."*
 - **Objektkarte: Datenzeile**
+
+> ### Teil 1 gebaut (`v2083`)
+>
+> **Drei Änderungen in `onboarding.js`:**
+> 1. **Aktenmappe steht an erster Stelle** — die Reihenfolge ist die
+>    erste Empfehlung, noch vor jeder Markierung.
+> 2. Sie trägt `standard: true` und ist **vorausgewählt**. Vorher stand
+>    in `_wahl.aussehen` `null`: der Nutzer musste aktiv etwas wählen,
+>    bevor es weiterging. **Eine Vorgabe, die man erst setzen muss, ist
+>    keine.** Die Markierung sitzt als Pille *„Standard"* in der Kachel.
+> 3. Ihre Objektkarte ist **`datenzeile`** statt `bordkarte`. Die anderen
+>    drei behalten die Bordkarte — Marcels Satz von damals galt für
+>    *„Aktenmappe, Kanzlei und Tower"*, und für zwei davon gilt er weiter.
+>
+> Die Vorgabe steht an **einer** Stelle (`standard: true`) und wird über
+> `_aussehenStandard()` gelesen; beide Initialstellen nutzen sie.
+>
+> **Ein Text, der die Einstellung nicht kannte:** dort stand hartkodiert
+> *„Objektkarten als Bordkarte"* — auch für eine Variante, die etwas
+> anderes setzt. Jetzt kommt der Name aus dem Modul, das den Stil führt.
+>
+> **Geprüft, dass es auch wirkt**, nicht nur angezeigt wird:
+> `_aussehenAnwenden` ruft `DealPilotObjektkarte.setze(a.karte)`, und im
+> Browser gemessen kennt dieses Modul `datenzeile` (Name *„Datenzeile"*).
+> Der Kommentar `v1748b` daneben dokumentiert genau die Falle: dort stand
+> einmal `DealPilotKartenVariante.setze('bordkarte')` — und **dieses**
+> Modul kennt „bordkarte" nicht, es setzte still auf `""` zurück.
 
 **(2) Die Vorschaubilder taugen nicht**
 *„Da sind irgendwie so ganz komische Bilder drinne. Können wir da
