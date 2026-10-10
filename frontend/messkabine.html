@@ -90,8 +90,17 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine</h1>
-  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar. Harness: <code>DPM.lauf()</code></span>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2063</span></h1>
+  <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
+       Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
+       drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
+       gab `erdrueckt` nicht zurueck, der Aufruf starb an
+       `undefined.length`, und ich habe zuerst den PRUEFLING verdaechtigt.
+       Wer hier etwas aendert, zieht die Zahl hoch - und sieht dann oben,
+       ob sein Browser sie wirklich hat. -->
+  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar.
+    Harness: <code>DPM.lauf()</code> · Ansichten: <code>DPM.pruefeAnsicht()</code>
+    · und <code>DPM.pruefSelbsttest()</code>, bevor man einer gruenen Messung glaubt</span>
   <div class="geraete" id="g"></div>
   <!-- v1984: Standbild-Schalter. Vorgabe EIN, weil eine Kabine, die
        das erste Einzelbild eines Uebergangs zeigt, kein Messgeraet ist. -->
