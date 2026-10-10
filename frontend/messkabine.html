@@ -1303,14 +1303,36 @@
 
        Genau dafuer ist er da: er hat den Fehler gefunden, bevor eine
        gruene Messung auf ihm aufgebaut wurde. */
-    var opfer = [].slice.call(d.querySelectorAll('button,a[href]')).filter(function(e){
+    /* v2062b · DER SELBSTTEST SUCHT SICH SEIN OPFER.
+       Am Seitenanfang des Quick-Checks war KEIN Knopf tauglich: von 23
+       waren 8 unten angeschnitten, 9 zu klein, 6 ohne Zeigerereignisse.
+       Der Test meldete daraufhin "kein Testknopf im Bild" und lief gar
+       nicht - ein Selbsttest, der sich regelmaessig selbst ueberspringt,
+       wird nach dem dritten Mal ignoriert und ist damit wertlos.
+       Also scrollt er, bis er eines findet. */
+    var taugt = function(e){
       var r = e.getBoundingClientRect();
       return r.width > 30 && r.height > 20
           && r.top > 0 && r.bottom < win.innerHeight
           && r.left > 0 && r.right < win.innerWidth
+          && e.offsetParent !== null
           && win.getComputedStyle(e).pointerEvents !== 'none';
-    })[0];
-    if (!opfer) return { urteil: 'kein Testknopf GANZ im Bild - erst eine Ansicht laden' };
+    };
+    var sc0 = apScroller(d, win);
+    var hoehe = sc0 ? sc0.clientHeight : win.innerHeight;
+    var ganz = sc0 ? sc0.scrollHeight : d.documentElement.scrollHeight;
+    var opfer = null, suchschritte = 0;
+    var maxS = Math.min(12, Math.max(1, Math.ceil(ganz/(hoehe*0.9))));
+    for (var s = 0; s < maxS && !opfer; s++) {
+      if (s > 0) {
+        if (sc0) sc0.scrollTop = s*hoehe*0.9; else win.scrollTo(0, s*hoehe*0.9);
+        await warte(260);
+      }
+      suchschritte = s + 1;
+      opfer = [].slice.call(d.querySelectorAll('button,a[href]')).filter(taugt)[0] || null;
+    }
+    if (!opfer) return { urteil: 'kein Testknopf GANZ im Bild gefunden ('
+                                 + suchschritte + ' Abschnitte durchsucht)' };
     var vorher = apBedienbar(d, win).verdaechtig.length;
     var r = opfer.getBoundingClientRect();
     var decke = d.createElement('div');
@@ -1326,8 +1348,9 @@
     await warte(250);
     var danach = apBedienbar(d, win).verdaechtig.length;
     return {
-      testknopf: (opfer.textContent||'').trim().slice(0,24)
-                 + ' ' + Math.round(r.width)+'x'+Math.round(r.height),
+      testknopf: ((opfer.textContent||'').trim().slice(0,24) || '(ohne Text)')
+                 + ' ' + Math.round(r.width)+'x'+Math.round(r.height)
+                 + ' (gefunden im ' + suchschritte + '. Abschnitt)',
       ohneDecke: vorher, mitDecke: mit.verdaechtig.length,
       knopfGefunden: gefunden, nachEntfernen: danach,
       urteil: (vorher === 0 && gefunden && danach === 0)
