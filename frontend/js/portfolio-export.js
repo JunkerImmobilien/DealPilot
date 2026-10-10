@@ -49,12 +49,52 @@
     ['DealScore', 'daten._dealpilot_score', '0-100'],
     ['Investor-Score', 'daten._ds2_score', '0-100'],
     ['Analyse vom', 'analyse._fuer.stand', 'Datum'],
+    /* ═══ v2070 · DER MARKTBERICHT GEHOERT IN DIE TABELLE ═══════════════
+       Marcel, 10.10.2026: „ob wir dann auch alle Marktberichtdaten auch
+       mit uebergeben koennen. Also dass wir wirklich was
+       Vollumfaengliches haben."
+
+       Die DealPilot-Sicherung bekommt sie seit `v2069` von selbst - sie
+       holt `/objects/portfolio-export` und schreibt es vollstaendig weg.
+       DIESE Tabelle ist eine flache Auswahl, und dort muss jede Spalte
+       einzeln benannt werden.
+
+       Vier reichen fuer den Zweck einer Tabelle: was ist das Objekt
+       heute wert, wie viele Berichte gibt es, seit wann, und wie hat
+       sich der Wert seitdem entwickelt. Den vollen Verlauf traegt die
+       JSON-Sicherung - eine Tabelle mit 33 Spalten fuer 33 Berichte
+       waere keine Tabelle mehr. */
+    ['Marktwert', '_mb_wert', 'EUR'],
+    ['Marktberichte', '_mb_anzahl', 'Anzahl'],
+    ['Erster Bericht', '_mb_erster', 'Datum'],
+    ['Wertentwicklung', '_mb_delta', '%'],
     ['Fotos', 'fotos_anzahl', 'Anzahl']
   ];
 
   function lies(obj, pfad) {
     if (pfad === '_status') {
       return obj.gewonnen ? 'gewonnen' : (obj.verloren ? 'verloren' : 'offen');
+    }
+    /* v2070 - die vier Marktbericht-Spalten. Sie stehen NEBEN `daten`,
+       nicht darin: die Berichte kommen aus einer eigenen Datenbank. */
+    if (pfad.indexOf('_mb_') === 0) {
+      var mb = obj.marktbericht;
+      if (!mb) return null;
+      var v = (mb.verlauf && mb.verlauf.length) ? mb.verlauf : null;
+      if (pfad === '_mb_wert') return (mb.stand && mb.stand.marktwert_eur) || null;
+      if (pfad === '_mb_anzahl') return v ? v.length : ((mb.stand && mb.stand.berichte) || null);
+      if (pfad === '_mb_erster') return v ? String(v[0].datum).slice(0, 10) : null;
+      if (pfad === '_mb_delta') {
+        /* Nur rechnen, wenn es wirklich zwei Punkte gibt - aus einem
+           einzelnen Bericht laesst sich keine Entwicklung ablesen, und
+           eine 0 dort waere eine Behauptung. */
+        if (!v || v.length < 2) return null;
+        var a = Number(v[0].marktwert_eur) || 0;
+        var b = Number(v[v.length - 1].marktwert_eur) || 0;
+        if (!a) return null;
+        return Math.round((b - a) / a * 1000) / 10;
+      }
+      return null;
     }
     var teile = pfad.split('.'), v = obj;
     for (var i = 0; i < teile.length; i++) {

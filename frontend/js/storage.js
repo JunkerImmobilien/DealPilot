@@ -2268,6 +2268,16 @@ function _buildXlsxRowForObject(o) {
      beschreibt: ein Feld ist erst fertig, wenn es auch exportiert
      werden kann. */
   var _ank = (d._ankauf && d._ankauf.stichtag) ? d._ankauf.stichtag : '';
+  /* v2070 - der Marktbericht haengt NEBEN den Daten (eigene Datenbank). */
+  var _mb = o.marktbericht || null;
+  var _mbV = (_mb && _mb.verlauf && _mb.verlauf.length) ? _mb.verlauf : null;
+  var _mbDelta = '';
+  if (_mbV && _mbV.length > 1) {
+    /* Aus EINEM Bericht laesst sich keine Entwicklung ablesen. */
+    var _a = Number(_mbV[0].marktwert_eur) || 0;
+    var _b = Number(_mbV[_mbV.length - 1].marktwert_eur) || 0;
+    if (_a) _mbDelta = Math.round((_b - _a) / _a * 1000) / 10;
+  }
   var _status = (d._deal_won === true || d._deal_won === 'true') ? 'gewonnen'
     : ((d._deal_lost === true || d._deal_lost === 'true') ? 'verloren' : 'offen');
   var _me = d.me_modus === 'einheiten' ? 'Aus Wohnungen'
@@ -2319,6 +2329,24 @@ function _buildXlsxRowForObject(o) {
     Einheiten_im_Mietplan: _eh.length ? _ehPlan : '',
     Einheiten_Indexmiete: _eh.length ? _ehIndex : '',
     Analyse_Stand: _analyseStand,
+    /* ═══ v2070 · VIER SPALTEN AUS DEM MARKTBERICHT ═════════════════════
+       Marcel: „ob wir dann auch alle Marktberichtdaten auch mit
+       uebergeben koennen. Also dass wir wirklich was Vollumfaengliches
+       haben."
+
+       Der Marktbericht liegt in einer EIGENEN Datenbank und steht
+       deshalb nicht in `o.data`, sondern als `o.marktbericht` daneben -
+       angehaengt von den Aufrufern aus dem Export-Paket (v2069). Fehlt
+       er, bleiben die Spalten leer; eine 0 waere eine Aussage, die
+       niemand gemessen hat.
+
+       Den vollen Verlauf traegt die JSON-Sicherung. Hier stehen die
+       vier, die in eine Tabelle gehoeren: heutiger Wert, Zahl der
+       Berichte, Beginn der Reihe und was daraus wurde. */
+    Marktwert: (_mb && _mb.stand && _mb.stand.marktwert_eur) || '',
+    Marktberichte: _mbV ? _mbV.length : ((_mb && _mb.stand && _mb.stand.berichte) || ''),
+    Erster_Bericht: _mbV ? String(_mbV[0].datum).slice(0, 10) : '',
+    Wertentwicklung_Pct: _mbDelta,
     Anlage: o.created_at ? o.created_at.slice(0, 10) : ''
   };
 }
@@ -2353,6 +2381,16 @@ async function exportSingleObjectExcel(objId) {
     return;
   }
   if (!single) { toast('⚠ Objekt nicht gefunden'); return; }
+
+  /* v2070 - derselbe Zusatz wie beim Gesamtexport: der Marktbericht
+     liegt in einer eigenen Datenbank und kommt ueber den Export-Endpunkt. */
+  try {
+    var _p1 = await Auth.apiCall('/objects/portfolio-export');
+    if (_p1 && Array.isArray(_p1.objekte)) {
+      var _tr = _p1.objekte.filter(function (x) { return x && x.id === single.id; })[0];
+      if (_tr && _tr.marktbericht) single.marktbericht = _tr.marktbericht;
+    }
+  } catch (e) { try { console.warn('[Export] Marktbericht nicht geladen:', e.message); } catch (x) {} }
 
   var row = _buildXlsxRowForObject(single);
   var ws = XLSX.utils.json_to_sheet([row]);
@@ -2402,6 +2440,23 @@ async function exportAllObjectsExcel() {
   } catch (e) { toast('⚠ Export-Fehler: ' + e.message); return; }
 
   if (!all.length) { toast('⚠ Keine Objekte zum Exportieren gefunden'); return; }
+
+  /* ═══ v2070 · DEN MARKTBERICHT DAZUHOLEN ════════════════════════════
+     Diese Liste kommt aus `/objects` bzw. aus dem Browserspeicher - dort
+     steht der Marktbericht nicht, er liegt in einer eigenen Datenbank.
+     Ein Aufruf des Export-Endpunkts reicht, um ihn je Objekt anzuhaengen.
+
+     Faellt er aus, laeuft der Export trotzdem: die vier Spalten bleiben
+     dann leer. Eine Excel-Datei gar nicht zu schreiben, weil ein
+     Nachbardienst schweigt, waere die schlechtere Antwort. */
+  try {
+    var _p = await Auth.apiCall('/objects/portfolio-export');
+    if (_p && Array.isArray(_p.objekte)) {
+      var _nach = {};
+      _p.objekte.forEach(function (x) { if (x && x.marktbericht) _nach[x.id] = x.marktbericht; });
+      all.forEach(function (o) { if (o && _nach[o.id]) o.marktbericht = _nach[o.id]; });
+    }
+  } catch (e) { try { console.warn('[Export] Marktberichte nicht geladen:', e.message); } catch (x) {} }
 
   var rows = all.map(_buildXlsxRowForObject);
   var ws = XLSX.utils.json_to_sheet(rows);
