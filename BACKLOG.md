@@ -228,7 +228,45 @@ Container am echten `buildPrompt()` nachgewiesen (8 von 8 Blöcken).
    Mietentwicklungsplan, Wohnungsdetails, Bodenrichtwert/Sachwert,
    RND/GND, Halter/Gesellschaft.
 
-#### N60.5 · ⚠ Der Telegram-Bot rechnet mit Mieten, die niemand eingegeben hat
+#### N60.5 · TEILERLEDIGT 10.10.2026 (`v2081`) — Block gebaut, Abnahme am Bot offen
+> ### Stand 10.10.2026: gebaut (`v2081`), Abnahme am echten Bot offen
+>
+> **Was behoben ist:**
+>
+> 1. **`kennzahlen_block`** — EIN fertiger Mehrzeiler mit Adresse und
+>    allen Zahlen statt einzelner Felder. Ihn kann das Modell kopieren
+>    oder weglassen, aber nicht halb übernehmen. Der Hinweis dazu steht
+>    jetzt **vorne**.
+> 2. **Eine echte Inkonsistenz im Werkzeug:** `miete_je_qm` rechnete mit
+>    `nkm` allein, `jahreskaltmiete` und die Rendite aber mit `nkm + ze`.
+>    Bei nkm 940 und ze 460 stand im selben Block *„Jahreskaltmiete
+>    16.800"* (= 1.400/Monat) und *„Miete je m² 9,40"* (= 940/Monat).
+>    Zwei Zahlen zur selben Miete — genau so eine Ausgabe lädt dazu ein,
+>    sie „passend" neu zu formulieren. Gegenprobe jetzt konsistent:
+>    `Jahresmiete/12/wfl` = `miete_je_qm`, mit und ohne `ze`.
+>
+> **Warum kein weiterer Appell:** verboten war es VIERFACH —
+> `agentLauf.js:103` (*„ZAHLEN ERFINDEST DU NIE"*), Regel 2, Regel 3 und
+> der `hinweis` selbst (*„so wie sie hier stehen"*). Alle vier gebrochen.
+> Siehe [[werkzeug-schlaegt-hinweis]]: was gerechnet werden soll, darf
+> nicht formulierbar sein.
+>
+> **Nachgemessen am echten Kern** — er ist unschuldig:
+> `rechenkerne.kpis({kp:180000, nkm:940, ze:0})` gibt 11.280 / 6,27 % /
+> 15,96 / 9,40 und trifft damit alle vier Sollwerte. Die Bot-Zahlen
+> passen zu **keiner gemeinsamen Miete**.
+>
+> **NOCH OFFEN, zwei Dinge:**
+> - **Abnahme am echten Bot** mit genau diesem Objekt (Sachsenstraße 18,
+>   KP 180.000, Miete 940). Braucht Telegram — nicht am Schreibtisch
+>   prüfbar, deshalb ausdrücklich als Abnahmepunkt benannt.
+> - **Marcels dritter Punkt:** *„erst schlecht mit 44 und danach auf
+>   einmal über 80"*. Davon **nicht** erklärt. Ein Score, der sich ohne
+>   Eingabeänderung verdoppelt, ist ein eigener Befund — die
+>   Kennzahlen-Erfindung ist dafür nur ein Kandidat, kein Nachweis.
+> - **Zweiter Befund aus den Bildern** (*„kein Objekt gefunden"*
+>   unmittelbar nach dem Anlegen) ist **unberührt**.
+
 Bilder: `Dateien/bot/IMG_1554.PNG` … `IMG_1559.PNG` (Sachsenstraße 18,
 32052 Herford, ETW 100 m², Bj 1998, KP 180.000, **Kaltmiete 940 €/Monat**).
 
