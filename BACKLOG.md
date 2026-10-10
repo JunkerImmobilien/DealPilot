@@ -102,7 +102,21 @@ gegenlesen.**
 > misst nach jedem Objekt gegen: Analyse 14.849 → 14.849, Fotos 6 → 6.
 > **Alle 20 Schreibvorgänge mit unveränderter Analyse und Fotozahl.**
 
-#### N60.1b · ⚠ SIEBEN Objekte tragen dieselbe Pilot-Analyse
+#### N60.1b · ERLEDIGT — am 10.10.2026 nachgemessen, keine Doppelung mehr
+
+> **Gemessen am Portfolio-Export vom 10.10.2026** (`Dateien/API-Export/`):
+> 13 Objekte tragen eine Pilot-Analyse, **alle 13 mit unterschiedlicher
+> Länge** — keine Gruppe gleicher Länge, also auch keine byte-gleiche.
+> Die sieben von 08.10. sind weg; `N60.5d` (Neuberechnung aller
+> Analysen) hat gewirkt, die Ursache ist seit `v2015` verriegelt
+> (`N60.5b`).
+>
+> **Ein offener Punkt, der nicht mehr offen ist, kostet jedes Mal eine
+> Messung.** Nachprüfbar mit einem Lauf über
+> `objekte[].analyse` im Export.
+
+<details><summary>Der Befund von damals</summary>
+
 Beim Nachmessen aufgefallen (08.10.2026), Länge in Zeichen:
 
 | Länge | Objekte |
@@ -117,6 +131,8 @@ Das deckt sich mit dem alten Befund weiter unten in dieser Datei (dort
 waren es sechs). **Eine Analyse, die zu einem anderen Objekt spricht,
 ist schlimmer als keine** — und sie ist ein starker Kandidat für
 Marcels Frage aus N60.5 („erst 44, dann über 80").
+
+</details>
 
 #### N60.2 · Messkabine: ALLES, nicht nur der Marktbericht
 Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine geprüft?
@@ -241,6 +257,43 @@ Richtig wäre: 940 × 12 = **11.280 €**, Rendite **6,27 %**, Faktor
 **Zweiter Befund aus denselben Bildern:** zweimal „**kein Objekt
 gefunden**" für die Sachsenstraße 18 — **unmittelbar nachdem der Bot
 dieses Objekt selbst angelegt hatte** (IMG_1554 und IMG_1558/1559).
+
+> ### Nachgemessen am 10.10.2026: der Kern ist unschuldig, die Zahlen sind ERFUNDEN
+>
+> `rechenkerne.kpis({ kp: 180000, nkm: 940, ze: 0 })` — der echte,
+> gespiegelte Kern, direkt gerufen:
+>
+> | | Kern | Bot | Soll |
+> |---|---:|---:|---:|
+> | Jahreskaltmiete | **11.280** | 16.800 | 11.280 |
+> | Bruttomietrendite | **6,27 %** | 4,80 % | 6,27 % |
+> | Kaufpreisfaktor | **15,96** | 20,8 | 15,96 |
+> | Miete je m² | **9,40** | 6,01 | 9,40 |
+>
+> **Der Kern trifft alle vier Sollwerte.** Und die Bot-Zahlen passen zu
+> **keiner gemeinsamen Miete**: 16.800 entspräche 1.400 €/Monat — damit
+> wäre die Rendite 9,33 % und der Faktor 10,71, nicht 4,80 % und 20,8.
+> Sie sind also nicht aus einer falschen Eingabe entstanden, sondern
+> **einzeln im Fliesstext geschrieben**.
+>
+> Die Werkzeuge geben die Zahlen als **fertige Texte** zurück
+> (`objekt_schnellblick`: `bruttomietrendite: pct(bmr) + " = " + eur(...)`)
+> und rufen `rechenkerne.kpis()`. Es fehlt also nicht die Rechnung,
+> sondern die **Pflicht, sie wörtlich zu übernehmen**.
+>
+> **Damit ist der nächste Schritt klar und liegt NICHT am Kern:**
+> 1. Im Prompt verbieten, Kennzahlen selbst zu formulieren — mit
+>    derselben Schärfe wie bei `bewertung.empfehlung_text`
+>    (`agentWerkzeuge.js:2429`: *„Nimm BEIDE wörtlich"*).
+> 2. Besser noch, weil ein Prompt nur bittet: die Zahlen gar nicht erst
+>    einzeln ausgeben, sondern **einen fertigen Block**, den das Modell
+>    nur durchreichen kann — siehe [[werkzeug-schlaegt-hinweis]]:
+>    was gerechnet werden soll, darf nicht formulierbar sein.
+> 3. Gegenprobe am echten Bot mit genau diesem Objekt.
+>
+> **Marcels dritter Punkt (44 → 80) wird davon nicht erklärt** und
+> bleibt offen — ein Score, der sich ohne Eingabeänderung verdoppelt,
+> ist ein eigener Befund.
 
 **Marcels dritter Punkt:** „Die Bewertung war erst schlecht mit 44 und
 danach auf einmal über 80. Warum?" — in diesen sechs Bildern nicht
@@ -1043,6 +1096,51 @@ sachverständige Orientierungswerte dieses Hauses.
 **Bewacht:** `tools/rnd-eingabe-pruefen.mjs` Abschnitt 10 prüft, dass
 kein Aktenzeichen neben der Katalog-Zeile steht und keines im
 Nutztext landet.
+
+---
+
+#### N60.28 · Die Rechtsform der aufnehmenden Gesellschaft fehlt im Datensatz
+Marcel am 10.10.2026, aus dem zweiten Chat: *„Die Rechtsform der
+aufnehmenden Gesellschaft fehlt im Datensatz."*
+
+**GEMESSEN am Export vom 10.10.2026:**
+
+| | Befund |
+|---|---|
+| `daten.halter` | trägt bei **19 von 23** Objekten den Wert `"privat"` — sonst nichts |
+| Mandanten-Block | **gibt es nicht** im Export (kein Schlüssel zu Mandant/Halter/Gesellschaft) |
+| Überführungsfelder | vorhanden, aber leer: `ueberf_preis`, `ueberf_restschuld`, `ueberf_rest_zins`, `verkehrswert_ueberf`, `gesellschafterdarlehen`, `halter_seit`, `ueberf_ende` |
+
+**Die Rechtsform existiert — nur nicht am Objekt.** Sie hängt am
+**Mandanten**: `DealPilotMandanten` führt `rechtsform` mit `isCorp()`
+und `rfLabel()` (`dashboard.js:2591`, `:2607`). Das Objekt speichert in
+`halter` nur, WER hält — nicht, in welcher Form.
+
+> **Warum das mehr ist als ein fehlendes Feld:** die Rechtsform
+> entscheidet, WELCHE Steuer gilt — Körperschaftsteuer bei einer
+> Kapitalgesellschaft, Einkommensteuer beim Privatmann. Der Kommentar in
+> `dashboard.js:1169` sagt es selbst: *„die Rechtsform sagt, WELCHE
+> Steuer gilt; der Tarif sagt nur, wie hoch"*. Ein Empfänger des
+> Exports, der nur `halter: "privat"` sieht, kann eine Überführung in
+> eine GmbH nicht von einer in eine GbR unterscheiden — und rechnet
+> beide gleich.
+
+**Zu tun, in dieser Reihenfolge:**
+1. Den **Mandanten mitexportieren**, nicht die Rechtsform ans Objekt
+   kopieren: Name, `rechtsform`, `rfLabel`, `isCorp`. Sonst entsteht die
+   vierte Stelle, an der dieselbe Angabe steht — vgl. `N60.23`.
+2. Am besten als eigener Block `mandanten` neben `objekte`, und
+   `daten.halter` verweist darauf. Der Export führt sein Lexikon schon
+   mit (`lexikon.strukturen`); dort gehört der Verweis beschrieben.
+3. **Vorher prüfen**, ob `halter` eine Mandanten-**Kennung** oder nur
+   ein Freitext ist — bei `"privat"` ist das nicht entscheidbar. Ohne
+   belastbaren Verweis bringt ein Mandanten-Block nichts.
+4. `docs/api-einrichtung.md` nachziehen.
+
+**Nicht vergessen:** die Betreiberform von DealPilot selbst ist
+**Einzelunternehmen** (Junker Solution, Kleinunternehmer § 19 UStG) —
+das ist eine andere Sache als die Rechtsform eines Mandanten und darf
+nicht vermischt werden.
 
 ---
 
