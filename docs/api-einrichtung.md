@@ -17,26 +17,44 @@ Geheimnis wie ein Passwort.
 | Basis (Produktion) | `https://app.dealpilot.immo/api/v1` |
 | Kopfzeile | `x-api-key: <schlüssel>` |
 | Grenze | **120 Aufrufe je Minute** je Schlüssel |
-| Voraussetzung | aktiver **Pro-Plan** am Konto — siehe Warnung unten |
+| Voraussetzung | das Plan-Merkmal **`api_access`** (haben `pro` und `partner`) |
 
-> ### ⚠ Gemessen am 10.10.2026: der Plan blockiert noch
->
-> Ein frisch angelegter Schlüssel wird **erkannt**, der Aufruf endet aber
-> mit **403 · „API access requires an active Pro plan"**.
->
-> Der Grund steht in `backend/src/middleware/auth.js`:
-> ```js
-> const PRO_PLAN_IDS = ['pro'];
-> ```
-> Das Konto trägt auf Staging den Plan **„Partner"**, und der steht nicht
-> in dieser Liste. **Ein 403 heißt hier also nicht „Schlüssel falsch".**
->
-> Zwei Wege, beide sind eine Produktentscheidung:
-> 1. `'partner'` in `PRO_PLAN_IDS` aufnehmen (eine Zeile), oder
-> 2. das Konto auf `pro` setzen (Eingriff in die Datenbank).
->
-> Bis das entschieden ist, laufen alle Aufrufe über die **angemeldete
-> Sitzung** statt über den Schlüssel.
+### Der Schlüssel
+
+Für die Anbindung liegt ein Schlüssel bereit — Name im Konto
+**„Rechenkerne + Export (Chat 2)"**, Recht `crud`, angelegt am
+10.10.2026, gültig für **Staging**. Marcel gibt ihn direkt weiter.
+
+**Er steht absichtlich nicht in dieser Datei.** Stattdessen als
+Umgebungsvariable setzen und von dort lesen:
+
+```bash
+export DEALPILOT_KEY="dpk_live_…"        # Linux / macOS
+$env:DEALPILOT_KEY = "dpk_live_…"        # PowerShell
+```
+
+> Ein Schlüssel in einer versionierten Datei ist auch nach dem Löschen
+> der Zeile noch im Git-Verlauf — und diese Datei wandert in einen
+> zweiten Chat. Zurückziehen geht jederzeit in
+> **Einstellungen → API**; ein neuer ist in zehn Sekunden angelegt.
+
+### Gegengetestet am 10.10.2026
+
+| Aufruf | Ergebnis |
+|---|---|
+| `GET /rechenkerne/` | **200** · nennt beide Kerne |
+| `GET /objects/portfolio-export` | **200** · 655 KB · 23 Objekte, 13 Pilot-Analysen, 17 Marktberichte, 60 Verlaufspunkte |
+| `POST /rechenkerne/rnd` | **200** in **103 ms** · `final_rnd 10,5` am Objekt 2026-001 |
+| `POST /rechenkerne/verkehrswert` | **422** — siehe Abschnitt 5 |
+
+> **Bis `v2072a` gab jeder Aufruf 403 „requires an active Pro plan".**
+> Der Grund war keine fehlende Berechtigung, sondern eine Namensliste
+> `PRO_PLAN_IDS = ['pro']` im Server — und `pro` kommt in der Tabelle
+> `subscriptions` gar nicht vor (dort stehen `partner`, `free`,
+> `starter`). Die Liste liess also **niemanden** durch. Jetzt hängt der
+> Zugang am Merkmal `plans.features->api_access`, genau wie das Anlegen
+> eines Schlüssels. **Ein 403 nennt jetzt den gemessenen Plan mit** —
+> wer ihn sieht, muss nicht am Schlüssel suchen.
 
 Der Schlüssel beginnt mit `dpk_live_`. Er ersetzt den
 `Authorization: Bearer …`-Kopf — **beides zusammen ist nicht nötig.**
@@ -72,7 +90,7 @@ GET /objects/portfolio-export
 GET /objects/portfolio-export?fotos=1     # mit Bildern (deutlich größer)
 ```
 
-Antwort (rund **890 KB** bei 23 Objekten, ohne Fotos):
+Antwort (gemessen **655 KB** bei 23 Objekten, ohne Fotos):
 
 ```jsonc
 {
@@ -196,3 +214,97 @@ Ehrlich benannt, damit niemand danach sucht:
   `wissen.portfolio_analyse`.
 - **`price_indices` / `rent_indices`** der Marktbericht-Datenbank sind
   derzeit leer (0 Zeilen, gemessen 10.10.2026).
+
+---
+
+## 5 · Die Rechenkerne (`v2071`)
+
+Zwei Endpunkte nehmen einen Objektdatensatz und geben eine Rechnung
+zurück. Sie heissen so, weil sie **dieselben Kerne** benutzen wie die
+App — nicht eine zweite Rechnung, die irgendwann auseinanderläuft.
+
+```
+GET  /rechenkerne/                 # Verzeichnis: was es gibt und was nicht
+POST /rechenkerne/rnd              # Restnutzungsdauer, rechnet HIER
+POST /rechenkerne/verkehrswert     # Wertermittlung, rechnet im mb-Dienst
+```
+
+### `POST /rechenkerne/rnd` — Restnutzungsdauer
+
+Zwei Eingabeformen, beide gültig:
+
+```jsonc
+{ "objekt": { … } }        // ein DealPilot-Datensatz, z.B. objekte[].daten
+                           // aus dem Portfolio-Export — wird übersetzt
+{ "eingabe": { … } }       // direkt die Kern-Eingabe
+```
+
+Optional `{ "afa": { "gebaeudeanteil": 70, "grenzsteuersatz": 42 } }`
+für den steuerlichen Vergleich.
+
+Gemessen am Objekt `2026-001` (ETW, Baujahr 1962, 100 m²), **200 in
+103 ms**:
+
+```jsonc
+{
+  "kern": "restnutzungsdauer",
+  "eingabe_verwendet": { … },        // was der Kern wirklich gelesen hat
+  "ergebnis": {
+    "final_rnd": 10.5,
+    "final_source": "technische Alterswertminderung (vorrangig)",
+    "verfahren": "technisch",
+    "methods": { "linear": { … }, "vogels": { … }, … },
+    "grenzen": [ { "greift": true, "art": "unter_30_prozent", "text": "…",
+                   "quelle": "Paragraf 185 Abs. 3 Satz 5 BewG" } ],
+    "plausibilitaet": { "mindest_30_prozent": 21, "unterschritten": true,
+                        "afa_satz_pct": 9.52 }
+  }
+}
+```
+
+> **`eingabe_verwendet` zuerst lesen, nicht das Ergebnis.** Dort steht,
+> was aus dem Datensatz geworden ist: die Gesamtnutzungsdauer hängt an
+> `objektTyp` (bei ETW **70**, nicht 80), und die Modernisierungspunkte
+> werden zu `gewerkeBewertung` übersetzt. Zwei Läufe mit verschiedener
+> GND ergeben verschiedene Zahlen, ohne dass einer falsch ist — ich habe
+> genau daran erst einen Rechenfehler vermutet, der keiner war.
+>
+> **`grenzen` ist kein Beiwerk.** Der Kern sagt selbst, wenn ein Wert
+> sachverständig gewürdigt werden muss. Wer nur `final_rnd` übernimmt,
+> verliert die Warnung — und damit die Begründbarkeit.
+
+### `POST /rechenkerne/verkehrswert` — Wertermittlung
+
+Geht an den Marktbericht-Dienst, weil dort das Register der
+Gutachterausschüsse liegt (Liegenschaftszins § 21 Abs. 2,
+Sachwertfaktor § 21 Abs. 3, NHK 2010, Bodenrichtwerte).
+`wert_stufe` 3 ist die Wertermittlung nach ImmoWertV.
+
+> ### ⚠ Gemessen am 10.10.2026: **422, noch nicht nutzbar**
+>
+> ```
+> "Keine Koordinaten – Adresse nicht geokodierbar und keine lat/lon angegeben."
+> ```
+>
+> Die Adresse im Datensatz ist vollständig (`str` „Hermannstraße",
+> `hnr` „9", `plz` „32609", `ort` „Hüllhorst"), und **kein** Objekt im
+> Export führt Koordinaten — Felder dafür gibt es gar nicht. Der Fehler
+> liegt also an der Weitergabe oder am Geokodierer, nicht an den Daten.
+> **Offen und im Backlog**; `/rechenkerne/rnd` und der Export sind davon
+> nicht betroffen.
+
+### Die spätere Bepreisung ist vorbereitet, nicht gebaut
+
+Marcel am 10.10.2026: *„Das brauchen wir jetzt nicht umsetzen."*
+Drei Dinge stehen schon, damit es später eine Zeile bleibt:
+
+1. **Eigener Namensraum** `/rechenkerne/*` — eine spätere Regel greift
+   genau diesen Pfad, ohne andere Endpunkte zu treffen.
+2. **Jeder Aufruf meldet sich** mit Nutzer, Kern und Dauer. Wer
+   abrechnen will, hat die Zählung schon.
+3. **Eine Stelle für die Freigabe:** `_darfRechnen()`. Sie lässt heute
+   jeden Berechtigten durch und ist der einzige Ort, an dem später ein
+   Plan-Merkmal oder ein Admin-Schalter hinein muss.
+
+> Eine Abrechnung, die man später an zwölf Stellen einbauen muss, wird
+> nicht eingebaut. Deshalb steht die Tür schon da — sie ist nur offen.

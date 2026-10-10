@@ -310,8 +310,21 @@ Runway: `linear-gradient(110deg, #E8CC7A, #C9A84C 55%, #b8932f)`.
 **Schriften:** Space Grotesk (Display) · JetBrains Mono (Mono/Labels) ·
 Inter (Body) · Cormorant Garamond (Serif).
 
-**Bildsprache Luftfahrt durchgehend:** Kerosin (KI-Guthaben) · Cockpit ·
-Boarding / QuickBoarding · Co-Pilot · Runway · Pre-Flight · Score-Dial.
+**Bildsprache Luftfahrt durchgehend:** Cockpit · Boarding /
+QuickBoarding · Co-Pilot · Runway · Pre-Flight · Score-Dial.
+
+> **Hier stand bis zum 10.10.2026 „Kerosin (KI-Guthaben)".** Den Begriff
+> gibt es seit **v1176** nicht mehr — `config.js:238` trägt die
+> Überschrift „Kontingente statt Kerosin", die Liter-Pakete darunter
+> sind seit v1183 stillgelegt. Es heißt **Kontingent**, und die Einheit
+> **„Liter" ist mitgefallen.** Marcel am 10.10.2026: *„ich sehe die
+> ganze Zeit irgendwas mit Kerosin. Das haben wir schon lange nicht
+> mehr."* Gemessen stehen noch **77 Treffer im Nutztext in 24 Dateien**,
+> darunter Willkommens-Mail, Kaufbestätigung und Preis-Fenster —
+> Abtragung im Backlog unter **N60.24**. Solange der Begriff hier als
+> Marke geführt wird, baut ihn der nächste Durchgang wieder ein.
+> **Der Rest der Bildsprache bleibt** — abgeschafft ist nur der Name
+> des Guthabens, nicht die Luftfahrt.
 
 **Score-Stufen — die Kette der Objektkarte gilt.** Geschrieben wird die
 Pille in `js/storage.js` von `_scoreLabel()` (Z. 3637, gerufen aus

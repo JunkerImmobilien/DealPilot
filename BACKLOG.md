@@ -713,6 +713,219 @@ oder im **iframe** vorschauen.
 
 ---
 
+#### N60.22 · Der Co-Pilot braucht Pillen mit Standardfragen — und eine Datentiefe-Auskunft
+Marcel, 10.10.2026: *„In der Pilotanalyse unten, wo dann halt auch der
+Co-Pilot sitzt, vielleicht noch ein paar Pillen machen, wo man
+draufklicken kann mit gewissen Standards."*
+
+**Die Frage, die er selbst formuliert** — und die der Co-Pilot heute
+nicht beantworten kann:
+
+> *„Habe ich in meinem Objekt alles angegeben oder würdest du mir
+> vorschlagen, noch Sachen anzugeben?"*
+
+Erwartete Antwort: *„Nee, du hast jetzt alle Pflichtfelder ausgefüllt,
+du hast zum Beispiel auch alle Investor-Deal-Score-Felder, alle KPIs
+ausgefüllt dafür"* — oder eben, **welche fehlen** und *„was könnte man
+noch machen, um weiter in die Tiefe zu gehen."*
+
+**Pillen, die Marcel nennt:** Soll/Ist-Abgleich · *„habe ich die volle
+Datentiefe erreicht"* · *„welche Felder fehlen"*.
+
+> **Der Zweck ist Hilfe, nicht Bericht:** *„dass der Kunde sich darüber
+> auch helfen kann, dass man quasi auch eine Hilfe da drin abbildet."*
+> Eine Pille, die nur eine Zahl nennt, erfüllt das nicht — sie muss
+> sagen, **was der nächste Schritt ist**.
+
+**Feldänderungen direkt aus dem Dialog** nennt Marcel ausdrücklich als
+nachrangig: *„ist jetzt nicht ganz so erheblich."*
+
+**Vor dem Bauen zu klären:** die Datentiefe-Auskunft braucht eine
+Quelle, und die darf **nicht** die dritte Feldliste werden — siehe
+N60.23. Erst dort entscheiden, wer die Pflichtfelder führt, dann hier
+davon lesen.
+
+---
+
+#### N60.23 · Pflichtfelder je Stufe statt einer Liste für alles
+Marcel, 10.10.2026: *„Wir haben jetzt auch unser Tab-Objekt umgebaut
+und haben dort drei Stufen … Unten unter Deal-Aktion haben wir dann
+Bereit für die Bank. Dort sind es aber nur 14 Grundfelder."*
+
+Sein Vorschlag: *„dass wir je nach Stufe verschiedene Grundfelder
+voraussetzen … für die Stufe sind es jetzt, sage ich mal, 14, für die
+Grundstufe sind es dann 28 und für die Stufe 3 so und so viele Felder."*
+
+**GEMESSEN am 10.10.2026** in `frontend/js/deal-action-readycheck.js`:
+
+| | Zahl | Stelle |
+|---|---|---|
+| feste Felder | **15** (nicht 14) | `FIELD_TARGETS`, Z. 23–37 |
+| objektartabhängig | **bis zu 6** | `ART_PFLICHT`, Z. 112 ff. (seit v1841) |
+| `ds2_`-Felder im Formular | **9** | `index.html` |
+
+**Zwei Befunde, die den Umbau begründen:**
+
+1. **Drei Score-Felder prüft der Readycheck überhaupt nicht:**
+   `ds2_marktfaktor`, `ds2_marktmiete`, `ds2_zustand`. Sie stehen im
+   Formular und gehen in den Investor-Deal-Score ein, zählen aber in
+   keinem Fortschrittsbalken mit.
+2. **`mietwachstum` sucht drei IDs, von denen eine nicht existiert**
+   (`ds2_mietwachstum`). Trifft keine der anderen, zählt das Feld gar
+   nicht mit — `fieldState()` gibt dann `exists:false` zurück und der
+   Zähler **überspringt es stillschweigend** (Z. 137).
+
+> **Darin steckt auch die Erklärung für Marcels „14".** Der Zähler zählt
+> nur Felder, die im DOM **vorhanden** sind. Blendet eine Stufe Felder
+> aus, sinkt die Gesamtzahl — die Anzeige sagt dann „14 von 14" und
+> meint gar nicht alle. Das ist genau der Fehler, den v1841 schon
+> einmal behoben hat: *„Eine Vollständigkeitsanzeige, die nicht alles
+> kennt, was gebraucht wird, meldet Vollständigkeit — und das ist
+> schlimmer als keine. Sie beendet die Suche."*
+
+**Deshalb: EINE Quelle, nach Stufe gestaffelt.** Nicht drei Listen
+(Readycheck, Score, Co-Pilot), sondern eine Tabelle, die je Stufe sagt,
+was gebraucht wird — `DealPilotObjektart.pflicht()` ist der Anfang, den
+v1841 schon gemacht hat. N60.22 liest von dort, statt eine vierte
+Liste anzulegen.
+
+**Dazu Marcels Absprung:** *„und dann noch die Pillen, dass man den
+Absprung dahin hat"* — die fehlenden Felder sind heute schon klickbare
+Chips mit Tab-Sprung und Gold-Flash (Z. 14–17). Das trägt.
+
+---
+
+#### N60.24 · „Kerosin" ist abgeschafft und steht noch 77-mal im Nutztext
+Marcel, 10.10.2026: *„ich sehe die ganze Zeit irgendwas mit Kerosin.
+Das haben wir schon lange nicht mehr."*
+
+**Der Nachfolgebegriff ist belegt, nicht geraten:** `config.js:238`
+trägt die Überschrift *„v1176 · Kontingente statt Kerosin"*, die alten
+Pakete darunter sind als *„STILLGELEGT v1183"* markiert. Es heißt
+**Kontingent**, und die Einheit **„Liter" ist mit weggefallen.**
+
+**GEMESSEN am 10.10.2026** (Kommentare abgezogen, Archiv und Entwürfe
+ausgenommen): **77 Treffer im Nutztext, 24 Dateien.** Die teuersten
+zuerst, weil der Kunde sie liest:
+
+| Datei | Nutztext | was der Kunde sieht |
+|---|---:|---|
+| `backend/src/services/welcomeMail.js` | 9 | **die Willkommens-Mail** |
+| `backend/templates/credit-pack-confirmation.html` | 4 | **die Kaufbestätigung** |
+| `frontend/js/pricing-modal.js` | 12 | **das Preis-Fenster** |
+| `backend/src/services/creditPacks.js` | 12 | Paketnamen im Backend |
+| `frontend/js/config.js` | 4 | `kerosin_10/28/90/160`, `label: '10 Liter'` |
+| `frontend/admin/js/admin-stats.js` | 3 | Admin-Auswertung |
+| `frontend/js/kerosin-confirm-lage.js` | 3 | **die Datei heißt so** |
+| `frontend/landing/assets/intro-kerosin.js` | 1 | **die Datei heißt so** |
+| 16 weitere | je 1–3 | |
+
+**Zwei Fallen bei der Abtragung:**
+
+> **1 · Ein grep nach „Kerosin" findet nicht alles.** Die Einheit ist
+> mitgefallen: **„Liter"**, `per_liter`, `gauge_*`, `Kurzstrecke`,
+> `Interkontinental`. Das ist dieselbe Falle wie bei der Währung
+> (`waehrung-steckt-in-der-einheit`) — **die Einheit steckt nicht im
+> Begriff.** Also zusätzlich nach `liter`, `Strecke` und den
+> Flugzeug-Zeichen suchen.
+>
+> **2 · Zwei Dateinamen tragen den Begriff.** Umbenennen heißt: jeden
+> `script src`-Verweis und jeden Cache-Buster mitziehen. Billiger ist,
+> die Datei zu lassen und nur den **Nutztext** darin zu ändern — der
+> Dateiname steht in keiner Oberfläche.
+
+**Was NICHT mitfallen darf:** die Luftfahrt-Bildsprache als Ganze.
+Cockpit, Runway, Pre-Flight, QuickBoarding, Co-Pilot und Score-Dial
+bleiben — abgeschafft ist nur **Kerosin als Name des Guthabens** und
+die Liter-Rechnung darunter. `CLAUDE.md` führt „Kerosin (KI-Guthaben)"
+noch als Markenbegriff und **gehört mit korrigiert**, sonst baut der
+nächste Durchgang ihn wieder ein.
+
+---
+
+#### N60.25 · Drei Texte versprechen das Gegenteil der Kontingent-Regel
+**Marcels Regel, von ihm am 10.10.2026 noch einmal bestätigt:** selbst
+dazugekauftes Kontingent verfällt nicht, monatlich zugeteiltes verfällt.
+
+**GEMESSEN am 10.10.2026 — der Code tut genau das, alle drei Punkte
+erfüllt:**
+
+| Regel | Stand | Nachweis |
+|---|---|---|
+| Gekauftes verfällt nicht | **erfüllt** | `aiCreditsService.js:405-426` Kauf → `*_bank`; alle Bank-Schreiber nur ±1/+n; kein `expires_at` |
+| Monatliches verfällt | **erfüllt** | `_monatsReset` setzt nur `*_used = 0`, kein Übertrag (`:226-232`); der Monatsrest wird gerechnet (`limit − used`, `:261`), nie gespeichert |
+| Verbrauchsreihenfolge | **Monat → Testphase → Gekauftes** | `:337` / `:343` / `:350`, Log-Quellen `monthly`/`trial`/`bonus` |
+
+> **Die Reihenfolge ist die richtige und soll so bleiben:** zuerst wird
+> verbraucht, was ohnehin verfällt. Gekauftes liegt zuletzt — es
+> verliert nie an Wert, also hat es keine Eile.
+
+**Falsch sind die TEXTE.** Drei Stellen behaupten die vor v1296
+geltende Regel, eine davon im laufenden Betrieb sichtbar:
+
+| Stelle | Behauptung |
+|---|---|
+| **`frontend/js/ai-credits.js:183-184`** | **„Nicht genutzte Bewertungen verfallen nicht."** — live im Tooltip-Panel (gerendert über `:232`) |
+| `frontend/landing/fragen.html:154` | „…sie bleiben auf dem Konto, solange das Abo läuft." |
+| `aiCreditsService.js:2-14` + `:308-313` | Dateikopf nennt noch „Bonus-Credits zuerst" und den Übertrag in die Bank |
+
+> **Der zweite Renderer in derselben Datei ist schon korrigiert**
+> (`ai-credits.js:318-320`) — es steht also beides im selben File, und
+> welcher greift, hängt am Weg. Genau deshalb ist es nie aufgefallen.
+
+**Das ist eine Zusage an den Kunden, die das Produkt nicht einhält** —
+und sie steht im Panel, das er beim Nachsehen seines Guthabens öffnet.
+Vor dem nächsten Prod-Rollout zu beheben. Korrekt sind dagegen
+`leistungsumfang.html:1084`, `landing/index.html:451,497`,
+`pricing-plugin.js:206` und `config.js:245-247` — der Wortlaut dort ist
+die Vorlage.
+
+**Drei tote Gutschrift-Pfade, dabei mitgemessen:**
+- `routes/admin.js:1088-1094` schreibt `bonus_credits` — die Spalte ist
+  seit v1183 stillgelegt und wird von `consumeArt`/`getStatus` **nicht
+  gelesen**. Eine Admin-Gutschrift erzeugt also **kein nutzbares
+  Guthaben**. Dasselbe gilt für `aiCreditsService.addBonus()` (`:515`).
+- `services/creditPackWebhook.js:78-85` bucht ebenfalls auf
+  `bonus_credits`. Erreichbar über `POST /credits/checkout` mit einer
+  Nicht-Bewertungs-SKU (`routes/credits.js:135-142` leitet nur
+  Bewertungs-SKUs um). **Ein Kauf über eine Alt-SKU wäre bezahlt und
+  ohne Wirkung.** Das Frontend ruft heute nur Bewertungs-SKUs.
+
+---
+
+#### N60.26 · `/rechenkerne/verkehrswert` gibt 422 — keine Koordinaten
+**GEMESSEN am 10.10.2026** mit gültigem Schlüssel am Objekt `2026-001`:
+
+```
+422 · "Keine Koordinaten – Adresse nicht geokodierbar und
+       keine lat/lon angegeben."
+```
+
+**Nicht die Daten sind schuld.** Die Adresse im Datensatz ist
+vollständig (`str` „Hermannstraße", `hnr` „9", `plz` „32609", `ort`
+„Hüllhorst"), und **kein** Objekt im Portfolio-Export führt
+Koordinaten — Felder dafür gibt es gar nicht.
+
+> **Eine eigene Falle beim Messen, damit sie nicht zweimal kostet:** ein
+> grep nach `/lat|lon/i` über die Feldnamen meldet zwei Treffer —
+> `inv_stellplatz` und `stellplatz_miete_monat`. Beides sind
+> Zufallstreffer im Wort „Stellplatz". **Es gibt kein Koordinatenfeld.**
+
+**Zu prüfen, in dieser Reihenfolge:**
+1. Was `routes/rechenkerne.js` weitergibt: heute
+   `Object.assign({}, body, …)`, also `{ objekt: {…} }` **verschachtelt**.
+   Erwartet `/reports/from-dealpilot` die Adressfelder flach? Die echten
+   Aufrufer sind `frontend/js/dealpilot-mb.js:603` und
+   `dealpilot-mb-qc.js:321` — **deren Nutzlast abschreiben, nicht raten.**
+2. Ob der Geokodierer im mb-Dienst erreichbar und konfiguriert ist.
+3. `lat`/`lon` als optionale Eingabe durchreichen, damit ein Aufrufer
+   mit eigenen Koordinaten nicht am Geokodierer hängt.
+
+`/rechenkerne/rnd` (200 in 103 ms) und der Portfolio-Export (200,
+655 KB) sind davon **nicht** betroffen.
+
+---
+
 #### N60.18 · Der Soll/Ist-Abgleich muss bankfähig werden — und erklären
 Marcel, 10.10.2026: *„Ich finde, du hast das auch schon gut gemacht bei
 der Pilotanalyse mit dem Soll-Ist-Abgleich. Was aber vielleicht auch
