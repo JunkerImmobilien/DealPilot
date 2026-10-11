@@ -1862,6 +1862,57 @@ bewusst seine eigene, kompakte Fassung. **Ich habe nichts nachgeladen.**
 > einzigen Stylesheets, `style.css` ist dort nicht geladen. *Ein iframe
 > erbt nichts*, und eine Korrektur in `style.css` erreicht es nie.
 
+### Befund 3 — der Marktbericht: Layout hält, aber helles Gold auf hellem Grund
+
+**Eigener Lauf, 8 Geräte, 11.10.2026:** 8 von 8 Punkten, Deckung 100 %.
+**Kein Querscroll, keine Schiene, kein Messfehler** — das Layout hält auf
+allen acht Geräten, von iPhone SE bis Desktop breit.
+
+**19 Kontraststellen bei 390 px, schlechteste `k=1,42`:**
+
+| Stellen | k | Text auf Grund | wo |
+|---:|---:|---|---|
+| 2× | **1,42** | `#E8CC7A` auf `rgb(247,243,230)` | `b`, 11,5 px |
+| 1× | **1,53** | `#E8CC7A` auf `rgb(253,252,248)` | `h4`, 13 px |
+| 3× | 1,66 | `rgb(200,200,208)` auf Weiß | `b`, 12,5 px |
+| 4× | 1,97–2,29 | `#C9A84C` auf Creme/Weiß | `span.mbst-kero`, `precPct` |
+
+### Die Ursache ist benannt, nicht geraten
+
+Mit dem Kaskaden-Walker im Dokument gefragt — **eine** Regel setzt die
+Farbe, ohne Inline-Stil:
+
+```css
+.mbst h4 { color: var(--wl-e8cc7a, #E8CC7A) }   /* inline im Dokument */
+```
+
+Das ist das **helle** Gold — gemacht für Obsidian. Und der Marktbericht
+ist **immer hell**: `marktbericht-view.js:mbTheme()` gibt seit `v895e`
+unverändert `'light'` zurück („Marktbericht immer hell").
+
+> **Der `html[data-mb-theme="light"]`-Block überschreibt die Hintergründe
+> mit über zehn `!important`-Regeln — aber nicht die goldenen
+> Textfarben.** Die Hell-Fassung wurde nachgerüstet, die Goldtöne nicht
+> mitgezogen. Genau der Fall „eine Farbe gilt nur zu ihrem Grund": beim
+> Umbau wandert die Fläche mit, die Beziehung nicht.
+
+**Zwei Korrekturen an meiner eigenen Messung, beide während des Laufs:**
+
+- Ich habe gemeldet, `?theme=` werde **gar nicht gelesen**. *Falsch.* Die
+  Seite liest ihn (`index.html:734`), akzeptiert aber nur `light` und
+  `dark`. Ich hatte `obsidian` übergeben — ein Wert aus dem Vokabular der
+  Haupt-App, den sie nicht kennt. `mbTheme()` schickt immer `light`, und
+  das kommt an.
+- `<html data-bg="obsidian">` steht **hart im Markup** (`index.html:2`),
+  und **keine einzige Regel liest es** — es kommt im Dokument genau
+  einmal vor, im Tag selbst. Ein totes Attribut, das behauptet, die Seite
+  sei dunkel. *Es hat mich zuerst in die falsche Richtung geschickt.*
+
+**Gehört in dieselbe Entscheidung wie N60.17/N60.29** (welcher Goldton auf
+hellem Grund). Der Fix ist hier ein Block Regeln im
+`data-mb-theme="light"`-Abschnitt — die goldenen Textfarben mitziehen, so
+wie es die Hintergründe schon tun.
+
 **Hängt an der Kontrast-Entscheidung aus N60.17/N60.29** — derselbe Weg
 sollte hier gelten, sonst sehen Haupt-App und Quick-Check wieder
 verschieden aus.
