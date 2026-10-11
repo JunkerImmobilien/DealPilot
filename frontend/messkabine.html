@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092e</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092f</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1854,16 +1854,35 @@
         /* Kein Reiter heisst: die Seite ist nicht da. Das ist ein Fund,
            kein leeres Ergebnis. */
         if (!btns.length) {
-          z0.funde.push({ wo: v.name + ' @ ' + g[0], art: 'KEINE REITER',
-                          text: 'nav.tabs button.tab findet nichts - Seite nicht geladen?' });
-          z0.punkte++;
-          continue;
+          /* ══ v2092f · EIN DOKUMENT OHNE REITER IST KEIN FEHLER ═══════
+             Der Quick-Check (`quickcheck-app.html`, Titel „DealPilot
+             Boarding") und der Marktbericht sind EIGENE Dokumente im
+             iframe und haben kein `nav.tabs`. Gemessen am 11.10.2026:
+             null Reiter, 3596 px hoch, eine durchgehende Seite.
+
+             Vorher meldete der Laeufer dort neunmal „KEINE REITER" und
+             MASS NICHTS - genau die Antwort, die Marcel nicht wollte
+             („Auch den Marktbericht und alle anderen Tabs und Bereiche
+             vollstaendig?").
+
+             > Ein Pruefstand, der eine Bauart nicht kennt, darf sie nicht
+             > als Fehler melden. Er misst sie einmal am Stueck.
+
+             `btns` bleibt leer, die Schleife laeuft trotzdem EINMAL -
+             `null` steht dann fuer „kein Reiter", und der Name im
+             Protokoll sagt es. */
+          z0.funde.push({ wo: v.name + ' @ ' + g[0], art: 'OHNE REITER',
+                          text: 'eigenes Dokument (' + (zz.d.title || '?').slice(0, 30)
+                                + ') - einmal am Stueck gemessen' });
+          btns = [null];
         }
 
         for (var bi = 0; bi < btns.length; bi++) {
           var b = btns[bi];
-          var rname = (b.getAttribute('data-tab') || b.textContent || '?').trim().slice(0, 18);
-          b.click();
+          var rname = b
+            ? (b.getAttribute('data-tab') || b.textContent || '?').trim().slice(0, 18)
+            : '(ohne Reiter)';
+          if (b) b.click();   /* v2092f: ohne Reiter gibt es nichts zu klicken */
           await warte(pause);
           z0.reiterGesehen++;
 

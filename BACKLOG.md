@@ -134,7 +134,7 @@ Marcels Frage aus N60.5 („erst 44, dann über 80").
 
 </details>
 
-#### N60.2 · WERKZEUG ERWEITERT 10.10.2026 (`v2085`) — die Matrix fehlt noch
+#### N60.2 · Werkzeug `v2085`, Matrix GEFAHREN `v2092`–`v2092e` — Marktbericht und Quick-Check offen
 > ### Vier Achsen statt einer (`v2085`–`v2085b`)
 >
 > **Der Befund vorher:** die Kabine konnte genau EINE Variantenachse
