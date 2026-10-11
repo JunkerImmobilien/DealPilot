@@ -2003,6 +2003,48 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     flex-wrap: wrap !important;
   }
 
+  /* ── v2117a · DER ABRUFEN-KNOPF STAND EINGERUECKT UND RANDVOLL ───────
+     Marcel: „In der Ansicht iPhone 14 Pro Max ist der Abrufen-Button
+     riesig, das ist doch nicht richtig gerendert."
+
+     GEMESSEN bei 430 px:
+
+       .dp-pf-tile   398 x 44  @16     <- alle Kacheln
+       #oab-run      356 x 50  @51     <- der Knopf, 83 % der Breite
+
+     Er ist also WEDER so breit wie die Kacheln NOCH an ihnen
+     ausgerichtet - 35 px eingerueckt und trotzdem fast randvoll. Genau
+     diese Mischung liest sich als „falsch gerendert".
+
+     Die Ursache sitzt nicht am Knopf, sondern an seiner Huelle:
+
+       span.dp-pf-rz   padding: 0 20px   margin-left: 14px
+
+     Beides stammt aus der Schreibtisch-Fassung, wo die Huelle neben
+     anderen Dingen in einer Zeile steht. Im Spaltenmodus hat sie keine
+     Nachbarn mehr - die Einrueckung bleibt trotzdem stehen.
+
+     > Der Block hier setzt fuer jedes Kind `min-width:0` und
+     > `max-width:100%`, aber keine Abstaende. Eine Huelle, die ihre
+     > Zeilen-Abstaende in den Spaltenmodus mitnimmt, richtet ihren
+     > Inhalt an etwas aus, das es dort nicht mehr gibt.
+
+     Der Knopf steht jetzt buendig unter den Kacheln und so breit wie
+     sie - eine Hauptaktion, die zur Spalte gehoert, in der sie steht. */
+  #oab-bar.dp-pfbar .dp-pf-rz,
+  .dp-pf-scroll .dp-pfbar .dp-pf-rz {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+  }
+  #oab-bar.dp-pfbar .dp-pf-rz .dp-pf-launch,
+  .dp-pf-scroll .dp-pfbar .dp-pf-rz .dp-pf-launch {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
   /* ── v1941e · DIESELBE KETTE AUCH AUF DEM HANDY ──────────────────────
      Nach v1941d standen die Kacheln untereinander und 44 px hoch - aber die
      Leiste lief weiter um 14 px ueber (369 > 355). Der Grund ist derselbe wie
