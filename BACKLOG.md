@@ -2551,6 +2551,56 @@ Karten, 11 px Luft.
 > Konstruktion. Ungemessen ist nicht in Ordnung — sie gehoert auf einer
 > Aktenmappen-Ansicht nachgemessen.
 
+### ⚠ Score-Kante: der Name verspricht etwas, das der Code nicht tut
+
+Marcel war hier unsicher (*„weiß ich nicht, die muss da glaube ich nicht
+unbedingt auswählbar sein"*). **Gemessen gibt es einen Grund dafür.**
+
+Über 21 Karten zeigt die Kante genau **zwei** Farben, und sie folgen
+**nicht** dem Score:
+
+| Score | Stufe | Kante |
+|---:|---|---|
+| 79 | GUT | Gold |
+| 69 | SOLIDE | Grün |
+| 64 | SOLIDE | **Gold** |
+| 60 | SOLIDE | **Gold** |
+
+Dieselbe Stufe, verschiedene Farben. Die 8 grünen Karten sind genau die
+8 mit `deal-won`.
+
+**Die Regeln sagen es direkt** (`layout-varianten.css:7213–7216`):
+
+```css
+.sb-card .sbc-top            border-left: 3px solid Gold
+.sb-card.deal-won  .sbc-top  border-left-color: #3FA56C
+.sb-card.deal-lost .sbc-top  border-left-color: #B8625C
+.sb-card .sbc-score-overlay  display: none
+```
+
+> **Der Stil blendet den Score-Ring aus und ersetzt ihn durch einen
+> Streifen, der Gewonnen/Verloren zeigt.** Im Stil „Score-Kante" ist der
+> Score damit **gar nicht sichtbar**. Der Name im Panel lautet
+> *„Score-Kante · Farbiger Strich statt Ring"* — er verspricht den
+> Score, der Code liefert den Deal-Status.
+
+*Das ist dieselbe Klasse wie ein beworbenes Feature ohne Code: die
+Beschriftung behauptet etwas, das die Messung nicht bestätigt. Marcel hat
+es gespürt, ohne es benennen zu können — und genau deshalb lohnt das
+Nachmessen statt des Nachfragens.*
+
+**Zwei ehrliche Wege, und sie schließen sich aus:**
+
+| | |
+|---|---|
+| (a) | Kante nach der **Score-Stufe** färben — über `ScoreTier.stufe()`, die EINE Quelle. Dann tut der Stil, was sein Name sagt. **Kostet den Gewonnen/Verloren-Hinweis**, den die Kante heute trägt. |
+| (b) | Stil aus der Auswahl nehmen, wie Marcel vorgeschlagen hat. |
+
+> (a) ist keine Kleinigkeit: der Won/Lost-Streifen ist die einzige Stelle,
+> an der dieser Stil den Dealstatus zeigt — die Karte hat dort auch kein
+> Band. Eine dritte Möglichkeit (Kante = Score, Status woanders) wäre ein
+> eigener Entwurf.
+
 ### Offen: der eine Punkt, der eine Entscheidung braucht
 
 **3 · Die Auswahl selbst einschränken.** Marcel will Score-Kante und
