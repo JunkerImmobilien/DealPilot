@@ -79,7 +79,13 @@ export function rechne() {
   });
 }
 
-/* ── ab hier nur noch Ausgabe ───────────────────────────────────────── */
+/* ── ab hier nur noch Ausgabe ─────────────────────────────────────────
+   v2101: NUR beim DIREKTEN Aufruf. `kontrast-css-bauen.mjs` importiert
+   `rechne()` von hier — ohne diese Sperre hat der Import die Demo-HTML
+   bei jedem CSS-Lauf neu geschrieben und ihren Bericht mitgedruckt.
+   **Ein Import darf keine Datei anfassen.** */
+const DIREKT = /kontrast-demo-bauen\.mjs$/.test(String(process.argv[1] || ''));
+if (DIREKT) {
 const zeilen = rechne();
 const summe = zeilen.reduce((a, z) => a + z.n, 0);
 const nStatus = zeilen.filter((z) => /Gruen|Rot/.test(z.name)).reduce((a, z) => a + z.n, 0);
@@ -339,3 +345,4 @@ for (const z of zeilen) {
     + '  ->  ' + z.v.hex + ' (-' + String(z.v.prozent).padStart(2) + '%)  '
     + z.kNeu.toFixed(2) + '   ' + z.schlechtester.g + ' = ' + z.schlechtester.k.toFixed(2));
 }
+}   /* Ende von `if (DIREKT)` — siehe die Begruendung weiter oben */

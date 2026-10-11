@@ -95,10 +95,10 @@
        nicht mehr aus einer eigenen Liste je Anzeige. */
     var _k=(window.ScoreTier?window.ScoreTier.classify(score):(score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
     var _w=(window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(score).wort:null;
-    if(_k==='top') return {t:'top', l:_w||'Top', col:'var(--dp-green)'};
-    if(_k==='green') return {t:'hi',  l:_w||'Gut',      col:'var(--dp-green)'};
-    if(_k==='gold') return {t:'mid', l:_w||'Solide',   col:'var(--dp-gold)'};
-    return {t:'lo', l:_w||'Schwach', col:'var(--dp-red)'};
+    if(_k==='top') return {t:'top', l:_w||'Top', col:'var(--dp-green-txt)'};
+    if(_k==='green') return {t:'hi',  l:_w||'Gut',      col:'var(--dp-green-txt)'};
+    if(_k==='gold') return {t:'mid', l:_w||'Solide',   col:'var(--dp-gold-txt)'};
+    return {t:'lo', l:_w||'Schwach', col:'var(--dp-red-txt)'};
   }
   function catBarColor(s){ return s>=70?'var(--dp-green)':s>=50?'var(--dp-gold)':'var(--dp-red)'; }
   function _dl(){return '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>';}
@@ -573,7 +573,9 @@
     })();
     function M(v){ if(v==null||isNaN(v))return '\u2013'; var sg=v<0?'-':''; var a=Math.abs(v); if(a>=1e6) return sg+(a/1e6).toFixed(2).replace('.',',')+'\u00a0Mio\u00a0\u20ac'; return sg+new Intl.NumberFormat('de-DE').format(Math.round(a))+'\u00a0\u20ac'; }
     function P2(v,d){ if(v==null||isNaN(v))return '\u2013'; return v.toFixed(d==null?2:d).replace('.',',')+'\u00a0%'; }
-    var green='var(--dp-green)', gold='var(--dp-gold)', red='var(--dp-red)', ch='var(--dp-card-ch)';
+    /* v2101: die -txt-Toene. `half()` schreibt sie als `color:` (Z. 579),
+       also gilt die Textvariable - die Fuellungen bleiben auf --dp-*. */
+    var green='var(--dp-green-txt)', gold='var(--dp-gold-txt)', red='var(--dp-red-txt)', ch='var(--dp-card-ch)';
     function cfc(v){ return v>=0?green:red; }
     function rcol(v,g,go){ return (v==null||isNaN(v))?ch:(v>=g?green:v>=go?gold:red); }
     function half(l,v,col,sub){ return '<div class="ov-half"><span class="ov-l">'+esc(l)+'</span><div class="ov-v" style="color:'+col+'">'+v+'</div><span class="ov-sub">'+esc(sub)+'</span></div>'; }
@@ -743,7 +745,7 @@
     var esg=esgW>0?esgS/esgW:null;
     var leer=arr.length?sum(function(o){return num(o.leerstand);})/arr.length:null;
 
-    function colByVal(v,good,bad){ if(v==null)return 'var(--dp-card-ch)'; return v>=good?'var(--dp-green)':v>=bad?'var(--dp-gold)':'var(--dp-red)'; }
+    function colByVal(v,good,bad){ if(v==null)return 'var(--dp-card-ch)'; return v>=good?'var(--dp-green-txt)':v>=bad?'var(--dp-gold-txt)':'var(--dp-red-txt)'; }
     function eurM(v){ return (v<0?'-':'')+fmtE(Math.abs(Math.round(v)))+' €'; }
     function cfCol(v){ return v>=0?'var(--dp-green)':'var(--dp-red)'; }
 
@@ -765,7 +767,7 @@
       : {l:'\u00d8-Zinssatz',
         v:avgZins==null?'\u2013':avgZins.toFixed(2).replace('.',',')+'\u00a0%',
         sub:'nach Restschuld gewichtet \u00b7 Klick: Zinsrisiko',
-        col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green)':avgZins<=4.5?'var(--dp-gold)':'var(--dp-red)'),
+        col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green-txt)':avgZins<=4.5?'var(--dp-gold-txt)':'var(--dp-red-txt)'),
         click:'DealPilotDashboard.toggleZins()',
         tip:'Durchschnittlicher Sollzins aller Finanzierungen, gewichtet nach der jeweiligen Restschuld.\nKlick wechselt zum Zinsbindungs-Risiko.'}),
       {l:'DSCR', v:(S.dscr==null?'\u2013':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung', col:(S.dscr==null?'var(--dp-card-ch)':(S.dscr>=1.2?'var(--dp-green)':S.dscr>=1?'var(--dp-gold)':'var(--dp-red)')),
