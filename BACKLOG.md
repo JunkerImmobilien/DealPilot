@@ -2690,17 +2690,52 @@ Nachmessen statt des Nachfragens.*
 > der Kaskaden-Walker" gilt auch dann, wenn man die Regel schon gefunden
 > zu haben glaubt.*
 
-**Zwei ehrliche Wege, und sie schließen sich aus:**
+### ✓ GEBAUT (`v2116`) — und es war nie eine Entscheidung
+
+**Ich hatte hier zwei Wege vorgelegt, die sich angeblich ausschließen:**
+Kante nach Score **oder** nach Status. *Das war eine ungeprüfte
+Annahme, und sie stand als Entscheidungsvorlage vor Marcel.*
+
+**Nachgemessen trägt die Karte beide Status als eigenes Band:**
+`.sbc-won-ribbon` („Won", 53×19 px, **im Stil `kante` sichtbar**, auf 8
+von 21 Karten) und `.sbc-lost-ribbon` (`storage.js:1398`/`1404`).
+
+> **Der Status stand nie nur an der Kante.** Die Umstellung kostet also
+> nichts — es war keine Abwägung, sondern Arbeit, die ich als Frage
+> getarnt hatte. *Eine Entscheidungsvorlage, deren Alternativen sich gar
+> nicht ausschließen, ist keine Vorlage, sondern eine Verzögerung.*
+
+**Gebaut und am laufenden Staging abgenommen, 21 von 21 richtig:**
+
+| Stufe | Farbe | Karten |
+|---|---|---|
+| grün | `rgb(111,203,145)` | 7 |
+| gold | `rgb(201,168,76)` | 9 |
+| rot | `rgb(221,162,158)` | 5 |
+
+**0 falsch.** Score 69 und 58 sind gewonnen und tragen trotzdem Gold,
+weil ihr Score Gold ist — und das „Won"-Band bleibt auf allen 8 Karten.
+
+Die Farben sind die **vorhandenen** aus `style.css:10311–10314`, nicht
+neue: derselbe Ton, den der Ring in dieser Stufe getragen hätte.
+Erreicht über `:has()`, weil die Stufenklasse an `.sbc-mini-score` hängt
+und nicht an der Karte; `display:none` stört nicht, `:has()` sieht den
+DOM. `deal-won`/`deal-lost` bleiben als Rückfall für Karten ohne Score.
+
+### Damit ist aus N60.38 nur noch eine Geschmacksfrage übrig
+
+Marcel wollte Score-Kante und Bordkarte aus der Auswahl nehmen — **weil
+beide nicht taugten**. Beide tun jetzt, was ihr Name sagt:
 
 | | |
 |---|---|
-| (a) | Kante nach der **Score-Stufe** färben — über `ScoreTier.stufe()`, die EINE Quelle. Dann tut der Stil, was sein Name sagt. **Kostet den Gewonnen/Verloren-Hinweis**, den die Kante heute trägt. |
-| (b) | Stil aus der Auswahl nehmen, wie Marcel vorgeschlagen hat. |
+| Bordkarte | `v2115` — Abrisskante aus dem Bild, 0 von 21 |
+| Score-Kante | `v2116` — zeigt den Score, 21 von 21 |
 
-> (a) ist keine Kleinigkeit: der Won/Lost-Streifen ist die einzige Stelle,
-> an der dieser Stil den Dealstatus zeigt — die Karte hat dort auch kein
-> Band. Eine dritte Möglichkeit (Kante = Score, Status woanders) wäre ein
-> eigener Entwurf.
+**Es muss also nichts mehr entfernt werden.** Will Marcel sie trotzdem
+nicht anbieten, ist das reine Geschmackssache und kein Defekt mehr —
+dann fällt je Stil eine Zeile in `objektkarten-stil.js:59` und die Frage
+nach dem Rückfall für jemanden, der ihn schon gewählt hat.
 
 ### Offen: der eine Punkt, der eine Entscheidung braucht
 
@@ -2708,14 +2743,41 @@ Nachmessen statt des Nachfragens.*
 Bordkarte beim Aussehen „DealPilot" **nicht mehr anbieten**.
 
 > ⚠ **Das ist kein CSS, sondern eine Auswahlregel** — und zwar eine,
-> die von zwei Achsen abhängt (Aussehen × Kartenstil). Vor dem Bauen
-> gehört gemessen, **wo die Liste der Kartenstile herkommt** und ob sie
-> überhaupt weiß, welches Aussehen gerade gilt. Eine Vorlage
-> auszublenden, die jemand schon gewählt hat, braucht außerdem einen
-> Rückfall — sonst sieht er nach dem Umschalten eine Karte, die er
-> nicht mehr wählen könnte.
+> die von zwei Achsen abhängt (Aussehen × Kartenstil).
 
-**Und die Gegenprobe gehört dazu:** Marcel hat sechs Stile beurteilt,
+**Gemessen am 11.10.2026, was dafür nötig wäre** (`objektkarten-stil.js`,
+289 Zeilen):
+
+| | |
+|---|---|
+| Kennt es das **Layout**? | ja — `layoutAktiv()` liest `data-dp-layout` |
+| Kennt es das **Aussehen**? | **nein** — `data-ui-theme` kommt im ganzen Modul nicht vor |
+| Wird die Liste neu gebaut? | **nein** — `if (host.getAttribute('data-gebaut') === '1') return;` |
+| Beobachtet es Änderungen? | nur `attributeFilter: ['data-dp-layout']` |
+
+**Daraus folgt konkret, was eine Einschränkung kostet:**
+
+1. Das Modul braucht eine **neue Eingabe** — es weiß heute nicht, welches
+   Aussehen gilt.
+2. Die Liste wird **einmal** gebaut und nie wieder. Eine Regel, die vom
+   Aussehen abhängt, braucht das Verwerfen dieses Zwischenspeichers
+   **und** einen zweiten Beobachter auf `data-ui-theme`. Ohne das zeigt
+   das Panel nach einem Wechsel die Liste des vorherigen Aussehens.
+3. **Der Fußtext wird falsch.** Er lautet heute: *„Wirkt in allen
+   Ansichten. Ohne eigene Wahl zeigt die Aktenmappe die Bordkarte, die
+   Ansicht DealPilot den Aktenreiter."*
+
+   > Direkt darüber steht im Code die Warnung, die genau hier gilt:
+   > *„Ein Hinweis, der einen Fehler beschreibt, lässt ihn wie eine
+   > Absicht aussehen."* Ein Satz, der „wirkt in allen Ansichten" sagt,
+   > während die Liste je Ansicht anders ist, ist dieselbe Falle.
+
+4. **Der Rückfall ist da** (`v2083a`): ohne eigene Wahl zeigt die
+   Aktenmappe die Bordkarte, DealPilot den Aktenreiter. Wer einen
+   ausgeblendeten Stil gewählt hatte, fiele also auf etwas Definiertes
+   zurück — das ist der einzige Teil, der schon steht.
+
+**Und die Gegenprobe gehört dazu:****Und die Gegenprobe gehört dazu:** Marcel hat sechs Stile beurteilt,
 aber das Aussehen hat mehrere Fassungen. Was er für „DealPilot" sagt,
 gilt nicht automatisch für Kontor, Panel, Kanzlei, Boarding, Konsole.
 *Eine Auswahlregel je Paar ist etwas anderes als eine je Stil.*
