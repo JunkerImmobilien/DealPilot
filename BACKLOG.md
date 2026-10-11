@@ -2806,7 +2806,7 @@ Ordnung sind.
 
 ---
 
-#### N60.16 · Kanban ERLEDIGT 10.10.2026 (`v2084`) — Cockpit-Teil offen
+#### N60.16 · ERLEDIGT — Kanban `v2084`, Cockpit `v2098`/`v2099`, Sortierung zurückgenommen
 Marcel, 09.10.2026: *„im Portfolio-Cockpit müssen wir dann natürlich
 auch schauen, dass wir den Bestand passend ergänzen können, also auch
 zwischen Ankauf und allem sinnvoll aufsplitten … Und auch die
@@ -2824,7 +2824,57 @@ Telegram-Bot bekommen beide Stände im Prompt.
 
 | Wo | Was |
 |---|---|
-| Portfolio-Cockpit | Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand** — heute rechnet es nur den laufenden Stand |
+| ~~Portfolio-Cockpit~~ | ~~Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand**~~ — **erledigt `v2099`**, siehe unten |
+
+> ### Summen auf Ankauf oder Bestand (`v2099`)
+>
+> **Gerechnet wird nicht zweimal.** `_ankauf.daten` ist eine
+> **vollständige** Kopie des Datensatzes (`ankauf.js:_datensatzJetzt` —
+> alles außer `_ankauf` selbst und `_thumb`). Also läuft **dieselbe**
+> `aggStats()` einmal über die heutigen und einmal über die
+> eingefrorenen Datensätze.
+>
+> > `kurz` allein hätte **nicht** gereicht: es führt neun Kennzahlen, die
+> > Summen brauchen aber auch `d1`, `d1t`, `san`, `moebl` und ein Dutzend
+> > weitere. Wer die Ankauf-Summen aus `kurz` baut, bekommt
+> > stillschweigend Nullen.
+>
+> **Am laufenden Staging abgenommen** (1280 px, echter Klickweg auf die
+> Kachel):
+>
+> | | Bestand | Ankauf-Stand |
+> |---|---:|---:|
+> | Objekte | 8 | **4** (4 ohne Stand) |
+> | Mieteinnahmen / Monat | 16.172 € | 8.552 € |
+> | Gesamtinvestition | 4,31 Mio € | 2,49 Mio € |
+> | Bruttomietrendite | 4,83 % | 4,55 % |
+> | Cashflow / Monat | −301 € | −1.058 € |
+>
+> ### ⚠ Die beiden Spalten sind KEIN Entwicklungsvergleich
+>
+> **Sie beschreiben verschiedene Objektmengen** — acht gegen vier. Dass
+> rechts 4,55 % und links 4,83 % steht, heißt **nicht**, dass das
+> Portfolio besser geworden ist: links sind vier Objekte mehr dabei.
+>
+> Deshalb nennt die Kachel die Grundmenge im Untertitel („4 von 8 · 4
+> ohne Ankauf-Stand"). **Die Entwicklungsfrage beantwortet die Kachel
+> „Seit Ankauf" (`v2098`)** — die vergleicht je Objekt mit sich selbst.
+> Die Summen beantworten eine andere Frage: *was habe ich gekauft, und
+> was habe ich heute.*
+>
+> ### Zwei Sperren gegen stille Nullen
+>
+> - Der Schalter erscheint **nur**, wenn es Objekte mit eingefrorenem
+>   Stand gibt (`schaltbar`). *Ein Schalter, der nichts tut, ist
+>   schlimmer als keiner.*
+> - Steht der Modus trotzdem auf Ankauf und es gibt **keinen** Stand,
+>   fällt er auf Bestand zurück, statt auf Nullen zu rechnen — *eine
+>   Summe von 0 € wäre eine Behauptung.*
+>
+> Die erste Kachel heißt im Ankauf-Modus auch so („Ankauf-Stand" statt
+> „Bestand"), damit die Überschrift nicht das Gegenteil dessen sagt, was
+> darunter steht.
+
 | ~~Portfolio-Cockpit~~ | ~~Die **Abweichung über den ganzen Bestand**~~ — **erledigt `v2098`**, siehe unten |
 | ~~Kanban~~ | ~~Spalte **Bestand**~~ — **erledigt `v2084`**, siehe unten |
 | ~~Sortierung~~ | ~~Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren~~ — **hat kein Ziel**, gemessen 10.10.2026, siehe unten |
