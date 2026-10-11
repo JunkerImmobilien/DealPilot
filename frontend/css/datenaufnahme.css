@@ -2031,8 +2031,23 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
 
      Der Knopf steht jetzt buendig unter den Kacheln und so breit wie
      sie - eine Hauptaktion, die zur Spalte gehoert, in der sie steht. */
+  /* ⚠ Die Geschwister-Fassung MUSS mitgenannt werden. Mein erster Entwurf
+     listete nur `.dp-pf-rz` - und `padding` und `width` griffen, `margin-left`
+     nicht. Der Walker fand den Grund:
+
+       #oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz { margin-left:14px !important }
+
+     Eine Klasse mehr als meine Fassung, also hoehere Spezifitaet - und ein
+     Medienblock aendert daran nichts, Media-Queries zaehlen nicht mit.
+     Gemessen blieb der Knopf deshalb bei x=31 statt x=16, waehrend Breite
+     und Polsterung laengst stimmten.
+
+     > Eine Regel, die zur HAELFTE greift, ist schwerer zu sehen als eine,
+     > die gar nicht greift: die Haelfte, die wirkt, sieht aus wie Erfolg. */
   #oab-bar.dp-pfbar .dp-pf-rz,
-  .dp-pf-scroll .dp-pfbar .dp-pf-rz {
+  #oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz,
+  .dp-pf-scroll .dp-pfbar .dp-pf-rz,
+  .dp-pf-scroll .dp-pfbar .dp-pf-qr + .dp-pf-rz {
     margin-left: 0 !important;
     margin-right: 0 !important;
     padding-left: 0 !important;
