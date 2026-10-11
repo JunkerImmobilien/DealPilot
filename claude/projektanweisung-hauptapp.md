@@ -36599,3 +36599,63 @@ war falsch. Gemessen 5.283 ms und 8.093 ms ohne jeden Flicken; die
 Messkabine nutzt rAF nirgends selbst, sie wartet ueber MessageChannel.
 Ursache war ein nach CDP-Zeitueberlauf noch LAUFENDES lade(), das mit dem
 neuen Lauf ueberlappte - ein Bedienfehler, kein Werkzeugfehler.
+
+---
+
+## Rollout-Journal 11.10.2026 — v2106-v2108: Marcels zwei Zurufe, und eine Demo statt einer Frage
+
+| Paket | Was | Commit | Nachweis (live gemessen) |
+|---|---|---|---|
+| v2106 | Demo zu N60.35: die zwei Wege der Farbregler | 244f0876 | frontend/farbregler-demo.html, Gold-Probe RC=0 |
+| v2107 | Score zurueck nach oben, wo das Kachelband steht | ac43179b | Ueberschneidung 22 px -> **0** |
+| v2107a | kennzahlen mit eigenem Wert | 9391e9dd | Pille 86-111, Kachel ab 114 -> **0** |
+| v2108 | Ankauf-Erklaerkasten faellt, Text in den title | 9391e9dd | Host **17 px**, Checkbox bedienbar |
+
+### Erst eine Demo, nicht eine Frage
+
+Ich hatte zu N60.35 geschrieben: *"ich baue dir eine Demo, wenn du sagst
+welche Richtung"*. **Das war ein Stehenbleiben** - CLAUDE.md sagt bei Optik
+ohne klare Vorgabe ausdruecklich "Demo bauen und zeigen", nicht fragen.
+Jetzt steht sie: drei Karten nebeneinander mit Farbwaehler, und je Karte
+wird der Kontrast der Skalenbeschriftung MITGERECHNET - gegen beide Enden
+des Verlaufs, der schlechtere gewinnt.
+
+**Zwei Korrekturen an meiner eigenen Warnung:** der Kopf traegt keinen
+Runway, sondern linear-gradient(rgb(15,15,15), rgb(2,2,2)) - das
+Markenargument galt dort nicht. Und die Karte hat gar keine eigene
+Hintergrundfarbe; was man dafuer haelt, ist ausschliesslich der Verlauf.
+
+### Der Score: Marcels eigene Vorgabe, teilweise zurueckgenommen
+
+v1943 kam aus seinem Satz vom 07.10.2026: *"Den score und die
+schaltflaechen muessen IMMER mittig angeordnet sein."* Am 11.10. mit Bild:
+im DealPilot-Stil passt das nicht.
+
+**Beides stimmt, und der Grund ist messbar:** die Kartenstile blenden das
+Kachelband aus, die Karte wird kurz, mittig ist dort richtig. Nur wo das
+Band steht, legt sich der Score darauf - 22 px, genau wo in seinem Bild
+die Pille "GUT" auf der BMR-Kachel liegt. Die Vorgabe war nicht falsch,
+sie war zu weit gefasst.
+
+Gegenprobe: ampel und datenzeile bleiben mittig (0 px zur Kartenmitte),
+kante hat das Overlay ohnehin nicht auf der Karte.  bleibt
+mittig - danach hat er nicht gefragt.
+
+> **Gemessen wird die PILLE, nicht der Overlay-Kasten.** Der Kasten ist
+> hoeher als das Sichtbare und meldet einen Fehler, wo keiner ist. Und bei
+>  am Band ist dessen Rechteck ohne Aussage - ein
+> Ueberschneidungswert daraus ist Messmuell, kein Befund.
+
+### Der Ankauf-Kasten: Text weg, Funktion bleibt
+
+Weg ist der Erklaertext. Geblieben ist die Freigabe-Checkbox - sie ist
+keine Aufklaerung, sondern der EINZIGE Weg, den eingefrorenen Stand zum
+Bearbeiten zu oeffnen. Ohne sie waere die Ankauf-Ansicht eine Sackgasse.
+
+Live: Host 17 px statt eines Kastens mit Rand und Schatten, kein
+Hintergrund, rechtsbuendig, cursor:help. Und die Checkbox ist WIRKLICH
+bedienbar - elementFromPoint auf ihrem Mittelpunkt liefert
+INPUT#ank-freigabe, nichts liegt darueber.
+
+**Dabei gefunden:** ankauf-ansicht.js hatte kein esc(). Mein
+title-Einbau haette beim Rendern geworfen, und node --check sieht das nie.
