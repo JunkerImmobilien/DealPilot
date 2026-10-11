@@ -2471,6 +2471,73 @@ die Knöpfe behalten will.
 
 ---
 
+#### N60.38 · Welche Kartenstile das Aussehen „DealPilot" verträgt (11.10.2026)
+
+**Marcel, nachdem er die Darstellung durchprobiert hat:**
+
+| Kartenstil | sein Urteil |
+|---|---|
+| **Kennzahlen** | geht |
+| **Minimal** | geht |
+| **Datenzeile** | *„geht zum Beispiel auch super, die sieht prima aus"* |
+| **Aktenreiter** | geht — **aber der Score ist runtergerutscht**, *„das hatten wir früher mal anders, das bitte wieder hochsetzen"* |
+| **Score-Kante** | *„muss da glaube ich nicht unbedingt auswählbar sein"* |
+| **Bordkarte** | *„muss jetzt auch nicht unbedingt auswählbar sein — es sei denn wir würden diesen Abriss vor das Bild optisch hinbekommen, weil das passt jetzt nicht, da läuft die Abrisskante durch das Bild"* |
+
+### Erledigt: der Score der großen Karte (`v2114`)
+
+Der Teil seiner Nachricht, der die **normale** Objektkarte betrifft, ist
+gebaut. **Aus der Versionsgeschichte geholt**, wie er es verlangt hat
+(*„Können wir irgendwie aus den früheren Versionsständen mal rausholen,
+wie wir das auf der normalen Objektkartei früher angezeigt haben?"*):
+
+```
+f843cc8d~1  — der Stand VOR v1924 „Score und Aktionen auf eine Höhe"
+
+  aside.sidebar .sb-card .sbc-actions        top:  6px   <- Knöpfe oben
+  aside.sidebar .sb-card .sbc-score-overlay  top: 38px   <- Score darunter
+```
+
+> **Und das erklärt, warum mein `v2107` ihn gestört hat:** ich hatte nur
+> den **Score** auf 38 px gesetzt und die **Knöpfe mittig gelassen**.
+> Dann liegt der Duplizieren-Knopf weiter auf dem Ring — genau der graue
+> Bereich, über den er sich danach beschwert hat. *Eine Staffelung hat
+> zwei Teile; einen davon wiederherzustellen stellt sie nicht wieder her.*
+
+Nach `v2114` gemessen, drei Karten: Knöpfe 7–29, Ring 39–89, Pille
+94–119, Band ab 123 — **0 px Überschneidung**, überall.
+
+### Offen: drei Punkte, die noch gemessen werden müssen
+
+**1 · Aktenreiter: der Score ist runtergerutscht.** Er sagt, das war
+früher anders. Derselbe Weg wie oben: in der Geschichte nachsehen, was
+dort galt, **bevor** `v1928` („senkrecht mittig, in allen sieben
+Kartenstilen") es vereinheitlicht hat. Nicht neu erfinden.
+
+**2 · Bordkarte: die Abrisskante läuft durchs Bild.** Das ist ein
+messbarer Befund, kein Geschmack — die Kante und das `.sbc-thumb`
+überschneiden sich. Erst messen, wo die Kante gezeichnet wird
+(Pseudoelement? eigener Knoten?), dann entscheiden: davorlegen oder den
+Stil aus der Auswahl nehmen.
+
+**3 · Die Auswahl selbst einschränken.** Marcel will Score-Kante und
+Bordkarte beim Aussehen „DealPilot" **nicht mehr anbieten**.
+
+> ⚠ **Das ist kein CSS, sondern eine Auswahlregel** — und zwar eine,
+> die von zwei Achsen abhängt (Aussehen × Kartenstil). Vor dem Bauen
+> gehört gemessen, **wo die Liste der Kartenstile herkommt** und ob sie
+> überhaupt weiß, welches Aussehen gerade gilt. Eine Vorlage
+> auszublenden, die jemand schon gewählt hat, braucht außerdem einen
+> Rückfall — sonst sieht er nach dem Umschalten eine Karte, die er
+> nicht mehr wählen könnte.
+
+**Und die Gegenprobe gehört dazu:** Marcel hat sechs Stile beurteilt,
+aber das Aussehen hat mehrere Fassungen. Was er für „DealPilot" sagt,
+gilt nicht automatisch für Kontor, Panel, Kanzlei, Boarding, Konsole.
+*Eine Auswahlregel je Paar ist etwas anderes als eine je Stil.*
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
