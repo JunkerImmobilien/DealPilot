@@ -134,7 +134,7 @@ Marcels Frage aus N60.5 („erst 44, dann über 80").
 
 </details>
 
-#### N60.2 · Werkzeug `v2085`, Matrix GEFAHREN `v2092`–`v2092e` — Marktbericht und Quick-Check offen
+#### N60.2 · ERLEDIGT — Werkzeug `v2085`, Matrix gefahren `v2092`–`v2092f`: Haupt-App, Quick-Check UND Marktbericht
 > ### Vier Achsen statt einer (`v2085`–`v2085b`)
 >
 > **Der Befund vorher:** die Kabine konnte genau EINE Variantenachse
