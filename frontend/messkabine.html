@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092f</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092g</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -457,7 +457,41 @@
     /* Erster Vorfahr mit Fläche; durchsichtige Schichten werden von hinten
        nach vorn übereinandergemalt. Weiß ist der Anfang — das Blatt. */
     var p = el, stapel = [], unmessbar = null, hatVerlauf = false;
-    /* v2065: Zuerst sehen, ob ein Vorfahr seinen Grund per Pseudoelement
+
+    /* ══ v2092g · DER EIGENE GRUND KOMMT ZUERST ═════════════════════════
+       GEMESSEN am 11.10.2026: `span.shr-stub-lab` trug nach v2101b
+       `background: rgb(26,23,20)` — deckend und dunkel, direkt am
+       Element. `effGrund` meldete trotzdem **rgb(255,255,255)** und
+       damit Kontrast 1,88 statt rund 8.
+
+       Die Ursache stand gleich darunter: die v2065-Schleife fragte bis zu
+       DREI Vorfahren nach einem Pseudoelement-Grund und kehrte beim
+       ersten Treffer zurueck — bevor der eigene Hintergrund des Elements
+       ueberhaupt angesehen wurde.
+
+       > Physikalisch ist das verdreht. Das ::before eines Vorfahren liegt
+       > ueber DESSEN Hintergrund, aber UNTER dem eigenen Hintergrund des
+       > Kindes. Wer zuerst den Vorfahren fragt, malt in der falschen
+       > Reihenfolge.
+
+       Deshalb steht jetzt der eigene, deckende Grund VOR der
+       Pseudoelement-Suche. Ohne Hintergrundbild, denn ein Bild koennte
+       darueber liegen — dann gilt weiter der alte Weg.
+
+       **Diese Messung war also an jedem Element falsch, das einen eigenen
+       deckenden Hintergrund hat** — bei `.ds2-tag` in v2089 kam die
+       richtige Zahl nur heraus, weil die Pruefung dort `cs.backgroundColor`
+       selbst gelesen hat und nicht `effGrund`. */
+    try {
+      var eig = win.getComputedStyle(el);
+      if ((!eig.backgroundImage || eig.backgroundImage === 'none')
+          && ist_deckend(eig.backgroundColor)) {
+        var ec = eig.backgroundColor.match(/[\d.]+/g) || [255, 255, 255];
+        return { r: +ec[0], g: +ec[1], b: +ec[2], a: 1, quelle: 'eigener Grund' };
+      }
+    } catch (e) {}
+
+    /* v2065: Danach, ob ein Vorfahr seinen Grund per Pseudoelement
        stellt - das liegt ÜBER seinem eigenen Hintergrund. */
     var pp = el.parentElement, tiefe = 0;
     while (pp && tiefe++ < 3) {
