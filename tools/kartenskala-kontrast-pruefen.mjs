@@ -168,7 +168,11 @@ console.log('\n=== 4 · Kommt es im Browser an? ===');
 for (const [blatt, re] of [['style.css', /css\/style\.css\?v=([^"']+)/],
                            ['ui-varianten.css', /css\/ui-varianten\.css\?v=([^"']+)/]]) {
   const m = idx.match(re);
-  melde(!!m && m[1] === 'v2104', blatt + ': Buster ist ' + (m ? m[1] : 'FEHLT') + ' (soll v2104)');
+  /* Auf die FAMILIE pruefen, nicht auf eine Zahl: `v2104b` ist richtig und
+     waere an `=== 'v2104'` gescheitert. Ein Pruefer, der bei jedem
+     Nachpaket rot wird, obwohl der Buster stimmt, wird abgestellt. */
+  melde(!!m && /^v21[0-9][0-9]/.test(m[1]),
+    blatt + ': Buster ist ' + (m ? m[1] : 'FEHLT') + ' (soll v2104 oder neuer)');
 }
 
 /* ── 5 · Kein Ton traegt dunkel UND hell ────────────────────────────── */

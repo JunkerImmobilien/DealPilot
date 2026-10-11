@@ -2064,24 +2064,89 @@ gar nicht steht**, und wurde rot, *bevor* etwas ausgerollt war.
 > (`{…}` ohne `}` darin) und sucht **darin** — ein Suchausdruck, der
 > über die Blockgrenze läuft, misst die nächste Vorlage.
 
-### ⚠ Was strukturell offen bleibt
+### ⚠ `v2105` GEBAUT UND ZURÜCKGEROLLT — derselbe Fehler, eine Stunde später
 
-Jede der acht Fassungen ist gegen **einen** Grund geprüft — den, den der
-Kartenregler in seiner Vorgabe liefert. **Die Kartenfläche ist aber eine
-eigene Achse:** `--dp-obj-card`, von `ui-varianten.js:1380/1454`
-**inline** gesetzt (Merker `dp_obj_ui`). Sie gehört nicht zur Vorlage.
+Der strukturelle Befund von oben lautete: die Kartenfläche ist eine eigene
+Achse (`--dp-obj-card`), und `dp_obj_ui` ist ein **freier Farbwähler**
+(`_dpDispObj`, Vorgabe `#F6F2E9`) — der Nutzer kann die Objektkarte auf
+jede Farbe stellen. Ein fester Ton je Vorlage kann das nicht abdecken.
 
-> Ein Ton je Vorlage kann deshalb **grundsätzlich nicht** für beide
-> Kartenfarben stimmen. Stellt der Nutzer den Regler um, wandert der
-> Grund — und `--uv-card-mut` ist dann für die andere Richtung gebaut.
-> Genau dieser Widerspruch steckt schon in `v1108`: dort wurde panels
-> Token **abgedunkelt** „weil der kühle Grauton auf heller Fläche zu
-> blass ist" — eine Begründung, die eine helle Karte voraussetzt.
+**Also habe ich den Ton abgeleitet.** Mit dem vorhandenen Kern, ohne
+zweiten Rechenweg: `DealPilotConfig.branding.tonFuerGrund(ton, grund,
+min)` — derselbe, den `whitelabel-override.js` für `--uv-sc-*` benutzt,
+und zwar mit genau derselben Basis `#a8a299`. Eine Stelle setzte
+`--dpuv-obj-mut`, der Rückbau räumte es ab, vier CSS-Stellen lasen es mit
+gestaffeltem Rückfall. Der Prüfer lud `config.js` in einem `vm`-Kontext
+und bestätigte 4,5 gegen neun echte Kartenfarben. **35 Punkte, RC=0.**
 
-**Offen: fünf Vorlagen × die Kartenstufen, als Messung, nicht als
-Rechnung.** Erst danach ist entscheidbar, ob `--uv-card-mut` überhaupt
-der richtige Ort ist — oder ob diese Beschriftungen einen Ton brauchen,
-der an der **Kachel** hängt statt an der Vorlage.
+#### Dann live gemessen, und es war schlechter als vorher
+
+Über den echten Bedienweg (`_dpDispObj('#C9A84C')`, die umhüllte
+Reglerfunktion):
+
+| Kartenfarbe gewählt | Token abgeleitet | **gemessener Grund** | k |
+|---|---|---|---:|
+| — (Vorgabe) | nicht gesetzt | `rgb(13,11,8)` | **4,80** |
+| `#C9A84C` Gold | `#403b33` | `rgb(13,11,8)` | **1,77** |
+| `#0d0b08` dunkel | `#a8a299` | `rgb(13,11,8)` | **7,76** |
+
+> **Die gewählte Kartenfarbe ist nicht der Grund, auf dem die
+> Beschriftungen liegen.** In der Grundfassung liest `.sb-card` das Token
+> `--dp-obj-card` überhaupt nicht — das tut nur `body.dp-chrome-hell`
+> (`style.css:36164`). Der Verlauf bleibt `rgb(13,11,8)`, egal was der
+> Regler sagt. Mein abgeleiteter Ton war für eine Goldfläche gerechnet
+> und lag auf Obsidian: **1,77 statt 4,80.**
+
+**`v2105` ist zurückgerollt** (`a78de89b`). Der Stand von `v2104b` ist
+gemessen und hält in allen acht Fassungen.
+
+#### Die Lehre, und sie ist dieselbe wie zwei Pakete vorher
+
+> Ich habe gegen einen **angenommenen** Grund abgeleitet — genau das, was
+> ich bei den fünf Vorlagen eine Stunde zuvor zurückgenommen hatte. Der
+> Unterschied: diesmal war die Annahme in **Code** gegossen, nicht in eine
+> Tabelle. Ein Prüfer mit 35 grünen Punkten hat sie nicht gefunden, weil
+> er die Ableitung geprüft hat und nicht den Ort, an dem sie landet.
+
+**Zwei gleiche Fehler hintereinander** — nach CLAUDE.md ist das das
+Signal, die Sitzung abzuschließen, nicht einen dritten Anlauf zu nehmen.
+
+#### Was wirklich zu messen ist, bevor hier nochmal etwas gebaut wird
+
+Nicht „welchen Ton braucht welche Vorlage", sondern:
+
+1. **Wo greift `--dp-obj-card` überhaupt?** Gemessen ist bisher nur, dass
+   es in der Grundfassung **nicht** greift. In welchen Fassungen färbt der
+   Regler die Karte wirklich — und in welchen ist er ohne Wirkung?
+2. **Ein Regler ohne Wirkung ist selbst ein Befund.** Wenn „Objektkarten"
+   im Panel in der Grundfassung nichts tut, verspricht die Oberfläche
+   etwas, das sie nicht hält. Das ist ein größerer Punkt als der Kontrast.
+3. Erst danach ist entscheidbar, ob der Ton aus der gewählten Farbe
+   abgeleitet werden darf — **und ob der Grund überhaupt vom Regler
+   abhängt.**
+
+### Nachtrag: der „Werkzeugfehler" existiert nicht
+
+Ich hatte notiert: *„`lade()` hängt im verborgenen Fenster, weil es `rAF`
+nur im iframe umlegt."* **Das ist falsch und zurückgenommen.** Die
+Messkabine benutzt `rAF` nirgends selbst (drei Treffer, alle in
+`rafErsatz`/`rafProbe` und alle auf das *Zielfenster*), und gemessen:
+
+| Lauf | Dauer | Flicken |
+|---|---:|---|
+| `lade()` Grundfassung | **5.283 ms** | keiner |
+| `lade()` kontor | **8.093 ms** | keiner |
+
+`lade()` löst über `warte(3600)` auf — eine Dauerschleife über
+`MessageChannel`, die die Hintergrund-Drosselung **absichtlich** umgeht
+(`setTimeout(…,200)` dauerte dort gemessen 12.071 ms). Das Werkzeug ist
+in Ordnung.
+
+**Die wahre Ursache meines hängenden Sechser-Laufs:** ein nach
+CDP-Zeitüberlauf noch **laufendes** `lade()` überlappte mit dem neuen
+Lauf — zwei gleichzeitige `lade()` auf einem iframe. Das steht wörtlich in
+meiner Notiz `zeitueberlauf-ist-kein-abbruch`, und ich habe es trotzdem
+getan. *Kein Backlog-Punkt, ein Bedienfehler.*
 
 ### Nebenbei zwei Werkzeugfunde
 
