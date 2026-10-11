@@ -1557,7 +1557,10 @@
       '  flex-wrap:wrap;margin-bottom:13px}',
       '.sk-titel{font:600 15px/1.2 "Space Grotesk",Inter,sans-serif;color:var(--dp-text,inherit)}',
       '.sk-art{font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.09em;',
-      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);',
+      /* v2101b: Weg (c) - `.sk-art` ist eine Pille, kein Fliesstext.
+         Der Ton bleibt, der Grund wird dunkel (wie `.ds2-tag`, v2089). */
+      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);background:#1A1714;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);',
       '  border-radius:999px;padding:5px 10px;white-space:nowrap}',
       '.sk-art-kst{color:#7A9CC6;border-color:rgba(122,156,198,.34)}',
       /* Kacheln: gleiche Breite, gleiche Grundlinie — eine Reihe, kein Flickenteppich */
@@ -1566,7 +1569,9 @@
       '.sk-k-l{font:500 10.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;',
       '  text-transform:uppercase;color:var(--dp-muted,#7A7370);margin-bottom:4px}',
       '.sk-k-v{font:600 15px/1.2 Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--dp-text,inherit)}',
-      '.sk-k-akzent .sk-k-v{color:var(--wl-c9a84c,#C9A84C)}',
+      /* v2101b: Weg (a). Gemessen 2,23 auf rgb(253,252,250). Der
+         gestaffelte Rueckfall haelt das Gold ausserhalb des Cockpits. */
+      '.sk-k-akzent .sk-k-v{color:var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C))}',
       '.sk-k-gut .sk-k-v{color:#3FA56C}',
       '.sk-k-schlecht .sk-k-v{color:#B8625C}',
       '.sk-box{height:260px;margin-bottom:14px}',
@@ -1597,7 +1602,8 @@
       '.sk-gruen{color:#3FA56C}',
       '.sk-rot{color:#B8625C}',
       '.sk-satz{white-space:nowrap;color:var(--dp-muted,#7A7370)}',
-      '.sk-satz b{color:var(--wl-c9a84c,#C9A84C);font-weight:600}',
+      /* v2101b: Weg (a), gemessen 2,23 bei 8 Traegern. */
+      '.sk-satz b{color:var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C));font-weight:600}',
       '.sk-pfeil{color:#3FA56C;font-weight:700;margin-left:5px}',
       '.sk-fuss{margin-top:11px;padding-top:10px;border-top:1px solid rgba(122,115,112,.12);',
       '  font-size:11.5px;line-height:1.55;color:var(--dp-muted,#7A7370)}',
