@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2092g</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2125</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1599,8 +1599,21 @@
   }
 
   /* Der ganze Durchlauf. `vorher` darf eine Ansicht oeffnen. */
-  async function pruefeAnsicht(breite, hoehe, vorher, name){
-    await lade(breite, '', hoehe);
+  /* ── v2125 · DER PRUEFER KONNTE NUR "HEUTE" ────────────────────────
+     Hier stand `lade(breite, '', hoehe)` - die Fassung wurde FEST auf
+     "Heute" gesetzt. Marcel arbeitet aber in der **Aktenmappe**
+     (`v1b`), und die Datenaufnahme-Befunde vom 11.10.2026 lagen alle
+     dort: der 1263-px-Ueberlauf auf dem iPad war in `v1b`, nicht in
+     "Heute".
+
+     > Ein Pruefer, der nur eine Fassung kennt, meldet null Befunde fuer
+     > die Fassung, die der Nutzer sieht - und wirkt dabei gruen.
+
+     `layout` und `extra` reisen jetzt mit und reichen bis `lade()`
+     durch. Ohne Angabe bleibt es bei "Heute", damit alte Aufrufe
+     dasselbe messen wie vorher. */
+  async function pruefeAnsicht(breite, hoehe, vorher, name, layout, extra){
+    await lade(breite, layout === undefined ? '' : layout, hoehe, extra);
     var z = ziel(), d = z.d, win = z.win;
     var geoeffnet = null;
     if (typeof vorher === 'function') { try { geoeffnet = vorher(win, d); } catch (e) { geoeffnet = 'Fehler: '+e; } }
@@ -1624,7 +1637,7 @@
     if (sc) sc.scrollTop = 0; else win.scrollTo(0,0);
     var u = apUeberlauf(d, win);
     return {
-      ansicht: name || d.title, v: win.innerWidth+'x'+win.innerHeight,
+      ansicht: name || d.title, fassung: (layout===undefined?'(Heute)':(layout||'(Heute)')), achsen: extra||null, v: win.innerWidth+'x'+win.innerHeight,
       geoeffnet: geoeffnet, scroller: sc ? apNam(sc) : '(Fenster)',
       deckung: gesehen+' geprueft / '+eingek+' eingeklappt / '+schritte+' Abschnitte',
       verdaechtig: verd.length, nichtErreichbar: echt.length, liste: echt.slice(0,8),
