@@ -226,6 +226,34 @@
   function toggleCf(){ _cfMode = (_cfMode === 'vs') ? 'ns' : 'vs'; try{ renderOverview(); }catch(e){} }
   var _giMode = 'mit'; /* v886-dash: 'mit' = Gesamtinvestition inkl. NK | 'ohne' = nur Kaufpreis */
   function toggleGi(){ _giMode = (_giMode === 'mit') ? 'ohne' : 'mit'; try{ renderOverview(); }catch(e){} }
+
+  /* ══ v2099 · SUMMEN WAHLWEISE AUF ANKAUF ODER BESTAND ════════════════
+     Backlog N60.16: „Summen und Kennzahlen wahlweise auf Ankauf oder
+     Bestand - heute rechnet es nur den laufenden Stand."
+
+     GERECHNET WIRD NICHT ZWEIMAL. `_ankauf.daten` ist eine VOLLSTAENDIGE
+     Kopie des Datensatzes (`ankauf.js:_datensatzJetzt` - alles ausser
+     `_ankauf` selbst und `_thumb`). Also laeuft dieselbe `aggStats()`
+     einmal ueber die heutigen und einmal ueber die eingefrorenen
+     Datensaetze. Eine eigene Ankauf-Summenrechnung waere eine zweite
+     Wahrheit - und `kurz` allein haette dafuer nicht gereicht: es fuehrt
+     neun Kennzahlen, die Summen brauchen aber auch `d1`, `d1t`, `san`,
+     `moebl` und ein Dutzend weitere.
+
+     DIE GRUNDMENGE WECHSELT MIT, und das muss dastehen: Objekte ohne
+     eingefrorenen Stand fallen im Ankauf-Modus heraus. Eine Summe ueber
+     vier von acht Objekten, die aussieht wie eine ueber acht, ist
+     falsch - `doppelkarte.js` sagt es fuer die Karten schon so: „eine
+     Karte, die im Ankauf-Modus ihre HEUTIGEN Zahlen zeigt, ohne das zu
+     sagen, waere eine Luege im Nebensatz."
+
+     Der Schalter erscheint nur, wenn es ueberhaupt etwas zu schalten
+     gibt - ein Schalter, der nichts tut, ist schlimmer als keiner. */
+  var _standMode = 'bestand';   /* 'bestand' | 'ankauf' */
+  function toggleStand(){
+    _standMode = (_standMode === 'bestand') ? 'ankauf' : 'bestand';
+    try{ renderOverview(); }catch(e){}
+  }
   /* v475: Objekt-Auswahl im Cockpit. -1 = alle aggregiert, sonst Index in wonList()/detailArr(). */
   var _dashSelIdx = -1;
   function selectObject(v){
@@ -463,6 +491,31 @@
   /* ══ v456: Portfolio-Uebersicht (Bestands-Hardfacts, aggregiert) ══ */
   function aggStats(alleTrotzAuswahl){
     var arr=detailArr(alleTrotzAuswahl);
+    /* v2099: im Ankauf-Modus rechnet dieselbe Aggregation ueber die
+       EINGEFRORENEN Datensaetze. `stand` reist mit, damit die Kacheln
+       sagen koennen, worueber gerechnet wurde - siehe Begruendung an
+       `toggleStand()`. */
+    var _standN = 0;
+    for (var _i = 0; _i < arr.length; _i++) {
+      if (arr[_i] && arr[_i]._ankauf && arr[_i]._ankauf.daten) _standN++;
+    }
+    var stand = { modus: _standMode, gesamt: arr.length,
+                  mitStand: _standN, genutzt: arr.length, ohne: 0,
+                  schaltbar: _standN > 0 };
+    if (_standMode === 'ankauf' && _standN > 0) {
+      var _frozen = [];
+      arr.forEach(function(o){
+        if (o && o._ankauf && o._ankauf.daten) _frozen.push(o._ankauf.daten);
+      });
+      stand.genutzt = _frozen.length;
+      stand.ohne = arr.length - _frozen.length;
+      arr = _frozen;
+    } else if (_standMode === 'ankauf') {
+      /* Kein Objekt mit Stand: NICHT auf Nullen rechnen. Der Modus faellt
+         zurueck und sagt es - eine Summe von 0 EUR waere eine Behauptung. */
+      stand.modus = 'bestand';
+      stand.zurueckgefallen = true;
+    }
     var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
     var kpSum=sum(_kpEuro);
     var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san)+num(o.moebl);});
@@ -498,7 +551,11 @@
       tilgJ:tilgSum, zinsJ:zinsSum, kdJ:kdSum,
       brutto:(kpSum>0?(mieteJ/kpSum*100):null),
       netto:nettoCalc,
-      dscr:(kdSum>0?(mieteJ/kdSum):null)
+      dscr:(kdSum>0?(mieteJ/kdSum):null),
+      /* v2099: worueber gerechnet wurde. Ohne dieses Feld koennten die
+         Kacheln die Grundmenge nicht nennen - und eine Summe ueber vier
+         von acht Objekten, die aussieht wie eine ueber acht, ist falsch. */
+      stand:stand
     };
   }
   function renderOverview(){
@@ -524,7 +581,33 @@
     var cfM = cfVor ? s.cfVsM : s.cfNsM, cfJ = cfVor ? s.cfVsJ : s.cfNsJ;
     var cfLabel = cfVor ? 'vor Steuer' : 'nach Steuer';
     var groups=[
-      {t:'Bestand', h:[ half('Objekte', String(s.n), gold, 'im Bestand'), half('Mieteinnahmen / Monat', M(s.mieteM), green, 'netto kalt') ]},
+      /* ── v2099 · DIE ERSTE KACHEL SAGT, WORUEBER GERECHNET WIRD ──────
+       * Sie ist der Umschalter zwischen Ankauf und Bestand - aber NUR,
+       * wenn es Objekte mit eingefrorenem Stand gibt (`schaltbar`). Ein
+       * Schalter, der nichts tut, ist schlimmer als keiner.
+       *
+       * Im Ankauf-Modus steht die Grundmenge im Untertitel: „4 von 8 -
+       * 4 ohne Ankauf-Stand". Ohne das waere die Summe ueber vier
+       * Objekte von einer ueber acht nicht zu unterscheiden. */
+      (function(){
+        var st = s.stand || { modus:'bestand', schaltbar:false };
+        var imAnkauf = (st.modus === 'ankauf');
+        var untenLinks = imAnkauf
+          ? (st.genutzt + ' von ' + st.gesamt
+             + (st.ohne ? ' · ' + st.ohne + ' ohne Ankauf-Stand' : ''))
+          : (st.schaltbar ? 'im Bestand · Klick: Ankauf-Stand' : 'im Bestand');
+        return {
+          t: imAnkauf ? 'Ankauf-Stand' : 'Bestand',
+          click: !!st.schaltbar,
+          fn: 'DealPilotDashboard.toggleStand()',
+          ctitle: imAnkauf
+            ? 'Gerechnet ueber die eingefrorenen Ankauf-Datensaetze — Klick: heutiger Stand'
+            : 'Gerechnet ueber die heutigen Datensaetze — Klick: eingefrorener Ankauf-Stand',
+          h: [ half('Objekte', String(s.n), gold, untenLinks),
+               half('Mieteinnahmen / Monat', M(s.mieteM), green,
+                    imAnkauf ? 'netto kalt · beim Ankauf' : 'netto kalt') ]
+        };
+      })(),
       (function(){ var giO=(_giMode==='ohne'); return {t:'Investition', click:true, fn:'DealPilotDashboard.toggleGi()', ctitle:'Klick wechselt Gesamtinvestition mit/ohne Kaufnebenkosten', h:[ half('Gesamtinvestition', M(giO?s.kp:s.gi), ch, giO?'ohne NK \u00b7 Klick: mit NK':'Kaufpreis + NK \u00b7 Klick: ohne NK'), half('Restschuld gesamt', M(s.rest), ch, 'Verbindlichkeiten') ]}; })(),
       {t:'Mietrendite', h:[ half('Bruttomietrendite', P2(s.brutto), rcol(s.brutto,5,3.5), 'Jahresmiete / KP'), half('Nettomietrendite', P2(s.netto), rcol(s.netto,4,2.5), (s.netto==null?'k.\u00a0A.':'nach BWK')) ]},
       {t:'Cashflow \u00b7 '+cfLabel, click:true, h:[ half('/ Monat', M(cfM), cfc(cfM), cfLabel), half('/ Jahr', M(cfJ), cfc(cfJ), 'Klick: '+(cfVor?'nach':'vor')+' Steuer') ]}
@@ -2955,6 +3038,9 @@
     showScoreDetails: showScoreDetails, showScoreUpgrade: showScoreUpgrade, closeScoreModal: _scoreModalClose,
     toggleCf: toggleCf,
     toggleGi: toggleGi,
+    /* v2099: die Bestand-Kachel ruft es per onclick-Zeichenkette - ohne
+       diesen Export waere der Schalter ein toter Klick. */
+    toggleStand: toggleStand,
     toggleRoe: function(){ window._dpRoeMode=(window._dpRoeMode==='nach')?'vor':'nach'; try{ renderHealth(); }catch(e){} },
     openObject: function(k){ try{ if(typeof window.loadSaved==='function') window.loadSaved(k); }catch(e){} },
     toggleZins: function(){ window._dpZinsMode=(window._dpZinsMode==='risiko')?'zins':'risiko'; try{ renderHealth(); }catch(e){} },
