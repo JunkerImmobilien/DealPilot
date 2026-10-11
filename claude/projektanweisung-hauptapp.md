@@ -36358,3 +36358,101 @@ Dokument, das seit `v895e` **immer hell** ist: **1,42**. Der
 > doppelten Quotes. Ab dem dritten Mal hätte jedes Skript in eine Datei
 > gehört. Das steht in `backticks-in-bash-verschwinden`, und ich habe es
 > trotzdem wieder getan.
+
+---
+
+## Rollout-Journal 11.10.2026 (N60.29/33) — v2101–v2103: der Kontrast im Cockpit, und zwei Ableitungen, die Fehler fanden
+
+**Was · Commit · Nachweis · Rest**
+
+| Paket | Was | Commit | Nachweis |
+|---|---|---|---|
+| `v2101`–`v2101d` | Kontrast im Cockpit, Marcels Freigabe umgesetzt | `45030ce3`, `1a7d09a3` | Gruppen unter 4,5: **42 → 9**; unter 3,0: **19 → 1** |
+| `v2092g` | `effGrund` las den eigenen Grund des Elements nicht | `775424c6` | `shr-stub-lab` meldete 1,88 statt ~8 |
+| `v2102` | Bundesland + amtlicher GrESt-Satz im Export | `026907e4` | **21 von 23** Objekten tragen ein Land; Prüfer 55 Punkte RC=0 |
+| `v2103` | Halter und Steuersphäre je Objekt im Export | `07ab9b7a` | 23 Objekte, 19× `privat`, 13× `halter_seit`; Prüfer 55 Punkte RC=0 |
+
+### Die Lehre dieser Sitzung: eine Ableitung ist auch ein Prüfmaß
+
+**Zwei Pakete haben nichts Neues erfasst**, sie haben nur ausgesprochen,
+was ohnehin schon dastand — und **beide fanden dabei einen Fehler, den
+vorher niemand sehen konnte.**
+
+`v2102` leitet das Bundesland aus der PLZ ab. Nebenprodukt: **acht
+Objekte weichen vom amtlichen Satz ab, fünf davon mit 0,00 %
+Grunderwerbsteuer** — bei einem echten Kauf unmöglich. Alle acht sind
+DEMO-Objekte, es gehört zu **N60.19**.
+
+`v2103` liefert den Halter. Nebenprodukt: **`halter` stand 22× im
+Bestand und 0× im Export.** Ich hatte den Punkt als „blockiert durch
+N60.28" notiert — blockiert war der *zweite* Schritt.
+
+> **Eine Zahl, die niemand ausspricht, wird auch nicht geprüft.** „0 %
+> Grunderwerbsteuer" stand im Datensatz und ist zwei Jahre niemandem
+> aufgefallen. Erst der Vergleich gegen die abgeleitete Zahl machte
+> daraus einen Befund.
+
+### Drei Korrekturen an meinen eigenen Aussagen
+
+1. **„`forPlz` gibt `null` zurück"** — *falsch*, ich hatte `fromPlz`
+   getippt. Mein eigener Tippfehler, als Befund gemeldet.
+2. **„Die GrESt-Tabelle liegt nur im Frontend"** — *falsch*, `v1823`
+   spiegelt sie längst samt Prüfhaken auf 16 Länder. Nur der Export
+   nutzte sie nicht.
+3. **„Punkt 4 und 5 brauchen eine Migration"** — *falsch*.
+   `user_settings` ist ein generischer Schlüssel→JSONB-Speicher, ein
+   neuer Schlüssel ist **eine Zeile** in `ERLAUBT`. Die Entscheidung ist
+   inhaltlich, nicht technisch — und sie ist deshalb nicht kleiner,
+   sondern anders: es gehen **Steuernummer, Finanzamt,
+   Handelsregister, USt-ID** auf den Server.
+
+> Nummer 1 und 2 haben Arbeit erzeugt, die es nicht gab. **Nummer 3 ist
+> die teure Sorte:** sie hätte einen Punkt monatelang als „wartet auf
+> Freigabe" geführt, obwohl die Freigabe eine andere Frage betrifft als
+> die, die ich gestellt hätte.
+
+### Der Prüfer, der GEGEN etwas prüft
+
+`tools/halter-export-pruefen.mjs` prüft nicht nur, dass Werte
+herauskommen, sondern dass **keine** herauskommen, wo der Server nichts
+weiß. Sechs verbotene Muster im kommentarfreien Text (`isCorp`,
+`erw_kuerzung`, die Hebesatz-Formel, `15.825`, `regime.kst`, `'gbr'`)
+halten `sphaere()` davon ab, ein zweites Mal entstehen zu können.
+
+**Warum am kommentarfreien Text:** die Begründung, die diese Doppelung
+verbietet, steht als Kommentar in derselben Datei. Ein Prüfer, der den
+Fließtext mitliest, findet sein eigenes Zitat — in dieser Sitzungsreihe
+dreimal passiert.
+
+### Ein Prüfer, der eine richtige Ausnahme als Fehler meldete
+
+Mein erster GrESt-Prüfer verlangte „keine überlappenden PLZ-Bereiche"
+und fand eine: `04900–04938` **BB** innerhalb von `04000–04999` **SN**.
+Das ist **fachlich richtig** — Elsterwerda, Bad Liebenwerda und Übigau
+tragen 049xx und liegen in Brandenburg.
+
+Geprüft wird jetzt, was wirklich schiefgehen kann: `grestFuer` nimmt den
+**ersten** Treffer, also muss die engere Spanne **vor** der weiteren
+stehen. Nachgemessen: BB auf Position 2, SN auf 3.
+
+> **Ein Prüfer, der eine richtige Ausnahme als Fehler meldet, wird
+> abgeschaltet.** Und dann prüft gar nichts mehr.
+
+### Rest — was auf eine Entscheidung wartet
+
+| Punkt | Art |
+|---|---|
+| Demodaten: 5× GrESt 0,00 % richtigstellen (N60.19) | **DB-Eingriff** |
+| Mandanten auf den Server (N60.28 Schritt 0, N60.33/4+5) | **Freigabe** — Steuernummer, Finanzamt, USt-ID verlassen den Rechner |
+| „Steuersätze über die Jahre": drei Lesarten | **fachlich** — `regime` hat keine Jahresdimension, `kosten` schon |
+| N51 Ansprechpartner 1+2 (Migration `ansprechpartner` JSONB) | **Freigabe** |
+| Restliche ~9 Beinahe-Treffer im Cockpit-Kontrast | Produkt |
+| Quick-Check und Marktbericht: dieselbe Farbentscheidung | Produkt |
+| Konsole-Fassung (13 Regeln gegen 102) | Produkt |
+| Anbieternamen an ~60 Anzeigestellen (N60.30) | Produkt |
+
+> **Nicht abnehmbar auf Staging:** es gibt dort **keine einzige
+> Gesellschaft** — alle 23 Objekte sind privat. Der Zweig von
+> `halterFuer()` für eine Mandanten-ID ist nur gegen die echte Funktion
+> mit vier erfundenen IDs geprüft. **Staging-Abnahmepunkt**, sobald es
+> einen Mandanten gibt.

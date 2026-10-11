@@ -1701,8 +1701,8 @@ auch erst mal nicht. Das kann dann auf der Tonspur erfolgen."*
 | 1 | ~~**Bonitätswerte**~~ | **war schon da:** `zve` 19/23, `grenz` 23/23, `ek` 19/23 — am echten Export gezählt |
 | 2 | ~~**Bundesland → Grunderwerbsteuersatz**~~ | **gebaut `v2102`** — siehe unten |
 | 3 | ~~**Mietverträge**~~ | **war schon da:** je Einheit 11 `mv_*`-Felder in `_mfh` (79 Einheiten). Auf Objektebene sammelt `collectData()` sie — nachgewiesen. Sie fehlen im Export nur, weil **kein Objekt sie gefüllt hat** |
-| 4 | **Rechtsform der Gesellschaft** | **ist N60.28** — und dort ist Schritt 0, die Mandanten überhaupt auf den Server zu bringen |
-| 5 | **Steuersätze über die Jahre** (Mandanten-Einstellungen) | hängt an derselben Wurzel wie 4: die Mandanten liegen nur im `localStorage` |
+| 4 | **Rechtsform** — *Fundament gebaut `v2103`* | der **Schlüssel** (`halter`, `halter_seit`, `steuersphaere`) geht jetzt mit. Die Rechtsform selbst braucht die Mandanten auf dem Server — **eine Entscheidung, keine Migration**, siehe unten |
+| 5 | **Steuersätze über die Jahre** | dieselbe Wurzel wie 4. **Und der Wortlaut trifft nicht, was es gibt** — gemessen, siehe unten |
 | 6 | ~~Zeiträume eigener Nutzung (§ 23 EStG)~~ | **von Marcel ausdrücklich zurückgestellt**: *„das haben wir im DealPilot nicht. Das brauchen wir aber auch erst mal nicht."* |
 
 ### Punkt 2 gebaut (`v2102`) — und es war fast alles schon da
@@ -1789,6 +1789,152 @@ Geschichte") und ist ein DB-Eingriff, also Marcels Freigabe.*
 > noch die Steuersätze. *Die Rechtsform ist nicht das Problem — sie ist
 > das Symptom.* Das gehört entschieden, bevor hier etwas gebaut wird:
 > eigene Tabelle `mandanten` oder ein Feld in `user_settings`.
+
+---
+
+### Punkt 4 · Das Fundament steht (`v2103`) — und der Befund war ein anderer
+
+Ich hatte Punkt 4 als „blockiert durch N60.28" notiert. **Erst gemessen,
+dann gemeldet** — und dabei kam etwas anderes heraus:
+
+| | |
+|---|---|
+| `halter` an jedem Objekt | **seit Langem da** (`storage.js:174`) |
+| am Staging-Bestand | **22× `privat`, 5× ohne, 13× mit `halter_seit`** |
+| im Export genannt | **null Mal** |
+
+> **Nicht die Rechtsform fehlte, sondern der SCHLÜSSEL.** Eine
+> Mandanten-Liste hätte ohne ihn gar nichts genützt: wir hätten
+> Rechtsformen geliefert und keine Zuordnung, welches Objekt zu welcher
+> gehört. *Das Blockierte war der zweite Schritt, nicht der erste.*
+
+Neu je Objekt: `halter`, `halter_seit`, `halter_rechtsform`,
+`steuersphaere`, `halter_herkunft`.
+
+**Am laufenden Export abgenommen:** 23 Objekte, 19× `privat`, 4× ohne
+Halter. Die vier bekommen `steuersphaere: "est"` **mit dem Vermerk**
+„kein halter am Objekt — die App zeigt dafür die Vorbelegung „Privat"".
+*Kein Halter heißt nicht „keine Angabe": das `<select>` ist darauf
+vorbelegt. Beides gleichzusetzen wäre still falsch, es zu verschweigen
+auch.*
+
+#### Was hier ausdrücklich NICHT gebaut wurde
+
+`sphaere()` in `mandanten.js` ist **seit `v1404` der ausdrückliche
+EINZIGE Schiedsrichter** — eingeführt, nachdem eine zweite Fassung an
+einem Beispiel mit drei privaten und zwei GbR-Objekten **9,6 % zu viel
+ausgewiesene Entlastung** erzeugt hatte. Sie liest die Rechtsform aus den
+Mandanten-Einstellungen.
+
+Die liegen im `localStorage` (`dp_mandanten`) — im Backend **null
+Treffer**. Der Server kennt keine Rechtsform. Eine zweite Fassung hier
+wäre genau die Doppelung, die `v1404` aufgeräumt hat, **und sie würde
+raten, wo sie nichts weiß.**
+
+Deshalb bleibt `steuersphaere` `null`, wo der Server nichts weiß, und der
+`HINWEIS` verbietet dem Empfänger ausdrücklich, das als `"est"` zu
+rechnen — *das steckte eine GmbH in die Progression des Nutzers.*
+
+`privat` ist die eine Ausnahme **ohne Nachschlagen**: der Eintrag ist in
+`mandanten.js:52` fest verdrahtet, und `sphaere()` gibt dafür `"est"`
+zurück, **bevor** sie irgendetwas liest. Das ist eine Konstante, keine
+Rechnung.
+
+Bewacht von `tools/halter-export-pruefen.mjs`: **55 Punkte, RC=0**, mit
+einem Netz aus **sechs verbotenen Mustern** gegen die Doppelung
+(`isCorp`, `erw_kuerzung`, die Hebesatz-Formel, `15.825`, `regime.kst`,
+`'gbr'`), geprüft am **kommentarfreien** Text — sonst findet der Prüfer
+die Begründung, die genau diese Doppelung verbietet.
+
+> **Nicht abnehmbar auf Staging:** es gibt dort **keine einzige
+> Gesellschaft**, alle 23 Objekte sind privat. Der Zweig für eine
+> Mandanten-ID ist nur gegen die echte Funktion mit vier erfundenen IDs
+> geprüft, nicht an echten Daten. **Staging-Abnahmepunkt**, sobald es
+> einen Mandanten gibt.
+
+---
+
+### ⚠ ENTSCHEIDUNG für Punkt 4 und 5 — und sie ist KEINE Migration
+
+Ich hatte „Migration, braucht Marcels Freigabe" notiert. **Nachgemessen
+ist das falsch:**
+
+```sql
+CREATE TABLE user_settings (        -- 074_nutzereinstellungen.sql
+  user_id UUID, schluessel TEXT, wert JSONB, updated_at TIMESTAMPTZ,
+  PRIMARY KEY (user_id, schluessel));
+```
+
+Ein **generischer Schlüssel→JSONB-Speicher**. Ein neuer Schlüssel ist
+eine **Zeile** in `routes/userSettings.js`:
+
+```js
+const ERLAUBT = ['datenraum','lage_profil','portfolio_analyse','eigenes_wissen'];
+```
+
+Und der Präzedenzfall steht als Begründung direkt daneben — `lage_profil`,
+**Marcels Entscheidung vom 07.10.2026** („ja auf den Server damit"), mit
+genau dem Argument, das hier auch gilt:
+
+> *„An dieser Zahl hängt eine RECHNUNG. Ein Profil, das nur auf einem
+> Gerät liegt, lässt denselben Kunden auf dem Handy ein anderes Ergebnis
+> sehen als am Schreibtisch, ohne dass er den Unterschied erklären
+> könnte."*
+
+`portfolioExport.js:443` liest heute schon drei dieser Schlüssel. Es wäre
+ein Eintrag mehr in einem Array.
+
+**Die Entscheidung ist also nicht technisch, sondern inhaltlich** — und
+deshalb Marcels: die Mandanten tragen **Steuernummer, Finanzamt,
+Handelsregister, USt-ID und Anschrift** (`mandanten.js:862`: *„gelten für
+JEDE Rechtsform"*). Heute liegen die ausschließlich in seinem Browser.
+
+> *Der Unterschied zum Datenraum und zum Lageprofil ist nicht die Technik,
+> sondern dass hier steuerliche Identifikationsdaten den Rechner
+> verlassen. Das ist keine Frage, die eine Messung beantwortet.*
+
+Dazu kommt die Doktrin im Tabellenkommentar selbst:
+
+> `user_settings` · *„Client-Daten, keine Berechnungsgrundlage. Wer etwas
+> serverseitig rechnen will, braucht eine eigene typisierte Tabelle."*
+
+Für den Export reicht Durchreichen. Sobald **der Server** mit den
+Steuersätzen rechnet, gilt der Satz und es braucht eine eigene Tabelle.
+*Das ist die Weggabelung, nicht die Migration.*
+
+---
+
+### ⚠ Punkt 5: der Wortlaut trifft nicht, was es gibt
+
+Marcel sagte „**Steuersätze über die Jahre**". Gemessen gibt es unter
+Mandanten **beides getrennt**:
+
+| | Struktur | Jahresdimension |
+|---|---|---|
+| **Steuersätze** | `regime = {kst, gewst, erw_kuerzung}` | **keine** — ein Satz, zeitlos |
+| **Gesellschaftskosten** | `kosten = {"2024":{…},"2025":{…}}` | **ja**, je Jahr |
+
+Die **Jahresdimension gibt es** (`kostenJahr()`, `kostenFuer(halterId,
+jahr)`, `_kErnte()` wirft leere Jahre weg) — aber **für Kosten, nicht für
+Steuersätze.** `effRate()` rechnet mit **einem** `kst`/`gewst`-Paar,
+unabhängig vom Jahr.
+
+**Drei mögliche Lesarten, und ich rate nicht:**
+
+1. *Die Kosten je Jahr sind gemeint* → dann ist es nur Auslieferung, die
+   Struktur steht.
+2. *Die Sätze sollen je Jahr erfassbar werden* → dann ist es ein
+   **Produktumbau** am Mandanten-Formular, und die Körperschaftsteuer hat
+   sich 2008 und 2024 wirklich geändert. Fachlich hätte er recht.
+3. *Beides zusammen soll in den Export* → dann ist es Lesart 1 plus die
+   Entscheidung oben.
+
+> **Marcel ist DESAG-zertifiziert und weiß das besser als ich.** Lesart 2
+> wäre eine echte Lücke: ein Bestandsobjekt über zehn Jahre mit einem
+> einzigen Steuersatz zu rechnen ist eine Vereinfachung, die niemand
+> ausgewiesen bekommt. Aber ob er das meint, steht nicht im Satz — und
+> ein Umbau am Steuerteil nach Vermutung ist das Teuerste, was hier
+> passieren kann.
 
 ---
 
