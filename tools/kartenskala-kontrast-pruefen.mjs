@@ -90,6 +90,50 @@ for (const f of FAELLE) {
   melde(k >= 4.6, f.name + ': hat Reserve (k=' + k.toFixed(2) + ' >= 4,6)');
 }
 
+/* ── 1b · Die fünf Vorlagen, jede gegen IHREN gemessenen Grund ────────
+   v2104b. Mein erster Anlauf hat alle fuenf gegen rgb(13,11,8) gerechnet
+   und drei davon fuer sauber erklaert (5,94 / 5,96 / 5,31). GEMESSEN
+   haben VIER von fuenf eine HELLE Kachel, und alle fuenf lagen unter
+   4,5. Deshalb steht hier je Vorlage der Grund, den die Messkabine
+   gemeldet hat - nicht einer fuer alle. */
+console.log('\n=== 1b · Die fuenf Vorlagen (--uv-card-mut) ===');
+const VORLAGEN = [
+  ['kontor',   [250, 249, 247], '3,14'],
+  ['kanzlei',  [251, 250, 247], '3,16'],
+  ['boarding', [255, 255, 255], '3,70'],
+  ['konsole',  [20, 23, 27],    '3,81'],
+  ['panel',    [248, 249, 251], '4,39']
+];
+console.log('    Vorlage    Ton       Grund (gemessen)    k alt   k neu');
+for (const [name, grund, kAlt] of VORLAGEN) {
+  /* Die LETZTE Deklaration gewinnt - bei panel sind es zwei (`:111` und
+     die Korrektur von v1108).
+
+     ABER: der Suchausdruck muss am BLOCKENDE halten. Mein erster Entwurf
+     suchte „ab `data-ui-theme=NAME` die naechsten 1200 Zeichen" und las
+     fuer `konsole` den Wert von `panel` - deren Block folgt dicht
+     darauf. Der Pruefer meldete daraufhin 3,53 fuer einen Ton, der dort
+     gar nicht steht. Gefunden, weil er rot wurde, bevor etwas ausgerollt
+     war - genau dafuer ist er da.
+
+     Deshalb: erst die Bloecke der Vorlage holen (`{...}` ohne `}` darin),
+     dann DARIN suchen. */
+  const blockRe = new RegExp('data-ui-theme="' + name + '"[^{]*\\{([^}]*)\\}', 'g');
+  const bloecke = [...uvN.matchAll(blockRe)];
+  let ton = null;
+  for (const b of bloecke) {
+    const d = [...b[1].matchAll(/--uv-card-mut:\s*(#[0-9a-fA-F]{6});/g)];
+    if (d.length) ton = d[d.length - 1][1];
+  }
+  if (!ton) { melde(false, name + ': --uv-card-mut in keinem eigenen Block gefunden'); continue; }
+  const k = kontrast(rgb(ton), grund);
+  console.log('    ' + name.padEnd(11) + ton + '   '
+    + ('rgb(' + grund.join(',') + ')').padEnd(20) + kAlt.padStart(5) + '   '
+    + String(k.toFixed(2)).padStart(5));
+  melde(k >= SCHWELLE, name + ': k=' + k.toFixed(2) + ' >= ' + SCHWELLE + ' (Ton ' + ton + ')');
+  melde(k >= 4.6, name + ': hat Reserve (k=' + k.toFixed(2) + ')');
+}
+
 /* ── 2 · Die alten Werte sind WEG ────────────────────────────────────── */
 console.log('\n=== 2 · Die alten Werte stehen nicht mehr im Nutztext ===');
 melde(!/aside\.sidebar\s+\.sb-card\s+\.sbcm-scale\s*\{[^}]*rgba\(168,\s*162,\s*153,\s*0\.65\)/.test(styleN),
@@ -143,19 +187,23 @@ melde(gemeinsam === 0, 'das Fenster ist leer - zwei Regeln sind noetig, nicht be
 /* ── 6 · Deckung, und was ausdruecklich NICHT geprueft ist ──────────── */
 console.log('\n=== 6 · Deckung ===');
 console.log('  Pruefpunkte          : ' + geprueft);
-console.log('  Fassungen geprueft   : 3 (Grundfassung, heller Skin, surface=light)');
+console.log('  Fassungen geprueft   : 8 — Grundfassung, heller Skin,');
+console.log('                         surface=light und die fuenf Vorlagen');
 console.log('  Stellen je Fassung   : 161 (23 Karten x 7 Beschriftungen)');
+console.log('  Stellen insgesamt    : ' + (8 * 161));
 console.log('  Nutztext style.css   : ' + anteil(style, styleN) + ' %');
 console.log('  Nutztext ui-varianten: ' + anteil(uv, uvN) + ' %');
 console.log('');
 console.log('  NICHT geprueft, und zwar absichtlich:');
-console.log('    Vorlagen panel und konsole. Ihre --uv-card-mut-Werte');
-console.log('    (#6B7683 / #6E747C) ergeben gegen die DUNKLE Karte 4,25');
-console.log('    und 4,17 - aber die Kartenflaeche ist eine EIGENE Achse');
-console.log('    (--dp-obj-card, vom Regler inline gesetzt), und der');
-console.log('    v1108-Kommentar spricht bei panel von einer HELLEN Karte.');
-console.log('    Ohne gemessenen Grund ist jede Zahl dazu geraten.');
-console.log('    -> Backlog, eigener Messlauf.');
+console.log('    Jede Fassung ist gegen EINEN gemessenen Grund geprueft -');
+console.log('    den, den die Messkabine bei der Vorgabe des Kartenreglers');
+console.log('    gemeldet hat. Die Kartenflaeche ist aber eine EIGENE');
+console.log('    Achse (--dp-obj-card, von ui-varianten.js inline');
+console.log('    gesetzt, Merker dp_obj_ui). Stellt der Nutzer sie um,');
+console.log('    wandert der Grund, und ein Ton je Vorlage kann dann');
+console.log('    grundsaetzlich nicht fuer beide Kartenfarben stimmen.');
+console.log('    -> 5 Vorlagen x die Kartenstufen, eigener Messlauf.');
+console.log('    Backlog N60.34.');
 
 console.log('\n' + (fehler === 0
   ? 'RC=0 - ' + geprueft + ' Punkte, keine Abweichung'

@@ -1938,6 +1938,166 @@ unabhängig vom Jahr.
 
 ---
 
+#### N60.34 · Die Skalen-Beschriftungen der Objektkarte (`v2104`, 11.10.2026)
+
+**Entstanden aus Marcels „kontrast vorschlag so umsetzen" (11.10.2026).**
+Nach `v2101d` standen im Cockpit noch neun Gruppen unter 4,5. Die
+größte davon hat sich beim Nachmessen als etwas anderes entpuppt.
+
+### Erste Korrektur: es war nicht das Cockpit
+
+Ich hatte „115 Stellen im Cockpit bei 3,78" notiert. **`messe()` scannt
+das ganze Dokument, nicht die gemessene Fläche.** Gemessen sind es
+**161 Stellen, alle in `aside.sidebar`, keine einzige im Cockpit**:
+`.sbcm-scale span` auf den Objektkarten — 23 Karten × 7 Beschriftungen
+(„0", „1", „1,5", „2+" am DSCR-Balken, „0 %", „5 %", „10 %" an der
+Rendite).
+
+### Zweite Korrektur: die Schwelle war falsch gewählt, nicht der Ton
+
+Die Schrift ist **7,5 px**. Damit gilt **4,5** — 3,0 gilt erst ab 24 px,
+oder ab 18,66 px fett. Und genau hier stand es schwarz auf weiß im
+eigenen Blatt (`ui-varianten.css`, `v1107`):
+
+> *„Die drei Werte sind in OKLab abgesenkt, bis sie gegen die
+> Kachelfläche #FAF8F3 **auf 3,2** kommen."*
+
+Gemessen: genau **3,28**. Der Ton traf sein Ziel — **das Ziel war die
+falsche Zahl.**
+
+### Der Befund: fünf Fassungen, und die schlimmste hatte nie eine Regel
+
+| Fassung | Ton | Grund (gemessen) | k | wo |
+|---|---|---|---:|---|
+| Grundfassung | `rgba(168,162,153,.65)` | `rgb(13,11,8)` Verlauf | **3,83** | `style.css:25546` |
+| **`body.dp-chrome-hell`** | dieselbe Deckkraft | `rgb(255,255,255)` | **1,76** | **KEINE Regel** |
+| `data-ui-surface=light` | `#8f897c` | `#FAF8F3` | **3,28** | `ui-varianten.css:554`+`:606` |
+| Vorlage `kontor` | `#918d84` | `rgb(250,249,247)` **hell** | **3,14** | `ui-varianten.css:78` |
+| Vorlage `kanzlei` | `#928d84` | `rgb(251,250,247)` **hell** | **3,16** | `:145` |
+| Vorlage `boarding` | `#8d8471` | `rgb(255,255,255)` **hell** | **3,70** | `:178` |
+| Vorlage `konsole` | `#6E747C` | `rgb(20,23,27)` dunkel | **3,81** | `:211` |
+| Vorlage `panel` | `#6B7683` | `rgb(248,249,251)` **hell** | **4,39** | `:2150` |
+
+> **`v1107`/`v1107b` haben genau diesen Fehler für `data-ui-surface` und
+> für jede Vorlage behoben — und den hellen Skin übersehen.** Dort war
+> der schlechteste Wert des ganzen Durchgangs: **1,76**, praktisch
+> unsichtbar. *Die Reparatur ist mit ihrem Anker gewandert, nicht mit der
+> Fassung* — dieselbe Klasse wie `reparatur-erbt-ihren-anker`.
+
+### Gebaut (`v2104`) und am laufenden Staging abgenommen
+
+| Fassung | vorher | nachher | Ton |
+|---|---:|---:|---|
+| Grundfassung, dunkle Karte | 3,83 | **4,80** | `#817d76` |
+| `surface=light`, Kachel creme | 3,28 | **4,80** | `#726e63` |
+| heller Skin, **weiße** Karte | **1,76** | **4,83** | `#76716b` |
+| heller Skin + helle Fläche | — | **4,55** | derselbe Ton |
+
+Jede Zahl ist im Browser nachgemessen, nicht gerechnet. Der Farbton
+bleibt erhalten (Faktor auf alle drei Kanäle, kein Clipping).
+
+### Deckend statt mit Deckkraft — das ist der eigentliche Punkt
+
+Der Kartengrund ist ein **Verlauf** (`effGrund` meldet `quelle:
+"verlauf"`). Eine Deckkraft darüber ergibt **je Stelle einen anderen
+Kontrast**; eine feste Farbe nicht. Dieselbe Klasse wie `v2090`, wo bei
+vier von sechs Stellen die Deckkraft der Fehler war.
+
+### `#8f897c` musste ZWEIMAL weichen
+
+Einmal am Token `--uv-card-mut` (`:554`), einmal in der Sechser-Regel
+(`:606`), **die die Farbe direkt setzt und den Token nicht liest**. Ohne
+Vorlage greift die Regel, mit Vorlage der Token. *Nur eine zu ändern
+hätte die Hälfte der Fälle stillschweigend ausgelassen.*
+
+### Warum es zwei Regeln sein MÜSSEN
+
+Der Prüfer rechnet es aus, statt es zu behaupten: von 256 Graustufen
+trägt **keine einzige** die dunkle und die creme Karte zugleich bei 4,5.
+Auf dunklem Grund braucht der Ton eine Mindesthelligkeit, auf hellem
+eine Höchsthelligkeit — **das Fenster ist leer.**
+
+Bewacht von `tools/kartenskala-kontrast-pruefen.mjs`: **16 Punkte,
+RC=0**, liest die echten Blätter, nennt seine Deckung und prüft am
+**kommentarfreien** Text.
+
+### ⚠ ZURÜCKGENOMMEN: meine Zahlen für ALLE FÜNF Vorlagen waren geraten
+
+Ich hatte alle fünf gegen `rgb(13,11,8)` gerechnet und **drei davon für
+sauber erklärt** — kontor 5,94, kanzlei 5,96, boarding 5,31. Dann
+nachgemessen, Vorlage für Vorlage, mit eigenem Ladevorgang:
+
+| Vorlage | Grund gerechnet | Grund **gemessen** | k gerechnet | k **gemessen** |
+|---|---|---|---:|---:|
+| kontor | `rgb(13,11,8)` | `rgb(250,249,247)` | 5,94 „ok" | **3,14** |
+| kanzlei | `rgb(13,11,8)` | `rgb(251,250,247)` | 5,96 „ok" | **3,16** |
+| boarding | `rgb(13,11,8)` | `rgb(255,255,255)` | 5,31 „ok" | **3,70** |
+| konsole | `rgb(13,11,8)` | `rgb(20,23,27)` | 4,17 | **3,81** |
+| panel | `rgb(13,11,8)` | `rgb(248,249,251)` | 4,25 | **4,39** |
+
+> **Vier von fünf Vorlagen haben eine HELLE Kachel.** Meine Rechnung hat
+> für drei davon ein „ok" erzeugt, wo in Wirklichkeit 3,1 stand — *eine
+> Rechnung gegen einen angenommenen Grund ist schlimmer als keine Zahl,
+> weil sie als Freigabe gelesen wird.* Das ist Regel 1 wörtlich: Struktur
+> wird nie angenommen, immer ausgelesen.
+
+**Behoben in `v2104b`** — je Vorlage ein eigener Ton, Farbton gehalten:
+
+| Vorlage | war | ist | k |
+|---|---|---|---:|
+| kontor | `#918d84` | `#716e67` | **4,83** |
+| kanzlei | `#928d84` | `#726f67` | **4,81** |
+| boarding | `#8d8471` | `#797161` | **4,83** |
+| konsole | `#6E747C` | `#7e858e` | **4,82** |
+| panel | `#6B7683` | `#656f7c` | **4,84** |
+
+**Acht Fassungen × 161 Stellen = 1.288 Stellen**, alle über 4,5.
+
+### Der Prüfer hat sich selbst erwischt
+
+Mein erster Suchausdruck lautete „ab `data-ui-theme=NAME` die nächsten
+1200 Zeichen" und las für **konsole den Wert von panel** — dessen Block
+folgt dicht darauf. Der Prüfer meldete **3,53 für einen Ton, der dort
+gar nicht steht**, und wurde rot, *bevor* etwas ausgerollt war.
+
+> Genau dafür ist er da. Jetzt holt er erst die Blöcke der Vorlage
+> (`{…}` ohne `}` darin) und sucht **darin** — ein Suchausdruck, der
+> über die Blockgrenze läuft, misst die nächste Vorlage.
+
+### ⚠ Was strukturell offen bleibt
+
+Jede der acht Fassungen ist gegen **einen** Grund geprüft — den, den der
+Kartenregler in seiner Vorgabe liefert. **Die Kartenfläche ist aber eine
+eigene Achse:** `--dp-obj-card`, von `ui-varianten.js:1380/1454`
+**inline** gesetzt (Merker `dp_obj_ui`). Sie gehört nicht zur Vorlage.
+
+> Ein Ton je Vorlage kann deshalb **grundsätzlich nicht** für beide
+> Kartenfarben stimmen. Stellt der Nutzer den Regler um, wandert der
+> Grund — und `--uv-card-mut` ist dann für die andere Richtung gebaut.
+> Genau dieser Widerspruch steckt schon in `v1108`: dort wurde panels
+> Token **abgedunkelt** „weil der kühle Grauton auf heller Fläche zu
+> blass ist" — eine Begründung, die eine helle Karte voraussetzt.
+
+**Offen: fünf Vorlagen × die Kartenstufen, als Messung, nicht als
+Rechnung.** Erst danach ist entscheidbar, ob `--uv-card-mut` überhaupt
+der richtige Ort ist — oder ob diese Beschriftungen einen Ton brauchen,
+der an der **Kachel** hängt statt an der Vorlage.
+
+### Nebenbei zwei Werkzeugfunde
+
+1. **`messe(d, win, label)` nimmt drei Argumente.** Ohne sie fällt es
+   mit `Cannot read properties of undefined (reading 'body')` — und
+   `kontrast(a, b)` nimmt zwei **Farbobjekte**, keine CSS-Strings
+   (sonst `NaN`). Steht jetzt in `messkabine-ohne-buster`.
+2. **`lade()` hängt im verborgenen Fenster.** Es legt `rAF` im *iframe*
+   um, aber nicht im **eigenen** Fenster der Messkabine — und ein
+   Hintergrundtab feuert `rAF` nie. Ein Sechser-Lauf blieb damit
+   stillschweigend stehen (`__ERG` leer nach Minuten). Nach dem Umlegen
+   von `window.requestAnimationFrame` liefen alle Läufe durch.
+   **Gehört in die Messkabine statt in jeden Aufruf** — Backlog.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —

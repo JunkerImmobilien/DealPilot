@@ -75,7 +75,8 @@ html[data-ui-theme="kontor"] {
   --uv-card-line:   #E7E4DD;
   --uv-card-ink:    #141310;
   --uv-card-ink2:   #4a4740;
-  --uv-card-mut:    #918d84;
+  /* v2104b: war #918d84. GEMESSEN auf rgb(250,249,247) = k=3,14, bei 7,5 px gilt 4,5. #716e67 haelt den Farbton, k=4,83. */
+  --uv-card-mut:    #716e67;
   --uv-card-tile:   #FAF9F7;
   --uv-card-tl:     #E7E4DD;
   --uv-f-body:      'Inter', system-ui, sans-serif;
@@ -142,7 +143,8 @@ html[data-ui-theme="kanzlei"] {
   --uv-card-line:   #EDE9E1;
   --uv-card-ink:    #1c1a16;
   --uv-card-ink2:   #55504a;
-  --uv-card-mut:    #928d84;
+  /* v2104b: war #928d84. GEMESSEN auf rgb(251,250,247) = k=3,16, bei 7,5 px gilt 4,5. #726f67 haelt den Farbton, k=4,81. */
+  --uv-card-mut:    #726f67;
   --uv-card-tile:   #FBFAF7;
   --uv-card-tl:     #EDE9E1;
   --uv-f-body:      'Inter', system-ui, sans-serif;
@@ -175,7 +177,8 @@ html[data-ui-theme="boarding"] {
   --uv-card-line:   var(--wl-e8d9a8, #E8D9A8);
   --uv-card-ink:    #1e1a12;
   --uv-card-ink2:   #554d3a;
-  --uv-card-mut:    #8d8471;
+  /* v2104b: war #8d8471. GEMESSEN auf rgb(255,255,255) = k=3,70, bei 7,5 px gilt 4,5. #797161 haelt den Farbton, k=4,83. */
+  --uv-card-mut:    #797161;
   --uv-card-tile:   #FFFFFF;
   --uv-card-tl:     var(--wl-ece0c2, #ECE0C2);
   --uv-f-body:      'Inter', system-ui, sans-serif;
@@ -208,7 +211,8 @@ html[data-ui-theme="konsole"] {
   --uv-card-line:   #262A30;
   --uv-card-ink:    #E6E8EA;
   --uv-card-ink2:   #A7ACB3;
-  --uv-card-mut:    #6E747C;
+  /* v2104b: war #6E747C. GEMESSEN auf rgb(20,23,27) = k=3,81, bei 7,5 px gilt 4,5. #7e858e haelt den Farbton, k=4,82. */
+  --uv-card-mut:    #7e858e;
   --uv-card-tile:   #14171B;
   --uv-card-tl:     #262A30;
   --uv-f-body:      'JetBrains Mono', ui-monospace, monospace;
@@ -2158,7 +2162,8 @@ html[data-ui-theme="panel"] {
      GEMESSEN auf der Objektkarte: 15 Fundstellen bei k=2,89 — knapp unter
      der Schwelle, aber durchgaengig. Derselbe Grund wie beim Geschwister-
      Token: der kuehle Grauton ist auf heller Flaeche zu blass. */
-  --uv-card-mut: #6B7683;
+  /* v2104b: war #6B7683. GEMESSEN auf rgb(248,249,251) = k=4,39, bei 7,5 px gilt 4,5. #656f7c haelt den Farbton, k=4,84. */
+  --uv-card-mut: #656f7c;
 }
 /* Ein weisses Etikett auf hellem Grund — eigene Flaeche, eigener Ton. */
 html[data-ui-theme] body .sec .ki-lage-tag {
