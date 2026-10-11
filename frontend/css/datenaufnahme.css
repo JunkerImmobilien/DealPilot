@@ -2192,15 +2192,35 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
      Deshalb am Schreibtisch `nowrap`. Auf dem Handy bleibt es dabei, dass die
      Kacheln untereinander stehen (eigene Regel weiter unten) - dort ist
      Umbrechen genau richtig. */
-  #oab-bar.dp-pfbar,
-  .dp-pf-scroll .dp-pfbar {
-    flex-wrap: nowrap !important;
-  }
-  #oab-bar.dp-pfbar .dp-pf-tile,
-  .dp-pf-scroll .dp-pfbar .dp-pf-tile {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-  }
+
+  /* ══ v2122 · ZURUECKGENOMMEN ═══════════════════════════════════════
+     Die Deklarationen von v1941a-d standen hier bis zum 11.10.2026 und
+     haben das Gegenteil von v2119 getan: Umbrechen verbieten, alles
+     schrumpfen lassen, Beschriftungen mit einer Ellipse kappen.
+
+     Marcel am 11.10.2026: "Wenn wir Desktop 1180 ausgewaehlt haben kann
+     man die auswahl nicht lesen unter Daten einlesen."
+
+     Gemessen bei 1180 px: vier Beschriftungen gekappt, "Sprache" auf
+     15 von 43 px. Die Ellipse hat genau das getan, was sie sollte.
+
+     > **v1941 war nicht falsch - es war die bessere von zwei schlechten
+     > Antworten.** Damals ging es um SECHS Pixel Ueberbreite, und ein
+     > Umbruch wegen sechs Pixel ist teurer als eine Ellipse. Die Lage
+     > ist heute eine andere: es fehlen 90 px, nicht 6, und v2119 kann
+     > umbrechen, ohne zu kappen.
+
+     Sie werden hier AUSGETRAGEN und nicht nur ueberschrieben. Ein
+     Stapel aus zwei Versionen, die sich widersprechen, ist genau das,
+     wovor der Kopf dieser Datei bei v1702d warnt ("Zwei Ebenen bauten
+     dieselbe Flaeche um"). Die Kommentare bleiben stehen - der Befund
+     von damals ist weiter richtig und erklaert, warum hier nichts mehr
+     steht.
+
+     `overflow-x: hidden` auf Leiste und Wrapper bleibt: mit Umbruch
+     laeuft nichts mehr quer, und wenn doch, soll kein Balken stehen.
+     ══════════════════════════════════════════════════════════════ */
+
 
   /* ── v1941c · DIE KINDER WAREN DER GRUND, NICHT DIE KACHEL ───────────
      Dritter Anlauf an derselben Stelle, und die ersten beiden haben die
@@ -2220,12 +2240,7 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
 
      Fuenf Kacheln a 92 px sind 460 px - das passt in die 753 px zweimal.
      Damit reicht Teilen, und weder Schieben noch Umbrechen wird gebraucht. */
-  #oab-bar.dp-pfbar .dp-pf-tile > *,
-  .dp-pf-scroll .dp-pfbar .dp-pf-tile > * {
-    min-width: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
+  /* v2122: ausgetragen - siehe Ruecknahme oben. */
   /* Und die Leiste selbst darf nicht mehr scrollen - sonst bleibt die
      Scrollleiste stehen, auch wenn nichts mehr ueberlaeuft. */
   #oab-bar.dp-pfbar,
@@ -2233,12 +2248,7 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
   .dp-pf-scroll {
     overflow-x: hidden !important;
   }
-  #oab-bar.dp-pfbar .dp-pf-tile .dp-pf-lbl,
-  .dp-pf-scroll .dp-pfbar .dp-pf-tile .dp-pf-lbl {
-    min-width: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
+  /* v2122: ausgetragen - die Ellipse war Marcels Befund. */
 }
 
 /* ==============================================================================
@@ -2269,26 +2279,18 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
    Polster und schrumpft nur so weit, wie die anderen auch.
    ============================================================================== */
 @media (min-width: 901px) {
+  /* v2122: Segmente duerfen weiter schrumpfen - aber nur bis zu einer
+     Kachel, und das setzt v2119 mit min-width:min-content. Lead und Stub
+     bekommen dort flex:0 0 auto. Hier stehen sie nicht mehr. */
   #oab-bar.dp-pfbar > .dp-pf-seg,
   .dp-pf-scroll .dp-pfbar > .dp-pf-seg {
     flex: 1 1 auto !important;
-    min-width: 0 !important;
   }
-  #oab-bar.dp-pfbar > .dp-pf-lead,
-  .dp-pf-scroll .dp-pfbar > .dp-pf-lead {
-    flex: 0 1 auto !important;
-    min-width: 0 !important;
-  }
-  #oab-bar.dp-pfbar > .dp-pf-rz,
-  .dp-pf-scroll .dp-pfbar > .dp-pf-rz {
-    flex: 0 1 auto !important;
-    min-width: 0 !important;
-  }
-  /* Die ganze Kette darunter - min-width:auto wirkt sonst von unten durch. */
-  #oab-bar.dp-pfbar *,
-  .dp-pf-scroll .dp-pfbar * {
-    min-width: 0 !important;
-  }
+  /* v2122: AUSGETRAGEN. Das war die schlimmste der fuenf: eine
+     Sammelregel auf JEDEN Nachfahren der Leiste. Sie hat jeden
+     spaeteren Schutz von unten wieder aufgehoben - genau die Form,
+     vor der CLAUDE.md warnt ("nie Sammelregeln auf Container-Kinder").
+     Was wirklich schrumpfen darf, nennt v2119 einzeln. */
 }
 
 /* ══ v1953 · DIE BORDKARTE DER DATENAUFNAHME IST ENTFERNT ═══════════════
@@ -2601,4 +2603,140 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
 }
 :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz > #oab-run.dp-pf-launch{
   margin: 0 !important;
+}
+
+/* =====================================================================
+   v2121 - AUF DEM IPAD STAND DIE LEISTE 1263 px BREIT IN 695 px
+
+   Marcel am 11.10.2026: "fuer mich passt die Datenaufnahme Karte immer
+   noch nicht. Hab in der Messkabien gerade IPad mini auf und es ist
+   alles verzwerrt."
+
+   GEMESSEN, iPad mini 768 px, Kartenstil "Kartei":
+
+     .dp-pf-scroll    695 x 383   clientW 695   scrollW 1263
+                      overflow-x: HIDDEN
+     #oab-bar        1263 x 363   width: 1263,32 px   min-width: 100%
+       .dp-pf-lead   1261 x  38   flex 1 0 100%
+       .dp-pf-seg     202 x 246
+       .dp-pf-seg     664 x 246   <- die Kacheln, je ~631 px
+       .dp-pf-rz     1261 x  65
+
+   568 px Inhalt liegen ausserhalb des Behaelters, und der Behaelter
+   klippt sie. Kein Balken, kein Hinweis - sie sind einfach weg.
+
+   ── DIE URSACHE SIND ZWEI REGELN GLEICHER STAERKE ──────────────────
+   Mit dem Kaskaden-Walker am Element, nicht gegrept:
+
+     (0,2,0) !  .dp-pf-scroll .dp-pfbar  width: max-content
+                style.css  @(min-width:641px) and (max-width:1100px)
+     (0,1,0) !  .dp-pf-scroll            overflow-x: auto
+                style.css  @(min-width:641px) and (max-width:1100px)
+     (0,1,0) !  .dp-pf-scroll            overflow-x: hidden
+                datenaufnahme.css  @(max-width:900px)        <- GEWINNT
+
+   Beide `overflow-x`-Regeln sind (0,1,0) und wichtig. Entschieden hat
+   die BLATTREIHENFOLGE: `datenaufnahme.css` ist Blatt 16, `style.css`
+   Blatt 1. Also gewinnt `hidden`.
+
+   > v1892 hat das Tablet-Band bewusst zum Wischen gebaut: `max-content`
+   > macht die Leiste erst ueberlaufbreit, damit der Wrapper etwas zu
+   > scrollen HAT. Eine spaetere Regel hat den Wrapper stillgelegt und
+   > die Breite stehen gelassen. Von einem Paar ist eine Haelfte
+   > uebrig - und die uebrige Haelfte ist genau die schaedliche.
+
+   Und `width:max-content` erklaert auch die 631 px breiten Kacheln:
+   v2117 gibt ihnen im Band 641-900 `calc(50% - 3px)`. 50 % von 1263
+   sind 631. Die Prozentangabe war richtig, ihr Bezug war es nicht.
+
+   ── DIE ENTSCHEIDUNG, AUSDRUECKLICH ───────────────────────────────
+   **Das Wischen wird fuer diese Leiste zurueckgenommen, nicht
+   repariert.** Marcel im Pruefauftrag: "Unbeabsichtigtes horizontales
+   Scrollen" steht dort unter den Fehlern, und "Verkleinere
+   Desktop-Elemente nicht einfach proportional ... Entscheide
+   stattdessen anhand des Inhalts, welche mobile Darstellungsform
+   funktional und gestalterisch am besten geeignet ist."
+
+   Seit v2119 kann die Leiste das, was sie damals nicht konnte:
+   umbrechen, ohne ihre Beschriftungen zu kappen. Damit braucht sie
+   keinen zweiten Mechanismus mehr. v1892 war nicht falsch - es war die
+   beste Antwort, solange Umbrechen Unleserlichkeit bedeutete.
+
+   Der Wisch-Hinweis (`.dp-pf-scroll::after`) faellt im selben Band
+   mit: ein Schatten, der "hier geht es weiter" sagt, wo es nicht
+   weitergeht, ist schlimmer als keiner. Fuer "kartei" und
+   `dp-pfzeile` war er schon aus - jetzt fuer jeden Stil.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 1100px){
+
+  /* 1 - keine Ueberlaufbreite mehr. (1,2,0) gegen die (0,2,0) aus v1892. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar,
+  :is(#oab-bar,#qc7-sources).dp-pfbar{
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex-wrap: wrap !important;
+    row-gap: 8px !important;
+  }
+
+  /* 2 - der Wrapper scrollt nicht mehr und klippt auch nichts.
+         (0,2,0) ueber :has gegen die (0,1,0) beider Vorgaenger. */
+  .dp-pf-scroll:has(.dp-pfbar){
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* 3 - der Wisch-Hinweis luegt ohne Wischen. */
+  .dp-pf-scroll:has(.dp-pfbar)::after{
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    width: 0 !important;
+  }
+
+  /* 4 - Lead und Stub hatten `flex:1 0 100%` und damit eine eigene
+         Zeile. Das war fuer die Wischzeile gedacht; beim Umbruch
+         reicht `auto`, dann teilen sie sich eine Zeile, wenn Platz
+         ist. 100 % bleibt als Mindestanspruch NICHT stehen. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+}
+
+/* =====================================================================
+   v2121a - TOUCHFLAECHEN AUF DEM TABLET
+
+   Aus demselben Lauf, 32 Messungen (4 Datenaufnahme-Stile x 8 Geraete):
+
+     Geraet            Abruf-Knopf   Kacheln
+     iPad mini   768       33 px      -
+     iPad Pro 11 834       33 px      -
+     1180                  33 px      34-35 px
+     1280                  33 px      34-35 px
+
+   Marcel im Pruefauftrag: "Touchflaechen sind ausreichend gross.
+   Buttons lassen sich bequem mit dem Finger bedienen."
+
+   > **Das Band 1024-1180 ist in Marcels eigener Geraeteliste
+   > "Tablet Querformat"** - das iPad Pro 11 ist im Querformat
+   > 1194 px breit. Eine Breite ueber 1024 heisst also nicht Maus.
+
+   Deshalb 44 px Mindesthoehe von 641 bis 1200 px, und darueber bleibt
+   es kompakt. `@media (pointer:coarse)` waere der genauere Weg - er
+   ist in der Messkabine aber NICHT pruefbar (das iframe laeuft in
+   einem Chrome mit Maus), und eine Regel, die ich nicht nachmessen
+   kann, ist hier die schlechtere.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 1200px){
+  :is(#oab-bar,#qc7-sources).dp-pfbar button#oab-run,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch{
+    min-height: 44px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    min-height: 44px !important;
+    align-items: center !important;
+  }
 }
