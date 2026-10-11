@@ -1908,6 +1908,50 @@ unverändert `'light'` zurück („Marktbericht immer hell").
   einmal vor, im Tag selbst. Ein totes Attribut, das behauptet, die Seite
   sei dunkel. *Es hat mich zuerst in die falsche Richtung geschickt.*
 
+### Was ohne Entscheidung ging, ist behoben (`v2100`)
+
+Von den 19 Stellen sind **18** übrig. Behoben ist die eine, die **keine**
+Farbfrage war:
+
+`wertermittlung.js:908` trug `<b style="color:#c8c8d0">` — ein helles
+Grau für dunklen Grund, **inline** gesetzt, auf einer Seite die seit
+`v895e` immer hell ist. **Kontrast 1,66.** Weil die Farbe inline steht,
+konnte der `data-mb-theme="light"`-Block sie nie erreichen.
+
+Genommen ist die **eigene Variable des Dokuments** (`--txt`, im
+light-Block `#2a2727`) — kein neu erfundener Ton: es ist ein Name in
+Fettschrift, also gilt die Textfarbe. **14,8 auf Weiß.** Nachgemessen:
+`#c8c8d0` kommt im Dokument **0×** vor.
+
+**Die Inline-Farben der Datei, gezählt und gerechnet:**
+
+| Ton | × | k auf Weiß | |
+|---|---:|---:|---|
+| `#c8c8d0` | 1 | 1,66 | **behoben** |
+| `#e8b84f` | 1 | **1,84** | Statusfarbe — siehe unten |
+| `#8a8a93` | 4 | 3,42 | fällt, aber lesbar |
+| `#8a8378` | 2 | 3,75 | fällt, aber lesbar |
+| `#7a7a84` | 1 | 4,25 | knapp |
+
+**`#e8b84f` nicht angefasst, mit Rechnung:** um auf Weiß 4,5 zu halten,
+müsste die Warnfarbe um **43 %** abgedunkelt werden und würde zu
+`#84692d` — einem Oliv. *Bei einer Statusfarbe verliert das das Signal.*
+Das ist eine Entscheidung, keine Rechnung.
+
+**Die drei verbleibenden unlesbaren Stellen (k < 2,0) sind ALLE Gold:**
+`#E8CC7A` auf Creme (1,42 / 1,53) und `#C9A84C` (1,97). **Kein**
+vorhandenes Marken-Gold erreicht auf Weiß 4,5 — `#b8932f` kommt auf 2,8,
+`#9a7f33` auf 3,47. Deshalb geht es hier nicht weiter ohne N60.29.
+
+> Die Doktrin ist klar — *Gold ist der Akzent, nicht die Textfarbe.* Der
+> WEG dorthin ist Marcels Wahl zwischen (a), (b) und (c) aus N60.17. Ich
+> habe keinen davon für ihn genommen.
+
+**Nicht angefasst:** der 7-px-Text im Quick-Check sitzt in `#qb-bp`, dem
+**Boarding-Pass**. Winzige Mono-Beschriftungen sind dort Teil der
+Bildsprache — das zu vergrößern wäre eine Gestaltungsänderung, keine
+Fehlerbehebung.
+
 **Gehört in dieselbe Entscheidung wie N60.17/N60.29** (welcher Goldton auf
 hellem Grund). Der Fix ist hier ein Block Regeln im
 `data-mb-theme="light"`-Abschnitt — die goldenen Textfarben mitziehen, so
