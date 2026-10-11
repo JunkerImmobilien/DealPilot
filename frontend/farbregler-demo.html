@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farbregler · Demo (N60.35)</title>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DealPilot · farbregler-demo.html · v2106 · Backlog N60.35
+
+     ZUM ENTSCHEIDEN, NICHT ZUM AUSLIEFERN.
+
+     Befund vom 11.10.2026: die fuenf Farbregler des Darstellungs-Panels
+     setzen ihre Tokens am `body`, aber gelesen werden sie nur unter
+     `html[data-ui-theme]` oder `body.dp-chrome-hell`. Im
+     AUSLIEFERUNGSZUSTAND faerbt also keiner von ihnen etwas.
+
+     Diese Seite zeigt die zwei moeglichen Wege NEBENEINANDER, mit den
+     ECHTEN Werten der Objektkarte - am 11.10.2026 im laufenden Staging
+     per getComputedStyle ausgelesen, nicht aus dem Blatt abgeschrieben:
+
+       Verlauf   linear-gradient(135deg, rgba(20,15,5,.6), rgba(0,0,0,.7))
+       Grund     rgba(0,0,0,0)        <- die Karte hat KEINE eigene Farbe
+       Rand      1.11px solid rgb(201,168,76), Radius 14px
+       Kachel    rgba(255,255,255,.024), Rand Gold 12 %
+       Skala     #817d76 (v2104), 7,5 px
+
+     Der Kontrast der Skalen-Beschriftung wird je Karte MITGERECHNET -
+     das ist die Zahl, an der die Entscheidung haengt, nicht der Eindruck.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap">
+<style>
+:root{
+  /* Gold traegt die var(--wl-<hex>, #<hex>)-Form, wie die
+     Whitelabel-Pflicht es verlangt — `tools/gold-audit.py` entfernt
+     `var(--x, …)`-Huellen vor dem Zaehlen, hartes Gold waere sofort rot
+     (eine Datei, die nicht in der Basislinie steht, ist immer rot).
+     GRUEN UND ROT bleiben nackt: Statusfarben werden nicht tokenisiert,
+     und sie stehen nachgemessen auch nicht in WL_TINTS. */
+  --obsidian:#050505;
+  --gold:    var(--wl-c9a84c, #C9A84C);
+  --gold-hi: var(--wl-e8cc7a, #E8CC7A);
+  --creme:#FDFCFA;
+  --gruen:#3FA56C; --rot:#B8625C;
+  /* Die echten Werte der Objektkarte, gemessen am 11.10.2026 */
+  --karte-verlauf: linear-gradient(135deg, rgba(20,15,5,.6) 0%, rgba(0,0,0,.7) 100%);
+  --kachel: rgba(255,255,255,.024);
+  --kachel-rand: var(--wl-c9a84c-12, rgba(201,168,76,.12));
+  --skala: #817d76;
+  /* Die Probefarben fuer den Regler — hier als Variablen, damit im
+     Skript darunter KEIN Marken-Literal steht. */
+  --probe-karte: var(--wl-fbf6e9, #FBF6E9);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; padding:28px 20px 60px; background:var(--obsidian); color:var(--creme);
+  font:400 15px/1.6 Inter,system-ui,sans-serif;
+}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font:700 26px/1.2 'Space Grotesk',sans-serif;margin:0 0 6px;color:var(--gold-hi)}
+.sub{font:400 14px/1.5 Inter,sans-serif;color:#9a948c;margin:0 0 26px;max-width:72ch}
+h2{font:500 17px/1.3 'Space Grotesk',sans-serif;margin:34px 0 12px;color:var(--creme)}
+code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.88em}
+
+/* ── Der Regler ─────────────────────────────────────────────────────── */
+.regler{
+  display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+  background:#0d0b08;border:1px solid var(--wl-c9a84c-22, rgba(201,168,76,.22));border-radius:12px;
+  padding:14px 16px;margin-bottom:8px;
+}
+.regler label{font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.06em;
+  text-transform:uppercase;color:#9a948c}
+.regler input[type=color]{width:52px;height:34px;border:1px solid var(--wl-c9a84c-30, rgba(201,168,76,.3));
+  border-radius:8px;background:none;cursor:pointer;padding:2px}
+.vorgaben{display:flex;gap:7px;flex-wrap:wrap}
+.vorgaben button{
+  width:30px;height:30px;border-radius:7px;border:1px solid rgba(255,255,255,.18);
+  cursor:pointer;padding:0;
+}
+.vorgaben button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.wert{font:500 13px/1 'JetBrains Mono',monospace;color:var(--gold-hi)}
+
+/* ── Drei Karten nebeneinander ──────────────────────────────────────── */
+.reihe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:18px}
+@media(max-width:860px){.reihe{grid-template-columns:1fr}}
+.spalte > h3{
+  font:500 13px/1.3 'JetBrains Mono',monospace;letter-spacing:.05em;
+  text-transform:uppercase;margin:0 0 4px;color:var(--gold)
+}
+.spalte > p{font:400 12.5px/1.5 Inter,sans-serif;color:#9a948c;margin:0 0 12px;min-height:3.6em}
+
+/* Die Karte - Aufbau und Masse aus der echten Objektkarte */
+.karte{
+  position:relative;border:1.11px solid var(--gold);border-radius:14px;
+  padding:13px 14px 14px;overflow:hidden;
+}
+.karte.ist{ background-color:transparent; background-image:var(--karte-verlauf); }
+/* Weg (a): wie die Vorlagen es tun - Verlauf abraeumen, Farbe setzen */
+.karte.wegA{ background-image:none; background-color:var(--pick,#F6F2E9); }
+/* Weg (b): Farbe UNTER den halbtransparenten Verlauf legen */
+.karte.wegB{ background-color:var(--pick,#F6F2E9); background-image:var(--karte-verlauf); }
+
+.k-kopf{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.k-bild{width:46px;height:46px;flex:0 0 auto;border-radius:9px;
+  background:rgba(255,255,255,.06);border:1px solid var(--wl-c9a84c-18, rgba(201,168,76,.18));
+  display:flex;align-items:center;justify-content:center;font-size:19px;opacity:.75}
+.k-zeile1{font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.08em;
+  color:var(--gold);margin-bottom:4px}
+.k-adresse{font:500 14px/1.25 'Space Grotesk',sans-serif;margin:0 0 2px}
+.k-preis{font:500 13px/1.2 'JetBrains Mono',monospace;color:var(--gold-hi)}
+
+/* Die drei Mini-Kacheln mit der Skala - das ist die Stelle aus N60.34 */
+.k-raster{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kachel{background:var(--kachel);border:1px solid var(--kachel-rand);
+  border-radius:8px;padding:6px 7px 5px}
+.kachel .lab{font:500 8px/1 'JetBrains Mono',monospace;letter-spacing:.07em;
+  text-transform:uppercase;color:#9a948c;margin-bottom:3px}
+.kachel .val{font:500 13px/1.1 'JetBrains Mono',monospace;margin-bottom:4px}
+.kachel .val.gut{color:var(--gruen)} .kachel .val.schlecht{color:var(--rot)}
+.balken{height:3px;border-radius:2px;background:rgba(255,255,255,.1);margin-bottom:3px;overflow:hidden}
+.balken i{display:block;height:100%;background:var(--gold);border-radius:2px}
+/* DIE SKALA - 7,5 px, der Gegenstand von N60.34 */
+.skala{display:flex;justify-content:space-between;font-size:7.5px;
+  font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;
+  color:var(--skala);margin-top:2px}
+
+/* Der Messwert je Karte */
+.mess{margin-top:10px;padding:9px 11px;border-radius:9px;
+  background:#0d0b08;border:1px solid rgba(255,255,255,.08);
+  font:400 12px/1.5 'JetBrains Mono',monospace}
+.mess b{font-weight:500}
+.mess .k{font-size:17px;font-weight:500}
+.ok{color:#6fd39b} .fail{color:#e88b82}
+.hinweis{margin-top:7px;font:400 11.5px/1.45 Inter,sans-serif;color:#8a847c}
+
+table{border-collapse:collapse;width:100%;margin-top:10px;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+th{font:500 11px/1 'JetBrains Mono',monospace;letter-spacing:.06em;
+  text-transform:uppercase;color:#9a948c}
+td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+.kasten{background:#0d0b08;border-left:3px solid var(--gold);
+  border-radius:0 10px 10px 0;padding:13px 16px;margin:16px 0;font-size:14px}
+.kasten p{margin:0 0 8px} .kasten p:last-child{margin:0}
+</style>
+</head><body>
+<div class="wrap">
+
+<h1>Farbregler · zwei Wege</h1>
+<p class="sub">
+  Backlog <b>N60.35</b>. Im Auslieferungszustand färbt keiner der fünf
+  Regler etwas — die Tokens landen am <code>body</code>, gelesen werden sie
+  nur unter <code>html[data-ui-theme]</code>. Diese Seite zeigt, wie es
+  aussähe, wenn man sie verdrahtet. Die Werte der Karte sind am laufenden
+  Staging ausgelesen, nicht aus dem Blatt abgeschrieben.
+</p>
+
+<div class="regler">
+  <label for="pick">Objektkarten</label>
+  <input type="color" id="pick" value="#F6F2E9">
+  <span class="wert" id="wert">#F6F2E9</span>
+  <div class="vorgaben" id="vorgaben"></div>
+</div>
+<p class="hinweis" style="margin:0 0 4px">
+  <b>#F6F2E9</b> ist die Vorgabe des Reglers. Die anderen Felder sind
+  Farben, die ein Nutzer wirklich wählen könnte — inklusive der
+  Markenfarben.
+</p>
+
+<div class="reihe" id="reihe"></div>
+
+<h2>Was die Zahlen sagen</h2>
+<table id="tab"><thead><tr>
+  <th>Fassung</th><th>Grund der Kachel</th><th class="num">Kontrast der Skala</th><th>Urteil</th>
+</tr></thead><tbody></tbody></table>
+
+<div class="kasten">
+  <p><b>Der Verlauf ist halbtransparentes Schwarz</b> —
+  <code>rgba(20,15,5,.6)</code> nach <code>rgba(0,0,0,.7)</code>. Weg (b)
+  legt die Farbe darunter, also bleiben von ihr 30–40 % übrig. Eine hell
+  gewählte Farbe kommt dort <i>dunkel</i> heraus, und zwar immer.</p>
+  <p><b>Weg (a) ist, was die Vorlagen schon tun</b>
+  (<code>ui-varianten.css:488</code>: <code>background-image:none</code>
+  plus <code>background-color</code>). Die Farbe kommt satt, die Fläche
+  wird flach — der dekorative Verlauf fällt.</p>
+</div>
+
+<div class="kasten">
+  <p><b>Zwei Korrekturen an meiner eigenen Warnung von vorhin.</b></p>
+  <p>Ich hatte geschrieben, bei Weg (a) fiele am Kopf „unter Umständen der
+  Runway". <b>Gemessen stimmt das nicht:</b> <code>header.hdr</code> trägt
+  <code>linear-gradient(rgb(15,15,15), rgb(2,2,2))</code> — ein dunkles
+  Grau, keine Goldfläche. Das Markenargument galt dort nicht.</p>
+  <p>Und: die Karte hat <b>keine eigene Hintergrundfarbe</b>
+  (<code>rgba(0,0,0,0)</code>). Was man für die Kartenfarbe hält, ist
+  ausschließlich der Verlauf.</p>
+</div>
+
+<script>
+/* ── WCAG, einmal. Kein zweiter Rechenweg auf der Seite. ───────────── */
+function lin(v){ v/=255; return v<=0.04045 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); }
+function lum(c){ return 0.2126*lin(c[0])+0.7152*lin(c[1])+0.0722*lin(c[2]); }
+function kontrast(a,b){ var l1=lum(a),l2=lum(b);
+  return Math.round(((Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05))*100)/100; }
+function hex2rgb(h){ h=h.replace('#','');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+/* Eine Schicht mit Alpha auf einen Grund legen */
+function ueber(farbe,alpha,grund){
+  return [0,1,2].map(function(i){ return alpha*farbe[i]+(1-alpha)*grund[i]; });
+}
+
+/* Die gemessenen Bausteine */
+var VERLAUF_A = [20,15,5],  VERLAUF_A_AL = 0.6;   /* Anfang 135deg */
+var VERLAUF_B = [0,0,0],    VERLAUF_B_AL = 0.7;   /* Ende */
+var KACHEL    = [255,255,255], KACHEL_AL = 0.024;
+var SKALA     = hex2rgb('#817d76');
+var OBSIDIAN  = [5,5,5];
+
+/* Der EFFEKTIVE Grund der Skalenschrift, Schicht fuer Schicht von unten:
+   Seite -> Kartengrund -> Verlauf -> Kachel. Gerechnet wird gegen BEIDE
+   Enden des Verlaufs und der SCHLECHTERE gewinnt - ein Ton, der nur im
+   Mittel traegt, versagt an einem Ende der Karte. */
+function grundFuer(modus, pick){
+  var basis = (modus==='ist') ? OBSIDIAN : hex2rgb(pick);
+  var enden = [];
+  if (modus==='wegA'){
+    enden = [basis];                                  /* kein Verlauf */
+  } else {
+    enden = [ ueber(VERLAUF_A, VERLAUF_A_AL, basis),
+              ueber(VERLAUF_B, VERLAUF_B_AL, basis) ];
+  }
+  return enden.map(function(e){ return ueber(KACHEL, KACHEL_AL, e); });
+}
+function schlechtester(modus, pick){
+  var gr = grundFuer(modus, pick);
+  var k = gr.map(function(g){ return kontrast(SKALA, g); });
+  var i = k.indexOf(Math.min.apply(null,k));
+  return { k:k[i], grund:gr[i] };
+}
+function rgbTxt(c){ return 'rgb('+Math.round(c[0])+','+Math.round(c[1])+','+Math.round(c[2])+')'; }
+
+var FASSUNGEN = [
+  { id:'ist',  titel:'Ist-Zustand',
+    text:'Der Regler setzt sein Token, und niemand liest es. Die gewählte Farbe hat KEINE Wirkung — egal welche.' },
+  { id:'wegA', titel:'Weg (a) · Verlauf abräumen',
+    text:'Wie die Vorlagen es lösen. Die Farbe kommt satt heraus, die Fläche wird flach.' },
+  { id:'wegB', titel:'Weg (b) · Farbe unter den Verlauf',
+    text:'Der Verlauf bleibt. Von der gewählten Farbe bleiben 30–40 % übrig, sie wirkt getönt.' }
+];
+
+function karteHtml(f){
+  return '<div class="spalte">'
+    + '<h3>'+f.titel+'</h3><p>'+f.text+'</p>'
+    + '<div class="karte '+f.id+'" id="karte-'+f.id+'">'
+    +   '<div class="k-kopf">'
+    +     '<div class="k-bild">⌂</div>'
+    +     '<div><div class="k-zeile1">2026-014 · MFH</div>'
+    +     '<div class="k-adresse">Löhner Str. 278</div>'
+    +     '<div class="k-preis">349.000 €</div></div>'
+    +   '</div>'
+    +   '<div class="k-raster">'
+    +     kachelHtml('DSCR','1,24','gut',62,['0','1','1,5','2+'])
+    +     kachelHtml('CF/Mon','+184 €','gut',48,['0','1','1,5','2+'])
+    +     kachelHtml('Rendite','4,1 %','schlecht',41,['0%','5%','10%'])
+    +   '</div>'
+    + '</div>'
+    + '<div class="mess" id="mess-'+f.id+'"></div>'
+    + '</div>';
+}
+function kachelHtml(lab,val,art,pct,skala){
+  return '<div class="kachel"><div class="lab">'+lab+'</div>'
+    + '<div class="val '+art+'">'+val+'</div>'
+    + '<div class="balken"><i style="width:'+pct+'%"></i></div>'
+    + '<div class="skala">'+skala.map(function(s){return '<span>'+s+'</span>';}).join('')+'</div>'
+    + '</div>';
+}
+
+document.getElementById('reihe').innerHTML = FASSUNGEN.map(karteHtml).join('');
+
+/* Vorgabefelder - echte Farben, die jemand waehlen koennte */
+/* Die Markenfarben werden AUS DEN CSS-VARIABLEN gelesen, nicht hier
+   hingeschrieben: ein Gold-Literal im Skript waere hartes Gold und der
+   Audit wuerde es finden. Nebeneffekt, der mir lieber ist als der
+   Umstand: faerbt whitelabel-override.js die Tokens um, zeigt die Demo
+   automatisch die Mandantenfarbe. */
+function ausVar(name, rueckfall){
+  try {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    /* Ein leerer Wert heisst "Token nicht gesetzt" - dann der Rueckfall.
+       Ein `var(--wl-…, #xxx)` kommt hier schon aufgeloest an. */
+    return /^#[0-9A-Fa-f]{6}$/.test(v) ? v : rueckfall;
+  } catch (e) { return rueckfall; }
+}
+var PROBEN = [
+  ['#F6F2E9','Vorgabe des Reglers'], ['#FFFFFF','Weiß'],
+  [ausVar('--probe-karte','#F6F2E9'),'Karte (Marke)'], ['#0d0b08','Obsidian-nah'],
+  [ausVar('--gold','#F6F2E9'),'Gold (Marke)'],
+  [ausVar('--gruen','#F6F2E9'),'Grün (Status)'],
+  [ausVar('--rot','#F6F2E9'),'Rot (Status)'],
+  ['#2A2727','--ch'], ['#1a3a5c','Dunkelblau']
+];
+document.getElementById('vorgaben').innerHTML = PROBEN.map(function(p){
+  return '<button type="button" style="background:'+p[0]+'" data-h="'+p[0]+'" title="'+p[1]+' '+p[0]+'"></button>';
+}).join('');
+
+function zeichne(pick){
+  document.documentElement.style.setProperty('--pick', pick);
+  document.getElementById('wert').textContent = pick.toUpperCase();
+  document.getElementById('pick').value = pick;
+  var zeilen = '';
+  FASSUNGEN.forEach(function(f){
+    var r = schlechtester(f.id, pick);
+    var gut = r.k >= 4.5;
+    var kl = gut ? 'ok' : 'fail';
+    document.getElementById('mess-'+f.id).innerHTML =
+        '<b>Skala auf Kachel</b><br>'
+      + '<span class="k '+kl+'">'+r.k.toFixed(2)+'</span> '
+      + '<span class="'+kl+'">'+(gut?'✓ über 4,5':'✗ unter 4,5')+'</span><br>'
+      + '<span style="color:#8a847c">Grund '+rgbTxt(r.grund)+'</span>'
+      + '<div class="hinweis">'+(f.id==='wegA'
+          ? 'Ein Ende, kein Verlauf.'
+          : 'Der SCHLECHTERE der zwei Verlaufsenden — ein Ton, der nur im Mittel trägt, versagt an einem Ende.')
+        +'</div>';
+    zeilen += '<tr><td>'+f.titel+'</td><td class="mono" style="color:#8a847c">'+rgbTxt(r.grund)+'</td>'
+      + '<td class="num '+kl+'">'+r.k.toFixed(2)+'</td>'
+      + '<td class="'+kl+'">'+(gut?'trägt':'trägt NICHT')+'</td></tr>';
+  });
+  document.querySelector('#tab tbody').innerHTML = zeilen;
+}
+
+document.getElementById('pick').addEventListener('input', function(){ zeichne(this.value); });
+document.getElementById('vorgaben').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-h]'); if (b) zeichne(b.getAttribute('data-h'));
+});
+zeichne('#F6F2E9');
+</script>
+</div></body></html>
