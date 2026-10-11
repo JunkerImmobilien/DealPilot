@@ -8902,6 +8902,54 @@ html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card.deal
   border-left-color:#B8625C !important;
 }
 
+/* ==============================================================================
+   v2116 - DIE SCORE-KANTE ZEIGT JETZT DEN SCORE
+
+   Der Stil heisst im Panel "Score-Kante · Farbiger Strich statt Ring"
+   (objektkarten-stil.js:62). GEMESSEN am Schreibtisch tat er etwas anderes:
+
+     .sbc-score-overlay   display:none      <- der Ring ist weg
+     .sbc-top border-left 13x Gold, 8x #3FA56C
+                                            <- und die 8 sind genau die
+                                               GEWONNENEN, nicht die besten
+
+   Score 69 trug Gruen, Score 64 und 60 trugen Gold - dieselbe Stufe
+   SOLIDE, verschiedene Farben. Der Strich zeigte den DEAL-STATUS, und der
+   Score war auf dieser Karte ueberhaupt nicht mehr sichtbar.
+
+   > Ein Name, der etwas verspricht, das der Code nicht tut, ist derselbe
+   > Fehler wie ein beworbenes Feature ohne Code.
+
+   WARUM DAS JETZT NICHTS KOSTET: ich hatte zuerst als Entscheidung
+   notiert, dass die Kante entweder den Score ODER den Status zeigen kann.
+   Das war eine ungepruefte Annahme. Gemessen traegt die Karte beide
+   Status als eigenes Band - `.sbc-won-ribbon` ("Won", 53x19 px, im Stil
+   `kante` sichtbar) und `.sbc-lost-ribbon` (storage.js:1398/1404). Der
+   Status geht also nicht verloren, er stand nie nur an der Kante.
+
+   DIE FARBEN SIND DIE VORHANDENEN (style.css:10311-10314), nicht neue:
+   derselbe Ton, den der Ring in dieser Stufe getragen haette.
+
+   Erreicht wird die Stufe ueber `:has()`, weil die Klasse an
+   `.sbc-mini-score` haengt und nicht an der Karte - `.sbc-top` ist deren
+   Geschwister, nicht ihr Vorfahr. `display:none` stoert dabei nicht:
+   `:has()` sieht den DOM, nicht die Darstellung.
+
+   Die beiden Regeln darueber (deal-won/deal-lost) bleiben als Rueckfall
+   fuer Karten ohne Score stehen - sie verlieren hier nur auf
+   Spezifitaet, weil `:has()` zwei Klassen beisteuert.
+   ============================================================================== */
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-green-strong) .sbc-top,
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-green) .sbc-top {
+  border-left-color:#6FCB91 !important;
+}
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-gold) .sbc-top {
+  border-left-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-red) .sbc-top {
+  border-left-color:#DDA29E !important;
+}
+
 html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card .sbc-score-overlay {
   display:none !important;
 }
