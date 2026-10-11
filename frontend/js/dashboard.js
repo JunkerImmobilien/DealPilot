@@ -1599,8 +1599,9 @@
       '.sk-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}',
       '.sk-dat{color:var(--dp-muted-txt, var(--dp-muted,#7A7370));white-space:nowrap}',
       '.sk-grau{color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
-      '.sk-gruen{color:#3FA56C}',
-      '.sk-rot{color:#B8625C}',
+      /* v2101d: Weg (a), 3,01 auf hellem Grund. Staffelung wie beim Grau. */
+      '.sk-gruen{color:var(--dp-green-txt,#2e784f)}',
+      '.sk-rot{color:var(--dp-red-txt,#a05550)}',
       '.sk-satz{white-space:nowrap;color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
       /* v2101b: Weg (a), gemessen 2,23 bei 8 Traegern. */
       '.sk-satz b{color:var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C));font-weight:600}',

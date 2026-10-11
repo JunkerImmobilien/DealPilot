@@ -188,9 +188,9 @@
 
   #dashboard-main .kc-flat .scl{font-family:'JetBrains Mono';font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;text-align:center;margin-top:1px}
 
-  #dashboard-main .kc.tg .sc, #dashboard-main .kc.tg .scl{color:var(--c-green)}
+  #dashboard-main .kc.tg .sc, #dashboard-main .kc.tg .scl{color:var(--dp-green-txt,#2e784f)}
 #dashboard-main .kc.ty .sc, #dashboard-main .kc.ty .scl{color:var(--c-accd-txt)}
-#dashboard-main .kc.tr .sc, #dashboard-main .kc.tr .scl{color:var(--c-red)}
+#dashboard-main .kc.tr .sc, #dashboard-main .kc.tr .scl{color:var(--dp-red-txt,#a25646)}
 
   #dashboard-main .kc-flat .chev{width:15px;height:15px;flex:0 0 15px;color:var(--c-front-mut);transition:transform .35s}
 
