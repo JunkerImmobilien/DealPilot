@@ -4987,9 +4987,34 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   display: flex;
   gap: 3px;
   opacity: 0;
+  /* ── v2110 · UNSICHTBAR HEISST AUCH UNANKLICKBAR ──────────────────
+     GEMESSEN am 11.10.2026: im Ruhezustand steht hier `opacity:0`, aber
+     `pointer-events` blieb `auto`. `elementsFromPoint` auf dem unteren
+     Rand des Score-Rings lieferte `button.sbc-btn` ganz oben - ein
+     unsichtbarer Knopf fing dort die Klicks ab, und zwar der zum
+     DUPLIZIEREN.
+
+     Seit `v1943` sind Ring UND Knoepfe beide senkrecht mittig, also
+     ueberlappen sie: 21 px senkrecht, 34-42 px waagerecht, auf allen
+     gemessenen Karten.
+
+     > Die Paarung gibt es unter den Layout-Varianten laengst
+     > (`layout-varianten.css:7313` fuehrt sie ausdruecklich als
+     > „opacity: 0  pointer-events: none"). Die DealPilot-Grundfassung
+     > hat sie nie bekommen - dieselbe Form wie bei den Farbreglern und
+     > bei den Skalen-Beschriftungen: eine Reparatur erbt den Anker, an
+     > dem sie geschrieben wurde.
+
+     Das aendert die OPTIK nicht - nur, dass ein Klick auf den Ring nicht
+     mehr am Duplizieren-Knopf haengen bleibt. Die sichtbare Ueberdeckung
+     beim Schweben ist eine eigene Frage und steht im Backlog. */
+  pointer-events: none;
   transition: opacity .12s ease;
 }
-.sb-card:hover .sbc-actions { opacity: 1; }
+/* `:focus-within` wie in den Varianten (`:7105`): sonst waere der Knopf
+   per Tastatur erreichbar, aber unsichtbar. */
+.sb-card:hover .sbc-actions,
+.sb-card:focus-within .sbc-actions { opacity: 1; pointer-events: auto; }
 .sbc-btn {
   width: 24px;
   height: 24px;
