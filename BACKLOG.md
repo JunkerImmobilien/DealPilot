@@ -3845,6 +3845,103 @@ und Übernehmen überall erreichbar.
 ---
 
 #### N60.17 · Responsive-Durchgang der ganzen App (Master-Prompt)
+
+### ✓ DATENAUFNAHME ABGEARBEITET 11.10.2026 (`v2117`–`v2117b`)
+
+**Marcel:** *„Für mich passt die Datenaufnahme-Karte immer noch nicht. Hab
+in der Messkabine gerade iPad mini auf und es ist alles verzerrt … In der
+Ansicht iPhone 14 Pro Max ist der Abrufen-Button riesig."*
+
+Er hatte in beiden Punkten recht. Zwei echte Defekte, beide gemessen:
+
+#### 1 · Drei von vier Pre-Flight-Kacheln waren auf jedem Tablet unerreichbar
+
+Bei 767 px gemessen:
+
+```
+.dp-pf-row  34-729  wrap=nowrap  4 Kinder
+  Kind 1      34-729
+  Kind 2     735-1431   <- draussen
+  Kind 3    1437-2132   <- draussen
+  Kind 4    2138-2833   <- draussen
+```
+
+`.dp-pf-scroll` trägt `overflow:hidden` — man sieht den Überlauf nicht
+einmal.
+
+> **Es war eine Lücke zwischen zwei Grenzen, kein falscher Wert.**
+> `width:100%` gilt ab 900 px abwärts, `flex-wrap:wrap` erst ab 640 px
+> abwärts. Dazwischen gilt das eine ohne das andere — und genau dort
+> liegen iPad mini (768) und iPad Pro 11″ (834).
+
+Der 900er-Block sagt seit `v1941d` „untereinander" und meint es auch; er
+hat es nur der **Reihe** nie gesagt, sondern nur der Leiste und der
+Kachel. Dazu die Tablet-Stufe aus Marcels Prompt („ein bis zwei
+Spalten"): 641–900 px zwei Spalten statt einer langen Säule.
+
+#### 2 · Der Abrufen-Knopf war eingerückt UND randvoll
+
+Bei 430 px: `.dp-pf-tile` 398×44 **@16**, `#oab-run` 356×50 **@51** —
+weder so breit wie die Kacheln noch an ihnen ausgerichtet. Ursache war
+nicht der Knopf, sondern seine Hülle `span.dp-pf-rz` mit
+`padding:0 20px` und `margin-left:14px` aus der Schreibtisch-Fassung.
+
+> **Und meine erste Korrektur griff nur zur Hälfte:** `padding` und
+> `width` wirkten, `margin-left` nicht. Der Walker fand den Grund —
+> `#oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz` hat eine Klasse mehr und
+> gewinnt; ein Medienblock ändert daran nichts. *Eine Regel, die zur
+> Hälfte greift, ist schwerer zu sehen als eine, die gar nicht greift:
+> die Hälfte, die wirkt, sieht aus wie Erfolg.*
+
+#### Abnahme, sechs Geräte, nach den Korrekturen
+
+| Gerät | Kachel | Knopf | bündig | draußen | abgeschnitten |
+|---|---|---|---|---:|---:|
+| iPhone SE 360 | 328@16 | 326@17 | ja | 0 | 0 |
+| iPhone 14 390 | 358@16 | 356@17 | ja | 0 | 0 |
+| iPhone 14 Pro Max 430 | 398@16 | 396@17 | ja | 0 | 0 |
+| iPad mini 767 | 345@34 *(2 Sp.)* | 693@35 | ja | 0 | 0 |
+| iPad Pro 11 833 | 377@34 *(2 Sp.)* | 759@35 | ja | 0 | 0 |
+| Desktop 1180 | 102@536 | 80@1071 | *Zeilenmodus* | 0 | 0 |
+
+### ⚠ Zweimal hat mein eigenes MESSGERÄT falschen Alarm geschlagen
+
+**Erster Entwurf:** meldete vier Reiter als schwer beschädigt (Objekt,
+Steuer, Bewertung, Deal-Aktion, bis zu 129 „raus" und 64
+„abgeschnitten"). Er brach beim ersten `overflow:hidden` ab, **ohne zu
+prüfen, ob davor ein scrollbarer Kasten liegt.** Mit der Korrektur sind
+es **null**: Steuer wischt in `.ytf-quick-wrap`, Bewertung in
+`.bc-svg-wrap`.
+
+**Zweiter Entwurf:** meldete zwei `img` als „teilweise abgeschnitten".
+Sie sitzen in `.dab-bp-logo`, einem eng anliegenden Logo-Rahmen mit
+`overflow:hidden`, und gehören zu Karten in den Schienen
+`#dab-rail-finanzierung` / `#dab-rail-gutachter`. Der Prüfer erreicht die
+Schiene nie, weil er am Logo-Rahmen stehenbleibt.
+
+> *Überlauf innerhalb eines Wischkastens ist kein Befund, und ein Logo,
+> das in seinen eigenen Rahmen beschnitten wird, auch nicht.* Beide Male
+> hätte ich ohne die Gegenprobe „behoben", was nicht kaputt war.
+
+### Der strukturelle Befund dahinter
+
+Die App benutzt **25 verschiedene Breakpoints** — 900 px (95×), 720 (43×),
+768 (39×), 700 (28×), 1100 (23×), 640 (22×), 600 (21×), 1024 (21×), 760,
+800, 560, 480 …
+
+> **Bei 25 Grenzen sind Lücken wie 641–900 unvermeidlich:** eine Regel
+> auf 900 und ihr Gegenstück auf 640 lassen ein 260 px breites Band, in
+> dem die Hälfte gilt. Das ist die Ursache, nicht der Einzelfall.
+> Zusammenlegen geht nicht in einem Zug — aber jedes Paar, das
+> zusammengehört, gehört auf dieselbe Grenze.
+
+### Noch nicht geprüft (ehrlich gekennzeichnet)
+
+Gemessen sind **die Pre-Flight-Leiste und die neun Reiter der
+Datenaufnahme** auf sechs Breiten. **Nicht** geprüft: Cockpit, Portfolio,
+Alle-Objekte, Anmeldung, Dialoge, Quick-Check, Marktbericht, Querformat,
+2560 px, Tastaturnavigation.
+
 Marcel, 09.10.2026, Master-Prompt: vollständiger Responsive-, UI/UX- und
 Funktionalitätscheck über alle Ansichten und zehn Viewport-Größen, mit
 direkter Umsetzung statt Fehlerliste.
