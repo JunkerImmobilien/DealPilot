@@ -36183,3 +36183,178 @@ gemessen), einmal beim Einbau von `pseudoGrund` (`v2065a`).
 
 Zwei gleiche Fehler hintereinander heißen nach Regel 4: abschließen und
 übergeben. Deshalb endet dieser Abschnitt hier und nicht bei der Behebung.
+
+## Rollout-Journal 10.–11.10.2026 (N60.2/16/24) — v2089–v2100: der Matrix-Läufer, und was er über uns herausfand
+
+**Was** · Marcel: *„ja, bitte arbeite alle Punkte aus dem Backlog ab."*
+Zwölf Rollouts. Das Ergebnis ist weniger die behobene Arbeit als die
+**gemessene**: an fünf Stellen war der Befund im Backlog falsch, und
+dreimal lag der Fehler in meinem eigenen Werkzeug.
+
+**Commit** · `aea7b3fe` `08604c62` `cba84c80` `b3bf99b5` `036de253`
+`757911b5` `02466fde` `9438aacb` `7244a49d` `80ffad48` `0bbc37af`
+`de38c850` `fd7cc765` `6266495f` `ca81ab09` `59a4ab7f` `437d8ad2`
+`7a642ff4` `f25c55e1`
+
+**Nachweis** · drei Matrix-Läufe, alle mit Deckung 100 %:
+
+| Dokument | Punkte | Messungen | Dauer |
+|---|---:|---|---|
+| Haupt-App | 48 | 432 Reiter | 12 min |
+| Quick-Check | 48 | 48 (ohne Reiter) | 3 min |
+| Marktbericht | 8 | 8 (ohne Reiter) | 1 min |
+
+Dazu fünf Prüfstrecken mit RC=0: `anmeldung-auskunft-pruefen` (27),
+`mfh-rnd-eingabe-pruefen` (16), `ankauf-abweichung-pruefen` (39),
+`kontrast-demo-pruefen` (95), `kerosin-nutztext-pruefen` (420 Dateien).
+
+#### `v2089`/`v2090` — Kontrast: bei vier von sechs Stellen war die Deckkraft der Fehler
+
+`.ds2-tag` trug Gold auf 14 %-Gold über Weiß, **k=2,06**. Und es gab
+**zwei** Fassungen: `.ct-pro .ds2-tag` mit `!important`, später und
+spezifischer — sie hätte die Korrektur still ausgehebelt. Gefunden nur,
+weil nach dem ersten Eingriff **alle** `ds2-tag`-Regeln gegreppt wurden.
+
+Bei `.hint` stand `rgba(42,39,39,.55)` — *liest sich wie „die Tinte, nur
+leiser", gerechnet ist es `rgb(138,136,136)`.* Die **dunkelste** der fünf
+Flächen entschied: 0,65 besteht auf vier und fällt auf `--surface2`
+durch, 0,68 hält überall.
+
+> **Der Mittelwert hat das Won-Band verharmlost.** Die Kabine mittelt
+> einen Verlauf und meldete 3,73. Am **hellen Ende** steht derselbe weiße
+> Text, und dort waren es **2,78** — die schlechteste Stelle der App und
+> die unauffälligste im Protokoll. Das Band trug zwei
+> Material-Design-Grüns statt `#3FA56C`.
+
+#### `v2091` — die Kontrast-Demo, und der Befund ist ein anderer als gedacht
+
+Im Cockpit liegen **234 Textstellen** unter der Schwelle, gebündelt auf
+**elf Töne** — und **131 davon tragen eine Statusfarbe (Grün/Rot) als
+Textfarbe**, nur 53 tragen Gold. *Ich war von einem Goldproblem
+ausgegangen; das ist der kleinere Teil.*
+
+Jede Zahl der Demo ist gerechnet. Der Prüfer fing sofort einen Fehler im
+Generator: er prüfte die Schwelle am **ungerundeten** Ton und
+veröffentlichte den gerundeten — drei Töne landeten auf 4,49/4,50/4,51.
+
+#### `v2092`–`v2092f` — der Matrix-Läufer, und drei Fehler in ihm selbst
+
+1. **Die Variante „DealPilot" war `opt: {}`** — also blieben `theme`,
+   `cards`, `kartenstil` und `objkarte` aus Vortests **stehen**, in allen
+   48 Punkten. Lauf verworfen. Jede Variante nennt jetzt den **vollen**
+   Achsensatz; `""` heißt *zurücksetzen*.
+2. **109 Querscroll-„Mängel" waren alle gewollt gebaut** (Pfeiltasten,
+   `scroll-snap`, Touch-Scrolling, Tabellenrahmen). *109 Fehlalarme
+   begraben jeden echten Fund.* Jetzt getrennt als `SCHIENE` — mit
+   Nachweis, nicht nach Klassenliste.
+3. **Der Erkenner dafür war tot:** Chrome verwirft
+   `-webkit-overflow-scrolling` beim Einlesen. Gemessen: 11.954 Regeln
+   durchgegangen, **null** mit `overflow-scrolling` im `cssText`, bei 10
+   Regeln auf denselben Selektor. Jetzt trägt die Regel `--dpm-schiene: 1`
+   — *die Absicht hängt am Element, nicht in einer Liste im Prüfer.*
+
+**Zwei Behauptungen im Backlog zurückgenommen:** drei Achsen kämen nicht
+an (zwei kommen an, bei `surface` hatte ich einen Wert erfunden, den
+`SURFACE` nicht kennt), und es gäbe vier Themes — es sind **sechs**,
+`konsole` war nie gemessen.
+
+> **`konsole` hat 13 Regeln, Kontor hat 102**, und 62 Sammelregeln in
+> `style.css` lassen es weg. Folge: `span.me-incze-desc` trägt die
+> Marken-Tinte `#2A2727` auf `rgb(39,39,37)` — **Kontrast 1,01, also
+> unsichtbar.** In allen anderen Fassungen misst dieselbe Stelle 13,96.
+> Eine voll wählbare Fassung, die Text verschwinden lässt.
+
+#### `v2093`/`v2094` — zwei Texte, die die Unwahrheit sagten
+
+`api.html` behauptete *„eine On-Demand-Berechnung per API gibt es noch
+nicht"* — seit `v2071` falsch. Zwei Endpunkte wurden zu zwölf. Und
+dreimal stand „Enthalten im Pro-Plan": `api_access` haben **pro und
+partner**, in den Migrationen nachgelesen.
+
+`userService.authenticate` gab jedem frisch Registrierten **„Account is
+disabled"** — englisch, und es klingt wie eine Sperre durch uns.
+Gemessen: `email_verified_at` blockiert **nichts**, der Riegel ist
+`is_active`. *Die Auskunft schickte den Nutzer in den Support statt in
+sein Postfach.* Nebenbei warf `errorHandler` das `code`-Feld **weg** —
+ein Kennwort wäre lautlos nie angekommen.
+
+#### `v2095`–`v2099` — RND je Einheit, und das Cockpit kann jetzt Ankauf
+
+`rndFuer()` gab dem Kern **vier von zehn** Feldern. Ohne `kernsaniert`
+gilt die Kappe **0,70 statt 0,90** der GND — gemessen bis **+3,4 Jahre**
+je Einheit. Und der Stichtag war auf *heute* festgenagelt, gegen die
+fachliche Festlegung. Statt die Rangfolge ein zweites Mal zu schreiben,
+wird sie geholt.
+
+**Die Vererbung war schon gebaut:** `GEB_IDS` (Dach, Außenwand,
+Leitungen, Heizung) gegen `WE_IDS` (Fenster, Bäder, Innenausbau,
+Grundriss), mit Zähler. Alle acht Gewerke genau einer Seite zugeordnet.
+
+`abweichungFuer(daten)` und der Summen-Umschalter laufen über **dieselbe**
+Rechnung wie bisher — bei **zwei von neun** Kennzahlen ist *kleiner*
+besser (Kaufpreis, LTV), und wer das nachbaut, erklärt einen gestiegenen
+Kaufpreis zur Verbesserung. 18 Richtungsfälle geprüft.
+
+#### `v2096` — die Vorschau war da, der Schleier hat sie verfälscht
+
+Der Klick auf eine Kachel schaltet die App wirklich um, und `.dpo-ov` ist
+ein **Schleier** zu 34 %, kein Vorhang. Der Fehler war subtiler: ein
+**dunkler** Schleier über der Wahl zwischen **hell und dunkel**.
+
+| Fläche | echt | unter dem Schleier | |
+|---|---|---|---:|
+| Creme | `rgb(253,252,250)` | `rgb(169,168,167)` | **−60 %** |
+| Obsidian | `rgb(5,5,5)` | `rgb(5,5,5)` | **−0 %** |
+
+> *Eine Vorschau, die das Gewählte dunkler zeigt als es ist, ist
+> schlimmer als keine: sie lässt den Nutzer gegen etwas entscheiden, das
+> er nie gesehen hat.* Kein zweites iframe — der Schleier fällt weg.
+
+#### `v2097`/`v2100` — „Kerosin" und die Anbieternamen
+
+N60.24 meldete *„alle erreichbaren Texte umgestellt"*. Gemessen: **25
+Treffer im Nutztext** (420 Dateien). Die meisten waren **kein Verstoß** —
+`_wireKerosinStrip` ist ein Funktionsname, und ein Filter **entfernt** den
+Begriff sogar. Wirklich betroffen: fünf Stellen, davon **eine live**.
+
+Dabei fiel auf, dass `quickcheck-app.html` **Sprengnetter und
+PriceHubble namentlich in Kundensätzen** nannte. Die zwei sind ersetzt;
+die restlichen ~60 Anzeige-Stellen **nicht**, weil Partner-Logos auf der
+Landingpage Marketing sind und Tour und Hilfe auf dieselben Knöpfe zeigen.
+
+#### Was die drei Läufe über die iframe-Dokumente herausfanden
+
+**Der Quick-Check ignoriert das gewählte Design.** Er lädt nur
+`whitelabel-override.js` und `qc-whitelabel.js` — die **Marken**schicht —
+und keines der vier Variantenmodule. `data-ui-theme` kommt dort **0×**
+vor. 40 von 48 Punkten meldeten es; *ich hatte eine Fassung sechsmal
+gemessen, nicht sechs.*
+
+Beide Dokumente haben **eigene** Kontrastfehler, die `style.css` nie
+erreicht: **Gold auf Gold** (1,68), 7-px-Text, und im Marktbericht
+`.mbst h4 { color: var(--wl-e8cc7a) }` — das **helle** Gold in einem
+Dokument, das seit `v895e` **immer hell** ist: **1,42**. Der
+`data-mb-theme="light"`-Block überschreibt die Hintergründe mit zehn
+`!important`, die goldenen **Textfarben** nicht.
+
+**Rest** · Was ohne Entscheidung ging, ist behoben. Offen und blockiert:
+
+| Was | wer entscheidet |
+|---|---|
+| Kontrast-Weg (a)/(b)/(c) für 234 Stellen | Marke |
+| `konsole` abschalten oder fertigbauen | Produkt |
+| Anbieternamen anonymisieren oder Regel schärfen | Marke/Vertrag |
+| `--gold-d`/`--gold-3` abdunkeln | Marke |
+| Quick-Check soll dem Design folgen | Produkt |
+| `api.html` auf Prod | Freigabe |
+| Gnadenfrist (a) oder (b) | Produkt |
+| Bankexport-Spalten | Produkt |
+| RND für Verkehrswert oder AfA | **fachlich** |
+| § 557b Sperrfrist beim VPI | **fachlich** |
+| BFH IX R 7/12 anwendbar | **fachlich** |
+
+> **Sechs Mal hat bash in dieser Sitzung mein Quoting zerlegt** —
+> Backslashes in Regex, `\u0027`-Tricks, deutsche Schlussanführungen in
+> doppelten Quotes. Ab dem dritten Mal hätte jedes Skript in eine Datei
+> gehört. Das steht in `backticks-in-bash-verschwinden`, und ich habe es
+> trotzdem wieder getan.
