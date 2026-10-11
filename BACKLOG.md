@@ -2196,9 +2196,38 @@ einmal:
 | Objektkarten | `--dpuv-obj-card` | `html[data-ui-theme] body … .sb-card` | **nein** |
 | Hero | `--dpuv-hero-card` | **niemand, in keiner Datei** | **nein, nie** |
 
-> **`--dpuv-hero-card` hat NULL Leser.** Dieser Regler ist nicht
-> fassungsabhängig kaputt, er ist überall ohne Wirkung — auch mit
-> Vorlage, auch im hellen Skin.
+> **⚠ KORREKTUR meiner eigenen Zeile von vorhin.** Ich hatte geschrieben:
+> *„`--dpuv-hero-card` hat NULL Leser … er ist überall ohne Wirkung."*
+> Der erste Halbsatz stimmt, der zweite nicht.
+>
+> **Nachgemessen liest niemand `--dpuv-hero-card` — aber `--dp-hero-card`
+> hat DREI Leser**, alle in `style.css` unter `body.dp-chrome-hell`
+> (`:36197`, `:36224`, `:36227`, die Score-Karte im Kopf). Und
+> `settings.js:3694` setzt genau diesen Namen.
+>
+> **Der Hero-Regler wirkt also — im hellen Skin, und nur dort.** Was
+> fehlt, ist der Leser im `--dpuv-`-Namensraum: `v1104` hat das Token in
+> `BEREICH_VARS`/`BEREICH_LS` aufgenommen und die Regel dazu nie
+> geschrieben. Die vier Geschwister haben ihre.
+>
+> *Ich hatte aus „kein Treffer für EINEN Namen" geschlossen „wirkt
+> nirgends". Das ist derselbe Fehler wie beim Grund: ein abgebrochener
+> Suchlauf ist kein negativer Befund.*
+
+**Damit sieht die Lage je Regler verschieden aus — und genau das ist der
+Punkt:**
+
+| Regler | wirkt mit Vorlage | wirkt im hellen Skin | wirkt im Auslieferungszustand |
+|---|---|---|---|
+| Kopfleiste | ja | nein | **nein** |
+| Objektleiste | ja | nein | **nein** |
+| KPI-Karten | ja | nein | **nein** |
+| Objektkarten | ja | ja | **nein** |
+| Hero | **nein** | ja | **nein** |
+
+> **Die eine Spalte, die überall „nein" sagt, ist der
+> Auslieferungszustand.** Das ist der gemeinsame Befund; alles andere
+> ist je Regler anders und muss je Regler gemessen werden.
 
 **Alle fünf hängen am selben `html[data-ui-theme]`** — und der Kommentar
 bei `ui-varianten.css:230` nennt die Bedingung selbst:
