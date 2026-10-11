@@ -36759,3 +36759,176 @@ nicht gefunden hatte — überflüssig **und** im falschen Menü.
 | N60.19 Demodaten 5× GrESt 0,00 % | **DB-Eingriff** |
 | Mandanten auf den Server (N60.28/33) | **Freigabe** |
 | N51 Ansprechpartner 1+2 | **Freigabe** |
+
+## Rollout-Journal 11.10.2026 — v2119–v2123: die Datenaufnahme-Karte über alle Geräte
+
+**Was · Commit · Nachweis · Rest**
+
+| Was | Commit |
+|---|---|
+| `v2119` die Leiste knautschte statt umzubrechen | `75cffa10` |
+| `v2120` der Abruf-Knopf war Gold auf Gold | `75cffa10` |
+| `v2121`/`a` iPad: 1263 px in 695 px · Touchflächen | `4514fda8` |
+| `v2122` `v1941a`–`d` ausgetragen | `4514fda8` |
+| `v2123`/`a` zwei Reste, die Höhe kosten | `7e7cfe42` |
+| `tools/datenaufnahme-leiste-pruefen.mjs` | `4514fda8` |
+| Backlog N60.39 | `5ed1c81d` |
+
+Marcel zweimal nacheinander: *„für mich passt die Datenaufnahme Karte
+immer noch nicht. Hab in der Messkabien gerade IPad mini auf und es ist
+alles verzwerrt"* und *„Dann hast du auch nicht die anderen
+Datenaufnahmekarten geprüft das musst du vollumfänglich machen. ich habe
+dir gesagt dass muss passen und auch gut aussehen."*
+
+### Die Lehre: ein Überlauf, der keiner ist
+
+Bei 1180 px war die Summe der direkten Kinder **exakt** die Innenbreite:
+888 von 888. Kein Überlauf, keine Scrollbreite, nichts außerhalb.
+Trotzdem waren vier Beschriftungen gekappt — „Sprache" auf **15 von
+43 px** — und der QR-Kasten auf 39 px gequetscht, mit einem 54-px-SVG
+darin.
+
+> **`flex-shrink: 1` plus `min-width: 0` heißt: lieber alles unleserlich
+> als eine zweite Zeile.** Wer nach einem Überlauf sucht, findet hier
+> nichts und hält die Leiste für gesund. Die Prüffrage ist nicht „läuft
+> etwas über", sondern „ist der sichtbare Teil noch der ganze Inhalt" —
+> `scrollWidth` gegen `clientWidth`, je Beschriftung.
+
+Und der Schaden hing nicht am Fenster, sondern am **Behälter**:
+1024 px → Leiste 1150 (heil), 1180 → 888 (kaputt), 1280 → 856 (kaputt),
+1440 → 1016 (kaputt), 1920 → 1280 (heil). Die Seitenleiste wechselt bei
+1100 px von 260 auf 380 px. **Deshalb kein weiterer Haltepunkt** —
+Haltepunkte beschreiben das Fenster, der Schaden saß im Behälter. Die
+Bauart wurde tragfähig gemacht statt die Breiten einzeln bedient.
+
+### Zwei Entscheidungen ausdrücklich zurückgenommen
+
+**`v1941a`–`d` (fünf Deklarationsblöcke, ausgetragen in `v2122`).** Sie
+taten das Gegenteil: `flex-wrap: nowrap`, Kacheln `flex: 1 1 auto` plus
+`min-width: 0`, Ellipse auf Beschriftung und Kachelkindern, und eine
+Sammelregel `#oab-bar.dp-pfbar * { min-width: 0 }` auf **jeden**
+Nachfahren — die hob jeden späteren Schutz von unten wieder auf.
+
+> `v1941` war nicht falsch. Damals ging es um **sechs Pixel**
+> Überbreite, und ein Umbruch wegen sechs Pixel ist teurer als eine
+> Ellipse. Heute fehlen 90. Die Kommentare bleiben stehen, die
+> Deklarationen nicht — ein Stapel aus zwei Versionen, die sich
+> widersprechen, ist genau das, wovor der Kopf dieser Datei bei
+> `v1702d` warnt.
+
+**`v1892` (Wischen im Tablet-Band, zurückgenommen in `v2121`).** Dort
+stand `width: max-content` auf der Leiste, damit der Wrapper überhaupt
+etwas zu scrollen HAT. Eine spätere Regel in `datenaufnahme.css` hat den
+Wrapper mit `overflow-x: hidden` stillgelegt — gleiche Spezifität,
+spätere Datei — und die Breite stehen gelassen.
+
+> **Von einem Paar blieb die schädliche Hälfte.** 1263 px Leiste in
+> einem 695 px Behälter mit `overflow: hidden`: 568 px lautlos
+> geklippt. Kein Balken, kein Hinweis. Das war Marcels „alles
+> verzerrt".
+
+Und `max-content` erklärt den Folgeschaden: `v2117` gibt den Kacheln im
+Band 641–900 `calc(50% - 3px)`. **50 % von 1263 sind 631.** Die
+Prozentangabe war richtig, ihr Bezug war es nicht.
+
+### Gold auf Gold — eine Farbe gilt nur zu ihrem Grund
+
+Gemessen auf 390 px: `#oab-bar` trägt den Runway-Verlauf
+(rgb 201,170,84), `.dp-pf-rz` ist ein weißer Stub 325×57, und
+`#oab-run` ist 323×50 mit demselben Verlauf. **Kontrast k = 1,07.**
+Vom Stub blieben links und rechts je 1 px — genau Marcels „verdeckt
+das komplette weisse".
+
+Der Kaskaden-Walker nennt den Sieger: `(2,1,0) !`
+`#obj-action-bar #oab-run.dp-pf-launch`, Block `v601`. Davor drei
+Stände derselben Fläche: `v597` weiß + Goldtext, `v599` **Gold**,
+`v601` dasselbe mit ID festgenagelt. Und die Grundregel in
+`style.css:33064` sagt bis heute `background:#050505`.
+
+> `v599` war richtig: die Leiste war damals **dunkel**, und Gold auf
+> dunkel ist der Akzent. Den Verlauf hat die Leiste später bekommen.
+> Keine der beiden Entscheidungen ist für sich falsch; zusammen ergeben
+> sie einen unsichtbaren Knopf. Jetzt wieder Obsidian mit Goldschrift —
+> die Hausform, die `.dp-pf-lead` und `.dp-pf-tile.tool` in derselben
+> Leiste schon tragen. Textkontrast gemessen **10,54** auf allen 48
+> Läufen.
+
+### Ein Maß für einen entfernten Inhalt
+
+`.dp-pf-rz` trug `min-width: 208px` — das Maß der Reißzone der
+**Bordkarte**, in der ein Strichcode von 174×52 stand. `.dp-pf-bc` ist
+seit `v1639` `display:none` und gemessen 0×0. Übrig blieb ein Knopf von
+83 px in einem Kasten von 208. **125 px für nichts**, auf jeder
+Desktopbreite.
+
+### Zwei eigene Messfehler, beide zurückgenommen
+
+**1 · „QR-SVG schief" in 10 von 48 Läufen** (kartei 82×68 in 92×92,
+buetten 52×48 in 64×64). Am gezeichneten Code gemessen ist er
+**quadratisch**: erstes `rect` 64×64 bzw. 41×41. Der viewBox ist
+`0 0 31 31`, ohne `preserveAspectRatio` gilt `xMidYMid meet` — das
+Verhältnis wird gewahrt. Schief ist das svg-**Element**, nicht das Bild
+darin. **Das steht schon im Kommentar bei `v1992`, und ich habe es
+trotzdem als Befund gemeldet.** Eine Probe mit `aspect-ratio: 1` hat es
+nachweislich verschlechtert (buetten: `rect` von 41×41 auf 36×36) — also
+wurde nichts geändert.
+
+**2 · „Kachel verdeckt von nichts" für alle fünf Kacheln auf jedem
+Handy.** `elementsFromPoint` sieht nur den Viewport, und die Leiste lag
+bei y = 7926. Ein Punkt außerhalb des Bildes liefert eine **leere
+Liste** — und leer ist kein Befund. Der Prüfer scrollt jetzt erst
+`scrollIntoView` und nennt mit `imBild`, ob die Punktproben überhaupt
+gültig waren. Die Restmeldungen („verdeckt von `button.tab`") sind der
+**sticky** Reiterleiste zuzuschreiben, unter die `scrollIntoView` die
+Leiste schiebt — auch das ein Werkzeugartefakt, kein Produktfehler.
+
+### `overflow-x: visible` kam als `auto` heraus
+
+In jedem Lauf im Band 641–1100 meldete `.dp-pf-scroll`
+`overflow-x: auto`, obwohl `v2121` dort `visible !important` setzt und
+auf Spezifität gewinnt. Es gewinnt auch — es wird **umgerechnet**: steht
+eine Achse auf etwas anderes als `visible`, rechnet der Browser die
+andere von `visible` auf `auto` um, und `overflow-y: hidden` steht im
+selben Band in `style.css`.
+
+> **Nicht die Kaskade hat entschieden, sondern die Berechnung.** Wer nur
+> den gemeldeten Wert liest, hält seine Regel für verloren und sucht an
+> der falschen Stelle nach einem stärkeren Selektor.
+
+### Nachweis
+
+**Matrix: 4 Kartenstile × 12 Breiten = 48 Messungen** am laufenden
+Staging im gleich-Origin-iframe. Je Lauf: Leistenmaß, Umbruchmodus,
+QR-Kasten gegen SVG gegen `rect`, abgeschnittene Beschriftungen
+(`scrollWidth`/`clientWidth`), Elemente außerhalb, Überschneidung der
+direkten Kinder, Knopfmaß, Kontrast Text und Grund, Erreichbarkeit per
+`elementsFromPoint`, Touchhöhe aller Kacheln.
+
+```
+  KAPP (abgeschnitten)   0 von 48
+  RAUS (ausserhalb)      0 von 48
+  UEBER (Ueberschneidung) 0 von 48
+  ZUBREIT                0 von 48
+  QUER (Querscroller)    0 von 48
+  Knopftext k >= 4,5    48 von 48   (10,54)
+```
+
+Breiten: 360 · 375 · 390 · 430 · 667 quer · 768 · 834 · 1024 ·
+1180 · 1280 · 1440 · 1920. Stile: Vorgabe · Zeile · Kartei · Buetten.
+
+Dazu **`tools/datenaufnahme-leiste-pruefen.mjs`**: rechnet die
+Spezifität aus und sagt, welche Regel am Ende gewinnt — für den
+Abruf-Knopf und für die fünf Schutzregeln aus `v2119`. Der Gold-Knopf
+ist dreimal gesetzt worden; ein Kommentar hält eine vierte Runde nicht
+auf. Er hat sich zweimal selbst erwischt (ein nackter Komma-Split
+zerlegte `:is(#oab-bar,#qc7-sources)`; der `:hover`-Stand gewann
+immer). Deckung: 17 Blätter, 13.674 Regeln, 2,44 Mio Zeichen. RC = 0.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.39 Kartenstil „Zeile": 53 Regeln an `body.dp-pfzeile`, 0 Setzer | **Optik + Risiko** |
+| Höhe bei 1180 px: 185 px in zwei Zeilen, Zeile 1 zu 60 % leer | **Optik** |
+| Knopf 33 px ab 1280 px (Absicht: Maus) | **gemessen, Entscheidung** |
+
