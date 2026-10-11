@@ -312,25 +312,68 @@
       + ' title="Bestand = der laufende Stand von heute (das Ist).">Bestand</button>'
       + '<button type="button" data-dk-modus="ankauf" class="dk-seg' + (alle ? ' aktiv' : '') + '"'
       + ' title="Ankauf = der Stand beim Nutzen-/Lastenwechsel, eingefroren (das Soll).'
-      + '\u000a' + mit + ' von ' + karten.length + ' Objekten haben einen Ankauf-Stand.">Ankauf</button>';
-    /* Die Erklaerzeile steht unter dem Schalter und nur im
-       Ankauf-Modus: im Bestand ist nichts zu erklaeren, das ist der
-       Normalfall. */
-    var hilfe = el('dk-hilfe');
-    if (!hilfe) {
-      hilfe = document.createElement('div');
-      hilfe.id = 'dk-hilfe';
-      hilfe.className = 'dk-hilfe';
-      if (s.parentNode) s.parentNode.insertBefore(hilfe, s.nextSibling);
-    }
-    hilfe.innerHTML = alle
-      ? '<b>Ankauf</b> = der Stand beim Nutzen-/Lastenwechsel, eingefroren \u2014 dein <b>Soll</b>.<br>'
-        + '<b>Bestand</b> = wie das Objekt heute dasteht \u2014 dein <b>Ist</b>.<br>'
-        + '<span>Nicht zu verwechseln mit Soll-Miete und Ist-Miete: die beschreiben EINE Miete,'
-        + ' nicht zwei Zeitpunkte.</span>'
-      : '';
-    hilfe.style.display = alle ? '' : 'none';
+      + '\u000a' + mit + ' von ' + karten.length + ' Objekten haben einen Ankauf-Stand.'
+      /* v2113: dieser Satz stand bisher NUR in der Erklaerzeile darunter.
+         Mit ihr faellt er nicht weg - er zieht hierher. Eine Gestaltung
+         zu verschlanken darf keine Aussage mitnehmen. */
+      + String.fromCharCode(10)
+      + 'Nicht zu verwechseln mit Soll-Miete und Ist-Miete: die beschreiben'
+      + ' EINE Miete, nicht zwei Zeitpunkte.">Ankauf</button>';
+    /* ── v2113 · DIE ERKLAERZEILE FAELLT ────────────────────────────────
+       Marcel am 11.10.2026: „wenn ich auf Ankauf gehe, stand da immer
+       noch dieses Feld darunter mit der Information." - und davor schon:
+       „Also wenn dann die Aufklaerung nur wenn man mit der Maus drueber
+       faehrt, aber nicht darunter nochmal ein extra Feld angeben."
+
+       > ICH HATTE IN v2108 DAS FALSCHE ELEMENT VERSCHLANKT. Dort ging es
+       > um `.ank-ansicht-kopf`, den Banner INNERHALB der Ankauf-Ansicht
+       > eines Objekts. Gemeint war `#dk-hilfe`: die Zeile, die unter dem
+       > Bestand/Ankauf-SCHALTER erscheint. Zwei Felder, die beide „beim
+       > Umschalten auf Ankauf darunter" auftauchen - erst sein zweiter
+       > Satz hat es eindeutig gemacht.
+
+       Nichts geht verloren: beide Knoepfe tragen die Erklaerung bereits
+       im `title`, und der eine Satz, der nur hier stand (Soll-Miete /
+       Ist-Miete), ist oben in den Ankauf-Tooltip nachgetragen.
+       Ein vorhandener Knoten wird entfernt, damit die Zeile auch ohne
+       Neuladen verschwindet.
+
+       ── UND DER SCHALTER MUSS IN JEDEM LAYOUT SICHTBAR SEIN ───────────
+       Marcel: „wenn ich das Aussehen in Aktenmappe aendere, dann habe
+       ich dort keine Moeglichkeit, zwischen Bestand und Ankauf
+       auszuwaehlen."
+
+       GEMESSEN im Layout `v1b`: `.dk-schalter` steht im DOM, ist aber
+       0 px hoch - er haengt am `.sb-header`, und der bleibt in der
+       ausgeblendeten Seitenleiste zurueck, waehrend die Aktenmappe
+       Suche, Liste, Aktionen, Score und Nutzer in die Schiene verschiebt.
+       Dieselbe Form wie beim Schnellstart: was nicht in der Teileliste
+       steht, bleibt liegen.
+
+       Die Verankerung passiert bei JEDEM Aufruf, nicht nur beim Anlegen:
+       `schalterSetzen()` laeuft nach jedem Neuaufbau der Liste, und ein
+       Layoutwechsel verschiebt `#sb-list` unter dem Schalter weg.
+
+       Liegt ein Layout an, haengt er sich VOR die Liste - gleiche
+       Eltern, also mit ihr in der Schiene. Sonst bleibt es beim
+       `.sb-header`: Marcels Platz aus v2040 („ganz nach oben, unter das
+       DealPilot Logo") gilt in der Grundansicht unveraendert. */
+    var alteHilfe = el('dk-hilfe');
+    if (alteHilfe && alteHilfe.parentNode) alteHilfe.parentNode.removeChild(alteHilfe);
+
+    var imLayout = document.documentElement.hasAttribute('data-dp-layout');
+    var kopf2 = document.querySelector('.sb-header');
+    try {
+      if (imLayout && liste.parentNode) {
+        if (s.parentNode !== liste.parentNode || s.nextElementSibling !== liste) {
+          liste.parentNode.insertBefore(s, liste);
+        }
+      } else if (kopf2 && kopf2.parentNode && s.parentNode !== kopf2.parentNode) {
+        kopf2.parentNode.insertBefore(s, kopf2.nextSibling);
+      }
+    } catch (e) { /* lieber am alten Platz als gar nicht */ }
   }
+
 
   /* Alle Karten mit Ankauf-Stand umschalten. Karten OHNE Stand bleiben
      stehen - aber sie werden gekennzeichnet: eine Karte, die im
