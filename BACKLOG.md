@@ -2507,18 +2507,51 @@ f843cc8d~1  — der Stand VOR v1924 „Score und Aktionen auf eine Höhe"
 Nach `v2114` gemessen, drei Karten: Knöpfe 7–29, Ring 39–89, Pille
 94–119, Band ab 123 — **0 px Überschneidung**, überall.
 
-### Offen: drei Punkte, die noch gemessen werden müssen
+### Zwei der drei Punkte sind erledigt (11.10.2026)
 
-**1 · Aktenreiter: der Score ist runtergerutscht.** Er sagt, das war
-früher anders. Derselbe Weg wie oben: in der Geschichte nachsehen, was
-dort galt, **bevor** `v1928` („senkrecht mittig, in allen sieben
-Kartenstilen") es vereinheitlicht hat. Nicht neu erfinden.
+**1 · Aktenreiter — war schon behoben, nur hiess er anders.**
 
-**2 · Bordkarte: die Abrisskante läuft durchs Bild.** Das ist ein
-messbarer Befund, kein Geschmack — die Kante und das `.sbc-thumb`
-überschneiden sich. Erst messen, wo die Kante gezeichnet wird
-(Pseudoelement? eigener Knoten?), dann entscheiden: davorlegen oder den
-Stil aus der Auswahl nehmen.
+`objektkarten-stil.js:60` fuehrt ihn als Schluessel `''`:
+
+```js
+'':  { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer · Standard' }
+```
+
+> **Der Aktenreiter IST die Standardkarte** — kein `data-dp-objkarte`.
+> Marcels „der Score ist runtergerutscht" galt also derselben Karte, die
+> `v2114` gerade in Ordnung gebracht hat. Gemessen: Ring 39–89, Knoepfe
+> 7–29, 0 px Ueberschneidung. *Zwei Namen fuer dieselbe Sache haetten
+> mich beinahe zweimal dasselbe bauen lassen.*
+
+**2 · Bordkarte: die Abrisskante lief durchs Bild (`v2115`).**
+
+Gemessen an **allen 21 Karten**, mit Foto wie mit Platzhalter:
+
+| | |
+|---|---|
+| `.sbc-seq` (Streifen) | 17–33 |
+| `.sbc-thumb` (Bild) | 27–91 |
+| **Kante im Bild** | **6 px, jedes Mal** |
+
+**Ursache, und sie ist strukturell:** `.sbc-seq` ist
+`position:absolute; left:0`, liegt aber **innerhalb** von `.sbc-top`
+(im Kartenaufbau steckt sie in `.sbc-top-line1`). Sie bezieht ihr
+`left:0` auf `.sbc-top`, nicht auf die Karte — und `margin-left:16px`
+schiebt **beide gemeinsam** nach rechts.
+
+> *Ein Abstand, der das auszuweichende Element mitnimmt, ist kein
+> Abstand.* Der Platz entstand links vom Streifen statt zwischen
+> Streifen und Inhalt.
+
+Korrigiert wurde der **Innenabstand**, nicht die Lage: `padding-left:
+27px` = 16 Streifen + 1 Kante + 10 Luft. Nachgemessen: **0 von 21**
+Karten, 11 px Luft.
+
+> **Nicht angefasst:** die Schienen-Fassung (`:7211`) traegt dieselbe
+> Konstruktion. Ungemessen ist nicht in Ordnung — sie gehoert auf einer
+> Aktenmappen-Ansicht nachgemessen.
+
+### Offen: der eine Punkt, der eine Entscheidung braucht
 
 **3 · Die Auswahl selbst einschränken.** Marcel will Score-Kante und
 Bordkarte beim Aussehen „DealPilot" **nicht mehr anbieten**.
