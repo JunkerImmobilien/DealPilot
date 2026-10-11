@@ -109,6 +109,59 @@ function konstanten() {
   return _konst;
 }
 
+/* ══ v2102 · BUNDESLAND UND AMTLICHER GREST-SATZ AUS DER PLZ ═══════════
+ *
+ * Die Tabelle wird NICHT hier gefuehrt. Sie liegt im Frontend
+ * (`grest-plz-lookup.js`) und ist seit `v1823` von
+ * `tools/frontend-konstanten.mjs` nach `frontend-konstanten.json`
+ * gespiegelt — mit einem Pruefhaken auf 16 Laender. Eine zweite Tabelle
+ * hier waere die Bauart, gegen die dieses Werkzeug gebaut wurde.
+ *
+ * `plz_bereiche` ist `[von, bis, Kuerzel]`. Gemessen an zehn echten PLZ
+ * (32609 NW, 10115 BE, 80331 BY, 20095 HH, 01067 SN, 60311 HE, 70173 BW,
+ * 04109 SN, 99084 TH, 24103 SH) trifft die Tabelle jede.
+ *
+ * KEIN TREFFER HEISST KEIN LAND — nie das naechstgelegene. Dieselbe
+ * Doktrin wie beim Register: wir erfinden keine Zahl. Dann steht in
+ * `grest_herkunft`, WARUM nichts da ist, damit der Empfaenger es nicht
+ * fuer einen Fehler haelt.
+ */
+function grestFuer(plz) {
+  const leer = { kuerzel: null, name: null, satz: null, herkunft: null };
+  const s = String(plz == null ? '' : plz).trim();
+  if (!/^\d{5}$/.test(s)) {
+    return Object.assign({}, leer, {
+      herkunft: s ? 'plz "' + s.slice(0, 8) + '" ist keine fuenfstellige Postleitzahl'
+                  : 'keine plz am Objekt'
+    });
+  }
+  const g = (konstanten().daten || {}).grest;
+  if (!g || !g.saetze || !Array.isArray(g.plz_bereiche)) {
+    return Object.assign({}, leer, { herkunft: 'GrESt-Tabelle nicht gespiegelt' });
+  }
+  const n = parseInt(s, 10);
+  let kuerzel = null;
+  for (let i = 0; i < g.plz_bereiche.length; i++) {
+    const b = g.plz_bereiche[i];
+    if (!Array.isArray(b) || b.length < 3) continue;
+    if (n >= Number(b[0]) && n <= Number(b[1])) { kuerzel = b[2]; break; }
+  }
+  if (!kuerzel) {
+    return Object.assign({}, leer, {
+      herkunft: 'plz ' + s + ' liegt in keinem der ' + g.plz_bereiche.length + ' PLZ-Bereiche'
+    });
+  }
+  const satz = (g.saetze[kuerzel] != null) ? Number(g.saetze[kuerzel]) : null;
+  return {
+    kuerzel: kuerzel,
+    name: (g.namen && g.namen[kuerzel]) || kuerzel,
+    satz: satz,
+    herkunft: satz != null
+      ? 'abgeleitet aus plz ' + s + ' (' + kuerzel + ')'
+      : 'Land ' + kuerzel + ' erkannt, aber kein Satz in der Tabelle'
+  };
+}
+
 /* Die Score-Kette. Sie steht an EINER Stelle im Frontend
    (`score-tiers.js`); hier wird sie NICHT nachgebaut, sondern als Text
    mitgegeben - wer den Export liest, soll wissen, was "62" heisst. */
@@ -132,6 +185,10 @@ const HINWEISE = [
   '`_ankauf` ist der eingefrorene Stand beim Nutzen-/Lastenwechsel (das Soll). Der uebrige Datensatz ist der laufende Stand (das Ist).',
   'Soll-Miete und Ist-Miete sind etwas ANDERES: die beschreiben eine Miete, nicht zwei Zeitpunkte.',
   'Ein fehlender Wert ist fehlend, nicht null. `null` heisst "liegt nicht vor" und darf nicht als 0 gerechnet werden.',
+  /* v2102 */
+  '`gest_p` ist der vom Nutzer ANGESETZTE Grunderwerbsteuersatz, `grest_satz_amtlich` der des Bundeslandes. '
+    + 'Sie DUERFEN abweichen: wer einen Kaufpreisanteil fuer Inventar herausrechnet, zahlt auf weniger Steuer. '
+    + 'Woher das Land kommt, steht in `grest_herkunft` - ohne Treffer gibt es KEIN Land, nicht das naechstgelegene.',
   'Die Pilot-Analyse traegt in `_fuer` einen Stempel: fuer welches Objekt und welchen Datenstand sie gilt. Eine Analyse ohne passenden Abdruck ist veraltet.'
 ];
 
@@ -309,6 +366,9 @@ async function bauen(userId, opt) {
       schlank[key] = daten[key];
     });
 
+    /* v2102: einmal je Objekt, nicht viermal */
+    const _gr = grestFuer(daten.plz);
+
     return {
       id: o.id,
       nummer: o.seq_no || null,
@@ -319,6 +379,37 @@ async function bauen(userId, opt) {
       angelegt_am: o.created_at,
       geaendert_am: o.updated_at,
       lageklasse: daten.lageklasse || null,
+      /* ── v2102 · DAS BUNDESLAND UND DER AMTLICHE GREST-SATZ ──────────
+       * Marcel am 11.10.2026: „Wir haben ja Bonitaetswerte und auch das
+       * Bundesland wissen wir ja fuer jedes Objekt. Daher wissen wir auch,
+       * wie das aussieht mit der Grunderwerbsteuersatz."
+       *
+       * Er hat recht, und es war schon alles da — nur nicht zusammen:
+       *
+       *   `plz`     steht am Objekt (21 von 23 belegt, gemessen)
+       *   `gest_p`  steht am Objekt, ist aber die EINGABE des Nutzers
+       *   die Saetze liegen seit `v1823` im gespiegelten
+       *   `frontend-konstanten.json` (16 Laender, 84 PLZ-Bereiche)
+       *
+       * Der Export hat die Konstanten geladen (`konstanten()`) und die
+       * GrESt-Daten darin nie benutzt. Jetzt leitet er sie ab.
+       *
+       * ZWEI FELDER, NICHT EINS — und das ist der Punkt:
+       *   `gest_p`               was der Nutzer angesetzt hat
+       *   `grest_satz_amtlich`   was das Land vorschreibt
+       * Sie DUERFEN abweichen: wer einen Kaufpreisanteil fuer Inventar
+       * herausrechnet, zahlt auf weniger Steuer. Eine zusammengelegte
+       * Zahl haette diesen Unterschied verschluckt — dieselbe Lehre wie
+       * bei den zwei RND-Spalten in `v2086`.
+       *
+       * `grest_herkunft` sagt, woher das Land kommt. Ohne das waere der
+       * Satz eine Behauptung: sechzehn Laender haben sechs verschiedene
+       * Saetze, und eine PLZ ohne Treffer ergibt KEIN Land, nicht das
+       * naechstgelegene. */
+      bundesland: _gr.kuerzel,
+      bundesland_name: _gr.name,
+      grest_satz_amtlich: _gr.satz,
+      grest_herkunft: _gr.herkunft,
       gewonnen: daten._deal_won === true || daten._deal_won === 'true',
       verloren: daten._deal_lost === true || daten._deal_lost === 'true',
       ankauf_stand: (daten._ankauf && daten._ankauf.stichtag) ? daten._ankauf.stichtag : null,
@@ -475,4 +566,8 @@ async function bauen(userId, opt) {
   };
 }
 
-module.exports = { bauen, SCORE_STUFEN, HINWEISE };
+/* v2102: `grestFuer` ist mitexportiert, damit die Ableitung EINZELN
+   pruefbar ist. Eine Funktion, die nur im Gesamtlauf sichtbar ist, laesst
+   sich nicht von "findet nichts" unterscheiden - dieselbe Lehre wie bei
+   `deklariertAbsichtlich` in der Messkabine. */
+module.exports = { bauen, SCORE_STUFEN, HINWEISE, grestFuer };
