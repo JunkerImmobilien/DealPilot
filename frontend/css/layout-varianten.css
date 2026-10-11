@@ -9214,9 +9214,22 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
    hat Marcel nicht gefragt, und die Knoepfe liegen rechts aussen, nicht auf
    dem Band.
    ============================================================================== */
-html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay,
-html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
   top: 38px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+/* "kennzahlen" braucht einen EIGENEN Wert, und das ist nachgemessen, nicht
+   geschaetzt: die Karte ist dort nur 195 px hoch statt 210, und das
+   Kachelband beginnt schon bei 114 px statt 123.
+
+   Mit top:38px blieben 5 px uebrig, auf denen die Pille "GUT" auf der
+   ersten Kachel lag - derselbe Fehler wie in Marcels Bild, nur kleiner.
+   Gemessen wird dabei die PILLE (.sbc-score-label, 25 px hoch, unten im
+   Overlay), nicht der Kasten: der Kasten ist hoeher als das, was man
+   sieht, und haette einen Fehler gemeldet, wo keiner ist. */
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+  top: 30px !important;
   bottom: auto !important;
   transform: none !important;
 }

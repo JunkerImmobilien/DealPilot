@@ -57,6 +57,16 @@
     return t[2] + '.' + t[1] + '.' + t[0];
   }
 
+  /* v2108: der Erklaertext geht jetzt als `title` ins Markup - also muss
+     er maskiert werden. Diese Datei hatte kein `esc()`; eins aus einer
+     anderen Datei zu RUFEN waere eine stille Abhaengigkeit gewesen, die
+     erst beim Rendern auffaellt (node --check sieht so etwas nie). */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
   /* ── Die Sperre ───────────────────────────────────────────────────
      EIN Griff, an der Stelle, durch die alle Schreibwege muessen.
      `saveObj` ist global (storage.js:757) und wird hier umhuellt. */
@@ -162,15 +172,34 @@
        darueber, und eine lokale Variable haette sie hier verdeckt. */
     var felderZahl = a.daten ? Object.keys(a.daten).length : 0;
     var korr = (a.korrekturen || []).length;
-    return '<div class="ank-ansicht-kopf">'
-      + '<div class="ank-ansicht-txt">'
-      + '<b>Ankauf abgeschlossen · ' + datum(a.stichtag) + '</b>'
-      + '<span>Eingefroren zum Nutzen-/Lastenwechsel. Du siehst den Stand von damals — '
+
+    /* ── v2108 · DER ERKLAERKASTEN FAELLT, DIE FUNKTION BLEIBT ─────────
+       Marcel am 11.10.2026: „Wenn wir auf Ankauf gehen, erscheint so ein
+       Feld da drunter. Das bitte weg. Also wenn dann die Aufklaerung nur
+       wenn man mit der Maus drueber faehrt, dass das dann erscheint, aber
+       nicht darunter nochmal ein extra Feld angeben."
+
+       Weg ist der ERKLAERTEXT (`.ank-ansicht-txt`: Ueberschrift plus zwei
+       Zeilen Fliesstext). Er steht jetzt als `title` und erscheint beim
+       Drueberfahren - genau so, wie er es beschrieben hat.
+
+       > DIE CHECKBOX BLEIBT, und zwar ausdruecklich. Sie ist keine
+       > Aufklaerung, sondern der EINZIGE Weg, den eingefrorenen Stand zum
+       > Bearbeiten zu oeffnen - ohne sie waere die Ankauf-Ansicht eine
+       > Sackgasse. Beim Verschlanken einer Ansicht faellt leicht eine
+       > Funktion mit weg; hier nicht.
+
+       Die Zahlen (Felder, Korrekturen, Pilot-Analyse) gehen in den
+       `title` mit: sie waren der einzige Ort, an dem der Umfang des
+       eingefrorenen Standes ueberhaupt stand. */
+    var erklaerung = 'Ankauf abgeschlossen · ' + datum(a.stichtag) + '\n'
+      + 'Eingefroren zum Nutzen-/Lastenwechsel. Du siehst den Stand von damals — '
       + felderZahl + ' Felder'
       + (a.daten && a.daten._ai ? ', inklusive Pilot-Analyse' : '')
       + (korr ? ' · ' + korr + (korr === 1 ? ' Korrektur' : ' Korrekturen') : '')
-      + '. Eingaben sind gesperrt, damit niemand Geschichte überschreibt.</span>'
-      + '</div>'
+      + '.\nEingaben sind gesperrt, damit niemand Geschichte überschreibt.';
+
+    return '<div class="ank-ansicht-kopf ank-schlank" title="' + esc(erklaerung) + '">'
       + '<label class="ank-frei"><input type="checkbox" id="ank-freigabe"'
       + (_frei ? ' checked' : '') + '> Zum nachträglichen Bearbeiten freigeben</label>'
       + '</div>';

@@ -40185,6 +40185,25 @@ body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
   font:400 12px/1.4 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#A8A299)}
 .ank-frei input{cursor:pointer}
 
+/* ── v2108 · DER KASTEN WIRD EINE ZEILE ──────────────────────────────
+   Marcel am 11.10.2026: „nicht darunter nochmal ein extra Feld angeben."
+   Der Erklaertext steht jetzt im `title` und erscheint beim Drueberfahren.
+
+   Geblieben ist nur die Freigabe-Checkbox - sie ist eine FUNKTION, nicht
+   eine Erklaerung, und der einzige Weg, den eingefrorenen Stand zum
+   Bearbeiten zu oeffnen.
+
+   Flaeche, Rand und Schatten fallen weg; was bleibt, ist eine Zeile am
+   rechten Rand. `justify-content` wird dabei ausdruecklich umgestellt:
+   die Grundregel setzt `space-between`, und mit nur EINEM Kind haette die
+   Checkbox sonst links geklebt - dort, wo vorher die Ueberschrift stand. */
+.ank-ansicht-kopf.ank-schlank{
+  padding:0 2px; margin:0 0 8px;
+  background:none; border:none; box-shadow:none; border-radius:0;
+  justify-content:flex-end; align-items:center;
+  cursor:help;
+}
+
 /* Die Reiter und ihr Inhalt: zurueckgenommen und unberuehrbar.
    Der Hinweis selbst bleibt voll da - er ist der einzige Weg zurueck. */
 /* v2037c - GEDIMMT WIRD MIT filter, NICHT MIT opacity.
