@@ -2163,6 +2163,114 @@ getan. *Kein Backlog-Punkt, ein Bedienfehler.*
 
 ---
 
+#### N60.35 · ⚠ Die Farbregler der Darstellung wirken ohne Vorlage NICHT (11.10.2026)
+
+**Gefunden beim Nachmessen von `v2105`, und größer als der Kontrastpunkt,
+aus dem es entstand.**
+
+Ich hatte vermutet, der Regler „Objektkarten" greife in der Grundfassung
+nicht. Nachgemessen mit **reinem Rot** — der lautesten möglichen Probe,
+damit kein „sieht man kaum" als Erklärung durchgeht:
+
+| Regler | Ziel | Token gesetzt | Fläche geändert |
+|---|---|---|---|
+| `_dpDispHeader` | `header.hdr` | `#FF0000` | **NEIN** (Verlauf bleibt) |
+| `_dpDispSide` | `aside.sidebar` | `#FF0000` | **NEIN** (`rgb(5,5,5)` bleibt) |
+| `_dpDispObj` | `.sb-card` | `#FF0000` | **NEIN** (Verlauf bleibt) |
+| `_dpDispKpi` | `--dp-card` | `#FF0000` | **NEIN** (siehe unten) |
+| `_dpDispHero` | `--dpuv-hero-card` | `#FF0000` | **NEIN — und zwar NIE** |
+
+### Deckungslücke geschlossen, über die Kaskade statt über das DOM
+
+Die zwei fehlenden Flächen gab es in der gemessenen Ansicht nicht
+(`.sc-pill`, `.kpi-card`, `.hero-card`: **null** Treffer). Statt
+Selektoren zu raten, habe ich gelesen, **wer die Tokens überhaupt
+liest** — der verlässlichere Weg, und er deckt alle Fassungen auf
+einmal:
+
+| Regler | Token | gelesen von | ohne Vorlage? |
+|---|---|---|---|
+| Kopfleiste | `--dpuv-header-bg` | `html[data-ui-theme] body header.hdr` | **nein** |
+| Objektleiste | `--dpuv-side-bg` | `html[data-ui-theme] body` → `--dp-s0/-s1` | **nein** |
+| KPI-Karten | `--dpuv-kpi-card` | `html[data-ui-theme] body` → `--dp-card` | **nein** |
+| Objektkarten | `--dpuv-obj-card` | `html[data-ui-theme] body … .sb-card` | **nein** |
+| Hero | `--dpuv-hero-card` | **niemand, in keiner Datei** | **nein, nie** |
+
+> **`--dpuv-hero-card` hat NULL Leser.** Dieser Regler ist nicht
+> fassungsabhängig kaputt, er ist überall ohne Wirkung — auch mit
+> Vorlage, auch im hellen Skin.
+
+**Alle fünf hängen am selben `html[data-ui-theme]`** — und der Kommentar
+bei `ui-varianten.css:230` nennt die Bedingung selbst:
+
+> *„Der Bereichsregler „Objektleiste" setzt `--dp-side-bg` — der bekommt
+> hier den Vortritt, sonst wäre er **unter jeder Vorlage** wirkungslos."*
+
+`v1102` hat die Regler also **unter den Vorlagen** verdrahtet und dabei
+richtig gedacht. Die Grundfassung stand nicht in der Fragestellung. *Ein
+Satz, der „unter jeder Vorlage" sagt, beschreibt genau die Lücke, die er
+hinterlässt — er nennt sie nur nicht.*
+
+### Warum: die Tokens landen, und niemand liest sie
+
+Der Regler setzt den Wert **inline am `body`** (`--dpuv-obj-card` und
+`--dp-obj-card`, `ui-varianten.js` `bereicheUmhuellen()`). Gelesen wird er
+an genau **zwei** Stellen, und beide haben eine Bedingung:
+
+```css
+html[data-ui-theme] body aside.sidebar .sb-card {   /* ui-varianten.css:488 */
+  background-image: none !important;
+  background-color: var(--dpuv-obj-card, var(--uv-card)) !important;
+}
+body.dp-chrome-hell aside.sidebar .sb-card {        /* style.css:36164 */
+  background: var(--dp-obj-card, var(--dp-card,#F6F2E9)) !important;
+}
+```
+
+**Ohne Vorlage und ohne hellen Skin greift keine von beiden** — und das
+ist der Auslieferungszustand, also was ein neuer Nutzer sieht.
+
+> Das ist das Gegenstück zu `gebaut-aber-unerreichbar`: dort wirkten 199
+> Regeln und der Schalter setzte nichts. **Hier setzt der Schalter, und
+> keine Regel liest.** Ein Farbwähler, der nichts färbt, ist schlimmer
+> als ein fehlender: der Nutzer sucht den Fehler bei sich.
+
+Dass es so gemeint war, steht im Blatt selbst (`ui-varianten.css:239`):
+*„`--dp-obj-card` NICHT hier: der Regler setzt genau diesen Namen
+inline"* — der `--dpuv-*`-Namensraum wurde in `v1104` **genau dafür**
+gebaut. Die Grundfassung wurde dabei nie verdrahtet.
+
+### ⚠ Nicht gebaut, weil es eine Optikentscheidung ist
+
+Die Vorlagen lösen es so: **`background-image: none !important`** plus
+`background-color`. Sie räumen den Verlauf also ab. Überträgt man das auf
+die Grundfassung, fällt der dekorative Verlauf der Objektkarte
+(`linear-gradient(135deg, rgba(20,15,5,0.6) …)`) und beim Kopf unter
+Umständen der **Runway** — das ist eine Markenfläche, kein Detail.
+
+**Zwei Wege, und sie sehen verschieden aus:**
+
+| | Wie | Folge |
+|---|---|---|
+| (a) | wie die Vorlagen: Verlauf abräumen, Farbe setzen | die gewählte Farbe kommt rein, die Fläche wird flach |
+| (b) | Farbe **unter** den halbtransparenten Verlauf legen | Verlauf bleibt, die Farbe wirkt getönt statt satt |
+
+> *Welcher richtig ist, ist Marcels Entscheidung — Demo bauen und zeigen.*
+> Ich habe in dieser Sitzung zweimal gegen eine Annahme gebaut und beides
+> zurückgenommen; ein dritter Anlauf auf eine ungeklärte Optikfrage wäre
+> derselbe Fehler zum dritten Mal.
+
+**Die Liste ist vollständig** — fünf Regler, fünf Mal ohne Wirkung im
+Auslieferungszustand, einer (`Hero`) überhaupt nie. Was fehlt, ist die
+Entscheidung (a) oder (b), nicht die Messung.
+
+> **Der kleinste echte Teilschritt wäre `--dpuv-hero-card`:** ein Token
+> ohne jeden Leser ist entweder ein fehlender Leser oder ein Regler, der
+> ins Panel gehört und nicht ins Produkt. Auch das ist eine Entscheidung,
+> aber eine viel kleinere.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
