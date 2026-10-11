@@ -5173,7 +5173,43 @@ durch `_link()`).
 > „Ansprechpartner 1" eine Behauptung.
 
 **Zu tun:**
-1. Spalte `ansprechpartner` (JSONB) in unserer `unterlagen`-Tabelle — Migration, also Rebuild.
+1. ~~Spalte `ansprechpartner` (JSONB) — Migration, also Rebuild.~~
+
+   > **⚠ KORRIGIERT am 11.10.2026. Das war eine Annahme, keine Messung** —
+   > derselbe Fehler wie bei N60.33, wo ich „braucht eine Migration"
+   > geschrieben hatte und `user_settings` sich als generischer
+   > Schlüssel→JSONB-Speicher herausstellte.
+
+   **Am Staging nachgemessen:**
+
+   | Tabelle | | |
+   |---|---|---|
+   | `unterlagen_aemter` | 20 Spalten | **`seiten` ist bereits `jsonb`** |
+   | | | 19 von 19 Ämtern gefüllt |
+   | `unterlagen_anfragen` | 10 Spalten | alle skalar |
+
+   Inhalt von `seiten` heute:
+
+   ```json
+   ["https://…/Kataster-und-Vermessung/", "https://…/Katastervermessungen/"]
+   ```
+
+   **Und genau das ist die Spalte, die v6 braucht.** `proSeite` — vom
+   Backlog selbst als *„der Kern des Gewinns"* bezeichnet — hält fest,
+   **auf welcher** Seite eine Adresse stand. Aus
+   `["url1","url2"]` wird `[{url, adressen:[…]}, …]`:
+   **eine Formänderung innerhalb einer vorhandenen `jsonb`-Spalte,
+   keine Migration.**
+
+   > **Die wertvolle Hälfte von v6 ist damit nicht blockiert.** Blockiert
+   > war sie nur durch meinen Satz. Ein falscher Blocker kostet mehr als
+   > eine fehlende Notiz: er hält Arbeit auf, die längst erlaubt ist —
+   > dieselbe Lehre wie bei der Namensnennung im Marktbericht.
+
+   Offen bleibt die **Form**: eine eigene Spalte `ansprechpartner` wäre
+   sauberer als eine Liste in einer Spalte namens `seiten`. Das ist eine
+   Schemafrage und braucht Marcels Freigabe — aber **erst für den
+   zweiten Schritt**, nicht für den Beleg.
 2. Den KI-Auftrag in `unterlagenService.js` um `ansprechpartner` erweitern, **wörtlich mit der
    Einschränkung aus v6** („nur wenn dort wörtlich steht"). Der Prompt ist die Stelle, an der
    erfundene Namen entstehen würden.
