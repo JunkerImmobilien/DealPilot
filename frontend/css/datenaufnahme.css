@@ -2837,3 +2837,97 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     overflow-y: visible !important;
   }
 }
+
+/* =====================================================================
+   v2124 - IM LAPTOP-BAND BRICHT DIE KACHELREIHE, NICHT DIE LEISTE
+
+   Nach v2119-v2123 ist nichts mehr abgeschnitten und nichts mehr
+   draussen. Die Leiste ist aber bei 1180 px 185 px hoch, und die erste
+   Zeile ist zu zwei Dritteln leer:
+
+     y  0   lead 128 + perf 1 + seg 173 + sep 1   = 303 von 888
+     y 97   seg 602 + qr 62 + rz 97               = 761 von 888
+
+   Das zweite Segment ist 602 px breit und unteilbar. Es passt nicht
+   neben die 303 - also wandert es in die zweite Zeile und laesst
+   585 px leer stehen.
+
+   ── DER UNTERSCHIED, AUF DEN ES ANKOMMT ───────────────────────────
+   `flex-wrap` auf der LEISTE und `flex-wrap` auf der KACHELREIHE sind
+   zwei verschiedene Dinge, und nur eines von beiden darf wirken:
+
+     Leiste wrap    -> das Segment wandert als Ganzes nach unten
+     Leiste nowrap  -> das Segment muss nachgeben, und weil seine
+                       eigene Reihe (.dp-pf-row) umbrechen DARF,
+                       bricht die Reihe statt die Leiste
+
+   > **Flexbox bricht um, bevor es schrumpft.** Genau das steht schon im
+   > Kommentar von v1941b. Was dort fehlte: schrumpfen darf der
+   > BEHAELTER, nicht die Kachel. v1941 hat die Kachel schrumpfen lassen
+   > und die Beschriftung gekappt; hier gibt das Segment nach, und die
+   > Kacheln wandern in eine zweite Reihe - in voller Breite.
+
+   GEMESSEN per Inline-Probe am Element (`style.setProperty(...,
+   'important')`), 1180 px:
+
+     wrap     888 x 185   seg2 602 x 87    Reihe 602 x 44
+     nowrap   888 x 137   seg2 348 x 137   Reihe 348 x 94
+
+   48 px weniger, zwei Kachelreihen statt einer halbleeren Leistenzeile,
+   und weiter 0 abgeschnitten / 0 draussen.
+
+   ── WARUM GENAU 1140 BIS 1400 ─────────────────────────────────────
+   Die Grenzen sind gemessen, nicht gewaehlt. Je Breite wrap gegen
+   nowrap, am laufenden Staging:
+
+     Breite   wrap           nowrap
+      901     581x309  0     581x237  ZWEI DRAUSSEN (+110)
+      920     600x309  0     600x237  ZWEI DRAUSSEN (+91)
+      980     660x259  0     660x237  ZWEI DRAUSSEN (+31)
+     1024     703x248  0     703x237  0        (11 px, nicht wert)
+     1100     808x183  0     808x187  0        SCHLECHTER
+     1180     888x185  0     888x137  0        BESSER  -48
+     1280     988x156  0     988x117  0        BESSER  -39
+     1340    1048x134  0    1048x117  0        BESSER  -17
+     1440    1148x 78  0    1148x 78  0        gleich (eine Zeile)
+     1920    1280x 78  0    1280x 78  0        gleich
+
+   Unter 1024 reicht die Zeile nicht einmal fuer die Mindestbreiten -
+   `.dp-pf-rz` und der Knopf stehen dann 110 px ausserhalb. Bei 1100
+   wird es schlechter. Ab 1440 passt alles in eine Zeile, da aendert
+   `nowrap` nichts. Also wirkt es nur dort, wo es gemessen hilft.
+
+   > Ein Haltepunkt, der nicht an einer Messung haengt, ist eine
+   > Behauptung. Diese beiden haengen an zweiundzwanzig.
+
+   Der Selektor ist Zeichen fuer Zeichen derselbe wie in v2119 - (1,2,0)
+   gegen (1,2,0), und bei gleicher Spezifitaet gewinnt die SPAETERE
+   Regel. Sie steht deshalb hier unten und nicht dort oben.
+   ===================================================================== */
+@media (min-width: 1140px) and (max-width: 1400px){
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar,
+  :is(#oab-bar,#qc7-sources).dp-pfbar{
+    flex-wrap: nowrap !important;
+  }
+  /* Die Reihe MUSS umbrechen duerfen - sie ist jetzt die einzige
+     Stelle, an der nachgegeben wird. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+  /* Und die Segmente muessen nachgeben duerfen, bis zu einer Kachel.
+     v2119 setzt das schon; hier noch einmal benannt, damit die
+     Bedingung des Bandes an einer Stelle vollstaendig steht. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+    flex: 0 1 auto !important;
+    min-width: min-content !important;
+  }
+  /* Lead, QR und Stub geben NICHT nach - sonst quetscht die Zeile sie
+     statt die Reihe umzubrechen, und genau das war v2119s Befund. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+}
