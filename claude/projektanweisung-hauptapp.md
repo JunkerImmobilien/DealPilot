@@ -36638,12 +36638,12 @@ die Pille "GUT" auf der BMR-Kachel liegt. Die Vorgabe war nicht falsch,
 sie war zu weit gefasst.
 
 Gegenprobe: ampel und datenzeile bleiben mittig (0 px zur Kartenmitte),
-kante hat das Overlay ohnehin nicht auf der Karte.  bleibt
+kante hat das Overlay ohnehin nicht auf der Karte. `.sbc-actions` bleibt
 mittig - danach hat er nicht gefragt.
 
 > **Gemessen wird die PILLE, nicht der Overlay-Kasten.** Der Kasten ist
 > hoeher als das Sichtbare und meldet einen Fehler, wo keiner ist. Und bei
->  am Band ist dessen Rechteck ohne Aussage - ein
+> `display:none` am Band ist dessen Rechteck ohne Aussage - ein
 > Ueberschneidungswert daraus ist Messmuell, kein Befund.
 
 ### Der Ankauf-Kasten: Text weg, Funktion bleibt
