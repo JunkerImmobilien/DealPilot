@@ -1503,49 +1503,6 @@
     dp_obj_ui:     '--dpuv-obj-card',
     dp_hero_ui:    '--dpuv-hero-card'
   };
-  /* ── v2105 · DER GEDÄMPFTE TON DER OBJEKTKARTE FOLGT IHRER FLÄCHE ─────
-     Backlog N60.34. `v2104`/`v2104b` haben die Skalen-Beschriftungen
-     (`.sbcm-scale span`, 7,5 px, 161 Stellen) in acht Fassungen auf über
-     4,5 gebracht — je Fassung mit einem festen Ton, gegen den GEMESSENEN
-     Grund.
-
-     DAS TRÄGT NUR, SOLANGE DIE FLÄCHE STEHT. Und sie steht nicht:
-     `dp_obj_ui` ist ein FREIER FARBWÄHLER (`_dpDispObj`, Vorgabe
-     #F6F2E9) — der Nutzer kann die Objektkarte auf jede Farbe stellen.
-     Ein fester Ton je Vorlage kann deshalb grundsätzlich nicht stimmen,
-     und es gibt auch keine "Stufen", die man durchmessen könnte.
-
-     > Ein Ton, der an der VORLAGE hängt, beschreibt nicht den Grund, auf
-     > dem er liegt. Genau dieser Widerspruch steckte schon in `v1108`:
-     > dort wurde panels Token abgedunkelt "weil der kühle Grauton auf
-     > HELLER Fläche zu blass ist" — eine Begründung, die eine helle Karte
-     > voraussetzt, während das Token zur Vorlage gehört.
-
-     Deshalb wird der Ton ABGELEITET, und zwar mit dem Kern, der dafür
-     schon da ist: `DealPilotConfig.branding.tonFuerGrund(ton, grund,
-     min)` wandert in OKLab-Helligkeit, hält Farbton und Sättigung und
-     nimmt die Richtung aus der Helligkeit des Grundes. KEIN zweiter
-     Rechenweg — `_setzeMarkentoene` in whitelabel-override.js benutzt
-     denselben, und zwar mit genau derselben Basis `#a8a299` (das ist
-     `rgba(168,162,153)`, der Originalton dieser Beschriftungen).
-
-     Fehlt `config.js` oder der Nutzer hat nie gewählt, wird NICHTS
-     gesetzt — dann greifen die festen Töne aus `v2104`/`v2104b` als
-     Rückfall. Dasselbe Muster wie bei `--uv-sc-*`: ist das Token da,
-     gewinnt es. */
-  var OBJ_MUT_BASIS = '#a8a299';   /* = rgba(168,162,153), der Originalton */
-  var OBJ_MUT_MIN   = 4.5;         /* 7,5 px — 3,0 gilt erst ab 24 px */
-  function objMutSetzen(h) {
-    if (!h) return;
-    try {
-      var c = window.DealPilotConfig && DealPilotConfig.branding
-        && DealPilotConfig.branding.tonFuerGrund;
-      if (typeof c !== 'function') return;        /* kein Rückfall: siehe oben */
-      var ton = c(OBJ_MUT_BASIS, h, OBJ_MUT_MIN);
-      if (ton) document.body.style.setProperty('--dpuv-obj-mut', ton);
-    } catch (e) { /* lieber kein Token als ein falsches */ }
-  }
-
   function bereicheUmhuellen() {
     if (window.__dpuvBereichHook) return;
     window.__dpuvBereichHook = true;
@@ -1555,9 +1512,6 @@
       window[fn] = function (h) {
         var r = orig.apply(this, arguments);
         try { if (h) document.body.style.setProperty(BEREICH_VARS[fn], h); } catch (e) {}
-        /* v2105: nur die OBJEKTKARTE — die anderen fünf Bereichsfarben
-           tragen diese Beschriftungen nicht. */
-        if (fn === '_dpDispObj') objMutSetzen(h);
         return r;
       };
     });
@@ -1565,9 +1519,6 @@
     Object.keys(BEREICH_LS).forEach(function (k) {
       try { var v = localStorage.getItem(k); if (v) document.body.style.setProperty(BEREICH_LS[k], v); } catch (e) {}
     });
-    /* v2105: und den abgeleiteten Ton gleich mit — sonst gilt er erst,
-       wenn der Nutzer den Regler EIN zweites Mal anfasst. */
-    try { objMutSetzen(localStorage.getItem('dp_obj_ui')); } catch (e) {}
   }
   /* Der Rueckbau muss die neuen Namen mitnehmen — sonst bliebe die Farbe
      nach "Zuruecksetzen" stehen, obwohl der Schluessel weg ist. */
@@ -1575,11 +1526,6 @@
     Object.keys(BEREICH_LS).forEach(function (k) {
       try { document.body.style.removeProperty(BEREICH_LS[k]); } catch (e) {}
     });
-    /* v2105: der abgeleitete Ton muss mit — er steht nicht in BEREICH_LS,
-       weil kein Schluessel ihn traegt. Bliebe er stehen, waere er nach
-       "Zuruecksetzen" gegen eine Karte gerechnet, die es nicht mehr gibt:
-       genau der Fehler, vor dem der Kommentar oben warnt. */
-    try { document.body.style.removeProperty('--dpuv-obj-mut'); } catch (e) {}
   }
 
   function targetUmhuellen() {
