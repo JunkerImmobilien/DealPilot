@@ -25547,7 +25547,21 @@ aside.sidebar .sb-card .sbcm-scale {
   display: flex !important;
   justify-content: space-between !important;
   font-size: 7.5px !important;
-  color: rgba(168,162,153,0.65) !important;
+  /* ── v2104 · war rgba(168,162,153,0.65) ───────────────────────────────
+     GEMESSEN am 11.10.2026: der Mischwert auf der dunklen Karte ist
+     rgb(114,109,102) auf rgb(13,11,8) — k=3,83 an 161 Stellen
+     (23 Karten x 7 Beschriftungen). Bei 7,5 px gilt 4,5.
+
+     DECKEND statt mit Deckkraft, und das ist der eigentliche Punkt:
+     der Kartengrund ist ein VERLAUF (effGrund meldet „verlauf"). Eine
+     Deckkraft darueber ergibt je Stelle einen anderen Kontrast, eine
+     feste Farbe nicht. Dieselbe Klasse wie v2090, wo bei vier von sechs
+     Stellen die Deckkraft der Fehler war.
+
+     #817d76 haelt den Farbton (Faktor auf alle drei Kanaele) und kommt
+     auf 4,80. Die Vorlagen- und Flaechenregeln in ui-varianten.css
+     liegen mit (0,4,4) darueber und bleiben unberuehrt. */
+  color: #817d76 !important;
   margin-top: 2px !important;
   font-variant-numeric: tabular-nums !important;
 }
@@ -36148,6 +36162,36 @@ body.dp-chrome-hell .sb-user{ background: var(--dp-side-bg,#EAE4D6) !important; 
 body.dp-chrome-hell #hdr-badges .sc-pill,
 body.dp-chrome-hell .sc-pill{ background: var(--dp-kpi-card, var(--dp-card,#F6F2E9)) !important; }
 body.dp-chrome-hell aside.sidebar .sb-card{ background: var(--dp-obj-card, var(--dp-card,#F6F2E9)) !important; }
+/* ══ v2104 · DIE SKALEN-BESCHRIFTUNGEN FEHLTEN IM HELLEN SKIN GANZ ══════
+   Gemessen am 11.10.2026 in der Messkabine, Merker `dp_chrome_hell`
+   gesetzt und NEU GELADEN (im laufenden Tab umschalten verfaelscht, weil
+   `_dpDispSkin` Inline-Variablen hinterlaesst):
+
+     Karte      rgb(255,255,255)   <- nicht #F6F2E9! Der Regler setzt
+                                      --dp-obj-card inline auf Weiss.
+     Text       rgba(168,162,153,0.65) -> gemischt rgb(198,195,189)
+     k          1,76   an 161 Stellen
+
+   DAS IST DER SCHLIMMSTE WERT DES GANZEN DURCHGANGS. Der helle Skin
+   dreht die Karte auf Weiss, und diese sechs Klassen tragen weiter ihre
+   Fassung fuer DUNKLEN Grund — es gab hier nie eine Regel.
+
+   > `v1107`/`v1107b` haben genau diesen Fehler fuer `data-ui-surface`
+   > und fuer jede Vorlage behoben und den hellen Skin uebersehen. Die
+   > Reparatur ist mit ihrem Anker gewandert, nicht mit der Fassung.
+
+   #76716b haelt den Farbton und kommt auf 4,83 gegen Weiss. Gegenprobe:
+   gegen #FAF8F3 sind es 4,55 — der Ton traegt also auch, wenn der Regler
+   die Karte auf Creme statt Weiss stellt. */
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbc-date,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbc-arrow,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-label,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-toggle-ico,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-scale,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-scale span,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-tick{
+  color:#76716b !important;
+}
 body.dp-chrome-hell #hdr-badges .sc-main,
 body.dp-chrome-hell .sc-main,
 body.dp-chrome-hell .sc-main .si{ background: var(--dp-hero-card, linear-gradient(135deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))) !important; }

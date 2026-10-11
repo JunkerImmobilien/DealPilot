@@ -551,7 +551,13 @@ html[data-ui-surface="light"] body aside.sidebar .sb-card {
   background: #FFFFFF !important;
   --uv-card-ink:  #1a1712;
   --uv-card-ink2: #4e4940;
-  --uv-card-mut:  #8f897c;
+  /* v2104: war #8f897c. GEMESSEN am 11.10.2026 in der Messkabine ergab
+     das auf der Kachelflaeche #FAF8F3 genau k=3,28 — und der v1107-
+     Kommentar nennt 3,2 ausdruecklich als ZIEL. Die Schwelle war falsch
+     gewaehlt: die Skalen-Beschriftungen sind 7,5 px, und 3,0 gilt erst
+     ab 24 px (oder ab 18,66 px fett). Bei 7,5 px sind es 4,5.
+     #726e63 haelt den Farbton und kommt auf 4,80. */
+  --uv-card-mut:  #726e63;
   --uv-card-tile: #FAF8F3;
   --uv-card-tl:   #E9E4D9;
 }
@@ -597,7 +603,12 @@ html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-label,
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-toggle-ico,
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-scale span,
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-tick {
-  color: #8f897c !important;
+  /* v2104: war #8f897c — dieselbe Korrektur wie am Token oben, und sie
+     muss hier NOCHMAL stehen: diese Regel setzt die Farbe direkt und
+     liest `--uv-card-mut` nicht. Ohne Vorlage greift sie, mit Vorlage
+     die Token-Regel weiter unten. Eine der beiden zu aendern haette die
+     Haelfte der Faelle stillschweigend ausgelassen. */
+  color: #726e63 !important;
 }
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-good .sbcm-val { color: #3b9667 !important; }
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-info .sbcm-val { color: #4f90b8 !important; }
