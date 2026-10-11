@@ -2378,6 +2378,68 @@ Geld), die Umlagewirkung in **Miete** (sie ändert die Miete) — und in
 beiden Reitern ein Verweis auf den anderen, damit niemand die Hälfte
 sieht. Das ist zu entscheiden, nicht zu messen.
 
+### ✓ Der Abgleich ist gefahren (11.10.2026) — am ECHTEN Objekt
+
+Marcel hatte ihn verlangt: *„da mal abgleichen, was die hergibt und dann
+mal schauen, was jetzt das Mietrecht hier ausgibt."*
+
+Gefahren mit dem **echten Modul** (`node test.js` vorweg: **38 ok, 0
+Fehler**) gegen ein **echtes Objekt** aus dem Staging-Bestand —
+`DEMO-BI3`, Bielefeld 33719, 8 Einheiten.
+
+#### Was das Mietrecht-Modul liefert
+
+| | |
+|---|---|
+| Kappungsgrenze § 558 Abs. 3 | **15 %** |
+| Mietpreisbremse § 556d | **ja, bis 31.12.2029** |
+| Kündigungssperre § 577a | **8 Jahre**, 01.03.2025–28.02.2030 |
+| Quellen am Ergebnis | 2, u. a. MietSchVO NRW |
+| Erhöhung § 558 im Jahr | **5.784 €** |
+| Neuvermietung / Umlage § 559 | 0 / 0 |
+
+Je Einheit, Beispiel Nr. 1: `ist 640` → `ziel 703`, `pot558_m 63`.
+
+#### ⚠ Und zwei Befunde, die den Wert heute begrenzen
+
+**1 · `ohne_vertragsart: 8` — alle acht Einheiten.** Das Modul meldet je
+Einheit `vertrag.fehlt: ["Vertragsart","Mietbeginn","letzte Erhöhung"]`.
+
+> Das sind **genau die Felder aus N60.33 Punkt 3**, die ich dort als
+> „vorhanden, aber von keinem Objekt gefüllt" gemessen hatte. Das Modul
+> erklärt endlich, **wofür** sie da sind: ohne sie gibt es keine Frist
+> und keinen Termin, nur die Obergrenze. Die 5.784 € stehen also ohne
+> den Zeitpunkt, zu dem man sie verlangen darf.
+
+**2 · Der Mietspiegel greift nicht — wegen uns, nicht wegen ihm.**
+`MietrechtOrt.mietspiegel('Bielefeld', {wfl, baujahr, lage})` kam leer
+zurück. Ursache gemessen: **`baujahr` ist am Objekt `null`.**
+
+> Bitter, weil Bielefeld der **einzige** Mietspiegel im Paket ist, der
+> `belastbar: true` trägt. Das Objekt liegt in genau der Stadt, für die
+> es eine gesicherte Matrix gäbe — und kann sie nicht nutzen, weil ein
+> Pflichtfeld fehlt. *Kein Treffer heißt kein Wert; hier heißt es: kein
+> Treffer wegen einer Lücke bei uns.*
+
+#### Der eigentliche Abgleich: zwei Werkzeuge, zwei Fragen
+
+| | Pilot-Mietpreisanalyse | mietrecht-ort |
+|---|---|---|
+| wo | `ki-miete.js` → `POST /api/v1/ai/ds2-suggest` | `einheiten()` lokal |
+| Quelle | **KI-Schätzung** | Normen, Verordnungen, Mietspiegel |
+| Ausgabe | `ds2_marktmiete`, `ds2_mietausfall`, je `{label, value}` | je Einheit Ziel, Potenzial, Fristen, Termine |
+| Beleg am Wert | **keiner** | Quelle, Seite, Hash, Abrufdatum |
+| beantwortet | **„Was zahlt der Markt?"** | **„Was ist erlaubt?"** |
+
+> **Sie überschneiden sich nicht — sie widersprechen sich im Zweifel.**
+> In einem Bremsengebiet kann die marktübliche Miete deutlich über dem
+> liegen, was man verlangen DARF. Beide Zahlen nebeneinander sind der
+> eigentliche Gewinn; eine davon wegzulassen macht die andere
+> gefährlich.
+
+**Damit ist Marcels Frage beantwortet:** nicht „welches ersetzt welches",
+sondern *beide nebeneinander, und die Differenz ist die Aussage.*
+
 ### Was zuerst gemessen werden muss, bevor etwas gebaut wird
 
 1. **Was gibt die Pilot-Mietpreisanalyse heute aus, und wo überschneidet
@@ -2387,7 +2449,29 @@ sieht. Das ist zu entscheiden, nicht zu messen.
    Oeynhausen), davon nur **Bielefeld** mit `belastbar: true`. Für alle
    anderen Orte gibt es keinen Mietspiegel im Paket — *kein Treffer heißt
    kein Wert*, und der Kunde bekommt den Weg zur Quelle.
-3. **Lizenz der Mietspiegel-Tabellen.** Das Paket sagt es selbst:
+3. **Lizenz der Mietspiegel-Tabellen — auf drei Zeilen eingedampft
+   (11.10.2026 nachgesehen).** Jede Tabelle trägt `quelle: {url, seiten,
+   abgerufen_am, lizenz}` — die Struktur für den Nachweis ist also da,
+   es fehlt nur der Wert:
+
+   | Mietspiegel | Art | Status laut Paket | Lizenz |
+   |---|---|---|---|
+   | Bielefeld 2026 | qualifiziert | gesichert (Textebene des PDF) | **nicht angegeben, § 5 UrhG zu prüfen** |
+   | Detmold 2025 | qualifiziert | gesichert, Anwendungsbeispiel S. 15 bestanden | **nicht angegeben, § 5 UrhG zu prüfen** |
+   | Bad Oeynhausen 2026 | einfach | **„zu prüfen … nicht für Berechnungen"** | nicht angegeben |
+
+   > **Das ist dieselbe Frage wie beim Register** — und dort ist sie
+   > beantwortet: genannt wird nur, was in *diesem* Bericht wirklich
+   > steckt, und wo die Lizenz fehlt, lässt sich nicht entscheiden, ob
+   > ein Vermerk nötig wäre. Vor der Anzeige im Kundenbericht zu klären,
+   > nicht danach.
+
+   **Bad Oeynhausen ist ohnehin gesperrt** — das Paket schreibt selbst
+   „nicht für Berechnungen". Bleiben zwei Städte, beide mit demselben
+   offenen Punkt. *Marcels Frage, nicht meine: er ist der
+   DESAG-zertifizierte Sachverständige und der Betreiber.*
+
+   Das Paket sagt es selbst:
    *„Nutzungsbedingungen der Gemeinden nicht angegeben (§ 5 UrhG zu
    prüfen)."* Dieselbe Frage wie beim Register — **vor** der Anzeige im
    Kundenbericht zu klären, nicht danach.
