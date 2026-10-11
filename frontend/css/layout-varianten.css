@@ -9177,6 +9177,55 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
   transform: translateY(-50%) !important;
 }
 
+/* ==============================================================================
+   v2114 - DIE ALTE STAFFELUNG ZURUECK, UND ZWAR BEIDE TEILE
+
+   Marcel am 11.10.2026: "Koennen wir irgendwie aus den frueheren
+   Versionsstaenden mal rausholen, wie wir das auf der normalen Objektkartei
+   frueher angezeigt haben? Das sollten wir dann bei der grossen Ansicht mit
+   den Kennzahlen drauf anpassen, dass es dann oben erscheint. Weil bei allen
+   anderen Karten ist das mittige Gut."
+
+   AUS DER VERSIONSGESCHICHTE GEHOLT (f843cc8d~1, der Stand VOR v1924):
+
+     aside.sidebar .sb-card .sbc-actions        top:  6px   <- Knoepfe oben
+     aside.sidebar .sb-card .sbc-score-overlay  top: 38px   <- Score darunter
+
+   Das ist die V103-Staffelung, deren Kommentar bis heute im Blatt steht
+   ("war 12 - jetzt unter den Action-Buttons").
+
+   > WARUM MEIN v2107 NICHT REICHTE und Marcel es zurueckgenommen hat: ich
+   > hatte nur den SCORE auf 38px gesetzt und die KNOEPFE mittig gelassen.
+   > Dann liegt der Duplizieren-Knopf (50 % = 94-116) weiter auf dem Ring
+   > (38-88 waere frei, 94-116 nicht) - genau der graue Bereich, ueber den
+   > er sich danach beschwert hat. Eine Staffelung hat zwei Teile; einen
+   > davon wiederherzustellen stellt sie nicht wieder her.
+
+   NUR DORT, WO DAS KACHELBAND STEHT - also ohne gewaehlten Kartenstil und
+   bei "kennzahlen". Alle anderen Kartenstile blenden das Band aus, sind
+   kurz, und dort bleibt die Mitte richtig (v1943 hat das an sechs Stilen
+   mit 0 px Abweichung gemessen).
+   ============================================================================== */
+html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions,
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
+  top: 6px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+  top: 38px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+/* "kennzahlen" ist flacher (195 px statt 210) und sein Kachelband beginnt
+   schon bei 114 px statt 123 - gemessen am 11.10.2026. Mit 38px lagen
+   5 px der Pille "GUT" auf der ersten Kachel. */
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+  top: 30px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
 /* =================================================================
    v1989 - DIE SAMMELREGEL AUF <small> REICHT INS DUNKLE BODENBLATT
 
