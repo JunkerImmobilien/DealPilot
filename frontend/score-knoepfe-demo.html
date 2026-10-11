@@ -236,6 +236,26 @@ function ueber(a,b){ /* senkrecht und waagerecht gleichzeitig = echte Flaeche */
   var w=Math.max(0, Math.min(a.right,b.right)-Math.max(a.left,b.left));
   return {s:Math.round(s), w:Math.round(w), flaeche:Math.round(s*w)};
 }
+/* Den Uebergang zum MESSEN stilllegen, statt auf ihn zu warten.
+
+   Erster Entwurf: `opacity !== '0'` sofort nach dem Umschalten - las
+   mitten in der Blende. Zweiter Entwurf: Schwelle plus ein zweiter Lauf
+   nach 200 ms - half beim Umschalten, aber NICHT beim Laden; (c) stand
+   weiter auf "Zahl verdeckt". Gemessen war die Deckkraft da laengst 0,
+   nur die Tabelle war aelter.
+
+   > Zweimal an der ZEIT gedreht, zweimal daneben. Ein Messwert, der von
+   > einer Blende abhaengt, wird nicht durch laengeres Warten richtig -
+   > die Blende gehoert fuer die Messung abgeschaltet. */
+function ohneUebergang(el, fn){
+  var alt = el.style.transition;
+  el.style.transition = 'none';
+  void el.offsetHeight;                    /* Umbruch erzwingen */
+  var r = fn();
+  el.style.transition = alt;
+  return r;
+}
+
 function zeichne(){
   var hov=document.getElementById('hov').checked;
   var band=document.getElementById('band').checked;
@@ -255,7 +275,9 @@ function zeichne(){
        "Zahl verdeckt": ausgerechnet die Fassung, die das verhindern
        soll. Deshalb eine Schwelle statt eines Vergleichs auf '0', und
        unten ein zweiter Lauf, wenn der Uebergang durch ist. */
-    var sichtbar = parseFloat(window.getComputedStyle(ring).opacity) > 0.05;
+    var sichtbar = ohneUebergang(ring, function(){
+      return parseFloat(window.getComputedStyle(ring).opacity) > 0.05;
+    });
     var uR = (hov && sichtbar) ? ueber(rb,ab) : {s:0,w:0,flaeche:0};
     var uZ = (hov && sichtbar) ? ueber(zb,ab) : {s:0,w:0,flaeche:0};
     var gut = uZ.flaeche===0;
