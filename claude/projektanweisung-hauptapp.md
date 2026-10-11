@@ -36456,3 +36456,99 @@ stehen. Nachgemessen: BB auf Position 2, SN auf 3.
 > `halterFuer()` für eine Mandanten-ID ist nur gegen die echte Funktion
 > mit vier erfundenen IDs geprüft. **Staging-Abnahmepunkt**, sobald es
 > einen Mandanten gibt.
+
+---
+
+## Rollout-Journal 11.10.2026 (N60.34) — v2104/v2104b: 1.288 Beschriftungen, und eine Rechnung, die als Freigabe gelesen wurde
+
+| Paket | Was | Commit | Nachweis |
+|---|---|---|---|
+| `v2104` | Skalen-Beschriftungen: Grundfassung, heller Skin, `surface=light` | `b43b1903` | live: 4,80 / 4,83 / 4,80 (war 3,83 / **1,76** / 3,28) |
+| `v2104a` | Frontend-Konstanten nachgezogen (nur Hash) | `9f9cdffb` | Buster in `index.html` ändert den Dateihash |
+| `v2104b` | dieselben Beschriftungen in allen fünf Vorlagen | `2737b2d3` | 4,81–4,84 (war 3,14 / 3,16 / 3,70 / 3,81 / 4,39) |
+
+**Acht Fassungen × 161 Stellen = 1.288 Stellen**, alle über 4,5.
+`.sbcm-scale span` auf den Objektkarten — 23 Karten × 7 Beschriftungen,
+**7,5 px**, und damit gilt 4,5 (3,0 erst ab 24 px oder ab 18,66 px fett).
+
+### Die Lehre: eine Rechnung gegen einen angenommenen Grund wird als Freigabe gelesen
+
+Ich habe alle fünf Vorlagen gegen `rgb(13,11,8)` **gerechnet** — den
+Grund, den ich für die Grundfassung gemessen hatte — und **drei davon**
+für sauber erklärt:
+
+| Vorlage | gerechnet | **gemessen** |
+|---|---:|---:|
+| kontor | 5,94 „ok" | **3,14** |
+| kanzlei | 5,96 „ok" | **3,16** |
+| boarding | 5,31 „ok" | **3,70** |
+| konsole | 4,17 | **3,81** |
+| panel | 4,25 | **4,39** |
+
+**Vier von fünf Vorlagen haben eine helle Kachel.** Hätte ich nach dem
+ersten Paket aufgehört, wären drei Fassungen mit 3,1 als „geprüft und in
+Ordnung" im Journal gestanden.
+
+> *Eine fehlende Zahl lässt jemanden nachmessen. Eine falsche Zahl
+> hindert ihn daran.* Regel 1 wörtlich: Struktur wird nie angenommen,
+> immer ausgelesen — und ein Grund ist Struktur.
+
+### Drei weitere Korrekturen an eigenen Aussagen
+
+1. **„115 Stellen im Cockpit"** — *falsch*. `messe()` scannt das ganze
+   Dokument, nicht die gemessene Fläche. Es sind **161 Stellen, alle in
+   `aside.sidebar`, keine einzige im Cockpit.**
+2. **„Die Töne sind für dunklen Grund gebaut"** — das stand so in
+   `v1107b` und war die Begründung, die Grundfassung auszunehmen.
+   Gemessen: **3,83.** Die Annahme war die Lücke.
+3. **Der Prüfer meldete 3,53 für konsole** — und der Ton stand dort gar
+   nicht. Mein Suchausdruck lief über die Blockgrenze und las panels
+   Wert. *Er wurde rot, bevor etwas ausgerollt war.* Jetzt holt er erst
+   die Blöcke der Vorlage und sucht darin.
+
+### Der schlimmste Wert des Durchgangs stand im hellen Skin
+
+`body.dp-chrome-hell` dreht die Karte auf **Weiß** — und für diese sechs
+Klassen gab es dort **nie eine Regel**. Gemessen: **k = 1,76**,
+praktisch unsichtbar.
+
+> `v1107`/`v1107b` haben genau diesen Fehler für `data-ui-surface` und
+> für jede Vorlage behoben und den hellen Skin übersehen. **Die
+> Reparatur ist mit ihrem Anker gewandert, nicht mit der Fassung.**
+
+### Und die Schwelle war falsch gewählt, nicht der Ton schlecht getroffen
+
+Im eigenen Blatt stand es (`ui-varianten.css`, `v1107`): *„abgesenkt, bis
+sie gegen die Kachelfläche #FAF8F3 **auf 3,2** kommen."* Gemessen: genau
+**3,28**. Der Ton traf sein Ziel — **das Ziel war die falsche Zahl.**
+
+### Deckend statt mit Deckkraft
+
+Der Kartengrund ist ein **Verlauf** (`effGrund` meldet `quelle:
+"verlauf"`). Eine Deckkraft darüber ergibt je Stelle einen anderen
+Kontrast, eine feste Farbe nicht. Dieselbe Klasse wie `v2090`.
+
+Und `#8f897c` musste **zweimal** weichen: am Token `--uv-card-mut` und in
+der Regel, die die Farbe **direkt** setzt und den Token nicht liest. Nur
+eine zu ändern hätte die Hälfte der Fälle stillschweigend ausgelassen.
+
+### Zwei Werkzeugfunde
+
+- **`messe(d, win, label)` nimmt drei Argumente**, `kontrast(a, b)` zwei
+  **Farbobjekte** (keine CSS-Strings, sonst `NaN`).
+- **`lade()` hängt im verborgenen Fenster.** Es legt `rAF` im *iframe*
+  um, aber nicht im **eigenen** Fenster — und ein Hintergrundtab feuert
+  `rAF` nie. Ein Sechser-Lauf blieb minutenlang stillschweigend stehen.
+  Nach dem Umlegen von `window.requestAnimationFrame` liefen alle Läufe
+  durch. **Gehört in die Messkabine** statt in jeden Aufruf — Backlog.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Kartenfläche ist eine **eigene Achse** (`--dp-obj-card`, inline) → 5 Vorlagen × Kartenstufen messen | Messlauf |
+| `rafErsatz` auch im Messkabinen-Fenster | Werkzeug |
+| Demodaten: 5× GrESt 0,00 % (N60.19) | **DB-Eingriff** |
+| Mandanten auf den Server (N60.28/N60.33) | **Freigabe** |
+| „Steuersätze über die Jahre": drei Lesarten | **fachlich** |
+| N51 Ansprechpartner 1+2 | **Freigabe** |
