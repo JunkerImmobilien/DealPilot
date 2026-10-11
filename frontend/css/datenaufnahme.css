@@ -2392,3 +2392,213 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     min-width:92px !important; min-height:92px !important;
   }
 }
+
+/* =====================================================================
+   v2119 - DIE LEISTE KNAUTSCHTE, STATT UMZUBRECHEN
+
+   Marcel am 11.10.2026: "Wenn wir Desktop 1180 ausgewaehlt haben kann
+   man die auswahl nicht lesen unter Daten einlesen und auch das
+   Dealpilot unter Marktbewertung auf der Datenaufnahme Karte. QR Code
+   passt dann garnicht und ueberlappt."
+
+   GEMESSEN bei 1180 px, Aktenmappe, direkte Kinder von #oab-bar:
+
+     Leiste       888 x 107   row / NOWRAP   SUMME der Kinder 888  "passt"
+       .dp-pf-lead    104    flex 0 1 auto   min-width 0
+       .dp-pf-seg     126    flex 1 1 auto   min-width 0
+       .dp-pf-seg     438    flex 1 1 auto   min-width 0
+       a.dp-pf-qr      39 x 68   natuerlich 47 - SVG darin 54 x 54
+       .dp-pf-rz      101          natuerlich 109
+
+     Beschriftungen  sichtbar / Inhalt
+       "Expose / Marktbericht"   67 / 120
+       "Sprache"                 15 /  43
+       "Gefuehrte Eingabe"       50 /  95
+       "ImmoMetrica"             35 /  73
+
+   > DAS IST KEIN UEBERLAUF. Die Summe der Kinder ist exakt die
+   > Innenbreite - weil jedes Kind schrumpfen DURFTE. `flex-shrink:1`
+   > plus `min-width:0` heisst: lieber alles unleserlich als eine
+   > zweite Zeile. Wer nach einem Ueberlauf sucht, findet hier nichts
+   > und haelt die Leiste fuer gesund.
+
+   Und es ist ausdruecklich NICHT vom Fenster abhaengig, sondern von
+   der Breite der Leiste selbst - gemessen:
+
+     Fenster   Seitenleiste   Leiste
+      1024         260         1150   (Querscroller, alles voll gross)
+      1180         380          888   kaputt
+      1280         380          856   kaputt
+      1440         380         1016   kaputt
+      1920         380         1280   heil
+
+   Deshalb KEIN weiterer Haltepunkt. Haltepunkte sind hier die falsche
+   Form: sie beschreiben das Fenster, der Schaden haengt am Behaelter.
+   Stattdessen wird die Bauart selbst tragfaehig gemacht:
+
+     1. Die Leiste darf umbrechen        (flex-wrap:wrap)
+     2. Die Kachelreihen duerfen umbrechen
+     3. Kacheln und QR schrumpfen NICHT  (flex:0 0 auto)
+
+   Damit regelt sich jede Behaelterbreite von selbst - auch die, die
+   es heute noch nicht gibt. Hoehe statt Unleserlichkeit; Marcel:
+   "wenn etwas nicht gerendert werden kann musst du es anders anzeigen
+   lassen oder umbauen fuer die groesse."
+
+   Die Grenze 901 ist Absicht: darunter liegt die Leiste bereits als
+   Spalte (flex-direction:column ab Z.1958) und der QR ist ausgeblendet.
+   ===================================================================== */
+@media (min-width: 901px){
+
+  /* 1 - die Leiste bricht um statt zu stauchen */
+  :is(#oab-bar,#qc7-sources).dp-pfbar,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar{
+    flex-wrap: wrap !important;
+    row-gap: 10px !important;
+  }
+
+  /* 2 - die Kachelreihe bricht um */
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+
+  /* 3 - Kacheln behalten ihre Beschriftung. flex-basis bleibt `auto`,
+         damit die Spaltenbreiten der schmalen Baender (width:100% /
+         calc(50% - 3px)) weiter greifen - dort gilt dieses Band nicht,
+         aber die Regel soll auch dann nichts umwerfen. */
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-lbl,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-lbl{
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  /* 4 - der QR bleibt quadratisch und wird nicht zusammengedrueckt.
+         Das SVG darin ist 54 px; der Kasten bekommt 54 plus Luft. */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+    flex: 0 0 auto !important;
+    min-width: 62px !important;
+    min-height: 62px !important;
+  }
+
+  /* 5 - der Abruf-Knopf schrumpft nicht unter seine Schrift */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar button#oab-run{
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* 6 - die Segmente duerfen schrumpfen, aber nur bis zu einer Kachel;
+         darunter wandern sie in die naechste Zeile statt die
+         Beschriftungen zu kappen. */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+    min-width: min-content !important;
+  }
+}
+
+/* =====================================================================
+   v2120 - DER ABRUF-KNOPF WAR GOLD AUF GOLD
+
+   Marcel am 11.10.2026: "Beim IPhone 14 ist der Abrufbutton fast so
+   gross das es das komplette weisse verdeckt und auch im gleichen gold
+   ton."
+
+   GEMESSEN auf 390 px, Aktenmappe, kein Kartenstil:
+
+     #oab-bar       357 x 439   Grund  Verlauf rgb(201,170,84)   <- GOLD
+       .dp-pf-rz    325 x  57   Grund  #ffffff, Rand 1,5 px Gold
+         #oab-run   323 x  50   Grund  Verlauf rgb(207,178,96)   <- GOLD
+
+   Beide Befunde sind EIN Befund: der Knopf ist 323 breit in einem
+   Stub von 325 und sitzt mit `margin:6px 0 0` oben an. Links und
+   rechts bleibt je 1 px weiss, unten 1 px. Vom "weissen Boarding-Stub"
+   ist damit ein Strich uebrig - und der Knopf selbst traegt dieselbe
+   Farbe wie die Leiste hinter dem Stub.
+
+   Kontrast Knopf gegen Leiste: k = 1,07. Das Einzige, was den Knopf
+   noch sichtbar macht, ist der 1 px Rest des Stubs.
+
+   ── WARUM ER GOLD WAR, UND WARUM DAS EINMAL RICHTIG WAR ────────────
+   Mit dem Kaskaden-Walker, nicht geraten. Es gewinnt:
+
+     (2,1,0) !  #obj-action-bar #oab-run.dp-pf-launch
+                background: linear-gradient(180deg,var(--gold-hi),var(--gold))
+                style.css, Block "v601-oab-gold-hard"
+
+   Darunter liegen drei Staende derselben Flaeche:
+
+     v597  weiss + Goldtext, Stub weiss mit Goldrand
+     v599  GOLD  + dunkler Text        <- die Umstellung
+     v601  dasselbe, noch einmal mit ID festgenagelt
+
+   Und die Grundregel in style.css:33064 sagt bis heute
+   `background:#050505; color:var(--gold-hi)`. Also: Obsidian mit
+   Goldschrift war der Ausgangszustand, Gold kam spaeter.
+
+   > v599 war nicht falsch. Die Leiste war damals DUNKEL. Gold auf
+   > dunkel ist der Akzent. Die Leiste hat spaeter den Runway-Verlauf
+   > bekommen - und damit wurde aus dem Akzent dieselbe Farbe wie der
+   > Grund. Keine der beiden Entscheidungen ist fuer sich falsch;
+   > zusammen ergeben sie einen unsichtbaren Knopf.
+
+   Das ist dieselbe Form wie [[farbe-gilt-nur-zu-ihrem-grund]]: eine
+   Farbe gilt nur zu dem Grund, zu dem sie gewaehlt wurde. Wandert der
+   Grund, wandert die Beziehung nicht mit.
+
+   ── WAS HIER GESETZT WIRD ──────────────────────────────────────────
+   Der Knopf wird wieder Obsidian mit Goldschrift - die Hausform, die
+   `.dp-pf-lead` und `.dp-pf-tile.tool` in derselben Leiste schon
+   tragen. Damit traegt er Kontrast zu BEIDEN Gruenden: zum weissen
+   Stub und zum goldenen Verlauf dahinter.
+
+   Und der Stub bekommt Polster, damit er wieder ein Stub ist und
+   nicht ein Rand: 6 px rundum statt 6 px nur oben.
+
+   Spezifitaet: `:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch`
+   ist (2,2,0) und schlaegt die (2,1,0) von v601 - ohne `#obj-action-bar`
+   zu nennen, damit dieselbe Regel im Quick-Check-Dokument greift, wo
+   es diesen Behaelter nicht gibt.
+   ===================================================================== */
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:hover,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:focus,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:active,
+:is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch,
+:is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch:hover{
+  background: #0A0A0A !important;
+  background-image: none !important;
+  color: var(--gold-hi, #E8CC7A) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px -3px rgba(0,0,0,.45) !important;
+  letter-spacing: .4px !important;
+  font-weight: 600 !important;
+}
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:hover{
+  background: #141210 !important;
+}
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch .dp-pf-ic,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch .dp-pf-ic svg{
+  color: var(--gold-hi, #E8CC7A) !important;
+  stroke: var(--gold-hi, #E8CC7A) !important;
+}
+/* Der Stub bekommt rundum Luft, damit er als Stub lesbar bleibt.
+   `overflow:hidden` steht dort bereits - das Polster kann also nicht
+   durch einen Ueberlauf wieder verschwinden. */
+:is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+:is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz > #oab-run.dp-pf-launch{
+  margin: 0 !important;
+}
