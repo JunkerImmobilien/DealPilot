@@ -9177,6 +9177,50 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
   transform: translateY(-50%) !important;
 }
 
+/* ==============================================================================
+   v2107 - DER SCORE GEHT ZURUECK NACH OBEN, ABER NUR WO DAS KACHELBAND STEHT
+
+   Marcel am 11.10.2026, mit Bild: "Du hast einmal die Objektkarten alle so
+   angepasst, dass der Score und auch die Einschaetzung gut oder solide immer
+   mittig auf der Karte sitzt. Das passt aber, wenn wir den Stil D-Pilot haben,
+   nicht mehr zu der Karte. Also da muesste das wieder hochgerueckt werden."
+
+   DAS NIMMT SEINE EIGENE VORGABE VON v1943 TEILWEISE ZURUECK ("IMMER mittig",
+   07.10.2026). Nicht stillschweigend: es gilt ab jetzt NUR dort, wo das
+   Kachelband fehlt.
+
+   GEMESSEN am 11.10.2026 auf Staging, Karte 344 x 210 px, warum beides
+   stimmen kann:
+
+     .sbc-top          15 - 115 px
+     .sbc-score-overlay 65 - 145 px   <- mittig, 80 px hoch
+     .sbc-mini-grid    123 - 199 px
+
+   Das Overlay und das Kachelband ueberschneiden sich um 22 px - genau die
+   Stelle, an der in Marcels Bild die Pille "GUT" auf der BMR-Kachel liegt.
+
+   > WARUM v1943 trotzdem richtig war: die Kartenstile blenden das Kachelband
+   > aus (`.sbc-mini-grid{display:none}`, Zeile 9134). Ohne Band ist die Karte
+   > kurz, und mittig ist dort die richtige Lage - v1943 hat das an sechs
+   > Stilen nachgemessen (0 px Abweichung bei Datenzeile, Ampel, Minimal).
+   > Die Vorgabe war nicht falsch, sie war nur zu weit gefasst.
+
+   Das Band steht in genau ZWEI Faellen: ohne gewaehlten Kartenstil (die
+   DealPilot-Ansicht, von der Marcel spricht) und bei "kennzahlen", das es
+   ausdruecklich wieder einblendet (Zeile 9137). Beide bekommen die Lage aus
+   `style.css` zurueck - top 38px, kein transform.
+
+   NUR DER SCORE. `.sbc-actions` (duplizieren/loeschen) bleibt mittig: danach
+   hat Marcel nicht gefragt, und die Knoepfe liegen rechts aussen, nicht auf
+   dem Band.
+   ============================================================================== */
+html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay,
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+  top: 38px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
 /* =================================================================
    v1989 - DIE SAMMELREGEL AUF <small> REICHT INS DUNKLE BODENBLATT
 
