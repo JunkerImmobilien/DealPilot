@@ -1683,7 +1683,7 @@ Chips mit Tab-Sprung und Gold-Flash (Z. 14–17). Das trägt.
 > > die Zeile **geschützte Leerzeichen** (U+00A0) zwischen Zahl und Einheit
 > > trägt. Der Fehler sah aus wie ein falsch kopierter Text.
 
-#### N60.33 · Sechs Felder, die die zweite Schnittstelle braucht (11.10.2026)
+#### N60.33 · Drei von sechs erledigt 11.10.2026 — `v2102`, und zwei waren schon da
 
 **Marcel, 11.10.2026, aus dem anderen Chat:** *„Zur API noch ein Befund
 in der anderen Schnittstelle. Wir haben ja Bonitätswerte und auch das
@@ -1698,12 +1698,84 @@ auch erst mal nicht. Das kann dann auf der Tonspur erfolgen."*
 
 | # | Was | Stand (noch zu messen) |
 |---|---|---|
-| 1 | **Bonitätswerte** | im Datensatz vorhanden — Feldnamen prüfen |
-| 2 | **Bundesland → Grunderwerbsteuersatz** | das Land ist über `plz`/`ags` ableitbar, der Satz je Land ist eine Tabelle. **Marcels Punkt: wir wissen es, also sollen wir es auch liefern** |
-| 3 | **Mietverträge**: Vertragsart, Beginn, letzte Erhöhung | `mv_art`, `mv_beginn`, `mv_letzte_erhoehung` — stehen je Einheit in `_mfh` und seit `v2087` auch auf Objektebene |
+| 1 | ~~**Bonitätswerte**~~ | **war schon da:** `zve` 19/23, `grenz` 23/23, `ek` 19/23 — am echten Export gezählt |
+| 2 | ~~**Bundesland → Grunderwerbsteuersatz**~~ | **gebaut `v2102`** — siehe unten |
+| 3 | ~~**Mietverträge**~~ | **war schon da:** je Einheit 11 `mv_*`-Felder in `_mfh` (79 Einheiten). Auf Objektebene sammelt `collectData()` sie — nachgewiesen. Sie fehlen im Export nur, weil **kein Objekt sie gefüllt hat** |
 | 4 | **Rechtsform der Gesellschaft** | **ist N60.28** — und dort ist Schritt 0, die Mandanten überhaupt auf den Server zu bringen |
 | 5 | **Steuersätze über die Jahre** (Mandanten-Einstellungen) | hängt an derselben Wurzel wie 4: die Mandanten liegen nur im `localStorage` |
 | 6 | ~~Zeiträume eigener Nutzung (§ 23 EStG)~~ | **von Marcel ausdrücklich zurückgestellt**: *„das haben wir im DealPilot nicht. Das brauchen wir aber auch erst mal nicht."* |
+
+### Punkt 2 gebaut (`v2102`) — und es war fast alles schon da
+
+| Baustein | wo |
+|---|---|
+| `plz` | am Objekt, **21 von 23** belegt |
+| `gest_p` | am Objekt — aber die **Eingabe** des Nutzers |
+| die Sätze | seit `v1823` im gespiegelten `frontend-konstanten.json`: **16 Länder, 84 PLZ-Bereiche**, mit Prüfhaken auf 16 |
+
+`portfolioExport.js` **hat die Konstanten geladen und die GrESt-Daten nie
+benutzt.** Jetzt leitet er ab: `bundesland`, `bundesland_name`,
+`grest_satz_amtlich`, `grest_herkunft`.
+
+**Zwei Felder, nicht eins:** `gest_p` ist, was der Nutzer angesetzt hat,
+`grest_satz_amtlich` was das Land vorschreibt. Sie **dürfen** abweichen —
+wer einen Kaufpreisanteil für Inventar herausrechnet, zahlt auf weniger
+Steuer. *Eine zusammengelegte Zahl hätte den Unterschied verschluckt*,
+dieselbe Lehre wie bei den zwei RND-Spalten in `v2086`. Der Unterschied
+steht als `HINWEIS` im Export.
+
+**Am laufenden Staging abgenommen:** 21 von 23 Objekten tragen ein Land
+(NW 15, ST 3, SN 2, NI 1). Die zwei ohne haben **keine `plz`**, und
+`grest_herkunft` sagt genau das — *kein Treffer heißt kein Land, nie das
+nächstgelegene.*
+
+Bewacht von `tools/grest-export-pruefen.mjs`: **55 Punkte, RC=0**, lädt
+das echte Modul und ruft die echte Funktion.
+
+### ⚠ Das neue Feld hat sofort einen Datenfehler gefunden
+
+**8 von 21 Objekten weichen vom amtlichen Satz ab — und alle acht sind
+DEMO-Objekte:**
+
+| Objekt | PLZ | Land | amtlich | angesetzt |
+|---|---|---|---:|---:|
+| DEMO-HH1 | 44577 | NW | 6,5 % | **0,00 %** |
+| DEMO-LE2 | 04155 | SN | 5,5 % | **0,00 %** |
+| DEMO-BI3 | 33719 | NW | 6,5 % | **0,00 %** |
+| DEMO-DT4 | 32756 | NW | 6,5 % | **0,00 %** |
+| DEMO-IB5 | 49477 | NW | 6,5 % | **0,00 %** |
+| DEMO-LE1 | 06184 | ST | 5,0 % | 5,50 % |
+| DEMO-LE1 | 33613 | NW | 6,5 % | 5,50 % |
+| DEMO-LE1 | 33647 | NW | 6,5 % | 5,50 % |
+
+**Fünf Demo-Objekte tragen 0,00 % Grunderwerbsteuer** — bei einem echten
+Kauf unmöglich. Die drei anderen tragen pauschal 5,50 %, unabhängig vom
+Land. *Das gehört zu **N60.19** („Die Demodaten erzählen keine
+Geschichte") und ist ein DB-Eingriff, also Marcels Freigabe.*
+
+> Die abgeleitete Zahl hat sich beim **ersten** Lauf bezahlt: ohne sie
+> wäre „0 % Grunderwerbsteuer" eine Zahl geblieben, die niemand
+> hinterfragt. Eine Ableitung ist nicht nur eine Auskunft — sie ist auch
+> ein Prüfmaß für das, was schon dasteht.
+
+### Drei Korrekturen an meinen eigenen Aussagen, alle im Lauf gefunden
+
+1. Ich meldete, `DealPilotGrest.forPlz` gebe für `32609` **`null`** zurück.
+   *Falsch* — ich hatte `fromPlz` getippt. `forPlz` trifft alle zehn
+   Probe-PLZ.
+2. Ich meldete, die Tabelle liege **„nur im Frontend"**. *Falsch* —
+   `v1823` hat sie längst gespiegelt, samt Prüfhaken. Nur der Export
+   nutzte sie nicht.
+3. Mein Prüfer verlangte **„keine überlappenden PLZ-Bereiche"** und fand
+   eine. Die ist **fachlich richtig**: `04900–04938` (Elsterwerda, Bad
+   Liebenwerda, Übigau) liegt in **Brandenburg**, obwohl der 04xxx-Block
+   sonst Sachsen ist. Geprüft wird jetzt, was wirklich schiefgehen kann:
+   die **engere** Spanne muss **vor** der weiteren stehen, sonst ist sie
+   unerreichbar. Nachgemessen: `BB` auf Position 2, `SN` auf 3 — `04910`
+   gibt BB, `04109` gibt SN.
+
+   > *Ein Prüfer, der eine richtige Ausnahme als Fehler meldet, wird
+   > abgeschaltet.*
 
 > **Vier der fünf offenen Punkte sind Auslieferung, einer ist eine
 > Ableitung.** Nummer 2 ist die interessante: der Grunderwerbsteuersatz
