@@ -2183,6 +2183,43 @@ nachträglich korrigierbar). Sie stehen im Dokument als Haken.
 > *Ein Negativbefund in drei Dateien ist keiner, wenn der Export in
 > einer vierten liegt.*
 >
+> ### `afa_rnd_jahre` nachgemessen (11.10.2026) — die Sorge ist ausgeräumt
+>
+> Der Punkt nannte `afa_rnd_jahre` als etwas, das `deal-action.js:2052`
+> „bewusst leer lässt — eine Entscheidung, kein Versehen, die aber jede
+> Auswertung am Feld unterläuft."
+>
+> **Die Entscheidung ist richtig und steht im Code begründet:**
+> `afa_rnd_jahre` ist die **Eingabe des Nutzers** und kann eine andere
+> Zahl tragen — etwa aus einem echten Gutachten. *Ein Vorschlag, der
+> sich selbst einsetzt, ist keiner.* Das Gerechnete steht daneben in
+> `_rnd`, mit Herkunft. Deshalb **zwei** Spalten im Export, nicht eine.
+>
+> **Am echten Export über 23 Objekte gemessen:**
+>
+> | | Objekte |
+> |---|---:|
+> | mit gerechneter RND (`_rnd.rnd_jahre`) | **0** |
+> | mit angesetzter RND (`afa_rnd_jahre`) | **0** |
+> | mit beiden | 0 |
+> | mit keiner | **23** |
+>
+> **Beide Spalten sind heute leer — und die Leitung ist trotzdem heil.**
+> Nachgewiesen am laufenden System: ein gesetztes `window._dpRnd` taucht
+> in `collectData()` als `_rnd` auf und verschwindet wieder, wenn der
+> Merker `null` wird. Es hat schlicht noch niemand die RND-Strecke
+> gefahren **und gespeichert**.
+>
+> > *Wer den Export prüft und zwei leere Spalten sieht, schließt auf
+> > einen Defekt.* Die Messung unterscheidet die beiden Fälle: „nie
+> > benutzt" sieht aus wie „kaputt", und nur ein Durchstich trennt sie.
+> > Der Durchstich ist gemacht, die Spalten tragen.
+>
+> **Damit bleibt an diesem Punkt nur noch eine Produktfrage offen** —
+> welche Spalten ein Bankexport tragen soll (siehe darunter). Das ist
+> keine Messfrage: eine Bank bekommt nicht alles, und was sie bekommt,
+> entscheidet der, der die Unterlage verantwortet.
+
 > **Offen:** die PDF-Wege (Investment-PDF, Bankexport). Dort stehen
 > ausgewählte Spalten, und welche davon ein Bankexport tragen soll, ist
 > eine Produktfrage. Ebenso `afa_rnd_jahre`, das `deal-action.js:2052`
