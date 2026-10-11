@@ -36659,3 +36659,103 @@ INPUT#ank-freigabe, nichts liegt darueber.
 
 **Dabei gefunden:** ankauf-ansicht.js hatte kein esc(). Mein
 title-Einbau haette beim Rendern geworfen, und node --check sieht das nie.
+
+---
+
+## Rollout-Journal 11.10.2026 — v2109–v2112: zurückgebaut, eine Regression gefunden, zwei Demos
+
+| Paket | Was | Commit | Nachweis (live) |
+|---|---|---|---|
+| `v2109` | `v2107`/`v2107a` zurückgebaut | `7ced4323` | Score-Regeln **identisch mit `origin/main`** |
+| `v2110` | unsichtbare Knöpfe fangen keine Klicks mehr ab | `5d69a5b9` | Ring frei von `button.sbc-btn` |
+| `v2110a` | **meine eigene Regression** behoben | `170ca71a` | 390 px: `opacity 1 · pointer-events auto` |
+| `v2111`/`a`/`b` | Demo zu N60.37 | `3af4ad4b`, `a51bd1ba` | 5 Karten, Ist 81 px², alle vier Wege 0 |
+| `v2112` | Quick-Check und Marktbericht aus der Seitenleiste | `d2eab3c1` | `.sb-neu-row` 0× im DOM, beide im Aktionen-Menü |
+
+### Die teuerste Stelle: ich habe mir eine Regression gebaut und sie selbst gefunden
+
+`v2110` hängte `pointer-events:none` an die **Grundregel** von
+`.sbc-actions` — richtig gedacht, denn ein unsichtbarer Knopf fing die
+Klicks auf dem Score-Ring ab. Es gibt aber vier weitere Regeln auf
+denselben Selektor, und eine davon ist die Handy-Regel:
+
+```css
+@media (max-width: 900px) { … .sbc-actions { opacity: 1 !important } }
+```
+
+Auf Touch gibt es kein Hover, deshalb stehen die Knöpfe dort **immer**
+sichtbar. Gemessen bei 390 px: *opacity 1, pointer-events none* —
+**Duplizieren und Löschen waren sichtbar und tot.** Zwanzig Minuten lang
+auf Staging, von mir ausgerollt.
+
+> **Eine Hälfte eines Paares zu ändern ist schlimmer, als beide zu
+> lassen:** der sichtbare Zustand sagt dann etwas anderes als der
+> bedienbare. Seitdem bewacht `tools/deckkraft-klickbarkeit-pruefen.mjs`
+> die Paarung über drei Blätter (12 Regeln, RC=0) — und er bricht ab,
+> wenn er **gar keine** Regel findet, statt grün zu werden.
+
+Dass meine Fassung überhaupt halb griff, sagt der Kaskaden-Walker:
+`.sb-card:hover .sbc-actions` (0,2,0) verliert gegen
+`aside.sidebar .sb-card .sbc-actions` (0,3,1) — deshalb wurde
+`pointer-events` auto, während `opacity` 0 blieb.
+
+### Der graue Bereich: zwei Kommentare, die sich widersprechen
+
+`V103` hat Knöpfe (`top:6px`) und Score (`top:38px`) bewusst gestaffelt,
+mit dem Vermerk *„Damit klickbar"*. `v1943` setzt **beide** auf
+`top:50%`. **Zwei Dinge in derselben Spalte auf dieselbe Mitte müssen
+sich überlappen** — gemessen 21 px, und der Knopf verdeckt die untere
+Hälfte der Score-Zahl. Marcels Anweisung war nicht falsch, sie war für
+zwei Elemente nicht erfüllbar. Steht als **N60.37** mit vier Wegen.
+
+### Zweimal „Demo bauen" geschrieben und zweimal gefragt
+
+Bei N60.35 und dann wieder bei N60.37 habe ich geschrieben *„Demo bauen,
+nicht fragen"* — und dann gefragt. Die Demo zeigt ja gerade die
+Richtungen, damit sie niemand im Abstrakten benennen muss. Beide stehen
+jetzt: `farbregler-demo.html` und `score-knoepfe-demo.html`.
+
+**Und die zweite Demo log, ausgerechnet bei der Fassung, die den Fehler
+verhindert:** (c) meldete „Zahl verdeckt", weil ich die Deckkraft mitten
+in der 120-ms-Blende las. Zweimal an der Zeit gedreht (Schwelle, dann
+ein zweiter Lauf nach 200 ms), zweimal daneben — erst das Stilllegen des
+Übergangs war richtig.
+
+> *Ein Messwert, der von einer Blende abhängt, wird nicht durch längeres
+> Warten richtig.* Steht in `eingefrorener-uebergang`, zweimal nicht
+> angewandt.
+
+### `v2112`: erst messen, ob eine Tür zugeht
+
+Marcel: *„im menü bei dealpilot bitte quick-check und marktbericht
+rausnehmen."* Vorher gemessen, ob damit eine Funktion unerreichbar wird:
+
+| | im Aktionen-Menü |
+|---|---|
+| `:771` `sbActionsAction('marktbericht')` | **„Marktbericht"** |
+| `:786` `sbActionsAction('quickcheck')` | **„Quick Boarding"** |
+
+Beide bleiben erreichbar, auch im Aktenmappen-Layout (dort nachgemessen:
+Schiene mit fünf Teilen, `schnellstart` entfällt sauber, Aktionen-Menü
+da, ein „Quick Boarding"-Knopf).
+
+**Zwei Sackgassen auf dem Weg, beide jetzt im Kommentar:** der Verteiler
+`case 'quickcheck'` in `ui.js:2167` hängt am Bottom-Sheet, und das ist
+seit V46 **unbedingt** abgeschaltet (`style.css:11804`, keine
+Media-Query). Und `hybrid-aktionen.js` erscheint nur in der Vorlage
+kanzlei ab 1500 px.
+
+**Zurückgenommen, bevor es ausgerollt war:** ich hatte Quick-Check schon
+in `hybrid-aktionen.js` eingetragen, weil ich den Eintrag `:786` noch
+nicht gefunden hatte — überflüssig **und** im falschen Menü.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.37 (a)–(d): welcher Weg? Demo steht | **Optik** |
+| N60.35 Farbregler (a)/(b): Demo steht | **Optik** |
+| N60.36 Mietrecht: Abgleich, Lizenz, Einspielweg | **fachlich + Freigabe** |
+| N60.19 Demodaten 5× GrESt 0,00 % | **DB-Eingriff** |
+| Mandanten auf den Server (N60.28/33) | **Freigabe** |
+| N51 Ansprechpartner 1+2 | **Freigabe** |
