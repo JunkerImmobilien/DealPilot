@@ -2569,7 +2569,8 @@ unbedingt auswählbar sein"*). **Gemessen gibt es einen Grund dafür.**
 Dieselbe Stufe, verschiedene Farben. Die 8 grünen Karten sind genau die
 8 mit `deal-won`.
 
-**Die Regeln sagen es direkt** (`layout-varianten.css:7213–7216`):
+**Die Regeln sagen es direkt** (`layout-varianten.css:8890–8905`, die
+Schreibtisch-Fassung):
 
 ```css
 .sb-card .sbc-top            border-left: 3px solid Gold
@@ -2588,6 +2589,22 @@ Dieselbe Stufe, verschiedene Farben. Die 8 grünen Karten sind genau die
 Beschriftung behauptet etwas, das die Messung nicht bestätigt. Marcel hat
 es gespürt, ohne es benennen zu können — und genau deshalb lohnt das
 Nachmessen statt des Nachfragens.*
+
+> **⚠ Eine Zwischenkorrektur von mir war selbst falsch.** Ich hatte die
+> Regeln zuerst bei `:7213–7216` zitiert — die stehen aber in
+> `@media (max-width: 900px)` und gelten nur auf dem Handy. Daraus habe
+> ich geschlossen, am Schreibtisch gäbe es **gar keine** Kante, und war
+> drauf und dran, das so zu melden.
+>
+> **Gefunden hat es der Kaskaden-Walker, nicht `grep`:** es gibt sehr
+> wohl Schreibtisch-Regeln (`:8890`, `:8897`, `:8901`) mit demselben
+> Inhalt. Mein Grep hatte sie weggefiltert, weil ich auf Einrückung
+> gefiltert habe.
+>
+> *Der ursprüngliche Befund stimmt also — aber ich hätte ihn beinahe
+> durch eine falsche Korrektur ersetzt. „Welche Regel gewinnt, sagt nur
+> der Kaskaden-Walker" gilt auch dann, wenn man die Regel schon gefunden
+> zu haben glaubt.*
 
 **Zwei ehrliche Wege, und sie schließen sich aus:**
 
