@@ -379,6 +379,21 @@ Marcels Frage aus N60.5 („erst 44, dann über 80").
 >
 > Kein `MESSFEHLER`, kein `ABBRUCH`, kein `KEINE REITER` in 48 Punkten.
 
+> ### Quick-Check-Matrix gefahren (11.10.2026, `v2092f`)
+>
+> **48 von 48 Punkten, Deckung 100 %**, 6 Fassungen × 8 Geräte, drei
+> Minuten. Kein Querscroll, keine Schiene, kein Messfehler, kein Abbruch.
+>
+> **Der Läufer konnte es vorher nicht.** Er sucht `nav.tabs button.tab`
+> und meldete bei einem Dokument ohne Reiter neunmal „KEINE REITER" —
+> statt zu messen. `quickcheck-app.html` lädt als **eigenes Dokument**
+> (Titel „DealPilot Boarding"), null Reiter, 3596 px hoch, eine
+> durchgehende Seite. *Ein Prüfstand, der eine Bauart nicht kennt, darf
+> sie nicht als Fehler melden — er misst sie einmal am Stück.* Seit
+> `v2092f` tut er das und nennt den Fall als Art `OHNE REITER`.
+>
+> **Der Lauf fand etwas Wichtigeres als Kontrast — siehe N60.32.**
+
 > ### Was weiterhin fehlt
 >
 > **Der Marktbericht und der Quick-Check sind NICHT dabei.** Der Läufer
@@ -1794,6 +1809,62 @@ noch als Markenbegriff und **gehört mit korrigiert**, sonst baut der
 nächste Durchgang ihn wieder ein.
 
 ---
+
+#### N60.32 · Der Quick-Check ignoriert das gewählte Design — und hat eigene Kontrastfehler
+
+**Gemessen am 11.10.2026** beim Quick-Check-Matrix-Lauf (48 Punkte).
+
+### Befund 1 — die gewählte Darstellung kommt dort nicht an
+
+**40 von 48 Punkten meldeten:** `theme angefordert "kontor", am <html> ""`.
+Ich habe also **eine Fassung sechsmal gemessen**, nicht sechs.
+
+Am Dokument nachgelesen: `quickcheck-app.html` lädt **nur zwei**
+Gestaltungsmodule —
+
+| geladen | fehlt |
+|---|---|
+| `whitelabel-override.js` | `ui-varianten.js` (→ `data-ui-theme`, `-cards`, `-surface`) |
+| `qc-whitelabel.js` | `layout-varianten.js` (→ `data-dp-layout`) |
+| | `karten-stil.js`, `objektkarten-stil.js` |
+
+`data-ui-theme` und `data-dp-layout` kommen in der Datei **0×** vor, und
+am `<html>` des Quick-Checks hängt nichts davon.
+
+> **Die MARKENschicht ist bewusst verdrahtet, die VARIANTENschicht nicht.**
+> Jemand hat also an das iframe gedacht — und die Hälfte angeschlossen.
+> Ein Kunde, der „Kontor · Rein weiß" wählt, bekommt eine weiße App mit
+> einem dunklen Quick-Check darin.
+
+**Das ist eine Produktentscheidung, keine Messfrage:** entweder der
+Quick-Check folgt der Wahl (vier Module nachladen — und dann einmal die
+ganze Matrix darüber, denn vier Gestaltungsattribute gleichzeitig haben
+sich in dieser App schon einmal gegenseitig erschlagen), oder er hat
+bewusst seine eigene, kompakte Fassung. **Ich habe nichts nachgeladen.**
+
+### Befund 2 — eigene Kontrastfehler, 16 Stellen bei 390 px
+
+| Stellen | k | Text auf Grund | wo |
+|---:|---:|---|---|
+| 5× | **1,68** | `#9a7f33` auf `#C9A84C` — **Gold auf Gold** | `span`, 11 px |
+| 2× | 2,53 | Weiß auf `rgb(193,159,66)` | `button.btn.primary` |
+| 1× | 2,56 | `rgb(154,147,144)` auf `rgb(240,236,228)` | `save-btn` |
+| 10× | 3,06 | `rgb(148,147,147)` auf Weiß | `span.hint` |
+| 7× | 3,49 | `rgb(107,100,90)` auf Obsidian | `div.l`, **7 px** |
+
+**Zwei davon sind mehr als zu wenig Kontrast:**
+- **Gold auf Gold** bei 1,68 ist praktisch unsichtbar.
+- **7 px** ist unter jeder lesbaren Größe, unabhängig vom Kontrast.
+
+> **`span.hint` steht hier bei 3,06, obwohl `v2090` genau diese Familie
+> in der Haupt-App auf 4,84–5,22 gehoben hat.** Das Dokument hat seine
+> eigene Kopie — `datenaufnahme.css` und `avsec-streifen.css` sind die
+> einzigen Stylesheets, `style.css` ist dort nicht geladen. *Ein iframe
+> erbt nichts*, und eine Korrektur in `style.css` erreicht es nie.
+
+**Hängt an der Kontrast-Entscheidung aus N60.17/N60.29** — derselbe Weg
+sollte hier gelten, sonst sehen Haupt-App und Quick-Check wieder
+verschieden aus.
 
 #### N60.25 · Texte ERLEDIGT 10.10.2026 (`v2077`) — drei tote Gutschrift-Pfade bleiben offen
 **Marcels Regel, von ihm am 10.10.2026 noch einmal bestätigt:** selbst
