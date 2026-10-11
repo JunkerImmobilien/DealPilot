@@ -8848,6 +8848,34 @@ html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card 
 html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-top {
   border-radius:0 5px 5px 0 !important;
   margin-left:16px !important;
+  /* ── v2115 · DIE ABRISSKANTE LIEF DURCHS BILD ──────────────────────
+     Marcel am 11.10.2026: „es sei denn wir wuerden diesen Abriss vor das
+     Bild optisch hinbekommen, weil das passt jetzt nicht, da laeuft die
+     Abrisskante durch das Bild."
+
+     GEMESSEN an allen 21 Karten, mit Foto wie mit Platzhalter:
+
+       .sbc-seq (der Streifen)  17-33 auf der Karte
+       .sbc-thumb (das Bild)    27-91
+       -> 6 px Abrisskante IM Bild, jedes Mal
+
+     URSACHE, und sie ist strukturell: `.sbc-seq` ist zwar
+     `position:absolute; left:0`, liegt aber INNERHALB von `.sbc-top`
+     (im Aufbau der Karte steckt sie in `.sbc-top-line1`). Sie bezieht
+     ihr `left:0` deshalb auf `.sbc-top`, nicht auf die Karte - und
+     `margin-left:16px` schiebt BEIDE gemeinsam nach rechts. Der Platz
+     entsteht links vom Streifen, nicht zwischen Streifen und Inhalt.
+
+     > Ein Abstand, der das auszuweichende Element mitnimmt, ist kein
+     > Abstand. Gemessen: `.sbc-top` beginnt bei 17, der Streifen endet
+     > bei 33, und das Bild startet bei 27 - also bei 10 px Innenabstand,
+     > waehrend der Streifen 16 px braucht.
+
+     Korrigiert wird deshalb der INNENABSTAND, nicht die Lage: 16 px
+     Streifen + 1 px Kante + 10 px Luft. Der aeussere Rand und die
+     Rundung bleiben, wie sie sind - an der Gestaltung aendert sich
+     nichts ausser dem, was sich ueberlappt hat. */
+  padding-left:27px !important;
 }
 
 html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-investor-ribbon {
