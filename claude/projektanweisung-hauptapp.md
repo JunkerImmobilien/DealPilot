@@ -36552,3 +36552,50 @@ eine zu ändern hätte die Hälfte der Fälle stillschweigend ausgelassen.
 | Mandanten auf den Server (N60.28/N60.33) | **Freigabe** |
 | „Steuersätze über die Jahre": drei Lesarten | **fachlich** |
 | N51 Ansprechpartner 1+2 | **Freigabe** |
+
+### Nachtrag 11.10.2026 — v2105 gebaut und zurueckgerollt (a78de89b)
+
+| Paket | Was | Commit |
+|---|---|---|
+| v2105 | Ton aus der gewaehlten Kartenfarbe ableiten | 3c6ac65c |
+| Revert | zurueckgerollt | a78de89b |
+| Befund | im Backlog N60.34 | f5e7754b |
+
+Der strukturelle Befund von v2104b war richtig: die Kartenflaeche ist
+eine eigene Achse, und dp_obj_ui ist ein FREIER Farbwaehler. Die
+Folgerung war falsch.
+
+Ich habe den Ton mit tonFuerGrund aus der GEWAEHLTEN Farbe abgeleitet -
+vorhandener Kern, kein zweiter Rechenweg, Pruefer 35 Punkte RC=0, Vertrag
+gegen neun echte Kartenfarben belegt. Dann live gemessen:
+
+| Kartenfarbe | Token | gemessener Grund | k |
+|---|---|---|---:|
+| Vorgabe | nicht gesetzt | rgb(13,11,8) | 4,80 |
+| #C9A84C Gold | #403b33 | rgb(13,11,8) | 1,77 |
+
+Die gewaehlte Kartenfarbe ist nicht der Grund: .sb-card liest
+--dp-obj-card in der Grundfassung gar nicht, das tut nur
+body.dp-chrome-hell (style.css:36164).
+
+> Ich habe wieder gegen einen ANGENOMMENEN Grund abgeleitet - eine Stunde
+> nachdem ich genau das bei den fuenf Vorlagen zurueckgenommen hatte.
+> Diesmal war die Annahme in Code gegossen statt in eine Tabelle, und ein
+> Pruefer mit 35 gruenen Punkten hat sie nicht gefunden: er hat die
+> ABLEITUNG geprueft, nicht den ORT, an dem sie landet.
+
+Zwei gleiche Fehler hintereinander. Nach CLAUDE.md ist das das Signal
+abzuschliessen, nicht einen dritten Anlauf zu nehmen. Der Stand von
+v2104b bleibt - gemessen, acht Fassungen, alle ueber 4,5; nach dem
+Rollback live nachgeprueft, auch mit gewaehlter Gold-Karte: 4,80.
+
+**Der naechste Schritt ist nicht Kontrast, sondern:** wo greift
+--dp-obj-card ueberhaupt? Tut der Regler "Objektkarten" in der
+Grundfassung nichts, verspricht die Oberflaeche etwas, das sie nicht
+haelt. Das ist der groessere Punkt. Steht in N60.34.
+
+**Und zurueckgenommen:** "lade() haengt an rAF im verborgenen Fenster"
+war falsch. Gemessen 5.283 ms und 8.093 ms ohne jeden Flicken; die
+Messkabine nutzt rAF nirgends selbst, sie wartet ueber MessageChannel.
+Ursache war ein nach CDP-Zeitueberlauf noch LAUFENDES lade(), das mit dem
+neuen Lauf ueberlappte - ein Bedienfehler, kein Werkzeugfehler.
