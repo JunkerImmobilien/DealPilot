@@ -2300,6 +2300,177 @@ Entscheidung (a) oder (b), nicht die Messung.
 
 ---
 
+#### N60.36 · Mietrecht im Reiter Miete — Marcels Modul (11.10.2026)
+
+**Marcel:** *„Ich habe dir unter Dateien einen neuen Ordner Mietrecht
+reingepackt … dass wir das im Tab Miete vielleicht oben. Wir haben ja dort
+Pilot Mietpreisanalyse. Da mal abgleichen, was die hergibt und dann mal
+schauen, was jetzt das Mietrecht hier ausgibt … alles zum Thema Mieten,
+Mietrecht angeben, also alles, was wir wissen, mit Quellen und so."*
+
+### Was im Paket steckt (ausgepackt und gelesen, nicht vermutet)
+
+```
+mietrecht-ort 1.3.0 · 26 Dateien · 3,7 MB
+```
+
+| Datei | was sie kann |
+|---|---|
+| `mietrecht-ort.js` | `ortsrecht(ort, stichtag)` → Kappung, Bremse, Sperrfrist; `einheiten(mfh, opts)` je Einheit |
+| `ortsrecht.json` | **alle 16 Länder**, 838 Gemeinden, Verordnungen mit Quelle, Link und Ablaufdatum |
+| `gemeinden.json` | amtliches Gemeindeverzeichnis, **10.943 Gemeinden** (Destatis GV-ISys) |
+| `normen/*.json` | **amtlicher Wortlaut** von 7 BGB- und 5 GEG-Normen, mit Hash und Abrufdatum |
+| `mietspiegel/*.json` | Bielefeld 2026, Detmold 2025, Bad Oeynhausen 2026 — mit Quelle **und Seite** |
+| `energie-pflichten.js` | GEG-Pflichten je Objekt, `umlage559e(kosten_we, foerderung_we, wfl)` |
+| `MODUL.json` | Version, Stand, **SHA-256 je Datei** |
+
+### ⚠ Der wichtigste Befund: es spricht unser Format schon
+
+Die Eingabe ist **`objekt._mfh.einheiten[]`** mit genau den Feldern
+`mv_art`, `mv_beginn`, `mv_letzte_erhoehung`, `mv_naechste_anpassung`.
+
+> **Das sind dieselben Felder, nach denen Marcel in N60.33 Punkt 3
+> gefragt hat** („Mietverträge, also Vertragsart, Beginn und letzte
+> Erhöhung"). Dort hatte ich gemessen: je Einheit vorhanden, auf
+> Objektebene gesammelt, aber **von keinem Objekt gefüllt**. Das Modul
+> erklärt, wofür sie da sind — und es meldet fehlende Vertragsdaten
+> ausdrücklich unter `vertrag.fehlt`, *„nicht still angenommen"*.
+
+Dieselbe Doktrin wie bei uns, bis in den Wortlaut: Entwürfe tragen
+`entwurf: true` und **rechnen nicht**; nicht gelistete Gemeinden sind
+`bekannt: false` statt stillschweigend „keine Verordnung"; ein eigener
+Abschnitt **„Grenzen (bewusst)"** nennt fünf Dinge, die es NICHT kann.
+
+### Die Gestaltung, auf die Marcel zeigt, gibt es schon
+
+Er meint das Feld aus Tab Objekt, Stufe 3. Gemessen ist das
+**`.oe-quellen`** (`style.css:38867`): Zeilen `.oe-qz` im Raster
+`150px | Wert | Aktion`, Links in `var(--wl-b8932f, #b8932f)` — und
+`.oe-qz.fehlt { color: #B8625C }`. **Das ist sein „leicht rötliches":**
+rot wird, *was fehlt*, nicht die ganze Fläche. Gebaut in
+`objekt-reiter.js:404`.
+
+> Das Muster passt eins zu eins: Beschriftung, Wert, Quelle als Link,
+> rot wo nichts da ist. Es muss nicht erfunden werden, nur gefüllt.
+
+### ⚠ Marcels Frage: gehört das Heizungsgesetz zu Miete oder Investition?
+
+**Meine Einschätzung: die Trennlinie ist nicht das Gesetz, sondern was
+die Pflicht BEWEGT.**
+
+| | Reiter | warum |
+|---|---|---|
+| § 35 oberste Geschossdecke | **Investition** | einmalige Ausgabe, ändert keine Miete |
+| § 43 Bio-Treppe bei neuer Gas-/Ölheizung | **Investition** | Betriebskosten und Anschaffung |
+| § 60b Heizungsprüfung ab 6 Wohnungen | **Investition** | Pflicht am Gebäude, Frist 30.09.2027 |
+| §§ 80/87 Energieausweis | **Investition** | Pflicht beim Verkauf/Vermietung, keine Mietwirkung |
+| **§ 559e BGB Umlage nach Heizungstausch** | **MIETE** | steht im **BGB**, nicht im GEG — es ist eine Mieterhöhung |
+| § 559 Abs. 3a Kappung 2 €/m² unter 7 €/m² | **MIETE** | deckelt genau diese Erhöhung |
+| Fernablesung bis 31.12.2026 (HeizkostenV) | **Miete** | Betriebskostenabrechnung |
+
+> **Der Prüfstein ist der Paragraf, nicht das Thema.** § 559e steht im
+> BGB zwischen den Mieterhöhungsvorschriften, obwohl ihn ein
+> Heizungstausch auslöst. Wer nach Thema sortiert („Heizung = Technik =
+> Investition"), zerreißt § 559 und § 559e, die zusammengehören.
+
+**Vorschlag:** die GEG-Pflichten als Liste in **Investition** (sie kosten
+Geld), die Umlagewirkung in **Miete** (sie ändert die Miete) — und in
+beiden Reitern ein Verweis auf den anderen, damit niemand die Hälfte
+sieht. Das ist zu entscheiden, nicht zu messen.
+
+### Was zuerst gemessen werden muss, bevor etwas gebaut wird
+
+1. **Was gibt die Pilot-Mietpreisanalyse heute aus, und wo überschneidet
+   sie sich mit `einheiten()`?** Marcel will den Abgleich; ohne ihn baut
+   man zwei Anzeigen, die sich widersprechen können.
+2. **Deckung der Mietspiegel:** drei Städte (Bielefeld, Detmold, Bad
+   Oeynhausen), davon nur **Bielefeld** mit `belastbar: true`. Für alle
+   anderen Orte gibt es keinen Mietspiegel im Paket — *kein Treffer heißt
+   kein Wert*, und der Kunde bekommt den Weg zur Quelle.
+3. **Lizenz der Mietspiegel-Tabellen.** Das Paket sagt es selbst:
+   *„Nutzungsbedingungen der Gemeinden nicht angegeben (§ 5 UrhG zu
+   prüfen)."* Dieselbe Frage wie beim Register — **vor** der Anzeige im
+   Kundenbericht zu klären, nicht danach.
+4. **Wie kommt es ins Repo?** Das Paket sagt: *„wird daraus gebaut und
+   nie von Hand geändert"* — Quelle der Wahrheit ist das
+   Portfolio-Strategie-Modul. Also keine Kopie pflegen, sondern einen
+   Einspielweg wie bei `tools/frontend-konstanten.mjs`.
+5. **1,2 MB `gemeinden-daten.js` im Browser** ist kein Beiwerk. Entweder
+   nachladen, wenn der Reiter geöffnet wird, oder serverseitig auflösen.
+
+---
+
+#### N60.37 · Score-Ring und Aktionsknöpfe liegen aufeinander (11.10.2026)
+
+**Marcel:** *„Zum Beispiel überlappt da jetzt auch noch irgendein grauer
+Bereich. Der überlappt da noch in den Ring. Dann kann man den auch nicht
+richtig lesen."*
+
+**GEMESSEN auf drei Karten, gleich:**
+
+| | senkrecht | waagerecht |
+|---|---|---|
+| Ring | 65–115 | 281–331 |
+| Aktionen | 94–116 | 289–337 |
+| **Überlappung** | **21 px** | **34–42 px** |
+
+Beim Schweben wird der Duplizieren-Knopf sichtbar: 22×22 px,
+Hintergrund `rgba(0,0,0,.6)` — dunkelgrau. Die Score-Zahl steht bei
+**79–104**, der Knopf bei **94–116**: er verdeckt die **untere Hälfte der
+Zahl**. Das ist der graue Bereich.
+
+### Die Ursache steht in zwei Kommentaren, die sich widersprechen
+
+`style.css:25602` (**V103**): *„Zurück nach rechts oben (Marcels Wunsch).
+Score-Overlay sitzt auch rechts oben, aber Aktionen bekommen z-index: 7 —
+höher als Score (4). Damit klickbar."* Und direkt darunter:
+`.sbc-score-overlay { top: 38px }` mit *„war 12 — jetzt unter den
+Action-Buttons"*.
+
+> **V103 hat die beiden bewusst ÜBEREINANDER gestapelt:** Knöpfe oben
+> (`top:6px`), Score darunter (`top:38px`). Kein Konflikt.
+
+`layout-varianten.css` (**v1943**, Marcel 07.10.2026): *„Den score und die
+schaltflaechen muessen IMMER mittig angeordnet sein."* — setzt **beide**
+auf `top:50%`.
+
+> **Zwei Dinge in derselben Spalte auf dieselbe Mitte zu setzen, muss sie
+> übereinanderlegen.** v1943 hat die Staffelung von V103 aufgehoben, ohne
+> sie zu ersetzen. Die Anweisung war nicht falsch — sie war für zwei
+> Elemente gleichzeitig nicht erfüllbar.
+
+### Was bereits behoben ist (`v2110`/`v2110a`, keine Optikentscheidung)
+
+Im Ruhezustand stand `opacity:0`, aber `pointer-events:auto` — ein
+**unsichtbarer** Duplizieren-Knopf fing die Klicks auf dem Ring ab
+(`elementsFromPoint` lieferte ihn zuoberst). Jetzt gepaart.
+
+> **Dabei habe ich mir selbst eine Regression gebaut und sie 20 Minuten
+> später gemessen:** `v2110` hängte `pointer-events:none` an die
+> Grundregel. Bei **390 px** gilt aber
+> `@media(max-width:900px) … { opacity:1 !important }` — auf Touch gibt es
+> kein Hover. Gemessen: *opacity 1, pointer-events none* — **Duplizieren
+> und Löschen waren sichtbar und tot.** Behoben in `v2110a`, bewacht von
+> `tools/deckkraft-klickbarkeit-pruefen.mjs` (12 Regeln, RC=0).
+
+### ⚠ Offen, und es ist eine Optikentscheidung
+
+Die **sichtbare** Überdeckung bleibt. Sie aufzulösen heißt, eines der
+beiden aus der Mitte zu nehmen — und genau das hat Marcel am 11.10.
+zurückgenommen (`v2109`, Kartenansicht wieder wie auf Prod).
+
+| Weg | was es bedeutet |
+|---|---|
+| (a) | Knöpfe zurück nach `top:6px` wie vor v1943 — die Staffelung von V103 wiederherstellen |
+| (b) | Score mittig lassen, Knöpfe nach links statt rechts |
+| (c) | Ring beim Schweben ausblenden, solange die Knöpfe stehen |
+| (d) | Knöpfe kleiner/versetzt, sodass sie unter dem Ring durchpassen |
+
+**Demo bauen, nicht fragen** — sobald klar ist, ob Marcel die Mitte für
+die Knöpfe behalten will.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
