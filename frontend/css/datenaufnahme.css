@@ -1971,6 +1971,38 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     justify-content: flex-start !important;
   }
 
+  /* ── v2117 · DIE REIHE HAT NIE ERFAHREN, DASS SIE UMBRECHEN SOLL ─────
+     Marcel am 11.10.2026: „Hab in der Messkabine gerade iPad mini auf und
+     es ist alles verzerrt."
+
+     GEMESSEN bei 767 px, Reiter Objekt:
+
+       .dp-pf-row   34-729   wrap=nowrap   4 Kinder
+         Kind 1       34-729
+         Kind 2      735-1431   <- draussen
+         Kind 3     1437-2132   <- draussen
+         Kind 4     2138-2833   <- draussen
+
+     Jede Kachel ist hier 100 % breit (die Regel direkt darueber), und die
+     Reihe steht auf `nowrap` - also vier Vollbreit-Kacheln nebeneinander
+     in einer 695 px breiten Reihe. `.dp-pf-scroll` traegt
+     `overflow:hidden`, deshalb sieht man den Ueberlauf nicht einmal:
+     DREI VON VIER KACHELN SIND UNERREICHBAR.
+
+     > **Es ist eine Luecke zwischen zwei Grenzen, nicht ein falscher
+     > Wert.** `width:100%` gilt ab 900 px abwaerts (dieser Block),
+     > `flex-wrap:wrap` erst ab 640 px abwaerts (style.css:33710).
+     > Dazwischen - 641 bis 900 - gilt das eine ohne das andere. Genau
+     > dort liegen iPad mini (768) und iPad Pro 11" (834).
+
+     Dieser Block sagt seit v1941d „untereinander" und meint es auch; er
+     hat es nur der REIHE nie gesagt, sondern nur der Leiste und der
+     Kachel. */
+  #oab-bar.dp-pfbar .dp-pf-row,
+  .dp-pf-scroll .dp-pfbar .dp-pf-row {
+    flex-wrap: wrap !important;
+  }
+
   /* ── v1941e · DIESELBE KETTE AUCH AUF DEM HANDY ──────────────────────
      Nach v1941d standen die Kacheln untereinander und 44 px hoch - aber die
      Leiste lief weiter um 14 px ueber (369 > 355). Der Grund ist derselbe wie
@@ -1992,6 +2024,36 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
   .dp-pf-scroll .dp-pfbar,
   .dp-pf-scroll {
     overflow-x: hidden !important;
+  }
+}
+
+/* ==============================================================================
+   v2117 - DIE TABLET-STUFE: ZWEI SPALTEN STATT EINER LANGEN SAEULE
+
+   Der Block darueber macht aus den Kacheln eine Saeule - richtig auf dem
+   Handy, aber auf einem 768er Tablet werden daraus vier Vollbreit-Kacheln
+   untereinander, und die Leiste wird unnoetig hoch.
+
+   Marcels Vorgabe im Pruef-Prompt: "Tablet: Ein bis zwei Spalten abhaengig
+   vom verfuegbaren Platz."
+
+   GEMESSEN, warum zwei und nicht drei: `.dp-pf-tile.tool` traegt eine
+   Mindestbreite von 200 px. Bei 767 px abzueglich Rand und Abstand bleiben
+   rund 695 px nutzbar - drei Spalten waeren 229 px und damit knapp,
+   zwei sind 344 px und tragen auch lange Beschriftungen.
+
+   Der Abstand der Reihe ist 6 px (gemessen), deshalb 50 % minus 3 px.
+
+   Die Grenze unten ist 641 px: darunter gilt wieder eine Spalte, und
+   genau dort setzt auch `style.css:33710` seit jeher an. Beide Grenzen
+   liegen jetzt auf demselben Wert - das war der Fehler, den dieser
+   Durchgang gefunden hat.
+   ============================================================================== */
+@media (min-width: 641px) and (max-width: 900px) {
+  #oab-bar.dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll .dp-pfbar .dp-pf-tile {
+    width: calc(50% - 3px) !important;
+    max-width: calc(50% - 3px) !important;
   }
 }
 
