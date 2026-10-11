@@ -612,7 +612,7 @@ html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-tick {
      liest `--uv-card-mut` nicht. Ohne Vorlage greift sie, mit Vorlage
      die Token-Regel weiter unten. Eine der beiden zu aendern haette die
      Haelfte der Faelle stillschweigend ausgelassen. */
-  color: #726e63 !important;
+  color: var(--dpuv-obj-mut, #726e63) !important;
 }
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-good .sbcm-val { color: #3b9667 !important; }
 html[data-ui-surface="light"] body aside.sidebar .sb-card .sbcm-info .sbcm-val { color: #4f90b8 !important; }
@@ -640,7 +640,11 @@ html[data-ui-theme] body aside.sidebar .sb-card .sbcm-label,
 html[data-ui-theme] body aside.sidebar .sb-card .sbcm-toggle-ico,
 html[data-ui-theme] body aside.sidebar .sb-card .sbcm-scale span,
 html[data-ui-theme] body aside.sidebar .sb-card .sbcm-tick {
-  color: var(--uv-card-mut) !important;
+  /* v2105: ist der aus der KARTENFLAECHE abgeleitete Ton da, gewinnt er.
+     Die Flaeche ist ein FREIER Farbwaehler (`dp_obj_ui`), ein Ton je
+     Vorlage kann sie nicht beschreiben. Sonst bleibt der feste Ton der
+     Vorlage aus v2104b, gewaehlt gegen den dort gemessenen Grund. */
+  color: var(--dpuv-obj-mut, var(--uv-card-mut)) !important;
 }
 
 /* Und die Marken-Elemente auf einer WEISSEN Karte in einer DUNKLEN Vorlage.

@@ -25561,7 +25561,7 @@ aside.sidebar .sb-card .sbcm-scale {
      #817d76 haelt den Farbton (Faktor auf alle drei Kanaele) und kommt
      auf 4,80. Die Vorlagen- und Flaechenregeln in ui-varianten.css
      liegen mit (0,4,4) darueber und bleiben unberuehrt. */
-  color: #817d76 !important;
+  color: var(--dpuv-obj-mut, #817d76) !important;
   margin-top: 2px !important;
   font-variant-numeric: tabular-nums !important;
 }
@@ -36190,7 +36190,7 @@ html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-toggle-ico,
 html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-scale,
 html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-scale span,
 html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-tick{
-  color:#76716b !important;
+  color: var(--dpuv-obj-mut, #76716b) !important;
 }
 body.dp-chrome-hell #hdr-badges .sc-main,
 body.dp-chrome-hell .sc-main,

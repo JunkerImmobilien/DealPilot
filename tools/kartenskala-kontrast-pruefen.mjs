@@ -17,6 +17,7 @@
    RC=0 ist sauber.
    ══════════════════════════════════════════════════════════════════════ */
 import fs from 'fs';
+import vm from 'node:vm';
 
 let fehler = 0, geprueft = 0;
 const melde = (ok, text) => {
@@ -64,19 +65,23 @@ const FAELLE = [
     datei: 'style.css', text: styleN, grund: 'dunkel',
     /* Die Regel, die die Farbe traegt - der Selektor kommt ZWEIMAL vor,
        nur eine der beiden setzt `color` (gegengeprueft in Abschnitt 3). */
-    re: /aside\.sidebar\s+\.sb-card\s+\.sbcm-scale\s*\{[^}]*?color:\s*(#[0-9a-fA-F]{6})/ },
+    re: /aside\.sidebar\s+\.sb-card\s+\.sbcm-scale\s*\{[^}]*?color:\s*var\(--dpuv-obj-mut,\s*(#[0-9a-fA-F]{6})\)/ },
   { name: 'heller Skin (weisse Karte)',
     datei: 'style.css', text: styleN, grund: 'weiss',
-    re: /body\.dp-chrome-hell[^{]*\.sbcm-scale span[^{]*\{[^}]*?color:\s*(#[0-9a-fA-F]{6})/ },
+    re: /body\.dp-chrome-hell[^{]*\.sbcm-scale span[^{]*\{[^}]*?color:\s*var\(--dpuv-obj-mut,\s*(#[0-9a-fA-F]{6})\)/ },
   { name: 'surface=light, Regel',
     datei: 'ui-varianten.css', text: uvN, grund: 'creme',
-    re: /data-ui-surface="light"[^{]*\.sbcm-tick\s*\{\s*color:\s*(#[0-9a-fA-F]{6})/ },
+    re: /data-ui-surface="light"[^{]*\.sbcm-tick\s*\{[^}]*?color:\s*var\(--dpuv-obj-mut,\s*(#[0-9a-fA-F]{6})\)/ },
   { name: 'surface=light, Token --uv-card-mut',
     datei: 'ui-varianten.css', text: uvN, grund: 'creme',
     re: /data-ui-surface="light"[^{]*\.sb-card\s*\{[^}]*--uv-card-mut:\s*(#[0-9a-fA-F]{6})/ }
 ];
 
-console.log('    Fassung                             Ton       Grund             k');
+/* v2105: geprueft wird der RUECKFALL im var() - der abgeleitete Ton steht
+   nicht im Blatt, er wird zur Laufzeit gesetzt (Abschnitt 1c). Dass der
+   Rueckfall ueberhaupt noch traegt, ist der Punkt: er gilt fuer jeden,
+   der die Kartenflaeche nie angefasst hat. */
+console.log('    Fassung                             Rueckfall Grund             k');
 for (const f of FAELLE) {
   const m = f.text.match(f.re);
   if (!m) { melde(false, f.name + ': Ton im Blatt NICHT GEFUNDEN (' + f.datei + ')'); continue; }
@@ -134,6 +139,101 @@ for (const [name, grund, kAlt] of VORLAGEN) {
   melde(k >= 4.6, name + ': hat Reserve (k=' + k.toFixed(2) + ')');
 }
 
+/* ── 1c · Der abgeleitete Ton (v2105) ───────────────────────────────────
+   Die festen Toene aus 1 und 1b sind nur noch der RUECKFALL. Die
+   Kartenflaeche ist ein FREIER Farbwaehler (`dp_obj_ui`), deshalb wird
+   der Ton aus ihr abgeleitet - mit `tonFuerGrund` aus config.js, dem
+   Kern, den `whitelabel-override.js` schon benutzt.
+
+   Hier wird die ECHTE Funktion aus der ECHTEN Datei gerufen, nicht
+   nachgebaut. Ein Pruefer, der die Formel nachbaut, misst sich selbst. */
+console.log('\n=== 1c · Der abgeleitete Ton folgt der Kartenflaeche ===');
+
+const uvjs = fs.readFileSync('frontend/js/ui-varianten.js', 'utf8');
+const uvjsN = nutz(uvjs);
+melde(/--dpuv-obj-mut/.test(uvjsN), 'ui-varianten.js setzt `--dpuv-obj-mut`');
+melde(/tonFuerGrund/.test(uvjsN), 'es benutzt `tonFuerGrund` (kein zweiter Rechenweg)');
+melde(/OBJ_MUT_MIN\s*=\s*4\.5/.test(uvjsN), 'der Mindestkontrast ist 4,5');
+melde(/#a8a299/.test(uvjsN), 'die Basis ist #a8a299 = der Originalton rgba(168,162,153)');
+melde(/removeProperty\('--dpuv-obj-mut'\)/.test(uvjsN),
+  'der Rueckbau raeumt ihn wieder ab (sonst bleibt er nach "Zuruecksetzen")');
+/* Liest das CSS ihn auch? Vier Stellen, sonst traegt er nur halb. */
+const leser = (styleN.match(/--dpuv-obj-mut/g) || []).length
+            + (uvN.match(/--dpuv-obj-mut/g) || []).length;
+console.log('    CSS-Stellen, die das Token lesen: ' + leser);
+melde(leser === 4, 'alle vier Fassungswege lesen es (sind: ' + leser + ')');
+/* Und jede davon MUSS einen Rueckfall tragen - ohne Token darf nichts
+   ungefaerbt bleiben. */
+const ohneRueckfall = [...styleN.matchAll(/var\(--dpuv-obj-mut\s*\)/g)].length
+                    + [...uvN.matchAll(/var\(--dpuv-obj-mut\s*\)/g)].length;
+melde(ohneRueckfall === 0, 'keine Stelle liest das Token OHNE Rueckfall');
+
+/* Die echte Funktion rufen und den Vertrag pruefen. `config.js` ist ein
+   Browser-Modul; geladen wird es mit einem DOM-Stummel, wie es
+   `tools/frontend-konstanten.mjs` seit v1823 tut. */
+let tfg = null;
+try {
+  /* Der Fensterstummel und der vm-Kontext sind von
+     `tools/frontend-konstanten.mjs` ABGESCHRIEBEN, nicht nachgebaut.
+     Mein erster Entwurf nahm `new Function('window', …)` und scheiterte
+     an `DealPilotConfig is not defined`: config.js greift auf das
+     GLOBALE Symbol zu, und ein Parameter namens `window` reicht dafuer
+     nicht. Nur `vm.createContext` laesst `var X` am Kontext landen. */
+  const el = () => ({
+    id: '', textContent: '', style: { setProperty() {}, removeProperty() {} },
+    className: '', value: '', options: [], children: [],
+    classList: { add() {}, remove() {}, contains() { return false; } },
+    appendChild() {}, setAttribute() {}, getAttribute() { return null; },
+    querySelector() { return null; }, querySelectorAll() { return []; },
+    addEventListener() {}, closest() { return null; }, parentElement: null
+  });
+  const document_ = {
+    readyState: 'complete', head: el(), body: el(), documentElement: el(),
+    getElementById() { return null; }, createElement() { return el(); },
+    querySelector() { return null; }, querySelectorAll() { return []; },
+    addEventListener() {}, createTextNode() { return el(); }
+  };
+  const win = {
+    document: document_,
+    addEventListener() {}, removeEventListener() {},
+    setTimeout() { return 0; }, clearTimeout() {},
+    setInterval() { return 0; }, clearInterval() {},
+    matchMedia() { return { matches: false, addEventListener() {} }; },
+    localStorage: { getItem() { return null; }, setItem() {}, removeItem() {} },
+    navigator: { userAgent: 'node', language: 'de' },
+    location: { href: '', search: '' }, console
+  };
+  win.window = win; win.self = win; win.globalThis = win;
+  const kontext = vm.createContext(win);
+  kontext.global = kontext;
+  new vm.Script(fs.readFileSync('frontend/js/config.js', 'utf8'),
+    { filename: 'config.js' }).runInContext(kontext);
+  const DPC = kontext.DealPilotConfig || win.DealPilotConfig;
+  tfg = DPC && DPC.branding && DPC.branding.tonFuerGrund;
+} catch (e) {
+  console.log('    config.js nicht ladbar: ' + String(e.message).slice(0, 70));
+}
+
+if (typeof tfg !== 'function') {
+  melde(false, 'tonFuerGrund konnte nicht gerufen werden - Vertrag UNGEPRUEFT');
+} else {
+  melde(true, 'tonFuerGrund aus der echten config.js geladen');
+  /* Gegen echte Kartenfarben: die Vorgabe, Weiss, Obsidian, und ein paar,
+     die ein Nutzer wirklich waehlen koennte. */
+  const KARTEN = ['#F6F2E9', '#FFFFFF', '#0d0b08', '#141719', '#C9A84C',
+                  '#3FA56C', '#2A2727', '#FBF6E9', '#000000'];
+  console.log('    Kartenfarbe   abgeleitet   k');
+  let alleOk = true;
+  for (const karte of KARTEN) {
+    const ton = tfg('#a8a299', karte, 4.5);
+    const k = kontrast(rgb(ton), rgb(karte));
+    console.log('    ' + karte.padEnd(14) + String(ton).padEnd(13) + k.toFixed(2)
+      + (k >= 4.5 ? '' : '   UNTER 4,5'));
+    if (k < 4.5) alleOk = false;
+  }
+  melde(alleOk, 'tonFuerGrund haelt 4,5 gegen alle ' + KARTEN.length + ' Kartenfarben');
+}
+
 /* ── 2 · Die alten Werte sind WEG ────────────────────────────────────── */
 console.log('\n=== 2 · Die alten Werte stehen nicht mehr im Nutztext ===');
 melde(!/aside\.sidebar\s+\.sb-card\s+\.sbcm-scale\s*\{[^}]*rgba\(168,\s*162,\s*153,\s*0\.65\)/.test(styleN),
@@ -168,7 +268,12 @@ console.log('\n=== 4 · Kommt es im Browser an? ===');
 for (const [blatt, re] of [['style.css', /css\/style\.css\?v=([^"']+)/],
                            ['ui-varianten.css', /css\/ui-varianten\.css\?v=([^"']+)/]]) {
   const m = idx.match(re);
-  melde(!!m && m[1] === 'v2104', blatt + ': Buster ist ' + (m ? m[1] : 'FEHLT') + ' (soll v2104)');
+  /* Auf die FAMILIE pruefen, nicht auf eine Zahl: sonst wird der Pruefer
+     bei jedem Nachpaket rot, obwohl der Buster richtig hochgezogen ist -
+     und dann stellt ihn jemand ab. Wichtig ist, dass er NICHT mehr auf
+     dem Stand von vor dieser Arbeit steht. */
+  melde(!!m && /^v210[4-9]/.test(m[1]),
+    blatt + ': Buster ist ' + (m ? m[1] : 'FEHLT') + ' (soll v2104 oder neuer)');
 }
 
 /* ── 5 · Kein Ton traegt dunkel UND hell ────────────────────────────── */
