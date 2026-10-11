@@ -25609,6 +25609,10 @@ aside.sidebar .sb-card .sbc-actions {
   display: flex !important;
   gap: 4px !important;
   opacity: 0;
+  /* v2110a: ausdruecklich MIT der Deckkraft gesetzt, nicht aus der
+     Grundregel geerbt. Wer hier eine der beiden aendert, sieht die
+     andere daneben stehen. */
+  pointer-events: none;
   transition: opacity 0.2s;
   z-index: 7 !important;     /* V103: über Score-Overlay (z-index: 4) */
 }
@@ -25617,9 +25621,16 @@ aside.sidebar .sb-card .sbc-score-overlay {
   top: 38px !important;       /* war 12 — jetzt unter den Action-Buttons */
 }
 aside.sidebar .sb-card:hover .sbc-actions,
+aside.sidebar .sb-card:focus-within .sbc-actions,
 aside.sidebar .sb-card.active .sbc-actions {
   /* V101: Aktiv-Card zeigt Aktionen IMMER (auch ohne Hover) damit Touch-User auf Mobile löschen können */
   opacity: 1;
+  /* v2110a: MUSS hier stehen. Diese Regel ist die regierende in der
+     Seitenleiste - meine Fassung an `.sb-card:hover` (0,2,0) verliert
+     gegen `aside.sidebar .sb-card .sbc-actions` (0,3,1). Gemessen:
+     `pointer-events` wurde `auto`, `opacity` blieb 0, weil nur die
+     Deckkraft ueberschrieben war. */
+  pointer-events: auto;
 }
 aside.sidebar .sb-card .sbc-btn {
   width: 22px !important;
@@ -27682,6 +27693,18 @@ header.hdr {
 @media (max-width: 900px) {
   aside.sidebar .sb-card .sbc-actions {
     opacity: 1 !important;
+    /* ── v2110a · HIER HAETTE MEIN v2110 DAS HANDY ZERLEGT ──────────
+       Auf Touch gibt es kein Hover, deshalb stehen die Knoepfe hier
+       IMMER sichtbar. `v2110` hat `pointer-events:none` an die
+       Grundregel gehaengt - gemessen bei 390 px kam heraus:
+       opacity 1, pointer-events none. Die Knoepfe zum Duplizieren und
+       Loeschen waren SICHTBAR UND TOT.
+
+       > Die Deckkraft und die Klickbarkeit gehoeren zusammen. Wer eine
+       > von beiden ohne die andere setzt, baut genau diesen Fehler -
+       > und auf dem Handy faellt er doppelt auf, weil es dort keinen
+       > Schwebezustand gibt, der ihn wieder aufhebt. */
+    pointer-events: auto !important;
   }
   aside.sidebar .sb-card .sbc-btn {
     width: 26px !important;
