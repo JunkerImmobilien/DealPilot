@@ -2784,6 +2784,103 @@ gilt nicht automatisch für Kontor, Panel, Kanzlei, Boarding, Konsole.
 
 ---
 
+#### N60.39 · Die Datenaufnahme-Karte über alle Geräte (11.10.2026) — ✅ vier Befunde behoben, einer offen
+
+Marcel am 11.10.2026, zweimal nacheinander: *„für mich passt die
+Datenaufnahme Karte immer noch nicht. Hab in der Messkabien gerade IPad
+mini auf und es ist alles verzwerrt"* und *„Dann hast du auch nicht die
+anderen Datenaufnahmekarten geprüft das musst du vollumfänglich machen."*
+
+Gefahren als Matrix: **4 Kartenstile × 12 Breiten = 48 Messungen**, jede
+am laufenden Staging im gleich-Origin-iframe. Je Lauf: Leistenmaß,
+Umbruchmodus, QR-Kasten gegen sein SVG, abgeschnittene Beschriftungen
+(`scrollWidth` gegen `clientWidth`), Elemente außerhalb der Leiste,
+Überschneidung der direkten Kinder, Knopfmaß, Kontrast Knopf/Grund und
+Text, Erreichbarkeit per `elementsFromPoint`, Touchhöhe aller Kacheln.
+
+### Behoben
+
+| | Befund (gemessen) | Paket |
+|---|---|---|
+| **1** | 1180–1440 px: vier Beschriftungen gekappt, „Sprache" auf **15 von 43 px**; QR-Kasten 39 px bei 54 px SVG | `v2119` |
+| **2** | 390 px: Abruf-Knopf 323×50 in einem weißen Stub von 325×57, **im selben Gold wie die Leiste** (k = 1,07) | `v2120` |
+| **3** | iPad mini/Pro 11: Leiste **1263 px breit in 695 px**, `overflow-x:hidden` → 568 px lautlos geklippt | `v2121` |
+| **4** | Knopf 33 px, Kacheln 34–35 px auf allen Tablet- und Querformatbreiten | `v2121a` |
+
+Dazu **`v2122`**: die fünf Deklarationsblöcke aus `v1941a`–`d`, die das
+Gegenteil tun, sind ausgetragen — nicht überschrieben.
+
+> **Keiner der vier Befunde war ein Überlauf.** Bei 1180 px war die Summe
+> der direkten Kinder *exakt* die Innenbreite: 888 von 888. Jedes Kind
+> durfte schrumpfen (`flex-shrink:1` plus `min-width:0`), also hat sich
+> die Leiste lieber unleserlich gemacht als eine zweite Zeile zu
+> beginnen. **Wer nach einem Überlauf sucht, findet hier nichts und hält
+> die Leiste für gesund.**
+
+Und der Schaden hing nicht am Fenster, sondern am **Behälter**:
+
+```
+  Fenster   Seitenleiste   Leiste
+   1024         260         1150   heil (aber Querscroller)
+   1180         380          888   kaputt
+   1280         380          856   kaputt
+   1440         380         1016   kaputt
+   1920         380         1280   heil
+```
+
+Deshalb **kein weiterer Haltepunkt**, sondern eine tragfähige Bauart:
+die Leiste und die Kachelreihen dürfen umbrechen, Kacheln, QR, Stub und
+Knopf schrumpfen nicht. Damit regelt sich jede Behälterbreite selbst,
+auch die, die es heute noch nicht gibt.
+
+### ⚠ Offen: der Kartenstil „Zeile" tut gar nichts
+
+**Gemessen, nicht vermutet:**
+
+```
+  53 Regeln hängen an  body.dp-pfzeile   (datenaufnahme.css)
+   0 Stellen im ganzen Repo setzen diese Klasse
+```
+
+Und am laufenden Staging gegengeprüft: mit `data-dp-kartenstil="zeile"`
+am `<html>` — das Attribut **wird** gesetzt — rendert die Leiste auf
+jedem der zwölf Maße **auf das Pixel genau wie die Vorgabe** (360 px:
+327×445 gegen 327×445; 1180 px: 888×166 gegen 888×166).
+
+> **Ein Entwurf, der in der Liste steht und nichts tut, ist schlimmer
+> als einer, der fehlt.** Marcel wählt ihn, sieht keine Änderung und
+> hält die Darstellung für kaputt — dieselbe Form wie bei den
+> Farbreglern in N60.35.
+
+Die Ursache steht in der Datei selbst, bei `v1702d`: die 50 Regeln
+hingen an `body.dp-neue-karte` — einer Marke, die *jedes* Layout setzt —
+und bekamen deshalb die Zeile aufgezwungen. Sie wurden auf
+`body.dp-pfzeile` umgehängt, *„und wird NIRGENDS gesetzt."* Das Abhängen
+war richtig. **Der zweite Schritt — sie an die ausdrückliche Wahl zu
+hängen — ist nie gekommen.**
+
+**Der kleine Weg ist eine Zeile in `karten-stil.js`:**
+
+```js
+document.body.classList.toggle('dp-pfzeile', aktuell === 'zeile');
+```
+
+Dasselbe in `rahmenNachziehen()` für das QuickBoarding-iframe — es ist
+ein eigenes Dokument und erbt die Klasse nicht.
+
+⚠ **Vor dem Bauen gehört gegengerechnet, was dabei aufwacht.** Die 53
+Regeln sind für eine Welt geschrieben, in der es `v2119`, `v2121`,
+`v2117` und die Tablet-Bänder noch nicht gab. Eine tote Regel zu beleben
+hebt ihre Spezifität von „trifft nie" auf voll — der Fall steht in den
+Notizen als `tote-regel-beleben`. Also: anschalten, **alle zwölf Maße
+neu messen**, und erst dann behalten.
+
+Und es ist eine **Optikentscheidung**: Marcel hat drei Entwürfe in der
+Liste, faktisch wirken zwei. Ob „Zeile" zurückkommt oder aus der Liste
+fällt, entscheidet er — nicht ich. Eine Demo zeigt es ihm in einem Bild.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
