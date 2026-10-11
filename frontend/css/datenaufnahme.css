@@ -2740,3 +2740,100 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     align-items: center !important;
   }
 }
+
+/* =====================================================================
+   v2123 - ZWEI RESTE, DIE HOEHE KOSTEN
+
+   Nach v2119/v2121 ist die Leiste auf allen 48 Messungen heil (0
+   abgeschnitten, 0 draussen, 0 Ueberschneidung, 0 Querscroller). Sie
+   ist aber hoeher als noetig. Gemessen bei 1180 px, direkte Kinder:
+
+     .dp-pf-lead   128 x 87   top   0
+     .dp-pf-seg    693 x 87   top   0   <- EIN Kachel-Segment, 693 breit
+     .dp-pf-seg    604 x 87   top  97
+     .dp-pf-qr      62 x 68   top 107
+     .dp-pf-rz     208 x 87   top  97   min-width: 208px
+
+   Zwei Reste erklaeren beides:
+
+   1 · `.dp-pf-seg` traegt `flex: 1 1 auto`. Die 1 vorne heisst
+       WACHSEN. Das erste Segment enthaelt genau EINE Kachel von
+       173 px und blaeht sich auf 693 px auf - es frisst den freien
+       Platz der ersten Zeile, und alles andere muss in die zweite.
+
+       > Wachsen und Umbrechen zusammen ergeben die schlechteste
+       > Verteilung: das erste Element nimmt alles, der Rest bricht um.
+       > Wachsen war fuer `nowrap` gedacht (v1941d) - mit `wrap` ist es
+       > genau falsch.
+
+   2 · `.dp-pf-rz` traegt `min-width: 208px` (style.css, v597). Die
+       208 px sind das Mass der Reisszone der BORDKARTE, in der ein
+       Strichcode von 174 x 52 stand. Der Strichcode (`.dp-pf-bc`) ist
+       seit v1639 `display:none` und gemessen 0 x 0. Uebrig ist ein
+       Knopf von 83 px in einem Kasten von 208.
+
+       > Ein Mass, das fuer einen entfernten Inhalt gesetzt wurde,
+       > bleibt stehen und wirkt weiter. 125 px fuer nichts.
+
+   Beides im Band 901+ zurueckgenommen. Gegengerechnet: bei 1440 px
+   war die Summe der Kinder 1370 bei 1148 Platz; ohne die 125 px sind
+   es 1245, und ohne das Wachsen verteilt sich der Rest sinnvoll.
+
+   ── UND EINE RUECKNAHME ────────────────────────────────────────────
+   Mein Pruefer hat in 10 von 48 Laeufen "QR-SVG schief" gemeldet
+   (kartei 82x68 in 92x92, buetten 52x48 in 64x64). **Das war ein
+   Messfehler, kein Befund.** Gemessen am gezeichneten Code selbst:
+
+     kartei    erstes rect  64 x 64    QUADRATISCH
+     buetten   erstes rect  41 x 41    QUADRATISCH
+
+   Der viewBox ist `0 0 31 31`, und ohne `preserveAspectRatio` gilt
+   `xMidYMid meet` - das Verhaeltnis wird GEWAHRT, der Code sitzt
+   zentriert im Kasten. Schief ist das svg-ELEMENT, nicht das Bild
+   darin. Genau das steht schon im Kommentar bei v1992, und ich habe
+   es trotzdem als Befund gemeldet.
+
+   Eine Probe mit `aspect-ratio:1` am svg hat es nachweislich
+   VERSCHLECHTERT (buetten: rect von 41x41 auf 36x36), also wird hier
+   nichts geaendert. Der Pruefer misst ab jetzt das `rect`.
+   ===================================================================== */
+@media (min-width: 901px){
+  /* 1 - Segmente wachsen nicht mehr */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+    flex-grow: 0 !important;
+  }
+  /* 2 - der Stub ist so breit wie sein Inhalt, nicht wie ein
+         entfernter Strichcode */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    min-width: fit-content !important;
+  }
+}
+
+/* =====================================================================
+   v2123a - `overflow-x: visible` KAM ALS `auto` HERAUS
+
+   Gemessen in allen Laeufen im Band 641-1100: `.dp-pf-scroll` meldete
+   `overflow-x: auto`, obwohl v2121 dort `visible !important` setzt und
+   mit (0,2,0) ueber :has gegen (0,1,0) gewinnt.
+
+   Die Regel gewinnt auch. Sie wird nur UMGERECHNET: steht eine der
+   beiden Achsen auf etwas anderes als `visible`, rechnet der Browser
+   die andere von `visible` auf `auto` um. Und `overflow-y: hidden`
+   steht in demselben Band in style.css.
+
+   > **Nicht die Kaskade hat entschieden, sondern die Berechnung.** Wer
+   > nur den gemeldeten Wert liest, haelt seine Regel fuer verloren und
+   > sucht an der falschen Stelle nach einem staerkeren Selektor.
+
+   Heute schadet es nicht (gemessen: 0 Querscroller in 48 Laeufen, es
+   laeuft nichts ueber). Es heisst aber, dass ein Balken erscheinen
+   KANN, sobald doch einmal etwas uebersteht - und dann waere er da,
+   ohne dass jemand ihn gewollt hat.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 1100px){
+  .dp-pf-scroll:has(.dp-pfbar){
+    overflow-y: visible !important;
+  }
+}
