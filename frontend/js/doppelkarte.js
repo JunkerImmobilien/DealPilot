@@ -361,17 +361,26 @@
     var alteHilfe = el('dk-hilfe');
     if (alteHilfe && alteHilfe.parentNode) alteHilfe.parentNode.removeChild(alteHilfe);
 
-    var imLayout = document.documentElement.hasAttribute('data-dp-layout');
-    var kopf2 = document.querySelector('.sb-header');
-    try {
-      if (imLayout && liste.parentNode) {
-        if (s.parentNode !== liste.parentNode || s.nextElementSibling !== liste) {
-          liste.parentNode.insertBefore(s, liste);
-        }
-      } else if (kopf2 && kopf2.parentNode && s.parentNode !== kopf2.parentNode) {
-        kopf2.parentNode.insertBefore(s, kopf2.nextSibling);
-      }
-    } catch (e) { /* lieber am alten Platz als gar nicht */ }
+    /* ⚠ HIER STAND EIN VERSUCH, DEN SCHALTER IN DIE SCHIENE ZU HAENGEN.
+       ZURUECKGENOMMEN, weil er es schlimmer machte.
+
+       Der Gedanke war: liegt ein Layout an, den Schalter VOR `#sb-list`
+       setzen - gleiche Eltern, also mit der Liste in der Schiene.
+
+       GEMESSEN danach im Layout `v1b`: der Schalter war **gar nicht mehr
+       im DOM**. Vorher war er wenigstens vorhanden (0 px hoch).
+
+       > Die Schiene wird bei jedem Layoutwechsel neu gebaut und die alte
+       > per `removeChild` entfernt. Das Layout fuehrt eine Rueckfahrkarte
+       > (`merker`) ueber die Knoten, die es selbst geholt hat - ein
+       > Knoten, den jemand anders dort hineinhaengt, steht nicht darin
+       > und faellt mit der alten Schiene weg.
+
+       Der richtige Weg ist der vorgesehene: `#dk-schalter` als BENANNTER
+       TEIL in `layout-varianten.js` (`KNOTEN` + `nimmt`), damit `hole()`
+       ihn auffaedelt und `zurueck()` ihn zurueckbringt. Das allein
+       reicht aber nicht, weil der Schalter dynamisch entsteht und
+       vergeht - beides muss zusammenspielen. Steht im Backlog. */
   }
 
 
