@@ -162,6 +162,83 @@ function grestFuer(plz) {
   };
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   v2103 · WEM GEHOERT DAS OBJEKT — Backlog N60.33 (4)
+
+   Marcel am 11.10.2026: „Die Rechtsform der Gesellschaft. Dann auch die
+   unter Mandanten in den Einstellungen unsere Steuersaetze ueber die
+   Jahre."
+
+   GEMESSEN, bevor hier etwas gebaut wurde:
+
+     `halter` steht seit Langem an jedem Objekt (`storage.js:174`) und
+     liegt WIRKLICH auf dem Server - am Staging-Bestand gezaehlt:
+     22 Objekte tragen `halter='privat'`, 5 tragen keinen, 13 tragen
+     zusaetzlich `halter_seit`.
+
+     `portfolioExport.js` nannte `halter` bis hierher NULL MAL.
+
+   > Das ist der eigentliche Befund: nicht die Rechtsform fehlte, sondern
+   > der SCHLUESSEL. Eine Mandanten-Liste waere ohne ihn nicht
+   > verknuepfbar gewesen - wir haetten Rechtsformen geliefert und keine
+   > Zuordnung, welches Objekt zu welcher gehoert.
+
+   ─────────────────────────────────────────────────────────────────────
+   WARUM HIER KEINE STEUERSPHAERE AUSGERECHNET WIRD
+
+   `mandanten.js` hat dafuer `sphaere()`, und die Funktion ist der
+   ausdrueckliche EINZIGE Schiedsrichter (v1404, nach einem Befund von
+   9,6 % zu viel ausgewiesener Entlastung). Sie liest die Rechtsform aus
+   den Mandanten-Einstellungen.
+
+   Die liegen im `localStorage` unter `dp_mandanten` - im Backend gibt es
+   dafuer **null Treffer**. Der Server kennt also keine Rechtsform.
+
+   Eine zweite Fassung von `sphaere()` hier waere genau die Doppelung,
+   die v1404 aufgeraeumt hat, und sie wuerde raten, wo sie nichts weiss.
+   Deshalb liefert der Export die TATSACHEN und sagt, was fehlt.
+
+   `privat` ist die eine Ausnahme, und zwar ohne Nachschlagen: der
+   Eintrag ist in `mandanten.js:52` fest verdrahtet (`rechtsform:
+   'privat'`), und `sphaere()` gibt dafuer `'est'` zurueck, BEVOR sie
+   irgendetwas liest. Das ist eine Konstante, keine Rechnung.
+   ══════════════════════════════════════════════════════════════════════ */
+function halterFuer(daten) {
+  const roh = String((daten && daten.halter) != null ? daten.halter : '').trim();
+  const seit = String((daten && daten.halter_seit) != null ? daten.halter_seit : '').trim();
+
+  /* Kein Halter am Objekt heisst nicht „keine Angabe": die App zeigt
+     dann „Privat", weil das <select> darauf vorbelegt ist. Das wird
+     hier benannt, nicht stillschweigend gleichgesetzt. */
+  if (!roh) {
+    return {
+      id: null,
+      seit: seit || null,
+      steuersphaere: 'est',
+      rechtsform: 'privat',
+      herkunft: 'kein halter am Objekt - die App zeigt dafuer die Vorbelegung "Privat"'
+    };
+  }
+  if (roh === 'privat') {
+    return {
+      id: 'privat',
+      seit: seit || null,
+      steuersphaere: 'est',
+      rechtsform: 'privat',
+      herkunft: 'halter "privat" ist der feste Eintrag der App, keine Gesellschaft'
+    };
+  }
+  return {
+    id: roh,
+    seit: seit || null,
+    steuersphaere: null,
+    rechtsform: null,
+    herkunft: 'halter "' + roh.slice(0, 40) + '" ist eine Mandanten-ID. '
+      + 'Rechtsform und Steuersaetze liegen im localStorage (dp_mandanten) '
+      + 'und sind dem Server nicht bekannt - siehe Backlog N60.28'
+  };
+}
+
 /* Die Score-Kette. Sie steht an EINER Stelle im Frontend
    (`score-tiers.js`); hier wird sie NICHT nachgebaut, sondern als Text
    mitgegeben - wer den Export liest, soll wissen, was "62" heisst. */
@@ -189,6 +266,11 @@ const HINWEISE = [
   '`gest_p` ist der vom Nutzer ANGESETZTE Grunderwerbsteuersatz, `grest_satz_amtlich` der des Bundeslandes. '
     + 'Sie DUERFEN abweichen: wer einen Kaufpreisanteil fuer Inventar herausrechnet, zahlt auf weniger Steuer. '
     + 'Woher das Land kommt, steht in `grest_herkunft` - ohne Treffer gibt es KEIN Land, nicht das naechstgelegene.',
+  /* v2103 */
+  '`halter` ist die Mandanten-ID, der das Objekt zugeordnet ist. "privat" ist der feste Eintrag der App, keine Gesellschaft. '
+    + '`steuersphaere` ist "est" (Einkommensteuer des Nutzers, EIN Topf) oder die Halter-ID (eigene Koerperschaftsteuer). '
+    + 'Sie ist NULL, wo der Server die Rechtsform nicht kennt: die Mandanten liegen nur im Browser. `halter_herkunft` sagt welcher Fall vorliegt. '
+    + 'Eine fehlende Sphaere darf NICHT als "est" gerechnet werden - das steckt eine GmbH in die Progression des Nutzers.',
   'Die Pilot-Analyse traegt in `_fuer` einen Stempel: fuer welches Objekt und welchen Datenstand sie gilt. Eine Analyse ohne passenden Abdruck ist veraltet.'
 ];
 
@@ -368,6 +450,7 @@ async function bauen(userId, opt) {
 
     /* v2102: einmal je Objekt, nicht viermal */
     const _gr = grestFuer(daten.plz);
+    const _ha = halterFuer(daten);                        /* v2103 */
 
     return {
       id: o.id,
@@ -410,6 +493,17 @@ async function bauen(userId, opt) {
       bundesland_name: _gr.name,
       grest_satz_amtlich: _gr.satz,
       grest_herkunft: _gr.herkunft,
+      /* ── v2103 · WEM GEHOERT DAS OBJEKT · N60.33 (4) ─────────────────
+       * Der Schluessel, ohne den eine Mandanten-Liste nichts nuetzt.
+       * `halter` stand 22× im Bestand und 0× im Export. Die Rechtsform
+       * bleibt `null`, wo der Server sie nicht kennt - siehe
+       * `halterFuer()` oben, Abschnitt „warum hier keine Steuersphaere
+       * ausgerechnet wird". */
+      halter: _ha.id,
+      halter_seit: _ha.seit,
+      halter_rechtsform: _ha.rechtsform,
+      steuersphaere: _ha.steuersphaere,
+      halter_herkunft: _ha.herkunft,
       gewonnen: daten._deal_won === true || daten._deal_won === 'true',
       verloren: daten._deal_lost === true || daten._deal_lost === 'true',
       ankauf_stand: (daten._ankauf && daten._ankauf.stichtag) ? daten._ankauf.stichtag : null,
@@ -570,4 +664,4 @@ async function bauen(userId, opt) {
    pruefbar ist. Eine Funktion, die nur im Gesamtlauf sichtbar ist, laesst
    sich nicht von "findet nichts" unterscheiden - dieselbe Lehre wie bei
    `deklariertAbsichtlich` in der Messkabine. */
-module.exports = { bauen, SCORE_STUFEN, HINWEISE, grestFuer };
+module.exports = { bauen, SCORE_STUFEN, HINWEISE, grestFuer, halterFuer };
