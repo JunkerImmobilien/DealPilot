@@ -247,8 +247,15 @@ function zeichne(){
     var ring=k.querySelector('.ring'), zahl=k.querySelector('.ring b'), akt=k.querySelector('.aktionen');
     var rb=ring.getBoundingClientRect(), zb=zahl.getBoundingClientRect(), ab=akt.getBoundingClientRect();
     /* Unsichtbares zaehlt nicht: in (c) weicht der Ring, dann gibt es
-       nichts zu ueberdecken - das ist der Sinn der Fassung. */
-    var sichtbar = window.getComputedStyle(ring).opacity !== '0';
+       nichts zu ueberdecken - das ist der Sinn der Fassung.
+
+       GEMESSEN WIRD DER GESETZTE ZUSTAND, NICHT DIE BLENDE. Der erste
+       Entwurf las `opacity !== '0'` direkt nach dem Umschalten - mitten
+       im 120-ms-Uebergang steht dort aber z. B. 0.37, und (c) meldete
+       "Zahl verdeckt": ausgerechnet die Fassung, die das verhindern
+       soll. Deshalb eine Schwelle statt eines Vergleichs auf '0', und
+       unten ein zweiter Lauf, wenn der Uebergang durch ist. */
+    var sichtbar = parseFloat(window.getComputedStyle(ring).opacity) > 0.05;
     var uR = (hov && sichtbar) ? ueber(rb,ab) : {s:0,w:0,flaeche:0};
     var uZ = (hov && sichtbar) ? ueber(zb,ab) : {s:0,w:0,flaeche:0};
     var gut = uZ.flaeche===0;
@@ -265,8 +272,12 @@ function zeichne(){
   });
   document.querySelector('#tab tbody').innerHTML = zeilen;
 }
-document.getElementById('hov').addEventListener('change', zeichne);
-document.getElementById('band').addEventListener('change', zeichne);
-zeichne();
+/* Zweimal zeichnen: einmal sofort, einmal nachdem der 120-ms-Uebergang
+   durch ist. Sonst zeigt (c) den Wert aus der Blende statt den aus dem
+   Ruhezustand - siehe die Begruendung oben. */
+function zeichneZweimal(){ zeichne(); setTimeout(zeichne, 200); }
+document.getElementById('hov').addEventListener('change', zeichneZweimal);
+document.getElementById('band').addEventListener('change', zeichneZweimal);
+zeichneZweimal();
 </script>
 </div></body></html>
