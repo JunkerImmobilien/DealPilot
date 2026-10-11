@@ -2112,6 +2112,40 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     width: calc(50% - 3px) !important;
     max-width: calc(50% - 3px) !important;
   }
+
+  /* ── v2118 · DER QR-CODE ZIEHT NEBEN DEN KOPF ───────────────────────
+     Marcel am 11.10.2026: „Die Positionierung des QR-Codes beim iPad Pro
+     11 und mini ist nicht gut, der könnte dann eher neben das DealPilot.
+     Dann sparen wir uns Höhe."
+
+     GEMESSEN bei 833 px, Leiste 761 x 427:
+
+       .dp-pf-lead   761x70  @0,0     Inhalt nur 129 px breit:
+                                      „BOARDING PASS", „PRE-FLIGHT",
+                                      „DealPilot · Boarding"
+       a#oab-pf-qr    54x68  @353,318 <- eigene Zeile, mittig
+
+     Rechts neben dem Kopf sind **632 px frei**, und die Leiste ist
+     `position:relative`. Der QR passt dort hinein, ohne irgendetwas zu
+     verdraengen - und seine eigene Zeile faellt weg.
+
+     > Ein Element, das eine ganze Zeile fuer sich beansprucht, waehrend
+     > daneben 632 px leer stehen, kostet Hoehe ohne Gegenwert. Auf einem
+     > Tablet im Hochformat ist Hoehe das Knappe, nicht Breite.
+
+     Nur in diesem Band: auf dem Handy ist der Kopf schmaler und der QR
+     wuerde den Text beruehren - dort bleibt er, wo er ist. */
+  #oab-bar.dp-pfbar { position: relative !important; }
+  #oab-bar.dp-pfbar > .dp-pf-qr,
+  #oab-bar.dp-pfbar > a.dp-pf-qr {
+    position: absolute !important;
+    top: 8px !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    z-index: 3 !important;
+  }
 }
 
 /* ==============================================================================
