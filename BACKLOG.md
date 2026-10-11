@@ -1683,6 +1683,43 @@ Chips mit Tab-Sprung und Gold-Flash (Z. 14–17). Das trägt.
 > > die Zeile **geschützte Leerzeichen** (U+00A0) zwischen Zahl und Einheit
 > > trägt. Der Fehler sah aus wie ein falsch kopierter Text.
 
+#### N60.33 · Sechs Felder, die die zweite Schnittstelle braucht (11.10.2026)
+
+**Marcel, 11.10.2026, aus dem anderen Chat:** *„Zur API noch ein Befund
+in der anderen Schnittstelle. Wir haben ja Bonitätswerte und auch das
+Bundesland wissen wir ja für jedes Objekt. Daher wissen wir auch, wie das
+aussieht mit der Grunderwerbsteuersatz. Dann Mietverträge, also
+Vertragsart, Beginn und letzte Erhöhung. Die Rechtsform der Gesellschaft.
+Dann auch die unter Mandanten in den Einstellungen unsere Steuersätze über
+die Jahre. Die brauchen wir ja auch, also was wir dort angegeben haben.
+Und gegebenenfalls Zeiträume eigener Nutzung für den steuerfreien Verkauf.
+Das ist ein Feld, das haben wir im DealPilot nicht. Das brauchen wir aber
+auch erst mal nicht. Das kann dann auf der Tonspur erfolgen."*
+
+| # | Was | Stand (noch zu messen) |
+|---|---|---|
+| 1 | **Bonitätswerte** | im Datensatz vorhanden — Feldnamen prüfen |
+| 2 | **Bundesland → Grunderwerbsteuersatz** | das Land ist über `plz`/`ags` ableitbar, der Satz je Land ist eine Tabelle. **Marcels Punkt: wir wissen es, also sollen wir es auch liefern** |
+| 3 | **Mietverträge**: Vertragsart, Beginn, letzte Erhöhung | `mv_art`, `mv_beginn`, `mv_letzte_erhoehung` — stehen je Einheit in `_mfh` und seit `v2087` auch auf Objektebene |
+| 4 | **Rechtsform der Gesellschaft** | **ist N60.28** — und dort ist Schritt 0, die Mandanten überhaupt auf den Server zu bringen |
+| 5 | **Steuersätze über die Jahre** (Mandanten-Einstellungen) | hängt an derselben Wurzel wie 4: die Mandanten liegen nur im `localStorage` |
+| 6 | ~~Zeiträume eigener Nutzung (§ 23 EStG)~~ | **von Marcel ausdrücklich zurückgestellt**: *„das haben wir im DealPilot nicht. Das brauchen wir aber auch erst mal nicht."* |
+
+> **Vier der fünf offenen Punkte sind Auslieferung, einer ist eine
+> Ableitung.** Nummer 2 ist die interessante: der Grunderwerbsteuersatz
+> steht nicht am Objekt, er **folgt** aus dem Bundesland. Eine Zahl, die
+> man ableiten kann, aber nicht mitliefert, lässt der Empfänger selbst
+> raten — und sechzehn Länder haben sechs verschiedene Sätze.
+>
+> **Nummern 4 und 5 hängen beide an N60.28 Schritt 0:** `mandanten.js`
+> führt die Liste in `localStorage` (`dp_mandanten`), und im Backend gibt
+> es **null Treffer** dafür. Der Server kennt weder Namen noch Rechtsform
+> noch die Steuersätze. *Die Rechtsform ist nicht das Problem — sie ist
+> das Symptom.* Das gehört entschieden, bevor hier etwas gebaut wird:
+> eigene Tabelle `mandanten` oder ein Feld in `user_settings`.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
@@ -2913,7 +2950,106 @@ mehr** — bei 9 px und 2,06 ist der Text nicht lesbar.
 > mein Zugriff, und die acht Bänder waren die ganze Zeit da. Ein
 > Suchlauf mit null Treffern muss sagen, wie viele Elemente er geprüft hat.
 
-#### N60.29 · Die zwei Goldtöne `--gold-d` und `--gold-3` (Marcels Entscheidung)
+#### N60.29 · ENTSCHIEDEN UND UMGESETZT 11.10.2026 (`v2101`–`v2101d`)
+
+> ### Marcels Entscheidung (11.10.2026): *„und bitte kontrast vorschlag so umsetzen."*
+>
+> Gemeint ist der Vorschlag aus `frontend/kontrast-cockpit.html`:
+> **Weg (a)** für Zahlen und Tabellen, **Weg (c)** für Abzeichen.
+>
+> | | Start | nach `v2101d` |
+> |---|---:|---:|
+> | Gruppen unter 4,5 | 42 | **9** |
+> | Stellen | 234 | 143 |
+> | **Gruppen unter 3,0** | **19** | **1** |
+> | schlechteste | 1,71 | **2,29** |
+>
+> ### Zwei Fallen, beide VOR dem Ausrollen gefunden
+>
+> **1 · Selektoren wären falsch gewesen.** Mein erster Generator legte die
+> gemessenen Träger-Selektoren mit `!important` um. Beim Gegenlesen der
+> erzeugten Regeln fiel auf: `#dashboard-main .ov-v` bekam **vier**
+> `color`-Regeln, weil dieselbe Klasse je nach Lage grün **oder** rot ist
+> — die letzte gewinnt. **Grün und Rot wären zu einer Farbe verschmolzen.**
+>
+> Die Farben kommen nämlich als **Inline-Stil** aus `dashboard.js`
+> (`style="color:var(--dp-green)"`). Eine Selektorregel kann sie gar nicht
+> unterscheiden.
+>
+> **2 · Die Variablen tragen beides.** `--dp-green/-gold/-red` färben Text
+> **und** füllen Balken: `catBarColor()` schreibt `background:`,
+> `tierOf()` und `colByVal()` schreiben `color:`. Ein Wechsel an der
+> Variablen hätte die Balken mitgezogen.
+>
+> ### Deshalb: eigene Textvariablen
+>
+> | Variable | Wert | war | ist |
+> |---|---|---:|---:|
+> | `--dp-green-txt` | `#2e784f` | 3,08 | 5,36 |
+> | `--dp-red-txt` | `#a25646` | 4,28 | 5,31 |
+> | `--dp-gold-txt` | `#7d682f` | 2,23 | 5,26 |
+> | `--dp-muted-txt` | `#6f6b63` | 2,94 | 5,17 |
+> | `--c-acc2-txt` | `#776940` | 1,71 | 4,93 |
+> | `--c-accd-txt` | `#7d682f` | 3,20 | 5,39 |
+>
+> Dazu direkt abgedunkelt, weil **nachgezählt nur** als `color:` benutzt:
+> `--c-greenl` (27 Träger), `--c-redl` (54), `.gempty`, `.dp-pp-s`,
+> `.dp-pp-hint`.
+>
+> **Gold geht NICHT über `--wl-c9a84c`:** der Token ist der Akzent des
+> Mandanten und gehört den Flächen.
+>
+> ### Der gestaffelte Rückfall
+>
+> Die Regeln im JS-Stilblock gelten **dokumentweit**, die Variablen stehen
+> nur unter `#dashboard-main`. Deshalb:
+>
+> ```css
+> var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C))
+> ```
+>
+> Im Cockpit gilt der Textton, überall sonst bleibt das Gold — *ein
+> pauschales Abdunkeln hätte Stellen getroffen, die niemand gemessen hat.*
+>
+> ### Weg (c) für die Abzeichen
+>
+> `.badge`, `.shr-stub-lab` und **`.sk-art`** bekommen dunklen Grund und
+> behalten ihren Ton — wie `.ds2-tag` in `v2089`. `.sk-art` ist eine
+> **Pille** (`border-radius:999px`, Rand, Polsterung), also ein Abzeichen
+> und kein Fließtext.
+>
+> ### ⚠ Dabei fiel ein Fehler im MESSGERÄT auf (`v2092g`)
+>
+> `span.shr-stub-lab` trug `background: rgb(26,23,20)` — deckend, dunkel,
+> direkt am Element. `effGrund` meldete trotzdem **Weiß** und damit 1,88
+> statt rund 8.
+>
+> **Ursache:** die `v2065`-Schleife fragte bis zu drei Vorfahren nach
+> einem Pseudoelement-Grund und kehrte beim ersten Treffer zurück —
+> **bevor** der eigene Hintergrund des Elements angesehen wurde.
+>
+> > Physikalisch ist das verdreht: das `::before` eines Vorfahren liegt
+> > über **dessen** Hintergrund, aber **unter** dem eigenen Hintergrund des
+> > Kindes. Wer zuerst den Vorfahren fragt, malt in der falschen
+> > Reihenfolge.
+>
+> **Das betraf jede Messung an einem Element mit eigenem deckenden Grund.**
+> Bei `.ds2-tag` in `v2089` kam die richtige Zahl nur heraus, weil die
+> Prüfung dort `cs.backgroundColor` selbst gelesen hat und nicht
+> `effGrund`. Nach der Korrektur meldet `effGrund` `Quelle: "eigener
+> Grund"` — und die Abzeichen sind aus der Mängelliste verschwunden.
+>
+> ### Was noch fällt (alles Beinahe-Treffer)
+>
+> 115× `rgb(113,108,102)` bei **3,78** — ein zusammengerechneter Wert, kein
+> Literal. Dazu 9× Gold bei 3,20, 9× Grün bei 3,01–3,08, 4× Rot bei
+> 3,69–4,18 und **eine** Stelle bei 2,29 (`div.v`). Eine weitere
+> Abdunklungsrunde, kein neuer Mechanismus.
+>
+> **Nicht angefasst:** `.kc.tg .sc` und `.kc.tr .sc` — `.sc` ist die große
+> Score-Zahl und hat im `.kc-flat`-Fall bei 7,5 px andere
+> Größenverhältnisse. Das gehört gemessen, nicht mitgenommen.
+
 
 **Gemessen 10.10.2026, die letzten drei Mängelgruppen nach `v2090`:**
 
