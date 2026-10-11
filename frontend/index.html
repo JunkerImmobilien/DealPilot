@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v2110a">
+<link rel="stylesheet" href="css/style.css?v=v2112">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v2104b">
@@ -668,18 +668,28 @@ label.dp-required.qc-required::after {
        jetzt als "+ Neues Objekt hinzufuegen" direkt ueber dem Portfolio.
        Die beiden Nachbarn tragen dadurch wieder ihre Beschriftung; zu zweit
        passen sie bei 323 px Seitenleiste ohne Umbruch. -->
-  <div class="sb-neu-row">
-    <button type="button" class="sb-neu-btn" onclick="enterQuickCheckMode()"
-            title="Quick-Check — Deal in einer Minute grob durchrechnen">
-      <svg class="sb-neu-ico" width="17" height="17" aria-hidden="true"><use href="#i-gauge"/></svg>
-      <span class="sb-neu-lbl">Quick-Check</span>
-    </button>
-    <button type="button" class="sb-neu-btn" onclick="openMarktberichtView()"
-            title="Marktbericht — Lage, Mieten und Werte zur Adresse">
-      <svg class="sb-neu-ico" width="17" height="17" aria-hidden="true"><use href="#i-bar"/></svg>
-      <span class="sb-neu-lbl">Marktbericht</span>
-    </button>
-  </div>
+  <!-- v2112: Marcel am 11.10.2026 — "im menü bei dealpilot bitte quick-check
+       und marktbericht rausnehmen". Die Zeile .sb-neu-row ist damit weg.
+
+       BEIDE BLEIBEN ERREICHBAR — nachgemessen, nicht angenommen. Sie
+       stehen im Aktionen-Menue der Seitenleiste, ein paar Zeilen
+       weiter unten in dieser Datei:
+
+         :771  sbActionsAction('marktbericht')  -> "Marktbericht"
+         :786  sbActionsAction('quickcheck')    -> "Quick Boarding"
+
+       Quick-Check traegt dort den Luftfahrt-Namen, ruft aber denselben
+       Weg (ui.js:2356 -> enterQuickCheckMode). Genau das meinte der
+       Kommentar in layout-varianten.js:247 mit "Quick-Check gibt es im
+       Aktionsmenue NICHT (dort steht 'Quick Boarding')" - er sprach vom
+       NAMEN, nicht von der Erreichbarkeit.
+
+       > Auf dem Weg hierher habe ich zwei Sackgassen gemessen, damit
+       > niemand sie nochmal laeuft: der Verteiler `case 'quickcheck'`
+       > in ui.js:2167 haengt am Bottom-Sheet, und das ist seit V46
+       > unbedingt abgeschaltet (style.css:11804, ohne Media-Query).
+       > Und `hybrid-aktionen.js` erscheint nur in der Vorlage kanzlei
+       > ab 1500 px - ein Eintrag dort haette hier nichts genuetzt. -->
 
   <!-- Free-Plan Badge slot (rendered by demo-paywall.js) -->
 
