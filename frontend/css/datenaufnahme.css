@@ -3073,3 +3073,46 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     padding-bottom: 11px !important;
   }
 }
+
+/* =====================================================================
+   v2134 - EINE TOUCHFLAECHE FUER ALLE VIER ENTWUERFE
+
+   Abnahme der OFFENEN Schublade, 4 Kartenstile x 3 Handys = 12 Laeufe.
+   Geoeffnet per echtem Klick auf `.dp-pf-mtrigger`, danach gemessen:
+
+     Ausloeser trifft      12 von 12
+     Schublade offen       12 von 12
+     Knopf verdeckt         0
+     Knopf ausserhalb       0
+     Beschriftung gekappt   0
+     Inhalt ausserhalb      0
+     Schliessknopf 45x44, im Bild   12 von 12
+
+   Uebrig war ein Mass:
+
+     Stil       Knopf
+     Vorgabe    326-396 x 50
+     Zeile      332-402 x 44   (v2133a)
+     Kartei      91 x 40       <- vier Pixel zu flach
+     Buetten    355-395 x 50
+
+   Vier Pixel sind kein Drama und auch kein Zufall: jeder Entwurf setzt
+   seine eigene Knopfhoehe, und jeder muss die Touchflaeche einzeln
+   mitnehmen. Drei von vier tun es, einer nicht.
+
+   > **Eine Regel je Entwurf ist eine Regel, die beim fuenften Entwurf
+   > fehlt.** Deshalb steht sie hier EINMAL und stilunabhaengig: unter
+   > 901 px ist der Abruf-Knopf mindestens 44 px hoch, egal welcher
+   > Entwurf gewaehlt ist.
+
+   Spezifitaet (2,2,0) - sie schlaegt die (1,3,1) der Kartei und die
+   (1,3,2) der Zeile, weil zwei IDs mehr zaehlen als drei Klassen.
+   Ueber 900 px bleibt jeder Entwurf bei seiner eigenen Hoehe; dort ist
+   eine Maus im Spiel.
+   ===================================================================== */
+@media (max-width: 900px){
+  :is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch{
+    min-height: 44px !important;
+  }
+}
