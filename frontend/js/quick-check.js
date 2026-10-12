@@ -688,17 +688,58 @@
     if (topIcon && window.Icons && Icons.brain) topIcon.innerHTML = Icons.brain({ size: 22 });
 
     // V56: Berechnungs-Werte in den 7 KPI-Karten anzeigen (statt 1-Zeilen-Hint)
-    function _setKpi(kpi, valText, ratioGood) {
+    /* ══ v2148 · DIE SKALA BEKOMMT EINEN LESER ══════════════════════════
+
+       `kennzahlenAmpel()` liefert seit v2143 je Kennzahl ein Feld
+       `skala` — bei der Bruttomietrendite den Satz „Ziel 3,5 % (A-Lage)
+       erreicht = gruen · ab 75 % gelb · 130 % = volle Punktzahl".
+
+       GEMESSEN am 12.10.2026: im ganzen Repo gab es dafuer NULL
+       Verbraucher. `_setKpi` nahm drei Argumente und kannte das vierte
+       nicht, also fiel die Begruendung still auf den Boden.
+
+       > Eine Note ohne ihren Massstab ist nicht nachvollziehbar — und
+       > genau deshalb war der Satz gebaut worden. Er stand nur nie
+       > irgendwo.
+
+       Er haengt jetzt als `title` an der Kachel: dort, wo auch die
+       feste Skala steht, wenn kein Ziel gilt. Kein neues Element, kein
+       Layout-Risiko. */
+    function _setKpi(kpi, valText, ratioGood, skala) {
       var card = document.querySelector('.qc-score-kpi[data-kpi="' + kpi + '"]');
       if (!card) return;
       var v = card.querySelector('.qc-score-kpi-v');
       if (v) v.textContent = valText;
+      if (skala) card.setAttribute('title', skala);
       card.classList.remove('qc-kpi-good', 'qc-kpi-mid', 'qc-kpi-bad');
       if (ratioGood == null) return;
       if (ratioGood >= 0.75) card.classList.add('qc-kpi-good');
       else if (ratioGood >= 0.4) card.classList.add('qc-kpi-mid');
       else card.classList.add('qc-kpi-bad');
     }
+
+    /* ══ v2148 · DIE ZIELRENDITE GILT FUER DIE GANZE ANSICHT ════════════
+
+       Bis v2147 stand die Ermittlung INNERHALB des `if (kp > 0 && nkm > 0)`
+       darunter. Damit war sie fuer die Empfehlungsbox weiter unten nicht
+       verlaesslich da: lief der else-Zweig, waren beide Namen
+       `undefined`, und `zielKaufpreis()` rechnete still mit seinem
+       Rueckfall von 6 % — in JEDER Lage dieselbe Zahl.
+
+       > Gemessen: `_renderQcRecommendation()` (Z. 793) bekam weder
+       > `zielBmr` noch `lageklasse`. Ein Nutzer mit A-Lage-Ziel 3,5 %
+       > sah einen Zielpreis, der auf 6 % gerechnet war — rund 42 %
+       > zu niedrig. Der Riegel griff also nicht als Riegel, sondern
+       > als stiller Ersatz der Eingabe.
+
+       Darum steht sie jetzt VOR dem `if` und gilt fuer alles darunter. */
+    var _lk = null, _zielB = null;
+    try {
+      _lk = v('qc_lageklasse') || null;
+      if (_lk && window.DealPilotLageProfil && DealPilotLageProfil.zielBmr) {
+        _zielB = DealPilotLageProfil.zielBmr(_lk);
+      }
+    } catch (e) { _zielB = null; }
 
     if (kp > 0 && nkm > 0) {
       /* ── v1936 · WERTE UND AMPEL AUS DEM KERN ──────────────────────────
@@ -716,14 +757,10 @@
          oder keine Zielrendite gesetzt hat - dann bleibt die feste
          Skala (3 % = 0 Pkt, 7 % = 100 Pkt). Das ist Marcels Riegel:
          ohne Eingabe wird nichts erfunden, sondern das Vorhandene
-         genommen. */
-      var _lk = null, _zielB = null;
-      try {
-        _lk = v('qc_lageklasse') || null;
-        if (_lk && window.DealPilotLageProfil && DealPilotLageProfil.zielBmr) {
-          _zielB = DealPilotLageProfil.zielBmr(_lk);
-        }
-      } catch (e) { _zielB = null; }
+         genommen.
+
+         v2148: die Ermittlung steht jetzt oberhalb dieses `if` — sie
+         wird auch von der Empfehlungsbox gebraucht. */
       var _amp = (window.QcHeuristik && QcHeuristik.kennzahlenAmpel)
         ? QcHeuristik.kennzahlenAmpel({ bmr: bmr, nmr: nmr, ekr: ekr, cfMon: cfMon,
             dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm,
@@ -740,7 +777,8 @@
       var _ampQuote = { gruen: 1, gelb: 0.5, rot: 0 };
       _amp.forEach(function (k) {
         _setKpi(k.id, k.wert == null ? '—' : k.wert,
-                k.ampel == null ? null : _ampQuote[k.ampel]);
+                k.ampel == null ? null : _ampQuote[k.ampel],
+                k.skala);                       /* v2148: der Massstab geht mit */
       });
     } else {
       ['bmr','nmr','ekr','cf','dscr','ltv','bwk'].forEach(function(k){ _setKpi(k, '—', null); });
@@ -790,9 +828,14 @@
     }
 
     // V54: Kauf-Empfehlung — pragmatisch + handlungsorientiert
+    /* v2148: `zielBmr` und `lageklasse` gehen mit. Ohne sie rechnete
+       `zielKaufpreis()` mit ZIEL_BMR_RUECKFALL = 6 % statt mit der
+       Zielrendite der Lage — in A-Lage (Ziel 3,5 %) ergab das einen
+       Zielpreis, der rund 42 % zu niedrig lag. */
     _renderQcRecommendation({
       score: score, kp: kp, nkm: nkm, bmr: bmr, nmr: nmr, cfMon: cfMon,
-      dscr: dscr, ltv: ltvPct, ekr: ekr
+      dscr: dscr, ltv: ltvPct, ekr: ekr,
+      zielBmr: _zielB, lageklasse: _lk
     });
 
     // V63.23: Berechnungs-Info — zeigt was in den Score eingeht

@@ -5475,11 +5475,47 @@ const QcApp = (function() {
     parts.push(`<strong>${_u.ueberschrift_kurz}</strong>.`);
 
     // KPI-Analyse
+    /* v2148 · DIE LAGEKLASSE IST DER MASSSTAB, NICHT DER BUNDESDURCHSCHNITT
+
+       Marcel: „Das muss auch mit in die Bewertung im Quick Check unten
+       weil der Investor ja lesen möchte und bewerten möchte ob der deal
+       passt."
+
+       Hier standen feste Schwellen — „ab 5,5 % gut, ueber dem deutschen
+       Durchschnitt (~4,5 %)". Gemessen heisst das: wer in A-Lage 3,5 %
+       ansetzt, bekam bei 4,0 % „unterdurchschnittlich" zu lesen, obwohl
+       er 114 % seines Ziels hat. Umgekehrt las ein C-Lage-Investor mit
+       Ziel 7 % bei 5,6 % ein „gut".
+
+       Das Wort kommt jetzt aus `QcHeuristik.zielUrteil()` — derselben
+       Quelle wie die Ampel und der Skalensatz. Hier wird NICHTS
+       nachgerechnet; zwei Zeilen hoeher steht, was eine zweite Kopie
+       der Schwellen anrichtet (v1945).
+
+       DER RIEGEL: ohne gesetzte Lageklasse gibt `zielBmr()` null und
+       `zielUrteil()` ebenfalls — dann greift der alte Text weiter, und
+       er sagt jetzt dazu, dass er am Bundesdurchschnitt misst. Marcels
+       Vorgabe vom 11.10.2026: „nur berücksichtigen". */
     if (k.bmr) {
-      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> ist`);
-      if (k.bmr >= 5.5) parts.push(`<strong>gut</strong> und liegt über dem deutschen Durchschnitt (~4,5%).`);
-      else if (k.bmr >= 4.5) parts.push(`<strong>marktüblich</strong>.`);
-      else parts.push(`<strong>unterdurchschnittlich</strong> und braucht entweder Mietsteigerung oder Kaufpreis-Reduktion.`);
+      var _zbmr = null, _zu = null;
+      try {
+        if (window.DealPilotLageProfil && inputs && inputs.lageklasse) {
+          _zbmr = window.DealPilotLageProfil.zielBmr(inputs.lageklasse);
+        }
+        if (_zbmr != null && window.QcHeuristik && QcHeuristik.zielUrteil) {
+          _zu = QcHeuristik.zielUrteil(k.bmr, _zbmr, inputs.lageklasse);
+        }
+      } catch (e) { _zu = null; }
+      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> liegt`);
+      if (_zu) {
+        parts.push(`<strong>${_zu.wort}</strong> von ${_zu.ziel.toFixed(1).replace('.', ',')} %`
+          + (_zu.klasse ? ` für die ${_zu.klasse}-Lage` : '') + `. ${_zu.satz}`);
+      } else {
+        if (k.bmr >= 5.5) parts.push(`<strong>über dem deutschen Durchschnitt</strong> (~4,5%).`);
+        else if (k.bmr >= 4.5) parts.push(`im <strong>marktüblichen</strong> Bereich.`);
+        else parts.push(`<strong>unterdurchschnittlich</strong> und braucht entweder Mietsteigerung oder Kaufpreis-Reduktion.`);
+        parts.push(`<em>Gemessen am Bundesdurchschnitt — für deine Zielrendite trage oben die Lageklasse ein.</em>`);
+      }
     }
 
     if (k.cfMon != null) {

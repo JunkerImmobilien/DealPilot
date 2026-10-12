@@ -36,6 +36,124 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N61 · Marcels Paket vom 12.10.2026 — sechs Punkte, wörtlich aufgenommen
+
+**Marcel hat sie aufgegeben, weil er sie im Backlog vermisste:** *„was mir
+irgendwie fehlt ist ein punkt wo ich gesagt habe …"* Genau dafür steht das
+hier. Ein Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal.
+
+#### N61.1 · Der Aussehen-Schritt: die App soll sich im Hintergrund mitändern
+
+**Marcel:** *„wenn man nach der neuanmeldung das aussehen der app auswählen
+kann dass die bilder dort nichts sagend sind und es gut wäre wenn sich im
+hintergrund die app direkt ändert und das bild das layout besser wieder
+gibt."*
+
+**Der erste Teil ist erledigt (v1753b/c), der zweite stand nie im Punkt.**
+Der alte Eintrag **U3** fasste nur „die Bilder sagen nichts" — dass die App
+im Hintergrund *sichtbar* mitwechseln soll, fehlte dort.
+
+**Gemessen am 12.10.2026 im Code:**
+
+| | |
+|---|---|
+| Miniaturen | `onboarding.js:280` trägt `dpo-mini` — v1753b wirkt, 84 px, Kopf/Spalten/Inhalt |
+| Klick | `onboarding.js:734` ruft `_aussehenAnwenden()` → `data-dp-layout` wird **wirklich live** gesetzt |
+| Schleier | `.dpo-ov` ist `rgba(5,5,5,.34)` (`onboarding.js:1008`) — **unverändert** |
+| unter 900 px | `onboarding.js:1198` `padding:0; align-items:stretch` → der Kasten füllt den Schirm, es gibt **kein „dahinter"** |
+
+> **Der Mechanismus schaltet also schon — Marcel sieht es nur nicht.**
+> Der Schleier nimmt hellen Flächen 60 % Helligkeit und dunklen 0 %
+> (gemessen am 10.10.2026), er verfälscht damit genau den Unterschied,
+> um den die Wahl geht. Und auf dem Gerät, auf dem Marcel am häufigsten
+> arbeitet, ist von der App überhaupt nichts zu sehen.
+
+**Zu tun:** am laufenden Fenster messen, wie viel der App neben dem Kasten
+sichtbar ist, dann den Schleier über *diesem* Schritt zurücknehmen und den
+Kasten so stellen, dass die Fläche frei wird. Ein Hinweis („die App dahinter
+wechselt mit") nur dort, wo er stimmt.
+
+#### N61.2 · Soll/Ist-Abgleich in der Pilot-Analyse weiter ausbauen
+
+**Marcel:** *„dann wollten wir Soll/Ist Abgleich weiter ausbauen in der Pilot
+Analyse und auch die Lage Klassen mit einbeziehen in die Pilot analyse."*
+
+Der Reiter existiert seit **v2042** (`ui.js:_sollIstHtml()`, rechnet nicht
+selbst — `DealPilotAnkauf.abweichung()` liefert die Zeilen). Was „weiter
+ausbauen" heißt, ist offen und gehört vor dem Bauen geklärt.
+
+#### N61.3 · Lageklassen in die Pilot-Analyse UND in die Quick-Check-Bewertung
+
+**Marcel:** *„Das muss auch mit in die Bewertung im Quick Check unten weil
+der Investor ja lesen möchte und bewerten möchte ob der deal passt."*
+
+Die Lageklasse ist seit **v2143** der Maßstab der Bruttomietrendite-Ampel
+(`qc-heuristik.js`, Prüfer `tools/lageklasse-ampel-pruefen.mjs`). Offen ist,
+ob sie auch **im Prompt der Pilot-Analyse** und **im Fazit unten im
+Quick-Check** ankommt.
+
+#### N61.4 · Lage & Markt: die Werte aus den Marktberichten holen, nicht recherchieren
+
+**Marcel:** *„in der Pilot Analyse woher kommen die werte und daten im reiter
+Lage & Markt? wenn wir einen marktbericht haben oder mehrere können wir die
+Daten dafür aus den Marktberichten holen da wir diese sachen ja dort über die
+partner abholen. dann können wir auch aussagen über die entwicklung
+treffen."* Und: *„man kann die werte der KI gerne mit den daten aus der
+schnittstelle abgleichen auch wenn Stufe 3 gerechnet wurde sollte auf
+jedenfall auch der Verkehrswert mit einfließen und die Gesamtbewertung
+einfließen."*
+
+**Gemessen am 12.10.2026 — das meiste ist gebaut, eine Lücke ist echt:**
+
+| Baustein | Stand |
+|---|---|
+| Berichtsblock im Prompt | **da** seit v947-mbsource (`openaiService.js:888`), ausdrücklich „die BESTE Quelle hier, vor allem anderen nutzen" |
+| mehrere Berichte | **da** — `/marktbericht/objects/history` lädt alle, Verlauf mit Datum und Marktwert |
+| Entwicklungsaussage | **da** — Entwicklungszeile in Panel „Lage & Markt" ab zwei Berichten (`ui.js:2822`), Riegel bei unter 30 Tagen Abstand im Prompt |
+| Mietabweichung | **da** und gerechnet, nicht geschätzt (`openaiService.js:940 ff`) |
+| **Stufe-3-Werte** | **FEHLT im Prompt.** `/objects/history` liefert seit v1963/v1965/v1979 `sachwert_eur`, `ertragswert_eur`, das **führende Verfahren** mit Grund und Quelle (§ 6 Abs. 1 ImmoWertV) und beide Rechenwege — der Prompt-Bauer liest **kein einziges** dieser Felder |
+| `mietspiegel_eur_qm` | das Ausgabeschema nennt es wörtlich *„Recherchierter Wert €/m²"* (`openaiService.js:1156`) — die KI soll **recherchieren**, obwohl der Bericht eine amtliche Mietpreisübersicht trägt |
+
+> **Die Zahlen liegen in der Antwort und verlassen den Prompt-Bauer nicht.**
+> Dasselbe Muster wie v1963: der Cross-Check lag in der Zeile und hat den
+> Server nie verlassen — nur eine Ebene weiter.
+
+#### N61.5 · Die Demo-Objekte
+
+**Marcel:** *„dann die demo objekte"* — gemeint ist **N60.19** („Die Demodaten
+erzählen keine Geschichte"), dort steht der Punkt mit Messung. Er hängt an
+einer Entscheidung von Marcel und ist nicht blockiert, sondern **unbeantwortet**.
+
+#### N61.6 · Das Unterlagen-Modul ergänzen — Marcel meint N51
+
+**Marcel:** *„und ich hatte auch ein paket reingegeben um die unterlagen
+prüfung. steht das auch noch im backlog?"* — und auf die Rückfrage:
+*„ja ich meine das unterlagen app das müssen wir ergänzen ist ja schon
+drin. soll nur ergänzt werden bzw. bissel erweitert."*
+
+**Geklärt: es ist `unterlagen-app-v6-ansprechpartner`, also N51.** Kein
+neues Paket, kein Umbau — die offenen Schritte stehen dort unter „Zu tun"
+(KI-Auftrag um `ansprechpartner` erweitern, `proSeite` als Beleg, `kopieAn`
+im Versand). **Die Migration ist dort schon als Annahme zurückgenommen:**
+`unterlagen_aemter.seiten` ist bereits `jsonb`.
+
+> **Mein Fehlgriff bei der Suche:** ich habe nach „Unterlagen**prüfung**"
+> gegreppt und nichts gefunden, weil der Punkt „Unterlagen-**Modul**"
+> heißt. Dieselbe Falle wie immer — nach dem WEG suchen, nicht nach dem
+> Wort, das Marcel gerade benutzt.
+
+**Dabei ist eine andere Lücke aufgefallen, und die bleibt echt:**
+`Dateien/vw-modul-v4-2-2.zip`
+und `-v4-2-5.zip` (08. und 10.10.2026) stehen in **keiner Zeile** des
+Backlogs. Das ist ein Gutachten-Modul mit drei Word-Vorlagen
+(`master_vwg`, `master_rndg`, `master_kpt`), `calc-engine.js`,
+`boris-nrw-service.js`, einer `IMPORT-API.md` und drei Beispiel-PDFs
+(Verkehrswertgutachten, Nutzungsdauergutachten, Kaufpreisaufteilung).
+**Ein Paket, das im Repo liegt und im Backlog fehlt, ist verloren** — genau
+der Fall, den Marcel hier anspricht. **Noch nicht gesichtet, nur gelistet.**
+
+---
+
 ### N60 · Marcels Paket vom 08.10.2026 — zehn Punkte, wörtlich aufgenommen
 
 **Marcel hat am 08.10.2026 ein ganzes Paket aufgegeben. Es steht hier
