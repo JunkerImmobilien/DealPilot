@@ -1612,7 +1612,79 @@ window._dpPaTab = function (id, btn) {
     for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i] === btn);
     var pans = wrap.querySelectorAll('.dp-pa-panel');
     for (var j = 0; j < pans.length; j++) pans[j].classList.toggle('active', pans[j].id === 'dp-pa-' + id);
+    /* v2155: die Amtsquellen erst laden, wenn der Reiter geoeffnet wird.
+       Sie haengen an der Gemeinde, nicht am Analyse-Ergebnis, und ein
+       Abruf beim Rendern der Analyse waere einer zu viel — die meisten
+       Nutzer oeffnen diesen Reiter nie. */
+    if (id === 'quellen') window._dpQuellenAemter();
   } catch (e) {}
+};
+
+/* ══ v2155 · DIE BELEGTEN AMTSQUELLEN NACHLADEN ══════════════════════
+ *
+ * Marcel: „dass wir auch die Quellen, die wir zum Beispiel ermittelt
+ * haben, wenn wir Unterlagen beim Amt anfordern, dass auch die dort mit
+ * eingegeben werden."
+ *
+ * Diese Quellen sind die stärksten, die das Produkt hat: WIR haben die
+ * Seite selbst abgerufen und die Adresse dort gefunden (`beleg_ok`,
+ * seit v2151 mit `seiten.pro_seite` je Seite). Das steht ausdrücklich
+ * dabei — eine belegte Amtsquelle ist etwas anderes als eine
+ * Web-Fundstelle.
+ *
+ * Geladen wird über `/unterlagen/aemter?plz=&ort=`: ein reiner
+ * Lesezugriff, kein Kontingent, keine Recherche (v1844).
+ */
+window._dpQuellenAemter = function () {
+  var box = document.getElementById('dp-pa-quellen-aemter');
+  if (!box || box._geladen) return;
+  box._geladen = true;
+  var plz = (document.getElementById('plz') || {}).value || '';
+  var ort = (document.getElementById('ort') || {}).value || '';
+  if (!plz && !ort) {
+    box.innerHTML = box.firstElementChild.outerHTML
+      + '<p class="dp-pa-p" style="color:#8b8678">Ohne PLZ und Ort lässt '
+      + 'sich die zuständige Gemeinde nicht bestimmen.</p>';
+    return;
+  }
+  if (typeof Auth === 'undefined' || !Auth.apiCall) return;
+  Auth.apiCall('/unterlagen/aemter?plz=' + encodeURIComponent(plz)
+    + '&ort=' + encodeURIComponent(ort), { method: 'GET' })
+    .then(function (r) {
+      var aemter = (r && r.aemter) || [];
+      var kopf = box.firstElementChild ? box.firstElementChild.outerHTML : '';
+      /* Nur Ämter MIT Quelle. Eines ohne Quelle gehört nicht in eine
+         Quellenliste — es wäre eine Zeile, die nichts belegt. */
+      var mit = aemter.filter(function (x) { return x && x.quelle_url; });
+      if (!mit.length) {
+        box.innerHTML = kopf
+          + '<p class="dp-pa-p" style="color:#8b8678">Für diese Gemeinde '
+          + 'sind noch keine Amtsquellen ermittelt. Sie entstehen beim Abruf '
+          + 'der Unterlagen — Reiter Dokumente, „Unterlagen anfordern".</p>';
+        return;
+      }
+      box.innerHTML = kopf
+        + '<div class="dp-pa-kv-sub">Von uns selbst abgerufen und gegen die '
+        + 'Adresse geprüft — ' + mit.length + ' Quelle(n)</div>'
+        + '<ul class="dp-pa-src">'
+        + mit.map(function (x) {
+            var art = _esc(String(x.art || '').toUpperCase());
+            var beh = _esc(x.behoerde || '');
+            /* Der Belegstand gehört an die Quelle, nicht in eine Fußnote:
+               „belegt" heißt, die Adresse stand auf DIESER Seite. */
+            var marke = x.beleg_ok
+              ? '<span style="color:var(--ok,#3FA56C)">✓ belegt</span>'
+              : '<span style="color:var(--warn,#D8954C)">⚠ nicht belegt</span>';
+            return '<li>' + _quelleZeile(beh + ' — ' + x.quelle_url)
+              + ' <span class="dp-pa-herk">' + art + ' · ' + marke + '</span></li>';
+          }).join('')
+        + '</ul>';
+    })
+    .catch(function () {
+      var kopf = box.firstElementChild ? box.firstElementChild.outerHTML : '';
+      box.innerHTML = kopf + '<p class="dp-pa-p" style="color:#8b8678">'
+        + 'Die Amtsquellen konnten nicht geladen werden.</p>';
+    });
 };
 function _renderAIServerAnalysis(a) {
   /* v584-rail */
@@ -1780,6 +1852,76 @@ function _renderAIServerAnalysis(a) {
   var pK = sec('', I.bank, 'BANK') + '<div class="dp-pa-card">' + sec('', I.bank, 'BANKARGUMENTE') +
     ((Array.isArray(a.bankargumente) && a.bankargumente.length) ? num(a.bankargumente) : '<em class="dp-pa-empty">\u2014 keine Bankargumente</em>') + '</div>';
 
+  /* ══ v2155 · ALLE QUELLEN AN EINER STELLE ═══════════════════════════
+   *
+   * Marcel am 12.10.2026: „alle Quellen, die wir angeben … auch die
+   * Quellen, die wir zum Beispiel ermittelt haben, wenn wir Unterlagen
+   * beim Amt anfordern."
+   *
+   * DREI HERKÜNFTE, und sie sind nicht gleichwertig:
+   *
+   *   KI-Recherche     eine Seite, die ein Modell gelesen hat
+   *   Marktbericht     gemessene Partnerdaten, amtliche Register
+   *   Ämter-Recherche  eine amtliche Seite, die WIR selbst abgerufen
+   *                    und gegen die Adresse geprüft haben
+   *
+   * > Sie in eine Liste zu werfen wäre falsch. Eine amtliche Quelle mit
+   * > Beleg und eine Web-Fundstelle eines Modells sehen dann gleich aus
+   * > — und genau dieser Unterschied ist die Doktrin dieses Produkts.
+   *
+   * Darum drei Blöcke mit ihrer Herkunft im Titel. Die Ämter-Quellen
+   * werden NACHGELADEN (`_quellenAemterNachladen`), weil sie nicht im
+   * Analyse-Ergebnis stecken, sondern an der Gemeinde hängen.
+   */
+  function _quellenHtml(a) {
+    var h = '';
+    var hat = false;
+
+    /* ── 1 · Was die KI recherchiert hat ───────────────────────────── */
+    if (Array.isArray(a.quellen) && a.quellen.length) {
+      hat = true;
+      h += '<div class="dp-pa-card">' + sec('', I.loc, 'AUS DER KI-RECHERCHE')
+        + '<div class="dp-pa-kv-sub">Vom Modell gelesene Webseiten. Eine '
+        + 'Fundstelle, kein Beleg — der Inhalt ist nicht von uns '
+        + 'gegengeprüft.</div>'
+        + '<ul class="dp-pa-src">'
+        + a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('')
+        + '</ul></div>';
+    }
+
+    /* ── 2 · Was der Marktbericht beisteuert ───────────────────────── */
+    /* `berichts_abgleich` (v2150) steht im Lage-Reiter; hier gehört die
+       Herkunft hin. Das führende Verfahren nennt seine Rechtsgrundlage,
+       und die ist eine Quelle wie jede andere. */
+    if (has(a.berichts_abgleich)) {
+      hat = true;
+      h += '<div class="dp-pa-card">' + sec('', I.loc, 'AUS DEM DEALPILOT-MARKTBERICHT')
+        + '<div class="dp-pa-kv">Gemessene Vergleichsdaten und amtliche '
+        + 'Registerwerte. Der vollständige Quellennachweis mit Kennzahl, '
+        + 'Jahrgang und Lizenz steht im Bericht selbst — dort ist er '
+        + 'belegpflichtig.</div>'
+        + '<div class="dp-pa-fuss">Sach- und Ertragswert im Bericht sind ein '
+        + 'Plausibilitäts-Quercheck nach ImmoWertV-Logik — indikativ, '
+        + 'kein Gutachten nach § 194 BauGB.</div></div>';
+    }
+
+    /* ── 3 · Was wir bei den Ämtern selbst belegt haben ────────────── */
+    /* Platzhalter: gefüllt von `_quellenAemterNachladen()`. Er sagt, dass
+       geladen wird — eine leere Stelle sähe aus wie „keine da". */
+    h += '<div class="dp-pa-card" id="dp-pa-quellen-aemter">'
+      + sec('', I.loc, 'AUS DER ÄMTER-RECHERCHE')
+      + '<p class="dp-pa-p" style="color:#8b8678">Lade die belegten '
+      + 'Amtsquellen dieser Gemeinde …</p></div>';
+
+    if (!hat) {
+      h = '<div class="dp-pa-card"><div class="dp-pa-kv">Zu diesem Objekt '
+        + 'liegen noch keine recherchierten Quellen vor. Sie entstehen, '
+        + 'sobald eine Analyse mit Web-Recherche läuft oder ein '
+        + 'Marktbericht abgerufen wird.</div></div>' + h;
+    }
+    return h;
+  }
+
   function tab(id, label, active) {
     return '<button type="button" class="dp-pa-tab' + (active ? ' active' : '') + '" onclick="_dpPaTab(\'' + id + '\',this)">' + label + '</button>';
   }
@@ -1896,6 +2038,20 @@ function _renderAIServerAnalysis(a) {
       /* v2042 - nur wenn ein Ankauf-Stand vorliegt: ohne ihn gibt es
          nichts abzugleichen, und ein leerer Reiter verspricht etwas. */
       (_siHtml ? tab('si', 'Soll/Ist-Abgleich', false) : '') +
+      /* ══ v2155 · DER QUELLEN-REITER ════════════════════════════════════
+         Marcel am 12.10.2026: „Wir brauchen dann extra Reiter auch nochmal
+         fuer die Quellen, dass wir wirklich nochmal alle Quellen, die wir
+         gesagt, die wir angeben, dass wir die dort nochmal ausgeben
+         koennen, dass wir auch die Quellen, die wir zum Beispiel ermittelt
+         haben, wenn wir Unterlagen beim Amt anfordern, dass auch die dort
+         mit eingegeben werden."
+
+         Er steht IMMER, auch leer — anders als der Soll/Ist-Reiter. Das
+         ist Absicht: ein fehlender Quellen-Reiter saehe aus, als gaebe es
+         keine Quellen. Ein leerer sagt, dass noch keine da sind, und
+         nennt den Weg dorthin. Das ist die Doktrin aus CLAUDE.md:
+         „Wo kein Wert vorliegt, bekommt der Kunde den Weg dorthin." */
+      tab('quellen', 'Quellen', false) +
       '<button type="button" class="dp-pa-tab" id="dp-pa-tab-verlauf" style="display:none" onclick="_dpPaTab(\'verlauf\',this)">Marktbericht-Verlauf</button>' +
     '</nav>' +
     '<div class="dp-pa-content">' +
@@ -1906,6 +2062,7 @@ function _renderAIServerAnalysis(a) {
       panel('verh', pV, false) +
       panel('bank', pK, false) +
       (_siHtml ? panel('si', _siHtml, false) : '') +
+      panel('quellen', _quellenHtml(a), false) +
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';
