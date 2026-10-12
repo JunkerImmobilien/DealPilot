@@ -115,12 +115,16 @@
        Deshalb bekommt der Inhalt unten Platz: die gemessene Hoehe des
        Bandes wandert als Variable an das Wurzelelement, und eine Regel
        in style.css gibt sie an .body weiter. Gemessen statt geraten -
-       das Band ist auf 360 px 195 px hoch und auf 1180 px 89. */
-    try {
-      var hoehe = Math.ceil(b.getBoundingClientRect().height);
-      document.documentElement.style.setProperty('--dp-verify-band-h', hoehe + 'px');
-      document.documentElement.setAttribute('data-dp-verify', '1');
-    } catch (e) {}
+       das Band ist auf 360 px 195 px hoch und auf 1180 px 83.
+
+       ⚠ GEMESSEN WIRD GANZ UNTEN, NACH DEM TEXT. Der erste Anlauf hat
+       hier gemessen - also BEVOR die Beschriftung im Band stand - und
+       bekam 139 statt 195 px. 56 px zu wenig, und zwar genau dort, wo
+       der Text in zwei Zeilen umbricht.
+
+       > Die Hoehe eines Elements, dessen Inhalt man gerade schreibt,
+       > misst man NACH dem Schreiben. Sonst misst man den leeren
+       > Kasten. */
     if (txt === null) {
       /* Abgelaufen. Der Server sperrt; hier steht nur, was zu tun ist. */
       b.classList.add('dvb-aus');
@@ -134,6 +138,12 @@
         '<b>Bitte E-Mail-Adresse bestätigen.</b> Du kannst weiterarbeiten, '
         + 'der Zugang bleibt noch <b class="dvb-rest">' + txt + '</b> offen.';
     }
+    /* Jetzt steht der Text, jetzt stimmt die Hoehe. */
+    try {
+      var hoehe = Math.ceil(b.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--dp-verify-band-h', hoehe + 'px');
+      document.documentElement.setAttribute('data-dp-verify', '1');
+    } catch (e) {}
   }
 
   function nachsenden() {
