@@ -299,9 +299,42 @@
          Verankert am `.sb-header` (dem Block mit dem Logo), nicht an
          einer Position in der Liste: ein Platz, der an einem
          benannten Element haengt, ueberlebt jeden Neuaufbau. */
-      var kopf = document.querySelector('.sb-header');
-      if (kopf && kopf.parentNode) kopf.parentNode.insertBefore(s, kopf.nextSibling);
-      else liste.insertBefore(s, liste.firstChild);   /* Rueckfall */
+      /* ══ v2145a · DER SCHALTER FOLGT DER LISTE, DIE ER UMSCHALTET ═════
+
+         Marcel am 12.10.2026, NACH v2145: „den umschalter bestand/ankauf
+         hab ich immer noch nicht finden koennen wenn ich aussehen
+         Aktenmappe eingestellt habe. Warum?"
+
+         GEMESSEN: Fassung v2145 geladen, Layout v1b aktiv - und der
+         Schalter sass trotzdem in `#sidebar [display:none]`.
+
+         v2145 hat `#dk-schalter` in die Knotenliste von
+         `layout-varianten.js` aufgenommen. Das greift beim SETZEN des
+         Layouts. Nur: beim Seitenladen ist das Layout schon gesetzt,
+         bevor es diesen Schalter gibt - `doppelkarte.js` baut ihn erst,
+         wenn die Objektliste steht. Er entsteht also NACH dem Umzug und
+         haengt sich an `.sb-header`, der in der versteckten Sidebar
+         zurueckblieb.
+
+         > Ein Knoten, der nach dem Umzug entsteht, zieht nicht mit um.
+         > Eine Liste von Knoten deckt den WECHSEL ab, nicht die GEBURT.
+
+         Deshalb hier die Wurzel: der Schalter sucht sich seinen Platz
+         an der Objektliste, wo immer die gerade steht. Ist sie
+         ausgewandert (Layout aktiv), geht er mit; steht sie in der
+         Sidebar, bleibt alles wie seit v2040 - unter dem Logo.
+
+         Beides zusammen deckt beide Faelle: v2145 den Layout-Wechsel
+         im Betrieb, v2145a das Laden mit bereits gesetztem Layout. */
+      var inSidebar = liste && liste.closest && liste.closest('#sidebar');
+      if (liste && !inSidebar && liste.parentNode) {
+        /* Die Liste ist ausgewandert - der Schalter gehoert davor. */
+        liste.parentNode.insertBefore(s, liste);
+      } else {
+        var kopf = document.querySelector('.sb-header');
+        if (kopf && kopf.parentNode) kopf.parentNode.insertBefore(s, kopf.nextSibling);
+        else if (liste) liste.insertBefore(s, liste.firstChild);   /* Rueckfall */
+      }
     }
     s.innerHTML =
       '<span class="dk-seg-titel">Stand</span>'
