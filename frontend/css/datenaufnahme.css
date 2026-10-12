@@ -3144,7 +3144,12 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
    `v2134` schon stilunabhaengig auf 44 gehoben, hier steht nur der
    Nachweis, dass es derselbe Fall ist.
    ===================================================================== */
-@media (max-width: 900px){
+/* v2134b: Band auf 1200 verlaengert. Gemessen blieb genau EINE Zeile
+   mit Befund: [kartei] bei 1180 px, Kacheln 42 px. Und 1180 ist das
+   iPad Pro 11 im Querformat (1194 px) - dieselbe Begruendung, mit der
+   v2121a dort schon 44 px setzt. Eine Grenze bei 900 laesst genau das
+   Geraet aus, um das es geht. */
+@media (max-width: 1200px){
   html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
     min-height: 44px !important;
   }
