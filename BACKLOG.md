@@ -36,6 +36,172 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N62 · Marcels Paket vom 12.10.2026 (abends) — zehn Punkte, abgeglichen
+
+**Marcel hat ausdrücklich darum gebeten:** *„Also das müsstest du einmal
+mit Backlog abgleichen, ob der Punkt dann da schon drinne steht."*
+
+**Gemessen am 12.10.2026 gegen die 23.117 Zeilen dieser Datei: SECHS von
+zehn Punkten standen überhaupt nicht drin, vier nur teilweise.**
+
+| # | Punkt | stand im Backlog |
+|---|---|---|
+| 1 | Tour in Aktenmappe, Tower, Kanzlei | **T1, offen** (Z. 9619) — Kanzlei und Tower *„nicht fertig gemessen"* |
+| 2 | Kanzlei-Schalter: Position und Optik | **nein** |
+| 3 | Pilot-Analyse: alle Daten einbeziehen | **N60.4 erledigt**, aber Liegenschaftszins und Wertgutachten fehlen; die inhaltliche Verbesserung der Kategorien steht nirgends |
+| 4 | Lage & Markt: Netz + Zensus + Gegenüberstellung | **N61.4, offen** — Zensus, Preisniveau mit Quellen und die Gegenüberstellung fehlen |
+| 5 | Eigener Reiter „Quellen" | **nein** |
+| 6 | Steuerliche Zusammenfassung → Soll/Ist | **N60.18**, nur als Stichwort (*„Was aber vielleicht auch geil wäre, wäre Steuer"*) |
+| 7 | Landingpage: Leistungsumfang unter Funktionen | **nein** |
+| 8 | Preise: Integrationsservice + Bestandsmigration | **nein** (null Treffer für „Integrationsservice") |
+| 9 | Subpage F&E / Portfolio-Strategie | **nein** — es gibt nur N14 (BSFZ-Siegel) und N21 (Stundennachweise) |
+| 10 | Tab Steuern: Vorjahr duplizieren | **nein** |
+
+> **Das ist die Antwort auf Marcels Frage, und sie ist unangenehm:** er
+> hat diese Dinge im Gespräch gesagt, und sie sind nicht angekommen. Ein
+> Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal — deshalb
+> stehen sie hier jetzt wörtlich, bevor einer davon gebaut wird.
+
+#### N62.1 · Die Tour muss in allen vier Ansichten laufen
+
+**Marcel:** *„prinzipiell möchte ich einmal, dass die Tour, die hier
+gemacht wird, wenn man sich neu anmeldet, auch bei der Aktenmappe, beim
+Tower und auch bei der Kanzleiansicht funktioniert. Das müssten wir einmal
+gegenprüfen."*
+
+Ergänzt **T1** (Z. 9619), wo vier Befunde gemessen sind — dort steht
+ausdrücklich *„Kanzlei und Tower sind nicht fertig gemessen"*. Der Hänger
+in der Kanzlei (Schritt 6) ist mit `v1774` behoben, offen sind B1 (Spot
+außerhalb des Bildschirms), B2 (kein Spot) und Schritt 24.
+
+#### N62.2 · Kanzlei: der Bestand/Ankauf-Schalter gehört höher und sieht fremd aus
+
+**Marcel:** *„Wir haben den Buchschalter in die App gepackt bei der
+Kanzlei. Der sollte aber bitte über die Suche, also zwischen dann der
+Aktion-Button und der Suche, also ein bisschen höher, und dass die
+Ausrichtung der Elemente dort gleich ist und auch das Layout und die
+Farbe, also Bestand, Stand und Ankauf, auch der Rahmen da drum, das müsste
+jetzt ein helles Weiß bekommen, also quasi im gleichen Design. … gleiche
+Formatierung wie die Suche und auch die Schrift bei den Aktionen."*
+
+Der Schalter selbst ist `v2145`/`v2145a` (`doppelkarte.js`), die
+Platzierung in der Kanzlei stand nie im Backlog. **Optikpunkt → vor dem
+Bauen im Browser messen**, was die Suche und die Aktionsknöpfe dort
+wirklich tragen (Rahmenfarbe, Höhe, Schriftgröße, Ausrichtung).
+
+#### N62.3 · Pilot-Analyse: alles muss einfließen, und die Kategorien müssen tragen
+
+**Marcel:** *„dass wir einmal schauen, ob generell alle Daten, also auch
+aus den Mehrfamilienhäusern, aus dem Konfigurator, die Daten aus dem
+Marktbericht, wenn wir welche abgerufen haben, dass wirklich alle Felder,
+auch Finanzierung und Liegenschaftszinsen und Wertgutachten, dass auch
+wirklich alles damit einfließt und wir dort auch bei den Einzelkategorien
+Briefing, Stärken, Risiken, Lage und Markt, dass wir da wirklich
+vernünftige Auswertungen bekommen. Also das sieht jetzt schon recht gut
+aus, aber das noch vollumfänglicher, genauer."*
+
+**Stand gemessen:** MFH-Konfigurator **9 von 28 Feldern** im Prompt
+(N60.8/N60.9, `v2022`), Marktbericht-Block da, Finanzierung und Steuer da
+(`v2011`/`v2139`). **Liegenschaftszins und Wertgutachten:** die Stufe-3-
+Werte sind mit `v2150` gebaut — der Liegenschaftszins selbst (`lzs_pct`,
+Zweig, Berichtsjahr, Register-Herkunft) steht noch nicht im Prompt.
+
+#### N62.4 · Lage & Markt: Netz UND Zensus UND die Objektfelder gegenüberstellen
+
+**Marcel:** *„Bei Lage und Markt könnten wir zusätzlich einmal die
+Makrolage, Mikrolage, Mietspiegel, Preisniveau aus dem Netz beziehen, aber
+auch mit Quellen dort legen … ich meine wir fragen das bei Census ab, die
+Lage und allem, dass wir auf diese Sachen dann dort eingehen. Und wir haben
+ja auch im Objekt, das wird ja dann auch aus dem Bericht geholt, da haben
+wir ja Wertsteigerungspotenzial, Nachfrageindikatoren,
+Bevölkerungsentwicklung, Entwicklungsmöglichkeiten. Also dass wir da
+wirklich die Daten halt auch abfragen und verwerten und das auch
+gegenüberstellen nochmal mit dem Mietspiegel oder der Recherche aus dem
+Netz."*
+
+Ergänzt **N61.4**. Neu darin sind drei Dinge: die **Zensus**-Daten (der
+Marktbericht fragt sie ab), das **Preisniveau aus dem Netz mit
+Quellenangabe**, und die **Gegenüberstellung** mit den vier Objektfeldern.
+`nutzerEinschaetzung()` liefert die neun Indikatoren seit `v1851` —
+gegenübergestellt werden sie nirgends.
+
+#### N62.5 · Ein eigener Reiter „Quellen" in der Pilot-Analyse
+
+**Marcel:** *„Wir brauchen dann extra Reiter auch nochmal für die Quellen,
+dass wir wirklich nochmal alle Quellen, die wir gesagt, die wir angeben,
+dass wir die dort nochmal ausgeben können, dass wir auch die Quellen, die
+wir zum Beispiel ermittelt haben, wenn wir Unterlagen beim Amt anfordern,
+dass auch die dort mit eingegeben werden."*
+
+Heute stehen die KI-Quellen als Block **innerhalb** von „Lage & Markt"
+(`ui.js:1725`). Die Quellen der Ämter-Recherche (`unterlagen_aemter.
+quelle_url` und seit `v2151` `seiten.pro_seite`) sind mit der
+Pilot-Analyse **nicht verknüpft** — und die des Marktberichts
+(`quellen_nachweis`) auch nicht.
+
+#### N62.6 · Steuerliche Zusammenfassung in der Pilot-Analyse — und im Soll/Ist
+
+**Marcel:** *„Dann bei der Pilotanalyse natürlich auch eine steuerliche
+Zusammenfassung machen. Das soll natürlich auch mit in den Soll-Ist-Abgleich
+einfließen."*
+
+Ergänzt **N60.18** (dort steht der Wunsch seit dem 08.10. als Stichwort)
+und **N61.2**. Der Prompt hat einen `## STEUER`-Block (`v2011`), aber kein
+Antwortfeld für eine Zusammenfassung — und ohne Zielfeld fällt der Auftrag
+lautlos auf den Boden.
+
+#### N62.7 · Landingpage: der Leistungsumfang gehört unter „Funktionen"
+
+**Marcel:** *„wir haben ja jetzt einmal ausgearbeitet, was DealPilot kann,
+was wir tun und allem. Vielleicht können wir das irgendwo auch noch mit auf
+die Internetseite einarbeiten. Wir haben auf der DealPilot-Seite einmal
+unter Funktionen den Leistungsumfang. Vielleicht passt das da irgendwo noch
+mit rein."*
+
+**Optik und Produkttext → Entwurf nach `design/Vorschläge/`, dann zeigen.**
+
+#### N62.8 · Preise: Integrationsservice und Bestandsmigration
+
+**Marcel:** *„dann wäre es cool, wenn wir unter Preise auch so einen
+Integrationsservice anbieten. … Und auch den Integrationsservice, dass wir
+sagen, wir migrieren auch Objektbestände. Das kann man bei uns anfragen,
+wenn das gemacht werden soll."*
+
+> **⚠ GELD. Wird nicht ohne Marcels Freigabe gebaut.** Ein
+> Integrationsservice braucht einen Preis, und der ist seine Entscheidung
+> — ebenso, ob es ein Festpreis, ein Tagessatz oder „auf Anfrage" ist.
+> Vorher gehört geprüft, ob die beworbene Leistung Code hat (es gibt einen
+> Portfolio-Import, `portfolioExport.js`/API) oder ob sie Handarbeit ist.
+
+#### N62.9 · Subpage zum F&E-Projekt und zur Portfolio-Strategie
+
+**Marcel:** *„dass wir auch noch ein bisschen was kurz zu unserem
+F&E-Projekt erklären. Dass wir da vielleicht noch mal eine Subpage haben,
+wo wir ein bisschen was zur Portfolio-Strategie erklären. … Dann natürlich
+nicht sagen, wie wir es machen, weil es ein Forschungsprojekt, aber einfach
+was passieren soll. Und dass wir mit Steuerkanzleien dort zusammenarbeiten."*
+
+Quelle für den fachlichen Rahmen: **`E:\Portfolio Strategie`** (eigenes
+Repo, bescheinigtes Vorhaben **827-757-583** nach § 6 FZulG, Laufzeit
+01.01.2026–31.12.2028). **Das Verfahren selbst gehört nicht auf die
+Seite** — nur, was es leisten soll. Vorhanden ist bisher nur das
+BSFZ-Siegel auf der Landing (N14, `v1873`).
+
+#### N62.10 · Tab Steuern: das Vorjahr duplizieren
+
+**Marcel:** *„bei der im Tab Steuern wäre das gut, wenn wir auch immer so
+das Vorjahr duplizieren können. Manche Sachen wiederholen sich ja. So
+können dann die Sachen übernommen werden. Außer jetzt die, die fest sind.
+Also die wir eh schon rausnehmen, wie Schuldzinsen oder so, AfA."*
+
+Die Unterscheidung **wiederkehrend gegen fest** ist der Kern: Schuldzinsen
+sinken mit der Restschuld, die AfA ist je Jahr festgelegt — wer sie
+mitkopiert, trägt eine falsche Zahl in ein Steuerjahr. Vor dem Bauen
+gehört die Feldliste des Reiters durchgegangen und **je Feld entschieden**,
+ob es wiederkehrt.
+
+---
+
 ### N61 · Marcels Paket vom 12.10.2026 — sechs Punkte, wörtlich aufgenommen
 
 **Marcel hat sie aufgegeben, weil er sie im Backlog vermisste:** *„was mir
