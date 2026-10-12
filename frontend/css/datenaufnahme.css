@@ -3017,3 +3017,59 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     flex: 0 0 auto !important;
   }
 }
+
+/* =====================================================================
+   v2133a - DER WIEDERBELEBTE ENTWURF BRACHTE EINEN 29-PX-KNOPF MIT
+
+   Abnahme von v2133: 2 Stile x 10 Breiten. Die Zeile wirkt jetzt
+   (35 von 44 Regeln treffen, Marke gesetzt) und ist sauber -
+   KAPP 0, RAUS 0, ZUBREIT 0, QUER 0, Textkontrast ueberall >= 4,5.
+
+   Gemessen gegen die Vorgabe:
+
+     Breite   Vorgabe              Zeile
+      360     360x445  Knopf 50    360x334  Knopf 29
+      390     357x445  Knopf 50    357x334  Knopf 29
+      430     397x445  Knopf 50    430x334  Knopf 29
+      768     695x383  Knopf 44    695x253  Knopf 44
+      834     761x383  Knopf 44    761x253  Knopf 44
+     1024     703x248  Knopf 44    703x203  Knopf 44
+     1180     888x137  Knopf 44    888x136  Knopf 44
+     1280     988x117  Knopf 33    988x114  Knopf 29
+     1440    1148x 78  Knopf 33   1148x132  Knopf 29
+     1920    1280x 78  Knopf 33   1280x 80  Knopf 29
+
+   Die Leiste wird 111 px flacher - genau das, was der Entwurf
+   verspricht. Der Knopf aber faellt auf **29 px**, weil die
+   Zeile-Regel ausdruecklich `min-height:0` setzt:
+
+     body.dp-pfzeile .dp-pfbar button#oab-run{ min-height:0 !important;
+       padding:8px 18px !important; font-size:13px !important }
+
+   Das war richtig: der Kommentar daneben erklaert, dass der 50-px-Knopf
+   die Zeile auf 76 statt 54 px trieb. Nur gab es damals die
+   Touchflaechen-Regel aus v2121a noch nicht.
+
+   > **Zwischen 641 und 1200 px gewinnt v2121a mit (2,1,1) gegen die
+   > (1,3,2) der Zeile** - deshalb stehen dort 44 px. Unter 641 gilt das
+   > Band nicht, und darunter liegen genau die Handys.
+
+   Also 44 px bis 900 px, und darueber bleibt die Zeile kompakt - sie
+   ist dort ein Entwurf fuer die Maus. Spezifitaet (2,2,2) gegen die
+   (1,3,2) des Entwurfs.
+
+   ── OFFEN UND BENANNT ─────────────────────────────────────────────
+   Bei 1440 px ist die Zeile **132 px** hoch, die Vorgabe 78. Bei
+   1920 px sind es 80. Nichts ist abgeschnitten und nichts laeuft
+   hinaus - die Leiste bricht dort nur eine Zeile mehr um als die
+   Vorgabe. Das ist eine Optikfrage am Entwurf, kein Defekt, und
+   gehoert Marcel gezeigt statt von mir entschieden.
+   ===================================================================== */
+@media (max-width: 900px){
+  body.dp-pfzeile :is(#oab-bar,#qc7-sources).dp-pfbar button#oab-run,
+  body.dp-pfzeile :is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch{
+    min-height: 44px !important;
+    padding-top: 11px !important;
+    padding-bottom: 11px !important;
+  }
+}
