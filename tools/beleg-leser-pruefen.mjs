@@ -9,10 +9,17 @@
  * „steht nicht auf der Quellseite" — für eine Adresse, die dort steht.
  * Der Nutzer bekommt eine Warnung für einen korrekten Fund.
  *
- * GEMESSEN am 12.10.2026 an der Fassung vor v2151: von neun echten
- * Schreibweisen wurden VIER verfehlt, und drei der fünf Treffer kamen
- * über einen Rückfall, der die Adresse nie gesehen hatte
- * (`includes(konto) && includes(domain)`).
+ * GEMESSEN am 12.10.2026 an der Fassung vor v2151: von den 19
+ * Schreibweisen unten wurden SIEBEN verfehlt, und ein Teil der Treffer
+ * kam über einen Rückfall, der die Adresse nie gesehen hatte
+ * (`includes(konto) && includes(domain)`) — der also auch „bestätigt"
+ * sagt, wenn „info" im Menü steht und die Domain im Impressum.
+ *
+ * Abschnitt 5 rechnet diese Zahlen bei jedem Lauf NEU aus, gegen die
+ * wörtlich nachgebaute alte Logik. Eine Zahl im Kopf eines Prüfers
+ * veraltet, eine gemessene nicht — mein erster Stand sagte hier
+ * „neun, vier verfehlt", und das stimmte nur für die neun Fälle, die
+ * ich zuerst geschrieben hatte.
  *
  * ── DIESER PRUEFER HAT ZWEI HAELFTEN ────────────────────────────────
  *
@@ -26,12 +33,41 @@
  * Er lädt den ECHTEN `unterlagenService.js` und ruft die ECHTE
  * Funktion. Ein Prüfer, der den Extraktor abschreibt, misst sich selbst.
  * ══════════════════════════════════════════════════════════════════════ */
+import fs from 'node:fs';
 import path from 'node:path';
 import Module from 'node:module';
 import { createRequire } from 'node:module';
 
-const WURZEL = process.cwd();
-const require_ = createRequire(path.join(WURZEL, 'backend', 'src', 'x.js'));
+/* ── ZWEI UMGEBUNGEN, EIN PRUEFER ───────────────────────────────────
+ *
+ * Im Repo liegt der Dienst unter `backend/src/services/`, IM CONTAINER
+ * unter `/app/src/services/` — das Image kopiert `backend/` als
+ * Wurzel. Ein Pruefer, der nur den Repo-Pfad kennt, laeuft dort nicht,
+ * und genau dort sind `pg` und `dotenv` echt installiert.
+ *
+ *   > Gemessen am 12.10.2026: `docker exec … node /tmp/p.mjs` brach mit
+ *   > „Cannot find module './services/unterlagenService.js'" ab. Ein
+ *   > Pruefer, der nur in einer Umgebung laeuft, prueft die andere nie
+ *   > — und die andere ist die ausgelieferte.
+ *
+ * Gesucht wird nach der DATEI, nicht geraten. Der gefundene Pfad wird
+ * unten in der Deckung genannt. */
+const KANDIDATEN = [
+  path.join(process.cwd(), 'backend', 'src'),
+  path.join(process.cwd(), 'src'),
+  '/app/src',
+  '/app/backend/src'
+];
+let BASIS = null;
+for (const k of KANDIDATEN) {
+  if (fs.existsSync(path.join(k, 'services', 'unterlagenService.js'))) { BASIS = k; break; }
+}
+if (!BASIS) {
+  console.error('unterlagenService.js in keinem dieser Pfade gefunden:\n  '
+    + KANDIDATEN.join('\n  '));
+  process.exit(2);
+}
+const require_ = createRequire(path.join(BASIS, 'x.js'));
 
 /* ── WARUM EIN STUB, UND WARUM NUR EINER ────────────────────────────
  *
@@ -233,7 +269,7 @@ if (!(fehlalarm && neuSauber)) rot++;
 
 console.log('');
 console.log('=== Deckung ===');
-console.log('  Dienst      : der ECHTE backend/src/services/unterlagenService.js');
+console.log('  Dienst      : der ECHTE ' + BASIS + '/services/unterlagenService.js');
 console.log('  Gestellt    : ' + (gestellt.length ? gestellt.join(', ') + ' (lokal nicht installiert)'
   : 'nichts — alle Abhaengigkeiten waren echt da'));
 console.log('  Faelle      : ' + faelle);
