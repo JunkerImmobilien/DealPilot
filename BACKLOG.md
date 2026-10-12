@@ -200,6 +200,76 @@ mitkopiert, trägt eine falsche Zahl in ein Steuerjahr. Vor dem Bauen
 gehört die Feldliste des Reiters durchgegangen und **je Feld entschieden**,
 ob es wiederkehrt.
 
+#### N62.11 · Eine Standard-Lageklasse, und sie muss sich diktieren lassen
+
+**Marcel am 12.10.2026:** *„Wir haben ja im Quickcheck auch die
+Lageklassen, die man auswählen kann. Da sollten wir zusehen: Wenn wir uns
+neu anmelden, dann kommt ja ein Modal, wo wir diese Werte setzen können,
+dass wir auch einen Standard wählen können. So mit einer kleinen
+Begründung wird dann im Quickcheck als Standard gesetzt oder so. Dass wir
+aber auch die Möglichkeit haben, die zu überschreiben. Das heißt, dass wir
+auch wenn wir in der Datenaufnahme Sprache auswählen, dass wir dort auch
+die Lage angeben können und dann wird die halt einfach dementsprechend
+überschrieben. Also es wird ja sowieso alles überschrieben, was wir extra
+diktieren, dass wir darauf achten."*
+
+**Gemessen am 12.10.2026 — zwei Lücken:**
+
+| | Stand |
+|---|---|
+| Onboarding-Modal | setzt die **Ziel-Renditen** je Klasse (`.dpo-lage-f` → `DealPilotLageProfil.setze(k, 'ziel_bmr', …)`, `onboarding.js:564/723`) — **aber keine Standard-KLASSE**. Man kann nicht sagen „meine Objekte sind meistens B-Lage" |
+| Diktat | **die Lageklasse kommt im Diktat gar nicht vor** — null Treffer für `lageklasse` in `voice-import.js` und `voiceExtractService.js`. Sie lässt sich also nicht diktieren und damit auch nicht überschreiben |
+
+**Die Kette, die Marcel beschreibt:**
+
+```
+Onboarding: Standardklasse wählen (mit Begründung, warum sie zählt)
+     ↓  wird Vorbelegung
+Quick-Check: Lageklasse vorbelegt, überschreibbar
+     ↓  wird überschrieben von
+Diktat/Datenaufnahme: „B-Lage" gesagt → gewinnt
+```
+
+**Marcels Grundsatz dazu, und er gilt über die Lage hinaus:** *„es wird ja
+sowieso alles überschrieben, was wir extra diktieren."* Das Diktat ist die
+ausdrückliche Angabe des Nutzers und schlägt jede Vorbelegung. Beim Bauen
+gehört geprüft, ob das **überall** so ist — ein Diktat, das eine
+Vorbelegung nicht überschreibt, ist ein stiller Datenverlust.
+
+**Riegel beachten:** `zielBmr()` gibt `null` ohne Klasse, und
+`ZIEL_BMR_RUECKFALL = 6` greift dann (`qc-heuristik.js:217`). Eine
+Standardklasse darf diesen Riegel nicht aushebeln — sie ist eine
+**Vorbelegung**, keine Annahme. Was der Nutzer nie gesetzt hat, muss als
+Vorgabe gekennzeichnet bleiben (dieselbe Unterscheidung wie in `v2140b`
+beim Investmentprofil: „selbst gesetzt" gegen „Vorgabe, nicht gesetzt").
+
+#### N62.12 · Die geführte Eingabe durchgehen — Plausibilität und Vollständigkeit
+
+**Marcel:** *„dass wir das auch in der geführten Tour haben. Also die
+nochmal durchgehen: Plausibilität, sind alle Daten drin, sind alle Stufen
+drin, wird der Kunde da vernünftig durchgeführt. Das sollten wir auch
+nochmal machen."*
+
+Gemeint ist die **geführte Datenaufnahme** (`dp-diktat.js`,
+`pilot-sprache.js`, `voice-import.js`), nicht die Onboarding-Tour aus
+N62.1. Vier Fragen, und jede braucht eine eigene Messung:
+
+1. **Plausibilität** — fängt die Strecke unsinnige Angaben ab, oder
+   schreibt sie sie durch? (Vgl. `N60.x` und die Lehre aus
+   `stille-verwerfung`: unbekannte Felder wurden bei `/bmf/aufteilung`
+   kommentarlos übersprungen.)
+2. **Sind alle Daten drin** — welche Felder des Reiters Objekt lassen sich
+   diktieren, und welche nicht? Die Lageklasse ist schon als fehlend
+   gemessen (N62.11).
+3. **Sind alle Stufen drin** — die Erfassung hat Etappen; kommt der Nutzer
+   durch alle, oder endet die Strecke vorzeitig?
+4. **Wird der Kunde vernünftig durchgeführt** — Reihenfolge, Rückfragen,
+   was passiert bei einer Lücke.
+
+**Reihenfolge laut Marcel:** *„Aber das machst du im Anschluss an die
+ganzen Punkte, die du jetzt gerade abarbeitest."* Also **nach** N62.3
+bis N62.6 (Pilot-Analyse).
+
 ---
 
 ### N61 · Marcels Paket vom 12.10.2026 — sechs Punkte, wörtlich aufgenommen
