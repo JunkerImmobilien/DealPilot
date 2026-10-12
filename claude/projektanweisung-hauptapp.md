@@ -38182,3 +38182,74 @@ eingeloggt, einer zuletzt am 01.08.2026.
 | drei aktive Prod-Konten ohne `is_test_user` | **gemessen, Marcel vorgelegt** |
 | EK-Quote-Skala bestraft 100 % Eigenkapital | Bewertungsfrage, offen |
 | Cashflow-Skala beim Barkauf | von Marcel vertagt |
+
+## Rollout-Journal 12.10.2026 — v2145: der Stand-Umschalter in den Layouts
+
+| Was | Commit |
+|---|---|
+| `v2145` `#dk-schalter` wandert mit der Objektliste | `8385fba6` |
+
+Marcel: *„was mir aufgefallen ist, dass man beim Aussehen Aktenmappe,
+Kanzlei und Tower keine umschalter zwischen Bestand und ankauf hat."*
+
+### Gemessen, bevor etwas gebaut wurde
+
+```
+  #dk-schalter sitzt in #sidebar
+  html[data-dp-layout] #sidebar { display:none }   layout-varianten.css
+  -> in allen drei Layouts: im DOM, 0x0, unsichtbar
+```
+
+Der Schalter ist **nicht kaputt und nicht versteckt** — er trägt
+`display:flex`, `visibility:visible`, `opacity:1`. Er fällt mit seinem
+Elternteil.
+
+### Die Ursache stand im eigenen Kommentar
+
+`KNOTEN` ist eine **handgeführte Liste** dessen, was aus `#sidebar`
+gerettet wird. Daneben steht, gemessen am Tag ihrer Entstehung:
+
+```
+  .sb-header   leer (49 px)
+  ...
+  "Der leere .sb-header bleibt, wo er ist."
+```
+
+**Damals war er leer.** In `v2040` hat der Stand-Umschalter genau dort
+seinen Platz bekommen (Marcel: *„das soll ganz nach oben … unter das
+DealPilot Logo"*) — und stand seitdem in einem Block, den die Layouts
+ausdrücklich zurückgelassen haben.
+
+> **Eine handgeführte Liste ist jedem späteren Einbau hinterher, und
+> zwar lautlos: der Knoten ist da, er ist nur nirgends.**
+
+Dasselbe Muster wie bei `SAATDATEIEN` — die Ernte stand in der Datenbank
+und erreichte keinen Bericht.
+
+### Gebaut
+
+`KNOTEN.stand = '#dk-schalter'`, und er wandert mit der **Objektliste**
+mit, die er umschaltet — dieselbe Mechanik wie der Aktions-Aufklapper
+eine Zeile darüber. `hole()` legt den Rückweg in `merker` ab, also steht
+er beim Verlassen des Layouts wieder unter dem Logo.
+
+**Er heißt `stand`, nicht `schalter`:** `KNOTEN.schalter` ist bereits
+der Aktions-Aufklapper (`#sb-actions-trigger-btn`). Zwei Dinge auf einem
+Namen löschen sich lautlos — siehe die Attributnamen-Falle bei
+`data-dp-karte`.
+
+### Nachweis am laufenden Staging
+
+```
+  Layout       Schiene  Umschalter   y    erreichbar  ueber der Liste
+  Aktenmappe   auf      232x32       185  ja          ja
+  Kanzlei      auf      232x32       185  ja          ja
+  Tower        auf      232x32       185  ja          ja
+
+  ohne Layout: zurueck in #sidebar, display flex
+```
+
+**Eine Messfalle dabei:** der Layout-Wechsel schließt die
+Portfolio-Schiene jedes Mal. Wer direkt nach `setze()` misst, sieht
+0×0 und hält den Einbau für gescheitert. Die Schiene gehört nach jedem
+Wechsel per Bedienweg geöffnet — erst dann misst man das Ergebnis.
