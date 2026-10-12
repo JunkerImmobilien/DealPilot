@@ -4932,6 +4932,27 @@ und Übernehmen überall erreichbar.
 
 ---
 
+#### N60.17 · ✅ DAS PRÜFWERKZEUG STEHT — am Code nachgemessen 12.10.2026
+
+> Alles in `frontend/messkabine.html` (nicht in `tools/`):
+>
+> ```
+>   :1753  pruefeAnsicht(breite, hoehe, vorher, name, layout, extra)
+>   :1512  apQuerScroller   + :1529 apQuerUngewollt (Absicht --dpm-schiene)
+>   :1475  apUeberlauf      echter Ueberlauf vs. von Scrollern gefangener
+>   :1792  pruefSelbsttest  prueft den Pruefer gegen eine kuenstliche Decke
+>   :172   GERAETE          8 Geraete, 360 bis 1280 px
+> ```
+>
+> `pruefeAnsicht` scrollt in bis zu 16 Abschnitten, misst je Abschnitt
+> verdeckte und erdrückte Elemente über `elementsFromPoint` und prüft
+> **jeden Verdacht zweimal nach** (zentriert und am Seitenanfang).
+>
+> **Offen bleibt der Durchgang selbst**, nicht das Werkzeug. Und zwei
+> Breiten fehlen in `GERAETE`: **320 px und 1920 px**.
+
+**Der ursprüngliche Text:**
+
 #### N60.17 · Responsive-Durchgang der ganzen App (Master-Prompt)
 
 ### ✓ DATENAUFNAHME ABGEARBEITET 11.10.2026 (`v2117`–`v2117b`)
@@ -6472,6 +6493,29 @@ belegten Einstiege:
 
 ---
 
+### N51 · ⚠ TEILS ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> **Erledigt ist der Link-Teil:** `frontend/js/unterlagen-modal.js:294-298`
+> rendert `antrag_url` immer als Verweis, kein `else if` mehr (v1971c).
+>
+> **Offen sind zwei Dinge, und das erste ist grundsätzlich:**
+>
+> 1. **Ansprechpartner 1 und 2 gibt es nicht** — gesucht nach
+>    `ansprechpartner`, `ap1`, `ap2` in `unterlagen-modal.js`,
+>    `unterlagenService.js`, dem ganzen Backend, dem Marktbericht und in
+>    `083_unterlagen_aemter.sql`: **kein Treffer.** Das Datenmodell führt
+>    **genau eine Behörde** je (Gemeinde, Unterlagenart), keine
+>    Personenliste — und der KI-Auftrag (`unterlagenService.js:307`)
+>    fordert ein einzelnes Objekt. Das ist kein fehlendes Feld, sondern
+>    eine andere Datenform.
+> 2. **Die Belegprüfung je Seite** fehlt: `belegPruefen()`
+>    (`unterlagenService.js:239-261`) prüft EINE Adresse gegen EINE
+>    Quellseite; `seiten` ist nur eine URL-Liste (max. 8).
+>
+> Die Vorlage `unterlagen-app-v6` liegt **nicht im Repo**.
+
+**Der ursprüngliche Text:**
+
 ### N51 · Unterlagen-Modul: Ansprechpartner 1 und 2 aus v6 übernehmen (08.10.2026)
 
 **Marcels Auftrag:** „im Dateien-Ordner diese Datei `unterlagen-app-v6-ansprechpartner` …
@@ -6881,6 +6925,19 @@ Garagen-BGF in den Sachwert eingeht.
 4. Danach die drei Sachwerte oben neu rechnen und gegen die 242.274 € aus CLAUDE.md halten.
 
 ---
+
+### N45 · ✅ ERLEDIGT — 34 Media-Queries, am Code gezählt 12.10.2026
+
+> `frontend/css/datenaufnahme.css`, 3.241 Zeilen, **34 `@media`-Blöcke**.
+> Breakpoints: 560 · 640 · 641 · 700 · 701 · 769 · 820 · 900 · 901 ·
+> 1024 · 1100 · 1140 · 1200 · 1400 · 1401 · 1439.
+>
+> **320–1920 px sind durchgehend abgedeckt**, aber nicht mit eigenen
+> Endstufen: unter 560 px gilt der 560er-Block (auch bei 320), über
+> 1439 px nur die Grundschicht. Das ist eine bewusste Lage, kein Loch —
+> wer dort eine eigene Stufe braucht, misst sie zuerst.
+
+**Der ursprüngliche Text:**
 
 ### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
 
@@ -7824,6 +7881,31 @@ Altenpflegeheim und Wochenendhaus), 395 Sperren. 280 davon sagen dasselbe: RP un
 kostenpflichtig und genehmigungspflichtig. **Frage:** je Gebiet eine Sperre (so wie geliefert) oder
 eine je Land? Dazu aus demselben Lauf: Otterndorf-Resthöfe 2024 → 2026 fortschreiben? Ostfriesische
 Ferienwohnungen auf Gemeindeebene ernten (Inseln sind eigene Gemeinden)?
+
+### N32 · ⚠ OFFEN im Kern — nachgemessen 12.10.2026, die Zahl ist gewachsen
+
+> `gutachterausschuss.js:430-443` (`unvollstaendig()`) liest **nur**
+> `unvollstaendig_grund`. `warum_kein_wert` kommt in der ganzen Datei
+> **nicht vor** — weder gesetzt noch gelesen noch weitergegeben.
+>
+> Am Registerbestand gezählt (alle 62 Dateien geparst):
+>
+> ```
+>   1.393 Saetze tragen warum_kein_wert, alle mit vollstaendig=false
+>      33 davon tragen es OHNE unvollstaendig_grund
+>          -> ihre Begruendung faellt still auf den Boden
+>     109 Saetze tragen umgekehrt nur unvollstaendig_grund
+> ```
+>
+> *(N32 nannte 34 von 86 — derselbe Befund, der Bestand ist gewachsen.)*
+>
+> **Ein zweiter Kanal funktioniert:** `quellen_links.js:474` gibt
+> `warum_kein_wert` aus einer **handgeführten** Liste aus, und die
+> Marktbericht-Ansicht zeigt es (`app.js:782`, `:884`, `:4215`). Der Text
+> erreicht den Nutzer also — aber nur, wenn jemand ihn dort eingetragen
+> hat. Der aus dem **Registersatz** erreicht ihn nicht.
+
+**Der ursprüngliche Text:**
 
 ### N32 · Befunde am Rechenkern aus den Ernteläufen (05.10.2026)
 
@@ -10186,6 +10268,20 @@ Die fehlende KPI-Angabe ist behoben (v1654d: `.sc-pill-sub` stand auf
 > eine Rendite, ist aber ein Score-Anteil. Die Demo zeigt beides
 > getrennt. **Das ist eine Produktentscheidung** — vor dem Bauen mit
 > Marcel klären, ob die Kennzahlenzeile die echten Werte tragen soll.
+
+### P3b · ✅ ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> Beide Regeln stehen, jede mit Messprotokoll im Kommentar:
+> `frontend/css/hell-varianten.css:157-159` blendet `#dp-kv-panel` unter
+> 900 px aus (v1652c), `frontend/css/layout-varianten.css:1418-1420`
+> dasselbe für `.dpl-schalter` (v1652d). Dazu `layout-varianten.css:2356`
+> — die Leiste wandert auch auf dem Schreibtisch nach rechts, weil sie
+> dort über dem Nutzerblock lag.
+>
+> Der Punkt bleibt als **Merkposten** stehen: er beschreibt das Muster,
+> nicht die Arbeit. Ein drittes festes Fenster hätte dasselbe Problem.
+
+**Der ursprüngliche Text:**
 
 ### P3b · Zwei Werkzeugfenster, die auf dem Handy im Weg standen
 
@@ -15031,6 +15127,19 @@ Gutachten der schwerste formale Mangel. Braucht eine mb-Migration.
 
 ### C · REGISTER UND QUELLENREGISTER
 
+### C1 · ✅ ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> `marktbericht/backend/migrations/006_harvest.sql:40` legt
+> `mb.gaa_documents` an (Fremdschlüssel auf `gaa_sources`, Unique auf
+> `url`, Arbeitsindex auf `(status, lauf_typ)`), erweitert um Preis,
+> Bestell-URL und Prüfstand in `007_quellenregister.sql:14-30`.
+>
+> **Und sie wird benutzt:** geschrieben in `HarvestService.js:171`,
+> gelesen in `routes/api.js:179` (die Dokumentzahl je Quelle, die im
+> Admin erscheint) und in `HarvestService.js:441` (Statusstatistik).
+
+**Der ursprüngliche Text:**
+
 #### C1 — Quellenregister in der Datenbank *(Marcels Vorgabe vom 13.09.)*
 
 **Ziel:** Für jeden Ausschuss steht in der Datenbank, **woher** die Zahl kommt —
@@ -15086,6 +15195,30 @@ Vier Regeln, nicht verhandelbar:
 - **Der Link kommt aus der Datenbank**, nicht aus einer Frontend-Konstante —
   sonst gibt es eine zweite Wahrheit neben C1
 
+### C3 · ⚠ TEILS — und der alte Satz war falsch (nachgemessen 12.10.2026)
+
+> **Hier stand: „Heute gibt es dafür im Admin nichts. Kein View, keine
+> Route." Das stimmt nicht.**
+>
+> ```
+>   View    frontend/admin/index.html:384  <section id="view-marktzinsen">
+>           „Marktzinsen & Gutachterausschuss-Daten"
+>   UI      frontend/admin/js/admin-marktzinsen.js
+>           quellenTabelle() :117-156 (Land · Ausschuss · Zugang)
+>           Werte mit „Seite / Zitat aus dem Bericht" :384
+>   Route   backend/src/routes/admin.js:1968 -> _mbCall GET /harvest/status
+>           -> marktbericht routes/api.js:170-194 (quellen, werte, namen)
+> ```
+>
+> **Was wirklich fehlt, ist der zweite Reiter „Bestand":** die Ansicht
+> der Registersätze selbst, filterbar nach Land, Kennzahl, Ausschuss und
+> Berichtsjahr. Belege für den Negativbefund: `register/stand` existiert
+> nur im mb-Container (`api.js:61`) und ist im Haupt-Backend **nicht
+> durchgeschleift** (kein Treffer in `admin.js`); `kennzahl` und
+> `Berichtsjahr` kommen in `admin-marktzinsen.js` **nicht vor**.
+
+**Der ursprüngliche Text:**
+
 #### C3 — Admin-View „Ausschuss-Register"
 
 **Heute gibt es dafür im Admin nichts.** Kein View, keine Route. Der einzige
@@ -15107,6 +15240,31 @@ Drei Fallen (alle schon einmal bezahlt): der Admin-API-Wrapper exportiert
 Und: **die Daten liegen in der mb-DB, der Admin hängt am Haupt-Backend** — der
 Weg führt über den Proxy, und `qstrUser()` ist dort der falsche Pfad.
 **Das gehört bewusst entschieden, nicht nebenbei.** Details in Block 04.
+
+### C4 · ⚠ TEILS — das Register rechnet, aber die Module gewinnen zuerst
+
+> Am Code nachgemessen (12.10.2026),
+> `marktbericht/backend/src/lib/gutachterausschuss.js:689-698`:
+>
+> ```js
+>   export function sachwertfaktor(o) {
+>     const a = zustaendig(ags);
+>     if (a) { … r.herkunft = 'modul'; return r; }     <- Modul zuerst
+>     const ausRegister = ausRegisterRechnen(o, ags);   <- Register danach
+> ```
+>
+> **Der Registerweg ist vollständig gebaut** — `ausRegisterRechnen()`
+> (`:506 ff.`) siebt Ebenen, löst Lageklassen auf, wählt Zweig und
+> Baujahrgruppe und rechnet über `swf_modelle.auswerten()`, mit
+> `herkunft: 'register'` und Modellvermerk. Lüdenscheid, Höxter und der
+> Märkische Kreis liegen im Register.
+>
+> **Nicht vollzogen ist der letzte Schritt von C4:** „`sachwertfaktor()`
+> auf das Register umstellen, die zwei Module als Rückfall". Im Code ist
+> es umgekehrt — für Minden-Lübbecke (AGS 05770) und Herford (05758)
+> wird das Register **nie** gefragt.
+
+**Der ursprüngliche Text:**
 
 #### C4 — Sachwertfaktoren ins Register
 
