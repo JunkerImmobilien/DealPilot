@@ -38074,3 +38074,111 @@ Aufruf im Container beweist, dass sie steht.
 |---|---|
 | Investor Deal Score beim Barkauf | **weiter offen, Marcel vorgelegt** |
 | Cashflow-Skala beim Barkauf | braucht eine Zahl von Marcel |
+
+## ✅ PROD-ROLLOUT 12.10.2026 — v1951 bis v2144
+
+**Marcels Freigabe:** *„ja das sind alles demo user"* auf die Vorlage,
+die die neun aktiven Prod-Konten nannte.
+
+| | |
+|---|---|
+| Merge-Commit | `74841228` |
+| Spanne | v1951 → v2144, **275 Pakete, 388 Commits** |
+| Umfang | 177 Dateien, 43.374 Zeilen dazu |
+| Migrationen | **genau eine: 086** |
+| Prod vorher | `9c1531ae` (v1950a, 07.10.) |
+
+### Der kritische Teil, und er ist gut ausgegangen
+
+**Migration 086 war der ganze Rollout.** Vorher gemessen:
+
+```
+  14 Nutzer, 9 aktiv, 0 mit Bestaetigungsstempel
+  -> 9 waeren ohne 086 ausgesperrt worden
+  Migrationsstand 85
+```
+
+Das ist genau das, was auf Staging passiert ist, als `v2136` ohne die
+Migration lief. Diesmal lagen beide im **selben Image**, die Migration
+läuft beim Containerstart vor dem ersten Request.
+
+**Nachher gemessen:**
+
+```
+  Migrationsstand            86
+  14 Nutzer, 9 aktiv, 9 mit Stempel, 0 ohne
+  dealpilot-backend          Up, healthy
+  Fehler im Log seit Start   0
+```
+
+> **Niemand ausgesperrt.** Der Fehler vom Vormittag auf Staging hat den
+> Rollout am Abend gerettet — weil er die Migration erzwungen hat, die
+> hier mitging.
+
+### Vor dem Eingriff gesichert, und angesehen
+
+```
+  /root/backups/haupt-vor-v2144-20261012-1340.sql.gz   11 MB
+  /root/backups/mb-vor-v2144-20261012-1340.sql.gz     1,6 MB
+```
+
+Beide mit `ls -lh` und `zcat | head -2` geprüft — die Marktbericht-DB
+steht in keinem Backup-Skript und braucht ihren eigenen `pg_dump`.
+
+### Abnahme am laufenden Prod
+
+```
+  Rechenkerne im Image
+    Barkauf ohne Parameter   72   unveraendert
+    Barkauf mit darlehen 0   82
+    finanziert               58   unveraendert
+    C-Lage-Ampel             gelb
+    Score-Stufe 82           GUT
+
+  Oeffentliche Domain
+    /api/v1/public/stats     echte Daten (868 Nutzer, 26 Objekte)
+    Buster ausgeliefert      dealscore v2141, qc-heuristik v2143,
+                             dealscore2 v2144
+    POST /avm/quote          401 ohne Token (geschuetzt)
+    POST /marktbericht/...   401 ohne Token
+    POST /auth/resend-verify 200, neutraler Satz
+```
+
+**`/api/v1/public/stats` als Lebenszeichen, nicht der Statuscode:** die
+Domain antwortet auf jeden Pfad mit 200 und liefert die `index.html`.
+Ein 200 beweist dort nichts — nur der Inhalt.
+
+### Was mit rausging
+
+| Pakete | Was |
+|---|---|
+| `v2136`–`v2138` | Erstanmeldung mit 6 h Gnadenfrist statt Riegel, Band mit Restzeit, `resend-verify`, und der kleine Zwang: Marktbewertung und Marktbericht brauchen die bestätigte Adresse (N60.3) |
+| `v2139`–`v2140` | Neun Feldgruppen kamen nie im Prompt an — darunter ein 16-zeiliger Regelblock, dessen Werte nirgends standen. Dazu das Investmentprofil, das keinen Prompt erreichte, obwohl eine Vorlage es wörtlich versprach |
+| `v2141`–`v2144` | Der Barkauf: LTV und DSCR entfallen aus der Gewichtung statt mit Platzhaltern dazustehen — in **beiden** Scores. Marcels Frage „erst 44, dann 80" ist damit beantwortet |
+| `v2143` | Die Lageklasse ist der Maßstab der Bruttomietrendite-Ampel — nicht des Scores |
+| `v2104`–`v2135` | Datenaufnahme auf allen Geräten, Kartenstile, Kontraste |
+| `v2088`, `v2142` | Prozesskarte und Prozesskarte Detail für den Messestand |
+
+**Zwölf neue Prüfwerkzeuge**, alle RC=0 — auch auf dem main-Stand vor
+dem Push gefahren.
+
+### Ein Befund, der festgehalten gehört
+
+Marcel sagte, es seien alles Demo-Nutzer. **Gemessen tragen drei der
+neun aktiven KEIN `is_test_user`-Flag** — zwei haben sich nie
+eingeloggt, einer zuletzt am 01.08.2026.
+
+> Das ändert nichts am Rollout (086 setzt den Stempel für alle neun),
+> aber es ändert etwas an der nächsten Entscheidung: wer „das sind
+> Demo-Nutzer" sagt, sollte sich auf das Flag verlassen können. Drei
+> Konten ohne Flag sind entweder echte Interessenten oder ein
+> vergessenes Häkchen — und beides will man wissen, bevor man eine
+> Sperre scharfschaltet.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| drei aktive Prod-Konten ohne `is_test_user` | **gemessen, Marcel vorgelegt** |
+| EK-Quote-Skala bestraft 100 % Eigenkapital | Bewertungsfrage, offen |
+| Cashflow-Skala beim Barkauf | von Marcel vertagt |
