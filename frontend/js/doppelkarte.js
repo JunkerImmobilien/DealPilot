@@ -355,12 +355,39 @@
          Zuerst wird deshalb der Suche-Teil gesucht. Nur wenn es ihn
          nicht gibt (Standardansicht), bleibt es beim Platz vor der
          Liste. */
-      var sucheTeil = document.querySelector('.dpl-schiene .dpl-teil-suche');
+      /* ══ v2154b · DRITTER ANLAUF, UND DIESMAL DIE BEDINGUNG GEMESSEN ══
+
+         v2145a legte ihn vor die Liste, v2154a in den Suche-Teil. BEIDE
+         Faecher sind genau die, die bei `data-dpl-portfolio="zu"`
+         ausgeblendet werden — und zu ist der Auslieferungszustand.
+
+         Ich habe dreimal gefragt „wo gehoert er hin" und nie „welcher
+         Ort ist SICHTBAR, wenn das Portfolio zu ist". Gemessen am
+         12.10.2026 in der Kanzlei-Ansicht bei zugeklapptem Portfolio:
+
+           .dpl-marke          y=0     sichtbar
+           .dpl-portfolio      y=110   sichtbar   <- der Aktionen-Knopf
+           .dpl-teil-suche     0x0     AUSGEBLENDET
+           .dpl-teil-objekte   0x0     AUSGEBLENDET
+           .dpl-teil-tabs      y=147   sichtbar
+
+         > Ein Platz, der nur im aufgeklappten Zustand existiert, ist fuer
+         > einen Schalter kein Platz. Die Frage war nie die Reihenfolge,
+         > sondern die Sichtbarkeit.
+
+         Er ist jetzt ein DIREKTES Kind der Schiene und sitzt hinter
+         `.dpl-portfolio` — damit zwischen Aktionen-Knopf und Suche, wie
+         Marcel es beschreibt, und sichtbar in beiden Zustaenden.
+
+         Fachlich bleibt es richtig: er legt den Modus der Objektliste
+         um, und bei zugeklapptem Portfolio wirkt er auf die Liste, die
+         beim Aufklappen erscheint — nicht ins Leere. */
+      var schiene = document.querySelector('.dpl-schiene');
+      var aufklapper = schiene ? schiene.querySelector('.dpl-portfolio') : null;
       var inSidebar = liste && liste.closest && liste.closest('#sidebar');
-      if (sucheTeil && !inSidebar) {
-        /* VOR das Suchfeld, damit er zwischen Aktionen-Knopf und Suche
-           steht — genau die Stelle, die Marcel beschreibt. */
-        sucheTeil.insertBefore(s, sucheTeil.firstChild);
+      if (schiene && !inSidebar) {
+        if (aufklapper) schiene.insertBefore(s, aufklapper.nextSibling);
+        else schiene.insertBefore(s, schiene.firstChild);
       } else if (liste && !inSidebar && liste.parentNode) {
         /* Die Liste ist ausgewandert - der Schalter gehoert davor. */
         liste.parentNode.insertBefore(s, liste);

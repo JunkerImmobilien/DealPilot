@@ -949,13 +949,36 @@
            es passiert nichts — richtig so, ein Schalter ohne Gegenstand
            waere eine leere Zusage. (Gemessen: 6 von 33 Objekten tragen
            einen Stand, der Schalter entsteht also.) */
-        if (art === 'suche') {
-          var st = hole(KNOTEN.stand);
-          if (st) h.insertBefore(st, k);
-        }
+        /* v2154b: NICHT in den suche-Teil — der ist bei zugeklapptem
+           Portfolio ausgeblendet, genau wie der objekte-Teil von v2145.
+           Der Schalter wird unten als direktes Kind der Schiene
+           eingehaengt, hinter `.dpl-portfolio`. */
         schiene.appendChild(h);
       }
     });
+
+    /* ══ v2154b · DER STAND-SCHALTER, HINTER DEN AUFKLAPPER ════════════
+       Als direktes Kind der Schiene — nicht in einem `.dpl-teil`, denn
+       die beiden, in denen er bis v2154a lag (`objekte`, `suche`), sind
+       bei `data-dpl-portfolio="zu"` ausgeblendet. Gemessen am
+       12.10.2026: beide 0x0, der Aufklapper selbst y=110 sichtbar.
+
+       Steht NACH der Teile-Schleife, weil `.dpl-portfolio` erst dort
+       existiert. `hole()` merkt sich den Rueckweg — beim Verlassen des
+       Layouts steht er wieder unter dem Logo.
+
+       Er kann fehlen: `doppelkarte.js` baut ihn nur, wenn mindestens ein
+       Objekt einen Ankauf-Stand hat (gemessen: 6 von 33). Dann ist
+       `hole()` null und es passiert nichts — ein Schalter ohne
+       Gegenstand waere eine leere Zusage. */
+    if (!handyOben) {
+      var _st = hole(KNOTEN.stand);
+      if (_st) {
+        var _auf = schiene.querySelector('.dpl-portfolio');
+        if (_auf) schiene.insertBefore(_st, _auf.nextSibling);
+        else schiene.insertBefore(_st, schiene.firstChild);
+      }
+    }
 
     /* ── v1656 · DER ORT IST DOCH NICHT GLEICHGUELTIG ───────────────
        Hier stand: „Beide Stellungen stehen `position:fixed`; der Ort im
