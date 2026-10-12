@@ -267,6 +267,175 @@ console.log('  ' + (fehlalarm && neuSauber ? 'ok  ' : 'ROT ')
   + 'der alte Rueckfall belegte eine Adresse, die nicht da war — der neue nicht');
 if (!(fehlalarm && neuSauber)) rot++;
 
+/* ══ 6 · v2152 · DER ZUSAMMENBAU DER ANSPRECHPERSONEN ═════════════════
+ *
+ * `personenAus()` trifft fuenf Zusicherungen, und jede einzelne war
+ * einmal ein denkbarer Fehler:
+ *
+ *   hoechstens zwei            sonst wird aus einer Auskunft eine Liste
+ *   nie der Empfaenger         sonst steht eine Adresse doppelt im Brief
+ *   keine Dubletten            dieselbe Person aus zwei Quellen
+ *   bestaetigt nur wenn WIR    sonst ist der Beleg eine Behauptung
+ *     die Adresse gefunden
+ *     haben
+ *   kopie beginnt bei false    niemand wird ohne Zutun angeschrieben
+ */
+console.log('');
+console.log('=== 6 · Zusammenbau der Ansprechpersonen (v2152) ===');
+if (typeof U.personenAus !== 'function') {
+  console.log('  ROT personenAus() ist nicht exportiert');
+  rot++;
+} else {
+  const BELEG = {
+    alle: ['bauamt@stadt-xy.de', 'a.mueller@stadt-xy.de', 'b.schmidt@stadt-xy.de'],
+    pro_seite: [{ url: 'https://stadt-xy.de/bauamt',
+                  mails: ['bauamt@stadt-xy.de', 'a.mueller@stadt-xy.de', 'b.schmidt@stadt-xy.de'] }]
+  };
+  const Q = 'https://stadt-xy.de/bauamt';
+  const proben = [
+    ['hoechstens zwei', function () {
+      const p = U.personenAus([
+        { name: 'A', email: 'a.mueller@stadt-xy.de' },
+        { name: 'B', email: 'b.schmidt@stadt-xy.de' },
+        { name: 'C', email: 'c.klein@stadt-xy.de' }
+      ], 'bauamt@stadt-xy.de', BELEG, Q);
+      return p.length === 2 ? null : 'es sind ' + p.length;
+    }],
+    ['Empfaenger faellt heraus', function () {
+      const p = U.personenAus([{ name: 'X', email: 'bauamt@stadt-xy.de' }],
+        'bauamt@stadt-xy.de', BELEG, Q);
+      return p.some(function (x) { return x.email === 'bauamt@stadt-xy.de'; })
+        ? 'der Empfaenger steht in der Liste' : null;
+    }],
+    ['keine Dublette', function () {
+      /* ISOLIERT pruefen: der Belegsatz darf hier KEINE weitere
+         persoenliche Adresse tragen, sonst fuellt Schritt 2 legitim
+         eine zweite Person nach und die Probe misst das Auffuellen
+         statt die Dublette.
+         Genau daran ist mein erster Entwurf gescheitert — er erwartete
+         1 und bekam 2, und die 2 war richtig. */
+      const nurEine = { alle: ['bauamt@stadt-xy.de', 'a.mueller@stadt-xy.de'],
+                        pro_seite: [{ url: Q, mails: ['bauamt@stadt-xy.de', 'a.mueller@stadt-xy.de'] }] };
+      const p = U.personenAus([
+        { name: 'A', email: 'a.mueller@stadt-xy.de' },
+        { name: 'A nochmal', email: 'a.mueller@stadt-xy.de' }
+      ], 'bauamt@stadt-xy.de', nurEine, Q);
+      return p.length === 1 ? null : 'es sind ' + p.length
+        + ' (' + p.map(function (x) { return x.email || x.name; }).join(', ') + ')';
+    }],
+    ['Dublette aus beiden Quellen', function () {
+      /* Die KI nennt a.mueller, und a.mueller steht auch auf der Seite.
+         Das ist der Normalfall — er darf NICHT zwei Eintraege geben. */
+      const p = U.personenAus([{ name: 'A', email: 'a.mueller@stadt-xy.de' }],
+        'bauamt@stadt-xy.de', BELEG, Q);
+      const wievielMal = p.filter(function (x) { return x.email === 'a.mueller@stadt-xy.de'; }).length;
+      return wievielMal === 1 ? null : 'a.mueller steht ' + wievielMal + ' mal in der Liste';
+    }],
+    ['belegt, weil WIR sie fanden', function () {
+      const p = U.personenAus([{ name: 'A', email: 'a.mueller@stadt-xy.de' }],
+        'bauamt@stadt-xy.de', BELEG, Q);
+      return p[0] && p[0].bestaetigt === true ? null : 'bestaetigt ist nicht true';
+    }],
+    ['NICHT belegt, nur genannt', function () {
+      /* Die KI nennt eine Adresse, die auf keiner gelesenen Seite stand.
+         Das ist der haeufigste Fall und der gefaehrlichste. */
+      const p = U.personenAus([{ name: 'Z', email: 'z.erfunden@stadt-xy.de' }],
+        'bauamt@stadt-xy.de', BELEG, Q);
+      return p[0] && p[0].bestaetigt === false ? null
+        : 'eine ungepruefte Adresse gilt als belegt';
+    }],
+    ['kopie beginnt bei false', function () {
+      const p = U.personenAus([{ name: 'A', email: 'a.mueller@stadt-xy.de' }],
+        'bauamt@stadt-xy.de', BELEG, Q);
+      return p[0] && p[0].kopie === false ? null : 'kopie ist nicht false';
+    }],
+    ['aufgefuellt aus der Quellseite', function () {
+      /* Die KI nennt NIEMANDEN. Dann treten die persoenlichen
+         Postfaecher der Quellseite ein — in deren Reihenfolge. */
+      const p = U.personenAus([], 'bauamt@stadt-xy.de', BELEG, Q);
+      if (p.length !== 2) return 'es sind ' + p.length;
+      if (p[0].email !== 'a.mueller@stadt-xy.de') return 'falsche Reihenfolge: ' + p[0].email;
+      return null;
+    }],
+    ['Funktionspostfach wird NICHT Person', function () {
+      const p = U.personenAus([], 'info@stadt-xy.de',
+        { alle: ['bauamt@stadt-xy.de', 'poststelle@stadt-xy.de'],
+          pro_seite: [{ url: Q, mails: ['bauamt@stadt-xy.de', 'poststelle@stadt-xy.de'] }] }, Q);
+      return p.length === 0 ? null : 'Funktionsadressen wurden als Personen gefuehrt';
+    }],
+    ['leere Huelle faellt weg', function () {
+      const p = U.personenAus([{ name: '', funktion: 'Sachgebiet', email: '', telefon: '' }],
+        'bauamt@stadt-xy.de', { alle: [], pro_seite: [] }, Q);
+      return p.length === 0 ? null : 'eine Person ohne Name UND ohne Adresse wurde gefuehrt';
+    }],
+    ['Name ohne Adresse bleibt', function () {
+      /* „Fragen Sie Frau X" ist eine brauchbare Auskunft — sie darf nur
+         nicht in Kopie koennen. */
+      const p = U.personenAus([{ name: 'Frau Mueller', funktion: 'Kataster' }],
+        'bauamt@stadt-xy.de', { alle: [], pro_seite: [] }, Q);
+      return (p.length === 1 && p[0].name === 'Frau Mueller' && !p[0].email) ? null
+        : 'ein Name ohne Adresse ging verloren';
+    }],
+    ['kein Beleg, keine Seiten', function () {
+      const p = U.personenAus([{ name: 'A', email: 'a.mueller@stadt-xy.de' }],
+        '', null, null);
+      return (p.length === 1 && p[0].bestaetigt === false) ? null
+        : 'ohne Belegdaten stimmt etwas nicht';
+    }],
+    ['ungueltige Adresse faellt weg', function () {
+      const p = U.personenAus([{ name: 'A', email: 'email' },
+                               { name: 'B', email: 'keine' }],
+        'bauamt@stadt-xy.de', BELEG, Q);
+      return p.every(function (x) { return !x.email; }) ? null
+        : 'ein Platzhalter wurde als Adresse genommen';
+    }]
+  ];
+  proben.forEach(function (pr) {
+    faelle++;
+    let fehler = null;
+    try { fehler = pr[1](); } catch (e) { fehler = 'wirft: ' + e.message; }
+    if (fehler) rot++;
+    console.log('  ' + (fehler ? 'ROT ' : 'ok  ') + pr[0].padEnd(32) + (fehler || ''));
+  });
+}
+
+/* ══ 7 · STEHT DER AUFTRAG IM PROMPT — UND SEIN ZIELFELD? ═════════════
+ *
+ * Der Prompt ist die Stelle, an der erfundene Namen entstehen. Die drei
+ * Einschraenkungen aus der Vorlage v6 muessen WOERTLICH dort stehen,
+ * und das Zielfeld muss im Antwortformat vorkommen:
+ *
+ *   > Ohne Zielfeld faellt ein Prompt-Auftrag lautlos auf den Boden.
+ *   > Das hat heute Morgen schon einmal Arbeit gekostet (v2139).
+ *
+ * Geprueft wird der KOMMENTARFREIE Text. Sonst findet der Pruefer seine
+ * eigenen Zitate aus den Begruendungen daneben — dreimal Fehlalarm in
+ * einer Sitzung, deshalb steht es hier.
+ */
+console.log('');
+console.log('=== 7 · Der KI-Auftrag und sein Zielfeld (v2152) ===');
+const quelle = fs.readFileSync(path.join(BASIS, 'services', 'unterlagenService.js'), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, ' ')          /* Blockkommentare weg */
+  .replace(/^\s*\/\/.*$/gm, ' ');             /* Zeilenkommentare weg */
+[
+  ['Auftrag: erste beiden',    'die ersten beiden '],
+  ['Auftrag: Reihenfolge',     'in der Reihenfolge der Seite'],
+  ['Riegel: wirklich stehen',  'Nur Personen, die dort wirklich stehen'],
+  ['Riegel: Mail nur woertlich', 'Eine E-Mail nur, wenn '],
+  /* Der Satz ist im Quelltext ueber zwei JS-Zeilen gebrochen, und `\n`
+     steht dort als ZWEI Zeichen. Gesucht wird deshalb ein Stueck, das
+     sicher in EINER Dateizeile steht — mein erster Versuch war
+     `'bleibt \n'` und fand nichts. */
+  ['Riegel: leer ist erlaubt', 'Stehen dort keine Personen, bleibt'],
+  ['Zielfeld im JSON-Format',  '"ansprechpartner":[{"name":"","funktion":"","email":"","telefon":""}]']
+].forEach(function (p) {
+  faelle++;
+  const ok = quelle.indexOf(p[1]) >= 0;
+  if (!ok) rot++;
+  console.log('  ' + (ok ? 'ok  ' : 'ROT ') + p[0].padEnd(30)
+    + (ok ? '' : 'nicht im kommentarfreien Text: "' + p[1].slice(0, 40) + '"'));
+});
+
 console.log('');
 console.log('=== Deckung ===');
 console.log('  Dienst      : der ECHTE ' + BASIS + '/services/unterlagenService.js');
@@ -274,10 +443,15 @@ console.log('  Gestellt    : ' + (gestellt.length ? gestellt.join(', ') + ' (lok
   : 'nichts — alle Abhaengigkeiten waren echt da'));
 console.log('  Faelle      : ' + faelle);
 console.log('  Geprueft    : 19 Schreibweisen finden, 12 Fehlalarme vermeiden,');
-console.log('                Reihenfolge, Postfachart, zwei Gegenproben');
+console.log('                Reihenfolge, 9 Postfacharten, zwei Gegenproben,');
+console.log('                13 Zusicherungen des Personen-Zusammenbaus (v2152),');
+console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text');
 console.log('  NICHT       : `belegSeiten()` selbst — die ruft echte Server ab.');
 console.log('                Dass sie die Seiten LIEST, ist hier bewiesen; dass sie');
 console.log('                sie ABRUFT, ist ein Staging-Abnahmepunkt.');
+console.log('                Auch NICHT: ob das Modell den Auftrag BEFOLGT. Dass er');
+console.log('                im Prompt steht und ein Zielfeld hat, ist geprueft —');
+console.log('                ob echte Personen herauskommen, zeigt nur ein Lauf.');
 console.log('');
 console.log(rot === 0 ? 'SAUBER — der Leser findet jede echte Schreibweise und keinen Fehlalarm.'
                       : 'ROT — ' + rot + ' Befund(e).');

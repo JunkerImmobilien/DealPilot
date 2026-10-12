@@ -281,6 +281,82 @@ function mailsAufSeite(html) {
     .filter(function (m) { return !/\.(png|jpe?g|gif|svg|webp|css|js|woff2?)$/.test(m); });
 }
 
+/* ══ v2152 · DIE ZWEI ANSPRECHPERSONEN — ZUSAMMENGEBAUT, NICHT GERATEN ══
+ *
+ * Marcel am 12.10.2026: „ja mach die ansprechpartner gleich mit."
+ * Vorlage: `unterlagen-app-v6-ansprechpartner`, dort server.js:428-446.
+ *
+ * ── DIE RANGFOLGE, UND WARUM SIE SO IST ────────────────────────────
+ *
+ *   1. was die KI auf der Seite GELESEN hat (mit Name und Funktion)
+ *   2. aufgefüllt mit den persönlichen Postfächern der QUELLSEITE,
+ *      in der Reihenfolge der Seite
+ *
+ * Der zweite Schritt ist kein Notnagel. Viele Amtsseiten nennen die
+ * Person im Bild oder in einer Tabelle, die kein Modell zuverlässig
+ * liest — die Adresse `a.mueller@…` steht aber im Text. Eine Adresse
+ * ohne Namen ist eine brauchbare Angabe; ein Name ohne Beleg ist keine.
+ *
+ * ── WAS NICHT PASSIERT ─────────────────────────────────────────────
+ *
+ * Höchstens zwei. Nie die Adresse, die ohnehin Empfänger ist — sonst
+ * steht dieselbe Adresse zweimal im Brief, einmal als An und einmal als
+ * Kopie. Und `bestaetigt` ist nur dann true, wenn die Adresse auf einer
+ * von uns SELBST gelesenen Seite stand:
+ *
+ *   > Ohne diese Unterscheidung wäre „Ansprechpartner 1" eine
+ *   > Behauptung. v5 wusste nur, ob eine Adresse irgendwo stand, v6
+ *   > weiß auf WELCHER Seite — und genau dafür liegt seit v2151
+ *   > `seiten.pro_seite` vor.
+ *
+ * `kopie` beginnt bei false. Der Nutzer hakt an, wer ins CC geht; eine
+ * Software, die von sich aus jemanden in Kopie setzt, verschickt Post
+ * an Menschen, die der Absender nicht gewählt hat.
+ */
+function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
+  const personen = [];
+  const eigen = _s(eigeneMail).toLowerCase();
+  const alle = (belegDetail && belegDetail.alle) || [];
+
+  function merke(p) {
+    if (personen.length >= 2) return;
+    if (!p.name && !p.email) return;                    /* leere Hülle */
+    if (p.email && p.email === eigen) return;           /* ist schon Empfänger */
+    if (p.email && personen.some((x) => x.email === p.email)) return;
+    if (!p.email && personen.some((x) => x.name && x.name === p.name)) return;
+    personen.push({
+      name: p.name || '', funktion: p.funktion || '',
+      email: p.email || '', telefon: p.telefon || '',
+      /* Belegt heisst: WIR haben die Adresse auf einer Seite gefunden,
+         die wir selbst abgerufen haben. Nicht: die KI hat sie genannt. */
+      bestaetigt: !!(p.email && alle.indexOf(p.email) >= 0),
+      kopie: false
+    });
+  }
+
+  /* 1 · Was die Recherche genannt hat */
+  const genannt = Array.isArray(roh) ? roh : [];
+  genannt.forEach(function (p) {
+    if (!p || typeof p !== 'object') return;
+    merke({
+      name: _s(p.name), funktion: _s(p.funktion),
+      email: mailGueltig(p.email) ? _s(p.email).toLowerCase() : '',
+      telefon: _s(p.telefon)
+    });
+  });
+
+  /* 2 · Aufgefüllt mit persönlichen Postfächern der Quellseite, in der
+     Reihenfolge, in der sie dort stehen. */
+  const seite = ((belegDetail && belegDetail.pro_seite) || [])
+    .find(function (s) { return s.url === quelleUrl; })
+    || ((belegDetail && belegDetail.pro_seite) || [])[0];
+  ((seite && seite.mails) || []).forEach(function (m) {
+    if (istPersonenpostfach(m)) merke({ name: '', funktion: '', email: m, telefon: '' });
+  });
+
+  return personen;
+}
+
 /* Ein persönliches Postfach oder ein Funktionspostfach? Nur ein
    Sortierkriterium — eine persönliche Adresse ist nicht falsch, aber sie
    veraltet mit der Person. Das Amt bleibt. */
@@ -456,12 +532,46 @@ async function amtSuchen(art, ort, opts = {}) {
     + '- "quelle" ist ein PFLICHTFELD: dort gehört die URL der Seite hinein, '
     + 'auf der du die Adresse gelesen hast. Schreibe den Link nicht in den '
     + 'Hinweis und nicht in den Fließtext, sondern in dieses Feld.\n'
+    /* ══ v2152 · DIE ANSPRECHPERSONEN — WOERTLICH AUS DER VORLAGE ═══════
+
+       Marcel am 12.10.2026: „ja mach die ansprechpartner gleich mit."
+       Vorlage: `unterlagen-app-v6-ansprechpartner`, dort server.js:386.
+
+       DER PROMPT IST DIE STELLE, AN DER ERFUNDENE NAMEN ENTSTEHEN. Ein
+       Modell, das nach „den beiden Ansprechpartnern" gefragt wird und
+       keine findet, nennt zwei plausible — Nachname plus Sachgebiet
+       liest sich wie ein Beleg und ist keiner.
+
+       > Deshalb stehen die drei Einschraenkungen aus v6 hier WOERTLICH:
+       > nur Personen, die dort wirklich stehen; eine E-Mail nur, wenn
+       > sie dort woertlich steht, sonst leer; stehen dort keine
+       > Personen, bleibt die Liste leer.
+
+       Die dritte ist die wichtigste. Ohne sie ist „leer" kein zulaessiges
+       Ergebnis, und das Modell MUSS etwas liefern. Dasselbe Muster wie
+       bei der Mietpreisuebersicht: wo die Quelle endet, endet die
+       Rechnung — eine leere Liste ist eine Antwort, keine Luecke.
+
+       Die REIHENFOLGE DER SEITE ist ausdruecklich verlangt: die zuerst
+       genannte Person ist die zustaendige. Ein Modell, das sie nach
+       Rang oder Alphabet sortiert, zerstoert genau die Information,
+       auf die sich „Ansprechpartner 1" stuetzt. */
+    + '- Nenne zusätzlich unter "ansprechpartner" die ersten beiden '
+    + 'Ansprechpersonen, die auf der offiziellen Seite für dieses Anliegen '
+    + 'aufgeführt sind, in der Reihenfolge der Seite: Name, Funktion, E-Mail, '
+    + 'Telefon. Nur Personen, die dort wirklich stehen. Eine E-Mail nur, wenn '
+    + 'sie dort wörtlich steht, sonst leer. Stehen dort keine Personen, bleibt '
+    + 'die Liste leer.\n'
     + '- Stelle keine Rückfragen und bitte nicht um Erlaubnis. Antworte direkt.'
     + nachtrag + '\n\n'
     + 'Antworte am Ende ausschließlich mit einem JSON-Objekt, ohne Einleitung '
     + 'und ohne Markdown:\n'
     + '{"behoerde":"","abteilung":"","email":"","telefon":"","kanal":"email | portal | formular | post",'
-    + '"antragUrl":"","quelle":"","seiten":[],"gebuehr":"","hinweis":"","kreis":"","bundesland":""}';
+    + '"antragUrl":"","quelle":"","seiten":[],'
+    /* Ohne Zielfeld faellt der Auftrag oben lautlos auf den Boden —
+       dieselbe Lehre wie bei den KI-Prompts der Pilot-Analyse (v2139). */
+    + '"ansprechpartner":[{"name":"","funktion":"","email":"","telefon":""}],'
+    + '"gebuehr":"","hinweis":"","kreis":"","bundesland":""}';
 
   const antwort = await openaiService.callOpenAI(prompt, {});
   const r = _findeJson(antwort && (antwort.text || antwort.output_text || antwort));
@@ -512,6 +622,10 @@ async function amtSuchen(art, ort, opts = {}) {
     telefon: _s(r.telefon),
     kanal: ['email', 'portal', 'formular', 'post'].includes(_s(r.kanal)) ? _s(r.kanal) : 'email',
     antrag_url: _link(r.antragUrl), quelle_url: _sauber(quelle),
+    /* v2152 · ROH durchreichen. Der Zusammenbau braucht den Beleg, und
+       der steht erst fest, wenn die Seiten gelesen sind — also eine
+       Ebene weiter in `amtHolen`. Hier wird nichts entschieden. */
+    _ansprechpartner_roh: Array.isArray(r.ansprechpartner) ? r.ansprechpartner : [],
     seiten: [...new Set(seiten.concat(hinweisLinks))].map(_sauber).slice(0, 8),
     gebuehr: _s(r.gebuehr), hinweis: _s(r.hinweis),
     kreis: _s(r.kreis), bundesland: _s(r.bundesland)
@@ -651,18 +765,52 @@ async function amtHolen(userId, art, ort, opts = {}) {
   } catch (e) {
     console.warn('[unterlagen] Belegseiten nicht lesbar:', e.message);
   }
+
+  /* v2152 · Erst JETZT, nachdem die Seiten gelesen sind: der Beleg je
+     Person haengt an `belegDetail`. Vorher gebaut waere `bestaetigt`
+     immer false — und ein Feld, das immer dasselbe sagt, sagt nichts. */
+  const personen = personenAus(
+    gefunden._ansprechpartner_roh,
+    gefunden.email,
+    belegDetail,
+    gefunden._beleg_quelle || gefunden.quelle_url
+  );
   if (register) {
     beleg.grund = 'Zuständigkeit und Quelle aus dem DealPilot-Register (amtlicher Datensatz)'
       + (gefunden.email ? (beleg.ok ? '; E-Mail wörtlich auf der Quellseite gefunden' : '; E-Mail aus der Websuche, nicht belegt') : '; keine E-Mail-Adresse ermittelt');
     beleg.ok = beleg.ok || !gefunden.email;
   }
 
+  /* ══ v2152 · DIE ANGEHAKTE KOPIE UEBERLEBT EINE NEURECHERCHE ════════
+   *
+   * Im `ON CONFLICT`-Zweig unten steht `ansprechpartner` NICHT einfach
+   * auf `EXCLUDED.ansprechpartner`. Das wuerde die Liste komplett
+   * ersetzen und damit jedes `kopie: true` loeschen, das der Nutzer
+   * gesetzt hat. Eine Neurecherche bringt oft genau dieselben Personen —
+   * dann waere seine Auswahl ohne Grund weg.
+   *
+   * Die NEUEN Personen gewinnen deshalb nur, wenn ueberhaupt welche
+   * gefunden wurden. Eine leere Liste ueberschreibt eine gefuellte
+   * NICHT: „nichts gefunden" ist kein Grund, Bekanntes zu verwerfen.
+   *
+   * ── WARUM DIESER KOMMENTAR HIER STEHT UND NICHT IM SQL ────────────
+   *
+   * Der erste Entwurf hatte ihn IM Template-Literal. Er nannte dort
+   * `_beleg_quelle` in Backticks — und ein Backtick beendet ein
+   * Template-Literal, auch mitten in einem, was wie ein Kommentar
+   * aussieht. `node --check` meldete „missing ) after argument list",
+   * 500 Zeilen weiter unten.
+   *
+   *   > Dieselbe Klasse wie ein zitiertes Kommentarende in einem
+   *   > CSS-Kommentar: das Zeichen wirkt, egal was drumherum steht.
+   *   > In einem Template-Literal gibt es keine Kommentare.
+   */
   const r = await query(
     `INSERT INTO unterlagen_aemter
        (gemeinde_schluessel, plz, ort, art, behoerde, abteilung, email, telefon,
         kanal, antrag_url, quelle_url, seiten, gebuehr, hinweis, kreis, bundesland,
-        beleg_ok, beleg_grund, geprueft_am, erstellt_von)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,now(),$19)
+        beleg_ok, beleg_grund, ansprechpartner, geprueft_am, erstellt_von)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,now(),$20)
      ON CONFLICT (gemeinde_schluessel, art) DO UPDATE SET
        behoerde = EXCLUDED.behoerde, abteilung = EXCLUDED.abteilung,
        email = EXCLUDED.email, telefon = EXCLUDED.telefon, kanal = EXCLUDED.kanal,
@@ -670,7 +818,14 @@ async function amtHolen(userId, art, ort, opts = {}) {
        seiten = EXCLUDED.seiten, gebuehr = EXCLUDED.gebuehr,
        hinweis = EXCLUDED.hinweis, kreis = EXCLUDED.kreis,
        bundesland = EXCLUDED.bundesland, beleg_ok = EXCLUDED.beleg_ok,
-       beleg_grund = EXCLUDED.beleg_grund, geprueft_am = now()
+       beleg_grund = EXCLUDED.beleg_grund,
+       -- v2152: siehe den Kommentar oberhalb dieser Abfrage
+       ansprechpartner = CASE
+         WHEN jsonb_array_length(EXCLUDED.ansprechpartner) > 0
+           THEN EXCLUDED.ansprechpartner
+         ELSE unterlagen_aemter.ansprechpartner
+       END,
+       geprueft_am = now()
      RETURNING *`,
     [schluessel, ort.plz || null, ort.ort || null, art, gefunden.behoerde,
      gefunden.abteilung || null, gefunden.email || null, gefunden.telefon || null,
@@ -688,7 +843,7 @@ async function amtHolen(userId, art, ort, opts = {}) {
                                          mails: beleg.gefundene } : null
      }), gefunden.gebuehr || null,
      gefunden.hinweis || null, gefunden.kreis || null, gefunden.bundesland || null,
-     beleg.ok, beleg.grund, userId || null]);
+     beleg.ok, beleg.grund, JSON.stringify(personen), userId || null]);
 
   return { gefunden: true, aus_register: false, amt: r.rows[0], beleg: beleg };
 }
@@ -766,5 +921,7 @@ module.exports = {
   ARTEN, ARTEN_MAP, gemeindeSchluessel, istGewerblich, mailGueltig,
   amtSuchen, amtHolen, aemterFuer, belegPruefen, anschreiben,
   /* v2151 · fuer die Pruefstrecke und kuenftige Aufrufer */
-  mailsAufSeite, istPersonenpostfach, belegSeiten
+  mailsAufSeite, istPersonenpostfach, belegSeiten,
+  /* v2152 · der Zusammenbau der Ansprechpersonen */
+  personenAus
 };
