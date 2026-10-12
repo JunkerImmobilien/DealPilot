@@ -65,6 +65,27 @@ function _ankaufBlock(ak) {
     }
   } else {
     z.push('Keine Kennzahl ist zu beiden Zeitpunkten vergleichbar - sage das, statt zu schaetzen.');
+    /* ══ v2139 · UND DANN LAGEN DIE ANKAUFSZAHLEN DOCH VOR ══════════
+       `ui.js:967` sendet `kennzahlen_damals` (der Kurzstand zum
+       Stichtag). Gelesen wurde nur `abweichung` - die Tabelle, die
+       einen VERGLEICH braucht.
+
+       > Genau wenn kein Vergleich moeglich ist, stand hier „sage das,
+       > statt zu schaetzen" - und die Zahlen von damals reisten
+       > ungelesen mit. Der Satz war richtig und die Lage eine andere. */
+    if (ak.kennzahlen_damals) {
+      z.push('');
+      z.push('Die Kennzahlen zum Ankauf liegen aber vor (nicht vergleichbar, aber nennbar):');
+      z.push(typeof ak.kennzahlen_damals === 'string'
+        ? ak.kennzahlen_damals : JSON.stringify(ak.kennzahlen_damals));
+    }
+  }
+  /* v2139: wann der Stand festgeschrieben wurde - nicht dasselbe wie der
+     Stichtag. Wer einen Ankauf drei Monate spaeter eintraegt, hat seine
+     Zahlen aus der Zeit der EINGABE, nicht aus der des Uebergangs. */
+  if (ak.festgeschrieben_am && ak.festgeschrieben_am !== ak.stichtag) {
+    z.push('Festgeschrieben wurde dieser Stand am ' + ak.festgeschrieben_am
+      + ' - nicht am Stichtag selbst.');
   }
   z.push('');
   z.push('ANKAUF ist der Soll-Stand (wie gekauft), BESTAND der Ist-Stand (heute).');
@@ -297,12 +318,37 @@ function buildPrompt(payload, opts) {
         + (o.einheiten.je_einheit && o.einheiten.je_einheit.length
             ? '\n' + o.einheiten.je_einheit.filter(function (e) { return e.wfl || e.miete; })
                 .map(function (e) {
+                  /* ══ v2139 · HIER FEHLTEN SIEBEN FELDER JE EINHEIT ══
+                     `ui.js:805-826` sendet je Einheit auch `etage`,
+                     `zimmer`, `vertragsart` (aus `mv_art`), die drei
+                     Vertragstermine und den `zustand`. Gedruckt wurden
+                     sechs andere.
+
+                     `art` ist `wohnen|gewerbe` - NICHT die Vertragsart.
+                     Die beiden Namen liegen so nah beieinander, dass
+                     die Luecke beim Lesen des Codes nicht auffaellt:
+                     eine Zeile mit `e.art` SIEHT aus, als stuende die
+                     Vertragsart drin.
+
+                     Reihenfolge: erst was die Einheit IST (Nr, Flaeche,
+                     Zimmer, Etage, Nutzung), dann was sie TRAEGT
+                     (Miete, Status, Vertrag, Termine), dann ihr
+                     Zustand. Die Termine tragen ihr Wort mit, weil
+                     drei nackte Datumsangaben hintereinander nicht
+                     unterscheidbar sind. */
                   return '  · ' + (e.nr ? 'Nr. ' + e.nr + ': ' : '')
                     + (e.wfl ? e.wfl + ' m²' : 'Fläche offen')
-                    + (e.miete ? ', ' + e.miete + ' € Ist-Kaltmiete' : '')
+                    + (e.zimmer ? ', ' + e.zimmer + ' Zi.' : '')
+                    + (e.etage ? ', ' + e.etage : '')
                     + (e.art ? ', ' + e.art : '')
+                    + (e.miete ? ', ' + e.miete + ' € Ist-Kaltmiete' : '')
                     + (e.status ? ', ' + e.status : '')
-                    + (e.lage ? ', ' + e.lage : '');
+                    + (e.lage ? ', ' + e.lage : '')
+                    + (e.vertragsart ? ', Vertrag: ' + e.vertragsart : '')
+                    + (e.letzte_erhoehung ? ', letzte Erhöhung ' + e.letzte_erhoehung : '')
+                    + (e.naechste_anpassung ? ', nächste Anpassung ' + e.naechste_anpassung : '')
+                    + (e.befristet_bis ? ', befristet bis ' + e.befristet_bis : '')
+                    + (e.zustand ? ', Zustand: ' + e.zustand : '');
                 }).join('\n')
             : '')
       : '',
@@ -326,12 +372,73 @@ function buildPrompt(payload, opts) {
     (o.einheiten && o.einheiten.gnd)
       ? '- Gesamtnutzungsdauer laut Konfigurator: ' + o.einheiten.gnd + ' Jahre'
       : '',
-    (o.einheiten && o.einheiten.modernisierung && Object.keys(o.einheiten.modernisierung).length)
-      ? '- Modernisierungsstand (Anlage 2 ImmoWertV): '
-        + Object.keys(o.einheiten.modernisierung).map(function (k) {
-            return k + '=' + o.einheiten.modernisierung[k];
-          }).join(', ')
+    /* ══ v2139a · WIE ALT IST DIESER EINHEITENSTAND? ═══════════════════
+       `mfh-einheiten.js:946` schreibt bei jedem Speichern ein Datum
+       (`stand`). Der Kommentar in `ui.js` nennt Marcels Auftrag woertlich:
+       er wollte Modernisierung UND Stand erfasst haben - gelesen wurde
+       nur die Modernisierung.
+
+       > Ein Datensatz ohne Datum laesst keine Frage nach seiner
+       > Aktualitaet zu. Das Modell kann nicht sagen "die Aufstellung ist
+       > zwei Jahre alt", wenn es nicht weiss, wann sie entstand. */
+    (o.einheiten && o.einheiten.stand)
+      ? '- Stand dieser Einheiten-Aufstellung: ' + o.einheiten.stand
       : '',
+    /* ══ v2139a · DIE SUMME DER EINHEITEN GEGEN DIE WOHNFLAECHE ═══════
+       `ui.js:788` sendet `flaeche_summe` - die addierte Flaeche der
+       Einheiten. Daneben steht `o.wfl`, die eingetragene Wohnflaeche.
+
+       Zwei Zahlen zur selben Groesse sind kein Widerspruch, solange
+       beide ihre Herkunft tragen. Weichen sie ab, ist das ein BEFUND:
+       entweder fehlt eine Einheit in der Aufstellung, oder die
+       Gesamtflaeche ist falsch. Beides aendert jede Kennzahl je m2.
+
+       Die Schwelle ist 1 m2 - unter Rundung soll hier nichts gemeldet
+       werden. Gerechnet wird NICHTS: genannt werden beide Zahlen. */
+    (function () {
+      var e = o.einheiten;
+      if (!e || e.flaeche_summe == null || !isFinite(e.flaeche_summe)) return '';
+      if (o.wfl == null || !isFinite(o.wfl)) {
+        return '- Summe der Einheitenflaechen: ' + e.flaeche_summe + ' m2'
+          + ' (eine Gesamtwohnflaeche ist nicht eingetragen)';
+      }
+      var diff = Number(e.flaeche_summe) - Number(o.wfl);
+      if (Math.abs(diff) < 1) {
+        return '- Summe der Einheitenflaechen: ' + e.flaeche_summe
+          + ' m2 - deckt sich mit der eingetragenen Wohnflaeche.';
+      }
+      return '- ABWEICHUNG Flaeche: die Einheiten summieren sich auf '
+        + e.flaeche_summe + ' m2, eingetragen sind ' + o.wfl + ' m2 ('
+        + (diff > 0 ? '+' : '') + Math.round(diff * 10) / 10 + ' m2).'
+        + ' Nenne BEIDE Zahlen und sage, was fehlen koennte (eine Einheit,'
+        + ' Gewerbe, Keller). Rechne KEINE dritte Zahl aus und waehle keine aus.';
+    })(),
+    /* ══ v2139a · EIN STRING ZERFAELLT HIER IN BUCHSTABEN ═════════════
+       `modernisierung` ist ein Verzeichnis Gewerk -> Stufe
+       (`mfh-einheiten.js`, `d.gebaeude`). Gelesen wurde es mit
+       `Object.keys()` - und das nimmt auch einen String an:
+       `Object.keys('Dach neu')` gibt '0'..'7' zurueck, `length` ist 8,
+       die Bedingung also WAHR, und im Prompt stuende
+       `0=D, 1=a, 2=c, 3=h, ...`.
+
+       Gefunden beim Bau von `tools/prompt-lecks-pruefen.mjs`: mein
+       Pruefauftrag schickte versehentlich einen String, und der Prompt
+       trug die Buchstaben. Das war mein Fehler im Pruefer - aber es ist
+       genau der Fehler, den ein Umbau am Sender eines Tages echt macht.
+
+       > Eine Pruefung auf `length` fragt, ob etwas DA ist, nicht ob es
+       > die richtige GESTALT hat. Der Unterschied faellt erst im
+       > Ergebnis auf, und dort sieht er wie ein Modellfehler aus. */
+    (function () {
+      var m = o.einheiten && o.einheiten.modernisierung;
+      if (!m) return '';
+      if (typeof m === 'string') {
+        return m.trim() ? '- Modernisierungsstand (als Text erfasst): ' + m.trim() : '';
+      }
+      if (typeof m !== 'object' || Array.isArray(m) || !Object.keys(m).length) return '';
+      return '- Modernisierungsstand (Anlage 2 ImmoWertV): '
+        + Object.keys(m).map(function (k) { return k + '=' + m[k]; }).join(', ');
+    })(),
     (o.einheiten && o.einheiten.anzahl > 1)
       ? '  ACHTUNG: Vergleiche Mietspiegel und ortsübliche Größen mit der '
         + 'Fläche JE EINHEIT, niemals mit der Gesamtfläche. Eine '
@@ -419,7 +526,29 @@ function buildPrompt(payload, opts) {
       ['Grenzsteuersatz', _st.grenzsteuersatz_pct != null ? _p(_st.grenzsteuersatz_pct) : null],
       ['AfA-Satz', _st.afa_satz_pct != null ? _p(_st.afa_satz_pct) : null],
       ['AfA ueber Restnutzungsdauer', _st.afa_rnd_jahre != null ? _st.afa_rnd_jahre + ' Jahre' : null],
-      ['Gebaeudeanteil', _st.gebaeudeanteil_pct != null ? _p(_st.gebaeudeanteil_pct) : null]
+      ['Gebaeudeanteil', _st.gebaeudeanteil_pct != null ? _p(_st.gebaeudeanteil_pct) : null],
+      /* ══ v2139 · VIER STEUERANGABEN REISTEN UNGELESEN MIT ══════════
+         `ui.js:892-911` sendet sie seit v2067a mit eigener Begruendung.
+         Gelesen wurden fuenf von neun.
+
+         Besonders die Sanierung: Aufgabe 8 soll die Steuerwirkung
+         beurteilen, und ob 40.000 EUR Sanierung als Erhaltungsaufwand
+         ueber zwei bis fuenf Jahre verteilt oder aktiviert werden,
+         aendert die Steuerwirkung der ersten Jahre vollstaendig. Das
+         Modell hat es nicht geraten - es wusste nichts davon. */
+      ['Eigener AfA-Satz', _st.afa_eigen_pct != null ? _p(_st.afa_eigen_pct) : null],
+      ['Sanierungskosten', (_st.sanierung && _st.sanierung.kosten_eur != null)
+        ? _z(_st.sanierung.kosten_eur) + ' EUR'
+          + (_st.sanierung.betrag_ist ? ' (' + _st.sanierung.betrag_ist + ')' : '') : null],
+      ['Sanierung steuerlich angesetzt', (_st.sanierung && _st.sanierung.steuerlich_angesetzt != null)
+        ? (_st.sanierung.steuerlich_angesetzt
+            ? ('ja, verteilt auf ' + (_st.sanierung.verteilung_jahre === 'auto'
+                ? 'automatisch gewaehlte Jahre' : (_st.sanierung.verteilung_jahre || '?') + ' Jahre'))
+            : 'nein - als Erhaltungsaufwand NICHT angesetzt') : null],
+      ['Sonder-AfA § 7b', _st.sonder_afa_7b ? 'aktiv' : null],
+      ['Erbbaurecht', (_st.erbbaurecht && _st.erbbaurecht.ja)
+        ? ('ja' + (_st.erbbaurecht.erbbauzins_eur_jahr != null
+            ? ', Erbbauzins ' + _z(_st.erbbaurecht.erbbauzins_eur_jahr) + ' EUR/Jahr' : '')) : null]
     ]) : '',
     _bw ? _zeilen('## BEWIRTSCHAFTUNG (Struktur, nicht nur die Summe)', [
       ['Hausgeld umlagefaehig', _bw.hausgeld_umlagefaehig != null ? _z(_bw.hausgeld_umlagefaehig) + ' EUR' : null],
@@ -443,7 +572,13 @@ function buildPrompt(payload, opts) {
       ['Intervall', _me.intervall_jahre != null ? _me.intervall_jahre + ' Jahre' : null],
       ['Schritthoehe', _me.schritt_pct != null ? _p(_me.schritt_pct) : null],
       ['Mietspiegel', _me.mietspiegel_eur_qm != null ? _me.mietspiegel_eur_qm + ' EUR/m2' : null],
-      ['Kalkulierter Leerstand', _me.leerstand_pct != null ? _p(_me.leerstand_pct) : null]
+      ['Kalkulierter Leerstand', _me.leerstand_pct != null ? _p(_me.leerstand_pct) : null],
+      /* v2139: `umlagefaehig` sagt, ob der Plan auf der Kaltmiete oder
+         auf der Warmmiete steht. Ohne diese Angabe sind Zielmiete und
+         Mietspiegel-Vergleich nicht einzuordnen - 12 EUR/m2 warm und
+         12 EUR/m2 kalt sind zwei verschiedene Objekte. */
+      ['Bezug der Zielmiete', _me.umlagefaehig != null
+        ? (_me.umlagefaehig ? 'inkl. umlagefaehiger Kosten (warm)' : 'Kaltmiete') : null]
     ]) : '',
     (_me && _me.modus === 'einheiten')
       ? ('\nZUR MIETENTWICKLUNG: Die Tabelle ist aus den Mietvertraegen der einzelnen'
@@ -487,8 +622,49 @@ function buildPrompt(payload, opts) {
     _zu ? _zeilen('## ZUSTAND UND ENERGIE (der Marktkontext oben bietet dafuer den gemessenen Abschlag an)', [
       ['Zustand', _zu.ds2_zustand], ['Energieklasse', _zu.energieklasse],
       ['Modernisierung', _zu.modernisierung],
-      ['Modernisierungspunkte', _zu.modernisierungspunkte]
+      ['Modernisierungspunkte', _zu.modernisierungspunkte],
+      /* ══ v2139 · DIE ACHT BAUTEILE UND DIE GERECHNETE RND ══════════
+         `ui.js:1025-1061` sendet beides seit v2067/v2068, jeweils mit
+         einer Begruendung, die genau sagt, warum eine Summe nicht
+         reicht: Eine Summe sagt nicht, WO die Punkte fehlen.
+
+         Gelesen wurde nur die Summe (`modernisierungspunkte`). Genau
+         die Unterscheidung, um die es ging, kam nicht an.
+
+         Und die RND des Wizards ist etwas anderes als
+         `steuer.afa_rnd_jahre`: dort steht, was der Nutzer EINGETRAGEN
+         hat, hier was die Bauteile HERGEBEN. Weichen sie ab, ist das
+         ein Befund - deshalb steht der Abgleich als Auftrag dabei und
+         nicht als stille Zahl. */
+      ['Letzte Modernisierung je Bauteil', (_zu.bauteile && typeof _zu.bauteile === 'object'
+        && Object.keys(_zu.bauteile).length)
+        ? Object.keys(_zu.bauteile).map(function (k) { return k + ' ' + _zu.bauteile[k]; }).join(', ')
+        : null],
+      ['Restnutzungsdauer GERECHNET (Anlage 2 ImmoWertV)', (_zu.restnutzungsdauer_berechnet
+        && _zu.restnutzungsdauer_berechnet.jahre != null)
+        ? (_zu.restnutzungsdauer_berechnet.jahre + ' Jahre'
+           + (_zu.restnutzungsdauer_berechnet.gesamtnutzungsdauer != null
+              ? ' von ' + _zu.restnutzungsdauer_berechnet.gesamtnutzungsdauer : '')
+           + (_zu.restnutzungsdauer_berechnet.alter_jahre != null
+              ? ', Alter ' + _zu.restnutzungsdauer_berechnet.alter_jahre + ' Jahre' : '')
+           + (_zu.restnutzungsdauer_berechnet.verfahren
+              ? ', Verfahren ' + _zu.restnutzungsdauer_berechnet.verfahren : '')
+           + (_zu.restnutzungsdauer_berechnet.stand
+              ? ', Stand ' + _zu.restnutzungsdauer_berechnet.stand : ''))
+        : null]
     ]) : '',
+    /* v2139: der Auftrag zum Abgleich. Zwei Restnutzungsdauern aus
+       verschiedenen Quellen sind kein Widerspruch, solange beide ihre
+       Herkunft tragen - aber eine Abweichung gehoert genannt. */
+    (_zu && _zu.restnutzungsdauer_berechnet && _zu.restnutzungsdauer_berechnet.jahre != null
+      && _st && _st.afa_rnd_jahre != null
+      && Math.abs(Number(_zu.restnutzungsdauer_berechnet.jahre) - Number(_st.afa_rnd_jahre)) >= 3)
+      ? ('\n- ABWEICHUNG Restnutzungsdauer: eingetragen ' + _st.afa_rnd_jahre
+         + ' Jahre (Steuer), aus den Bauteilen gerechnet '
+         + _zu.restnutzungsdauer_berechnet.jahre + ' Jahre. Nenne BEIDE mit ihrer'
+         + ' Herkunft und sage, was die Abweichung fuer die AfA bedeutet.'
+         + ' Rechne KEINE dritte Zahl aus.')
+      : '',
     '',
     /* v2013 - DIE FOTOS. Ein Bild zeigt einen EINDRUCK, keine Messung. */
     _nFotos ? ('\n## FOTOS DES OBJEKTS\nDu bekommst ' + _nFotos + ' Foto(s) dieses Objekts mitgeliefert.'
@@ -511,6 +687,11 @@ function buildPrompt(payload, opts) {
     (o.einheiten && Array.isArray(o.einheiten.je_einheit)
       && o.einheiten.je_einheit.some(function (e) { return e && e.vertragsart; }))
       ? ('\n## MIETVERTRAEGE JE EINHEIT'
+        /* v2139: der Verweis auf den Ort. Bis hierher nannte dieser
+           Block vier Feldnamen, die im Prompt nicht vorkamen - weder
+           als Wert noch als Ort. Jetzt stehen sie in der Einheitenzeile
+           oben, und der Block sagt das. */
+        + '\n(Die Werte stehen oben in der Einheitenliste je Zeile.)'
         + '\n- "vertragsart" steht je Einheit. Staffelmiete (\u00a7 557a BGB) und Indexmiete'
         + '\n  (\u00a7 557b BGB) tragen ihre naechste Erhoehung SCHON im Vertrag: das ist ein'
         + '\n  TERMIN, kein Mieterhoehungspotenzial. Behandle beides nicht gleich - sonst'
