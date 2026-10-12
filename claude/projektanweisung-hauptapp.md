@@ -36932,3 +36932,140 @@ immer). Deckung: 17 Blätter, 13.674 Regeln, 2,44 Mio Zeichen. RC = 0.
 | Höhe bei 1180 px: 185 px in zwei Zeilen, Zeile 1 zu 60 % leer | **Optik** |
 | Knopf 33 px ab 1280 px (Absicht: Maus) | **gemessen, Entscheidung** |
 
+
+## Rollout-Journal 12.10.2026 — v2126–v2128: Durchgang 1 und 2 der Geräteabnahme
+
+Marcels Auftrag: *„wenn das so weit ist und du das komplett abgearbeitet
+hast und sorgfältig und alle passt, dann machst du diese prüfung mit
+allen handys und tablets und desktop prüfung nochmal 5 mal. ganz genau
+durchgehen … nutze dabei immer unterschiedliche herangehensweisen wenn
+möglich."*
+
+| Was | Commit |
+|---|---|
+| `v2126` zwei Reste aus der 72-Läufe-Abnahme | `fe48a9e4` |
+| `v2125` Messkabine: `pruefeAnsicht` konnte nur „Heute" | `e6306f19` |
+| `v2127` Messkabine: zwei Erkennerfehler | `1e6c35e4` |
+| `v2128` der 2-Pixel-Stummel auf jedem Schreibtisch | `1e6c35e4` |
+| Backlog N60.39 (Kartenstil „Zeile"), N60.40 (Cockpit-Vollbild) | `5ed1c81d`, `1e6c35e4` |
+
+### Erst das Messgerät, dann das Produkt
+
+**`v2125`:** In `pruefeAnsicht` stand `lade(breite, '', hoehe)` — die
+Fassung war **fest auf „Heute"** gesetzt. Marcel arbeitet in der
+**Aktenmappe**, und alle Datenaufnahme-Befunde vom 11.10. lagen dort:
+der 1263-px-Überlauf auf dem iPad war in `v1b`, nicht in „Heute".
+
+> **Ein Prüfer, der nur eine Fassung kennt, meldet null Befunde für die
+> Fassung, die der Nutzer sieht — und wirkt dabei grün.**
+
+**`v2127`, zwei Erkennerfehler, beide vor dem Weiterbauen behoben:**
+
+**1 · `apQuerScroller` hat die Absichtsmarke nicht gelesen.**
+`deklariertAbsichtlich()` gibt es seit `v2092e` genau dafür: ein
+gewollter Querscroller trägt `--dpm-schiene:1`. Gemessen wurde
+`div#oe-karte-gewerke` als Befund gemeldet (301 sichtbar / 648 Inhalt) —
+und genau dieses Element trägt die Marke.
+
+> **Ein Erkenner, der bekannte Absichten mitmeldet, wird nach dem dritten
+> Mal überlesen — und dann auch der echte Befund daneben.** Die Marke war
+> gebaut, exportiert und dokumentiert; gefragt hat sie niemand. Dieselbe
+> Form wie bei den Farbreglern: *setzt, und keiner liest.*
+
+**2 · Ein gestylter Schalter ist nicht erdrückt.** `input#ai-in-pdf` 0×0
+wurde in 6 von 8 Geräten gemeldet. Er steht in einem
+`<label class="ji-switch">` von 300 px Breite — das native Feld wird auf
+null gesetzt, bedient wird es über das Label. Geprüft wird jetzt der
+**Bedienweg**; ohne Label bleibt es ein Befund.
+
+Selbsttest vor dem Durchgang: **BESTANDEN** („findet einen echten Fehler
+und schweigt danach wieder").
+
+### Durchgang 1 — alle Reiter über alle Geräte
+
+8 Geräte × 9 Reiter = **72 Reiterbesuche** in der Aktenmappe, je Reiter
+ein Scroll-Durchlauf mit **Doppelprüfung** jeder Verdachtsstelle
+(zentriert und am Seitenanfang).
+
+```
+  Reiterbesuche             72
+  Klick nicht angekommen     0
+  Sektion nicht aktiviert    0
+  Bedienelemente geprüft  8778
+  nicht erreichbar           0
+  echter Überlauf            0
+```
+
+Geräte: 360 · 390 · 430 · 667 quer · 768 · 834 · 1180 · 1440.
+
+### Der eine echte Fund: ein 2-Pixel-Stummel
+
+`.dp-sidebar-toggle`, in 18 von 72 Reiterbesuchen als erdrückt gemeldet:
+
+```
+   768 px   0 x 0    display:none          (v1888, Absicht)
+   901 px   2 x 20   inline-block   @248, y=7198
+  1180 px   2 x 20   inline-block   @248, y=4304
+  1440 px   2 x 20   inline-block   @248, y=4111
+  1920 px   2 x 20   inline-block   @248, y=4037
+
+  background  rgb(240,240,240)   Browser-Standard
+  border      1,11 px outset      Browser-Standard
+  svg darin   0 x 0
+```
+
+Er schaltet trotz seines Namens das **Cockpit-Vollbild**. Mit offenem
+Cockpit nachgemessen: bei 390 und 768 `display:none` (bei `dp-show`
+**true**), bei 1440 2×20 bei **y = 6029** — unterhalb des 5.954 px hohen
+Cockpits. Dazu **0** Vollbild-Knöpfe im Cockpit und **0**
+`.dp-dash-btn`.
+
+> **Das Cockpit-Vollbild ist gebaut und auf keiner Breite erreichbar.**
+
+Und `dashboard.js` pflegt dafür eine Klasse, die niemand liest:
+`dp-show` wird beim Öffnen gesetzt und beim Schließen entfernt —
+**0 von 11.757** Regeln im laufenden Dokument nennen sie.
+`style.css:32836` begründet, dass `#dp-sb-toggle` im Cockpit-Vollbild
+weicht, mit *„eigene Steuerung"* — **die es nicht gibt.**
+
+`v2128` blendet den Stummel aus. **Keine neue Steuerung gebaut:** ob das
+Cockpit ein Vollbild braucht und wo der Schalter sitzt, ist eine
+Produktentscheidung (Backlog N60.40, drei Wege). Marcel hat für die
+Layouts das Gegenteil verlangt (*„dieses Vollbild-Menü ausblenden, das
+müsste bei der Ansicht raus"*) — ein neuer Knopf wäre eine Annahme.
+
+### Nicht angefasst, weil im Kommentar belegt
+
+`html[data-dp-layout] #dp-sb-toggle{display:none}` sieht wie ein Defekt
+aus (der Vollbild-Umschalter fehlt in jedem Layout). Der Kommentar in
+`layout-varianten.css:1480` zitiert Marcel wörtlich: *„es gibt dort
+dieses Vollbild-Menü ausblenden, das müsste bei der Ansicht raus"*.
+
+> **Zuerst den Kommentar lesen, dann den Befund schreiben.** Hätte ich
+> hier „repariert", hätte ich seine Entscheidung zurückgedreht.
+
+### `v2126` — die beiden Reste der Datenaufnahme
+
+**Kartei, vier Chips in einer Reihe ohne Umbruch.** Bei 940 px standen
+`.dp-pf-row`, `.dp-pf-tile` und `.dp-pf-lbl` **85 px außerhalb** der
+Karte. `wrap` ist in jeder gemessenen Breite besser oder unverändert:
+940 und 980 von „4 bzw. 2 draußen" auf 0, ab 1000 px kein Unterschied.
+
+> Die Begründung des Entwurfs (*„in einer Reihe fällt jeder Unterschied
+> sofort auf"*) stimmt — und gilt nur, solange die Reihe passt. Eine
+> Gestaltungsabsicht, die Inhalt aus der Karte schiebt, ist keine
+> Gestaltung mehr.
+
+**Ein Pixel Fensterbreite kostete 17 px Höhe:** 1400 px → 117 px hoch,
+1401 px → 134 px. Die Bandgrenze aus `v2124` lag nicht am
+Umschlagpunkt; der liegt bei einer **Behälterbreite** von rund 1148 px,
+also einem Fenster von 1440. Das Band reicht jetzt bis 1439.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.40 Cockpit-Vollbild: (a) ausbauen / (b) Knopf / (c) Tastatur | **Entscheidung** |
+| N60.39 Kartenstil „Zeile": 53 Regeln, 0 Setzer | **Optik + Risiko** |
+| 521 `font-size`-Deklarationen unter 11 px (Codeanalyse, 17 Blätter) | **gemessen, noch nicht im Browser geprüft** |
+
