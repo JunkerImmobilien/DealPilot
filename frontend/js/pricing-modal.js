@@ -870,8 +870,22 @@
       _bindCtaHandlers();
       _mountPlanCards();
       _wireKerosinStrip();
-      _pmMatrixFalten();   /* v2132 */
     }, 30);
+
+    /* ── v2132a · DIE FALTE HAENGT NICHT MEHR AN DER KETTE ──────────
+       Sie stand als FUENFTER Aufruf in einem setTimeout hinter
+       _injectPlanCss, _initToggle, _bindCtaHandlers, _mountPlanCards
+       und _wireKerosinStrip. Stuerzt einer davon, laeuft sie nicht -
+       und niemand sieht einen Fehler, nur einen fehlenden Knopf.
+
+       Gemessen am 12.10.2026 war es NICHT so (0 Fehler im Lauf, der
+       Knopf kam bei 390 und 768 px), aber die Bauart traegt das
+       Risiko: dieselbe Form, die schon einmal einen Pruefabschnitt
+       hinter einem process.exit verschwinden liess.
+
+       Eigener Takt, eigenes try/catch, und spaeter als die Kette -
+       sie braucht das fertige Markup, nicht umgekehrt. */
+    setTimeout(function(){ try { _pmMatrixFalten(); } catch (e) {} }, 90);
   }
 
   /* ══ v2132 · DIE COCKPIT-MATRIX WIRD AUF DEM HANDY AUFGEKLAPPT ══

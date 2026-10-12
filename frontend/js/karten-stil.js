@@ -340,6 +340,35 @@
        aufgetragener Anstrich. */
     if (document.body) document.body.classList.toggle('dp-neue-karte-stil', !!aktuell);   /* v1936 */
 
+    /* ══ v2133 · DER ENTWURF "ZEILE" HATTE 53 REGELN UND KEINEN SETZER ══
+
+       Marcel am 12.10.2026: "mach es so das es funktioniert und passend
+       bedient werden kann."
+
+       GEMESSEN am 11.10.2026:
+
+         53 Regeln haengen an  body.dp-pfzeile   (datenaufnahme.css)
+          0 Stellen im ganzen Repo setzen diese Klasse
+
+       Und am laufenden Staging gegengeprueft: mit
+       data-dp-kartenstil="zeile" am <html> - das Attribut WIRD gesetzt -
+       rendert die Leiste auf jeder Breite praktisch wie die Vorgabe.
+       Ein Entwurf, der in der Liste steht und nichts tut, ist
+       schlimmer als einer, der fehlt: Marcel waehlt ihn, sieht keine
+       Aenderung und haelt die Darstellung fuer kaputt.
+
+       DIE URSACHE STEHT IN datenaufnahme.css BEI v1702d: die Regeln
+       hingen an body.dp-neue-karte - einer Marke, die JEDES Layout
+       setzt - und bekamen die Zeile deshalb aufgezwungen. Sie wurden
+       auf body.dp-pfzeile umgehaengt, woertlich "und wird NIRGENDS
+       gesetzt". Das Abhaengen war richtig. Der zweite Schritt, sie an
+       die AUSDRUECKLICHE Wahl zu haengen, ist nie gekommen.
+
+       Hier ist er. Eine Zeile, und sie setzt die Marke nur bei
+       aktuell === "zeile" - nicht bei jedem Stil, sonst waere der
+       Fehler von v1702d wieder da. */
+    if (document.body) document.body.classList.toggle('dp-pfzeile', aktuell === 'zeile');   /* v2133 */
+
     try { localStorage.setItem(LS, aktuell); } catch (e) {}
     anwenden();
 
@@ -432,6 +461,9 @@
          Die Klasse traegt nicht die Helligkeit, sondern den UMBAU.   */
       var fb = doc.body;
       if (fb) fb.classList.toggle('dp-neue-karte', !!hauptNeu);
+      /* v2133: dasselbe fuer die Zeile - das QuickBoarding ist ein
+         eigenes Dokument und erbt keine Body-Klasse der Haupt-App. */
+      if (fb) fb.classList.toggle('dp-pfzeile', aktuell === 'zeile');
     } catch (e) { /* ohne Spiegel bleibt es beim Stand des Aufbaus */ }
 
     if (!f._dpkLoad) {
