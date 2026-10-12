@@ -37576,3 +37576,96 @@ Behoben, indem Abschnitt 9 dieselbe Weiche benutzt (`mwZeile`).
 |---|---|
 | Migration 086 muss beim Prod-Rollout mit `v2136` mit | **Pflicht** |
 | N60.3 damit vollständig abgeschlossen | — |
+
+## Rollout-Journal 12.10.2026 — v2139/v2139a: Regeln ohne Daten (N60.4 Teil 2)
+
+| Was | Commit |
+|---|---|
+| `v2139` neun Feldgruppen kommen im Prompt an | `24f79752` |
+| `v2139a` Typfalle am `Object.keys()`-Leser | `24f79752` |
+| `tools/prompt-lecks-pruefen.mjs` — 32 Felder, RC 0 | `24f79752` |
+
+**Erst nachgemessen: fünf der sieben offenen Punkte waren längst
+erledigt** (Produktwissen in `projektwissen.js`, Mietvertragsfelder,
+Fotos, Portfolio-Substanzfelder `v2014`, die sieben Blöcke `v2011`).
+Offen waren zwei: kein RAG (→ N60.7) und das Investmentprofil.
+
+### Der Befund
+
+Die sieben Blöcke aus `v2011` waren gebaut — aber **nicht vollständig
+gefüllt.** Neun Feldgruppen verließen den Browser und wurden nie in
+Text umgesetzt. Und der schlimmste Fall war kein stummes Feld:
+
+> Der Prompt trägt einen **16-zeiligen Regelblock** „MIETVERTRAEGE JE
+> EINHEIT", der dem Modell `vertragsart`, `naechste_anpassung`,
+> `letzte_erhoehung` und `befristet_bis` erklärt. **Die Werte standen
+> nirgends.** Seine Bedingung prüft `e.vertragsart` — er erschien also
+> genau dann, wenn die Daten vorlagen.
+
+Ein stummes Feld lässt das Modell im Unklaren; eine Regel ohne Daten
+lässt es **glauben**, es habe sie. Und `e.art` (`wohnen|gewerbe`) sieht
+im Code aus wie eine Vertragsart.
+
+Drei Schließungen sind mehr als eine Zeile:
+
+- **Sanierung** — Aufgabe 8 soll die Steuerwirkung beurteilen und wusste
+  nichts von 40.000 € Sanierung und ihrer Verteilung.
+- **Zwei Restnutzungsdauern** — eingetragen (`steuer.afa_rnd_jahre`)
+  gegen gerechnet (Bauteile, Anlage 2). Ab 3 Jahren Abweichung steht
+  jetzt der Auftrag im Prompt, **beide** mit Herkunft zu nennen.
+- **`ankauf.kennzahlen_damals`** lag genau dann vor, wenn der Prompt
+  „sage das, statt zu schaetzen" sagte.
+
+Dazu ein **Flächenabgleich**: summieren sich die Einheiten anders auf
+als die eingetragene Wohnfläche (ab 1 m²), ist das ein Befund.
+
+### `v2139a` — ein String zerfiel in Buchstaben
+
+`einheiten.modernisierung` wurde mit `Object.keys()` gelesen. Das nimmt
+auch einen String: `Object.keys('Dach neu')` → `0`…`7`, `length` 8, und
+im Prompt stünde `0=D, 1=a, 2=c, …`.
+
+> **Eine Prüfung auf `length` fragt, ob etwas DA ist, nicht ob es die
+> richtige GESTALT hat.** Im Ergebnis sieht das wie ein Modellfehler aus.
+
+### Der Prüfer ist der wichtigere Teil
+
+`tools/prompt-lecks-pruefen.mjs` ruft die **echte** `buildPrompt()` mit
+einem Auftrag, in dem jedes Feld einen unverwechselbaren Wert trägt, und
+sucht jeden im **Text** — nicht per `grep` auf den Quelltext, denn ein
+gelesenes Feld kann ungedruckt bleiben.
+
+```
+  32 Felder je mit Quellzeile   32 gruen
+   4 Gegenproben                Feld weg -> Wert muss verschwinden, 0 blind
+   2 Typproben                  String/Array zerfallen nicht
+   4 Regelbloecke               Regel genannt -> Wert vorhanden?
+```
+
+RC = 0 lokal, auf dem Staging-Host **und im gebauten Image** (18/18 per
+`docker exec`). Der Host-Lauf beweist die Datei, nicht das Image.
+
+`dotenv` fehlt lokal. Ersetzt wird **nur** das — per Haken auf
+`Module._load`, nicht `config` selbst: ein nachgebautes `config` wäre
+eine Nachbildung, und ein Prüfer gegen eine Nachbildung misst seine
+eigene Annahme. `require.resolve('dotenv')` geht nicht, was nicht
+installiert ist, lässt sich nicht auflösen.
+
+### ⚠ ZURÜCKGENOMMEN: zwei gemeldete Lecks waren meine
+
+Der erste Lauf meldete vier rote Felder, **zwei gab es nicht:**
+`halter.halter` heißt `halter.name`, und ein Feld `wohnung.stellplatz`
+existiert nicht (es sind `garagen` und `stellplaetze_aussen`). Beide
+werden gelesen.
+
+> **Ein Prüfer, der einen Feldnamen erfindet, meldet ein Leck, das es
+> nicht gibt — und schickt den nächsten Leser in die falsche Datei.**
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Investmentprofil erreicht keinen Prompt | **nächstes Paket** |
+| `settings.js:579` verspricht genau das wörtlich | **Versprechen ohne Code** |
+| vier `ai_*`-Schlüssel schreiben in Ids, die es nicht gibt | gemessen |
+| kein RAG | N60.7 |

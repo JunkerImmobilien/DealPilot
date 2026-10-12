@@ -753,7 +753,7 @@ Countdown/Hinweis in der App, Sperre bei Ablauf, Entsperrung durch
 Bestätigung. **Vorher messen**, was `email_verified` heute tatsächlich
 blockiert.
 
-#### N60.4 · Was macht die Pilot- und die Cockpit-Analyse wirklich? — TEIL 1 ERLEDIGT (`v2009`)
+#### N60.4 · Was macht die Pilot- und die Cockpit-Analyse wirklich? — TEIL 1 (`v2009`) UND TEIL 2 (`v2139`) ERLEDIGT, Rest: Investmentprofil
 Marcel: „Auf welche Daten wird zugegriffen und wo ist das Wissen? Haben
 wir auf alles Zugriff oder können wir was besser machen?"
 
@@ -790,6 +790,203 @@ Container am echten `buildPrompt()` nachgewiesen (8 von 8 Blöcken).
 - **Zinsbindung und Anschlusskondition.** Aufgabe 13 fordert eine
   Anschlussfinanzierungs-Analyse; mitgereist war nur die Restschuld zum
   Ende der Zinsbindung — **ohne zu wissen, wann das ist.**
+
+### ✅ TEIL 2 GEBAUT 12.10.2026 (`v2139`, `v2139a`) — und fünf der sieben Punkte waren längst erledigt
+
+**Erst nachgemessen, dann gebaut.** Von den sieben Punkten unten waren
+am 12.10.2026 fünf nicht mehr offen:
+
+| Punkt | Stand, gemessen |
+|---|---|
+| 1 · Produktwissen nur am Telegram-Agenten | **erledigt** — `services/projektwissen.js` ist EIN Lader für alle drei Piloten, gerufen in `openaiService.js:411`, `:2330`, `agentLauf.js:273`, `routes/ai.js:275` |
+| 2 · kein RAG | **weiter offen**, gehört zu N60.7 |
+| 3 · Mietvertragsfelder gibt es nicht | **erledigt** — `js/mietvertrag-objekt.js` (N60.8, `v2021`/`v2022`) |
+| 4 · Fotos werden nie ausgewertet | **erledigt** — N60.4d, `v2013` |
+| 5 · Portfolio-Pilot sieht nur 24 Zahlenfelder | **erledigt** — `v2014` hat sechs Substanzfelder ergänzt (`dashboard.js:2886-2899`: Lageklasse, Zustand, Energieklasse, Leerstand, Wohneinheiten, Bodenrichtwert) |
+| 6 · Investmentprofil erreicht keinen Prompt | **offen und bestätigt** — siehe unten |
+| 7 · Sieben unsichtbare Blöcke | **erledigt** — `v2011` baut alle sieben (`## STEUER`, `## BEWIRTSCHAFTUNG`, `## MIETENTWICKLUNGSPLAN`, `## WOHNUNGSDETAILS`, `## BODEN UND SUBSTANZ`, `## HALTER UND UEBERGANG`, `## ZUSTAND UND ENERGIE`) |
+
+> **Fünf von sieben Punkten als offen zu führen, kostet jedes Mal eine
+> Messung** — und wer einem von ihnen folgt, baut etwas zum zweiten
+> Mal. Dieselbe Lektion wie bei den Score-Stufen am 07.10.2026.
+
+### Der echte Befund: Regeln ohne Daten
+
+Punkt 7 war gebaut — aber **die Blöcke waren nicht vollständig gefüllt.**
+Neun Feldgruppen verließen den Browser und wurden von `buildPrompt()`
+nie in Text umgesetzt. Derselbe Fehlertyp wie in Teil 1 (`v2009`), nur
+an anderen Feldern.
+
+**Und der schlimmste Fall war kein stummes Feld, sondern das Gegenteil:**
+
+> Der Prompt trägt einen **16-zeiligen Regelblock** „MIETVERTRAEGE JE
+> EINHEIT", der dem Modell erklärt, wie es `vertragsart`,
+> `naechste_anpassung`, `letzte_erhoehung` und `befristet_bis` lesen
+> soll. **Die Werte standen nirgends im Prompt.** Und die Bedingung des
+> Blocks prüft `e.vertragsart` — er erschien also **genau dann, wenn
+> die Daten vorlagen**, und erklärte sie, ohne sie zu zeigen.
+
+Das ist teurer als ein fehlendes Feld. Ein stummes Feld lässt das
+Modell im Unklaren; eine Regel ohne Daten lässt es **glauben**, es habe
+sie. Und `e.art` (`wohnen|gewerbe`) sieht beim Lesen des Codes aus wie
+eine Vertragsart — die Lücke fällt dort nicht auf.
+
+### Was geschlossen ist (`v2139`), je mit Quelle
+
+| Feld | gesendet | war |
+|---|---|---|
+| `etage`, `zimmer` je Einheit | `ui.js:813-814` | stumm |
+| `vertragsart` (aus `mv_art`) | `ui.js:815` | stumm, **und erklärt** |
+| `letzte_erhoehung`, `naechste_anpassung`, `befristet_bis` | `ui.js:816-818` | stumm, **und erklärt** |
+| `zustand` je Einheit | `ui.js:825` | stumm |
+| `steuer.afa_eigen_pct` | `ui.js:897` | stumm |
+| `steuer.sanierung` (4 Angaben) | `ui.js:899-906` | stumm |
+| `steuer.sonder_afa_7b` | `ui.js:908` | stumm |
+| `steuer.erbbaurecht` | `ui.js:909-911` | stumm |
+| `mietentwicklung.umlagefaehig` | `ui.js:936` | stumm |
+| `zustand.bauteile` (8 Bauteile) | `ui.js:1031-1037` | stumm |
+| `zustand.restnutzungsdauer_berechnet` | `ui.js:1053-1061` | stumm |
+| `ankauf.kennzahlen_damals` | `ui.js:967` | stumm |
+| `ankauf.festgeschrieben_am` | `ui.js:969` | stumm |
+| `einheiten.stand` | `ui.js:837` | stumm |
+| `einheiten.flaeche_summe` | `ui.js:788` | stumm |
+
+**Drei davon sind mehr als eine Zeile im Prompt:**
+
+- **Die Sanierung.** Aufgabe 8 soll die Steuerwirkung beurteilen — und
+  ob 40.000 € Sanierung als Erhaltungsaufwand über zwei bis fünf Jahre
+  verteilt oder aktiviert werden, ändert die Steuerwirkung der ersten
+  Jahre vollständig. Das Modell hat es nicht geraten: es wusste nichts
+  davon.
+- **Die gerechnete Restnutzungsdauer** ist etwas anderes als
+  `steuer.afa_rnd_jahre`: dort steht, was der Nutzer **eingetragen**
+  hat, hier was die Bauteile **hergeben**. Ab 3 Jahren Abweichung steht
+  jetzt ein Auftrag im Prompt, **beide** mit Herkunft zu nennen und
+  keine dritte Zahl zu rechnen.
+- **`ankauf.kennzahlen_damals` lag genau dann vor, wenn der Prompt
+  „sage das, statt zu schaetzen" sagte.** Der Satz war richtig, die
+  Lage eine andere.
+
+Dazu ein **Flächenabgleich**: summieren sich die Einheiten anders auf
+als die eingetragene Wohnfläche (ab 1 m²), steht das als Befund im
+Prompt — entweder fehlt eine Einheit, oder die Gesamtfläche ist falsch.
+Beides ändert jede Kennzahl je m².
+
+### `v2139a` · Ein String zerfiel in Einzelbuchstaben
+
+`einheiten.modernisierung` ist ein Verzeichnis Gewerk → Stufe
+(`mfh-einheiten.js`, `d.gebaeude`). Gelesen wurde es mit
+`Object.keys()` — und das nimmt auch einen String an:
+`Object.keys('Dach neu')` gibt `0`…`7` zurück, `length` ist 8, die
+Bedingung also **wahr**, und im Prompt stünde `0=D, 1=a, 2=c, 3=h, …`.
+
+> **Eine Prüfung auf `length` fragt, ob etwas DA ist, nicht ob es die
+> richtige GESTALT hat.** Der Unterschied fällt erst im Ergebnis auf,
+> und dort sieht er wie ein Modellfehler aus.
+
+Gefunden, weil mein eigener Prüfauftrag versehentlich einen String
+schickte. Heute trifft es niemanden — aber es ist genau der Fehler, den
+ein Umbau am Sender eines Tages echt macht. Jetzt nach Typ
+unterschieden.
+
+### Der Prüfer — `tools/prompt-lecks-pruefen.mjs`
+
+**Der wichtigere Teil des Pakets.** Zweimal wurde dieselbe Lücke
+gefunden (`v2009`, `v2139`), beide Male durch Hinsehen. Ein Feld
+dazugeben kostet eine Zeile in `ui.js`, ein Feld **lesen** kostet eine
+zweite an anderer Stelle — und niemand merkt, wenn die zweite fehlt.
+
+Er ruft die **echte** `buildPrompt()` mit einem Auftrag, in dem jedes
+Feld einen unverwechselbaren Wert trägt, und sucht jeden im **Text**:
+
+```
+  32 Felder               je mit Quellzeile in ui.js, 32 gruen
+   4 Gegenproben          Feld weg -> Wert MUSS verschwinden (0 blind)
+   2 Typproben            String/Array zerfallen nicht mehr
+   4 Regelbloecke         nennt der Block ein Feld, steht ein Wert dazu?
+  ~94 Feldnamen im Sender  die Deckung wird mitgenannt
+```
+
+**Nicht `grep` auf den Quelltext:** ein gelesenes `payload.x` kann
+trotzdem ungedruckt bleiben, etwa in einer Bedingung, die nie wahr
+wird. Nur der Text beweist, dass es ankommt.
+
+RC = 0 — lokal, auf dem Staging-Host **und im gebauten Image** (18 von
+18 Proben, `docker exec`). Der Host-Lauf beweist die Datei, nicht das
+Image; beides zu prüfen ist die Lektion aus der Rechenkern-Spiegelung.
+
+### ⚠ ZURÜCKGENOMMEN: zwei vom Prüfer gemeldete Lecks waren meine
+
+Der erste Lauf meldete vier rote Felder. **Zwei davon gab es nicht:**
+
+- `halter.halter` heißt **`halter.name`** (`ui.js:988`) und wird
+  gelesen (`openaiService.js:481-486`).
+- Ein Feld `wohnung.stellplatz` gibt es nicht — Stellplätze stehen als
+  **`garagen`** und **`stellplaetze_aussen`** (`ui.js:976`), beide
+  gelesen (`:463-469`).
+
+> **Ein Prüfer, der einen Feldnamen erfindet, meldet ein Leck, das es
+> nicht gibt — und schickt den nächsten Leser in die falsche Datei.**
+
+Die Namen im Prüfer sind jetzt an `ui.js` ausgelesen, nicht geraten.
+Echt waren nur `einheiten.stand` und `einheiten.flaeche_summe`.
+
+### Promptlänge
+
+Eine ETW mit **allen** neuen Feldern belegt: **25.051 → 25.531
+Zeichen**, also +480 (1,9 %). Ein MFH mit zwei Einheiten und allem
+belegt kommt auf 30.765. Kein Grund zur Sorge, aber gemessen und nicht
+geschätzt.
+
+### Offen aus Teil 2
+
+1. **Kein RAG** → N60.7.
+2. **Das Investmentprofil erreicht keinen Prompt** — bestätigt am
+   12.10.2026, und es ist schlimmer als gedacht:
+
+   | | |
+   |---|---|
+   | Speicher | `localStorage`, Schlüssel `dp_investment_profile` |
+   | Schlüssel | **23**, nicht 24 (`config.js:993-1047`) |
+   | UI | Einstellungen → „Standardwerte" (`investment-profile.js:158-298`) |
+   | Leser | `main.js:38-49` (Formular-Vorbelegung), `dealscore2-ui.js`, `zve-manager.js` u. a. |
+   | in `user_settings` | **nein** — `ERLAUBT` führt nur `datenraum`, `lage_profil`, `portfolio_analyse`, `eigenes_wissen` (`userSettings.js:59`) |
+   | in einem Prompt | **nirgends** — kein Treffer in `ui.js`, `copilot.js`, `portfolio-pilot.js`, `dashboard.js` |
+
+   **Die drei Mindest-Schwellen `min_dscr`, `min_cashflow_vor_st`,
+   `max_ltv` haben nicht einmal ein Formularfeld** — sie reisen also
+   nirgendwohin. Und `openaiService.js:785-789` verlangt wörtlich:
+
+   ```
+   5. Investor-Fit — Für wen ist der Deal geeignet?
+      - Cashflow-Investor?  - Wertsteigerungs-Investor?  - Sicherheitsorientiert?
+   ```
+
+   Die Aufgabe nennt **drei Archetypen und keine Eingabe**. Die
+   Schwellen im Prompt (`:203`, `:222`, `:774`, u. a. „LTV < 85 % und
+   DSCR >= 1,2") sind **fest verdrahtet**, nicht aus dem Profil.
+
+   **Und `settings.js:579` bietet dem Nutzer wörtlich diese Vorlage an:**
+   *„Bewerte meine Kaufentscheidung anhand meines persönlichen
+   Investmentprofils (Mindest-DSCR, Max-LTV, Mindest-Cashflow)."*
+
+   > **Ein Versprechen ohne Code.** Wer diese Vorlage anklickt, bekommt
+   > eine Antwort, die seine Schwellen nie gesehen hat — und sie sieht
+   > genauso aus wie eine, die sie kennt.
+
+   Dazu sind **die vier `ai_*`-Schlüssel tot:**
+   `investment-profile.js:138-155` schreibt in `#ai_strat`, `#ai_verk`,
+   `#ai_risk`, `#ai_markt` und `#ai-param-*-display` — **diese Ids gibt
+   es in `index.html` nicht** (0 Treffer). Der Client-Prompt, der sie
+   las, ist mit `ui.js:2010-2033` entfallen.
+
+   **Nächstes Paket.** Es braucht eine Vorrangregel zwischen Profil und
+   Objektwerten — deshalb ein eigener Schritt und nicht in `v2139`
+   mitgenommen.
+
+---
+
+**Der ursprüngliche Text von Teil 2, zur Nachvollziehbarkeit:**
 
 **NOCH OFFEN aus derselben Bestandsaufnahme — Teil 2:**
 
