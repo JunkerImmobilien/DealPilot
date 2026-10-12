@@ -6741,7 +6741,71 @@ durch `_link()`).
 > **Startseite** dagegen null — die Unterscheidung „Seite trägt keine"
 > gegen „Abruf scheitert" ist damit belegt, nicht vermutet.
 
-**Offen bleiben Schritt 2 bis 5:**
+> **✅ SCHRITT 2 BIS 5 ERLEDIGT am 12.10.2026 (`v2152`–`v2152b`).**
+> Migration **087**: eigene Spalte `ansprechpartner jsonb NOT NULL
+> DEFAULT '[]'` — die Form, die hier unten als „sauberer" vermerkt war.
+> Sie führt **keine Bedingung** ein (anders als v2136, das mit
+> `email_verified_at` alle vier Staging-Konten aussperrte): gemessen nach
+> dem Lauf tragen alle **19** Altsätze eine leere Liste, **kein NULL**,
+> kein Satz unbrauchbar.
+>
+> **Der KI-Auftrag steht wörtlich aus v6 im Prompt**, mit allen drei
+> Einschränkungen. Die dritte ist die wichtigste — *„Stehen dort keine
+> Personen, bleibt die Liste leer"*: ohne sie ist leer kein zulässiges
+> Ergebnis und das Modell **muss** etwas liefern. Dazu das Zielfeld im
+> Antwortformat, sonst fällt der Auftrag lautlos auf den Boden.
+>
+> **Der Zusammenbau** (`personenAus`) nimmt zuerst, was die Recherche
+> gelesen hat, und füllt dann mit den persönlichen Postfächern der
+> Quellseite auf — in deren Reihenfolge. `bestaetigt` ist nur true, wenn
+> **wir** die Adresse auf einer selbst abgerufenen Seite gefunden haben.
+> `kopie` beginnt bei false; dafür gibt es **PUT
+> /unterlagen/amt/:id/kopie**, der ausschließlich das Häkchen setzt —
+> ein Endpunkt, über den sich die Adresse ändern ließe, hebt den Beleg
+> auf. Die angehakte Auswahl überlebt eine Neurecherche (`CASE` statt
+> `EXCLUDED`): „nichts gefunden" ist kein Grund, Bekanntes zu verwerfen.
+> Versand über `&cc=` im `mailto`, der Empfänger fällt doppelt heraus,
+> und der CC steht im **Briefkopf** — nicht erst im Mailprogramm.
+>
+> **DER ABNAHMELAUF HAT EINEN FEHLER GEFUNDEN, den kein erdachter
+> Prüfauftrag gefunden hätte** (`v2152b`): auf dem echten Impressum des
+> Kreises Minden-Lübbecke galt `rechnung@invoice.minden-luebbecke.de`
+> als **persönliches** Postfach und erschien als „Ansprechpartner 2" —
+> ein Rechnungspostfach als Ansprechperson für eine Flurkartenanfrage.
+> Ursache: `/^[a-z]\.?[a-z]+$/` sollte `mweber` treffen und trifft jedes
+> Wort aus Kleinbuchstaben. Jetzt zählt **nur der Punkt** im Konto;
+> `mweber` gilt als Funktion, und das ist die sichere Seite — eine
+> Funktion, die als persönlich gilt, schickt Post an die falsche Stelle;
+> eine persönliche, die als Funktion gilt, kostet nur eine Angabe.
+>
+> **Nachweise:**
+> - `tools/beleg-leser-pruefen.mjs`: **79 Fälle, RC=0**, darunter 13
+>   Zusicherungen des Zusammenbaus, 5 Formproben der Spalte `seiten`,
+>   6 Stellen des KI-Auftrags am **kommentarfreien** Text und 22
+>   Postfacharten — **sechs davon aus echten Amtsseiten**, mit
+>   Quellenvermerk im Code. Lauf auch **im Container**, dort „Gestellt:
+>   nichts".
+> - **Echte Recherche** (Flurkarte 32609 Hüllhorst): richtiges Amt,
+>   Adresse belegt, **null** Ansprechpartner genannt statt zwei
+>   erfundener — der Riegel greift. Null falsch belegte.
+> - **Positive Seite** ohne zweiten KI-Lauf, gegen das echte Impressum:
+>   4 Adressen gelesen, 1 Person zusammengebaut (`s.ohnesorge@…`,
+>   `bestaetigt=true`, `kopie=false`), keine Dubletten, Empfänger nicht
+>   dabei.
+>
+> **Dabei eine Falle dokumentiert, die ich selbst gebaut hatte**
+> (`v2152a`): `seiten` hat jetzt **zwei Formen** — alle 19 Altsätze
+> tragen die URL-Liste (`jsonb_typeof = array`), neue das Objekt mit dem
+> Beleg. Eine Nachmigration wäre falsch (die Altsätze haben den Beleg
+> nicht, ihn zu erfinden wäre schlimmer), also gibt es `seitenLesen()`:
+> ein Leser, beide Formen, `alt: true` als ehrliche Auskunft.
+>
+> **Offen und ausdrücklich nicht bewiesen:** ob das Modell bei einem Amt,
+> dessen Seite Personen **nennt**, auch welche zurückgibt. Der Lauf oben
+> traf ein Amt ohne genannte Personen — das belegt den Riegel, nicht den
+> Fund. Beim nächsten Abruf einer Bauakte mitmessen.
+
+~~**Offen bleiben Schritt 2 bis 5:**~~ **(erledigt, siehe oben)**
 
 2. Den KI-Auftrag in `unterlagenService.js` um `ansprechpartner` erweitern, **wörtlich mit der
    Einschränkung aus v6** („nur wenn dort wörtlich steht"). Der Prompt ist die Stelle, an der
