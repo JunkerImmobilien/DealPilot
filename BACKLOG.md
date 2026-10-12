@@ -9805,6 +9805,36 @@ stehen vermutlich im zweiten Dokument
 
 ## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
 
+### N1 · ✅ ERLEDIGT — Marcel hat den Preis gesenkt (nachgemessen 12.10.2026)
+
+> **Marcel am 12.10.2026: „also wir haben das doch schon auf 4 euro
+> oder? schau nochmal nach."** Er hat recht, und der Eintrag unten war
+> veraltet.
+>
+> Am **echten Katalog auf Prod** nachgerechnet (`ladeKatalog()` im
+> laufenden Container, nicht `config.js`):
+>
+> ```
+>   Einzelpreise      mpi 0,90   mpi_plus 1,90   wev 3,90
+>
+>   nachkauf_starter   4,00 EUR   5x mpi          Einzelwert  4,50   -0,50  Vorteil
+>   nachkauf_investor  8,75 EUR   5/5/0           Einzelwert 14,00   -5,25  Vorteil
+>   nachkauf_pro      12,50 EUR   5/5/5           Einzelwert 33,50  -21,00  Vorteil
+> ```
+>
+> **Alle drei Pakete sind jetzt guenstiger als der Einzelkauf.** Der
+> Starter traegt eine NEUE Preis-ID (`price_1UKupB…` statt
+> `price_1UCzxM…`) — es wurde also ein neuer Stripe-Preis angelegt, der
+> alte nicht geaendert.
+>
+> **Die Ursache im Code besteht fort und ist kein Defekt:**
+> `config.js:521` leitet den Paketpreis weiter als Monatsbeitrag ÷ 4 ab.
+> Solange der Stripe-Preis gilt (und er gilt — der Katalog kommt von
+> dort), ist das ohne Wirkung. Die Waechterfunktion
+> `_preisplausibilitaet()` bleibt und meldet den naechsten Fall.
+
+**Der ursprüngliche Befund, zur Nachvollziehbarkeit:**
+
 ### N1 · Starter-Nachkauf ist teurer als der Einzelkauf — ENTSCHEIDUNG OFFEN
 
 Gemessen am **echten Stripe-Katalog** (`GET /credits/bewertungen`),
@@ -9832,6 +9862,26 @@ Marcels Entscheidung:
    6,40 €)
 
 Der Stripe-Konnektor braucht dafür eine neue Anmeldung per `/mcp`.
+
+### N2 · ✅ ERLEDIGT 12.10.2026 — mit dem Prod-Rollout v1951–v2144
+
+> **Der blockierende Satz war: „Der Prod-Pull wurde von der
+> Arbeitsumgebung abgewiesen."** Am 12.10.2026 ist der Rollout gefahren
+> worden (Merge `74841228`), und damit sind beide Stücke live.
+>
+> Auf dem laufenden Prod nachgemessen:
+>
+> ```
+>   0c6cda6 v1669   bmfService.js traegt die Meldung (4 Treffer)
+>   cc28127 v1673   _preisplausibilitaet in bewertungsKatalog.js (2)
+>   beide Commits   Vorfahr von origin/main
+> ```
+>
+> Die Preis-Plausibilität meldet den Starter-Aufschlag beim
+> **Katalog-Abruf**, nicht beim Start — deshalb steht nichts im
+> Startlog, und das ist kein Befund.
+
+**Der ursprüngliche Text:**
 
 ### N2 · Zwei Backend-Fixes liegen auf `main`, der Prod-Pull fehlt
 
@@ -15448,6 +15498,24 @@ Vollständiger Ablauf: Block 04, Abschnitt „Wie die Ernte abläuft".
 | **F3** | **Sechs PDF im Browser laden und anhängen** | siehe Tabelle unten |
 | **F4** | **Drei einzelne Seiten:** Hamm (S. 64/65), Krefeld (S. 66), Kreis Unna (Kap. 8.1) | drei NRW-Sachwertfaktoren, Tabellen sind geerntet und geprüft |
 | **F5** | **Entscheidung: RLP-Landesbericht kaufen?** ✅ **Preis bestätigt 14.09.2026: 150 € PDF** (200 Druck, 300 kombiniert, LVermGeo-GeoShop) — die frühere Spanne „150 gegen 28" ist damit erledigt. Inhalt am Verzeichnis belegt: **fünf** Objektarten-Gruppen Sachwertfaktoren (4.2.2 bis 4.2.6) **plus** Liegenschaftszinssätze (4.3). Offen bleibt **nur** die Lizenz: „Vervielfältigung nur mit Erlaubnis", aber „Wiedergabe von Daten jedweder Art … mit Quellenangabe gestattet" — zwei Sätze, die verschieden weit gehen. Einzelheiten unter **F5** weiter unten | **ein Bundesland, 4,1 Mio Einwohner, beide Kennzahlen** |
+
+#### F5 · ⏸ ZURÜCKGESTELLT 12.10.2026 — Landesgrundstücksmarktbericht RLP, 150 €
+
+> **Marcels Entscheidung am 12.10.2026: „wir kaufen den bericht erst
+> nicht aber bitte weis mich drauf hin wenn wir das nächste mal
+> ernten."**
+>
+> Also **nicht gekauft, aber nicht verworfen.** Die Vorlage unten bleibt
+> vollständig stehen — sie ist am Inhaltsverzeichnis des kostenfreien
+> Auszugs belegt und veraltet nicht so schnell wie eine Preisangabe.
+>
+> **⚠ WIEDERVORLAGE: beim nächsten Erntelauf.** Wer eine Ernte für ein
+> weiteres Bundesland plant, prüft zuerst diesen Punkt — 150 € für
+> 4,1 Mio Einwohner mit beiden Kennzahlen in EINEM Dokument ist der
+> beste Schnitt, den die Ernte bisher gefunden hat. Vor dem Kauf die
+> **Lizenz klären**, nicht vermuten: das Impressum verbietet
+> „Digitalisieren, Scannen sowie Speicherung auf Datenträgern" ohne
+> Erlaubnis des Herausgebers.
 
 #### F5 · KAUFENTSCHEIDUNG: Landesgrundstücksmarktbericht RLP, 150 € **[NEU 14.09.2026]**
 

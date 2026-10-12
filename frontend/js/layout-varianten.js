@@ -249,7 +249,20 @@
        Beide wandern deshalb mit. Der leere `.sb-header` bleibt, wo er
        ist. */
     schnellstart: '.sb-neu-row',
-    suche:        '.sb-section-title-with-sort'
+    suche:        '.sb-section-title-with-sort',
+    /* ── v2145 · DER STAND-UMSCHALTER (Bestand / Ankauf) ─────────────
+       Er sitzt seit v2040 unter dem Logo, also im `.sb-header` - und
+       der blieb laut dem Kommentar oben bewusst zurueck, WEIL ER LEER
+       WAR. Das stimmt seit v2040 nicht mehr.
+
+       Marcel am 12.10.2026: „beim Aussehen Aktenmappe, Kanzlei und
+       Tower keine umschalter zwischen Bestand und ankauf".
+
+       Er heisst `stand`, nicht `schalter`: `KNOTEN.schalter` ist
+       bereits der Aktions-Aufklapper (`#sb-actions-trigger-btn`). Zwei
+       Dinge auf einem Namen loeschen sich lautlos - siehe die
+       Attributnamen-Falle bei `data-dp-karte`. */
+    stand:        '#dk-schalter'
   };
 
   var merker = [];       /* [{ knoten, eltern, naechstes }] */
@@ -894,6 +907,19 @@
         if (art === 'aktionen') {
           var s = hole(KNOTEN.schalter);
           if (s) h.insertBefore(s, k);
+        }
+        /* v2145: der Stand-Umschalter gehoert ueber die Objektliste -
+           er legt deren Modus um. Dieselbe Mechanik wie eine Zeile
+           darueber; `hole()` merkt sich den Rueckweg, also steht er
+           beim Verlassen des Layouts wieder unter dem Logo.
+
+           Er kann fehlen: `doppelkarte.js` baut ihn nur, wenn
+           mindestens ein Objekt einen Ankauf-Stand hat. Dann ist
+           `hole()` null und es passiert nichts - richtig so, ein
+           Schalter ohne Gegenstand waere eine leere Zusage. */
+        if (art === 'objekte') {
+          var st = hole(KNOTEN.stand);
+          if (st) h.insertBefore(st, k);
         }
         schiene.appendChild(h);
       }
