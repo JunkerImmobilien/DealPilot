@@ -141,6 +141,41 @@
       '  font-size:14px;font-weight:600;color:#FDFCFA}',
       '.dp-kg-v.leer{color:#B8625C}',
       '.dp-kg-s{flex:0 0 auto;font-size:10px;color:#8C857B;min-width:56px;text-align:right}',
+      /* ══ v2131 · DER SATZ WURDE MITTEN IM WORT ABGESCHNITTEN ══════
+         GEMESSEN am 12.10.2026, 360 px, Durchgang 4 der Geraeteabnahme:
+
+           .dp-kg-f   clientWidth 306   scrollWidth 473   -167 px
+           white-space: nowrap
+
+         Der ganze Satz lautet:
+           "Zuruecksetzung am 01.11.2026. Was du bis dahin nicht nutzt,
+            verfaellt - zugekaufte Bewertungen nie."
+
+         Sichtbar waren 306 von 473 px, also rund zwei Drittel. Gekappt
+         wurde genau die AUSNAHME am Ende.
+
+         > **Ein Satz, dessen Ausnahme abgeschnitten wird, sagt das
+         > Gegenteil von dem, was er soll.** Der Kunde liest "was du
+         > nicht nutzt, verfaellt" - und nicht, dass gekaufte
+         > Bewertungen davon ausgenommen sind.
+
+         URSACHE ist Erbschaft, keine eigene Regel: auf .dp-kg-f passen
+         NULL white-space-Regeln (im laufenden Dokument gegengeprueft).
+         Die Kette:
+
+           button#hdr-credits-pill   white-space: nowrap   <- hier
+             div.dp-kg-panel         nowrap  (geerbt)
+               div.dp-kg-f           nowrap  (geerbt)
+
+         Fuer die Pille selbst ist nowrap richtig - sie ist eine Zeile.
+         Das Panel haengt aber IM Knopf und erbt eine Eigenschaft, die
+         fuer eine andere Rolle gewaehlt wurde.
+
+         Deshalb wird sie am Panel zurueckgenommen und nur dort wieder
+         gesetzt, wo sie gebraucht wird: an den Zahlen (.dp-kg-v) und
+         ihren Einheiten (.dp-kg-s), die nicht umbrechen duerfen. */
+      '.dp-kg-panel{white-space:normal}',
+      '.dp-kg-v,.dp-kg-s{white-space:nowrap}',
       '.dp-kg-f{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);',
       '  font-size:10.5px;color:#8C857B;line-height:1.45}',
       '.dp-kg-pill .dp-kg-label{font-family:"JetBrains Mono",ui-monospace,monospace;',

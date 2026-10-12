@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2129</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2131</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1547,6 +1547,39 @@
     return { gezaehlt: gezaehlt, frei: frei, verdecker: verdecker, r: r };
   }
 
+  /* ── v2131 · DIE SCREENREADER-FORM IST KEIN ABGESCHNITTENER TEXT ──
+     In Durchgang 4 (12.10.2026) meldete der Pruefer auf jedem Geraet
+     **23 geklippte Beschriftungen** `label.oe-sr`, je rund 85 px zu
+     wenig. Gegengeprueft in `style.css:38748`:
+
+       .oe-sr { position:absolute !important; width:1px; height:1px;
+                overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+     Das ist die Standardform "visually hidden": der Text steht fuer
+     Screenreader im Dokument und wird fuer das Auge auf einen Pixel
+     gekappt - **mit Absicht**. Die Tabelle der Objekterfassung nennt
+     ihre Spalten in der Kopfzeile, die 23 Labels wiederholen sie je
+     Zelle fuer die Vorlesefunktion.
+
+     > **Eine Form, die Text absichtlich wegkappt, meldet jeder
+     > Kapp-Test als Befund.** 23 Fehlalarme auf jedem Geraet, und
+     > daneben stand EIN echter. Genau so verliert ein Pruefer seine
+     > Glaubwuerdigkeit.
+
+     Erkannt wird das Muster, nicht der Klassenname: 1x1 px (oder
+     kleiner) UND geklippt UND absolut positioniert. `clip-path:
+     inset(50%)` ist die neuere Schreibweise und zaehlt mit. */
+  function apNurFuerVorleser(e, win){
+    var cs = win.getComputedStyle(e);
+    if (cs.position !== 'absolute' && cs.position !== 'fixed') return false;
+    var r = e.getBoundingClientRect();
+    if (r.width > 2 || r.height > 2) return false;
+    var geklippt = /hidden|clip/.test(cs.overflow)
+                || (cs.clip && cs.clip !== 'auto')
+                || (cs.clipPath && cs.clipPath !== 'none');
+    return !!geklippt;
+  }
+
   /* ── v2129 · DEN SCHLIESSKNOPF FINDEN, OHNE IHN ZU ERFINDEN ───────
      In Durchgang 2 (12.10.2026, 100 Laeufe) meldete der Pruefer
      siebenmal "KEIN Schliessknopf gefunden" - darunter beim
@@ -2190,7 +2223,7 @@
                  deklariertAbsichtlich: deklariertAbsichtlich,
                  pruefeAnsicht: pruefeAnsicht, pruefSelbsttest: pruefSelbsttest,
                  apBedienbar: apBedienbar, apUeberlauf: apUeberlauf,
-                 apQuerScroller: apQuerScroller, apQuerUngewollt: apQuerUngewollt, apUeberLabel: apUeberLabel, apSchliesser: apSchliesser, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
+                 apQuerScroller: apQuerScroller, apQuerUngewollt: apQuerUngewollt, apUeberLabel: apUeberLabel, apSchliesser: apSchliesser, apNurFuerVorleser: apNurFuerVorleser, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
                  kontrast: kontrast, gemalt: gemalt, male: male,
                  lage: lage, warte: warte,
