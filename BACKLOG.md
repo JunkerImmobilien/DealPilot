@@ -2624,7 +2624,7 @@ unabhängig vom Jahr.
 3. *Beides zusammen soll in den Export* → dann ist es Lesart 1 plus die
    Entscheidung oben.
 
-> **Marcel ist DESAG-zertifiziert und weiß das besser als ich.** Lesart 2
+> **Marcel ist DESAG-geprüft und weiß das besser als ich.** Lesart 2
 > wäre eine echte Lücke: ein Bestandsobjekt über zehn Jahre mit einem
 > einzigen Steuersatz zu rechnen ist eine Vereinfachung, die niemand
 > ausgewiesen bekommt. Aber ob er das meint, steht nicht im Satz — und
@@ -3164,7 +3164,7 @@ sondern *beide nebeneinander, und die Differenz ist die Aussage.*
    **Bad Oeynhausen ist ohnehin gesperrt** — das Paket schreibt selbst
    „nicht für Berechnungen". Bleiben zwei Städte, beide mit demselben
    offenen Punkt. *Marcels Frage, nicht meine: er ist der
-   DESAG-zertifizierte Sachverständige und der Betreiber.*
+   DESAG-geprüfte Sachverständige und der Betreiber.*
 
    Das Paket sagt es selbst:
    *„Nutzungsbedingungen der Gemeinden nicht angegeben (§ 5 UrhG zu
@@ -6627,7 +6627,7 @@ schreibt daraus „Führendes Verfahren: Vergleichswertverfahren"
 
 > **Warum das anders wiegt als die übrigen Punkte:** bei allen anderen Befunden rechnet
 > etwas falsch. Hier rechnet alles richtig — und der Bericht **benennt die Grundlage
-> falsch**. Marcel ist DESAG-zertifiziert und zeichnet das. Eine Zahl, die „Vergleichswert
+> falsch**. Marcel ist DESAG-geprüft und zeichnet das. Eine Zahl, die „Vergleichswert
 > nach § 6 Abs. 1 ImmoWertV, abgeleitet über den Kaufpreis je m²" heißt und aus Inseraten
 > kommt, ist kein Rechenfehler, sondern eine falsche Herkunftsangabe — genau das, was die
 > Doktrin „jede Zahl trägt Herkunft" verhindern soll.
@@ -7193,7 +7193,7 @@ Der Kern ist **N4** — alles andere hängt davon ab oder ist klein.
 
 ---
 
-### N1 · Das Unterlagen-Modal trägt nicht die Marke
+### N1 (04.10.) · Das Unterlagen-Modal trägt nicht die Marke
 
 Marcel: *„Das müsste einmal das Modal auch im Stil vom Deal-Piloten, also
 so wie das Einstellungsmenü oder die anderen Modals, die wir öffnen, auch
@@ -7210,7 +7210,7 @@ Zwei Mängel, beide gemeldet:
   zu lesen. Vermutlich `btn-ghost` auf dunklem Grund. **Kontrast gegen den
   effektiven Grund messen**, nicht gegen den Behälter.
 
-### N2 · „Alle abrufen" statt fünfmal klicken
+### N2 (04.10.) · „Alle abrufen" statt fünfmal klicken
 
 Marcel: *„man muss die ja alle einzeln abrufen. Genau, dass man da noch
 einen Button macht: alle abrufen."*
@@ -7222,7 +7222,7 @@ fünf nacheinander holt, mit Fortschritt je Zeile.
 > dieselbe Gemeinde fünfmal dieselbe Arbeit, und die Ämter-Ernte kann
 > jeden Treffer für den nächsten nutzen.
 
-### N3 · Sind Gemarkung, Flur und Flurstück Pflicht?
+### N3 (04.10.) · Sind Gemarkung, Flur und Flurstück Pflicht?
 
 Marcel: *„ist es zwangsläufig notwendig, dass man Flur, Gemarkung und
 Flurstück eingeben muss?"*
@@ -7237,7 +7237,7 @@ ein Hinweis. **Dazu:** die BORIS-Antwort trägt Gemarkungsnummer und -name
 (41 Felder, siehe `boris-liefert-die-gemarkung`). Das Feld liesse sich beim
 Bodenrichtwert-Abruf mitfüllen.
 
-### N4 · DER REITER OBJEKT WIRD NEU GEORDNET — das große Stück
+### N4 (04.10.) · DER REITER OBJEKT WIRD NEU GEORDNET — das große Stück
 
 Marcel: *„im Tab Objekt haben wir unten Wertermittlung, Marktbericht. Da
 haben wir uns irgendwie falsch verstanden. Das ist ja jede, jede, jede
@@ -7333,7 +7333,7 @@ nur EZFH). Marktbericht-App füllt ihr Formular längst aus dem Objekt
   ohne Feld, `#bank-tbody` nicht mehr im Markup (CSV-Export tot, der
   Bankexport läuft über `exportPDFBank`).
 
-### N5 · „BORIS abrufen" heißt nicht immer BORIS
+### N5 (04.10.) · „BORIS abrufen" heißt nicht immer BORIS
 
 Marcel: *„Rufen wir wirklich immer bei BORIS ab oder haben wir für die 16
 Bundesländer auch andere Quellen? Weil dann brauchen wir es ja nicht
@@ -9132,7 +9132,7 @@ sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
 „Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
 Sprache, dann Felder füllen.
 
-### V3 · V5 · V7 — GEMESSEN: im Kern schon vorhanden
+### V3 (01.10.) · V5 · V7 — GEMESSEN: im Kern schon vorhanden
 
 Am 01.10.2026 am laufenden System gemessen, BEVOR gebaut wurde:
 
@@ -9154,7 +9154,7 @@ buildFullCatalog()            liest aus window.FIELDS           → V7
 gegen ein belegtes Feld (sagt er, was drinsteht?), gegen ein leeres, und
 einer mit Blick auf die Kostenansage.
 
-### V3 · Belegte Felder nicht still überschreiben — ERLEDIGT (v1764, v1767b)
+### V3 (01.10.) · Belegte Felder nicht still überschreiben — ERLEDIGT (v1764, v1767b)
 
 Marcel: „Wenn die Felder bereits gefüllt sind, gibt er an, was drin steht, und
 ich muss bestätigen, ob übersprungen wird."
@@ -9805,7 +9805,7 @@ stehen vermutlich im zweiten Dokument
 
 ## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
 
-### N1 · ✅ ERLEDIGT — Marcel hat den Preis gesenkt (nachgemessen 12.10.2026)
+### N1 (29.09.) · ✅ ERLEDIGT — Marcel hat den Preis gesenkt (nachgemessen 12.10.2026)
 
 > **Marcel am 12.10.2026: „also wir haben das doch schon auf 4 euro
 > oder? schau nochmal nach."** Er hat recht, und der Eintrag unten war
@@ -9863,7 +9863,7 @@ Marcels Entscheidung:
 
 Der Stripe-Konnektor braucht dafür eine neue Anmeldung per `/mcp`.
 
-### N2 · ✅ ERLEDIGT 12.10.2026 — mit dem Prod-Rollout v1951–v2144
+### N2 (29.09.) · ✅ ERLEDIGT 12.10.2026 — mit dem Prod-Rollout v1951–v2144
 
 > **Der blockierende Satz war: „Der Prod-Pull wurde von der
 > Arbeitsumgebung abgewiesen."** Am 12.10.2026 ist der Rollout gefahren
@@ -9905,7 +9905,7 @@ Zwei Backend-Dateien, **keine Migration, kein Frontend**.
 `tools/rollout-prod.ps1` ist hier das falsche Werkzeug: es MERGED
 staging → main und brächte alle 346 Commits samt Migrationen mit.
 
-### N3 · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
+### N3 (29.09.) · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
 
 Beim Wechsel auf `main` meldete git einen seit einer früheren Sitzung
 stehengebliebenen Sequencer-Zustand:
@@ -9939,7 +9939,7 @@ hier **nicht**.
 > Frage in zehn Sekunden erledigt. **Erst messen, ob es die Aufgabe
 > noch gibt, dann fragen.**
 
-### N4 · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
+### N4 (29.09.) · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
 
 > **Zurückgenommen, 29.09.2026:** Unten stand „**Im Repo existiert keine
 > Gegenstelle**". Das ist falsch. Ich hatte nach den *Dateinamen des
@@ -10025,7 +10025,7 @@ alles") von der Modul-Seite entkoppelt: **ein Modul muss die Rechnung
 nicht mitbringen, nur die Eingaben füllen und `POST /bmf/aufteilung`
 rufen.** Die Rechnung bleibt an der amtlichen Vorlage.
 
-### N5 · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
+### N5 (29.09.) · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
 
 `rnd-calc.js:419-433` wählt **immer die technische Alterswertminderung**,
 solange Alter < GND; das Punktraster ist nur Rückfall.
@@ -13836,7 +13836,7 @@ entfällt — nicht raten.
         und damit Qualität und Kerosinverbrauch.
      2. **Der Preis war „für den Zustand zu hoch."** Ob und wie der Zustand
         in die Marktmiete eingeht, ist eine fachliche Frage — Marcel ist
-        DESAG-zertifiziert, ich rate hier nicht.
+        DESAG-geprüft, ich rate hier nicht.
    - ~~**Den KI-Knopf nach oben**~~ — **ERLEDIGT `v1241` (`63758ba`).**
      Gemessen: der Knopf saß bei **y = 1178**, am Ende der linken Spalte, bei
      einem Fenster von 725 px. Wer die Miete einträgt, sah ihn erst nach dem
@@ -15499,7 +15499,7 @@ Vollständiger Ablauf: Block 04, Abschnitt „Wie die Ernte abläuft".
 | **F4** | **Drei einzelne Seiten:** Hamm (S. 64/65), Krefeld (S. 66), Kreis Unna (Kap. 8.1) | drei NRW-Sachwertfaktoren, Tabellen sind geerntet und geprüft |
 | **F5** | **Entscheidung: RLP-Landesbericht kaufen?** ✅ **Preis bestätigt 14.09.2026: 150 € PDF** (200 Druck, 300 kombiniert, LVermGeo-GeoShop) — die frühere Spanne „150 gegen 28" ist damit erledigt. Inhalt am Verzeichnis belegt: **fünf** Objektarten-Gruppen Sachwertfaktoren (4.2.2 bis 4.2.6) **plus** Liegenschaftszinssätze (4.3). Offen bleibt **nur** die Lizenz: „Vervielfältigung nur mit Erlaubnis", aber „Wiedergabe von Daten jedweder Art … mit Quellenangabe gestattet" — zwei Sätze, die verschieden weit gehen. Einzelheiten unter **F5** weiter unten | **ein Bundesland, 4,1 Mio Einwohner, beide Kennzahlen** |
 
-#### F5 · ⏸ ZURÜCKGESTELLT 12.10.2026 — Landesgrundstücksmarktbericht RLP, 150 €
+#### F5 (12.09.) · ⏸ ZURÜCKGESTELLT 12.10.2026 — Landesgrundstücksmarktbericht RLP, 150 €
 
 > **Marcels Entscheidung am 12.10.2026: „wir kaufen den bericht erst
 > nicht aber bitte weis mich drauf hin wenn wir das nächste mal
@@ -15517,7 +15517,7 @@ Vollständiger Ablauf: Block 04, Abschnitt „Wie die Ernte abläuft".
 > „Digitalisieren, Scannen sowie Speicherung auf Datenträgern" ohne
 > Erlaubnis des Herausgebers.
 
-#### F5 · KAUFENTSCHEIDUNG: Landesgrundstücksmarktbericht RLP, 150 € **[NEU 14.09.2026]**
+#### F5 (12.09.) · KAUFENTSCHEIDUNG: Landesgrundstücksmarktbericht RLP, 150 € **[NEU 14.09.2026]**
 
 **Das ist die klarste Kaufvorlage, die die Ernte bisher hervorgebracht hat** —
 und das Gegenstück zur Bayern-Empfehlung („nicht kaufen").

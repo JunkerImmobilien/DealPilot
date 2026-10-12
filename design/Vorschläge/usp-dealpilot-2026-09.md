@@ -84,7 +84,7 @@ trägt seinen Modellvermerk. Amtliche **Bodenrichtwerte aus BORIS**
 (11 von 11 Bundesländern, mit Stichtag und Bodenrichtwertzone), Daten der
 Gutachterausschüsse, Liegenschaftszinssätze, Sachwertfaktoren.
 
-**Der Beweis ist kein Marketing:** der Betreiber ist **DESAG-zertifizierter
+**Der Beweis ist kein Marketing:** der Betreiber ist **DESAG-geprüfter
 Sachverständiger**. Die Rechenwege sind gegen die Anwendungsbeispiele der
 amtlichen Dokumente geprüft.
 
@@ -223,7 +223,7 @@ Entscheidung, keine Technikfrage.
 **Für Berater, Makler, Steuerberater:**
 > „Drei normierte Verfahren nach ImmoWertV. Amtliche Bodenrichtwerte mit
 > Stichtag. § 7b Sonder-AfA, taggenau im Kaufjahr. Mandantentrennung für
-> GmbH und privat. Von einem DESAG-zertifizierten Sachverständigen gebaut."
+> GmbH und privat. Von einem DESAG-geprüften Sachverständigen gebaut."
 
 **Für den Bestandshalter:**
 > „Ihre GmbH und Ihr Privatbestand haben verschiedene Steuersätze — also

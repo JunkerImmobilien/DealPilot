@@ -73,7 +73,7 @@ window.QcHeuristik = (function () {
    *   „Immer bedenken dass es angebotspreise sind und meistens 10 %
    *    dadrunter verkauft wird."
    *
-   * Er ist DESAG-zertifizierter Sachverständiger; bei Bewertungsfragen gilt
+   * Er ist DESAG-geprüfter Sachverständiger; bei Bewertungsfragen gilt
    * sein Wort. Ein Preis, der aus Angebotsdaten stammt, liegt systematisch
    * über dem, was am Ende gezahlt wird.
    *

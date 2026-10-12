@@ -116,7 +116,7 @@ Marcel ist **nicht-technisch** und schreibt oft per Spracheingabe mit
 Tippfehlern — **Intent parsen, nicht Wortlaut**. „ja weiter", „hau rein",
 „ok los" heißt: ohne Rückfrage fortfahren.
 
-Er ist **DESAG-zertifizierter Sachverständiger**. Bei Bewertungsfragen weiß er
+Er ist **DESAG-geprüfter Sachverständiger**. Bei Bewertungsfragen weiß er
 es besser, bei Code nicht. Sagt er „das ist für mich Quatsch", genau hinsehen.
 
 Optik, Produkt, Geld, Preise → **Demo-first oder nachfragen, nie raten.**

@@ -194,7 +194,7 @@ schreibt casual Deutsch (du), oft per Spracheingabe mit Tippfehlern —
 **Intent parsen, nicht Wortlaut.** „ja weiter" / „hau rein" / „ok los" /
 „mach weiter" = ohne Rückfrage fortfahren. Immer kopierbare Bash-Befehle.
 
-**Er ist DESAG-zertifizierter Sachverständiger.** Bei Bewertungsfragen weiß er
+**Er ist DESAG-geprüfter Sachverständiger.** Bei Bewertungsfragen weiß er
 es besser, bei Code nicht. Sagt er „das ist für mich Quatsch", genau hinsehen —
 beim Ertragswert hatte er recht, und sein eigenes Gutachten war der Beleg.
 **Aber auch die Kaskade gilt für ihn:** seine gegriffene 0,91 für die Löhner
@@ -7737,7 +7737,7 @@ Zwei Fragen stecken darin, beide für Marcel:
    damit Qualität und Kerosinverbrauch.
 2. **Der Preis war „für den Zustand zu hoch".** Ob und wie der Zustand in
    die Marktmiete eingeht, ist eine fachliche Frage — Marcel ist
-   DESAG-zertifiziert, hier wird nicht geraten.
+   DESAG-geprüft, hier wird nicht geraten.
 
 > **Nachtrag 07.09.2026 — Punkt 1 ist beantwortet und gebaut.** Marcel:
 > *„ich möchte dass das garnichts kostet. es gibt kein kerosin mehr. das

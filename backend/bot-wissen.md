@@ -26,7 +26,7 @@ Wertermittlung — und bewertet ihn mit zwei Scores.
 Betreiber ist **Junker Solution**, das Einzelunternehmen von Marcel Junker,
 Kleinunternehmer nach § 19 UStG. **Keine UG, keine GmbH.** Junker Immobilien,
 DealPilot und Junker Digital sind Marken darunter. Marcel Junker ist
-DESAG-zertifizierter Sachverständiger.
+DESAG-geprüfter Sachverständiger.
 
 ---
 

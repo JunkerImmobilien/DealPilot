@@ -412,7 +412,7 @@
       +     '<div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>'
       +   '<div class="weg-handy"><svg viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/>'
       +     '<path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></svg>'
-      +     '<div><b>Aus der Gutachtenpraxis</b><span>DESAG-zertifizierter Sachverständiger</span></div></div>'
+      +     '<div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>'
       +   '<div><svg viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/>'
       +     '<path d="m9 12 2.2 2.2L15.5 10"/></svg>'
       +     '<div><b>Ihre Daten bleiben Ihre</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>'
