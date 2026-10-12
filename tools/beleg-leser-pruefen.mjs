@@ -402,6 +402,38 @@ if (typeof U.personenAus !== 'function') {
       return (p.length === 1 && p[0].bestaetigt === false) ? null
         : 'ohne Belegdaten stimmt etwas nicht';
     }],
+    /* ══ v2153 · ENTWEDER ZWEI ODER KEINE ════════════════════════════
+       Marcel: „wenn es nicht 2 ansprechpartner gibt sollte man schauen
+       ob es eine übergeordnete email adresse oder einen kontakt gibt
+       und den ausgeben und die ansprechpartner weg lassen." */
+    ['eine nackte Adresse faellt', function () {
+      /* Nur EIN persoenliches Postfach auf der Seite, kein Name. Das
+         war genau der Abnahmefall vom 12.10. (s.ohnesorge@…) — er sah
+         aus wie DIE Ansprechperson des Katasteramts. */
+      const nurEine = { alle: ['bauamt@stadt-xy.de', 'a.mueller@stadt-xy.de'],
+                        pro_seite: [{ url: Q, mails: ['bauamt@stadt-xy.de', 'a.mueller@stadt-xy.de'] }] };
+      const p = U.personenAus([], 'bauamt@stadt-xy.de', nurEine, Q);
+      return p.length === 0 ? null
+        : 'eine einzelne nackte Adresse wurde als Ansprechperson gefuehrt';
+    }],
+    ['eine MIT Namen bleibt', function () {
+      /* „Frau Mueller, Katasterauskunft" behauptet keine Zustaendigkeit
+         ueber das Amt hinaus und ist am Telefon brauchbar. */
+      const nurEine = { alle: ['bauamt@stadt-xy.de'],
+                        pro_seite: [{ url: Q, mails: ['bauamt@stadt-xy.de'] }] };
+      const p = U.personenAus([{ name: 'Frau Mueller', funktion: 'Katasterauskunft',
+                                 telefon: '0571 807-0' }],
+        'bauamt@stadt-xy.de', nurEine, Q);
+      return (p.length === 1 && p[0].name === 'Frau Mueller') ? null
+        : 'eine benannte Person ging verloren (' + p.length + ')';
+    }],
+    ['zwei bleiben zwei', function () {
+      const p = U.personenAus([
+        { name: 'A', email: 'a.mueller@stadt-xy.de' },
+        { name: 'B', email: 'b.schmidt@stadt-xy.de' }
+      ], 'bauamt@stadt-xy.de', BELEG, Q);
+      return p.length === 2 ? null : 'es sind ' + p.length;
+    }],
     ['ungueltige Adresse faellt weg', function () {
       const p = U.personenAus([{ name: 'A', email: 'email' },
                                { name: 'B', email: 'keine' }],

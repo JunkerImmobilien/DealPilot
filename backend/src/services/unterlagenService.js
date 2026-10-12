@@ -392,6 +392,36 @@ function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
     if (istPersonenpostfach(m)) merke({ name: '', funktion: '', email: m, telefon: '' });
   });
 
+  /* ══ v2153 · ENTWEDER ZWEI ODER KEINE ═══════════════════════════════
+   *
+   * Marcel am 12.10.2026: „wenn es nicht 2 ansprechpartner gibt sollte
+   * man schauen ob es eine übergeordnete email adresse oder einen
+   * kontakt gibt und den ausgeben und die ansprechpartner weg lassen."
+   *
+   * Das ist eine fachliche Entscheidung, und sie ist richtig: EINE
+   * Ansprechperson neben der Amtsadresse sieht aus wie eine
+   * Zuständigkeit, ist aber nur die eine, die wir zufällig lesen
+   * konnten. Beim Abnahmelauf gegen das Impressum des Kreises
+   * Minden-Lübbecke war es genau so — vier Adressen auf der Seite, eine
+   * davon persönlich, also eine Person. Wer liest, hält sie für DIE
+   * Ansprechperson des Katasteramts.
+   *
+   *   > Eine halbe Liste behauptet mehr, als sie weiß. Die Amtsadresse
+   *   > behauptet nichts und kommt an.
+   *
+   * Darum fällt die Liste bei weniger als zwei Einträgen GANZ weg. Die
+   * übergeordnete Adresse steht ohnehin schon als `email` am Amt — hier
+   * wird nur zurückgegeben, dass sie der Weg ist.
+   *
+   * EINE AUSNAHME: ein Eintrag mit NAMEN und Funktion ist etwas anderes
+   * als eine nackte Adresse. „Frau Müller, Katasterauskunft" ist eine
+   * Auskunft, die der Nutzer am Telefon brauchen kann, und sie
+   * behauptet keine Zuständigkeit, die über das Amt hinausgeht. Sie
+   * bleibt deshalb — die nackte Adresse ohne Namen fällt. */
+  if (personen.length < 2) {
+    const mitNamen = personen.filter(function (p) { return !!p.name; });
+    return mitNamen;
+  }
   return personen;
 }
 

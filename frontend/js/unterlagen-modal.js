@@ -269,6 +269,23 @@
     var t = '<b>' + _esc(a.behoerde) + '</b>'
       + (a.abteilung ? ' · ' + _esc(a.abteilung) : '');
     if (a.email) t += '<br>' + _esc(a.email);
+    /* ══ v2153 · DIE TELEFONNUMMER FEHLTE GANZ ═══════════════════════════
+
+       Marcel am 12.10.2026: „am besten auch telefonnummer dazu."
+
+       GEMESSEN: `telefon` kommt seit v1833 aus der Recherche
+       (`unterlagenService.js:696`), liegt als eigene Spalte in
+       `unterlagen_aemter` und wurde im Modal an KEINER Stelle
+       ausgegeben. Erst v2152 zeigte sie — aber nur bei den
+       Ansprechpersonen, nicht beim Amt selbst.
+
+       > Ein Feld, das erhoben und gespeichert wird und nirgends
+       > erscheint, ist dieselbe Art Verlust wie die `skala` von heute
+       > Morgen: die Arbeit ist getan und kommt nicht an.
+
+       Bei einem Amt ist die Nummer oft der schnellere Weg als eine
+       E-Mail, auf die in zwei Wochen jemand antwortet. */
+    if (a.telefon) t += '<br>' + _esc(a.telefon);
     /* ══ v1971c · DER PORTAL-LINK WAR KEIN LINK ═══════════════════════════
 
        Hier stand:
@@ -365,6 +382,52 @@
         t += '</div>';
       });
       t += '</div>';
+    } else {
+      /* ══ v2153 · KEINE ZWEI PERSONEN → DER AMTSWEG, AUSDRUECKLICH ═════
+
+         Marcel: „wenn es nicht 2 ansprechpartner gibt sollte man schauen
+         ob es eine übergeordnete email adresse oder einen kontakt gibt
+         und den ausgeben und die ansprechpartner weg lassen."
+
+         Das Backend laesst die halbe Liste weg (`personenAus`). Hier
+         steht, WARUM — sonst sieht die Stelle aus, als sei die Suche
+         gescheitert.
+
+         Die uebergeordnete Adresse ist nicht neu zu holen: sie steht
+         zwei Zeilen hoeher als `a.email` mit ihrem Belegstand. Dieser
+         Block nennt sie als den WEG und ergaenzt die Alternativen, die
+         beim Lesen der Seiten ohnehin anfielen (Funktionspostfaecher
+         zuerst, seit v2151).
+
+         Ohne eigene Adresse und ohne Portal steht hier nichts
+         Beschwichtigendes: dann ist der Weg wirklich offen, und das
+         gehoert gesagt. */
+      var _alt = [];
+      try {
+        var _s2 = a.seiten;
+        if (_s2 && !Array.isArray(_s2) && Array.isArray(_s2.alternativen)) {
+          _alt = _s2.alternativen.filter(function (m) { return m && m !== a.email; });
+        }
+      } catch (e) {}
+      if (a.email || a.telefon) {
+        t += '<div style="margin-top:7px;font-size:12px;color:#6f6960">'
+          + 'Keine zwei belegten Ansprechpersonen auf der Quellseite — '
+          + 'nimm den allgemeinen Weg des Amts oben.'
+          + (_alt.length
+              ? '<br>Weitere Adressen von den gelesenen Seiten: '
+                + _esc(_alt.slice(0, 3).join(', '))
+              : '')
+          + '</div>';
+      } else if (a.antrag_url) {
+        t += '<div style="margin-top:7px;font-size:12px;color:#6f6960">'
+          + 'Keine Adresse und keine Ansprechperson belegt — dieses Amt '
+          + 'nimmt die Anfrage über das Portal.</div>';
+      } else {
+        t += '<div style="margin-top:7px;font-size:12px;'
+          + 'color:var(--warn,#D8954C)">Weder Adresse noch Ansprechperson '
+          + 'belegt. Bitte den Weg selbst prüfen — die Quelle ist oben '
+          + 'verlinkt.</div>';
+      }
     }
     if (a.gebuehr) t += '<br>Gebühr: ' + _esc(a.gebuehr);
     if (a.hinweis) t += '<br><i>' + _esc(a.hinweis) + '</i>';
