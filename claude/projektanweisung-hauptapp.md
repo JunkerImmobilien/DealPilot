@@ -37368,3 +37368,135 @@ vier Pixel zu flach. Vorgabe 50, Zeile 44 (`v2133a`), Buetten 50.
 | Zeile bei 1440 px: 132 px hoch, Vorgabe 78 (nichts gekappt) | **Optik am Entwurf** |
 | `#bmfOverlay` Schließknopf 31×27 (nur Maus-Breiten) | **Feinschliff** |
 
+
+## Rollout-Journal 12.10.2026 — v2136–v2137b: die Gnadenfrist (Backlog N60.3)
+
+| Was | Commit |
+|---|---|
+| `v2136` Backend: Zugang sofort, Frist statt Riegel | `91b5179a` |
+| `v2136a` die Frist gilt auch für den API-Schlüssel | `91b5179a` |
+| `v2136b` **Migration 086** — Stempel für Altkonten | `ac567381` |
+| `v2137` Frontend: direkt rein, Band mit Restzeit | `099a2287` |
+| `v2137a` das Band nimmt Platz, statt zu schweben | `a0754705` |
+| `v2137b` die Bandhöhe wurde vor dem Text gemessen | `23c22cc2` |
+
+Marcels Vorgabe stand seit dem 08.10. im Backlog; die Vormessung
+(`v2094`) hatte die Grundlage geschaffen. Gebaut wurde Weg **(a)**:
+`is_active=true` ab der Anmeldung, die **Frist** trägt, was vorher der
+Riegel trug.
+
+### Der Befund, ohne den es nicht gegangen wäre
+
+Der Bestätigungsweg setzte `is_active = TRUE` — und `email_verified_at`
+blieb **NULL**. Gegen die Staging-Datenbank gemessen: **4 Nutzer, 4
+aktiv, 0 mit Stempel.**
+
+> **Eine Spalte, die eine Unterscheidung tragen soll, muss auch
+> geschrieben werden.** `v2094` hat sie gelesen und niemand gefüllt.
+
+**Keine Schema-Migration nötig:** `is_active`, `email_verified_at` und
+`created_at` gibt es alle. Die Frist ist `created_at + N Stunden`.
+
+### ⚠ Der Fehler, und er war groß
+
+**`v2136` hat auf Staging alle vier Konten ausgesperrt** — beide von
+Marcel und das Admin-Konto. Frist seit Monaten abgelaufen, also 403
+`VERIFY_EXPIRED` an jeder Anfrage.
+
+Das Bittere: ich hatte den Altbestand **selbst gemessen** und die Zahl
+in die Commit-Botschaft geschrieben. Ich habe sie als Begründung für
+den Fix gelesen und nicht als Warnung für die Vergangenheit.
+
+> **Wer eine Spalte zur Bedingung macht, muss ihren Altbestand
+> mitbringen.** Das Ergebnis war kein Schönheitsfehler, sondern eine
+> Aussperrung.
+
+**Gefunden hat es die Abnahme im Browser, nicht der Prüfer.** Das Band
+zeigte bei einer Frist 4 h 12 min **in der Zukunft** „abgelaufen". Mein
+erster Gedanke war ein Fehler im Band — der Server hatte recht und
+schickte für den angemeldeten Altnutzer einen Ablauf in der
+Vergangenheit.
+
+Behoben in **Migration 086**: `email_verified_at = created_at` für alle
+schon aktiven ohne Stempel, mit der Grenze `created_at < NOW()` (wird
+beim Lauf ausgewertet — ohne sie würde die Migration jeden künftigen
+Nutzer stempeln und die Frist dauerhaft abschalten). Vorher gesichert:
+`/root/backups/vor-086-20261012-0902.sql.gz`, 48 MB, Anfang angesehen.
+
+**⚠ Diese Migration gehört zwingend zu `v2136`.** Vor einem
+Prod-Rollout muss sie mit.
+
+### Wo die Frist greift
+
+An **jeder** Anfrage (`middleware/auth.js`), beim **Login**
+(`userService`) und im **API-Schlüssel**-Pfad (`v2136a`).
+
+> Eine Frist, die nur beim Anmelden geprüft wird, läuft für eine offene
+> Sitzung **nie** ab — der Token gilt sieben Tage. Und ein Zugang, der
+> die Frist nicht kennt, hebt sie auf: wer sich in den sechs Stunden
+> einen API-Schlüssel anlegt, hätte danach unbegrenzt weitergearbeitet.
+
+`v2136a` hat **mein eigener Prüfer** gefunden, und zwar als Rest: er
+suchte den englischen Satz „User account is disabled" und fand ihn nach
+dem Umbau noch einmal — im API-Key-Pfad. Es gibt zwei Wege in die App,
+und ich hatte einen angefasst.
+
+### Das Band
+
+Die Frist wird **nicht im Browser gerechnet**. Der Ablaufzeitpunkt kommt
+vom Server — aus der Antwort der Anmeldung oder aus der Kopfzeile
+`X-DP-Verify-Deadline`, die `v2136` an jede Anfrage hängt.
+
+Der Aufsatz sitzt auf `window.fetch`, nicht auf `Auth.apiCall`: so kommt
+die Kopfzeile unabhängig davon an, welcher Aufrufer sie ausgelöst hat.
+
+**Zwei eigene Fehler in der Abnahme:**
+
+`v2137a` — das Band lag bei 360 px über **drei**, bei 390 px über
+**zwei** Bedienknöpfen. Ein `position:fixed`-Element am unteren Rand
+verdeckt, was dort steht. **Dieselbe Falle wie beim Werkzeugpanel** —
+und ich habe sie gebaut, obwohl sie in meinen Notizen steht. Jetzt
+bekommt der Inhalt unten Platz, aus der **gemessenen** Bandhöhe.
+
+`v2137b` — die Höhe wurde gemessen, **bevor** der Text im Band stand:
+139 statt 195 px. *Die Höhe eines Elements, dessen Inhalt man gerade
+schreibt, misst man nach dem Schreiben.*
+
+### Nachweis
+
+Am lebenden Staging, mit echten Konten (danach gelöscht):
+
+```
+  Anmeldung                 201, Token, verifyDeadline +6 h
+  Zugang sofort             GET /objects -> 200
+  Kopfzeile                 x-dp-verify-deadline kommt mit
+  created_at -7 h           derselbe Token -> 403 VERIFY_EXPIRED
+  Login nach Ablauf         403 VERIFY_EXPIRED
+  resend unbekannt/bestätigt 200, neutraler Satz
+  Bestätigungslink          302, danach email_verified_at gesetzt
+  Altkonto nach 086         Stempel da, nicht ausgesperrt
+  Aufräumen                 4 Nutzer, 4 gestempelt, 0 Testreste
+```
+
+Band, vier Breiten, nach `v2137b`:
+
+```
+   360 px   Band 195 px   Variable 195   Polster 60 -> 215   verdeckt 0 von 26
+   390 px   Band 176 px   Variable 176   Polster 60 -> 196   verdeckt 0 von 26
+   768 px   Band 177 px   Variable 178   Polster 80 -> 198   verdeckt 0 von 27
+  1180 px   Band  83 px   Variable  83   Polster 80 -> 103   verdeckt 0 von 34
+```
+
+Restzeit „4 Std. 12 Min." auf allen vier, Knöpfe 44 px und erreichbar,
+Textkontrast **16,18**, abgelaufen rot `rgb(184,98,92)`.
+
+Prüfer `tools/anmeldung-auskunft-pruefen.mjs`: **27 → 48 Punkte**,
+RC = 0, alles echte Aufrufe.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Weg (a) heißt: ein unbestätigter Zugang **ist** ein Zugang | **benannt, Marcels Vorgabe** |
+| Migration 086 muss beim Prod-Rollout mit | **Pflicht** |
+

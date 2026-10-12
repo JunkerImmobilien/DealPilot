@@ -430,7 +430,7 @@ Desktop gerendert werden."
 > clientWidth`, und Kontrast der tragenden Flächen. Vorbild ist der
 > Läufer aus N58.
 
-#### N60.3 · Erstanmeldung: 6 Stunden Gnadenfrist
+#### N60.3 · ✅ GEBAUT 12.10.2026 (`v2136`–`v2137b`) — Erstanmeldung: 6 Stunden Gnadenfrist
 Marcel: „Bei der Erstanmeldung besteht die Möglichkeit, dass der Kunde
 direkt Zugang zur App bekommt und spätestens 6 Stunden nach
 Erstanmeldung bestätigen muss, sonst wird der Account gesperrt. Der
@@ -504,6 +504,141 @@ sehen."
 > > die neue Zeile nie — der Test war grün und hat nichts geprüft. Jetzt
 > > prüft er mit `42P01` und hält in einer Gegenprobe fest, dass `23505`
 > > wirklich den anderen Weg nimmt.
+
+### ✅ Gebaut, Weg (a) — Marcels Wortlaut
+
+Marcel am 12.10.2026 auf die Frage: *„mach es so das es funktioniert
+und passend bedient werden kann."* Also Weg **(a)**: `is_active=true`
+ab der Sekunde der Anmeldung, die **Frist** trägt, was vorher der
+Riegel trug.
+
+| | |
+|---|---|
+| `is_active` | **TRUE** ab der Anmeldung |
+| `email_verified_at` | NULL, bis der Link geklickt wird |
+| Ablauf | `created_at` + `config.auth.verifyGnadenfristStunden` (6) |
+
+**Keine Migration für das Schema nötig** — `is_active`,
+`email_verified_at` und `created_at` gibt es alle. Aber eine für die
+**Daten**, siehe unten.
+
+### Erst gemessen: der Stempel wurde nie gesetzt
+
+Der Bestätigungsweg setzte `is_active = TRUE` — und `email_verified_at`
+blieb **NULL**. Gegen die Staging-Datenbank:
+
+```
+  4 Nutzer, 4 aktiv, 0 mit email_verified_at
+```
+
+> **Eine Spalte, die eine Unterscheidung tragen soll, muss auch
+> geschrieben werden.** `v2094` hat sie gelesen und niemand gefüllt.
+> Wer bestätigt hatte und später deaktiviert wird, hätte weiter „sieh
+> in dein Postfach" gelesen — und einen Knopf „Mail erneut senden"
+> bekommen, der ihm nichts bringt.
+
+### Die sechs Teile
+
+| | Was | Wo |
+|---|---|---|
+| 1 | Die Frist als **eine** Quelle | `config.auth.verifyGnadenfristStunden` |
+| 2 | Anmeldung aktiv + Token + `verifyDeadline` zurück | `registerWithVerify.js` |
+| 3 | Bestätigung setzt den Stempel (`COALESCE`) | `registerWithVerify.js` |
+| 4 | `POST /auth/resend-verify`, 3/Stunde, immer neutral | `registerWithVerify.js` |
+| 5 | Frist an **jeder** Anfrage und beim Login | `middleware/auth.js`, `userService.js` |
+| 6 | Band mit Restzeit und Knopf, 44 px, k = 16,18 | `frontend/js/verify-frist.js` |
+
+Zu (5): eine Frist, die nur beim Anmelden geprüft wird, läuft für eine
+offene Sitzung **nie** ab — der Token gilt sieben Tage. Und `v2136a`
+hat sie auch in den **API-Schlüssel**-Pfad gelegt: ein Zugang, der die
+Frist nicht kennt, hebt sie auf.
+
+Zu (6): die Frist wird **nicht im Browser gerechnet.** Der
+Ablaufzeitpunkt kommt vom Server — aus der Antwort der Anmeldung oder
+aus der Kopfzeile `X-DP-Verify-Deadline`, die `v2136` an jede Anfrage
+hängt. Die Uhr des Nutzers ist nicht die unsere.
+
+### ⚠ Der Fehler, den ich dabei gemacht habe
+
+**`v2136` hat auf Staging alle vier Konten ausgesperrt** — beide von
+Marcel und das Admin-Konto.
+
+```
+  info@junker-immobilien.io   is_active=t  2026-05-13  Stempel NULL
+  majunker@gmx.net            is_active=t  2026-07-14  Stempel NULL
+  junker_immobilien@gmx.de    is_active=t  2026-07-23  Stempel NULL
+  pruef-ein-125f5634@...test  is_active=t  2026-10-04  Stempel NULL
+```
+
+Frist seit Monaten abgelaufen → 403 `VERIFY_EXPIRED` an jeder Anfrage.
+
+**Das Bittere:** ich hatte den Altbestand selbst gemessen und die Zahl
+in die Commit-Botschaft geschrieben („4 Nutzer, 4 aktiv, 0 mit
+email_verified_at"). Ich habe sie als **Begründung für den Fix**
+gelesen und nicht als **Warnung für die Vergangenheit**.
+
+> **Wer eine Spalte zur Bedingung macht, muss ihren Altbestand
+> mitbringen.** Das Ergebnis war kein Schönheitsfehler, sondern eine
+> Aussperrung.
+
+Gefunden hat es die **Abnahme im Browser**, nicht der Prüfer: das Band
+zeigte bei einer Frist 4 h 12 min **in der Zukunft** „abgelaufen". Mein
+erster Gedanke war ein Fehler im Band — der Server hatte recht.
+
+Behoben in **Migration `086_verify_stempel_nachtragen.sql`**:
+`email_verified_at = created_at` für alle, die schon aktiv sind und
+keinen Stempel haben, mit der Grenze `created_at < NOW()` (wird beim
+Lauf ausgewertet; ohne sie würde die Migration jeden künftigen Nutzer
+stempeln und die Frist dauerhaft abschalten).
+
+**⚠ Diese Migration gehört zwingend zu `v2136`.** Vor einem
+Prod-Rollout muss sie mit, sonst sperrt die Frist dort genauso aus.
+
+### Nachweis, am lebenden Staging
+
+```
+  Anmeldung                 201, Token, verifyDeadline +6 h, Text deutsch
+  Zugang sofort             GET /objects -> 200
+  Kopfzeile                 x-dp-verify-deadline kommt mit
+  created_at -7 h gesetzt   derselbe Token -> 403 VERIFY_EXPIRED
+  Login nach Ablauf         403 VERIFY_EXPIRED
+  resend-verify unbekannt   200, neutraler Satz
+  resend-verify bestätigt   200, neutraler Satz, keine Mail
+  Bestätigungslink          302, danach email_verified_at = 08:50:51
+  Altkonto nach 086         Stempel da, nicht ausgesperrt
+  Testkonten                gelöscht, 4 Nutzer, 4 gestempelt, 0 Reste
+```
+
+Prüfer `tools/anmeldung-auskunft-pruefen.mjs`: von 27 auf **48 Punkte**,
+RC = 0. `userService.authenticate()` 7×, `middleware.authenticate()` 5×,
+`errorHandler()` 5× — echte Aufrufe.
+
+### Drei eigene Fehler, die der Prüfer gefunden hat
+
+1. Der `config`-Ersatz kannte nur `env`. Die neue Weiche liest
+   `auth.verifyGnadenfristStunden` — mit dem alten Ersatz ein
+   TypeError. **Gefunden, weil der Prüfer nach dem Einbau weiter grün
+   war:** die alten Tests erreichen die neue Weiche gar nicht.
+2. Meine Login-Proben gaben `plainPassword: 'p'`, der Ersatz
+   akzeptiert nur `'richtig'`. Fünf rote Punkte, alle in der Probe.
+3. Die Prüfung auf den englischen Satz las den **rohen** Dateitext —
+   also auch meinen Kommentar, der ihn zitiert. Vierte Mal dieselbe
+   Falle.
+
+Und zwei in der Browser-Abnahme: das Band verdeckte bei 360 px **drei**
+Bedienknöpfe (`v2137a` gibt dem Inhalt Platz), und die Bandhöhe wurde
+**vor** dem Text gemessen — 139 statt 195 px (`v2137b`).
+
+### Offen
+
+Der Preis von Weg (a), ausdrücklich: **ein unbestätigter Zugang ist ein
+Zugang.** Wer eine fremde Adresse einträgt, kann sechs Stunden
+arbeiten. Das sind Marcels Vorgabe und die sechs Stunden sind die
+Begrenzung — aber es gehört gesagt.
+
+---
+
+**Der ursprüngliche Text des Punktes, zur Nachvollziehbarkeit:**
 
 **Was noch offen ist — und es ist eine Produktentscheidung:**
 
