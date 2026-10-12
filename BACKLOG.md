@@ -6703,6 +6703,46 @@ durch `_link()`).
    sauberer als eine Liste in einer Spalte namens `seiten`. Das ist eine
    Schemafrage und braucht Marcels Freigabe — aber **erst für den
    zweiten Schritt**, nicht für den Beleg.
+> **✅ SCHRITT 1 ERLEDIGT am 12.10.2026 (`v2151`/`v2151a`) — und dabei fiel
+> ein Defekt in UNSERER Fassung auf, der größer war als die Ergänzung:**
+>
+> `belegPruefen()` suchte `text.includes(adresse)` im rohen HTML. Ämter
+> schreiben ihre Adressen gegen Erntemaschinen verschleiert. **An 19
+> echten Schreibweisen gemessen verfehlte die alte Logik sieben** —
+> `[at] [dot]`, `{punkt}`, Soft-Hyphen, Zero-Width, `<wbr>`,
+> Gedankenstrich, Minuszeichen. Eine verfehlte Adresse heißt im Modal
+> „steht nicht auf der genannten Quellseite", **für eine Adresse, die
+> dort steht.** Der Nutzer bekommt eine Warnung für einen korrekten Fund.
+>
+> **Und der Rückfall war zugleich zu lax:** `includes(konto) &&
+> includes(domain)` sagt „bestätigt", wenn „info" im Menü steht und die
+> Domain im Impressum. Gemessen an
+> `<nav>Info</nav><footer>stadt-xy.de</footer>` — bestätigt, ohne die
+> Adresse je gesehen zu haben. **Ein falscher Beleg ist schlimmer als
+> ein fehlender: er behauptet eine Herkunft.**
+>
+> Gebaut: `mailsAufSeite()` (stellt die Seite her, liest dann echte
+> Adressen, Reihenfolge der Seite bleibt), `istPersonenpostfach()`,
+> `belegSeiten()` (bis sechs Seiten parallel, `pro_seite`).
+>
+> **Die Spalte `seiten` hatte keinen Leser** — gemessen: ein grep nach
+> `.seiten` über `backend/src` und `frontend/js` findet außer dem eigenen
+> INSERT keinen Treffer. Bis zu acht amtliche Seiten lagen je Amt in der
+> Datenbank und wurden nie abgerufen. Sie trägt jetzt
+> `{liste, pro_seite, alternativen, beleg_quelle}` — **keine Migration**,
+> die Spalte ist `jsonb` und hatte keinen Leser, der brechen konnte.
+>
+> **Nachweis:** `tools/beleg-leser-pruefen.mjs`, 42 Fälle, RC=0 — und
+> zwar **im Container gegen `/app/src/services/unterlagenService.js`,
+> mit „Gestellt: nichts — alle Abhängigkeiten waren echt da"**. Dazu die
+> Abnahme gegen echte Amtsseiten: Hüllhorst, Hiddenhausen,
+> Minden-Lübbecke und Bielefeld liefern je 3–4 echte Adressen aus dem
+> Impressum (`info@huellhorst.de`, `posteingang@bielefeld.de`, …), die
+> **Startseite** dagegen null — die Unterscheidung „Seite trägt keine"
+> gegen „Abruf scheitert" ist damit belegt, nicht vermutet.
+
+**Offen bleiben Schritt 2 bis 5:**
+
 2. Den KI-Auftrag in `unterlagenService.js` um `ansprechpartner` erweitern, **wörtlich mit der
    Einschränkung aus v6** („nur wenn dort wörtlich steht"). Der Prompt ist die Stelle, an der
    erfundene Namen entstehen würden.
