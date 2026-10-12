@@ -601,7 +601,17 @@
           ltv: ltvPct,
           dscr: dscr,
           wp_kpi: wpEstimate,
-          mstg: 1.5
+          mstg: 1.5,
+          /* v2141: Marcel am 12.10.2026: "das mit dem score muss aber
+             auch beim quickcheck passen und auch beim investor deal
+             score. also in der gesamten app."
+
+             Ohne Darlehen entfallen LTV und DSCR im Score, statt mit je
+             50 von 100 zu Buche zu stehen. `d_total` ist die Summe
+             beider Darlehen aus DealKpis; fehlt sie, rechnet der Kern
+             wie bisher. */
+          darlehen: (kpis && kpis.d_total != null && isFinite(kpis.d_total))
+            ? kpis.d_total : null
         });
         score = dsResult.score;
         var bd = dsResult.breakdown || [];

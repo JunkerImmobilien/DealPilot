@@ -6005,7 +6005,9 @@
     if (!Z || !window.DealScore || typeof window.DealScore.computeFromKpis !== 'function') return null;
     var S = window.DealScore.computeFromKpis({
       kp: Z.kp, cf_m: Z.K.cf_m || 0, nmy: Z.K.nmy || 0, ltv: Z.K.ltv || 0,
-      dscr: Z.K.dscr || 0, wp_kpi: Z.wp, mstg: _rfNum(_rfFeld('mietstg')) || 1.5
+      dscr: Z.K.dscr || 0, wp_kpi: Z.wp, mstg: _rfNum(_rfFeld('mietstg')) || 1.5,
+      /* v2141: ohne Darlehen entfallen LTV und DSCR im Score. */
+      darlehen: (Z.K.d_total != null && isFinite(Z.K.d_total)) ? Z.K.d_total : null
     });
     return { S: S, Z: Z };
   }

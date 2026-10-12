@@ -2160,15 +2160,42 @@ async function objekt_schnellblick(ctx, args) {
     herkunft = 'in DealPilot gerechnet und am Objekt gespeichert';
   } else if (!scoreFehlt.length) {
     const mstg = dez(d.mietstg) != null ? dez(d.mietstg) : 1.5;
+    /* v2141 - AUCH IM BOT. `darlehen` steht hier schon als Variable
+       (oben aus `d1` gelesen oder abgeleitet). Ohne sie bekaeme der Bot
+       einen anderen Score als die App, und zwar lautlos: beide rufen
+       denselben Kern, nur mit verschiedenen Eingaben. Genau auf diesem
+       Weg blieb am 07.10.2026 eine ungespiegelte Score-Aenderung
+       stundenlang unentdeckt. */
     const S = rechenkerne.score({
       kp: kp, cf_m: K.cf_m, nmy: K.nmy, ltv: K.ltv, dscr: K.dscr,
-      wp_kpi: wp, mstg: mstg
+      wp_kpi: wp, mstg: mstg,
+      darlehen: (darlehen != null && isFinite(darlehen)) ? darlehen : null
     });
     score = S.score;
+    /* v2141 - DIE HERKUNFT NANNTE DIE FALSCHE URSACHE.
+
+       Marcel am 12.10.2026: "Die Bewertung war erst schlecht mit 44 und
+       danach auf einmal ueber 80. Warum?"
+
+       Am echten Kern nachgerechnet (Sachsenstr. 18, kp 180.000, nkm 940):
+       dasselbe Objekt, dieselben Eingaben, EINE Annahme Unterschied -
+       ein abgeleitetes Darlehen gegen den Barkauf:
+
+         EK-Quote  0 %   ->  31 KRITISCH  statt  72 GUT   (+41)
+         EK-Quote 10 %   ->  44 SCHWACH   statt  72 GUT   (+28)
+         EK-Quote 20 %   ->  58 SOLIDE    statt  72 GUT   (+14)
+
+       Die 44 ist exakt getroffen. Die Ursache ist die Ableitung in
+       Z. 2029 (darlehenAbgeleitet), nicht "mehr Felder".
+
+       > Eine Herkunftsangabe, die die falsche Ursache nennt, ist
+       > schlimmer als keine: sie beendet die Suche. */
     herkunft = 'Quick-Check-Score — gerechnet mit demselben Kern wie die App '
-      + '(DealKpis + DealScore). Das Objekt wurde in DealPilot noch nicht '
-      + 'vollstaendig gerechnet; der Vollbild-Score kann abweichen, weil er '
-      + 'mehr Felder kennt.';
+      + '(DealKpis + DealScore), aber mit den Annahmen, die unter '
+      + '"beruht_auf_annahmen" stehen. Das Objekt wurde in DealPilot noch '
+      + 'nicht vollstaendig gerechnet. Weicht der Vollbild-Score ab, liegt es '
+      + 'ZUERST an diesen Annahmen und erst danach daran, dass er mehr Felder '
+      + 'kennt.';
     teilnoten = S.breakdown.map((b) => ({
       was: b.label, punkte: Math.round(b.score) + ' von 100',
       gewicht: b.weight + ' %', grundlage: b.input
