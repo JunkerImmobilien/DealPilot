@@ -40651,3 +40651,115 @@ body .dp-sidebar-toggle{ display: none !important; }
 .dpfk-bp{ font-size: 8.5px !important; }
 .dpfk-fl{ font-size: 8.5px !important; }
 .dpfk-strip [id^="mrpf-top-src-"]{ font-size: 8.5px !important; }
+
+/* =====================================================================
+   v2137 - DAS BAND DER BESTAETIGUNGSFRIST (Backlog N60.3)
+
+   Marcel: "Der Hinweis muss natuerlich mit der Erstanmeldung kommen."
+
+   Unten statt oben: oben sitzen Kopfzeile, Reiterleiste und bei schmalen
+   Breiten der Burger. Ein Band dort haette etwas verdeckt - und genau
+   das war der Befund von v1992a am Werkzeugpanel ("#dp-kv-panel und
+   .dpl-schalter lagen auf 390 px ueber der Datenaufnahme").
+
+   Es liegt UNTER der Datenaufnahme-Schublade (z 1100) und ueber allem
+   anderen: z 1090. Eine Schublade, die vom Band verdeckt wird, waere
+   schlimmer als ein Hinweis, der kurz wartet.
+   ===================================================================== */
+#dp-verify-band{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  z-index: 1090;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  max-width: min(760px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #0E0D0B;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);
+  box-shadow: 0 14px 40px -14px rgba(0,0,0,.75);
+  color: #F3EAD0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+#dp-verify-band b{ color: var(--gold-hi, #E8CC7A); font-weight: 600; }
+#dp-verify-band .dvb-ico{
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);
+  color: var(--gold-hi, #E8CC7A);
+  font-size: 15px;
+}
+#dp-verify-band .dvb-txt{ flex: 1 1 auto; min-width: 0; }
+
+/* Beide Knoepfe 44 px hoch - dieselbe Untergrenze wie ueberall sonst
+   seit v2134. Ein Hinweis, den man auf dem Handy nicht wegtippen kann,
+   ist ein Hindernis. */
+#dp-verify-band .dvb-send,
+#dp-verify-band .dvb-zu{
+  flex: 0 0 auto;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 9px;
+}
+#dp-verify-band .dvb-send{
+  padding: 10px 14px;
+  background: var(--gold-hi, #E8CC7A);
+  color: #1A1407;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#dp-verify-band .dvb-send:hover{ filter: brightness(1.06); }
+#dp-verify-band .dvb-send:disabled{ opacity: .7; cursor: default; }
+#dp-verify-band .dvb-zu{
+  min-width: 44px;
+  background: transparent;
+  border: 1px solid #2A2622;
+  color: #8C857B;
+  font-size: 15px;
+  line-height: 1;
+}
+#dp-verify-band .dvb-zu:hover{ color: #F3EAD0; border-color: #3A352E; }
+
+/* Abgelaufen: dieselbe Flaeche, andere Dringlichkeit. Rot bleibt in
+   jeder Marke rot (CLAUDE.md: Statusfarben nie tokenisieren). */
+#dp-verify-band.dvb-aus{
+  border-color: #B8625C;
+  background: #140D0C;
+}
+#dp-verify-band.dvb-aus .dvb-ico{ background: rgba(184,98,92,.18); color: #D8564C; }
+#dp-verify-band.dvb-aus b{ color: #E8A49F; }
+
+/* Weggetippt: das Band schrumpft auf den Hinweis, verschwindet aber
+   NICHT. Eine Frist, die man ausblenden kann, ist keine Frist - und
+   ein Zugang, der in vier Stunden endet, gehoert nicht versteckt. */
+#dp-verify-band.dvb-klein{ padding: 8px 10px; gap: 8px; }
+#dp-verify-band.dvb-klein .dvb-txt{
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#dp-verify-band.dvb-klein .dvb-send{ display: none; }
+
+@media (max-width: 640px){
+  #dp-verify-band{
+    left: 8px; right: 8px;
+    transform: none;
+    max-width: none;
+    flex-wrap: wrap;
+    bottom: 10px;
+  }
+  #dp-verify-band .dvb-txt{ flex: 1 1 100%; order: 2; }
+  #dp-verify-band .dvb-send{ flex: 1 1 auto; order: 3; }
+  #dp-verify-band .dvb-zu{ order: 1; margin-left: auto; }
+  #dp-verify-band.dvb-klein .dvb-txt{ max-width: none; }
+}

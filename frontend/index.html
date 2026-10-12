@@ -35,7 +35,7 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v2130">
+<link rel="stylesheet" href="css/style.css?v=v2137">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v2104b">
@@ -3639,7 +3639,7 @@ label.dp-required.qc-required::after {
 <script src="js/all-objects.js?v=v1960"></script>
 <script src="js/track-record.js?v=W39"></script>
 <script src="js/pdf.js?v=v1895"></script>
-<script src="js/auth.js?v=860"></script>
+<script src="js/auth.js?v=v2137"></script>
   <script src="js/auth-401-handler.js?v=950" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
   <script src="js/rate-limit-handler.js?v=v1370" defer></script>
@@ -3745,7 +3745,12 @@ label.dp-required.qc-required::after {
 <!-- V54: Floating Save-Button entfernt — Speichern steht in der Tab-Leiste rechts. -->
 
 
-  <script src="js/register-easter-egg.js?v=v1421b" defer></script>
+  <script src="js/register-easter-egg.js?v=v2137" defer></script>
+  <!-- v2137 · N60.3: das Band der Bestaetigungsfrist. Ohne defer, weil
+       register-easter-egg.js beim Erfolg DealPilotVerifyFrist.start()
+       ruft - und ein defer-Script, das spaeter geladen wird, ist dort
+       noch nicht da. -->
+  <script src="js/verify-frist.js?v=v2137"></script>
   <script src="credits-modal.js?v=1194"></script>
   <script src="js/grest-plz-lookup.js?v=v1823"></script>
 

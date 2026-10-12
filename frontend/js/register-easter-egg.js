@@ -279,7 +279,44 @@
         return;
       }
 
-      // Erfolg
+      /* ══ v2137 · DIREKT REIN, STATT INS POSTFACH (N60.3) ═══════════
+         Hier stand "Bitte klicke auf den Link in der Mail um dein Konto
+         zu aktivieren" - und das Formular wurde ausgeblendet. Der Nutzer
+         war fertig, aber nicht drin.
+
+         Marcel: "so kann ein User direkt, ohne dass er jetzt in seine
+         Mails gehen muss, schon was sehen."
+
+         Seit `v2136` liefert die Anmeldung einen Token mit. Wenn er da
+         ist, wird die Sitzung angelegt und die App betreten; das Band
+         der Frist uebernimmt den Hinweis. Fehlt er - alte Fassung des
+         Backends, oder ein Fehler beim Anlegen -, bleibt der alte Weg
+         ueber das Postfach stehen. **Kein Zustand ohne Ausgang.** */
+      if (data && data.token && data.user) {
+        try {
+          localStorage.setItem('ji_token', data.token);
+          localStorage.setItem('ji_session', JSON.stringify({
+            userId: data.user.id, email: data.user.email, name: data.user.name,
+            role: data.user.role, mode: 'api',
+            expires: Date.now() + 7 * 24 * 60 * 60 * 1000
+          }));
+        } catch (e) {}
+        if (data.verifyDeadline && window.DealPilotVerifyFrist) {
+          try { window.DealPilotVerifyFrist.start(data.verifyDeadline, data.user.email); } catch (e) {}
+        }
+        sucEl.style.display = 'block';
+        sucEl.innerHTML =
+          '<strong style="color:#3FA56C">✓ Willkommen an Bord!</strong><br>' +
+          'Du bist drin — wir haben dir parallel eine Bestätigungs-Mail an <strong>'
+          + _esc(email) + '</strong> geschickt.<br>' +
+          '<span style="color:#666;font-size:12px">Bitte bestätige sie innerhalb von '
+          + (data.verifyGraceHours || 6) + ' Stunden, sonst wird der Zugang gesperrt.</span>';
+        /* Kurz lesen lassen, dann rein. */
+        setTimeout(function () { try { location.reload(); } catch (e) {} }, 2200);
+        return;
+      }
+
+      // Erfolg (Rueckfall: Backend ohne Token)
       sucEl.style.display = 'block';
       sucEl.innerHTML =
         '<strong style="color:#3FA56C">✓ Anmeldung erfolgreich!</strong><br>' +
