@@ -291,7 +291,12 @@ window.QcHeuristik = (function () {
     KPI_SKALEN.forEach(function (s) {
       if (na[s[0]]) return;
       var v = +quelle[s[0]] || 0;
-      liste.push({ id: s[0], was: s[1], wert: _kpiText(s[2], v), guete: s[3](v) });
+      /* v2143: dieselbe Guete wie in der Ampel - sonst nennt der Satz
+         „die schwaechste Groesse" eine andere als die rote Ampel
+         darueber, und beide stehen auf demselben Bildschirm. */
+      var zg = (s[0] === 'bmr') ? _zielGuete(v, d.zielBmr) : null;
+      liste.push({ id: s[0], was: s[1], wert: _kpiText(s[2], v),
+                   guete: (zg != null) ? zg : s[3](v) });
     });
     liste.sort(function (a, b) { return a.guete - b.guete; });
     return liste.slice(0, wieviele || 2);
@@ -491,6 +496,50 @@ window.QcHeuristik = (function () {
     return String(v);
   }
 
+  /* v2143 · Die Guete der Bruttomietrendite AM ZIEL DER LAGEKLASSE.
+     Gibt null zurueck, wenn kein Ziel vorliegt - dann greift die feste
+     Skala aus KPI_SKALEN weiter. */
+  function _zielGuete(erreicht, ziel) {
+    if (ziel == null || ziel === '') return null;
+    var z = Number(String(ziel).replace(',', '.'));
+    if (!isFinite(z) || z <= 0) return null;
+    var e = Number(erreicht);
+    if (!isFinite(e) || e <= 0) return 0;
+    var q = e / z;
+    /* v2143a · DIE KNICKPUNKTE LIEGEN NICHT AUF DEN AMPELSCHWELLEN.
+
+       Erster Entwurf begann bei 0,6 und traf damit bei genau 80 % des
+       Ziels die Guete 0,3994 - die Gelb-Schwelle liegt bei 0,40. Ein
+       Tausendstel, und die Ampel sprang auf Rot. Eine Grenze, die auf
+       einer anderen Grenze liegt, entscheidet per Rundung.
+
+       Jetzt beginnt die Skala bei 0,5, und die Ampelwechsel liegen
+       dazwischen statt auf einem Knick:
+
+         unter 75 % des Ziels    rot
+         75 bis 97 %             gelb
+         ab 97 %                 gruen   (Ziel erreicht = 0,80)
+         ab 130 %                volle Punktzahl
+
+       Und fachlich ist es besser: wer 60 % seiner Zielrendite
+       erreicht, hat kein wertloses Objekt. */
+    if (q <= 0.5) return 0;
+    if (q >= 1.3) return 1;
+    if (q <= 1.0) return (q - 0.5) / 0.5 * 0.8;
+    return 0.8 + (q - 1.0) / 0.3 * 0.2;
+  }
+
+  /* Der Satz unter der Ampel, wenn ein Ziel gilt. Er nennt BEIDE
+     Zahlen - das Ziel und das Erreichte -, weil eine Note ohne ihren
+     Massstab nicht nachvollziehbar ist. */
+  function _zielSkala(ziel, klasse) {
+    var z = Number(String(ziel).replace(',', '.'));
+    var k = klasse ? String(klasse).toUpperCase().charAt(0) : '';
+    return 'Ziel ' + z.toFixed(1).replace('.', ',') + ' %'
+      + (k === 'A' || k === 'B' || k === 'C' ? ' (' + k + '-Lage)' : '')
+      + ' erreicht = gruen · ab 75 % gelb · 130 % = volle Punktzahl';
+  }
+
   function _ampel(q) {
     if (q == null) return null;
     if (q >= 0.75) return 'gruen';
@@ -513,8 +562,19 @@ window.QcHeuristik = (function () {
       if (na[id]) return { id: id, was: s[1], wert: null, ampel: null,
                            skala: s[4], entfaellt: na[id] };
       var v = +quelle[id] || 0;
-      var q = s[3](v);
-      return { id: id, was: s[1], wert: _kpiText(s[2], v), ampel: _ampel(q), skala: s[4] };
+      /* ══ v2143 · DIE BRUTTOMIETRENDITE MISST AM ZIEL DER LAGE ══════
+         Nur sie: die Lageklasse ist in BRUTTOmietrendite definiert
+         (lage-profil.js VORGABE), und die anderen Groessen haben mit
+         ihr nichts zu tun. Fehlt das Ziel, bleibt die feste Skala.
+
+         Der SCORE bleibt unberuehrt - diese Ampel ist Anzeige, und
+         `kategorien()` nimmt die Punkte aus DealScore. */
+      var zg = (id === 'bmr') ? _zielGuete(v, d.zielBmr) : null;
+      var q = (zg != null) ? zg : s[3](v);
+      return { id: id, was: s[1], wert: _kpiText(s[2], v), ampel: _ampel(q),
+               skala: (zg != null) ? _zielSkala(d.zielBmr, d.lageklasse) : s[4],
+               /* Damit die Anzeige sagen kann, WORAN gemessen wurde. */
+               am_ziel: (zg != null) ? true : undefined };
     });
   }
 

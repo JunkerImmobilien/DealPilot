@@ -707,9 +707,27 @@
        * nicht sagen, WELCHE davon das Urteil traegt. Sie liegen jetzt
        * WOERTLICH in `js/qc-heuristik.js`. Die Ampelklassen bleiben hier:
        * sie sind Anzeige. */
+      /* ══ v2143 · DIE LAGEKLASSE ALS MASSSTAB DER BRUTTOMIETRENDITE ══
+         Marcel: "kann man das nicht an den Lage Klassen koppeln? … nur
+         beruecksichtigen." Also auf die AMPEL, nicht auf den Score:
+         dieselbe Wohnung behaelt fuer jeden Nutzer denselben Score.
+
+         `zielBmr()` gibt null, wenn der Nutzer keine Klasse gewaehlt
+         oder keine Zielrendite gesetzt hat - dann bleibt die feste
+         Skala (3 % = 0 Pkt, 7 % = 100 Pkt). Das ist Marcels Riegel:
+         ohne Eingabe wird nichts erfunden, sondern das Vorhandene
+         genommen. */
+      var _lk = null, _zielB = null;
+      try {
+        _lk = v('qc_lageklasse') || null;
+        if (_lk && window.DealPilotLageProfil && DealPilotLageProfil.zielBmr) {
+          _zielB = DealPilotLageProfil.zielBmr(_lk);
+        }
+      } catch (e) { _zielB = null; }
       var _amp = (window.QcHeuristik && QcHeuristik.kennzahlenAmpel)
         ? QcHeuristik.kennzahlenAmpel({ bmr: bmr, nmr: nmr, ekr: ekr, cfMon: cfMon,
-            dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm })
+            dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm,
+            zielBmr: _zielB, lageklasse: _lk })
         : [];
       /* Die Ampelstufe wird in die Quote zurueckuebersetzt, die `_setKpi`
          erwartet — die Schwellen dort (>= 0,75 gruen, >= 0,40 gelb) sind

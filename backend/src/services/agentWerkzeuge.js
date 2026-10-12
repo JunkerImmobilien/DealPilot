@@ -2002,6 +2002,41 @@ async function objekt_schnellblick(ctx, args) {
      gerechnet wurde, entscheidet AUCH ueber die Finanzierung (Block
      darunter). */
   const sGespeichert = dialog.scoreLesen(d);
+
+  /* ══ v2143 · DAS ZIEL DER LAGEKLASSE, SERVERSEITIG GEHOLT ══════════
+     Die Klasse steht am Objekt (`d.lageklasse`), ihre Zielrendite im
+     Lage-Profil des Nutzers - serverseitig unter
+     `user_settings.lage_profil` (v1956, Marcels Entscheidung: "ja auf
+     den Server damit").
+
+     Hier wird GELESEN, nicht gerechnet: der Kern bekommt die Zahl als
+     Parameter und misst damit die AMPEL, nicht den Score.
+
+     Faellt irgendetwas aus - keine Klasse, kein Profil, kein Wert -,
+     bleibt `null`, und die feste Skala gilt weiter. Das ist Marcels
+     Riegel: ohne Eingabe wird nichts erfunden.
+
+     > `Number(null)` ist 0 und besteht `Number.isFinite`. Deshalb wird
+     > hier auf ABWESENHEIT geprueft und erst danach gerechnet - sonst
+     > waere ein fehlendes Ziel ein Ziel von 0 %, und jede Rendite
+     > traefe es unendlich gut. */
+  let zielBmrLage = null;
+  try {
+    const _klasse = d.lageklasse ? String(d.lageklasse).toUpperCase().charAt(0) : null;
+    if (_klasse === 'A' || _klasse === 'B' || _klasse === 'C') {
+      const _lp = await query(
+        'SELECT wert FROM user_settings WHERE user_id = $1 AND schluessel = $2',
+        [ctx.userId, 'lage_profil']
+      );
+      const _prof = (_lp.rowCount && _lp.rows[0].wert) || null;
+      const _k = _prof && _prof.klassen ? _prof.klassen[_klasse] : null;
+      const _z = _k ? _k.ziel_bmr : null;
+      if (_z != null && _z !== '') {
+        const _n = Number(String(_z).replace(',', '.'));
+        if (isFinite(_n) && _n > 0) zielBmrLage = _n;
+      }
+    }
+  } catch (e) { zielBmrLage = null; }
   if (zins && tilg) {
     const gi = kp + knkSumme;
     ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
@@ -2317,9 +2352,15 @@ async function objekt_schnellblick(ctx, args) {
        * Datei, die der Browser laedt. */
       stufensatz: H ? rechenkerne.heuristikTeil('stufensatz',
         rechenkerne.stufe(score).farbe) : undefined,
+      /* v2143: die Lageklasse steht am Objekt (`lageklasse`), ihr Ziel
+         im Lage-Profil des Nutzers - das liegt serverseitig unter
+         `/user-settings/lage_profil`. Hier wird NUR durchgereicht, was
+         schon gelesen ist; der Kern rechnet damit die Ampel, nicht den
+         Score. Fehlt eines von beiden, bleibt die feste Skala. */
       kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
-          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 }, nichtAnwendbar) : undefined,
+          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
+          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar) : undefined,
       kategorien: K ? rechenkerne.heuristikTeil('kategorien',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
