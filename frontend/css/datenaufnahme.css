@@ -2931,3 +2931,89 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     flex: 0 0 auto !important;
   }
 }
+
+/* =====================================================================
+   v2126 - ZWEI RESTE AUS DER 72-LAEUFE-ABNAHME
+
+   Abnahme nach v2124: 4 Kartenstile x 18 Breiten = 72 Messungen.
+   KAPP 0, UEBER 0, ZUBREIT 0, QUER 0, Knopftext k >= 4,5 ueberall.
+   Zwei Dinge blieben.
+
+   ── 1 · KARTEI: DIE VIER CHIPS STANDEN IN EINER REIHE, DIE NICHT
+          UMBRECHEN DURFTE ──────────────────────────────────────────
+   Gemessen, Kartenstil "Kartei", Reihe `nowrap` gegen `wrap`:
+
+     Fenster   Leiste    nowrap            wrap
+      901      581     raus 0            raus 0
+      940      620     raus 4            raus 0   (Hoehe 320 -> 374)
+      980      660     raus 2            raus 0   (Hoehe 320 -> 374)
+     1000      680     raus 0            raus 0   unveraendert
+     1024      703     raus 0            raus 0   unveraendert
+     1100      808     raus 0            raus 0   unveraendert
+     1180      888     raus 0            raus 0   unveraendert
+     1440     1148     raus 0            raus 0   unveraendert
+
+   Bei 940 px standen `div.dp-pf-row`, `label.dp-pf-tile` und
+   `span.dp-pf-lbl` **85 px ausserhalb** der Karte. Die Reihe trug
+   `flex-wrap:nowrap` aus dem Kartei-Entwurf (Z. 850) - mit der
+   Begruendung *"Alle vier Chips gleich hoch und gleich gefasst - in
+   einer Reihe faellt jeder Unterschied sofort auf"*.
+
+   > Die Begruendung stimmt, und sie gilt nur, solange die Reihe passt.
+   > Eine Gestaltungsabsicht, die Inhalt aus der Karte schiebt, ist
+   > keine Gestaltung mehr.
+
+   `wrap` ist in jeder gemessenen Breite entweder besser oder
+   unveraendert - es greift nur, wenn es muss. Deshalb im ganzen Band
+   901-1100, nicht nur bei 940.
+
+   Spezifitaet: der Entwurf nennt
+     html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row
+   das ist (1,3,1). Hier steht `.dp-pf-scroll` zusaetzlich davor: (1,4,1).
+
+   ── 2 · EIN PIXEL FENSTERBREITE KOSTETE 17 PX HOEHE ───────────────
+   Gemessen an der Bandgrenze von v2124:
+
+     1400 px   Leiste 1108 x 117   nowrap
+     1401 px   Leiste 1109 x 134   wrap     <- 17 px hoeher
+     1440 px   Leiste 1148 x  78   eine Zeile
+
+   Die 1400 war zu frueh gewaehlt. Eine Zeile wird die Leiste erst bei
+   einer Behaelterbreite von rund 1148 px, und die gibt es ab einem
+   Fenster von 1440. Zwischen 1401 und 1439 half `nowrap` also noch -
+   das Band endet jetzt bei 1439.
+
+   > Eine Bandgrenze, die nicht am Umschlagpunkt liegt, erzeugt einen
+   > Sprung, den niemand gewollt hat. Hier waren es 17 px auf ein Pixel
+   > Fensterbreite.
+   ===================================================================== */
+@media (min-width: 901px) and (max-width: 1100px){
+  html[data-dp-kartenstil="kartei"] .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  html[data-dp-kartenstil="kartei"] .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-seg .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Das Band aus v2124, weitergezogen bis an den gemessenen
+   Umschlagpunkt. Der Selektor ist derselbe; bei gleicher Spezifitaet
+   gewinnt die spaetere Regel, und das ist diese. */
+@media (min-width: 1401px) and (max-width: 1439px){
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar,
+  :is(#oab-bar,#qc7-sources).dp-pfbar{
+    flex-wrap: nowrap !important;
+  }
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+    flex: 0 1 auto !important;
+    min-width: min-content !important;
+  }
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+}
