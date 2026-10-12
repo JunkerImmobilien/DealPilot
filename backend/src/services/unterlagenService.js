@@ -281,6 +281,44 @@ function mailsAufSeite(html) {
     .filter(function (m) { return !/\.(png|jpe?g|gif|svg|webp|css|js|woff2?)$/.test(m); });
 }
 
+/* ══ v2152a · `seiten` HAT ZWEI FORMEN — UND BEIDE SIND GUELTIG ════════
+ *
+ * Bis v2150 war die Spalte eine URL-Liste:        ["https://…", …]
+ * Seit v2151 ist sie ein Objekt mit dem Beleg:    { liste, pro_seite, … }
+ *
+ * GEMESSEN auf Staging am 12.10.2026 nach der Migration: alle 19
+ * bestehenden Saetze tragen noch `array`, neue bekommen `object`. Die
+ * Spalte ist damit GEMISCHT, und das bleibt sie — eine Nachmigration
+ * waere falsch, weil die Altsaetze den Beleg je Seite gar nicht haben:
+ * ihn zu erfinden waere schlimmer als ihn zu vermissen.
+ *
+ *   > Wer `amt.seiten.pro_seite` liest, bekommt bei 19 von 19
+ *   > vorhandenen Saetzen `undefined` — und das sieht wie „keine Seiten
+ *   > gelesen" aus, statt wie „aus der Zeit vor dem Beleg".
+ *
+ * Darum gibt es EINEN Leser, und der versteht beide Formen. Dieselbe
+ * Rangfolge-Technik wie bei `gnd_jahre` im Marktbericht: mehrere Namen
+ * oder Formen, eine Stelle, die sie kennt.
+ *
+ * Heute hat die Spalte noch keinen Leser im Produkt — dieser hier ist
+ * fuer den naechsten, damit er nicht erst messen muss. */
+function seitenLesen(seiten) {
+  if (!seiten) return { liste: [], pro_seite: [], alternativen: [], alt: false };
+  if (Array.isArray(seiten)) {
+    /* Alte Form: nur URLs, kein Beleg. `alt: true` ist die ehrliche
+       Auskunft — der Aufrufer darf nicht glauben, hier sei nichts
+       gefunden worden. */
+    return { liste: seiten.filter(Boolean), pro_seite: [], alternativen: [], alt: true };
+  }
+  return {
+    liste: Array.isArray(seiten.liste) ? seiten.liste : [],
+    pro_seite: Array.isArray(seiten.pro_seite) ? seiten.pro_seite : [],
+    alternativen: Array.isArray(seiten.alternativen) ? seiten.alternativen : [],
+    beleg_quelle: seiten.beleg_quelle || null,
+    alt: false
+  };
+}
+
 /* ══ v2152 · DIE ZWEI ANSPRECHPERSONEN — ZUSAMMENGEBAUT, NICHT GERATEN ══
  *
  * Marcel am 12.10.2026: „ja mach die ansprechpartner gleich mit."
@@ -923,5 +961,7 @@ module.exports = {
   /* v2151 · fuer die Pruefstrecke und kuenftige Aufrufer */
   mailsAufSeite, istPersonenpostfach, belegSeiten,
   /* v2152 · der Zusammenbau der Ansprechpersonen */
-  personenAus
+  personenAus,
+  /* v2152a · der Leser, der beide Formen von `seiten` versteht */
+  seitenLesen
 };

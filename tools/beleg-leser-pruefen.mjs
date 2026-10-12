@@ -399,6 +399,40 @@ if (typeof U.personenAus !== 'function') {
   });
 }
 
+/* ══ 6b · v2152a · `seiten` HAT ZWEI FORMEN ═══════════════════════════
+ *
+ * Gemessen auf Staging: alle 19 bestehenden Saetze tragen die ALTE
+ * URL-Liste, neue bekommen das Objekt mit dem Beleg. Ein Leser, der nur
+ * die neue Form kennt, meldet bei jedem Altsatz „keine Seiten gelesen"
+ * — und das ist etwas anderes als „aus der Zeit vor dem Beleg".
+ */
+console.log('');
+console.log('=== 6b · Beide Formen von `seiten` (v2152a) ===');
+if (typeof U.seitenLesen !== 'function') {
+  console.log('  ROT seitenLesen() ist nicht exportiert'); rot++;
+} else {
+  [
+    ['alte URL-Liste', ['https://a.de', 'https://b.de'],
+      function (r) { return r.liste.length === 2 && r.pro_seite.length === 0 && r.alt === true
+        ? null : 'liste=' + r.liste.length + ' alt=' + r.alt; }],
+    ['neue Objektform', { liste: ['https://a.de'], pro_seite: [{ url: 'https://a.de', mails: ['x@a.de'] }], alternativen: ['y@a.de'] },
+      function (r) { return r.pro_seite.length === 1 && r.alt === false
+        ? null : 'pro_seite=' + r.pro_seite.length + ' alt=' + r.alt; }],
+    ['null', null,
+      function (r) { return r.liste.length === 0 && r.pro_seite.length === 0 ? null : 'nicht leer'; }],
+    ['leeres Objekt', {},
+      function (r) { return r.liste.length === 0 && r.alt === false ? null : 'alt=' + r.alt; }],
+    ['Array mit Luecken', ['https://a.de', null, ''],
+      function (r) { return r.liste.length === 1 ? null : 'liste=' + r.liste.length; }]
+  ].forEach(function (p) {
+    faelle++;
+    let fehler = null;
+    try { fehler = p[2](U.seitenLesen(p[1])); } catch (e) { fehler = 'wirft: ' + e.message; }
+    if (fehler) rot++;
+    console.log('  ' + (fehler ? 'ROT ' : 'ok  ') + p[0].padEnd(22) + (fehler || ''));
+  });
+}
+
 /* ══ 7 · STEHT DER AUFTRAG IM PROMPT — UND SEIN ZIELFELD? ═════════════
  *
  * Der Prompt ist die Stelle, an der erfundene Namen entstehen. Die drei
@@ -445,6 +479,7 @@ console.log('  Faelle      : ' + faelle);
 console.log('  Geprueft    : 19 Schreibweisen finden, 12 Fehlalarme vermeiden,');
 console.log('                Reihenfolge, 9 Postfacharten, zwei Gegenproben,');
 console.log('                13 Zusicherungen des Personen-Zusammenbaus (v2152),');
+console.log('                5 Formproben der Spalte seiten (v2152a),');
 console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text');
 console.log('  NICHT       : `belegSeiten()` selbst — die ruft echte Server ab.');
 console.log('                Dass sie die Seiten LIEST, ist hier bewiesen; dass sie');
