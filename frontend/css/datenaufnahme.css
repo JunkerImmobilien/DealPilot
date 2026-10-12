@@ -3154,3 +3154,88 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     min-height: 44px !important;
   }
 }
+
+/* =====================================================================
+   v2135 - "DEALPILOT" STAND AUF 12 VON 53 PX
+
+   Marcel am 12.10.2026: "auf dem ipad mini die datenaufnahme DealPilot
+   und die Stufen werden nicht richtig dargestellt."
+
+   GEMESSEN, iPad mini 768 px, Kartenstil Kartei, die Kachel
+   `[data-src="dealpilot"]` und ihr Inhalt:
+
+     Kachel                  89 x 44     width: 88,941px
+       span.dp-pf-logo.dp    12 sichtbar / 53 Inhalt    "DealPilot"
+       span.dp-pf-stufen     12 sichtbar / 17 Inhalt    die drei Pillen
+       span.dp-pf-led        12 x 12
+
+   Von "DealPilot" waren 12 von 53 px zu sehen, von den Stufen 12 von
+   17. Beides steht als Rest da, nicht als Beschriftung.
+
+   ── DER UMFANG, GEMESSEN STATT GESCHAETZT ─────────────────────────
+   4 Kartenstile x 5 Breiten: **12 von 20 Laeufen betroffen.**
+
+     Stil      641    768    834    900    901
+     Vorgabe   heil   heil   heil   heil   heil
+     Zeile     KAPP   KAPP   KAPP   KAPP   heil
+     Kartei    KAPP   KAPP   KAPP   KAPP   heil
+     Buetten   KAPP   KAPP   KAPP   KAPP   heil
+
+   Also drei Stile ueber das ganze Band 641-900, und ab 901 ist alles
+   in Ordnung (Kachel 173-184 px, Logo 59/59, Stufen 60/60).
+
+   ── ZWEI URSACHEN, DIE ZUSAMMEN WIRKEN ────────────────────────────
+   **1 · Eine Prozentangabe mit zwei verschiedenen Bezugsgroessen.**
+   `v2117` gibt den Kacheln im Band 641-900 `width: calc(50% - 3px)` -
+   zwei Spalten statt einer langen Saeule. Gemessen bei 768 px:
+
+     .dp-pf-seg (Marktbewertung)   Reihe 184 px -> 50 % = 89 px
+     .dp-pf-seg (Daten einlesen)   Reihe 664 px -> 50 % = 329 px
+
+   > **Das erste Segment enthaelt EINE Kachel.** Seine Reihe ist so
+   > breit wie diese Kachel, und die Haelfte davon ist zu wenig fuer
+   > ihren eigenen Inhalt. Die Regel war fuer vier Kacheln gedacht und
+   > trifft eine.
+
+   Dieselbe Falle wie bei `v2121`: dort waren 50 % von 1263 px
+   plötzlich 631 px. **Eine Prozentangabe ist nur so gut wie ihr
+   Bezug**, und der Bezug ist hier je Segment ein anderer.
+
+   **2 · Eine Sammelregel nimmt dem Inhalt seine Mindestbreite.**
+   `v1941e` setzt im Band bis 900 px
+
+     #oab-bar.dp-pfbar *  { min-width: 0 !important }
+
+   auf JEDEN Nachfahren. Ohne sie waere die Kachel bei 89 px
+   uebergelaufen - mit ihr schrumpft stattdessen der Text auf 12 px.
+   Der Ueberlauf ist weg, der Inhalt auch.
+
+   ── WAS HIER GESETZT WIRD ─────────────────────────────────────────
+   Die Kachel darf nicht schmaler werden als ihr Inhalt
+   (`min-width: max-content`), und der Inhalt bekommt seine
+   Mindestbreite zurueck (`min-width: auto`). Die 50 % bleiben als
+   WUNSCHbreite stehen - wo sie passen, teilen die Kacheln weiter zu
+   zweit; wo sie nicht passen, gewinnt der Inhalt.
+
+   Spezifitaet: `:is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile > *`
+   ist (1,2,0) gegen die (1,1,0) der Sammelregel - die nennt nur EINE
+   Klasse. Bei der Kachel selbst ist es (1,2,0) gegen (1,2,0), also
+   entscheidet die Reihenfolge, und diese Regel steht spaeter.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 900px){
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    min-width: max-content !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile > *,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile > *{
+    min-width: auto !important;
+  }
+  /* Die Reihe muss umbrechen duerfen - sonst schiebt die gewachsene
+     Kachel ihre Nachbarn aus der Karte. In der Kartei steht dort
+     `nowrap` aus dem Entwurf (Z. 850). */
+  html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  html[data-dp-kartenstil] .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+}
