@@ -182,8 +182,13 @@
   .fuss div{font-size:12.4px; color:#C9C2B6}
   .fuss b{display:block; font-family:var(--f-disp); font-size:13px; color:var(--gold-hi);
     margin-bottom:3px; font-weight:600}
+  /* v2142: war #6b655c — am laufenden Blatt gemessen Kontrast 3,53 auf
+     Obsidian, also unter 4,5. Mit --grau (#8a8279) sind es 5,39, und das
+     Token gibt es hier schon. Eine Fusszeile, die niemand lesen kann,
+     traegt das Stand-Datum umsonst — und genau das Datum ist die Zeile,
+     die am Stand jemand nachsieht. */
   .stand{margin-top:18px; font-family:var(--f-mono); font-size:9px; letter-spacing:.1em;
-    color:#6b655c; text-transform:uppercase}
+    color:var(--grau); text-transform:uppercase}
 
   /* ── Schmal: Bahnen untereinander ──────────────────────────── */
   @media (max-width:1180px){
