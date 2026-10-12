@@ -37950,3 +37950,127 @@ Detailkarte nachgezogen.
 | Investor Deal Score beim Barkauf | **Marcel vorgelegt, Zahlen stehen** |
 | Cashflow-Skala beim Barkauf (immer 100) | eigener Punkt, braucht eine Zahl von Marcel |
 | Lageklassen an den Score koppeln | gemessen, Zahlen stehen, nicht gebaut |
+
+## Rollout-Journal 12.10.2026 — v2143: die Lageklasse misst die Ampel
+
+| Was | Commit |
+|---|---|
+| `v2143` Bruttomietrendite misst am Ziel der Lageklasse | `b3b50996` |
+| `v2143a` die Knickpunkte liegen nicht auf den Ampelschwellen | `b3b50996` |
+
+Marcel: *„kann man das nicht an den Lage Klassen koppeln? … da muss aber
+dann ein riegel rein falls die A,B oder C-Lage nicht eingegeben wurde
+muss ein default wert angenommen werden. nur berücksichtigen."*
+
+### Wo sie wirkt — und wo ausdrücklich nicht
+
+Auf die **Ampel** und die Einschätzung. **Nicht auf den Score.**
+
+> Der Score sieht die persönlichen Einstellungen nie. Dieselbe Wohnung
+> hat für jeden Nutzer denselben Score; eine Einstellung, die ihn
+> verschiebt, macht zwei Nutzer unvergleichbar und jedes gespeicherte
+> Urteil rückwirkend ungültig. Das steht seit `v2140` fest.
+
+**Marcels „nur berücksichtigen" ist genau dieser Weg.** Nachgewiesen:
+Score mit A-Lage, C-Lage und ohne — alle 77.
+
+### Brutto oder netto? Gerechnet, nicht gemeint
+
+Seine Rückfrage: *„man könnte ja auch die Bruttomietrendite der lage
+klassen auf die nettomietrendite runterrechnen oder? was ist besser?"*
+
+**Die beiden Renditen haben verschiedene Nenner** (`deal-kpis.js:185-187`):
+
+```
+  bmy = nkm_j / kp                  <- Kaufpreis
+  nmy = (nkm_j - bwk_nul) / gi      <- Gesamtinvestition, nach BWK
+```
+
+Das Verhältnis `nmy/bmy` schwankt deshalb zwischen **0,520** (MFH mit
+Verwaltung und Instandhaltung) und **0,905** (ohne BWK-Angabe) — um
+74 %. **Eine Umrechnungszahl gibt es nicht.**
+
+| Fall | brutto | netto | Faktor |
+|---|---|---|---|
+| ETW, niedriges Hausgeld, BY | 6,27 % | 4,98 % | 0,795 |
+| ETW, normales Hausgeld, NRW | 6,27 % | 4,46 % | 0,712 |
+| MFH mit Verwaltung + IH | 6,27 % | 3,26 % | **0,520** |
+| **ohne BWK-Angabe** | 6,27 % | 5,67 % | **0,905** |
+
+> **Rechnet man objektgenau um, geben beide Wege dieselbe Note** — beide
+> Seiten werden mit demselben Faktor multipliziert, das Verhältnis
+> erreicht/Ziel bleibt gleich. **Rechnet man pauschal um** (etwa ×0,80),
+> verschiebt sich die Note um **bis zu 57 Punkte**, systematisch gegen
+> Objekte mit hoher Bewirtschaftung: das MFH fiele von 95 auf 38.
+
+**Also brutto**, aus drei Gründen:
+
+1. Es ist die Zahl, die der Nutzer **selbst eingegeben** hat. Kein
+   Erklärungsbedarf, warum sein 5,0-%-Ziel plötzlich 3,56 % heißt — und
+   diese Zahl wäre je Objekt eine andere.
+2. Sie lässt sich **nicht durch eine fehlende Angabe schönen**: ohne
+   BWK-Eintrag sieht die Nettorendite besser aus (0,905 statt 0,712).
+3. Die Bewirtschaftung steckt im Score schon im **Cashflow (30 %)** und
+   in der eigenen BWK-Ampel. Hier noch einmal wäre Doppelgewichtung.
+
+### Der Riegel
+
+Fehlt die Klasse oder ihr Ziel, gilt die **bisherige feste Skala**
+(3 % = 0 Pkt, 7 % = 100 Pkt) — nicht etwa eine erfundene Klasse.
+
+> `zielKaufpreis()` nimmt an derselben Stelle `ZIEL_BMR_RUECKFALL = 6`.
+> Das ist **dort** richtig, weil ohne Zahl kein Zielpreis entstehen
+> KANN. Hier gibt es eine Alternative — und eine vorhandene Skala
+> schlägt einen Rückfallwert.
+
+Geprüft in vier Lagen: kein Ziel, `null`, `0`, unsinniger Text.
+
+### ⚠ `v2143a` · Ein Tausendstel entschied die Farbe
+
+Der erste Entwurf begann bei 60 % des Ziels und traf bei **genau 80 %**
+die Güte **0,3994** — die Gelb-Schwelle liegt bei **0,40**.
+
+> **Eine Grenze, die auf einer anderen Grenze liegt, entscheidet per
+> Rundung.** Gefunden hat es der eigene Prüfer, nicht der Zufall.
+
+Jetzt beginnt die Skala bei 50 %:
+
+```
+  unter 75 % des Ziels   rot
+  75 bis 97 %            gelb
+  ab 97 %                gruen    (Ziel erreicht = Guete 0,80)
+  ab 130 %               volle Punktzahl
+```
+
+Und fachlich besser: wer 60 % seiner Zielrendite erreicht, hat kein
+wertloses Objekt.
+
+### Nachweis, am lebenden Staging mit echten Objekten
+
+```
+  Westerfeldstr (B-Lage)   7,23 %  gruen  Ziel 5,0 % — 145 % erreicht
+  Am Markt (C-Lage)        5,53 %  gelb   Ziel 7,0 % —  79 % erreicht
+  Sachsenstr (ohne Lage)   keine Ampel, Pflichtangaben fehlen
+  Score in drei Lagen      77 / 77 / 77
+```
+
+**Dieselbe App urteilt in der C-Lage strenger** — genau das war der
+Auftrag. Der Bot holt das Ziel serverseitig aus
+`user_settings.lage_profil` und gibt es als **Parameter** weiter: ein
+Kern liest nie Einstellungen.
+
+Prüfer `tools/lageklasse-ampel-pruefen.mjs`, RC=0 — Riegel in 4 Lagen,
+dieselbe Wohnung in 3 Lagen, Ziel-erreicht-ist-grün, 6 andere
+Kennzahlen unberührt, Score in 3 Lagen gleich, Ampelverlauf an 8
+Punkten.
+
+**Der echte Lauf war nötig:** `node --check` sieht einen ReferenceError
+nicht, und `zielBmrLage` ist eine neue Variable im Bot-Pfad. Erst der
+Aufruf im Container beweist, dass sie steht.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Investor Deal Score beim Barkauf | **weiter offen, Marcel vorgelegt** |
+| Cashflow-Skala beim Barkauf | braucht eine Zahl von Marcel |

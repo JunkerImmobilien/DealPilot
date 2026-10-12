@@ -1359,8 +1359,33 @@ Genau so ist es in `qc-heuristik.js:222` schon gebaut
 (`ZIEL_BMR_RUECKFALL = 6`), und die Zielrendite kommt dort als
 **Parameter** in den Kern — derselben Linie wäre zu folgen.
 
-**Nicht gebaut**, weil die Skala („wie viel Note bei 80 % des Ziels?")
-eine Bewertungsentscheidung ist.
+### ✅ GEBAUT 12.10.2026 (`v2143`) — Marcel: „ja mach das so das es passt"
+
+**Die Lageklasse ist der Maßstab der Bruttomietrendite-Ampel** — nicht
+des Scores. Sein „nur berücksichtigen" war der Ausweg aus dem
+Widerspruch zu `v2140`: der Score sieht die Einstellungen nie, die
+Beurteilung darf es.
+
+**Brutto, nicht netto** — und das ist gerechnet, nicht gemeint: die
+beiden Renditen haben verschiedene Nenner (`bmy` auf den Kaufpreis,
+`nmy` auf die Gesamtinvestition nach BWK), das Verhältnis schwankt
+zwischen 0,52 und 0,91. Objektgenau umgerechnet geben beide Wege
+dieselbe Note; pauschal umgerechnet verschiebt sich die Note um bis zu
+**57 Punkte** gegen Objekte mit hoher Bewirtschaftung.
+
+**Der Riegel:** ohne Klasse oder Ziel gilt die feste Skala (3 % = 0,
+7 % = 100) — nicht ein Rückfallwert. Eine vorhandene Skala schlägt eine
+erfundene Klasse.
+
+**`v2143a`:** der erste Entwurf traf bei genau 80 % des Ziels die Güte
+0,3994 gegen die Gelb-Schwelle 0,40 — ein Tausendstel entschied die
+Farbe. Die Skala beginnt jetzt bei 50 %, die Ampelwechsel liegen bei
+75 % und 97 %.
+
+Am lebenden Staging mit echten Objekten: Westerfeldstr. (B-Lage) 7,23 %
+gegen Ziel 5,0 % → grün; Am Markt (C-Lage) 5,53 % gegen 7,0 % → gelb.
+Score in allen Lagen 77. Prüfer `tools/lageklasse-ampel-pruefen.mjs`,
+RC=0.
 
 ---
 
