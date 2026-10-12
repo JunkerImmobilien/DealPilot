@@ -73,7 +73,12 @@ var Auth = (function() {
          > Eine Sperre ohne sichtbaren Ausweg ist eine Sackgasse. Das
          > war der Grund, aus dem v2094 ueberhaupt ein Kennwort an den
          > Fehler gehaengt hat. */
+      /* v2138: der kleine Zwang hat denselben Ausweg wie die abgelaufene
+         Frist - das Band zeigen, damit der Knopf 'Mail erneut senden' da
+         ist. Ein 403, der nur sagt 'geht nicht', schickt den Kunden in
+         den Support. */
       if (res.status === 403 && data && (data.code === 'VERIFY_EXPIRED'
+            || data.code === 'EMAIL_NOT_VERIFIED_GATE'
             || data.code === 'EMAIL_NOT_VERIFIED')) {
         try {
           if (window.DealPilotVerifyFrist) {

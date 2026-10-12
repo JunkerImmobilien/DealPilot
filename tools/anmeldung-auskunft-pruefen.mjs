@@ -342,12 +342,95 @@ melde(/verifyGnadenfristStunden/.test(mwT) && /verifyGnadenfristStunden/.test(sv
 melde(!/\b6\s*\*\s*3600/.test(mwT) && !/\b6\s*\*\s*3600/.test(svcT2),
   'und keine der beiden Stellen rechnet mit einer fest eingetragenen 6');
 
+/* ── 9 · DER KLEINE ZWANG (v2138) ─────────────────────────────────────
+   Marcel: "vlt Marktbewertung und abruf von dealpilot sachen erfordern
+   dann die anmeldung und bestaetigung? quasi ein kleiner zwang?"
+
+   Geprueft wird die ECHTE `requireVerified()` aus der Mittelschicht,
+   mit beiden Lagen - und zusaetzlich, dass sie an den Routen HAENGT,
+   die wirklich Kontingent verbrauchen. Eine Sperre, die nicht
+   eingehaengt ist, ist keine. */
+console.log('\n=== 9 · Der kleine Zwang ===');
+
+/* v2138: KEINE zweite Weiche. `middleware/auth.js` hat `query` beim
+   Laden festgehalten - ein Ersatz nach dem require wird ignoriert, und
+   die Weiche aus Abschnitt 7 antwortet weiter mit `mwZeile`. Genau das
+   hat vier Punkte falsch GRUEN gemacht. Also dieselbe Weiche nutzen. */
+async function durchGate(zeile, user) {
+  mwZeile = zeile;
+  let status = 200, koerper = null, weiter = false;
+  const res = { status: (s) => { status = s; return res; }, json: (b) => { koerper = b; return res; }, set: () => res };
+  await mw.requireVerified({ user: user === undefined ? { id: 'u1' } : user }, res, () => { weiter = true; });
+  return { status, koerper, weiter };
+}
+
+const g1 = await durchGate({ email_verified_at: new Date().toISOString() });
+melde(g1.weiter === true, 'Bestaetigt: der Abruf geht durch');
+
+const g2 = await durchGate({ email_verified_at: null });
+melde(g2.weiter === false && g2.status === 403,
+  'Unbestaetigt: 403, kein next() (ist: ' + g2.status + ')');
+melde(!!g2.koerper && g2.koerper.code === 'EMAIL_NOT_VERIFIED_GATE',
+  'und code EMAIL_NOT_VERIFIED_GATE (ist: ' + (g2.koerper ? g2.koerper.code : '-') + ')');
+melde(!!g2.koerper && /bestätige sie/i.test(g2.koerper.error || ''),
+  'und der Text sagt, was zu tun ist');
+
+const g3 = await durchGate({ email_verified_at: null }, null);
+melde(g3.status === 401, 'Ohne req.user: 401, nicht stillschweigend durchgelassen');
+
+const g4 = await durchGate(null);
+melde(g4.status === 401, 'Nutzer existiert nicht mehr: 401');
+
+/* Haengt sie an den Routen, die verbrauchen? */
+const avmT = fs.readFileSync('backend/src/routes/avm.js', 'utf8');
+const mbT = fs.readFileSync('backend/src/routes/marktbericht.js', 'utf8');
+melde(/consumeAvm/.test(avmT) && /requireVerified/.test(avmT),
+  'avm.js verbraucht Kontingent UND traegt die Sperre');
+melde(/consumeStufe/.test(mbT) && /requireVerified/.test(mbT),
+  'marktbericht.js verbraucht Kontingent UND traegt die Sperre');
+
+/* Je Route einzeln: steht requireVerified in DERSELBEN Zeile wie der
+   Routeneintrag? Ein Import allein beweist nichts. */
+[['avm.js', avmT, ["router.post('/quote'", "router.post('/sprengnetter'", "router.post('/pricehubble'"]],
+ ['marktbericht.js', mbT, ["router.post('/reports/generate-stream'", "router.post('/reports/generate'", "router.post('/reports/from-dealpilot'"]]
+].forEach(function (paar) {
+  const name = paar[0], txt = paar[1], routen = paar[2];
+  routen.forEach(function (r) {
+    const zeile = txt.split(/\r?\n/).find(function (z) { return z.indexOf(r) === 0; });
+    melde(!!zeile && /requireVerified/.test(zeile),
+      name + ' ' + r.replace("router.post('", '').replace("'", '') + ' traegt requireVerified');
+  });
+});
+
+/* ── 10 · DIE MAIL NENNT DIE FRIST (v2138) ───────────────────────────── */
+console.log('\n=== 10 · Die Bestaetigungsmail ===');
+const tplPfad = require_.resolve('./services/verifyMailTemplate');
+delete require_.cache[tplPfad];
+const tpl = require_('./services/verifyMailTemplate');
+const mailText = tpl.renderVerifyText('Marcel', 'https://x/verify?token=abc', null);
+melde(mailText.indexOf(String(FRIST_H) + ' Stunden') >= 0,
+  'Der Text nennt die Frist (' + FRIST_H + ' Stunden)');
+melde(/24 Stunden gültig/.test(mailText),
+  'und erklaert, dass der LINK 24 Stunden gilt - zwei Zahlen, eine Erklaerung');
+melde(/später wieder rein/.test(mailText),
+  'und sagt, dass man auch spaeter wieder reinkommt');
+const mailHtml = tpl.renderVerifyMail('Marcel', 'https://x/verify?token=abc', null);
+melde(!/KEROSIN/i.test(mailHtml) && !/KEROSIN/i.test(mailText),
+  'Kein "Kerosin" mehr in der Mail (N60.24)');
+melde(/KONTINGENT/.test(mailHtml), 'sondern Kontingent');
+/* Die Frist in der Mail kommt aus DEMSELBEN Feld wie die Sperre */
+const tplRoh = fs.readFileSync('backend/src/services/verifyMailTemplate.js', 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '');
+melde(/verifyGnadenfristStunden/.test(tplRoh),
+  'und sie kommt aus der config, nicht aus einer eigenen Zahl');
+
 /* ── 6 · Deckung ─────────────────────────────────────────────────────── */
 console.log('\n=== 6 · Deckung ===');
 console.log('  Pruefpunkte            : ' + geprueft);
 console.log('  echte Funktionsaufrufe : userService.authenticate() 7x, errorHandler() 5x,');
 console.log('                           middleware.authenticate() 5x');
 console.log('  Frist im Test          : ' + FRIST_H + ' h, aus demselben config-Feld wie die App');
+console.log('  dazu                   : requireVerified() 4x, renderVerifyText/Mail 2x');
 console.log('  ersetzt                : db/pool, authFailuresService, utils/password');
 console.log('  NICHT ersetzt          : userService, errors.js — die echten Dateien');
 

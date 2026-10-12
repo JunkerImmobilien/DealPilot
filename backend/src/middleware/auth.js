@@ -244,6 +244,45 @@ async function authenticate(req, res, next) {
 }
 
 /**
+ * ══ v2138 · DER KLEINE ZWANG (Backlog N60.3) ═══════════════════════
+ *
+ * Marcel am 12.10.2026: "vlt Marktbewertung und abruf von dealpilot
+ * sachen erfordern dann die anmeldung und bestaetigung? quasi ein
+ * kleiner zwang?"
+ *
+ * Genau die richtige Stelle, und sie loest zugleich den PREIS, den ich
+ * bei v2136 ausdruecklich benannt hatte: ein unbestaetigter Zugang ist
+ * ein Zugang - wer eine fremde Adresse eintraegt, kann sechs Stunden
+ * arbeiten. Mit dieser Sperre kann er sechs Stunden *sehen*, aber
+ * nichts abrufen, was Geld kostet.
+ *
+ * > **Ein Zwang, der am Teuren haengt, braucht keinen Riegel am
+ * > Eingang.** Wer die App ansehen will, kann das sofort; wer
+ * > Kontingent verbrauchen will, bestaetigt vorher seine Adresse.
+ *
+ * Sie sitzt in der Mittelschicht und nicht im Verbrauchspfad, weil sie
+ * den Aufruf verhindern soll, BEVOR eine Leistung erbracht wird. Eine
+ * Pruefung hinter dem Abruf waere ein Abruf, den niemand bezahlt.
+ *
+ * `authenticate` muss davor laufen - ohne `req.user` ist hier nichts
+ * zu entscheiden, und ein stillschweigendes Durchlassen waere der
+ * schlechteste Ausgang.
+ */
+async function requireVerified(req, res, next) {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+    const r = await query('SELECT email_verified_at FROM users WHERE id = $1', [req.user.id]);
+    if (r.rowCount === 0) return res.status(401).json({ error: 'User no longer exists' });
+    if (r.rows[0].email_verified_at) return next();
+    return res.status(403).json({
+      error: 'Dafür müssen wir deine E-Mail-Adresse kennen. Bitte bestätige sie über den Link '
+        + 'in der Bestätigungs-Mail – danach steht der Abruf sofort zur Verfügung.',
+      code: 'EMAIL_NOT_VERIFIED_GATE'
+    });
+  } catch (err) { next(err); }
+}
+
+/**
  * Require user to have a specific role
  */
 function requireRole(...roles) {
@@ -256,4 +295,4 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { authenticate, requireRole };
+module.exports = { authenticate, requireVerified, requireRole };   /* v2138 */

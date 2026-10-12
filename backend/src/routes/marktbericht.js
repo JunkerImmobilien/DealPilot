@@ -19,7 +19,7 @@
  */
 
 const express = require('express');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, requireVerified } = require('../middleware/auth');   /* v2138 */
 const aiCreditsService = require('../services/aiCreditsService');
 const creditAlert = require('../services/creditAlert'); // v554
 
@@ -501,7 +501,8 @@ router.post('/ausstattung/vorschlag', authenticate, async function (req, res) {
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
 });
 // v560-stream: echtes NDJSON-Streaming durch den Proxy (Auth + 5L), Lade-Fortschritt bleibt erhalten.
-router.post('/reports/generate-stream', authenticate, async function (req, res) {
+/* v2138: verbraucht Kontingent (consumeStufe) -> Bestaetigung noetig. */
+router.post('/reports/generate-stream', authenticate, requireVerified, async function (req, res) {
   const body = req.body || {};
   const fast = !!(body.fast || body.schnell);
 
@@ -639,7 +640,8 @@ router.post('/reports/generate-stream', authenticate, async function (req, res) 
   } catch (e) { console.warn('[marktbericht] stream-Abrechnung failed:', e.message); }
 });
 
-router.post('/reports/from-dealpilot', authenticate, runReport);
-router.post('/reports/generate', authenticate, runReport);
+/* v2138: beide laufen durch runReport und damit durch consumeStufe. */
+router.post('/reports/from-dealpilot', authenticate, requireVerified, runReport);
+router.post('/reports/generate', authenticate, requireVerified, runReport);
 
 module.exports = router;

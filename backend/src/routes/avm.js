@@ -23,7 +23,7 @@
 
 const express = require('express');
 const crypto = require('crypto'); // v480: Cache-Key-Hash
-const { authenticate } = require('../middleware/auth');
+const { authenticate, requireVerified } = require('../middleware/auth');   /* v2138 */
 const aiCreditsService = require('../services/aiCreditsService');
 const avmCreditsService = require('../services/avmCreditsService');
 /* v1230: `const { query } = require('../db/pool')` stand hier fuer den
@@ -179,7 +179,8 @@ router.get('/health', function (req, res) {
 });
 
 // ── POST /quote — Credit-Kosten vorab (verbraucht nichts) ────────────────────
-router.post('/quote', authenticate, async function (req, res, next) {
+/* v2138: /quote verbraucht Kontingent (consumeAvm) -> Bestaetigung noetig. */
+router.post('/quote', authenticate, requireVerified, async function (req, res, next) {
   try {
     if (!avmEnabled()) {
       return res.status(503).json({ error: 'avm_disabled', disabled: true, message: 'AVM-Abruf ist derzeit deaktiviert.' });
@@ -332,10 +333,10 @@ async function runProvider(provider, req, res, next) {
 }
 
 // ── POST /sprengnetter ────────────────────────────────────────────────────────
-router.post('/sprengnetter', authenticate, function (req, res, next) { return runProvider('sprengnetter', req, res, next); });
+router.post('/sprengnetter', authenticate, requireVerified, function (req, res, next) { return runProvider('sprengnetter', req, res, next); });   /* v2138 */
 
 // ── POST /pricehubble ─────────────────────────────────────────────────────────
-router.post('/pricehubble', authenticate, function (req, res, next) { return runProvider('pricehubble', req, res, next); });
+router.post('/pricehubble', authenticate, requireVerified, function (req, res, next) { return runProvider('pricehubble', req, res, next); });   /* v2138 */
 
 // ── History: GET/POST/DELETE /:objectId/history ─────────────────────────────── (v742-avm-history)
 router.get('/:objectId/history', authenticate, async function (req, res, next) {

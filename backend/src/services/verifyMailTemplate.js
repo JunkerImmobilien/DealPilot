@@ -24,12 +24,29 @@ function renderVerifyText(firstName, verifyUrl, brand) {
   var fn = (firstName || '').toString().trim() || 'Pilot';
   var nm = (brand && brand.name) ? brand.name : 'DealPilot';
   var url = (brand && brand.website) ? brand.website : 'https://dealpilot.junker-immobilien.io';
+  var frist = require('../config').auth.verifyGnadenfristStunden;   /* v2138 */
   return (
     'Hallo ' + fn + ',\n\n' +
     'dein Check-in bei ' + nm + ' ist fast fertig \u2014 bitte bestätige deine E-Mail-Adresse,\n' +
     'um dein Cockpit zu aktivieren:\n\n' +
     verifyUrl + '\n\n' +
-    'Der Link ist 24 Stunden gültig. Falls du dich nicht angemeldet hast, ignoriere diese Mail.\n\n' +
+    /* ══ v2138 · DIE MAIL NANNTE DIE FRIST NICHT ═══════════════════
+       Hier stand nur "Der Link ist 24 Stunden gültig". Seit v2136
+       sperrt der Zugang nach SECHS Stunden - und davon stand in der
+       Mail kein Wort. Die App zeigte 6, die Mail 24.
+
+       > Zwei Zahlen vor demselben Kunden, und keine erklaert die
+       > andere. Der Widerspruch ist nur scheinbar: der Zugang sperrt
+       > nach 6 Stunden, der Link oeffnet ihn 24 Stunden lang wieder.
+       > Genau das muss dastehen, sonst rechnet der Kunde selbst - und
+       > rechnet falsch.
+
+       `frist` kommt aus der config, damit Mail und Sperre nie
+       auseinanderlaufen. */
+    'Bitte innerhalb von ' + frist + ' Stunden bestätigen — danach sperren wir den Zugang\n' +
+    'vorübergehend. Der Link selbst bleibt 24 Stunden gültig: du kommst also auch\n' +
+    'später wieder rein, sobald du ihn anklickst.\n\n' +
+    'Falls du dich nicht angemeldet hast, ignoriere diese Mail.\n\n' +
     'Guten Flug \u2014 dein ' + nm + '-Team\n' +
     url
   );
@@ -139,7 +156,10 @@ function renderVerifyMail(firstName, verifyUrl, brand) {
 '                  GATE<br><span style="font-size:13px;color:#1a1407;font-weight:700;">COCKPIT</span>\n' +
 '                </td>\n' +
 '                <td style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:1px;color:#8a8473;padding-right:18px;">\n' +
-'                  TANK<br><span style="font-size:13px;color:#1a1407;font-weight:700;">KEROSIN \u2713</span>\n' +
+/* v2138 · N60.24: "Kerosin" gibt es seit v1176 nicht mehr. Diese Mail
+   ist das ERSTE, was ein Kunde von DealPilot liest - und sie trug den
+   abgeschafften Begriff bis heute. Es heisst Kontingent. */
+'                  TANK<br><span style="font-size:13px;color:#1a1407;font-weight:700;">KONTINGENT \u2713</span>\n' +
 '                </td>\n' +
 '                <td style="font-family:\'JetBrains Mono\',\'Courier New\',monospace;font-size:8px;letter-spacing:1px;color:#8a8473;">\n' +
 '                  STATUS<br><span style="font-size:13px;color:' + B.acc + ';font-weight:700;">CHECK-IN</span>\n' +
