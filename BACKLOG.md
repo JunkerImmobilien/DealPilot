@@ -2833,7 +2833,59 @@ die Leiste und die Kachelreihen dürfen umbrechen, Kacheln, QR, Stub und
 Knopf schrumpfen nicht. Damit regelt sich jede Behälterbreite selbst,
 auch die, die es heute noch nicht gibt.
 
-### ⚠ Offen: der Kartenstil „Zeile" tut gar nichts
+### ✅ ERLEDIGT 12.10.2026 (`v2133`, `v2133a`) — der Stil wirkt
+
+Eine Zeile in `karten-stil.js`, an die **ausdrückliche** Wahl gehängt:
+
+```js
+document.body.classList.toggle('dp-pfzeile', aktuell === 'zeile');
+```
+
+Nur bei `aktuell === 'zeile'` — nicht bei jedem Stil, sonst wäre der
+Fehler von `v1702d` zurück. Dasselbe im QuickBoarding-iframe, das ein
+eigenes Dokument ist und keine Body-Klasse erbt.
+
+**Abnahme: 2 Stile × 10 Breiten.** Marke gesetzt, **35 von 44 Regeln
+treffen**, und:
+
+```
+  KAPP 0 · RAUS 0 · ZUBREIT 0 · QUER 0 · Textkontrast überall >= 4,5
+
+  Breite   Vorgabe              Zeile
+   360     360x445  Knopf 50    360x334  Knopf 29 -> 44
+   390     357x445  Knopf 50    357x334  Knopf 29 -> 44
+   430     397x445  Knopf 50    430x334  Knopf 29 -> 44
+   768     695x383  Knopf 44    695x253  Knopf 44
+  1024     703x248  Knopf 44    703x203  Knopf 44
+  1180     888x137  Knopf 44    888x136  Knopf 44
+```
+
+Die Leiste wird **111 px flacher** — genau das, was der Entwurf
+verspricht („Eine Leiste, 55 px").
+
+**`v2133a`:** der Entwurf brachte einen **29-px-Knopf** mit, weil seine
+Regel `min-height:0` setzt. Das war richtig — der Kommentar erklärt,
+dass der 50-px-Knopf die Zeile auf 76 statt 54 px trieb. Nur gab es
+damals `v2121a` noch nicht. Jetzt 44 px bis 900 px, darüber bleibt die
+Zeile kompakt.
+
+### ⚠ Zwei Korrekturen an eigenen Zahlen
+
+**„53 Regeln" war ein `grep -c` auf den STRING.** Gezählt sind es
+**33 Regelblöcke mit 40 Selektoren** in der Datei und **44 Regeln** im
+laufenden Dokument (die Medien-Varianten zählen dort einzeln), davon
+treffen **35**. *Zählen ist keine Messung.*
+
+**„rendert auf das Pixel genau wie die Vorgabe" war zu stark.** Schon
+vor `v2133` gab es Unterschiede (1280 px: 156 gegen 166). Richtig ist:
+**praktisch gleich** — der Unterschied kam aus `dp-neue-karte-stil`,
+nicht aus den 44 Regeln.
+
+### Offen und benannt
+
+Bei **1440 px** ist die Zeile **132 px** hoch, die Vorgabe 78; bei
+1920 px sind es 80. Nichts abgeschnitten, nichts draußen — die Leiste
+bricht dort eine Zeile mehr um. **Optikfrage am Entwurf, kein Defekt.**
 
 **Gemessen, nicht vermutet:**
 
@@ -2881,7 +2933,7 @@ fällt, entscheidet er — nicht ich. Eine Demo zeigt es ihm in einem Bild.
 
 ---
 
-#### N60.40 · ⚠ ENTSCHEIDUNG: braucht das Cockpit ein Vollbild? (12.10.2026)
+#### N60.40 · ✅ ERLEDIGT 12.10.2026 — das Cockpit-Vollbild tut NICHTS, gemessen
 
 **Gefunden in Durchgang 1 der Geräteabnahme** — 8 Geräte × 9 Reiter,
 **8.778 geprüfte Bedienelemente**, 0 unerreichbar, 0 echter Überlauf.
@@ -2947,6 +2999,66 @@ Er war auf keiner Breite ein bedienbarer Knopf, und auf Handy und
 Tablet seit `v1888` schon ausgeblendet.
 `DealPilotDashboard.toggleSidebar()` bleibt unberührt.
 
+### ✅ Keine Entscheidung nötig — der Modus ist ein Leerlauf
+
+Marcel am 12.10.2026: *„mach es so das es funktioniert und passend
+bedient werden kann."* Also habe ich zuerst gemessen, **was er tut** —
+bevor ich einen Knopf dafür baue.
+
+`toggleSidebar()` aufgerufen, Zustand davor und danach verglichen,
+Cockpit offen, zwei Breiten:
+
+```
+   390 px                      vorher          nachher
+     body-Klasse               (ohne)          dp-dash-fullscreen
+     nav.tabs                  0x0 none        0x0 none
+     aside#sidebar           359x758 flex    359x758 flex
+     header.hdr              386x93  block   386x93  block
+     .tabs-workflow-bar         0x0 none        0x0 none
+     Cockpit                 386x9200        386x9200
+     .app-wrap Spalten        390px           390px
+
+  1440 px                      vorher          nachher
+     aside#sidebar              0x0 none        0x0 none
+     header.hdr             1188x49  block  1188x49  block
+     Cockpit                1188x6019       1188x6019
+     .app-wrap Spalten       1192.01px       1192.01px
+```
+
+> **Sieben gemessene Eigenschaften, zweimal, und nicht eine ändert
+> sich.** Die Klasse wird gesetzt und von niemandem gelesen.
+
+Der Kommentar in `dashboard.js:2079` behauptet das Gegenteil:
+*„eigene Body-Klasse dp-dash-fullscreen, die per CSS dasselbe erreicht
+(Tab-Bar/Workflow-Bar/Sidebar weg)"*. **Diese CSS-Regeln gibt es
+nicht** — gegrept und im laufenden Dokument gegengeprüft: alles, was
+sie verstecken sollten, ist im Cockpit **ohnehin schon** versteckt.
+
+**Damit ist die Frage beantwortet, ohne sie zu stellen:** ein Vollbild,
+das kein Pixel bewegt, braucht keinen Schalter. `v2128` hat den
+2-Pixel-Stummel entfernt — das war die ganze Arbeit. Es ist **keine
+Funktion verloren**, denn es gab keine.
+
+> Hätte ich den Knopf gebaut, wie es naheliegend war, hätte Marcel
+> einen schönen 44-px-Schalter bekommen, der nichts tut. **Erst messen,
+> was ein Schalter schaltet, dann den Schalter bauen.**
+
+`DealPilotDashboard.toggleSidebar()` und `dp-dash-fullscreen` bleiben
+im Code: `marktbericht-view.js:189` und `ui.js:344` **lesen** die
+Klasse, um das Cockpit zu schließen. Die wird nie gesetzt, also ist der
+Zweig tot — aber harmlos, und er zu entfernen hieße, in zwei fremden
+Dateien zu schneiden.
+
+### Wenn das Cockpit doch einmal breiter werden soll
+
+Gemessen bei 1440 px: das Cockpit ist **1188 px** breit, daneben liegt
+die Layout-Schiene mit **248 px**. Ein echtes Vollbild müsste die
+Schiene ausblenden — das ist die Navigation, und Marcel hat den
+vergleichbaren Schalter in den Layouts ausdrücklich entfernen lassen
+(`layout-varianten.css:1499`). Deshalb baue ich das nicht von mir aus.
+
+---
+
 ### ⚠ Offen, und ausdrücklich eine Entscheidung für Marcel
 
 **Soll das Cockpit ein Vollbild bekommen, und wo gehört der Schalter
@@ -2973,7 +3085,7 @@ Regel in `style.css:32836`, die `#dp-sb-toggle` dort versteckt.
 
 ---
 
-#### N60.41 · ⚠ Das Preise-Fenster ist auf dem Handy 13 Bildschirme lang (12.10.2026)
+#### N60.41 · ✅ ERLEDIGT 12.10.2026 (`v2132`, `v2132a`) — die Cockpit-Matrix klappt auf
 
 **Gefunden in Durchgang 2 der Geräteabnahme** (100 Läufe, 5 Breiten ×
 20 echte Öffner). Gemessen an `.pricing-modal-shell`:
@@ -3001,7 +3113,51 @@ Das ist **Geld und Produkt**, und CLAUDE.md zieht die Grenze genau da:
 Kündigungen"*. Welche Tarife in welcher Reihenfolge und Tiefe ein Kunde
 sieht, entscheidet Marcel — nicht mein Umbruch.
 
-### Drei Wege, jeder ohne Inhaltsverlust
+### ✅ Gebaut: Weg (b), das Aufklappen
+
+Marcel am 12.10.2026: *„mach es so das es funktioniert und passend
+bedient werden kann."*
+
+Gemessen, welcher Block die Länge macht — direkte Kinder bei 390 px:
+
+```
+    243 px   .dp-header
+     24 px   .dp-container (Zeitstrahl)
+    440 px   .dp-container (Plan-Karte)
+    901 px   .dp-section
+   1674 px   .dp-feature-table-wrap   <- 45 % des Fensters
+     77 px   .dp-footer-note
+```
+
+Darin `table.mx` mit 1338 px: die vollständige Gegenüberstellung aller
+Leistungen je Plan.
+
+> **Eine Vergleichstabelle vergleicht nur, wenn man zwei Spalten
+> gleichzeitig sieht.** Auf dem Handy sieht man eine — und wischt für
+> die zweite so weit, dass die erste nicht mehr erinnert wird.
+
+**Preise, Pläne, Reihenfolge und Knöpfe sind unberührt.** Zugeklappt
+ist nur die Tabelle; Titel und Unterzeile bleiben sichtbar, sie sind
+die Beschriftung der Falte. Über 900 px passiert gar nichts, und eine
+zweite Regel hebt eine stehengebliebene Falte auf, falls jemand schmal
+öffnet und dann dreht.
+
+Der Knopf trägt `aria-expanded`, seine Beschriftung wechselt mit dem
+Zustand, 44 px Trefferfläche, Hausform Obsidian mit Goldschrift
+(Textkontrast gemessen **10,54**).
+
+**`v2132a`:** die Falte hing als **fünfter** Aufruf in einem
+`setTimeout` hinter vier anderen. Stürzt einer, läuft sie nicht — und
+man sieht keinen Fehler, nur einen fehlenden Knopf. Jetzt eigener Takt,
+eigenes `try/catch`.
+
+> **Ein eigener Messfehler dazu:** die erste Abnahme meldete „kein
+> Falte-Knopf" bei 768 px. Mit 2400 ms statt 2200 war er da. Es war
+> **Zeitverhalten, nicht die Breite** — `openPricingModal` nimmt den
+> asynchronen Weg, solange die Pakete noch laden.
+
+### Die drei Wege, die zur Wahl standen
+
 
 | | Weg | was der Kunde merkt |
 |---|---|---|
