@@ -1487,7 +1487,7 @@
     '#s8 .dab-bp-stub{width:58px;flex-shrink:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:var(--stubbg,#F8F6F1);color:var(--acc)}',
     '#s8 .dab-bp-code{writing-mode:vertical-rl;font-family:var(--dab-fm);font-size:10px;font-weight:700;letter-spacing:2.5px;color:var(--acc)}',
     '#s8 .dab-bp-barcode{width:26px;height:44px;background:repeating-linear-gradient(0deg,var(--bar,#2A2727) 0 1.5px,transparent 1.5px 3px,var(--bar,#2A2727) 3px 5.5px,transparent 5.5px 7px);opacity:.55;border-radius:2px}',
-    '#s8 .dab-bp-lbl{writing-mode:vertical-rl;font-family:var(--dab-fs);font-size:7.5px;letter-spacing:1.6px;color:var(--bpmut,#7A7370);text-transform:uppercase}',
+    /* v2130: 7,5 -> 8,5 px, Hausuntergrenze aus v1890 */ '#s8 .dab-bp-lbl{writing-mode:vertical-rl;font-family:var(--dab-fs);font-size:8.5px;letter-spacing:1.6px;color:var(--bpmut,#7A7370);text-transform:uppercase}',
     /* Werbe-Karte */
     '#s8 .dab-bp-ad{border-style:dashed;background:linear-gradient(160deg,#fffdf6,#f6eed6)}',
     '#s8 .dab-bp-adbadge{font-family:var(--dab-fs);font-size:8.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--dab-gold3);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);padding:3px 9px;border-radius:99px;align-self:flex-start;margin-bottom:9px}',

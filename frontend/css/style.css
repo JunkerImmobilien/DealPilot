@@ -40587,3 +40587,67 @@ body .dp-sidebar-toggle{ display: none !important; }
   .img-del{ position: absolute !important; }
   #dp-sb-toggle{ position: fixed !important; }
 }
+
+/* =====================================================================
+   v2130 - FUENF BESCHRIFTUNGEN UNTER DER HAUSUNTERGRENZE
+
+   Durchgang 3 der Geraeteabnahme: 6 Geraete x 9 Reiter, je Reiter alle
+   WIRKLICH gerenderten Textknoten gemessen (Blattknoten mit Inhalt,
+   Flaeche > 2 px, sichtbar, `offsetParent` vorhanden).
+
+     Geraet     Textknoten   davon unter 11 px
+      360          1.359          540
+      390          1.368          540
+      768          1.645          401
+      834          1.663          410
+     1180          1.692          465
+     1440          1.692          465
+
+   ── WARUM 540 KEIN BEFUND SIND, 14 ABER SCHON ─────────────────────
+   Gemessene Groessen: 7,5 · 8 · 8,5 · 8,8 · 9 · 9,1 · 9,5 · 10 ·
+   10,5 · 10,9 px.
+
+   Die Hausuntergrenze steht nicht in CLAUDE.md, sondern in einer
+   Entscheidung: **`v1890`** hat die Donut-Beschriftung der Deal-Aktion
+   von 6,5 px auf **8,5 px** gehoben, mit der Begruendung *"Zu klein
+   ist sie auf JEDEM Geraet; die Regel gilt jetzt ueberall."* Damit ist
+   8,5 px der Boden, den dieses Haus sich selbst gesetzt hat - und
+   9 bis 10,5 px sind bewusste Mikrobeschriftungen in JetBrains Mono,
+   keine Fehler.
+
+   > **Eine Grenze, die man selbst waehlt, ist keine Messung.** Mein
+   > erster Durchgang hat mit 11 px gerechnet und 540 "Befunde" ergeben.
+   > Das waere ein Umbau der halben App gewesen - gegen Marcels
+   > ausdrueckliche Vorgabe *"Fuehre keine unnoetige komplette
+   > Neugestaltung durch."* Erst die Suche nach der Hausentscheidung
+   > hat die richtige Grenze geliefert.
+
+   Unter 8,5 px bleiben, auf jedem Geraet gleich, **fuenf Formen**:
+
+     7,5 px   div.dab-bp-lbl               7x   "BOARDING" / "FREI"
+     7,5 px   span.dp-pf-scan              1x   "SCAN"
+       8 px   span.dpfk-bp                 1x
+       8 px   #dpfk-ltvlabel .dpfk-fl      1x
+       8 px   .dpfk-strip [id^=mrpf-top-src-]  4x
+
+   Alle fuenf sind einzeilige Versalien-Etiketten in JetBrains Mono.
+   8,5 px aendert ihre Rolle nicht, nur ihre Lesbarkeit - dieselbe
+   Bewegung wie bei `v1890`.
+
+   ── KEIN BEFUND, ausdruecklich ────────────────────────────────────
+   `span.bp` wird mit **0 px** gemessen. Das ist die Versteckmechanik
+   der Kartei-Fassung: `datenaufnahme.css:609` setzt
+   `font-size:0 !important` auf "BOARDING PASS" und zeichnet mit
+   `::after` den Text "DealPilot" in 14 px. Null Pixel ist hier die
+   Absicht, nicht die Groesse.
+
+   `.dab-bp-lbl` liegt NICHT hier, sondern in
+   `deal-action-boarding.js:1490` - einem per JS eingehaengten Blatt.
+   Dort wird die Zahl direkt geaendert; ein Blatt von hier koennte
+   gegen ein spaeter eingehaengtes verlieren
+   (siehe [[probe-blatt-vor-blatt-44]]).
+   ===================================================================== */
+.dp-pf-scan{ font-size: 8.5px !important; }
+.dpfk-bp{ font-size: 8.5px !important; }
+.dpfk-fl{ font-size: 8.5px !important; }
+.dpfk-strip [id^="mrpf-top-src-"]{ font-size: 8.5px !important; }
