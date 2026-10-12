@@ -40763,3 +40763,28 @@ body .dp-sidebar-toggle{ display: none !important; }
   #dp-verify-band .dvb-zu{ order: 1; margin-left: auto; }
   #dp-verify-band.dvb-klein .dvb-txt{ max-width: none; }
 }
+
+/* =====================================================================
+   v2137a - DER PLATZ FUER DAS BAND
+
+   GEMESSEN bei 360 und 390 px: das Band lag ueber DREI bzw. ZWEI
+   Knoepfen der Datenaufnahme (button.oe-btn, #oe-mb-oeffnen). Ein
+   position:fixed-Element am unteren Rand verdeckt, was dort steht.
+
+   > Ein Hinweis, der eine Bedienung verdeckt, ist kein Hinweis mehr,
+   > sondern ein Hindernis.
+
+   Dieselbe Falle wie beim Werkzeugpanel, das auf 390 px ueber der
+   Datenaufnahme lag - und ich habe sie selbst wieder gebaut.
+
+   Die Hoehe kommt GEMESSEN aus dem Band (`--dp-verify-band-h`), nicht
+   geraten: auf 360 px ist es 195 px hoch, auf 1180 px 89. Eine feste
+   Zahl waere auf einer der beiden Breiten falsch.
+
+   Das Polster liegt an `.body` - dem Inhalt im Scroller `.main-col`,
+   nicht am Scroller selbst. So waechst die scrollbare Flaeche, und
+   jeder Knopf laesst sich ueber das Band schieben.
+   ===================================================================== */
+html[data-dp-verify="1"] .body{
+  padding-bottom: calc(var(--dp-verify-band-h, 0px) + 20px) !important;
+}

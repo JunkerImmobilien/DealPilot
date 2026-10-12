@@ -90,11 +90,37 @@
 
   function zeichne() {
     var iso = lese();
-    if (!iso) { if (band) band.style.display = 'none'; return; }
+    if (!iso) {
+      if (band) band.style.display = 'none';
+      try {
+        document.documentElement.removeAttribute('data-dp-verify');
+        document.documentElement.style.removeProperty('--dp-verify-band-h');
+      } catch (e) {}
+      return;
+    }
     var rest = new Date(iso).getTime() - Date.now();
     var txt = restText(rest);
     var b = baue();
     b.style.display = 'flex';
+    /* ══ v2137a · DAS BAND NIMMT PLATZ, STATT ZU SCHWEBEN ═══════════
+       GEMESSEN bei 360 und 390 px: das Band lag ueber DREI bzw. ZWEI
+       Knoepfen der Datenaufnahme (button.oe-btn). Ein position:fixed-
+       Element am unteren Rand verdeckt, was dort steht - genau der
+       Fall, den ich mir selbst als Falle notiert habe (das
+       Werkzeugpanel lag auf 390 px ueber der Datenaufnahme).
+
+       > Ein Hinweis, der eine Bedienung verdeckt, ist kein Hinweis
+       > mehr, sondern ein Hindernis.
+
+       Deshalb bekommt der Inhalt unten Platz: die gemessene Hoehe des
+       Bandes wandert als Variable an das Wurzelelement, und eine Regel
+       in style.css gibt sie an .body weiter. Gemessen statt geraten -
+       das Band ist auf 360 px 195 px hoch und auf 1180 px 89. */
+    try {
+      var hoehe = Math.ceil(b.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--dp-verify-band-h', hoehe + 'px');
+      document.documentElement.setAttribute('data-dp-verify', '1');
+    } catch (e) {}
     if (txt === null) {
       /* Abgelaufen. Der Server sperrt; hier steht nur, was zu tun ist. */
       b.classList.add('dvb-aus');
@@ -158,6 +184,12 @@
     schreibe('', null);
     if (ticker) { clearInterval(ticker); ticker = null; }
     if (band) band.style.display = 'none';
+    /* v2137a: der Platz muss mit dem Band gehen, sonst bleibt unten
+       eine Luecke stehen, die niemand erklaeren kann. */
+    try {
+      document.documentElement.removeAttribute('data-dp-verify');
+      document.documentElement.style.removeProperty('--dp-verify-band-h');
+    } catch (e) {}
   }
 
   /* ── Die Kopfzeile jeder Antwort mitlesen ───────────────────────────
