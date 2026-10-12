@@ -37213,3 +37213,158 @@ zurück — der Knoten war nach dem Neu-Rendern nicht mehr im Dokument.
 | N60.39 Kartenstil „Zeile": 53 Regeln, 0 Setzer | **Optik + Risiko** |
 | `#bmfOverlay` Schließknopf 31×27 (nur Maus-Breiten) | **Feinschliff** |
 
+
+## Rollout-Journal 12.10.2026 — v2132–v2134: „mach es so das es funktioniert und passend bedient werden kann"
+
+Marcels Antwort auf die drei Entscheidungen, die ich ihm vorgelegt
+hatte. Also gebaut statt gefragt — aber jedes Mal **zuerst gemessen,
+was der Schalter schaltet.**
+
+| Was | Commit |
+|---|---|
+| `v2132`/`a` die Cockpit-Matrix klappt auf dem Handy auf | `5be70125`, `77fda9bb` |
+| `v2133`/`a` der Kartenstil „Zeile" wirkt | `77fda9bb`, `5c26d4be` |
+| `v2134` eine Touchfläche für alle vier Entwürfe | `577119b0` |
+| N60.39, N60.40, N60.41 geschlossen | `d4b791e8` |
+
+### N60.40 — der Fund, der den Knopf überflüssig gemacht hat
+
+Naheliegend war: dem Cockpit-Vollbild einen ordentlichen 44-px-Schalter
+geben. Zuerst habe ich gemessen, **was `toggleSidebar()` bewirkt** —
+Zustand davor und danach, Cockpit offen, zwei Breiten, sieben
+Eigenschaften:
+
+```
+   390 px                   vorher         nachher
+     body-Klasse            (ohne)         dp-dash-fullscreen
+     nav.tabs               0x0 none       0x0 none
+     aside#sidebar        359x758 flex   359x758 flex
+     header.hdr           386x93 block   386x93 block
+     .tabs-workflow-bar     0x0 none       0x0 none
+     Cockpit              386x9200       386x9200
+     .app-wrap Spalten     390px          390px
+
+  1440 px   alles identisch, Cockpit 1188x6019 vorher und nachher
+```
+
+> **Nicht eine Eigenschaft ändert sich.** Der Kommentar in
+> `dashboard.js:2079` behauptet das Gegenteil (*„per CSS dasselbe
+> erreicht — Tab-Bar/Workflow-Bar/Sidebar weg"*). Diese Regeln gibt es
+> nicht, und alles, was sie verstecken sollten, ist im Cockpit ohnehin
+> schon versteckt.
+
+Hätte ich den Knopf gebaut, hätte Marcel einen schönen 44-px-Schalter
+bekommen, der nichts tut. **Erst messen, was ein Schalter schaltet,
+dann den Schalter bauen.** `v2128` hatte den 2-Pixel-Stummel schon
+entfernt — das war die ganze Arbeit, und es ist keine Funktion
+verloren, weil es keine gab.
+
+### Der Befund, der fünf Durchgänge neu einordnet
+
+**Unter 641 px ist die Datenaufnahme keine Karte, sondern eine
+Schublade von unten** (`v619-boarding-mobile`, `style.css:33626`):
+`position:fixed`, `z-index:1100`, `transform:translateY(110%)`,
+geöffnet per `.dp-pf-mtrigger`.
+
+Gemessen bei 390 px, Schublade **zu**, in allen vier Stilen:
+
+```
+  .dp-pf-scroll   position fixed   z 1100   top 185-334
+  #oab-bar        top 875-890  bei 757 px Viewport
+  .main-col       scrollTop 0 -> 3000 bewegt #s0 um -2839 px
+                  und #oab-bar um 0 px
+```
+
+> **Ich habe in fünf Durchgängen die Handy-Breiten gemessen und dabei
+> immer die geschlossene Schublade vermessen.** Ein `transform` fällt
+> in `getBoundingClientRect` mit hinein — die Zahlen sehen plausibel
+> aus und zeigen auf einen Ort, den es auf dem Schirm nicht gibt.
+
+Ehrlich getrennt, was das für die Befunde heißt:
+
+| | |
+|---|---|
+| Breiten, Umbrüche, gekappte Beschriftungen, Knopfmaße | **gültig** |
+| Positionen, `elementsFromPoint`, Erreichbarkeit | **ungültig** |
+
+Daher kamen „Kachel verdeckt von nichts" und „Knopf nicht frei". Beide
+hatte ich als Werkzeugartefakt notiert — jetzt ist auch die **Ursache**
+bekannt, nicht nur die Wirkung.
+
+**Nachgeholt:** 4 Kartenstile × 3 Handys, per echtem Klick geöffnet.
+
+```
+  Auslöser trifft                12 von 12
+  Schublade offen                12 von 12
+  Auslöser 304-374 x 52, frei    12 von 12
+  Schließknopf 45x44, im Bild    12 von 12
+  Knopf verdeckt / außerhalb      0 / 0
+  Beschriftung gekappt            0
+  Inhalt außerhalb                0
+```
+
+### `v2132` — 45 % des Preise-Fensters sind eine Tabelle
+
+Gemessen, welcher Block die Länge macht (390 px, direkte Kinder):
+`.dp-feature-table-wrap` **1674 px von 3686** — darin `table.mx` mit
+1338 px.
+
+> **Eine Vergleichstabelle vergleicht nur, wenn man zwei Spalten
+> gleichzeitig sieht.** Auf dem Handy sieht man eine — und wischt für
+> die zweite so weit, dass die erste nicht mehr erinnert wird.
+
+Zugeklappt mit einem Knopf davor, der sagt was dahinter liegt:
+`aria-expanded`, wechselnde Beschriftung, 44 px, Textkontrast **10,54**.
+Gemessen bei 360 px: **4.609 px zu, 10.124 px auf** — also 54 % weniger,
+und beim zweiten Klick wieder exakt 4.609. **Preise, Pläne, Reihenfolge
+und Knöpfe sind unberührt.**
+
+**`v2132a`:** die Falte hing als fünfter Aufruf in einem `setTimeout`
+hinter vier anderen. Jetzt eigener Takt, eigenes `try/catch` — *eine
+angehängte Zeile läuft nicht, wenn ein Vorgänger stürzt.*
+
+### `v2133` — 44 Regeln ohne Setzer
+
+Eine Zeile in `karten-stil.js`, an die **ausdrückliche** Wahl gehängt
+(nicht an jeden Stil — sonst wäre der Fehler von `v1702d` zurück), und
+dasselbe im QuickBoarding-iframe.
+
+Abnahme 2 Stile × 10 Breiten: Marke gesetzt, **35 von 44 Regeln
+treffen**, KAPP 0 · RAUS 0 · ZUBREIT 0 · QUER 0, Kontrast überall
+≥ 4,5. Die Leiste wird **111 px flacher** (445 → 334 bei 390 px) —
+genau das, was der Entwurf verspricht.
+
+### Drei eigene Korrekturen
+
+**1 · „53 Regeln" war ein `grep -c` auf den String.** Gezählt sind es
+33 Regelblöcke mit 40 Selektoren in der Datei und 44 Regeln im
+laufenden Dokument. *Zählen ist keine Messung.*
+
+**2 · „rendert auf das Pixel genau wie die Vorgabe" war zu stark.**
+Schon vorher gab es Unterschiede (1280 px: 156 gegen 166) — sie kamen
+aus `dp-neue-karte-stil`, nicht aus den 44 Regeln.
+
+**3 · „Die Falte fehlt bei 430 px" war mein Messtakt.** `DPM.warte(200)`
+lieferte im Hintergrundfenster Proben bei 821 und 1800 ms. Die Falte
+kommt ~90 ms nach dem Rendern; das **Fenster** wartet auf
+`preiseAusKatalog()` und braucht 0,8 bis 4,9 s. Das ist `v1674` und
+Absicht: *„Lieber 200 ms warten als einen Preis zeigen, den die Kasse
+nicht kennt."*
+
+### `v2134` — eine Regel statt vier
+
+In der offenen Schublade war ein Maß übrig: der Kartei-Knopf **91×40**,
+vier Pixel zu flach. Vorgabe 50, Zeile 44 (`v2133a`), Buetten 50.
+
+> **Eine Regel je Entwurf ist eine Regel, die beim fünften Entwurf
+> fehlt.** Jetzt steht sie einmal und stilunabhängig: unter 901 px
+> mindestens 44 px, Spezifität (2,2,0) gegen die (1,3,1) der Kartei —
+> zwei IDs zählen mehr als drei Klassen.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Zeile bei 1440 px: 132 px hoch, Vorgabe 78 (nichts gekappt) | **Optik am Entwurf** |
+| `#bmfOverlay` Schließknopf 31×27 (nur Maus-Breiten) | **Feinschliff** |
+
