@@ -822,7 +822,41 @@ function _buildAIPayload() {
                    nur noch Altdaten geliefert - die im Prompt aussehen wie
                    gepflegte. Ein Feld entfernen heisst nicht, es
                    loszuwerden. */
-                zustand: e.zustand || null
+                zustand: e.zustand || null,
+                /* ══ v2156 · SIEBEN FELDER, DIE EINE BEURTEILUNG TRAGEN ══
+
+                   Marcel am 12.10.2026: „ob generell alle Daten, also auch
+                   aus den Mehrfamilienhaeusern, aus dem Konfigurator …
+                   dass auch wirklich alles damit einfliesst."
+
+                   GEMESSEN: von 36 Feldern je Einheit reisten 13 mit. Der
+                   Prompt druckte alle 13 — die Luecke lag HIER, im Sender.
+
+                   Die Auswahl von v2022 war richtig („nicht alle 28
+                   Felder"), aber sie hat die MIETE verloren: Soll-Miete,
+                   Staffel/Index und Kuendigungsverzicht sind genau das,
+                   woraus Mietsteigerungspotenzial entsteht. Eine Analyse,
+                   die eine Staffelmiete nicht kennt, nennt als Chance,
+                   was schon vertraglich vereinbart ist.
+
+                   Draussen bleiben weiter: Kaution, Mietername (hat im
+                   Prompt nichts verloren), Notiz, Bilder. Und `keller`,
+                   `balkon_qm`, `stellplatz` — die tragen kein Urteil,
+                   das die Objektebene nicht schon hat. */
+                soll_miete: zahl(e.soll) || null,
+                mietvertrag_seit: e.mv_beginn || null,
+                kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
+                erhoehung_art: e.mv_erhoehung_art || null,
+                erhoehung_wert: zahl(e.mv_erhoehung_wert) || null,
+                erhoehung_rhythmus_jahre: zahl(e.mv_rhythmus_jahre) || null,
+                /* Offene Staffelstufen: wie viele Erhoehungen noch
+                   kommen, ohne dass neu verhandelt werden muss. */
+                stufen_offen: zahl(e.mv_stufen_offen) || null,
+                /* Was an DIESER Wohnung gemacht werden muss, und was es
+                   kostet. Stand bisher nur dann im Prompt, wenn jemand
+                   den Haken fuer die Steuer-Summe gesetzt hatte. */
+                massnahme: e.massnahme || null,
+                massnahme_kosten: zahl(e.kosten) || null
               };
             }),
             /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
@@ -831,7 +865,41 @@ function _buildAIPayload() {
             aufgeteilt: m.aufgeteilt != null ? !!m.aufgeteilt : null,
             gnd: Number(m.gnd) || null,
             stand: m.stand || null,
-            modernisierung: m.gebaeude || null
+            /* ══ v2156 · ROHCODES UEBERSETZEN, BEVOR SIE RAUSGEHEN ══════
+               Hier stand `m.gebaeude` roh. Die Stufen sind `0`, `h`, `v`
+               (mfh-einheiten.js:38), und so kamen sie im Prompt an:
+
+                 dach=v, heizung=h, fenster=0
+
+               GEMESSEN am 12.10.2026: der Prompt druckt sie unveraendert
+               (openaiService.js:433-441). Das Modell liest „v" und muss
+               raten, ob das „vor kurzem" oder „vollstaendig" heisst — und
+               was „h" ist, kann niemand erraten.
+
+               > Die Uebersetzungstabelle liegt eine Datei weiter
+               > (`STUFE_ZU_OBJEKT`, mfh-einheiten.js:176) und wurde
+               > serverseitig nie benutzt. Ein Code ohne seine Tabelle ist
+               > kein Datum, sondern ein Rätsel.
+
+               Uebersetzt wird HIER, beim Sender: er kennt seine eigenen
+               Codes. Die Tabelle im Backend nachzubauen waere eine zweite
+               Kopie, die beim naechsten Stufen-Namen auseinanderlaeuft. */
+            modernisierung: (function () {
+              var g2 = m.gebaeude;
+              if (!g2 || typeof g2 !== 'object') return g2 || null;
+              var T = (window.DpMfhEinheiten && window.DpMfhEinheiten.STUFE_ZU_OBJEKT)
+                || { '0': 'Keine/Nie', h: '10 - 20 Jahre', v: '< 5 Jahre' };
+              var o = {}, n = 0;
+              Object.keys(g2).forEach(function (k) {
+                var v2 = g2[k];
+                if (v2 == null || v2 === '') return;
+                /* Unbekannte Stufe NICHT verschlucken: lieber der Rohwert
+                   mit Hinweis als eine stille Luecke. */
+                o[k] = T[String(v2)] || (String(v2) + ' (unbekannte Stufe)');
+                n++;
+              });
+              return n ? o : null;
+            })()
           };
         } catch (e) { return null; }
       })(),
@@ -1765,6 +1833,27 @@ function _renderAIServerAnalysis(a) {
       '<div class="dp-pa-card">' + sec('good', I.sr, 'ST\u00c4RKEN') + list(a.staerken) + '</div>' +
       '<div class="dp-pa-card">' + sec('bad', I.risk, 'RISIKEN') + list(a.risiken) + '</div>' +
     '</div>';
+  /* ══ v2156 · DER OPTISCHE EINDRUCK HATTE KEINEN LESER ════════════════
+     Das Feld wird verlangt, sobald Fotos mitgehen (openaiService.js:1415,
+     4-6 Saetze), und GEMESSEN am 12.10.2026 gab es im ganzen Frontend
+     keine Stelle, die es ausgibt — null Treffer fuer `optischer_eindruck`
+     in frontend/js.
+
+     > Die Arbeit wurde erzeugt, bezahlt und weggeworfen. Dasselbe Muster
+     > wie die `skala` von heute Morgen und die Telefonnummer der Aemter.
+
+     Er steht bei den Staerken und Risiken, weil er genau dort hingehoert:
+     ein Eindruck, der dem erfassten Zustand widerspricht, ist ein Risiko.
+     Die Einordnung steht dabei — es ist ein Eindruck aus Bildern, keine
+     Feststellung, und der Prompt verbietet ausdruecklich, daraus Baujahr,
+     Flaeche oder Wert abzuleiten. */
+  if (has(a.optischer_eindruck)) {
+    pS += '<div class="dp-pa-card">' + sec('', I.sr, 'OPTISCHER EINDRUCK AUS DEN FOTOS')
+       + p(a.optischer_eindruck)
+       + '<div class="dp-pa-fuss">Ein visueller Eindruck aus den mitgesendeten '
+       + 'Bildern — keine Feststellung. Baujahr, Fläche und Wert kommen '
+       + 'aus der Erfassung, nicht aus dem Foto.</div></div>';
+  }
 
   // Panel 3 — Risiko & Szenarien
   var pR = sec('', I.risk, 'RISIKO & SZENARIEN');

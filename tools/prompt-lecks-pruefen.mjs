@@ -116,10 +116,25 @@ const auftrag = {
       /* Ein OBJEKT, so wie `mfh-einheiten.js` es fuehrt (Gewerk ->
          Stufe) — nicht ein String. Mein erster Auftrag schickte einen
          String, und genau daran fiel die Typfalle im Leser auf. */
-      modernisierung: { Dach: 'PRUEFSTUFE-4', Heizung: 'PRUEFSTUFE-2' },
+      /* v2156: `_buildAIPayload()` uebersetzt die Rohcodes jetzt VOR dem
+         Senden (ui.js, STUFE_ZU_OBJEKT). Der Auftrag traegt deshalb die
+         uebersetzte Form — so, wie der echte Sender sie schickt. Die
+         frueheren Werte („PRUEFSTUFE-4") waren erfunden und haetten den
+         Rohcode-Befund nie gezeigt. */
+      modernisierung: { dach: '< 5 Jahre', heizung: '10 - 20 Jahre' },
       je_einheit: [{
         nr: 1, wfl: 8123, miete: 91234, art: 'wohnen', status: 'vermietet',
         lage: 'PRUEFLAGE-EINS',
+        /* v2156 · die neun Felder, die bis v2155 im Sender haengenblieben */
+        soll_miete: 97531,
+        mietvertrag_seit: '2018-03-01',
+        kuendigungsverzicht_bis: '2029-06-30',
+        erhoehung_art: 'PRUEF-STAFFEL',
+        erhoehung_wert: 43,
+        erhoehung_rhythmus_jahre: 2,
+        stufen_offen: 3,
+        massnahme: 'PRUEF-BAD-ERNEUERN',
+        massnahme_kosten: 28456,
         /* Die sieben, die bis v2139 ungelesen mitreisten (ui.js:813-826) */
         etage: 'PRUEFETAGE', zimmer: 7,
         vertragsart: 'PRUEF-STAFFELMIETE',
@@ -177,7 +192,11 @@ const auftrag = {
 
   boden: {
     bodenrichtwert_eur_qm: 219, grundstueck_qm: 9876,
-    sachwertfaktor: 1.07, liegenschaftszins_pct: 2.56
+    /* v2156: der Objekt-Zins ist mit ABSICHT anders als der des
+       Berichts (2,56 %). So wird der Abweichungszweig im
+       Wertermittlungsblock mitgeprueft — zwei Zahlen, die gleich heissen
+       und verschieden sind, waren genau der Befund. */
+    sachwertfaktor: 1.07, liegenschaftszins_pct: 3.40
   },
 
   /* v2139a: die Namen aus `ui.js:987-991` ausgelesen, nicht geraten. */
@@ -266,6 +285,20 @@ const auftrag = {
       fuehrend_grund: 'PRUEFGRUND-RENDITEOBJEKT',
       fuehrend_quelle: 'PRUEFQUELLE-PARAGRAF-6',
       hat_crosscheck: true,
+      /* ══ v2156 · DER ZINS, DER DEN ERTRAGSWERT ERZEUGT ═══════════════
+         Die Feldnamen stammen aus der erweiterten SELECT-Liste von
+         `/objects/history` (marktbericht api.js), nicht aus meinem Kopf:
+         lzs_pct, lzs_stufe, lzs_zweig, lzs_berichtsjahr,
+         lzs_aus_register, gnd_jahre, bwk_quote.
+         Der Zins ist mit ABSICHT anders als der im Objekt (3,40 %) —
+         so wird der Abweichungszweig mitgeprueft. */
+      lzs_pct: 2.56,
+      lzs_stufe: 'PRUEF-A',
+      lzs_zweig: 'PRUEF-ZWEIG-WOHNEN',
+      lzs_berichtsjahr: 2025,
+      lzs_aus_register: true,
+      gnd_jahre: 70,
+      bwk_quote: 0.22,
       data: { rent: { median_sqm: 7.31 } }
     },
     verlauf: [
@@ -348,7 +381,13 @@ const ERWARTET = [
   ['halter.name', 'ui.js:988', 'PRUEF-HALTER-GMBH'],
   ['wohnung.garagen', 'ui.js:976', '3'],
   ['objekt.einheiten.stand', 'ui.js:837', '2026-10-12'],
-  ['objekt.einheiten.modernisierung', 'ui.js:838', 'Dach=PRUEFSTUFE-4'],
+  /* v2156: hier stand `Dach=PRUEFSTUFE-4` — ein erfundener Stufenwert.
+     Er hat zwar bewiesen, dass das FELD ankommt, aber nie gezeigt, dass
+     dort ein unverstaendlicher ROHCODE stand (`dach=v`). Ein erfundener
+     Testwert prueft die Leitung und nicht den Inhalt. Die Erwartung
+     steht jetzt unter „Stufen: Klartext statt Code" mit dem echten
+     uebersetzten Wert. */
+  ['objekt.einheiten.modernisierung', 'ui.js:838', 'dach=< 5 Jahre'],
   ['objekt.einheiten.flaeche_summe', 'ui.js:788', 'ABWEICHUNG Flaeche'],
 
   /* ── v2140 · das Investmentprofil ──────────────────────────────── */
@@ -409,7 +448,46 @@ const ERWARTET = [
   ['Aufgabe 14 steht da',          'v2150', '14. Abgleich mit dem Marktbericht'],
   ['Zielfeld berichts_abgleich',   'v2150', '"berichts_abgleich"'],
   ['Zielfeld mietspiegel_herkunft', 'v2150', '"mietspiegel_herkunft"'],
-  ['Mietspiegel: Bericht zuerst',  'v2150', 'VORRANG: der Wert aus dem DealPilot-Marktbericht']
+  ['Mietspiegel: Bericht zuerst',  'v2150', 'VORRANG: der Wert aus dem DealPilot-Marktbericht'],
+
+  /* ══ v2156 · ALLES MUSS EINFLIESSEN (N62.3) ══════════════════════════
+     Marcel am 12.10.2026: „ob generell alle Daten, also auch aus den
+     Mehrfamilienhaeusern, aus dem Konfigurator … auch Finanzierung und
+     Liegenschaftszinsen und Wertgutachten, dass auch wirklich alles
+     damit einfliesst."
+
+     GEMESSEN vorher: von 36 Feldern je Einheit reisten 13 mit, die
+     Modernisierungsstufen kamen als ROHCODES (`dach=v`), und der
+     Liegenschaftszins stand ohne Auftrag und fehlte im
+     Wertermittlungsblock ganz. */
+  ['MFH: Soll-Kaltmiete',          'v2156', 'Soll-Kaltmiete 97531'],
+  ['MFH: Vertrag seit',            'v2156', 'Vertrag seit 2018-03-01'],
+  ['MFH: Kuendigungsverzicht',     'v2156', 'KUENDIGUNGSVERZICHT bis 2029-06-30'],
+  ['MFH: Erhoehungsart',           'v2156', 'Erhoehung: PRUEF-STAFFEL'],
+  ['MFH: Erhoehungswert',          'v2156', '(43)'],
+  ['MFH: Rhythmus',                'v2156', 'alle 2 Jahre'],
+  ['MFH: offene Stufen',           'v2156', '3 Stufe(n) offen'],
+  ['MFH: Massnahme',               'v2156', 'MASSNAHME: PRUEF-BAD-ERNEUERN'],
+  ['MFH: Massnahmekosten',         'v2156', '28.456'],
+  /* Die Rohcodes: VORHER stand im Prompt `dach=v`. Jetzt der Klartext —
+     und der Rohcode darf NICHT mehr vorkommen. */
+  ['Stufen: Klartext statt Code',  'v2156', 'dach=< 5 Jahre'],
+  ['Stufen: zweites Gewerk',       'v2156', 'heizung=10 - 20 Jahre'],
+  /* Liegenschaftszins: Auftrag am Objektfeld */
+  ['LZS: Auftrag am Objektfeld',   'v2156', 'AUFTRAG zum Liegenschaftszins'],
+  ['LZS: der Hebel genannt',       'v2156', 'um gut ein\n  Fuenftel'],
+  /* Liegenschaftszins: im Wertermittlungsblock, mit Herkunft */
+  ['LZS: im Wertermittlungsblock', 'v2156', 'Liegenschaftszinssatz der Rechnung: 2,56 %'],
+  ['LZS: Stufe als Herkunft',      'v2156', 'Stufe PRUEF-A'],
+  ['LZS: Zweig',                   'v2156', 'PRUEF-ZWEIG-WOHNEN'],
+  ['LZS: Jahrgang',                'v2156', 'Jahrgang 2025'],
+  ['LZS: aus dem Register',        'v2156', 'aus dem amtlichen Register'],
+  ['LZS: Abweichung gemeldet',     'v2156', 'ABWEICHUNG: im Objekt ist 3,40 %'],
+  ['GND der Rechnung',             'v2156', 'Gesamtnutzungsdauer der Rechnung: 70 Jahre'],
+  ['BWK-Quote der Rechnung',       'v2156', 'Bewirtschaftungskostenquote der Rechnung: 22,0 %'],
+  /* Staerken und Risiken: echte Vorgabe je Eintrag */
+  ['Staerken: Satzvorgabe',        'v2156', 'je Eintrag 2-3 Sätze MIT der Zahl'],
+  ['Risiken: Folge verlangt',      'v2156', 'mit der Folge für den Investor']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */

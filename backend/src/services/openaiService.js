@@ -349,7 +349,29 @@ function buildPrompt(payload, opts) {
                     + (e.letzte_erhoehung ? ', letzte Erhöhung ' + e.letzte_erhoehung : '')
                     + (e.naechste_anpassung ? ', nächste Anpassung ' + e.naechste_anpassung : '')
                     + (e.befristet_bis ? ', befristet bis ' + e.befristet_bis : '')
-                    + (e.zustand ? ', Zustand: ' + e.zustand : '');
+                    + (e.zustand ? ', Zustand: ' + e.zustand : '')
+                    /* ══ v2156 · DIE MIETE IST MEHR ALS EINE ZAHL ════════
+                       Die Soll-Miete, die Erhoehungsart und der
+                       Kuendigungsverzicht reisten bis v2155 nicht mit
+                       (gemessen: 13 von 36 Feldern). Ohne sie nennt die
+                       Analyse als CHANCE, was vertraglich schon
+                       vereinbart ist — eine Staffelmiete steigt von
+                       selbst, eine Indexmiete haengt am VPI, und ein
+                       Kuendigungsverzicht bindet beide Seiten.
+                       Die Soll-Miete steht NEBEN der Ist-Miete, nicht
+                       statt ihr: der Abstand ist der Hebel. */
+                    + (e.soll_miete ? ', Soll-Kaltmiete ' + e.soll_miete + ' €' : '')
+                    + (e.mietvertrag_seit ? ', Vertrag seit ' + e.mietvertrag_seit : '')
+                    + (e.kuendigungsverzicht_bis
+                        ? ', KUENDIGUNGSVERZICHT bis ' + e.kuendigungsverzicht_bis : '')
+                    + (e.erhoehung_art ? ', Erhoehung: ' + e.erhoehung_art
+                        + (e.erhoehung_wert != null ? ' (' + e.erhoehung_wert + ')' : '')
+                        + (e.erhoehung_rhythmus_jahre ? ', alle ' + e.erhoehung_rhythmus_jahre + ' Jahre' : '')
+                        + (e.stufen_offen != null ? ', ' + e.stufen_offen + ' Stufe(n) offen' : '')
+                      : '')
+                    + (e.massnahme ? ', MASSNAHME: ' + e.massnahme
+                        + (e.massnahme_kosten ? ' (' + fmtEur(e.massnahme_kosten) + ')' : '')
+                      : '');
                 }).join('\n')
             : '')
       : '',
@@ -614,6 +636,24 @@ function buildPrompt(payload, opts) {
       ['Liegenschaftszins', _bo.liegenschaftszins_pct != null ? _p(_bo.liegenschaftszins_pct) : null],
       ['Nutzungsart', _bo.nutzungsart]
     ]) : '',
+    /* ══ v2156 · EINE ZAHL OHNE AUFTRAG WIRD NICHT BENUTZT ═══════════════
+       Marcel am 12.10.2026: „auch Liegenschaftszinsen … dass auch wirklich
+       alles damit einfliesst."
+       Der Zins STAND im Prompt (eine Zeile hoeher, seit v2011) — aber kein
+       Satz sagte dem Modell, was es damit tun soll. Anders als bei der
+       Restnutzungsdauer, wo ein ausdruecklicher Abgleich-Auftrag steht.
+       Gemessen: er kommt in den Antworten praktisch nicht vor.
+       > Ein Datum im Prompt ist kein Datum in der Analyse. Ohne Auftrag
+       > liest das Modell darueber hinweg — dieselbe Lehre wie bei den
+       > Feldern ohne Zielfeld (v2139). */
+    (_bo && _bo.liegenschaftszins_pct != null)
+      ? '- AUFTRAG zum Liegenschaftszins: er ist die Groesse, an der der\n'
+        + '  Ertragswert haengt (ein Prozentpunkt mehr senkt ihn um gut ein\n'
+        + '  Fuenftel). Ordne ihn ein: passt er zu Lage und Objektart, und was\n'
+        + '  bedeutet er fuer die Bewertung? Liegt unten ein Marktbericht mit\n'
+        + '  einem eigenen Zinssatz vor, gilt dessen Wert — nenne dann beide\n'
+        + '  und sage, welcher woher kommt.'
+      : '',
     _ha ? _zeilen('## HALTER UND UEBERGANG (privat oder Gesellschaft aendert Steuer und Finanzierung)', [
       ['Halter', _ha.name], ['Gehalten seit', _ha.seit],
       ['Kaufdatum', _ha.kaufdatum],
@@ -978,6 +1018,65 @@ function buildPrompt(payload, opts) {
         } else if (a.fuehrend_grund) {
           L.push('- KEIN fuehrendes Verfahren ausgewiesen: ' + a.fuehrend_grund);
         }
+        /* ══ v2156 · DER ZINS GEHOERT ZUM ERTRAGSWERT ════════════════════
+
+           Marcel am 12.10.2026: „auch Finanzierung und Liegenschaftszinsen
+           und Wertgutachten, dass auch wirklich alles damit einfliesst."
+
+           GEMESSEN: der Ertragswert stand hier ohne den Liegenschaftszins,
+           der ihn erzeugt. Das Objektfeld `lzs_pct` aus dem Formular steht
+           400 Zeilen weiter oben im Block „BODEN UND SUBSTANZ" — als
+           nackte Zahl, ohne Auftrag. Zwei Zahlen zur selben Groesse, ohne
+           Beruehrung, und das Modell musste raten, welche gilt.
+
+           > Ein Ertragswert ohne seinen Zinssatz ist nicht pruefbar. Der
+           > Zins ist die Groesse, an der die ganze Rechnung haengt: ein
+           > Prozentpunkt mehr senkt den Ertragswert um gut ein Fuenftel.
+
+           Die HERKUNFT steht dabei (Stufe A-E, Zweig, Jahrgang, aus dem
+           Register oder nicht). Ein amtlicher Satz des Gutachterausschusses
+           und ein Rueckfall sind nicht dasselbe — und die Analyse muss das
+           sagen koennen, statt beides „Liegenschaftszins" zu nennen. */
+        if (a.lzs_pct != null) {
+          var _lz = Number(a.lzs_pct);
+          var _lzh = [];
+          if (a.lzs_stufe) _lzh.push('Stufe ' + a.lzs_stufe);
+          if (a.lzs_zweig) _lzh.push(String(a.lzs_zweig));
+          if (a.lzs_berichtsjahr) _lzh.push('Jahrgang ' + a.lzs_berichtsjahr);
+          _lzh.push(a.lzs_aus_register ? 'aus dem amtlichen Register'
+                                       : 'NICHT aus dem Register — Rueckfallwert');
+          L.push('- Liegenschaftszinssatz der Rechnung: '
+            + fmtNum(_lz, 2).replace('.', ',') + ' %  (' + _lzh.join(' · ') + ')');
+          if (!a.lzs_aus_register) {
+            L.push('  ACHTUNG: Dieser Zinssatz kommt NICHT vom Gutachterausschuss.');
+            L.push('  Der Ertragswert darueber ist damit eine Rechnung mit einer');
+            L.push('  Annahme, nicht mit einem amtlichen Modellwert. Sage das dazu,');
+            L.push('  wenn du den Ertragswert verwendest.');
+          }
+          /* Weicht der Zins des Berichts von dem im Formular ab, ist das
+             ein Befund — keine Kleinigkeit: beide Zahlen heissen gleich. */
+          /* `_bo` ist der Boden-Block (Z. 117), nicht `mb` — das ist die
+             Marktbewertung. Mein erster Zugriff hiess `mb.liegenschafts-
+             zins_pct` und waere immer undefined gewesen: eine Abweichung,
+             die nie gemeldet wird, sieht wie Uebereinstimmung aus. */
+          if (_bo && _bo.liegenschaftszins_pct != null) {
+            var _lzf = Number(_bo.liegenschaftszins_pct);
+            if (isFinite(_lzf) && _lzf > 0 && Math.abs(_lzf - _lz) >= 0.05) {
+              L.push('  ABWEICHUNG: im Objekt ist ' + fmtNum(_lzf, 2).replace('.', ',')
+                + ' % hinterlegt, der Bericht rechnet mit '
+                + fmtNum(_lz, 2).replace('.', ',') + ' %.');
+              L.push('  Nenne BEIDE und sage, welcher woher kommt. Der Bericht rechnet');
+              L.push('  mit seinem eigenen; der hinterlegte Wert ist ein Formularfeld.');
+            }
+          }
+        }
+        if (a.gnd_jahre != null) {
+          L.push('- Gesamtnutzungsdauer der Rechnung: ' + Math.round(Number(a.gnd_jahre)) + ' Jahre');
+        }
+        if (a.bwk_quote != null) {
+          L.push('- Bewirtschaftungskostenquote der Rechnung: '
+            + fmtNum(Number(a.bwk_quote) * 100, 1).replace('.', ',') + ' % des Rohertrags');
+        }
         L.push('- EINORDNUNG, die mitgesagt werden MUSS: diese Werte sind ein');
         L.push('  vereinfachter Plausibilitaets-Quercheck nach ImmoWertV-Logik,');
         L.push('  INDIKATIV und KEIN Gutachten nach Paragraf 194 BauGB. Nenne sie');
@@ -1235,8 +1334,26 @@ function buildPrompt(payload, opts) {
     '{',
     '  "gesamtbewertung": "4-6 Sätze, mit Zahlen",',
     '  "fazit_kurz": "Kaufen | Prüfen | Nicht kaufen",',
-    '  "staerken":   ["Stärke 1 ausführlich mit Zahl", "Stärke 2", "Stärke 3", "Stärke 4", "Stärke 5"],',
-    '  "risiken":    ["Risiko 1 ausführlich mit Zahl", "Risiko 2", "Risiko 3", "Risiko 4", "Risiko 5"],',
+    /* ══ v2156 · JEDER EINTRAG BRAUCHT EINE VORGABE ═══════════════════
+       Marcel am 12.10.2026: „dass wir da wirklich vernuenftige
+       Auswertungen bekommen … das noch vollumfaenglicher, genauer."
+
+       Hier stand `["Staerke 1 ausfuehrlich mit Zahl", "Staerke 2",
+       "Staerke 3", …]`. GEMESSEN: das ist die schwaechste Vorgabe des
+       ganzen Antwortformats — alle anderen Felder nennen eine Satzzahl
+       (4-6, 8-12), diese beiden nur das Wort „ausfuehrlich", und zwar
+       nur am ERSTEN Element. Die Eintraege 2 bis 5 hatten gar keine.
+
+       > Ein Listeneintrag ohne Vorgabe wird ein Stichwort. „Gute Lage"
+       > ist keine Staerke, es ist eine Behauptung — und sie steht dann
+       > neben einem ersten Eintrag, der drei Saetze und eine Zahl hat.
+
+       Jetzt tragen alle fuenf dieselbe Anforderung: zwei bis drei Saetze
+       MIT der Zahl, auf die sich die Aussage stuetzt. Das ist dieselbe
+       Strenge wie im uebrigen Format und der Grund, warum die
+       Investmentbewertung heute brauchbar ist. */
+    '  "staerken":   ["je Eintrag 2-3 Sätze MIT der Zahl, auf die sich die Aussage stützt (z.B. \\"DSCR 1,34 liegt über der Bankschwelle 1,2 …\\"). Kein Stichwort, kein Allgemeinplatz. Fünf Einträge, der erste der stärkste.", "Stärke 2 — gleiche Anforderung", "Stärke 3", "Stärke 4", "Stärke 5"],',
+    '  "risiken":    ["je Eintrag 2-3 Sätze MIT Zahl und mit der Folge für den Investor (was passiert, wenn es eintritt). Fünf Einträge, der erste der schwerste.", "Risiko 2 — gleiche Anforderung", "Risiko 3", "Risiko 4", "Risiko 5"],',
     '  "risikoanalyse": {',
     '    "finanzierungsrisiko": "Ausführliche Bewertung von LTV+DSCR, 4-5 Sätze",',
     '    "cashflow_stabilitaet": "Ausführliche Bewertung Cashflow-Stabilität, 4-5 Sätze",',
@@ -1334,7 +1451,28 @@ async function callOpenAI(prompt, opts) {
     input: prompt,
     // V34: Output-Limit deutlich erhöht — die ausführlichen Texte aus V33
     // brauchen mehr Platz. Vorher Default (~4k) → JSON-Truncate.
-    max_output_tokens: 8000,
+    /* ══ v2156 · 8000 WAREN SCHON KNAPP, UND ES WURDE MEHR VERLANGT ═════
+
+       GEMESSEN am 12.10.2026: das Antwortformat verlangt über rund 30
+       Felder grob 110 bis 160 Sätze. Bei etwa 20 Tokens je deutschem Satz
+       sind das 2.200 bis 3.200 Tokens für den Fließtext allein, plus
+       JSON-Gerüst, plus die beiden Fünferlisten.
+
+       Dass es bisher meist reichte, lag daran, dass die Listeneinträge
+       Stichworte waren. v2156 verlangt dort 2-3 Sätze MIT Zahl, also bis
+       zu 30 Sätze mehr — und dazu kommen die neuen Felder
+       (`berichts_abgleich`, `mietspiegel_herkunft`, Aufgabe 14).
+
+       > Ein Truncate ist hier kein Schönheitsfehler: `extractJson()` hat
+       > eine Reparatur für abgeschnittenes JSON (Z. 1409 ff), aber die
+       > rettet die Struktur, nicht den Inhalt. Die zuletzt verlangten
+       > Felder fehlen dann einfach — und das sind die, die in der
+       > Aufgabenliste hinten stehen: Bankargumente, Anschreiben,
+       > Anschlussfinanzierung, der Berichtsabgleich.
+
+       12000 statt 8000. Die Kappe bleibt eine Kappe — sie soll nur nicht
+       vor dem Ende der Aufgabenliste greifen. */
+    max_output_tokens: 12000,
     /* v1264: Web-Suche abschaltbar. Additiv — wer die Option nicht setzt,
        bekommt sie weiter, also ändert sich für alle bestehenden Aufrufer
        nichts. Gebraucht wird das für Nachbearbeitungs-Aufrufe, die einen

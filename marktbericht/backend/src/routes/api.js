@@ -602,6 +602,38 @@ router.get('/objects/history', async (req, res) => {
                  eines Template-Literals. Ein Backtick beendet die
                  Zeichenkette und zerlegt die Datei - in dieser Sitzung
                  schon einmal passiert, an genau dieser Stelle. */
+              /* ══ v2156 · DER ZINS, DER DEN ERTRAGSWERT ERZEUGT ══════════
+                 Marcel am 12.10.2026: „auch Finanzierung und
+                 Liegenschaftszinsen und Wertgutachten, dass auch wirklich
+                 alles damit einfliesst."
+
+                 GEMESSEN: der Ertragswert geht seit v1963 ueber diese
+                 Schnittstelle, der Zinssatz NICHT. In der Pilot-Analyse
+                 stand damit der Ertragswert ohne die Groesse, die ihn
+                 erzeugt — und 400 Zeilen weiter oben im selben Prompt das
+                 Objektfeld lzs_pct aus dem Formular. Zwei Zahlen zur
+                 selben Sache, ohne Beruehrung.
+
+                 Mitgeliefert wird auch die HERKUNFT: ein amtlicher Satz
+                 des Gutachterausschusses und ein Rueckfall sind nicht
+                 dasselbe, und genau das muss die Analyse sagen koennen.
+                 Die Stufe traegt A-E, dazu der Zweig des Ausschusses, der
+                 Jahrgang und ob der Satz aus dem Register kam.
+
+                 KEINE BACKTICKS IN DIESEM KOMMENTAR. Er steht in einem
+                 Template-Literal, und dort beendet ein Backtick das
+                 Literal — auch mitten in etwas, das wie ein Kommentar
+                 aussieht. Mir ist das am 12.10.2026 ZWEIMAL passiert,
+                 hier und in unterlagenService.js (v2152). */
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_pct_effektiv')::numeric
+                AS lzs_pct,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_stufe')      AS lzs_stufe,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_zweig')      AS lzs_zweig,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_berichtsjahr') AS lzs_berichtsjahr,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_aus_register')::boolean
+                AS lzs_aus_register,
+              (data->'cross_check'->'assumptions'->>'gnd_jahre')::numeric           AS gnd_jahre,
+              (data->'cross_check'->'assumptions'->>'bwk_quote')::numeric           AS bwk_quote,
               (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
               (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
               (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,
