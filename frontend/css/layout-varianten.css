@@ -420,7 +420,11 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
   font-family:'JetBrains Mono', ui-monospace, monospace;
 }
 .dpl-schalter-k{ font-size:9px; letter-spacing:.12em; text-transform:uppercase;
-  color:#9A9287; padding-right:4px; }
+  /* v2090: stand auf #9A9287 — auf dem hellen Grund rgb(253,252,250)
+     ergibt das Kontrast 3,00 bei 9 px (gemessen 10.10.2026), Schwelle 4,5.
+     #7A736B ist derselbe Ton um 21 % abgedunkelt: 4,56. Die Beschriftung
+     bleibt zurückgenommen, ist aber lesbar. */
+  color:#7A736B; padding-right:4px; }
 .dpl-schalter button{
   font-family:inherit; font-size:10.5px; letter-spacing:.05em;
   padding:5px 9px; border:1px solid #CEC6B6; background:#fff; color:#6B645A;
@@ -8844,6 +8848,34 @@ html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card 
 html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-top {
   border-radius:0 5px 5px 0 !important;
   margin-left:16px !important;
+  /* ── v2115 · DIE ABRISSKANTE LIEF DURCHS BILD ──────────────────────
+     Marcel am 11.10.2026: „es sei denn wir wuerden diesen Abriss vor das
+     Bild optisch hinbekommen, weil das passt jetzt nicht, da laeuft die
+     Abrisskante durch das Bild."
+
+     GEMESSEN an allen 21 Karten, mit Foto wie mit Platzhalter:
+
+       .sbc-seq (der Streifen)  17-33 auf der Karte
+       .sbc-thumb (das Bild)    27-91
+       -> 6 px Abrisskante IM Bild, jedes Mal
+
+     URSACHE, und sie ist strukturell: `.sbc-seq` ist zwar
+     `position:absolute; left:0`, liegt aber INNERHALB von `.sbc-top`
+     (im Aufbau der Karte steckt sie in `.sbc-top-line1`). Sie bezieht
+     ihr `left:0` deshalb auf `.sbc-top`, nicht auf die Karte - und
+     `margin-left:16px` schiebt BEIDE gemeinsam nach rechts. Der Platz
+     entsteht links vom Streifen, nicht zwischen Streifen und Inhalt.
+
+     > Ein Abstand, der das auszuweichende Element mitnimmt, ist kein
+     > Abstand. Gemessen: `.sbc-top` beginnt bei 17, der Streifen endet
+     > bei 33, und das Bild startet bei 27 - also bei 10 px Innenabstand,
+     > waehrend der Streifen 16 px braucht.
+
+     Korrigiert wird deshalb der INNENABSTAND, nicht die Lage: 16 px
+     Streifen + 1 px Kante + 10 px Luft. Der aeussere Rand und die
+     Rundung bleiben, wie sie sind - an der Gestaltung aendert sich
+     nichts ausser dem, was sich ueberlappt hat. */
+  padding-left:27px !important;
 }
 
 html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card .sbc-investor-ribbon {
@@ -8868,6 +8900,54 @@ html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card.deal
 
 html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card.deal-lost .sbc-top {
   border-left-color:#B8625C !important;
+}
+
+/* ==============================================================================
+   v2116 - DIE SCORE-KANTE ZEIGT JETZT DEN SCORE
+
+   Der Stil heisst im Panel "Score-Kante · Farbiger Strich statt Ring"
+   (objektkarten-stil.js:62). GEMESSEN am Schreibtisch tat er etwas anderes:
+
+     .sbc-score-overlay   display:none      <- der Ring ist weg
+     .sbc-top border-left 13x Gold, 8x #3FA56C
+                                            <- und die 8 sind genau die
+                                               GEWONNENEN, nicht die besten
+
+   Score 69 trug Gruen, Score 64 und 60 trugen Gold - dieselbe Stufe
+   SOLIDE, verschiedene Farben. Der Strich zeigte den DEAL-STATUS, und der
+   Score war auf dieser Karte ueberhaupt nicht mehr sichtbar.
+
+   > Ein Name, der etwas verspricht, das der Code nicht tut, ist derselbe
+   > Fehler wie ein beworbenes Feature ohne Code.
+
+   WARUM DAS JETZT NICHTS KOSTET: ich hatte zuerst als Entscheidung
+   notiert, dass die Kante entweder den Score ODER den Status zeigen kann.
+   Das war eine ungepruefte Annahme. Gemessen traegt die Karte beide
+   Status als eigenes Band - `.sbc-won-ribbon` ("Won", 53x19 px, im Stil
+   `kante` sichtbar) und `.sbc-lost-ribbon` (storage.js:1398/1404). Der
+   Status geht also nicht verloren, er stand nie nur an der Kante.
+
+   DIE FARBEN SIND DIE VORHANDENEN (style.css:10311-10314), nicht neue:
+   derselbe Ton, den der Ring in dieser Stufe getragen haette.
+
+   Erreicht wird die Stufe ueber `:has()`, weil die Klasse an
+   `.sbc-mini-score` haengt und nicht an der Karte - `.sbc-top` ist deren
+   Geschwister, nicht ihr Vorfahr. `display:none` stoert dabei nicht:
+   `:has()` sieht den DOM, nicht die Darstellung.
+
+   Die beiden Regeln darueber (deal-won/deal-lost) bleiben als Rueckfall
+   fuer Karten ohne Score stehen - sie verlieren hier nur auf
+   Spezifitaet, weil `:has()` zwei Klassen beisteuert.
+   ============================================================================== */
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-green-strong) .sbc-top,
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-green) .sbc-top {
+  border-left-color:#6FCB91 !important;
+}
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-gold) .sbc-top {
+  border-left-color:var(--wl-c9a84c, #C9A84C) !important;
+}
+html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card:has(.sbc-mini-score.sbc-score-red) .sbc-top {
+  border-left-color:#DDA29E !important;
 }
 
 html:not([data-dp-layout])[data-dp-objkarte="kante"] :is(#sb-list) .sb-card .sbc-score-overlay {
@@ -9172,3 +9252,81 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
   height: auto !important;
   transform: translateY(-50%) !important;
 }
+
+/* ==============================================================================
+   v2114 - DIE ALTE STAFFELUNG ZURUECK, UND ZWAR BEIDE TEILE
+
+   Marcel am 11.10.2026: "Koennen wir irgendwie aus den frueheren
+   Versionsstaenden mal rausholen, wie wir das auf der normalen Objektkartei
+   frueher angezeigt haben? Das sollten wir dann bei der grossen Ansicht mit
+   den Kennzahlen drauf anpassen, dass es dann oben erscheint. Weil bei allen
+   anderen Karten ist das mittige Gut."
+
+   AUS DER VERSIONSGESCHICHTE GEHOLT (f843cc8d~1, der Stand VOR v1924):
+
+     aside.sidebar .sb-card .sbc-actions        top:  6px   <- Knoepfe oben
+     aside.sidebar .sb-card .sbc-score-overlay  top: 38px   <- Score darunter
+
+   Das ist die V103-Staffelung, deren Kommentar bis heute im Blatt steht
+   ("war 12 - jetzt unter den Action-Buttons").
+
+   > WARUM MEIN v2107 NICHT REICHTE und Marcel es zurueckgenommen hat: ich
+   > hatte nur den SCORE auf 38px gesetzt und die KNOEPFE mittig gelassen.
+   > Dann liegt der Duplizieren-Knopf (50 % = 94-116) weiter auf dem Ring
+   > (38-88 waere frei, 94-116 nicht) - genau der graue Bereich, ueber den
+   > er sich danach beschwert hat. Eine Staffelung hat zwei Teile; einen
+   > davon wiederherzustellen stellt sie nicht wieder her.
+
+   NUR DORT, WO DAS KACHELBAND STEHT - also ohne gewaehlten Kartenstil und
+   bei "kennzahlen". Alle anderen Kartenstile blenden das Band aus, sind
+   kurz, und dort bleibt die Mitte richtig (v1943 hat das an sechs Stilen
+   mit 0 px Abweichung gemessen).
+   ============================================================================== */
+html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions,
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
+  top: 6px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+html:not([data-dp-layout]):not([data-dp-objkarte]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+  top: 38px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+/* "kennzahlen" ist flacher (195 px statt 210) und sein Kachelband beginnt
+   schon bei 114 px statt 123 - gemessen am 11.10.2026. Mit 38px lagen
+   5 px der Pille "GUT" auf der ersten Kachel. */
+html:not([data-dp-layout])[data-dp-objkarte="kennzahlen"] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-overlay {
+  top: 30px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* =================================================================
+   v1989 - DIE SAMMELREGEL AUF <small> REICHT INS DUNKLE BODENBLATT
+
+   Weiter oben steht in dieser Datei
+
+     html[data-dp-layout] .body small{ color:var(--dpl-leise) !important }
+
+   also eine Sammelregel auf JEDES <small> in `.body`. `--dpl-leise`
+   ist ein gedaempftes Grau fuer die HELLE Flaeche.
+
+   Auf dem Handy ist die Pre-Flight-Karte aber ein DUNKLES Bodenblatt
+   (.dp-pf-scroll{background:#0c0c0e}). Dort landet dasselbe Grau auf
+   fast schwarz. Gemessen am 08.10.2026 auf 390 px, „Datenquellen fuer
+   diesen Abruf", 11 px:
+
+     heute, aus der Sammelregel   #6b645a   3,35 : 1   unter AA
+     wie der Block es vorsah      #8A8A93   5,71 : 1   in Ordnung
+
+   > Eine Sammelregel auf ein Element wie `small` kennt den Grund
+   > nicht, auf dem es landet. Sie wirkt dort, wo niemand sie
+   > hingeschrieben hat - und ein !important macht daraus eine Ansage.
+
+   Hier wird NICHTS neu gestaltet: wiederhergestellt ist die Farbe,
+   die `style.css` fuer diesen Kopf selbst vorgesehen hat. Gleiche
+   Spezifitaet wie die Sammelregel (0,2,2), aber spaeter in derselben
+   Datei - bei gleicher Spezifitaet gewinnt die spaetere Regel.
+   ================================================================= */
+html[data-dp-layout] .dp-pf-scroll small{ color:#8A8A93 !important; }

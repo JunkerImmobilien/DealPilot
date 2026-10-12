@@ -523,15 +523,31 @@
     var GEWERKE = { bmf_mod_dach: 'dach', bmf_mod_fenster: 'fenster', mod_leit: 'leitungen',
                     mod_heiz: 'heizung', mod_daemm: 'aussenwand', mod_bad: 'baeder',
                     mod_innen: 'innenausbau', mod_grdr: 'grundriss' };
-    var bewertung = {}, punkte = 0, gezaehlt = 0, bewertet = 0;
+    /* ── v2075 · DIE PUNKTE KOMMEN AUS DEM KERN ──────────────────────────
+       HIER WURDEN SIE SELBST VERGEBEN, mit pauschal 2 je Bauteil. Anlage 2
+       gibt Dach und Aussenwand aber je 4; die Summe ist 20, nicht 16.
+       Gemessen am 10.10.2026: ein voll modernisiertes Objekt bekam hier 16
+       statt 20 Punkte, bei Alter 64 und GND 80 sind das 3,11 Jahre
+       Restnutzungsdauer. Dasselbe Objekt rechnete im Wizard anders als
+       hier - lautlos, weil beide Zahlen plausibel aussehen.
+
+       Es war die vierte Stelle, die Punkte vergibt. Jetzt vergibt sie der
+       Kern (`DealPilotRND.punkteAusJaTeilNein`), und die Gewerke-Grade
+       bleiben hier - die beschreiben den ZUSTAND, nicht die Punkte. */
+    var werte = {}, bewertung = {}, gezaehlt = 0;
     Object.keys(GEWERKE).forEach(function (id) {
       var e = el(id); if (!e) return;
       var v = String(e.value || '').toLowerCase();
       gezaehlt++;
-      if (v === 'ja' || v === 'voll' || v === 'v') { bewertung[GEWERKE[id]] = 'gehoben'; punkte += 2; bewertet++; }
-      else if (v === 'teil' || v === 'teilweise' || v === 'h') { bewertung[GEWERKE[id]] = 'standard'; punkte += 1; bewertet++; }
-      else { bewertung[GEWERKE[id]] = 'veraltet'; }
+      werte[GEWERKE[id]] = v;
+      if (v === 'ja' || v === 'voll' || v === 'v') bewertung[GEWERKE[id]] = 'gehoben';
+      else if (v === 'teil' || v === 'teilweise' || v === 'h') bewertung[GEWERKE[id]] = 'standard';
+      else bewertung[GEWERKE[id]] = 'veraltet';
     });
+    var pk = (window.DealPilotRND && window.DealPilotRND.punkteAusJaTeilNein)
+      ? window.DealPilotRND.punkteAusJaTeilNein(werte)
+      : { total: 0, bewertet: 0 };
+    var punkte = pk.total, bewertet = pk.bewertet;
 
     var luecken = [];
     if (!gnd) luecken.push('die Objektart');

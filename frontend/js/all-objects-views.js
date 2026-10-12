@@ -51,11 +51,79 @@
     return s;
   }
 
+  /* ── v2084a · DIE STATUSFELDER LIEGEN FLACH, NICHT IN `data` ──────────
+   *
+   * HIER STAND NUR `obj.data._deal_won`. Gemessen am 10.10.2026 an der
+   * echten Antwort von `GET /objects?limit=500`: die 23 Einträge tragen
+   * **kein `data`-Feld** (0 von 23). Der Status steht flach und ohne
+   * Unterstrich:
+   *
+   *     deal_won: true/false      deal_lost: true/false
+   *     ankauf_kurz, ankauf_stichtag, lageklasse, dealpilot_score, …
+   *
+   * `obj.data || {}` ergab also immer `{}`, und damit war jedes Objekt
+   * **'open'** — alle 23, auch die acht gewonnenen.
+   *
+   * > Zusammen mit dem `items`-Fehler in `loadObjects()` war die Ansicht
+   * > doppelt kaputt: erst kam nichts an, und wäre etwas angekommen,
+   * > hätte alles in einer Spalte gelegen. Beides ohne Fehlermeldung.
+   *
+   * Beide Formen werden jetzt gelesen — flach zuerst, weil der Server
+   * so antwortet. Die `data`-Form bleibt, weil andere Aufrufer
+   * (`storage.js`-Spiegel, Einzelobjekt-Abruf) sie liefern. */
   function getStatus(obj) {
     const d = obj.data || {};
-    if (d._deal_won === true || d._deal_won === 'true') return 'won';
-    if (d._deal_lost === true || d._deal_lost === 'true') return 'lost';
+    const won  = (obj.deal_won  !== undefined) ? obj.deal_won  : d._deal_won;
+    const lost = (obj.deal_lost !== undefined) ? obj.deal_lost : d._deal_lost;
+    if (won === true || won === 'true') return 'won';
+    if (lost === true || lost === 'true') return 'lost';
     return 'open';
+  }
+
+  /* ── v2084 · DIE KANBAN-SPALTE „BESTAND" (Backlog N60.16) ─────────────
+   *
+   * Marcel, 09.10.2026: „Ein gewonnenes Objekt gehört in eine Spalte
+   * Bestand, nicht weiter in die Akquise-Strecke."
+   *
+   * Bestand heißt: gewonnen UND der Ankauf-Stand ist festgeschrieben —
+   * also der Lastenwechsel vollzogen und der Stand eingefroren
+   * (`_ankauf`, seit v2030). Ein gewonnener Deal ohne diesen Stand ist
+   * noch nicht im Bestand; da fehlt der Stichtag.
+   *
+   * `ankauf_stichtag` ist eine LISTENSPALTE (`objectService.js:51`) und
+   * liegt auf der oberen Ebene, nicht in `data`. `loadObjects()` liest
+   * die rohe Serverantwort, also steht sie hier so zur Verfügung.
+   *
+   * ── WARUM getStatus() UNBERÜHRT BLEIBT ──────────────────────────────
+   * `getStatus()` speist auch `filterObjects()` und `getKPIs()`. Würde
+   * dort aus 'won' plötzlich 'bestand', sänke die angezeigte Gewinnquote,
+   * ohne dass ein Deal verloren ging — eine Kennzahl, die sich durch eine
+   * Ansichtsänderung bewegt, ist keine. Die Kanban-Ansicht bekommt
+   * deshalb ihre EIGENE Einteilung, und die Zählung bleibt, wie sie war.
+   *
+   * GEMESSEN am 10.10.2026 am echten Portfolio (23 Objekte):
+   *   gewonnen und Ankauf-Stand   3   -> Bestand
+   *   gewonnen ohne Ankauf-Stand  5   -> bleibt Gewonnen
+   *   Ankauf-Stand ohne gewonnen  0
+   *
+   * > Marcels Befund aus N60.19 („Objekte, die im Bestand stehen, aber
+   * > gar nicht auf Gewonnen gesetzt sind") trifft auf diesen Datenstand
+   * > NICHT zu — es gibt null davon. Die Richtung ist umgekehrt: fünf
+   * > gewonnene Deals ohne eingefrorenen Ankauf-Stand. Das ist auch ein
+   * > unvollständiger Zustand, aber ein anderer.
+   */
+  function istBestand(obj) {
+    if (getStatus(obj) !== 'won') return false;
+    /* Der Stichtag kann als Listenspalte oder im Datensatz stehen. */
+    if (obj.ankauf_stichtag) return true;
+    const a = (obj.data || {})._ankauf;
+    return !!(a && (a.stichtag || a.kurz));
+  }
+
+  function getKanbanSpalte(obj) {
+    const s = getStatus(obj);
+    if (s === 'won') return istBestand(obj) ? 'bestand' : 'won';
+    return s;
   }
 
   function statusLabel(s) {
@@ -80,7 +148,37 @@
         return [];
       }
       const data = await res.json();
-      _objects = Array.isArray(data.objects) ? data.objects : (Array.isArray(data) ? data : []);
+      /* ── v2084a · DIE ANTWORT HEISST `items`, NICHT `objects` ─────────
+       *
+       * HIER STAND `data.objects` mit `data` als Rückfall. Gemessen am
+       * 10.10.2026 an der echten Antwort von `GET /objects?limit=500`:
+       *
+       *     { "items": [ … 23 Objekte … ], "count": 23 }
+       *
+       * `data.objects` ist dort `undefined`, und `data` selbst ist kein
+       * Array — beide Zweige greifen nicht, `_objects` blieb **leer**.
+       *
+       * > Die ganze Ansicht „Alle Objekte" zeigte nichts: Karten, Liste
+       * > und Kanban. Und zwar ohne Fehler — `res.ok` war wahr, der
+       * > Rückfall lieferte ein gültiges leeres Array, und eine leere
+       * > Liste sieht aus wie ein leeres Portfolio. Aufgefallen beim
+       * > Nachmessen der neuen Kanban-Spalte: vier Spalten, alle mit
+       * > Anzahl 0, während die Seitenliste 23 Karten zeigte.
+       *
+       * Gesucht wird jetzt in dieser Reihenfolge, und `items` zuerst,
+       * weil der Server es so nennt. Die anderen Namen bleiben als
+       * Rückfall stehen — eine Antwortform, die sich einmal geändert
+       * hat, kann sich wieder ändern. */
+      _objects = Array.isArray(data.items) ? data.items
+        : Array.isArray(data.objects) ? data.objects
+        : Array.isArray(data.data) ? data.data
+        : Array.isArray(data) ? data : [];
+      if (!_objects.length && data && typeof data.count === 'number' && data.count > 0) {
+        /* Der Server zaehlt mehr, als hier ankommt — das ist ein Formfehler
+           und keine leere Liste. Sichtbar machen, nicht verschweigen. */
+        console.warn('[V260-01] Antwort trägt count=' + data.count
+          + ', aber keine erkannte Liste. Schlüssel: ' + Object.keys(data).join(','));
+      }
       return _objects;
     } catch(e) {
       console.warn('[V260-01] loadObjects:', e.message);
@@ -102,9 +200,25 @@
     const open = total - won - lost;
     const decided = won + lost;
     const hitRate = decided > 0 ? Math.round((won / decided) * 100) : 0;
+    /* ── v2084a · DER KAUFPREIS LIEGT AUCH FLACH ──────────────────────
+       HIER STAND NUR `o.data.kaufpreis`. Dieselbe Ursache wie beim
+       Status: die Listenantwort traegt kein `data`. Gemessen steht dort
+       `kaufpreis: "1680000.00"` auf der oberen Ebene — und im
+       Objekt-Datensatz heisst dasselbe Feld `kp`.
+
+       Folge, im Browser gesehen: „Investitionsvolumen (gewonnen) 0 EUR"
+       und „Oe Kaufpreis (gewonnen) 0 EUR" bei acht gewonnenen Objekten.
+       Eine Null sieht aus wie ein Ergebnis.
+
+       Alle drei Namen werden gelesen. Der Wert ist ein String in EURO,
+       nicht in Cent (nachgesehen, nicht angenommen). */
     let totalKp = 0, wonKp = 0;
     objs.forEach(o => {
-      const kp = parseFloat((o.data && o.data.kaufpreis) || 0) || 0;
+      const d = o.data || {};
+      const roh = (o.kaufpreis !== undefined && o.kaufpreis !== null) ? o.kaufpreis
+        : (d.kaufpreis !== undefined && d.kaufpreis !== null) ? d.kaufpreis
+        : d.kp;
+      const kp = parseFloat(String(roh == null ? '' : roh).replace(',', '.')) || 0;
       totalKp += kp;
       if (getStatus(o) === 'won') wonKp += kp;
     });
@@ -242,18 +356,22 @@
   }
 
   function renderKanbanView(objs) {
+    /* v2084: vier Spalten. „Bestand" ist das Ende der Strecke, nicht
+       „Gewonnen" — ein gewonnener Deal ohne eingefrorenen Ankauf-Stand
+       steht noch dazwischen und wird genau dort sichtbar. */
     const cols = {
-      open: { label: 'Offen', cls: 'open', icon: '⏳', items: [] },
-      won: { label: 'Gewonnen', cls: 'won', icon: '✓', items: [] },
-      lost: { label: 'Verloren', cls: 'lost', icon: '✗', items: [] }
+      open:    { label: 'Offen',     cls: 'open',    icon: '⏳', items: [] },
+      won:     { label: 'Gewonnen',  cls: 'won',     icon: '✓', items: [] },
+      bestand: { label: 'Bestand',   cls: 'bestand', icon: '🏠', items: [] },
+      lost:    { label: 'Verloren',  cls: 'lost',    icon: '✗', items: [] }
     };
     objs.forEach(o => {
-      const s = getStatus(o);
+      const s = getKanbanSpalte(o);
       if (cols[s]) cols[s].items.push(o);
     });
-    
+
     let html = '<div class="ao-kanban">';
-    ['open', 'won', 'lost'].forEach(key => {
+    ['open', 'won', 'bestand', 'lost'].forEach(key => {
       const col = cols[key];
       html += '<div class="ao-kanban-col ao-kanban-col-' + col.cls + '">';
       html += '<div class="ao-kanban-col-header">';

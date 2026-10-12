@@ -2,12 +2,17 @@
    score-ketten-pruefen.mjs   (v1950)
 
    WOZU: CLAUDE.md sagt „Die Kette steht an EINER Stelle: js/score-tiers.js".
-   Tatsaechlich gibt es VIER Kopien, und drei davon MUESSEN es bleiben:
+   Tatsaechlich gibt es FUENF Stellen - eine davon ist eine woertliche
+   SPIEGELUNG, die anderen sind echte Kopien:
 
      frontend/js/score-tiers.js            die Quelle (Haupt-App, Quick-Check)
      frontend/marktbericht-app/app.js      eigenes Dokument, Rueckfall fuers PDF
+     backend/src/generated/
+       rechenkerne/score-tiers.js          WOERTLICHE Spiegelung (v1899),
+                                           erzeugt von
+                                           tools/rechenkerne-spiegeln.mjs
      backend/src/services/
-       telegramDialogService.js            eigenes Image ohne frontend/
+       telegramDialogService.js            Rueckfall, falls die Spiegelung fehlt
      marktbericht/frontend/app.js          statische Wurzel des mb-Backends;
                                            heute von aussen NICHT erreichbar,
                                            aber im Image und hinter
@@ -77,7 +82,22 @@ vm.createContext(mbAltCtx);
 vm.runInContext(mbAltTreffer[0] + '; this.__f = _scoreTier;', mbAltCtx);
 const mbAltStufe = mbAltCtx.__f;
 
-/* ── Quelle 4 · stufeZu aus dem Telegram-Dienst ──────────────────────── */
+/* ── Quelle 4 · die WOERTLICHE Spiegelung ins Backend-Image ──────────── */
+/* v1955: Sie fehlte hier - und war genau deshalb seit v1950 veraltet
+   (2781 statt 4962 Bytes). Ein Pruefer, der die Spiegelung nicht kennt,
+   wird gruen, waehrend das Image mit einem alten Kern laeuft. */
+let spiegelStufe = null, spiegelHinweis = '';
+try {
+  const sp = require('../backend/src/generated/rechenkerne/score-tiers.js');
+  if (sp && typeof sp.stufe === 'function') spiegelStufe = sp.stufe;
+  else spiegelHinweis = 'Spiegelung exportiert kein stufe()';
+} catch (e) { spiegelHinweis = 'Spiegelung nicht ladbar: ' + e.message; }
+if (!spiegelStufe) {
+  console.error(rot('ABBRUCH: ' + spiegelHinweis + '  ->  node tools/rechenkerne-spiegeln.mjs'));
+  process.exit(1);
+}
+
+/* ── Quelle 5 · stufeZu aus dem Telegram-Dienst ──────────────────────── */
 /* Die Datei verlangt ../db/pool und ./openaiService - ein require wuerde
    eine Datenbankverbindung aufbauen. Deshalb nur die Funktion, ebenfalls
    ausgeschnitten und gezaehlt. */
@@ -105,6 +125,13 @@ for (let s = 0; s <= 100; s++) {
   if (mb !== soll.wort) { fehler++; abw.push('  Score ' + s + ': Marktbericht "' + mb + '" statt "' + soll.wort + '"'); }
   if (mbAlt !== soll.wort) { fehler++; abw.push('  Score ' + s + ': mb-Wurzel "' + mbAlt + '" statt "' + soll.wort + '"'); }
   if (bot !== soll.versal) { fehler++; abw.push('  Score ' + s + ': Bot "' + bot + '" statt "' + soll.versal + '"'); }
+  /* v1955: die Spiegelung muss WORT UND VERSAL treffen - sie ist dieselbe
+     Datei, nicht nur dieselbe Kette. Weicht sie ab, ist sie veraltet. */
+  const sp = spiegelStufe(s);
+  if (sp.wort !== soll.wort || sp.versal !== soll.versal) {
+    fehler++; abw.push('  Score ' + s + ': Spiegelung "' + sp.wort + '/' + sp.versal
+      + '" statt "' + soll.wort + '/' + soll.versal + '" - rechenkerne-spiegeln.mjs laufen lassen');
+  }
 }
 
 /* Die Grenzen ausdruecklich, beide Seiten - ein Vergleich ueber 0..100 in
@@ -126,7 +153,7 @@ if (leerSoll !== '–') { fehler++; abw.push('  score-tiers.js: stufe(null) ergi
 if (botStufe(null) !== null) { fehler++; abw.push('  Bot: stufeZu(null) ergibt "' + botStufe(null) + '", erwartet null'); }
 
 console.log('');
-console.log('Quellen: 4 (score-tiers.js, marktbericht-app/app.js, marktbericht/frontend/app.js, telegramDialogService.js)');
+console.log('Quellen: 5 (score-tiers.js, die Spiegelung ins Backend-Image, zwei Marktbericht-Fassungen, telegramDialogService.js)');
 console.log('DECKUNG: ' + gemessen + ' Vergleichspunkte (0..100 plus 13 Grenzen plus Abwesenheit)');
 console.log('');
 console.log('Die Kette aus score-tiers.js:');
@@ -142,4 +169,4 @@ if (fehler) {
   if (abw.length > 20) console.log('  … und ' + (abw.length - 20) + ' weitere');
   process.exit(1);
 }
-console.log(gruen('ALLE VIER KETTEN GLEICH (' + gemessen + ' Punkte)'));
+console.log(gruen('ALLE FUENF STELLEN GLEICH (' + gemessen + ' Punkte)'));

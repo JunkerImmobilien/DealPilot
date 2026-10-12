@@ -33,14 +33,24 @@
     ov.innerHTML =
       '<div class="kcl-modal" role="dialog" aria-modal="true">' +
         '<div class="kcl-hero"><span class="bp">BOARDING PASS \u00b7 DEALPILOT</span><h3>Lage-Analyse best\u00e4tigen</h3></div>' +
-        '<div class="kcl-body">F\u00fcr die KI-Lagebewertung wird Kerosin verbraucht:' +
-          '<div class="kcl-cost"><b>' + LAGE_L + '\u00a0L</b> Lage-Analyse (KI)</div>' +
+        /* \u2500\u2500 v2097 \u00b7 HIER STAND \u201eKEROSIN" UND DIE EINHEIT \u201eL" \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+           Beides ist seit v1176 abgeschafft (CLAUDE.md: es heisst
+           Kontingent, die Einheit \u201eLiter" ist mitgefallen). Dieser Satz
+           steht in einem Fenster, das der Nutzer VOR jeder KI-Lage-
+           bewertung sieht \u2014 also an einer der sichtbarsten Stellen
+           ueberhaupt. Gefunden von tools/kerosin-nutztext-pruefen.mjs,
+           nachdem N60.24 \u201ealle erreichbaren Texte umgestellt" gemeldet
+           hatte. Die Dateiname bleibt (sie ist in index.html verdrahtet;
+           ein Dateiname ist kein Kundentext). */
+        '<div class="kcl-body">F\u00fcr die KI-Lagebewertung wird Kontingent verbraucht:' +
+          '<div class="kcl-cost"><b>' + LAGE_L + '</b> Anfrage' + (LAGE_L === 1 ? '' : 'n') + ' \u00b7 Lage-Analyse (KI)</div>' +
           'M\u00f6chtest du fortfahren?' +
           '<label class="kcl-skip"><input type="checkbox" id="kcl-skip" style="accent-color:#C9A84C"> Nicht mehr fragen</label>' +
         '</div>' +
         '<div class="kcl-foot">' +
           '<button type="button" class="kcl-btn kcl-cancel" id="kcl-cancel">Abbrechen</button>' +
-          '<button type="button" class="kcl-btn kcl-go" id="kcl-go">Analysieren (' + LAGE_L + '\u00a0L)</button>' +
+          /* v2097: \u201eL" war die Einheit des abgeschafften Begriffs. */
+          '<button type="button" class="kcl-btn kcl-go" id="kcl-go">Analysieren (' + LAGE_L + '\u00a0Anfrage' + (LAGE_L === 1 ? '' : 'n') + ')</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(ov);

@@ -2115,13 +2115,15 @@
     "stichtag": null,
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10900_2026.pdf",
     "quelle_parser": "v1084-WREZ",
     "quellenvermerk": null,
-    "lizenz": null,
+    "lizenz": "dl-de/zero-2-0",
     "verwendung": "produkt",
     "auflagen": null,
-    "fundstelle": "Kap. 5.1.3"
+    "fundstelle": "Kap. 5.1.3",
+    "quelle_url_bisher_403": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+    "lizenz_nachweis": "Impressumsseite der PDF-Fassung: \"Fuer den Grundstuecksmarktbericht gilt die Datenlizenz Deutschland - Zero - Version 2.0 (dl-de/zero-2-0). Jede Nutzung ist ohne Einschraenkungen oder Bedingungen zulaessig.\" Dazu: \"Das Dokument kann unter www.boris.nrw.de gebuehrenfrei heruntergeladen werden.\" Am 08.10.2026 im Volltext nachgemessen; die Werte 1,33 (Median 1,32, n=73) und 1,47 (Median 1,44, n=74) stehen in Kap. 5.1.3 derselben Fassung. Der frueher hinterlegte Portal-Link gibt 403."
   },
   {
     "land_code": "NW",
@@ -2168,13 +2170,15 @@
     "stichtag": null,
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10900_2026.pdf",
     "quelle_parser": "v1084-WREZ",
     "quellenvermerk": null,
-    "lizenz": null,
+    "lizenz": "dl-de/zero-2-0",
     "verwendung": "produkt",
     "auflagen": null,
-    "fundstelle": "Kap. 5.1.3"
+    "fundstelle": "Kap. 5.1.3",
+    "quelle_url_bisher_403": "https://gmb.gutachterausschuss-essen.de/gmb_10900_2026/",
+    "lizenz_nachweis": "Impressumsseite der PDF-Fassung: \"Fuer den Grundstuecksmarktbericht gilt die Datenlizenz Deutschland - Zero - Version 2.0 (dl-de/zero-2-0). Jede Nutzung ist ohne Einschraenkungen oder Bedingungen zulaessig.\" Dazu: \"Das Dokument kann unter www.boris.nrw.de gebuehrenfrei heruntergeladen werden.\" Am 08.10.2026 im Volltext nachgemessen; die Werte 1,33 (Median 1,32, n=73) und 1,47 (Median 1,44, n=74) stehen in Kap. 5.1.3 derselben Fassung. Der frueher hinterlegte Portal-Link gibt 403."
   },
   {
     "land_code": "NW",

@@ -95,10 +95,10 @@
        nicht mehr aus einer eigenen Liste je Anzeige. */
     var _k=(window.ScoreTier?window.ScoreTier.classify(score):(score>=85?'top':score>=70?'green':score>=50?'gold':'red'));
     var _w=(window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(score).wort:null;
-    if(_k==='top') return {t:'top', l:_w||'Top', col:'var(--dp-green)'};
-    if(_k==='green') return {t:'hi',  l:_w||'Gut',      col:'var(--dp-green)'};
-    if(_k==='gold') return {t:'mid', l:_w||'Solide',   col:'var(--dp-gold)'};
-    return {t:'lo', l:_w||'Schwach', col:'var(--dp-red)'};
+    if(_k==='top') return {t:'top', l:_w||'Top', col:'var(--dp-green-txt)'};
+    if(_k==='green') return {t:'hi',  l:_w||'Gut',      col:'var(--dp-green-txt)'};
+    if(_k==='gold') return {t:'mid', l:_w||'Solide',   col:'var(--dp-gold-txt)'};
+    return {t:'lo', l:_w||'Schwach', col:'var(--dp-red-txt)'};
   }
   function catBarColor(s){ return s>=70?'var(--dp-green)':s>=50?'var(--dp-gold)':'var(--dp-red)'; }
   function _dl(){return '<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>';}
@@ -226,6 +226,34 @@
   function toggleCf(){ _cfMode = (_cfMode === 'vs') ? 'ns' : 'vs'; try{ renderOverview(); }catch(e){} }
   var _giMode = 'mit'; /* v886-dash: 'mit' = Gesamtinvestition inkl. NK | 'ohne' = nur Kaufpreis */
   function toggleGi(){ _giMode = (_giMode === 'mit') ? 'ohne' : 'mit'; try{ renderOverview(); }catch(e){} }
+
+  /* ══ v2099 · SUMMEN WAHLWEISE AUF ANKAUF ODER BESTAND ════════════════
+     Backlog N60.16: „Summen und Kennzahlen wahlweise auf Ankauf oder
+     Bestand - heute rechnet es nur den laufenden Stand."
+
+     GERECHNET WIRD NICHT ZWEIMAL. `_ankauf.daten` ist eine VOLLSTAENDIGE
+     Kopie des Datensatzes (`ankauf.js:_datensatzJetzt` - alles ausser
+     `_ankauf` selbst und `_thumb`). Also laeuft dieselbe `aggStats()`
+     einmal ueber die heutigen und einmal ueber die eingefrorenen
+     Datensaetze. Eine eigene Ankauf-Summenrechnung waere eine zweite
+     Wahrheit - und `kurz` allein haette dafuer nicht gereicht: es fuehrt
+     neun Kennzahlen, die Summen brauchen aber auch `d1`, `d1t`, `san`,
+     `moebl` und ein Dutzend weitere.
+
+     DIE GRUNDMENGE WECHSELT MIT, und das muss dastehen: Objekte ohne
+     eingefrorenen Stand fallen im Ankauf-Modus heraus. Eine Summe ueber
+     vier von acht Objekten, die aussieht wie eine ueber acht, ist
+     falsch - `doppelkarte.js` sagt es fuer die Karten schon so: „eine
+     Karte, die im Ankauf-Modus ihre HEUTIGEN Zahlen zeigt, ohne das zu
+     sagen, waere eine Luege im Nebensatz."
+
+     Der Schalter erscheint nur, wenn es ueberhaupt etwas zu schalten
+     gibt - ein Schalter, der nichts tut, ist schlimmer als keiner. */
+  var _standMode = 'bestand';   /* 'bestand' | 'ankauf' */
+  function toggleStand(){
+    _standMode = (_standMode === 'bestand') ? 'ankauf' : 'bestand';
+    try{ renderOverview(); }catch(e){}
+  }
   /* v475: Objekt-Auswahl im Cockpit. -1 = alle aggregiert, sonst Index in wonList()/detailArr(). */
   var _dashSelIdx = -1;
   function selectObject(v){
@@ -325,6 +353,18 @@
       dscr:          numN(d._kpis_dscr),
       ltv:           numN(d._kpis_ltv),
       cashflowMonatlich: (d._kpis_cf_ns!=null ? num(d._kpis_cf_ns)/12 : null),
+      /* v2144: ohne Darlehen entfallen DSCR und LTV im Investor Deal
+         Score. Gelesen wird der GESPEICHERTE Stand (d1 + d2) - was am
+         Objekt steht, gilt; eine Ableitung gaebe es hier nicht.
+
+         Steht gar nichts, bleibt es `null` und alles rechnet wie vor
+         v2144 - `Number(null)` waere 0 und damit ein Barkauf, den
+         niemand erklaert hat. */
+      darlehen: (function(){
+        var a = numN(d.d1), b = numN(d.d2);
+        if (a == null && b == null) return null;
+        return (a || 0) + (b || 0);
+      })(),
       __raw:d
     };
   }
@@ -463,6 +503,31 @@
   /* ══ v456: Portfolio-Uebersicht (Bestands-Hardfacts, aggregiert) ══ */
   function aggStats(alleTrotzAuswahl){
     var arr=detailArr(alleTrotzAuswahl);
+    /* v2099: im Ankauf-Modus rechnet dieselbe Aggregation ueber die
+       EINGEFRORENEN Datensaetze. `stand` reist mit, damit die Kacheln
+       sagen koennen, worueber gerechnet wurde - siehe Begruendung an
+       `toggleStand()`. */
+    var _standN = 0;
+    for (var _i = 0; _i < arr.length; _i++) {
+      if (arr[_i] && arr[_i]._ankauf && arr[_i]._ankauf.daten) _standN++;
+    }
+    var stand = { modus: _standMode, gesamt: arr.length,
+                  mitStand: _standN, genutzt: arr.length, ohne: 0,
+                  schaltbar: _standN > 0 };
+    if (_standMode === 'ankauf' && _standN > 0) {
+      var _frozen = [];
+      arr.forEach(function(o){
+        if (o && o._ankauf && o._ankauf.daten) _frozen.push(o._ankauf.daten);
+      });
+      stand.genutzt = _frozen.length;
+      stand.ohne = arr.length - _frozen.length;
+      arr = _frozen;
+    } else if (_standMode === 'ankauf') {
+      /* Kein Objekt mit Stand: NICHT auf Nullen rechnen. Der Modus faellt
+         zurueck und sagt es - eine Summe von 0 EUR waere eine Behauptung. */
+      stand.modus = 'bestand';
+      stand.zurueckgefallen = true;
+    }
     var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
     var kpSum=sum(_kpEuro);
     var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san)+num(o.moebl);});
@@ -498,7 +563,11 @@
       tilgJ:tilgSum, zinsJ:zinsSum, kdJ:kdSum,
       brutto:(kpSum>0?(mieteJ/kpSum*100):null),
       netto:nettoCalc,
-      dscr:(kdSum>0?(mieteJ/kdSum):null)
+      dscr:(kdSum>0?(mieteJ/kdSum):null),
+      /* v2099: worueber gerechnet wurde. Ohne dieses Feld koennten die
+         Kacheln die Grundmenge nicht nennen - und eine Summe ueber vier
+         von acht Objekten, die aussieht wie eine ueber acht, ist falsch. */
+      stand:stand
     };
   }
   function renderOverview(){
@@ -516,7 +585,9 @@
     })();
     function M(v){ if(v==null||isNaN(v))return '\u2013'; var sg=v<0?'-':''; var a=Math.abs(v); if(a>=1e6) return sg+(a/1e6).toFixed(2).replace('.',',')+'\u00a0Mio\u00a0\u20ac'; return sg+new Intl.NumberFormat('de-DE').format(Math.round(a))+'\u00a0\u20ac'; }
     function P2(v,d){ if(v==null||isNaN(v))return '\u2013'; return v.toFixed(d==null?2:d).replace('.',',')+'\u00a0%'; }
-    var green='var(--dp-green)', gold='var(--dp-gold)', red='var(--dp-red)', ch='var(--dp-card-ch)';
+    /* v2101: die -txt-Toene. `half()` schreibt sie als `color:` (Z. 579),
+       also gilt die Textvariable - die Fuellungen bleiben auf --dp-*. */
+    var green='var(--dp-green-txt)', gold='var(--dp-gold-txt)', red='var(--dp-red-txt)', ch='var(--dp-card-ch)';
     function cfc(v){ return v>=0?green:red; }
     function rcol(v,g,go){ return (v==null||isNaN(v))?ch:(v>=g?green:v>=go?gold:red); }
     function half(l,v,col,sub){ return '<div class="ov-half"><span class="ov-l">'+esc(l)+'</span><div class="ov-v" style="color:'+col+'">'+v+'</div><span class="ov-sub">'+esc(sub)+'</span></div>'; }
@@ -524,11 +595,88 @@
     var cfM = cfVor ? s.cfVsM : s.cfNsM, cfJ = cfVor ? s.cfVsJ : s.cfNsJ;
     var cfLabel = cfVor ? 'vor Steuer' : 'nach Steuer';
     var groups=[
-      {t:'Bestand', h:[ half('Objekte', String(s.n), gold, 'im Bestand'), half('Mieteinnahmen / Monat', M(s.mieteM), green, 'netto kalt') ]},
+      /* ── v2099 · DIE ERSTE KACHEL SAGT, WORUEBER GERECHNET WIRD ──────
+       * Sie ist der Umschalter zwischen Ankauf und Bestand - aber NUR,
+       * wenn es Objekte mit eingefrorenem Stand gibt (`schaltbar`). Ein
+       * Schalter, der nichts tut, ist schlimmer als keiner.
+       *
+       * Im Ankauf-Modus steht die Grundmenge im Untertitel: „4 von 8 -
+       * 4 ohne Ankauf-Stand". Ohne das waere die Summe ueber vier
+       * Objekte von einer ueber acht nicht zu unterscheiden. */
+      (function(){
+        var st = s.stand || { modus:'bestand', schaltbar:false };
+        var imAnkauf = (st.modus === 'ankauf');
+        var untenLinks = imAnkauf
+          ? (st.genutzt + ' von ' + st.gesamt
+             + (st.ohne ? ' · ' + st.ohne + ' ohne Ankauf-Stand' : ''))
+          : (st.schaltbar ? 'im Bestand · Klick: Ankauf-Stand' : 'im Bestand');
+        return {
+          t: imAnkauf ? 'Ankauf-Stand' : 'Bestand',
+          click: !!st.schaltbar,
+          fn: 'DealPilotDashboard.toggleStand()',
+          ctitle: imAnkauf
+            ? 'Gerechnet ueber die eingefrorenen Ankauf-Datensaetze — Klick: heutiger Stand'
+            : 'Gerechnet ueber die heutigen Datensaetze — Klick: eingefrorener Ankauf-Stand',
+          h: [ half('Objekte', String(s.n), gold, untenLinks),
+               half('Mieteinnahmen / Monat', M(s.mieteM), green,
+                    imAnkauf ? 'netto kalt · beim Ankauf' : 'netto kalt') ]
+        };
+      })(),
       (function(){ var giO=(_giMode==='ohne'); return {t:'Investition', click:true, fn:'DealPilotDashboard.toggleGi()', ctitle:'Klick wechselt Gesamtinvestition mit/ohne Kaufnebenkosten', h:[ half('Gesamtinvestition', M(giO?s.kp:s.gi), ch, giO?'ohne NK \u00b7 Klick: mit NK':'Kaufpreis + NK \u00b7 Klick: ohne NK'), half('Restschuld gesamt', M(s.rest), ch, 'Verbindlichkeiten') ]}; })(),
       {t:'Mietrendite', h:[ half('Bruttomietrendite', P2(s.brutto), rcol(s.brutto,5,3.5), 'Jahresmiete / KP'), half('Nettomietrendite', P2(s.netto), rcol(s.netto,4,2.5), (s.netto==null?'k.\u00a0A.':'nach BWK')) ]},
       {t:'Cashflow \u00b7 '+cfLabel, click:true, h:[ half('/ Monat', M(cfM), cfc(cfM), cfLabel), half('/ Jahr', M(cfJ), cfc(cfJ), 'Klick: '+(cfVor?'nach':'vor')+' Steuer') ]}
     ];
+
+    /* ── v2098 · SEIT ANKAUF, UEBER DEN GANZEN BESTAND ────────────────
+     * Backlog N60.16: „die Abweichung ueber den ganzen Bestand - wie
+     * viele Objekte stehen besser, wie viele schlechter als beim Ankauf".
+     *
+     * Gerechnet wird NICHT hier, sondern von
+     * `DealPilotAnkauf.abweichungFuer(daten)` - derselben Funktion, die
+     * der Reiter Soll/Ist benutzt. Eine zweite Fassung waere hier
+     * besonders teuer: `KENNZAHLEN` fuehrt die Richtung je Kennzahl, und
+     * bei ZWEI davon (Kaufpreis, LTV) ist KLEINER besser. Wer das
+     * nachbaut, erklaert einen gestiegenen Kaufpreis zur Verbesserung.
+     * `tools/ankauf-abweichung-pruefen.mjs` prueft alle 18 Richtungen.
+     *
+     * Das Urteil je Objekt haengt am DealScore - der eigenen
+     * Gesamtkennzahl. Kein erfundenes Gewicht ueber die neun Kennzahlen:
+     * welche davon schwerer zaehlt, ist eine Bewertungsfrage, und der
+     * Score ist die Antwort, die das Produkt ohnehin gibt. Die Kachel
+     * sagt das im Titel-Hinweis, damit niemand eine andere Rechnung
+     * dahinter vermutet.
+     *
+     * Die Kachel erscheint NUR, wenn es Objekte mit eingefrorenem
+     * Ankauf-Stand gibt. Eine Kachel mit „0 von 0" ist keine Auskunft,
+     * sondern eine leere Zeile. */
+    (function(){
+      var A = window.DealPilotAnkauf;
+      if (!A || typeof A.abweichungFuer !== 'function') return;
+      var besser = 0, schlechter = 0, gleich = 0, ohneScore = 0, mitStand = 0;
+      arr.forEach(function(o){
+        var r = null;
+        try { r = A.abweichungFuer(o); } catch (e) { return; }
+        if (!r) return;
+        mitStand++;
+        if (r.urteil === 'besser') besser++;
+        else if (r.urteil === 'schlechter') schlechter++;
+        else if (r.urteil === 'gleich') gleich++;
+        else ohneScore++;
+      });
+      if (!mitStand) return;
+      /* Die Methode steht im SICHTBAREN Untertitel, nicht in `ctitle`:
+         der Renderer gibt `title` nur bei `click:true` aus (Z. 533), ein
+         `ctitle` ohne Klick waere ein totes Feld. */
+      groups.push({
+        t: 'Seit Ankauf',
+        h: [ half('Besser', String(besser), green,
+                  'am DealScore · ' + mitStand + ' von ' + arr.length + ' mit Ankauf-Stand'),
+             half('Schlechter', String(schlechter), red,
+                  (gleich ? gleich + ' unverändert' : 'kein unverändertes')
+                  + (ohneScore ? ' · ' + ohneScore + ' ohne Score' : '')) ]
+      });
+    })();
+
     host.innerHTML=groups.map(function(g){
       var cl='ov-card ov-pair-card'+(g.click?' ov-clickable':'');
       var on=g.click?(' onclick="'+(g.fn||'DealPilotDashboard.toggleCf()')+'" title="'+esc(g.ctitle||'Klick wechselt vor/nach Steuer')+'"'):'';
@@ -609,7 +757,7 @@
     var esg=esgW>0?esgS/esgW:null;
     var leer=arr.length?sum(function(o){return num(o.leerstand);})/arr.length:null;
 
-    function colByVal(v,good,bad){ if(v==null)return 'var(--dp-card-ch)'; return v>=good?'var(--dp-green)':v>=bad?'var(--dp-gold)':'var(--dp-red)'; }
+    function colByVal(v,good,bad){ if(v==null)return 'var(--dp-card-ch)'; return v>=good?'var(--dp-green-txt)':v>=bad?'var(--dp-gold-txt)':'var(--dp-red-txt)'; }
     function eurM(v){ return (v<0?'-':'')+fmtE(Math.abs(Math.round(v)))+' €'; }
     function cfCol(v){ return v>=0?'var(--dp-green)':'var(--dp-red)'; }
 
@@ -631,7 +779,7 @@
       : {l:'\u00d8-Zinssatz',
         v:avgZins==null?'\u2013':avgZins.toFixed(2).replace('.',',')+'\u00a0%',
         sub:'nach Restschuld gewichtet \u00b7 Klick: Zinsrisiko',
-        col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green)':avgZins<=4.5?'var(--dp-gold)':'var(--dp-red)'),
+        col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green-txt)':avgZins<=4.5?'var(--dp-gold-txt)':'var(--dp-red-txt)'),
         click:'DealPilotDashboard.toggleZins()',
         tip:'Durchschnittlicher Sollzins aller Finanzierungen, gewichtet nach der jeweiligen Restschuld.\nKlick wechselt zum Zinsbindungs-Risiko.'}),
       {l:'DSCR', v:(S.dscr==null?'\u2013':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung', col:(S.dscr==null?'var(--dp-card-ch)':(S.dscr>=1.2?'var(--dp-green)':S.dscr>=1?'var(--dp-gold)':'var(--dp-red)')),
@@ -1421,52 +1569,59 @@
       '  flex-wrap:wrap;margin-bottom:13px}',
       '.sk-titel{font:600 15px/1.2 "Space Grotesk",Inter,sans-serif;color:var(--dp-text,inherit)}',
       '.sk-art{font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.09em;',
-      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);',
+      /* v2101b: Weg (c) - `.sk-art` ist eine Pille, kein Fliesstext.
+         Der Ton bleibt, der Grund wird dunkel (wie `.ds2-tag`, v2089). */
+      '  text-transform:uppercase;color:var(--wl-c9a84c,#C9A84C);background:#1A1714;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);',
       '  border-radius:999px;padding:5px 10px;white-space:nowrap}',
       '.sk-art-kst{color:#7A9CC6;border-color:rgba(122,156,198,.34)}',
       /* Kacheln: gleiche Breite, gleiche Grundlinie — eine Reihe, kein Flickenteppich */
       '.sk-zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}',
       '.sk-k{border:1px solid rgba(122,115,112,.14);border-radius:9px;padding:9px 11px}',
       '.sk-k-l{font:500 10.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;',
-      '  text-transform:uppercase;color:var(--dp-muted,#7A7370);margin-bottom:4px}',
+      '  text-transform:uppercase;color:var(--dp-muted-txt, var(--dp-muted,#7A7370));margin-bottom:4px}',
       '.sk-k-v{font:600 15px/1.2 Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--dp-text,inherit)}',
-      '.sk-k-akzent .sk-k-v{color:var(--wl-c9a84c,#C9A84C)}',
+      /* v2101b: Weg (a). Gemessen 2,23 auf rgb(253,252,250). Der
+         gestaffelte Rueckfall haelt das Gold ausserhalb des Cockpits. */
+      '.sk-k-akzent .sk-k-v{color:var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C))}',
       '.sk-k-gut .sk-k-v{color:#3FA56C}',
       '.sk-k-schlecht .sk-k-v{color:#B8625C}',
       '.sk-box{height:260px;margin-bottom:14px}',
       /* v1405 · Umschalter ueber der Grafik */
       '.sk-umsch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}',
       '.sk-u-btn{font:600 11.5px/1 Inter,sans-serif;padding:7px 12px;border-radius:7px;cursor:pointer;',
-      '  border:1px solid rgba(122,115,112,.24);background:transparent;color:var(--dp-muted,#7A7370);',
+      '  border:1px solid rgba(122,115,112,.24);background:transparent;color:var(--dp-muted-txt, var(--dp-muted,#7A7370));',
       '  transition:background .15s,color .15s,border-color .15s}',
       '.sk-u-btn:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);color:var(--wl-c9a84c,#C9A84C)}',
       '.sk-u-an{background:var(--wl-c9a84c,#C9A84C);border-color:var(--wl-c9a84c,#C9A84C);color:#2c2410}',
       '.sk-u-an:hover{color:#2c2410}',
       '.sk-u-btn:focus-visible{outline:2px solid var(--wl-c9a84c,#C9A84C);outline-offset:2px}',
       '.sk-u-hint{flex:1 1 220px;min-width:180px;font-size:11.5px;line-height:1.45;',
-      '  color:var(--dp-muted,#7A7370)}',
+      '  color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
       /* Die Tabelle scrollt in ihrem eigenen Kasten — die Seite nie quer */
       '.sk-tabwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}',
       '.sk-tab{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}',
       '.sk-tab th{font:600 10px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.07em;',
-      '  text-transform:uppercase;color:var(--dp-muted,#7A7370);text-align:left;padding:0 10px 7px;',
+      '  text-transform:uppercase;color:var(--dp-muted-txt, var(--dp-muted,#7A7370));text-align:left;padding:0 10px 7px;',
       '  border-bottom:1px solid rgba(122,115,112,.20);white-space:nowrap}',
       '.sk-tab th.r,.sk-tab td.r{text-align:right}',
       '.sk-tab td{padding:8px 10px;border-bottom:1px solid rgba(122,115,112,.10);',
       '  font-variant-numeric:tabular-nums;vertical-align:baseline}',
       '.sk-tab tr:last-child td{border-bottom:none}',
       '.sk-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}',
-      '.sk-dat{color:var(--dp-muted,#7A7370);white-space:nowrap}',
-      '.sk-grau{color:var(--dp-muted,#7A7370)}',
-      '.sk-gruen{color:#3FA56C}',
-      '.sk-rot{color:#B8625C}',
-      '.sk-satz{white-space:nowrap;color:var(--dp-muted,#7A7370)}',
-      '.sk-satz b{color:var(--wl-c9a84c,#C9A84C);font-weight:600}',
+      '.sk-dat{color:var(--dp-muted-txt, var(--dp-muted,#7A7370));white-space:nowrap}',
+      '.sk-grau{color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
+      /* v2101d: Weg (a), 3,01 auf hellem Grund. Staffelung wie beim Grau. */
+      '.sk-gruen{color:var(--dp-green-txt,#2e784f)}',
+      '.sk-rot{color:var(--dp-red-txt,#a05550)}',
+      '.sk-satz{white-space:nowrap;color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
+      /* v2101b: Weg (a), gemessen 2,23 bei 8 Traegern. */
+      '.sk-satz b{color:var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C));font-weight:600}',
       '.sk-pfeil{color:#3FA56C;font-weight:700;margin-left:5px}',
       '.sk-fuss{margin-top:11px;padding-top:10px;border-top:1px solid rgba(122,115,112,.12);',
-      '  font-size:11.5px;line-height:1.55;color:var(--dp-muted,#7A7370)}',
+      '  font-size:11.5px;line-height:1.55;color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
       '.sk-leer{border:1px dashed rgba(122,115,112,.26);border-radius:11px;padding:20px;',
-      '  font-size:12.5px;line-height:1.55;color:var(--dp-muted,#7A7370);text-align:center}',
+      '  font-size:12.5px;line-height:1.55;color:var(--dp-muted-txt, var(--dp-muted,#7A7370));text-align:center}',
       '@media(max-width:640px){.sk-box{height:220px}.sk-topf{padding:13px 12px 12px}}'
     ].join('');
     document.head.appendChild(s);
@@ -2738,6 +2893,24 @@
         name: o.name || o._name || null,
         ort: o.ort || null,
         objektart: o.objart || o.objektart || null,
+        /* == v2014 - SECHS FELDER ZUR SUBSTANZ ======================
+
+           Der Analyse-Auftrag des Cockpits verlangt woertlich
+           "Klumpenrisiken - Lage, Objektart, Finanzierung, auslaufende
+           Zinsbindungen". Dafuer standen hier bisher 24 Felder, alles
+           Zahlen und Namen: als "Lage" nur `ort`, kein Zustand, keine
+           Energieklasse, kein Leerstand, keine Einheitenzahl.
+
+           Nicht alle 46 Felder der Einzelanalyse (v2011): der Deckel
+           liegt bei 60 Objekten, das waeren 2.760 zusaetzliche Werte -
+           ein Auftrag, in dem man die Frage nicht mehr findet.
+           Diese sechs sind die, nach denen gefragt wird. */
+        lageklasse: o.lageklasse || null,
+        zustand: o.ds2_zustand || null,
+        energieklasse: o.ds2_energie || null,
+        leerstand_pct: _ppZahl(o.leerstand),
+        wohneinheiten: _ppZahl(o.einheiten),
+        bodenrichtwert_eur_qm: _ppZahl(o.brw),
         baujahr: _ppZahl(o.baujahr),
         wohnflaeche_qm: _ppZahl(o.wfl),
         kaufpreis_eur: kp || null,
@@ -2886,6 +3059,9 @@
     showScoreDetails: showScoreDetails, showScoreUpgrade: showScoreUpgrade, closeScoreModal: _scoreModalClose,
     toggleCf: toggleCf,
     toggleGi: toggleGi,
+    /* v2099: die Bestand-Kachel ruft es per onclick-Zeichenkette - ohne
+       diesen Export waere der Schalter ein toter Klick. */
+    toggleStand: toggleStand,
     toggleRoe: function(){ window._dpRoeMode=(window._dpRoeMode==='nach')?'vor':'nach'; try{ renderHealth(); }catch(e){} },
     openObject: function(k){ try{ if(typeof window.loadSaved==='function') window.loadSaved(k); }catch(e){} },
     toggleZins: function(){ window._dpZinsMode=(window._dpZinsMode==='risiko')?'zins':'risiko'; try{ renderHealth(); }catch(e){} },

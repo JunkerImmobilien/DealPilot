@@ -905,7 +905,24 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       var r = pruefe(v);
       h += '<div class="wm-z" data-ziel="' + ((r.fehlt && r.fehlt[0]) || '') + '">' +
         '<span class="wm-i ' + r.klasse + '">' + r.zeichen + '</span>' +
-        '<span style="flex:1"><b style="color:#c8c8d0">' + v.name + '</b> &nbsp;<span>' + r.text + '</span></span></div>';
+        /* ── v2100 · #c8c8d0 WAR EIN REST AUS DER DUNKLEN ZEIT ──────────
+           Ein helles Grau fuer dunklen Grund, INLINE gesetzt - und der
+           Marktbericht ist seit `v895e` IMMER hell
+           (`marktbericht-view.js:mbTheme()` gibt unveraendert 'light').
+           Gemessen am 11.10.2026: Kontrast 1,66 auf Weiss. Das ist kein
+           schwacher Kontrast, das ist unlesbar.
+
+           Weil die Farbe INLINE steht, konnte der
+           `html[data-mb-theme="light"]`-Block sie nicht erreichen - dort
+           liegen ueber zehn `!important`-Regeln fuer die Hintergruende,
+           aber eine Stylesheet-Regel kaeme hier ohnehin nicht an.
+
+           Genommen wird die EIGENE Variable des Dokuments (`--txt`,
+           im light-Block auf #2a2727), nicht ein neu erfundener Ton: es
+           ist ein Name in Fettschrift, also gilt die Textfarbe. 14,8 auf
+           Weiss. Welcher GOLDTON auf hellem Grund gilt, ist eine andere
+           Frage und liegt bei Marcel (Backlog N60.29/N60.32). */
+        '<span style="flex:1"><b style="color:var(--txt,#2a2727)">' + v.name + '</b> &nbsp;<span>' + r.text + '</span></span></div>';
     });
     d.innerHTML = h;
     knopfSperren();

@@ -4,6 +4,16 @@
 
    Eigenständig, neben dem alten quick-check.js Modal.
    Felder mit qct_ Prefix damit's nicht kollidiert.
+
+   ⚠ DIESE DATEI IST IN KEINER HTML EINGEBUNDEN (gemessen 12.10.2026:
+   0 Treffer in `index.html` und in `quickcheck-app.html`). Sie läuft
+   also nie. `ui.js:445` vermerkt den Grund: „qcUpdate() lebte nur in
+   quick-check-tab.js (entfernt). QC rechnet im iframe."
+
+   > Sie wird hier mitgepflegt, damit sie bei einer Wiederbelebung nicht
+   > mit einem alten Stand aufwacht — die v2141-Änderung unten ist
+   > deshalb drin, obwohl sie heute nichts bewirkt. Wer den Quick-Check
+   > prüft, prüft `quick-check.js` und das iframe, NICHT diese Datei.
    ═══════════════════════════════════════════════════════════════ */
 (function() {
 
@@ -92,7 +102,11 @@
         });
         var _ds = DealScore.computeFromKpis({
           kp: kp, cf_m: _k.cf_m, nmy: _k.nmy, ltv: _k.ltv, dscr: _k.dscr,
-          wp_kpi: kp * 0.05, mstg: 1.5
+          wp_kpi: kp * 0.05, mstg: 1.5,
+          /* v2141: ohne Darlehen entfallen LTV und DSCR im Score, statt
+             mit je 50 von 100 zu Buche zu stehen. `d_total` ist die
+             Summe beider Darlehen aus DealKpis. */
+          darlehen: (_k.d_total != null && isFinite(_k.d_total)) ? _k.d_total : null
         });
         if (_ds && isFinite(_ds.score)) _qscore = Math.round(_ds.score);
       }

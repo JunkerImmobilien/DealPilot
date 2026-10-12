@@ -97,21 +97,59 @@
        das Bild geschickt (Dateien/karte.png) - schweres Papier, die
        Kacheln blindgepraegt statt gedruckt. */
     buetten:   { name: 'Buetten',   sub: 'Papier, Kacheln blindgepraegt' },
-    bordkarte: { name: 'Bordkarte', sub: 'Abriss trennt Waehlen von Ausloesen' },
-    trichter:  { name: 'Trichter',  sub: 'Links die Quellen, rechts das Ergebnis' }
+    /* ══ v1953 · BORDKARTE IST RAUS ═══════════════════════════════════
+       Marcel am 07.10.2026: "Dann haben wir die Bordkarte, die koennen wir
+       rausnehmen. Die hatten wir auch schon mal rausgenommen, also die kann
+       wirklich raus."
+
+       GEMEINT IST DIE DATENAUFNAHME-BORDKARTE, nicht die der Objektkarte.
+       Es gibt zwei gleichnamige Stile in zwei Listen:
+
+         hier (karten-stil.js)        data-dp-kartenstil  Datenaufnahme
+         objektkarten-stil.js         data-dp-objkarte    Liste der Objekte
+
+       Die ANDERE Bordkarte ist seit v1915 der Rueckfall der Aktenmappe -
+       Marcels eigene Entscheidung vom 06.10. Haette ich die falsche Liste
+       angefasst, waere sein Standard stillschweigend verschwunden. Der
+       Zusammenhang, in dem er es gesagt hat, nennt Kartei, Zeile, Buetten
+       und Trichter - das ist eindeutig diese Liste.
+
+       Wer den Stil gespeichert hat, faellt weich zurueck: `STILE[stil]` ist
+       undefined, und `setze()` setzt dann (siehe Kommentar oben). Der
+       Weg ueber `?karte=bordkarte` ist unten ausdruecklich geschlossen -
+       sonst koennte die Adresszeile einen Stil zurueckholen, den es nicht
+       mehr gibt, und die CSS-Regeln dazu sind entfernt.
+       ════════════════════════════════════════════════════════════════ */
+    /* ══ v1985 · TRICHTER IST RAUS ════════════════════════════════════
+       Marcel am 08.10.2026: „den Trichter auf jeden Fall rausnehmen und
+       die Bordkarte auch. Die fallen komplett raus."
+
+       Damit ist die Liste wieder drei Entwuerfe lang: Zeile, Kartei,
+       Buetten. `STILE['trichter']` ist jetzt undefined, und `setze()`
+       faellt weich zurueck — wer ihn gemerkt hatte, bekommt keinen
+       Entwurf statt eines halben.
+
+       Sein JS fiel mit: `ertragBauen()` und `ERTRAG` konnten nach
+       diesem Schnitt nie mehr gerufen werden. `ertragAbraeumen()` und
+       `rzHeimat` BLEIBEN — sie sind das Netz fuer den Abrufknopf, der
+       im Trichter umgehaengt wurde. Baut ein alter Tab doch noch einen
+       `.dpk-ertrag`, wandert der Knopf an seinen gemerkten Platz
+       zurueck statt ans Ende der Leiste.
+
+       Die 26 reinen Trichter-Regeln in `datenaufnahme.css` sind
+       entfernt, bei zwei GEMISCHTEN Regeln nur der Trichter-Selektor:
+       sie trugen daneben `html[data-dp-pfstil]:not([data-dp-kartenstil])`,
+       und wer sie ganz loescht, nimmt dem pfstil-Zweig die Gestaltung
+       mit. Das faellt erst auf, wenn jemand diesen Zweig benutzt.
+       ════════════════════════════════════════════════════════════════ */
   };
 
   var aktuell = '';
   var wache = null;
 
-  /* ── Der Ertragsblock des Trichters ───────────────────────────────
-     Was dabei herauskommt. Drei Zeilen, keine Zahlen — Zahlen wären
-     eine Behauptung, solange nichts abgerufen wurde. */
-  var ERTRAG = [
-    ['Adresse, Fläche, Baujahr', 'Objektdaten'],
-    ['Kaufpreis und Miete',      'Investition'],
-    ['Marktwert und Spanne',     'Bewertung']
-  ];
+  /* v1985: `ERTRAG` und `ertragBauen()` sind mit dem Trichter gefallen -
+     nach dem Schnitt in STILE konnten sie nie mehr gerufen werden.
+     `rzHeimat` und `ertragAbraeumen()` bleiben als Netz, siehe dort. */
 
   /* Der Abrufknopf steckt in `.dp-pf-rz`. Im Trichter gehört er unter
      den Ertragsblock — also wird er umgehängt. Sein Platz wird exakt
@@ -119,23 +157,22 @@
      beim Zurückschalten irgendwo am Ende. */
   var rzHeimat = null;
 
-  function ertragBauen(bar) {
-    if (!bar || bar.querySelector('.dpk-ertrag')) return;
-    var e = document.createElement('div');
-    e.className = 'dpk-ertrag';
-    e.innerHTML = '<span class="dpk-ertrag-titel">Was dabei herauskommt</span>'
-      + ERTRAG.map(function (z) {
-          return '<span class="dpk-ertrag-zeile"><span>' + z[0]
-            + '</span><span class="dpk-ertrag-was">' + z[1] + '</span></span>';
-        }).join('');
-    bar.appendChild(e);
 
-    var rz = bar.querySelector('.dp-pf-rz');
-    if (rz) {
-      if (!rzHeimat) rzHeimat = { eltern: rz.parentNode, naechster: rz.nextSibling };
-      e.appendChild(rz);
-    }
-  }
+  /* ══ v1992 · DER NOTNAGEL AUS v1990 IST RAUS ══════════════════════
+
+     Hier stand `qrNachziehen()`: es setzte unter 900 px ein inline
+     `display:none` auf den QR, weil ich CSS fuer machtlos hielt.
+
+     CSS war nicht machtlos - mir fehlte die ID. `datenaufnahme.css`
+     fuehrt 62 Selektoren mit `:is(#oab-bar,#qc7-sources)`, und `:is()`
+     erbt die Spezifitaet seines STAERKSTEN Arguments. Diese Regeln
+     liegen auf (1,3,2); meine lagen alle ohne ID darunter.
+
+     > Ein Notnagel, dessen Begruendung nicht mehr gilt, wird selbst zum
+     > Defekt. Er haengt jetzt in `datenaufnahme.css`, wo er hingehoert.
+
+     Mit ihm faellt auch der resize-Horcher - eine Medienabfrage
+     braucht keinen. */
 
   function ertragAbraeumen() {
     /* Erst den Knopf heimschicken, dann den Block entfernen - sonst
@@ -250,7 +287,8 @@
     if (wache) wache.disconnect();
     try {
       var bar = document.getElementById('oab-bar');
-      if (aktuell === 'trichter') { ertragBauen(bar); } else { ertragAbraeumen(); }
+      ertragAbraeumen();   /* v1985: der Trichter ist raus, es gibt nichts zu bauen */
+      /* v1992: qrNachziehen() ist raus - CSS kann es, mit ID-Spezifitaet */
       zaehlung(bar);
       objektnummerSetzen(bar);
       karteiZaehlung(bar);
@@ -301,6 +339,35 @@
        keine der 46 Grundregeln, und der Stil sähe aus wie ein halb
        aufgetragener Anstrich. */
     if (document.body) document.body.classList.toggle('dp-neue-karte-stil', !!aktuell);   /* v1936 */
+
+    /* ══ v2133 · DER ENTWURF "ZEILE" HATTE 53 REGELN UND KEINEN SETZER ══
+
+       Marcel am 12.10.2026: "mach es so das es funktioniert und passend
+       bedient werden kann."
+
+       GEMESSEN am 11.10.2026:
+
+         53 Regeln haengen an  body.dp-pfzeile   (datenaufnahme.css)
+          0 Stellen im ganzen Repo setzen diese Klasse
+
+       Und am laufenden Staging gegengeprueft: mit
+       data-dp-kartenstil="zeile" am <html> - das Attribut WIRD gesetzt -
+       rendert die Leiste auf jeder Breite praktisch wie die Vorgabe.
+       Ein Entwurf, der in der Liste steht und nichts tut, ist
+       schlimmer als einer, der fehlt: Marcel waehlt ihn, sieht keine
+       Aenderung und haelt die Darstellung fuer kaputt.
+
+       DIE URSACHE STEHT IN datenaufnahme.css BEI v1702d: die Regeln
+       hingen an body.dp-neue-karte - einer Marke, die JEDES Layout
+       setzt - und bekamen die Zeile deshalb aufgezwungen. Sie wurden
+       auf body.dp-pfzeile umgehaengt, woertlich "und wird NIRGENDS
+       gesetzt". Das Abhaengen war richtig. Der zweite Schritt, sie an
+       die AUSDRUECKLICHE Wahl zu haengen, ist nie gekommen.
+
+       Hier ist er. Eine Zeile, und sie setzt die Marke nur bei
+       aktuell === "zeile" - nicht bei jedem Stil, sonst waere der
+       Fehler von v1702d wieder da. */
+    if (document.body) document.body.classList.toggle('dp-pfzeile', aktuell === 'zeile');   /* v2133 */
 
     try { localStorage.setItem(LS, aktuell); } catch (e) {}
     anwenden();
@@ -394,6 +461,9 @@
          Die Klasse traegt nicht die Helligkeit, sondern den UMBAU.   */
       var fb = doc.body;
       if (fb) fb.classList.toggle('dp-neue-karte', !!hauptNeu);
+      /* v2133: dasselbe fuer die Zeile - das QuickBoarding ist ein
+         eigenes Dokument und erbt keine Body-Klasse der Haupt-App. */
+      if (fb) fb.classList.toggle('dp-pfzeile', aktuell === 'zeile');
     } catch (e) { /* ohne Spiegel bleibt es beim Stand des Aufbaus */ }
 
     if (!f._dpkLoad) {
@@ -608,6 +678,10 @@
        > loescht `dp-neue-karte-stil`, also genau den
        > Auslieferungszustand. Der Vorbehalt von v1660 („KEIN Standard
        > per JS") bleibt gewahrt: '' ist kein Standard, sondern keiner. */
+    /* v1953: ein entfernter Stil darf auch ueber die Adresszeile nicht
+       zurueckkommen - seine Regeln sind weg, er saehe kaputt aus. */
+    if (ausUrl === 'bordkarte') ausUrl = 'aus';
+    if (ausUrl === 'trichter') ausUrl = 'aus';   /* v1985 */
     if (ausUrl !== null) setze(ausUrl === 'aus' ? '' : ausUrl);
     else setze(gemerkt);
     /* KEIN Standard per JS. Wer nichts gewaehlt hat, bekommt die

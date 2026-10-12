@@ -43,7 +43,62 @@
  * sachverständige Verfahrenswahl — sie sorgt dafür, dass derselbe Objekttyp
  * immer dieselbe Behandlung bekommt.
  */
-export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung = null }) {
+/* ══ v1971 · OHNE KAUFPREISE KEIN VERGLEICHSWERTVERFAHREN ══════════════
+
+   Marcels Frage vom 08.10.2026: „Eigentumswohnungen werden ja
+   üblicherweise nach dem Vergleichswert bewertet. Und haben wir da
+   überhaupt Vergleichswerte und sind das dann auch die Verkaufspreise?
+   Weil dann wäre es ja im Bericht nicht richtig."
+
+   GEMESSEN: der Wert, den der Bericht „Vergleichswert" nannte, stammt zu
+   100 Prozent aus PORTALINSERATEN (Median Euro/m2 aus Angeboten). Die
+   Kette: MarketAnalysisService -> ValuationService.market_value.estimated
+   -> CrossCheckService. Der Code sagt es an drei Stellen selbst, u. a.
+   connectors/IrwConnector.js: „Unser bisheriger Vergleichswert stammt aus
+   Portalinseraten, das sind Angebotspreise. Paragraf 25 ImmoWertV
+   verlangt Kaufpreise."
+
+   Diese Funktion gab fuer Wohnungseigentum trotzdem
+   `verfahren: vergleichswert` zurueck, mit der Begruendung „ueber den
+   KAUFPREIS je m2 Wohnflaeche" — und der Bericht schrieb daraus
+   „Fuehrendes Verfahren: Vergleichswertverfahren". Das ist kein
+   Rechenfehler, sondern eine falsche HERKUNFTSANGABE, und damit das
+   Gegenteil der eigenen Doktrin „jede Zahl traegt Herkunft".
+
+   Paragraf 24 ImmoWertV verlangt fuer das Vergleichswertverfahren
+   Vergleichspreise, Paragraf 25 Abs. 1 definiert sie als Kaufpreise
+   geeigneter Vergleichsgrundstuecke. Angebotspreise sind keine.
+
+   DESHALB BRAUCHT DIE FUNKTION JETZT `vergleichsbasis`:
+
+     'kaufpreise'  ein amtlicher Vergleichsfaktor (Paragraf 20, aus der
+                   Kaufpreissammlung) oder ein Immobilienrichtwert liegt
+                   vor -> das Vergleichswertverfahren fuehrt
+     sonst         es gibt KEIN fuehrendes Verfahren. Der Bericht sagt,
+                   was fehlt und wo es steht.
+
+   > Warum kein Ersatz-Verfahren gewaehlt wird: Paragraf 6 Abs. 1 richtet
+   > die Verfahrenswahl nach der ART DES OBJEKTS, nicht nach der
+   > Datenlage. Bei typischem Wohnungseigentum IST der Vergleichswert das
+   > richtige Verfahren. Statt es durch Sachwert zu ersetzen — was fuer
+   > eine Wohnung modellfremd ist, der Ausschuss leitet dafuer meist gar
+   > keinen Sachwertfaktor ab — sagt der Bericht, dass das fuehrende
+   > Verfahren nicht belegbar ist, und zeigt Ertrags- und Sachwert als
+   > das, was sie dann sind: Plausibilitaet.
+
+   > Marcel dazu: „Ansonsten sollten wir den Vergleichswert einfach
+   > rausnehmen. Dann geben wir den Ertragswert an oder den Sachwert oder
+   > beides ... Was wir nicht haben, können wir ja nicht angeben."
+
+   DER WEG STEHT IM REGISTER. Gemessen am 08.10.2026: 0 Saetze mit der
+   Kennzahl `vergleichsfaktor`, aber die Sperren nennen die Quellen —
+   fuer BERLIN ist der amtliche Vergleichsfaktor sogar der EINZIGE Weg
+   (dort gibt es fuer Eigentumswohnungen weder Liegenschaftszinssatz noch
+   Sachwertfaktor). Weitere: Brandenburg (Kap. 8.2.3, „hier noch nicht
+   erfasst"), Saarpfalz-Kreis, Augsburg. Die Ernte holt sie nach
+   (Backlog N50). */
+export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung = null,
+                                      vergleichsbasis = null }) {
   const s = String(objektart || '').toLowerCase();
   const we = Number(wohneinheiten);
   const eigen = /eigen|selbst/i.test(String(nutzung || ''));
@@ -78,6 +133,16 @@ export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung =
   }
 
   if (istWohnung) {
+    /* v1971: Das Vergleichswertverfahren fuehrt nur mit KAUFPREISEN. */
+    if (vergleichsbasis !== 'kaufpreise') {
+      return {
+        verfahren: null,
+        fehlt: 'vergleichspreise',
+        grund: 'Für typisches Wohnungseigentum ist das Vergleichswertverfahren das richtige Verfahren (§ 6 Abs. 1 ImmoWertV). Es verlangt Vergleichspreise, und das sind nach § 25 Abs. 1 ImmoWertV KAUFPREISE geeigneter Vergleichsgrundstücke. Für dieses Objekt liegt kein amtlicher Vergleichsfaktor und kein Immobilienrichtwert vor; die vorliegenden Marktdaten sind Angebotspreise aus Immobilienportalen und ersetzen sie nicht. Ein führendes Verfahren wird daher nicht ausgewiesen — Ertrags- und Sachwert stehen als Plausibilitätsrechnung daneben.',
+        quelle: '§ 24, § 25 Abs. 1 ImmoWertV',
+        weg: 'Amtliche Vergleichsfaktoren führt der zuständige Gutachterausschuss (§ 20 ImmoWertV, abgeleitet aus der Kaufpreissammlung). Eine Auskunft aus der Kaufpreissammlung nach § 195 BauGB ist bei der Geschäftsstelle möglich.',
+      };
+    }
     return {
       verfahren: 'vergleichswert',
       grund: eigen
@@ -85,6 +150,7 @@ export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung =
         : 'Eigentumswohnungen lassen sich über den Kaufpreis je m² Wohnfläche unter Beachtung '
           + 'von Größe, Alter und Ausstattung gut miteinander vergleichen.',
       quelle: 'Grundstücksmarktbericht 2025, Abschnitt 6.1 · § 6 Abs. 1 ImmoWertV',
+      basis: 'kaufpreise',
     };
   }
 

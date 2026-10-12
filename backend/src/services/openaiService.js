@@ -15,6 +15,9 @@
  */
 
 const config = require('../config');
+/* v2010 - dasselbe Projektwissen, das der Telegram-Agent liest.
+   Bis v2010 war agentLauf.js sein einziger Leser. */
+const projektwissen = require('./projektwissen');
 const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
@@ -32,7 +35,68 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
  *
  * Web-Search bleibt aktiv für Lage-/Mietspiegel-Recherche.
  */
-function buildPrompt(payload) {
+/* v2041 - der Ankauf-Block fuer den Prompt.
+
+   Marcel: „sind wir aktuell nach Plan? Kannst du mir einen Soll-Ist-
+   Vergleich machen?" - in der App und ueber den Telegram-Bot; beide
+   laufen hier durch.
+
+   Die Tabelle geht FERTIG hinein. Das Modell soll vergleichen, nicht
+   nachrechnen: die beiden Saetze wurden jeweils zu ihrer Zeit
+   gerechnet. Eine Neuberechnung mit heutigen Regeln wuerde nicht das
+   Objekt messen, sondern unsere Regelaenderung. */
+function _ankaufBlock(ak) {
+  var z = [];
+  z.push('');
+  z.push('## ANKAUF-STAND (eingefroren) UND ABWEICHUNG');
+  z.push('Dieses Objekt ist gekauft. Der Stand beim Nutzen-/Lastenwechsel am '
+    + ak.stichtag + ' wurde eingefroren.');
+  if (ak.korrekturen) {
+    z.push('Davon ' + ak.korrekturen + ' spaetere Korrektur(en) - der Massstab wurde angepasst.');
+  }
+  if (Array.isArray(ak.abweichung) && ak.abweichung.length) {
+    z.push('');
+    z.push('Kennzahl | Ankauf | Bestand heute | Differenz | Richtung');
+    for (var i = 0; i < ak.abweichung.length; i++) {
+      var r = ak.abweichung[i];
+      var d = Math.round(r.diff * 100) / 100;
+      z.push(r.wort + ' | ' + r.ankauf + ' | ' + r.bestand + ' | '
+        + (d > 0 ? '+' : '') + d + ' | ' + r.richtung);
+    }
+  } else {
+    z.push('Keine Kennzahl ist zu beiden Zeitpunkten vergleichbar - sage das, statt zu schaetzen.');
+    /* ══ v2139 · UND DANN LAGEN DIE ANKAUFSZAHLEN DOCH VOR ══════════
+       `ui.js:967` sendet `kennzahlen_damals` (der Kurzstand zum
+       Stichtag). Gelesen wurde nur `abweichung` - die Tabelle, die
+       einen VERGLEICH braucht.
+
+       > Genau wenn kein Vergleich moeglich ist, stand hier „sage das,
+       > statt zu schaetzen" - und die Zahlen von damals reisten
+       > ungelesen mit. Der Satz war richtig und die Lage eine andere. */
+    if (ak.kennzahlen_damals) {
+      z.push('');
+      z.push('Die Kennzahlen zum Ankauf liegen aber vor (nicht vergleichbar, aber nennbar):');
+      z.push(typeof ak.kennzahlen_damals === 'string'
+        ? ak.kennzahlen_damals : JSON.stringify(ak.kennzahlen_damals));
+    }
+  }
+  /* v2139: wann der Stand festgeschrieben wurde - nicht dasselbe wie der
+     Stichtag. Wer einen Ankauf drei Monate spaeter eintraegt, hat seine
+     Zahlen aus der Zeit der EINGABE, nicht aus der des Uebergangs. */
+  if (ak.festgeschrieben_am && ak.festgeschrieben_am !== ak.stichtag) {
+    z.push('Festgeschrieben wurde dieser Stand am ' + ak.festgeschrieben_am
+      + ' - nicht am Stichtag selbst.');
+  }
+  z.push('');
+  z.push('ANKAUF ist der Soll-Stand (wie gekauft), BESTAND der Ist-Stand (heute).');
+  z.push('NICHT zu verwechseln mit Soll-Miete und Ist-Miete: die beschreiben EINE');
+  z.push('Miete (was hereinkaeme gegen was gezahlt wird), nicht zwei Zeitpunkte.');
+  z.push('Wird nach einem Soll-Ist-Vergleich gefragt oder danach, ob es nach Plan');
+  z.push('laeuft, antworte AUS DIESER TABELLE und rechne sie nicht nach.');
+  return z.join('\n');
+}
+
+function buildPrompt(payload, opts) {
   const o = payload.objekt || {};
   const k = payload.kennzahlen || {};
   const f = payload.finanzierung || {};
@@ -41,6 +105,30 @@ function buildPrompt(payload) {
   const mr = payload.marktradar || [];
   const mbr = payload.marktbericht || null;   /* v947-mbsource: der echte Bericht */
   const isc = payload.investor_score || null;
+  /* v2009 - Vermarktungsdauer. Bis hierher gab es sie nur im Request. */
+  const vh = payload.verhandlung || null;
+  /* v2011 - die sieben Bloecke aus Marcels Liste. */
+  const _st = payload.steuer || null;
+  const _bw = payload.bewirtschaftung || null;
+  const _me = payload.mietentwicklung || null;
+  /* v2041 - der eingefrorene Ankauf-Stand samt fertiger Abweichung. */
+  const _ak = payload.ankauf || null;
+  const _wo = payload.wohnung || null;
+  const _bo = payload.boden || null;
+  const _ha = payload.halter || null;
+  const _zu = payload.zustand || null;
+  const _ip = payload.investor_profil || null;   /* v2140 */
+  /* v2013 - wie viele Fotos mitgehen. Sie stehen NICHT im Text (sie
+     waeren dort base64), aber das Modell muss wissen, dass es welche
+     hat und was es daraus NICHT schliessen darf. */
+  const _nFotos = (opts && Array.isArray(opts.fotos)) ? opts.fotos.length : 0;
+  /* Nur Werte, die es WIRKLICH gibt - ein leerer Block waere eine
+     Ueberschrift ohne Inhalt und kostet nur Aufmerksamkeit. */
+  const _zeilen = function (titel, paare) {
+    const da = paare.filter(function (p) { return p[1] != null && p[1] !== ''; });
+    if (!da.length) return '';
+    return '\n' + titel + '\n' + da.map(function (p) { return '- ' + p[0] + ': ' + p[1]; }).join('\n');
+  };
   /* ═══ v1311 · Woher die Zahlen kommen ════════════════════════════════
      Marcels Vorgabe vom 11.09.2026: der Co-Pilot soll das Wissen aus dem
      Sprechlauf mitnehmen. Die WERTE kamen schon an — was fehlte, war ihre
@@ -231,12 +319,37 @@ function buildPrompt(payload) {
         + (o.einheiten.je_einheit && o.einheiten.je_einheit.length
             ? '\n' + o.einheiten.je_einheit.filter(function (e) { return e.wfl || e.miete; })
                 .map(function (e) {
+                  /* ══ v2139 · HIER FEHLTEN SIEBEN FELDER JE EINHEIT ══
+                     `ui.js:805-826` sendet je Einheit auch `etage`,
+                     `zimmer`, `vertragsart` (aus `mv_art`), die drei
+                     Vertragstermine und den `zustand`. Gedruckt wurden
+                     sechs andere.
+
+                     `art` ist `wohnen|gewerbe` - NICHT die Vertragsart.
+                     Die beiden Namen liegen so nah beieinander, dass
+                     die Luecke beim Lesen des Codes nicht auffaellt:
+                     eine Zeile mit `e.art` SIEHT aus, als stuende die
+                     Vertragsart drin.
+
+                     Reihenfolge: erst was die Einheit IST (Nr, Flaeche,
+                     Zimmer, Etage, Nutzung), dann was sie TRAEGT
+                     (Miete, Status, Vertrag, Termine), dann ihr
+                     Zustand. Die Termine tragen ihr Wort mit, weil
+                     drei nackte Datumsangaben hintereinander nicht
+                     unterscheidbar sind. */
                   return '  · ' + (e.nr ? 'Nr. ' + e.nr + ': ' : '')
                     + (e.wfl ? e.wfl + ' m²' : 'Fläche offen')
-                    + (e.miete ? ', ' + e.miete + ' € Ist-Kaltmiete' : '')
+                    + (e.zimmer ? ', ' + e.zimmer + ' Zi.' : '')
+                    + (e.etage ? ', ' + e.etage : '')
                     + (e.art ? ', ' + e.art : '')
+                    + (e.miete ? ', ' + e.miete + ' € Ist-Kaltmiete' : '')
                     + (e.status ? ', ' + e.status : '')
-                    + (e.lage ? ', ' + e.lage : '');
+                    + (e.lage ? ', ' + e.lage : '')
+                    + (e.vertragsart ? ', Vertrag: ' + e.vertragsart : '')
+                    + (e.letzte_erhoehung ? ', letzte Erhöhung ' + e.letzte_erhoehung : '')
+                    + (e.naechste_anpassung ? ', nächste Anpassung ' + e.naechste_anpassung : '')
+                    + (e.befristet_bis ? ', befristet bis ' + e.befristet_bis : '')
+                    + (e.zustand ? ', Zustand: ' + e.zustand : '');
                 }).join('\n')
             : '')
       : '',
@@ -260,12 +373,73 @@ function buildPrompt(payload) {
     (o.einheiten && o.einheiten.gnd)
       ? '- Gesamtnutzungsdauer laut Konfigurator: ' + o.einheiten.gnd + ' Jahre'
       : '',
-    (o.einheiten && o.einheiten.modernisierung && Object.keys(o.einheiten.modernisierung).length)
-      ? '- Modernisierungsstand (Anlage 2 ImmoWertV): '
-        + Object.keys(o.einheiten.modernisierung).map(function (k) {
-            return k + '=' + o.einheiten.modernisierung[k];
-          }).join(', ')
+    /* ══ v2139a · WIE ALT IST DIESER EINHEITENSTAND? ═══════════════════
+       `mfh-einheiten.js:946` schreibt bei jedem Speichern ein Datum
+       (`stand`). Der Kommentar in `ui.js` nennt Marcels Auftrag woertlich:
+       er wollte Modernisierung UND Stand erfasst haben - gelesen wurde
+       nur die Modernisierung.
+
+       > Ein Datensatz ohne Datum laesst keine Frage nach seiner
+       > Aktualitaet zu. Das Modell kann nicht sagen "die Aufstellung ist
+       > zwei Jahre alt", wenn es nicht weiss, wann sie entstand. */
+    (o.einheiten && o.einheiten.stand)
+      ? '- Stand dieser Einheiten-Aufstellung: ' + o.einheiten.stand
       : '',
+    /* ══ v2139a · DIE SUMME DER EINHEITEN GEGEN DIE WOHNFLAECHE ═══════
+       `ui.js:788` sendet `flaeche_summe` - die addierte Flaeche der
+       Einheiten. Daneben steht `o.wfl`, die eingetragene Wohnflaeche.
+
+       Zwei Zahlen zur selben Groesse sind kein Widerspruch, solange
+       beide ihre Herkunft tragen. Weichen sie ab, ist das ein BEFUND:
+       entweder fehlt eine Einheit in der Aufstellung, oder die
+       Gesamtflaeche ist falsch. Beides aendert jede Kennzahl je m2.
+
+       Die Schwelle ist 1 m2 - unter Rundung soll hier nichts gemeldet
+       werden. Gerechnet wird NICHTS: genannt werden beide Zahlen. */
+    (function () {
+      var e = o.einheiten;
+      if (!e || e.flaeche_summe == null || !isFinite(e.flaeche_summe)) return '';
+      if (o.wfl == null || !isFinite(o.wfl)) {
+        return '- Summe der Einheitenflaechen: ' + e.flaeche_summe + ' m2'
+          + ' (eine Gesamtwohnflaeche ist nicht eingetragen)';
+      }
+      var diff = Number(e.flaeche_summe) - Number(o.wfl);
+      if (Math.abs(diff) < 1) {
+        return '- Summe der Einheitenflaechen: ' + e.flaeche_summe
+          + ' m2 - deckt sich mit der eingetragenen Wohnflaeche.';
+      }
+      return '- ABWEICHUNG Flaeche: die Einheiten summieren sich auf '
+        + e.flaeche_summe + ' m2, eingetragen sind ' + o.wfl + ' m2 ('
+        + (diff > 0 ? '+' : '') + Math.round(diff * 10) / 10 + ' m2).'
+        + ' Nenne BEIDE Zahlen und sage, was fehlen koennte (eine Einheit,'
+        + ' Gewerbe, Keller). Rechne KEINE dritte Zahl aus und waehle keine aus.';
+    })(),
+    /* ══ v2139a · EIN STRING ZERFAELLT HIER IN BUCHSTABEN ═════════════
+       `modernisierung` ist ein Verzeichnis Gewerk -> Stufe
+       (`mfh-einheiten.js`, `d.gebaeude`). Gelesen wurde es mit
+       `Object.keys()` - und das nimmt auch einen String an:
+       `Object.keys('Dach neu')` gibt '0'..'7' zurueck, `length` ist 8,
+       die Bedingung also WAHR, und im Prompt stuende
+       `0=D, 1=a, 2=c, 3=h, ...`.
+
+       Gefunden beim Bau von `tools/prompt-lecks-pruefen.mjs`: mein
+       Pruefauftrag schickte versehentlich einen String, und der Prompt
+       trug die Buchstaben. Das war mein Fehler im Pruefer - aber es ist
+       genau der Fehler, den ein Umbau am Sender eines Tages echt macht.
+
+       > Eine Pruefung auf `length` fragt, ob etwas DA ist, nicht ob es
+       > die richtige GESTALT hat. Der Unterschied faellt erst im
+       > Ergebnis auf, und dort sieht er wie ein Modellfehler aus. */
+    (function () {
+      var m = o.einheiten && o.einheiten.modernisierung;
+      if (!m) return '';
+      if (typeof m === 'string') {
+        return m.trim() ? '- Modernisierungsstand (als Text erfasst): ' + m.trim() : '';
+      }
+      if (typeof m !== 'object' || Array.isArray(m) || !Object.keys(m).length) return '';
+      return '- Modernisierungsstand (Anlage 2 ImmoWertV): '
+        + Object.keys(m).map(function (k) { return k + '=' + m[k]; }).join(', ');
+    })(),
     (o.einheiten && o.einheiten.anzahl > 1)
       ? '  ACHTUNG: Vergleiche Mietspiegel und ortsübliche Größen mit der '
         + 'Fläche JE EINHEIT, niemals mit der Gesamtfläche. Eine '
@@ -335,13 +509,340 @@ function buildPrompt(payload) {
     eb && eb.ok ? 'Wiederverkauf der wichtigste Einzelfaktor an diesem Objekt.' : '',
     eb && eb.ok && eb.annahmen.restlaufzeit < 30 ? 'ACHTUNG: unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll.' : '',
     eb && eb.ok ? '' : '',
+    /* v2010 - DAS PRODUKTWISSEN. Bis hierher kannte die Pilot-Analyse
+       die Begriffe der App nur aus hartkodierten Absaetzen weiter oben;
+       `bot-wissen.md` las ausschliesslich der Telegram-Agent. Jetzt
+       lesen alle drei dieselbe gepflegte Datei. */
+    /* v2019b - der Block kommt jetzt von aussen (mit Marcels
+       Ergaenzung). Ohne ihn bleibt der Basisblock - buildPrompt wird
+       auch von Pruefwerkzeugen ohne Nutzer gerufen. */
+    (function () { var _b = (opts && opts.wissensblock) || projektwissen.block();
+      return _b ? ('\n' + _b + '\n') : ''; })(),
+
+    /* ══ v2011 · DIE SIEBEN BLOECKE ══════════════════════════════
+       Sie stehen VOR den Input-Daten, weil sie beschreiben, WAS das
+       Objekt ist - die Kennzahlen sagen nur, wie es sich rechnet. */
+    _st ? _zeilen('## STEUER (fuer Aufgabe 8 - bisher musstest du raten)', [
+      ['Zu versteuerndes Einkommen', _st.zve != null ? _z(_st.zve) + ' EUR' : null],
+      ['Grenzsteuersatz', _st.grenzsteuersatz_pct != null ? _p(_st.grenzsteuersatz_pct) : null],
+      ['AfA-Satz', _st.afa_satz_pct != null ? _p(_st.afa_satz_pct) : null],
+      ['AfA ueber Restnutzungsdauer', _st.afa_rnd_jahre != null ? _st.afa_rnd_jahre + ' Jahre' : null],
+      ['Gebaeudeanteil', _st.gebaeudeanteil_pct != null ? _p(_st.gebaeudeanteil_pct) : null],
+      /* ══ v2139 · VIER STEUERANGABEN REISTEN UNGELESEN MIT ══════════
+         `ui.js:892-911` sendet sie seit v2067a mit eigener Begruendung.
+         Gelesen wurden fuenf von neun.
+
+         Besonders die Sanierung: Aufgabe 8 soll die Steuerwirkung
+         beurteilen, und ob 40.000 EUR Sanierung als Erhaltungsaufwand
+         ueber zwei bis fuenf Jahre verteilt oder aktiviert werden,
+         aendert die Steuerwirkung der ersten Jahre vollstaendig. Das
+         Modell hat es nicht geraten - es wusste nichts davon. */
+      ['Eigener AfA-Satz', _st.afa_eigen_pct != null ? _p(_st.afa_eigen_pct) : null],
+      ['Sanierungskosten', (_st.sanierung && _st.sanierung.kosten_eur != null)
+        ? _z(_st.sanierung.kosten_eur) + ' EUR'
+          + (_st.sanierung.betrag_ist ? ' (' + _st.sanierung.betrag_ist + ')' : '') : null],
+      ['Sanierung steuerlich angesetzt', (_st.sanierung && _st.sanierung.steuerlich_angesetzt != null)
+        ? (_st.sanierung.steuerlich_angesetzt
+            ? ('ja, verteilt auf ' + (_st.sanierung.verteilung_jahre === 'auto'
+                ? 'automatisch gewaehlte Jahre' : (_st.sanierung.verteilung_jahre || '?') + ' Jahre'))
+            : 'nein - als Erhaltungsaufwand NICHT angesetzt') : null],
+      ['Sonder-AfA § 7b', _st.sonder_afa_7b ? 'aktiv' : null],
+      ['Erbbaurecht', (_st.erbbaurecht && _st.erbbaurecht.ja)
+        ? ('ja' + (_st.erbbaurecht.erbbauzins_eur_jahr != null
+            ? ', Erbbauzins ' + _z(_st.erbbaurecht.erbbauzins_eur_jahr) + ' EUR/Jahr' : '')) : null]
+    ]) : '',
+    _bw ? _zeilen('## BEWIRTSCHAFTUNG (Struktur, nicht nur die Summe)', [
+      ['Hausgeld umlagefaehig', _bw.hausgeld_umlagefaehig != null ? _z(_bw.hausgeld_umlagefaehig) + ' EUR' : null],
+      ['Hausgeld NICHT umlagefaehig', _bw.hausgeld_nicht_umlagefaehig != null ? _z(_bw.hausgeld_nicht_umlagefaehig) + ' EUR' : null],
+      ['Grundsteuer', _bw.grundsteuer != null ? _z(_bw.grundsteuer) + ' EUR' : null],
+      ['WEG-Ruecklage', _bw.weg_ruecklage != null ? _z(_bw.weg_ruecklage) + ' EUR' : null],
+      ['Eigene Ruecklage', _bw.eigene_ruecklage != null ? _z(_bw.eigene_ruecklage) + ' EUR' : null],
+      ['Kalkulierter Mietausfall', _bw.mietausfall_pct != null ? _p(_bw.mietausfall_pct) : null]
+    ]) : '',
+    /* v2026 - der Plan sagt jetzt, WORAUS er gerechnet ist, und
+       kennzeichnet die Indexmieten als Annahme. Die vier
+       Progressionsfelder kommen im Modus `einheiten` nicht mehr mit
+       (ui.js laesst sie dort weg), also faellt ihre Zeile von selbst. */
+    _me ? _zeilen('## MIETENTWICKLUNGSPLAN (bereits geplant, nicht von dir zu erfinden)', [
+      ['Woraus gerechnet', _me.herkunft || _me.modus],
+      ['Wohnungen mit Ist-Miete', _me.einheiten_gesamt],
+      ['davon im Plan', _me.einheiten_mit_plan],
+      ['davon Indexmiete (Hoehe = ANNAHME)', _me.einheiten_index],
+      ['Zielmiete', _me.soll_eur_qm != null ? _me.soll_eur_qm + ' EUR/m2' : null],
+      ['Schritte', _me.schritte],
+      ['Intervall', _me.intervall_jahre != null ? _me.intervall_jahre + ' Jahre' : null],
+      ['Schritthoehe', _me.schritt_pct != null ? _p(_me.schritt_pct) : null],
+      ['Mietspiegel', _me.mietspiegel_eur_qm != null ? _me.mietspiegel_eur_qm + ' EUR/m2' : null],
+      ['Kalkulierter Leerstand', _me.leerstand_pct != null ? _p(_me.leerstand_pct) : null],
+      /* v2139: `umlagefaehig` sagt, ob der Plan auf der Kaltmiete oder
+         auf der Warmmiete steht. Ohne diese Angabe sind Zielmiete und
+         Mietspiegel-Vergleich nicht einzuordnen - 12 EUR/m2 warm und
+         12 EUR/m2 kalt sind zwei verschiedene Objekte. */
+      ['Bezug der Zielmiete', _me.umlagefaehig != null
+        ? (_me.umlagefaehig ? 'inkl. umlagefaehiger Kosten (warm)' : 'Kaltmiete') : null]
+    ]) : '',
+    (_me && _me.modus === 'einheiten')
+      ? ('\nZUR MIETENTWICKLUNG: Die Tabelle ist aus den Mietvertraegen der einzelnen'
+        + '\nWohnungen gerechnet, nicht aus einer pauschalen Steigerung. Wohnungen ohne'
+        + '\nHaken bleiben auf ihrer Ist-Miete - fuer sie wird KEINE Steigerung'
+        + '\nangenommen. Rechne keine eigene Progression dagegen.'
+        + ((_me.einheiten_index > 0)
+            ? ('\nBei den Indexmietvertraegen (§ 557b BGB) steht der TERMIN im Vertrag, die'
+              + '\nHOEHE nicht - sie ergibt sich erst aus dem Verbraucherpreisindex. Nenne'
+              + '\ndiesen Teil ausdruecklich eine Annahme, kein vereinbartes Ergebnis.')
+            : ''))
+      : '',
+    /* v2041 - ANKAUF gegen BESTAND. Gebaut von `_ankaufBlock()` weiter
+       unten; hier steht nur der Aufruf, damit die Verkettung lesbar
+       bleibt. */
+    _ak ? _ankaufBlock(_ak) : '',
+    _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
+      ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
+      ['Etage', _wo.etage], ['Etagen gesamt', _wo.etagen_gesamt],
+      ['Garagen', _wo.garagen], ['Stellplaetze aussen', _wo.stellplaetze_aussen],
+      ['Balkon/Terrasse', _wo.balkon_qm != null ? _wo.balkon_qm + ' m2' : null],
+      ['Grundriss', _wo.grundriss]
+    ]) : '',
+    _bo ? _zeilen('## BODEN UND SUBSTANZ', [
+      ['Bodenrichtwert', _bo.bodenrichtwert_eur_qm != null ? _z(_bo.bodenrichtwert_eur_qm) + ' EUR/m2' : null],
+      ['Stichtag', _bo.brw_stichtag],
+      ['Grundstueck', _bo.grundstueck_qm != null ? _z(_bo.grundstueck_qm) + ' m2' : null],
+      ['Miteigentumsanteil', _bo.miteigentumsanteil_pct != null ? _p(_bo.miteigentumsanteil_pct) : null],
+      ['Bruttogrundflaeche', _bo.bgf_qm != null ? _z(_bo.bgf_qm) + ' m2' : null],
+      ['Standardstufe', _bo.standardstufe],
+      ['Sachwertfaktor', _bo.sachwertfaktor],
+      ['Liegenschaftszins', _bo.liegenschaftszins_pct != null ? _p(_bo.liegenschaftszins_pct) : null],
+      ['Nutzungsart', _bo.nutzungsart]
+    ]) : '',
+    _ha ? _zeilen('## HALTER UND UEBERGANG (privat oder Gesellschaft aendert Steuer und Finanzierung)', [
+      ['Halter', _ha.name], ['Gehalten seit', _ha.seit],
+      ['Kaufdatum', _ha.kaufdatum],
+      ['Wirtschaftlicher Uebergang', _ha.wirtschaftlicher_uebergang],
+      ['Vermietungsstand', _ha.vermietungsstand]
+    ]) : '',
+    _zu ? _zeilen('## ZUSTAND UND ENERGIE (der Marktkontext oben bietet dafuer den gemessenen Abschlag an)', [
+      ['Zustand', _zu.ds2_zustand], ['Energieklasse', _zu.energieklasse],
+      ['Modernisierung', _zu.modernisierung],
+      ['Modernisierungspunkte', _zu.modernisierungspunkte],
+      /* ══ v2139 · DIE ACHT BAUTEILE UND DIE GERECHNETE RND ══════════
+         `ui.js:1025-1061` sendet beides seit v2067/v2068, jeweils mit
+         einer Begruendung, die genau sagt, warum eine Summe nicht
+         reicht: Eine Summe sagt nicht, WO die Punkte fehlen.
+
+         Gelesen wurde nur die Summe (`modernisierungspunkte`). Genau
+         die Unterscheidung, um die es ging, kam nicht an.
+
+         Und die RND des Wizards ist etwas anderes als
+         `steuer.afa_rnd_jahre`: dort steht, was der Nutzer EINGETRAGEN
+         hat, hier was die Bauteile HERGEBEN. Weichen sie ab, ist das
+         ein Befund - deshalb steht der Abgleich als Auftrag dabei und
+         nicht als stille Zahl. */
+      ['Letzte Modernisierung je Bauteil', (_zu.bauteile && typeof _zu.bauteile === 'object'
+        && Object.keys(_zu.bauteile).length)
+        ? Object.keys(_zu.bauteile).map(function (k) { return k + ' ' + _zu.bauteile[k]; }).join(', ')
+        : null],
+      ['Restnutzungsdauer GERECHNET (Anlage 2 ImmoWertV)', (_zu.restnutzungsdauer_berechnet
+        && _zu.restnutzungsdauer_berechnet.jahre != null)
+        ? (_zu.restnutzungsdauer_berechnet.jahre + ' Jahre'
+           + (_zu.restnutzungsdauer_berechnet.gesamtnutzungsdauer != null
+              ? ' von ' + _zu.restnutzungsdauer_berechnet.gesamtnutzungsdauer : '')
+           + (_zu.restnutzungsdauer_berechnet.alter_jahre != null
+              ? ', Alter ' + _zu.restnutzungsdauer_berechnet.alter_jahre + ' Jahre' : '')
+           + (_zu.restnutzungsdauer_berechnet.verfahren
+              ? ', Verfahren ' + _zu.restnutzungsdauer_berechnet.verfahren : '')
+           + (_zu.restnutzungsdauer_berechnet.stand
+              ? ', Stand ' + _zu.restnutzungsdauer_berechnet.stand : ''))
+        : null]
+    ]) : '',
+    /* v2139: der Auftrag zum Abgleich. Zwei Restnutzungsdauern aus
+       verschiedenen Quellen sind kein Widerspruch, solange beide ihre
+       Herkunft tragen - aber eine Abweichung gehoert genannt. */
+    (_zu && _zu.restnutzungsdauer_berechnet && _zu.restnutzungsdauer_berechnet.jahre != null
+      && _st && _st.afa_rnd_jahre != null
+      && Math.abs(Number(_zu.restnutzungsdauer_berechnet.jahre) - Number(_st.afa_rnd_jahre)) >= 3)
+      ? ('\n- ABWEICHUNG Restnutzungsdauer: eingetragen ' + _st.afa_rnd_jahre
+         + ' Jahre (Steuer), aus den Bauteilen gerechnet '
+         + _zu.restnutzungsdauer_berechnet.jahre + ' Jahre. Nenne BEIDE mit ihrer'
+         + ' Herkunft und sage, was die Abweichung fuer die AfA bedeutet.'
+         + ' Rechne KEINE dritte Zahl aus.')
+      : '',
+    /* ══ v2140 · DIESER INVESTOR — SEINE SCHWELLEN, NICHT UNSERE ══════
+
+       Aufgabe 5 („Investor-Fit") nannte drei Archetypen und keine
+       Eingabe. Die Schwellen dieses Nutzers lagen im `localStorage`.
+
+       Die Ordnung darunter ist der eigentliche Inhalt dieses Blocks.
+       Ohne sie stehen zwei Schwellen zur selben Groesse im Prompt - die
+       DealPilot-Skala („solide ab DSCR 1,2", weiter oben) und die
+       persoenliche („ab 1,35 kauf ich") - und das Modell waehlt eine
+       aus, ohne zu sagen welche.
+
+       > Der SCORE darf das Profil nie sehen. Dieselbe Wohnung hat fuer
+       > jeden Nutzer denselben Score; eine Einstellung, die ihn
+       > verschiebt, macht zwei Nutzer unvergleichbar. Das ist dieselbe
+       > Regel wie fuer die Rechenkerne: ein Kern liest NIE
+       > Einstellungen.
+
+       Die ANALYSE darf es - sie urteilt fuer diesen Investor. */
+    /* ══ v2140b · WAS DAVON HAT DER NUTZER SELBST GESETZT? ════════════
+       `_selbst_gesetzt` ist die Liste der Schluessel, die im
+       `localStorage` des Nutzers stehen (`ui.js`, aus `load()`). Alles
+       andere ist die VORGABE aus `config.js` - sie gilt, weil die App
+       danach rechnet, aber sie ist keine Entscheidung.
+
+       Ohne diese Trennung urteilt das Modell gegen eine Schwelle und
+       nennt sie "seine" - und der Nutzer liest ein Mass, das er nie
+       gesetzt hat. */
+    _ip ? (function () {
+      var g = Array.isArray(_ip._selbst_gesetzt) ? _ip._selbst_gesetzt : [];
+      var mark = function (k, wert) {
+        if (wert == null) return null;
+        return wert + (g.indexOf(k) >= 0 ? '  (selbst gesetzt)' : '  (Vorgabe, nicht gesetzt)');
+      };
+      return _zeilen('## DIESER INVESTOR (Einstellungen, keine Messung am Objekt)', [
+        ['Mindest-DSCR', mark('min_dscr', _ip.min_dscr != null
+          ? String(_ip.min_dscr).replace('.', ',') : null)],
+        ['Mindest-Cashflow', mark('min_cashflow_vor_st', _ip.min_cashflow_vor_st != null
+          ? _z(_ip.min_cashflow_vor_st) + ' EUR/Monat vor Steuer' : null)],
+        ['Maximaler LTV', mark('max_ltv', _ip.max_ltv != null
+          ? _p(Number(_ip.max_ltv)) : null)],
+        ['Strategie', mark('strategie', _ip.strategie)],
+        ['Risikoneigung', mark('risikoneigung', _ip.risikoneigung)],
+        ['Erwarteter Verkaeufer-Druck', mark('verkaeufer_druck', _ip.verkaeufer_druck)],
+        ['Eingeschaetzte Marktlage', mark('marktlage', _ip.marktlage)]
+      ]);
+    })() : '',
+    _ip ? ('\n- Diese Zahlen sind EINSTELLUNGEN. Der DealScore und die DealPilot-Skala'
+      + '\n  weiter oben bleiben unberuehrt: sie messen das OBJEKT. Rechne keinen'
+      + '\n  Score nach dem Profil um.'
+      + '\n- Beantworte Aufgabe 5 (Investor-Fit) AN DIESEN Schwellen: nenne je'
+      + '\n  Schwelle, ob sie gehalten oder verfehlt wird, mit BEIDEN Zahlen'
+      + '\n  (Schwelle und gemessener Wert).'
+      + '\n- Widerspricht eine persoenliche Schwelle der DealPilot-Skala (etwa'
+      + '\n  Mindest-DSCR 1,35 gegen "solide ab 1,2"), nenne BEIDE und sage,'
+      + '\n  welche wessen ist. Mische sie nicht und waehle keine aus.'
+      /* v2140b: der frueher hier stehende Satz („Fehlt eine Schwelle
+         hier...") konnte NIE greifen - `get()` im Frontend gibt immer
+         einen Wert, notfalls die Vorgabe. Eine Regel, deren Bedingung
+         nicht eintreten kann, ist keine Regel. Jetzt steht die
+         Unterscheidung an der Zeile selbst. */
+      + '\n- "(selbst gesetzt)" heisst: eine Entscheidung dieses Nutzers. Daran'
+      + '\n  darfst du ihn messen. "(Vorgabe, nicht gesetzt)" ist der Standardwert'
+      + '\n  der App - er gilt fuer die Rechnung, ist aber KEINE Aussage des Nutzers.'
+      + '\n  Nenne ihn nicht "seine" Schwelle und bau darauf kein Urteil ueber'
+      + '\n  seine Ziele.'
+      + (Array.isArray(_ip._selbst_gesetzt) && _ip._selbst_gesetzt.length === 0
+          ? '\n- ACHTUNG: der Nutzer hat KEINE dieser Angaben selbst gesetzt. Alles'
+            + '\n  oben ist Vorgabe. Urteile nach der DealPilot-Skala, sage das'
+            + '\n  ausdruecklich, und schlage ihm vor, sein Profil zu fuellen'
+            + '\n  (Einstellungen -> Standardwerte).'
+          : '')) : '',
+    '',
+    /* v2013 - DIE FOTOS. Ein Bild zeigt einen EINDRUCK, keine Messung. */
+    _nFotos ? ('\n## FOTOS DES OBJEKTS\nDu bekommst ' + _nFotos + ' Foto(s) dieses Objekts mitgeliefert.'
+      + '\n- Beschreibe, was SICHTBAR ist: Bauweise, Fassade, Fenster, Dach, Umfeld, Pflegezustand.'
+      + '\n- Nenne es als visuellen Eindruck, nicht als Feststellung.'
+      + '\n- Leite aus einem Foto NIEMALS ab: Baujahr, Wohnflaeche, Sanierungsjahr, Energieklasse'
+      + '\n  oder einen Wert. Dafuer sind die erfassten Felder da.'
+      + '\n- Der Zustand steht als ERFASSTES Feld oben (Abschnitt ZUSTAND UND ENERGIE).'
+      + '\n  Widerspricht der Bildeindruck diesem Feld, SAGE DAS ausdruecklich und nenne beides -'
+      + '\n  ersetze das Feld nicht stillschweigend.'
+      + '\n- Zeigt ein Bild nichts Aussagekraeftiges, sage das statt etwas zu konstruieren.') : '',
+    '',
+    /* ══ v2022 · MIETVERTRAEGE JE EINHEIT ════════════════════════
+       Ohne diese Regel waeren die neuen Felder weitere Zahlen. */
+    /* v2022a - hier stand `ein`. Die Einheiten haengen an `o.einheiten`
+       (o = payload.objekt), nicht an einer Variablen `ein` - die gibt es
+       in buildPrompt gar nicht. Der Container hat es beim ersten echten
+       Aufruf geworfen: ReferenceError: ein is not defined. node --check
+       sieht so etwas nicht, es ist gueltige Syntax. */
+    (o.einheiten && Array.isArray(o.einheiten.je_einheit)
+      && o.einheiten.je_einheit.some(function (e) { return e && e.vertragsart; }))
+      ? ('\n## MIETVERTRAEGE JE EINHEIT'
+        /* v2139: der Verweis auf den Ort. Bis hierher nannte dieser
+           Block vier Feldnamen, die im Prompt nicht vorkamen - weder
+           als Wert noch als Ort. Jetzt stehen sie in der Einheitenzeile
+           oben, und der Block sagt das. */
+        + '\n(Die Werte stehen oben in der Einheitenliste je Zeile.)'
+        + '\n- "vertragsart" steht je Einheit. Staffelmiete (\u00a7 557a BGB) und Indexmiete'
+        + '\n  (\u00a7 557b BGB) tragen ihre naechste Erhoehung SCHON im Vertrag: das ist ein'
+        + '\n  TERMIN, kein Mieterhoehungspotenzial. Behandle beides nicht gleich - sonst'
+        + '\n  rechnest du dieselbe Steigerung zweimal (einmal als Staffel, einmal als'
+        + '\n  Luft zur Marktmiete).'
+        + '\n- "naechste_anpassung" ist dieser Termin. Nenne ihn, wenn er in den naechsten'
+        + '\n  zwei Jahren liegt.'
+        + '\n- "letzte_erhoehung" sagt, wie lange die Miete schon steht. Je laenger, desto'
+        + '\n  eher ist Spielraum da - aber nur bei UNBEFRISTETEN Vertraegen ohne Staffel.'
+        + '\n- "befristet_bis" ist ein Leerstandsrisiko mit Datum, kein Vorteil.'
+        + '\n- Zeitmiete (\u00a7 575 BGB) braucht einen gesetzlichen Grund; moebliert/Kurzzeit'
+        + '\n  (\u00a7 549 Abs. 2 BGB) hat keinen Kuendigungsschutz; preisgebundene Wohnungen'
+        + '\n  folgen der Kostenmiete, nicht dem Mietspiegel.'
+        /* v2023a - die Regel zu `rnd_eigen` ist entfallen: das Feld gibt
+           es seit v2023 nicht mehr. Die Restnutzungsdauer je Einheit
+           kommt aus dem Zustand (Anlage 2 ImmoWertV, Schritt 3/4 des
+           MFH-Konfigurators) - EIN Weg, nicht zwei. */
+        + '\n- Die Restnutzungsdauer je Einheit steht NICHT hier: sie wird aus dem'
+        + '\n  Zustand gerechnet (Anlage 2 ImmoWertV). Leite sie nicht aus dem Vertrag ab.')
+      : '',
+    '',
     '## INPUT-DATEN',
     '',
     'DealScore: ' + (ds.total != null ? ds.total : '–') + ' / 100',
+    /* v2009 - hier stand nur `.total`. Die vier Teilscores reisen seit
+       jeher mit und wurden verworfen - waehrend das Antwortformat ein
+       Feld `score_vergleich` verlangt, das erklaeren soll, WELCHE
+       Zusatz-KPIs die Differenz treiben. Das Modell musste raten. */
     isc ? ('Investor Deal Score: ' + (isc.total != null ? isc.total : '–') + ' / 100 (beruecksichtigt zusaetzlich Lage/Substanz/Upside — 24 KPIs)') : '',
+    /* v2009 - die Aufschluesselung des Investor Deal Score. */
+    (isc && (isc.rendite != null || isc.finanzierung != null || isc.risiko != null || isc.lage != null))
+      ? ('  davon Rendite ' + (isc.rendite != null ? isc.rendite : '–')
+         + ' | Finanzierung ' + (isc.finanzierung != null ? isc.finanzierung : '–')
+         + ' | Risiko ' + (isc.risiko != null ? isc.risiko : '–')
+         + ' | Lage ' + (isc.lage != null ? isc.lage : '–')
+         + (isc.label ? ' | Stufe ' + isc.label : '')
+         + '  (nutze GENAU diese vier fuer score_vergleich - nicht raten)')
+      : '',
+
+    /* v2009 - VERMARKTUNGSDAUER. `verhandlung` wurde seit jeher
+       geschickt und kam im ganzen Dienst nur EINMAL vor: in der
+       Beschreibung der Ausgabe. Wie lange ein Objekt am Markt steht,
+       ist einer der staerksten Verhandlungshebel ueberhaupt. */
+    (vh && (vh.tage_online != null || vh.inseriert_seit))
+      ? ('\nVERMARKTUNGSDAUER\n'
+         + (vh.tage_online != null ? '- Seit ' + vh.tage_online + ' Tagen inseriert\n' : '')
+         + (vh.inseriert_seit ? '- Inseriert seit: ' + vh.inseriert_seit + '\n' : '')
+         + '- Lange Standzeit ist ein Verhandlungshebel, kurze mahnt zur Eile. '
+         + 'Nenne die Zahl in der Verhandlungsempfehlung, wenn sie etwas aussagt.')
+      : '',
+
+    /* v2009 - DIE GEMESSENEN LAGESCORES. Bisher wurden aus
+       `dealpilot_marktbewertung` nur `marktkontext` und `erbbaurecht`
+       gelesen. Die Lagescores kommen aus dem Marktbericht - also aus
+       einer MESSUNG - waehrend `makrolage`/`mikrolage` weiter oben
+       Marcels SELBSTeinschaetzung sind. Das Modell sah bisher nur die
+       Selbsteinschaetzung und nicht die Messung daneben. */
+    (_dpmb && (_dpmb.mikrolage || _dpmb.makrolage || _dpmb.wertentwicklung_pct_pa != null))
+      ? ('\nDEALPILOT-LAGESCORES (gemessen, nicht geschaetzt)\n'
+         + (_dpmb.mikrolage ? '- Mikrolage: ' + (_dpmb.mikrolage.label || '–')
+             + (_dpmb.mikrolage.score != null ? ' (' + _dpmb.mikrolage.score + '/100)' : '') + '\n' : '')
+         + (_dpmb.makrolage ? '- Makrolage: ' + (_dpmb.makrolage.label || '–')
+             + (_dpmb.makrolage.score != null ? ' (' + _dpmb.makrolage.score + '/100)' : '') + '\n' : '')
+         + (_dpmb.wertentwicklung_pct_pa != null ? '- Wertentwicklung: ' + _p(_dpmb.wertentwicklung_pct_pa) + ' p.a.\n' : '')
+         + (_dpmb.marktwert != null ? '- Marktwert laut Karte: ' + _z(_dpmb.marktwert) + ' EUR\n' : '')
+         + 'Diese Werte sind GEMESSEN. Weichen sie von der Selbsteinschaetzung '
+         + 'des Investors ab, sage es und begruende mit diesen Zahlen.')
+      : '',
+
     '',
     'Cashflow:',
-    '- Monatlich: ' + fmtEur(k.cf_m),
+    /* v2009 - `cf_m` ist der Cashflow VOR Steuer (calc.js:1970:
+       cf_m = cf_op/12, waehrend cf_ns = cf_op - steuer). Das stand
+       bisher nicht dran, und Aufgabe 8 verlangt eine Aussage zur
+       Steuererstattung. Jetzt steht beides da und ist benannt. */
+    '- Monatlich (VOR Steuer): ' + fmtEur(k.cf_m),
+    (k.cf_ns != null && isFinite(k.cf_ns)) ? ('- Jaehrlich NACH Steuer: ' + fmtEur(k.cf_ns)) : '',
+    (k.steuer != null && isFinite(k.steuer)) ? ('- Steuerwirkung p.a.: ' + fmtEur(-k.steuer) + ' (negativ = Erstattung)') : '',
+    (k.afa != null && isFinite(k.afa)) ? ('- AfA p.a.: ' + fmtEur(k.afa)) : '',
     '- Score: ' + cfScore + ' / 100',
     '',
     'Rendite (NMR):',
@@ -370,6 +871,12 @@ function buildPrompt(payload) {
     f.d1z_pct != null ? 'Sollzins D1: ' + Number(f.d1z_pct).toFixed(2) + ' %' : '',
     f.d1t_pct != null ? 'Tilgung D1: ' + Number(f.d1t_pct).toFixed(2) + ' %' : '',
     f.restschuld_ezb != null ? 'Restschuld am Ende der Zinsbindung: ' + fmtEur(f.restschuld_ezb) : '',
+    /* v2009 - Aufgabe 13 verlangt eine Anschlussfinanzierungs-Analyse.
+       Bis hierher reiste die Restschuld mit, aber nicht, WANN die
+       Zinsbindung endet. Eine Restschuld ohne Datum ist keine Basis. */
+    (f.d1_bindj != null && f.d1_bindj !== '') ? ('Zinsbindung: ' + f.d1_bindj + ' Jahre') : '',
+    (f.anschl_z != null && f.anschl_z !== '') ? ('Angenommener Anschlusszins: ' + f.anschl_z + ' %') : '',
+    (f.anschl_t != null && f.anschl_t !== '') ? ('Angenommene Anschlusstilgung: ' + f.anschl_t + ' %') : '',
     '',
     /* v947-mbsource: Der DealPilot-Marktbericht ist die BESTE Quelle im Prompt —
      * gemessene Vergleichsdaten statt Formularfelder. Er steht deshalb VOR der
@@ -533,6 +1040,16 @@ function buildPrompt(payload) {
     '   - Wertsteigerungs-Investor?',
     '   - Sicherheitsorientiert?',
     '   → jeweils 2-3 Sätze Begründung mit Bezug auf Zahlen',
+    /* v2140: die Aufgabe nannte bis hierher drei Archetypen und KEINE
+       Eingabe - die Schwellen dieses Nutzers erreichten den Prompt
+       nicht. Jetzt tun sie es, und die Aufgabe sagt, wo sie stehen. */
+    (payload.investor_profil
+      ? '   → UND KONKRET: der Abschnitt "DIESER INVESTOR" nennt seine eigenen'
+        + ' Schwellen.\n     Pruefe sie einzeln ab (gehalten / verfehlt, je mit'
+        + ' beiden Zahlen) und sage zum\n     Schluss, ob der Deal zu DIESEM'
+        + ' Investor passt - nicht nur zu einem Archetyp.'
+      : '   → Ein persoenliches Investmentprofil liegt nicht vor. Urteile nach den'
+        + '\n     DealPilot-Schwellen und sage, dass du das tust.'),
     '',
     '6. Klare Empfehlung — "Kaufen", "Prüfen", oder "Nicht kaufen" mit ausführlicher Begründung',
     '',
@@ -640,6 +1157,15 @@ function buildPrompt(payload) {
     '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
+    /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von
+       22 Schluesseln kamen zurueck), aber das Modell schrieb KEIN Wort
+       zum Bildeindruck. Der Grund stand im Antwortformat: es gab kein
+       Feld dafuer. Ich hatte "beschreibe, was sichtbar ist" verlangt
+       und keinen Ort dafuer gegeben - das Modell fuellt die definierten
+       Felder, nicht erfundene.
+       Das Feld erscheint nur, wenn auch Fotos mitgehen; sonst waere es
+       eine Zeile, die zum Raten einlaedt. */
+    _nFotos ? '  "optischer_eindruck": "Was die Fotos ZEIGEN: Bauweise, Fassade, Fenster, Dach, Umfeld, Pflegezustand. Als visueller Eindruck formuliert, nicht als Feststellung. KEIN Baujahr, keine Flaeche, kein Sanierungsjahr, kein Wert daraus ableiten. Widerspricht der Eindruck dem erfassten Zustandsfeld, nenne BEIDES und sage, dass sie auseinandergehen. 4-6 Saetze.",' : '',
     '  "quellen":             ["URL 1", "URL 2", "..."]',
     '}'
   ].filter(Boolean).join('\n');
@@ -895,8 +1421,34 @@ const ANTI_RUECKFRAGE = [
 ].join('\n');
 
 async function analyze(payload, opts) {
-  const prompt = buildPrompt(payload) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
-  const r = await callOpenAI(prompt, opts);
+  const prompt = buildPrompt(payload, opts) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
+  /* v2013 - MIT Fotos geht der ERSTE Anlauf ueber den Bildweg.
+
+     `callOpenAI` schickt `input: <string>`; Bilder brauchen
+     content-parts. Den Weg gab es schon (`_callOpenAIVision`), aber
+     nur fuer den Beleg-Import.
+
+     Ohne Fotos bleibt ALLES wie es war - gleiche Funktion, gleiche
+     Websuche. Und der zweite Anlauf weiter unten laeuft immer ueber
+     den Textweg: ein Wiederholversuch soll nicht auch noch die
+     Bilder bezahlen. */
+  const _fotos = (opts && Array.isArray(opts.fotos)) ? opts.fotos.slice(0, 4) : [];
+  let r;
+  if (_fotos.length) {
+    const teile = [{ type: 'input_text', text: prompt }].concat(
+      _fotos.map(function (f) { return { type: 'input_image', image_url: f }; }));
+    /* v2013a - GEMESSEN am ersten echten Lauf: die Analyse kam mit nur
+       5 von ~20 Schluesseln zurueck, 2.731 Zeichen, abgeschnitten.
+       Ursache: `_callOpenAIVision` deckelt bei `opts.maxTokens || 700`.
+       Die 700 stammen vom Beleg-Import, fuer den die Funktion gebaut
+       wurde - eine Rechnung braucht keine 8000 Tokens, eine
+       Pilot-Analyse schon. Der Textweg nimmt 8000, also muss der
+       Bildweg dieselben bekommen; sonst ist die Antwort je nach Weg
+       verschieden lang, und das sieht man ihr nicht an. */
+    r = await _callOpenAIVision(teile, Object.assign({}, opts, { maxTokens: 8000 }));
+  } else {
+    r = await callOpenAI(prompt, opts);
+  }
   let parsed = extractJson(r.text);
   let used = r;
 
@@ -2034,7 +2586,13 @@ async function copilotChat(payload, opts) {
     return Object.keys(b).length ? JSON.stringify(b) : '{"nkm":"850"}';
   })();
 
+  /* v2010 - auch der Co-Pilot und der Portfolio-Pilot lesen jetzt das
+     Projektwissen. Er steht als ERSTER Systemblock: ueber alle
+     Anfragen gleich, also die richtige Stelle fuer den Prompt-Cache. */
+  /* v2019b - mit Marcels Ergaenzung, wenn der Aufrufer sie mitgibt. */
+  const _pw = (opts && opts.wissensblock) || projektwissen.block();
   const sys = [
+    _pw ? _pw : '',
     istPortfolio
       ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
       : 'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
@@ -2073,7 +2631,16 @@ async function copilotChat(payload, opts) {
           '- "projektion" ist eine Modellfortschreibung, keine Prognose: sie unterstellt gleichbleibende Miete,',
           '  Zins und Tilgung. Nenne sie so, wenn du sie verwendest.',
           '- Die Einheit steht IM Feldnamen (_eur, _eur_jahr, _prozent, _qm). Lies sie dort ab, rate sie nicht.',
-          '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.'
+          '- Fehlt ein Feld (null), ist es nicht erfasst - nicht null. Sage, was fehlt, statt es zu ueberspringen.',
+          /* v2014 - die sechs neuen Felder zur Substanz. Ohne diese Zeile
+             stehen sie zwar im Auftrag, werden aber als weitere Zahlen
+             gelesen statt als Risikotraeger. */
+          '- Je Objekt stehen jetzt auch "lageklasse" (A/B/C), "zustand", "energieklasse",',
+          '  "leerstand_pct", "wohneinheiten" und "bodenrichtwert_eur_qm". Nutze SIE fuer die',
+          '  Klumpenrisiken: Lage ueber lageklasse und bodenrichtwert (nicht nur ueber den Ort),',
+          '  Substanz ueber zustand und energieklasse, Ertragssicherheit ueber leerstand_pct.',
+          '- Haeufen sich schlechte Energieklassen oder renovierungsbeduerftige Objekte, ist das',
+          '  ein Sanierungs-Klumpen - benenne ihn mit Namen und Anzahl.'
         ].join('\n')
       : '',
 

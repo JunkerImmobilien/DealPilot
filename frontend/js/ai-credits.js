@@ -141,6 +141,41 @@
       '  font-size:14px;font-weight:600;color:#FDFCFA}',
       '.dp-kg-v.leer{color:#B8625C}',
       '.dp-kg-s{flex:0 0 auto;font-size:10px;color:#8C857B;min-width:56px;text-align:right}',
+      /* ══ v2131 · DER SATZ WURDE MITTEN IM WORT ABGESCHNITTEN ══════
+         GEMESSEN am 12.10.2026, 360 px, Durchgang 4 der Geraeteabnahme:
+
+           .dp-kg-f   clientWidth 306   scrollWidth 473   -167 px
+           white-space: nowrap
+
+         Der ganze Satz lautet:
+           "Zuruecksetzung am 01.11.2026. Was du bis dahin nicht nutzt,
+            verfaellt - zugekaufte Bewertungen nie."
+
+         Sichtbar waren 306 von 473 px, also rund zwei Drittel. Gekappt
+         wurde genau die AUSNAHME am Ende.
+
+         > **Ein Satz, dessen Ausnahme abgeschnitten wird, sagt das
+         > Gegenteil von dem, was er soll.** Der Kunde liest "was du
+         > nicht nutzt, verfaellt" - und nicht, dass gekaufte
+         > Bewertungen davon ausgenommen sind.
+
+         URSACHE ist Erbschaft, keine eigene Regel: auf .dp-kg-f passen
+         NULL white-space-Regeln (im laufenden Dokument gegengeprueft).
+         Die Kette:
+
+           button#hdr-credits-pill   white-space: nowrap   <- hier
+             div.dp-kg-panel         nowrap  (geerbt)
+               div.dp-kg-f           nowrap  (geerbt)
+
+         Fuer die Pille selbst ist nowrap richtig - sie ist eine Zeile.
+         Das Panel haengt aber IM Knopf und erbt eine Eigenschaft, die
+         fuer eine andere Rolle gewaehlt wurde.
+
+         Deshalb wird sie am Panel zurueckgenommen und nur dort wieder
+         gesetzt, wo sie gebraucht wird: an den Zahlen (.dp-kg-v) und
+         ihren Einheiten (.dp-kg-s), die nicht umbrechen duerfen. */
+      '.dp-kg-panel{white-space:normal}',
+      '.dp-kg-v,.dp-kg-s{white-space:nowrap}',
       '.dp-kg-f{margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);',
       '  font-size:10.5px;color:#8C857B;line-height:1.45}',
       '.dp-kg-pill .dp-kg-label{font-family:"JetBrains Mono",ui-monospace,monospace;',
@@ -180,8 +215,32 @@
                 '</div>';
     }
 
+    /* ── v2077 · HIER STAND DAS GEGENTEIL DER REGEL ─────────────────────
+       „Nicht genutzte Bewertungen verfallen nicht." — das war der Stand
+       bis v1183. Marcels Entscheidung vom 11.09.2026 hat ihn umgedreht:
+       das Monatskontingent verfällt, nur Gekauftes bleibt.
+
+       `v1296` hat diesen Satz korrigiert — aber nur im ZWEITEN Renderer
+       dieser Datei (Z. 319 ff.). Dieser hier blieb stehen und lief
+       seither im Tooltip-Panel mit, also genau dort, wo der Kunde sein
+       Guthaben nachsieht.
+
+       Am 10.10.2026 gegen den Code gemessen, und der Code hält die Regel
+       ein: `_monatsReset` setzt nur `*_used = 0` ohne Übertrag
+       (`aiCreditsService.js:226-232`), der Kauf geht in `*_bank`
+       (`:405-426`), und kein Schreiber leert die Bank je. Verbraucht
+       wird in der Reihenfolge Monat → Testphase → Gekauftes (`:337`,
+       `:343`, `:350`).
+
+       > Falsch war nie die Rechnung, sondern dieser Satz. Eine Zusage,
+       > die das Produkt nicht einhält, ist teurer als ein Rechenfehler —
+       > sie wird geglaubt.
+
+       Derselbe Wortlaut wie im zweiten Renderer, nur kürzer für den
+       Fuß. Zwei Fassungen desselben Satzes sind der Grund, warum er
+       einmal übersehen wurde. */
     var fuss = 'Zurücksetzung am ' + _datum(s.period_reset_at) + '. ' +
-               'Nicht genutzte Bewertungen verfallen nicht.';
+               'Was du bis dahin nicht nutzt, verfällt — zugekaufte Bewertungen nie.';
     /* v1185: Waehrend der Testphase stimmt der zweite Satz nicht — was aus
        dem Testpaket kommt, verfaellt sehr wohl. Ein Satz, der in einem
        Zustand falsch ist, gehoert ersetzt, nicht ergaenzt. */

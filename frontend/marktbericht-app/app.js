@@ -800,7 +800,23 @@ function _renderWertverfahren(d) {
           : null))
     + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
     + '<div class="wv-g">'
-    + karte('vgl', 'Vergleichswert', eur(v), 'f\u00fchrend bei Eigentumswohnungen', 'vergleich')
+    /* ══ v1971 · DIE KARTE HEISST, WAS SIE IST ══════════════════════════
+
+       Hier stand Titel „Vergleichswert" und Unterzeile „fuehrend bei
+       Eigentumswohnungen" — beides fest, unabhaengig davon, woraus die
+       Zahl gebildet ist und ob ueberhaupt ein Verfahren fuehrt.
+
+       Der Hinweis auf die Angebotsbasis stand nur im EINGEKLAPPTEN
+       Erklaertext. Was eingeklappt ist, wird nicht gelesen.
+
+       Marcel am 08.10.2026: „Vergleichswert muessen wir auf jeden Fall
+       umbenennen." */
+    + karte('vgl', (cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation',
+        eur(v),
+        ((cc.comparison && cc.comparison.basis) === 'kaufpreise'
+          ? 'amtliche Grundlage · § 20, § 25 ImmoWertV'
+          : 'Angebotspreise aus Portalen — keine Kaufpreise (§ 25 ImmoWertV)'),
+        'vergleich')
     /* ── v1200 · Die Karte verschwieg, WIE gerechnet wurde ─────────────────
        Sie zeigte nur „Reinertrag 3.767 € p. a.". Dass ohne Bodenwert
        gerechnet wurde — bei einer Eigentumswohnung ohne Miteigentumsanteil
@@ -2130,7 +2146,7 @@ function _mbEnsureReportsPanel(){
      /* v944-collapse: KEINE zwei Spalten — ein Bericht pro Zeile. "Volle Breite"
         heisst volle Breite fuer die Zeile, nicht zwei Zeilen nebeneinander. */
      +'#mbReportsPanel .mbrep-list{display:none}'
-     +'#mbReportsPanel.open .mbrep-list{display:block}'
+     +'#mbReportsPanel.open .mbrep-list{display:block;container-type:inline-size;container-name:mbrep}'
      +'#mbReportsPanel .mbrep-tog{display:inline-flex;align-items:center;gap:7px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;font-weight:600;color:#8a8378;background:none;border:none;cursor:pointer;padding:6px 2px}'
      +'#mbReportsPanel .mbrep-tog:hover{color:var(--wl-9a7f33, #9a7f33)}'
      +'#mbReportsPanel .mbrep-tog .chev{display:inline-block;transition:transform .18s;font-size:9px}'
@@ -2140,7 +2156,25 @@ function _mbEnsureReportsPanel(){
         bleibt hart (keine WL_TINTS). */
      +'#mbReportsPanel .mbrep-del{width:34px;height:34px;flex:0 0 auto;border:1px solid rgba(42,39,39,.16);border-radius:9px;background:none;color:#9a9288;font-size:14px;line-height:1;cursor:pointer}'
      +'#mbReportsPanel .mbrep-del:hover{color:#B8625C;border-color:#B8625C;background:#FBF3F2}'
-     +'@media(max-width:600px){#mbReportsPanel .mbrep-row{flex-wrap:wrap}#mbReportsPanel .mbrep-mv{text-align:left}}';
+     /* v2004 · Hier stand @media(max-width:600px). Die Absicht war
+        richtig, der Massstab falsch: gemessen wird das FENSTER (1568 px),
+        waehrend die Liste nach dem Oeffnen eines Berichts in einer 290 px
+        schmalen Spalte sitzt. Die Regel sah vorhanden aus und war tot.
+        @container misst die Liste selbst. Bei schmaler Spalte wird aus
+        der Zeile ein Block: Kennung und Adresse oben, darunter Datum und
+        Wert, die Knoepfe in eigener Reihe - statt vier Spalten auf einer
+        Breite, die fuer eine reicht. */
+     +'@container mbrep (max-width:560px){'
+       +'#mbReportsPanel .mbrep-row{flex-wrap:wrap;gap:6px 10px;align-items:flex-start}'
+       +'#mbReportsPanel .mbrep-icb{display:none}'
+       +'#mbReportsPanel .mbrep-main{flex:1 1 100%}'
+       +'#mbReportsPanel .mbrep-l1{flex-wrap:wrap;gap:6px}'
+       +'#mbReportsPanel .mbrep-addr{white-space:normal;line-height:1.35}'
+       +'#mbReportsPanel .mbrep-mv{flex:0 0 auto;text-align:left;font-size:13px}'
+       +'#mbReportsPanel .mbrep-mv small{display:inline;margin-left:5px}'
+       +'#mbReportsPanel .mbrep-act{flex:1 1 auto;justify-content:flex-end;gap:5px}'
+       +'#mbReportsPanel .mbrep-act button{padding:6px 10px;font-size:11px}'
+     +'}';
     document.head.appendChild(st);
   }
   p=document.createElement('div'); p.className='panel'; p.id='mbReportsPanel'; p.style.display='none'; /* v942: wird von _mbLoadReportsList gesteuert */
@@ -2463,8 +2497,16 @@ function _mbMapTouch(m) {
 function drawMap(lat, lon, comps) {
   if (!map) {
     map = L.map('map', { zoomControl: true }).setView([lat, lon], 16);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap, © CARTO', maxZoom: 19,
+    /* v2004 · Carto verlangt seit Kurzem einen Schluessel und liefert
+       fuer JEDE Kachel dieselbe Grafik "API KEY REQUIRED" - gemessen:
+       drei verschiedene Kacheln, drei Zoomstufen, HTTP 200, 2049 Byte,
+       md5 502fc5f6793fad87, identisch. Ein Ausfall mit Statuscode 200
+       loest kein tileerror aus; Leaflet zeichnet ihn brav.
+       OSM-Standard braucht keinen Schluessel. ACHTUNG: dort gibt es
+       weder Subdomains ({s}) noch Retina-Kacheln ({r}) - beide
+       Platzhalter muessen raus, sonst laufen die Anfragen ins Leere. */
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap-Mitwirkende', maxZoom: 19,
     }).addTo(map);
     _mbMapTouch(map);
   } else {
@@ -3806,7 +3848,20 @@ async function exportPdf(out) {
      * das seit v1061 aus — es stand nur nirgends im Dokument. */
     const _vw = cc.verfahrenswahl || null;
     const _vwKey = (_vw && _vw.verfahren) ? _vw.verfahren : null;
-    const _fuehrt = (k) => (_vwKey ? _vwKey === k : k === 'vergleichswert');
+    /* ══ v1971 · OHNE FUEHRENDES VERFAHREN FUEHRT NICHTS ════════════════
+
+       Hier stand als Rueckfall `k === 'vergleichswert'`: liefert
+       `verfahrenswahl` kein Verfahren, galt der Vergleichswert als
+       fuehrend. Das war gedacht fuer den Fall „noch nicht gerechnet".
+
+       Seit v1971 gibt `verfahrenswahl` fuer Wohnungseigentum OHNE
+       kaufpreisbasierte Grundlage ABSICHTLICH kein Verfahren zurueck —
+       und dieser Rueckfall haette genau dort die Angebotskarte wieder zur
+       fuehrenden gemacht. Also das Gegenteil dessen, was der Patch im
+       Backend bewirkt.
+
+       Jetzt fuehrt nichts, wenn nichts fuehrt. */
+    const _fuehrt = (k) => (_vwKey ? _vwKey === k : false);
     const sw = cc.sachwert || {}, ew = cc.ertragswert || {};
     /* v1057-WVGL-1 · Oben steht die Marktpreisindikation aus Angeboten —
      * das ist richtig und aktuell. Hier unten steht der Verfahrensvergleich
@@ -3815,13 +3870,41 @@ async function exportPdf(out) {
      * oben und unten dieselbe Zahl aus derselben Quelle und bestaetigen
      * sich gegenseitig. */
     const _irwOk = cc.irw && cc.irw.verfuegbar && cc.irw.wert_qm > 0;
-    const _vglTitel = _irwOk ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
+    /* ══ v1971 · DER TITEL FOLGT DER BASIS DER ZAHL ═════════════════════
+
+       Hier stand:
+
+         const _vglTitel = _irwOk ? 'VERGLEICHSWERT · AMTLICH'
+                                  : 'MARKTPREIS AUS ANGEBOTEN';
+
+       Lag ein Immobilienrichtwert vor, hiess die Karte „VERGLEICHSWERT ·
+       AMTLICH" und die Zeile „Angebotspreise — keine beurkundeten
+       Kaufpreise" fiel weg. DIE ANGEZEIGTE ZAHL BLIEB DABEI UNVERAENDERT
+       `cc.comparison.vergleichswert_eur` — also der Median aus
+       Portalinseraten. Der Immobilienrichtwert fliesst nirgends in diese
+       Zahl ein (CrossCheckService schreibt ihn nur nach `out.irw`).
+
+       Der Hinweis verschwand damit genau dann, wenn er am meisten
+       taeuscht: ueber einer Angebotszahl stand „amtlich".
+
+       Jetzt entscheidet `cc.comparison.basis`, was das Backend seit
+       v1971 mitliefert und was die Zahl wirklich traegt. Der
+       Immobilienrichtwert wird weiter gezeigt — als eigene Zeile, nicht
+       als Titel. */
+    const _vglBasis = (cc.comparison && cc.comparison.basis) || 'angebote';
+    const _vglAmtlich = _vglBasis === 'kaufpreise';
+    const _vglTitel = _vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
     card3(M, _vglTitel, cc.comparison.vergleichswert_eur, [
       mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m² Median' : null,
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
-      /* v1057-WVGL-2 */
+      /* v1971: BEIDE Zeilen, nicht die eine ODER die andere. Der
+         Immobilienrichtwert ist eine Auskunft fuer sich; der
+         Paragraf-25-Hinweis haengt daran, woraus die ZAHL gebildet ist. */
       _irwOk
         ? 'Immobilienrichtwert ' + cc.irw.wert_qm + ' €/m² · Stichtag ' + (cc.irw.stichtag || '?')
+        : null,
+      _vglAmtlich
+        ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)'
         : 'Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)',
       /* v1061-WTXT-1 · Hier stand der rohe Bezeichner: "Immobilienrichtwerte:
        * nicht_beschlossen". Ein Datenbankwert im Kundenbericht. */

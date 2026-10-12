@@ -331,6 +331,106 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                13072 war die letzte Luecke unter den im Register gefuehrten
                                MV-Landkreisen (13071, 13073, 13076 liegen). */
                             'lzs-swf-mv-rostock-2026-sperren.json',
+                            /* ══ v1976 · DIE ERSTEN VERGLEICHSFAKTOREN ═══════════
+
+                               Bis zum 08.10.2026 fuehrte das Register 0 Saetze mit
+                               der Kennzahl `vergleichsfaktor` — gemessen ueber alle
+                               58 Dateien. Der Leseweg war gebaut und ungenutzt:
+                               `gutachterausschuss.js:1339` wertet sie aus, `api.js`,
+                               `CrossCheckService` und `verfahrenswahl.js` kennen sie.
+
+                               Seit v1971 fuehrt das Vergleichswertverfahren nur noch
+                               mit KAUFPREISBASIERTER Grundlage — ohne sie weist der
+                               Bericht kein fuehrendes Verfahren aus. Diese zwei
+                               Dateien sind der Anfang der Gegenseite.
+
+                               vgf-bb.json · Landkreis Barnim, GMB 2025, 2 WERTE
+                                 ezfh  Matrix 13x7 (Wohnflaeche x Bodenwert), Euro/m2
+                                       Wohnflaeche, RND-Koeffizient, 123 Kauffaelle,
+                                       R2 0,70 -> Stufe B
+                                 rhdhh Matrix 9x10, zwei Koeffizienten (RND und
+                                       Grundstuecksflaeche), 79 Kauffaelle, R2 0,79
+                                       -> Stufe A
+                                 Anwendungsbeispiele nachgerechnet: EZFH S. 85 Soll
+                                 „rd. 582.000", Ist 581.175 (Abweichung 0,14 % — der
+                                 Bericht rechnet mit dem UNGERUNDETEN Faktor 1,0515
+                                 und druckt 1,05, deshalb B statt A). DHH S. 102 Soll
+                                 „rd. 376.000", Ist 375.685 -> vollstaendig
+                                 reproduziert.
+
+                               > ACHTUNG, DOPPELZAEHLUNG: diese Vergleichsfaktoren
+                               > ENTHALTEN den Bodenwert („beinhalten den Gebaeude-
+                               > und Bodenwert"). Ein zusaetzlicher Bodenwertansatz
+                               > zaehlt ihn zweimal. Steht in den `auflagen`.
+
+                               vgf-sl.json · Saarland, 7 SPERREN, kein Wert
+                                 3x vergleichsfaktor Saarpfalz-Kreis (10045): die
+                                   Faktoren EXISTIEREN, der Ausschuss gibt sie nur
+                                   auf Antrag gegen Gebuehr heraus (30,74 Euro je
+                                   halbe Stunde) und verbietet die oeffentliche
+                                   Wiedergabe ohne Erlaubnis. Kein dl-de, also
+                                   `quellenvermerk: null` — ein Vermerk ist hier
+                                   nicht FEHLEND, sondern nicht existent.
+                                 4x liegenschaftszinssatz Landeshauptstadt
+                                   Saarbruecken (10041100, im Register bisher gar
+                                   nicht vertreten): als Wert gesperrt, weil es
+                                   ANGEWENDETE und nicht abgeleitete Saetze sind, jeder
+                                   Modellvermerk nach § 10 fehlt, und eine SPANNE kein
+                                   Wert ist — bei MFH 1,5 bis 5,0 % laege ein
+                                   Mittelwert um mehr als das Dreifache daneben.
+
+                               > Die Saarpfalz-Faktoren sind der EINZIGE
+                               > Vergleichsfaktor-Ausschuss des Landes — amtlich so
+                               > gesagt im Immobilienmarktbericht der Landeshauptstadt
+                               > 2026, Kap. 7.2, S. 56: „Vergleichsfaktoren liegen
+                               > zurzeit im Saarland nur fuer den Saar-Pfalz-Kreis
+                               > vor." */
+                            'vgf-bb.json',
+                            'vgf-sl.json',
+                            /* v1976b: Berlin — 3 WERTE und 1 Sperre.
+
+                               ezfh           Matrix 8x7 (Bodenrichtwert x BGF),
+                                              Euro/m2 BRUTTO-GRUNDFLAECHE, 2.859
+                                              Kauffaelle
+                               ezfh_sehr_gut  8 Stuetzstellen, 26 Kauffaelle
+                               villa          7 Stuetzstellen, 38 Kauffaelle
+                               etw            SPERRE: die neun „Tabellen" sind
+                                              gezeichnete ENTSCHEIDUNGSBAEUME. Alle 73
+                                              Endknotenwerte und die Altbezirks-
+                                              zuordnung sind geerntet (Fallzahlprobe
+                                              9.779 = 9.779 ohne Rest), aber NICHT,
+                                              welche Split-Schwelle zu welchem
+                                              Endknoten fuehrt — die Verbinderlinien
+                                              sind von Beschriftungsfeldern
+                                              zerschnitten, und drei
+                                              Rekonstruktionsregeln ergaben drei
+                                              verschiedene Kantenmengen. Das ist
+                                              Tuning, keine Messung, also steht kein
+                                              geratener Pfad in der Datei. Mit einem
+                                              Rasterizer in einem Durchgang
+                                              aufloesbar.
+
+                               Anwendungsbeispiel EZFH S. 17 Zeile fuer Zeile
+                               nachgerechnet: Ausgangswert 3.336, Baujahr 1936 +/-0,
+                               Doppelhaushaelfte -278, schlechter Zustand -566 ->
+                               2.492 Euro/m2 BGF, Grundbesitzwert 498.400 Euro. Soll
+                               = Ist in jeder Zeile.
+
+                               > ⚠ VERWENDUNG IST „INTERN", UND DAS IST KEIN
+                               > FORMFEHLER. Die Blaetter sagen woertlich: „Die
+                               > Vergleichsfaktoren ersetzen nicht eine
+                               > gutachterliche Ermittlung des Verkehrswertes im
+                               > Sinne des § 194 BauGB", und jeder Endknoten tragt
+                               > „ausschliesslich fuer die steuerliche Bewertung".
+                               > Sie sind amtlich fuer die steuerliche
+                               > Bedarfsbewertung und die Kaufpreisaufteilung, NICHT
+                               > als Verkehrswert.
+                               >
+                               > Wer sie an `_vglKaufpreise` in CrossCheckService
+                               > verdrahtet (v1971), macht daraus ein fuehrendes
+                               > Vergleichswertverfahren, das sie nicht tragen. Die
+                               > Verdrahtung muss `verwendung` lesen. */
+                            'vgf-be.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

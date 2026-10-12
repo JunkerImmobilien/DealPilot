@@ -35,7 +35,27 @@
     entwicklungs:   ['ds2_entwicklung', 'ds2_entwicklungsmoeglichkeiten'],
     leerstand:      ['leerstand'],
     instandhaltung: ['instandhaltung', 'ihr', 'instandh'],
-    mietausfall:    ['ds2_mietausfall', 'mietausfall']
+    mietausfall:    ['ds2_mietausfall', 'mietausfall'],
+    /* ── v2079 · DREI SCORE-FELDER FEHLTEN IM ZAEHLER ──────────────────
+       Gemessen am 10.10.2026: `index.html` fuehrt NEUN `ds2_`-Felder, die
+       in den Investor-Deal-Score eingehen. Diese Liste kannte sechs.
+       `ds2_marktfaktor`, `ds2_marktmiete` und `ds2_zustand` standen im
+       Formular, gingen in den Score ein und zaehlten in keinem
+       Fortschrittsbalken mit.
+
+       `ds2_zustand` ist dabei dasselbe Feld, das `rnd-calc.js` als
+       Rueckfall fuer die Gewerke-Bewertung liest - es wirkt also auch auf
+       die Restnutzungsdauer. Ein Feld mit zwei Wirkungen und null
+       Zaehlungen.
+
+       Das ist derselbe Fehler, den v1841 fuer die Objektart-Pflichtfelder
+       behoben hat, und der Satz von damals gilt hier genauso:
+       „Eine Vollstaendigkeitsanzeige, die nicht alles kennt, was
+       gebraucht wird, meldet Vollstaendigkeit - und das ist schlimmer
+       als keine. Sie beendet die Suche." */
+    marktfaktor:    ['ds2_marktfaktor'],
+    marktmiete:     ['ds2_marktmiete'],
+    zustand:        ['ds2_zustand']
   };
 
   /* Deutsche Chip-Labels (unabhaengig vom Score). */
@@ -45,7 +65,9 @@
     mikrolage: 'Mikrolage', makrolage: 'Makrolage', bevoelkerung: 'Bev\u00f6lkerung',
     nachfrage: 'Nachfrage', mietwachstum: 'Mietwachstum', wertsteigerung: 'Wertsteigerung',
     entwicklungs: 'Entwicklungsm\u00f6glichkeiten', leerstand: 'Leerstand',
-    instandhaltung: 'Instandhaltung', mietausfall: 'Mietausfall-Risiko'
+    instandhaltung: 'Instandhaltung', mietausfall: 'Mietausfall-Risiko',
+    /* v2079 - die drei, die der Zaehler nicht kannte */
+    marktfaktor: 'Marktfaktor', marktmiete: 'Marktmiete', zustand: 'Objektzustand'
   };
 
   function esc(s) {
@@ -115,6 +137,72 @@
     etagen_ges:'Etagen gesamt'
   };
 
+  /* ── v2079 · DIE STUFE DES REITERS OBJEKT ZAEHLT MIT ─────────────────
+   *
+   * Marcel am 10.10.2026: „Wir haben jetzt auch unser Tab-Objekt umgebaut
+   * und haben dort drei Stufen … Unten unter Deal-Aktion haben wir dann
+   * Bereit für die Bank. Dort sind es aber nur 14 Grundfelder … dass wir
+   * je nach Stufe verschiedene Grundfelder voraussetzen."
+   *
+   * GEMESSEN: die Staffel ist gebaut und wurde hier nur nicht gefragt.
+   * `objekt-reiter.js` führt sie in `pflichtFuer(stufe)` und exportiert
+   * sie über `window.DealPilotObjektReiter`:
+   *
+   *     Stufe 1   6 Felder   Adresse, Objektart, Wohnfläche, Baujahr
+   *     Stufe 2  13 Felder   dazu Kaufpreis, Miete, Zustand, Energie,
+   *                          Standardstufe, Zimmer (+Etage/Einheiten)
+   *     Stufe 3  bis 20      dazu Grundstück, Bodenrichtwert, BGF, MEA,
+   *                          NHK-Typ, Garage
+   *
+   * Dieser Block zählte dagegen 15 feste Felder — und zwar die des
+   * Investor-Deal-Scores (Zins, Tilgung, Lagen, Mietwachstum …). Das ist
+   * ein ANDERER Zweck als die Wertermittlung, deshalb bleiben beide
+   * Listen. Aber „Bereit für die Bank?" ist erst beides zusammen: der
+   * Score braucht seine Felder, der Verkehrswert die der gewählten Stufe.
+   *
+   * > Zwei richtige Listen für zwei Zwecke sind kein Fehler. Einer von
+   * > ihnen nicht zu fragen, schon — die Anzeige meldete Vollständigkeit
+   * > für die Hälfte der Arbeit.
+   *
+   * Die Stufe kommt aus `zielstufe()`, also aus derselben Pille, die der
+   * Nutzer im Reiter Objekt gesetzt hat. Fehlt das Modul, zählt wie
+   * bisher nur der Score — kein harter Ausfall. */
+  function stufenPflicht() {
+    var OR = window.DealPilotObjektReiter;
+    if (!OR || typeof OR.pflichtFuer !== 'function') return { stufe: null, felder: [] };
+    var stufe = 1;
+    try { stufe = parseInt(OR.zielstufe && OR.zielstufe(), 10) || 1; } catch (e) { stufe = 1; }
+    var ids;
+    try { ids = OR.pflichtFuer(stufe) || []; } catch (e) { return { stufe: stufe, felder: [] }; }
+    var raus = [];
+    ids.forEach(function (id) {
+      /* Was der Score schon zaehlt, nicht doppelt fuehren. */
+      if (SCORE_IDS[id]) return;
+      var e = document.getElementById(id);
+      if (!e) return;                        /* nicht im DOM — nicht zaehlen */
+      raus.push({ id: id, name: (OR.FELDNAMEN && OR.FELDNAMEN[id]) || id,
+        gefuellt: String(e.value || '').trim() !== '' });
+    });
+    return { stufe: stufe, felder: raus };
+  }
+
+  /* v2079 · KEINE zweite Namensliste hier. Die Beschriftungen kommen aus
+     `DealPilotObjektReiter.FELDNAMEN` — dieselbe Quelle, die auch der
+     Reiter Objekt und `tools/objekt-vollstaendigkeit.mjs` nennen. Eine
+     Kopie an dieser Stelle wuerde genau das Problem erzeugen, das
+     `pflichtFuer()` vermeidet: zwei Listen, die auseinanderlaufen, sobald
+     ein Feld dazukommt. Fehlt die Quelle, steht die id da — unschoen,
+     aber nicht falsch. */
+
+  /* Welche DOM-Ids der Score schon abdeckt — gegen Doppelzaehlung. */
+  var SCORE_IDS = (function () {
+    var m = {};
+    Object.keys(FIELD_TARGETS).forEach(function (k) {
+      FIELD_TARGETS[k].forEach(function (id) { m[id] = true; });
+    });
+    return m;
+  })();
+
   function artPflichtFelder() {
     var OA = window.DealPilotObjektart;
     var sel = document.getElementById('objart');
@@ -144,9 +232,16 @@
       total++;
       if (!p.gefuellt) missing.push({ key: '_art_' + p.id, name: p.name, art: true });
     });
+    /* v2079 · Was die gewaehlte Eingabetiefe zwingend braucht. */
+    var sp = stufenPflicht();
+    sp.felder.forEach(function (p) {
+      total++;
+      if (!p.gefuellt) missing.push({ key: '_stufe_' + p.id, name: p.name, stufe: true });
+    });
     var filled = total - missing.length;
     var percent = total ? Math.round(filled / total * 100) : 0;
-    return { percent: percent, filled: filled, total: total, missing: missing };
+    return { percent: percent, filled: filled, total: total, missing: missing,
+      stufe: sp.stufe, stufe_felder: sp.felder.length };
   }
 
   function buildHtml(d) {
@@ -167,9 +262,17 @@
         '<button type="button" class="dp-rc-exp-btn" onclick="DealPilotReadyCheck.exp(\'invest\')">Investment-PDF</button>' +
         '<button type="button" class="dp-rc-exp-btn" onclick="DealPilotReadyCheck.exp(\'bmf\')">BMF-Steuer</button>' +
       '</div>';
+    /* v2079 \u00b7 Die Stufe gehoert in die Ueberschrift, nicht nur in den
+       Zaehler. \u201e28 von 34 Feldern" sagt nichts darueber, WELCHE 34 das
+       sind - und die Zahl aendert sich, wenn der Nutzer die Eingabetiefe
+       umstellt. Ohne die Stufe daneben sieht das wie ein Fehler aus. */
+    var stufeTxt = d.stufe
+      ? ' \u00b7 Eingabetiefe ' + d.stufe + (d.stufe_felder ? ' (+' + d.stufe_felder + ')' : '')
+      : '';
     return '<div id="da-readycheck" class="da-readycheck">' +
       '<div class="dp-rc-head"><span class="dp-rc-title">Bereit f\u00fcr die Bank?</span>' +
-        '<span class="dp-rc-prog">' + d.filled + ' / ' + d.total + ' Feldern \u00b7 ' + pct + ' %</span></div>' +
+        '<span class="dp-rc-prog">' + d.filled + ' / ' + d.total + ' Feldern \u00b7 ' + pct + ' %'
+        + esc(stufeTxt) + '</span></div>' +
       '<div class="dp-rc-bar"><div class="dp-rc-bar-fill" style="width:' + pct + '%"></div></div>' +
       body + exp +
     '</div>';
@@ -204,9 +307,14 @@
        und stehen nicht in FIELD_TARGETS — ihre id ist der Schluessel
        selbst. Ohne diesen Zweig fuehrte ihr Chip ins Leere, und ein Chip,
        der nicht springt, sieht aus wie ein kaputter Chip. */
+    /* v2079 · Dieselbe Falle fuer die Stufen-Pflichtfelder: ihr Praefix ist
+       `_stufe_`, ihre id steckt dahinter. Ein Chip, der nicht springt,
+       sieht aus wie ein kaputter Chip. */
     var el = (key && key.indexOf('_art_') === 0)
       ? document.getElementById(key.slice(5))
-      : firstEl(FIELD_TARGETS[key] || []);
+      : (key && key.indexOf('_stufe_') === 0)
+        ? document.getElementById(key.slice(7))
+        : firstEl(FIELD_TARGETS[key] || []);
     if (!el) return;
     var sec = el.closest ? el.closest('.sec') : null;
     if (sec) {

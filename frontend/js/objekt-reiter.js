@@ -35,8 +35,15 @@
 
   /* ── Objekt, wie es der Dienst braucht (nur was den Zins bestimmt) ──── */
   function objektFuerApi() {
+    /* v1965: die MODERNISIERUNGSPUNKTE gehen mit. Ohne sie kann der
+       Endpunkt Anlage 2 nicht anwenden - er fiel still auf die Schaetzung
+       zurueck, waehrend die Oberflaeche „rechnet nach Anlage 2 neu"
+       versprach. Der Wert kommt aus derselben Quelle wie die Zeile
+       darunter (`modPunkte()`), damit nicht zwei Zahlen entstehen. */
+    var _mp = modPunkte();
     return { plz: _v('plz'), ort: _v('ort'), str: _v('str'), hnr: _v('hnr'), objart: _v('objart'),
-             baujahr: _v('baujahr'), einheiten: _v('einheiten'), nutzungsart: _v('nutzungsart'), wfl: _v('wfl') };
+             baujahr: _v('baujahr'), einheiten: _v('einheiten'), nutzungsart: _v('nutzungsart'), wfl: _v('wfl'),
+             mod_punkte: _mp ? _mp.total : null, modernis: _v('modernis') };
   }
 
   /* ═══ Automatik-Leiste ═══════════════════════════════════════════════ */
@@ -59,6 +66,30 @@
     var tip = m && STUFEN[m[1]] ? ' title="' + esc(STUFEN[m[1]]) + '"' : '';
     return '<span class="oe-st ' + cls + '"' + tip + '>' + esc(txt) + '</span>';
   }
+  /* ══ v1967 · WELCHE RESTNUTZUNGSDAUER HIER STEHT ══════════════════════
+
+     Marcel am 08.10.2026: „Es koennte ja sein, dass die Leute, wenn sie
+     Restnutzungsdauer lesen, dann denken, dass sie sich auf ein
+     Restnutzungsdauergutachten bezieht. Das ist ja in diesem Fall nicht
+     so. Wenn das so ist, muesstest du mir das einmal sagen."
+
+     ES IST SO. Die Zahl in dieser Leiste ist die Restnutzungsdauer FUER
+     DIE VERKEHRSWERTERMITTLUNG: sie traegt die lineare
+     Alterswertminderung im Sachwertverfahren (Paragraf 38 Abs. 1
+     ImmoWertV) und den Vervielfaeltiger im Ertragswertverfahren
+     (Paragraf 34). Ein Restnutzungsdauergutachten nach Paragraf 7
+     Abs. 4 Satz 2 EStG verfolgt einen ANDEREN Zweck — die
+     Abschreibungsdauer gegenueber dem Finanzamt — und wird vom Modul
+     fuer Nutzungsdauergutachten erstellt, nicht hier.
+
+     Dieselbe Formel, zwei Zwecke. Deshalb steht es jetzt dran, statt
+     dass der Leser es sich zusammenreimt. */
+  var RND_HINWEIS = '<div class="oe-legende"><b>Restnutzungsdauer:</b> die hier '
+    + 'gezeigte Zahl gilt für die <b>Verkehrswertermittlung</b> — Alterswertminderung '
+    + 'im Sachwertverfahren (§ 38 ImmoWertV) und Vervielfältiger im Ertragswertverfahren '
+    + '(§ 34). Ein <b>Restnutzungsdauergutachten</b> für die Abschreibung '
+    + '(§ 7 Abs. 4 Satz 2 EStG) ist etwas anderes und entsteht nicht hier.</div>';
+
   var LEGENDE = '<div class="oe-legende"><b>Stufen:</b> A amtlich für Gebiet und Objektart · B amtlich, übergeordnet oder Modellansatz · '
     + 'C amtlich aus einer Nachbargemeinde desselben Ausschusses · D gesetzlicher Auffangwert (§ 256 BewG) · E eigene Angabe. '
     + 'Eingabetiefe 1/2/3 = Marktpreisindikation / erweiterte Indikation / Sach- und Ertragswert.</div>';
@@ -73,6 +104,43 @@
     if (manuell) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(manuell) + ' €/m² — ' + q;
     return zeile('Bodenrichtwert', brw ? esc(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));
   }
+
+  /* ══ v1972 · DER WEG ZUR ANLAGE 2 ════════════════════════════════════
+
+     Marcel am 08.10.2026: „das brauchst du nicht weiter anzeigen, also
+     dass das gemacht wird. Aber es wäre schon gut, dass man signalisiert
+     bekommt: Wo ist denn die Anlage 2 und wo muss ich die aufstellen?
+     Dass der Weg klar ist. Vielleicht, ja, dass man da irgendwie einen
+     kleinen Absprung hat ... Oder wenigstens das rauslesen kann dann im
+     Tab Objekt, welche Felder da wo gefüllt werden müssten."
+
+     Die Zeile sagte bisher, wie viel schon erfasst IST („5 von 8
+     Bauteilen angegeben, gerechnet"). Das ist eine Auskunft über den
+     Stand, keine über den WEG. Jetzt stehen die acht Felder als Chips
+     da, die leeren hervorgehoben, und ein Klick springt hin.
+
+     Der Absprung ist nicht neu gebaut: `abweichend(feld)` gibt es seit
+     v1852 und macht genau das Richtige — es öffnet die Detailkarte
+     (`#oe-karte-gewerke`, `data-oe-detail="1"`), setzt die Eingabetiefe
+     auf Stufe 3, klappt auf, rollt hin und setzt den Fokus. Der
+     Klick-Verteiler auf `[data-oe-feld]` liegt schon. Es fehlte nur der
+     Knopf.
+
+     > Die Beschriftungen stehen HIER und nicht im HTML abgelesen: ein
+     > `<label class="oe-sr">` ist für Bildschirmleser gedacht und heißt
+     > „Außenwände · modernisiert" — in einem Chip ist der Zusatz
+     > Füllmaterial. Dafür sind es dieselben acht Schlüssel wie in
+     > `modPunkte()` darunter, damit nicht zwei Listen entstehen. */
+  var MOD_FELDER = [
+    ['mod_dach',        'Dach'],
+    ['mod_fenster',     'Fenster'],
+    ['mod_leitungen',   'Leitungen'],
+    ['mod_heizung',     'Heizung'],
+    ['mod_aussenwand',  'Außenwände'],
+    ['mod_baeder',      'Bäder'],
+    ['mod_innenausbau', 'Innenausbau'],
+    ['mod_grundriss',   'Grundriss'],
+  ];
 
   function modPunkte() {
     var W = window.DealPilotRND_Wizard;
@@ -92,7 +160,106 @@
     var v = String(p.total);
     var opt = Array.prototype.find.call(sel.options, function (o) { return o.value === v; });
     if (!opt) { opt = document.createElement('option'); opt.value = v; opt.textContent = v + ' Punkte (aus den Gewerken)'; opt.setAttribute('data-oe-auto', '1'); sel.appendChild(opt); }
-    if (sel.value !== v) { sel.value = v; }
+    /* ══ v1973 · GESETZT IST NICHT GESPEICHERT ═════════════════════════
+
+       Hier stand nur `sel.value = v;`.
+
+       Ein programmatisch gesetzter Wert loest KEIN `change`-Ereignis aus.
+       Die Punkte standen damit im Auswahlfeld, aber die Speicherung hat
+       sie nie gesehen — obwohl `storage.js:43` `mod_punkte` ausdruecklich
+       unter den gesicherten Feldern fuehrt.
+
+       GEMESSEN am 08.10.2026 in der Produktionsdatenbank:
+
+         21 Objekte fuehren die acht Modernisierungsfelder
+         10 davon haben ein LEERES `mod_punkte`
+
+       Bei diesen zehn faellt der Bericht auf die Schaetzung zurueck,
+       obwohl die Antworten vorliegen — und nichts widerspricht. Genau
+       der stille Rueckfall, den dieselbe Datei an anderer Stelle als
+       „schlimmer als ein Fehler" bezeichnet.
+
+       `mfh-einheiten.js:624` macht es seit Langem richtig und ist die
+       Vorlage: `dispatchEvent(new Event('change', { bubbles: true }))`.
+
+       > KEINE SCHLEIFE: die `change`-Listener fuer die Automatik haengen
+       > an den ACHT Gewerke-Feldern (`mod_dach` bis `mod_grundriss`),
+       > nicht an `mod_punkte`. Vorher gegengelesen — `mod_punkte` wird in
+       > dieser Datei von keinem Listener beobachtet. */
+    if (sel.value !== v) {
+      sel.value = v;
+      try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    }
+  }
+
+  /* ══ v1979 · WORIN SICH ZWEI BERICHTE UNTERSCHEIDEN ══════════════════
+
+     Marcel: „man hat die hintereinander abgerufen und wuerde ja jetzt
+     erwarten, dass die gleich sind ... kann ja sein, dass er da wieder
+     was eingetippt hat, zwei unterschiedliche Sachen, und dann passt das
+     nicht mehr und er kann sich nicht mehr dran erinnern."
+
+     Verglichen wird mit dem naechstaelteren Bericht DERSELBEN ART —
+     einen Ertragswert gegen einen Sachwert zu stellen waere sinnlos.
+
+     Gezeigt wird die ZEILE des Rechenwegs, die sich unterscheidet, nicht
+     eine Prozentzahl. „9.256 EUR mehr" sagt nichts; „sonstige Ertraege
+     1.080 EUR x Barwertfaktor" sagt, was eingetippt war.
+
+     > Der Vergleich ueber die BESCHRIFTUNG, nicht ueber die Position:
+     > fehlt eine Zeile, verschieben sich alle folgenden um eins, und ein
+     > Vergleich nach Index meldet dann fuenf Unterschiede statt einem.
+     > Gemessen an den beiden Parkstr.-Berichten: 11 gegen 12 Zeilen. */
+  function _wegMap(weg) {
+    var m = {};
+    (weg || []).forEach(function (z) {
+      if (!z || !z.pos) return;
+      /* Die Beschriftung traegt teils Zahlen in Klammern. Fuer
+         den Vergleich zaehlt der Name davor, die Klammer steht
+         in der Anzeige. */
+      var name = String(z.pos).replace(/\s*\(.*$/, '').trim();
+      m[name] = { wert: z.wert, voll: String(z.pos) };
+    });
+    return m;
+  }
+  function _unterschiedZeigen(liste, i) {
+    var ziel = document.getElementById('oe-vw-diff');
+    if (!ziel) return;
+    var h = liste[i];
+    ziel.innerHTML = '';
+    if (!h || !h.weg || !h.weg.length) return;
+    /* den naechstaelteren Bericht DERSELBEN Art finden */
+    var vor = null;
+    for (var j = i + 1; j < liste.length; j++) {
+      if (liste[j].art === h.art && liste[j].weg && liste[j].weg.length) { vor = liste[j]; break; }
+    }
+    if (!vor) return;
+    var a = _wegMap(h.weg), b = _wegMap(vor.weg);
+    var zeilen = [];
+    Object.keys(b).forEach(function (k) {
+      if (!(k in a)) zeilen.push({ art: 'weg', k: k, voll: b[k].voll, wert: b[k].wert });
+    });
+    Object.keys(a).forEach(function (k) {
+      if (!(k in b)) zeilen.push({ art: 'neu', k: k, voll: a[k].voll, wert: a[k].wert });
+      else if (String(a[k].wert) !== String(b[k].wert)) {
+        zeilen.push({ art: 'anders', k: k, voll: a[k].voll, wert: a[k].wert, alt: b[k].wert });
+      }
+    });
+    if (!zeilen.length) {
+      ziel.innerHTML = '<span class="oe-q">Rechenweg identisch zum Bericht vom '
+        + _datum(vor.created_at) + '.</span>';
+      return;
+    }
+    var kopf = '<b>Unterschied zum Bericht vom ' + _datum(vor.created_at) + '</b>';
+    var txt = zeilen.slice(0, 6).map(function (z) {
+      var w = (z.wert == null || z.wert === '') ? '' : deNum(Number(z.wert)) + ' €';
+      if (z.art === 'weg') return '<span class="oe-d-weg">− ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' — damals dabei, jetzt nicht</span>';
+      if (z.art === 'neu') return '<span class="oe-d-neu">+ ' + esc(z.voll) + (w ? ' (' + w + ')' : '') + ' — jetzt dabei, damals nicht</span>';
+      return '<span class="oe-d-and">' + esc(z.k) + ': ' + deNum(Number(z.alt)) + ' € → ' + w + '</span>';
+    }).join('<br>');
+    ziel.innerHTML = '<div class="oe-q oe-vw-diff-box">' + kopf + '<br>' + txt
+      + (zeilen.length > 6 ? '<br><span class="oe-q">… und ' + (zeilen.length - 6) + ' weitere</span>' : '')
+      + '</div>';
   }
 
   async function automatik() {
@@ -101,8 +268,42 @@
     var o = objektFuerApi();
     var mp = modPunkte();
     modPunkteSchreiben(mp);
-    var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—',
-      mp ? st('b', 'gerechnet') + mp.angaben + ' von 8 Bauteilen angegeben (Gewerke-Tabelle, Anlage 2)' : 'aus der Spalte „modernisiert" in der Gewerke-Tabelle', '');
+    /* ══ v1967 · 0 PUNKTE IST EIN BEFUND, KEIN LEERES FELD ═════════════
+
+       Gemessen an Parkstr. 9: 5 von 8 Bauteilen sind angegeben, und es
+       kommen 0 von 20 Punkten heraus. Das ist RICHTIG gerechnet — die
+       Anlage 2 vergibt weniger als die Maximalpunkte, wenn die
+       Massnahmen weiter zurueckliegen, und bei alten Jahrgaengen null.
+
+       Es ist aber nicht dasselbe wie „nichts angegeben", und der
+       Bericht schrieb bisher genau das: „Es wurde kein
+       Modernisierungsgrad erfasst." Deshalb steht hier jetzt, WAS die
+       Zahl bedeutet und was sie kostet.
+
+       Warum es der staerkste Hebel ist, am echten Kern gemessen
+       (Parkstr. 9, Baujahr 1905, GND 80):
+
+         0 Punkte   ->  10 Jahre   (Rueckfall: GND minus Alter, Untergrenze)
+         8 Punkte   ->  Anlage 2 greift
+        14 Punkte   ->  deutlich mehr
+
+       Und die Restnutzungsdauer traegt den Gebaeudesachwert linear
+       (Paragraf 38 Abs. 1 ImmoWertV). */
+    /* v1972: die Chips sind der Weg. Die LEEREN tragen `fehlt` und
+       stehen vorn — wer etwas nachtragen will, sieht zuerst, was fehlt. */
+    var mpChips = (function () {
+      var voll = [], leer = [];
+      MOD_FELDER.forEach(function (f) {
+        var c = '<span class="oe-chip' + (_v(f[0]) ? '' : ' fehlt')
+          + '" data-oe-feld="' + f[0] + '">' + esc(f[1]) + '</span>';
+        (_v(f[0]) ? voll : leer).push(c);
+      });
+      return '<span class="oe-chips">' + leer.concat(voll).join('') + '</span>';
+    })();
+    var mpQ = (mp && mp.total > 0 ? st('a', 'Anlage 2 greift') : st('x', 'Anlage 2 greift nicht'))
+      + 'Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle (Anlage 2 ImmoWertV) und tragen die Restnutzungsdauer. Klick springt zum Feld:'
+      + '<br>' + mpChips;
+    var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
       box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
         + zeile('Sachwertfaktor', '—', 'PLZ eintragen', '') + zeile('GND / RND', '—', 'Baujahr und Objektart eintragen', '') + mpZeile;
@@ -151,13 +352,35 @@
           + ' Eigener Ansatz möglich:', knopf('eintragen', 'sachwertfaktor'));
       }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
-      html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + (r.rnd_jahre != null ? r.rnd_jahre : '—') + ' J.',
-        gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV') + ' · Restnutzungsdauer aus Baujahr' + (mp ? ' — mit ' + mp.total + ' Modernisierungspunkten rechnet der Bericht nach Anlage 2 neu' : ''), '');
+      /* ══ v1965 · DIE RESTNUTZUNGSDAUER MIT IHRER HERKUNFT ════════════
+
+         Hier stand `r.rnd_jahre` ohne jede Einordnung, und dahinter die
+         feste Zusage „mit N Modernisierungspunkten rechnet der Bericht
+         nach Anlage 2 neu". Beides war an dieser Stelle nicht gedeckt:
+         der Endpunkt hat Anlage 2 nie angewandt (siehe api.js, v1965),
+         und eine 0 kam als Gedankenstrich an.
+
+         Jetzt steht da, welcher der beiden Wege gerechnet hat:
+
+           anlage2      das Modell der Anlage 2 aus den Punkten
+           geschaetzt   Gesamtnutzungsdauer minus Alter — der RUECKFALL
+
+         Beim Rueckfall steht auch, WARUM, denn das ist die Antwort auf
+         Marcels Frage „wo muss ich die Eingaben machen": die
+         Modernisierungspunkte sind der einzige Hebel. */
+      var rndTxt = (r.rnd_jahre == null) ? '—' : deNum(r.rnd_jahre, (r.rnd_jahre % 1 ? 1 : 0));
+      var rndQ = r.rnd_quelle === 'anlage2' ? st('a', 'Anlage 2')
+              : r.rnd_quelle === 'geschaetzt' ? st('b', 'geschätzt') : '';
+      var rndSatz = r.rnd_hinweis ? esc(r.rnd_hinweis)
+              : 'Restnutzungsdauer aus Baujahr und Modernisierungspunkten (Anlage 2 ImmoWertV).';
+      html += zeile('GND / RND', (r.gnd_jahre || '—') + ' / ' + rndTxt + ' J.',
+        gq + 'Gesamtnutzungsdauer ' + (r.gnd_quelle === 'register' ? 'aus dem Modell des Ausschusses' : 'nach Anlage 1 ImmoWertV')
+        + ' · ' + rndQ + rndSatz, '');
       var bpi = r.baupreisindex;
       if (bpi && bpi.wert) html += zeile('Baupreisindex', deNum(bpi.wert, 2), st('b', 'Konstante') + '2010 → ' + esc(bpi.stichtag || '') + ' · noch nicht je Ausschuss (Backlog B1)', '');
     }
     html += mpZeile;
-    html += LEGENDE;   /* v1865 */
+    html += RND_HINWEIS + LEGENDE;   /* v1967 + v1865 */
     box.innerHTML = html;
     /* v1855 · was der Anfragen-Block wissen muss: fehlt der Zins, fehlt der Faktor? */
     /* v1865 · Stufe D ist der gesetzliche Auffangwert (§ 256 BewG) — ein Wert,
@@ -356,7 +579,14 @@
   }
   var ZIEL_KEY = 'dp_zielstufe';
   function zielstufe() { try { var z = parseInt(localStorage.getItem(ZIEL_KEY), 10); return (z >= 1 && z <= 3) ? z : 1; } catch (e) { return 1; } }
-  function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} zielAnwenden(); stufen(); }
+  /* v2001 · Marcel: „wenn ich oben mit den kleinen Kreisen wechsle, dann
+     steht immer noch: fuer Stufe 3 fehlt noch." Gemessen: `_fehlStufe`
+     wurde NUR in stufeAbrufen() gesetzt - die Zeile unten zeigte die
+     zuletzt ABGERUFENE Stufe, nicht die gewaehlte. Jetzt folgt sie der
+     Wahl. Die Eingabetiefe selbst bleibt ein Merker je NUTZER (siehe
+     oben) - verwirrend war nicht die gemerkte Tiefe, sondern dass die
+     Zeile ihr nicht folgte. */
+  function zielSetzen(z) { try { localStorage.setItem(ZIEL_KEY, String(z)); } catch (e) {} fehlZeileSetzen(z); zielAnwenden(); stufen(); }
   function zielAnwenden() {
     var z = zielstufe();
     document.querySelectorAll('[data-oe-ziel]').forEach(function (b) { b.classList.toggle('on', parseInt(b.getAttribute('data-oe-ziel'), 10) === z); });
@@ -372,11 +602,23 @@
     if (hint) hint.textContent = z === 1 ? 'Einfach: Adresse, Objektart, Wohnfläche, Baujahr — Marktpreisindikation.'
       : z === 2 ? 'Mittel: dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe — erweiterte Indikation, Gewerke sichtbar.'
       : 'Ausgiebig: dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ — Sach- und Ertragswert, Block unten.';
-    var e3 = document.querySelector('.card[data-oe-stufe-min="3"]');
-    if (e3) {
+    /* ══ v1967 · ALLE Stufe-3-Bereiche, nicht nur der erste ════════════
+
+       Hier stand `querySelector` — SINGULAR. Der Mechanismus war gebaut,
+       deckte aber genau ein Element ab, und ein zweites Element mit
+       demselben Attribut waere lautlos sichtbar geblieben.
+
+       Marcel am 08.10.2026: „wenn wir natuerlich einfache Stufe haben,
+       Stufe 1 oder Stufe 2, dann brauchen wir das ja gar nicht angeben,
+       ne?" — richtig. Die Leiste zeigt Bodenrichtwert,
+       Liegenschaftszins, Sachwertfaktor, GND/RND und Baupreisindex;
+       alles davon braucht erst die Wertermittlung nach ImmoWertV. Kein
+       einziges dieser Felder steht in pflichtFuer(1) oder
+       pflichtFuer(2) — `brw` kommt erst bei `stufe >= 3` dazu. */
+    document.querySelectorAll('[data-oe-stufe-min="3"]').forEach(function (e3) {
       e3.classList.toggle('oe-stufe-aus', z < 3);
       if (z === 3 && e3.classList.contains('v212-collapsed')) { var t = e3.querySelector('.v212-collapse-toggle'); if (t) t.click(); }
-    }
+    });
     /* v1854 · die Detailkarten (Gewerke, Bauteile) hängen am Haken; Mittel
        und Ausgiebig setzen ihn von selbst, Einfach lässt ihn, wie er war. */
     var cb = $('oe-details-cb');
@@ -393,12 +635,55 @@
       f.classList.remove('oe-pflicht-fehlt');
       f.querySelectorAll('input,select').forEach(function (el) { el.style.removeProperty('border-color'); el.style.removeProperty('box-shadow'); });
     });
+    /* v1978: die Hebel-Markierung MIT abräumen — sonst bleibt der Rahmen
+       stehen, wenn jemand das Feld gerade gefüllt hat. Gemessen am
+       Vorgänger: `oe-pflicht-fehlt` wurde abgeräumt, eine zweite Klasse
+       hätte überlebt. */
+    document.querySelectorAll('.oe-hebel-leer').forEach(function (f) {
+      f.classList.remove('oe-hebel-leer');
+      f.querySelectorAll('input,select').forEach(function (el) { el.style.removeProperty('border-color'); el.style.removeProperty('box-shadow'); });
+    });
+    /* ══ v1978 · DIE LEEREN MODERNISIERUNGSFELDER WERDEN MITMARKIERT ════
+
+       Marcel am 08.10.2026: „wenn wir Sachen haben, die noch fehlen, dann
+       kann man ja draufklicken. Da wäre es gut, wenn du auch so eine rote
+       Umrahmung um das Feld setzt. Die, die du jetzt gemacht hast, kann
+       man nicht richtig erkennen."
+
+       Die acht Gewerke-Felder sind seit v1972 als Chips verlinkt, das
+       ZIELFELD selbst blieb aber unmarkiert — wer hinsprang, landete auf
+       einem Feld wie jedem anderen.
+
+       Markiert wird mit DERSELBEN Farbe und demselben Schatten wie die
+       Pflichtfelder (`#B8625C`), nicht mit einer zweiten. Zwei Rottöne
+       für dieselbe Aussage wären genau die Verwirrung, die hier gerade
+       behoben wird.
+
+       > SIE ZÄHLEN NICHT ALS PFLICHT. `fehltFuer()` bleibt unberührt, die
+       > Stufen-Leiste sagt weiter „bereit". Marcels Entscheidung vom
+       > 08.10.2026 war ausdrücklich, dass ohne Modernisierungspunkte
+       > trotzdem ein Bericht entsteht — nur mit der Schätzung statt
+       > Anlage 2. Ein roter Rahmen zeigt den Hebel, er sperrt nicht.
+
+       Deshalb eine eigene Klasse `oe-hebel-leer` statt
+       `oe-pflicht-fehlt`: die Optik ist dieselbe, die BEDEUTUNG nicht,
+       und beim Aufräumen darf das eine nicht das andere mitnehmen. */
     fehltFuer(z).forEach(function (id) {
       var el = $(id); var f = el && el.closest('.f'); if (!f) return;
       f.classList.add('oe-pflicht-fehlt');
       el.style.setProperty('border-color', '#B8625C', 'important');
       el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
     });
+    if (z >= 3) {
+      MOD_FELDER.forEach(function (mf) {
+        if (_v(mf[0])) return;
+        var el = $(mf[0]); if (!el) return;
+        var f = el.closest('.f') || el.closest('td') || el.parentElement;
+        if (f) f.classList.add('oe-hebel-leer');
+        el.style.setProperty('border-color', '#B8625C', 'important');
+        el.style.setProperty('box-shadow', '0 0 0 2px rgba(184,98,92,.18)', 'important');
+      });
+    }
     optionalMarkieren();
     preflightPillen();
   }
@@ -456,6 +741,10 @@
   }
   var _fehlStufe = null;   /* v1852: die zuletzt angefragte Stufe — die Fehlliste folgt der Eingabe */
   function fehlendeNachziehen() { if (_fehlStufe) fehlendeZeigen(_fehlStufe, fehltFuer(_fehlStufe)); }
+  /* v2001 · eine Stelle, die die Zeile auf eine Stufe stellt - gerufen
+     von den Kreisen UND beim Objektwechsel. Ohne den Objektwechsel blieb
+     nach dem Loeschen die Fehlliste des geloeschten Objekts stehen. */
+  function fehlZeileSetzen(z) { _fehlStufe = z; fehlendeZeigen(z, fehltFuer(z)); }
   function stufeAbrufen(s) {
     var fehlt = fehltFuer(s);
     _fehlStufe = s;
@@ -511,12 +800,36 @@
     if (hint && r && r.hinweise && r.hinweise.length) hint.setAttribute('title', r.hinweise.join(' '));
   }
 
+  /* ══ v1964 · WOHER DIE ZAHLEN STAMMEN ════════════════════════════════
+     Marcel am 08.10.2026: „Unter Lage und Einschaetzung muss die Quelle
+     dran, woher wir das bezogen haben und aus welchem Bericht."
+
+     Vorher stand dort eine feste Beschriftung: „(Marktdaten, Zensus,
+     Makro-Score)" - eine Aufzaehlung dessen, was es GEBEN KOENNTE, nicht
+     dessen, was in DIESEM Bericht steckt. Eine Herkunftsangabe, die
+     immer dieselbe ist, ist keine.
+
+     Jetzt kommt sie aus `meta.provenance` des tatsaechlichen Berichts,
+     mit seinem Datum. Fehlt beides, steht gar nichts da - lieber keine
+     Angabe als eine erfundene. */
+  function _lageHerkunft(D) {
+    if (!D) return '';
+    var teile = [];
+    if (D.quelle_lage) teile.push(esc(D.quelle_lage));
+    if (D.bericht_datum) teile.push('Bericht vom ' + esc(D.bericht_datum));
+    return teile.length ? ' <span class="oe-q">(' + teile.join(' · ') + ')</span>' : '';
+  }
+
   /* ═══ Lage: Einschätzung neben Datenlage (sobald ein Bericht da ist) ═ */
   function lageVergleich() {
     var box = $('oe-lage-vergleich'); if (!box) return;
     var D = null;
     try { D = (window.DealPilotMB && typeof DealPilotMB.letzter === 'function') ? DealPilotMB.letzter() : null; } catch (e) {}
-    var eig = [['Makrolage', _v('makrolage')], ['Mikrolage', _v('mikrolage')], ['Bevölkerung', _v('ds2_bevoelkerung')], ['Nachfrage', _v('ds2_nachfrage')]]
+    /* v1958b: die Lageklasse zuerst - sie ist die Entscheidung, die
+       anderen sind Einschaetzungen. `_v()` liefert den rohen Wert (A/B/C),
+       daraus wird "A-Lage". Leer bleibt leer und faellt durch den
+       vorhandenen filter() heraus. */
+    var eig = [['Lageklasse', (_v('lageklasse') ? _v('lageklasse') + '-Lage' : '')], ['Makrolage', _v('makrolage')], ['Mikrolage', _v('mikrolage')], ['Bevölkerung', _v('ds2_bevoelkerung')], ['Nachfrage', _v('ds2_nachfrage')]]
       .filter(function (p) { return p[1]; }).map(function (p) { return p[0] + ' <b>' + esc(p[1].replace(/_/g, ' ')) + '</b>'; });
     if (!eig.length && !D) { box.style.display = 'none'; return; }
     var dat = [];
@@ -527,7 +840,7 @@
       if (D.bevRaw != null) dat.push('Bevölkerung <b>' + (D.bevRaw >= 0 ? '+' : '') + esc(deNum(D.bevRaw, 1)) + ' %</b>');
     }
     box.innerHTML = '<div class="oe-box"><h5>IHRE EINSCHÄTZUNG</h5>' + (eig.length ? eig.join(' · ') : '<span class="oe-leer">noch keine</span>') + '</div>'
-      + '<div class="oe-box"><h5>DATENLAGE · GEMESSEN (Marktdaten, Zensus, Makro-Score)</h5>' + (dat.length ? dat.join(' · ') : '<span class="oe-leer">erscheint nach dem ersten Marktbericht</span>') + '</div>';
+      + '<div class="oe-box"><h5>DATENLAGE · GEMESSEN' + _lageHerkunft(D) + '</h5>' + (dat.length ? dat.join(' · ') : '<span class="oe-leer">erscheint nach dem ersten Marktbericht</span>') + '</div>';
     box.style.display = '';
   }
 
@@ -555,24 +868,85 @@
     var lauf = ++_vwLauf;
     var j = await api('/marktbericht/objects/history?ref=' + encodeURIComponent(ref));
     if (lauf !== _vwLauf) return;
-    var liste = ((j && j.history) || []).filter(function (h) { return Number(h.market_value) > 0; });
+    /* ══ v1963 · JEDE ZAHL IST EIN EIGENER EINTRAG ═══════════════════
+       Vorher stand hier nur der Marktwert je Bericht. Nach einer Stufe-3-
+       Wertermittlung gibt es aber DREI Zahlen, und welche als Verkehrswert
+       gilt, entscheidet der Sachverstaendige - nicht die Software.
+
+       Deshalb wird je Bericht fuer jede vorhandene Zahl ein eigener
+       Eintrag gebaut, benannt und datiert. Wer den Ertragswert will,
+       waehlt den Ertragswert.
+
+       > Die Reihenfolge ist Absicht: Ertragswert und Sachwert ZUERST,
+       > denn sie stammen aus einem Verfahren nach ImmoWertV. Der
+       > Marktwert ist eine Indikation aus Angebotspreisen. */
+    var roh = (j && j.history) || [];
+    var liste = [];
+    roh.forEach(function (h) {
+      /* v1965: `fuehrend` kommt aus `cross_check.verfahrenswahl` des
+         Berichts - die Software entscheidet das nicht selbst, sie gibt
+         die Entscheidung des Berichts weiter (Paragraf 6 Abs. 1
+         ImmoWertV: das Verfahren richtet sich nach dem im gewoehnlichen
+         Geschaeftsverkehr Ueblichen). Der MARKTWERT kann nie fuehrend
+         sein - er ist eine Indikation aus Angebotspreisen, kein
+         Verfahren nach ImmoWertV. */
+      /* v1979: der Rechenweg je Art wandert mit in den Eintrag, damit
+         zwei Berichte derselben Art verglichen werden koennen. */
+      var basis = { created_at: h.created_at, ai_mode: h.ai_mode,
+                    fuehrend_grund: h.fuehrend_grund, fuehrend_quelle: h.fuehrend_quelle };
+      var fv = String(h.fuehrend || '');
+      var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
+      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert', weg: h.ertrag_weg || null }));
+      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert', weg: h.sachwert_weg || null }));
+      if (isFinite(m) && m > 0) liste.push(Object.assign({}, basis, { wert: m, art: 'Marktwert', fuehrend: false }));
+    });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    /* v1963: neueste zuerst. Innerhalb desselben Berichts bleibt die
+       Einfuegereihenfolge (Ertrag, Sach, Markt) stehen - Array.sort ist
+       in modernen Browsern stabil. */
     liste.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
     var opt = function (h, i) {
-      return '<option value="' + i + '">' + _datum(h.created_at) + (_stufeAus(h) ? ' · ' + _stufeAus(h) : '') + ' · ' + deNum(h.market_value, 0) + ' €</option>';
+      /* v1963: die ART steht vorn - sie ist die Information, nicht das Datum. */
+      /* v1965: das Kennzeichen steht HINTEN und klein, wie Marcel es
+         wollte. Der Grund wandert in den Tooltip - im Dropdown ist kein
+         Platz fuer einen Satz. */
+      var _f = h.fuehrend ? ' · führend' : '';
+      var _t = h.fuehrend && h.fuehrend_grund
+        ? ' title="' + esc(h.fuehrend_grund + (h.fuehrend_quelle ? ' (' + h.fuehrend_quelle + ')' : '')) + '"' : '';
+      return '<option value="' + i + '"' + _t + '>' + (h.art || 'Marktwert') + ' · '
+        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _f + '</option>';
     };
     box.innerHTML = (liste.length > 1
-      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'
-      : '<span class="oe-q">Marktbericht ' + _datum(liste[0].created_at) + (_stufeAus(liste[0]) ? ' · ' + _stufeAus(liste[0]) : '') + ': <b>' + deNum(liste[0].market_value, 0) + ' €</b></span>')
+      ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select><div id="oe-vw-diff"></div>'
+      : '<span class="oe-q">' + (liste[0].art || 'Marktwert') + ' · '
+        + _datum(liste[0].created_at) + ': <b>' + deNum(liste[0].wert) + ' €</b></span>')
       + '<button type="button" class="oe-btn" id="oe-vw-btn">als Verkehrswert übernehmen</button>'
       + (liste.length > 1 ? '<span class="oe-q">' + liste.length + ' Berichte im Verlauf</span>' : '');
     box.style.display = '';
     box._liste = liste;
+    /* v1979a: beim Rendern sofort den Unterschied des ersten Eintrags,
+       und bei jeder Auswahl neu. Ohne den Listener blieb die Zeile leer —
+       live gemessen, und es sah aus wie „es gibt keinen Unterschied". */
+    var _s = $('oe-vw-wahl');
+    if (_s) {
+      _s.addEventListener('change', function () {
+        _unterschiedZeigen(liste, parseInt(_s.value, 10) || 0);
+      });
+    }
+    _unterschiedZeigen(liste, _s ? (parseInt(_s.value, 10) || 0) : 0);
   }
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
+    /* v1979a: der Aufruf von `_unterschiedZeigen` stand HIER — in
+       `verkehrswertSetzen()`, also im Weg zum Knopf „als Verkehrswert
+       uebernehmen". Der Unterschied erschien damit erst NACH dem
+       Uebernehmen, nicht beim Auswaehlen. Genau verkehrt: man will
+       wissen, worin sich zwei Berichte unterscheiden, BEVOR man einen
+       von ihnen uebernimmt. Er haengt jetzt am Dropdown. */
     var sel = $('oe-vw-wahl'); var h = box._liste[sel ? parseInt(sel.value, 10) || 0 : 0]; if (!h) return;
-    el.value = String(Math.round(Number(h.market_value)));
+    /* v1963: `wert` statt `market_value` - der Eintrag weiss selbst,
+       welche Zahl er traegt (Ertrags-, Sach- oder Marktwert). */
+    el.value = String(Math.round(Number(h.wert != null ? h.wert : h.market_value)));
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }
@@ -637,7 +1011,9 @@
         if (typeof calc === 'function') { try { calc(); } catch (e) {} }
       });
     });
-    ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'].forEach(function (id) {
+    /* v1972: dieselbe Liste wie MOD_FELDER oben — sie stand hier ein
+       zweites Mal ausgeschrieben. */
+    MOD_FELDER.map(function (f) { return f[0]; }).forEach(function (id) {
       var el = $(id); if (el) el.addEventListener('change', function () { spaeter(automatik, 100); });
     });
     ['makrolage', 'mikrolage', 'ds2_bevoelkerung', 'ds2_nachfrage'].forEach(function (id) { var el = $(id); if (el) el.addEventListener('change', function () { spaeter(lageVergleich, 100); }); });
@@ -647,7 +1023,9 @@
        nachziehen: sofort nach dem Befuellen und nach dem Bodenrichtwert-
        Autolauf, der etwas spaeter seinen Status schreibt. */
     window.addEventListener('dp:object-ready', function () {
-      setTimeout(function () { alles(); stufen(); }, 120);
+      /* v2001 · fehlZeileSetzen mit: ein frisches (leeres) Objekt trug
+         sonst die Fehlliste des vorigen weiter. */
+      setTimeout(function () { alles(); stufen(); fehlZeileSetzen(zielstufe()); }, 120);
       setTimeout(alles, 1800);
     });
     window.addEventListener('dp:plan-ready', function () { stufen(); });
@@ -675,6 +1053,53 @@
   window.addEventListener('dp:mb-ready', function () {
     setTimeout(function () { try { verkehrswertUebernahme(); } catch (e) {} try { automatik(); } catch (e) {} }, 1500);
   });
-  window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte,
-    zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen };
+  /* ══ v1980 · DER VERLAUF GEHOERT ZUM OBJEKTWISSEN ════════════════════
+
+     Marcel am 08.10.2026: „wichtig ist auch, dass natuerlich dieser
+     Verlauf auch immer mit in das Objektwissen mit reingeht. Das haben
+     wir ja irgendwie mit der Pilotanalyse gemacht."
+
+     GEMESSEN, was der Co-Pilot heute bekommt (copilot.js, context()):
+
+       pilot_analyse           seit v1847
+       marktpreis_indikation   seit v1703
+       die WERTERMITTLUNG      gar nicht
+
+     Dabei liegt sie fertig da: die Wertanker-Liste fuehrt je Bericht
+     Art, Wert, das fuehrende Verfahren samt Grund und seit v1979 den
+     Rechenweg. An Parkstr. 9 sind das acht Eintraege aus vier Berichten.
+
+     Der Chat fragte das Modell also zu einem Objekt, dessen
+     Wertermittlung im Reiter daneben stand — genau der Befund, den v1847
+     fuer die Pilot-Analyse behoben hat.
+
+     Herausgegeben wird VERDICHTET: Art, Wert, Datum, fuehrend, Grund.
+     Der Rechenweg bleibt drin, weil er die Frage „warum zwei
+     verschiedene Ertragswerte?" beantwortet — aber nur die
+     Positionsnamen und Betraege, nicht die ganze Staffel.
+
+     > Gerechnet wird NICHTS. Nur gelesen, was die Leiste schon hat. */
+  function verlauf() {
+    var box = $('oe-vw');
+    if (!box || !box._liste || !box._liste.length) return null;
+    return box._liste.map(function (h) {
+      return {
+        art: h.art || null,
+        wert_eur: h.wert != null ? Math.round(Number(h.wert)) : null,
+        datum: h.created_at || null,
+        fuehrend: !!h.fuehrend,
+        fuehrend_grund: h.fuehrend || null ? (h.fuehrend_grund || null) : null,
+        rechenweg: (h.weg || []).map(function (z) {
+          return { pos: z && z.pos ? String(z.pos) : null, wert: z ? z.wert : null };
+        }),
+      };
+    });
+  }
+
+  window.DealPilotObjektReiter = { automatik: automatik, gewerke: gewerke, stufen: stufen, lageVergleich: lageVergleich, abweichend: abweichend, modPunkte: modPunkte, verlauf: verlauf,
+    zielstufe: zielstufe, zielSetzen: zielSetzen, fehltFuer: fehltFuer, pflichtFuer: pflichtFuer, stufeAbrufen: stufeAbrufen,
+    /* v2079: die Beschriftungen mit exportiert - der Readycheck in
+       deal-action-readycheck.js braucht sie, und eine zweite Namensliste
+       dort waere genau die Doppelung, die pflichtFuer vermeidet. */
+    FELDNAMEN: FELDNAMEN };
 })();

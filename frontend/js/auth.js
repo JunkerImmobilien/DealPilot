@@ -62,9 +62,35 @@ var Auth = (function() {
     try { data = await res.json(); } catch(e) { _jsonErr = e; } /* v724-json-throw */
     if (res.ok && _jsonErr) { throw new Error("Antwort konnte nicht gelesen werden (" + _jsonErr.name + ")"); }
     if (!res.ok) {
+      /* ══ v2137 · DIE ABGELAUFENE FRIST IST KEIN GEWOEHNLICHER 403 ══
+         Sie hat genau EINEN Ausweg: die Mail erneut schicken. Deshalb
+         wird hier das Band umgestellt, bevor der Fehler weiterfliegt -
+         sonst sieht der Nutzer nur eine Meldung und sucht den Knopf.
+
+         Der Fehler wird NICHT geschluckt: jeder Aufrufer bekommt ihn
+         wie bisher. Hier wird nur der Weg zurueck sichtbar gemacht.
+
+         > Eine Sperre ohne sichtbaren Ausweg ist eine Sackgasse. Das
+         > war der Grund, aus dem v2094 ueberhaupt ein Kennwort an den
+         > Fehler gehaengt hat. */
+      /* v2138: der kleine Zwang hat denselben Ausweg wie die abgelaufene
+         Frist - das Band zeigen, damit der Knopf 'Mail erneut senden' da
+         ist. Ein 403, der nur sagt 'geht nicht', schickt den Kunden in
+         den Support. */
+      if (res.status === 403 && data && (data.code === 'VERIFY_EXPIRED'
+            || data.code === 'EMAIL_NOT_VERIFIED_GATE'
+            || data.code === 'EMAIL_NOT_VERIFIED')) {
+        try {
+          if (window.DealPilotVerifyFrist) {
+            if (data.code === 'VERIFY_EXPIRED') window.DealPilotVerifyFrist.abgelaufen();
+            else window.DealPilotVerifyFrist.zeichne();
+          }
+        } catch (e) {}
+      }
       var msg = (data && data.error) || ('HTTP ' + res.status);
       var error = new Error(msg);
       error.status = res.status; error.data = data;
+      error.code = (data && data.code) || null;   /* v2137 */
       throw error;
     }
     return data;
@@ -168,6 +194,12 @@ var Auth = (function() {
       return this.getSession();
     },
     _storeSession(resp) {
+      /* v2137: wer sich erfolgreich anmeldet, hat die Frist entweder
+         noch offen (dann setzt die Kopfzeile das Band) oder bestaetigt
+         (dann kommt keine Kopfzeile mehr). Ein alter Merker wuerde das
+         Band sonst ewig stehen lassen - er wird hier geraeumt und von
+         der naechsten Antwort neu gesetzt, falls noetig. */
+      try { if (window.DealPilotVerifyFrist) window.DealPilotVerifyFrist.stop(); } catch (e) {}
       localStorage.setItem(TOKEN_KEY, resp.token);
       localStorage.setItem(SESSION_KEY, JSON.stringify({
         userId: resp.user.id, email: resp.user.email, name: resp.user.name,

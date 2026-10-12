@@ -1,10 +1,10 @@
-<!DOCTYPE html><!-- DealPilot API · v1543 -->
+<!DOCTYPE html><!-- DealPilot API · v2093 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>API · DealPilot</title>
-<meta name="description" content="Die DealPilot REST-API: Objekte programmatisch anlegen, lesen, ändern und löschen. JSON über HTTPS, Header X-API-Key, 120 Anfragen pro Minute. Enthalten im Pro-Plan.">
+<meta name="description" content="Die DealPilot REST-API: Objekte programmatisch anlegen, lesen, ändern und löschen. JSON über HTTPS, Header X-API-Key, 120 Anfragen pro Minute. Enthalten im Pro- und im Partner-Plan.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
@@ -116,7 +116,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         <li><a href="dp2.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
         <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 18 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
         <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
-        <li><a href="api.html" class="hier"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+        <li><a href="api.html" class="hier"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro- und Partner-Plan</span></span></a></li>
       </ul></li>
     <li><a href="dp2.html#stories">Stories</a></li>
     <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
@@ -143,7 +143,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <button class="api-back" data-view="landing">← zur&uuml;ck zur Startseite</button>
       <p class="eye ac">◆ DealPilot Platform</p>
       <h1>DealPilot <span class="ac">API</span></h1>
-      <p class="lead">Greife programmatisch auf deinen Objektbestand zu &mdash; anlegen, lesen, &auml;ndern, l&ouml;schen. Vollst&auml;ndige REST-Schnittstelle &uuml;ber HTTPS, JSON rein und raus. Enthalten im Pro-Plan.</p>
+      <p class="lead">Greife programmatisch auf deinen Objektbestand zu &mdash; anlegen, lesen, &auml;ndern, l&ouml;schen. Vollst&auml;ndige REST-Schnittstelle &uuml;ber HTTPS, JSON rein und raus. Enthalten im Pro- und im Partner-Plan.</p>
       <div class="chips"><span class="chip">REST · JSON</span><span class="chip">Header X-API-Key</span><span class="chip">Basis /api/v1</span><span class="chip">Voller CRUD</span><span class="chip">120 Anfragen/min</span></div>
     </div>
   </section>
@@ -194,6 +194,22 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
             <div class="ep"><span class="mm post">POST</span><span class="path">/objects</span><span class="desc">Anlegen — zählt gegen das Objektlimit deines Plans</span></div>
             <div class="ep"><span class="mm put">PUT</span><span class="path">/objects/:id</span><span class="desc">Ändern — <code>data</code> wird komplett ersetzt; optional <code>expectedVersion</code> gegen konkurrierende Änderungen</span></div>
             <div class="ep"><span class="mm del">DEL</span><span class="path">/objects/:id</span><span class="desc">Endgültig löschen (kein Papierkorb)</span></div>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/objects/portfolio-export</span><span class="desc">Das ganze Portfolio in einem Abruf — alle Objekte mit vollem <code>data</code>, für Auswertungen und Sicherungen</span></div>
+
+            <h3 style="margin:26px 0 10px">Rechenkerne &mdash; auf Zuruf rechnen</h3>
+            <div class="note"><b>Hier wird gerechnet, nicht nur gelesen.</b> Diese beiden Endpunkte führen dieselben Kerne aus wie die App selbst &mdash; wörtlich dieselben Dateien, in das Backend gespiegelt. Eine zweite Rechnung gibt es nicht, damit Schnittstelle und App nie unterschiedlich urteilen.</div>
+            <div class="ep"><span class="mm post">POST</span><span class="path">/rechenkerne/rnd</span><span class="desc">Restnutzungsdauer nach Anlage 2 ImmoWertV, sechs Verfahren. Eingabe <code>{ objekt: … }</code> (ein DealPilot-Datensatz) oder <code>{ eingabe: … }</code> (direkt). Optional <code>{ afa: { gebaeudeanteil, grenzsteuersatz, standardAfaSatz } }</code> &mdash; dann kommt der Steuervorteil mit. Zurück kommen <code>final_rnd</code>, <code>final_source</code>, alle Einzelverfahren und <code>eingabe_verwendet</code></span></div>
+            <div class="ep"><span class="mm post">POST</span><span class="path">/rechenkerne/verkehrswert</span><span class="desc">Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert, mit <code>wert_stufe</code> 1&ndash;3. Rechnet im Marktbericht-Dienst, weil dort das Register der Gutachterausschüsse liegt</span></div>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/rechenkerne/</span><span class="desc">Beschreibt sich selbst: welche Kerne es gibt, wo sie rechnen, welche Eingabe sie erwarten</span></div>
+            <div class="note" style="border-left-color:var(--gold)"><b>Zwei Dinge, die die Antwort mitliefert &mdash; und die wichtiger sind als die Zahl:</b>
+              <code>eingabe_verwendet</code> zeigt, <i>womit</i> wirklich gerechnet wurde (ein Feld, das nicht ankommt, wird sonst still durch einen Standardwert ersetzt), und
+              <code>pruefung.uebernahme_gesperrt</code> sagt, wann das Ergebnis <b>nicht</b> ohne Sachverständigenprüfung übernommen werden darf. Wer nur <code>final_rnd</code> ausliest, übersieht beides.</div>
+
+            <h3 style="margin:26px 0 10px">Marktbericht</h3>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/marktbericht/objects</span><span class="desc">Objekte mit Marktbericht-Bezug</span></div>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/marktbericht/reports/one</span><span class="desc">Einen erzeugten Bericht abrufen</span></div>
+            <div class="ep"><span class="mm get">GET</span><span class="path">/marktbericht/objects/history</span><span class="desc">Verlauf der Berichte zu einem Objekt</span></div>
+
             <p class="lead" style="margin-top:18px">Antwort-Beispiel <code>GET /objects/:id</code> (gekürzt):</p>
             <pre>{
   "id": "9b2f…",
@@ -228,8 +244,8 @@ curl -X PUT -H <span class="s">"X-API-Key: dpk_live_KEY"</span> -H <span class="
             <p class="lead">Damit du weißt, woran du bist: Die DealPilot-API ist heute eine <b>Daten-API</b> für deinen Objektbestand — bewusst schlank und stabil.</p>
             <div class="uc">
               <div class="c"><h3>Das kann sie heute</h3><p>Vollen Lese- und Schreibzugriff auf deine Objekte (CRUD), Summaries mit letztem KPI-Stand, Fotos und KI-Analyse-Text inklusive. Ideal für Import, Sync und eigenes Reporting.</p></div>
-              <div class="c"><h3>Berechnungen</h3><p>Deal Score, DSCR, Cashflow und Steuer werden in der App gerechnet. Die API liefert Rohdaten plus den zuletzt gespeicherten KPI-Stand — eine On-Demand-Berechnung per API gibt es noch nicht.</p></div>
-              <div class="c"><h3>Noch nicht per API</h3><p>KI-Co-Pilot und AVM-Marktbewertungen, PDF-Export-Erzeugung, Webhooks bei Änderungen sowie Volltextsuche/Filter (aktuell <code>limit</code>/<code>offset</code>).</p></div>
+              <div class="c"><h3>Berechnungen</h3><p>Deal Score, DSCR, Cashflow und Steuer werden in der App gerechnet; die API liefert dafür Rohdaten plus den zuletzt gespeicherten KPI-Stand. <b>Restnutzungsdauer und Verkehrswert rechnet die API auf Zuruf</b> — über <code>POST /rechenkerne/rnd</code> und <code>POST /rechenkerne/verkehrswert</code>, mit denselben Kernen wie die App.</p></div>
+              <div class="c"><h3>Noch nicht per API</h3><p>KI-Co-Pilot und AVM-Marktbewertungen, PDF-Export-Erzeugung, Webhooks bei Änderungen sowie Volltextsuche/Filter (aktuell <code>limit</code>/<code>offset</code>). Deal Score, DSCR und Cashflow gibt es nur als gespeicherten Stand, nicht auf Zuruf.</p></div>
               <div class="c"><h3>Roadmap</h3><p>Genau diese Punkte stehen auf der Ausbauliste. Du brauchst einen davon zuerst? Schreib an <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a> — API-Wünsche fließen direkt in die Priorisierung.</p></div>
             </div>
           </div>

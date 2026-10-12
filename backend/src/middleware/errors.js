@@ -25,9 +25,25 @@ function errorHandler(err, req, res, next) {
     return res.status(400).json({ error: 'Referenced resource does not exist' });
   }
 
-  // Custom HTTP error
+  /* ── v2094 · DER HANDLER HAT `code` WEGGEWORFEN ───────────────────────
+   *
+   * Hier stand `json({ error: err.message })`. Wer an einem `HttpError`
+   * ein `code` setzt, damit das Frontend zwei Faelle unterscheiden kann,
+   * bekam es nie zu sehen — die Zeile reicht nur die Botschaft weiter,
+   * und zwar lautlos. Gemessen am 10.10.2026, als `EMAIL_NOT_VERIFIED`
+   * fuer N60.3 gebraucht wurde.
+   *
+   * Durchgelassen wird nur ein ausdruecklich gesetztes Kennwort in
+   * GROSSBUCHSTABEN_MIT_UNTERSTRICH. Das ist kein Schoenheitsfilter: die
+   * PostgreSQL-Fehlercodes (`23505`, `23503` — zwei Zeilen weiter oben
+   * abgefangen) liegen ebenfalls auf `err.code`, und ein Datenbankcode
+   * gehoert nicht nach aussen.                                         */
   if (err.statusCode) {
-    return res.status(err.statusCode).json({ error: err.message });
+    const body = { error: err.message };
+    if (typeof err.code === 'string' && /^[A-Z][A-Z0-9_]{2,39}$/.test(err.code)) {
+      body.code = err.code;
+    }
+    return res.status(err.statusCode).json(body);
   }
 
   // Unknown error - log it, return generic 500

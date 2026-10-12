@@ -41,7 +41,39 @@
     { a: 0.4660, b: 1.0270, c: 0.9906, rel: 19 },
     { a: 0.4320, b: 0.9540, c: 0.9811, rel: 18 },
     { a: 0.3980, b: 0.8810, c: 0.9717, rel: 17 },
-    { a: 0.3640, b: 0.8810, c: 0.9622, rel: 16 },
+    /* ══ v1966 · HIER STAND b: 0.8810 — EIN TIPPFEHLER ══════════════════
+       Die 0.8810 der Zeile DARUEBER (11 Punkte) stand ein zweites Mal
+       hier bei 12 Punkten. Die b-Reihe der Tabelle 3 faellt ab 9 Punkten
+       um genau 0,0730 je Schritt:
+
+         P9 1.0270 · P10 0.9540 · P11 0.8810 · P12 0.8080 · P13 0.7350
+
+       BELEGT am Verordnungstext (gesetze-im-internet.de, Anlage 2
+       ImmoWertV, Tabelle 3): bei 12 Punkten gilt a=0,3640 b=0,8080
+       c=0,9622, relatives Alter 16 %. Beide anderen Kerne im Haus
+       (marktbericht anlage2.js und das Modul v4.2.2) fuehren 0.8080 —
+       nur diese Datei nicht.
+
+       WIRKUNG, am echten Kern gemessen (GND 80, 12 Punkte):
+
+         Baujahr 1995  54,04 statt 56,00 Jahre
+         Baujahr 1990  51,16 statt 53,78
+         Baujahr 1980  46,08 statt 49,44
+         Baujahr 1970  41,91 statt 46,00
+         Baujahr 1964  39,84 statt 44,37
+         Baujahr 1955  37,36 statt 42,54
+
+       Die Restnutzungsdauer fiel also bei genau EINER Punktzahl um bis zu
+       4,5 Jahre zu niedrig aus. Betroffen war nur P12 — P11 und P13 sind
+       richtig, deshalb sah die Tabelle beim Drueberlesen stimmig aus.
+
+       > Der Pruefer dieser Datei (tools/rnd-pruefung/, 22 Faelle gegen
+       > drei unterschriebene Gutachten) hat es nicht gefunden: unter den
+       > 22 Faellen war kein Objekt mit 12 Modernisierungspunkten. Ein
+       > Pruefer, der seine DECKUNG nicht nennt, wird gruen, ohne die
+       > Luecke zu zeigen. Deshalb gibt es jetzt
+       > tools/rnd-kerne-pruefen.mjs, der alle 21 Punktzahlen abfaehrt. */
+    { a: 0.3640, b: 0.8080, c: 0.9622, rel: 16 },
     { a: 0.3300, b: 0.7350, c: 0.9528, rel: 15 },
     { a: 0.3040, b: 0.6760, c: 0.9506, rel: 14 },
     { a: 0.2780, b: 0.6170, c: 0.9485, rel: 13 },
@@ -82,7 +114,31 @@
     gehoben:  { id: 'gehoben',  label: 'zukunftsorientiert / gehoben' }
   };
 
-  // Schadens-Katalog mit orientierenden RND-Abschlägen (BFH IX R 7/12)
+  /* ── Schadens-Katalog mit orientierenden RND-Abschlägen ──────────────
+   *
+   * v2080: HIER STAND „(BFH IX R 7/12)" als Quelle. Das Aktenzeichen
+   * belegt die Prozentsätze unten NICHT — kein BFH-Urteil nennt
+   * 5 % für einen feuchten Keller oder 25 % für Tragwerksmängel. Die
+   * Werte sind ein eigener Modellansatz.
+   *
+   * Gemeldet vom zweiten Chat am 10.10.2026: im Register steht das
+   * Urteil als „offen", der Leitsatz ist nicht geprüft. Nachgemessen:
+   * das Zitat steht **nur in diesem Kommentar** und in keinem Nutztext,
+   * erscheint also in keinem Gutachten und keiner Oberfläche. Das
+   * Risiko war damit nie der Kunde, sondern der nächste Entwickler —
+   * wer ein Aktenzeichen danebenstehen sieht, hält die Zahlen für
+   * belegt und prüft sie nicht nach.
+   *
+   * > Ein Aktenzeichen verleiht Autorität, auch wenn es die Zahl nicht
+   * > trägt. Das ist dieselbe Falle, die Marcel am Gutachten kritisiert
+   * > hat: dort stand „Anlage 1 ImmoWertV" unter einer GND, die aus
+   * > Anlage 22 BewG kam.
+   *
+   * Was die Abschläge WIRKLICH sind: sachverständige Orientierungswerte
+   * dieses Hauses, anzuwenden nur über `applySchadensAbschlag` und
+   * danach zu würdigen. Wird ein Urteil als Grundlage gebraucht, gehört
+   * es vorher geprüft und mit Leitsatz zitiert — im Backlog unter
+   * N60.27. */
   const SCHADEN_KATALOG = [
     { id: 'feuchte_keller',     label: 'Aufsteigende Feuchtigkeit im Keller',      abschlag: 5 },
     { id: 'feuchte_wand',       label: 'Feuchteschäden in Wohnräumen',             abschlag: 8 },
@@ -268,42 +324,94 @@
   // VERFAHREN 6: Technische Restnutzungsdauer — KORRIGIERT V3
   // ============================================================
   /**
-   * Korrigierte Formel basierend auf beiden Original-Gutachten:
-   *   Niedrig/veraltet:    RND-Basis × Anteil/100 / 2  → ABZUG
-   *   Aktueller Standard:  RND-Basis × Anteil/100 / 2  → AUFSCHLAG (NICHT neutral!)
-   *   Zukunftsorientiert:  RND-Basis × Anteil/100      → AUFSCHLAG (volle Gewichtung)
+   * Technische Restnutzungsdauer aus dem Zustand der Gewerke.
+   *
+   *   veraltet:  RND-Basis × Anteil/100 / 2  → ABZUG
+   *   zeitgemaess (standard): NEUTRAL        → siehe unten
+   *   gehoben:   RND-Basis × Anteil/100 / 2  → maessiger AUFSCHLAG
+   *
+   * ── v2074 · ZEITGEMAESSHEIT IST KEIN AUFSCHLAG ──────────────────────
+   *
+   * HIER STAND "Aktueller Standard: AUFSCHLAG (NICHT neutral!)" mit
+   * halber und fuer `gehoben` mit VOLLER Gewichtung. Am 10.10.2026
+   * nachgemessen, was das bedeutet (GND 80, alle Gewerke zeitgemaess):
+   *
+   *     Alter 10 -> 80 Jahre von 80   =  0,00 % Alterswertminderung
+   *     Alter 28 -> 78 Jahre          =  2,50 %
+   *     Alter 48 -> 48 Jahre          = 40,00 %
+   *
+   * Ein zehn Jahre genutztes Gebaeude ohne jede Abnutzung ist kein
+   * Bewertungsergebnis. Und mit `gehoben` erreichte schon ein Alter von
+   * 10 die volle Gesamtnutzungsdauer.
+   *
+   * Marcels Festlegung 1 vom 10.10.2026 ordnet das richtig zu:
+   * "Ursprüngliche, aber nachweislich zeitgemäße Bauteile dürfen
+   * Modernisierungspunkte erhalten." Zeitgemaessheit wirkt also ueber
+   * die PUNKTE in Anlage 2 - dort ist sie ausdruecklich vorgesehen und
+   * modellkonform gedeckelt. Ein zweites Mal als Aufschlag auf die
+   * technische RND gerechnet, zaehlt sie doppelt.
+   *
+   * Deshalb: zeitgemaess = Normalfall = Basis (GND - Alter). Nur
+   * nachweislich gehobene, also erneuerte Gewerke geben einen
+   * Aufschlag, und zwar den halben statt den vollen.
+   *
+   * ── DER DECKEL ──────────────────────────────────────────────────────
+   * Zusaetzlich 0,90 × GND als Obergrenze. Begruendung: Anlage 2 streckt
+   * selbst bei vollstaendiger Kernsanierung nur auf 90 Prozent der GND -
+   * es bleibt ein Abschlag fuer die verbliebene Altsubstanz. Was nach
+   * einer Kernsanierung nicht erreichbar ist, kann ein Gebaeude ohne
+   * eine solche nicht ueberschreiten.
+   *
+   * > Die Zahlenwerte dieser Formel (halbe Gewichtung, 0,90-Deckel) sind
+   * > ein MODELLANSATZ und gehoeren sachverstaendig bestaetigt. Der
+   * > Befund, den sie behebt, ist dagegen gemessen: 0,00 Prozent
+   * > Alterswertminderung bei zehn Jahren Alter.
+   *
+   * ── FEHLENDE ANGABE IST NICHT "ZEITGEMAESS" ─────────────────────────
+   * HIER STAND `|| 'standard'`: ein Gewerk ohne Bewertung galt als
+   * zeitgemaess und bekam den Aufschlag. `calcTechnisch(28, 80, {})`
+   * ergab deshalb 78 statt 52 Jahre - ohne eine einzige Angabe. Nicht
+   * bewertete Gewerke werden jetzt gezaehlt und in `unbewertet_pct`
+   * ausgewiesen; sie wirken neutral, behaupten aber nichts.
    */
   function calcTechnisch(alter, gnd, gewerkeBewertung, gewerkeWeights, gewerkeRestlebensdauer) {
     const weights = gewerkeWeights || {};
-    let pctVeraltet = 0, pctStandard = 0, pctGehoben = 0, totalWeight = 0;
+    let pctVeraltet = 0, pctStandard = 0, pctGehoben = 0, pctUnbewertet = 0, totalWeight = 0;
 
     // Gewerke mit ihren prozentualen Anteilen aufaddieren (wie im Original-Gutachten Kap. 5.3.2)
     GEWERKE.forEach(function (g) {
       const w = (weights[g.id] != null) ? Number(weights[g.id]) : g.weight;
       totalWeight += w;
-      const grad = (gewerkeBewertung && gewerkeBewertung[g.id]) || 'standard';
+      const grad = (gewerkeBewertung && gewerkeBewertung[g.id]) || null;
       if (grad === 'veraltet') pctVeraltet += w;
       else if (grad === 'gehoben') pctGehoben += w;
-      else pctStandard += w;
+      else if (grad === 'standard') pctStandard += w;
+      else pctUnbewertet += w;   /* v2074: nicht bewertet, nicht "zeitgemaess" */
     });
 
     // Auf 100% normieren falls Gewichte abweichen
     if (totalWeight > 0 && totalWeight !== 100) {
-      pctVeraltet = (pctVeraltet / totalWeight) * 100;
-      pctStandard = (pctStandard / totalWeight) * 100;
-      pctGehoben  = (pctGehoben  / totalWeight) * 100;
+      pctVeraltet   = (pctVeraltet   / totalWeight) * 100;
+      pctStandard   = (pctStandard   / totalWeight) * 100;
+      pctGehoben    = (pctGehoben    / totalWeight) * 100;
+      pctUnbewertet = (pctUnbewertet / totalWeight) * 100;
     }
 
     // Lineare Basis (= Regelfallformel: GND - Alter)
     const rndBasis = Math.max(0, gnd - alter);
 
-    // Korrigierte Gutachter-Formel:
-    const abzugVeraltet    = rndBasis * pctVeraltet / 100 / 2;
-    const aufschlagStandard = rndBasis * pctStandard / 100 / 2;
-    const aufschlagGehoben  = rndBasis * pctGehoben  / 100;
+    /* v2074: zeitgemaess wirkt neutral (siehe Kopf), gehoben mit halber
+       Gewichtung, veraltet zieht ab. */
+    const abzugVeraltet     = rndBasis * pctVeraltet / 100 / 2;
+    const aufschlagStandard = 0;
+    const aufschlagGehoben  = rndBasis * pctGehoben  / 100 / 2;
 
     let rnd = rndBasis - abzugVeraltet + aufschlagStandard + aufschlagGehoben;
-    rnd = Math.max(0, Math.min(rnd, gnd));
+    /* v2074: Obergrenze 0,90 x GND - was eine Kernsanierung nach
+       Anlage 2 nicht erreicht, erreicht ein Gebaeude ohne sie nicht. */
+    const technischMax = gnd * 0.90;
+    const gedeckelt = rnd > technischMax;
+    rnd = Math.max(0, Math.min(rnd, technischMax, gnd));
 
     const awm = gnd > 0 ? ((gnd - rnd) / gnd) * 100 : 0;
 
@@ -324,12 +432,16 @@
 
     // Formel im Gutachter-Format (1:1 wie im Original):
     const formula = fmtNum2(rndBasis) + ' Jahre - ' + fmtNum2(abzugVeraltet) + ' Jahre + '
-                  + fmtNum2(aufschlagStandard) + ' Jahre + ' + fmtNum2(aufschlagGehoben)
-                  + ' Jahre = ' + fmtNum2(rnd) + ' Jahre';
+                  + fmtNum2(aufschlagGehoben) + ' Jahre = ' + fmtNum2(rnd) + ' Jahre'
+                  + (gedeckelt ? ' (gedeckelt auf 0,90 x GND = ' + fmtNum2(technischMax) + ')' : '');
 
     return {
       method: 'technisch',
       label: 'Technische Restnutzungsdauer',
+      /* v2074 - Deckung der Bewertung: ohne sie sieht ein Ergebnis aus
+         Annahmen genauso aus wie eines aus Angaben. */
+      anteil_unbewertet_pct: round2(pctUnbewertet),
+      gedeckelt_auf_90_prozent: gedeckelt,
       anteil_veraltet_pct: round2(pctVeraltet),
       anteil_standard_pct: round2(pctStandard),
       anteil_gehoben_pct: round2(pctGehoben),
@@ -424,29 +536,142 @@
     const grenzen = [];
     const basisTechnisch = Math.max(0, gnd - alter);
 
+    /* ══ v2074 · DIE BERECHNUNGSREIHENFOLGE ════════════════════════════
+       Marcels verbindliche Festlegung vom 10.10.2026, Schritt 3 bis 6:
+
+         3. Modernisierungspunkte nach Anlage 2 ImmoWertV
+         4. Berechnung der modellhaften wirtschaftlichen Restnutzungsdauer
+         5. Sachverstaendige Plausibilitaetspruefung anhand des
+            tatsaechlichen technischen Zustands
+         6. Festlegung der endgueltigen wirtschaftlichen RND
+
+       und Regel 3: "Die technische Restlebensdauer eines einzelnen
+       Bauteils darf die wirtschaftliche Gebaeude-RND nicht automatisch
+       begrenzen" sowie "Das rechnerische Modellergebnis darf nicht
+       ungeprueft als endgueltige wirtschaftliche Restnutzungsdauer
+       uebernommen werden."
+
+       HIER STAND DIE UMGEKEHRTE REIHENFOLGE: die technische
+       Alterswertminderung war "vorrangig" und wurde Endwert, das
+       Punktraster lief als Beiwerk mit. Das hat drei unplausible
+       Ergebnisse erzeugt, am 10.10.2026 am echten Portfolio gemessen:
+
+         Objekt    Bj    Alter  Basis  Punktraster  technisch  Endwert
+         2026-1002 1998  28     52     52,00        78         78
+         2026-1007 1998  28     52     52,00        78         78
+         2026-999  1998  28     52     52,00        78         78
+
+       78 Jahre bei einem 28 Jahre alten Gebaeude sind 2,5 Prozent
+       Alterswertminderung - praktisch ein Neubau. Bei Alter 10 kommt
+       dieselbe Formel auf 80 von 80 Jahren, also NULL Abnutzung.
+
+       Die Ursache liegt in calcTechnisch: ein als zeitgemaess
+       bewertetes Gewerk gibt dort einen AUFSCHLAG von 50 Prozent auf
+       die Basis-RND, ein fehlendes gilt als zeitgemaess und bekommt ihn
+       ebenfalls. Zeitgemaessheit gehoert nach Marcels Festlegung 1 aber
+       in die MODERNISIERUNGSPUNKTE nach Anlage 2 - dort darf ein nie
+       modernisiertes, aber zeitgemaesses Bauteil Punkte erhalten - und
+       nicht in einen Aufschlag auf die technische Restnutzungsdauer.
+
+       > Das Modell rechnet. Die Technik prueft. Der Sachverstaendige
+       > entscheidet. In dieser Reihenfolge.
+
+       Die technische RND bleibt vollstaendig in `methods.technisch`
+       erhalten und wird als Plausibilitaetspruefung ausgewiesen - sie
+       verschwindet nicht, sie urteilt nur nicht mehr allein.         */
     let final, finalSource, verfahren;
-    if (basisTechnisch > 0) {
+    if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
+      final = punktraster.restnutzungsdauer;
+      verfahren = 'punktraster';
+      finalSource = 'Punktrastermethode (Anlage 2 ImmoWertV) - Modellergebnis';
+      /* Schritt 5: die Technik prueft das Modell, ersetzt es nicht. */
+      if (basisTechnisch > 0 && recommendedNachSchaden != null) {
+        const abw = recommendedNachSchaden - final;
+        const abwPct = final > 0 ? Math.abs(abw / final) * 100 : 0;
+        if (abwPct >= 20) {
+          grenzen.push({
+            greift: true, art: 'technik_weicht_ab',
+            text: 'Die technische Alterswertminderung ergibt '
+                + round2(recommendedNachSchaden) + ' Jahre und weicht damit um '
+                + round2(abw) + ' Jahre (' + round2(abwPct) + ' %) vom Modellergebnis ab. '
+                + (abw < 0
+                   ? 'Der bauliche Zustand ist schlechter, als das Modell unterstellt - '
+                   + 'Erneuerungsbedarf und Instandhaltungsrueckstand pruefen.'
+                   : 'Der bauliche Zustand ist besser, als das Modell unterstellt - '
+                   + 'pruefen, ob zeitgemaesse Bauteile als Modernisierungspunkte '
+                   + 'anzusetzen sind (Anlage 2 laesst das zu).')
+                + ' Eine Abweichung wird sachverstaendig gewuerdigt und begruendet, '
+                + 'nicht automatisch uebernommen.',
+            quelle: 'Fachliche Festlegung 10.10.2026, Schritt 5 - Plausibilitaetspruefung'
+          });
+        }
+      }
+    } else if (basisTechnisch > 0) {
+      /* Kein Modellergebnis (relatives Alter unter der Schwelle der
+         Anlage 2, oder keine Punkte) - dann traegt die technische
+         Ermittlung, und das wird benannt. */
       final = recommendedNachSchaden;
       verfahren = 'technisch';
       finalSource = applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
         ? 'technische Alterswertminderung + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
-        : 'technische Alterswertminderung (vorrangig)';
+        : 'technische Alterswertminderung - kein Modellergebnis nach Anlage 2';
     } else if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
       final = punktraster.restnutzungsdauer;
       verfahren = 'punktraster';
       finalSource = 'Punktrastermethode - technisch nicht mehr ableitbar (Alter >= GND)';
     } else {
+      /* ── v2073 · ALTER >= GND: BASIS NULL, ABER KEIN URTEIL ───────────
+         Marcels fachliche Festlegung vom 10.10.2026:
+
+           „Die rechnerische Basis-RND beträgt 0 Jahre. Daraus darf jedoch
+            nicht automatisch die tatsächliche wirtschaftliche
+            Restnutzungsdauer mit 0 Jahren abgeleitet werden. Eine
+            unkontrollierte Extrapolation der quadratischen
+            Modernisierungsformel über ihren fachlich plausiblen Bereich
+            ist ebenfalls nicht zulässig."
+
+         HIER STAND: „kein Verfahren liefert einen Wert (Alter >= GND,
+         Anlage 2 nicht anwendbar)". Das ist genau die Aussage, die
+         Marcel untersagt — Anlage 2 ist bei Alter >= GND nicht
+         GESETZLICH ausgeschlossen; was dort endet, ist der fachlich
+         plausible Bereich ihrer Formel. Der Unterschied ist nicht
+         akademisch: ein Gutachten, das sich auf einen Ausschluss beruft,
+         den die Verordnung nicht hergibt, ist angreifbar.
+
+         Was die Gegenprobe am Gutachten-Modul V4.2 zeigt, warum hier
+         NICHT extrapoliert wird (am echten `verfahrenPunktraster`
+         gerechnet, GND 80, 8 Punkte):
+
+             Alter  56 ->  38,0 Jahre
+             Alter  88 ->  31,6   (Scheitel)
+             Alter 130 ->  42,6
+             Alter 160 ->  56,0   = Kappe 0,7 * GND
+
+         Hinter dem Scheitel STEIGT die Parabel wieder. Ein 160 Jahre
+         altes Gebaeude bekaeme dort 56 Jahre Restnutzungsdauer - mehr
+         als ein 56 Jahre altes mit 38. Die Formel rechnet weiter, aber
+         sie bedeutet dort nichts mehr.
+
+         Deshalb: Basis 0 ausweisen, die Pruefung VERLANGEN, und einen
+         positiven Wert nur ueber `input.reelleRND` annehmen - also erst
+         nach dokumentierter fachlicher Beurteilung.                    */
       final = 0;
       verfahren = 'keines';
-      finalSource = 'kein Verfahren liefert einen Wert (Alter >= GND, Anlage 2 nicht anwendbar)';
+      finalSource = 'rechnerische Basis 0 Jahre - tatsaechliche Restnutzungsdauer '
+                  + 'sachverstaendig zu beurteilen';
       grenzen.push({
-        greift: true, art: 'kein_verfahren',
+        greift: true, art: 'pruefung_erforderlich',
         text: 'Das Alter (' + alter + ' J.) erreicht die Gesamtnutzungsdauer (' + gnd + ' J.). '
-            + 'Kein Verfahren rechnet hier - die technische Ermittlung hat keine Basis mehr, '
-            + 'und die Kurve der Anlage 2 liegt hinter ihrem Scheitel. '
-            + 'Naechster Schritt: Gesamtnutzungsdauer pruefen (bei Kernsanierung gilt ein '
-            + 'fiktives Baujahr) oder eine reelle Restnutzungsdauer sachverstaendig setzen.',
-        quelle: 'Anlage 2 ImmoWertV - Anwendungsbereich'
+            + 'Die rechnerische Basis betraegt damit 0 Jahre. Daraus folgt NICHT, dass die '
+            + 'wirtschaftliche Restnutzungsdauer 0 ist: ein genutztes Gebaeude hat eine. '
+            + 'Die Formel der Anlage 2 wird hier NICHT fortgerechnet - sie liegt hinter '
+            + 'ihrem Scheitelpunkt und steigt dort wieder an, was fachlich nicht tragfaehig ist. '
+            + 'Zu beurteilen sind Modernisierung, Sanierung, baulicher Zustand und '
+            + 'wirtschaftliche Nutzbarkeit; bei Kernsanierung ist ein fiktives Baujahr zu '
+            + 'pruefen. Ein positiver Wert wird erst nach dokumentierter Beurteilung '
+            + 'uebernommen (reelle Restnutzungsdauer).',
+        quelle: 'Fachliche Festlegung 10.10.2026 - Grenze des Modellbereichs der Anlage 2, '
+              + 'kein gesetzlicher Ausschluss'
       });
     }
 
@@ -515,6 +740,33 @@
         mindest_30_prozent: mindest30,
         unterschritten: unter30,
         afa_satz_pct: final > 0 ? round2(100 / final) : null
+      },
+      /* ── v2073 · DIE PRUEFPFLICHT ALS FLAGGE, NICHT ALS FLIESSTEXT ────
+         Marcel am 10.10.2026: „Bei überschrittener GND soll die Software
+         eine sachverständige Prüfung verlangen … Ein endgültiger
+         positiver RND-Wert wird erst nach dokumentierter fachlicher
+         Beurteilung übernommen."
+
+         Ein Hinweis, der nur in `grenzen[].text` steht, kann eine
+         Oberflaeche nicht abfragen - sie muesste Text durchsuchen. Also
+         gibt es die Pflicht als EIN Feld, das jeder Aufrufer prueft,
+         bevor er einen Wert uebernimmt. Die beiden Faelle sind
+         absichtlich getrennt: die 30-%-Marke ist ein Anker, der gemeldet
+         und nicht gekappt wird; die ueberschrittene GND ist eine Sperre. */
+      pruefung: {
+        erforderlich: basisTechnisch <= 0 || unter30,
+        grund: basisTechnisch <= 0
+          ? 'alter_erreicht_gnd'
+          : (unter30 ? 'unter_30_prozent_der_gnd' : null),
+        /* Darf das Ergebnis ohne Beurteilung uebernommen werden? */
+        uebernahme_gesperrt: basisTechnisch <= 0 && reell == null,
+        /* Was die Sperre loest: eine dokumentierte reelle RND. */
+        loest_die_sperre: 'input.reelleRND (sachverstaendig, mit Begruendung)',
+        basis_rnd_jahre: round2(Math.max(0, gnd - alter)),
+        hinweis: basisTechnisch <= 0
+          ? 'Rechnerische Basis 0 Jahre. Das ist KEINE Aussage, dass die wirtschaftliche '
+          + 'Restnutzungsdauer 0 ist - sie ist sachverstaendig zu beurteilen.'
+          : null
       }
     };
   }
@@ -628,6 +880,155 @@
     return Math.min(0.475, satz + soli);
   }
 
+  /* ============================================================
+     v2073 · DREI ABLEITUNGEN, DIE IM WIZARD LAGEN
+
+     Marcel am 10.10.2026, nach einem Abgleich mit seinem
+     Gutachten-Modul: „schauen das die felder aus tab objekt für rnd
+     wichtig sind auch tatsächlich reingehen".
+
+     GEMESSEN: sie gingen nicht rein. `calcAll` liest `input.modPoints`,
+     `input.gnd` und `input.kernsaniert` — `mapDealPilotObject` hat
+     keines davon gesetzt. Die Folge war still und teuer:
+
+       modPoints  -> clampInt(undefined,0,20) = 0   schlechteste Koeffizienten
+       gnd        -> (Number(undefined) || 70) = 70  statt 80 (Anlage 1)
+       kernsaniert-> false                           Kappe 0,70 statt 0,90
+
+     Ein Objekt mit `mod_punkte = 11` rechnete also mit NULL Punkten,
+     und ein ETW-Baujahr 1962 gegen eine Gesamtnutzungsdauer von 70
+     statt 80 Jahren. Am Objekt 2026-001 gemessen: 10,5 Jahre statt
+     einer plausiblen Zahl — und weil Anlage 2 mit 0 Punkten nichts
+     hergab, gewann das technische Verfahren.
+
+     > **Die Ableitungen FEHLTEN nicht — sie lagen im Wizard**
+     > (`rnd-wizard.js`: `computeModPoints` 645, `istKernsaniert` 1282,
+     > `gndFromObjektTyp` 673). Wer den Wizard bedient, bekam richtige
+     > Zahlen; wer den Kern direkt rief, bekam die Defaults. Genau das
+     > trennt die App von der Schnittstelle — und deshalb stehen sie
+     > jetzt HIER, am Kern, und werden nicht ein zweites Mal
+     > geschrieben.
+
+     Die Zahlen sind aus dem Wizard übernommen, nicht neu erfunden:
+     dieselben Höchstpunkte je Bauteil, dieselbe Staffel, dieselbe
+     GND-Liste (Wohngebäude 80 seit v1439, Anlage 1 ImmoWertV).
+     ============================================================ */
+
+  /* Höchstpunkte je Bauteil nach Anlage 2 ImmoWertV, Summe 20.
+     ABGELEITET aus MOD_ELEMENTS, nicht daneben geschrieben.
+
+     v2075: In v2073 stand hier eine eigene Liste mit denselben acht
+     Zahlen. Gemessen waren sie identisch - also eine Doppelung, und
+     zwar genau die, die zwei Absaetze weiter unten kritisiert wird
+     ("vier Ableitungen derselben Zahl laufen auseinander"). Sie wurde
+     im selben Zug eingebaut, in dem der Kern die Punktevergabe
+     uebernahm. Eine zweite Liste ist nicht falsch, solange sie stimmt -
+     sie ist falsch, SOBALD jemand eine der beiden aendert. */
+  var MOD_MAX = (function () {
+    var m = {};
+    MOD_ELEMENTS.forEach(function (e) { m[e.id] = e.max; });
+    return m;
+  })();
+
+  /**
+   * Modernisierungspunkte aus den acht Bauteil-Angaben.
+   * Erwartet die Klartext-Stufen des Reiters Objekt
+   * ("Keine/Nie", "> 20 Jahre", "10 - 20 Jahre", "5 - 10 Jahre",
+   *  "< 5 Jahre", "Kernsanierung").
+   */
+  function punkteAusMod(mod) {
+    if (!mod) return { total: 0, elemente: {} };
+    var elemente = {}, total = 0;
+    Object.keys(MOD_MAX).forEach(function (key) {
+      var z = String(mod[key] || 'Keine/Nie');
+      var p = 0;
+      if (z.indexOf('< 5') >= 0 || /kernsanier/i.test(z)) p = MOD_MAX[key];
+      else if (z.indexOf('5 - 10') >= 0 || z.indexOf('5-10') >= 0) p = Math.round(MOD_MAX[key] * 0.7);
+      else if (z.indexOf('10 - 20') >= 0 || z.indexOf('10-20') >= 0) p = Math.round(MOD_MAX[key] * 0.4);
+      elemente[key] = p;
+      total += p;
+    });
+    return { total: Math.min(20, total), elemente: elemente };
+  }
+
+  /**
+   * Modernisierungspunkte aus einer ja/teilweise/nein-Angabe je Bauteil.
+   *
+   * Dieselben Hoechstpunkte wie `punkteAusMod`, nur ein anderes
+   * Eingabeformat: der BMF-Rechner und die Wohnungsliste fragen nicht
+   * nach Zeitstufen, sondern nach "modernisiert ja / teilweise / nein".
+   *
+   * ── v2075 · WARUM DAS HIER STEHT UND NICHT DORT ─────────────────────
+   * `bmf-bodenabschlag.js` hat die Punkte selbst vergeben, mit PAUSCHAL
+   * 2 je Bauteil. Anlage 2 gibt Dach und Aussenwand aber je 4 - die
+   * Summe ist 20, nicht 16. Am 10.10.2026 gemessen:
+   *
+   *     Fall                 BMF alt   Anlage 2
+   *     alles modernisiert        16         20
+   *     nur Dach                   2          4
+   *     Dach + Aussenwand          4          8
+   *
+   * Wirkung auf die Restnutzungsdauer bei GND 80: bei Alter 64 sind das
+   * 3,11 Jahre. Dasselbe Objekt bekam im BMF-Rechner also eine andere
+   * Restnutzungsdauer als im Wizard, und zwar lautlos.
+   *
+   * Es war die VIERTE Stelle, die Punkte vergibt (Wizard, Kern,
+   * BMF-Rechner, deal-action aus `sanstand`). Vier Ableitungen derselben
+   * Zahl laufen auseinander - das hat `score-tiers.js` schon einmal
+   * gezeigt. Deshalb steht sie jetzt am Kern.
+   *
+   * Erkannt werden: ja / voll / v / true  -> volle Punkte
+   *                 teil / teilweise / h  -> halbe, aufgerundet
+   *                 alles andere          -> 0
+   */
+  function punkteAusJaTeilNein(werte) {
+    if (!werte) return { total: 0, elemente: {}, bewertet: 0 };
+    var elemente = {}, total = 0, bewertet = 0;
+    Object.keys(MOD_MAX).forEach(function (id) {
+      var v = String(werte[id] == null ? '' : werte[id]).toLowerCase().trim();
+      var p = 0;
+      if (v === 'ja' || v === 'voll' || v === 'v' || v === 'true') { p = MOD_MAX[id]; bewertet++; }
+      else if (v === 'teil' || v === 'teilweise' || v === 'h') { p = Math.round(MOD_MAX[id] * 0.5); bewertet++; }
+      elemente[id] = p;
+      total += p;
+    });
+    return { total: Math.min(20, total), elemente: elemente, bewertet: bewertet };
+  }
+
+  /** Kernsanierung an irgendeinem Bauteil? Dann gilt die Streckung auf 0,90·GND. */
+  function istKernsaniert(mod) {
+    if (!mod) return false;
+    return Object.keys(mod).some(function (k) { return /kernsanier/i.test(String(mod[k] || '')); });
+  }
+
+  /**
+   * Gesamtnutzungsdauer aus der Objektart, Anlage 1 ImmoWertV 2021.
+   *
+   * Marcels fachliche Festlegung vom 10.10.2026: „Für Eigentumswohnungen
+   * in Mehrfamilienhäusern gilt standardmäßig eine GND von 80 Jahren
+   * gemäß Anlage 1 ImmoWertV. Abweichende Modellvorgaben oder
+   * sachverständig begründete Ansätze müssen gesondert auswählbar und
+   * dokumentierbar sein."
+   *
+   * Das Auswählbare ist `input.gnd`: wer eine andere GND führt, setzt
+   * sie und übersteuert diese Ableitung. Woher sie dann kommt, gehört
+   * in den Modellvermerk — nicht hierher.
+   *
+   * Die Werte stimmen mit `rnd-wizard.js:673` überein. Die zentrale
+   * Tabelle (`rnd-gnd-table.js`) direkt zu fragen geht NICHT: dort
+   * landen unbekannte Bezeichnungen bei mfh = 80 statt bei 60 (v1439).
+   */
+  function gndAusObjektTyp(typ) {
+    if (!typ) return 80;
+    var t = String(typ).toLowerCase();
+    if (t.indexOf('hotel') >= 0 || t.indexOf('budget') >= 0) return 40;
+    if (t.indexOf('büro') >= 0 || t.indexOf('buero') >= 0 || t.indexOf('geschäft') >= 0
+        || t.indexOf('geschaeft') >= 0) return 60;
+    if (t.indexOf('industrie') >= 0 || t.indexOf('lager') >= 0 || t.indexOf('werk') >= 0) return 40;
+    if (t.indexOf('garage') >= 0) return 60;
+    return 80;  /* ETW, MFH, EFH, DHH, RH - Anlage 1 ImmoWertV */
+  }
+
   // ============================================================
   // DEALPILOT-OBJEKT IMPORT (NEU V3)
   // ============================================================
@@ -641,10 +1042,20 @@
    *   rate_X = 4-5 → 'gehoben'
    *   ds2_zustand = 'gut' / 'mittel' / 'schlecht' beeinflusst nicht-gerateten Gewerke
    *   ds2_energie F/G/H → Schaden 'energetisch_kritisch'
+   *
+   * Zweiter Parameter `opt` (v2073), alles optional:
+   *   opt.stichtag  — der Wertermittlungsstichtag. OHNE Angabe gilt
+   *                   HEUTE, nicht das Kaufdatum (siehe unten).
+   *   opt.zweck     — 'verkehrswert' (Vorgabe) oder 'afa'
+   *   opt.gnd       — übersteuert die Ableitung aus der Objektart
    */
-  function mapDealPilotObject(d) {
+  function mapDealPilotObject(d, opt) {
     if (!d) return {};
     if (d.data) d = d.data;  // ggf. wrapper auspacken
+
+    /* v2080: macht aus jedem Wert einen String - auch aus Zahlen, 0 und
+       false. Siehe die Begruendung bei `objekt_adresse` weiter unten. */
+    function _text(v) { return (v == null) ? '' : String(v); }
 
     function rateToGrad(rate) {
       const n = parseInt(rate, 10);
@@ -654,12 +1065,50 @@
       return 'gehoben';
     }
 
+    /* ── v2080 · DIE VERGLEICHSWERTE PASSTEN ZU KEINER ECHTEN OPTION ────
+     *
+     * HIER STAND eine Prüfung auf `schlecht`, `veraltet`, `sehr gut`,
+     * `hochwertig`, `gehoben`. Gemessen am 10.10.2026 bietet
+     * `index.html` bei `ds2_zustand` aber genau diese fünf Werte an:
+     *
+     *     Neubau / kernsaniert
+     *     Guter Zustand
+     *     Normaler Zustand
+     *     Renovierungsbedürftig
+     *     Stark sanierungsbedürftig
+     *
+     * **Keiner davon enthielt eines der gesuchten Wörter.** „Guter
+     * Zustand" trägt „gut", gesucht wurde „sehr gut". Ergebnis: ALLE
+     * fünf Optionen ergaben `standard`. Das Feld hatte auf die
+     * Restnutzungsdauer praktisch keine Wirkung — ein stark
+     * sanierungsbedürftiges Objekt wurde wie ein normales gerechnet.
+     *
+     * Gemeldet vom zweiten Chat am 10.10.2026, hier nachgemessen und
+     * bestätigt. Dasselbe Muster wie `avm.scoreLocation`
+     * (`feldname-nur-im-testdatensatz`): ein plausibler Vergleich, der
+     * nie trifft, weil die Werte aus einer anderen Quelle stammen als
+     * die, die der Nutzer anklickt.
+     *
+     * > Ein Rückfall, der immer denselben Wert liefert, ist kein
+     * > Rückfall. Er ist eine Konstante mit Begründung.
+     *
+     * Die Zuordnung ist bewusst konservativ: „gut" ist nach Anlage 2
+     * kein gehobener Standard, sondern der zeitgemäße Normalfall —
+     * dieselbe Linie wie `calcTechnisch` seit v2074. Nur eine
+     * Kernsanierung hebt. Die alten Wörter bleiben als Rückfall für
+     * Altdatensätze stehen. */
     function zustandFallback(zustand) {
-      if (!zustand) return 'standard';
+      if (zustand == null || zustand === '') return 'standard';
       const z = String(zustand).toLowerCase();
-      if (z.indexOf('schlecht') >= 0 || z.indexOf('veraltet') >= 0) return 'veraltet';
+      /* Die echten Optionen des Formulars, zuerst geprüft. */
+      if (z.indexOf('sanierungsbed') >= 0 || z.indexOf('renovierungsbed') >= 0) return 'veraltet';
+      if (z.indexOf('kernsaniert') >= 0 || z.indexOf('neubau') >= 0) return 'gehoben';
+      if (z.indexOf('normal') >= 0 || z.indexOf('gut') >= 0) return 'standard';
+      /* Altdatensätze und freie Eingaben. */
+      if (z.indexOf('schlecht') >= 0 || z.indexOf('veraltet') >= 0
+          || z.indexOf('abgewohnt') >= 0) return 'veraltet';
       if (z.indexOf('sehr gut') >= 0 || z.indexOf('hochwertig') >= 0
-          || z.indexOf('gehoben') >= 0) return 'gehoben';
+          || z.indexOf('gehoben') >= 0 || z.indexOf('neuwertig') >= 0) return 'gehoben';
       return 'standard';
     }
 
@@ -741,16 +1190,106 @@
     const grenz = parseGermanNum(d.grenz);
     const afaSatz = parseGermanNum(d.afa_satz);
 
+    /* ── v2073 · Die acht Bauteil-Angaben aus dem Reiter Objekt ──────────
+       Sie heissen dort `mod_<bauteil>` und tragen Klartext-Stufen.
+       `mod_punkte` ist die im Objekt GESPEICHERTE Punktzahl (geschrieben
+       von objekt-reiter.js) und hat Vorrang - sie ist das, was der
+       Nutzer in der App sieht. Fehlt sie, wird aus den acht Feldern
+       gerechnet: gemessen am 10.10.2026 hatten 10 von 21 Objekten
+       gefuellte `mod_*` und ein LEERES `mod_punkte`. Wer nur auf
+       `mod_punkte` baut, verliert bei knapp der Haelfte die Angaben. */
+    var mod = {
+      dach: d.mod_dach, fenster: d.mod_fenster, leitungen: d.mod_leitungen,
+      heizung: d.mod_heizung, aussenwand: d.mod_aussenwand, baeder: d.mod_baeder,
+      innenausbau: d.mod_innenausbau, grundriss: d.mod_grundriss
+    };
+    var modHatAngaben = Object.keys(mod).some(function (k) {
+      var v = String(mod[k] || '').trim();
+      return v !== '' && v !== 'Keine/Nie';
+    });
+    var gespeichertePunkte = parseInt(d.mod_punkte, 10);
+    var punkteObj = punkteAusMod(mod);
+    var modPoints = (!isNaN(gespeichertePunkte) && gespeichertePunkte > 0)
+      ? Math.min(20, gespeichertePunkte)
+      : (modHatAngaben ? punkteObj.total : 0);
+
+    /* ── v2073 · Der Stichtag ist eine FESTLEGUNG, keine Nebenwirkung ───
+       Marcel am 10.10.2026: „Maßgeblich ist der explizit festgelegte
+       Wertermittlungs- beziehungsweise steuerlich relevante Stichtag.
+       Für aktuelle Verkehrswertgutachten ist nicht automatisch das
+       Kaufdatum maßgeblich. Für AfA-Gutachten ist der steuerlich
+       relevante Betrachtungsbeginn zu berücksichtigen."
+
+       HIER STAND `stichtag: d.kaufdat || d._at || null`. Das hat jedes
+       Objekt stillschweigend zu seinem Kaufdatum gerechnet - bei einem
+       2019 gekauften Haus also sieben Jahre zu jung. Am Objekt
+       2026-001 gemessen: Stichtag 2026-07-01 statt heute.
+
+       Drei Wege, in dieser Rangfolge:
+         1. `opt.stichtag` - ausdruecklich gesetzt, gilt immer
+         2. zweck 'afa'   - wirtschaftlicher Uebergang (Nutzen-/Lasten-
+                            wechsel), sonst Kaufdatum
+         3. Vorgabe       - HEUTE, denn ein Verkehrswert wird auf einen
+                            aktuellen Stichtag ermittelt
+       Welcher Weg gegriffen hat, steht in `stichtag_herkunft` - eine
+       Herkunftsangabe gehoert an den Wert, nicht in ein Protokoll. */
+    var zweck = (opt && opt.zweck) || 'verkehrswert';
+    var stichtag, stichtagHerkunft;
+    if (opt && opt.stichtag) {
+      stichtag = opt.stichtag;
+      stichtagHerkunft = 'ausdruecklich gesetzt';
+    } else if (zweck === 'afa') {
+      stichtag = d.wirtschaftlicher_uebergang || d.kaufdat || d._at || null;
+      stichtagHerkunft = d.wirtschaftlicher_uebergang
+        ? 'wirtschaftlicher Uebergang (steuerlicher Betrachtungsbeginn)'
+        : (d.kaufdat ? 'Kaufdatum - wirtschaftlicher Uebergang fehlt' : 'nicht bestimmbar');
+    } else {
+      stichtag = new Date().toISOString().slice(0, 10);
+      stichtagHerkunft = 'heute (Verkehrswert-Stichtag)';
+    }
+
+    var gndGesetzt = opt && opt.gnd != null && Number(opt.gnd) > 0;
+    var gnd = gndGesetzt ? Number(opt.gnd) : gndAusObjektTyp(d.objart);
+
     return {
       baujahr: parseInt(d.baujahr, 10) || null,
-      stichtag: d.kaufdat || d._at || null,
+      stichtag: stichtag,
+      stichtag_herkunft: stichtagHerkunft,
+      zweck: zweck,
       objektTyp: mapObjektTyp(d.objart),
+      /* v2073 - vorher fehlten diese drei und liefen in die Defaults */
+      gnd: gnd,
+      gnd_herkunft: gndGesetzt
+        ? 'ausdruecklich gesetzt'
+        : 'Anlage 1 ImmoWertV, abgeleitet aus der Objektart "' + (d.objart || 'unbekannt') + '"',
+      modPoints: modPoints,
+      modPoints_herkunft: (!isNaN(gespeichertePunkte) && gespeichertePunkte > 0)
+        ? 'Feld mod_punkte im Objekt'
+        : (modHatAngaben ? 'gerechnet aus den acht mod_*-Angaben' : 'keine Modernisierungsangaben'),
+      modPoints_elemente: punkteObj.elemente,
+      kernsaniert: istKernsaniert(mod),
       gewerkeBewertung: gewerkeBewertung,
       schaeden: schaeden,
       // Gutachten-Metadaten
-      objekt_adresse: ((d.str || '') + ' ' + (d.hnr || '')).trim()
+      /* ── v2080 · ZWEI ABSTURZSTELLEN BEI ZAHLEN ─────────────────────
+         HIER STAND `(d.plz || '').trim()` und `(d.ort || '').trim()`.
+         Kommt die PLZ als ZAHL statt als Text - und aus einer fremden
+         Datenquelle kommt sie so - gibt `32609 || ''` die Zahl zurueck,
+         und Zahlen haben kein `.trim`:
+
+             TypeError: (d.plz || "").trim is not a function
+
+         Der zweite Chat hat es an der PLZ gemeldet; nachgemessen trifft
+         es auch `d.ort`. `d.str` und `d.hnr` sind robust, weil sie nur
+         verkettet und erst am Ende getrimmt werden - derselbe Ausdruck,
+         andere Reihenfolge, anderer Ausgang.
+
+         `_text()` macht aus allem einen String, auch aus 0 und false.
+         Ein Absturz in der Abbildung nimmt den ganzen Aufruf mit, und
+         zwar bevor irgendetwas gerechnet wurde. */
+      objekt_adresse: (_text(d.str) + ' ' + _text(d.hnr)).trim()
                     + (d.plz || d.ort
-                       ? ', ' + (d.plz || '').trim() + ' ' + (d.ort || '').trim()
+                       ? ', ' + _text(d.plz).trim() + ' ' + _text(d.ort).trim()
                        : ''),
       objekt_einheit: d._name || '',
       wohnflaeche: parseGermanNum(d.wfl),
@@ -845,6 +1384,15 @@
     calcAfaVergleich: calcAfaVergleich,
     estimateGrenzsteuersatz: estimateGrenzsteuersatz,
     mapDealPilotObject: mapDealPilotObject,
+    /* v2073 - die drei Ableitungen, die bis dahin nur im Wizard lagen.
+       Sie stehen hier, damit der Wizard sie von HIER nimmt und keine
+       zweite Fassung entsteht: `score-tiers.js` hat gezeigt, was eine
+       erlaubte Doppelung kostet (vier Kopien, drei davon abweichend). */
+    MOD_MAX: MOD_MAX,
+    punkteAusMod: punkteAusMod,
+    punkteAusJaTeilNein: punkteAusJaTeilNein,
+    istKernsaniert: istKernsaniert,
+    gndAusObjektTyp: gndAusObjektTyp,
     punkteToGrad: punkteToGrad,
     parseStichtagYear: parseStichtagYear,
     fmtNum2: fmtNum2,

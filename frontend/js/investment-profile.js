@@ -169,6 +169,46 @@ window.DealPilotInvestmentProfile = (function() {
         '</div>'
       ].join('');
     }
+    /* ── v1957 · Der Block der drei Lageklassen ──────────────────────
+       Pflicht ist genau EINE Zahl je Klasse: die Zielrendite. Alles
+       Weitere ist freiwillig - Marcel: „das ist auch ein Profil, aber es
+       ist kein Muss."
+
+       Leer heißt: es gilt weiter der Standardwert darüber. Deshalb
+       stehen die Zusatzfelder ohne Vorbelegung da und tragen den
+       Platzhalter des geerbten Werts. */
+    function lageProfilHtml() {
+      var LP = window.DealPilotLageProfil;
+      if (!LP) return '';
+      var prof = LP.get();
+      var zeilen = LP.KLASSEN.map(function (k) {
+        var s = prof.klassen[k] || {};
+        var e = LP.ETIKETT[k];
+        function zf(feld, platz) {
+          var v = s[feld];
+          return '<input type="number" step="any" class="ip-lage-f" ' +
+            'data-k="' + k + '" data-f="' + feld + '" ' +
+            'value="' + (v != null ? v : '') + '" placeholder="' + platz + '">';
+        }
+        return [
+          '<div class="ip-lage-zeile">',
+          '  <div class="ip-lage-kopf"><b>' + e.name + '</b><span>' + e.sub + '</span></div>',
+          '  <div class="ip-lage-grid">',
+          '    <label>Zielrendite ' + zf('ziel_bmr', 'Pflicht') + ' <span class="ip-suffix">% brutto</span></label>',
+          '    <label>Mietausfall ' + zf('mietausfall_pct', 'Standard') + ' <span class="ip-suffix">% NKM</span></label>',
+          '    <label>Bewirt. n. uml. ' + zf('bwk_anteil_default', 'Standard') + ' <span class="ip-suffix">% NKM</span></label>',
+          '    <label>Eigenkapital ' + zf('ek_quote_default', 'Standard') + ' <span class="ip-suffix">% KP</span></label>',
+          '  </div>',
+          '</div>'
+        ].join('');
+      }).join('');
+      return [
+        '<h3 class="ip-section">Lageklassen A · B · C</h3>',
+        '<p class="hint">Die <b>Zielrendite</b> ist das Einzige, was gebraucht wird. Im Quick-Check wählst du die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du verhandeln müsstest, um sie zu erreichen. Die drei Werte daneben sind freiwillig — bleiben sie leer, gelten deine Standardwerte von oben. Die Vorbelegung ist marktüblich: gute Lage, wenig Rendite.</p>',
+        '<div class="ip-lage-box">' + zeilen + '</div>'
+      ].join('');
+    }
+
     function blEl() {
       var bls = [
         ['BW','Baden-Württemberg (5,0 %)'], ['BY','Bayern (3,5 %)'],
@@ -210,10 +250,22 @@ window.DealPilotInvestmentProfile = (function() {
            _dpProfilWert, bis v1431 _dpProfil). Jetzt wirken alle drei. */
         field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer — typisch 15–20 %'),
         field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen — typisch 15–22 %'),
-        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — A-Lage eher 1 %, C-Lage eher 3 %'),
+        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — A-Lage eher 1 %, C-Lage eher 3 % — je Lageklasse getrennt: siehe unten.'),
         (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
         field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',
+
+      /* ══ v1957 · DIE LAGEKLASSEN ════════════════════════════════════
+         Marcel am 07.10.2026: „dass man da vielleicht A-, B- und C-Lage
+         mit einem Investorenprofil koppeln kann, wonach man rausgeht und
+         welche Mindest-Bruttomietrendite man haben will."
+
+         Der Abschnitt steht ABSICHTLICH direkt unter der Bewirtschaftung:
+         dort hängt seit Langem der Hinweis „A-Lage eher 1 %, C-Lage eher
+         3 %" am Mietausfall-Feld - als toter Fließtext, mit dem nichts
+         rechnete. Jetzt ist die Beziehung verdrahtet, und der Hinweis
+         zeigt dorthin. */
+      lageProfilHtml(),
 
       '<h3 class="ip-section">Persönliche Mindest-Schwellen</h3>',
       '<p class="hint">Diese Werte erscheinen ab V63.77 als farbliche Marker in den Kennzahlen — „grün" wenn dein persönliches Ziel erreicht ist.</p>',
@@ -243,6 +295,30 @@ window.DealPilotInvestmentProfile = (function() {
       '  <button type="button" class="btn btn-outline" onclick="DealPilotInvestmentProfile.resetToDefaults()">Auf Defaults zurücksetzen</button>',
       '</div>'
     ].join('');
+  }
+
+  /* ── v1957 · Die Lagefelder speichern sich selbst ────────────────────
+     Nicht über `saveFromForm()`: das Lage-Profil liegt in einem EIGENEN
+     Speicher (`dp_lage_profil`, serverseitig gesichert) und hat eine
+     eigene Struktur. Es in denselben Sammelspeicher zu quetschen wäre
+     genau die Vermischung, die später niemand mehr auseinanderbekommt.
+
+     Jede Änderung geht sofort durch - `DealPilotLageProfil.setze()`
+     schreibt lokal und schickt zum Server. Ein leeres Feld wird zu
+     `null`, nicht zu 0. */
+  function wireLageProfil() {
+    var LP = window.DealPilotLageProfil;
+    if (!LP) return;
+    var felder = document.querySelectorAll('.ip-lage-f');
+    for (var i = 0; i < felder.length; i++) {
+      (function (el) {
+        if (el._v1957) return;
+        el._v1957 = 1;
+        el.addEventListener('change', function () {
+          LP.setze(el.getAttribute('data-k'), el.getAttribute('data-f'), el.value);
+        });
+      })(felder[i]);
+    }
   }
 
   function saveFromForm() {
@@ -357,6 +433,7 @@ window.DealPilotInvestmentProfile = (function() {
     getHausgeldEstimate: getHausgeldEstimate,
     syncAiParamsToTab: syncAiParamsToTab,
     renderPaneHtml: renderPaneHtml,
+    wireLageProfil: wireLageProfil,   /* v1957 */
     saveFromForm: saveFromForm,
     resetToDefaults: resetToDefaults
   };

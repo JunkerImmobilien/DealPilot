@@ -147,7 +147,9 @@ router.post('/checkout', userAuth, async (req, res) => {
   if (!pack.stripe_price_id) {
     return res.status(503).json({
       error: 'stripe_price_missing',
-      message: 'Kerosin-Kauf ist noch nicht freigeschaltet. (Stripe-Produkt fehlt — ENV STRIPE_PRICE_' + pack.id.toUpperCase() + ' setzen.)'
+      /* v2097: hier stand „Kerosin-Kauf". Den Begriff gibt es seit v1176
+         nicht mehr (CLAUDE.md), und diese Meldung geht LIVE an den Kunden. */
+      message: 'Dieses Kontingent-Paket ist noch nicht freigeschaltet. (Stripe-Produkt fehlt — ENV STRIPE_PRICE_' + pack.id.toUpperCase() + ' setzen.)'
     });
   }
 
@@ -168,7 +170,9 @@ router.post('/checkout', userAuth, async (req, res) => {
     if (!userPlan || userPlan.plan_id === 'free') {
       return res.status(403).json({
         error: 'upgrade_required',
-        message: 'Kerosin kann nur ab dem Starter-Plan getankt werden. Bitte upgrade dein Abo.',
+        /* v2078: hier stand „Kerosin kann nur ab dem Starter-Plan getankt
+           werden". Seit v1176 heisst es Kontingent, die Liter sind weg. */
+        message: 'Kontingent kann erst ab dem Starter-Plan nachgekauft werden. Bitte upgrade dein Abo.',
         upgrade_to: 'starter'
       });
     }

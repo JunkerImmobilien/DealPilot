@@ -320,7 +320,36 @@
        Eingabetiefe wie im Reiter Objekt (dp_zielstufe, objekt-reiter.js
        rendert und hört auf sie). Der Abruf-Schritt nimmt die gewählte Stufe. */
     var _dpInner = '<span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-stufen" id="oab-dp-stufen" title="Stufe der Marktbewertung: Einfach · Mittel · Ausgiebig"></span>';
-      var _qrSvg = '<svg class="dp-qr" viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR DealPilot"><rect width="37" height="37" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM19 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM20 11h1v1h-1zM22 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM30 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM32 13h1v1h-1zM4 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM28 14h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM24 15h1v1h-1zM25 15h1v1h-1zM27 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM4 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM21 16h1v1h-1zM24 16h1v1h-1zM29 16h1v1h-1zM30 16h1v1h-1zM5 17h1v1h-1zM9 17h1v1h-1zM11 17h1v1h-1zM16 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM32 17h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM23 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM4 21h1v1h-1zM9 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM30 21h1v1h-1zM32 21h1v1h-1zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM17 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM4 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM16 24h1v1h-1zM18 24h1v1h-1zM21 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM30 24h1v1h-1zM31 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM16 28h1v1h-1zM21 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM18 29h1v1h-1zM20 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM29 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM13 30h1v1h-1zM14 30h1v1h-1zM17 30h1v1h-1zM19 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM25 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM14 31h1v1h-1zM15 31h1v1h-1zM16 31h1v1h-1zM23 31h1v1h-1zM24 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM15 32h1v1h-1zM17 32h1v1h-1zM18 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM26 32h1v1h-1zM27 32h1v1h-1zM28 32h1v1h-1zM30 32h1v1h-1z" fill="#141210"/></svg>';
+      /* ══ v1954 · DER QR WIRD ERZEUGT, NICHT MITGESCHLEPPT ═══════════
+         Marcel am 07.10.2026: "der QR-Code koennte auch schoener
+         dargestellt werden. Der sieht irgendwie kuenstlich aus."
+
+         GEMESSEN: das fest eingebaute SVG ist ein ECHTER, gueltiger QR -
+         es traegt dieselben 431 Module wie ein frisch erzeugter. Der
+         Unterschied ist die RUHEZONE: viewBox 37 statt 31, also Rand 4
+         statt 1. Von 54 gerenderten Pixeln gehen damit rund 22 Prozent
+         an weissen Rand, und der Code selbst wird winzig und flau.
+
+         > Ich hatte zuerst gemeldet, es sei "gar kein QR, nur ein rect".
+         > Das war ein MESSFEHLER: die Module stecken in einem <path>,
+         > das eine <rect> ist der weisse Hintergrund. Zurueckgenommen.
+
+         `window.DpQr` (js/dp-qr.js, v721) erzeugt ihn richtig und wird
+         eine Zeile tiefer ohnehin schon benutzt, sobald ein geteilter
+         Pass existiert (`_updateShareQr`). Dort steht `border:1` - jetzt
+         steht es an beiden Stellen, sonst springt die Ruhezone beim
+         Wechsel. Der fest eingebaute Code bleibt als Rueckfall: faellt
+         `dp-qr.js` aus, ist ein Code mit grossem Rand besser als keiner. */
+      var _qrZiel = 'https://dealpilot.junker-immobilien.io';
+      var _qrSvgFest = '<svg class="dp-qr" viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" aria-label="QR DealPilot"><rect width="37" height="37" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM14 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM19 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM13 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM21 7h1v1h-1zM23 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM17 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM20 11h1v1h-1zM22 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM30 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM24 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM32 13h1v1h-1zM4 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM28 14h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM20 15h1v1h-1zM24 15h1v1h-1zM25 15h1v1h-1zM27 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM4 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM21 16h1v1h-1zM24 16h1v1h-1zM29 16h1v1h-1zM30 16h1v1h-1zM5 17h1v1h-1zM9 17h1v1h-1zM11 17h1v1h-1zM16 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM32 17h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM5 19h1v1h-1zM7 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM19 19h1v1h-1zM23 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM21 20h1v1h-1zM23 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM4 21h1v1h-1zM9 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM18 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM30 21h1v1h-1zM32 21h1v1h-1zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM30 22h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM14 23h1v1h-1zM17 23h1v1h-1zM19 23h1v1h-1zM20 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM4 24h1v1h-1zM7 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM11 24h1v1h-1zM16 24h1v1h-1zM18 24h1v1h-1zM21 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM30 24h1v1h-1zM31 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM16 28h1v1h-1zM21 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM17 29h1v1h-1zM18 29h1v1h-1zM20 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM29 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM13 30h1v1h-1zM14 30h1v1h-1zM17 30h1v1h-1zM19 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM25 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM14 31h1v1h-1zM15 31h1v1h-1zM16 31h1v1h-1zM23 31h1v1h-1zM24 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM15 32h1v1h-1zM17 32h1v1h-1zM18 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM26 32h1v1h-1zM27 32h1v1h-1zM28 32h1v1h-1zM30 32h1v1h-1z" fill="#141210"/></svg>';
+      var _qrSvg = (function () {
+        try {
+          if (window.DpQr && typeof window.DpQr.svg === 'function') {
+            return window.DpQr.svg(_qrZiel, { ecc: 'M', border: 1 });
+          }
+        } catch (e) { /* Rueckfall unten */ }
+        return _qrSvgFest;
+      })();
     mount.innerHTML =
       '<div class="dp-pf-scroll"><div class="dp-pfbar" id="oab-bar">' +
         '<span class="dp-pf-stripe"></span>' +
@@ -712,6 +741,133 @@
     });
     return neu;
   }
+
+  /* ══ v1995 · DER RIEGEL ════════════════════════════════════════════
+
+     Marcel am 08.10.2026: „Wenn wir ein Objekt angelegt haben und im
+     Objekt sind und das schon reingeladen ist, dann sollten wir diese
+     Werte wie ImmoMetrica, auch Exposé, oder auch geführte
+     Eingabe/Sprache ausgrauen … Das machen wir halt nur, wenn noch
+     nichts drin steht."
+
+     WORAN „SCHON REINGELADEN" ERKANNT WIRD - GEMESSEN, nicht gefuehlt.
+     Die Gesamtzahl gefuellter Felder taugt NICHT: auch ohne Objekt sind
+     64 Felder gefuellt (Vorgaben aus dem Investitionsprofil).
+
+       ohne Objekt        64 Felder gesamt,  0 von 11 KERNfeldern
+       Objekt 2026-1036   95 Felder gesamt, 10 von 11 KERNfeldern
+
+     Die Schwelle steht bei DREI - weit genug von beiden Messwerten,
+     dass weder ein frisches Objekt versehentlich sperrt noch ein halb
+     gefuelltes durchrutscht.
+
+     Gesperrt werden die QUELLEN, die Felder ueberschreiben koennen.
+     `dealpilot` bleibt immer frei - das sind die Stufen, und der
+     Marktbericht ist genau das, was Marcel ab hier noch will. */
+  var RIEGEL_KERN = ['plz', 'ort', 'str', 'hnr', 'wfl', 'kp', 'baujahr', 'nkm', 'grd', 'objart', 'zimmer'];
+  var RIEGEL_QUELLEN = ['import', 'immometrica', 'voice', 'gefuehrt'];
+  var RIEGEL_SCHWELLE = 3;
+  var _riegelFrei = null;   /* Schluessel des Objekts, fuer das freigegeben wurde */
+
+  function _riegelKernZahl() {
+    var n = 0;
+    for (var i = 0; i < RIEGEL_KERN.length; i++) {
+      var e = document.getElementById(RIEGEL_KERN[i]);
+      if (e && String(e.value || '').trim() !== '') n++;
+    }
+    return n;
+  }
+  function _riegelGreift() {
+    var key = window._currentObjKey || null;
+    if (_riegelFrei !== null && _riegelFrei === key) return false;   /* fuer dieses Objekt freigegeben */
+    return _riegelKernZahl() >= RIEGEL_SCHWELLE;
+  }
+
+  /* Die Freigabe gilt fuer EIN Objekt und verfaellt beim Wechsel. Ein
+     Umbau, der sich nicht abwaehlen laesst, ist kein Angebot, sondern
+     eine Ansage. */
+  function riegelFreigeben() {
+    _riegelFrei = window._currentObjKey || null;
+    riegelNachziehen();
+    try { toast('Quellen freigegeben - sie koennen jetzt Felder ueberschreiben'); } catch (e) {}
+  }
+  window.DealPilotRiegel = {
+    greift: _riegelGreift, kernZahl: _riegelKernZahl,
+    freigeben: riegelFreigeben,
+    nachziehen: function () { riegelNachziehen(); },
+  };
+
+  function riegelNachziehen() {
+    var bar = document.querySelector('.dp-pfbar');
+    if (!bar) return 0;
+    var zu = _riegelGreift();
+    var n = 0;
+    RIEGEL_QUELLEN.forEach(function (src) {
+      var tile = bar.querySelector('.dp-pf-tile[data-src="' + src + '"]');
+      if (!tile) return;
+      var box = tile.querySelector('input[type=checkbox]');
+      /* Was von Haus aus gesperrt ist (z. B. ImmoMetrica ohne Schluessel),
+         bleibt gesperrt - der Riegel merkt sich, was ER getan hat. */
+      if (zu) {
+        if (tile.getAttribute('data-riegel') === 'zu') return;
+        tile.setAttribute('data-riegel', 'zu');
+        tile.setAttribute('data-riegel-titel', tile.getAttribute('title') || '');
+        tile.classList.add('dp-pf-riegel-zu');
+        tile.setAttribute('title', 'Dieses Objekt ist schon gefuellt - diese Quelle wuerde Felder ueberschreiben');
+        if (box) { box.checked = false; box.disabled = true; }
+        tile.classList.remove('on');
+        n++;
+      } else if (tile.getAttribute('data-riegel') === 'zu') {
+        tile.removeAttribute('data-riegel');
+        var alt = tile.getAttribute('data-riegel-titel');
+        if (alt) tile.setAttribute('title', alt); else tile.removeAttribute('title');
+        tile.removeAttribute('data-riegel-titel');
+        tile.classList.remove('dp-pf-riegel-zu');
+        if (box) box.disabled = false;
+        n++;
+      }
+    });
+    _riegelHinweis(bar, zu);
+    return n;
+  }
+
+  /* Die Zeile sagt WARUM gesperrt ist und bietet den Ausweg an. Ohne sie
+     waere der Riegel eine Sperre, die niemand erklaert. */
+  function _riegelHinweis(bar, zu) {
+    var id = 'oab-riegel-hinweis';
+    var alt = document.getElementById(id);
+    if (!zu) { if (alt) alt.remove(); return; }
+    if (alt) return;
+    var seg = bar.querySelector('.dp-pf-tile[data-src="import"]');
+    seg = seg ? seg.closest('.dp-pf-seg') : null;
+    if (!seg) return;
+    var d = document.createElement('div');
+    d.id = id;
+    d.className = 'dp-pf-riegel-hinweis';
+    d.innerHTML = '<span>Quellen gesperrt \u2014 dieses Objekt ist schon gef\u00fcllt.</span>'
+      + ' <button type="button" class="dp-pf-riegel-frei">trotzdem freigeben</button>';
+    d.querySelector('.dp-pf-riegel-frei').addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation(); riegelFreigeben();
+    });
+    seg.appendChild(d);
+  }
+
+  /* Nachziehen, wenn sich etwas aendert: Objektwechsel, Formulareingabe,
+     und einmal nach dem Bau der Leiste. Ohne Beobachter steht der Riegel
+     nach dem ersten Klick auf ein anderes Objekt falsch. */
+  (function _riegelHorcher() {
+    var _letzter = null;
+    function pruefe() {
+      var k = window._currentObjKey || null;
+      if (k !== _letzter) { _letzter = k; _riegelFrei = (_riegelFrei === k) ? k : null; }
+      try { riegelNachziehen(); } catch (e) {}
+    }
+    document.addEventListener('input', function (e) {
+      if (e.target && RIEGEL_KERN.indexOf(e.target.id) >= 0) pruefe();
+    }, true);
+    document.addEventListener('dp:objekt-geladen', pruefe);
+    setInterval(pruefe, 1500);
+  })();
 
   async function runSelected() {
     var srcs = selectedSources();
@@ -2250,7 +2406,47 @@
   function scan() { var b = document.querySelectorAll('.dp-pfbar'); for (var i = 0; i < b.length; i++) enhance(b[i]); }
   if (document.readyState !== 'loading') scan(); else document.addEventListener('DOMContentLoaded', scan);
   try {
-    var mo = new MutationObserver(function () { if (window._pfScanQ) return; window._pfScanQ = 1; requestAnimationFrame(function () { window._pfScanQ = 0; scan(); }); });
+    /* ══ v1987 · DER RIEGEL LOESTE SICH NUR IM rAF ════════════════════
+
+       Hier stand:
+
+         if (window._pfScanQ) return; window._pfScanQ = 1;
+         requestAnimationFrame(function(){ window._pfScanQ = 0; scan(); });
+
+       Der Riegel wird VOR dem rAF gesetzt und NUR im Rueckruf geloest.
+       Feuert das rAF nicht, bleibt er auf 1 - fuer die Lebensdauer der
+       Seite. Der Beobachter laeuft dann noch und kehrt in der ersten
+       Zeile immer um.
+
+       GEMESSEN am 08.10.2026: _pfScanQ === 1, bar._pfM === undefined,
+       null .dp-pf-mtrigger im DOM. Nach Hand-Entriegeln und einem
+       DOM-Anstoss erschien der Ausloeser sofort (331x52).
+
+       > Ohne Ausloeser steht das Blatt per translateY(110%) unter dem
+       > Bildrand. Die GANZE Datenaufnahme ist dann auf dem Handy
+       > unerreichbar - die Quellen und der Abruf-Knopf.
+
+       rAF feuert nicht, wenn das Dokument verborgen ist. Auf einem
+       echten Geraet heisst das: die Seite wird in einem
+       HINTERGRUND-Tab geladen (geteilter Link, „in neuem Tab",
+       Sparmodus). Wer dann nach vorn wechselt, findet die
+       Datenaufnahme nicht - und nichts deutet darauf hin, warum.
+
+       Das rAF BLEIBT: es buendelt die Mutationen, und genau dafuer ist
+       es da. Daneben steht jetzt ein Timer als Notnagel. Wer zuerst
+       kommt, raeumt den anderen ab - so laeuft scan() genau einmal je
+       Buendel, auch ohne Einzelbilder. */
+    var mo = new MutationObserver(function () {
+      if (window._pfScanQ) return;
+      window._pfScanQ = 1;
+      var los = function () {
+        if (!window._pfScanQ) return;
+        window._pfScanQ = 0;
+        scan();
+      };
+      var nagel = setTimeout(los, 120);
+      requestAnimationFrame(function () { clearTimeout(nagel); los(); });
+    });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
 })();

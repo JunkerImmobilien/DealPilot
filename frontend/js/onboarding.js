@@ -39,14 +39,33 @@ window.DealPilotOnboarding = (function () {
 
   /* ── Die Aussehen-Wahl ──────────────────────────────────────────────
      Marcel: „Standardmäßig würde ich bei Aktenmappe, Kanzlei und Tower
-     dann halt einfach die Bordkarte dort nehmen als Objektkarten."       */
+     dann halt einfach die Bordkarte dort nehmen als Objektkarten."
+
+     ── v2083 · AKTENMAPPE IST DIE VORGABE (Backlog N60.21) ───────────
+     Marcel am 10.10.2026: „Ich würde gerne, dass wir das Standard-Design
+     … auf die Aktenmappe legen. Den könnte man dann auch oben
+     reinsetzen: Aktenmappe, Standard." Dazu die Objektkarte als
+     **Datenzeile**.
+
+     Geändert hat sich damit DREIERLEI:
+       1. Aktenmappe steht an ERSTER Stelle — die Reihenfolge ist die
+          erste Empfehlung, noch vor jeder Markierung.
+       2. Sie trägt `standard: true` und ist vorausgewählt (`_wahl`
+          startet auf 'v1b'). Vorher stand dort `null`, also musste der
+          Nutzer aktiv etwas wählen, bevor es weiterging.
+       3. Ihre Objektkarte ist `datenzeile`, nicht mehr `bordkarte`.
+
+     Die anderen drei behalten die Bordkarte — Marcels Satz von damals
+     galt für „Aktenmappe, Kanzlei und Tower", und für zwei davon gilt
+     er weiter. Für die Aktenmappe ist er durch die neue Vorgabe
+     ersetzt.                                                            */
   var AUSSEHEN = [
-    { id: '',    name: 'DealPilot',  karte: null,
-      unter: 'Obsidian und Gold, Reiter oben',
-      fuer: 'Die Standardansicht — dunkel, kompakt, alles auf einem Schirm.' },
-    { id: 'v1b', name: 'Aktenmappe', karte: 'bordkarte',
+    { id: 'v1b', name: 'Aktenmappe', karte: 'datenzeile', standard: true,
       unter: 'Menü links, Reiter oben im Kopf',
       fuer: 'Wie eine Mappe mit Registern. Ruhig und vertraut.' },
+    { id: '',    name: 'DealPilot',  karte: null,
+      unter: 'Obsidian und Gold, Reiter oben',
+      fuer: 'Dunkel und kompakt, alles auf einem Schirm.' },
     { id: 'v2',  name: 'Kanzlei',    karte: 'bordkarte',
       unter: 'Navigation links, Aktionen rechts',
       fuer: 'Zwei Schienen: links wo du bist, rechts was du tun kannst.' },
@@ -54,6 +73,26 @@ window.DealPilotOnboarding = (function () {
       unter: 'Aktionen links, Score und Ausgaben rechts',
       fuer: 'Alles im Blick wie im Cockpit — für den zweiten Bildschirm.' }
   ];
+
+  /* Die Vorgabe steht an EINER Stelle und wird nicht zweimal genannt. */
+  function _aussehenStandard() {
+    var s = AUSSEHEN.filter(function (a) { return a.standard; })[0];
+    return s ? s.id : '';
+  }
+
+  /* Die Beschriftung des Kartenstils kommt aus dem Modul, das ihn führt.
+     v2083: hier stand hartkodiert „Objektkarten als Bordkarte" — auch
+     für eine Variante, die etwas anderes setzt. Ein Text, der die
+     Einstellung nicht kennt, beschreibt sie irgendwann falsch. */
+  function _karteName(id) {
+    if (!id) return null;
+    try {
+      var OK = window.DealPilotObjektkarte;
+      if (OK && OK.stile && OK.stile[id] && OK.stile[id].name) return OK.stile[id].name;
+    } catch (e) {}
+    /* Rückfall: der Bezeichner selbst, groß geschrieben. */
+    return id.charAt(0).toUpperCase() + id.slice(1);
+  }
 
   /* ═══════════════════════════════════════════════════════════════════
      v1749 · DIE INVESTORTYPEN SIND DIE DEALSCORE-PROFILE
@@ -159,7 +198,9 @@ window.DealPilotOnboarding = (function () {
   }
 
   var _schritt = 0, _ov = null;
-  var _wahl = { aussehen: null, typ: _typDefault() };
+  /* v2083: die Vorauswahl ist der Standard (Aktenmappe), nicht null -
+     vorher musste der Nutzer erst klicken, bevor es weiterging. */
+  var _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };
 
   function _ls(k)      { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function _lsSet(k,v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -244,7 +285,13 @@ window.DealPilotOnboarding = (function () {
   function s1() {
     return ''
       + '<p class="dpo-vor">Womit möchtest du arbeiten? Du kannst das jederzeit '
-      + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.</p>'
+      + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.'
+      /* v2096: Der Hinweis steht NUR, wo er stimmt. Unter 900 px fuellt der
+         Kasten den Schirm, dann gibt es kein „dahinter" — ein Hinweis, der
+         auf etwas Unsichtbares zeigt, ist schlimmer als keiner. Die Grenze
+         ist dieselbe wie in der Regel `.dpo-ov-schau`. */
+      + '<span class="dpo-nur-breit"> <b>Die App dahinter wechselt sofort mit</b> '
+      + '— klick die vier Kacheln einmal durch.</span></p>'
       + '<div class="dpo-kacheln">'
       + AUSSEHEN.map(function (a) {
           return '<button type="button" class="dpo-kachel' + (_wahl.aussehen === a.id ? ' an' : '')
@@ -253,7 +300,10 @@ window.DealPilotOnboarding = (function () {
             + '<span class="dpo-k-name">' + esc(a.name) + '</span>'
             + '<span class="dpo-k-unter">' + esc(a.unter) + '</span>'
             + '<span class="dpo-k-fuer">' + esc(a.fuer) + '</span>'
-            + (a.karte ? '<span class="dpo-k-zusatz">Objektkarten als Bordkarte</span>' : '')
+            /* v2083: der Kartenstil wird beim Namen genannt, nicht geraten. */
+            + (a.karte ? '<span class="dpo-k-zusatz">Objektkarten als '
+                + esc(_karteName(a.karte)) + '</span>' : '')
+            + (a.standard ? '<span class="dpo-k-std">Standard</span>' : '')
             + '</button>';
         }).join('')
       + '</div>';
@@ -480,7 +530,50 @@ window.DealPilotOnboarding = (function () {
             +   ' · LTV bis ' + t.ltv + ' % · EK ' + t.ek + ' %</span>'
             + '</button>';
         }).join('')
-      + '</div>';
+      + '</div>'
+      /* ══ v1961 · DIE LAGEKLASSEN IN DER ERSTEINRICHTUNG ═══════════════
+         Marcel am 07.10.2026: „das sollte man vielleicht auch, wenn man
+         sich neu anmeldet, bei der Ersteinrichtung mit berücksichtigen."
+
+         Hier stehen NUR die drei Zielrenditen. Die Zusatzwerte je Klasse
+         (Mietausfall, Bewirtschaftung, Eigenkapital) gehören nicht in
+         eine Ersteinrichtung: sie sind freiwillig, und ein Assistent, der
+         zwölf Felder zeigt, wird weggeklickt. Der Kollege schreibt genau
+         das in `Anmerkungen.docx`: „sehr viele Eingabefelder und teilweise
+         noch etwas verwirrend."
+
+         Die Werte stehen vorbelegt da (3,5 / 5,0 / 7,0) und sind sofort
+         gültig - wer nichts anfasst, hat trotzdem ein brauchbares Profil.
+         Gespeichert wird bei jeder Änderung sofort über
+         `DealPilotLageProfil`, nicht erst beim Abschluss: der Assistent
+         lässt sich abbrechen, und was eingetippt war, soll dann stehen. */
+      + (function () {
+          var LP = window.DealPilotLageProfil;
+          if (!LP) return '';
+          return '<p class="dpo-vor dpo-vor-klein" style="margin-top:18px">'
+            + '<b>Lageklassen.</b> Investoren gliedern Standorte in A, B und C '
+            + 'und knüpfen daran eine Mindestrendite. Im Quick-Check wählst du '
+            + 'die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du '
+            + 'verhandeln müsstest. Die Vorbelegung ist marktüblich — gute Lage, '
+            + 'wenig Rendite.</p>'
+            + '<div class="dpo-lage">'
+            + LP.KLASSEN.map(function (k) {
+                var z = LP.zielBmr(k);
+                return '<label class="dpo-lage-z">'
+                  + '<span>' + esc(LP.ETIKETT[k].name) + '</span>'
+                  + '<input type="number" step="any" class="dpo-lage-f" data-k="' + k + '" '
+                  /* v1961a: KEIN Komma. <input type="number"> verwirft
+                     einen Wert mit Komma stillschweigend - das Feld stand
+                     dann LEER da. Gemessen im laufenden Assistenten: A
+                     (3,5) war leer, B (5) und C (7) nicht, weil ganze
+                     Zahlen kein Komma haben. Ein Fehler, der sich hinter
+                     runden Zahlen versteckt. */
+                  +   'value="' + (z != null ? z : '') + '">'
+                  + '<span class="dpo-lage-e">% brutto</span>'
+                  + '</label>';
+              }).join('')
+            + '</div>';
+        })();
   }
 
   var SCHRITTE = [
@@ -613,6 +706,25 @@ window.DealPilotOnboarding = (function () {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); }
     }, true);
 
+    /* ══ v1961a · DIE LAGEFELDER BRAUCHEN 'change', NICHT 'click' ══════
+       v1961 hat sie in den Klick-Faenger darunter gehaengt. Der faengt
+       Klicks - eine Eingabe erreicht ihn nie.
+
+       Dass das Haekchen daneben (dpo_zins_auto) dort funktioniert, hat
+       den Fehler verdeckt: ein Klick auf eine Checkbox IST ein Klick.
+
+       Gemessen im laufenden Assistenten: 4,75 getippt, im Profil stand
+       weiterhin 3,5. */
+    _ov.addEventListener('change', function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains('dpo-lage-f')) return;
+      try {
+        if (window.DealPilotLageProfil) {
+          window.DealPilotLageProfil.setze(t.getAttribute('data-k'), 'ziel_bmr', t.value);
+        }
+      } catch (e) {}
+    });
+
     _ov.addEventListener('click', function (ev) {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); return; }
       var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ]') : null;
@@ -633,6 +745,9 @@ window.DealPilotOnboarding = (function () {
         return;
       }
       if (ev.target.id === 'dpo_zins_auto') { _zinsFeld(); return; }
+      /* v1961a: hier stand die Behandlung der Lagefelder. Sie gehoert
+         nicht in den KLICK-Faenger - eine Eingabe ist kein Klick. Sie
+         sitzt jetzt in einem eigenen 'change'-Listener weiter oben. */
       if (ev.target.id === 'dpo-rechnen') { _rechnen(); return; }
       if (ev.target.id === 'dpo-weiter') { _sichern(); _vor(); return; }
       if (ev.target.id === 'dpo-zurueck') { _sichern(); _zurueck(); return; }
@@ -838,6 +953,10 @@ window.DealPilotOnboarding = (function () {
 
   function _zeichne() {
     var s = SCHRITTE[_schritt];
+    /* v2096: im Schritt „Aussehen" den Schleier wegnehmen und den Kasten
+       zur Seite legen, damit die App dahinter WAHRHEITSGEMAESS zu sehen
+       ist. Die Begruendung mit den gemessenen Zahlen steht am CSS. */
+    try { if (_ov) _ov.classList.toggle('dpo-ov-schau', _schritt === 0); } catch (e) {}
     el('dpo-titel').textContent = s.titel;
     el('dpo-inhalt').innerHTML = s.bau();
     el('dpo-schritte').innerHTML = SCHRITTE.map(function (x, i) {
@@ -931,14 +1050,34 @@ window.DealPilotOnboarding = (function () {
       '.dpo-hinweis{background:#F6F2E6;border:1px solid #E8E1CE;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.6;color:#4a453f;margin-bottom:16px}',
       '.dpo-kacheln{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}',
       '.dpo-kacheln-3{grid-template-columns:repeat(3,1fr)}',
-      '.dpo-kachel{text-align:left;background:#fff;border:1.5px solid #E7E2D6;border-radius:12px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:.14s;font:inherit}',
+      '.dpo-kachel{position:relative;text-align:left;background:#fff;border:1.5px solid #E7E2D6;border-radius:12px;padding:13px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:.14s;font:inherit}',
       '.dpo-kachel:hover{border-color:var(--wl-c9a84c,#C9A84C);transform:translateY(-1px)}',
       '.dpo-kachel.an{border-color:var(--wl-b8932f,#b8932f);box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 22%,transparent)}',
       '.dpo-k-name{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:14.5px;color:#1b1815}',
       '.dpo-k-unter{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.4px;color:#8a837a;text-transform:uppercase}',
       '.dpo-k-fuer{font-size:12px;line-height:1.5;color:#55504a;margin-top:2px}',
+      /* v1961: die drei Lage-Zeilen. Schmal und ruhig - sie sollen den
+         Assistenten nicht dominieren, die Profilkacheln daruaber sind
+         die eigentliche Wahl des Schritts. */
+      '.dpo-lage{display:flex;flex-direction:column;gap:7px;margin-top:8px}',
+      '.dpo-lage-z{display:grid;grid-template-columns:1fr 84px auto;align-items:center;gap:10px;font-size:12.5px}',
+      '.dpo-lage-f{width:100%;box-sizing:border-box;padding:6px 8px;font-size:13px;text-align:right}',
+      '.dpo-lage-e{font-size:10.5px;opacity:.6;white-space:nowrap}',
+      '@media (max-width:420px){.dpo-lage-z{grid-template-columns:1fr 72px auto}}',
       '.dpo-k-werte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#6b6660;margin-top:4px}',
       '.dpo-k-zusatz{font-size:10.5px;color:var(--wl-b8932f,#b8932f);margin-top:4px;font-weight:600}',
+      /* v2083 · Die Standard-Markierung. Marcel: „Den könnte man dann auch
+         oben reinsetzen: Aktenmappe, Standard." Sie sitzt IN der Kachel,
+         nicht in der Überschrift — verglichen wird an den Kacheln, also
+         muss sie dort stehen. Die Kachel ist `position:relative` (eine
+         Hauptregel gesetzt), damit die Pille nicht wandert. Eine zweite
+         `.dpo-kachel`-Regel nur fuer `position` hatte ich zuerst daneben
+         geschrieben und wieder entfernt — zwei Regeln auf denselben
+         Selektor sind der Anfang jedes Kaskadenstreits. */
+      '.dpo-k-std{position:absolute;top:7px;right:7px;'
+        + 'background:var(--wl-c9a84c,#C9A84C);color:#0c0b09;'
+        + 'font:700 8.5px/1 "JetBrains Mono",monospace;letter-spacing:.1em;'
+        + 'text-transform:uppercase;padding:3px 6px;border-radius:3px}',
       /* v1753c · 38 px war das eigentliche Problem.
          Gemessen: 322 x 38 — ein Verhaeltnis von 8:1. Kein Bildschirm
          sieht so aus, und in einem so flachen Band ist jede Aufteilung
@@ -1001,6 +1140,59 @@ window.DealPilotOnboarding = (function () {
       '.dpo-b-still{background:transparent;color:#7A7370;border-color:#E7E2D6}',
       '.dpo-b-still:hover{color:#1b1815;border-color:#C9C3B6}',
       '.dpo-b-gold{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1a1508;border:none}',
+      /* ══ v2096 · DER SCHLEIER HAT DIE VORSCHAU VERFAELSCHT ═══════════
+         Marcel, 10.10.2026: „Da sind irgendwie so ganz komische Bilder
+         drinne. Koennen wir da irgendwie vernuenftige Bilder nehmen? …
+         dann kann man das im Hintergrund einmal sehen, wie die App
+         aussehen wuerde … Kann man das irgendwie in place anzeigen?"
+
+         GEMESSEN am 10.10.2026, und der Befund war ein anderer als
+         erwartet: die Vorschau in place EXISTIERT. Ein Klick auf eine
+         Kachel ruft `_aussehenAnwenden()`, und das setzt wirklich um —
+
+           Aktenmappe -> dp-layout="v1b"  dp-objkarte="datenzeile"
+           Kanzlei    -> dp-layout="v2"   dp-objkarte="bordkarte"
+           Tower      -> dp-layout="v2b"  dp-objkarte="bordkarte"
+           DealPilot  -> dp-layout=null   dp-objkarte="bordkarte"
+
+         Und `.dpo-ov` ist kein deckender Vorhang, sondern ein Schleier:
+         `rgba(5,5,5,.34)`. Die App ist dahinter zu 66 % sichtbar.
+
+         DER FEHLER WAR SUBTILER UND SCHLIMMER. Ein DUNKLER Schleier
+         ueber der Wahl zwischen HELL und DUNKEL. Nachgerechnet, was er
+         mit den Flaechen macht, um die es geht:
+
+           Creme   #FDFCFA -> rgb(169,168,167)   -60 % Helligkeit
+           Weiss   #FFFFFF -> rgb(170,170,170)   -60 %
+           Gold    #C9A84C -> rgb(134,113,52)    -58 %
+           Obsidian#050505 -> rgb(5,5,5)           -0 %
+
+         Die hellen Fassungen verlieren 60 % ihrer Helligkeit, Obsidian
+         keine einzige. Unter dem Schleier sieht HELL grau aus und DUNKEL
+         unveraendert — die Vorschau verfaelscht genau den Unterschied,
+         den der Nutzer waehlen soll.
+
+         > Eine Vorschau, die das Gewaehlte dunkler zeigt als es ist, ist
+         > schlimmer als keine: sie laesst den Nutzer eine Entscheidung
+         > gegen etwas treffen, das er nie gesehen hat.
+
+         Deshalb KEIN neuer Mechanismus und kein zweites iframe (das
+         waere eine zweite App im Speicher und ein zweiter Zustand).
+         Im Schritt „Aussehen" wird der Schleier weggenommen und der
+         Kasten in die untere rechte Ecke gelegt, damit Kopf und
+         Seitenschienen frei liegen — genau die Teile, die sich zwischen
+         den vier Fassungen unterscheiden.
+
+         Erst ab 900 px: darunter fuellt der Kasten den Schirm ohnehin
+         (Regel unten), da gibt es kein „dahinter". Dort tragen die
+         Miniaturen die Entscheidung weiter — sie bleiben deshalb. */
+      '.dpo-nur-breit{display:none}',
+      '@media(min-width:900px){',
+      '  .dpo-nur-breit{display:inline}',
+      '  .dpo-ov.dpo-ov-schau{background:transparent;align-items:flex-end;justify-content:flex-end;padding:16px}',
+      '  .dpo-ov.dpo-ov-schau .dpo-kasten{width:min(620px,100%);max-height:min(74vh,660px);',
+      '    box-shadow:0 20px 64px rgba(5,5,5,.5),0 0 0 1px rgba(5,5,5,.18)}',
+      '}',
       /* Handy und Tablet: eine Spalte, Fussleiste bricht um */
       '@media(max-width:680px){',
       '  .dpo-ov{padding:0;align-items:stretch}',
@@ -1104,7 +1296,7 @@ window.DealPilotOnboarding = (function () {
       var alt = document.getElementById('dp-onboarding');
       if (alt) alt.remove();
       _ov = null;
-      _wahl = { aussehen: null, typ: _typDefault() };   /* v1770 */
+      _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };   /* v1770, v2083 */
       zeige(0);
       return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls geloescht)' : '');
     },

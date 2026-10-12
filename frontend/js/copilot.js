@@ -111,6 +111,37 @@
     if (_mpErgebnis) {
       try { c.marktpreis_indikation = _mpErgebnis; } catch (e) {}
     }
+    /* ══ v1980 · DIE WERTERMITTLUNG UND IHR VERLAUF ════════════════════
+
+       Marcel: „wichtig ist auch, dass natuerlich dieser Verlauf auch
+       immer mit in das Objektwissen mit reingeht. Das haben wir ja
+       irgendwie mit der Pilotanalyse gemacht."
+
+       Derselbe Befund wie v1847, eine Ebene weiter: der Chat kannte die
+       Pilot-Analyse und die Marktpreis-Indikation, aber nicht die
+       Wertermittlung nach ImmoWertV — obwohl sie im Reiter Objekt
+       daneben stand.
+
+       Mitgegeben wird der VERLAUF, nicht nur der letzte Stand: an
+       Parkstr. 9 gibt es zwei Ertragswerte (364.000 und 355.000) aus zwei
+       Berichten, und der Unterschied ist eine einzige Zeile des
+       Rechenwegs (sonstige Ertraege 1.080 EUR). Wer nur den letzten Stand
+       kennt, kann die Frage „warum zwei verschiedene?" nicht beantworten.
+
+       Dazu die Marktbericht-Karte selbst (`DealPilotMB.letzter()`) mit
+       Mikro-/Makrolage, Marktwert und Mietspanne.
+
+       Gerechnet wird nichts — nur gelesen. */
+    try {
+      var _vl = (window.DealPilotObjektReiter && typeof DealPilotObjektReiter.verlauf === 'function')
+        ? DealPilotObjektReiter.verlauf() : null;
+      if (_vl && _vl.length) c.wertermittlung_verlauf = _vl;
+    } catch (e) {}
+    try {
+      var _mb = (window.DealPilotMB && typeof DealPilotMB.letzter === 'function')
+        ? DealPilotMB.letzter() : null;
+      if (_mb) c.marktbericht = _mb;
+    } catch (e) {}
     return c;
   }
 

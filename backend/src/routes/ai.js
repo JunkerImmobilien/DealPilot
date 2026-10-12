@@ -22,6 +22,7 @@ const aiCreditsService = require('../services/aiCreditsService');  // V63.86
 const dokumentSchemas = require('../services/dokumentSchemas');   /* v1678 */
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
+const marketRatesService = require('../services/marketRatesService');  /* v1951: Marktzins fuer die Quick-Check-Einordnung */
 
 /* v947-mbsource
  * ──────────────────────────────────────────────────────────────────────────
@@ -245,7 +246,34 @@ router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Hall
     } catch (e) { console.warn('[ai] marktbericht attach:', e.message); }
     delete payload.objId;   /* gehoert nicht in den Prompt */
 
-    const result = await openaiService.analyze(payload, { userApiKey });
+    /* v2009 - HIER STAND `analyze(payload, { userApiKey })`.
+
+       aiOptions (Detailgrad, Tonalitaet, Fokus und Marcels eigene
+       Anweisungen bis 500 Zeichen) wurde vom Browser geschickt und
+       hier WEGGEWORFEN. `_analyzeStyleSuffix(opts)` im Dienst konnte
+       deshalb nie etwas finden. Die Einstellung war im UI sichtbar,
+       speicherbar - und ohne Wirkung.
+
+       Wie es geht, steht zwanzig Zeilen weiter unten in /ai/lage:
+       herausziehen, aus dem Payload loeschen (sie gehoeren nicht in
+       den Prompt-Text), als zweites Argument uebergeben. */
+    /* v2013 - die Fotos gehoeren NICHT in den Prompt-Text (sie waeren
+       dort 1,8 MB base64), sondern als eigene Bildteile an das Modell.
+       Deshalb hier heraus und als Option weiter. */
+    const fotos = Array.isArray(payload.fotos)
+      ? payload.fotos.filter(function (x) { return typeof x === 'string' && x.indexOf('data:image') === 0; }).slice(0, 4)
+      : [];
+    delete payload.fotos;
+
+    const aiOptions = (payload.aiOptions && typeof payload.aiOptions === 'object')
+      ? payload.aiOptions : null;
+    delete payload.aiOptions;
+
+    /* v2019b - Marcels eigenes Wissen aus den Einstellungen gehoert
+       in denselben Block wie das Projektwissen, nur getrennt
+       ueberschrieben. Faellt die Abfrage aus, bleibt der Basisblock. */
+    const wissensblock = await require('../services/projektwissen').blockFuer(req.user.id);
+    const result = await openaiService.analyze(payload, { userApiKey, aiOptions, fotos, wissensblock });
 
     // V63.86: Nach erfolgreicher Analyse Credits abziehen (nur wenn Server-Key benutzt wurde)
     if (!userApiKey) {
@@ -400,6 +428,80 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       return res.status(400).json({ error: 'kp_oder_nkm_fehlt' });
     }
 
+    /* ══ v1951 · MARKTZINSEN AUS DER ECHTEN QUELLE ══════════════════════
+       Marcel am 07.10.2026: die Heuristik soll "auch unser Projektwissen
+       mit uebernehmen", und zur Marktpreisindikation gehoert der Zins, zu
+       dem man heute finanziert. Ohne ihn kann die KI nicht sagen, ob die
+       eingegebenen 3,5 % guenstig oder teuer sind - sie haette nur die
+       Zahl des Nutzers und keinen Massstab.
+
+       GEHOLT WIRD SERVERSEITIG, nicht vom Browser: der Satz ist eine
+       Tatsachenbehauptung im Bericht. Was der Client schickt, kann er
+       auch erfunden haben.
+
+       `getCurrentRates()` statt `getMarketContext()`: letzteres liefert
+       EZB-LEITZINSEN (MRR, EURIBOR 3M) - das ist nicht der Satz, zu dem
+       jemand ein Haus finanziert. `getCurrentRates()` fuehrt die vier
+       Zinsbindungs-Koerbe der Bundesbank (variabel, 1-5, 5-10, ueber 10),
+       also genau die Groesse, die neben Marcels Eingabe gehoert.
+
+       > WENN DIE QUELLE AUSFAELLT, FAELLT DIE ZEILE WEG. `fallback_used`
+       > nennt die Koerbe, die auf den statischen Wert zurueckgefallen
+       > sind; steht der benutzte Korb darin, kommt KEIN Satz in den
+       > Prompt. Ein statischer Wert von Februar 2026, als "aktueller
+       > Marktzins" angekuendigt, waere eine Behauptung - und ein Notnagel,
+       > der den Ausfall zudeckt, ist schlimmer als die Luecke.
+       > Auf Prod am 07.10.2026 gemessen: `fallback_used: []`, Quelle
+       > bundesbank, Werte 4,40 / 4,03 / 3,81 / 4,04 %.
+
+       Ein Fehlschlag darf die Analyse nicht verhindern - deshalb try/catch
+       und weiter ohne die Zeile. */
+    let zinsSatz = null;
+    try {
+      const mr = await marketRatesService.getCurrentRates();
+      /* Der Korb richtet sich nach der Zinsbindung.
+         GEMESSEN am 07.10.2026: der Quick-Check ERHEBT keine Zinsbindung
+         (kein Feld in quickcheck-app.html). `bind` ist heute also immer
+         null und der Korb immer "5 bis 10 Jahre" - der haeufigste Fall im
+         Wohnungskauf. Die Staffelung steht hier trotzdem, damit sie traegt,
+         sobald das Feld kommt; sie ist VORRAT, nicht verdrahtet. Wer sie
+         fuer aktiv haelt, sucht spaeter den Fehler an der falschen Stelle. */
+      const bind = z(i.zinsbindung);
+      const korb = bind == null ? '5_10'
+        : bind <= 1 ? 'var'
+        : bind <= 5 ? '1_5'
+        : bind <= 10 ? '5_10' : 'over10';
+      const wert = mr && mr.rates ? mr.rates[korb] : null;
+      const ersetzt = mr && Array.isArray(mr.fallback_used) && mr.fallback_used.indexOf(korb) >= 0;
+      if (wert != null && !ersetzt) {
+        zinsSatz = {
+          wert: wert,
+          korb: (mr.labels && mr.labels[korb]) || korb,
+          quelle: (mr.sourceInfo && mr.sourceInfo.name) || mr.source || 'unbekannt',
+          /* `asOf` ist ein Date-Objekt. Direkt verkettet landet es als
+             "Sat Aug 01 2026 00:00:00 GMT+0000 (Coordinated Universal Time)"
+             im deutschen Prompt - gemessen im Container, nicht geraten.
+             Deshalb MM.JJJJ: die Bundesbank-Statistik ist monatlich und
+             laeuft dem Stichtag zwei Monate nach, ein Tagesdatum waere
+             genauer, als die Zahl ist. */
+          stand: (function (d) {
+            if (!d) return null;
+            var t = (d instanceof Date) ? d : new Date(d);
+            if (isNaN(t.getTime())) return String(d);
+            /* UTC-Getter, nicht die oertlichen: der Stichtag kommt als
+               UTC-Zeitstempel, und `getMonth()` haette ihn am Monatsende
+               in den FOLGEmonat gekippt (gemessen: 31.12. 23:00 UTC wurde
+               unter CET zu 01.2027). Der Server laeuft auf UTC, ein
+               Entwicklerrechner nicht - der Fehler waere nur hier
+               aufgefallen, nicht dort. */
+            return String(t.getUTCMonth() + 1).padStart(2, '0') + '.' + t.getUTCFullYear();
+          })(mr.asOf)
+        };
+      }
+    } catch (e) {
+      console.warn('[v1951 qc-analyse] Marktzins nicht verfuegbar: ' + e.message);
+    }
+
     /* Der Prompt. Frueher stand er in quickcheck-app.html ab Zeile 5299. */
     const prompt = [
       'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.',
@@ -427,10 +529,74 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
         ? 'Gerechnetes Urteil (gilt, nicht widersprechen): ' + p.urteil
           + (p.urteil_text ? '\n  Begruendung: ' + p.urteil_text : '')
         : '',
-      avm && avm.marktwert
-        ? '\nMarktdaten eines unabhaengigen Bewertungspartners: Marktwert '
-          + eur(z(avm.marktwert)) + ' EUR'
-          + (avm.scoreLocation != null ? ', Lage ' + avm.scoreLocation + '/10' : '')
+      /* ══ v1951 · DIE LAGE STAND IM DATENSATZ UND NIE IM PROMPT ═══════
+         Hier wurde `avm.scoreLocation` gelesen. Gemessen am 07.10.2026
+         gibt es dieses Feld nur in EINEM Testdatensatz
+         (quickcheck-app.html:4496). Der echte Eintrag des
+         DealPilot-Bewertungswegs traegt `scoreMacro` und `scoreMicro`
+         (dort gesetzt aus `d.macro/10` und `d.micro/10`).
+
+         **Die Lage-Zeile ist also praktisch nie entstanden** - und drei
+         Zeilen weiter unten verbot der Prompt, etwas ueber die Lage zu
+         sagen. Beides zusammen heisst: die KI DURFTE nichts zur Lage
+         sagen und HAETTE auch nichts gewusst. Genau das hat Marcel
+         beanstandet.
+
+         > Der Datensatz war die ganze Zeit vollstaendig: der Quick-Check
+         > schickt `_avmResults[0]` KOMPLETT (quickcheck-app.html:5625).
+         > Es fehlte kein Feld, es wurde das falsche gelesen. **Ein
+         > Feldname, der nur im Testdatensatz existiert, faellt beim
+         > Gegenlesen nicht auf - er sieht richtig aus und trifft nie.**
+
+         `scoreLocation` bleibt als erster Griff stehen, damit der
+         Testdatensatz weiter funktioniert; danach Makro und Mikro.
+         Einheiten ausgeschrieben: die Scores stehen auf 0-10, die
+         Marktmiete ist eine MONATSmiete (nicht EUR/m2 - der Feldname
+         `marktmieteCold` sagt das nicht). */
+      avm && (avm.marktwert || avm.scoreMacro != null || avm.scoreMicro != null)
+        ? [
+            '',
+            'Marktdaten eines unabhaengigen Bewertungspartners:',
+            avm.marktwert ? '- Marktwert: ' + eur(z(avm.marktwert)) + ' EUR' : '',
+            avm.marktmieteCold ? '- Marktmiete: ' + eur(z(avm.marktmieteCold)) + ' EUR/Monat' : '',
+            avm.scoreLocation != null ? '- Lage: ' + avm.scoreLocation + ' von 10' : '',
+            avm.scoreMakro != null || avm.scoreMacro != null
+              ? '- Makrolage (Stadt/Region): ' + (avm.scoreMacro != null ? avm.scoreMacro : avm.scoreMakro) + ' von 10' : '',
+            avm.scoreMicro != null ? '- Mikrolage (Stadtteil, Umfeld): ' + avm.scoreMicro + ' von 10' : '',
+            avm.wertentwicklung != null ? '- Wertentwicklung: ' + avm.wertentwicklung + ' % pro Jahr' : ''
+          ].filter(Boolean).join('\n')
+        : '',
+      /* ══ v1959 · DIE ZIELRENDITE DER LAGEKLASSE ═══════════════════════
+         Marcel: „je nachdem was man auswaehlt, zum Beispiel A-Lage und da
+         moechte ich 8 Prozent, dann geht im Quick-Check in unsere
+         Bewertung mit ein, um wie viel ich den Kaufpreis verhandeln muss."
+
+         Die Zahl ist NICHT nachgerechnet: `p.urteil_text` traegt den
+         Zielpreis schon, gerechnet von `qc-heuristik.js`. Hier steht nur,
+         WORAUF er sich bezieht - sonst liest die KI einen Zielpreis ohne
+         Begruendung und erfindet sich eine.
+
+         Der ABSTAND wird gebildet, nicht die Rendite: aus Kaufpreis und
+         Jahresmiete, beides steht oben. Das ist keine neue Zahl im Sinne
+         des Verbots weiter unten, sondern dieselbe in Prozent - und sie
+         kommt vom Server, nicht vom Modell. */
+      (function () {
+        const zb = p.zielBmr == null ? null : Number(String(p.zielBmr).replace(',', '.'));
+        if (zb == null || !isFinite(zb) || zb <= 0) return '';
+        const kl = i.lageklasse ? String(i.lageklasse).toUpperCase() : null;
+        const nkmJahr = (z(i.nkm) || 0) * 12;
+        const kp = z(i.kp) || 0;
+        const ist = (kp > 0) ? (nkmJahr / kp * 100) : null;
+        return '\nDeine Zielvorgabe: ' + (kl ? kl + '-Lage, ' : '')
+          + 'Ziel-Bruttomietrendite ' + zb.toString().replace('.', ',') + ' %'
+          + (ist != null ? ' (dieses Objekt liegt bei '
+              + ist.toFixed(2).replace('.', ',') + ' %)' : '');
+      })(),
+      /* v1951: der Massstab fuer den eingegebenen Zins. Nur wenn echt. */
+      zinsSatz
+        ? '\nMarktzins zum Vergleich: ' + zinsSatz.wert + ' % fuer Zinsbindung '
+          + zinsSatz.korb + ' (Quelle: ' + zinsSatz.quelle
+          + (zinsSatz.stand ? ', Stand ' + zinsSatz.stand : '') + ')'
         : '',
       '',
       'Antworte ALS JSON (keine Markdown-Codebloecke, nur reines JSON):',
@@ -450,9 +616,21 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '  dagegen, nenne den Grund - das Urteil bleibt stehen.',
       '- Eine neue Zahl bilden. Nicht ueberschlagen, nicht umrechnen, nicht',
       '  hochrechnen. Nur die Zahlen oben.',
+      /* v1951: das Verbot bleibt - aber jetzt STEHT oben etwas zur Lage,
+          wenn Marktdaten vorliegen. Vorher war es ein Verbot ohne
+          Grundlage: die Lage-Zeile entstand nie (falscher Feldname), und
+          die KI durfte deshalb zur Lage gar nichts sagen. */
       '- Etwas ueber LAGE, ZUSTAND oder AUSSTATTUNG behaupten, das oben',
-      '  nicht steht. "Attraktiv durch die Lage" ist erfunden, auch wenn es',
-      '  harmlos klingt.',
+      '  nicht steht. Stehen Makro- und Mikrolage oben, DARFST du sie',
+      '  einordnen - aber nur sie, und ohne eigene Note daraus zu machen.',
+      '  "Attraktiv durch die Lage" ohne Zahl oben ist erfunden, auch wenn',
+      '  es harmlos klingt.',
+      '- Die Zielrendite bewerten. Sie ist die Vorgabe des Nutzers, nicht',
+      '  dein Urteil. Du sagst, wie weit das Objekt davon entfernt ist -',
+      '  nicht, ob die Vorgabe klug ist.',
+      '- Den Marktzins als Empfehlung ausgeben. Er ist ein Vergleichswert:',
+      '  du darfst sagen, ob der eingegebene Zins darueber oder darunter',
+      '  liegt, aber keinen Zins vorschlagen und keine Finanzierung raten.',
       '- Einen Bewertungsanbieter beim Namen nennen. Er heisst',
       '  "unabhaengiger Bewertungspartner".'
     ].filter(Boolean).join('\n');

@@ -33,6 +33,10 @@ function _buildDeal2FromState() {
     var d1V108 = v('d1');
     var d2V108 = v('d2');
     var darlV108 = d1V108 + d2V108;
+    /* v2144: ohne Darlehen entfallen DSCR und LTV im Investor Deal
+       Score, statt mit 0 bzw. 85 Punkten zu Buche zu stehen. Die
+       Summe steht hier schon — sie wird nur weitergereicht. */
+    deal.darlehen = darlV108;
     ekV108 = State.gi - darlV108;   // kann auch negativ werden (Über-Finanzierung)
   }
 

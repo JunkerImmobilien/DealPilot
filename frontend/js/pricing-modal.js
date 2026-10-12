@@ -871,6 +871,100 @@
       _mountPlanCards();
       _wireKerosinStrip();
     }, 30);
+
+    /* ── v2132a · DIE FALTE HAENGT NICHT MEHR AN DER KETTE ──────────
+       Sie stand als FUENFTER Aufruf in einem setTimeout hinter
+       _injectPlanCss, _initToggle, _bindCtaHandlers, _mountPlanCards
+       und _wireKerosinStrip. Stuerzt einer davon, laeuft sie nicht -
+       und niemand sieht einen Fehler, nur einen fehlenden Knopf.
+
+       Gemessen am 12.10.2026 war es NICHT so (0 Fehler im Lauf, der
+       Knopf kam bei 390 und 768 px), aber die Bauart traegt das
+       Risiko: dieselbe Form, die schon einmal einen Pruefabschnitt
+       hinter einem process.exit verschwinden liess.
+
+       Eigener Takt, eigenes try/catch, und spaeter als die Kette -
+       sie braucht das fertige Markup, nicht umgekehrt. */
+    setTimeout(function(){ try { _pmMatrixFalten(); } catch (e) {} }, 90);
+  }
+
+  /* ══ v2132 · DIE COCKPIT-MATRIX WIRD AUF DEM HANDY AUFGEKLAPPT ══
+
+     Marcel am 12.10.2026: "mach es so das es funktioniert und passend
+     bedient werden kann."
+
+     GEMESSEN, 390 px, direkte Kinder von #pricing-plugin-host:
+
+        243 px   .dp-header
+         24 px   .dp-container (Zeitstrahl)
+        440 px   .dp-container (Plan-Karte)
+        901 px   .dp-section
+       1674 px   .dp-feature-table-wrap   <- 45 % des Fensters
+         77 px   .dp-footer-note
+       ------
+       3686 px   Shell, bei 757 px Viewport
+
+     Darin steckt `table.mx` mit 1338 px: die vollstaendige
+     Gegenueberstellung aller Leistungen je Plan. Auf einem 390 px
+     breiten Schirm ist das keine Tabelle mehr, sondern ein Marsch.
+
+     > **Eine Vergleichstabelle vergleicht nur, wenn man zwei Spalten
+     > gleichzeitig sieht.** Auf dem Handy sieht man eine - und wischt
+     > fuer die zweite so weit, dass die erste nicht mehr erinnert
+     > wird. Der Platz, den sie kostet, ist dann doppelt verloren.
+
+     Deshalb: zugeklappt starten, mit einem Knopf davor, der sagt was
+     dahinter liegt. **Kein Inhalt faellt weg** - Marcels Pruefauftrag
+     ausdruecklich: "Wenn Informationen mobil nicht gleichzeitig
+     dargestellt werden koennen, verwende sinnvoll aufgebaute Listen,
+     Detailansichten, aufklappbare Bereiche oder alternative Layouts."
+
+     Preise, Plaene, Reihenfolge und Knoepfe bleiben unberuehrt - es
+     wird nur eine Tabelle zugeklappt. Ueber 900 px passiert gar
+     nichts: dort hat die Matrix ihren Platz.
+
+     Der Knopf traegt `aria-expanded` und seine Beschriftung wechselt
+     mit dem Zustand - ein Knopf, der nicht sagt was er tun wird, ist
+     keine Bedienung. */
+  function _pmMatrixFalten() {
+    try {
+      if (!window.matchMedia || !window.matchMedia('(max-width: 900px)').matches) return;
+      var wrap = document.querySelector('#pricing-modal .dp-feature-table-wrap');
+      if (!wrap || wrap.getAttribute('data-pm-falte')) return;
+      wrap.setAttribute('data-pm-falte', '1');
+
+      /* Titel und Unterzeile bleiben SICHTBAR - sie sind die
+         Beschriftung der Falte, nicht ihr Inhalt. Zugeklappt wird nur,
+         was darunter kommt. */
+      var kopf = wrap.querySelector('.dp-feature-table-h');
+      var sub  = wrap.querySelector('.dp-feature-table-sub');
+      var rest = [];
+      [].forEach.call(wrap.children, function (c) {
+        if (c === kopf || c === sub) return;
+        rest.push(c);
+      });
+      if (!rest.length) return;
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pm-falte-btn';
+      btn.setAttribute('aria-expanded', 'false');
+
+      function stand(offen) {
+        rest.forEach(function (c) { c.classList.toggle('pm-falte-zu', !offen); });
+        btn.setAttribute('aria-expanded', offen ? 'true' : 'false');
+        btn.textContent = offen ? 'Cockpit-Matrix ausblenden' : 'Cockpit-Matrix anzeigen';
+      }
+      stand(false);
+      btn.addEventListener('click', function () {
+        stand(btn.getAttribute('aria-expanded') !== 'true');
+      });
+
+      /* hinter die Unterzeile, also direkt ueber den Inhalt */
+      var nach = sub || kopf;
+      if (nach && nach.parentNode === wrap) wrap.insertBefore(btn, nach.nextSibling);
+      else wrap.insertBefore(btn, wrap.firstChild);
+    } catch (e) { /* eine Falte darf das Fenster nie verhindern */ }
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -938,7 +1032,7 @@
           '<p class="dp-sub"><strong>Gez\u00e4hlt werden Bewertungen, getrennt nach Art.</strong> Ein Pass, umschaltbar \u2014 Zugekauftes kommt obendrauf, wird zuletzt verbraucht und verf\u00e4llt nie.</p>' +
         '</div>' +
         _kerosinStripHtml() +
-        '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar \u00b7 verfallen nicht \u00b7 kein Abo.</p>' +
+        '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar \u00b7 zugekaufte verfallen nicht \u00b7 kein Abo.</p>' +
       '</div>' +
 
       // V63.82: Feature-Übersicht — vollständige Vergleichstabelle
@@ -1093,10 +1187,19 @@
       '<div class="kp-flight">' + flight + '</div>' +
       _kerosinGauge(off, deg) +
       '<div class="dp-credits-amount">' + liter + '</div>' +
-      '<div class="dp-credits-amount-label">Liter = ' + liter + ' Pilot-Anfragen</div>' +
+      /* v2097: hier stand „Liter = X Pilot-Anfragen". Die Einheit „Liter"
+         ist mit dem Begriff „Kerosin" gefallen (CLAUDE.md). Das steht im
+         PREIS-FENSTER — genau dort, wo Marcel den Begriff „die ganze Zeit"
+         gesehen hat. Mein eigener Waechter hatte die Zeile als Bezeichner
+         eingeordnet, weil zu wenige deutsche Woerter darin stehen; von
+         Hand nachgesehen ist sie kundensichtbar. */
+      '<div class="dp-credits-amount-label">= ' + liter + ' Pilot-Anfragen</div>' +
       '<div class="dp-credits-divider"></div>' +
       '<div class="dp-credits-price">' + price + ' €</div>' +
-      '<div class="dp-credits-perunit">' + perLiterStr + ' / Liter</div>' +
+      /* v2097: „/ Liter" -> „/ Anfrage". Dieselbe Begruendung wie oben;
+         `perLiter` rechnet den Preis je Anfrage, der Name der Variablen
+         stammt aus der alten Einheit und bleibt (Bezeichner, kein Text). */
+      '<div class="dp-credits-perunit">' + perLiterStr + ' / Anfrage</div>' +
       '<div class="dp-credits-target">' + target + '</div>' +
       '<div class="kp-reach">' + reach + '</div>' +
       '<a class="dp-credits-cta" href="#" data-pack-id="' + packId + '" onclick="window._buyCreditPackDirect(this); return false;">Bewertungen kaufen</a>' +

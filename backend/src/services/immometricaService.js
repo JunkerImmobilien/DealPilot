@@ -56,6 +56,58 @@ function _demoPack(list) { return { count: list.length, next: null, items: list.
 function _demoResults(searchId) { const list = DEMO_RAW[searchId] || DEMO_RAW['s-kapital']; return _demoPack(list); }
 function _demoFavorites() { return _demoPack(DEMO_RAW['s-kapital'].slice(0, 2)); }
 
+/* ══ v1996 · EIN INVENTAR, DAS KEINEN ABRUF KOSTET ═══════════════════
+
+   Es gibt keine oeffentliche Doku: `searchapi/v1/` antwortet 401 mit
+   `www-authenticate: Token`, alle Doku-Pfade 404, der Wayback-Index
+   kennt unter `searchapi` keinen Treffer. Die 63-Feld-Tabelle in
+   `immometricaMapping.js` ist damit UNSER EINZIGES Inventar der API —
+   und sie kam ohne Musterantwort ins Repo.
+
+     > Eine Feldliste, die niemand gegen eine echte Antwort haelt, ist
+     > eine Behauptung.
+
+   Dieses Protokoll ruft NICHTS zusaetzlich ab. Der Tarif fuehrt 600
+   Objekte im Monat; jeder Probeabruf ginge davon ab. Es sieht bei der
+   naechsten echten Nutzung einmal hin.
+
+   Protokolliert werden die SCHLUESSEL der Rohantwort — und als einzige
+   Werte `condition` und `energy_efficiency_class`. Das sind
+   Aufzaehlungen, keine personenbezogenen Angaben, und an ihnen haengen
+   zwei Felder, die seit Juni als PENDING gelten (`ds2_zustand`,
+   `ds2_energie`). Ob die API "A+" oder "a_plus" schickt, weiss heute
+   niemand, und ohne das ist jede Zuordnung geraten.
+
+   Preise, Adressen, Inseratstexte und Links werden NICHT angefasst. */
+let _inventarGesehen = false;
+function inventarNotieren(items) {
+  if (_inventarGesehen) return;
+  if (!Array.isArray(items) || !items.length) return;
+  _inventarGesehen = true;
+  try {
+    const schluessel = new Set();
+    const zustand = new Set(), energie = new Set();
+    items.slice(0, 25).forEach((it) => {
+      if (!it || typeof it !== 'object') return;
+      Object.keys(it).forEach((k) => schluessel.add(k));
+      if (it.condition != null && it.condition !== '') zustand.add(String(it.condition));
+      if (it.energy_efficiency_class != null && it.energy_efficiency_class !== '') {
+        energie.add(String(it.energy_efficiency_class));
+      }
+    });
+    const bekannt = new Set(Object.keys(mapping.FIELD_MAP || {}));
+    const neu = [...schluessel].filter((k) => !bekannt.has(k)).sort();
+    const fehlt = [...bekannt].filter((k) => !k.includes('[') && !schluessel.has(k)).sort();
+    console.log('[immometrica-inventar] Schluessel in der Antwort: ' + schluessel.size);
+    console.log('[immometrica-inventar] UNBEKANNT (nicht im Mapping): ' + (neu.length ? neu.join(', ') : 'keine'));
+    console.log('[immometrica-inventar] im Mapping, NICHT in der Antwort: ' + (fehlt.length ? fehlt.join(', ') : 'keine'));
+    console.log('[immometrica-inventar] condition-Werte: ' + ([...zustand].join(' | ') || '(keine)'));
+    console.log('[immometrica-inventar] energy_efficiency_class-Werte: ' + ([...energie].join(' | ') || '(keine)'));
+  } catch (e) {
+    try { console.log('[immometrica-inventar] nicht erstellt: ' + e.message); } catch (e2) {}
+  }
+}
+
 async function call(token, url) {
   const res = await fetch(url, { headers: { Authorization: 'Token ' + token, Accept: 'application/json' } });
   const text = await res.text();
@@ -79,6 +131,7 @@ async function getResults(token, searchId, page) {
   if (page) url += '?page=' + encodeURIComponent(page);
   const j = await call(token, url);
   const items = Array.isArray(j) ? j : (j && j.results) || [];
+  inventarNotieren(items);   /* v1996 */
   return {
     count: j && j.count != null ? j.count : items.length,
     next: (j && j.next) || null,
@@ -91,6 +144,7 @@ async function getFavorites(token, cc) {
   const url = abs('favorites/' + encodeURIComponent(cc) + '/');
   const j = await call(token, url);
   const items = Array.isArray(j) ? j : (j && j.results) || [];
+  inventarNotieren(items);   /* v1996 */
   return {
     count: j && j.count != null ? j.count : items.length,
     items: items.filter(it => !it.fake).map(it => ({ raw: it, dp: mapping.mapToDp(it) })),

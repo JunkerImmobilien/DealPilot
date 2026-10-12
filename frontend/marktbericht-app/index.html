@@ -113,8 +113,18 @@
     border:1px solid var(--line);border-radius:999px;padding:4px 10px;}
   h1{font-family:'Space Grotesk';font-weight:600;font-size:15px;letter-spacing:.4px;
     text-transform:uppercase;color:var(--muted);margin:0 0 14px;}
-  .grid{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start;}
-  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  /* v2005 · `1fr` hat min-width:auto und kann NICHT unter die Breite
+     seines Inhalts schrumpfen. Gemessen bei 1024 px (iPad quer):
+     #resultPanel bestand auf 762 px, obwohl 574 px Platz waren - das
+     Raster ist nicht umgebrochen, es ist hinausgewachsen (Dokument
+     scrollte 160 px waagerecht). minmax(0,1fr) heilt jede Breite und
+     steht in den Handy-Regeln weiter unten laengst dreimal. */
+  .grid{display:grid;grid-template-columns:380px minmax(0,1fr);gap:22px;align-items:start;}
+  /* v2005 · Umschaltpunkt 880 -> 1080. Bei 1024 galt vorher noch die
+     zweispaltige Fassung, und 380 px Seitenspalte + 22 px Abstand
+     liessen dem Bericht 574 px - zu wenig. Genau diese eine Breite war
+     als einzige kaputt, und es ist die des iPads im Querformat. */
+  @media(max-width:1080px){.grid{grid-template-columns:minmax(0,1fr)}}
   .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));
     border:1px solid var(--line);border-radius:16px;padding:20px;
     box-shadow:0 10px 40px rgba(0,0,0,.35);}
@@ -176,7 +186,7 @@
     background:conic-gradient(var(--gold) var(--deg,0deg), #26262c 0);position:relative;}
   .score-circle::after{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--panel);}
   .score-circle span{position:relative;z-index:1;}
-  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+  .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0;}
   .kpi{background:#0f0f12;border:1px solid var(--line);border-radius:12px;padding:12px;}
   .kpi .v{font-family:'Space Grotesk';font-weight:600;font-size:18px;}
   .kpi .l{font-size:11px;color:var(--muted);margin-top:2px;}
@@ -206,7 +216,7 @@
     border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;}
   @keyframes s{to{transform:rotate(360deg)}}
   /* Marktbewertung (Wert + Spanne) */
-  .valbox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  .valbox{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin:14px 0;}
   @media(max-width:560px){.valbox{grid-template-columns:1fr}}
   .valcard{background:#0f0f12;border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
   .valcard .cap{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
@@ -218,8 +228,12 @@
   .rangebar .mark{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;
     background:var(--gold);transform:translate(-50%,-50%);box-shadow:0 0 0 3px var(--panel);}
   /* Bewertungs-Kacheln */
-  .assess-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 18px;} .assess.assess-nutzer{border-style:dashed;opacity:.92} .assess.assess-nutzer .l{font-style:italic}
-  @media(max-width:560px){.assess-grid{grid-template-columns:repeat(2,1fr)}}
+  .assess-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 18px;} .assess.assess-nutzer{border-style:dashed;opacity:.92} .assess.assess-nutzer .l{font-style:italic}
+  @media(max-width:560px){.assess-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  /* v2006 · Unter 420 px ist eine zweispaltige Bewertungskachel nicht
+     mehr lesbar, egal wie gut sie schrumpft. Gemessen am iPhone SE
+     (360 px): zwei Kacheln brauchten 302 px, da waren 267. */
+  @media(max-width:420px){.assess-grid{grid-template-columns:minmax(0,1fr) !important}}
   .assess{background:#0f0f12;border:1px solid var(--line);border-radius:12px;padding:12px;}
   .assess .l{font-size:11px;color:var(--muted);}
   .assess .v{font-family:'Space Grotesk';font-weight:600;font-size:15px;margin-top:3px;text-transform:capitalize;}
@@ -331,9 +345,9 @@
     html,body{overflow-x:hidden !important;max-width:100vw}
     .wrap{padding-left:14px !important;padding-right:14px !important}
     .scorebox{flex-direction:column !important;align-items:flex-start !important;gap:12px !important}
-    .kpis{grid-template-columns:1fr 1fr !important}
+    .kpis{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important}
     .valbox{grid-template-columns:1fr !important}
-    .assess-grid{grid-template-columns:1fr 1fr !important}
+    .assess-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important}
     .report{padding:16px 16px !important;max-width:100% !important;overflow-wrap:break-word}
     .report h1{font-size:19px !important}
     .report h2{font-size:15px !important}
@@ -693,8 +707,8 @@ if (!window._wlrgbaH) {
      Haupt-App wirken hier nicht, das Blatt muss ausdruecklich geladen
      werden. VOR app.js, damit window.ScoreTier steht, wenn sie laeuft. -->
 <script src="../js/score-tiers.js?v=v1950"></script>
-<script src="app.js?v=v1950"></script>
-<script src="mb-objektwahl.js?v=1877"></script><!-- v566-objektwahl -->
+<script src="app.js?v=v2005"></script>
+<script src="mb-objektwahl.js?v=2007"></script><!-- v566-objektwahl -->
 <script>
 /* DealPilot-Partikelfeld: leichte, langsam driftende Gold-Punkte hinter dem Content */
 (function () {
@@ -722,7 +736,7 @@ try{var _u=new URLSearchParams(location.search).get('theme');if(_u==='light'||_u
 })();</script>
 <!-- WUI10-1 · Wertermittlung: Zielfrage, Stufenfelder, Pflichtfeld-Ampel -->
 <script src="feldhilfe.js?v=1338"></script>
-<script src="wertermittlung.js?v=1435"></script>
+<script src="wertermittlung.js?v=2100"></script>
 <script src="mb-stufen.js?v=1435"></script>
 <script src="mb-wizard.js?v=1350"></script><!-- v1127: Reiter, nach mb-stufen.js --><!-- v1126: Stufen als Meilensteine, nach wertermittlung.js -->
 <!-- v1340: Eingabe-Karten (Variante B). NACH mb-wizard.js — vorher liegen die

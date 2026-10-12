@@ -725,6 +725,9 @@ async function _runAIGuarded() {
  * der User-Key wird nur als Fallback genutzt — wird vom Backend nie geloggt.
  */
 function _buildAIPayload() {
+  /* v2011 - ein leeres Textfeld ist NICHT erfasst, nicht "". Das
+     Modell soll "nicht erfasst" von "leer eingetragen" trennen. */
+  var txt = function (id) { var v = g(id); return (v == null || String(v).trim() === '') ? null : String(v).trim(); };
   var k = State.kpis || {};
   var dealscoreSnap = null;
   if (typeof DealScore !== 'undefined' && typeof DealScore.snapshot === 'function') {
@@ -801,7 +804,25 @@ function _buildAIPayload() {
                 miete: zahl(e.ist) || null,
                 art: e.art || null,           /* wohnen | gewerbe */
                 status: e.status || null,     /* vermietet | leer  */
-                lage: e.lage || null
+                lage: e.lage || null,
+                /* v2022 - was eine BEURTEILUNG traegt. Nicht alle 28
+                   Felder der Wohnung: 28 x 20 waeren 560 Werte in einem
+                   Prompt, der ohnehin 23.000 Zeichen hat. Kaution,
+                   Mietername, Keller und Notiz bleiben draussen - der
+                   Mietername hat im Prompt ohnehin nichts verloren. */
+                etage: e.etage || null,
+                zimmer: zahl(e.zimmer) || null,
+                vertragsart: e.mv_art || null,
+                letzte_erhoehung: e.mv_letzte_erhoehung || null,
+                naechste_anpassung: e.mv_naechste_anpassung || null,
+                befristet_bis: e.mv_befristet_bis || null,
+                /* v2023a - `rnd_eigen`/`rnd_jahre` sind hier entfallen.
+                   Das FELD ist in v2023 weggefallen (die RND kommt aus
+                   Zustand je Einheit); der Sender blieb stehen und haette
+                   nur noch Altdaten geliefert - die im Prompt aussehen wie
+                   gepflegte. Ein Feld entfernen heisst nicht, es
+                   loszuwerden. */
+                zustand: e.zustand || null
               };
             }),
             /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
@@ -825,8 +846,222 @@ function _buildAIPayload() {
     },
     finanzierung: {
       d1z_pct: k.d1z_pct, d1t_pct: k.d1t_pct, d1: k.d1,
+      /* v2009 - Zinsbindung und Anschlusskondition. Aufgabe 13 des
+         Prompts verlangt eine Anschlussfinanzierungs-Analyse; bis
+         hierher reiste nur die Restschuld mit, ohne das Jahr dazu.
+         Gelesen wird aus dem Formular, weil State.kpis diese drei
+         nicht fuehrt. */
+      d1_bindj: parseDe(g('d1_bindj')), anschl_z: parseDe(g('anschl_z')),
+      anschl_t: parseDe(g('anschl_t')), anschl_bj: parseDe(g('anschl_bj')),
       restschuld_ezb: (typeof State !== 'undefined' && State.rs1 != null) ? State.rs1 : ((typeof State !== 'undefined' && State.rs != null) ? State.rs : (parseDe(g('restschuld')) || null))
     },
+    /* ══ v2011 · SIEBEN BLOECKE, DIE DIE KI NIE GESEHEN HAT ═══════
+
+       Alle 46 Felder stehen im Feldkatalog (256 Feld-Ids) - sie
+       reisten nur nie mit. Der Prompt stellt Aufgaben, fuer die er
+       die Daten nicht hatte: Aufgabe 8 verlangt eine Aussage zur
+       Steuererstattung ohne Grenzsteuersatz, der Marktkontext-Block
+       bietet den Energie-Abschlag an "wenn die Energieklasse bekannt
+       ist" - sie war nie bekannt. Eine Aufgabe ohne Datengrundlage
+       wird nicht unbeantwortet gelassen, sie wird GERATEN.
+
+       `null` statt `0`: ein nicht erfasstes Feld darf nicht wie eine
+       gemessene Null aussehen (CLAUDE.md: Number(null) ist 0 und
+       besteht Number.isFinite). `txt()` gibt leere Felder als null. */
+    /* ═══ v2067a · SANIERUNG, § 7b UND ERBPACHT REISTEN NICHT MIT ═══════
+       Marcel, 10.10.2026: „Was ist mit den daten aus dem tab Steuer?
+       werden diese uebergeben?"
+
+       GEMESSEN: die Grundlagen ja - zve, Grenzsteuersatz, AfA-Satz,
+       Restnutzungsdauer und der BMF-Gebaeudeanteil standen hier. Sechs
+       Felder aus demselben Reiter nicht:
+
+         san              Sanierungskosten
+         san_ust          brutto oder netto
+         san_tax_years    Verteilung (§ 82b EStDV: 2 bis 5 Jahre)
+         san_tax_active   ob sie steuerlich angesetzt werden
+         afa_sonder7b_aktiv   die Sonder-AfA nach § 7b
+         erbpacht / erbbauzins
+
+       Das sind keine Nebensaechlichkeiten: eine Sanierung ueber fuenf
+       Jahre verteilt aendert den Cashflow nach Steuer in jedem einzelnen
+       davon, und ein Erbbaurecht aendert, was man ueberhaupt kauft. Ein
+       Pilot, der beides nicht kennt, beurteilt ein anderes Objekt.
+
+       Die RECHNUNG bleibt unberuehrt - hier wird nur gelesen. */
+    steuer: (function () {
+      var an = function (id) { var e = document.getElementById(id); return !!(e && e.checked); };
+      var s = {
+        zve: parseDe(g('zve')), grenzsteuersatz_pct: parseDe(g('grenz')),
+        afa_satz_pct: parseDe(g('afa_satz')), afa_rnd_jahre: parseDe(g('afa_rnd_jahre')),
+        gebaeudeanteil_pct: parseDe(g('geb_ant')), afa_eigen_pct: parseDe(g('afa_eigen'))
+      };
+      var sanKosten = parseDe(g('san'));
+      if (sanKosten) {
+        s.sanierung = {
+          kosten_eur: sanKosten,
+          betrag_ist: txt('san_ust') || null,          /* brutto | netto */
+          steuerlich_angesetzt: an('san_tax_active'),
+          verteilung_jahre: txt('san_tax_years') || null   /* auto | 2 … 5 */
+        };
+      }
+      if (an('afa_sonder7b_aktiv')) s.sonder_afa_7b = true;
+      if (an('erbpacht')) {
+        s.erbbaurecht = { ja: true, erbbauzins_eur_jahr: parseDe(g('erbbauzins')) || null };
+      }
+      return s;
+    })(),
+    bewirtschaftung: {
+      hausgeld_umlagefaehig: parseDe(g('hg_ul')), hausgeld_nicht_umlagefaehig: parseDe(g('hg_nul')),
+      grundsteuer: parseDe(g('grundsteuer')), weg_ruecklage: parseDe(g('weg_r')),
+      eigene_ruecklage: parseDe(g('eigen_r')), mietausfall_pct: parseDe(g('mietausfall'))
+    },
+    /* v2026 - die Mietentwicklung sagt jetzt, WORAUS sie gerechnet ist.
+
+       Vorher ging `modus` roh raus („einheiten") und daneben die fuenf
+       Progressionsfelder, die in diesem Modus gar nicht gelten. Das
+       Modell haette aus `soll_eur_qm` und `schritt_pct` gerechnet,
+       waehrend die Tabelle etwas anderes zeigt.
+
+       Ein Wert, der nicht gilt, ist im Prompt schlimmer als kein Wert. */
+    mietentwicklung: (function () {
+      var ME = window.MietEntwicklung;
+      var m = (ME && typeof ME.getMode === 'function') ? ME.getMode() : txt('me_modus');
+      var aus = {
+        modus: m,
+        herkunft: m === 'einheiten'
+          ? 'Aus den Mietvertraegen der einzelnen Wohnungen'
+          : (m === 'detail' ? 'Stufenplan von Hand' : 'Gleichmaessige Steigerung je Jahr'),
+        mietspiegel_eur_qm: parseDe(g('mietspiegel')),
+        leerstand_pct: parseDe(g('leerstand')), umlagefaehig: parseDe(g('umlagef'))
+      };
+      if (m === 'einheiten' && ME && typeof ME.einheitenStand === 'function') {
+        var st = ME.einheitenStand();
+        aus.einheiten_gesamt = st.gesamt;
+        aus.einheiten_mit_plan = st.mit;
+        aus.einheiten_index = st.index;   /* deren Hoehe ist eine ANNAHME */
+      } else {
+        /* nur hier gelten die Progressionsfelder */
+        aus.soll_eur_qm = parseDe(g('me_soll'));
+        aus.schritte = parseDe(g('me_anz'));
+        aus.intervall_jahre = parseDe(g('me_int'));
+        aus.schritt_pct = parseDe(g('me_pct'));
+      }
+      return aus;
+    })(),
+    /* v2041 - der ANKAUF-STAND und die Abweichung. Marcel: „wenn wir
+       der Pilotanalyse eine Frage stellen wie: sind wir aktuell nach
+       Plan? Kannst du mir einen Soll-Ist-Vergleich machen."
+
+       Gerechnet wird hier nichts: `abweichung()` liefert die Zeilen
+       fertig, aus zwei Saetzen persistierter `_kpis_*` - jede von den
+       echten Kernen zu ihrer Zeit. Das Modell soll vergleichen, nicht
+       nachrechnen; sonst rechnete es alte Daten mit heutigen Regeln. */
+    ankauf: (function () {
+      var AK = window.DealPilotAnkauf;
+      if (!AK || !AK.vorhanden()) return null;
+      var st = AK.stand(), ab = null;
+      try { ab = AK.abweichung(); } catch (e) {}
+      return {
+        stichtag: st.stichtag,
+        festgeschrieben_am: st.am,
+        korrekturen: (st.korrekturen || []).length,
+        kennzahlen_damals: st.kurz,
+        abweichung: ab ? ab.zeilen : null
+      };
+    })(),
+    wohnung: {
+      zimmer: parseDe(g('zimmer')), baeder: parseDe(g('bad_anz')),
+      etage: txt('etage'), etagen_gesamt: parseDe(g('etagen_ges')),
+      garagen: parseDe(g('garagen')), stellplaetze_aussen: parseDe(g('stellpl_aussen')),
+      balkon_qm: parseDe(g('balkon_flae')), grundriss: txt('grundriss')
+    },
+    boden: {
+      bodenrichtwert_eur_qm: parseDe(g('brw')), brw_stichtag: txt('brw_stichtag'),
+      grundstueck_qm: parseDe(g('gsfl')), miteigentumsanteil_pct: parseDe(g('mea')),
+      bgf_qm: parseDe(g('bgf')), standardstufe: txt('standardstufe'),
+      sachwertfaktor: parseDe(g('sachwertfaktor')), liegenschaftszins_pct: parseDe(g('lzs_pct')),
+      nutzungsart: txt('nutzungsart')
+    },
+    halter: {
+      name: txt('halter'), seit: txt('halter_seit'), kaufdatum: txt('kaufdat'),
+      wirtschaftlicher_uebergang: txt('wirtschaftlicher_uebergang'),
+      vermietungsstand: txt('vermstand')
+    },
+    /* ═══ v2067 · DIE ACHT BAUTEILE EINZELN, NICHT NUR IHRE SUMME ═══════
+       Marcel, 10.10.2026: „sind alle rnd daten und zustandsfelder sowie
+       auch alles aus dem bmf rechner mit drin? greift das auch bei der
+       pilot analyse und bei dem cockpit piloten?"
+
+       GEMESSEN: im EXPORT stehen 22 Zustandsfelder je Objekt (mod_* fuer
+       acht Bauteile, ausst_*, qual_*, standardstufe). Hier reisten vier:
+       Gesamtzustand, Energieklasse, ein Freitext und die PUNKTSUMME.
+
+       Eine Summe sagt nicht, WO die Punkte fehlen. 11 von 20 kann heissen
+       „Dach und Fenster neu, Leitungen von 1960" oder „alles mittelmaessig"
+       - fuer die Beurteilung eines Kaufpreises sind das zwei verschiedene
+       Objekte, und der Pilot konnte sie nicht unterscheiden.
+
+       Die acht Bauteile sind dieselben wie in Anlage 2 ImmoWertV und wie
+       im RND-Wizard (`_getRndPrefill`, v1856) - gelesen wird dasselbe
+       Feld, nicht ein zweites daneben.
+
+       ── DIE WERTE SIND SCHON KLARTEXT ───────────────────────────────
+       Mein erster Anlauf uebersetzte "0"/"h"/"v" in Worte - die Stufen
+       des MFH-Konfigurators. GEMESSEN am Objektformular tragen die
+       `mod_*`-Felder aber FUENF Klartextstufen:
+
+         "Keine/Nie" · "> 20 Jahre" · "10 - 20 Jahre" ·
+         "5 - 10 Jahre" · "< 5 Jahre"
+
+       Das ist feiner als die Dreiteilung und schon lesbar. Die
+       Uebersetzungstabelle war also nicht nur ueberfluessig, sie haette
+       bei jedem Wert danebengegriffen und den Rohwert durchgereicht -
+       richtig aus Versehen.
+
+       `mfh-einheiten.js` fuehrt die Kurzcodes und uebersetzt sie selbst
+       (`STUFE_ZU_OBJEKT`). Zwei Schreibweisen fuer dieselbe Sache, und
+       wer sie verwechselt, merkt es nicht. */
+    zustand: (function () {
+      var TEILE = { mod_dach: 'Dach', mod_fenster: 'Fenster', mod_leitungen: 'Leitungen',
+                    mod_heizung: 'Heizung', mod_aussenwand: 'Aussenwaende',
+                    mod_baeder: 'Baeder', mod_innenausbau: 'Innenausbau',
+                    mod_grundriss: 'Grundriss' };
+      var bauteile = {}, n = 0;
+      Object.keys(TEILE).forEach(function (id) {
+        var v = String(g(id) || '').trim();
+        if (!v) return;
+        /* Der Wert ist die letzte Modernisierung als Zeitangabe. */
+        bauteile[TEILE[id]] = v;
+        n++;
+      });
+      var z = {
+        ds2_zustand: txt('ds2_zustand'), energieklasse: txt('ds2_energie'),
+        modernisierung: txt('modernis'), modernisierungspunkte: parseDe(g('mod_punkte'))
+      };
+      /* Nur mitschicken, was wirklich ausgefuellt ist - ein leerer Block
+         sieht nach Angabe aus und ist keine. */
+      if (n) z.bauteile = bauteile;
+      /* `standardstufe` steht schon in `boden`, `afa_rnd_jahre` in
+         `steuer`. Beide hier noch einmal zu senden waere eine Doppelung,
+         die beim naechsten Umbau auseinanderlaeuft - gepruefte Stelle
+         schlaegt bequeme Stelle. */
+      /* v2068: das Ergebnis des RND-Wizards, falls er gelaufen ist. Es
+         ist etwas anderes als `steuer.afa_rnd_jahre`: dort steht, was
+         der Nutzer eingetragen hat, hier was die Bauteile hergeben.
+         Weichen beide ab, ist das ein Befund und keine Doppelung. */
+      try {
+        var _r = window._dpRnd;
+        if (_r && _r.rnd_jahre) {
+          z.restnutzungsdauer_berechnet = {
+            jahre: _r.rnd_jahre, gesamtnutzungsdauer: _r.gnd_jahre || null,
+            alter_jahre: _r.alter_jahre || null, verfahren: _r.verfahren || null,
+            stand: _r.stand || null
+          };
+        }
+      } catch (e) {}
+      return z;
+    })(),
     dealscore: dealscoreSnap || {},
     /* v947-mbsource: NUR die Objekt-ID. Den Marktbericht holt /ai/analyze selbst
      * aus dem mb-Backend — der Browser soll Marktdaten weder faelschen noch
@@ -932,6 +1167,72 @@ function _buildAIPayload() {
   try {
     if (typeof Settings !== 'undefined') {
       var _s = Settings.get() || {};
+            /* ══ v2140 · DAS INVESTMENTPROFIL — SIEBEN VON 23 SCHLUESSELN ══
+
+         Aufgabe 5 des Analyseauftrags heisst „Investor-Fit - fuer wen
+         ist der Deal geeignet?" und nennt drei Archetypen. Sie nannte
+         keine EINGABE: die Schwellen dieses Investors lagen im
+         `localStorage` und erreichten keinen Prompt.
+
+         Noch schlimmer: `settings.js:579` bietet als Vorlage woertlich
+         „Bewerte meine Kaufentscheidung anhand meines persoenlichen
+         Investmentprofils (Mindest-DSCR, Max-LTV, Mindest-Cashflow)"
+         an. Die Anweisung reiste mit, die Daten nicht.
+
+         WARUM NUR SIEBEN: die uebrigen 16 sind VORBELEGUNGEN fuer
+         Formularfelder (Tilgung, EK-Quote, BWK-Quoten, Grenzsteuersatz,
+         Nebenkosten, Miet- und Wertsteigerung). Sie stehen im Auftrag
+         schon als OBJEKTWERT - dort EINGETRAGEN statt vorbelegt.
+
+         > Was im Objekt steht, gilt. Das Profil liefert nur, was im
+         > Objekt NICHT steht: die Schwellen und die Haltung.
+
+         Beide zu senden waere eine stille Doppelung: zwei
+         Grenzsteuersaetze fuer dieselbe Groesse. */
+      try {
+        var _ip = (window.DealPilotInvestmentProfile
+          && typeof DealPilotInvestmentProfile.get === 'function')
+          ? DealPilotInvestmentProfile : null;
+        if (_ip) {
+          var _prof = {
+            min_dscr: _ip.get('min_dscr'),
+            min_cashflow_vor_st: _ip.get('min_cashflow_vor_st'),
+            max_ltv: _ip.get('max_ltv'),
+            strategie: _ip.get('ai_strat'),
+            risikoneigung: _ip.get('ai_risk'),
+            verkaeufer_druck: _ip.get('ai_verk'),
+            marktlage: _ip.get('ai_markt')
+          };
+          /* ══ v2140b · EINE VORGABE IST KEINE ENTSCHEIDUNG ══════════
+
+             `get()` gibt den Vorgabewert, wenn der Nutzer nichts
+             gesetzt hat. Im Browser gemessen: ein Schluessel im
+             Speicher, sieben Werte aus `get()`. Als "Einstellungen des
+             Nutzers" waere das eine Behauptung.
+
+             > Eine Vorgabe als persoenliche Einstellung auszugeben,
+             > behauptet eine Entscheidung.
+
+             Die Werte gelten trotzdem - danach rechnet die App auch.
+             Also beides: der WERT aus `get()`, und daneben die Liste
+             dessen, was der Nutzer SELBST gesetzt hat (`load()` gibt
+             nur die rohen Nutzerwerte). Der Prompt kennzeichnet dann
+             je Zeile, was Entscheidung und was Vorgabe ist. */
+          var _roh = (typeof _ip.load === 'function') ? (_ip.load() || {}) : {};
+          var _gesetzt = [];
+          var _ZU_ROH = { strategie: 'ai_strat', risikoneigung: 'ai_risk',
+            verkaeufer_druck: 'ai_verk', marktlage: 'ai_markt' };
+          Object.keys(_prof).forEach(function (k) {
+            if (_prof[k] == null || _prof[k] === '') { delete _prof[k]; return; }
+            var rk = _ZU_ROH[k] || k;
+            if (_roh[rk] != null && _roh[rk] !== '') _gesetzt.push(k);
+          });
+          if (Object.keys(_prof).length) {
+            _prof._selbst_gesetzt = _gesetzt;
+            payload.investor_profil = _prof;
+          }
+        }
+      } catch (e) { /* optional - ohne Profil laeuft die Analyse weiter */ }
       payload.aiOptions = {
         detailLevel: _s.ai_detail_level || '',
         tonality: _s.ai_tonality || '',
@@ -981,6 +1282,156 @@ function _formatAIError(err) {
   }
   return '⚠ Pilot-Analyse fehlgeschlagen: ' + ((err && (err.message || err.error)) || err);
 }
+/* ══ v2013 · FOTOS FUER DIE KI ═══════════════════════════════════
+
+   Verkleinert im Browser - auf dem Geraet, das die Bilder ohnehin
+   schon hat. Der Server bekommt nur das Ergebnis.
+
+   Vier Stueck: mehr erklaert ein Objekt nicht besser, kostet aber
+   je Bild. 768 px lange Kante reicht fuer "wie sieht es aus";
+   fuer eine MESSUNG reicht auch das Original nicht, und genau das
+   steht als Regel im Prompt.
+
+   ZWEI DINGE GEMESSEN, BEVOR HIER ETWAS STAND:
+   - Einen Verkleinerer gibt es SCHON: `window._dpResizeDataUrl`
+     (ui.js:505), benutzt von storage.js beim Speichern. Ein zweiter
+     waere eine Dublette - CLAUDE.md verbietet das fuer Rechenkerne,
+     und fuer eine Bildumrechnung gilt dasselbe.
+   - Die Fotos stehen in `imgs` (ui.js:530), nicht in einem
+     `_objPhotos`. Mein erster Entwurf griff auf einen Namen zu, den
+     es nicht gibt, und haette IMMER leer zurueckgegeben - ohne Fehler,
+     ohne Meldung, einfach nie ein Bild. */
+var KI_FOTOS_MAX = 4;
+var KI_FOTO_KANTE = 768;
+async function _fotosFuerKi() {
+  var roh = [];
+  try {
+    var q = (typeof imgs !== 'undefined' && imgs) ? imgs : (window.imgs || []);
+    roh = q.map(function (i) { return i && i.src; });
+  } catch (e) { roh = []; }
+  roh = (roh || []).filter(function (x) { return typeof x === 'string' && x.indexOf('data:image') === 0; });
+  if (!roh.length || typeof window._dpResizeDataUrl !== 'function') return [];
+  var aus = [];
+  for (var i = 0; i < roh.length && aus.length < KI_FOTOS_MAX; i++) {
+    try {
+      var k = await window._dpResizeDataUrl(roh[i], KI_FOTO_KANTE, 0.72);
+      if (k && typeof k === 'string' && k.indexOf('data:image') === 0) aus.push(k);
+    } catch (e) { /* ein Bild weniger ist kein Grund abzubrechen */ }
+  }
+  return aus;
+}
+
+/* ══ v2015 · DER STEMPEL AUF DER ANALYSE ═════════════════════════
+
+   Gemessen: sieben Objekte trugen byte-identisch dieselbe Analyse,
+   und sie sprach von einem achten. Der Bot hat es gemerkt - mit
+   einer Heuristik ("nennt der Text den Ort nicht?"), die raet und
+   nur im Telegram-Werkzeug sitzt.
+
+   Beim ERZEUGEN weiss der Browser genau, fuer welches Objekt er
+   rechnet. Diese eine Zeile fehlte. Jetzt kann jeder Leser exakt
+   vergleichen statt zu raten - im Bot, im PDF, im Co-Pilot.
+
+   Eine Herkunftsangabe gehoert an den ORT, an dem sie entsteht,
+   nicht an den, der sie spaeter braucht. */
+/* ══ v2017 · DER FINGERABDRUCK DER ZAHLEN ════════════════════════
+
+   Genau die Felder, ueber die die Analyse urteilt. `updated_at` des
+   Objekts waere der naheliegende Vergleich und der falsche: es
+   aendert sich bei jedem Speichern - ein Haken, eine Notiz, ein
+   Foto. Ein Banner, das nach jedem Klick "veraltet" ruft, wird nach
+   drei Tagen weggesehen.
+
+   Die Liste ist bewusst kurz und benannt: sie erlaubt es, dem Nutzer
+   zu SAGEN, WAS sich geaendert hat - nicht nur DASS. */
+var ANALYSE_FELDER = [
+  ['kp','Kaufpreis'], ['nkm','Nettokaltmiete'], ['wfl','Wohnflaeche'],
+  ['baujahr','Baujahr'], ['objart','Objektart'], ['zimmer','Zimmer'],
+  ['d1z','Sollzins'], ['d1t','Tilgung'], ['ek','Eigenkapital'],
+  ['gsfl','Grundstueck'], ['brw','Bodenrichtwert'], ['mea','Miteigentumsanteil'],
+  ['ds2_zustand','Zustand'], ['ds2_energie','Energieklasse'],
+  ['makrolage','Makrolage'], ['mikrolage','Mikrolage'], ['lageklasse','Lageklasse'],
+  ['hg_nul','Hausgeld'], ['leerstand','Leerstand'], ['einheiten','Wohneinheiten']
+];
+function _analyseAbdruck() {
+  var o = {};
+  try {
+    for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+      var id = ANALYSE_FELDER[i][0];
+      var v = (typeof g === 'function') ? g(id) : '';
+      o[id] = (v == null || String(v).trim() === '') ? null : String(v).trim();
+    }
+  } catch (e) { return null; }
+  return o;
+}
+/* v2048 - derselbe Abdruck, andere Quelle.
+
+   `_analyseAbdruck()` liest aus dem FORMULAR - also nur fuer das
+   geoeffnete Objekt. Der Export prueft ALLE und hat nur Datensaetze.
+
+   Dieselbe Liste `ANALYSE_FELDER`, derselbe Vergleich, nur eine
+   andere Quelle. Eine zweite Feldliste waere beim naechsten Feld
+   auseinandergelaufen - lautlos, weil beide Seiten plausibel
+   bleiben. */
+function _analyseAbdruckAus(daten) {
+  if (!daten || typeof daten !== 'object') return null;
+  var o = {};
+  for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+    var id = ANALYSE_FELDER[i][0];
+    var v = daten[id];
+    o[id] = (v == null || String(v).trim() === '') ? null : String(v).trim();
+  }
+  return o;
+}
+
+/* v2048 - welche Felder haben sich seit der Analyse geaendert?
+   Gibt die BESCHRIFTUNGEN zurueck. Ohne Abdruck wird NICHTS
+   behauptet: eine alte Analyse ohne Stempel ist unbekannt, nicht
+   veraltet. */
+function _analyseAbweichungAus(daten, alt) {
+  if (!alt || typeof alt !== 'object') return null;
+  var jetzt = _analyseAbdruckAus(daten);
+  if (!jetzt) return null;
+  var raus = [];
+  for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+    var id = ANALYSE_FELDER[i][0];
+    if ((alt[id] || null) !== (jetzt[id] || null)) raus.push(ANALYSE_FELDER[i][1]);
+  }
+  return raus;
+}
+window._analyseAbdruckAus = _analyseAbdruckAus;
+window._analyseAbweichungAus = _analyseAbweichungAus;
+
+/* Was hat sich geaendert? Gibt die BESCHRIFTUNGEN zurueck, nicht die Ids. */
+function _analyseAbweichung(alt) {
+  if (!alt || typeof alt !== 'object') return null;   /* ohne Abdruck wird nichts behauptet */
+  var jetzt = _analyseAbdruck();
+  if (!jetzt) return null;
+  var raus = [];
+  for (var i = 0; i < ANALYSE_FELDER.length; i++) {
+    var id = ANALYSE_FELDER[i][0];
+    if ((alt[id] || null) !== (jetzt[id] || null)) raus.push(ANALYSE_FELDER[i][1]);
+  }
+  return raus;
+}
+
+function _analyseStempeln(analyse) {
+  if (!analyse || typeof analyse !== 'object') return analyse;
+  try {
+    var adr = [g('str'), g('hnr')].filter(Boolean).join(' ');
+    var ort = [g('plz'), g('ort')].filter(Boolean).join(' ');
+    analyse._fuer = {
+      objekt_id: window._currentObjKey || null,
+      kuerzel: (typeof g === 'function' ? (g('kuerzel') || null) : null),
+      adresse: [adr, ort].filter(Boolean).join(', ') || null,
+      stand: new Date().toISOString(),
+      /* v2017 - worauf sich die Analyse stuetzt. Ohne das laesst sich
+         spaeter nur das Alter sagen, nicht die Gueltigkeit. */
+      abdruck: _analyseAbdruck()
+    };
+  } catch (e) { /* ohne Stempel ist sie nicht schlechter als vorher */ }
+  return analyse;
+}
 async function _runAIServer(btn) {
   var _orig = btn.innerHTML; /* v596-origbtn */
   btn.textContent = '⏳ Recherchiere Lage & analysiere...';
@@ -992,12 +1443,32 @@ async function _runAIServer(btn) {
     '</div>';
   try {
     var payload = _buildAIPayload();
+    /* v2013 - die Fotos, verkleinert. Gemessen liegen sie als
+       data:image/jpeg;base64 im Objekt, bis 1,8 MB je Objekt - roh
+       mitzuschicken waere teuer und unnoetig. `_fotosFuerKi()` gibt
+       hoechstens vier zurueck, lange Kante 768 px, JPEG 72 %. */
+    try { payload.fotos = await _fotosFuerKi(); } catch (e) { payload.fotos = []; }
     var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
     var html;
     if (data && data.analysis) {
-      html = _renderAIServerAnalysis(data.analysis);
-      window._aiAnalysis = data.analysis;
-      window._aiText = JSON.stringify(data.analysis, null, 2);
+      /* v2017a - STEMPELN VOR DEM RENDERN.
+       *
+       * Hier stand `html = _renderAIServerAnalysis(data.analysis)` ZUERST
+       * und der Stempel danach. Gemessen am echten Lauf: die frisch
+       * gerechnete Analyse war korrekt gestempelt, und oben stand
+       * trotzdem „Diese Analyse trägt noch kein Datum" — der Kopf aus
+       * v2017 liest `a._fuer`, und das gab es zum Zeitpunkt des Renderns
+       * noch nicht. Erst ein Neuladen des Objekts zeigte den Stand.
+       *
+       * Zwanzig Zeilen weiter unten (runMiniAI) war die Reihenfolge von
+       * Anfang an richtig herum. Zwei Wege, eine Sache — und nur einer
+       * stimmte.
+       *
+       * Gefunden hat es nicht der Prüfer, sondern der Blick auf den
+       * Bildschirm nach dem Lauf. */
+      window._aiAnalysis = _analyseStempeln(data.analysis);
+      window._aiText = JSON.stringify(window._aiAnalysis, null, 2);
+      html = _renderAIServerAnalysis(window._aiAnalysis);
       // V25: Mini-Block in Tab Kennzahlen mit aktualisieren
       var _mb = document.getElementById('ai-mini-body'); if (_mb) _mb.innerHTML = html; /* v596: Voll-Analyse in Bewertung */
       // V63.69: KI-Analyse direkt persistieren — User-Wunsch
@@ -1298,8 +1769,105 @@ function _renderAIServerAnalysis(a) {
     return '<section class="dp-pa-panel' + (active ? ' active' : '') + '" id="dp-pa-' + id + '">' + inner + '</section>';
   }
 
+  /* v2042 - der Soll/Ist-Abgleich. Marcel: „zusaetzlich in der
+     Pilot-Analyse dann einen Reiter Soll/Ist-Abgleich mit passendem
+     Text."
+
+     Rechnet nichts: `DealPilotAnkauf.abweichung()` liefert die Zeilen
+     fertig, aus zwei Saetzen persistierter Kennzahlen. Und er nennt
+     die Deckung - eine Tafel, die vollstaendig aussieht und es nicht
+     ist, ist schlimmer als eine kurze. */
+  function _sollIstHtml() {
+    var AK = window.DealPilotAnkauf;
+    if (!AK || !AK.vorhanden()) return '';
+    var a = null;
+    try { a = AK.abweichung(); } catch (e) {}
+    if (!a) return '';
+    var gesamt = (AK.KENNZAHLEN || []).length;
+    function f(v, e) {
+      if (v === null || v === undefined || !isFinite(v)) return '\u2013';
+      if (e === 'eur') return Math.round(v).toLocaleString('de-DE') + ' \u20ac';
+      if (e === 'pct') return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
+      return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function d(z) {
+      var vz = z.diff > 0 ? '+' : '';
+      if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' \u20ac';
+      if (z.einheit === 'pct') return vz + f(z.diff, 'zahl') + ' %-Punkte';
+      return vz + f(z.diff, 'zahl');
+    }
+    var t = a.stichtag ? a.stichtag.split('-').reverse().join('.') : '';
+    var reihen = a.zeilen.map(function (z) {
+      return '<tr class="abw-' + z.richtung + '"><td class="abw-wort">' + z.wort + '</td>'
+        + '<td class="abw-zahl">' + f(z.ankauf, z.einheit) + '</td>'
+        + '<td class="abw-zahl">' + f(z.bestand, z.einheit) + '</td>'
+        + '<td class="abw-zahl abw-diff">' + d(z) + '</td></tr>';
+    }).join('');
+    var schlechter = a.zeilen.filter(function (z) { return z.richtung === 'schlechter'; }).length;
+    var besser = a.zeilen.filter(function (z) { return z.richtung === 'besser'; }).length;
+    return '<div class="abw-tafel-host" style="margin:0">'
+      + '<div class="abw-kopf"><h4>Soll/Ist-Abgleich <span class="abw-sub">Bestand gegen Ankauf</span></h4>'
+      + '<div class="abw-stand">Ankauf-Stand vom <b>' + t + '</b></div></div>'
+      + '<p style="margin:0 0 12px;font:400 12.5px/1.6 Inter,system-ui,sans-serif">'
+      + '<b>Ankauf</b> ist der Stand beim Nutzen-/Lastenwechsel \u2014 dein <b>Soll</b>. '
+      + '<b>Bestand</b> ist, wie das Objekt heute dasteht \u2014 dein <b>Ist</b>. '
+      + (besser || schlechter
+          ? ('Von ' + a.zeilen.length + ' vergleichbaren Kennzahlen stehen <b>' + besser
+             + '</b> besser und <b>' + schlechter + '</b> schlechter als beim Ankauf.')
+          : 'Es hat sich nichts bewegt.')
+      + '</p>'
+      + '<table class="abw-tafel"><thead><tr><th>Kennzahl</th><th>Ankauf</th><th>Bestand</th><th>Abweichung</th></tr></thead>'
+      + '<tbody>' + reihen + '</tbody></table>'
+      + '<div class="abw-deckung">' + a.zeilen.length + ' von ' + gesamt + ' Kennzahlen vergleichbar'
+      + (a.zeilen.length < gesamt
+          ? ' \u2014 die \u00fcbrigen lagen zu einem der beiden Zeitpunkte nicht vor und werden <b>nicht</b> gesch\u00e4tzt.'
+          : '.')
+      + '</div></div>';
+  }
+  var _siHtml = _sollIstHtml();
+
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
-  return '<div class="dp-pa-wrap">' +
+  /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
+  var _kopf = '';
+  try {
+     var _f = a._fuer || null;
+     if (_f && _f.stand) {
+       var _d = new Date(_f.stand);
+       var _datum = isNaN(_d) ? '' : _d.toLocaleDateString('de-DE');
+       var _tage = isNaN(_d) ? null : Math.max(0, Math.round((Date.now() - _d.getTime()) / 86400000));
+       var _fremd = _f.objekt_id && window._currentObjKey && String(_f.objekt_id) !== String(window._currentObjKey);
+       var _ab = _fremd ? null : _analyseAbweichung(_f.abdruck);
+       var _klasse = 'ok', _text;
+       if (_fremd) {
+         _klasse = 'fremd';
+         _text = '<b>Diese Analyse geh\u00f6rt zu einem anderen Objekt</b>'
+               + (_f.adresse ? ' (' + _escClean(_f.adresse) + ')' : '')
+               + ' \u2014 bitte neu abrufen, bevor du dich darauf st\u00fctzt.';
+       } else if (_ab && _ab.length) {
+         _klasse = 'alt';
+         _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
+               + ' \u2014 seitdem ' + (_ab.length === 1 ? 'hat sich ' : 'haben sich ')
+               + '<b>' + _ab.map(_escClean).join(', ') + '</b> ge\u00e4ndert. '
+               + 'Die Texte unten k\u00f6nnen \u00fcberholt sein \u2014 neu abrufen.';
+       } else if (_ab) {
+         _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
+               + ' \u2014 die Zahlen haben sich seitdem nicht ge\u00e4ndert.';
+       } else {
+         /* Stempel ohne Abdruck: Alter ja, Gueltigkeit NICHT behauptet. */
+         _klasse = 'unbekannt';
+         _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
+               + ' \u2014 ob sich die Zahlen seitdem ge\u00e4ndert haben, ist nicht feststellbar.';
+       }
+       _kopf = '<div class="dp-pa-stand dp-pa-stand-' + _klasse + '">' + _text + '</div>';
+     } else {
+       /* v2017 - ALTE Analysen ohne Stempel. Hier wird NICHTS behauptet:
+          "aktuell" waere eine Aussage ohne Grundlage. */
+       _kopf = '<div class="dp-pa-stand dp-pa-stand-unbekannt">'
+             + 'Diese Analyse tr\u00e4gt noch kein Datum (vor Oktober 2026 erstellt). '
+             + 'Beim n\u00e4chsten Abruf steht hier, von wann sie ist und ob sie noch gilt.</div>';
+     }
+  } catch (e) { _kopf = ''; }
+  return '<div class="dp-pa-wrap">' + _kopf +
     '<nav class="dp-pa-rail">' +
       tab('briefing', 'Briefing', true) +
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +
@@ -1307,6 +1875,9 @@ function _renderAIServerAnalysis(a) {
       tab('loc', 'Lage &amp; Markt', false) +
       tab('verh', 'Verhandlung &amp; Offerte', false) +
       tab('bank', 'Bank', false) +
+      /* v2042 - nur wenn ein Ankauf-Stand vorliegt: ohne ihn gibt es
+         nichts abzugleichen, und ein leerer Reiter verspricht etwas. */
+      (_siHtml ? tab('si', 'Soll/Ist-Abgleich', false) : '') +
       '<button type="button" class="dp-pa-tab" id="dp-pa-tab-verlauf" style="display:none" onclick="_dpPaTab(\'verlauf\',this)">Marktbericht-Verlauf</button>' +
     '</nav>' +
     '<div class="dp-pa-content">' +
@@ -1316,6 +1887,7 @@ function _renderAIServerAnalysis(a) {
       panel('loc', pL, false) +
       panel('verh', pV, false) +
       panel('bank', pK, false) +
+      (_siHtml ? panel('si', _siHtml, false) : '') +
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';
@@ -1474,8 +2046,10 @@ async function _runMiniAIGuarded() {
 
     var data = await Auth.apiCall('/ai/analyze', { method: 'POST', body: payload });
     if (data && data.analysis) {
-      window._aiAnalysis = data.analysis;
-      window._aiText = JSON.stringify(data.analysis, null, 2);
+      /* v2015 - stempeln, BEVOR gespeichert wird. Danach ist nicht
+         mehr feststellbar, fuer welches Objekt sie gerechnet wurde. */
+      window._aiAnalysis = _analyseStempeln(data.analysis);
+      window._aiText = JSON.stringify(window._aiAnalysis, null, 2);
       _renderMiniAI(data.analysis);
       // Auch den großen Block in Tab s5 mit aktualisieren
       var aiContent = document.getElementById('ai-content');

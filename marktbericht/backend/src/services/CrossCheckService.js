@@ -11,7 +11,20 @@ import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
-import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';   /* v1056-WRND-3 */
+/* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
+
+     import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
+
+   `anlage2Rnd` kam in dieser Datei GENAU EINMAL vor: in der Importzeile.
+   Gerechnet wird seit v1816 ueber `rndEinheitlich` (Zeile darunter).
+
+   Er stand damit genau an der Stelle, die CLAUDE.md mit „Eine
+   Restnutzungsdauer fuer alle Verfahren" meint — und sah aus wie ein
+   zweiter Weg, der noch benutzt wird. Wer hier sucht, welchen Kern der
+   Sachwert fragt, fand zwei Kandidaten.
+
+   Die Zieldatei lib/anlage2.js bleibt: lib/rnd-einheitlich.js und
+   lib/immowertv.js importieren sie und rufen sie auch. */
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js'; /* v1816 */
 import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
 /* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
@@ -1087,13 +1100,45 @@ export const CrossCheckService = {
      * den Ertragswert, typisches Wohnungseigentum ueber den Vergleich.
      * Feste Regel, kein Gefuehl: derselbe Objekttyp bekommt immer dieselbe
      * Behandlung. */
+    /* ══ v1971 · DIE BASIS DES VERGLEICHS WIRD GEMESSEN ════════════════
+
+       Ein Vergleichswertverfahren darf nur fuehren, wenn KAUFPREISE
+       dahinterstehen (Paragraf 25 Abs. 1 ImmoWertV). Beide hier
+       moeglichen Grundlagen sind kaufpreisbasiert und sagen das selbst:
+
+         amtlicher Vergleichsfaktor  Paragraf 20, aus der
+                                     Kaufpreissammlung des Ausschusses
+         Immobilienrichtwert         beurkundete Kaufpreise, BORIS
+
+       Fehlen beide, bleibt nur der Median aus Portalinseraten — und der
+       ist ein ANGEBOTSPREIS. Dann gibt es kein fuehrendes Verfahren.
+       Siehe den Block in lib/verfahrenswahl.js. */
+    /* v1977: DRITTE kaufpreisbasierte Grundlage — der amtliche
+       Vergleichsfaktor aus dem Register (§ 20 ImmoWertV, aus der
+       Kaufpreissammlung). Er wird in ReportOrchestrator gelesen und
+       trägt dort schon die `verwendung`-Prüfung: Sätze, die der
+       Ausschuss nur für die steuerliche Bewertung freigibt, kommen
+       bereits mit `verfuegbar: false` an. Hier wird deshalb nur noch
+       `verfuegbar` gefragt — die Entscheidung fällt an der Stelle, die
+       den Satz gelesen hat. */
+    const _vglKaufpreise =
+      !!(p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar)
+      || !!(p.register_vergleichsfaktor && p.register_vergleichsfaktor.verfuegbar)
+      || !!(p.irw && p.irw.verfuegbar && Number(p.irw.wert_qm) > 0);
     out.verfahrenswahl = fuehrendesVerfahren({
       objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
+      vergleichsbasis: _vglKaufpreise ? 'kaufpreise' : null,
     });
     if (out.verfahrenswahl && out.verfahrenswahl.grund) {
-      out.notes.push('Führendes Verfahren: ' + ({ sachwert: 'Sachwertverfahren',
-        ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren' }
-        [out.verfahrenswahl.verfahren] || '—') + '. ' + out.verfahrenswahl.grund);
+      /* v1971: ohne fuehrendes Verfahren steht das AUCH im Bericht —
+         „—" als Verfahrensname war eine Leerstelle, die wie ein Fehler
+         aussah. */
+      const _vn = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
+        vergleichswert: 'Vergleichswertverfahren' }[out.verfahrenswahl.verfahren];
+      out.notes.push(_vn
+        ? 'Führendes Verfahren: ' + _vn + '. ' + out.verfahrenswahl.grund
+        : 'Kein führendes Verfahren ausgewiesen. ' + out.verfahrenswahl.grund
+          + (out.verfahrenswahl.weg ? ' ' + out.verfahrenswahl.weg : ''));
     }
 
     /* v1061-WVER-3 · Objektspezifisch angepasster Zinssatz nach Paragraf 33.
@@ -1110,6 +1155,17 @@ export const CrossCheckService = {
         wohnflaeche_qm: ref.living_area, normobjekt_qm: p.normobjekt_qm || null,
       });
       if (_an && _an.verfuegbar) out.zins_anpassung = _an;
+    }
+
+    /* v1977: auch der zurueckgehaltene Satz gehoert in den Bericht. Dass
+       ein Ausschuss Vergleichsfaktoren fuehrt, sie aber nur fuer die
+       steuerliche Bewertung freigibt, ist selbst eine Auskunft — und
+       zwar die, die dem Leser sonst fehlt: er sieht kein fuehrendes
+       Verfahren und erfaehrt nicht, warum. */
+    if (p.register_vergleichsfaktor) {
+      out.register_vergleichsfaktor = p.register_vergleichsfaktor;
+      const _rv = p.register_vergleichsfaktor;
+      if (_rv.hinweis && out.notes.indexOf(_rv.hinweis) < 0) out.notes.push(_rv.hinweis);
     }
 
     if (p.amtlicher_vergleichsfaktor) {
@@ -1155,8 +1211,33 @@ export const CrossCheckService = {
         ['ertragswert', out.ertragswert.available ? out.ertragswert.value_eur : null],
       ].filter(([, v]) => v != null);
       const nums = vals.map(([, v]) => v);
+      /* ══ v1971 · DIE AUSGABE NENNT IHRE BASIS ════════════════════════
+
+         `vergleichswert_eur` heisst aus Ruecksicht auf bestehende Leser
+         weiter so (Verlauf, Dropdown, gespeicherte Berichte), traegt aber
+         jetzt seine Herkunft mit. Beide Oberflaechen — Bildschirm und PDF
+         — beschriften danach, statt den Namen zu behaupten.
+
+           basis: 'kaufpreise'  amtlicher Vergleichsfaktor oder
+                                Immobilienrichtwert -> echter
+                                Vergleichswert nach Paragraf 24
+           basis: 'angebote'    Median aus Portalinseraten -> das ist
+                                eine MARKTPREISINDIKATION, kein
+                                Vergleichswert
+
+         > Eine Umbenennung des FELDES waere die groessere Reparatur, aber
+         > sie bricht jeden gespeicherten Bericht und das Wertanker-
+         > Dropdown. Die Beschriftung ist das, was der Kunde liest — sie
+         > wird korrigiert, der Schluessel bleibt. */
       out.comparison = {
         vergleichswert_eur: vgl,
+        basis: _vglKaufpreise ? 'kaufpreise' : 'angebote',
+        bezeichnung: _vglKaufpreise ? 'Vergleichswert' : 'Marktpreisindikation aus Angeboten',
+        basis_hinweis: _vglKaufpreise
+          ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 Abs. 1 ImmoWertV).'
+          : 'Angebotspreise aus Immobilienportalen, Median €/m². Keine beurkundeten '
+            + 'Kaufpreise — § 25 Abs. 1 ImmoWertV verlangt für das '
+            + 'Vergleichswertverfahren Kaufpreise.',
         sachwert_eur: out.sachwert.available ? out.sachwert.value_eur : null,
         ertragswert_eur: out.ertragswert.available ? out.ertragswert.value_eur : null,
         min_eur: nums.length ? Math.min(...nums) : null,

@@ -1000,6 +1000,21 @@
 
   var _rfEinstiegWeiter = null;
 
+  /* v2050 - die gemerkte Ansage HOLEN und dabei verbrauchen. Wer sie
+     angehaengt hat, bekommt sie kein zweites Mal: sonst stuende sie
+     beim Neuling zweimal da, und genau das war der Befund. */
+  function _rfAnsageHolen() {
+    if (!_rf || !_rf.ansage) return '';
+    var t = _rf.ansage; _rf.ansage = ''; return t;
+  }
+
+  /* Die Ansage als eigene Blase - fuer den, der die Tonfrage nicht
+     bekommt, weil er sie schon einmal beantwortet hat. */
+  function _rfAnsage() {
+    var t = _rfAnsageHolen();
+    if (t) _rfBlase('co', t);
+  }
+
   /* === v1115-WERK - ERKLAERUNG AUF ABRUF, AN JEDER FRAGE ==============
      Marcels Ansage: "Bei jedem Punkt kann man dann auch sagen: Erklaere
      mir das oder Erklaerung abgeben, oder man hat so ein Infofenster, wo
@@ -1014,13 +1029,17 @@
      Was hier NICHT passiert: eine neue Erklaerung erfinden. Es ist
      derselbe Text, den der Lernmodus zeigt, plus die Auskunft des
      Co-Piloten, wenn jemand mehr wissen will. */
-  function _rfErklaerZeigen() {
+  /* v2052 - `gesagt` ist der Satz, den der Nutzer wirklich benutzt hat.
+     Ueber den Chip bleibt es bei der Vorgabe; getippt oder gesprochen
+     steht jetzt im Verlauf, was gesagt wurde. Ein Verlauf, der die
+     eigenen Worte ersetzt, ist keiner. */
+  function _rfErklaerZeigen(gesagt) {
     if (!_rf) return;
     var e = _rf.offen && _rf.offen[_rf.i];
     if (!e) return;
     var w = _rfWozu(e);
     var name = _rfFeldName((e.ids && e.ids[0]) || '') || e.frage;
-    _rfBlase('ich', 'Erklär mir das.');
+    _rfBlase('ich', escH(String(gesagt || '').trim()) || 'Erklär mir das.');
     if (w) {
       _rfBlase('co', '<b>' + escH(name) + '</b>' +
         '<div class="vi-rf-wozu" style="margin-top:6px">' + escH(w) + '</div>' +
@@ -1050,27 +1069,43 @@
     _rfBlase('ich', art === 'erf_neu' ? 'Erste Immobilie.'
       : (art === 'erf_profi' ? 'Profi.' : 'Schon ein paar gemacht.'));
 
+    /* ═══ v2050 · EINE BLASE, NICHT ZWEI ════════════════════════════
+
+       Bestaetigung und Ansage stehen zusammen. Vorher war die Ansage
+       schon durch, bevor der Nutzer ueberhaupt gefragt worden war -
+       jetzt ist sie die ANTWORT auf seine Wahl.
+
+       Bei „Erste Immobilie“ sind die Punkte 1 und 4 der alten Liste
+       weg: sie sagten dasselbe wie die Ansage (der Reihe nach fragen,
+       am Ende eine Uebersicht), und im selben Absatz waere die
+       Wiederholung sichtbar gewesen.
+
+       Punkt 2 und 3 BLEIBEN. Punkt 3 ist seit v2049 sogar wichtiger:
+       dort ist der Knopf „Weiss ich nicht“ weggefallen, und dieser
+       Satz ist jetzt der einzige Ort, an dem der Weg erklaert wird. */
+    var _ans = _rfAnsageHolen();
+    var _vor = _ans ? '<div style="margin-top:8px">' + _ans + '</div>' : '';
+
     if (art === 'erf_neu') {
       _rfBlase('co',
-        'Alles klar — dann gehen wir es in Ruhe an. <b>So laeuft es ab:</b>' +
-        '<div class="vi-rf-wozu" style="margin-top:6px">' +
-        '<b>1.</b> Ich frage der Reihe nach — Adresse, Größe, Preis, Miete, Finanzierung. ' +
-        'Unter jeder Frage steht, wozu die Angabe dient.<br>' +
-        '<b>2.</b> Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
-        'Marktpreisindikation. Du sagst nur, ob ich soll.<br>' +
-        '<b>3.</b> Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage spaeter noch einmal ' +
-        'oder rechne ohne.<br>' +
-        '<b>4.</b> Am Ende siehst du eine Übersicht, und das Objekt wird angelegt.</div>' +
+        'Alles klar — dann gehen wir es in Ruhe an.' + _vor +
+        '<div class="vi-rf-wozu" style="margin-top:8px">' +
+        'Was ich selbst holen kann, hole ich: Bodenrichtwert, Lage, ' +
+        'Marktpreisindikation — du sagst nur, ob ich soll.<br>' +
+        'Weisst du etwas nicht, sag <b>"weiß ich nicht"</b> — ich frage später ' +
+        'noch einmal oder rechne ohne.</div>' +
         '<div style="margin-top:8px">Du kannst mich jederzeit unterbrechen: ' +
         '<b>"erklär mir das"</b>, <b>"warum fragst du das"</b> oder eine eigene Frage — ' +
         'danach machen wir weiter, wo wir waren.</div>');
     } else if (art === 'erf_profi') {
-      _rfBlase('co', 'Verstanden — kurz und knapp. ' +
-        '<b>"weiß ich nicht"</b> überspringt, <b>"fertig"</b> bringt dich zur Übersicht, ' +
-        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.');
+      _rfBlase('co', 'Verstanden — kurz und knapp.' + _vor +
+        '<div style="margin-top:8px"><b>"weiß ich nicht"</b> überspringt, ' +
+        '<b>"fertig"</b> bringt dich zur Übersicht, ' +
+        'und <b>"erklär mir das"</b> gibt es trotzdem, wenn du es brauchst.</div>');
     } else {
-      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst — ' +
-        'sag einfach <b>"erklär mir das"</b>. <b>"weiß ich nicht"</b> überspringt.');
+      _rfBlase('co', 'Gut. Ich halte es kurz und erkläre, wenn du fragst.' + _vor +
+        '<div style="margin-top:8px">Sag einfach <b>"erklär mir das"</b>. ' +
+        '<b>"weiß ich nicht"</b> überspringt.</div>');
     }
 
     var w = _rfEinstiegWeiter; _rfEinstiegWeiter = null;
@@ -3764,6 +3799,13 @@
       '  background:linear-gradient(90deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C));',
       '  transition:width .45s cubic-bezier(.22,.8,.3,1)}',
       '.vi-rf-schalter{display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
+      /* v2049 - der Fertig-Knopf in der Kopfzeile: ruhig, rechts, und
+         er verdeckt nichts. Kein Gold - er ist ein Ausgang, keine
+         Empfehlung. */
+      '.vi-rf-fertig{border:1px solid rgba(168,162,153,.30);background:none;',
+      '  color:#A8A299;border-radius:7px;padding:5px 11px;cursor:pointer;',
+      '  font:500 11.5px/1 Inter,system-ui,sans-serif;white-space:nowrap}',
+      '.vi-rf-fertig:hover{color:#E8E3D8;border-color:rgba(168,162,153,.55)}',
       '.vi-rf-fs{display:flex;align-items:center;gap:7px;cursor:pointer;',
       '  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;opacity:.75}',
       '.vi-rf-fs input{accent-color:var(--wl-c9a84c, #C9A84C)}',
@@ -4459,7 +4501,49 @@
          und Aufnahme. Ein Chat hat immer nur EINE Spalte: der Verlauf
          scrollt, die Eingabe steht unten fest. Genau das wird hier
          gebaut - ohne neue Maschinerie, nur mit Stil. */
-      '@media(max-width:600px){',
+      /* ═══ v2056 · NICHT NUR SCHMAL, AUCH FLACH ════════════════════════
+
+         GEMESSEN in der Messkabine bei 767x497 und 667x375 (Handy im
+         Querformat, kleines Tablet): die gefuehrte Eingabe war dort
+         KOMPLETT unbedienbar - 0 von 3 Chips erreichbar, Eingabefeld und
+         Uebernehmen ebenfalls nicht.
+
+         Die Ursache ist die Falle aus CLAUDE.md, wortwoertlich: ein
+         Flex-Kind in einem overflow-Container schrumpft, statt zu
+         scrollen. Die Buehne (.vi-rf-buehne) fiel auf HOEHE 0, waehrend ihr Grid
+         (grid-template-rows: 220px 180px) mit overflow:visible darueber
+         hinausquoll - die Merkliste lag damit auf der Eingabezeile.
+
+         Das Handy-Layout haette genau das verhindert (dort ist die Buehne
+         eine Flex-Spalte, kein Grid). Es hing nur an der BREITE - und ein
+         Handy im Querformat ist 667 bis 932 px breit.
+
+         Die zweite Bedingung (max-height:560px) fasst alle flachen Faelle:
+           667x375, 844x390, 932x430  Handys quer
+           767x497                    kleines Tablet
+           ein klein gezogenes Fenster am Schreibtisch
+
+         Ein Schwellenwert auf EINER Achse beschreibt kein Geraet - er
+         beschreibt eine Haltung des Geraets. */
+      /* ═══ v2059 · AUCH 601-900 px BRAUCHT DAS HANDY-LAYOUT ════════════
+         GEMESSEN bei 767x757 (iPad hochkant): nur 1 von 3 Chips
+         erreichbar. Dieselbe Ursache wie bei 767x497 vor v2056 - die
+         Buehne ist dort ein Grid mit grid-template-rows: 220px 180px
+         (= 400 px) in einem 208 px hohen Kasten, bei overflow:visible.
+         Der Inhalt quillt heraus: die Merkliste lag bei 203..423, der
+         Chat bei 435..615, die Chip-Leiste bei 423..552 - alles
+         uebereinander.
+
+         v2056 hat nur die FLACHEN Faelle gefangen. Der Fehler haengt
+         aber an der BREITE: bis 900 px ist die zweispaltige Buehne zu
+         eng. Das stand schon im Code - Z. 3971 macht sie dort bereits
+         einspaltig. Ich folge dieser Entscheidung, statt eine zweite
+         danebenzustellen.
+
+         Ein iPad hochkant bekommt damit das Handy-Layout. Das ist
+         Absicht: 1 von 3 erreichbaren Knoepfen ist keine Bedienbarkeit,
+         und eine andere Anordnung ist erlaubt, wenn sie bedienbar ist. */
+      '@media(max-width:900px),(max-height:560px){',
       /* 1 · Der Verlauf scrollt, statt zu quellen. min-height:0 ist
              Pflicht: ohne sie ignoriert ein Flex-Kind das overflow. */
       '  .oabi-ov.vi-mode .oabi-body{overflow-y:auto;-webkit-overflow-scrolling:touch}',
@@ -4512,7 +4596,35 @@
          GENAU die Hoehe der Buehne und scrollt in sich - und
          _rfAnsEnde() scrollt weiterhin das richtige Element ans Ende,
          was bei einem Scroller weiter oben nicht mehr stimmen wuerde. */
-      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:38vh;',
+      /* ═══ v2055 · DIE BUEHNE DARF SCHRUMPFEN ═══════════════════════
+         Hier stand `flex:1 1 auto` mit `min-height:38vh`. Das heisst:
+         sie gibt nichts ab. GEMESSEN auf 390 px summierten sich die
+         Mindesthoehen auf 659 px bei 510 verfuegbaren - der Container
+         scrollte, und dadurch KLEBTEN Mikrofonkasten und Eingabezeile
+         ueber der Chip-Leiste. Alle drei Chips der Tonfrage waren
+         unerreichbar, und der Lauf wartet auf genau diese Antwort.
+
+         `flex:1 1 0` mit kleiner fester Untergrenze: sie nimmt, was
+         uebrig ist, statt den Rest zu verdraengen. Der Chat darin hat
+         laengst `flex:1 1 0;min-height:0` und scrollt in sich - es
+         geht also nichts verloren.
+
+         Das ist die Falle aus CLAUDE.md in der anderen Richtung: dort
+         schrumpfen Flex-Kinder, statt zu scrollen. Hier schrumpfte
+         eines NICHT und verdraengte die Bedienung aus dem Bild. */
+      /* v2055a - 110px waren ZU WENIG. Gemessen nach v2055 auf 390x757:
+         der Chat fiel von 288 auf 66 px bei 1019 px Inhalt - die Chips
+         waren frei, dafuer das Gespraech erdrueckt. Eine Korrektur, die
+         an anderer Stelle einen neuen Schaden anrichtet, ist keine.
+
+         28vh statt einer festen Zahl: es waechst mit dem Geraet (757 ->
+         212, 664 -> 186, 568 -> 159) statt nur auf einem zu passen.
+
+         Mehr als 110 geht nur, WEIL die Chip-Leiste seit v2055 klebt:
+         laeuft die Summe jetzt ueber, legt sie sich ueber das Gespraech,
+         statt dahinter zu verschwinden. Das Sicherheitsnetz erlaubt die
+         groessere Buehne - ohne es waere 28vh wieder der alte Fehler. */
+      '  .oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 0;min-height:28vh;',
       '    display:flex;flex-direction:column}',
       '  .oabi-ov.vi-mode.vi-dialog #vi-rf-chat{flex:1 1 0;min-height:0;height:auto;',
       '    max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
@@ -4543,7 +4655,34 @@
       '    transform:rotate(180deg)}',
       /* Die aktuelle Frage ist die juengste Wortmeldung, nicht die halbe
          Anzeige. Sie steht direkt ueber der Eingabe und scrollt in sich. */
-      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:26vh;overflow-y:auto;min-height:0;flex:0 0 auto}',
+      /* ═══ v2055 · DIE CHIP-LEISTE KLEBT MIT ═══════════════════════
+         Sie stand als EINZIGE der drei Bedienschichten im Fluss,
+         waehrend Mikrofonkasten (bottom:44) und Eingabezeile
+         (bottom:0) darueber klebten. Sobald der Container scrollte,
+         verschwand sie dahinter - GEMESSEN: alle drei Chips der
+         Tonfrage unerreichbar.
+
+         `bottom:130px` ist Mikro (86) + Zeile (44). Damit sitzt sie
+         immer UEBER den beiden, nie darunter.
+
+         Der eigene Grund ist Pflicht, nicht Geschmack: ein klebendes
+         Element ohne Hintergrund laesst das Gespraech durchscheinen.
+         `z-index:4` haelt die Reihenfolge der drei Schichten -
+         darunter das Gespraech, darueber Mikro (5) und Zeile (6). */
+      /* v2055b - 26vh reichten auf dem kleinsten Geraet nicht. GEMESSEN
+         auf 320x565: die Leiste brauchte 217 px und bekam 145, der Chip
+         'Profi' lag ausserhalb und war nur durch Scrollen in einer
+         147-px-Leiste erreichbar - ohne jeden Hinweis darauf.
+
+         flex-wrap ist gesetzt, half aber nicht: die drei Chips sind
+         148 + 190 + 85 px breit, und bei ~270 px nutzbarer Breite passen
+         keine zwei davon nebeneinander. Also braucht die Leiste Hoehe.
+
+         min(230px, 40vh) - der Deckel ist so wichtig wie die Untergrenze:
+         ohne ihn erschlaegt die klebende Leiste auf grossen Geraeten das
+         Gespraech. 565 -> 226 (217 noetig), 757 -> 230. */
+      '  .oabi-ov.vi-mode #vi-rf-dran{max-height:min(230px,40vh);overflow-y:auto;min-height:0;flex:0 0 auto;',
+      '    position:sticky;bottom:130px;z-index:4;background:var(--cr,#FDFCFA)}',
       /* Reihenfolge per order - ohne das DOM anzufassen. */
       '  .oabi-ov.vi-mode .vi-rf-kopfzeile{order:1}',
       '  .oabi-ov.vi-mode #vi-rf-band{order:2}',
@@ -4574,6 +4713,77 @@
       '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:wrap;row-gap:8px}',
       '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 100%;order:-1}',
       '  .oabi-ov.vi-mode .vi-rf-halt{margin-left:auto}',
+      '}',
+      /* ═══ v2057 · BREIT UND FLACH IST NICHT SCHMAL ═════════════════════
+         v2056 hat den Handy-Block auf flache Fenster ausgeweitet, damit
+         das Querformat ueberhaupt bedienbar wird. Das war richtig fuer die
+         HOEHEN-Regeln (klebende Bedienleiste, kompakte Buehne) - aber es
+         hat die BREITEN-Regeln mitgenommen, und die sind bei 667 px
+         Breite falsch.
+
+         GEMESSEN bei 666x373, gleich nach v2056:
+           Chip-Leiste 574 px breit, die drei Chips zusammen 424 px -
+           sie passen locker nebeneinander, standen aber in zwei Zeilen.
+           Grund: der Vorspann "Damit ich den richtigen Ton treffe:"
+           belegt 231 px in DERSELBEN Zeile; 231 + 424 = 655 > 574.
+           Der Mikrofonkasten brach ebenso zweizeilig um (82 statt 40 px),
+           obwohl 666 px Breite da sind.
+
+         Zusammen waren das 129 + 82 = 211 px Bedienung in einem 145 px
+         hohen Scrollport - und sticky kann nicht mehr Platz schaffen,
+         als der Port hat. Deshalb blieben die Chips verdeckt.
+
+         Hier wird nur zurueckgenommen, was an der BREITE haengt:
+           · der Vorspann bekommt eine eigene Zeile, die Chips eine
+           · der Mikrofonkasten bleibt einzeilig
+
+         Ich habe zwei verschiedene Anliegen in eine Media-Query gesteckt
+         (schmal UND flach). Dieser Gegenblock trennt sie wieder, statt
+         v2056 zurueckzudrehen - der Nutzen dort ist gemessen: 767x497
+         ging von 0 auf 3 erreichbare Chips. */
+      /* v2059 - der Gegenblock gilt jetzt fuer BEIDE Wege in den
+         Handy-Block hinein: breit-und-flach wie bisher, und neu auch
+         601-900 px bei normaler Hoehe. Sonst braechen dort Chips und
+         Mikrofonkasten um, obwohl die Breite reicht. */
+      '@media(min-width:601px) and (max-width:900px),(min-width:601px) and (max-height:560px){',
+      '  .oabi-ov.vi-mode .vi-dran-lbl{flex:1 1 100%}',
+      '  .oabi-ov.vi-mode .vi-dran-a{row-gap:4px}',
+      '  .oabi-ov.vi-mode .vi-rf-mikro{flex-wrap:nowrap;row-gap:0}',
+      '  .oabi-ov.vi-mode .vi-rf-mikro-txt{flex:1 1 auto;order:0}',
+      '}',
+      /* ═══ v2058 · SEHR FLACH: DIE ENTSCHEIDUNG SCHLAEGT DEN PEGEL ══════
+         GEMESSEN bei 666x373 nach v2057: die drei Chips standen jetzt in
+         EINER Zeile und der Mikrofonkasten war auf 54 px - trotzdem
+         blieben sie verdeckt.
+
+         Die Rechnung geht dort nicht auf, und zwar grundsaetzlich:
+
+           Scrollport            145 px
+           Chip-Leiste            97
+           Mikrofonkasten         54
+           Eingabezeile           40
+                                 ---
+           Bedienung zusammen    191 px
+
+         Und `sticky` schafft keinen Platz: es haelt ein Element an
+         seiner Flussposition fest, es hebt es nicht darueber hinaus.
+         `#vi-rf-dran` wollte mit bottom:130 auf Oberkante 61 - der Port
+         beginnt aber erst bei 143. Also klemmte es bei 157..254, und
+         der Mikrofonkasten (189..244) lag davor.
+
+         Wenn drei Schichten nicht nebeneinander passen, muss eine davor.
+         Die Chip-Leiste bekommt deshalb denselben Versatz wie der
+         Mikrofonkasten (bottom:44) und legt sich mit z-index:7 darueber.
+
+         Das ist eine Entscheidung ueber Vorrang, keine Platzierung:
+         solange eine Frage offen ist, ist die ANTWORT wichtiger als der
+         Aussteuerungspegel. Der Kasten kommt zurueck, sobald die Leiste
+         leer ist - sie wird dann ausgeblendet.
+
+         Die Eingabezeile (248..288) bleibt frei: die Chip-Leiste endet
+         bei 244. Sie wird also nicht verdeckt, nur der Pegel. */
+      '@media(max-height:420px){',
+      '  .oabi-ov.vi-mode #vi-rf-dran{bottom:44px;z-index:7}',
       '}',
       '.vi-rf-knf-z{padding:8px 10px;border:1px solid rgba(42,39,39,.16);border-radius:8px;',
       '  background:rgba(42,39,39,.03)}',
@@ -4853,6 +5063,36 @@
      Geschwindigkeitsgewinn: eine Verneinung, die früher 2 Sekunden und
      0,1 Cent gekostet hat, kostet jetzt nichts und dauert nichts. */
   var RF_NEIN = /^(nein|nee|ne|nichts|kein[es]?|keine[rs]?|gibt('s| es)? (hier )?(nicht|keine)|haben wir (nicht|keine)|hab(e)? ich (nicht|keine)|brauchen wir (nicht|keine)|kommt nicht in frage|entf(ä|ae)llt|weiter|(ü|ue)berspringen|(ü|ue)berspring|weiss nicht|wei(ß|ss) ich nicht|keine ahnung|passt so|passt|unbekannt|k\.?a\.?)\b[\s.!]*$/i;
+
+  /* ═══ v2052 · „ERKLAER MIR DAS" IST KEINE FREIE FRAGE ════════════════
+
+     GEMESSEN auf Staging: bei der Frage nach der ADRESSE antwortete der
+     Co-Pilot auf „erklaer mir das" mit einer Erklaerung des DSCR.
+
+     `_rfErklaerZeigen()` macht es richtig - es nimmt den Wozu-Satz der
+     laufenden Frage. Gerufen wurde es aber nur ueber den CHIP (Z. 7239).
+     Der getippte Satz fiel durch bis `_rfIstFrage` und ging als freie
+     Frage an die KI, die ohne Feldbezug raten musste.
+
+     Und genau diesen Satz empfiehlt der Co-Pilot dreimal selbst
+     (Z. 994, 1094, 1100). Eine Anleitung, die das Programm selbst gibt,
+     ist ein Versprechen - hier war sie eine Falle.
+
+     ENG GEFASST, UND DAS IST DER PUNKT: nur Saetze OHNE eigenes Thema.
+     „Erklaer mir den DSCR" geht weiter an die KI - dort NENNT jemand ein
+     Thema, und die Feld-Erklaerung waere die falsche Antwort. Das Muster
+     endet auf `$`: wer weiterredet, meint etwas anderes. */
+  var RF_ERKLAER = new RegExp(
+    '^\\s*(?:(?:kannst du|k(?:\u00f6|oe)nntest du|bitte|und|ja)\\s+)*' +
+    '(?:' +
+      'erkl(?:\u00e4|ae)r(?:e|st)?(?:\\s+mir)?(?:\\s+(?:das|es|die\\s+frage|bitte|mal))*' +
+      '|erkl(?:\u00e4|ae)rung(?:\\s+bitte)?' +
+      '|was\\s+(?:hei(?:\u00df|ss)t|bedeutet|soll)\\s+(?:das|es)' +
+      '|warum\\s+fragst\\s+du\\s+(?:das|danach|mich\\s+das)' +
+      '|wozu\\s+(?:brauchst\\s+du\\s+)?(?:das|die\\s+angabe|den)' +
+      '|was\\s+meinst\\s+du\\s+damit' +
+      '|(?:das\\s+)?versteh(?:e)?\\s+ich\\s+nicht' +
+    ')\\s*[?.!,]*$', 'i');
 
   /* ═══ v1288b · Eine Verneinung darf auch ein SATZ sein ═════════════════
      Gemessen am 10.09.2026 im Sprechlauf. Auf „Muss etwas saniert werden,
@@ -5765,7 +6005,9 @@
     if (!Z || !window.DealScore || typeof window.DealScore.computeFromKpis !== 'function') return null;
     var S = window.DealScore.computeFromKpis({
       kp: Z.kp, cf_m: Z.K.cf_m || 0, nmy: Z.K.nmy || 0, ltv: Z.K.ltv || 0,
-      dscr: Z.K.dscr || 0, wp_kpi: Z.wp, mstg: _rfNum(_rfFeld('mietstg')) || 1.5
+      dscr: Z.K.dscr || 0, wp_kpi: Z.wp, mstg: _rfNum(_rfFeld('mietstg')) || 1.5,
+      /* v2141: ohne Darlehen entfallen LTV und DSCR im Score. */
+      darlehen: (Z.K.d_total != null && isFinite(Z.K.d_total)) ? Z.K.d_total : null
     });
     return { S: S, Z: Z };
   }
@@ -7026,9 +7268,29 @@
 
     } else if (_rf.adresseFrage) {
       frage = '<b>Stimmt die Adresse?</b> Sag „ja" — oder nenn sie mir noch einmal.';
-    } else if (e) {
-      frage = '<b>Jetzt dran</b> · ' + escH(_rfKurzname(e)) + ' — ' + escH(e.frage);
     }
+    /* ═══ v2049 · DIE DRITTE KOPIE DERSELBEN FRAGE ══════════════════
+
+       Hier stand die Zeile mit dem Kurznamen und der Frage. GEMESSEN:
+       der Fragetext stand damit DREIMAL gleichzeitig auf dem Schirm -
+       als Blase im Verlauf (Z. 9176, dort mit Pillen und Skalen), im
+       festen Streifen darueber (`_rfFrageAnheften`, v1619) und hier
+       darunter.
+
+       Marcel: es ist total ueberladen, und: dass man das wirklich
+       eher im Chatverlauf hat.
+
+       Diese Kopie geht, nicht eine der anderen: die Blase IST der
+       Verlauf, und der Streifen traegt die Begruendung aus v1619 -
+       wer sich etwas erklaeren laesst, scrollt die Blase aus dem Bild.
+       Beides erfuellt, was diese Zeile auch tat; sie war die Kopie
+       ohne eigenen Zweck. Und sie war die teure: Z. 4443 hat
+       `#vi-rf-dran` auf dem Handy mit 337 px gemessen, ueber die
+       HAELFTE des Koerpers.
+
+       Die vier anderen Zweige oben bleiben - das sind ZUSTAENDE
+       (uebersprungen, fertig, Adressfrage), keine Wiederholung einer
+       Frage, die woanders steht. */
     if (!frage && !akt.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
     host.style.display = '';
     /* ═══ v1119-WPULS · Der Zustand steht am Rahmen ══════════════════════
@@ -8123,11 +8385,84 @@
   function _rfFrageAnheften(e) {
     var host = $('vi-rf-frage');
     if (!host) return;
-    if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    /* v2050a - `_rfFrageAnheften(null)` raeumt nur ab. Der Merker
+       unten darf hier nicht gesetzt werden: abgeraeumt ist nicht
+       dasselbe wie gefragt. */
+    if (!e || !e.frage) { host.style.display = 'none'; host.innerHTML = '';
+      _rfStreifenAugeAus();   /* v2051 - kein Auge auf einer Frage, die es nicht mehr gibt */
+      return; }
+    /* ═══ v2050a · AB HIER WURDE GEFRAGT ════════════════════════════
+       Der Merker sitzt hier, weil das die GEMEINSAME Stelle beider
+       Frage-Blasen ist - `_rfFrage` und `_rfFrageNochmal` rufen beide
+       direkt davor. An einer der beiden haette er die andere
+       verfehlt. Gelesen wird er in `_rfModusSetzen`. */
+    if (_rf) _rf.gefragt = 1;
     host.innerHTML =
-      '<div class="vi-rf-frage-txt">' + escH(e.frage) + '</div>' +
-      _rfAntwortHilfe(e);
+      /* v2049 - nur der Fragetext. `_rfAntwortHilfe(e)` stand hier UND
+         in der Blase (Z. 9176, dort zusammen mit `_rfPillen` und
+         `_rfSkalen`). Dieser Streifen ist die AUFGABE in einem Satz;
+         die Hilfe gehoert dorthin, wo auch die Pillen stehen. */
+      '<div class="vi-rf-frage-txt">' + escH(e.frage) + '</div>';
     host.style.display = '';
+  }
+
+  /* ═══ v2051 · DER STREIFEN ERSCHEINT ERST, WENN DIE FRAGE WEG IST ══
+
+     GEMESSEN im Bild nach v2050a: die Frage stand zweimal - oben im
+     festen Streifen und darunter als Blase.
+
+     Zwei richtige Forderungen widersprachen sich:
+       v1619  die Frage muss bleiben, wenn sie aus dem Bild scrollt
+       N60.15 dieselbe Frage zweimal ist eine Kopie zu viel
+
+     Der alte Kommentar hat den Widerspruch gesehen und eine Seite zur
+     Regel erklaert („Doppelt ist hier richtig"). Richtig ist es aber
+     nur, SOLANGE die eine nicht zu sehen ist - und genau das stand
+     nicht da.
+
+     Also wird es gemessen statt entschieden: der Streifen zeigt sich,
+     wenn die Frage-Blase NICHT im Bild ist. Kein Schaetzen am
+     Scrollstand, sondern ein `IntersectionObserver` mit dem Chat als
+     Bezugsrahmen.
+
+     OHNE `IntersectionObserver` bleibt der Streifen dauerhaft stehen -
+     also das Verhalten von v1619. Ein fehlendes Messgeraet darf die
+     Aufgabe nicht verschwinden lassen; die Doppelung ist das
+     harmlosere der beiden Versagen. */
+  var _rfStreifenAuge = null;
+
+  function _rfStreifenZeigen(ja) {
+    var f = $('vi-rf-frage'); if (!f) return;
+    /* Nur anfassen, wenn wirklich etwas drinsteht - sonst macht der
+       Beobachter einen leeren Streifen sichtbar. */
+    if (ja && f.innerHTML) f.style.display = '';
+    else if (!ja) f.style.display = 'none';
+  }
+
+  function _rfStreifenAugeAus() {
+    try { if (_rfStreifenAuge) _rfStreifenAuge.disconnect(); } catch (e) {}
+    _rfStreifenAuge = null;
+  }
+
+  function _rfStreifenBeobachten(blase) {
+    _rfStreifenAugeAus();
+    var chat = $('vi-rf-chat');
+    if (!blase || !chat || typeof IntersectionObserver !== 'function') {
+      _rfStreifenZeigen(true);   /* Rueckfall: wie v1619 */
+      return;
+    }
+    /* Die Blase ist gerade entstanden und steht unten im Bild -
+       deshalb faengt der Streifen versteckt an. Der Beobachter
+       korrigiert das beim ersten Lauf ohnehin selbst. */
+    _rfStreifenZeigen(false);
+    try {
+      _rfStreifenAuge = new IntersectionObserver(function (eintraege) {
+        var e = eintraege[eintraege.length - 1];
+        if (!e) return;
+        _rfStreifenZeigen(!e.isIntersecting);
+      }, { root: chat, threshold: 0.3 });
+      _rfStreifenAuge.observe(blase);
+    } catch (ex) { _rfStreifenZeigen(true); }
   }
 
   function _rfDranBlase(b) {
@@ -8137,6 +8472,10 @@
         .forEach(function (x) { x.classList.remove('vi-rf-dran-blase'); });
       if (b) b.classList.add('vi-rf-dran-blase');
     } catch (e) {}
+    /* v2051 - hier, nicht in `_rfFrageAnheften`: das laeuft VOR dem
+       `_rfBlase` (Z. 9257 und 8220), die Blase gibt es dort noch gar
+       nicht. Diese Stelle kennt beides. */
+    _rfStreifenBeobachten(b);
     return b;
   }
 
@@ -8941,22 +9280,47 @@
       '<div class="vi-rf-kopfzeile">' +
         '<span class="vi-rf-kopf">' + (_rf.alle ? 'Der Co-Pilot fragt' : 'Noch offen') + '</span>' +
         '<span class="vi-rf-schalter">' +
-          '<label class="vi-rf-fs"><input type="checkbox" id="vi-rf-fs" checked> Freisprechen</label>' +
-          /* v1282: Wer gleich alles will, muss nicht erst die Pflichtstrecke
-             abwarten. Der Schalter haengt die Feinheiten sofort an. */
-          /* ═══ v1311 · Im Quick-Check gibt es „Alle Felder" nicht ═══════
-             Marcels Vorgabe vom 11.09.2026: „im QuickCheck sollte der
-             Sprechlauf natürlich reduziert sein."
+          /* ═══ v2049 · DER SCHALTER GEHT, DAS ZUHOEREN BLEIBT ═════════
+             Marcel: „das Freisprechen, das kann raus."
 
-             Der Katalog ist dort schon begrenzt (19 Felder statt 192,
-             `QC_IDS`) — der Schalter daneben hätte ihn aber wieder
-             aufgebläht: `_rfTiefeStarten` hängt die Feinheiten an, und die
-             gehören nicht zum Quick-Check. Ein Schalter, der den schnellen
-             Weg in den langen verwandelt, nimmt ihm seinen Zweck.
+             Das EINGABEFELD bleibt, nur versteckt: `#vi-rf-fs` wird an
+             zwei Stellen gelesen - Z. 9090 bindet den Wechsel, Z. 11588
+             schaltet es im Quick-Check ab. Ein entferntes Element haette
+             dort zwei Abstuerze ergeben.
 
-             Wer mehr will, legt ein Objekt an — dort steht der Schalter. */
-          (_qcTarget ? '' :
-            '<label class="vi-rf-fs" id="vi-rf-alles-w"><input type="checkbox" id="vi-rf-alles"> Alle Felder</label>') +
+             Ein Schalter, den niemand mehr sieht, aber jeder Leser noch
+             findet, ist sicherer als ein entferntes Element. */
+          '<input type="checkbox" id="vi-rf-fs" checked hidden>' +
+          /* ═══ v2053 · „ALLE FELDER“ GEHT, DER WEG DAHIN BLEIBT ═══════
+
+             Hier stand ein Schalter, der mit `_rfTiefeStarten()` alle
+             Feinheiten auf einen Schlag an die Liste haengte.
+
+             Marcel: „Es gibt immer nur alle Felder und es ist total
+             ueberladen. ... Also alles auf einmal. Der Kunde weiss ja
+             gar nicht, was er machen soll. Das muss also Stueck fuer
+             Stueck kommen.“
+
+             STUECK FUER STUECK IST SCHON GEBAUT: am Ende der
+             Pflichtstrecke fragt der Co-Pilot nacheinander nach den
+             Feinheiten (`_rfTiefeAnbieten`, Z. 10214), der Eingabetiefe
+             (`_rfStufeStarten`, v1862) und der Wertermittlung (v1386).
+             Dazu der Chip `tiefe` in der Aktionsleiste (Z. 7335). Der
+             Schalter war die Abkuerzung fuer den, der den Weg schon
+             kennt - er stand aber da, wo der Neuling zuerst hinsieht.
+
+             v1311 hatte ihn im Quick-Check schon ausgeblendet, mit
+             genau diesem Satz: „Ein Schalter, der den schnellen Weg in
+             den langen verwandelt, nimmt ihm seinen Zweck.“ Das gilt
+             jetzt ueberall, und damit faellt auch die `_qcTarget`-
+             Unterscheidung - es gibt nichts mehr zu unterscheiden.
+
+             Anders als `#vi-rf-fs` (v2049) darf das Element ganz weg:
+             es hatte GENAU EINEN Leser, und der faellt mit. */
+          /* v2049 - „Fertig" zieht aus der Fusszeile hierher. Er faellt
+             NICHT weg: ohne ihn kaeme man aus dem Lauf nur noch ueber
+             Abbrechen heraus, und das ist etwas anderes - es verwirft. */
+          '<button type="button" id="vi-rf-ende" class="vi-rf-fertig">Fertig \u2014 zur \u00dcbersicht</button>' +
         '</span>' +
       '</div>' +
       /* v1288: das Etappenband - wo im Sprechlauf stehen wir gerade. */
@@ -9003,14 +9367,28 @@
         '<button type="button" class="vi-rf-btn" id="vi-rf-ok">Übernehmen</button>' +
       '</div>' +
       '<div class="vi-rf-neben" id="vi-rf-neben">' +
-        '<button type="button" id="vi-rf-nix">Weiß ich nicht</button>' +
+        /* ═══ v2049 · DIE FUSSZEILE TRAEGT NUR NOCH ANTWORTEN ════════
+           Marcel: „da ganz unten steht auch noch weiss ich nicht,
+           normal, fertig zur Uebersicht. Ich glaube, das braucht man
+           auch nicht."
+
+           „Weiss ich nicht" war der DRITTE Weg zu derselben Handlung.
+           GEMESSEN an `RF_NEIN` (Z. 4855): weiter, ueberspringen,
+           weiss nicht, weiss ich nicht, keine Ahnung sind alle
+           gefasst - gesprochen wie getippt. Ueberspringen bleibt also
+           erreichbar, nur nicht mehr als Knopf.
+
+           Der gewonnene Platz geht an die Felder und den Verlauf. */
         /* v1378 (C2): Der Ton steht bei den Nebenknoepfen, nicht in der
            Aktionsleiste. Dort stehen ENTSCHEIDUNGEN, die verschwinden,
            wenn sie getroffen sind - der Ton ist eine Dauereinstellung. */
-        '<button type="button" id="vi-rf-ton" title="Ton umschalten: Lernmodus · Normal · Investor-Modus"></button>' +
+        /* v2049 - der Ton bleibt umschaltbar, aber nicht als Dauerknopf
+           in der Fusszeile. `_rfTonKnopf()` und `_rfModusWeiter()`
+           lesen das Element weiter, deshalb bleibt es - versteckt. */
+        '<button type="button" id="vi-rf-ton" hidden></button>' +
 
         '<button type="button" id="vi-rf-passt" style="display:none"></button>' +
-        '<button type="button" id="vi-rf-ende">Fertig — zur Übersicht</button>' +
+        /* v2049 - steht jetzt in der Kopfzeile. */
       '</div>' +
       '<div id="vi-rf-gesagt" style="display:none"></div>';
     h.style.display = '';
@@ -9026,7 +9404,9 @@
     /* v1381 · Anhalten und Weiter. */
     $('vi-rf-halt').addEventListener('click', function () { _fsPauseUm(); });
     _fsPauseKnopf();
-    $('vi-rf-nix').addEventListener('click', function () { _rfUeberspringen(); });
+    /* v2049 - `#vi-rf-nix` gibt es nicht mehr; ein nacktes $() darauf
+       waere ein Absturz beim Aufbau. Ueberspringen laeuft ueber die
+       Sprache (`RF_NEIN`, Z. 4855) und `_rf.aktionen`. */
     /* v1378 (C2) */
     $('vi-rf-ton').addEventListener('click', function () { _rfModusWeiter(); });
     _rfTonKnopf();
@@ -9070,23 +9450,9 @@
       }
       _rfWeiter();
     });
-    /* v1282: „Alle Felder" haengt die Feinheiten sofort an - und wieder ab,
-       solange sie noch nicht dran waren. Wer schon mitten drin ist, behaelt
-       sie: eine Frage zurueckzunehmen, die gerade gestellt wird, waere
-       verwirrender als eine zu viel. */
-    var alles = $('vi-rf-alles');
-    if (alles) alles.addEventListener('change', function () {
-      if (this.checked) {
-        if (_rf.tiefeAn) return;
-        _rf.tiefeGefragt = 1;
-        _rfTiefeStarten();
-      } else if (_rf.tiefeAn) {
-        var vorher = _rf.offen.length;
-        _rf.offen = _rf.offen.filter(function (e, i) { return !e.tiefe || i <= _rf.i; });
-        _rf.tiefeAn = 0; _rf.tiefeGefragt = 0;
-        if (vorher !== _rf.offen.length) _rfStandZeichnen();
-      }
-    });
+    /* v2053 - der Horcher auf „Alle Felder“ faellt mit dem Schalter.
+       `_rf.tiefeAn` und `_rf.tiefeGefragt` BLEIBEN: der Angebotsweg am
+       Ende der Pflichtstrecke fuehrt sie weiter. */
     $('vi-rf-fs').addEventListener('change', function () {
       _fs.an = this.checked;
       /* v1381: Ein Halt-Knopf ohne Freisprechen hat nichts anzuhalten.
@@ -10298,10 +10664,34 @@
           if (_m) v = _m[0];
         }
       } catch (e2) {}
+      /* ═══ v2054 · WAS SCHON SO DASTAND, IST KEINE NACHRICHT ════════
+
+         GEMESSEN im Pruefläufer: nach jeder Antwort meldete der
+         Co-Pilot „Das nehme ich gleich mit: Zinssatz = 3.5 · Tilgung =
+         1.5 · Notarkosten % = 2.2 ..." - dieselben Einstellungswerte,
+         die schon beim ersten Mal uebernommen worden waren. Die Liste
+         wuchs mit jeder Antwort, statt zu schrumpfen.
+
+         „Das nehme ich mit" ist eine Nachricht ueber eine AENDERUNG.
+         Wo sich nichts aendert, ist sie keine Nachricht, sondern Laerm.
+
+         `namen` bleibt unberuehrt: die GESTELLTE Frage gilt als
+         beantwortet, auch wenn der Wert derselbe war. */
+      var _alt = _rf.data.fields[id];
+      var _gleich = (_alt != null && _alt !== '' &&
+                     String(_alt).trim() === String(v).trim());
       _rf.data.fields[id] = v;
+      /* v2054 - die Adresse gilt wieder als unbestaetigt, wenn sie sich
+         WIRKLICH geaendert hat. `_rfAdresseAntwort` setzte den Merker
+         frueher bei jeder beliebigen Antwort zurueck - deshalb kam die
+         Bestaetigung nach „165 Quadratmeter" wortgleich noch einmal.
+         Hier liegt die Antwort schon vor, dort war es eine Vermutung. */
+      if (!_gleich && (id === 'str' || id === 'hnr' || id === 'plz' || id === 'ort')) {
+        _rf.adresseGeprueft = 0;
+      }
       var kat = _rf.catalog.filter(function (c) { return c.id === id; })[0];
       var name = (kat ? kat.label : id) + ' = ' + v;
-      if (gefragt) namen.push(name); else extra.push(name);
+      if (gefragt) namen.push(name); else if (!_gleich) extra.push(name);
     });
     /* ═══ v1377b (C5) · Aus dem Einkommen wird der Steuersatz ══════════
        Wer sein zu versteuerndes Einkommen nennt, hat den Grenzsteuersatz
@@ -10552,8 +10942,19 @@
       return true;
     }
     /* Alles andere ist eine Korrektur — sie geht durch die normale
-       Auswertung und ueberschreibt, was dort steht. */
-    _rf.adresseFrage = 0; _rf.adresseGeprueft = 0;
+       Auswertung und ueberschreibt, was dort steht.
+
+       ═══ v2054 · NUR `adresseFrage` FAELLT HIER ═══════════════════
+       Hier stand auch `_rf.adresseGeprueft = 0`. Gemeint war: wer die
+       Adresse korrigiert, soll die neue bestaetigen. Richtig gedacht -
+       nur ist „165 Quadratmeter“ keine Adresskorrektur, und an DIESER
+       Stelle ist noch nicht bekannt, was der Satz wirklich enthielt.
+
+       GEMESSEN: die Bestaetigung kam danach wortgleich noch einmal.
+
+       Der Merker faellt jetzt in der Uebernahme-Schleife, und nur
+       wenn eines der vier Adressfelder einen ANDEREN Wert bekommt. */
+    _rf.adresseFrage = 0;
     _rfAktionWeg('adresse');
     return false;
   }
@@ -10786,8 +11187,24 @@
     _rfTonKnopf();
     _rfDranZeichnen();
     /* Die offene Frage kommt mit dem neuen Ton wieder - sonst wirkt der
-       Wechsel erst bei der naechsten Frage, und das sieht nach nichts aus. */
-    if (_rf && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
+       Wechsel erst bei der naechsten Frage, und das sieht nach nichts aus.
+
+       ═══ v2050a · NUR, WENN SCHON GEFRAGT WURDE ═══════════════════
+       GEMESSEN am Verlauf: beim Einstieg stand die erste Frage
+       zweimal da, und die erste Kopie kam VOR der Antwort des
+       Nutzers - `_rfErfahrungGewaehlt` ruft `_rfModusSetzen`, und das
+       stellte hier eine Frage, die noch gar nicht an der Reihe war.
+       Danach stellte der regulaere Ablauf sie noch einmal.
+
+       `abschlussOffen`/`nachfassOffen` fassen den Fall nicht: am
+       Anfang ist beides falsch und `_rf.i` ist 0, genau wie bei der
+       ersten Frage. Aus dem Zustand allein ist nicht ablesbar, ob
+       schon gefragt WURDE - deshalb der Merker aus
+       `_rfFrageAnheften`.
+
+       Der Satz oben bleibt richtig: wer MITTEN im Lauf den Ton
+       wechselt, bekommt seine offene Frage weiter neu. */
+    if (_rf && _rf.gefragt && !_rf.abschlussOffen && !_rf.nachfassOffen) _rfFrageNochmal();
 
   }
 
@@ -11131,6 +11548,14 @@
     if (_hoeflich && _istAbrufWunsch(t) && (_rf.aktionen || []).length) {
       /* v1327: was der Satz SONST noch trug, geht nicht verloren. */
       if (_rfAktionJa(t)) { _rfRestNachAktion(t); return true; }
+    }
+    /* ═══ v2052 · ERST DIE FELD-ERKLAERUNG, DANN DIE FREIE FRAGE ══════
+       Steht VOR `_rfIstFrage`: „erklaer mir das" IST eine Frage, und
+       ohne diese Zeile faengt der freie Weg sie ab und raet ein Thema.
+       Gemessen: bei der Adressfrage kam eine DSCR-Erklaerung. */
+    if (RF_ERKLAER.test(t) && _rf.offen && _rf.offen[_rf.i]) {
+      _rfErklaerZeigen(t);
+      return true;
     }
     /* 1. Frage? Dann beantworten statt eintragen. */
     if (!_hoeflich && _rfIstFrage(t)) { _rfFrageBeantworten(t); return true; }
@@ -11558,7 +11983,20 @@
     luecken.forEach(function (e) { if (e.et) etDa[e.et] = 1; });
     var etTxt = ETAPPEN.filter(function (E) { return etDa[E.nr]; })
                        .map(function (E) { return E.name; }).join(' · ');
-    _rfBlase('co', alle
+    /* ═══ v2050 · DIE ANSAGE IST EINE ANTWORT, KEINE DURCHSAGE ══════
+
+       Sie stand hier als erste Blase - noch vor der Begruessung, und
+       GEMESSEN fuellten die beiden zusammen 224 von 239 px Chathoehe,
+       bevor eine Frage gestellt war.
+
+       Marcel: immer nur eine Message vom Co-Piloten und dann eine
+       Antwort dazu.
+
+       Sie wird jetzt gemerkt und spaeter verbraucht: beim Neuling
+       haengt `_rfErfahrungGewaehlt` sie an seine Bestaetigung (eine
+       Blase statt zwei), beim Wiederkehrer blaest `_rfAnsage` sie
+       einzeln vor der ersten Frage. */
+    _rf.ansage = (alle
       ? vorTxt + 'Ich führe dich durch — <b>' + luecken.length + '</b> ' +
         (luecken.length === 1 ? 'Frage' : 'Fragen') + ' in ' +
         Object.keys(etDa).length + ' Etappen: <b>' + escH(etTxt) + '</b>. ' +
@@ -11569,8 +12007,11 @@
         (luecken.length === 1 ? 'Für die Rechnung fehlt mir noch eine.'
                               : 'Für die Rechnung fehlen mir noch ' + luecken.length + '.'));
 
-    /* v1308: Die übernommenen Werte zum Nachsehen — vor der ersten Frage. */
-    if (_rf.vorlaufZeigen) _rfVorlaufKarte(vorQuelle);
+    /* v1308: Die übernommenen Werte zum Nachsehen — vor der ersten Frage.
+       v2050: und NACH der Begruessung, nicht davor - sonst bestaetigt
+       der Nutzer eine Werteliste, bevor der Co-Pilot sich vorgestellt
+       hat. Der Quellenname wird dafuer mitgemerkt. */
+    _rf.vorlaufQuelle = vorQuelle;
 
     _fs.an = true;
     /* Das Kontingent wird MIT dem Mikrofon geladen, nicht danach: das
@@ -11589,18 +12030,38 @@
         _fs.an = false;
         _fsMikroKasten(false, 'Mikrofon nicht verfügbar', 'Tippe deine Antworten — oder gib das Mikrofon im Browser frei und öffne neu.');
       }
-      /* v1288: Steht die Adresse schon (freier Weg, oder ein Objekt war
-         offen), fällt die Entscheidung über die Marktpreisindikation VOR
-         der ersten Frage — dann läuft sie über den ganzen Dialog. */
-      if (!_rf.marktGefragt && (_rfFeld('plz') || _rfFeld('ort'))) {
-        try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
-        _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
-      }
+      /* ═══ v2050 · ALLES ERST NACH DER BEGRUESSUNG ═══════════════
+
+         Marktangebot und Vorlaufkarte standen hier VOR dem Einstieg.
+         Mit Adresse und Vorlauf stapelten sich damit bis zu vier
+         unbeantwortete Blasen, und der Nutzer antwortete auf die
+         unterste - auf die Tonfrage, die als letzte kam.
+
+         Jetzt laeuft es der Reihe nach: vorstellen, Ton waehlen,
+         Ansage, uebernommene Werte, Marktangebot, erste Frage. Jeder
+         Schritt wartet auf den vorigen.
+
+         v1288 bleibt erfuellt: die Entscheidung ueber die
+         Marktpreisindikation faellt weiter VOR der ersten Frage, nur
+         nicht mehr vor der Begruessung. */
+      var _losgehts = function () {
+        if (!_rf) return;
+        _rfAnsage();   /* leer, wenn die Tonwahl sie schon angehaengt hat */
+        /* v1308: die uebernommenen Werte zum Nachsehen. */
+        if (_rf.vorlaufZeigen) {
+          try { _rfVorlaufKarte(_rf.vorlaufQuelle); } catch (ex) {}
+        }
+        if (!_rf.marktGefragt && (_rfFeld('plz') || _rfFeld('ort'))) {
+          try { _rfMarktAnbieten(); } catch (ex) { try { console.warn('[voice] Marktangebot', ex); } catch (e2) {} }
+          _rfBandZeichnen();   /* v1291b: kein Anhalten mehr — das Angebot steht in der Leiste */
+        }
+        _rfFrage();
+      };
       /* v1115-WEIN: Der Co-Pilot stellt sich vor und fragt EINMAL nach der
          Erfahrung - erst danach beginnt der Fragenlauf. Wer schon gewaehlt
          hat, merkt davon nichts. */
-      if (alle && !_rfErfahrung()) _rfEinstieg(_rfFrage);
-      else _rfFrage();
+      if (alle && !_rfErfahrung()) _rfEinstieg(_losgehts);
+      else _losgehts();
     });
   }
 

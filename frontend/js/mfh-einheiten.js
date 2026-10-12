@@ -69,12 +69,89 @@
     var k = (art === 'GESCH' || art === 'BUERO') ? 'geschaeft' : 'mfh';
     try { return (T && typeof T.getDefault === 'function' ? T.getDefault(k) : 80) || 80; } catch (x) { return 80; }
   }
-  function rndFuer(punkte) {
+  /* ══ v2095 · DIE EINHEITEN-RND LIEF IN DIE DEFAULTS ═══════════════════
+   *
+   * HIER STAND:
+   *   calcAll({ baujahr: bj,
+   *             stichtag: new Date().toISOString().slice(0,10),
+   *             gnd: gnd(), modPoints: punkte })
+   *
+   * VIER Felder. `calcAll` liest ZEHN — gemessen am 10.10.2026:
+   * `baujahr, stichtag, gnd, modPoints, gewerkeBewertung, gewerkeWeights,
+   * gewerkeRestlebensdauer, schaeden, applySchadensAbschlag, kernsaniert`.
+   * Die sechs ungenannten liefen still in die Vorgaben.
+   *
+   * ZWEI DAVON SIND TEUER:
+   *
+   * · `kernsaniert` fehlte. Der Kern sagt es in seinem eigenen Kommentar
+   *   (`rnd-calc.js:896`): ohne diese Angabe gilt die Kappe **0,70 statt
+   *   0,90** der GND. Bei GND 80 sind das 56 statt 72 Jahre — sechzehn
+   *   Jahre Unterschied an jeder Einheit, und zwar lautlos.
+   *
+   * · `stichtag` war auf HEUTE festgenagelt. Das verstößt gegen Marcels
+   *   fachliche Festlegung vom 10.10.2026: der Wertermittlungsstichtag
+   *   ist der ausdrücklich gesetzte, nicht automatisch ein Datum, das
+   *   das Programm sich selbst nimmt. `mapDealPilotObject` führt dafür
+   *   eine Rangfolge (ausdrücklich gesetzt > wirtschaftlicher Übergang >
+   *   Kaufdatum > heute) und schreibt mit, welcher Weg gegriffen hat.
+   *
+   * Statt diese Rangfolge hier ein ZWEITES Mal zu schreiben, wird sie
+   * geholt: `mapDealPilotObject(collectData())` — derselbe Weg, den
+   * `deal-action.js:1813` nimmt. Eine zweite Ableitung wäre genau der
+   * Fehler, den `score-tiers.js` vier Kopien gekostet hat.
+   *
+   * Überschrieben wird nur, was an der EINHEIT anders ist: die Punkte
+   * (mit Vererbung gerechnet) und die GND des Wizards.
+   *
+   * ── WAS DAMIT NICHT GELÖST IST, und das gehört gesagt ───────────────
+   * `kernsaniert` erbt die Einheit vom GEBÄUDE. Eine einzelne
+   * kernsanierte Wohnung in einem sonst unsanierten Haus lässt sich
+   * heute nicht erfassen: `istKernsaniert()` sucht den Text
+   * „kernsanier" in den Werten, die MFH-Stufen heißen aber `0/h/v`.
+   * Auf den Einheitendaten wäre die Funktion also IMMER `false` — sie
+   * dort aufzurufen hätte wie eine Prüfung ausgesehen und nie gegriffen.
+   * Im Backlog unter N60.10 notiert.                                   */
+  function rndBasis() {
+    /* Einmal je Auswertung, nicht je Einheit: collectData() liest das
+       ganze Formular. */
+    try {
+      if (typeof window.collectData === 'function'
+          && window.DealPilotRND && window.DealPilotRND.mapDealPilotObject) {
+        return window.DealPilotRND.mapDealPilotObject(window.collectData()) || null;
+      }
+    } catch (x) {}
+    return null;
+  }
+
+  function rndFuer(punkte, basis) {
     var bj = zahl(el('baujahr') && el('baujahr').value);
     if (!bj || !window.DealPilotRND || !window.DealPilotRND.calcAll) return null;
+    var eingabe = {};
+    if (basis) {
+      for (var k in basis) {
+        if (Object.prototype.hasOwnProperty.call(basis, k)) eingabe[k] = basis[k];
+      }
+    }
+    /* Ohne Basis bleibt nur der alte Notweg — aber er wird BENANNT,
+       statt als vollwertige Rechnung durchzugehen. */
+    if (!basis) {
+      eingabe.stichtag = new Date().toISOString().slice(0, 10);
+      eingabe.stichtag_herkunft = 'Notweg: collectData() nicht erreichbar, heutiges Datum';
+    }
+    eingabe.baujahr = bj;
+    eingabe.gnd = gnd();
+    eingabe.modPoints = punkte;
+    eingabe.modPoints_herkunft = 'je Einheit gerechnet, Gebäudegewerke geerbt';
     try {
-      var r = window.DealPilotRND.calcAll({ baujahr: bj, stichtag: new Date().toISOString().slice(0, 10), gnd: gnd(), modPoints: punkte });
-      return (r && r.methods && r.methods.punktraster) ? r.methods.punktraster.restnutzungsdauer : (r ? r.final_rnd : null);
+      var r = window.DealPilotRND.calcAll(eingabe);
+      var jahre = (r && r.methods && r.methods.punktraster)
+        ? r.methods.punktraster.restnutzungsdauer
+        : (r ? r.final_rnd : null);
+      return { jahre: jahre,
+               stichtag: eingabe.stichtag || null,
+               stichtag_herkunft: eingabe.stichtag_herkunft || null,
+               kernsaniert: eingabe.kernsaniert === true,
+               gnd: eingabe.gnd };
     } catch (x) { return null; }
   }
 
@@ -288,10 +365,239 @@
       '<td>' + sel('zustand', ZUSTAND) + '</td>' +
       '<td>' + inp('massnahme', 110, 'z. B. Bad neu') + '</td>' +
       '<td>' + inp('kosten', 70, '€', 'decimal') + '</td>' +
-      '<td style="white-space:nowrap"><button type="button" data-dup="' + i + '" title="Zeile duplizieren" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer">⧉</button> ' +
+      /* v2021 - der Weg ins Wohnungsfenster. Die Zeile bleibt der
+         Ueberblick; alles Weitere steht dahinter. */
+      '<td style="white-space:nowrap"><button type="button" data-det="' + i + '" title="Alle Angaben zu dieser Wohnung" style="border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--wl-9a7f33, #9a7f33);margin-right:4px">\u2026</button>' +
+      '<button type="button" data-dup="' + i + '" title="Zeile duplizieren" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer">⧉</button> ' +
       '<button type="button" data-del="' + i + '" title="Zeile löschen" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:#B8625C">✕</button></td>' +
       '</tr>';
   }
+  /* ══ v2021 · DAS WOHNUNGSFENSTER ════════════════════════════════
+
+     Marcel: „wenn wir auf die Wohnung klicken, dass da drin dann
+     wieder ein Modal aufgeht, wo wir dann alle Angaben machen
+     können … auch mit Bildern nochmal zusätzlich."
+
+     Die Tabellenzeile bleibt der Ueberblick. Alles, was eine
+     einzelne Wohnung ausmacht, steht hier - und wird im selben
+     Einheiten-Objekt gespeichert, das es schon gibt. */
+
+  /* Die Vertragsformen des deutschen Mietrechts, mit Fundstelle.
+     Staffel und Index tragen ihre naechste Erhoehung SCHON im
+     Vertrag - sie sind kein Potenzial, sondern ein Termin. Wer
+     beides gleich behandelt, rechnet dieselbe Steigerung zweimal. */
+  var MIETVERTRAG_ARTEN = [
+    ['', '– keine Angabe –'],
+    ['unbefristet', 'Unbefristet (Regelfall)'],
+    ['staffel', 'Staffelmiete (\u00a7 557a BGB)'],
+    ['index', 'Indexmiete (\u00a7 557b BGB)'],
+    ['zeitmiete', 'Zeitmietvertrag, befristet (\u00a7 575 BGB)'],
+    ['kuendigungsverzicht', 'Mit K\u00fcndigungsverzicht'],
+    ['gewerbe', 'Gewerbemietvertrag'],
+    ['moebliert_kurz', 'M\u00f6bliert / Kurzzeit (\u00a7 549 Abs. 2 BGB)'],
+    ['werkswohnung', 'Werks-/Dienstwohnung (\u00a7 576 BGB)'],
+    ['sozial', 'Preisgebunden / Sozialwohnung'],
+    ['unter', 'Untermietvertrag']
+  ];
+  var WOHNUNG_FOTOS_MAX = 6;
+
+  function wSchliessen() { var a = el("mfh-we-ov"); if (a && a.parentNode) a.parentNode.removeChild(a); }
+
+  function wohnungOeffnen(i) {
+    var e = _arbeit[i]; if (!e) return;
+    wSchliessen();
+    function f(k, label, ph, typ, breit) {
+      return '<label class="mfh-we-f' + (breit ? ' mfh-we-breit' : '') + '"><span>' + esc(label) + '</span>'
+        + '<input data-wk="' + k + '" value="' + esc(e[k] == null ? '' : e[k]) + '" placeholder="' + esc(ph || '')
+        + '" inputmode="' + (typ || 'text') + '"></label>';
+    }
+    function s(k, label, opts) {
+      return '<label class="mfh-we-f"><span>' + esc(label) + '</span>'
+        + selHtml('data-wk="' + k + '"', e[k], opts) + '</label>';
+    }
+    function d(k, label) {
+      return '<label class="mfh-we-f"><span>' + esc(label) + '</span>'
+        + '<input type="date" data-wk="' + k + '" value="' + esc(e[k] || '') + '"></label>';
+    }
+    var titel = (e.lage || e.nr || (i + 1));
+    var ov = document.createElement("div"); ov.id = "mfh-we-ov";
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.60);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px';
+    ov.innerHTML = '<div class="mfh-we-karte">' +
+      '<div class="mfh-we-kopf"><b>Wohnung ' + esc(String(titel)) + '</b>'
+        + '<button type="button" id="mfh-we-zu" aria-label="Schlie\u00dfen">\u2715</button></div>' +
+      '<div class="mfh-we-leib">' +
+        '<h4>Stammdaten</h4><div class="mfh-we-raster">' +
+          f('nr', 'Nummer', String(i + 1)) +
+          f('lage', 'Lage im Haus', 'EG links') +
+          s('art', 'Art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) +
+          f('wfl', 'Wohnfl\u00e4che (m\u00b2)', '', 'decimal') +
+          f('zimmer', 'Zimmer', '', 'decimal') +
+          f('etage', 'Etage', 'z.\u202fB. 2. OG') +
+          f('balkon_qm', 'Balkon/Terrasse (m\u00b2)', '', 'decimal') +
+          f('keller', 'Keller / Abstellraum', 'z.\u202fB. Kellerabteil 4') +
+          f('stellplatz', 'Stellplatz / Garage', 'z.\u202fB. TG-Platz 7') +
+        '</div>' +
+        '<h4>Miete</h4><div class="mfh-we-raster">' +
+          f('ist', 'Ist-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
+          f('soll', 'Soll-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
+          s('status', 'Status', [['vermietet', 'vermietet'], ['leer', 'leer']]) +
+          f('nk_vorauszahlung', 'NK-Vorauszahlung (\u20ac/Monat)', '', 'decimal') +
+          f('stellplatz_miete', 'Stellplatzmiete (\u20ac/Monat)', '', 'decimal') +
+        '</div>' +
+        '<h4>Mietvertrag</h4>' +
+        '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre n\u00e4chste Erh\u00f6hung schon im Vertrag \u2014 sie sind ein <b>Termin</b>, kein Potenzial.<br>' +
+          '<b>K\u00fcndigungsverzicht</b> hei\u00dft: <i>beide</i> Seiten verzichten bis zu diesem Datum auf die ordentliche K\u00fcndigung ' +
+          '(zul\u00e4ssig bis vier Jahre ab Vertragsschluss, bei Staffelmiete \u00a7 557a Abs. 3 BGB). F\u00fcr dich zweischneidig: ' +
+          'Mietsicherheit auf der einen Seite \u2014 keine Eigenbedarfs- oder Verwertungsk\u00fcndigung auf der anderen.</p>' +
+        '<div class="mfh-we-raster">' +
+          s('mv_art', 'Vertragsart', MIETVERTRAG_ARTEN) +
+          d('mv_beginn', 'Mietbeginn') +
+          d('mv_letzte_erhoehung', 'Letzte Erh\u00f6hung') +
+          d('mv_naechste_anpassung', 'N\u00e4chste Anpassung (Staffel/Index)') +
+          f('mv_kaution', 'Kaution (\u20ac)', '', 'decimal') +
+          d('mv_befristet_bis', 'Befristet bis') +
+          d('mv_kuendigungsverzicht_bis', 'K\u00fcndigungsverzicht bis') +
+          f('mv_mieter', 'Mieter (Name, optional)', '') +
+          f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
+        '</div>' +
+        /* v2023 - DIE ERHOEHUNG WIRD KONKRET.
+           Marcel: „bei all dem, wo wir feststellen koennen, wann wir
+           erhoehen und wie hoch die Erhoehung sein wird, waere es
+           super, wenn wir das mit angeben koennten."
+           Ein Datum ohne Betrag ist ein Termin ohne Inhalt - man kann
+           damit nichts fortschreiben. Die Felder erscheinen NUR bei
+           Staffel und Index: bei einem unbefristeten Vertrag waere
+           „naechste Erhoehung 3 %" eine Behauptung, keine Angabe. */
+        '<div id="mfh-we-erh-box" style="display:none">' +
+          '<h4>Geplante Erh\u00f6hungen</h4>' +
+          /* v2025 - eine Indexmiete steht der HOEHE nach nicht fest. */
+          '<div id="mfh-we-index-warn" class="mfh-we-warn" style="display:none">' +
+            '<b>Indexmiete \u2014 die H\u00f6he ist eine Annahme.</b> Der <i>Termin</i> steht im Vertrag, ' +
+            'die H\u00f6he ergibt sich erst aus dem Verbraucherpreisindex. Was du hier eintr\u00e4gst, ' +
+            'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
+          '</div>' +
+          '<p class="mfh-we-hint">Nur bei <b>Staffel-</b> und <b>Indexmiete</b>: hier steht die Erh\u00f6hung vorher fest. ' +
+            'Mit diesen Angaben kann DealPilot die Ist-Miete fortschreiben \u2014 und sie in die ' +
+            '<b>Mietentwicklung</b> des Objekts einrechnen.</p>' +
+          '<div class="mfh-we-raster">' +
+            s('mv_erhoehung_art', 'Erh\u00f6hung angeben als', [['', '\u2013'], ['prozent', 'Prozent'], ['betrag', 'Euro je Monat']]) +
+            f('mv_erhoehung_wert', 'N\u00e4chste Erh\u00f6hung (H\u00f6he)', 'z.\u202fB. 3 oder 45', 'decimal') +
+            f('mv_rhythmus_jahre', 'Rhythmus (alle \u2026 Jahre)', 'z.\u202fB. 2', 'decimal') +
+            f('mv_stufen_offen', 'Noch offene Stufen', 'z.\u202fB. 3', 'decimal') +
+          '</div>' +
+          '<label class="mfh-we-haken"><input type="checkbox" data-wkb="mv_in_mietentwicklung"' +
+            (e.mv_in_mietentwicklung ? ' checked' : '') + '>' +
+            '<span>Diese Staffel in die <b>Mietentwicklung</b> des Objekts einrechnen</span></label>' +
+        '</div>' +
+        '<h4>Zustand</h4><div class="mfh-we-raster">' +
+          s('zustand', 'Gesamtzustand', ZUSTAND) +
+          f('massnahme', 'Geplante Ma\u00dfnahme', 'z.\u202fB. Bad neu') +
+          f('kosten', 'Kosten (\u20ac)', '', 'decimal') +
+        '</div>' +
+        /* v2023 - HIER STAND EIN FELD FUER EINE EIGENE RESTNUTZUNGSDAUER.
+
+           Marcel: „nimm mal bitte die Restnutzungsdauer bei den
+           Einheiten raus. Wir haben ja dann noch Zustand je Einheit.
+           Das wird passend uebertragen … also das ist alles valide."
+
+           Er hat recht. Schritt 3 des Konfigurators erfasst den Zustand
+           je Einheit nach Anlage 2 ImmoWertV, Schritt 4 rechnet daraus
+           Punkte und Restnutzungsdauer - je Einheit UND
+           flaechengewichtet aufs Gebaeude. Ein zweites Feld waere eine
+           ZWEITE Zahl zur selben Groesse.
+
+           Ich habe es gebaut, weil es gewuenscht war, ohne zu messen,
+           dass der Weg dafuer schon existiert. Das Feld war nicht
+           falsch - es war ueberfluessig, und bei einer Bewertung ist
+           das dasselbe. */
+        '<h4>Bilder</h4>' +
+        '<p class="mfh-we-hint">H\u00f6chstens ' + WOHNUNG_FOTOS_MAX + ' Bilder je Wohnung, automatisch verkleinert.</p>' +
+        '<div id="mfh-we-bilder" class="mfh-we-bilder"></div>' +
+        '<input type="file" id="mfh-we-datei" accept="image/*" multiple style="display:none">' +
+        '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-bild-neu">Bilder hinzuf\u00fcgen</button>' +
+      '</div>' +
+      '<div class="mfh-we-fuss"><button type="button" class="btn" id="mfh-we-ok">Fertig</button></div>' +
+    '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click", function (ev) { if (ev.target === ov) { wSchliessen(); zeichnen(); } });
+    el("mfh-we-zu").onclick = function () { wSchliessen(); zeichnen(); };
+    el("mfh-we-ok").onclick = function () { wSchliessen(); zeichnen(); };
+    /* Jede Eingabe landet sofort im Einheiten-Objekt - es wird als
+       Ganzes gespeichert, also braucht es keine Feldliste. */
+    ov.querySelectorAll("[data-wk]").forEach(function (inp) {
+      var k = inp.getAttribute("data-wk");
+      inp.addEventListener("input", function () { e[k] = inp.value; });
+      inp.addEventListener("change", function () { e[k] = inp.value; });
+    });
+    /* v2023 - Haken schreiben true/false, nicht .value ("on"). */
+    ov.querySelectorAll("[data-wkb]").forEach(function (box) {
+      var k = box.getAttribute("data-wkb");
+      box.addEventListener("change", function () { e[k] = box.checked; });
+    });
+    /* v2023 - der RND-Haken ist entfallen; dafuer schaltet die
+       Vertragsart die Erhoehungsfelder. */
+    var vArt = ov.querySelector('[data-wk="mv_art"]');
+    function erhoehungZeigen() {
+      var box = el('mfh-we-erh-box'); if (!box) return;
+      var a = vArt ? vArt.value : '';
+      var planbar = (a === 'staffel' || a === 'index');
+      box.style.display = planbar ? '' : 'none';
+      /* v2025 - nur bei Index, nicht bei Staffel: die Staffel STEHT im
+         Vertrag, da ist nichts anzunehmen. */
+      var warn = el('mfh-we-index-warn');
+      if (warn) warn.style.display = (a === 'index') ? '' : 'none';
+    }
+    if (vArt) vArt.addEventListener("change", erhoehungZeigen);
+    erhoehungZeigen();
+    bilderZeichnen(e);
+    el("mfh-we-bild-neu").onclick = function () { el("mfh-we-datei").click(); };
+    el("mfh-we-datei").onchange = function (ev) { bilderAufnehmen(e, ev.target.files); };
+  }
+
+  function bilderZeichnen(e) {
+    var host = el("mfh-we-bilder"); if (!host) return;
+    var b = Array.isArray(e.bilder) ? e.bilder : [];
+    if (!b.length) { host.innerHTML = '<span class="mfh-we-hint">Noch keine Bilder.</span>'; return; }
+    host.innerHTML = b.map(function (src, n) {
+      return '<span class="mfh-we-bild"><img src="' + src + '" alt="">'
+        + '<button type="button" data-bild-weg="' + n + '" title="Bild entfernen">\u2715</button></span>';
+    }).join("");
+    host.querySelectorAll("[data-bild-weg]").forEach(function (btn) {
+      btn.onclick = function () {
+        var n = parseInt(btn.getAttribute("data-bild-weg"), 10);
+        e.bilder.splice(n, 1); bilderZeichnen(e);
+      };
+    });
+  }
+
+  /* Verkleinert ueber den VORHANDENEN Verkleinerer (ui.js:505) - keine
+     zweite Umrechnung. Gemessen am Bestand traegt ein Objekt bis
+     1,8 MB Fotos; je Wohnung unbegrenzt waere bei zwanzig Einheiten
+     ein Objekt, das nicht mehr speichert. */
+  function bilderAufnehmen(e, dateien) {
+    if (!dateien || !dateien.length) return;
+    if (!Array.isArray(e.bilder)) e.bilder = [];
+    var frei = WOHNUNG_FOTOS_MAX - e.bilder.length;
+    if (frei <= 0) { alert("Mehr als " + WOHNUNG_FOTOS_MAX + " Bilder je Wohnung gehen nicht."); return; }
+    var liste = Array.prototype.slice.call(dateien, 0, frei);
+    var offen = liste.length;
+    liste.forEach(function (datei) {
+      var r = new FileReader();
+      r.onload = function () {
+        var roh = r.result;
+        function fertig(src) {
+          if (src) e.bilder.push(src);
+          if (--offen <= 0) bilderZeichnen(e);
+        }
+        if (typeof window._dpResizeDataUrl === "function") {
+          window._dpResizeDataUrl(roh, 1200, 0.78).then(fertig, function () { fertig(roh); });
+        } else { fertig(roh); }
+      };
+      r.onerror = function () { if (--offen <= 0) bilderZeichnen(e); };
+      r.readAsDataURL(datei);
+    });
+  }
+
   function schritt2() {
     return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
       /* v1628 · KEIN min-width MEHR. Es war die Ursache des
@@ -328,9 +634,18 @@
   function auswerten(list, geb) {
     var s = summe(list), gp = 0;
     GEB_IDS.concat(WE_IDS).forEach(function (id) { gp += punkteVon(id, geb[id] || '0'); });
+    /* v2095: die Rangfolge fuer Stichtag/kernsaniert EINMAL holen, nicht
+       je Einheit - collectData() liest das ganze Formular. */
+    var basis = rndBasis();
     var zeilen = list.map(function (e) {
       var p = punkteEinheit(e, geb), fl = zahl(e.wfl);
-      return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt, rnd: rndFuer(p.punkte) };
+      var r = rndFuer(p.punkte, basis);
+      return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt,
+               /* `rnd` bleibt eine ZAHL - Z. 567 und 589 rechnen damit.
+                  Die Herkunft reist daneben mit, statt die Form zu
+                  aendern und zwei Verbraucher zu brechen. */
+               rnd: r ? r.jahre : null,
+               rndInfo: r || null };
     });
     var flSum = zeilen.reduce(function (a, z) { return a + z.fl; }, 0);
     var pGew = flSum > 0 ? zeilen.reduce(function (a, z) { return a + z.punkte * z.fl; }, 0) / flSum
@@ -371,6 +686,26 @@
       + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
       + '</div></div>'
+      /* ── v2095a · DIE ZAHL TRÄGT IHREN STICHTAG ──────────────────────
+       * Die Restnutzungsdauer hängt am Stichtag: sieben Jahre Unterschied
+       * ergeben rund 1,7 Jahre RND (am echten Kern gemessen). Bis v2095
+       * war der Stichtag auf HEUTE festgenagelt und stand nirgends — die
+       * Zahl sah damit aus, als gelte sie zeitlos.
+       *
+       * `rndInfo` reist seit v2095 an jeder Zeile mit. Hier wird sie
+       * gezeigt, weil jede Zahl ihre Herkunft trägt. Alle Zeilen haben
+       * denselben Stichtag (eine Basis je Auswertung), also steht er
+       * einmal unter der Tabelle statt elfmal darin. */
+      + (function () {
+          var i = (d.zeilen[0] || {}).rndInfo;
+          if (!i || !i.stichtag) return '';
+          return '<div class="cf-hint" style="margin-top:6px">Stichtag <b>'
+            + esc(i.stichtag.split('-').reverse().join('.')) + '</b>'
+            + (i.stichtag_herkunft ? ' — ' + esc(i.stichtag_herkunft) : '')
+            + ' · GND ' + esc(String(i.gnd)) + ' Jahre'
+            + (i.kernsaniert ? ' · Kernsanierung angesetzt' : '')
+            + '</div>';
+        })()
       + '<div class="cf-hint" style="margin-top:6px">Gerechnet mit dem Punktraster der Anlage 2 aus dem RND-Kern (DealPilotRND ' + ((window.DealPilotRND && window.DealPilotRND.VERSION) || '') + '). Die Zahl ist indikativ — den Nachweis fürs Finanzamt liefert ein Gutachten.</div>';
   }
 
@@ -404,6 +739,49 @@
     var s = document.createElement('style');
     s.id = 'mfh-stil-v2';
     s.textContent = [
+      /* ══ v2021b · DAS WOHNUNGSFENSTER ══════════════════════════
+         Im selben Stilblock wie der Konfigurator - ein Fenster in
+         einem zweiten Blatt faellt beim naechsten Umbau als erstes
+         auseinander. Das Raster ohne feste Spaltenzahl: dieselbe
+         Lehre wie v2005/v2006, ein 1fr mit fester Zahl waechst aus
+         dem Fenster heraus statt umzubrechen. */
+      '#mfh-we-ov .mfh-we-karte{background:#fff;border-radius:14px;max-width:860px;width:100%;',
+      '  max-height:92vh;display:flex;flex-direction:column;overflow:hidden;color:#2A2727;',
+      '  font-family:Inter,sans-serif;box-shadow:0 24px 70px rgba(0,0,0,.34);',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent)}',
+      '#mfh-we-ov .mfh-we-kopf{display:flex;align-items:center;justify-content:space-between;',
+      '  padding:14px 18px;border-bottom:1px solid rgba(42,39,39,.10);font-size:15px}',
+      '#mfh-we-ov .mfh-we-kopf button{border:0;background:transparent;font-size:18px;cursor:pointer;color:#8A8272}',
+      '#mfh-we-ov .mfh-we-leib{padding:16px 18px;overflow:auto}',
+      '#mfh-we-ov h4{font:600 12px/1.2 "Space Grotesk",sans-serif;letter-spacing:.09em;',
+      '  text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin:20px 0 8px}',
+      '#mfh-we-ov h4:first-child{margin-top:0}',
+      '#mfh-we-ov .mfh-we-raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}',
+      '#mfh-we-ov .mfh-we-f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;min-width:0}',
+      '#mfh-we-ov .mfh-we-f.mfh-we-breit{grid-column:1/-1}',
+      '#mfh-we-ov .mfh-we-f span{color:#6B6356;font-size:11.5px}',
+      '#mfh-we-ov .mfh-we-f input,#mfh-we-ov .mfh-we-f select{width:100%;box-sizing:border-box;',
+      '  border:1px solid #E6E0D3;border-radius:8px;padding:7px 9px;font-size:13px;background:#fff;color:#2A2727}',
+      '#mfh-we-ov .mfh-we-f input:focus,#mfh-we-ov .mfh-we-f select:focus{outline:0;',
+      '  border-color:var(--wl-c9a84c, #C9A84C)}',
+      '#mfh-we-ov .mfh-we-hint{font-size:11.5px;color:#8A8272;margin:0 0 8px;line-height:1.5}',
+      /* v2025 - die Annahme-Warnung bei Indexmiete. Gold, nicht rot:
+         es ist kein Fehler, nur eine Zahl mit anderer Herkunft. */
+      '#mfh-we-ov .mfh-we-warn{font-size:12px;line-height:1.55;margin:0 0 10px;padding:9px 12px;',
+      /* v2029 - war `rgba(201,168,76,.12)`. Der Gold-Audit zaehlt das
+         zu Recht als hartes Gold: beim Mandanten bliebe dieses Feld
+         DealPilot-golden, waehrend alles andere umfaerbt. */
+      '  border-radius:9px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);color:#8a6d1f;',
+      '  border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}',
+      '#mfh-we-ov .mfh-we-haken{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:0 0 10px;cursor:pointer}',
+      '#mfh-we-ov .mfh-we-bilder{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}',
+      '#mfh-we-ov .mfh-we-bild{position:relative;display:inline-block}',
+      '#mfh-we-ov .mfh-we-bild img{width:96px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #E6E0D3;display:block}',
+      '#mfh-we-ov .mfh-we-bild button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;',
+      '  border-radius:50%;border:1px solid #E6E0D3;background:#fff;color:#B8625C;cursor:pointer;',
+      '  font-size:11px;line-height:1;padding:0}',
+      '#mfh-we-ov .mfh-we-fuss{padding:12px 18px;border-top:1px solid rgba(42,39,39,.10);text-align:right}',
+      '@media(max-width:560px){#mfh-we-ov .mfh-we-raster{grid-template-columns:minmax(0,1fr)}}',
       '#mfh-modal .mfh-karte{background:#fff;border-radius:14px;max-width:1180px;width:100%;',
       '  max-height:92vh;display:flex;flex-direction:column;position:relative;',
       '  overflow:hidden;color:#2A2727;font-family:Inter,sans-serif;',
@@ -520,7 +898,10 @@
       if (t === m) schliessen();
       if (t.id === 'mfh-weg') { _weg = t.checked; }
       if (t.dataset && t.dataset.s != null) { _schritt = +t.dataset.s; zeichnen(); }
-      if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; _arbeit.splice(i + 1, 0, c); zeichnen(); }
+      if (t.dataset && t.dataset.dup != null) { var i = +t.dataset.dup, c = JSON.parse(JSON.stringify(_arbeit[i])); c.nr = String(_arbeit.length + 1); c.lage = ''; c.bilder = null; c.mv_mieter = ''; /* v2021 */ _arbeit.splice(i + 1, 0, c); zeichnen(); }
+      /* v2021 - der Weg ins Wohnungsfenster, im selben delegierten
+         Behandler wie dup und del. */
+      if (t.dataset && t.dataset.det != null) { wohnungOeffnen(+t.dataset.det); }
       if (t.dataset && t.dataset.del != null) { _arbeit.splice(+t.dataset.del, 1); zeichnen(); }
     });
     el('mfh-zu').onclick = schliessen;
@@ -680,5 +1061,18 @@
   }
   window.addEventListener('dp:object-ready', function () { setTimeout(knopf, 250); setTimeout(istSoll, 700); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
-  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten };
+  /* v2027 - `artMitEinheiten` ist die AUSKUNFT zu ARTEN_MIT_EINHEITEN
+     (Z. 32). Die Mietentwicklung braucht dieselbe Antwort, darf die
+     Liste aber nicht kopieren: eine zweite Liste waere beim naechsten
+     neuen Objekttyp veraltet - und sie wuerde lautlos falsch
+     antworten, nicht fehlen. Ohne Argument liest sie das Feld selbst. */
+  function artMitEinheiten(art) {
+    if (art == null) art = (el('objart') && el('objart').value) || '';
+    return !!ARTEN_MIT_EINHEITEN[art];
+  }
+  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
+       braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
+       eine zweite Liste dort waere der Anfang der Abweichung. */
+    vertragsarten: MIETVERTRAG_ARTEN };
 })();

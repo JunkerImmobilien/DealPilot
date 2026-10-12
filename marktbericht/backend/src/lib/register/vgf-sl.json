@@ -1,0 +1,571 @@
+[
+  {
+    "land_code": "SL",
+    "ags": "10045",
+    "ebene": "kreis",
+    "gebiet_name": "Saarpfalz-Kreis",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis",
+    "kennzahl": "vergleichsfaktor",
+    "zweig": "efh",
+    "objektart_bez": "EFH – freistehendes Einfamilienhaus (Haustyp-Einteilung des Ausschusses)",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alles hier Stehende ist wörtlich oder sinngleich aus der Leistungsbeschreibung des Ausschusses und seinem Antragsformular; es beschreibt das MODELL. Die Zahlenwerte des Modells (die Gebäudefaktoren selbst) sind nicht veröffentlicht — siehe warum_kein_wert.",
+      "art": "Gebäudefaktor (§ 193 Abs. 5 BauGB, § 21 Abs. 1 ImmoWertV) — Kaufpreis pro Flächeneinheit, NICHT Ertragsfaktor",
+      "bezugseinheit": "Wohnfläche nach WoFlV, wörtlich: „Als geeignete Bezugseinheit für die Ableitung der Gebäudefaktoren wurde die Wohnfläche nach WoFlV gewählt.\"",
+      "einheit": "EUR je m² Wohnfläche",
+      "ableitung": "multiple Regressionsanalyse auf der Kaufpreissammlung des Ausschusses; wörtlich: „Die Gebäudefaktoren wurden mit dem Verfahren der multiplen Regressionsanalyse abgeleitet. Die wesentlichen Einflussgrößen (Ausstattungs)Standard, Wohnfläche, Bodenrichtwert und Haustyp bestimmen signifikant den Kaufpreis.\"",
+      "einflussgroessen": [
+        "Lage (Bodenrichtwert)",
+        "Baujahr",
+        "Wohnfläche",
+        "Haustyp",
+        "Grundstücksgröße",
+        "Ausstattungsstandard"
+      ],
+      "im_faktor_enthalten": "wörtlich: „Die Gebäudefaktoren werden als Kaufpreis pro Flächeneinheit (Wohnfläche) dargestellt. Werte für Grund und Boden sind in den Gebäudefaktoren ebenso enthalten wie Stellplätze, Garagen oder Carports in üblicher Anzahl.\" — Bodenwert und Stellplätze dürfen also NICHT zusätzlich angesetzt werden.",
+      "haustypen": {
+        "efh": "EFH – freistehendes Einfamilienhaus",
+        "zfh": "ZFH – Zweifamilienhaus, Doppelhaushälfte und Reihenendhaus",
+        "rmh": "RH – Reihenmittelhaus"
+      },
+      "standardstufen_gewichtung": "Das Antragsformular lässt den Ausstattungsstandard je Bauteil in fünf Stufen ankreuzen und gewichtet sie: Außenwände 23 %, Dach 15 %, Fenster- und Außentüren 11 %, Innenwände und -türen 11 %, Deckenkonstruktion und Treppen 11 %, Fußböden 5 %, Sanitäreinrichtungen 9 %, Heizung 9 %, sonstige technische Ausstattung 6 % (Summe 100 %). Die Stufentexte sind die der Anlage 4 ImmoWertV / NHK 2010.",
+      "modernisierung": "Der Modernisierungsgrad wird nur bei Baujahr vor 1950 abgefragt — acht Merkmale (Fenster, Fassadendämmung, Dacherneuerung, Heizung, Bad, Elektroinstallation, Grundriss, Fußböden), je vollständig / teilweise / keine.",
+      "umrechnungskoeffizienten": "Gesondert veröffentlichte Umrechnungskoeffizienten gibt es NICHT. Die Einflüsse von Lage, Baujahr, Wohnfläche, Haustyp, Grundstücksgröße und Standard stecken im Regressionsmodell selbst. Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt für sein Gebiet ausdrücklich: „In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor. In der Vergleichswertrichtlinie, Anlagen 1 und 2 sind Koeffizienten veröffentlicht.\" (Kap. 7.1, S. 56.)",
+      "gnd_jahre": null,
+      "gnd_hinweis": "Ein Vergleichsfaktor braucht keine Gesamtnutzungsdauer; der Ausschuss nennt keine. Keine Zahl eintragen.",
+      "selbsteinschraenkung_des_ausschusses": "wörtlich: „Im Ergebnis stellen die Gebäudefaktoren als Schätzwerte ein mittleres Preisniveau dar. Diese sind nicht unmittelbar für eine Verkehrswertermittlung i. S. des § 194 BauGB anzuwenden, denn bei der Durchführung einer Wertermittlung im Vergleichswertverfahren sind – wie im Ertrags- und Sachwertverfahren – besondere objektspezifische Grundstücksmerkmale zu prüfen und zu berücksichtigen.\""
+    },
+    "geltungsbereich": {
+      "ags": "10045",
+      "ebene": "kreis",
+      "gebiet": "Saarpfalz-Kreis",
+      "gemeinden": [
+        "Homburg",
+        "St. Ingbert",
+        "Blieskastel",
+        "Bexbach",
+        "Kirkel",
+        "Mandelbachtal",
+        "Gersheim"
+      ],
+      "nur_dieser_kreis": "Der Faktor gilt AUSSCHLIESSLICH für den Saarpfalz-Kreis. Kein anderer saarländischer Ausschuss leitet Vergleichsfaktoren ab (Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, Kap. 7.2, S. 56). Für die übrigen sechs Ausschüsse gibt es deshalb weder einen eigenen noch einen übertragbaren Wert.",
+      "gueltigkeitsbereiche": "Der Ausschuss schreibt: „Die Kalkulation führt auf Grund des in der Kaufpreissammlung erfassten Datenmaterials nur innerhalb festgelegter Gültigkeitsbereiche bei den Einflussgrößen zu verwertbaren Ergebnissen. Eine Ermittlung außerhalb dieser Grenzwerte ist daher nicht möglich.\" Die Grenzwerte selbst sind NICHT veröffentlicht. Ohne sie ist nicht entscheidbar, ob ein Objekt im Modell liegt."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Immobilienmarktbericht 2026 (Berichtszeitraum 01.01.–31.12.2025), Kapitel 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)\", Druckseite 56, wörtlich: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.\" — am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Leistungsbeschreibung „Vergleichswertfaktoren\" (Dienstleistung SAL:entry:269302-VLR), am 08.10.2026 gelesen — nennt Ableitungsverfahren, Bezugseinheit, Haustypen, Gebühr und Lizenz, aber KEINE Zahl. https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/"
+      },
+      {
+        "art": "amtliches Formular",
+        "fundstelle": "Gutachterausschuss des Saarpfalz-Kreises, „Antrag auf Erteilung einer schriftlichen Auskunft über Vergleichsfaktoren\" (PDF, 396 KB, am 08.10.2026 geladen, HTTP 200) — führt die Eingangsgrößen des Modells und die Gewichtung der Standardstufen auf. https://sl.egovernor.de/api/datei/0HfNVcembbQPfJAXMCIZB"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Saarlandes (ZGGA) beim LVGL, Informationsblatt zum Grundstücksmarktbericht des Saarlandes 2024 (7. Auflage, Saarbrücken, Dezember 2024, 2 Seiten), wörtlich: „Des Weiteren finden Sie Vergleichsfaktoren für Ein- und Zweifamilienhäuser im Marktbericht.\" — am 08.10.2026 geladen (HTTP 200, 1,4 MB), https://www.saarland.de/lvgl/DE/service/publikationen/grundstuecksmarktbericht2024.pdf?__blob=publicationFile&v=3"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Grundstücksmarktbericht 2022 für den Regionalverband Saarbrücken (Vollversion, am 08.10.2026 geladen, HTTP 200, 10,1 MB, 4.862 Textzeilen): der EINZIGE Treffer auf „Vergleichsfaktor\" steht im Gesetzeszitat § 193 Abs. 5 BauGB Nr. 4 auf Druckseite 75. Dieser Bericht enthält KEINE Vergleichsfaktoren-Tabelle. https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Quelle ist der zuständige Gutachterausschuss selbst, bestätigt durch einen zweiten amtlichen Ausschuss (Landeshauptstadt Saarbrücken) und durch die ZGGA. Die Stufe bewertet die QUELLE; ein Wert liegt nicht vor.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Der Ausschuss nennt für seine Vergleichsfaktoren weder Stichtag noch Jahrgang. Die Existenzaussage ist auf den 31.12.2025 datierbar (Berichtszeitraum des Immobilienmarktberichts 2026 der Landeshauptstadt Saarbrücken); die Faktoren selbst sind undatiert. Der Stichtag ist mit der Auskunft beim Ausschuss zu erfragen — ohne ihn ist keine Zeitanpassung möglich.",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+    "quelle_parser": "v1973-hand (Leistungsseite und Antragsformular des Saarpfalz-Kreises, pdftotext am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": "genehmigungspflichtig — wörtlich aus der Leistungsbeschreibung „Vergleichswertfaktoren\" des Gutachterausschusses für Grundstückswerte für den Saarpfalz-Kreis, Abschnitt „Verwendung der Daten\": „Die Ergebnisse der Berechnung sowie die Bodenrichtwerte und deren Kartengrundlagen sind gesetzlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke, die Weitergabe (z. B. in Form von Exposees o. ä.) und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers gestattet.\"",
+    "lizenz_hinweis": "KEINE offene Lizenz, kein dl-de. Der Ausschuss verlangt für jede Weitergabe und jede öffentliche Wiedergabe seiner Ergebnisse die Erlaubnis des Herausgebers. Ein Quellenvermerk im Sinne von dl-de/by-2-0 existiert deshalb nicht und darf nicht erfunden werden; ein Kundenbericht darf diese Zahlen erst tragen, wenn die Erlaubnis vorliegt (gutachterausschuss@saarpfalz-kreis.de, 06841 104-8434).",
+    "fundstelle": "Leistungsbeschreibung „Vergleichswertfaktoren\", Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis; Existenznachweis: Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, Kapitel 7.2, Druckseite 56",
+    "seite": 56,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel. § 21 Abs. 1 ImmoWertV verlangt den örtlichen Vergleichsfaktor des zuständigen Ausschusses; im Saarland hat ihn nur der Saarpfalz-Kreis.",
+      "Der Gebäudefaktor ENTHÄLT den Bodenwert sowie Stellplätze, Garagen und Carports in üblicher Anzahl. Wer ihn anwendet, darf diese Positionen nicht zusätzlich ansetzen.",
+      "Der Ausschuss schließt die unmittelbare Anwendung für eine Verkehrswertermittlung nach § 194 BauGB selbst aus („Schätzwerte\", „mittleres Preisniveau\"). Als Vergleichsfaktor im Sinne von § 21 Abs. 1 ImmoWertV und als Plausibilitätsmaßstab ist er brauchbar, als Verkehrswert nicht.",
+      "Die Gültigkeitsbereiche der Einflussgrößen sind nicht veröffentlicht. Ein Kalkulator liefert außerhalb seines Gültigkeitsbereichs KEINE Fehlermeldung — eine Zahl ohne gemessene Grenzen ist deshalb nicht prüfbar.",
+      "Vor jeder Weitergabe oder öffentlichen Wiedergabe ist die Erlaubnis des Herausgebers nötig (gutachterausschuss@saarpfalz-kreis.de).",
+      "ACHTUNG BEIM SÄEN: die Kennzahl „vergleichsfaktor\" kommt im Register bisher NICHT vor (gemessen am 08.10.2026 über alle Registerdateien: 0 Treffer). Vor dem Säen prüfen, ob gutachterausschuss.js und CrossCheckService sie lesen — sonst liegt der Satz in der Datenbank und erreicht keinen Bericht."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026. Der Saarpfalz-Kreis ist der EINZIGE Ausschuss im Saarland, der Vergleichsfaktoren ableitet — das steht amtlich und aktuell im Immobilienmarktbericht 2026 des Gutachterausschusses für Grundstückswerte für die Landeshauptstadt Saarbrücken (Kapitel 7.2, Druckseite 56, Berichtszeitraum 2025): „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.\" DIE ZAHLEN SELBST VERÖFFENTLICHT DER AUSSCHUSS NICHT. Er beschreibt auf seiner Leistungsseite nur das Modell (multiple Regression, Bezugseinheit Wohnfläche nach WoFlV, drei Haustypen EFH / ZFH / RH) und gibt die Gebäudefaktoren auf ANTRAG als schriftliche Auskunft heraus: „Antrag auf Erteilung einer schriftlichen Auskunft über Vergleichsfaktoren\", Gebühr nach Gutachtergebührenverordnung Punkt 9.2 — 30,74 Euro je angefangene halbe Stunde (Punkt 9.1, höherer Dienst: 41,80 Euro). Der zweite Weg ist der landesweite Grundstücksmarktbericht des Saarlandes der ZGGA beim LVGL: sein Informationsblatt zur 7. Auflage (Dezember 2024) sagt „Des Weiteren finden Sie Vergleichsfaktoren für Ein- und Zweifamilienhäuser im Marktbericht.\"; der Bericht kostet 75 Euro und ist nur bei der ZGGA zu beziehen (zgga@lvgl.saarland.de, Kaibelstraße 4-6, 66740 Saarlouis). KEIN frei abrufbares amtliches Dokument druckt einen Saarpfalz-Vergleichsfaktor ab — am 08.10.2026 geprüft am Immobilienmarktbericht 2026, 2021 und 2018 der Landeshauptstadt Saarbrücken, am Grundstücksmarktbericht 2022 (Vollversion) und 2024 (Kurzversion) des Regionalverbands Saarbrücken, am Informationsblatt des Landesberichts 2024 und an der Leistungsseite samt Antragsformular des Saarpfalz-Kreises. HINZU KOMMT DIE LIZENZ: selbst mit der Zahl in der Hand wäre die öffentliche Wiedergabe nur mit Erlaubnis des Herausgebers erlaubt. ZUSTÄNDIG: Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Geschäftsstelle Julius-Probst-Straße 1, 66459 Kirkel (Postadresse Am Forum 1, 66424 Homburg), 06841 104-8434, gutachterausschuss@saarpfalz-kreis.de.",
+    "unvollstaendig_grund": "Der Wert existiert amtlich, ist aber nicht frei veröffentlicht. Zwei Wege: (1) schriftliche Auskunft beim Gutachterausschuss Saarpfalz-Kreis beantragen (Formular auf der Leistungsseite, 30,74 Euro je angefangene halbe Stunde nach GutGebVO 9.2); (2) Grundstücksmarktbericht des Saarlandes bei der ZGGA beim LVGL für 75 Euro beziehen — er führt nach dem eigenen Informationsblatt Vergleichsfaktoren für Ein- und Zweifamilienhäuser. In beiden Fällen ist vor einer Wiedergabe im Kundenbericht die Erlaubnis des Herausgebers einzuholen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "SL",
+    "ags": "10045",
+    "ebene": "kreis",
+    "gebiet_name": "Saarpfalz-Kreis",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis",
+    "kennzahl": "vergleichsfaktor",
+    "zweig": "zfh",
+    "objektart_bez": "ZFH – Zweifamilienhaus, Doppelhaushälfte und Reihenendhaus (Haustyp-Einteilung des Ausschusses — er fasst diese drei in EINER Klasse zusammen)",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alles hier Stehende ist wörtlich oder sinngleich aus der Leistungsbeschreibung des Ausschusses und seinem Antragsformular; es beschreibt das MODELL. Die Zahlenwerte des Modells (die Gebäudefaktoren selbst) sind nicht veröffentlicht — siehe warum_kein_wert.",
+      "art": "Gebäudefaktor (§ 193 Abs. 5 BauGB, § 21 Abs. 1 ImmoWertV) — Kaufpreis pro Flächeneinheit, NICHT Ertragsfaktor",
+      "bezugseinheit": "Wohnfläche nach WoFlV, wörtlich: „Als geeignete Bezugseinheit für die Ableitung der Gebäudefaktoren wurde die Wohnfläche nach WoFlV gewählt.\"",
+      "einheit": "EUR je m² Wohnfläche",
+      "ableitung": "multiple Regressionsanalyse auf der Kaufpreissammlung des Ausschusses; wörtlich: „Die Gebäudefaktoren wurden mit dem Verfahren der multiplen Regressionsanalyse abgeleitet. Die wesentlichen Einflussgrößen (Ausstattungs)Standard, Wohnfläche, Bodenrichtwert und Haustyp bestimmen signifikant den Kaufpreis.\"",
+      "einflussgroessen": [
+        "Lage (Bodenrichtwert)",
+        "Baujahr",
+        "Wohnfläche",
+        "Haustyp",
+        "Grundstücksgröße",
+        "Ausstattungsstandard"
+      ],
+      "im_faktor_enthalten": "wörtlich: „Die Gebäudefaktoren werden als Kaufpreis pro Flächeneinheit (Wohnfläche) dargestellt. Werte für Grund und Boden sind in den Gebäudefaktoren ebenso enthalten wie Stellplätze, Garagen oder Carports in üblicher Anzahl.\" — Bodenwert und Stellplätze dürfen also NICHT zusätzlich angesetzt werden.",
+      "haustypen": {
+        "efh": "EFH – freistehendes Einfamilienhaus",
+        "zfh": "ZFH – Zweifamilienhaus, Doppelhaushälfte und Reihenendhaus",
+        "rmh": "RH – Reihenmittelhaus"
+      },
+      "standardstufen_gewichtung": "Das Antragsformular lässt den Ausstattungsstandard je Bauteil in fünf Stufen ankreuzen und gewichtet sie: Außenwände 23 %, Dach 15 %, Fenster- und Außentüren 11 %, Innenwände und -türen 11 %, Deckenkonstruktion und Treppen 11 %, Fußböden 5 %, Sanitäreinrichtungen 9 %, Heizung 9 %, sonstige technische Ausstattung 6 % (Summe 100 %). Die Stufentexte sind die der Anlage 4 ImmoWertV / NHK 2010.",
+      "modernisierung": "Der Modernisierungsgrad wird nur bei Baujahr vor 1950 abgefragt — acht Merkmale (Fenster, Fassadendämmung, Dacherneuerung, Heizung, Bad, Elektroinstallation, Grundriss, Fußböden), je vollständig / teilweise / keine.",
+      "umrechnungskoeffizienten": "Gesondert veröffentlichte Umrechnungskoeffizienten gibt es NICHT. Die Einflüsse von Lage, Baujahr, Wohnfläche, Haustyp, Grundstücksgröße und Standard stecken im Regressionsmodell selbst. Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt für sein Gebiet ausdrücklich: „In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor. In der Vergleichswertrichtlinie, Anlagen 1 und 2 sind Koeffizienten veröffentlicht.\" (Kap. 7.1, S. 56.)",
+      "gnd_jahre": null,
+      "gnd_hinweis": "Ein Vergleichsfaktor braucht keine Gesamtnutzungsdauer; der Ausschuss nennt keine. Keine Zahl eintragen.",
+      "selbsteinschraenkung_des_ausschusses": "wörtlich: „Im Ergebnis stellen die Gebäudefaktoren als Schätzwerte ein mittleres Preisniveau dar. Diese sind nicht unmittelbar für eine Verkehrswertermittlung i. S. des § 194 BauGB anzuwenden, denn bei der Durchführung einer Wertermittlung im Vergleichswertverfahren sind – wie im Ertrags- und Sachwertverfahren – besondere objektspezifische Grundstücksmerkmale zu prüfen und zu berücksichtigen.\""
+    },
+    "geltungsbereich": {
+      "ags": "10045",
+      "ebene": "kreis",
+      "gebiet": "Saarpfalz-Kreis",
+      "gemeinden": [
+        "Homburg",
+        "St. Ingbert",
+        "Blieskastel",
+        "Bexbach",
+        "Kirkel",
+        "Mandelbachtal",
+        "Gersheim"
+      ],
+      "nur_dieser_kreis": "Der Faktor gilt AUSSCHLIESSLICH für den Saarpfalz-Kreis. Kein anderer saarländischer Ausschuss leitet Vergleichsfaktoren ab (Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, Kap. 7.2, S. 56). Für die übrigen sechs Ausschüsse gibt es deshalb weder einen eigenen noch einen übertragbaren Wert.",
+      "gueltigkeitsbereiche": "Der Ausschuss schreibt: „Die Kalkulation führt auf Grund des in der Kaufpreissammlung erfassten Datenmaterials nur innerhalb festgelegter Gültigkeitsbereiche bei den Einflussgrößen zu verwertbaren Ergebnissen. Eine Ermittlung außerhalb dieser Grenzwerte ist daher nicht möglich.\" Die Grenzwerte selbst sind NICHT veröffentlicht. Ohne sie ist nicht entscheidbar, ob ein Objekt im Modell liegt."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Immobilienmarktbericht 2026 (Berichtszeitraum 01.01.–31.12.2025), Kapitel 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)\", Druckseite 56, wörtlich: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.\" — am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Leistungsbeschreibung „Vergleichswertfaktoren\" (Dienstleistung SAL:entry:269302-VLR), am 08.10.2026 gelesen — nennt Ableitungsverfahren, Bezugseinheit, Haustypen, Gebühr und Lizenz, aber KEINE Zahl. https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/"
+      },
+      {
+        "art": "amtliches Formular",
+        "fundstelle": "Gutachterausschuss des Saarpfalz-Kreises, „Antrag auf Erteilung einer schriftlichen Auskunft über Vergleichsfaktoren\" (PDF, 396 KB, am 08.10.2026 geladen, HTTP 200) — führt die Eingangsgrößen des Modells und die Gewichtung der Standardstufen auf. https://sl.egovernor.de/api/datei/0HfNVcembbQPfJAXMCIZB"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Saarlandes (ZGGA) beim LVGL, Informationsblatt zum Grundstücksmarktbericht des Saarlandes 2024 (7. Auflage, Saarbrücken, Dezember 2024, 2 Seiten), wörtlich: „Des Weiteren finden Sie Vergleichsfaktoren für Ein- und Zweifamilienhäuser im Marktbericht.\" — am 08.10.2026 geladen (HTTP 200, 1,4 MB), https://www.saarland.de/lvgl/DE/service/publikationen/grundstuecksmarktbericht2024.pdf?__blob=publicationFile&v=3"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Grundstücksmarktbericht 2022 für den Regionalverband Saarbrücken (Vollversion, am 08.10.2026 geladen, HTTP 200, 10,1 MB, 4.862 Textzeilen): der EINZIGE Treffer auf „Vergleichsfaktor\" steht im Gesetzeszitat § 193 Abs. 5 BauGB Nr. 4 auf Druckseite 75. Dieser Bericht enthält KEINE Vergleichsfaktoren-Tabelle. https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Quelle ist der zuständige Gutachterausschuss selbst, bestätigt durch einen zweiten amtlichen Ausschuss (Landeshauptstadt Saarbrücken) und durch die ZGGA. Die Stufe bewertet die QUELLE; ein Wert liegt nicht vor.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Der Ausschuss nennt für seine Vergleichsfaktoren weder Stichtag noch Jahrgang. Die Existenzaussage ist auf den 31.12.2025 datierbar (Berichtszeitraum des Immobilienmarktberichts 2026 der Landeshauptstadt Saarbrücken); die Faktoren selbst sind undatiert. Der Stichtag ist mit der Auskunft beim Ausschuss zu erfragen — ohne ihn ist keine Zeitanpassung möglich.",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+    "quelle_parser": "v1973-hand (Leistungsseite und Antragsformular des Saarpfalz-Kreises, pdftotext am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": "genehmigungspflichtig — wörtlich aus der Leistungsbeschreibung „Vergleichswertfaktoren\" des Gutachterausschusses für Grundstückswerte für den Saarpfalz-Kreis, Abschnitt „Verwendung der Daten\": „Die Ergebnisse der Berechnung sowie die Bodenrichtwerte und deren Kartengrundlagen sind gesetzlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke, die Weitergabe (z. B. in Form von Exposees o. ä.) und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers gestattet.\"",
+    "lizenz_hinweis": "KEINE offene Lizenz, kein dl-de. Der Ausschuss verlangt für jede Weitergabe und jede öffentliche Wiedergabe seiner Ergebnisse die Erlaubnis des Herausgebers. Ein Quellenvermerk im Sinne von dl-de/by-2-0 existiert deshalb nicht und darf nicht erfunden werden; ein Kundenbericht darf diese Zahlen erst tragen, wenn die Erlaubnis vorliegt (gutachterausschuss@saarpfalz-kreis.de, 06841 104-8434).",
+    "fundstelle": "Leistungsbeschreibung „Vergleichswertfaktoren\", Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis; Existenznachweis: Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, Kapitel 7.2, Druckseite 56",
+    "seite": 56,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel. § 21 Abs. 1 ImmoWertV verlangt den örtlichen Vergleichsfaktor des zuständigen Ausschusses; im Saarland hat ihn nur der Saarpfalz-Kreis.",
+      "Der Gebäudefaktor ENTHÄLT den Bodenwert sowie Stellplätze, Garagen und Carports in üblicher Anzahl. Wer ihn anwendet, darf diese Positionen nicht zusätzlich ansetzen.",
+      "Der Ausschuss schließt die unmittelbare Anwendung für eine Verkehrswertermittlung nach § 194 BauGB selbst aus („Schätzwerte\", „mittleres Preisniveau\"). Als Vergleichsfaktor im Sinne von § 21 Abs. 1 ImmoWertV und als Plausibilitätsmaßstab ist er brauchbar, als Verkehrswert nicht.",
+      "Die Gültigkeitsbereiche der Einflussgrößen sind nicht veröffentlicht. Ein Kalkulator liefert außerhalb seines Gültigkeitsbereichs KEINE Fehlermeldung — eine Zahl ohne gemessene Grenzen ist deshalb nicht prüfbar.",
+      "Vor jeder Weitergabe oder öffentlichen Wiedergabe ist die Erlaubnis des Herausgebers nötig (gutachterausschuss@saarpfalz-kreis.de).",
+      "ACHTUNG BEIM SÄEN: die Kennzahl „vergleichsfaktor\" kommt im Register bisher NICHT vor (gemessen am 08.10.2026 über alle Registerdateien: 0 Treffer). Vor dem Säen prüfen, ob gutachterausschuss.js und CrossCheckService sie lesen — sonst liegt der Satz in der Datenbank und erreicht keinen Bericht."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026. Der Saarpfalz-Kreis ist der EINZIGE Ausschuss im Saarland, der Vergleichsfaktoren ableitet — das steht amtlich und aktuell im Immobilienmarktbericht 2026 des Gutachterausschusses für Grundstückswerte für die Landeshauptstadt Saarbrücken (Kapitel 7.2, Druckseite 56, Berichtszeitraum 2025): „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.\" DIE ZAHLEN SELBST VERÖFFENTLICHT DER AUSSCHUSS NICHT. Er beschreibt auf seiner Leistungsseite nur das Modell (multiple Regression, Bezugseinheit Wohnfläche nach WoFlV, drei Haustypen EFH / ZFH / RH) und gibt die Gebäudefaktoren auf ANTRAG als schriftliche Auskunft heraus: „Antrag auf Erteilung einer schriftlichen Auskunft über Vergleichsfaktoren\", Gebühr nach Gutachtergebührenverordnung Punkt 9.2 — 30,74 Euro je angefangene halbe Stunde (Punkt 9.1, höherer Dienst: 41,80 Euro). Der zweite Weg ist der landesweite Grundstücksmarktbericht des Saarlandes der ZGGA beim LVGL: sein Informationsblatt zur 7. Auflage (Dezember 2024) sagt „Des Weiteren finden Sie Vergleichsfaktoren für Ein- und Zweifamilienhäuser im Marktbericht.\"; der Bericht kostet 75 Euro und ist nur bei der ZGGA zu beziehen (zgga@lvgl.saarland.de, Kaibelstraße 4-6, 66740 Saarlouis). KEIN frei abrufbares amtliches Dokument druckt einen Saarpfalz-Vergleichsfaktor ab — am 08.10.2026 geprüft am Immobilienmarktbericht 2026, 2021 und 2018 der Landeshauptstadt Saarbrücken, am Grundstücksmarktbericht 2022 (Vollversion) und 2024 (Kurzversion) des Regionalverbands Saarbrücken, am Informationsblatt des Landesberichts 2024 und an der Leistungsseite samt Antragsformular des Saarpfalz-Kreises. HINZU KOMMT DIE LIZENZ: selbst mit der Zahl in der Hand wäre die öffentliche Wiedergabe nur mit Erlaubnis des Herausgebers erlaubt. ZUSTÄNDIG: Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Geschäftsstelle Julius-Probst-Straße 1, 66459 Kirkel (Postadresse Am Forum 1, 66424 Homburg), 06841 104-8434, gutachterausschuss@saarpfalz-kreis.de.",
+    "unvollstaendig_grund": "Der Wert existiert amtlich, ist aber nicht frei veröffentlicht. Zwei Wege: (1) schriftliche Auskunft beim Gutachterausschuss Saarpfalz-Kreis beantragen (Formular auf der Leistungsseite, 30,74 Euro je angefangene halbe Stunde nach GutGebVO 9.2); (2) Grundstücksmarktbericht des Saarlandes bei der ZGGA beim LVGL für 75 Euro beziehen — er führt nach dem eigenen Informationsblatt Vergleichsfaktoren für Ein- und Zweifamilienhäuser. In beiden Fällen ist vor einer Wiedergabe im Kundenbericht die Erlaubnis des Herausgebers einzuholen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "SL",
+    "ags": "10045",
+    "ebene": "kreis",
+    "gebiet_name": "Saarpfalz-Kreis",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis",
+    "kennzahl": "vergleichsfaktor",
+    "zweig": "rmh",
+    "objektart_bez": "RH – Reihenmittelhaus (Haustyp-Einteilung des Ausschusses)",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Alles hier Stehende ist wörtlich oder sinngleich aus der Leistungsbeschreibung des Ausschusses und seinem Antragsformular; es beschreibt das MODELL. Die Zahlenwerte des Modells (die Gebäudefaktoren selbst) sind nicht veröffentlicht — siehe warum_kein_wert.",
+      "art": "Gebäudefaktor (§ 193 Abs. 5 BauGB, § 21 Abs. 1 ImmoWertV) — Kaufpreis pro Flächeneinheit, NICHT Ertragsfaktor",
+      "bezugseinheit": "Wohnfläche nach WoFlV, wörtlich: „Als geeignete Bezugseinheit für die Ableitung der Gebäudefaktoren wurde die Wohnfläche nach WoFlV gewählt.\"",
+      "einheit": "EUR je m² Wohnfläche",
+      "ableitung": "multiple Regressionsanalyse auf der Kaufpreissammlung des Ausschusses; wörtlich: „Die Gebäudefaktoren wurden mit dem Verfahren der multiplen Regressionsanalyse abgeleitet. Die wesentlichen Einflussgrößen (Ausstattungs)Standard, Wohnfläche, Bodenrichtwert und Haustyp bestimmen signifikant den Kaufpreis.\"",
+      "einflussgroessen": [
+        "Lage (Bodenrichtwert)",
+        "Baujahr",
+        "Wohnfläche",
+        "Haustyp",
+        "Grundstücksgröße",
+        "Ausstattungsstandard"
+      ],
+      "im_faktor_enthalten": "wörtlich: „Die Gebäudefaktoren werden als Kaufpreis pro Flächeneinheit (Wohnfläche) dargestellt. Werte für Grund und Boden sind in den Gebäudefaktoren ebenso enthalten wie Stellplätze, Garagen oder Carports in üblicher Anzahl.\" — Bodenwert und Stellplätze dürfen also NICHT zusätzlich angesetzt werden.",
+      "haustypen": {
+        "efh": "EFH – freistehendes Einfamilienhaus",
+        "zfh": "ZFH – Zweifamilienhaus, Doppelhaushälfte und Reihenendhaus",
+        "rmh": "RH – Reihenmittelhaus"
+      },
+      "standardstufen_gewichtung": "Das Antragsformular lässt den Ausstattungsstandard je Bauteil in fünf Stufen ankreuzen und gewichtet sie: Außenwände 23 %, Dach 15 %, Fenster- und Außentüren 11 %, Innenwände und -türen 11 %, Deckenkonstruktion und Treppen 11 %, Fußböden 5 %, Sanitäreinrichtungen 9 %, Heizung 9 %, sonstige technische Ausstattung 6 % (Summe 100 %). Die Stufentexte sind die der Anlage 4 ImmoWertV / NHK 2010.",
+      "modernisierung": "Der Modernisierungsgrad wird nur bei Baujahr vor 1950 abgefragt — acht Merkmale (Fenster, Fassadendämmung, Dacherneuerung, Heizung, Bad, Elektroinstallation, Grundriss, Fußböden), je vollständig / teilweise / keine.",
+      "umrechnungskoeffizienten": "Gesondert veröffentlichte Umrechnungskoeffizienten gibt es NICHT. Die Einflüsse von Lage, Baujahr, Wohnfläche, Haustyp, Grundstücksgröße und Standard stecken im Regressionsmodell selbst. Der Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken sagt für sein Gebiet ausdrücklich: „In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor. In der Vergleichswertrichtlinie, Anlagen 1 und 2 sind Koeffizienten veröffentlicht.\" (Kap. 7.1, S. 56.)",
+      "gnd_jahre": null,
+      "gnd_hinweis": "Ein Vergleichsfaktor braucht keine Gesamtnutzungsdauer; der Ausschuss nennt keine. Keine Zahl eintragen.",
+      "selbsteinschraenkung_des_ausschusses": "wörtlich: „Im Ergebnis stellen die Gebäudefaktoren als Schätzwerte ein mittleres Preisniveau dar. Diese sind nicht unmittelbar für eine Verkehrswertermittlung i. S. des § 194 BauGB anzuwenden, denn bei der Durchführung einer Wertermittlung im Vergleichswertverfahren sind – wie im Ertrags- und Sachwertverfahren – besondere objektspezifische Grundstücksmerkmale zu prüfen und zu berücksichtigen.\""
+    },
+    "geltungsbereich": {
+      "ags": "10045",
+      "ebene": "kreis",
+      "gebiet": "Saarpfalz-Kreis",
+      "gemeinden": [
+        "Homburg",
+        "St. Ingbert",
+        "Blieskastel",
+        "Bexbach",
+        "Kirkel",
+        "Mandelbachtal",
+        "Gersheim"
+      ],
+      "nur_dieser_kreis": "Der Faktor gilt AUSSCHLIESSLICH für den Saarpfalz-Kreis. Kein anderer saarländischer Ausschuss leitet Vergleichsfaktoren ab (Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, Kap. 7.2, S. 56). Für die übrigen sechs Ausschüsse gibt es deshalb weder einen eigenen noch einen übertragbaren Wert.",
+      "gueltigkeitsbereiche": "Der Ausschuss schreibt: „Die Kalkulation führt auf Grund des in der Kaufpreissammlung erfassten Datenmaterials nur innerhalb festgelegter Gültigkeitsbereiche bei den Einflussgrößen zu verwertbaren Ergebnissen. Eine Ermittlung außerhalb dieser Grenzwerte ist daher nicht möglich.\" Die Grenzwerte selbst sind NICHT veröffentlicht. Ohne sie ist nicht entscheidbar, ob ein Objekt im Modell liegt."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Immobilienmarktbericht 2026 (Berichtszeitraum 01.01.–31.12.2025), Kapitel 7.2 „Vergleichsfaktoren für bebaute Grundstücke (Ertrags- und Gebäudefaktoren)\", Druckseite 56, wörtlich: „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.\" — am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Leistungsbeschreibung „Vergleichswertfaktoren\" (Dienstleistung SAL:entry:269302-VLR), am 08.10.2026 gelesen — nennt Ableitungsverfahren, Bezugseinheit, Haustypen, Gebühr und Lizenz, aber KEINE Zahl. https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/"
+      },
+      {
+        "art": "amtliches Formular",
+        "fundstelle": "Gutachterausschuss des Saarpfalz-Kreises, „Antrag auf Erteilung einer schriftlichen Auskunft über Vergleichsfaktoren\" (PDF, 396 KB, am 08.10.2026 geladen, HTTP 200) — führt die Eingangsgrößen des Modells und die Gewichtung der Standardstufen auf. https://sl.egovernor.de/api/datei/0HfNVcembbQPfJAXMCIZB"
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Saarlandes (ZGGA) beim LVGL, Informationsblatt zum Grundstücksmarktbericht des Saarlandes 2024 (7. Auflage, Saarbrücken, Dezember 2024, 2 Seiten), wörtlich: „Des Weiteren finden Sie Vergleichsfaktoren für Ein- und Zweifamilienhäuser im Marktbericht.\" — am 08.10.2026 geladen (HTTP 200, 1,4 MB), https://www.saarland.de/lvgl/DE/service/publikationen/grundstuecksmarktbericht2024.pdf?__blob=publicationFile&v=3"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Grundstücksmarktbericht 2022 für den Regionalverband Saarbrücken (Vollversion, am 08.10.2026 geladen, HTTP 200, 10,1 MB, 4.862 Textzeilen): der EINZIGE Treffer auf „Vergleichsfaktor\" steht im Gesetzeszitat § 193 Abs. 5 BauGB Nr. 4 auf Druckseite 75. Dieser Bericht enthält KEINE Vergleichsfaktoren-Tabelle. https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Quelle ist der zuständige Gutachterausschuss selbst, bestätigt durch einen zweiten amtlichen Ausschuss (Landeshauptstadt Saarbrücken) und durch die ZGGA. Die Stufe bewertet die QUELLE; ein Wert liegt nicht vor.",
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "stichtag_hinweis": "Der Ausschuss nennt für seine Vergleichsfaktoren weder Stichtag noch Jahrgang. Die Existenzaussage ist auf den 31.12.2025 datierbar (Berichtszeitraum des Immobilienmarktberichts 2026 der Landeshauptstadt Saarbrücken); die Faktoren selbst sind undatiert. Der Stichtag ist mit der Auskunft beim Ausschuss zu erfragen — ohne ihn ist keine Zeitanpassung möglich.",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/",
+    "quelle_parser": "v1973-hand (Leistungsseite und Antragsformular des Saarpfalz-Kreises, pdftotext am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": "genehmigungspflichtig — wörtlich aus der Leistungsbeschreibung „Vergleichswertfaktoren\" des Gutachterausschusses für Grundstückswerte für den Saarpfalz-Kreis, Abschnitt „Verwendung der Daten\": „Die Ergebnisse der Berechnung sowie die Bodenrichtwerte und deren Kartengrundlagen sind gesetzlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke, die Weitergabe (z. B. in Form von Exposees o. ä.) und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers gestattet.\"",
+    "lizenz_hinweis": "KEINE offene Lizenz, kein dl-de. Der Ausschuss verlangt für jede Weitergabe und jede öffentliche Wiedergabe seiner Ergebnisse die Erlaubnis des Herausgebers. Ein Quellenvermerk im Sinne von dl-de/by-2-0 existiert deshalb nicht und darf nicht erfunden werden; ein Kundenbericht darf diese Zahlen erst tragen, wenn die Erlaubnis vorliegt (gutachterausschuss@saarpfalz-kreis.de, 06841 104-8434).",
+    "fundstelle": "Leistungsbeschreibung „Vergleichswertfaktoren\", Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis; Existenznachweis: Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken, Kapitel 7.2, Druckseite 56",
+    "seite": 56,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel. § 21 Abs. 1 ImmoWertV verlangt den örtlichen Vergleichsfaktor des zuständigen Ausschusses; im Saarland hat ihn nur der Saarpfalz-Kreis.",
+      "Der Gebäudefaktor ENTHÄLT den Bodenwert sowie Stellplätze, Garagen und Carports in üblicher Anzahl. Wer ihn anwendet, darf diese Positionen nicht zusätzlich ansetzen.",
+      "Der Ausschuss schließt die unmittelbare Anwendung für eine Verkehrswertermittlung nach § 194 BauGB selbst aus („Schätzwerte\", „mittleres Preisniveau\"). Als Vergleichsfaktor im Sinne von § 21 Abs. 1 ImmoWertV und als Plausibilitätsmaßstab ist er brauchbar, als Verkehrswert nicht.",
+      "Die Gültigkeitsbereiche der Einflussgrößen sind nicht veröffentlicht. Ein Kalkulator liefert außerhalb seines Gültigkeitsbereichs KEINE Fehlermeldung — eine Zahl ohne gemessene Grenzen ist deshalb nicht prüfbar.",
+      "Vor jeder Weitergabe oder öffentlichen Wiedergabe ist die Erlaubnis des Herausgebers nötig (gutachterausschuss@saarpfalz-kreis.de).",
+      "ACHTUNG BEIM SÄEN: die Kennzahl „vergleichsfaktor\" kommt im Register bisher NICHT vor (gemessen am 08.10.2026 über alle Registerdateien: 0 Treffer). Vor dem Säen prüfen, ob gutachterausschuss.js und CrossCheckService sie lesen — sonst liegt der Satz in der Datenbank und erreicht keinen Bericht."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026. Der Saarpfalz-Kreis ist der EINZIGE Ausschuss im Saarland, der Vergleichsfaktoren ableitet — das steht amtlich und aktuell im Immobilienmarktbericht 2026 des Gutachterausschusses für Grundstückswerte für die Landeshauptstadt Saarbrücken (Kapitel 7.2, Druckseite 56, Berichtszeitraum 2025): „Vergleichsfaktoren liegen zurzeit im Saarland nur für den Saar-Pfalz-Kreis vor.\" DIE ZAHLEN SELBST VERÖFFENTLICHT DER AUSSCHUSS NICHT. Er beschreibt auf seiner Leistungsseite nur das Modell (multiple Regression, Bezugseinheit Wohnfläche nach WoFlV, drei Haustypen EFH / ZFH / RH) und gibt die Gebäudefaktoren auf ANTRAG als schriftliche Auskunft heraus: „Antrag auf Erteilung einer schriftlichen Auskunft über Vergleichsfaktoren\", Gebühr nach Gutachtergebührenverordnung Punkt 9.2 — 30,74 Euro je angefangene halbe Stunde (Punkt 9.1, höherer Dienst: 41,80 Euro). Der zweite Weg ist der landesweite Grundstücksmarktbericht des Saarlandes der ZGGA beim LVGL: sein Informationsblatt zur 7. Auflage (Dezember 2024) sagt „Des Weiteren finden Sie Vergleichsfaktoren für Ein- und Zweifamilienhäuser im Marktbericht.\"; der Bericht kostet 75 Euro und ist nur bei der ZGGA zu beziehen (zgga@lvgl.saarland.de, Kaibelstraße 4-6, 66740 Saarlouis). KEIN frei abrufbares amtliches Dokument druckt einen Saarpfalz-Vergleichsfaktor ab — am 08.10.2026 geprüft am Immobilienmarktbericht 2026, 2021 und 2018 der Landeshauptstadt Saarbrücken, am Grundstücksmarktbericht 2022 (Vollversion) und 2024 (Kurzversion) des Regionalverbands Saarbrücken, am Informationsblatt des Landesberichts 2024 und an der Leistungsseite samt Antragsformular des Saarpfalz-Kreises. HINZU KOMMT DIE LIZENZ: selbst mit der Zahl in der Hand wäre die öffentliche Wiedergabe nur mit Erlaubnis des Herausgebers erlaubt. ZUSTÄNDIG: Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis, Geschäftsstelle Julius-Probst-Straße 1, 66459 Kirkel (Postadresse Am Forum 1, 66424 Homburg), 06841 104-8434, gutachterausschuss@saarpfalz-kreis.de.",
+    "unvollstaendig_grund": "Der Wert existiert amtlich, ist aber nicht frei veröffentlicht. Zwei Wege: (1) schriftliche Auskunft beim Gutachterausschuss Saarpfalz-Kreis beantragen (Formular auf der Leistungsseite, 30,74 Euro je angefangene halbe Stunde nach GutGebVO 9.2); (2) Grundstücksmarktbericht des Saarlandes bei der ZGGA beim LVGL für 75 Euro beziehen — er führt nach dem eigenen Informationsblatt Vergleichsfaktoren für Ein- und Zweifamilienhäuser. In beiden Fällen ist vor einer Wiedergabe im Kundenbericht die Erlaubnis des Herausgebers einzuholen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "SL",
+    "ags": "10041100",
+    "ebene": "gemeinde",
+    "gebiet_name": "Landeshauptstadt Saarbrücken",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "etw",
+    "objektart_bez": "Eigentumswohnungen",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "KEINE Modellangaben im Dokument. Der Bericht nennt zu diesen Zinssätzen weder Gesamtnutzungsdauer noch Bewirtschaftungskosten, Rohertrag, Restnutzungsdauer, Bodenwertansatz, Fallzahl oder Stichtag. Damit fehlt der Modellvermerk nach § 10 ImmoWertV vollständig.",
+      "gnd_jahre": null,
+      "bewirtschaftungskosten": null,
+      "rohertrag": null,
+      "restnutzungsdauer": null,
+      "bodenwert": null
+    },
+    "geltungsbereich": {
+      "ags": "10041100",
+      "ebene": "gemeinde",
+      "gebiet": "Landeshauptstadt Saarbrücken",
+      "nur_diese_gemeinde": "Der Gutachterausschuss der Landeshauptstadt Saarbrücken ist ein eigener Ausschuss NEBEN dem des Regionalverbands Saarbrücken (ags 10041). Die Spanne gilt nur für das Stadtgebiet und darf nicht auf den Regionalverband oder einen Landkreis übertragen werden."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "Zeitreihe",
+        "fundstelle": "Dieselbe Tabelle steht im Immobilienmarktbericht 2021 (Berichtszeitraum 2020, Kapitel 7.3, Druckseite 47) mit SECHS Zeilen und anderen Spannen: Eigentumswohnungen, Mietwohngrundstücke (z.B. Büro), Mehrfamilienwohnhäuser, gemischt bis 50 %, gemischt über 50 %, Geschäftsgrundstücke gegen die Werte 2,5–4,5 / 5,0–6,0 / 3,0–5,0 / 3,0–6,0 / 5,0–6,0 / 5,0–7,0 %. Diese Zeilenzuordnung ist NUR mit -layout gemessen und daher unsicher — sie steht hier als Hinweis auf die Fortschreibung, nicht als Wert. Quelle: https://www.saarbruecken.de/media/download-6169428642e86"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Der Immobilienmarktbericht 2018 derselben Stelle (Berichtszeitraum 2017) führt an dieser Stelle KEINE Tabelle und sagt in Kapitel 12.2 „Vergleichsfaktoren liegen zurzeit im Saarland nicht vor.\" — die Tabelle ist also zwischen 2018 und 2021 entstanden. Quelle: https://www.saarbruecken.de/media/download-532af4a9c0e9c"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Frei abrufbare, amtliche Veröffentlichung des örtlich zuständigen Gutachterausschusses. Die Stufe bewertet die QUELLE; als Rechenwert ist der Satz unbrauchbar (Spanne ohne Punktwert, kein Modellvermerk).",
+    "fallzahl": null,
+    "streuung": "2,0 – 3,5 %",
+    "stichtag": null,
+    "stichtag_hinweis": "Der Bericht nennt für diese Zinssätze keinen Stichtag. Der Berichtszeitraum ist 01.01.–31.12.2025; die Bodenrichtwerte desselben Berichts sind zum 01.01.2026 festgesetzt (Druckseiten 54 und 55).",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+    "quelle_parser": "v1973-hand (pdftotext -table / -raw / -layout, Druckseite 57, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": null,
+    "lizenz_hinweis": "KEINE Lizenz- und keine Urheberrechtsangabe im Dokument. Das Impressum auf der letzten Seite nennt nur „Herausgeber: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken\" und die Anschrift — kein dl-de, kein Nutzungsvorbehalt, kein Copyright-Satz (gemessen am 08.10.2026 über den gesamten Text: null Treffer auf Urheberrecht, Vervielfältigung, Nachdruck, Lizenz). Ohne Angabe ist nicht entscheidbar, ob ein Quellenvermerk nötig wäre; vor einer Wiedergabe beim Ausschuss nachfragen (vermessungsamt@saarbruecken.de).",
+    "fundstelle": "Immobilienmarktbericht 2026, Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Kapitel 7.3 „Marktanpassungsfaktoren und Liegenschaftszinssätze\", Druckseite 57",
+    "seite": 57,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel.",
+      "Das sind „angewendete\" Zinssätze — vom Ausschuss in eigenen Gutachten benutzte Spannen, NICHT aus der Kaufpreissammlung abgeleitete und beschlossene Liegenschaftszinssätze. Der Bericht sagt dazu im selben Kapitel: „Die Zentrale Geschäftsstelle der Gutachterausschüsse des Saarlandes sammelt landesweit die entsprechenden Daten, um sie aufzubereiten und im Grundstücksmarktbericht Saarland zu veröffentlichen.\"",
+      "Eine Spanne ist kein Wert. Ein Mittelwert daraus wäre erfunden — bei Mehrfamilienwohnhäusern (1,5–5,0 %) läge er um mehr als das Dreifache falsch, wenn die Wahl falsch ist.",
+      "Ohne Modellvermerk nach § 10 ImmoWertV rechnet kein Ertragswertverfahren damit. Kein Verfahren rechnet halb.",
+      "Sachwertfaktoren führt dieser Bericht nicht; Umrechnungskoeffizienten ausdrücklich nicht („In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor.\", Kapitel 7.1, Druckseite 56)."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026 am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (frei abrufbar, HTTP 200): der Ausschuss druckt auf Druckseite 57 eine Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" mit fünf Grundstücksarten und je einer SPANNE. Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Diese Spannen sind kein verwendbarer Liegenschaftszinssatz: (1) es sind angewendete, nicht abgeleitete Sätze — die Ableitung macht landesweit die Zentrale Geschäftsstelle und veröffentlicht sie im kostenpflichtigen Grundstücksmarktbericht Saarland (75 Euro, ZGGA beim LVGL, zgga@lvgl.saarland.de); (2) es fehlt jeder Modellvermerk nach § 10 ImmoWertV — keine Gesamtnutzungsdauer, keine Bewirtschaftungskosten, kein Rohertragsansatz, keine Restnutzungsdauer, keine Fallzahl, kein Stichtag; (3) eine Spanne ohne Punktwert lässt sich nur durch eine eigene Annahme auflösen, und die wäre erfunden. DER SATZ IST DAMIT ALS EXISTENZ BELEGT, NICHT ALS ZAHL. Weg zur echten Zahl: Grundstücksmarktbericht des Saarlandes bei der ZGGA beziehen (75 Euro) oder Einzelauskunft beim Gutachterausschuss der Landeshauptstadt Saarbrücken (Gerberstraße 29, 66111 Saarbrücken, 0681 905-1765, vermessungsamt@saarbruecken.de) — die Amtshandlungen sind nach GutGebVO gebührenpflichtig. KORREKTUR EINER FRÜHEREN MESSUNG: in verfuegbarkeit-sl.json steht zu diesem Ausschuss „Beide Jahrgaenge nennen Liegenschaftszinssaetze nur im Text, nicht als Tabelle\". Das stimmt für den Jahrgang 2018 — die Jahrgänge 2021 und 2026 führen aber sehr wohl eine Tabelle.",
+    "unvollstaendig_grund": "Die amtliche Veröffentlichung nennt nur eine Spanne und keinen Modellvermerk. Ein Punktwert ist nur über den kostenpflichtigen Grundstücksmarktbericht des Saarlandes (75 Euro, ZGGA beim LVGL) oder über eine gebührenpflichtige Einzelauskunft des Ausschusses zu bekommen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "SL",
+    "ags": "10041100",
+    "ebene": "gemeinde",
+    "gebiet_name": "Landeshauptstadt Saarbrücken",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "mfh",
+    "objektart_bez": "Mehrfamilienwohnhäuser",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "KEINE Modellangaben im Dokument. Der Bericht nennt zu diesen Zinssätzen weder Gesamtnutzungsdauer noch Bewirtschaftungskosten, Rohertrag, Restnutzungsdauer, Bodenwertansatz, Fallzahl oder Stichtag. Damit fehlt der Modellvermerk nach § 10 ImmoWertV vollständig.",
+      "gnd_jahre": null,
+      "bewirtschaftungskosten": null,
+      "rohertrag": null,
+      "restnutzungsdauer": null,
+      "bodenwert": null
+    },
+    "geltungsbereich": {
+      "ags": "10041100",
+      "ebene": "gemeinde",
+      "gebiet": "Landeshauptstadt Saarbrücken",
+      "nur_diese_gemeinde": "Der Gutachterausschuss der Landeshauptstadt Saarbrücken ist ein eigener Ausschuss NEBEN dem des Regionalverbands Saarbrücken (ags 10041). Die Spanne gilt nur für das Stadtgebiet und darf nicht auf den Regionalverband oder einen Landkreis übertragen werden."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "Zeitreihe",
+        "fundstelle": "Dieselbe Tabelle steht im Immobilienmarktbericht 2021 (Berichtszeitraum 2020, Kapitel 7.3, Druckseite 47) mit SECHS Zeilen und anderen Spannen: Eigentumswohnungen, Mietwohngrundstücke (z.B. Büro), Mehrfamilienwohnhäuser, gemischt bis 50 %, gemischt über 50 %, Geschäftsgrundstücke gegen die Werte 2,5–4,5 / 5,0–6,0 / 3,0–5,0 / 3,0–6,0 / 5,0–6,0 / 5,0–7,0 %. Diese Zeilenzuordnung ist NUR mit -layout gemessen und daher unsicher — sie steht hier als Hinweis auf die Fortschreibung, nicht als Wert. Quelle: https://www.saarbruecken.de/media/download-6169428642e86"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Der Immobilienmarktbericht 2018 derselben Stelle (Berichtszeitraum 2017) führt an dieser Stelle KEINE Tabelle und sagt in Kapitel 12.2 „Vergleichsfaktoren liegen zurzeit im Saarland nicht vor.\" — die Tabelle ist also zwischen 2018 und 2021 entstanden. Quelle: https://www.saarbruecken.de/media/download-532af4a9c0e9c"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Frei abrufbare, amtliche Veröffentlichung des örtlich zuständigen Gutachterausschusses. Die Stufe bewertet die QUELLE; als Rechenwert ist der Satz unbrauchbar (Spanne ohne Punktwert, kein Modellvermerk).",
+    "fallzahl": null,
+    "streuung": "1,5 – 5,0 %",
+    "stichtag": null,
+    "stichtag_hinweis": "Der Bericht nennt für diese Zinssätze keinen Stichtag. Der Berichtszeitraum ist 01.01.–31.12.2025; die Bodenrichtwerte desselben Berichts sind zum 01.01.2026 festgesetzt (Druckseiten 54 und 55).",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+    "quelle_parser": "v1973-hand (pdftotext -table / -raw / -layout, Druckseite 57, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": null,
+    "lizenz_hinweis": "KEINE Lizenz- und keine Urheberrechtsangabe im Dokument. Das Impressum auf der letzten Seite nennt nur „Herausgeber: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken\" und die Anschrift — kein dl-de, kein Nutzungsvorbehalt, kein Copyright-Satz (gemessen am 08.10.2026 über den gesamten Text: null Treffer auf Urheberrecht, Vervielfältigung, Nachdruck, Lizenz). Ohne Angabe ist nicht entscheidbar, ob ein Quellenvermerk nötig wäre; vor einer Wiedergabe beim Ausschuss nachfragen (vermessungsamt@saarbruecken.de).",
+    "fundstelle": "Immobilienmarktbericht 2026, Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Kapitel 7.3 „Marktanpassungsfaktoren und Liegenschaftszinssätze\", Druckseite 57",
+    "seite": 57,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel.",
+      "Das sind „angewendete\" Zinssätze — vom Ausschuss in eigenen Gutachten benutzte Spannen, NICHT aus der Kaufpreissammlung abgeleitete und beschlossene Liegenschaftszinssätze. Der Bericht sagt dazu im selben Kapitel: „Die Zentrale Geschäftsstelle der Gutachterausschüsse des Saarlandes sammelt landesweit die entsprechenden Daten, um sie aufzubereiten und im Grundstücksmarktbericht Saarland zu veröffentlichen.\"",
+      "Eine Spanne ist kein Wert. Ein Mittelwert daraus wäre erfunden — bei Mehrfamilienwohnhäusern (1,5–5,0 %) läge er um mehr als das Dreifache falsch, wenn die Wahl falsch ist.",
+      "Ohne Modellvermerk nach § 10 ImmoWertV rechnet kein Ertragswertverfahren damit. Kein Verfahren rechnet halb.",
+      "Sachwertfaktoren führt dieser Bericht nicht; Umrechnungskoeffizienten ausdrücklich nicht („In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor.\", Kapitel 7.1, Druckseite 56)."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026 am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (frei abrufbar, HTTP 200): der Ausschuss druckt auf Druckseite 57 eine Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" mit fünf Grundstücksarten und je einer SPANNE. Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Diese Spannen sind kein verwendbarer Liegenschaftszinssatz: (1) es sind angewendete, nicht abgeleitete Sätze — die Ableitung macht landesweit die Zentrale Geschäftsstelle und veröffentlicht sie im kostenpflichtigen Grundstücksmarktbericht Saarland (75 Euro, ZGGA beim LVGL, zgga@lvgl.saarland.de); (2) es fehlt jeder Modellvermerk nach § 10 ImmoWertV — keine Gesamtnutzungsdauer, keine Bewirtschaftungskosten, kein Rohertragsansatz, keine Restnutzungsdauer, keine Fallzahl, kein Stichtag; (3) eine Spanne ohne Punktwert lässt sich nur durch eine eigene Annahme auflösen, und die wäre erfunden. DER SATZ IST DAMIT ALS EXISTENZ BELEGT, NICHT ALS ZAHL. Weg zur echten Zahl: Grundstücksmarktbericht des Saarlandes bei der ZGGA beziehen (75 Euro) oder Einzelauskunft beim Gutachterausschuss der Landeshauptstadt Saarbrücken (Gerberstraße 29, 66111 Saarbrücken, 0681 905-1765, vermessungsamt@saarbruecken.de) — die Amtshandlungen sind nach GutGebVO gebührenpflichtig. KORREKTUR EINER FRÜHEREN MESSUNG: in verfuegbarkeit-sl.json steht zu diesem Ausschuss „Beide Jahrgaenge nennen Liegenschaftszinssaetze nur im Text, nicht als Tabelle\". Das stimmt für den Jahrgang 2018 — die Jahrgänge 2021 und 2026 führen aber sehr wohl eine Tabelle.",
+    "unvollstaendig_grund": "Die amtliche Veröffentlichung nennt nur eine Spanne und keinen Modellvermerk. Ein Punktwert ist nur über den kostenpflichtigen Grundstücksmarktbericht des Saarlandes (75 Euro, ZGGA beim LVGL) oder über eine gebührenpflichtige Einzelauskunft des Ausschusses zu bekommen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "SL",
+    "ags": "10041100",
+    "ebene": "gemeinde",
+    "gebiet_name": "Landeshauptstadt Saarbrücken",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "ggg",
+    "objektart_bez": "Gemischt genutzte Grundstücke — zwei Klassen in EINEM Satz geführt, weil der Register-Zweig „ggg\" nicht nach dem gewerblichen Rohertragsanteil trennt: gewerblicher Anteil am Rohertrag bis zu 50 % → 3,0–6,0 %; über 50 % → 5,0–6,0 %",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "KEINE Modellangaben im Dokument. Der Bericht nennt zu diesen Zinssätzen weder Gesamtnutzungsdauer noch Bewirtschaftungskosten, Rohertrag, Restnutzungsdauer, Bodenwertansatz, Fallzahl oder Stichtag. Damit fehlt der Modellvermerk nach § 10 ImmoWertV vollständig.",
+      "gnd_jahre": null,
+      "bewirtschaftungskosten": null,
+      "rohertrag": null,
+      "restnutzungsdauer": null,
+      "bodenwert": null
+    },
+    "geltungsbereich": {
+      "ags": "10041100",
+      "ebene": "gemeinde",
+      "gebiet": "Landeshauptstadt Saarbrücken",
+      "nur_diese_gemeinde": "Der Gutachterausschuss der Landeshauptstadt Saarbrücken ist ein eigener Ausschuss NEBEN dem des Regionalverbands Saarbrücken (ags 10041). Die Spanne gilt nur für das Stadtgebiet und darf nicht auf den Regionalverband oder einen Landkreis übertragen werden."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "Zeitreihe",
+        "fundstelle": "Dieselbe Tabelle steht im Immobilienmarktbericht 2021 (Berichtszeitraum 2020, Kapitel 7.3, Druckseite 47) mit SECHS Zeilen und anderen Spannen: Eigentumswohnungen, Mietwohngrundstücke (z.B. Büro), Mehrfamilienwohnhäuser, gemischt bis 50 %, gemischt über 50 %, Geschäftsgrundstücke gegen die Werte 2,5–4,5 / 5,0–6,0 / 3,0–5,0 / 3,0–6,0 / 5,0–6,0 / 5,0–7,0 %. Diese Zeilenzuordnung ist NUR mit -layout gemessen und daher unsicher — sie steht hier als Hinweis auf die Fortschreibung, nicht als Wert. Quelle: https://www.saarbruecken.de/media/download-6169428642e86"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Der Immobilienmarktbericht 2018 derselben Stelle (Berichtszeitraum 2017) führt an dieser Stelle KEINE Tabelle und sagt in Kapitel 12.2 „Vergleichsfaktoren liegen zurzeit im Saarland nicht vor.\" — die Tabelle ist also zwischen 2018 und 2021 entstanden. Quelle: https://www.saarbruecken.de/media/download-532af4a9c0e9c"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Frei abrufbare, amtliche Veröffentlichung des örtlich zuständigen Gutachterausschusses. Die Stufe bewertet die QUELLE; als Rechenwert ist der Satz unbrauchbar (Spanne ohne Punktwert, kein Modellvermerk).",
+    "fallzahl": null,
+    "streuung": "3,0 – 6,0 % (gewerblicher Anteil bis 50 %) bzw. 5,0 – 6,0 % (über 50 %)",
+    "stichtag": null,
+    "stichtag_hinweis": "Der Bericht nennt für diese Zinssätze keinen Stichtag. Der Berichtszeitraum ist 01.01.–31.12.2025; die Bodenrichtwerte desselben Berichts sind zum 01.01.2026 festgesetzt (Druckseiten 54 und 55).",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+    "quelle_parser": "v1973-hand (pdftotext -table / -raw / -layout, Druckseite 57, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": null,
+    "lizenz_hinweis": "KEINE Lizenz- und keine Urheberrechtsangabe im Dokument. Das Impressum auf der letzten Seite nennt nur „Herausgeber: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken\" und die Anschrift — kein dl-de, kein Nutzungsvorbehalt, kein Copyright-Satz (gemessen am 08.10.2026 über den gesamten Text: null Treffer auf Urheberrecht, Vervielfältigung, Nachdruck, Lizenz). Ohne Angabe ist nicht entscheidbar, ob ein Quellenvermerk nötig wäre; vor einer Wiedergabe beim Ausschuss nachfragen (vermessungsamt@saarbruecken.de).",
+    "fundstelle": "Immobilienmarktbericht 2026, Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Kapitel 7.3 „Marktanpassungsfaktoren und Liegenschaftszinssätze\", Druckseite 57",
+    "seite": 57,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel.",
+      "Das sind „angewendete\" Zinssätze — vom Ausschuss in eigenen Gutachten benutzte Spannen, NICHT aus der Kaufpreissammlung abgeleitete und beschlossene Liegenschaftszinssätze. Der Bericht sagt dazu im selben Kapitel: „Die Zentrale Geschäftsstelle der Gutachterausschüsse des Saarlandes sammelt landesweit die entsprechenden Daten, um sie aufzubereiten und im Grundstücksmarktbericht Saarland zu veröffentlichen.\"",
+      "Eine Spanne ist kein Wert. Ein Mittelwert daraus wäre erfunden — bei Mehrfamilienwohnhäusern (1,5–5,0 %) läge er um mehr als das Dreifache falsch, wenn die Wahl falsch ist.",
+      "Ohne Modellvermerk nach § 10 ImmoWertV rechnet kein Ertragswertverfahren damit. Kein Verfahren rechnet halb.",
+      "Sachwertfaktoren führt dieser Bericht nicht; Umrechnungskoeffizienten ausdrücklich nicht („In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor.\", Kapitel 7.1, Druckseite 56)."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026 am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (frei abrufbar, HTTP 200): der Ausschuss druckt auf Druckseite 57 eine Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" mit fünf Grundstücksarten und je einer SPANNE. Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Diese Spannen sind kein verwendbarer Liegenschaftszinssatz: (1) es sind angewendete, nicht abgeleitete Sätze — die Ableitung macht landesweit die Zentrale Geschäftsstelle und veröffentlicht sie im kostenpflichtigen Grundstücksmarktbericht Saarland (75 Euro, ZGGA beim LVGL, zgga@lvgl.saarland.de); (2) es fehlt jeder Modellvermerk nach § 10 ImmoWertV — keine Gesamtnutzungsdauer, keine Bewirtschaftungskosten, kein Rohertragsansatz, keine Restnutzungsdauer, keine Fallzahl, kein Stichtag; (3) eine Spanne ohne Punktwert lässt sich nur durch eine eigene Annahme auflösen, und die wäre erfunden. DER SATZ IST DAMIT ALS EXISTENZ BELEGT, NICHT ALS ZAHL. Weg zur echten Zahl: Grundstücksmarktbericht des Saarlandes bei der ZGGA beziehen (75 Euro) oder Einzelauskunft beim Gutachterausschuss der Landeshauptstadt Saarbrücken (Gerberstraße 29, 66111 Saarbrücken, 0681 905-1765, vermessungsamt@saarbruecken.de) — die Amtshandlungen sind nach GutGebVO gebührenpflichtig. KORREKTUR EINER FRÜHEREN MESSUNG: in verfuegbarkeit-sl.json steht zu diesem Ausschuss „Beide Jahrgaenge nennen Liegenschaftszinssaetze nur im Text, nicht als Tabelle\". Das stimmt für den Jahrgang 2018 — die Jahrgänge 2021 und 2026 führen aber sehr wohl eine Tabelle.",
+    "unvollstaendig_grund": "Die amtliche Veröffentlichung nennt nur eine Spanne und keinen Modellvermerk. Ein Punktwert ist nur über den kostenpflichtigen Grundstücksmarktbericht des Saarlandes (75 Euro, ZGGA beim LVGL) oder über eine gebührenpflichtige Einzelauskunft des Ausschusses zu bekommen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "SL",
+    "ags": "10041100",
+    "ebene": "gemeinde",
+    "gebiet_name": "Landeshauptstadt Saarbrücken",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken",
+    "kennzahl": "liegenschaftszinssatz",
+    "zweig": "gegi",
+    "objektart_bez": "Geschäftsgrundstücke (der Register-Zweig „gegi\" heißt sonst „Gewerbe- und Industriegrundstück\" — der Bericht sagt „Geschäftsgrundstücke\"; die Bezeichnung des Berichts gilt)",
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": {
+      "hinweis": "KEINE Modellangaben im Dokument. Der Bericht nennt zu diesen Zinssätzen weder Gesamtnutzungsdauer noch Bewirtschaftungskosten, Rohertrag, Restnutzungsdauer, Bodenwertansatz, Fallzahl oder Stichtag. Damit fehlt der Modellvermerk nach § 10 ImmoWertV vollständig.",
+      "gnd_jahre": null,
+      "bewirtschaftungskosten": null,
+      "rohertrag": null,
+      "restnutzungsdauer": null,
+      "bodenwert": null
+    },
+    "geltungsbereich": {
+      "ags": "10041100",
+      "ebene": "gemeinde",
+      "gebiet": "Landeshauptstadt Saarbrücken",
+      "nur_diese_gemeinde": "Der Gutachterausschuss der Landeshauptstadt Saarbrücken ist ein eigener Ausschuss NEBEN dem des Regionalverbands Saarbrücken (ags 10041). Die Spanne gilt nur für das Stadtgebiet und darf nicht auf den Regionalverband oder einen Landkreis übertragen werden."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Am 08.10.2026 geladen (HTTP 200, 2,6 MB, 61 Druckseiten), https://www.saarbruecken.de/media/download-672dd7209e93a"
+      },
+      {
+        "art": "Zeitreihe",
+        "fundstelle": "Dieselbe Tabelle steht im Immobilienmarktbericht 2021 (Berichtszeitraum 2020, Kapitel 7.3, Druckseite 47) mit SECHS Zeilen und anderen Spannen: Eigentumswohnungen, Mietwohngrundstücke (z.B. Büro), Mehrfamilienwohnhäuser, gemischt bis 50 %, gemischt über 50 %, Geschäftsgrundstücke gegen die Werte 2,5–4,5 / 5,0–6,0 / 3,0–5,0 / 3,0–6,0 / 5,0–6,0 / 5,0–7,0 %. Diese Zeilenzuordnung ist NUR mit -layout gemessen und daher unsicher — sie steht hier als Hinweis auf die Fortschreibung, nicht als Wert. Quelle: https://www.saarbruecken.de/media/download-6169428642e86"
+      },
+      {
+        "art": "Gegenprobe",
+        "fundstelle": "Der Immobilienmarktbericht 2018 derselben Stelle (Berichtszeitraum 2017) führt an dieser Stelle KEINE Tabelle und sagt in Kapitel 12.2 „Vergleichsfaktoren liegen zurzeit im Saarland nicht vor.\" — die Tabelle ist also zwischen 2018 und 2021 entstanden. Quelle: https://www.saarbruecken.de/media/download-532af4a9c0e9c"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Frei abrufbare, amtliche Veröffentlichung des örtlich zuständigen Gutachterausschusses. Die Stufe bewertet die QUELLE; als Rechenwert ist der Satz unbrauchbar (Spanne ohne Punktwert, kein Modellvermerk).",
+    "fallzahl": null,
+    "streuung": "5,0 – 7,5 %",
+    "stichtag": null,
+    "stichtag_hinweis": "Der Bericht nennt für diese Zinssätze keinen Stichtag. Der Berichtszeitraum ist 01.01.–31.12.2025; die Bodenrichtwerte desselben Berichts sind zum 01.01.2026 festgesetzt (Druckseiten 54 und 55).",
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.saarbruecken.de/media/download-672dd7209e93a",
+    "quelle_parser": "v1973-hand (pdftotext -table / -raw / -layout, Druckseite 57, am 08.10.2026 gelesen)",
+    "quellenvermerk": null,
+    "lizenz": null,
+    "lizenz_hinweis": "KEINE Lizenz- und keine Urheberrechtsangabe im Dokument. Das Impressum auf der letzten Seite nennt nur „Herausgeber: Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken\" und die Anschrift — kein dl-de, kein Nutzungsvorbehalt, kein Copyright-Satz (gemessen am 08.10.2026 über den gesamten Text: null Treffer auf Urheberrecht, Vervielfältigung, Nachdruck, Lizenz). Ohne Angabe ist nicht entscheidbar, ob ein Quellenvermerk nötig wäre; vor einer Wiedergabe beim Ausschuss nachfragen (vermessungsamt@saarbruecken.de).",
+    "fundstelle": "Immobilienmarktbericht 2026, Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Kapitel 7.3 „Marktanpassungsfaktoren und Liegenschaftszinssätze\", Druckseite 57",
+    "seite": 57,
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel.",
+      "Das sind „angewendete\" Zinssätze — vom Ausschuss in eigenen Gutachten benutzte Spannen, NICHT aus der Kaufpreissammlung abgeleitete und beschlossene Liegenschaftszinssätze. Der Bericht sagt dazu im selben Kapitel: „Die Zentrale Geschäftsstelle der Gutachterausschüsse des Saarlandes sammelt landesweit die entsprechenden Daten, um sie aufzubereiten und im Grundstücksmarktbericht Saarland zu veröffentlichen.\"",
+      "Eine Spanne ist kein Wert. Ein Mittelwert daraus wäre erfunden — bei Mehrfamilienwohnhäusern (1,5–5,0 %) läge er um mehr als das Dreifache falsch, wenn die Wahl falsch ist.",
+      "Ohne Modellvermerk nach § 10 ImmoWertV rechnet kein Ertragswertverfahren damit. Kein Verfahren rechnet halb.",
+      "Sachwertfaktoren führt dieser Bericht nicht; Umrechnungskoeffizienten ausdrücklich nicht („In Saarbrücken liegen zurzeit keine lokalen Umrechnungskoeffizienten vor.\", Kapitel 7.1, Druckseite 56)."
+    ],
+    "warum_kein_wert": "GEMESSEN AM 08.10.2026 am Immobilienmarktbericht 2026 der Landeshauptstadt Saarbrücken (frei abrufbar, HTTP 200): der Ausschuss druckt auf Druckseite 57 eine Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" mit fünf Grundstücksarten und je einer SPANNE. Immobilienmarktbericht 2026, Kapitel 7.3, Druckseite 57, Tabelle „Vom Gutachterausschuss Saarbrücken angewendete Liegenschaftszinssätze\" — Eigentumswohnungen 2,0–3,5 %; Mehrfamilienwohnhäuser 1,5–5,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil am Rohertrag bis zu 50 % 3,0–6,0 %; gemischt genutzte Grundstücke mit gewerblichem Anteil über 50 % 5,0–6,0 %; Geschäftsgrundstücke 5,0–7,5 %. Die Zeilenzuordnung ist mit DREI Auslesewegen gegengeprüft (pdftotext -table, -raw und -layout auf Druckseite 57); -table und -raw stimmen überein, -layout verschiebt die Wertespalte um eine Zeile nach oben und ist hier NICHT maßgeblich. Diese Spannen sind kein verwendbarer Liegenschaftszinssatz: (1) es sind angewendete, nicht abgeleitete Sätze — die Ableitung macht landesweit die Zentrale Geschäftsstelle und veröffentlicht sie im kostenpflichtigen Grundstücksmarktbericht Saarland (75 Euro, ZGGA beim LVGL, zgga@lvgl.saarland.de); (2) es fehlt jeder Modellvermerk nach § 10 ImmoWertV — keine Gesamtnutzungsdauer, keine Bewirtschaftungskosten, kein Rohertragsansatz, keine Restnutzungsdauer, keine Fallzahl, kein Stichtag; (3) eine Spanne ohne Punktwert lässt sich nur durch eine eigene Annahme auflösen, und die wäre erfunden. DER SATZ IST DAMIT ALS EXISTENZ BELEGT, NICHT ALS ZAHL. Weg zur echten Zahl: Grundstücksmarktbericht des Saarlandes bei der ZGGA beziehen (75 Euro) oder Einzelauskunft beim Gutachterausschuss der Landeshauptstadt Saarbrücken (Gerberstraße 29, 66111 Saarbrücken, 0681 905-1765, vermessungsamt@saarbruecken.de) — die Amtshandlungen sind nach GutGebVO gebührenpflichtig. KORREKTUR EINER FRÜHEREN MESSUNG: in verfuegbarkeit-sl.json steht zu diesem Ausschuss „Beide Jahrgaenge nennen Liegenschaftszinssaetze nur im Text, nicht als Tabelle\". Das stimmt für den Jahrgang 2018 — die Jahrgänge 2021 und 2026 führen aber sehr wohl eine Tabelle.",
+    "unvollstaendig_grund": "Die amtliche Veröffentlichung nennt nur eine Spanne und keinen Modellvermerk. Ein Punktwert ist nur über den kostenpflichtigen Grundstücksmarktbericht des Saarlandes (75 Euro, ZGGA beim LVGL) oder über eine gebührenpflichtige Einzelauskunft des Ausschusses zu bekommen.",
+    "vollstaendig": false
+  }
+]

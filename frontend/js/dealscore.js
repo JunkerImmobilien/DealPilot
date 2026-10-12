@@ -96,6 +96,47 @@ var DealScore = (function() {
     return Math.max(0, Math.min(100, s));
   }
 
+  /* ══ v2141 · DREI LAGEN, NICHT ZWEI ═══════════════════════════════
+
+     1. LTV/DSCR liegen vor          -> normale Note
+     2. nicht angegeben (null)       -> 50, Platzhalter (wie bisher)
+     3. BARKAUF (darlehen === 0)     -> die Kategorie entfaellt
+
+     Lage 3 gab es nicht, und sie ist von Lage 2 nur zu unterscheiden,
+     wenn der Aufrufer das Darlehen mitgibt. `0` allein reicht nicht:
+     `K.ltv || 0` macht aus einem fehlenden Wert auch eine 0.
+
+     > `Number(null)` ist 0 und besteht `Number.isFinite`. Wer das
+     > verwechselt, haelt eine Abwesenheit fuer eine Messung. */
+  /* Drei Namen in dieser Rangfolge - wie `gnd_jahre` in
+     `lib/gutachterausschuss.js`. Grund: mehrere Aufrufer geben
+     `State.kpis` DIREKT durch (`pdf-investment-bank.js:852`), und dort
+     heisst die Summe beider Darlehen `d_total`. Wer nur `darlehen`
+     liest, greift bei genau diesen Aufrufern ins Leere - und zwar
+     lautlos, weil `undefined` wie "nichts gesagt" aussieht.
+
+       darlehen  >  d_total  >  d1 (+ d2)
+
+     Gelesen wird der ERSTE, der ueberhaupt eine Zahl traegt. Eine 0
+     ist eine Zahl und beendet die Suche - sonst wuerde ein
+     ausdruecklicher Barkauf (`darlehen: 0`) weitergereicht und an
+     einem alten `d1` haengenbleiben. */
+  function _istBarkauf(kpis) {
+    if (!kpis) return false;
+    var kandidaten = [kpis.darlehen, kpis.d_total];
+    if (kpis.d1 != null && kpis.d1 !== '') {
+      kandidaten.push(Number(kpis.d1 || 0) + Number(kpis.d2 || 0));
+    }
+    for (var i = 0; i < kandidaten.length; i++) {
+      var d = kandidaten[i];
+      if (d === undefined || d === null || d === '') continue;
+      var n = Number(d);
+      if (!isFinite(n)) continue;
+      return n <= 0;
+    }
+    return false;   /* kein Aufrufer hat etwas gesagt - alles wie bisher */
+  }
+
   function _scoreLtv(ltv_pct) {
     // 70% → 100, 90% → 50, 110% → 0
     if (!ltv_pct || isNaN(ltv_pct)) return 50;
@@ -156,7 +197,12 @@ var DealScore = (function() {
       ltv: K.ltv || 0,
       dscr: K.dscr || 0,
       wp_kpi: K.wp_kpi || 0,
-      mstg: mstg
+      mstg: mstg,
+      /* v2141: `d_total` ist die Summe beider Darlehen aus
+         `DealKpis.compute()`. Ist sie 0, ist es ein Barkauf - dann
+         entfallen LTV und DSCR statt mit 50 zu Buche zu stehen.
+         Fehlt sie (aelterer State), bleibt alles wie bisher. */
+      darlehen: (K.d_total != null && isFinite(K.d_total)) ? K.d_total : null
     });
   }
 
@@ -178,17 +224,35 @@ var DealScore = (function() {
     var kp = K.kp || 1;
     var mstg = K.mstg || 1.5;
 
+    /* v2141: beim Barkauf tragen LTV und DSCR `weight: 0` und
+       `score: null`. Sie bleiben in der Liste - eine Kategorie, die
+       nicht anwendbar ist, gehoert BENANNT und nicht beziffert, und
+       jede Anzeige liest den `breakdown` nach `key`. Wer sie
+       herausnaehme, liesse Kacheln verschwinden. */
+    var barkauf = _istBarkauf(K);
     var components = [
       { key: 'cashflow', label: 'Cashflow', weight: weights.cashflow, score: _scoreCashflow(cf_m), input: cf_m.toFixed(0) + ' €/Mon' },
       { key: 'rendite', label: 'Rendite (NMR)', weight: weights.rendite, score: _scoreRendite(nmr), input: nmr.toFixed(2) + ' %' },
-      { key: 'ltv', label: 'LTV', weight: weights.ltv, score: _scoreLtv(ltv), input: ltv.toFixed(1) + ' %' },
-      { key: 'risiko', label: 'Risiko (DSCR)', weight: weights.risiko, score: _scoreRisiko(dscr), input: 'DSCR ' + dscr.toFixed(2) },
+      barkauf
+        ? { key: 'ltv', label: 'LTV', weight: 0, score: null, entfaellt: 'am Objekt ist kein Darlehen hinterlegt', input: 'entfällt — Barkauf' }
+        : { key: 'ltv', label: 'LTV', weight: weights.ltv, score: _scoreLtv(ltv), input: ltv.toFixed(1) + ' %' },
+      barkauf
+        ? { key: 'risiko', label: 'Risiko (DSCR)', weight: 0, score: null, entfaellt: 'ohne Kapitaldienst gibt es keinen Deckungsgrad', input: 'entfällt — Barkauf' }
+        : { key: 'risiko', label: 'Risiko (DSCR)', weight: weights.risiko, score: _scoreRisiko(dscr), input: 'DSCR ' + dscr.toFixed(2) },
       { key: 'potenzial', label: 'Potenzial (Wertpuffer + Miete)', weight: weights.potenzial, score: _scorePotenzial(wp, kp, mstg), input: 'Puffer ' + Math.round(wp).toLocaleString('de-DE') + ' €' }
     ];
 
-    var total = 0;
-    components.forEach(function(c) { total += (c.score * c.weight) / 100; });
-    var score = Math.round(total);
+    /* v2141: auf die TATSAECHLICH vergebenen Gewichte hochrechnen.
+       Bis hierher war die Summe der Gewichte immer 100, also fiel der
+       Unterschied nicht auf; mit einer entfallenen Kategorie waere ein
+       `/100` eine stille Abwertung um deren Gewicht. */
+    var total = 0, gewichtSumme = 0;
+    components.forEach(function(c) {
+      if (c.score == null || !(c.weight > 0)) return;
+      total += c.score * c.weight;
+      gewichtSumme += c.weight;
+    });
+    var score = Math.round(gewichtSumme > 0 ? total / gewichtSumme : 0);
 
     var color, label;
     // V63.32: Score-Schwellen identisch zum Quick-Check (gleiche Farbskala für gleiche Werte)

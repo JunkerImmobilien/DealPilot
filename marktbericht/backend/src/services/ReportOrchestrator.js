@@ -22,7 +22,9 @@ import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
 import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
-         erbbaurechtskoeffizient as erbbauKoeffizient }   /* v1342 */
+         erbbaurechtskoeffizient as erbbauKoeffizient,   /* v1342 */
+         /* v1977: der amtliche Vergleichsfaktor aus dem Register. */
+         vergleichsfaktor as regVergleichsfaktor }
   from '../lib/gutachterausschuss.js';
 import { ScoringService } from './ScoringService.js';
 import { ReportGenerationService } from './ReportGenerationService.js';
@@ -595,6 +597,149 @@ export const ReportOrchestrator = {
     const _rndVorab = rndEinheitlich(ref, 80);
     step('rnd-vorab: ' + (_rndVorab.rnd != null ? _rndVorab.rnd + ' Jahre (' + _rndVorab.quelle + ')' : 'keine'));
 
+    /* ══ v1977 · DER AMTLICHE VERGLEICHSFAKTOR AUS DEM REGISTER ═════════
+
+       Seit v1971 fuehrt das Vergleichswertverfahren nur mit
+       KAUFPREISBASIERTER Grundlage. Dafuer gab es bis heute genau EINE
+       Quelle: die fest einkodierte Tabelle des Kreises Minden-Luebbecke
+       (`vergleichsfaktoren_nrw.js`, oben als `_amtVf`). Ueberall sonst
+       wies der Bericht kein fuehrendes Verfahren aus.
+
+       Seit v1976 liegen die ERSTEN Registersaetze: Barnim (BB) mit zwei
+       Werten, Berlin mit drei, dazu Sperren fuer das Saarland. Der
+       Leseweg war schon gebaut und ungenutzt — `GAA.vergleichsfaktor()`
+       gibt es laengst und lieferte immer `kein_ausschuss_hinterlegt`.
+
+       WARUM HIER UND NICHT BEI `_amtVf` (Zeile ~515): die
+       Registersaetze brauchen die RESTNUTZUNGSDAUER als
+       Anpassungsfaktor, und die entsteht erst zwei Zeilen darueber.
+       Dort oben waere sie noch nicht bekannt.
+
+       > ⚠ `verwendung` IST DIE SPERRE, NICHT DIE VERFUEGBARKEIT.
+       >
+       > Die BERLINER Faktoren sind amtlich — aber amtlich fuer die
+       > STEUERLICHE Bedarfsbewertung. Die Blaetter sagen woertlich: „Die
+       > Vergleichsfaktoren ersetzen nicht eine gutachterliche Ermittlung
+       > des Verkehrswertes im Sinne des § 194 BauGB", und jeder
+       > Baum-Endknoten tragt „ausschliesslich fuer die steuerliche
+       > Bewertung". Sie tragen deshalb `verwendung: "intern"`.
+       >
+       > Wer sie als Verkehrswert-Grundlage nimmt, baut ein fuehrendes
+       > Verfahren auf eine Zahl, die genau das ausschliesst. Deshalb
+       > wird `verwendung` GEPRUEFT und nicht gehofft — und deshalb
+       > steht der Grund im Protokoll, wenn ein Satz zurueckgehalten
+       > wird.
+
+       Die Feldnamen der Achsen sind AUSGELESEN, nicht geraten: `brw`,
+       `wohnflaeche`, `rnd`, `flaeche`. Zweimal habe ich sie am
+       08.10.2026 falsch geraten (`bodenwert_eur_qm`, `rnd_jahre`,
+       `grundstueck_qm`) und bekam `achse_x_fehlt` — ein Fehlschlag, der
+       wie „kein Wert" aussieht. */
+    let _regVf = null;
+    try {
+      const _brwVf = (landValue && landValue.available && Number(landValue.value_sqm) > 0)
+        ? Number(landValue.value_sqm) : null;
+      if (_agsWert && _brwVf != null && Number(ref.living_area) > 0) {
+        /* ══ v1977a · JEDER AUSSCHUSS BENENNT SEINE ACHSEN ANDERS ═══════
+
+           Hier standen vier Namen: `brw`, `wohnflaeche`, `rnd`,
+           `flaeche`. Das sind die von BARNIM. Berlin fuehrt dieselbe
+           Kennzahl ueber `bgf_qm` x `brw_eur_qm` — der Aufruf bekam
+           dort `achse_x_fehlt` und sah aus wie „kein Wert".
+
+           Am Register gemessen, alle Achsen- und Korrekturnamen, die
+           ueberhaupt vorkommen:
+
+             Achsen       brw · brw_eur_qm · bodenwert · wohnflaeche ·
+                          wohnflaeche_qm · bgf_qm
+             Korrekturen  rnd · flaeche · baujahr · gebaeudestellung ·
+                          bauzustand
+
+           Geliefert wird deshalb, was vorliegt, unter JEDEM Namen, den
+           das Register benutzt. Der Satz nimmt sich, was er braucht.
+
+           > `gebaeudestellung` und `bauzustand` werden ABSICHTLICH NICHT
+           > abgebildet. DealPilot fuehrt `haustyp` und `ds2_zustand`, und
+           > eine Zuordnung waere eine Entscheidung ueber amtliche
+           > Klassen — also eine erfundene Einordnung. Der Leser erfaehrt
+           > sie als `korrekturen_offen`, das die Leseroutine schon
+           > zurueckgibt. */
+        const _bgfVf = Number(ref.bgf) > 0 ? Number(ref.bgf) : null;
+        const _r = regVergleichsfaktor({
+          ags: String(_agsWert), objektart: ref.property_type,
+          brw: _brwVf, brw_eur_qm: _brwVf, bodenwert: _brwVf,
+          wohnflaeche: Number(ref.living_area) || null,
+          wohnflaeche_qm: Number(ref.living_area) || null,
+          bgf_qm: _bgfVf,
+          rnd: _rndVorab.rnd != null ? _rndVorab.rnd : null,
+          rnd_jahre: _rndVorab.rnd != null ? _rndVorab.rnd : null,
+          flaeche: Number(ref.plot_area) > 0 ? Number(ref.plot_area) : null,
+          baujahr: Number(ref.build_year) > 0 ? Number(ref.build_year) : null,
+        });
+        if (_r && _r.verfuegbar && _r.wert != null) {
+          if (String(_r.verwendung || '') === 'intern') {
+            _regVf = { verfuegbar: false, grund: 'nur_steuerliche_bewertung',
+              hinweis: 'Für dieses Gebiet führt der Gutachterausschuss amtliche '
+                + 'Vergleichsfaktoren, aber ausdrücklich nur für die steuerliche '
+                + 'Bedarfsbewertung und die Kaufpreisaufteilung. Sie ersetzen nach '
+                + 'eigener Angabe des Ausschusses keine Ermittlung des Verkehrswertes '
+                + 'nach § 194 BauGB und tragen deshalb hier kein Verfahren.',
+              ausschuss: _r.ausschuss || null, quelle_url: _r.quelle_url || null };
+            step('vergleichsfaktor-register: zurueckgehalten (nur steuerliche Bewertung)');
+          } else {
+            /* ══ v1977a · DIE BEZUGSGROESSE IST NICHT IMMER DIE WOHNFLAECHE
+
+               Hier stand `* Number(ref.living_area)`. Barnim rechnet in
+               Euro je Quadratmeter WOHNFLAECHE, Berlin in Euro je
+               Quadratmeter BRUTTO-GRUNDFLAECHE. Mit der Wohnflaeche
+               multipliziert waere der Berliner Wert um den Faktor
+               Wfl/BGF daneben — bei einem Haus rund 25 Prozent, und
+               nichts haette widersprochen.
+
+               Die Leseroutine gibt `bezugsgroesse` zurueck; sie
+               entscheidet. Fehlt sie oder ist die passende Flaeche
+               nicht erfasst, gibt es KEINEN Objektwert — kein
+               Rateversuch mit der anderen Flaeche. */
+            const _bez = String(_r.bezugsgroesse || _r.einheit_bez || '');
+            const _istBgf = /bgf|brutto/i.test(_bez);
+            const _flaecheFuerWert = _istBgf ? _bgfVf : (Number(ref.living_area) || null);
+            if (_flaecheFuerWert == null) {
+              _regVf = { verfuegbar: false, grund: _istBgf ? 'bgf_fehlt' : 'wohnflaeche_fehlt',
+                faktor_qm: Number(_r.wert), bezugsgroesse: _bez || null,
+                hinweis: 'Für dieses Gebiet liegt ein amtlicher Vergleichsfaktor von '
+                  + _r.wert + ' €/m² vor, bezogen auf die '
+                  + (_istBgf ? 'Brutto-Grundfläche' : 'Wohnfläche')
+                  + '. Diese Fläche ist am Objekt nicht erfasst, deshalb wird kein '
+                  + 'Objektwert daraus gebildet.',
+                ausschuss: _r.ausschuss || null, quelle_url: _r.quelle_url || null };
+              step('vergleichsfaktor-register: Faktor da, aber Bezugsflaeche fehlt ('
+                + (_istBgf ? 'BGF' : 'Wohnflaeche') + ')');
+              throw { _abbruch: true };
+            }
+            const _wert = Number(_r.wert) * _flaecheFuerWert;
+            _regVf = { verfuegbar: true, faktor_qm: Number(_r.wert),
+              wert_eur: Math.round(_wert), einheit: _r.einheit || null,
+              rechenweg: _r.rechenweg || null, ausschuss: _r.ausschuss || null,
+              quelle_url: _r.quelle_url || null, stufe: _r.stufe || null,
+              quellenvermerk: _r.quellenvermerk || null,
+              hinweis: 'Amtlicher Vergleichsfaktor nach § 20 ImmoWertV, abgeleitet aus '
+                + 'der Kaufpreissammlung des Gutachterausschusses. Anders als '
+                + 'Angebotspreise beruht er auf beurkundeten Kaufpreisen (§ 25 Abs. 1 '
+                + 'ImmoWertV).' };
+            step('vergleichsfaktor-register: ' + _r.wert + ' EUR/m2 -> '
+              + Math.round(_wert) + ' EUR');
+          }
+        } else if (_r && _r.grund) {
+          step('vergleichsfaktor-register: keiner (' + _r.grund + ')');
+        }
+      }
+    } catch (e) {
+      /* v1977a: der gezielte Abbruch oben hat `_regVf` absichtlich
+         gesetzt — ihn hier auf null zu werfen wuerde die Auskunft
+         wegwerfen, um die es gerade ging. */
+      if (!(e && e._abbruch)) _regVf = null;
+    }
+
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
         ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
@@ -836,7 +981,11 @@ export const ReportOrchestrator = {
             && !(Number(ref.stellplatz_miete_monat) > 0),
           irw: _irw,           /* v1053-WIRW-3 */
           amtliche_miete: _amtMiete,   /* v1059-WMIET-3 */
-          amtlicher_vergleichsfaktor: _amtVf,   /* v1060-WVF-3 */
+          amtlicher_vergleichsfaktor: _amtVf,
+      /* v1977: der Registerweg laeuft NEBEN der fest einkodierten
+         NRW-Tabelle, nicht in sie hinein. Zwei Quellen, zwei Felder — so
+         bleibt im Bericht erkennbar, woher der Faktor kommt. */
+      register_vergleichsfaktor: _regVf,   /* v1060-WVF-3 */
           bwk_modus: ref.bwk_modus || null,
           bwk_verwaltung_je_we: ref.bwk_verwaltung_je_we || null,
           bwk_instandhaltung_je_qm: ref.bwk_instandhaltung_je_qm || null,

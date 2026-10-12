@@ -31914,6 +31914,467 @@ NICHT prüfen kann. „0 Fehler" kann damit nicht mehr „nichts geprüft" heiß
 > Spiegel für Auswertungen. Im Ordner liegen 4.660 Sätze, in der Tabelle 3.443 — **das ist kein
 > Datenverlust**, sondern der Unterschied zwischen Rechenweg und Spiegel.
 
+### (86) 07.10.2026 — v1958 bis v1961a: die Lageklasse geht durch die ganze Kette
+
+P2 und P3 des Lage-Pakets. Marcel: „ja auf den Server damit und dann alles umsetzen."
+
+#### A · Die drei Stellen, an denen ein Feld lautlos verschwindet
+
+Beide Messläufe hatten sie unabhängig voneinander genannt — und alle drei sind bedient:
+
+```
+storage.js  FIELDS        sonst faellt das Feld beim SPEICHERN weg
+storage.js  resetFields   sonst klebt Objekt As Klasse an Objekt B
+qc-bridge.js CARRIERS     sonst geht sie zwischen iframe und Fenster verloren
+```
+
+**Am lebenden Objekt nachgemessen**, nicht aus dem Code geschlossen:
+
+```
+collectData().lageklasse = "B"        -> im Feldkatalog: JA
+Objekt A auf B gesetzt, Objekt B ohne Klasse geladen
+  Feld danach: ""                     -> die Reset-Liste greift
+```
+
+#### B · Zwei Dinge, die gleich aussehen und Verschiedenes heißen
+
+> **Die vorhandene Stufenpille taugt nicht.** `objekt-reiter.js` führt `STUFEN A–E` — die
+> bedeuten die **Herkunft** eines Wertes („amtlich vom Gutachterausschuss" bis „eigene Angabe").
+> Ein „A" hätte dort einen Tooltip über Gutachterausschüsse gezeigt. Der Messbericht hatte sie
+> als „exakt das Muster" vorgeschlagen; das Muster stimmt, die **Bedeutung** nicht.
+
+Deshalb eine eigene Pille (`.oe-lk-tag` im Reiter, `.ao-lk` in der Tabelle) mit eigenem Wort
+(„Ziel") und eigenem Tooltip.
+
+**Und keine Ampel in der Liste:** A, B und C tragen dieselbe Farbe. Eine C-Lage ist nicht
+schlechter als eine A-Lage, sie ist eine andere Strategie. Grün für A und Rot für C würde eine
+Wertung behaupten, die Marcel ausdrücklich nicht getroffen hat.
+
+#### C · Die KI kennt jetzt das Ziel
+
+```
+Deine Zielvorgabe: C-Lage, Ziel-Bruttomietrendite 7 % (dieses Objekt liegt bei 5,33 %)
+```
+
+> **Die Zahl ist nicht nachgerechnet.** Den Zielpreis trägt `urteil_text` schon, gerechnet von
+> `qc-heuristik.js`. Hier steht nur, WORAUF er sich bezieht — sonst liest die KI einen Zielpreis
+> ohne Begründung und erfindet sich eine. Dazu ein neues Verbot: **die Zielrendite ist Marcels
+> Vorgabe, nicht das Urteil der KI.**
+
+#### D · Vier Dateien tragen defekte Bytes
+
+```
+storage.js    3 Bytes      index.html  2 Bytes      style.css  1 Byte
+```
+
+Alle drei werden **byteweise** behandelt (latin1 lesen und schreiben, nachweislich verlustfrei),
+und der eingefügte Text ist reines ASCII.
+
+> **Dabei habe ich selbst ein viertes Byte erzeugt.** Ein Mittelpunkt in meinem eigenen Kommentar
+> ist latin1 `0xB7` — für sich **kein gültiges UTF-8**. Der Rundlauf-Prüfer hat es gefangen
+> (3 → 4) und es ist zurückgenommen. **Die Schranke ist nicht „latin1-darstellbar", sondern
+> ASCII**, wenn die Datei später als UTF-8 gelesen wird.
+
+#### E · Zwei Fehler, die erst der Lauf im Assistenten zeigte
+
+> **1 · A-Lage stand leer da.** Ich hatte `3.5` als `"3,5"` ins Feld geschrieben — ein
+> `<input type="number">` **verwirft ein Komma stillschweigend**. B (5) und C (7) sind ganze
+> Zahlen und hatten keins, deshalb sah es richtig aus. **Ein Fehler, der sich hinter runden
+> Zahlen versteckt.**
+
+> **2 · Die Eingabe wurde nicht gespeichert.** v1961 hat die Lagefelder in den **Klick**-Fänger
+> gehängt. Der fängt Klicks — eine Eingabe erreicht ihn nie. **Dass das Häkchen daneben
+> (`dpo_zins_auto`) dort funktioniert, hat den Fehler verdeckt: ein Klick auf eine Checkbox IST
+> ein Klick.** Gemessen: 4,75 getippt, im Profil stand weiterhin 3,5.
+
+Keine Syntaxprüfung hätte eines von beiden gefunden.
+
+#### F · Meine Zählprüfungen waren heute fünfmal falsch
+
+Rückfall-Konstante 3 statt 4 · CSS-Blöcke 14 statt 11 · `zielBmr` 3 statt 2 · `p.zielBmr` 2 statt
+1 · `_th(` 10 statt 6 — und jedes Mal **stimmte der Patch**, nur meine Erwartung nicht.
+
+> **Eine absolute Zahl prüft mein Gedächtnis, kein Ergebnis.** Seitdem wird der UNTERSCHIED
+> geprüft (Kopfzellen +1, Datenzellen +1) oder das Vorhandensein eines eindeutigen Blocks. Und
+> gezählt werden nur echte Aufrufe (`_th(` mit Anführungszeichen) — der Zähler traf sonst die
+> Erwähnung im eigenen Kommentar.
+
+#### G · Abnahme
+
+```
+Einstellungen   3 Zeilen, 12 Felder, Pflichtfeld golden, kein Ueberlauf
+Server          lokal 4,25 gesetzt -> vom Server A=4.25 mit Zeitstempel
+Quick-Check     C-Lage -> "verhandeln noetig", Zielpreis 162.857 EUR
+                Handrechnung 11.400 / 0,07 = 162.857                 stimmt
+Reiter Objekt   Feld in der Karte Lage, vor Makrolage, Abzeichen gold
+Speicherweg     collectData liefert "B" · Reset leert beim Objektwechsel
+Tabelle         9 Koepfe = 9 Zellen, Spalte 3, sortierbar, leer als Strich
+Ersteinrichtung 3 Felder gefuellt, Eingabe speichert sofort
+KI-Prompt       Zielvorgabe und Abstand, 12 Kettenproben gruen
+```
+
+**CLAUDE.md ergänzt:** die fünf gespiegelten Kerne, die Pflicht,
+`tools/rechenkerne-spiegeln.mjs` nach jeder Änderung laufen zu lassen, und der Satz, dass ein
+Kern **nie** Einstellungen liest.
+
+### (85) 07.10.2026 — v1955 bis v1957a: A-/B-/C-Lage, und ein Prüfer, wo ein Erzeuger stand
+
+#### A · v1955 · Ich habe einen Prüfer gebaut, wo ein Erzeuger stand
+
+**v1950 behauptete:** „Das Backend-Image kopiert `frontend/` nicht. Ein gemeinsames Modul zur
+Laufzeit gibt es ohne Bauschritt also nicht." Der erste Satz stimmt. **Der zweite nicht.**
+
+`tools/rechenkerne-spiegeln.mjs` gibt es seit v1899. Es spiegelt **fünf** Rechenkerne nach
+`backend/src/generated/rechenkerne/` — und `score-tiers.js` ist einer davon.
+`services/rechenkerne.js` reicht ihn als `stufe(wert)` heraus.
+
+> **Gefunden beim Messen für ein ganz anderes Paket.** Und dabei kam heraus, dass die
+> gespiegelte Kopie seit meiner v1950-Änderung **veraltet** war:
+>
+> ```
+> frontend/js/score-tiers.js              4962 Bytes  mit v1950
+> backend/.../score-tiers.js (gespiegelt) 2781 Bytes  ohne v1950
+> Pruefsummen erzeugt 08:20 Uhr - vor meiner Aenderung
+> ```
+>
+> **Eine zweite Quelle, die niemand nachzieht, ist genau das, was die Spiegelung verhindern
+> soll.** Mein Prüfer kannte sie nicht und wurde grün, während das Image mit einem alten Kern lief.
+
+`telegramDialogService` **liest** die Kette jetzt, statt sie zu führen. Der eigene Rückfall bleibt
+nur für den Fall, dass die Spiegelung fehlt — ein Bot, der wegen eines fehlenden Kerns gar nichts
+sagt, wäre schlimmer als einer, der die Wörter doppelt kennt.
+
+**Beweis, dass der Spiegelweg wirklich genommen wird:** die gespiegelte Datei verstimmt →
+`stufeZu(92)` antwortet mit dem verstimmten Wert. Der Prüfer führt sie als fünfte Stelle und
+vergleicht **Wort UND Versal**; eine veraltete Spiegelung ergibt 16 Abweichungen und RC=1.
+
+#### B · v1956/v1957 · Die Lageklassen
+
+Marcel: „Investoren gliedern das immer in A-, B- und C-Lagen und machen das an
+Bruttomietrenditen fest, die sie erreichen wollen." Sein Kollege schrieb dasselbe zweimal in
+`design/mockups/Anmerkungen.docx`.
+
+> **Der Satz des Kollegen stand längst in der App** — als toter Hinweis am Mietausfall-Feld:
+> „A-Lage eher 1 %, C-Lage eher 3 %". **Die Beziehung war dokumentiert und nie verdrahtet.**
+
+**Zwei Entscheidungen von Marcel, beide auf Nachfrage:**
+
+- **Vorbelegung marktüblich**, nicht nach seinem Beispiel: A 3,5 · B 5,0 · C 7,0. Er hatte
+  „A-Lage 8 %" gesagt; am Markt ist es umgekehrt. Seine 8 war ein Rechenbeispiel.
+- **Die Klasse wählt nur der Kunde.** Kein Vorschlag aus der Makrolage, auch wenn Marktdaten
+  vorliegen — die Einstufung ist eine Strategieentscheidung, keine Messung.
+- **Auf den Server** („ja auf den server damit"). Freigabeliste `['datenraum', 'lage_profil']`.
+
+**Der Rechenkern bleibt sauber.** `zielKaufpreis()` liest **keine** Einstellungen — die Zielrendite
+kommt als Parameter:
+
+```js
+var kpForBmr = nkmYear / (zielBmr / 100);     // vorher: nkmYear / 0.06
+```
+
+> **Warum nicht aus den Einstellungen lesen:** der Kern wird wörtlich ins Backend-Image
+> gespiegelt und läuft dort ohne Browser, ohne localStorage, ohne angemeldeten Nutzer. Ein Kern,
+> der sich seine Eingaben selbst holt, ist dort nicht mehr derselbe Kern. Fehlt `zielBmr`,
+> gilt der Rückfall 6 % — der Telegram-Bot rechnet unverändert weiter.
+
+Geprüft wird überall auf **Abwesenheit**: `Number(null)` ist 0 und besteht `isFinite`. Mit
+`||`-Rückfall hätte eine 0 die 6 % ersetzt und durch null geteilt.
+
+#### C · Die Kette, am lebenden Quick-Check nachgemessen
+
+```
+Objekt 180.000 EUR, 950 EUR Kaltmiete  ->  Bruttomietrendite 6,33 %
+
+ohne Lageklasse   "Kauf moeglich - genauer pruefen"
+                  "der Preis ist nicht das Problem"        (Ziel 6 %)
+
+mit C-Lage        "Kauf moeglich - verhandeln noetig"
+                  "Bei einem Kaufpreis von 162.857 EUR
+                   (10% Nachlass = 17.143 EUR weniger)"    (Ziel 7 %)
+
+Handrechnung      11.400 / 0,07 = 162.857 EUR              stimmt
+```
+
+**Der Lauf kostet nichts:** der eigenständige Quick-Check hat kein Elternfenster, das auf die
+KI-Anfrage hört — `qc-ai-bridge.js` liegt nur in der Haupt-App.
+
+**Server-Rundlauf gemessen:** lokal `4,25` gesetzt → vom Server zurückgelesen `A=4.25` mit
+Zeitstempel.
+
+#### D · v1957a · Eine Kurzschrift mit !important schlug die Einzeleigenschaft
+
+Das Pflichtfeld sollte golden umrandet sein und blieb grau. **Die Regel griff** —
+`font-weight: 600` aus derselben Regel kam an. Nur `border-color` nicht.
+
+Der Grund steht 2400 Zeilen weiter unten:
+
+```css
+.set-modal-v2 input[type="number"], ... {
+  border: 1px solid var(--border) !important;
+}
+```
+
+> **Eine KURZSCHRIFT mit `!important`.** Sie schlägt eine Einzeleigenschaft ohne `!important`
+> unabhängig von der Spezifität — und sie schlägt sogar einen **inline** gesetzten Wert ohne
+> `!important`. Die bekannte Notiz „Inline-!important schlägt alles" gilt hier in der Umkehrung.
+
+**Genau das hat die Fehlersuche gekostet:** der Inline-Versuch blieb grau, was zuerst wie ein
+ungültiges `color-mix()` aussah. Die Gegenprobe auf einem frischen Element lieferte dasselbe
+`color-mix()` sauber als `color(srgb 0.788 0.659 0.298 / 0.55)` — es lag nicht am Wert.
+
+#### E · style.css trägt ein defektes Byte
+
+Gemessen: **genau ein Byte**, das kein gültiges UTF-8 ist (Zeile 32944, in einem Kommentar). Ein
+Schreibvorgang als UTF-8 hätte es still ersetzt — eine Änderung an einer Stelle, die mit dem
+Paket nichts zu tun hat.
+
+> Deshalb wird `style.css` **byteweise** behandelt: latin1 lesen und schreiben (nachweislich
+> verlustfrei), und der eingefügte Text enthält **nur ASCII**. Ein Unicode-Zeichen würde beim
+> latin1-Schreiben zu einem Fragezeichen. Nach dem Schreiben gegengelesen: das Byte ist
+> unverändert da.
+
+#### F · Drei eigene Fehlzählungen, alle vor dem Schreiben gefangen
+
+> Rückfall-Konstante **3x statt 4x** · CSS-Blöcke **14 statt 11** (die Media-Queries und ihre
+> inneren Regeln vergessen) · Kommentar-Tiefenscanner meldete `settings.js` als kaputt — gegen
+> `HEAD` geprüft, dort schon vorher 4/5, der Scanner versteht keine Zeichenketten. Er vergleicht
+> jetzt **vorher gegen nachher** statt einen absoluten Wert zu fordern.
+
+**Offen aus dem Plan:** P2 (Speichern ins Objekt, Pille im Reiter Objekt, Zielrendite in die
+KI-Analyse) und P3 (Spalte und Sortierung, Filterpille, Schritt in der Ersteinrichtung).
+
+### (84) 07.10.2026 — v1952 bis v1954a: Werbung als Bewegtbild, Bordkarte raus, zwei unlesbare Texte
+
+#### A · „und wo liegt mein video für die werbung?"
+
+**Es gab keins.** Ich hatte „als Video ausgeben" dreimal als offenen Punkt notiert, statt es zu
+bauen. Marcel hat nicht nach einer Liste gefragt.
+
+Jetzt da: `design/Vorschläge/werbung-01-riss-reel.gif` — 432 × 768 (9:16 exakt), 22 Bilder,
+0,97 MB, Schleife 7000 ms.
+
+**Der Weg, weil weder ffmpeg noch Playwright auf dem Rechner liegen:** Chrome headless
+fotografiert die Vorlage bei **echten 1080 × 1920**, ein Start je Bild, die Animationszeit kommt
+per `?t=` aus der URL in eine Aufnahmekopie, die alle Animationen anhält.
+
+> **Von 70 Einzelbildern sind nur 21 verschieden** — die Vorlage hält lange still. Gleiche
+> Bilder werden zu einem mit Haltezeit zusammengefasst; aus 25,6 MB werden 7,7 MB, und das GIF
+> ist dadurch nicht schlechter, sondern kleiner. Gemessen per MD5, nicht nach Dateigröße
+> geschätzt.
+
+Das GIF setzt der **Browser** zusammen (`gif.js`), weil lokal kein Encoder da ist. Für ein
+echtes MP4 fehlt weiterhin ffmpeg — die Zeile dafür steht im Skript.
+
+**Zwei Fallen, beide im Werkzeug dokumentiert:**
+
+> **Chrome meldet ERFOLG auf stderr** („… bytes written to file …"). PowerShell 5.1 macht daraus
+> einen ErrorRecord; mit `$ErrorActionPreference='Stop'` bricht der Lauf **nach dem ersten Bild**
+> ab, obwohl alles geklappt hat. Die Erfolgskontrolle ist die DATEI, nicht der Rückgabewert.
+
+> **Ohne `--user-data-dir` entsteht gar kein Screenshot** — lautlos, ohne Fehlermeldung.
+
+Werkzeug: `tools/werbung-aufnehmen.ps1` und `tools/werbung-gif.html`. Die anderen drei
+Werbemittel sind damit ein Aufruf.
+
+#### B · v1953 · Die Bordkarte der Datenaufnahme ist raus
+
+**Es gibt zwei gleichnamige Stile in zwei Listen:**
+
+```
+karten-stil.js        data-dp-kartenstil   Datenaufnahme   <- gemeint
+objektkarten-stil.js  data-dp-objkarte     Objektliste     <- bleibt
+```
+
+> Die ANDERE Bordkarte ist seit v1915 der Rückfall der Aktenmappe — **Marcels eigene
+> Entscheidung vom 06.10.** Hätte ich die falsche Liste angefasst, wäre sein Standard
+> stillschweigend verschwunden. Der Zusammenhang, in dem er es gesagt hat, nennt Kartei, Zeile,
+> Bütten und Trichter: eindeutig die Datenaufnahme.
+
+Entfernt: der Eintrag und **32 CSS-Regeln**. Gemessen: 34 Regeln nannten den Wert, davon 32 nur
+ihn; die beiden anderen sind **Trichter**-Regeln, die die Bordkarte per `:not()` ausschließen —
+die bleiben, weil `:not()` die Spezifität seines Arguments trägt.
+
+Der Weg über `?karte=bordkarte` ist geschlossen; ein gespeicherter Merker fällt weich auf
+„Automatisch" zurück.
+
+**Nebenbefund:** „Zeile" hat **gar keine eigene Regel** — es ist die schlichte Grundleiste.
+Deshalb gefällt sie Marcel und war nie betroffen.
+
+#### C · v1954/v1954a · Zwei Texte unter dem Lesbarkeitsminimum
+
+Marcel: „bei Datenübernahme aus den Knöpfen alles in Dunkelgrau. Das müsste größer sein."
+
+```
+Buetten  Gruppentitel      9px    #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+Buetten  QR-Beschriftung   7.5px  #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+Kartei   Gruppentitel      9px    #9A9287 auf Weiss              Kontrast 3.07
+```
+
+Minimum ist 4,5. Die Kachelbeschriftung daneben hat 15,40 — **deshalb liest sich die Leiste wie
+„alles dunkelgrau": kräftige Stellen stehen neben ausgewaschenen.**
+
+> **Marcel hat die Farbe genannt, nicht den Kontrast.** Der genannte Auslöser ist eine
+> Beobachtung, keine Diagnose: gemessen war nicht „zu dunkel", sondern **zu hell auf hellem
+> Grund**.
+
+> **Kartei fand erst der Rundlauf.** Marcel hatte Bütten beschrieben; nach dessen Behebung habe
+> ich **alle fünf Stile** durchgemessen — derselbe Mangel, andere Stelle. Ein Durchlauf über
+> alle Fälle findet, was eine Einzelmeldung nicht nennt.
+
+Jetzt `#665C49` (5,88) und `#6E685F` (5,51), beide warmgrau, Größen 10 px und 9 px.
+
+#### D · Der QR — und zwei zurückgenommene Messungen
+
+Marcel: „der QR-Code sieht irgendwie künstlich aus."
+
+> **Rücknahme 1: „Das ist gar kein QR, nur ein `rect`."** Messfehler — die Module stecken in
+> einem `<path>`, das eine `<rect>` ist der weiße Hintergrund. Der feste Code war **echt und
+> gültig**: dieselben 431 Module wie ein frisch erzeugter.
+
+Der wirkliche Mangel war die **Ruhezone**: `viewBox 37` statt `31`, also Rand 4 statt 1. Von
+54 gerenderten Pixeln gingen rund 22 Prozent an weißen Rand. Jetzt erzeugt `window.DpQr` ihn
+mit `border:1` — dieselbe Einstellung, die `_updateShareQr` für geteilte Pässe längst benutzt,
+sonst springt die Ruhezone beim Wechsel.
+
+> **Rücknahme 2: „Der QR ist je Stil 137/136/54/44/308 px groß" und daraus „v1954 hat ihn auf 54
+> geschrumpft".** Beides falsch. Die Zahlen stammten aus einem Lauf, der die Stile
+> **umgeschaltet statt neu geladen** hat; der Trichter baut die Leiste dabei um und hinterlässt
+> einen Zwischenstand. `style.css:33016` setzt `.dp-pf-qr svg` auf feste **54 × 54** — das ist
+> die vorgesehene Größe, in jedem Stil. Die Lehre „nur nach Neuladen messen" galt bisher dem
+> Hell/Obsidian-Wechsel; **sie gilt genauso für die Datenaufnahme-Stile.**
+
+#### E · Der Prüfer hat sich dabei zweimal selbst verraten
+
+> **1 · Fünfmal „trichter".** Der Abnahmelauf meldete für jeden Stil denselben Namen — er hatte
+> jedes Mal das **alte** Dokument gemessen, weil `readyState` auch dort `'complete'` ist, bevor
+> das neue Laden beginnt. Aufgefallen nur, **weil der Prüfer den gemessenen Stil mitnennt.**
+> Seitdem prüft er die Ladekennung aus der URL und den erwarteten Stil.
+
+> **2 · Falscher Speicherschlüssel.** Ich habe `dp_kartenstil` geraten; er heißt
+> `dp_karten_stil` (`karten-stil.js:66`). Der Prüfer brach mit „erwartet automatisch, geladen
+> trichter" ab, statt grün zu werden.
+
+**Abnahme, jeder Stil einzeln neu geladen:**
+
+```
+Stil           QR    viewBox  schwaechster Text
+(automatisch)  54    31 31    scan     7.74
+zeile          54    31 31    scan     7.74
+kartei         54    31 31    grouplbl 5.51
+buetten        52    31 31    grouplbl 5.88
+trichter       54    31 31    scan     8.53
+
+Deckung: 5/5 Stile, 22 Textstellen · KEINE Stelle unter 4,5
+```
+
+### (83) 07.10.2026 — v1951/v1951a: die Lage stand im Datensatz und nie im Prompt
+
+**Marcel:** „Es wäre super, wenn wir diese gesamte Heuristik da unten noch mal überdenken,
+vielleicht auch das direkt an unseren OpenAI-Dienst schicken, auch unser Projektwissen mit
+übernehmen" — Makro-/Mikrolage und Schnittstellen inbegriffen. Das war nach v1946 als eigenes
+Paket liegen geblieben.
+
+#### A · Der Befund: ein Feldname, der nur im Testdatensatz existiert
+
+Der Prompt in `routes/ai.js` las:
+
+```js
++ (avm.scoreLocation != null ? ', Lage ' + avm.scoreLocation + '/10' : '')
+```
+
+**`scoreLocation` gibt es nur an EINER Stelle im ganzen Haus** — im Testdatensatz
+`quickcheck-app.html:4496`. Der echte Eintrag des DealPilot-Bewertungswegs trägt
+`scoreMacro` und `scoreMicro` (dort gesetzt aus `d.macro/10` und `d.micro/10`).
+
+> **Die Lage-Zeile ist damit praktisch nie entstanden — und drei Zeilen weiter verbot der
+> Prompt, etwas über die Lage zu sagen.** Beides zusammen heißt: die KI DURFTE nichts zur Lage
+> sagen und HÄTTE auch nichts gewusst. Genau der Eindruck, den Marcel als „überhaupt nicht
+> plausibel" beschrieben hat.
+
+> **Es fehlte kein Feld.** Der Quick-Check schickt `_avmResults[0]` **komplett**
+> (`quickcheck-app.html:5625`); Makro, Mikro, Marktmiete und Wertentwicklung lagen die ganze
+> Zeit im Datensatz. Es wurde das falsche gelesen. **Ein Feldname, der nur im Testdatensatz
+> existiert, fällt beim Gegenlesen nicht auf — er sieht richtig aus und trifft nie.** Dieselbe
+> Sorte Fehler wie `#app` bei v1147: ein plausibler Anker ohne Treffer.
+
+#### B · Was jetzt im Prompt steht
+
+```
+Marktdaten eines unabhaengigen Bewertungspartners:
+- Marktwert: 230.000 EUR
+- Marktmiete: 850 EUR/Monat
+- Makrolage (Stadt/Region): 6.5 von 10
+- Mikrolage (Stadtteil, Umfeld): 7.1 von 10
+- Wertentwicklung: 1.8 % pro Jahr
+
+Marktzins zum Vergleich: 3.81 % fuer Zinsbindung 5 bis 10 Jahre
+                         (Quelle: Deutsche Bundesbank, Stand 08.2026)
+```
+
+**Die Einheit steht ausgeschrieben, weil der Feldname lügt:** `marktmieteCold` ist die
+MONATSmiete, nicht EUR/m². Wer das annimmt, baut einen Faktor-165-Fehler ein.
+
+**Der Zins kommt serverseitig** — er ist eine Tatsachenbehauptung im Bericht, und was der Client
+schickt, kann er erfunden haben. Genommen wird `getCurrentRates()`, **nicht**
+`getMarketContext()`: letzteres liefert EZB-LEITZINSEN (MRR, EURIBOR 3M), und das ist nicht
+der Satz, zu dem jemand ein Haus finanziert. `getCurrentRates()` führt die vier
+Zinsbindungs-Körbe der Bundesbank.
+
+> **Fällt die Quelle aus, fällt die Zeile weg.** `fallback_used` nennt die Körbe, die auf den
+> statischen Wert zurückgefallen sind; steht der benutzte Korb darin, kommt kein Satz in den
+> Prompt. **Ein statischer Wert von Februar 2026, als „aktueller Marktzins" angekündigt, wäre
+> eine Behauptung** — und ein Notnagel, der den Ausfall zudeckt, ist schlimmer als die Lücke.
+
+**Das Lage-Verbot bleibt, wird aber zur Grundlage:** steht die Lage oben, darf sie eingeordnet
+werden — „ohne eigene Note daraus zu machen". Dazu ein neues Verbot: der Marktzins ist ein
+Vergleichswert, **keine Finanzierungsempfehlung**.
+
+#### C · Drei Dinge, die erst der echte Lauf gezeigt hat
+
+> **1 · `marketRatesService` war in `ai.js` nicht eingebunden.** Ohne die `require`-Zeile wäre
+> der Aufruf ein ReferenceError **zur Laufzeit** gewesen — `node --check` findet das nicht,
+> die Syntax stimmt. Vor dem Benutzen einer Abhängigkeit prüfen, ob sie in DIESER Datei steht.
+
+> **2 · `mr.asOf` ist ein `Date`-Objekt.** Direkt verkettet hätte im deutschen Prompt
+> gestanden: „Stand Sat Aug 01 2026 00:00:00 GMT+0000 (Coordinated Universal Time)". Im
+> Container gemessen, nicht geraten. Jetzt MM.JJJJ — die Bundesbank-Statistik ist monatlich und
+> läuft dem Stichtag zwei Monate nach (gemessen: Stand 08.2026), ein Tagesdatum wäre genauer,
+> als die Zahl ist.
+
+> **3 · `getMonth()` rechnet in ORTSZEIT.** Ein UTC-Zeitstempel am Monatsende kippt dadurch in
+> den Folgemonat: 31.12. 23:00 UTC wurde unter CET zu **01.2027**. Jetzt `getUTCMonth()`.
+> **Der Server läuft auf UTC, ein Entwicklerrechner nicht** — der Fehler wäre nur auf dem Server
+> aufgefallen, und dort sieht niemand hin. Gefunden, weil meine Probe einen Grenzfall
+> mitgeführt hat, den ich zuerst für einen Prüferfehler hielt.
+
+#### D · Nachweis
+
+Der Prompt ist mit dem **echten** Handler gelesen worden, nicht mit einem Nachbau: Routenmodul
+geladen, Handler aus dem express-Stack geholt (3 Schichten, der letzte), `callOpenAI` vorher
+ersetzt — **kein OpenAI-Aufruf, keine Kosten**, und der gebaute Prompt sichtbar.
+
+```
+Handler gefunden (von 3 Schichten der letzte) · HTTP 200
+
+ok  Makrolage          ok  Marktzins mit Korb       ok  Lage darf eingeordnet werden
+ok  Mikrolage          ok  Quelle genannt           ok  Zins ist keine Empfehlung
+ok  Marktwert          ok  Stand als MM.JJJJ        ok  Urteil gilt weiter
+ok  Marktmiete/Monat   ok  kein englisches Datum    ok  Wertentwicklung
+
+ALLE 12 KETTENPROBEN GRUEN
+```
+
+Die Nutzlast der Probe ist genau die Form, die der Quick-Check schickt — **ohne**
+`scoreLocation`, weil es die im Echtbetrieb nicht gibt. Eine Probe mit dem Testfeld hätte
+den Fehler nicht gefunden.
+
+**Kleinigkeit, bewusst nicht nachgebaut:** der leere erste Eintrag des Marktdaten-Blocks wird
+von `.filter(Boolean)` entfernt, die gewünschte Leerzeile davor entsteht also nicht. Der
+Prompt ist dadurch dichter, nicht falsch — nicht wert, dafür ein Image neu zu bauen.
+
+**Staging: `1108ade8`, Backend neu gebaut, healthy. Prod noch nicht** — eine Änderung am
+KI-Prompt ändert, was zahlende Nutzer zu lesen bekommen.
+
 ### (82) 07.10.2026 — Prod-Rollout v1948 bis v1950a
 
 **Marcel: „ja rollout."** Prod und Staging sind wieder gleichauf.
@@ -35260,3 +35721,2356 @@ angestoßen und **über eine Markierung im Fenster abgefragt**, nicht erwartet.
 - Das Register kennt heute vier Ansichten. **Quick-Check und Marktbericht melden
   sich noch nicht an** — sie laufen weiter über `.sec`/`body`-Klassen. Wer dort
   die nächste Vollbild-Ansicht baut, meldet sie am besten mit an.
+
+
+## Rollout-Journal 09.10.2026 (N60.15/1) — v2049–v2054: die geführte Eingabe sagte dasselbe drei- bis viermal
+
+**Was** · Erster Teil des Dialog-Neubaus aus N60.15. Marcel am Bild
+`Dateien/geführteeingabe.png`: *„es ist total überladen … Der Kunde weiß ja gar
+nicht, was er machen soll."* Sieben Pakete, alle auf Staging nachgemessen.
+
+| | Was | Nachweis |
+|---|---|---|
+| `v2049` | Freisprechen-Schalter weg, Fußzeile leer, **dritte** Frage-Kopie entfernt | `#vi-rf-neben` 1314×**0** px |
+| `v2050` | Begrüßung → Antwort → Bestätigung **und** Ansage in **einer** Blase → Frage | vorher 2 Blasen = **224 von 239 px** vor der ersten Frage |
+| `v2050a` | Die erste Frage stand **zweimal**, eine **vor** der Antwort | 5 Blasen → 4, abwechselnd |
+| `v2051` | Fragestreifen nur, wenn die Blase **nicht im Bild** ist | löst v1619 ↔ N60.15 durch Messen statt Entscheiden |
+| `v2052` | „erklär mir das" hing nur am Chip → bei der **Adressfrage** kam eine **DSCR**-Erklärung | Muster gegen 24 Sätze: 14/14 und 10/10 |
+| `v2053` | Schalter „Alle Felder" weg, der Weg dahin bleibt | `vi-rf-alles` 3× → 0× |
+| `v2054` | Übernahme-Meldung und Adressbestätigung wiederholten sich bei **jeder** Antwort | Läufer: ab der 3. Antwort nur noch Neues |
+
+**Commit** · `fcc866d8` · `121020e9` · `2fbcc881` · `49ec9858` · `8d9cfb23` ·
+`80216985` · `5d32215d` (dazu `e57c5cf2` Frontend-Konstanten)
+
+**Nachweis** · Ein Prüfläufer im Browser, der **protokolliert, was er tut** —
+welcher Knopf, welcher Satz, welche Blasen danach neu sind. Durchgespielt:
+*Profi* und *Erste Immobilie* am leeren Objekt, Wiederkehrer mit Vorbefüllung.
+
+#### Drei Befunde, die nicht im Auftrag standen
+
+- **Der Co-Pilot verstand seinen eigenen Vorschlag nicht** (`v2052`). Er
+  empfiehlt „erklär mir das" an **drei** Stellen selbst (Z. 994, 1094, 1100),
+  und `_rfErklaerZeigen()` hing nur am Chip. Getippt fiel der Satz durch bis
+  `_rfIstFrage` und ging ohne Feldbezug an die KI. **Eine Anleitung, die das
+  Programm selbst gibt, ist ein Versprechen** — hier war sie eine Falle, denn
+  wer sie befolgte, bekam eine falsche Auskunft statt gar keiner.
+- **Ein Defekt, älter als dieser Umbau** (`v2050a`). `_rfModusSetzen` ruft
+  `_rfFrageNochmal()`, damit ein Ton-Wechsel sofort wirkt — richtig mitten im
+  Lauf, falsch beim Einstieg, wo es noch keine offene Frage gibt. Vorher
+  standen die beiden Kopien direkt untereinander und sahen aus wie Absicht.
+- **`adresseGeprueft` fiel bei jeder beliebigen Antwort** (`v2054`). Gemeint
+  war „wer die Adresse korrigiert, bestätigt die neue" — nur ist „165
+  Quadratmeter" keine Adresskorrektur, und an **jener** Stelle ist noch nicht
+  bekannt, was der Satz enthielt. Eine Vermutung dort, wo man sie noch nicht
+  prüfen kann, ist teurer als eine Prüfung dort, wo die Antwort schon vorliegt.
+
+#### Zwei Fehler im Werkzeug, nicht im Produkt
+
+- **`String.replace` deutet den ERSATZ.** Ein einzufügendes Muster endete auf
+  `[?.!,]*$'` — und `$'` heißt „alles nach dem Treffer". Die Ersetzung hätte
+  den **gesamten Dateirest** noch einmal eingefügt, und `node --check` hätte
+  nichts gemerkt: der duplizierte Rest ist gültiges JavaScript. Gefangen hat es
+  nur die Ankerzählung des **nächsten** Schritts (plötzlich 2 statt 1). Seitdem
+  ist der Ersatz eine **Funktion** (`() => neu`), und jedes Paket prüft die
+  **Längendifferenz**.
+- **Dreimal ein geratener Sollwert** (`_rfMarktAnbieten` 2 statt 3,
+  `_rfFrageNochmal` 1 statt 3, `adresseGeprueft = 0` 1 statt 2). Jedes Mal war
+  die Erwartung falsch, nicht der Code; beim dritten Mal widersprach der
+  Sollwert sogar einem **anderen Prüfer im selben Skript**. Ein Prüfer, der
+  eine Zahl behauptet, muss sie vorher **zählen** — oder prüfen, **wo** etwas
+  steht statt **wie oft**.
+
+#### Was offen bleibt
+
+- **Vorhandene Daten werden erkannt, aber nicht angesagt.** Mit korrekt
+  übergebenem `vorlaufFelder`-**Array** zählt der Lauf 16 statt 17 Fragen und
+  setzt das ✓ an der Wohnfläche — **sagt aber kein Wort davon**. `vorTxt`
+  bleibt leer, `_rfVorbefuellt` liefert also `{}`. **Die Ursache ist nicht
+  gemessen.** Genau Marcels *„wenn schon Daten drinne stehen … das ist
+  wichtig."*
+- **Im Lauf folgen weiter zwei bis drei Co-Blasen je Antwort.** Die Regel „eine
+  Nachricht, eine Antwort" gilt am Einstieg, noch nicht im Gespräch.
+- **Die Tonfrage steht allein, aber noch nicht als eigene Frage** — sie ist
+  weiter ein `.vi-rf-wozu`-Kasten **in** der Begrüßungsblase.
+- **Messkabine Handy und Tablet steht aus**, und mit ihr der eigentliche
+  Nachweis für `v2051`: am Schreibtisch ist der Fragestreifen nie nötig, weil
+  die Frage-Blase (275 px) im 575-px-Chat nie ganz aus dem Bild kommt.
+- **Nicht durchgespielt:** Marktpreisindikation, tiefere Stufe, Kombinatorik.
+
+
+## Rollout-Journal 09.10.2026 (N60.15/2) — v2055–v2059: die Messkabine fand einen Priorität-1-Fehler
+
+**Was** · Marcels Auftrag: *„mach die Messkabine und auch die geführte
+Eingabe muss da geprüft werden."* Geprüft wurde nicht die Optik, sondern die
+**Erreichbarkeit** — je Knopf: liegt er auf *seinem eigenen Mittelpunkt* in
+`elementsFromPoint` obenauf?
+
+> **Auf dem Handy war die Tonfrage nicht zu beantworten.** Alle drei Chips
+> verdeckt — und `_rfEinstieg` wartet auf genau diese Antwort. Der Lauf hing
+> am zweiten Bildschirm fest.
+>
+> Mein erster Läufer meldete „3 von 3 sichtbar", geprüft über Geometrie.
+> **Keiner war anklickbar.** Geometrie sagt, dass ein Knopf gemalt wird; sie
+> sagt nicht, dass man ihn trifft.
+
+| | Befund | Fix |
+|---|---|---|
+| `v2055` | `#vi-rf-mikro` (`sticky`,`bottom:44`) und `.vi-rf-zeile` (`sticky`,`bottom:0`) klebten über der Chip-Leiste, sobald `#vi-frage` scrollte — 705 px Inhalt in 510 px | Bühne darf schrumpfen, Chip-Leiste klebt mit |
+| `v2055a` | **Mein eigener Fehler:** die neue Untergrenze von 110 px drückte den Chat von 288 auf **66 px** bei 1019 px Inhalt | `min-height:28vh` statt fester Zahl |
+| `v2055b` | 320×565: dritter Chip außerhalb der Leiste (217 nötig, 145 da) | `max-height:min(230px,40vh)` |
+| `v2056` | **601–767 px komplett unbedienbar** — die Bühne fiel auf **Höhe 0**, ihr Grid (220+180) quoll mit `overflow:visible` über alles | Handy-Block auch bei `(max-height:560px)` |
+| `v2057` | Nebenwirkung: Breiten-Regeln auf breiten flachen Fenstern | Gegenblock nimmt nur die Breiten-Regeln zurück |
+| `v2058` | 666×373: 191 px Bedienung in 145 px Port, **`sticky` schafft keinen Platz** | Chip-Leiste `z-index:7` über den Pegel |
+| `v2059` | **iPad hochkant 767×757: 1 von 3 Chips** — dieselbe Grid-Ursache, an der Breite | Handy-Block bis **900 px** |
+
+**Commit** · `c4efaf4b` · `e0ec32e0` · `fa749a4b` · `18044d97` · `6bb056da` ·
+`cf82b7f8` · `3babd58a` · `cfe09ee4`
+
+**Nachweis** · 13 Größen im gleich-Origin-iframe der Messkabine, je Größe
+Chips/Eingabe/Übernehmen auf eigenem Mittelpunkt, seitlicher Überlauf,
+Chathöhe vor und nach der Tonwahl. Vorher 0–2 von 3 erreichbaren Chips auf
+*jeder* Handy- und Tabletgröße, jetzt **3/3 überall**; Desktop unverändert.
+
+#### Drei Sätze, die der Lauf gelehrt hat
+
+- **`sticky` verdeckt, sobald der Container scrollt.** Zwei Flex-Geschwister
+  können sich nicht überlappen — ein sticky schon. Wer eine Überlappung
+  misst, liest zuerst `position`, `bottom`, `z-index` und `order` aller
+  Geschwister aus.
+- **`sticky` schafft keinen Platz.** Es hält ein Element an seiner
+  Flussposition fest, hebt es aber nicht darüber hinaus. Bei 145 px Port und
+  191 px Bedienung half kein `bottom`-Wert; eine Schicht musste davor.
+- **Ein Schwellenwert auf EINER Achse beschreibt kein Gerät, sondern eine
+  Haltung.** `max-width:600px` verfehlte jedes Handy im Querformat (667–932
+  px breit) und das iPad hochkant.
+
+#### Ein eigener Fehler, offen
+
+`v2055` hat die Chips freigelegt und dabei den Chat auf 66 px gedrückt — eine
+Korrektur, die an anderer Stelle einen neuen Schaden anrichtet, ist keine.
+`v2055a` hat es zurückgenommen. Ebenso `v2057`: `v2056` hat zwei verschiedene
+Anliegen (schmal UND flach) in eine Media-Query gesteckt und dadurch
+Umbruch-Regeln auf breite Fenster gezogen.
+
+#### Was NICHT geprüft ist
+
+- **Farbkontraste.** Das Browserfenster stand im Hintergrund; die Messkabine
+  sagt dann selbst, dass nur Geometrie gilt — `getComputedStyle` friert dort
+  Übergänge ein. Der Selbsttest der Kabine war grün (6/6).
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation.**
+- **Über 757 px Höhe** — so hoch ist das Browserfenster.
+- **Der Rest der App.** Geprüft wurde die geführte Eingabe, nicht Cockpit,
+  Portfolio, Objektkarten, Marktbericht oder Einstellungen.
+
+
+## Rollout-Journal 09.10.2026 (N60.17) — v2060–v2060c: breite Tabellen werden auf dem Handy zu Karten
+
+**Was** · Marcels Master-Prompt, Abschnitt „Intelligente mobile Darstellung":
+*„Breite Tabellen · Smartphone: Kartenansicht oder vertikale Liste,
+Feldbezeichnung über oder neben dem Wert, wichtige Informationen zuerst,
+Zusatzdetails bei Bedarf aufklappbar."* Und: *„Verkleinere Desktop-Elemente
+nicht einfach proportional."*
+
+#### Die Bestandsaufnahme kam vor dem Umbau
+
+In der Messkabine bei 390 px, je Ansicht durchgescrollt, jedes Bedienelement
+per `elementsFromPoint` auf seinem eigenen Mittelpunkt, jeder Verdacht
+zweimal nachgeprüft:
+
+| Ansicht | geprüft | nicht erreichbar | echter Überlauf |
+|---|---:|---:|---:|
+| `single` (Objekt) | 298 | **0** | 0 |
+| `dashboard` (Cockpit) | 102 | **0** | 0 |
+| `all` (Alle Objekte) | 19 | **0** | 0 |
+
+> **Kein einziger funktionaler Fehler.** Was blieb, waren fünf Tabellen, die
+> waagerecht geschoben werden mussten — bis Faktor **2,8x**.
+
+Sie waren **kein Fehler**: jede liegt in einer Hülle mit `overflow-x:auto`,
+und der Balken nimmt dort messbar Höhe weg (4 bis 14 px). Nichts war
+abgeschnitten.
+
+> Aber 14 Spalten in 332 px waagerecht zu schieben heisst, eine Zahl zu lesen
+> und ihre Überschrift nicht mehr zu sehen. Das ist bedienbar und trotzdem
+> unbrauchbar.
+
+#### Ein Modul statt fünf Korrekturen
+
+`frontend/js/tabellen-karten.js` (neu). Gefiltert wird über die **Form**
+(`thead` + mindestens 5 Spalten), nicht über Namen — die nächste Tabelle
+bekommt den Kartenmodus geschenkt. Je `td` ein `data-dptk-spalte` aus dem
+`th`, eine Klasse an die Tabelle, sonst nichts: **keine Zelle entfernt, keine
+Zeile umsortiert.** Ein `MutationObserver` hängt die Beschriftung nach jedem
+`innerHTML`-Rendern wieder an.
+
+Drei Fenster, drei Verhalten:
+
+| Breite | Darstellung | gemessen |
+|---|---|---|
+| bis 600 px | Karten, 4 Spalten + Schalter „Alle 14 Spalten +10" | Tabelle 332 statt 926 px, Karte 124 px |
+| 601–1200 px | Tabelle ohne `min-width`, Umbruch erlaubt | 688 bei 767 px, 725 bei 1023 px |
+| ab 1201 px | unverändert | 1021 bei 1440 px |
+
+**Commit** · `c46820a3` · `10a10793` · `4b380cc7` · `bdcef11f`
+
+**Nachweis** · Acht Breiten von 320 bis 1920 px, `dashboard`:
+**Querscroller 0 auf allen acht.** Funktional nachgeprüft auf 320, 390 und
+768 px: 89 bis 103 Bedienelemente je Lauf, **0 nicht erreichbar**, 0
+Überlauf. Der Umschalter per echtem Klick: 4 → 14 Spalten und zurück, Tabelle
+bleibt bei 332 px.
+
+#### `v2060a` — der Befund, der den Schaden verhindert hat
+
+Von den fünf gefundenen Tabellen sind **zwei Eingabemasken**: `#oe-gewerke`
+mit 23 und `.ytf-table` mit **45** Feldern. Der Kartenmodus hätte sie
+zerquetscht.
+
+Und genau das ist hier schon einmal passiert. In `style.css` steht darüber:
+
+> *„v1881 · HANDY-DURCHGANG 05.10.2026 … die Regel v1862c macht die TABELLE
+> zum Scrollkasten (display:block) — der Inhalt schrumpfte trotzdem auf
+> 60-px-Auswahlen ('– k', 'Kei', '> 2'), gemessen auf 390 px."*
+
+Dort steht deshalb `min-width:620px !important` an einer ID-ID-Regel — sie
+hat meine Regel ohnehin geschlagen (2-0-0 gegen 0-1-1), der Schaden blieb
+aus. Gefunden habe ich es, **weil ich die Begründung der fremden Regel
+gelesen habe, statt sie mit mehr Spezifität zu überfahren.**
+
+> Eine Anzeigetabelle liest man. Eine Eingabetabelle bedient man, und ein
+> `<select>` mit 110 px Mindestbreite passt in keine Label-Wert-Zeile. Die
+> **Form** allein unterscheidet das nicht — die Felder darin schon.
+
+#### Acht Fassungen des Prüfers, bevor seine Befunde galten
+
+Jede Fehlfassung hätte zu einem Umbau an gesunder Stelle geführt:
+
+- **Das Fenster scrollt nicht** — `html`/`body` stehen auf `overflow:hidden`,
+  gescrollt wird `.main-col`. `window.scrollTo` bewegte nichts: **8 von 932**
+  Elementen gesehen.
+- **Gefangener Überlauf ist keiner** — die Projektionstabelle scrollt in
+  `div.pw` wirklich (Balken nimmt 5 px Höhe).
+- **`display:contents` hat Höhe 0** — `form#dp-noform` umschließt die ganze
+  App; die Prüfung „Höhe 0 = eingeklappt" verwarf **176 von 176** Elementen
+  und meldete 0 Befunde.
+- **Sticky lässt sich nicht hinscrollen** — `scrollIntoView` bewegt die
+  Reiterleiste nicht, alle neun Reiter galten als unbedienbar. Bei
+  `scrollTop=0` sind sie frei.
+
+Nach diesen vier Korrekturen blieben von 11 bzw. 20 „Befunden" **null** echte
+übrig. Deshalb trägt jedes Ergebnis seine **Deckung**: bricht sie ein, ist
+der Prüfer kaputt, nicht das Produkt.
+
+#### Was NICHT geprüft ist
+
+- **Farbkontraste** — das Fenster stand im Hintergrund; die Messkabine sagt
+  dann selbst, dass nur Geometrie gilt. Ihr Selbsttest war grün (6/6).
+- **Die Ansicht `strategie`** — `setMainView('strategie')` öffnet sie nicht;
+  das Register kennt sie, der Weg dorthin ist ein anderer.
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation.**
+- **Höhen über 757 px** — so hoch ist das Browserfenster.
+- **Quick-Check und Marktbericht** — eigene Dokumente im iframe.
+
+
+## Rollout-Journal 09.10.2026 (N60.17/2) — v2061–v2061b: der Ansichts-Prüfer wohnt jetzt in der Messkabine
+
+**Was** · Die drei offenen Ansichten aus N60.17 geprüft — und das Werkzeug,
+das dafür im Chat entstand, dauerhaft eingebaut, statt es wegzuwerfen.
+
+| Dokument / Ansicht | Weg dorthin | 320 | 390 | 768 |
+|---|---|---|---|---|
+| `strategie` | `PortfolioStrategie.open()` | 21 ✔ | 15 ✔ | 10 ✔ |
+| Quick-Check | `?ziel=/quickcheck-app.html` | 38 ✔ | 41 ✔ | 41 ✔ |
+| Marktbericht | `?ziel=/marktbericht-app/index.html` | 11 ✔ | 13 ✔ | 16 ✔ |
+
+Zahl = geprüfte Bedienelemente; ✔ = 0 nicht erreichbar, 0 echter Überlauf,
+0 Querscroller. **Kein einziger Befund.**
+
+**Der Weg zur Strategie stand nicht in `setMainView`.** Das Register meldet
+sie (`DealPilotAnsichten.namen()` → `single · all · strategie · dashboard`),
+geöffnet wird sie aber über `PortfolioStrategie.open()` aus
+`portfolio-strategie.js:231`. Vorher stand sie als „nicht erreichbar" im
+Backlog — sie war nur anders erreichbar.
+
+**Commit** · `1563e4f0` · `17d81dfc` · `ae480bd5`
+
+#### `DPM.pruefeAnsicht()` und `DPM.pruefSelbsttest()`
+
+Im Kopf des Blocks stehen die **vier Artefakte**, die er nicht mehr meldet —
+jedes hätte zu einem Umbau an einer gesunden Stelle geführt:
+
+- **Das Fenster scrollt nicht** (`html`/`body` auf `overflow:hidden`,
+  gescrollt wird `.main-col`) — der Prüfer sah 8 von 932 Elementen.
+- **Gefangener Überlauf ist keiner** — `div.pw` scrollt wirklich, der Balken
+  nimmt 5 px Höhe.
+- **`display:contents` hat Höhe 0** — `form#dp-noform` umschließt die ganze
+  App; die Regel „Höhe 0 = eingeklappt" verwarf 176 von 176 Elementen.
+- **Sticky lässt sich nicht hinscrollen** — `scrollIntoView` bewegt die
+  Reiterleiste nicht; jeder Verdacht wird deshalb zweimal geprüft,
+  zentriert **und** am Seitenanfang.
+
+#### Der Selbsttest ist beim ersten Lauf durchgefallen — und das war sein Wert
+
+`v2061` meldete „DURCHGEFALLEN". Die Ursache lag nicht im Prüfer, sondern in
+seiner **Opferwahl**: er nahm einen Knopf aus dem eingeklappten Seitenmenü bei
+**x = −286**. `elementsFromPoint` gibt dort ein leeres Array zurück — die
+Decke konnte nichts verdecken, also konnte nichts gefunden werden. Die
+Bedingung prüfte nur die senkrechte Lage.
+
+> Gefunden **bevor** eine grüne Messung auf ihm aufgebaut wurde. Genau dafür
+> ist er da: null Befunde heisst „nichts gefunden", nicht „nichts da".
+
+`v2061b` ergänzt die waagerechte Hälfte der Bedingung. Danach: ohne Decke 0
+Befunde, mit Decke genau 1 (der richtige Knopf), nach Entfernen wieder 0 —
+**BESTANDEN**.
+
+#### Was offen bleibt
+
+- **Nur die Startansicht der iframes ist geprüft.** Marktbericht (Formular,
+  fertiger Bericht, PDF-Vorschau) und Quick-Check haben weitere Zustände;
+  jeder ist ein eigener Durchgang.
+- **Farbkontraste** — Fenster im Hintergrund, die Kabine sagt dann selbst,
+  dass nur Geometrie gilt.
+- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation**, Höhen über
+  757 px, Anmeldung/Registrierung, Upload-Flächen, Lade-/Fehler-/
+  Leerzustände.
+
+
+## Rollout-Journal 09.10.2026 (N60.17/3) — v2062–v2063: die weiteren iframe-Zustände
+
+**Was** · Marcels Auftrag: *„ja mach die weiteren zustände der iframe."* Bisher
+war nur der erste Bildschirm von Quick-Check und Marktbericht gemessen.
+
+| Zustand | Weg dorthin | 320 | 390 | 768 |
+|---|---|---|---|---|
+| Marktbericht · Standort-Finder | `_lfSetView('finder')` | ✔ | ✔ | ✔ |
+| Marktbericht · fertiger Bericht | `#resultBody` entsperrt | ✔ | ✔ | ✔ |
+| …**mit langen Texten und großen Zahlen** | Platzhalter gefüllt | ✔ | ✔ | ✔ |
+| Quick-Check · `#transfer-modal` | Klasse `.show` (Z. 2042) | ✔ | ✔ | – |
+| Quick-Check · `#api-modal` | `.show` | ✔ | ✔ | – |
+| Quick-Check · `#qc6-credit-modal` | `.show` | – | ✔ | – |
+
+Alle Modal-Boxen passen vollständig ins Bild (320 px: 271×429 bei y 68),
+**alle Knöpfe treffen**. Der Bericht wächst mit langen Texten in die **Höhe**
+— 1321 → 1984 px bei 390 px Breite — nicht in die Breite: 0 Überlauf, kein
+seitliches Scrollen, auch auf 320 px.
+
+**Commit** · `d4cf4c01` · `f37f3d4d` · `e1479ce8` · `9bd2fe64`
+
+#### Zwei Dinge, die nach Befund aussahen und keiner waren
+
+- **`#mainTabs` im Marktbericht**: fünf Knöpfe (Marktbericht, PDF-Export,
+  Dunkel, Schließen) mit **Höhe 0** auf *allen* Breiten. Alle tragen
+  `display:none` inline, mit dem Vermerk `v647-mb hidden` — ausdrücklich
+  abgeschaltet, weil die Hauptapp die Leiste stellt. Deshalb führt auch kein
+  Knopf zum **Standort-Finder**; er ist nur über `_lfSetView('finder')`
+  erreichbar. Gebaut und erreichbar, aber ohne Weg dorthin.
+- **Vier „erdrückte" Knöpfe im Quick-Check** („Bestätigen & abrufen",
+  „Fertig" …) waren Knöpfe **geschlossener Modals**. Sie tragen selbst
+  `display:flex`; ihr Modal trägt `display:none`.
+
+#### Was der Prüfer dabei gelernt hat
+
+- **`v2062` · erdrückt ist nicht abgeschaltet.** Ein Knopf mit Höhe 0 wurde
+  bisher stillschweigend übersprungen. Das ist richtig bei `display:none`
+  (absichtlich weg) und falsch, wenn er gerendert wird und nur zusammenfällt
+  — dann ist er ein Befund. Beides sah vorher gleich aus.
+- **`v2062a` · das eigene `display` sagt nichts über die Vorfahren.**
+  `offsetParent === null` entscheidet, ob etwas gerendert wird. Ohne diese
+  Zeile meldet der Prüfer in *jedem* Dokument sämtliche Knöpfe geschlossener
+  Modals.
+- **`v2062b` · der Selbsttest sucht sein Opfer.** Am Seitenanfang des
+  Quick-Checks war von 23 Knöpfen **keiner** tauglich (8 unten
+  angeschnitten, 9 zu klein, 6 ohne Zeigerereignisse). Er meldete „kein
+  Testknopf im Bild" und lief gar nicht. Ein Selbsttest, der sich
+  regelmäßig selbst überspringt, wird nach dem dritten Mal ignoriert — und
+  ist damit wertlos. Jetzt scrollt er, bis er eines findet (im Quick-Check:
+  2. Abschnitt).
+
+#### `v2063` — die Kabine sagt, welche Fassung läuft
+
+`messkabine.html` trägt **keinen Cache-Buster**. Nach drei Änderungen lief im
+Tab noch die alte Fassung: `DPM.apBedienbar` gab `erdrueckt` nicht zurück,
+der Aufruf starb an `undefined.length` — und ich habe zuerst den **Prüfling**
+verdächtigt statt das Werkzeug.
+
+Die Fassung steht jetzt oben neben der Überschrift (`#mk-stand`). Wer etwas
+ändert, zieht die Zahl hoch und sieht sofort, ob sein Browser sie hat. Neu
+laden mit `?mk=<version>&ziel=…`.
+
+#### Was offen bleibt
+
+- **Der Marktbericht mit echten Daten.** Geprüft ist das Gerüst mit
+  gefüllten Platzhaltern, nicht ein wirklich abgerufener Bericht — das
+  kostet Kerosin. `#genProgress` ebenso.
+- Farbkontraste (Fenster im Hintergrund), Touch-Gesten,
+  Bildschirmtastatur, Tastaturnavigation, Höhen über 757 px.
+- Anmeldung/Registrierung, Upload-Flächen, Lade- und Fehlerzustände.
+
+
+## Rollout-Journal 10.10.2026 (N60.17/4) — v2064–v2065a: die Farbkontraste, endlich messbar
+
+**Was** · Marcel: *„ja los browser fenster ist vorne."* Damit meldet die
+Messkabine `fensterSichtbar: true` und `weg: "Geometrie +
+checkVisibility()"` — **voll messbar**. Vorher galt dort nur Geometrie, und
+Farbwerte aus `getComputedStyle` sind im Hintergrund nicht verlässlich.
+
+| Ansicht | Paare | Stellen | unter 3,0 |
+|---|---:|---:|---:|
+| Objekt (`single`) | 57 | **22** | 5 |
+| Cockpit (`dashboard`) | 120 | **38** | 19 |
+| Alle Objekte (`all`) | 20 | 7 | **0** |
+
+**Commit** · `897a951a` · `01b2812e` · `da00e1fc`
+
+#### `v2064` — wie viele STELLEN, nicht wie viele Elemente
+
+`kontrastN` zählt Elemente, und die Liste war auf acht gekappt. 57 Paare
+klangen nach einem großen Befund; im ersten Blick waren es **zwei** Regeln
+(`span.ds2-tag`, `span.oe-lk-tag`), nur vielfach wiederholt.
+
+> Der Unterschied entscheidet über die Arbeit: zwei Regeln oder vierzig. Wer
+> nur `kontrastN` liest, schätzt den Aufwand um das Zwanzigfache falsch ein.
+
+`r.kontrastGruppen` und `r.kontrastStellen` stehen jetzt daneben.
+
+#### `v2065` — ein Pseudoelement kann der echte Grund sein
+
+Die **drei schwersten** Cockpit-Befunde (k 1,63 / 1,70 / 1,98) waren
+Score-Ringe. `div.sc` trägt `conic-gradient(rgb(169,141,64) 65%, …)`, und
+die Zahl darauf hat dieselbe Goldfarbe — Kontrast 1,7.
+
+Nur: `div.sc::before` legt einen **weißen Kern** (33×33 px, `inset:3.5px`,
+`border-radius:50%`), und die Zahl (13×13) steht darauf. Der echte Kontrast
+ist rund **3,1**.
+
+> Ein Pseudoelement findet kein DOM-Werkzeug — `getComputedStyle(el,
+> '::before')` findet es doch. Man muss nur daran denken, dass es den Grund
+> stellen kann.
+
+`pseudoGrund()` prüft jetzt die drei nächsten Vorfahren auf
+`::before`/`::after` mit **deckender** Hintergrundfarbe und `inset`, und ob
+der Text ganz darin liegt. Nach dem Fix: 21 → 19 unter 3,0, und die drei
+Score-Fälle sind raus. **Ohne ihn hätte ich Score-Farben geändert, die in
+Ordnung sind.**
+
+#### Der Befund selbst: Gold ist der Akzent, nicht die Textfarbe
+
+| Stelle | Schrift | Kontrast | Farbe auf Grund |
+|---|---|---:|---|
+| `span.ds2-tag` (8×) | 9 px | **2,06** | Gold `#C9A84C` auf Creme |
+| `div.card-title` (6×) | 9,5 px | **2,29** | Gold auf Weiß |
+| `span.badge` (7×) | 8,5 px | **1,71** | helles Gold auf Creme |
+| `div.sk-k-v` (2×) | 15 px | **2,23** | Gold auf Weiß |
+| `span` „Won" (8×) | 9 px | 3,73 | Weiß auf Grün |
+
+Nötig wären 4,5 (ab 24 px: 3,0). Bei 9 px und 2,06 ist der Text nicht
+lesbar — **das ist keine Geschmacksfrage mehr.**
+
+**Die Behebung ist aber eine Markenentscheidung und gehört Marcel.** Drei
+Wege, die die Marke erhalten: Gold als **Fläche** mit Obsidian-Schrift bei
+Tags und Pillen (~8,9, so sind die Score-Pillen schon gebaut); ein eigener
+dunklerer *Textton* (das vorhandene „Gold dunkel" `#b8932f` reicht mit ~2,8
+**nicht**); oder die kleinen Beschriftungen auf die normale Textfarbe und
+Gold nur für Rahmen und Linien. Demo zuerst.
+
+#### Ein Fehler, der mir ZWEIMAL unterlief
+
+`male(farbe, hinter)` braucht **zwei** Argumente. Mit einem stirbt es an
+`hinter.r`. Einmal beim Nachbau der Kontrastmessung (0 von 428 Textknoten
+gemessen), einmal beim Einbau von `pseudoGrund` (`v2065a`).
+
+> Eine fremde Aufrufhilfe schreibt man ab, man rekonstruiert sie nicht.
+
+Zwei gleiche Fehler hintereinander heißen nach Regel 4: abschließen und
+übergeben. Deshalb endet dieser Abschnitt hier und nicht bei der Behebung.
+
+## Rollout-Journal 10.–11.10.2026 (N60.2/16/24) — v2089–v2100: der Matrix-Läufer, und was er über uns herausfand
+
+**Was** · Marcel: *„ja, bitte arbeite alle Punkte aus dem Backlog ab."*
+Zwölf Rollouts. Das Ergebnis ist weniger die behobene Arbeit als die
+**gemessene**: an fünf Stellen war der Befund im Backlog falsch, und
+dreimal lag der Fehler in meinem eigenen Werkzeug.
+
+**Commit** · `aea7b3fe` `08604c62` `cba84c80` `b3bf99b5` `036de253`
+`757911b5` `02466fde` `9438aacb` `7244a49d` `80ffad48` `0bbc37af`
+`de38c850` `fd7cc765` `6266495f` `ca81ab09` `59a4ab7f` `437d8ad2`
+`7a642ff4` `f25c55e1`
+
+**Nachweis** · drei Matrix-Läufe, alle mit Deckung 100 %:
+
+| Dokument | Punkte | Messungen | Dauer |
+|---|---:|---|---|
+| Haupt-App | 48 | 432 Reiter | 12 min |
+| Quick-Check | 48 | 48 (ohne Reiter) | 3 min |
+| Marktbericht | 8 | 8 (ohne Reiter) | 1 min |
+
+Dazu fünf Prüfstrecken mit RC=0: `anmeldung-auskunft-pruefen` (27),
+`mfh-rnd-eingabe-pruefen` (16), `ankauf-abweichung-pruefen` (39),
+`kontrast-demo-pruefen` (95), `kerosin-nutztext-pruefen` (420 Dateien).
+
+#### `v2089`/`v2090` — Kontrast: bei vier von sechs Stellen war die Deckkraft der Fehler
+
+`.ds2-tag` trug Gold auf 14 %-Gold über Weiß, **k=2,06**. Und es gab
+**zwei** Fassungen: `.ct-pro .ds2-tag` mit `!important`, später und
+spezifischer — sie hätte die Korrektur still ausgehebelt. Gefunden nur,
+weil nach dem ersten Eingriff **alle** `ds2-tag`-Regeln gegreppt wurden.
+
+Bei `.hint` stand `rgba(42,39,39,.55)` — *liest sich wie „die Tinte, nur
+leiser", gerechnet ist es `rgb(138,136,136)`.* Die **dunkelste** der fünf
+Flächen entschied: 0,65 besteht auf vier und fällt auf `--surface2`
+durch, 0,68 hält überall.
+
+> **Der Mittelwert hat das Won-Band verharmlost.** Die Kabine mittelt
+> einen Verlauf und meldete 3,73. Am **hellen Ende** steht derselbe weiße
+> Text, und dort waren es **2,78** — die schlechteste Stelle der App und
+> die unauffälligste im Protokoll. Das Band trug zwei
+> Material-Design-Grüns statt `#3FA56C`.
+
+#### `v2091` — die Kontrast-Demo, und der Befund ist ein anderer als gedacht
+
+Im Cockpit liegen **234 Textstellen** unter der Schwelle, gebündelt auf
+**elf Töne** — und **131 davon tragen eine Statusfarbe (Grün/Rot) als
+Textfarbe**, nur 53 tragen Gold. *Ich war von einem Goldproblem
+ausgegangen; das ist der kleinere Teil.*
+
+Jede Zahl der Demo ist gerechnet. Der Prüfer fing sofort einen Fehler im
+Generator: er prüfte die Schwelle am **ungerundeten** Ton und
+veröffentlichte den gerundeten — drei Töne landeten auf 4,49/4,50/4,51.
+
+#### `v2092`–`v2092f` — der Matrix-Läufer, und drei Fehler in ihm selbst
+
+1. **Die Variante „DealPilot" war `opt: {}`** — also blieben `theme`,
+   `cards`, `kartenstil` und `objkarte` aus Vortests **stehen**, in allen
+   48 Punkten. Lauf verworfen. Jede Variante nennt jetzt den **vollen**
+   Achsensatz; `""` heißt *zurücksetzen*.
+2. **109 Querscroll-„Mängel" waren alle gewollt gebaut** (Pfeiltasten,
+   `scroll-snap`, Touch-Scrolling, Tabellenrahmen). *109 Fehlalarme
+   begraben jeden echten Fund.* Jetzt getrennt als `SCHIENE` — mit
+   Nachweis, nicht nach Klassenliste.
+3. **Der Erkenner dafür war tot:** Chrome verwirft
+   `-webkit-overflow-scrolling` beim Einlesen. Gemessen: 11.954 Regeln
+   durchgegangen, **null** mit `overflow-scrolling` im `cssText`, bei 10
+   Regeln auf denselben Selektor. Jetzt trägt die Regel `--dpm-schiene: 1`
+   — *die Absicht hängt am Element, nicht in einer Liste im Prüfer.*
+
+**Zwei Behauptungen im Backlog zurückgenommen:** drei Achsen kämen nicht
+an (zwei kommen an, bei `surface` hatte ich einen Wert erfunden, den
+`SURFACE` nicht kennt), und es gäbe vier Themes — es sind **sechs**,
+`konsole` war nie gemessen.
+
+> **`konsole` hat 13 Regeln, Kontor hat 102**, und 62 Sammelregeln in
+> `style.css` lassen es weg. Folge: `span.me-incze-desc` trägt die
+> Marken-Tinte `#2A2727` auf `rgb(39,39,37)` — **Kontrast 1,01, also
+> unsichtbar.** In allen anderen Fassungen misst dieselbe Stelle 13,96.
+> Eine voll wählbare Fassung, die Text verschwinden lässt.
+
+#### `v2093`/`v2094` — zwei Texte, die die Unwahrheit sagten
+
+`api.html` behauptete *„eine On-Demand-Berechnung per API gibt es noch
+nicht"* — seit `v2071` falsch. Zwei Endpunkte wurden zu zwölf. Und
+dreimal stand „Enthalten im Pro-Plan": `api_access` haben **pro und
+partner**, in den Migrationen nachgelesen.
+
+`userService.authenticate` gab jedem frisch Registrierten **„Account is
+disabled"** — englisch, und es klingt wie eine Sperre durch uns.
+Gemessen: `email_verified_at` blockiert **nichts**, der Riegel ist
+`is_active`. *Die Auskunft schickte den Nutzer in den Support statt in
+sein Postfach.* Nebenbei warf `errorHandler` das `code`-Feld **weg** —
+ein Kennwort wäre lautlos nie angekommen.
+
+#### `v2095`–`v2099` — RND je Einheit, und das Cockpit kann jetzt Ankauf
+
+`rndFuer()` gab dem Kern **vier von zehn** Feldern. Ohne `kernsaniert`
+gilt die Kappe **0,70 statt 0,90** der GND — gemessen bis **+3,4 Jahre**
+je Einheit. Und der Stichtag war auf *heute* festgenagelt, gegen die
+fachliche Festlegung. Statt die Rangfolge ein zweites Mal zu schreiben,
+wird sie geholt.
+
+**Die Vererbung war schon gebaut:** `GEB_IDS` (Dach, Außenwand,
+Leitungen, Heizung) gegen `WE_IDS` (Fenster, Bäder, Innenausbau,
+Grundriss), mit Zähler. Alle acht Gewerke genau einer Seite zugeordnet.
+
+`abweichungFuer(daten)` und der Summen-Umschalter laufen über **dieselbe**
+Rechnung wie bisher — bei **zwei von neun** Kennzahlen ist *kleiner*
+besser (Kaufpreis, LTV), und wer das nachbaut, erklärt einen gestiegenen
+Kaufpreis zur Verbesserung. 18 Richtungsfälle geprüft.
+
+#### `v2096` — die Vorschau war da, der Schleier hat sie verfälscht
+
+Der Klick auf eine Kachel schaltet die App wirklich um, und `.dpo-ov` ist
+ein **Schleier** zu 34 %, kein Vorhang. Der Fehler war subtiler: ein
+**dunkler** Schleier über der Wahl zwischen **hell und dunkel**.
+
+| Fläche | echt | unter dem Schleier | |
+|---|---|---|---:|
+| Creme | `rgb(253,252,250)` | `rgb(169,168,167)` | **−60 %** |
+| Obsidian | `rgb(5,5,5)` | `rgb(5,5,5)` | **−0 %** |
+
+> *Eine Vorschau, die das Gewählte dunkler zeigt als es ist, ist
+> schlimmer als keine: sie lässt den Nutzer gegen etwas entscheiden, das
+> er nie gesehen hat.* Kein zweites iframe — der Schleier fällt weg.
+
+#### `v2097`/`v2100` — „Kerosin" und die Anbieternamen
+
+N60.24 meldete *„alle erreichbaren Texte umgestellt"*. Gemessen: **25
+Treffer im Nutztext** (420 Dateien). Die meisten waren **kein Verstoß** —
+`_wireKerosinStrip` ist ein Funktionsname, und ein Filter **entfernt** den
+Begriff sogar. Wirklich betroffen: fünf Stellen, davon **eine live**.
+
+Dabei fiel auf, dass `quickcheck-app.html` **Sprengnetter und
+PriceHubble namentlich in Kundensätzen** nannte. Die zwei sind ersetzt;
+die restlichen ~60 Anzeige-Stellen **nicht**, weil Partner-Logos auf der
+Landingpage Marketing sind und Tour und Hilfe auf dieselben Knöpfe zeigen.
+
+#### Was die drei Läufe über die iframe-Dokumente herausfanden
+
+**Der Quick-Check ignoriert das gewählte Design.** Er lädt nur
+`whitelabel-override.js` und `qc-whitelabel.js` — die **Marken**schicht —
+und keines der vier Variantenmodule. `data-ui-theme` kommt dort **0×**
+vor. 40 von 48 Punkten meldeten es; *ich hatte eine Fassung sechsmal
+gemessen, nicht sechs.*
+
+Beide Dokumente haben **eigene** Kontrastfehler, die `style.css` nie
+erreicht: **Gold auf Gold** (1,68), 7-px-Text, und im Marktbericht
+`.mbst h4 { color: var(--wl-e8cc7a) }` — das **helle** Gold in einem
+Dokument, das seit `v895e` **immer hell** ist: **1,42**. Der
+`data-mb-theme="light"`-Block überschreibt die Hintergründe mit zehn
+`!important`, die goldenen **Textfarben** nicht.
+
+**Rest** · Was ohne Entscheidung ging, ist behoben. Offen und blockiert:
+
+| Was | wer entscheidet |
+|---|---|
+| Kontrast-Weg (a)/(b)/(c) für 234 Stellen | Marke |
+| `konsole` abschalten oder fertigbauen | Produkt |
+| Anbieternamen anonymisieren oder Regel schärfen | Marke/Vertrag |
+| `--gold-d`/`--gold-3` abdunkeln | Marke |
+| Quick-Check soll dem Design folgen | Produkt |
+| `api.html` auf Prod | Freigabe |
+| Gnadenfrist (a) oder (b) | Produkt |
+| Bankexport-Spalten | Produkt |
+| RND für Verkehrswert oder AfA | **fachlich** |
+| § 557b Sperrfrist beim VPI | **fachlich** |
+| BFH IX R 7/12 anwendbar | **fachlich** |
+
+> **Sechs Mal hat bash in dieser Sitzung mein Quoting zerlegt** —
+> Backslashes in Regex, `\u0027`-Tricks, deutsche Schlussanführungen in
+> doppelten Quotes. Ab dem dritten Mal hätte jedes Skript in eine Datei
+> gehört. Das steht in `backticks-in-bash-verschwinden`, und ich habe es
+> trotzdem wieder getan.
+
+---
+
+## Rollout-Journal 11.10.2026 (N60.29/33) — v2101–v2103: der Kontrast im Cockpit, und zwei Ableitungen, die Fehler fanden
+
+**Was · Commit · Nachweis · Rest**
+
+| Paket | Was | Commit | Nachweis |
+|---|---|---|---|
+| `v2101`–`v2101d` | Kontrast im Cockpit, Marcels Freigabe umgesetzt | `45030ce3`, `1a7d09a3` | Gruppen unter 4,5: **42 → 9**; unter 3,0: **19 → 1** |
+| `v2092g` | `effGrund` las den eigenen Grund des Elements nicht | `775424c6` | `shr-stub-lab` meldete 1,88 statt ~8 |
+| `v2102` | Bundesland + amtlicher GrESt-Satz im Export | `026907e4` | **21 von 23** Objekten tragen ein Land; Prüfer 55 Punkte RC=0 |
+| `v2103` | Halter und Steuersphäre je Objekt im Export | `07ab9b7a` | 23 Objekte, 19× `privat`, 13× `halter_seit`; Prüfer 55 Punkte RC=0 |
+
+### Die Lehre dieser Sitzung: eine Ableitung ist auch ein Prüfmaß
+
+**Zwei Pakete haben nichts Neues erfasst**, sie haben nur ausgesprochen,
+was ohnehin schon dastand — und **beide fanden dabei einen Fehler, den
+vorher niemand sehen konnte.**
+
+`v2102` leitet das Bundesland aus der PLZ ab. Nebenprodukt: **acht
+Objekte weichen vom amtlichen Satz ab, fünf davon mit 0,00 %
+Grunderwerbsteuer** — bei einem echten Kauf unmöglich. Alle acht sind
+DEMO-Objekte, es gehört zu **N60.19**.
+
+`v2103` liefert den Halter. Nebenprodukt: **`halter` stand 22× im
+Bestand und 0× im Export.** Ich hatte den Punkt als „blockiert durch
+N60.28" notiert — blockiert war der *zweite* Schritt.
+
+> **Eine Zahl, die niemand ausspricht, wird auch nicht geprüft.** „0 %
+> Grunderwerbsteuer" stand im Datensatz und ist zwei Jahre niemandem
+> aufgefallen. Erst der Vergleich gegen die abgeleitete Zahl machte
+> daraus einen Befund.
+
+### Drei Korrekturen an meinen eigenen Aussagen
+
+1. **„`forPlz` gibt `null` zurück"** — *falsch*, ich hatte `fromPlz`
+   getippt. Mein eigener Tippfehler, als Befund gemeldet.
+2. **„Die GrESt-Tabelle liegt nur im Frontend"** — *falsch*, `v1823`
+   spiegelt sie längst samt Prüfhaken auf 16 Länder. Nur der Export
+   nutzte sie nicht.
+3. **„Punkt 4 und 5 brauchen eine Migration"** — *falsch*.
+   `user_settings` ist ein generischer Schlüssel→JSONB-Speicher, ein
+   neuer Schlüssel ist **eine Zeile** in `ERLAUBT`. Die Entscheidung ist
+   inhaltlich, nicht technisch — und sie ist deshalb nicht kleiner,
+   sondern anders: es gehen **Steuernummer, Finanzamt,
+   Handelsregister, USt-ID** auf den Server.
+
+> Nummer 1 und 2 haben Arbeit erzeugt, die es nicht gab. **Nummer 3 ist
+> die teure Sorte:** sie hätte einen Punkt monatelang als „wartet auf
+> Freigabe" geführt, obwohl die Freigabe eine andere Frage betrifft als
+> die, die ich gestellt hätte.
+
+### Der Prüfer, der GEGEN etwas prüft
+
+`tools/halter-export-pruefen.mjs` prüft nicht nur, dass Werte
+herauskommen, sondern dass **keine** herauskommen, wo der Server nichts
+weiß. Sechs verbotene Muster im kommentarfreien Text (`isCorp`,
+`erw_kuerzung`, die Hebesatz-Formel, `15.825`, `regime.kst`, `'gbr'`)
+halten `sphaere()` davon ab, ein zweites Mal entstehen zu können.
+
+**Warum am kommentarfreien Text:** die Begründung, die diese Doppelung
+verbietet, steht als Kommentar in derselben Datei. Ein Prüfer, der den
+Fließtext mitliest, findet sein eigenes Zitat — in dieser Sitzungsreihe
+dreimal passiert.
+
+### Ein Prüfer, der eine richtige Ausnahme als Fehler meldete
+
+Mein erster GrESt-Prüfer verlangte „keine überlappenden PLZ-Bereiche"
+und fand eine: `04900–04938` **BB** innerhalb von `04000–04999` **SN**.
+Das ist **fachlich richtig** — Elsterwerda, Bad Liebenwerda und Übigau
+tragen 049xx und liegen in Brandenburg.
+
+Geprüft wird jetzt, was wirklich schiefgehen kann: `grestFuer` nimmt den
+**ersten** Treffer, also muss die engere Spanne **vor** der weiteren
+stehen. Nachgemessen: BB auf Position 2, SN auf 3.
+
+> **Ein Prüfer, der eine richtige Ausnahme als Fehler meldet, wird
+> abgeschaltet.** Und dann prüft gar nichts mehr.
+
+### Rest — was auf eine Entscheidung wartet
+
+| Punkt | Art |
+|---|---|
+| Demodaten: 5× GrESt 0,00 % richtigstellen (N60.19) | **DB-Eingriff** |
+| Mandanten auf den Server (N60.28 Schritt 0, N60.33/4+5) | **Freigabe** — Steuernummer, Finanzamt, USt-ID verlassen den Rechner |
+| „Steuersätze über die Jahre": drei Lesarten | **fachlich** — `regime` hat keine Jahresdimension, `kosten` schon |
+| N51 Ansprechpartner 1+2 (Migration `ansprechpartner` JSONB) | **Freigabe** |
+| Restliche ~9 Beinahe-Treffer im Cockpit-Kontrast | Produkt |
+| Quick-Check und Marktbericht: dieselbe Farbentscheidung | Produkt |
+| Konsole-Fassung (13 Regeln gegen 102) | Produkt |
+| Anbieternamen an ~60 Anzeigestellen (N60.30) | Produkt |
+
+> **Nicht abnehmbar auf Staging:** es gibt dort **keine einzige
+> Gesellschaft** — alle 23 Objekte sind privat. Der Zweig von
+> `halterFuer()` für eine Mandanten-ID ist nur gegen die echte Funktion
+> mit vier erfundenen IDs geprüft. **Staging-Abnahmepunkt**, sobald es
+> einen Mandanten gibt.
+
+---
+
+## Rollout-Journal 11.10.2026 (N60.34) — v2104/v2104b: 1.288 Beschriftungen, und eine Rechnung, die als Freigabe gelesen wurde
+
+| Paket | Was | Commit | Nachweis |
+|---|---|---|---|
+| `v2104` | Skalen-Beschriftungen: Grundfassung, heller Skin, `surface=light` | `b43b1903` | live: 4,80 / 4,83 / 4,80 (war 3,83 / **1,76** / 3,28) |
+| `v2104a` | Frontend-Konstanten nachgezogen (nur Hash) | `9f9cdffb` | Buster in `index.html` ändert den Dateihash |
+| `v2104b` | dieselben Beschriftungen in allen fünf Vorlagen | `2737b2d3` | 4,81–4,84 (war 3,14 / 3,16 / 3,70 / 3,81 / 4,39) |
+
+**Acht Fassungen × 161 Stellen = 1.288 Stellen**, alle über 4,5.
+`.sbcm-scale span` auf den Objektkarten — 23 Karten × 7 Beschriftungen,
+**7,5 px**, und damit gilt 4,5 (3,0 erst ab 24 px oder ab 18,66 px fett).
+
+### Die Lehre: eine Rechnung gegen einen angenommenen Grund wird als Freigabe gelesen
+
+Ich habe alle fünf Vorlagen gegen `rgb(13,11,8)` **gerechnet** — den
+Grund, den ich für die Grundfassung gemessen hatte — und **drei davon**
+für sauber erklärt:
+
+| Vorlage | gerechnet | **gemessen** |
+|---|---:|---:|
+| kontor | 5,94 „ok" | **3,14** |
+| kanzlei | 5,96 „ok" | **3,16** |
+| boarding | 5,31 „ok" | **3,70** |
+| konsole | 4,17 | **3,81** |
+| panel | 4,25 | **4,39** |
+
+**Vier von fünf Vorlagen haben eine helle Kachel.** Hätte ich nach dem
+ersten Paket aufgehört, wären drei Fassungen mit 3,1 als „geprüft und in
+Ordnung" im Journal gestanden.
+
+> *Eine fehlende Zahl lässt jemanden nachmessen. Eine falsche Zahl
+> hindert ihn daran.* Regel 1 wörtlich: Struktur wird nie angenommen,
+> immer ausgelesen — und ein Grund ist Struktur.
+
+### Drei weitere Korrekturen an eigenen Aussagen
+
+1. **„115 Stellen im Cockpit"** — *falsch*. `messe()` scannt das ganze
+   Dokument, nicht die gemessene Fläche. Es sind **161 Stellen, alle in
+   `aside.sidebar`, keine einzige im Cockpit.**
+2. **„Die Töne sind für dunklen Grund gebaut"** — das stand so in
+   `v1107b` und war die Begründung, die Grundfassung auszunehmen.
+   Gemessen: **3,83.** Die Annahme war die Lücke.
+3. **Der Prüfer meldete 3,53 für konsole** — und der Ton stand dort gar
+   nicht. Mein Suchausdruck lief über die Blockgrenze und las panels
+   Wert. *Er wurde rot, bevor etwas ausgerollt war.* Jetzt holt er erst
+   die Blöcke der Vorlage und sucht darin.
+
+### Der schlimmste Wert des Durchgangs stand im hellen Skin
+
+`body.dp-chrome-hell` dreht die Karte auf **Weiß** — und für diese sechs
+Klassen gab es dort **nie eine Regel**. Gemessen: **k = 1,76**,
+praktisch unsichtbar.
+
+> `v1107`/`v1107b` haben genau diesen Fehler für `data-ui-surface` und
+> für jede Vorlage behoben und den hellen Skin übersehen. **Die
+> Reparatur ist mit ihrem Anker gewandert, nicht mit der Fassung.**
+
+### Und die Schwelle war falsch gewählt, nicht der Ton schlecht getroffen
+
+Im eigenen Blatt stand es (`ui-varianten.css`, `v1107`): *„abgesenkt, bis
+sie gegen die Kachelfläche #FAF8F3 **auf 3,2** kommen."* Gemessen: genau
+**3,28**. Der Ton traf sein Ziel — **das Ziel war die falsche Zahl.**
+
+### Deckend statt mit Deckkraft
+
+Der Kartengrund ist ein **Verlauf** (`effGrund` meldet `quelle:
+"verlauf"`). Eine Deckkraft darüber ergibt je Stelle einen anderen
+Kontrast, eine feste Farbe nicht. Dieselbe Klasse wie `v2090`.
+
+Und `#8f897c` musste **zweimal** weichen: am Token `--uv-card-mut` und in
+der Regel, die die Farbe **direkt** setzt und den Token nicht liest. Nur
+eine zu ändern hätte die Hälfte der Fälle stillschweigend ausgelassen.
+
+### Zwei Werkzeugfunde
+
+- **`messe(d, win, label)` nimmt drei Argumente**, `kontrast(a, b)` zwei
+  **Farbobjekte** (keine CSS-Strings, sonst `NaN`).
+- **`lade()` hängt im verborgenen Fenster.** Es legt `rAF` im *iframe*
+  um, aber nicht im **eigenen** Fenster — und ein Hintergrundtab feuert
+  `rAF` nie. Ein Sechser-Lauf blieb minutenlang stillschweigend stehen.
+  Nach dem Umlegen von `window.requestAnimationFrame` liefen alle Läufe
+  durch. **Gehört in die Messkabine** statt in jeden Aufruf — Backlog.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Kartenfläche ist eine **eigene Achse** (`--dp-obj-card`, inline) → 5 Vorlagen × Kartenstufen messen | Messlauf |
+| `rafErsatz` auch im Messkabinen-Fenster | Werkzeug |
+| Demodaten: 5× GrESt 0,00 % (N60.19) | **DB-Eingriff** |
+| Mandanten auf den Server (N60.28/N60.33) | **Freigabe** |
+| „Steuersätze über die Jahre": drei Lesarten | **fachlich** |
+| N51 Ansprechpartner 1+2 | **Freigabe** |
+
+### Nachtrag 11.10.2026 — v2105 gebaut und zurueckgerollt (a78de89b)
+
+| Paket | Was | Commit |
+|---|---|---|
+| v2105 | Ton aus der gewaehlten Kartenfarbe ableiten | 3c6ac65c |
+| Revert | zurueckgerollt | a78de89b |
+| Befund | im Backlog N60.34 | f5e7754b |
+
+Der strukturelle Befund von v2104b war richtig: die Kartenflaeche ist
+eine eigene Achse, und dp_obj_ui ist ein FREIER Farbwaehler. Die
+Folgerung war falsch.
+
+Ich habe den Ton mit tonFuerGrund aus der GEWAEHLTEN Farbe abgeleitet -
+vorhandener Kern, kein zweiter Rechenweg, Pruefer 35 Punkte RC=0, Vertrag
+gegen neun echte Kartenfarben belegt. Dann live gemessen:
+
+| Kartenfarbe | Token | gemessener Grund | k |
+|---|---|---|---:|
+| Vorgabe | nicht gesetzt | rgb(13,11,8) | 4,80 |
+| #C9A84C Gold | #403b33 | rgb(13,11,8) | 1,77 |
+
+Die gewaehlte Kartenfarbe ist nicht der Grund: .sb-card liest
+--dp-obj-card in der Grundfassung gar nicht, das tut nur
+body.dp-chrome-hell (style.css:36164).
+
+> Ich habe wieder gegen einen ANGENOMMENEN Grund abgeleitet - eine Stunde
+> nachdem ich genau das bei den fuenf Vorlagen zurueckgenommen hatte.
+> Diesmal war die Annahme in Code gegossen statt in eine Tabelle, und ein
+> Pruefer mit 35 gruenen Punkten hat sie nicht gefunden: er hat die
+> ABLEITUNG geprueft, nicht den ORT, an dem sie landet.
+
+Zwei gleiche Fehler hintereinander. Nach CLAUDE.md ist das das Signal
+abzuschliessen, nicht einen dritten Anlauf zu nehmen. Der Stand von
+v2104b bleibt - gemessen, acht Fassungen, alle ueber 4,5; nach dem
+Rollback live nachgeprueft, auch mit gewaehlter Gold-Karte: 4,80.
+
+**Der naechste Schritt ist nicht Kontrast, sondern:** wo greift
+--dp-obj-card ueberhaupt? Tut der Regler "Objektkarten" in der
+Grundfassung nichts, verspricht die Oberflaeche etwas, das sie nicht
+haelt. Das ist der groessere Punkt. Steht in N60.34.
+
+**Und zurueckgenommen:** "lade() haengt an rAF im verborgenen Fenster"
+war falsch. Gemessen 5.283 ms und 8.093 ms ohne jeden Flicken; die
+Messkabine nutzt rAF nirgends selbst, sie wartet ueber MessageChannel.
+Ursache war ein nach CDP-Zeitueberlauf noch LAUFENDES lade(), das mit dem
+neuen Lauf ueberlappte - ein Bedienfehler, kein Werkzeugfehler.
+
+---
+
+## Rollout-Journal 11.10.2026 — v2106-v2108: Marcels zwei Zurufe, und eine Demo statt einer Frage
+
+| Paket | Was | Commit | Nachweis (live gemessen) |
+|---|---|---|---|
+| v2106 | Demo zu N60.35: die zwei Wege der Farbregler | 244f0876 | frontend/farbregler-demo.html, Gold-Probe RC=0 |
+| v2107 | Score zurueck nach oben, wo das Kachelband steht | ac43179b | Ueberschneidung 22 px -> **0** |
+| v2107a | kennzahlen mit eigenem Wert | 9391e9dd | Pille 86-111, Kachel ab 114 -> **0** |
+| v2108 | Ankauf-Erklaerkasten faellt, Text in den title | 9391e9dd | Host **17 px**, Checkbox bedienbar |
+
+### Erst eine Demo, nicht eine Frage
+
+Ich hatte zu N60.35 geschrieben: *"ich baue dir eine Demo, wenn du sagst
+welche Richtung"*. **Das war ein Stehenbleiben** - CLAUDE.md sagt bei Optik
+ohne klare Vorgabe ausdruecklich "Demo bauen und zeigen", nicht fragen.
+Jetzt steht sie: drei Karten nebeneinander mit Farbwaehler, und je Karte
+wird der Kontrast der Skalenbeschriftung MITGERECHNET - gegen beide Enden
+des Verlaufs, der schlechtere gewinnt.
+
+**Zwei Korrekturen an meiner eigenen Warnung:** der Kopf traegt keinen
+Runway, sondern linear-gradient(rgb(15,15,15), rgb(2,2,2)) - das
+Markenargument galt dort nicht. Und die Karte hat gar keine eigene
+Hintergrundfarbe; was man dafuer haelt, ist ausschliesslich der Verlauf.
+
+### Der Score: Marcels eigene Vorgabe, teilweise zurueckgenommen
+
+v1943 kam aus seinem Satz vom 07.10.2026: *"Den score und die
+schaltflaechen muessen IMMER mittig angeordnet sein."* Am 11.10. mit Bild:
+im DealPilot-Stil passt das nicht.
+
+**Beides stimmt, und der Grund ist messbar:** die Kartenstile blenden das
+Kachelband aus, die Karte wird kurz, mittig ist dort richtig. Nur wo das
+Band steht, legt sich der Score darauf - 22 px, genau wo in seinem Bild
+die Pille "GUT" auf der BMR-Kachel liegt. Die Vorgabe war nicht falsch,
+sie war zu weit gefasst.
+
+Gegenprobe: ampel und datenzeile bleiben mittig (0 px zur Kartenmitte),
+kante hat das Overlay ohnehin nicht auf der Karte. `.sbc-actions` bleibt
+mittig - danach hat er nicht gefragt.
+
+> **Gemessen wird die PILLE, nicht der Overlay-Kasten.** Der Kasten ist
+> hoeher als das Sichtbare und meldet einen Fehler, wo keiner ist. Und bei
+> `display:none` am Band ist dessen Rechteck ohne Aussage - ein
+> Ueberschneidungswert daraus ist Messmuell, kein Befund.
+
+### Der Ankauf-Kasten: Text weg, Funktion bleibt
+
+Weg ist der Erklaertext. Geblieben ist die Freigabe-Checkbox - sie ist
+keine Aufklaerung, sondern der EINZIGE Weg, den eingefrorenen Stand zum
+Bearbeiten zu oeffnen. Ohne sie waere die Ankauf-Ansicht eine Sackgasse.
+
+Live: Host 17 px statt eines Kastens mit Rand und Schatten, kein
+Hintergrund, rechtsbuendig, cursor:help. Und die Checkbox ist WIRKLICH
+bedienbar - elementFromPoint auf ihrem Mittelpunkt liefert
+INPUT#ank-freigabe, nichts liegt darueber.
+
+**Dabei gefunden:** ankauf-ansicht.js hatte kein esc(). Mein
+title-Einbau haette beim Rendern geworfen, und node --check sieht das nie.
+
+---
+
+## Rollout-Journal 11.10.2026 — v2109–v2112: zurückgebaut, eine Regression gefunden, zwei Demos
+
+| Paket | Was | Commit | Nachweis (live) |
+|---|---|---|---|
+| `v2109` | `v2107`/`v2107a` zurückgebaut | `7ced4323` | Score-Regeln **identisch mit `origin/main`** |
+| `v2110` | unsichtbare Knöpfe fangen keine Klicks mehr ab | `5d69a5b9` | Ring frei von `button.sbc-btn` |
+| `v2110a` | **meine eigene Regression** behoben | `170ca71a` | 390 px: `opacity 1 · pointer-events auto` |
+| `v2111`/`a`/`b` | Demo zu N60.37 | `3af4ad4b`, `a51bd1ba` | 5 Karten, Ist 81 px², alle vier Wege 0 |
+| `v2112` | Quick-Check und Marktbericht aus der Seitenleiste | `d2eab3c1` | `.sb-neu-row` 0× im DOM, beide im Aktionen-Menü |
+
+### Die teuerste Stelle: ich habe mir eine Regression gebaut und sie selbst gefunden
+
+`v2110` hängte `pointer-events:none` an die **Grundregel** von
+`.sbc-actions` — richtig gedacht, denn ein unsichtbarer Knopf fing die
+Klicks auf dem Score-Ring ab. Es gibt aber vier weitere Regeln auf
+denselben Selektor, und eine davon ist die Handy-Regel:
+
+```css
+@media (max-width: 900px) { … .sbc-actions { opacity: 1 !important } }
+```
+
+Auf Touch gibt es kein Hover, deshalb stehen die Knöpfe dort **immer**
+sichtbar. Gemessen bei 390 px: *opacity 1, pointer-events none* —
+**Duplizieren und Löschen waren sichtbar und tot.** Zwanzig Minuten lang
+auf Staging, von mir ausgerollt.
+
+> **Eine Hälfte eines Paares zu ändern ist schlimmer, als beide zu
+> lassen:** der sichtbare Zustand sagt dann etwas anderes als der
+> bedienbare. Seitdem bewacht `tools/deckkraft-klickbarkeit-pruefen.mjs`
+> die Paarung über drei Blätter (12 Regeln, RC=0) — und er bricht ab,
+> wenn er **gar keine** Regel findet, statt grün zu werden.
+
+Dass meine Fassung überhaupt halb griff, sagt der Kaskaden-Walker:
+`.sb-card:hover .sbc-actions` (0,2,0) verliert gegen
+`aside.sidebar .sb-card .sbc-actions` (0,3,1) — deshalb wurde
+`pointer-events` auto, während `opacity` 0 blieb.
+
+### Der graue Bereich: zwei Kommentare, die sich widersprechen
+
+`V103` hat Knöpfe (`top:6px`) und Score (`top:38px`) bewusst gestaffelt,
+mit dem Vermerk *„Damit klickbar"*. `v1943` setzt **beide** auf
+`top:50%`. **Zwei Dinge in derselben Spalte auf dieselbe Mitte müssen
+sich überlappen** — gemessen 21 px, und der Knopf verdeckt die untere
+Hälfte der Score-Zahl. Marcels Anweisung war nicht falsch, sie war für
+zwei Elemente nicht erfüllbar. Steht als **N60.37** mit vier Wegen.
+
+### Zweimal „Demo bauen" geschrieben und zweimal gefragt
+
+Bei N60.35 und dann wieder bei N60.37 habe ich geschrieben *„Demo bauen,
+nicht fragen"* — und dann gefragt. Die Demo zeigt ja gerade die
+Richtungen, damit sie niemand im Abstrakten benennen muss. Beide stehen
+jetzt: `farbregler-demo.html` und `score-knoepfe-demo.html`.
+
+**Und die zweite Demo log, ausgerechnet bei der Fassung, die den Fehler
+verhindert:** (c) meldete „Zahl verdeckt", weil ich die Deckkraft mitten
+in der 120-ms-Blende las. Zweimal an der Zeit gedreht (Schwelle, dann
+ein zweiter Lauf nach 200 ms), zweimal daneben — erst das Stilllegen des
+Übergangs war richtig.
+
+> *Ein Messwert, der von einer Blende abhängt, wird nicht durch längeres
+> Warten richtig.* Steht in `eingefrorener-uebergang`, zweimal nicht
+> angewandt.
+
+### `v2112`: erst messen, ob eine Tür zugeht
+
+Marcel: *„im menü bei dealpilot bitte quick-check und marktbericht
+rausnehmen."* Vorher gemessen, ob damit eine Funktion unerreichbar wird:
+
+| | im Aktionen-Menü |
+|---|---|
+| `:771` `sbActionsAction('marktbericht')` | **„Marktbericht"** |
+| `:786` `sbActionsAction('quickcheck')` | **„Quick Boarding"** |
+
+Beide bleiben erreichbar, auch im Aktenmappen-Layout (dort nachgemessen:
+Schiene mit fünf Teilen, `schnellstart` entfällt sauber, Aktionen-Menü
+da, ein „Quick Boarding"-Knopf).
+
+**Zwei Sackgassen auf dem Weg, beide jetzt im Kommentar:** der Verteiler
+`case 'quickcheck'` in `ui.js:2167` hängt am Bottom-Sheet, und das ist
+seit V46 **unbedingt** abgeschaltet (`style.css:11804`, keine
+Media-Query). Und `hybrid-aktionen.js` erscheint nur in der Vorlage
+kanzlei ab 1500 px.
+
+**Zurückgenommen, bevor es ausgerollt war:** ich hatte Quick-Check schon
+in `hybrid-aktionen.js` eingetragen, weil ich den Eintrag `:786` noch
+nicht gefunden hatte — überflüssig **und** im falschen Menü.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.37 (a)–(d): welcher Weg? Demo steht | **Optik** |
+| N60.35 Farbregler (a)/(b): Demo steht | **Optik** |
+| N60.36 Mietrecht: Abgleich, Lizenz, Einspielweg | **fachlich + Freigabe** |
+| N60.19 Demodaten 5× GrESt 0,00 % | **DB-Eingriff** |
+| Mandanten auf den Server (N60.28/33) | **Freigabe** |
+| N51 Ansprechpartner 1+2 | **Freigabe** |
+
+## Rollout-Journal 11.10.2026 — v2119–v2123: die Datenaufnahme-Karte über alle Geräte
+
+**Was · Commit · Nachweis · Rest**
+
+| Was | Commit |
+|---|---|
+| `v2119` die Leiste knautschte statt umzubrechen | `75cffa10` |
+| `v2120` der Abruf-Knopf war Gold auf Gold | `75cffa10` |
+| `v2121`/`a` iPad: 1263 px in 695 px · Touchflächen | `4514fda8` |
+| `v2122` `v1941a`–`d` ausgetragen | `4514fda8` |
+| `v2123`/`a` zwei Reste, die Höhe kosten | `7e7cfe42` |
+| `tools/datenaufnahme-leiste-pruefen.mjs` | `4514fda8` |
+| Backlog N60.39 | `5ed1c81d` |
+
+Marcel zweimal nacheinander: *„für mich passt die Datenaufnahme Karte
+immer noch nicht. Hab in der Messkabien gerade IPad mini auf und es ist
+alles verzwerrt"* und *„Dann hast du auch nicht die anderen
+Datenaufnahmekarten geprüft das musst du vollumfänglich machen. ich habe
+dir gesagt dass muss passen und auch gut aussehen."*
+
+### Die Lehre: ein Überlauf, der keiner ist
+
+Bei 1180 px war die Summe der direkten Kinder **exakt** die Innenbreite:
+888 von 888. Kein Überlauf, keine Scrollbreite, nichts außerhalb.
+Trotzdem waren vier Beschriftungen gekappt — „Sprache" auf **15 von
+43 px** — und der QR-Kasten auf 39 px gequetscht, mit einem 54-px-SVG
+darin.
+
+> **`flex-shrink: 1` plus `min-width: 0` heißt: lieber alles unleserlich
+> als eine zweite Zeile.** Wer nach einem Überlauf sucht, findet hier
+> nichts und hält die Leiste für gesund. Die Prüffrage ist nicht „läuft
+> etwas über", sondern „ist der sichtbare Teil noch der ganze Inhalt" —
+> `scrollWidth` gegen `clientWidth`, je Beschriftung.
+
+Und der Schaden hing nicht am Fenster, sondern am **Behälter**:
+1024 px → Leiste 1150 (heil), 1180 → 888 (kaputt), 1280 → 856 (kaputt),
+1440 → 1016 (kaputt), 1920 → 1280 (heil). Die Seitenleiste wechselt bei
+1100 px von 260 auf 380 px. **Deshalb kein weiterer Haltepunkt** —
+Haltepunkte beschreiben das Fenster, der Schaden saß im Behälter. Die
+Bauart wurde tragfähig gemacht statt die Breiten einzeln bedient.
+
+### Zwei Entscheidungen ausdrücklich zurückgenommen
+
+**`v1941a`–`d` (fünf Deklarationsblöcke, ausgetragen in `v2122`).** Sie
+taten das Gegenteil: `flex-wrap: nowrap`, Kacheln `flex: 1 1 auto` plus
+`min-width: 0`, Ellipse auf Beschriftung und Kachelkindern, und eine
+Sammelregel `#oab-bar.dp-pfbar * { min-width: 0 }` auf **jeden**
+Nachfahren — die hob jeden späteren Schutz von unten wieder auf.
+
+> `v1941` war nicht falsch. Damals ging es um **sechs Pixel**
+> Überbreite, und ein Umbruch wegen sechs Pixel ist teurer als eine
+> Ellipse. Heute fehlen 90. Die Kommentare bleiben stehen, die
+> Deklarationen nicht — ein Stapel aus zwei Versionen, die sich
+> widersprechen, ist genau das, wovor der Kopf dieser Datei bei
+> `v1702d` warnt.
+
+**`v1892` (Wischen im Tablet-Band, zurückgenommen in `v2121`).** Dort
+stand `width: max-content` auf der Leiste, damit der Wrapper überhaupt
+etwas zu scrollen HAT. Eine spätere Regel in `datenaufnahme.css` hat den
+Wrapper mit `overflow-x: hidden` stillgelegt — gleiche Spezifität,
+spätere Datei — und die Breite stehen gelassen.
+
+> **Von einem Paar blieb die schädliche Hälfte.** 1263 px Leiste in
+> einem 695 px Behälter mit `overflow: hidden`: 568 px lautlos
+> geklippt. Kein Balken, kein Hinweis. Das war Marcels „alles
+> verzerrt".
+
+Und `max-content` erklärt den Folgeschaden: `v2117` gibt den Kacheln im
+Band 641–900 `calc(50% - 3px)`. **50 % von 1263 sind 631.** Die
+Prozentangabe war richtig, ihr Bezug war es nicht.
+
+### Gold auf Gold — eine Farbe gilt nur zu ihrem Grund
+
+Gemessen auf 390 px: `#oab-bar` trägt den Runway-Verlauf
+(rgb 201,170,84), `.dp-pf-rz` ist ein weißer Stub 325×57, und
+`#oab-run` ist 323×50 mit demselben Verlauf. **Kontrast k = 1,07.**
+Vom Stub blieben links und rechts je 1 px — genau Marcels „verdeckt
+das komplette weisse".
+
+Der Kaskaden-Walker nennt den Sieger: `(2,1,0) !`
+`#obj-action-bar #oab-run.dp-pf-launch`, Block `v601`. Davor drei
+Stände derselben Fläche: `v597` weiß + Goldtext, `v599` **Gold**,
+`v601` dasselbe mit ID festgenagelt. Und die Grundregel in
+`style.css:33064` sagt bis heute `background:#050505`.
+
+> `v599` war richtig: die Leiste war damals **dunkel**, und Gold auf
+> dunkel ist der Akzent. Den Verlauf hat die Leiste später bekommen.
+> Keine der beiden Entscheidungen ist für sich falsch; zusammen ergeben
+> sie einen unsichtbaren Knopf. Jetzt wieder Obsidian mit Goldschrift —
+> die Hausform, die `.dp-pf-lead` und `.dp-pf-tile.tool` in derselben
+> Leiste schon tragen. Textkontrast gemessen **10,54** auf allen 48
+> Läufen.
+
+### Ein Maß für einen entfernten Inhalt
+
+`.dp-pf-rz` trug `min-width: 208px` — das Maß der Reißzone der
+**Bordkarte**, in der ein Strichcode von 174×52 stand. `.dp-pf-bc` ist
+seit `v1639` `display:none` und gemessen 0×0. Übrig blieb ein Knopf von
+83 px in einem Kasten von 208. **125 px für nichts**, auf jeder
+Desktopbreite.
+
+### Zwei eigene Messfehler, beide zurückgenommen
+
+**1 · „QR-SVG schief" in 10 von 48 Läufen** (kartei 82×68 in 92×92,
+buetten 52×48 in 64×64). Am gezeichneten Code gemessen ist er
+**quadratisch**: erstes `rect` 64×64 bzw. 41×41. Der viewBox ist
+`0 0 31 31`, ohne `preserveAspectRatio` gilt `xMidYMid meet` — das
+Verhältnis wird gewahrt. Schief ist das svg-**Element**, nicht das Bild
+darin. **Das steht schon im Kommentar bei `v1992`, und ich habe es
+trotzdem als Befund gemeldet.** Eine Probe mit `aspect-ratio: 1` hat es
+nachweislich verschlechtert (buetten: `rect` von 41×41 auf 36×36) — also
+wurde nichts geändert.
+
+**2 · „Kachel verdeckt von nichts" für alle fünf Kacheln auf jedem
+Handy.** `elementsFromPoint` sieht nur den Viewport, und die Leiste lag
+bei y = 7926. Ein Punkt außerhalb des Bildes liefert eine **leere
+Liste** — und leer ist kein Befund. Der Prüfer scrollt jetzt erst
+`scrollIntoView` und nennt mit `imBild`, ob die Punktproben überhaupt
+gültig waren. Die Restmeldungen („verdeckt von `button.tab`") sind der
+**sticky** Reiterleiste zuzuschreiben, unter die `scrollIntoView` die
+Leiste schiebt — auch das ein Werkzeugartefakt, kein Produktfehler.
+
+### `overflow-x: visible` kam als `auto` heraus
+
+In jedem Lauf im Band 641–1100 meldete `.dp-pf-scroll`
+`overflow-x: auto`, obwohl `v2121` dort `visible !important` setzt und
+auf Spezifität gewinnt. Es gewinnt auch — es wird **umgerechnet**: steht
+eine Achse auf etwas anderes als `visible`, rechnet der Browser die
+andere von `visible` auf `auto` um, und `overflow-y: hidden` steht im
+selben Band in `style.css`.
+
+> **Nicht die Kaskade hat entschieden, sondern die Berechnung.** Wer nur
+> den gemeldeten Wert liest, hält seine Regel für verloren und sucht an
+> der falschen Stelle nach einem stärkeren Selektor.
+
+### Nachweis
+
+**Matrix: 4 Kartenstile × 12 Breiten = 48 Messungen** am laufenden
+Staging im gleich-Origin-iframe. Je Lauf: Leistenmaß, Umbruchmodus,
+QR-Kasten gegen SVG gegen `rect`, abgeschnittene Beschriftungen
+(`scrollWidth`/`clientWidth`), Elemente außerhalb, Überschneidung der
+direkten Kinder, Knopfmaß, Kontrast Text und Grund, Erreichbarkeit per
+`elementsFromPoint`, Touchhöhe aller Kacheln.
+
+```
+  KAPP (abgeschnitten)   0 von 48
+  RAUS (ausserhalb)      0 von 48
+  UEBER (Ueberschneidung) 0 von 48
+  ZUBREIT                0 von 48
+  QUER (Querscroller)    0 von 48
+  Knopftext k >= 4,5    48 von 48   (10,54)
+```
+
+Breiten: 360 · 375 · 390 · 430 · 667 quer · 768 · 834 · 1024 ·
+1180 · 1280 · 1440 · 1920. Stile: Vorgabe · Zeile · Kartei · Buetten.
+
+Dazu **`tools/datenaufnahme-leiste-pruefen.mjs`**: rechnet die
+Spezifität aus und sagt, welche Regel am Ende gewinnt — für den
+Abruf-Knopf und für die fünf Schutzregeln aus `v2119`. Der Gold-Knopf
+ist dreimal gesetzt worden; ein Kommentar hält eine vierte Runde nicht
+auf. Er hat sich zweimal selbst erwischt (ein nackter Komma-Split
+zerlegte `:is(#oab-bar,#qc7-sources)`; der `:hover`-Stand gewann
+immer). Deckung: 17 Blätter, 13.674 Regeln, 2,44 Mio Zeichen. RC = 0.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.39 Kartenstil „Zeile": 53 Regeln an `body.dp-pfzeile`, 0 Setzer | **Optik + Risiko** |
+| Höhe bei 1180 px: 185 px in zwei Zeilen, Zeile 1 zu 60 % leer | **Optik** |
+| Knopf 33 px ab 1280 px (Absicht: Maus) | **gemessen, Entscheidung** |
+
+
+## Rollout-Journal 12.10.2026 — v2126–v2128: Durchgang 1 und 2 der Geräteabnahme
+
+Marcels Auftrag: *„wenn das so weit ist und du das komplett abgearbeitet
+hast und sorgfältig und alle passt, dann machst du diese prüfung mit
+allen handys und tablets und desktop prüfung nochmal 5 mal. ganz genau
+durchgehen … nutze dabei immer unterschiedliche herangehensweisen wenn
+möglich."*
+
+| Was | Commit |
+|---|---|
+| `v2126` zwei Reste aus der 72-Läufe-Abnahme | `fe48a9e4` |
+| `v2125` Messkabine: `pruefeAnsicht` konnte nur „Heute" | `e6306f19` |
+| `v2127` Messkabine: zwei Erkennerfehler | `1e6c35e4` |
+| `v2128` der 2-Pixel-Stummel auf jedem Schreibtisch | `1e6c35e4` |
+| Backlog N60.39 (Kartenstil „Zeile"), N60.40 (Cockpit-Vollbild) | `5ed1c81d`, `1e6c35e4` |
+
+### Erst das Messgerät, dann das Produkt
+
+**`v2125`:** In `pruefeAnsicht` stand `lade(breite, '', hoehe)` — die
+Fassung war **fest auf „Heute"** gesetzt. Marcel arbeitet in der
+**Aktenmappe**, und alle Datenaufnahme-Befunde vom 11.10. lagen dort:
+der 1263-px-Überlauf auf dem iPad war in `v1b`, nicht in „Heute".
+
+> **Ein Prüfer, der nur eine Fassung kennt, meldet null Befunde für die
+> Fassung, die der Nutzer sieht — und wirkt dabei grün.**
+
+**`v2127`, zwei Erkennerfehler, beide vor dem Weiterbauen behoben:**
+
+**1 · `apQuerScroller` hat die Absichtsmarke nicht gelesen.**
+`deklariertAbsichtlich()` gibt es seit `v2092e` genau dafür: ein
+gewollter Querscroller trägt `--dpm-schiene:1`. Gemessen wurde
+`div#oe-karte-gewerke` als Befund gemeldet (301 sichtbar / 648 Inhalt) —
+und genau dieses Element trägt die Marke.
+
+> **Ein Erkenner, der bekannte Absichten mitmeldet, wird nach dem dritten
+> Mal überlesen — und dann auch der echte Befund daneben.** Die Marke war
+> gebaut, exportiert und dokumentiert; gefragt hat sie niemand. Dieselbe
+> Form wie bei den Farbreglern: *setzt, und keiner liest.*
+
+**2 · Ein gestylter Schalter ist nicht erdrückt.** `input#ai-in-pdf` 0×0
+wurde in 6 von 8 Geräten gemeldet. Er steht in einem
+`<label class="ji-switch">` von 300 px Breite — das native Feld wird auf
+null gesetzt, bedient wird es über das Label. Geprüft wird jetzt der
+**Bedienweg**; ohne Label bleibt es ein Befund.
+
+Selbsttest vor dem Durchgang: **BESTANDEN** („findet einen echten Fehler
+und schweigt danach wieder").
+
+### Durchgang 1 — alle Reiter über alle Geräte
+
+8 Geräte × 9 Reiter = **72 Reiterbesuche** in der Aktenmappe, je Reiter
+ein Scroll-Durchlauf mit **Doppelprüfung** jeder Verdachtsstelle
+(zentriert und am Seitenanfang).
+
+```
+  Reiterbesuche             72
+  Klick nicht angekommen     0
+  Sektion nicht aktiviert    0
+  Bedienelemente geprüft  8778
+  nicht erreichbar           0
+  echter Überlauf            0
+```
+
+Geräte: 360 · 390 · 430 · 667 quer · 768 · 834 · 1180 · 1440.
+
+### Der eine echte Fund: ein 2-Pixel-Stummel
+
+`.dp-sidebar-toggle`, in 18 von 72 Reiterbesuchen als erdrückt gemeldet:
+
+```
+   768 px   0 x 0    display:none          (v1888, Absicht)
+   901 px   2 x 20   inline-block   @248, y=7198
+  1180 px   2 x 20   inline-block   @248, y=4304
+  1440 px   2 x 20   inline-block   @248, y=4111
+  1920 px   2 x 20   inline-block   @248, y=4037
+
+  background  rgb(240,240,240)   Browser-Standard
+  border      1,11 px outset      Browser-Standard
+  svg darin   0 x 0
+```
+
+Er schaltet trotz seines Namens das **Cockpit-Vollbild**. Mit offenem
+Cockpit nachgemessen: bei 390 und 768 `display:none` (bei `dp-show`
+**true**), bei 1440 2×20 bei **y = 6029** — unterhalb des 5.954 px hohen
+Cockpits. Dazu **0** Vollbild-Knöpfe im Cockpit und **0**
+`.dp-dash-btn`.
+
+> **Das Cockpit-Vollbild ist gebaut und auf keiner Breite erreichbar.**
+
+Und `dashboard.js` pflegt dafür eine Klasse, die niemand liest:
+`dp-show` wird beim Öffnen gesetzt und beim Schließen entfernt —
+**0 von 11.757** Regeln im laufenden Dokument nennen sie.
+`style.css:32836` begründet, dass `#dp-sb-toggle` im Cockpit-Vollbild
+weicht, mit *„eigene Steuerung"* — **die es nicht gibt.**
+
+`v2128` blendet den Stummel aus. **Keine neue Steuerung gebaut:** ob das
+Cockpit ein Vollbild braucht und wo der Schalter sitzt, ist eine
+Produktentscheidung (Backlog N60.40, drei Wege). Marcel hat für die
+Layouts das Gegenteil verlangt (*„dieses Vollbild-Menü ausblenden, das
+müsste bei der Ansicht raus"*) — ein neuer Knopf wäre eine Annahme.
+
+### Nicht angefasst, weil im Kommentar belegt
+
+`html[data-dp-layout] #dp-sb-toggle{display:none}` sieht wie ein Defekt
+aus (der Vollbild-Umschalter fehlt in jedem Layout). Der Kommentar in
+`layout-varianten.css:1480` zitiert Marcel wörtlich: *„es gibt dort
+dieses Vollbild-Menü ausblenden, das müsste bei der Ansicht raus"*.
+
+> **Zuerst den Kommentar lesen, dann den Befund schreiben.** Hätte ich
+> hier „repariert", hätte ich seine Entscheidung zurückgedreht.
+
+### `v2126` — die beiden Reste der Datenaufnahme
+
+**Kartei, vier Chips in einer Reihe ohne Umbruch.** Bei 940 px standen
+`.dp-pf-row`, `.dp-pf-tile` und `.dp-pf-lbl` **85 px außerhalb** der
+Karte. `wrap` ist in jeder gemessenen Breite besser oder unverändert:
+940 und 980 von „4 bzw. 2 draußen" auf 0, ab 1000 px kein Unterschied.
+
+> Die Begründung des Entwurfs (*„in einer Reihe fällt jeder Unterschied
+> sofort auf"*) stimmt — und gilt nur, solange die Reihe passt. Eine
+> Gestaltungsabsicht, die Inhalt aus der Karte schiebt, ist keine
+> Gestaltung mehr.
+
+**Ein Pixel Fensterbreite kostete 17 px Höhe:** 1400 px → 117 px hoch,
+1401 px → 134 px. Die Bandgrenze aus `v2124` lag nicht am
+Umschlagpunkt; der liegt bei einer **Behälterbreite** von rund 1148 px,
+also einem Fenster von 1440. Das Band reicht jetzt bis 1439.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.40 Cockpit-Vollbild: (a) ausbauen / (b) Knopf / (c) Tastatur | **Entscheidung** |
+| N60.39 Kartenstil „Zeile": 53 Regeln, 0 Setzer | **Optik + Risiko** |
+| 521 `font-size`-Deklarationen unter 11 px (Codeanalyse, 17 Blätter) | **gemessen, noch nicht im Browser geprüft** |
+
+
+## Rollout-Journal 12.10.2026 — v2129–v2131: Durchgang 2 bis 5 der Geräteabnahme
+
+| Was | Commit |
+|---|---|
+| `v2129` Trefferflächen-Hilfe zerstörte Platzierungen | `87f1b1c6` |
+| `v2130` fünf Beschriftungen unter der Hausuntergrenze | `9d242b79` |
+| `v2131` der Kontingent-Satz wurde mitten im Wort gekappt | `32916fea` |
+| Messkabine `v2129`/`v2131` zwei weitere Erkenner | `87f1b1c6`, `32916fea` |
+| Backlog N60.41 (Preise-Fenster 13 Bildschirme) | `10c62ba5` |
+
+### Die vier Durchgänge und was sie gemessen haben
+
+**Durchgang 2 — Modale, Menüs, Hilfe.** 5 Breiten × 20 **echte** Öffner
+= 100 Läufe, jedes Fenster auf einem **frischen** Dokument (Restzustand
+ist sonst der Messfehler). Dateiauswahl-Dialoge bewusst ausgenommen —
+`showOpenFilePicker` und Geschwister würden die Sitzung blockieren.
+
+```
+  Läufe                        100
+  Öffner mit Fehler              0
+  geöffnet und gemessen         75
+  Panel breiter als Viewport     0
+  Panel höher OHNE Scroll        0
+  Panel höher, Overlay scrollt  11
+  Schließknopf verdeckt          0
+```
+
+**Durchgang 3 — Schrift, gerendert statt im Code.** 6 Geräte × 9 Reiter,
+je Reiter **alle** sichtbaren Blattknoten mit Text: 1.359 bis 1.692
+Textknoten je Gerät.
+
+**Durchgang 4 — extreme Inhalte.** 94 Zeichen Straße, 59 Zeichen Ort,
+11 Ziffern Kaufpreis, in die **echten** Felder (`str`/`ort`/`plz`/`kp`)
+per `input`+`change` wie beim Tippen, danach `calc()` und
+`dpUpdateAll()`. Vorher **und** nachher gemessen:
+
+```
+  Gerät   vorher              nachher
+   360    raus 0  klippt 25   raus 0  klippt 25   Seite +0
+   390    raus 0  klippt 24   raus 0  klippt 24   Seite +0
+   768    raus 0  klippt 23   raus 0  klippt 23   Seite +0
+  1180    raus 0  klippt 23   raus 0  klippt 23   Seite +0
+  1440    raus 0  klippt 23   raus 0  klippt 23   Seite +0
+```
+
+> **Der extreme Inhalt ändert nichts.** Kein Überlauf, kein neues
+> Kappen, die Seite wird nicht breiter. Das ist das Ergebnis — und es
+> ist nur eines, weil vorher UND nachher gemessen wurde.
+
+**Durchgang 5 — Fokus, Tastatur, Konsole.** 5 Geräte × 9 Reiter:
+**0 Konsolenmeldungen** (`error`, `warn`, `onerror`,
+`unhandledrejection` eingehängt). Und zur Fokusmarke:
+
+```
+  Regeln, die outline abschalten      89
+  Regeln, die im Fokus etwas bieten  113
+  Bedienelemente im Dokument         116
+  davon Ring abgeschaltet             75
+  davon OHNE Ersatz                    0
+```
+
+### Die drei echten Funde
+
+**`v2129` — eine Trefferflächen-Hilfe hat Platzierungen zerstört.**
+Gemessen am Preise-Fenster:
+
+```
+   360 px   .pricing-modal-close  36x44  @1, 45      oben LINKS
+   390 px                         36x44  @1, 45      oben LINKS
+   768 px                         36x40  @1, 45      oben LINKS
+  1180 px                         36x36  @1106, 45   richtig
+  1440 px                         36x36  @1241, 45   richtig
+```
+
+Die Grenze ist 768 px, und dort steht `v652d`:
+`.pricing-modal-close { position: relative !important }` — damit ein
+`::after` die 44-px-Fläche aufspannen kann.
+
+> **Die Absicht war richtig, das Mittel nicht.** Der Knopf ist in
+> `pricing-modal.css:40` schon `position:absolute; top:16px;
+> right:16px`. **Ein absolut positioniertes Element IST ein Bezug für
+> sein Pseudoelement.** `relative` zu erzwingen hat `top`/`right` von
+> „Abstand zum Elternrand" in „Verschiebung aus der Flussposition"
+> umgedeutet: 16 px nach unten, 16 px nach **links**.
+
+Die Rechnung geht auf: Flussposition im Shell-Polster ist links 17 /
+oben 29. Minus 16 ergibt 1, plus 16 ergibt 45 — die gemessenen Werte.
+Dieselbe Liste trifft `.img-del` (`absolute`, der Löschknopf in der
+Fotoecke) und `#dp-sb-toggle` (`fixed`). Nach `v2129` sitzt der Knopf
+auf **jeder** Breite 17 px vom rechten Shell-Rand und ist erreichbar.
+
+**`v2130` — fünf Beschriftungen unter der Hausuntergrenze.** Mein erster
+Durchgang rechnete mit 11 px und ergab **540 „Befunde"**. Das wäre ein
+Umbau der halben App gewesen.
+
+> **Eine Grenze, die man selbst wählt, ist keine Messung.** Die
+> Hausuntergrenze steht nicht in CLAUDE.md, sondern in `v1890`: dort
+> wurde 6,5 px auf **8,5 px** gehoben, *„zu klein ist sie auf JEDEM
+> Gerät"*. Damit sind 9 bis 10,5 px bewusste Mikrobeschriftungen —
+> und nur **14 Stellen in 5 Formen** liegen wirklich darunter.
+
+**`v2131` — der Kontingent-Satz wurde mitten im Wort gekappt.**
+`.dp-kg-f` hatte `clientWidth 306` bei `scrollWidth 473`. Der ganze
+Satz: *„Zurücksetzung am 01.11.2026. Was du bis dahin nicht nutzt,
+verfällt — zugekaufte Bewertungen nie."*
+
+> **Ein Satz, dessen Ausnahme abgeschnitten wird, sagt das Gegenteil
+> von dem, was er soll.** Der Kunde liest „was du nicht nutzt,
+> verfällt" — und nicht, dass gekaufte Bewertungen ausgenommen sind.
+
+Ursache ist **Erbschaft**, keine eigene Regel: auf `.dp-kg-f` passen
+null `white-space`-Regeln. Die Kette ist
+`button#hdr-credits-pill` (`nowrap`, für eine Pille richtig) →
+`.dp-kg-panel` → `.dp-kg-f`. Das Panel hängt **im** Knopf und erbt eine
+Eigenschaft, die für eine andere Rolle gewählt wurde. Nach `v2131`:
+212/212, vollständig, Zahlen weiter `nowrap`.
+
+### Vier Erkennerfehler, alle vor dem Weiterbauen behoben
+
+| # | Meldung | Wirklichkeit |
+|---|---|---|
+| 1 | 7× „KEIN Schließknopf" | `DP_BAR()` baut `<button class="dpm-x">` — mein Selektor kannte nur `close`/`schliess` |
+| 2 | 23× „Beschriftung abgeschnitten" je Gerät | `.oe-sr` ist die Screenreader-Form (1×1 px, `clip:rect(0 0 0 0)`) — **mit Absicht** gekappt |
+| 3 | „Kontingent-Panel öffnet auf dem Handy nicht" | `el.click()` gibt keinen **Fokus**; das Panel hängt an `:focus-within`. Mit `.focus()`: opacity 1, sichtbar |
+| 4 | „116 von 116 ohne Fokusmarke" | ein **programmatischer** Fokus löst `:focus-visible` nicht aus — der Browser setzt es nur nach Tastatureingabe |
+
+Dazu ein fünfter, der kein Erkennerfehler war, sondern ein Griff:
+beim ersten Versuch am Kontingent-Panel kamen **leere** Computed-Werte
+zurück — der Knoten war nach dem Neu-Rendern nicht mehr im Dokument.
+
+> **Nach jedem Eingriff neu greifen.** Ein alter Griff auf ein Modul,
+> das sich selbst neu zeichnet, misst einen Knoten, den es nicht mehr
+> gibt — und liefert dabei keinen Fehler, sondern leere Werte.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.41 Preise-Fenster: 13,3 Bildschirme bei 360 px, drei Wege | **Geld/Produkt** |
+| N60.40 Cockpit-Vollbild: (a) ausbauen / (b) Knopf / (c) Tastatur | **Entscheidung** |
+| N60.39 Kartenstil „Zeile": 53 Regeln, 0 Setzer | **Optik + Risiko** |
+| `#bmfOverlay` Schließknopf 31×27 (nur Maus-Breiten) | **Feinschliff** |
+
+
+## Rollout-Journal 12.10.2026 — v2132–v2134: „mach es so das es funktioniert und passend bedient werden kann"
+
+Marcels Antwort auf die drei Entscheidungen, die ich ihm vorgelegt
+hatte. Also gebaut statt gefragt — aber jedes Mal **zuerst gemessen,
+was der Schalter schaltet.**
+
+| Was | Commit |
+|---|---|
+| `v2132`/`a` die Cockpit-Matrix klappt auf dem Handy auf | `5be70125`, `77fda9bb` |
+| `v2133`/`a` der Kartenstil „Zeile" wirkt | `77fda9bb`, `5c26d4be` |
+| `v2134` eine Touchfläche für alle vier Entwürfe | `577119b0` |
+| N60.39, N60.40, N60.41 geschlossen | `d4b791e8` |
+
+### N60.40 — der Fund, der den Knopf überflüssig gemacht hat
+
+Naheliegend war: dem Cockpit-Vollbild einen ordentlichen 44-px-Schalter
+geben. Zuerst habe ich gemessen, **was `toggleSidebar()` bewirkt** —
+Zustand davor und danach, Cockpit offen, zwei Breiten, sieben
+Eigenschaften:
+
+```
+   390 px                   vorher         nachher
+     body-Klasse            (ohne)         dp-dash-fullscreen
+     nav.tabs               0x0 none       0x0 none
+     aside#sidebar        359x758 flex   359x758 flex
+     header.hdr           386x93 block   386x93 block
+     .tabs-workflow-bar     0x0 none       0x0 none
+     Cockpit              386x9200       386x9200
+     .app-wrap Spalten     390px          390px
+
+  1440 px   alles identisch, Cockpit 1188x6019 vorher und nachher
+```
+
+> **Nicht eine Eigenschaft ändert sich.** Der Kommentar in
+> `dashboard.js:2079` behauptet das Gegenteil (*„per CSS dasselbe
+> erreicht — Tab-Bar/Workflow-Bar/Sidebar weg"*). Diese Regeln gibt es
+> nicht, und alles, was sie verstecken sollten, ist im Cockpit ohnehin
+> schon versteckt.
+
+Hätte ich den Knopf gebaut, hätte Marcel einen schönen 44-px-Schalter
+bekommen, der nichts tut. **Erst messen, was ein Schalter schaltet,
+dann den Schalter bauen.** `v2128` hatte den 2-Pixel-Stummel schon
+entfernt — das war die ganze Arbeit, und es ist keine Funktion
+verloren, weil es keine gab.
+
+### Der Befund, der fünf Durchgänge neu einordnet
+
+**Unter 641 px ist die Datenaufnahme keine Karte, sondern eine
+Schublade von unten** (`v619-boarding-mobile`, `style.css:33626`):
+`position:fixed`, `z-index:1100`, `transform:translateY(110%)`,
+geöffnet per `.dp-pf-mtrigger`.
+
+Gemessen bei 390 px, Schublade **zu**, in allen vier Stilen:
+
+```
+  .dp-pf-scroll   position fixed   z 1100   top 185-334
+  #oab-bar        top 875-890  bei 757 px Viewport
+  .main-col       scrollTop 0 -> 3000 bewegt #s0 um -2839 px
+                  und #oab-bar um 0 px
+```
+
+> **Ich habe in fünf Durchgängen die Handy-Breiten gemessen und dabei
+> immer die geschlossene Schublade vermessen.** Ein `transform` fällt
+> in `getBoundingClientRect` mit hinein — die Zahlen sehen plausibel
+> aus und zeigen auf einen Ort, den es auf dem Schirm nicht gibt.
+
+Ehrlich getrennt, was das für die Befunde heißt:
+
+| | |
+|---|---|
+| Breiten, Umbrüche, gekappte Beschriftungen, Knopfmaße | **gültig** |
+| Positionen, `elementsFromPoint`, Erreichbarkeit | **ungültig** |
+
+Daher kamen „Kachel verdeckt von nichts" und „Knopf nicht frei". Beide
+hatte ich als Werkzeugartefakt notiert — jetzt ist auch die **Ursache**
+bekannt, nicht nur die Wirkung.
+
+**Nachgeholt:** 4 Kartenstile × 3 Handys, per echtem Klick geöffnet.
+
+```
+  Auslöser trifft                12 von 12
+  Schublade offen                12 von 12
+  Auslöser 304-374 x 52, frei    12 von 12
+  Schließknopf 45x44, im Bild    12 von 12
+  Knopf verdeckt / außerhalb      0 / 0
+  Beschriftung gekappt            0
+  Inhalt außerhalb                0
+```
+
+### `v2132` — 45 % des Preise-Fensters sind eine Tabelle
+
+Gemessen, welcher Block die Länge macht (390 px, direkte Kinder):
+`.dp-feature-table-wrap` **1674 px von 3686** — darin `table.mx` mit
+1338 px.
+
+> **Eine Vergleichstabelle vergleicht nur, wenn man zwei Spalten
+> gleichzeitig sieht.** Auf dem Handy sieht man eine — und wischt für
+> die zweite so weit, dass die erste nicht mehr erinnert wird.
+
+Zugeklappt mit einem Knopf davor, der sagt was dahinter liegt:
+`aria-expanded`, wechselnde Beschriftung, 44 px, Textkontrast **10,54**.
+Gemessen bei 360 px: **4.609 px zu, 10.124 px auf** — also 54 % weniger,
+und beim zweiten Klick wieder exakt 4.609. **Preise, Pläne, Reihenfolge
+und Knöpfe sind unberührt.**
+
+**`v2132a`:** die Falte hing als fünfter Aufruf in einem `setTimeout`
+hinter vier anderen. Jetzt eigener Takt, eigenes `try/catch` — *eine
+angehängte Zeile läuft nicht, wenn ein Vorgänger stürzt.*
+
+### `v2133` — 44 Regeln ohne Setzer
+
+Eine Zeile in `karten-stil.js`, an die **ausdrückliche** Wahl gehängt
+(nicht an jeden Stil — sonst wäre der Fehler von `v1702d` zurück), und
+dasselbe im QuickBoarding-iframe.
+
+Abnahme 2 Stile × 10 Breiten: Marke gesetzt, **35 von 44 Regeln
+treffen**, KAPP 0 · RAUS 0 · ZUBREIT 0 · QUER 0, Kontrast überall
+≥ 4,5. Die Leiste wird **111 px flacher** (445 → 334 bei 390 px) —
+genau das, was der Entwurf verspricht.
+
+### Drei eigene Korrekturen
+
+**1 · „53 Regeln" war ein `grep -c` auf den String.** Gezählt sind es
+33 Regelblöcke mit 40 Selektoren in der Datei und 44 Regeln im
+laufenden Dokument. *Zählen ist keine Messung.*
+
+**2 · „rendert auf das Pixel genau wie die Vorgabe" war zu stark.**
+Schon vorher gab es Unterschiede (1280 px: 156 gegen 166) — sie kamen
+aus `dp-neue-karte-stil`, nicht aus den 44 Regeln.
+
+**3 · „Die Falte fehlt bei 430 px" war mein Messtakt.** `DPM.warte(200)`
+lieferte im Hintergrundfenster Proben bei 821 und 1800 ms. Die Falte
+kommt ~90 ms nach dem Rendern; das **Fenster** wartet auf
+`preiseAusKatalog()` und braucht 0,8 bis 4,9 s. Das ist `v1674` und
+Absicht: *„Lieber 200 ms warten als einen Preis zeigen, den die Kasse
+nicht kennt."*
+
+### `v2134` — eine Regel statt vier
+
+In der offenen Schublade war ein Maß übrig: der Kartei-Knopf **91×40**,
+vier Pixel zu flach. Vorgabe 50, Zeile 44 (`v2133a`), Buetten 50.
+
+> **Eine Regel je Entwurf ist eine Regel, die beim fünften Entwurf
+> fehlt.** Jetzt steht sie einmal und stilunabhängig: unter 901 px
+> mindestens 44 px, Spezifität (2,2,0) gegen die (1,3,1) der Kartei —
+> zwei IDs zählen mehr als drei Klassen.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Zeile bei 1440 px: 132 px hoch, Vorgabe 78 (nichts gekappt) | **Optik am Entwurf** |
+| `#bmfOverlay` Schließknopf 31×27 (nur Maus-Breiten) | **Feinschliff** |
+
+
+## Rollout-Journal 12.10.2026 — v2136–v2137b: die Gnadenfrist (Backlog N60.3)
+
+| Was | Commit |
+|---|---|
+| `v2136` Backend: Zugang sofort, Frist statt Riegel | `91b5179a` |
+| `v2136a` die Frist gilt auch für den API-Schlüssel | `91b5179a` |
+| `v2136b` **Migration 086** — Stempel für Altkonten | `ac567381` |
+| `v2137` Frontend: direkt rein, Band mit Restzeit | `099a2287` |
+| `v2137a` das Band nimmt Platz, statt zu schweben | `a0754705` |
+| `v2137b` die Bandhöhe wurde vor dem Text gemessen | `23c22cc2` |
+
+Marcels Vorgabe stand seit dem 08.10. im Backlog; die Vormessung
+(`v2094`) hatte die Grundlage geschaffen. Gebaut wurde Weg **(a)**:
+`is_active=true` ab der Anmeldung, die **Frist** trägt, was vorher der
+Riegel trug.
+
+### Der Befund, ohne den es nicht gegangen wäre
+
+Der Bestätigungsweg setzte `is_active = TRUE` — und `email_verified_at`
+blieb **NULL**. Gegen die Staging-Datenbank gemessen: **4 Nutzer, 4
+aktiv, 0 mit Stempel.**
+
+> **Eine Spalte, die eine Unterscheidung tragen soll, muss auch
+> geschrieben werden.** `v2094` hat sie gelesen und niemand gefüllt.
+
+**Keine Schema-Migration nötig:** `is_active`, `email_verified_at` und
+`created_at` gibt es alle. Die Frist ist `created_at + N Stunden`.
+
+### ⚠ Der Fehler, und er war groß
+
+**`v2136` hat auf Staging alle vier Konten ausgesperrt** — beide von
+Marcel und das Admin-Konto. Frist seit Monaten abgelaufen, also 403
+`VERIFY_EXPIRED` an jeder Anfrage.
+
+Das Bittere: ich hatte den Altbestand **selbst gemessen** und die Zahl
+in die Commit-Botschaft geschrieben. Ich habe sie als Begründung für
+den Fix gelesen und nicht als Warnung für die Vergangenheit.
+
+> **Wer eine Spalte zur Bedingung macht, muss ihren Altbestand
+> mitbringen.** Das Ergebnis war kein Schönheitsfehler, sondern eine
+> Aussperrung.
+
+**Gefunden hat es die Abnahme im Browser, nicht der Prüfer.** Das Band
+zeigte bei einer Frist 4 h 12 min **in der Zukunft** „abgelaufen". Mein
+erster Gedanke war ein Fehler im Band — der Server hatte recht und
+schickte für den angemeldeten Altnutzer einen Ablauf in der
+Vergangenheit.
+
+Behoben in **Migration 086**: `email_verified_at = created_at` für alle
+schon aktiven ohne Stempel, mit der Grenze `created_at < NOW()` (wird
+beim Lauf ausgewertet — ohne sie würde die Migration jeden künftigen
+Nutzer stempeln und die Frist dauerhaft abschalten). Vorher gesichert:
+`/root/backups/vor-086-20261012-0902.sql.gz`, 48 MB, Anfang angesehen.
+
+**⚠ Diese Migration gehört zwingend zu `v2136`.** Vor einem
+Prod-Rollout muss sie mit.
+
+### Wo die Frist greift
+
+An **jeder** Anfrage (`middleware/auth.js`), beim **Login**
+(`userService`) und im **API-Schlüssel**-Pfad (`v2136a`).
+
+> Eine Frist, die nur beim Anmelden geprüft wird, läuft für eine offene
+> Sitzung **nie** ab — der Token gilt sieben Tage. Und ein Zugang, der
+> die Frist nicht kennt, hebt sie auf: wer sich in den sechs Stunden
+> einen API-Schlüssel anlegt, hätte danach unbegrenzt weitergearbeitet.
+
+`v2136a` hat **mein eigener Prüfer** gefunden, und zwar als Rest: er
+suchte den englischen Satz „User account is disabled" und fand ihn nach
+dem Umbau noch einmal — im API-Key-Pfad. Es gibt zwei Wege in die App,
+und ich hatte einen angefasst.
+
+### Das Band
+
+Die Frist wird **nicht im Browser gerechnet**. Der Ablaufzeitpunkt kommt
+vom Server — aus der Antwort der Anmeldung oder aus der Kopfzeile
+`X-DP-Verify-Deadline`, die `v2136` an jede Anfrage hängt.
+
+Der Aufsatz sitzt auf `window.fetch`, nicht auf `Auth.apiCall`: so kommt
+die Kopfzeile unabhängig davon an, welcher Aufrufer sie ausgelöst hat.
+
+**Zwei eigene Fehler in der Abnahme:**
+
+`v2137a` — das Band lag bei 360 px über **drei**, bei 390 px über
+**zwei** Bedienknöpfen. Ein `position:fixed`-Element am unteren Rand
+verdeckt, was dort steht. **Dieselbe Falle wie beim Werkzeugpanel** —
+und ich habe sie gebaut, obwohl sie in meinen Notizen steht. Jetzt
+bekommt der Inhalt unten Platz, aus der **gemessenen** Bandhöhe.
+
+`v2137b` — die Höhe wurde gemessen, **bevor** der Text im Band stand:
+139 statt 195 px. *Die Höhe eines Elements, dessen Inhalt man gerade
+schreibt, misst man nach dem Schreiben.*
+
+### Nachweis
+
+Am lebenden Staging, mit echten Konten (danach gelöscht):
+
+```
+  Anmeldung                 201, Token, verifyDeadline +6 h
+  Zugang sofort             GET /objects -> 200
+  Kopfzeile                 x-dp-verify-deadline kommt mit
+  created_at -7 h           derselbe Token -> 403 VERIFY_EXPIRED
+  Login nach Ablauf         403 VERIFY_EXPIRED
+  resend unbekannt/bestätigt 200, neutraler Satz
+  Bestätigungslink          302, danach email_verified_at gesetzt
+  Altkonto nach 086         Stempel da, nicht ausgesperrt
+  Aufräumen                 4 Nutzer, 4 gestempelt, 0 Testreste
+```
+
+Band, vier Breiten, nach `v2137b`:
+
+```
+   360 px   Band 195 px   Variable 195   Polster 60 -> 215   verdeckt 0 von 26
+   390 px   Band 176 px   Variable 176   Polster 60 -> 196   verdeckt 0 von 26
+   768 px   Band 177 px   Variable 178   Polster 80 -> 198   verdeckt 0 von 27
+  1180 px   Band  83 px   Variable  83   Polster 80 -> 103   verdeckt 0 von 34
+```
+
+Restzeit „4 Std. 12 Min." auf allen vier, Knöpfe 44 px und erreichbar,
+Textkontrast **16,18**, abgelaufen rot `rgb(184,98,92)`.
+
+Prüfer `tools/anmeldung-auskunft-pruefen.mjs`: **27 → 48 Punkte**,
+RC = 0, alles echte Aufrufe.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Weg (a) heißt: ein unbestätigter Zugang **ist** ein Zugang | **benannt, Marcels Vorgabe** |
+| Migration 086 muss beim Prod-Rollout mit | **Pflicht** |
+
+
+## Rollout-Journal 12.10.2026 — v2138: der kleine Zwang
+
+| Was | Commit |
+|---|---|
+| `v2138` `requireVerified()` an den sechs Verbrauchsrouten | `cc3bf354` |
+| `v2138` die Mail nennt die Frist (6 h) und erklärt die 24 h | `cc3bf354` |
+| `v2138` Kerosin-Rest in der Bordkarte (N60.24) | `cc3bf354` |
+
+**Marcels Vorschlag, wörtlich:** *„vlt Marktbewertung und abruf von
+dealpilot sachen erfordern dann die anmeldung und bestätigung? quasi ein
+kleiner zwang?"* — und damit genau die Antwort auf den Preis, den ich
+bei `v2136` selbst benannt hatte: ein unbestätigter Zugang **ist** ein
+Zugang.
+
+> **Ein Zwang, der am Teuren hängt, braucht keinen Riegel am Eingang.**
+> Sehen darf jeder sofort. Abrufen, was Kontingent verbraucht, erst
+> nach der Bestätigung.
+
+Die Sperre sitzt in der **Mittelschicht**, nicht im Verbrauchspfad —
+eine Prüfung hinter dem Abruf wäre ein Abruf, den niemand bezahlt.
+Eingehängt an `avm/quote|sprengnetter|pricehubble` und
+`marktbericht/reports/generate|generate-stream|from-dealpilot`.
+
+### Die Mail nannte nur eine der beiden Zahlen
+
+Sie sagte „Der Link ist 24 Stunden gültig" — von den **sechs** Stunden,
+nach denen `v2136` sperrt, stand kein Wort drin. Die App zeigte 6, die
+Mail 24.
+
+> Zwei Zahlen vor demselben Kunden, und keine erklärt die andere. Der
+> Widerspruch ist nur scheinbar — aber das muss **dastehen**, sonst
+> rechnet der Kunde selbst und rechnet falsch.
+
+Die 6 kommt aus `config.auth.verifyGnadenfristStunden`, damit Mail und
+Sperre nie auseinanderlaufen.
+
+### Nachweis
+
+Am lebenden Staging, frisches unbestätigtes Konto (danach gelöscht):
+
+```
+  GET  /objects                        200   sehen darf er
+  POST /avm/quote                      403   EMAIL_NOT_VERIFIED_GATE
+  POST /avm/sprengnetter               403   EMAIL_NOT_VERIFIED_GATE
+  POST /avm/pricehubble                403   EMAIL_NOT_VERIFIED_GATE
+  POST /marktbericht/reports/generate  403   EMAIL_NOT_VERIFIED_GATE
+  Bestätigungslink                     302
+  POST /avm/quote danach               400   Eingabefehler = Sperre offen
+```
+
+Mailtext aus dem **laufenden Image** gerendert: 6 Stunden genannt, 24-h-
+Link erklärt, „du kommst also auch später wieder rein", kein „Kerosin"
+in Text und HTML, `KONTINGENT ✓` in der Bordkarte.
+
+Prüfer: **48 → 68 Punkte**, RC = 0.
+
+### ⚠ Vier Punkte des Prüfers waren falsch GRÜN
+
+`middleware/auth.js` holt `query` beim **Laden**
+(`const { query } = require(...)`) und hält damit die Funktion als
+Referenz. Mein Ersatz hing danach im `require`-Cache.
+
+> **Ein Ersatz, der nach dem `require` kommt, wird nicht nur ignoriert —
+> er lässt die vorige Probe weiterantworten.** Die Weiche aus Abschnitt 7
+> lieferte noch die Zeile des letzten Tests (bestätigt), also ging
+> alles durch. Falsches Grün ist schlimmer als ein Absturz.
+
+Behoben, indem Abschnitt 9 dieselbe Weiche benutzt (`mwZeile`).
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Migration 086 muss beim Prod-Rollout mit `v2136` mit | **Pflicht** |
+| N60.3 damit vollständig abgeschlossen | — |
+
+## Rollout-Journal 12.10.2026 — v2139/v2139a: Regeln ohne Daten (N60.4 Teil 2)
+
+| Was | Commit |
+|---|---|
+| `v2139` neun Feldgruppen kommen im Prompt an | `24f79752` |
+| `v2139a` Typfalle am `Object.keys()`-Leser | `24f79752` |
+| `tools/prompt-lecks-pruefen.mjs` — 32 Felder, RC 0 | `24f79752` |
+
+**Erst nachgemessen: fünf der sieben offenen Punkte waren längst
+erledigt** (Produktwissen in `projektwissen.js`, Mietvertragsfelder,
+Fotos, Portfolio-Substanzfelder `v2014`, die sieben Blöcke `v2011`).
+Offen waren zwei: kein RAG (→ N60.7) und das Investmentprofil.
+
+### Der Befund
+
+Die sieben Blöcke aus `v2011` waren gebaut — aber **nicht vollständig
+gefüllt.** Neun Feldgruppen verließen den Browser und wurden nie in
+Text umgesetzt. Und der schlimmste Fall war kein stummes Feld:
+
+> Der Prompt trägt einen **16-zeiligen Regelblock** „MIETVERTRAEGE JE
+> EINHEIT", der dem Modell `vertragsart`, `naechste_anpassung`,
+> `letzte_erhoehung` und `befristet_bis` erklärt. **Die Werte standen
+> nirgends.** Seine Bedingung prüft `e.vertragsart` — er erschien also
+> genau dann, wenn die Daten vorlagen.
+
+Ein stummes Feld lässt das Modell im Unklaren; eine Regel ohne Daten
+lässt es **glauben**, es habe sie. Und `e.art` (`wohnen|gewerbe`) sieht
+im Code aus wie eine Vertragsart.
+
+Drei Schließungen sind mehr als eine Zeile:
+
+- **Sanierung** — Aufgabe 8 soll die Steuerwirkung beurteilen und wusste
+  nichts von 40.000 € Sanierung und ihrer Verteilung.
+- **Zwei Restnutzungsdauern** — eingetragen (`steuer.afa_rnd_jahre`)
+  gegen gerechnet (Bauteile, Anlage 2). Ab 3 Jahren Abweichung steht
+  jetzt der Auftrag im Prompt, **beide** mit Herkunft zu nennen.
+- **`ankauf.kennzahlen_damals`** lag genau dann vor, wenn der Prompt
+  „sage das, statt zu schaetzen" sagte.
+
+Dazu ein **Flächenabgleich**: summieren sich die Einheiten anders auf
+als die eingetragene Wohnfläche (ab 1 m²), ist das ein Befund.
+
+### `v2139a` — ein String zerfiel in Buchstaben
+
+`einheiten.modernisierung` wurde mit `Object.keys()` gelesen. Das nimmt
+auch einen String: `Object.keys('Dach neu')` → `0`…`7`, `length` 8, und
+im Prompt stünde `0=D, 1=a, 2=c, …`.
+
+> **Eine Prüfung auf `length` fragt, ob etwas DA ist, nicht ob es die
+> richtige GESTALT hat.** Im Ergebnis sieht das wie ein Modellfehler aus.
+
+### Der Prüfer ist der wichtigere Teil
+
+`tools/prompt-lecks-pruefen.mjs` ruft die **echte** `buildPrompt()` mit
+einem Auftrag, in dem jedes Feld einen unverwechselbaren Wert trägt, und
+sucht jeden im **Text** — nicht per `grep` auf den Quelltext, denn ein
+gelesenes Feld kann ungedruckt bleiben.
+
+```
+  32 Felder je mit Quellzeile   32 gruen
+   4 Gegenproben                Feld weg -> Wert muss verschwinden, 0 blind
+   2 Typproben                  String/Array zerfallen nicht
+   4 Regelbloecke               Regel genannt -> Wert vorhanden?
+```
+
+RC = 0 lokal, auf dem Staging-Host **und im gebauten Image** (18/18 per
+`docker exec`). Der Host-Lauf beweist die Datei, nicht das Image.
+
+`dotenv` fehlt lokal. Ersetzt wird **nur** das — per Haken auf
+`Module._load`, nicht `config` selbst: ein nachgebautes `config` wäre
+eine Nachbildung, und ein Prüfer gegen eine Nachbildung misst seine
+eigene Annahme. `require.resolve('dotenv')` geht nicht, was nicht
+installiert ist, lässt sich nicht auflösen.
+
+### ⚠ ZURÜCKGENOMMEN: zwei gemeldete Lecks waren meine
+
+Der erste Lauf meldete vier rote Felder, **zwei gab es nicht:**
+`halter.halter` heißt `halter.name`, und ein Feld `wohnung.stellplatz`
+existiert nicht (es sind `garagen` und `stellplaetze_aussen`). Beide
+werden gelesen.
+
+> **Ein Prüfer, der einen Feldnamen erfindet, meldet ein Leck, das es
+> nicht gibt — und schickt den nächsten Leser in die falsche Datei.**
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Investmentprofil erreicht keinen Prompt | **nächstes Paket** |
+| `settings.js:579` verspricht genau das wörtlich | **Versprechen ohne Code** |
+| vier `ai_*`-Schlüssel schreiben in Ids, die es nicht gibt | gemessen |
+| kein RAG | N60.7 |
+
+## Rollout-Journal 12.10.2026 — v2140/v2140b: das Investmentprofil (N60.4 Punkt 6)
+
+| Was | Commit |
+|---|---|
+| `v2140` sieben von 23 Schlüsseln erreichen den Prompt | `bd1e8831` |
+| `v2140a` Frontend-Konstanten nachgezogen | `20bd4025` |
+| `v2140b` eine Vorgabe ist keine Entscheidung | `b22aded3` |
+
+Gemessen: 23 Schlüssel im `localStorage`, ein gepflegtes
+Einstellungsformular — und **kein Prompt sah sie.** Aufgabe 5
+(„Investor-Fit — für wen ist der Deal geeignet?") nannte drei
+Archetypen und **keine Eingabe.**
+
+**Und `settings.js:579` bietet dem Nutzer wörtlich diese Vorlage an:**
+*„Bewerte meine Kaufentscheidung anhand meines persönlichen
+Investmentprofils (Mindest-DSCR, Max-LTV, Mindest-Cashflow)."*
+
+> Die **Anweisung** reist seit `v2009` mit, die **Daten** nicht. Das ist
+> dieselbe Falle wie bei den Mietverträgen in `v2139` — eine Regel ohne
+> Daten. Nur löst sie hier der Nutzer selbst aus, und er bekommt eine
+> Antwort, die seine Schwellen nie gesehen hat. Sie sieht genauso aus
+> wie eine, die sie kennt.
+
+### Die Vorrangregel
+
+Sieben Schlüssel reisen mit (3 Schwellen + 4 Haltungen), **16 nicht**:
+die sind Vorbelegungen für Formularfelder und stehen im Auftrag schon
+als Objektwert.
+
+> **Was im Objekt steht, gilt. Das Profil liefert nur, was im Objekt
+> NICHT steht.** Beide zu senden wäre eine stille Doppelung — zwei
+> Grenzsteuersätze für dieselbe Größe.
+
+### Der SCORE darf das Profil nie sehen
+
+Ohne diese Ordnung stünden zwei Schwellen zur selben Größe im Prompt:
+die DealPilot-Skala („solide ab DSCR 1,2") und die persönliche. Das
+Modell wählt dann eine, ohne zu sagen welche.
+
+> Dieselbe Wohnung hat für jeden Nutzer denselben Score; eine
+> Einstellung, die ihn verschiebt, macht zwei Nutzer unvergleichbar.
+> **Dieselbe Regel wie für die Rechenkerne: ein Kern liest NIE
+> Einstellungen.** Die *Analyse* darf es.
+
+### ⚠ `v2140b` — der Fehler in `v2140`, gefunden im Browser
+
+`get()` gibt den **Vorgabewert**, wenn der Nutzer nichts gesetzt hat.
+Am laufenden Staging: **ein** Schlüssel im Speicher, **sieben** Werte
+aus `get()`. Der Block hieß „Einstellungen des Nutzers".
+
+> **Eine Vorgabe als persönliche Einstellung auszugeben, behauptet eine
+> Entscheidung.**
+
+Und der Satz „Fehlt eine Schwelle hier, hat der Nutzer sie nicht
+gesetzt" konnte **nie** greifen. *Eine Regel, deren Bedingung nicht
+eintreten kann, ist keine Regel.*
+
+Jetzt trägt jede Zeile „(selbst gesetzt)" oder „(Vorgabe, nicht
+gesetzt)", und ist nichts gesetzt, sagt der Prompt es und nennt den Weg.
+
+**Der Prüfer konnte das nicht finden** — er kennt nur den Auftrag, den
+ich ihm gebe, und ich hatte ihm belegte Werte gegeben. Wie bei `v2136`.
+
+### Zwei eigene Prüfer-Fehler dabei
+
+1. Die Probe suchte `(selbst gesetzt)` im **ganzen** Prompt und fand
+   die **Erklärung** des Blocks statt einer Datenzeile. Vierter Fall
+   dieser Falle.
+2. Beim Einbau per `node -e` in bash sind die **Backslashes des Regex
+   verschwunden** — aus `\(` wurde eine Gruppe, und `[^"](selbst
+   gesetzt)` traf die Erklärung. Behoben mit dem Edit-Werkzeug und
+   nachgelesen.
+
+### Nachweis
+
+```
+  Pruefer                 32 -> 47 Punkte, RC 0
+                          lokal, Staging-Host UND gebautes Image
+  Browser, Lage A         8 Felder, selbst gesetzt []
+  Browser, Lage B         min_dscr 1.42, selbst gesetzt [min_dscr, strategie]
+                          max_ltv 90 bleibt Vorgabe
+  localStorage            zurueckgedreht, unveraendert
+```
+
+### Nebenbei gemessen und wichtig
+
+**Die Zeilenenden sind je Datei verschieden.** `frontend/js/ui.js` und
+`storage.js` sind **LF**; `settings.js`, `calc.js`, `dashboard.js`,
+`investment-profile.js` und das ganze Backend sind **CRLF**. Ein
+pauschales „Frontend ist CRLF" ließ beim ersten Anlauf jeden Anker
+still ins Leere greifen (`0x, erwartet 1`), und danach schmuggelte der
+Einbau 46 CRLF-Zeilen in eine LF-Datei.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.4 damit abgeschlossen, bis auf RAG (→ N60.7) | — |
+| `syncAiParamsToTab()` schreibt in vier Ids, die es nicht gibt | gemessen, ändert heute nichts |
+
+## Rollout-Journal 12.10.2026 — v2141/v2142: der Barkauf und die zweite Prozesskarte
+
+| Was | Commit |
+|---|---|
+| `v2141` Barkauf: LTV und DSCR entfallen aus der Gewichtung | `ed8be81f` |
+| `v2142` Prozesskarte Detail — Netzplan, Steuerjahr, Score-Aufbau | `2e3a9469` |
+| `v2142a` Kontrast der Stand-Zeile, beide Karten | `606b5e0c` |
+
+### Marcels Frage 44 → 80 hat eine Antwort
+
+Er hatte gefragt: *„Die Bewertung war erst schlecht mit 44 und danach
+auf einmal über 80. Warum?"* (N60.5, dritter Punkt, seit 10.10. offen).
+
+Am echten Kern nachgerechnet, Sachsenstr. 18, kp 180.000, nkm 940 —
+**dasselbe Objekt, dieselben Eingaben, EINE Annahme Unterschied:**
+
+| EK-Quote | Darlehen **angenommen** | als **Barkauf** | Sprung |
+|---|---:|---:|---|
+| 0 % | **31** KRITISCH | 72 GUT | +41 |
+| 10 % | **44** SCHWACH | 72 GUT | +28 |
+| 20 % | 58 SOLIDE | 72 GUT | +14 |
+
+**Die 44 ist exakt getroffen.** Die Ursache ist `agentWerkzeuge.js:2029`
+(`darlehenAbgeleitet`): solange kein Score gespeichert ist, wird ein
+Darlehen abgeleitet; danach gilt der gespeicherte, und am Objekt steht
+keins. Es ist kein Modellfehler und kein Kernfehler.
+
+> **Die `herkunft` des Bot-Scores nannte die falsche Ursache** — „weil
+> er mehr Felder kennt". Eine Herkunftsangabe, die auf die falsche
+> Ursache zeigt, ist schlimmer als keine: sie beendet die Suche.
+
+### Der Befund dahinter, und Marcels Entscheidung
+
+`_scoreLtv(0)` und `_scoreRisiko(0)` gaben je **50** — der Rückfall für
+„keine Angabe". Bei einem Barkauf ist das keine fehlende Angabe,
+sondern eine Aussage. An fünf Barkauf-Objekten mit gleichem Kaufpreis
+und nur verschiedener Miete gemessen:
+
+```
+  30 % Cashflow  immer 100 (ohne Kapitaldienst ist der Cashflow fast
+                 die ganze Nettomiete; die Skala endet bei +200 EUR)
+  15 % LTV       Platzhalter 50
+  15 % DSCR      Platzhalter 50
+```
+
+**60 % des Scores standen fest, bevor das Objekt angesehen war.**
+Deshalb hieß eine Wohnung mit 0,90 % Nettorendite „SOLIDE".
+
+Drei Varianten vorgelegt, **Marcel wählte „weglassen und umgewichten"**:
+Spanne 41 statt 29 Punkte, vier statt drei Stufen. Und sein Zusatz:
+*„das mit dem score muss aber auch beim quickcheck passen und auch beim
+investor deal score. also in der gesamten app."*
+
+### Gebaut
+
+`darlehen` kommt als **Parameter** — ein Kern liest nie Einstellungen,
+er bekommt eine Tatsache. Fehlt er, rechnet alles wie bisher.
+
+**Die Rangfolge der Feldnamen:** `darlehen` > `d_total` > `d1+d2`.
+Nötig, weil mehrere Aufrufer `State.kpis` **direkt** durchgeben, und
+dort heißt die Summe `d_total`. Wer nur einen Namen liest, greift bei
+genau diesen Aufrufern lautlos ins Leere.
+
+Angefasst: `dealscore.js` (Kern, gespiegelt), `quick-check.js`,
+`quick-check-tab.js`, `voice-import.js`, `agentWerkzeuge.js`.
+
+**Nicht angefasst: `storage.js:1748`** — ein Notnagel für Altobjekte mit
+erfundenen Annahmen (`ltv ?? 80`, `dscr ?? 1.2`). Dort aus `ltv === 0`
+auf einen Barkauf zu schließen wäre genau die Verwechslung von
+Abwesenheit und Messung, die dieses Paket behebt.
+
+### Nachweis
+
+```
+  ohne Parameter          72  unveraendert
+  darlehen = 0            82  LTV/DSCR weight 0, score null, mit Grund
+  finanziert              58  MIT und OHNE Parameter gleich
+  Rangfolge               6 Lagen, alle richtig
+  im gebauten Image       alle drei Sollwerte getroffen
+```
+
+Neuer Prüfer `tools/barkauf-score-pruefen.mjs`, RC=0. Dazu
+`score-ketten-pruefen` (115 Punkte) und `rechenkerne-spiegeln --pruefen`.
+
+**Die Probe, die zählt, ist die Gegenprobe:** ein finanziertes Objekt
+bleibt bei 58. Eine Umgewichtung, die alte Scores verschiebt, wäre ein
+stiller Umbau jedes gespeicherten Urteils.
+
+### Nebenbefund: `quick-check-tab.js` läuft nie
+
+In **keiner** HTML eingebunden (gemessen: 0 Treffer in `index.html` und
+`quickcheck-app.html`). `ui.js:445` nennt den Grund: „qcUpdate() lebte
+nur in quick-check-tab.js (entfernt). QC rechnet im iframe." Die
+Änderung bleibt drin, damit die Datei bei einer Wiederbelebung nicht mit
+altem Stand aufwacht — der Kopf sagt das jetzt ausdrücklich.
+
+### ⚠ Offen und Marcel vorgelegt: der Investor Deal Score
+
+Dort ist es **umgekehrt und schlimmer** — die 0 bestraft den Barkauf,
+statt ihn zu schönen:
+
+| Finanzierungs-Kategorie | DSCR | LTV | Kategorie |
+|---|---|---|---|
+| finanziert (1,18 / 88) | 76 Pkt (Gew. 35) | 100 (Gew. 30) | **85** |
+| Barkauf (0 / 0) | **0 Pkt** | 85 | **49** |
+| unbekannt (null / null) | nicht angewandt | nicht angewandt | 60 |
+
+Der Mechanismus für „nicht anwendbar" ist in DS2 **schon da**
+(`applied: false`, `_aggregate` nimmt die Kennzahl aus der Gewichtung) —
+er greift nur bei `null`, und ein Barkauf liefert `0`.
+
+**Daran hängt eine zweite Frage, die eine Bewertungsentscheidung ist:**
+die EK-Quote-Skala ist auf **Hebelwirkung** kalibriert
+(`[[10,100],[20,80],[30,60],[40,30]]`) — ein Barkauf hat 100 % EK und
+bekommt **30 Punkte**. Lässt man DSCR und LTV weg, bleibt diese
+Bestrafung allein übrig und die Kategorie fällt auf **30**. Deshalb
+nicht gebaut, sondern vorgelegt.
+
+### `v2142` · Die zweite Prozesskarte
+
+Marcel: *„kann man diese prozesskarte auch noch weiter ausführen mit
+netzplan? … und auch steuer etc. jährliche IST eintragungen. kannst du
+auch noch darstellen wie die score sich zusammensetzen und wie sie dann
+individualisiert werden können."*
+
+`design/Messe/prozesskarte-detail.html`, drei Tafeln:
+
+- **A · Netzplan Boarding** — drei Stufen (6 / 13 / bis 20
+  Pflichtfelder) mit den sieben Etappen, die etwas freischalten. E7 und
+  E8 gestrichelt, weil sie `extra: true` tragen.
+- **B · Das Steuerjahr** — Ankaufstand, Steuerzeitraum, Werbungskosten
+  als IST-Eintragung, Anlage V, und der Kreislauf.
+- **C · Die Scores** — beide mit Balken in der **Breite ihres Gewichts**,
+  die Unterkennzahlen von DS2, die Stufenleiter, und eine Tabelle „wo
+  man dreht" (Vorlagen, eigene Gewichte, Lageklassen, Schwellen).
+
+**Warum ein zweites Blatt:** die Hauptkarte beantwortet „was kann ich
+tun und was kommt heraus" — A3, aus zwei Metern lesbar. Ein Netzplan
+beantwortet „in welcher Reihenfolge, und was hängt an was". Beides auf
+ein Blatt zu zwingen kostet genau die Lesbarkeit, für die die erste
+Karte gebaut wurde.
+
+**Eine Quelle für die Gestaltung:** der erste `<style>`-Block ist nicht
+abgeschrieben, sondern **der der Hauptkarte** — und der Prüfer
+vergleicht beide wörtlich.
+
+**Kein zweiter Prüfer:** `tools/prozesskarte-pruefen.mjs` prüft jetzt
+beide Karten, und zusätzlich, dass die **Balkenbreiten die Gewichte
+sind**. Eine Grafik, die anders zeigt als sie sagt, ist schlimmer als
+keine. RC=0.
+
+### ⚠ Vier eigene Fehler in diesem Paket
+
+1. **Im Kommentar des Prüfers** habe ich die Zeichenfolge wörtlich
+   hingeschrieben, die einen Blockkommentar beendet — und damit beim
+   **Erklären** genau die Falle gebaut, die der Satz beschreibt.
+2. **Der CSS-Vergleich suchte auf dem rohen Text** und fand das
+   style-Tag im Fließtext meines eigenen Kopfkommentars. Fünfter Fall
+   derselben Falle.
+3. **Dasselbe in der Tag-Bilanz** (4 Öffnungen statt 2).
+4. **Drei Kontrastfehler gemeldet, die es nicht gab:** `.bahn-nr` steht
+   auf einem Gold-**Verlauf**, und `backgroundColor` ist bei einem
+   Gradient transparent — mein Messer stieg auf den dunklen Grund
+   dahinter auf und rechnete Kontrast 1,00. Mit einem Messer, das
+   `background-image` mitliest, sind es **12,96**.
+
+> **Ein Messgerät, das einen Verlauf nicht kennt, meldet die stärkste
+> Stelle der Seite als die schwächste.**
+
+Echt war **ein** Fehler: `.stand` mit 3,53 auf Obsidian, seit `v2088`,
+auf beiden Karten. Behoben mit `--grau` (5,39) in der Hauptkarte, die
+Detailkarte nachgezogen.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Investor Deal Score beim Barkauf | **Marcel vorgelegt, Zahlen stehen** |
+| Cashflow-Skala beim Barkauf (immer 100) | eigener Punkt, braucht eine Zahl von Marcel |
+| Lageklassen an den Score koppeln | gemessen, Zahlen stehen, nicht gebaut |
+
+## Rollout-Journal 12.10.2026 — v2143: die Lageklasse misst die Ampel
+
+| Was | Commit |
+|---|---|
+| `v2143` Bruttomietrendite misst am Ziel der Lageklasse | `b3b50996` |
+| `v2143a` die Knickpunkte liegen nicht auf den Ampelschwellen | `b3b50996` |
+
+Marcel: *„kann man das nicht an den Lage Klassen koppeln? … da muss aber
+dann ein riegel rein falls die A,B oder C-Lage nicht eingegeben wurde
+muss ein default wert angenommen werden. nur berücksichtigen."*
+
+### Wo sie wirkt — und wo ausdrücklich nicht
+
+Auf die **Ampel** und die Einschätzung. **Nicht auf den Score.**
+
+> Der Score sieht die persönlichen Einstellungen nie. Dieselbe Wohnung
+> hat für jeden Nutzer denselben Score; eine Einstellung, die ihn
+> verschiebt, macht zwei Nutzer unvergleichbar und jedes gespeicherte
+> Urteil rückwirkend ungültig. Das steht seit `v2140` fest.
+
+**Marcels „nur berücksichtigen" ist genau dieser Weg.** Nachgewiesen:
+Score mit A-Lage, C-Lage und ohne — alle 77.
+
+### Brutto oder netto? Gerechnet, nicht gemeint
+
+Seine Rückfrage: *„man könnte ja auch die Bruttomietrendite der lage
+klassen auf die nettomietrendite runterrechnen oder? was ist besser?"*
+
+**Die beiden Renditen haben verschiedene Nenner** (`deal-kpis.js:185-187`):
+
+```
+  bmy = nkm_j / kp                  <- Kaufpreis
+  nmy = (nkm_j - bwk_nul) / gi      <- Gesamtinvestition, nach BWK
+```
+
+Das Verhältnis `nmy/bmy` schwankt deshalb zwischen **0,520** (MFH mit
+Verwaltung und Instandhaltung) und **0,905** (ohne BWK-Angabe) — um
+74 %. **Eine Umrechnungszahl gibt es nicht.**
+
+| Fall | brutto | netto | Faktor |
+|---|---|---|---|
+| ETW, niedriges Hausgeld, BY | 6,27 % | 4,98 % | 0,795 |
+| ETW, normales Hausgeld, NRW | 6,27 % | 4,46 % | 0,712 |
+| MFH mit Verwaltung + IH | 6,27 % | 3,26 % | **0,520** |
+| **ohne BWK-Angabe** | 6,27 % | 5,67 % | **0,905** |
+
+> **Rechnet man objektgenau um, geben beide Wege dieselbe Note** — beide
+> Seiten werden mit demselben Faktor multipliziert, das Verhältnis
+> erreicht/Ziel bleibt gleich. **Rechnet man pauschal um** (etwa ×0,80),
+> verschiebt sich die Note um **bis zu 57 Punkte**, systematisch gegen
+> Objekte mit hoher Bewirtschaftung: das MFH fiele von 95 auf 38.
+
+**Also brutto**, aus drei Gründen:
+
+1. Es ist die Zahl, die der Nutzer **selbst eingegeben** hat. Kein
+   Erklärungsbedarf, warum sein 5,0-%-Ziel plötzlich 3,56 % heißt — und
+   diese Zahl wäre je Objekt eine andere.
+2. Sie lässt sich **nicht durch eine fehlende Angabe schönen**: ohne
+   BWK-Eintrag sieht die Nettorendite besser aus (0,905 statt 0,712).
+3. Die Bewirtschaftung steckt im Score schon im **Cashflow (30 %)** und
+   in der eigenen BWK-Ampel. Hier noch einmal wäre Doppelgewichtung.
+
+### Der Riegel
+
+Fehlt die Klasse oder ihr Ziel, gilt die **bisherige feste Skala**
+(3 % = 0 Pkt, 7 % = 100 Pkt) — nicht etwa eine erfundene Klasse.
+
+> `zielKaufpreis()` nimmt an derselben Stelle `ZIEL_BMR_RUECKFALL = 6`.
+> Das ist **dort** richtig, weil ohne Zahl kein Zielpreis entstehen
+> KANN. Hier gibt es eine Alternative — und eine vorhandene Skala
+> schlägt einen Rückfallwert.
+
+Geprüft in vier Lagen: kein Ziel, `null`, `0`, unsinniger Text.
+
+### ⚠ `v2143a` · Ein Tausendstel entschied die Farbe
+
+Der erste Entwurf begann bei 60 % des Ziels und traf bei **genau 80 %**
+die Güte **0,3994** — die Gelb-Schwelle liegt bei **0,40**.
+
+> **Eine Grenze, die auf einer anderen Grenze liegt, entscheidet per
+> Rundung.** Gefunden hat es der eigene Prüfer, nicht der Zufall.
+
+Jetzt beginnt die Skala bei 50 %:
+
+```
+  unter 75 % des Ziels   rot
+  75 bis 97 %            gelb
+  ab 97 %                gruen    (Ziel erreicht = Guete 0,80)
+  ab 130 %               volle Punktzahl
+```
+
+Und fachlich besser: wer 60 % seiner Zielrendite erreicht, hat kein
+wertloses Objekt.
+
+### Nachweis, am lebenden Staging mit echten Objekten
+
+```
+  Westerfeldstr (B-Lage)   7,23 %  gruen  Ziel 5,0 % — 145 % erreicht
+  Am Markt (C-Lage)        5,53 %  gelb   Ziel 7,0 % —  79 % erreicht
+  Sachsenstr (ohne Lage)   keine Ampel, Pflichtangaben fehlen
+  Score in drei Lagen      77 / 77 / 77
+```
+
+**Dieselbe App urteilt in der C-Lage strenger** — genau das war der
+Auftrag. Der Bot holt das Ziel serverseitig aus
+`user_settings.lage_profil` und gibt es als **Parameter** weiter: ein
+Kern liest nie Einstellungen.
+
+Prüfer `tools/lageklasse-ampel-pruefen.mjs`, RC=0 — Riegel in 4 Lagen,
+dieselbe Wohnung in 3 Lagen, Ziel-erreicht-ist-grün, 6 andere
+Kennzahlen unberührt, Score in 3 Lagen gleich, Ampelverlauf an 8
+Punkten.
+
+**Der echte Lauf war nötig:** `node --check` sieht einen ReferenceError
+nicht, und `zielBmrLage` ist eine neue Variable im Bot-Pfad. Erst der
+Aufruf im Container beweist, dass sie steht.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Investor Deal Score beim Barkauf | **weiter offen, Marcel vorgelegt** |
+| Cashflow-Skala beim Barkauf | braucht eine Zahl von Marcel |

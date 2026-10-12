@@ -26,7 +26,14 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
    nachbaut, was hier schon steht. */
 import { WertParameterService } from '../services/WertParameterService.js';
 import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
-import { gnd as iwGnd, rnd as iwRnd } from '../lib/immowertv.js';
+/* v1968: `rnd as iwRnd` ist raus. Seit v1965 ruft diese Datei die
+   Restnutzungsdauer ueber rnd-einheitlich.js; der Name war nur noch
+   gebunden, nicht benutzt. `iwGnd` bleibt (Nutzung im Endpunkt
+   /wertparameter/zinssatz). */
+import { gnd as iwGnd } from '../lib/immowertv.js';
+/* v1965: die EINE Ableitung der Restnutzungsdauer. Siehe den Block am
+   Endpunkt /wertparameter/zinssatz. */
+import { restnutzungsdauerEinheitlich } from '../lib/rnd-einheitlich.js';
 import { ZensusConnector } from '../connectors/ZensusConnector.js';
 import { GeoapifyConnector } from '../connectors/GeoapifyConnector.js';
 import { LocationFinderService } from '../services/LocationFinderService.js';
@@ -533,7 +540,72 @@ router.get('/objects/history', async (req, res) => {
               property_type, living_area, build_year,
               market_value, market_value_low, market_value_high,
               median_sqm, gross_yield_pct, rent_multiplier, deal_score, micro_score, macro_score,
-              price_cagr_pct, confidence, comparable_group, ai_mode
+              price_cagr_pct, confidence, comparable_group, ai_mode,
+              /* ══ v1963 · DIE IMMOWERTV-WERTE GEHEN MIT ══════════════════
+                 Marcel am 08.10.2026: „wenn wir die Stufe 3 gerechnet haben,
+                 sollte der Verkehrswert bzw. Ertragswert auch unten in dem
+                 Dropdown erscheinen unter Wertanker."
+
+                 GEMESSEN: die Werte liegen laengst in data->cross_check
+                 (Parkstr. 9: Sachwert 295.000, Ertragswert 355.000) - diese
+                 SELECT-Liste hat sie nur nie mitgenommen. 23 Spalten, data
+                 nicht darunter. Der Cross-Check lag in der Zeile und hat den
+                 Server nie verlassen.
+
+                 Ausgeliefert werden GENAU DIE DREI ZAHLEN, nicht der ganze
+                 Datensatz: ein Verlauf mit 31 Staenden wuerde sonst jeden
+                 vollstaendigen Bericht mitschleppen. */
+              (data->'cross_check'->'sachwert'->>'value_eur')::numeric    AS sachwert_eur,
+              (data->'cross_check'->'ertragswert'->>'value_eur')::numeric AS ertragswert_eur,
+              /* ══ v1979 · DER RECHENWEG, VERDICHTET ════════════════════
+
+                 Marcel am 08.10.2026: „bei dem Auswahlmenue Ertragswert
+                 fuehrend haben wir zum Beispiel zwei Ertragswerte, einmal
+                 vom 7.10. und vom 8.10. ... Kriegt man das irgendwie hin
+                 zu sehen, wo der Unterschied ist, warum, dass der Kunde
+                 das weiss?"
+
+                 GEMESSEN an genau diesen zwei Berichten: 364.000 gegen
+                 355.000, bei IDENTISCHER Miete (6,52), identischem Zins
+                 und identischer Restnutzungsdauer. Der Unterschied steckt
+                 in EINER Zeile des Rechenwegs:
+
+                   7.10.  + sonstige Ertraege (1.080 EUR x Barwertfaktor)
+                          = 9.256    -> 363.909
+                   8.10.  diese Zeile fehlt           -> 354.653
+
+                 Jemand hatte 1.080 EUR sonstige Ertraege eingetragen und
+                 sie zwischen den Laeufen entfernt. Beide Rechenwege liegen
+                 vollstaendig im Bericht (ertragswert.staffel, 11 bzw. 12
+                 Zeilen) — sie haben den Server nur nie verlassen.
+
+                 Mitgeliefert wird NICHT der ganze Rechenweg: ein Verlauf
+                 mit 33 Staenden wuerde sonst 33 Staffeln mitschleppen.
+                 Verdichtet auf Beschriftung und Betrag je Zeile — genau
+                 das, was ein Vergleich braucht. */
+              (SELECT jsonb_agg(jsonb_build_object('pos', e->>'pos', 'wert', e->>'wert'))
+                 FROM jsonb_array_elements(coalesce(data->'cross_check'->'ertragswert'->'staffel', '[]'::jsonb)) e)
+                AS ertrag_weg,
+              (SELECT jsonb_agg(jsonb_build_object('pos', e->>'pos', 'wert', e->>'wert'))
+                 FROM jsonb_array_elements(coalesce(data->'cross_check'->'sachwert'->'staffel', '[]'::jsonb)) e)
+                AS sachwert_weg,
+              /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
+                 „welcher ist jetzt der fuehrende? Vielleicht sollte man das
+                 dann mit in dem Dropdown mit angeben."
+
+                 Der Bericht entscheidet das laengst und schreibt es nach
+                 cross_check.verfahrenswahl (Parkstr. 9: ertragswert, Grund
+                 „Renditeobjekt", Quelle Paragraf 6 Abs. 1 ImmoWertV).
+                 Es stand nur nirgends.
+
+                 KEINE BACKTICKS in diesem Kommentar: er steht INNERHALB
+                 eines Template-Literals. Ein Backtick beendet die
+                 Zeichenkette und zerlegt die Datei - in dieser Sitzung
+                 schon einmal passiert, an genau dieser Stelle. */
+              (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
+              (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
+              (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,
+              (data ? 'cross_check')                                        AS hat_crosscheck
          FROM mb.object_snapshots
         WHERE user_id = $1${cond}
         ORDER BY created_at ASC`,
@@ -1045,11 +1117,57 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
        aus einer fertigen Zahl umgerechnet (v1338). */
     const gndJ = (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd))
                  || iwGnd(m.property_type);
-    let rndJ = null;
+    /* ══ v1965 · DIE DRITTE ABLEITUNG DERSELBEN ZAHL ═══════════════════
+
+       Hier stand:
+
+         const rr = iwRnd(gndJ, m.build_year, 'bestand', new Date().getFullYear());
+
+       Das ist ein DRITTER Weg zur Restnutzungsdauer. CLAUDE.md fuehrt als
+       Doktrin: „Eine Restnutzungsdauer fuer alle Verfahren", und seit
+       v1816 liegt sie in `lib/rnd-einheitlich.js`. Der Bericht fragt
+       dort. Dieser Endpunkt fragte `immowertv.js`.
+
+       GEMESSEN am 08.10.2026 an Parkstr. 9 in Bad Oeynhausen
+       (Baujahr 1905, GND 80, also Alter 121):
+
+         Endpunkt   iwRnd           ->  jahre 0   (linear, max(0, 80-121))
+         Bericht    rnd-einheitlich ->  10        (RND_MIN greift)
+         Frontend   calcPunktraster ->  nicht anwendbar (Scheitel bei 84)
+
+       Drei Wege, drei Zahlen fuer dasselbe Gebaeude.
+
+       ZWEI WEITERE FEHLER steckten in denselben vier Zeilen:
+
+       1. `iwRnd` nimmt die Modernisierungspunkte als FUENFTES Argument
+          (`opt.mod_punkte`) - es wurde nie uebergeben. Anlage 2 konnte an
+          diesem Endpunkt also GAR NICHT greifen, auch nicht bei 20
+          Punkten. Die Zeile „mit N Modernisierungspunkten rechnet der
+          Bericht nach Anlage 2 neu" stand in der Oberflaeche und war an
+          dieser Stelle unwahr.
+
+       2. Die Auslieferung lautete `Number(rndJ) || null`. Eine ECHTE
+          Null - rechnerisch aufgebrauchte Nutzungsdauer, ein Befund - 
+          wurde damit zu `null` und in der Oberflaeche zu einem
+          Gedankenstrich. CLAUDE.md warnt genau davor: nie ein
+          `||`-Rueckfall auf einem Wert, der 0 sein darf.
+
+       > Marcel sah deshalb bei Parkstr. 9 eine leere Zelle und fragte,
+       > wo er etwas eintragen muss. Die Antwort war: nirgends - die Zahl
+       > war da und ging auf dem Weg verloren.
+
+       Jetzt fragt der Endpunkt denselben Kern wie der Bericht und liefert
+       die Herkunft mit. `iwRnd` bleibt importiert, weil `iwGnd` aus
+       derselben Datei kommt und andere Routen sie nutzen. */
+    const _rndRef = Object.assign({}, m, {
+      mod_punkte: m.mod_punkte != null ? m.mod_punkte
+        : (d.mod_punkte != null && d.mod_punkte !== '' ? Number(d.mod_punkte) : null)
+    });
+    let rndJ = null, rndHerkunft = null;
     try {
-      const rr = iwRnd(gndJ, m.build_year, 'bestand', new Date().getFullYear());
-      rndJ = (rr && typeof rr === 'object') ? (rr.rnd ?? rr.jahre ?? null) : rr;
-    } catch (e) { rndJ = null; }
+      rndHerkunft = restnutzungsdauerEinheitlich(_rndRef, gndJ);
+      rndJ = rndHerkunft && rndHerkunft.rnd != null ? rndHerkunft.rnd : null;
+    } catch (e) { rndJ = null; rndHerkunft = null; }
 
     /* v1851 · Die Automatik-Leiste im Reiter Objekt zeigt neben dem Zins auch,
        ob der Ausschuss SACHWERTFAKTOREN fuehrt. Der Faktor selbst haengt am
@@ -1080,7 +1198,13 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       quelle_url: p.quelle_url || null, zweig: p.zweig || null, lage: p.lage || null,
       berichtsjahr: p.berichtsjahr || null, stichtag: p.stichtag || null,
       ausschuss: p.quelle || null,
-      gnd_jahre: Number(gndJ) || null, rnd_jahre: Number(rndJ) || null,
+      gnd_jahre: Number(gndJ) || null,
+      /* v1965: erst auf ABWESENHEIT pruefen, dann rechnen. `rnd_jahre: 0`
+         ist ein Befund und kein fehlender Wert. */
+      rnd_jahre: (rndJ == null || !Number.isFinite(Number(rndJ))) ? null : Number(rndJ),
+      rnd_quelle: (rndHerkunft && rndHerkunft.quelle) || null,
+      rnd_grund: (rndHerkunft && rndHerkunft.grund) || null,
+      rnd_hinweis: (rndHerkunft && rndHerkunft.hinweis) || null,
       gnd_quelle: (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd)) ? 'register' : 'anlage1',
       sachwertfaktor_quelle: swfQuelle,
       baupreisindex: BAUPREISINDEX_KONSTANTE,

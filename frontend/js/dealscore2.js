@@ -390,22 +390,59 @@ window.DealScore2 = (function() {
     return _aggregate(bd, cfg);
   }
 
+  /* v2144 · Dieselbe Rangfolge der Feldnamen wie in `dealscore.js`
+     (`_istBarkauf`): `darlehen` > `d_total` > `d1 + d2`. Zwei Kerne,
+     die dieselbe Frage verschieden beantworten, waeren schlimmer als
+     zwei, die sie gar nicht stellen.
+
+     Eine 0 ist eine Zahl und beendet die Suche — sonst wuerde ein
+     ausdruecklicher Barkauf (`darlehen: 0`) weitergereicht und an
+     einem alten `d1` haengenbleiben.
+
+     Sagt KEIN Aufrufer etwas, bleibt alles wie vor v2144. */
+  function _ds2Barkauf(deal) {
+    if (!deal) return false;
+    var kandidaten = [deal.darlehen, deal.d_total];
+    if (deal.d1 != null && deal.d1 !== '') {
+      kandidaten.push(Number(deal.d1 || 0) + Number(deal.d2 || 0));
+    }
+    for (var i = 0; i < kandidaten.length; i++) {
+      var d = kandidaten[i];
+      if (d === undefined || d === null || d === '') continue;
+      var n = Number(d);
+      if (!isFinite(n)) continue;
+      return n <= 0;
+    }
+    return false;
+  }
+
   function scoreFinanzierung(deal, cfg) {
     var t = cfg.thresholds, w = cfg.subWeights.finanzierung;
     var bd = [];
 
-    var dscr = num(deal.dscr);
+    /* ══ v2144 · BEIM BARKAUF GIBT ES KEINEN DSCR UND KEINEN LTV ═════
+       `null` statt `0` — damit greift `_aggregate()`, nimmt beide aus
+       der Gewichtung und setzt `applied: false`. Der Mechanismus war
+       schon da; er sah eine 0 nur nicht als Abwesenheit an.
+
+       `grund` sagt der Anzeige, WARUM — eine Kennzahl, die nicht
+       anwendbar ist, gehoert benannt und nicht beziffert. */
+    var barkauf = _ds2Barkauf(deal);
+
+    var dscr = barkauf ? null : num(deal.dscr);
     bd.push({
       key: 'dscr', name: 'DSCR', value: dscr, unit: '',
       points: dscr !== null ? interpolate(dscr, t.dscr) : null,
-      weight: w.dscr
+      weight: w.dscr,
+      grund: barkauf ? 'ohne Kapitaldienst gibt es keinen Deckungsgrad' : undefined
     });
 
-    var ltv = num(deal.ltv);
+    var ltv = barkauf ? null : num(deal.ltv);
     bd.push({
       key: 'ltv', name: 'LTV', value: ltv, unit: '%',
       points: ltv !== null ? bucketLookup(ltv, t.ltvBuckets) : null,
-      weight: w.ltv
+      weight: w.ltv,
+      grund: barkauf ? 'am Objekt ist kein Darlehen hinterlegt' : undefined
     });
 
     var zins = num(deal.zinsSatz);

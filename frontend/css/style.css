@@ -1994,7 +1994,17 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 
 /* Quick mode table */
-.ytf-quick-wrap { overflow-x: auto; }
+/* v2092e: `--dpm-schiene` sagt „dieser Querscroller ist gewollt". Die
+   Messkabine liest das Merkmal und zaehlt solche Behaelter als SCHIENE
+   statt als Mangel.
+
+   Warum nicht `-webkit-overflow-scrolling:touch` als Nachweis? Weil
+   CHROME DIE EIGENSCHAFT BEIM EINLESEN VERWIRFT — gemessen am 10.10.2026:
+   11.954 Regeln durchgegangen, NULL mit `overflow-scrolling` im cssText,
+   und `setProperty('-webkit-overflow-scrolling','touch')` gibt `""`
+   zurueck. Die Absicht steht in der Datei und ist im Browser in beide
+   Richtungen unsichtbar. Eine eigene Variable behaelt er. */
+.ytf-quick-wrap { overflow-x: auto; --dpm-schiene: 1; }
 .ytf-table {
   width: 100%;
   border-collapse: collapse;
@@ -4977,9 +4987,34 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   display: flex;
   gap: 3px;
   opacity: 0;
+  /* ── v2110 · UNSICHTBAR HEISST AUCH UNANKLICKBAR ──────────────────
+     GEMESSEN am 11.10.2026: im Ruhezustand steht hier `opacity:0`, aber
+     `pointer-events` blieb `auto`. `elementsFromPoint` auf dem unteren
+     Rand des Score-Rings lieferte `button.sbc-btn` ganz oben - ein
+     unsichtbarer Knopf fing dort die Klicks ab, und zwar der zum
+     DUPLIZIEREN.
+
+     Seit `v1943` sind Ring UND Knoepfe beide senkrecht mittig, also
+     ueberlappen sie: 21 px senkrecht, 34-42 px waagerecht, auf allen
+     gemessenen Karten.
+
+     > Die Paarung gibt es unter den Layout-Varianten laengst
+     > (`layout-varianten.css:7313` fuehrt sie ausdruecklich als
+     > „opacity: 0  pointer-events: none"). Die DealPilot-Grundfassung
+     > hat sie nie bekommen - dieselbe Form wie bei den Farbreglern und
+     > bei den Skalen-Beschriftungen: eine Reparatur erbt den Anker, an
+     > dem sie geschrieben wurde.
+
+     Das aendert die OPTIK nicht - nur, dass ein Klick auf den Ring nicht
+     mehr am Duplizieren-Knopf haengen bleibt. Die sichtbare Ueberdeckung
+     beim Schweben ist eine eigene Frage und steht im Backlog. */
+  pointer-events: none;
   transition: opacity .12s ease;
 }
-.sb-card:hover .sbc-actions { opacity: 1; }
+/* `:focus-within` wie in den Varianten (`:7105`): sonst waere der Knopf
+   per Tastatur erreichbar, aber unsichtbar. */
+.sb-card:hover .sbc-actions,
+.sb-card:focus-within .sbc-actions { opacity: 1; pointer-events: auto; }
 .sbc-btn {
   width: 24px;
   height: 24px;
@@ -8085,10 +8120,107 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 /* ═══════════════════════════════════════════════════
    V38: DS2-Tag Pille (z.B. „DS2" neben Labels)
 ═══════════════════════════════════════════════════ */
+/* ===== v1958b - DAS ABZEICHEN DER LAGEKLASSE =========================
+   Es sieht aus wie .ds2-tag, sagt aber etwas anderes: das DS2-Abzeichen
+   bedeutet "geht in den Investor Deal Score", dieses hier bedeutet
+   "bestimmt deine Zielrendite". Deshalb eine eigene Klasse und ein
+   eigenes Wort (Ziel) statt Wiederverwendung - zwei Dinge, die gleich
+   aussehen und Verschiedenes heissen, sind schlimmer als zwei, die sich
+   unterscheiden.
+
+   NICHT VERWECHSELN: objekt-reiter.js fuehrt eine Pille Stufe A-E
+   (.oe-st). Die meint die HERKUNFT eines Wertes - amtlich vom
+   Gutachterausschuss bis eigene Angabe - und hat mit der Lageklasse
+   nichts zu tun. Ein A ist dort etwas voellig anderes als hier.
+   ================================================================ */
+/* ===== v1960 - DIE LAGEKLASSE IN DER TABELLE =========================
+   A, B und C bekommen DIESELBE Farbe. Eine Ampel waere hier falsch: eine
+   C-Lage ist nicht schlechter als eine A-Lage, sie ist eine andere
+   Strategie mit anderer Zielrendite. Gruen fuer A und Rot fuer C wuerde
+   eine Wertung behaupten, die Marcel ausdruecklich nicht getroffen hat.
+   ================================================================= */
+.ao-lk {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);
+  color: var(--wl-c9a84c, #C9A84C);
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);
+}
+.ao-lk-leer {
+  opacity: .35;
+  font-size: 12px;
+}
+
+.oe-lk-tag {
+  display: inline-block;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+  color: var(--wl-c9a84c, #C9A84C);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+  cursor: help;
+}
+
+/* ── v2089 · DAS DS2-ETIKETT WAR UNLESBAR (Backlog N60.17) ─────────────
+ *
+ * HIER STAND `background: color-mix(in srgb, var(--gold) 14%, transparent)`
+ * mit `color: var(--gold)`. Auf einer weissen Karte ergibt 14 % Gold auf
+ * durchsichtig fast wieder Weiss — und Gold auf Weiss ist nicht lesbar.
+ *
+ * GEMESSEN am 10.10.2026 in der Messkabine, 1180 px, Reiter Objekt,
+ * acht sichtbare Etiketten mit dem Text „DS2":
+ *
+ *     Gold rgb(201,168,76) auf rgb(255,255,255)
+ *     Kontrast 2,29   ·   Schwelle 4,5   ·   9px/700
+ *
+ * Die Schwelle ist 4,5 und nicht 3,0, weil 9 px keine grosse Schrift
+ * sind (gross = ab 24 px, oder ab 18,66 px bei Fettung).
+ *
+ * ── ZWEIMAL AN DER FALSCHEN STELLE GESUCHT, BEIDES NOTIERT ───────────
+ *
+ * 1. Zuerst im Reiter Pilot-Analyse gemessen: 42 Etiketten gefunden,
+ *    NULL sichtbar. „Null sichtbar" war kein Befund, sondern der falsche
+ *    Ort — im Reiter Objekt sind es acht.
+ * 2. Dann angenommen, in der DealPilot-Ansicht liege das Etikett auf
+ *    Obsidian und sei dort lesbar. Gemessen: der Grund ist **auch dort
+ *    Weiss**, Kontrast ebenfalls 2,29. Die Etiketten sitzen in
+ *    FORMULARKARTEN, und die sind in beiden Ansichten hell — Obsidian
+ *    traegt Kopf, Menue und Seitenleiste, nicht die Karten.
+ *
+ * ── WARUM DER GRUND DUNKEL WIRD UND NICHT DIE SCHRIFT ────────────────
+ *
+ * Marcel am 10.10.2026: „die Pillen und Texts Gold". Gold dunkler zu
+ * faerben waere der naheliegende Weg, kostet aber genau das Gold: die
+ * hellste Toenung, die 4,5 auf Weiss haelt, ist #7a6220 — ein Oliv.
+ *
+ * Gerechnet, was Gold ERHAELT:
+ *     #C9A84C auf #1A1714   7,81   haelt
+ *     #C9A84C auf #2A2727   6,48   haelt
+ *     #7a6220 auf Weiss     5,84   haelt, ist aber kein Gold mehr
+ *
+ * Also traegt das Etikett jetzt einen dunklen Grund — dieselbe Anmutung
+ * wie die Pillen auf der Objektkarte, wo Gold auf dunkel immer stand.
+ * `#1A1714` ist die Tinte der Marke, nicht Obsidian: CLAUDE.md verbietet
+ * `--ch` AUF Obsidian, hier liegt es auf einer hellen Karte.
+ *
+ * Die Hell-Themes behalten ihre eigene Fassung (Z. 38142 ff.:
+ * `color:#3B352D` auf `#F2EFE9`) — dort ist die helle Gestaltung
+ * gewollt, und jene Regel ist spezifischer und steht spaeter.         */
 .ds2-tag {
   display: inline-block;
-  background: color-mix(in srgb, var(--gold) 14%, transparent);
-  color: var(--gold);
+  background: #1A1714;
+  color: var(--wl-c9a84c, #C9A84C);
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, transparent);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -16115,15 +16247,36 @@ body.hdr-collapsed .hdr-toggle-btn-compact {
   color: rgba(42,39,39,0.40) !important;
 }
 
-/* Hint-Texte unter Feldern: nie weiß */
+/* ── v2090 · DIE DECKKRAFT WAR DER FEHLER, NICHT DIE FARBE ─────────────
+ *
+ * Hier stand `rgba(42,39,39,0.55)` — die Tinte zu 55 %. Über Weiß ergibt
+ * das `rgb(138,136,136)`, und genau diese Zahl hat die Messkabine am
+ * 10.10.2026 gemeldet: **Kontrast 3,52 bei 10,5 px**, Schwelle 4,5.
+ * Sechs der zwölf Mängelgruppen im Reiter Objekt waren dieser eine Wert.
+ *
+ * Die Absicht der Zeile war richtig und steht noch da: Hinweistexte sollen
+ * nicht weiß sein. Nur hat niemand nachgerechnet, was 55 % der Tinte auf
+ * den fünf Flächen ergibt, auf denen ein `.hint` wirklich sitzt:
+ *
+ *     Deckkraft   weiß   --surface   creme   --karte   --surface2
+ *       0,55      3,52     3,44      3,43     3,45       3,34
+ *       0,65      4,71     4,61      4,55     4,62       4,43  <- knapp
+ *       0,68      5,22     5,04      4,97     5,04       4,84  <- haelt
+ *
+ * **Die dunkelste Fläche entscheidet, nicht die häufigste.** 0,65 besteht
+ * auf vier von fünf und wäre auf `--surface2` durchgefallen — gewählt ist
+ * deshalb 0,68: die niedrigste Deckkraft, die überall hält. Der Hinweis
+ * bleibt damit nachrangig, wie gewollt, aber lesbar.
+ *
+ * `.qc-hint-inline` stand auf 0,50 und war noch schwächer.             */
 .qc-hint,
 .qc-ai-src,
 .hint,
 .f .hint {
-  color: rgba(42,39,39,0.55) !important;
+  color: rgba(42,39,39,0.68) !important;
 }
 .qc-hint-inline {
-  color: rgba(42,39,39,0.50) !important;
+  color: rgba(42,39,39,0.68) !important;
   font-weight: 400;
 }
 
@@ -21136,6 +21289,101 @@ body.qc-standalone-active #s-quick::before {
 @media (max-width: 600px) {
   .set-modal-v2 .ip-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== v1957 - DIE DREI LAGEKLASSEN IN DEN EINSTELLUNGEN =============
+   Eine Zeile je Klasse: Kopf mit Name und Erklaerung, darunter vier
+   schmale Zahlenfelder. Die Zielrendite ist Pflicht und steht zuerst;
+   die drei daneben sind freiwillig und tragen den Platzhalter
+   "Standard", damit sichtbar ist: leer heisst NICHT null.
+
+   Gold nur ueber die Whitelabel-Tokens - jedes Gold-Literal steht als
+   var(--wl-<hex>, #<hex>), sonst faerbt es sich beim Mandanten nicht um
+   (CLAUDE.md). Gruen und Rot kommen hier nicht vor.
+
+   Dieser Block ist bewusst ASCII: style.css wird byteweise
+   geschrieben, damit ein defektes Byte an anderer Stelle unberuehrt
+   bleibt. ==================================================== */
+.set-modal-v2 .ip-lage-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.set-modal-v2 .ip-lage-zeile {
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent);
+  border-radius: 8px;
+  padding: 10px 12px 12px;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent);
+}
+.set-modal-v2 .ip-lage-kopf {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 9px;
+  flex-wrap: wrap;
+}
+.set-modal-v2 .ip-lage-kopf b {
+  font-size: 13px;
+  color: var(--wl-c9a84c, #C9A84C);
+  letter-spacing: .4px;
+}
+.set-modal-v2 .ip-lage-kopf span {
+  font-size: 11px;
+  opacity: .72;
+}
+.set-modal-v2 .ip-lage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.set-modal-v2 .ip-lage-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10.5px;
+  letter-spacing: .3px;
+  opacity: .9;
+  min-width: 0;             /* sonst sprengt ein langer Titel die Spalte */
+}
+.set-modal-v2 .ip-lage-grid .ip-suffix {
+  font-size: 9.5px;
+  opacity: .6;
+}
+.set-modal-v2 input.ip-lage-f {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 6px 7px;
+  font-size: 12.5px;
+}
+/* Die Pflichtzahl traegt die Markenfarbe, die freiwilligen nicht -
+   so sieht man ohne Erklaerung, worauf es ankommt.
+
+   v1957a - WARUM HIER !important STEHT, OBWOHL DIE SPEZIFITAET REICHT:
+   gemessen am 07.10.2026 greift die Regel (font-weight:600 kommt an),
+   nur border-color nicht. Der Grund ist 2400 Zeilen weiter unten:
+
+     .set-modal-v2 input[type="number"], ... {
+       border: 1px solid var(--border) !important;
+     }
+
+   Eine KURZSCHRIFT mit !important. Sie schlaegt eine Einzeleigenschaft
+   ohne !important unabhaengig von der Spezifitaet - und sie schlaegt
+   sogar einen INLINE gesetzten Wert ohne !important. Genau das hat die
+   Fehlersuche gekostet: der Inline-Versuch im Browser blieb grau, was
+   zuerst wie ein ungueltiges color-mix() aussah. Auf einem frischen
+   Element lieferte dasselbe color-mix() sauber
+   color(srgb 0.788 0.659 0.298 / 0.55). */
+.set-modal-v2 input.ip-lage-f[data-f="ziel_bmr"] {
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
+  font-weight: 600;
+}
+@media (max-width: 760px) {
+  .set-modal-v2 .ip-lage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .set-modal-v2 .ip-lage-grid { grid-template-columns: 1fr; }
+}
 .set-modal-v2 .ip-field { display: flex; flex-direction: column; gap: 4px; }
 .set-modal-v2 .ip-field-row {
   display: flex;
@@ -25242,12 +25490,17 @@ aside.sidebar .sb-card .sbc-score-label {
   color: var(--green-2, #5ed992) !important;
   border: 1px solid rgba(63,165,108,0.35) !important;
 }
-aside.sidebar .sb-card .sbc-score-label.tier-gold {
+/* v2028 - HIER STAND `.tier-gold`. Diese Klasse setzt niemand:
+   `storage.js:1686` schreibt `sbc-score-gold`. Die Regel hat nie
+   gegriffen, und die gruene Grundregel darueber galt fuer ALLE
+   Stufen - SOLIDE, GUT, SCHWACH und KRITISCH waren gleich gruen. */
+aside.sidebar .sb-card .sbc-score-label.sbc-score-gold {
   background: color-mix(in srgb, var(--gold) 18%, transparent) !important;
   color: var(--gold-2, #E8C964) !important;
   border-color: color-mix(in srgb, var(--gold) 40%, transparent) !important;
 }
-aside.sidebar .sb-card .sbc-score-label.tier-red {
+/* v2028 - dasselbe fuer rot: `.tier-red` statt `.sbc-score-red`. */
+aside.sidebar .sb-card .sbc-score-label.sbc-score-red {
   background: rgba(184,98,92,0.18) !important;
   color: #e8a09a !important;
   border-color: rgba(184,98,92,0.40) !important;
@@ -25319,7 +25572,21 @@ aside.sidebar .sb-card .sbcm-scale {
   display: flex !important;
   justify-content: space-between !important;
   font-size: 7.5px !important;
-  color: rgba(168,162,153,0.65) !important;
+  /* ── v2104 · war rgba(168,162,153,0.65) ───────────────────────────────
+     GEMESSEN am 11.10.2026: der Mischwert auf der dunklen Karte ist
+     rgb(114,109,102) auf rgb(13,11,8) — k=3,83 an 161 Stellen
+     (23 Karten x 7 Beschriftungen). Bei 7,5 px gilt 4,5.
+
+     DECKEND statt mit Deckkraft, und das ist der eigentliche Punkt:
+     der Kartengrund ist ein VERLAUF (effGrund meldet „verlauf"). Eine
+     Deckkraft darueber ergibt je Stelle einen anderen Kontrast, eine
+     feste Farbe nicht. Dieselbe Klasse wie v2090, wo bei vier von sechs
+     Stellen die Deckkraft der Fehler war.
+
+     #817d76 haelt den Farbton (Faktor auf alle drei Kanaele) und kommt
+     auf 4,80. Die Vorlagen- und Flaechenregeln in ui-varianten.css
+     liegen mit (0,4,4) darueber und bleiben unberuehrt. */
+  color: #817d76 !important;
   margin-top: 2px !important;
   font-variant-numeric: tabular-nums !important;
 }
@@ -25342,6 +25609,10 @@ aside.sidebar .sb-card .sbc-actions {
   display: flex !important;
   gap: 4px !important;
   opacity: 0;
+  /* v2110a: ausdruecklich MIT der Deckkraft gesetzt, nicht aus der
+     Grundregel geerbt. Wer hier eine der beiden aendert, sieht die
+     andere daneben stehen. */
+  pointer-events: none;
   transition: opacity 0.2s;
   z-index: 7 !important;     /* V103: über Score-Overlay (z-index: 4) */
 }
@@ -25350,9 +25621,16 @@ aside.sidebar .sb-card .sbc-score-overlay {
   top: 38px !important;       /* war 12 — jetzt unter den Action-Buttons */
 }
 aside.sidebar .sb-card:hover .sbc-actions,
+aside.sidebar .sb-card:focus-within .sbc-actions,
 aside.sidebar .sb-card.active .sbc-actions {
   /* V101: Aktiv-Card zeigt Aktionen IMMER (auch ohne Hover) damit Touch-User auf Mobile löschen können */
   opacity: 1;
+  /* v2110a: MUSS hier stehen. Diese Regel ist die regierende in der
+     Seitenleiste - meine Fassung an `.sb-card:hover` (0,2,0) verliert
+     gegen `aside.sidebar .sb-card .sbc-actions` (0,3,1). Gemessen:
+     `pointer-events` wurde `auto`, `opacity` blieb 0, weil nur die
+     Deckkraft ueberschrieben war. */
+  pointer-events: auto;
 }
 aside.sidebar .sb-card .sbc-btn {
   width: 22px !important;
@@ -26919,14 +27197,43 @@ aside.sidebar .sb-actions-trigger .sb-actions-arrow {
   display: block;
   color: var(--gold, #C9A84C);
 }
-/* DS2-Tag im Card-Titel passend zum hellen Card */
+/* ── v2089 · DIE ZWEITE FASSUNG DESSELBEN ETIKETTS (Backlog N60.17) ────
+ *
+ * HIER STAND „DS2-Tag im Card-Titel passend zum hellen Card" mit
+ * `background: color-mix(gold 14%, transparent)` und
+ * `color: var(--gold-3, #9a7f33)` — beides `!important`.
+ *
+ * DIESE REGEL HAETTE DIE KORREKTUR OBEN STILL AUSGEHEBELT, wo immer
+ * `.ct-pro` ein Vorfahr ist: sie ist spezifischer, steht spaeter UND
+ * traegt `!important`. Gefunden, weil ich nach dem ersten Eingriff alle
+ * `ds2-tag`-Regeln gegreppt habe statt nur die eine zu aendern.
+ *
+ * GERECHNET, bevor hier etwas stand (color-mix auf transparent heisst:
+ * 14 % Gold mit 86 % des darunterliegenden Grundes):
+ *
+ *     #9a7f33 auf rgb(247,243,230)  k=3,47   faellt
+ *     #9a7f33 auf rgb(244,235,211)  k=3,24   faellt   (Kartengrund)
+ *
+ * Also war die zweite Fassung ebenfalls unlesbar, nur etwas weniger.
+ * Und `--gold-3` ist ohne Whitelabel gar nicht gesetzt — es greift immer
+ * der Fallback `#9a7f33` (`whitelabel-override.js:526` setzt es erst beim
+ * Mandanten, als `_darken(akzent, 26)`).
+ *
+ * Jetzt traegt sie dieselbe Fassung wie die Regel oben: Gold auf Tinte,
+ * k=7,81. ZWEI Aussehen fuer dasselbe Etikett waren der eigentliche
+ * Fehler — ein Kuerzel, das je nach Karte anders aussieht, liest sich
+ * wie zwei verschiedene Dinge.
+ *
+ * Nicht angetastet: die Fassung der vier Hell-Themes (Z. 38209 ff.,
+ * `#3B352D` auf `#F2EFE9`). Die ist dunkel-auf-hell, besteht, und
+ * gewinnt dort auf Spezifitaet gegen beide Regeln hier.              */
 .ct-pro .ds2-tag {
   font-size: 9px !important;
   padding: 2px 6px !important;
   letter-spacing: 0.3px !important;
-  background: color-mix(in srgb, var(--gold) 14%, transparent) !important;
-  color: var(--gold-3, #9a7f33) !important;
-  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent) !important;
+  background: #1A1714 !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, transparent) !important;
   border-radius: 4px !important;
   margin-left: 6px;
   font-weight: 700;
@@ -27386,6 +27693,18 @@ header.hdr {
 @media (max-width: 900px) {
   aside.sidebar .sb-card .sbc-actions {
     opacity: 1 !important;
+    /* ── v2110a · HIER HAETTE MEIN v2110 DAS HANDY ZERLEGT ──────────
+       Auf Touch gibt es kein Hover, deshalb stehen die Knoepfe hier
+       IMMER sichtbar. `v2110` hat `pointer-events:none` an die
+       Grundregel gehaengt - gemessen bei 390 px kam heraus:
+       opacity 1, pointer-events none. Die Knoepfe zum Duplizieren und
+       Loeschen waren SICHTBAR UND TOT.
+
+       > Die Deckkraft und die Klickbarkeit gehoeren zusammen. Wer eine
+       > von beiden ohne die andere setzt, baut genau diesen Fehler -
+       > und auf dem Handy faellt er doppelt auf, weil es dort keinen
+       > Schwebezustand gibt, der ihn wieder aufhebt. */
+    pointer-events: auto !important;
   }
   aside.sidebar .sb-card .sbc-btn {
     width: 26px !important;
@@ -27569,7 +27888,23 @@ aside.sidebar .sb-card .sbc-won-ribbon {
   top: -1px;
   left: -1px;
   right: auto;
-  background: linear-gradient(135deg, #4CAF50, #2e7d32);
+  /* ── v2090 · DAS WON-BAND TRUG FREMDES GRÜN ──────────────────────────
+   * Hier stand `linear-gradient(135deg, #4CAF50, #2e7d32)` — zwei
+   * Material-Design-Grüns. Das Marken-Grün ist `#3FA56C`.
+   *
+   * **Der Mittelwert hat den Befund verharmlost.** Die Messkabine mittelt
+   * einen Verlauf zu einer Farbe und meldete `rgb(61,150,65)`, Kontrast
+   * 3,73 bei 8 Bändern. Entscheidend ist aber das HELLE Ende, denn dort
+   * steht derselbe weiße Text:
+   *
+   *     Weiß auf #4CAF50 (hell)   2,78   <- der wahre Wert
+   *     Weiß auf #3d9641 (Mittel) 3,73
+   *     Weiß auf #2e7d32 (dunkel) 5,13
+   *
+   * Jetzt Marken-Grün um 20 % abgedunkelt als helles Ende (4,59) und
+   * weitere 26 % für das dunkle (7,27). **Grün bleibt Grün** — CLAUDE.md
+   * verbietet, Statusfarben zu tokenisieren, nicht sie lesbar zu machen. */
+  background: linear-gradient(135deg, #328456, #256240);
   color:var(--dp-ink-1);
   font-size: 9px;
   font-weight: 800;
@@ -30636,8 +30971,20 @@ div.f div.cf#zaer_display,
 /* Kanban */
 .ao-kanban {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* v2084 · VIER Spalten (Offen · Gewonnen · Bestand · Verloren).
+     `minmax(0, 1fr)` statt `1fr`: ein Rasterfeld hat `min-width:auto`
+     und waechst sonst aus dem Raster HINAUS statt umzubrechen — bei
+     drei Spalten fiel das nicht auf, bei vier wird es eng. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+}
+/* Unter 1100 px zwei Reihen statt vier Spalten — vier Karten
+   nebeneinander sind auf dem iPad nicht mehr lesbar. */
+@media (max-width: 1100px) {
+  .ao-kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .ao-kanban { grid-template-columns: minmax(0, 1fr); }
 }
 .ao-kanban-col {
   background: color-mix(in srgb, var(--gold) 3%, transparent);
@@ -30664,6 +31011,15 @@ div.f div.cf#zaer_display,
 .ao-kanban-col-open .ao-kanban-col-title  { color: var(--gold, #C9A84C); }
 .ao-kanban-col-won .ao-kanban-col-title   { color: var(--green, #3FA56C); }
 .ao-kanban-col-lost .ao-kanban-col-title  { color: var(--red, #B8625C); }
+/* v2084 · Bestand. Dunkleres Gold: das Objekt ist nicht mehr „offen"
+   (helles Gold) und nicht nur „gewonnen" (gruen) — es gehoert zum
+   Besitz. VORSCHLAG, von Marcel zu bestaetigen; die Statusfarben
+   Gruen und Rot bleiben in jeder Marke unveraendert. */
+.ao-kanban-col-bestand .ao-kanban-col-title { color: var(--wl-b8932f, #b8932f); }
+.ao-kanban-col-bestand {
+  background: color-mix(in srgb, var(--gold) 6%, transparent);
+  border-color: color-mix(in srgb, var(--gold) 34%, transparent);
+}
 .ao-kanban-count {
   background: #fff;
   color: var(--ch, #2A2727);
@@ -33304,6 +33660,52 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   .dp-pf-scroll .dp-pf-lead{display:none!important}
   .dp-pf-scroll .dp-pf-perf,.dp-pf-scroll .dp-pf-qr,.dp-pf-scroll .dp-pf-sep,.dp-pf-scroll .dp-pf-bc{display:none!important}
   .dp-pf-scroll .dp-pf-seg{width:100%!important;flex:0 0 auto!important;gap:8px!important}
+  /* ── v1987 · DIE TEXTFARBEN SIND NICHT MITGEWANDERT ───────────────
+     Marcel am 08.10.2026: „Man sollte die Texte lesen koennen."
+
+     Dieser Block macht aus der HELLEN Pre-Flight-Karte ein DUNKLES
+     Bodenblatt (.dp-pf-scroll{background:#0c0c0e} weiter oben). Die
+     Schriftgroesse des Etiketts wurde dabei nachgezogen - die Farbe
+     nicht. Gemessen im geoeffneten Blatt auf 390 px gegen #0c0c0e:
+
+       span.dp-pf-grouplbl  „Marktbewertung"         #665c49  2,97
+       span.k-neu           „Daten uebernehmen aus"  #665c49  2,97
+       span.dp-pf-scan      „Scan ›"                 #665c49  2,97
+       small                „Datenquellen fuer …"    #6b645a  3,35
+
+     Alle vier unter AA fuer Kleintext (4,5). Das ist „Farbe gilt nur
+     zu ihrem Grund": beim Verschieben des Blocks in ein dunkles Blatt
+     wandert die Beziehung zwischen Text und Grund nicht mit.
+
+     Gesetzt wird die Gold-Familie der hellen Karte in ihrer HELLEN
+     Fassung - dort war das Etikett dunkles Gold, hier ist es helles.
+     Nachgerechnet (ohne Raute, damit kein Gold-Literal im Kommentar
+     steht): E8CC7A auf 0c0c0e = 12,42:1, c9c3b4 = 11,12:1.
+     Whitelabel-Pflicht: jedes Gold als var(--wl-<hex>, #<hex>). */
+  /* ── v1988 · DIE FARBAENDERUNG AUS v1987 IST ZURUECKGENOMMEN ──────
+
+     In v1987 stand hier `color:var(--wl-e8cc7a,#E8CC7A)!important`
+     fuer `.dp-pf-grouplbl`, `.k-neu` und `.dp-pf-scan`. Begruendet war
+     das mit einem gemessenen Kontrast von 2,97 gegen #0c0c0e.
+
+     DIE MESSUNG WAR FALSCH. Das Messgeraet (Messkabine, effGrund) hat
+     die Hintergrund-EBENEN von `.dp-pfbar` in einen Mittelwert
+     geworfen. Die unterste Ebene ist aber
+
+       radial-gradient(120% 100% at 30% 0%, rgb(255,253,247),
+                                            rgb(246,240,226) 62%)
+
+     also CREME - die helle Karte. Die Etiketten liegen auf Creme, nie
+     auf #0c0c0e. Gegen den wirklichen Grund:
+
+       altes dunkles Gold  4A3C10 auf FBF6E9  =  10,0 : 1   gut
+       mein helles Gold    E8CC7A auf FBF6E9  =   1,2 : 1   unlesbar
+
+     Die Etiketten waren nie das Problem. Mein Instrument war es, und
+     ich habe das Produkt geaendert, bevor ich mit dem reparierten
+     Instrument nachgemessen habe (behoben in v1988).
+
+     Die Schriftgroesse bleibt, wie sie vor v1987 war. */
   .dp-pf-scroll .dp-pf-grouplbl{font-size:10px!important;margin-bottom:4px!important}
   .dp-pf-scroll .dp-pf-row{flex-wrap:wrap!important;gap:8px!important}
   .dp-pf-scroll .dp-pf-tile{flex:1 1 100%!important;min-width:0!important;min-height:48px!important;justify-content:space-between!important}
@@ -33501,6 +33903,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   .bc-svg-wrap {
     height: auto !important;
     overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+    --dpm-schiene: 1;   /* v2092e: gewollter Querscroller, siehe .ytf-quick-wrap */
   }
   .bc-svg-wrap svg {
     min-width: 680px !important;   /* lesbar; Nutzer scrollt horizontal */
@@ -35552,9 +35955,22 @@ body[data-dp-skin="hell"] .sb-card [class*="price"]{ color:var(--gold-lo) !impor
 /* --- Tier-Pills: dunkel / rot (wie STARK/SCHWACH) --- */
 body[data-dp-skin="hell"] .sbc-score-label,
 body[data-dp-skin="hell"] .sbc-verdict{ background:#1f2a22 !important; color:#7fe0a6 !important; border-color:#1f2a22 !important; }
+/* v2028a - der lange Selektor ist noetig, seit v2028 die
+   Obsidian-Rotregel belebt hat: die traegt (0,4,1) und hat diese
+   hier (0,2,1) geschlagen - hellrot auf hellem Grund, Kontrast 1,1. */
+body[data-dp-skin="hell"] aside.sidebar .sb-card .sbc-score-label.sbc-score-red,
 body[data-dp-skin="hell"] .sbc-score-label.sbc-score-red,
 body[data-dp-skin="hell"] .sbc-score-label.tier-red,
 body[data-dp-skin="hell"] .sbc-verdict.tier-red{ background:#B8625C !important; color:#ffffff !important; border-color:#B8625C !important; }
+/* v2028 - GOLD fehlte in dieser Fassung ganz: SOLIDE fiel auf die
+   gruene Grundregel darueber zurueck. Dunkler Text auf Gold, weil
+   Gold auf hellem Grund sonst nicht liest.
+
+   Der lange Selektor ist Absicht: die Obsidian-Regel weiter oben
+   traegt (0,4,1) und wuerde eine kurze Hell-Regel (0,3,1) auch im
+   Hell-Modus schlagen - mit goldener Schrift auf hellem Grund.
+   Hier zaehlt Spezifitaet, nicht Reihenfolge. */
+body[data-dp-skin="hell"] aside.sidebar .sb-card .sbc-score-label.sbc-score-gold{ background:var(--gold) !important; color:#2A2727 !important; border-color:var(--gold) !important; }
 
 /* --- Score-Donut: weisse Mitte, dunkle Zahl (best effort) --- */
 body[data-dp-skin="hell"] .sc-donut-hole,
@@ -35653,16 +36069,36 @@ body.dp-chrome-hell aside.sidebar .sb-card{ background:#F6F2E9 !important; borde
 body.dp-chrome-hell aside.sidebar .sb-price,
 body.dp-chrome-hell aside.sidebar [class*="price"]{ color:#241f18 !important; }
 
+/* v2028b - Gruen gehoerte dazu und fehlte. Die gruene Obsidian-
+   Grundregel (0,3,1) hat die duenne Pille hier (0,2,1) geschlagen:
+   gemessen rgb(94,217,146) auf der Cremekarte #F6F2E9, Kontrast 1,48.
+   Gleiche Machart wie Rot und Gold daneben, nur in Gruen. */
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-green,
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-green-strong{
+  background:rgba(46,158,99,.10) !important; color:#1f7a45 !important;
+  border-color:rgba(46,158,99,.45) !important;
+}
+
 /* EDLE Tier-Pills: duenn, getoent, gesperrt (nicht plumpes Vollflaechen-Pill) */
 body.dp-chrome-hell .sbc-score-label,
 body.dp-chrome-hell .sbc-verdict{
   background:rgba(46,158,99,.10) !important; color:#1f7a45 !important;
   border:1px solid rgba(46,158,99,.45) !important; font-weight:700 !important; letter-spacing:.08em !important;
 }
+/* v2028a - gleicher Grund wie eine Fassung darueber. */
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-red,
 body.dp-chrome-hell .sbc-score-label.sbc-score-red,
 body.dp-chrome-hell .sbc-score-label.tier-red,
 body.dp-chrome-hell .sbc-verdict.tier-red{
   background:rgba(184,98,92,.10) !important; color:#a23c34 !important; border-color:rgba(184,98,92,.45) !important;
+}
+/* v2028 - und hier fehlte gold genauso. Gleiche duenne Machart wie
+   die rote Pille daneben, damit die Reihe ruhig bleibt. Langer
+   Selektor aus demselben Grund wie oben: (0,5,2) schlaegt die
+   Obsidian-Regel (0,4,1). */
+body.dp-chrome-hell aside.sidebar .sb-card .sbc-score-label.sbc-score-gold{
+  background:color-mix(in srgb, var(--gold) 10%, transparent) !important; color:#8a6d1f !important;
+  border-color:color-mix(in srgb, var(--gold) 45%, transparent) !important;
 }
 
 /* Tabs: aktiver Tab dunkel + Gold-Unterstrich */
@@ -35774,6 +36210,36 @@ body.dp-chrome-hell .sb-user{ background: var(--dp-side-bg,#EAE4D6) !important; 
 body.dp-chrome-hell #hdr-badges .sc-pill,
 body.dp-chrome-hell .sc-pill{ background: var(--dp-kpi-card, var(--dp-card,#F6F2E9)) !important; }
 body.dp-chrome-hell aside.sidebar .sb-card{ background: var(--dp-obj-card, var(--dp-card,#F6F2E9)) !important; }
+/* ══ v2104 · DIE SKALEN-BESCHRIFTUNGEN FEHLTEN IM HELLEN SKIN GANZ ══════
+   Gemessen am 11.10.2026 in der Messkabine, Merker `dp_chrome_hell`
+   gesetzt und NEU GELADEN (im laufenden Tab umschalten verfaelscht, weil
+   `_dpDispSkin` Inline-Variablen hinterlaesst):
+
+     Karte      rgb(255,255,255)   <- nicht #F6F2E9! Der Regler setzt
+                                      --dp-obj-card inline auf Weiss.
+     Text       rgba(168,162,153,0.65) -> gemischt rgb(198,195,189)
+     k          1,76   an 161 Stellen
+
+   DAS IST DER SCHLIMMSTE WERT DES GANZEN DURCHGANGS. Der helle Skin
+   dreht die Karte auf Weiss, und diese sechs Klassen tragen weiter ihre
+   Fassung fuer DUNKLEN Grund — es gab hier nie eine Regel.
+
+   > `v1107`/`v1107b` haben genau diesen Fehler fuer `data-ui-surface`
+   > und fuer jede Vorlage behoben und den hellen Skin uebersehen. Die
+   > Reparatur ist mit ihrem Anker gewandert, nicht mit der Fassung.
+
+   #76716b haelt den Farbton und kommt auf 4,83 gegen Weiss. Gegenprobe:
+   gegen #FAF8F3 sind es 4,55 — der Ton traegt also auch, wenn der Regler
+   die Karte auf Creme statt Weiss stellt. */
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbc-date,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbc-arrow,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-label,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-toggle-ico,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-scale,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-scale span,
+html body.dp-chrome-hell aside.sidebar.sidebar .sb-card .sbcm-tick{
+  color:#76716b !important;
+}
 body.dp-chrome-hell #hdr-badges .sc-main,
 body.dp-chrome-hell .sc-main,
 body.dp-chrome-hell .sc-main .si{ background: var(--dp-hero-card, linear-gradient(135deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo))) !important; }
@@ -38292,10 +38758,82 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-fehlt b { color: #B8625C; }
 .oe-fehlt .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
 .oe-fehlt .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+/* v1972 - die Chip-Regel hing an `.oe-fehlt`. Die acht Modernisierungs-Chips
+   der Automatik-Leiste liegen aber in `.oe-chips` innerhalb einer `.oe-q`,
+   also NICHT unter diesem Anker - sie waeren unformatiert geblieben. Gemessen
+   vorher: `.oe-chip` kommt in style.css genau zweimal vor, beide Male unter
+   `.oe-fehlt`. Statt den bestehenden Anker zu weiten, steht hier ein eigener
+   mit gleicher Spezifitaet. */
+.oe-chips { display: inline-block; margin-top: 2px; }
+.oe-chips .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
+.oe-chips .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+/* Leer heisst: hier fehlt die Angabe, die die Anlage 2 braucht. Rot und Gruen
+   bleiben in jeder Marke gleich - Statusfarben werden nicht tokenisiert. */
+/* == v1978 - DIE LEEREN CHIPS WAREN NICHT ZU ERKENNEN ================
+
+   Hier stand ein Orange (#D8954C Rahmen, #8a5a1c Text) auf einer Karte,
+   die selbst einen goldenen Rahmen hat. Marcel: "Die, die du jetzt
+   gemacht hast, kann man nicht richtig erkennen."
+
+   GEMESSEN am Bildschirm: der Chip war 101x22 px, Rahmen 1 px in
+   rgb(216,149,76) - gegen den Goldrahmen der Leiste daneben kaum zu
+   unterscheiden.
+
+   Jetzt dasselbe ROT wie die Pflichtfelder (#B8625C), 2 px Rahmen und
+   ein zarter Grund.
+
+   > Rot ist hier richtig und bleibt in jeder Marke gleich: CLAUDE.md
+   > "Statusfarben nie tokenisieren". Es ist dieselbe Aussage wie beim
+   > Pflichtfeld - hier fehlt etwas - nur ohne Sperre.
+
+   NUR ASCII IN DIESEM BLOCK: style.css wird byteweise geschrieben, und
+   ein Umlaut im Kommentar wird zu einem Ersatzzeichen. Der erste
+   Versuch hob sie von 1 auf 3. ================================== */
+/* == v1979a - DER RAHMEN BLIEB 1 PX, DER RING NICHT ===================
+
+   Die Regel sagte `border: 2px`, gemessen kam 1,33 px an. Und zwar
+   nicht durch eine staerkere Regel: auch ein INLINE
+   `border-width: 2px` aenderte den berechneten Wert nicht, waehrend
+   ein inline `4px !important` sehr wohl wirkte (computed 3,33 px bei
+   einer Seitenskalierung von 0,833).
+
+   Ich kann das nicht erklaeren, und deshalb baue ich nicht darauf.
+   Statt den Rahmen zu erzwingen, steht hier das HAUSMUSTER, das die
+   Pflichtfelder seit v1852b benutzen und das gegen diese Frage immun
+   ist: ein box-shadow-Ring. Er liegt ausserhalb des Kastens, nimmt
+   keinen Platz und haengt nicht an der Rahmenbreite.
+
+   Der Rahmen bleibt in der Marken-Rotfarbe, der Ring macht ihn
+   sichtbar. ============================================= */
+.oe-chips .oe-chip.fehlt { border-color: #B8625C; background: #fdf3f2; color: #7a3f3a; font-weight: 700; box-shadow: 0 0 0 2px rgba(184,98,92,.30); }
+.oe-chips .oe-chip.fehlt:hover { background: #fbe8e6; border-color: #9c4a44; box-shadow: 0 0 0 3px rgba(184,98,92,.42); }
+
+/* v1978 - das Zielfeld, auf das ein Chip springt. Optik wie beim
+   Pflichtfeld, Bedeutung anders: ein Hebel, keine Sperre. Die eigene
+   Klasse gibt es, damit das Aufraeumen beide auseinanderhalten kann. */
+.oe-hebel-leer > label, .oe-hebel-leer .oe-g { color: #7a3f3a; }
+
+/* v1979 - worin sich zwei Berichte unterscheiden. Nur ASCII in diesem
+   Block: style.css wird byteweise geschrieben. */
+.oe-vw-diff-box { margin-top: 6px; padding: 7px 9px; border-radius: 8px; border: 1px solid #E0DBD3; background: #fcfbf8; line-height: 1.5; }
+.oe-vw-diff-box b { color: #2A2727; }
+.oe-d-weg { color: #8a3f39; }
+.oe-d-neu { color: #2f6b4a; }
+.oe-d-and { color: #6b5a2a; }
+.oe-chips .oe-chip.fehlt::before { content: "+ "; }
 .f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
 .oe-anfragen-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
 .card[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
+/* v1967 - die Regel verlangte `.card`. Die Leiste der ImmoWertV-Parameter
+   ist aber ein Formularfeld (`div.f.s2#oe-auto-wrap`), kein Karten-Element,
+   und blieb deshalb bei Stufe 1 und 2 stehen.
+
+   Die bestehende Regel wird NICHT geschwaecht - sie bleibt, wie sie ist.
+   Daneben steht eine zweite mit derselben Spezifitaet (0,3,0) fuer `.f`.
+   Vorher gegengelesen: `oe-stufe-aus` kommt in dieser Datei genau einmal
+   vor, es gibt also keine zweite Regel, die sich damit erschlaegt. */
+.f[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
 
 /* v1852b · Eingabetiefe im Reiterkopf, Übernahme am Verkehrswert */
 .oe-kopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; padding: 10px 14px; border: 1px solid var(--border-g, #e9dcb3); border-left: 3px solid var(--wl-C9A84C, #C9A84C); border-radius: 10px; background: var(--karte, #FBF6E9); }
@@ -38560,7 +39098,12 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
        (display:block) — der Inhalt schrumpfte trotzdem auf 60-px-Auswahlen ("– k", "Kei", "> 2"), gemessen
        auf 390 px. Scrollkasten ist jetzt die Karte, die Tabelle behaelt ihre Breite und wischt. */
 @media (max-width: 520px) {
-  #oe-karte-gewerke { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* v2092e: `--dpm-schiene` ist der Nachweis der Absicht fuer die
+     Messkabine. `-webkit-overflow-scrolling` daneben bleibt stehen (es
+     wirkt in iOS-Safari), taugt aber NICHT als Nachweis: Chrome verwirft
+     die Eigenschaft beim Einlesen. Siehe die Begruendung an
+     `.ytf-quick-wrap`. */
+  #oe-karte-gewerke { overflow-x: auto; -webkit-overflow-scrolling: touch; --dpm-schiene: 1; }
   #oe-karte-gewerke #oe-gewerke { display: table !important; min-width: 620px !important; max-width: none !important; overflow: visible !important; }
   #oe-karte-gewerke #oe-gewerke select, #oe-karte-gewerke #oe-gewerke input { min-width: 110px; }
 }
@@ -39201,4 +39744,1047 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
    Eintrag soll in JEDER Ansicht weg sein, nicht nur in der Schublade. */
 .sb-act-item.sb-act-item[data-feature="portfolio_strategie"] {
   display: none !important;
+}
+
+/* =================================================================
+   v1982 - Sortiermenue der Portfolio-Liste und die Lage-Gruppenkoepfe
+
+   Das Menue haengt am <body> (position:fixed), weil die Seitenleiste
+   mehrere overflow-Vorfahren hat. z-index 9500: ueber allem in der
+   Seite, unter den Modalen (9990-10100).
+   ================================================================= */
+.sb-sort-menu {
+  position: fixed;
+  z-index: 9500;
+  min-width: 212px;
+  padding: 5px;
+  border-radius: 10px;
+  background: #161513;
+  border: 1px solid var(--wl-c9a84c, #C9A84C);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+  font-family: var(--font-main, system-ui, sans-serif);
+}
+.sb-sort-menu-kopf {
+  padding: 6px 9px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a39b8c;
+}
+.sb-sort-menu .sb-sort-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #f3ead0;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.sb-sort-menu .sb-sort-opt svg { fill: currentColor; flex: 0 0 auto; }
+.sb-sort-menu .sb-sort-opt span { flex: 1 1 auto; }
+.sb-sort-menu .sb-sort-opt:hover {
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);
+}
+.sb-sort-menu .sb-sort-opt.aktiv {
+  color: var(--wl-e8cc7a, #E8CC7A);
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);
+}
+.sb-sort-menu .sb-sort-haken { flex: 0 0 auto; }
+
+/* Die Gruppenkoepfe der A/B/C-Lagen. Marcel 08.10.2026: "dass wir dann
+   so Unterkategorien machen: A-Lage, B-Lage, C-Lage". Sie erscheinen NUR
+   im Sortiermodus `lage` und werden nach dem Rendern eingesetzt. */
+.sb-lage-kopf {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 2px 4px;
+  padding: 4px 8px 5px;
+  border-left: 3px solid var(--wl-c9a84c, #C9A84C);
+  border-radius: 0 5px 5px 0;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--wl-e8cc7a, #E8CC7A);
+}
+.sb-lage-kopf:first-child { margin-top: 2px; }
+.sb-lage-kopf-b { border-left-color: var(--wl-b8932f, #b8932f); opacity: 0.92; }
+.sb-lage-kopf-c { border-left-color: #6f6960; opacity: 0.86; color: #d8cfae; }
+.sb-lage-kopf-ohne {
+  border-left-color: #4a4540;
+  background: rgba(255,255,255,0.03);
+  color: #a39b8c;
+  text-transform: none;
+  letter-spacing: 0.03em;
+}
+
+/* Auf dem Handy darf das Menue die Breite nehmen, die es braucht, aber
+   nicht ueber den Rand - die Lage kappt storage.js, die Breite hier. */
+@media (max-width: 480px) {
+  .sb-sort-menu { min-width: 0; width: calc(100vw - 24px); max-width: 280px; }
+  .sb-sort-menu .sb-sort-opt { padding: 11px 10px; font-size: 14px; }
+}
+
+/* =================================================================
+   v1990 - ZWEI FLAECHEN, DEREN TEXTFARBEN NICHT MITGEWANDERT SIND
+
+   Marcel hat am 08.10.2026 zwei Bilder geschickt und auf dem einen die
+   Zeile eingekreist, die man nicht lesen kann: "Das betrifft viele
+   andere Felder auch."
+
+   -- A - DIE FELDHILFE -------------------------------------------
+
+   Gemessen am Feld lzs_pct (genau dem aus seinem Bild):
+
+     ul.dp-feldhilfe-wofuer   e8dcbf auf ffffff    1,36 : 1  <- eingekreist
+     div.dp-feldhilfe-titel   c9a84c auf ffffff    2,29 : 1
+     div.dp-feldhilfe-body    353232 auf ffffff   12,74 : 1  in Ordnung
+
+   Die Sprechblase ist als DUNKLE Flaeche entworfen
+   (.dp-feldhilfe-popup{background:#050505;color:#f3ead0}). Sie traegt
+   aber eine zweite Klasse, .dp-tip-popup, und ein Inline-Blatt setzt
+   die unbedingt auf WEISS. Der Grund ist hell geworden, die
+   Akzentfarben sind dunkel geblieben. Der Fliesstext hat den Wechsel
+   mitgemacht, Titel und Aufzaehlung nicht - genau die zwei.
+
+   > Grund und Schrift werden hier ALS PAAR gesetzt. Sonst laufen sie
+   > beim naechsten Eingriff am Inline-Blatt wieder auseinander.
+
+   -- B - DIE STUFEN 1 - 2 - 3 AUF DER KARTE ----------------------
+
+   Marcel: "Die Stufen auf der Karte, also 1, 2, 3, kann man nur bei
+   der richtig gut lesen, die gerade ausgewaehlt wurde."
+
+     nicht gewaehlt   f6efda auf fffdf7    1,13 : 1
+     gewaehlt (3)     050505 auf Gold      8,92 : 1
+
+   .dp-pf-pille traegt color:#f3ead0 bei opacity:.75 - entworfen fuer
+   die DUNKLE Leiste. In der hellen Karte steht Creme auf Creme.
+
+   Im Dokument gibt es einen ZWEITEN Satz derselben Pillen, und der ist
+   schon geloest: .oe-pillen .dp-pf-pille (gemessen 13,72 : 1). Hier
+   wird genau das gespiegelt, statt etwas Neues zu erfinden - und nur
+   dann, wenn die Leiste wirklich die helle Karte ist
+   (body.dp-neue-karte-stil). Auf der dunklen bleibt Creme richtig.
+
+   Alle Werte vor dem Schreiben gerechnet:
+     Titel 836d31 = 5,00  -  Liste 4a453d = 9,49  -  Mono 6b6358 = 5,91
+     Pille 2A2727 auf fffdf7 = 13,72
+   ================================================================= */
+
+/* A - die Sprechblase als PAAR: heller Grund, helle Tinten */
+.dp-feldhilfe-popup.dp-feldhilfe-popup {
+  background: #ffffff;
+  color: #353232;
+}
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-titel {
+  color: var(--wl-836d31, #836d31);
+}
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-wofuer,
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-wofuer li {
+  color: #4a453d;
+}
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-par {
+  color: #6b6358;
+}
+/* "leer" stand auf opacity .6 - auf hellem Grund ist das zu wenig */
+.dp-feldhilfe-popup.dp-feldhilfe-popup .dp-feldhilfe-leer {
+  opacity: .85;
+}
+
+/* B - die Stufenpillen der Leiste, wenn sie die HELLE Karte ist */
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-pille {
+  border-color: #b9b2aa;
+  color: #2A2727;
+  opacity: 1;
+}
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-pille.on {
+  color: #050505;
+}
+
+/* =================================================================
+   v1991 - DIE LAMPE DER AUSWAHL WIRD SICHTBAR GRUEN
+
+   Marcel am 08.10.2026: "oben auf der Datenaufnahme Karte darf die
+   Lampe der Auswahl gerne gruen sein."
+
+   SIE WAR SCHON GRUEN. .dp-pf-tile.on .dp-pf-led traegt seit Langem
+   radial-gradient(circle at 35% 30%, #5BD98E, #3FA56C 70%). Verdeckt
+   haben es zwei Dinge:
+
+     Groesse   9 x 9 px   (der Grundwert ist 11, ein v578-Block
+                           ueberschreibt ihn mit 9 !important)
+     Rand      rgba(5,5,5,.35) - ein dunkler Ring auf hellem Grund,
+               der bei 9 px fast die halbe Flaeche einnimmt
+
+   Auf Marcels Bild ist "Expose / Marktbericht" gewaehlt, und der Punkt
+   sieht trotzdem dunkel aus. Bei 9 px mit dunklem Ring liest niemand
+   eine Farbe.
+
+   > Eine Zustandsanzeige, die ihren Zustand nicht zeigt, ist keine.
+   > Ein richtiges Gruen, das man nicht sieht, richtet denselben
+   > Schaden an wie ein falsches.
+
+   Nur auf der HELLEN Karte (body.dp-neue-karte-stil). Auf der dunklen
+   Leiste ist der dunkle Ring richtig - dort traegt er die Tiefe.
+
+   Im Browser gegengeprueft, mit echter Wartezeit:
+     heute     9x9   Rand rgba(5,5,5,.35)
+     nachher  12x12  Rand rgba(63,165,108,.55)
+
+   Statusfarbe: Gruen bleibt in jeder Marke Gruen - kein var(--wl-..).
+   ================================================================= */
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-led {
+  width: 12px !important;
+  height: 12px !important;
+  border-color: rgba(5,5,5,.18) !important;
+}
+body.dp-neue-karte-stil .dp-pfbar .dp-pf-tile.on .dp-pf-led {
+  border-color: rgba(63,165,108,.55) !important;
+  box-shadow: 0 0 0 2px rgba(63,165,108,.22), 0 0 8px rgba(63,165,108,.55) !important;
+}
+
+/* =================================================================
+   v1995 - DER RIEGEL: gesperrte Quellen bei einem gefuellten Objekt
+
+   Marcel: "dann sollten wir diese Werte wie ImmoMetrica, auch Expose,
+   oder auch gefuehrte Eingabe/Sprache ausgrauen ... dann haben wir da
+   schon mal einen Riegel drin."
+
+   EIGENE KLASSE, nicht .dp-pf-disabled. Gemessen: die vorhandene
+   Ausgrauung wird in style.css weiter unten wieder aufgehoben
+
+     .dp-pfbar .dp-pf-tile.dp-pf-disabled{opacity:1 !important}
+
+   Wer sie benutzt, baut eine Sperre, die man nicht sieht.
+   ================================================================= */
+.dp-pfbar .dp-pf-tile.dp-pf-riegel-zu,
+#qc7-sources .dp-pf-tile.dp-pf-riegel-zu {
+  opacity: .42 !important;
+  filter: grayscale(.5) !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+.dp-pf-riegel-hinweis {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 7px;
+  font: 11px/1.4 Inter, system-ui, sans-serif;
+  color: #6b6358;
+}
+.dp-pf-riegel-frei {
+  border: 1px solid #b9b2aa;
+  background: transparent;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font: 600 11px/1.4 Inter, system-ui, sans-serif;
+  color: #2A2727;
+  cursor: pointer;
+}
+.dp-pf-riegel-frei:hover { border-color: #2A2727; }
+/* Auf der DUNKLEN Leiste tragen Text und Knopf helle Tinten - die
+   Beziehung zwischen Schrift und Grund wandert nicht von selbst mit. */
+body:not(.dp-neue-karte-stil) .dp-pf-riegel-hinweis { color: #a39b8c; }
+body:not(.dp-neue-karte-stil) .dp-pf-riegel-frei {
+  color: #f3ead0;
+  border-color: rgba(243,234,208,.45);
+}
+
+/* =================================================================
+   v1999 - "Adresse nicht veroeffentlicht" im ImmoMetrica-Fenster
+
+   Marcel: "da koennte man die fehlende Strasse etc anklicken, dann
+   wird das Zentrum genommen oder der Ortskern."
+
+   Kein Warnton: der Ortskern ist erlaubt, es ist kein Fehler. Aber
+   auch nicht unsichtbar - ein Wert ohne seine Herkunft wird wie eine
+   Messung behandelt.
+   ================================================================= */
+.imo-ortskern {
+  margin: 10px 0 2px;
+  padding: 9px 11px;
+  border-left: 3px solid #b9b2aa;
+  border-radius: 0 6px 6px 0;
+  background: rgba(0,0,0,.035);
+  font: 12px/1.45 Inter, system-ui, sans-serif;
+  color: #4a453d;
+}
+.imo-ortskern b { display: block; margin-bottom: 2px; color: #2A2727; }
+.imo-ortskern span b { display: inline; }
+
+/* =================================================================
+   v2000 - die Rueckfrage beim Adressabgleich (ImmoMetrica)
+
+   Marcel: "Gegebenenfalls muss das dann ueber eine Bestaetigung
+   laufen." Sie steht IM Fenster, nicht als Browser-Dialog: ein
+   confirm() blockiert alles und sagt nichts ueber den Unterschied.
+
+   Rot ist hier richtig - anders als beim Ortskern ist das ein
+   moeglicher Fehlgriff, kein erlaubter Ersatz. Statusfarben werden
+   nicht tokenisiert.
+   ================================================================= */
+.imo-abgleich {
+  margin: 10px 14px;
+  padding: 12px 14px;
+  border: 1px solid #B8625C;
+  border-radius: 10px;
+  background: rgba(184,98,92,.07);
+  font: 12.5px/1.5 Inter, system-ui, sans-serif;
+  color: #2A2727;
+}
+.imo-abgleich > b { display: block; margin-bottom: 4px; color: #B8625C; }
+.imo-abgleich > span { display: block; color: #4a453d; }
+.imo-ab-paar {
+  display: flex; gap: 10px; align-items: baseline;
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px dashed rgba(42,39,39,.18);
+}
+.imo-ab-paar > span {
+  flex: 0 0 62px;
+  font: 600 10.5px "JetBrains Mono", monospace;
+  letter-spacing: .06em; text-transform: uppercase; color: #6b6358;
+}
+.imo-ab-paar > b { flex: 1 1 auto; font-weight: 600; }
+.imo-ab-frage { margin-top: 10px; font-weight: 600; }
+.imo-ab-knoepfe { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
+
+/* == v2017 - Stand-Zeile ueber der Pilot-Analyse ===================
+   Vier Zustaende, vier Farben. Gruen nur, wenn die Gueltigkeit
+   WIRKLICH geprueft wurde - "unbekannt" ist grau, nicht gruen. */
+.dp-pa-stand{font:400 12.5px/1.5 Inter,system-ui,sans-serif;padding:9px 13px;
+  border-radius:10px;margin:0 0 14px;border:1px solid transparent}
+.dp-pa-stand b{font-weight:600}
+.dp-pa-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.35);color:#2F8E5A}
+.dp-pa-stand-alt{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);color:#8a6d1f}
+.dp-pa-stand-fremd{background:rgba(184,98,92,.12);border-color:rgba(184,98,92,.40);color:#9d4b45}
+.dp-pa-stand-unbekannt{background:rgba(42,39,39,.05);border-color:rgba(42,39,39,.15);color:#6b645e}
+
+/* == v2018 - Stand der letzten Portfolio-Analyse ==================== */
+.dp-pp-stand{font:400 12px/1.5 Inter,system-ui,sans-serif;padding:8px 12px;
+  border-radius:9px;margin:0 0 10px;border:1px solid transparent}
+.dp-pp-stand b{font-weight:600}
+.dp-pp-stand-ok{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.30);color:#2F8E5A}
+.dp-pp-stand-alt{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);color:#8a6d1f}
+
+/* == v2025 - Herkunft der Mietentwicklung ========================== */
+.me-herkunft{font:400 12px/1.55 Inter,system-ui,sans-serif;margin:0 0 10px;padding:8px 12px;
+  border-radius:9px;background:rgba(42,39,39,.05);border:1px solid rgba(42,39,39,.12);color:#6B6356}
+.me-herkunft b{font-weight:600;color:#2A2727}
+.me-herkunft-annahme{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);color:#8a6d1f;
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}
+.me-herkunft-annahme b{color:#8a6d1f}
+
+/* == v2030 - die Ankauf-Frage unter den Status-Kacheln ============== */
+/* Sie sitzt dort, wo der Zuschlag eingetragen wird. Gold, weil sie ein
+   Angebot ist und keine Warnung - und abwaehlbar, weil ein Umbau ohne
+   Abwahl eine Ansage waere. */
+.ank-zeile{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-left:14px;margin-right:14px;
+  margin:12px 0 2px;padding:11px 14px;border-radius:10px;
+  font:400 13px/1.5 Inter,system-ui,sans-serif;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent)}
+/* v2030a - die Zeile sitzt auf der CREME-Tafel der Deal-Aktion
+   (#s8 .dab-tafel, background #FDFCFA), nicht auf Obsidian. Ihre
+   Textfarben sind deshalb die der Tafel: #2A2727 und #7A7370.
+   Mit --dp-ink-1 (hell) waere sie unsichtbar gewesen. */
+.ank-zeile .ank-txt{flex:1 1 260px;min-width:0;color:#2A2727}
+.ank-zeile b{font-weight:600}
+.ank-zeile i{font-style:italic;opacity:.85}
+.ank-aktionen{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.ank-btn{border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent);background:var(--wl-c9a84c, #C9A84C);
+  color:#2A2727;border-radius:8px;padding:7px 15px;cursor:pointer;
+  font:600 12.5px/1 Inter,system-ui,sans-serif;white-space:nowrap}
+.ank-btn:hover{background:var(--wl-b8932f, #b8932f)}
+.ank-btn-leise{border:0;background:none;color:var(--muted,#8A8272);cursor:pointer;
+  font:400 12.5px/1 Inter,system-ui,sans-serif;text-decoration:underline;white-space:nowrap}
+.ank-btn-leise:hover{color:#2A2727}
+/* Festgeschrieben: ruhiger, kein Gold mehr - es ist erledigt. */
+.ank-zeile.ank-fest{background:rgba(63,165,108,.10);border-color:rgba(63,165,108,.32)}
+.ank-zeile.ank-fest b{color:#1F7A45}
+.ank-korr{font-size:11.5px;color:var(--muted,#8A8272)}
+/* Fehlt der Stichtag, ist es keine Frage sondern ein Hinweis. */
+.ank-zeile.ank-fehlt{background:rgba(42,39,39,.06);border-color:rgba(42,39,39,.22)}
+@media (max-width:620px){
+  .ank-zeile{flex-direction:column;align-items:stretch;gap:10px}
+  .ank-aktionen{justify-content:flex-end}
+}
+
+/* == v2031 - die Doppelkarte ======================================= */
+/* Die Karte dreht sich SELBST und tauscht auf halbem Weg ihren Inhalt.
+   Kein Wrapper: .sb-list ist display:flex, ein Wrapper wuerde das
+   Flex-Kind ersetzen und 245 Regeln auf .sb-card ins Leere laufen
+   lassen. Dasselbe Element, dieselbe Stelle, nur gedreht. */
+.sb-card.dk-dreht{
+  transform:perspective(900px) rotateY(90deg) !important;
+  transition:transform .17s cubic-bezier(.4,0,.7,.2) !important;
+}
+/* Der Rueckweg nimmt die vorhandene Transition der Karte (25176).
+   Eine eigene waere eine zweite Quelle fuer dieselbe Bewegung. */
+.sb-card{transform-style:flat}
+
+/* Der Dreh-Knopf. NICHT in .sbc-actions: die haengt am Hover
+   (style.css:4982), und auf dem Handy gibt es keinen Hover - ein Knopf,
+   den man dort nicht sieht, ist nicht vorhanden. */
+/* v2032 - IM FLUSS, nicht absolut. Gemessen lag der absolute Knopf auf
+   dem Desktop ueber einer .sbcm-Kennzahlkachel und war auf dem Handy
+   gar nicht zu sehen: in fuenf Kartenstilen ist keine Ecke in allen
+   frei. In .sbc-top-line1 ordnet ihn jeder Stil selbst ein. */
+.dk-knopf{
+  display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;
+  margin-left:6px;vertical-align:middle;
+  padding:2px 7px 2px 5px;border-radius:6px;cursor:pointer;
+  font:600 9px/1.4 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.05em;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 42%, transparent);
+  color:var(--wl-e8cc7a, #E8CC7A);
+  opacity:.82;transition:opacity .15s ease,background .15s ease;
+}
+.dk-knopf:hover{opacity:1;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}
+.dk-knopf svg{flex:0 0 auto}
+/* v2032 - die fruehere Regel .sb-card.dk-dreht .dk-knopf{opacity:0}
+   ist entfallen: der Knopf gehoert jetzt zum Inhalt und dreht mit. */
+
+/* v2035 - das Goldband ist entfallen. Es lag absolut ueber der Karte
+   und ueberschrieb in anderen Darstellungen (Aktenmappe, Kartei) fast
+   alles; `padding-top:24px !important` hat die Karte zusaetzlich
+   verzogen. Den Zustand sagt jetzt der Chip in der Kopfzeile.
+
+   Was bleibt, ist eine FARBE - die kann nichts verdecken: ein
+   zurueckhaltender Goldrand an der Karte, solange sie den Ankauf
+   zeigt. */
+.sb-card.sb-card-ankauf{
+  border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
+  box-shadow:inset 3px 0 0 0 color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent);
+}
+
+/* Der Schalter ueber der Liste - dreht alle Karten auf einmal. */
+.dk-schalter{
+  display:block;width:calc(100% - 4px);margin:0 2px 10px;
+  padding:7px 10px;border-radius:8px;cursor:pointer;
+  font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;
+  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);
+  color:var(--wl-e8cc7a, #E8CC7A);
+}
+.dk-schalter:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 24%, transparent)}
+
+/* Wer Bewegung abbestellt hat, bekommt einen Schnitt statt einer
+   Drehung - aber denselben Inhaltswechsel. */
+@media (prefers-reduced-motion:reduce){
+  .sb-card.dk-dreht{transform:none !important;opacity:.25 !important;transition:opacity .12s linear !important}
+}
+
+/* == v2033 - der Knopf traegt den ZUSTAND ========================== */
+/* Vorderseite ruhig (Bestand ist der Normalfall), Rueckseite gold -
+   genau wie das Band darueber. Beide sagen dasselbe, damit die Frage
+   "welche ist fuer was" am Kartenrand beantwortet ist. */
+.dk-knopf{background:rgba(42,39,39,.18);border-color:rgba(168,162,153,.30);color:var(--dp-ink-30,#A8A299)}
+.dk-knopf:hover{background:rgba(42,39,39,.30);color:var(--dp-ink-1,#E8E3D8)}
+.dk-knopf-ankauf{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;
+  color:var(--wl-e8cc7a, #E8CC7A) !important}
+.dk-knopf-ankauf:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent) !important}
+
+/* == v2036 - der Modus-Dreher ueber der Objektliste ================ */
+/* Zwei Segmente, ausserhalb der Karte. Er muss deshalb in keiner der
+   vier Darstellungsachsen passen - das war der Grund fuer drei
+   Anlaeufe am Knopf JE KARTE. */
+.dk-schalter{display:flex;align-items:center;gap:4px;
+  width:calc(100% - 4px);margin:0 2px 10px;padding:3px;border-radius:9px;
+  background:rgba(42,39,39,.22);border:1px solid rgba(168,162,153,.18)}
+.dk-seg-titel{flex:0 0 auto;padding:0 7px 0 5px;
+  font:600 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;
+  color:var(--muted,#8A8272)}
+.dk-seg{flex:1 1 0;min-width:0;padding:5px 6px;border:0;border-radius:7px;cursor:pointer;
+  background:none;color:var(--dp-ink-30,#A8A299);
+  font:600 10.5px/1.3 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.05em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-seg:hover{color:var(--dp-ink-1,#E8E3D8)}
+.dk-seg.aktiv{background:rgba(42,39,39,.55);color:var(--dp-ink-1,#E8E3D8)}
+.dk-seg[data-dk-modus="ankauf"].aktiv{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 26%, transparent);color:var(--wl-e8cc7a, #E8CC7A)}
+.dk-seg b{font-weight:700;opacity:.65;margin-left:2px}
+/* Karten ohne Ankauf-Stand im Ankauf-Modus: zurueckgenommen, nicht
+   versteckt - und mit Begruendung am Element. */
+.sb-card.dk-ohne-ankauf{opacity:.42}
+.sb-card.dk-ohne-ankauf:hover{opacity:.62}
+
+/* == v2037 - die Ankauf-Ansicht ==================================== */
+/* Gesperrt wird mit DECKKRAFT und pointer-events, nicht mit display.
+   Man soll sehen, was damals dastand - nur nicht hineinschreiben. */
+.ank-ansicht-kopf{display:flex;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin:0 0 14px;padding:12px 16px;border-radius:11px;
+  background:rgba(20,17,12,.92);border:1.5px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 70%, transparent);
+  box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.ank-ansicht-txt{flex:1 1 280px;min-width:0;font:400 12.5px/1.55 Inter,system-ui,sans-serif;
+  color:var(--dp-ink-1,#E8E3D8)}
+.ank-ansicht-txt b{display:block;font:700 11px/1.5 "JetBrains Mono",ui-monospace,monospace;
+  letter-spacing:.12em;color:var(--wl-e8cc7a, #E8CC7A);margin-bottom:3px}
+.ank-ansicht-txt span{display:block;color:var(--dp-ink-30,#A8A299)}
+.ank-frei{flex:0 0 auto;display:flex;align-items:center;gap:7px;cursor:pointer;
+  font:400 12px/1.4 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#A8A299)}
+.ank-frei input{cursor:pointer}
+
+/* ── v2108 · DER KASTEN WIRD EINE ZEILE ──────────────────────────────
+   Marcel am 11.10.2026: „nicht darunter nochmal ein extra Feld angeben."
+   Der Erklaertext steht jetzt im `title` und erscheint beim Drueberfahren.
+
+   Geblieben ist nur die Freigabe-Checkbox - sie ist eine FUNKTION, nicht
+   eine Erklaerung, und der einzige Weg, den eingefrorenen Stand zum
+   Bearbeiten zu oeffnen.
+
+   Flaeche, Rand und Schatten fallen weg; was bleibt, ist eine Zeile am
+   rechten Rand. `justify-content` wird dabei ausdruecklich umgestellt:
+   die Grundregel setzt `space-between`, und mit nur EINEM Kind haette die
+   Checkbox sonst links geklebt - dort, wo vorher die Ueberschrift stand. */
+.ank-ansicht-kopf.ank-schlank{
+  padding:0 2px; margin:0 0 8px;
+  background:none; border:none; box-shadow:none; border-radius:0;
+  justify-content:flex-end; align-items:center;
+  cursor:help;
+}
+
+/* Die Reiter und ihr Inhalt: zurueckgenommen und unberuehrbar.
+   Der Hinweis selbst bleibt voll da - er ist der einzige Weg zurueck. */
+/* v2037c - GEDIMMT WIRD MIT filter, NICHT MIT opacity.
+
+   Gemessen: .sec.active traegt nur die Animation "fi"
+   (@keyframes fi: 0% opacity:0 -> 100% opacity:1), keine eigene
+   Deckkraft-Regel. Mein opacity-!important aus v2037a hat sich damit
+   verhakt: nach dem Zurueckschalten blieb der Inhalt dauerhaft auf 0
+   - sichtbar klickbar, aber leer.
+
+   filter beruehrt die Animation nicht. Beim Verlassen faellt es
+   ersatzlos weg, und "fi" spielt wieder wie vorher.
+
+     > Wer eine Eigenschaft ueberschreibt, die eine Animation fuehrt,
+     > uebernimmt ihren Endzustand mit. Eine ANDERE Eigenschaft zu
+     > nehmen ist kein Trick, sondern der Ausweg. */
+body.dp-ankauf-ansicht .sec,
+body.dp-ankauf-ansicht nav.tabs{filter:grayscale(.5) opacity(.55);pointer-events:none;
+  transition:filter .18s ease}
+body.dp-ankauf-ansicht #ank-ansicht-host{opacity:1;pointer-events:auto}
+/* Freigegeben: voll sichtbar und bedienbar, aber der Rahmen bleibt. */
+body.dp-ankauf-frei .sec,
+body.dp-ankauf-frei nav.tabs{filter:none;pointer-events:auto}
+/* v2039 - VOLLFLAECHIG rot, nicht als Schleier. Marcel: das sollte
+   da schon komplett rot dargestellt sein" und eine weisse Schrift
+   unter dem Roten, das kann man nicht lesen".
+
+   Der Freigabe-Zustand war ein 10-Prozent-Rotschleier mit hellgrauem
+   Text. Auf einem ringsum abgeblendeten Bildschirm verschwindet so
+   etwas doppelt. Eine Warnung, die man uebersehen kann, ist keine -
+   sie ist der einzige Hinweis darauf, dass man gerade Geschichte
+   ueberschreiben kann.
+
+   Weiss auf #B8625C: Kontrast 4,2. Statusrot bleibt in jeder Marke
+   gleich (CLAUDE.md), deshalb kein Token. */
+body.dp-ankauf-frei .ank-ansicht-kopf{
+  background:#B8625C !important;border-color:#8E4A45 !important;
+  box-shadow:0 6px 22px rgba(184,98,92,.45) !important}
+body.dp-ankauf-frei .ank-ansicht-txt,
+body.dp-ankauf-frei .ank-ansicht-txt b,
+body.dp-ankauf-frei .ank-ansicht-txt span,
+body.dp-ankauf-frei .ank-frei{color:#ffffff !important}
+body.dp-ankauf-frei .ank-frei{font-weight:600}
+
+/* == v2034 - die Abweichungstafel ================================== */
+/* Bestand gegen Ankauf. Gruen und Rot sind hier Statusfarben und
+   bleiben in jeder Marke gleich (CLAUDE.md: Statusfarben nie
+   tokenisieren) - nur der Rahmen traegt Gold. */
+.abw-tafel-host{margin:22px 0 10px;padding:14px 16px 12px;border-radius:12px;
+  background:rgba(42,39,39,.05);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)}
+.abw-kopf{display:flex;align-items:baseline;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.abw-kopf h4{margin:0;font:600 14px/1.3 "Space Grotesk",system-ui,sans-serif;color:var(--dp-ink-1,#E8E3D8)}
+.abw-sub{font:400 12px/1.3 Inter,system-ui,sans-serif;color:var(--muted,#8A8272);margin-left:6px}
+.abw-stand{font:400 11.5px/1.4 "JetBrains Mono",ui-monospace,monospace;color:var(--muted,#8A8272)}
+.abw-tafel{width:100%;border-collapse:collapse;font:400 12.5px/1.5 Inter,system-ui,sans-serif}
+.abw-tafel th{text-align:right;padding:4px 8px;font:600 10px/1.4 "JetBrains Mono",ui-monospace,monospace;
+  letter-spacing:.08em;color:var(--muted,#8A8272);border-bottom:1px solid rgba(168,162,153,.22)}
+.abw-tafel th:first-child{text-align:left}
+.abw-tafel td{padding:5px 8px;border-bottom:1px solid rgba(168,162,153,.10)}
+.abw-tafel tr:last-child td{border-bottom:0}
+.abw-wort{text-align:left;color:var(--dp-ink-1,#E8E3D8)}
+.abw-zahl{text-align:right;font-variant-numeric:tabular-nums;color:var(--dp-ink-30,#A8A299)}
+.abw-diff{font-weight:600;white-space:nowrap}
+.abw-pct{display:block;font-size:10.5px;font-weight:400;opacity:.75}
+/* Statusfarben - in jeder Marke dieselben */
+.abw-besser .abw-diff{color:#6FCB91}
+.abw-schlechter .abw-diff{color:#E8A09A}
+.abw-gleich .abw-diff{color:var(--muted,#8A8272)}
+.abw-deckung{margin-top:9px;font:400 11.5px/1.5 Inter,system-ui,sans-serif;color:var(--muted,#8A8272)}
+@media (max-width:620px){
+  .abw-tafel{font-size:11.5px}
+  .abw-tafel th,.abw-tafel td{padding:4px 5px}
+  .abw-pct{display:none}
+}
+
+/* == v2039 - die Erklaerzeile unter dem Modus-Dreher =============== */
+/* Nur im Ankauf-Modus: im Bestand ist nichts zu erklaeren. */
+.dk-hilfe{margin:-4px 2px 12px;padding:8px 11px;border-radius:8px;
+  background:rgba(42,39,39,.28);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent);
+  font:400 11px/1.6 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#A8A299)}
+.dk-hilfe b{font-weight:700;color:var(--wl-e8cc7a, #E8CC7A)}
+.dk-hilfe span{display:block;margin-top:5px;font-size:10.5px;opacity:.78}
+
+/* == v2040a - der Modus-Dreher, am LEBENDEN Element gemessen ======= */
+/* v2040 nahm die Werte aus einer REGEL in dieser Datei
+   (aside.sidebar .sb-actions-trigger, Z. 26942). Im Browser gewinnt
+   aber eine andere - gemessen an der echten Schaltflaeche:
+
+     ich hatte        live
+     DM Sans 12/600   Inter 13/700
+     Versalien        normal
+     radius 7px       radius 10px
+     --gold-2         rgb(201,168,76) = var(--gold)
+     9px/14px innen   12px/14px
+     4px/12px aussen  8px/10px
+
+   Eine Regel in der Datei zu lesen ist nicht dasselbe, wie die
+   gewinnende zu kennen. Das sagt nur getComputedStyle am echten
+   Element - und genau das steht in CLAUDE.md als erste Regel. */
+aside.sidebar .dk-schalter{
+  display:flex !important;align-items:center !important;gap:3px !important;
+  width:calc(100% - 20px) !important;margin:8px 10px !important;padding:4px !important;
+  background:transparent !important;
+  border:1px solid color-mix(in srgb, var(--gold) 50%, transparent) !important;
+  border-radius:10px !important;box-shadow:none !important;
+}
+aside.sidebar .dk-schalter:hover{border-color:var(--gold) !important}
+aside.sidebar .dk-seg-titel{
+  flex:0 0 auto;padding:0 9px 0 7px;
+  font-family:Inter,system-ui,sans-serif !important;font-size:11px !important;
+  font-weight:700 !important;letter-spacing:.26px !important;text-transform:none !important;
+  /* v2090: stand auf 55 % — Gold zu 55 % auf Obsidian ergibt
+     rgb(112,94,44) und Kontrast 3,23 (gemessen 10.10.2026, 11 px).
+     Dieselbe Ursache wie bei `.hint` weiter oben: eine Deckkraft, die nie
+     gegen ihren Grund gerechnet wurde. 82 % hält auf Obsidian (6,1) UND
+     auf `--ch` (4,8) — die aktive Kachel legt rgba(42,39,39,.55) darunter,
+     also gilt der hellere der beiden Gründe. */
+  color:color-mix(in srgb, var(--gold) 82%, transparent) !important;
+}
+aside.sidebar .dk-seg{
+  flex:1 1 0;min-width:0;padding:8px 10px !important;border:0 !important;
+  border-radius:7px !important;background:transparent !important;cursor:pointer;
+  font-family:Inter,system-ui,sans-serif !important;font-size:13px !important;
+  font-weight:700 !important;letter-spacing:.26px !important;text-transform:none !important;
+  /* v2090: stand auf 62 % — rgb(126,105,48), Kontrast 3,83 bei 13 px.
+     Siehe die Begründung an `.dk-seg-titel` darüber. */
+  color:color-mix(in srgb, var(--gold) 82%, transparent) !important;
+  transition:all .18s ease !important;
+}
+aside.sidebar .dk-seg:hover{
+  background:color-mix(in srgb, var(--gold) 10%, transparent) !important;
+  color:var(--gold) !important;
+}
+aside.sidebar .dk-seg.aktiv{
+  background:color-mix(in srgb, var(--gold) 16%, transparent) !important;
+  color:var(--gold) !important;
+}
+aside.sidebar .dk-hilfe{margin:0 10px 10px !important;width:calc(100% - 20px) !important}
+
+/* == v2042 - der Stand-Kasten gehoert ueber die volle Breite ======= */
+/* Gemessen am lebenden Element: .dp-pa-wrap ist ein Raster mit
+   204px 1fr, gebaut fuer ZWEI Kinder (Leiste schmal, Inhalt breit).
+   v2017 hat den Stand-Kasten als ERSTES Kind davorgesetzt und damit
+   alles um eine Zelle verschoben:
+
+     Zelle 1  .dp-pa-stand    204 px
+     Zelle 2  .dp-pa-rail    1010 px   <- deshalb gestapelte Vollzeilen
+     Zelle 3  .dp-pa-content  204 px   <- deshalb der Textstreifen
+
+   Ein Element in ein Raster einzufuegen ist nie neutral: das Raster
+   zaehlt Kinder, nicht Bedeutungen. */
+.dp-pa-wrap > .dp-pa-stand,
+.dp-pa-wrap > .dp-pa-stand-alt{grid-column:1 / -1;width:100%;box-sizing:border-box;
+  margin:0 0 4px}
+
+/* == v2042a - die Abweichungstafel IM hellen Pilot-Panel =========== */
+/* Gemessen: weiss auf rgb(244,244,244), Kontrast 1,1 - unlesbar.
+   Meine Farben aus v2034 sind fuer den dunklen Grund der App gebaut;
+   die Pilot-Analyse ist ein helles Panel und fuehrt dafuer EIGENE
+   Tintenvariablen (--ink, --ink2, --green, --red auf .dp-pa-wrap).
+   Die werden hier benutzt statt neuer Werte - so faerbt die Tafel mit,
+   wenn das Panel sich aendert.
+
+   Derselbe Fehlertyp wie bei der Creme-Tafel der Deal-Aktion: eine
+   Farbe gilt nur zu ihrem Grund. */
+.dp-pa-wrap .abw-tafel-host{background:#fff;border-color:var(--line,#E7E4DC)}
+.dp-pa-wrap .abw-kopf h4{color:var(--ink,#2A2826)}
+.dp-pa-wrap .abw-sub,
+.dp-pa-wrap .abw-stand,
+.dp-pa-wrap .abw-deckung{color:var(--ink3,#938B7F)}
+.dp-pa-wrap .abw-wort{color:var(--ink,#2A2826)}
+.dp-pa-wrap .abw-zahl{color:var(--ink2,#5C554E)}
+.dp-pa-wrap .abw-tafel th{color:var(--ink3,#938B7F);border-bottom-color:var(--line,#E7E4DC)}
+.dp-pa-wrap .abw-tafel td{border-bottom-color:var(--line,#E7E4DC)}
+.dp-pa-wrap .abw-besser .abw-diff{color:var(--green,#2F8E5A)}
+.dp-pa-wrap .abw-schlechter .abw-diff{color:var(--red,#B8625C)}
+.dp-pa-wrap .abw-gleich .abw-diff{color:var(--ink3,#938B7F)}
+.dp-pa-wrap .abw-deckung b{color:var(--ink,#2A2826)}
+
+/* =====================================================================
+   v2128 - EIN 2-PIXEL-STUMMEL AUF JEDEM SCHREIBTISCH
+
+   Gefunden in Durchgang 1 der Geraeteabnahme (8 Geraete x 9 Reiter,
+   8.778 gepruefte Bedienelemente): `.dp-sidebar-toggle` wurde in 18 von
+   72 Reiterbesuchen als "erdrueckt" gemeldet - 2 x 20 px.
+
+   GEMESSEN, Aktenmappe, alle Reiter:
+
+     Breite   Zustand
+      768     0 x 0    display:none        (v1888, Absicht)
+      901     2 x 20   display:inline-block  @248, y=7198
+     1180     2 x 20   display:inline-block  @248, y=4304
+     1440     2 x 20   display:inline-block  @248, y=4111
+     1920     2 x 20   display:inline-block  @248, y=4037
+
+     background  rgb(240,240,240)
+     border      1,11 px outset
+     svg darin   0 x 0
+
+   Das ist der **nackte Browser-Standardknopf**: grau, geriffelt, ohne
+   eine einzige eigene Regel. Sein Symbol ist 0 x 0, weil das `<svg>`
+   nur einen `viewBox` traegt und keine Groesse bekommt. Er steht im
+   Textfluss zwischen `#dashboard-main` und `#all-objects-main`, also
+   rund 4.000 bis 7.200 px unterhalb des Seitenanfangs.
+
+   ── WAS ER BEDIENT, UND WARUM IHN NIEMAND ERREICHT ────────────────
+   `onclick="DealPilotDashboard.toggleSidebar()"` - und das schaltet
+   trotz des Namens das **Cockpit-Vollbild** (`dp-dash-fullscreen`).
+
+   Mit offenem Cockpit nachgemessen (`DealPilotDashboard.open()`):
+
+     390 px   .dp-sidebar-toggle  display:none   dp-show=TRUE
+     768 px   .dp-sidebar-toggle  display:none   dp-show=TRUE
+    1440 px   .dp-sidebar-toggle  2x20 @248,6029 - unterhalb des
+              Cockpits (das ist 5.954 px hoch), also nicht im Bild
+
+     Vollbild-Knoepfe im Cockpit:  0
+     .dp-dash-btn im Cockpit:      0
+
+   > **Das Cockpit-Vollbild ist gebaut und auf keiner Breite
+   > erreichbar.** Auf Handy und Tablet ist sein einziger Schalter
+   > ausgeblendet, auf dem Schreibtisch ist er 2 px breit und steht
+   > 6.000 px tief in der Seite.
+
+   Und `dashboard.js` setzt dafuer eine Klasse, die nichts liest:
+
+     dashboard.js:2494   tog.classList.add('dp-show')      beim Oeffnen
+     dashboard.js:2514   tog.classList.remove('dp-show')   beim Schliessen
+
+     Regeln im laufenden Dokument, die "dp-show" nennen:  0 von 11.757
+
+   Dieselbe Form wie bei den Farbreglern in N60.35: ein Schalter setzt,
+   und niemand liest. Nur steht hier zusaetzlich ein graues Artefakt im
+   Bild.
+
+   ── WAS HIER GETAN WIRD, UND WAS AUSDRUECKLICH NICHT ──────────────
+   Der Stummel wird **ausgeblendet**. Er ist auf keiner Breite ein
+   bedienbarer Knopf gewesen, und auf Handy und Tablet war er es schon
+   seit `v1888` nicht mehr.
+
+   Es wird **keine neue Steuerung gebaut.** Ob das Cockpit ein Vollbild
+   braucht und wo sein Schalter sitzen soll, ist eine
+   Produktentscheidung - sie steht als Frage im Backlog unter N60.40.
+   Marcel hat fuer die Layouts genau das Gegenteil verlangt (*"es gibt
+   dort dieses Vollbild-Menue ausblenden, das muesste bei der Ansicht
+   raus"*, `layout-varianten.css:1480`), also waere ein neuer
+   Vollbildknopf hier eine Annahme, keine Umsetzung.
+
+   `DealPilotDashboard.toggleSidebar()` bleibt unberuehrt, die Klasse
+   `dp-show` wird weiter gesetzt. Es faellt nur die Flaeche weg, die
+   ohnehin niemand treffen konnte.
+   ===================================================================== */
+body .dp-sidebar-toggle{ display: none !important; }
+
+/* =====================================================================
+   v2129 - EINE TREFFERFLAECHEN-HILFE HAT PLATZIERUNGEN ZERSTOERT
+
+   Gefunden in Durchgang 2 der Geraeteabnahme (100 Laeufe, 5 Breiten x
+   20 echte Oeffner). Gemessen am Preise-Fenster:
+
+     Breite   .pricing-modal-close
+      360     36 x 44  @1, 45      <- oben LINKS
+      390     36 x 44  @1, 45      <- oben LINKS
+      768     36 x 40  @1, 45      <- oben LINKS
+     1180     36 x 36  @1106, 45   <- oben rechts, richtig
+     1440     36 x 36  @1241, 45   <- oben rechts, richtig
+
+   Die Grenze ist 768 px, und genau dort steht:
+
+     @media (max-width: 768px){
+       .pricing-modal-close, .bw-cta { position: relative !important; }
+       .pricing-modal-close::after, .bw-cta::after { ... 44 x 44 ... }
+     }
+
+   Das ist der Block "v652d: Preise-/Upgrade-Fenster - .pricing-modal-close
+   und a.bw-cta lagen unter 44px Trefferflaeche. Optik bleibt, Flaeche
+   kommt per ::after."
+
+   ── DIE ABSICHT WAR RICHTIG, DAS MITTEL NICHT ─────────────────────
+   `position: relative` sollte dem `::after` einen Bezug geben. Aber
+   `.pricing-modal-close` ist in `pricing-modal.css:40` bereits
+
+     position: absolute;  top: 16px;  right: 16px;
+
+   > **Ein absolut positioniertes Element IST schon ein Bezug fuer sein
+   > Pseudoelement.** `relative` zu erzwingen war nicht nur unnoetig,
+   > es hat `top` und `right` von "Abstand zum Elternrand" in "Verschiebung
+   > aus der Flussposition" umgedeutet: 16 px nach unten und 16 px nach
+   > LINKS. Daraus wurde x = 1.
+
+   Die Rechnung geht genau auf: Flussposition im Shell-Polster ist
+   links 17 / oben 29. Minus 16 ergibt 1, plus 16 ergibt 45 - die
+   gemessenen Werte.
+
+   ── DERSELBE GRIFF TRIFFT NOCH EINE STELLE ────────────────────────
+   Die grosse Trefferflaechen-Liste in style.css (Block
+   "v652-uebrige-mobile", @media max-width:768px) nennt neun Selektoren
+   und setzt auf alle `position: relative !important`:
+
+     .dp-tip              kein eigenes position   -> relative ist richtig
+     .sb-sort-btn         kein eigenes position   -> richtig
+     .sbc-btn             kein eigenes position   -> richtig
+     .sb-user-icon-btn    kein eigenes position   -> richtig
+     .hdr-mobile-menu     kein eigenes position   -> richtig
+     .btn.btn-sm          kein eigenes position   -> richtig
+     .img-del             position: ABSOLUTE      -> zerstoert
+     .dp-sidebar-toggle   (seit v2128 display:none)
+     #dp-sb-toggle        position: FIXED         -> zerstoert
+
+   `.img-del` ist der Loeschknopf am Foto: `absolute; top:5px; right:5px`,
+   also die Ecke des Bildes. Mit `relative` rutscht er um 5 px nach
+   unten und 5 px nach links aus seiner Flussposition - und die liegt
+   nicht in der Ecke.
+
+   > Dieser Teil ist **an der Kaskade** gefunden, nicht am Bild: in der
+   > Demo liegt kein Foto, also war `.img-del` in keinem der 100 Laeufe
+   > im Dokument. Das gehoert so gesagt - es ist ein Codebefund mit
+   > derselben Ursache, nicht eine zweite Messung.
+
+   ── WAS HIER GESETZT WIRD ─────────────────────────────────────────
+   Nur die Positionsart wird zurueckgeholt. `top`/`right` stehen in den
+   Grundregeln und werden damit wieder richtig gelesen; das `::after`
+   mit seinen 44 x 44 bleibt vollstaendig erhalten, weil `absolute` und
+   `fixed` genauso ein Bezug sind wie `relative`.
+
+   Band und Selektoren sind Zeichen fuer Zeichen dieselben wie dort -
+   bei gleicher Spezifitaet gewinnt die spaetere Regel, und das ist
+   diese.
+   ===================================================================== */
+@media (max-width: 768px){
+  .pricing-modal-close{ position: absolute !important; }
+  .img-del{ position: absolute !important; }
+  #dp-sb-toggle{ position: fixed !important; }
+}
+
+/* =====================================================================
+   v2130 - FUENF BESCHRIFTUNGEN UNTER DER HAUSUNTERGRENZE
+
+   Durchgang 3 der Geraeteabnahme: 6 Geraete x 9 Reiter, je Reiter alle
+   WIRKLICH gerenderten Textknoten gemessen (Blattknoten mit Inhalt,
+   Flaeche > 2 px, sichtbar, `offsetParent` vorhanden).
+
+     Geraet     Textknoten   davon unter 11 px
+      360          1.359          540
+      390          1.368          540
+      768          1.645          401
+      834          1.663          410
+     1180          1.692          465
+     1440          1.692          465
+
+   ── WARUM 540 KEIN BEFUND SIND, 14 ABER SCHON ─────────────────────
+   Gemessene Groessen: 7,5 · 8 · 8,5 · 8,8 · 9 · 9,1 · 9,5 · 10 ·
+   10,5 · 10,9 px.
+
+   Die Hausuntergrenze steht nicht in CLAUDE.md, sondern in einer
+   Entscheidung: **`v1890`** hat die Donut-Beschriftung der Deal-Aktion
+   von 6,5 px auf **8,5 px** gehoben, mit der Begruendung *"Zu klein
+   ist sie auf JEDEM Geraet; die Regel gilt jetzt ueberall."* Damit ist
+   8,5 px der Boden, den dieses Haus sich selbst gesetzt hat - und
+   9 bis 10,5 px sind bewusste Mikrobeschriftungen in JetBrains Mono,
+   keine Fehler.
+
+   > **Eine Grenze, die man selbst waehlt, ist keine Messung.** Mein
+   > erster Durchgang hat mit 11 px gerechnet und 540 "Befunde" ergeben.
+   > Das waere ein Umbau der halben App gewesen - gegen Marcels
+   > ausdrueckliche Vorgabe *"Fuehre keine unnoetige komplette
+   > Neugestaltung durch."* Erst die Suche nach der Hausentscheidung
+   > hat die richtige Grenze geliefert.
+
+   Unter 8,5 px bleiben, auf jedem Geraet gleich, **fuenf Formen**:
+
+     7,5 px   div.dab-bp-lbl               7x   "BOARDING" / "FREI"
+     7,5 px   span.dp-pf-scan              1x   "SCAN"
+       8 px   span.dpfk-bp                 1x
+       8 px   #dpfk-ltvlabel .dpfk-fl      1x
+       8 px   .dpfk-strip [id^=mrpf-top-src-]  4x
+
+   Alle fuenf sind einzeilige Versalien-Etiketten in JetBrains Mono.
+   8,5 px aendert ihre Rolle nicht, nur ihre Lesbarkeit - dieselbe
+   Bewegung wie bei `v1890`.
+
+   ── KEIN BEFUND, ausdruecklich ────────────────────────────────────
+   `span.bp` wird mit **0 px** gemessen. Das ist die Versteckmechanik
+   der Kartei-Fassung: `datenaufnahme.css:609` setzt
+   `font-size:0 !important` auf "BOARDING PASS" und zeichnet mit
+   `::after` den Text "DealPilot" in 14 px. Null Pixel ist hier die
+   Absicht, nicht die Groesse.
+
+   `.dab-bp-lbl` liegt NICHT hier, sondern in
+   `deal-action-boarding.js:1490` - einem per JS eingehaengten Blatt.
+   Dort wird die Zahl direkt geaendert; ein Blatt von hier koennte
+   gegen ein spaeter eingehaengtes verlieren
+   (siehe [[probe-blatt-vor-blatt-44]]).
+   ===================================================================== */
+.dp-pf-scan{ font-size: 8.5px !important; }
+.dpfk-bp{ font-size: 8.5px !important; }
+.dpfk-fl{ font-size: 8.5px !important; }
+.dpfk-strip [id^="mrpf-top-src-"]{ font-size: 8.5px !important; }
+
+/* =====================================================================
+   v2137 - DAS BAND DER BESTAETIGUNGSFRIST (Backlog N60.3)
+
+   Marcel: "Der Hinweis muss natuerlich mit der Erstanmeldung kommen."
+
+   Unten statt oben: oben sitzen Kopfzeile, Reiterleiste und bei schmalen
+   Breiten der Burger. Ein Band dort haette etwas verdeckt - und genau
+   das war der Befund von v1992a am Werkzeugpanel ("#dp-kv-panel und
+   .dpl-schalter lagen auf 390 px ueber der Datenaufnahme").
+
+   Es liegt UNTER der Datenaufnahme-Schublade (z 1100) und ueber allem
+   anderen: z 1090. Eine Schublade, die vom Band verdeckt wird, waere
+   schlimmer als ein Hinweis, der kurz wartet.
+   ===================================================================== */
+#dp-verify-band{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  z-index: 1090;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  max-width: min(760px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #0E0D0B;
+  border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent);
+  box-shadow: 0 14px 40px -14px rgba(0,0,0,.75);
+  color: #F3EAD0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+#dp-verify-band b{ color: var(--gold-hi, #E8CC7A); font-weight: 600; }
+#dp-verify-band .dvb-ico{
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);
+  color: var(--gold-hi, #E8CC7A);
+  font-size: 15px;
+}
+#dp-verify-band .dvb-txt{ flex: 1 1 auto; min-width: 0; }
+
+/* Beide Knoepfe 44 px hoch - dieselbe Untergrenze wie ueberall sonst
+   seit v2134. Ein Hinweis, den man auf dem Handy nicht wegtippen kann,
+   ist ein Hindernis. */
+#dp-verify-band .dvb-send,
+#dp-verify-band .dvb-zu{
+  flex: 0 0 auto;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 9px;
+}
+#dp-verify-band .dvb-send{
+  padding: 10px 14px;
+  background: var(--gold-hi, #E8CC7A);
+  color: #1A1407;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#dp-verify-band .dvb-send:hover{ filter: brightness(1.06); }
+#dp-verify-band .dvb-send:disabled{ opacity: .7; cursor: default; }
+#dp-verify-band .dvb-zu{
+  min-width: 44px;
+  background: transparent;
+  border: 1px solid #2A2622;
+  color: #8C857B;
+  font-size: 15px;
+  line-height: 1;
+}
+#dp-verify-band .dvb-zu:hover{ color: #F3EAD0; border-color: #3A352E; }
+
+/* Abgelaufen: dieselbe Flaeche, andere Dringlichkeit. Rot bleibt in
+   jeder Marke rot (CLAUDE.md: Statusfarben nie tokenisieren). */
+#dp-verify-band.dvb-aus{
+  border-color: #B8625C;
+  background: #140D0C;
+}
+#dp-verify-band.dvb-aus .dvb-ico{ background: rgba(184,98,92,.18); color: #D8564C; }
+#dp-verify-band.dvb-aus b{ color: #E8A49F; }
+
+/* Weggetippt: das Band schrumpft auf den Hinweis, verschwindet aber
+   NICHT. Eine Frist, die man ausblenden kann, ist keine Frist - und
+   ein Zugang, der in vier Stunden endet, gehoert nicht versteckt. */
+#dp-verify-band.dvb-klein{ padding: 8px 10px; gap: 8px; }
+#dp-verify-band.dvb-klein .dvb-txt{
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#dp-verify-band.dvb-klein .dvb-send{ display: none; }
+
+@media (max-width: 640px){
+  #dp-verify-band{
+    left: 8px; right: 8px;
+    transform: none;
+    max-width: none;
+    flex-wrap: wrap;
+    bottom: 10px;
+  }
+  #dp-verify-band .dvb-txt{ flex: 1 1 100%; order: 2; }
+  #dp-verify-band .dvb-send{ flex: 1 1 auto; order: 3; }
+  #dp-verify-band .dvb-zu{ order: 1; margin-left: auto; }
+  #dp-verify-band.dvb-klein .dvb-txt{ max-width: none; }
+}
+
+/* =====================================================================
+   v2137a - DER PLATZ FUER DAS BAND
+
+   GEMESSEN bei 360 und 390 px: das Band lag ueber DREI bzw. ZWEI
+   Knoepfen der Datenaufnahme (button.oe-btn, #oe-mb-oeffnen). Ein
+   position:fixed-Element am unteren Rand verdeckt, was dort steht.
+
+   > Ein Hinweis, der eine Bedienung verdeckt, ist kein Hinweis mehr,
+   > sondern ein Hindernis.
+
+   Dieselbe Falle wie beim Werkzeugpanel, das auf 390 px ueber der
+   Datenaufnahme lag - und ich habe sie selbst wieder gebaut.
+
+   Die Hoehe kommt GEMESSEN aus dem Band (`--dp-verify-band-h`), nicht
+   geraten: auf 360 px ist es 195 px hoch, auf 1180 px 89. Eine feste
+   Zahl waere auf einer der beiden Breiten falsch.
+
+   Das Polster liegt an `.body` - dem Inhalt im Scroller `.main-col`,
+   nicht am Scroller selbst. So waechst die scrollbare Flaeche, und
+   jeder Knopf laesst sich ueber das Band schieben.
+   ===================================================================== */
+html[data-dp-verify="1"] .body{
+  padding-bottom: calc(var(--dp-verify-band-h, 0px) + 20px) !important;
 }

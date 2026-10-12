@@ -414,229 +414,39 @@ html.qc-app .dp-pfbar .dp-pf-tile.on .dp-pf-led{ background:#3FA56C !important; 
    > einem Bereich stapeln uebereinander, statt untereinander zu
    > stehen. Mit Auto-Platzierung in Spalte 1 passiert genau das
    > Richtige, ohne jedes Kind einzeln zu benennen. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar{
-  display:grid !important;
-  grid-template-columns:1fr 296px !important;
-  align-items:start !important;
-  gap:0 !important;
-  padding:0 !important;
-  height:auto !important; min-height:0 !important;
-  overflow:visible !important;
-  background:#FFFDF9 !important;
-  border:1px solid #E6E0D2 !important; border-radius:3px !important;
-}
+
 /* Alles Vorhandene bleibt links. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > *{ grid-column:1 !important; }
+
 /* Die linke Spalte bekommt ihr eigenes Polster - das Gitter hat keins,
    sonst saesse der Trennstrich zur rechten Spalte im Polster. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg{
-  padding:0 15px !important; margin:0 !important;
-}
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{ padding-top:13px !important; }
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-grouplbl{
-  display:block !important; margin-bottom:7px !important;
-}
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-row{
-  flex-wrap:wrap !important; gap:7px !important;
-}
+
+
+
+
 /* Der Trenner zwischen den beiden Quellgruppen wird wieder sichtbar -
    im Trichter hat er Platz und Bedeutung. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-sep{
-  display:block !important;
-  grid-column:1 !important;
-  height:1px !important; width:auto !important;
-  margin:12px 15px !important;
-  background:#F0ECE2 !important; border:0 !important;
-}
+
 /* Der QR bleibt links unten, klein und ruhig. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-qr{
-  margin:12px 0 13px 15px !important; justify-self:start !important;
-}
+
 
 /* Die rechte Spalte. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dpk-ertrag{
-  grid-column:2 !important; grid-row:1 / span 50 !important;
-  display:flex !important; flex-direction:column !important;
-  padding:13px 15px !important;
-  background:#FBF9F4 !important;
-  border-left:1px solid #E6E0D2 !important;
-  align-self:stretch !important;
-}
-html[data-dp-kartenstil="trichter"] .dpk-ertrag-titel{
-  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
-  text-transform:uppercase; color:#8C8578;
-  margin-bottom:9px;
-}
-html[data-dp-kartenstil="trichter"] .dpk-ertrag-zeile{
-  display:flex; justify-content:space-between; gap:10px;
-  padding:6px 0; border-bottom:1px solid #F2EFE8;
-  font-size:12.5px; color:#2C2A26; font-variant-numeric:tabular-nums;
-}
-html[data-dp-kartenstil="trichter"] .dpk-ertrag-was{
-  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.07em;
-  text-transform:uppercase; color:#8C8578; white-space:nowrap;
-}
+
+
+
+
 /* Der Abrufknopf sitzt im Trichter UNTER dem Ergebnis - dort, wo der
    Blick nach dem Lesen ankommt. `margin-top:auto` schiebt ihn ans
    untere Ende, egal wie hoch die linke Spalte geworden ist. */
-html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-rz{
-  margin-top:auto !important; padding-top:12px !important;
-  width:100% !important; min-width:0 !important; display:block !important;
-}
-html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-launch{
-  width:100% !important; justify-content:center !important;
-}
-
-/* ── ENTWURF 5 · BORDKARTE, ERNST GEMEINT ─────────────────────────────
-   Die Metapher bleibt - aber nur das, was ETWAS BEDEUTET: der Abriss
-   trennt „Quellen waehlen" von „Abrufen". Perforation als feine
-   Punktlinie, kein Strichcode, kein Streifen.
-
-   Hier ist kein einziges neues Element noetig. `.dp-pf-perf` IST die
-   Perforation; sie war in der Zeile nur versteckt. Ein Bauteil, das
-   schon dasteht, wieder einzublenden ist ehrlicher als ein zweites
-   danebenzustellen.
-
-   ── v1702: DER ENTWURF IST NICHT MEHR DIE VORGABE ───────────────────
-   Bis hierher stand an 35 Stellen `html[data-dp-layout]:not([data-dp-
-   kartenstil])` - also: sobald IRGENDEIN Layout aktiv ist und niemand
-   einen Entwurf gewaehlt hat, wird der Streifen zur hellen Bordkarte
-   umgebaut. Gemessen am 29.09.2026 in Kanzlei (v2): Grund `#FFFDF9`
-   statt Runway-Verlauf, 128 statt 78 px, `.dp-pf-stripe` und
-   `.dp-pf-perf` auf 0x0, `.dp-pf-lead` als volle Zeile 1278x38 statt
-   als Bordkarten-Kopf 149 px links.
-
-   Marcel: „jetzt sieht der Streifen bei Datenaufnahme im Tab Objekt bei
-   dem Layout Kanzlei und Tower und Arbeitsmappe nicht mehr so aus wie
-   aus unserer demo. Stand heute passt die pre flight Karte."
-
-   Der Anker heisst jetzt `data-dp-pfstil` und wird NIRGENDS gesetzt -
-   die Regeln bleiben lesbar stehen, greifen aber nicht mehr. Ein Layout
-   allein aendert den Streifen damit nicht: ohne gewaehlten Entwurf
-   sieht er in JEDEM Layout aus wie im Auslieferungszustand, also wie in
-   der Demo. Die vier Entwuerfe bleiben ueber `data-dp-kartenstil`
-   waehlbar - sie sind ein Angebot, keine Ansage. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar{
-  display:flex !important; flex-wrap:wrap !important;
-  align-items:stretch !important;
-  padding:0 !important; height:auto !important; min-height:0 !important;
-  background:#FFFDF9 !important;
-  border:1px solid #DCD4C2 !important; border-radius:3px !important;
-  overflow:hidden !important;
-}
-/* Der Vorspann kommt zurueck - aber als Markenzeile, nicht als
-   Versalien-Aufdruck. Der alte Text wird auf Schriftgrad 0 gesetzt und
-   der neue im Pseudoelement gefuehrt: so bleibt der Knoten, an dem
-   `object-actions.js` haengt, unangetastet. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
-  display:flex !important; order:1 !important;
-  flex:1 0 100% !important; align-items:baseline !important; gap:9px !important;
-  padding:12px 16px 0 !important; margin:0 !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .bp,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .bp{
-  display:inline !important;
-  font-family:"Space Grotesk",sans-serif; font-weight:700;
-  letter-spacing:0; text-transform:none; color:#2C2A26;
-  font-size:0 !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .bp::after,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .bp::after{
-  content:"DealPilot"; font-size:13px; letter-spacing:.01em;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .k,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .k{
-  display:inline !important; font-weight:700 !important; font-size:13px !important;
-  color:#2C2A26 !important; letter-spacing:0 !important; text-transform:none !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .s,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .s{ display:none !important; }
-
-/* Die Quellen in der Mitte. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg{
-  order:2 !important; padding:11px 16px 0 !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg:last-of-type,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg:last-of-type{
-  padding-bottom:13px !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-row,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-row{ flex-wrap:wrap !important; }
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-qr,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-qr{ display:none !important; }
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-sep,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-sep{ display:none !important; }
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-stripe,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-stripe,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-bc,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-bc{ display:none !important; }
-
-/* Die Perforation - zwischen Waehlen und Ausloesen, nicht als Zierat. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf{
-  display:block !important; order:8 !important;
-  flex:0 0 0 !important; width:0 !important; height:auto !important;
-  align-self:stretch !important;
-  margin:10px 0 !important; padding:0 !important;
-  background:none !important;
-  border-left:2px dotted #DCD4C2 !important;
-}
-
-/* Der Abschnitt rechts. Die einzige Farbflaeche der Karte - sie zieht
-   den Blick auf den Knopf, und genau das soll sie. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
-  order:9 !important;
-  flex:0 0 190px !important; width:190px !important; min-width:190px !important;
-  display:flex !important; flex-direction:column !important;
-  justify-content:center !important; gap:7px !important;
-  padding:13px 16px !important; margin:0 0 0 auto !important;
-  background:#FBF6E9 !important;
-  align-self:stretch !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz::before,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz::before{
-  display:block !important;
-  content:"Abschnitt";
-  font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.09em;
-  text-transform:uppercase; color:#8C8578;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-launch,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-launch{
-  width:100% !important; justify-content:center !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dpk-zahl,
-html[data-dp-kartenstil="bordkarte"] .dpk-zahl{
-  font-size:11.5px; color:#8C8578; font-variant-numeric:tabular-nums;
-}
 
 /* ── SCHMALE SCHIRME ──────────────────────────────────────────────────
    Der Trichter braucht Breite; unter 820 px bricht er auf zwei Bloecke
    um - so steht es schon im Entwurf. Die Bordkarte legt ihren Abschnitt
    unter die Quellen und behaelt die Perforation als WAAGERECHTE Linie:
    ihre Bedeutung ist „hier wird getrennt", nicht „hier ist rechts". */
-@media (max-width: 820px){
-  html[data-dp-kartenstil="trichter"] .dp-pfbar{ grid-template-columns:1fr !important; }
-  html[data-dp-kartenstil="trichter"] .dp-pfbar .dpk-ertrag{
-    grid-column:1 !important; grid-row:auto !important;
-    border-left:0 !important; border-top:1px solid #E6E0D2 !important;
-    margin-top:12px !important;
-  }
-  html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf,
-  html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf{
-    flex:0 0 100% !important; width:auto !important; height:0 !important;
-    margin:10px 16px !important;
-    border-left:0 !important; border-top:2px dotted #DCD4C2 !important;
-  }
-  html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
-  html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
-    flex:0 0 100% !important; width:auto !important; min-width:0 !important;
-    margin:0 !important;
-  }
-}
+/* v1985: hier stand eine @media (max-width:820px) mit zwei
+   Trichter-Regeln. Mit dem Entwurf sind beide gefallen, und ein leerer
+   Medienblock ist kein Platzhalter, sondern eine Frage fuer den
+   naechsten Leser. */
 
 /* ═══════════════════════════════════════════════════════════════════════
    v1651b · drei Nachbesserungen, alle gemessen
@@ -674,17 +484,8 @@ html[data-dp-kartenstil="bordkarte"] .dpk-zahl{
 
    `display` war gesetzt, die RICHTUNG nicht. Derselbe Fehler wie bei
    `.dpl-schiene` in v1649. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg{
-  flex-direction:column !important;
-  align-items:flex-start !important;
-  justify-content:flex-start !important;
-  gap:0 !important;
-  height:auto !important;
-}
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-row{
-  justify-content:flex-start !important;
-  width:100% !important;
-}
+
+
 
 /* Der Kopf der linken Spalte - der Gegenpart zu „Was dabei
    herauskommt". Ohne ihn ist der Trichter nur ein Kasten mit einer
@@ -693,29 +494,13 @@ html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-row{
 
    Gefuehrt wird er im Pseudoelement, damit der Knoten, an dem
    `object-actions.js` haengt, unangetastet bleibt. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-lead{
-  display:block !important;
-  padding:13px 15px 0 !important; margin:0 !important;
-  height:auto !important; width:auto !important;
-}
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-lead .bp{
-  display:block !important; font-size:0 !important;
-  letter-spacing:0 !important; color:#8C8578 !important;
-  background:none !important; padding:0 !important; margin:0 !important;
-  border:0 !important;
-}
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-lead .bp::after{
-  content:"Woher die Daten kommen";
-  font-family:"JetBrains Mono",monospace; font-size:10px;
-  letter-spacing:.09em; text-transform:uppercase;
-}
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-lead .k,
-html[data-dp-kartenstil="trichter"] .dp-pfbar .dp-pf-lead .s{ display:none !important; }
+
+
+
+
 /* Die erste Gruppe rueckt dafuer nach oben - der Kopf traegt jetzt den
    Abstand. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{
-  padding-top:9px !important;
-}
+
 
 /* ── (3) DER ABRUFKNOPF, UND WARUM MEINE REGEL VERLOR ─────────────────
    Gemessen: der Knopf blieb 84 px breit, obwohl
@@ -728,13 +513,11 @@ html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{
    in v1648).
 
    Deshalb traegt der Selektor die ID mit. */
-html[data-dp-kartenstil="trichter"] .dpk-ertrag #oab-run.dp-pf-launch,
 html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pf-rz #oab-run.dp-pf-launch,
 html[data-dp-kartenstil="bordkarte"] .dp-pf-rz #oab-run.dp-pf-launch{
   width:100% !important; min-width:0 !important;
   display:flex !important; justify-content:center !important;
 }
-html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-rz,
 html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
 html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
   width:100% !important; box-sizing:border-box !important;
@@ -775,167 +558,13 @@ html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* Der Kopf der linken Spalte darf nicht mitwachsen. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-lead{
-  align-self:start !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   v1651e · drei Feinheiten, alle gemessen
-
-   ── DER FEHLER, DEN ICH JETZT ZUM DRITTEN MAL GEMACHT HABE ───────────
-   `.dp-pf-lead` stand in der Bordkarte UNTEREINANDER statt nebeneinander:
-   gemessen `flex-direction:column`, Kopf 55 px hoch statt 19.
-
-   Ich hatte `display:flex` und `align-items:baseline` gesetzt - und die
-   RICHTUNG vergessen. Dasselbe in v1640 bei `.dp-pf-seg`, dasselbe in
-   v1649 bei `.dpl-schiene`.
-
-   > **`display:flex` sagt nichts ueber die Richtung.** Wer ein Element
-   > zu einem Flex-Behaelter macht, das vorher schon einer war, erbt
-   > dessen `flex-direction` - und sie steht nicht da, wo man sie sucht.
-   > Ab jetzt gehoert `flex-direction` in jede Regel, die `display:flex`
-   > auf ein fremdes Element setzt, auch wenn `row` der Vorgabewert ist.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
-  flex-direction:row !important;
-  flex-wrap:wrap !important;
-  height:auto !important;
-}
-
-/* Die Perforation gehoert AN den Abschnitt, nicht irgendwohin.
-   Gemessen: sie stand bei x=1483, der Abschnitt bei x=1703 - 220 px
-   Luft dazwischen, weil `margin-left:auto` am Abschnitt hing und ihn
-   von ihr wegschob. Der Zwischenraum gehoert VOR die Trennung, nicht
-   hinter sie. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf{
-  margin-left:auto !important;
-}
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz{
-  margin-left:0 !important;
-}
-
 /* Der Trichter: der Abrufknopf klebte am unteren Rand, weit unter den
    drei Ergebniszeilen. `margin-top:auto` schiebt ihn ans Ende des
    Blocks - aber der Block ist so hoch wie die linke Spalte, nicht so
    hoch wie sein Inhalt. Ein fester Abstand haelt ihn dort, wo der
    Blick nach der letzten Zeile ankommt. */
-html[data-dp-kartenstil="trichter"] .dpk-ertrag .dp-pf-rz{
-  margin-top:14px !important; padding-top:0 !important;
-}
+
 /* Und ein Atemzug zwischen dem Kopf und der ersten Gruppe. */
-html[data-dp-kartenstil="trichter"] .dp-pfbar > .dp-pf-seg:first-of-type{
-  padding-top:11px !important;
-}
-
-/* v1651f · und die AUSRICHTUNG. Der Kopf stand mittig, weil
-   `.dp-pf-lead` aus der Basis `justify-content:center` traegt - in
-   einer 55-px-Leiste richtig, in einer Karte nicht. Derselbe Satz wie
-   oben, nur die naechste Eigenschaft: eine Regel aendert nur, was sie
-   benennt. */
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead,
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead{
-  justify-content:flex-start !important;
-  text-align:left !important;
-}
-
-/* ── v1657 · DIE BORDKARTE, ZEILE FUER ZEILE NACH DEM ENTWURF ────────
-   Marcel: „die Datenaufnahme-Karte sieht auch nicht aus wie in der
-   Demo."
-
-   Der Entwurf (`entwurf-aktionsbox.html`, „5 · Bordkarte neu"):
-
-     [links, flex:1, Polster 13/16]
-       Kopfzeile:  DealPilot · Datenaufnahme · „Objekt 2026-1637" rechts
-       Quellen:    flex, gap 7, umbrechend
-     [Perforation: 2px punktiert, Rand 10px oben/unten]
-     [rechts, 190 px, Creme #FBF6E9, mittig]
-       „Abschnitt" · [Abrufen] · „1 Quelle gewaehlt"
-
-   Zwei Abweichungen, gemessen:
-   1. Der Kopf traegt „BOARDING PASS · Datenaufnahme · DealPilot ·
-      Boarding" - drei Angaben, von denen zwei dasselbe sagen.
-   2. **Die Objektnummer fehlt.** Im Entwurf steht sie rechts im Kopf
-      und beantwortet die Frage, fuer welches Objekt hier abgerufen
-      wird - bei einer Karte, die man aus einer Liste heraus oeffnet,
-      ist das keine Zierde.
-
-   Die Nummer kommt aus `#hdr-obj-num` und wird per `attr()` nicht
-   erreichbar; `karten-stil.js` setzt sie deshalb als
-   `data-dpk-objekt` an die Leiste. Hier steht nur ihre Gestalt. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead .s,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead .s{
-  display:none !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead::after,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead::after{
-  content:attr(data-dpk-objekt);
-  margin-left:auto;
-  font-family:"JetBrains Mono",ui-monospace,monospace;
-  font-size:10px; letter-spacing:.07em; text-transform:uppercase;
-  color:#8C8578;
-  align-self:center;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   v1659 · DIE BORDKARTE, AN DER DEMO AUSGEMESSEN
-
-   Marcel: „die Datenaufnahme hast du noch nicht angepasst, das sollte
-   halt so sein wie in der Demo."
-
-   Die Demo im Browser geoeffnet (`entwurf-aktionsbox.html`,
-   „5 · Bordkarte neu") und jeden Wert ausgelesen:
-
-     Karte        flex · bg WEISS · Rahmen 1,11px rgb(206,198,182)
-                  radius 3px · overflow hidden · 1090x108
-     links        flex:1 · Polster 13px 16px · transparent
-     Perforation  1,11px DOTTED rgb(206,198,182) · Hoehe 86
-     Abschnitt    190px · bg rgb(251,246,233)
-
-   Meine Fassung wich in drei Werten ab: `#FFFDF9` statt Weiss,
-   `#DCD4C2` statt `#CEC6B6`, und die Perforation war 2 px statt 1.
-   Der Cremeblock rechts stimmte.
-   ═══════════════════════════════════════════════════════════════════════ */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar{
-  background:#FFFFFF !important;
-  border:1px solid #CEC6B6 !important;
-  border-radius:3px !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-perf,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-perf{
-  border-left:1px dotted #CEC6B6 !important;
-  margin:11px 0 !important;
-}
-/* Der Abschnitt rechts: 190 px und Creme, wie gemessen. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-rz,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-rz{
-  flex:0 0 190px !important; width:190px !important; min-width:190px !important;
-  background:#FBF6E9 !important;
-  padding:13px 16px !important;
-}
-/* Die linke Seite: Polster 13/16 wie im Entwurf. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg{
-  padding:0 16px !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-lead,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-lead{
-  padding:13px 16px 0 !important;
-}
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar > .dp-pf-seg:last-of-type,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar > .dp-pf-seg:last-of-type{
-  padding-bottom:13px !important;
-}
-/* Die Quellkacheln: der Entwurf setzt sie mit 7 px Abstand nebeneinander. */
-html[data-dp-kartenstil="bordkarte"] .dp-pfbar .dp-pf-row,
-html[data-dp-pfstil]:not([data-dp-kartenstil]) .dp-pfbar .dp-pf-row{
-  gap:7px !important;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════
    v1659b · DIE KARTEI — ENTWURF 2, AN DER DEMO AUSGEMESSEN
 
@@ -1317,7 +946,12 @@ html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-gro
   font-family:"JetBrains Mono",ui-monospace,monospace !important;
   font-size:9px !important; letter-spacing:.9px !important;
   text-transform:uppercase !important;
-  color:#9A9287 !important;
+  /* v1954a: #9A9287 auf Weiss ergab Kontrast 3.07 - unter dem Minimum von
+     4,5, und das bei 9 px Versalien mit 0.9 px Sperrung. Gefunden beim
+     Rundlauf ueber alle Stile, NACHDEM Buetten behoben war: derselbe Mangel,
+     andere Datei-Stelle. Ein Durchlauf ueber alle Faelle findet, was eine
+     Einzelmeldung nicht nennt. #6E685F bringt 5,51 und bleibt warmgrau. */
+  color:#6E685F !important;
 }
 /* Der Trennstrich zwischen den beiden Gruppen — dieselbe Haarlinie
    wie auf der Karte, nur auf die Höhe der Kartei gebracht. */
@@ -2060,8 +1694,30 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .k { color:#F5EEDC !imp
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-lead .s { color:#A2977E !important; display:block !important; }
 
 /* Abschnittsbeschriftungen: MARKTBEWERTUNG, DATEN EINLESEN */
+/* ══ v1954 · ZWEI TEXTE WAREN NICHT LESBAR ════════════════════════════
+   Marcel am 07.10.2026: "Das Problem ist, dass bei Datenuebernahme aus
+   den Knoepfen alles in Dunkelgrau steht. Das muesste groesser sein."
+
+   GEMESSEN, Text gegen den EFFEKTIVEN Grund (erster Vorfahr mit Flaeche):
+
+     Gruppentitel      9px    #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+     QR-Beschriftung   7.5px  #9A8F76 auf rgb(244,242,237)   Kontrast 2.86
+
+   Das Minimum ist 4,5. Beide lagen bei 2,86 - und das bei 9 bzw. 7,5 px.
+   Die Kachelbeschriftung daneben hat 15,40; deshalb liest sich die Leiste
+   wie "alles dunkelgrau": die kraeftigen Stellen stehen neben ausgewaschenen.
+
+   > Marcel hat die Farbe genannt, nicht den Kontrast. Der Ausloeser ist
+   > eine Beobachtung, keine Diagnose - gemessen war nicht "zu dunkel",
+   > sondern ZU HELL auf hellem Papier.
+
+   #665C49 bringt 5,88 und bleibt ein warmer Grauton, also der
+   Buetten-Charakter. Die Groessen gehen auf 10 px und 9 px - Marcels
+   "muesste groesser sein".
+   ════════════════════════════════════════════════════════════════════ */
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-grouplbl{
-  color:#9A8F76 !important;
+  color:#665C49 !important;
+  font-size:10px !important;
 }
 
 /* Die Kacheln sind blindgepraegt, nicht gedruckt. */
@@ -2117,7 +1773,7 @@ html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr img,
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-qr svg{
   border-color:#2A2418 !important;
 }
-html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-scan{ color:#9A8F76 !important; }
+html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-scan{ color:#665C49 !important; font-size:9px !important; }  /* v1954 */
 html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-rz{
   background:radial-gradient(120% 100% at 50% 0%, #FFFDF7, #F4EDDD) !important;
   display:flex !important; align-items:center !important;
@@ -2315,6 +1971,95 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     justify-content: flex-start !important;
   }
 
+  /* ── v2117 · DIE REIHE HAT NIE ERFAHREN, DASS SIE UMBRECHEN SOLL ─────
+     Marcel am 11.10.2026: „Hab in der Messkabine gerade iPad mini auf und
+     es ist alles verzerrt."
+
+     GEMESSEN bei 767 px, Reiter Objekt:
+
+       .dp-pf-row   34-729   wrap=nowrap   4 Kinder
+         Kind 1       34-729
+         Kind 2      735-1431   <- draussen
+         Kind 3     1437-2132   <- draussen
+         Kind 4     2138-2833   <- draussen
+
+     Jede Kachel ist hier 100 % breit (die Regel direkt darueber), und die
+     Reihe steht auf `nowrap` - also vier Vollbreit-Kacheln nebeneinander
+     in einer 695 px breiten Reihe. `.dp-pf-scroll` traegt
+     `overflow:hidden`, deshalb sieht man den Ueberlauf nicht einmal:
+     DREI VON VIER KACHELN SIND UNERREICHBAR.
+
+     > **Es ist eine Luecke zwischen zwei Grenzen, nicht ein falscher
+     > Wert.** `width:100%` gilt ab 900 px abwaerts (dieser Block),
+     > `flex-wrap:wrap` erst ab 640 px abwaerts (style.css:33710).
+     > Dazwischen - 641 bis 900 - gilt das eine ohne das andere. Genau
+     > dort liegen iPad mini (768) und iPad Pro 11" (834).
+
+     Dieser Block sagt seit v1941d „untereinander" und meint es auch; er
+     hat es nur der REIHE nie gesagt, sondern nur der Leiste und der
+     Kachel. */
+  #oab-bar.dp-pfbar .dp-pf-row,
+  .dp-pf-scroll .dp-pfbar .dp-pf-row {
+    flex-wrap: wrap !important;
+  }
+
+  /* ── v2117a · DER ABRUFEN-KNOPF STAND EINGERUECKT UND RANDVOLL ───────
+     Marcel: „In der Ansicht iPhone 14 Pro Max ist der Abrufen-Button
+     riesig, das ist doch nicht richtig gerendert."
+
+     GEMESSEN bei 430 px:
+
+       .dp-pf-tile   398 x 44  @16     <- alle Kacheln
+       #oab-run      356 x 50  @51     <- der Knopf, 83 % der Breite
+
+     Er ist also WEDER so breit wie die Kacheln NOCH an ihnen
+     ausgerichtet - 35 px eingerueckt und trotzdem fast randvoll. Genau
+     diese Mischung liest sich als „falsch gerendert".
+
+     Die Ursache sitzt nicht am Knopf, sondern an seiner Huelle:
+
+       span.dp-pf-rz   padding: 0 20px   margin-left: 14px
+
+     Beides stammt aus der Schreibtisch-Fassung, wo die Huelle neben
+     anderen Dingen in einer Zeile steht. Im Spaltenmodus hat sie keine
+     Nachbarn mehr - die Einrueckung bleibt trotzdem stehen.
+
+     > Der Block hier setzt fuer jedes Kind `min-width:0` und
+     > `max-width:100%`, aber keine Abstaende. Eine Huelle, die ihre
+     > Zeilen-Abstaende in den Spaltenmodus mitnimmt, richtet ihren
+     > Inhalt an etwas aus, das es dort nicht mehr gibt.
+
+     Der Knopf steht jetzt buendig unter den Kacheln und so breit wie
+     sie - eine Hauptaktion, die zur Spalte gehoert, in der sie steht. */
+  /* ⚠ Die Geschwister-Fassung MUSS mitgenannt werden. Mein erster Entwurf
+     listete nur `.dp-pf-rz` - und `padding` und `width` griffen, `margin-left`
+     nicht. Der Walker fand den Grund:
+
+       #oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz { margin-left:14px !important }
+
+     Eine Klasse mehr als meine Fassung, also hoehere Spezifitaet - und ein
+     Medienblock aendert daran nichts, Media-Queries zaehlen nicht mit.
+     Gemessen blieb der Knopf deshalb bei x=31 statt x=16, waehrend Breite
+     und Polsterung laengst stimmten.
+
+     > Eine Regel, die zur HAELFTE greift, ist schwerer zu sehen als eine,
+     > die gar nicht greift: die Haelfte, die wirkt, sieht aus wie Erfolg. */
+  #oab-bar.dp-pfbar .dp-pf-rz,
+  #oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz,
+  .dp-pf-scroll .dp-pfbar .dp-pf-rz,
+  .dp-pf-scroll .dp-pfbar .dp-pf-qr + .dp-pf-rz {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+  }
+  #oab-bar.dp-pfbar .dp-pf-rz .dp-pf-launch,
+  .dp-pf-scroll .dp-pfbar .dp-pf-rz .dp-pf-launch {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
   /* ── v1941e · DIESELBE KETTE AUCH AUF DEM HANDY ──────────────────────
      Nach v1941d standen die Kacheln untereinander und 44 px hoch - aber die
      Leiste lief weiter um 14 px ueber (369 > 355). Der Grund ist derselbe wie
@@ -2336,6 +2081,70 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
   .dp-pf-scroll .dp-pfbar,
   .dp-pf-scroll {
     overflow-x: hidden !important;
+  }
+}
+
+/* ==============================================================================
+   v2117 - DIE TABLET-STUFE: ZWEI SPALTEN STATT EINER LANGEN SAEULE
+
+   Der Block darueber macht aus den Kacheln eine Saeule - richtig auf dem
+   Handy, aber auf einem 768er Tablet werden daraus vier Vollbreit-Kacheln
+   untereinander, und die Leiste wird unnoetig hoch.
+
+   Marcels Vorgabe im Pruef-Prompt: "Tablet: Ein bis zwei Spalten abhaengig
+   vom verfuegbaren Platz."
+
+   GEMESSEN, warum zwei und nicht drei: `.dp-pf-tile.tool` traegt eine
+   Mindestbreite von 200 px. Bei 767 px abzueglich Rand und Abstand bleiben
+   rund 695 px nutzbar - drei Spalten waeren 229 px und damit knapp,
+   zwei sind 344 px und tragen auch lange Beschriftungen.
+
+   Der Abstand der Reihe ist 6 px (gemessen), deshalb 50 % minus 3 px.
+
+   Die Grenze unten ist 641 px: darunter gilt wieder eine Spalte, und
+   genau dort setzt auch `style.css:33710` seit jeher an. Beide Grenzen
+   liegen jetzt auf demselben Wert - das war der Fehler, den dieser
+   Durchgang gefunden hat.
+   ============================================================================== */
+@media (min-width: 641px) and (max-width: 900px) {
+  #oab-bar.dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll .dp-pfbar .dp-pf-tile {
+    width: calc(50% - 3px) !important;
+    max-width: calc(50% - 3px) !important;
+  }
+
+  /* ── v2118 · DER QR-CODE ZIEHT NEBEN DEN KOPF ───────────────────────
+     Marcel am 11.10.2026: „Die Positionierung des QR-Codes beim iPad Pro
+     11 und mini ist nicht gut, der könnte dann eher neben das DealPilot.
+     Dann sparen wir uns Höhe."
+
+     GEMESSEN bei 833 px, Leiste 761 x 427:
+
+       .dp-pf-lead   761x70  @0,0     Inhalt nur 129 px breit:
+                                      „BOARDING PASS", „PRE-FLIGHT",
+                                      „DealPilot · Boarding"
+       a#oab-pf-qr    54x68  @353,318 <- eigene Zeile, mittig
+
+     Rechts neben dem Kopf sind **632 px frei**, und die Leiste ist
+     `position:relative`. Der QR passt dort hinein, ohne irgendetwas zu
+     verdraengen - und seine eigene Zeile faellt weg.
+
+     > Ein Element, das eine ganze Zeile fuer sich beansprucht, waehrend
+     > daneben 632 px leer stehen, kostet Hoehe ohne Gegenwert. Auf einem
+     > Tablet im Hochformat ist Hoehe das Knappe, nicht Breite.
+
+     Nur in diesem Band: auf dem Handy ist der Kopf schmaler und der QR
+     wuerde den Text beruehren - dort bleibt er, wo er ist. */
+  #oab-bar.dp-pfbar { position: relative !important; }
+  #oab-bar.dp-pfbar > .dp-pf-qr,
+  #oab-bar.dp-pfbar > a.dp-pf-qr {
+    position: absolute !important;
+    top: 8px !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    z-index: 3 !important;
   }
 }
 
@@ -2383,15 +2192,35 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
      Deshalb am Schreibtisch `nowrap`. Auf dem Handy bleibt es dabei, dass die
      Kacheln untereinander stehen (eigene Regel weiter unten) - dort ist
      Umbrechen genau richtig. */
-  #oab-bar.dp-pfbar,
-  .dp-pf-scroll .dp-pfbar {
-    flex-wrap: nowrap !important;
-  }
-  #oab-bar.dp-pfbar .dp-pf-tile,
-  .dp-pf-scroll .dp-pfbar .dp-pf-tile {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-  }
+
+  /* ══ v2122 · ZURUECKGENOMMEN ═══════════════════════════════════════
+     Die Deklarationen von v1941a-d standen hier bis zum 11.10.2026 und
+     haben das Gegenteil von v2119 getan: Umbrechen verbieten, alles
+     schrumpfen lassen, Beschriftungen mit einer Ellipse kappen.
+
+     Marcel am 11.10.2026: "Wenn wir Desktop 1180 ausgewaehlt haben kann
+     man die auswahl nicht lesen unter Daten einlesen."
+
+     Gemessen bei 1180 px: vier Beschriftungen gekappt, "Sprache" auf
+     15 von 43 px. Die Ellipse hat genau das getan, was sie sollte.
+
+     > **v1941 war nicht falsch - es war die bessere von zwei schlechten
+     > Antworten.** Damals ging es um SECHS Pixel Ueberbreite, und ein
+     > Umbruch wegen sechs Pixel ist teurer als eine Ellipse. Die Lage
+     > ist heute eine andere: es fehlen 90 px, nicht 6, und v2119 kann
+     > umbrechen, ohne zu kappen.
+
+     Sie werden hier AUSGETRAGEN und nicht nur ueberschrieben. Ein
+     Stapel aus zwei Versionen, die sich widersprechen, ist genau das,
+     wovor der Kopf dieser Datei bei v1702d warnt ("Zwei Ebenen bauten
+     dieselbe Flaeche um"). Die Kommentare bleiben stehen - der Befund
+     von damals ist weiter richtig und erklaert, warum hier nichts mehr
+     steht.
+
+     `overflow-x: hidden` auf Leiste und Wrapper bleibt: mit Umbruch
+     laeuft nichts mehr quer, und wenn doch, soll kein Balken stehen.
+     ══════════════════════════════════════════════════════════════ */
+
 
   /* ── v1941c · DIE KINDER WAREN DER GRUND, NICHT DIE KACHEL ───────────
      Dritter Anlauf an derselben Stelle, und die ersten beiden haben die
@@ -2411,12 +2240,7 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
 
      Fuenf Kacheln a 92 px sind 460 px - das passt in die 753 px zweimal.
      Damit reicht Teilen, und weder Schieben noch Umbrechen wird gebraucht. */
-  #oab-bar.dp-pfbar .dp-pf-tile > *,
-  .dp-pf-scroll .dp-pfbar .dp-pf-tile > * {
-    min-width: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
+  /* v2122: ausgetragen - siehe Ruecknahme oben. */
   /* Und die Leiste selbst darf nicht mehr scrollen - sonst bleibt die
      Scrollleiste stehen, auch wenn nichts mehr ueberlaeuft. */
   #oab-bar.dp-pfbar,
@@ -2424,12 +2248,7 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
   .dp-pf-scroll {
     overflow-x: hidden !important;
   }
-  #oab-bar.dp-pfbar .dp-pf-tile .dp-pf-lbl,
-  .dp-pf-scroll .dp-pfbar .dp-pf-tile .dp-pf-lbl {
-    min-width: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
+  /* v2122: ausgetragen - die Ellipse war Marcels Befund. */
 }
 
 /* ==============================================================================
@@ -2460,24 +2279,963 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
    Polster und schrumpft nur so weit, wie die anderen auch.
    ============================================================================== */
 @media (min-width: 901px) {
+  /* v2122: Segmente duerfen weiter schrumpfen - aber nur bis zu einer
+     Kachel, und das setzt v2119 mit min-width:min-content. Lead und Stub
+     bekommen dort flex:0 0 auto. Hier stehen sie nicht mehr. */
   #oab-bar.dp-pfbar > .dp-pf-seg,
   .dp-pf-scroll .dp-pfbar > .dp-pf-seg {
     flex: 1 1 auto !important;
-    min-width: 0 !important;
   }
-  #oab-bar.dp-pfbar > .dp-pf-lead,
-  .dp-pf-scroll .dp-pfbar > .dp-pf-lead {
+  /* v2122: AUSGETRAGEN. Das war die schlimmste der fuenf: eine
+     Sammelregel auf JEDEN Nachfahren der Leiste. Sie hat jeden
+     spaeteren Schutz von unten wieder aufgehoben - genau die Form,
+     vor der CLAUDE.md warnt ("nie Sammelregeln auf Container-Kinder").
+     Was wirklich schrumpfen darf, nennt v2119 einzeln. */
+}
+
+/* ══ v1953 · DIE BORDKARTE DER DATENAUFNAHME IST ENTFERNT ═══════════════
+   Marcel am 07.10.2026: "die kann wirklich raus."
+
+   Entfernt wurden 32 Regeln, die ausschliesslich an
+   html[data-dp-kartenstil="bordkarte"] hingen. GEMESSEN, nicht geschaetzt:
+   34 Regeln nannten den Wert, davon 32 nur ihn; die beiden anderen sind
+   TRICHTER-Regeln, die die Bordkarte per :not(...) ausschliessen. Die sind
+   geblieben - :not() traegt die Spezifitaet seines Arguments, ein Wegfall
+   haette die Kaskade des Trichters verschoben.
+
+   Der Wert ist auch ueber ?karte= nicht mehr erreichbar (karten-stil.js),
+   sonst holte die Adresszeile einen Stil zurueck, dessen Regeln es nicht
+   mehr gibt.
+
+   Die Objektkarten-Bordkarte (data-dp-objkarte="bordkarte") ist eine
+   ANDERE Sache und bleibt - sie ist seit v1915 der Rueckfall der
+   Aktenmappe.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* =================================================================
+   v1989 - DER QR FAELLT UNTER 640 px
+
+   Marcel am 08.10.2026: „Da kannst du dann, wenn das nicht passend
+   dargestellt wird, den Barcode fuer die Handy-Version oder auch
+   Tablet-Version rausnehmen."
+
+   GEMESSEN auf 390 px, Entwurf Kartei:
+
+     QR-Kasten   64 x 92   nicht quadratisch
+     SVG darin   54 x 68   nicht quadratisch
+
+   Ursache, mit dem Kaskaden-Walker gefunden: diese Datei setzt
+   `width:92px !important` auf den Kasten - und unter
+   `@media (max-width:900px)` ein `max-width:100% !important` auf
+   JEDES Kind der Leiste. Die Breite wird gekappt, die HOEHE bleibt
+   bei 92. Also ein gestauchter Code.
+
+   > Ein QR, der nicht quadratisch ist, laesst sich nicht zuverlaessig
+   > scannen. Er sieht aus wie ein Angebot und ist keins.
+
+   Im Entwurf Buetten ist er 64x64 und damit quadratisch, nimmt aber
+   denselben knappen Platz. Marcels Freigabe deckt beide.
+
+   Die doppelte Klasse `.dp-pf-qr.dp-pf-qr` ist ABSICHT und steht
+   hier benannt, damit sie niemand fuer einen Tippfehler haelt:
+
+     vorhanden  html[data-dp-kartenstil="kartei"] .dp-pfbar > .dp-pf-qr
+                {display:flex!important}              (0,3,2)
+     neu        html[data-dp-kartenstil] .dp-pfbar > .dp-pf-qr.dp-pf-qr
+                {display:none!important}              (0,4,2)
+
+   Dieselbe Hausform fuehrt diese Datei weiter oben schon einmal.
+   ================================================================= */
+/* v1992 - DIE REGEL AUS v1989 HATTE KEINE ID UND WAR DAMIT WIRKUNGSLOS.
+
+   Hier stand eine @media (max-width:640px) mit
+     html[data-dp-kartenstil] .dp-pfbar > .dp-pf-qr.dp-pf-qr
+   also (0,4,1). Dagegen steht weiter oben in dieser Datei
+     html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources)
+       .dp-pfbar > .dp-pf-qr{display:flex !important}
+   und :is() erbt die Spezifitaet seines STAERKSTEN Arguments - hier
+   eine ID. Also (1,3,2). Die alte Regel konnte nie gewinnen.
+
+   Im Browser gegengeprueft (mit echter Wartezeit, sonst misst man den
+   Zustand VOR der eigenen Aenderung):
+     ohne ID -> 64x92, display flex   wirkungslos
+     mit ID  -> 0x0,   display none
+
+   Grenze 900 px: Marcels Freigabe nennt Handy UND Tablet. */
+@media (max-width: 900px){
+  html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-qr,
+  html[data-dp-kartenstil] .dp-pf-scroll :is(#oab-bar,#qc7-sources) .dp-pf-qr{
+    display:none !important;
+  }
+}
+
+/* v1992 - DER KASTEN WAR 64 BREIT UND 92 HOCH
+
+   Zwei Regeln aus zwei Versionen, die nie zusammen gelesen wurden:
+     Z1182  :is(#oab-bar,..) > .dp-pf-qr{width:64px;height:64px}  (1,3,2)
+     Z1596  > .dp-pf-qr.dp-pf-qr{min-width:92px;min-height:92px}  (0,4,2)
+
+   Die ID-Regel gewinnt fuer height - aber min-height setzt NIEMAND mit
+   ID, also bleibt die 92 stehen. Und min-height schlaegt height.
+   Ergebnis: 64 breit, 92 hoch. Keine der beiden Regeln ist falsch;
+   zusammen ergeben sie einen schiefen Kasten.
+
+   Aufgeloest zu 92 x 92 - der Hoehe, die er ohnehin hat. Gemessen:
+   Kasten 92x92, der gezeichnete Code waechst von 54 auf 68 px, die
+   Leiste bleibt 132 px hoch.
+
+   > Der QR war uebrigens die ganze Zeit scannbar: sein viewBox ist
+   > 0 0 31 31 und ohne preserveAspectRatio gilt xMidYMid meet, das das
+   > Verhaeltnis WAHRT. Schief war der Kasten, nicht der Code. */
+@media (min-width: 901px){
+  html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+    width:92px !important; height:92px !important;
+    min-width:92px !important; min-height:92px !important;
+  }
+}
+
+/* =====================================================================
+   v2119 - DIE LEISTE KNAUTSCHTE, STATT UMZUBRECHEN
+
+   Marcel am 11.10.2026: "Wenn wir Desktop 1180 ausgewaehlt haben kann
+   man die auswahl nicht lesen unter Daten einlesen und auch das
+   Dealpilot unter Marktbewertung auf der Datenaufnahme Karte. QR Code
+   passt dann garnicht und ueberlappt."
+
+   GEMESSEN bei 1180 px, Aktenmappe, direkte Kinder von #oab-bar:
+
+     Leiste       888 x 107   row / NOWRAP   SUMME der Kinder 888  "passt"
+       .dp-pf-lead    104    flex 0 1 auto   min-width 0
+       .dp-pf-seg     126    flex 1 1 auto   min-width 0
+       .dp-pf-seg     438    flex 1 1 auto   min-width 0
+       a.dp-pf-qr      39 x 68   natuerlich 47 - SVG darin 54 x 54
+       .dp-pf-rz      101          natuerlich 109
+
+     Beschriftungen  sichtbar / Inhalt
+       "Expose / Marktbericht"   67 / 120
+       "Sprache"                 15 /  43
+       "Gefuehrte Eingabe"       50 /  95
+       "ImmoMetrica"             35 /  73
+
+   > DAS IST KEIN UEBERLAUF. Die Summe der Kinder ist exakt die
+   > Innenbreite - weil jedes Kind schrumpfen DURFTE. `flex-shrink:1`
+   > plus `min-width:0` heisst: lieber alles unleserlich als eine
+   > zweite Zeile. Wer nach einem Ueberlauf sucht, findet hier nichts
+   > und haelt die Leiste fuer gesund.
+
+   Und es ist ausdruecklich NICHT vom Fenster abhaengig, sondern von
+   der Breite der Leiste selbst - gemessen:
+
+     Fenster   Seitenleiste   Leiste
+      1024         260         1150   (Querscroller, alles voll gross)
+      1180         380          888   kaputt
+      1280         380          856   kaputt
+      1440         380         1016   kaputt
+      1920         380         1280   heil
+
+   Deshalb KEIN weiterer Haltepunkt. Haltepunkte sind hier die falsche
+   Form: sie beschreiben das Fenster, der Schaden haengt am Behaelter.
+   Stattdessen wird die Bauart selbst tragfaehig gemacht:
+
+     1. Die Leiste darf umbrechen        (flex-wrap:wrap)
+     2. Die Kachelreihen duerfen umbrechen
+     3. Kacheln und QR schrumpfen NICHT  (flex:0 0 auto)
+
+   Damit regelt sich jede Behaelterbreite von selbst - auch die, die
+   es heute noch nicht gibt. Hoehe statt Unleserlichkeit; Marcel:
+   "wenn etwas nicht gerendert werden kann musst du es anders anzeigen
+   lassen oder umbauen fuer die groesse."
+
+   Die Grenze 901 ist Absicht: darunter liegt die Leiste bereits als
+   Spalte (flex-direction:column ab Z.1958) und der QR ist ausgeblendet.
+   ===================================================================== */
+@media (min-width: 901px){
+
+  /* 1 - die Leiste bricht um statt zu stauchen */
+  :is(#oab-bar,#qc7-sources).dp-pfbar,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar{
+    flex-wrap: wrap !important;
+    row-gap: 10px !important;
+  }
+
+  /* 2 - die Kachelreihe bricht um */
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+
+  /* 3 - Kacheln behalten ihre Beschriftung. flex-basis bleibt `auto`,
+         damit die Spaltenbreiten der schmalen Baender (width:100% /
+         calc(50% - 3px)) weiter greifen - dort gilt dieses Band nicht,
+         aber die Regel soll auch dann nichts umwerfen. */
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-lbl,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-lbl{
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  /* 4 - der QR bleibt quadratisch und wird nicht zusammengedrueckt.
+         Das SVG darin ist 54 px; der Kasten bekommt 54 plus Luft. */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr{
+    flex: 0 0 auto !important;
+    min-width: 62px !important;
+    min-height: 62px !important;
+  }
+
+  /* 5 - der Abruf-Knopf schrumpft nicht unter seine Schrift */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar button#oab-run{
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* 6 - die Segmente duerfen schrumpfen, aber nur bis zu einer Kachel;
+         darunter wandern sie in die naechste Zeile statt die
+         Beschriftungen zu kappen. */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+    min-width: min-content !important;
+  }
+}
+
+/* =====================================================================
+   v2120 - DER ABRUF-KNOPF WAR GOLD AUF GOLD
+
+   Marcel am 11.10.2026: "Beim IPhone 14 ist der Abrufbutton fast so
+   gross das es das komplette weisse verdeckt und auch im gleichen gold
+   ton."
+
+   GEMESSEN auf 390 px, Aktenmappe, kein Kartenstil:
+
+     #oab-bar       357 x 439   Grund  Verlauf rgb(201,170,84)   <- GOLD
+       .dp-pf-rz    325 x  57   Grund  #ffffff, Rand 1,5 px Gold
+         #oab-run   323 x  50   Grund  Verlauf rgb(207,178,96)   <- GOLD
+
+   Beide Befunde sind EIN Befund: der Knopf ist 323 breit in einem
+   Stub von 325 und sitzt mit `margin:6px 0 0` oben an. Links und
+   rechts bleibt je 1 px weiss, unten 1 px. Vom "weissen Boarding-Stub"
+   ist damit ein Strich uebrig - und der Knopf selbst traegt dieselbe
+   Farbe wie die Leiste hinter dem Stub.
+
+   Kontrast Knopf gegen Leiste: k = 1,07. Das Einzige, was den Knopf
+   noch sichtbar macht, ist der 1 px Rest des Stubs.
+
+   ── WARUM ER GOLD WAR, UND WARUM DAS EINMAL RICHTIG WAR ────────────
+   Mit dem Kaskaden-Walker, nicht geraten. Es gewinnt:
+
+     (2,1,0) !  #obj-action-bar #oab-run.dp-pf-launch
+                background: linear-gradient(180deg,var(--gold-hi),var(--gold))
+                style.css, Block "v601-oab-gold-hard"
+
+   Darunter liegen drei Staende derselben Flaeche:
+
+     v597  weiss + Goldtext, Stub weiss mit Goldrand
+     v599  GOLD  + dunkler Text        <- die Umstellung
+     v601  dasselbe, noch einmal mit ID festgenagelt
+
+   Und die Grundregel in style.css:33064 sagt bis heute
+   `background:#050505; color:var(--gold-hi)`. Also: Obsidian mit
+   Goldschrift war der Ausgangszustand, Gold kam spaeter.
+
+   > v599 war nicht falsch. Die Leiste war damals DUNKEL. Gold auf
+   > dunkel ist der Akzent. Die Leiste hat spaeter den Runway-Verlauf
+   > bekommen - und damit wurde aus dem Akzent dieselbe Farbe wie der
+   > Grund. Keine der beiden Entscheidungen ist fuer sich falsch;
+   > zusammen ergeben sie einen unsichtbaren Knopf.
+
+   Das ist dieselbe Form wie [[farbe-gilt-nur-zu-ihrem-grund]]: eine
+   Farbe gilt nur zu dem Grund, zu dem sie gewaehlt wurde. Wandert der
+   Grund, wandert die Beziehung nicht mit.
+
+   ── WAS HIER GESETZT WIRD ──────────────────────────────────────────
+   Der Knopf wird wieder Obsidian mit Goldschrift - die Hausform, die
+   `.dp-pf-lead` und `.dp-pf-tile.tool` in derselben Leiste schon
+   tragen. Damit traegt er Kontrast zu BEIDEN Gruenden: zum weissen
+   Stub und zum goldenen Verlauf dahinter.
+
+   Und der Stub bekommt Polster, damit er wieder ein Stub ist und
+   nicht ein Rand: 6 px rundum statt 6 px nur oben.
+
+   Spezifitaet: `:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch`
+   ist (2,2,0) und schlaegt die (2,1,0) von v601 - ohne `#obj-action-bar`
+   zu nennen, damit dieselbe Regel im Quick-Check-Dokument greift, wo
+   es diesen Behaelter nicht gibt.
+   ===================================================================== */
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:hover,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:focus,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:active,
+:is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch,
+:is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch:hover{
+  background: #0A0A0A !important;
+  background-image: none !important;
+  color: var(--gold-hi, #E8CC7A) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px -3px rgba(0,0,0,.45) !important;
+  letter-spacing: .4px !important;
+  font-weight: 600 !important;
+}
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch:hover{
+  background: #141210 !important;
+}
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch .dp-pf-ic,
+:is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch .dp-pf-ic svg{
+  color: var(--gold-hi, #E8CC7A) !important;
+  stroke: var(--gold-hi, #E8CC7A) !important;
+}
+/* Der Stub bekommt rundum Luft, damit er als Stub lesbar bleibt.
+   `overflow:hidden` steht dort bereits - das Polster kann also nicht
+   durch einen Ueberlauf wieder verschwinden. */
+:is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+:is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz > #oab-run.dp-pf-launch{
+  margin: 0 !important;
+}
+
+/* =====================================================================
+   v2121 - AUF DEM IPAD STAND DIE LEISTE 1263 px BREIT IN 695 px
+
+   Marcel am 11.10.2026: "fuer mich passt die Datenaufnahme Karte immer
+   noch nicht. Hab in der Messkabien gerade IPad mini auf und es ist
+   alles verzwerrt."
+
+   GEMESSEN, iPad mini 768 px, Kartenstil "Kartei":
+
+     .dp-pf-scroll    695 x 383   clientW 695   scrollW 1263
+                      overflow-x: HIDDEN
+     #oab-bar        1263 x 363   width: 1263,32 px   min-width: 100%
+       .dp-pf-lead   1261 x  38   flex 1 0 100%
+       .dp-pf-seg     202 x 246
+       .dp-pf-seg     664 x 246   <- die Kacheln, je ~631 px
+       .dp-pf-rz     1261 x  65
+
+   568 px Inhalt liegen ausserhalb des Behaelters, und der Behaelter
+   klippt sie. Kein Balken, kein Hinweis - sie sind einfach weg.
+
+   ── DIE URSACHE SIND ZWEI REGELN GLEICHER STAERKE ──────────────────
+   Mit dem Kaskaden-Walker am Element, nicht gegrept:
+
+     (0,2,0) !  .dp-pf-scroll .dp-pfbar  width: max-content
+                style.css  @(min-width:641px) and (max-width:1100px)
+     (0,1,0) !  .dp-pf-scroll            overflow-x: auto
+                style.css  @(min-width:641px) and (max-width:1100px)
+     (0,1,0) !  .dp-pf-scroll            overflow-x: hidden
+                datenaufnahme.css  @(max-width:900px)        <- GEWINNT
+
+   Beide `overflow-x`-Regeln sind (0,1,0) und wichtig. Entschieden hat
+   die BLATTREIHENFOLGE: `datenaufnahme.css` ist Blatt 16, `style.css`
+   Blatt 1. Also gewinnt `hidden`.
+
+   > v1892 hat das Tablet-Band bewusst zum Wischen gebaut: `max-content`
+   > macht die Leiste erst ueberlaufbreit, damit der Wrapper etwas zu
+   > scrollen HAT. Eine spaetere Regel hat den Wrapper stillgelegt und
+   > die Breite stehen gelassen. Von einem Paar ist eine Haelfte
+   > uebrig - und die uebrige Haelfte ist genau die schaedliche.
+
+   Und `width:max-content` erklaert auch die 631 px breiten Kacheln:
+   v2117 gibt ihnen im Band 641-900 `calc(50% - 3px)`. 50 % von 1263
+   sind 631. Die Prozentangabe war richtig, ihr Bezug war es nicht.
+
+   ── DIE ENTSCHEIDUNG, AUSDRUECKLICH ───────────────────────────────
+   **Das Wischen wird fuer diese Leiste zurueckgenommen, nicht
+   repariert.** Marcel im Pruefauftrag: "Unbeabsichtigtes horizontales
+   Scrollen" steht dort unter den Fehlern, und "Verkleinere
+   Desktop-Elemente nicht einfach proportional ... Entscheide
+   stattdessen anhand des Inhalts, welche mobile Darstellungsform
+   funktional und gestalterisch am besten geeignet ist."
+
+   Seit v2119 kann die Leiste das, was sie damals nicht konnte:
+   umbrechen, ohne ihre Beschriftungen zu kappen. Damit braucht sie
+   keinen zweiten Mechanismus mehr. v1892 war nicht falsch - es war die
+   beste Antwort, solange Umbrechen Unleserlichkeit bedeutete.
+
+   Der Wisch-Hinweis (`.dp-pf-scroll::after`) faellt im selben Band
+   mit: ein Schatten, der "hier geht es weiter" sagt, wo es nicht
+   weitergeht, ist schlimmer als keiner. Fuer "kartei" und
+   `dp-pfzeile` war er schon aus - jetzt fuer jeden Stil.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 1100px){
+
+  /* 1 - keine Ueberlaufbreite mehr. (1,2,0) gegen die (0,2,0) aus v1892. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar,
+  :is(#oab-bar,#qc7-sources).dp-pfbar{
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex-wrap: wrap !important;
+    row-gap: 8px !important;
+  }
+
+  /* 2 - der Wrapper scrollt nicht mehr und klippt auch nichts.
+         (0,2,0) ueber :has gegen die (0,1,0) beider Vorgaenger. */
+  .dp-pf-scroll:has(.dp-pfbar){
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* 3 - der Wisch-Hinweis luegt ohne Wischen. */
+  .dp-pf-scroll:has(.dp-pfbar)::after{
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    width: 0 !important;
+  }
+
+  /* 4 - Lead und Stub hatten `flex:1 0 100%` und damit eine eigene
+         Zeile. Das war fuer die Wischzeile gedacht; beim Umbruch
+         reicht `auto`, dann teilen sie sich eine Zeile, wenn Platz
+         ist. 100 % bleibt als Mindestanspruch NICHT stehen. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+}
+
+/* =====================================================================
+   v2121a - TOUCHFLAECHEN AUF DEM TABLET
+
+   Aus demselben Lauf, 32 Messungen (4 Datenaufnahme-Stile x 8 Geraete):
+
+     Geraet            Abruf-Knopf   Kacheln
+     iPad mini   768       33 px      -
+     iPad Pro 11 834       33 px      -
+     1180                  33 px      34-35 px
+     1280                  33 px      34-35 px
+
+   Marcel im Pruefauftrag: "Touchflaechen sind ausreichend gross.
+   Buttons lassen sich bequem mit dem Finger bedienen."
+
+   > **Das Band 1024-1180 ist in Marcels eigener Geraeteliste
+   > "Tablet Querformat"** - das iPad Pro 11 ist im Querformat
+   > 1194 px breit. Eine Breite ueber 1024 heisst also nicht Maus.
+
+   Deshalb 44 px Mindesthoehe von 641 bis 1200 px, und darueber bleibt
+   es kompakt. `@media (pointer:coarse)` waere der genauere Weg - er
+   ist in der Messkabine aber NICHT pruefbar (das iframe laeuft in
+   einem Chrome mit Maus), und eine Regel, die ich nicht nachmessen
+   kann, ist hier die schlechtere.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 1200px){
+  :is(#oab-bar,#qc7-sources).dp-pfbar button#oab-run,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch{
+    min-height: 44px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    min-height: 44px !important;
+    align-items: center !important;
+  }
+}
+
+/* =====================================================================
+   v2123 - ZWEI RESTE, DIE HOEHE KOSTEN
+
+   Nach v2119/v2121 ist die Leiste auf allen 48 Messungen heil (0
+   abgeschnitten, 0 draussen, 0 Ueberschneidung, 0 Querscroller). Sie
+   ist aber hoeher als noetig. Gemessen bei 1180 px, direkte Kinder:
+
+     .dp-pf-lead   128 x 87   top   0
+     .dp-pf-seg    693 x 87   top   0   <- EIN Kachel-Segment, 693 breit
+     .dp-pf-seg    604 x 87   top  97
+     .dp-pf-qr      62 x 68   top 107
+     .dp-pf-rz     208 x 87   top  97   min-width: 208px
+
+   Zwei Reste erklaeren beides:
+
+   1 · `.dp-pf-seg` traegt `flex: 1 1 auto`. Die 1 vorne heisst
+       WACHSEN. Das erste Segment enthaelt genau EINE Kachel von
+       173 px und blaeht sich auf 693 px auf - es frisst den freien
+       Platz der ersten Zeile, und alles andere muss in die zweite.
+
+       > Wachsen und Umbrechen zusammen ergeben die schlechteste
+       > Verteilung: das erste Element nimmt alles, der Rest bricht um.
+       > Wachsen war fuer `nowrap` gedacht (v1941d) - mit `wrap` ist es
+       > genau falsch.
+
+   2 · `.dp-pf-rz` traegt `min-width: 208px` (style.css, v597). Die
+       208 px sind das Mass der Reisszone der BORDKARTE, in der ein
+       Strichcode von 174 x 52 stand. Der Strichcode (`.dp-pf-bc`) ist
+       seit v1639 `display:none` und gemessen 0 x 0. Uebrig ist ein
+       Knopf von 83 px in einem Kasten von 208.
+
+       > Ein Mass, das fuer einen entfernten Inhalt gesetzt wurde,
+       > bleibt stehen und wirkt weiter. 125 px fuer nichts.
+
+   Beides im Band 901+ zurueckgenommen. Gegengerechnet: bei 1440 px
+   war die Summe der Kinder 1370 bei 1148 Platz; ohne die 125 px sind
+   es 1245, und ohne das Wachsen verteilt sich der Rest sinnvoll.
+
+   ── UND EINE RUECKNAHME ────────────────────────────────────────────
+   Mein Pruefer hat in 10 von 48 Laeufen "QR-SVG schief" gemeldet
+   (kartei 82x68 in 92x92, buetten 52x48 in 64x64). **Das war ein
+   Messfehler, kein Befund.** Gemessen am gezeichneten Code selbst:
+
+     kartei    erstes rect  64 x 64    QUADRATISCH
+     buetten   erstes rect  41 x 41    QUADRATISCH
+
+   Der viewBox ist `0 0 31 31`, und ohne `preserveAspectRatio` gilt
+   `xMidYMid meet` - das Verhaeltnis wird GEWAHRT, der Code sitzt
+   zentriert im Kasten. Schief ist das svg-ELEMENT, nicht das Bild
+   darin. Genau das steht schon im Kommentar bei v1992, und ich habe
+   es trotzdem als Befund gemeldet.
+
+   Eine Probe mit `aspect-ratio:1` am svg hat es nachweislich
+   VERSCHLECHTERT (buetten: rect von 41x41 auf 36x36), also wird hier
+   nichts geaendert. Der Pruefer misst ab jetzt das `rect`.
+   ===================================================================== */
+@media (min-width: 901px){
+  /* 1 - Segmente wachsen nicht mehr */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
+    flex-grow: 0 !important;
+  }
+  /* 2 - der Stub ist so breit wie sein Inhalt, nicht wie ein
+         entfernter Strichcode */
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    min-width: fit-content !important;
+  }
+}
+
+/* =====================================================================
+   v2123a - `overflow-x: visible` KAM ALS `auto` HERAUS
+
+   Gemessen in allen Laeufen im Band 641-1100: `.dp-pf-scroll` meldete
+   `overflow-x: auto`, obwohl v2121 dort `visible !important` setzt und
+   mit (0,2,0) ueber :has gegen (0,1,0) gewinnt.
+
+   Die Regel gewinnt auch. Sie wird nur UMGERECHNET: steht eine der
+   beiden Achsen auf etwas anderes als `visible`, rechnet der Browser
+   die andere von `visible` auf `auto` um. Und `overflow-y: hidden`
+   steht in demselben Band in style.css.
+
+   > **Nicht die Kaskade hat entschieden, sondern die Berechnung.** Wer
+   > nur den gemeldeten Wert liest, haelt seine Regel fuer verloren und
+   > sucht an der falschen Stelle nach einem staerkeren Selektor.
+
+   Heute schadet es nicht (gemessen: 0 Querscroller in 48 Laeufen, es
+   laeuft nichts ueber). Es heisst aber, dass ein Balken erscheinen
+   KANN, sobald doch einmal etwas uebersteht - und dann waere er da,
+   ohne dass jemand ihn gewollt hat.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 1100px){
+  .dp-pf-scroll:has(.dp-pfbar){
+    overflow-y: visible !important;
+  }
+}
+
+/* =====================================================================
+   v2124 - IM LAPTOP-BAND BRICHT DIE KACHELREIHE, NICHT DIE LEISTE
+
+   Nach v2119-v2123 ist nichts mehr abgeschnitten und nichts mehr
+   draussen. Die Leiste ist aber bei 1180 px 185 px hoch, und die erste
+   Zeile ist zu zwei Dritteln leer:
+
+     y  0   lead 128 + perf 1 + seg 173 + sep 1   = 303 von 888
+     y 97   seg 602 + qr 62 + rz 97               = 761 von 888
+
+   Das zweite Segment ist 602 px breit und unteilbar. Es passt nicht
+   neben die 303 - also wandert es in die zweite Zeile und laesst
+   585 px leer stehen.
+
+   ── DER UNTERSCHIED, AUF DEN ES ANKOMMT ───────────────────────────
+   `flex-wrap` auf der LEISTE und `flex-wrap` auf der KACHELREIHE sind
+   zwei verschiedene Dinge, und nur eines von beiden darf wirken:
+
+     Leiste wrap    -> das Segment wandert als Ganzes nach unten
+     Leiste nowrap  -> das Segment muss nachgeben, und weil seine
+                       eigene Reihe (.dp-pf-row) umbrechen DARF,
+                       bricht die Reihe statt die Leiste
+
+   > **Flexbox bricht um, bevor es schrumpft.** Genau das steht schon im
+   > Kommentar von v1941b. Was dort fehlte: schrumpfen darf der
+   > BEHAELTER, nicht die Kachel. v1941 hat die Kachel schrumpfen lassen
+   > und die Beschriftung gekappt; hier gibt das Segment nach, und die
+   > Kacheln wandern in eine zweite Reihe - in voller Breite.
+
+   GEMESSEN per Inline-Probe am Element (`style.setProperty(...,
+   'important')`), 1180 px:
+
+     wrap     888 x 185   seg2 602 x 87    Reihe 602 x 44
+     nowrap   888 x 137   seg2 348 x 137   Reihe 348 x 94
+
+   48 px weniger, zwei Kachelreihen statt einer halbleeren Leistenzeile,
+   und weiter 0 abgeschnitten / 0 draussen.
+
+   ── WARUM GENAU 1140 BIS 1400 ─────────────────────────────────────
+   Die Grenzen sind gemessen, nicht gewaehlt. Je Breite wrap gegen
+   nowrap, am laufenden Staging:
+
+     Breite   wrap           nowrap
+      901     581x309  0     581x237  ZWEI DRAUSSEN (+110)
+      920     600x309  0     600x237  ZWEI DRAUSSEN (+91)
+      980     660x259  0     660x237  ZWEI DRAUSSEN (+31)
+     1024     703x248  0     703x237  0        (11 px, nicht wert)
+     1100     808x183  0     808x187  0        SCHLECHTER
+     1180     888x185  0     888x137  0        BESSER  -48
+     1280     988x156  0     988x117  0        BESSER  -39
+     1340    1048x134  0    1048x117  0        BESSER  -17
+     1440    1148x 78  0    1148x 78  0        gleich (eine Zeile)
+     1920    1280x 78  0    1280x 78  0        gleich
+
+   Unter 1024 reicht die Zeile nicht einmal fuer die Mindestbreiten -
+   `.dp-pf-rz` und der Knopf stehen dann 110 px ausserhalb. Bei 1100
+   wird es schlechter. Ab 1440 passt alles in eine Zeile, da aendert
+   `nowrap` nichts. Also wirkt es nur dort, wo es gemessen hilft.
+
+   > Ein Haltepunkt, der nicht an einer Messung haengt, ist eine
+   > Behauptung. Diese beiden haengen an zweiundzwanzig.
+
+   Der Selektor ist Zeichen fuer Zeichen derselbe wie in v2119 - (1,2,0)
+   gegen (1,2,0), und bei gleicher Spezifitaet gewinnt die SPAETERE
+   Regel. Sie steht deshalb hier unten und nicht dort oben.
+   ===================================================================== */
+@media (min-width: 1140px) and (max-width: 1400px){
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar,
+  :is(#oab-bar,#qc7-sources).dp-pfbar{
+    flex-wrap: nowrap !important;
+  }
+  /* Die Reihe MUSS umbrechen duerfen - sie ist jetzt die einzige
+     Stelle, an der nachgegeben wird. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+  /* Und die Segmente muessen nachgeben duerfen, bis zu einer Kachel.
+     v2119 setzt das schon; hier noch einmal benannt, damit die
+     Bedingung des Bandes an einer Stelle vollstaendig steht. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
     flex: 0 1 auto !important;
-    min-width: 0 !important;
+    min-width: min-content !important;
   }
-  #oab-bar.dp-pfbar > .dp-pf-rz,
-  .dp-pf-scroll .dp-pfbar > .dp-pf-rz {
+  /* Lead, QR und Stub geben NICHT nach - sonst quetscht die Zeile sie
+     statt die Reihe umzubrechen, und genau das war v2119s Befund. */
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+}
+
+/* =====================================================================
+   v2126 - ZWEI RESTE AUS DER 72-LAEUFE-ABNAHME
+
+   Abnahme nach v2124: 4 Kartenstile x 18 Breiten = 72 Messungen.
+   KAPP 0, UEBER 0, ZUBREIT 0, QUER 0, Knopftext k >= 4,5 ueberall.
+   Zwei Dinge blieben.
+
+   ── 1 · KARTEI: DIE VIER CHIPS STANDEN IN EINER REIHE, DIE NICHT
+          UMBRECHEN DURFTE ──────────────────────────────────────────
+   Gemessen, Kartenstil "Kartei", Reihe `nowrap` gegen `wrap`:
+
+     Fenster   Leiste    nowrap            wrap
+      901      581     raus 0            raus 0
+      940      620     raus 4            raus 0   (Hoehe 320 -> 374)
+      980      660     raus 2            raus 0   (Hoehe 320 -> 374)
+     1000      680     raus 0            raus 0   unveraendert
+     1024      703     raus 0            raus 0   unveraendert
+     1100      808     raus 0            raus 0   unveraendert
+     1180      888     raus 0            raus 0   unveraendert
+     1440     1148     raus 0            raus 0   unveraendert
+
+   Bei 940 px standen `div.dp-pf-row`, `label.dp-pf-tile` und
+   `span.dp-pf-lbl` **85 px ausserhalb** der Karte. Die Reihe trug
+   `flex-wrap:nowrap` aus dem Kartei-Entwurf (Z. 850) - mit der
+   Begruendung *"Alle vier Chips gleich hoch und gleich gefasst - in
+   einer Reihe faellt jeder Unterschied sofort auf"*.
+
+   > Die Begruendung stimmt, und sie gilt nur, solange die Reihe passt.
+   > Eine Gestaltungsabsicht, die Inhalt aus der Karte schiebt, ist
+   > keine Gestaltung mehr.
+
+   `wrap` ist in jeder gemessenen Breite entweder besser oder
+   unveraendert - es greift nur, wenn es muss. Deshalb im ganzen Band
+   901-1100, nicht nur bei 940.
+
+   Spezifitaet: der Entwurf nennt
+     html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row
+   das ist (1,3,1). Hier steht `.dp-pf-scroll` zusaetzlich davor: (1,4,1).
+
+   ── 2 · EIN PIXEL FENSTERBREITE KOSTETE 17 PX HOEHE ───────────────
+   Gemessen an der Bandgrenze von v2124:
+
+     1400 px   Leiste 1108 x 117   nowrap
+     1401 px   Leiste 1109 x 134   wrap     <- 17 px hoeher
+     1440 px   Leiste 1148 x  78   eine Zeile
+
+   Die 1400 war zu frueh gewaehlt. Eine Zeile wird die Leiste erst bei
+   einer Behaelterbreite von rund 1148 px, und die gibt es ab einem
+   Fenster von 1440. Zwischen 1401 und 1439 half `nowrap` also noch -
+   das Band endet jetzt bei 1439.
+
+   > Eine Bandgrenze, die nicht am Umschlagpunkt liegt, erzeugt einen
+   > Sprung, den niemand gewollt hat. Hier waren es 17 px auf ein Pixel
+   > Fensterbreite.
+   ===================================================================== */
+@media (min-width: 901px) and (max-width: 1100px){
+  html[data-dp-kartenstil="kartei"] .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  html[data-dp-kartenstil="kartei"] .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-seg .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Das Band aus v2124, weitergezogen bis an den gemessenen
+   Umschlagpunkt. Der Selektor ist derselbe; bei gleicher Spezifitaet
+   gewinnt die spaetere Regel, und das ist diese. */
+@media (min-width: 1401px) and (max-width: 1439px){
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar,
+  :is(#oab-bar,#qc7-sources).dp-pfbar{
+    flex-wrap: nowrap !important;
+  }
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
+  }
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg,
+  :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-seg{
     flex: 0 1 auto !important;
-    min-width: 0 !important;
+    min-width: min-content !important;
   }
-  /* Die ganze Kette darunter - min-width:auto wirkt sonst von unten durch. */
-  #oab-bar.dp-pfbar *,
-  .dp-pf-scroll .dp-pfbar * {
-    min-width: 0 !important;
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-lead,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-qr,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar > .dp-pf-rz{
+    flex: 0 0 auto !important;
+  }
+}
+
+/* =====================================================================
+   v2133a - DER WIEDERBELEBTE ENTWURF BRACHTE EINEN 29-PX-KNOPF MIT
+
+   Abnahme von v2133: 2 Stile x 10 Breiten. Die Zeile wirkt jetzt
+   (35 von 44 Regeln treffen, Marke gesetzt) und ist sauber -
+   KAPP 0, RAUS 0, ZUBREIT 0, QUER 0, Textkontrast ueberall >= 4,5.
+
+   Gemessen gegen die Vorgabe:
+
+     Breite   Vorgabe              Zeile
+      360     360x445  Knopf 50    360x334  Knopf 29
+      390     357x445  Knopf 50    357x334  Knopf 29
+      430     397x445  Knopf 50    430x334  Knopf 29
+      768     695x383  Knopf 44    695x253  Knopf 44
+      834     761x383  Knopf 44    761x253  Knopf 44
+     1024     703x248  Knopf 44    703x203  Knopf 44
+     1180     888x137  Knopf 44    888x136  Knopf 44
+     1280     988x117  Knopf 33    988x114  Knopf 29
+     1440    1148x 78  Knopf 33   1148x132  Knopf 29
+     1920    1280x 78  Knopf 33   1280x 80  Knopf 29
+
+   Die Leiste wird 111 px flacher - genau das, was der Entwurf
+   verspricht. Der Knopf aber faellt auf **29 px**, weil die
+   Zeile-Regel ausdruecklich `min-height:0` setzt:
+
+     body.dp-pfzeile .dp-pfbar button#oab-run{ min-height:0 !important;
+       padding:8px 18px !important; font-size:13px !important }
+
+   Das war richtig: der Kommentar daneben erklaert, dass der 50-px-Knopf
+   die Zeile auf 76 statt 54 px trieb. Nur gab es damals die
+   Touchflaechen-Regel aus v2121a noch nicht.
+
+   > **Zwischen 641 und 1200 px gewinnt v2121a mit (2,1,1) gegen die
+   > (1,3,2) der Zeile** - deshalb stehen dort 44 px. Unter 641 gilt das
+   > Band nicht, und darunter liegen genau die Handys.
+
+   Also 44 px bis 900 px, und darueber bleibt die Zeile kompakt - sie
+   ist dort ein Entwurf fuer die Maus. Spezifitaet (2,2,2) gegen die
+   (1,3,2) des Entwurfs.
+
+   ── OFFEN UND BENANNT ─────────────────────────────────────────────
+   Bei 1440 px ist die Zeile **132 px** hoch, die Vorgabe 78. Bei
+   1920 px sind es 80. Nichts ist abgeschnitten und nichts laeuft
+   hinaus - die Leiste bricht dort nur eine Zeile mehr um als die
+   Vorgabe. Das ist eine Optikfrage am Entwurf, kein Defekt, und
+   gehoert Marcel gezeigt statt von mir entschieden.
+   ===================================================================== */
+@media (max-width: 900px){
+  body.dp-pfzeile :is(#oab-bar,#qc7-sources).dp-pfbar button#oab-run,
+  body.dp-pfzeile :is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch{
+    min-height: 44px !important;
+    padding-top: 11px !important;
+    padding-bottom: 11px !important;
+  }
+}
+
+/* =====================================================================
+   v2134 - EINE TOUCHFLAECHE FUER ALLE VIER ENTWUERFE
+
+   Abnahme der OFFENEN Schublade, 4 Kartenstile x 3 Handys = 12 Laeufe.
+   Geoeffnet per echtem Klick auf `.dp-pf-mtrigger`, danach gemessen:
+
+     Ausloeser trifft      12 von 12
+     Schublade offen       12 von 12
+     Knopf verdeckt         0
+     Knopf ausserhalb       0
+     Beschriftung gekappt   0
+     Inhalt ausserhalb      0
+     Schliessknopf 45x44, im Bild   12 von 12
+
+   Uebrig war ein Mass:
+
+     Stil       Knopf
+     Vorgabe    326-396 x 50
+     Zeile      332-402 x 44   (v2133a)
+     Kartei      91 x 40       <- vier Pixel zu flach
+     Buetten    355-395 x 50
+
+   Vier Pixel sind kein Drama und auch kein Zufall: jeder Entwurf setzt
+   seine eigene Knopfhoehe, und jeder muss die Touchflaeche einzeln
+   mitnehmen. Drei von vier tun es, einer nicht.
+
+   > **Eine Regel je Entwurf ist eine Regel, die beim fuenften Entwurf
+   > fehlt.** Deshalb steht sie hier EINMAL und stilunabhaengig: unter
+   > 901 px ist der Abruf-Knopf mindestens 44 px hoch, egal welcher
+   > Entwurf gewaehlt ist.
+
+   Spezifitaet (2,2,0) - sie schlaegt die (1,3,1) der Kartei und die
+   (1,3,2) der Zeile, weil zwei IDs mehr zaehlen als drei Klassen.
+   Ueber 900 px bleibt jeder Entwurf bei seiner eigenen Hoehe; dort ist
+   eine Maus im Spiel.
+   ===================================================================== */
+@media (max-width: 900px){
+  :is(#oab-bar,#qc7-sources).dp-pfbar #oab-run.dp-pf-launch,
+  :is(#oab-bar,#qc7-sources).dp-pfbar .qc6-run.dp-pf-launch{
+    min-height: 44px !important;
+  }
+}
+
+/* =====================================================================
+   v2134a - ZWEI PIXEL IN DER KARTEI
+
+   Schlussabnahme der offenen Schublade, 390 px, alle vier Entwuerfe,
+   Kachel fuer Kachel gemessen:
+
+     Vorgabe   358 x 44   min-height 44px   Polster 6/9
+     Zeile     364 x 44   min-height 44px   Polster 6/11
+     Buetten   366 x 44   min-height 44px   Polster 6/9
+     Kartei    388 x 42   min-height 42px   Polster 0/13   <- hier
+
+   42 statt 44. Die Begruendung daneben steht seit v1664: *"Alle vier
+   Chips gleich hoch und gleich gefasst - die Masse sind die der Demo,
+   ohne Unterzeile also flacher."* Die Demo kannte keine Touchflaeche.
+
+   > **Zwei Pixel sind kein Gestaltungsunterschied, sondern ein
+   > Unterschied zwischen Entwurf und Geraet.** Auf dem Schreibtisch
+   > sieht 42 aus wie 44; unter dem Finger ist es die Grenze.
+
+   Geaendert wird nur das Mass, und nur unter 901 px. Ueber 901 px
+   behaelt die Kartei ihre 42 px - dort ist eine Maus im Spiel, und die
+   Demo-Proportion bleibt, wo sie gemeint war.
+
+   Dasselbe fuer den Abruf-Knopf der Kartei (40 px, Z. 1189): den hat
+   `v2134` schon stilunabhaengig auf 44 gehoben, hier steht nur der
+   Nachweis, dass es derselbe Fall ist.
+   ===================================================================== */
+/* v2134b: Band auf 1200 verlaengert. Gemessen blieb genau EINE Zeile
+   mit Befund: [kartei] bei 1180 px, Kacheln 42 px. Und 1180 ist das
+   iPad Pro 11 im Querformat (1194 px) - dieselbe Begruendung, mit der
+   v2121a dort schon 44 px setzt. Eine Grenze bei 900 laesst genau das
+   Geraet aus, um das es geht. */
+@media (max-width: 1200px){
+  html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    min-height: 44px !important;
+  }
+}
+
+/* =====================================================================
+   v2135 - "DEALPILOT" STAND AUF 12 VON 53 PX
+
+   Marcel am 12.10.2026: "auf dem ipad mini die datenaufnahme DealPilot
+   und die Stufen werden nicht richtig dargestellt."
+
+   GEMESSEN, iPad mini 768 px, Kartenstil Kartei, die Kachel
+   `[data-src="dealpilot"]` und ihr Inhalt:
+
+     Kachel                  89 x 44     width: 88,941px
+       span.dp-pf-logo.dp    12 sichtbar / 53 Inhalt    "DealPilot"
+       span.dp-pf-stufen     12 sichtbar / 17 Inhalt    die drei Pillen
+       span.dp-pf-led        12 x 12
+
+   Von "DealPilot" waren 12 von 53 px zu sehen, von den Stufen 12 von
+   17. Beides steht als Rest da, nicht als Beschriftung.
+
+   ── DER UMFANG, GEMESSEN STATT GESCHAETZT ─────────────────────────
+   4 Kartenstile x 5 Breiten: **12 von 20 Laeufen betroffen.**
+
+     Stil      641    768    834    900    901
+     Vorgabe   heil   heil   heil   heil   heil
+     Zeile     KAPP   KAPP   KAPP   KAPP   heil
+     Kartei    KAPP   KAPP   KAPP   KAPP   heil
+     Buetten   KAPP   KAPP   KAPP   KAPP   heil
+
+   Also drei Stile ueber das ganze Band 641-900, und ab 901 ist alles
+   in Ordnung (Kachel 173-184 px, Logo 59/59, Stufen 60/60).
+
+   ── ZWEI URSACHEN, DIE ZUSAMMEN WIRKEN ────────────────────────────
+   **1 · Eine Prozentangabe mit zwei verschiedenen Bezugsgroessen.**
+   `v2117` gibt den Kacheln im Band 641-900 `width: calc(50% - 3px)` -
+   zwei Spalten statt einer langen Saeule. Gemessen bei 768 px:
+
+     .dp-pf-seg (Marktbewertung)   Reihe 184 px -> 50 % = 89 px
+     .dp-pf-seg (Daten einlesen)   Reihe 664 px -> 50 % = 329 px
+
+   > **Das erste Segment enthaelt EINE Kachel.** Seine Reihe ist so
+   > breit wie diese Kachel, und die Haelfte davon ist zu wenig fuer
+   > ihren eigenen Inhalt. Die Regel war fuer vier Kacheln gedacht und
+   > trifft eine.
+
+   Dieselbe Falle wie bei `v2121`: dort waren 50 % von 1263 px
+   plötzlich 631 px. **Eine Prozentangabe ist nur so gut wie ihr
+   Bezug**, und der Bezug ist hier je Segment ein anderer.
+
+   **2 · Eine Sammelregel nimmt dem Inhalt seine Mindestbreite.**
+   `v1941e` setzt im Band bis 900 px
+
+     #oab-bar.dp-pfbar *  { min-width: 0 !important }
+
+   auf JEDEN Nachfahren. Ohne sie waere die Kachel bei 89 px
+   uebergelaufen - mit ihr schrumpft stattdessen der Text auf 12 px.
+   Der Ueberlauf ist weg, der Inhalt auch.
+
+   ── WAS HIER GESETZT WIRD ─────────────────────────────────────────
+   Die Kachel darf nicht schmaler werden als ihr Inhalt
+   (`min-width: max-content`), und der Inhalt bekommt seine
+   Mindestbreite zurueck (`min-width: auto`). Die 50 % bleiben als
+   WUNSCHbreite stehen - wo sie passen, teilen die Kacheln weiter zu
+   zweit; wo sie nicht passen, gewinnt der Inhalt.
+
+   Spezifitaet: `:is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile > *`
+   ist (1,2,0) gegen die (1,1,0) der Sammelregel - die nennt nur EINE
+   Klasse. Bei der Kachel selbst ist es (1,2,0) gegen (1,2,0), also
+   entscheidet die Reihenfolge, und diese Regel steht spaeter.
+   ===================================================================== */
+@media (min-width: 641px) and (max-width: 900px){
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    min-width: max-content !important;
+  }
+  :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile > *,
+  .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile > *{
+    min-width: auto !important;
+  }
+  /* Die Reihe muss umbrechen duerfen - sonst schiebt die gewachsene
+     Kachel ihre Nachbarn aus der Karte. In der Kartei steht dort
+     `nowrap` aus dem Entwurf (Z. 850). */
+  html[data-dp-kartenstil] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row,
+  html[data-dp-kartenstil] .dp-pf-scroll :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-row{
+    flex-wrap: wrap !important;
   }
 }

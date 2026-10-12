@@ -17,8 +17,26 @@
 
   #dashboard-main .stage{
     --c-page:#fff;--c-ink:#1b1815;--c-mut:#6b6660;--c-panel:#0c0b09;--c-ptext:#ece7dd;--c-pmut:#9a948a;
-    --c-acc:var(--wl-c9a84c, #C9A84C);--c-acc2:var(--wl-e8cc7a, #E8CC7A);--c-accd:var(--wl-b8932f, #b8932f);--c-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
-    --c-green:#3FA56C;--c-greenl:#5cc187;--c-greenm:#2FBE6E;--c-red:#B86250;--c-redl:#d98579;
+    --c-acc:var(--wl-c9a84c, #C9A84C);--c-acc2:var(--wl-e8cc7a, #E8CC7A);--c-accd:var(--wl-b8932f, #b8932f);
+    /* v2101b: Textvarianten der beiden Gold-Akzente. Dieselbe Trennung
+       wie bei --dp-*-txt: `--c-acc2` und `--c-accd` faerben im Cockpit
+       ueberwiegend TEXT (`color:`, acht Regeln), aber `--c-acc2` zieht
+       auch einen SVG-Strich (`stroke:`, Z. 260). Der bleibt auf dem
+       Akzent - ein Strich ist eine Flaeche, kein Text.
+         #E8CC7A hell  1,71 -> #776940  4,93  (18 Traeger)
+         #b8932f dunkel 3,20 -> #7d682f  5,39  (49 Traeger)
+       Gerechnet von tools/kontrast-css-bauen.mjs, gleiche Quelle wie
+       die Demo. NICHT ueber --wl-* geaendert: das sind die Tokens des
+       Mandanten und gehoeren den Flaechen. */
+    --c-acc2-txt:#776940;--c-accd-txt:#7d682f;--c-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);
+    /* v2101: `--c-greenl` und `--c-redl` werden AUSSCHLIESSLICH als
+       `color:` benutzt (`:226`, `:296`, `:297`, `dashboard.js:400`) -
+       nachgezaehlt, deshalb hier direkt abgedunkelt statt ueber eine
+       zweite Variable. Sie trugen 81 der gemessenen Stellen:
+         #5cc187  2,23 -> #387652  5,41   (td.pos, 27x)
+         #d98579  2,77 -> #965c53  5,31   (td.neg und .v, 54x)
+       `--c-green`, `--c-red`, `--c-greenm` bleiben: die fuellen auch. */
+    --c-green:#3FA56C;--c-greenl:#387652;--c-greenm:#2FBE6E;--c-red:#B86250;--c-redl:#965c53;
     --c1:var(--wl-c9a84c, #C9A84C);--c2:#3FA56C;--c3:var(--wl-e8cc7a, #E8CC7A);--c4:#6f93b8;
     --c-front:#fff;--c-front-tx:#191713;--c-front-mut:#6b6660;--c-front-line:#cdbf9a;--c-front-acc:var(--wl-b8932f, #b8932f);
     --c-ring:#2FBE6E;--ring-w:13;--head-font:'Space Grotesk';
@@ -54,18 +72,18 @@
   #dashboard-main .hdr{display:flex;align-items:center;gap:13px;padding:18px 4px 6px}
 
   #dashboard-main .hdr .wm{font-family:'Space Grotesk';font-weight:700;font-size:18px;color:var(--c-ink)}
-#dashboard-main .hdr .wm span{color:var(--c-accd)}
+#dashboard-main .hdr .wm span{color:var(--c-accd-txt)}
 
   #dashboard-main .hdr .pf{margin-left:auto;display:flex;align-items:center;gap:9px;background:var(--c-panel);color:var(--c-ptext);border-radius:30px;padding:7px 15px;border:1px solid var(--c-line)}
 
   #dashboard-main .hdr .pf .led{width:8px;height:8px;border-radius:50%;background:var(--c-green);box-shadow:0 0 8px 1px rgba(63,165,108,.7);animation:pulse 2.2s infinite}
 
-  #dashboard-main .hdr .pf .t{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.3px;color:var(--c-acc2)}
+  #dashboard-main .hdr .pf .t{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.3px;color:var(--c-acc2-txt)}
 
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
   #dashboard-main .sl{display:flex;align-items:center;gap:11px;margin:26px 4px 12px}
 
-  #dashboard-main .sl .e{font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--c-accd)}
+  #dashboard-main .sl .e{font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--c-accd-txt)}
 
   #dashboard-main .sl h2{font-family:var(--head-font);font-weight:600;font-size:17px;margin:0;color:var(--c-ink)}
 
@@ -83,7 +101,7 @@
 
   #dashboard-main .hpre .led{width:9px;height:9px;border-radius:50%;background:var(--c-green);box-shadow:0 0 8px 1px rgba(63,165,108,.7);animation:pulse 2.2s infinite}
 
-  #dashboard-main .hpre .t{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--c-acc2)}
+  #dashboard-main .hpre .t{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--c-acc2-txt)}
 
   #dashboard-main .hpre .cls{margin-left:auto;font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:#2c2410;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 60%,var(--wl-b8932f, #b8932f));border-radius:20px;padding:3px 11px;font-weight:700}
 
@@ -151,7 +169,7 @@
 
   #dashboard-main .gcol{display:flex;flex-direction:column;gap:11px;min-height:50px}
 
-  #dashboard-main .gempty{font-size:12px;color:#a89f8c;font-style:italic;padding:13px 4px;border:1px dashed var(--c-line);border-radius:11px;text-align:center}
+  #dashboard-main .gempty{font-size:12px;color:#6f695c;font-style:italic;padding:13px 4px;border:1px dashed var(--c-line);border-radius:11px;text-align:center}
 
   #dashboard-main .kc{background:var(--c-front);color:var(--c-front-tx);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-left:4px solid var(--tier,var(--c-green));border-radius:12px;
     box-shadow:0 9px 22px -12px rgba(110,82,18,.45);overflow:hidden;cursor:pointer}
@@ -170,9 +188,9 @@
 
   #dashboard-main .kc-flat .scl{font-family:'JetBrains Mono';font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;text-align:center;margin-top:1px}
 
-  #dashboard-main .kc.tg .sc, #dashboard-main .kc.tg .scl{color:var(--c-green)}
-#dashboard-main .kc.ty .sc, #dashboard-main .kc.ty .scl{color:var(--c-accd)}
-#dashboard-main .kc.tr .sc, #dashboard-main .kc.tr .scl{color:var(--c-red)}
+  #dashboard-main .kc.tg .sc, #dashboard-main .kc.tg .scl{color:var(--dp-green-txt,#2e784f)}
+#dashboard-main .kc.ty .sc, #dashboard-main .kc.ty .scl{color:var(--c-accd-txt)}
+#dashboard-main .kc.tr .sc, #dashboard-main .kc.tr .scl{color:var(--dp-red-txt,#a25646)}
 
   #dashboard-main .kc-flat .chev{width:15px;height:15px;flex:0 0 15px;color:var(--c-front-mut);transition:transform .35s}
 
@@ -220,7 +238,7 @@
   #dashboard-main .shr .o{font-family:'Space Grotesk';font-weight:600;font-size:13px;color:var(--c-ptext)}
 #dashboard-main .shr .o small{display:block;font-family:Inter;font-weight:400;font-size:10px;color:var(--c-pmut);margin-top:1px}
 
-  #dashboard-main .shr .cd{font-family:'JetBrains Mono';font-size:11.5px;color:var(--c-acc2);letter-spacing:1px}
+  #dashboard-main .shr .cd{font-family:'JetBrains Mono';font-size:11.5px;color:var(--c-acc2-txt);letter-spacing:1px}
 
   #dashboard-main .shr .rt{font-family:'JetBrains Mono';font-size:11px;color:var(--c-pmut)}
 #dashboard-main .shr .rt.w{color:var(--c-redl)}
@@ -228,7 +246,7 @@
   #dashboard-main .shr .ac{display:flex;gap:6px;justify-self:end}
 #dashboard-main .shr .ac button{font-family:'JetBrains Mono';font-size:10px;cursor:pointer;border-radius:7px;padding:5px 10px}
 
-  #dashboard-main .shr .ac .e{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid var(--c-line);color:var(--c-acc2)}
+  #dashboard-main .shr .ac .e{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid var(--c-line);color:var(--c-acc2-txt)}
 #dashboard-main .shr .ac .r{background:rgba(184,98,80,.13);border:1px solid rgba(184,98,80,.4);color:var(--c-redl)}
 
   #dashboard-main .shq{background:var(--c-hatch);border-left:1px dashed var(--c-line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:15px}
@@ -256,7 +274,7 @@
 
   #dashboard-main .chart .cs{font-family:'JetBrains Mono';font-size:9px;color:var(--c-pmut)}
 
-  #dashboard-main .chart .badge{margin-left:auto;font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-acc2);border:1px solid var(--c-line);border-radius:20px;padding:2px 8px}
+  #dashboard-main .chart .badge{margin-left:auto;font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-acc2-txt);border:1px solid var(--c-line);border-radius:20px;padding:2px 8px}
 
   #dashboard-main .draw{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 1.9s ease-out forwards}
 
@@ -273,7 +291,7 @@
 
   #dashboard-main .ph .t{font-family:'Space Grotesk';font-weight:600;font-size:13.5px;color:var(--c-ptext)}
 
-  #dashboard-main .ph .tag{font-family:'JetBrains Mono';font-size:9px;color:var(--c-acc2);border:1px solid var(--c-line);border-radius:20px;padding:2px 8px}
+  #dashboard-main .ph .tag{font-family:'JetBrains Mono';font-size:9px;color:var(--c-acc2-txt);border:1px solid var(--c-line);border-radius:20px;padding:2px 8px}
 
   #dashboard-main .ph .yrs{margin-left:auto;display:flex;gap:5px}
 
@@ -579,6 +597,41 @@
 #dashboard-main{
   --dp-green:#3FA56C; --dp-gold:var(--wl-c9a84c, #C9A84C); --dp-red:#B86250; --dp-muted:#9a948a;
   --dp-card-ch:#ece7dd; --dp-green-bg:rgba(63,165,108,.14); --dp-red-bg:rgba(184,98,80,.14);
+
+  /* ══ v2101 · EIGENE TÖNE FÜR TEXT, GETRENNT VON DEN FÜLLUNGEN ══════
+     Marcel am 11.10.2026: „und bitte kontrast vorschlag so umsetzen."
+     Der Vorschlag aus `frontend/kontrast-cockpit.html`, Weg (a).
+
+     WARUM NICHT EINFACH `--dp-green` ABDUNKELN: dieselben drei Variablen
+     tragen im Cockpit BEIDES — Text und Flächen. `catBarColor()`
+     (`dashboard.js:103`) füllt damit die Balken (`background:`,
+     `:387`), `tierOf()` und `colByVal()` färben damit Zahlen
+     (`color:`). Ein Wechsel an der Variablen hätte die Balken
+     mitgezogen.
+
+     > Beim ersten Anlauf wollte ich stattdessen die gemessenen
+     > SELEKTOREN färben. Das wäre schlimmer gewesen: `.ov-v` trägt je
+     > nach Lage Grün ODER Rot, und mein Generator hätte vier
+     > `!important`-Regeln auf denselben Selektor gelegt — die letzte
+     > gewinnt. **Grün und Rot wären zu einer Farbe verschmolzen.**
+     > Gefunden, weil ich die erzeugten Regeln gegengelesen habe, bevor
+     > sie rausgingen.
+
+     Gerechnet von `tools/kontrast-css-bauen.mjs` aus derselben Quelle
+     wie die Demo: die kleinste Abdunklung, die auf allen acht hellen
+     Flächen 4,5 hält (die dunkelste entscheidet, nicht die häufigste).
+
+       Grün  #3FA56C  3,08 -> #2e784f  5,36   (-27 %)
+       Rot   #B86250  4,28 -> #a25646  5,31   (-12 %)
+       Gold  #C9A84C  2,23 -> #7d682f  5,26   (-38 %)
+       Grau  #9A948A  2,94 -> #6f6b63  5,17   (-28 %)
+
+     Gold geht NICHT über `--wl-c9a84c`: der Token ist der Akzent des
+     Mandanten und gehört den Flächen. Hier steht die Textfarbe. */
+  --dp-green-txt:#2e784f;
+  --dp-red-txt:#a25646;
+  --dp-gold-txt:#7d682f;
+  --dp-muted-txt:#6f6b63;
 }
 
 
@@ -588,8 +641,8 @@
 /* (A) Kennzahlen 4er-Block (renderOverview -> #dp-overview-strip) */
 #dashboard-main #dp-overview-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:13px}
 #dashboard-main .ov-card{background:var(--c-panel);border:1px solid var(--c-line);border-radius:14px;padding:14px 16px;position:relative;box-shadow:0 9px 26px -17px rgba(120,90,20,.25)}
-#dashboard-main .ov-card-title{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c-accd);margin-bottom:11px}
-#dashboard-main .ov-toggle-hint{color:var(--c-accd);font-size:11px;margin-left:5px;opacity:.85}
+#dashboard-main .ov-card-title{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c-accd-txt);margin-bottom:11px}
+#dashboard-main .ov-toggle-hint{color:var(--c-accd-txt);font-size:11px;margin-left:5px;opacity:.85}
 #dashboard-main .ov-pair{display:flex;gap:14px}
 #dashboard-main .ov-pair .ov-half{flex:1 1 0;min-width:0}
 #dashboard-main .ov-pair .ov-half + .ov-half{border-left:1px solid var(--c-line);padding-left:14px}
@@ -666,11 +719,11 @@
 #dashboard-main .shr2:first-child{border-top:none}
 #dashboard-main .shr2 .o{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;color:var(--c-ink)}
 #dashboard-main .shr2 .o small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:10px;color:var(--c-mut);margin-top:1px}
-#dashboard-main .shr2 .cd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--c-accd);letter-spacing:1px}
+#dashboard-main .shr2 .cd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--c-accd-txt);letter-spacing:1px}
 #dashboard-main .shr2 .rt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--c-mut)}
 #dashboard-main .shr2 .ac{display:flex;gap:6px;justify-self:end}
 #dashboard-main .shr2 .ac button{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 10px}
-#dashboard-main .shr2 .ac .e{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid var(--c-line);color:var(--c-accd)}
+#dashboard-main .shr2 .ac .e{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid var(--c-line);color:var(--c-accd-txt)}
 #dashboard-main .shr2 .ac .r{background:rgba(184,98,80,.13);border:1px solid rgba(184,98,80,.4);color:var(--c-red)}
 #dashboard-main .shr-stub{position:relative;display:flex;align-items:center;justify-content:center;align-self:stretch;padding:0 14px;border-left:2px dashed var(--c-line);text-decoration:none}
 #dashboard-main .shr-stub::before,#dashboard-main .shr-stub::after{content:'';position:absolute;left:-7px;width:12px;height:12px;border-radius:50%;background:var(--c-page)}
@@ -695,7 +748,7 @@
 #dashboard-main .sh-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 16px;border-bottom:1px solid var(--c-line);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5%, transparent)}
 #dashboard-main .sh-cnt{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--c-mut)}
 #dashboard-main .sh-ctrl{display:flex;gap:7px}
-#dashboard-main .shb{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 11px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);border:1px solid var(--c-line);color:var(--c-accd)}
+#dashboard-main .shb{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 11px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);border:1px solid var(--c-line);color:var(--c-accd-txt)}
 #dashboard-main .shb.shb-m{background:transparent;color:var(--c-mut)}
 #dashboard-main .shb:hover{filter:brightness(1.06)}
 
@@ -738,11 +791,11 @@
 #dashboard-main .shr2 .o{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;color:var(--c-ink);line-height:1.2}
 #dashboard-main .shr2 .o small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:10px;color:var(--c-mut);margin-top:2px}
 #dashboard-main .shr-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-#dashboard-main .shr2 .cd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--c-accd);letter-spacing:1px}
+#dashboard-main .shr2 .cd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--c-accd-txt);letter-spacing:1px}
 #dashboard-main .shr2 .rt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--c-mut);padding:2px 8px;border:1px solid var(--c-line);border-radius:20px}
 #dashboard-main .shr2 .ac{display:flex;gap:6px;margin-top:1px}
 #dashboard-main .shr2 .ac button{font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;border-radius:7px;padding:5px 11px}
-#dashboard-main .shr2 .ac .e{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid var(--c-line);color:var(--c-accd)}
+#dashboard-main .shr2 .ac .e{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 13%, transparent);border:1px solid var(--c-line);color:var(--c-accd-txt)}
 #dashboard-main .shr2 .ac .r{background:rgba(184,98,80,.12);border:1px solid rgba(184,98,80,.4);color:var(--c-red)}
 #dashboard-main .shr-stub{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#0c0b09;text-decoration:none;border-left:2px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);transition:box-shadow .15s}
 #dashboard-main .shr-stub::before,#dashboard-main .shr-stub::after{content:'';position:absolute;left:-7px;width:13px;height:13px;border-radius:50%;background:var(--c-page);z-index:2}
@@ -862,7 +915,7 @@
 #dashboard-main .dp-pp-ic svg{width:15px;height:15px}
 #dashboard-main .dp-pp-tt{display:flex;flex-direction:column;line-height:1.15;margin-right:auto;min-width:0}
 #dashboard-main .dp-pp-t{font-weight:700;font-size:13.5px;color:#2A2826}
-#dashboard-main .dp-pp-s{font-size:11px;color:#938B7F}
+#dashboard-main .dp-pp-s{font-size:11px;color:#706a61}
 #dashboard-main .dp-pp-web{
   display:flex;align-items:center;gap:5px;font-size:11.5px;color:#5C554E;cursor:pointer;user-select:none;
 }
@@ -877,7 +930,7 @@
 #dashboard-main .dp-pp-log{
   max-height:420px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;
 }
-#dashboard-main .dp-pp-hint{font-size:12.5px;color:#938B7F;line-height:1.55}
+#dashboard-main .dp-pp-hint{font-size:12.5px;color:#706a61;line-height:1.55}
 #dashboard-main .dp-pp-msg{font-size:13px;line-height:1.6;padding:10px 13px;border-radius:11px;max-width:88%}
 #dashboard-main .dp-pp-u{
   align-self:flex-end;background:var(--gold);color:#1a1407;border-bottom-right-radius:3px;
@@ -938,4 +991,20 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip{
 }
 body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   border-color:var(--gold);color:#EDE7DA;background:#221F17;
+}
+
+/* PP v2101b � WEG (c) FUER DIE ABZEICHEN PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+   Marcels Vorschlag trennt: Weg (a) fuer Zahlen und Tabellen, Weg (c)
+   fuer Abzeichen. Ein Abzeichen ist eine Pille, keine Zahl in einer
+   Spalte - dort traegt der dunkle Grund die Marke weiter, statt den Ton
+   zu verlieren. Genau wie `.ds2-tag` in v2089: Gold auf Tinte = 7,81.
+
+   Diese Regel steht NACH der Umhaengung auf --c-acc2-txt und gewinnt
+   deshalb: das Abzeichen bekommt seinen hellen Ton zurueck, aber auf
+   dunklem Grund. 10 Traeger gemessen (span.badge 7x, shr-stub-lab 3x). */
+#dashboard-main .badge,
+#dashboard-main .shr-stub-lab {
+  background: #1A1714 !important;
+  color: var(--wl-e8cc7a, #E8CC7A) !important;
+  border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 38%, transparent) !important;
 }

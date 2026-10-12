@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontrast im Cockpit</title>
+<!-- ═══════════════════════════════════════════════════════════════════
+     DealPilot · Kontrast-Vorschlag fuers Cockpit · v2091
+     Backlog N60.17 / N60.29 · Stand 10.10.2026
+
+     ERZEUGT von tools/kontrast-demo-bauen.mjs - nicht von Hand aendern.
+     Jede Zahl ist gerechnet; tools/kontrast-demo-pruefen.mjs rechnet sie
+     unabhaengig nach und wird rot, wenn eine davon abweicht.
+     ═══════════════════════════════════════════════════════════════════ -->
+<style>
+  :root{
+    --gold:#C9A84C; --gold-hi:#E8CC7A;
+    --grund:#FDFCFA; --flaeche:#ffffff; --rand:#E0DBD3;
+    --text:#2A2727; --leise:rgba(42,39,39,.68);
+    --gut:#256240; --schlecht:#8E3B32; --warn:#8a6f22;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --grund:#0D0C0B; --flaeche:#171513; --rand:#2E2A26;
+      --text:#F3EAD0; --leise:rgba(243,234,208,.72);
+      --gut:#5FC48D; --schlecht:#E09086; --warn:#D9BC6A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --grund:#0D0C0B; --flaeche:#171513; --rand:#2E2A26;
+    --text:#F3EAD0; --leise:rgba(243,234,208,.72);
+    --gut:#5FC48D; --schlecht:#E09086; --warn:#D9BC6A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--grund);color:var(--text);
+    font:15px/1.6 Inter,system-ui,-apple-system,sans-serif;
+    padding:0 16px 72px}
+  .wrap{max-width:1120px;margin:0 auto}
+  header{padding:52px 0 8px}
+  h1{font:600 clamp(26px,5vw,38px)/1.15 "Space Grotesk",Inter,sans-serif;
+    margin:0 0 10px;letter-spacing:-.01em}
+  .runway{height:3px;width:120px;border-radius:2px;margin:0 0 22px;
+    background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f)}
+  .lead{font-size:17px;max-width:62ch;color:var(--leise);margin:0 0 6px}
+  h2{font:600 19px/1.3 "Space Grotesk",Inter,sans-serif;margin:46px 0 6px}
+  h2 .zahl{font-family:"JetBrains Mono",ui-monospace,monospace;
+    font-size:13px;color:var(--gold);margin-right:9px}
+  p{max-width:68ch}
+  .karte{background:var(--flaeche);border:1px solid var(--rand);
+    border-radius:12px;padding:20px;margin:18px 0;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--rand);
+    vertical-align:middle}
+  th{font:600 10px/1.4 "JetBrains Mono",ui-monospace,monospace;
+    text-transform:uppercase;letter-spacing:.09em;color:var(--leise);
+    border-bottom-width:2px}
+  td.num,th.num{text-align:right;
+    font-family:"JetBrains Mono",ui-monospace,monospace}
+  td.nm{font-weight:600;white-space:nowrap}
+  td.st code{font-size:11px;color:var(--leise)}
+  code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px}
+  .sw{display:inline-block;width:13px;height:13px;border-radius:3px;
+    margin-right:6px;vertical-align:-2px;border:1px solid rgba(0,0,0,.18)}
+  .bad{color:var(--schlecht);font-weight:700}
+  .warn{color:var(--warn);font-weight:600}
+  .good{color:var(--gut);font-weight:700}
+  .dim{color:var(--leise)}
+  .zwei{display:grid;gap:18px;
+    grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+  .probe{background:#fff;border:1px solid var(--rand);border-radius:12px;
+    padding:18px}
+  .probe h3{font:600 11px/1.3 "JetBrains Mono",ui-monospace,monospace;
+    text-transform:uppercase;letter-spacing:.1em;margin:0 0 14px;
+    color:#6b645a}
+  .row{display:flex;align-items:baseline;gap:10px;padding:7px 0;
+    border-bottom:1px solid #eee9e0}
+  .row:last-child{border-bottom:0}
+  .lbl{flex:0 0 118px;font-size:11px;color:#6b645a;
+    font-family:"JetBrains Mono",ui-monospace,monospace}
+  .val{flex:1 1 auto;min-width:0;font-size:15px;font-weight:700;
+    font-family:"JetBrains Mono",ui-monospace,monospace}
+  .k{flex:0 0 46px;text-align:right;font-size:11px;font-weight:700;
+    font-family:"JetBrains Mono",ui-monospace,monospace}
+  .k.good{color:#256240}
+  .k.bad{color:#8E3B32}
+  blockquote{margin:20px 0;padding:14px 18px;
+    border-left:3px solid var(--gold);
+    background:color-mix(in srgb, var(--gold) 7%, transparent);
+    border-radius:0 8px 8px 0}
+  blockquote p{margin:0 0 8px}
+  blockquote p:last-child{margin:0}
+  ul{max-width:68ch}
+  li{margin:7px 0}
+  footer{margin-top:54px;padding-top:20px;border-top:1px solid var(--rand);
+    font-size:12.5px;color:var(--leise)}
+  @media(max-width:620px){
+    td.st,th.st{display:none}
+    header{padding-top:34px}
+    .lbl{flex-basis:92px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Kontrast im Cockpit</h1>
+  <div class="runway"></div>
+  <p class="lead">Im Cockpit liegen <strong>234 Textstellen</strong>
+  unter der Lesbarkeitsschwelle &mdash; gemessen am 10.10.2026 bei 1180&nbsp;px.
+  Das sind nicht 234 Entscheidungen, sondern <strong>11</strong>:
+  so viele Farbt&ouml;ne stecken dahinter.</p>
+</header>
+
+<h2><span class="zahl">1</span>Was gemessen ist</h2>
+<p>Die Messkabine fand 42 Gruppen. Nach Farbe geb&uuml;ndelt bleiben
+11 Ursachen. N&ouml;tig sind <strong>4,5</strong> &mdash; 3,0 gilt erst
+ab 24&nbsp;px, oder ab 18,66&nbsp;px bei Fettung, und keine dieser Stellen
+ist so gro&szlig;.</p>
+
+<div class="karte">
+<table>
+  <thead>
+    <tr>
+      <th>Ton</th><th class="num">Stellen</th><th>heute</th>
+      <th class="num">k</th><th>Vorschlag</th><th class="num">k</th>
+      <th class="num">dunkler</th><th class="st">Beispiele</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td class="nm">Rot hell</td>
+        <td class="num">54</td>
+        <td><span class="sw" style="background:#D98579"></span><code>#D98579</code></td>
+        <td class="num bad">2.77</td>
+        <td><span class="sw" style="background:#965c53"></span><code>#965c53</code></td>
+        <td class="num good">5.31</td>
+        <td class="num dim">&minus;31&thinsp;%</td>
+        <td class="st"><code>td.neg · div.v</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Grau</td>
+        <td class="num">47</td>
+        <td><span class="sw" style="background:#9A948A"></span><code>#9A948A</code></td>
+        <td class="num bad">2.94</td>
+        <td><span class="sw" style="background:#6f6b63"></span><code>#6f6b63</code></td>
+        <td class="num good">5.17</td>
+        <td class="num dim">&minus;28&thinsp;%</td>
+        <td class="st"><code>td.sk-grau · th.r</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Gruen hell</td>
+        <td class="num">27</td>
+        <td><span class="sw" style="background:#5CC187"></span><code>#5CC187</code></td>
+        <td class="num bad">2.23</td>
+        <td><span class="sw" style="background:#387652"></span><code>#387652</code></td>
+        <td class="num good">5.41</td>
+        <td class="num dim">&minus;39&thinsp;%</td>
+        <td class="st"><code>td.pos</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Gold dunkel</td>
+        <td class="num">29</td>
+        <td><span class="sw" style="background:#A98D40"></span><code>#A98D40</code></td>
+        <td class="num warn">3.20</td>
+        <td><span class="sw" style="background:#7d682f"></span><code>#7d682f</code></td>
+        <td class="num good">5.39</td>
+        <td class="num dim">&minus;26&thinsp;%</td>
+        <td class="st"><code>div.ov-card-title · span.cd</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Gruen (Marke)</td>
+        <td class="num">26</td>
+        <td><span class="sw" style="background:#3FA56C"></span><code>#3FA56C</code></td>
+        <td class="num warn">3.08</td>
+        <td><span class="sw" style="background:#2e784f"></span><code>#2e784f</code></td>
+        <td class="num good">5.36</td>
+        <td class="num dim">&minus;27&thinsp;%</td>
+        <td class="st"><code>div.ov-v · div.scl</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Rot (Marke)</td>
+        <td class="num">16</td>
+        <td><span class="sw" style="background:#B86250"></span><code>#B86250</code></td>
+        <td class="num warn">4.28</td>
+        <td><span class="sw" style="background:#a25646"></span><code>#a25646</code></td>
+        <td class="num good">5.31</td>
+        <td class="num dim">&minus;12&thinsp;%</td>
+        <td class="st"><code>div.ov-v · button.r</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Gold (Marke)</td>
+        <td class="num">14</td>
+        <td><span class="sw" style="background:#C9A84C"></span><code>#C9A84C</code></td>
+        <td class="num bad">2.23</td>
+        <td><span class="sw" style="background:#7d682f"></span><code>#7d682f</code></td>
+        <td class="num good">5.26</td>
+        <td class="num dim">&minus;38&thinsp;%</td>
+        <td class="st"><code>div.sk-k-v · span.sk-art</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Rot (Token)</td>
+        <td class="num">8</td>
+        <td><span class="sw" style="background:#B8625C"></span><code>#B8625C</code></td>
+        <td class="num warn">4.15</td>
+        <td><span class="sw" style="background:#a05550"></span><code>#a05550</code></td>
+        <td class="num good">5.24</td>
+        <td class="num dim">&minus;13&thinsp;%</td>
+        <td class="st"><code>td.sk-rot</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Gold hell</td>
+        <td class="num">10</td>
+        <td><span class="sw" style="background:#D5BB73"></span><code>#D5BB73</code></td>
+        <td class="num bad">1.71</td>
+        <td><span class="sw" style="background:#776940"></span><code>#776940</code></td>
+        <td class="num good">4.93</td>
+        <td class="num dim">&minus;44&thinsp;%</td>
+        <td class="st"><code>span.badge · shr-stub-la</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Grau warm</td>
+        <td class="num">1</td>
+        <td><span class="sw" style="background:#A89F8C"></span><code>#A89F8C</code></td>
+        <td class="num bad">2.56</td>
+        <td><span class="sw" style="background:#6f695c"></span><code>#6f695c</code></td>
+        <td class="num good">5.32</td>
+        <td class="num dim">&minus;34&thinsp;%</td>
+        <td class="st"><code>div.gempty</code></td>
+      </tr>
+      <tr>
+        <td class="nm">Grau kuehl</td>
+        <td class="num">2</td>
+        <td><span class="sw" style="background:#938B7F"></span><code>#938B7F</code></td>
+        <td class="num warn">3.37</td>
+        <td><span class="sw" style="background:#706a61"></span><code>#706a61</code></td>
+        <td class="num good">5.35</td>
+        <td class="num dim">&minus;24&thinsp;%</td>
+        <td class="st"><code>dp-pp-hint · dp-pp-s</code></td>
+      </tr>
+  </tbody>
+</table>
+</div>
+
+<blockquote>
+  <p><strong>Der gr&ouml;&szlig;te Block ist nicht Gold, sondern Gr&uuml;n und Rot.</strong>
+  Von den 234 Stellen tragen <strong>131</strong> eine
+  Statusfarbe als <em>Textfarbe</em> auf hellem Grund, nur
+  <strong>53</strong> tragen Gold. Ich war von einem Goldproblem
+  ausgegangen &mdash; das war der kleinere Teil.</p>
+  <p>CLAUDE.md sagt: <em>Statusfarben nie tokenisieren</em>. Das verbietet,
+  Gr&uuml;n und Rot <strong>umf&auml;rbbar</strong> zu machen, damit sie in jeder
+  Marke gleich bleiben &mdash; nicht, sie lesbar zu machen. Ein Gr&uuml;n, das man
+  nicht lesen kann, sagt so wenig wie ein Rot, das immer rot ist.</p>
+</blockquote>
+
+<h2><span class="zahl">2</span>Wie es aussieht</h2>
+<p>Dieselben sieben T&ouml;ne, links wie heute, rechts der Vorschlag &mdash; beide
+auf wei&szlig;em Grund, weil das der Grund im Cockpit ist. Die Zahl rechts ist
+der gemessene Kontrast.</p>
+
+<div class="zwei">
+  <div class="probe">
+    <h3>Heute</h3>
+      <div class="row">
+        <span class="lbl">Rot hell</span>
+        <span class="val" style="color:#D98579">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">2.77</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Grau</span>
+        <span class="val" style="color:#9A948A">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">2.94</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gruen hell</span>
+        <span class="val" style="color:#5CC187">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">2.23</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gold dunkel</span>
+        <span class="val" style="color:#A98D40">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">3.20</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gruen (Marke)</span>
+        <span class="val" style="color:#3FA56C">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">3.08</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Rot (Marke)</span>
+        <span class="val" style="color:#B86250">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">4.28</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gold (Marke)</span>
+        <span class="val" style="color:#C9A84C">1.248.500&nbsp;&euro;</span>
+        <span class="k bad">2.23</span>
+      </div>
+  </div>
+  <div class="probe">
+    <h3>Vorschlag</h3>
+      <div class="row">
+        <span class="lbl">Rot hell</span>
+        <span class="val" style="color:#965c53">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.31</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Grau</span>
+        <span class="val" style="color:#6f6b63">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.17</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gruen hell</span>
+        <span class="val" style="color:#387652">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.41</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gold dunkel</span>
+        <span class="val" style="color:#7d682f">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.39</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gruen (Marke)</span>
+        <span class="val" style="color:#2e784f">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.36</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Rot (Marke)</span>
+        <span class="val" style="color:#a25646">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.31</span>
+      </div>
+      <div class="row">
+        <span class="lbl">Gold (Marke)</span>
+        <span class="val" style="color:#7d682f">1.248.500&nbsp;&euro;</span>
+        <span class="k good">5.26</span>
+      </div>
+  </div>
+</div>
+
+<h2><span class="zahl">3</span>Wie der Vorschlag gerechnet ist</h2>
+<p>Jeder Ton wird auf <em>seiner eigenen Achse</em> abgedunkelt: der
+Farbwinkel bleibt, Gr&uuml;n bleibt Gr&uuml;n und Gold bleibt Gold. Genommen wird
+die <strong>kleinste</strong> Abdunklung, die auf <strong>allen</strong>
+8 Fl&auml;chen h&auml;lt, auf denen diese Farben vorkommen:</p>
+<ul>
+  <li>Wei&szlig; <code>#ffffff</code>, Creme <code>#FDFCFA</code>, Karte
+      <code>#FBF6E9</code>, <code>--surface2 #F0ECE4</code> und vier weitere.</li>
+  <li><strong>Die dunkelste Fl&auml;che entscheidet, nicht die h&auml;ufigste.</strong>
+      Bei <code>.hint</code> in <code>v2090</code> bestand 0,65 auf vier von
+      f&uuml;nf Fl&auml;chen und fiel auf <code>--surface2</code> durch.</li>
+  <li>Die <code>k</code>-Spalten zeigen den Wert auf dem <em>gemessenen</em>
+      Grund; der schlechteste Fall steht im Pr&uuml;fprotokoll von
+      <code>tools/kontrast-demo-pruefen.mjs</code>.</li>
+</ul>
+
+<h2><span class="zahl">4</span>Was zu entscheiden ist</h2>
+<p>Die Rechnung ist eindeutig, die <strong>Gestaltung</strong> nicht. Drei Wege:</p>
+<ul>
+  <li><strong>(a) Die T&ouml;ne abdunkeln, wie hier gezeigt.</strong> Ein
+      Eingriff, wirkt &uuml;berall, die Farbfamilie bleibt. Die Werte werden
+      sichtbar satter &mdash; das ist der Preis.</li>
+  <li><strong>(b) Nur Tabellen- und Kennzahlentexte,</strong> Pillen und
+      Abzeichen so lassen. Weniger auff&auml;llig, erzeugt aber eine zweite
+      Gr&uuml;n- und Rotstufe neben der vorhandenen &mdash; genau so sind die vier
+      <code>ds2-tag</code>-Fassungen entstanden.</li>
+  <li><strong>(c) Dunkler Grund wie beim DS2-Etikett</strong>
+      (<code>v2089</code>): die Farbe bleibt ganz unver&auml;ndert, k liegt dann
+      bei 7&ndash;9. Passt f&uuml;r Pillen, nicht f&uuml;r Zahlen in einer Tabelle.</li>
+</ul>
+<p><strong>Mein Vorschlag:</strong> <strong>(a)</strong> f&uuml;r Zahlen und
+Tabellen, <strong>(c)</strong> f&uuml;r Abzeichen &mdash; so ist das DS2-Etikett
+schon gel&ouml;st, und eine zweite Farbstufe entsteht nicht.</p>
+
+<footer>
+  DealPilot &middot; Junker Solution &middot; Kontrast-Vorschlag <code>v2091</code>
+  &middot; Backlog N60.17 / N60.29 &middot; gemessen 10.10.2026, 1180&nbsp;px,
+  Cockpit &middot; 234 Stellen, 11 Ursachen &middot;
+  jede Zahl gerechnet, keine geschrieben
+</footer>
+
+</div>
+</body>
+</html>

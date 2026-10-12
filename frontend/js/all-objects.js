@@ -54,6 +54,15 @@
       id: obj.id || obj._id || (obj.kuerzel || ''),
       kuerzel: d.kuerzel || obj.kuerzel || '–',
       adresse: ((d.str || '') + ' ' + (d.hnr || '')).trim() + (d.ort ? ', ' + d.ort : ''),
+      /* v1960 · Die Lageklasse. Was hier nicht aufgenommen wird, ist in
+         dieser Tabelle nicht sortierbar - der Vergleicher weiter unten
+         ist generisch und greift auf `r[key]` zu.
+
+         Leere Klasse wird zu einem Gedankenstrich, NICHT zu "": beim
+         Sortieren landet ein leerer Text sonst vor dem A, und eine
+         Spalte, die mit lauter Leerzeilen beginnt, sieht nach einem
+         Fehler aus statt nach "nicht eingestuft". */
+      lageklasse: (d.lageklasse ? String(d.lageklasse).toUpperCase() : '–'),
       kp: kp,
       gi: gi,
       bmy: bmy,
@@ -130,6 +139,9 @@
             '<tr>' +
               _th('Kürzel', 'kuerzel') +
               _th('Adresse', 'adresse') +
+              /* v1960: Sortierung kommt von selbst - _th() verdrahtet
+                 _aoSort(key), und der Vergleicher ist generisch. */
+              _th('Lage', 'lageklasse') +
               _th('Kaufpreis', 'kp', true) +
               _th('Gesamt-Inv.', 'gi', true) +
               _th('Brutto-Rendite', 'bmy', true) +
@@ -143,6 +155,13 @@
               return '<tr class="ao-row">' +
                 '<td class="ao-kz">' + _esc(r.kuerzel) + '</td>' +
                 '<td>' + _esc(r.adresse || '–') + '</td>' +
+                /* v1960: die Klasse als Pille, damit sie im Zahlenblock
+                   nicht untergeht. Eigene Klasse `ao-lk` - NICHT die
+                   Stufenpille aus objekt-reiter.js, die bedeutet etwas
+                   anderes (Herkunft eines Wertes, nicht Lage). */
+                '<td>' + (r.lageklasse !== '–'
+                  ? '<span class="ao-lk ao-lk-' + _esc(r.lageklasse) + '">' + _esc(r.lageklasse) + '</span>'
+                  : '<span class="ao-lk-leer">–</span>') + '</td>' +
                 '<td class="num">' + _fmtE(r.kp) + '</td>' +
                 '<td class="num">' + _fmtE(r.gi) + '</td>' +
                 '<td class="num">' + _fmtP(r.bmy) + '</td>' +

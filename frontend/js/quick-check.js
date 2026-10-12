@@ -601,7 +601,17 @@
           ltv: ltvPct,
           dscr: dscr,
           wp_kpi: wpEstimate,
-          mstg: 1.5
+          mstg: 1.5,
+          /* v2141: Marcel am 12.10.2026: "das mit dem score muss aber
+             auch beim quickcheck passen und auch beim investor deal
+             score. also in der gesamten app."
+
+             Ohne Darlehen entfallen LTV und DSCR im Score, statt mit je
+             50 von 100 zu Buche zu stehen. `d_total` ist die Summe
+             beider Darlehen aus DealKpis; fehlt sie, rechnet der Kern
+             wie bisher. */
+          darlehen: (kpis && kpis.d_total != null && isFinite(kpis.d_total))
+            ? kpis.d_total : null
         });
         score = dsResult.score;
         var bd = dsResult.breakdown || [];
@@ -697,9 +707,27 @@
        * nicht sagen, WELCHE davon das Urteil traegt. Sie liegen jetzt
        * WOERTLICH in `js/qc-heuristik.js`. Die Ampelklassen bleiben hier:
        * sie sind Anzeige. */
+      /* ══ v2143 · DIE LAGEKLASSE ALS MASSSTAB DER BRUTTOMIETRENDITE ══
+         Marcel: "kann man das nicht an den Lage Klassen koppeln? … nur
+         beruecksichtigen." Also auf die AMPEL, nicht auf den Score:
+         dieselbe Wohnung behaelt fuer jeden Nutzer denselben Score.
+
+         `zielBmr()` gibt null, wenn der Nutzer keine Klasse gewaehlt
+         oder keine Zielrendite gesetzt hat - dann bleibt die feste
+         Skala (3 % = 0 Pkt, 7 % = 100 Pkt). Das ist Marcels Riegel:
+         ohne Eingabe wird nichts erfunden, sondern das Vorhandene
+         genommen. */
+      var _lk = null, _zielB = null;
+      try {
+        _lk = v('qc_lageklasse') || null;
+        if (_lk && window.DealPilotLageProfil && DealPilotLageProfil.zielBmr) {
+          _zielB = DealPilotLageProfil.zielBmr(_lk);
+        }
+      } catch (e) { _zielB = null; }
       var _amp = (window.QcHeuristik && QcHeuristik.kennzahlenAmpel)
         ? QcHeuristik.kennzahlenAmpel({ bmr: bmr, nmr: nmr, ekr: ekr, cfMon: cfMon,
-            dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm })
+            dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm,
+            zielBmr: _zielB, lageklasse: _lk })
         : [];
       /* Die Ampelstufe wird in die Quote zurueckuebersetzt, die `_setKpi`
          erwartet — die Schwellen dort (>= 0,75 gruen, >= 0,40 gelb) sind
@@ -1705,6 +1733,9 @@
       // Optional
       objektart:    v('qc_objektart'),
       energieklasse:v('qc_energieklasse'),
+      /* v1958: die Lageklasse aus dem Quick-Check. Der versteckte
+         Traeger `qc_lageklasse` kommt aus qc-bridge.js (v1956). */
+      lageklasse:   v('qc_lageklasse'),
       zimmer:       v('qc_zimmer'),
       stellplatz:   v('qc_stellplatz'),
       bewirt_mode:  v('qc_bewirt_mode') || 'hg',
@@ -1849,6 +1880,20 @@
       }
     }
     if (snapshot.energieklasse) set('ds2_energie', snapshot.energieklasse.toUpperCase());
+
+    /* ══ v1958 · DIE LAGEKLASSE WANDERT MIT ════════════════════════════
+       Marcel: „wenn ich das Objekt speichere aus dem Quick-Check, muss es
+       mit uebernommen werden in Tab Objekt."
+
+       Nur A, B oder C werden uebernommen. Alles andere - auch ein
+       Tippfehler aus einem Import - bleibt leer: eine Lageklasse zu RATEN
+       waere genau das, was Marcel ausgeschlossen hat ("nur der Kunde
+       waehlt"). Leer ist ein gueltiger Zustand, dann rechnet die
+       Heuristik mit ihrem Rueckfall weiter. */
+    if (snapshot.lageklasse) {
+      var _lk = String(snapshot.lageklasse).trim().toUpperCase();
+      if (_lk === 'A' || _lk === 'B' || _lk === 'C') set('lageklasse', _lk);
+    }
 
     // Zimmer + Stellplatz in 'thesis'
     var notesParts = [];

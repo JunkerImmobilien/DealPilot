@@ -269,7 +269,32 @@
     var t = '<b>' + _esc(a.behoerde) + '</b>'
       + (a.abteilung ? ' · ' + _esc(a.abteilung) : '');
     if (a.email) t += '<br>' + _esc(a.email);
-    else if (a.antrag_url) t += '<br>nur über das Portal';
+    /* ══ v1971c · DER PORTAL-LINK WAR KEIN LINK ═══════════════════════════
+
+       Hier stand:
+
+         else if (a.antrag_url) t += '<br>nur über das Portal';
+
+       Zwei Fehler in einer Zeile, Marcel am 08.10.2026: „teilweise gingen
+       die Links nicht."
+
+       1. `nur über das Portal` war reiner TEXT. Die Adresse des Portals
+          stand daneben im Datensatz (`antrag_url`, vom Backend durch
+          `_link()` geprüft) und wurde nie ausgegeben. Wer das las, musste
+          selbst suchen.
+
+       2. Es war ein `else if`. Hat ein Amt eine E-Mail UND ein Portal —
+          der Normalfall bei Bauamt und Grundbuchamt — erschien der
+          Portal-Hinweis GAR NICHT. Der Zweig war nur erreichbar, wenn die
+          E-Mail fehlte.
+
+       Jetzt steht der Link immer da, wo es einen gibt, und sagt dazu, ob
+       er der einzige Weg ist. */
+    if (a.antrag_url) {
+      t += '<br><a href="' + _esc(a.antrag_url) + '" target="_blank" rel="noopener">'
+        + (a.email ? 'Online-Antrag / Portal' : 'nur über das Portal — hier öffnen')
+        + '</a>';
+    }
     /* Der Belegstand gehört an die Adresse, nicht in eine Fußnote. */
     t += '<br>' + (a.beleg_ok
       ? '<span style="color:var(--ok,#3FA56C)">✓ belegt</span> — ' + _esc(a.beleg_grund || '')

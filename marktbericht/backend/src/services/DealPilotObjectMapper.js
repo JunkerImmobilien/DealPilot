@@ -14,10 +14,64 @@ function pick(d, keys) {
   for (const k of keys) if (d[k] != null && d[k] !== '') return d[k];
   return null;
 }
+/* ══ v1962 · DER PUNKT IST NICHT IMMER EIN TAUSENDERTRENNER ═══════════
+
+   Hier stand:
+
+     parseFloat(String(v).replace(/\./g, '').replace(',', '.') ...)
+
+   Der Punkt wurde IMMER geloescht. Richtig fuer "1.234,56" - zerstoerend
+   fuer jeden Wert, der mit Dezimalpunkt gespeichert ist:
+
+     "64.58"  ->  6458     Faktor 100    Garagen-BGF
+     "3.5"    ->    35     Faktor 10     Zinssatz 3,5 % wurde zu 35 %
+     "0.5"    ->     5     Faktor 10     Grundbuchamt
+
+   GEFUNDEN am 07.10.2026 beim Ausloesen einer Stufe-3-Wertermittlung:
+   eine 100-m2-Eigentumswohnung ergab einen Sachwert von 1.717.808 EUR,
+   das 8,6-fache des Vergleichswerts. Die Spur fuehrte ueber
+   garage.bgf_qm = 6458 zum Objektfeld garagen_bgf_qm = "64.58".
+
+   > WARUM ES SO LANGE UNENTDECKT BLIEB: ganze Zahlen gehen heil durch,
+   > und Werte mit KOMMA auch. Nur die Punkt-Schreibweise kippt - und die
+   > entsteht, wenn ein Wert einmal durch JavaScript gelaufen ist
+   > (String(64.58) ergibt "64.58"). Der Fehler traf also genau die
+   > Werte, die die App selbst gerechnet hat, nicht die eingetippten.
+
+   DIE REGEL, nach der jetzt entschieden wird:
+
+     1. Steht ein KOMMA drin, ist es deutsche Schreibweise:
+        Punkte sind Tausendertrenner, das Komma ist das Dezimalzeichen.
+     2. Sonst: sieht die Zahl aus wie eine Tausendergruppierung
+        (1.234 / 1.234.567 - nach jedem Punkt GENAU drei Ziffern),
+        werden die Punkte entfernt.
+     3. Sonst ist der Punkt das Dezimalzeichen und bleibt stehen.
+
+   > Regel 2 bleibt eine ENTSCHEIDUNG, keine Messung: "1.234" ist fuer
+   > sich mehrdeutig. Fuer die Felder hier (Kaufpreis, Flaeche, BGF) ist
+   > die Tausenderlesart die richtige, und ein JavaScript-Wert sieht nie
+   > so aus - String(1.234) ergibt "1.234" nur bei genau diesem Wert,
+   > waehrend eine getippte Zahl mit Nachkommastellen in Deutschland ein
+   > Komma traegt. Wer das aendert, aendert es bewusst.
+
+   Dieselbe Regel steht schon richtig in
+   connectors/opendata/klassen.js und profile/be-lzs.js - sie war nur
+   nie hierher uebernommen worden.
+   ══════════════════════════════════════════════════════════════════ */
 function num(v) {
   if (v == null || v === '') return null;
-  const n = typeof v === 'number' ? v
-    : parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+  if (typeof v === 'number') return isNaN(v) ? null : v;
+  let t = String(v).trim().replace(/[^\d.,-]/g, '');
+  if (t === '') return null;
+  if (t.indexOf(',') >= 0) {
+    /* Deutsche Schreibweise: Punkte raus, Komma wird zum Punkt. */
+    t = t.replace(/\./g, '').replace(',', '.');
+  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(t)) {
+    /* Reine Tausendergruppierung: 1.234 / 1.234.567 */
+    t = t.replace(/\./g, '');
+  }
+  /* Sonst bleibt der Punkt das Dezimalzeichen. */
+  const n = parseFloat(t);
   return isNaN(n) ? null : n;
 }
 /* ── v1839 · FÜNF VON ELF OBJEKTARTEN FIELEN DURCH ───────────────────────
@@ -206,7 +260,31 @@ export const DealPilotObjectMapper = {
       bgf: num(pick(d, ['bgf'])),
       standardstufe: standardstufeAus(d),
       grundriss: pick(d, ['grundriss']),
+      /* ══ v1973 · 0 PUNKTE IST EINE ANTWORT, KEINE LEERE STELLE ═══════
+
+         `mod_punkte` allein kann nicht zwischen zwei Faellen
+         unterscheiden:
+
+           niemand hat hingesehen          -> Schaetzung ist richtig
+           alle acht mit „Keine/Nie"       -> 0 Punkte sind ein BEFUND,
+                                              und Anlage 2 gilt
+
+         GEMESSEN an der Parkstr. 9: fuenf der acht Bauteile sind
+         beantwortet (dreimal „Keine/Nie", zweimal „> 20 Jahre"), und es
+         kommen 0 Punkte heraus. Das ist richtig gerechnet — die Anlage 2
+         vergibt null, wenn die Massnahmen weit zurueckliegen. Der Bericht
+         schrieb daraus aber „Es wurde kein Modernisierungsgrad erfasst."
+
+         `mod_angaben` zaehlt deshalb, wie viele der acht Felder
+         ueberhaupt eine Antwort tragen. Das ist ZAEHLEN, kein Modell —
+         die Punktevergabe bleibt dort, wo sie hingehoert (Anlage 2,
+         Tabelle 1), und wird hier nicht nachgebaut. */
       mod_punkte: num(pick(d, ['mod_punkte'])),
+      mod_angaben: (function () {
+        const felder = ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung',
+                        'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'];
+        return felder.reduce((n, k) => n + (d[k] != null && String(d[k]).trim() !== '' ? 1 : 0), 0);
+      })(),
       sachwertfaktor: dez(pick(d, ['sachwertfaktor'])),
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);

@@ -59,6 +59,59 @@
   v2 Kanzlei · v2b Tower. Gesetzt wird er VOR dem Laden, und der iframe
   lädt danach ganz neu — nie im laufenden Dokument umschalten, sonst
   hinterlässt der Skin-Wechsel Inline-Variablen und man misst die Störung.
+
+  v2085 · DREI WEITERE ACHSEN (Backlog N60.2)
+
+      await DPM.lauf({ breite: 1180, layout: 'v1b',
+                       kartenstil: 'kartei', objkarte: 'datenzeile',
+                       theme: 'v2' })
+
+      Merker                gültige Werte
+      dp_layout             '' · v1b · v2 · v2b
+      dp_karten_stil        '' · zeile · kartei · buetten
+      dp_objkarte_stil      '' · bordkarte · kante · datenzeile · ampel ·
+                            kennzahlen · minimal
+      dp_karten_variante    '' · v1 … v6   (Hell-Fassungen der Karten)
+
+  v2085a · DREI ACHSEN LIEGEN IM JSON `dp_user_settings`, nicht in
+  eigenen Schlüsseln. v2085 hatte `theme` auf `dp_karten_variante`
+  geschrieben — der erste echte Lauf meldete `angefordert.theme=v2`
+  gegen `attribute.theme=null` und hat den Fehler selbst gezeigt.
+
+      ui_theme     '' · kontor · panel · kanzlei · boarding · konsole  (*)
+      ui_cards     kompakt · '' · wallet · …                          (*)
+      ui_surface   (siehe ui-varianten.js)                             (*)
+
+  (*) v2085b · DIESE DREI UEBERSCHREIBT DER SERVER.
+  dp_user_settings ist servergespiegelt: die App laedt die Einstellungen
+  nach dem Start und schreibt denselben Schluessel. Vor dem Laden
+  gesetzt, sind sie wirkungslos - und zwar lautlos.
+
+  Gemessen am 10.10.2026: theme 'kontor' angefordert, attribute.theme
+  blieb null, und im iframe stand "ui_theme": "" - der gesetzte Wert
+  war weg, ueberschrieben von der Server-Antwort.
+
+  Wer sie pruefen will, setzt sie NACH dem Laden im iframe:
+      var z = DPM.ziel();
+      z.win.DealPilotUiVarianten.setze({ ui_theme: 'kontor' });
+  und liest danach z.d.documentElement.dataset.uiTheme.
+
+  Dass das Ergebnis die Luecke ZEIGT, ist der Zweck von `attribute`:
+  ein Lauf, der theme 'kontor' anfordert und null erhaelt, behauptet
+  keine Pruefung, die nicht stattgefunden hat.
+
+  Das JSON wird GEPATCHT, nicht ersetzt — dort stehen auch die
+  Nutzerdaten. Wer es überschreibt, löscht Einstellungen, die er
+  nicht prüft.
+
+  `undefined` heißt NICHT ANFASSEN — alte Aufrufe bleiben gültig und
+  die Wahl des Nutzers unberührt. `''` heißt ausdrücklich abwählen.
+
+  Das Ergebnis trägt `angefordert` UND `attribute`: was gesetzt wurde
+  und was am `<html>` wirklich hängt. Ein Merker im Speicher ist kein
+  Nachweis — das Modul kann ihn verwerfen (unbekannter Wert) oder an
+  eine Bedingung binden (`objektkarten-stil.js` setzt nur bei aktivem
+  Layout). Weichen beide ab, steht es im Protokoll.
 -->
 <style>
   :root{color-scheme:dark}
@@ -81,13 +134,33 @@
     background:#131211;border:1px solid #2a2724;padding:14px}
   .werte h2{font-size:12px;margin:0 0 8px;letter-spacing:.1em;color:#C9A84C}
   .ok{color:#5BD98E} .warn{color:#E8CC7A} .bad{color:#E4A89E} .leise{color:#8b857b}
+  /* v1984 */
+  .standbild{display:inline-flex;align-items:center;gap:6px;margin-left:14px;
+    font:600 11px/1 ui-monospace,monospace;letter-spacing:.06em;color:#E8CC7A;cursor:pointer;
+    border:1px solid #3a352e;border-radius:6px;padding:6px 9px;background:#171614}
+  .standbild input{width:13px;height:13px;accent-color:#C9A84C;cursor:pointer;margin:0}
 </style>
 </head>
 <body>
 <header>
-  <h1>Messkabine</h1>
-  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar. Harness: <code>DPM.lauf()</code></span>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2131</span></h1>
+  <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
+       Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
+       drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
+       gab `erdrueckt` nicht zurueck, der Aufruf starb an
+       `undefined.length`, und ich habe zuerst den PRUEFLING verdaechtigt.
+       Wer hier etwas aendert, zieht die Zahl hoch - und sieht dann oben,
+       ob sein Browser sie wirklich hat. -->
+  <span class="hin">Der iframe hat dieselbe Herkunft — von außen messbar.
+    Harness: <code>DPM.lauf()</code> · Ansichten: <code>DPM.pruefeAnsicht()</code>
+    · und <code>DPM.pruefSelbsttest()</code>, bevor man einer gruenen Messung glaubt</span>
   <div class="geraete" id="g"></div>
+  <!-- v1984: Standbild-Schalter. Vorgabe EIN, weil eine Kabine, die
+       das erste Einzelbild eines Uebergangs zeigt, kein Messgeraet ist. -->
+  <label class="standbild" title="Setzt transition und animation im Pruefling auf none - INLINE mit !important, weil ein Blatt auf Spezifitaet verliert">
+    <input type="checkbox" id="sb" checked> Standbild
+  </label>
+  <span class="hin leise" id="sicht">Sichtbarkeit: ?</span>
 </header>
 <main>
   <div class="rahmen" id="rahmen"><b id="lbl"></b><iframe id="f" title="Prüfling"></iframe></div>
@@ -280,20 +353,225 @@
     if (!a || !b) return false;
     return !(a.r === 0 && a.g === 0 && a.b === 0 && b.r === 255 && b.g === 255 && b.b === 255);
   }
+  /* ══ v1986 · EIN VERLAUF IST AUCH EIN GRUND ═══════════════════════════
+
+     Hier stand nur `backgroundColor`. Gemessen am Abruf-Knopf der
+     Datenaufnahme: er traegt `background-color: rgba(0,0,0,0)` und
+     `background-image: linear-gradient(#D5BB73, #C9A84C)`. Die alte
+     Fassung fiel also auf die Schicht DAHINTER durch (#0c0c0e) und
+     meldete Kontrast 1,07 fuer einen Knopf, der bei rund 8:1 liegt.
+
+     In dieser Marke ist das der Normalfall, nicht die Ausnahme: der
+     Runway ist die Hausfarbe jeder Handlungsflaeche.
+
+     Ein Verlauf wird ueber seine Farbstopps GEMITTELT. Jeder Stopp
+     wird mit `male()` ueber den bereits gesammelten Grund gemalt,
+     damit Alpha in den Stopps richtig faellt. Das ist eine Naeherung —
+     und sie ist als solche benannt: `quelle` sagt, woher der Grund
+     kommt.
+
+     > Ein `url(...)` kann niemand ausrechnen. Dann meldet die Funktion
+     > `unmessbar` statt einer Zahl, die nach Messung aussieht. Eine
+     > fehlende Messung ist ehrlich, eine falsche ist teuer. */
+  function stopps(bild){
+    /* Farbstopps aus einem CSS-Verlauf. Keine Prozente, keine Winkel —
+       nur die Farben. `color(srgb …)` ist dabei, weil `male()` sie kann
+       und der Selbsttest der Kabine genau daran einmal gescheitert ist. */
+    var re = /(rgba?\([^)]*\)|color\(\s*srgb[^)]*\)|#[0-9a-fA-F]{3,8}\b|\b(?:transparent|currentcolor)\b)/gi;
+    var out = [], m;
+    while ((m = re.exec(bild))) out.push(m[1]);
+    return out;
+  }
+  /* v1988 · Die Ebenen eines `background-image` trennen. Kommas auf
+     Klammertiefe 0 sind Ebenengrenzen, alle anderen gehoeren zu einer
+     Farbe oder einer Positionsangabe. */
+  function ebenenTrennen(bild){
+    var out = [], tief = 0, start = 0;
+    for (var i = 0; i < bild.length; i++) {
+      var c = bild[i];
+      if (c === '(') tief++;
+      else if (c === ')') tief--;
+      else if (c === ',' && tief === 0) { out.push(bild.slice(start, i)); start = i + 1; }
+    }
+    out.push(bild.slice(start));
+    return out.map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+  /* ═══ v2065 · EIN PSEUDOELEMENT KANN DER ECHTE GRUND SEIN ═══════════
+     Gemessen am 09.10.2026 an den Score-Ringen im Cockpit: `div.sc`
+     trägt `conic-gradient(rgb(169,141,64) 65%, …)` — den Ring. Die Zahl
+     darauf hat DIESELBE Goldfarbe, und die Kabine meldete Kontrast 1,7.
+
+     Sie stand damit unter den drei schwersten Befunden der ganzen App.
+
+     Nur: `div.sc::before` legt einen WEISSEN Kern (33×33 px, inset 3,5,
+     border-radius 50%), und die Zahl (13×13) steht darauf — nicht auf
+     dem Gold. Der echte Kontrast ist rund 3,1.
+
+     > Ein Pseudoelement findet kein DOM-Werkzeug. `getComputedStyle(el,
+     > '::before')` findet es doch — man muss nur daran denken, dass es
+     > den Grund stellen kann.
+
+     Gefasst wird der häufige Fall: ein Pseudoelement mit deckender
+     Hintergrundfarbe und `inset`, das den Textbereich überdeckt. Alles
+     andere (Verläufe im Pseudoelement, berechnete Positionen) bleibt
+     ungefasst und wird als solches gemeldet. */
+  function pseudoGrund(p, el, win){
+    var rEl = el.getBoundingClientRect();
+    var rP = p.getBoundingClientRect();
+    var treffer = null;
+    ['::before', '::after'].forEach(function(welches){
+      if (treffer) return;
+      var ps;
+      try { ps = win.getComputedStyle(p, welches); } catch (e) { return; }
+      if (!ps || ps.content === 'none' || ps.content === 'normal') return;
+      var bg = ps.backgroundColor;
+      if (!bg || bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') return;
+      /* `male` braucht ZWEI Argumente - Farbe und den Grund darunter.
+         Mit einem Argument stirbt es an `hinter.r`. Mir ist dieser
+         Fehler in derselben Sitzung ZWEIMAL unterlaufen: einmal beim
+         Nachbau der Kontrastmessung, einmal hier. Eine fremde
+         Aufrufhilfe schreibt man ab, man rekonstruiert sie nicht.
+         Nur deckende Farben zaehlen, deshalb ist Weiss als Basis
+         beliebig - das Ergebnis haengt nicht davon ab. */
+      if (!ist_deckend(bg)) return;
+      var f = male(bg, { r: 255, g: 255, b: 255 });
+      if (!f) return;
+      /* `inset` gibt an, wie weit es vom Rand des Elterns einrückt.
+         Nur der gleichmäßige Fall wird gefasst - sonst müsste man die
+         Position nachrechnen, und eine geratene Geometrie ist schlimmer
+         als keine. */
+      var ins = parseFloat(ps.insetBlockStart || ps.top);
+      if (!isFinite(ins)) return;
+      var k = { links: rP.left + ins, oben: rP.top + ins,
+                rechts: rP.right - ins, unten: rP.bottom - ins };
+      /* Liegt der Text GANZ darin? Sonst steht er teils daneben. */
+      if (rEl.left >= k.links - 0.5 && rEl.right <= k.rechts + 0.5
+          && rEl.top >= k.oben - 0.5 && rEl.bottom <= k.unten + 0.5) {
+        treffer = f;
+      }
+    });
+    return treffer;
+  }
+
   function effGrund(el, win){
     /* Erster Vorfahr mit Fläche; durchsichtige Schichten werden von hinten
        nach vorn übereinandergemalt. Weiß ist der Anfang — das Blatt. */
-    var p = el, stapel = [];
+    var p = el, stapel = [], unmessbar = null, hatVerlauf = false;
+
+    /* ══ v2092g · DER EIGENE GRUND KOMMT ZUERST ═════════════════════════
+       GEMESSEN am 11.10.2026: `span.shr-stub-lab` trug nach v2101b
+       `background: rgb(26,23,20)` — deckend und dunkel, direkt am
+       Element. `effGrund` meldete trotzdem **rgb(255,255,255)** und
+       damit Kontrast 1,88 statt rund 8.
+
+       Die Ursache stand gleich darunter: die v2065-Schleife fragte bis zu
+       DREI Vorfahren nach einem Pseudoelement-Grund und kehrte beim
+       ersten Treffer zurueck — bevor der eigene Hintergrund des Elements
+       ueberhaupt angesehen wurde.
+
+       > Physikalisch ist das verdreht. Das ::before eines Vorfahren liegt
+       > ueber DESSEN Hintergrund, aber UNTER dem eigenen Hintergrund des
+       > Kindes. Wer zuerst den Vorfahren fragt, malt in der falschen
+       > Reihenfolge.
+
+       Deshalb steht jetzt der eigene, deckende Grund VOR der
+       Pseudoelement-Suche. Ohne Hintergrundbild, denn ein Bild koennte
+       darueber liegen — dann gilt weiter der alte Weg.
+
+       **Diese Messung war also an jedem Element falsch, das einen eigenen
+       deckenden Hintergrund hat** — bei `.ds2-tag` in v2089 kam die
+       richtige Zahl nur heraus, weil die Pruefung dort `cs.backgroundColor`
+       selbst gelesen hat und nicht `effGrund`. */
+    try {
+      var eig = win.getComputedStyle(el);
+      if ((!eig.backgroundImage || eig.backgroundImage === 'none')
+          && ist_deckend(eig.backgroundColor)) {
+        var ec = eig.backgroundColor.match(/[\d.]+/g) || [255, 255, 255];
+        return { r: +ec[0], g: +ec[1], b: +ec[2], a: 1, quelle: 'eigener Grund' };
+      }
+    } catch (e) {}
+
+    /* v2065: Danach, ob ein Vorfahr seinen Grund per Pseudoelement
+       stellt - das liegt ÜBER seinem eigenen Hintergrund. */
+    var pp = el.parentElement, tiefe = 0;
+    while (pp && tiefe++ < 3) {
+      var pg = pseudoGrund(pp, el, win);
+      if (pg) return pg;
+      pp = pp.parentElement;
+    }
     while (p) {
-      var c = win.getComputedStyle(p).backgroundColor;
+      var st = win.getComputedStyle(p);
+      var bild = st.backgroundImage;
+      if (bild && bild !== 'none') {
+        if (/url\(/i.test(bild)) {
+          /* Ein Bild als Grund - die Farbe daraus zu raten waere eine
+             Behauptung. Der Befund ist: nicht messbar, und warum. */
+          unmessbar = unmessbar || { grund: 'url() im background-image', bei: p };
+        } else {
+          /* ══ v1988 · EBENENWEISE, NICHT ALLE STOPPS IN EINEN TOPF ═══
+
+             v1986 hat hier ALLE Farbstopps ALLER Ebenen gemittelt.
+             Gemessen an `.dp-pfbar`: drei Ebenen, zehn Stopps —
+             zwei Schraffuren mit Alpha 0,03 (acht Stopps) und unten
+             eine radiale CREME-Flaeche (zwei Stopps). Der Mittelwert
+             ergab #3d3c3b statt der Wahrheit bei rund #FBF6E9, und
+             auf dieser falschen Zahl habe ich in v1987 eine Textfarbe
+             geaendert.
+
+             > CSS malt die Ebenen von der LETZTEN zur ersten: die
+             > letzte liegt unten, die erste oben. Eine deckende Ebene
+             > macht alles unter ihr bedeutungslos — und alles
+             > darueber liegt auf IHR.
+
+             Also je Ebene ein eigener Eintrag, in der Reihenfolge, in
+             der CSS sie malt. Deckt eine Ebene, endet die Suche dort.
+
+             Getrennt wird mit TIEFENVERFOLGUNG, nicht mit einem Regex:
+             mein erster Anlauf nahm /,(?![^()]*\))/ und zerlegte den
+             echten Wert in 13 Teile statt 3 - das Muster traegt nur
+             EINE Klammerebene, und `repeating-linear-gradient(0deg,
+             rgba(…))` hat zwei. Dieselbe Lehre wie bei der
+             CSS-Klammerbilanz: Paare zaehlen findet das nie, nur die
+             TIEFE verfolgen. */
+          var ebenen = ebenenTrennen(bild);
+          var tiefsteDeckend = -1;
+          for (var e = ebenen.length - 1; e >= 0; e--) {
+            var ss = stopps(ebenen[e]);
+            if (!ss.length) continue;
+            if (ss.every(function (x) { return ist_deckend(x); })) { tiefsteDeckend = e; break; }
+          }
+          /* Von der untersten relevanten Ebene nach oben einreihen.
+             `stapel` wird spaeter von HINTEN nach vorn gemalt, also
+             kommt die unterste Ebene ZULETZT hinein. */
+          var vonUnten = (tiefsteDeckend >= 0) ? tiefsteDeckend : ebenen.length - 1;
+          for (var e2 = 0; e2 <= vonUnten; e2++) {
+            var s2 = stopps(ebenen[e2]);
+            if (s2.length) { hatVerlauf = true; stapel.push({ verlauf: s2 }); }
+          }
+          if (tiefsteDeckend >= 0) break;
+        }
+      }
+      var c = st.backgroundColor;
       if (deckt(c)) { stapel.push(c); if (ist_deckend(c)) break; }
       p = p.parentElement;
     }
     var out = { r:255, g:255, b:255, a:1 };
     for (var i = stapel.length - 1; i >= 0; i--) {
-      var n = male(stapel[i], out);
-      if (n) out = n;
+      var lage = stapel[i];
+      if (lage && lage.verlauf) {
+        var summe = { r:0, g:0, b:0 }, n = 0;
+        for (var j = 0; j < lage.verlauf.length; j++) {
+          var q = male(lage.verlauf[j], out);
+          if (q) { summe.r += q.r; summe.g += q.g; summe.b += q.b; n++; }
+        }
+        if (n) out = { r: summe.r/n, g: summe.g/n, b: summe.b/n, a: 1 };
+      } else {
+        var k = male(lage, out);
+        if (k) out = k;
+      }
     }
+    out.quelle = unmessbar ? 'unmessbar' : (hatVerlauf ? 'verlauf' : 'farbe');
+    if (unmessbar) out.warum = unmessbar.grund;
     return out;
   }
   /* Deckend heißt: über Schwarz und über Weiß kommt dasselbe heraus. */
@@ -531,6 +809,26 @@
     });
     schwach.sort(function(a, b){ return a.k - b.k; });
     r.kontrast = schwach.slice(0, 8); r.kontrastN = schwach.length;
+    /* ═══ v2064 · WIE VIELE STELLEN, NICHT WIE VIELE ELEMENTE ═════════
+       `kontrastN` zaehlt Elemente. 57 Paare klingt nach einem grossen
+       Befund - gemessen am 09.10.2026 waren es ZWEI Stellen
+       (`span.ds2-tag` und `span.oe-lk-tag`, beide Gold auf Creme bei
+       9 px, Kontrast 2,06), nur vielfach wiederholt.
+
+       Der Unterschied entscheidet ueber die Arbeit: zwei Regeln oder
+       vierzig. Die Liste war auf acht gekappt und zeigte ihn nicht;
+       wer nur `kontrastN` liest, schaetzt den Aufwand um das
+       Zwanzigfache falsch ein. */
+    var gr = {};
+    schwach.forEach(function(x){
+      var key = x.t + '|' + x.fs + '|' + x.fg + '|' + x.grund;
+      if (!gr[key]) gr[key] = { sel: x.t, schrift: x.fs, kontrast: +x.k.toFixed(2),
+                                farbe: x.fg, grund: x.grund, txt: x.txt, n: 0 };
+      gr[key].n++;
+    });
+    r.kontrastGruppen = Object.keys(gr).map(function(k){ return gr[k]; })
+                              .sort(function(a,b){ return b.n - a.n; });
+    r.kontrastStellen = r.kontrastGruppen.length;
     return r;
   }
 
@@ -601,20 +899,343 @@
   /* ── Harness: EIN Aufruf je Aussehen und Breite ───────────────────────── */
   function ziel(){ return { d: f.contentDocument, win: f.contentWindow }; }
 
-  function setzeMerker(layout){
+  /* ══ v1984 · STANDBILD ═══════════════════════════════════════════════
+
+     Warum INLINE und nicht ein Blatt: `style.css` setzt
+
+         body #sidebar.sidebar{ … transition:transform .26s … !important }
+
+     Das ist Spezifitaet (1,1,1) mit `!important`. Ein Blatt mit `*`
+     ist (0,0,0) — es verliert, obwohl es ebenfalls `!important`
+     traegt. Gemessen am 08.10.2026: mit dem Blatt blieb der Uebergang
+     bei 0.26s und die Schublade bei x=-357; inline sprang sie auf x=0.
+
+     Inline-`!important` steht ueber jeder Autoren-Regel, auch ueber
+     einer wichtigen. Das ist die einzige Stufe, die hier reicht.
+
+     Pseudoelemente haben kein style-Attribut. Fuer die bleibt nur ein
+     Blatt, und das traegt deshalb absichtlich eine hohe Spezifitaet.
+
+     > Gemerkt wird, welche Elemente VORHER keinen Inline-Wert hatten.
+     > Nur die werden beim Abschalten geleert. Ein Messmittel, das
+     > Spuren hinterlaesst, misst beim naechsten Mal sich selbst. */
+  var SB_AN = true;              /* Vorgabe: Standbild ein */
+  var sbBeobachter = null;
+  var SB_BLATT_ID = 'dpm-standbild';
+
+  function sbElementStill(el){
+    if (!el || !el.style) return 0;
+    if (el.dataset && el.dataset.dpmSb === '1') return 0;
     try {
-      if (layout === '' || layout === null) window.localStorage.removeItem('dp_layout');
-      else window.localStorage.setItem('dp_layout', layout);
-      window.localStorage.setItem('dp_layout_gewaehlt', '1');
+      var vorherT = el.style.getPropertyValue('transition');
+      var vorherA = el.style.getPropertyValue('animation');
+      el.setAttribute('data-dpm-sb', '1');
+      el.setAttribute('data-dpm-sb-alt', (vorherT ? 't' : '') + (vorherA ? 'a' : ''));
+      el.style.setProperty('transition', 'none', 'important');
+      el.style.setProperty('animation', 'none', 'important');
+      return 1;
+    } catch (e) { return 0; }
+  }
+
+  function standbild(an){
+    SB_AN = !!an;
+    var z = ziel();
+    if (!z.d || !z.d.body) return { fehler: 'kein Dokument' };
+    var d = z.d;
+    if (sbBeobachter) { sbBeobachter.disconnect(); sbBeobachter = null; }
+    var altesBlatt = d.getElementById(SB_BLATT_ID);
+    if (altesBlatt) altesBlatt.remove();
+
+    if (!SB_AN) {
+      /* zurueckdrehen - nur was wir selbst gesetzt haben */
+      var auf = 0;
+      [].forEach.call(d.querySelectorAll('[data-dpm-sb]'), function(el){
+        var alt = el.getAttribute('data-dpm-sb-alt') || '';
+        if (alt.indexOf('t') < 0) el.style.removeProperty('transition');
+        if (alt.indexOf('a') < 0) el.style.removeProperty('animation');
+        el.removeAttribute('data-dpm-sb');
+        el.removeAttribute('data-dpm-sb-alt');
+        auf++;
+      });
+      sichtNachziehen();
+      return { standbild: false, zurueckgedreht: auf };
+    }
+
+    /* Blatt NUR fuer Pseudoelemente - hohe Spezifitaet, damit es nicht
+       dasselbe Schicksal erleidet wie das alte `*`-Messblatt. */
+    var st = d.createElement('style');
+    st.id = SB_BLATT_ID;
+    st.textContent = 'html body *::before,html body *::after,'
+      + 'html body *::first-line,html body *::marker'
+      + '{transition:none !important;animation:none !important}';
+    d.head.appendChild(st);
+
+    var n = 0;
+    n += sbElementStill(d.documentElement);
+    n += sbElementStill(d.body);
+    [].forEach.call(d.querySelectorAll('*'), function(el){ n += sbElementStill(el); });
+
+    /* Was die App SPAETER baut, bekommt es auch. Die Objektliste baut
+       sich bei jeder Sortierung komplett neu - ohne diesen Beobachter
+       waere genau die Flaeche wieder animiert, die gemessen wird. */
+    try {
+      sbBeobachter = new z.win.MutationObserver(function(liste){
+        if (!SB_AN) return;
+        for (var i = 0; i < liste.length; i++) {
+          var hinzu = liste[i].addedNodes || [];
+          for (var j = 0; j < hinzu.length; j++) {
+            var k = hinzu[j];
+            if (!k || k.nodeType !== 1) continue;
+            sbElementStill(k);
+            if (k.querySelectorAll) [].forEach.call(k.querySelectorAll('*'), sbElementStill);
+          }
+        }
+      });
+      sbBeobachter.observe(d.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+
+    /* Ein Umbruch erzwingen, damit die Zielwerte sofort gelten */
+    void d.documentElement.offsetHeight;
+    sichtNachziehen();
+    return { standbild: true, elemente: n, beobachter: !!sbBeobachter };
+  }
+
+  /* ══ v1986 · rAF FEUERT IM VERBORGENEN DOKUMENT NICHT ════════════════
+
+     GEMESSEN mit einer Frist von 1200 ms: in der Kabine UND im
+     Pruefling kommt kein rAF-Rueckruf, solange das Browserfenster
+     nicht vorn liegt.
+
+     Das ist nicht kosmetisch. `object-actions.js` baut die
+     Pre-Flight-Karte auf dem Handy erst dann zum Bodenblatt um, wenn
+     ein MutationObserver `scan()` ruft — und der tut das in einem rAF.
+     Ohne rAF entsteht kein `.dp-pf-mtrigger`, das Blatt bleibt per
+     `translateY(110%)` unter dem Bildrand, und die Kabine zeigt eine
+     Datenaufnahme, die es auf einem echten Geraet so nie gibt.
+
+     > Ich habe das beinahe als Produktfehler gemeldet. Entschieden hat
+     > es eine rAF-Frist, nicht eine plausible Erklaerung. */
+  function rafErsatz(){
+    var z = ziel();
+    if (!z.win) return { fehler: 'kein Fenster' };
+    if (z.win.__dpmRafEcht) return { schon: true };
+    try {
+      z.win.__dpmRafEcht = z.win.requestAnimationFrame.bind(z.win);
+      z.win.requestAnimationFrame = function (cb) {
+        return z.win.setTimeout(function () { cb(z.win.performance.now()); }, 16);
+      };
+      return { umgelegt: true };
+    } catch (e) { return { fehler: e.message }; }
+  }
+
+  /* Eine Probe, die den Ersatz MESSBAR macht: feuert rAF jetzt? */
+  async function rafProbe(){
+    var z = ziel();
+    if (!z.win) return ['kein Fenster'];
+    var kam = await new Promise(function (res) {
+      var da = false;
+      try { z.win.requestAnimationFrame(function () { da = true; res(true); }); }
+      catch (e) { res(false); return; }
+      setTimeout(function () { if (!da) res(false); }, 1200);
+    });
+    return [(kam ? 'ok   ' : 'FEHL ') + 'rAF im Pruefling feuert: ' + kam
+            + '  (Sichtbarkeit ' + ((ziel().d && ziel().d.visibilityState) || '?') + ', Ersatz '
+            + (z.win.__dpmRafEcht ? 'aktiv' : 'aus') + ')'];
+  }
+
+  /* Die Sichtbarkeit des Prueflings gehoert IN DIE KABINE, nicht in den
+     Kopf des Messenden: sie ist „hidden", solange das Browserfenster
+     nicht vorn liegt, und dann laeuft kein Uebergang von selbst. */
+  function sichtNachziehen(){
+    var e = document.getElementById('sicht');
+     if (!e) return;
+    var z = ziel();
+    var v = (z.d && z.d.visibilityState) || '?';
+    var raf = false;
+    try { raf = !!(ziel().win && ziel().win.__dpmRafEcht); } catch (x) {}
+    e.textContent = 'Sichtbarkeit: ' + v + ' · Standbild: ' + (SB_AN ? 'ein' : 'aus')
+      + ' · rAF-Ersatz: ' + (raf ? 'aktiv' : 'aus');
+    e.className = 'hin ' + (SB_AN ? 'ok' : (v === 'visible' ? 'leise' : 'warn'));
+  }
+
+  /* Eine Gegenprobe, die den Zweck des Schalters MESSBAR macht: eine
+     Flaeche mit Uebergang suchen und nachsehen, ob er wirklich still
+     ist. Ohne das waere „Standbild: ein" nur eine Behauptung. */
+  function standbildProbe(){
+    var z = ziel();
+    if (!z.d || !z.win) return ['kein Dokument'];
+    var out = [], laufen = 0, geprueft = 0;
+    var els = [].slice.call(z.d.querySelectorAll('*')).slice(0, 1200);
+    for (var i = 0; i < els.length; i++) {
+      var cs = z.win.getComputedStyle(els[i]);
+      var t = cs.transitionDuration || '', a = cs.animationName || '';
+      geprueft++;
+      var tLaeuft = t && t.split(',').some(function(x){ return parseFloat(x) > 0; });
+      var aLaeuft = a && a !== 'none';
+      if (tLaeuft || aLaeuft) {
+        laufen++;
+        if (out.length < 6) out.push(nam(els[i]) + '  dauer=' + t + '  anim=' + a);
+      }
+    }
+    return [(laufen === 0 ? 'ok   ' : 'FEHL ') + 'noch bewegt: ' + laufen
+            + ' von ' + geprueft + ' Elementen  (Standbild ' + (SB_AN ? 'ein' : 'aus') + ')']
+           .concat(out);
+  }
+
+  /* ── v2085 · VIER VARIANTENACHSEN, NICHT NUR DAS LAYOUT ───────────────
+   *
+   * Backlog N60.2 fordert den Lauf über „mindestens 3 Gestaltungs-
+   * varianten". Gemessen konnte die Kabine nur EINE setzen: `dp_layout`.
+   * Kartenstil und Theme waren über sie nicht ansteuerbar — die
+   * Attribute existieren in der App (`karten-stil.js:334` setzt
+   * `data-dp-kartenstil`, `hell-varianten.js:43` liest
+   * `data-ui-theme`), aber die Kabine kannte ihre Merker nicht.
+   *
+   * > Ein Prüfstand, der eine Achse nicht verstellen kann, prüft sie
+   * > nicht — und meldet trotzdem „geprüft". Genau das hat N60.17
+   * > getan: vier Ansichten protokolliert, alle beim Standard-Design.
+   *
+   * Die vier Merker, aus den Modulen abgeschrieben, nicht geraten:
+   *
+   *   dp_layout           layout-varianten.js:63    '' v1b v2 v2b
+   *   dp_karten_stil      karten-stil.js:66         '' zeile kartei buetten
+   *   dp_objkarte_stil    objektkarten-stil.js:43   '' bordkarte kante
+   *                                                 datenzeile ampel
+   *                                                 kennzahlen minimal
+   *   dp_karten_variante  hell-varianten.js:28      '' v1 … v6
+   *
+   * `undefined` heißt „nicht anfassen" — so bleiben alte Aufrufe
+   * (`lauf({breite, layout})`) unverändert gültig. `''` heißt
+   * ausdrücklich „abwählen" und entfernt den Merker.
+   */
+  var MERKER = {
+    layout:         'dp_layout',
+    kartenstil:     'dp_karten_stil',
+    objkarte:       'dp_objkarte_stil',
+    kartenvariante: 'dp_karten_variante'
+  };
+
+  function setzeEinen(schluessel, wert){
+    try {
+      if (wert === '' || wert === null) window.localStorage.removeItem(schluessel);
+      else window.localStorage.setItem(schluessel, wert);
     } catch (e) {}
   }
 
-  function lade(breite, layout, hoehe){
-    setzeMerker(layout);
+  /* ── v2085a · DAS THEME LIEGT IM JSON, NICHT IN EINEM EIGENEN SCHLUESSEL
+   *
+   * v2085 hat `theme` auf `dp_karten_variante` geschrieben und die Werte
+   * `v1…v6` dokumentiert. Der erste echte Lauf hat gezeigt, dass das
+   * falsch war — und zwar durch das Feld, das genau dafuer eingebaut
+   * wurde:
+   *
+   *     angefordert: { theme: 'v2' }
+   *     attribute:   { theme: null }      <- kam nicht an
+   *
+   * Gemessen: `data-ui-theme` setzt `ui-varianten.js:217` aus dem Feld
+   * `ui_theme` in **`localStorage['dp_user_settings']`** (einem JSON),
+   * und die gueltigen Werte sind
+   *
+   *     '' · kontor · panel · kanzlei · boarding · konsole
+   *
+   * `dp_karten_variante` mit `v1…v6` ist etwas ANDERES: die Hell-
+   * Fassungen der Karten (`hell-varianten.js`). Zwei Begriffe, zwei
+   * Speicher, ein verwechselter Name.
+   *
+   * > Ein Merker, den man setzt, ohne das Attribut nachzusehen, ist eine
+   * > Behauptung. Der Lauf hat meinen eigenen Fehler in der ersten
+   * > Messung gemeldet — deshalb bleibt `attribute` im Ergebnis, auch
+   * > wenn jetzt alles ankommt.
+   *
+   * Das JSON wird GEPATCHT, nicht ersetzt: in `dp_user_settings` stehen
+   * auch `ui_cards`, `ui_surface`, `ui_form` und die Nutzerdaten. Wer es
+   * ueberschreibt, loescht Einstellungen, die er nicht prueft.
+   */
+  /* ── v2085b · DIESE DREI ACHSEN UEBERSCHREIBT DER SERVER ─────────────
+   *
+   * ZWEITER Fehlversuch am Theme, deshalb Diagnose statt Nachbessern.
+   * Gemessen IM iframe, nach einem Lauf mit `theme: 'kontor'`:
+   *
+   *     localStorage['dp_user_settings'] -> { … "ui_theme": "" … }
+   *
+   * Der gesetzte Wert war weg. `dp_user_settings` ist **servergespiegelt**:
+   * die App laedt die Einstellungen nach dem Start vom Server und
+   * schreibt sie in denselben Schluessel. Die anderen vier Merker
+   * (`dp_layout`, `dp_karten_stil`, `dp_objkarte_stil`,
+   * `dp_karten_variante`) sind rein lokal - deshalb kommen die an und
+   * diese drei nicht.
+   *
+   * > Vor dem Laden zu setzen ist bei einem servergespiegelten Wert
+   * > wirkungslos, und zwar lautlos: der Merker steht da, bis die
+   * > Antwort kommt.
+   *
+   * Es BLEIBT hier, weil es ohne Server-Antwort (Abruf scheitert, offline)
+   * trotzdem greift - aber es ist kein verlaesslicher Weg. Wer diese drei
+   * Achsen prueefen will, setzt sie NACH dem Laden ueber die Modul-API im
+   * iframe und liest danach das Attribut:
+   *
+   *     var z = DPM.ziel();
+   *     z.win.DealPilotUiVarianten.setze({ ui_theme: 'kontor' });
+   *     // dann erst messen
+   *
+   * Dass `attribute` die Luecke zeigt, ist der Zweck des Feldes: ein
+   * Lauf, der `theme: 'kontor'` anfordert und `theme: null` erhaelt,
+   * behauptet keine Pruefung, die nicht stattgefunden hat.
+   */
+  function setzeJsonFeld(feld, wert){
+    try {
+      var s = {};
+      try { s = JSON.parse(window.localStorage.getItem('dp_user_settings') || '{}') || {}; }
+      catch (e) { s = {}; }
+      if (wert === '' || wert === null) delete s[feld];
+      else s[feld] = wert;
+      window.localStorage.setItem('dp_user_settings', JSON.stringify(s));
+    } catch (e) {}
+  }
+
+  function setzeMerker(layout, extra){
+    setzeEinen(MERKER.layout, layout);
+    try { window.localStorage.setItem('dp_layout_gewaehlt', '1'); } catch (e) {}
+    if (!extra) return;
+    /* Nur was ausdrücklich genannt ist. `undefined` laesst den Merker
+       in Ruhe - sonst wuerde jeder Lauf die Wahl des Nutzers loeschen. */
+    if (extra.kartenstil !== undefined) setzeEinen(MERKER.kartenstil, extra.kartenstil);
+    if (extra.objkarte   !== undefined) setzeEinen(MERKER.objkarte,   extra.objkarte);
+    if (extra.kartenvariante !== undefined) {
+      setzeEinen(MERKER.kartenvariante, extra.kartenvariante);
+      /* hell-varianten.js zeigt sich nur mit gesetztem Schalter. */
+      try {
+        window.localStorage.setItem('dp_karten_schalter', extra.kartenvariante ? '1' : '0');
+      } catch (e) {}
+    }
+    /* Die drei Achsen aus `dp_user_settings`. */
+    if (extra.theme   !== undefined) setzeJsonFeld('ui_theme',   extra.theme);
+    if (extra.cards   !== undefined) setzeJsonFeld('ui_cards',   extra.cards);
+    if (extra.surface !== undefined) setzeJsonFeld('ui_surface', extra.surface);
+  }
+
+  /* Was gerade eingestellt ist - fuer die Beschriftung und das Protokoll.
+     Ein Lauf, der seine Variante nicht nennt, ist nicht nachvollziehbar. */
+  function varianteKurz(layout, extra){
+    var t = [ (layout === '' || layout == null) ? 'Heute' : layout ];
+    if (extra) {
+      if (extra.kartenstil) t.push('ks:' + extra.kartenstil);
+      if (extra.objkarte)   t.push('ok:' + extra.objkarte);
+      if (extra.theme)      t.push('th:' + extra.theme);
+      if (extra.kartenvariante) t.push('kv:' + extra.kartenvariante);
+      if (extra.cards)      t.push('cd:' + extra.cards);
+      if (extra.surface)    t.push('sf:' + extra.surface);
+    }
+    return t.join(' · ');
+  }
+
+  function lade(breite, layout, hoehe, extra){
+    setzeMerker(layout, extra);
     rahmen.style.width  = (breite + 2) + 'px';          /* +2 für den Rahmen */
     rahmen.style.height = Math.min(hoehe || 780, 760) + 'px';
-    lbl.textContent = breite + ' px · ' + (layout === '' ? 'Heute' : layout);
-    aktuell = [ (layout === '' ? 'Heute' : layout) + ' @ ' + breite, breite, hoehe || 780 ];
+    var kurz = varianteKurz(layout, extra);
+    lbl.textContent = breite + ' px · ' + kurz;
+    aktuell = [ kurz + ' @ ' + breite, breite, hoehe || 780 ];
     return new Promise(function(fertig){
       var los = false;
       function da(){ if (los) return; los = true; warte(3600).then(fertig); }
@@ -644,12 +1265,36 @@
 
   async function lauf(opt){
     opt = opt || {};
-    await lade(opt.breite || 390, opt.layout === undefined ? '' : opt.layout, opt.hoehe);
+    /* v2085: die drei neuen Achsen reisen als `extra` mit. Nur was
+       ausdruecklich genannt ist, wird gesetzt. */
+    var extra = {};
+    if (opt.kartenstil !== undefined) extra.kartenstil = opt.kartenstil;
+    if (opt.objkarte   !== undefined) extra.objkarte   = opt.objkarte;
+    if (opt.theme      !== undefined) extra.theme      = opt.theme;
+    if (opt.kartenvariante !== undefined) extra.kartenvariante = opt.kartenvariante;
+    if (opt.cards      !== undefined) extra.cards      = opt.cards;
+    if (opt.surface    !== undefined) extra.surface    = opt.surface;
+    await lade(opt.breite || 390, opt.layout === undefined ? '' : opt.layout, opt.hoehe, extra);
     var z = ziel();
     var erg = {
       breite: opt.breite || 390,
       layout: opt.layout === undefined ? '' : opt.layout,
       gesetzt: z.d.documentElement.getAttribute('data-dp-layout'),
+      /* v2085 · WAS WIRKLICH AM <html> HAENGT, nicht was gesetzt wurde.
+         Ein Merker im Speicher ist kein Nachweis: das Modul kann ihn
+         verwerfen (unbekannter Wert) oder an eine Bedingung binden
+         (`objektkarten-stil.js` setzt nur bei aktivem Layout). Deshalb
+         steht hier das ATTRIBUT - und bei Abweichung faellt es auf. */
+      angefordert: extra,
+      attribute: {
+        layout:     z.d.documentElement.getAttribute('data-dp-layout'),
+        kartenstil: z.d.documentElement.getAttribute('data-dp-kartenstil'),
+        objkarte:   z.d.documentElement.getAttribute('data-dp-objkarte'),
+        theme:      z.d.documentElement.getAttribute('data-ui-theme'),
+        cards:      z.d.documentElement.getAttribute('data-ui-cards'),
+        surface:    z.d.documentElement.getAttribute('data-ui-surface'),
+        kartenvariante: z.d.documentElement.getAttribute('data-dp-karte')
+      },
       iw: z.win.innerWidth,
       start: messe(z.d, z.win, 'Start')
     };
@@ -679,6 +1324,17 @@
   }
 
   f.addEventListener('load', function(){ setTimeout(function(){
+    /* v1984: das Standbild gilt je DOKUMENT - nach jedem Laden neu
+       setzen, sonst misst der erste Lauf nach einem Geraetewechsel
+       wieder ein eingefrorenes Einzelbild. */
+    try { if (SB_AN) standbild(true); else sichtNachziehen(); } catch (e) {}
+    /* v1986: rAF im Pruefling auf einen Timer umlegen, solange er
+       verborgen ist. Ohne das bleibt die Handy-Datenaufnahme ein
+       Bodenblatt ohne Ausloeser - gemessen, nicht vermutet. */
+    try {
+      var zz = ziel();
+      if (zz.d && zz.d.visibilityState !== 'visible') rafErsatz();
+    } catch (e) {}
     var z = ziel();
     if (!z.d) { w.innerHTML = '<h2>MESSWERTE</h2><span class="bad">Kein Dokument</span>'; return; }
     try { zeige(messe(z.d, z.win, 'Start')); }
@@ -709,10 +1365,872 @@
     return zeilen;
   }
 
-  window.DPM = { messe: messe, zeige: zeige, lade: lade, lauf: lauf,
+  /* v1984: der Schalter wird GEKLICKT, nicht per Attribut gesetzt -
+     derselbe Bedienweg, den die Doktrin fuer Varianten verlangt. */
+  (function(){
+    var box = document.getElementById('sb');
+    if (!box) return;
+    box.addEventListener('change', function(){
+      try { standbild(box.checked); } catch (e) {}
+    });
+  })();
+
+  /* ═══════════════════════════════════════════════════════════════════
+     v2061 · DER ANSICHTS-PRUEFER
+     ═══════════════════════════════════════════════════════════════════
+     Am 09.10.2026 im Chat gebaut, achtmal umgeworfen und danach
+     weggeworfen gewesen. Hier bleibt er.
+
+     Er beantwortet drei Fragen je Ansicht und Breite:
+       1. Ist jedes Bedienelement erreichbar?   (nicht: sichtbar)
+       2. Ragt etwas ungefangen aus dem Bild?
+       3. Was muss waagerecht geschoben werden?
+
+     ── DIE VIER ARTEFAKTE, DIE ER NICHT MEHR MELDET ──────────────────
+
+     Jedes davon haette zu einem Umbau an einer GESUNDEN Stelle gefuehrt:
+
+     (a) DAS FENSTER SCROLLT NICHT. `html`/`body` stehen in DealPilot auf
+         `overflow:hidden`; gescrollt wird `.main-col`. `window.scrollTo`
+         bewegte nichts - der Pruefer sah 8 von 932 Elementen.
+         -> `scroller()` sucht den echten Behaelter.
+
+     (b) GEFANGENER UEBERLAUF IST KEINER. Die Projektionstabelle (926 px)
+         liegt in `div.pw` mit `overflow-x:auto`, und der Balken nimmt
+         dort 5 px Hoehe weg - sie scrollt wirklich.
+         -> `gefangen()` geht die Elternkette hoch.
+
+     (c) `display:contents` HAT HOEHE 0. `form#dp-noform` umschliesst die
+         ganze App; die Regel "Vorfahr mit Hoehe 0 = eingeklappt" verwarf
+         176 von 176 Elementen und meldete stolz null Befunde.
+         -> eingeklappt ist nur Hoehe 0 MIT `overflow:hidden`.
+
+     (d) STICKY LAESST SICH NICHT HINSCROLLEN. `scrollIntoView` bewegt die
+         Reiterleiste nicht; sie bleibt unter dem sticky Kopf, und alle
+         neun Reiter galten als unbedienbar. Bei `scrollTop=0` sind sie
+         frei.
+         -> jeder Verdacht wird ZWEIMAL geprueft: zentriert und am
+            Seitenanfang.
+
+     ── WARUM FUENF PUNKTE JE KNOPF ───────────────────────────────────
+
+     "Kann ich das anklicken?" heisst: ist IRGENDEIN Punkt frei. Ein
+     sticky Kopf, der einen Knopf halb ueberlappt, macht ihn nicht
+     unbedienbar. Nur wer an allen fuenf Punkten verdeckt ist, zaehlt.
+
+     ── UND WARUM `selbsttest` PFLICHT IST ────────────────────────────
+
+     Null Befunde heisst "nichts gefunden", nicht "nichts da".
+     `DPM.pruefSelbsttest()` legt eine Decke ueber einen echten Knopf und
+     prueft, ob der Pruefer sie bemerkt - und ob er danach wieder
+     schweigt. Ohne dieses Paar ist eine gruene Messung wertlos.
+     ═══════════════════════════════════════════════════════════════════ */
+  function apNam(el){
+    if (!el) return '?';
+    return el.tagName.toLowerCase() + (el.id ? '#'+el.id : '')
+      + (el.className && typeof el.className === 'string'
+         ? '.' + el.className.trim().split(/\s+/).slice(0,2).join('.') : '');
+  }
+
+  /* (a) Der echte Scroll-Behaelter - nicht das Fenster. */
+  function apScroller(d, win){
+    var k = [].slice.call(d.querySelectorAll('div,main,section')).filter(function(e){
+      var cs = win.getComputedStyle(e);
+      return (cs.overflowY === 'auto' || cs.overflowY === 'scroll')
+          && e.scrollHeight > e.clientHeight + 40 && e.clientHeight > 200;
+    });
+    k.sort(function(a,b){ return (b.scrollHeight-b.clientHeight)-(a.scrollHeight-a.clientHeight); });
+    return k[0] || null;
+  }
+
+  /* (c) Eingeklappt ist nur Hoehe 0 MIT overflow:hidden. */
+  function apEingeklappt(el, win){
+    var p = el.parentElement;
+    while (p && p.nodeType === 1 && p.tagName !== 'BODY') {
+      var cs = win.getComputedStyle(p);
+      if (cs.display === 'contents') { p = p.parentElement; continue; }
+      var r = p.getBoundingClientRect();
+      if ((r.height < 2 || r.width < 2)
+          && (cs.overflow==='hidden' || cs.overflowY==='hidden' || cs.overflowX==='hidden'))
+        return apNam(p);
+      if (p.tagName === 'DETAILS' && !p.open) return apNam(p);
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  /* (b) Faengt ein Vorfahr den Ueberlauf ab? */
+  function apGefangen(el, win){
+    var p = el.parentElement;
+    while (p && p.nodeType === 1) {
+      var cs = win.getComputedStyle(p);
+      if ((cs.overflowX==='auto'||cs.overflowX==='scroll'||cs.overflowX==='hidden')
+          && p.scrollWidth > p.clientWidth) return apNam(p);
+      if (cs.overflow === 'hidden') return apNam(p);
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  function apUeberlauf(d, win){
+    var raus = [], gef = 0;
+    [].slice.call(d.querySelectorAll('body *')).forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return;
+      if (r.right <= win.innerWidth + 2) return;
+      if (r.left >= win.innerWidth) return;
+      if (win.getComputedStyle(el).position === 'fixed') return;
+      if (apGefangen(el, win)) { gef++; return; }
+      raus.push({ el: apNam(el), rausPx: Math.round(r.right - win.innerWidth),
+                  b: Math.round(r.width),
+                  txt: (el.textContent||'').trim().replace(/\s+/g,' ').slice(0,24) });
+    });
+    raus.sort(function(a,b){ return b.rausPx - a.rausPx; });
+    return { echt: raus.slice(0,6), echtZahl: raus.length, vonScrollerGefangen: gef };
+  }
+
+  /* Waagerechte Scroller sind kein Fehler, aber auf dem Handy ein
+     UX-Befund - deshalb getrennt gezaehlt und benannt.
+
+     ── v2127 · DIE ABSICHTSMARKE WURDE NICHT GELESEN ─────────────────
+     `deklariertAbsichtlich()` gibt es seit v2092e genau dafuer: eine
+     Regel, die einen gewollten Querscroller macht, traegt
+     `--dpm-schiene: 1`. Dieser Erkenner hat die Marke NIE abgefragt.
+
+     GEMESSEN am 12.10.2026, SE 360 px, Reiter Objekt:
+     `div#oe-karte-gewerke` wurde als Querscroller gemeldet (301
+     sichtbar / 648 Inhalt, 2,2x) - und genau dieses Element traegt die
+     Marke. Der Befund war also von Anfang an als gewollt erklaert.
+
+     > **Ein Erkenner, der bekannte Absichten mitmeldet, wird nach dem
+     > dritten Mal ueberlesen** - und dann auch der echte Befund daneben.
+     > Die Marke war gebaut, exportiert und dokumentiert; gefragt hat
+     > sie niemand. Dieselbe Form wie [[schalter-setzt-keiner-liest]].
+
+     Gezaehlt wird jetzt getrennt: `absicht` je Eintrag, und die Liste
+     fuehrt die ungewollten ZUERST. */
+  function apQuerScroller(d, win){
+    return [].slice.call(d.querySelectorAll('div,section,main,table')).filter(function(e){
+      var cs = win.getComputedStyle(e);
+      if (!(cs.overflowX==='auto'||cs.overflowX==='scroll')) return false;
+      if (e.scrollWidth <= e.clientWidth + 8) return false;
+      var r = e.getBoundingClientRect();
+      return r.width > 80 && r.height > 40 && e.offsetParent;
+    }).map(function(e){
+      return { el: apNam(e), sicht: e.clientWidth, inhalt: e.scrollWidth,
+               faktor: (e.scrollWidth/e.clientWidth).toFixed(1)+'x',
+               balkenNimmtHoehe: (e.offsetHeight-e.clientHeight)+'px',
+               absicht: !!deklariertAbsichtlich(e, win) };
+    }).sort(function(a,b){ return (a.absicht?1:0) - (b.absicht?1:0); }).slice(0,8);
+  }
+
+  /* Wie viele davon NICHT erklaert sind - das ist die nuetzliche Zahl. */
+  function apQuerUngewollt(d, win){
+    return apQuerScroller(d, win).filter(function(x){ return !x.absicht; }).length;
+  }
+
+  /* Fuenf Punkte je Knopf: frei ist frei, auch teilweise. */
+  function apPunkte(d, win, e, muster){
+    var r = e.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) return null;
+    var px = muster || [[.5,.5],[.25,.3],[.75,.3],[.25,.7],[.75,.7]];
+    var frei = 0, gezaehlt = 0, verdecker = null;
+    px.forEach(function(p){
+      var x = r.left + r.width*p[0], y = r.top + r.height*p[1];
+      if (x<1 || y<1 || x>win.innerWidth-1 || y>win.innerHeight-1) return;
+      gezaehlt++;
+      var o = d.elementsFromPoint(x, y)[0];
+      if (!o) return;
+      if (o===e || e.contains(o) || o.contains(e)) frei++;
+      else if (!verdecker) verdecker = apNam(o);
+    });
+    return { gezaehlt: gezaehlt, frei: frei, verdecker: verdecker, r: r };
+  }
+
+  /* ── v2131 · DIE SCREENREADER-FORM IST KEIN ABGESCHNITTENER TEXT ──
+     In Durchgang 4 (12.10.2026) meldete der Pruefer auf jedem Geraet
+     **23 geklippte Beschriftungen** `label.oe-sr`, je rund 85 px zu
+     wenig. Gegengeprueft in `style.css:38748`:
+
+       .oe-sr { position:absolute !important; width:1px; height:1px;
+                overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+     Das ist die Standardform "visually hidden": der Text steht fuer
+     Screenreader im Dokument und wird fuer das Auge auf einen Pixel
+     gekappt - **mit Absicht**. Die Tabelle der Objekterfassung nennt
+     ihre Spalten in der Kopfzeile, die 23 Labels wiederholen sie je
+     Zelle fuer die Vorlesefunktion.
+
+     > **Eine Form, die Text absichtlich wegkappt, meldet jeder
+     > Kapp-Test als Befund.** 23 Fehlalarme auf jedem Geraet, und
+     > daneben stand EIN echter. Genau so verliert ein Pruefer seine
+     > Glaubwuerdigkeit.
+
+     Erkannt wird das Muster, nicht der Klassenname: 1x1 px (oder
+     kleiner) UND geklippt UND absolut positioniert. `clip-path:
+     inset(50%)` ist die neuere Schreibweise und zaehlt mit. */
+  function apNurFuerVorleser(e, win){
+    var cs = win.getComputedStyle(e);
+    if (cs.position !== 'absolute' && cs.position !== 'fixed') return false;
+    var r = e.getBoundingClientRect();
+    if (r.width > 2 || r.height > 2) return false;
+    var geklippt = /hidden|clip/.test(cs.overflow)
+                || (cs.clip && cs.clip !== 'auto')
+                || (cs.clipPath && cs.clipPath !== 'none');
+    return !!geklippt;
+  }
+
+  /* ── v2129 · DEN SCHLIESSKNOPF FINDEN, OHNE IHN ZU ERFINDEN ───────
+     In Durchgang 2 (12.10.2026, 100 Laeufe) meldete der Pruefer
+     siebenmal "KEIN Schliessknopf gefunden" - darunter beim
+     Track-Record-Fenster auf 360 und 1180 px.
+
+     GEGENGEPRUEFT im Code: `DP_BAR()` in `storage.js:2958` baut die
+     Kopfzeile JEDER Vollansicht und darin
+
+       <button class="dpm-x" onclick="...m.remove()">
+
+     `dpm-x` enthaelt weder "close" noch "schliess" noch ein
+     `aria-label`. Die sieben Meldungen waren also **meine Blindheit,
+     nicht ihr Mangel.**
+
+     > Ein Pruefer, der nach EINER Namensform sucht, meldet jede andere
+     > als Fehlen. "Nicht gefunden" ist dann eine Aussage ueber den
+     > Pruefer.
+
+     Diese Liste nennt deshalb die Hausformen ausdruecklich und zusaetzlich
+     das ZEICHEN: ein Knopf, dessen ganzer Text ein Kreuz ist, ist ein
+     Schliessknopf, wie auch immer seine Klasse heisst. */
+  function apSchliesser(wurzel){
+    var sel = '[class*=close],[class*=Close],[class*=schliess],.dpm-x,.bsheet-close,'
+            + '[aria-label*=chlie],[title*=chlie],[aria-label*=lose],button.x,.modal-x';
+    var t = wurzel.querySelector(sel);
+    if (t) return t;
+    /* Zeichen statt Klasse: x, X, times, multiplication, ballot */
+    var kn = wurzel.querySelectorAll('button,[role=button],a');
+    for (var i = 0; i < kn.length; i++) {
+      var s = (kn[i].textContent || '').trim();
+      if (s.length <= 2 && /^[×✕✖✗✘xX╳]$/.test(s)) return kn[i];
+    }
+    return null;
+  }
+
+  /* v2127: Bedienweg ueber ein Label. Beide Formen - umschliessend und
+     per `for`. Gegenprobe im Selbsttest unten: ein nacktes 0x0-Feld
+     ohne Label MUSS weiter als Befund durchkommen. */
+  function apUeberLabel(e, d, win){
+    var kandidaten = [];
+    try { var umschl = e.closest('label'); if (umschl) kandidaten.push(umschl); } catch (x) {}
+    if (e.id) {
+      try {
+        var fuer = d.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(e.id) : e.id) + '"]');
+        if (fuer) kandidaten.push(fuer);
+      } catch (x) {}
+    }
+    for (var i = 0; i < kandidaten.length; i++) {
+      var l = kandidaten[i];
+      var lr = l.getBoundingClientRect();
+      var lcs = win.getComputedStyle(l);
+      if (lr.width >= 20 && lr.height >= 20
+          && lcs.display !== 'none' && lcs.visibility !== 'hidden'
+          && lcs.pointerEvents !== 'none') return l;
+    }
+    return null;
+  }
+
+  function apBedienbar(d, win){
+    var alle = [].slice.call(d.querySelectorAll(
+      'button, a[href], input, select, textarea, [role=button], [onclick]'));
+    var gesehen = 0, verd = [], eingek = 0, erdrueckt = [];
+    alle.forEach(function(e){
+      var r = e.getBoundingClientRect();
+      var cs = win.getComputedStyle(e);
+      /* ═══ ERDRUECKT IST NICHT ABGESCHALTET ═════════════════════════
+         Ein Knopf mit Hoehe 0 wurde hier frueher stillschweigend
+         uebersprungen. Das ist richtig, wenn er `display:none` traegt -
+         dann ist er ABSICHTLICH weg. Es ist falsch, wenn er gerendert
+         wird und nur zusammengefallen ist: dann ist er ein Befund.
+
+         Gemessen am 09.10.2026 an `#mainTabs` im Marktbericht: fuenf
+         Knoepfe (PDF-Export, Dunkel, Schliessen ...) mit Hoehe 0. Erst
+         der Blick auf `display` zeigte, dass sie `none` tragen - seit
+         v647 ausdruecklich abgeschaltet, weil die Hauptapp die Leiste
+         stellt. KEIN Befund also, aber der Pruefer konnte das vorher
+         gar nicht unterscheiden.
+
+         Die andere Haelfte dieses Falls ist teuer: ein Knopf, der
+         gerendert wird und auf 0 faellt, SIEHT aus wie nicht vorhanden. */
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      /* DAS EIGENE `display` SAGT NICHTS UEBER DIE VORFAHREN.
+         Gemessen am Quick-Check: `#qc6-credit-confirm` ("Bestaetigen &
+         abrufen") traegt `display:flex` - sein Modal `#qc6-credit-modal`
+         aber `display:none`. Der Knopf behaelt seinen eigenen Wert, wird
+         aber nicht gerendert. Ohne diese Zeile meldet der Pruefer in
+         JEDEM Dokument saemtliche Knoepfe geschlossener Modals als
+         "erdrueckt".
+         `offsetParent === null` heisst: ein Vorfahr ist `display:none`.
+         Ausnahme `position:fixed` - dort ist es immer null. */
+      var gerendert = e.offsetParent !== null || cs.position === 'fixed';
+      if (!gerendert) return;
+      /* ── v2127 · EIN GESTYLTER SCHALTER IST NICHT ERDRUECKT ─────────
+         GEMESSEN am 12.10.2026, SE 360, Reiter Pilot-Analyse:
+         `input#ai-in-pdf` 0x0 wurde als erdrueckt gemeldet. Im HTML
+         steht er in
+
+           <label class="ji-switch">
+             <input type="checkbox" id="ai-in-pdf">
+             <span class="ji-slider"></span>
+             <span class="ji-switch-label">Pilot-Analyse im PDF …</span>
+           </label>
+
+         Das ist die uebliche Bauform eines Schalters: das native Feld
+         wird auf null gesetzt, bedient wird es ueber das `<label>` -
+         und das ist hier 300 px breit und anklickbar.
+
+         > **Null mal null heisst nicht unbedienbar, wenn ein Label
+         > davorsteht.** Ein Fehlalarm, der sich oft wiederholt, nimmt
+         > dem echten Befund daneben die Aufmerksamkeit.
+
+         Geprueft wird deshalb der BEDIENWEG: ein umschliessendes oder
+         per `for` zugeordnetes Label mit mindestens 20x20 px. Gibt es
+         keines, bleibt es ein Befund - dann ist das Feld wirklich
+         unbedienbar. */
+      if ((r.width < 4 || r.height < 4) && cs.pointerEvents !== 'none'
+          && !apEingeklappt(e, win) && !apUeberLabel(e, d, win)) {
+        erdrueckt.push({ el: apNam(e),
+          txt: (e.textContent||e.value||e.placeholder||'').trim().replace(/\s+/g,' ').slice(0,26),
+          gr: Math.round(r.width)+'x'+Math.round(r.height), display: cs.display });
+        return;
+      }
+      if (r.width<4 || r.height<4) return;
+      if (r.bottom<0 || r.top>win.innerHeight || r.right<0 || r.left>win.innerWidth) return;
+      if (cs.pointerEvents==='none') return;
+      if (apEingeklappt(e, win)) { eingek++; return; }
+      gesehen++;
+      var p = apPunkte(d, win, e);
+      if (p && p.gezaehlt > 0 && p.frei === 0)
+        verd.push({ el: e, txt: (e.textContent||e.value||e.placeholder||'')
+                      .trim().replace(/\s+/g,' ').slice(0,26) });
+    });
+    return { gesehen: gesehen, verdaechtig: verd, eingeklappt: eingek,
+             erdrueckt: erdrueckt };
+  }
+
+  /* (d) Jeder Verdacht zweimal: zentriert UND am Seitenanfang. */
+  async function apNachpruefen(d, win, verd){
+    var sc = apScroller(d, win), echt = [];
+    for (var i = 0; i < Math.min(verd.length, 25); i++) {
+      var e = verd[i].el;
+      try { e.scrollIntoView({ block: 'center' }); } catch (x) {}
+      await warte(200);
+      var a = apPunkte(d, win, e, [[.5,.5],[.3,.35],[.7,.35],[.3,.65],[.7,.65]]);
+      if (!a || a.gezaehlt === 0 || a.frei > 0) continue;
+      if (sc) sc.scrollTop = 0; else win.scrollTo(0,0);
+      await warte(250);
+      var b = apPunkte(d, win, e, [[.5,.5],[.3,.35],[.7,.35],[.3,.65],[.7,.65]]);
+      if (!b || b.gezaehlt === 0 || b.frei > 0) continue;
+      echt.push({ el: apNam(e), txt: verd[i].txt,
+                  gr: Math.round(b.r.width)+'x'+Math.round(b.r.height),
+                  verdecktVon: (b.verdecker || a.verdecker) });
+    }
+    return echt;
+  }
+
+  /* Der ganze Durchlauf. `vorher` darf eine Ansicht oeffnen. */
+  /* ── v2125 · DER PRUEFER KONNTE NUR "HEUTE" ────────────────────────
+     Hier stand `lade(breite, '', hoehe)` - die Fassung wurde FEST auf
+     "Heute" gesetzt. Marcel arbeitet aber in der **Aktenmappe**
+     (`v1b`), und die Datenaufnahme-Befunde vom 11.10.2026 lagen alle
+     dort: der 1263-px-Ueberlauf auf dem iPad war in `v1b`, nicht in
+     "Heute".
+
+     > Ein Pruefer, der nur eine Fassung kennt, meldet null Befunde fuer
+     > die Fassung, die der Nutzer sieht - und wirkt dabei gruen.
+
+     `layout` und `extra` reisen jetzt mit und reichen bis `lade()`
+     durch. Ohne Angabe bleibt es bei "Heute", damit alte Aufrufe
+     dasselbe messen wie vorher. */
+  async function pruefeAnsicht(breite, hoehe, vorher, name, layout, extra){
+    await lade(breite, layout === undefined ? '' : layout, hoehe, extra);
+    var z = ziel(), d = z.d, win = z.win;
+    var geoeffnet = null;
+    if (typeof vorher === 'function') { try { geoeffnet = vorher(win, d); } catch (e) { geoeffnet = 'Fehler: '+e; } }
+    await warte(1800);
+    var sc = apScroller(d, win);
+    var h = sc ? sc.clientHeight : win.innerHeight;
+    var ganz = sc ? sc.scrollHeight : d.documentElement.scrollHeight;
+    var schritte = Math.min(16, Math.max(1, Math.ceil(ganz/(h*0.9))));
+    var gesehen = 0, verd = [], seen = {}, eingek = 0, erd = [], seenE = {};
+    for (var i = 0; i < schritte; i++) {
+      if (sc) sc.scrollTop = i*h*0.9; else win.scrollTo(0, i*h*0.9);
+      await warte(230);
+      var b = apBedienbar(d, win);
+      gesehen += b.gesehen; eingek += b.eingeklappt;
+      b.verdaechtig.forEach(function(x){
+        var k = apNam(x.el)+'|'+x.txt; if (seen[k]) return; seen[k] = 1; verd.push(x); });
+      b.erdrueckt.forEach(function(x){
+        var k = x.el+'|'+x.txt; if (seenE[k]) return; seenE[k] = 1; erd.push(x); });
+    }
+    var echt = await apNachpruefen(d, win, verd);
+    if (sc) sc.scrollTop = 0; else win.scrollTo(0,0);
+    var u = apUeberlauf(d, win);
+    return {
+      ansicht: name || d.title, fassung: (layout===undefined?'(Heute)':(layout||'(Heute)')), achsen: extra||null, v: win.innerWidth+'x'+win.innerHeight,
+      geoeffnet: geoeffnet, scroller: sc ? apNam(sc) : '(Fenster)',
+      deckung: gesehen+' geprueft / '+eingek+' eingeklappt / '+schritte+' Abschnitte',
+      verdaechtig: verd.length, nichtErreichbar: echt.length, liste: echt.slice(0,8),
+      erdrueckt: erd.length, erdruecktListe: erd.slice(0,8),
+      echterUeberlauf: u.echtZahl, ueberlaufListe: u.echt,
+      vonScrollerGefangen: u.vonScrollerGefangen,
+      querScroller: apQuerScroller(d, win), querUngewollt: apQuerUngewollt(d, win)
+    };
+  }
+
+  /* Null Befunde heisst "nichts gefunden", nicht "nichts da". */
+  async function pruefSelbsttest(){
+    var z = ziel(), d = z.d, win = z.win;
+    if (!d) return { urteil: 'kein Dokument' };
+    /* Das Opfer muss GANZ im Bild liegen - auch waagerecht. Beim ersten
+       Anlauf fehlte diese Haelfte der Bedingung, und gewaehlt wurde ein
+       Knopf des eingeklappten Seitenmenues bei x = -286. `elementsFromPoint`
+       gibt dort ein LEERES Array, die Decke konnte nichts verdecken, und
+       der Selbsttest meldete „DURCHGEFALLEN" - fuer einen Mangel, den er
+       selbst mitgebracht hatte.
+
+       Genau dafuer ist er da: er hat den Fehler gefunden, bevor eine
+       gruene Messung auf ihm aufgebaut wurde. */
+    /* v2062b · DER SELBSTTEST SUCHT SICH SEIN OPFER.
+       Am Seitenanfang des Quick-Checks war KEIN Knopf tauglich: von 23
+       waren 8 unten angeschnitten, 9 zu klein, 6 ohne Zeigerereignisse.
+       Der Test meldete daraufhin "kein Testknopf im Bild" und lief gar
+       nicht - ein Selbsttest, der sich regelmaessig selbst ueberspringt,
+       wird nach dem dritten Mal ignoriert und ist damit wertlos.
+       Also scrollt er, bis er eines findet. */
+    var taugt = function(e){
+      var r = e.getBoundingClientRect();
+      return r.width > 30 && r.height > 20
+          && r.top > 0 && r.bottom < win.innerHeight
+          && r.left > 0 && r.right < win.innerWidth
+          && e.offsetParent !== null
+          && win.getComputedStyle(e).pointerEvents !== 'none';
+    };
+    var sc0 = apScroller(d, win);
+    var hoehe = sc0 ? sc0.clientHeight : win.innerHeight;
+    var ganz = sc0 ? sc0.scrollHeight : d.documentElement.scrollHeight;
+    var opfer = null, suchschritte = 0;
+    var maxS = Math.min(12, Math.max(1, Math.ceil(ganz/(hoehe*0.9))));
+    for (var s = 0; s < maxS && !opfer; s++) {
+      if (s > 0) {
+        if (sc0) sc0.scrollTop = s*hoehe*0.9; else win.scrollTo(0, s*hoehe*0.9);
+        await warte(260);
+      }
+      suchschritte = s + 1;
+      opfer = [].slice.call(d.querySelectorAll('button,a[href]')).filter(taugt)[0] || null;
+    }
+    if (!opfer) return { urteil: 'kein Testknopf GANZ im Bild gefunden ('
+                                 + suchschritte + ' Abschnitte durchsucht)' };
+    var vorher = apBedienbar(d, win).verdaechtig.length;
+    var r = opfer.getBoundingClientRect();
+    var decke = d.createElement('div');
+    decke.id = '_dpm-selbsttest';
+    decke.style.cssText = 'position:fixed;left:'+(r.left-4)+'px;top:'+(r.top-4)
+      + 'px;width:'+(r.width+8)+'px;height:'+(r.height+8)
+      + 'px;background:rgba(255,0,0,.35);z-index:99999';
+    d.body.appendChild(decke);
+    await warte(300);
+    var mit = apBedienbar(d, win);
+    var gefunden = mit.verdaechtig.some(function(x){ return x.el === opfer; });
+    decke.remove();
+    await warte(250);
+    var danach = apBedienbar(d, win).verdaechtig.length;
+    return {
+      testknopf: ((opfer.textContent||'').trim().slice(0,24) || '(ohne Text)')
+                 + ' ' + Math.round(r.width)+'x'+Math.round(r.height)
+                 + ' (gefunden im ' + suchschritte + '. Abschnitt)',
+      ohneDecke: vorher, mitDecke: mit.verdaechtig.length,
+      knopfGefunden: gefunden, nachEntfernen: danach,
+      urteil: (vorher === 0 && gefunden && danach === 0)
+        ? 'BESTANDEN - findet einen echten Fehler und schweigt danach wieder'
+        : 'DURCHGEFALLEN - gruene Messungen sind nichts wert'
+    };
+  }
+
+  /* ═══ v2092 · DER MATRIX-LÄUFER (Backlog N60.2) ══════════════════════
+
+     Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine
+     geprüft? Auch den Marktbericht und alle anderen Tabs und Bereiche
+     vollständig? Die App muss unter allen möglichen Designs passend auf
+     Handy, Tablet und Desktop gerendert werden."
+
+     Bis heute lautete die ehrliche Antwort nein. Das Werkzeug konnte es
+     seit v2085, gelaufen ist es nie — und von Hand sind es zu viele
+     Punkte, um sie durchzuhalten.
+
+     ── EINE BEHAUPTUNG IM BACKLOG WAR FALSCH, GEMESSEN AM 10.10.2026 ──
+
+     Dort stand, drei Achsen kämen nicht an, weil `ui_theme`, `ui_cards`
+     und `ui_surface` im servergespiegelten `dp_user_settings` liegen.
+     Nachgemessen über das `attribute`-Feld von `lauf()`:
+
+         theme   -> data-ui-theme="kontor"     KOMMT AN
+         cards   -> data-ui-cards="wallet"     KOMMT AN
+         surface -> data-ui-surface=null       schien zu fehlen
+
+     Bei `surface` lag es an MIR: ich hatte `papier` angefordert, und
+     `SURFACE` kennt nur `''` und `'light'`. **Ein erfundener Wert sieht
+     wie eine kaputte Achse aus.** Es kommen also alle sechs Achsen an,
+     und der Läufer darf sie alle fahren.
+
+     Nebenbei kam ein SECHSTES Theme zum Vorschein: `konsole`. Die vier
+     in der CSS-Sammelregel sind nicht alle, die es gibt — wer nach dem
+     Stylesheet geht, prüft fünf von sechs.
+
+     ── WAS DER LÄUFER MELDET ─────────────────────────────────────────
+
+     Je Punkt (Gerät × Variante × Reiter):
+       · Nachweis der Variante: angefordert gegen das ATTRIBUT am <html>
+       · echter Querscroll der Seite (nimmt ein Balken Höhe weg?)
+       · DIREKTE Kinder, die aus ihrem Behälter ragen
+       · Kontraststellen, nach Farbpaar gebündelt
+     Gemeldet wird nur, was AUFFÄLLT, plus immer die DECKUNG: wie viele
+     Punkte wirklich gefahren wurden. Ein Läufer, der seine Deckung nicht
+     nennt, kann grün werden, ohne etwas angesehen zu haben.
+
+     Er läuft lange (rund 50 Neuladungen). Deshalb startet er im
+     HINTERGRUND und schreibt nach `window.DPM_MATRIX` — EINMAL starten,
+     danach nur abfragen. Ein zweiter Start verdoppelt die Arbeit, ohne
+     dass man es sieht.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* ── EINE VARIANTE NENNT ALLE ACHSEN, NICHT NUR DIE ABWEICHENDE ──────
+
+     v2092a. Im ERSTEN echten Lauf stand bei den ersten acht Punkten:
+
+         DealPilot @ iPhone SE: theme angefordert "", am <html> "kontor"
+
+     Die Variante „DealPilot" war als `opt: {}` geschrieben — und
+     `setzeMerker()` setzt mit Absicht nur, was ausdrücklich genannt ist
+     (sonst löschte jeder Lauf die Wahl des Nutzers). Also blieben
+     `ui_theme: kontor`, `ui_cards: wallet`, `dp_karten_stil: kartei` und
+     `dp_objkarte_stil: datenzeile` aus meinen vorherigen Achsen-Proben
+     **stehen**, und der Läufer hat acht Punkte als „DealPilot" gemeldet,
+     die Kontor waren.
+
+     **Damit war nicht nur der Name falsch, sondern der ganze Lauf:** die
+     Reste lagen in ALLEN 48 Punkten, weil keine Variante sie zurücksetzt.
+     Ein Prüfstand, der den Restzustand des vorigen Laufs mitnimmt, misst
+     nicht die Variante, sondern die Reihenfolge.
+
+     Gefunden hat es das `attribute`-Feld, das genau dafür gebaut wurde —
+     angefordert gegen das, was wirklich am `<html>` hängt. Ohne es hätte
+     der Läufer „48 Punkte, sechs Varianten" gemeldet und fünf gefahren.
+
+     Jede Variante trägt jetzt den VOLLEN Satz. `''` heißt ausdrücklich
+     „zurücksetzen", nicht „nicht erwähnt".                              */
+  var ACHSEN_LEER = { theme: '', cards: '', surface: '', kartenstil: '',
+                      objkarte: '', kartenvariante: '' };
+
+  function variante(name, abweichung){
+    var o = {};
+    for (var k in ACHSEN_LEER) if (Object.prototype.hasOwnProperty.call(ACHSEN_LEER, k)) o[k] = ACHSEN_LEER[k];
+    for (var j in abweichung) if (Object.prototype.hasOwnProperty.call(abweichung, j)) o[j] = abweichung[j];
+    return { name: name, opt: o };
+  }
+
+  /* Die Achsenwerte stehen in ui-varianten.js (THEMES/CARDS/SURFACE) und
+     in layout-varianten.css. Hier die Vorauswahl für einen Lauf: sechs
+     Varianten, die sich in den TRAGENDEN FLÄCHEN unterscheiden. */
+  var VARIANTEN = [
+    variante('DealPilot', {}),
+    variante('Kontor',    { theme: 'kontor' }),
+    variante('Panel',     { theme: 'panel' }),
+    variante('Kanzlei',   { theme: 'kanzlei' }),
+    variante('Boarding',  { theme: 'boarding' }),
+    variante('Konsole',   { theme: 'konsole' })
+  ];
+
+  /* Steht fuer dieses Element irgendwo `-webkit-overflow-scrolling` in einem
+     Blatt? Das ist die DEKLARIERTE Absicht, waehrend getComputedStyle sie in
+     Chrome nie zeigt.
+
+     Rekursiv, weil die Regel in einer @media-Gruppe liegen kann (bei
+     #oe-karte-gewerke tut sie das). Und `rule.cssRules` wird nur betreten,
+     wenn es WIRKLICH Kinder hat - eine CSSStyleRule traegt heute selbst eine
+     leere Liste und sieht dadurch wie ein Behaelter aus. */
+  function deklariertAbsichtlich(el, win){
+    /* ── v2092e · DREI ANLAEUFE, DANN DIE DIAGNOSE ───────────────────────
+
+       Gesucht war ein Nachweis, dass ein Querscroller GEWOLLT ist.
+
+       1. Anlauf (v2092b): `getComputedStyle(el).webkitOverflowScrolling
+          === 'touch'`. Tot — Chrome kennt die Eigenschaft nicht.
+       2. Anlauf (v2092c): dieselbe Eigenschaft im CSSOM suchen. Auch tot.
+          GEMESSEN am 10.10.2026: 11.954 Regeln durchgegangen, 45 von 48
+          Blaettern lesbar, **NULL Regeln mit `overflow-scrolling` im
+          cssText** — bei gleichzeitig 10 Regeln auf den Selektor
+          `oe-karte-gewerke`. Der Durchlauf funktionierte also, die
+          Eigenschaft war nur nicht da.
+       3. Gegenprobe: `setProperty('-webkit-overflow-scrolling','touch')`
+          gibt `""` zurueck. **Chrome verwirft sie beim Einlesen.**
+
+       Die Absicht steht in der Datei und ist im Browser in BEIDE
+       Richtungen unsichtbar. Also wird sie als eigene Variable notiert,
+       die Chrome behaelt: `--dpm-schiene: 1` an der Regel, die den
+       Scroller macht (`style.css`, drei Stellen).
+
+       Das ist zugleich der richtige Ort: die Absicht haengt am ELEMENT,
+       nicht an einer Liste im Pruefer — eine Liste veraltet beim naechsten
+       neuen Scroller, die Variable wandert mit der Regel.
+
+       Nebenwirkung, bewusst in Kauf genommen: eigene Variablen WERDEN
+       VERERBT. Ein Scroller INNERHALB einer markierten Schiene gilt
+       damit ebenfalls als gewollt. Das ist selten und die harmlosere
+       Richtung — ein verpasster Mangel in einer Schiene wiegt leichter
+       als 109 Fehlalarme.                                              */
+    try {
+      return String(win.getComputedStyle(el).getPropertyValue('--dpm-schiene')).trim() === '1';
+    } catch (e) { return false; }
+  }
+
+  async function matrix(opt){
+    opt = opt || {};
+    var geraete  = opt.geraete  || GERAETE;
+    var varianten = opt.varianten || VARIANTEN;
+    var pause    = opt.pause || 320;
+
+    var z0 = { punkte: 0, soll: geraete.length * varianten.length, laeuft: true,
+               begonnen: new Date().toISOString(), funde: [], achsen: [],
+               reiterGesehen: 0, fertig: null };
+    window.DPM_MATRIX = z0;
+
+    for (var vi = 0; vi < varianten.length; vi++) {
+      var v = varianten[vi];
+      for (var gi = 0; gi < geraete.length; gi++) {
+        var g = geraete[gi];
+        var o = { breite: g[1], hoehe: g[2] };
+        for (var k in v.opt) if (Object.prototype.hasOwnProperty.call(v.opt, k)) o[k] = v.opt[k];
+
+        var r;
+        try { r = await lauf(o); }
+        catch (e) {
+          z0.funde.push({ wo: v.name + ' @ ' + g[0], art: 'ABBRUCH', text: String(e && e.message || e) });
+          z0.punkte++;
+          continue;
+        }
+
+        /* (1) NACHWEIS DER VARIANTE über ALLE Achsen, nicht nur `theme`.
+               v2092a: zuerst stand hier nur `theme`. Das hat den Restzustand
+               bei `cards`, `kartenstil` und `objkarte` nicht gesehen - und
+               genau die lagen aus einem vorigen Lauf noch an. Wer eine
+               Achse nicht prüft, prüft sie nicht, und meldet trotzdem
+               „Variante gesetzt". */
+        for (var ax in ACHSEN_LEER) {
+          if (!Object.prototype.hasOwnProperty.call(ACHSEN_LEER, ax)) continue;
+          var soll = v.opt[ax] === undefined ? '' : v.opt[ax];
+          var ist  = (r.attribute && r.attribute[ax]) || '';
+          if (String(soll) !== String(ist)) {
+            z0.achsen.push(v.name + ' @ ' + g[0] + ': ' + ax + ' angefordert "'
+                           + soll + '", am <html> "' + ist + '"');
+          }
+        }
+
+        var zz = ziel();
+        var btns = [].slice.call(zz.d.querySelectorAll('nav.tabs button.tab'));
+        /* Kein Reiter heisst: die Seite ist nicht da. Das ist ein Fund,
+           kein leeres Ergebnis. */
+        if (!btns.length) {
+          /* ══ v2092f · EIN DOKUMENT OHNE REITER IST KEIN FEHLER ═══════
+             Der Quick-Check (`quickcheck-app.html`, Titel „DealPilot
+             Boarding") und der Marktbericht sind EIGENE Dokumente im
+             iframe und haben kein `nav.tabs`. Gemessen am 11.10.2026:
+             null Reiter, 3596 px hoch, eine durchgehende Seite.
+
+             Vorher meldete der Laeufer dort neunmal „KEINE REITER" und
+             MASS NICHTS - genau die Antwort, die Marcel nicht wollte
+             („Auch den Marktbericht und alle anderen Tabs und Bereiche
+             vollstaendig?").
+
+             > Ein Pruefstand, der eine Bauart nicht kennt, darf sie nicht
+             > als Fehler melden. Er misst sie einmal am Stueck.
+
+             `btns` bleibt leer, die Schleife laeuft trotzdem EINMAL -
+             `null` steht dann fuer „kein Reiter", und der Name im
+             Protokoll sagt es. */
+          z0.funde.push({ wo: v.name + ' @ ' + g[0], art: 'OHNE REITER',
+                          text: 'eigenes Dokument (' + (zz.d.title || '?').slice(0, 30)
+                                + ') - einmal am Stueck gemessen' });
+          btns = [null];
+        }
+
+        for (var bi = 0; bi < btns.length; bi++) {
+          var b = btns[bi];
+          var rname = b
+            ? (b.getAttribute('data-tab') || b.textContent || '?').trim().slice(0, 18)
+            : '(ohne Reiter)';
+          if (b) b.click();   /* v2092f: ohne Reiter gibt es nichts zu klicken */
+          await warte(pause);
+          z0.reiterGesehen++;
+
+          var wo = v.name + ' @ ' + g[0] + ' · Reiter ' + rname;
+
+          /* (2) ECHTER Querscroll: ein Balken muss HOEHE/BREITE wegnehmen.
+                 scrollWidth allein ist kein Befund - ein beschnittenes
+                 Element erzeugt ihn auch. */
+          /* Die Rueckgaben sind NACHGELESEN, nicht angenommen:
+               apQuerScroller -> Array von {el, sicht, inhalt, faktor,
+                                            balkenNimmtHoehe}
+               apUeberlauf    -> OBJEKT {echt:[], echtZahl, vonScrollerGefangen}
+             `ue.length` waere hier still immer undefined gewesen und der
+             Laeufer haette nie einen Ueberlauf gemeldet - derselbe Fehler
+             wie bei effGrund().rgb am 10.10.2026. */
+          /* ══ v2092b · EINE SCHIENE IST KEIN MANGEL ════════════════════
+             Der erste Lauf meldete 109 QUERSCROLL-Funde. Nachgesehen sind
+             ALLE FÜNF gewollt gebaut:
+
+               dab-rail         hat eigene Pfeiltasten (railScroll(id,±1))
+               oe-karte-gewerke overflow-x:auto MIT
+                                -webkit-overflow-scrolling:touch
+               ytf-quick-wrap   in style.css:39561 steht die Messung
+                                schon als Kommentar
+               dptk-huelle      Rahmen um eine 1021px breite Datentabelle
+               bc-svg-wrap      Rahmen um ein breites SVG
+
+             `apQuerScroller` sagt in seinem eigenen Kommentar: „Waagerechte
+             Scroller sind kein Fehler, aber auf dem Handy ein UX-Befund."
+             Ich habe sie trotzdem als Mangel gemeldet — und 109 Fehlalarme
+             begraben jeden echten Fund. **Ein Prüfer, der ruft wenn nichts
+             ist, ist so wertlos wie einer, der schweigt wenn etwas ist.**
+
+             Jetzt getrennt: wer seine Absicht ZEIGT, wird als `SCHIENE`
+             gezählt und nicht als Mangel. Als Absicht gilt nur, was im
+             DOM nachweisbar ist — Bedienknöpfe, Touch-Scrolling oder
+             Scroll-Snap. Eine Klassenliste wäre geraten.             */
+          try {
+            var qs = apQuerScroller(zz.d, zz.win) || [];
+            var mangel = [], schienen = [];
+            for (var qi = 0; qi < qs.length; qi++) {
+              var x = qs[qi];
+              var knoten = null;
+              /* Das gemessene Element wiederfinden, um es zu befragen */
+              try {
+                var kand = [].slice.call(zz.d.querySelectorAll('div,section,main,table'));
+                for (var ki = 0; ki < kand.length; ki++) {
+                  if (kand[ki].clientWidth === x.sicht && kand[ki].scrollWidth === x.inhalt) { knoten = kand[ki]; break; }
+                }
+              } catch (e2) {}
+              var gewollt = false, warum = '';
+              if (knoten) {
+                var kcs = zz.win.getComputedStyle(knoten);
+                /* v2092c: HIER STAND `kcs.webkitOverflowScrolling === 'touch'`
+                   und der Test war TOT. `-webkit-overflow-scrolling` ist eine
+                   Alt-Eigenschaft von iOS-Safari; Chrome kennt sie nicht,
+                   also meldet getComputedStyle dort nie 'touch'.
+
+                   Aufgefallen im Nachweislauf: `#oe-karte-gewerke` wurde als
+                   Mangel gemeldet, obwohl style.css:38998 die Eigenschaft
+                   ausdruecklich setzt. Ein Erkenner, der nie feuert, sieht
+                   aus wie ein strenger Erkenner.
+
+                   Gemessen wird jetzt die DEKLARIERTE Absicht im Stylesheet,
+                   nicht der berechnete Wert - denn die Absicht steht dort,
+                   auch wenn dieser Browser sie nicht umsetzt. */
+                if (deklariertAbsichtlich(knoten, zz.win)) { gewollt = true; warum = '--dpm-schiene gesetzt'; }
+                else if (kcs.scrollSnapType && kcs.scrollSnapType !== 'none') { gewollt = true; warum = 'scroll-snap'; }
+                else if (knoten.querySelector('button[onclick*="Scroll"],button[class*="arr"],[class*="rail-arr"]')
+                         || (knoten.parentElement && knoten.parentElement.querySelector('[class*="rail-arr"],button[class*="arr"]'))) {
+                  gewollt = true; warum = 'eigene Bedienknoepfe';
+                }
+                else if (knoten.querySelector('table') && knoten.children.length === 1) {
+                  gewollt = true; warum = 'Rahmen um eine Tabelle';
+                }
+              }
+              var zeile = x.el + ' ' + x.sicht + '->' + x.inhalt + ' (' + x.faktor
+                        + ', Balken ' + x.balkenNimmtHoehe + ')';
+              if (gewollt) schienen.push(zeile + ' [' + warum + ']');
+              else mangel.push(zeile + (knoten ? '' : ' [Element nicht wiedergefunden]'));
+            }
+            if (schienen.length) {
+              z0.funde.push({ wo: wo, art: 'SCHIENE', n: schienen.length,
+                              text: schienen.slice(0, 2).join(' | ') });
+            }
+            if (mangel.length) {
+              z0.funde.push({ wo: wo, art: 'QUERSCROLL', n: mangel.length,
+                              text: mangel.slice(0, 2).join(' | ') });
+            }
+          } catch (e) {
+            z0.funde.push({ wo: wo, art: 'MESSFEHLER', text: 'apQuerScroller: ' + String(e && e.message || e) });
+          }
+
+          /* (3) Was aus seinem Behaelter ragt - `echtZahl`, nicht `length` */
+          try {
+            var ue = apUeberlauf(zz.d, zz.win) || {};
+            if (ue.echtZahl) {
+              z0.funde.push({ wo: wo, art: 'UEBERLAUF', n: ue.echtZahl,
+                text: ue.echtZahl + ' Element(e): ' + (ue.echt || []).slice(0, 2).join(' | ')
+                    + (ue.vonScrollerGefangen ? ' · ' + ue.vonScrollerGefangen + ' von einem Scroller gefangen' : '') });
+            }
+          } catch (e) {
+            z0.funde.push({ wo: wo, art: 'MESSFEHLER', text: 'apUeberlauf: ' + String(e && e.message || e) });
+          }
+
+          /* (4) Kontrast, nach Farbpaar gebuendelt - die STELLENZAHL ist
+                 die nuetzliche, nicht die Elementzahl. */
+          try {
+            var m = messe(zz.d, zz.win, wo);
+            var gr = (m.kontrastGruppen || []).filter(function(x){ return +x.kontrast < 4.5; });
+            if (gr.length) {
+              z0.funde.push({ wo: wo, art: 'KONTRAST',
+                text: gr.length + ' Stellen, schlechteste k=' +
+                      gr.map(function(x){ return +x.kontrast; }).sort(function(a,b){ return a-b; })[0] +
+                      ' (' + gr.slice(0, 2).map(function(x){ return x.sel; }).join(', ') + ')',
+                n: gr.length });
+            }
+          } catch (e) {}
+        }
+        z0.punkte++;
+      }
+    }
+    z0.laeuft = false;
+    z0.fertig = new Date().toISOString();
+    return z0;
+  }
+
+  /* Kurzbericht - damit die Abfrage nicht an der Ausgabegroesse scheitert */
+  function matrixStand(){
+    var m = window.DPM_MATRIX;
+    if (!m) return 'kein Lauf gestartet';
+    var nachArt = {};
+    m.funde.forEach(function(f){ nachArt[f.art] = (nachArt[f.art] || 0) + 1; });
+    return {
+      laeuft: m.laeuft,
+      punkte: m.punkte + ' von ' + m.soll,
+      deckung: Math.round((m.punkte / m.soll) * 100) + ' %',
+      reiterGesehen: m.reiterGesehen,
+      funde: m.funde.length,
+      nachArt: nachArt,
+      achsenAbweichungen: m.achsen.length,
+      achsen: m.achsen.slice(0, 6)
+    };
+  }
+
+  window.DPM = {
+                 matrix: matrix, matrixStand: matrixStand, varianten: VARIANTEN,
+                 /* v2092c: mitexportiert, damit der Erkenner EINZELN
+                    befragbar ist. Ein Erkenner, den man nur im Lauf sieht,
+                    laesst sich nicht von "findet nichts" unterscheiden -
+                    genau daran ist die tote webkitOverflowScrolling-Weiche
+                    so lange unentdeckt geblieben. */
+                 deklariertAbsichtlich: deklariertAbsichtlich,
+                 pruefeAnsicht: pruefeAnsicht, pruefSelbsttest: pruefSelbsttest,
+                 apBedienbar: apBedienbar, apUeberlauf: apUeberlauf,
+                 apQuerScroller: apQuerScroller, apQuerUngewollt: apQuerUngewollt, apUeberLabel: apUeberLabel, apSchliesser: apSchliesser, apNurFuerVorleser: apNurFuerVorleser, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
                  kontrast: kontrast, gemalt: gemalt, male: male,
                  lage: lage, warte: warte,
+                 standbild: standbild, standbildProbe: standbildProbe,
+                 rafErsatz: rafErsatz, rafProbe: rafProbe,
+                 stopps: stopps,
+                 standbildAn: function(){ return SB_AN; },
                  selbsttest: selbsttest, geraete: GERAETE };
 
   waehle(2);   /* iPhone 14 */

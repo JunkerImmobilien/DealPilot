@@ -279,12 +279,33 @@ async function pilot_analyse_lesen(ctx, args) {
    * nirgends nennt, aber EINEN ANDEREN Ort aus dem Portfolio, ist mit hoher
    * Wahrscheinlichkeit kopiert — dann bekommt der Nutzer das gesagt, statt
    * dass der Bot dem falschen Haus die richtige Sprache gibt. */
+  /* ══ v2015 · ZUERST DER STEMPEL, DANN DIE HEURISTIK ═════════════
+
+     Seit v2015 traegt jede NEUE Analyse `_fuer.objekt_id` - die
+     Kennung des Objekts, fuer das sie gerechnet wurde. Damit ist der
+     Vergleich exakt: gleich oder nicht.
+
+     Die Heuristik darunter bleibt fuer die ALTEN Analysen ohne
+     Stempel - und sie sagt jetzt dazu, dass sie raet. Sonst liest
+     sich eine Vermutung wie eine Feststellung. */
+  const _st = (roh && typeof roh === 'object' && roh._fuer) ? roh._fuer : null;
+  if (_st && _st.objekt_id) {
+    aus.gehoert_zu = { objekt_id: _st.objekt_id, adresse: _st.adresse || null, stand: _st.stand || null };
+    if (String(_st.objekt_id) !== String(id)) {
+      aus.fremd_verdacht = true;
+      aus.fremd_sicher = true;
+      aus.so_sagen = 'Diese gespeicherte Pilot-Analyse wurde NACHWEISLICH fuer ein anderes '
+                   + 'Objekt gerechnet' + (_st.adresse ? ' (' + _st.adresse + ')' : '')
+                   + '. Stuetze dich NICHT darauf. In DealPilot im Reiter „Pilot-Analyse" neu erstellen.';
+    }
+  }
   const ort = String(o.daten.ort || '').trim();
-  if (ort) {
+  if (ort && !aus.gehoert_zu) {
     const text = (typeof roh === 'string') ? roh : JSON.stringify(roh);
     const nenntOrt = text.toLowerCase().includes(ort.toLowerCase());
     if (!nenntOrt) {
       aus.fremd_verdacht = true;
+      aus.fremd_sicher = false;   /* v2015 - das hier ist eine Vermutung */
       aus.so_sagen = 'Achtung: Die gespeicherte Pilot-Analyse nennt den Ort ' + ort + ' nirgends — '
                    + 'sie stammt vermutlich von einem anderen Objekt. Bitte in DealPilot im Reiter '
                    + '„Pilot-Analyse" neu erstellen, bevor du dich darauf stützt.';
@@ -299,6 +320,62 @@ async function pilot_analyse_lesen(ctx, args) {
     } else if (v === undefined) delete aus[k];
   });
   return aus;
+}
+
+/* ══ v2012 · DIE COCKPIT-ANALYSE, ABHOLBAR ═══════════════════════════
+
+   Eine OBJEKT-Analyse wird gespeichert und hat hier laengst ein
+   Werkzeug (`pilot_analyse_lesen`). Die PORTFOLIO-Analyse hatte
+   beides nicht: sie entstand im Chat des Cockpits und war mit dem
+   Schliessen des Reiters weg. Der Bot konnte die ZAHLEN lesen
+   (`portfolio_lesen`), nie die Beurteilung.
+
+   Seit v2012 legt der Portfolio-Pilot sie in `user_settings` unter
+   `portfolio_analyse` ab. Hier wird sie geholt - mit STAND, denn
+   eine Beurteilung ohne Datum ist bei einem Portfolio, das sich
+   jeden Monat aendert, eine Falle. */
+async function portfolio_analyse_lesen(ctx) {
+  const r = await query(
+    'SELECT wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = $2',
+    [ctx.userId, 'portfolio_analyse']
+  );
+  /* v2012a - GEMESSEN beim Aufraeumen eines Prueflaufs: hier stand
+     `!r.rows[0].wert`. Ein zurueckgesetzter Eintrag ist aber
+     `{text:null,...}` - ein Objekt, und damit truthy. Das Werkzeug
+     meldete `vorhanden: true` mit `analyse: null`, und der Bot haette
+     eine Analyse angekuendigt, die es nicht gibt.
+     Geprueft wird deshalb der TEXT, nicht die Zeile. */
+  const _w = (r.rowCount && r.rows[0].wert) || null;
+  if (!_w || !_w.text || !String(_w.text).trim()) {
+    return {
+      vorhanden: false,
+      hinweis: 'Es liegt keine Portfolio-Analyse vor. Sie entsteht in DealPilot im '
+             + 'Portfolio-Cockpit ueber den Knopf "Portfolio-Analyse starten". '
+             + 'Sag das - und erfinde KEINE eigene Gesamtbeurteilung. Die reinen '
+             + 'Zahlen kannst du mit portfolio_lesen holen.'
+    };
+  }
+  const w = _w;   /* v2012a - oben schon geprueft und gehalten */
+  const stand = w.stand || r.rows[0].updated_at;
+  let alter = null;
+  try {
+    const t = new Date(stand).getTime();
+    if (Number.isFinite(t)) alter = Math.max(0, Math.round((Date.now() - t) / 86400000));
+  } catch (e) {}
+  return {
+    vorhanden: true,
+    analyse: w.text || null,
+    stand: stand || null,
+    stand_lesbar: stand ? new Date(stand).toLocaleDateString('de-DE') : null,
+    alter_tage: alter,
+    anzahl_objekte: w.anzahl_objekte != null ? w.anzahl_objekte : null,
+    objekte_im_payload: w.objekte_im_payload != null ? w.objekte_im_payload : null,
+    portfolio_score: w.portfolio_score != null ? w.portfolio_score : null,
+    hinweis: 'Das ist die gespeicherte Beurteilung aus dem Portfolio-Cockpit, nicht neu '
+           + 'gerechnet. NENNE DEN STAND. Ist sie aelter als 30 Tage, sage ausdruecklich, '
+           + 'dass sich das Portfolio seitdem geaendert haben kann, und biete an, die '
+           + 'aktuellen Zahlen mit portfolio_lesen dagegenzuhalten.'
+  };
 }
 
 async function portfolio_lesen(ctx) {
@@ -1784,7 +1861,26 @@ async function objekt_schnellblick(ctx, args) {
   };
   if (wfl) {
     rechnung.kaufpreis_je_qm = eur(kp / wfl) + '/m²';
-    rechnung.miete_je_qm = (nkm / wfl).toFixed(2).replace('.', ',') + ' EUR/m²';
+    /* ── v2081 · DIESELBE MIETE IN ZWEI GROESSEN ───────────────────────
+       HIER STAND `(nkm / wfl)` — also OHNE die Zusatzeinnahmen, waehrend
+       `jahreskaltmiete` und die Rendite eine Zeile darueber mit
+       `nkm + ze` rechnen (`K0.nkm_j`). Bei nkm 940 und ze 460 stand im
+       selben Block „Jahreskaltmiete 16.800 EUR" und „Miete je m² 9,40" —
+       16.800 entspricht aber 1.400 EUR/Monat, also 14,00 je m².
+
+       Zwei Zahlen zur selben Miete, und keine sagt, welche gemeint ist.
+       Genau so eine Ausgabe laedt dazu ein, sie „passend" neu zu
+       formulieren.
+
+       Jetzt wird die GESAMTE Kaltmiete je m² ausgewiesen — dieselbe
+       Grundlage wie Rendite und Faktor — und die Nettokaltmiete nur
+       zusaetzlich, wenn sie abweicht. Beide tragen ihren Namen. */
+    rechnung.miete_je_qm = ((nkm + ze) / wfl).toFixed(2).replace('.', ',') + ' EUR/m²'
+      + (ze ? '  (Gesamt-Kaltmiete inkl. Zusatzeinnahmen)' : '');
+    if (ze) {
+      rechnung.nettokaltmiete_je_qm = (nkm / wfl).toFixed(2).replace('.', ',') + ' EUR/m²'
+        + '  (ohne die ' + eur(ze) + '/Monat Zusatzeinnahmen)';
+    }
   }
 
   /* ── Kaufnebenkosten, soweit belegbar ───────────────────────────────── */
@@ -1906,6 +2002,41 @@ async function objekt_schnellblick(ctx, args) {
      gerechnet wurde, entscheidet AUCH ueber die Finanzierung (Block
      darunter). */
   const sGespeichert = dialog.scoreLesen(d);
+
+  /* ══ v2143 · DAS ZIEL DER LAGEKLASSE, SERVERSEITIG GEHOLT ══════════
+     Die Klasse steht am Objekt (`d.lageklasse`), ihre Zielrendite im
+     Lage-Profil des Nutzers - serverseitig unter
+     `user_settings.lage_profil` (v1956, Marcels Entscheidung: "ja auf
+     den Server damit").
+
+     Hier wird GELESEN, nicht gerechnet: der Kern bekommt die Zahl als
+     Parameter und misst damit die AMPEL, nicht den Score.
+
+     Faellt irgendetwas aus - keine Klasse, kein Profil, kein Wert -,
+     bleibt `null`, und die feste Skala gilt weiter. Das ist Marcels
+     Riegel: ohne Eingabe wird nichts erfunden.
+
+     > `Number(null)` ist 0 und besteht `Number.isFinite`. Deshalb wird
+     > hier auf ABWESENHEIT geprueft und erst danach gerechnet - sonst
+     > waere ein fehlendes Ziel ein Ziel von 0 %, und jede Rendite
+     > traefe es unendlich gut. */
+  let zielBmrLage = null;
+  try {
+    const _klasse = d.lageklasse ? String(d.lageklasse).toUpperCase().charAt(0) : null;
+    if (_klasse === 'A' || _klasse === 'B' || _klasse === 'C') {
+      const _lp = await query(
+        'SELECT wert FROM user_settings WHERE user_id = $1 AND schluessel = $2',
+        [ctx.userId, 'lage_profil']
+      );
+      const _prof = (_lp.rowCount && _lp.rows[0].wert) || null;
+      const _k = _prof && _prof.klassen ? _prof.klassen[_klasse] : null;
+      const _z = _k ? _k.ziel_bmr : null;
+      if (_z != null && _z !== '') {
+        const _n = Number(String(_z).replace(',', '.'));
+        if (isFinite(_n) && _n > 0) zielBmrLage = _n;
+      }
+    }
+  } catch (e) { zielBmrLage = null; }
   if (zins && tilg) {
     const gi = kp + knkSumme;
     ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
@@ -2064,15 +2195,42 @@ async function objekt_schnellblick(ctx, args) {
     herkunft = 'in DealPilot gerechnet und am Objekt gespeichert';
   } else if (!scoreFehlt.length) {
     const mstg = dez(d.mietstg) != null ? dez(d.mietstg) : 1.5;
+    /* v2141 - AUCH IM BOT. `darlehen` steht hier schon als Variable
+       (oben aus `d1` gelesen oder abgeleitet). Ohne sie bekaeme der Bot
+       einen anderen Score als die App, und zwar lautlos: beide rufen
+       denselben Kern, nur mit verschiedenen Eingaben. Genau auf diesem
+       Weg blieb am 07.10.2026 eine ungespiegelte Score-Aenderung
+       stundenlang unentdeckt. */
     const S = rechenkerne.score({
       kp: kp, cf_m: K.cf_m, nmy: K.nmy, ltv: K.ltv, dscr: K.dscr,
-      wp_kpi: wp, mstg: mstg
+      wp_kpi: wp, mstg: mstg,
+      darlehen: (darlehen != null && isFinite(darlehen)) ? darlehen : null
     });
     score = S.score;
+    /* v2141 - DIE HERKUNFT NANNTE DIE FALSCHE URSACHE.
+
+       Marcel am 12.10.2026: "Die Bewertung war erst schlecht mit 44 und
+       danach auf einmal ueber 80. Warum?"
+
+       Am echten Kern nachgerechnet (Sachsenstr. 18, kp 180.000, nkm 940):
+       dasselbe Objekt, dieselben Eingaben, EINE Annahme Unterschied -
+       ein abgeleitetes Darlehen gegen den Barkauf:
+
+         EK-Quote  0 %   ->  31 KRITISCH  statt  72 GUT   (+41)
+         EK-Quote 10 %   ->  44 SCHWACH   statt  72 GUT   (+28)
+         EK-Quote 20 %   ->  58 SOLIDE    statt  72 GUT   (+14)
+
+       Die 44 ist exakt getroffen. Die Ursache ist die Ableitung in
+       Z. 2029 (darlehenAbgeleitet), nicht "mehr Felder".
+
+       > Eine Herkunftsangabe, die die falsche Ursache nennt, ist
+       > schlimmer als keine: sie beendet die Suche. */
     herkunft = 'Quick-Check-Score — gerechnet mit demselben Kern wie die App '
-      + '(DealKpis + DealScore). Das Objekt wurde in DealPilot noch nicht '
-      + 'vollstaendig gerechnet; der Vollbild-Score kann abweichen, weil er '
-      + 'mehr Felder kennt.';
+      + '(DealKpis + DealScore), aber mit den Annahmen, die unter '
+      + '"beruht_auf_annahmen" stehen. Das Objekt wurde in DealPilot noch '
+      + 'nicht vollstaendig gerechnet. Weicht der Vollbild-Score ab, liegt es '
+      + 'ZUERST an diesen Annahmen und erst danach daran, dass er mehr Felder '
+      + 'kennt.';
     teilnoten = S.breakdown.map((b) => ({
       was: b.label, punkte: Math.round(b.score) + ' von 100',
       gewicht: b.weight + ' %', grundlage: b.input
@@ -2194,9 +2352,15 @@ async function objekt_schnellblick(ctx, args) {
        * Datei, die der Browser laedt. */
       stufensatz: H ? rechenkerne.heuristikTeil('stufensatz',
         rechenkerne.stufe(score).farbe) : undefined,
+      /* v2143: die Lageklasse steht am Objekt (`lageklasse`), ihr Ziel
+         im Lage-Profil des Nutzers - das liegt serverseitig unter
+         `/user-settings/lage_profil`. Hier wird NUR durchgereicht, was
+         schon gelesen ist; der Kern rechnet damit die Ampel, nicht den
+         Score. Fehlt eines von beiden, bleibt die feste Skala. */
       kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
-          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 }, nichtAnwendbar) : undefined,
+          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
+          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar) : undefined,
       kategorien: K ? rechenkerne.heuristikTeil('kategorien',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
@@ -2321,12 +2485,52 @@ async function objekt_schnellblick(ctx, args) {
 
          > Eine Zahl ohne ihr Objekt ist nicht pruefbar. Und eine Zahl
          > unter dem FALSCHEN Objekt sieht genauso aus wie eine richtige. */
-    hinweis: 'Schreibe die Adresse aus "adresse" WOERTLICH ueber die Zahlen — '
+    /* ── v2081 · EIN BLOCK STATT EINZELNER ZAHLEN ──────────────────────
+     *
+     * GEMESSEN am 10.10.2026 (Backlog N60.5): der Bot gab zu einem
+     * Objekt mit KP 180.000 und 940 EUR Miete vier Kennzahlen aus, von
+     * denen keine zu einer gemeinsamen Miete passt — 16.800 Jahresmiete
+     * (= 1.400/Monat), aber 4,80 % Rendite (= 720) und Faktor 20,8
+     * (= 721). Der Kern rechnet alle vier richtig (11.280 / 6,27 % /
+     * 15,96 / 9,40), direkt nachgerufen.
+     *
+     * Verboten war es dreifach: `agentLauf.js:103` („ZAHLEN ERFINDEST DU
+     * NIE"), Regel 2 („Summen NUR aus Zahlen, die ein Werkzeug geliefert
+     * hat"), Regel 3 („rechnest KEINE Renditen selbst") — und der
+     * Hinweis hier sagte „so wie sie hier stehen". Vier Verbote, alle
+     * gebrochen.
+     *
+     * > Ein vierter Appell waere der falsche Schluss. Was gerechnet
+     * > werden soll, darf nicht formulierbar sein — und einzelne Felder
+     * > SIND formulierbar: das Modell setzt sie in einen eigenen Satz
+     * > und schreibt dabei die Zahl neu.
+     *
+     * `kennzahlen_block` ist deshalb EIN fertiger Mehrzeiler. Ihn kann
+     * das Modell kopieren oder weglassen, aber nicht halb uebernehmen.
+     * Der Hinweis dazu steht VORNE, nicht am Ende. */
+    kennzahlen_block: [
+      _adrVon(o),
+      '',
+      'Jahreskaltmiete:    ' + rechnung.jahreskaltmiete,
+      'Bruttomietrendite:  ' + rechnung.bruttomietrendite,
+      'Kaufpreisfaktor:    ' + rechnung.kaufpreisfaktor
+    ].concat(
+      rechnung.kaufpreis_je_qm ? ['Kaufpreis je m²:    ' + rechnung.kaufpreis_je_qm] : []
+    ).concat(
+      rechnung.miete_je_qm ? ['Miete je m²:        ' + rechnung.miete_je_qm] : []
+    ).concat(
+      rechnung.nettokaltmiete_je_qm ? ['davon netto:        ' + rechnung.nettokaltmiete_je_qm] : []
+    ).join('\n'),
+
+    hinweis: 'GIB "kennzahlen_block" WOERTLICH UND VOLLSTAENDIG AUS, Zeile fuer '
+      + 'Zeile, bevor du etwas dazu sagst. Formuliere die Zahlen daraus NICHT '
+      + 'neu und rechne nichts nach — sie sind fertig und stammen aus dem '
+      + 'Rechenkern der App. Brauchst du eine Zahl, die dort nicht steht, '
+      + 'sagst du, dass sie fehlt. '
+      + 'Schreibe die Adresse aus "adresse" WOERTLICH ueber die Zahlen — '
       + 'nicht die, die der Nutzer gesagt hat. Weichen beide voneinander ab, '
       + 'nennst du die Zahlen NICHT, sondern sagst, welches Objekt du gefunden '
       + 'hast, und fragst nach. '
-      + 'Gib dem Nutzer die Zahlen MIT ihrem Rechenweg, so wie sie hier '
-      + 'stehen — sie sind fertig formatiert. '
       /* v1925: hier stand „Sag ausdruecklich, dass das noch kein Score ist".
          Es IST jetzt einer — und zwar der, den die App rechnet. */
       + 'Der Block "bewertung" traegt den DEAL-SCORE mit seiner Stufe, die '
@@ -3396,6 +3600,17 @@ const WERKZEUGE = [
     beschreibung: 'Alle Daten EINES Objekts: Kerndaten, Scores, Kennzahlen, Felder. '
       + 'Ohne Angabe wird das zuletzt besprochene Objekt genommen.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+
+  /* v2012 · Die Cockpit-Analyse - das Gegenstueck zu pilot_analyse_lesen. */
+  { name: 'portfolio_analyse_lesen', stufe: 'lesen', fn: portfolio_analyse_lesen,
+    beschreibung: 'Die gespeicherte PORTFOLIO-Analyse (Cockpit-Analyse) des Nutzers: '
+      + 'Vermoegensbilanz, Ertragslage, welche Objekte tragen und welche belasten, '
+      + 'Klumpenrisiken, Entwicklung und die naechsten Schritte - als Fliesstext, so '
+      + 'wie der Portfolio-Pilot sie geschrieben hat. Nutze es, wenn nach der '
+      + 'Gesamtbeurteilung, der Einschaetzung des Bestands, Klumpenrisiken oder '
+      + '"was soll ich als naechstes tun" gefragt wird. Fuer reine ZAHLEN nimm '
+      + 'portfolio_lesen. Kostet nichts; rechnet nichts neu. NENNE IMMER DEN STAND.',
+    parameter: { type: 'object', properties: {}, additionalProperties: false } },
 
   { name: 'portfolio_lesen', stufe: 'lesen', fn: portfolio_lesen,
     beschreibung: 'Die Portfolio-Zahlen in EINEM Aufruf: Vermoegensbilanz, Projektion '

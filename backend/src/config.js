@@ -24,7 +24,22 @@ const config = {
   auth: {
     jwtSecret: process.env.JWT_SECRET || '',
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
-    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '11', 10)
+    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '11', 10),
+
+    /* ══ v2136 · DIE GNADENFRIST (Backlog N60.3) ══════════════════════
+       Marcel: "Bei der Erstanmeldung besteht die Moeglichkeit, dass der
+       Kunde direkt Zugang zur App bekommt und spaetestens 6 Stunden nach
+       Erstanmeldung bestaetigen muss, sonst wird der Account gesperrt."
+
+       EINE Quelle fuer die Frist. Sie wird an drei Stellen gelesen: der
+       Anmeldung (Antwort mit Ablaufzeitpunkt), dem Login
+       (userService.authenticate) und JEDER Anfrage (middleware
+       authenticate). Drei Zahlen an drei Orten waeren drei Fristen.
+
+       > Eine Frist, die an mehreren Stellen steht, ist keine Frist,
+       > sondern eine Vermutung. Dieselbe Form wie die Score-Kette: ein
+       > Wert, eine Stelle, alle lesen von dort. */
+    verifyGnadenfristStunden: parseInt(process.env.VERIFY_GRACE_HOURS || '6', 10)
   },
 
   rateLimit: {

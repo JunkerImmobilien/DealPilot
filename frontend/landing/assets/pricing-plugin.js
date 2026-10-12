@@ -223,7 +223,7 @@
             _nkCard('Investor', '5 · 5 · 0', '8,75',  '5 Indikationen · 5 erweiterte') +
             _nkCard('Pro',      '5 · 5 · 5', '12,50', '5 · 5 · 5 Wertermittlungen') +
           '</div>' +
-          '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar · verfallen nicht · kein Abo.</p>' +
+          '<p class="dp-note" style="text-align:center;margin-top:14px">Bewertungen sind ab dem Starter-Plan zubuchbar · zugekaufte verfallen nicht · kein Abo.</p>' +
         '</div>' +
 
         // Feature-Übersicht

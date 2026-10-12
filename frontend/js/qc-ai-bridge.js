@@ -60,7 +60,10 @@
              der Widerspruch, den Marcel am 07.10.2026 beanstandet hat. */
           urteil: d.urteil || null,
           urteil_text: d.urteil_text || null,
-          avm: d.avm || null
+          avm: d.avm || null,
+          /* v1959: die Zielrendite der Lageklasse. `null` heisst: keine
+             Klasse gewaehlt - dann sagt der Prompt dazu nichts. */
+          zielBmr: (d.zielBmr != null ? d.zielBmr : null)
           /* Der Nutzerschlüssel geht bewusst NICHT mit: wer einen eigenen
              hat, pflegt ihn in den Einstellungen, und von dort holt ihn
              der Server-Pfad. Ein Schlüssel, der durch zwei Fenster

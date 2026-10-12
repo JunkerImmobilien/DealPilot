@@ -66,25 +66,15 @@ const werkzeuge = require('./agentWerkzeuge');
    /app/bot-wissen.md. Lokal ist es backend/bot-wissen.md — derselbe
    relative Weg. EIN Ort, keine Kopie: eine handgepflegte Datei zweimal zu
    haben heisst, sie laeuft auseinander. */
-const WISSEN_PFAD = path.join(__dirname, '..', '..', 'bot-wissen.md');
-let _wissen = null;
-function wissen() {
-  if (_wissen !== null) return _wissen;
-  try {
-    const t = fs.readFileSync(WISSEN_PFAD, 'utf8');
-    /* Der Kopf der Datei richtet sich an Marcel, nicht an das Modell —
-       alles bis zum ersten `---` ist Anleitung zum Pflegen. */
-    const i = t.indexOf('\n---\n');
-    _wissen = (i > 0 ? t.slice(i + 5) : t).trim();
-  } catch (e) {
-    /* Fehlt die Datei, laeuft der Agent weiter — aber OHNE Produktwissen,
-       und die Regel unten verbietet ihm dann jede Produktaussage. Lieber
-       ein Agent, der "weiss ich nicht" sagt, als einer, der raet. */
-    _wissen = '';
-    try { console.warn('[agentLauf] Projektwissen nicht lesbar: ' + WISSEN_PFAD); } catch (_) {}
-  }
-  return _wissen;
-}
+/* v2010 - HIER STAND DER LADER. Er ist nach services/projektwissen.js
+   gezogen, weil er jetzt DREI Leser hat: diesen Agenten, die
+   Pilot-Analyse und den Portfolio-Piloten. Gemessen hatte
+   bot-wissen.md bis v2010 genau EINEN - die beiden Piloten im
+   Browser trugen ihr Produktwissen hartkodiert im Prompt.
+   Abgeschrieben wird er nicht: zwei Lader heisst zwei
+   Wissensstaende, von denen keiner falsch aussieht. */
+const projektwissen = require('./projektwissen');
+const wissen = projektwissen.wissen;
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
 const RUNDEN_MAX = 6;
@@ -172,6 +162,40 @@ const SYSTEM =
 + '(in der App nachsehen, Marcel fragen). Eine erfundene Erklaerung fuer '
 + 'einen DealPilot-Begriff klingt wie eine echte und ist damit schlimmer '
 + 'als eine Luecke.\n'
+/* ══ v2016 · WAS IN EINER AUSKUNFT IMMER DRINSTEHT ══════════════════
+
+   Marcels Vorgabe woertlich: "Wenn ich nach wichtigen Daten frage,
+   moechte ich immer, wenn verfuegbar, DealScore und Investor DealScore
+   sowie alle beteiligten KPIs haben und eine textuelle
+   Gesamtbewertung. … Wenn moeglich auch immer den Stand nennen."
+
+   Die Werkzeuge liefern beide Scores laengst - in den Regeln stand
+   nirgends, dass sie auch GENANNT werden muessen. Derselbe Fehler wie
+   bei den Fotos: die Daten reisen mit, und ohne Auftrag passiert
+   nichts damit. In Marcels Telegram-Bildern sieht man es: auf "gib mir
+   alle Daten zur Parkstr" kommt eine lange Feldliste und kein Score. */
++ '7k. BEI JEDER AUSKUNFT ZU EINEM OBJEKT ODER ZUM BESTAND gehoeren vier '
++ 'Dinge in die Antwort, sobald sie verfuegbar sind:\n'
++ '    (a) BEIDE Scores: DealScore und Investor Deal Score, jeweils mit '
++ 'ihrer Stufe. Fehlt einer, sage WARUM er fehlt (meist: Angaben fehlen) '
++ 'statt ihn wegzulassen.\n'
++ '    (b) Die Kennzahlen, die dazugehoeren: Bruttomietrendite, '
++ 'Kaufpreisfaktor, Cashflow, DSCR, LTV. Nicht alle auf einmal vorlesen - '
++ 'die, die zur Frage passen, und bei "alle Daten" alle.\n'
++ '    (c) EINE Gesamtbewertung in Worten. Zahlen allein sind keine '
++ 'Auskunft: sag in zwei bis drei Saetzen, was sie zusammen bedeuten.\n'
++ '    (d) Den STAND: woher die Zahl kommt und wann sie entstand. Eine '
++ 'Pilot-Analyse von vor sechs Wochen sieht genauso aus wie eine von '
++ 'heute - der Unterschied steht nur im Datum. Liefert ein Werkzeug ein '
++ 'Stand-Feld, nenne es.\n'
++ '    Das gilt fuer "gib mir alle Daten zu X" genauso wie fuer "wie '
++ 'laeuft mein Portfolio". Es gilt NICHT, wenn der Nutzer ausdruecklich '
++ 'nur EINE Zahl will ("wie hoch ist die Miete") - dann antworte kurz.\n'
++ '7l. Fragt jemand nach der EINSCHAETZUNG des Gesamtbestands, nach '
++ 'Klumpenrisiken oder "was soll ich als naechstes tun", hole die '
++ 'gespeicherte Cockpit-Analyse mit portfolio_analyse_lesen und NENNE '
++ 'IHREN STAND. Fuer reine Zahlen nimm portfolio_lesen. Liegt keine '
++ 'Analyse vor, sage das und erfinde keine eigene Gesamtbeurteilung.\n'
 + '8. Keine Floskeln, keine Wiederholung der Frage. Antworte direkt.\n'
 + '9. ALLE Geldbetraege sind GANZE EURO, niemals Cent. 4721579 ist '
 + '"4.721.579 EUR", nicht "47.215,79". Du verschiebst kein Komma und '
@@ -243,14 +267,12 @@ async function laufen(frage, ctx, opts) {
   /* v1817 · Das Projektwissen als eigener Block NACH den Regeln und VOR
      der Lage. Beide sind über alle Anfragen gleich, das ist für den
      Prompt-Cache die richtige Reihenfolge: stabil zuerst. */
-  const _w = wissen();
+  /* v2019b - jetzt mit Marcels Ergaenzung aus den Einstellungen, und
+     die Einleitung kommt aus projektwissen selbst. Sie stand hier
+     inline UND dort - nebeneinander waere sie doppelt im Prompt. */
+  const _w = await projektwissen.blockFuer(ctx && ctx.userId);
   if (_w) {
-    eingabe.push({ role: 'system', content:
-      'PROJEKTWISSEN DEALPILOT. Das Folgende ist die EINZIGE Quelle für '
-      + 'Aussagen über das Produkt, seine Begriffe und seine Kennzahlen. '
-      + 'Steht eine Antwort hier nicht drin und liefert sie auch kein '
-      + 'Werkzeug, sagst du das — du erfindest KEINE Erklärung für einen '
-      + 'DealPilot-Begriff.\n\n' + _w });
+    eingabe.push({ role: 'system', content: _w });
   }
 
   /* Was der Agent ueber die Lage wissen muss, OHNE ein Werkzeug zu rufen —

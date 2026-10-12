@@ -109,9 +109,28 @@
   }
 
   /* Was gilt gerade — aus eigener Wahl oder Rueckfall. */
+  /* ── v2083a · DER RUECKFALL IST JETZT DIE DATENZEILE ──────────────────
+   *
+   * HIER STAND `'bordkarte'`. Das war Marcels Entscheidung vom
+   * 06.10.2026 (v1915: „die Aktenmappe würde ich erst mal standardmäßig
+   * mit der Bordkarte anzeigen").
+   *
+   * Am 10.10.2026 hat er sie ersetzt: „Ich würde gerne, dass wir das
+   * Standard-Design … auf die Aktenmappe legen" — mit der Objektkarte
+   * als **Datenzeile**. Das Onboarding setzt sie seit `v2083`; dieser
+   * Rückfall gilt für alle, die das Onboarding nie durchlaufen haben
+   * oder ihren Merker gelöscht haben.
+   *
+   * > Zwei Entscheidungen zur selben Frage, vier Tage auseinander. Wer
+   * > nur die eine umsetzt, baut einen Unterschied zwischen dem, was
+   * > neue Nutzer sehen, und dem, was Bestandsnutzer sehen — und beide
+   * > halten ihren Stand für den Standard.
+   *
+   * Die Bedingung `layoutAktiv()` bleibt: in der DealPilot-Ansicht ('')
+   * gibt es keine Schiene, dort darf kein Kartenstil hängen (v1949). */
   function effektiv() {
     if (gewaehlt !== null) return gewaehlt;
-    return layoutAktiv() ? 'bordkarte' : '';
+    return layoutAktiv() ? 'datenzeile' : '';
   }
 
   /* Eine eigene Wahl. Sie wird gemerkt UND angewandt. */
@@ -120,6 +139,24 @@
     try { localStorage.setItem(LS, gewaehlt); } catch (e) {}
     anwenden();
   }
+
+  /* ── v2083a · SETZEN OHNE ZU MERKEN ──────────────────────────────────
+   *
+   * Fuer eine Vorschau (Backlog N60.21 Teil 2). `setze()` schreibt immer
+   * in den Speicher — und ein iframe teilt den Speicher mit der
+   * Hauptseite, weil er dieselbe Herkunft hat. Eine Vorschau ueber
+   * `setze()` wuerde also die echte Einstellung des Nutzers
+   * ueberschreiben, und zwar genau dann, wenn er nur schauen wollte.
+   *
+   * `zeige()` setzt das Attribut und laesst den Speicher in Ruhe;
+   * `zurueck()` stellt den gemerkten Stand wieder her. */
+  function zeige(stil) {
+    var s = (stil && STILE[stil]) ? stil : '';
+    var h = document.documentElement;
+    if (s) h.setAttribute(ATTR, s); else h.removeAttribute(ATTR);
+    aktuell = s;
+  }
+  function zurueck() { anwenden(); }
 
   /* Das Attribut ans <html> — ohne Layout-Bedingung (v1949). */
   function anwenden() {
@@ -244,6 +281,9 @@
     /* v1949: ein Pruefer soll die ECHTE Entscheidung lesen koennen,
        nicht nur das Ergebnis. */
     gewaehlt: function () { return gewaehlt; },
-    anwenden: anwenden
+    anwenden: anwenden,
+    /* v2083a: fuer eine Vorschau, die den Speicher nicht anfasst. */
+    zeige: zeige,
+    zurueck: zurueck
   };
 })();

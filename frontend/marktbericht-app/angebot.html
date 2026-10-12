@@ -73,6 +73,10 @@
   .loading,.error{padding:60px 20px;text-align:center;color:var(--muted);}
   .error{color:var(--bad);}
   .disc{font-size:10.5px;color:#5e5e68;margin-top:8px;}
+
+    /* v2004 · OSM-Standard ist hell; dies macht daraus die dunkle
+       Fassung, die das Angebot immer hatte. Nur die Kachelebene. */
+    .amap-dunkel{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9)}
 </style>
 </head>
 <body>
@@ -266,8 +270,14 @@ function render(out, key) {
         bildung: { c: '#E8946A', l: 'Bildung' }, gastronomie: { c: '#D9685F', l: 'Gastronomie' },
       };
       const map = L.map('amap', { scrollWheelZoom: false, attributionControl: true }).setView([lat, lon], 15);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19,
+      /* v2004 · derselbe Befund wie im Bericht: Carto liefert ohne
+         Schluessel nur noch "API KEY REQUIRED". Einen DUNKLEN Kachelsatz
+         ohne Schluessel gibt es nicht - die Dunkelheit kommt deshalb per
+         Filter auf die echten OSM-Kacheln. Die Namensnennung bleibt
+         ungefiltert, sie haengt ausserhalb der Kachelebene. */
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap-Mitwirkende', maxZoom: 19,
+        className: 'amap-dunkel',
       }).addTo(map);
       // Objekt-Marker (Gold)
       L.circleMarker([lat, lon], { radius: 9, color: '#0a0a0c', weight: 2, fillColor: '#C9A84C', fillOpacity: 1 })

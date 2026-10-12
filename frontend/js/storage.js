@@ -54,6 +54,13 @@ var WM_FIELDS = [
 var FIELDS = [
   'plz','ort','str','hnr','objart','wfl','baujahr','wert_soll','kaufdat','wirtschaftlicher_uebergang','kuerzel','ausst',
   'thesis','risiken','notizen','bankval','svwert','makrolage','mikrolage',
+  /* v1958 - Die Lageklasse A/B/C. Ohne diesen Eintrag faellt sie beim
+     Speichern LAUTLOS weg - genau der Fall, den diese Datei weiter oben
+     schon mehrfach protokolliert. Sie steht neben makrolage/mikrolage,
+     weil sie dieselbe Karte teilt, ist aber etwas anderes: Makro- und
+     Mikrolage sind Einschaetzungen des STANDORTS, die Lageklasse ist
+     eine STRATEGIE-Entscheidung des Investors. */
+  'lageklasse',
   'vermstand','nutzungsart','exitstr','kp','makler_p','notar_p','gba_p','gest_p','ji_p',
   // V291.1-storage-cleanup: kp_kueche deprecated — Eingabe komplett über inv_* Felder
   // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
@@ -141,6 +148,13 @@ var FIELDS = [
   'bspar_quote_min', 'bspar_dar_z', 'bspar_dar_t',
   // V23: Mietentwicklung Detail-Modus
   'mietspiegel','me_modus','me_soll','me_anz','me_int','me_pct',
+  /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
+     Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
+     nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
+     Felder im Formular sichtbar und wuerden NICHT gespeichert: diese
+     Liste ist die Einsammelstelle, und was hier fehlt, verschwindet
+     beim Speichern lautlos. */
+  'mv_art','mv_beginn','mv_letzte_erhoehung',
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',
@@ -270,6 +284,17 @@ function collectData() {
   if (ekNk) d['_ek_ist_nk'] = ekNk.checked;
   /* v1448: Einheitenliste des Mehrfamilienhauses (mfh-einheiten.js) */
   if (window._dpMfh && window._dpMfh.einheiten && window._dpMfh.einheiten.length) d._mfh = window._dpMfh;
+  /* v2068: das Ergebnis des RND-Wizards (deal-action.js). Gleiches
+     Muster wie `_mfh` - es haengt an einem Fenster-Merker, nicht an
+     einem Formularfeld, und war deshalb nach dem Schliessen des
+     Fensters weg. `afa_rnd_jahre` bleibt unberuehrt: das ist die
+     EINGABE des Nutzers, dies hier der VORSCHLAG des Wizards. */
+  if (window._dpRnd && window._dpRnd.rnd_jahre) d._rnd = window._dpRnd;
+  /* v2030: der eingefrorene Ankauf-Stand (ankauf.js). Gleiches Muster
+     wie `_mfh` - der Zustand haengt an einem Fenster-Merker, nicht an
+     einem zweiten Ladeweg. `daten` wird mitgeschrieben, aber NIE hier
+     erzeugt: das macht `DealPilotAnkauf.festschreiben()`. */
+  if (window._dpAnkauf && window._dpAnkauf.daten) d._ankauf = window._dpAnkauf;
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -443,6 +468,9 @@ function loadData(d) {
   // Beispiel: Objekt A hat san=12000, Objekt B hat keinen san-Wert → ohne diesen Reset
   // bleibt san=12000 im DOM → GI von B = kp_B + nk_B + 12000 (falsch).
   var resetFields = [
+    /* v1958: ohne diesen Eintrag traegt Objekt B die Lageklasse von
+       Objekt A weiter - und an ihr haengt eine Rechnung. */
+    'lageklasse',
     'san', 'moebl',                              // GI-Aufschläge (calc.js Z.433)
     'umlagef', 'ze',                              // Mieten-Aufschläge (calc.js Z.509)
     'grundsteuer', 'ul_sonst',                    // BWK ul (calc.js Z.545)
@@ -549,6 +577,14 @@ function loadData(d) {
   if (ekNkL) ekNkL.checked = !!d._ek_ist_nk;
   /* v1448: Einheitenliste - fehlt sie, ist sie leer (sonst erbte das Objekt die des vorigen) */
   window._dpMfh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh : null;
+  /* v2068: RND-Ergebnis. Fehlt es, ist es NULL - sonst erbte das
+     geladene Objekt die Restnutzungsdauer des vorigen, und zwar eine,
+     die zu seinen Bauteilen gar nicht passt. */
+  window._dpRnd = (d._rnd && d._rnd.rnd_jahre) ? d._rnd : null;
+  /* v2030: Ankauf-Stand. Fehlt er, ist er NULL - sonst erbte das
+     geladene Objekt den Stand des vorigen, und zwar einen, der auf
+     eine fremde Adresse zeigt. */
+  window._dpAnkauf = (d._ankauf && d._ankauf.daten) ? d._ankauf : null;
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
@@ -598,7 +634,21 @@ function loadData(d) {
   }
   // V23: Mietentwicklungs-Modus aus dem geladenen Wert übernehmen + UI synchen
   if (window.MietEntwicklung && typeof MietEntwicklung.refresh === 'function') {
-    var mMode = (d.me_modus === 'detail') ? 'detail' : 'prog';
+    /* v2026 - HIER STAND `(d.me_modus === 'detail') ? 'detail' : 'prog'`.
+
+       Seit v2024 gibt es DREI Modi. `me_modus` steht in der Feldliste
+       (Z. 150) und wird gespeichert - aber diese Zeile kannte den
+       dritten nicht und warf ihn beim Laden stumm auf `prog`.
+
+       Wer Aus Wohnungen" waehlte, speicherte und neu lud, bekam die
+       geometrische Progression zu sehen. Ohne Meldung, ohne Luecke -
+       nur eine andere Zahl.
+
+       Die Absicherung braucht es hier NICHT: `getMode()` prueft selbst
+       bei jedem Lesen, ob eine Wohnung mit Haken da ist, und faellt
+       sonst auf `prog`. Hier zu pruefen waere zu frueh - die Einheiten
+       sind beim Laden noch nicht gesetzt. */
+    var mMode = (d.me_modus === 'detail' || d.me_modus === 'einheiten') ? d.me_modus : 'prog';
     MietEntwicklung.setMode(mMode);  // ruft intern auch calc()
   }
   /* v1814 · UND IMMER SOFORT RECHNEN.
@@ -1193,6 +1243,15 @@ function invalidateRenderCache() {
 window.invalidateRenderCache = invalidateRenderCache;
 
 async function renderSaved(opts) {
+  /* v2031a - HIER, nicht auf oberster Ebene. `_renderRichCard` ist in
+     DIESER Funktion deklariert (Z. 1333); ein Export davor lief gegen
+     ein undefiniertes Symbol. Funktionsdeklarationen werden im Bereich
+     hochgezogen, deshalb steht die Zeile sicher ganz oben.
+
+     `node --check` hat das NICHT gesehen - die Syntax war in Ordnung.
+     Gefangen hat es erst `tools/frontend-konstanten.mjs`, also ein
+     echter Lauf: "FEHLGESCHLAGEN: _renderRichCard is not defined". */
+  window._renderRichCard = _renderRichCard;
   // V314b-rendersaved-token-check: Vor Login KEIN /objects-Fetch.
   // Stille Rueckkehr — Sidebar bleibt im natuerlichen Zustand.
   if (!window.Auth || typeof window.Auth.isLoggedIn !== 'function' || !window.Auth.isLoggedIn()) {
@@ -1298,6 +1357,25 @@ async function renderSaved(opts) {
     } catch (e) { return String(v); }
   }
   function _renderRichCard(opts) {
+    /* v2031 - die Zutaten je Objekt merken. Die Doppelkarte baut ihre
+       Rueckseite daraus: dasselbe Objekt, dieselbe Adresse, dasselbe
+       Bild - nur die Zahlen vom Ankauf.
+
+       Das steht HIER und nicht an den zwei Aufrufstellen: so kann
+       keine vergessen werden, und eine dritte bekaeme es umsonst. */
+    try {
+      /* v2031b - NICHT merken, wenn die Doppelkarte selbst gebaut hat.
+         Sonst ueberschreibt ihr eigener Aufruf den Merker mit den
+         Ankauf-Zutaten, und die Vorderseite wird danach aus ihnen
+         gebaut - die Karte liess sich nicht mehr zurueckdrehen.
+         Gemessen: nach einer Drehung trug _dkOpts[key].ankaufBand ein
+         Datum. Ein Merker, der von seinem eigenen Leser beschrieben
+         wird, ist keiner. */
+      if (opts && opts.key && !opts._dkAbgeleitet) {
+        if (!window._dkOpts) window._dkOpts = {};
+        window._dkOpts[opts.key] = opts;
+      }
+    } catch (e) {}
     var addr = _shortAddr(opts.name);
     var seqHtml = opts.seq
       ? '<span class="sbc-seq' + (opts.isDuplicateSeq ? ' sbc-seq-dup' : '') + '"' +
@@ -1462,7 +1540,14 @@ async function renderSaved(opts) {
         '</div>'
       : '';
 
-    return '<div class="sb-card' + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
+    /* v2031 - das Goldband der Rueckseite. Ohne es saehe der Ankauf
+       aus wie der laufende Stand mit anderen Zahlen - und wer die
+       Karte nur halb im Blick hat, liest den Ankaufspreis als
+       heutigen. Ein Band, das sagt was man sieht, ist hier keine
+       Zierde. */
+    var ankaufBand = '';
+    return '<div class="sb-card' + (opts.ankaufBand ? ' sb-card-ankauf' : '') + (opts.isActive ? ' active' : '') + (opts.showInvestor ? ' has-investor-ribbon' : '') + (opts.dealWon ? ' deal-won' : '') + (opts.dealLost ? ' deal-lost' : '') /* V248-03 */ + '" data-key="' + _esc(opts.key) + '"' + (opts.dateUpdated ? ' data-updated="' + _esc(opts.dateUpdated) + '"' : '') /* v844-card-kaufdat: updated_at fuers Filtern */ + ' data-tip="' + _esc((opts.seq ? opts.seq + ' · ' : '') + (opts.name || '')) + '">' +
+      ankaufBand +
       investorRibbon +
       wonRibbon +
       lostRibbon + /* V322-lost-ribbon-html */
@@ -1472,6 +1557,21 @@ async function renderSaved(opts) {
         '<div class="sbc-top-body">' +
           '<div class="sbc-top-line1">' +
             seqHtml +
+            /* v2036 - HIER STAND DER DREH-KNOPF. Marcel: vielleicht
+               machen wir oben dann einen Umschalter ... dann bleiben die
+               Karten wie sie sind."
+
+               Drei Anlaeufe hat der Knopf auf der Karte gekostet: absolut
+               gesetzt lag er ueber einer Kennzahl (v2031), im Fluss
+               ordnete ihn jede Fassung anders ein (v2032), und das
+               Goldband frass in der schmalen Fassung die ganze Zeile
+               (v2035). Grund ist immer derselbe: die Karte hat VIER
+               Darstellungsachsen, und jede Zugabe muss in allen
+               Kombinationen passen.
+
+               Ein Schalter AUSSERHALB der Karte muss das nicht. Die
+               Karte bleibt, wie sie gebaut ist; gewechselt werden nur
+               die Zahlen darin (doppelkarte.js). */
             aiHtml +
             ds2HintBadge +
             (opts.date ? '<span class="sbc-date">' + _esc(opts.date) + '</span>' : '') +
@@ -1566,24 +1666,14 @@ async function renderSaved(opts) {
         return;
       }
       // V63.27: Sortierung — aktives Objekt zuerst, dann nach Sort-Modus
-      var sortMode = (window.localStorage && localStorage.getItem('dp_sb_sort')) || 'recent';
+      var sortMode = _sbSortModus();
       // V98: items klonen damit Sort den Cache nicht mutiert
       items = items.slice();
-      items.sort(function(a, b) {
-        // Aktives Objekt IMMER zuerst
-        if (a.id === _currentObjKey && b.id !== _currentObjKey) return -1;
-        if (b.id === _currentObjKey && a.id !== _currentObjKey) return 1;
-        // Sonst nach gewähltem Modus
-        if (sortMode === 'id') {
-          // Nach seq_no ABsteigend (höchste/neueste ID zuerst)
-          var sa = (a.seq_no || ''), sb = (b.seq_no || '');
-          if (sa < sb) return 1;
-          if (sa > sb) return -1;
-          return 0;
-        } else {
-          // Default: zuletzt bearbeitet zuerst
-          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
-        }
+      items.sort(_sbVergleich(sortMode));
+      /* v1982: die Paare fuer die Gruppenkoepfe, aus DEMSELBEN Array wie die
+         Karten - sonst zeigt ein Kopf auf eine Karte, die woanders steht. */
+      _sbLagePaare = items.map(function(o) {
+        return { key: o.id, klasse: _sbLageVon(o) };
       });
 
       // V63.25: Duplikat-Detection — Set aller seq_no und markieren welche doppelt vorkommen
@@ -1674,6 +1764,9 @@ async function renderSaved(opts) {
                    ds2Score >= 50 ? 'sbc-score-gold' : 'sbc-score-red';
         }
         return _renderRichCard({
+          /* v2031: die Ankauf-Spalten aus der Listenabfrage (v2030) */
+          ankaufKurz: o.ankauf_kurz || null,
+          ankaufStichtag: o.ankauf_stichtag || null,
           key: o.id,
           seq: o.seq_no || '',
           isDuplicateSeq: !!(o.seq_no && _dupSeqs[o.seq_no]),       // V63.25
@@ -1699,6 +1792,7 @@ async function renderSaved(opts) {
           halter: _halterName(o.halter)
         });
       }).join('');   /* v1512: der Knopf steht jetzt OBEN */
+      _sbLageKoepfeEinsetzen(list);   /* v1982 */
       list.querySelectorAll('.sb-card').forEach(function(el) {
         el.addEventListener('click', function() {
           // V102: Burger-Menü auf Mobile sofort schließen wenn ein Objekt angeklickt wird
@@ -1719,7 +1813,30 @@ async function renderSaved(opts) {
         if (Auth.isLoggedIn()) return k.startsWith(prefix);
         return k.startsWith('ji_') && !k.startsWith('ji_u_') &&
                !['ji_ak','ji_ak_oai','ji_provider','ji_sb_collapsed','ji_users','ji_session','ji_token'].includes(k);
-      }).sort().reverse();
+      });
+      /* ══ v1982 · DER LOKALE PFAD SORTIERTE NUR NACH SCHLUESSELNAMEN ══
+
+         GEMESSEN: hier stand `.sort().reverse()` auf den
+         localStorage-Schluesseln. Der ID-Knopf aus V63.27 hatte in
+         diesem Pfad also noch NIE eine Wirkung - er sah aus wie ein
+         Schalter und war keiner. Aufgefallen beim Bau des Menues: ein
+         Modus mehr macht einen toten Schalter nicht sichtbarer.
+
+         Jetzt laeuft derselbe Vergleich wie im Server-Pfad. Dafuer muss
+         einmal geparst werden - bei einem lokalen Bestand ohne Konto ist
+         das eine Handvoll Objekte. */
+      var _lokal = keys.map(function (k) {
+        var d = {};
+        try { d = JSON.parse(localStorage.getItem(k) || '{}'); } catch (e) {}
+        return { id: k, seq_no: d.seq_no || d._seq || k, updated_at: d._at || 0,
+                 kaufdat: d.kaufdat || (d.data && d.data.kaufdat) || null,
+                 lageklasse: d.lageklasse || (d.data && d.data.lageklasse) || null };
+      });
+      _lokal.sort(_sbVergleich(_sbSortModus()));
+      _sbLagePaare = _lokal.map(function (o) {
+        return { key: o.id, klasse: _sbLageVon(o) };
+      });
+      keys = _lokal.map(function (o) { return o.id; });
 
     if (!keys.length) {
       list.innerHTML = _addNewBtn() + '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>';
@@ -1750,6 +1867,9 @@ async function renderSaved(opts) {
       }
       var showInvestorLs = !!(hasDs2FeatureLs && d._ds2_computed);
       return _renderRichCard({
+        /* v2031: im lokalen Pfad liegt der Stand im Datensatz selbst */
+        ankaufKurz: (d._ankauf && d._ankauf.kurz) ? d._ankauf.kurz : null,
+        ankaufStichtag: (d._ankauf && d._ankauf.stichtag) ? d._ankauf.stichtag : null,
         key: k,
         seq: d._obj_seq || '',
         name: d._name || 'Unbenannt',
@@ -1771,6 +1891,7 @@ async function renderSaved(opts) {
         halter: _halterName(d.halter || (d.data && d.data.halter))
       });
     }).join('');   /* v1512: der Knopf steht jetzt OBEN */
+    _sbLageKoepfeEinsetzen(list);   /* v1982 */
     list.querySelectorAll('.sb-card').forEach(function(el) {
       el.addEventListener('click', function() {
         // V102: Burger-Menü auf Mobile sofort schließen
@@ -1980,6 +2101,61 @@ function _resetUiAfterDelete() {
 // ══════════════════════════════════════════════════
 // EXPORT / IMPORT
 // ══════════════════════════════════════════════════
+/* v2045 - EINE Beschaffung fuer beide Sicherungswege.
+
+   Marcel: pass die DealPilot-Sicherung an." Beide Wege - alle und
+   einzeln - holen dasselbe Paket vom Server: Objekte PLUS Lexikon,
+   Score-Stufen, Einheiten-Hinweise, Projektwissen und die eigene
+   Ergaenzung. Die Datei bleibt `.dpkt` und ist damit beides:
+   wiederherstellbar und lesbar.
+
+   `objektId` filtert auf ein Objekt - das Lexikon bleibt dabei
+   vollstaendig. Es kostet 60 KB und macht die Datei erst brauchbar;
+   eine Einzeldatei ohne Lexikon waere wieder nur eine Liste aus
+   Kuerzeln. */
+async function _dpSicherungsPaket(objektId) {
+  var mitFotos = _v893rExpPhotos();
+  var paket = await Auth.apiCall('/objects/portfolio-export' + (mitFotos ? '?fotos=1' : ''));
+  if (!paket || !Array.isArray(paket.objekte)) throw new Error('Der Export kam leer zurueck');
+  /* v2048b - der Stand wird geprueft, BEVOR eine Datei entsteht.
+
+     Marcel: "vorher soll der Stand geprueft werden und wenn veraltet
+     gefragt werden, ob erst aktualisiert werden soll vor dem Export."
+
+     Hier und nicht in den zwei Aufrufern: beide Sicherungswege - alle
+     und einzeln - laufen durch diese Funktion. Eine Pruefung je
+     Aufrufer waere eine Liste, die beim naechsten Weg unvollstaendig
+     ist. */
+  if (window.DealPilotPortfolioExport
+      && typeof DealPilotPortfolioExport.standPruefenUndFragen === 'function') {
+    if (!DealPilotPortfolioExport.standPruefenUndFragen(paket)) {
+      throw new Error('abgebrochen');
+    }
+  }
+  if (objektId) {
+    paket.objekte = paket.objekte.filter(function (o) { return o.id === objektId; });
+    paket.anzahl_objekte = paket.objekte.length;
+    paket.auswahl = 'einzelnes Objekt';
+  }
+  return paket;
+}
+
+/* v2045 - die Tabelle faellt zusaetzlich ab, aber NUR
+   unverschluesselt: eine verschluesselte Sicherung neben einer
+   offenen Tabelle waere ein Schloss an einer offenen Tuer. */
+function _dpSicherungCsv(paket) {
+  if (window._exportEncrypt) return;
+  if (!window.DealPilotPortfolioExport) return;
+  try {
+    var csv = DealPilotPortfolioExport._csvAus(paket);
+    var b = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'DealPilot_Portfolio_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.csv';
+    a.click();
+  } catch (e) { console.warn('[v2045] CSV:', e.message); }
+}
+
 function _v893rExpPhotos(){ try { return localStorage.getItem('dp_export_photos') !== '0'; } catch(e){ return true; } } /* v893r-expphotos */
 /* v893t-crypto: AES-GCM Passwort-Verschluesselung (Web-Crypto) */
 async function _dpDeriveKey(password, salt) {
@@ -2006,29 +2182,16 @@ async function exportAllJSON() {
     else alert('Objekt-Sicherung (Import/Export) ist im Pro-Plan enthalten.');
     return;
   }
-  var all = [];
-  if (Auth.isApiMode()) {
-    try {
-      var resp = await Auth.apiCall('/objects?limit=500');
-      // Need full objects, not just summaries
-      for (var i = 0; i < (resp.items || []).length; i++) {
-        var full = await Auth.apiCall('/objects/' + resp.items[i].id);
-        all.push({
-          data: full.data, ai_analysis: full.ai_analysis,
-          photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at
-        });
-      }
-    } catch (err) { toast('⚠ Export-Fehler: ' + err.message); return; }
-  } else {
-    var prefix = Auth.isLoggedIn() ? Auth.getStorageKey('obj_') : 'ji_';
-    var keys = Object.keys(localStorage).filter(function(k) {
-      if (Auth.isLoggedIn()) return k.startsWith(prefix);
-      return k.startsWith('ji_') && !k.startsWith('ji_u_') &&
-             !['ji_ak','ji_ak_oai','ji_provider','ji_sb_collapsed','ji_users','ji_session','ji_token'].includes(k);
-    });
-    all = keys.map(function(k) { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch(e) { return {}; } });
-  }
-  var _out = JSON.stringify(all, null, 2); /* v893t-crypto */
+  /* v2045 - das volle Paket statt einer blossen Objektliste.
+     Der alte Weg holte je Objekt einen Abruf und legte `data`,
+     `ai_analysis` und `photos` nebeneinander - ohne jede Angabe,
+     was die 280 Kuerzel darin bedeuten. */
+  var paket;
+  try { paket = await _dpSicherungsPaket(null); }
+  catch (err) { toast('\u26a0 Export-Fehler: ' + err.message); return; }
+  var all = paket;
+  var _anzahl = paket.objekte.length;
+  var _out = JSON.stringify(all, null, 2); /* v893t-crypto, v2045: `all` ist das Paket */
   if (window._exportEncrypt) {
     var _pw = window.prompt('Passwort für die Verschlüsselung vergeben — unbedingt merken! Ohne Passwort ist das Backup nicht wiederherstellbar.');
     if (!_pw) { toast('Export abgebrochen (kein Passwort)'); return; }
@@ -2039,7 +2202,8 @@ async function exportAllJSON() {
   a.href = URL.createObjectURL(blob);
   a.download = 'DealPilot_Objekte_' + new Date().toISOString().replace(/[:T.]/g, '-').slice(0, 17) + '.dpkt';  // V251-05
   a.click();
-  toast('✓ ' + all.length + ' Objekte exportiert');
+  toast('✓ ' + _anzahl + ' Objekte gesichert - mit Feld-Lexikon und Wissen');
+  _dpSicherungCsv(paket);
 }
 
 // V63.44: Direkter Alias für die neue Sidebar-Aktion
@@ -2061,31 +2225,23 @@ async function exportSingleObjectJson(objId) {
     return;
   }
   if (!objId) { toast('⚠ Kein Objekt ausgewählt'); return; }
-  var single = null;
-  try {
-    if (Auth.isApiMode()) {
-      var full = await Auth.apiCall('/objects/' + objId);
-      single = {
-        data: full.data, ai_analysis: full.ai_analysis,
-        photos: (_v893rExpPhotos() ? full.photos : []), name: full.name, created_at: full.created_at
-      };
-    } else {
-      var raw = localStorage.getItem(objId);
-      if (raw) single = JSON.parse(raw);
-    }
-  } catch (e) {
-    toast('⚠ Objekt konnte nicht geladen werden: ' + e.message);
-    return;
-  }
-  if (!single) { toast('⚠ Objekt nicht gefunden'); return; }
+  /* v2045 - dasselbe Paket wie bei alle", nur auf ein Objekt
+     gefiltert. Das Lexikon bleibt dabei vollstaendig: eine
+     Einzeldatei ohne Lexikon waere wieder nur eine Liste aus
+     Kuerzeln. */
+  var paket = null;
+  try { paket = await _dpSicherungsPaket(objId); }
+  catch (e) { toast('\u26a0 Objekt konnte nicht geladen werden: ' + e.message); return; }
+  if (!paket.objekte.length) { toast('\u26a0 Objekt nicht gefunden'); return; }
+  var single = paket.objekte[0];
 
   // Dateiname aus Adresse / Kürzel
-  var d = single.data || {};
+  var d = single.daten || single.data || {};   /* v2045: das Paket nennt es `daten` */
   var nameSlug = (d.kuerzel || d.str || single.name || 'objekt')
     .toString()
     .replace(/[^a-zA-Z0-9_-]/g, '_')
     .substring(0, 40);
-  var _out = JSON.stringify([single], null, 2); /* v893t-crypto */
+  var _out = JSON.stringify(paket, null, 2); /* v2045: das ganze Paket, nicht nur das Objekt */
   if (window._exportEncrypt) {
     var _pw = window.prompt('Passwort für die Verschlüsselung vergeben — unbedingt merken! Ohne Passwort ist die Datei nicht wiederherstellbar.');
     if (!_pw) { toast('Export abgebrochen (kein Passwort)'); return; }
@@ -2114,6 +2270,36 @@ function _buildXlsxRowForObject(o) {
   var cfns = d._kpis_cf_ns != null ? d._kpis_cf_ns : '';
   var ds1 = d._dealpilot_score != null ? d._dealpilot_score : '';
   var ds2 = d._ds2_score != null ? d._ds2_score : '';
+  /* v2044 - die Felder aus dieser Woche. Sie standen bisher in der
+     App und in keiner Tabelle - genau der Fall, den N60.13
+     beschreibt: ein Feld ist erst fertig, wenn es auch exportiert
+     werden kann. */
+  var _ank = (d._ankauf && d._ankauf.stichtag) ? d._ankauf.stichtag : '';
+  /* v2070 - der Marktbericht haengt NEBEN den Daten (eigene Datenbank). */
+  var _mb = o.marktbericht || null;
+  var _mbV = (_mb && _mb.verlauf && _mb.verlauf.length) ? _mb.verlauf : null;
+  var _mbDelta = '';
+  if (_mbV && _mbV.length > 1) {
+    /* Aus EINEM Bericht laesst sich keine Entwicklung ablesen. */
+    var _a = Number(_mbV[0].marktwert_eur) || 0;
+    var _b = Number(_mbV[_mbV.length - 1].marktwert_eur) || 0;
+    if (_a) _mbDelta = Math.round((_b - _a) / _a * 1000) / 10;
+  }
+  var _status = (d._deal_won === true || d._deal_won === 'true') ? 'gewonnen'
+    : ((d._deal_lost === true || d._deal_lost === 'true') ? 'verloren' : 'offen');
+  var _me = d.me_modus === 'einheiten' ? 'Aus Wohnungen'
+    : (d.me_modus === 'detail' ? 'Stufenplan' : 'Gleichmaessige Steigerung');
+  /* Einheiten als ZAHLEN, nicht als Liste: verschachtelte Vertraege
+     in einer Zelle sind keine Tabelle. Wer sie einzeln braucht,
+     nimmt den JSON-Export - der traegt `_mfh` vollstaendig. */
+  var _eh = (d._mfh && Array.isArray(d._mfh.einheiten)) ? d._mfh.einheiten : [];
+  var _ehPlan = _eh.filter(function (e) { return e && e.mv_in_mietentwicklung; }).length;
+  var _ehIndex = _eh.filter(function (e) { return e && e.mv_art === 'index'; }).length;
+  var _analyseStand = '';
+  try {
+    var _a = o.ai_analysis ? JSON.parse(o.ai_analysis) : null;
+    if (_a && _a._fuer && _a._fuer.stand) _analyseStand = String(_a._fuer.stand).slice(0, 10);
+  } catch (e) {}
   return {
     Name: name,
     Kuerzel: d.kuerzel || '',
@@ -2140,8 +2326,87 @@ function _buildXlsxRowForObject(o) {
     Verkehrswert: d.svwert || '',
     Bankbewertung: d.bankval || '',
     Sanierungsbedarf: d.san || '',
+    /* v2044 - ab hier die Felder aus N60.13 */
+    Lageklasse: d.lageklasse || '',
+    Status: _status,
+    Lastenwechsel: d.wirtschaftlicher_uebergang || '',
+    Ankauf_Stand: _ank,
+    Mietentwicklung: _me,
+    Einheiten_erfasst: _eh.length || '',
+    Einheiten_im_Mietplan: _eh.length ? _ehPlan : '',
+    Einheiten_Indexmiete: _eh.length ? _ehIndex : '',
+    Analyse_Stand: _analyseStand,
+    /* ═══ v2070 · VIER SPALTEN AUS DEM MARKTBERICHT ═════════════════════
+       Marcel: „ob wir dann auch alle Marktberichtdaten auch mit
+       uebergeben koennen. Also dass wir wirklich was Vollumfaengliches
+       haben."
+
+       Der Marktbericht liegt in einer EIGENEN Datenbank und steht
+       deshalb nicht in `o.data`, sondern als `o.marktbericht` daneben -
+       angehaengt von den Aufrufern aus dem Export-Paket (v2069). Fehlt
+       er, bleiben die Spalten leer; eine 0 waere eine Aussage, die
+       niemand gemessen hat.
+
+       Den vollen Verlauf traegt die JSON-Sicherung. Hier stehen die
+       vier, die in eine Tabelle gehoeren: heutiger Wert, Zahl der
+       Berichte, Beginn der Reihe und was daraus wurde. */
+    Marktwert: (_mb && _mb.stand && _mb.stand.marktwert_eur) || '',
+    Marktberichte: _mbV ? _mbV.length : ((_mb && _mb.stand && _mb.stand.berichte) || ''),
+    Erster_Bericht: _mbV ? String(_mbV[0].datum).slice(0, 10) : '',
+    Wertentwicklung_Pct: _mbDelta,
+
+    /* ── v2086 · DIE RESTNUTZUNGSDAUER UND DAS MIETVERHAELTNIS ────────
+       Backlog N60.13: "ALLE neuen Felder muessen durch".
+
+       RND: `_rnd` wird seit v2068 am Objekt festgehalten (der Wizard
+       schreibt es, `storage.js:285` nimmt es mit). In der Tabelle
+       stehen die Zahl und das Verfahren - nicht die sechs
+       Einzelverfahren, die gehoeren in die JSON-Sicherung.
+
+       NICHT zu verwechseln mit `afa_rnd_jahre` im Reiter Steuer: dort
+       steht, was der Nutzer ANGESETZT hat. Weichen beide ab, ist das
+       ein Befund und kein Fehler - deshalb stehen beide Spalten da und
+       nicht eine zusammengerechnete.
+
+       Vertragsart: es gibt KEIN Objektfeld dafuer - die Mietvertraege
+       haengen heute nur an den MFH-Einheiten (`_mfh.einheiten[].mv_art`,
+       Backlog N60.8-alt). Fuer ein MFH wird deshalb die haeufigste Art
+       genannt, mit der Zahl dahinter; fuer alle anderen Objektarten
+       bleibt die Spalte LEER statt eine Art zu erfinden, die nirgends
+       eingegeben wurde. */
+    RND_Jahre: (d._rnd && d._rnd.rnd_jahre != null) ? d._rnd.rnd_jahre : '',
+    RND_Verfahren: (d._rnd && d._rnd.verfahren) || '',
+    RND_Stand: (d._rnd && d._rnd.stand) || '',
+    AfA_RND_angesetzt: d.afa_rnd_jahre || '',
+    Vertragsart: _mietvertragsArt(d),
+    Ankauf_Stichtag: (d._ankauf && d._ankauf.stichtag)
+      || o.ankauf_stichtag || o.ankaufStichtag || '',
     Anlage: o.created_at ? o.created_at.slice(0, 10) : ''
   };
+}
+
+/* ── v2086 · Die Vertragsart eines Objekts, soweit es eine gibt ────────
+   Nur MFH-Einheiten fuehren `mv_art`. Genannt wird die haeufigste mit
+   ihrer Zahl ("Index 4 von 6"), weil eine einzelne Art bei sechs
+   Wohnungen nichts aussagt. Fuehrt keine Einheit eine Art, bleibt es
+   leer - eine leere Zelle ist ehrlicher als "unbekannt", das wie eine
+   erfasste Angabe aussieht. */
+function _mietvertragsArt(d) {
+  try {
+    var e = d && d._mfh && d._mfh.einheiten;
+    if (!Array.isArray(e) || !e.length) return '';
+    var zaehl = {}, mit = 0;
+    e.forEach(function (x) {
+      var a = x && x.mv_art ? String(x.mv_art).trim() : '';
+      if (!a) return;
+      mit++;
+      zaehl[a] = (zaehl[a] || 0) + 1;
+    });
+    if (!mit) return '';
+    var beste = '', n = 0;
+    Object.keys(zaehl).forEach(function (k) { if (zaehl[k] > n) { n = zaehl[k]; beste = k; } });
+    return beste + ' (' + n + ' von ' + e.length + ')';
+  } catch (x) { return ''; }
 }
 
 /**
@@ -2174,6 +2439,16 @@ async function exportSingleObjectExcel(objId) {
     return;
   }
   if (!single) { toast('⚠ Objekt nicht gefunden'); return; }
+
+  /* v2070 - derselbe Zusatz wie beim Gesamtexport: der Marktbericht
+     liegt in einer eigenen Datenbank und kommt ueber den Export-Endpunkt. */
+  try {
+    var _p1 = await Auth.apiCall('/objects/portfolio-export');
+    if (_p1 && Array.isArray(_p1.objekte)) {
+      var _tr = _p1.objekte.filter(function (x) { return x && x.id === single.id; })[0];
+      if (_tr && _tr.marktbericht) single.marktbericht = _tr.marktbericht;
+    }
+  } catch (e) { try { console.warn('[Export] Marktbericht nicht geladen:', e.message); } catch (x) {} }
 
   var row = _buildXlsxRowForObject(single);
   var ws = XLSX.utils.json_to_sheet([row]);
@@ -2223,6 +2498,23 @@ async function exportAllObjectsExcel() {
   } catch (e) { toast('⚠ Export-Fehler: ' + e.message); return; }
 
   if (!all.length) { toast('⚠ Keine Objekte zum Exportieren gefunden'); return; }
+
+  /* ═══ v2070 · DEN MARKTBERICHT DAZUHOLEN ════════════════════════════
+     Diese Liste kommt aus `/objects` bzw. aus dem Browserspeicher - dort
+     steht der Marktbericht nicht, er liegt in einer eigenen Datenbank.
+     Ein Aufruf des Export-Endpunkts reicht, um ihn je Objekt anzuhaengen.
+
+     Faellt er aus, laeuft der Export trotzdem: die vier Spalten bleiben
+     dann leer. Eine Excel-Datei gar nicht zu schreiben, weil ein
+     Nachbardienst schweigt, waere die schlechtere Antwort. */
+  try {
+    var _p = await Auth.apiCall('/objects/portfolio-export');
+    if (_p && Array.isArray(_p.objekte)) {
+      var _nach = {};
+      _p.objekte.forEach(function (x) { if (x && x.marktbericht) _nach[x.id] = x.marktbericht; });
+      all.forEach(function (o) { if (o && _nach[o.id]) o.marktbericht = _nach[o.id]; });
+    }
+  } catch (e) { try { console.warn('[Export] Marktberichte nicht geladen:', e.message); } catch (x) {} }
 
   var rows = all.map(_buildXlsxRowForObject);
   var ws = XLSX.utils.json_to_sheet(rows);
@@ -2287,7 +2579,26 @@ async function importJSON(inp) {
         try { var _dec = await _dpDecryptJson(data, _pw); data = JSON.parse(_dec); }
         catch (err) { toast('⚠ Falsches Passwort oder beschädigte Datei'); inp.value = ''; return; }
       }
-      var arr = Array.isArray(data) ? data : [data];
+      /* v2045 - das neue Sicherungsformat erkennen.
+
+         `Array.isArray(data) ? data : [data]` haette das umhuellte
+         Paket als EIN Objekt importiert - DealPilot haette ein
+         Objekt namens lexikon" angelegt.
+
+         Alte Dateien (reines Array) laufen unveraendert durch. Das
+         ist keine Hoeflichkeit, sondern Pflicht: es gibt
+         Sicherungen da draussen. */
+      var arr;
+      if (data && data.dealpilot_export === 'portfolio' && Array.isArray(data.objekte)) {
+        arr = data.objekte.map(function (o) {
+          return { data: o.daten || o.data || {},
+                   ai_analysis: o.analyse ? JSON.stringify(o.analyse) : null,
+                   photos: o.fotos || [],
+                   name: o.name || null };
+        });
+      } else {
+        arr = Array.isArray(data) ? data : [data];
+      }
       if (Auth.isApiMode()) {
         for (var i = 0; i < arr.length; i++) {
           var item = arr[i];
@@ -2591,30 +2902,44 @@ async function showPortfolioDetail() {
   document.body.appendChild(modal);
 }
 
-function exportPortfolioCSV() {
-  if (!window._portfolioCache) return;
-  var c = window._portfolioCache;
-  var rows = [['Objekt','Kaufpreis','Miete_Monat','CF_nSt_Monat','BMR_pct','DSCR','Darlehen_total']];
-  c.objects.forEach(function(o){
-    rows.push([
-      o.name,
-      o.kpis.kp.toFixed(0),
-      o.kpis.nkm_m.toFixed(0),
-      o.kpis.cf_ns_monthly.toFixed(0),
-      o.kpis.bmy.toFixed(2),
-      o.kpis.dscr.toFixed(2),
-      o.kpis.d_total.toFixed(0)
-    ]);
-  });
-  rows.push([]);
-  rows.push(['SUMME', c.totals.invest.toFixed(0), c.totals.miete_m.toFixed(0), c.totals.cf_m.toFixed(0), c.avgBmr.toFixed(2) + ' (Ø)', c.avgDscr.toFixed(2) + ' (Ø)', c.totals.rest_total.toFixed(0)]);
-  var csv = rows.map(function(r){ return r.map(function(x){return '"'+(''+x).replace(/"/g,'""')+'"';}).join(';'); }).join('\n');
-  var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+/* v2046 - EINE Tabelle, nicht zwei.
+
+   Hier standen SIEBEN Spalten aus `window._portfolioCache`: Name,
+   Kaufpreis, Miete, Cashflow, BMR, DSCR, Darlehen. Keine Lageklasse,
+   kein Status, kein Ankauf-Stand, keine Einheiten - und keine
+   Einheitenangabe am Spaltenkopf.
+
+   Statt sie um neun Spalten zu erweitern, baut sie jetzt dieselbe
+   Tabelle wie der Portfolio-Export. Zwei Tabellen ueber dieselbe
+   Sache laufen auseinander - nicht vielleicht, sondern beim naechsten
+   Feld, das nur eine von beiden bekommt. Dann stehen zwei Dateien
+   nebeneinander, beide plausibel, und niemand weiss, welche recht
+   hat.
+
+   Knopf und Dateiname bleiben. */
+async function exportPortfolioCSV() {
+  if (!window.DealPilotPortfolioExport) {
+    if (typeof toast === 'function') toast('\u26a0 Export-Modul nicht geladen');
+    return;
+  }
+  var paket;
+  try {
+    paket = await Auth.apiCall('/objects/portfolio-export');
+  } catch (e) {
+    if (typeof toast === 'function') toast('\u26a0 Export-Fehler: ' + (e.message || e));
+    return;
+  }
+  if (!paket || !Array.isArray(paket.objekte) || !paket.objekte.length) {
+    if (typeof toast === 'function') toast('\u26a0 Keine Objekte zum Exportieren');
+    return;
+  }
+  var csv = DealPilotPortfolioExport._csvAus(paket);
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'Junker_Portfolio_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download = 'Junker_Portfolio_' + new Date().toISOString().slice(0, 10) + '.csv';
   a.click();
-  toast('✓ Portfolio-CSV exportiert');
+  if (typeof toast === 'function') toast('\u2713 ' + paket.objekte.length + ' Objekte als Tabelle exportiert');
 }
 
 // ═══════════════════════════════════════════════════
@@ -3996,13 +4321,224 @@ window._toggleSbcDscr = function(card) {
 };
 
 // V63.27: Sortier-Modus für Sidebar-Liste
-function setSidebarSort(mode) {
-  if (mode !== 'id' && mode !== 'recent') return;
-  try { localStorage.setItem('dp_sb_sort', mode); } catch(e) {}
-  // Buttons-State
-  document.querySelectorAll('.sb-sort-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.getAttribute('data-sort') === mode);
+/* ══ v1982 · VIER SORTIERUNGEN STATT ZWEI ════════════════════════════
+
+   Marcel am 08.10.2026: „wenn man da draufklickt, eine Auswahl kommt,
+   dass man dann nach ID sortieren kann, nach Datum, also nach Kaufdatum
+   und vielleicht auch nach Lage? Und dass wir dann so Unterkategorien
+   machen: A-Lage, B-Lage, C-Lage."
+
+   Die vier Modi und was sie lesen:
+
+     recent   updated_at     (Vorgabe, wie bisher)
+     id       seq_no         absteigend, hoechste zuerst
+     kaufdat  data->>kaufdat jüngster Kauf zuerst, OHNE Datum nach hinten
+     lage     data->>lageklasse  A, B, C, dann ohne - mit Gruppenkoepfen
+
+   > EINE Abweichung von der bisherigen Regel, bewusst: im Modus `lage`
+   > steht das aktive Objekt NICHT mehr zwingend oben. Sonst erscheint
+   > seine Lageklasse zweimal als Gruppenkopf - einmal fuer die eine
+   > Karte oben und einmal fuer den eigentlichen Block. Ein Gruppenkopf,
+   > der zweimal dasteht, ist schlimmer als eine Karte, die nicht oben
+   > steht.
+
+   Kaufdatum: `kaufdat` kommt als TEXT aus dem JSON (data->>). Ein
+   deutsches „14.08.2026" sortiert als Text falsch, deshalb wird es
+   normalisiert. `Number(null)` ist 0 und besteht `Number.isFinite` -
+   also erst auf Abwesenheit pruefen, dann vergleichen. */
+var _SB_MODI = ['recent', 'id', 'kaufdat', 'lage'];
+var _SB_MODI_TEXT = {
+  recent:  { wort: 'Zuletzt bearbeitet', icon: 'i-clock' },
+  id:      { wort: 'Objekt-ID',          icon: 'i-hash' },
+  kaufdat: { wort: 'Kaufdatum',          icon: 'i-calendar' },
+  lage:    { wort: 'Lage (A/B/C)',       icon: 'i-pin' }
+};
+var _sbLagePaare = [];
+
+function _sbSortModus() {
+  var m = null;
+  try { m = localStorage.getItem('dp_sb_sort'); } catch (e) {}
+  return _SB_MODI.indexOf(m) >= 0 ? m : 'recent';
+}
+
+/* Die Lageklasse eines Listeneintrags. Server-Pfad: Spalte `lageklasse`
+   (seit v1982 in der Liste-API). Lokaler Pfad: direkt aus dem Datensatz.
+   Rueckgabe immer "A", "B", "C" oder "" - nie undefined, damit der
+   Gruppenkopf-Vergleich nicht an zwei Sorten Leere scheitert. */
+function _sbLageVon(o) {
+  if (!o) return "";
+  var v = o.lageklasse;
+  if (v == null && o.data) v = o.data.lageklasse;
+  v = (v == null) ? "" : String(v).trim().toUpperCase();
+  return (v === "A" || v === "B" || v === "C") ? v : "";
+}
+
+/* Kaufdatum als vergleichbare Zahl. Leer -> null (nicht 0!), damit
+   Objekte ohne Kaufdatum hinten landen statt 1970 zu behaupten. */
+function _sbKaufdatZahl(o) {
+  var v = (o && o.kaufdat != null) ? o.kaufdat : (o && o.data ? o.data.kaufdat : null);
+  if (v == null) return null;
+  var s = String(v).trim();
+  if (!s) return null;
+  var m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (m) return Number(m[3]) * 10000 + Number(m[2]) * 100 + Number(m[1]);
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return Number(m[1]) * 10000 + Number(m[2]) * 100 + Number(m[3]);
+  var t = Date.parse(s);
+  return isNaN(t) ? null : t;
+}
+
+function _sbVergleich(modus) {
+  return function (a, b) {
+    /* Aktives Objekt zuerst - ausser im Lage-Modus, siehe Kommentar oben */
+    if (modus !== 'lage') {
+      if (a.id === _currentObjKey && b.id !== _currentObjKey) return -1;
+      if (b.id === _currentObjKey && a.id !== _currentObjKey) return 1;
+    }
+    if (modus === 'id') {
+      /* ── v1982b · ZAHLENBEWUSST, NICHT TEXTWEISE ────────────────────
+
+         Am Bildschirm gemessen: `2026-999` stand VOR `2026-1082`, weil
+         "9" groesser ist als "1". Der Vergleich war seit V63.27 ein
+         reiner Textvergleich und jahrelang richtig - solange keine
+         Objektnummer vierstellig wurde. Auf Staging sind 16 von 20
+         Nummern ueber 1000, und die hoechste stand an Platz zwei.
+
+         `numeric: true` vergleicht Ziffernblöcke als Zahlen und den
+         Rest als Text. Das Jahr vor dem Bindestrich zaehlt dabei mit:
+         `2025-1100` landet hinter allen 2026ern. Eine leere
+         Objektnummer faellt nach hinten statt nach vorn. */
+      var sa = (a.seq_no || ''), sb = (b.seq_no || '');
+      if (sa === sb) return 0;
+      return String(sb).localeCompare(String(sa), 'de', { numeric: true, sensitivity: 'base' });
+    }
+    if (modus === 'kaufdat') {
+      var ka = _sbKaufdatZahl(a), kb = _sbKaufdatZahl(b);
+      if (ka == null && kb == null) return 0;
+      if (ka == null) return 1;
+      if (kb == null) return -1;
+      return kb - ka;
+    }
+    if (modus === 'lage') {
+      var ra = { A: 0, B: 1, C: 2 }, la = _sbLageVon(a), lb = _sbLageVon(b);
+      var pa = (la in ra) ? ra[la] : 3, pb = (lb in ra) ? ra[lb] : 3;
+      if (pa !== pb) return pa - pb;
+      /* innerhalb einer Lageklasse: zuletzt bearbeitet zuerst */
+      return new Date(b.updated_at || b._at || 0) - new Date(a.updated_at || a._at || 0);
+    }
+    return new Date(b.updated_at || b._at || 0) - new Date(a.updated_at || a._at || 0);
+  };
+}
+
+/* ── Die Gruppenkoepfe ─────────────────────────────────────────────────
+   Sie werden NACH dem Rendern eingesetzt, nicht im Karten-Template:
+   die Karte baut `_renderRichCard()`, und die an zwei Stellen zu
+   erweitern hiesse, denselben Eingriff doppelt zu fuehren. */
+function _sbLageKoepfeEinsetzen(list) {
+  if (_sbSortModus() !== 'lage') return 0;
+  if (!list || !_sbLagePaare.length) return 0;
+  var map = {};
+  _sbLagePaare.forEach(function (p) { map[p.key] = p.klasse; });
+  var karten = list.querySelectorAll('.sb-card');
+  var letzte = null, gesetzt = 0;
+  for (var i = 0; i < karten.length; i++) {
+    var k = map[karten[i].getAttribute('data-key')];
+    if (k == null) k = "";
+    if (letzte !== null && k === letzte) continue;
+    letzte = k;
+    var h = document.createElement('div');
+    h.className = 'sb-lage-kopf' + (k ? ' sb-lage-kopf-' + k.toLowerCase() : ' sb-lage-kopf-ohne');
+    h.setAttribute('data-lage', k || 'ohne');
+    h.textContent = k ? (k + '-Lage') : 'ohne Lageklasse';
+    karten[i].parentNode.insertBefore(h, karten[i]);
+    gesetzt++;
+  }
+  return gesetzt;
+}
+window._sbLageKoepfeEinsetzen = _sbLageKoepfeEinsetzen;
+
+/* ── Das Menue am body ─────────────────────────────────────────────── */
+function _sbMenueZu() {
+  var m = document.getElementById('sb-sort-menu');
+  if (m) m.remove();
+  var t = document.getElementById('sb-sort-trigger');
+  if (t) t.setAttribute('aria-expanded', 'false');
+}
+window._sbMenueZu = _sbMenueZu;
+
+function toggleSidebarSortMenu(ev) {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  if (document.getElementById('sb-sort-menu')) { _sbMenueZu(); return; }
+  var t = document.getElementById('sb-sort-trigger');
+  if (!t) return;
+  var aktiv = _sbSortModus();
+  var r = t.getBoundingClientRect();
+  var m = document.createElement('div');
+  m.id = 'sb-sort-menu';
+  m.className = 'sb-sort-menu';
+  m.setAttribute('role', 'menu');
+  var html = '<div class="sb-sort-menu-kopf">Sortieren nach</div>';
+  _SB_MODI.forEach(function (k) {
+    var d = _SB_MODI_TEXT[k];
+    html += '<button type="button" class="sb-sort-opt' + (k === aktiv ? ' aktiv' : '')
+      + '" data-sort="' + k + '" role="menuitem">'
+      + '<svg width="13" height="13" aria-hidden="true"><use href="#' + d.icon + '"/></svg>'
+      + '<span>' + d.wort + '</span>'
+      + (k === aktiv ? '<svg class="sb-sort-haken" width="13" height="13"><use href="#i-check"/></svg>' : '')
+      + '</button>';
   });
+  m.innerHTML = html;
+  document.body.appendChild(m);
+  /* Lage erst NACH dem Anhaengen rechnen - vorher hat das Menue keine
+     Groesse, und eine Breite von 0 kappt man nirgends richtig. */
+  var mb = m.getBoundingClientRect();
+  var links = Math.min(r.left, window.innerWidth - mb.width - 8);
+  var oben = r.bottom + 6;
+  if (oben + mb.height > window.innerHeight - 8) oben = Math.max(8, r.top - mb.height - 6);
+  m.style.left = Math.max(8, links) + 'px';
+  m.style.top = oben + 'px';
+  t.setAttribute('aria-expanded', 'true');
+  m.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.sb-sort-opt') : null;
+    if (!b) return;
+    e.stopPropagation();
+    setSidebarSort(b.getAttribute('data-sort'));
+    _sbMenueZu();
+  });
+}
+window.toggleSidebarSortMenu = toggleSidebarSortMenu;
+
+document.addEventListener('click', function (e) {
+  if (!document.getElementById('sb-sort-menu')) return;
+  if (e.target.closest && (e.target.closest('#sb-sort-menu') || e.target.closest('#sb-sort-trigger'))) return;
+  _sbMenueZu();
+}, true);
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') _sbMenueZu();
+});
+
+/* Der Ausloeser zeigt, WONACH gerade sortiert wird - sonst ist das Menue
+   eine Entscheidung, die man nach dem Schliessen nicht mehr sieht. */
+function _sbAusloeserNachziehen() {
+  var t = document.getElementById('sb-sort-trigger');
+  if (!t) return;
+  var m = _sbSortModus(), d = _SB_MODI_TEXT[m];
+  if (!d) return;
+  t.setAttribute('data-sort', m);
+  t.setAttribute('title', 'Sortierung: ' + d.wort);
+  var u = t.querySelector('use');
+  if (u) u.setAttribute('href', '#' + d.icon);
+  t.classList.add('active');
+}
+window._sbAusloeserNachziehen = _sbAusloeserNachziehen;
+
+function setSidebarSort(mode) {
+  /* v1982: vier Modi statt zwei. Ein unbekannter Modus wird abgewiesen,
+     nicht stillschweigend zu `recent` - sonst sieht ein Tippfehler im
+     Aufruf wie eine funktionierende Vorgabe aus. */
+  if (_SB_MODI.indexOf(mode) < 0) return;
+  try { localStorage.setItem('dp_sb_sort', mode); } catch(e) {}
+  _sbAusloeserNachziehen();
   if (typeof renderSaved === 'function') renderSaved();
 }
 window.setSidebarSort = setSidebarSort;
@@ -4010,12 +4546,8 @@ window.setSidebarSort = setSidebarSort;
 // V63.27: Beim Laden den gespeicherten Sort-Modus visuell aktivieren
 (function _initSidebarSort() {
   document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      var mode = (window.localStorage && localStorage.getItem('dp_sb_sort')) || 'recent';
-      document.querySelectorAll('.sb-sort-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.getAttribute('data-sort') === mode);
-      });
-    }, 200);
+    /* v1982: der Ausloeser traegt jetzt das Symbol des aktiven Modus */
+    setTimeout(_sbAusloeserNachziehen, 200);
   });
 })();
 

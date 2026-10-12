@@ -520,6 +520,19 @@
     }
     var token = _token();
     if (!token) return { ok: false, grund: 'kein_token', fehler: 'Bitte einloggen' };
+    /* ══ v1999 · OHNE STRASSE IST DAS DER ORTSKERN, UND DAS GEHOERT GESAGT
+
+       Diese Zeile faellt bei fehlender Strasse still auf „PLZ Ort"
+       zurueck, und die Geokodierung liefert dafuer den
+       Ortsmittelpunkt. Der Wert kam bisher zurueck und sah aus wie
+       jeder andere.
+
+         > Das ist kein falscher Wert - es ist ein Wert ohne seine
+         > Herkunft. In dieser Codebasis ist genau das der teure Fall.
+
+       Marcel hat den Ortskern am 08.10.2026 ausdruecklich erlaubt -
+       fuer die Marktpreisindikation. Was fehlte, war die Angabe. */
+    var _ortskern = !str;
     var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
     if (!addr) return { ok: false, grund: 'keine_adresse', fehler: 'Keine Adresse' };
     var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), {
@@ -574,7 +587,10 @@
        Antwort und wurde hier weggeworfen — siehe `_nutzungPruefen`. */
     return { ok: true, wert: bd.value_sqm, stichtag: bd.stichtag || null,
              zone: bd.zone || null, quelle: bd.source || 'BORIS',
-             nutzung: bd.nutzung || null, roh: bd };
+             nutzung: bd.nutzung || null,
+             /* v1999: ohne Strasse kommt der Wert vom Ortsmittelpunkt */
+             ortskern: _ortskern,
+             roh: bd };
   }
 
   /* ═══ v1838 · PASST DIE ZONE ZUM OBJEKT? ═══════════════════════════════

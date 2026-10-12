@@ -328,11 +328,45 @@ window.DealPilotDealAction = (function() {
       var gewerke = sanstand <= 2 ? { fenster: 'gehoben', dach: 'gehoben', heizung: 'gehoben' }
                   : sanstand === 3 ? { fenster: 'standard', dach: 'standard', heizung: 'standard' }
                   : { fenster: 'veraltet', dach: 'veraltet', heizung: 'veraltet' };
+
+      /* ── v2075 · DIE ACHT FELDER SCHLAGEN DEN SANIERUNGSSTAND ──────────
+         HIER STAND `modPoints: sanstand <= 2 ? 6 : (sanstand === 3 ? 3 : 0)`.
+         Diese Ableitung kennt genau drei Werte - 6, 3 und 0 - und Anlage 2
+         kennt 0 bis 20. Gemessen am 10.10.2026 bei GND 80 und Alter 50:
+         ein voll modernisiertes Objekt bekam hier 6 Punkte und damit 36,83
+         Jahre statt 56,00 - **19,17 Jahre zu wenig**.
+
+         Dieser Block baut nur einen HINWEIS ("lohnt ein RND-Gutachten?"),
+         also muss die Zahl nicht gutachterlich sein. Aber sie darf dem
+         Wizard nicht WIDERSPRECHEN: wer hier 36 liest und im Wizard 56
+         bekommt, traut keinem von beiden mehr.
+
+         Darum: stehen die acht `mod_*`-Felder des Reiters Objekt gefuellt
+         da, zaehlen sie - ueber dieselbe Kernfunktion wie ueberall sonst.
+         Nur wenn dort nichts steht, bleibt `sanstand` der Rueckfall, und
+         das ist dann auch ehrlich: eine Abschaetzung aus einem
+         Sammelfeld. */
+      var modPts = null;
+      try {
+        var modFelder = {}, modGefuellt = false;
+        ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand',
+         'baeder', 'innenausbau', 'grundriss'].forEach(function (k) {
+          var e = document.getElementById('mod_' + k);
+          var v = e ? String(e.value || '').trim() : '';
+          modFelder[k] = v;
+          if (v && v !== 'Keine/Nie') modGefuellt = true;
+        });
+        var gespeichert = parseInt((document.getElementById('mod_punkte') || {}).value, 10);
+        if (!isNaN(gespeichert) && gespeichert > 0) modPts = Math.min(20, gespeichert);
+        else if (modGefuellt && DealPilotRND.punkteAusMod) modPts = DealPilotRND.punkteAusMod(modFelder).total;
+      } catch (e) { /* kein DOM-Zugriff -> Rueckfall unten */ }
+      if (modPts == null) modPts = sanstand <= 2 ? 6 : (sanstand === 3 ? 3 : 0);
+
       var rndRes = DealPilotRND.calcAll({
         baujahr: baujahr,
         stichtag: heute + '-01-01',
         gnd: gnd,
-        modPoints: sanstand <= 2 ? 6 : (sanstand === 3 ? 3 : 0),
+        modPoints: modPts,
         gewerkeBewertung: gewerke
       });
       rndJahre = rndRes.final_rnd;
@@ -540,6 +574,12 @@ window.DealPilotDealAction = (function() {
       '      <span class="da-stat-lbl">Verloren</span>',
       '    </div>',
       '  </div>',
+      /* v2030a - hier STAND der Platz fuer die Ankauf-Frage, und das
+         war falsch: `renderWonCard()` wird nicht mehr gerufen. Die
+         sichtbaren Status-Kacheln baut `deal-action-boarding.js` in
+         `statusTafel()`; dort sitzt der Platz jetzt. Eine zweite ID
+         desselben Namens bleibt hier NICHT stehen - auch totes Markup
+         wird irgendwann wieder lebendig. */
       '  <input type="hidden" id="_deal_won_state" value="false">',
       '  <input type="hidden" id="_deal_won_at_state" value="">',
       '  <input type="hidden" id="_deal_lost_state" value="false">',
@@ -1996,6 +2036,41 @@ window.DealPilotDealAction = (function() {
       }
     } catch (e) { console.warn('[RND] Result-Enrichment fehlgeschlagen:', e); }
 
+    /* ═══ v2068 · DAS ERGEBNIS WIRD FESTGEHALTEN, NICHT NUR GEZEIGT ════
+       Marcel, 10.10.2026: „sind alle rnd daten … mit drin? greift das
+       auch bei der pilot analyse?"
+
+       GEMESSEN am Export ueber 22 Objekte: `afa_rnd_jahre` war bei
+       NULL davon belegt. Der Wizard liest `mod_*` und `ausst_*`, rechnet
+       die Restnutzungsdauer nach Anlage 2 - und zeigte sie in einem
+       Fenster, das man wegklickt. Danach war sie weg.
+
+         > Eine Zahl, die nur im Fenster steht, ist fuer jeden anderen
+         > Weg nicht vorhanden: nicht im Export, nicht im Piloten, nicht
+         > im naechsten Jahr.
+
+       WAS HIER NICHT PASSIERT: `afa_rnd_jahre` wird NICHT ueberschrieben.
+       Das Feld ist eine Eingabe des Nutzers und kann eine andere Zahl
+       tragen - etwa aus einem echten Gutachten. Der Wizard ist ein
+       Vorschlag, und ein Vorschlag, der sich selbst einsetzt, ist keiner.
+
+       Festgehalten wird das ERGEBNIS mit seiner Herkunft, nach dem
+       Muster von `_mfh`: Fenster-Merker, den `storage.js` beim Speichern
+       mitnimmt. */
+    try {
+      window._dpRnd = {
+        rnd_jahre: result.final_rnd || null,
+        gnd_jahre: result.gnd || null,
+        alter_jahre: result.alter || null,
+        punkte: (result.modernisierung && result.modernisierung.punkte) || null,
+        verfahren: result.verfahren || 'Anlage 2 ImmoWertV',
+        /* Der AfA-Vergleich, falls er gerechnet werden konnte. */
+        afa_vorteil_eur: afa && afa.barwert_vorteil != null ? afa.barwert_vorteil : null,
+        stand: new Date().toISOString().slice(0, 10)
+      };
+      if (typeof window.markDirty === 'function') window.markDirty();
+    } catch (e) { try { console.warn('[RND] Ergebnis nicht gemerkt', e); } catch (x) {} }
+
     _renderRndResultModal(gutachtenState, result, afa);
   }
 
@@ -2374,6 +2449,13 @@ window.DealPilotDealAction = (function() {
       if (s === status) btn.classList.add('active');
       else btn.classList.remove('active');
     });
+    /* v2030 - die Ankauf-Frage folgt dem Status. Sie erscheint bei
+       `won`, und sie bleibt sichtbar, solange ein Stand da ist -
+       sonst waere ein festgeschriebener Ankauf nach einem Klick auf
+       „Offen" unauffindbar. */
+    try {
+      if (window.DealPilotAnkauf) DealPilotAnkauf.frageZeigen(status);
+    } catch (e) { console.warn('[v2030] Ankauf-Frage:', e.message); }
   }
 
   return {

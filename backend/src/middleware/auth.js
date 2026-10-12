@@ -4,7 +4,31 @@ const { query } = require('../db/pool');
 /* mand v807: API-Key-Auth */
 const apiKeyService = require('../services/apiKeyService');
 const subscriptionService = require('../services/subscriptionService');
-const PRO_PLAN_IDS = ['pro'];
+/* v2072a: die Schnittstelle haengt am MERKMAL `api_access`, nicht an
+   Plannamen. Die Berechtigung liegt damit an EINER Stelle — in der
+   Spalte plans.features — und ein neuer Plan braucht keine Codesuche.
+
+   HIER STAND BIS v2072 `PRO_PLAN_IDS = ['pro']`, und v2072 hat daraus
+   `['pro','partner']` gemacht. BEIDES WAR FALSCH, das zweite nur
+   weniger auffaellig: genau diese Namensliste wurde am 02.10.2026 schon
+   einmal entfernt — eine Datei weiter, in routes/apiKeys.js, mit der
+   ausdruecklichen Begruendung "wer kuenftig einen Plan anlegt, setzt
+   ein Flag und muss keine Namensliste im Code suchen". Die Liste hier
+   war die DRITTE Stelle derselben Berechtigung und hat den behobenen
+   Fehler wiederholt.
+
+   Gemessen am 10.10.2026 in der Tabelle plans:
+     free false · starter false · investor false · pro TRUE · partner TRUE
+   Und in subscriptions: partner 3x aktiv, free 1x, starter 1x gekuendigt
+   — "pro" kommt dort GAR NICHT vor. Die alte Liste liess also niemanden
+   durch, und ihr 403 sah aus wie ein falscher Schluessel.
+
+   Den STATUS prueft das nicht und muss es nicht: getEffectivePlan gibt
+   fuer ein nicht aktives Abo plan_id 'free' zurueck (downgraded), und
+   free traegt api_access false.
+
+   Die TESTPHASE dagegen braucht eine eigene Pruefung — siehe unten. */
+const API_FEATURE = 'api_access';
 const _apiKeyRate = new Map();
 function _rateOk(keyId) {
   const now = Date.now();
@@ -18,14 +42,79 @@ async function _authViaApiKey(req, res, next, plain) {
     const rec = await apiKeyService.findValidByPlaintext(plain);
     if (!rec) return res.status(401).json({ error: 'Invalid or revoked API key' });
     if (!_rateOk(rec.id)) return res.status(429).json({ error: 'Rate limit exceeded (120/min)' });
-    const r = await query('SELECT id, email, name, role, is_active FROM users WHERE id = $1', [rec.user_id]);
+    /* ══ v2136a · DIE FRIST GILT AUCH FUER DEN API-SCHLUESSEL ════════
+       GEFUNDEN von meinem eigenen Pruefer, und zwar als Rest: er suchte
+       den englischen Satz "User account is disabled" und fand ihn nach
+       dem Umbau noch einmal - hier. Es gibt ZWEI Wege in die App, und
+       ich hatte nur den einen angefasst.
+
+       > Ein Zugang, der die Frist nicht kennt, hebt sie auf. Wer sich
+       > in den sechs Stunden einen API-Schluessel anlegt, haette danach
+       > unbegrenzt weitergearbeitet - die Sperre haette nur den Browser
+       > getroffen.
+
+       Dieselben drei Lagen wie im Token-Pfad, dieselben Kennwoerter,
+       damit ein Aufrufer EINEN Fall behandelt und nicht zwei.
+
+       Die Spalten kommen jetzt mit; vorher stand hier nur `is_active`. */
+    const r = await query(
+      'SELECT id, email, name, role, is_active, email_verified_at, created_at FROM users WHERE id = $1',
+      [rec.user_id]
+    );
     if (r.rowCount === 0) return res.status(401).json({ error: 'User no longer exists' });
     const user = r.rows[0];
-    if (!user.is_active) return res.status(403).json({ error: 'User account is disabled' });
+    if (!user.is_active) {
+      if (!user.email_verified_at) {
+        return res.status(403).json({
+          error: 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte klicke den Link in der '
+            + 'Bestätigungs-Mail – auch im Spam-Ordner.',
+          code: 'EMAIL_NOT_VERIFIED'
+        });
+      }
+      return res.status(403).json({
+        error: 'Dieser Zugang ist deaktiviert. Bitte wende dich an den Support.',
+        code: 'ACCOUNT_DISABLED'
+      });
+    }
+    if (!user.email_verified_at) {
+      const fristApi = require('../config').auth.verifyGnadenfristStunden;
+      if (Date.now() > new Date(user.created_at).getTime() + fristApi * 3600 * 1000) {
+        return res.status(403).json({
+          error: 'Die Frist zur Bestätigung deiner E-Mail-Adresse ist abgelaufen. Lass dir die '
+            + 'Bestätigungs-Mail erneut schicken, dann ist der Zugang sofort wieder da.',
+          code: 'VERIFY_EXPIRED'
+        });
+      }
+    }
     try {
       const plan = await subscriptionService.getEffectivePlan(user.id);
-      if (PRO_PLAN_IDS.indexOf(((plan && plan.plan_id) || '').toLowerCase()) < 0) {
-        return res.status(403).json({ error: 'API access requires an active Pro plan' });
+      /* v2072a: dasselbe Merkmal, das routes/apiKeys.js per
+         requireFeature('api_access') prueft. Dort geht es um das ANLEGEN
+         eines Schluessels, hier um sein BENUTZEN — beide muessen am
+         gleichen Massstab haengen, sonst entsteht wieder eine Tuer, die
+         sich zeigt und nicht oeffnet (so war es bis v1791).
+         Die Meldung nennt den gemessenen Plan MIT, damit ein 403 nicht
+         wieder als falscher Schluessel gelesen wird. */
+      if (!plan || !plan.plan_features || !plan.plan_features[API_FEATURE]) {
+        return res.status(403).json({
+          error: `Feature '${API_FEATURE}' is not available on your plan`,
+          plan_id: (plan && plan.plan_id) || null,
+          upgrade_required: true
+        });
+      }
+      /* v2072: waehrend der Testphase bleibt die Schnittstelle zu — aus
+         demselben Grund, aus dem getEffectivePlan dort export_csv,
+         json_backup und excel_import ausschaltet ("Pro-Verkaufsargumente").
+         Das Merkmal oben allein reicht nicht: die Testphase liefert die
+         FEATURES des gewaehrten Plans, api_access ist darin true.
+         Marcels Entscheidung vom 10.10.2026 ("ja b"). */
+      if (plan.trial === true) {
+        return res.status(403).json({
+          error: 'API-Zugang ist in der Testphase nicht enthalten',
+          plan_id: plan.plan_id, trial: true,
+          trial_ends_at: plan.trial_ends_at || null,
+          upgrade_required: true
+        });
       }
     } catch (e) { /* im Zweifel durchlassen statt Owner aussperren */ }
     req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
@@ -94,9 +183,18 @@ async function authenticate(req, res, next) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Verify user still exists and is active
+    /* ══ v2136 · DIE FRIST WIRD HIER DURCHGESETZT (N60.3) ═══════════
+       `email_verified_at` und `created_at` kommen mit. Vorher stand
+       hier nur `is_active`, und das reichte, solange der Riegel die
+       Bestaetigung ERZWANG. Seit v2136 ist der Zugang sofort da - also
+       muss der Ablauf an einer Stelle greifen, die JEDE Anfrage
+       passiert.
+
+       > Eine Frist, die nur beim Anmelden geprueft wird, laeuft fuer
+       > eine offene Sitzung nie ab. Der Token gilt sieben Tage; sechs
+       > Stunden waeren damit eine Empfehlung. */
     const r = await query(
-      'SELECT id, email, name, role, is_active FROM users WHERE id = $1',
+      'SELECT id, email, name, role, is_active, email_verified_at, created_at FROM users WHERE id = $1',
       [payload.userId]
     );
     if (r.rowCount === 0) {
@@ -104,7 +202,33 @@ async function authenticate(req, res, next) {
     }
     const user = r.rows[0];
     if (!user.is_active) {
-      return res.status(403).json({ error: 'User account is disabled' });
+      /* v2136: dieselbe Unterscheidung wie beim Login (v2094) - und
+         auf Deutsch. Hier stand 'User account is disabled'. */
+      if (!user.email_verified_at) {
+        return res.status(403).json({
+          error: 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte klicke den Link in der '
+            + 'Bestätigungs-Mail – auch im Spam-Ordner.',
+          code: 'EMAIL_NOT_VERIFIED'
+        });
+      }
+      return res.status(403).json({
+        error: 'Dieser Zugang ist deaktiviert. Bitte wende dich an den Support.',
+        code: 'ACCOUNT_DISABLED'
+      });
+    }
+    if (!user.email_verified_at) {
+      const frist = require('../config').auth.verifyGnadenfristStunden;
+      const ablauf = new Date(user.created_at).getTime() + frist * 3600 * 1000;
+      if (Date.now() > ablauf) {
+        return res.status(403).json({
+          error: 'Die Frist zur Bestätigung deiner E-Mail-Adresse ist abgelaufen. Lass dir die '
+            + 'Bestätigungs-Mail erneut schicken, dann ist der Zugang sofort wieder da.',
+          code: 'VERIFY_EXPIRED'
+        });
+      }
+      /* Noch in der Frist: die App soll den Countdown zeigen koennen,
+         ohne eine zweite Anfrage. */
+      res.set('X-DP-Verify-Deadline', new Date(ablauf).toISOString());
     }
 
     req.user = {
@@ -120,6 +244,45 @@ async function authenticate(req, res, next) {
 }
 
 /**
+ * ══ v2138 · DER KLEINE ZWANG (Backlog N60.3) ═══════════════════════
+ *
+ * Marcel am 12.10.2026: "vlt Marktbewertung und abruf von dealpilot
+ * sachen erfordern dann die anmeldung und bestaetigung? quasi ein
+ * kleiner zwang?"
+ *
+ * Genau die richtige Stelle, und sie loest zugleich den PREIS, den ich
+ * bei v2136 ausdruecklich benannt hatte: ein unbestaetigter Zugang ist
+ * ein Zugang - wer eine fremde Adresse eintraegt, kann sechs Stunden
+ * arbeiten. Mit dieser Sperre kann er sechs Stunden *sehen*, aber
+ * nichts abrufen, was Geld kostet.
+ *
+ * > **Ein Zwang, der am Teuren haengt, braucht keinen Riegel am
+ * > Eingang.** Wer die App ansehen will, kann das sofort; wer
+ * > Kontingent verbrauchen will, bestaetigt vorher seine Adresse.
+ *
+ * Sie sitzt in der Mittelschicht und nicht im Verbrauchspfad, weil sie
+ * den Aufruf verhindern soll, BEVOR eine Leistung erbracht wird. Eine
+ * Pruefung hinter dem Abruf waere ein Abruf, den niemand bezahlt.
+ *
+ * `authenticate` muss davor laufen - ohne `req.user` ist hier nichts
+ * zu entscheiden, und ein stillschweigendes Durchlassen waere der
+ * schlechteste Ausgang.
+ */
+async function requireVerified(req, res, next) {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+    const r = await query('SELECT email_verified_at FROM users WHERE id = $1', [req.user.id]);
+    if (r.rowCount === 0) return res.status(401).json({ error: 'User no longer exists' });
+    if (r.rows[0].email_verified_at) return next();
+    return res.status(403).json({
+      error: 'Dafür müssen wir deine E-Mail-Adresse kennen. Bitte bestätige sie über den Link '
+        + 'in der Bestätigungs-Mail – danach steht der Abruf sofort zur Verfügung.',
+      code: 'EMAIL_NOT_VERIFIED_GATE'
+    });
+  } catch (err) { next(err); }
+}
+
+/**
  * Require user to have a specific role
  */
 function requireRole(...roles) {
@@ -132,4 +295,4 @@ function requireRole(...roles) {
   };
 }
 
-module.exports = { authenticate, requireRole };
+module.exports = { authenticate, requireVerified, requireRole };   /* v2138 */

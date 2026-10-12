@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score und Knöpfe · Demo (N60.37)</title>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DealPilot · score-knoepfe-demo.html · v2111 · Backlog N60.37
+
+     ZUM ENTSCHEIDEN, NICHT ZUM AUSLIEFERN.
+
+     Marcel am 11.10.2026: "Zum Beispiel ueberlappt da jetzt auch noch
+     irgendein grauer Bereich. Der ueberlappt da noch in den Ring. Dann
+     kann man den auch nicht richtig lesen."
+
+     ALLE MASSE SIND AM LAUFENDEN STAGING GEMESSEN (getComputedStyle und
+     getBoundingClientRect, 11.10.2026), nicht aus dem Blatt abgeschrieben:
+
+       Karte       344 x 210, Rand 1.11px solid rgb(201,168,76), Radius 14
+       Verlauf     linear-gradient(135deg, rgba(20,15,5,.6), rgba(0,0,0,.7))
+       Ring        65-115 senkrecht, 281-331 waagerecht (50 x 50)
+       Score-Zahl  79-104
+       Aktionen    94-116, x 289-337; Knoepfe 22x22, rgba(0,0,0,.6)
+       Kachelband  123-199, Kacheln rgba(255,255,255,.024)
+
+     DIE URSACHE, in zwei Kommentaren, die sich widersprechen:
+
+       V103 (style.css:25602)  Knoepfe top:6px, Score top:38px - GESTAFFELT,
+                               mit dem Vermerk "Damit klickbar"
+       v1943 (Marcel 07.10.)   beide auf top:50% - "IMMER mittig"
+
+     Zwei Dinge in derselben Spalte auf dieselbe Mitte MUESSEN sich
+     ueberlappen. Die Anweisung war nicht falsch, sie war fuer zwei
+     Elemente gleichzeitig nicht erfuellbar.
+
+     Je Karte wird die Ueberdeckung der SCORE-ZAHL ausgerechnet - das ist
+     die Zahl, an der die Entscheidung haengt, nicht der Eindruck.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&display=swap">
+<style>
+:root{
+  /* Gold in der var(--wl-<hex>, #<hex>)-Form - gold-audit.py entfernt die
+     Huelle vor dem Zaehlen. Gruen und Rot bleiben nackt: Statusfarben
+     werden nicht tokenisiert und stehen auch nicht in WL_TINTS. */
+  --obsidian:#050505;
+  --gold:    var(--wl-c9a84c, #C9A84C);
+  --gold-hi: var(--wl-e8cc7a, #E8CC7A);
+  --creme:#FDFCFA;
+  --gruen:#3FA56C; --rot:#B8625C;
+  --verlauf: linear-gradient(135deg, rgba(20,15,5,.6) 0%, rgba(0,0,0,.7) 100%);
+  --kachel: rgba(255,255,255,.024);
+  --kachel-rand: var(--wl-c9a84c-12, rgba(201,168,76,.12));
+  --knopf-bg: rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;padding:26px 20px 70px;background:var(--obsidian);color:var(--creme);
+  font:400 15px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:1240px;margin:0 auto}
+h1{font:700 26px/1.2 'Space Grotesk',sans-serif;margin:0 0 6px;color:var(--gold-hi)}
+.sub{font:400 14px/1.5 Inter,sans-serif;color:#9a948c;margin:0 0 20px;max-width:74ch}
+h2{font:500 17px/1.3 'Space Grotesk',sans-serif;margin:32px 0 10px}
+code{font-family:'JetBrains Mono',monospace;font-size:.88em}
+
+.schalter{display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  background:#0d0b08;border:1px solid var(--wl-c9a84c-22, rgba(201,168,76,.22));
+  border-radius:12px;padding:13px 16px;margin-bottom:6px}
+.schalter label{display:flex;align-items:center;gap:8px;cursor:pointer;
+  font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.05em;text-transform:uppercase;color:#9a948c}
+.schalter input{cursor:pointer;width:16px;height:16px}
+
+.reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:16px}
+.spalte>h3{font:500 12px/1.3 'JetBrains Mono',monospace;letter-spacing:.05em;
+  text-transform:uppercase;margin:0 0 4px;color:var(--gold)}
+.spalte>p{font:400 12.5px/1.5 Inter,sans-serif;color:#9a948c;margin:0 0 10px;min-height:4.2em}
+
+/* ── Die Karte, Masse aus der echten Objektkarte ───────────────────── */
+.karte{position:relative;border:1.11px solid var(--gold);border-radius:14px;
+  padding:13px 14px 14px;overflow:hidden;background-image:var(--verlauf);height:210px}
+.k-kopf{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px}
+.k-bild{width:46px;height:46px;flex:0 0 auto;border-radius:9px;background:rgba(255,255,255,.06);
+  border:1px solid var(--wl-c9a84c-18, rgba(201,168,76,.18));display:flex;align-items:center;
+  justify-content:center;font-size:19px;opacity:.75}
+.k-z1{font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--gold);margin-bottom:4px}
+.k-adr{font:500 14px/1.25 'Space Grotesk',sans-serif;margin:0 0 2px}
+.k-preis{font:500 13px/1.2 'JetBrains Mono',monospace;color:var(--gold-hi)}
+.k-raster{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.kachel{background:var(--kachel);border:1px solid var(--kachel-rand);border-radius:8px;padding:6px 7px 5px}
+.kachel .lab{font:500 8px/1 'JetBrains Mono',monospace;letter-spacing:.07em;
+  text-transform:uppercase;color:#9a948c;margin-bottom:3px}
+.kachel .val{font:500 13px/1.1 'JetBrains Mono',monospace;margin-bottom:4px}
+.kachel .val.gut{color:var(--gruen)} .kachel .val.schlecht{color:var(--rot)}
+.balken{height:3px;border-radius:2px;background:rgba(255,255,255,.1);margin-bottom:3px;overflow:hidden}
+.balken i{display:block;height:100%;background:var(--gold);border-radius:2px}
+.skala{display:flex;justify-content:space-between;font-size:7.5px;
+  font-family:'JetBrains Mono',monospace;color:#817d76;margin-top:2px}
+
+/* Der Ring - 50x50, wie gemessen */
+.ring{position:absolute;right:12px;width:50px;height:50px;border-radius:50%;
+  border:3px solid var(--gruen);display:flex;align-items:center;justify-content:center;
+  background:rgba(5,5,5,.55);z-index:4}
+.ring b{font:700 15px/1 'JetBrains Mono',monospace;color:#fff}
+.stufe{position:absolute;right:12px;font:700 9px/1 'JetBrains Mono',monospace;
+  letter-spacing:.08em;padding:5px 8px;border-radius:999px;background:#1A1714;
+  color:var(--gold-hi);border:1px solid var(--kachel-rand);z-index:4}
+
+/* Die Knoepfe - 22x22, rgba(0,0,0,.6), Abstand 4 */
+.aktionen{position:absolute;display:flex;gap:4px;z-index:7;opacity:0;transition:opacity .12s}
+.karte.zeigen .aktionen{opacity:1}
+.aktionen button{width:22px;height:22px;border-radius:6px;background:var(--knopf-bg);
+  border:1px solid rgba(255,255,255,.14);color:#e8e3d8;font-size:12px;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+
+/* ── Die fuenf Fassungen ───────────────────────────────────────────── */
+/* IST: beide mittig (v1943) */
+.f-ist   .ring     {top:50%;transform:translateY(-50%) translateY(-14px)}
+.f-ist   .stufe    {top:50%;transform:translateY(-50%) translateY(26px)}
+.f-ist   .aktionen {top:50%;right:6px;transform:translateY(-50%)}
+/* (a) Knoepfe zurueck nach oben - die Staffelung von V103 */
+.f-a     .ring     {top:38px}
+.f-a     .stufe    {top:92px}
+.f-a     .aktionen {top:6px;right:6px}
+/* (b) Score mittig, Knoepfe nach LINKS */
+.f-b     .ring     {top:50%;transform:translateY(-50%) translateY(-14px)}
+.f-b     .stufe    {top:50%;transform:translateY(-50%) translateY(26px)}
+.f-b     .aktionen {top:50%;left:12px;right:auto;transform:translateY(-50%)}
+/* (c) Ring weicht, solange die Knoepfe stehen */
+.f-c     .ring     {top:50%;transform:translateY(-50%) translateY(-14px);transition:opacity .12s}
+.f-c     .stufe    {top:50%;transform:translateY(-50%) translateY(26px);transition:opacity .12s}
+.f-c.zeigen .ring, .f-c.zeigen .stufe {opacity:0}
+.f-c     .aktionen {top:50%;right:6px;transform:translateY(-50%)}
+/* (d) Knoepfe unter den Ring gesetzt, kleiner */
+.f-d     .ring     {top:46px}
+.f-d     .stufe    {top:100px}
+.f-d     .aktionen {top:50%;right:6px;transform:translateY(-50%) translateY(34px)}
+.f-d     .aktionen button{width:19px;height:19px;font-size:11px}
+
+.mess{margin-top:9px;padding:9px 11px;border-radius:9px;background:#0d0b08;
+  border:1px solid rgba(255,255,255,.08);font:400 12px/1.55 'JetBrains Mono',monospace}
+.mess .z{font-size:17px;font-weight:500}
+.ok{color:#6fd39b} .fail{color:#e88b82} .mid{color:#e8c37a}
+.hinw{margin-top:6px;font:400 11.5px/1.45 Inter,sans-serif;color:#8a847c}
+.kasten{background:#0d0b08;border-left:3px solid var(--gold);border-radius:0 10px 10px 0;
+  padding:13px 16px;margin:16px 0;font-size:14px}
+.kasten p{margin:0 0 8px} .kasten p:last-child{margin:0}
+table{border-collapse:collapse;width:100%;margin-top:8px;font-size:13.5px}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+th{font:500 11px/1 'JetBrains Mono',monospace;letter-spacing:.05em;text-transform:uppercase;color:#9a948c}
+td.num{text-align:right;font-family:'JetBrains Mono',monospace}
+</style>
+</head><body>
+<div class="wrap">
+
+<h1>Score und Knöpfe · vier Wege</h1>
+<p class="sub">
+  Backlog <b>N60.37</b>. Seit <code>v1943</code> sind Ring <i>und</i>
+  Aktionsknöpfe senkrecht mittig — zwei Dinge in derselben Spalte auf
+  derselben Mitte. Gemessen überlappen sie <b>21 px</b>, und der
+  Duplizieren-Knopf verdeckt die <b>untere Hälfte der Score-Zahl</b>.
+  Alle Maße hier sind am laufenden Staging ausgelesen.
+</p>
+
+<div class="schalter">
+  <label><input type="checkbox" id="hov" checked> Knöpfe zeigen (Schwebezustand)</label>
+  <label><input type="checkbox" id="band" checked> Kachelband zeigen</label>
+</div>
+
+<div class="reihe" id="reihe"></div>
+
+<h2>Was die Zahlen sagen</h2>
+<table id="tab"><thead><tr>
+  <th>Fassung</th><th class="num">Ring ↔ Knöpfe</th><th class="num">auf der Score-Zahl</th><th>Urteil</th>
+</tr></thead><tbody></tbody></table>
+
+<div class="kasten">
+  <p><b>Die Ursache steht in zwei Kommentaren, die sich widersprechen.</b></p>
+  <p><code>V103</code> (<code>style.css:25602</code>) hat die beiden bewusst
+  <i>gestaffelt</i> — Knöpfe oben (<code>top:6px</code>), Score darunter
+  (<code>top:38px</code>) — mit dem Vermerk „Damit klickbar".</p>
+  <p><code>v1943</code> (Marcel, 07.10.2026) setzt <b>beide</b> auf
+  <code>top:50%</code>: „Den score und die schaltflaechen muessen IMMER
+  mittig angeordnet sein."</p>
+  <p><b>Beides zugleich geht nicht.</b> Die Anweisung war nicht falsch — sie
+  war für zwei Elemente in einer Spalte nicht erfüllbar.</p>
+</div>
+
+<div class="kasten">
+  <p><b>Schon behoben, unabhängig von dieser Entscheidung</b>
+  (<code>v2110</code>/<code>v2110a</code>): im Ruhezustand waren die Knöpfe
+  unsichtbar und fingen trotzdem die Klicks auf dem Ring ab. Jetzt sind
+  Deckkraft und Klickbarkeit gepaart — bewacht von
+  <code>tools/deckkraft-klickbarkeit-pruefen.mjs</code>.</p>
+</div>
+
+<script>
+var FASSUNGEN = [
+  { id:'f-ist', titel:'Ist-Zustand (v1943)',
+    text:'Ring und Knöpfe beide mittig. Der Duplizieren-Knopf liegt auf der unteren Hälfte der Zahl.' },
+  { id:'f-a', titel:'(a) Knöpfe zurück nach oben',
+    text:'Die Staffelung von V103 wiederherstellen: Knöpfe oben rechts, Ring darunter. Nimmt die Knöpfe aus der Mitte.' },
+  { id:'f-b', titel:'(b) Knöpfe nach links',
+    text:'Beide bleiben mittig, die Knöpfe wechseln auf die linke Kartenseite. Mitte bleibt, Spalte wechselt.' },
+  { id:'f-c', titel:'(c) Ring weicht beim Schweben',
+    text:'Beide bleiben, wo sie sind — der Ring blendet sich aus, solange die Knöpfe stehen.' },
+  { id:'f-d', titel:'(d) Knöpfe unter den Ring',
+    text:'Ring etwas höher, Knöpfe kleiner und darunter. Beide nah an der Mitte, ohne Überdeckung.' }
+];
+
+function kachel(lab,val,art,pct,sk){
+  return '<div class="kachel"><div class="lab">'+lab+'</div>'
+   +'<div class="val '+art+'">'+val+'</div>'
+   +'<div class="balken"><i style="width:'+pct+'%"></i></div>'
+   +'<div class="skala">'+sk.map(function(x){return '<span>'+x+'</span>';}).join('')+'</div></div>';
+}
+function karte(f){
+  return '<div class="spalte"><h3>'+f.titel+'</h3><p>'+f.text+'</p>'
+   +'<div class="karte '+f.id+'" id="k-'+f.id+'">'
+   +  '<div class="ring"><b>79</b></div><div class="stufe">GUT</div>'
+   +  '<div class="aktionen"><button type="button" title="Duplizieren">⎘</button>'
+   +  '<button type="button" title="Löschen">×</button></div>'
+   +  '<div class="k-kopf"><div class="k-bild">⌂</div>'
+   +   '<div><div class="k-z1">2026-1052 · MFH</div>'
+   +   '<div class="k-adr">Gohliser Str. 42, Leipzig</div>'
+   +   '<div class="k-preis">1.680.000 €</div></div></div>'
+   +  '<div class="k-raster band">'
+   +   kachel('DSCR','1,34','gut',62,['0','1','1,5','2+'])
+   +   kachel('CF/J','+16.715 €','gut',55,['0','1','1,5','2+'])
+   +   kachel('BMR','5,66 %','schlecht',44,['0%','5%','10%'])
+   +  '</div>'
+   +'</div><div class="mess" id="m-'+f.id+'"></div></div>';
+}
+document.getElementById('reihe').innerHTML = FASSUNGEN.map(karte).join('');
+
+/* Ueberdeckung MESSEN, nicht behaupten: echte Rechtecke im Dokument. */
+function ueber(a,b){ /* senkrecht und waagerecht gleichzeitig = echte Flaeche */
+  var s=Math.max(0, Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
+  var w=Math.max(0, Math.min(a.right,b.right)-Math.max(a.left,b.left));
+  return {s:Math.round(s), w:Math.round(w), flaeche:Math.round(s*w)};
+}
+/* Den Uebergang zum MESSEN stilllegen, statt auf ihn zu warten.
+
+   Erster Entwurf: `opacity !== '0'` sofort nach dem Umschalten - las
+   mitten in der Blende. Zweiter Entwurf: Schwelle plus ein zweiter Lauf
+   nach 200 ms - half beim Umschalten, aber NICHT beim Laden; (c) stand
+   weiter auf "Zahl verdeckt". Gemessen war die Deckkraft da laengst 0,
+   nur die Tabelle war aelter.
+
+   > Zweimal an der ZEIT gedreht, zweimal daneben. Ein Messwert, der von
+   > einer Blende abhaengt, wird nicht durch laengeres Warten richtig -
+   > die Blende gehoert fuer die Messung abgeschaltet. */
+function ohneUebergang(el, fn){
+  var alt = el.style.transition;
+  el.style.transition = 'none';
+  void el.offsetHeight;                    /* Umbruch erzwingen */
+  var r = fn();
+  el.style.transition = alt;
+  return r;
+}
+
+function zeichne(){
+  var hov=document.getElementById('hov').checked;
+  var band=document.getElementById('band').checked;
+  var zeilen='';
+  FASSUNGEN.forEach(function(f){
+    var k=document.getElementById('k-'+f.id);
+    k.classList.toggle('zeigen', hov);
+    var g=k.querySelector('.k-raster'); if(g) g.style.visibility = band?'visible':'hidden';
+    var ring=k.querySelector('.ring'), zahl=k.querySelector('.ring b'), akt=k.querySelector('.aktionen');
+    var rb=ring.getBoundingClientRect(), zb=zahl.getBoundingClientRect(), ab=akt.getBoundingClientRect();
+    /* Unsichtbares zaehlt nicht: in (c) weicht der Ring, dann gibt es
+       nichts zu ueberdecken - das ist der Sinn der Fassung.
+
+       GEMESSEN WIRD DER GESETZTE ZUSTAND, NICHT DIE BLENDE. Der erste
+       Entwurf las `opacity !== '0'` direkt nach dem Umschalten - mitten
+       im 120-ms-Uebergang steht dort aber z. B. 0.37, und (c) meldete
+       "Zahl verdeckt": ausgerechnet die Fassung, die das verhindern
+       soll. Deshalb eine Schwelle statt eines Vergleichs auf '0', und
+       unten ein zweiter Lauf, wenn der Uebergang durch ist. */
+    var sichtbar = ohneUebergang(ring, function(){
+      return parseFloat(window.getComputedStyle(ring).opacity) > 0.05;
+    });
+    var uR = (hov && sichtbar) ? ueber(rb,ab) : {s:0,w:0,flaeche:0};
+    var uZ = (hov && sichtbar) ? ueber(zb,ab) : {s:0,w:0,flaeche:0};
+    var gut = uZ.flaeche===0;
+    var kl = gut?'ok':(uZ.flaeche<120?'mid':'fail');
+    document.getElementById('m-'+f.id).innerHTML =
+        '<b>Ring ↔ Knöpfe</b> '+uR.s+' px senkrecht × '+uR.w+' px waagerecht<br>'
+      + '<b>auf der Score-Zahl</b> <span class="z '+kl+'">'+uZ.flaeche+'</span> <span class="'+kl+'">px²</span>'
+      + '<div class="hinw">'+(gut
+          ? 'Die Zahl ist frei.'
+          : 'Der Knopf liegt auf der Zahl — genau das, was Marcel sieht.')+'</div>';
+    zeilen += '<tr><td>'+f.titel+'</td><td class="num">'+uR.s+' × '+uR.w+'</td>'
+      + '<td class="num '+kl+'">'+uZ.flaeche+'</td>'
+      + '<td class="'+kl+'">'+(gut?'Zahl frei':'Zahl verdeckt')+'</td></tr>';
+  });
+  document.querySelector('#tab tbody').innerHTML = zeilen;
+}
+/* Zweimal zeichnen: einmal sofort, einmal nachdem der 120-ms-Uebergang
+   durch ist. Sonst zeigt (c) den Wert aus der Blende statt den aus dem
+   Ruhezustand - siehe die Begruendung oben. */
+function zeichneZweimal(){ zeichne(); setTimeout(zeichne, 200); }
+document.getElementById('hov').addEventListener('change', zeichneZweimal);
+document.getElementById('band').addEventListener('change', zeichneZweimal);
+zeichneZweimal();
+</script>
+</div></body></html>

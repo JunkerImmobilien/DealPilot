@@ -21,8 +21,42 @@ const { authenticate } = require('../middleware/auth');
 const { query } = require('../db/pool');
 
 /* Erlaubte Schlüssel. Eine feste Liste, damit die Tabelle nicht mit der
-   Zeit zum Abstellraum wird. */
-const ERLAUBT = ['datenraum'];
+   Zeit zum Abstellraum wird.
+
+   v1956 · `lage_profil` kommt dazu — Marcels Entscheidung vom 07.10.2026
+   („ja auf den Server damit"). Es trägt die Zielrenditen je Lageklasse
+   A/B/C und optional abweichende Standardwerte je Klasse.
+
+   > WARUM ES HIERHER GEHÖRT UND NICHT IN DEN localStorage: an dieser
+   > Zahl hängt eine RECHNUNG — der Quick-Check leitet daraus ab, um
+   > wie viel der Kaufpreis sinken müsste. Ein Profil, das nur auf einem
+   > Gerät liegt, lässt denselben Kunden auf dem Handy ein anderes
+   > Ergebnis sehen als am Schreibtisch, ohne dass er den Unterschied
+   > erklären könnte. Beim Datenraum ging es um verlorene Links; hier
+   > geht es um zwei verschiedene Wahrheiten.
+
+   Das Investmentprofil (`dp_investment_profile`, 24 Schlüssel) bleibt
+   vorerst lokal. Es hier mitzunehmen wäre ein eigener Schritt — und
+   einer, der eine Vorrangregel zwischen beiden braucht. */
+/* v2012 - `portfolio_analyse`: die Beurteilung des Portfolio-Piloten.
+
+   Eine OBJEKT-Analyse wird gespeichert (objects.ai_analysis) und hat
+   im Telegram-Bot ein eigenes Werkzeug. Die PORTFOLIO-Analyse hatte
+   beides nicht - sie entstand im Chat des Cockpits und war mit dem
+   Schliessen des Reiters weg. Der Bot konnte die Zahlen lesen, nie
+   die Beurteilung. Eine Analyse, die nur im Fenster lebt, ist fuer
+   jeden anderen Weg nicht vorhanden - auch fuer den Nutzer selbst am
+   naechsten Tag nicht.
+
+   Hier und nicht in einer eigenen Tabelle, weil `updated_at` den
+   STAND gleich mitliefert. Die 200-KB-Grenze unten stand mit der
+   Begruendung "damit hier keine Dokumente landen" - eine Analyse ist
+   kein Dokument, und der Text wird beim Schreiben zusaetzlich
+   gekappt (die laengste gemessene Objekt-Analyse hat 14.849 Zeichen). */
+/* v2019 - `eigenes_wissen`: was Marcel dem Projektwissen hinzufuegt.
+   Es geht in den Prompt ALLER DREI Piloten, aber als eigener Block
+   mit eigener Ueberschrift - siehe services/projektwissen.js. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen'];
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {
