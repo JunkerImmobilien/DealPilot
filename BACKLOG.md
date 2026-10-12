@@ -125,6 +125,49 @@ Quellenangabe**, und die **Gegenüberstellung** mit den vier Objektfeldern.
 `nutzerEinschaetzung()` liefert die neun Indikatoren seit `v1851` —
 gegenübergestellt werden sie nirgends.
 
+> **✅ Teilweise erledigt 12.10.2026 · `v2157` (`ff1af46b`, `7b71224d`).**
+> Gegenüberstellung und Preisniveau mit Quelle: gebaut. Die Pilot-Analyse
+> bekommt jetzt beide Lage-Seiten des Berichts (`assessment` = aus
+> Messdaten, `nutzer_einschaetzung` = Objektfelder), die Lageklasse und die
+> vier Objektfelder, den Bevölkerungstrend und — wenn vorhanden — den
+> Zensus. Neue Aufgabe 15 mit Zielfeld `lage_gegenueberstellung` (je
+> Merkmal: Ihre Angabe · Marktbericht · Recherche mit Quelle · Urteil ·
+> Kommentar), Karte „Gegenüberstellung" im Reiter Lage & Markt, die
+> Zeilen-Quellen auch im Quellen-Reiter.
+> **Nachweis:** `prompt-lecks-pruefen` 100 Stellen, 12 neu, RC=0;
+> Kettenprobe im Container an Bericht 176 (vier Abweichungen markiert,
+> Zensus als fehlend benannt); Karte bei 390 px ohne Überlauf.
+> **Rest:** ob das Modell die Zeilen sinnvoll füllt, zeigt nur ein echter
+> Analyselauf.
+>
+> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.**
+> `marktbericht/backend/data/zensus2022_kreise.csv` trägt nur die
+> Beispielzeile. **0 von 162 Berichten auf Staging haben Zensus-Werte**
+> (159× `kreis_nicht_in_datei`, 3× `kein_ags`). Der „Zensus-Abruf" lief
+> nie. Die Zensus-Datenbank (`ergebnisse.zensus2022.de`) liefert per
+> Schnittstelle nur mit **registriertem Konto** — Gastzugang gibt Code 15,
+> die Web-Oberfläche braucht eine Sitzung. **Braucht Marcel:** kostenloses
+> Konto anlegen; danach lässt sich die Kreisdatei (~400 Kreise:
+> Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
+> Quelle erzeugen statt abtippen.
+
+#### N62.4a · Makro-Score: Ersatzwerte gelten als gemessen
+
+**Gefunden am 12.10.2026 bei N62.4.** `ScoringService.macroScore()`
+(`marktbericht/backend/src/services/ScoringService.js:17`) setzt für jede
+fehlende Kennzahl einen Ersatzwert ein (`kaufkraft_idx ?? 100`,
+`arbeitslosenquote ?? 6`, `wanderungssaldo ?? 0`, Trends `?? 0`) und
+meldet trotzdem `estimated: false`. An Bericht 176 ist **nur der
+Bevölkerungsteil gemessen** (65); die anderen fünf Teilwerte sind
+Platzhalter (50/50/50/50/60), der Makro-Score 54 ist also überwiegend
+erfunden — und geht mit 20 % in den Deal-Score des Berichts.
+
+Verstößt gegen „Kein Treffer heißt kein Wert". Richtig wäre: nur
+vorhandene Kennzahlen mitteln, `estimated` setzen, sobald eine fehlt, und
+die Zahl der gemessenen Teile mitführen. **Ändert Scores bestehender
+Berichte → Marktbericht-Strang, vor dem Bauen mit Marcel abstimmen.**
+In die Pilot-Analyse gehen die Teilwerte seit `v2157` bewusst **nicht**.
+
 #### N62.5 · Ein eigener Reiter „Quellen" in der Pilot-Analyse
 
 **Marcel:** *„Wir brauchen dann extra Reiter auch nochmal für die Quellen,

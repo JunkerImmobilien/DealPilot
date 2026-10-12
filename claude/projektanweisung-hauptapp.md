@@ -38614,6 +38614,49 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2157 · Lage & Markt: die Lage zweimal erhoben, gegenübergestellt (N62.4)
+
+**Was**  Der Marktbericht trägt die Lage **zweimal**: `assessment` (aus
+Messdaten abgeleitet) und `nutzer_einschaetzung` (die Objektfelder). An
+Bericht 176 weichen sie in **vier von fünf** Punkten ab — keine der beiden
+Seiten kam in der Pilot-Analyse an. Ebenso fehlten die Lageklasse und die
+vier Objektfelder (`ds2_bevoelkerung`, `ds2_nachfrage`,
+`ds2_wertsteigerung`, `ds2_entwicklung`) im Sender; nur Makro/Mikro fuhren mit.
+
+- `/objects/history` liefert `lage_bericht`, `lage_nutzer`,
+  `bevoelkerung_trend_pct`, `zensus`
+- Prompt: Block „LAGE ZWEIMAL ERHOBEN" mit `<- WEICHT AB`; Zensus mit
+  Stichtag oder ausdrücklich als fehlend benannt
+- Aufgabe 15 + Zielfeld `lage_gegenueberstellung` (Quelle **je Zeile**)
+- Karte „Gegenüberstellung" im Reiter, gestapelt für 390 px; die
+  Zeilen-Quellen auch im Quellen-Reiter (v2155)
+
+**Commit**  `ff1af46b`, `7b71224d` (frontend-konstanten)
+
+**Nachweis**  `prompt-lecks-pruefen` 100 Stellen, 12 neu, RC=0 ·
+Kettenprobe im Container: echte `/objects/history` → echte
+`buildPrompt()` an Bericht 176 · Karte im Browser gerendert (gestelltes
+Ergebnis, kein KI-Lauf), 390 px ohne Überlauf, Musterzeile verworfen.
+
+**Zwei Befunde, die nicht gebaut sind:**
+
+1. **Der Zensus lief nie.** Die Kreisdatei ist leer (nur die
+   Beispielzeile), **0 von 162 Berichten** tragen Werte. Die
+   Zensus-Schnittstelle verlangt ein registriertes Konto (Gast → Code 15).
+   Nach drei Anläufen abgebrochen; braucht Marcels Konto.
+2. **Der Makro-Score rechnet mit Ersatzwerten** und meldet
+   `estimated: false` — an Bericht 176 sind fünf von sechs Teilwerten
+   Platzhalter. Backlog **N62.4a**. Die Teilwerte gehen deshalb bewusst
+   **nicht** in den Prompt.
+
+> **Ein Abruf, der nie Daten hatte, sieht aus wie ein Abruf ohne
+> Treffer.** `kreis_nicht_in_datei` klingt nach einem Kreis, der fehlt —
+> es fehlten alle.
+
+**Rest**  ob das Modell die Zeilen sinnvoll füllt: echter Analyselauf.
+
+---
+
 ### Zwei eigene Fehler dieser Sitzung
 
 **1 · Derselbe Fehler zweimal: Backtick im SQL-Kommentar.** In einem
@@ -38677,7 +38720,7 @@ N62.5 (Quellen-Reiter) · dazu N51 vollständig (v2151–v2152b).
 
 | # | Punkt |
 |---|---|
-| N62.4 | Lage & Markt: Zensus-Daten, Preisniveau mit Quellen, Gegenüberstellung mit den vier Objektfeldern (`ds2_wertsteigerung`, `ds2_nachfrage`, `ds2_bevoelkerung`, `ds2_entwicklung`) |
+| N62.4 | **teilweise erledigt (v2157)** — offen nur noch die Zensus-Datei (Konto nötig) · Lage & Markt: Zensus-Daten, Preisniveau mit Quellen, Gegenüberstellung mit den vier Objektfeldern (`ds2_wertsteigerung`, `ds2_nachfrage`, `ds2_bevoelkerung`, `ds2_entwicklung`) |
 | N62.6 | Steuerliche Zusammenfassung → in den Soll/Ist-Abgleich |
 | N62.7 | Landingpage: Leistungsumfang unter „Funktionen" |
 | N62.8 | Preise: Integrationsservice + Bestandsmigration — **⚠ GELD, nicht ohne Marcels Freigabe** |
