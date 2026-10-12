@@ -3116,3 +3116,36 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     min-height: 44px !important;
   }
 }
+
+/* =====================================================================
+   v2134a - ZWEI PIXEL IN DER KARTEI
+
+   Schlussabnahme der offenen Schublade, 390 px, alle vier Entwuerfe,
+   Kachel fuer Kachel gemessen:
+
+     Vorgabe   358 x 44   min-height 44px   Polster 6/9
+     Zeile     364 x 44   min-height 44px   Polster 6/11
+     Buetten   366 x 44   min-height 44px   Polster 6/9
+     Kartei    388 x 42   min-height 42px   Polster 0/13   <- hier
+
+   42 statt 44. Die Begruendung daneben steht seit v1664: *"Alle vier
+   Chips gleich hoch und gleich gefasst - die Masse sind die der Demo,
+   ohne Unterzeile also flacher."* Die Demo kannte keine Touchflaeche.
+
+   > **Zwei Pixel sind kein Gestaltungsunterschied, sondern ein
+   > Unterschied zwischen Entwurf und Geraet.** Auf dem Schreibtisch
+   > sieht 42 aus wie 44; unter dem Finger ist es die Grenze.
+
+   Geaendert wird nur das Mass, und nur unter 901 px. Ueber 901 px
+   behaelt die Kartei ihre 42 px - dort ist eine Maus im Spiel, und die
+   Demo-Proportion bleibt, wo sie gemeint war.
+
+   Dasselbe fuer den Abruf-Knopf der Kartei (40 px, Z. 1189): den hat
+   `v2134` schon stilunabhaengig auf 44 gehoben, hier steht nur der
+   Nachweis, dass es derselbe Fall ist.
+   ===================================================================== */
+@media (max-width: 900px){
+  html[data-dp-kartenstil="kartei"] :is(#oab-bar,#qc7-sources).dp-pfbar .dp-pf-tile{
+    min-height: 44px !important;
+  }
+}
