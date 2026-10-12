@@ -42,10 +42,50 @@ async function _authViaApiKey(req, res, next, plain) {
     const rec = await apiKeyService.findValidByPlaintext(plain);
     if (!rec) return res.status(401).json({ error: 'Invalid or revoked API key' });
     if (!_rateOk(rec.id)) return res.status(429).json({ error: 'Rate limit exceeded (120/min)' });
-    const r = await query('SELECT id, email, name, role, is_active FROM users WHERE id = $1', [rec.user_id]);
+    /* ══ v2136a · DIE FRIST GILT AUCH FUER DEN API-SCHLUESSEL ════════
+       GEFUNDEN von meinem eigenen Pruefer, und zwar als Rest: er suchte
+       den englischen Satz "User account is disabled" und fand ihn nach
+       dem Umbau noch einmal - hier. Es gibt ZWEI Wege in die App, und
+       ich hatte nur den einen angefasst.
+
+       > Ein Zugang, der die Frist nicht kennt, hebt sie auf. Wer sich
+       > in den sechs Stunden einen API-Schluessel anlegt, haette danach
+       > unbegrenzt weitergearbeitet - die Sperre haette nur den Browser
+       > getroffen.
+
+       Dieselben drei Lagen wie im Token-Pfad, dieselben Kennwoerter,
+       damit ein Aufrufer EINEN Fall behandelt und nicht zwei.
+
+       Die Spalten kommen jetzt mit; vorher stand hier nur `is_active`. */
+    const r = await query(
+      'SELECT id, email, name, role, is_active, email_verified_at, created_at FROM users WHERE id = $1',
+      [rec.user_id]
+    );
     if (r.rowCount === 0) return res.status(401).json({ error: 'User no longer exists' });
     const user = r.rows[0];
-    if (!user.is_active) return res.status(403).json({ error: 'User account is disabled' });
+    if (!user.is_active) {
+      if (!user.email_verified_at) {
+        return res.status(403).json({
+          error: 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte klicke den Link in der '
+            + 'Bestätigungs-Mail – auch im Spam-Ordner.',
+          code: 'EMAIL_NOT_VERIFIED'
+        });
+      }
+      return res.status(403).json({
+        error: 'Dieser Zugang ist deaktiviert. Bitte wende dich an den Support.',
+        code: 'ACCOUNT_DISABLED'
+      });
+    }
+    if (!user.email_verified_at) {
+      const fristApi = require('../config').auth.verifyGnadenfristStunden;
+      if (Date.now() > new Date(user.created_at).getTime() + fristApi * 3600 * 1000) {
+        return res.status(403).json({
+          error: 'Die Frist zur Bestätigung deiner E-Mail-Adresse ist abgelaufen. Lass dir die '
+            + 'Bestätigungs-Mail erneut schicken, dann ist der Zugang sofort wieder da.',
+          code: 'VERIFY_EXPIRED'
+        });
+      }
+    }
     try {
       const plan = await subscriptionService.getEffectivePlan(user.id);
       /* v2072a: dasselbe Merkmal, das routes/apiKeys.js per
@@ -143,9 +183,18 @@ async function authenticate(req, res, next) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Verify user still exists and is active
+    /* ══ v2136 · DIE FRIST WIRD HIER DURCHGESETZT (N60.3) ═══════════
+       `email_verified_at` und `created_at` kommen mit. Vorher stand
+       hier nur `is_active`, und das reichte, solange der Riegel die
+       Bestaetigung ERZWANG. Seit v2136 ist der Zugang sofort da - also
+       muss der Ablauf an einer Stelle greifen, die JEDE Anfrage
+       passiert.
+
+       > Eine Frist, die nur beim Anmelden geprueft wird, laeuft fuer
+       > eine offene Sitzung nie ab. Der Token gilt sieben Tage; sechs
+       > Stunden waeren damit eine Empfehlung. */
     const r = await query(
-      'SELECT id, email, name, role, is_active FROM users WHERE id = $1',
+      'SELECT id, email, name, role, is_active, email_verified_at, created_at FROM users WHERE id = $1',
       [payload.userId]
     );
     if (r.rowCount === 0) {
@@ -153,7 +202,33 @@ async function authenticate(req, res, next) {
     }
     const user = r.rows[0];
     if (!user.is_active) {
-      return res.status(403).json({ error: 'User account is disabled' });
+      /* v2136: dieselbe Unterscheidung wie beim Login (v2094) - und
+         auf Deutsch. Hier stand 'User account is disabled'. */
+      if (!user.email_verified_at) {
+        return res.status(403).json({
+          error: 'Deine E-Mail-Adresse ist noch nicht bestätigt. Bitte klicke den Link in der '
+            + 'Bestätigungs-Mail – auch im Spam-Ordner.',
+          code: 'EMAIL_NOT_VERIFIED'
+        });
+      }
+      return res.status(403).json({
+        error: 'Dieser Zugang ist deaktiviert. Bitte wende dich an den Support.',
+        code: 'ACCOUNT_DISABLED'
+      });
+    }
+    if (!user.email_verified_at) {
+      const frist = require('../config').auth.verifyGnadenfristStunden;
+      const ablauf = new Date(user.created_at).getTime() + frist * 3600 * 1000;
+      if (Date.now() > ablauf) {
+        return res.status(403).json({
+          error: 'Die Frist zur Bestätigung deiner E-Mail-Adresse ist abgelaufen. Lass dir die '
+            + 'Bestätigungs-Mail erneut schicken, dann ist der Zugang sofort wieder da.',
+          code: 'VERIFY_EXPIRED'
+        });
+      }
+      /* Noch in der Frist: die App soll den Countdown zeigen koennen,
+         ohne eine zweite Anfrage. */
+      res.set('X-DP-Verify-Deadline', new Date(ablauf).toISOString());
     }
 
     req.user = {

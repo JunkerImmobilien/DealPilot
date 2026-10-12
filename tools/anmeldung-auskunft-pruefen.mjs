@@ -42,7 +42,16 @@ const pfadPw = require_.resolve('./utils/password');
    tun hat - und ein Pruefer, der nicht startet, prueft nichts. */
 const pfadConfig = require_.resolve('./config');
 require_.cache[pfadConfig] = new Module(pfadConfig, null);
-require_.cache[pfadConfig].exports = { env: 'test' };
+/* v2136: `auth.verifyGnadenfristStunden` MUSS mit in den Ersatz. Die
+   neue Frist-Weiche liest sie per `require('../config')`, und mit einem
+   Ersatz, der nur `env` kennt, waere das ein TypeError. Gefunden, weil
+   der Pruefer nach dem Einbau weiter gruen war: die alten Tests
+   erreichen die neue Weiche gar nicht. */
+const FRIST_H = 6;
+require_.cache[pfadConfig].exports = {
+  env: 'test',
+  auth: { verifyGnadenfristStunden: FRIST_H }
+};
 require_.cache[pfadConfig].loaded = true;
 
 let naechsteZeile = null;
@@ -203,10 +212,142 @@ const svc = fs.readFileSync('backend/src/services/userService.js', 'utf8');
 melde((svc.match(/EMAIL_NOT_VERIFIED/g) || []).length === 1,
   'EMAIL_NOT_VERIFIED steht genau einmal im Dienst');
 
+/* ── 7 · DIE GNADENFRIST (v2136, N60.3) ───────────────────────────────
+   Hier wird die ECHTE `authenticate()` des Dienstes gerufen und die
+   ECHTE `authenticate()`-Middleware - mit Zeilen, die vor und nach dem
+   Ablauf liegen. Die Frist selbst kommt aus dem config-Ersatz, damit
+   der Test nicht eine zweite Zahl erfindet. */
+console.log('\n=== 7 · Die Gnadenfrist ===');
+
+const H = 3600 * 1000;
+const jetzt = Date.now();
+const frisch = new Date(jetzt - 1 * H).toISOString();      /* 1 h alt  */
+const abgelaufen = new Date(jetzt - (FRIST_H + 1) * H).toISOString();  /* 7 h alt */
+
+/* (a) Login: in der Frist, unbestaetigt -> KOMMT DURCH */
+naechsteZeile = { id: 'u1', email: 'a@b.de', password_hash: 'x', name: 'A',
+  role: 'user', is_active: true, email_verified_at: null, created_at: frisch };
+let durch = null, gefangen = null;
+try { durch = await userService.authenticate({ email: 'a@b.de', plainPassword: 'richtig', ipAddress: '1.2.3.4' }); }
+catch (e) { gefangen = e; }
+melde(!!durch && !gefangen, 'Login in der Frist: unbestaetigt kommt durch');
+
+/* (b) Login: Frist abgelaufen -> VERIFY_EXPIRED */
+naechsteZeile = { id: 'u1', email: 'a@b.de', password_hash: 'x', name: 'A',
+  role: 'user', is_active: true, email_verified_at: null, created_at: abgelaufen };
+durch = null; gefangen = null;
+try { durch = await userService.authenticate({ email: 'a@b.de', plainPassword: 'richtig', ipAddress: '1.2.3.4' }); }
+catch (e) { gefangen = e; }
+melde(!!gefangen && gefangen.code === 'VERIFY_EXPIRED',
+  'Login nach Ablauf: code VERIFY_EXPIRED (ist: ' + (gefangen ? gefangen.code : 'kein Fehler') + ')');
+melde(!!gefangen && gefangen.statusCode === 403, 'und Status 403');
+melde(!!gefangen && /erneut schicken/.test(gefangen.message || ''),
+  'und der Text nennt den Weg zurueck');
+
+/* (c) Login: BESTAETIGT und alt -> die Frist greift nicht */
+naechsteZeile = { id: 'u1', email: 'a@b.de', password_hash: 'x', name: 'A',
+  role: 'user', is_active: true, email_verified_at: abgelaufen, created_at: abgelaufen };
+durch = null; gefangen = null;
+try { durch = await userService.authenticate({ email: 'a@b.de', plainPassword: 'richtig', ipAddress: '1.2.3.4' }); }
+catch (e) { gefangen = e; }
+melde(!!durch && !gefangen, 'Wer bestaetigt hat, ist von der Frist nie betroffen');
+
+/* (d) Die Middleware an JEDER Anfrage - der Ort, an dem die Frist
+       wirklich greift. Sie zieht `users WHERE id`, nicht `WHERE email`,
+       also braucht der Ersatz eine zweite Weiche. */
+const pfadMw = require_.resolve('./middleware/auth.js');
+let mwZeile = null;
+const altePool = require_.cache[pfadPool].exports.query;
+require_.cache[pfadPool].exports.query = async (sql, params) => {
+  if (/FROM users WHERE id/i.test(sql)) {
+    return mwZeile ? { rowCount: 1, rows: [mwZeile] } : { rowCount: 0, rows: [] };
+  }
+  return altePool(sql, params);
+};
+const pfadJwt = require_.resolve('./utils/jwt');
+require_.cache[pfadJwt] = new Module(pfadJwt, null);
+require_.cache[pfadJwt].exports = { verify: () => ({ userId: 'u1' }), sign: () => 't' };
+require_.cache[pfadJwt].loaded = true;
+const mw = require_('./middleware/auth.js');
+
+async function durchMw(zeile) {
+  mwZeile = zeile;
+  let status = 200, koerper = null, kopf = {}, weiter = false;
+  const res = {
+    status: (s) => { status = s; return res; },
+    json: (b) => { koerper = b; return res; },
+    set: (k, v) => { kopf[k] = v; return res; }
+  };
+  await mw.authenticate({ headers: { authorization: 'Bearer x' } }, res, () => { weiter = true; });
+  return { status, koerper, kopf, weiter };
+}
+
+const m1 = await durchMw({ id: 'u1', email: 'a@b.de', name: 'A', role: 'user',
+  is_active: true, email_verified_at: null, created_at: frisch });
+melde(m1.weiter === true, 'Middleware in der Frist: Anfrage geht durch');
+melde(!!m1.kopf['X-DP-Verify-Deadline'],
+  'und der Ablauf kommt als Kopfzeile mit (ist: ' + (m1.kopf['X-DP-Verify-Deadline'] || 'keine') + ')');
+
+const m2 = await durchMw({ id: 'u1', email: 'a@b.de', name: 'A', role: 'user',
+  is_active: true, email_verified_at: null, created_at: abgelaufen });
+melde(m2.weiter === false && m2.status === 403, 'Middleware nach Ablauf: 403, kein next()');
+melde(!!m2.koerper && m2.koerper.code === 'VERIFY_EXPIRED',
+  'und code VERIFY_EXPIRED (ist: ' + (m2.koerper ? m2.koerper.code : '-') + ')');
+
+const m3 = await durchMw({ id: 'u1', email: 'a@b.de', name: 'A', role: 'user',
+  is_active: true, email_verified_at: abgelaufen, created_at: abgelaufen });
+melde(m3.weiter === true && !m3.kopf['X-DP-Verify-Deadline'],
+  'Bestaetigt: kein Ablauf, keine Kopfzeile');
+
+const m4 = await durchMw({ id: 'u1', email: 'a@b.de', name: 'A', role: 'user',
+  is_active: false, email_verified_at: null, created_at: frisch });
+melde(m4.status === 403 && m4.koerper && m4.koerper.code === 'EMAIL_NOT_VERIFIED',
+  'Middleware: inaktiv und nie bestaetigt -> EMAIL_NOT_VERIFIED');
+const m5 = await durchMw({ id: 'u1', email: 'a@b.de', name: 'A', role: 'user',
+  is_active: false, email_verified_at: frisch, created_at: abgelaufen });
+melde(m5.status === 403 && m5.koerper && m5.koerper.code === 'ACCOUNT_DISABLED',
+  'Middleware: inaktiv und bestaetigt -> ACCOUNT_DISABLED');
+/* v2136: NUR auf dem kommentarfreien Text pruefen. Der erste Lauf war
+   rot, weil der neue Kommentar den alten Satz ZITIERT - dieselbe Falle
+   wie schon dreimal zuvor. Ein Pruefer, der sein eigenes Zitat findet,
+   meldet einen Fehler, den er selbst mitgebracht hat. */
+const mwRoh = fs.readFileSync('backend/src/middleware/auth.js', 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/^\s*\/\/.*$/gm, '');
+melde(!/User account is disabled/.test(mwRoh),
+  'Der englische Satz steht nicht mehr in der Middleware');
+
+/* ── 8 · Was die Dateien tragen muessen ──────────────────────────────── */
+console.log('\n=== 8 · Die Quellen ===');
+const regT = fs.readFileSync('backend/src/routes/registerWithVerify.js', 'utf8');
+melde(/VALUES \(\$1, \$2, \$3, \$4, TRUE\)/.test(regT),
+  'Die Anmeldung legt den Nutzer AKTIV an (Zugang sofort)');
+melde(!/VALUES \(\$1, \$2, \$3, \$4, FALSE\)/.test(regT),
+  'und der alte Riegel FALSE steht nicht mehr da');
+melde(/email_verified_at = COALESCE\(email_verified_at, NOW\(\)\)/.test(regT),
+  'Die Bestaetigung setzt den Stempel (COALESCE, zweiter Klick ueberschreibt nicht)');
+melde(/router\.post\('\/resend-verify'/.test(regT),
+  'Der Endpunkt /resend-verify ist da — das Versprechen von EMAIL_NOT_VERIFIED');
+melde(/verifyDeadline/.test(regT),
+  'Die Antwort der Anmeldung traegt den Ablaufzeitpunkt');
+const confT = fs.readFileSync('backend/src/config.js', 'utf8');
+melde(/verifyGnadenfristStunden/.test(confT), 'Die Frist steht in der config');
+/* EINE Quelle: nirgends eine fest eingetragene 6 neben der Frist */
+const mwT = fs.readFileSync('backend/src/middleware/auth.js', 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '');
+const svcT2 = fs.readFileSync('backend/src/services/userService.js', 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '');
+melde(/verifyGnadenfristStunden/.test(mwT) && /verifyGnadenfristStunden/.test(svcT2),
+  'Middleware UND Dienst lesen die Frist aus der config, nicht aus einer eigenen Zahl');
+melde(!/\b6\s*\*\s*3600/.test(mwT) && !/\b6\s*\*\s*3600/.test(svcT2),
+  'und keine der beiden Stellen rechnet mit einer fest eingetragenen 6');
+
 /* ── 6 · Deckung ─────────────────────────────────────────────────────── */
 console.log('\n=== 6 · Deckung ===');
 console.log('  Pruefpunkte            : ' + geprueft);
-console.log('  echte Funktionsaufrufe : authenticate() 4x, errorHandler() 5x');
+console.log('  echte Funktionsaufrufe : userService.authenticate() 7x, errorHandler() 5x,');
+console.log('                           middleware.authenticate() 5x');
+console.log('  Frist im Test          : ' + FRIST_H + ' h, aus demselben config-Feld wie die App');
 console.log('  ersetzt                : db/pool, authFailuresService, utils/password');
 console.log('  NICHT ersetzt          : userService, errors.js — die echten Dateien');
 

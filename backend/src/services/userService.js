@@ -107,7 +107,7 @@ async function authenticate({ email, plainPassword, ipAddress }) {
   /* v2094: `email_verified_at` kommt mit, um die zwei Gruende fuer
      is_active=false auseinanderzuhalten - siehe unten. */
   const r = await query(
-    `SELECT id, email, password_hash, name, role, is_active, email_verified_at
+    `SELECT id, email, password_hash, name, role, is_active, email_verified_at, created_at
      FROM users WHERE email = $1`,
     [emailLower]
   );
@@ -188,6 +188,24 @@ async function authenticate({ email, plainPassword, ipAddress }) {
     const err = new HttpError(403, 'Dieser Zugang ist deaktiviert. Bitte wende dich an den Support.');
     err.code = 'ACCOUNT_DISABLED';
     throw err;
+  }
+
+  /* ══ v2136 · DIE FRIST AUCH BEIM LOGIN (N60.3) ════════════════════
+     Seit v2136 ist der Zugang sofort da (`is_active=true`), also faellt
+     der Riegel oben fuer frisch Registrierte nicht mehr. Wer die sechs
+     Stunden verstreichen laesst, muss hier dieselbe Auskunft bekommen
+     wie an jeder anderen Anfrage - mit demselben Kennwort, damit das
+     Frontend EINEN Fall behandelt und nicht zwei. */
+  if (!user.email_verified_at) {
+    const frist = require('../config').auth.verifyGnadenfristStunden;
+    const ablauf = new Date(user.created_at).getTime() + frist * 3600 * 1000;
+    if (Date.now() > ablauf) {
+      const e2 = new HttpError(403,
+        'Die Frist zur Bestätigung deiner E-Mail-Adresse ist abgelaufen. Lass dir die '
+        + 'Bestätigungs-Mail erneut schicken, dann ist der Zugang sofort wieder da.');
+      e2.code = 'VERIFY_EXPIRED';
+      throw e2;
+    }
   }
 
   // V204 H6: Erfolg → Fehlversuche zurücksetzen

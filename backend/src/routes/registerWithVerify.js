@@ -43,6 +43,17 @@ const registerLimiter = rateLimit({
   message: { error: 'Zu viele Registrierungs-Versuche. Bitte versuche es später erneut.' }
 });
 
+/* v2136: eigener, strengerer Zaehler fuer das Nachsenden. Fuenf
+   Registrierungen pro Stunde sind etwas anderes als fuenf Mails an
+   dieselbe Adresse - der zweite Weg ist der billigere Missbrauch. */
+const resendLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Zu viele Anfragen. Bitte versuche es in einer Stunde erneut.' }
+});
+
 const RegisterSchema = z.object({
   name: z.string().trim().min(2, 'Name zu kurz').max(100, 'Name zu lang'),
   email: z.string().trim().toLowerCase().email('Ungültige E-Mail-Adresse').max(200),
@@ -86,9 +97,36 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
     const isFirstUser = parseInt(countResult.rows[0].cnt, 10) === 0;
     const role = isFirstUser ? 'admin' : 'user';
 
+    /* ══ v2136 · ZUGANG SOFORT, FRIST STATT RIEGEL (N60.3) ══════════
+       Hier stand `FALSE`. Marcel: "Bei der Erstanmeldung besteht die
+       Moeglichkeit, dass der Kunde direkt Zugang zur App bekommt und
+       spaetestens 6 Stunden nach Erstanmeldung bestaetigen muss, sonst
+       wird der Account gesperrt. Der Hinweis muss natuerlich mit der
+       Erstanmeldung kommen, aber so kann ein User direkt, ohne dass er
+       jetzt in seine Mails gehen muss, schon was sehen."
+
+       Der Riegel war `is_active=false` - und er hat die Mail zur
+       Voraussetzung gemacht, nicht zur Bestaetigung. Jetzt traegt die
+       FRIST, was vorher der Riegel trug:
+
+         is_active        TRUE ab der Sekunde der Anmeldung
+         email_verified_at NULL, bis der Link geklickt wird
+         Ablauf           created_at + config.auth.verifyGnadenfristStunden
+
+       Durchgesetzt wird sie nicht hier, sondern an JEDER Anfrage
+       (`middleware/auth.js`) und beim Login (`userService`). Eine Frist,
+       die nur beim Anmelden geprueft wird, laeuft fuer eine offene
+       Sitzung nie ab.
+
+       ⚠ DER PREIS, ausdruecklich benannt: ein unbestaetigter Zugang ist
+       ein Zugang. Wer eine fremde Adresse eintraegt, kann sechs Stunden
+       arbeiten, und der Inhaber der Adresse erfaehrt es nur aus der
+       Mail. Das ist Marcels Entscheidung und steht so in N60.3 als
+       Weg (a); der Gegenvorschlag (b) war ein eigenes Lesezugangs-
+       Merkmal. Die sechs Stunden sind die Begrenzung dieses Preises. */
     const r = await query(
       `INSERT INTO users (email, password_hash, name, role, is_active)
-       VALUES ($1, $2, $3, $4, FALSE)
+       VALUES ($1, $2, $3, $4, TRUE)
        RETURNING id, email, name, role, created_at`,
       [email, hash, name, role]
     );
@@ -164,13 +202,85 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
       console.error('[register-verify] Admin-Notification fehlgeschlagen:', e.message);
     }
 
+    /* v2136: Token und Ablauf mit der Antwort. Ohne Token muesste der
+       Nutzer sich nach der Anmeldung noch einmal anmelden - und genau
+       diesen Umweg soll die Gnadenfrist ersparen. `verifyDeadline` ist
+       die EINE Zahl, aus der die App ihren Countdown rechnet; sie wird
+       nicht im Frontend abgeleitet, sonst haette die Frist zwei
+       Wahrheiten. */
+    const _frist = require('../config').auth.verifyGnadenfristStunden;
+    const _ablauf = new Date(new Date(user.created_at).getTime() + _frist * 3600 * 1000);
     res.status(201).json({
       success: true,
-      message: 'Anmeldung erfolgreich. Bitte E-Mail-Postfach prüfen und Bestätigungs-Link klicken.'
+      message: 'Anmeldung erfolgreich. Du kannst sofort loslegen – bitte bestätige deine E-Mail-Adresse innerhalb von '
+        + _frist + ' Stunden, sonst wird der Zugang gesperrt.',
+      token: jwtUtil.sign({ userId: user.id, email: user.email, name: user.name, role: user.role }),
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      emailVerified: false,
+      verifyDeadline: _ablauf.toISOString(),
+      verifyGraceHours: _frist
     });
   } catch (err) {
     console.error('[register-verify] Fehler:', err);
     res.status(500).json({ error: 'Registrierung fehlgeschlagen. Bitte später erneut versuchen.' });
+  }
+});
+
+/**
+ * ══ v2136 · POST /auth/resend-verify (N60.3) ═════════════════════════
+ *
+ * `v2094` hat den Fehlercode `EMAIL_NOT_VERIFIED` eingefuehrt, damit das
+ * Frontend einen Knopf "Mail erneut senden" zeigen kann statt den Text
+ * zu zerlegen. **Den Endpunkt dazu gab es nicht.** Gemessen: in
+ * `registerWithVerify.js` standen genau zwei Routen, und keine davon
+ * verschickt die Mail noch einmal.
+ *
+ * > Ein Kennwort an einem Fehler ist ein Versprechen. Ohne den Weg
+ * > dahinter ist es eine Beschriftung ohne Tuer.
+ *
+ * Antwortet IMMER neutral (200), auch fuer unbekannte Adressen - sonst
+ * waere der Endpunkt eine Auskunft darueber, wer Kunde ist. Dieselbe
+ * Haltung wie die Anmeldung selbst, die bei bekannter Adresse ebenfalls
+ * 200 gibt.
+ */
+router.post('/resend-verify', resendLimiter, async (req, res) => {
+  const neutral = {
+    success: true,
+    message: 'Falls für diese Adresse eine Bestätigung offen ist, haben wir sie erneut verschickt.'
+  };
+  try {
+    const email = String((req.body && req.body.email) || '').trim().toLowerCase();
+    if (!email || email.length > 200 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return res.json(neutral);
+    }
+    const r = await query(
+      'SELECT id, email, name, email_verified_at FROM users WHERE email = $1 AND deleted_at IS NULL',
+      [email]
+    );
+    /* Unbekannt, oder schon bestaetigt: beides beantwortet derselbe Satz. */
+    if (r.rowCount === 0 || r.rows[0].email_verified_at) return res.json(neutral);
+
+    const user = r.rows[0];
+    const token = await emailVerifyService.createVerifyToken(user.id);
+    const baseUrl = process.env.APP_URL || process.env.FRONTEND_BASE_URL
+      || 'https://app.dealpilot.junker-immobilien.io';
+    const verifyUrl = `${baseUrl}/api/v1/auth/verify-email?token=${token}`;
+    const firstName = (user.name || '').trim().split(/\s+/)[0] || user.name || '';
+    let _brand = null;
+    try { _brand = await resellerBrandLookup.brandForEmail(user.email); } catch (e) {}
+    await mailerService.sendMail({
+      to: user.email,
+      subject: verifyMailTemplate.subject(),
+      text: verifyMailTemplate.renderVerifyText(firstName, verifyUrl, _brand),
+      html: verifyMailTemplate.renderVerifyMail(firstName, verifyUrl, _brand)
+    });
+    console.log('[resend-verify] Verify-Mail erneut gesendet an:', email);
+    return res.json(neutral);
+  } catch (err) {
+    console.error('[resend-verify] Fehler:', err.message);
+    /* Auch im Fehlerfall neutral - der Nutzer soll nicht aus der Antwort
+       schliessen koennen, ob seine Adresse bekannt ist. */
+    return res.json(neutral);
   }
 });
 
@@ -191,7 +301,28 @@ router.get('/verify-email', async (req, res) => {
     }
 
     // User aktivieren
-    await query('UPDATE users SET is_active = TRUE WHERE id = $1', [userId]);
+    /* ══ v2136 · DER STEMPEL WURDE NIE GESETZT ══════════════════════
+       Hier stand nur `is_active = TRUE`. `email_verified_at` blieb
+       NULL - auch nach einer erfolgreichen Bestaetigung.
+
+       GEMESSEN am 12.10.2026 auf Staging:
+         4 Nutzer, 4 aktiv, 0 mit email_verified_at.
+
+       Das war die Grundlage, auf der v2094 seine zwei Auskuenfte
+       unterscheidet ("noch nicht bestaetigt" gegen "deaktiviert") -
+       und sie war leer. Wer bestaetigt hatte und spaeter deaktiviert
+       wird, haette weiter "sieh in dein Postfach" gelesen und einen
+       Knopf "Mail erneut senden" bekommen, der ihm nichts bringt.
+
+       > Eine Spalte, die eine Unterscheidung tragen soll, muss auch
+       > GESCHRIEBEN werden. v2094 hat sie gelesen und niemand gefuellt.
+
+       COALESCE, damit ein zweiter Klick auf denselben Link den ersten
+       Zeitpunkt nicht ueberschreibt. */
+    await query(
+      'UPDATE users SET is_active = TRUE, email_verified_at = COALESCE(email_verified_at, NOW()) WHERE id = $1',
+      [userId]
+    );
 
     // Free-Plan zuweisen falls nicht schon zugewiesen
     // (Subscriptions-Tabelle: insert wenn nicht existiert)
