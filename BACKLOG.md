@@ -753,7 +753,7 @@ Countdown/Hinweis in der App, Sperre bei Ablauf, Entsperrung durch
 Bestätigung. **Vorher messen**, was `email_verified` heute tatsächlich
 blockiert.
 
-#### N60.4 · Was macht die Pilot- und die Cockpit-Analyse wirklich? — TEIL 1 (`v2009`) UND TEIL 2 (`v2139`) ERLEDIGT, Rest: Investmentprofil
+#### N60.4 · ✅ ERLEDIGT — Teil 1 (`v2009`), Teil 2 (`v2139`), Investmentprofil (`v2140`). Rest: nur noch RAG → N60.7
 Marcel: „Auf welche Daten wird zugegriffen und wo ist das Wissen? Haben
 wir auf alles Zugriff oder können wir was besser machen?"
 
@@ -953,9 +953,20 @@ geschätzt.
    | in `user_settings` | **nein** — `ERLAUBT` führt nur `datenraum`, `lage_profil`, `portfolio_analyse`, `eigenes_wissen` (`userSettings.js:59`) |
    | in einem Prompt | **nirgends** — kein Treffer in `ui.js`, `copilot.js`, `portfolio-pilot.js`, `dashboard.js` |
 
-   **Die drei Mindest-Schwellen `min_dscr`, `min_cashflow_vor_st`,
-   `max_ltv` haben nicht einmal ein Formularfeld** — sie reisen also
-   nirgendwohin. Und `openaiService.js:785-789` verlangt wörtlich:
+   > **⚠ ZURÜCKGENOMMEN (noch am 12.10.2026, vor dem Bau):** hier
+   > stand „die drei Mindest-Schwellen `min_dscr`,
+   > `min_cashflow_vor_st`, `max_ltv` haben nicht einmal ein
+   > Formularfeld". **Das ist falsch.** Sie haben eins
+   > (`investment-profile.js:273-275`, Abschnitt „Persönliche
+   > Mindest-Schwellen") und werden von `saveFromForm()` gesammelt
+   > (`:347-349`). Nachgemessen, bevor etwas gebaut wurde.
+   >
+   > Richtig bleibt: sie erreichten **keinen Prompt**. Und die vier
+   > `ai_*`-Schlüssel haben wirklich kein Feld im Profil-Panel — sie
+   > werden aus dem **KI-Tab** geschrieben (`settings.js:549`,
+   > `:1558-1573`). Gepflegt und stumm.
+
+   Und `openaiService.js:785-789` verlangte wörtlich:
 
    ```
    5. Investor-Fit — Für wen ist der Deal geeignet?
@@ -980,9 +991,106 @@ geschätzt.
    es in `index.html` nicht** (0 Treffer). Der Client-Prompt, der sie
    las, ist mit `ui.js:2010-2033` entfallen.
 
-   **Nächstes Paket.** Es braucht eine Vorrangregel zwischen Profil und
-   Objektwerten — deshalb ein eigener Schritt und nicht in `v2139`
-   mitgenommen.
+### ✅ GEBAUT 12.10.2026 (`v2140`, `v2140b`)
+
+**Sieben von 23 Schlüsseln reisen mit** — und die Auswahl ist die
+Vorrangregel, die dieser Punkt verlangte:
+
+| | |
+|---|---|
+| mit | `min_dscr`, `min_cashflow_vor_st`, `max_ltv`, `ai_strat`, `ai_risk`, `ai_verk`, `ai_markt` |
+| ohne | die 16 übrigen: Tilgung, Zinsbindung, EK-Quote, BWK-Quoten, Mietausfall, Leerstand, Miet- und Wertsteigerung, Grenzsteuersatz, Bundesland, Notar, Makler, Hausgeld-Satz, Zins-Stufe |
+
+> **Was im Objekt steht, gilt. Das Profil liefert nur, was im Objekt
+> NICHT steht: die Schwellen des Investors und seine Haltung.**
+
+Die 16 sind **Vorbelegungen für Formularfelder** (`main.js:38-49`
+belegt daraus `tilgung`, `ek`, `bwk`, `grenz`, `mietstg`, `wertstg` …).
+Sie stehen im Auftrag schon als **Objektwert** — dort *eingetragen*
+statt *vorbelegt*. Beide zu senden wäre eine stille Doppelung: zwei
+Grenzsteuersätze für dieselbe Größe, und beim nächsten Umbau laufen sie
+auseinander.
+
+### Die Ordnung ist der eigentliche Inhalt des Blocks
+
+Ohne sie stünden **zwei Schwellen zur selben Größe** im Prompt — die
+DealPilot-Skala („solide ab DSCR 1,2", `openaiService.js:211`) und die
+persönliche („ab 1,35 kauf ich") — und das Modell wählt eine aus, ohne
+zu sagen welche. Jetzt steht da:
+
+> **Der SCORE darf das Profil nie sehen.** Dieselbe Wohnung hat für
+> jeden Nutzer denselben Score; eine Einstellung, die ihn verschiebt,
+> macht zwei Nutzer unvergleichbar. **Dieselbe Regel wie für die
+> Rechenkerne: ein Kern liest NIE Einstellungen.** Die *Analyse* darf
+> es — sie urteilt für diesen Investor.
+
+Dazu: jede Schwelle wird **einzeln** abgeprüft (gehalten / verfehlt, je
+mit **beiden** Zahlen), Widersprüche zur DealPilot-Skala werden benannt
+statt gemischt, und Aufgabe 5 verweist auf den Block statt nur drei
+Archetypen zu nennen.
+
+### ⚠ `v2140b` · Eine Vorgabe ist keine Entscheidung
+
+**Im Browser am laufenden Staging gemessen** — und es war ein Fehler in
+`v2140`, zwanzig Minuten nach dem Rollout:
+
+```
+  dp_investment_profile im Speicher :  1 Schluessel
+  get() liefert                     :  7 Werte
+    min_dscr 1.2 | min_cashflow 0 | max_ltv 90
+    ai_strat "Buy & Hold" | ai_risk "Moderat (ausgewogen)" | …
+```
+
+Das sind die **Vorgaben** aus `config.js:993-1047`, nicht Marcels
+Entscheidungen. Der Block hieß „DIESER INVESTOR (Einstellungen des
+Nutzers)".
+
+> **Eine Vorgabe als persönliche Einstellung auszugeben, behauptet eine
+> Entscheidung.** Das Modell urteilt dann gegen eine Schwelle und nennt
+> sie „seine" — und der Nutzer liest ein Maß, das er nie gesetzt hat.
+
+**Und mein eigener Satz im Prompt konnte nie greifen:** „Fehlt eine
+Schwelle hier, hat der Nutzer sie nicht gesetzt" — `get()` gibt immer
+etwas zurück. *Eine Regel, deren Bedingung nicht eintreten kann, ist
+keine Regel.*
+
+Behoben: `ui.js` schickt neben den Werten die Liste `_selbst_gesetzt`
+(aus `load()`, den **rohen** Nutzerwerten), und jede Zeile im Prompt
+trägt **„(selbst gesetzt)"** oder **„(Vorgabe, nicht gesetzt)"**. Ist
+nichts gesetzt, sagt der Prompt das ausdrücklich und nennt den Weg
+(*Einstellungen → Standardwerte*).
+
+**Gefunden hat es die Messung im Browser, nicht der Prüfer** — der
+kennt nur den Auftrag, den ich ihm gebe, und ich hatte ihm belegte
+Werte gegeben. Dasselbe Muster wie bei `v2136`, wo die Abnahme im
+Browser die Aussperrung fand.
+
+### Nachweis
+
+Prüfer `tools/prompt-lecks-pruefen.mjs`: **32 → 47 Punkte**, RC = 0,
+lokal, auf dem Staging-Host und im gebauten Image. Dazu 5 Gegenproben,
+2 Typproben, 3 Ohne-Profil- und 4 Alles-Vorgabe-Proben.
+
+Im Browser am ausgerollten Stand, **beide Lagen**:
+
+```
+  ui-Fassung                      v2140
+  A echter Zustand (Marcel)       8 Felder, selbst gesetzt []
+  B zwei Schwellen gesetzt        min_dscr 1.42, selbst gesetzt [min_dscr, strategie]
+    Vorgaben bleiben Vorgabe      max_ltv 90 NICHT in der Liste
+  localStorage zurueckgedreht     unveraendert
+```
+
+### Offen an diesem Punkt
+
+Die vier `ai_*`-Schlüssel erreichen jetzt den Prompt — **aber ihr
+Anzeige-Spiegel ist weiter tot:** `investment-profile.js:138-155`
+`syncAiParamsToTab()` schreibt in `#ai_strat`, `#ai_verk`, `#ai_risk`,
+`#ai_markt` und `#ai-param-*-display`, und **diese Ids gibt es in
+`index.html` nicht** (0 Treffer). Die Werte selbst kommen aus
+`#set_ai_*` im KI-Tab und sind gepflegt; nur das Zurückschreiben ins
+Profil-Panel greift ins Leere. Abzutragen, wenn das Panel ohnehin
+angefasst wird — es ändert heute nichts an der Analyse.
 
 ---
 

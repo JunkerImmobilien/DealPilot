@@ -37669,3 +37669,103 @@ werden gelesen.
 | `settings.js:579` verspricht genau das wörtlich | **Versprechen ohne Code** |
 | vier `ai_*`-Schlüssel schreiben in Ids, die es nicht gibt | gemessen |
 | kein RAG | N60.7 |
+
+## Rollout-Journal 12.10.2026 — v2140/v2140b: das Investmentprofil (N60.4 Punkt 6)
+
+| Was | Commit |
+|---|---|
+| `v2140` sieben von 23 Schlüsseln erreichen den Prompt | `bd1e8831` |
+| `v2140a` Frontend-Konstanten nachgezogen | `20bd4025` |
+| `v2140b` eine Vorgabe ist keine Entscheidung | `b22aded3` |
+
+Gemessen: 23 Schlüssel im `localStorage`, ein gepflegtes
+Einstellungsformular — und **kein Prompt sah sie.** Aufgabe 5
+(„Investor-Fit — für wen ist der Deal geeignet?") nannte drei
+Archetypen und **keine Eingabe.**
+
+**Und `settings.js:579` bietet dem Nutzer wörtlich diese Vorlage an:**
+*„Bewerte meine Kaufentscheidung anhand meines persönlichen
+Investmentprofils (Mindest-DSCR, Max-LTV, Mindest-Cashflow)."*
+
+> Die **Anweisung** reist seit `v2009` mit, die **Daten** nicht. Das ist
+> dieselbe Falle wie bei den Mietverträgen in `v2139` — eine Regel ohne
+> Daten. Nur löst sie hier der Nutzer selbst aus, und er bekommt eine
+> Antwort, die seine Schwellen nie gesehen hat. Sie sieht genauso aus
+> wie eine, die sie kennt.
+
+### Die Vorrangregel
+
+Sieben Schlüssel reisen mit (3 Schwellen + 4 Haltungen), **16 nicht**:
+die sind Vorbelegungen für Formularfelder und stehen im Auftrag schon
+als Objektwert.
+
+> **Was im Objekt steht, gilt. Das Profil liefert nur, was im Objekt
+> NICHT steht.** Beide zu senden wäre eine stille Doppelung — zwei
+> Grenzsteuersätze für dieselbe Größe.
+
+### Der SCORE darf das Profil nie sehen
+
+Ohne diese Ordnung stünden zwei Schwellen zur selben Größe im Prompt:
+die DealPilot-Skala („solide ab DSCR 1,2") und die persönliche. Das
+Modell wählt dann eine, ohne zu sagen welche.
+
+> Dieselbe Wohnung hat für jeden Nutzer denselben Score; eine
+> Einstellung, die ihn verschiebt, macht zwei Nutzer unvergleichbar.
+> **Dieselbe Regel wie für die Rechenkerne: ein Kern liest NIE
+> Einstellungen.** Die *Analyse* darf es.
+
+### ⚠ `v2140b` — der Fehler in `v2140`, gefunden im Browser
+
+`get()` gibt den **Vorgabewert**, wenn der Nutzer nichts gesetzt hat.
+Am laufenden Staging: **ein** Schlüssel im Speicher, **sieben** Werte
+aus `get()`. Der Block hieß „Einstellungen des Nutzers".
+
+> **Eine Vorgabe als persönliche Einstellung auszugeben, behauptet eine
+> Entscheidung.**
+
+Und der Satz „Fehlt eine Schwelle hier, hat der Nutzer sie nicht
+gesetzt" konnte **nie** greifen. *Eine Regel, deren Bedingung nicht
+eintreten kann, ist keine Regel.*
+
+Jetzt trägt jede Zeile „(selbst gesetzt)" oder „(Vorgabe, nicht
+gesetzt)", und ist nichts gesetzt, sagt der Prompt es und nennt den Weg.
+
+**Der Prüfer konnte das nicht finden** — er kennt nur den Auftrag, den
+ich ihm gebe, und ich hatte ihm belegte Werte gegeben. Wie bei `v2136`.
+
+### Zwei eigene Prüfer-Fehler dabei
+
+1. Die Probe suchte `(selbst gesetzt)` im **ganzen** Prompt und fand
+   die **Erklärung** des Blocks statt einer Datenzeile. Vierter Fall
+   dieser Falle.
+2. Beim Einbau per `node -e` in bash sind die **Backslashes des Regex
+   verschwunden** — aus `\(` wurde eine Gruppe, und `[^"](selbst
+   gesetzt)` traf die Erklärung. Behoben mit dem Edit-Werkzeug und
+   nachgelesen.
+
+### Nachweis
+
+```
+  Pruefer                 32 -> 47 Punkte, RC 0
+                          lokal, Staging-Host UND gebautes Image
+  Browser, Lage A         8 Felder, selbst gesetzt []
+  Browser, Lage B         min_dscr 1.42, selbst gesetzt [min_dscr, strategie]
+                          max_ltv 90 bleibt Vorgabe
+  localStorage            zurueckgedreht, unveraendert
+```
+
+### Nebenbei gemessen und wichtig
+
+**Die Zeilenenden sind je Datei verschieden.** `frontend/js/ui.js` und
+`storage.js` sind **LF**; `settings.js`, `calc.js`, `dashboard.js`,
+`investment-profile.js` und das ganze Backend sind **CRLF**. Ein
+pauschales „Frontend ist CRLF" ließ beim ersten Anlauf jeden Anker
+still ins Leere greifen (`0x, erwartet 1`), und danach schmuggelte der
+Einbau 46 CRLF-Zeilen in eine LF-Datei.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.4 damit abgeschlossen, bis auf RAG (→ N60.7) | — |
+| `syncAiParamsToTab()` schreibt in vier Ids, die es nicht gibt | gemessen, ändert heute nichts |
