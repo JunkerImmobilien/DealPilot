@@ -870,7 +870,87 @@
       _bindCtaHandlers();
       _mountPlanCards();
       _wireKerosinStrip();
+      _pmMatrixFalten();   /* v2132 */
     }, 30);
+  }
+
+  /* ══ v2132 · DIE COCKPIT-MATRIX WIRD AUF DEM HANDY AUFGEKLAPPT ══
+
+     Marcel am 12.10.2026: "mach es so das es funktioniert und passend
+     bedient werden kann."
+
+     GEMESSEN, 390 px, direkte Kinder von #pricing-plugin-host:
+
+        243 px   .dp-header
+         24 px   .dp-container (Zeitstrahl)
+        440 px   .dp-container (Plan-Karte)
+        901 px   .dp-section
+       1674 px   .dp-feature-table-wrap   <- 45 % des Fensters
+         77 px   .dp-footer-note
+       ------
+       3686 px   Shell, bei 757 px Viewport
+
+     Darin steckt `table.mx` mit 1338 px: die vollstaendige
+     Gegenueberstellung aller Leistungen je Plan. Auf einem 390 px
+     breiten Schirm ist das keine Tabelle mehr, sondern ein Marsch.
+
+     > **Eine Vergleichstabelle vergleicht nur, wenn man zwei Spalten
+     > gleichzeitig sieht.** Auf dem Handy sieht man eine - und wischt
+     > fuer die zweite so weit, dass die erste nicht mehr erinnert
+     > wird. Der Platz, den sie kostet, ist dann doppelt verloren.
+
+     Deshalb: zugeklappt starten, mit einem Knopf davor, der sagt was
+     dahinter liegt. **Kein Inhalt faellt weg** - Marcels Pruefauftrag
+     ausdruecklich: "Wenn Informationen mobil nicht gleichzeitig
+     dargestellt werden koennen, verwende sinnvoll aufgebaute Listen,
+     Detailansichten, aufklappbare Bereiche oder alternative Layouts."
+
+     Preise, Plaene, Reihenfolge und Knoepfe bleiben unberuehrt - es
+     wird nur eine Tabelle zugeklappt. Ueber 900 px passiert gar
+     nichts: dort hat die Matrix ihren Platz.
+
+     Der Knopf traegt `aria-expanded` und seine Beschriftung wechselt
+     mit dem Zustand - ein Knopf, der nicht sagt was er tun wird, ist
+     keine Bedienung. */
+  function _pmMatrixFalten() {
+    try {
+      if (!window.matchMedia || !window.matchMedia('(max-width: 900px)').matches) return;
+      var wrap = document.querySelector('#pricing-modal .dp-feature-table-wrap');
+      if (!wrap || wrap.getAttribute('data-pm-falte')) return;
+      wrap.setAttribute('data-pm-falte', '1');
+
+      /* Titel und Unterzeile bleiben SICHTBAR - sie sind die
+         Beschriftung der Falte, nicht ihr Inhalt. Zugeklappt wird nur,
+         was darunter kommt. */
+      var kopf = wrap.querySelector('.dp-feature-table-h');
+      var sub  = wrap.querySelector('.dp-feature-table-sub');
+      var rest = [];
+      [].forEach.call(wrap.children, function (c) {
+        if (c === kopf || c === sub) return;
+        rest.push(c);
+      });
+      if (!rest.length) return;
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pm-falte-btn';
+      btn.setAttribute('aria-expanded', 'false');
+
+      function stand(offen) {
+        rest.forEach(function (c) { c.classList.toggle('pm-falte-zu', !offen); });
+        btn.setAttribute('aria-expanded', offen ? 'true' : 'false');
+        btn.textContent = offen ? 'Cockpit-Matrix ausblenden' : 'Cockpit-Matrix anzeigen';
+      }
+      stand(false);
+      btn.addEventListener('click', function () {
+        stand(btn.getAttribute('aria-expanded') !== 'true');
+      });
+
+      /* hinter die Unterzeile, also direkt ueber den Inhalt */
+      var nach = sub || kopf;
+      if (nach && nach.parentNode === wrap) wrap.insertBefore(btn, nach.nextSibling);
+      else wrap.insertBefore(btn, wrap.firstChild);
+    } catch (e) { /* eine Falte darf das Fenster nie verhindern */ }
   }
 
   // ═══════════════════════════════════════════════════════════════

@@ -988,3 +988,63 @@
 .dp-step.dp-best:not(.dp-active) .dp-step-circle {
   border: 2px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);
 }
+
+/* =====================================================================
+   v2132 - DIE FALTE DER COCKPIT-MATRIX
+
+   Gehoert zu `_pmMatrixFalten()` in `pricing-modal.js`. Der Knopf
+   erscheint nur unter 901 px; darueber hat die Matrix ihren Platz und
+   die Falte wird nie angelegt.
+
+   Die Hausform: Obsidian mit Goldschrift, 44 px Trefferflaeche, volle
+   Breite - dieselbe Bewegung wie beim Abruf-Knopf der Datenaufnahme
+   (v2120).
+   ===================================================================== */
+@media (max-width: 900px){
+  #pricing-modal .pm-falte-btn{
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    margin: 10px 0 2px;
+    padding: 11px 16px;
+    background: #0A0A0A;
+    color: var(--gold-hi, #E8CC7A);
+    border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 34%, transparent);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  #pricing-modal .pm-falte-btn:hover{
+    background: #141210;
+    border-color: var(--gold, #C9A84C);
+  }
+  /* Der Pfeil zeigt, wohin es geht - und dreht sich mit dem Zustand. */
+  #pricing-modal .pm-falte-btn::after{
+    content: '';
+    width: 7px; height: 7px;
+    border-right: 1.6px solid currentColor;
+    border-bottom: 1.6px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform .16s ease;
+  }
+  #pricing-modal .pm-falte-btn[aria-expanded="true"]::after{
+    transform: rotate(-135deg) translateY(-2px);
+  }
+  #pricing-modal .dp-feature-table-wrap .pm-falte-zu{
+    display: none !important;
+  }
+}
+/* Ueber 900 px darf nichts zugeklappt bleiben - auch dann nicht, wenn
+   der Nutzer das Fenster bei schmaler Breite geoeffnet und danach
+   gedreht hat. Die Klasse bleibt am Knoten stehen, diese Regel hebt
+   sie auf. */
+@media (min-width: 901px){
+  #pricing-modal .pm-falte-btn{ display: none !important; }
+  #pricing-modal .dp-feature-table-wrap .pm-falte-zu{ display: block !important; }
+}
