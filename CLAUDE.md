@@ -217,6 +217,39 @@ nicht): `dscr-engine.js`, `deal-kpis.js`, `score-tiers.js`, `dealscore.js`,
 **Parameter** (so kam die Zielrendite in `zielKaufpreis()`, v1956). Ein Kern,
 der sich seine Eingaben selbst holt, ist dort nicht mehr derselbe Kern.
 
+### Cache-Buster: FÜNF Dokumente, nicht eines
+
+`index.html`, `quickcheck-app.html`, `marktbericht-app/index.html`,
+`messkabine.html` und `landing/index.html` laden **dieselben Kerne mit
+eigenen Bustern**. 193 js-Dateien tragen einen, **zehn werden von mehr als
+einem Dokument geladen.**
+
+> **Am 12.10.2026 waren fünf Buster älter als ihre Datei** — darunter
+> `deal-kpis.js` (geändert 06.10. mit *„vier gemessene Fehler in der
+> Steuerrechnung"*, Buster vom 18.07.) und `whitelabel-override.js`
+> (geändert 29.09. mit *„das Partner-Logo kam nie an"*, Buster vom
+> 16.07., in BEIDEN iframes). Wer den Quick-Check seit Juli einmal offen
+> hatte, rechnete dort mit der alten Engine.
+
+**Nach jeder Änderung an einem mehrfach geladenen Modul:**
+`node tools/buster-ebenen-pruefen.mjs`. Er prüft zwei Dinge getrennt —
+gleicher Buster auf allen Ebenen, und ob ein Buster **älter** ist als
+seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
+
+### Prüfwerkzeuge (alle RC=0)
+
+| Werkzeug | prüft |
+|---|---|
+| `rechenkerne-spiegeln.mjs` | die fünf Kerne ins Backend-Image |
+| `score-ketten-pruefen.mjs` | 115 Punkte, alle fünf Score-Stellen gleich |
+| `rnd-kerne-pruefen.mjs` | beide RND-Kerne über 1.764 Fälle |
+| `zielurteil-pruefen.mjs` | Wort und Ampel der Lageklasse, 409 Fälle |
+| `beleg-leser-pruefen.mjs` | Ämter-Belegprüfung, 79 Fälle, läuft auch im Container |
+| `buster-ebenen-pruefen.mjs` | Cache-Buster über alle fünf Dokumente |
+| `objekt-mapper-pruefen.mjs` | Empfindlichkeit der Reiter-Objekt-Felder |
+| `prompt-lecks-pruefen.mjs` | 88 Felder kommen im Prompt an |
+| `gold-audit.py` | Whitelabel, gegen Basislinie (nur auf dem Server) |
+
 ## Namensräume nie mischen
 
 `vNNN` Haupt-App · `MA` Mobile · `vNNN` Marktbericht · `P-NN`/`W-NN`
@@ -296,6 +329,25 @@ Gebaut wird sie in `js/storage.js` von `_renderRichCard()` ab Z.866.
   Konfiguration nicht geändert hat → `--force-recreate`. `printenv` **im**
   Container ist die Wahrheit.
 - Kein `#` in Einzeiler-Pastes, kein `!` in doppelten Quotes.
+- **Backticks in `node -e` führt bash AUS.** Text mit Backticks gehört in
+  eine Datei (Write) oder in ein Skript unter `scratchpad/`. Dasselbe für
+  Commit-Botschaften: erst in eine Datei, dann `git commit -F`.
+- **In einem Template-Literal gibt es keine Kommentare.** Ein Backtick in
+  etwas, das wie ein Kommentar aussieht, **beendet das Literal** — und
+  `node --check` meldet „missing `)` after argument list" hunderte Zeilen
+  weiter unten.
+
+  > Am 12.10.2026 **zweimal** passiert: `unterlagenService.js` nannte
+  > `_beleg_quelle` im INSERT, `marktbericht/.../api.js` nannte `lzs_pct`
+  > im SELECT. In diesem Projekt ist der Backtick die übliche
+  > Auszeichnung für einen Feldnamen — genau diese Gewohnheit ist die
+  > Falle.
+
+  **Der Kommentar gehört VOR die Abfrage.** Und: **alle** Backticks im
+  Literal zählen, nicht nur den einen, den die Meldung nahelegt — ein
+  gesundes SQL-Literal trägt genau zwei. Einen eigenen Prüfer dafür habe
+  ich gebaut und verworfen (110 Fehlalarme; richtig zählen hieße JS
+  tokenisieren). `node --check` deckt es ab.
 
 ---
 

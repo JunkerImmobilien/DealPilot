@@ -38253,3 +38253,444 @@ Namen löschen sich lautlos — siehe die Attributnamen-Falle bei
 Portfolio-Schiene jedes Mal. Wer direkt nach `setze()` misst, sieht
 0×0 und hält den Einbau für gescheitert. Die Schiene gehört nach jedem
 Wechsel per Bedienweg geöffnet — erst dann misst man das Ergebnis.
+
+---
+
+## Rollout-Journal 12.10.2026 (abends) — v2148–v2156
+
+**Was**  Neun Pakete: die Lageklasse als Maßstab der Bewertung, die
+Belegprüfung der Ämter-Recherche, Ansprechpartner je Amt, die Tour in den
+Varianten-Ansichten, der Quellen-Reiter und die Vervollständigung des
+Pilot-Analyse-Prompts.
+
+**Commits**  `75e9c6c0` (v2156) · `af75d07d` (v2155) · `e26aeb02`
+(v2154b) · `8b2fd539` (v2154a) · `6c7ecb51` (v2154) · `8786a4ad` (v2153)
+· `0566e785` (v2152b) · `a29aaace` (v2152a) · `2db64592` (v2152, **mit
+Migration 087**) · `815953d1` (v2151a) · `cca48a07` (v2151) · `c73c0c6c`
+(v2150) · `468570e6` (v2149) · `eeda685b`/`28d2956f`/`fd0b0b8d` (v2148)
+
+---
+
+### v2148 · Die Lageklasse ist der Maßstab, nicht der Bundesdurchschnitt
+
+Marcel: *„Das muss auch mit in die Bewertung im Quick Check unten weil der
+Investor ja lesen möchte und bewerten möchte ob der deal passt."*
+
+**Drei Befunde, alle gemessen:**
+
+1. `composeOpinion()` im Quick-Check beurteilte die Bruttomietrendite an
+   **festen** Schwellen („ab 5,5 % gut, über dem deutschen Durchschnitt
+   ~4,5 %"). In A-Lage mit Ziel 3,75 % las ein Investor bei 4,0 %
+   *„unterdurchschnittlich, braucht Mietsteigerung oder
+   Kaufpreis-Reduktion"* — bei **107 % seines eigenen Ziels**. Umgekehrt
+   bekam eine C-Lage mit Ziel 7 % bei 5,6 % ein „gut".
+2. `_renderQcRecommendation()` bekam weder `zielBmr` noch `lageklasse`.
+   `zielKaufpreis()` rechnete mit `ZIEL_BMR_RUECKFALL = 6` — in **jeder**
+   Lage dieselbe Zahl, in A-Lage rund 42 % zu niedrig. Ursache: die
+   Ermittlung stand *innerhalb* von `if (kp > 0 && nkm > 0)`.
+3. **Die `skala` aus v2143 hatte keinen Leser.** `kennzahlenAmpel()`
+   erzeugte den Satz „Ziel 3,75 % (A-Lage) erreicht = grün · ab 75 %
+   gelb", und im ganzen Repo gab es **null** Verbraucher — `_setKpi` nahm
+   drei Argumente und kannte das vierte nicht.
+
+Das Wort kommt jetzt aus EINER Stelle: `QcHeuristik.zielUrteil()`. Zwei
+Zeilen über der geänderten Stelle steht der Befund von v1945 — dort stand
+schon einmal die dritte Kopie derselben Schwellen.
+
+> **Was der Prüfer gefunden hat:** der erste Entwurf ließ das Wort bei
+> q ≥ 0,97 auf „am Ziel" springen. Die Ampel kippt aber bei Güte 0,75,
+> also bei q = 0,96875 — in der Lücke von 1,25 Promille stand eine grüne
+> Ampel neben „knapp unter deinem Ziel". Die Grenze auf 0,96875 zu ziehen
+> wäre der falsche Weg (Grenze auf Grenze, daran ist v2143 einmal
+> gescheitert). Das Wort leitet sich jetzt **aus der Ampel** ab und kann
+> ihr konstruktiv nicht mehr widersprechen.
+
+**v2148c:** `_zielSkala` nannte per `toFixed(1)` „Ziel 3,8 %", gerechnet
+wurde mit 3,75.
+
+**Nachweis**  `tools/zielurteil-pruefen.mjs` (NEU), 409 Fälle, RC=0. Im
+Browser an Marcels echtem Profil: A-Lage 4,0 % → „am Ziel"/grün, C-Lage
+5,6 % → „knapp unter"/gelb.
+
+---
+
+### v2149 · Fünf Cache-Buster waren älter als ihre Datei
+
+**Gefunden beim Nachmessen von v2148:** `quickcheck-app.html` lud
+`js/qc-heuristik.js?v=v2146`, obwohl die Haupt-App auf v2148 stand. **Das
+eigene Dokument hat seinen eigenen Buster.** Vier weitere, gegen git
+gemessen:
+
+| Datei | geändert | Buster von |
+|---|---|---|
+| **`deal-kpis.js`** | 06.10. — *„vier gemessene Fehler in der Steuerrechnung"* (v1898) | 18.07. |
+| **`whitelabel-override.js`** | 29.09. — *„das Partner-Logo kam nie an"* (v1698) | 16.07. |
+| `avm-section.js` | 30.08. | 16.07. |
+| `immometrica-qc.js` | 16.07. | 15.06. |
+| `dscr-engine.js` | 19.05. | 18.07. (unkritisch) |
+
+**Wer den Quick-Check seit Juli einmal offen hatte, rechnete dort mit der
+Kennzahlen-Engine von vor den vier Steuerkorrekturen.** Und die
+Logo-Reparatur vom 29.09. kam in Quick-Check *und* Marktbericht nicht an.
+
+**`tools/buster-ebenen-pruefen.mjs` (NEU)** prüft beides getrennt:
+gleicher Buster auf allen Ebenen, und ob ein Buster **älter** ist als
+seine Datei (gegen git, nicht gegen die Dateizeit). **Nur über die
+mehrfach geladenen Dateien laufen lassen** — `log -S` über alle 193 × 5
+braucht Minuten.
+
+---
+
+### v2150 · Die Stufe-3-Werte des Marktberichts fließen ein
+
+Marcel: *„woher kommen die werte und daten im reiter Lage & Markt? … auch
+wenn Stufe 3 gerechnet wurde sollte auf jedenfall auch der Verkehrswert
+mit einfließen und die Gesamtbewertung einfließen."*
+
+Panel 4 zeigte vier Felder, alle aus der KI-Recherche. Das Ausgabefeld
+hieß wörtlich *„Recherchierter Wert €/m²"*, und der Auftrag „3. Lokaler
+Mietspiegel" stand **unbedingt** da — auch wenn ein Bericht mit
+gemessenen Partnerdaten vorlag.
+
+**Die Lücke war die Stufe 3.** `/objects/history` liefert seit v1963/v1965
+`sachwert_eur`, `ertragswert_eur` und das **führende Verfahren** mit Grund
+und Rechtsgrundlage (§ 6 Abs. 1 ImmoWertV). `buildPrompt()` las **kein
+einziges** dieser Felder — es endete beim Deal-Score.
+
+Gebaut: Block „WERTERMITTLUNG IM BERICHT" mit beiden Werten, dem
+**gerechneten** Abstand (Deutung ab 25 %), dem führenden Verfahren und dem
+tragenden Wert als Kaufpreis-Anker; Aufgabe 14 „Abgleich mit dem
+Marktbericht" mit den Zielfeldern `berichts_abgleich` und
+`mietspiegel_herkunft`.
+
+> **Warum das Wort „Verkehrswert" nicht fällt:** Marcels Auftrag ist, dass
+> der Wert *einfließt*, nicht dass er umbenannt wird. Der Bericht schreibt
+> selbst „indikativ, kein Gutachten n. § 194 BauGB"
+> (`CrossCheckService.js:121`). Beides gilt gleichzeitig.
+
+**Nachweis**  65 Felder gegen die echte `buildPrompt()`, 18 neu. Neun
+Gegenproben, und die wichtigste: bei einem Bericht **ohne** Stufe 3
+erscheint der Block gar nicht.
+
+**Rest**  ob das Modell die neuen Felder auch **füllt**.
+
+---
+
+### v2151 · Die Belegprüfung LIEST die Seite jetzt
+
+**Gefunden beim Einarbeiten von `unterlagen-app-v6` (N51):** ein Defekt in
+*unserer* Fassung, größer als die Ergänzung.
+
+`belegPruefen()` suchte `text.includes(adresse)` im rohen HTML. **An 19
+echten Schreibweisen gemessen verfehlte die alte Logik sieben:**
+`[at] [dot]`, `{punkt}`, Soft-Hyphen, Zero-Width, `<wbr>`,
+Gedankenstrich, Minuszeichen.
+
+**Eine verfehlte Adresse heißt im Modal „steht nicht auf der genannten
+Quellseite" — für eine Adresse, die dort steht.**
+
+**Und der Rückfall war zugleich zu lax:** `includes(konto) &&
+includes(domain)` sagt „bestätigt", wenn „info" im Menü steht und die
+Domain im Impressum. **Ein falscher Beleg ist schlimmer als ein fehlender:
+er behauptet eine Herkunft.**
+
+Gebaut: `mailsAufSeite()` (stellt die Seite her, liest dann echte
+Adressen, Reihenfolge der Seite bleibt), `istPersonenpostfach()`,
+`belegSeiten()` (bis sechs Seiten parallel, `pro_seite`).
+
+**Die Spalte `seiten` hatte keinen Leser** — bis zu acht amtliche Seiten je
+Amt lagen in der Datenbank und wurden nie abgerufen.
+
+**Nachweis**  `tools/beleg-leser-pruefen.mjs` (NEU), 79 Fälle, RC=0 — **im
+Container gegen `/app/src/services/unterlagenService.js`, mit „Gestellt:
+nichts"**. Abnahme gegen echte Amtsseiten: Hüllhorst, Hiddenhausen,
+Minden-Lübbecke und Bielefeld liefern je 3–4 Adressen aus dem Impressum,
+die **Startseite** null — die Unterscheidung „Seite trägt keine" gegen
+„Abruf scheitert" ist belegt.
+
+---
+
+### v2152 · Ansprechpartner 1 und 2 je Amt (Migration 087)
+
+**Migration 087:** eigene Spalte `ansprechpartner jsonb NOT NULL DEFAULT
+'[]'`. Sie führt **keine Bedingung** ein — anders als v2136, das mit
+`email_verified_at` alle vier Staging-Konten aussperrte. Nach dem Lauf
+gemessen: **19 Altsätze, alle mit leerer Liste, kein NULL.**
+
+Der KI-Auftrag steht wörtlich aus v6 im Prompt. **Die dritte
+Einschränkung ist die wichtigste** — *„Stehen dort keine Personen, bleibt
+die Liste leer"*: ohne sie ist leer kein zulässiges Ergebnis und das
+Modell **muss** zwei plausible Namen erfinden.
+
+`bestaetigt` ist nur true, wenn **wir** die Adresse auf einer selbst
+abgerufenen Seite gefunden haben. `kopie` beginnt bei false; dafür gibt es
+**`PUT /unterlagen/amt/:id/kopie`**, der ausschließlich das Häkchen setzt
+— ein Endpunkt, über den sich die Adresse ändern ließe, hebt den Beleg
+auf. **Die angehakte Auswahl überlebt eine Neurecherche** (`CASE` statt
+`EXCLUDED`).
+
+**v2152a:** `seiten` hat **zwei Formen** — alle 19 Altsätze tragen die
+URL-Liste (`jsonb_typeof = array`), neue das Objekt mit dem Beleg. Eine
+Nachmigration wäre falsch (die Altsätze haben den Beleg nicht), also gibt
+es `seitenLesen()`: ein Leser, beide Formen, `alt: true` als ehrliche
+Auskunft.
+
+**v2152b — DER ABNAHMELAUF HAT EINEN FEHLER GEFUNDEN, den kein erdachter
+Prüfauftrag gefunden hätte:** auf dem echten Impressum des Kreises
+Minden-Lübbecke galt `rechnung@invoice.minden-luebbecke.de` als
+**persönliches** Postfach und erschien als „Ansprechpartner 2". Ursache:
+`/^[a-z]\.?[a-z]+$/` sollte `mweber` treffen und trifft jedes Wort aus
+Kleinbuchstaben. Jetzt zählt **nur der Punkt** im Konto.
+
+> `mweber` gilt damit als Funktion, und das ist die sichere Seite: eine
+> Funktion, die als persönlich gilt, schickt Post an die falsche Stelle;
+> eine persönliche, die als Funktion gilt, kostet nur eine Angabe.
+
+**Nachweis**  79 Fälle, RC=0, darunter 22 Postfacharten — **sechs aus
+echten Amtsseiten**, mit Quellenvermerk im Code. Echte Recherche
+(Flurkarte 32609 Hüllhorst): richtiges Amt, Adresse belegt, **null**
+Ansprechpartner genannt statt zwei erfundener.
+
+**Rest**  ob das Modell bei einem Amt, dessen Seite Personen **nennt**,
+auch welche zurückgibt. **Beim nächsten Bauakten-Abruf mitmessen.**
+
+---
+
+### v2153 · Entweder zwei Ansprechpartner oder der Amtsweg
+
+Marcel: *„wenn es nicht 2 ansprechpartner gibt sollte man schauen ob es
+eine übergeordnete email adresse oder einen kontakt gibt und den ausgeben
+und die ansprechpartner weg lassen. am besten auch telefonnummer dazu."*
+
+Der Abnahmelauf von v2152 hatte genau den Fall: vier Adressen auf dem
+Impressum, **eine** davon persönlich. Wer das liest, hält sie für *die*
+Ansprechperson des Katasteramts.
+
+> **Eine halbe Liste behauptet mehr, als sie weiß. Die Amtsadresse
+> behauptet nichts und kommt an.**
+
+`personenAus()` gibt bei weniger als zwei Einträgen eine leere Liste
+zurück. **Eine Ausnahme:** ein Eintrag **mit Namen** bleibt — „Frau
+Müller, Katasterauskunft" ist am Telefon brauchbar.
+
+**DIE TELEFONNUMMER FEHLTE GANZ.** `telefon` kommt seit v1833 aus der
+Recherche, liegt als Spalte in `unterlagen_aemter` — und wurde im Modal an
+**keiner** Stelle ausgegeben. Dasselbe Muster wie die `skala` und
+`optischer_eindruck`.
+
+---
+
+### v2154 · Die Tour in den Varianten-Ansichten (N62.1)
+
+**ZWEI EIGENE BEFUNDE ZURÜCKGENOMMEN, bevor der richtige kam:**
+
+1. „Der erste Anker trifft ein unsichtbares Element, der Rückfall springt
+   nie ein." **Falsch** — die Engine prüft seit v1774 jeden Teilselektor
+   **und jeden Treffer** auf Sichtbarkeit. Ich hatte `querySelector`
+   benutzt und damit mich selbst gemessen.
+2. „Alle 38 Anker treffen, also ist nichts kaputt." **Unvollständig** —
+   Treffen ist nicht das Maß, Fläche ist es.
+
+**Der echte Befund:** in der Kanzlei steht `data-dpl-portfolio="zu"`
+(Auslieferungszustand). `.dpl-teil-objekte` und `.dpl-teil-suche` stehen
+dann auf `display:none !important`; **33 Objektkarten im DOM, keine mit
+Fläche.** Die Tour wechselt den **Tab** — ein eingeklapptes **Panel** hat
+sie nie geöffnet.
+
+`_openTabForStep` klappt es jetzt bei `targetSec === 'sidebar'` auf, per
+**Klick** auf `.dpl-portfolio`. Live gemessen: beim Tour-Start ging
+`portfolio` von `"zu"` auf `"auf"`.
+
+**v2154a/b — DER SCHALTER, DRITTER ANLAUF.** Ich habe dreimal gefragt *„wo
+gehört er hin"* und nie *„welcher Ort ist sichtbar"*. Beide Fächer, in die
+ich ihn gelegt habe (`-objekte` in v2145a, `-suche` in v2154a), sind genau
+die ausgeblendeten.
+
+> **Ein Platz, der nur im aufgeklappten Zustand existiert, ist für einen
+> Schalter kein Platz.**
+
+Er ist jetzt ein **direktes Kind der Schiene**, hinter `.dpl-portfolio` —
+zwischen Aktionen-Knopf (y=110) und Suche (y=147), sichtbar in beiden
+Zuständen. **An BEIDEN Stellen gleich gebaut:** `doppelkarte.js` (Geburt
+beim Laden) und `layout-varianten.js` (Wechsel im Betrieb). Eine Fassung
+allein wirkt nur in einem der beiden Fälle — das war schon der Befund von
+v2145/v2145a.
+
+**Die Gestaltung an den Nachbarn gemessen:** helles Weiß (72 %), Rahmen
+`rgb(233,227,214)` wie die Suche, Radius 10 px, Inter 700 auf 12 px (bei
+13 px läuft „Bestand" plus Zähler über den 87-px-Knopf). Der **aktive**
+Zustand ist weiß mit Schatten, nicht dunkel gefüllt: auf hellem Grund sähe
+eine dunkle Füllung aus wie *abgewählt*.
+
+**Nachweis**  Im Browser bei zugeklapptem Portfolio: y=147, 243×34,
+`elementsFromPoint` auf dem Mittelpunkt zeigt den eigenen Knopf obenauf.
+Kein Segment läuft über (42/42, 87/87, 87/87 px).
+
+**Rest**  dass die Tour **durchläuft**, ist nicht gemessen — nur, dass ihr
+Schritt 1 ein Ziel findet. Die T1-Befunde B1 (Spot außerhalb des
+Bildschirms), B2 (kein Spot) und Schritt 24 bleiben offen.
+
+---
+
+### v2155 · Ein eigener Reiter „Quellen" (N62.5)
+
+**Drei Herkünfte, getrennt** — und das ist der Kern:
+
+| | |
+|---|---|
+| KI-Recherche | eine Seite, die ein Modell gelesen hat |
+| Marktbericht | gemessene Partnerdaten, amtliche Registerwerte |
+| Ämter-Recherche | eine amtliche Seite, die **wir** selbst abgerufen und gegen die Adresse geprüft haben |
+
+> Sie in eine Liste zu werfen wäre falsch: eine belegte Amtsquelle und
+> eine Web-Fundstelle eines Modells sähen dann gleich aus — und genau
+> dieser Unterschied ist die Doktrin dieses Produkts.
+
+**Der Reiter steht immer, auch leer.** Ein fehlender Quellen-Reiter sähe
+aus, als gäbe es keine Quellen. Die Amtsquellen werden erst beim **Öffnen**
+geladen (`/unterlagen/aemter`, reiner Lesezugriff, kein Kontingent). Ämter
+**ohne** `quelle_url` werden ausgelassen.
+
+**Nachweis**  Am echten Endpunkt: 6 Ämter für 32609 Hüllhorst, **alle mit
+Quelle, alle mit Telefon**, 1 belegt. Nachprüflauf mit dem neuen Leser:
+**keiner der sieben unbelegten Sätze wäre jetzt belegt** — bei sechs trägt
+die Quellseite überhaupt keine Adresse, beim siebten (Detmold) steht die
+gesuchte dort nicht. **Keine Nacharbeit nötig.**
+
+---
+
+### v2156 · Die Pilot-Analyse bekommt alles (N62.3)
+
+**1 · 13 von 36 Einheitenfeldern.** Der Prompt druckte alle 13, die er
+bekam — **die Lücke lag im Sender.** Die Auswahl von v2022 war richtig
+gedacht, aber sie hat die **Miete** verloren: Soll-Kaltmiete,
+Kündigungsverzicht, Staffel/Index mit Rhythmus und offenen Stufen,
+Vertragsbeginn, Maßnahme mit Kosten.
+
+> Eine Analyse, die eine Staffelmiete nicht kennt, nennt als **Chance**,
+> was vertraglich schon vereinbart ist.
+
+**2 · Die Modernisierungsstufen kamen als Rohcode.** Im Prompt stand
+wörtlich `dach=v, heizung=h, fenster=0`. Die Übersetzungstabelle
+(`STUFE_ZU_OBJEKT`, `mfh-einheiten.js:176`) lag eine Datei weiter und wurde
+serverseitig nie benutzt. **Ein Code ohne seine Tabelle ist kein Datum,
+sondern ein Rätsel.** Übersetzt wird beim **Sender**; die Tabelle ist dafür
+jetzt exportiert.
+
+**3 · Der Liegenschaftszins.** Er *stand* im Prompt (Boden-Block, seit
+v2011) — **ohne Auftrag.** **Ein Datum im Prompt ist kein Datum in der
+Analyse.** Schlimmer: im Wertermittlungsblock fehlte er **ganz**. Der
+Ertragswert stand ohne die Größe, die ihn erzeugt, und 400 Zeilen weiter
+oben das Objektfeld.
+
+`/objects/history` liefert jetzt `lzs_pct` **mit Herkunft** (Stufe A–E,
+Zweig, Jahrgang, aus dem Register oder nicht), dazu `gnd_jahre` und
+`bwk_quote`. Weicht der Zins des Berichts vom hinterlegten ab, wird das
+gemeldet.
+
+**Nachweis an echten Berichtsdaten:** Bericht 174 trägt 2,9 % Stufe **A**
+Jahrgang 2025 (amtlicher Satz), 173/176 je 2,56 % Stufe **E**.
+
+**4 · Stärken und Risiken hatten keine Vorgabe.** Im Antwortformat stand
+`["Stärke 1 ausführlich mit Zahl", "Stärke 2", …]` — die schwächste
+Vorgabe des ganzen Formats; alle anderen Felder nennen eine Satzzahl.
+**Ein Listeneintrag ohne Vorgabe wird ein Stichwort.** Jetzt alle fünf:
+2–3 Sätze mit Zahl, bei Risiken zusätzlich die Folge für den Investor.
+
+**Außerdem:** `max_output_tokens` 8000 → 12000 (die Vorgaben summieren
+sich auf 110–160 Sätze; ein Truncate rettet über `extractJson` die
+Struktur, nicht den Inhalt). Und `optischer_eindruck` **hatte keinen
+Leser** — wird verlangt, sobald Fotos mitgehen, und erschien nirgends.
+Steht jetzt bei den Risiken.
+
+**Nachweis**  88 Felder gegen die echte `buildPrompt()`, RC=0, davon 23
+neu. **Eine alte Erwartung nachgezogen:** sie suchte `Dach=PRUEFSTUFE-4`
+— einen erfundenen Stufenwert. Er bewies, dass das **Feld** ankommt, und
+hat nie gezeigt, dass dort ein unverständlicher Rohcode stand. **Ein
+erfundener Testwert prüft die Leitung, nicht den Inhalt.**
+
+**Rest**  ob die Antworten dadurch besser werden — nur ein echter
+Analyselauf an einem MFH mit Marktbericht zeigt das.
+
+---
+
+### Zwei eigene Fehler dieser Sitzung
+
+**1 · Derselbe Fehler zweimal: Backtick im SQL-Kommentar.** In einem
+Template-Literal gibt es keine Kommentare — ein Backtick darin **beendet
+das Literal**. In diesem Projekt ist der Backtick die übliche Auszeichnung
+für einen Feldnamen, und genau diese Gewohnheit ist die Falle. Passiert in
+`unterlagenService.js` (v2152, `_beleg_quelle`) und in
+`marktbericht/.../api.js` (v2156, `lzs_pct`). `node --check` meldet
+„missing ) after argument list" **hunderte Zeilen weiter unten**.
+
+**Vorgehen:** der Kommentar gehört **vor** die Abfrage. Und: **alle**
+Backticks im Literal zählen, nicht nur den einen, den die Meldung
+nahelegt — ein gesundes SQL-Literal trägt genau zwei.
+
+**2 · Ein Prüfer gebaut und verworfen.** Für Fehler 1 habe ich einen
+Prüfer geschrieben: erster Entwurf **110 Befunde, kein einziger echt**
+(SQL-Schlusszeilen wie „RETURNING id" sind keine Kommentare); nach der
+Verengung 5 Befunde, **auch alle falsch** — ein naiver Backtick-Zähler
+hält einen Backtick in einem *normalen* Kommentar für einen
+Literal-Anfang. Richtig zählen hieße JS tokenisieren.
+
+> `node --check` deckt es ab. **Ein Prüfer mit Fehlalarmen ist schlimmer
+> als keiner** — dieselbe Lehre wie beim gold-audit, das grün wurde,
+> obwohl es 175 Dateien nicht gelesen hatte.
+
+---
+
+### Neue Prüfwerkzeuge dieser Sitzung
+
+| Werkzeug | prüft | Umfang |
+|---|---|---|
+| `tools/zielurteil-pruefen.mjs` | Wort und Ampel sagen an jeder Grenze dasselbe | 409 Fälle |
+| `tools/beleg-leser-pruefen.mjs` | 19 Amts-Schreibweisen finden, 12 Fehlalarme vermeiden, Personen-Zusammenbau, beide `seiten`-Formen, KI-Auftrag | 79 Fälle |
+| `tools/buster-ebenen-pruefen.mjs` | gleicher Buster auf allen Ebenen; kein Buster älter als seine Datei | 10 Dateien |
+| `tools/objekt-mapper-pruefen.mjs` | Empfindlichkeit: ändert ein anderer Eingabewert die Mapper-Ausgabe? | 82 Felder |
+| `tools/prompt-lecks-pruefen.mjs` (erweitert) | jedes belegte Feld kommt im Prompt an | 88 Felder |
+
+**Alle laufen mit RC=0.** `beleg-leser-pruefen.mjs` findet den Dienst auch
+**im Container** (`/app/src`) und nennt, welche Module es stellen musste —
+im Container „nichts".
+
+**Zum Objekt-Mapper (N4) zwei eigene Zahlen zurückgenommen:** die Meldung
+„71 Schlüssel, 70 gelesen" war am **Quelltext** gegreppt, nicht am Lauf
+gemessen — es sind **68 über drei Wege** (`reportInput` 59,
+`nutzerEinschaetzung` 9, `dealpilot` 0). Und **46 von 82 Testwerten waren
+erfunden** (die `eq_*`-Felder tragen GROSSSCHREIBUNG, die
+Modernisierungsfelder Text ohne `value`). Der Prüfer hält seine Testwerte
+jetzt gegen die echten `<option>`-Werte aus `index.html`. Ergebnis: **76
+Felder wirken, 5 sind gewollt stumm (per Gegenprobe bewiesen), 1
+(`etagen_ges`) hat kein Ziel im Bericht.** `assessment()` hat **keinen
+Aufrufer** — eine Doppelung zu `nutzerEinschaetzung()`.
+
+---
+
+### Offene Punkte für den nächsten Chat (alle in BACKLOG.md unter N62)
+
+**Erledigt:** N62.1 (Tour), N62.2 (Schalter), N62.3 (Prompt-Daten),
+N62.5 (Quellen-Reiter) · dazu N51 vollständig (v2151–v2152b).
+
+**Offen, mit Messung im Backlog:**
+
+| # | Punkt |
+|---|---|
+| N62.4 | Lage & Markt: Zensus-Daten, Preisniveau mit Quellen, Gegenüberstellung mit den vier Objektfeldern (`ds2_wertsteigerung`, `ds2_nachfrage`, `ds2_bevoelkerung`, `ds2_entwicklung`) |
+| N62.6 | Steuerliche Zusammenfassung → in den Soll/Ist-Abgleich |
+| N62.7 | Landingpage: Leistungsumfang unter „Funktionen" |
+| N62.8 | Preise: Integrationsservice + Bestandsmigration — **⚠ GELD, nicht ohne Marcels Freigabe** |
+| N62.9 | Subpage F&E / Portfolio-Strategie (Quelle: `E:\Portfolio Strategie`, Vorhaben 827-757-583 nach § 6 FZulG, Laufzeit 01.01.2026–31.12.2028) |
+| N62.10 | Tab Steuern: Vorjahr duplizieren — **ohne** die festen Posten (Schuldzinsen, AfA) |
+| N62.11 | Standard-Lageklasse im Onboarding, **überschreibbar per Diktat** — die Lageklasse kommt im Diktat heute **gar nicht** vor (null Treffer in `voice-import.js` und `voiceExtractService.js`) |
+| N62.12 | Die geführte Eingabe durchgehen: Plausibilität, Vollständigkeit, Stufen, Führung — **nach** N62.4/N62.6 |
+
+Dazu aus N61: **N61.2** (Soll/Ist ausbauen — „was ausbauen heißt" ist
+offen), **N61.6** (`vw-modul-v4-2-2/-v4-2-5` liegt im Repo und ist **noch
+nicht gesichtet** — Gutachten-Modul mit `master_vwg`, `master_rndg`,
+`master_kpt`).
+
+**Prod-Rollout:** steht aus. Prod trägt noch „DESAG-zertifizierter
+Sachverständiger" (v2146 hat es auf Staging korrigiert) und keines der
+Pakete v2148–v2156.
