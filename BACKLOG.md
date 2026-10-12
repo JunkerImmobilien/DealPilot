@@ -36,7 +36,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N62 · Marcels Paket vom 12.10.2026 (abends) — zehn Punkte, abgeglichen
+### N62 · Marcels Paket vom 12.10.2026 (abends) — zwölf Punkte, abgeglichen
 
 **Marcel hat ausdrücklich darum gebeten:** *„Also das müsstest du einmal
 mit Backlog abgleichen, ob der Punkt dann da schon drinne steht."*
