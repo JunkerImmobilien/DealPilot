@@ -222,12 +222,32 @@ if (!reiheOk) console.log('      gefunden: ' + reihe.join(' | '));
 /* ══ 4 · FUNKTIONS- ODER PERSONENPOSTFACH ═════════════════════════════ */
 console.log('');
 console.log('=== 4 · Funktionspostfach erkennen ===');
+/* Die mit (*) stammen aus ECHTEN Amtsseiten, nicht aus meinem Kopf.
+   `rechnung@invoice…` stand am 12.10.2026 im Impressum des Kreises
+   Minden-Lübbecke und wurde von der ersten Fassung als PERSOENLICH
+   eingeordnet — ein Rechnungspostfach als Ansprechperson. Kein
+   erdachter Auftrag hätte das gefunden. */
 const POSTF = [
   ['info@stadt-xy.de', false], ['bauamt@stadt-xy.de', false],
   ['poststelle@kreis.de', false], ['buergerbuero@stadt.de', false],
   ['kataster@kreis.de', false], ['grundbuch@ag-xy.de', false],
   ['a.mueller@stadt-xy.de', true], ['anna.schmidt@kreis.de', true],
-  ['m.weber@stadt.de', true]
+  ['m.weber@stadt.de', true],
+  /* v2152b · aus echten Seiten */
+  ['rechnung@invoice.minden-luebbecke.de', false],      /* (*) */
+  ['info@minden-luebbecke.de', false],                  /* (*) */
+  ['s.ohnesorge@minden-luebbecke.de', true],            /* (*) */
+  ['info@vps.minden-luebbecke.de', false],              /* (*) */
+  ['poststelle@vps.huellhorst.de', false],              /* (*) */
+  ['posteingang@bielefeld.de', false],                  /* (*) */
+  /* Woerter, die kein Name sind und in keiner Liste stehen muessen,
+     seit nur der PUNKT zaehlt */
+  ['buchhaltung@stadt.de', false], ['anmeldung@stadt.de', false],
+  ['fundbuero@stadt.de', false], ['standesamt@stadt.de', false],
+  ['mweber@stadt.de', false],   /* nicht unterscheidbar -> sichere Seite */
+  /* Und zwei, die einen Punkt tragen und TROTZDEM Funktion sind —
+     dafuer ist die Negativliste da */
+  ['post.stelle@stadt.de', false], ['buerger.service@stadt.de', false]
 ];
 POSTF.forEach(function (p) {
   faelle++;

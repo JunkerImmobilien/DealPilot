@@ -401,8 +401,44 @@ function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
 function istPersonenpostfach(email) {
   const k = _s(email).toLowerCase().split('@')[0] || '';
   if (!k) return false;
-  if (/^(info|kontakt|post|poststelle|service|amt|buergerbuero|buergerservice|zentrale|mail|office|verwaltung|rathaus|stadt|gemeinde|kreis|bauamt|bauaufsicht|kataster|grundbuch|vermessung)/.test(k)) return false;
-  return /\./.test(k) || /^[a-z]\.?[a-z]+$/.test(k);
+  /* ══ v2152b · EIN WORT IST KEIN NAME ═══════════════════════════════
+
+     Hier stand als zweite Bedingung:
+
+       return /\./.test(k) || /^[a-z]\.?[a-z]+$/.test(k);
+
+     Der zweite Teil sollte `mweber` treffen (Initial plus Name). Er
+     trifft aber JEDES Wort aus Kleinbuchstaben.
+
+     GEMESSEN am 12.10.2026 am echten Impressum des Kreises
+     Minden-Lübbecke: `rechnung@invoice.minden-luebbecke.de` wurde als
+     PERSOENLICH eingeordnet und erschien damit als „Ansprechpartner 2"
+     im Modal — ein Rechnungspostfach als Ansprechperson für eine
+     Flurkartenanfrage.
+
+     > Ein erdachter Pruefauftrag hätte das nie gefunden: meine neun
+     > Proben waren `info`, `bauamt`, `a.mueller`, … — alles Fälle, die
+     > ich mir ausgedacht habe. Erst die echte Seite hatte ein Wort, das
+     > weder in meiner Negativliste stand noch wie ein Name aussieht.
+
+     Jetzt zählt NUR der Punkt im Konto (`vorname.nachname`, `m.weber`).
+     `mweber` gilt damit als Funktion — und das ist die sichere Seite:
+
+       Funktion, die als persönlich gilt  ->  falsche Ansprechperson
+       persönlich, die als Funktion gilt  ->  eine Person weniger
+
+     Der erste Fehler schickt Post an die falsche Stelle, der zweite
+     kostet eine Angabe. Bei einem Werkzeug, das Anfragen an Ämter
+     stellt, ist die zweite Richtung die richtige.
+
+     Die Negativliste bleibt trotzdem — sie fängt die Funktionspostfächer
+     ab, die einen Punkt TRAGEN. Geprüft wird sie gegen das Konto OHNE
+     Trennzeichen: `buerger.service@…` sähe sonst wie ein Name aus, weil
+     in der Liste `buergerservice` ohne Punkt steht. Gemessen — der
+     Prüfer hatte genau diesen Fall als einzigen roten. */
+  const glatt = k.replace(/[._-]/g, '');
+  if (/^(info|kontakt|post|poststelle|service|amt|buergerbuero|buergerservice|zentrale|mail|office|verwaltung|rathaus|stadt|gemeinde|kreis|bauamt|bauaufsicht|kataster|grundbuch|vermessung|rechnung|buchhaltung|invoice|datenschutz|presse|webmaster|noreply|abuse|support|hilfe|zentral|allgemein|sekretariat|geschaeftsstelle|team|anmeldung|fundbuero|standesamt|posteingang)/.test(glatt)) return false;
+  return /\./.test(k);
 }
 
 function _findeJson(text) {
