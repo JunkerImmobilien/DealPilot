@@ -1203,14 +1203,34 @@ function _buildAIPayload() {
             verkaeufer_druck: _ip.get('ai_verk'),
             marktlage: _ip.get('ai_markt')
           };
-          /* Nur mitschicken, was belegt ist - ein leerer Block sieht
-             nach Angabe aus und ist keine. `get()` gibt den Vorgabewert,
-             wenn der Nutzer nichts gesetzt hat; genau der ist gewollt,
-             denn danach rechnet die App auch. */
+          /* ══ v2140b · EINE VORGABE IST KEINE ENTSCHEIDUNG ══════════
+
+             `get()` gibt den Vorgabewert, wenn der Nutzer nichts
+             gesetzt hat. Im Browser gemessen: ein Schluessel im
+             Speicher, sieben Werte aus `get()`. Als "Einstellungen des
+             Nutzers" waere das eine Behauptung.
+
+             > Eine Vorgabe als persoenliche Einstellung auszugeben,
+             > behauptet eine Entscheidung.
+
+             Die Werte gelten trotzdem - danach rechnet die App auch.
+             Also beides: der WERT aus `get()`, und daneben die Liste
+             dessen, was der Nutzer SELBST gesetzt hat (`load()` gibt
+             nur die rohen Nutzerwerte). Der Prompt kennzeichnet dann
+             je Zeile, was Entscheidung und was Vorgabe ist. */
+          var _roh = (typeof _ip.load === 'function') ? (_ip.load() || {}) : {};
+          var _gesetzt = [];
+          var _ZU_ROH = { strategie: 'ai_strat', risikoneigung: 'ai_risk',
+            verkaeufer_druck: 'ai_verk', marktlage: 'ai_markt' };
           Object.keys(_prof).forEach(function (k) {
-            if (_prof[k] == null || _prof[k] === '') delete _prof[k];
+            if (_prof[k] == null || _prof[k] === '') { delete _prof[k]; return; }
+            var rk = _ZU_ROH[k] || k;
+            if (_roh[rk] != null && _roh[rk] !== '') _gesetzt.push(k);
           });
-          if (Object.keys(_prof).length) payload.investor_profil = _prof;
+          if (Object.keys(_prof).length) {
+            _prof._selbst_gesetzt = _gesetzt;
+            payload.investor_profil = _prof;
+          }
         }
       } catch (e) { /* optional - ohne Profil laeuft die Analyse weiter */ }
       payload.aiOptions = {

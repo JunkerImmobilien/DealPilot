@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
- * prompt-lecks-pruefen.mjs — v2139, erweitert in v2140
+ * prompt-lecks-pruefen.mjs — v2139, erweitert in v2140 und v2140b
  *
  * KOMMT AN, WAS GESENDET WIRD?
  *
@@ -222,7 +222,10 @@ const auftrag = {
     strategie: 'PRUEF-BUY-AND-HOLD',
     risikoneigung: 'PRUEF-KONSERVATIV',
     verkaeufer_druck: 'PRUEF-HOCH',
-    marktlage: 'PRUEF-SEITWAERTS'
+    marktlage: 'PRUEF-SEITWAERTS',
+    /* v2140b: welche davon hat der Nutzer SELBST gesetzt? Hier drei von
+       sieben - so wird die Kennzeichnung in BEIDEN Richtungen geprueft. */
+    _selbst_gesetzt: ['min_dscr', 'max_ltv', 'strategie']
   },
 
   verhandlung: { inseriert_seit: '2026-01-13', tage_online: 263 },
@@ -317,7 +320,17 @@ const ERWARTET = [
      zwei Schwellen zur selben Groesse im Prompt und das Modell waehlt. */
   ['profil: Score bleibt unberuehrt', 'v2140', 'Rechne keinen'],
   ['profil: beide Zahlen nennen', 'v2140', 'Mische sie nicht'],
-  ['profil: Aufgabe 5 verweist darauf', 'v2140', 'DIESER INVESTOR']
+  ['profil: Aufgabe 5 verweist darauf', 'v2140', 'DIESER INVESTOR'],
+
+  /* ── v2140b · Vorgabe oder Entscheidung? ────────────────────────────
+     Im Browser gemessen: `get()` gibt immer einen Wert, notfalls die
+     Vorgabe aus `config.js`. Ein Block "Einstellungen des Nutzers"
+     behauptet dann eine Entscheidung, die niemand getroffen hat. */
+  ['kennzeichnung: selbst gesetzt', 'v2140b', '1,37  (selbst gesetzt)'],
+  ['kennzeichnung: Vorgabe', 'v2140b', 'vor Steuer  (Vorgabe, nicht gesetzt)'],
+  ['kennzeichnung: Strategie gesetzt', 'v2140b', 'PRUEF-BUY-AND-HOLD  (selbst gesetzt)'],
+  ['kennzeichnung: Marktlage Vorgabe', 'v2140b', 'PRUEF-SEITWAERTS  (Vorgabe, nicht gesetzt)'],
+  ['Ordnung: Vorgabe ist keine Aussage', 'v2140b', 'KEINE Aussage des Nutzers']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */
@@ -403,6 +416,38 @@ typProben.forEach(function (tp) {
        : (gutDa ? 'sauber' : 'Text kommt NICHT an')));
 });
 
+/* ══ ALLES VORGABE: merkt der Prompt es? (v2140b) ════════════════════
+ *
+ * Der haeufigste Fall in der Praxis - gemessen an Marcels eigenem
+ * Staging-Konto: EIN Schluessel im Speicher, sieben Werte aus `get()`.
+ * Dann darf das Modell nicht gegen "seine" Schwellen urteilen. */
+console.log('\n=== Alles Vorgabe: merkt der Prompt es? ===');
+let vorgabeRot = 0;
+(function () {
+  const kopie = JSON.parse(JSON.stringify(auftrag));
+  kopie.investor_profil._selbst_gesetzt = [];
+  let txt = '';
+  try { txt = openai.buildPrompt(kopie, {}); } catch (e) { txt = 'FEHLER ' + e.message; }
+  const proben = [
+    ['Block ist noch da', txt.indexOf('DIESER INVESTOR') >= 0],
+    /* v2140b: NICHT nach '(selbst gesetzt)' im ganzen Prompt suchen -
+       die ERKLAERUNG des Blocks zitiert den Ausdruck in
+       Anfuehrungszeichen und loest dann falsch aus. Gesucht wird die
+       markierte ZEILE: zwei Leerzeichen davor, kein Anfuehrungszeichen.
+
+       > Ein Pruefer, der einen Ausdruck sucht, der auch in der Regel
+       > ueber ihn vorkommt, misst die Regel statt die Daten. Vierter
+       > Fall dieser Falle - siehe [[pruefer-findet-eigenes-zitat]]. */
+    ['keine Zeile als gesetzt', !/[^"]\(selbst gesetzt\)/.test(txt)],
+    ['der Hinweis steht da', txt.indexOf('KEINE dieser Angaben selbst gesetzt') >= 0],
+    ['und nennt den Weg', txt.indexOf('Einstellungen -> Standardwerte') >= 0]
+  ];
+  proben.forEach(function (pr) {
+    if (!pr[1]) vorgabeRot++;
+    console.log('  ' + (pr[1] ? 'ok  ' : 'ROT ') + pr[0]);
+  });
+})();
+
 /* ══ OHNE PROFIL: sagt der Prompt es, oder schweigt er? (v2140) ══════
  *
  * Ein fehlendes Profil darf nicht dazu fuehren, dass Aufgabe 5
@@ -470,6 +515,7 @@ console.log('  Gegenproben           : ' + proben.length + ', davon blind: ' + b
 console.log('  Regelbloecke          : ' + regelFelder.length + ', ohne Daten: ' + ohneDaten);
 console.log('  Typproben             : ' + typProben.length + ', rot: ' + typRot);
 console.log('  Ohne-Profil-Proben    : 3, rot: ' + ohneRot);
+console.log('  Alles-Vorgabe-Proben  : 4, rot: ' + vorgabeRot);
 console.log('  buildPrompt           : die ECHTE Funktion aus openaiService.js');
 console.log('  _buildAIPayload       : ' + (bau ? bau.split('\n').length + ' Zeilen gelesen'
   : 'NICHT GEFUNDEN — die Feldliste unten ist dann nicht abgeglichen'));
@@ -484,9 +530,11 @@ const gesendet = new Set();
 console.log('  Feldnamen im Sender   : ~' + gesendet.size
   + ' (geprueft werden ' + ERWARTET.length + ' Stellen gezielt, nicht alle)');
 
-const rc = (rot > 0 || blind > 0 || ohneDaten > 0 || typRot > 0 || ohneRot > 0) ? 1 : 0;
+const rc = (rot > 0 || blind > 0 || ohneDaten > 0 || typRot > 0 || ohneRot > 0
+  || vorgabeRot > 0) ? 1 : 0;
 console.log('\n' + (rc === 0
   ? 'SAUBER — jedes belegte Feld kommt im Prompt an.'
   : 'ROT — ' + rot + ' Feld(er) verschwinden, ' + blind + ' blinde Probe(n), '
-    + ohneDaten + ' Regel(n) ohne Daten, ' + typRot + ' Typprobe(n) rot.'));
+    + ohneDaten + ' Regel(n) ohne Daten, ' + typRot + ' Typprobe(n) rot, '
+    + (ohneRot + vorgabeRot) + ' Profil-Probe(n) rot.'));
 process.exit(rc);

@@ -684,16 +684,34 @@ function buildPrompt(payload, opts) {
        > Einstellungen.
 
        Die ANALYSE darf es - sie urteilt fuer diesen Investor. */
-    _ip ? _zeilen('## DIESER INVESTOR (Einstellungen des Nutzers, keine Messung am Objekt)', [
-      ['Mindest-DSCR', _ip.min_dscr != null ? String(_ip.min_dscr).replace('.', ',') : null],
-      ['Mindest-Cashflow', _ip.min_cashflow_vor_st != null
-        ? _z(_ip.min_cashflow_vor_st) + ' EUR/Monat vor Steuer' : null],
-      ['Maximaler LTV', _ip.max_ltv != null ? _p(Number(_ip.max_ltv)) : null],
-      ['Strategie', _ip.strategie],
-      ['Risikoneigung', _ip.risikoneigung],
-      ['Erwarteter Verkaeufer-Druck', _ip.verkaeufer_druck],
-      ['Eingeschaetzte Marktlage', _ip.marktlage]
-    ]) : '',
+    /* ══ v2140b · WAS DAVON HAT DER NUTZER SELBST GESETZT? ════════════
+       `_selbst_gesetzt` ist die Liste der Schluessel, die im
+       `localStorage` des Nutzers stehen (`ui.js`, aus `load()`). Alles
+       andere ist die VORGABE aus `config.js` - sie gilt, weil die App
+       danach rechnet, aber sie ist keine Entscheidung.
+
+       Ohne diese Trennung urteilt das Modell gegen eine Schwelle und
+       nennt sie "seine" - und der Nutzer liest ein Mass, das er nie
+       gesetzt hat. */
+    _ip ? (function () {
+      var g = Array.isArray(_ip._selbst_gesetzt) ? _ip._selbst_gesetzt : [];
+      var mark = function (k, wert) {
+        if (wert == null) return null;
+        return wert + (g.indexOf(k) >= 0 ? '  (selbst gesetzt)' : '  (Vorgabe, nicht gesetzt)');
+      };
+      return _zeilen('## DIESER INVESTOR (Einstellungen, keine Messung am Objekt)', [
+        ['Mindest-DSCR', mark('min_dscr', _ip.min_dscr != null
+          ? String(_ip.min_dscr).replace('.', ',') : null)],
+        ['Mindest-Cashflow', mark('min_cashflow_vor_st', _ip.min_cashflow_vor_st != null
+          ? _z(_ip.min_cashflow_vor_st) + ' EUR/Monat vor Steuer' : null)],
+        ['Maximaler LTV', mark('max_ltv', _ip.max_ltv != null
+          ? _p(Number(_ip.max_ltv)) : null)],
+        ['Strategie', mark('strategie', _ip.strategie)],
+        ['Risikoneigung', mark('risikoneigung', _ip.risikoneigung)],
+        ['Erwarteter Verkaeufer-Druck', mark('verkaeufer_druck', _ip.verkaeufer_druck)],
+        ['Eingeschaetzte Marktlage', mark('marktlage', _ip.marktlage)]
+      ]);
+    })() : '',
     _ip ? ('\n- Diese Zahlen sind EINSTELLUNGEN. Der DealScore und die DealPilot-Skala'
       + '\n  weiter oben bleiben unberuehrt: sie messen das OBJEKT. Rechne keinen'
       + '\n  Score nach dem Profil um.'
@@ -703,8 +721,22 @@ function buildPrompt(payload, opts) {
       + '\n- Widerspricht eine persoenliche Schwelle der DealPilot-Skala (etwa'
       + '\n  Mindest-DSCR 1,35 gegen "solide ab 1,2"), nenne BEIDE und sage,'
       + '\n  welche wessen ist. Mische sie nicht und waehle keine aus.'
-      + '\n- Fehlt eine Schwelle hier, hat der Nutzer sie nicht gesetzt. Nimm dann'
-      + '\n  die DealPilot-Skala und sage, dass du das tust - erfinde keine.') : '',
+      /* v2140b: der frueher hier stehende Satz („Fehlt eine Schwelle
+         hier...") konnte NIE greifen - `get()` im Frontend gibt immer
+         einen Wert, notfalls die Vorgabe. Eine Regel, deren Bedingung
+         nicht eintreten kann, ist keine Regel. Jetzt steht die
+         Unterscheidung an der Zeile selbst. */
+      + '\n- "(selbst gesetzt)" heisst: eine Entscheidung dieses Nutzers. Daran'
+      + '\n  darfst du ihn messen. "(Vorgabe, nicht gesetzt)" ist der Standardwert'
+      + '\n  der App - er gilt fuer die Rechnung, ist aber KEINE Aussage des Nutzers.'
+      + '\n  Nenne ihn nicht "seine" Schwelle und bau darauf kein Urteil ueber'
+      + '\n  seine Ziele.'
+      + (Array.isArray(_ip._selbst_gesetzt) && _ip._selbst_gesetzt.length === 0
+          ? '\n- ACHTUNG: der Nutzer hat KEINE dieser Angaben selbst gesetzt. Alles'
+            + '\n  oben ist Vorgabe. Urteile nach der DealPilot-Skala, sage das'
+            + '\n  ausdruecklich, und schlage ihm vor, sein Profil zu fuellen'
+            + '\n  (Einstellungen -> Standardwerte).'
+          : '')) : '',
     '',
     /* v2013 - DIE FOTOS. Ein Bild zeigt einen EINDRUCK, keine Messung. */
     _nFotos ? ('\n## FOTOS DES OBJEKTS\nDu bekommst ' + _nFotos + ' Foto(s) dieses Objekts mitgeliefert.'
