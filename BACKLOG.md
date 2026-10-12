@@ -2973,6 +2973,54 @@ Regel in `style.css:32836`, die `#dp-sb-toggle` dort versteckt.
 
 ---
 
+#### N60.41 · ⚠ Das Preise-Fenster ist auf dem Handy 13 Bildschirme lang (12.10.2026)
+
+**Gefunden in Durchgang 2 der Geräteabnahme** (100 Läufe, 5 Breiten ×
+20 echte Öffner). Gemessen an `.pricing-modal-shell`:
+
+| Breite | Höhe des Fensters | Viewport | das sind |
+|---|---:|---:|---:|
+| 360 px | **10.078 px** | 757 | **13,3 Bildschirme** |
+| 390 px | 9.564 px | 757 | 12,6 Bildschirme |
+| 768 px | 4.970 px | 757 | 6,6 Bildschirme |
+| 1180 px | 3.871 px | 757 | 5,1 Bildschirme |
+
+**Es ist nicht kaputt:** das Overlay scrollt (`overflow-y:auto`), nichts
+ist abgeschnitten, nichts liegt außerhalb, und der Schließknopf sitzt
+seit `v2129` wieder oben rechts und ist erreichbar. Gemessen wurde das
+auf allen vier Breiten.
+
+> **Aber 13 Bildschirme sind keine Preisübersicht, das ist ein
+> Prospekt.** Wer auf dem Handy den Partner-Tarif unten sucht, wischt
+> dreizehn Mal — und weiß dabei nie, wie weit es noch geht.
+
+### Warum ich hier nichts gebaut habe
+
+Das ist **Geld und Produkt**, und CLAUDE.md zieht die Grenze genau da:
+*„Nachfragen nur bei: Produktion, Datenbank-Eingriffen, Geld, Preisen,
+Kündigungen"*. Welche Tarife in welcher Reihenfolge und Tiefe ein Kunde
+sieht, entscheidet Marcel — nicht mein Umbruch.
+
+### Drei Wege, jeder ohne Inhaltsverlust
+
+| | Weg | was der Kunde merkt |
+|---|---|---|
+| **a** | **Reiter** über den Tarifgruppen (Abos · Kontingente · Partner) | eine Gruppe auf einmal, Wischweg ~1–2 Bildschirme |
+| **b** | **Aufklappen**: je Tarif Titel + Preis + CTA sichtbar, Leistungsliste zugeklappt | Überblick zuerst, Details auf Wunsch |
+| **c** | **Vergleichstabelle quer** statt Karten untereinander | eine Schiene, bekannt vom Gewerke-Kasten |
+
+Marcels Prüfauftrag nennt genau diese Form: *„Wenn Informationen mobil
+nicht gleichzeitig dargestellt werden können, verwende sinnvoll
+aufgebaute Listen, Detailansichten, aufklappbare Bereiche oder
+alternative Layouts."* **(b)** entspricht dem am genauesten und ist der
+kleinste Eingriff — er ändert keine Reihenfolge und keinen Preis.
+
+> Zur Einordnung: dieselbe Datei trägt **6 von 521** `font-size`-Werten
+> unter 11 px, ist also nicht das Hauptproblem bei der Lesbarkeit. Die
+> Länge ist es.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —
