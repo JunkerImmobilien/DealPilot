@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot · Prozesskarte Detail</title>
+<!--
+  ════════════════════════════════════════════════════════════════════════
+  DealPilot v2142 — design/Messe/prozesskarte-detail.html
+
+  Marcel, 12.10.2026: „kann man diese prozesskarte auch noch weiter
+  ausführen mit netzplan? also quasi den boarding prozess sukzessiv als
+  ablaufplan und auch steuer etc. jährliche IST eintragungen. kannst du
+  auch noch darstellen wie die score sich zusammensetzen und wie sie dann
+  individualisiert werden können."
+
+  Also DREI Tafeln, die genau diese drei Fragen beantworten:
+
+    A  Netzplan Boarding   welcher Schritt schaltet was frei
+    B  Das Steuerjahr      der jährliche Kreislauf mit IST-Eintragungen
+    C  Die Scores          woraus sie bestehen, und wo man dreht
+
+  ── WARUM EINE ZWEITE TAFEL UND NICHT MEHR AUF DER ERSTEN ─────────────
+
+  `prozesskarte.html` beantwortet „was kann ich tun, und was kommt dabei
+  heraus" — neun Stationen, A3, am Stand lesbar aus zwei Metern. Ein
+  Netzplan beantwortet eine andere Frage: „in welcher REIHENFOLGE, und
+  was hängt an was". Beides auf ein Blatt zu zwingen, kostet genau die
+  Lesbarkeit, für die die erste Karte gebaut wurde.
+
+  > Zwei Fragen, zwei Blätter. Die Hauptkarte bleibt das Schaufenster,
+  > diese hier ist das Blatt für das Gespräch danach — wenn einer fragt,
+  > wie es wirklich läuft.
+
+  ── JEDE ZAHL UND JEDER NAME IST GEMESSEN ─────────────────────────────
+
+    8 Etappen, Namen und Ziele    backend/src/generated/frontend-konstanten.json
+                                  (Etappe 7+8 tragen `extra: true`)
+    Pflichtfelder je Stufe        frontend/js/objekt-reiter.js pflichtFuer()
+                                  Stufe 1: plz ort str objart wfl baujahr = 6
+                                  Stufe 2: + kp nkm ds2_zustand ds2_energie
+                                           standardstufe zimmer (+etage bei
+                                           ETW / +einheiten bei MFH) = 13
+                                  Stufe 3: + nutzungsart gsfl brw bgf
+                                           (+mea bei ETW, +nhk_haus
+                                           nhk_geschosse nhk_dach bei Haus,
+                                           +garagen_bgf_qm garagen_stufe
+                                           wenn Garagen) = bis 20
+    259 Feld-Ids, 11 Objektarten  frontend-konstanten.json
+    DealScore 5 Faktoren          frontend/js/dealscore.js DEFAULT_WEIGHTS
+                                  cashflow 30 · rendite 25 · ltv 15 ·
+                                  risiko 15 · potenzial 15
+    DealScore 6 Vorlagen          dito PRESET_WEIGHTS: balanced,
+                                  conservative, optimistic, lage,
+                                  cashflow, sicherheit
+    DS2 5 Kategorien              frontend/js/dealscore2.js weights
+                                  rendite 35 · finanzierung 25 ·
+                                  risiko 20 · lage 10 · upside 10
+    DS2 Unterkennzahlen           dito subWeights, am Kern ausgelesen
+    Score-Stufen 85/70/50/35      frontend/js/score-tiers.js
+    Lageklassen A/B/C             frontend/js/lage-profil.js VORGABE
+                                  3,5 / 5,0 / 7,0 % brutto
+    Barkauf: LTV+DSCR entfallen   frontend/js/dealscore.js _istBarkauf()
+                                  (v2141, Marcels Entscheidung 12.10.2026)
+    Steuerjahr                    /api/v1/tax-periods, /api/v1/tax-snapshots,
+                                  /api/v1/objects/wk-aggregate,
+                                  frontend/js/anlage-v-2025.js
+
+  Was NICHT draufsteht: Zahlen, die niemand gemessen hat. Keine
+  Zeitersparnis, keine Nutzerzahlen, keine Treffergenauigkeit.
+
+  ── GESTALTUNG ───────────────────────────────────────────────────────
+  Der <style>-Block bis zur Marke „ERGÄNZUNG" ist WÖRTLICH der aus
+  `prozesskarte.html`. Er wird von `tools/prozesskarte-pruefen.mjs`
+  verglichen: läuft er auseinander, stehen am Stand zwei Gestaltungen
+  nebeneinander, und das sieht jeder sofort.
+  ════════════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<!-- ══ WOERTLICH der <style>-Block aus prozesskarte.html ══════════════
+     Nicht abgeschrieben, sondern eingesetzt: tools/prozesskarte-pruefen.mjs
+     vergleicht beide. Laufen sie auseinander, stehen am Stand zwei
+     Gestaltungen nebeneinander - und das sieht jeder Besucher sofort. -->
+<style>
+  :root{
+    --obsidian:#050505;
+    --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f;
+    --gruen:#3FA56C; --rot:#B8625C;
+    --creme:#FDFCFA; --karte:#FBF6E9;
+    --tinte:#1A1714; --grau:#8a8279;
+    --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+    --f-disp:"Space Grotesk",system-ui,sans-serif;
+    --f-mono:"JetBrains Mono",ui-monospace,monospace;
+    --f-body:Inter,system-ui,sans-serif;
+    --f-serif:"Cormorant Garamond",Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--obsidian); color:var(--creme);
+    font-family:var(--f-body); font-size:14px; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* Ein ruhiger Lichtschein, kein Partikelfeld — gedruckt wäre das Grau. */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(120% 60% at 12% -10%, rgba(232,204,122,.10), transparent 60%),
+      radial-gradient(90% 50% at 92% 110%, rgba(201,168,76,.07), transparent 65%);
+  }
+  .blatt{position:relative; z-index:1; max-width:1760px; margin:0 auto; padding:30px 34px 48px}
+
+  /* ── Kopf ─────────────────────────────────────────────────── */
+  header{display:flex; align-items:flex-end; justify-content:space-between;
+    gap:24px; flex-wrap:wrap; padding-bottom:16px; border-bottom:1px solid rgba(201,168,76,.26)}
+  .marke{display:flex; align-items:center; gap:13px}
+  .marke .zeichen{width:42px;height:42px;border-radius:9px;background:var(--runway);
+    display:grid;place-items:center;flex:0 0 auto}
+  .marke .zeichen svg{width:24px;height:24px}
+  h1{margin:0; font-family:var(--f-disp); font-weight:700; font-size:27px; letter-spacing:-.015em}
+  .unter{margin:3px 0 0; font-family:var(--f-mono); font-size:10.5px;
+    letter-spacing:.17em; text-transform:uppercase; color:var(--gold)}
+  .kopf-satz{max-width:560px; font-family:var(--f-serif); font-size:17.5px;
+    line-height:1.45; color:#E9E2D2; text-align:right}
+
+  /* ── Die Runway unter dem Kopf: die drei Phasen ───────────── */
+  .runway{display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:0; margin:22px 0 4px; border-radius:7px; overflow:hidden;
+    border:1px solid rgba(201,168,76,.3)}
+  .runway div{padding:9px 14px; font-family:var(--f-mono); font-size:10px;
+    letter-spacing:.15em; text-transform:uppercase; text-align:center;
+    background:rgba(201,168,76,.07); color:var(--gold-hi)}
+  .runway div + div{border-left:1px solid rgba(201,168,76,.22)}
+  .runway b{display:block; font-family:var(--f-disp); font-size:13.5px;
+    letter-spacing:0; text-transform:none; color:var(--creme); margin-top:3px; font-weight:600}
+
+  /* ── Das Board: drei Bahnen ───────────────────────────────── */
+  .bahnen{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:18px}
+  .bahn{display:flex; flex-direction:column; gap:13px; position:relative}
+  .bahn-kopf{display:flex; align-items:center; gap:9px; padding:11px 14px;
+    border-radius:8px 8px 0 0; background:rgba(201,168,76,.1);
+    border:1px solid rgba(201,168,76,.3); border-bottom:none}
+  .bahn-nr{width:23px;height:23px;border-radius:50%;background:var(--runway);
+    color:var(--obsidian); font-family:var(--f-mono); font-weight:700; font-size:11px;
+    display:grid;place-items:center;flex:0 0 auto}
+  .bahn-kopf h2{margin:0; font-family:var(--f-disp); font-size:16px; font-weight:600}
+  .bahn-kopf .wann{margin-left:auto; font-family:var(--f-mono); font-size:9.5px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--grau)}
+
+  .station{background:rgba(255,255,255,.028); border:1px solid rgba(201,168,76,.19);
+    border-radius:9px; padding:13px 15px}
+  .station h3{margin:0 0 3px; font-family:var(--f-disp); font-size:14px; font-weight:600;
+    color:var(--creme); display:flex; align-items:center; gap:7px}
+  .station h3 .mk{font-family:var(--f-mono); font-size:8.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-lo); border:1px solid rgba(201,168,76,.4);
+    border-radius:3px; padding:2px 5px; font-weight:700}
+  .station .was{margin:7px 0 0; font-size:12.8px; color:#D8D2C6}
+  .station ul{margin:6px 0 0; padding-left:16px}
+  .station li{font-size:12.6px; color:#D8D2C6; margin:2px 0}
+
+  /* „Was dabei herauskommt" — das ist die Antwort auf Marcels Frage. */
+  .raus{margin-top:11px; padding-top:9px; border-top:1px dashed rgba(201,168,76,.3)}
+  .raus-lbl{font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--gold); display:block; margin-bottom:6px}
+  .pillen{display:flex; flex-wrap:wrap; gap:5px}
+  .pille{font-family:var(--f-body); font-size:11.4px; font-weight:500;
+    border:1px solid rgba(201,168,76,.45); color:var(--gold-hi);
+    border-radius:999px; padding:3px 9px; background:rgba(201,168,76,.07)}
+  .pille.gruen{border-color:rgba(63,165,108,.5); color:#8FD6AE; background:rgba(63,165,108,.08)}
+
+  /* Der Pfeil zwischen den Bahnen */
+  .pfeil{position:absolute; top:50%; right:-13px; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; background:var(--obsidian);
+    border:1px solid rgba(201,168,76,.45); display:grid; place-items:center; z-index:2}
+  .pfeil svg{width:11px;height:11px;fill:var(--gold)}
+
+  /* ── Fußzeile: die Doktrin, kurz ───────────────────────────── */
+  .fuss{margin-top:26px; padding-top:15px; border-top:1px solid rgba(201,168,76,.26);
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px}
+  .fuss div{font-size:12.4px; color:#C9C2B6}
+  .fuss b{display:block; font-family:var(--f-disp); font-size:13px; color:var(--gold-hi);
+    margin-bottom:3px; font-weight:600}
+  .stand{margin-top:18px; font-family:var(--f-mono); font-size:9px; letter-spacing:.1em;
+    color:#6b655c; text-transform:uppercase}
+
+  /* ── Schmal: Bahnen untereinander ──────────────────────────── */
+  @media (max-width:1180px){
+    .bahnen{grid-template-columns:minmax(0,1fr)}
+    .pfeil{top:auto; bottom:-15px; right:50%; transform:translateX(50%) rotate(90deg)}
+    .kopf-satz{text-align:left}
+    .runway{grid-template-columns:minmax(0,1fr)}
+    .runway div + div{border-left:none; border-top:1px solid rgba(201,168,76,.22)}
+    .fuss{grid-template-columns:minmax(0,1fr)}
+  }
+
+  /* ── Druck: A3 quer, helle Fassung ─────────────────────────── */
+  @page{ size:A3 landscape; margin:12mm }
+  @media print{
+    body{background:#fff; color:var(--tinte)}
+    body::before{display:none}
+    .blatt{max-width:none; padding:0}
+    header{border-color:rgba(26,23,20,.2)}
+    .kopf-satz{color:#3a352e}
+    .unter{color:var(--gold-lo)}
+    .runway{border-color:rgba(26,23,20,.25)}
+    .runway div{background:#F6F2E8; color:var(--gold-lo)}
+    .runway b{color:var(--tinte)}
+    .bahn-kopf{background:#F6F2E8; border-color:rgba(26,23,20,.22)}
+    .station{background:var(--karte); border-color:rgba(26,23,20,.18);
+      break-inside:avoid; page-break-inside:avoid}
+    .station h3,.station .was,.station li{color:var(--tinte)}
+    .pille{color:#6b5518; border-color:rgba(184,147,47,.6); background:#F6F2E8}
+    .pille.gruen{color:#215C3B; border-color:rgba(33,92,59,.45); background:#EDF5F0}
+    .pfeil{background:#fff}
+    .fuss div{color:#3a352e}
+    .fuss b{color:var(--gold-lo)}
+    .bahnen{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+</style>
+<style>
+  /* ══ ERGÄNZUNG · nur was diese drei Tafeln brauchen ══════════════════
+     Keine Farbe und keine Schrift neu — alles aus den Tokens oben. */
+
+  .tafel{margin-top:30px}
+  .tafel-kopf{display:flex; align-items:baseline; gap:12px;
+    padding-bottom:9px; margin-bottom:16px;
+    border-bottom:1px solid rgba(201,168,76,.26)}
+  .tafel-nr{font-family:var(--f-mono); font-size:10px; letter-spacing:.16em;
+    color:var(--gold); padding:3px 8px; border:1px solid rgba(201,168,76,.4);
+    border-radius:4px}
+  .tafel-kopf h2{margin:0; font-family:var(--f-disp); font-size:20px;
+    font-weight:600; color:var(--creme)}
+  .tafel-kopf p{margin:0 0 0 auto; max-width:620px; font-family:var(--f-serif);
+    font-size:15px; color:#C9C2B6; text-align:right}
+
+  /* ── Netzplan: Spalten als Stufen, Knoten darin ──────────────────── */
+  .netz{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px}
+  .stufe{display:flex; flex-direction:column; gap:10px; position:relative}
+  .stufe-kopf{display:flex; align-items:center; gap:8px; padding:9px 13px;
+    border:1px solid rgba(201,168,76,.3); border-radius:7px;
+    background:rgba(201,168,76,.05)}
+  .stufe-kopf b{font-family:var(--f-disp); font-size:14.5px; color:var(--gold-hi)}
+  .stufe-kopf .pflicht{margin-left:auto; font-family:var(--f-mono);
+    font-size:9.5px; letter-spacing:.1em; color:var(--grau)}
+  .knoten{background:rgba(255,255,255,.028);
+    border:1px solid rgba(201,168,76,.19); border-left:2px solid var(--gold);
+    border-radius:7px; padding:11px 13px}
+  .knoten.extra{border-left-style:dashed; border-left-color:var(--gold-lo)}
+  .knoten h4{margin:0; font-family:var(--f-disp); font-size:13.5px;
+    font-weight:600; color:var(--creme); display:flex; align-items:baseline; gap:7px}
+  .knoten h4 .nr{font-family:var(--f-mono); font-size:9px; color:var(--gold);
+    border:1px solid rgba(201,168,76,.35); border-radius:3px; padding:1px 4px}
+  .knoten .ziel{margin:4px 0 0; font-size:12.4px; color:#D8D2C6}
+  .knoten .frei{margin:8px 0 0; padding-top:7px;
+    border-top:1px dashed rgba(201,168,76,.28);
+    font-family:var(--f-mono); font-size:9px; letter-spacing:.12em;
+    color:var(--gold); text-transform:uppercase}
+  .knoten .frei-txt{margin:3px 0 0; font-size:12.2px; color:#C9C2B6}
+  .wartet{font-family:var(--f-mono); font-size:10.5px; color:var(--rot);
+    padding:7px 12px; border:1px dashed rgba(184,98,92,.45); border-radius:6px;
+    background:rgba(184,98,92,.06)}
+
+  /* ── Steuerjahr: der Kreislauf als Kette mit Jahreswechsel ───────── */
+  .jahr{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px}
+  .monat{background:rgba(255,255,255,.028);
+    border:1px solid rgba(201,168,76,.19); border-radius:8px; padding:12px 14px;
+    position:relative}
+  .monat .wann{font-family:var(--f-mono); font-size:9px; letter-spacing:.14em;
+    color:var(--gold); text-transform:uppercase}
+  .monat h4{margin:4px 0 0; font-family:var(--f-disp); font-size:14px;
+    font-weight:600; color:var(--creme)}
+  .monat p{margin:6px 0 0; font-size:12.4px; color:#D8D2C6}
+  .monat .ist{margin-top:9px; padding-top:8px;
+    border-top:1px dashed rgba(63,165,108,.32)}
+  .monat .ist-lbl{font-family:var(--f-mono); font-size:8.5px; letter-spacing:.14em;
+    color:#8FD6AE; text-transform:uppercase; display:block; margin-bottom:4px}
+  .kreis{margin-top:14px; padding:12px 16px; border-radius:8px;
+    border:1px solid rgba(201,168,76,.3); background:rgba(201,168,76,.045);
+    font-size:12.8px; color:#D8D2C6}
+  .kreis b{font-family:var(--f-disp); color:var(--gold-hi)}
+
+  /* ── Scores: Balken als Gewicht, Tabelle als Vorlagen ───────────── */
+  .score-paar{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px}
+  .score-box{background:rgba(255,255,255,.028);
+    border:1px solid rgba(201,168,76,.19); border-radius:9px; padding:15px 17px}
+  .score-box > h3{margin:0 0 3px; font-family:var(--f-disp); font-size:16px;
+    font-weight:600; color:var(--creme)}
+  .score-box > .unterzeile{margin:0 0 13px; font-family:var(--f-mono);
+    font-size:9.5px; letter-spacing:.1em; color:var(--grau)}
+  .faktor{margin:9px 0 0}
+  .faktor-kopf{display:flex; align-items:baseline; gap:8px; font-size:12.6px;
+    color:#D8D2C6}
+  .faktor-kopf b{font-family:var(--f-disp); font-size:13px; color:var(--creme);
+    font-weight:600}
+  .faktor-kopf .pct{margin-left:auto; font-family:var(--f-mono); font-size:11px;
+    color:var(--gold-hi)}
+  .balken{margin-top:4px; height:7px; border-radius:4px;
+    background:rgba(201,168,76,.12); overflow:hidden}
+  .balken i{display:block; height:100%; background:var(--runway)}
+  .faktor .sub{margin:4px 0 0; font-family:var(--f-mono); font-size:9.5px;
+    color:var(--grau); letter-spacing:.04em}
+
+  .stufen-leiter{display:flex; gap:0; margin-top:14px; border-radius:6px;
+    overflow:hidden; border:1px solid rgba(201,168,76,.26)}
+  .stufen-leiter div{flex:1 1 0; padding:7px 4px; text-align:center;
+    font-family:var(--f-mono); font-size:9.5px}
+  .stufen-leiter div b{display:block; font-family:var(--f-disp); font-size:12px;
+    margin-bottom:2px}
+  .sl-top{background:rgba(63,165,108,.13); color:#8FD6AE}
+  .sl-gut{background:rgba(63,165,108,.07); color:#8FD6AE}
+  .sl-sol{background:rgba(201,168,76,.1); color:var(--gold-hi)}
+  .sl-schw{background:rgba(184,98,92,.08); color:#E0A09B}
+  .sl-krit{background:rgba(184,98,92,.15); color:#E0A09B}
+
+  .dreh{margin-top:18px}
+  .dreh table{width:100%; border-collapse:collapse}
+  .dreh th{font-family:var(--f-mono); font-size:9px; letter-spacing:.13em;
+    text-transform:uppercase; color:var(--gold); text-align:left;
+    padding:0 10px 7px 0; border-bottom:1px solid rgba(201,168,76,.26)}
+  .dreh td{font-size:12.5px; color:#D8D2C6; padding:8px 10px 8px 0;
+    border-bottom:1px solid rgba(201,168,76,.1); vertical-align:top}
+  .dreh td b{font-family:var(--f-disp); font-size:13px; color:var(--creme)}
+  .dreh td .ort{display:block; font-family:var(--f-mono); font-size:9.5px;
+    color:var(--grau); margin-top:2px}
+
+  .merke{margin-top:16px; padding:13px 16px; border-radius:8px;
+    border-left:3px solid var(--gold); background:rgba(201,168,76,.055);
+    font-family:var(--f-serif); font-size:15.5px; color:#E4DECF}
+  .merke b{font-family:var(--f-disp); font-size:14px; color:var(--gold-hi);
+    display:block; margin-bottom:4px; font-weight:600}
+
+  @media print{
+    .tafel{break-inside:avoid; page-break-inside:avoid}
+    .tafel-kopf h2{color:var(--tinte)}
+    .tafel-kopf p{color:#4a443c}
+    .knoten, .monat, .score-box{background:#fff; border-color:rgba(26,23,20,.16)}
+    .knoten .ziel, .monat p, .faktor-kopf, .dreh td{color:#3a352e}
+    .knoten h4, .monat h4, .score-box > h3, .faktor-kopf b, .dreh td b{color:var(--tinte)}
+    .merke{background:#F7F2E4; color:#3a352e}
+    .merke b{color:var(--gold-lo)}
+    .kreis{background:#F7F2E4; color:#3a352e}
+  }
+  @media (max-width:1100px){
+    .netz, .jahr, .score-paar{grid-template-columns:minmax(0,1fr)}
+    .tafel-kopf{flex-wrap:wrap}
+    .tafel-kopf p{margin-left:0; text-align:left}
+  }
+</style>
+</head>
+<body>
+<div class="blatt">
+
+  <header>
+    <div class="marke">
+      <span class="zeichen" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#050505" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12h3l2-3h4l-1 3h5l3-4 2 1-2 3 2 3-2 1-3-4h-5l1 3H7l-2-3H2z"/>
+        </svg>
+      </span>
+      <div>
+        <h1>Wie es wirklich läuft</h1>
+        <p class="unter">DealPilot · Prozesskarte Detail</p>
+      </div>
+    </div>
+    <p class="kopf-satz">Drei Tafeln für das Gespräch nach dem ersten Blick:
+      <em>in welcher Reihenfolge</em>, <em>was jedes Jahr dazukommt</em> —
+      und <em>woraus die Scores bestehen</em>.</p>
+  </header>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       TAFEL A · NETZPLAN BOARDING
+       Die acht Etappen stehen in frontend-konstanten.json; die drei
+       Stufen und ihre Pflichtfelder in objekt-reiter.js pflichtFuer().
+       Der Netzplan zeigt, was WORAN hängt - das ist die Frage, die eine
+       Stationskarte nicht beantwortet.
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section class="tafel">
+    <div class="tafel-kopf">
+      <span class="tafel-nr">Tafel A</span>
+      <h2>Netzplan Boarding</h2>
+      <p>Jede Stufe schaltet frei, was ohne sie nicht rechnen darf.
+        Was fehlt, wird nicht geschätzt — es wird genannt.</p>
+    </div>
+
+    <div class="netz">
+
+      <!-- ── STUFE 1 ──────────────────────────────────────────────── -->
+      <div class="stufe">
+        <div class="stufe-kopf">
+          <b>Stufe 1 · Einordnen</b>
+          <span class="pflicht">6 Pflichtfelder</span>
+        </div>
+
+        <article class="knoten">
+          <h4><span class="nr">E1</span> Basis</h4>
+          <p class="ziel">Objekt, Preis und Miete. Adresse, Objektart,
+            Wohnfläche, Baujahr.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">Quick-Check mit Ampel · Bruttomietrendite ·
+            Kaufpreisfaktor · Marktpreisindikation (Stufe 1)</p>
+        </article>
+
+        <div class="wartet">ohne Stufe 1 kein Score — und keine Schätzung
+          an ihrer Stelle</div>
+      </div>
+
+      <!-- ── STUFE 2 ──────────────────────────────────────────────── -->
+      <div class="stufe">
+        <div class="stufe-kopf">
+          <b>Stufe 2 · Durchrechnen</b>
+          <span class="pflicht">13 Pflichtfelder</span>
+        </div>
+
+        <article class="knoten">
+          <h4><span class="nr">E2</span> Geld</h4>
+          <p class="ziel">Finanzierung und Kaufnebenkosten. Zwei Darlehen,
+            Zins, Tilgung, Zinsbindung, Eigenkapital.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">DSCR · Beleihungsauslauf · Cashflow vor und
+            nach Steuer · DealScore · Investor Deal Score</p>
+        </article>
+
+        <article class="knoten">
+          <h4><span class="nr">E3</span> Lage &amp; Zustand</h4>
+          <p class="ziel">Wo es steht und wie es dasteht. Zustand,
+            Energieklasse, Standardstufe, Zimmer.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">Lage-Analyse · Mietanalyse · Risiko-Kategorie
+            im Investor Deal Score</p>
+        </article>
+
+        <article class="knoten">
+          <h4><span class="nr">E4</span> Feinschliff</h4>
+          <p class="ziel">Bewirtschaftung, Mietentwicklung, Steuer.
+            Hausgeld getrennt nach umlagefähig, Rücklagen, Grenzsteuersatz.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">Cashflow nach Steuer · AfA inkl. § 7b ·
+            Mietentwicklungsplan · Anlage V</p>
+        </article>
+      </div>
+
+      <!-- ── STUFE 3 ──────────────────────────────────────────────── -->
+      <div class="stufe">
+        <div class="stufe-kopf">
+          <b>Stufe 3 · Bewerten</b>
+          <span class="pflicht">bis 20 Pflichtfelder</span>
+        </div>
+
+        <article class="knoten">
+          <h4><span class="nr">E5</span> Deine Sicht</h4>
+          <p class="ziel">Investmentthese und Risiken — in eigenen Worten.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">Pilot-Analyse mit Bezug auf die eigene
+            These statt auf allgemeines Wissen</p>
+        </article>
+
+        <article class="knoten extra">
+          <h4><span class="nr">E7</span> Wertermittlung</h4>
+          <p class="ziel">Sachwertverfahren nach ImmoWertV. Nutzungsart,
+            Grundstück, Bodenrichtwert, BGF — bei ETW der
+            Miteigentumsanteil, am Haus Hausform, Geschosse und Dach.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">Sachwert (NHK 2010) · Ertragswert ·
+            Querverprobung · Marktbericht Stufe 3 (WEV)</p>
+        </article>
+
+        <article class="knoten extra">
+          <h4><span class="nr">E8</span> Restnutzungsdauer</h4>
+          <p class="ziel">Modernisierungsgrad nach Anlage 2 — acht Bauteile,
+            zwanzig Punkte.</p>
+          <p class="frei">schaltet frei</p>
+          <p class="frei-txt">Restnutzungsdauer aus dem Punktraster ·
+            Abgleich gegen die eingetragene AfA-Dauer</p>
+        </article>
+
+        <div class="wartet">ETW ohne Miteigentumsanteil: Sachwert OHNE
+          Bodenwert — und das steht dann dran</div>
+      </div>
+
+    </div>
+
+    <div class="merke">
+      <b>Etappe 6 „Feinheiten" steht absichtlich nicht im Netz</b>
+      Sie sammelt die übrigen Felder der 259 und schaltet nichts frei.
+      Ein Knoten ohne Nachfolger gehört nicht in einen Netzplan — er
+      täuscht eine Abhängigkeit vor, die es nicht gibt. Die Etappen 7
+      und 8 tragen gestrichelte Kanten: sie sind als <em>extra</em>
+      gekennzeichnet, also optional, bis jemand den Wert braucht.
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       TAFEL B · DAS STEUERJAHR
+       Marcels Punkt: „auch steuer etc. jährliche IST eintragungen."
+       Belegt über /api/v1/tax-periods, /tax-snapshots, /objects/wk-aggregate
+       und frontend/js/anlage-v-2025.js.
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section class="tafel">
+    <div class="tafel-kopf">
+      <span class="tafel-nr">Tafel B</span>
+      <h2>Das Steuerjahr im Bestand</h2>
+      <p>Der Plan von damals bleibt stehen. Daneben wachsen die
+        IST-Eintragungen — und die Abweichung bleibt sichtbar.</p>
+    </div>
+
+    <div class="jahr">
+
+      <article class="monat">
+        <span class="wann">beim Kauf · einmal</span>
+        <h4>Ankaufstand einfrieren</h4>
+        <p>Zum Nutzen-/Lastenwechsel wird der <em>ganze</em> Datensatz
+          festgeschrieben, nicht nur der Preis. Der Stichtag und das
+          Datum der Festschreibung stehen beide da.</p>
+        <div class="ist"><span class="ist-lbl">ab dann messbar</span>
+          <div class="pillen">
+            <span class="pille">Soll (Ankauf)</span>
+            <span class="pille">Ist (heute)</span>
+            <span class="pille">Abweichung je Kennzahl</span>
+          </div></div>
+      </article>
+
+      <article class="monat">
+        <span class="wann">laufendes Jahr</span>
+        <h4>Steuerzeitraum anlegen</h4>
+        <p>Je Objekt ein Zeitraum mit Von- und Bis-Datum. DealPilot prüft
+          auf Überlappung — zwei Zeiträume über denselben Monat wären
+          zwei Wahrheiten über dieselbe Miete.</p>
+        <div class="ist"><span class="ist-lbl">was dabei entsteht</span>
+          <div class="pillen">
+            <span class="pille">Zeitraum je Objekt</span>
+            <span class="pille">Zuordnung nach Datum</span>
+          </div></div>
+      </article>
+
+      <article class="monat">
+        <span class="wann">zum Jahresende</span>
+        <h4>Werbungskosten eintragen</h4>
+        <p>Die tatsächlichen Kosten des Jahres je Objekt — als
+          Schnappschuss mit Jahr und Quelle. Belege lassen sich
+          fotografieren und auslesen, statt abgetippt zu werden.</p>
+        <div class="ist"><span class="ist-lbl">IST-Eintragung</span>
+          <div class="pillen">
+            <span class="pille gruen">WK je Jahr je Objekt</span>
+            <span class="pille">Beleg-Import</span>
+            <span class="pille">Bemerkung mit Datum</span>
+          </div></div>
+      </article>
+
+      <article class="monat">
+        <span class="wann">zur Erklärung</span>
+        <h4>Anlage V und Bilanz</h4>
+        <p>Die Summe über <em>alle</em> gehaltenen Objekte — Überschuss
+          der Vermietung und Verpachtung je Jahr. Als PDF für den
+          Steuerberater, nicht als Behauptung.</p>
+        <div class="ist"><span class="ist-lbl">was herauskommt</span>
+          <div class="pillen">
+            <span class="pille gruen">Anlage V 2025</span>
+            <span class="pille">Werbungskosten-PDF</span>
+            <span class="pille">V+V-Überschuss je Jahr</span>
+          </div></div>
+      </article>
+
+    </div>
+
+    <div class="kreis">
+      <b>Und dann beginnt es wieder.</b>
+      Jedes Jahr kommt eine Zeile dazu: Werbungskosten, Miete, Instandhaltung,
+      Wertverlauf aus dem wiederholten Marktbericht. Der Ankaufstand bleibt
+      der Maßstab — <em>eingefroren</em>, damit die Abweichung nach zehn
+      Jahren noch etwas bedeutet. Wer den Maßstab mitwachsen lässt, misst
+      am Ende nur noch sich selbst.
+    </div>
+
+    <div class="merke">
+      <b>Warum nichts neu gerechnet wird</b>
+      Beide Sätze — Ankauf und heute — wurden zu ihrer Zeit mit den damaligen
+      Rechenkernen gerechnet. Eine Neuberechnung mit heutigen Regeln würde
+      nicht das Objekt messen, sondern unsere eigene Regeländerung. Deshalb
+      geht die Soll-Ist-Tabelle fertig in die Analyse, und das Modell
+      vergleicht sie, statt sie nachzurechnen.
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       TAFEL C · DIE SCORES
+       Marcels Punkt: „wie die score sich zusammensetzen und wie sie dann
+       individualisiert werden können."
+       Gewichte wörtlich aus dealscore.js DEFAULT_WEIGHTS und
+       dealscore2.js weights/subWeights.
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section class="tafel">
+    <div class="tafel-kopf">
+      <span class="tafel-nr">Tafel C</span>
+      <h2>Woraus die Scores bestehen</h2>
+      <p>Zwei Scores, bewusst verschieden. Dass sie abweichen, ist der
+        Zweck — und die Differenz wird erklärt, nicht geglättet.</p>
+    </div>
+
+    <div class="score-paar">
+
+      <!-- ── DealScore ──────────────────────────────────────────────── -->
+      <div class="score-box">
+        <h3>DealScore</h3>
+        <p class="unterzeile">fünf Faktoren · der schnelle Blick</p>
+
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Cashflow</b> was monatlich bleibt
+            <span class="pct">30 %</span></div>
+          <div class="balken"><i style="width:30%"></i></div>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Rendite</b> netto, nach Bewirtschaftung
+            <span class="pct">25 %</span></div>
+          <div class="balken"><i style="width:25%"></i></div>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Beleihungsauslauf</b> wie viel Fremdkapital
+            <span class="pct">15 %</span></div>
+          <div class="balken"><i style="width:15%"></i></div>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Risiko</b> Deckung des Kapitaldienstes
+            <span class="pct">15 %</span></div>
+          <div class="balken"><i style="width:15%"></i></div>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Potenzial</b> Wertpuffer und Mietsteigerung
+            <span class="pct">15 %</span></div>
+          <div class="balken"><i style="width:15%"></i></div>
+        </div>
+
+        <div class="stufen-leiter">
+          <div class="sl-krit"><b>&lt; 35</b>Kritisch</div>
+          <div class="sl-schw"><b>35</b>Schwach</div>
+          <div class="sl-sol"><b>50</b>Solide</div>
+          <div class="sl-gut"><b>70</b>Gut</div>
+          <div class="sl-top"><b>85</b>Sehr gut</div>
+        </div>
+      </div>
+
+      <!-- ── Investor Deal Score ────────────────────────────────────── -->
+      <div class="score-box">
+        <h3>Investor Deal Score</h3>
+        <p class="unterzeile">fünf Kategorien · je mit Unterkennzahlen</p>
+
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Rendite</b> <span class="pct">35 %</span></div>
+          <div class="balken"><i style="width:35%"></i></div>
+          <p class="sub">brutto 25 · netto 30 · Cashflow 25 · Cash-on-Cash 20</p>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Finanzierung</b> <span class="pct">25 %</span></div>
+          <div class="balken"><i style="width:25%"></i></div>
+          <p class="sub">DSCR 35 · LTV 30 · Zins 15 · Tilgung 10 · EK-Bedarf 10</p>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Risiko</b> <span class="pct">20 %</span></div>
+          <div class="balken"><i style="width:20%"></i></div>
+          <p class="sub">Leerstand 20 · Instandhaltung 20 · Qualität 20 ·
+            Baujahr 15 · Energie 15 · Mietausfall 10</p>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Lage</b> <span class="pct">10 %</span></div>
+          <div class="balken"><i style="width:10%"></i></div>
+          <p class="sub">Markt vs. Ist 25 · Mietwachstum 25 · Bevölkerung 20 ·
+            Nachfrage 15 · Mikrolage 15</p>
+        </div>
+        <div class="faktor">
+          <div class="faktor-kopf"><b>Upside</b> <span class="pct">10 %</span></div>
+          <div class="balken"><i style="width:10%"></i></div>
+          <p class="sub">Mietsteigerung 35 · Kaufpreisfaktor 30 ·
+            Wertsteigerung 20 · Entwicklung 15</p>
+        </div>
+
+        <div class="merke" style="margin-top:14px">
+          <b>Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung</b>
+          Sie wird nicht mit einem Mittelwert gefüllt. Der Score sagt
+          dann, wie viele Kennzahlen er hatte — eine Note aus drei von
+          sechs ist etwas anderes als eine aus sechs.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Wo man dreht ──────────────────────────────────────────────── -->
+    <div class="dreh">
+      <table>
+        <thead>
+          <tr>
+            <th>Was sich einstellen lässt</th>
+            <th>Was es verändert</th>
+            <th>Wo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Sechs Vorlagen für den DealScore</b>
+              <span class="ort">ausgewogen · konservativ · optimistisch ·
+                lageorientiert · cashflowstark · sicherheitsorientiert</span></td>
+            <td>Die fünf Gewichte auf einmal. Cashflowstark wiegt den
+              Cashflow mit 45 statt 30 %, sicherheitsorientiert den
+              Beleihungsauslauf und das Risiko mit je 25 statt 15.</td>
+            <td>Einstellungen → Score</td>
+          </tr>
+          <tr>
+            <td><b>Eigene Gewichte</b>
+              <span class="ort">jede der fünf Zahlen frei, Summe 100</span></td>
+            <td>Wer Potenzial über Cashflow stellt, bekommt eine andere
+              Rangfolge im Portfolio — dieselben Objekte, anderes Urteil.</td>
+            <td>Einstellungen → Score</td>
+          </tr>
+          <tr>
+            <td><b>Lageklassen A · B · C</b>
+              <span class="ort">Ziel-Bruttomietrendite je Klasse,
+                vorbelegt 3,5 / 5,0 / 7,0 %</span></td>
+            <td>Den Zielkaufpreis im Quick-Check: um wie viel der Preis
+              sinken müsste, damit die eigene Zielrendite erreicht wird.
+              In einer A-Lage ist eine niedrigere Rendite normal, in einer
+              C-Lage erwartet man den Risikoaufschlag.</td>
+            <td>Einstellungen → Standardwerte</td>
+          </tr>
+          <tr>
+            <td><b>Persönliche Mindest-Schwellen</b>
+              <span class="ort">Mindest-DSCR · Mindest-Cashflow ·
+                maximaler Beleihungsauslauf</span></td>
+            <td>Das Urteil der KI-Analyse: sie prüft jede Schwelle einzeln
+              ab und nennt beide Zahlen — die eigene und die gemessene.
+              Den Score lassen sie unberührt.</td>
+            <td>Einstellungen → Standardwerte</td>
+          </tr>
+          <tr>
+            <td><b>Vorgaben je Objektart</b>
+              <span class="ort">Tilgung, Eigenkapitalquote,
+                Bewirtschaftungsquoten, Mietausfall, Leerstand</span></td>
+            <td>Die Vorbelegung neuer Objekte. Eingetragene Werte am Objekt
+              gewinnen immer gegen die Vorgabe.</td>
+            <td>Einstellungen → Standardwerte</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="merke">
+      <b>Der Score sieht die persönlichen Schwellen nie — und das ist Absicht</b>
+      Dieselbe Wohnung hat für jeden Nutzer denselben Score. Eine
+      Einstellung, die ihn verschiebt, macht zwei Nutzer unvergleichbar und
+      jedes gespeicherte Urteil rückwirkend ungültig. Die <em>Gewichte</em>
+      darf man drehen, denn sie sind eine Frage der Strategie. Die
+      <em>Schwellen</em> wirken auf die Beurteilung, nicht auf die Zahl.
+    </div>
+
+    <div class="merke">
+      <b>Und was es nicht gibt, bekommt keine Note</b>
+      Ein Barkauf hat keinen Beleihungsauslauf und keinen
+      Schuldendeckungsgrad. Diese beiden Kategorien entfallen dann aus der
+      Gewichtung — die übrigen drei tragen die volle Bewertung. Vorher
+      standen dort zwei Platzhalter von je 50 von 100, und damit lagen
+      30 % des Scores fest, bevor das Objekt angesehen war.
+    </div>
+  </section>
+
+
+  <!-- Die Doktrin, in der Fassung dieser Tafel -->
+  <div class="fuss">
+    <div><b>Jede Zahl auf diesem Blatt ist gemessen</b>
+      Gewichte, Pflichtfelder, Etappen und Schwellen stehen so im Code und
+      nicht in einer Folie. Wo eine Zahl fehlt, fehlt sie — es steht keine
+      geschätzte an ihrer Stelle.</div>
+    <div><b>Was fehlt, schaltet nicht frei</b>
+      Eine Pflichtangabe lässt sich nicht umgehen, und das Verfahren
+      erscheint nicht halb. Ein halb gerechneter Wert sieht aus wie ein
+      ganzer — das ist teurer als eine Lücke.</div>
+    <div><b>Die Strategie ist einstellbar, der Maßstab nicht</b>
+      Gewichte und Zielrenditen gehören dem Kunden. Die Schwellen der
+      Stufen und die Rechenkerne gehören dem Produkt — sonst vergleicht
+      niemand mehr zwei Objekte.</div>
+  </div>
+
+  <p class="stand">Junker Solution · DealPilot · Stand 12.10.2026 ·
+    jede Angabe aus dem laufenden Produkt gemessen ·
+    Gegenstück zu <em>prozesskarte.html</em></p>
+
+</div>
+</body>
+</html>
