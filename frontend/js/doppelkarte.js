@@ -326,8 +326,42 @@
 
          Beides zusammen deckt beide Faelle: v2145 den Layout-Wechsel
          im Betrieb, v2145a das Laden mit bereits gesetztem Layout. */
+      /* ══ v2154a · NICHT AN DIE LISTE, SONDERN AN DIE SUCHE ════════════
+
+         Marcel am 12.10.2026: „Der sollte aber bitte ueber die Suche,
+         also zwischen dann der Aktion-Button und der Suche, also ein
+         bisschen hoeher."
+
+         v2145a setzte ihn VOR die ausgewanderte Liste. Das war richtig
+         gegen den Fehler von damals (er blieb in der versteckten
+         Sidebar), aber es hat ihn in die falsche Schublade gelegt:
+
+           .dpl-portfolio      y=110   der Aktionen-Knopf
+           .dpl-teil-suche     y=147
+           .dpl-teil-objekte   y=185   <- hier landete er, VOR #sb-list
+
+         Und `.dpl-teil-objekte` ist das Fach, das bei
+         `data-dpl-portfolio="zu"` auf `display:none !important` steht —
+         der Auslieferungszustand. Gemessen am 12.10.2026 in der
+         Kanzlei-Ansicht: Eltern `dpl-teil dpl-teil-objekte`, y=185.
+
+         > v2154 hat das in `layout-varianten.js` korrigiert, aber das
+         > greift nur beim SETZEN des Layouts. Beim Laden ist das Layout
+         > schon gesetzt, und dann entscheidet DIESE Stelle. Dieselbe
+         > Teilung wie bei v2145/v2145a — die eine Fassung deckt den
+         > Wechsel, die andere die Geburt, und beide muessen dasselbe
+         > tun.
+
+         Zuerst wird deshalb der Suche-Teil gesucht. Nur wenn es ihn
+         nicht gibt (Standardansicht), bleibt es beim Platz vor der
+         Liste. */
+      var sucheTeil = document.querySelector('.dpl-schiene .dpl-teil-suche');
       var inSidebar = liste && liste.closest && liste.closest('#sidebar');
-      if (liste && !inSidebar && liste.parentNode) {
+      if (sucheTeil && !inSidebar) {
+        /* VOR das Suchfeld, damit er zwischen Aktionen-Knopf und Suche
+           steht — genau die Stelle, die Marcel beschreibt. */
+        sucheTeil.insertBefore(s, sucheTeil.firstChild);
+      } else if (liste && !inSidebar && liste.parentNode) {
         /* Die Liste ist ausgewandert - der Schalter gehoert davor. */
         liste.parentNode.insertBefore(s, liste);
       } else {
