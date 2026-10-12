@@ -738,6 +738,13 @@ function _buildAIPayload() {
       plz: g('plz'), ort: g('ort'), str: g('str'), hnr: g('hnr'),
       objart: g('objart'), wfl: parseDe(g('wfl')) || null, baujahr: g('baujahr'),
       makrolage: g('makrolage'), mikrolage: g('mikrolage'),
+      /* v2157 · Die vier Lage-Felder des Objekts fuhren nie mit — nur
+         Makro- und Mikrolage. Marcel: „Wertsteigerungspotenzial,
+         Nachfrageindikatoren, Bevoelkerungsentwicklung,
+         Entwicklungsmoeglichkeiten ... auch gegenueberstellen." */
+      lageklasse: txt('lageklasse'),
+      bevoelkerung: txt('ds2_bevoelkerung'), nachfrage: txt('ds2_nachfrage'),
+      wertsteigerung: txt('ds2_wertsteigerung'), entwicklung: txt('ds2_entwicklung'),
       thesis: g('thesis'), risiken: g('risiken'), notizen: g('notizen'),
       /* ── v1700 · DIE EINHEITEN EINES MEHRFAMILIENHAUSES ─────────────
          Marcel: „bei Mehrfamilienhaeusern gebe ich die Gesamtquadrat-
@@ -1616,6 +1623,15 @@ function _urlSauber(u) {
   } catch (e) { return u; }
 }
 
+/* v2157 · die Zeilen der Lage-Gegenüberstellung, robust gelesen: das
+   Antwortformat zeigt dem Modell eine Musterzeile als Text ("... je eine
+   Zeile fuer ..."); kommt sie zurück, ist sie kein Merkmal. */
+function _lageZeilen(a) {
+  var g = a && a.lage_gegenueberstellung;
+  if (!Array.isArray(g)) return [];
+  return g.filter(function (z) { return z && typeof z === 'object' && z.merkmal; });
+}
+
 function _quelleZeile(q) {
   var roh = '' + (q == null ? '' : q);
   var m = roh.match(/https?:\/\/\S+/);
@@ -1901,6 +1917,31 @@ function _renderAIServerAnalysis(a) {
        + '<div class="dp-pa-fuss">Sach- und Ertragswert im Bericht sind ein Plausibilit\u00e4ts-Quercheck '
        + 'nach ImmoWertV-Logik \u2014 indikativ, kein Gutachten nach \u00a7 194 BauGB.</div></div>';
   }
+  /* v2157 · DIE GEGENÜBERSTELLUNG (N62.4) — je Merkmal drei Seiten:
+     Objektfeld (Angabe des Investors), Marktbericht (gemessen),
+     Recherche (mit ihrer Quelle in derselben Zeile). Gestapelt statt als
+     Tabelle: vier Spalten tragen bei 390 px nicht. */
+  var _lg = _lageZeilen(a);
+  if (_lg.length) {
+    pL += '<div class="dp-pa-card dp-pa-ggs">' + sec('', I.loc, 'GEGENÜBERSTELLUNG')
+       + '<div class="dp-pa-kv-sub">Ihre Angabe · Marktbericht · Recherche</div>'
+       + _lg.map(function (z) {
+           var u = String(z.urteil || '').toLowerCase();
+           var kl = /abweich|weicht/.test(u) ? 'ab' : (/stimmt/.test(u) ? 'ok' : 'offen');
+           var zl = function (lbl, v) {
+             return has(v) ? '<div class="dp-pa-ggs-z"><span>' + lbl + '</span>' + _escClean(v) + '</div>' : '';
+           };
+           var q = has(z.quelle) ? '<div class="dp-pa-ggs-z"><span>Quelle</span>' + _quelleZeile(z.quelle) + '</div>' : '';
+           return '<div class="dp-pa-ggs-row">'
+             + '<div class="dp-pa-ggs-kopf"><strong>' + _esc(z.merkmal || '') + '</strong>'
+             + (u ? '<em class="dp-pa-ggs-u dp-pa-ggs-' + kl + '">' + _esc(z.urteil) + '</em>' : '') + '</div>'
+             + zl('Ihre Angabe', z.objektfeld) + zl('Marktbericht', z.bericht) + zl('Recherche', z.recherche) + q
+             + (has(z.kommentar) ? '<div class="dp-pa-ggs-k">' + _escClean(z.kommentar) + '</div>' : '')
+             + '</div>';
+         }).join('')
+       + '<div class="dp-pa-fuss">„Ihre Angabe“ ist die Selbsteinschätzung aus dem Objekt — '
+       + 'nicht gemessen. Der Marktbericht leitet die Lage aus Messdaten ab.</div></div>';
+  }
   if (Array.isArray(a.quellen) && a.quellen.length) {
     pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
       a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('') +
@@ -1967,7 +2008,19 @@ function _renderAIServerAnalysis(a) {
     var hat = false;
 
     /* ── 1 · Was die KI recherchiert hat ───────────────────────────── */
-    if (Array.isArray(a.quellen) && a.quellen.length) {
+    /* v2157: die Quellen der Lage-Gegenüberstellung stehen je Zeile; was
+       davon nicht schon im Sammel-Array steht, kommt hier dazu — mit dem
+       Merkmal als Beschriftung. */
+    var _kiQ = Array.isArray(a.quellen) ? a.quellen.slice() : [];
+    _lageZeilen(a).forEach(function (z) {
+      if (!has(z.quelle)) return;
+      var u = String(z.quelle).match(/https?:\/\/\S+/);
+      if (!u) return;
+      var dabei = _kiQ.some(function (q) { return String(q).indexOf(u[0]) >= 0; });
+      if (!dabei) _kiQ.push(z.merkmal + ' – ' + u[0]);
+    });
+    if (_kiQ.length) {
+      a = Object.assign({}, a, { quellen: _kiQ });
       hat = true;
       h += '<div class="dp-pa-card">' + sec('', I.loc, 'AUS DER KI-RECHERCHE')
         + '<div class="dp-pa-kv-sub">Vom Modell gelesene Webseiten. Eine '

@@ -637,6 +637,33 @@ router.get('/objects/history', async (req, res) => {
               (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
               (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
               (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,
+              /* ══ v2157 · DIE LAGE, ZWEIMAL ERHOBEN, GEHT MIT ════════════
+                 Marcel am 12.10.2026: „wir haben ja auch im Objekt ...
+                 Wertsteigerungspotenzial, Nachfrageindikatoren,
+                 Bevoelkerungsentwicklung, Entwicklungsmoeglichkeiten. Also
+                 dass wir da wirklich die Daten halt auch abfragen und
+                 verwerten und das auch gegenueberstellen."
+
+                 GEMESSEN an Bericht 176: der Bericht traegt BEIDE Seiten -
+                 assessment (aus Messdaten abgeleitet) und
+                 nutzer_einschaetzung (die Objektfelder) - und sie weichen
+                 in vier von fuenf Punkten ab. Keine der beiden verliess
+                 den Server in Richtung Pilot-Analyse.
+
+                 Dazu der Bevoelkerungstrend (gemessen) - NICHT die
+                 Makro-Teilwerte: ScoringService setzt fuer fehlende
+                 Kennzahlen Ersatzwerte ein und meldet trotzdem estimated
+                 false. Bei Bericht 176 ist nur der Bevoelkerungsteil
+                 gemessen, fuenf von sechs Teilwerten sind Platzhalter.
+                 Und der Zensus-Block samt
+                 seinem available-Schalter - damit die Analyse sagen kann,
+                 dass er FEHLT, statt ihn zu erfinden.
+
+                 KEINE BACKTICKS IN DIESEM KOMMENTAR (Template-Literal). */
+              (data->'assessment')                                          AS lage_bericht,
+              (data->'nutzer_einschaetzung')                                AS lage_nutzer,
+              (data->>'bevoelkerung_trend_pct')::numeric                    AS bevoelkerung_trend_pct,
+              (data->'zensus')                                              AS zensus,
               (data ? 'cross_check')                                        AS hat_crosscheck
          FROM mb.object_snapshots
         WHERE user_id = $1${cond}

@@ -103,6 +103,9 @@ if (typeof openai.buildPrompt !== 'function') {
 const auftrag = {
   objekt: {
     str: 'Pruefstrasse', hnr: '9', plz: '32609', ort: 'Pruefort',
+    /* v2157 · die vier Lage-Felder und die Lageklasse (N62.4) */
+    lageklasse: 'PRUEF-B', bevoelkerung: 'PRUEF-WACHSEND', nachfrage: 'PRUEF-STARK',
+    wertsteigerung: 'PRUEF-HOCH', entwicklung: 'PRUEF-BEGRENZT',
     objektart: 'mfh', wfl: 23456, baujahr: 1968, zimmer: 5,
     kaufpreis: 345678,
     einheiten: {
@@ -299,6 +302,12 @@ const auftrag = {
       lzs_aus_register: true,
       gnd_jahre: 70,
       bwk_quote: 0.22,
+      /* v2157 · die Lage, zweimal erhoben, und der Zensus. Mikrolage mit
+         Absicht abweichend, damit die Abweichungsmarke mitgeprueft wird. */
+      lage_bericht: { makrolage: 'PRUEF-MAKRO-GLEICH', mikrolage: 'PRUEF-MIKRO-BERICHT', nachfrage: 'PRUEF-NACHFRAGE-BERICHT' },
+      lage_nutzer:  { makrolage: 'PRUEF-MAKRO-GLEICH', mikrolage: 'PRUEF-MIKRO-NUTZER' },
+      bevoelkerung_trend_pct: 0.2976,
+      zensus: { available: true, leerstandsquote: 3.7, eigentuemerquote: 51.2, nettokaltmiete_qm: 6.41, kreis_name: 'PRUEFKREIS' },
       data: { rent: { median_sqm: 7.31 } }
     },
     verlauf: [
@@ -487,7 +496,20 @@ const ERWARTET = [
   ['BWK-Quote der Rechnung',       'v2156', 'Bewirtschaftungskostenquote der Rechnung: 22,0 %'],
   /* Staerken und Risiken: echte Vorgabe je Eintrag */
   ['Staerken: Satzvorgabe',        'v2156', 'je Eintrag 2-3 Sätze MIT der Zahl'],
-  ['Risiken: Folge verlangt',      'v2156', 'mit der Folge für den Investor']
+  ['Risiken: Folge verlangt',      'v2156', 'mit der Folge für den Investor'],
+  /* v2157 · N62.4 */
+  ['objekt.lageklasse',            'ui.js v2157', 'PRUEF-B-Lage'],
+  ['objekt.bevoelkerung',          'ui.js v2157', 'PRUEF-WACHSEND'],
+  ['objekt.nachfrage',             'ui.js v2157', 'PRUEF-STARK'],
+  ['objekt.wertsteigerung',        'ui.js v2157', 'PRUEF-HOCH'],
+  ['objekt.entwicklung',           'ui.js v2157', 'PRUEF-BEGRENZT'],
+  ['Lage: Bericht-Seite',          'v2157', 'Bericht PRUEF-NACHFRAGE-BERICHT'],
+  ['Lage: Abweichung markiert',    'v2157', 'Bericht PRUEF-MIKRO-BERICHT | Objektfeld PRUEF-MIKRO-NUTZER  <- WEICHT AB'],
+  ['Lage: Gleichstand ohne Marke', 'v2157', 'Bericht PRUEF-MAKRO-GLEICH | Objektfeld PRUEF-MAKRO-GLEICH\n'],
+  ['Bevoelkerungstrend',           'v2157', '+0,30 % pro Jahr'],
+  ['Zensus: Leerstand',            'v2157', 'Leerstandsquote 3,7 %'],
+  ['Zensus: Kreis + Stichtag',     'v2157', 'Stichtag 15.05.2022, PRUEFKREIS'],
+  ['Aufgabe 15 + Zielfeld',        'v2157', '"lage_gegenueberstellung": [']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */

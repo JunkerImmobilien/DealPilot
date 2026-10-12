@@ -476,6 +476,12 @@ function buildPrompt(payload, opts) {
     o.baujahr ? '- Baujahr: ' + o.baujahr : '',
     o.makrolage ? '- Makrolage (Selbstbewertung): ' + o.makrolage : '',
     o.mikrolage ? '- Mikrolage (Selbstbewertung): ' + o.mikrolage : '',
+    /* v2157 · die vier Lage-Felder und die Lageklasse (N62.4) */
+    o.lageklasse ? '- Lageklasse (Selbstbewertung): ' + o.lageklasse + '-Lage' : '',
+    o.bevoelkerung ? '- Bevoelkerungsentwicklung (Selbstbewertung): ' + o.bevoelkerung : '',
+    o.nachfrage ? '- Nachfrage-Indikatoren (Selbstbewertung): ' + o.nachfrage : '',
+    o.wertsteigerung ? '- Wertsteigerungs-Potenzial (Selbstbewertung): ' + o.wertsteigerung : '',
+    o.entwicklung ? '- Entwicklungs-Moeglichkeiten (Selbstbewertung): ' + o.entwicklung : '',
     o.thesis ? '- Investitionsthese des Investors: ' + o.thesis : '',
     o.risiken ? '- Vom Investor benannte Risiken: ' + o.risiken : '',
     o.notizen ? '- Sonstige Bemerkungen des Investors: ' + o.notizen : '',
@@ -946,6 +952,65 @@ function buildPrompt(payload, opts) {
       if (a.confidence_pct != null) L.push('- Aussagekraft laut Bericht: ' + a.confidence_pct + ' %');
       if (a.micro_score != null) L.push('- Mikrolage: ' + a.micro_score + ' von 100');
       if (a.macro_score != null) L.push('- Makrolage: ' + a.macro_score + ' von 100');
+
+      /* ══ v2157 · DIE LAGE, ZWEIMAL ERHOBEN (N62.4) ═════════════════════
+
+         Marcel am 12.10.2026: „Und wir haben ja auch im Objekt ...
+         Wertsteigerungspotenzial, Nachfrageindikatoren,
+         Bevoelkerungsentwicklung, Entwicklungsmoeglichkeiten. Also dass
+         wir da wirklich die Daten halt auch abfragen und verwerten und das
+         auch gegenueberstellen."
+
+         GEMESSEN an Bericht 176 (Huellhorst): der Bericht leitet die Lage
+         aus Messdaten ab (lage_bericht) und fuehrt daneben die Angaben des
+         Nutzers (lage_nutzer). Sie weichen in vier von fuenf Punkten ab —
+         Mikrolage begrenzt gegen durchschnittlich, Nachfrage hoch gegen
+         mittel, Wertsteigerung hoch gegen mittel, Entwicklung steigend
+         gegen begrenzt. Keine der beiden Seiten kam bisher hier an.
+
+         Der Zensus wird mitgegeben, WENN er da ist, und sonst ausdruecklich
+         als fehlend benannt: am 12.10.2026 trugen 0 von 162 Berichten auf
+         Staging Zensus-Werte (die Kreisdatei ist leer). Ohne diesen Satz
+         fuellt das Modell die Luecke mit einer recherchierten Leerstands-
+         quote und stellt sie neben gemessene Zahlen. */
+      var _lb = (a.lage_bericht && typeof a.lage_bericht === 'object') ? a.lage_bericht : null;
+      var _ln = (a.lage_nutzer && typeof a.lage_nutzer === 'object') ? a.lage_nutzer : null;
+      if (_lb || _ln) {
+        var _lz = [
+          ['Makrolage', 'makrolage'], ['Mikrolage', 'mikrolage'],
+          ['Bevoelkerungsentwicklung', 'bevoelkerung'], ['Nachfrage', 'nachfrage'],
+          ['Wertsteigerung', 'wertsteigerung'], ['Entwicklung', 'entwicklung'],
+          ['Mietentwicklung', 'mietentwicklung']
+        ].map(function (r) {
+          var vb = _lb && _lb[r[1]] != null ? String(_lb[r[1]]) : null;
+          var vn = _ln && _ln[r[1]] != null ? String(_ln[r[1]]) : null;
+          if (vb == null && vn == null) return null;
+          var abw = (vb != null && vn != null && vb.toLowerCase() !== vn.toLowerCase());
+          return '  ' + r[0] + ': Bericht ' + (vb || '–') + ' | Objektfeld ' + (vn || '–')
+               + (abw ? '  <- WEICHT AB' : '');
+        }).filter(Boolean);
+        if (_lz.length) {
+          L.push('- LAGE ZWEIMAL ERHOBEN (Bericht = aus Messdaten abgeleitet, Objektfeld = Angabe des Investors):');
+          _lz.forEach(function (z) { L.push(z); });
+        }
+      }
+      if (a.bevoelkerung_trend_pct != null && isFinite(Number(a.bevoelkerung_trend_pct)))
+        L.push('- Bevoelkerungstrend des Kreises (gemessen): '
+          + (Number(a.bevoelkerung_trend_pct) >= 0 ? '+' : '')
+          + Number(a.bevoelkerung_trend_pct).toFixed(2).replace('.', ',') + ' % pro Jahr');
+      var _zs = (a.zensus && typeof a.zensus === 'object') ? a.zensus : null;
+      if (_zs && _zs.available) {
+        var _zt = [];
+        if (_zs.leerstandsquote != null) _zt.push('Leerstandsquote ' + String(_zs.leerstandsquote).replace('.', ',') + ' %');
+        if (_zs.eigentuemerquote != null) _zt.push('Eigentuemerquote ' + String(_zs.eigentuemerquote).replace('.', ',') + ' %');
+        if (_zs.nettokaltmiete_qm != null) _zt.push('Nettokaltmiete ' + String(_zs.nettokaltmiete_qm).replace('.', ',') + ' EUR/m2');
+        if (_zs.jung_18_30 != null) _zt.push('Anteil 18-30 Jahre ' + String(_zs.jung_18_30).replace('.', ',') + ' %');
+        L.push('- ZENSUS 2022 (amtlich, Stichtag 15.05.2022' + (_zs.kreis_name ? ', ' + _zs.kreis_name : '') + '): '
+          + (_zt.length ? _zt.join(', ') : 'keine Kennzahl'));
+      } else if (_zs) {
+        L.push('- ZENSUS 2022: fuer diesen Kreis liegen KEINE Zensus-Werte vor. Nenne keine Zensus-Zahl'
+          + ' und schreibe keine recherchierte Leerstands- oder Eigentuemerquote als Zensuswert.');
+      }
       if (a.gross_yield_pct != null) L.push('- Bruttorendite laut Bericht: ' + fmtNum(a.gross_yield_pct, 1).replace('.', ',') + ' %');
       if (a.rent_multiplier != null) L.push('- Kaufpreisfaktor laut Bericht: ' + fmtNum(a.rent_multiplier, 1).replace('.', ','));
       if (a.deal_score != null) L.push('- Deal-Score laut Bericht: ' + a.deal_score);
@@ -1317,6 +1382,26 @@ function buildPrompt(payload, opts) {
         + '   Paragraf 194 BauGB — schreibe sie nie als "Verkehrswert".\n'
         + '   Gehoert nach "berichts_abgleich".'
         : '',
+    /* ══ v2157 · AUFGABE 15 — DIE LAGE GEGENUEBERSTELLEN (N62.4) ════════
+       Marcel: „Makrolage, Mikrolage, Mietspiegel, Preisniveau aus dem
+       Netz beziehen, aber auch mit Quellen ... und das auch
+       gegenueberstellen nochmal mit dem Mietspiegel oder der Recherche
+       aus dem Netz."
+       Die Aufgabe steht IMMER: auch ohne Bericht gibt es zwei Seiten —
+       das Objektfeld und die Recherche. Die Quelle steht je ZEILE, nicht
+       nur im Sammel-Array: eine Zahl ohne ihre Quelle daneben ist im
+       Reiter nicht nachpruefbar. */
+    '15. Lage-Gegenueberstellung — eine Zeile je Merkmal: Makrolage, Mikrolage,',
+    '   Bevoelkerungsentwicklung, Nachfrage, Wertsteigerung, Entwicklung,',
+    '   Mietniveau, Kaufpreisniveau. Je Zeile drei Spalten: was das OBJEKTFELD',
+    '   sagt (Angabe des Investors), was der MARKTBERICHT sagt (nur wenn oben',
+    '   ein Bericht steht, sonst null) und was deine RECHERCHE ergibt — mit',
+    '   der URL der Quelle in derselben Zeile. Keine Quelle gefunden: null,',
+    '   nicht schaetzen. Dann ein Urteil: "stimmt", "weicht ab" oder "offen"',
+    '   (wenn eine Seite fehlt), und 1-2 Saetze, was die Abweichung fuer die',
+    '   Investition bedeutet. Wo das Objektfeld vom Bericht abweicht, sage',
+    '   deutlich, dass die Angabe des Investors nicht gemessen ist.',
+    '   Gehoert nach "lage_gegenueberstellung".',
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',
     '- Mit Zahlen aus dem Deal arbeiten — konkret werden',
@@ -1402,6 +1487,11 @@ function buildPrompt(payload, opts) {
        eine Stelle, an der die Antwort landen kann. */
     '  "berichts_abgleich":   "Wenn ein Marktbericht vorliegt: 2-4 Sätze, wie deine Einordnung zu seinen gemessenen Werten steht (Marktwert, Marktmiete, Sach-/Ertragswert, führendes Verfahren). Weichen sie ab, nenne BEIDE Zahlen und sage, welche woher kommt. null ohne Bericht",',
     '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
+    /* v2157 · Zielfeld fuer Aufgabe 15 (N62.4) */
+    '  "lage_gegenueberstellung": [',
+    '    { "merkmal": "Makrolage", "objektfeld": "Angabe des Investors oder null", "bericht": "Wert laut Marktbericht oder null", "recherche": "dein Befund, kurz, mit Zahl wo moeglich", "quelle": "URL der Recherchequelle oder null", "urteil": "stimmt | weicht ab | offen", "kommentar": "1-2 Saetze: was das fuer die Investition heisst" },',
+    '    "... je eine Zeile fuer Mikrolage, Bevoelkerungsentwicklung, Nachfrage, Wertsteigerung, Entwicklung, Mietniveau, Kaufpreisniveau"',
+    '  ],',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
     /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von
