@@ -2881,6 +2881,98 @@ fällt, entscheidet er — nicht ich. Eine Demo zeigt es ihm in einem Bild.
 
 ---
 
+#### N60.40 · ⚠ ENTSCHEIDUNG: braucht das Cockpit ein Vollbild? (12.10.2026)
+
+**Gefunden in Durchgang 1 der Geräteabnahme** — 8 Geräte × 9 Reiter,
+**8.778 geprüfte Bedienelemente**, 0 unerreichbar, 0 echter Überlauf.
+Der einzige echte Fund war ein grauer Stummel:
+
+```
+  .dp-sidebar-toggle   Aktenmappe, alle Reiter
+
+    768 px    0 x 0    display:none          (v1888, Absicht)
+    901 px    2 x 20   inline-block   @248, y=7198
+   1180 px    2 x 20   inline-block   @248, y=4304
+   1440 px    2 x 20   inline-block   @248, y=4111
+   1920 px    2 x 20   inline-block   @248, y=4037
+
+    background  rgb(240,240,240)      <- Browser-Standard
+    border      1,11 px outset        <- Browser-Standard
+    svg darin   0 x 0
+```
+
+Das ist der **nackte Standardknopf** ohne eine einzige eigene Regel.
+Sein Symbol ist 0 × 0, weil das `<svg>` nur einen `viewBox` trägt. Er
+steht im Textfluss zwischen `#dashboard-main` und `#all-objects-main`,
+also 4.000–7.200 px unterhalb des Seitenanfangs.
+
+### Was er bedient
+
+`onclick="DealPilotDashboard.toggleSidebar()"` — und das schaltet
+trotz des Namens das **Cockpit-Vollbild** (`dp-dash-fullscreen`:
+Kopfzeile und Objektspalte weg, Cockpit über die ganze Breite).
+
+Mit offenem Cockpit nachgemessen (`DealPilotDashboard.open()`):
+
+| Breite | `.dp-sidebar-toggle` | `dp-show` |
+|---|---|---|
+| 390 px | `display:none` | **true** |
+| 768 px | `display:none` | **true** |
+| 1440 px | 2×20 @248,**6029** — unter dem 5.954 px hohen Cockpit | **true** |
+
+Dazu: **0** Vollbild-Knöpfe im Cockpit, **0** `.dp-dash-btn`.
+
+> **Das Cockpit-Vollbild ist gebaut und auf keiner Breite erreichbar.**
+> Auf Handy und Tablet ist sein einziger Schalter ausgeblendet, auf dem
+> Schreibtisch ist er 2 px breit und steht 6.000 px tief in der Seite.
+
+Und `dashboard.js` pflegt dafür eine Klasse, die niemand liest:
+
+```
+  dashboard.js:2494   tog.classList.add('dp-show')      beim Öffnen
+  dashboard.js:2514   tog.classList.remove('dp-show')   beim Schließen
+
+  Regeln im laufenden Dokument, die "dp-show" nennen:  0 von 11.757
+```
+
+Dieselbe Form wie bei den Farbreglern in **N60.35**: ein Schalter
+setzt, und keiner liest. Nur steht hier zusätzlich ein graues Artefakt
+im Bild. Und `style.css:32836` begründet, dass `#dp-sb-toggle` im
+Cockpit-Vollbild weicht, mit *„eigene Steuerung"* — **die es nicht
+gibt.**
+
+### Gebaut: `v2128` blendet den Stummel aus
+
+Er war auf keiner Breite ein bedienbarer Knopf, und auf Handy und
+Tablet seit `v1888` schon ausgeblendet.
+`DealPilotDashboard.toggleSidebar()` bleibt unberührt.
+
+### ⚠ Offen, und ausdrücklich eine Entscheidung für Marcel
+
+**Soll das Cockpit ein Vollbild bekommen, und wo gehört der Schalter
+hin?** Ich baue hier keinen, und zwar aus einem gemessenen Grund:
+
+> Für die Layouts hat Marcel genau das Gegenteil verlangt —
+> *„es gibt dort dieses Vollbild-Menü ausblenden, das müsste bei der
+> Ansicht raus"* und *„da ist auch dieses Ein- und Ausblenden oben
+> rechts, das könnte dann auch weg."* Deshalb steht in
+> `layout-varianten.css:1499`
+> `html[data-dp-layout] #dp-sb-toggle{display:none}`. Ein **neuer**
+> Vollbildknopf wäre damit eine Annahme, keine Umsetzung.
+
+Drei Wege, alle klein:
+
+| | Weg | Aufwand |
+|---|---|---|
+| **a** | gar keiner — `toggleSidebar()` und `dp-show` ausbauen | 1 Paket |
+| **b** | ein Knopf in der Cockpit-Kopfzeile, 44 × 44, Hausform | 1 Paket |
+| **c** | nur per Tastatur (z. B. `F`), ohne Fläche | 1 Paket |
+
+Bei (a) fällt auch `dp-dash-fullscreen` als Zustand weg — und damit die
+Regel in `style.css:32836`, die `#dp-sb-toggle` dort versteckt.
+
+---
+
 #### N60.30 · Anbieter-Neutralität: die Regel steht in CLAUDE.md und wird nicht eingehalten
 
 **CLAUDE.md:** *„Sprengnetter und PriceHubble nie namentlich nach außen —

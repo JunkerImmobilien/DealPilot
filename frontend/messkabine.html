@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2125</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2127</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1490,7 +1490,25 @@
   }
 
   /* Waagerechte Scroller sind kein Fehler, aber auf dem Handy ein
-     UX-Befund - deshalb getrennt gezaehlt und benannt. */
+     UX-Befund - deshalb getrennt gezaehlt und benannt.
+
+     ── v2127 · DIE ABSICHTSMARKE WURDE NICHT GELESEN ─────────────────
+     `deklariertAbsichtlich()` gibt es seit v2092e genau dafuer: eine
+     Regel, die einen gewollten Querscroller macht, traegt
+     `--dpm-schiene: 1`. Dieser Erkenner hat die Marke NIE abgefragt.
+
+     GEMESSEN am 12.10.2026, SE 360 px, Reiter Objekt:
+     `div#oe-karte-gewerke` wurde als Querscroller gemeldet (301
+     sichtbar / 648 Inhalt, 2,2x) - und genau dieses Element traegt die
+     Marke. Der Befund war also von Anfang an als gewollt erklaert.
+
+     > **Ein Erkenner, der bekannte Absichten mitmeldet, wird nach dem
+     > dritten Mal ueberlesen** - und dann auch der echte Befund daneben.
+     > Die Marke war gebaut, exportiert und dokumentiert; gefragt hat
+     > sie niemand. Dieselbe Form wie [[schalter-setzt-keiner-liest]].
+
+     Gezaehlt wird jetzt getrennt: `absicht` je Eintrag, und die Liste
+     fuehrt die ungewollten ZUERST. */
   function apQuerScroller(d, win){
     return [].slice.call(d.querySelectorAll('div,section,main,table')).filter(function(e){
       var cs = win.getComputedStyle(e);
@@ -1501,8 +1519,14 @@
     }).map(function(e){
       return { el: apNam(e), sicht: e.clientWidth, inhalt: e.scrollWidth,
                faktor: (e.scrollWidth/e.clientWidth).toFixed(1)+'x',
-               balkenNimmtHoehe: (e.offsetHeight-e.clientHeight)+'px' };
-    }).slice(0,6);
+               balkenNimmtHoehe: (e.offsetHeight-e.clientHeight)+'px',
+               absicht: !!deklariertAbsichtlich(e, win) };
+    }).sort(function(a,b){ return (a.absicht?1:0) - (b.absicht?1:0); }).slice(0,8);
+  }
+
+  /* Wie viele davon NICHT erklaert sind - das ist die nuetzliche Zahl. */
+  function apQuerUngewollt(d, win){
+    return apQuerScroller(d, win).filter(function(x){ return !x.absicht; }).length;
   }
 
   /* Fuenf Punkte je Knopf: frei ist frei, auch teilweise. */
@@ -1521,6 +1545,29 @@
       else if (!verdecker) verdecker = apNam(o);
     });
     return { gezaehlt: gezaehlt, frei: frei, verdecker: verdecker, r: r };
+  }
+
+  /* v2127: Bedienweg ueber ein Label. Beide Formen - umschliessend und
+     per `for`. Gegenprobe im Selbsttest unten: ein nacktes 0x0-Feld
+     ohne Label MUSS weiter als Befund durchkommen. */
+  function apUeberLabel(e, d, win){
+    var kandidaten = [];
+    try { var umschl = e.closest('label'); if (umschl) kandidaten.push(umschl); } catch (x) {}
+    if (e.id) {
+      try {
+        var fuer = d.querySelector('label[for="' + (window.CSS && CSS.escape ? CSS.escape(e.id) : e.id) + '"]');
+        if (fuer) kandidaten.push(fuer);
+      } catch (x) {}
+    }
+    for (var i = 0; i < kandidaten.length; i++) {
+      var l = kandidaten[i];
+      var lr = l.getBoundingClientRect();
+      var lcs = win.getComputedStyle(l);
+      if (lr.width >= 20 && lr.height >= 20
+          && lcs.display !== 'none' && lcs.visibility !== 'hidden'
+          && lcs.pointerEvents !== 'none') return l;
+    }
+    return null;
   }
 
   function apBedienbar(d, win){
@@ -1557,8 +1604,31 @@
          Ausnahme `position:fixed` - dort ist es immer null. */
       var gerendert = e.offsetParent !== null || cs.position === 'fixed';
       if (!gerendert) return;
+      /* ── v2127 · EIN GESTYLTER SCHALTER IST NICHT ERDRUECKT ─────────
+         GEMESSEN am 12.10.2026, SE 360, Reiter Pilot-Analyse:
+         `input#ai-in-pdf` 0x0 wurde als erdrueckt gemeldet. Im HTML
+         steht er in
+
+           <label class="ji-switch">
+             <input type="checkbox" id="ai-in-pdf">
+             <span class="ji-slider"></span>
+             <span class="ji-switch-label">Pilot-Analyse im PDF …</span>
+           </label>
+
+         Das ist die uebliche Bauform eines Schalters: das native Feld
+         wird auf null gesetzt, bedient wird es ueber das `<label>` -
+         und das ist hier 300 px breit und anklickbar.
+
+         > **Null mal null heisst nicht unbedienbar, wenn ein Label
+         > davorsteht.** Ein Fehlalarm, der sich oft wiederholt, nimmt
+         > dem echten Befund daneben die Aufmerksamkeit.
+
+         Geprueft wird deshalb der BEDIENWEG: ein umschliessendes oder
+         per `for` zugeordnetes Label mit mindestens 20x20 px. Gibt es
+         keines, bleibt es ein Befund - dann ist das Feld wirklich
+         unbedienbar. */
       if ((r.width < 4 || r.height < 4) && cs.pointerEvents !== 'none'
-          && !apEingeklappt(e, win)) {
+          && !apEingeklappt(e, win) && !apUeberLabel(e, d, win)) {
         erdrueckt.push({ el: apNam(e),
           txt: (e.textContent||e.value||e.placeholder||'').trim().replace(/\s+/g,' ').slice(0,26),
           gr: Math.round(r.width)+'x'+Math.round(r.height), display: cs.display });
@@ -1644,7 +1714,7 @@
       erdrueckt: erd.length, erdruecktListe: erd.slice(0,8),
       echterUeberlauf: u.echtZahl, ueberlaufListe: u.echt,
       vonScrollerGefangen: u.vonScrollerGefangen,
-      querScroller: apQuerScroller(d, win)
+      querScroller: apQuerScroller(d, win), querUngewollt: apQuerUngewollt(d, win)
     };
   }
 
@@ -2085,7 +2155,7 @@
                  deklariertAbsichtlich: deklariertAbsichtlich,
                  pruefeAnsicht: pruefeAnsicht, pruefSelbsttest: pruefSelbsttest,
                  apBedienbar: apBedienbar, apUeberlauf: apUeberlauf,
-                 apQuerScroller: apQuerScroller, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
+                 apQuerScroller: apQuerScroller, apQuerUngewollt: apQuerUngewollt, apUeberLabel: apUeberLabel, apScroller: apScroller, messe: messe, zeige: zeige, lade: lade, lauf: lauf,
                  reiterLauf: reiterLauf, ziel: ziel, effGrund: effGrund,
                  kontrast: kontrast, gemalt: gemalt, male: male,
                  lage: lage, warte: warte,
