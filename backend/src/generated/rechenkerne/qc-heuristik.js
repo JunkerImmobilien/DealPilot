@@ -535,7 +535,21 @@ window.QcHeuristik = (function () {
   function _zielSkala(ziel, klasse) {
     var z = Number(String(ziel).replace(',', '.'));
     var k = klasse ? String(klasse).toUpperCase().charAt(0) : '';
-    return 'Ziel ' + z.toFixed(1).replace('.', ',') + ' %'
+    /* ── v2148c · DER GENANNTE MASSSTAB MUSS DER GERECHNETE SEIN ───────
+
+       Hier stand `toFixed(1)`. GEMESSEN an Marcels eigenem Profil auf
+       Staging: sein A-Ziel steht auf **3,75 %**, der Satz sagte „Ziel
+       3,8 %" — gerechnet wurde mit 3,75.
+
+       > Eine Note mit ihrem Massstab daneben ist nur dann
+       > nachvollziehbar, wenn der genannte Massstab der gerechnete ist.
+       > Wer bei 3,78 % nachprueft, findet sonst einen Widerspruch, der
+       > keiner ist — und glaubt der Ampel nicht mehr.
+
+       Zwei Nachkommastellen, die ueberfluessige Null faellt weg: 5 wird
+       „5", 3,75 bleibt „3,75", 3,5 wird „3,5". */
+    var zs = z.toFixed(2).replace(/0$/, '').replace(/[.,]$/, '').replace('.', ',');
+    return 'Ziel ' + zs + ' %'
       + (k === 'A' || k === 'B' || k === 'C' ? ' (' + k + '-Lage)' : '')
       + ' erreicht = gruen · ab 75 % gelb · 130 % = volle Punktzahl';
   }
