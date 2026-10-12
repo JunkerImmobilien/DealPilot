@@ -33276,6 +33276,14 @@ body.hdr-banner-only .hdr-v61-row2 {
 .dp-pa-kv strong{color:var(--ink)}
 .dp-pa-kv:last-child{margin-bottom:0}
 .dp-pa-kv-sub{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:0 0 6px}
+/* v2150 · Herkunft am Wert und der Abgleich gegen den Marktbericht.
+   Gold ist hier der AKZENT (Rahmen, nicht Flaeche) - eine ausgefuellte
+   Goldflaeche wuerde den Block zur Hauptsache machen, und das ist er
+   nicht: er ordnet ein. Die Fussnote traegt die ImmoWertV-Einordnung
+   und darf nie wegfallen. */
+.dp-pa-herk{font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3);opacity:.9}
+.dp-pa-abgl{border-color:var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.055)}
+.dp-pa-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(140,134,120,.26);font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3)}
 .dp-pa-tone-good{border-color:#CDE5D6;background:#F4FAF6}
 .dp-pa-tone-bad{border-color:#E9CFC9;background:#FBF4F2}
 .dp-pa-insight{background:var(--gold-soft);border-color:var(--gold-bd)}

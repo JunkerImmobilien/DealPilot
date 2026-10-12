@@ -231,7 +231,50 @@ const auftrag = {
   verhandlung: { inseriert_seit: '2026-01-13', tage_online: 263 },
   investor_score: { total: 71, rendite: 67, finanzierung: 73, risiko: 61, lage: 79 },
   dealscore: { total: 68 },
-  herkunft: 'PRUEF-HERKUNFT-OBJEKT'
+  herkunft: 'PRUEF-HERKUNFT-OBJEKT',
+
+  /* ══ v2150 · DER MARKTBERICHT, SO WIE ai.js IHN BAUT ═════════════════
+   *
+   * Die Form ist NICHT erfunden: `_mbHistoryFor()` in
+   * `backend/src/routes/ai.js:38` gibt `{ anzahl, aktuell, verlauf }`,
+   * wobei `aktuell` die ganze Zeile aus `/objects/history` ist. Die
+   * Feldnamen stehen in der SELECT-Liste von
+   * `marktbericht/backend/src/routes/api.js:524` — `sachwert_eur`,
+   * `ertragswert_eur`, `fuehrend`, `fuehrend_grund`, `fuehrend_quelle`.
+   *
+   * > Ein Pruefauftrag mit erfundenen Feldnamen misst nichts. Genau
+   * > dieser Fehler hat beim Objekt-Mapper 46 Testwerte gekostet.
+   *
+   * Die Zahlen sind so gewaehlt, dass der Abstand Ertrags- zu Sachwert
+   * ueber 25 % liegt (291.837 -> 367.419 = +25,9 %) — damit wird auch
+   * der DEUTUNGS-Zweig mitgeprueft, nicht nur die Ausgabe der Zahlen.
+   * Der Zeitabstand im Verlauf ist mit Absicht groesser als 30 Tage,
+   * sonst greift der Riegel und die Entwicklungszeilen fallen weg. */
+  marktbericht: {
+    anzahl: 2,
+    aktuell: {
+      created_at: '2026-10-10T09:15:00.000Z',
+      address: 'PRUEFADRESSE-BERICHT 9',
+      market_value: 352000, market_value_low: 318000, market_value_high: 389000,
+      median_sqm: 2714, confidence_pct: 71,
+      micro_score: 63, macro_score: 58,
+      gross_yield_pct: 6.4, rent_multiplier: 15.6, deal_score: 67,
+      /* die Stufe-3-Felder, die bis v2149 niemand gelesen hat */
+      sachwert_eur: 291837,
+      ertragswert_eur: 367419,
+      fuehrend: 'ertragswert',
+      fuehrend_grund: 'PRUEFGRUND-RENDITEOBJEKT',
+      fuehrend_quelle: 'PRUEFQUELLE-PARAGRAF-6',
+      hat_crosscheck: true,
+      data: { rent: { median_sqm: 7.31 } }
+    },
+    verlauf: [
+      { datum: '2026-06-02T08:00:00.000Z', marktwert: 338000, deal_score: 61,
+        sachwert: 280111, ertragswert: 349222, fuehrend: 'ertragswert' },
+      { datum: '2026-10-10T09:15:00.000Z', marktwert: 352000, deal_score: 67,
+        sachwert: 291837, ertragswert: 367419, fuehrend: 'ertragswert' }
+    ]
+  }
 };
 
 /* ══ DIE ERWARTUNGEN ═════════════════════════════════════════════════
@@ -330,7 +373,43 @@ const ERWARTET = [
   ['kennzeichnung: Vorgabe', 'v2140b', 'vor Steuer  (Vorgabe, nicht gesetzt)'],
   ['kennzeichnung: Strategie gesetzt', 'v2140b', 'PRUEF-BUY-AND-HOLD  (selbst gesetzt)'],
   ['kennzeichnung: Marktlage Vorgabe', 'v2140b', 'PRUEF-SEITWAERTS  (Vorgabe, nicht gesetzt)'],
-  ['Ordnung: Vorgabe ist keine Aussage', 'v2140b', 'KEINE Aussage des Nutzers']
+  ['Ordnung: Vorgabe ist keine Aussage', 'v2140b', 'KEINE Aussage des Nutzers'],
+
+  /* ══ v2150 · DIE STUFE-3-WERTE DES MARKTBERICHTS ═════════════════════
+     Marcel am 12.10.2026: „auch wenn Stufe 3 gerechnet wurde sollte auf
+     jedenfall auch der Verkehrswert mit einfliessen und die
+     Gesamtbewertung einfliessen."
+
+     GEMESSEN: `/objects/history` liefert `sachwert_eur`,
+     `ertragswert_eur`, `fuehrend` + Grund + Quelle seit v1963/v1965.
+     `buildPrompt()` las davon kein einziges Feld — es endete beim
+     Deal-Score. Die Werte reisten bis in den Prompt-Bauer und wurden
+     dort fallen gelassen. */
+  ['Stufe 3: Sachwert',            'v2150', '291.837'],
+  ['Stufe 3: Ertragswert',         'v2150', '367.419'],
+  ['Stufe 3: Abstand gerechnet',   'v2150', '+25,9 %'],
+  ['Stufe 3: Abstand gedeutet',    'v2150', 'WEIT auseinander'],
+  ['Stufe 3: fuehrendes Verfahren', 'v2150', 'Ertragswertverfahren'],
+  ['Stufe 3: Grund der Wahl',      'v2150', 'PRUEFGRUND-RENDITEOBJEKT'],
+  ['Stufe 3: Rechtsgrundlage',     'v2150', 'PRUEFQUELLE-PARAGRAF-6'],
+  ['Stufe 3: der tragende Wert',   'v2150', 'Der TRAGENDE Wert'],
+  /* Die EINORDNUNG ist kein Beiwerk: ohne sie wird aus einem
+     Quercheck ein Verkehrswert. Sie wird genauso geprueft wie die Zahl. */
+  ['Stufe 3: kein Gutachten',      'v2150', 'KEIN Gutachten nach Paragraf 194 BauGB'],
+  ['Stufe 3: nie "Verkehrswert"',  'v2150', 'nie als "Verkehrswert"'],
+  /* Entwicklung ueber mehrere Berichte (Marcels „aussagen ueber die
+     entwicklung treffen") */
+  ['Verlauf: Verfahrenswerte',     'v2150', 'Entwicklung der Verfahrenswerte ueber 2 Berichte'],
+  ['Verlauf: aelterer Sachwert',   'v2150', '280.111'],
+  /* Der Recherche-Auftrag muss den Bericht kennen */
+  ['Recherche: Bericht hat Vorrang', 'v2150', 'LIEGT EIN MARKTBERICHT VOR'],
+  ['Recherche: nie ohne Hinweis',  'v2150', 'NIE eine recherchierte Zahl ohne Hinweis'],
+  /* Aufgabe 14 und ihr Zielfeld — ohne Feld faellt die Arbeit auf den
+     Boden, das ist die Lehre aus v2139 */
+  ['Aufgabe 14 steht da',          'v2150', '14. Abgleich mit dem Marktbericht'],
+  ['Zielfeld berichts_abgleich',   'v2150', '"berichts_abgleich"'],
+  ['Zielfeld mietspiegel_herkunft', 'v2150', '"mietspiegel_herkunft"'],
+  ['Mietspiegel: Bericht zuerst',  'v2150', 'VORRANG: der Wert aus dem DealPilot-Marktbericht']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */
@@ -373,7 +452,27 @@ const proben = [
   ['steuer.sanierung', '47.119', function (a) { delete a.steuer.sanierung; }],
   ['ankauf.kennzahlen_damals', 'PRUEF-KENNZAHLEN-DAMALS', function (a) {
     delete a.ankauf.kennzahlen_damals; }],
-  ['investor_profil', 'DIESER INVESTOR', function (a) { delete a.investor_profil; }]
+  ['investor_profil', 'DIESER INVESTOR', function (a) { delete a.investor_profil; }],
+  /* ══ v2150 · OHNE BERICHT DARF NICHTS DAVON STEHEN ═══════════════════
+     Das ist die wichtigere Haelfte. Ein Auftrag „gleiche mit dem
+     Marktbericht ab", wenn gar keiner vorliegt, erzeugt eine erfundene
+     Antwort — und zwar eine, die wie eine gemessene aussieht.
+     Jede der vier Proben nimmt den Bericht weg und prueft eine andere
+     Stelle, die er eingefuegt hatte. */
+  ['marktbericht: Sachwert',    '291.837',                      function (a) { delete a.marktbericht; }],
+  ['marktbericht: Aufgabe 14',  '14. Abgleich mit dem Marktbericht', function (a) { delete a.marktbericht; }],
+  ['marktbericht: Recherche-Vorrang', 'LIEGT EIN MARKTBERICHT VOR', function (a) { delete a.marktbericht; }],
+  /* Und der Sonderfall, der zwischen „kein Bericht" und „Bericht ohne
+     Stufe 3" liegt: ein Bericht, bei dem nur die Marktpreisindikation
+     gerechnet wurde. Dann darf der Block ueberhaupt nicht erscheinen,
+     obwohl der Bericht selbst da ist. */
+  ['Bericht ohne Stufe 3',      'WERTERMITTLUNG IM BERICHT',    function (a) {
+    delete a.marktbericht.aktuell.sachwert_eur;
+    delete a.marktbericht.aktuell.ertragswert_eur;
+    delete a.marktbericht.aktuell.fuehrend;
+    delete a.marktbericht.aktuell.fuehrend_grund;
+    a.marktbericht.verlauf.forEach(function (v) { delete v.sachwert; delete v.ertragswert; });
+  }]
 ];
 
 /* ── Die Typprobe (v2139a) ─────────────────────────────────────────────

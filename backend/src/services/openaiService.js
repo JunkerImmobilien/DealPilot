@@ -910,6 +910,94 @@ function buildPrompt(payload, opts) {
       if (a.rent_multiplier != null) L.push('- Kaufpreisfaktor laut Bericht: ' + fmtNum(a.rent_multiplier, 1).replace('.', ','));
       if (a.deal_score != null) L.push('- Deal-Score laut Bericht: ' + a.deal_score);
 
+      /* ══ v2150 · DIE WERTERMITTLUNG STUFE 3 GEHT MIT ═══════════════════
+
+         Marcel am 12.10.2026: „in der Pilot Analyse woher kommen die werte
+         und daten im reiter Lage & Markt? wenn wir einen marktbericht haben
+         oder mehrere koennen wir die Daten dafuer aus den Marktberichten
+         holen da wir diese sachen ja dort ueber die partner abholen." Und:
+         „auch wenn Stufe 3 gerechnet wurde sollte auf jedenfall auch der
+         Verkehrswert mit einfliessen und die Gesamtbewertung einfliessen."
+
+         GEMESSEN am 12.10.2026: `/objects/history` liefert seit v1963 den
+         Sachwert und den Ertragswert und seit v1965 das FUEHRENDE
+         Verfahren mit Grund und Quelle (Paragraf 6 Abs. 1 ImmoWertV). Der
+         Block hier las davon KEIN EINZIGES FELD — er endete beim
+         Deal-Score. Die Zahlen lagen in `a` und wurden nie gelesen.
+
+         Dasselbe Muster wie v1963 selbst: dort lag der Cross-Check in der
+         Datenbankzeile und hat den Server nie verlassen. Hier verlaesst er
+         den Server und erreicht den Prompt nicht.
+
+         ── WARUM DAS WORT „VERKEHRSWERT" HIER NICHT FAELLT ───────────────
+
+         Marcels Auftrag ist, dass der Wert EINFLIESST — nicht, dass er
+         umbenannt wird. Die Doktrin steht im Bericht selbst
+         (`CrossCheckService.js:121`): „Vereinfachtes Sachwert-/Ertrags-
+         wertverfahren nach ImmoWertV-Logik als Plausibilitaets-Quercheck.
+         Indikativ, kein Gutachten n. Paragraf 194 BauGB."
+
+         > Beides gilt gleichzeitig: die Zahl gehoert in die Analyse, UND
+         > sie darf nicht als Verkehrswert etikettiert werden. Deshalb
+         > bekommt die KI den Wert, das Verfahren, den Grund — und den
+         > Satz, was sie damit nicht tun darf. Ein Wert ohne seine
+         > Einordnung ist in diesem Fall schlimmer als keiner. */
+      var _sw = a.sachwert_eur != null ? Number(a.sachwert_eur) : null;
+      var _ew = a.ertragswert_eur != null ? Number(a.ertragswert_eur) : null;
+      if (_sw != null || _ew != null || a.fuehrend) {
+        L.push('');
+        L.push('## WERTERMITTLUNG IM BERICHT (Stufe 3, ImmoWertV-Logik)');
+        if (_sw != null) L.push('- Sachwert: ' + fmtEur(_sw));
+        if (_ew != null) L.push('- Ertragswert: ' + fmtEur(_ew));
+        if (_sw != null && _ew != null && _sw > 0) {
+          var _spr = ((_ew - _sw) / _sw) * 100;
+          L.push('- Abstand Ertrags- zu Sachwert: ' + (_spr >= 0 ? '+' : '')
+            + _spr.toFixed(1).replace('.', ',') + ' %');
+          if (Math.abs(_spr) > 25) {
+            L.push('  ACHTUNG: Die beiden Verfahren liegen WEIT auseinander. Das ist');
+            L.push('  ein Befund und gehoert genannt: entweder traegt die Substanz den');
+            L.push('  Preis nicht (Ertragswert hoeher) oder die Miete traegt die');
+            L.push('  Substanz nicht (Sachwert hoeher). Sage, welcher Fall vorliegt.');
+          }
+        }
+        var _vn = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
+                    vergleichswert: 'Vergleichswertverfahren' }[a.fuehrend] || null;
+        if (_vn) {
+          L.push('- FUEHRENDES VERFAHREN: ' + _vn
+            + (a.fuehrend_grund ? ' — ' + a.fuehrend_grund : ''));
+          if (a.fuehrend_quelle) L.push('  Rechtsgrundlage: ' + a.fuehrend_quelle);
+          var _tragend = a.fuehrend === 'sachwert' ? _sw
+                       : a.fuehrend === 'ertragswert' ? _ew : null;
+          if (_tragend != null) {
+            L.push('- Der TRAGENDE Wert ist damit ' + fmtEur(_tragend)
+              + ' (' + _vn + ').');
+            L.push('  Nutze ihn als Anker fuer die Einordnung des Kaufpreises und');
+            L.push('  sage ausdruecklich, aus welchem Verfahren er kommt und warum');
+            L.push('  dieses Verfahren fuehrt.');
+          }
+        } else if (a.fuehrend_grund) {
+          L.push('- KEIN fuehrendes Verfahren ausgewiesen: ' + a.fuehrend_grund);
+        }
+        L.push('- EINORDNUNG, die mitgesagt werden MUSS: diese Werte sind ein');
+        L.push('  vereinfachter Plausibilitaets-Quercheck nach ImmoWertV-Logik,');
+        L.push('  INDIKATIV und KEIN Gutachten nach Paragraf 194 BauGB. Nenne sie');
+        L.push('  nie als "Verkehrswert" und nie als Gutachtenergebnis.');
+
+        /* Entwicklung: nur wenn mehr als ein Bericht die Werte traegt. */
+        var _vs = (mbr.verlauf || []).filter(function (x) { return x.sachwert != null || x.ertragswert != null; });
+        if (_vs.length > 1) {
+          L.push('- Entwicklung der Verfahrenswerte ueber ' + _vs.length + ' Berichte:');
+          _vs.forEach(function (x) {
+            L.push('  • ' + new Date(x.datum).toLocaleDateString('de-DE') + ': '
+              + (x.sachwert != null ? 'Sachwert ' + fmtEur(x.sachwert) : 'Sachwert —')
+              + ' · ' + (x.ertragswert != null ? 'Ertragswert ' + fmtEur(x.ertragswert) : 'Ertragswert —')
+              + (x.fuehrend ? ' · fuehrend: ' + x.fuehrend : ''));
+          });
+          L.push('  Der Zeitabstand-Riegel von oben gilt hier genauso: unter 30 Tagen');
+          L.push('  kommt eine Differenz aus geaenderten EINGABEN, nicht aus dem Markt.');
+        }
+      }
+
       /* ---- Verlauf: NUR wenn er etwas bedeutet ---------------------------- */
       var v = (mbr.verlauf || []).filter(function (x) { return x.marktwert != null; });
       if (v.length > 1) {
@@ -1013,6 +1101,19 @@ function buildPrompt(payload, opts) {
     '2. Mikrolage PLZ ' + (o.plz || '?') + ' (Stadtteil-Reputation, Infrastruktur)',
     '3. Lokaler Mietspiegel (€/m² Bestand vs. Neubau)',
     '4. Kaufpreisniveau für vergleichbare Objekte in der Region',
+    /* ══ v2150 · DER RECHERCHE-AUFTRAG MUSS DEN BERICHT KENNEN ══════════
+       Marcel: „wenn wir einen marktbericht haben oder mehrere koennen wir
+       die Daten dafuer aus den Marktberichten holen da wir diese sachen ja
+       dort ueber die partner abholen."
+       Punkte 3 und 4 standen UNBEDINGT da. Liegt ein Bericht vor, ist eine
+       Web-Recherche zum Mietniveau nicht nur unnoetig, sondern schaedlich:
+       sie stellt eine geschaetzte Zahl neben eine gemessene. */
+    mbr ? 'WICHTIG zu 3 und 4: zu diesem Objekt LIEGT EIN MARKTBERICHT VOR (Block oben). '
+        + 'Seine Marktmiete und seine Vergleichswerte sind GEMESSEN — sie gelten, nicht deine '
+        + 'Recherche. Recherchiere zu 3 und 4 nur ERGAENZEND (z.B. Neubaumiete, wenn der Bericht '
+        + 'nur Bestand fuehrt) und sage bei jeder Zahl, ob sie aus dem Bericht oder aus deiner '
+        + 'Recherche kommt. Stelle NIE eine recherchierte Zahl ohne Hinweis neben eine gemessene.'
+        : '',
     '',
     '## AUFGABEN',
     '',
@@ -1097,6 +1198,26 @@ function buildPrompt(payload, opts) {
     '   entweder Eigenkapital-Einsatz/Sondertilgung (mit Hausnummer) ODER eine guenstigere',
     '   Anschlusskondition (Zielzins), damit der Cashflow nicht negativ wird.',
     '',
+    /* ══ v2150 · AUFGABE 14 — DER ABGLEICH GEGEN DIE SCHNITTSTELLE ══════
+       Marcel: „man kann die werte der KI gerne mit den daten aus der
+       schnittstelle abgleichen auch wenn Stufe 3 gerechnet wurde sollte
+       auf jedenfall auch der Verkehrswert mit einfliessen und die
+       Gesamtbewertung einfliessen."
+
+       Die Aufgabe steht nur, wenn ein Bericht da ist — ein Auftrag, der
+       auf nichts zeigt, erzeugt eine erfundene Antwort. Das Zielfeld
+       `berichts_abgleich` steht im Antwortformat weiter unten; ohne
+       Zielfeld faellt die Arbeit lautlos auf den Boden. */
+    mbr ? '14. Abgleich mit dem Marktbericht — stelle deine Einordnung NEBEN seine\n'
+        + '   gemessenen Werte: Marktwert und Spanne, Marktmiete, Sach- und Ertragswert,\n'
+        + '   das fuehrende Verfahren. Wo ihr uebereinstimmt, sage es kurz. Wo nicht,\n'
+        + '   nenne BEIDE Zahlen und sage, welche woher kommt — der Bericht ist gemessen,\n'
+        + '   deine Einordnung ist eine Einschaetzung. Nutze den tragenden Wert des\n'
+        + '   fuehrenden Verfahrens als Anker fuer den Kaufpreis und nenne das Verfahren\n'
+        + '   dabei. Die Sach- und Ertragswerte sind INDIKATIV und kein Gutachten nach\n'
+        + '   Paragraf 194 BauGB — schreibe sie nie als "Verkehrswert".\n'
+        + '   Gehoert nach "berichts_abgleich".'
+        : '',
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',
     '- Mit Zahlen aus dem Deal arbeiten — konkret werden',
@@ -1153,7 +1274,16 @@ function buildPrompt(payload, opts) {
     '  ],',
     '  "makrolage_recherche": "Ausführlich recherchierte Fakten zur Makrolage, 4-6 Sätze",',
     '  "mikrolage_recherche": "Ausführlich recherchierte Fakten zur Mikrolage, 4-6 Sätze",',
-    '  "mietspiegel_eur_qm":  "Recherchierter Wert €/m² oder null",',
+    /* v2150 · Marcel: „man kann die werte der KI gerne mit den daten aus
+       der schnittstelle abgleichen." Das Feld hiess „Recherchierter Wert" —
+       und genau das hat das Modell getan, auch wenn der Marktbericht eine
+       GEMESSENE Marktmiete trug. Ein Feldname ist eine Anweisung. */
+    '  "mietspiegel_eur_qm":  "€/m² kalt. VORRANG: der Wert aus dem DealPilot-Marktbericht, falls einer im Prompt steht. Nur ohne Bericht selbst recherchieren. null, wenn keine belastbare Quelle da ist — nie schätzen",',
+    '  "mietspiegel_herkunft": "woher dieser Wert kommt: \\"Marktbericht vom <Datum>\\" oder die recherchierte Quelle. null wenn kein Wert",',
+    /* v2150 · DAS FELD FUER DEN ABGLEICH. Ohne Zielfeld verschwindet ein
+       Prompt-Auftrag lautlos — der Auftrag unten in Aufgabe 14 braucht
+       eine Stelle, an der die Antwort landen kann. */
+    '  "berichts_abgleich":   "Wenn ein Marktbericht vorliegt: 2-4 Sätze, wie deine Einordnung zu seinen gemessenen Werten steht (Marktwert, Marktmiete, Sach-/Ertragswert, führendes Verfahren). Weichen sie ab, nenne BEIDE Zahlen und sage, welche woher kommt. null ohne Bericht",',
     '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',

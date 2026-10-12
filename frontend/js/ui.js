@@ -1717,11 +1717,29 @@ function _renderAIServerAnalysis(a) {
   var pL = sec('', I.loc, 'LAGE & MARKT') + '<div class="dp-pa-card">';
   if (a.makrolage_recherche)     pL += kv('Makrolage', a.makrolage_recherche);
   if (a.mikrolage_recherche)     pL += kv('Mikrolage', a.mikrolage_recherche);
-  if (has(a.mietspiegel_eur_qm)) pL += '<div class="dp-pa-kv"><strong>Mietspiegel:</strong> ' + _escClean(a.mietspiegel_eur_qm) + ' \u20ac/m\u00b2</div>';
+  /* v2150 \u00b7 DIE HERKUNFT STEHT AM WERT, NICHT IM KLEINGEDRUCKTEN.
+     Marcel: \u201ewoher kommen die werte und daten im reiter Lage & Markt?"
+     Die Antwort war: aus der KI-Recherche \u2014 auch wenn ein Marktbericht
+     mit gemessenen Partnerdaten vorlag. Seit v2150 hat der Bericht
+     Vorrang, und `mietspiegel_herkunft` sagt, welcher Fall vorliegt.
+     Ohne diese Zeile wuesste der Leser es weiterhin nicht. */
+  if (has(a.mietspiegel_eur_qm)) pL += '<div class="dp-pa-kv"><strong>Mietspiegel:</strong> '
+    + _escClean(a.mietspiegel_eur_qm) + ' \u20ac/m\u00b2'
+    + (a.mietspiegel_herkunft ? ' <span class="dp-pa-herk">\u00b7 ' + _esc(a.mietspiegel_herkunft) + '</span>' : '')
+    + '</div>';
   if (a.kaufpreisniveau)         pL += kv('Kaufpreisniveau', a.kaufpreisniveau);
   if (!a.makrolage_recherche && !a.mikrolage_recherche && !has(a.mietspiegel_eur_qm) && !a.kaufpreisniveau)
     pL += '<em class="dp-pa-empty">\u2014 keine Lage-Daten</em>';
   pL += '</div>';
+  /* v2150 \u00b7 Der Abgleich gegen den Marktbericht \u2014 eigene Karte, weil er
+     eine andere Art von Aussage ist: nicht recherchiert, sondern
+     gegenuebergestellt. Steht nur, wenn ein Bericht vorlag. */
+  if (has(a.berichts_abgleich)) {
+    pL += '<div class="dp-pa-card dp-pa-abgl">' + sec('', I.loc, 'ABGLEICH MIT DEM MARKTBERICHT')
+       + p(a.berichts_abgleich)
+       + '<div class="dp-pa-fuss">Sach- und Ertragswert im Bericht sind ein Plausibilit\u00e4ts-Quercheck '
+       + 'nach ImmoWertV-Logik \u2014 indikativ, kein Gutachten nach \u00a7 194 BauGB.</div></div>';
+  }
   if (Array.isArray(a.quellen) && a.quellen.length) {
     pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
       a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('') +

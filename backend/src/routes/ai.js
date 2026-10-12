@@ -52,11 +52,29 @@ async function _mbHistoryFor(userId, ref) {
     return {
       anzahl: reps.length,
       aktuell: last,
+      /* ══ v2150 · DIE STUFE-3-WERTE FAHREN MIT ════════════════════════
+       *
+       * Marcel am 12.10.2026: „auch wenn Stufe 3 gerechnet wurde sollte
+       * auf jedenfall auch der Verkehrswert mit einfliessen und die
+       * Gesamtbewertung einfliessen."
+       *
+       * GEMESSEN: `/objects/history` liefert sie seit v1963/v1965
+       * (`sachwert_eur`, `ertragswert_eur`, `fuehrend` + Grund + Quelle).
+       * Der Verlauf hier nahm davon NICHTS mit — nur Marktwert und
+       * Deal-Score. Die Zahlen lagen in der Antwort und kamen eine
+       * Ebene weiter nicht an.
+       *
+       * Fuer eine Entwicklungsaussage braucht es sie im VERLAUF, nicht
+       * nur im aktuellen Stand: ein Sachwert, der ueber vier Berichte
+       * steigt, ist eine Aussage — ein einzelner ist ein Punkt. */
       verlauf: reps.map(function (x) {
         return {
           datum: x.created_at,
           marktwert: x.market_value != null ? Number(x.market_value) : null,
           deal_score: x.deal_score != null ? Number(x.deal_score) : null,
+          sachwert: x.sachwert_eur != null ? Number(x.sachwert_eur) : null,
+          ertragswert: x.ertragswert_eur != null ? Number(x.ertragswert_eur) : null,
+          fuehrend: x.fuehrend || null,
         };
       }),
     };
