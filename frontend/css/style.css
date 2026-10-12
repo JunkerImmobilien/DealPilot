@@ -40506,3 +40506,84 @@ aside.sidebar .dk-hilfe{margin:0 10px 10px !important;width:calc(100% - 20px) !i
    ohnehin niemand treffen konnte.
    ===================================================================== */
 body .dp-sidebar-toggle{ display: none !important; }
+
+/* =====================================================================
+   v2129 - EINE TREFFERFLAECHEN-HILFE HAT PLATZIERUNGEN ZERSTOERT
+
+   Gefunden in Durchgang 2 der Geraeteabnahme (100 Laeufe, 5 Breiten x
+   20 echte Oeffner). Gemessen am Preise-Fenster:
+
+     Breite   .pricing-modal-close
+      360     36 x 44  @1, 45      <- oben LINKS
+      390     36 x 44  @1, 45      <- oben LINKS
+      768     36 x 40  @1, 45      <- oben LINKS
+     1180     36 x 36  @1106, 45   <- oben rechts, richtig
+     1440     36 x 36  @1241, 45   <- oben rechts, richtig
+
+   Die Grenze ist 768 px, und genau dort steht:
+
+     @media (max-width: 768px){
+       .pricing-modal-close, .bw-cta { position: relative !important; }
+       .pricing-modal-close::after, .bw-cta::after { ... 44 x 44 ... }
+     }
+
+   Das ist der Block "v652d: Preise-/Upgrade-Fenster - .pricing-modal-close
+   und a.bw-cta lagen unter 44px Trefferflaeche. Optik bleibt, Flaeche
+   kommt per ::after."
+
+   ── DIE ABSICHT WAR RICHTIG, DAS MITTEL NICHT ─────────────────────
+   `position: relative` sollte dem `::after` einen Bezug geben. Aber
+   `.pricing-modal-close` ist in `pricing-modal.css:40` bereits
+
+     position: absolute;  top: 16px;  right: 16px;
+
+   > **Ein absolut positioniertes Element IST schon ein Bezug fuer sein
+   > Pseudoelement.** `relative` zu erzwingen war nicht nur unnoetig,
+   > es hat `top` und `right` von "Abstand zum Elternrand" in "Verschiebung
+   > aus der Flussposition" umgedeutet: 16 px nach unten und 16 px nach
+   > LINKS. Daraus wurde x = 1.
+
+   Die Rechnung geht genau auf: Flussposition im Shell-Polster ist
+   links 17 / oben 29. Minus 16 ergibt 1, plus 16 ergibt 45 - die
+   gemessenen Werte.
+
+   ── DERSELBE GRIFF TRIFFT NOCH EINE STELLE ────────────────────────
+   Die grosse Trefferflaechen-Liste in style.css (Block
+   "v652-uebrige-mobile", @media max-width:768px) nennt neun Selektoren
+   und setzt auf alle `position: relative !important`:
+
+     .dp-tip              kein eigenes position   -> relative ist richtig
+     .sb-sort-btn         kein eigenes position   -> richtig
+     .sbc-btn             kein eigenes position   -> richtig
+     .sb-user-icon-btn    kein eigenes position   -> richtig
+     .hdr-mobile-menu     kein eigenes position   -> richtig
+     .btn.btn-sm          kein eigenes position   -> richtig
+     .img-del             position: ABSOLUTE      -> zerstoert
+     .dp-sidebar-toggle   (seit v2128 display:none)
+     #dp-sb-toggle        position: FIXED         -> zerstoert
+
+   `.img-del` ist der Loeschknopf am Foto: `absolute; top:5px; right:5px`,
+   also die Ecke des Bildes. Mit `relative` rutscht er um 5 px nach
+   unten und 5 px nach links aus seiner Flussposition - und die liegt
+   nicht in der Ecke.
+
+   > Dieser Teil ist **an der Kaskade** gefunden, nicht am Bild: in der
+   > Demo liegt kein Foto, also war `.img-del` in keinem der 100 Laeufe
+   > im Dokument. Das gehoert so gesagt - es ist ein Codebefund mit
+   > derselben Ursache, nicht eine zweite Messung.
+
+   ── WAS HIER GESETZT WIRD ─────────────────────────────────────────
+   Nur die Positionsart wird zurueckgeholt. `top`/`right` stehen in den
+   Grundregeln und werden damit wieder richtig gelesen; das `::after`
+   mit seinen 44 x 44 bleibt vollstaendig erhalten, weil `absolute` und
+   `fixed` genauso ein Bezug sind wie `relative`.
+
+   Band und Selektoren sind Zeichen fuer Zeichen dieselben wie dort -
+   bei gleicher Spezifitaet gewinnt die spaetere Regel, und das ist
+   diese.
+   ===================================================================== */
+@media (max-width: 768px){
+  .pricing-modal-close{ position: absolute !important; }
+  .img-del{ position: absolute !important; }
+  #dp-sb-toggle{ position: fixed !important; }
+}
