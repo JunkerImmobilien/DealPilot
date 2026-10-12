@@ -37069,3 +37069,147 @@ also einem Fenster von 1440. Das Band reicht jetzt bis 1439.
 | N60.39 Kartenstil „Zeile": 53 Regeln, 0 Setzer | **Optik + Risiko** |
 | 521 `font-size`-Deklarationen unter 11 px (Codeanalyse, 17 Blätter) | **gemessen, noch nicht im Browser geprüft** |
 
+
+## Rollout-Journal 12.10.2026 — v2129–v2131: Durchgang 2 bis 5 der Geräteabnahme
+
+| Was | Commit |
+|---|---|
+| `v2129` Trefferflächen-Hilfe zerstörte Platzierungen | `87f1b1c6` |
+| `v2130` fünf Beschriftungen unter der Hausuntergrenze | `9d242b79` |
+| `v2131` der Kontingent-Satz wurde mitten im Wort gekappt | `32916fea` |
+| Messkabine `v2129`/`v2131` zwei weitere Erkenner | `87f1b1c6`, `32916fea` |
+| Backlog N60.41 (Preise-Fenster 13 Bildschirme) | `10c62ba5` |
+
+### Die vier Durchgänge und was sie gemessen haben
+
+**Durchgang 2 — Modale, Menüs, Hilfe.** 5 Breiten × 20 **echte** Öffner
+= 100 Läufe, jedes Fenster auf einem **frischen** Dokument (Restzustand
+ist sonst der Messfehler). Dateiauswahl-Dialoge bewusst ausgenommen —
+`showOpenFilePicker` und Geschwister würden die Sitzung blockieren.
+
+```
+  Läufe                        100
+  Öffner mit Fehler              0
+  geöffnet und gemessen         75
+  Panel breiter als Viewport     0
+  Panel höher OHNE Scroll        0
+  Panel höher, Overlay scrollt  11
+  Schließknopf verdeckt          0
+```
+
+**Durchgang 3 — Schrift, gerendert statt im Code.** 6 Geräte × 9 Reiter,
+je Reiter **alle** sichtbaren Blattknoten mit Text: 1.359 bis 1.692
+Textknoten je Gerät.
+
+**Durchgang 4 — extreme Inhalte.** 94 Zeichen Straße, 59 Zeichen Ort,
+11 Ziffern Kaufpreis, in die **echten** Felder (`str`/`ort`/`plz`/`kp`)
+per `input`+`change` wie beim Tippen, danach `calc()` und
+`dpUpdateAll()`. Vorher **und** nachher gemessen:
+
+```
+  Gerät   vorher              nachher
+   360    raus 0  klippt 25   raus 0  klippt 25   Seite +0
+   390    raus 0  klippt 24   raus 0  klippt 24   Seite +0
+   768    raus 0  klippt 23   raus 0  klippt 23   Seite +0
+  1180    raus 0  klippt 23   raus 0  klippt 23   Seite +0
+  1440    raus 0  klippt 23   raus 0  klippt 23   Seite +0
+```
+
+> **Der extreme Inhalt ändert nichts.** Kein Überlauf, kein neues
+> Kappen, die Seite wird nicht breiter. Das ist das Ergebnis — und es
+> ist nur eines, weil vorher UND nachher gemessen wurde.
+
+**Durchgang 5 — Fokus, Tastatur, Konsole.** 5 Geräte × 9 Reiter:
+**0 Konsolenmeldungen** (`error`, `warn`, `onerror`,
+`unhandledrejection` eingehängt). Und zur Fokusmarke:
+
+```
+  Regeln, die outline abschalten      89
+  Regeln, die im Fokus etwas bieten  113
+  Bedienelemente im Dokument         116
+  davon Ring abgeschaltet             75
+  davon OHNE Ersatz                    0
+```
+
+### Die drei echten Funde
+
+**`v2129` — eine Trefferflächen-Hilfe hat Platzierungen zerstört.**
+Gemessen am Preise-Fenster:
+
+```
+   360 px   .pricing-modal-close  36x44  @1, 45      oben LINKS
+   390 px                         36x44  @1, 45      oben LINKS
+   768 px                         36x40  @1, 45      oben LINKS
+  1180 px                         36x36  @1106, 45   richtig
+  1440 px                         36x36  @1241, 45   richtig
+```
+
+Die Grenze ist 768 px, und dort steht `v652d`:
+`.pricing-modal-close { position: relative !important }` — damit ein
+`::after` die 44-px-Fläche aufspannen kann.
+
+> **Die Absicht war richtig, das Mittel nicht.** Der Knopf ist in
+> `pricing-modal.css:40` schon `position:absolute; top:16px;
+> right:16px`. **Ein absolut positioniertes Element IST ein Bezug für
+> sein Pseudoelement.** `relative` zu erzwingen hat `top`/`right` von
+> „Abstand zum Elternrand" in „Verschiebung aus der Flussposition"
+> umgedeutet: 16 px nach unten, 16 px nach **links**.
+
+Die Rechnung geht auf: Flussposition im Shell-Polster ist links 17 /
+oben 29. Minus 16 ergibt 1, plus 16 ergibt 45 — die gemessenen Werte.
+Dieselbe Liste trifft `.img-del` (`absolute`, der Löschknopf in der
+Fotoecke) und `#dp-sb-toggle` (`fixed`). Nach `v2129` sitzt der Knopf
+auf **jeder** Breite 17 px vom rechten Shell-Rand und ist erreichbar.
+
+**`v2130` — fünf Beschriftungen unter der Hausuntergrenze.** Mein erster
+Durchgang rechnete mit 11 px und ergab **540 „Befunde"**. Das wäre ein
+Umbau der halben App gewesen.
+
+> **Eine Grenze, die man selbst wählt, ist keine Messung.** Die
+> Hausuntergrenze steht nicht in CLAUDE.md, sondern in `v1890`: dort
+> wurde 6,5 px auf **8,5 px** gehoben, *„zu klein ist sie auf JEDEM
+> Gerät"*. Damit sind 9 bis 10,5 px bewusste Mikrobeschriftungen —
+> und nur **14 Stellen in 5 Formen** liegen wirklich darunter.
+
+**`v2131` — der Kontingent-Satz wurde mitten im Wort gekappt.**
+`.dp-kg-f` hatte `clientWidth 306` bei `scrollWidth 473`. Der ganze
+Satz: *„Zurücksetzung am 01.11.2026. Was du bis dahin nicht nutzt,
+verfällt — zugekaufte Bewertungen nie."*
+
+> **Ein Satz, dessen Ausnahme abgeschnitten wird, sagt das Gegenteil
+> von dem, was er soll.** Der Kunde liest „was du nicht nutzt,
+> verfällt" — und nicht, dass gekaufte Bewertungen ausgenommen sind.
+
+Ursache ist **Erbschaft**, keine eigene Regel: auf `.dp-kg-f` passen
+null `white-space`-Regeln. Die Kette ist
+`button#hdr-credits-pill` (`nowrap`, für eine Pille richtig) →
+`.dp-kg-panel` → `.dp-kg-f`. Das Panel hängt **im** Knopf und erbt eine
+Eigenschaft, die für eine andere Rolle gewählt wurde. Nach `v2131`:
+212/212, vollständig, Zahlen weiter `nowrap`.
+
+### Vier Erkennerfehler, alle vor dem Weiterbauen behoben
+
+| # | Meldung | Wirklichkeit |
+|---|---|---|
+| 1 | 7× „KEIN Schließknopf" | `DP_BAR()` baut `<button class="dpm-x">` — mein Selektor kannte nur `close`/`schliess` |
+| 2 | 23× „Beschriftung abgeschnitten" je Gerät | `.oe-sr` ist die Screenreader-Form (1×1 px, `clip:rect(0 0 0 0)`) — **mit Absicht** gekappt |
+| 3 | „Kontingent-Panel öffnet auf dem Handy nicht" | `el.click()` gibt keinen **Fokus**; das Panel hängt an `:focus-within`. Mit `.focus()`: opacity 1, sichtbar |
+| 4 | „116 von 116 ohne Fokusmarke" | ein **programmatischer** Fokus löst `:focus-visible` nicht aus — der Browser setzt es nur nach Tastatureingabe |
+
+Dazu ein fünfter, der kein Erkennerfehler war, sondern ein Griff:
+beim ersten Versuch am Kontingent-Panel kamen **leere** Computed-Werte
+zurück — der Knoten war nach dem Neu-Rendern nicht mehr im Dokument.
+
+> **Nach jedem Eingriff neu greifen.** Ein alter Griff auf ein Modul,
+> das sich selbst neu zeichnet, misst einen Knoten, den es nicht mehr
+> gibt — und liefert dabei keinen Fehler, sondern leere Werte.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| N60.41 Preise-Fenster: 13,3 Bildschirme bei 360 px, drei Wege | **Geld/Produkt** |
+| N60.40 Cockpit-Vollbild: (a) ausbauen / (b) Knopf / (c) Tastatur | **Entscheidung** |
+| N60.39 Kartenstil „Zeile": 53 Regeln, 0 Setzer | **Optik + Risiko** |
+| `#bmfOverlay` Schließknopf 31×27 (nur Maus-Breiten) | **Feinschliff** |
+
