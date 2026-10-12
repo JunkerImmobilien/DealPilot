@@ -37500,3 +37500,79 @@ RC = 0, alles echte Aufrufe.
 | Weg (a) heißt: ein unbestätigter Zugang **ist** ein Zugang | **benannt, Marcels Vorgabe** |
 | Migration 086 muss beim Prod-Rollout mit | **Pflicht** |
 
+
+## Rollout-Journal 12.10.2026 — v2138: der kleine Zwang
+
+| Was | Commit |
+|---|---|
+| `v2138` `requireVerified()` an den sechs Verbrauchsrouten | `cc3bf354` |
+| `v2138` die Mail nennt die Frist (6 h) und erklärt die 24 h | `cc3bf354` |
+| `v2138` Kerosin-Rest in der Bordkarte (N60.24) | `cc3bf354` |
+
+**Marcels Vorschlag, wörtlich:** *„vlt Marktbewertung und abruf von
+dealpilot sachen erfordern dann die anmeldung und bestätigung? quasi ein
+kleiner zwang?"* — und damit genau die Antwort auf den Preis, den ich
+bei `v2136` selbst benannt hatte: ein unbestätigter Zugang **ist** ein
+Zugang.
+
+> **Ein Zwang, der am Teuren hängt, braucht keinen Riegel am Eingang.**
+> Sehen darf jeder sofort. Abrufen, was Kontingent verbraucht, erst
+> nach der Bestätigung.
+
+Die Sperre sitzt in der **Mittelschicht**, nicht im Verbrauchspfad —
+eine Prüfung hinter dem Abruf wäre ein Abruf, den niemand bezahlt.
+Eingehängt an `avm/quote|sprengnetter|pricehubble` und
+`marktbericht/reports/generate|generate-stream|from-dealpilot`.
+
+### Die Mail nannte nur eine der beiden Zahlen
+
+Sie sagte „Der Link ist 24 Stunden gültig" — von den **sechs** Stunden,
+nach denen `v2136` sperrt, stand kein Wort drin. Die App zeigte 6, die
+Mail 24.
+
+> Zwei Zahlen vor demselben Kunden, und keine erklärt die andere. Der
+> Widerspruch ist nur scheinbar — aber das muss **dastehen**, sonst
+> rechnet der Kunde selbst und rechnet falsch.
+
+Die 6 kommt aus `config.auth.verifyGnadenfristStunden`, damit Mail und
+Sperre nie auseinanderlaufen.
+
+### Nachweis
+
+Am lebenden Staging, frisches unbestätigtes Konto (danach gelöscht):
+
+```
+  GET  /objects                        200   sehen darf er
+  POST /avm/quote                      403   EMAIL_NOT_VERIFIED_GATE
+  POST /avm/sprengnetter               403   EMAIL_NOT_VERIFIED_GATE
+  POST /avm/pricehubble                403   EMAIL_NOT_VERIFIED_GATE
+  POST /marktbericht/reports/generate  403   EMAIL_NOT_VERIFIED_GATE
+  Bestätigungslink                     302
+  POST /avm/quote danach               400   Eingabefehler = Sperre offen
+```
+
+Mailtext aus dem **laufenden Image** gerendert: 6 Stunden genannt, 24-h-
+Link erklärt, „du kommst also auch später wieder rein", kein „Kerosin"
+in Text und HTML, `KONTINGENT ✓` in der Bordkarte.
+
+Prüfer: **48 → 68 Punkte**, RC = 0.
+
+### ⚠ Vier Punkte des Prüfers waren falsch GRÜN
+
+`middleware/auth.js` holt `query` beim **Laden**
+(`const { query } = require(...)`) und hält damit die Funktion als
+Referenz. Mein Ersatz hing danach im `require`-Cache.
+
+> **Ein Ersatz, der nach dem `require` kommt, wird nicht nur ignoriert —
+> er lässt die vorige Probe weiterantworten.** Die Weiche aus Abschnitt 7
+> lieferte noch die Zeile des letzten Tests (bestätigt), also ging
+> alles durch. Falsches Grün ist schlimmer als ein Absturz.
+
+Behoben, indem Abschnitt 9 dieselbe Weiche benutzt (`mwZeile`).
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Migration 086 muss beim Prod-Rollout mit `v2136` mit | **Pflicht** |
+| N60.3 damit vollständig abgeschlossen | — |

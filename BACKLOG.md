@@ -629,12 +629,103 @@ Und zwei in der Browser-Abnahme: das Band verdeckte bei 360 px **drei**
 Bedienknöpfe (`v2137a` gibt dem Inhalt Platz), und die Bandhöhe wurde
 **vor** dem Text gemessen — 139 statt 195 px (`v2137b`).
 
+### Der Preis von Weg (a) — und wie er in `v2138` abgetragen wurde
+
+Hier stand: *„ein unbestätigter Zugang ist ein Zugang. Wer eine fremde
+Adresse einträgt, kann sechs Stunden arbeiten."* Das war der
+ausdrücklich benannte Preis von Weg (a).
+
+**Marcel hat am 12.10.2026 selbst die Lösung vorgeschlagen:** *„vlt
+Marktbewertung und abruf von dealpilot sachen erfordern dann die
+anmeldung und bestätigung? quasi ein kleiner zwang?"*
+
+Gebaut in **`v2138`** als `requireVerified()` in
+`backend/src/middleware/auth.js`, eingehängt an den sechs Routen, die
+**Kontingent verbrauchen**:
+
+| Route | verbraucht |
+|---|---|
+| `POST /avm/quote` | `consumeAvm` |
+| `POST /avm/sprengnetter` | `consumeAvm` |
+| `POST /avm/pricehubble` | `consumeAvm` |
+| `POST /marktbericht/reports/generate` | `consumeStufe` |
+| `POST /marktbericht/reports/generate-stream` | `consumeStufe` |
+| `POST /marktbericht/reports/from-dealpilot` | `consumeStufe` |
+
+> **Ein Zwang, der am Teuren hängt, braucht keinen Riegel am Eingang.**
+> Wer die App ansehen will, kann das sofort — genau Marcels Vorgabe.
+> Wer Kontingent verbrauchen will, bestätigt vorher seine Adresse. Der
+> Preis von Weg (a) schrumpft damit auf „sechs Stunden *sehen*", und
+> das kostet niemanden Geld.
+
+Die Sperre sitzt **in der Mittelschicht, nicht im Verbrauchspfad** —
+eine Prüfung hinter dem Abruf wäre ein Abruf, den niemand bezahlt.
+
+### Die Mail nannte die Frist nicht (`v2138`)
+
+Gemessen am ausgehenden Text: er sagte nur „Der Link ist 24 Stunden
+gültig". Von den **sechs** Stunden, nach denen `v2136` sperrt, stand
+dort kein Wort.
+
+> **Zwei Zahlen vor demselben Kunden, und keine erklärt die andere.**
+> Der Widerspruch ist nur scheinbar: der Zugang sperrt nach 6 Stunden,
+> der Link öffnet ihn 24 Stunden lang wieder. Genau das muss dastehen,
+> sonst rechnet der Kunde selbst — und rechnet falsch.
+
+Die Zahl kommt aus `config.auth.verifyGnadenfristStunden`, also aus
+demselben Feld wie die Sperre. Mitgefallen ist ein **Kerosin**-Rest in
+der HTML-Bordkarte („TANK · KEROSIN ✓" → „KONTINGENT ✓") — die
+Bestätigungsmail ist das Erste, was ein Kunde von DealPilot liest, und
+sie trug den seit `v1176` abgeschafften Begriff bis heute (N60.24).
+
+### Nachweis `v2138`, am lebenden Staging
+
+Frisches, unbestätigtes Konto:
+
+```
+  GET  /objects                        200   (sehen darf er)
+  POST /avm/quote                      403   EMAIL_NOT_VERIFIED_GATE
+  POST /avm/sprengnetter               403   EMAIL_NOT_VERIFIED_GATE
+  POST /avm/pricehubble                403   EMAIL_NOT_VERIFIED_GATE
+  POST /marktbericht/reports/generate  403   EMAIL_NOT_VERIFIED_GATE
+  Bestätigungslink geklickt            302
+  POST /avm/quote danach               400   (Eingabefehler = Sperre offen)
+  Testkonto gelöscht                   4 Nutzer, 0 Reste
+```
+
+Der Text der Sperre, wörtlich wie er rausgeht: *„Dafür müssen wir deine
+E-Mail-Adresse kennen. Bitte bestätige sie über den Link in der
+Bestätigungs-Mail – danach steht der Abruf sofort zur Verfügung."*
+
+Mailtext aus dem **laufenden Image** (nicht aus dem Repo): nennt die 6
+Stunden, erklärt den 24-Stunden-Link, sagt „du kommst also auch später
+wieder rein", kein „Kerosin" mehr in Text und HTML.
+
+Prüfer `tools/anmeldung-auskunft-pruefen.mjs`: **48 → 68 Punkte**,
+RC = 0 — Abschnitt 9 ruft die echte `requireVerified()` in vier Lagen
+auf und prüft je Route, dass sie in **derselben Zeile** wie der
+Routeneintrag steht (ein Import allein beweist nichts), Abschnitt 10
+rendert die echte Mail.
+
+### ⚠ Vier Prüferpunkte waren falsch GRÜN
+
+Mein Ersatz für `query` hing **nach** dem `require` von
+`middleware/auth.js` — und das Modul hatte `query` beim Laden schon als
+Referenz festgehalten.
+
+> **Ein Ersatz, der nach dem `require` kommt, wird nicht nur ignoriert —
+> er lässt die vorige Probe weiterantworten.** Abschnitt 7 beantwortete
+> meine Gate-Fragen mit der Zeile des letzten Tests (bestätigt), also
+> ging alles durch. Das ist schlimmer als ein Absturz, weil es grün
+> aussieht.
+
+Behoben, indem Abschnitt 9 **dieselbe** Weiche benutzt (`mwZeile`)
+statt eine zweite zu bauen.
+
 ### Offen
 
-Der Preis von Weg (a), ausdrücklich: **ein unbestätigter Zugang ist ein
-Zugang.** Wer eine fremde Adresse einträgt, kann sechs Stunden
-arbeiten. Das sind Marcels Vorgabe und die sechs Stunden sind die
-Begrenzung — aber es gehört gesagt.
+Nichts mehr an diesem Punkt. Für den Prod-Rollout gilt weiter:
+**Migration 086 muss mit `v2136` zusammen.**
 
 ---
 
