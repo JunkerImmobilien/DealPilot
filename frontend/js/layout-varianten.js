@@ -908,16 +908,48 @@
           var s = hole(KNOTEN.schalter);
           if (s) h.insertBefore(s, k);
         }
-        /* v2145: der Stand-Umschalter gehoert ueber die Objektliste -
-           er legt deren Modus um. Dieselbe Mechanik wie eine Zeile
-           darueber; `hole()` merkt sich den Rueckweg, also steht er
-           beim Verlassen des Layouts wieder unter dem Logo.
+        /* ══ v2154 · DER STAND-SCHALTER GEHOERT UEBER DIE SUCHE ═══════════
 
-           Er kann fehlen: `doppelkarte.js` baut ihn nur, wenn
-           mindestens ein Objekt einen Ankauf-Stand hat. Dann ist
-           `hole()` null und es passiert nichts - richtig so, ein
-           Schalter ohne Gegenstand waere eine leere Zusage. */
-        if (art === 'objekte') {
+           Marcel am 12.10.2026: „Wir haben den Buchschalter in die App
+           gepackt bei der Kanzlei. Der sollte aber bitte über die Suche,
+           also zwischen dann der Aktion-Button und der Suche, also ein
+           bisschen höher."
+
+           v2145 hing ihn an den `objekte`-Teil, mit der Begruendung „er
+           legt deren Modus um". Das stimmt fachlich — und war der Grund,
+           warum Marcel ihn nicht fand.
+
+           GEMESSEN am 12.10.2026 in der Kanzlei-Ansicht:
+
+             .dpl-marke          y=0
+             .dpl-portfolio      y=110   <- der Aktionen-Knopf
+             .dpl-teil-suche     y=147
+             .dpl-teil-objekte   y=185   <- hier sass der Schalter DRIN
+             #dk-schalter        y=185, Eltern .dpl-teil
+
+           Der `objekte`-Teil ist die ZUKLAPPBARE Schublade: bei
+           `data-dpl-portfolio="zu"` steht er auf `display:none
+           !important` (layout-varianten.css). Wer das Portfolio
+           zuklappt, nimmt den Schalter mit — und zugeklappt ist der
+           Auslieferungszustand.
+
+           > Ein Schalter, der in dem Fach liegt, das er umschaltet,
+           > verschwindet mit dem Fach. Dasselbe Muster wie v2040: damals
+           > steckte er IN der Objektliste und scrollte mit.
+
+           Er haengt jetzt am `suche`-Teil und steht dort VOR dem
+           Suchfeld — damit genau zwischen Aktionen-Knopf und Suche, wie
+           Marcel es beschreibt. Der `suche`-Teil wird bei zugeklapptem
+           Portfolio ebenfalls ausgeblendet; das ist richtig, denn dann
+           ist auch keine Objektliste da, deren Modus man umlegen
+           koennte.
+
+           Er kann fehlen: `doppelkarte.js` baut ihn nur, wenn mindestens
+           ein Objekt einen Ankauf-Stand hat. Dann ist `hole()` null und
+           es passiert nichts — richtig so, ein Schalter ohne Gegenstand
+           waere eine leere Zusage. (Gemessen: 6 von 33 Objekten tragen
+           einen Stand, der Schalter entsteht also.) */
+        if (art === 'suche') {
           var st = hole(KNOTEN.stand);
           if (st) h.insertBefore(st, k);
         }
