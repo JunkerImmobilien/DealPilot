@@ -353,6 +353,18 @@
       dscr:          numN(d._kpis_dscr),
       ltv:           numN(d._kpis_ltv),
       cashflowMonatlich: (d._kpis_cf_ns!=null ? num(d._kpis_cf_ns)/12 : null),
+      /* v2144: ohne Darlehen entfallen DSCR und LTV im Investor Deal
+         Score. Gelesen wird der GESPEICHERTE Stand (d1 + d2) - was am
+         Objekt steht, gilt; eine Ableitung gaebe es hier nicht.
+
+         Steht gar nichts, bleibt es `null` und alles rechnet wie vor
+         v2144 - `Number(null)` waere 0 und damit ein Barkauf, den
+         niemand erklaert hat. */
+      darlehen: (function(){
+        var a = numN(d.d1), b = numN(d.d2);
+        if (a == null && b == null) return null;
+        return (a || 0) + (b || 0);
+      })(),
       __raw:d
     };
   }
