@@ -117,6 +117,7 @@ function buildPrompt(payload, opts) {
   const _bo = payload.boden || null;
   const _ha = payload.halter || null;
   const _zu = payload.zustand || null;
+  const _ip = payload.investor_profil || null;   /* v2140 */
   /* v2013 - wie viele Fotos mitgehen. Sie stehen NICHT im Text (sie
      waeren dort base64), aber das Modell muss wissen, dass es welche
      hat und was es daraus NICHT schliessen darf. */
@@ -665,6 +666,45 @@ function buildPrompt(payload, opts) {
          + ' Herkunft und sage, was die Abweichung fuer die AfA bedeutet.'
          + ' Rechne KEINE dritte Zahl aus.')
       : '',
+    /* ══ v2140 · DIESER INVESTOR — SEINE SCHWELLEN, NICHT UNSERE ══════
+
+       Aufgabe 5 („Investor-Fit") nannte drei Archetypen und keine
+       Eingabe. Die Schwellen dieses Nutzers lagen im `localStorage`.
+
+       Die Ordnung darunter ist der eigentliche Inhalt dieses Blocks.
+       Ohne sie stehen zwei Schwellen zur selben Groesse im Prompt - die
+       DealPilot-Skala („solide ab DSCR 1,2", weiter oben) und die
+       persoenliche („ab 1,35 kauf ich") - und das Modell waehlt eine
+       aus, ohne zu sagen welche.
+
+       > Der SCORE darf das Profil nie sehen. Dieselbe Wohnung hat fuer
+       > jeden Nutzer denselben Score; eine Einstellung, die ihn
+       > verschiebt, macht zwei Nutzer unvergleichbar. Das ist dieselbe
+       > Regel wie fuer die Rechenkerne: ein Kern liest NIE
+       > Einstellungen.
+
+       Die ANALYSE darf es - sie urteilt fuer diesen Investor. */
+    _ip ? _zeilen('## DIESER INVESTOR (Einstellungen des Nutzers, keine Messung am Objekt)', [
+      ['Mindest-DSCR', _ip.min_dscr != null ? String(_ip.min_dscr).replace('.', ',') : null],
+      ['Mindest-Cashflow', _ip.min_cashflow_vor_st != null
+        ? _z(_ip.min_cashflow_vor_st) + ' EUR/Monat vor Steuer' : null],
+      ['Maximaler LTV', _ip.max_ltv != null ? _p(Number(_ip.max_ltv)) : null],
+      ['Strategie', _ip.strategie],
+      ['Risikoneigung', _ip.risikoneigung],
+      ['Erwarteter Verkaeufer-Druck', _ip.verkaeufer_druck],
+      ['Eingeschaetzte Marktlage', _ip.marktlage]
+    ]) : '',
+    _ip ? ('\n- Diese Zahlen sind EINSTELLUNGEN. Der DealScore und die DealPilot-Skala'
+      + '\n  weiter oben bleiben unberuehrt: sie messen das OBJEKT. Rechne keinen'
+      + '\n  Score nach dem Profil um.'
+      + '\n- Beantworte Aufgabe 5 (Investor-Fit) AN DIESEN Schwellen: nenne je'
+      + '\n  Schwelle, ob sie gehalten oder verfehlt wird, mit BEIDEN Zahlen'
+      + '\n  (Schwelle und gemessener Wert).'
+      + '\n- Widerspricht eine persoenliche Schwelle der DealPilot-Skala (etwa'
+      + '\n  Mindest-DSCR 1,35 gegen "solide ab 1,2"), nenne BEIDE und sage,'
+      + '\n  welche wessen ist. Mische sie nicht und waehle keine aus.'
+      + '\n- Fehlt eine Schwelle hier, hat der Nutzer sie nicht gesetzt. Nimm dann'
+      + '\n  die DealPilot-Skala und sage, dass du das tust - erfinde keine.') : '',
     '',
     /* v2013 - DIE FOTOS. Ein Bild zeigt einen EINDRUCK, keine Messung. */
     _nFotos ? ('\n## FOTOS DES OBJEKTS\nDu bekommst ' + _nFotos + ' Foto(s) dieses Objekts mitgeliefert.'
@@ -968,6 +1008,16 @@ function buildPrompt(payload, opts) {
     '   - Wertsteigerungs-Investor?',
     '   - Sicherheitsorientiert?',
     '   → jeweils 2-3 Sätze Begründung mit Bezug auf Zahlen',
+    /* v2140: die Aufgabe nannte bis hierher drei Archetypen und KEINE
+       Eingabe - die Schwellen dieses Nutzers erreichten den Prompt
+       nicht. Jetzt tun sie es, und die Aufgabe sagt, wo sie stehen. */
+    (payload.investor_profil
+      ? '   → UND KONKRET: der Abschnitt "DIESER INVESTOR" nennt seine eigenen'
+        + ' Schwellen.\n     Pruefe sie einzeln ab (gehalten / verfehlt, je mit'
+        + ' beiden Zahlen) und sage zum\n     Schluss, ob der Deal zu DIESEM'
+        + ' Investor passt - nicht nur zu einem Archetyp.'
+      : '   → Ein persoenliches Investmentprofil liegt nicht vor. Urteile nach den'
+        + '\n     DealPilot-Schwellen und sage, dass du das tust.'),
     '',
     '6. Klare Empfehlung — "Kaufen", "Prüfen", oder "Nicht kaufen" mit ausführlicher Begründung',
     '',

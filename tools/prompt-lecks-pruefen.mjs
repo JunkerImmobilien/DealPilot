@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
- * prompt-lecks-pruefen.mjs — v2139
+ * prompt-lecks-pruefen.mjs — v2139, erweitert in v2140
  *
  * KOMMT AN, WAS GESENDET WIRD?
  *
@@ -211,6 +211,20 @@ const auftrag = {
     abweichung: null                          /* GENAU der Fall: kein Vergleich */
   },
 
+  /* ── v2140 · DAS INVESTMENTPROFIL ────────────────────────────────
+     Sieben von 23 Schluesseln (ui.js:1197-1205). Die uebrigen sind
+     Formular-Vorbelegungen und stehen schon als Objektwert im Auftrag -
+     siehe die Vorrangregel in ui.js. */
+  investor_profil: {
+    min_dscr: 1.37,
+    min_cashflow_vor_st: 173,
+    max_ltv: 81,
+    strategie: 'PRUEF-BUY-AND-HOLD',
+    risikoneigung: 'PRUEF-KONSERVATIV',
+    verkaeufer_druck: 'PRUEF-HOCH',
+    marktlage: 'PRUEF-SEITWAERTS'
+  },
+
   verhandlung: { inseriert_seit: '2026-01-13', tage_online: 263 },
   investor_score: { total: 71, rendite: 67, finanzierung: 73, risiko: 61, lage: 79 },
   dealscore: { total: 68 },
@@ -289,7 +303,21 @@ const ERWARTET = [
   ['wohnung.garagen', 'ui.js:976', '3'],
   ['objekt.einheiten.stand', 'ui.js:837', '2026-10-12'],
   ['objekt.einheiten.modernisierung', 'ui.js:838', 'Dach=PRUEFSTUFE-4'],
-  ['objekt.einheiten.flaeche_summe', 'ui.js:788', 'ABWEICHUNG Flaeche']
+  ['objekt.einheiten.flaeche_summe', 'ui.js:788', 'ABWEICHUNG Flaeche'],
+
+  /* ── v2140 · das Investmentprofil ──────────────────────────────── */
+  ['profil.min_dscr', 'ui.js:1198', '1,37'],
+  ['profil.min_cashflow', 'ui.js:1199', '173 EUR/Monat vor Steuer'],
+  ['profil.max_ltv', 'ui.js:1200', '81,0 %'],
+  ['profil.strategie', 'ui.js:1201', 'PRUEF-BUY-AND-HOLD'],
+  ['profil.risikoneigung', 'ui.js:1202', 'PRUEF-KONSERVATIV'],
+  ['profil.verkaeufer_druck', 'ui.js:1203', 'PRUEF-HOCH'],
+  ['profil.marktlage', 'ui.js:1204', 'PRUEF-SEITWAERTS'],
+  /* Die ORDNUNG ist der eigentliche Inhalt des Blocks: ohne sie stehen
+     zwei Schwellen zur selben Groesse im Prompt und das Modell waehlt. */
+  ['profil: Score bleibt unberuehrt', 'v2140', 'Rechne keinen'],
+  ['profil: beide Zahlen nennen', 'v2140', 'Mische sie nicht'],
+  ['profil: Aufgabe 5 verweist darauf', 'v2140', 'DIESER INVESTOR']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */
@@ -331,7 +359,8 @@ const proben = [
   ['zustand.bauteile', 'PRUEFJAHR-2011', function (a) { delete a.zustand.bauteile; }],
   ['steuer.sanierung', '47.119', function (a) { delete a.steuer.sanierung; }],
   ['ankauf.kennzahlen_damals', 'PRUEF-KENNZAHLEN-DAMALS', function (a) {
-    delete a.ankauf.kennzahlen_damals; }]
+    delete a.ankauf.kennzahlen_damals; }],
+  ['investor_profil', 'DIESER INVESTOR', function (a) { delete a.investor_profil; }]
 ];
 
 /* ── Die Typprobe (v2139a) ─────────────────────────────────────────────
@@ -374,6 +403,33 @@ typProben.forEach(function (tp) {
        : (gutDa ? 'sauber' : 'Text kommt NICHT an')));
 });
 
+/* ══ OHNE PROFIL: sagt der Prompt es, oder schweigt er? (v2140) ══════
+ *
+ * Ein fehlendes Profil darf nicht dazu fuehren, dass Aufgabe 5
+ * stillschweigend nach fremdem Mass urteilt. Der Prompt muss sagen,
+ * dass keins vorliegt - sonst sieht die Antwort genauso aus wie eine,
+ * die das Profil kannte.
+ *
+ *   > Dasselbe Muster wie bei einer Regel ohne Daten, nur umgekehrt:
+ *   > hier fehlen die Daten, und die Regel muss das AUSSPRECHEN. */
+console.log('\n=== Ohne Profil: wird das gesagt? ===');
+let ohneRot = 0;
+(function () {
+  const kopie = JSON.parse(JSON.stringify(auftrag));
+  delete kopie.investor_profil;
+  let txt = '';
+  try { txt = openai.buildPrompt(kopie, {}); } catch (e) { txt = 'FEHLER ' + e.message; }
+  const proben = [
+    ['Block ist weg', txt.indexOf('DIESER INVESTOR') < 0],
+    ['Aufgabe 5 sagt es', txt.indexOf('Investmentprofil liegt nicht vor') >= 0],
+    ['und nennt den Ersatz', txt.indexOf('DealPilot-Schwellen') >= 0]
+  ];
+  proben.forEach(function (pr) {
+    if (!pr[1]) ohneRot++;
+    console.log('  ' + (pr[1] ? 'ok  ' : 'ROT ') + pr[0]);
+  });
+})();
+
 /* ══ REGELN OHNE DATEN ═══════════════════════════════════════════════
  *
  * Der eigentliche Befund von v2139 war kein stummes Feld, sondern ein
@@ -413,6 +469,7 @@ console.log('  Geprueft              : ' + ERWARTET.length + ' Felder, '
 console.log('  Gegenproben           : ' + proben.length + ', davon blind: ' + blind);
 console.log('  Regelbloecke          : ' + regelFelder.length + ', ohne Daten: ' + ohneDaten);
 console.log('  Typproben             : ' + typProben.length + ', rot: ' + typRot);
+console.log('  Ohne-Profil-Proben    : 3, rot: ' + ohneRot);
 console.log('  buildPrompt           : die ECHTE Funktion aus openaiService.js');
 console.log('  _buildAIPayload       : ' + (bau ? bau.split('\n').length + ' Zeilen gelesen'
   : 'NICHT GEFUNDEN — die Feldliste unten ist dann nicht abgeglichen'));
@@ -427,7 +484,7 @@ const gesendet = new Set();
 console.log('  Feldnamen im Sender   : ~' + gesendet.size
   + ' (geprueft werden ' + ERWARTET.length + ' Stellen gezielt, nicht alle)');
 
-const rc = (rot > 0 || blind > 0 || ohneDaten > 0 || typRot > 0) ? 1 : 0;
+const rc = (rot > 0 || blind > 0 || ohneDaten > 0 || typRot > 0 || ohneRot > 0) ? 1 : 0;
 console.log('\n' + (rc === 0
   ? 'SAUBER — jedes belegte Feld kommt im Prompt an.'
   : 'ROT — ' + rot + ' Feld(er) verschwinden, ' + blind + ' blinde Probe(n), '

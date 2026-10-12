@@ -1167,6 +1167,52 @@ function _buildAIPayload() {
   try {
     if (typeof Settings !== 'undefined') {
       var _s = Settings.get() || {};
+            /* ══ v2140 · DAS INVESTMENTPROFIL — SIEBEN VON 23 SCHLUESSELN ══
+
+         Aufgabe 5 des Analyseauftrags heisst „Investor-Fit - fuer wen
+         ist der Deal geeignet?" und nennt drei Archetypen. Sie nannte
+         keine EINGABE: die Schwellen dieses Investors lagen im
+         `localStorage` und erreichten keinen Prompt.
+
+         Noch schlimmer: `settings.js:579` bietet als Vorlage woertlich
+         „Bewerte meine Kaufentscheidung anhand meines persoenlichen
+         Investmentprofils (Mindest-DSCR, Max-LTV, Mindest-Cashflow)"
+         an. Die Anweisung reiste mit, die Daten nicht.
+
+         WARUM NUR SIEBEN: die uebrigen 16 sind VORBELEGUNGEN fuer
+         Formularfelder (Tilgung, EK-Quote, BWK-Quoten, Grenzsteuersatz,
+         Nebenkosten, Miet- und Wertsteigerung). Sie stehen im Auftrag
+         schon als OBJEKTWERT - dort EINGETRAGEN statt vorbelegt.
+
+         > Was im Objekt steht, gilt. Das Profil liefert nur, was im
+         > Objekt NICHT steht: die Schwellen und die Haltung.
+
+         Beide zu senden waere eine stille Doppelung: zwei
+         Grenzsteuersaetze fuer dieselbe Groesse. */
+      try {
+        var _ip = (window.DealPilotInvestmentProfile
+          && typeof DealPilotInvestmentProfile.get === 'function')
+          ? DealPilotInvestmentProfile : null;
+        if (_ip) {
+          var _prof = {
+            min_dscr: _ip.get('min_dscr'),
+            min_cashflow_vor_st: _ip.get('min_cashflow_vor_st'),
+            max_ltv: _ip.get('max_ltv'),
+            strategie: _ip.get('ai_strat'),
+            risikoneigung: _ip.get('ai_risk'),
+            verkaeufer_druck: _ip.get('ai_verk'),
+            marktlage: _ip.get('ai_markt')
+          };
+          /* Nur mitschicken, was belegt ist - ein leerer Block sieht
+             nach Angabe aus und ist keine. `get()` gibt den Vorgabewert,
+             wenn der Nutzer nichts gesetzt hat; genau der ist gewollt,
+             denn danach rechnet die App auch. */
+          Object.keys(_prof).forEach(function (k) {
+            if (_prof[k] == null || _prof[k] === '') delete _prof[k];
+          });
+          if (Object.keys(_prof).length) payload.investor_profil = _prof;
+        }
+      } catch (e) { /* optional - ohne Profil laeuft die Analyse weiter */ }
       payload.aiOptions = {
         detailLevel: _s.ai_detail_level || '',
         tonality: _s.ai_tonality || '',
