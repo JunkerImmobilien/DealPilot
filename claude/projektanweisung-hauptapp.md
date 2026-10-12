@@ -37769,3 +37769,184 @@ Einbau 46 CRLF-Zeilen in eine LF-Datei.
 |---|---|
 | N60.4 damit abgeschlossen, bis auf RAG (→ N60.7) | — |
 | `syncAiParamsToTab()` schreibt in vier Ids, die es nicht gibt | gemessen, ändert heute nichts |
+
+## Rollout-Journal 12.10.2026 — v2141/v2142: der Barkauf und die zweite Prozesskarte
+
+| Was | Commit |
+|---|---|
+| `v2141` Barkauf: LTV und DSCR entfallen aus der Gewichtung | `ed8be81f` |
+| `v2142` Prozesskarte Detail — Netzplan, Steuerjahr, Score-Aufbau | `2e3a9469` |
+| `v2142a` Kontrast der Stand-Zeile, beide Karten | `606b5e0c` |
+
+### Marcels Frage 44 → 80 hat eine Antwort
+
+Er hatte gefragt: *„Die Bewertung war erst schlecht mit 44 und danach
+auf einmal über 80. Warum?"* (N60.5, dritter Punkt, seit 10.10. offen).
+
+Am echten Kern nachgerechnet, Sachsenstr. 18, kp 180.000, nkm 940 —
+**dasselbe Objekt, dieselben Eingaben, EINE Annahme Unterschied:**
+
+| EK-Quote | Darlehen **angenommen** | als **Barkauf** | Sprung |
+|---|---:|---:|---|
+| 0 % | **31** KRITISCH | 72 GUT | +41 |
+| 10 % | **44** SCHWACH | 72 GUT | +28 |
+| 20 % | 58 SOLIDE | 72 GUT | +14 |
+
+**Die 44 ist exakt getroffen.** Die Ursache ist `agentWerkzeuge.js:2029`
+(`darlehenAbgeleitet`): solange kein Score gespeichert ist, wird ein
+Darlehen abgeleitet; danach gilt der gespeicherte, und am Objekt steht
+keins. Es ist kein Modellfehler und kein Kernfehler.
+
+> **Die `herkunft` des Bot-Scores nannte die falsche Ursache** — „weil
+> er mehr Felder kennt". Eine Herkunftsangabe, die auf die falsche
+> Ursache zeigt, ist schlimmer als keine: sie beendet die Suche.
+
+### Der Befund dahinter, und Marcels Entscheidung
+
+`_scoreLtv(0)` und `_scoreRisiko(0)` gaben je **50** — der Rückfall für
+„keine Angabe". Bei einem Barkauf ist das keine fehlende Angabe,
+sondern eine Aussage. An fünf Barkauf-Objekten mit gleichem Kaufpreis
+und nur verschiedener Miete gemessen:
+
+```
+  30 % Cashflow  immer 100 (ohne Kapitaldienst ist der Cashflow fast
+                 die ganze Nettomiete; die Skala endet bei +200 EUR)
+  15 % LTV       Platzhalter 50
+  15 % DSCR      Platzhalter 50
+```
+
+**60 % des Scores standen fest, bevor das Objekt angesehen war.**
+Deshalb hieß eine Wohnung mit 0,90 % Nettorendite „SOLIDE".
+
+Drei Varianten vorgelegt, **Marcel wählte „weglassen und umgewichten"**:
+Spanne 41 statt 29 Punkte, vier statt drei Stufen. Und sein Zusatz:
+*„das mit dem score muss aber auch beim quickcheck passen und auch beim
+investor deal score. also in der gesamten app."*
+
+### Gebaut
+
+`darlehen` kommt als **Parameter** — ein Kern liest nie Einstellungen,
+er bekommt eine Tatsache. Fehlt er, rechnet alles wie bisher.
+
+**Die Rangfolge der Feldnamen:** `darlehen` > `d_total` > `d1+d2`.
+Nötig, weil mehrere Aufrufer `State.kpis` **direkt** durchgeben, und
+dort heißt die Summe `d_total`. Wer nur einen Namen liest, greift bei
+genau diesen Aufrufern lautlos ins Leere.
+
+Angefasst: `dealscore.js` (Kern, gespiegelt), `quick-check.js`,
+`quick-check-tab.js`, `voice-import.js`, `agentWerkzeuge.js`.
+
+**Nicht angefasst: `storage.js:1748`** — ein Notnagel für Altobjekte mit
+erfundenen Annahmen (`ltv ?? 80`, `dscr ?? 1.2`). Dort aus `ltv === 0`
+auf einen Barkauf zu schließen wäre genau die Verwechslung von
+Abwesenheit und Messung, die dieses Paket behebt.
+
+### Nachweis
+
+```
+  ohne Parameter          72  unveraendert
+  darlehen = 0            82  LTV/DSCR weight 0, score null, mit Grund
+  finanziert              58  MIT und OHNE Parameter gleich
+  Rangfolge               6 Lagen, alle richtig
+  im gebauten Image       alle drei Sollwerte getroffen
+```
+
+Neuer Prüfer `tools/barkauf-score-pruefen.mjs`, RC=0. Dazu
+`score-ketten-pruefen` (115 Punkte) und `rechenkerne-spiegeln --pruefen`.
+
+**Die Probe, die zählt, ist die Gegenprobe:** ein finanziertes Objekt
+bleibt bei 58. Eine Umgewichtung, die alte Scores verschiebt, wäre ein
+stiller Umbau jedes gespeicherten Urteils.
+
+### Nebenbefund: `quick-check-tab.js` läuft nie
+
+In **keiner** HTML eingebunden (gemessen: 0 Treffer in `index.html` und
+`quickcheck-app.html`). `ui.js:445` nennt den Grund: „qcUpdate() lebte
+nur in quick-check-tab.js (entfernt). QC rechnet im iframe." Die
+Änderung bleibt drin, damit die Datei bei einer Wiederbelebung nicht mit
+altem Stand aufwacht — der Kopf sagt das jetzt ausdrücklich.
+
+### ⚠ Offen und Marcel vorgelegt: der Investor Deal Score
+
+Dort ist es **umgekehrt und schlimmer** — die 0 bestraft den Barkauf,
+statt ihn zu schönen:
+
+| Finanzierungs-Kategorie | DSCR | LTV | Kategorie |
+|---|---|---|---|
+| finanziert (1,18 / 88) | 76 Pkt (Gew. 35) | 100 (Gew. 30) | **85** |
+| Barkauf (0 / 0) | **0 Pkt** | 85 | **49** |
+| unbekannt (null / null) | nicht angewandt | nicht angewandt | 60 |
+
+Der Mechanismus für „nicht anwendbar" ist in DS2 **schon da**
+(`applied: false`, `_aggregate` nimmt die Kennzahl aus der Gewichtung) —
+er greift nur bei `null`, und ein Barkauf liefert `0`.
+
+**Daran hängt eine zweite Frage, die eine Bewertungsentscheidung ist:**
+die EK-Quote-Skala ist auf **Hebelwirkung** kalibriert
+(`[[10,100],[20,80],[30,60],[40,30]]`) — ein Barkauf hat 100 % EK und
+bekommt **30 Punkte**. Lässt man DSCR und LTV weg, bleibt diese
+Bestrafung allein übrig und die Kategorie fällt auf **30**. Deshalb
+nicht gebaut, sondern vorgelegt.
+
+### `v2142` · Die zweite Prozesskarte
+
+Marcel: *„kann man diese prozesskarte auch noch weiter ausführen mit
+netzplan? … und auch steuer etc. jährliche IST eintragungen. kannst du
+auch noch darstellen wie die score sich zusammensetzen und wie sie dann
+individualisiert werden können."*
+
+`design/Messe/prozesskarte-detail.html`, drei Tafeln:
+
+- **A · Netzplan Boarding** — drei Stufen (6 / 13 / bis 20
+  Pflichtfelder) mit den sieben Etappen, die etwas freischalten. E7 und
+  E8 gestrichelt, weil sie `extra: true` tragen.
+- **B · Das Steuerjahr** — Ankaufstand, Steuerzeitraum, Werbungskosten
+  als IST-Eintragung, Anlage V, und der Kreislauf.
+- **C · Die Scores** — beide mit Balken in der **Breite ihres Gewichts**,
+  die Unterkennzahlen von DS2, die Stufenleiter, und eine Tabelle „wo
+  man dreht" (Vorlagen, eigene Gewichte, Lageklassen, Schwellen).
+
+**Warum ein zweites Blatt:** die Hauptkarte beantwortet „was kann ich
+tun und was kommt heraus" — A3, aus zwei Metern lesbar. Ein Netzplan
+beantwortet „in welcher Reihenfolge, und was hängt an was". Beides auf
+ein Blatt zu zwingen kostet genau die Lesbarkeit, für die die erste
+Karte gebaut wurde.
+
+**Eine Quelle für die Gestaltung:** der erste `<style>`-Block ist nicht
+abgeschrieben, sondern **der der Hauptkarte** — und der Prüfer
+vergleicht beide wörtlich.
+
+**Kein zweiter Prüfer:** `tools/prozesskarte-pruefen.mjs` prüft jetzt
+beide Karten, und zusätzlich, dass die **Balkenbreiten die Gewichte
+sind**. Eine Grafik, die anders zeigt als sie sagt, ist schlimmer als
+keine. RC=0.
+
+### ⚠ Vier eigene Fehler in diesem Paket
+
+1. **Im Kommentar des Prüfers** habe ich die Zeichenfolge wörtlich
+   hingeschrieben, die einen Blockkommentar beendet — und damit beim
+   **Erklären** genau die Falle gebaut, die der Satz beschreibt.
+2. **Der CSS-Vergleich suchte auf dem rohen Text** und fand das
+   style-Tag im Fließtext meines eigenen Kopfkommentars. Fünfter Fall
+   derselben Falle.
+3. **Dasselbe in der Tag-Bilanz** (4 Öffnungen statt 2).
+4. **Drei Kontrastfehler gemeldet, die es nicht gab:** `.bahn-nr` steht
+   auf einem Gold-**Verlauf**, und `backgroundColor` ist bei einem
+   Gradient transparent — mein Messer stieg auf den dunklen Grund
+   dahinter auf und rechnete Kontrast 1,00. Mit einem Messer, das
+   `background-image` mitliest, sind es **12,96**.
+
+> **Ein Messgerät, das einen Verlauf nicht kennt, meldet die stärkste
+> Stelle der Seite als die schwächste.**
+
+Echt war **ein** Fehler: `.stand` mit 3,53 auf Obsidian, seit `v2088`,
+auf beiden Karten. Behoben mit `--grau` (5,39) in der Hauptkarte, die
+Detailkarte nachgezogen.
+
+### Rest
+
+| Punkt | Art |
+|---|---|
+| Investor Deal Score beim Barkauf | **Marcel vorgelegt, Zahlen stehen** |
+| Cashflow-Skala beim Barkauf (immer 100) | eigener Punkt, braucht eine Zahl von Marcel |
+| Lageklassen an den Score koppeln | gemessen, Zahlen stehen, nicht gebaut |

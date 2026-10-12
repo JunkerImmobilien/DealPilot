@@ -1227,6 +1227,145 @@ dieses Objekt selbst angelegt hatte** (IMG_1554 und IMG_1558/1559).
 > bleibt offen — ein Score, der sich ohne Eingabeänderung verdoppelt,
 > ist ein eigener Befund.
 
+### ✅ Marcels dritter Punkt ist beantwortet und behoben (`v2141`, 12.10.2026)
+
+Seine Frage: *„Die Bewertung war erst schlecht mit 44 und danach auf
+einmal über 80. Warum?"*
+
+**Am echten Kern nachgerechnet** — Sachsenstr. 18, kp 180.000, nkm 940,
+dasselbe Objekt, dieselben Eingaben, **eine Annahme Unterschied:**
+
+| EK-Quote | Darlehen **angenommen** | als **Barkauf** | Sprung |
+|---|---:|---:|---|
+| 0 % | **31** KRITISCH | 72 GUT | +41 |
+| 10 % | **44** SCHWACH | 72 GUT | +28 |
+| 20 % | 58 SOLIDE | 72 GUT | +14 |
+| 30 % | 71 GUT | 72 GUT | +1 |
+
+**Die 44 ist exakt getroffen.** Es war weder ein Modellfehler noch ein
+Kernfehler, sondern ein Wechsel der Grundlage: `agentWerkzeuge.js:2029`
+leitet ein Darlehen ab, **solange kein Score gespeichert ist**
+(`darlehenAbgeleitet`). Danach gilt der gespeicherte Score — und am
+Objekt steht kein Darlehen, also rechnet DealPilot es als Barkauf.
+
+> **Die `herkunft` des Bot-Scores nannte die falsche Ursache:** „der
+> Vollbild-Score kann abweichen, weil er mehr Felder kennt". Gemessen
+> liegt es an der Annahme, nicht an den Feldern. Eine Herkunftsangabe,
+> die auf die falsche Ursache zeigt, ist schlimmer als keine — sie
+> beendet die Suche.
+
+### Der Befund dahinter — und was Marcel entschieden hat
+
+Beim Nachmessen fiel auf, dass die Lage grundsätzlicher ist.
+`_scoreLtv(0)` und `_scoreRisiko(0)` geben je **50** — der Rückfall für
+„keine Angabe". **Ein Barkauf ist aber keine fehlende Angabe, sondern
+eine Aussage.** An fünf Barkauf-Objekten mit gleichem Kaufpreis und nur
+verschiedener Miete:
+
+```
+  30 % Cashflow  immer 100  (ohne Kapitaldienst ist der Cashflow fast
+                 die ganze Nettomiete; die Skala endet bei +200 EUR)
+  15 % LTV       Platzhalter 50
+  15 % DSCR      Platzhalter 50
+```
+
+**60 % des Scores standen fest, bevor das Objekt angesehen war** —
+deshalb hieß eine Wohnung mit 0,90 % Nettorendite „SOLIDE".
+
+Drei Varianten mit Zahlen vorgelegt. **Marcel wählte „weglassen und
+umgewichten"**, mit dem Zusatz: *„das mit dem score muss aber auch beim
+quickcheck passen und auch beim investor deal score. also in der
+gesamten app."*
+
+| Objekt (Barkauf) | heute | nach `v2141` |
+|---|---|---|
+| 1.400 €/Mon · 7,24 % | 77 GUT | **88 SEHR GUT** |
+| 940 €/Mon · 4,46 % | 72 GUT | **82 GUT** |
+| 700 €/Mon · 3,02 % | 60 SOLIDE | **65 SOLIDE** |
+| 520 €/Mon · 1,93 % | 52 SOLIDE | **53 SOLIDE** |
+| 350 €/Mon · 0,90 % | 48 SCHWACH | **47 SCHWACH** |
+| **Spanne / Stufen** | 29 / 3 von 5 | **41 / 4 von 5** |
+
+**Keine Skala geändert.** Die drei bleibenden Kategorien behalten ihre
+Maßstäbe, nur ihr Anteil wächst von 70 auf 100 %. Ein neuer
+Schwellenwert wäre eine Bewertungsentscheidung; diese hier ist eine
+Sachfeststellung: eine Größe, die es nicht gibt, bekommt keine Note.
+
+**Die Gegenprobe, die zählt:** ein finanziertes Objekt bleibt bei 58 —
+mit und ohne den neuen Parameter. Eine Umgewichtung, die alte Scores
+verschiebt, wäre ein stiller Umbau jedes gespeicherten Urteils.
+
+Prüfer `tools/barkauf-score-pruefen.mjs`, RC=0, auch im gebauten Image.
+
+### ⚠ Noch offen am Investor Deal Score — Marcel vorgelegt
+
+Dort ist es **umgekehrt und schlimmer**: die 0 bestraft den Barkauf.
+
+| Finanzierungs-Kategorie | DSCR | LTV | Kategorie |
+|---|---|---|---|
+| finanziert (1,18 / 88) | 76 Pkt (Gew. 35) | 100 (Gew. 30) | **85** |
+| **Barkauf (0 / 0)** | **0 Pkt** (Gew. 35) | 85 | **49** |
+| unbekannt (null / null) | nicht angewandt | nicht angewandt | 60 |
+
+**Ein schuldenfreies Objekt bekommt die Finanzierungsnote eines
+Objekts, das seinen Kapitaldienst nicht deckt.** Der Mechanismus für
+„nicht anwendbar" ist in `dealscore2.js` schon da (`applied: false`,
+`_aggregate`) — er greift nur bei `null`, und ein Barkauf liefert `0`.
+
+**Daran hängt eine zweite Frage, und sie ist eine Bewertungsentscheidung:**
+die EK-Quote-Skala ist auf **Hebelwirkung** kalibriert
+(`[[10,100],[20,80],[30,60],[40,30]]`) — 100 % Eigenkapital bekommt
+**30 Punkte**. Lässt man DSCR und LTV weg, bleibt diese Bestrafung
+allein übrig, und die Kategorie fällt von 49 auf **30**. Deshalb nicht
+gebaut, sondern mit Zahlen vorgelegt.
+
+### Auch offen: die Cashflow-Skala beim Barkauf
+
+Sie ist auf finanzierte Objekte kalibriert (−200 € → 0, **0 € → 50**,
++200 € → 100). Beim Barkauf ist der Cashflow fast die ganze Nettomiete,
+also **ab 200 €/Monat immer die Note 100** — auch bei der Wohnung mit
+0,90 % Rendite. Diese 30 % messen beim Barkauf nichts.
+
+Das zu heilen braucht **eine Zahl, die Marcel setzt**: ab welcher
+Rendite auf das eingesetzte Geld ist ein Barkauf gut? Ein geratener
+Wert (4 % als Mitte) ließ ein Objekt mit 6,27 % brutto auf SOLIDE
+fallen — sachlich falsch, und ausdrücklich zurückgenommen.
+
+### Und eine Idee von Marcel, gemessen aber nicht gebaut
+
+*„kann man das nicht an den Lageklassen koppeln?"* — die Lageklassen
+A/B/C mit Ziel-Bruttomietrenditen gibt es seit `v1956`
+(`lage-profil.js`, vorbelegt 3,5 / 5,0 / 7,0 %). Heute wirken sie auf
+den **Zielkaufpreis**, nicht auf den Score.
+
+Durchgerechnet, einheitentreu (Verhältnis erreicht/Ziel, beide brutto —
+die Zielrendite ist **brutto**, `_scoreRendite` bewertet **netto**; das
+zu mischen wäre ein Fehler von rund 1,5 Punkten):
+
+| Miete/Mon | brutto | heute | A (3,5 %) | B (5 %) | C (7 %) | ohne Eintrag (6 %) |
+|---|---|---|---|---|---|---|
+| 700 | 4,67 % | 34 | 100 | 58 | 12 | 31 |
+| 940 | 6,27 % | 82 | 100 | 95 | 52 | 74 |
+| 1.200 | 8,00 % | 100 | 100 | 100 | 84 | 100 |
+
+**Fachlich richtig:** dieselbe Wohnung ist in einer A-Lage eine
+Punktlandung und verfehlt in einer C-Lage ihr Ziel. Das kann die feste
+Skala nicht. **Und der Rückfall (6 %) liegt dicht an der heutigen
+Skala**, bestehende Objekte wandern also nur mäßig.
+
+**Marcels Riegel dazu:** *„falls die A, B oder C-Lage nicht eingegeben
+wurde muss ein default wert angenommen werden. nur berücksichtigen."*
+Genau so ist es in `qc-heuristik.js:222` schon gebaut
+(`ZIEL_BMR_RUECKFALL = 6`), und die Zielrendite kommt dort als
+**Parameter** in den Kern — derselben Linie wäre zu folgen.
+
+**Nicht gebaut**, weil die Skala („wie viel Note bei 80 % des Ziels?")
+eine Bewertungsentscheidung ist.
+
+---
+
+**Der ursprüngliche Stand des Punktes:**
+
 **Marcels dritter Punkt:** „Die Bewertung war erst schlecht mit 44 und
 danach auf einmal über 80. Warum?" — in diesen sechs Bildern nicht
 enthalten, aber die Zahlenbefunde oben sind ein starker Kandidat.
