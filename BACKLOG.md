@@ -15359,8 +15359,8 @@ Bundesland erreichbar.
 System oben deckt beide Kennzahlen über alle Ausschüsse. Kein anderes
 Bundesland bietet so viel hinter einer einzigen, freien Lizenz — Hamburg
 eingeschlossen.
- . 
- . 
+
+
 ##### Das Modell ist entschlüsselt — gemessen am Dashboard
 
 **Die Bauform steht fest:**
@@ -15461,8 +15461,8 @@ trägt er, fällt die Handarbeit weg.
 
 **Nicht vergessen:** der Quellenvermerk gehört in denselben Arbeitsgang
 (A2). Ohne ihn darf keine dieser Zahlen in einen Kundenbericht.
- . 
- . #### E3 — Die Regeln, die bei jeder Ernte gelten
+
+#### E3 — Die Regeln, die bei jeder Ernte gelten
 
 - **Lizenz und Inhaltsverzeichnis im ERSTEN Abruf zusammen lesen.** *Kiels
   Daten wären lesbar gewesen; die Lizenzprüfung kam zu spät.*
@@ -15642,10 +15642,10 @@ Damit es niemand für gemessen hält:
   Rauschdaten), aber nie gegen echte Daten gelaufen
 - **`market=seed`** — ein Etikett, kein Befund (D)
 - **Der Preis des RLP-Landesberichts**
- . 
- . '---' . 
- . 
- . ## Fertig
+
+---
+
+## Fertig
 
 ### Alle Anlage-V-Zeilen zugeordnet, Halterangaben aufs PDF — `v1220`/`v1221`, 03.09.2026
 
