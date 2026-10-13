@@ -151,6 +151,13 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.17 · Warum bleibt data._ai hinter der Spalte ai_analysis zurück?
+
+Gemessen 13.10.2026: bei 4 von 8 gewonnenen Objekten trug `ai_analysis` die
+Analyse vom 13.10., `data._ai` die vom 09.10. v2170b liest beide und nimmt die
+neuere — die Ursache (welcher Speicherweg nur die Spalte schreibt) ist offen.
+Jeder andere Leser von `data._ai` sieht weiter die alte.
+
 #### N62.16 · Makro-Kennzahlen vorab holen und speichern (wie der Zensus)
 
 **Gemessen 13.10.2026 nach Marcels neuem Regionaldatenbank-Passwort:** die

@@ -38614,6 +38614,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2168–v2170b · fremde Marktbericht-Karte, Makro-Budget, Portfolio-Pilot frisch (13.10.2026, Prod-Rollout 3 `104c021d`)
+
+- **v2168** `aa218f2b`: Marcels Bild „frage" („234 €/m² · −88,2 %") — die Karte `_mb_state` (199.000 € für 95 m²) stand auf sieben Objekten, weil `_mb_state`/`_avm_state` in den `resetFields` beim Laden fehlten. Jetzt geleert; die Karte trägt `fuer.key`, fremde (Schlüssel oder Fläche > 15 % daneben) werden verworfen. Browser: Gohliser leer, 001/1056 behalten ihre eigene.
+- **v2169/v2169a** `4fe97bd4`, `2115bd72`: Regionaldatenbank nach neuem Passwort erreichbar, aber 44–182 s je Tabelle. Abrufe parallel, Erfolge 30 Tage im Speicher, ein Bericht wartet höchstens 20 s (vorher bis 180 s — hätte die 6 Berichtsplätze blockiert). Dauerhaft: N62.16.
+- **v2170–v2170b** `3fb90585`, `e32d7522`, `6def3fdf`: Portfolio-Pilot lädt vor jeder Anfrage die ganze Kette frisch und nimmt die NEUERE von `ai_analysis`-Spalte und `data._ai` — bei 4 von 8 Objekten war die Kopie veraltet. Fazit = Gesamtbewertung. Gemessen: 8/8 mit Analyse vom 13.10. inkl. Steuer.
+- Neuabruf Staging: 26 Objekte mit gpt-4.1 neu, 7 ohne Kaufpreis übersprungen, 0 Fehler.
+- OpenAI-Stufe „Launch": gpt-4.1 2 Mio. TPM / 10.000 RPM — kein Engpass.
+
 ### Prod-Rollouts 13.10.2026 · v2145–v2167 und das Modell gpt-4.1
 
 - **Rollout 1** `b62eb9d2` (v2145–v2166): beide DBs gesichert und angesehen (11 MB/71 Tabellen, 1,6 MB/26), Migrationen 087 + mb 016 angewendet, Zensus-Import 894.880 Werte (VACUUM scheiterte am /dev/shm des DB-Containers — harmlos). **Rollout 2** `31bff93e` (v2163a–v2167). Push nach main mit Marcels ausdrücklicher Erlaubnis („du kannst pushen").
