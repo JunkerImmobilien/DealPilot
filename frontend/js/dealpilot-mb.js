@@ -414,12 +414,21 @@ if (!window._wlc) {
   /* Bevölkerungsentwicklung in %/Jahr -> die fünf Stufen des Feldes.
      Die Schwellen sind bewusst eng: unter einem halben Prozent im Jahr
      ist ein Ort weder wachsend noch schrumpfend, er steht. */
+  /* ══ v2177 · EINE SCHWELLENKETTE FUER DIE LAGE ═══════════════════════
+     Hier standen eigene Grenzen (Score/10: 8/6/4/2, Bevoelkerung 1,0/0,3),
+     die „Lage analysieren" (v2175, LageMessungService.SCHWELLEN) andere
+     (Makro 75/60/45/30, Mikro 85/75/55/35, Bevoelkerung 0,8/0,2). Derselbe
+     Ort bekam je nach Weg ein anderes Wort. Marcel hat am 13.10.2026 die
+     Ketten von LageMessungService abgenommen („ja das passt so") - sie
+     gelten jetzt hier genauso. Wer eine aendert, aendert BEIDE. */
+  function _stufeMakro(sc) { if (sc == null || !isFinite(sc)) return null; return sc >= 75 ? 'sehr_gut' : sc >= 60 ? 'gut' : sc >= 45 ? 'durchschnittlich' : sc >= 30 ? 'schwach' : 'sehr_schwach'; }
+  function _stufeMikro(sc) { if (sc == null || !isFinite(sc)) return null; return sc >= 85 ? 'sehr_gut' : sc >= 75 ? 'gut' : sc >= 55 ? 'durchschnittlich' : sc >= 35 ? 'schwach' : 'sehr_schwach'; }
   function _bevStufe(pctProJahr) {
     if (pctProJahr == null || !isFinite(pctProJahr)) return null;
-    if (pctProJahr >= 1.0) return 'stark_wachsend';
-    if (pctProJahr >= 0.3) return 'wachsend';
-    if (pctProJahr >= -0.3) return 'stabil';
-    if (pctProJahr >= -1.0) return 'leicht_fallend';
+    if (pctProJahr >= 0.8) return 'stark_wachsend';
+    if (pctProJahr >= 0.2) return 'wachsend';
+    if (pctProJahr >= -0.2) return 'stabil';
+    if (pctProJahr >= -0.8) return 'leicht_fallend';
     return 'stark_fallend';
   }
 
@@ -470,8 +479,8 @@ if (!window._wlc) {
     var lc = function (sc) { return sc >= 8 ? 'sehr_gut' : sc >= 6 ? 'gut' : sc >= 4 ? 'durchschnittlich' : sc >= 2 ? 'schwach' : 'sehr_schwach'; };
     var wc = function (p) { return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines'; };
     var gesetzt = [];
-    if (D.macroRaw != null && setSelLeer('makrolage', lc(D.macroRaw / 10))) gesetzt.push('Makrolage');
-    if (D.microRaw != null && setSelLeer('mikrolage', lc(D.microRaw / 10))) gesetzt.push('Mikrolage');
+    if (D.macroRaw != null && setSelLeer('makrolage', _stufeMakro(D.macroRaw))) gesetzt.push('Makrolage');
+    if (D.microRaw != null && setSelLeer('mikrolage', _stufeMikro(D.microRaw))) gesetzt.push('Mikrolage');
     if (D.trendRaw != null && setSelLeer('ds2_wertsteigerung', wc(D.trendRaw))) gesetzt.push('Wertsteigerung');
     var b = _bevStufe(D.bevRaw);
     if (b && setSelLeer('ds2_bevoelkerung', b)) gesetzt.push('Bevölkerung');
@@ -494,8 +503,8 @@ if (!window._wlc) {
     }
     var lc = function (sc) { return sc >= 8 ? 'sehr_gut' : sc >= 6 ? 'gut' : sc >= 4 ? 'durchschnittlich' : sc >= 2 ? 'schwach' : 'sehr_schwach'; };
     var wc = function (p) { return p >= 3 ? 'sehr_hoch' : p >= 2 ? 'hoch' : p >= 1 ? 'mittel' : p > 0 ? 'niedrig' : 'keines'; };
-    if (D.macroRaw != null) { setSel('makrolage', lc(D.macroRaw / 10)); applied.push('Makrolage'); }
-    if (D.microRaw != null) { setSel('mikrolage', lc(D.microRaw / 10)); applied.push('Mikrolage'); }
+    if (D.macroRaw != null) { setSel('makrolage', _stufeMakro(D.macroRaw)); applied.push('Makrolage'); }
+    if (D.microRaw != null) { setSel('mikrolage', _stufeMikro(D.microRaw)); applied.push('Mikrolage'); }
     if (D.trendRaw != null) { var _w = wc(D.trendRaw); if (_w) { setSel('ds2_wertsteigerung', _w); applied.push('Wertsteigerung'); } }
     /* v1316: die beiden, die es schon gab, aber nie ankamen. */
     var _bev = _bevStufe(D.bevRaw);
@@ -745,7 +754,7 @@ if (!window._wlc) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
 
-  global.DealPilotMB = { run: run, restore: restore, inputs: inputs, uebernehmen: uebernehmen, /* v1862: ein Sammler, eine Karte */ letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
+  global.DealPilotMB = { lageStufen: { makro: _stufeMakro, mikro: _stufeMikro, bev: function (p) { return _bevStufe(p); }, nachfrage: function (t) { return _nachfrageStufe(t); } }, /* v2177 */ run: run, restore: restore, inputs: inputs, uebernehmen: uebernehmen, /* v1862: ein Sammler, eine Karte */ letzter: function () { return D || null; }, /* v1851: letzte Karte fuer die Lage-Gegenueberstellung */ /* v752-api */
     getData: function () { return (D && D.mw) ? { D: D, mode: mode } : null; },
     setMode: function (m) { mode = (m === 'mid') ? 'med' : m; try { persistLight(); } catch (e) {} },
     apply: applyToFields,

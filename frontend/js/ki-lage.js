@@ -68,7 +68,10 @@ function _lageCss() {
   document.head.appendChild(st);
 }
 
-function runKiLage() {
+function runKiLage(opts) {
+  /* v2177: {ergaenzen:true} = ein Marktbericht hat die Lage schon gemessen;
+     die KI ergaenzt nur, was er nicht misst. */
+  var _erg = !!(opts && opts.ergaenzen);
   var btn = document.getElementById('ki-lage-btn');
   var body = document.getElementById('ki-lage-body');
   if (!body) return;
@@ -90,7 +93,8 @@ function runKiLage() {
   window._lastKiLageData = null;
   var _kiFertig = false;
   var _ladeKi = '<div class="ki-lage-loading"><div class="ki-lage-spinner"></div>KI ergänzt Texte, Wertsteigerung und Entwicklung …</div>';
-  var _messP = _lageMessen(str, hnr, plz, ort).then(function (m) {
+  if (_erg) window._kiLageErgaenzt = window._currentObjKey || '';
+  var _messP = (_erg ? Promise.resolve(null) : _lageMessen(str, hnr, plz, ort)).then(function (m) {
     window._lastLageMessung = m;
     if (!_kiFertig) body.innerHTML = (m ? _lageVergleichHtml(m, null) : '') + _ladeKi;
     return m;
@@ -199,6 +203,22 @@ function runKiLage() {
       throw new Error(data.error || 'Keine Daten zurückgekommen');
     }
     _kiFertig = true;
+    if (_erg) {
+      /* v2177: nur die Felder, die der Bericht NICHT gemessen hat */
+      var D = window.DealPilotMB && DealPilotMB.letzter ? DealPilotMB.letzter() : null;
+      var erg = { entwicklung: data.entwicklung || null, wertsteigerung: (D && D.trendRaw != null) ? null : (data.wertsteigerung || null) };
+      window._kiLageErgaenzung = window._kiLageErgaenzung || {};
+      window._kiLageErgaenzung[window._currentObjKey || ''] = erg;
+      [['ds2_entwicklung', erg.entwicklung], ['ds2_wertsteigerung', erg.wertsteigerung]].forEach(function (p) {
+        var el = document.getElementById(p[0]);
+        if (el && p[1] && p[1].value && el.querySelector('option[value="' + p[1].value + '"]')) { el.value = p[1].value; el.dispatchEvent(new Event('change')); }
+      });
+      if (typeof dpUpdateAll === 'function') dpUpdateAll();
+      window._kiLageErgaenzt = null;
+      if (typeof window._kiLageBerichtZeichnen === 'function') window._kiLageBerichtZeichnen();
+      if (typeof toast === 'function') toast('✓ Per Web-Recherche ergänzt — die gemessenen Felder bleiben unverändert');
+      return;
+    }
     /* v2175: die Messung abwarten (sie ist fast immer schon da), dann beides zeigen */
     return _messP.then(function () { _renderKiLage(data); });
   })
@@ -564,3 +584,88 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       '<div style="margin-top:10px"><button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById(\'plz\').focus();document.getElementById(\'plz\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">PLZ-Feld öffnen →</button></div>' +
     '</div>';
 };
+
+/* ══ v2177 · LIEGT EIN MARKTBERICHT VOR, WIRD NICHT NOCHMAL ANALYSIERT ════
+   Marcel am 13.10.2026: „wenn wir einen Marktbericht abgerufen haben, der
+   es bereits eingetragen hat, sollten wir die Moeglichkeit des Abrufes
+   nicht mehr anbieten ... dann koennen wir dort reinschreiben als Info,
+   dass wir den Stand aus Marktbericht uebernommen haben. ... man koennte
+   sonst noch den Abgleich gegenueber Webrecherche anbieten, aber ist das
+   sinnvoll?"
+   Entschieden: der Bericht hat die Lage GEMESSEN (dealpilot-mb.js autoLage,
+   dieselben Schwellen wie hier seit v2177). Eine Web-Recherche ergaenzt nur,
+   was er nicht misst - die Entwicklungsmoeglichkeiten (und die Wertsteigerung,
+   wenn der Bericht keine Preisreihe hatte). Fuer gemessene Felder bringt ein
+   Abgleich mit dem Web nichts. */
+(function () {
+  'use strict';
+  function bericht() {
+    var D = window.DealPilotMB && typeof DealPilotMB.letzter === 'function' ? DealPilotMB.letzter() : null;
+    if (!D || (D.macroRaw == null && D.microRaw == null && D.bevRaw == null && D.tageRaw == null)) return null;
+    return D;
+  }
+  function fz(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ','); }
+  function zeilen(D) {
+    var S = (window.DealPilotMB && DealPilotMB.lageStufen) || {};
+    var z = [];
+    if (D.macroRaw != null) z.push(['makrolage', 'Makrolage', S.makro && S.makro(D.macroRaw), 'Score ' + Math.round(D.macroRaw)]);
+    if (D.microRaw != null) z.push(['mikrolage', 'Mikrolage', S.mikro && S.mikro(D.microRaw), 'Score ' + Math.round(D.microRaw)]);
+    if (D.bevRaw != null) z.push(['ds2_bevoelkerung', 'Bevölkerung', S.bev && S.bev(D.bevRaw), fz(D.bevRaw, 2) + ' %/Jahr']);
+    if (D.tageRaw != null) z.push(['ds2_nachfrage', 'Nachfrage', S.nachfrage && S.nachfrage(D.tageRaw), Math.round(D.tageRaw) + ' Tage Vermarktungsdauer']);
+    if (D.trendRaw != null) z.push(['ds2_wertsteigerung', 'Wertsteigerung', null, fz(D.trendRaw, 1) + ' %/Jahr Preisentwicklung']);
+    return z;
+  }
+  function zeichnen() {
+    var body = document.getElementById('ki-lage-body');
+    var btn = document.getElementById('ki-lage-btn');
+    var tag = document.querySelector('#ki-lage-box .ki-lage-tag');
+    if (!body) return;
+    var D = bericht();
+    if (!D) {
+      if (btn) btn.style.display = '';
+      if (tag) tag.textContent = '4 gemessen · 2 KI';
+      if (body.getAttribute('data-aus-bericht')) {
+        body.removeAttribute('data-aus-bericht');
+        body.innerHTML = '<div class="ki-lage-empty">Adresse oben eintragen, dann Button klicken — DealPilot misst Makrolage, Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten und stellt die KI-Einschätzung daneben; Wertsteigerung und Entwicklung ergänzt die KI.</div>';
+      }
+      return;
+    }
+    if (btn) btn.style.display = 'none';
+    if (tag) tag.textContent = 'aus dem Marktbericht';
+    if (window._kiLageErgaenzt === (window._currentObjKey || '')) return;   /* KI-Ergaenzung steht gerade da */
+    var rows = zeilen(D).map(function (r) {
+      var feld = document.getElementById(r[0]);
+      var jetzt = feld && feld.value ? _lageOptText(r[0], feld.value) : '–';
+      var soll = r[2] ? _lageOptText(r[0], r[2]) : null;
+      var anders = soll && feld && feld.value && feld.value !== r[2];
+      return '<tr><td>' + r[1] + '</td><td><b>' + _escKi(jetzt) + '</b><span class="lv-w">' + _escKi(r[3]) + '</span></td>'
+        + '<td class="lv-u">' + (anders ? '<span class="lv-ab" title="Im Feld steht ein anderer Wert als die Messung des Berichts (' + _escKi(soll) + ') — von Hand geändert?">≠</span>' : '<span class="lv-ok">✓</span>') + '</td></tr>';
+    }).join('');
+    var E = (window._kiLageErgaenzung || {})[window._currentObjKey || ''] || {};
+    [['ds2_entwicklung', 'Entwicklung', E.entwicklung], ['ds2_wertsteigerung', 'Wertsteigerung', E.wertsteigerung]].forEach(function (p) {
+      if (!p[2] || !p[2].value) return;
+      var q = p[2].source && p[2].source.url ? ' <a class="ki-lage-src-link" href="' + _escKi(p[2].source.url) + '" target="_blank" rel="noopener noreferrer">Quelle</a>' : '';
+      rows += '<tr><td>' + p[1] + '</td><td><b>' + _escKi(_lageOptText(p[0], p[2].value)) + '</b><span class="lv-w">Web-Recherche: ' + _escKi(p[2].text || '') + '</span>' + q + '</td><td class="lv-u">KI</td></tr>';
+    });
+    var offen = ['ds2_entwicklung'].concat(D.trendRaw == null ? ['ds2_wertsteigerung'] : []);
+    var html = '<div class="ki-lage-vergleich"><div class="lv-kopf">✓ Lage aus dem Marktbericht' + (D.bericht_datum ? ' vom ' + _escKi(D.bericht_datum) : '') + ' übernommen</div>'
+      + '<table class="lv-tab"><tbody>' + rows + '</tbody></table>'
+      + '<div class="lv-fuss">Gemessen im Marktbericht — eine erneute Analyse ist nicht nötig. '
+      + 'Nicht gemessen werden ' + (offen.length > 1 ? 'Wertsteigerung und Entwicklungsmöglichkeiten' : 'die Entwicklungsmöglichkeiten (B-Plan, Stadtentwicklung)') + '; die ergänzt auf Wunsch eine Web-Recherche.</div>'
+      + '<div class="ki-lage-actions" style="margin-top:10px"><button class="btn btn-sm" type="button" onclick="runKiLage({ergaenzen:true})">'
+      + (offen.length > 1 ? 'Wertsteigerung & Entwicklung' : 'Entwicklung') + ' per Web-Recherche ergänzen</button></div></div>';
+    _lageCss();
+    body.setAttribute('data-aus-bericht', '1');
+    if (body.innerHTML !== html) body.innerHTML = html;
+  }
+  window._kiLageBerichtZeichnen = zeichnen;
+  var letzterKey = null;
+  function takt() {
+    var k = window._currentObjKey || '';
+    if (k !== letzterKey) { letzterKey = k; window._kiLageErgaenzt = null; }
+    try { zeichnen(); } catch (e) {}
+  }
+  window.addEventListener('dp:mb-ready', function () { setTimeout(takt, 300); });
+  window.addEventListener('dp:object-ready', function () { setTimeout(takt, 1500); });
+  setInterval(takt, 2500);
+})();
