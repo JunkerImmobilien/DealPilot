@@ -868,6 +868,15 @@ async function saveObj(opts) {
 
   var data = collectData();
   var aiText = window._aiText || null;
+  /* v2193 · N62.17 - URSACHE gefunden: collectData() traegt `_ai` aus
+     _currentObjData mit, also den Text vom LADEN des Objekts. Nach einer
+     neuen Analyse ging der neue Text in die Spalte ai_analysis, der alte
+     in data._ai (gemessen: _aiText geaendert, collectData()._ai unveraendert).
+     Ab hier bekommen beide denselben Text. */
+  if (aiText && data && typeof data === 'object') {
+    data._ai = aiText;
+    try { if (window._currentObjData) window._currentObjData._ai = aiText; } catch (e) {}
+  }
   var photos = (typeof imgs !== 'undefined') ? imgs.map(function(i){ return i.src; }) : [];
   /* v734-resize-on-save: grosse (Alt-)Fotos vor dem Upload verkleinern. v725 resized nur beim
      Upload; Altfotos liegen unkomprimiert (gemessen 3MB) und liessen den PUT timeouten.

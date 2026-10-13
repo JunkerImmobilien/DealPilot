@@ -279,6 +279,8 @@ OpenAI ist kein Engpass (Stufe „Launch", gpt-4.1 2 Mio. TPM).
 
 #### N62.17 · Warum bleibt data._ai hinter der Spalte ai_analysis zurück?
 
+> **✅ v2193 (13.10.2026):** Ursache: collectData() trägt _ai aus _currentObjData mit (Stand beim Laden). Nach einer neuen Analyse ging der neue Text in die Spalte, der alte in data._ai — im Browser nachgestellt (_aiText geändert, collectData()._ai unverändert). saveObj setzt jetzt beide gleich. Alte Kopien in nicht wieder gespeicherten Objekten bleiben; der einzige Leser (dashboard.js) nimmt seit v2170b die neuere.
+
 Gemessen 13.10.2026: bei 4 von 8 gewonnenen Objekten trug `ai_analysis` die
 Analyse vom 13.10., `data._ai` die vom 09.10. v2170b liest beide und nimmt die
 neuere — die Ursache (welcher Speicherweg nur die Spalte schreibt) ist offen.
