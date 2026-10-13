@@ -53,7 +53,7 @@
   var _oabiDone = null;  /* v393: Kombi-Flow Completion */
   var _qcMode = false;            /* v418: Import aus dem Quick-Check */
   var _qcPendingMerged = {};      /* v418: Bucket B+C -> beim qc-save ins Objekt */
-  var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz',
+  var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz', lageklasse:'qc_lageklasse' /* v2159 */,
     /* v506-obj2qc: Finanzierung + Mieten-Einzelposten (Sprachaufzeichnung) */
     d1z:'qc_zins', d1t:'qc_tilg', ze_stp:'qc_nkm_stp', ze_kueche:'qc_nkm_kueche', ze_sonst:'qc_nkm_sonst' };  /* v418: Bucket A */
 
@@ -1649,7 +1649,16 @@
     var raw = String(val).trim().toLowerCase();
     for (var i = 0; i < el.options.length; i++) {
       var o = el.options[i], ov = (o.value || '').toLowerCase(), ot = (o.text || '').toLowerCase();
-      if (ov === raw || ot === raw || (raw && ot && ot.indexOf(raw) >= 0) || (raw && ot && raw.indexOf(ot) >= 0)) { el.selectedIndex = i; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} return true; }
+      /* v2159 · Erst EXAKT, dann ungefaehr - und die leere Option nimmt nie ein
+         Teilwort an. Bis hier griff der erste Teilwort-Treffer in Optionsreihen-
+         folge: diktiertes "A" und "B" landeten auf "- keine Angabe -" ("Angabe"
+         enthaelt beide Buchstaben), "schwach" auf "Sehr schwach". */
+      if (ov === raw || ot === raw) { el.selectedIndex = i; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} return true; }
+    }
+    for (var j = 0; j < el.options.length; j++) {
+      var o2 = el.options[j], ov2 = (o2.value || '').toLowerCase(), ot2 = (o2.text || '').toLowerCase();
+      if (!ov2) continue;
+      if ((raw && ot2 && ot2.indexOf(raw) >= 0) || (raw && ot2 && raw.indexOf(ot2) >= 0)) { el.selectedIndex = j; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} return true; }
     }
     return false;
   }

@@ -89,8 +89,13 @@
     C: { kurz: 'C', name: 'C-Lage', sub: 'Randlage, höhere Rendite, höheres Risiko' }
   };
 
+  /* v2159 · N62.11: `standard` ist die Klasse, in der die Objekte des
+     Nutzers meistens liegen (A/B/C oder null). Sie ist eine VORBELEGUNG
+     fuer neue Quick-Checks, keine Annahme: wer nie eine gewaehlt hat,
+     bekommt keine, und `zielBmr(null)` bleibt null (Riegel in
+     qc-heuristik.js, Rueckfall 6 %). */
   function leer() {
-    var p = { version: 1, klassen: {}, updated_at: null };
+    var p = { version: 1, klassen: {}, standard: null, updated_at: null };
     KLASSEN.forEach(function (k) {
       p.klassen[k] = { ziel_bmr: VORGABE[k] };
       ZUSATZ.forEach(function (f) { p.klassen[k][f] = null; });
@@ -213,6 +218,21 @@
     return schreiben(p);
   }
 
+  /* Standardklasse lesen: 'A' | 'B' | 'C' | null. */
+  function standard() {
+    var s = lesen().standard;
+    var k = String(s || '').toUpperCase().charAt(0);
+    return KLASSEN.indexOf(k) >= 0 ? k : null;
+  }
+
+  /* Standardklasse setzen; '' oder null loescht sie. */
+  function setzeStandard(klasse) {
+    var k = String(klasse || '').toUpperCase().charAt(0);
+    var p = lesen();
+    p.standard = KLASSEN.indexOf(k) >= 0 ? k : null;
+    return schreiben(p);
+  }
+
   function etikett(klasse) {
     var k = String(klasse || '').toUpperCase().charAt(0);
     return ETIKETT[k] || null;
@@ -229,6 +249,8 @@
     zielBmr: zielBmr,
     zusatz: zusatz,
     setze: setze,
+    standard: standard,
+    setzeStandard: setzeStandard,
     etikett: etikett
   };
 

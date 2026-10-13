@@ -572,7 +572,30 @@ window.DealPilotOnboarding = (function () {
                   + '<span class="dpo-lage-e">% brutto</span>'
                   + '</label>';
               }).join('')
-            + '</div>';
+            + '</div>'
+            /* v2159 · N62.11 — die Standardklasse. Marcel am 12.10.2026:
+               „dass wir auch einen Standard wählen können. So mit einer
+               kleinen Begründung wird dann im Quickcheck als Standard
+               gesetzt." Ohne Wahl bleibt es bei „keine Vorgabe" — der
+               Quick-Check bekommt dann keine Klasse und rechnet wie bisher. */
+            + (function () {
+                var std = LP.standard ? LP.standard() : null;
+                return '<label class="dpo-lage-z dpo-lage-std-z">'
+                  + '<span>Meine Objekte liegen meistens in</span>'
+                  + '<select class="dpo-lage-std">'
+                  +   '<option value="">keine Vorgabe</option>'
+                  +   LP.KLASSEN.map(function (k) {
+                        return '<option value="' + k + '"' + (std === k ? ' selected' : '') + '>'
+                          + esc(LP.ETIKETT[k].name) + '</option>';
+                      }).join('')
+                  + '</select>'
+                  + '</label>'
+                  + '<p class="dpo-vor dpo-vor-klein dpo-lage-std-why">'
+                  + 'Diese Klasse steht in jedem neuen Quick-Check vorausgewählt, '
+                  + 'damit die Zielrendite sofort greift. Sie ist als Vorgabe '
+                  + 'gekennzeichnet; du änderst sie dort im Feld oder sagst beim '
+                  + 'Diktat einfach „B-Lage" — was du ausdrücklich angibst, gilt.</p>';
+              })();
         })();
   }
 
@@ -717,6 +740,14 @@ window.DealPilotOnboarding = (function () {
        weiterhin 3,5. */
     _ov.addEventListener('change', function (ev) {
       var t = ev.target;
+      if (t && t.classList && t.classList.contains('dpo-lage-std')) {
+        try {
+          if (window.DealPilotLageProfil && window.DealPilotLageProfil.setzeStandard) {
+            window.DealPilotLageProfil.setzeStandard(t.value);
+          }
+        } catch (e) {}
+        return;
+      }
       if (!t || !t.classList || !t.classList.contains('dpo-lage-f')) return;
       try {
         if (window.DealPilotLageProfil) {
@@ -1063,7 +1094,10 @@ window.DealPilotOnboarding = (function () {
       '.dpo-lage-z{display:grid;grid-template-columns:1fr 84px auto;align-items:center;gap:10px;font-size:12.5px}',
       '.dpo-lage-f{width:100%;box-sizing:border-box;padding:6px 8px;font-size:13px;text-align:right}',
       '.dpo-lage-e{font-size:10.5px;opacity:.6;white-space:nowrap}',
-      '@media (max-width:420px){.dpo-lage-z{grid-template-columns:1fr 72px auto}}',
+      '.dpo-lage-std-z{grid-template-columns:1fr 130px;margin-top:10px}',
+      '.dpo-lage-std{width:100%;box-sizing:border-box;padding:6px 8px;font-size:13px}',
+      '.dpo-lage-std-why{margin-top:6px}',
+      '@media (max-width:420px){.dpo-lage-z{grid-template-columns:1fr 72px auto}.dpo-lage-std-z{grid-template-columns:1fr 120px}}',
       '.dpo-k-werte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#6b6660;margin-top:4px}',
       '.dpo-k-zusatz{font-size:10.5px;color:var(--wl-b8932f,#b8932f);margin-top:4px;font-weight:600}',
       /* v2083 · Die Standard-Markierung. Marcel: „Den könnte man dann auch

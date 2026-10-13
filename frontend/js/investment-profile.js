@@ -205,7 +205,14 @@ window.DealPilotInvestmentProfile = (function() {
       return [
         '<h3 class="ip-section">Lageklassen A · B · C</h3>',
         '<p class="hint">Die <b>Zielrendite</b> ist das Einzige, was gebraucht wird. Im Quick-Check wählst du die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du verhandeln müsstest, um sie zu erreichen. Die drei Werte daneben sind freiwillig — bleiben sie leer, gelten deine Standardwerte von oben. Die Vorbelegung ist marktüblich: gute Lage, wenig Rendite.</p>',
-        '<div class="ip-lage-box">' + zeilen + '</div>'
+        '<div class="ip-lage-box">' + zeilen + '</div>',
+        /* v2159 · N62.11: die Standardklasse fuer neue Quick-Checks. */
+        '<label class="ip-lage-std-z">Standard für neue Quick-Checks ',
+        '<select class="ip-lage-std"><option value="">keine Vorgabe</option>' +
+          LP.KLASSEN.map(function (k) {
+            return '<option value="' + k + '"' + ((LP.standard && LP.standard() === k) ? ' selected' : '') + '>' + LP.ETIKETT[k].name + '</option>';
+          }).join('') + '</select></label>',
+        '<p class="hint">Steht in jedem neuen Quick-Check vorausgewählt und ist dort als Vorgabe gekennzeichnet. Im Feld oder per Diktat („B-Lage") überschreibst du sie.</p>'
       ].join('');
     }
 
@@ -309,6 +316,11 @@ window.DealPilotInvestmentProfile = (function() {
   function wireLageProfil() {
     var LP = window.DealPilotLageProfil;
     if (!LP) return;
+    var stdSel = document.querySelector('.ip-lage-std');
+    if (stdSel && !stdSel._v2159) {
+      stdSel._v2159 = 1;
+      stdSel.addEventListener('change', function () { if (LP.setzeStandard) LP.setzeStandard(stdSel.value); });
+    }
     var felder = document.querySelectorAll('.ip-lage-f');
     for (var i = 0; i < felder.length; i++) {
       (function (el) {

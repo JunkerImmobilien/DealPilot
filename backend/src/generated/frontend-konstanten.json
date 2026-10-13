@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-12T18:34:36.931Z",
+ "erzeugt_am": "2026-10-13T05:50:33.781Z",
  "quellen": {
-  "voice-import": "8ff982e2997e8057",
+  "voice-import": "c937964696bccc44",
   "objektart-felder": "b1481ff1f7c0b04d",
   "storage": "e4e268914b1ec8cd",
-  "index-html": "164e70c326e186c9",
+  "index-html": "8c8d054dff52ab48",
   "grest": "9c0a4587759b4148"
  },
  "daten": {
@@ -213,6 +213,16 @@
     "vorbelegt": 1,
     "profil": "nebenkosten",
     "frage": "Die Kaufnebenkosten — Makler, Notar, Grundbuch und Grunderwerbsteuer, jeweils in Prozent vom Kaufpreis."
+   },
+   {
+    "et": 3,
+    "ids": [
+     "lageklasse"
+    ],
+    "rang": 12,
+    "skalen": 1,
+    "profil": "lage",
+    "frage": "In welcher Lageklasse siehst du das Objekt — A, B oder C?"
    },
    {
     "et": 3,

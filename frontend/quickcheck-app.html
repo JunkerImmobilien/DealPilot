@@ -3535,6 +3535,10 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <option value="B">B-Lage</option>
           <option value="C">C-Lage</option>
         </select>
+        <!-- v2159 · N62.11: sichtbar, solange die Klasse aus der Standardklasse
+             des Profils stammt. Eine Vorbelegung, keine Messung - und weiter
+             die Wahl des Kunden: er hat sie selbst als Standard gesetzt. -->
+        <span id="qc_lageklasse_vorgabe" class="qc-lk-vorgabe" hidden>Vorgabe aus deinem Profil · überschreibbar</span>
       </div>
     </div>
   </div>
@@ -6250,6 +6254,7 @@ function renderTransferList() {
     try { window._qcExposePhotos=[]; } catch(e){}
     try { window.__qbPlzOrtLast=''; } catch(e){}
     try { window.parent.postMessage({source:'dp-qc',type:'qc-reset-buffer'},'*'); } catch(e){}
+    try { if (window.__qcLageVorgabe) window.__qcLageVorgabe.vorbelegen(); } catch(e){} /* v2159 */
     _qbSetRunBtn('abrufen');
     try { if (typeof scheduleUpdate==='function') scheduleUpdate(); } catch(e){}
     showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');
@@ -6488,7 +6493,13 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         var raw=String(v).trim().toLowerCase();
         for(var i=0;i<e.options.length;i++){
           var t=(e.options[i].text||"").toLowerCase(), vv=(e.options[i].value||"").toLowerCase();
-          if(t===raw||vv===raw||(t&&t.indexOf(raw)>=0)||(raw&&raw.indexOf(t)>=0)){ e.selectedIndex=i; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
+          /* v2159: erst exakt (Wert oder Text); der ungefaehre Treffer folgt unten und ueberspringt die leere Option */
+          if(t===raw||vv===raw){ e.selectedIndex=i; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
+        }
+        for(var i2=0;i2<e.options.length;i2++){
+          var t2=(e.options[i2].text||"").toLowerCase(), vv2=(e.options[i2].value||"").toLowerCase();
+          if(!vv2) continue;
+          if((t2&&t2.indexOf(raw)>=0)||(raw&&t2&&raw.indexOf(t2)>=0)){ e.selectedIndex=i2; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
         }
         return;
       }
@@ -6621,7 +6632,40 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/deal-kpis.js?v=v2149"></script>
   <!-- v1956: das Lage-Profil. Eigenes Dokument, eigene Einbindung -
        gleicher Ursprung, also derselbe Speicher wie im Hauptfenster. -->
-  <script src="js/lage-profil.js?v=v1956"></script>
+  <script src="js/lage-profil.js?v=v2159"></script>
+  <style>.qc-lk-vorgabe{display:block;margin-top:4px;font-size:10.5px;letter-spacing:.02em;opacity:.72}.qc-lk-vorgabe[hidden]{display:none}</style>
+  <script>
+  /* v2159 · N62.11 - die Standardklasse des Profils belegt einen NEUEN
+     Quick-Check vor. Nur wenn das Feld leer ist: ein geladener oder
+     diktierter Wert gewinnt immer. Der Hinweis bleibt nur stehen, solange
+     der Wert noch der vorbelegte ist - jede andere Wahl, auch per Diktat,
+     loescht ihn (Pruefung bei change und nach jedem Import-Ergebnis). */
+  (function () {
+    function el() { return document.getElementById('qc_lageklasse'); }
+    function hinweis() {
+      var s = el(), h = document.getElementById('qc_lageklasse_vorgabe');
+      if (!s || !h) return;
+      var gilt = s.dataset.lkVorgabe && s.value === s.dataset.lkVorgabe;
+      if (!gilt) { delete s.dataset.lkVorgabe; }
+      h.hidden = !gilt;
+    }
+    function vorbelegen() {
+      var s = el(), LP = window.DealPilotLageProfil;
+      if (!s || !LP || !LP.standard) return;
+      var k = LP.standard();
+      if (k && !s.value) { s.value = k; s.dataset.lkVorgabe = k;
+        try { s.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
+      hinweis();
+    }
+    window.__qcLageVorgabe = { vorbelegen: vorbelegen, hinweis: hinweis };
+    function los() {
+      vorbelegen();
+      var s = el(); if (s) s.addEventListener('change', hinweis);
+      window.addEventListener('message', function () { setTimeout(hinweis, 0); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los); else los();
+  })();
+  </script>
   <script src="js/score-tiers.js?v=v1950"></script>
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
