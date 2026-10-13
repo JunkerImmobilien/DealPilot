@@ -789,7 +789,7 @@
   function riegelFreigeben() {
     _riegelFrei = window._currentObjKey || null;
     riegelNachziehen();
-    try { toast('Quellen freigegeben - sie koennen jetzt Felder ueberschreiben'); } catch (e) {}
+    try { toast('Quellen freigegeben - sie können jetzt Felder überschreiben'); } catch (e) {}
   }
   window.DealPilotRiegel = {
     greift: _riegelGreift, kernZahl: _riegelKernZahl,
@@ -813,7 +813,7 @@
         tile.setAttribute('data-riegel', 'zu');
         tile.setAttribute('data-riegel-titel', tile.getAttribute('title') || '');
         tile.classList.add('dp-pf-riegel-zu');
-        tile.setAttribute('title', 'Dieses Objekt ist schon gefuellt - diese Quelle wuerde Felder ueberschreiben');
+        tile.setAttribute('title', 'Gesperrt: dieses Objekt ist schon gefüllt — diese Quelle würde Felder überschreiben. Über „Freigeben“ trotzdem einlesen.');
         if (box) { box.checked = false; box.disabled = true; }
         tile.classList.remove('on');
         n++;
@@ -833,23 +833,30 @@
 
   /* Die Zeile sagt WARUM gesperrt ist und bietet den Ausweg an. Ohne sie
      waere der Riegel eine Sperre, die niemand erklaert. */
+  /* v2178 · Marcel am 13.10.2026: „Kann man auf der Datenaufnahmekarte das
+     ‚trotzdem freigeben' ueber die ‚Daten einlesen'-Funktionen abbilden und
+     nur freigeben nennen? Dann wird die Karte naemlich nicht so verzerrt. Es
+     soll trotzdem im Hintergrund ausgegraut sein."
+     Bis v2177 haengte hier eine eigene Zeile unter den Quellen. Jetzt steht
+     eine Kachel „Freigeben" IN der Reihe - ohne Checkbox, damit sie nie als
+     Quelle mitzaehlt (selectedSources liest nur input:checked). Das Warum
+     steht im Tooltip. */
   function _riegelHinweis(bar, zu) {
     var id = 'oab-riegel-hinweis';
     var alt = document.getElementById(id);
     if (!zu) { if (alt) alt.remove(); return; }
     if (alt) return;
-    var seg = bar.querySelector('.dp-pf-tile[data-src="import"]');
-    seg = seg ? seg.closest('.dp-pf-seg') : null;
-    if (!seg) return;
-    var d = document.createElement('div');
-    d.id = id;
-    d.className = 'dp-pf-riegel-hinweis';
-    d.innerHTML = '<span>Quellen gesperrt \u2014 dieses Objekt ist schon gef\u00fcllt.</span>'
-      + ' <button type="button" class="dp-pf-riegel-frei">trotzdem freigeben</button>';
-    d.querySelector('.dp-pf-riegel-frei').addEventListener('click', function (e) {
-      e.preventDefault(); e.stopPropagation(); riegelFreigeben();
-    });
-    seg.appendChild(d);
+    var tile = bar.querySelector('.dp-pf-tile[data-src="import"]');
+    var row = tile ? tile.closest('.dp-pf-row') : null;
+    if (!row) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.id = id;
+    b.className = 'dp-pf-tile tool dp-pf-freigeben';
+    b.title = 'Die Quellen sind gesperrt, weil dieses Objekt schon gefüllt ist — ein neues Einlesen würde Felder überschreiben. Freigeben, um trotzdem einzulesen.';
+    b.innerHTML = '<span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.2"/></svg></span><span class="dp-pf-lbl">Freigeben</span>';
+    b.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); riegelFreigeben(); });
+    row.appendChild(b);
   }
 
   /* Nachziehen, wenn sich etwas aendert: Objektwechsel, Formulareingabe,

@@ -800,7 +800,7 @@ async function saveObj(opts) {
   /* v828-inflight-guard: Doppel-Anlage verhindern. Wenn bereits ein POST fuer ein NEUES
      Objekt laeuft (_currentObjKey noch null), keinen zweiten POST starten. */
   if (_newObjSaveInflight && !_currentObjKey) {
-    try { console.warn('[storage] saveObj: Neu-Anlage laeuft bereits -> zweiter Aufruf uebersprungen (v828)'); } catch(e){}
+    try { console.warn('[storage] saveObj: Neu-Anlage läuft bereits -> zweiter Aufruf übersprungen (v828)'); } catch(e){}
     return;
   }
   /* v893v-race: Lock SOFORT (synchron, vor allen awaits) setzen -> parallele Auto-Saves
@@ -860,7 +860,7 @@ async function saveObj(opts) {
      anderes. Still abbrechen ist richtig: weiterschreiben hiesse, fremde
      (meist leere) Daten unter einer neuen Nummer anzulegen. */
   if (_currentObjKey !== _ctxKey) {
-    try { console.warn('[storage] saveObj: Objektwechsel waehrend des Speicherns -> abgebrochen (v1268)'); } catch (e) {}
+    try { console.warn('[storage] saveObj: Objektwechsel während des Speicherns -> abgebrochen (v1268)'); } catch (e) {}
     _newObjSaveInflight = false;
     return;
   }
@@ -2138,7 +2138,7 @@ function _resetUiAfterDelete() {
 async function _dpSicherungsPaket(objektId) {
   var mitFotos = _v893rExpPhotos();
   var paket = await Auth.apiCall('/objects/portfolio-export' + (mitFotos ? '?fotos=1' : ''));
-  if (!paket || !Array.isArray(paket.objekte)) throw new Error('Der Export kam leer zurueck');
+  if (!paket || !Array.isArray(paket.objekte)) throw new Error('Der Export kam leer zurück');
   /* v2048b - der Stand wird geprueft, BEVOR eine Datei entsteht.
 
      Marcel: "vorher soll der Stand geprueft werden und wenn veraltet
@@ -4581,7 +4581,7 @@ async function _encryptForExport(payload) {
   // Ruft Backend-Endpoint, gibt verschluesselten Blob zurueck.
   const token = localStorage.getItem('ji_token');
   if (!token) {
-    console.warn('[V251-05] Kein Token — Export bleibt unverschluesselt');
+    console.warn('[V251-05] Kein Token — Export bleibt unverschlüsselt');
     return null;
   }
   try {

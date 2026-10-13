@@ -87,7 +87,7 @@
       id: 'qb-save',
       tab: 's-quick',
       selector: '#qc-tab-host, #s-quick',
-      subSelectors: ['#qc-save-btn'],
+      subSelectors: ['#save-btn'],
       subTargets: ['Als Objekt speichern', 'speichern'],
       icon: 'i-piggy-bank',
       title: 'Als Objekt speichern',

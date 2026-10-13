@@ -481,7 +481,7 @@
       var gmbhKey = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : window._currentObjKey;
       var linkEl = document.getElementById('_ueberf_link');
       var privatKey = linkEl ? linkEl.value : '';
-      if (!window.confirm('\u00dcberf\u00fchrung aufheben?\n\nDieses GESELLSCHAFTS-Objekt wird GELOESCHT und das Privat-Objekt aufgetaut (Einfrier-Datum entfernt). Das kann nicht rueckgaengig gemacht werden.')) return;
+      if (!window.confirm('\u00dcberf\u00fchrung aufheben?\n\nDieses GESELLSCHAFTS-Objekt wird GELOESCHT und das Privat-Objekt aufgetaut (Einfrier-Datum entfernt). Das kann nicht rückgängig gemacht werden.')) return;
       if (!window.Auth || !Auth.apiCall) { if (typeof toast === 'function') toast('Nicht eingeloggt.'); return; }
       if (privatKey) {
         try {
@@ -491,7 +491,7 @@
         } catch (e) {}
       }
       if (gmbhKey) { await Auth.apiCall('/objects/' + gmbhKey, { method: 'DELETE' }); }
-      if (typeof toast === 'function') toast('\u2713 \u00dcberf\u00fchrung aufgehoben \u2014 Gesellschafts-Objekt geloescht, Privat-Objekt aufgetaut.');
+      if (typeof toast === 'function') toast('\u2713 \u00dcberf\u00fchrung aufgehoben \u2014 Gesellschafts-Objekt gelöscht, Privat-Objekt aufgetaut.');
       if (privatKey && typeof loadSaved === 'function') { try { await loadSaved(privatKey); } catch (e) {} }
       try { if (typeof renderSaved === 'function') renderSaved({ _immediate: true }); } catch (e) {}
       try { if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio(); } catch (e) {}

@@ -164,7 +164,7 @@
   // Summary-Liste laden (selber Endpoint wie storage.js, kein Doppel-Fetch-Risiko)
   function loadSummaries(){
     if(!window.Auth || typeof window.Auth.apiCall!=='function'){
-      return Promise.reject(new Error('Auth nicht verfuegbar'));
+      return Promise.reject(new Error('Auth nicht verfügbar'));
     }
     return window.Auth.apiCall('/objects?limit=100&_t='+Date.now()).then(function(resp){
       // v452.1 FIX: Response-Form ist resp.items (wie storage.js Sidebar),
@@ -618,8 +618,8 @@
           click: !!st.schaltbar,
           fn: 'DealPilotDashboard.toggleStand()',
           ctitle: imAnkauf
-            ? 'Gerechnet ueber die eingefrorenen Ankauf-Datensaetze — Klick: heutiger Stand'
-            : 'Gerechnet ueber die heutigen Datensaetze — Klick: eingefrorener Ankauf-Stand',
+            ? 'Gerechnet über die eingefrorenen Ankauf-Datensaetze — Klick: heutiger Stand'
+            : 'Gerechnet über die heutigen Datensätze — Klick: eingefrorener Ankauf-Stand',
           h: [ half('Objekte', String(s.n), gold, untenLinks),
                half('Mieteinnahmen / Monat', M(s.mieteM), green,
                     imAnkauf ? 'netto kalt · beim Ankauf' : 'netto kalt') ]
@@ -2003,7 +2003,7 @@
     if(typ==='invest'){
       var fnInv=(typeof window.exportPDF==='function')?window.exportPDF:(typeof exportPDF==='function')?exportPDF:null;
       if(fnInv){ try{ fnInv(); }catch(e){} }
-      else if(typeof window.toast==='function') window.toast('Investment-PDF-Funktion nicht verfuegbar');
+      else if(typeof window.toast==='function') window.toast('Investment-PDF-Funktion nicht verfügbar');
     } else if(typ==='bank'){
       /* v1737 · Hier klapperte eine Namensliste vier Kandidaten ab und nahm
          den ersten Treffer — `exportBmfPdf`, also die Kaufpreisaufteilung
@@ -2014,12 +2014,12 @@
       var fnBank = (typeof window.exportPDFBank === 'function') ? window.exportPDFBank
                  : (typeof window.exportBankPDF === 'function') ? window.exportBankPDF : null;
       if(fnBank){ try{ fnBank(); }catch(e){} }
-      else if(typeof window.toast==='function') window.toast('Bankexport-Funktion nicht verfuegbar');
+      else if(typeof window.toast==='function') window.toast('Bankexport-Funktion nicht verfügbar');
     } else if(typ==='wk-single' || typ==='wk-all'){
       var mode=(typ==='wk-all')?'all-years':'single-year';
       var fnWk=(typeof window.exportWerbungskostenPDF==='function')?window.exportWerbungskostenPDF:(typeof exportWerbungskostenPDF==='function')?exportWerbungskostenPDF:null;
       if(fnWk){ try{ fnWk(mode); }catch(e){} }
-      else if(typeof window.toast==='function') window.toast('Werbungskosten-PDF-Funktion nicht verfuegbar');
+      else if(typeof window.toast==='function') window.toast('Werbungskosten-PDF-Funktion nicht verfügbar');
     }
   }
   function cardPdf(key, typ){
@@ -2061,10 +2061,10 @@
   function headerTrackRecord(){
     if(typeof window.showTrackRecordView==='function'){ closeDashboard(); window.showTrackRecordView(); return; }
     if(typeof window.exportPortfolioStrategyPDF==='function') return window.exportPortfolioStrategyPDF();
-    if(typeof window.toast==='function') window.toast('Track-Record-Funktion nicht verfuegbar');
+    if(typeof window.toast==='function') window.toast('Track-Record-Funktion nicht verfügbar');
   }
   function cardDelete(key, name){
-    if(!confirm('Objekt „'+name+'" wirklich loeschen? Das kann nicht rueckgaengig gemacht werden.')) return;
+    if(!confirm('Objekt „'+name+'" wirklich löschen? Das kann nicht rückgängig gemacht werden.')) return;
     if(!window.Auth||typeof window.Auth.apiCall!=='function') return;
     window.Auth.apiCall('/objects/'+key,{method:'DELETE'}).then(function(){
       _summaries=_summaries.filter(function(o){return (o.id||o.key)!==key;});

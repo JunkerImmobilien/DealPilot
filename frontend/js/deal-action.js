@@ -665,7 +665,7 @@ window.DealPilotDealAction = (function() {
   function renderCard(o) {
     // V256-01: Guard gegen undefined Card-Objekt (verhindert renderTab-Crash)
     if (!o || typeof o !== 'object') {
-      console.warn('[V256-01] renderCard mit ungueltigem Argument aufgerufen:', o);
+      console.warn('[V256-01] renderCard mit ungültigem Argument aufgerufen:', o);
       return '';
     }
     // V256-01: Defaults fuer Pflichtfelder
@@ -2434,7 +2434,7 @@ window.DealPilotDealAction = (function() {
     if (label) {
       label.textContent = status === 'won'  ? 'Status: Gewonnen ✓'
                        : status === 'lost' ? 'Status: Verloren'
-                                           : 'Status: In Pruefung';
+                                           : 'Status: In Prüfung';
     }
     if (sub) {
       sub.textContent = status === 'won'  ? 'Deal als gewonnen markiert.'

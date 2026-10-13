@@ -28,7 +28,7 @@
     /* Vorbedingung: ein Objekt ist geladen */
     if (typeof _currentObjKey === 'undefined' || !window._currentObjKey && typeof _currentObjKey === 'undefined') { /* tolerant */ }
     var _ck = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : (window._currentObjKey || null);
-    if (!_ck) { if (typeof toast === 'function') toast('Bitte zuerst ein Objekt oeffnen, das ueberfuehrt werden soll.'); return; }
+    if (!_ck) { if (typeof toast === 'function') toast('Bitte zuerst ein Objekt öffnen, das ueberfuehrt werden soll.'); return; }
 
     var corps = _corpMandanten();
     if (!corps.length) {

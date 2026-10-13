@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=v2159a';
+  var IFRAME_SRC = 'quickcheck-app.html?v=v2180';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -179,7 +179,7 @@
   // ── (qc-save) Übernahme ──
   function _handleSave(inputs, avm, photos, pendingTargets) {
     /* v893f-guard: Doppel-/Dreifach-Anlage verhindern (iframe schickt qc-save teils mehrfach) */
-    if (_handleSave._busy) { try { console.warn('[qc-bridge] Speichern laeuft bereits \u2014 Doppelauftrag ignoriert (v893f)'); } catch (e) {} return; }
+    if (_handleSave._busy) { try { console.warn('[qc-bridge] Speichern läuft bereits \u2014 Doppelauftrag ignoriert (v893f)'); } catch (e) {} return; }
     _handleSave._busy = true;
     try { setTimeout(function () { _handleSave._busy = false; }, 6000); } catch (e) { _handleSave._busy = false; }
     inputs = inputs || {};
@@ -321,7 +321,7 @@
     // die Rohwerte bleiben in object-actions (_qcPendingMerged) bis zum qc-save.
     try { window._qcExposePhotos = []; } catch (e) {}
     if (!(window.ObjectActions && typeof window.ObjectActions.openImport === 'function')) {
-      console.warn('[qc-bridge] ObjectActions.openImport fehlt — Import nicht moeglich.');
+      console.warn('[qc-bridge] ObjectActions.openImport fehlt — Import nicht möglich.');
       _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: {}, pending: [] });
       return;
     }
@@ -342,7 +342,7 @@
      (v418): qcData -> qc_*-Felder im iframe, Rest -> pendingList (Save-Transfer). */
   function _handleVoice() {
     if (!(window.VoiceImport && typeof window.VoiceImport.open === 'function')) {
-      console.warn('[qc-bridge] VoiceImport.open fehlt — Sprachaufzeichnung nicht moeglich.');
+      console.warn('[qc-bridge] VoiceImport.open fehlt — Sprachaufzeichnung nicht möglich.');
       _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: {}, pending: [] });
       return;
     }

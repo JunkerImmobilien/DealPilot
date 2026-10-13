@@ -107,7 +107,7 @@
       dataUsedBits = 4 + ccBits + bytes.length * 8;
       if (dataUsedBits <= dataCapacityBits) { version = v; break; }
     }
-    if (version === -1) throw new RangeError('Daten zu lang fuer QR (max Version 40)');
+    if (version === -1) throw new RangeError('Daten zu lang für QR (max Version 40)');
 
     var bb = [];
     appendBits(0x4, 4, bb);                         // Byte-Modus

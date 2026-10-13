@@ -178,7 +178,7 @@
       if (typeof window.showQuickCheck === 'function') {
         try { window.showQuickCheck(); return true; } catch(e) {}
       }
-      console.warn('[DpTour V239.2] Quick-Check konnte nicht geoeffnet werden');
+      console.warn('[DpTour V239.2] Quick-Check konnte nicht geöffnet werden');
       return false;
     }
     if (targetSec === 'sidebar' || targetSec === 'header' || targetSec === 'settings') {
@@ -249,10 +249,10 @@
   function _hasUserObjects() {
     var sbList = document.querySelector('#sb-list');
     if (!sbList) return false;
-    var cards = sbList.querySelectorAll('button, a, .sb-card, [data-obj-id], .sidebar-obj-card');
-    if (cards.length > 0) return true;
-    var children = sbList.children;
-    return children && children.length > 0;
+    /* v2178 · Hier zaehlte JEDES Kind von #sb-list - auch der Platzhalter
+       „Lade..." oder „Noch keine Objekte" (storage.js). Damit war die
+       Antwort fast immer „hat Objekte". Gezaehlt werden nur echte Karten. */
+    return sbList.querySelectorAll('.sb-card, [data-obj-id], .sidebar-obj-card').length > 0;
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -380,14 +380,16 @@
             console.log('[DpTour v1747] Demo-Objekt geladen:', (r && r.name) || key);
             /* Die Liste neu holen und warten, bis die Karte wirklich steht -
                nicht auf die Uhr, sondern auf das Ziel. */
-            if (typeof window.refreshSavedList === 'function') {
-              try { window.refreshSavedList(); } catch (ex) {}
-            }
-            var seit = Date.now();
-            (function warte() {
-              if (_sichtbareKarte() || (Date.now() - seit) > 2500) { fertig(key); return; }
-              setTimeout(warte, 70);
-            })();
+            /* v2178 · Hier stand window.refreshSavedList - die Funktion gibt es
+               nirgends (gemessen). Die Liste wurde nie neu gezeichnet, nach
+               2,5 s gab es keine Karte, und das Demo wurde am Ende wieder
+               geloescht, ohne je gezeigt worden zu sein. Jetzt: Liste neu
+               zeichnen UND das Objekt direkt oeffnen - nicht ueber eine Karte,
+               die vielleicht noch nicht steht. */
+            try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (ex) {}
+            var p = null;
+            try { if (typeof window.loadSaved === 'function') p = window.loadSaved(key); } catch (ex) {}
+            Promise.resolve(p).then(function () { fertig(key); }, function () { fertig(key); });
           })
           .catch(function (e) {
             console.warn('[DpTour v1747] Demo-Objekt konnte nicht geladen werden:', e);
@@ -408,7 +410,7 @@
       if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
       window.Auth.apiCall('/objects/' + key, { method: 'DELETE' }).then(function () {
         console.log('[DpTour v1746] Demo-Objekt wieder entfernt:', key);
-        if (typeof window.refreshSavedList === 'function') { try { window.refreshSavedList(); } catch (e) {} }
+        try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {}   /* v2178: refreshSavedList gibt es nicht */
       }).catch(function () {});
     } catch (e) {}
   }
@@ -437,7 +439,18 @@
          in der Schiene. Ein Klick auf eine Huelle laedt nichts.
          v1747 · und sie steht nur dann sichtbar dort, wenn die Schiene auf
          „Portfolio" geschaltet ist - sonst erst umschalten. */
-      _karteSuchen().then(function (firstItem) {
+      /* v2178 · Nach der Erstanmeldung startet die Tour, BEVOR die Liste
+         gezeichnet ist - eine noch nicht gezeichnete Karte galt als „keine".
+         Bis zu 5 s auf die Liste warten, dann erst das Demo anlegen. */
+      (function aufListeWarten() {
+        return new Promise(function (ok) {
+          var seit = Date.now();
+          (function w() {
+            if (_hasUserObjects() || (Date.now() - seit) > 5000) { ok(); return; }
+            setTimeout(w, 120);
+          })();
+        });
+      })().then(_karteSuchen).then(function (firstItem) {
         if (firstItem) {
           _karteKlicken(firstItem);
           /* Auf das geladene Objekt warten statt auf 1800 ms Uhr */
@@ -455,8 +468,10 @@
         console.log('[DpTour v1747] Keine sichtbare Karte und kein Objekt - Demo wird geladen');
         _demoAnlegen().then(function (key) {
           if (!key) { resolve(false); return; }
+          /* v2178: _demoAnlegen oeffnet das Objekt selbst - eine Karte
+             anzuklicken ist nur noch der Rueckfall */
           _karteSuchen().then(function (karte) {
-            if (karte) _karteKlicken(karte);
+            if (karte && window._currentObjKey !== key) _karteKlicken(karte);
             var seit = Date.now();
             (function warte() {
               var h = document.querySelector('#hdr-obj');
@@ -1308,15 +1323,20 @@
       };
       document.addEventListener('keydown', state.onKeydown);
 
-      // V239.1: Erst Objekt laden, dann Tour starten
-      if (hasObjects) {
-        _ensureObjectLoaded().then(function() {
-          console.log('[DpTour V239.1] Object load attempt finished, rendering Step 1');
-          _renderStep();
-        });
-      } else {
+      /* V239.1: Erst Objekt laden, dann Tour starten.
+         v2178 · Marcel: „Wenn danach die Tour startet, wollten wir ein
+         Standard-Objekt laden. Das passiert nicht." Bis hierher holte nur
+         der Zweig „hat Objekte" eines - genau der, der keines braucht. Jetzt
+         in JEDEM Fall; steht danach ein Objekt, gilt die Variante mit
+         Objekten. */
+      _ensureObjectLoaded().then(function(geladen) {
+        if (geladen && state.variant !== 'withObjects' && variants.withObjects) {
+          state.variant = 'withObjects';
+          state.steps = variants.withObjects;
+        }
+        console.log('[DpTour v2178] Objekt geladen:', !!geladen, '| Variante', state.variant);
         _renderStep();
-      }
+      });
       return true;
     },
 
@@ -1799,7 +1819,7 @@
       // oder wenn URL einen ?token=/?verify=/?register=-Param hat
       var qs = window.location.search || '';
       if (/[?&](token|verify|verify_error|register)=/.test(qs)) {
-        console.log('[DpTour V247] Auto-Start unterdrueckt: URL-Param signalisiert Auth-Flow');
+        console.log('[DpTour V247] Auto-Start unterdrückt: URL-Param signalisiert Auth-Flow');
         return;
       }
       // v427: persistenter Marker (URL wird vom register-Handler bereinigt)
@@ -1846,12 +1866,12 @@
         if (Tour.isComplete()) return;
         // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
         if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) {
-          console.log('[DpTour V247/v427] Auto-Start unterdrueckt: Auth-/Register-Modal noch offen');
+          console.log('[DpTour V247/v427] Auto-Start unterdrückt: Auth-/Register-Modal noch offen');
           return;
         }
         // V247: Session muss aktiv sein
         if (typeof Auth !== 'undefined' && typeof Auth.isLoggedIn === 'function' && !Auth.isLoggedIn()) {
-          console.log('[DpTour V247] Auto-Start unterdrueckt: User nicht eingeloggt');
+          console.log('[DpTour V247] Auto-Start unterdrückt: User nicht eingeloggt');
           return;
         }
         /* v1239 · Nicht mehr starten, sondern fragen.

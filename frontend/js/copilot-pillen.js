@@ -40,20 +40,20 @@
   window._dpCpPillenInit = true;
 
   var LOKAL = [
-    { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollstaendig ist dieses Objekt?' },
+    { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollständig ist dieses Objekt?' },
     { id: 'fehlt',  text: 'Was fehlt?',        titel: 'Welche Felder sind noch leer?' }
   ];
   var FRAGEN = [
     { id: 'sollist', text: 'Soll/Ist',
       frage: 'Vergleiche den Ankaufstand mit dem heutigen Stand: Wo liegen wir '
-           + 'besser, wo schlechter, und was heisst das fuer die Bank?' },
+           + 'besser, wo schlechter, und was heißt das für die Bank?' },
     { id: 'tiefer', text: 'Mehr Tiefe?',
-      frage: 'Welche zusaetzlichen Angaben wuerden die Analyse dieses Objekts '
+      frage: 'Welche zusätzlichen Angaben würden die Analyse dieses Objekts '
            + 'belastbarer machen — und was bringt jede davon konkret?' },
     { id: 'risiko', text: 'Risiken',
-      frage: 'Was sind die drei groessten Risiken bei diesem Objekt, '
+      frage: 'Was sind die drei größten Risiken bei diesem Objekt, '
            + 'gemessen an den vorliegenden Zahlen?' },
-    { id: 'bank', text: 'Bankgespraech',
+    { id: 'bank', text: 'Bankgespräch',
       frage: 'Worauf wird die Bank bei diesem Objekt zuerst schauen, '
            + 'und welche Zahl sollte ich vorher kennen?' }
   ];
@@ -92,22 +92,22 @@
 
   function antwortTiefe() {
     var d = daten();
-    if (!d) return 'Die Vollstaendigkeit kann ich gerade nicht messen — '
-      + 'der Zaehler aus dem Reiter Deal-Aktion ist nicht erreichbar.';
+    if (!d) return 'Die Vollständigkeit kann ich gerade nicht messen — '
+      + 'der Zähler aus dem Reiter Deal-Aktion ist nicht erreichbar.';
     var t = [];
     t.push(d.filled + ' von ' + d.total + ' Feldern sind gefuellt (' + d.percent + ' %).');
     if (d.stufe) {
-      t.push('Eingabetiefe ' + d.stufe + ' ist gewaehlt; davon kommen '
+      t.push('Eingabetiefe ' + d.stufe + ' ist gewählt; davon kommen '
         + d.stufe_felder + ' Pflichtfelder der Wertermittlung dazu.');
     }
     if (!d.missing.length) {
       t.push('Es fehlt nichts — alle Felder dieser Stufe und alle '
-        + 'Investor-Deal-Score-Felder sind ausgefuellt.');
+        + 'Investor-Deal-Score-Felder sind ausgefüllt.');
     } else {
       t.push('Offen sind noch ' + d.missing.length + '.');
       if (d.stufe && d.stufe < 3) {
-        t.push('Fuer eine Wertermittlung nach ImmoWertV braucht es Eingabetiefe 3 — '
-          + 'die Pille dafuer steht oben im Reiter Objekt.');
+        t.push('Für eine Wertermittlung nach ImmoWertV braucht es Eingabetiefe 3 — '
+          + 'die Pille dafür steht oben im Reiter Objekt.');
       }
     }
     return t.join(' ');
@@ -125,8 +125,8 @@
     var art   = d.missing.filter(function (m) { return m.art; });
     var score = d.missing.filter(function (m) { return !m.stufe && !m.art; });
     var t = ['Es fehlen ' + d.missing.length + ' Angaben:'];
-    if (score.length) t.push('• ' + score.length + ' fuer den Investor-Deal-Score');
-    if (stufe.length) t.push('• ' + stufe.length + ' fuer die Wertermittlung (Eingabetiefe '
+    if (score.length) t.push('• ' + score.length + ' für den Investor-Deal-Score');
+    if (stufe.length) t.push('• ' + stufe.length + ' für die Wertermittlung (Eingabetiefe '
       + (d.stufe || '?') + ')');
     if (art.length)   t.push('• ' + art.length + ' Pflichtfelder der Objektart');
     t.push('Klick auf eine Angabe, dann springe ich hin.');

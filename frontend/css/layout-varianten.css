@@ -9443,3 +9443,29 @@ html[data-dp-layout] .dpl-schiene .dk-seg[data-dk-modus="ankauf"].aktiv{
   color:var(--wl-e8cc7a,#E8CC7A);
   box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 45%, transparent);
 }
+
+/* ══ v2178 · DIE AKTIONEN VERDECKEN DIE HOHEN KARTEN NICHT MEHR ═════════════
+   Marcel am 13.10.2026: „Wenn ich Aktenmappe oder Kanzlei oder Tower als Aussehen ausgewaehlt habe und
+   Objektkarte Kennzahlen oder Aktenreiter ausgewaehlt ist, wird viel verdeckt von den Flaechen duplizieren
+   und loeschen. Da ist ein grosses schwarzes Kaestchen drueber."
+   GEMESSEN: v1707 (oben) gibt .sbc-actions in der Schiene height:100% und einen Verlauf bis #15140F -
+   auf den hohen Karten (Kachelband) eine kartenhohe, fast schwarze Flaeche ueber Kacheln, Preis und Ring,
+   bei der AKTIVEN Karte dauerhaft. Ohne Layout ist das seit v2114 geloest (Kopfzone, s. o.) - hier
+   dieselbe Loesung fuer Aktenreiter (kein Attribut) und Kennzahlen. Spezifitaet gleich den Hover/
+   Aktiv-Regeln oben, daher am Ende der Datei. */
+html[data-dp-layout]:not([data-dp-objkarte]) .dpl-schiene .sb-card .sbc-actions,
+html[data-dp-layout]:not([data-dp-objkarte]) .dpl-schiene .sb-card:hover .sbc-actions,
+html[data-dp-layout]:not([data-dp-objkarte]) .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout]:not([data-dp-objkarte]) .dpl-schiene .sb-card.is-active .sbc-actions,
+html[data-dp-layout][data-dp-objkarte="kennzahlen"] .dpl-schiene .sb-card .sbc-actions,
+html[data-dp-layout][data-dp-objkarte="kennzahlen"] .dpl-schiene .sb-card:hover .sbc-actions,
+html[data-dp-layout][data-dp-objkarte="kennzahlen"] .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout][data-dp-objkarte="kennzahlen"] .dpl-schiene .sb-card.is-active .sbc-actions{
+  top:6px !important;
+  bottom:auto !important;
+  height:auto !important;
+  transform:none !important;
+  align-items:flex-start !important;
+  padding:0 !important;
+  background:transparent !important;
+}

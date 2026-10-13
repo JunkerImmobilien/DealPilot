@@ -87,15 +87,15 @@
   /* ── Semantik-Hinweise (Bedeutung/Einheit; Select-Optionen kommen aus dem DOM) ── */
   var HINTS = {
     str: 'Strasse', hnr: 'Hausnummer', plz: 'Postleitzahl', ort: 'Ort',
-    objart: 'Objektart', wfl: 'Wohnflaeche in m2', gsfl: 'Grundstuecksflaeche in m2',
-    baujahr: 'Baujahr', kaufdat: 'Kaufdatum', wirtschaftlicher_uebergang: 'Wirtschaftlicher Uebergang (Datum)',
+    objart: 'Objektart', wfl: 'Wohnfläche in m2', gsfl: 'Grundstücksfläche in m2',
+    baujahr: 'Baujahr', kaufdat: 'Kaufdatum', wirtschaftlicher_uebergang: 'Wirtschaftlicher Übergang (Datum)',
     kuerzel: 'Objekt-Kuerzel/Spitzname', ausst: 'Ausstattungsbeschreibung',
     thesis: 'Investment-These', risiken: 'Risiken', notizen: 'Sonstige Bemerkungen/Notizen',
     bankval: 'Bankbewertung in Euro', svwert: 'Marktwert/Verkehrswert in Euro',
     makrolage: 'Makrolage (Stadt/Region, Wirtschaft, Infrastruktur)',
     mikrolage: 'Mikrolage (Viertel, Strasse, Umfeld)',
     /* v2159 · N62.11 */
-    lageklasse: 'Lageklasse des Investors: A (Toplage, beste Lage), B (solide, mittlere Lage) oder C (Randlage, einfache Lage). Nur setzen, wenn ausdruecklich A-, B- oder C-Lage gesagt wird',
+    lageklasse: 'Lageklasse des Investors: A (Toplage, beste Lage), B (solide, mittlere Lage) oder C (Randlage, einfache Lage). Nur setzen, wenn ausdrücklich A-, B- oder C-Lage gesagt wird',
     vermstand: 'Vermietungsstand', exitstr: 'Exit-Strategie',
     kp: 'Kaufpreis in Euro', makler_p: 'Maklerprovision in Prozent', notar_p: 'Notarkosten in Prozent',
     gba_p: 'Grundbuchamt in Prozent', gest_p: 'Grunderwerbsteuer in Prozent',
@@ -119,24 +119,24 @@
        er landet ueber buildFullCatalog im Prompt. Die zweite Haelfte steht
        als Regel 14 im Backend-Prompt; ein Hinweis allein wird gern
        ueberlesen, wenn zwei Felder fast gleich heissen. */
-    moebl: 'GESAMTSUMME Inventar (Kueche + Moebel + Geraete). NUR nutzen, wenn EIN Gesamtbetrag genannt wird. Werden Einzelposten genannt, stattdessen inv_kueche / inv_moebel / inv_geraete fuellen und dieses Feld WEGLASSEN',
-    inv_kueche: 'Kueche als Einzelposten in Euro', inv_moebel: 'Moebel/Einrichtung als Einzelposten in Euro (ohne Kueche)',
-    inv_geraete: 'Investition Geraete in Euro', inv_pv: 'Investition Photovoltaik in Euro',
+    moebl: 'GESAMTSUMME Inventar (Küche + Möbel + Geräte). NUR nutzen, wenn EIN Gesamtbetrag genannt wird. Werden Einzelposten genannt, stattdessen inv_kueche / inv_moebel / inv_geraete fuellen und dieses Feld WEGLASSEN',
+    inv_kueche: 'Küche als Einzelposten in Euro', inv_moebel: 'Moebel/Einrichtung als Einzelposten in Euro (ohne Küche)',
+    inv_geraete: 'Investition Geräte in Euro', inv_pv: 'Investition Photovoltaik in Euro',
     inv_stellplatz: 'Investition Stellplatz in Euro', inv_sonst: 'Investition Sonstiges in Euro',
     brw: 'Bodenrichtwert in Euro pro m2', mea: 'Miteigentumsanteil',
     mietstg: 'Mietsteigerung in Prozent pro Jahr', wertstg: 'Wertsteigerung in Prozent pro Jahr',
     kostenstg: 'Kostensteigerung in Prozent pro Jahr', leerstand: 'Leerstand in Prozent',
     btj: 'Betrachtungszeitraum in Jahren', exit_bmy: 'Exit-Mietmultiplikator',
     nkm: 'Nettokaltmiete in Euro pro Monat',
-    ze: 'Zusatzeinnahmen in Euro pro Monat \u2014 SUMME aller Posten (z.B. Kuechenmiete, Stellplatz, Garage)',
+    ze: 'Zusatzeinnahmen in Euro pro Monat \u2014 SUMME aller Posten (z.B. Küchenmiete, Stellplatz, Garage)',
     ze_stp: 'Stellplatz-/Garagenmiete in Euro pro Monat (Einzelposten)',
-    ze_kueche: 'Kuechenmiete in Euro pro Monat (Einzelposten)',
+    ze_kueche: 'Küchenmiete in Euro pro Monat (Einzelposten)',
     ze_sonst: 'Sonstige Zusatzeinnahmen in Euro pro Monat (Einzelposten)',
-    umlagef: 'Umlagefaehige Nebenkosten in Euro pro Monat',
-    afa_satz: 'AfA-Satz in Prozent', geb_ant: 'Gebaeudeanteil in Prozent',
+    umlagef: 'Umlagefähige Nebenkosten in Euro pro Monat',
+    afa_satz: 'AfA-Satz in Prozent', geb_ant: 'Gebäudeanteil in Prozent',
     zve: 'Zu versteuerndes Einkommen in Euro pro Jahr', grenz: 'Grenzsteuersatz in Prozent',
     ek: 'Eigenkapital in Euro', d1: 'Darlehen 1 Summe in Euro', d1z: 'Darlehen 1 Sollzins in Prozent',
-    d1t: 'Darlehen 1 anfaengliche Tilgung in Prozent', d1_bindj: 'Darlehen 1 Zinsbindung in Jahren',
+    d1t: 'Darlehen 1 anfängliche Tilgung in Prozent', d1_bindj: 'Darlehen 1 Zinsbindung in Jahren',
     d1_type: 'Darlehen 1 Typ', d1_auszahl: 'Darlehen 1 Auszahlungsdatum',
     anschl_z: 'Anschlusszins in Prozent', anschl_t: 'Anschlusstilgung in Prozent',
     d2: 'Darlehen 2 Summe in Euro', d2z: 'Darlehen 2 Sollzins in Prozent',
@@ -150,18 +150,18 @@
        nennen als dem Rechenkern ist ein Faktor 12, den niemand sieht. */
     hg_ul: 'Hausgeld-Anteil, der auf den Mieter UMLEGBAR ist, in Euro pro Jahr',
     hg_nul: 'Hausgeld-Anteil, der NICHT umlegbar ist, in Euro pro Jahr',
-    grundsteuer: 'Grundsteuer in Euro pro Jahr', ul_sonst: 'Sonstige umlagefaehige Kosten in Euro pro Jahr',
-    weg_r: 'WEG-Ruecklage in Euro pro Jahr', eigen_r: 'Eigene Ruecklage in Euro pro Jahr',
-    mietausfall: 'Mietausfallwagnis in Prozent', nul_sonst: 'Sonstige nicht umlagefaehige Kosten in Euro pro Jahr',
-    bwk_ul_pct: 'Bewirtschaftungskosten umlagefaehig in Prozent', bwk_nul_pct: 'Bewirtschaftungskosten nicht umlagefaehig in Prozent',
+    grundsteuer: 'Grundsteuer in Euro pro Jahr', ul_sonst: 'Sonstige umlagefähige Kosten in Euro pro Jahr',
+    weg_r: 'WEG-Ruecklage in Euro pro Jahr', eigen_r: 'Eigene Rücklage in Euro pro Jahr',
+    mietausfall: 'Mietausfallwagnis in Prozent', nul_sonst: 'Sonstige nicht umlagefähige Kosten in Euro pro Jahr',
+    bwk_ul_pct: 'Bewirtschaftungskosten umlagefähig in Prozent', bwk_nul_pct: 'Bewirtschaftungskosten nicht umlagefähig in Prozent',
     bwk_kp_pct: 'Bewirtschaftungskosten in Prozent vom Kaufpreis',
     mietspiegel: 'Mietspiegel in Euro pro m2', me_soll: 'Soll-Miete in Euro pro m2',
     me_anz: 'Anzahl Mieterhöhungen', me_int: 'Intervall Mieterhöhung in Jahren', me_pct: 'Mieterhöhung in Prozent',
     ds2_zustand: 'Zustand des Objekts/der Wohnung', ds2_energie: 'Energieeffizienz/Energieklasse',
     ds2_mietausfall: 'Mietausfall-Risiko', ds2_marktmiete: 'Marktmiete in Euro pro m2',
-    ds2_bevoelkerung: 'Bevoelkerungsentwicklung am Standort', ds2_nachfrage: 'Nachfrage-Indikator am Standort',
+    ds2_bevoelkerung: 'Bevölkerungsentwicklung am Standort', ds2_nachfrage: 'Nachfrage-Indikator am Standort',
     ds2_marktfaktor: 'Marktfaktor', ds2_wertsteigerung: 'Wertsteigerungs-Erwartung', ds2_entwicklung: 'Entwicklung der Lage',
-    rate_kueche: 'Zustand Kueche (Sterne 1-5)', rate_bad: 'Zustand Bad (Sterne 1-5)',
+    rate_kueche: 'Zustand Küche (Sterne 1-5)', rate_bad: 'Zustand Bad (Sterne 1-5)',
     rate_boden: 'Zustand Boden (Sterne 1-5)', rate_fenster: 'Zustand Fenster (Sterne 1-5)',
     qual_kueche: 'Qualitaet Kueche', qual_bad: 'Qualitaet Bad', qual_boden: 'Qualitaet Boden', qual_fenster: 'Qualitaet Fenster',
     zimmer: 'Anzahl Zimmer', bad_anz: 'Anzahl Baeder', etage: 'Etage', etagen_ges: 'Etagen gesamt',
@@ -508,7 +508,7 @@
        versteht: er setzt das Haekchen und feuert change, sonst bliebe die
        Rechenkette stehen. */
     if ($("erbpacht")) cat.push({ id: 'erbpacht', kind: 'bool', label: 'Erbbaurecht / Erbpacht',
-      hint: 'Das Grundstueck gehoert nicht mit, es wird gegen Erbbauzins ueberlassen. Nur setzen, wenn ausdruecklich von Erbbaurecht, Erbpacht oder Erbbauzins die Rede ist.' });
+      hint: 'Das Grundstück gehört nicht mit, es wird gegen Erbbauzins überlassen. Nur setzen, wenn ausdrücklich von Erbbaurecht, Erbpacht oder Erbbauzins die Rede ist.' });
     return cat;
   }
   function catalogEntry(catalog, id) {
@@ -1388,21 +1388,21 @@
   var EXPLAIN = {
     plz:'Postleitzahl des Objekts', ort:'Stadt / Gemeinde', str:'Strassenname',
     hnr:'Hausnummer', objart:'Art des Objekts (z.B. Eigentumswohnung, Mehrfamilienhaus)',
-    wfl:'Wohnflaeche in m\u00b2', baujahr:'Baujahr des Gebaeudes',
+    wfl:'Wohnfläche in m\u00b2', baujahr:'Baujahr des Gebäudes',
     kaufdat:'Datum des Kaufvertrags (Beurkundung)',
     wirtschaftlicher_uebergang:'Nutzen-/Lastenwechsel: ab wann Mieten & Kosten dir zufliessen \u2014 oft nach dem Kaufdatum',
     zimmer:'Anzahl Zimmer', etage:'Etage / Geschoss',
     stellpl_aussen:'Anzahl Aussenstellplaetze', garagen:'Anzahl Garagen / Tiefgaragen',
     kp:'Kaufpreis in Euro', san:'Geplante Sanierungs-/Renovierungskosten in Euro',
-    moebl:'Was wird mitverkauft? Kueche, Moebel, Geraete — Wert in Euro',
-    nkm:'Netto-Kaltmiete (ohne Nebenkosten)', ze:'Zusatzeinnahmen pro Monat (Stellplatz, Kueche \u2026) \u2014 Summe',
+    moebl:'Was wird mitverkauft? Küche, Möbel, Geräte — Wert in Euro',
+    nkm:'Netto-Kaltmiete (ohne Nebenkosten)', ze:'Zusatzeinnahmen pro Monat (Stellplatz, Küche \u2026) \u2014 Summe',
     hg_ul:'Hausgeld-Anteil, der auf den Mieter UMLEGBAR ist',
-    hg_nul:'Hausgeld-Anteil, der NICHT umlegbar ist (traegt der Eigentuemer)',
+    hg_nul:'Hausgeld-Anteil, der NICHT umlegbar ist (trägt der Eigentümer)',
     grundsteuer:'Grundsteuer pro Jahr',
     ek:'Eingesetztes Eigenkapital in Euro', d1z:'Sollzinssatz des Darlehens in %',
-    d1t:'Anfaengliche Tilgung in %', d1_bindj:'Zinsbindung in Jahren',
+    d1t:'Anfängliche Tilgung in %', d1_bindj:'Zinsbindung in Jahren',
     brw:'Bodenrichtwert pro m\u00b2', mea:'Miteigentumsanteil in %',
-    gsfl:'Grundstuecksflaeche in m\u00b2',
+    gsfl:'Grundstücksfläche in m\u00b2',
     makrolage:'Lage im Grossen (Stadt / Region / Wirtschaft)',
     mikrolage:'Lage im Kleinen (Viertel / Strasse / Umfeld)',
     ds2_zustand:'Zustand der Wohnung', ds2_energie:'Energieeffizienzklasse',
@@ -6905,7 +6905,7 @@
     ds2_entwicklung: ['Entwicklungsmoeglichkeiten', 'Ausbau, Anbau, Teilung — oder keine'],
     /* Etappe 6 · Kauf und Steuer */
     kaufdat:        ['Kaufdatum',               'Maerz 2026'],
-    wirtschaftlicher_uebergang: ['Uebergang von Mieten und Kosten', '1. Mai 2026'],
+    wirtschaftlicher_uebergang: ['Übergang von Mieten und Kosten', '1. Mai 2026'],
     afa_satz:       ['AfA-Satz',                '2 Prozent'],
     geb_ant:        ['Gebaeudeanteil',          '75 Prozent'],
     grenz:          ['Grenzsteuersatz',         '42 Prozent'],
@@ -6917,18 +6917,18 @@
     /* Wertermittlung */
     standardstufe:  ['Ausstattungsstufe',       '1 bis 5 — 3 ist normal'],
     garagen:        ['Garagen',                 '2'],
-    stellpl_aussen: ['Stellplaetze im Freien',  '4'],
-    garagen_bgf_qm: ['Grundflaeche der Garagen', '36 Quadratmeter'],
+    stellpl_aussen: ['Stellplätze im Freien',  '4'],
+    garagen_bgf_qm: ['Grundfläche der Garagen', '36 Quadratmeter'],
     modernis:       ['Modernisierungen',        'Dach 2015, Fenster 2018'],
     /* Restnutzungsdauer */
     mod_dach:       ['Dach',                    '2015, oder nicht gemacht'],
     mod_fenster:    ['Fenster',                 '2018, oder nicht gemacht'],
-    mod_aussenwand: ['Aussenwaende und Daemmung', '2015, oder nicht gemacht'],
+    mod_aussenwand: ['Außenwände und Dämmung', '2015, oder nicht gemacht'],
     mod_heizung:    ['Heizung',                 '2020, oder nicht gemacht'],
     mod_leitungen:  ['Leitungen',               'nicht gemacht'],
     mod_baeder:     ['Baeder',                  '2019, oder nicht gemacht'],
     mod_innenausbau: ['Innenausbau',            'nicht gemacht'],
-    mod_grundriss:  ['Grundriss',               'unveraendert, oder 2019 geoeffnet'],
+    mod_grundriss:  ['Grundriss',               'unveraendert, oder 2019 geöffnet'],
   };
 
   /** Die Antworthilfe zu einem Feld — was der Nutzer sagen kann. */
@@ -7969,7 +7969,7 @@
           '<b>' + escH(_rfKonfliktWert(k.id, k.neu)) + '</b>' +
           '<i>' + escH(k.quelleNeu) + '</i></div>' +
       '</div>' +
-      '<div class="vi-rf-zaehler">Ich rechne mit dem, den du waehlst — und die Herkunft ' +
+      '<div class="vi-rf-zaehler">Ich rechne mit dem, den du wählst — und die Herkunft ' +
         'steht danach in der Übersicht.</div>');
 
     _rfAktion('knf_neu', 'Der abgerufene Wert ersetzt deine Angabe. Die Herkunft wird mitgefuehrt.',
@@ -9242,7 +9242,7 @@
       if (_n) {
         var _namen = ['Makrolage', 'Mikrolage', 'Bevoelkerung', 'Nachfrage', 'Wertsteigerung'];
         _rfBlase('co', '...Daraus habe ich <b>' + _n + ' Angabe' + (_n === 1 ? '' : 'n') +
-          '</b> uebernommen — mit Herkunft, nicht als deine Schaetzung.' +
+          '</b> übernommen — mit Herkunft, nicht als deine Schätzung.' +
           (_restOffen ? ' Was jetzt noch fehlt, frage ich gleich.' : ''));
       }
       if (!_restOffen) {
@@ -12163,7 +12163,7 @@
             }).join('');
             if (qm.calls) {
               zeilen += '<div style="display:flex;justify-content:space-between;gap:12px">' +
-                '<span>Live-Hilfe waehrend des Sprechens</span><span>' + qm.calls + ' Laufe' + '</span></div>';
+                '<span>Live-Hilfe während des Sprechens</span><span>' + qm.calls + ' Laufe' + '</span></div>';
             }
             var kd = document.createElement('details');
             kd.style.cssText = 'margin:10px 0 4px;font-size:12px;color:#7A7370';

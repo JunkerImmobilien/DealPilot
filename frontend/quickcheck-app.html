@@ -5700,7 +5700,7 @@ const QcApp = (function() {
   async function runRealAi(opt) {
     var _auto = !!(opt && opt.automatisch);
     closeApiModal();
-    showToast(_auto ? '\u2728 KI-Bewertung laeuft \u2026' : '\u2728 Analyse laeuft \u2026');
+    showToast(_auto ? '\u2728 KI-Bewertung läuft \u2026' : '\u2728 Analyse läuft \u2026');
     document.getElementById('ai-source').textContent = 'DealPilot \u00b7 KI-Analyse';
 
     const inputs = QcEngine.getInputs();
@@ -5710,13 +5710,13 @@ const QcApp = (function() {
     try { _uFuerKi = _qcUrteil(score, inputs, score.kpi || {}, null); } catch (_e) {}
 
     if (!window.parent || window.parent === window) {
-      showToast('\u26a0 Analyse nur in der App verfuegbar');
+      showToast('\u26a0 Analyse nur in der App verfügbar');
       return;
     }
 
     /* Eine Anfrage nach der anderen - zwei gleichzeitig wuerden sich die
        Antwort gegenseitig wegnehmen. */
-    if (_aiWartet) { showToast('\u23f3 Eine Analyse laeuft bereits'); return; }
+    if (_aiWartet) { showToast('\u23f3 Eine Analyse läuft bereits'); return; }
 
     var abgelaufen = setTimeout(function () {
       if (_aiWartet) { _aiWartet = null; showToast('\u26a0 Zeitueberschreitung');

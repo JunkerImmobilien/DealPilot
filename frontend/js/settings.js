@@ -829,19 +829,11 @@ function showSettings(initialTab) {
            Geprueft wird mit `Plan.full()`, nicht `Plan.can()`: gemessen
            gibt `can('theme_palette')` auch im Partner-Plan false,
            `full()` und `mode()` sagen beide 'full'. */
-        (function(){
-          var frei = true;
-          try { if (window.Plan && typeof Plan.full === 'function') frei = !!Plan.full('theme_palette'); } catch(e){}
-          if (frei) {
-            return '<button type="button" class="btn" style="margin-bottom:12px" onclick="_dpOpenFromSettings()">Darstellung \u00f6ffnen</button>';
-          }
-          /* Sichtbar, aber zu — wer nicht weiss, dass es das gibt, fragt
-             auch nicht danach. Der Grund steht daneben, nicht im Tooltip. */
-          return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
-                   '<button type="button" class="btn" disabled style="opacity:.5;cursor:not-allowed">Darstellung \u00f6ffnen</button>' +
-                   '<span class="hint" style="margin:0">Feineinstellungen (Vorlagen, Farben, Schrift) ab <strong>Pro</strong></span>' +
-                 '</div>';
-        })() +
+        /* v2178 · Marcel am 13.10.2026: "Unter Anzeigeoptionen bitte
+           Darstellung oeffnen entfernen. Steht nur fuer Partner zur
+           Verfuegung." Partner erreichen das Panel ueber ihr Portal
+           (reseller-portal.js). Hier stand bis v2177 der Knopf, frei ab Pro. */
+        '' +
         '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
           /* v1706: HIER STAND DIE WAHL OBSIDIAN / HELL UND DER KNOPF
              DARSTELLUNG OEFFNEN.
@@ -3472,7 +3464,7 @@ function _v213ResetCards() {
     var current = getMode();
     return '<div class="dp-bg-toggle-wrap">' +
       '<div class="dp-bg-toggle-title">Hintergrund</div>' +
-      '<div class="dp-bg-toggle-desc">Waehle das visuelle Theme der App.</div>' +
+      '<div class="dp-bg-toggle-desc">Wähle das visuelle Theme der App.</div>' +
       '<div class="dp-bg-toggle">' +
       modes.map(function(m) {
         return '<div class="dp-bg-option' + (m.key === current ? ' active' : '') + '" ' +

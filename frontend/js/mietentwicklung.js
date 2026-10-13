@@ -306,8 +306,8 @@ window.MietEntwicklung = (function() {
       if (nutzbar) btnE.style.removeProperty('opacity');
       else btnE.style.setProperty('opacity', '.45', 'important');
       btnE.title = nutzbar
-        ? ('Aus den Mietvertraegen der einzelnen Wohnungen (' + einheitenStand().mit + ' mit Staffel)')
-        : 'Keine Wohnung ist fuer die Mietentwicklung angehakt - im MFH-Konfigurator je Wohnung setzen.';
+        ? ('Aus den Mietverträgen der einzelnen Wohnungen (' + einheitenStand().mit + ' mit Staffel)')
+        : 'Keine Wohnung ist für die Mietentwicklung angehakt — im MFH-Konfigurator je Wohnung setzen.';
     }
     if (blkP && blkD) {
       blkP.style.display = mode === 'prog' ? '' : 'none';

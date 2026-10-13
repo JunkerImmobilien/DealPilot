@@ -40817,12 +40817,27 @@ html[data-dp-verify="1"] .body{
 #sb-list .dk-leer{order:2;margin:10px 4px;padding:12px 14px;border:1px dashed rgba(140,134,120,.45);
   border-radius:10px;font:400 12px/1.5 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#A8A299)}
 .ank-ansicht-kopf.ank-schlank.ank-mit-wahl{justify-content:space-between;cursor:default;gap:10px 16px}
+/* v2178 · Marcel: "Umschalter SOLL und IST kann man nicht immer lesen, weil Text weiss ist."
+   Gemessen: inaktiver Text var(--dp-ink-30) ist im hellen Skin hellgrau auf Creme.
+   Der Schalter traegt jetzt seinen EIGENEN dunklen Grund - lesbar in jedem Skin. */
 .ank-wahl{display:inline-flex;gap:3px;padding:3px;border-radius:9px;
-  background:rgba(140,134,120,.14);border:1px solid rgba(140,134,120,.3)}
+  background:#141210;border:1px solid rgba(201,168,76,.35)}
 .ank-seg{border:0;background:transparent;padding:6px 12px;border-radius:7px;cursor:pointer;
-  font:600 12px/1.2 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#8b8678);white-space:nowrap}
-.ank-seg:hover{color:var(--dp-ink-1,#2A2727)}
+  font:600 12px/1.2 Inter,system-ui,sans-serif;color:#D6CFBF;white-space:nowrap}
+.ank-seg:hover{color:#FDFCFA}
 .ank-seg.aktiv{background:var(--wl-c9a84c, #C9A84C);color:#1a1407}
 body.dp-ankauf-frei .ank-ansicht-kopf.ank-schlank{padding:8px 12px !important;border-radius:10px !important}
 body.dp-ankauf-frei .ank-seg{color:#ffffff}
 body.dp-ankauf-frei .ank-seg.aktiv{background:#ffffff;color:#8E4A45}
+
+/* v2178 · Marcel: "Unter Einstellungen ist die Einwilligung fuer Telegram komplett gross geschrieben."
+   Gemessen: .set-modal-v2 label und .set-modal-cream .pane-wrap .f label setzen JEDES Label auf Versalien -
+   auch eines, das einen Haken mit einem ganzen Satz traegt. Feldbeschriftungen bleiben Versalien,
+   Haken-Saetze werden normal geschrieben. */
+/* :not(#dp-nie) hebt auf ID-Stufe: .set-modal-cream .pane-wrap .f label (0,3,1) schluege sonst (0,2,2). Beschraenkt auf Haken-Labels. */
+.set-modal-v2 label:has(> input[type="checkbox"]):not(#dp-nie),
+.set-modal-v2 label:has(> input[type="radio"]):not(#dp-nie){text-transform:none;letter-spacing:normal}
+
+/* v2178 · Kachel „Freigeben“ in der Reihe „Daten einlesen“ statt eigener Hinweiszeile (object-actions.js _riegelHinweis).
+   Ein <button> erbt keine Tile-Schrift; ausgegraut wird sie nie - sie ist der Ausweg. */
+.dp-pfbar .dp-pf-tile.dp-pf-freigeben{font:inherit;cursor:pointer;opacity:1 !important;filter:none !important;pointer-events:auto}

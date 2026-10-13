@@ -339,8 +339,8 @@
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
     platz(80, 'Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
     abschnitt('Herleitung der amtlichen Arbeitshilfe');
-    einleitung('Gerechnet hat die Arbeitshilfe des Bundesfinanzministeriums selbst; die Werte stammen aus ihrem Berechnungsblatt. Bei einem Mietwohngrundstueck fuehrt sie ueber das Ertragswertverfahren, sonst ueber den Sachwert.');
-    zeile('Bodenwert (Flaeche × Bodenrichtwert)', eur(bodenwert));
+    einleitung('Gerechnet hat die Arbeitshilfe des Bundesfinanzministeriums selbst; die Werte stammen aus ihrem Berechnungsblatt. Bei einem Mietwohngrundstück führt sie über das Ertragswertverfahren, sonst über den Sachwert.');
+    zeile('Bodenwert (Fläche × Bodenrichtwert)', eur(bodenwert));
     if (sachwert) zeile('Sachwert (marktangepasst)', eur(sachwert));
     if (ertrag) zeile('Ertragswert', eur(ertrag));
     zeile('Massgebender Verkehrswert', eur(vw), { fett: true });
@@ -353,7 +353,7 @@
     /* ── Aufteilung mit Abschlag ─────────────────────────────────── */
     neueSeite('Kaufpreisaufteilung für den Notarvertrag', 'Angepasste Aufteilung mit Abschlag auf den Grund und Boden');
     abschnitt('Angepasste Kaufpreisaufteilung - amtlich gegen ' + pct(abschlag, 0) + ' Abschlag');
-    einleitung('Die Arbeitshilfe bindet das Finanzgericht nicht (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine niedrigere Bodenkomponente ist ansetzbar, wenn sie begruendet ist' + (grundBegr ? ' - hier: ' + grundBegr : '') + '.');
+    einleitung('Die Arbeitshilfe bindet das Finanzgericht nicht (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine niedrigere Bodenkomponente ist ansetzbar, wenn sie begründet ist' + (grundBegr ? ' - hier: ' + grundBegr : '') + '.');
     function zv(label, a, n, fmt, fett) {
       var d = (a != null && n != null) ? n - a : null;
       return { fett: !!fett, werte: [label, fmt ? fmt(a) : eur(a), fmt ? fmt(n) : eur(n),
@@ -467,7 +467,7 @@
     abschnitt('Grundlagen und Hinweise');
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
     [
-      'Die amtliche Aufteilung stammt aus der Arbeitshilfe des Bundesfinanzministeriums (Berechnungsblatt), ausgefuehrt mit den oben genannten Angaben.',
+      'Die amtliche Aufteilung stammt aus der Arbeitshilfe des Bundesfinanzministeriums (Berechnungsblatt), ausgeführt mit den oben genannten Angaben.',
       'Der Abschlag auf den Grund und Boden ist ein Szenario daneben und ersetzt die Arbeitshilfe nicht. Er braucht eine Begründung, die zum Grundstück passt, und ist im Zweifel nachzuweisen.',
       'Dieses Dokument ist eine Aufbereitung der Berechnung und keine Steuerberatung. Die Feststellung trifft das Finanzamt.'
     ].forEach(function (t) {

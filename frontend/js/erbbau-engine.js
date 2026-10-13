@@ -193,7 +193,7 @@
          darunter, und genau darin steckt der halbe Wert. */
       zinsVertragEur = zinsAngemessenEur;
       out.hinweise.push('Kein Erbbauzins angegeben - gerechnet wird mit einem marktgerechten Vertrag. ' +
-        'Alte Vertraege liegen oft deutlich darunter; dann faellt der Abschlag kleiner aus.');
+        'Alte Verträge liegen oft deutlich darunter; dann fällt der Abschlag kleiner aus.');
     }
     var bwf = barwertfaktor(i, rlz);
     var zinsvorteil = (zinsAngemessenEur - zinsVertragEur) * bwf;
@@ -212,8 +212,8 @@
       restGeb = gebaeudeanteil * ((rnd - rlz) / rnd);
       heimfall = restGeb * (1 - ent / 100) * azf;
     } else if (rnd == null) {
-      out.hinweise.push('Keine Restnutzungsdauer angegeben - der Heimfall bleibt unberuecksichtigt. ' +
-        'Ueberlebt das Gebaeude den Vertrag, faellt der Abschlag hoeher aus.');
+      out.hinweise.push('Keine Restnutzungsdauer angegeben - der Heimfall bleibt unberücksichtigt. ' +
+        'Ueberlebt das Gebäude den Vertrag, fällt der Abschlag höher aus.');
     }
 
     /* Zusammensetzen. */
@@ -233,14 +233,14 @@
       if (!markt.imRahmen) {
         out.hinweise.push('Der gerechnete Abschlag von ' + abschlagPct.toFixed(1) + ' % liegt ausserhalb der ' +
           'Spanne, die bei ' + sp.text + ' (' + sp.von + '-' + sp.bis + ' %) am Markt beobachtet wird. ' +
-          'Das kann stimmen - ein sehr guenstiger oder sehr teurer Erbbauzins wirkt genau so. ' +
+          'Das kann stimmen - ein sehr günstiger oder sehr teurer Erbbauzins wirkt genau so. ' +
           'Vertragszins, Restlaufzeit und Bodenwert bitte gegenlesen.');
       }
     }
 
     if (rlz < 30) {
       out.hinweise.push('Unter 30 Jahren Restlaufzeit finanzieren die meisten Banken nicht mehr voll - ' +
-        'die Tilgung muss dann innerhalb der Restlaufzeit durch sein. Das trifft den Wiederverkauf haerter ' +
+        'die Tilgung muss dann innerhalb der Restlaufzeit durch sein. Das trifft den Wiederverkauf härter ' +
         'als die Rechnung zeigt.');
     }
 
@@ -266,7 +266,7 @@
       restlaufzeit: rlz,
       restnutzungsdauer: rnd,
       zinsGeschaetzt: !zinsBekannt,
-      quelle: '§ 50 ImmoWertV 2021, Zinssaetze nach § 193 Abs. 4 BewG, Entschaedigung § 27 ErbbauRG'
+      quelle: '§ 50 ImmoWertV 2021, Zinssätze nach § 193 Abs. 4 BewG, Entschädigung § 27 ErbbauRG'
     };
     out.markt = markt;
     return out;

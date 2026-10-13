@@ -126,7 +126,7 @@
        die Einheiten-Fallen. Sie stehen im JSON genauso. */
     z.push('');
     z.push('# DealPilot Portfolio-Export vom ' + paket.erzeugt_am);
-    z.push('# ' + paket.anzahl_objekte + ' Objekte. Das vollstaendige Paket (alle Felder,');
+    z.push('# ' + paket.anzahl_objekte + ' Objekte. Das vollständige Paket (alle Felder,');
     z.push('# Pilot-Analysen, Ankauf-Staende, Feld-Lexikon) liegt in der JSON-Datei.');
     (paket.lexikon && paket.lexikon.hinweise ? paket.lexikon.hinweise : []).forEach(function (h) {
       z.push('# ' + h.replace(/`/g, ''));
@@ -187,7 +187,7 @@
   function nachfragen(b) {
     var z = [];
     if (b.veraltet.length) z.push('\u26a0 ' + b.veraltet.length + ' von ' + b.gesamt
-      + ' Pilot-Analysen sind VERALTET \u2014 die Zahlen haben sich seitdem geaendert:\n   \u2022 '
+      + ' Pilot-Analysen sind VERALTET \u2014 die Zahlen haben sich seitdem geändert:\n   \u2022 '
       + b.veraltet.slice(0, 6).join('\n   \u2022 ')
       + (b.veraltet.length > 6 ? '\n   \u2022 \u2026 und ' + (b.veraltet.length - 6) + ' weitere' : ''));
     if (b.ohne.length) z.push('\u2139 ' + b.ohne.length + ' Objekte haben noch GAR KEINE Pilot-Analyse.');

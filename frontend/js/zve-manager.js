@@ -140,7 +140,7 @@
 
     var html = '<div class="zve-editor-wrap" style="margin-top:22px;padding-top:18px;border-top:1px solid rgba(201,168,76,0.18)">';
     html += '<div style="font-family:var(--font-main,\'IBM Plex Sans\',sans-serif);font-weight:600;font-size:14px;color:var(--ch,#2A2727);margin-bottom:4px">Zu versteuerndes Einkommen (zvE)</div>';
-    html += '<div style="font-size:12.5px;color:var(--muted,#7A7370);margin-bottom:12px">Dein zvE wird zentral hier gespeichert und in alle Objekte uebernommen. Fuer historische Jahre (z.B. vor einer Lohnerhoehung) kannst du eigene Eintraege hinzufuegen.</div>';
+    html += '<div style="font-size:12.5px;color:var(--muted,#7A7370);margin-bottom:12px">Dein zvE wird zentral hier gespeichert und in alle Objekte übernommen. Für historische Jahre (z.B. vor einer Lohnerhöhung) kannst du eigene Einträge hinzufügen.</div>';
 
     html += '<div style="margin-bottom:14px"><label style="font-size:12px;color:var(--muted,#7A7370);display:block;margin-bottom:4px">Aktuelles zvE / Jahr</label>';
     html += '<div style="display:flex;gap:8px;align-items:center"><input type="text" id="zve-profile-current" inputmode="decimal" value="' + current.toLocaleString('de-DE') + '" placeholder="65000" style="height:38px;padding:0 11px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;font-family:var(--font-main,\'IBM Plex Sans\',sans-serif);width:200px;background:#fff" />';
@@ -148,7 +148,7 @@
 
     html += '<div style="font-size:12px;color:var(--muted,#7A7370);margin-bottom:6px">Historische Eintraege</div>';
     if (history.length === 0) {
-      html += '<div style="font-size:13px;color:var(--muted,#7A7370);font-style:italic;padding:8px 0">Keine historischen Eintraege. Klick "Hinzufuegen" um z.B. den zvE vor einer Lohnerhoehung einzutragen.</div>';
+      html += '<div style="font-size:13px;color:var(--muted,#7A7370);font-style:italic;padding:8px 0">Keine historischen Einträge. Klick "Hinzufügen" um z.B. den zvE vor einer Lohnerhöhung einzutragen.</div>';
     } else {
       html += '<div style="border:1px solid rgba(201,168,76,0.18);border-radius:8px;overflow:hidden;margin-bottom:10px">';
       history.forEach(function(e, i) {

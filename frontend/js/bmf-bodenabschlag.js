@@ -328,7 +328,7 @@
           setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
           if (window.toast) window.toast('+ Arbeitshilfe als PDF gespeichert');
         })
-        .catch(function (e) { if (window.toast) window.toast('Arbeitshilfe als PDF nicht moeglich: ' + e.message); })
+        .catch(function (e) { if (window.toast) window.toast('Arbeitshilfe als PDF nicht möglich: ' + e.message); })
         .then(function () { ahKnopf.disabled = false; ahKnopf.textContent = alt; });
     };
     var pdfKnopf = el('bmf-boden-pdf');

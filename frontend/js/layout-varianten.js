@@ -1211,6 +1211,12 @@
     if (v && !LAYOUTS[v]) v = '';
     zurueck();
     aktuell = v;
+    /* v2178 · Marcel: „Beim Aussehen DealPilot fehlt der Umschalter mit
+       Bestand und Ankauf. Der kam bei mir erst, als ich gefiltert habe."
+       GEMESSEN: der Schalter haengt nach einem Layoutwechsel an der
+       entfernten Schiene und wird erst beim naechsten Neuzeichnen der
+       Liste neu gebaut. Nach JEDEM setze() einmal neu anlegen. */
+    setTimeout(function () { try { if (window.DealPilotDoppelkarte) DealPilotDoppelkarte.anlegen(); } catch (e) {} }, 0);
     var h = document.documentElement;
     if (!v) {
       kopfOffenHalten(false);
@@ -1324,6 +1330,11 @@
          Marken passen. */
       try { if (typeof window._dpDispRefresh === 'function') window._dpDispRefresh(); } catch (e) {}
       try { localStorage.removeItem(LS); } catch (e) {}
+      /* v2178 · Marcel: „Standard-Setup vom Aussehen DealPilot ist immer
+         mit den Objektkarten Kennzahlen." Wer auf DealPilot wechselt,
+         bekommt die Kennzahlen-Karte; aendern laesst sie sich danach
+         in den Einstellungen wie jede andere. */
+      try { if (window.DealPilotObjektkarte && typeof DealPilotObjektkarte.setze === 'function') DealPilotObjektkarte.setze('kennzahlen'); } catch (e) {}
       schalterNachziehen();
       return;
     }

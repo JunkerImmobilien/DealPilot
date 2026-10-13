@@ -439,9 +439,9 @@
     if (!rows.length) sperren.push({ was: 'Cashflow-Jahre', wo: 'Reiter Finanzierung', warum: 'Ohne sie gibt es keine Jahresuebersicht und keinen Vermoegensaufbau.' });
 
     if (darlehen > 0 && !(zahl(K.dscr) > 0)) warnen.push('Der Kapitaldienstdeckungsgrad steht auf null, obwohl ein Darlehen hinterlegt ist.');
-    if (!(zahl(K.bwk) > 0) && !(zahl(K.bwk_cf) > 0)) warnen.push('Keine Bewirtschaftungskosten hinterlegt - der Cashflow faellt dadurch zu hoch aus.');
-    if (!isFinite(Number(K.irr))) warnen.push('Kein interner Zinsfuss (IRR) - dafuer fehlen die Angaben zum Verkauf.');
-    if (!(zahl(K.steuer) !== 0)) warnen.push('Keine Steuerwirkung gerechnet - Grenzsteuersatz und Abschreibung pruefen.');
+    if (!(zahl(K.bwk) > 0) && !(zahl(K.bwk_cf) > 0)) warnen.push('Keine Bewirtschaftungskosten hinterlegt - der Cashflow fällt dadurch zu hoch aus.');
+    if (!isFinite(Number(K.irr))) warnen.push('Kein interner Zinsfuss (IRR) - dafür fehlen die Angaben zum Verkauf.');
+    if (!(zahl(K.steuer) !== 0)) warnen.push('Keine Steuerwirkung gerechnet - Grenzsteuersatz und Abschreibung prüfen.');
 
     /* v1511 · Marcel 22.09.2026: "es gibt doch die Standardfelder, die wir
        ausfuellen muessen. Da haben wir doch einen Counter fuer, ob wir

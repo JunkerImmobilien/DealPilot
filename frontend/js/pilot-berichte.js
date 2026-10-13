@@ -127,7 +127,7 @@
       return { objekte_mit_bericht: je.length, berichte_gesamt: liste.length,
         berichte: je.slice(0, 40),
         hinweis: 'Je Objekt steht hier der JÜNGSTE Bericht. Diese Marktwerte '
-          + 'stammen aus dem Marktbericht, nicht aus der Vermoegensbilanz — '
+          + 'stammen aus dem Marktbericht, nicht aus der Vermögensbilanz — '
           + 'stelle sie daneben, bilde keine Summe und kein Mittel daraus.' };
     });
   }

@@ -400,7 +400,7 @@ function _getZveForDateWithFallback(yearStr) {
     if (match && typeof match.zve === 'number' && match.zve > 0) {
       return {
         zve: match.zve,
-        source: 'letzter bekannter Wert (gueltig ab ' + match.valid_from + ')',
+        source: 'letzter bekannter Wert (gültig ab ' + match.valid_from + ')',
         exact: false,
         period: match
       };
