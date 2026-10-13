@@ -33,7 +33,7 @@
            nicht mehr, und ein Kontingent, das man nicht sieht, ist genau
            die Blackbox, die der Testbericht bemaengelt. */
         '<span class="dp-cp-badge" id="dp-cp-rest">' + cpBadgeText() + '</span>' +
-        '<label class="dp-cp-web" title="Erlaubt dem Co-Pilot, fuer aktuelle Marktdaten im Web zu recherchieren"><input type="checkbox" id="dp-cp-web"><span>Web-Recherche</span></label>' +
+        '<label class="dp-cp-web" title="Erlaubt dem Co-Pilot, für aktuelle Marktdaten im Web zu recherchieren"><input type="checkbox" id="dp-cp-web"><span>Web-Recherche</span></label>' +
         /* v1703: Marcels Auftrag - „eine neue Anfrage an unsere
            Schnittstelle, wie denn so die gaengigen Marktpreise sind.
            Kann man ja vorher sagen, dass das einen Abruf kosten wuerde."

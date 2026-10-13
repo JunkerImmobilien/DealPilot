@@ -1073,7 +1073,7 @@ label.dp-required.qc-required::after {
        Zweispalten-Reihe — gemessen 2003 px unter dem Seitenanfang, also
        hinter zwei sehr hohen Karten. Jetzt steht er direkt unter der
        Ueberschrift, wo die Zahl hingehoert, und sagt selbst, was sie ist. -->
-  <div class="wert-puffer" id="wert-puffer" style="display:none" title="Verkehrswert minus Kaufpreis. Ist der Verkehrswert hoeher, kaufst du unter Wert — der Puffer ist sofortiges Eigenkapital, ohne dass du etwas dafuer eingezahlt hast. Negativ heisst: du zahlst ueber Marktwert. Der Verkehrswert kommt aus dem Feld weiter unten oder aus einem importierten Gutachten; ohne ihn bleibt die Zeile leer."><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
+  <div class="wert-puffer" id="wert-puffer" style="display:none" title="Verkehrswert minus Kaufpreis. Ist der Verkehrswert höher, kaufst du unter Wert — der Puffer ist sofortiges Eigenkapital, ohne dass du etwas dafür eingezahlt hast. Negativ heisst: du zahlst über Marktwert. Der Verkehrswert kommt aus dem Feld weiter unten oder aus einem importierten Gutachten; ohne ihn bleibt die Zeile leer."><span>Sofortiger Wertpuffer / Equity</span><span id="wert-puffer-val" class="c-green fw6"></span></div>
 
   <!-- v1313: Der Wertpuffer darueber rechnet beim Erbbaurecht auf einem
        bereits GEKUERZTEN Verkehrswert. Ohne diese Zeile faellt der Puffer
@@ -1107,7 +1107,7 @@ label.dp-required.qc-required::after {
             <option value="stark_sanierungsbeduerftig">Stark sanierungsbedürftig</option>
           </select>
         </div>
-      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fuenf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualitaet des Gebaeudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
+      <div class="f"><label title="Die Normalherstellungskosten 2010 staffeln die Baukosten nach fünf Standardstufen — von sehr einfach (1) bis stark gehoben (5). Die Stufe beschreibt die Ausstattungsqualität des Gebäudes, nicht seinen Zustand; der Zustand steckt im Modernisierungsgrad.">Standardstufe (NHK 2010)</label><div class="iw"><select id="standardstufe">
         <option value="">— keine Angabe —</option>
         <option value="1">1 · sehr einfach (nur Häuser)</option>
         <option value="2">2 · einfach (nur Häuser)</option>
@@ -1335,7 +1335,7 @@ label.dp-required.qc-required::after {
                Investors - an ihr haengt die Zielrendite und damit der
                Verhandlungsspielraum. Kein DS2-Abzeichen: sie geht nicht in
                den Investor Deal Score, sondern in die Heuristik. -->
-          <div class="f"><label>Lageklasse <span class="oe-lk-tag" title="Bestimmt deine Zielrendite aus den Einstellungen. Daraus rechnet DealPilot, auf welchen Kaufpreis du verhandeln muesstest.">Ziel</span></label><select id="lageklasse" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll()"><option value="" selected>- keine Angabe -</option><option value="A">A-Lage</option><option value="B">B-Lage</option><option value="C">C-Lage</option></select></div>
+          <div class="f"><label>Lageklasse <span class="oe-lk-tag" title="Bestimmt deine Zielrendite aus den Einstellungen. Daraus rechnet DealPilot, auf welchen Kaufpreis du verhandeln müsstest.">Ziel</span></label><select id="lageklasse" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll()"><option value="" selected>- keine Angabe -</option><option value="A">A-Lage</option><option value="B">B-Lage</option><option value="C">C-Lage</option></select></div>
           <div class="f"><label>Makrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="makrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f"><label>Mikrolage <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><select id="mikrolage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"><option value="" selected>– keine Angabe –</option><option value="sehr_schwach">Sehr schwach</option><option value="schwach">Schwach</option><option value="durchschnittlich">Durchschnittlich</option><option value="gut">Gut</option><option value="sehr_gut">Sehr gut</option></select></div>
       <div class="f">
@@ -1389,7 +1389,7 @@ label.dp-required.qc-required::after {
         <div class="ki-lage-title">
           <span id="ki-lage-icon" class="ki-lage-icon" data-ico="sparkles" data-ico-size="20"></span>
           <span>Pilot-Lage-Bewertung</span>
-          <span class="ki-lage-tag" title="v2175: vier Felder gemessen aus unseren Daten, zwei aus der KI">4 gemessen · 2 KI</span>
+          <span class="ki-lage-tag" title="Vier Lage-Felder werden aus amtlichen Daten gemessen, zwei ergänzt die KI">4 gemessen · 2 KI</span>
         </div>
         <button class="btn btn-gold btn-sm" id="ki-lage-btn" onclick="runKiLage()" type="button">
           <span data-ico="sparkles" data-ico-size="14"></span> Komplette Lage analysieren
@@ -1453,7 +1453,7 @@ label.dp-required.qc-required::after {
     <div class="card-title">Grundlagen</div>
     <div class="g3">
       
-      <div class="f"><label title="Bruttogrundflaeche nach DIN 277: alle Grundflaechen aller Grundrissebenen, aussen gemessen. NICHT die Wohnflaeche — die BGF ist regelmaessig deutlich groesser und ist die Bezugsgroesse der NHK.">Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div><button type="button" class="oe-btn oe-btn-klein" id="oe-bgf-schaetzen" title="Grobe Näherung: Wohnfläche × 1,35 — der Faustwert, mit dem auch der Bericht rechnet, wenn die BGF fehlt. Kein Ersatz für die Bauzeichnung (DIN 277).">aus Wohnfläche schätzen</button><span class="hint oe-bgf-hint" id="oe-bgf-hint"></span></div>
+      <div class="f"><label title="Bruttogrundfläche nach DIN 277: alle Grundflächen aller Grundrissebenen, außen gemessen. NICHT die Wohnfläche — die BGF ist regelmäßig deutlich größer und ist die Bezugsgröße der NHK.">Bruttogrundfläche (m²)</label><div class="iw"><input id="bgf" type="text" inputmode="decimal" placeholder="nur für den Sachwert bei Häusern" class="tr"><span class="sfx">m²</span></div><button type="button" class="oe-btn oe-btn-klein" id="oe-bgf-schaetzen" title="Grobe Näherung: Wohnfläche × 1,35 — der Faustwert, mit dem auch der Bericht rechnet, wenn die BGF fehlt. Kein Ersatz für die Bauzeichnung (DIN 277).">aus Wohnfläche schätzen</button><span class="hint oe-bgf-hint" id="oe-bgf-hint"></span></div>
       
       <div class="f"><label>Grundrissart</label><div class="iw"><select id="grundriss">
         <option value="">— keine Angabe —</option>
@@ -1462,7 +1462,7 @@ label.dp-required.qc-required::after {
         <option value="dreispaenner">Dreispänner · 3 Wohnungen (× 0,97)</option>
         <option value="vierspaenner">Vierspänner · 4 Wohnungen (× 0,95)</option>
       </select></div></div>
-      <div class="f"><label title="Punktesystem der Anlage 2: durchgefuehrte Modernisierungen (Dach, Fenster, Heizung, Baeder, Leitungen ...) ergeben Punkte, aus denen sich die verlaengerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualitaet.">Modernisierungsgrad (Anlage 2)</label><div class="iw"><select id="mod_punkte">
+      <div class="f"><label title="Punktesystem der Anlage 2: durchgeführte Modernisierungen (Dach, Fenster, Heizung, Bäder, Leitungen ...) ergeben Punkte, aus denen sich die verlängerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualität.">Modernisierungsgrad (Anlage 2)</label><div class="iw"><select id="mod_punkte">
         <option value="">— keine Angabe, wird geschätzt —</option>
         <option value="0">nicht modernisiert</option>
         <option value="4">kleine Modernisierungen im Rahmen der Instandhaltung</option>
@@ -1470,8 +1470,8 @@ label.dp-required.qc-required::after {
         <option value="14">überwiegend modernisiert</option>
         <option value="19">umfassend modernisiert</option>
       </select></div></div>
-      <div class="f"><label title="Marktanpassungsfaktor nach Paragraf 21 Abs. 3 ImmoWertV: er fuehrt den vorlaeufigen Sachwert zum marktangepassten Sachwert. Er kommt vom oertlichen Gutachterausschuss und ist keine Schaetzung — ohne Faktor bleibt der Sachwert vorlaeufig.">Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
-      <div class="f"><label title="Nur die Stellplatz- und Garagenmiete. Die Nettokaltmiete der Wohnung steht im Tab Miete und wird von dort uebernommen — sie fehlt hier nicht, sie steht nur nicht zweimal. Die Bewirtschaftungskosten-Quoten rechnen auf dem GESAMTEN Rohertrag, also einschliesslich dieser Stellplaetze.">Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
+      <div class="f"><label title="Marktanpassungsfaktor nach Paragraf 21 Abs. 3 ImmoWertV: er führt den vorläufigen Sachwert zum marktangepassten Sachwert. Er kommt vom örtlichen Gutachterausschuss und ist keine Schätzung — ohne Faktor bleibt der Sachwert vorläufig.">Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
+      <div class="f"><label title="Nur die Stellplatz- und Garagenmiete. Die Nettokaltmiete der Wohnung steht im Tab Miete und wird von dort übernommen — sie fehlt hier nicht, sie steht nur nicht zweimal. Die Bewirtschaftungskosten-Quoten rechnen auf dem GESAMTEN Rohertrag, also einschliesslich dieser Stellplätze.">Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
       <div class="f"><label>Sonstige Einnahmen (€/Jahr)</label><div class="iw"><span class="pfx">€</span><input id="sonstige_jahr" type="text" inputmode="decimal" placeholder="Werbefläche, Antennenanlage …" class="trl"></div></div>
     </div>
 
@@ -1555,7 +1555,7 @@ label.dp-required.qc-required::after {
     <div class="card-title">Ansätze des Sachverständigen</div>
     <p class="sec-desc" style="margin:-6px 0 12px">Nur für den Ausnahmefall. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus der Parametertabelle, Bodenrichtwert über BORIS.</p>
     <div class="g3">
-      <div class="f"><label title="Der Zinssatz, mit dem der Verkehrswert von Grundstuecken im Durchschnitt marktueblich verzinst wird (Paragraf 21 Abs. 2 ImmoWertV). Er kommt vom oertlichen Gutachterausschuss und steuert den Ertragswert stark — schon ein halber Punkt verschiebt ihn spuerbar.">Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher bzw. gesetzlicher Wert" class="tr"><span class="sfx">%</span></div></div>
+      <div class="f"><label title="Der Zinssatz, mit dem der Verkehrswert von Grundstücken im Durchschnitt marktüblich verzinst wird (Paragraf 21 Abs. 2 ImmoWertV). Er kommt vom örtlichen Gutachterausschuss und steuert den Ertragswert stark — schon ein halber Punkt verschiebt ihn spürbar.">Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher bzw. gesetzlicher Wert" class="tr"><span class="sfx">%</span></div></div>
       <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
       <div class="f"><label>Bodenwert-Anpassung (%)</label><div class="iw"><input id="brw_anpassung_pct" type="text" inputmode="decimal" placeholder="z. B. -10 für Lärmbelastung" class="tr"><span class="sfx">%</span></div></div>
       <div class="f s2"><label>Begründung der Anpassung</label><div class="iw"><input id="brw_anpassung_grund" type="text" placeholder="Pflicht, sobald eine Anpassung eingetragen ist" class="tr"></div></div>
@@ -1908,11 +1908,11 @@ label.dp-required.qc-required::after {
       <div class="card" id="mv-objekt-karte" style="margin-bottom:14px">
         <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-doc"/></svg></span>Mietvertrag
           <span class="oe-ct-hint" id="mv-objekt-hinweis">für dieses Objekt</span></div>
-        <div class="f"><label title="Die Vertragsform bestimmt, ob und wann erhoeht werden darf. Staffel- und Indexmiete tragen ihren naechsten Termin schon im Vertrag — sie sind kein Potenzial, sondern ein Datum.">Vertragsart</label>
+        <div class="f"><label title="Die Vertragsform bestimmt, ob und wann erhöht werden darf. Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag — sie sind kein Potenzial, sondern ein Datum.">Vertragsart</label>
           <div class="iw"><select id="mv_art"><option value="">– keine Angabe –</option></select></div></div>
-        <div class="f"><label title="Seit wann das Mietverhaeltnis besteht. Bei Staffelmiete die Grundlage fuer die Stufen, bei Indexmiete fuer die Zwoelfmonatsfrist.">Mietverhältnis seit</label>
+        <div class="f"><label title="Seit wann das Mietverhältnis besteht. Bei Staffelmiete die Grundlage für die Stufen, bei Indexmiete für die Zwölfmonatsfrist.">Mietverhältnis seit</label>
           <div class="iw"><input id="mv_beginn" type="date"></div></div>
-        <div class="f"><label title="Wann die Miete zuletzt erhoeht wurde. Daran haengen die Kappungsgrenze und bei Indexmieten die Frist bis zur naechsten Anpassung.">Letzte Erhöhung</label>
+        <div class="f"><label title="Wann die Miete zuletzt erhöht wurde. Daran hängen die Kappungsgrenze und bei Indexmieten die Frist bis zur nächsten Anpassung.">Letzte Erhöhung</label>
           <div class="iw"><input id="mv_letzte_erhoehung" type="date"></div></div>
         <p class="hint" id="mv-objekt-mfh-hinweis" style="display:none"></p>
       </div>
@@ -2316,7 +2316,7 @@ label.dp-required.qc-required::after {
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px">
       <button type="button" class="btn btn-sm"
               onclick="if(window.DealPilotBelegImport)DealPilotBelegImport.open('wk')"
-              title="Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen als PDF oder Foto einlesen. Die KI teilt eine Hausgeldabrechnung in umlagefaehige und nicht umlagefaehige Kosten auf und erkennt die Ruecklagenzufuehrung."
+              title="Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen als PDF oder Foto einlesen. Die KI teilt eine Hausgeldabrechnung in umlagefähige und nicht umlagefähige Kosten auf und erkennt die Rücklagenzuführung."
               style="background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border:1px solid var(--wl-b8932f, #b8932f);padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit">
         📎 Belege &amp; Abrechnungen einlesen (KI)
       </button>
@@ -3028,7 +3028,7 @@ label.dp-required.qc-required::after {
         <!-- v1312: der Erbbauzins steckt in der Summe darunter, ist aber kein Feld
              hier - er kommt aus dem Reiter Objekt. Ohne diese Zeile taucht er in den
              Kosten auf, ohne dass jemand sagen koennte, woher. -->
-        <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefaehig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
+        <div class="f"><label>davon Erbbauzins <span class="info-tag" title="Kommt aus dem Reiter Objekt, Grund &amp; Boden. Nicht umlagefähig (§ 2 BetrKV kennt ihn nicht), aber steuerlich abziehbar.">ℹ Objekt</span></label><div class="cf" id="erb_zins_j">—</div></div>
         <div class="f"><label>Summe nicht umlagefähig</label><div class="cf" id="nul_sum">—</div></div>
       </div>
     </div>
@@ -3730,7 +3730,7 @@ label.dp-required.qc-required::after {
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
-<script src="js/portfolio-pilot.js?v=v2170"></script>
+<script src="js/portfolio-pilot.js?v=v2179"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=v1904a"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
@@ -4166,7 +4166,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<script src="js/copilot.js?v=v1980"></script>
+<script src="js/copilot.js?v=v2179"></script>
 <script src="js/copilot-pillen.js?v=v2082"></script>
 <script src="js/dp-diktat.js?v=v1760"></script><!-- v1760 · Mikrofon fuer Textfelder -->
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->

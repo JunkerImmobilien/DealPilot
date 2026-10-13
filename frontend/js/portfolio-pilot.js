@@ -101,7 +101,7 @@
           '<span class="dp-pp-t">Portfolio-Pilot</span>' +
           '<span class="dp-pp-s">Analyse ueber alle Objekte — und Fragen zu jedem einzelnen</span>' +
         '</div>' +
-        '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, fuer aktuelle Marktdaten im Web zu recherchieren">' +
+        '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, für aktuelle Marktdaten im Web zu recherchieren">' +
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
         '<button type="button" class="dp-pp-go" id="dp-pp-go">Portfolio-Analyse starten</button>' +
       '</div>' +
