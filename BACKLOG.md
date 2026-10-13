@@ -166,6 +166,8 @@ Gemessen in der Messkabine (11 Breiten × 9 Reiter + 8 Ansichten). Überlauf, He
 
 #### N62.23 · Frage an Marcel: vw-modul (Junker Gutachten-Modul V4.2)
 
+> **✅ ENTSCHIEDEN 13.10.2026 — ignorieren.** Marcel: das Zip ist eine ältere Fassung für die Junker-Homepage; der Rechenkern der neueren Version (VW-Modul V422) ist bereits gegengeprüft und in DealPilot eingebaut. Die Homepage zieht er selbst irgendwann nach. Kein Auftrag hier.
+
 Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Backlog-Zeile. Inhalt (nur gelesen, README): eigenständige Web-App für Verkehrswert-, RND- und Kaufpreisaufteilungs-Gutachten mit Word-Vorlagen und PDF über LibreOffice/PHP, gedacht für die **Junker-Homepage / das Portal** (/modules/vw/), nicht für DealPilot. Nicht angefasst. **Zu klären:** gehört das in DealPilot (z. B. als Modul neben dem BMF-Rechner und dem RND-Assistenten) oder bleibt es auf der Homepage?
 
 #### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet

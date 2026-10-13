@@ -38714,6 +38714,32 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod (13) v2191–v2198c · Backlog-Paket + Responsive-Check (13.10.2026)
+
+- **Was:** main ← staging (21 Commits), Backend und mb-Backend neu gebaut.
+- **Commit:** `c5bc8a3f` (main)
+- **Nachweis:**
+  - Gesichert in `/root/backups/`: `main-20261013-1758.sql.gz` (11 MB, 71 CREATE TABLE) und `mb-20261013-1758.sql.gz` (25 MB, 30).
+  - Rebuild RC=0, `dealpilot-backend` healthy.
+  - Log mb-backend: `apply 018_plz_orte_laufzeiten.sql … OK`, listening :4000.
+  - `mb.plz_orte` und `mb.laufzeiten` existieren (je 0 Zeilen, füllen sich mit dem ersten Bericht).
+  - Prod liefert `pilot-tower.js?v=v2198a`.
+- **Entschieden (Marcel):** N62.23 vw-modul wird ignoriert. Die neuere Fassung (V422) ist gegengeprüft und eingebaut, die Homepage zieht Marcel selbst nach.
+- **Nachgemessen für Marcels Frage nach Rot/Grün und Touch:**
+  - Rot `#B8625C` liegt bei 3,8–4,3:1, zum Beispiel:
+    - Datenaufnahme-Status „15 fehlt", „Anlage 2 greift nicht" (10 px)
+    - Finanzierung DSCR-Badge und „DSCR: Kritisch"
+    - Steuer-Hinweis „Keine Steuerberatung"
+  - Grün `#3FA56C` liegt bei 2,6–3,1:1, zum Beispiel:
+    - Bankgespräch-Titel „Erstrangige Grundschuld", „Vollständig vermietet"
+    - Steuer-Beträge „+0 €"
+  - Touch bei 390 px:
+    - Kartenknöpfe `sbc-btn` 26×26 (in der Objektschublade)
+    - Checkboxen 16×16 (`erbpacht`, `inv_tax_active`, `me_inc_ze`, …), meist in einem anklickbaren Label
+    - Pilot-Knopf 38×38
+    - Kontingent-Pille 110×32
+- **Rest:** Grün/Rot-Variante wartet auf Marcels Entscheidung, die Touch-Flächen auf die Abnahme am Gerät.
+
 ### v2198–v2198c · Kompletter Responsive-Check (13.10.2026, Staging)
 
 - **Was:** Marcels Master-Prompt „vollständiger Responsive-, UI-/UX- und Funktionalitätscheck".
