@@ -95,14 +95,43 @@ export const DestatisConnector = {
     // automatisch auf den regionalstatistik-Kreis-Code mappen -> robust gegen stale .env.
     const popRaw = cfg.destatis.tablePopulation || '12411-01-01-4';
     const popCode = /^\d{5}-\d{4}$/.test(popRaw) ? '12411-01-01-4' : popRaw;
+    /* ══ v2165 · DREI KENNZAHLEN, DIE NIE ANKAMEN ══════════════════════
+       Gemessen am 13.10.2026 im Container: nur die Bevoelkerung kam an.
+         82411-01-03-4  -> Code 104, die Tabelle gibt es nicht mehr
+         13211-02-05-4  -> Code 98 „zu gross", weil ohne Kreisfilter geholt
+       Und keiner der 162 Berichte hatte je eine zweite echte Kennzahl - der
+       Makro-Score bestand bis v2158 aus Platzhaltern, seitdem wird die
+       Makrolage nie gesetzt (sie braucht zwei gemessene).
+       Ersatz, mit Kreisfilter gemessen (Minden-Lübbecke):
+         82000-07-01-4  verfuegb. Einkommen je EW, letzte Spalte  28.375 € (2023)
+         AI008-1        Arbeitslosenquote, Spalte 3              6,4 % (2025)
+         AI002-1        Wanderungssaldo je 10.000 EW, Spalte 9    34,3 (2024)
+       Die alten Codes stehen noch in der .env - sie werden hier umgelenkt,
+       wie oben beim Bevoelkerungscode. */
+    const _tot = { '82411-01-03-4': '82000-07-01-4', '13211-02-05-4': 'AI008-1' };
+    const _inc = cfg.destatis.tableIncome || '82000-07-01-4';
+    const _unemp = cfg.destatis.tableUnemployment || 'AI008-1';
     const tables = {
       bevoelkerung: popCode,
-      einkommen: cfg.destatis.tableIncome,
-      arbeitslosenquote: cfg.destatis.tableUnemployment,
+      einkommen: _tot[_inc] || _inc,
+      arbeitslosenquote: _tot[_unemp] || _unemp,
+      wanderung: 'AI002-1',
     };
     const series = {};
+    const _atlas = {};   /* v2165: Zeilen der Atlas-/VGR-Tabellen, je Schluessel */
     for (const [key, name] of Object.entries(tables)) {
       if (!name) continue;
+      if (key !== 'bevoelkerung') {
+        try {
+          /* Einkommen OHNE Kreisfilter: die Antwort traegt dann auch die
+             Zeile "DG" (Deutschland) - der Bundeswert fuer den Index kommt
+             aus derselben Tabelle und demselben Jahr, nicht aus einer
+             Schaetzung. Die beiden Atlas-Tabellen MIT Filter (sonst Code 98). */
+          const txt = await this._fetchTableFfcsv(name, krs, now, key === 'einkommen' ? null : krs);
+          _atlas[key] = this._atlasZeilen(this._extractCsv(txt));
+        } catch { _atlas[key] = null; }
+        continue;
+      }
       try {
         const txt = await this._fetchTableFfcsv(name, krs, now);
         const csv = this._extractCsv(txt);                 // JSON-Envelope -> Object.Content, sonst Rohtext
@@ -119,21 +148,30 @@ export const DestatisConnector = {
       const first = bev[0].value, last = bev[bev.length - 1].value, yrs = bev[bev.length - 1].year - bev[0].year || 1;
       if (first > 0 && last > 0) metrics.bevoelkerung_trend = ((last / first) ** (1 / yrs) - 1) * 100; // %/Jahr
     }
-    const ein = series.einkommen;
-    if (ein && ein.length) {
-      const v = ein[ein.length - 1].value; // verfuegbares Einkommen je Einwohner (€)
-      if (v > 0) metrics.kaufkraft_idx = (v / 24000) * 100; // grob: Bundesschnitt ~24.000 € = Index 100
+    /* v2165 · aus den Atlas-Zeilen. Jahr je Kennzahl wird mitgegeben. */
+    const jahre = {};
+    const neueste = (rows, schl, spalte) => {
+      const r = (rows || []).filter((z) => z.schl === schl && z.werte[spalte] != null)
+        .sort((a, b) => b.jahr - a.jahr)[0];
+      return r ? { jahr: r.jahr, wert: r.werte[spalte] } : null;
+    };
+    const einK = _atlas.einkommen ? neueste(_atlas.einkommen, krs, 'letzte') : null;
+    if (einK && einK.wert > 0) {
+      const de = (_atlas.einkommen || []).find((z) => z.schl === 'DG' && z.jahr === einK.jahr);
+      const bund = de ? de.werte.letzte : null;
+      if (bund > 0) { metrics.kaufkraft_idx = (einK.wert / bund) * 100; jahre.kaufkraft = einK.jahr; }
     }
-    const alq = series.arbeitslosenquote;
-    if (alq && alq.length) {
-      const v = alq[alq.length - 1].value;
-      if (v >= 0) metrics.arbeitslosenquote = v;
-    }
+    const alqK = neueste(_atlas.arbeitslosenquote, krs, 3);
+    if (alqK && alqK.wert >= 0) { metrics.arbeitslosenquote = alqK.wert; jahre.arbeitslosenquote = alqK.jahr; }
+    const wanK = neueste(_atlas.wanderung, krs, 9);
+    /* je 10.000 EW -> % pro Jahr (34,3 je 10.000 = 0,343 %), dieselbe Einheit
+       wie bevoelkerung_trend, die ScoringService mit v/2+0.5 abbildet */
+    if (wanK && Number.isFinite(wanK.wert)) { metrics.wanderungssaldo = wanK.wert / 100; jahre.wanderung = wanK.jahr; }
 
     const hasAny = Object.keys(metrics).length > 0;
     return {
       available: hasAny, source: 'destatis', metrics: hasAny ? metrics : null,
-      kreis_ags: krs, tables_used: tables,
+      kreis_ags: krs, tables_used: tables, jahre,
       reason: hasAny ? undefined : 'kein_wert_geparst',
       note: hasAny ? 'Sozioökonomie aus GENESIS-Regionalstatistik (Kreisebene).'
                    : 'GENESIS antwortete, aber es konnten keine Werte geparst werden (Format prüfen über /destatis/raw).',
@@ -218,7 +256,29 @@ export const DestatisConnector = {
     } catch (e) { return { ok: false, base, reason: e.message }; }
   },
 
-  async _fetchTableFfcsv(name, krs, now) {
+  /* v2165 · Zeilen der Atlas-/VGR-Tabellen: "Jahr;Schluessel;Name;Wert;Wert;…".
+     werte[i] = Spalte i (0-basiert, wie im CSV), werte.letzte = letzte Zahl. */
+  _atlasZeilen(csv) {
+    if (!csv) return null;
+    const out = [];
+    for (const l of String(csv).split(/\r?\n/)) {
+      const c = l.split(';');
+      if (!/^(19|20)\d{2}$/.test((c[0] || '').trim())) continue;
+      const werte = {};
+      let letzte = null;
+      for (let i = 3; i < c.length; i++) {
+        const raw = (c[i] || '').replace(/"/g, '').trim();
+        if (!/^-?\d{1,3}(\.\d{3})*(,\d+)?$|^-?\d+(,\d+)?$/.test(raw)) { werte[i] = null; continue; }
+        werte[i] = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+        letzte = werte[i];
+      }
+      werte.letzte = letzte;
+      out.push({ jahr: parseInt(c[0], 10), schl: (c[1] || '').trim(), werte });
+    }
+    return out.length ? out : null;
+  },
+
+  async _fetchTableFfcsv(name, krs, now, kreisFilter) {
     // KEIN regionalvariable/regionalkey: regionalstatistik liefert sonst Code 104
     // "keine Objekte zum Selektionskriterium", weil die Tabelle die Variable "KREISE"
     // so nicht kennt. Wir holen die (Kreis-)Tabelle komplett und filtern den Ziel-Kreis
@@ -228,6 +288,10 @@ export const DestatisConnector = {
       name, area: 'all', compress: 'false', language: 'de', format: 'ffcsv',
       startyear: String(now - 12), endyear: String(now),
     };
+    /* v2165: mit Kreisfilter, wo gewuenscht. Der Kommentar oben („KREISE
+       liefert 104") gilt fuer die Bevoelkerungstabelle; die Atlas-Tabellen
+       antworten mit Filter Code 0 und ohne ihn Code 98 (gemessen). */
+    if (kreisFilter) { body.regionalvariable = 'KREISE'; body.regionalkey = kreisFilter; }
     const base = await resolveBase(); // genesisws/genesisWS-robust
     const r = await httpText(`${base}/data/table`, { method: 'POST', headers: authHeaders(), form: body, timeoutMs: 30000, retries: 1 });
     return r.text || '';

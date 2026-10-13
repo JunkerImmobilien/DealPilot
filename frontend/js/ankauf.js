@@ -65,7 +65,12 @@
     { schluessel: '_kpis_dscr',     wort: 'DSCR',               einheit: 'zahl', besser: 'groesser' },
     { schluessel: '_kpis_cf_ns',    wort: 'Cashflow n. Steuer', einheit: 'eur',  besser: 'groesser' },
     { schluessel: '_kpis_ltv',      wort: 'LTV',                einheit: 'pct',  besser: 'kleiner' },
-    { schluessel: '_ds2_score',     wort: 'DealScore',          einheit: 'zahl', besser: 'groesser' }
+    { schluessel: '_ds2_score',     wort: 'DealScore',          einheit: 'zahl', besser: 'groesser' },
+    /* v2160 · N62.6 — die Steuerwirkung p. a. = Cashflow nach minus vor
+       Steuer (positiv = Erstattung). ABGELEITET aus zwei gespeicherten
+       Kennzahlen, nicht neu gerechnet; alte Ankauf-Staende bekommen sie
+       aus ihrem eingefrorenen Datensatz (`a.daten`). */
+    { schluessel: '_steuerwirkung', wort: 'Steuerwirkung p. a.', einheit: 'eur', besser: 'groesser' }
   ];
 
   /* ── Zahlen ───────────────────────────────────────────────────────
@@ -116,6 +121,8 @@
        ist, und merkt sich NICHT welcher. Beim Vergleich gilt dieselbe
        Reihenfolge auf beiden Seiten, sonst vergleicht man zwei Skalen. */
     if (k._ds2_score == null) k._ds2_score = zahl(daten._dealpilot_score);
+    var _ns = zahl(daten._kpis_cf_ns), _vs = zahl(daten._kpis_cf_vs);
+    k._steuerwirkung = (_ns !== null && _vs !== null) ? Math.round((_ns - _vs) * 100) / 100 : null;
     return k;
   }
 
@@ -141,6 +148,9 @@
   function festschreiben(stichtag) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(stichtag || '')))
       throw new Error('Kein gültiger Stichtag');
+    /* v2164: Bestand heisst gewonnen (Marcel, 13.10.2026). */
+    if ((document.getElementById('_deal_won_state') || {}).value !== 'true')
+      throw new Error('Einen Ankauf-Stand gibt es nur für gewonnene Objekte');
     var daten = _datensatzJetzt();
     var neu = {
       stichtag: stichtag,
@@ -216,6 +226,11 @@
     for (var i = 0; i < KENNZAHLEN.length; i++) {
       var k = KENNZAHLEN[i];
       var vorher = zahl(a.kurz[k.schluessel]);
+      /* v2160: eine spaeter dazugekommene Kennzahl fehlt in alten Kurzfassungen -
+         sie kommt dann aus dem eingefrorenen Datensatz desselben Stichtags. */
+      if (vorher === null && k.schluessel === '_steuerwirkung' && a.daten) {
+        try { vorher = zahl(_kurzfassung(a.daten)._steuerwirkung); } catch (e) {}
+      }
       var nachher = zahl(jetzt[k.schluessel]);
       if (vorher === null || nachher === null) continue;
       var diff = nachher - vorher;

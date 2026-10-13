@@ -73,7 +73,7 @@ window.QcHeuristik = (function () {
    *   „Immer bedenken dass es angebotspreise sind und meistens 10 %
    *    dadrunter verkauft wird."
    *
-   * Er ist DESAG-zertifizierter Sachverständiger; bei Bewertungsfragen gilt
+   * Er ist DESAG-geprüfter Sachverständiger; bei Bewertungsfragen gilt
    * sein Wort. Ein Preis, der aus Angebotsdaten stammt, liegt systematisch
    * über dem, was am Ende gezahlt wird.
    *
@@ -535,7 +535,21 @@ window.QcHeuristik = (function () {
   function _zielSkala(ziel, klasse) {
     var z = Number(String(ziel).replace(',', '.'));
     var k = klasse ? String(klasse).toUpperCase().charAt(0) : '';
-    return 'Ziel ' + z.toFixed(1).replace('.', ',') + ' %'
+    /* ── v2148c · DER GENANNTE MASSSTAB MUSS DER GERECHNETE SEIN ───────
+
+       Hier stand `toFixed(1)`. GEMESSEN an Marcels eigenem Profil auf
+       Staging: sein A-Ziel steht auf **3,75 %**, der Satz sagte „Ziel
+       3,8 %" — gerechnet wurde mit 3,75.
+
+       > Eine Note mit ihrem Massstab daneben ist nur dann
+       > nachvollziehbar, wenn der genannte Massstab der gerechnete ist.
+       > Wer bei 3,78 % nachprueft, findet sonst einen Widerspruch, der
+       > keiner ist — und glaubt der Ampel nicht mehr.
+
+       Zwei Nachkommastellen, die ueberfluessige Null faellt weg: 5 wird
+       „5", 3,75 bleibt „3,75", 3,5 wird „3,5". */
+    var zs = z.toFixed(2).replace(/0$/, '').replace(/[.,]$/, '').replace('.', ',');
+    return 'Ziel ' + zs + ' %'
       + (k === 'A' || k === 'B' || k === 'C' ? ' (' + k + '-Lage)' : '')
       + ' erreicht = gruen · ab 75 % gelb · 130 % = volle Punktzahl';
   }
@@ -545,6 +559,85 @@ window.QcHeuristik = (function () {
     if (q >= 0.75) return 'gruen';
     if (q >= 0.4) return 'gelb';
     return 'rot';
+  }
+
+  /* ══ v2148 · DAS ZIELURTEIL IN WORTEN — EINE STELLE ══════════════════
+
+     Marcel am 12.10.2026: „Das muss auch mit in die Bewertung im Quick
+     Check unten weil der Investor ja lesen möchte und bewerten möchte
+     ob der deal passt."
+
+     GEMESSEN, warum das noetig war: `composeOpinion()` im Quick-Check
+     (quickcheck-app.html:5479) beurteilte die Bruttomietrendite an
+     FESTEN Schwellen — „ab 5,5 % gut, ueber dem deutschen Durchschnitt
+     (~4,5 %)". Die Lageklasse kam dort nicht vor. Ein Investor mit
+     C-Lage-Ziel 7 % las also „gut" bei 5,6 %, obwohl er sein Ziel um
+     ein Fuenftel verfehlt.
+
+     > **Und das Gegenteil ist schlimmer:** in A-Lage mit Ziel 3,5 % hiess
+     > eine 4,0 % „unterdurchschnittlich und braucht Mietsteigerung oder
+     > Kaufpreis-Reduktion" — bei 114 % des eigenen Ziels.
+
+     ── WARUM DIE WORTE HIERHER GEHOEREN ────────────────────────────────
+
+     Zwei Zeilen ueber jener Stelle steht der Befund von v1945: dort
+     stand schon einmal die DRITTE Kopie derselben Schwellen, und sie
+     widersprach dem Urteil zwei Zentimeter darueber. Wer jetzt dort
+     „ab 75 % gelb" hinschreibt, baut die VIERTE.
+
+     Darum liefert diese Funktion das Wort mit — sie ist dieselbe
+     Quelle, aus der schon die Ampel und der Skalensatz kommen. Die
+     Schwellen stehen genau einmal, in `_zielGuete`.
+
+     ── UND SIE LIEST NICHTS ────────────────────────────────────────────
+
+     `ziel` kommt als PARAMETER. Der Kern laeuft im Backend ohne
+     Browser und ohne `DealPilotLageProfil` — wer sich seine Eingaben
+     selbst holt, ist dort nicht mehr derselbe Kern. */
+  function zielUrteil(bmr, ziel, klasse) {
+    var g = _zielGuete(bmr, ziel);
+    if (g == null) return null;                    /* kein Ziel -> der Aufrufer bleibt bei seiner festen Skala */
+    var e = Number(bmr), z = Number(String(ziel).replace(',', '.'));
+    var q = (isFinite(e) && z > 0) ? e / z : 0;
+    var amp = _ampel(g);
+
+    /* ── DAS WORT HAENGT AN DER AMPEL, NICHT AN EIGENEN SCHWELLEN ──────
+
+       Erster Entwurf liess das Wort bei q >= 0,97 auf „am Ziel"
+       springen. GEMESSEN mit `tools/zielurteil-pruefen.mjs`:
+
+         q = 0,9699  ->  Guete 0,7518  ->  Ampel GRUEN
+                         Wort „knapp unter deinem Ziel"
+
+       Die Ampel kippt bei Guete 0,75, das heisst bei q = 0,96875. In
+       der Luecke von 1,25 Promille stand eine gruene Ampel neben
+       „knapp unter deinem Ziel".
+
+       > **Die Grenze auf 0,96875 zu ziehen waere der falsche Weg** —
+       > dann liegt sie wieder GENAU auf einer anderen Grenze, und
+       > genau daran ist v2143 einmal gescheitert. Zwei Zahlenreihen,
+       > die dasselbe beschreiben, laufen irgendwann auseinander.
+
+       Deshalb leitet sich das Wort jetzt AUS DER AMPEL ab. Rot, gelb
+       und gruen koennen nicht mehr etwas anderes sagen als der Text —
+       sie sind dieselbe Entscheidung. Nur innerhalb von Gruen wird
+       noch unterschieden, weil die Ampel oben nicht weiterzaehlt:
+       1,15 ist dort die EINZIGE eigene Grenze. */
+    var wort, satz;
+    if (amp === 'rot')       { wort = 'deutlich unter deinem Ziel'; satz = 'Entweder der Preis muss fallen oder die Miete steigen.'; }
+    else if (amp === 'gelb') { wort = 'knapp unter deinem Ziel';    satz = 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.'; }
+    else if (q >= 1.15)      { wort = 'deutlich über deinem Ziel';  satz = 'Das ist Spielraum — beim Preis oder bei der Qualität des Objekts.'; }
+    else                     { wort = 'am Ziel';                    satz = 'Genau das, was du für diese Lage angesetzt hast.'; }
+    return {
+      guete: g,
+      ampel: amp,
+      quote: q,
+      wort: wort,
+      satz: satz,
+      skala: _zielSkala(ziel, klasse),
+      ziel: z,
+      klasse: klasse ? String(klasse).toUpperCase().charAt(0) : null
+    };
   }
 
   /**
@@ -671,6 +764,7 @@ window.QcHeuristik = (function () {
     ANGEBOTSABSCHLAG: ANGEBOTSABSCHLAG,     /* v1939 */
     kennzahlenAmpel: kennzahlenAmpel, /* v1936 */
     kategorien: kategorien,         /* v1936 */
+    zielUrteil: zielUrteil,         /* v2148 */
     SCHWELLE: SCHWELLE
   };
 })();

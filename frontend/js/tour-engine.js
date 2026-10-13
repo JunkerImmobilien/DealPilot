@@ -182,6 +182,59 @@
       return false;
     }
     if (targetSec === 'sidebar' || targetSec === 'header' || targetSec === 'settings') {
+      /* ══ v2154 · DIE SIDEBAR IST NICHT IMMER OFFEN ════════════════════
+
+         Marcel am 12.10.2026: „prinzipiell möchte ich einmal, dass die
+         Tour, die hier gemacht wird, wenn man sich neu anmeldet, auch
+         bei der Aktenmappe, beim Tower und auch bei der Kanzleiansicht
+         funktioniert."
+
+         Hier stand `return true` — die Annahme, die Sidebar sei immer da.
+         In der Standardansicht stimmt das. In den Varianten-Ansichten
+         liegt sie als `.dpl-schiene` vor und hat ein EINGEKLAPPTES
+         Portfolio-Panel.
+
+         GEMESSEN am 12.10.2026 in der Kanzlei-Ansicht (`v2`):
+
+           html[data-dpl-portfolio]            "zu"
+           .dpl-teil-objekte                   display:none !important
+           .dpl-teil-suche                     display:none !important
+           .sb-card im DOM                     33
+           .sb-card mit Fläche                 0
+
+         Die Regel steht in `layout-varianten.css` und hängt an genau
+         diesem Attribut. Die Tour wechselt den TAB, wenn ein Schritt
+         einen braucht — ein eingeklapptes Panel hat sie nie geöffnet.
+         Schritt 1 („Hier liegen alle deine Objekte") fand deshalb kein
+         sichtbares Ziel und die Tour brach dort ab.
+
+         > Der Anker war nie falsch. `_findElementWithRetry` prüft seit
+         > v1774 jeden Teilselektor und jeden Treffer auf Sichtbarkeit —
+         > er hätte `.dpl-schiene` genommen. Nur war ALLES unsichtbar,
+         > weil der Elternteil ausgeblendet war.
+
+         Aufgeklappt wird per KLICK auf den Knopf, nicht per
+         `setAttribute`: der Klickbehandler zieht den Zustand nach
+         (Merker, Attribut, Nachbarelemente). Wer das Attribut selbst
+         setzt, überspringt diese Arbeit — dieselbe Lehre wie bei den
+         Gestaltungsvarianten.
+
+         Der Zustand wird NICHT zurückgestellt. Ein Panel, das die Tour
+         öffnet, hat der Nutzer danach offen — das ist richtig, denn die
+         Tour hat ihm gerade erklärt, was darin liegt. */
+      if (targetSec === 'sidebar') {
+        try {
+          var _h = document.documentElement;
+          if (_h.getAttribute('data-dp-layout')
+              && _h.getAttribute('data-dpl-portfolio') === 'zu') {
+            var _pk = document.querySelector('.dpl-portfolio');
+            if (_pk) {
+              _pk.click();
+              console.info('[DpTour v2154] Portfolio-Panel der Schiene aufgeklappt');
+            }
+          }
+        } catch (e) {}
+      }
       return true;
     }
     var tab = document.querySelector('.tab[data-target-sec="' + targetSec + '"]');

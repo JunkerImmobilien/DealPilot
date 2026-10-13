@@ -2867,6 +2867,43 @@
      um interessant zu werden. */
   var PP_MAX_OBJEKTE = 60;
 
+  /* ══ v2164 · DIE PILOT-ANALYSE JE OBJEKT GEHT MIT ═════════════════════
+     Marcel am 13.10.2026: „Pruefe danach die Portfolio Piloten, ob der jetzt
+     auch alle Infos aus den Pilot-Analysen der einzelnen Objekte bekommt."
+     Gemessen: NEIN. Alle neun gewonnenen Objekte auf Staging tragen eine
+     Analyse (`_ai`), der Auszug unten las sie nie - der Portfolio-Pilot
+     sah nur Rohzahlen und sollte trotzdem sagen, „welche tragen, welche
+     belasten".
+
+     Ein AUSZUG, nicht die ganze Analyse: der Deckel liegt bei 60 Objekten
+     (v2014). Gekuerzt wird hart, und der Stand steht dabei - eine alte
+     Analyse darf nicht wie eine neue gelesen werden. */
+  function _ppAnalyse(o) {
+    var roh = o && o._ai;
+    if (!roh) return null;
+    var a = roh;
+    if (typeof roh === 'string') { try { a = JSON.parse(roh); } catch (e) { return null; } }
+    if (!a || typeof a !== 'object') return null;
+    function k(t, n) { t = (t == null) ? '' : String(t).replace(/\s+/g, ' ').trim(); return t ? (t.length > n ? t.slice(0, n - 1) + '\u2026' : t) : null; }
+    function liste(x, m, n) {
+      if (!Array.isArray(x)) return null;
+      var r = x.slice(0, m).map(function (e) {
+        return k(typeof e === 'string' ? e : (e && (e.titel || e.text || e.punkt || e.risiko || JSON.stringify(e))), n);
+      }).filter(Boolean);
+      return r.length ? r : null;
+    }
+    var f = a._fuer || {};
+    return {
+      stand: f.stand ? String(f.stand).slice(0, 10) : null,
+      empfehlung: k(a.empfehlung, 40),
+      fazit: k(a.fazit_kurz || a.gesamtbewertung, 320),
+      risiken: liste(a.risiken, 3, 140),
+      staerken: liste(a.staerken, 3, 140),
+      steuer: k(a.steuer_zusammenfassung, 260),
+      soll_ist_steuer: k(a.soll_ist_steuer, 220)
+    };
+  }
+
   function _ppZahl(v) {
     var n = num(v);
     return (v == null || v === '' || !isFinite(n)) ? null : n;
@@ -2948,7 +2985,8 @@
         ltv_prozent: _ppZahl(o.ltv) != null ? _ppZahl(o.ltv) : _ppZahl(o._kpis_ltv),
         bruttomietrendite_prozent: _ppZahl(o._kpis_bmy),
         dealpilot_score: _ppZahl(o._dealpilot_score),
-        investor_deal_score: _ppZahl(o._ds2_score)
+        investor_deal_score: _ppZahl(o._ds2_score),
+        pilot_analyse: _ppAnalyse(o)   /* v2164 */
       };
     });
 

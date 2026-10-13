@@ -519,7 +519,7 @@ function showSettings(initialTab) {
           'die KI aus der echten Quelle, sonst steht hier irgendwann die falsche.</p>' +
         '<div class="f">' +
           '<textarea id="set_eigenes_wissen" rows="8" maxlength="20000" ' +
-            'placeholder="z.\u202fB.: Junker Solution ist ein Einzelunternehmen (Kleinunternehmer \u00a7 19 UStG), keine UG. \u2014 DESAG-zertifiziert hei\u00dft: \u2026"></textarea>' +
+            'placeholder="z.\u202fB.: Junker Solution ist ein Einzelunternehmen (Kleinunternehmer \u00a7 19 UStG), keine UG. \u2014 DESAG-geprüft hei\u00dft: \u2026"></textarea>' +
           '<div style="display:flex;align-items:center;gap:10px;margin-top:8px">' +
             '<button type="button" class="btn" id="set_wissen_save">Wissen speichern</button>' +
             '<span id="set_wissen_status" class="hint" style="margin:0"></span>' +

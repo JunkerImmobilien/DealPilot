@@ -249,7 +249,20 @@
        Beide wandern deshalb mit. Der leere `.sb-header` bleibt, wo er
        ist. */
     schnellstart: '.sb-neu-row',
-    suche:        '.sb-section-title-with-sort'
+    suche:        '.sb-section-title-with-sort',
+    /* ── v2145 · DER STAND-UMSCHALTER (Bestand / Ankauf) ─────────────
+       Er sitzt seit v2040 unter dem Logo, also im `.sb-header` - und
+       der blieb laut dem Kommentar oben bewusst zurueck, WEIL ER LEER
+       WAR. Das stimmt seit v2040 nicht mehr.
+
+       Marcel am 12.10.2026: „beim Aussehen Aktenmappe, Kanzlei und
+       Tower keine umschalter zwischen Bestand und ankauf".
+
+       Er heisst `stand`, nicht `schalter`: `KNOTEN.schalter` ist
+       bereits der Aktions-Aufklapper (`#sb-actions-trigger-btn`). Zwei
+       Dinge auf einem Namen loeschen sich lautlos - siehe die
+       Attributnamen-Falle bei `data-dp-karte`. */
+    stand:        '#dk-schalter'
   };
 
   var merker = [];       /* [{ knoten, eltern, naechstes }] */
@@ -895,9 +908,77 @@
           var s = hole(KNOTEN.schalter);
           if (s) h.insertBefore(s, k);
         }
+        /* ══ v2154 · DER STAND-SCHALTER GEHOERT UEBER DIE SUCHE ═══════════
+
+           Marcel am 12.10.2026: „Wir haben den Buchschalter in die App
+           gepackt bei der Kanzlei. Der sollte aber bitte über die Suche,
+           also zwischen dann der Aktion-Button und der Suche, also ein
+           bisschen höher."
+
+           v2145 hing ihn an den `objekte`-Teil, mit der Begruendung „er
+           legt deren Modus um". Das stimmt fachlich — und war der Grund,
+           warum Marcel ihn nicht fand.
+
+           GEMESSEN am 12.10.2026 in der Kanzlei-Ansicht:
+
+             .dpl-marke          y=0
+             .dpl-portfolio      y=110   <- der Aktionen-Knopf
+             .dpl-teil-suche     y=147
+             .dpl-teil-objekte   y=185   <- hier sass der Schalter DRIN
+             #dk-schalter        y=185, Eltern .dpl-teil
+
+           Der `objekte`-Teil ist die ZUKLAPPBARE Schublade: bei
+           `data-dpl-portfolio="zu"` steht er auf `display:none
+           !important` (layout-varianten.css). Wer das Portfolio
+           zuklappt, nimmt den Schalter mit — und zugeklappt ist der
+           Auslieferungszustand.
+
+           > Ein Schalter, der in dem Fach liegt, das er umschaltet,
+           > verschwindet mit dem Fach. Dasselbe Muster wie v2040: damals
+           > steckte er IN der Objektliste und scrollte mit.
+
+           Er haengt jetzt am `suche`-Teil und steht dort VOR dem
+           Suchfeld — damit genau zwischen Aktionen-Knopf und Suche, wie
+           Marcel es beschreibt. Der `suche`-Teil wird bei zugeklapptem
+           Portfolio ebenfalls ausgeblendet; das ist richtig, denn dann
+           ist auch keine Objektliste da, deren Modus man umlegen
+           koennte.
+
+           Er kann fehlen: `doppelkarte.js` baut ihn nur, wenn mindestens
+           ein Objekt einen Ankauf-Stand hat. Dann ist `hole()` null und
+           es passiert nichts — richtig so, ein Schalter ohne Gegenstand
+           waere eine leere Zusage. (Gemessen: 6 von 33 Objekten tragen
+           einen Stand, der Schalter entsteht also.) */
+        /* v2154b: NICHT in den suche-Teil — der ist bei zugeklapptem
+           Portfolio ausgeblendet, genau wie der objekte-Teil von v2145.
+           Der Schalter wird unten als direktes Kind der Schiene
+           eingehaengt, hinter `.dpl-portfolio`. */
         schiene.appendChild(h);
       }
     });
+
+    /* ══ v2154b · DER STAND-SCHALTER, HINTER DEN AUFKLAPPER ════════════
+       Als direktes Kind der Schiene — nicht in einem `.dpl-teil`, denn
+       die beiden, in denen er bis v2154a lag (`objekte`, `suche`), sind
+       bei `data-dpl-portfolio="zu"` ausgeblendet. Gemessen am
+       12.10.2026: beide 0x0, der Aufklapper selbst y=110 sichtbar.
+
+       Steht NACH der Teile-Schleife, weil `.dpl-portfolio` erst dort
+       existiert. `hole()` merkt sich den Rueckweg — beim Verlassen des
+       Layouts steht er wieder unter dem Logo.
+
+       Er kann fehlen: `doppelkarte.js` baut ihn nur, wenn mindestens ein
+       Objekt einen Ankauf-Stand hat (gemessen: 6 von 33). Dann ist
+       `hole()` null und es passiert nichts — ein Schalter ohne
+       Gegenstand waere eine leere Zusage. */
+    if (!handyOben) {
+      var _st = hole(KNOTEN.stand);
+      if (_st) {
+        var _auf = schiene.querySelector('.dpl-portfolio');
+        if (_auf) schiene.insertBefore(_st, _auf.nextSibling);
+        else schiene.insertBefore(_st, schiene.firstChild);
+      }
+    }
 
     /* ── v1656 · DER ORT IST DOCH NICHT GLEICHGUELTIG ───────────────
        Hier stand: „Beide Stellungen stehen `position:fixed`; der Ort im

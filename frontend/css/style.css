@@ -33276,6 +33276,24 @@ body.hdr-banner-only .hdr-v61-row2 {
 .dp-pa-kv strong{color:var(--ink)}
 .dp-pa-kv:last-child{margin-bottom:0}
 .dp-pa-kv-sub{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:0 0 6px}
+/* v2150 · Herkunft am Wert und der Abgleich gegen den Marktbericht.
+   Gold ist hier der AKZENT (Rahmen, nicht Flaeche) - eine ausgefuellte
+   Goldflaeche wuerde den Block zur Hauptsache machen, und das ist er
+   nicht: er ordnet ein. Die Fussnote traegt die ImmoWertV-Einordnung
+   und darf nie wegfallen. */
+.dp-pa-herk{font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3);opacity:.9}
+.dp-pa-abgl{border-color:var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.055)}
+.dp-pa-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(140,134,120,.26);font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3)}
+/* v2157 · Lage-Gegenueberstellung (N62.4). Status-Farben bewusst NICHT tokenisiert. */
+.dp-pa-ggs-row{padding:10px 0;border-top:1px solid rgba(140,134,120,.20)}
+.dp-pa-ggs-row:first-of-type{border-top:0}
+.dp-pa-ggs-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 5px;font-size:13.5px;color:var(--ink)}
+.dp-pa-ggs-u{flex:0 0 auto;font:600 10.5px/1 'JetBrains Mono',monospace;font-style:normal;letter-spacing:.05em;text-transform:uppercase;padding:4px 7px;border-radius:999px;border:1px solid rgba(140,134,120,.35);color:var(--ink3)}
+.dp-pa-ggs-ok{color:#2F8E5A;border-color:rgba(63,165,108,.40);background:rgba(63,165,108,.08)}
+.dp-pa-ggs-ab{color:#A4524C;border-color:rgba(184,98,92,.45);background:rgba(184,98,92,.08)}
+.dp-pa-ggs-z{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;font-size:13px;line-height:1.55;color:var(--ink2);margin:0 0 2px;overflow-wrap:anywhere}
+.dp-pa-ggs-z>span{font:400 10.5px/1.9 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3)}
+.dp-pa-ggs-k{font-size:13px;line-height:1.55;color:var(--ink2);margin-top:5px;font-style:italic}
 .dp-pa-tone-good{border-color:#CDE5D6;background:#F4FAF6}
 .dp-pa-tone-bad{border-color:#E9CFC9;background:#FBF4F2}
 .dp-pa-insight{background:var(--gold-soft);border-color:var(--gold-bd)}

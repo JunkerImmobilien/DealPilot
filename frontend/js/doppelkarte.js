@@ -299,9 +299,103 @@
          Verankert am `.sb-header` (dem Block mit dem Logo), nicht an
          einer Position in der Liste: ein Platz, der an einem
          benannten Element haengt, ueberlebt jeden Neuaufbau. */
-      var kopf = document.querySelector('.sb-header');
-      if (kopf && kopf.parentNode) kopf.parentNode.insertBefore(s, kopf.nextSibling);
-      else liste.insertBefore(s, liste.firstChild);   /* Rueckfall */
+      /* ══ v2145a · DER SCHALTER FOLGT DER LISTE, DIE ER UMSCHALTET ═════
+
+         Marcel am 12.10.2026, NACH v2145: „den umschalter bestand/ankauf
+         hab ich immer noch nicht finden koennen wenn ich aussehen
+         Aktenmappe eingestellt habe. Warum?"
+
+         GEMESSEN: Fassung v2145 geladen, Layout v1b aktiv - und der
+         Schalter sass trotzdem in `#sidebar [display:none]`.
+
+         v2145 hat `#dk-schalter` in die Knotenliste von
+         `layout-varianten.js` aufgenommen. Das greift beim SETZEN des
+         Layouts. Nur: beim Seitenladen ist das Layout schon gesetzt,
+         bevor es diesen Schalter gibt - `doppelkarte.js` baut ihn erst,
+         wenn die Objektliste steht. Er entsteht also NACH dem Umzug und
+         haengt sich an `.sb-header`, der in der versteckten Sidebar
+         zurueckblieb.
+
+         > Ein Knoten, der nach dem Umzug entsteht, zieht nicht mit um.
+         > Eine Liste von Knoten deckt den WECHSEL ab, nicht die GEBURT.
+
+         Deshalb hier die Wurzel: der Schalter sucht sich seinen Platz
+         an der Objektliste, wo immer die gerade steht. Ist sie
+         ausgewandert (Layout aktiv), geht er mit; steht sie in der
+         Sidebar, bleibt alles wie seit v2040 - unter dem Logo.
+
+         Beides zusammen deckt beide Faelle: v2145 den Layout-Wechsel
+         im Betrieb, v2145a das Laden mit bereits gesetztem Layout. */
+      /* ══ v2154a · NICHT AN DIE LISTE, SONDERN AN DIE SUCHE ════════════
+
+         Marcel am 12.10.2026: „Der sollte aber bitte ueber die Suche,
+         also zwischen dann der Aktion-Button und der Suche, also ein
+         bisschen hoeher."
+
+         v2145a setzte ihn VOR die ausgewanderte Liste. Das war richtig
+         gegen den Fehler von damals (er blieb in der versteckten
+         Sidebar), aber es hat ihn in die falsche Schublade gelegt:
+
+           .dpl-portfolio      y=110   der Aktionen-Knopf
+           .dpl-teil-suche     y=147
+           .dpl-teil-objekte   y=185   <- hier landete er, VOR #sb-list
+
+         Und `.dpl-teil-objekte` ist das Fach, das bei
+         `data-dpl-portfolio="zu"` auf `display:none !important` steht —
+         der Auslieferungszustand. Gemessen am 12.10.2026 in der
+         Kanzlei-Ansicht: Eltern `dpl-teil dpl-teil-objekte`, y=185.
+
+         > v2154 hat das in `layout-varianten.js` korrigiert, aber das
+         > greift nur beim SETZEN des Layouts. Beim Laden ist das Layout
+         > schon gesetzt, und dann entscheidet DIESE Stelle. Dieselbe
+         > Teilung wie bei v2145/v2145a — die eine Fassung deckt den
+         > Wechsel, die andere die Geburt, und beide muessen dasselbe
+         > tun.
+
+         Zuerst wird deshalb der Suche-Teil gesucht. Nur wenn es ihn
+         nicht gibt (Standardansicht), bleibt es beim Platz vor der
+         Liste. */
+      /* ══ v2154b · DRITTER ANLAUF, UND DIESMAL DIE BEDINGUNG GEMESSEN ══
+
+         v2145a legte ihn vor die Liste, v2154a in den Suche-Teil. BEIDE
+         Faecher sind genau die, die bei `data-dpl-portfolio="zu"`
+         ausgeblendet werden — und zu ist der Auslieferungszustand.
+
+         Ich habe dreimal gefragt „wo gehoert er hin" und nie „welcher
+         Ort ist SICHTBAR, wenn das Portfolio zu ist". Gemessen am
+         12.10.2026 in der Kanzlei-Ansicht bei zugeklapptem Portfolio:
+
+           .dpl-marke          y=0     sichtbar
+           .dpl-portfolio      y=110   sichtbar   <- der Aktionen-Knopf
+           .dpl-teil-suche     0x0     AUSGEBLENDET
+           .dpl-teil-objekte   0x0     AUSGEBLENDET
+           .dpl-teil-tabs      y=147   sichtbar
+
+         > Ein Platz, der nur im aufgeklappten Zustand existiert, ist fuer
+         > einen Schalter kein Platz. Die Frage war nie die Reihenfolge,
+         > sondern die Sichtbarkeit.
+
+         Er ist jetzt ein DIREKTES Kind der Schiene und sitzt hinter
+         `.dpl-portfolio` — damit zwischen Aktionen-Knopf und Suche, wie
+         Marcel es beschreibt, und sichtbar in beiden Zustaenden.
+
+         Fachlich bleibt es richtig: er legt den Modus der Objektliste
+         um, und bei zugeklapptem Portfolio wirkt er auf die Liste, die
+         beim Aufklappen erscheint — nicht ins Leere. */
+      var schiene = document.querySelector('.dpl-schiene');
+      var aufklapper = schiene ? schiene.querySelector('.dpl-portfolio') : null;
+      var inSidebar = liste && liste.closest && liste.closest('#sidebar');
+      if (schiene && !inSidebar) {
+        if (aufklapper) schiene.insertBefore(s, aufklapper.nextSibling);
+        else schiene.insertBefore(s, schiene.firstChild);
+      } else if (liste && !inSidebar && liste.parentNode) {
+        /* Die Liste ist ausgewandert - der Schalter gehoert davor. */
+        liste.parentNode.insertBefore(s, liste);
+      } else {
+        var kopf = document.querySelector('.sb-header');
+        if (kopf && kopf.parentNode) kopf.parentNode.insertBefore(s, kopf.nextSibling);
+        else if (liste) liste.insertBefore(s, liste.firstChild);   /* Rueckfall */
+      }
     }
     s.innerHTML =
       '<span class="dk-seg-titel">Stand</span>'

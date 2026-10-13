@@ -337,8 +337,17 @@ export const ReportOrchestrator = {
 
     const zensusP = (async () => {
       const agsInfo = await agsP;
-      const z = ZensusConnector.lookup(agsInfo?.kreis_ags);
-      step(`Strukturdaten: ${z.available ? 'ausgewertet' : 'keine Daten'}`);
+      /* v2162 · Datenbank (Kreis + Gemeinde, nach Baujahr und Flaeche).
+         Die Gemeinde nur, wenn sie EINDEUTIG ist - sonst bleibt es beim
+         Kreiswert, und der heisst so. */
+      const gem = await AgsResolver.gemeindeEindeutig(geo?.components?.postcode, geo?.components?.city).catch(() => null);
+      const z = await ZensusConnector.lookupDb({
+        kreisAgs: agsInfo?.kreis_ags, gemeindeAgs: gem?.gemeinde_ags,
+        baujahr: ref.build_year,
+        /* v2162c: die Zensus-Groessenklassen gelten JE WOHNUNG. Bei mehreren
+           Einheiten zaehlt die mittlere Wohnungsgroesse, nicht das Haus. */
+        wohnflaeche: (ref.living_area && ref.units > 1) ? ref.living_area / ref.units : ref.living_area });
+      step(`Strukturdaten: ${z.available ? 'ausgewertet' + (z.gemeinde ? ' (Gemeinde ' + z.gemeinde.name + ')' : ' (Kreis)') : 'keine Daten'}`);
       return z;
     })().catch((e) => { step('zensus: fehler ' + e.message); return { available: false, source: 'zensus2022', reason: e.message }; });
 
@@ -378,7 +387,13 @@ export const ReportOrchestrator = {
 
     // Bewertungen aus ECHTEN Quellen zusammenfuehren (keine Nutzereingabe).
     let assessment = (insights && insights.assessment) ? { ...insights.assessment } : null;
-    if (macroRaw.available && macro && macro.estimated === false && macro.score != null) {
+    /* v2158 · Die Makrolage-Wertung braucht mindestens ZWEI gemessene
+       Kennzahlen. Bis v2157 entstand sie aus einem Score, der fehlende
+       Kennzahlen mit Platzhaltern auffuellte (Bericht 176: 5 von 6) — und
+       stand dann als gemessene Lage neben der Angabe des Investors. Aus
+       dem Bevoelkerungstrend allein wird keine Makrolage. */
+    if (macroRaw.available && macro && macro.estimated === false && macro.score != null
+        && (macro.gemessen ?? 0) >= 2) {
       assessment = assessment || {};
       assessment.makrolage = macro.score >= 60 ? 'gut' : macro.score >= 45 ? 'durchschnittlich' : 'schwach';
     }

@@ -33,7 +33,7 @@ niemand — der Wettbewerb hört nach „kaufen oder nicht" auf.
 |---|---|
 | **3 s** (Vorbeigehen) | **„Andere sagen dir, ob du kaufen sollst. Wir sagen dir, was deine Bank dazu sagt."** |
 | **10 s** (Blickkontakt) | „Erzähl mir dein Objekt — nach vier Minuten Reden hast du Score, Cashflow, Steuer und ein Bank-PDF." |
-| **30 s** (steht schon) | „DealPilot ist deutsche Investmentsoftware für Immobilien. Vorne der Quick-Check in 60 Sekunden, hinten die Anlage V. Dazwischen drei Wertermittlungsverfahren nach ImmoWertV, amtliche Bodenrichtwerte und ein Bankexport. Gebaut von einem DESAG-zertifizierten Sachverständigen." |
+| **30 s** (steht schon) | „DealPilot ist deutsche Investmentsoftware für Immobilien. Vorne der Quick-Check in 60 Sekunden, hinten die Anlage V. Dazwischen drei Wertermittlungsverfahren nach ImmoWertV, amtliche Bodenrichtwerte und ein Bankexport. Gebaut von einem DESAG-geprüften Sachverständigen." |
 
 **Der Claim bleibt:** *„Immobilienentscheidungen sind zu groß für ein
 Bauchgefühl."*
@@ -402,7 +402,7 @@ Mikrofon zu sprechen.
 | „Das kann mein Excel auch." | „Rechnet Ihr Excel das Kaufjahr ab dem wirtschaftlichen Übergang? Und sagt es Ihnen, wie viel Ihrer Zahlen belegt sind?" |
 | „Noch ein Abo." | „19,99 € Einstieg. Eine einzige richtig eingeschätzte Kaufpreisaufteilung zahlt Ihnen Jahre davon." |
 | „KI erfindet doch Zahlen." | „Deshalb entscheidet sie bei uns nichts. Der Bodenrichtwert ist amtlich mit Stichtag, die KI rechnet nur gegen — und wenn beide abweichen, ist das ein Prüfsignal, kein neuer Wert." |
-| „Wer steckt dahinter?" | „Ein DESAG-zertifizierter Sachverständiger. Die Rechenwege sind gegen die Anwendungsbeispiele der amtlichen Dokumente geprüft." |
+| „Wer steckt dahinter?" | „Ein DESAG-geprüfter Sachverständiger. Die Rechenwege sind gegen die Anwendungsbeispiele der amtlichen Dokumente geprüft." |
 | „Gibt's das für Österreich?" | Ehrlich: „Deutschland ist vollständig, Österreich steht auf dem Plan." *(nicht behaupten)* |
 
 ### Vier Dinge, die vor der Messe stehen müssen

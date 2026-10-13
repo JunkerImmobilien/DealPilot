@@ -3535,6 +3535,10 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
           <option value="B">B-Lage</option>
           <option value="C">C-Lage</option>
         </select>
+        <!-- v2159 · N62.11: sichtbar, solange die Klasse aus der Standardklasse
+             des Profils stammt. Eine Vorbelegung, keine Messung - und weiter
+             die Wahl des Kunden: er hat sie selbst als Standard gesetzt. -->
+        <span id="qc_lageklasse_vorgabe" class="qc-lk-vorgabe" hidden>Vorgabe aus deinem Profil · überschreibbar</span>
       </div>
     </div>
   </div>
@@ -5475,11 +5479,47 @@ const QcApp = (function() {
     parts.push(`<strong>${_u.ueberschrift_kurz}</strong>.`);
 
     // KPI-Analyse
+    /* v2148 · DIE LAGEKLASSE IST DER MASSSTAB, NICHT DER BUNDESDURCHSCHNITT
+
+       Marcel: „Das muss auch mit in die Bewertung im Quick Check unten
+       weil der Investor ja lesen möchte und bewerten möchte ob der deal
+       passt."
+
+       Hier standen feste Schwellen — „ab 5,5 % gut, ueber dem deutschen
+       Durchschnitt (~4,5 %)". Gemessen heisst das: wer in A-Lage 3,5 %
+       ansetzt, bekam bei 4,0 % „unterdurchschnittlich" zu lesen, obwohl
+       er 114 % seines Ziels hat. Umgekehrt las ein C-Lage-Investor mit
+       Ziel 7 % bei 5,6 % ein „gut".
+
+       Das Wort kommt jetzt aus `QcHeuristik.zielUrteil()` — derselben
+       Quelle wie die Ampel und der Skalensatz. Hier wird NICHTS
+       nachgerechnet; zwei Zeilen hoeher steht, was eine zweite Kopie
+       der Schwellen anrichtet (v1945).
+
+       DER RIEGEL: ohne gesetzte Lageklasse gibt `zielBmr()` null und
+       `zielUrteil()` ebenfalls — dann greift der alte Text weiter, und
+       er sagt jetzt dazu, dass er am Bundesdurchschnitt misst. Marcels
+       Vorgabe vom 11.10.2026: „nur berücksichtigen". */
     if (k.bmr) {
-      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> ist`);
-      if (k.bmr >= 5.5) parts.push(`<strong>gut</strong> und liegt über dem deutschen Durchschnitt (~4,5%).`);
-      else if (k.bmr >= 4.5) parts.push(`<strong>marktüblich</strong>.`);
-      else parts.push(`<strong>unterdurchschnittlich</strong> und braucht entweder Mietsteigerung oder Kaufpreis-Reduktion.`);
+      var _zbmr = null, _zu = null;
+      try {
+        if (window.DealPilotLageProfil && inputs && inputs.lageklasse) {
+          _zbmr = window.DealPilotLageProfil.zielBmr(inputs.lageklasse);
+        }
+        if (_zbmr != null && window.QcHeuristik && QcHeuristik.zielUrteil) {
+          _zu = QcHeuristik.zielUrteil(k.bmr, _zbmr, inputs.lageklasse);
+        }
+      } catch (e) { _zu = null; }
+      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> liegt`);
+      if (_zu) {
+        parts.push(`<strong>${_zu.wort}</strong> von ${_zu.ziel.toFixed(1).replace('.', ',')} %`
+          + (_zu.klasse ? ` für die ${_zu.klasse}-Lage` : '') + `. ${_zu.satz}`);
+      } else {
+        if (k.bmr >= 5.5) parts.push(`<strong>über dem deutschen Durchschnitt</strong> (~4,5%).`);
+        else if (k.bmr >= 4.5) parts.push(`im <strong>marktüblichen</strong> Bereich.`);
+        else parts.push(`<strong>unterdurchschnittlich</strong> und braucht entweder Mietsteigerung oder Kaufpreis-Reduktion.`);
+        parts.push(`<em>Gemessen am Bundesdurchschnitt — für deine Zielrendite trage oben die Lageklasse ein.</em>`);
+      }
     }
 
     if (k.cfMon != null) {
@@ -6214,6 +6254,7 @@ function renderTransferList() {
     try { window._qcExposePhotos=[]; } catch(e){}
     try { window.__qbPlzOrtLast=''; } catch(e){}
     try { window.parent.postMessage({source:'dp-qc',type:'qc-reset-buffer'},'*'); } catch(e){}
+    try { if (window.__qcLageVorgabe) window.__qcLageVorgabe.vorbelegen(); } catch(e){} /* v2159 */
     _qbSetRunBtn('abrufen');
     try { if (typeof scheduleUpdate==='function') scheduleUpdate(); } catch(e){}
     showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');
@@ -6452,7 +6493,13 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         var raw=String(v).trim().toLowerCase();
         for(var i=0;i<e.options.length;i++){
           var t=(e.options[i].text||"").toLowerCase(), vv=(e.options[i].value||"").toLowerCase();
-          if(t===raw||vv===raw||(t&&t.indexOf(raw)>=0)||(raw&&raw.indexOf(t)>=0)){ e.selectedIndex=i; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
+          /* v2159: erst exakt (Wert oder Text); der ungefaehre Treffer folgt unten und ueberspringt die leere Option */
+          if(t===raw||vv===raw){ e.selectedIndex=i; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
+        }
+        for(var i2=0;i2<e.options.length;i2++){
+          var t2=(e.options[i2].text||"").toLowerCase(), vv2=(e.options[i2].value||"").toLowerCase();
+          if(!vv2) continue;
+          if((t2&&t2.indexOf(raw)>=0)||(raw&&t2&&raw.indexOf(t2)>=0)){ e.selectedIndex=i2; try{e.dispatchEvent(new Event("change",{bubbles:true}));}catch(_){} return; }
         }
         return;
       }
@@ -6581,26 +6628,64 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
 
-  <script src="js/dscr-engine.js?v=969n"></script>
-  <script src="js/deal-kpis.js?v=969n"></script>
+  <script src="js/dscr-engine.js?v=v2149"></script>
+  <script src="js/deal-kpis.js?v=v2149"></script>
   <!-- v1956: das Lage-Profil. Eigenes Dokument, eigene Einbindung -
        gleicher Ursprung, also derselbe Speicher wie im Hauptfenster. -->
-  <script src="js/lage-profil.js?v=v1956"></script>
+  <script src="js/lage-profil.js?v=v2159"></script>
+  <style>.qc-lk-vorgabe{display:block;margin-top:4px;font-size:10.5px;letter-spacing:.02em;opacity:.72}.qc-lk-vorgabe[hidden]{display:none}</style>
+  <script>
+  /* v2159 · N62.11 - die Standardklasse des Profils belegt einen NEUEN
+     Quick-Check vor. Nur wenn das Feld leer ist: ein geladener oder
+     diktierter Wert gewinnt immer. Der Hinweis bleibt nur stehen, solange
+     der Wert noch der vorbelegte ist - jede andere Wahl, auch per Diktat,
+     loescht ihn (Pruefung bei change und nach jedem Import-Ergebnis). */
+  (function () {
+    function el() { return document.getElementById('qc_lageklasse'); }
+    function hinweis() {
+      var s = el(), h = document.getElementById('qc_lageklasse_vorgabe');
+      if (!s || !h) return;
+      var gilt = s.dataset.lkVorgabe && s.value === s.dataset.lkVorgabe;
+      if (!gilt) { delete s.dataset.lkVorgabe; }
+      h.hidden = !gilt;
+    }
+    function vorbelegen() {
+      var s = el(), LP = window.DealPilotLageProfil;
+      if (!s || !LP || !LP.standard) return;
+      var k = LP.standard();
+      if (k && !s.value) { s.value = k; s.dataset.lkVorgabe = k;
+        try { s.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
+      hinweis();
+    }
+    window.__qcLageVorgabe = { vorbelegen: vorbelegen, hinweis: hinweis };
+    function los() {
+      vorbelegen();
+      var s = el(); if (s) s.addEventListener('change', hinweis);
+      window.addEventListener('message', function (ev) {
+        /* Ein Diktat ist eine ausdrueckliche Angabe - auch wenn es dieselbe Klasse nennt. */
+        var d = ev && ev.data, s2 = el();
+        if (s2 && d && d.type === 'qc-import-result' && d.data && d.data.qc_lageklasse) delete s2.dataset.lkVorgabe;
+        setTimeout(hinweis, 0);
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los); else los();
+  })();
+  </script>
   <script src="js/score-tiers.js?v=v1950"></script>
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2143"></script>
+  <script src="js/qc-heuristik.js?v=v2148c"></script>
   <script src="js/dealscore.js?v=v2141"></script>
-  <script src="js/avm-section.js?v=W33"></script>
+  <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
      kommt hier nicht rein. Deshalb laedt der iframe die Override-Ebene selbst
      und holt sein Branding ueber ji_token (same-origin). -->
-  <script src="js/whitelabel-override.js?v=W33"></script>
+  <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
   <script src="js/dealpilot-mb-qc.js?v=953"></script>
-  <script src="js/immometrica-qc.js?v=W33"></script>
+  <script src="js/immometrica-qc.js?v=v2149"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">
 html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !important; }

@@ -103,6 +103,9 @@ if (typeof openai.buildPrompt !== 'function') {
 const auftrag = {
   objekt: {
     str: 'Pruefstrasse', hnr: '9', plz: '32609', ort: 'Pruefort',
+    /* v2157 · die vier Lage-Felder und die Lageklasse (N62.4) */
+    lageklasse: 'PRUEF-B', bevoelkerung: 'PRUEF-WACHSEND', nachfrage: 'PRUEF-STARK',
+    wertsteigerung: 'PRUEF-HOCH', entwicklung: 'PRUEF-BEGRENZT',
     objektart: 'mfh', wfl: 23456, baujahr: 1968, zimmer: 5,
     kaufpreis: 345678,
     einheiten: {
@@ -116,10 +119,25 @@ const auftrag = {
       /* Ein OBJEKT, so wie `mfh-einheiten.js` es fuehrt (Gewerk ->
          Stufe) — nicht ein String. Mein erster Auftrag schickte einen
          String, und genau daran fiel die Typfalle im Leser auf. */
-      modernisierung: { Dach: 'PRUEFSTUFE-4', Heizung: 'PRUEFSTUFE-2' },
+      /* v2156: `_buildAIPayload()` uebersetzt die Rohcodes jetzt VOR dem
+         Senden (ui.js, STUFE_ZU_OBJEKT). Der Auftrag traegt deshalb die
+         uebersetzte Form — so, wie der echte Sender sie schickt. Die
+         frueheren Werte („PRUEFSTUFE-4") waren erfunden und haetten den
+         Rohcode-Befund nie gezeigt. */
+      modernisierung: { dach: '< 5 Jahre', heizung: '10 - 20 Jahre' },
       je_einheit: [{
         nr: 1, wfl: 8123, miete: 91234, art: 'wohnen', status: 'vermietet',
         lage: 'PRUEFLAGE-EINS',
+        /* v2156 · die neun Felder, die bis v2155 im Sender haengenblieben */
+        soll_miete: 97531,
+        mietvertrag_seit: '2018-03-01',
+        kuendigungsverzicht_bis: '2029-06-30',
+        erhoehung_art: 'PRUEF-STAFFEL',
+        erhoehung_wert: 43,
+        erhoehung_rhythmus_jahre: 2,
+        stufen_offen: 3,
+        massnahme: 'PRUEF-BAD-ERNEUERN',
+        massnahme_kosten: 28456,
         /* Die sieben, die bis v2139 ungelesen mitreisten (ui.js:813-826) */
         etage: 'PRUEFETAGE', zimmer: 7,
         vertragsart: 'PRUEF-STAFFELMIETE',
@@ -151,7 +169,11 @@ const auftrag = {
       verteilung_jahre: '4'
     },
     sonder_afa_7b: true,                      /* ui.js:908 — war stumm */
-    erbbaurecht: { ja: true, erbbauzins_eur_jahr: 19876 }  /* ui.js:909-911 */
+    erbbaurecht: { ja: true, erbbauzins_eur_jahr: 19876 },  /* ui.js:909-911 */
+    /* v2166: Werbungskosten, Wende, Jahresverlauf */
+    werbungskosten_jahr1: { schuldzinsen_eur: 13579, afa_eur: 8642, bewirtschaftung_steuerlich_eur: 2468, summe_eur: 24689, mieteinnahmen_eur: 21357 },
+    wende: { erstes_jahr_steuerlich_positiv: 2034, steuerwirkung_bis_dahin_eur: -11223, steuerlast_danach_bis_jahr15_eur: 9988, gerechnet_ueber_jahre: 30 },
+    verlauf: [{ jahr: 2027, miete_eur: 21357, zinsen_eur: 13579, afa_eur: 8642, bwk_steuerlich_eur: 2468, ergebnis_vuv_eur: -3332, steuer_eur: -1389, cashflow_nach_steuer_eur: 777 }]
   },
 
   bewirtschaftung: {
@@ -177,7 +199,11 @@ const auftrag = {
 
   boden: {
     bodenrichtwert_eur_qm: 219, grundstueck_qm: 9876,
-    sachwertfaktor: 1.07, liegenschaftszins_pct: 2.56
+    /* v2156: der Objekt-Zins ist mit ABSICHT anders als der des
+       Berichts (2,56 %). So wird der Abweichungszweig im
+       Wertermittlungsblock mitgeprueft — zwei Zahlen, die gleich heissen
+       und verschieden sind, waren genau der Befund. */
+    sachwertfaktor: 1.07, liegenschaftszins_pct: 3.40
   },
 
   /* v2139a: die Namen aus `ui.js:987-991` ausgelesen, nicht geraten. */
@@ -231,7 +257,74 @@ const auftrag = {
   verhandlung: { inseriert_seit: '2026-01-13', tage_online: 263 },
   investor_score: { total: 71, rendite: 67, finanzierung: 73, risiko: 61, lage: 79 },
   dealscore: { total: 68 },
-  herkunft: 'PRUEF-HERKUNFT-OBJEKT'
+  herkunft: 'PRUEF-HERKUNFT-OBJEKT',
+
+  /* ══ v2150 · DER MARKTBERICHT, SO WIE ai.js IHN BAUT ═════════════════
+   *
+   * Die Form ist NICHT erfunden: `_mbHistoryFor()` in
+   * `backend/src/routes/ai.js:38` gibt `{ anzahl, aktuell, verlauf }`,
+   * wobei `aktuell` die ganze Zeile aus `/objects/history` ist. Die
+   * Feldnamen stehen in der SELECT-Liste von
+   * `marktbericht/backend/src/routes/api.js:524` — `sachwert_eur`,
+   * `ertragswert_eur`, `fuehrend`, `fuehrend_grund`, `fuehrend_quelle`.
+   *
+   * > Ein Pruefauftrag mit erfundenen Feldnamen misst nichts. Genau
+   * > dieser Fehler hat beim Objekt-Mapper 46 Testwerte gekostet.
+   *
+   * Die Zahlen sind so gewaehlt, dass der Abstand Ertrags- zu Sachwert
+   * ueber 25 % liegt (291.837 -> 367.419 = +25,9 %) — damit wird auch
+   * der DEUTUNGS-Zweig mitgeprueft, nicht nur die Ausgabe der Zahlen.
+   * Der Zeitabstand im Verlauf ist mit Absicht groesser als 30 Tage,
+   * sonst greift der Riegel und die Entwicklungszeilen fallen weg. */
+  marktbericht: {
+    anzahl: 2,
+    aktuell: {
+      created_at: '2026-10-10T09:15:00.000Z',
+      address: 'PRUEFADRESSE-BERICHT 9',
+      market_value: 352000, market_value_low: 318000, market_value_high: 389000,
+      median_sqm: 2714, confidence_pct: 71,
+      micro_score: 63, macro_score: 58,
+      gross_yield_pct: 6.4, rent_multiplier: 15.6, deal_score: 67,
+      /* die Stufe-3-Felder, die bis v2149 niemand gelesen hat */
+      sachwert_eur: 291837,
+      ertragswert_eur: 367419,
+      fuehrend: 'ertragswert',
+      fuehrend_grund: 'PRUEFGRUND-RENDITEOBJEKT',
+      fuehrend_quelle: 'PRUEFQUELLE-PARAGRAF-6',
+      hat_crosscheck: true,
+      /* ══ v2156 · DER ZINS, DER DEN ERTRAGSWERT ERZEUGT ═══════════════
+         Die Feldnamen stammen aus der erweiterten SELECT-Liste von
+         `/objects/history` (marktbericht api.js), nicht aus meinem Kopf:
+         lzs_pct, lzs_stufe, lzs_zweig, lzs_berichtsjahr,
+         lzs_aus_register, gnd_jahre, bwk_quote.
+         Der Zins ist mit ABSICHT anders als der im Objekt (3,40 %) —
+         so wird der Abweichungszweig mitgeprueft. */
+      lzs_pct: 2.56,
+      lzs_stufe: 'PRUEF-A',
+      lzs_zweig: 'PRUEF-ZWEIG-WOHNEN',
+      lzs_berichtsjahr: 2025,
+      lzs_aus_register: true,
+      gnd_jahre: 70,
+      bwk_quote: 0.22,
+      /* v2157 · die Lage, zweimal erhoben, und der Zensus. Mikrolage mit
+         Absicht abweichend, damit die Abweichungsmarke mitgeprueft wird. */
+      lage_bericht: { makrolage: 'PRUEF-MAKRO-GLEICH', mikrolage: 'PRUEF-MIKRO-BERICHT', nachfrage: 'PRUEF-NACHFRAGE-BERICHT' },
+      lage_nutzer:  { makrolage: 'PRUEF-MAKRO-GLEICH', mikrolage: 'PRUEF-MIKRO-NUTZER' },
+      bevoelkerung_trend_pct: 0.2976,
+      zensus: { available: true, leerstandsquote: 3.7, eigentuemerquote: 51.2, nettokaltmiete_qm: 6.41, kreis_name: 'PRUEFKREIS',
+        gemeinde: { name: 'PRUEFGEMEINDE', nettokaltmiete_qm: 5.87, leerstandsquote: 4.4, leerstandsquote_marktaktiv: 1.3,
+          miete_baujahr: { klasse: 'PRUEF-BJ-KLASSE', wert: 5.11 }, miete_flaeche: null,
+          leerstandsdauer: [{ text: 'PRUEF-DAUER', anteil_pct: 61.7 }] },
+        kreis: { name: 'PRUEFKREIS', miete_flaeche: { klasse: 'PRUEF-FL-KLASSE', wert: 4.22 } } },
+      data: { rent: { median_sqm: 7.31 } }
+    },
+    verlauf: [
+      { datum: '2026-06-02T08:00:00.000Z', marktwert: 338000, deal_score: 61,
+        sachwert: 280111, ertragswert: 349222, fuehrend: 'ertragswert' },
+      { datum: '2026-10-10T09:15:00.000Z', marktwert: 352000, deal_score: 67,
+        sachwert: 291837, ertragswert: 367419, fuehrend: 'ertragswert' }
+    ]
+  }
 };
 
 /* ══ DIE ERWARTUNGEN ═════════════════════════════════════════════════
@@ -305,7 +398,13 @@ const ERWARTET = [
   ['halter.name', 'ui.js:988', 'PRUEF-HALTER-GMBH'],
   ['wohnung.garagen', 'ui.js:976', '3'],
   ['objekt.einheiten.stand', 'ui.js:837', '2026-10-12'],
-  ['objekt.einheiten.modernisierung', 'ui.js:838', 'Dach=PRUEFSTUFE-4'],
+  /* v2156: hier stand `Dach=PRUEFSTUFE-4` — ein erfundener Stufenwert.
+     Er hat zwar bewiesen, dass das FELD ankommt, aber nie gezeigt, dass
+     dort ein unverstaendlicher ROHCODE stand (`dach=v`). Ein erfundener
+     Testwert prueft die Leitung und nicht den Inhalt. Die Erwartung
+     steht jetzt unter „Stufen: Klartext statt Code" mit dem echten
+     uebersetzten Wert. */
+  ['objekt.einheiten.modernisierung', 'ui.js:838', 'dach=< 5 Jahre'],
   ['objekt.einheiten.flaeche_summe', 'ui.js:788', 'ABWEICHUNG Flaeche'],
 
   /* ── v2140 · das Investmentprofil ──────────────────────────────── */
@@ -330,7 +429,107 @@ const ERWARTET = [
   ['kennzeichnung: Vorgabe', 'v2140b', 'vor Steuer  (Vorgabe, nicht gesetzt)'],
   ['kennzeichnung: Strategie gesetzt', 'v2140b', 'PRUEF-BUY-AND-HOLD  (selbst gesetzt)'],
   ['kennzeichnung: Marktlage Vorgabe', 'v2140b', 'PRUEF-SEITWAERTS  (Vorgabe, nicht gesetzt)'],
-  ['Ordnung: Vorgabe ist keine Aussage', 'v2140b', 'KEINE Aussage des Nutzers']
+  ['Ordnung: Vorgabe ist keine Aussage', 'v2140b', 'KEINE Aussage des Nutzers'],
+
+  /* ══ v2150 · DIE STUFE-3-WERTE DES MARKTBERICHTS ═════════════════════
+     Marcel am 12.10.2026: „auch wenn Stufe 3 gerechnet wurde sollte auf
+     jedenfall auch der Verkehrswert mit einfliessen und die
+     Gesamtbewertung einfliessen."
+
+     GEMESSEN: `/objects/history` liefert `sachwert_eur`,
+     `ertragswert_eur`, `fuehrend` + Grund + Quelle seit v1963/v1965.
+     `buildPrompt()` las davon kein einziges Feld — es endete beim
+     Deal-Score. Die Werte reisten bis in den Prompt-Bauer und wurden
+     dort fallen gelassen. */
+  ['Stufe 3: Sachwert',            'v2150', '291.837'],
+  ['Stufe 3: Ertragswert',         'v2150', '367.419'],
+  ['Stufe 3: Abstand gerechnet',   'v2150', '+25,9 %'],
+  ['Stufe 3: Abstand gedeutet',    'v2150', 'WEIT auseinander'],
+  ['Stufe 3: fuehrendes Verfahren', 'v2150', 'Ertragswertverfahren'],
+  ['Stufe 3: Grund der Wahl',      'v2150', 'PRUEFGRUND-RENDITEOBJEKT'],
+  ['Stufe 3: Rechtsgrundlage',     'v2150', 'PRUEFQUELLE-PARAGRAF-6'],
+  ['Stufe 3: der tragende Wert',   'v2150', 'Der TRAGENDE Wert'],
+  /* Die EINORDNUNG ist kein Beiwerk: ohne sie wird aus einem
+     Quercheck ein Verkehrswert. Sie wird genauso geprueft wie die Zahl. */
+  ['Stufe 3: kein Gutachten',      'v2150', 'KEIN Gutachten nach Paragraf 194 BauGB'],
+  ['Stufe 3: nie "Verkehrswert"',  'v2150', 'nie als "Verkehrswert"'],
+  /* Entwicklung ueber mehrere Berichte (Marcels „aussagen ueber die
+     entwicklung treffen") */
+  ['Verlauf: Verfahrenswerte',     'v2150', 'Entwicklung der Verfahrenswerte ueber 2 Berichte'],
+  ['Verlauf: aelterer Sachwert',   'v2150', '280.111'],
+  /* Der Recherche-Auftrag muss den Bericht kennen */
+  ['Recherche: Bericht hat Vorrang', 'v2150', 'LIEGT EIN MARKTBERICHT VOR'],
+  ['Recherche: nie ohne Hinweis',  'v2150', 'NIE eine recherchierte Zahl ohne Hinweis'],
+  /* Aufgabe 14 und ihr Zielfeld — ohne Feld faellt die Arbeit auf den
+     Boden, das ist die Lehre aus v2139 */
+  ['Aufgabe 14 steht da',          'v2150', '14. Abgleich mit dem Marktbericht'],
+  ['Zielfeld berichts_abgleich',   'v2150', '"berichts_abgleich"'],
+  ['Zielfeld mietspiegel_herkunft', 'v2150', '"mietspiegel_herkunft"'],
+  ['Mietspiegel: Bericht zuerst',  'v2150', 'VORRANG: der Wert aus dem DealPilot-Marktbericht'],
+
+  /* ══ v2156 · ALLES MUSS EINFLIESSEN (N62.3) ══════════════════════════
+     Marcel am 12.10.2026: „ob generell alle Daten, also auch aus den
+     Mehrfamilienhaeusern, aus dem Konfigurator … auch Finanzierung und
+     Liegenschaftszinsen und Wertgutachten, dass auch wirklich alles
+     damit einfliesst."
+
+     GEMESSEN vorher: von 36 Feldern je Einheit reisten 13 mit, die
+     Modernisierungsstufen kamen als ROHCODES (`dach=v`), und der
+     Liegenschaftszins stand ohne Auftrag und fehlte im
+     Wertermittlungsblock ganz. */
+  ['MFH: Soll-Kaltmiete',          'v2156', 'Soll-Kaltmiete 97531'],
+  ['MFH: Vertrag seit',            'v2156', 'Vertrag seit 2018-03-01'],
+  ['MFH: Kuendigungsverzicht',     'v2156', 'KUENDIGUNGSVERZICHT bis 2029-06-30'],
+  ['MFH: Erhoehungsart',           'v2156', 'Erhoehung: PRUEF-STAFFEL'],
+  ['MFH: Erhoehungswert',          'v2156', '(43)'],
+  ['MFH: Rhythmus',                'v2156', 'alle 2 Jahre'],
+  ['MFH: offene Stufen',           'v2156', '3 Stufe(n) offen'],
+  ['MFH: Massnahme',               'v2156', 'MASSNAHME: PRUEF-BAD-ERNEUERN'],
+  ['MFH: Massnahmekosten',         'v2156', '28.456'],
+  /* Die Rohcodes: VORHER stand im Prompt `dach=v`. Jetzt der Klartext —
+     und der Rohcode darf NICHT mehr vorkommen. */
+  ['Stufen: Klartext statt Code',  'v2156', 'dach=< 5 Jahre'],
+  ['Stufen: zweites Gewerk',       'v2156', 'heizung=10 - 20 Jahre'],
+  /* Liegenschaftszins: Auftrag am Objektfeld */
+  ['LZS: Auftrag am Objektfeld',   'v2156', 'AUFTRAG zum Liegenschaftszins'],
+  ['LZS: der Hebel genannt',       'v2156', 'um gut ein\n  Fuenftel'],
+  /* Liegenschaftszins: im Wertermittlungsblock, mit Herkunft */
+  ['LZS: im Wertermittlungsblock', 'v2156', 'Liegenschaftszinssatz der Rechnung: 2,56 %'],
+  ['LZS: Stufe als Herkunft',      'v2156', 'Stufe PRUEF-A'],
+  ['LZS: Zweig',                   'v2156', 'PRUEF-ZWEIG-WOHNEN'],
+  ['LZS: Jahrgang',                'v2156', 'Jahrgang 2025'],
+  ['LZS: aus dem Register',        'v2156', 'aus dem amtlichen Register'],
+  ['LZS: Abweichung gemeldet',     'v2156', 'ABWEICHUNG: im Objekt ist 3,40 %'],
+  ['GND der Rechnung',             'v2156', 'Gesamtnutzungsdauer der Rechnung: 70 Jahre'],
+  ['BWK-Quote der Rechnung',       'v2156', 'Bewirtschaftungskostenquote der Rechnung: 22,0 %'],
+  /* Staerken und Risiken: echte Vorgabe je Eintrag */
+  ['Staerken: Satzvorgabe',        'v2156', 'je Eintrag 3-4 Sätze MIT der Zahl'],
+  ['Risiken: Folge verlangt',      'v2156', 'mit der Folge für den Investor'],
+  /* v2157 · N62.4 */
+  ['objekt.lageklasse',            'ui.js v2157', 'PRUEF-B-Lage'],
+  ['objekt.bevoelkerung',          'ui.js v2157', 'PRUEF-WACHSEND'],
+  ['objekt.nachfrage',             'ui.js v2157', 'PRUEF-STARK'],
+  ['objekt.wertsteigerung',        'ui.js v2157', 'PRUEF-HOCH'],
+  ['objekt.entwicklung',           'ui.js v2157', 'PRUEF-BEGRENZT'],
+  ['Lage: Bericht-Seite',          'v2157', 'Bericht PRUEF-NACHFRAGE-BERICHT'],
+  ['Lage: Abweichung markiert',    'v2157', 'Bericht PRUEF-MIKRO-BERICHT | Objektfeld PRUEF-MIKRO-NUTZER  <- WEICHT AB'],
+  ['Lage: Gleichstand ohne Marke', 'v2157', 'Bericht PRUEF-MAKRO-GLEICH | Objektfeld PRUEF-MAKRO-GLEICH\n'],
+  ['Bevoelkerungstrend',           'v2157', '+0,30 % pro Jahr'],
+  ['Zensus: Leerstand',            'v2157', 'Leerstandsquote 3,7 %'],
+  ['Zensus: Kreis + Stichtag',     'v2157', 'Stichtag 15.05.2022, KREIS PRUEFKREIS'],
+  ['Zensus: Gemeinde',             'v2162', 'Gemeinde PRUEFGEMEINDE: Nettokaltmiete 5,87'],
+  ['Zensus: Baujahr aus Gemeinde',  'v2162', 'PRUEF-BJ-KLASSE (Gemeinde): 5,11'],
+  ['Zensus: Groesse aus Kreis',     'v2162', 'PRUEF-FL-KLASSE (Kreis): 4,22'],
+  ['Zensus: Leerstandsdauer',       'v2162', 'PRUEF-DAUER 61,7 %'],
+  ['Zensus: Bestandsmiete-Hinweis', 'v2162', 'BESTANDSMIETE aller laufenden Vertraege'],
+  ['Aufgabe 15 + Zielfeld',        'v2157', '"lage_gegenueberstellung": ['],
+  ['Steuer: Werbungskosten Jahr 1', 'v2166', 'Werbungskosten gesamt 24.689 EUR = Schuldzinsen 13.579 + AfA 8.642'],
+  ['Steuer: Jahr der Wende',        'v2166', 'Erstes Jahr mit positivem Ergebnis aus Vermietung: 2034'],
+  ['Steuer: Steuerlast danach',     'v2166', 'Steuerlast danach bis Jahr 15: 9.988 EUR'],
+  ['Steuer: Jahresverlauf',         'v2166', '2027 | 21357 | 13579 | 8642 | 2468 | -3332 | -1389 | 777'],
+  ['Aufgabe 16 Steuer',             'v2160', '16. Steuerliche Zusammenfassung'],
+  ['Zielfeld steuer_zusammenfassung', 'v2160', '"steuer_zusammenfassung":'],
+  ['Zielfeld soll_ist_steuer (Ankauf)', 'v2160', '"soll_ist_steuer":']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */
@@ -373,7 +572,27 @@ const proben = [
   ['steuer.sanierung', '47.119', function (a) { delete a.steuer.sanierung; }],
   ['ankauf.kennzahlen_damals', 'PRUEF-KENNZAHLEN-DAMALS', function (a) {
     delete a.ankauf.kennzahlen_damals; }],
-  ['investor_profil', 'DIESER INVESTOR', function (a) { delete a.investor_profil; }]
+  ['investor_profil', 'DIESER INVESTOR', function (a) { delete a.investor_profil; }],
+  /* ══ v2150 · OHNE BERICHT DARF NICHTS DAVON STEHEN ═══════════════════
+     Das ist die wichtigere Haelfte. Ein Auftrag „gleiche mit dem
+     Marktbericht ab", wenn gar keiner vorliegt, erzeugt eine erfundene
+     Antwort — und zwar eine, die wie eine gemessene aussieht.
+     Jede der vier Proben nimmt den Bericht weg und prueft eine andere
+     Stelle, die er eingefuegt hatte. */
+  ['marktbericht: Sachwert',    '291.837',                      function (a) { delete a.marktbericht; }],
+  ['marktbericht: Aufgabe 14',  '14. Abgleich mit dem Marktbericht', function (a) { delete a.marktbericht; }],
+  ['marktbericht: Recherche-Vorrang', 'LIEGT EIN MARKTBERICHT VOR', function (a) { delete a.marktbericht; }],
+  /* Und der Sonderfall, der zwischen „kein Bericht" und „Bericht ohne
+     Stufe 3" liegt: ein Bericht, bei dem nur die Marktpreisindikation
+     gerechnet wurde. Dann darf der Block ueberhaupt nicht erscheinen,
+     obwohl der Bericht selbst da ist. */
+  ['Bericht ohne Stufe 3',      'WERTERMITTLUNG IM BERICHT',    function (a) {
+    delete a.marktbericht.aktuell.sachwert_eur;
+    delete a.marktbericht.aktuell.ertragswert_eur;
+    delete a.marktbericht.aktuell.fuehrend;
+    delete a.marktbericht.aktuell.fuehrend_grund;
+    a.marktbericht.verlauf.forEach(function (v) { delete v.sachwert; delete v.ertragswert; });
+  }]
 ];
 
 /* ── Die Typprobe (v2139a) ─────────────────────────────────────────────

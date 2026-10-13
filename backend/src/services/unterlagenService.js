@@ -211,6 +211,266 @@ function _sauber(url) {
   } catch (e) { return u; }
 }
 
+/* ══ v2151 · DIE ADRESSEN AUF EINER SEITE — WIRKLICH LESEN ════════════
+ *
+ * Marcel am 12.10.2026: „ich meine das unterlagen app das müssen wir
+ * ergänzen ist ja schon drin. soll nur ergänzt werden bzw. bissel
+ * erweitert." Die Vorlage ist `unterlagen-app-v6-ansprechpartner`.
+ *
+ * ── DER GEMESSENE DEFEKT ────────────────────────────────────────────
+ *
+ * Die Belegprüfung suchte bis v2150 `text.includes(adresse)` im rohen
+ * HTML. Ämter schreiben ihre Adressen aber gegen Erntemaschinen
+ * verschleiert. Am 12.10.2026 an neun echten Schreibweisen gemessen —
+ * VIER wurden verfehlt:
+ *
+ *   gefunden   info@stadt-xy.de
+ *   gefunden   info<span>@</span>stadt-xy.de      (über den Rückfall)
+ *   gefunden   info(at)stadt-xy.de                (über den Rückfall)
+ *   VERFEHLT   info [at] stadt-xy [dot] de
+ *   gefunden   info&commat;stadt-xy.de            (über den Rückfall)
+ *   VERFEHLT   in<soft hyphen>fo@stadt-xy.de
+ *   VERFEHLT   info@stadt<wbr>-xy.de
+ *   gefunden   Info@Stadt-XY.de
+ *   VERFEHLT   info@stadt<Gedankenstrich>xy.de
+ *
+ * Eine verfehlte Adresse heisst „steht nicht auf der genannten
+ * Quellseite" — für eine Adresse, die dort steht. Der Nutzer bekommt
+ * eine Warnung für einen korrekten Fund.
+ *
+ * ── UND DER RUECKFALL WAR ZUGLEICH ZU LAX ───────────────────────────
+ *
+ * Drei der fünf Treffer kamen über den Rückfall
+ * `text.includes(konto) && text.includes(domain)`. Der prüft nur, ob
+ * beide Teile IRGENDWO auf der Seite stehen:
+ *
+ *   > „info" steht auf fast jeder Amtsseite im Menü, die Domain im
+ *   > Impressum. Diese Prüfung sagt dann „bestätigt", ohne dass die
+ *   > Adresse dort überhaupt vorkommt. Ein falscher Beleg ist
+ *   > schlimmer als keiner — er behauptet eine Herkunft.
+ *
+ * Beides ersetzt dieser Leser: er stellt die Seite erst her (Entities,
+ * zerstückelnde Inline-Tags, (at)/(dot)-Schreibweisen, unsichtbare
+ * Zeichen, Gedankenstriche) und liest dann ECHTE Adressen. Danach wird
+ * verglichen — vollständig, nicht in Teilen.
+ *
+ * Die Reihenfolge der Fundstellen bleibt die der Seite. Das ist kein
+ * Beiwerk: die erste genannte Person ist die zuständige. */
+function mailsAufSeite(html) {
+  let t = String(html || '')
+    .replace(/&#(\d+);/g, function (_, d) { return String.fromCharCode(+d); })
+    .replace(/&#x([0-9a-f]+);/gi, function (_, h) { return String.fromCharCode(parseInt(h, 16)); })
+    .replace(/&commat;/gi, '@').replace(/&period;/gi, '.').replace(/%40/gi, '@');
+  /* Inline-Tags fallen WEG (eine Adresse ist oft mit <span> zerstückelt),
+     alle anderen werden zu einem Leerzeichen — sonst klebt der Text zweier
+     Absätze zu einer Scheinadresse zusammen. Beide Fassungen werden
+     gelesen: das Entfernen kann selbst zwei Wörter verkleben. */
+  const ohneTags = t.replace(/<\/?(span|b|i|u|em|strong|wbr|font|nobr|abbr|small)\b[^>]*>/gi, '')
+                    .replace(/<[^>]+>/g, ' ');
+  t = (t + '\n' + ohneTags)
+    .normalize('NFKC')
+    .replace(/[­​-‍⁠﻿]/g, '')   /* Soft-Hyphen, Zero-Width */
+    .replace(/[‐-―−]/g, '-')              /* Gedankenstriche zu Bindestrich */
+    .replace(/\s*[([{]\s*(at|ät)\s*[)\]}]\s*/gi, '@')
+    .replace(/\s*[([{]\s*(dot|punkt)\s*[)\]}]\s*/gi, '.')
+    .toLowerCase();
+  const treffer = t.match(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/g) || [];
+  return [...new Set(treffer)]
+    .filter(function (m) { return mailGueltig(m); })
+    /* Eine Bilddatei ist keine Adresse: `logo@2x.png` trifft das Muster. */
+    .filter(function (m) { return !/\.(png|jpe?g|gif|svg|webp|css|js|woff2?)$/.test(m); });
+}
+
+/* ══ v2152a · `seiten` HAT ZWEI FORMEN — UND BEIDE SIND GUELTIG ════════
+ *
+ * Bis v2150 war die Spalte eine URL-Liste:        ["https://…", …]
+ * Seit v2151 ist sie ein Objekt mit dem Beleg:    { liste, pro_seite, … }
+ *
+ * GEMESSEN auf Staging am 12.10.2026 nach der Migration: alle 19
+ * bestehenden Saetze tragen noch `array`, neue bekommen `object`. Die
+ * Spalte ist damit GEMISCHT, und das bleibt sie — eine Nachmigration
+ * waere falsch, weil die Altsaetze den Beleg je Seite gar nicht haben:
+ * ihn zu erfinden waere schlimmer als ihn zu vermissen.
+ *
+ *   > Wer `amt.seiten.pro_seite` liest, bekommt bei 19 von 19
+ *   > vorhandenen Saetzen `undefined` — und das sieht wie „keine Seiten
+ *   > gelesen" aus, statt wie „aus der Zeit vor dem Beleg".
+ *
+ * Darum gibt es EINEN Leser, und der versteht beide Formen. Dieselbe
+ * Rangfolge-Technik wie bei `gnd_jahre` im Marktbericht: mehrere Namen
+ * oder Formen, eine Stelle, die sie kennt.
+ *
+ * Heute hat die Spalte noch keinen Leser im Produkt — dieser hier ist
+ * fuer den naechsten, damit er nicht erst messen muss. */
+function seitenLesen(seiten) {
+  if (!seiten) return { liste: [], pro_seite: [], alternativen: [], alt: false };
+  if (Array.isArray(seiten)) {
+    /* Alte Form: nur URLs, kein Beleg. `alt: true` ist die ehrliche
+       Auskunft — der Aufrufer darf nicht glauben, hier sei nichts
+       gefunden worden. */
+    return { liste: seiten.filter(Boolean), pro_seite: [], alternativen: [], alt: true };
+  }
+  return {
+    liste: Array.isArray(seiten.liste) ? seiten.liste : [],
+    pro_seite: Array.isArray(seiten.pro_seite) ? seiten.pro_seite : [],
+    alternativen: Array.isArray(seiten.alternativen) ? seiten.alternativen : [],
+    beleg_quelle: seiten.beleg_quelle || null,
+    alt: false
+  };
+}
+
+/* ══ v2152 · DIE ZWEI ANSPRECHPERSONEN — ZUSAMMENGEBAUT, NICHT GERATEN ══
+ *
+ * Marcel am 12.10.2026: „ja mach die ansprechpartner gleich mit."
+ * Vorlage: `unterlagen-app-v6-ansprechpartner`, dort server.js:428-446.
+ *
+ * ── DIE RANGFOLGE, UND WARUM SIE SO IST ────────────────────────────
+ *
+ *   1. was die KI auf der Seite GELESEN hat (mit Name und Funktion)
+ *   2. aufgefüllt mit den persönlichen Postfächern der QUELLSEITE,
+ *      in der Reihenfolge der Seite
+ *
+ * Der zweite Schritt ist kein Notnagel. Viele Amtsseiten nennen die
+ * Person im Bild oder in einer Tabelle, die kein Modell zuverlässig
+ * liest — die Adresse `a.mueller@…` steht aber im Text. Eine Adresse
+ * ohne Namen ist eine brauchbare Angabe; ein Name ohne Beleg ist keine.
+ *
+ * ── WAS NICHT PASSIERT ─────────────────────────────────────────────
+ *
+ * Höchstens zwei. Nie die Adresse, die ohnehin Empfänger ist — sonst
+ * steht dieselbe Adresse zweimal im Brief, einmal als An und einmal als
+ * Kopie. Und `bestaetigt` ist nur dann true, wenn die Adresse auf einer
+ * von uns SELBST gelesenen Seite stand:
+ *
+ *   > Ohne diese Unterscheidung wäre „Ansprechpartner 1" eine
+ *   > Behauptung. v5 wusste nur, ob eine Adresse irgendwo stand, v6
+ *   > weiß auf WELCHER Seite — und genau dafür liegt seit v2151
+ *   > `seiten.pro_seite` vor.
+ *
+ * `kopie` beginnt bei false. Der Nutzer hakt an, wer ins CC geht; eine
+ * Software, die von sich aus jemanden in Kopie setzt, verschickt Post
+ * an Menschen, die der Absender nicht gewählt hat.
+ */
+function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
+  const personen = [];
+  const eigen = _s(eigeneMail).toLowerCase();
+  const alle = (belegDetail && belegDetail.alle) || [];
+
+  function merke(p) {
+    if (personen.length >= 2) return;
+    if (!p.name && !p.email) return;                    /* leere Hülle */
+    if (p.email && p.email === eigen) return;           /* ist schon Empfänger */
+    if (p.email && personen.some((x) => x.email === p.email)) return;
+    if (!p.email && personen.some((x) => x.name && x.name === p.name)) return;
+    personen.push({
+      name: p.name || '', funktion: p.funktion || '',
+      email: p.email || '', telefon: p.telefon || '',
+      /* Belegt heisst: WIR haben die Adresse auf einer Seite gefunden,
+         die wir selbst abgerufen haben. Nicht: die KI hat sie genannt. */
+      bestaetigt: !!(p.email && alle.indexOf(p.email) >= 0),
+      kopie: false
+    });
+  }
+
+  /* 1 · Was die Recherche genannt hat */
+  const genannt = Array.isArray(roh) ? roh : [];
+  genannt.forEach(function (p) {
+    if (!p || typeof p !== 'object') return;
+    merke({
+      name: _s(p.name), funktion: _s(p.funktion),
+      email: mailGueltig(p.email) ? _s(p.email).toLowerCase() : '',
+      telefon: _s(p.telefon)
+    });
+  });
+
+  /* 2 · Aufgefüllt mit persönlichen Postfächern der Quellseite, in der
+     Reihenfolge, in der sie dort stehen. */
+  const seite = ((belegDetail && belegDetail.pro_seite) || [])
+    .find(function (s) { return s.url === quelleUrl; })
+    || ((belegDetail && belegDetail.pro_seite) || [])[0];
+  ((seite && seite.mails) || []).forEach(function (m) {
+    if (istPersonenpostfach(m)) merke({ name: '', funktion: '', email: m, telefon: '' });
+  });
+
+  /* ══ v2153 · ENTWEDER ZWEI ODER KEINE ═══════════════════════════════
+   *
+   * Marcel am 12.10.2026: „wenn es nicht 2 ansprechpartner gibt sollte
+   * man schauen ob es eine übergeordnete email adresse oder einen
+   * kontakt gibt und den ausgeben und die ansprechpartner weg lassen."
+   *
+   * Das ist eine fachliche Entscheidung, und sie ist richtig: EINE
+   * Ansprechperson neben der Amtsadresse sieht aus wie eine
+   * Zuständigkeit, ist aber nur die eine, die wir zufällig lesen
+   * konnten. Beim Abnahmelauf gegen das Impressum des Kreises
+   * Minden-Lübbecke war es genau so — vier Adressen auf der Seite, eine
+   * davon persönlich, also eine Person. Wer liest, hält sie für DIE
+   * Ansprechperson des Katasteramts.
+   *
+   *   > Eine halbe Liste behauptet mehr, als sie weiß. Die Amtsadresse
+   *   > behauptet nichts und kommt an.
+   *
+   * Darum fällt die Liste bei weniger als zwei Einträgen GANZ weg. Die
+   * übergeordnete Adresse steht ohnehin schon als `email` am Amt — hier
+   * wird nur zurückgegeben, dass sie der Weg ist.
+   *
+   * EINE AUSNAHME: ein Eintrag mit NAMEN und Funktion ist etwas anderes
+   * als eine nackte Adresse. „Frau Müller, Katasterauskunft" ist eine
+   * Auskunft, die der Nutzer am Telefon brauchen kann, und sie
+   * behauptet keine Zuständigkeit, die über das Amt hinausgeht. Sie
+   * bleibt deshalb — die nackte Adresse ohne Namen fällt. */
+  if (personen.length < 2) {
+    const mitNamen = personen.filter(function (p) { return !!p.name; });
+    return mitNamen;
+  }
+  return personen;
+}
+
+/* Ein persönliches Postfach oder ein Funktionspostfach? Nur ein
+   Sortierkriterium — eine persönliche Adresse ist nicht falsch, aber sie
+   veraltet mit der Person. Das Amt bleibt. */
+function istPersonenpostfach(email) {
+  const k = _s(email).toLowerCase().split('@')[0] || '';
+  if (!k) return false;
+  /* ══ v2152b · EIN WORT IST KEIN NAME ═══════════════════════════════
+
+     Hier stand als zweite Bedingung:
+
+       return /\./.test(k) || /^[a-z]\.?[a-z]+$/.test(k);
+
+     Der zweite Teil sollte `mweber` treffen (Initial plus Name). Er
+     trifft aber JEDES Wort aus Kleinbuchstaben.
+
+     GEMESSEN am 12.10.2026 am echten Impressum des Kreises
+     Minden-Lübbecke: `rechnung@invoice.minden-luebbecke.de` wurde als
+     PERSOENLICH eingeordnet und erschien damit als „Ansprechpartner 2"
+     im Modal — ein Rechnungspostfach als Ansprechperson für eine
+     Flurkartenanfrage.
+
+     > Ein erdachter Pruefauftrag hätte das nie gefunden: meine neun
+     > Proben waren `info`, `bauamt`, `a.mueller`, … — alles Fälle, die
+     > ich mir ausgedacht habe. Erst die echte Seite hatte ein Wort, das
+     > weder in meiner Negativliste stand noch wie ein Name aussieht.
+
+     Jetzt zählt NUR der Punkt im Konto (`vorname.nachname`, `m.weber`).
+     `mweber` gilt damit als Funktion — und das ist die sichere Seite:
+
+       Funktion, die als persönlich gilt  ->  falsche Ansprechperson
+       persönlich, die als Funktion gilt  ->  eine Person weniger
+
+     Der erste Fehler schickt Post an die falsche Stelle, der zweite
+     kostet eine Angabe. Bei einem Werkzeug, das Anfragen an Ämter
+     stellt, ist die zweite Richtung die richtige.
+
+     Die Negativliste bleibt trotzdem — sie fängt die Funktionspostfächer
+     ab, die einen Punkt TRAGEN. Geprüft wird sie gegen das Konto OHNE
+     Trennzeichen: `buerger.service@…` sähe sonst wie ein Name aus, weil
+     in der Liste `buergerservice` ohne Punkt steht. Gemessen — der
+     Prüfer hatte genau diesen Fall als einzigen roten. */
+  const glatt = k.replace(/[._-]/g, '');
+  if (/^(info|kontakt|post|poststelle|service|amt|buergerbuero|buergerservice|zentrale|mail|office|verwaltung|rathaus|stadt|gemeinde|kreis|bauamt|bauaufsicht|kataster|grundbuch|vermessung|rechnung|buchhaltung|invoice|datenschutz|presse|webmaster|noreply|abuse|support|hilfe|zentral|allgemein|sekretariat|geschaeftsstelle|team|anmeldung|fundbuero|standesamt|posteingang)/.test(glatt)) return false;
+  return /\./.test(k);
+}
+
 function _findeJson(text) {
   if (!text) return null;
   const roh = String(text);
@@ -258,13 +518,89 @@ async function belegPruefen(email, quelleUrl) {
   } catch (e) {
     return { ok: false, grund: 'Quelle nicht erreichbar: ' + (e.message || e) };
   }
+  /* ══ v2151 · VOLLSTAENDIG VERGLEICHEN, NICHT IN TEILEN ═══════════════
+
+     Hier stand:
+
+       if (text.includes(adr))                      -> woertlich
+       if (text.includes(konto) && text.includes(domain))  -> „getrennt"
+
+     Die erste Zeile verfehlte vier von neun echten Schreibweisen (siehe
+     `mailsAufSeite`), die zweite fing drei davon auf — aber zu dem
+     Preis, dass sie auch dann „bestaetigt" sagt, wenn „info" im Menue
+     steht und die Domain im Impressum. Sie hat die Adresse nie gesehen.
+
+     Jetzt wird die Seite erst hergestellt und dann GELESEN. Verglichen
+     wird die ganze Adresse gegen die ganze Fundliste. */
   const adr = String(email).toLowerCase();
-  if (text.includes(adr)) return { ok: true, grund: 'wörtlich auf der Quellseite gefunden' };
-  const [konto, domain] = adr.split('@');
-  if (konto && domain && text.includes(konto) && text.includes(domain)) {
-    return { ok: true, grund: 'auf der Quellseite gefunden (gegen Erntemaschinen getrennt geschrieben)' };
+  const gefundene = mailsAufSeite(text);
+  if (gefundene.includes(adr)) {
+    return { ok: true, grund: 'auf der Quellseite gefunden', gefundene: gefundene };
   }
-  return { ok: false, grund: 'die Adresse steht nicht auf der genannten Quellseite' };
+  /* Der Beleg fehlt — aber die Seite ist nicht umsonst gelesen worden.
+     Was dort STEHT, ist die brauchbarste Auskunft an dieser Stelle:
+     Funktionspostfaecher zuerst, persoenliche danach. */
+  const andere = gefundene.slice()
+    .sort(function (a, b) { return istPersonenpostfach(a) - istPersonenpostfach(b); })
+    .slice(0, 6);
+  return {
+    ok: false,
+    grund: 'die Adresse steht nicht auf der genannten Quellseite'
+      + (andere.length ? ' (dort stehen ' + andere.length + ' andere: ' + andere.slice(0, 3).join(', ') + ')' : ' (dort steht gar keine Adresse)'),
+    gefundene: gefundene,
+    alternativen: andere
+  };
+}
+
+/* ══ v2151 · DER BELEG JE SEITE ═══════════════════════════════════════
+ *
+ * Aus der Vorlage v6 (`pruefeAdresse`). Der Kern des Gewinns ist nicht
+ * die zusaetzliche Seite, sondern der BELEG:
+ *
+ *   > v5 wusste nur, ob eine Adresse IRGENDWO auf einer der gelesenen
+ *   > Seiten stand. v6 weiss, auf WELCHER — und kann deshalb eine
+ *   > Adresse ueberhaupt als „belegt" ausweisen.
+ *
+ * Das ist dieselbe Lehre wie bei der Herkunftsangabe im Marktbericht:
+ * eine Angabe gehoert an den ORT, nicht an den Wert. Ohne `pro_seite`
+ * waere „Ansprechpartner 1" eine Behauptung.
+ *
+ * Hoechstens sechs Seiten, parallel, je acht Sekunden. Gewerbliche
+ * Portale fallen vorher weg — eine Adresse von einem Bestellportal ist
+ * kein amtlicher Beleg, auch wenn sie stimmt.
+ */
+async function belegSeiten(email, urls) {
+  const seiten = [...new Set((urls || []).map(_link).filter(Boolean))]
+    .filter(function (u) { return !istGewerblich(u); })
+    .slice(0, 6);
+  if (!seiten.length) return { bestaetigt: false, alle: [], alternativen: [], pro_seite: [] };
+  const funde = await Promise.all(seiten.map(async function (url) {
+    try {
+      const a = await fetch(url, {
+        redirect: 'follow',
+        headers: { 'User-Agent': 'DealPilot/1.0 (Immobilienbewertung; Belegpruefung)',
+                   'Accept-Language': 'de' },
+        signal: AbortSignal.timeout(8000)
+      });
+      if (!a.ok) return [];
+      /* Ein PDF oder Bild hat keinen Text, den dieser Leser versteht —
+         er wuerde Bytefolgen als Adressen deuten. */
+      if (!/html|text|xml/.test(a.headers.get('content-type') || '')) return [];
+      return mailsAufSeite((await a.text()).slice(0, 2e6));
+    } catch (e) { return []; }
+  }));
+  const alle = [...new Set(funde.flat())];
+  const adr = _s(email).toLowerCase();
+  const andere = alle.filter(function (m) { return m !== adr; })
+    .sort(function (a, b) { return istPersonenpostfach(a) - istPersonenpostfach(b); });
+  return {
+    bestaetigt: !!(adr && alle.includes(adr)),
+    alle: alle,
+    alternativen: andere.slice(0, 6),
+    /* In der Reihenfolge der Seite — die erste genannte Stelle ist die
+       zustaendige. Das ist die Grundlage fuer Ansprechpartner 1 und 2. */
+    pro_seite: seiten.map(function (url, i) { return { url: url, mails: funde[i] }; })
+  };
 }
 
 /* ═══ DIE RECHERCHE ═════════════════════════════════════════════════════
@@ -300,12 +636,46 @@ async function amtSuchen(art, ort, opts = {}) {
     + '- "quelle" ist ein PFLICHTFELD: dort gehört die URL der Seite hinein, '
     + 'auf der du die Adresse gelesen hast. Schreibe den Link nicht in den '
     + 'Hinweis und nicht in den Fließtext, sondern in dieses Feld.\n'
+    /* ══ v2152 · DIE ANSPRECHPERSONEN — WOERTLICH AUS DER VORLAGE ═══════
+
+       Marcel am 12.10.2026: „ja mach die ansprechpartner gleich mit."
+       Vorlage: `unterlagen-app-v6-ansprechpartner`, dort server.js:386.
+
+       DER PROMPT IST DIE STELLE, AN DER ERFUNDENE NAMEN ENTSTEHEN. Ein
+       Modell, das nach „den beiden Ansprechpartnern" gefragt wird und
+       keine findet, nennt zwei plausible — Nachname plus Sachgebiet
+       liest sich wie ein Beleg und ist keiner.
+
+       > Deshalb stehen die drei Einschraenkungen aus v6 hier WOERTLICH:
+       > nur Personen, die dort wirklich stehen; eine E-Mail nur, wenn
+       > sie dort woertlich steht, sonst leer; stehen dort keine
+       > Personen, bleibt die Liste leer.
+
+       Die dritte ist die wichtigste. Ohne sie ist „leer" kein zulaessiges
+       Ergebnis, und das Modell MUSS etwas liefern. Dasselbe Muster wie
+       bei der Mietpreisuebersicht: wo die Quelle endet, endet die
+       Rechnung — eine leere Liste ist eine Antwort, keine Luecke.
+
+       Die REIHENFOLGE DER SEITE ist ausdruecklich verlangt: die zuerst
+       genannte Person ist die zustaendige. Ein Modell, das sie nach
+       Rang oder Alphabet sortiert, zerstoert genau die Information,
+       auf die sich „Ansprechpartner 1" stuetzt. */
+    + '- Nenne zusätzlich unter "ansprechpartner" die ersten beiden '
+    + 'Ansprechpersonen, die auf der offiziellen Seite für dieses Anliegen '
+    + 'aufgeführt sind, in der Reihenfolge der Seite: Name, Funktion, E-Mail, '
+    + 'Telefon. Nur Personen, die dort wirklich stehen. Eine E-Mail nur, wenn '
+    + 'sie dort wörtlich steht, sonst leer. Stehen dort keine Personen, bleibt '
+    + 'die Liste leer.\n'
     + '- Stelle keine Rückfragen und bitte nicht um Erlaubnis. Antworte direkt.'
     + nachtrag + '\n\n'
     + 'Antworte am Ende ausschließlich mit einem JSON-Objekt, ohne Einleitung '
     + 'und ohne Markdown:\n'
     + '{"behoerde":"","abteilung":"","email":"","telefon":"","kanal":"email | portal | formular | post",'
-    + '"antragUrl":"","quelle":"","seiten":[],"gebuehr":"","hinweis":"","kreis":"","bundesland":""}';
+    + '"antragUrl":"","quelle":"","seiten":[],'
+    /* Ohne Zielfeld faellt der Auftrag oben lautlos auf den Boden —
+       dieselbe Lehre wie bei den KI-Prompts der Pilot-Analyse (v2139). */
+    + '"ansprechpartner":[{"name":"","funktion":"","email":"","telefon":""}],'
+    + '"gebuehr":"","hinweis":"","kreis":"","bundesland":""}';
 
   const antwort = await openaiService.callOpenAI(prompt, {});
   const r = _findeJson(antwort && (antwort.text || antwort.output_text || antwort));
@@ -356,6 +726,10 @@ async function amtSuchen(art, ort, opts = {}) {
     telefon: _s(r.telefon),
     kanal: ['email', 'portal', 'formular', 'post'].includes(_s(r.kanal)) ? _s(r.kanal) : 'email',
     antrag_url: _link(r.antragUrl), quelle_url: _sauber(quelle),
+    /* v2152 · ROH durchreichen. Der Zusammenbau braucht den Beleg, und
+       der steht erst fest, wenn die Seiten gelesen sind — also eine
+       Ebene weiter in `amtHolen`. Hier wird nichts entschieden. */
+    _ansprechpartner_roh: Array.isArray(r.ansprechpartner) ? r.ansprechpartner : [],
     seiten: [...new Set(seiten.concat(hinweisLinks))].map(_sauber).slice(0, 8),
     gebuehr: _s(r.gebuehr), hinweis: _s(r.hinweis),
     kreis: _s(r.kreis), bundesland: _s(r.bundesland)
@@ -452,18 +826,95 @@ async function amtHolen(userId, art, ort, opts = {}) {
   }
 
   const beleg = await belegPruefen(gefunden.email, gefunden._beleg_quelle || gefunden.quelle_url);
+
+  /* ══ v2151 · DIE WEITEREN SEITEN WERDEN JETZT AUCH GELESEN ═══════════
+   *
+   * `seiten` wurde bis v2150 gespeichert und von NIEMANDEM gelesen —
+   * gemessen am 12.10.2026: ein grep nach `.seiten` ueber backend/src
+   * und frontend/js findet ausser dem eigenen INSERT keinen Treffer.
+   * Bis zu acht amtliche Seiten lagen in der Datenbank, und keine davon
+   * wurde je abgerufen.
+   *
+   * Das ist teuer, denn genau dort steht oft die Adresse: viele
+   * Kreis-Websites verstecken sie hinter einem „E-Mail"-Link, waehrend
+   * sie im Serviceportal der Gemeinde offen steht (so beschreibt es die
+   * Vorlage v6 in `sucheAdresse`).
+   *
+   * ZWEI DINGE KOMMEN DABEI HERAUS, und das zweite ist das wichtigere:
+   *   1. Ein Beleg, wenn die Quellseite selbst nichts hergab.
+   *   2. `pro_seite` — WELCHE Seite WELCHE Adresse trug. Ohne diese
+   *      Zuordnung bleibt jede spaetere Personenangabe eine Behauptung.
+   *
+   * Der Beleg der Quellseite wird dadurch NICHT schwaecher: ein Fund auf
+   * einer Nebenseite heisst ausdruecklich „auf einer weiteren amtlichen
+   * Seite", nicht „auf der Quellseite". Wer das zusammenwirft, verliert
+   * genau die Unterscheidung, um die es hier geht. */
+  let belegDetail = { bestaetigt: false, alle: [], alternativen: [], pro_seite: [] };
+  try {
+    const weitere = [gefunden.quelle_url].concat(gefunden.seiten || [])
+      .filter(function (u) { return u && u !== (gefunden._beleg_quelle || gefunden.quelle_url); });
+    if (gefunden.email && weitere.length) {
+      belegDetail = await belegSeiten(gefunden.email, weitere);
+      if (!beleg.ok && belegDetail.bestaetigt) {
+        beleg.ok = true;
+        beleg.grund = 'auf einer weiteren amtlichen Seite gefunden ('
+          + (belegDetail.pro_seite.find(function (s) {
+              return s.mails.includes(_s(gefunden.email).toLowerCase()); }) || {}).url + ')';
+      }
+    } else if (weitere.length) {
+      /* Ohne eigene Adresse trotzdem lesen: die Fundliste ist dann der
+         brauchbarste Hinweis, den wir dem Nutzer geben koennen. */
+      belegDetail = await belegSeiten('', weitere);
+    }
+  } catch (e) {
+    console.warn('[unterlagen] Belegseiten nicht lesbar:', e.message);
+  }
+
+  /* v2152 · Erst JETZT, nachdem die Seiten gelesen sind: der Beleg je
+     Person haengt an `belegDetail`. Vorher gebaut waere `bestaetigt`
+     immer false — und ein Feld, das immer dasselbe sagt, sagt nichts. */
+  const personen = personenAus(
+    gefunden._ansprechpartner_roh,
+    gefunden.email,
+    belegDetail,
+    gefunden._beleg_quelle || gefunden.quelle_url
+  );
   if (register) {
     beleg.grund = 'Zuständigkeit und Quelle aus dem DealPilot-Register (amtlicher Datensatz)'
       + (gefunden.email ? (beleg.ok ? '; E-Mail wörtlich auf der Quellseite gefunden' : '; E-Mail aus der Websuche, nicht belegt') : '; keine E-Mail-Adresse ermittelt');
     beleg.ok = beleg.ok || !gefunden.email;
   }
 
+  /* ══ v2152 · DIE ANGEHAKTE KOPIE UEBERLEBT EINE NEURECHERCHE ════════
+   *
+   * Im `ON CONFLICT`-Zweig unten steht `ansprechpartner` NICHT einfach
+   * auf `EXCLUDED.ansprechpartner`. Das wuerde die Liste komplett
+   * ersetzen und damit jedes `kopie: true` loeschen, das der Nutzer
+   * gesetzt hat. Eine Neurecherche bringt oft genau dieselben Personen —
+   * dann waere seine Auswahl ohne Grund weg.
+   *
+   * Die NEUEN Personen gewinnen deshalb nur, wenn ueberhaupt welche
+   * gefunden wurden. Eine leere Liste ueberschreibt eine gefuellte
+   * NICHT: „nichts gefunden" ist kein Grund, Bekanntes zu verwerfen.
+   *
+   * ── WARUM DIESER KOMMENTAR HIER STEHT UND NICHT IM SQL ────────────
+   *
+   * Der erste Entwurf hatte ihn IM Template-Literal. Er nannte dort
+   * `_beleg_quelle` in Backticks — und ein Backtick beendet ein
+   * Template-Literal, auch mitten in einem, was wie ein Kommentar
+   * aussieht. `node --check` meldete „missing ) after argument list",
+   * 500 Zeilen weiter unten.
+   *
+   *   > Dieselbe Klasse wie ein zitiertes Kommentarende in einem
+   *   > CSS-Kommentar: das Zeichen wirkt, egal was drumherum steht.
+   *   > In einem Template-Literal gibt es keine Kommentare.
+   */
   const r = await query(
     `INSERT INTO unterlagen_aemter
        (gemeinde_schluessel, plz, ort, art, behoerde, abteilung, email, telefon,
         kanal, antrag_url, quelle_url, seiten, gebuehr, hinweis, kreis, bundesland,
-        beleg_ok, beleg_grund, geprueft_am, erstellt_von)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,now(),$19)
+        beleg_ok, beleg_grund, ansprechpartner, geprueft_am, erstellt_von)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,now(),$20)
      ON CONFLICT (gemeinde_schluessel, art) DO UPDATE SET
        behoerde = EXCLUDED.behoerde, abteilung = EXCLUDED.abteilung,
        email = EXCLUDED.email, telefon = EXCLUDED.telefon, kanal = EXCLUDED.kanal,
@@ -471,14 +922,32 @@ async function amtHolen(userId, art, ort, opts = {}) {
        seiten = EXCLUDED.seiten, gebuehr = EXCLUDED.gebuehr,
        hinweis = EXCLUDED.hinweis, kreis = EXCLUDED.kreis,
        bundesland = EXCLUDED.bundesland, beleg_ok = EXCLUDED.beleg_ok,
-       beleg_grund = EXCLUDED.beleg_grund, geprueft_am = now()
+       beleg_grund = EXCLUDED.beleg_grund,
+       -- v2152: siehe den Kommentar oberhalb dieser Abfrage
+       ansprechpartner = CASE
+         WHEN jsonb_array_length(EXCLUDED.ansprechpartner) > 0
+           THEN EXCLUDED.ansprechpartner
+         ELSE unterlagen_aemter.ansprechpartner
+       END,
+       geprueft_am = now()
      RETURNING *`,
     [schluessel, ort.plz || null, ort.ort || null, art, gefunden.behoerde,
      gefunden.abteilung || null, gefunden.email || null, gefunden.telefon || null,
      gefunden.kanal, gefunden.antrag_url || null, gefunden.quelle_url || null,
-     JSON.stringify(gefunden.seiten), gefunden.gebuehr || null,
+     /* v2151 · `seiten` traegt jetzt den BELEG je Seite, nicht nur die
+        URL-Liste. Form: { liste: [url,…], pro_seite: [{url,mails}],
+        alternativen: [mail,…] }. Das bricht nichts — gemessen hat diese
+        Spalte keinen einzigen Leser; die `liste` bleibt trotzdem drin,
+        damit ein kuenftiger Leser nicht erst parsen muss. */
+     JSON.stringify({
+       liste: gefunden.seiten || [],
+       pro_seite: belegDetail.pro_seite,
+       alternativen: belegDetail.alternativen,
+       beleg_quelle: beleg.gefundene ? { url: gefunden._beleg_quelle || gefunden.quelle_url,
+                                         mails: beleg.gefundene } : null
+     }), gefunden.gebuehr || null,
      gefunden.hinweis || null, gefunden.kreis || null, gefunden.bundesland || null,
-     beleg.ok, beleg.grund, userId || null]);
+     beleg.ok, beleg.grund, JSON.stringify(personen), userId || null]);
 
   return { gefunden: true, aus_register: false, amt: r.rows[0], beleg: beleg };
 }
@@ -554,5 +1023,11 @@ async function aemterFuer(plz, ort) {
 
 module.exports = {
   ARTEN, ARTEN_MAP, gemeindeSchluessel, istGewerblich, mailGueltig,
-  amtSuchen, amtHolen, aemterFuer, belegPruefen, anschreiben
+  amtSuchen, amtHolen, aemterFuer, belegPruefen, anschreiben,
+  /* v2151 · fuer die Pruefstrecke und kuenftige Aufrufer */
+  mailsAufSeite, istPersonenpostfach, belegSeiten,
+  /* v2152 · der Zusammenbau der Ansprechpersonen */
+  personenAus,
+  /* v2152a · der Leser, der beide Formen von `seiten` versteht */
+  seitenLesen
 };

@@ -87,6 +87,33 @@ let map, marker, compLayer, chart;
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n, s = '') => (n == null || isNaN(n) ? '–' : new Intl.NumberFormat('de-DE').format(n) + s);
+/* v2162 · Die Zensus-Zeilen an EINER Stelle - Web-Karten und PDF lesen
+   dieselbe Liste. Bis v2161 standen drei Kreiswerte ohne das Wort "Kreis"
+   da; seit der Datenbank gibt es die Gemeinde und die Werte passend zu
+   Baujahr und Groesse. Kein Treffer heisst kein Wert: fehlt die Gemeinde
+   (gesperrt oder PLZ nicht eindeutig), steht nur der Kreis da. */
+function _zensusZeilen(z) {
+  if (!z || !z.available) return [];
+  const de = (n, dec) => new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
+  const out = [];
+  const g = z.gemeinde, k = z.kreis;
+  const kn = (k && k.name) || z.kreis_name || 'Kreis';
+  if (g && g.nettokaltmiete_qm != null) out.push(['Ø Nettokaltmiete Gemeinde ' + g.name + ' (Zensus 2022)', de(g.nettokaltmiete_qm, 2) + ' €/m²']);
+  /* kreisfreie Stadt: Gemeinde = Kreis -> nur eine Zeile */
+  if (z.nettokaltmiete_qm != null && !(g && g.name === kn && g.nettokaltmiete_qm === z.nettokaltmiete_qm))
+    out.push(['Ø Nettokaltmiete Kreis ' + kn + ' (Zensus 2022)', de(z.nettokaltmiete_qm, 2) + ' €/m²']);
+  for (const [feld, wort] of [['miete_baujahr', 'Baujahr'], ['miete_flaeche', 'Größe']]) {
+    const a = g && g[feld] && g[feld].wert != null ? [g[feld], 'Gemeinde'] : (k && k[feld] && k[feld].wert != null ? [k[feld], 'Kreis'] : null);
+    if (a) out.push(['Ø Nettokaltmiete ' + wort + ' ' + a[0].klasse + ' (' + a[1] + ', Zensus 2022)', de(a[0].wert, 2) + ' €/m²']);
+  }
+  const lb = g && g.leerstandsquote != null ? [g, 'Gemeinde'] : [k || z, 'Kreis'];
+  if (lb[0].leerstandsquote != null) out.push(['Leerstandsquote ' + lb[1] + ' (Zensus 2022)', de(lb[0].leerstandsquote, 1) + ' %']);
+  if (lb[0].leerstandsquote_marktaktiv != null) out.push(['davon marktaktiv, Geschosswohnungen (' + lb[1] + ')', de(lb[0].leerstandsquote_marktaktiv, 1) + ' %']);
+  const lang = lb[0].leerstandsdauer && lb[0].leerstandsdauer.find((x) => /12 Monaten/.test(x.text));
+  if (lang && lang.anteil_pct != null) out.push(['Leere Wohnungen seit über 12 Monaten (' + lb[1] + ')', de(lang.anteil_pct, 1) + ' %']);
+  if (z.eigentuemerquote != null) out.push(['Eigentümerquote Kreis (Zensus 2022)', de(z.eigentuemerquote, 1) + ' %']);
+  return out;
+}
 
 // Health
 fetch(API + '/health').then(r => r.json()).then(h => {
@@ -1185,7 +1212,11 @@ function render(out) {
       ? `Kaufpreis ${mvv.discount_to_market_pct >= 0 ? mvv.discount_to_market_pct + ' % unter' : Math.abs(mvv.discount_to_market_pct) + ' % über'} Marktwert`
       : null,
     bruttorendite: yld.gross_yield_pct != null ? `${yld.gross_yield_pct} % Rendite · Faktor ${yld.rent_multiplier ?? '–'}` : null,
-    makrolage: (d.macro && d.macro.score != null) ? `Makro-Score ${d.macro.score}/100` : null,
+    /* v2158 · Seit N62.4a mittelt der Makro-Score nur gemessene Kennzahlen;
+       wie viele es sind, gehoert an die Zahl. Alte Berichte kennen das Feld nicht. */
+    makrolage: (d.macro && d.macro.score != null)
+      ? `Makro-Score ${d.macro.score}/100` + (d.macro.gemessen != null ? ` · aus ${d.macro.gemessen} von ${d.macro.moeglich || 6} Kennzahlen` : '')
+      : null,
     mikrolage: (d.micro && d.micro.score != null) ? `Mikro-Score ${d.micro.score}/100` : null,
     mietentwicklung: (d.insights && d.insights.series && d.insights.series.rent_cagr_pct != null)
       ? `Miet-Zeitreihe: ${d.insights.series.rent_cagr_pct} % p. a.`
@@ -1560,9 +1591,8 @@ function renderAssessment(d) {
     const card = (label, valHtml) => `<div class="assess rate-neutral"><div class="l">${label}</div>
        <div class="v" style="text-transform:none;"><span class="dot" style="background:var(--gold);"></span>${valHtml}</div></div>`;
     const de = (n, dec) => new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
-    if (z.leerstandsquote != null) extra += card('Leerstandsquote (Zensus 2022)', de(z.leerstandsquote, 1) + ' %');
-    if (z.eigentuemerquote != null) extra += card('Eigentümerquote (Zensus 2022)', de(z.eigentuemerquote, 1) + ' %');
-    if (z.nettokaltmiete_qm != null) extra += card('Ø Nettokaltmiete (Zensus 2022)', de(z.nettokaltmiete_qm, 2) + ' €/m²');
+    void de;   /* v2162: die Zeilen kommen aus _zensusZeilen() */
+    for (const [l, w] of _zensusZeilen(z)) extra += card(l, w);
   }
 
   /* v1853 · N4-P1b: die Einschaetzung des NUTZERS (aus dem Reiter Objekt)
@@ -4683,9 +4713,8 @@ async function exportPdf(out) {
     // Zensus-2022-Kennzahlen (amtlich) anhaengen:
     if (_z && _z.available) {
       const de = (n, dec) => new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
-      if (_z.leerstandsquote != null) ar.push(['Leerstandsquote (Zensus 2022)', de(_z.leerstandsquote, 1) + ' %']);
-      if (_z.eigentuemerquote != null) ar.push(['Eigentümerquote (Zensus 2022)', de(_z.eigentuemerquote, 1) + ' %']);
-      if (_z.nettokaltmiete_qm != null) ar.push(['Ø Nettokaltmiete (Zensus 2022)', de(_z.nettokaltmiete_qm, 2) + ' €/m²']);
+      void de;   /* v2162: die Zeilen kommen aus _zensusZeilen() */
+      for (const r of _zensusZeilen(_z)) ar.push(r);
     }
     const rateCol = (label, v) => {
       const s = String(v || '').toLowerCase();
@@ -4708,8 +4737,9 @@ async function exportPdf(out) {
       },
     });
     y = doc.lastAutoTable.finalY + 6;
-    if (_z && _z.available && _z.license) { need(6); doc.setFontSize(7); doc.setTextColor(...MUT);
-      doc.text('Zensus-Kennzahlen: ' + _z.license, M, y); y += 5; }
+    if (_z && _z.available && _z.license) { doc.setFontSize(7); doc.setTextColor(...MUT);
+      const _zl = doc.splitTextToSize('Zensus-Kennzahlen (Bestandsmieten aller Verträge, Stichtag 15.05.2022): ' + _z.license, W - 2 * M);
+      need(4 * _zl.length + 2); doc.text(_zl, M, y); y += 4 * _zl.length + 1; }
     if (A.marktmiete_eur_qm != null) { need(8); doc.setFontSize(9); doc.setTextColor(...MUT);
       doc.text('Eingeschätzte Marktmiete: ' + A.marktmiete_eur_qm + ' €/m²' + (A.marktfaktor != null ? '   ·   Marktfaktor: ' + A.marktfaktor : ''), M, y); y += 8; }
     /* v1853 · N4-P1b: die Einschaetzung des Nutzers als EIGENE Tabelle unter

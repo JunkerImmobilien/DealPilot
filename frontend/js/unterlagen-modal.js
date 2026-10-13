@@ -269,6 +269,23 @@
     var t = '<b>' + _esc(a.behoerde) + '</b>'
       + (a.abteilung ? ' · ' + _esc(a.abteilung) : '');
     if (a.email) t += '<br>' + _esc(a.email);
+    /* ══ v2153 · DIE TELEFONNUMMER FEHLTE GANZ ═══════════════════════════
+
+       Marcel am 12.10.2026: „am besten auch telefonnummer dazu."
+
+       GEMESSEN: `telefon` kommt seit v1833 aus der Recherche
+       (`unterlagenService.js:696`), liegt als eigene Spalte in
+       `unterlagen_aemter` und wurde im Modal an KEINER Stelle
+       ausgegeben. Erst v2152 zeigte sie — aber nur bei den
+       Ansprechpersonen, nicht beim Amt selbst.
+
+       > Ein Feld, das erhoben und gespeichert wird und nirgends
+       > erscheint, ist dieselbe Art Verlust wie die `skala` von heute
+       > Morgen: die Arbeit ist getan und kommt nicht an.
+
+       Bei einem Amt ist die Nummer oft der schnellere Weg als eine
+       E-Mail, auf die in zwei Wochen jemand antwortet. */
+    if (a.telefon) t += '<br>' + _esc(a.telefon);
     /* ══ v1971c · DER PORTAL-LINK WAR KEIN LINK ═══════════════════════════
 
        Hier stand:
@@ -303,6 +320,114 @@
     if (a.quelle_url) {
       t += '<br><a href="' + _esc(a.quelle_url) + '" target="_blank" rel="noopener"'
         + ' style="font-size:12px">Quelle ansehen</a>';
+    }
+    /* ══ v2152 · DIE ANSPRECHPERSONEN ════════════════════════════════════
+
+       Marcel am 12.10.2026: „ja mach die ansprechpartner gleich mit."
+
+       Je Person steht hier DREIERLEI, und alle drei sind nötig:
+         · wer es ist (Name, Funktion — soweit die Seite sie nennt)
+         · ob die Adresse BELEGT ist (wir haben sie selbst auf einer
+           amtlichen Seite gefunden) oder nur genannt
+         · ein Häkchen „in Kopie"
+
+       Der Belegstand ist das Entscheidende. Eine Person, deren Adresse
+       nur die Recherche genannt hat, sieht genauso aus wie eine
+       belegte — und ohne diesen Unterschied schickt der Nutzer Post an
+       eine Adresse, die niemand geprüft hat.
+
+       Ein Name ohne Adresse bekommt KEIN Häkchen: in Kopie kann nur,
+       wer ein Postfach hat. Angezeigt wird er trotzdem, denn „fragen
+       Sie Frau X" ist eine brauchbare Auskunft. */
+    /* Dieses Modal gestaltet durchgehend mit style-Attributen (43
+       Stellen) und hat kein eigenes Stylesheet. Klassen hätten hier
+       nirgends gegriffen — und ein nachträglich eingehängtes <style>
+       verliert gegen die Blätter, die im BODY hängen. */
+    if (Array.isArray(a.ansprechpartner) && a.ansprechpartner.length) {
+      var _S_BOX = 'margin-top:9px;padding:8px 10px;border-radius:8px;'
+        + 'background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.28)';
+      var _S_ZEILE = 'font-size:12.5px;line-height:1.5';
+      var _S_KLEIN = 'font-size:12px;color:#6f6960';
+      t += '<div style="' + _S_BOX + '">'
+        + '<div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;'
+        + 'color:#6f6960;margin-bottom:5px">Ansprechpartner laut Quellseite</div>';
+      a.ansprechpartner.forEach(function (p, i) {
+        t += '<div style="' + _S_ZEILE + (i ? ';margin-top:7px' : '') + '">'
+          + '<div>' + (i + 1) + '. <b>' + _esc(p.name || p.email || '—') + '</b>'
+          + (p.funktion ? ' <span style="' + _S_KLEIN + '">· ' + _esc(p.funktion) + '</span>' : '')
+          + '</div>';
+        if (p.email) {
+          t += '<div style="' + _S_KLEIN + '">' + _esc(p.email)
+            /* Der Belegstand je PERSON, nicht je Amt. Eine Adresse, die
+               nur die Recherche genannt hat, sieht sonst genauso aus
+               wie eine, die wir selbst auf der Seite gefunden haben. */
+            + (p.bestaetigt
+                ? ' <span style="color:var(--ok,#3FA56C)">✓ belegt</span>'
+                : ' <span style="color:var(--warn,#D8954C)">⚠ nur genannt</span>')
+            + '</div>';
+        }
+        if (p.telefon) t += '<div style="' + _S_KLEIN + '">' + _esc(p.telefon) + '</div>';
+        if (p.email) {
+          t += '<label style="display:inline-flex;align-items:center;gap:5px;'
+            + 'margin-top:3px;font-size:12px;cursor:pointer">'
+            + '<input type="checkbox"' + (p.kopie ? ' checked' : '')
+            + ' onchange="DealPilotUnterlagen.kopieSetzen(' + Number(a.id) + ',' + i + ',this)">'
+            + 'in Kopie</label>';
+        } else {
+          /* Ein Häkchen an einem Namen ohne Postfach wäre ein
+             Versprechen, das der Versand nicht halten kann. */
+          t += '<div style="' + _S_KLEIN + ';opacity:.8">keine Adresse genannt — '
+            + 'kann nicht in Kopie</div>';
+        }
+        t += '</div>';
+      });
+      t += '</div>';
+    } else {
+      /* ══ v2153 · KEINE ZWEI PERSONEN → DER AMTSWEG, AUSDRUECKLICH ═════
+
+         Marcel: „wenn es nicht 2 ansprechpartner gibt sollte man schauen
+         ob es eine übergeordnete email adresse oder einen kontakt gibt
+         und den ausgeben und die ansprechpartner weg lassen."
+
+         Das Backend laesst die halbe Liste weg (`personenAus`). Hier
+         steht, WARUM — sonst sieht die Stelle aus, als sei die Suche
+         gescheitert.
+
+         Die uebergeordnete Adresse ist nicht neu zu holen: sie steht
+         zwei Zeilen hoeher als `a.email` mit ihrem Belegstand. Dieser
+         Block nennt sie als den WEG und ergaenzt die Alternativen, die
+         beim Lesen der Seiten ohnehin anfielen (Funktionspostfaecher
+         zuerst, seit v2151).
+
+         Ohne eigene Adresse und ohne Portal steht hier nichts
+         Beschwichtigendes: dann ist der Weg wirklich offen, und das
+         gehoert gesagt. */
+      var _alt = [];
+      try {
+        var _s2 = a.seiten;
+        if (_s2 && !Array.isArray(_s2) && Array.isArray(_s2.alternativen)) {
+          _alt = _s2.alternativen.filter(function (m) { return m && m !== a.email; });
+        }
+      } catch (e) {}
+      if (a.email || a.telefon) {
+        t += '<div style="margin-top:7px;font-size:12px;color:#6f6960">'
+          + 'Keine zwei belegten Ansprechpersonen auf der Quellseite — '
+          + 'nimm den allgemeinen Weg des Amts oben.'
+          + (_alt.length
+              ? '<br>Weitere Adressen von den gelesenen Seiten: '
+                + _esc(_alt.slice(0, 3).join(', '))
+              : '')
+          + '</div>';
+      } else if (a.antrag_url) {
+        t += '<div style="margin-top:7px;font-size:12px;color:#6f6960">'
+          + 'Keine Adresse und keine Ansprechperson belegt — dieses Amt '
+          + 'nimmt die Anfrage über das Portal.</div>';
+      } else {
+        t += '<div style="margin-top:7px;font-size:12px;'
+          + 'color:var(--warn,#D8954C)">Weder Adresse noch Ansprechperson '
+          + 'belegt. Bitte den Weg selbst prüfen — die Quelle ist oben '
+          + 'verlinkt.</div>';
+      }
     }
     if (a.gebuehr) t += '<br>Gebühr: ' + _esc(a.gebuehr);
     if (a.hinweis) t += '<br><i>' + _esc(a.hinweis) + '</i>';
@@ -370,6 +495,16 @@
       + (amt && !amt.beleg_ok
           ? ' <span style="color:var(--warn,#D8954C)">(nicht belegt — bitte prüfen)</span>'
           : '')
+      /* v2152 · Der CC steht im Briefkopf, nicht nur im mailto-Link.
+         Wer in Kopie geht, muss es VOR dem Senden sehen können — ein
+         Empfänger, der erst im Mailprogramm auftaucht, ist eine
+         Überraschung, und bei Post an Ämter eine unangenehme. */
+      + (function () {
+          var cc = _kopienVon(amt);
+          return cc.length
+            ? '<div style="margin-top:3px">Kopie an: <b>' + _esc(cc.join(', ')) + '</b></div>'
+            : '';
+        })()
       + '</div>'
       + '<div style="margin-bottom:6px"><b>Betreff:</b> ' + _esc(r.betreff) + '</div>'
       + '<textarea id="dp-ul-brief" readonly style="width:100%;min-height:320px;'
@@ -380,7 +515,15 @@
       + ' onclick="DealPilotUnterlagen.kopieren()">In die Zwischenablage</button>'
       + (amt && amt.email
           ? '<button type="button" style="' + _KNOPF_HELL + '"'
-            + ' onclick="DealPilotUnterlagen.mailOeffnen(\'' + _esc(amt.email) + '\')">'
+            /* v2152 · Die angehakten Adressen gehen als CC mit, als JSON
+               und nicht als Komma-Liste: eine Adresse mit Sonderzeichen
+               würde eine Liste zerlegen.
+               `_esc` macht aus `"` bereits `&quot;` (Z. 62), und genau
+               das braucht ein onclick-Attribut — der Browser dekodiert
+               es vor dem Auswerten zurück. Ein zusätzliches `replace`
+               darauf fände nichts mehr und sähe nur nach Sorgfalt aus. */
+            + ' onclick="DealPilotUnterlagen.mailOeffnen(\'' + _esc(amt.email) + '\','
+            + _esc(JSON.stringify(_kopienVon(amt))) + ')">'
             + 'Im Mailprogramm öffnen</button>'
           : '')
       + '<button type="button" style="' + _KNOPF_HELL + '"'
@@ -400,7 +543,7 @@
     }
   }
 
-  function mailOeffnen(adresse) {
+  function mailOeffnen(adresse, kopien) {
     var t = document.getElementById('dp-ul-brief');
     var betreff = '';
     var kopf = document.querySelector('#dp-ul-body b');
@@ -410,10 +553,69 @@
        Zeichen liegt. Der Brief ist kürzer, aber der Text geht trotzdem
        zusätzlich in die Zwischenablage — falls das Programm ihn abschneidet. */
     kopieren();
+    /* ══ v2152 · DER EMPFAENGER STEHT NIE AUCH IN KOPIE ════════════════
+
+       Vorlage v6: „nie die Adresse, die ohnehin Empfänger ist"
+       (`server.js:467`). Dieselbe Adresse zweimal im Kopf eines Briefes
+       sieht nach einem Fehler aus — und bei manchen Programmen führt
+       sie zu zwei Zustellungen.
+
+       Hier wird es doppelt verhindert: `personenAus()` nimmt den
+       Empfänger beim Zusammenbau gar nicht auf, und hier fällt er noch
+       einmal heraus. Die zweite Prüfung ist nicht überflüssig: in die
+       Liste kann über den Kopie-Endpunkt nichts Fremdes gelangen, aber
+       die Empfängeradresse kann sich ändern, nachdem die Liste
+       entstanden ist (Neurecherche, anderes Funktionspostfach). */
+    var cc = (Array.isArray(kopien) ? kopien : [])
+      .filter(function (m) { return m && m !== adresse; });
     var url = 'mailto:' + encodeURIComponent(adresse)
       + '?subject=' + encodeURIComponent(betreff)
+      + (cc.length ? '&cc=' + cc.map(encodeURIComponent).join(',') : '')
       + '&body=' + encodeURIComponent(t ? t.value : '');
     window.location.href = url;
+  }
+
+  /* ══ v2152 · DAS HAEKCHEN SETZT, UND ZWAR AUF DEM SERVER ═════════════
+   *
+   * Ein Häkchen, das nur im DOM lebt, ist beim nächsten Öffnen weg —
+   * und der Nutzer merkt es erst, wenn die Kopie nicht angekommen ist.
+   *
+   * `Auth.apiCall` stringifiziert selbst, und `getApiBase()` enthält
+   * `/api/v1` (CLAUDE.md). Ein nacktes `fetch` würde den zentralen
+   * 401-Handler umgehen. */
+  function kopieSetzen(amtId, nr, feld) {
+    var an = !!(feld && feld.checked);
+    if (!amtId) {
+      if (window.toast) window.toast('⚠ Amt noch nicht gespeichert');
+      if (feld) feld.checked = !an;
+      return;
+    }
+    /* `_api()` ist der Weg dieses Moduls — er geht über `Auth.apiCall`
+       und damit über den zentralen 401-Handler. Ein nacktes `fetch`
+       würde ihn umgehen (CLAUDE.md). */
+    _api('/amt/' + amtId + '/kopie', { method: 'PUT', body: { nr: nr, kopie: an } })
+      .then(function (r) {
+        /* Den geänderten Satz in den Vorrat zurückschreiben, damit der
+           Brief den CC kennt, ohne neu zu laden. Der Vorrat ist nach
+           ART indiziert (`_amtJeArt`), nicht als Liste — gemessen an
+           Z. 40 und 181, nicht angenommen. */
+        if (r && r.amt && r.amt.art) _amtJeArt[r.amt.art] = r.amt;
+        if (window.toast) window.toast(an ? '✓ geht in Kopie' : 'Kopie entfernt');
+      })
+      .catch(function (e) {
+        /* Zurückstellen: ein Häkchen, das gesetzt aussieht und nicht
+           gespeichert ist, ist schlimmer als eines, das abspringt. */
+        if (feld) feld.checked = !an;
+        if (window.toast) window.toast('⚠ ' + (e.message || e));
+      });
+  }
+
+  /* Die angehakten Adressen eines Amts — eine Stelle, zwei Aufrufer
+     (Briefkopf und mailto). */
+  function _kopienVon(amt) {
+    return ((amt && Array.isArray(amt.ansprechpartner)) ? amt.ansprechpartner : [])
+      .filter(function (p) { return p.kopie && p.email && p.email !== amt.email; })
+      .map(function (p) { return p.email; });
   }
 
   function zurueck() { _aufbauen(); }
@@ -456,6 +658,9 @@
     /* v1843 · Ohne Export ruft das onclick ins Leere — derselbe Fehler
        wie beim Abbrechen-Knopf des Telegram-Panels (v1825). */
     alleAbrufen: alleAbrufen,
-    kopieren: kopieren, mailOeffnen: mailOeffnen, zurueck: zurueck
+    kopieren: kopieren, mailOeffnen: mailOeffnen, zurueck: zurueck,
+    /* v2152 · Ohne Export ruft das onchange der Kopie-Kästchen ins Leere
+       — derselbe Fehler wie v1843 beim Abrufen-Knopf. */
+    kopieSetzen: kopieSetzen
   };
 })();

@@ -26,6 +26,13 @@ Der Connector ist fertig gebaut. Es fehlt nur der kostenlose Zugang:
 
 ## 2) Zensus 2022 (Leerstand + Eigentümerquote + Ø-Miete) — eine CSV befüllen
 
+> **Seit v2161 (13.10.2026) wird die Datei ERZEUGT, nicht von Hand gepflegt:**
+> `tools/zensus-kreise-holen.mjs` holt sie aus der Zensus-Datenbank
+> (Tabellen 4000W-0001, 4000W-0004, Ebene GEOLK4, 400 Kreise). Zugang:
+> `ZENSUS_USER`/`ZENSUS_PASSWORD` in der `.env` — ein Konto bei
+> ergebnisse.zensus2022.de, NICHT das Destatis/Regionaldatenbank-Konto.
+> Der Text unten beschreibt den alten Handweg und bleibt nur als Hintergrund.
+
 Diese Werte gibt es nicht per einfachem Token-API, aber als **freie amtliche Daten**.
 Du trägst sie einmalig in die Datei `zensus2022_kreise.csv` (neben dieser README) ein.
 

@@ -602,9 +602,68 @@ router.get('/objects/history', async (req, res) => {
                  eines Template-Literals. Ein Backtick beendet die
                  Zeichenkette und zerlegt die Datei - in dieser Sitzung
                  schon einmal passiert, an genau dieser Stelle. */
+              /* ══ v2156 · DER ZINS, DER DEN ERTRAGSWERT ERZEUGT ══════════
+                 Marcel am 12.10.2026: „auch Finanzierung und
+                 Liegenschaftszinsen und Wertgutachten, dass auch wirklich
+                 alles damit einfliesst."
+
+                 GEMESSEN: der Ertragswert geht seit v1963 ueber diese
+                 Schnittstelle, der Zinssatz NICHT. In der Pilot-Analyse
+                 stand damit der Ertragswert ohne die Groesse, die ihn
+                 erzeugt — und 400 Zeilen weiter oben im selben Prompt das
+                 Objektfeld lzs_pct aus dem Formular. Zwei Zahlen zur
+                 selben Sache, ohne Beruehrung.
+
+                 Mitgeliefert wird auch die HERKUNFT: ein amtlicher Satz
+                 des Gutachterausschusses und ein Rueckfall sind nicht
+                 dasselbe, und genau das muss die Analyse sagen koennen.
+                 Die Stufe traegt A-E, dazu der Zweig des Ausschusses, der
+                 Jahrgang und ob der Satz aus dem Register kam.
+
+                 KEINE BACKTICKS IN DIESEM KOMMENTAR. Er steht in einem
+                 Template-Literal, und dort beendet ein Backtick das
+                 Literal — auch mitten in etwas, das wie ein Kommentar
+                 aussieht. Mir ist das am 12.10.2026 ZWEIMAL passiert,
+                 hier und in unterlagenService.js (v2152). */
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_pct_effektiv')::numeric
+                AS lzs_pct,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_stufe')      AS lzs_stufe,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_zweig')      AS lzs_zweig,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_berichtsjahr') AS lzs_berichtsjahr,
+              (data->'cross_check'->'assumptions'->>'liegenschaftszins_aus_register')::boolean
+                AS lzs_aus_register,
+              (data->'cross_check'->'assumptions'->>'gnd_jahre')::numeric           AS gnd_jahre,
+              (data->'cross_check'->'assumptions'->>'bwk_quote')::numeric           AS bwk_quote,
               (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
               (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
               (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,
+              /* ══ v2157 · DIE LAGE, ZWEIMAL ERHOBEN, GEHT MIT ════════════
+                 Marcel am 12.10.2026: „wir haben ja auch im Objekt ...
+                 Wertsteigerungspotenzial, Nachfrageindikatoren,
+                 Bevoelkerungsentwicklung, Entwicklungsmoeglichkeiten. Also
+                 dass wir da wirklich die Daten halt auch abfragen und
+                 verwerten und das auch gegenueberstellen."
+
+                 GEMESSEN an Bericht 176: der Bericht traegt BEIDE Seiten -
+                 assessment (aus Messdaten abgeleitet) und
+                 nutzer_einschaetzung (die Objektfelder) - und sie weichen
+                 in vier von fuenf Punkten ab. Keine der beiden verliess
+                 den Server in Richtung Pilot-Analyse.
+
+                 Dazu der Bevoelkerungstrend (gemessen) - NICHT die
+                 Makro-Teilwerte: ScoringService setzt fuer fehlende
+                 Kennzahlen Ersatzwerte ein und meldet trotzdem estimated
+                 false. Bei Bericht 176 ist nur der Bevoelkerungsteil
+                 gemessen, fuenf von sechs Teilwerten sind Platzhalter.
+                 Und der Zensus-Block samt
+                 seinem available-Schalter - damit die Analyse sagen kann,
+                 dass er FEHLT, statt ihn zu erfinden.
+
+                 KEINE BACKTICKS IN DIESEM KOMMENTAR (Template-Literal). */
+              (data->'assessment')                                          AS lage_bericht,
+              (data->'nutzer_einschaetzung')                                AS lage_nutzer,
+              (data->>'bevoelkerung_trend_pct')::numeric                    AS bevoelkerung_trend_pct,
+              (data->'zensus')                                              AS zensus,
               (data ? 'cross_check')                                        AS hat_crosscheck
          FROM mb.object_snapshots
         WHERE user_id = $1${cond}
@@ -637,6 +696,27 @@ router.get('/destatis/check', async (req, res) => {
     hinweis: r.ok ? ('Zugangsdaten gültig (Pfad: ' + r.base + ') – Sozioökonomie kann angebunden werden.')
                   : 'Anmeldung fehlgeschlagen: ' + (r.reason || r.status || 'unbekannt'),
     status: r.status, username: r.username });
+});
+
+// GET /zensus/objekt?plz=32120&ort=Hiddenhausen&baujahr=1964&wfl=233
+// v2162 · Zensus 2022 fuer EIN Objekt: Gemeinde (nur wenn eindeutig) und
+// Kreis, Miete und Leerstand passend zu Baujahr und Flaeche, die Dauer des
+// Leerstands. Fuer die Reiter Miete und Investitionen der Haupt-App.
+// Referenzdaten, kein Nutzerbezug — deshalb ohne user_id.
+router.get('/zensus/objekt', async (req, res) => {
+  try {
+    const plz = String(req.query.plz || '').trim();
+    if (!/^\d{5}$/.test(plz)) return res.status(400).json({ error: 'plz_fehlt' });
+    const zahl = (v) => { const n = Number(String(v == null ? '' : v).replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : null; };
+    const [k, g] = await Promise.all([
+      AgsResolver.fromPostcode(plz).catch(() => null),
+      AgsResolver.gemeindeEindeutig(plz, req.query.ort).catch(() => null)
+    ]);
+    if (!k) return res.json({ available: false, reason: 'plz_unbekannt' });
+    const z = await ZensusConnector.lookupDb({ kreisAgs: k.kreis_ags, gemeindeAgs: g && g.gemeinde_ags,
+      baujahr: zahl(req.query.baujahr), wohnflaeche: zahl(req.query.wfl) });
+    res.json(Object.assign({}, z, { gemeinde_eindeutig: g ? g.eindeutig : null }));
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /zensus/check — ist die Zensus-CSV da, wie viele Kreise, welche Spalten erkannt + Beispiel.

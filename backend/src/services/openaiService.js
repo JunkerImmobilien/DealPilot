@@ -349,7 +349,29 @@ function buildPrompt(payload, opts) {
                     + (e.letzte_erhoehung ? ', letzte Erhöhung ' + e.letzte_erhoehung : '')
                     + (e.naechste_anpassung ? ', nächste Anpassung ' + e.naechste_anpassung : '')
                     + (e.befristet_bis ? ', befristet bis ' + e.befristet_bis : '')
-                    + (e.zustand ? ', Zustand: ' + e.zustand : '');
+                    + (e.zustand ? ', Zustand: ' + e.zustand : '')
+                    /* ══ v2156 · DIE MIETE IST MEHR ALS EINE ZAHL ════════
+                       Die Soll-Miete, die Erhoehungsart und der
+                       Kuendigungsverzicht reisten bis v2155 nicht mit
+                       (gemessen: 13 von 36 Feldern). Ohne sie nennt die
+                       Analyse als CHANCE, was vertraglich schon
+                       vereinbart ist — eine Staffelmiete steigt von
+                       selbst, eine Indexmiete haengt am VPI, und ein
+                       Kuendigungsverzicht bindet beide Seiten.
+                       Die Soll-Miete steht NEBEN der Ist-Miete, nicht
+                       statt ihr: der Abstand ist der Hebel. */
+                    + (e.soll_miete ? ', Soll-Kaltmiete ' + e.soll_miete + ' €' : '')
+                    + (e.mietvertrag_seit ? ', Vertrag seit ' + e.mietvertrag_seit : '')
+                    + (e.kuendigungsverzicht_bis
+                        ? ', KUENDIGUNGSVERZICHT bis ' + e.kuendigungsverzicht_bis : '')
+                    + (e.erhoehung_art ? ', Erhoehung: ' + e.erhoehung_art
+                        + (e.erhoehung_wert != null ? ' (' + e.erhoehung_wert + ')' : '')
+                        + (e.erhoehung_rhythmus_jahre ? ', alle ' + e.erhoehung_rhythmus_jahre + ' Jahre' : '')
+                        + (e.stufen_offen != null ? ', ' + e.stufen_offen + ' Stufe(n) offen' : '')
+                      : '')
+                    + (e.massnahme ? ', MASSNAHME: ' + e.massnahme
+                        + (e.massnahme_kosten ? ' (' + fmtEur(e.massnahme_kosten) + ')' : '')
+                      : '');
                 }).join('\n')
             : '')
       : '',
@@ -454,6 +476,12 @@ function buildPrompt(payload, opts) {
     o.baujahr ? '- Baujahr: ' + o.baujahr : '',
     o.makrolage ? '- Makrolage (Selbstbewertung): ' + o.makrolage : '',
     o.mikrolage ? '- Mikrolage (Selbstbewertung): ' + o.mikrolage : '',
+    /* v2157 · die vier Lage-Felder und die Lageklasse (N62.4) */
+    o.lageklasse ? '- Lageklasse (Selbstbewertung): ' + o.lageklasse + '-Lage' : '',
+    o.bevoelkerung ? '- Bevoelkerungsentwicklung (Selbstbewertung): ' + o.bevoelkerung : '',
+    o.nachfrage ? '- Nachfrage-Indikatoren (Selbstbewertung): ' + o.nachfrage : '',
+    o.wertsteigerung ? '- Wertsteigerungs-Potenzial (Selbstbewertung): ' + o.wertsteigerung : '',
+    o.entwicklung ? '- Entwicklungs-Moeglichkeiten (Selbstbewertung): ' + o.entwicklung : '',
     o.thesis ? '- Investitionsthese des Investors: ' + o.thesis : '',
     o.risiken ? '- Vom Investor benannte Risiken: ' + o.risiken : '',
     o.notizen ? '- Sonstige Bemerkungen des Investors: ' + o.notizen : '',
@@ -551,6 +579,37 @@ function buildPrompt(payload, opts) {
         ? ('ja' + (_st.erbbaurecht.erbbauzins_eur_jahr != null
             ? ', Erbbauzins ' + _z(_st.erbbaurecht.erbbauzins_eur_jahr) + ' EUR/Jahr' : '')) : null]
     ]) : '',
+    /* v2166 · Werbungskosten, Jahresverlauf und das Jahr der Wende -
+       fertig gerechnet von der App (calc.js, State.cfRows). */
+    (_st && (_st.werbungskosten_jahr1 || _st.verlauf || _st.wende)) ? (function () {
+      var o = [''];
+      var wk = _st.werbungskosten_jahr1;
+      if (wk) {
+        o.push('## STEUER: WERBUNGSKOSTEN JAHR 1 (von der App gerechnet)');
+        o.push('- Mieteinnahmen ' + _z(wk.mieteinnahmen_eur) + ' EUR; Werbungskosten gesamt ' + _z(wk.summe_eur)
+          + ' EUR = Schuldzinsen ' + _z(wk.schuldzinsen_eur) + ' + AfA ' + _z(wk.afa_eur)
+          + ' + Bewirtschaftung (steuerlich) ' + _z(wk.bewirtschaftung_steuerlich_eur) + ' EUR');
+      }
+      var w = _st.wende;
+      if (w) {
+        o.push('## STEUER: WANN WIRD DAS OBJEKT STEUERLICH POSITIV');
+        o.push(w.erstes_jahr_steuerlich_positiv
+          ? ('- Erstes Jahr mit positivem Ergebnis aus Vermietung: ' + w.erstes_jahr_steuerlich_positiv
+             + '. Steuerwirkung bis dahin: ' + _z(w.steuerwirkung_bis_dahin_eur) + ' EUR (negativ = Erstattung).'
+             + ' Steuerlast danach bis Jahr 15: ' + _z(w.steuerlast_danach_bis_jahr15_eur) + ' EUR.')
+          : ('- In den gerechneten ' + w.gerechnet_ueber_jahre + ' Jahren bleibt das Ergebnis negativ.'
+             + ' Steuerwirkung gesamt: ' + _z(w.steuerwirkung_bis_dahin_eur) + ' EUR (negativ = Erstattung).'));
+      }
+      if (Array.isArray(_st.verlauf) && _st.verlauf.length) {
+        o.push('## STEUER: JAHRESVERLAUF (EUR; Ergebnis = Miete - Zinsen - AfA - BWK; Steuer negativ = Erstattung)');
+        o.push('Jahr | Miete | Zinsen | AfA | BWK | Ergebnis V+V | Steuer | Cashflow n. St.');
+        _st.verlauf.forEach(function (r) {
+          o.push([r.jahr, r.miete_eur, r.zinsen_eur, r.afa_eur, r.bwk_steuerlich_eur, r.ergebnis_vuv_eur,
+                  r.steuer_eur, r.cashflow_nach_steuer_eur].map(function (x) { return x == null ? '-' : x; }).join(' | '));
+        });
+      }
+      return o.join('\n');
+    })() : '',
     _bw ? _zeilen('## BEWIRTSCHAFTUNG (Struktur, nicht nur die Summe)', [
       ['Hausgeld umlagefaehig', _bw.hausgeld_umlagefaehig != null ? _z(_bw.hausgeld_umlagefaehig) + ' EUR' : null],
       ['Hausgeld NICHT umlagefaehig', _bw.hausgeld_nicht_umlagefaehig != null ? _z(_bw.hausgeld_nicht_umlagefaehig) + ' EUR' : null],
@@ -614,6 +673,24 @@ function buildPrompt(payload, opts) {
       ['Liegenschaftszins', _bo.liegenschaftszins_pct != null ? _p(_bo.liegenschaftszins_pct) : null],
       ['Nutzungsart', _bo.nutzungsart]
     ]) : '',
+    /* ══ v2156 · EINE ZAHL OHNE AUFTRAG WIRD NICHT BENUTZT ═══════════════
+       Marcel am 12.10.2026: „auch Liegenschaftszinsen … dass auch wirklich
+       alles damit einfliesst."
+       Der Zins STAND im Prompt (eine Zeile hoeher, seit v2011) — aber kein
+       Satz sagte dem Modell, was es damit tun soll. Anders als bei der
+       Restnutzungsdauer, wo ein ausdruecklicher Abgleich-Auftrag steht.
+       Gemessen: er kommt in den Antworten praktisch nicht vor.
+       > Ein Datum im Prompt ist kein Datum in der Analyse. Ohne Auftrag
+       > liest das Modell darueber hinweg — dieselbe Lehre wie bei den
+       > Feldern ohne Zielfeld (v2139). */
+    (_bo && _bo.liegenschaftszins_pct != null)
+      ? '- AUFTRAG zum Liegenschaftszins: er ist die Groesse, an der der\n'
+        + '  Ertragswert haengt (ein Prozentpunkt mehr senkt ihn um gut ein\n'
+        + '  Fuenftel). Ordne ihn ein: passt er zu Lage und Objektart, und was\n'
+        + '  bedeutet er fuer die Bewertung? Liegt unten ein Marktbericht mit\n'
+        + '  einem eigenen Zinssatz vor, gilt dessen Wert — nenne dann beide\n'
+        + '  und sage, welcher woher kommt.'
+      : '',
     _ha ? _zeilen('## HALTER UND UEBERGANG (privat oder Gesellschaft aendert Steuer und Finanzierung)', [
       ['Halter', _ha.name], ['Gehalten seit', _ha.seit],
       ['Kaufdatum', _ha.kaufdatum],
@@ -906,9 +983,237 @@ function buildPrompt(payload, opts) {
       if (a.confidence_pct != null) L.push('- Aussagekraft laut Bericht: ' + a.confidence_pct + ' %');
       if (a.micro_score != null) L.push('- Mikrolage: ' + a.micro_score + ' von 100');
       if (a.macro_score != null) L.push('- Makrolage: ' + a.macro_score + ' von 100');
+
+      /* ══ v2157 · DIE LAGE, ZWEIMAL ERHOBEN (N62.4) ═════════════════════
+
+         Marcel am 12.10.2026: „Und wir haben ja auch im Objekt ...
+         Wertsteigerungspotenzial, Nachfrageindikatoren,
+         Bevoelkerungsentwicklung, Entwicklungsmoeglichkeiten. Also dass
+         wir da wirklich die Daten halt auch abfragen und verwerten und das
+         auch gegenueberstellen."
+
+         GEMESSEN an Bericht 176 (Huellhorst): der Bericht leitet die Lage
+         aus Messdaten ab (lage_bericht) und fuehrt daneben die Angaben des
+         Nutzers (lage_nutzer). Sie weichen in vier von fuenf Punkten ab —
+         Mikrolage begrenzt gegen durchschnittlich, Nachfrage hoch gegen
+         mittel, Wertsteigerung hoch gegen mittel, Entwicklung steigend
+         gegen begrenzt. Keine der beiden Seiten kam bisher hier an.
+
+         Der Zensus wird mitgegeben, WENN er da ist, und sonst ausdruecklich
+         als fehlend benannt: am 12.10.2026 trugen 0 von 162 Berichten auf
+         Staging Zensus-Werte (die Kreisdatei ist leer). Ohne diesen Satz
+         fuellt das Modell die Luecke mit einer recherchierten Leerstands-
+         quote und stellt sie neben gemessene Zahlen. */
+      var _lb = (a.lage_bericht && typeof a.lage_bericht === 'object') ? a.lage_bericht : null;
+      var _ln = (a.lage_nutzer && typeof a.lage_nutzer === 'object') ? a.lage_nutzer : null;
+      if (_lb || _ln) {
+        var _lz = [
+          ['Makrolage', 'makrolage'], ['Mikrolage', 'mikrolage'],
+          ['Bevoelkerungsentwicklung', 'bevoelkerung'], ['Nachfrage', 'nachfrage'],
+          ['Wertsteigerung', 'wertsteigerung'], ['Entwicklung', 'entwicklung'],
+          ['Mietentwicklung', 'mietentwicklung']
+        ].map(function (r) {
+          var vb = _lb && _lb[r[1]] != null ? String(_lb[r[1]]) : null;
+          var vn = _ln && _ln[r[1]] != null ? String(_ln[r[1]]) : null;
+          if (vb == null && vn == null) return null;
+          var abw = (vb != null && vn != null && vb.toLowerCase() !== vn.toLowerCase());
+          return '  ' + r[0] + ': Bericht ' + (vb || '–') + ' | Objektfeld ' + (vn || '–')
+               + (abw ? '  <- WEICHT AB' : '');
+        }).filter(Boolean);
+        if (_lz.length) {
+          L.push('- LAGE ZWEIMAL ERHOBEN (Bericht = aus Messdaten abgeleitet, Objektfeld = Angabe des Investors):');
+          _lz.forEach(function (z) { L.push(z); });
+        }
+      }
+      if (a.bevoelkerung_trend_pct != null && isFinite(Number(a.bevoelkerung_trend_pct)))
+        L.push('- Bevoelkerungstrend des Kreises (gemessen): '
+          + (Number(a.bevoelkerung_trend_pct) >= 0 ? '+' : '')
+          + Number(a.bevoelkerung_trend_pct).toFixed(2).replace('.', ',') + ' % pro Jahr');
+      var _zs = (a.zensus && typeof a.zensus === 'object') ? a.zensus : null;
+      if (_zs && _zs.available) {
+        var _zt = [];
+        if (_zs.leerstandsquote != null) _zt.push('Leerstandsquote ' + String(_zs.leerstandsquote).replace('.', ',') + ' %');
+        if (_zs.eigentuemerquote != null) _zt.push('Eigentuemerquote ' + String(_zs.eigentuemerquote).replace('.', ',') + ' %');
+        if (_zs.nettokaltmiete_qm != null) _zt.push('Nettokaltmiete ' + String(_zs.nettokaltmiete_qm).replace('.', ',') + ' EUR/m2');
+        if (_zs.jung_18_30 != null) _zt.push('Anteil 18-30 Jahre ' + String(_zs.jung_18_30).replace('.', ',') + ' %');
+        L.push('- ZENSUS 2022 (amtlich, Stichtag 15.05.2022, KREIS' + (_zs.kreis_name ? ' ' + _zs.kreis_name : '') + '): '
+          + (_zt.length ? _zt.join(', ') : 'keine Kennzahl'));
+        /* v2162 · Gemeinde und die Werte passend zu Baujahr und Groesse
+           (mb.zensus_werte). Die Miete ist BESTANDSMIETE aller Vertraege -
+           das Modell darf sie nicht als Markt- oder Angebotsmiete ausgeben. */
+        var _zf = function (n, d) { return n == null ? null : Number(n).toFixed(d).replace('.', ','); };
+        var _zg = _zs.gemeinde, _zk = _zs.kreis;
+        if (_zg) {
+          var _gt = [];
+          if (_zg.nettokaltmiete_qm != null) _gt.push('Nettokaltmiete ' + _zf(_zg.nettokaltmiete_qm, 2) + ' EUR/m2');
+          if (_zg.leerstandsquote != null) _gt.push('Leerstandsquote ' + _zf(_zg.leerstandsquote, 1) + ' %');
+          if (_zg.leerstandsquote_marktaktiv != null) _gt.push('marktaktiver Leerstand ' + _zf(_zg.leerstandsquote_marktaktiv, 1) + ' %');
+          if (_gt.length) L.push('  Gemeinde ' + _zg.name + ': ' + _gt.join(', '));
+        }
+        [['miete_baujahr', 'Baujahrsklasse'], ['miete_flaeche', 'Groessenklasse']].forEach(function (p) {
+          var src = (_zg && _zg[p[0]] && _zg[p[0]].wert != null) ? [_zg[p[0]], 'Gemeinde'] : ((_zk && _zk[p[0]] && _zk[p[0]].wert != null) ? [_zk[p[0]], 'Kreis'] : null);
+          if (src) L.push('  Nettokaltmiete ' + p[1] + ' ' + src[0].klasse + ' (' + src[1] + '): ' + _zf(src[0].wert, 2) + ' EUR/m2');
+        });
+        var _zl = (_zg && _zg.leerstandsdauer) || (_zk && _zk.leerstandsdauer);
+        if (_zl && _zl.length) L.push('  Dauer des Leerstands (Anteil der leeren Wohnungen): '
+          + _zl.map(function (x) { return x.text + ' ' + _zf(x.anteil_pct, 1) + ' %'; }).join(', '));
+        if (_zg || (_zk && (_zk.miete_baujahr || _zk.miete_flaeche)))
+          L.push('  Die Zensus-Miete ist die BESTANDSMIETE aller laufenden Vertraege am Stichtag, keine Angebotsmiete;'
+            + ' nenne sie als solche. Der Zensus-Leerstand ist keine Mietausfallannahme (Langzeitleerstand zaehlt mit).');
+      } else if (_zs) {
+        L.push('- ZENSUS 2022: fuer diesen Kreis liegen KEINE Zensus-Werte vor. Nenne keine Zensus-Zahl'
+          + ' und schreibe keine recherchierte Leerstands- oder Eigentuemerquote als Zensuswert.');
+      }
       if (a.gross_yield_pct != null) L.push('- Bruttorendite laut Bericht: ' + fmtNum(a.gross_yield_pct, 1).replace('.', ',') + ' %');
       if (a.rent_multiplier != null) L.push('- Kaufpreisfaktor laut Bericht: ' + fmtNum(a.rent_multiplier, 1).replace('.', ','));
       if (a.deal_score != null) L.push('- Deal-Score laut Bericht: ' + a.deal_score);
+
+      /* ══ v2150 · DIE WERTERMITTLUNG STUFE 3 GEHT MIT ═══════════════════
+
+         Marcel am 12.10.2026: „in der Pilot Analyse woher kommen die werte
+         und daten im reiter Lage & Markt? wenn wir einen marktbericht haben
+         oder mehrere koennen wir die Daten dafuer aus den Marktberichten
+         holen da wir diese sachen ja dort ueber die partner abholen." Und:
+         „auch wenn Stufe 3 gerechnet wurde sollte auf jedenfall auch der
+         Verkehrswert mit einfliessen und die Gesamtbewertung einfliessen."
+
+         GEMESSEN am 12.10.2026: `/objects/history` liefert seit v1963 den
+         Sachwert und den Ertragswert und seit v1965 das FUEHRENDE
+         Verfahren mit Grund und Quelle (Paragraf 6 Abs. 1 ImmoWertV). Der
+         Block hier las davon KEIN EINZIGES FELD — er endete beim
+         Deal-Score. Die Zahlen lagen in `a` und wurden nie gelesen.
+
+         Dasselbe Muster wie v1963 selbst: dort lag der Cross-Check in der
+         Datenbankzeile und hat den Server nie verlassen. Hier verlaesst er
+         den Server und erreicht den Prompt nicht.
+
+         ── WARUM DAS WORT „VERKEHRSWERT" HIER NICHT FAELLT ───────────────
+
+         Marcels Auftrag ist, dass der Wert EINFLIESST — nicht, dass er
+         umbenannt wird. Die Doktrin steht im Bericht selbst
+         (`CrossCheckService.js:121`): „Vereinfachtes Sachwert-/Ertrags-
+         wertverfahren nach ImmoWertV-Logik als Plausibilitaets-Quercheck.
+         Indikativ, kein Gutachten n. Paragraf 194 BauGB."
+
+         > Beides gilt gleichzeitig: die Zahl gehoert in die Analyse, UND
+         > sie darf nicht als Verkehrswert etikettiert werden. Deshalb
+         > bekommt die KI den Wert, das Verfahren, den Grund — und den
+         > Satz, was sie damit nicht tun darf. Ein Wert ohne seine
+         > Einordnung ist in diesem Fall schlimmer als keiner. */
+      var _sw = a.sachwert_eur != null ? Number(a.sachwert_eur) : null;
+      var _ew = a.ertragswert_eur != null ? Number(a.ertragswert_eur) : null;
+      if (_sw != null || _ew != null || a.fuehrend) {
+        L.push('');
+        L.push('## WERTERMITTLUNG IM BERICHT (Stufe 3, ImmoWertV-Logik)');
+        if (_sw != null) L.push('- Sachwert: ' + fmtEur(_sw));
+        if (_ew != null) L.push('- Ertragswert: ' + fmtEur(_ew));
+        if (_sw != null && _ew != null && _sw > 0) {
+          var _spr = ((_ew - _sw) / _sw) * 100;
+          L.push('- Abstand Ertrags- zu Sachwert: ' + (_spr >= 0 ? '+' : '')
+            + _spr.toFixed(1).replace('.', ',') + ' %');
+          if (Math.abs(_spr) > 25) {
+            L.push('  ACHTUNG: Die beiden Verfahren liegen WEIT auseinander. Das ist');
+            L.push('  ein Befund und gehoert genannt: entweder traegt die Substanz den');
+            L.push('  Preis nicht (Ertragswert hoeher) oder die Miete traegt die');
+            L.push('  Substanz nicht (Sachwert hoeher). Sage, welcher Fall vorliegt.');
+          }
+        }
+        var _vn = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
+                    vergleichswert: 'Vergleichswertverfahren' }[a.fuehrend] || null;
+        if (_vn) {
+          L.push('- FUEHRENDES VERFAHREN: ' + _vn
+            + (a.fuehrend_grund ? ' — ' + a.fuehrend_grund : ''));
+          if (a.fuehrend_quelle) L.push('  Rechtsgrundlage: ' + a.fuehrend_quelle);
+          var _tragend = a.fuehrend === 'sachwert' ? _sw
+                       : a.fuehrend === 'ertragswert' ? _ew : null;
+          if (_tragend != null) {
+            L.push('- Der TRAGENDE Wert ist damit ' + fmtEur(_tragend)
+              + ' (' + _vn + ').');
+            L.push('  Nutze ihn als Anker fuer die Einordnung des Kaufpreises und');
+            L.push('  sage ausdruecklich, aus welchem Verfahren er kommt und warum');
+            L.push('  dieses Verfahren fuehrt.');
+          }
+        } else if (a.fuehrend_grund) {
+          L.push('- KEIN fuehrendes Verfahren ausgewiesen: ' + a.fuehrend_grund);
+        }
+        /* ══ v2156 · DER ZINS GEHOERT ZUM ERTRAGSWERT ════════════════════
+
+           Marcel am 12.10.2026: „auch Finanzierung und Liegenschaftszinsen
+           und Wertgutachten, dass auch wirklich alles damit einfliesst."
+
+           GEMESSEN: der Ertragswert stand hier ohne den Liegenschaftszins,
+           der ihn erzeugt. Das Objektfeld `lzs_pct` aus dem Formular steht
+           400 Zeilen weiter oben im Block „BODEN UND SUBSTANZ" — als
+           nackte Zahl, ohne Auftrag. Zwei Zahlen zur selben Groesse, ohne
+           Beruehrung, und das Modell musste raten, welche gilt.
+
+           > Ein Ertragswert ohne seinen Zinssatz ist nicht pruefbar. Der
+           > Zins ist die Groesse, an der die ganze Rechnung haengt: ein
+           > Prozentpunkt mehr senkt den Ertragswert um gut ein Fuenftel.
+
+           Die HERKUNFT steht dabei (Stufe A-E, Zweig, Jahrgang, aus dem
+           Register oder nicht). Ein amtlicher Satz des Gutachterausschusses
+           und ein Rueckfall sind nicht dasselbe — und die Analyse muss das
+           sagen koennen, statt beides „Liegenschaftszins" zu nennen. */
+        if (a.lzs_pct != null) {
+          var _lz = Number(a.lzs_pct);
+          var _lzh = [];
+          if (a.lzs_stufe) _lzh.push('Stufe ' + a.lzs_stufe);
+          if (a.lzs_zweig) _lzh.push(String(a.lzs_zweig));
+          if (a.lzs_berichtsjahr) _lzh.push('Jahrgang ' + a.lzs_berichtsjahr);
+          _lzh.push(a.lzs_aus_register ? 'aus dem amtlichen Register'
+                                       : 'NICHT aus dem Register — Rueckfallwert');
+          L.push('- Liegenschaftszinssatz der Rechnung: '
+            + fmtNum(_lz, 2).replace('.', ',') + ' %  (' + _lzh.join(' · ') + ')');
+          if (!a.lzs_aus_register) {
+            L.push('  ACHTUNG: Dieser Zinssatz kommt NICHT vom Gutachterausschuss.');
+            L.push('  Der Ertragswert darueber ist damit eine Rechnung mit einer');
+            L.push('  Annahme, nicht mit einem amtlichen Modellwert. Sage das dazu,');
+            L.push('  wenn du den Ertragswert verwendest.');
+          }
+          /* Weicht der Zins des Berichts von dem im Formular ab, ist das
+             ein Befund — keine Kleinigkeit: beide Zahlen heissen gleich. */
+          /* `_bo` ist der Boden-Block (Z. 117), nicht `mb` — das ist die
+             Marktbewertung. Mein erster Zugriff hiess `mb.liegenschafts-
+             zins_pct` und waere immer undefined gewesen: eine Abweichung,
+             die nie gemeldet wird, sieht wie Uebereinstimmung aus. */
+          if (_bo && _bo.liegenschaftszins_pct != null) {
+            var _lzf = Number(_bo.liegenschaftszins_pct);
+            if (isFinite(_lzf) && _lzf > 0 && Math.abs(_lzf - _lz) >= 0.05) {
+              L.push('  ABWEICHUNG: im Objekt ist ' + fmtNum(_lzf, 2).replace('.', ',')
+                + ' % hinterlegt, der Bericht rechnet mit '
+                + fmtNum(_lz, 2).replace('.', ',') + ' %.');
+              L.push('  Nenne BEIDE und sage, welcher woher kommt. Der Bericht rechnet');
+              L.push('  mit seinem eigenen; der hinterlegte Wert ist ein Formularfeld.');
+            }
+          }
+        }
+        if (a.gnd_jahre != null) {
+          L.push('- Gesamtnutzungsdauer der Rechnung: ' + Math.round(Number(a.gnd_jahre)) + ' Jahre');
+        }
+        if (a.bwk_quote != null) {
+          L.push('- Bewirtschaftungskostenquote der Rechnung: '
+            + fmtNum(Number(a.bwk_quote) * 100, 1).replace('.', ',') + ' % des Rohertrags');
+        }
+        L.push('- EINORDNUNG, die mitgesagt werden MUSS: diese Werte sind ein');
+        L.push('  vereinfachter Plausibilitaets-Quercheck nach ImmoWertV-Logik,');
+        L.push('  INDIKATIV und KEIN Gutachten nach Paragraf 194 BauGB. Nenne sie');
+        L.push('  nie als "Verkehrswert" und nie als Gutachtenergebnis.');
+
+        /* Entwicklung: nur wenn mehr als ein Bericht die Werte traegt. */
+        var _vs = (mbr.verlauf || []).filter(function (x) { return x.sachwert != null || x.ertragswert != null; });
+        if (_vs.length > 1) {
+          L.push('- Entwicklung der Verfahrenswerte ueber ' + _vs.length + ' Berichte:');
+          _vs.forEach(function (x) {
+            L.push('  • ' + new Date(x.datum).toLocaleDateString('de-DE') + ': '
+              + (x.sachwert != null ? 'Sachwert ' + fmtEur(x.sachwert) : 'Sachwert —')
+              + ' · ' + (x.ertragswert != null ? 'Ertragswert ' + fmtEur(x.ertragswert) : 'Ertragswert —')
+              + (x.fuehrend ? ' · fuehrend: ' + x.fuehrend : ''));
+          });
+          L.push('  Der Zeitabstand-Riegel von oben gilt hier genauso: unter 30 Tagen');
+          L.push('  kommt eine Differenz aus geaenderten EINGABEN, nicht aus dem Markt.');
+        }
+      }
 
       /* ---- Verlauf: NUR wenn er etwas bedeutet ---------------------------- */
       var v = (mbr.verlauf || []).filter(function (x) { return x.marktwert != null; });
@@ -1013,6 +1318,19 @@ function buildPrompt(payload, opts) {
     '2. Mikrolage PLZ ' + (o.plz || '?') + ' (Stadtteil-Reputation, Infrastruktur)',
     '3. Lokaler Mietspiegel (€/m² Bestand vs. Neubau)',
     '4. Kaufpreisniveau für vergleichbare Objekte in der Region',
+    /* ══ v2150 · DER RECHERCHE-AUFTRAG MUSS DEN BERICHT KENNEN ══════════
+       Marcel: „wenn wir einen marktbericht haben oder mehrere koennen wir
+       die Daten dafuer aus den Marktberichten holen da wir diese sachen ja
+       dort ueber die partner abholen."
+       Punkte 3 und 4 standen UNBEDINGT da. Liegt ein Bericht vor, ist eine
+       Web-Recherche zum Mietniveau nicht nur unnoetig, sondern schaedlich:
+       sie stellt eine geschaetzte Zahl neben eine gemessene. */
+    mbr ? 'WICHTIG zu 3 und 4: zu diesem Objekt LIEGT EIN MARKTBERICHT VOR (Block oben). '
+        + 'Seine Marktmiete und seine Vergleichswerte sind GEMESSEN — sie gelten, nicht deine '
+        + 'Recherche. Recherchiere zu 3 und 4 nur ERGAENZEND (z.B. Neubaumiete, wenn der Bericht '
+        + 'nur Bestand fuehrt) und sage bei jeder Zahl, ob sie aus dem Bericht oder aus deiner '
+        + 'Recherche kommt. Stelle NIE eine recherchierte Zahl ohne Hinweis neben eine gemessene.'
+        : '',
     '',
     '## AUFGABEN',
     '',
@@ -1097,6 +1415,79 @@ function buildPrompt(payload, opts) {
     '   entweder Eigenkapital-Einsatz/Sondertilgung (mit Hausnummer) ODER eine guenstigere',
     '   Anschlusskondition (Zielzins), damit der Cashflow nicht negativ wird.',
     '',
+    /* ══ v2150 · AUFGABE 14 — DER ABGLEICH GEGEN DIE SCHNITTSTELLE ══════
+       Marcel: „man kann die werte der KI gerne mit den daten aus der
+       schnittstelle abgleichen auch wenn Stufe 3 gerechnet wurde sollte
+       auf jedenfall auch der Verkehrswert mit einfliessen und die
+       Gesamtbewertung einfliessen."
+
+       Die Aufgabe steht nur, wenn ein Bericht da ist — ein Auftrag, der
+       auf nichts zeigt, erzeugt eine erfundene Antwort. Das Zielfeld
+       `berichts_abgleich` steht im Antwortformat weiter unten; ohne
+       Zielfeld faellt die Arbeit lautlos auf den Boden. */
+    mbr ? '14. Abgleich mit dem Marktbericht — stelle deine Einordnung NEBEN seine\n'
+        + '   gemessenen Werte: Marktwert und Spanne, Marktmiete, Sach- und Ertragswert,\n'
+        + '   das fuehrende Verfahren. Wo ihr uebereinstimmt, sage es kurz. Wo nicht,\n'
+        + '   nenne BEIDE Zahlen und sage, welche woher kommt — der Bericht ist gemessen,\n'
+        + '   deine Einordnung ist eine Einschaetzung. Nutze den tragenden Wert des\n'
+        + '   fuehrenden Verfahrens als Anker fuer den Kaufpreis und nenne das Verfahren\n'
+        + '   dabei. Die Sach- und Ertragswerte sind INDIKATIV und kein Gutachten nach\n'
+        + '   Paragraf 194 BauGB — schreibe sie nie als "Verkehrswert".\n'
+        + '   Gehoert nach "berichts_abgleich".'
+        : '',
+    /* ══ v2157 · AUFGABE 15 — DIE LAGE GEGENUEBERSTELLEN (N62.4) ════════
+       Marcel: „Makrolage, Mikrolage, Mietspiegel, Preisniveau aus dem
+       Netz beziehen, aber auch mit Quellen ... und das auch
+       gegenueberstellen nochmal mit dem Mietspiegel oder der Recherche
+       aus dem Netz."
+       Die Aufgabe steht IMMER: auch ohne Bericht gibt es zwei Seiten —
+       das Objektfeld und die Recherche. Die Quelle steht je ZEILE, nicht
+       nur im Sammel-Array: eine Zahl ohne ihre Quelle daneben ist im
+       Reiter nicht nachpruefbar. */
+    '15. Lage-Gegenueberstellung — eine Zeile je Merkmal: Makrolage, Mikrolage,',
+    '   Bevoelkerungsentwicklung, Nachfrage, Wertsteigerung, Entwicklung,',
+    '   Mietniveau, Kaufpreisniveau. Je Zeile drei Spalten: was das OBJEKTFELD',
+    '   sagt (Angabe des Investors), was der MARKTBERICHT sagt (nur wenn oben',
+    '   ein Bericht steht, sonst null) und was deine RECHERCHE ergibt — mit',
+    '   der URL der Quelle in derselben Zeile. Keine Quelle gefunden: null,',
+    '   nicht schaetzen. Dann ein Urteil: "stimmt", "weicht ab" oder "offen"',
+    '   (wenn eine Seite fehlt), und 1-2 Saetze, was die Abweichung fuer die',
+    '   Investition bedeutet. Wo das Objektfeld vom Bericht abweicht, sage',
+    '   deutlich, dass die Angabe des Investors nicht gemessen ist.',
+    '   Gehoert nach "lage_gegenueberstellung".',
+    /* v2160 · N62.6 — die steuerliche Zusammenfassung. Marcel: „bei der
+       Pilotanalyse natuerlich auch eine steuerliche Zusammenfassung machen.
+       Das soll natuerlich auch mit in den Soll-Ist-Abgleich einfliessen."
+       Bis hier stand die Steuer nur als Nebensatz in Aufgabe 8 - ohne
+       eigenes Feld (Lehre v2013b: ohne Zielfeld kein Text). */
+    '',
+    '16. Steuerliche Zusammenfassung — was die Investition steuerlich bewirkt, NUR aus',
+    /* v2166: gegliedert - Marcel: „auf Werbungskosten eingehen und wann das Objekt
+       steuerlich positiv wird und was das an Abgaben bedeutet." Die Zahlen stehen
+       oben fertig (STEUER: WERBUNGSKOSTEN / WANN POSITIV / JAHRESVERLAUF). */
+    '   Gliederung, in dieser Reihenfolge: (1) Werbungskosten Jahr 1 nach Art mit EUR -',
+    '   Schuldzinsen, AfA, Bewirtschaftung - und ihr Verhaeltnis zur Miete; (2) Ergebnis aus',
+    '   Vermietung und Steuerwirkung im ersten Jahr; (3) in welchem Jahr das Ergebnis positiv',
+    '   wird und WARUM (Zinsanteil sinkt, Miete steigt, AfA bleibt) - mit den Zahlen dieses',
+    '   Jahres; (4) was danach an Steuer anfaellt, je Jahr und kumuliert bis Jahr 15, und wie',
+    '   das den Cashflow nach Steuer veraendert; (5) Sanierung: wie sie steuerlich wirkt (falls',
+    '   angegeben); (6) Hinweis auf den Steuerberater. Zahlen NUR aus den Steuer-Bloecken oben.',
+    '   dem Block STEUER und den Kennzahlen (Steuerwirkung p.a., Cashflow vor/nach Steuer).',
+    '   Nenne: AfA-Basis und -Satz bzw. Restnutzungsdauer, ob Sanierung als',
+    '   Erhaltungsaufwand verteilt wird, die Steuerwirkung im ersten Jahr in EUR und',
+    '   was sie fuer den Cashflow nach Steuer heisst. Fehlt eine Angabe (z. B. kein',
+    '   Grenzsteuersatz), sage das und rechne NICHT mit einem angenommenen Satz.',
+    /* v2164a - gemessen am ersten echten Lauf (2026-1052): „2 % ueber eine
+       Restnutzungsdauer von 80 Jahren". Eingetragen war nur der Satz; die
+       80 stammt aus der Gesamtnutzungsdauer des Marktberichts. */
+    '   Die AfA-Dauer ergibt sich aus dem Satz (2 % = 50 Jahre, 2,5 % = 40, 3 % = 33). Eine',
+    '   Restnutzungsdauer nennst du NUR, wenn oben "AfA ueber Restnutzungsdauer" steht;',
+    '   die Gesamtnutzungsdauer des Marktberichts ist KEINE AfA-Dauer.',
+    '   Keine Steuerberatung: schliesse mit dem Hinweis, dass ein Steuerberater die',
+    '   Einordnung bestaetigen sollte. Gehoert nach "steuer_zusammenfassung".',
+    (_ak ? '   Liegt oben ein ANKAUF-STAND vor: vergleiche zusaetzlich die steuerliche Lage\n'
+      + '   beim Ankauf mit heute (Zeile "Steuerwirkung p. a." und Cashflow n. Steuer der\n'
+      + '   Abweichungstabelle) und erklaere die Bewegung. Gehoert nach "soll_ist_steuer".' : ''),
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',
     '- Mit Zahlen aus dem Deal arbeiten — konkret werden',
@@ -1112,18 +1503,36 @@ function buildPrompt(payload, opts) {
     '## ANTWORTFORMAT — strikt JSON, keine Markdown-Codeblöcke',
     'Antworte AUSSCHLIESSLICH mit folgendem JSON-Objekt:',
     '{',
-    '  "gesamtbewertung": "4-6 Sätze, mit Zahlen",',
+    '  "gesamtbewertung": "8-10 Sätze, mit Zahlen: Rendite, Cashflow vor/nach Steuer, DSCR/LTV, Lage, Hauptrisiko, Urteil",',
     '  "fazit_kurz": "Kaufen | Prüfen | Nicht kaufen",',
-    '  "staerken":   ["Stärke 1 ausführlich mit Zahl", "Stärke 2", "Stärke 3", "Stärke 4", "Stärke 5"],',
-    '  "risiken":    ["Risiko 1 ausführlich mit Zahl", "Risiko 2", "Risiko 3", "Risiko 4", "Risiko 5"],',
+    /* ══ v2156 · JEDER EINTRAG BRAUCHT EINE VORGABE ═══════════════════
+       Marcel am 12.10.2026: „dass wir da wirklich vernuenftige
+       Auswertungen bekommen … das noch vollumfaenglicher, genauer."
+
+       Hier stand `["Staerke 1 ausfuehrlich mit Zahl", "Staerke 2",
+       "Staerke 3", …]`. GEMESSEN: das ist die schwaechste Vorgabe des
+       ganzen Antwortformats — alle anderen Felder nennen eine Satzzahl
+       (4-6, 8-12), diese beiden nur das Wort „ausfuehrlich", und zwar
+       nur am ERSTEN Element. Die Eintraege 2 bis 5 hatten gar keine.
+
+       > Ein Listeneintrag ohne Vorgabe wird ein Stichwort. „Gute Lage"
+       > ist keine Staerke, es ist eine Behauptung — und sie steht dann
+       > neben einem ersten Eintrag, der drei Saetze und eine Zahl hat.
+
+       Jetzt tragen alle fuenf dieselbe Anforderung: zwei bis drei Saetze
+       MIT der Zahl, auf die sich die Aussage stuetzt. Das ist dieselbe
+       Strenge wie im uebrigen Format und der Grund, warum die
+       Investmentbewertung heute brauchbar ist. */
+    '  "staerken":   ["je Eintrag 3-4 Sätze MIT der Zahl, auf die sich die Aussage stützt (z.B. \\"DSCR 1,34 liegt über der Bankschwelle 1,2 …\\"). Kein Stichwort, kein Allgemeinplatz. Fünf Einträge, der erste der stärkste.", "Stärke 2 — gleiche Anforderung", "Stärke 3", "Stärke 4", "Stärke 5"],',
+    '  "risiken":    ["je Eintrag 3-4 Sätze MIT Zahl und mit der Folge für den Investor (was passiert, wenn es eintritt). Fünf Einträge, der erste der schwerste.", "Risiko 2 — gleiche Anforderung", "Risiko 3", "Risiko 4", "Risiko 5"],',
     '  "risikoanalyse": {',
-    '    "finanzierungsrisiko": "Ausführliche Bewertung von LTV+DSCR, 4-5 Sätze",',
-    '    "cashflow_stabilitaet": "Ausführliche Bewertung Cashflow-Stabilität, 4-5 Sätze",',
-    '    "annahmen_abhaengigkeit": "Welche Annahmen sind kritisch? 4-5 Sätze"',
+    '    "finanzierungsrisiko": "Ausführliche Bewertung von LTV+DSCR mit beiden Zahlen, Bankschwellen und Entwicklung über die Jahre, 6-8 Sätze",',
+    '    "cashflow_stabilitaet": "Cashflow-Stabilität: Cashflow vor UND nach Steuer, wie er sich über den Jahresverlauf entwickelt, was ihn trägt und was ihn kippen kann, 6-8 Sätze",',
+    '    "annahmen_abhaengigkeit": "Welche Annahmen sind kritisch (Miete, Leerstand, Zins nach Bindung, Instandhaltung)? Je Annahme: was passiert, wenn sie nicht eintritt, 6-8 Sätze"',
     '  },',
     '  "szenarien": {',
-    '    "worst_case": "Miete -10%, Zins +1% — Folgen ausführlich qualitativ und quantitativ, 4-6 Sätze",',
-    '    "best_case":  "Miete +5%, Wertsteigerung über Erwartung — Folgen ausführlich, 4-6 Sätze"',
+    '    "worst_case": "Miete -10%, Zins +1% — Folgen ausführlich qualitativ und quantitativ (Cashflow, DSCR, Steuer), 6-8 Sätze",',
+    '    "best_case":  "Miete +5%, Wertsteigerung über Erwartung — Folgen ausführlich mit Zahlen, 6-8 Sätze"',
     '  },',
     '  "investor_fit": {',
     '    "cashflow_investor":     "ja/nein/teilweise — Begründung mit Zahlen, 2-3 Sätze",',
@@ -1131,10 +1540,10 @@ function buildPrompt(payload, opts) {
     '    "sicherheitsorientiert": "ja/nein/teilweise — Begründung mit Zahlen, 2-3 Sätze"',
     '  },',
     '  "empfehlung": "Kaufen | Prüfen | Nicht kaufen",',
-    '  "empfehlung_begruendung": "Ausführliche Begründung, 4-6 Sätze",',
-    '  "dealpilot_insight": "Tool-Voice, 4-5 Sätze, fundiert",',
-    '  "investmentbewertung": "Holistische Bewertung — 8-12 Sätze, mit Zahlen, Lage, Marktumfeld, Risiko, langfristige Perspektive",',
-    '  "verhandlungsempfehlung": "Konkrete Verhandlungsstrategie — 8-12 Sätze: Argumente, Hebel, Zielpreis, Kompromisse",',
+    '  "empfehlung_begruendung": "Ausführliche Begründung: die drei Gründe, die das Urteil tragen, je mit Zahl, und was es ändern würde, 8-10 Sätze",',
+    '  "dealpilot_insight": "Tool-Voice, 6-8 Sätze, fundiert — die eine Erkenntnis, die in den Zahlen steckt und die man auf den ersten Blick nicht sieht",',
+    '  "investmentbewertung": "Holistische Bewertung — 12-16 Sätze, mit Zahlen, Lage, Marktumfeld, Risiko, langfristige Perspektive",',
+    '  "verhandlungsempfehlung": "Konkrete Verhandlungsstrategie — 12-16 Sätze: Argumente, Hebel, Zielpreis, Kompromisse",',
     '  "kaufpreis_offerte": {',
     '    "empfohlen": "Empfohlener Kaufpreis als Zahl mit € — z.B. 175.000 €",',
     '    "begruendung": "Warum dieser Preis? 5-7 Sätze mit Bezug auf Vergleichswerte und Marktlage",',
@@ -1151,10 +1560,27 @@ function buildPrompt(payload, opts) {
     '    "Argument 4",',
     '    "Argument 5"',
     '  ],',
-    '  "makrolage_recherche": "Ausführlich recherchierte Fakten zur Makrolage, 4-6 Sätze",',
-    '  "mikrolage_recherche": "Ausführlich recherchierte Fakten zur Mikrolage, 4-6 Sätze",',
-    '  "mietspiegel_eur_qm":  "Recherchierter Wert €/m² oder null",',
-    '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
+    '  "makrolage_recherche": "Ausführlich recherchierte Fakten zur Makrolage (Bevölkerung, Wirtschaft, Arbeitsmarkt, Wohnungsmarkt) mit Zahlen und Jahr, 8-10 Sätze",',
+    '  "mikrolage_recherche": "Ausführlich recherchierte Fakten zur Mikrolage (Quartier, Infrastruktur, Verkehr, Nachfrage, Lärm/Umfeld) mit Zahlen, 8-10 Sätze",',
+    /* v2150 · Marcel: „man kann die werte der KI gerne mit den daten aus
+       der schnittstelle abgleichen." Das Feld hiess „Recherchierter Wert" —
+       und genau das hat das Modell getan, auch wenn der Marktbericht eine
+       GEMESSENE Marktmiete trug. Ein Feldname ist eine Anweisung. */
+    '  "mietspiegel_eur_qm":  "€/m² kalt. VORRANG: der Wert aus dem DealPilot-Marktbericht, falls einer im Prompt steht. Nur ohne Bericht selbst recherchieren. null, wenn keine belastbare Quelle da ist — nie schätzen",',
+    '  "mietspiegel_herkunft": "woher dieser Wert kommt: \\"Marktbericht vom <Datum>\\" oder die recherchierte Quelle. null wenn kein Wert",',
+    /* v2150 · DAS FELD FUER DEN ABGLEICH. Ohne Zielfeld verschwindet ein
+       Prompt-Auftrag lautlos — der Auftrag unten in Aufgabe 14 braucht
+       eine Stelle, an der die Antwort landen kann. */
+    '  "berichts_abgleich":   "Wenn ein Marktbericht vorliegt: 2-4 Sätze, wie deine Einordnung zu seinen gemessenen Werten steht (Marktwert, Marktmiete, Sach-/Ertragswert, führendes Verfahren). Weichen sie ab, nenne BEIDE Zahlen und sage, welche woher kommt. null ohne Bericht",',
+    '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten (EUR/m², Faktor, Bodenrichtwert, Marktbericht), 6-8 Sätze",',
+    /* v2157 · Zielfeld fuer Aufgabe 15 (N62.4) */
+    '  "lage_gegenueberstellung": [',
+    '    { "merkmal": "Makrolage", "objektfeld": "Angabe des Investors oder null", "bericht": "Wert laut Marktbericht oder null", "recherche": "dein Befund, kurz, mit Zahl wo moeglich", "quelle": "URL der Recherchequelle oder null", "urteil": "stimmt | weicht ab | offen", "kommentar": "1-2 Saetze: was das fuer die Investition heisst" },',
+    '    "... je eine Zeile fuer Mikrolage, Bevoelkerungsentwicklung, Nachfrage, Wertsteigerung, Entwicklung, Mietniveau, Kaufpreisniveau"',
+    '  ],',
+    /* v2160 · Zielfelder fuer Aufgabe 16 (N62.6, vertieft v2166) */
+    '  "steuer_zusammenfassung": "14-20 Saetze in der Gliederung von Aufgabe 16: Werbungskosten nach Art, Ergebnis und Steuerwirkung Jahr 1, Jahr der Wende und warum, Steuerlast danach in EUR, Folge fuer den Cashflow nach Steuer, Sanierung, Hinweis auf Steuerberater",',
+    _ak ? '  "soll_ist_steuer": "2-4 Saetze: steuerliche Lage beim Ankauf gegen heute, mit beiden Zahlen; null, wenn keine Steuerzahl zu beiden Zeitpunkten vorliegt",' : '',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
     /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von
@@ -1204,7 +1630,28 @@ async function callOpenAI(prompt, opts) {
     input: prompt,
     // V34: Output-Limit deutlich erhöht — die ausführlichen Texte aus V33
     // brauchen mehr Platz. Vorher Default (~4k) → JSON-Truncate.
-    max_output_tokens: 8000,
+    /* ══ v2156 · 8000 WAREN SCHON KNAPP, UND ES WURDE MEHR VERLANGT ═════
+
+       GEMESSEN am 12.10.2026: das Antwortformat verlangt über rund 30
+       Felder grob 110 bis 160 Sätze. Bei etwa 20 Tokens je deutschem Satz
+       sind das 2.200 bis 3.200 Tokens für den Fließtext allein, plus
+       JSON-Gerüst, plus die beiden Fünferlisten.
+
+       Dass es bisher meist reichte, lag daran, dass die Listeneinträge
+       Stichworte waren. v2156 verlangt dort 2-3 Sätze MIT Zahl, also bis
+       zu 30 Sätze mehr — und dazu kommen die neuen Felder
+       (`berichts_abgleich`, `mietspiegel_herkunft`, Aufgabe 14).
+
+       > Ein Truncate ist hier kein Schönheitsfehler: `extractJson()` hat
+       > eine Reparatur für abgeschnittenes JSON (Z. 1409 ff), aber die
+       > rettet die Struktur, nicht den Inhalt. Die zuletzt verlangten
+       > Felder fehlen dann einfach — und das sind die, die in der
+       > Aufgabenliste hinten stehen: Bankargumente, Anschreiben,
+       > Anschlussfinanzierung, der Berichtsabgleich.
+
+       12000 statt 8000. Die Kappe bleibt eine Kappe — sie soll nur nicht
+       vor dem Ende der Aufgabenliste greifen. */
+    max_output_tokens: 16000,   /* v2166: laengere Texte; gpt-4o-mini erlaubt 16.384 */
     /* v1264: Web-Suche abschaltbar. Additiv — wer die Option nicht setzt,
        bekommt sie weiter, also ändert sich für alle bestehenden Aufrufer
        nichts. Gebraucht wird das für Nachbearbeitungs-Aufrufe, die einen
@@ -2640,7 +3087,14 @@ async function copilotChat(payload, opts) {
           '  Klumpenrisiken: Lage ueber lageklasse und bodenrichtwert (nicht nur ueber den Ort),',
           '  Substanz ueber zustand und energieklasse, Ertragssicherheit ueber leerstand_pct.',
           '- Haeufen sich schlechte Energieklassen oder renovierungsbeduerftige Objekte, ist das',
-          '  ein Sanierungs-Klumpen - benenne ihn mit Namen und Anzahl.'
+          '  ein Sanierungs-Klumpen - benenne ihn mit Namen und Anzahl.',
+          /* v2164 - der Auszug der Einzel-Analysen. Ohne diese Zeile waere er
+             nur weiterer Text im Kontext (Lehre v2014). */
+          '- Je Objekt steht "pilot_analyse": ein AUSZUG der Pilot-Analyse dieses Objekts (Empfehlung,',
+          '  Fazit, Top-Risiken/-Staerken, Steuer) mit ihrem Stand. Nutze ihn fuer "welche tragen, welche',
+          '  belasten" und fuer Klumpenrisiken (gleiche Risiken bei mehreren Objekten). Ist er null, gibt es',
+          '  fuer das Objekt keine Analyse - sage das. Ist der Stand alt, sage, dass die Einschaetzung aelter ist',
+          '  als die Zahlen. Die Zahlen im Objekt gehen vor, wenn sie dem Auszug widersprechen.'
         ].join('\n')
       : '',
 

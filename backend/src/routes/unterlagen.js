@@ -160,4 +160,61 @@ router.get('/aemter', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/* ─── PUT /amt/:id/kopie ────────────────────────────────────────────────
+ *
+ * v2152 · Wer geht in Kopie? Marcel am 12.10.2026: „ja mach die
+ * ansprechpartner gleich mit." Vorlage v6 (`server.js:1236-1241`).
+ *
+ * WARUM DAS EINEN EIGENEN ENDPUNKT BRAUCHT: `kopie` beginnt bei false,
+ * und ohne eine Stelle, die es setzen kann, bleibt es das für immer.
+ * Dann wäre das Feld gebaut und tot — dasselbe Muster wie die `skala`,
+ * die heute Morgen erzeugt wurde und keinen Leser hatte.
+ *
+ * Gesetzt wird NUR das Häkchen, nie Name, Adresse oder Beleg. Ein
+ * Endpunkt, über den sich die Adresse einer Ansprechperson ändern
+ * lässt, hebt den Beleg auf: `bestaetigt` würde weiter true sagen,
+ * obwohl die Adresse nicht mehr die ist, die auf der Seite stand.
+ *
+ *   > Ein Beleg gilt für den Wert, mit dem er erhoben wurde.
+ *
+ * Die Ämter-Tabelle ist gemeindeweit und hat kein `user_id` — sie ist
+ * eine gemeinsame Ernte (`erstellt_von` sagt nur, wer sie angelegt
+ * hat). Das Häkchen ist damit ausdrücklich eine Angabe am AMT, nicht
+ * am Nutzer. Für einen zweiten Mandanten wäre das zu trennen; heute
+ * gibt es genau ein Partner-Abo, und eine Trennung ohne Bedarf baut
+ * eine Tabelle, die niemand füllt.
+ */
+router.put('/amt/:id/kopie', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id) || 0;
+    if (!id) return res.status(400).json({ error: 'Kein Amt angegeben.' });
+    const b = req.body || {};
+    const nr = Number(b.nr);
+    /* `Number(null)` ist 0 und besteht isFinite — erst auf Abwesenheit
+       prüfen, dann rechnen (CLAUDE.md). */
+    if (b.nr === undefined || b.nr === null || !Number.isInteger(nr) || nr < 0 || nr > 1) {
+      return res.status(400).json({ error: 'nr muss 0 oder 1 sein.' });
+    }
+    if (typeof b.kopie !== 'boolean') {
+      return res.status(400).json({ error: 'kopie muss true oder false sein.' });
+    }
+    const vor = await query(
+      'SELECT ansprechpartner FROM unterlagen_aemter WHERE id = $1', [id]);
+    if (!vor.rows.length) return res.status(404).json({ error: 'Amt nicht gefunden.' });
+    const liste = Array.isArray(vor.rows[0].ansprechpartner) ? vor.rows[0].ansprechpartner : [];
+    if (!liste[nr]) return res.status(404).json({ error: 'Diese Ansprechperson gibt es nicht.' });
+    /* Ohne Adresse kann niemand in Kopie gehen — ein Häkchen an einem
+       Namen ohne Postfach wäre ein Versprechen, das der Versand nicht
+       halten kann. */
+    if (b.kopie && !liste[nr].email) {
+      return res.status(400).json({ error: 'Diese Person hat keine E-Mail-Adresse.' });
+    }
+    liste[nr] = Object.assign({}, liste[nr], { kopie: b.kopie });
+    const r = await query(
+      'UPDATE unterlagen_aemter SET ansprechpartner = $2 WHERE id = $1 RETURNING *',
+      [id, JSON.stringify(liste)]);
+    res.json({ amt: r.rows[0] });
+  } catch (e) { next(e); }
+});
+
 module.exports = router;

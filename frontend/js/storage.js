@@ -294,7 +294,14 @@ function collectData() {
      wie `_mfh` - der Zustand haengt an einem Fenster-Merker, nicht an
      einem zweiten Ladeweg. `daten` wird mitgeschrieben, aber NIE hier
      erzeugt: das macht `DealPilotAnkauf.festschreiben()`. */
-  if (window._dpAnkauf && window._dpAnkauf.daten) d._ankauf = window._dpAnkauf;
+  /* v2164 · Marcel am 13.10.2026: „Objekte, die im Bestand sind, koennen nur
+     gewonnen sein." Der Stand ist AKTIV nur bei gewonnen. Geht ein Objekt
+     zurueck auf offen/verloren, RUHT er (`_ankauf_ruhend`) - geloescht wird
+     nichts, und beim erneuten Gewinnen ist er wieder da (storage.js Laden). */
+  if (window._dpAnkauf && window._dpAnkauf.daten) {
+    var _ankWon = (document.getElementById('_deal_won_state') || {}).value === 'true';
+    if (_ankWon) d._ankauf = window._dpAnkauf; else d._ankauf_ruhend = window._dpAnkauf;
+  }
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
   // BWK mode
@@ -584,7 +591,8 @@ function loadData(d) {
   /* v2030: Ankauf-Stand. Fehlt er, ist er NULL - sonst erbte das
      geladene Objekt den Stand des vorigen, und zwar einen, der auf
      eine fremde Adresse zeigt. */
-  window._dpAnkauf = (d._ankauf && d._ankauf.daten) ? d._ankauf : null;
+  window._dpAnkauf = (d._ankauf && d._ankauf.daten) ? d._ankauf
+    : ((d._deal_won && d._ankauf_ruhend && d._ankauf_ruhend.daten) ? d._ankauf_ruhend : null);   /* v2164 */
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
@@ -1049,6 +1057,10 @@ function _clearFormForNewObject() {
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
   var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
   var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
+  /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
+     neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
+     "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
+  window._dpAnkauf = null; window._dpAnkaufAuto = false;
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
   }
@@ -1145,6 +1157,10 @@ function _newObjLeeren() {
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
   var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
   var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
+  /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
+     neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
+     "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
+  window._dpAnkauf = null; window._dpAnkaufAuto = false;
   // V58: Workflow-Bar zurücksetzen + Outputs nullen
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);

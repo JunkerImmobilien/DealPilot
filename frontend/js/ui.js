@@ -738,6 +738,13 @@ function _buildAIPayload() {
       plz: g('plz'), ort: g('ort'), str: g('str'), hnr: g('hnr'),
       objart: g('objart'), wfl: parseDe(g('wfl')) || null, baujahr: g('baujahr'),
       makrolage: g('makrolage'), mikrolage: g('mikrolage'),
+      /* v2157 · Die vier Lage-Felder des Objekts fuhren nie mit — nur
+         Makro- und Mikrolage. Marcel: „Wertsteigerungspotenzial,
+         Nachfrageindikatoren, Bevoelkerungsentwicklung,
+         Entwicklungsmoeglichkeiten ... auch gegenueberstellen." */
+      lageklasse: txt('lageklasse'),
+      bevoelkerung: txt('ds2_bevoelkerung'), nachfrage: txt('ds2_nachfrage'),
+      wertsteigerung: txt('ds2_wertsteigerung'), entwicklung: txt('ds2_entwicklung'),
       thesis: g('thesis'), risiken: g('risiken'), notizen: g('notizen'),
       /* ── v1700 · DIE EINHEITEN EINES MEHRFAMILIENHAUSES ─────────────
          Marcel: „bei Mehrfamilienhaeusern gebe ich die Gesamtquadrat-
@@ -822,7 +829,41 @@ function _buildAIPayload() {
                    nur noch Altdaten geliefert - die im Prompt aussehen wie
                    gepflegte. Ein Feld entfernen heisst nicht, es
                    loszuwerden. */
-                zustand: e.zustand || null
+                zustand: e.zustand || null,
+                /* ══ v2156 · SIEBEN FELDER, DIE EINE BEURTEILUNG TRAGEN ══
+
+                   Marcel am 12.10.2026: „ob generell alle Daten, also auch
+                   aus den Mehrfamilienhaeusern, aus dem Konfigurator …
+                   dass auch wirklich alles damit einfliesst."
+
+                   GEMESSEN: von 36 Feldern je Einheit reisten 13 mit. Der
+                   Prompt druckte alle 13 — die Luecke lag HIER, im Sender.
+
+                   Die Auswahl von v2022 war richtig („nicht alle 28
+                   Felder"), aber sie hat die MIETE verloren: Soll-Miete,
+                   Staffel/Index und Kuendigungsverzicht sind genau das,
+                   woraus Mietsteigerungspotenzial entsteht. Eine Analyse,
+                   die eine Staffelmiete nicht kennt, nennt als Chance,
+                   was schon vertraglich vereinbart ist.
+
+                   Draussen bleiben weiter: Kaution, Mietername (hat im
+                   Prompt nichts verloren), Notiz, Bilder. Und `keller`,
+                   `balkon_qm`, `stellplatz` — die tragen kein Urteil,
+                   das die Objektebene nicht schon hat. */
+                soll_miete: zahl(e.soll) || null,
+                mietvertrag_seit: e.mv_beginn || null,
+                kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
+                erhoehung_art: e.mv_erhoehung_art || null,
+                erhoehung_wert: zahl(e.mv_erhoehung_wert) || null,
+                erhoehung_rhythmus_jahre: zahl(e.mv_rhythmus_jahre) || null,
+                /* Offene Staffelstufen: wie viele Erhoehungen noch
+                   kommen, ohne dass neu verhandelt werden muss. */
+                stufen_offen: zahl(e.mv_stufen_offen) || null,
+                /* Was an DIESER Wohnung gemacht werden muss, und was es
+                   kostet. Stand bisher nur dann im Prompt, wenn jemand
+                   den Haken fuer die Steuer-Summe gesetzt hatte. */
+                massnahme: e.massnahme || null,
+                massnahme_kosten: zahl(e.kosten) || null
               };
             }),
             /* Die Gebaeude-Angaben des Konfigurators: Marcel wollte
@@ -831,7 +872,41 @@ function _buildAIPayload() {
             aufgeteilt: m.aufgeteilt != null ? !!m.aufgeteilt : null,
             gnd: Number(m.gnd) || null,
             stand: m.stand || null,
-            modernisierung: m.gebaeude || null
+            /* ══ v2156 · ROHCODES UEBERSETZEN, BEVOR SIE RAUSGEHEN ══════
+               Hier stand `m.gebaeude` roh. Die Stufen sind `0`, `h`, `v`
+               (mfh-einheiten.js:38), und so kamen sie im Prompt an:
+
+                 dach=v, heizung=h, fenster=0
+
+               GEMESSEN am 12.10.2026: der Prompt druckt sie unveraendert
+               (openaiService.js:433-441). Das Modell liest „v" und muss
+               raten, ob das „vor kurzem" oder „vollstaendig" heisst — und
+               was „h" ist, kann niemand erraten.
+
+               > Die Uebersetzungstabelle liegt eine Datei weiter
+               > (`STUFE_ZU_OBJEKT`, mfh-einheiten.js:176) und wurde
+               > serverseitig nie benutzt. Ein Code ohne seine Tabelle ist
+               > kein Datum, sondern ein Rätsel.
+
+               Uebersetzt wird HIER, beim Sender: er kennt seine eigenen
+               Codes. Die Tabelle im Backend nachzubauen waere eine zweite
+               Kopie, die beim naechsten Stufen-Namen auseinanderlaeuft. */
+            modernisierung: (function () {
+              var g2 = m.gebaeude;
+              if (!g2 || typeof g2 !== 'object') return g2 || null;
+              var T = (window.DpMfhEinheiten && window.DpMfhEinheiten.STUFE_ZU_OBJEKT)
+                || { '0': 'Keine/Nie', h: '10 - 20 Jahre', v: '< 5 Jahre' };
+              var o = {}, n = 0;
+              Object.keys(g2).forEach(function (k) {
+                var v2 = g2[k];
+                if (v2 == null || v2 === '') return;
+                /* Unbekannte Stufe NICHT verschlucken: lieber der Rohwert
+                   mit Hinweis als eine stille Luecke. */
+                o[k] = T[String(v2)] || (String(v2) + ' (unbekannte Stufe)');
+                n++;
+              });
+              return n ? o : null;
+            })()
           };
         } catch (e) { return null; }
       })(),
@@ -909,6 +984,45 @@ function _buildAIPayload() {
       if (an('erbpacht')) {
         s.erbbaurecht = { ja: true, erbbauzins_eur_jahr: parseDe(g('erbbauzins')) || null };
       }
+      /* ══ v2166 · DER STEUERVERLAUF ═════════════════════════════════════
+         Marcel am 13.10.2026: „auch bei Steuern ist die Aussage gering …
+         da auch auf Werbungskosten eingehen und wann das Objekt steuerlich
+         positiv wird und was das an Abgaben bedeutet."
+         Das Modell bekam bisher EINE Zahl (Steuerwirkung Jahr 1). Die
+         App rechnet aber jedes Jahr (State.cfRows: Miete, Zins, BWK, AfA,
+         Ergebnis, Steuer) - hier geht diese Reihe mit, FERTIG gerechnet.
+         Das Modell soll erklaeren, nicht nachrechnen. */
+      try {
+        var R = (window.State && Array.isArray(State.cfRows)) ? State.cfRows : [];
+        var z = function (v) { return (typeof v === 'number' && isFinite(v)) ? Math.round(v) : null; };
+        if (R.length) {
+          var r1 = R[0];
+          s.werbungskosten_jahr1 = {
+            schuldzinsen_eur: z(r1.zy), afa_eur: z(r1.afa_y),
+            bewirtschaftung_steuerlich_eur: z(r1.bwk_st_y),
+            summe_eur: z((r1.zy || 0) + (r1.afa_y || 0) + (r1.bwk_st_y || 0)),
+            mieteinnahmen_eur: z(r1.nkm_y)
+          };
+          s.verlauf = R.slice(0, 15).map(function (r) {
+            return { jahr: r.cal || r.y, miete_eur: z(r.nkm_y), zinsen_eur: z(r.zy), afa_eur: z(r.afa_y),
+                     bwk_steuerlich_eur: z(r.bwk_st_y), ergebnis_vuv_eur: z(r.zve_y),
+                     steuer_eur: z(r.tax_y), cashflow_nach_steuer_eur: z(r.cfns_y) };
+          });
+          var wende = null, erstattBis = 0, lastAb = 0;
+          for (var i = 0; i < R.length; i++) {
+            var e = R[i].zve_y, t = R[i].tax_y;
+            if (wende === null && typeof e === 'number' && e > 0) wende = R[i].cal || R[i].y;
+            if (wende === null && typeof t === 'number') erstattBis += t;
+            else if (typeof t === 'number' && i < 15) lastAb += t;
+          }
+          s.wende = {
+            erstes_jahr_steuerlich_positiv: wende,
+            steuerwirkung_bis_dahin_eur: z(erstattBis),          /* negativ = Erstattung */
+            steuerlast_danach_bis_jahr15_eur: wende ? z(lastAb) : null,
+            gerechnet_ueber_jahre: R.length
+          };
+        }
+      } catch (e) {}
       return s;
     })(),
     bewirtschaftung: {
@@ -1548,6 +1662,15 @@ function _urlSauber(u) {
   } catch (e) { return u; }
 }
 
+/* v2157 · die Zeilen der Lage-Gegenüberstellung, robust gelesen: das
+   Antwortformat zeigt dem Modell eine Musterzeile als Text ("... je eine
+   Zeile fuer ..."); kommt sie zurück, ist sie kein Merkmal. */
+function _lageZeilen(a) {
+  var g = a && a.lage_gegenueberstellung;
+  if (!Array.isArray(g)) return [];
+  return g.filter(function (z) { return z && typeof z === 'object' && z.merkmal; });
+}
+
 function _quelleZeile(q) {
   var roh = '' + (q == null ? '' : q);
   var m = roh.match(/https?:\/\/\S+/);
@@ -1612,7 +1735,79 @@ window._dpPaTab = function (id, btn) {
     for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i] === btn);
     var pans = wrap.querySelectorAll('.dp-pa-panel');
     for (var j = 0; j < pans.length; j++) pans[j].classList.toggle('active', pans[j].id === 'dp-pa-' + id);
+    /* v2155: die Amtsquellen erst laden, wenn der Reiter geoeffnet wird.
+       Sie haengen an der Gemeinde, nicht am Analyse-Ergebnis, und ein
+       Abruf beim Rendern der Analyse waere einer zu viel — die meisten
+       Nutzer oeffnen diesen Reiter nie. */
+    if (id === 'quellen') window._dpQuellenAemter();
   } catch (e) {}
+};
+
+/* ══ v2155 · DIE BELEGTEN AMTSQUELLEN NACHLADEN ══════════════════════
+ *
+ * Marcel: „dass wir auch die Quellen, die wir zum Beispiel ermittelt
+ * haben, wenn wir Unterlagen beim Amt anfordern, dass auch die dort mit
+ * eingegeben werden."
+ *
+ * Diese Quellen sind die stärksten, die das Produkt hat: WIR haben die
+ * Seite selbst abgerufen und die Adresse dort gefunden (`beleg_ok`,
+ * seit v2151 mit `seiten.pro_seite` je Seite). Das steht ausdrücklich
+ * dabei — eine belegte Amtsquelle ist etwas anderes als eine
+ * Web-Fundstelle.
+ *
+ * Geladen wird über `/unterlagen/aemter?plz=&ort=`: ein reiner
+ * Lesezugriff, kein Kontingent, keine Recherche (v1844).
+ */
+window._dpQuellenAemter = function () {
+  var box = document.getElementById('dp-pa-quellen-aemter');
+  if (!box || box._geladen) return;
+  box._geladen = true;
+  var plz = (document.getElementById('plz') || {}).value || '';
+  var ort = (document.getElementById('ort') || {}).value || '';
+  if (!plz && !ort) {
+    box.innerHTML = box.firstElementChild.outerHTML
+      + '<p class="dp-pa-p" style="color:#8b8678">Ohne PLZ und Ort lässt '
+      + 'sich die zuständige Gemeinde nicht bestimmen.</p>';
+    return;
+  }
+  if (typeof Auth === 'undefined' || !Auth.apiCall) return;
+  Auth.apiCall('/unterlagen/aemter?plz=' + encodeURIComponent(plz)
+    + '&ort=' + encodeURIComponent(ort), { method: 'GET' })
+    .then(function (r) {
+      var aemter = (r && r.aemter) || [];
+      var kopf = box.firstElementChild ? box.firstElementChild.outerHTML : '';
+      /* Nur Ämter MIT Quelle. Eines ohne Quelle gehört nicht in eine
+         Quellenliste — es wäre eine Zeile, die nichts belegt. */
+      var mit = aemter.filter(function (x) { return x && x.quelle_url; });
+      if (!mit.length) {
+        box.innerHTML = kopf
+          + '<p class="dp-pa-p" style="color:#8b8678">Für diese Gemeinde '
+          + 'sind noch keine Amtsquellen ermittelt. Sie entstehen beim Abruf '
+          + 'der Unterlagen — Reiter Dokumente, „Unterlagen anfordern".</p>';
+        return;
+      }
+      box.innerHTML = kopf
+        + '<div class="dp-pa-kv-sub">Von uns selbst abgerufen und gegen die '
+        + 'Adresse geprüft — ' + mit.length + ' Quelle(n)</div>'
+        + '<ul class="dp-pa-src">'
+        + mit.map(function (x) {
+            var art = _esc(String(x.art || '').toUpperCase());
+            var beh = _esc(x.behoerde || '');
+            /* Der Belegstand gehört an die Quelle, nicht in eine Fußnote:
+               „belegt" heißt, die Adresse stand auf DIESER Seite. */
+            var marke = x.beleg_ok
+              ? '<span style="color:var(--ok,#3FA56C)">✓ belegt</span>'
+              : '<span style="color:var(--warn,#D8954C)">⚠ nicht belegt</span>';
+            return '<li>' + _quelleZeile(beh + ' — ' + x.quelle_url)
+              + ' <span class="dp-pa-herk">' + art + ' · ' + marke + '</span></li>';
+          }).join('')
+        + '</ul>';
+    })
+    .catch(function () {
+      var kopf = box.firstElementChild ? box.firstElementChild.outerHTML : '';
+      box.innerHTML = kopf + '<p class="dp-pa-p" style="color:#8b8678">'
+        + 'Die Amtsquellen konnten nicht geladen werden.</p>';
+    });
 };
 function _renderAIServerAnalysis(a) {
   /* v584-rail */
@@ -1693,6 +1888,27 @@ function _renderAIServerAnalysis(a) {
       '<div class="dp-pa-card">' + sec('good', I.sr, 'ST\u00c4RKEN') + list(a.staerken) + '</div>' +
       '<div class="dp-pa-card">' + sec('bad', I.risk, 'RISIKEN') + list(a.risiken) + '</div>' +
     '</div>';
+  /* ══ v2156 · DER OPTISCHE EINDRUCK HATTE KEINEN LESER ════════════════
+     Das Feld wird verlangt, sobald Fotos mitgehen (openaiService.js:1415,
+     4-6 Saetze), und GEMESSEN am 12.10.2026 gab es im ganzen Frontend
+     keine Stelle, die es ausgibt — null Treffer fuer `optischer_eindruck`
+     in frontend/js.
+
+     > Die Arbeit wurde erzeugt, bezahlt und weggeworfen. Dasselbe Muster
+     > wie die `skala` von heute Morgen und die Telefonnummer der Aemter.
+
+     Er steht bei den Staerken und Risiken, weil er genau dort hingehoert:
+     ein Eindruck, der dem erfassten Zustand widerspricht, ist ein Risiko.
+     Die Einordnung steht dabei — es ist ein Eindruck aus Bildern, keine
+     Feststellung, und der Prompt verbietet ausdruecklich, daraus Baujahr,
+     Flaeche oder Wert abzuleiten. */
+  if (has(a.optischer_eindruck)) {
+    pS += '<div class="dp-pa-card">' + sec('', I.sr, 'OPTISCHER EINDRUCK AUS DEN FOTOS')
+       + p(a.optischer_eindruck)
+       + '<div class="dp-pa-fuss">Ein visueller Eindruck aus den mitgesendeten '
+       + 'Bildern — keine Feststellung. Baujahr, Fläche und Wert kommen '
+       + 'aus der Erfassung, nicht aus dem Foto.</div></div>';
+  }
 
   // Panel 3 — Risiko & Szenarien
   var pR = sec('', I.risk, 'RISIKO & SZENARIEN');
@@ -1717,11 +1933,54 @@ function _renderAIServerAnalysis(a) {
   var pL = sec('', I.loc, 'LAGE & MARKT') + '<div class="dp-pa-card">';
   if (a.makrolage_recherche)     pL += kv('Makrolage', a.makrolage_recherche);
   if (a.mikrolage_recherche)     pL += kv('Mikrolage', a.mikrolage_recherche);
-  if (has(a.mietspiegel_eur_qm)) pL += '<div class="dp-pa-kv"><strong>Mietspiegel:</strong> ' + _escClean(a.mietspiegel_eur_qm) + ' \u20ac/m\u00b2</div>';
+  /* v2150 \u00b7 DIE HERKUNFT STEHT AM WERT, NICHT IM KLEINGEDRUCKTEN.
+     Marcel: \u201ewoher kommen die werte und daten im reiter Lage & Markt?"
+     Die Antwort war: aus der KI-Recherche \u2014 auch wenn ein Marktbericht
+     mit gemessenen Partnerdaten vorlag. Seit v2150 hat der Bericht
+     Vorrang, und `mietspiegel_herkunft` sagt, welcher Fall vorliegt.
+     Ohne diese Zeile wuesste der Leser es weiterhin nicht. */
+  if (has(a.mietspiegel_eur_qm)) pL += '<div class="dp-pa-kv"><strong>Mietspiegel:</strong> '
+    + _escClean(a.mietspiegel_eur_qm) + ' \u20ac/m\u00b2'
+    + (a.mietspiegel_herkunft ? ' <span class="dp-pa-herk">\u00b7 ' + _esc(a.mietspiegel_herkunft) + '</span>' : '')
+    + '</div>';
   if (a.kaufpreisniveau)         pL += kv('Kaufpreisniveau', a.kaufpreisniveau);
   if (!a.makrolage_recherche && !a.mikrolage_recherche && !has(a.mietspiegel_eur_qm) && !a.kaufpreisniveau)
     pL += '<em class="dp-pa-empty">\u2014 keine Lage-Daten</em>';
   pL += '</div>';
+  /* v2150 \u00b7 Der Abgleich gegen den Marktbericht \u2014 eigene Karte, weil er
+     eine andere Art von Aussage ist: nicht recherchiert, sondern
+     gegenuebergestellt. Steht nur, wenn ein Bericht vorlag. */
+  if (has(a.berichts_abgleich)) {
+    pL += '<div class="dp-pa-card dp-pa-abgl">' + sec('', I.loc, 'ABGLEICH MIT DEM MARKTBERICHT')
+       + p(a.berichts_abgleich)
+       + '<div class="dp-pa-fuss">Sach- und Ertragswert im Bericht sind ein Plausibilit\u00e4ts-Quercheck '
+       + 'nach ImmoWertV-Logik \u2014 indikativ, kein Gutachten nach \u00a7 194 BauGB.</div></div>';
+  }
+  /* v2157 · DIE GEGENÜBERSTELLUNG (N62.4) — je Merkmal drei Seiten:
+     Objektfeld (Angabe des Investors), Marktbericht (gemessen),
+     Recherche (mit ihrer Quelle in derselben Zeile). Gestapelt statt als
+     Tabelle: vier Spalten tragen bei 390 px nicht. */
+  var _lg = _lageZeilen(a);
+  if (_lg.length) {
+    pL += '<div class="dp-pa-card dp-pa-ggs">' + sec('', I.loc, 'GEGENÜBERSTELLUNG')
+       + '<div class="dp-pa-kv-sub">Ihre Angabe · Marktbericht · Recherche</div>'
+       + _lg.map(function (z) {
+           var u = String(z.urteil || '').toLowerCase();
+           var kl = /abweich|weicht/.test(u) ? 'ab' : (/stimmt/.test(u) ? 'ok' : 'offen');
+           var zl = function (lbl, v) {
+             return has(v) ? '<div class="dp-pa-ggs-z"><span>' + lbl + '</span>' + _escClean(v) + '</div>' : '';
+           };
+           var q = has(z.quelle) ? '<div class="dp-pa-ggs-z"><span>Quelle</span>' + _quelleZeile(z.quelle) + '</div>' : '';
+           return '<div class="dp-pa-ggs-row">'
+             + '<div class="dp-pa-ggs-kopf"><strong>' + _esc(z.merkmal || '') + '</strong>'
+             + (u ? '<em class="dp-pa-ggs-u dp-pa-ggs-' + kl + '">' + _esc(z.urteil) + '</em>' : '') + '</div>'
+             + zl('Ihre Angabe', z.objektfeld) + zl('Marktbericht', z.bericht) + zl('Recherche', z.recherche) + q
+             + (has(z.kommentar) ? '<div class="dp-pa-ggs-k">' + _escClean(z.kommentar) + '</div>' : '')
+             + '</div>';
+         }).join('')
+       + '<div class="dp-pa-fuss">„Ihre Angabe“ ist die Selbsteinschätzung aus dem Objekt — '
+       + 'nicht gemessen. Der Marktbericht leitet die Lage aus Messdaten ab.</div></div>';
+  }
   if (Array.isArray(a.quellen) && a.quellen.length) {
     pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
       a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('') +
@@ -1761,6 +2020,88 @@ function _renderAIServerAnalysis(a) {
   // Panel 6 — Bank
   var pK = sec('', I.bank, 'BANK') + '<div class="dp-pa-card">' + sec('', I.bank, 'BANKARGUMENTE') +
     ((Array.isArray(a.bankargumente) && a.bankargumente.length) ? num(a.bankargumente) : '<em class="dp-pa-empty">\u2014 keine Bankargumente</em>') + '</div>';
+
+  /* ══ v2155 · ALLE QUELLEN AN EINER STELLE ═══════════════════════════
+   *
+   * Marcel am 12.10.2026: „alle Quellen, die wir angeben … auch die
+   * Quellen, die wir zum Beispiel ermittelt haben, wenn wir Unterlagen
+   * beim Amt anfordern."
+   *
+   * DREI HERKÜNFTE, und sie sind nicht gleichwertig:
+   *
+   *   KI-Recherche     eine Seite, die ein Modell gelesen hat
+   *   Marktbericht     gemessene Partnerdaten, amtliche Register
+   *   Ämter-Recherche  eine amtliche Seite, die WIR selbst abgerufen
+   *                    und gegen die Adresse geprüft haben
+   *
+   * > Sie in eine Liste zu werfen wäre falsch. Eine amtliche Quelle mit
+   * > Beleg und eine Web-Fundstelle eines Modells sehen dann gleich aus
+   * > — und genau dieser Unterschied ist die Doktrin dieses Produkts.
+   *
+   * Darum drei Blöcke mit ihrer Herkunft im Titel. Die Ämter-Quellen
+   * werden NACHGELADEN (`_quellenAemterNachladen`), weil sie nicht im
+   * Analyse-Ergebnis stecken, sondern an der Gemeinde hängen.
+   */
+  function _quellenHtml(a) {
+    var h = '';
+    var hat = false;
+
+    /* ── 1 · Was die KI recherchiert hat ───────────────────────────── */
+    /* v2157: die Quellen der Lage-Gegenüberstellung stehen je Zeile; was
+       davon nicht schon im Sammel-Array steht, kommt hier dazu — mit dem
+       Merkmal als Beschriftung. */
+    var _kiQ = Array.isArray(a.quellen) ? a.quellen.slice() : [];
+    _lageZeilen(a).forEach(function (z) {
+      if (!has(z.quelle)) return;
+      var u = String(z.quelle).match(/https?:\/\/\S+/);
+      if (!u) return;
+      var dabei = _kiQ.some(function (q) { return String(q).indexOf(u[0]) >= 0; });
+      if (!dabei) _kiQ.push(z.merkmal + ' – ' + u[0]);
+    });
+    if (_kiQ.length) {
+      a = Object.assign({}, a, { quellen: _kiQ });
+      hat = true;
+      h += '<div class="dp-pa-card">' + sec('', I.loc, 'AUS DER KI-RECHERCHE')
+        + '<div class="dp-pa-kv-sub">Vom Modell gelesene Webseiten. Eine '
+        + 'Fundstelle, kein Beleg — der Inhalt ist nicht von uns '
+        + 'gegengeprüft.</div>'
+        + '<ul class="dp-pa-src">'
+        + a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('')
+        + '</ul></div>';
+    }
+
+    /* ── 2 · Was der Marktbericht beisteuert ───────────────────────── */
+    /* `berichts_abgleich` (v2150) steht im Lage-Reiter; hier gehört die
+       Herkunft hin. Das führende Verfahren nennt seine Rechtsgrundlage,
+       und die ist eine Quelle wie jede andere. */
+    if (has(a.berichts_abgleich)) {
+      hat = true;
+      h += '<div class="dp-pa-card">' + sec('', I.loc, 'AUS DEM DEALPILOT-MARKTBERICHT')
+        + '<div class="dp-pa-kv">Gemessene Vergleichsdaten und amtliche '
+        + 'Registerwerte. Der vollständige Quellennachweis mit Kennzahl, '
+        + 'Jahrgang und Lizenz steht im Bericht selbst — dort ist er '
+        + 'belegpflichtig.</div>'
+        + '<div class="dp-pa-fuss">Sach- und Ertragswert im Bericht sind ein '
+        + 'Plausibilitäts-Quercheck nach ImmoWertV-Logik — indikativ, '
+        + 'kein Gutachten nach § 194 BauGB.</div></div>';
+    }
+
+    /* ── 3 · Was wir bei den Ämtern selbst belegt haben ────────────── */
+    /* Platzhalter: gefüllt von `_quellenAemterNachladen()`. Er sagt, dass
+       geladen wird — eine leere Stelle sähe aus wie „keine da". */
+    h += '<div class="dp-pa-card" id="dp-pa-quellen-aemter">'
+      + sec('', I.loc, 'AUS DER ÄMTER-RECHERCHE')
+      + '<p class="dp-pa-p" style="color:#8b8678">Lade die belegten '
+      + 'Amtsquellen dieser Gemeinde …</p></div>';
+
+    if (!hat) {
+      h = '<div class="dp-pa-card"><div class="dp-pa-kv">Zu diesem Objekt '
+        + 'liegen noch keine recherchierten Quellen vor. Sie entstehen, '
+        + 'sobald eine Analyse mit Web-Recherche läuft oder ein '
+        + 'Marktbericht abgerufen wird.</div></div>' + h;
+    }
+    return h;
+  }
 
   function tab(id, label, active) {
     return '<button type="button" class="dp-pa-tab' + (active ? ' active' : '') + '" onclick="_dpPaTab(\'' + id + '\',this)">' + label + '</button>';
@@ -1825,6 +2166,20 @@ function _renderAIServerAnalysis(a) {
       + '</div></div>';
   }
   var _siHtml = _sollIstHtml();
+  /* v2160 · N62.6 — der Steuer-Text des Modells gehoert AN die Tafel:
+     die Tafel zeigt die Zahlen, der Text erklaert ihre Bewegung. */
+  if (_siHtml && has(a.soll_ist_steuer)) {
+    _siHtml += '<div class="dp-pa-card" style="margin-top:12px">' + sec('', I.bank, 'STEUERLICH: ANKAUF GEGEN HEUTE') + p(a.soll_ist_steuer) + '</div>';
+  }
+  /* v2160 · N62.6 — der Steuer-Reiter. Er steht immer: eine Analyse von
+     vor v2160 hat das Feld nicht, und dann sagt er das, statt zu fehlen. */
+  var pSt = sec('', I.bank, 'STEUERLICHE ZUSAMMENFASSUNG');
+  pSt += has(a.steuer_zusammenfassung)
+    ? '<div class="dp-pa-card">' + p(a.steuer_zusammenfassung)
+      + '<div class="dp-pa-fuss">Eine Einordnung aus deinen Eingaben im Reiter Steuer — keine Steuerberatung. '
+      + 'Lass sie von deinem Steuerberater bestätigen.</div></div>'
+    : '<div class="dp-pa-card"><div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen '
+      + 'Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div></div>';
 
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
   /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
@@ -1875,9 +2230,24 @@ function _renderAIServerAnalysis(a) {
       tab('loc', 'Lage &amp; Markt', false) +
       tab('verh', 'Verhandlung &amp; Offerte', false) +
       tab('bank', 'Bank', false) +
+      tab('steuer', 'Steuer', false) +   /* v2160 */
       /* v2042 - nur wenn ein Ankauf-Stand vorliegt: ohne ihn gibt es
          nichts abzugleichen, und ein leerer Reiter verspricht etwas. */
       (_siHtml ? tab('si', 'Soll/Ist-Abgleich', false) : '') +
+      /* ══ v2155 · DER QUELLEN-REITER ════════════════════════════════════
+         Marcel am 12.10.2026: „Wir brauchen dann extra Reiter auch nochmal
+         fuer die Quellen, dass wir wirklich nochmal alle Quellen, die wir
+         gesagt, die wir angeben, dass wir die dort nochmal ausgeben
+         koennen, dass wir auch die Quellen, die wir zum Beispiel ermittelt
+         haben, wenn wir Unterlagen beim Amt anfordern, dass auch die dort
+         mit eingegeben werden."
+
+         Er steht IMMER, auch leer — anders als der Soll/Ist-Reiter. Das
+         ist Absicht: ein fehlender Quellen-Reiter saehe aus, als gaebe es
+         keine Quellen. Ein leerer sagt, dass noch keine da sind, und
+         nennt den Weg dorthin. Das ist die Doktrin aus CLAUDE.md:
+         „Wo kein Wert vorliegt, bekommt der Kunde den Weg dorthin." */
+      tab('quellen', 'Quellen', false) +
       '<button type="button" class="dp-pa-tab" id="dp-pa-tab-verlauf" style="display:none" onclick="_dpPaTab(\'verlauf\',this)">Marktbericht-Verlauf</button>' +
     '</nav>' +
     '<div class="dp-pa-content">' +
@@ -1887,7 +2257,9 @@ function _renderAIServerAnalysis(a) {
       panel('loc', pL, false) +
       panel('verh', pV, false) +
       panel('bank', pK, false) +
+      panel('steuer', pSt, false) +
       (_siHtml ? panel('si', _siHtml, false) : '') +
+      panel('quellen', _quellenHtml(a), false) +
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';

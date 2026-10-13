@@ -39,7 +39,7 @@ ${mv.confidence_pct != null ? `Aussagekraft der Indikation: **${mv.confidence_la
 Adresse: ${a.formatted || p.ref.address || 'n/a'}. Koordinaten: ${p.ref.lat?.toFixed?.(5)}, ${p.ref.lon?.toFixed?.(5)}.
 
 ## C) Makrolage
-Makro-Score: **${macro.score ?? 'n/a'}/100**${macro.estimated ? ' (geschätzt, neutraler Default)' : ''}.
+Makro-Score: ${macro.score != null ? '**' + macro.score + '/100**' : 'kein Wert (keine Kennzahl gemessen)'}.
 ${macro.note || ''}
 
 ## D) Mikrolage

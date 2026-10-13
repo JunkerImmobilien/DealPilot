@@ -1074,5 +1074,11 @@
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */
-    vertragsarten: MIETVERTRAG_ARTEN };
+    vertragsarten: MIETVERTRAG_ARTEN,
+    /* v2156: die Stufen-Tabelle mitexportiert. `_buildAIPayload()`
+       uebersetzt die Rohcodes `0/h/v`, bevor sie in den Prompt gehen —
+       bis v2155 kam dort „dach=v" an und das Modell musste raten. Eine
+       zweite Tabelle in ui.js waere der Anfang der Abweichung, genau wie
+       bei den Vertragsarten eine Zeile hoeher. */
+    STUFE_ZU_OBJEKT: STUFE_ZU_OBJEKT };
 })();

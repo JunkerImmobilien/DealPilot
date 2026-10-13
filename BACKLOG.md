@@ -36,6 +36,483 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N62 · Marcels Paket vom 12.10.2026 (abends) — zwölf Punkte, abgeglichen
+
+**Marcel hat ausdrücklich darum gebeten:** *„Also das müsstest du einmal
+mit Backlog abgleichen, ob der Punkt dann da schon drinne steht."*
+
+**Gemessen am 12.10.2026 gegen die 23.117 Zeilen dieser Datei: SECHS von
+zehn Punkten standen überhaupt nicht drin, vier nur teilweise.**
+
+| # | Punkt | stand im Backlog |
+|---|---|---|
+| 1 | Tour in Aktenmappe, Tower, Kanzlei | **T1, offen** (Z. 9619) — Kanzlei und Tower *„nicht fertig gemessen"* |
+| 2 | Kanzlei-Schalter: Position und Optik | **nein** |
+| 3 | Pilot-Analyse: alle Daten einbeziehen | **N60.4 erledigt**, aber Liegenschaftszins und Wertgutachten fehlen; die inhaltliche Verbesserung der Kategorien steht nirgends |
+| 4 | Lage & Markt: Netz + Zensus + Gegenüberstellung | **N61.4, offen** — Zensus, Preisniveau mit Quellen und die Gegenüberstellung fehlen |
+| 5 | Eigener Reiter „Quellen" | **nein** |
+| 6 | Steuerliche Zusammenfassung → Soll/Ist | **N60.18**, nur als Stichwort (*„Was aber vielleicht auch geil wäre, wäre Steuer"*) |
+| 7 | Landingpage: Leistungsumfang unter Funktionen | **nein** |
+| 8 | Preise: Integrationsservice + Bestandsmigration | **nein** (null Treffer für „Integrationsservice") |
+| 9 | Subpage F&E / Portfolio-Strategie | **nein** — es gibt nur N14 (BSFZ-Siegel) und N21 (Stundennachweise) |
+| 10 | Tab Steuern: Vorjahr duplizieren | **nein** |
+
+> **Das ist die Antwort auf Marcels Frage, und sie ist unangenehm:** er
+> hat diese Dinge im Gespräch gesagt, und sie sind nicht angekommen. Ein
+> Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal — deshalb
+> stehen sie hier jetzt wörtlich, bevor einer davon gebaut wird.
+
+#### N62.1 · Die Tour muss in allen vier Ansichten laufen
+
+**Marcel:** *„prinzipiell möchte ich einmal, dass die Tour, die hier
+gemacht wird, wenn man sich neu anmeldet, auch bei der Aktenmappe, beim
+Tower und auch bei der Kanzleiansicht funktioniert. Das müssten wir einmal
+gegenprüfen."*
+
+Ergänzt **T1** (Z. 9619), wo vier Befunde gemessen sind — dort steht
+ausdrücklich *„Kanzlei und Tower sind nicht fertig gemessen"*. Der Hänger
+in der Kanzlei (Schritt 6) ist mit `v1774` behoben, offen sind B1 (Spot
+außerhalb des Bildschirms), B2 (kein Spot) und Schritt 24.
+
+#### N62.2 · Kanzlei: der Bestand/Ankauf-Schalter gehört höher und sieht fremd aus
+
+**Marcel:** *„Wir haben den Buchschalter in die App gepackt bei der
+Kanzlei. Der sollte aber bitte über die Suche, also zwischen dann der
+Aktion-Button und der Suche, also ein bisschen höher, und dass die
+Ausrichtung der Elemente dort gleich ist und auch das Layout und die
+Farbe, also Bestand, Stand und Ankauf, auch der Rahmen da drum, das müsste
+jetzt ein helles Weiß bekommen, also quasi im gleichen Design. … gleiche
+Formatierung wie die Suche und auch die Schrift bei den Aktionen."*
+
+Der Schalter selbst ist `v2145`/`v2145a` (`doppelkarte.js`), die
+Platzierung in der Kanzlei stand nie im Backlog. **Optikpunkt → vor dem
+Bauen im Browser messen**, was die Suche und die Aktionsknöpfe dort
+wirklich tragen (Rahmenfarbe, Höhe, Schriftgröße, Ausrichtung).
+
+#### N62.3 · Pilot-Analyse: alles muss einfließen, und die Kategorien müssen tragen
+
+**Marcel:** *„dass wir einmal schauen, ob generell alle Daten, also auch
+aus den Mehrfamilienhäusern, aus dem Konfigurator, die Daten aus dem
+Marktbericht, wenn wir welche abgerufen haben, dass wirklich alle Felder,
+auch Finanzierung und Liegenschaftszinsen und Wertgutachten, dass auch
+wirklich alles damit einfließt und wir dort auch bei den Einzelkategorien
+Briefing, Stärken, Risiken, Lage und Markt, dass wir da wirklich
+vernünftige Auswertungen bekommen. Also das sieht jetzt schon recht gut
+aus, aber das noch vollumfänglicher, genauer."*
+
+**Stand gemessen:** MFH-Konfigurator **9 von 28 Feldern** im Prompt
+(N60.8/N60.9, `v2022`), Marktbericht-Block da, Finanzierung und Steuer da
+(`v2011`/`v2139`). **Liegenschaftszins und Wertgutachten:** die Stufe-3-
+Werte sind mit `v2150` gebaut — der Liegenschaftszins selbst (`lzs_pct`,
+Zweig, Berichtsjahr, Register-Herkunft) steht noch nicht im Prompt.
+
+#### N62.4 · Lage & Markt: Netz UND Zensus UND die Objektfelder gegenüberstellen
+
+**Marcel:** *„Bei Lage und Markt könnten wir zusätzlich einmal die
+Makrolage, Mikrolage, Mietspiegel, Preisniveau aus dem Netz beziehen, aber
+auch mit Quellen dort legen … ich meine wir fragen das bei Census ab, die
+Lage und allem, dass wir auf diese Sachen dann dort eingehen. Und wir haben
+ja auch im Objekt, das wird ja dann auch aus dem Bericht geholt, da haben
+wir ja Wertsteigerungspotenzial, Nachfrageindikatoren,
+Bevölkerungsentwicklung, Entwicklungsmöglichkeiten. Also dass wir da
+wirklich die Daten halt auch abfragen und verwerten und das auch
+gegenüberstellen nochmal mit dem Mietspiegel oder der Recherche aus dem
+Netz."*
+
+Ergänzt **N61.4**. Neu darin sind drei Dinge: die **Zensus**-Daten (der
+Marktbericht fragt sie ab), das **Preisniveau aus dem Netz mit
+Quellenangabe**, und die **Gegenüberstellung** mit den vier Objektfeldern.
+`nutzerEinschaetzung()` liefert die neun Indikatoren seit `v1851` —
+gegenübergestellt werden sie nirgends.
+
+> **✅ Teilweise erledigt 12.10.2026 · `v2157` (`ff1af46b`, `7b71224d`).**
+> Gegenüberstellung und Preisniveau mit Quelle: gebaut. Die Pilot-Analyse
+> bekommt jetzt beide Lage-Seiten des Berichts (`assessment` = aus
+> Messdaten, `nutzer_einschaetzung` = Objektfelder), die Lageklasse und die
+> vier Objektfelder, den Bevölkerungstrend und — wenn vorhanden — den
+> Zensus. Neue Aufgabe 15 mit Zielfeld `lage_gegenueberstellung` (je
+> Merkmal: Ihre Angabe · Marktbericht · Recherche mit Quelle · Urteil ·
+> Kommentar), Karte „Gegenüberstellung" im Reiter Lage & Markt, die
+> Zeilen-Quellen auch im Quellen-Reiter.
+> **Nachweis:** `prompt-lecks-pruefen` 100 Stellen, 12 neu, RC=0;
+> Kettenprobe im Container an Bericht 176 (vier Abweichungen markiert,
+> Zensus als fehlend benannt); Karte bei 390 px ohne Überlauf.
+> **Rest:** ob das Modell die Zeilen sinnvoll füllt, zeigt nur ein echter
+> Analyselauf.
+>
+> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10., später: Marcel hat sich bei GENESIS-Online/Destatis angemeldet **✅ ERLEDIGT 13.10.2026 · v2161 · `e8a320a9`:** Marcels Zensus-Konto in beiden `.env`; `tools/zensus-kreise-holen.mjs` erzeugt die Datei, 400/400 Kreise mit allen drei Werten, im mb-Container nachgemessen (Herford 4,2 / 53,8 / 5,54). **Weiter möglich (gemessen):** Nettokaltmiete je Kreis nach Baujahr (4000W-0005, 11 Stufen) und Fläche (4000W-0009), Durchschnittsmiete je GEMEINDE (GEOGM4, z. B. Hiddenhausen 5,31), marktaktive Leerstandsquote (4000W-0002). Achtung fachlich: Zensus-Miete = Bestandsmiete aller Verträge zum 15.05.2022, keine Angebotsmiete. — dort gemessen 331 Statistiken, KEIN Zensus 2022, nur Mikrozensus. Der Zensus 2022 liegt NUR auf ergebnisse.zensus2022.de.) (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
+> `marktbericht/backend/data/zensus2022_kreise.csv` trägt nur die
+> Beispielzeile. **0 von 162 Berichten auf Staging haben Zensus-Werte**
+> (159× `kreis_nicht_in_datei`, 3× `kein_ags`). Der „Zensus-Abruf" lief
+> nie. Die Zensus-Datenbank (`ergebnisse.zensus2022.de`) liefert per
+> Schnittstelle nur mit **registriertem Konto** — Gastzugang gibt Code 15,
+> die Web-Oberfläche braucht eine Sitzung. **Braucht Marcel:** kostenloses
+> Konto anlegen; danach lässt sich die Kreisdatei (~400 Kreise:
+> Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
+> Quelle erzeugen statt abtippen.
+
+#### N62.4b · Zensus in der Datenbank — ✅ v2162–v2162c, 13.10.2026
+
+**Marcel:** *„nicht in eine Datei schreiben, sondern direkt in eine Datenbank,
+wo wir das vielleicht jährlich oder alle zwei Jahre einmal abgleichen … ich
+brauche das ja für ganz Deutschland."* Commits `65c28743`, `cae6bc16`,
+`f7bbefc0`, `708be31c`.
+
+- `mb.zensus_werte` (Migration 016): **894.880 Werte, 400 Kreise, 10.786
+  Gemeinden**, 10 Tabellen (Leerstand/Eigentum, marktaktiv, Miete gesamt/
+  Baujahr/Fläche, Leerstand Baujahr/Fläche, marktaktiv Baujahr/Fläche,
+  Leerstandsdauer). Import `npm run zensus` im mb-Container, ~2½ min,
+  Protokoll in `mb.zensus_abrufe`. Zugang per `docker exec -e ZENSUS_USER… `
+  (nicht in der compose-Datei).
+- **Abgleich:** der Zensus ist eine Stichtagserhebung (15.05.2022), neue
+  Zahlen erst mit dem nächsten Zensus. Jährlich lohnt nur das Nachziehen
+  von Korrekturen — der Import ist ein UPSERT.
+- Leser `ZensusConnector.lookupDb`: Gemeinde nur EINDEUTIG
+  (`AgsResolver.gemeindeEindeutig` — `fromPostcode` nahm die ERSTE Ortschaft),
+  Kreis daneben, Miete/Leerstand passend zu Baujahr und Größe **je Wohnung**
+  (bei MFH Fläche/Einheiten — gemessen: 852 m²/12 WE landete sonst bei
+  „200 m² und mehr").
+- Anzeige: Reiter Miete (Bestandsmiete unter Marktmiete), Investitionen
+  (Leerstand unter „Leerstand p.a." mit Abgrenzung), Marktbericht Web+PDF
+  (`_zensusZeilen()`), Pilot-Prompt (Gemeinde, Klassen, Dauer,
+  Bestandsmiete-Hinweis). prompt-lecks 108 grün.
+- **Offen:** Tabellengröße 430 MB (Lizenz/URL je Zeile) — vor Prod den Platz
+  dort messen, ggf. Lizenz je Tabelle auslagern. Einmal nach dem Seitenaufruf
+  fehlten die Hinweise (nach einem Ladeversuch mit leerem Schlüssel), nicht
+  nachstellbar. Optik bei 390 px nicht im Bild abgenommen. Prod braucht die
+  Migration, den Import und die Sicherung vorher.
+
+#### N62.4a · Makro-Score: Ersatzwerte gelten als gemessen
+
+> **✅ Erledigt 13.10.2026 · v2158 · `33bca6d9`** (Marcels Freigabe: „Den
+> Makroscore müssen wir auf jeden Fall anpassen"). `macroScore()` mittelt nur
+> noch gemessene Kennzahlen und nennt `gemessen`/`moeglich`/`fehlend`; ohne
+> jede Kennzahl `score: null` (dealScore vermerkt `makrolage` als geschätzt).
+> Die Bericht-Makrolage entsteht erst ab ZWEI gemessenen Kennzahlen. Im
+> Container nachgemessen: Bevölkerungstrend allein → 65, „aus 1 von 6".
+> **Rest:** bestehende Berichte tragen weiter den alten Score und die alte
+> Makrolage (Bericht 176); sie ändern sich erst bei Neuberechnung. Ein
+> frischer Berichtslauf ist Abnahmepunkt.
+
+
+**Gefunden am 12.10.2026 bei N62.4.** `ScoringService.macroScore()`
+(`marktbericht/backend/src/services/ScoringService.js:17`) setzt für jede
+fehlende Kennzahl einen Ersatzwert ein (`kaufkraft_idx ?? 100`,
+`arbeitslosenquote ?? 6`, `wanderungssaldo ?? 0`, Trends `?? 0`) und
+meldet trotzdem `estimated: false`. An Bericht 176 ist **nur der
+Bevölkerungsteil gemessen** (65); die anderen fünf Teilwerte sind
+Platzhalter (50/50/50/50/60), der Makro-Score 54 ist also überwiegend
+erfunden — und geht mit 20 % in den Deal-Score des Berichts.
+
+Verstößt gegen „Kein Treffer heißt kein Wert". Richtig wäre: nur
+vorhandene Kennzahlen mitteln, `estimated` setzen, sobald eine fehlt, und
+die Zahl der gemessenen Teile mitführen. **Ändert Scores bestehender
+Berichte → Marktbericht-Strang, vor dem Bauen mit Marcel abstimmen.**
+In die Pilot-Analyse gehen die Teilwerte seit `v2157` bewusst **nicht**.
+
+#### N62.5 · Ein eigener Reiter „Quellen" in der Pilot-Analyse
+
+**Marcel:** *„Wir brauchen dann extra Reiter auch nochmal für die Quellen,
+dass wir wirklich nochmal alle Quellen, die wir gesagt, die wir angeben,
+dass wir die dort nochmal ausgeben können, dass wir auch die Quellen, die
+wir zum Beispiel ermittelt haben, wenn wir Unterlagen beim Amt anfordern,
+dass auch die dort mit eingegeben werden."*
+
+Heute stehen die KI-Quellen als Block **innerhalb** von „Lage & Markt"
+(`ui.js:1725`). Die Quellen der Ämter-Recherche (`unterlagen_aemter.
+quelle_url` und seit `v2151` `seiten.pro_seite`) sind mit der
+Pilot-Analyse **nicht verknüpft** — und die des Marktberichts
+(`quellen_nachweis`) auch nicht.
+
+#### N62.6 · Steuerliche Zusammenfassung in der Pilot-Analyse — und im Soll/Ist
+
+> **✅ Erledigt 13.10.2026 · v2160 · `8abf834b`.** Aufgabe 16 mit Zielfeld
+> `steuer_zusammenfassung` (nur aus Block STEUER + Kennzahlen, kein
+> angenommener Satz, Hinweis auf Steuerberater); mit Ankauf-Stand zusätzlich
+> `soll_ist_steuer`. Neuer Reiter **Steuer** (steht immer, alte Analysen
+> sagen, dass das Feld fehlt); die Soll/Ist-Tafel trägt den Steuer-Text.
+> `ankauf.js` führt die Kennzahl **Steuerwirkung p. a.** (cf_ns − cf_vs),
+> für alte Stände aus dem eingefrorenen Datensatz abgeleitet.
+> Prüfer `prompt-lecks-pruefen` 103 Stellen grün; Reiter im Browser mit
+> gestelltem Ergebnis gerendert. **Abnahme offen:** ein echter Analyselauf.
+
+
+**Marcel:** *„Dann bei der Pilotanalyse natürlich auch eine steuerliche
+Zusammenfassung machen. Das soll natürlich auch mit in den Soll-Ist-Abgleich
+einfließen."*
+
+Ergänzt **N60.18** (dort steht der Wunsch seit dem 08.10. als Stichwort)
+und **N61.2**. Der Prompt hat einen `## STEUER`-Block (`v2011`), aber kein
+Antwortfeld für eine Zusammenfassung — und ohne Zielfeld fällt der Auftrag
+lautlos auf den Boden.
+
+#### N62.7 · Landingpage: der Leistungsumfang gehört unter „Funktionen"
+
+**Marcel:** *„wir haben ja jetzt einmal ausgearbeitet, was DealPilot kann,
+was wir tun und allem. Vielleicht können wir das irgendwo auch noch mit auf
+die Internetseite einarbeiten. Wir haben auf der DealPilot-Seite einmal
+unter Funktionen den Leistungsumfang. Vielleicht passt das da irgendwo noch
+mit rein."*
+
+**Optik und Produkttext → Entwurf nach `design/Vorschläge/`, dann zeigen.**
+
+#### N62.8 · Preise: Integrationsservice und Bestandsmigration
+
+**Marcel:** *„dann wäre es cool, wenn wir unter Preise auch so einen
+Integrationsservice anbieten. … Und auch den Integrationsservice, dass wir
+sagen, wir migrieren auch Objektbestände. Das kann man bei uns anfragen,
+wenn das gemacht werden soll."*
+
+> **⚠ GELD. Wird nicht ohne Marcels Freigabe gebaut.** Ein
+> Integrationsservice braucht einen Preis, und der ist seine Entscheidung
+> — ebenso, ob es ein Festpreis, ein Tagessatz oder „auf Anfrage" ist.
+> Vorher gehört geprüft, ob die beworbene Leistung Code hat (es gibt einen
+> Portfolio-Import, `portfolioExport.js`/API) oder ob sie Handarbeit ist.
+
+#### N62.9 · Subpage zum F&E-Projekt und zur Portfolio-Strategie
+
+**Marcel:** *„dass wir auch noch ein bisschen was kurz zu unserem
+F&E-Projekt erklären. Dass wir da vielleicht noch mal eine Subpage haben,
+wo wir ein bisschen was zur Portfolio-Strategie erklären. … Dann natürlich
+nicht sagen, wie wir es machen, weil es ein Forschungsprojekt, aber einfach
+was passieren soll. Und dass wir mit Steuerkanzleien dort zusammenarbeiten."*
+
+Quelle für den fachlichen Rahmen: **`E:\Portfolio Strategie`** (eigenes
+Repo, bescheinigtes Vorhaben **827-757-583** nach § 6 FZulG, Laufzeit
+01.01.2026–31.12.2028). **Das Verfahren selbst gehört nicht auf die
+Seite** — nur, was es leisten soll. Vorhanden ist bisher nur das
+BSFZ-Siegel auf der Landing (N14, `v1873`).
+
+#### N62.10 · Tab Steuern: das Vorjahr duplizieren
+
+**Marcel:** *„bei der im Tab Steuern wäre das gut, wenn wir auch immer so
+das Vorjahr duplizieren können. Manche Sachen wiederholen sich ja. So
+können dann die Sachen übernommen werden. Außer jetzt die, die fest sind.
+Also die wir eh schon rausnehmen, wie Schuldzinsen oder so, AfA."*
+
+Die Unterscheidung **wiederkehrend gegen fest** ist der Kern: Schuldzinsen
+sinken mit der Restschuld, die AfA ist je Jahr festgelegt — wer sie
+mitkopiert, trägt eine falsche Zahl in ein Steuerjahr. Vor dem Bauen
+gehört die Feldliste des Reiters durchgegangen und **je Feld entschieden**,
+ob es wiederkehrt.
+
+#### N62.11 · Eine Standard-Lageklasse, und sie muss sich diktieren lassen
+
+> **✅ Erledigt 13.10.2026 · v2159/v2159a · `8c7aa666`, `036982eb`.**
+> Standardklasse in `lage-profil.js` (`standard()`/`setzeStandard()`),
+> wählbar im Onboarding und im Investmentprofil, mit Begründung. Neuer
+> Quick-Check wird vorbelegt (nur leeres Feld), Marke „Vorgabe aus deinem
+> Profil · überschreibbar"; jede andere Wahl und JEDES Diktat löscht sie.
+> Diktat: `lageklasse` in HINTS/WL/QC_IDS/OBJ2QC, geführte Eingabe fragt
+> sie in Etappe 3 und BIETET den Standard an (`profil: 'lage'`).
+> **Nebenbefund behoben:** beide Auswahl-Schreiber (`setSelectSmart`,
+> iframe `_applyImportData`) nahmen den ersten Teilwort-Treffer — diktiertes
+> „A"/„B" landete auf „keine Angabe", „schwach" auf „Sehr schwach",
+> Energieklasse „A" auf „A+". Jetzt erst exakt, dann ungefähr, leere Option
+> nie. Im Browser am echten Code nachgemessen.
+> **Nebenbefund 2:** `qc-bridge.js` lädt `quickcheck-app.html` mit EIGENEM
+> Buster (`IFRAME_SRC`) — wer das Fenster ändert, zieht ihn mit.
+> **Abnahme offen:** Onboarding-Schritt mit der neuen Auswahl nur per Code
+> geprüft, nicht im Bild.
+
+
+**Marcel am 12.10.2026:** *„Wir haben ja im Quickcheck auch die
+Lageklassen, die man auswählen kann. Da sollten wir zusehen: Wenn wir uns
+neu anmelden, dann kommt ja ein Modal, wo wir diese Werte setzen können,
+dass wir auch einen Standard wählen können. So mit einer kleinen
+Begründung wird dann im Quickcheck als Standard gesetzt oder so. Dass wir
+aber auch die Möglichkeit haben, die zu überschreiben. Das heißt, dass wir
+auch wenn wir in der Datenaufnahme Sprache auswählen, dass wir dort auch
+die Lage angeben können und dann wird die halt einfach dementsprechend
+überschrieben. Also es wird ja sowieso alles überschrieben, was wir extra
+diktieren, dass wir darauf achten."*
+
+**Gemessen am 12.10.2026 — zwei Lücken:**
+
+| | Stand |
+|---|---|
+| Onboarding-Modal | setzt die **Ziel-Renditen** je Klasse (`.dpo-lage-f` → `DealPilotLageProfil.setze(k, 'ziel_bmr', …)`, `onboarding.js:564/723`) — **aber keine Standard-KLASSE**. Man kann nicht sagen „meine Objekte sind meistens B-Lage" |
+| Diktat | **die Lageklasse kommt im Diktat gar nicht vor** — null Treffer für `lageklasse` in `voice-import.js` und `voiceExtractService.js`. Sie lässt sich also nicht diktieren und damit auch nicht überschreiben |
+
+**Die Kette, die Marcel beschreibt:**
+
+```
+Onboarding: Standardklasse wählen (mit Begründung, warum sie zählt)
+     ↓  wird Vorbelegung
+Quick-Check: Lageklasse vorbelegt, überschreibbar
+     ↓  wird überschrieben von
+Diktat/Datenaufnahme: „B-Lage" gesagt → gewinnt
+```
+
+**Marcels Grundsatz dazu, und er gilt über die Lage hinaus:** *„es wird ja
+sowieso alles überschrieben, was wir extra diktieren."* Das Diktat ist die
+ausdrückliche Angabe des Nutzers und schlägt jede Vorbelegung. Beim Bauen
+gehört geprüft, ob das **überall** so ist — ein Diktat, das eine
+Vorbelegung nicht überschreibt, ist ein stiller Datenverlust.
+
+**Riegel beachten:** `zielBmr()` gibt `null` ohne Klasse, und
+`ZIEL_BMR_RUECKFALL = 6` greift dann (`qc-heuristik.js:217`). Eine
+Standardklasse darf diesen Riegel nicht aushebeln — sie ist eine
+**Vorbelegung**, keine Annahme. Was der Nutzer nie gesetzt hat, muss als
+Vorgabe gekennzeichnet bleiben (dieselbe Unterscheidung wie in `v2140b`
+beim Investmentprofil: „selbst gesetzt" gegen „Vorgabe, nicht gesetzt").
+
+#### N62.12 · Die geführte Eingabe durchgehen — Plausibilität und Vollständigkeit
+
+> **Marcel am 13.10.2026:** *„bitte beachten das wir microlage und makrolage
+> auch über die geomap schnittselle bekommen."* Gemessen im Code: der
+> `GeoMapConnector` liefert heute nur Angebote; die Mikrolage kommt aus dem
+> Geoapify-Score (`MarketInsightsService.js:96`), die Makrolage aus dem
+> Makro-Score (seit v2158 nur gemessene Kennzahlen). **Prüfen:** welche
+> Lage-Endpunkte GeoMap anbietet und ob die geführte Eingabe (`abruf: 'lage'`)
+> sie nutzen kann, statt den Nutzer zu fragen.
+
+
+**Marcel:** *„dass wir das auch in der geführten Tour haben. Also die
+nochmal durchgehen: Plausibilität, sind alle Daten drin, sind alle Stufen
+drin, wird der Kunde da vernünftig durchgeführt. Das sollten wir auch
+nochmal machen."*
+
+Gemeint ist die **geführte Datenaufnahme** (`dp-diktat.js`,
+`pilot-sprache.js`, `voice-import.js`), nicht die Onboarding-Tour aus
+N62.1. Vier Fragen, und jede braucht eine eigene Messung:
+
+1. **Plausibilität** — fängt die Strecke unsinnige Angaben ab, oder
+   schreibt sie sie durch? (Vgl. `N60.x` und die Lehre aus
+   `stille-verwerfung`: unbekannte Felder wurden bei `/bmf/aufteilung`
+   kommentarlos übersprungen.)
+2. **Sind alle Daten drin** — welche Felder des Reiters Objekt lassen sich
+   diktieren, und welche nicht? Die Lageklasse ist schon als fehlend
+   gemessen (N62.11).
+3. **Sind alle Stufen drin** — die Erfassung hat Etappen; kommt der Nutzer
+   durch alle, oder endet die Strecke vorzeitig?
+4. **Wird der Kunde vernünftig durchgeführt** — Reihenfolge, Rückfragen,
+   was passiert bei einer Lücke.
+
+**Reihenfolge laut Marcel:** *„Aber das machst du im Anschluss an die
+ganzen Punkte, die du jetzt gerade abarbeitest."* Also **nach** N62.3
+bis N62.6 (Pilot-Analyse).
+
+---
+
+### N61 · Marcels Paket vom 12.10.2026 — sechs Punkte, wörtlich aufgenommen
+
+**Marcel hat sie aufgegeben, weil er sie im Backlog vermisste:** *„was mir
+irgendwie fehlt ist ein punkt wo ich gesagt habe …"* Genau dafür steht das
+hier. Ein Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal.
+
+#### N61.1 · Der Aussehen-Schritt: die App soll sich im Hintergrund mitändern
+
+**Marcel:** *„wenn man nach der neuanmeldung das aussehen der app auswählen
+kann dass die bilder dort nichts sagend sind und es gut wäre wenn sich im
+hintergrund die app direkt ändert und das bild das layout besser wieder
+gibt."*
+
+**Der erste Teil ist erledigt (v1753b/c), der zweite stand nie im Punkt.**
+Der alte Eintrag **U3** fasste nur „die Bilder sagen nichts" — dass die App
+im Hintergrund *sichtbar* mitwechseln soll, fehlte dort.
+
+**Gemessen am 12.10.2026 im Code:**
+
+| | |
+|---|---|
+| Miniaturen | `onboarding.js:280` trägt `dpo-mini` — v1753b wirkt, 84 px, Kopf/Spalten/Inhalt |
+| Klick | `onboarding.js:734` ruft `_aussehenAnwenden()` → `data-dp-layout` wird **wirklich live** gesetzt |
+| Schleier | `.dpo-ov` ist `rgba(5,5,5,.34)` (`onboarding.js:1008`) — **unverändert** |
+| unter 900 px | `onboarding.js:1198` `padding:0; align-items:stretch` → der Kasten füllt den Schirm, es gibt **kein „dahinter"** |
+
+> **Der Mechanismus schaltet also schon — Marcel sieht es nur nicht.**
+> Der Schleier nimmt hellen Flächen 60 % Helligkeit und dunklen 0 %
+> (gemessen am 10.10.2026), er verfälscht damit genau den Unterschied,
+> um den die Wahl geht. Und auf dem Gerät, auf dem Marcel am häufigsten
+> arbeitet, ist von der App überhaupt nichts zu sehen.
+
+**Zu tun:** am laufenden Fenster messen, wie viel der App neben dem Kasten
+sichtbar ist, dann den Schleier über *diesem* Schritt zurücknehmen und den
+Kasten so stellen, dass die Fläche frei wird. Ein Hinweis („die App dahinter
+wechselt mit") nur dort, wo er stimmt.
+
+#### N61.2 · Soll/Ist-Abgleich in der Pilot-Analyse weiter ausbauen
+
+**Marcel:** *„dann wollten wir Soll/Ist Abgleich weiter ausbauen in der Pilot
+Analyse und auch die Lage Klassen mit einbeziehen in die Pilot analyse."*
+
+Der Reiter existiert seit **v2042** (`ui.js:_sollIstHtml()`, rechnet nicht
+selbst — `DealPilotAnkauf.abweichung()` liefert die Zeilen). Was „weiter
+ausbauen" heißt, ist offen und gehört vor dem Bauen geklärt.
+
+#### N61.3 · Lageklassen in die Pilot-Analyse UND in die Quick-Check-Bewertung
+
+**Marcel:** *„Das muss auch mit in die Bewertung im Quick Check unten weil
+der Investor ja lesen möchte und bewerten möchte ob der deal passt."*
+
+Die Lageklasse ist seit **v2143** der Maßstab der Bruttomietrendite-Ampel
+(`qc-heuristik.js`, Prüfer `tools/lageklasse-ampel-pruefen.mjs`). Offen ist,
+ob sie auch **im Prompt der Pilot-Analyse** und **im Fazit unten im
+Quick-Check** ankommt.
+
+#### N61.4 · Lage & Markt: die Werte aus den Marktberichten holen, nicht recherchieren
+
+**Marcel:** *„in der Pilot Analyse woher kommen die werte und daten im reiter
+Lage & Markt? wenn wir einen marktbericht haben oder mehrere können wir die
+Daten dafür aus den Marktberichten holen da wir diese sachen ja dort über die
+partner abholen. dann können wir auch aussagen über die entwicklung
+treffen."* Und: *„man kann die werte der KI gerne mit den daten aus der
+schnittstelle abgleichen auch wenn Stufe 3 gerechnet wurde sollte auf
+jedenfall auch der Verkehrswert mit einfließen und die Gesamtbewertung
+einfließen."*
+
+**Gemessen am 12.10.2026 — das meiste ist gebaut, eine Lücke ist echt:**
+
+| Baustein | Stand |
+|---|---|
+| Berichtsblock im Prompt | **da** seit v947-mbsource (`openaiService.js:888`), ausdrücklich „die BESTE Quelle hier, vor allem anderen nutzen" |
+| mehrere Berichte | **da** — `/marktbericht/objects/history` lädt alle, Verlauf mit Datum und Marktwert |
+| Entwicklungsaussage | **da** — Entwicklungszeile in Panel „Lage & Markt" ab zwei Berichten (`ui.js:2822`), Riegel bei unter 30 Tagen Abstand im Prompt |
+| Mietabweichung | **da** und gerechnet, nicht geschätzt (`openaiService.js:940 ff`) |
+| **Stufe-3-Werte** | **FEHLT im Prompt.** `/objects/history` liefert seit v1963/v1965/v1979 `sachwert_eur`, `ertragswert_eur`, das **führende Verfahren** mit Grund und Quelle (§ 6 Abs. 1 ImmoWertV) und beide Rechenwege — der Prompt-Bauer liest **kein einziges** dieser Felder |
+| `mietspiegel_eur_qm` | das Ausgabeschema nennt es wörtlich *„Recherchierter Wert €/m²"* (`openaiService.js:1156`) — die KI soll **recherchieren**, obwohl der Bericht eine amtliche Mietpreisübersicht trägt |
+
+> **Die Zahlen liegen in der Antwort und verlassen den Prompt-Bauer nicht.**
+> Dasselbe Muster wie v1963: der Cross-Check lag in der Zeile und hat den
+> Server nie verlassen — nur eine Ebene weiter.
+
+#### N61.5 · Die Demo-Objekte
+
+**Marcel:** *„dann die demo objekte"* — gemeint ist **N60.19** („Die Demodaten
+erzählen keine Geschichte"), dort steht der Punkt mit Messung. Er hängt an
+einer Entscheidung von Marcel und ist nicht blockiert, sondern **unbeantwortet**.
+
+#### N61.6 · Das Unterlagen-Modul ergänzen — Marcel meint N51
+
+**Marcel:** *„und ich hatte auch ein paket reingegeben um die unterlagen
+prüfung. steht das auch noch im backlog?"* — und auf die Rückfrage:
+*„ja ich meine das unterlagen app das müssen wir ergänzen ist ja schon
+drin. soll nur ergänzt werden bzw. bissel erweitert."*
+
+**Geklärt: es ist `unterlagen-app-v6-ansprechpartner`, also N51.** Kein
+neues Paket, kein Umbau — die offenen Schritte stehen dort unter „Zu tun"
+(KI-Auftrag um `ansprechpartner` erweitern, `proSeite` als Beleg, `kopieAn`
+im Versand). **Die Migration ist dort schon als Annahme zurückgenommen:**
+`unterlagen_aemter.seiten` ist bereits `jsonb`.
+
+> **Mein Fehlgriff bei der Suche:** ich habe nach „Unterlagen**prüfung**"
+> gegreppt und nichts gefunden, weil der Punkt „Unterlagen-**Modul**"
+> heißt. Dieselbe Falle wie immer — nach dem WEG suchen, nicht nach dem
+> Wort, das Marcel gerade benutzt.
+
+**Dabei ist eine andere Lücke aufgefallen, und die bleibt echt:**
+`Dateien/vw-modul-v4-2-2.zip`
+und `-v4-2-5.zip` (08. und 10.10.2026) stehen in **keiner Zeile** des
+Backlogs. Das ist ein Gutachten-Modul mit drei Word-Vorlagen
+(`master_vwg`, `master_rndg`, `master_kpt`), `calc-engine.js`,
+`boris-nrw-service.js`, einer `IMPORT-API.md` und drei Beispiel-PDFs
+(Verkehrswertgutachten, Nutzungsdauergutachten, Kaufpreisaufteilung).
+**Ein Paket, das im Repo liegt und im Backlog fehlt, ist verloren** — genau
+der Fall, den Marcel hier anspricht. **Noch nicht gesichtet, nur gelistet.**
+
+---
+
 ### N60 · Marcels Paket vom 08.10.2026 — zehn Punkte, wörtlich aufgenommen
 
 **Marcel hat am 08.10.2026 ein ganzes Paket aufgegeben. Es steht hier
@@ -2624,7 +3101,7 @@ unabhängig vom Jahr.
 3. *Beides zusammen soll in den Export* → dann ist es Lesart 1 plus die
    Entscheidung oben.
 
-> **Marcel ist DESAG-zertifiziert und weiß das besser als ich.** Lesart 2
+> **Marcel ist DESAG-geprüft und weiß das besser als ich.** Lesart 2
 > wäre eine echte Lücke: ein Bestandsobjekt über zehn Jahre mit einem
 > einzigen Steuersatz zu rechnen ist eine Vereinfachung, die niemand
 > ausgewiesen bekommt. Aber ob er das meint, steht nicht im Satz — und
@@ -3164,7 +3641,7 @@ sondern *beide nebeneinander, und die Differenz ist die Aussage.*
    **Bad Oeynhausen ist ohnehin gesperrt** — das Paket schreibt selbst
    „nicht für Berechnungen". Bleiben zwei Städte, beide mit demselben
    offenen Punkt. *Marcels Frage, nicht meine: er ist der
-   DESAG-zertifizierte Sachverständige und der Betreiber.*
+   DESAG-geprüfte Sachverständige und der Betreiber.*
 
    Das Paket sagt es selbst:
    *„Nutzungsbedingungen der Gemeinden nicht angegeben (§ 5 UrhG zu
@@ -4932,6 +5409,27 @@ und Übernehmen überall erreichbar.
 
 ---
 
+#### N60.17 · ✅ DAS PRÜFWERKZEUG STEHT — am Code nachgemessen 12.10.2026
+
+> Alles in `frontend/messkabine.html` (nicht in `tools/`):
+>
+> ```
+>   :1753  pruefeAnsicht(breite, hoehe, vorher, name, layout, extra)
+>   :1512  apQuerScroller   + :1529 apQuerUngewollt (Absicht --dpm-schiene)
+>   :1475  apUeberlauf      echter Ueberlauf vs. von Scrollern gefangener
+>   :1792  pruefSelbsttest  prueft den Pruefer gegen eine kuenstliche Decke
+>   :172   GERAETE          8 Geraete, 360 bis 1280 px
+> ```
+>
+> `pruefeAnsicht` scrollt in bis zu 16 Abschnitten, misst je Abschnitt
+> verdeckte und erdrückte Elemente über `elementsFromPoint` und prüft
+> **jeden Verdacht zweimal nach** (zentriert und am Seitenanfang).
+>
+> **Offen bleibt der Durchgang selbst**, nicht das Werkzeug. Und zwei
+> Breiten fehlen in `GERAETE`: **320 px und 1920 px**.
+
+**Der ursprüngliche Text:**
+
 #### N60.17 · Responsive-Durchgang der ganzen App (Master-Prompt)
 
 ### ✓ DATENAUFNAHME ABGEARBEITET 11.10.2026 (`v2117`–`v2117b`)
@@ -6472,6 +6970,29 @@ belegten Einstiege:
 
 ---
 
+### N51 · ⚠ TEILS ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> **Erledigt ist der Link-Teil:** `frontend/js/unterlagen-modal.js:294-298`
+> rendert `antrag_url` immer als Verweis, kein `else if` mehr (v1971c).
+>
+> **Offen sind zwei Dinge, und das erste ist grundsätzlich:**
+>
+> 1. **Ansprechpartner 1 und 2 gibt es nicht** — gesucht nach
+>    `ansprechpartner`, `ap1`, `ap2` in `unterlagen-modal.js`,
+>    `unterlagenService.js`, dem ganzen Backend, dem Marktbericht und in
+>    `083_unterlagen_aemter.sql`: **kein Treffer.** Das Datenmodell führt
+>    **genau eine Behörde** je (Gemeinde, Unterlagenart), keine
+>    Personenliste — und der KI-Auftrag (`unterlagenService.js:307`)
+>    fordert ein einzelnes Objekt. Das ist kein fehlendes Feld, sondern
+>    eine andere Datenform.
+> 2. **Die Belegprüfung je Seite** fehlt: `belegPruefen()`
+>    (`unterlagenService.js:239-261`) prüft EINE Adresse gegen EINE
+>    Quellseite; `seiten` ist nur eine URL-Liste (max. 8).
+>
+> Die Vorlage `unterlagen-app-v6` liegt **nicht im Repo**.
+
+**Der ursprüngliche Text:**
+
 ### N51 · Unterlagen-Modul: Ansprechpartner 1 und 2 aus v6 übernehmen (08.10.2026)
 
 **Marcels Auftrag:** „im Dateien-Ordner diese Datei `unterlagen-app-v6-ansprechpartner` …
@@ -6541,6 +7062,110 @@ durch `_link()`).
    sauberer als eine Liste in einer Spalte namens `seiten`. Das ist eine
    Schemafrage und braucht Marcels Freigabe — aber **erst für den
    zweiten Schritt**, nicht für den Beleg.
+> **✅ SCHRITT 1 ERLEDIGT am 12.10.2026 (`v2151`/`v2151a`) — und dabei fiel
+> ein Defekt in UNSERER Fassung auf, der größer war als die Ergänzung:**
+>
+> `belegPruefen()` suchte `text.includes(adresse)` im rohen HTML. Ämter
+> schreiben ihre Adressen gegen Erntemaschinen verschleiert. **An 19
+> echten Schreibweisen gemessen verfehlte die alte Logik sieben** —
+> `[at] [dot]`, `{punkt}`, Soft-Hyphen, Zero-Width, `<wbr>`,
+> Gedankenstrich, Minuszeichen. Eine verfehlte Adresse heißt im Modal
+> „steht nicht auf der genannten Quellseite", **für eine Adresse, die
+> dort steht.** Der Nutzer bekommt eine Warnung für einen korrekten Fund.
+>
+> **Und der Rückfall war zugleich zu lax:** `includes(konto) &&
+> includes(domain)` sagt „bestätigt", wenn „info" im Menü steht und die
+> Domain im Impressum. Gemessen an
+> `<nav>Info</nav><footer>stadt-xy.de</footer>` — bestätigt, ohne die
+> Adresse je gesehen zu haben. **Ein falscher Beleg ist schlimmer als
+> ein fehlender: er behauptet eine Herkunft.**
+>
+> Gebaut: `mailsAufSeite()` (stellt die Seite her, liest dann echte
+> Adressen, Reihenfolge der Seite bleibt), `istPersonenpostfach()`,
+> `belegSeiten()` (bis sechs Seiten parallel, `pro_seite`).
+>
+> **Die Spalte `seiten` hatte keinen Leser** — gemessen: ein grep nach
+> `.seiten` über `backend/src` und `frontend/js` findet außer dem eigenen
+> INSERT keinen Treffer. Bis zu acht amtliche Seiten lagen je Amt in der
+> Datenbank und wurden nie abgerufen. Sie trägt jetzt
+> `{liste, pro_seite, alternativen, beleg_quelle}` — **keine Migration**,
+> die Spalte ist `jsonb` und hatte keinen Leser, der brechen konnte.
+>
+> **Nachweis:** `tools/beleg-leser-pruefen.mjs`, 42 Fälle, RC=0 — und
+> zwar **im Container gegen `/app/src/services/unterlagenService.js`,
+> mit „Gestellt: nichts — alle Abhängigkeiten waren echt da"**. Dazu die
+> Abnahme gegen echte Amtsseiten: Hüllhorst, Hiddenhausen,
+> Minden-Lübbecke und Bielefeld liefern je 3–4 echte Adressen aus dem
+> Impressum (`info@huellhorst.de`, `posteingang@bielefeld.de`, …), die
+> **Startseite** dagegen null — die Unterscheidung „Seite trägt keine"
+> gegen „Abruf scheitert" ist damit belegt, nicht vermutet.
+
+> **✅ SCHRITT 2 BIS 5 ERLEDIGT am 12.10.2026 (`v2152`–`v2152b`).**
+> Migration **087**: eigene Spalte `ansprechpartner jsonb NOT NULL
+> DEFAULT '[]'` — die Form, die hier unten als „sauberer" vermerkt war.
+> Sie führt **keine Bedingung** ein (anders als v2136, das mit
+> `email_verified_at` alle vier Staging-Konten aussperrte): gemessen nach
+> dem Lauf tragen alle **19** Altsätze eine leere Liste, **kein NULL**,
+> kein Satz unbrauchbar.
+>
+> **Der KI-Auftrag steht wörtlich aus v6 im Prompt**, mit allen drei
+> Einschränkungen. Die dritte ist die wichtigste — *„Stehen dort keine
+> Personen, bleibt die Liste leer"*: ohne sie ist leer kein zulässiges
+> Ergebnis und das Modell **muss** etwas liefern. Dazu das Zielfeld im
+> Antwortformat, sonst fällt der Auftrag lautlos auf den Boden.
+>
+> **Der Zusammenbau** (`personenAus`) nimmt zuerst, was die Recherche
+> gelesen hat, und füllt dann mit den persönlichen Postfächern der
+> Quellseite auf — in deren Reihenfolge. `bestaetigt` ist nur true, wenn
+> **wir** die Adresse auf einer selbst abgerufenen Seite gefunden haben.
+> `kopie` beginnt bei false; dafür gibt es **PUT
+> /unterlagen/amt/:id/kopie**, der ausschließlich das Häkchen setzt —
+> ein Endpunkt, über den sich die Adresse ändern ließe, hebt den Beleg
+> auf. Die angehakte Auswahl überlebt eine Neurecherche (`CASE` statt
+> `EXCLUDED`): „nichts gefunden" ist kein Grund, Bekanntes zu verwerfen.
+> Versand über `&cc=` im `mailto`, der Empfänger fällt doppelt heraus,
+> und der CC steht im **Briefkopf** — nicht erst im Mailprogramm.
+>
+> **DER ABNAHMELAUF HAT EINEN FEHLER GEFUNDEN, den kein erdachter
+> Prüfauftrag gefunden hätte** (`v2152b`): auf dem echten Impressum des
+> Kreises Minden-Lübbecke galt `rechnung@invoice.minden-luebbecke.de`
+> als **persönliches** Postfach und erschien als „Ansprechpartner 2" —
+> ein Rechnungspostfach als Ansprechperson für eine Flurkartenanfrage.
+> Ursache: `/^[a-z]\.?[a-z]+$/` sollte `mweber` treffen und trifft jedes
+> Wort aus Kleinbuchstaben. Jetzt zählt **nur der Punkt** im Konto;
+> `mweber` gilt als Funktion, und das ist die sichere Seite — eine
+> Funktion, die als persönlich gilt, schickt Post an die falsche Stelle;
+> eine persönliche, die als Funktion gilt, kostet nur eine Angabe.
+>
+> **Nachweise:**
+> - `tools/beleg-leser-pruefen.mjs`: **79 Fälle, RC=0**, darunter 13
+>   Zusicherungen des Zusammenbaus, 5 Formproben der Spalte `seiten`,
+>   6 Stellen des KI-Auftrags am **kommentarfreien** Text und 22
+>   Postfacharten — **sechs davon aus echten Amtsseiten**, mit
+>   Quellenvermerk im Code. Lauf auch **im Container**, dort „Gestellt:
+>   nichts".
+> - **Echte Recherche** (Flurkarte 32609 Hüllhorst): richtiges Amt,
+>   Adresse belegt, **null** Ansprechpartner genannt statt zwei
+>   erfundener — der Riegel greift. Null falsch belegte.
+> - **Positive Seite** ohne zweiten KI-Lauf, gegen das echte Impressum:
+>   4 Adressen gelesen, 1 Person zusammengebaut (`s.ohnesorge@…`,
+>   `bestaetigt=true`, `kopie=false`), keine Dubletten, Empfänger nicht
+>   dabei.
+>
+> **Dabei eine Falle dokumentiert, die ich selbst gebaut hatte**
+> (`v2152a`): `seiten` hat jetzt **zwei Formen** — alle 19 Altsätze
+> tragen die URL-Liste (`jsonb_typeof = array`), neue das Objekt mit dem
+> Beleg. Eine Nachmigration wäre falsch (die Altsätze haben den Beleg
+> nicht, ihn zu erfinden wäre schlimmer), also gibt es `seitenLesen()`:
+> ein Leser, beide Formen, `alt: true` als ehrliche Auskunft.
+>
+> **Offen und ausdrücklich nicht bewiesen:** ob das Modell bei einem Amt,
+> dessen Seite Personen **nennt**, auch welche zurückgibt. Der Lauf oben
+> traf ein Amt ohne genannte Personen — das belegt den Riegel, nicht den
+> Fund. Beim nächsten Abruf einer Bauakte mitmessen.
+
+~~**Offen bleiben Schritt 2 bis 5:**~~ **(erledigt, siehe oben)**
+
 2. Den KI-Auftrag in `unterlagenService.js` um `ansprechpartner` erweitern, **wörtlich mit der
    Einschränkung aus v6** („nur wenn dort wörtlich steht"). Der Prompt ist die Stelle, an der
    erfundene Namen entstehen würden.
@@ -6627,7 +7252,7 @@ schreibt daraus „Führendes Verfahren: Vergleichswertverfahren"
 
 > **Warum das anders wiegt als die übrigen Punkte:** bei allen anderen Befunden rechnet
 > etwas falsch. Hier rechnet alles richtig — und der Bericht **benennt die Grundlage
-> falsch**. Marcel ist DESAG-zertifiziert und zeichnet das. Eine Zahl, die „Vergleichswert
+> falsch**. Marcel ist DESAG-geprüft und zeichnet das. Eine Zahl, die „Vergleichswert
 > nach § 6 Abs. 1 ImmoWertV, abgeleitet über den Kaufpreis je m²" heißt und aus Inseraten
 > kommt, ist kein Rechenfehler, sondern eine falsche Herkunftsangabe — genau das, was die
 > Doktrin „jede Zahl trägt Herkunft" verhindern soll.
@@ -6881,6 +7506,19 @@ Garagen-BGF in den Sachwert eingeht.
 4. Danach die drei Sachwerte oben neu rechnen und gegen die 242.274 € aus CLAUDE.md halten.
 
 ---
+
+### N45 · ✅ ERLEDIGT — 34 Media-Queries, am Code gezählt 12.10.2026
+
+> `frontend/css/datenaufnahme.css`, 3.241 Zeilen, **34 `@media`-Blöcke**.
+> Breakpoints: 560 · 640 · 641 · 700 · 701 · 769 · 820 · 900 · 901 ·
+> 1024 · 1100 · 1140 · 1200 · 1400 · 1401 · 1439.
+>
+> **320–1920 px sind durchgehend abgedeckt**, aber nicht mit eigenen
+> Endstufen: unter 560 px gilt der 560er-Block (auch bei 320), über
+> 1439 px nur die Grundschicht. Das ist eine bewusste Lage, kein Loch —
+> wer dort eine eigene Stufe braucht, misst sie zuerst.
+
+**Der ursprüngliche Text:**
 
 ### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
 
@@ -7193,7 +7831,7 @@ Der Kern ist **N4** — alles andere hängt davon ab oder ist klein.
 
 ---
 
-### N1 · Das Unterlagen-Modal trägt nicht die Marke
+### N1 (04.10.) · Das Unterlagen-Modal trägt nicht die Marke
 
 Marcel: *„Das müsste einmal das Modal auch im Stil vom Deal-Piloten, also
 so wie das Einstellungsmenü oder die anderen Modals, die wir öffnen, auch
@@ -7210,7 +7848,7 @@ Zwei Mängel, beide gemeldet:
   zu lesen. Vermutlich `btn-ghost` auf dunklem Grund. **Kontrast gegen den
   effektiven Grund messen**, nicht gegen den Behälter.
 
-### N2 · „Alle abrufen" statt fünfmal klicken
+### N2 (04.10.) · „Alle abrufen" statt fünfmal klicken
 
 Marcel: *„man muss die ja alle einzeln abrufen. Genau, dass man da noch
 einen Button macht: alle abrufen."*
@@ -7222,7 +7860,7 @@ fünf nacheinander holt, mit Fortschritt je Zeile.
 > dieselbe Gemeinde fünfmal dieselbe Arbeit, und die Ämter-Ernte kann
 > jeden Treffer für den nächsten nutzen.
 
-### N3 · Sind Gemarkung, Flur und Flurstück Pflicht?
+### N3 (04.10.) · Sind Gemarkung, Flur und Flurstück Pflicht?
 
 Marcel: *„ist es zwangsläufig notwendig, dass man Flur, Gemarkung und
 Flurstück eingeben muss?"*
@@ -7237,7 +7875,7 @@ ein Hinweis. **Dazu:** die BORIS-Antwort trägt Gemarkungsnummer und -name
 (41 Felder, siehe `boris-liefert-die-gemarkung`). Das Feld liesse sich beim
 Bodenrichtwert-Abruf mitfüllen.
 
-### N4 · DER REITER OBJEKT WIRD NEU GEORDNET — das große Stück
+### N4 (04.10.) · DER REITER OBJEKT WIRD NEU GEORDNET — das große Stück
 
 Marcel: *„im Tab Objekt haben wir unten Wertermittlung, Marktbericht. Da
 haben wir uns irgendwie falsch verstanden. Das ist ja jede, jede, jede
@@ -7333,7 +7971,7 @@ nur EZFH). Marktbericht-App füllt ihr Formular längst aus dem Objekt
   ohne Feld, `#bank-tbody` nicht mehr im Markup (CSV-Export tot, der
   Bankexport läuft über `exportPDFBank`).
 
-### N5 · „BORIS abrufen" heißt nicht immer BORIS
+### N5 (04.10.) · „BORIS abrufen" heißt nicht immer BORIS
 
 Marcel: *„Rufen wir wirklich immer bei BORIS ab oder haben wir für die 16
 Bundesländer auch andere Quellen? Weil dann brauchen wir es ja nicht
@@ -7824,6 +8462,31 @@ Altenpflegeheim und Wochenendhaus), 395 Sperren. 280 davon sagen dasselbe: RP un
 kostenpflichtig und genehmigungspflichtig. **Frage:** je Gebiet eine Sperre (so wie geliefert) oder
 eine je Land? Dazu aus demselben Lauf: Otterndorf-Resthöfe 2024 → 2026 fortschreiben? Ostfriesische
 Ferienwohnungen auf Gemeindeebene ernten (Inseln sind eigene Gemeinden)?
+
+### N32 · ⚠ OFFEN im Kern — nachgemessen 12.10.2026, die Zahl ist gewachsen
+
+> `gutachterausschuss.js:430-443` (`unvollstaendig()`) liest **nur**
+> `unvollstaendig_grund`. `warum_kein_wert` kommt in der ganzen Datei
+> **nicht vor** — weder gesetzt noch gelesen noch weitergegeben.
+>
+> Am Registerbestand gezählt (alle 62 Dateien geparst):
+>
+> ```
+>   1.393 Saetze tragen warum_kein_wert, alle mit vollstaendig=false
+>      33 davon tragen es OHNE unvollstaendig_grund
+>          -> ihre Begruendung faellt still auf den Boden
+>     109 Saetze tragen umgekehrt nur unvollstaendig_grund
+> ```
+>
+> *(N32 nannte 34 von 86 — derselbe Befund, der Bestand ist gewachsen.)*
+>
+> **Ein zweiter Kanal funktioniert:** `quellen_links.js:474` gibt
+> `warum_kein_wert` aus einer **handgeführten** Liste aus, und die
+> Marktbericht-Ansicht zeigt es (`app.js:782`, `:884`, `:4215`). Der Text
+> erreicht den Nutzer also — aber nur, wenn jemand ihn dort eingetragen
+> hat. Der aus dem **Registersatz** erreicht ihn nicht.
+
+**Der ursprüngliche Text:**
 
 ### N32 · Befunde am Rechenkern aus den Ernteläufen (05.10.2026)
 
@@ -9132,7 +9795,7 @@ sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
 „Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
 Sprache, dann Felder füllen.
 
-### V3 · V5 · V7 — GEMESSEN: im Kern schon vorhanden
+### V3 (01.10.) · V5 · V7 — GEMESSEN: im Kern schon vorhanden
 
 Am 01.10.2026 am laufenden System gemessen, BEVOR gebaut wurde:
 
@@ -9154,7 +9817,7 @@ buildFullCatalog()            liest aus window.FIELDS           → V7
 gegen ein belegtes Feld (sagt er, was drinsteht?), gegen ein leeres, und
 einer mit Blick auf die Kostenansage.
 
-### V3 · Belegte Felder nicht still überschreiben — ERLEDIGT (v1764, v1767b)
+### V3 (01.10.) · Belegte Felder nicht still überschreiben — ERLEDIGT (v1764, v1767b)
 
 Marcel: „Wenn die Felder bereits gefüllt sind, gibt er an, was drin steht, und
 ich muss bestätigen, ob übersprungen wird."
@@ -9805,6 +10468,36 @@ stehen vermutlich im zweiten Dokument
 
 ## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
 
+### N1 (29.09.) · ✅ ERLEDIGT — Marcel hat den Preis gesenkt (nachgemessen 12.10.2026)
+
+> **Marcel am 12.10.2026: „also wir haben das doch schon auf 4 euro
+> oder? schau nochmal nach."** Er hat recht, und der Eintrag unten war
+> veraltet.
+>
+> Am **echten Katalog auf Prod** nachgerechnet (`ladeKatalog()` im
+> laufenden Container, nicht `config.js`):
+>
+> ```
+>   Einzelpreise      mpi 0,90   mpi_plus 1,90   wev 3,90
+>
+>   nachkauf_starter   4,00 EUR   5x mpi          Einzelwert  4,50   -0,50  Vorteil
+>   nachkauf_investor  8,75 EUR   5/5/0           Einzelwert 14,00   -5,25  Vorteil
+>   nachkauf_pro      12,50 EUR   5/5/5           Einzelwert 33,50  -21,00  Vorteil
+> ```
+>
+> **Alle drei Pakete sind jetzt guenstiger als der Einzelkauf.** Der
+> Starter traegt eine NEUE Preis-ID (`price_1UKupB…` statt
+> `price_1UCzxM…`) — es wurde also ein neuer Stripe-Preis angelegt, der
+> alte nicht geaendert.
+>
+> **Die Ursache im Code besteht fort und ist kein Defekt:**
+> `config.js:521` leitet den Paketpreis weiter als Monatsbeitrag ÷ 4 ab.
+> Solange der Stripe-Preis gilt (und er gilt — der Katalog kommt von
+> dort), ist das ohne Wirkung. Die Waechterfunktion
+> `_preisplausibilitaet()` bleibt und meldet den naechsten Fall.
+
+**Der ursprüngliche Befund, zur Nachvollziehbarkeit:**
+
 ### N1 · Starter-Nachkauf ist teurer als der Einzelkauf — ENTSCHEIDUNG OFFEN
 
 Gemessen am **echten Stripe-Katalog** (`GET /credits/bewertungen`),
@@ -9833,6 +10526,26 @@ Marcels Entscheidung:
 
 Der Stripe-Konnektor braucht dafür eine neue Anmeldung per `/mcp`.
 
+### N2 (29.09.) · ✅ ERLEDIGT 12.10.2026 — mit dem Prod-Rollout v1951–v2144
+
+> **Der blockierende Satz war: „Der Prod-Pull wurde von der
+> Arbeitsumgebung abgewiesen."** Am 12.10.2026 ist der Rollout gefahren
+> worden (Merge `74841228`), und damit sind beide Stücke live.
+>
+> Auf dem laufenden Prod nachgemessen:
+>
+> ```
+>   0c6cda6 v1669   bmfService.js traegt die Meldung (4 Treffer)
+>   cc28127 v1673   _preisplausibilitaet in bewertungsKatalog.js (2)
+>   beide Commits   Vorfahr von origin/main
+> ```
+>
+> Die Preis-Plausibilität meldet den Starter-Aufschlag beim
+> **Katalog-Abruf**, nicht beim Start — deshalb steht nichts im
+> Startlog, und das ist kein Befund.
+
+**Der ursprüngliche Text:**
+
 ### N2 · Zwei Backend-Fixes liegen auf `main`, der Prod-Pull fehlt
 
 `main` trägt seit `cc28127`:
@@ -9855,7 +10568,7 @@ Zwei Backend-Dateien, **keine Migration, kein Frontend**.
 `tools/rollout-prod.ps1` ist hier das falsche Werkzeug: es MERGED
 staging → main und brächte alle 346 Commits samt Migrationen mit.
 
-### N3 · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
+### N3 (29.09.) · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
 
 Beim Wechsel auf `main` meldete git einen seit einer früheren Sitzung
 stehengebliebenen Sequencer-Zustand:
@@ -9889,7 +10602,7 @@ hier **nicht**.
 > Frage in zehn Sekunden erledigt. **Erst messen, ob es die Aufgabe
 > noch gibt, dann fragen.**
 
-### N4 · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
+### N4 (29.09.) · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
 
 > **Zurückgenommen, 29.09.2026:** Unten stand „**Im Repo existiert keine
 > Gegenstelle**". Das ist falsch. Ich hatte nach den *Dateinamen des
@@ -9975,7 +10688,7 @@ alles") von der Modul-Seite entkoppelt: **ein Modul muss die Rechnung
 nicht mitbringen, nur die Eingaben füllen und `POST /bmf/aufteilung`
 rufen.** Die Rechnung bleibt an der amtlichen Vorlage.
 
-### N5 · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
+### N5 (29.09.) · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
 
 `rnd-calc.js:419-433` wählt **immer die technische Alterswertminderung**,
 solange Alter < GND; das Punktraster ist nur Rückfall.
@@ -10136,6 +10849,20 @@ Die fehlende KPI-Angabe ist behoben (v1654d: `.sc-pill-sub` stand auf
 > eine Rendite, ist aber ein Score-Anteil. Die Demo zeigt beides
 > getrennt. **Das ist eine Produktentscheidung** — vor dem Bauen mit
 > Marcel klären, ob die Kennzahlenzeile die echten Werte tragen soll.
+
+### P3b · ✅ ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> Beide Regeln stehen, jede mit Messprotokoll im Kommentar:
+> `frontend/css/hell-varianten.css:157-159` blendet `#dp-kv-panel` unter
+> 900 px aus (v1652c), `frontend/css/layout-varianten.css:1418-1420`
+> dasselbe für `.dpl-schalter` (v1652d). Dazu `layout-varianten.css:2356`
+> — die Leiste wandert auch auf dem Schreibtisch nach rechts, weil sie
+> dort über dem Nutzerblock lag.
+>
+> Der Punkt bleibt als **Merkposten** stehen: er beschreibt das Muster,
+> nicht die Arbeit. Ein drittes festes Fenster hätte dasselbe Problem.
+
+**Der ursprüngliche Text:**
 
 ### P3b · Zwei Werkzeugfenster, die auf dem Handy im Weg standen
 
@@ -13786,7 +14513,7 @@ entfällt — nicht raten.
         und damit Qualität und Kerosinverbrauch.
      2. **Der Preis war „für den Zustand zu hoch."** Ob und wie der Zustand
         in die Marktmiete eingeht, ist eine fachliche Frage — Marcel ist
-        DESAG-zertifiziert, ich rate hier nicht.
+        DESAG-geprüft, ich rate hier nicht.
    - ~~**Den KI-Knopf nach oben**~~ — **ERLEDIGT `v1241` (`63758ba`).**
      Gemessen: der Knopf saß bei **y = 1178**, am Ende der linken Spalte, bei
      einem Fenster von 725 px. Wer die Miete einträgt, sah ihn erst nach dem
@@ -14981,6 +15708,19 @@ Gutachten der schwerste formale Mangel. Braucht eine mb-Migration.
 
 ### C · REGISTER UND QUELLENREGISTER
 
+### C1 · ✅ ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> `marktbericht/backend/migrations/006_harvest.sql:40` legt
+> `mb.gaa_documents` an (Fremdschlüssel auf `gaa_sources`, Unique auf
+> `url`, Arbeitsindex auf `(status, lauf_typ)`), erweitert um Preis,
+> Bestell-URL und Prüfstand in `007_quellenregister.sql:14-30`.
+>
+> **Und sie wird benutzt:** geschrieben in `HarvestService.js:171`,
+> gelesen in `routes/api.js:179` (die Dokumentzahl je Quelle, die im
+> Admin erscheint) und in `HarvestService.js:441` (Statusstatistik).
+
+**Der ursprüngliche Text:**
+
 #### C1 — Quellenregister in der Datenbank *(Marcels Vorgabe vom 13.09.)*
 
 **Ziel:** Für jeden Ausschuss steht in der Datenbank, **woher** die Zahl kommt —
@@ -15036,6 +15776,30 @@ Vier Regeln, nicht verhandelbar:
 - **Der Link kommt aus der Datenbank**, nicht aus einer Frontend-Konstante —
   sonst gibt es eine zweite Wahrheit neben C1
 
+### C3 · ⚠ TEILS — und der alte Satz war falsch (nachgemessen 12.10.2026)
+
+> **Hier stand: „Heute gibt es dafür im Admin nichts. Kein View, keine
+> Route." Das stimmt nicht.**
+>
+> ```
+>   View    frontend/admin/index.html:384  <section id="view-marktzinsen">
+>           „Marktzinsen & Gutachterausschuss-Daten"
+>   UI      frontend/admin/js/admin-marktzinsen.js
+>           quellenTabelle() :117-156 (Land · Ausschuss · Zugang)
+>           Werte mit „Seite / Zitat aus dem Bericht" :384
+>   Route   backend/src/routes/admin.js:1968 -> _mbCall GET /harvest/status
+>           -> marktbericht routes/api.js:170-194 (quellen, werte, namen)
+> ```
+>
+> **Was wirklich fehlt, ist der zweite Reiter „Bestand":** die Ansicht
+> der Registersätze selbst, filterbar nach Land, Kennzahl, Ausschuss und
+> Berichtsjahr. Belege für den Negativbefund: `register/stand` existiert
+> nur im mb-Container (`api.js:61`) und ist im Haupt-Backend **nicht
+> durchgeschleift** (kein Treffer in `admin.js`); `kennzahl` und
+> `Berichtsjahr` kommen in `admin-marktzinsen.js` **nicht vor**.
+
+**Der ursprüngliche Text:**
+
 #### C3 — Admin-View „Ausschuss-Register"
 
 **Heute gibt es dafür im Admin nichts.** Kein View, keine Route. Der einzige
@@ -15057,6 +15821,31 @@ Drei Fallen (alle schon einmal bezahlt): der Admin-API-Wrapper exportiert
 Und: **die Daten liegen in der mb-DB, der Admin hängt am Haupt-Backend** — der
 Weg führt über den Proxy, und `qstrUser()` ist dort der falsche Pfad.
 **Das gehört bewusst entschieden, nicht nebenbei.** Details in Block 04.
+
+### C4 · ⚠ TEILS — das Register rechnet, aber die Module gewinnen zuerst
+
+> Am Code nachgemessen (12.10.2026),
+> `marktbericht/backend/src/lib/gutachterausschuss.js:689-698`:
+>
+> ```js
+>   export function sachwertfaktor(o) {
+>     const a = zustaendig(ags);
+>     if (a) { … r.herkunft = 'modul'; return r; }     <- Modul zuerst
+>     const ausRegister = ausRegisterRechnen(o, ags);   <- Register danach
+> ```
+>
+> **Der Registerweg ist vollständig gebaut** — `ausRegisterRechnen()`
+> (`:506 ff.`) siebt Ebenen, löst Lageklassen auf, wählt Zweig und
+> Baujahrgruppe und rechnet über `swf_modelle.auswerten()`, mit
+> `herkunft: 'register'` und Modellvermerk. Lüdenscheid, Höxter und der
+> Märkische Kreis liegen im Register.
+>
+> **Nicht vollzogen ist der letzte Schritt von C4:** „`sachwertfaktor()`
+> auf das Register umstellen, die zwei Module als Rückfall". Im Code ist
+> es umgekehrt — für Minden-Lübbecke (AGS 05770) und Herford (05758)
+> wird das Register **nie** gefragt.
+
+**Der ursprüngliche Text:**
 
 #### C4 — Sachwertfaktoren ins Register
 
@@ -15309,8 +16098,8 @@ Bundesland erreichbar.
 System oben deckt beide Kennzahlen über alle Ausschüsse. Kein anderes
 Bundesland bietet so viel hinter einer einzigen, freien Lizenz — Hamburg
 eingeschlossen.
- . 
- . 
+
+
 ##### Das Modell ist entschlüsselt — gemessen am Dashboard
 
 **Die Bauform steht fest:**
@@ -15411,8 +16200,8 @@ trägt er, fällt die Handarbeit weg.
 
 **Nicht vergessen:** der Quellenvermerk gehört in denselben Arbeitsgang
 (A2). Ohne ihn darf keine dieser Zahlen in einen Kundenbericht.
- . 
- . #### E3 — Die Regeln, die bei jeder Ernte gelten
+
+#### E3 — Die Regeln, die bei jeder Ernte gelten
 
 - **Lizenz und Inhaltsverzeichnis im ERSTEN Abruf zusammen lesen.** *Kiels
   Daten wären lesbar gewesen; die Lizenzprüfung kam zu spät.*
@@ -15449,7 +16238,25 @@ Vollständiger Ablauf: Block 04, Abschnitt „Wie die Ernte abläuft".
 | **F4** | **Drei einzelne Seiten:** Hamm (S. 64/65), Krefeld (S. 66), Kreis Unna (Kap. 8.1) | drei NRW-Sachwertfaktoren, Tabellen sind geerntet und geprüft |
 | **F5** | **Entscheidung: RLP-Landesbericht kaufen?** ✅ **Preis bestätigt 14.09.2026: 150 € PDF** (200 Druck, 300 kombiniert, LVermGeo-GeoShop) — die frühere Spanne „150 gegen 28" ist damit erledigt. Inhalt am Verzeichnis belegt: **fünf** Objektarten-Gruppen Sachwertfaktoren (4.2.2 bis 4.2.6) **plus** Liegenschaftszinssätze (4.3). Offen bleibt **nur** die Lizenz: „Vervielfältigung nur mit Erlaubnis", aber „Wiedergabe von Daten jedweder Art … mit Quellenangabe gestattet" — zwei Sätze, die verschieden weit gehen. Einzelheiten unter **F5** weiter unten | **ein Bundesland, 4,1 Mio Einwohner, beide Kennzahlen** |
 
-#### F5 · KAUFENTSCHEIDUNG: Landesgrundstücksmarktbericht RLP, 150 € **[NEU 14.09.2026]**
+#### F5 (12.09.) · ⏸ ZURÜCKGESTELLT 12.10.2026 — Landesgrundstücksmarktbericht RLP, 150 €
+
+> **Marcels Entscheidung am 12.10.2026: „wir kaufen den bericht erst
+> nicht aber bitte weis mich drauf hin wenn wir das nächste mal
+> ernten."**
+>
+> Also **nicht gekauft, aber nicht verworfen.** Die Vorlage unten bleibt
+> vollständig stehen — sie ist am Inhaltsverzeichnis des kostenfreien
+> Auszugs belegt und veraltet nicht so schnell wie eine Preisangabe.
+>
+> **⚠ WIEDERVORLAGE: beim nächsten Erntelauf.** Wer eine Ernte für ein
+> weiteres Bundesland plant, prüft zuerst diesen Punkt — 150 € für
+> 4,1 Mio Einwohner mit beiden Kennzahlen in EINEM Dokument ist der
+> beste Schnitt, den die Ernte bisher gefunden hat. Vor dem Kauf die
+> **Lizenz klären**, nicht vermuten: das Impressum verbietet
+> „Digitalisieren, Scannen sowie Speicherung auf Datenträgern" ohne
+> Erlaubnis des Herausgebers.
+
+#### F5 (12.09.) · KAUFENTSCHEIDUNG: Landesgrundstücksmarktbericht RLP, 150 € **[NEU 14.09.2026]**
 
 **Das ist die klarste Kaufvorlage, die die Ernte bisher hervorgebracht hat** —
 und das Gegenstück zur Bayern-Empfehlung („nicht kaufen").
@@ -15574,10 +16381,10 @@ Damit es niemand für gemessen hält:
   Rauschdaten), aber nie gegen echte Daten gelaufen
 - **`market=seed`** — ein Etikett, kein Befund (D)
 - **Der Preis des RLP-Landesberichts**
- . 
- . '---' . 
- . 
- . ## Fertig
+
+---
+
+## Fertig
 
 ### Alle Anlage-V-Zeilen zugeordnet, Halterangaben aufs PDF — `v1220`/`v1221`, 03.09.2026
 

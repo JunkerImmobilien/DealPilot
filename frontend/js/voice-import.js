@@ -94,6 +94,8 @@
     bankval: 'Bankbewertung in Euro', svwert: 'Marktwert/Verkehrswert in Euro',
     makrolage: 'Makrolage (Stadt/Region, Wirtschaft, Infrastruktur)',
     mikrolage: 'Mikrolage (Viertel, Strasse, Umfeld)',
+    /* v2159 · N62.11 */
+    lageklasse: 'Lageklasse des Investors: A (Toplage, beste Lage), B (solide, mittlere Lage) oder C (Randlage, einfache Lage). Nur setzen, wenn ausdruecklich A-, B- oder C-Lage gesagt wird',
     vermstand: 'Vermietungsstand', exitstr: 'Exit-Strategie',
     kp: 'Kaufpreis in Euro', makler_p: 'Maklerprovision in Prozent', notar_p: 'Notarkosten in Prozent',
     gba_p: 'Grundbuchamt in Prozent', gest_p: 'Grunderwerbsteuer in Prozent',
@@ -1345,6 +1347,7 @@
     { id:'mikrolage',  g:4, frage:'Wie ist die Straße?', label:'Mikrolage', kw:['mikrolage','mikro','viertel','umfeld'] },
     { id:'ds2_zustand',g:4, frage:'In welchem Zustand?',  label:'Zustand',   kw:['zustand'] },
     { id:'ds2_energie',g:4, label:'Energieklasse',       kw:['energie','energieklasse','effizienz'] },
+    { id:'lageklasse', g:4, label:'Lageklasse',          kw:['lageklasse','a-lage','b-lage','c-lage','toplage'] },  /* v2159 */
 
     { id:'ds2_nachfrage',    g:5, noc:1, label:'Nachfrage',           kw:['nachfrage'] },
     { id:'ds2_bevoelkerung', g:5, noc:1, label:'Bevölkerung',        kw:['bevoelkerung','einwohner'] },
@@ -1378,7 +1381,8 @@
   /* v517: Quick-Check-Felder (= Keys aus object-actions OBJ2QC + ze_*). Im QC
      zeigt die Chip-Wolke NUR diese; Objekt-Modus = volle WL (zwei Sessions). */
   var QC_IDS = ['str','hnr','plz','ort','wfl','baujahr','zimmer','objart','kp','nkm',
-    'hg_ul','ek','ds2_energie','stellpl_aussen','d1z','d1t','ze_stp','ze_kueche','ze_sonst'];
+    'hg_ul','ek','ds2_energie','stellpl_aussen','d1z','d1t','ze_stp','ze_kueche','ze_sonst',
+    'lageklasse'];  /* v2159 · N62.11: diktierte Lage ueberschreibt die Vorgabe im Quick-Check */
 
   /* v521: Kurz-Erklaerungen fuer Tooltips (Maus ueber Chip). Fallback = Label. */
   var EXPLAIN = {
@@ -2802,6 +2806,10 @@
        Stufen stehen IN der Frage — wir bewerten danach, also soll der
        Nutzer sie kennen, statt Freitext zu raten (v1288, Backlog-Punkt 2).
        `abruf` heisst: das kann der Co-Pilot selbst holen. */
+    /* v2159 · N62.11 — die Lageklasse. Steht eine Standardklasse im Profil,
+       wird sie ANGEBOTEN (profil: 'lage'), nie still genommen. */
+    { et: 3, ids: ['lageklasse'],                   rang: 12, skalen: 1, profil: 'lage',
+      frage: 'In welcher Lageklasse siehst du das Objekt — A, B oder C?' },
     { et: 3, ids: ['makrolage', 'mikrolage'],       rang: 12, skalen: 1, abruf: 'lage',
       frage: 'Wie schätzt du die Lage ein — erst die Region, dann die Straße?' },
     { et: 3, ids: ['ds2_zustand', 'ds2_energie'],   rang: 12, skalen: 1, nachArt: 1,
@@ -3395,6 +3403,14 @@
      schon steht. Dasselbe gilt fuer die Nebenkosten in Euro. */
   function _rfProfilVorschlag(eintrag) {
     if (!eintrag || !eintrag.profil) return null;
+    if (eintrag.profil === 'lage') {   /* v2159 · eigener Speicher, nicht das Investmentprofil */
+      try {
+        var LP = window.DealPilotLageProfil;
+        var k = (LP && LP.standard) ? LP.standard() : null;
+        if (!k) return null;
+        return { werte: { lageklasse: k }, text: (LP.ETIKETT[k] ? LP.ETIKETT[k].name : k + '-Lage') + ' (dein Standard)' };
+      } catch (e) { return null; }
+    }
     var P = window.DealPilotInvestmentProfile;
     if (!P || typeof P.get !== 'function') return null;
     try {
