@@ -587,7 +587,7 @@
     var css = [
       '.hkv{border:1px solid rgba(0,0,0,.09);border-radius:12px;margin:0 0 16px;overflow:hidden;background:#fff}',
       '.hkv-h{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.09)}',
-      '.hkv-ic{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8CC7A,#C9A84C);border:1px solid rgba(201,168,76,.5)}',
+      '.hkv-ic{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8CC7A,#C9A84C);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent)}',
       '.hkv-ic svg{width:18px;height:18px;stroke:#1c1502;fill:none;stroke-width:1.8}',
       '.hkv-h .t{font:700 14px Inter,system-ui,sans-serif;color:#1b1815}',
       '.hkv-h .s{font-size:11px;color:#6f675b;margin-top:1px}',
@@ -601,7 +601,7 @@
       '.hkv-cap{grid-column:1/-1;font-size:10.5px;color:#6f675b;padding-left:117px;margin-top:-3px}',
       '.hkv-duo{display:grid;grid-template-columns:1fr 1fr;gap:13px}',
       '.hkv-col{border:1px solid rgba(0,0,0,.09);border-radius:9px;padding:12px 14px;background:#faf7f0}',
-      '.hkv-col.acc{border-color:rgba(201,168,76,.4)}',
+      '.hkv-col.acc{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}',
       '.hkv-col .k{font:700 10px "DM Sans",sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#9a7f33}',
       '.hkv-col .v{font:700 25px "Cormorant Garamond",Georgia,serif;margin-top:2px;color:#1b1815}',
       '.hkv-col .d{font-size:10.5px;color:#6f675b;margin-top:2px}',
@@ -643,7 +643,7 @@
       + '<div class="hkv-seg">'
       + '<div class="sg" style="background:rgba(63,165,108,.20)"><div class="r" style="color:#2f8f57">85\u2013100</div><div class="l" style="color:#2f8f57">Sehr gut</div></div>'
       + '<div class="sg" style="background:rgba(63,165,108,.10)"><div class="r" style="color:#2f8f57">70\u201384</div><div class="l" style="color:#2f8f57">Gut</div></div>'
-      + '<div class="sg" style="background:rgba(201,168,76,.18)"><div class="r" style="color:#9a7f33">50\u201369</div><div class="l" style="color:#9a7f33">Solide</div></div>'
+      + '<div class="sg" style="background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent)"><div class="r" style="color:#9a7f33">50\u201369</div><div class="l" style="color:#9a7f33">Solide</div></div>'
       + '<div class="sg" style="background:rgba(201,140,60,.16)"><div class="r" style="color:#b5742a">35\u201349</div><div class="l" style="color:#b5742a">Schwach</div></div>'
       + '<div class="sg" style="background:rgba(184,98,92,.15)"><div class="r" style="color:#a8514a">0\u201334</div><div class="l" style="color:#a8514a">Kritisch</div></div>'
       + '</div></div></div>';
@@ -668,7 +668,7 @@
         + '.hab .kn{display:flex;flex-direction:column;gap:8px}'
         + '.hab button{border:0;border-radius:10px;padding:10px 14px;font:600 13px "Space Grotesk",sans-serif;cursor:pointer;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407;white-space:nowrap}'
         + '.hab button.z{background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-e8cc7a, #E8CC7A)}'
-        + '.hab .l{fill:none;stroke:rgba(201,168,76,.5);stroke-width:2;stroke-dasharray:4 6;animation:hab-f 1s linear infinite}'
+        + '.hab .l{fill:none;stroke:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);stroke-width:2;stroke-dasharray:4 6;animation:hab-f 1s linear infinite}'
         + '.hab rect{fill:#1f1b16;stroke:var(--wl-c9a84c, #C9A84C);stroke-width:1.2}.hab text{fill:#efe7d4;font:600 10px Inter,sans-serif}'
         + '.hab .fl{fill:var(--wl-e8cc7a, #E8CC7A)}'
         + '@keyframes hab-f{to{stroke-dashoffset:-10}}'

@@ -33282,7 +33282,7 @@ body.hdr-banner-only .hdr-v61-row2 {
    nicht: er ordnet ein. Die Fussnote traegt die ImmoWertV-Einordnung
    und darf nie wegfallen. */
 .dp-pa-herk{font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3);opacity:.9}
-.dp-pa-abgl{border-color:var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.055)}
+.dp-pa-abgl{border-color:var(--wl-c9a84c,#C9A84C);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5.5%, transparent)}
 .dp-pa-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(140,134,120,.26);font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3)}
 /* v2157 · Lage-Gegenueberstellung (N62.4). Status-Farben bewusst NICHT tokenisiert. */
 .dp-pa-ggs-row{padding:10px 0;border-top:1px solid rgba(140,134,120,.20)}
@@ -38206,7 +38206,7 @@ button.btn-brw.brw-veraltet::after {
   color: var(--wl-b8932f, #b8932f);
 }
 .plan-einzel-row .pm-menge-b:hover:not(:disabled),
-.plan-menge-zeile .pm-menge-b:hover:not(:disabled) { background: var(--wl-c9a84c, rgba(201,168,76,.22)); }
+.plan-menge-zeile .pm-menge-b:hover:not(:disabled) { background: var(--wl-c9a84c, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)); }
 .plan-einzel-row .pm-menge-b:disabled,
 .plan-menge-zeile .pm-menge-b:disabled { opacity: .3; cursor: default; }
 .plan-einzel-row .pm-menge-n,
@@ -39428,7 +39428,7 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   .dp-pf-scroll::-webkit-scrollbar-thumb {
     background: var(--wl-c9a84c, #C9A84C); border-radius: 99px;
   }
-  /* v1892b · Hier stand `rgba(201, 168, 76, .14)`. Das ist Gold in ZAHLENFORM und faerbt sich
+  /* v1892b · Hier stand `color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent)`. Das ist Gold in ZAHLENFORM und faerbt sich
      beim Mandanten genauso wenig um wie ein Hex - gold-audit.py hat es sofort gemeldet
      ("css/style.css 0 -> 1, Datei war sauber"). Derselbe Griff danebenn wie in v1699e. */
   .dp-pf-scroll::-webkit-scrollbar-track {
@@ -40821,7 +40821,7 @@ html[data-dp-verify="1"] .body{
    Gemessen: inaktiver Text var(--dp-ink-30) ist im hellen Skin hellgrau auf Creme.
    Der Schalter traegt jetzt seinen EIGENEN dunklen Grund - lesbar in jedem Skin. */
 .ank-wahl{display:inline-flex;gap:3px;padding:3px;border-radius:9px;
-  background:#141210;border:1px solid rgba(201,168,76,.35)}
+  background:#141210;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)}
 .ank-seg{border:0;background:transparent;padding:6px 12px;border-radius:7px;cursor:pointer;
   font:600 12px/1.2 Inter,system-ui,sans-serif;color:#D6CFBF;white-space:nowrap}
 .ank-seg:hover{color:#FDFCFA}

@@ -345,7 +345,7 @@
        verliert gegen die Blätter, die im BODY hängen. */
     if (Array.isArray(a.ansprechpartner) && a.ansprechpartner.length) {
       var _S_BOX = 'margin-top:9px;padding:8px 10px;border-radius:8px;'
-        + 'background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.28)';
+        + 'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent)';
       var _S_ZEILE = 'font-size:12.5px;line-height:1.5';
       var _S_KLEIN = 'font-size:12px;color:#6f6960';
       t += '<div style="' + _S_BOX + '">'
