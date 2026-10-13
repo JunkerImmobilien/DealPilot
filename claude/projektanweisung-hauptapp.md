@@ -38614,6 +38614,12 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
+
+- **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).
+- **v2185** `2078e762`, **Prod (10)** `e239f6a8`: Faktor **1,60** für Stichtage ab 01.01.2026. Zwei Fachquellen übereinstimmend: Verwaltung 367 €/Wohnung bzw. EFH/ZFH, 439 €/ETW, 48 €/Garage, Instandhaltung 14,40 €/m² ([immobilien-wertermittlung.de](https://www.immobilien-wertermittlung.de/news_detail?id=10), [abels-immobilienbewertung.com](https://www.abels-immobilienbewertung.com/post/neue-bewirtschaftungskosten-2026-instandhaltungskosten-und-verwaltungskosten-ab-dem-01-01-2026)); gegen 230/275/30/9,00 jedes Mal 1,596–1,600. **Kein amtliches Schreiben gefunden.** Staging-Konto von 1,30 auf 1,60 nachgezogen. Probelauf 7/7.
+- **BEFUND, NICHT GEÄNDERT:** der Marktbericht rechnet im Ertragswert (außerhalb des NRW-Modells, `ErtragswertService.js:360–386`) mit den UNfortgeschriebenen 230 €/9,00 € — 2026 rund 37 % zu niedrige Bewirtschaftungskosten, Ertragswert zu hoch. Er warnt selbst („nicht indexiert … vorläufig"). Bewertungsfrage (§ 10: Ansätze des Gutachterausschusses bei der Ableitung des Zinssatzes) → Marcel, Backlog N62.21.
+
 ### Prod (8) v2182 · v2183 Demo · v2184 Bewirtschaftung je Objektart (13.10.2026, Staging)
 
 - **Prod (8)** `b7c21e8f`: v2182 (Tour scrollt zu Zielen im iframe), nur Frontend.
