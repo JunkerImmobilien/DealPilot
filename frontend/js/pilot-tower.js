@@ -468,7 +468,19 @@
      die Antwort zeigen." Der beste Treffer steht als Antwort OBEN, ohne
      Klick; die Liste darunter hält die übrigen. Enter fragt die KI —
      ihre Antwort ersetzt die Sofort-Antwort an derselben Stelle. */
-  var _kiLaeuft = false, _sofortT = null;
+  /* v2189f · Marcel, 13.10.2026: „vielleicht die Fragen auch an die KI
+     schicken? Kriegen wir dann bessere Antworten in der Hilfe?" Eine FRAGE
+     (endet auf ?, beginnt mit einem Fragewort, oder hat mindestens fünf
+     Wörter) geht nach einer Tipp-Pause von selbst an die KI. Ein Stichwort
+     wie „DSCR" nicht - sonst kostet jedes Wort einen Abruf vom Tageslimit. */
+  function istFrage(q) {
+    q = String(q || '').trim().toLowerCase();
+    if (q.length < 8) return false;
+    if (/\?$/.test(q)) return true;
+    if (/^(wie|was|warum|wieso|weshalb|wo|wann|welche|welcher|welches|kann|muss|soll|darf|gibt|ist|sind|lohnt|brauche|wer)\s/.test(q)) return true;
+    return q.split(/\s+/).length >= 5;
+  }
+  var _kiLaeuft = false, _sofortT = null, _autoT = null, _autoZuletzt = '';
   function sofort(q) {
     if (_kiLaeuft) return;
     clearTimeout(_sofortT);
@@ -479,6 +491,12 @@
       if (!e) { box.innerHTML = '<div class="antw"><div class="q">Keine Sofort-Antwort</div>In Hilfe, Feldern und Abläufen steht dazu nichts. Drück Enter — dann fragt der Pilot die KI.</div>'; return; }
       antworte(e, true);
     }, 140);
+    clearTimeout(_autoT);
+    if (istFrage(q)) _autoT = setTimeout(function () {
+      var inp = tower.querySelector('.frage');
+      if (!inp || inp.value !== q || _kiLaeuft || q === _autoZuletzt) return;
+      _autoZuletzt = q; fragen();
+    }, 1400);
   }
   function waehle(i) {
     var lis = tower.querySelectorAll('ul.tr li[data-i]'); if (!lis.length) return;

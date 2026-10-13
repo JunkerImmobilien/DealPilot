@@ -1121,6 +1121,28 @@
     return _norm(q).split(' ').filter(function (w) { return w.length >= 3 && _FUELL.indexOf(' ' + w + ' ') < 0; }).map(_formen);
   }
   function _trifft(text, formen) { for (var i = 0; i < formen.length; i++) if (text.indexOf(formen[i]) >= 0) return true; return false; }
+  /* v2189f · Marcel, 13.10.2026: „vielleicht die Fragen auch an die KI
+     schicken? Kriegen wir dann bessere Antworten in der Hilfe?" Eine FRAGE
+     (endet auf ?, beginnt mit einem Fragewort, oder hat mindestens fünf
+     Wörter) geht nach einer Tipp-Pause von selbst an die KI. Ein Stichwort
+     wie „DSCR" nicht - sonst kostet jedes Wort einen Abruf vom Tageslimit. */
+  function istFrage(q) {
+    q = String(q || '').trim().toLowerCase();
+    if (q.length < 8) return false;
+    if (/\?$/.test(q)) return true;
+    if (/^(wie|was|warum|wieso|weshalb|wo|wann|welche|welcher|welches|kann|muss|soll|darf|gibt|ist|sind|lohnt|brauche|wer)\s/.test(q)) return true;
+    return q.split(/\s+/).length >= 5;
+  }
+  var _autoT = null, _autoZuletzt = '';
+  function _autoKi(roh) {
+    clearTimeout(_autoT);
+    if (!istFrage(roh)) return;
+    _autoT = setTimeout(function () {
+      var inp = document.getElementById('help-search-input');
+      if (!inp || inp.value.trim() !== roh || roh === _autoZuletzt) return;
+      _autoZuletzt = roh; helpKiOben();
+    }, 1400);
+  }
   function _onSearch(e) {
     var roh = (e.target.value || '').trim();
     var q = roh.toLowerCase();
@@ -1151,6 +1173,7 @@
           return '<button type="button" onclick="DealPilotAtlas.oeffne(\'' + a.ziel.atlas + '\',\'' + a.ziel.station + '\')">' + _escHtml(a.t) + '</button>';
         }).join('') + '</span>' : '')
       + '</div><div id="help-ki-oben"></div>';
+    _autoKi(roh);
     if (!hits.length) {
       c.innerHTML = html + '<div class="help-empty">' +
         '<h2>Keine Treffer für „' + _escHtml(roh) + '“</h2>' +
