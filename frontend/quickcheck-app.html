@@ -3446,13 +3446,13 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
     <div class="row row-adr">
       <div class="field">
-        <label for="qc_str">Straße</label>
+        <label class="req" for="qc_str">Straße</label>
         <input type="text" id="qc_str" placeholder="Dresdenstraße" autocomplete="off">
         <span class="source">PDF-Import</span>
       </div>
       <div class="field">
         <label for="qc_hnr">Hausnr.</label>
-        <input type="text" id="qc_hnr" placeholder="116" autocomplete="off">
+        <input type="text" id="qc_hnr" placeholder="116 · optional" autocomplete="off">
         <span class="source">PDF</span>
       </div>
       <div class="field">
@@ -3800,7 +3800,8 @@ const QcIcons = (function() {
 const QcEngine = (function() {
   const FIELDS = [
     { id: 'plz', required: true }, { id: 'ort', required: true },
-    { id: 'str', required: false }, { id: 'hnr', required: false },
+    /* v2190 · Marcel 13.10.2026: Strasse wird Pflicht (wie in Stufe 1 des Marktberichts, objekt-reiter.js pflichtFuer). Die Hausnummer bleibt frei - viele Inserate veroeffentlichen keine; die Lage bezieht sich dann auf die Strasse. */
+    { id: 'str', required: true }, { id: 'hnr', required: false },
     { id: 'objektart', required: false }, { id: 'wfl', required: true },
     { id: 'bj', required: false }, { id: 'zimmer', required: false },
     { id: 'energieklasse', required: false }, { id: 'stellplatz', required: false },
@@ -7345,10 +7346,10 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 <script>
 (function () {
   'use strict';
-  /* Die neun Pflichtfelder — ausgelesen aus den `.field`-Bloecken, die einen
+  /* Die zehn Pflichtfelder (v2190: Strasse dazu) — ausgelesen aus den `.field`-Bloecken, die einen
      `<span class="req">` tragen. Wer ein zehntes ergaenzt, traegt es hier nach;
      die Liste steht bewusst sichtbar und wird nicht geraten. */
-  var PFLICHT = ['qc_plz', 'qc_ort', 'qc_wfl', 'qc_hg', 'qc_hg_split',
+  var PFLICHT = ['qc_str', 'qc_plz', 'qc_ort', 'qc_wfl', 'qc_hg', 'qc_hg_split',
                  'qc_kp', 'qc_ek', 'qc_zins', 'qc_tilg'];
 
   var ROT = '#B8625C';

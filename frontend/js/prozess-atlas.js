@@ -36,7 +36,7 @@
       knoten: [
         { id: 'qc1', s: 0, z: 0, t: 'Inserat erfassen', k: 'Quick-Check',
           d: 'Adresse, Fläche, Miete, Hausgeld und Finanzierung — mehr braucht der Quick-Check nicht. Der Score rechnet live mit, während du tippst.',
-          unter: [['Adresse', 'PLZ und Ort sind Pflicht, Straße und Hausnummer helfen der Marktbewertung.'], ['Objektdaten', 'Objektart, Wohnfläche, Baujahr, Lageklasse A/B/C.'], ['Miete und Hausgeld', 'Nettokaltmiete gesamt, Hausgeld und der nicht umlagefähige Anteil.'], ['Finanzierung', 'Beleihung, Kaufpreis, Eigenkapital, Zins, Tilgung.']],
+          unter: [['Adresse', 'Straße, PLZ und Ort sind Pflicht. Die Hausnummer ist frei — fehlt sie, bezieht sich die Lage auf die Straße.'], ['Objektdaten', 'Objektart, Wohnfläche, Baujahr, Lageklasse A/B/C.'], ['Miete und Hausgeld', 'Nettokaltmiete gesamt, Hausgeld und der nicht umlagefähige Anteil.'], ['Finanzierung', 'Beleihung, Kaufpreis, Eigenkapital, Zins, Tilgung.']],
           ein: ['PLZ', 'Ort', 'Wohnfläche', 'Nettokaltmiete', 'Hausgeld', 'Kaufpreis', 'Eigenkapital', 'Zins', 'Tilgung'],
           aus: ['Quick Check Score', 'Fünf Teilscores', 'KPI-Leiste mit Zielwerten'],
           ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:QUICK CHECK SCORE' },
@@ -87,7 +87,7 @@
       id: 'quickcheck', name: 'Quick-Check', sub: 'Ein Inserat in einer Minute einordnen — und nur übernehmen, was taugt',
       spalten: ['Eingeben', 'Bewerten', 'Entscheiden'],
       knoten: [
-        { id: 'q1', s: 0, z: 0, t: 'Adresse', k: 'PLZ · Ort Pflicht', d: 'Straße und Hausnummer sind freiwillig, machen die Marktbewertung aber genauer.', ein: ['Straße', 'Hausnr.', 'PLZ', 'Ort'], aus: ['Standort'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Adresse' },
+        { id: 'q1', s: 0, z: 0, t: 'Adresse', k: 'Straße · PLZ · Ort Pflicht', d: 'Die Hausnummer ist freiwillig — viele Inserate nennen keine. Fehlt sie, bezieht sich die Lage auf die Straße.', ein: ['Straße', 'Hausnr.', 'PLZ', 'Ort'], aus: ['Standort'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Adresse' },
         { id: 'q2', s: 0, z: 1, t: 'Objekt und Miete', k: 'Wohnfläche · Nettokaltmiete', d: 'Objektart, Fläche, Baujahr, Lageklasse — und die Mieteinnahmen je Monat. Die Lageklasse bestimmt deine Zielrendite.', ein: ['Objektart', 'Wohnfläche', 'Baujahr', 'Lageklasse', 'Grundmiete', 'Stellplatz'], aus: ['Nettokaltmiete gesamt'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Mieteinnahmen' },
         { id: 'q3', s: 0, z: 2, t: 'Kosten und Geld', k: 'Hausgeld · Finanzierung', d: 'Hausgeld je Monat und der nicht umlagefähige Anteil (Vorgabe 22 %). Dazu Beleihung, Kaufpreis, Eigenkapital, Zins und Tilgung.', ein: ['Hausgeld', 'nicht umlagefähig %', 'Kaufpreis', 'Eigenkapital', 'Zins', 'Tilgung'], aus: ['Kapitaldienst'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Bewirtschaftungskosten' },
         { id: 'q4', s: 1, z: 0, t: 'Score live', k: 'fünf Teilscores', d: 'Rendite, Cashflow, LTV, Risiko, Potenzial — je von 100, dazu der Ring mit dem Gesamtscore. Er rechnet bei jeder Eingabe neu.', gew: [['Rendite', 0], ['Cashflow', 0], ['LTV', 0], ['Risiko', 0], ['Potenzial', 0]], aus: ['Quick Check Score'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/quick-check.js:kennzahlenAmpel' },
