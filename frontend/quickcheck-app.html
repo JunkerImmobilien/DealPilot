@@ -3842,7 +3842,13 @@ const QcEngine = (function() {
   }
   function completeness(inputs) {
     const missing = [];
-    FIELDS.forEach(f => { if (f.required && !inputs[f.id]) missing.push(f); });
+    /* v2199 · Ein Inserat ohne veroeffentlichte Anschrift (ImmoMetrica, 6 von 7
+       Favoriten am 13.10.2026) hat keine Strasse - die Pflicht aus v2190 haette
+       Score und Speichern dann dauerhaft gesperrt. Markiert der Import das Feld
+       als "Ortskern", gilt sie als erfuellt (Marcels Entscheidung v1999: der
+       Ortskern wird genommen und steht sichtbar dabei). */
+    const _ok = (id) => { const e = document.getElementById('qc_' + id); return !!(e && e.dataset && e.dataset.ortskern === '1'); };
+    FIELDS.forEach(f => { if (f.required && !inputs[f.id] && !(f.id === 'str' && _ok('str'))) missing.push(f); });
     return { missing, hasAllRequired: missing.length === 0 };
   }
   function hasFullAddress(inputs) { return !!(inputs.plz && inputs.ort && inputs.str && inputs.hnr); }
@@ -6240,7 +6246,7 @@ function renderTransferList() {
           await new Promise(function(resolve){
             try {
               if (window.parent && window.parent.ImmoMetricaImport) {
-                window.parent.ImmoMetricaImport.open(function(picked){ try { if (window.ImmoMetricaQcFill) window.ImmoMetricaQcFill(picked); } catch(e){} resolve(); }, { target:'qc', onClose:function(){ resolve(); } });
+                window.parent.ImmoMetricaImport.open(function(picked){ try { if (window.ImmoMetricaQcFill) window.ImmoMetricaQcFill(picked); } catch(e){} resolve(); }, { target:'qc', onClose:function(){ resolve(); }, feld:function(id){ var e=document.getElementById('qc_'+id); return e ? e.value : ''; } });
               } else { resolve(); }
             } catch(e){ resolve(); }
           });
@@ -6721,7 +6727,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
   <script src="js/dealpilot-mb-qc.js?v=v2192a"></script>
-  <script src="js/immometrica-qc.js?v=v2149"></script>
+  <script src="js/immometrica-qc.js?v=v2199"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">
 html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !important; }
@@ -7227,6 +7233,30 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
   border-color:var(--wl-c9a84c, #C9A84C) !important;
   background:#FFFDF8 !important;
 }
+/* v2199 · Dasselbe fuer "buetten". Marcel 13.10.2026: "Exposé, Marktbericht,
+   Sprache und ImmoMetrica, das kann man nicht lesen. Das ist ein sehr dunkles
+   Grau." Gemessen: Schrift #2A2418 (Buetten-Regel aus datenaufnahme.css) auf
+   Grund #0A0A0A (Z. ~3196 `#qc7-sources .dp-pf-tile.tool` mit ID) - der Grund
+   kam von der einen, die Schrift von der anderen Schicht. Im Objekt-Tab ist
+   die Kachel #FFFDF7 mit #2A2418; das gilt jetzt auch hier. */
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile,
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile.tool,
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile.on{
+  background:#FFFDF7 !important;
+  color:#2A2418 !important;
+  border:0 !important;
+  box-shadow:inset 0 0 0 1px rgba(150,132,96,.24),
+             inset 0 1px 0 rgba(255,255,255,.9),
+             0 1px 2px rgba(120,100,60,.14) !important;
+}
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile.on,
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile:has(input:checked){
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--wl-b8932f, #b8932f) 70%, transparent),
+             inset 0 2px 4px rgba(150,120,50,.18) !important;
+}
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile .dp-pf-lbl{ color:#2A2418 !important; }
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile .dp-pf-ic,
+html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile .dp-pf-ic svg{ color:#9A8B62 !important; stroke:currentColor !important; }
 
 /* ── v1682 · DER ABRUF-KNOPF HAELT SEINEN PLATZ SELBST ──────────────
    Gemessen gegen den Objekt-Tab:
@@ -7250,6 +7280,28 @@ html[data-dp-kartenstil="kartei"] #qc7-sources .dp-pf-tile.on{
 #qc7-sources.dp-pfbar .dp-pf-rz{
   margin-left:auto !important;
   border-bottom:0 !important;
+}
+/* v2199 · Marcel 13.10.2026: "der Barcode an der Seite, wo Abrufen draufsteht,
+   ist sehr schmal ... koennte groesser sein und je nach Handy/Tablet kleiner".
+   Gemessen (1280 px): Reisszone 99x78, Strichcode absolut mit inset 5/12 als
+   73x67-Kasten HINTER dem 85x34-Knopf - sichtbar blieben nur zwei Streifen
+   oben und unten. Jetzt steht er als eigener Streifen UEBER dem Knopf, im
+   Fluss statt darunter; die Groesse folgt der Bildschirmbreite. Unter 641 px
+   bleibt er ausgeblendet (v636, Platz fuer den vollbreiten Knopf). */
+@media (min-width:641px){
+  #qc7-sources.dp-pfbar .dp-pf-rz{
+    flex-direction:column !important; justify-content:center !important; align-items:stretch !important;
+    gap:6px !important; padding:8px 14px !important; min-width:136px !important;
+  }
+  #qc7-sources.dp-pfbar .dp-pf-rz .dp-pf-bc{
+    position:static !important; inset:auto !important; display:block !important;
+    width:100% !important; height:24px !important; flex:0 0 auto !important; opacity:.85 !important;
+  }
+  #qc7-sources.dp-pfbar .dp-pf-rz .dp-pf-launch{ margin:0 !important; align-self:stretch !important; justify-content:center !important; }
+}
+@media (min-width:641px) and (max-width:1100px){
+  #qc7-sources.dp-pfbar .dp-pf-rz{ min-width:112px !important; padding:7px 10px !important; gap:5px !important; }
+  #qc7-sources.dp-pfbar .dp-pf-rz .dp-pf-bc{ height:18px !important; }
 }
 
 /* ── v1685 · BEI „HEUTE" ZEIGT DAS QUICKBOARDING DASSELBE ───────────
@@ -7394,6 +7446,7 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
   function leer(el) {
     if (!el) return false;
     var v = (el.value == null ? '' : String(el.value)).trim();
+    if (v === '' && el.id === 'qc_str' && el.dataset && el.dataset.ortskern === '1') return false;   /* v2199 Ortskern */
     if (v === '') return true;
     /* Eine 0 ist bei Kaufpreis, Wohnflaeche und Hausgeld keine Angabe,
        sondern eine fehlende. Beim Eigenkapital und bei der Tilgung dagegen

@@ -296,12 +296,23 @@ function parseAddr(it) {
        dass der Bodenrichtwert vom Ortsmittelpunkt kommen muss. */
     return { plz, str: '', hnr: '', ort };
   }
-  if (raw.includes(',')) {
+  /* v2199 · Marcel 13.10.2026: "Da steht PLZ 32602, das passt, und unter
+     Strasse steht dann auch 32602." Gemessen kam "32602, Vlotho" - der
+     Komma-Zweig nahm links IMMER eine Strasse an, also wurde die PLZ zur
+     Strasse und der Ort blieb leer. Steht links nur eine PLZ (oder
+     "PLZ Ort"), gibt es keine Strasse; der Ort steht dann rechts. */
+  const linksPlz = raw.includes(',') ? plzOrt(raw.split(',')[0]) : null;
+  if (raw.includes(',') && (/^\d{5}$/.test(raw.split(',')[0].trim()) || (linksPlz && linksPlz.plz))) {
+    const right = raw.split(',').slice(1).join(',').trim();
+    plz = plz || linksPlz.plz || raw.split(',')[0].trim();
+    ort = (linksPlz && linksPlz.plz && linksPlz.ort) ? linksPlz.ort : plzOrt(right).ort;
+  } else if (raw.includes(',')) {
     const parts = raw.split(',');
     const left = parts[0].trim(); const right = (parts[1] || '').trim();
     const sh = splitStrHnr(left); str = sh.str; hnr = sh.hnr;
     const mr = right.match(/(\d{5})\s+(.+)$/);
     if (mr) { plz = plz || mr[1]; ort = mr[2].trim(); }
+    else if (right && !istLand(right)) ort = right;   /* v2199: "Str. 1, Vlotho" */
   } else if (/[A-Za-z].*\s+\d/.test(raw) && !/^\d{5}\b/.test(raw)) {
     const noplz = raw.replace(/\s*\b\d{5}\b.*$/, '').trim();
     const sh2 = splitStrHnr(noplz); str = sh2.str; hnr = sh2.hnr;
@@ -317,6 +328,10 @@ function parseAddr(it) {
     const ohneLand = seg.filter((t) => !istLand(t));
     ort = (ohneLand[ohneLand.length - 1] || '').replace(/\d{5}/g, '').trim();
   }
+  /* v2199 · "Petershagen (Petershagen)", "Herford (Innenstadt)": der
+     Klammerteil ist ein Ortsteil des Portals. Ins Feld Ort gehoert die
+     Gemeinde - mit Klammer findet weder Geocoder noch Bodenrichtwert sie. */
+  ort = String(ort || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
   return { plz, str, hnr, ort };
 }
 

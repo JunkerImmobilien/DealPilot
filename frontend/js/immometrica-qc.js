@@ -62,9 +62,44 @@
     return true;
   }
 
+  /* v2199 · Hinweis unter dem Strassenfeld, solange das Inserat keine
+     Anschrift fuehrt. Tippt jemand eine Strasse ein, verschwindet er. */
+  function _ortskernHinweis(el, wo) {
+    var feld = el.closest ? el.closest('.field') : el.parentNode;
+    var alt = document.getElementById('qc-ortskern-hinweis'); if (alt) alt.remove();
+    el.placeholder = wo ? 'nicht veröffentlicht' : 'Dresdenstraße';
+    if (!wo || !feld) return;
+    var h = document.createElement('div');
+    h.id = 'qc-ortskern-hinweis';
+    h.style.cssText = 'font-size:11px;line-height:1.35;color:#665C49;margin-top:4px';
+    h.textContent = 'Inserat ohne Straße — Marktpreis und Bodenrichtwert vom Ortskern ' + wo + '. Straße nachtragen macht es genauer.';
+    feld.appendChild(h);
+    if (!el._v2199) {
+      el._v2199 = 1;
+      el.addEventListener('input', function () {
+        if (String(el.value || '').trim()) { delete el.dataset.ortskern; var x = document.getElementById('qc-ortskern-hinweis'); if (x) x.remove(); }
+      });
+    }
+  }
+
   function fillQc(picked) {
     if (!picked) return;
     var n = 0;
+    /* v2199 · Kommt eine neue Anschrift (PLZ oder Ort), gehoeren Strasse und
+       Nummer dazu - auch wenn das Inserat sie nicht nennt. Sonst bliebe die
+       Strasse des vorherigen Objekts neben dem neuen Ort stehen. */
+    var _str = document.getElementById('qc_str');
+    if ((picked.plz || picked.ort) && !picked.str) {
+      ['qc_str', 'qc_hnr'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el && el.value) { el.value = ''; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
+      });
+      /* Inserat ohne Anschrift: die Strassen-Pflicht gilt als erfuellt, der
+         Ortskern steht sichtbar am Feld (quickcheck-app.html completeness). */
+      if (_str) { _str.dataset.ortskern = '1'; _ortskernHinweis(_str, [picked.plz, picked.ort].filter(Boolean).join(' ')); }
+    } else if (_str && picked.str) {
+      delete _str.dataset.ortskern; _ortskernHinweis(_str, null);
+    }
     Object.keys(MAP).forEach(function (k) {
       if (picked[k] != null && picked[k] !== '') { if (setQc(MAP[k], picked[k])) n++; }
     });
