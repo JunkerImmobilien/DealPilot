@@ -1610,7 +1610,12 @@ async function _runAIServer(btn) {
       throw new Error('Antwort vom Server enthielt keine Analyse.');
     }
     document.getElementById('ai-content').innerHTML = html;
-    toast('✓ Pilot-Analyse mit Web-Recherche abgeschlossen');
+    /* v2167: nur bei echter Analyse „abgeschlossen". Bei einer Verweigerung
+       des Modells (gemessen mit gpt-4o: „I'm sorry, but I can't assist")
+       stand der Fehlerkasten da UND die Erfolgsmeldung - und wer den Kasten
+       uebersah, hielt die alte Analyse fuer die neue. */
+    if (data && data.analysis) toast('✓ Pilot-Analyse mit Web-Recherche abgeschlossen');
+    else toast('⚠ Die KI hat keine Analyse geliefert — Details im Feld darunter');
     // V63.86: Pill aktualisieren nach Credit-Verbrauch
     if (window.AiCredits) window.AiCredits.refresh(true);
   } catch (e) {

@@ -38614,6 +38614,16 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2163–v2166 · Stand-Leiste, Bestand=gewonnen, Makrolage, Steuer-Tiefe (13.10.2026)
+
+- **v2163** `fcf4fdab`: Stand-Leiste (Bestand/Ankauf) auf dunkler Schiene wie der Portfolio-Knopf (Aktenmappe/Kanzlei/Tower gemessen: Schiene rgb(14,13,11)). Im Bild abgenommen.
+- **v2164** `79512fe3`: neues Objekt erbte den Ankauf-Stand des vorherigen (2026-1090 trug Bismarckstr. 27 — auf Staging entfernt, Prod sauber). Festschreiben nur bei gewonnen; nicht gewonnen -> `_ankauf_ruhend`. Portfolio-Pilot bekommt je Objekt `pilot_analyse` (Auszug) + Regel.
+- **v2164a** `d79f2155`: Aufgabe 16 — AfA-Dauer aus dem Satz, GND ist keine AfA-Dauer (gemessen „2 % über 80 Jahre").
+- **v2165** `34e9e886`: Makrolage war SEIT JEHER ohne zweite echte Kennzahl (82411-01-03-4 tot, 13211-02-05-4 ohne Kreisfilter Code 98). Jetzt 82000-07-01-4 (Index gegen DG), AI008-1 Sp.3, AI002-1 Sp.9; Makro-Score aus 4 angebundenen. Offline mit echten Antworten geprüft (Score 58). **Live blockiert:** Regionaldatenbank verlangt seit 13.10. ~09:15 ein neues Passwort („Erstanmeldung") — Marcel muss es auf regionalstatistik.de setzen und `DESTATIS_PASSWORD` nachziehen; bis dahin kommt KEINE Makro-Kennzahl, auch die Bevölkerung nicht.
+- **v2166** `6f7ac447`: Steuerverlauf (15 J.), Werbungskosten J1, Jahr der Wende in Payload und Prompt; Aufgabe 16 gegliedert; 17 Längen angehoben; max_output_tokens 16000. Probelauf 2026-1052: Steuertext konkret und richtig, aber NICHT länger — **das Modell ist gpt-4o-mini** (OPENAI_DEFAULT_MODEL) und hält Längen nicht. Modellwechsel = Kosten, Marcels Entscheidung.
+- Neuabruf aller Objekte: 4 von 33 auf Staging erledigt, dann angehalten (erst Modellfrage).
+- **Prod-Rollout:** Merge `b62eb9d2` liegt im lokalen Zweig `prod-rollout-20261013`; der Push nach main wurde vom Sicherheitsfilter abgewiesen. Danach auf Prod: beide DBs sichern und ansehen, pull, build backend mb-backend, Migrationen (087, mb 016), `npm run zensus` mit `docker exec -e`, Platz (117 GB frei).
+
 ### v2161–v2162c · Zensus 2022: Datei, dann Datenbank (N62.4)
 
 **Was:** v2161 Kreisdatei aus der amtlichen Quelle (`tools/zensus-kreise-holen.mjs`);

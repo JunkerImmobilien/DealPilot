@@ -9426,6 +9426,10 @@ html[data-dp-layout] .dpl-schiene .dk-schalter{
   background:transparent;
   border:1px solid rgb(230,225,214);
   border-radius:10px;
+  /* v2163a · Marcel: „so breit wie bei Portfolio dadrueber und noch etwas
+     Platz zwischen beidem". Gleiche Rechnung wie .dpl-portfolio
+     (calc(100% - 16px), 8px seitlich); 10px Luft nach oben. */
+  width:calc(100% - 16px); margin:10px 8px 8px; box-sizing:border-box;
 }
 html[data-dp-layout] .dpl-schiene .dk-schalter:hover{ border-color:var(--wl-c9a84c,#C9A84C); }
 html[data-dp-layout] .dpl-schiene .dk-seg-titel{ color:rgb(191,183,169); opacity:.75; }

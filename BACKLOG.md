@@ -151,6 +151,42 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.14 · Marktbericht in Worten: bewerten, Entwicklung, Ableitung, Prognose
+
+**Marcel am 13.10.2026:** *„wenn wir die Pilot-Analyse anpassen, können wir
+auch den Marktbericht nicht nur grafisch darstellen, sondern vielleicht auch
+die Marktberichte bewerten und die Entwicklung beschreiben und die Ableitung
+sowie Prognose."* Heute: `ReportGenerationService` (gpt-4.1-mini, Chat
+Completions) schreibt einen Text; die Zeitreihen (Miete, Kaufpreis,
+Bevölkerung, Zensus, Makro) stehen nur als Grafik. Zu bauen: ein
+Bewertungsteil mit Entwicklung (aus den Reihen, mit Zahlen), Ableitung
+(Verfahren, Spread, Marktanpassung) und einer als Modellfortschreibung
+gekennzeichneten Prognose — mit Zielfeld je Teil (Lehre v2013b).
+
+#### N62.15 · Datenschutz: KI-Datenfluss gegen die Rechtstexte (gemessen 13.10.2026)
+
+Inventur (nur gelesen): einziger KI-Anbieter OpenAI (USA). Name/E-Mail des
+NUTZERS gehen nicht hinaus. Es gehen hinaus: Objektadresse, Halter-Name,
+Freitexte, bis 4 Fotos, Tonaufnahmen (Diktat), ganze Dokumente (Grundbuch:
+Eigentümer mit Geburtsdatum; Kaufvertrag: Käufer/Verkäufer), Ansprechpartner
+der Ämter. Keine Pseudonymisierung, `store:false` nirgends gesetzt.
+Lücken gegen die Texte: `datenschutz.html` Ziffer 6 sagt „keine
+personenbezogenen Daten Dritter" (stimmt nicht), nennt keine Fotos/Ton,
+nennt „Chat Completions" (es ist Responses/Realtime); `settings.js:2775`
+sagt „OpenAI Ireland, nur Lage-Analyse"; `sicherheit.html` verspricht „keine
+Weitergabe"; Einwilligung nur im Browser geprüft, `/api/v1/consent`
+existiert nicht (Ziffer 12 verspricht Consent-Logs); Verantwortlicher heißt
+„Junker Immobilien" statt Junker Solution. **Rechtliche Bewertung gehört zu
+einem Anwalt — hier steht nur, was der Code tut.**
+
+#### N62.13 · Offen aus dem 13.10.2026 (v2163–v2166)
+
+1. **Regionaldatenbank-Passwort erneuern** (Marcel) — sonst keine Makro-Kennzahlen (v2165 wartet darauf).
+2. **Modell der Pilot-Analyse** — gpt-4o-mini hält Längen nicht; Wechsel kostet (Marcel).
+3. **Neuabruf aller Pilot-Analysen** — 4/33 auf Staging erledigt; Rest nach der Modellfrage.
+4. **Prod-Rollout** — Merge `b62eb9d2` bereit, Push nach main braucht Marcel.
+5. Rumpfjahr: Jahr 1 im Steuerverlauf ist anteilig (2026-1052: 7.930 € Miete gegen 56.800 € Zinsen) — prüfen, ob Zinsen dort auch anteilig sein müssten.
+
 #### N62.4b · Zensus in der Datenbank — ✅ v2162–v2162c, 13.10.2026
 
 **Marcel:** *„nicht in eine Datei schreiben, sondern direkt in eine Datenbank,
