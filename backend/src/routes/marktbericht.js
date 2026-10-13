@@ -455,7 +455,8 @@ router.get('/isoline', authenticate, readGet('/isoline'));
 router.get('/geocode/autocomplete', authenticate, readGet('/geocode/autocomplete'));
 router.get('/location-finder/meta', authenticate, readGet('/location-finder/meta'));
 router.get('/zensus/objekt', authenticate, readGet('/zensus/objekt'));
-router.get('/lage/gemessen', authenticate, readGet('/lage/gemessen'));   /* v2175 · Lage gemessen */   /* v2162 · Zensus je Objekt */
+router.get('/lage/gemessen', authenticate, readGet('/lage/gemessen'));   /* v2175 · Lage gemessen */
+router.get('/bwk/ansaetze', authenticate, readGet('/bwk/ansaetze'));     /* v2186 · Anlage 3 zum Stichtag */   /* v2162 · Zensus je Objekt */
 router.get('/geomap/balance', authenticate, readGet('/geomap/balance'));
 router.get('/geomap/timeseries', authenticate, readGet('/geomap/timeseries'));
 // v785-boris-proxy: Bodenrichtwert (Open Data, 0 Kerosin) + Geocoding fuer das Objekt-Tab.

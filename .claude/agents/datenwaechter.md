@@ -19,7 +19,8 @@ Ergebnis — ein Prüfer, der nichts gelesen hat, ist nicht grün.
 3. **Register**: `node tools/saat-pruefen.mjs --basislinie` (RC=0?) und je Land
    Werte/Sperren — Länder ohne einen Wert benennen.
 4. **Ausschuss-Verzeichnis** `mb.gaa_sources`: Anzahl `portal_defekt`.
-5. **Ein Bericht als Gegenprobe**: in `mb.object_snapshots` die letzten
+5. **Bewirtschaftungskosten je Jahr** (`marktbericht/backend/src/lib/immowertv.js`, `BWK_JAHRE`, seit v2186): Steht das LAUFENDE Jahr drin, mit allen fünf Werten (Verwaltung je Wohnung, je ETW, je Garage; Instandhaltung je m², je Garage) und Quelle? Ab Januar fehlt es typischerweise — dann die veröffentlichten Werte recherchieren (zwei übereinstimmende Quellen, Rechenweg: Basiswert × VPI Okt. Vorjahr / Okt. 2001, kaufmännisch gerundet) und als Vorschlag melden. Nicht selbst eintragen.
+6. **Ein Bericht als Gegenprobe**: in `mb.object_snapshots` die letzten
    Berichte — `data->'macro'->>'gemessen'` (4 = alle Makro-Kennzahlen),
    `data->'zensus'->>'available'`.
 

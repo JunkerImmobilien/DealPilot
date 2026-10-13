@@ -61,6 +61,68 @@ export const BWK_TABELLE = {
   mietausfall_wohnen_pct: 2.0,
   mietausfall_gewerbe_pct: 4.0,
 };
+/* ────────────────────────────────────────────────────────────────────────────
+ * v2186 · DIE FORTGESCHRIEBENEN ANSAETZE JE STICHTAGSJAHR.
+ *
+ * Marcel am 13.10.2026: „sollten wir dann im Marktbericht auch anpassen fuer
+ * den Ertragswert, das soll schon passen. Bekommen wir auch immer die
+ * aktuellen Werte je nach Objektart?"
+ *
+ * GEMESSEN vorher: der Ertragswert nahm BWK_TABELLE oben UNfortgeschrieben
+ * (230 EUR / 9,00 EUR/m2) - fuer 2026 rund 37 % zu niedrige Kosten, Ertragswert
+ * zu hoch. Die Anlage-3-Betraege werden jaehrlich zum 1. Januar mit dem
+ * Verbraucherpreisindex fortgeschrieben (Oktober Vorjahr gegen Oktober 2001,
+ * kaufmaennisch auf volle Euro; Beispielrechnung HVBG Hessen: 230 EUR x Index
+ * = 351,41 -> 351 EUR fuer 2024).
+ *
+ * Hier stehen die veroeffentlichten Werte je Jahr - je Objektart getrennt:
+ *   verw_we      Verwaltung je Wohnung bzw. je Wohngebaeude bei EFH/ZFH
+ *   verw_etw     Verwaltung je Eigentumswohnung
+ *   verw_garage  Verwaltung je Garage oder Einstellplatz
+ *   inst_qm      Instandhaltung je m2 Wohnflaeche (Schoenheitsreparaturen beim Mieter)
+ *   inst_garage  Instandhaltung je Garage oder Einstellplatz
+ * Quellen: Verordnungstext (2021), Fachveroeffentlichungen (2024-2026, je zwei
+ * uebereinstimmend), Tabelle Brandenburg (2023, nur Teilwerte). KEIN amtliches
+ * Schreiben gefunden - deshalb steht die Quelle an jedem Jahr.
+ *
+ * NEUES JAHR: jedes Jahr im Januar die Werte eintragen (Agent `datenwaechter`
+ * prueft das). Fehlt ein Jahr oder ein Feld, nimmt bwkAnsaetze() das letzte
+ * belegte Jahr DAVOR und sagt das - nie ein spaeteres, nie eine Schaetzung.
+ * ──────────────────────────────────────────────────────────────────────────── */
+export const BWK_JAHRE = {
+  2021: { verw_we: 298, verw_etw: 357, verw_garage: 39, inst_qm: 11.70, inst_garage: 88,
+          quelle: 'ImmoWertV 2021, Anlage 3 (Verordnungstext, Stand 01.01.2021)' },
+  2023: { verw_we: 339, verw_garage: 44, inst_qm: 13.20,
+          quelle: 'Tabelle Brandenburg ab 01.01.2023 (Teilwerte; ETW und Garagen-Instandhaltung nicht genannt)' },
+  2024: { verw_we: 351, verw_etw: 420, verw_garage: 46, inst_qm: 13.80, inst_garage: 104,
+          quelle: 'Fortschreibung 2024 (immobilien-wertermittlung.de; Rechenweg HVBG Hessen)' },
+  2025: { verw_we: 359, verw_etw: 429, verw_garage: 47, inst_qm: 14.00, inst_garage: 106,
+          quelle: 'Fortschreibung 2025 (immobilien-wertermittlung.de, sprengnetter.de)' },
+  2026: { verw_we: 367, verw_etw: 439, verw_garage: 48, inst_qm: 14.40, inst_garage: 108,
+          quelle: 'Fortschreibung 2026, VPI Okt. 2024 -> Okt. 2025 +2,33 % (immobilien-wertermittlung.de, abels-immobilienbewertung.com)' },
+};
+
+/* Ansaetze zum Stichtagsjahr. Je Feld das Jahr selbst, sonst das letzte
+   belegte Jahr davor. `abweichend` nennt jedes Feld, das NICHT aus dem
+   Stichtagsjahr kommt - der Bericht muss das sagen koennen. */
+const BWK_NAMEN = { verw_we: 'Verwaltung je Wohnung', verw_etw: 'Verwaltung je Eigentumswohnung', verw_garage: 'Verwaltung je Garage', inst_qm: 'Instandhaltung je m²', inst_garage: 'Instandhaltung je Garage' };
+export function bwkAnsaetze(stichtagJahr) {
+  const ziel = Number(stichtagJahr) || new Date().getFullYear();
+  const jahre = Object.keys(BWK_JAHRE).map(Number).sort((a, b) => a - b);
+  const felder = ['verw_we', 'verw_etw', 'verw_garage', 'inst_qm', 'inst_garage'];
+  const out = { stichtag_jahr: ziel, werte: {}, jahr_je_feld: {}, quellen: [], abweichend: [] };
+  for (const f of felder) {
+    const j = jahre.filter((x) => x <= ziel && BWK_JAHRE[x][f] != null).pop();
+    if (j == null) continue;
+    out.werte[f] = BWK_JAHRE[j][f];
+    out.jahr_je_feld[f] = j;
+    if (out.quellen.indexOf(BWK_JAHRE[j].quelle) < 0) out.quellen.push(BWK_JAHRE[j].quelle);
+    if (j !== ziel) out.abweichend.push(BWK_NAMEN[f] + ' aus ' + j);
+  }
+  out.vollstaendig = felder.every((f) => out.werte[f] != null);
+  return out;
+}
+
 
 /* ────────────────────────────────────────────────────────────────────────────
  * Anlage 2 ImmoWertV — Modernisierungspunkte. Summe 20.

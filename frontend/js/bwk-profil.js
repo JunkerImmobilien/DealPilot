@@ -85,7 +85,7 @@
     try { p = JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) {}
     var s = kopie(STANDARD);
     if (!p || typeof p !== 'object') return s;
-    if (zahl(p.faktor) != null) s.faktor = zahl(p.faktor);
+    if (p.faktor_eigen && zahl(p.faktor) != null) s.faktor = zahl(p.faktor);   /* v2186: nur ein SELBST gesetzter Faktor gilt vor dem Jahreswert */
     ['etw', 'efh', 'mfh'].forEach(function (a) {
       Object.keys(s[a]).forEach(function (k) { if (p[a] && zahl(p[a][k]) != null) s[a][k] = zahl(p[a][k]); });
     });
@@ -94,6 +94,17 @@
   function schreiben(p) {
     try { localStorage.setItem(LS, JSON.stringify(p)); } catch (e) {}
     try { if (window.Auth && Auth.apiCall) Auth.apiCall(FERN, { method: 'PUT', body: { wert: p } }).catch(function () {}); } catch (e) {}
+  }
+  /* v2186 · Der Standardfaktor folgt den Anlage-3-Werten ZUM JAHR - aus
+     derselben Tabelle wie der Ertragswert im Marktbericht (/bwk/ansaetze).
+     Instandhaltung je m2 des Jahres geteilt durch den Basiswert 9,00. Wer
+     den Faktor selbst eintraegt (faktor_eigen), behaelt seinen. */
+  function jahresFaktor() {
+    if (!window.Auth || !Auth.apiCall) return;
+    Auth.apiCall('/marktbericht/bwk/ansaetze?jahr=' + new Date().getFullYear(), { method: 'GET' }).then(function (r) {
+      var q = r && r.werte && r.werte.inst_qm;
+      if (q > 0) { STANDARD.faktor = Math.round(q / 9 * 100) / 100; STANDARD.jahr = r.stichtag_jahr; leisteZeichnen(); }
+    }).catch(function () {});
   }
   function vomServer() {
     if (!window.Auth || !Auth.apiCall) return;
@@ -226,6 +237,7 @@
       var p = lesen(), k = t.getAttribute('data-bwkp-k'), a = t.getAttribute('data-bwkp-art'), n = zahl(t.value);
       if (n == null) return;
       if (a) p[a][k] = n; else p[k] = n;
+      if (k === 'faktor') p.faktor_eigen = true;   /* v2186 */
       schreiben(p);
       if (typeof window.toast === 'function') toast('✓ Standardwert gespeichert');
     });
@@ -240,7 +252,7 @@
     document.head.appendChild(st);
   }
 
-  function start() { css(); vomServer(); setTimeout(leisteZeichnen, 1500); }
+  function start() { css(); vomServer(); jahresFaktor(); setTimeout(leisteZeichnen, 1500); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
   window.DealPilotBwkProfil = { lesen: lesen, vorschlag: vorschlag, einsetzen: einsetzen, leisteZeichnen: leisteZeichnen,

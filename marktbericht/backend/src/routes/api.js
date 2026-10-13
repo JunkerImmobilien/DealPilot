@@ -10,6 +10,7 @@ import { GeocodingService } from '../services/GeocodingService.js';
 import { DealPilotImportService } from '../services/DealPilotImportService.js';
 import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
 import { messeLage } from '../services/LageMessungService.js';   /* v2175 */
+import { bwkAnsaetze } from '../lib/immowertv.js';   /* v2186 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
@@ -737,6 +738,12 @@ router.get('/lage/gemessen', async (req, res) => {
     if (!/^\d{5}$/.test(plz) && !req.query.adresse) return res.status(400).json({ error: 'plz_fehlt' });
     res.json(await messeLage({ adresse: req.query.adresse || null, plz: plz || null, ort: req.query.ort || null }));
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /bwk/ansaetze?jahr=2026 — v2186 · Anlage-3-Bewirtschaftungskosten zum Stichtag,
+// je Objektart, mit Quelle. Eine Quelle fuer Ertragswert UND Haupt-App (bwk-profil.js).
+router.get('/bwk/ansaetze', (req, res) => {
+  try { res.json(bwkAnsaetze(req.query.jahr)); } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /zensus/check — ist die Zensus-CSV da, wie viele Kreise, welche Spalten erkannt + Beispiel.
