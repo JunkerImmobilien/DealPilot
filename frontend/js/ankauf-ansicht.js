@@ -87,12 +87,15 @@
         return Promise.resolve(false);
       }
       /* v2173 · FREIGEGEBEN HEISST: DAS SOLL WIRD GESCHRIEBEN, NICHT DAS IST.
-         Gemessen am 13.10.2026: mit gesetztem Haken lief der normale
-         Speicherweg - er schickt das FORMULAR als Objekt, und im Formular
-         steht der eingefrorene Stand. Das Ist von 2026-999 trug danach die
-         Wohnflaeche des Ankaufs (68 statt 95 m²). Der Hinweis versprach
-         „Speichern ueberschreibt den Ankauf-Stand" - geschrieben wurde der
-         laufende. */
+         Aus dem Code gelesen (13.10.2026): mit gesetztem Haken lief der
+         normale Speicherweg - er schickt das FORMULAR als Objekt, und im
+         Formular steht der eingefrorene Stand. Der Hinweis versprach
+         „Speichern ueberschreibt den Ankauf-Stand" - geschrieben haette es
+         den laufenden.
+         ZURUECKGENOMMEN: ich hatte es zuerst als GEMESSEN gemeldet („2026-999
+         trug danach 68 statt 95 m²"). Falsch - die Sicherung von 07:01 traegt
+         ebenfalls 68; die 95 stammten aus einer fremden Marktbericht-Karte
+         (v2168). Gegen die Sicherung verglichen: nichts ueberschrieben. */
       if (_aktiv && _frei) return sollSpeichern();
       return echt.apply(this, arguments);
     };
