@@ -160,6 +160,8 @@
       korrekturen: []
     };
     window._dpAnkauf = neu;
+    /* v2173: der Ist|Soll-Umschalter im Objekt erscheint sofort */
+    try { if (window.DealPilotAnkaufAnsicht) setTimeout(DealPilotAnkaufAnsicht.bannerZeichnen, 0); } catch (e) {}
     return neu;
   }
 
@@ -197,7 +199,10 @@
     throw new Error('Unbekannte Korrektur: ' + was);
   }
 
-  function verwerfen() { window._dpAnkauf = null; }
+  function verwerfen() {
+    window._dpAnkauf = null;
+    try { if (window.DealPilotAnkaufAnsicht) setTimeout(DealPilotAnkaufAnsicht.bannerZeichnen, 0); } catch (e) {}   /* v2173 */
+  }
 
   /* ── Die Abweichung ───────────────────────────────────────────────
      Liest beide Seiten aus PERSISTIERTEN Kennzahlen - die eine aus dem

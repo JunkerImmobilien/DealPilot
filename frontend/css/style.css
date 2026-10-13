@@ -40806,3 +40806,23 @@ body .dp-sidebar-toggle{ display: none !important; }
 html[data-dp-verify="1"] .body{
   padding-bottom: calc(var(--dp-verify-band-h, 0px) + 20px) !important;
 }
+
+/* ══ v2173 · Bestand/Ankauf als Filter, Ist | Soll im Objekt ══════════════
+   doppelkarte.js blendet Karten der anderen Phase aus (.dk-weg), verlorene
+   stehen in „Ankauf“ am Ende. ankauf-ansicht.js zeigt bei Objekten mit
+   Ankauf-Stand den Umschalter Ist | Soll; freigegeben wird der Kopf rot
+   (Statusrot, nicht tokenisiert). */
+#sb-list .sb-card.dk-weg{display:none !important}
+#sb-list .sb-card.deal-lost{order:1}
+#sb-list .dk-leer{order:2;margin:10px 4px;padding:12px 14px;border:1px dashed rgba(140,134,120,.45);
+  border-radius:10px;font:400 12px/1.5 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#A8A299)}
+.ank-ansicht-kopf.ank-schlank.ank-mit-wahl{justify-content:space-between;cursor:default;gap:10px 16px}
+.ank-wahl{display:inline-flex;gap:3px;padding:3px;border-radius:9px;
+  background:rgba(140,134,120,.14);border:1px solid rgba(140,134,120,.3)}
+.ank-seg{border:0;background:transparent;padding:6px 12px;border-radius:7px;cursor:pointer;
+  font:600 12px/1.2 Inter,system-ui,sans-serif;color:var(--dp-ink-30,#8b8678);white-space:nowrap}
+.ank-seg:hover{color:var(--dp-ink-1,#2A2727)}
+.ank-seg.aktiv{background:var(--wl-c9a84c, #C9A84C);color:#1a1407}
+body.dp-ankauf-frei .ank-ansicht-kopf.ank-schlank{padding:8px 12px !important;border-radius:10px !important}
+body.dp-ankauf-frei .ank-seg{color:#ffffff}
+body.dp-ankauf-frei .ank-seg.aktiv{background:#ffffff;color:#8E4A45}

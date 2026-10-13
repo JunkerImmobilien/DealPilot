@@ -151,6 +151,43 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.19 · NÄCHSTE PAKETE A → B → C (Marcel, 13.10.2026: „Der Reihenfolge nach, aber A, B und C, alles zusammen.")
+
+**A · Marktbericht im Hintergrund, mit Fortschritt und Meldung.** Gemessen 13.10.:
+Stufe 3 ist aus dem Tab Objekt abrufbar (`objekt-reiter.js:693-759` → `DealPilotMB.run`,
+`dealpilot-mb.js:606`), aber nur mit Dreh-Spinner ohne Balken und ohne Schließen
+(`_mbSpinner`, `dealpilot-mb.js:583`), als EIN blockierender Request. Kein Job-System
+(`lib/limiter.js` = Semaphor im Speicher, MAX 6), keine Benachrichtigung in der App.
+Echter Schrittfortschritt existiert schon: `POST /reports/generate-stream` (NDJSON,
+`marktbericht/backend/src/routes/api.js:373`, Proxy `backend/src/routes/marktbericht.js:506`).
+Bauplan: (1) Job-Tabelle `mb.report_jobs` (Status, Schritte, Ergebnis-ID, Fehler,
+Dauer je Schritt = Laufzeiten aus N62.18 Punkt 6) + Warteschlange aus der DB statt
+im Speicher (N62.18 Punkt 5); (2) `POST /reports/jobs` startet, `GET /reports/jobs/:id`
+liefert Stand; (3) Modal mit echten Schritten und Platz in der Warteschlange, Knopf
+„im Hintergrund weiter"; (4) Meldung „Bericht fertig — öffnen" (Toast + Glocke im
+Kopf, Merker je Nutzer). **Optik: Demo-first.**
+Dazu: „Im Marktbericht öffnen" übernimmt nur den GESPEICHERTEN Stand
+(`mb-objektwahl.js:570`) — vorher speichern.
+
+**B · Lage aus eigenen Daten + KI im Vergleich.** „Lage analysieren"
+(`ki-lage.js:7` → `/ai/lage` → `openaiService.analyzeLage:1969`) ist reine KI mit
+Websuche, Quellen ungeprüft, füllt 6 Felder (Box verspricht 8). 4 Felder lassen sich
+messen: makrolage ← `mb.makro_werte`/macroScore · mikrolage ← Geoapify-Score ·
+ds2_bevoelkerung ← Trend + Wanderung · ds2_nachfrage ← Vermarktungsdauer + Zensus-
+Leerstand. ds2_wertsteigerung nur mit vollem Bericht, ds2_entwicklung bleibt KI.
+Bauplan: Messung zuerst (mit Quelle je Feld, 5-Stufen-Abbildung festlegen), KI ergänzt
+Entwicklung + Text, Abweichung sichtbar. Achtung: die Gegenüberstellung der
+Pilot-Analyse vergleicht heute oft KI gegen Messung, nicht Nutzer gegen Messung.
+
+**C · Pflichtfeld-Vertrag + Agents für die Datenpflege.** Gemessen 13.10.: Register
+62 Dateien / 4.832 Sätze; BY, SL, HB ohne Wert; kein Satz mit Baupreisindex als Zahl;
+81 LZS-Werte ohne Stichtag, 977 ohne Seite; `tools/saat-pruefen.mjs` RC=1 (49 Befunde),
+läuft nur von Hand, prüft Stichtag/Seite/GND/Index nicht. `mb.param_modell` (3.562)
+hinter den Dateien (4.832). Bauplan: Vertrag je Datensatz (Quelle, Seite, Stichtag,
+Lizenz, GND und Index als Zahl), Prüfer erzwingt ihn und hängt in `deploy-staging.ps1`;
+Agents (`.claude/agents/`): Register-Ernte (zuerst BY/SL/HB), Nachernte aus
+`mb.gaa_documents` (78 PDFs auf „neu"), Datenwächter Makro/Zensus, Ämter.
+
 #### N62.18 · NÄCHSTES PAKET (Marcel, 13.10.2026: „ja mach das als nächstes Paket") — eigene Datenhaltung, Warteschlange, Laufzeiten
 
 **Marcel:** *„können wir die kritischen Anfragen, die zeitintensiv sind, nicht in
