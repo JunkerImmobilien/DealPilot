@@ -130,13 +130,28 @@ export const DestatisConnector = {
        Fehlschlag wird beim naechsten Bericht erneut versucht. */
     const TAGE30 = 30 * 24 * 3600 * 1000;
     const self = this;
+    /* v2169a · ZEITBUDGET. Ein Bericht wartet hoechstens 20 s auf die
+       Regionaldatenbank (gemessen 13.10.: 44-182 s je Tabelle). Der Abruf
+       laeuft danach WEITER und fuellt den Speicher fuer den naechsten
+       Bericht - er blockiert nur keinen der sechs Berichtsplaetze mehr.
+       Laufende Abrufe je Schluessel werden geteilt, nicht doppelt gestartet. */
+    const BUDGET_MS = 20000;
+    const laufend = (DestatisConnector._laufend = DestatisConnector._laufend || new Map());
     async function holeText(name, filter) {
       const ck = 'destatis:' + name + ':' + (filter || 'ALLE');
       const c = cacheGet(ck);
       if (c !== undefined && c !== null) return c;
-      const txt = await self._fetchTableFfcsv(name, krs, now, filter);
-      if (txt && !/"Code"\s*:\s*[1-9]/.test(String(txt).slice(0, 300))) cacheSet(ck, txt, TAGE30);
-      return txt;
+      let p = laufend.get(ck);
+      if (!p) {
+        p = self._fetchTableFfcsv(name, krs, now, filter)
+          .then((txt) => {
+            if (txt && !/"Code"\s*:\s*[1-9]/.test(String(txt).slice(0, 300))) cacheSet(ck, txt, TAGE30);
+            return txt;
+          })
+          .finally(() => laufend.delete(ck));
+        laufend.set(ck, p);
+      }
+      return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('zeitbudget')), BUDGET_MS))]);
     }
     await Promise.all(Object.entries(tables).map(async ([key, name]) => {
       if (!name) return;
