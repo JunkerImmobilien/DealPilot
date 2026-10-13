@@ -121,6 +121,16 @@ function bevZeilen(csv) {
         wert_roh: String(p.value), merkmal: 'Bevölkerung insgesamt (Stichtag 31.12.)', stichtag: p.year + '-12-31' });
     }
   }
+  /* v2172c · Hamburg und Berlin stehen in dieser Tabelle nur als Land
+     (02, 11) - gemessen: nach dem ersten Lauf fehlten genau diese zwei. */
+  for (const land of ['02', '11']) {
+    if (out.some((z) => z.ags === land + '000')) continue;
+    for (const p of DestatisConnector._parseDatencsvSeries(csv, land) || []) {
+      out.push({ kennzahl: 'bevoelkerung', ags: land + '000', gebiet_name: land === '02' ? 'Hamburg' : 'Berlin',
+        jahr: p.year, wert: p.value, wert_roh: String(p.value),
+        merkmal: 'Bevölkerung insgesamt (Stichtag 31.12.)', stichtag: p.year + '-12-31' });
+    }
+  }
   return out;
 }
 
