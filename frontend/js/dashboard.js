@@ -3053,7 +3053,8 @@
     /* v2170: die Detailkopien werden sonst nur beim LOESCHEN erneuert - eine
        Pilot-Analyse aus derselben Sitzung kam beim Portfolio-Piloten nie an
        (gemessen: Stand 09.10. statt 13.10.). Vor jeder Pilot-Anfrage frisch. */
-    frisch: function () { _details = {}; _detailsLoaded = false; return loadDetails(); },
+    frisch: function () { _details = {}; _detailsLoaded = false;   /* ganze Kette, s. portfolioLaden (v1793b) */
+      return loadSummaries().then(function () { return loadDetails(); }); },
     /* v1793 · GEMESSEN: portfolioPayload() gibt 0 Objekte zurueck, solange
        das Dashboard nicht einmal offen war. Grund ist `_details` - ein
        Cache, den nur `loadDetails()` fuellt, und das lief bisher
