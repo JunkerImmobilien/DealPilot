@@ -9,6 +9,7 @@ import { MicroLocationService } from '../services/MicroLocationService.js';
 import { GeocodingService } from '../services/GeocodingService.js';
 import { DealPilotImportService } from '../services/DealPilotImportService.js';
 import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
+import { messeLage } from '../services/LageMessungService.js';   /* v2175 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { runLimited, limiterStats } from '../lib/limiter.js';
@@ -723,6 +724,17 @@ router.get('/zensus/objekt', async (req, res) => {
     const z = await ZensusConnector.lookupDb({ kreisAgs: k.kreis_ags, gemeindeAgs: g && g.gemeinde_ags,
       baujahr: zahl(req.query.baujahr), wohnflaeche: zahl(req.query.wfl) });
     res.json(Object.assign({}, z, { gemeinde_eindeutig: g ? g.eindeutig : null }));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /lage/gemessen?adresse=&plz=&ort= — v2175 · die vier messbaren Lage-Felder
+// (Makro, Mikro, Bevoelkerung, Nachfrage) mit Wert, Stufe, Schwelle und Quelle.
+// Referenzdaten, keine GeoMap-Kosten; nur Geoapify fuer die Mikrolage (7 Tage im Speicher).
+router.get('/lage/gemessen', async (req, res) => {
+  try {
+    const plz = String(req.query.plz || '').trim();
+    if (!/^d{5}$/.test(plz) && !req.query.adresse) return res.status(400).json({ error: 'plz_fehlt' });
+    res.json(await messeLage({ adresse: req.query.adresse || null, plz: plz || null, ort: req.query.ort || null }));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
