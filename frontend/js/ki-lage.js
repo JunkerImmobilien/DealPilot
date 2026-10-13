@@ -4,26 +4,74 @@
    Ruft den Backend-Endpoint /api/v1/ai/lage auf.
 ═══════════════════════════════════════════════════════════════ */
 
+/* ══ v2175 · ERST MESSEN, DANN DIE KI — UND BEIDES IM VERGLEICH ═══════════
+   Marcel am 13.10.2026: „Macht im Tab Objekt die ‚Lage analysieren' noch
+   Sinn? ... koennen wir das mit unseren vorhandenen Daten ... besser? Oder
+   vielleicht auch beides und im Vergleich?"
+   GEMESSEN vorher: reine KI mit Websuche, Quellen ungeprueft, sechs Felder
+   (die Box versprach acht). Jetzt holt /marktbericht/lage/gemessen vier
+   Felder aus unseren Daten (Makro, Mikro, Bevoelkerung, Nachfrage) in
+   rund einer Sekunde - ohne KI, in jedem Tarif. Die KI laeuft daneben und
+   liefert Texte, Wertsteigerung und Entwicklung. Beim Uebernehmen gewinnt
+   die Messung; wo sie fehlt, die KI. */
+var _LAGE_FELDER = [
+  { id: 'makrolage',          t: 'Makrolage',             ki: 'makro' },
+  { id: 'mikrolage',          t: 'Mikrolage',             ki: 'mikro' },
+  { id: 'ds2_bevoelkerung',   t: 'Bevölkerung',           ki: 'bevoelkerung' },
+  { id: 'ds2_nachfrage',      t: 'Nachfrage',             ki: 'nachfrage' },
+  { id: 'ds2_wertsteigerung', t: 'Wertsteigerung',        ki: 'wertsteigerung' },
+  { id: 'ds2_entwicklung',    t: 'Entwicklung',           ki: 'entwicklung' }
+];
+function _lageOptText(id, val) {
+  var el = document.getElementById(id);
+  var o = el && val ? el.querySelector('option[value="' + val + '"]') : null;
+  return o ? o.textContent.replace(/\s*\(.*\)\s*$/, '') : (val || '–');
+}
+function _lageMessen(str, hnr, plz, ort) {
+  if (typeof Auth === 'undefined' || !Auth.apiCall) return Promise.resolve(null);
+  var adr = [(str + ' ' + hnr).trim(), (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
+  return Auth.apiCall('/marktbericht/lage/gemessen?adresse=' + encodeURIComponent(adr)
+    + '&plz=' + encodeURIComponent(plz) + '&ort=' + encodeURIComponent(ort), { method: 'GET' })
+    .then(function (r) { return (r && r.felder) ? r : null; })
+    .catch(function () { return null; });
+}
+function _lageVergleichHtml(m, ki) {
+  var f = (m && m.felder) || {};
+  var zeilen = _LAGE_FELDER.map(function (x) {
+    var g = f[x.id];
+    var k = ki && ki[x.ki] && ki[x.ki].value ? ki[x.ki].value : null;
+    var gTxt = g ? '<b>' + _escKi(_lageOptText(x.id, g.stufe)) + '</b><span class="lv-w">'
+      + _escKi(String(g.wert).replace('.', ',') + ' ' + g.einheit) + '</span>' : '<span class="lv-leer">nicht gemessen</span>';
+    var kTxt = ki ? (k ? _escKi(_lageOptText(x.id, k)) : '–') : '<span class="lv-leer">läuft …</span>';
+    var urteil = (g && k) ? (g.stufe === k ? '<span class="lv-ok" title="Messung und KI stimmen überein">✓</span>'
+      : '<span class="lv-ab" title="Messung und KI weichen ab — übernommen wird die Messung">≠</span>') : '';
+    var tip = g ? (g.quelle + (g.stand ? ' · Stand ' + (typeof g.stand === 'object' ? JSON.stringify(g.stand).replace(/[{}"]/g, '') : g.stand) : '')
+      + (g.zusatz ? ' · ' + g.zusatz : '') + '\nSchwelle (Modellannahme): ' + g.schwelle) : 'Für dieses Merkmal gibt es keine Messung — hier zählt die KI-Einschätzung.';
+    return '<tr title="' + _escKi(tip) + '"><td>' + x.t + '</td><td>' + gTxt + '</td><td>' + kTxt + '</td><td class="lv-u">' + urteil + '</td></tr>';
+  }).join('');
+  return '<div class="ki-lage-vergleich">'
+    + '<div class="lv-kopf">Gemessen aus unseren Daten · im Vergleich zur KI</div>'
+    + '<table class="lv-tab"><thead><tr><th>Merkmal</th><th>Gemessen</th><th>KI</th><th></th></tr></thead><tbody>' + zeilen + '</tbody></table>'
+    + '<div class="lv-fuss">Gemessen: Regionaldatenbank, Zensus 2022, Umfeld-Analyse — Quelle und Schwelle beim Darüberfahren. '
+    + 'Beim Übernehmen gilt die Messung, wo es eine gibt.</div></div>';
+}
+function _lageCss() {
+  if (document.getElementById('ki-lage-v2175-css')) return;
+  var st = document.createElement('style'); st.id = 'ki-lage-v2175-css';
+  st.textContent = '.ki-lage-vergleich{margin:0 0 14px;padding:12px 14px;border:1px solid rgba(201,168,76,.35);border-radius:12px}'
+    + '.lv-kopf{font:600 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:8px}'
+    + '.lv-tab{width:100%;border-collapse:collapse;font-size:12.5px}.lv-tab th{text-align:left;font:500 10.5px/1.3 "JetBrains Mono",monospace;color:#8b8678;padding:4px 6px;border-bottom:1px solid rgba(140,134,120,.3)}'
+    + '.lv-tab td{padding:6px;border-bottom:1px solid rgba(140,134,120,.15);vertical-align:top}.lv-tab tr{cursor:help}'
+    + '.lv-w{display:block;font:400 11px/1.3 "JetBrains Mono",monospace;color:#8b8678}.lv-leer{color:#8b8678;font-style:italic}'
+    + '.lv-u{text-align:center;width:28px;font-weight:700}.lv-ok{color:#3FA56C}.lv-ab{color:#B8625C}'
+    + '.lv-fuss{margin-top:8px;font-size:11.5px;color:#8b8678}';
+  document.head.appendChild(st);
+}
+
 function runKiLage() {
   var btn = document.getElementById('ki-lage-btn');
   var body = document.getElementById('ki-lage-body');
   if (!body) return;
-
-  // V63.82: KI-Credits-Gate
-  if (typeof Paywall !== 'undefined' && !Paywall.gate('ai_calls')) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Lage analysieren'; }
-    return;
-  }
-
-  // V63.82: Wenn ki_market_analysis nicht im Plan → Hinweis
-  if (typeof Plan !== 'undefined' && !Plan.can('ai_market_analysis')) {
-    body.innerHTML = '<div class="ki-lage-err">' +
-      '🔒 KI-Lagebewertung ist Teil des <strong>Investor</strong>-Plans und höher.<br>' +
-      '<button class="btn btn-gold" style="margin-top:10px" onclick="if(typeof openPricingModal===\'function\') openPricingModal();">Plan ansehen</button>' +
-    '</div>';
-    if (btn) { btn.disabled = false; btn.textContent = 'Lage analysieren'; }
-    return;
-  }
 
   // Adresse aus den Feldern bauen
   var str = (document.getElementById('str') || {}).value || '';
@@ -33,6 +81,34 @@ function runKiLage() {
   var adresse = [str + ' ' + hnr, plz + ' ' + ort].map(function(s) { return s.trim(); }).filter(Boolean).join(', ');
   if (!adresse) {
     body.innerHTML = '<div class="ki-lage-err">⚠ Bitte zuerst eine Adresse im Tab Objekt eintragen.</div>';
+    return;
+  }
+
+  /* v2175: die Messung laeuft in JEDEM Tarif und zuerst - sie kostet keine KI. */
+  _lageCss();
+  window._lastLageMessung = null;
+  window._lastKiLageData = null;
+  var _kiFertig = false;
+  var _ladeKi = '<div class="ki-lage-loading"><div class="ki-lage-spinner"></div>KI ergänzt Texte, Wertsteigerung und Entwicklung …</div>';
+  var _messP = _lageMessen(str, hnr, plz, ort).then(function (m) {
+    window._lastLageMessung = m;
+    if (!_kiFertig) body.innerHTML = (m ? _lageVergleichHtml(m, null) : '') + _ladeKi;
+    return m;
+  });
+  function _nurMessung(hinweis) {
+    _messP.then(function (m) {
+      body.innerHTML = (m ? _lageVergleichHtml(m, null) : '<div class="ki-lage-err">⚠ Für diese Adresse liegt keine Messung vor.</div>')
+        + (hinweis ? '<div class="ki-lage-err" style="margin-top:8px">' + hinweis + '</div>' : '')
+        + (m ? '<div class="ki-lage-actions"><button class="btn btn-gold ki-lage-apply-btn" type="button" onclick="applyKiLageToFields()">⤓ Gemessene Werte übernehmen</button></div>' : '');
+      if (btn) { btn.disabled = false; btn.textContent = 'Lage neu analysieren'; }
+    });
+  }
+
+  // V63.82: KI-Credits-Gate (v2175: gilt nur noch fuer den KI-Teil)
+  if (typeof Paywall !== 'undefined' && !Paywall.gate('ai_calls')) { _nurMessung(''); return; }
+  // V63.82: Wenn ki_market_analysis nicht im Plan → Hinweis
+  if (typeof Plan !== 'undefined' && !Plan.can('ai_market_analysis')) {
+    _nurMessung('🔒 Die KI-Ergänzung (Texte, Wertsteigerung, Entwicklung) ist Teil des <strong>Investor</strong>-Plans und höher. Die Messung oben gilt in jedem Plan.');
     return;
   }
 
@@ -122,10 +198,13 @@ function runKiLage() {
     if (!data.success || (!data.makro && !data.mikro)) {
       throw new Error(data.error || 'Keine Daten zurückgekommen');
     }
-    _renderKiLage(data);
+    _kiFertig = true;
+    /* v2175: die Messung abwarten (sie ist fast immer schon da), dann beides zeigen */
+    return _messP.then(function () { _renderKiLage(data); });
   })
   .catch(function(err) {
-    body.innerHTML = '<div class="ki-lage-err">⚠ ' + (err.message || 'Fehler bei der Lage-Analyse') + '</div>';
+    _kiFertig = true;
+    _nurMessung('⚠ KI-Ergänzung fehlgeschlagen: ' + _escKi(err.message || 'Fehler bei der Lage-Analyse'));
   })
   .finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = 'Lage neu analysieren'; }
@@ -210,6 +289,7 @@ function _renderKiLage(data) {
   body.innerHTML =
     (typeof window.KiLage !== 'undefined' && typeof window.KiLage.getAccuracyBanner === 'function'
       ? window.KiLage.getAccuracyBanner() : '') +
+    (window._lastLageMessung ? _lageVergleichHtml(window._lastLageMessung, data) : '') +   /* v2175 */
     '<div class="ki-lage-grid">' +
       renderBox('Makrolage', 'makro', data.makro) +
       renderBox('Mikrolage', 'mikro', data.mikro) +
@@ -220,7 +300,7 @@ function _renderKiLage(data) {
       '<button class="btn btn-gold ki-lage-apply-btn" type="button" onclick="applyKiLageToFields()">' +
         '⤓ In Felder übernehmen' +
       '</button>' +
-      '<span class="ki-lage-apply-hint">Befüllt die Lage-Dropdowns im Tab Objekt mit den KI-Bewertungen.</span>' +
+      '<span class="ki-lage-apply-hint">Befüllt die Lage-Felder: gemessene Werte zuerst, sonst die KI-Bewertung.</span>' +
     '</div>';
 
   // V63.6: Daten zwischenspeichern für späteres "In Felder übernehmen"
@@ -234,8 +314,9 @@ function _renderKiLage(data) {
  * V63.8: Nutzt direkt die KI-gelieferten ENUM-Werte (keine Score-Mapping mehr).
  */
 function applyKiLageToFields() {
-  var d = window._lastKiLageData;
-  if (!d) {
+  var d = window._lastKiLageData || {};
+  var mg = (window._lastLageMessung && window._lastLageMessung.felder) || {};
+  if (!window._lastKiLageData && !Object.keys(mg).length) {
     if (typeof toast === 'function') toast('⚠ Keine KI-Lage-Daten verfügbar — bitte zuerst "Lage analysieren"');
     return;
   }
@@ -253,15 +334,16 @@ function applyKiLageToFields() {
     }
   }
 
-  // V63.8: Direkter ENUM-Wert vom Backend (keine Score-Mapping mehr)
-  if (d.makro && d.makro.value)         _setSelect('makrolage',          d.makro.value);
-  if (d.mikro && d.mikro.value)         _setSelect('mikrolage',          d.mikro.value);
-  if (d.bevoelkerung && d.bevoelkerung.value)   _setSelect('ds2_bevoelkerung',   d.bevoelkerung.value);
-  if (d.nachfrage && d.nachfrage.value)         _setSelect('ds2_nachfrage',      d.nachfrage.value);
-  if (d.wertsteigerung && d.wertsteigerung.value)_setSelect('ds2_wertsteigerung',d.wertsteigerung.value);
-  if (d.entwicklung && d.entwicklung.value)     _setSelect('ds2_entwicklung',    d.entwicklung.value);
+  /* v2175: je Feld die Messung, wo es eine gibt - sonst der KI-Wert */
+  var _n = { gemessen: 0, ki: 0 };
+  _LAGE_FELDER.forEach(function (x) {
+    var g = mg[x.id] && mg[x.id].stufe;
+    var k = d[x.ki] && d[x.ki].value;
+    if (g) { _setSelect(x.id, g); _n.gemessen++; }
+    else if (k) { _setSelect(x.id, k); _n.ki++; }
+  });
 
-  if (typeof toast === 'function') toast('✓ Lage-Bewertung in Felder übernommen');
+  if (typeof toast === 'function') toast('✓ Lage übernommen — ' + _n.gemessen + ' gemessen, ' + _n.ki + ' aus der KI');
   if (typeof dpUpdateAll === 'function') dpUpdateAll();
 }
 window.applyKiLageToFields = applyKiLageToFields;
