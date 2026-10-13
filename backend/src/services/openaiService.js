@@ -3284,7 +3284,25 @@ async function copilotChat(payload, opts) {
   }
   convo += 'Nutzer: ' + message + '\nCo-Pilot:';
 
-  const prompt = sys + '\n\n' + ctxBlock + '\n\n--- Gespraech ---\n' + convo;
+  /* v2188 · DER TOWER SCHICKT DIE HILFE MIT
+     Der Pilot (frontend/js/pilot-tower.js) sucht vor der KI-Frage selbst
+     in Hilfe, Feld-Erklaerungen und Ablaeufen und schickt die besten
+     Treffer als `hilfe` mit. Bis hier kannte der Co-Pilot die Hilfetexte
+     der App nicht - er beantwortete Bedienfragen aus allgemeinem Wissen.
+     Begrenzt auf 8 Eintraege a 1.200 Zeichen: es ist ein Auszug, kein
+     zweites Handbuch im Prompt. */
+  const _hilfe = Array.isArray(payload.hilfe) ? payload.hilfe.slice(0, 8) : [];
+  const hilfeBlock = _hilfe.length
+    ? 'AUSZUG AUS DER DEALPILOT-HILFE (zur Frage gefunden):\n'
+      + _hilfe.map(function (h) {
+        return '- [' + String((h && h.art) || '').slice(0, 30) + '] ' + String((h && h.titel) || '').slice(0, 120)
+          + ': ' + String((h && h.text) || '').slice(0, 1200);
+      }).join('\n')
+      + '\nBei Fragen zur BEDIENUNG der App (wo, wie, was passiert wenn) ist dieser Auszug die'
+      + ' massgebliche Quelle: nenne Reiter und Knopf so, wie sie dort heissen, und erfinde keine'
+      + ' Menuepunkte. Steht die Antwort nicht darin, sag das und rate keinen Weg.\n\n'
+    : '';
+  const prompt = sys + '\n\n' + hilfeBlock + ctxBlock + '\n\n--- Gespraech ---\n' + convo;
   /* v1329: war gpt-4.1-mini - abgekuendigt zum 11.12.2026. */
   const model = opts.model || process.env.COPILOT_MODEL || 'gpt-5.6-luna';
 

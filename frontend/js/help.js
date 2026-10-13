@@ -17,6 +17,56 @@
 
   // ─── Hilfe-Inhalte: Themen-Baum ─────────────────────────────────────────
   var HELP_TOPICS = [
+    /* v2188: Abläufe & Pilot — der Einstieg in den Prozess-Atlas */
+    {
+      id: 'ablaeufe',
+      title: 'Abläufe & Pilot',
+      icon: 'i-route',
+      desc: 'Alle Prozesse als Netzplan, der Pilot auf F1',
+      sections: [
+        {
+          h: 'Der Pilot — Hilfe auf Tastendruck',
+          body: 'Drück <strong>F1</strong> — oder <strong>?</strong>, wenn du gerade nicht in einem Feld tippst. Der Pilot fliegt zu dem Feld, auf dem Maus oder Cursor stehen, erklärt es und zeigt, wofür es gebraucht wird.\n\nDarunter fragst du einfach, was du wissen willst. Die Sofort-Antworten kommen ohne KI aus Hilfe, Feld-Erklärungen und Abläufen — mit „Zeig mir das Feld“ springt er an die Stelle. Reicht das nicht, beantwortet „Den Piloten fragen“ die Frage mit KI und kennt dabei dein geöffnetes Objekt.\n\nDer Pilot sitzt unten links. Ein Klick auf ihn öffnet ihn auch ohne Taste — so geht es auch auf dem Handy.'
+        },
+        {
+          h: 'Der Prozess-Atlas',
+          body: 'Sieben Abläufe als Netzplan: die ganze Reise vom Inserat bis zum Portfolio, der Quick-Check, der Netzplan der Datenaufnahme, der Deal bis „gewonnen“, das Steuerjahr, der Marktbericht und woraus die Scores bestehen.\n\nKlick eine Station an: die Schritte klappen auf, die Eingaben fliegen ein, die Ergebnisse erscheinen. „Ablauf abspielen“ geht alle Stationen nacheinander durch, „Hinfliegen“ öffnet die Stelle in der App. Grün markiert ist, wo dein geöffnetes Objekt gerade steht.'
+        },
+        {
+          h: 'Die Reise in drei Phasen',
+          body: '<strong>Pre-Flight · Quick-Check</strong> — Inserat erfassen, Marktpreis einholen, Urteil lesen und als Objekt speichern.\n\n<strong>Boarding · Ankauf</strong> — Datenaufnahme in Etappen, Wert ermitteln (Marktbericht Stufe 3), bereit für die Bank.\n\n<strong>Reiseflug · Bestand</strong> — auf „Gewonnen“ wird der Ankauf-Stand zum Nutzen-/Lastenwechsel eingefroren; danach pflegst du das Ist, und das Portfolio-Cockpit steuert alle Objekte zusammen.'
+        },
+        {
+          h: 'Tastenkürzel',
+          body: '<strong>F1</strong> — Pilot rufen, überall (auch im Quick-Check-Fenster).\n<strong>?</strong> — Pilot rufen, wenn kein Eingabefeld aktiv ist.\n<strong>Pfeiltasten</strong> und <strong>Enter</strong> — im Tower durch die Treffer gehen und öffnen.\n<strong>Esc</strong> — Tower, Atlas oder Hilfe schließen.'
+        }
+      ]
+    },
+    /* v2188: Bestand — Ankauf-Stand, Soll und Ist */
+    {
+      id: 'bestand',
+      title: 'Bestand: Soll und Ist',
+      icon: 'i-history',
+      desc: 'Gewonnen, eingefroren, weitergepflegt',
+      sections: [
+        {
+          h: 'Was beim Status „Gewonnen“ passiert',
+          body: 'Im Reiter Deal-Aktion setzt du den Status auf <strong>Gewonnen</strong>. Steht im Reiter Objekt der <strong>Nutzen-/Lastenwechsel</strong> („Wirtsch. Übergang“), schreibt DealPilot den ganzen Datensatz zu diesem Tag fest — das ist das Soll. Fehlt das Datum, wird nichts eingefroren, und DealPilot sagt dir, was fehlt. Das heutige Datum wird nie stillschweigend eingesetzt.\n\nIn der Zeile darunter kannst du den Stand neu nehmen oder rückgängig machen.'
+        },
+        {
+          h: 'Ist · heute und Soll · Ankauf-Stand',
+          body: 'Oben im Objekt schaltest du zwischen <strong>Ist · heute</strong> (frei zu pflegen) und <strong>Soll · Ankauf-Stand</strong>. Das Soll ist gesperrt. Musst du es korrigieren, hak „zum nachträglichen Bearbeiten freigeben“ an — gespeichert wird dann mit Nachweis, das Ist bleibt unverändert.\n\nWarum eingefroren? Damit die Abweichung nach zehn Jahren noch etwas bedeutet. Wer den Maßstab mitwachsen lässt, misst am Ende nur noch sich selbst.'
+        },
+        {
+          h: 'Bestand und Ankauf in der Liste',
+          body: 'In der Seitenleiste filterst du unter „Stand“: <strong>Bestand</strong> zeigt die gewonnenen Objekte, <strong>Ankauf</strong> die Akquise. Verlorene Objekte bleiben mit allen Zahlen erhalten — ausgegraut am Ende der Ankauf-Liste.'
+        },
+        {
+          h: 'In eine Gesellschaft überführen',
+          body: 'Deal-Aktion → „In Gesellschaft überführen“. Der Assistent fragt den Stichtag, die Gesellschaft (GmbH/UG), den Verkehrswert als AfA-Basis und den übernommenen Zins. Er weist auf Grunderwerbsteuer und verdeckte Einlage hin und prüft die Zehnjahresfrist nach § 23 EStG. Danach friert das Privatobjekt ein, und ein verlinktes GmbH-Objekt entsteht mit Werten, Fotos und Analyse. Voraussetzung: die Gesellschaft ist unter Einstellungen als Mandant angelegt.'
+        }
+      ]
+    },
     {
       id: 'einstieg',
       title: 'Einstieg',
@@ -29,7 +79,7 @@
         },
         {
           h: 'Schnellstart in 4 Schritten',
-          body: '1. <strong>Objekt anlegen</strong> — Adresse, Wohnfläche, Kaufpreis im Tab „Objekt".\n\n2. <strong>Mieten & Kosten</strong> — Kaltmiete, Hausgeld, Grundsteuer im Tab „Miete".\n\n3. <strong>Finanzierung</strong> — Darlehensbetrag, Zins, Tilgung, Bindungsdauer im Tab „Finanzierung".\n\n4. <strong>Annahmen prüfen</strong> — Mietsteigerung, Wertsteigerung, Anschlusszins (Voreinstellungen sind konservativ).\n\nDanach hat der Tab „Kennzahlen" alle Renditen, der Tab „PDF" eine Druckvorschau.'
+          body: '1. <strong>Quick-Check</strong> — ein Inserat in einer Minute einordnen. Lohnt es sich, „Als Objekt speichern“.\n\n2. <strong>Datenaufnahme</strong> — die Reiter Objekt, Investition, Miete, Finanzierung, Bewirtschaftung und Steuer. Vom Groben zum Feinen; was fehlt, nennt DealPilot statt es zu schätzen.\n\n3. <strong>Bewerten</strong> — Pilot-Analyse, Reiter Bewertung, Marktbericht bis zur Wertermittlung nach ImmoWertV.\n\n4. <strong>Deal-Aktion</strong> — bereit für die Bank, Status Offen · Gewonnen · Verloren. Gewonnen friert den Ankauf-Stand zum Nutzen-/Lastenwechsel ein.\n\n<strong>Tipp:</strong> Drück überall <strong>F1</strong> oder <strong>?</strong> — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Alle Abläufe als Netzplan stehen im Thema „Abläufe & Pilot“.'
         },
         {
           h: 'Wo speichert DealPilot?',
@@ -89,7 +139,7 @@
         },
         {
           h: 'DealScore (0–100) — die Gesamtbewertung',
-          body: 'Der DealScore ist die zusammengefasste Bewertung deines Investments. Er kombiniert acht Einzel-Kennzahlen zu einer Zahl zwischen 0 und 100, mit der du verschiedene Objekte schnell vergleichen kannst.\n\n<strong>Die acht Bausteine:</strong>\n• Cashflow nach Steuern\n• Nettomietrendite\n• Bruttomietrendite\n• DSCR (Schuldendeckung)\n• LTV (Beleihungsauslauf)\n• EK-Rendite p.a.\n• Vermögenszuwachs über 10 Jahre\n• Wertpuffer / Sicherheitsreserve\n\nDie Gewichtung der einzelnen Bausteine kannst du in den Einstellungen unter „Investor Deal Score 2.0" anpassen — je nachdem, ob du eher Cashflow-Investor, Wertsteigerungs-Investor oder sicherheitsorientierter Anleger bist.\n\n<strong>Bedeutung der Bereiche:</strong>\n• <strong>80–100 — Ausgezeichnet:</strong> Klare Kauf-Empfehlung. Alle Hauptkennzahlen liegen im starken Bereich, die Risiken sind überschaubar. Solche Objekte sind selten — wenn du eines findest, schnell handeln.\n• <strong>60–79 — Gut:</strong> Sorgfältig prüfen. Die Hauptkennzahlen sind solide, aber nicht überall stark. Lohnt eine genaue Analyse — oft mit Verhandlungspotenzial.\n• <strong>40–59 — Mittel:</strong> Vorsichtig. Mindestens eine Hauptkennzahl ist im kritischen Bereich. Nur kaufen, wenn du eine konkrete Aufwertungsstrategie hast oder die Lage außergewöhnlich ist.\n• <strong>Unter 40 — Schwach:</strong> Eher ablehnen. Mehrere Kennzahlen schwach, das Risiko-Rendite-Verhältnis stimmt meistens nicht.'
+          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (ausgewogen, konservativ, optimistisch, lageorientiert, cashflowstark, sicherheitsorientiert), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
         }
       ]
     },
@@ -193,7 +243,7 @@
         },
         {
           h: 'Wie oft kann ich die KI nutzen?',
-          body: 'Free-Plan: limitiert pro Monat. Investor/Pro/Business: deutlich mehr Calls. Genaue Limits siehst du in den Einstellungen → Plan.'
+          body: 'Die Pilot-Analyse zählt auf dein Kontingent im Plan. Wie viele Analysen und Marktberichte dein Plan enthält und wie viele noch frei sind, steht unter Einstellungen → Plan. Fragen an den Piloten (F1 oder ?) haben ein eigenes Tageslimit je Plan.'
         },
         {
           h: 'Persistenz',
@@ -213,16 +263,16 @@
           body: 'Je vollständiger ein Objekt erfasst ist, desto genauer die Marktbewertung. Beispiel aus der Praxis: Nur mit Adresse + Wohnfläche ergab eine Bewertung 212.000 € mit hoher Unsicherheit — mit vollständigen Angaben (Zustand, Ausstattung, Baujahr, Grundstück) 251.000 € mit deutlich höherer Treffsicherheit. Es lohnt sich, die Felder im Tab „Objekt“ möglichst komplett auszufüllen.'
         },
         {
-          h: 'Sprengnetter (aktiv)',
-          body: 'Sprengnetter AVM nutzt alle folgenden Angaben: <strong>Adresse, Objektart, Wohnfläche, Baujahr, Zimmerzahl, Etage, Grundstücksfläche, Modernisierungsjahr</strong> sowie die Ausstattungsdetails <strong>Zustand, Ausstattungsstandard, Heizung, Verglasung, Bodenbelag, Bad, Gäste-WC, Keller, Außenwände, Dacheindeckung, Aufzug, Balkon, Garage/Stellplatz</strong>. Zurück kommen Marktwert mit Spanne, Marktmiete und echte Vergleichsobjekte aus der Nachbarschaft.'
+          h: 'Woraus die Marktbewertung entsteht',
+          body: 'Der DealPilot-Marktbericht arbeitet in acht Etappen: Standort ermitteln, Vergleichspreise, Vergleichsmieten, Mikrolage, Makrolage, Strukturdaten (Zensus), Bodenrichtwert, Bewertung und Bericht. Makrolage und Zensus kommen aus DealPilots eigener Datenbank und werden regelmäßig aktualisiert. Zurück kommen Marktwert mit Spanne, Marktmiete und die Lage-Einschätzung — als Marktpreisindikation, ausdrücklich kein Gutachten nach § 194 BauGB.'
         },
         {
-          h: 'DealPilot-Marktwert (aktiv)',
-          body: 'Die DealPilot-eigene Markteinschätzung kombiniert deine Lage- und Potenzialbewertungen (Mikro-/Makrolage, Nachfrage, Entwicklung) mit Zustand, Ausstattung, Energieklasse und Bodenrichtwert sowie amtlichen Marktdaten. Die neuen Ausstattungsdetails fließen ebenfalls ein.'
+          h: 'Stufe 1, 2 und 3',
+          body: '<strong>Einfach · Stufe 1</strong> — Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr.\n<strong>Mittel · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Ausstattung (ab Investor).\n<strong>Ausgiebig · Stufe 3</strong> — Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert (ab Pro).\n\nFehlt für eine Stufe eine Angabe, sagt DealPilot welche — der Bericht rechnet nie halb. Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.'
         },
         {
-          h: 'PriceHubble (in Vorbereitung)',
-          body: 'Die PriceHubble-Anbindung ist in Vorbereitung und noch nicht aktiv. Sobald verfügbar, werden dieselben Objektangaben genutzt. Bis dahin liefert PriceHubble nur Demo-Werte.'
+          h: 'Woher die amtlichen Zahlen kommen',
+          body: 'In Stufe 3 rechnet DealPilot mit dem Liegenschaftszinssatz und dem Sachwertfaktor des zuständigen Gutachterausschusses. Jede Zahl trägt ihre Herkunft — Ausschuss, Jahrgang, Lizenz, Stichtag — und steht im Quellennachweis des Berichts. Liegt für eine Region kein amtlicher Wert vor, nennt der Bericht den zuständigen Ausschuss und den Weg zur Quelle, statt eine Zahl zu erfinden. Ein Nachbarkreis oder ein Landesmittel wird nie eingesetzt.'
         },
         {
           h: 'Tipp: Pflichtfelder zuerst',
@@ -330,7 +380,7 @@
         },
         {
           h: 'DealScore (0–100)',
-          body: 'Zusammengefasste Bewertung aller wichtigen Kennzahlen: Cashflow, NMR, BMR, DSCR, LTV, EK-Rendite, Vermögenszuwachs, Wertpuffer. Gewichtung in Settings → „Investor Deal Score 2.0" anpassbar.\n\n<strong>Skala:</strong> 80–100 ausgezeichnet, 60–79 gut, 40–59 mittel, unter 40 schwach.'
+          body: 'Eine Zahl von 0 bis 100 aus fünf Faktoren: Cashflow 30 %, Rendite 25 %, Beleihungsauslauf 15 %, Risiko 15 %, Potenzial 15 %. Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Gewichte und Vorlagen unter Einstellungen.'
         },
         {
           h: 'DSCR (Debt Service Coverage Ratio)',
@@ -591,10 +641,11 @@
     /* DealScore-Leiste */
     h += '<div class="hkv"><div class="hkv-h"><span class="hkv-ic">' + icScore + '</span><div><div class="t">DealScore</div><div class="s">Eine Zahl 0\u2013100 aus acht Kennzahlen</div></div></div><div class="hkv-b">'
       + '<div class="hkv-seg">'
-      + '<div class="sg" style="background:rgba(63,165,108,.16)"><div class="r" style="color:#2f8f57">80\u2013100</div><div class="l" style="color:#2f8f57">Ausgezeichnet</div></div>'
-      + '<div class="sg" style="background:rgba(201,168,76,.18)"><div class="r" style="color:#b8932f">60\u201379</div><div class="l" style="color:#b8932f">Gut</div></div>'
-      + '<div class="sg" style="background:rgba(201,140,60,.16)"><div class="r" style="color:#b5742a">40\u201359</div><div class="l" style="color:#b5742a">Mittel</div></div>'
-      + '<div class="sg" style="background:rgba(184,98,92,.15)"><div class="r" style="color:#a8514a">0\u201339</div><div class="l" style="color:#a8514a">Schwach</div></div>'
+      + '<div class="sg" style="background:rgba(63,165,108,.20)"><div class="r" style="color:#2f8f57">85\u2013100</div><div class="l" style="color:#2f8f57">Sehr gut</div></div>'
+      + '<div class="sg" style="background:rgba(63,165,108,.10)"><div class="r" style="color:#2f8f57">70\u201384</div><div class="l" style="color:#2f8f57">Gut</div></div>'
+      + '<div class="sg" style="background:rgba(201,168,76,.18)"><div class="r" style="color:#9a7f33">50\u201369</div><div class="l" style="color:#9a7f33">Solide</div></div>'
+      + '<div class="sg" style="background:rgba(201,140,60,.16)"><div class="r" style="color:#b5742a">35\u201349</div><div class="l" style="color:#b5742a">Schwach</div></div>'
+      + '<div class="sg" style="background:rgba(184,98,92,.15)"><div class="r" style="color:#a8514a">0\u201334</div><div class="l" style="color:#a8514a">Kritisch</div></div>'
       + '</div></div></div>';
     /* Faktor-Tabelle */
     h += '<div class="hkv"><div class="hkv-h"><span class="hkv-ic">' + icTab + '</span><div><div class="t">Faktor \u2194 Bruttomietrendite</div><div class="s">Kaufpreis \u00f7 Jahresmiete \u2014 Spiegelbild der Rendite</div></div></div><div class="hkv-b">'
@@ -605,6 +656,38 @@
       + '<tr><td class="fc">40\u00d7</td><td class="ar">\u2194</td><td class="rc">\u2248 2,5\u00a0%</td><td class="nc">Top-Lagen (M\u00fcnchen)</td></tr>'
       + '</table></div></div>';
     return h;
+  }
+  /* v2188: Einstieg in den Prozess-Atlas — eine kleine, laufende Vorschau
+     (drei Stationen, ein Flugzeug) statt eines Textlinks. */
+  function _atlasBannerHtml() {
+    if (!document.getElementById('help-atlas-style')) {
+      var st = document.createElement('style'); st.id = 'help-atlas-style';
+      st.textContent = '.hab{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px;overflow:hidden;position:relative}'
+        + '.hab svg{width:100%;max-width:360px;height:auto;display:block}'
+        + '.hab .t{font:600 16px "Space Grotesk",sans-serif;color:#fdfcfa;margin-top:8px}.hab .s{font-size:12.5px;color:#b9ad8f;margin-top:2px}'
+        + '.hab .kn{display:flex;flex-direction:column;gap:8px}'
+        + '.hab button{border:0;border-radius:10px;padding:10px 14px;font:600 13px "Space Grotesk",sans-serif;cursor:pointer;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407;white-space:nowrap}'
+        + '.hab button.z{background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-e8cc7a, #E8CC7A)}'
+        + '.hab .l{fill:none;stroke:rgba(201,168,76,.5);stroke-width:2;stroke-dasharray:4 6;animation:hab-f 1s linear infinite}'
+        + '.hab rect{fill:#1f1b16;stroke:var(--wl-c9a84c, #C9A84C);stroke-width:1.2}.hab text{fill:#efe7d4;font:600 10px Inter,sans-serif}'
+        + '.hab .fl{fill:var(--wl-e8cc7a, #E8CC7A)}'
+        + '@keyframes hab-f{to{stroke-dashoffset:-10}}'
+        + '@media (max-width:640px){.hab{grid-template-columns:1fr}}';
+      document.head.appendChild(st);
+    }
+    var pfad = 'M88 30 C110 30 112 30 136 30 M224 30 C246 30 248 30 272 30';
+    return '<div class="hab"><div>'
+      + '<svg viewBox="0 0 360 60" aria-hidden="true">'
+      + '<path class="l" d="' + pfad + '"/>'
+      + '<rect x="2" y="12" width="86" height="36" rx="9"/><text x="45" y="34" text-anchor="middle">Quick-Check</text>'
+      + '<rect x="136" y="12" width="88" height="36" rx="9"/><text x="180" y="34" text-anchor="middle">Ankauf</text>'
+      + '<rect x="272" y="12" width="86" height="36" rx="9"/><text x="315" y="34" text-anchor="middle">Bestand</text>'
+      + '<path class="fl" d="M-9 -1.4 L-2 -1.4 L3 -6.5 L5.6 -6.5 L2.4 -1.4 L7 -1.4 L9.5 -3.2 L10.8 -3.2 L9.6 0 L10.8 3.2 L9.5 3.2 L7 1.4 L2.4 1.4 L5.6 6.5 L3 6.5 L-2 1.4 L-9 1.4 Z"><animateMotion dur="3s" repeatCount="indefinite" rotate="auto" path="' + pfad + '"/></path>'
+      + '</svg>'
+      + '<div class="t">Prozess-Atlas — alle Abläufe als Netzplan</div>'
+      + '<div class="s">Klick eine Station: Schritte klappen auf, Daten fliegen ein. Grün: wo dein Objekt gerade steht.</div></div>'
+      + '<div class="kn"><button type="button" onclick="window.DealPilotAtlas && DealPilotAtlas.oeffne()">✈ Atlas öffnen</button>'
+      + '<button type="button" class="z" onclick="hideHelp(); window.DealPilotPilot && DealPilotPilot.rufen()">Pilot rufen · F1</button></div></div>';
   }
   function _renderTopic(topic) {
     var c = document.getElementById('help-content');
@@ -642,6 +725,8 @@
           '</button>' +
         '</div>';
     }
+    /* v2188: Prozess-Atlas und Pilot oben im Thema „Abläufe & Pilot“ */
+    if (topic.id === 'ablaeufe') { html += _atlasBannerHtml(); }
     /* v789-kpi-viz: Visuals oben im Kennzahlen-Topic */
     if (topic.id === 'kennzahlen') { html += _kpiVizHtml(); }
     topic.sections.forEach(function(s) {
@@ -828,6 +913,18 @@
   }
 
   window.showHelp = showHelp;
+  /* v2188: der Pilot (pilot-tower.js) liest die Themen und springt hinein */
+  window.DealPilotHilfe = {
+    themen: function () { return HELP_TOPICS; },
+    oeffne: function (id, h) {
+      showHelp(); _selectTopic(id);
+      if (h) setTimeout(function () {
+        var c = document.getElementById('help-content'); if (!c) return;
+        var hs = c.querySelectorAll('.help-section h3');
+        for (var i = 0; i < hs.length; i++) if (hs[i].textContent === h) { hs[i].scrollIntoView({ block: 'start' }); hs[i].parentNode.style.boxShadow = '0 0 0 2px var(--wl-c9a84c, #C9A84C)'; break; }
+      }, 120);
+    }
+  };
   window.hideHelp = hideHelp;
   window.helpAskAI = helpAskAI;
 })();
