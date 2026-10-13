@@ -170,7 +170,41 @@ const CHAPTER_GROUPS = [
   { id: 'g1', titel: 'Zusammenfassung & Empfehlung', kapitel: ['A) Zusammenfassung & Empfehlung'] },
   { id: 'g2', titel: 'Objekt, Lage & Markt', kapitel: ['B) Objekt, Lage & Markt'] },
   { id: 'g3', titel: 'Bewertung, Rendite & Ausblick', kapitel: ['C) Bewertung, Rendite & Ausblick'] },
+  /* v2196 · N62.14 · Marcel 13.10.2026: „die Marktberichte bewerten und die
+     Entwicklung beschreiben und die Ableitung sowie Prognose." Ein eigenes
+     Kapitel mit drei Teilen; die Prognose-Zahlen rechnet der Code (kapitelD),
+     das Modell schreibt sie nur aus. */
+  { id: 'g4', titel: 'Entwicklung, Ableitung & Prognose', kapitel: ['D) Entwicklung, Ableitung & Prognose'] },
 ];
+
+/* v2196 · Fakten fuer Kapitel D - fertig gerechnet, damit das Modell keine
+   Zahl erfindet. Die Prognose ist eine MODELLFORTSCHREIBUNG des gemessenen
+   Preistrends (Zinseszins ueber 3 und 5 Jahre), kein Gutachten und keine
+   Vorhersage; ohne Trend gibt es keine Prognosezahl. */
+export function kapitelD(p) {
+  p = p || {};
+  const mv = (p.valuation && p.valuation.market_value) || {};
+  const est = Number(mv.estimated);
+  const pt = p.price_trend_pct != null ? Number(p.price_trend_pct) : null;
+  const rt = p.rent_trend_pct != null ? Number(p.rent_trend_pct) : null;
+  const bt = p.bevoelkerung_trend_pct != null ? Number(p.bevoelkerung_trend_pct) : null;
+  const r0 = (x) => Math.round(x / 1000) * 1000;
+  const prog = (Number.isFinite(est) && est > 0 && Number.isFinite(pt))
+    ? { j3: r0(est * Math.pow(1 + pt / 100, 3)), j5: r0(est * Math.pow(1 + pt / 100, 5)), trend_pct: pt, basis: est }
+    : null;
+  const cc = p.cross_check || {};
+  const ew = cc.ertragswert && cc.ertragswert.available ? cc.ertragswert : null;
+  const sw = cc.sachwert && cc.sachwert.available ? cc.sachwert : null;
+  return {
+    entwicklung: { preis_trend_pct_jahr: pt, miete_trend_pct_jahr: rt, bevoelkerung_trend_pct: bt,
+                   berichte_im_verlauf: Array.isArray(p.market_history) ? p.market_history.length : null },
+    ableitung: { marktwert: Number.isFinite(est) ? est : null, spanne: [mv.low ?? null, mv.high ?? null],
+                 median_qm: mv.basis_median_sqm ?? null, abweichung_kaufpreis_pct: mv.discount_to_market_pct ?? null,
+                 ertragswert: ew ? (ew.wert ?? ew.ertragswert_eur ?? null) : null, liegenschaftszins_pct: ew ? ew.liegenschaftszins_pct ?? null : null,
+                 sachwert: sw ? (sw.wert ?? sw.sachwert_eur ?? null) : null },
+    prognose: prog,
+  };
+}
 
 /* v960-chapterguard
  * ────────────────────────────────────────────────────────────────────────────
@@ -296,6 +330,20 @@ async function callOpenAI(payload, opts = {}) {
           + `Quadratmeter bei 135 Angeboten". `
           + `Erfinde keine Zahl dazu.`;
       }
+    }
+    if (g.id === 'g4') {
+      const D = kapitelD(payload);
+      extra += '\n\nKAPITEL D - DREI TEILE, JE EIN ABSATZ, IN DIESER REIHENFOLGE. Nutze NUR diese fertig '
+        + 'gerechneten Werte (null = liegt nicht vor, dann sag das in einem Halbsatz und erfinde nichts): '
+        + JSON.stringify(D) + '. '
+        + '(1) ENTWICKLUNG: Preis- und Mietentwicklung je Jahr und Bevoelkerungstrend mit den Zahlen; '
+        + 'gibt es mehrere Berichte im Verlauf, sag es. '
+        + '(2) ABLEITUNG: wie der Marktwert zustande kommt - Vergleichsmedian je m2 mal Flaeche mal '
+        + 'Faktoren, die Spanne, der Abstand des Kaufpreises; liegen Ertrags- oder Sachwert vor, deren '
+        + 'Abstand zum Marktwert und der Liegenschaftszins. '
+        + '(3) PROGNOSE: nur wenn "prognose" nicht null ist - nenne die Werte j3 und j5 und schreibe '
+        + 'ausdruecklich, dass es eine MODELLFORTSCHREIBUNG des bisherigen Preistrends ist, keine Vorhersage '
+        + 'und kein Gutachten. Ist "prognose" null, schreibe, dass ohne Preistrend keine Fortschreibung moeglich ist.';
     }
     if (payload.erbbaurecht && payload.erbbaurecht.ok && (g.id === 'g1' || g.id === 'g3')) {
       const eb = payload.erbbaurecht;

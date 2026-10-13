@@ -5094,6 +5094,7 @@ async function exportPdf(out) {
 // Sprechende Kapiteltitel (statt "A) ...", "B) ..."). Fallback = Text hinter dem Buchstaben.
 const PDF_SECTION_TITLES = {
   A: 'Zusammenfassung & Empfehlung', B: 'Objekt, Lage & Markt', C: 'Bewertung, Rendite & Ausblick',
+  D: 'Entwicklung, Ableitung & Prognose',   /* v2196 · N62.14 */
 };
 // v895d-mbfmt: Markdown -> typisierte Bloecke (Ueberschrift/UL/OL/Tabelle/Callout/Absatz)
 function mdToPdfLines(md) {
