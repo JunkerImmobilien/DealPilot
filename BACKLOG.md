@@ -151,7 +151,7 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
-#### N62.19 · NÄCHSTE PAKETE A → B → C (Marcel, 13.10.2026: „Der Reihenfolge nach, aber A, B und C, alles zusammen.")
+#### N62.19 · NÄCHSTE PAKETE A → B → C — ✅ GEBAUT 13.10.2026 v2174–v2176 (Staging, Prod offen; Schwellen B von Marcel abzunehmen) (Marcel, 13.10.2026: „Der Reihenfolge nach, aber A, B und C, alles zusammen.")
 
 **A · Marktbericht im Hintergrund, mit Fortschritt und Meldung.** Gemessen 13.10.:
 Stufe 3 ist aus dem Tab Objekt abrufbar (`objekt-reiter.js:693-759` → `DealPilotMB.run`,

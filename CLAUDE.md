@@ -257,6 +257,13 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `objekt-mapper-pruefen.mjs` | Empfindlichkeit der Reiter-Objekt-Felder |
 | `prompt-lecks-pruefen.mjs` | 88 Felder kommen im Prompt an |
 | `gold-audit.py` | Whitelabel, gegen Basislinie (nur auf dem Server) |
+| `saat-pruefen.mjs --basislinie` | Register-Pflichtfelder (Quelle, Stichtag, Seite, Lizenz; SWF: GND + Baupreisindex als Zahl) gegen `tools/saat-basislinie.json` — läuft in `deploy-staging.ps1` mit, der Deckel darf nur sinken |
+
+**Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
+(Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
+Harvest-Takt gefundenen PDFs auswerten), `datenwaechter` (Deckung und Stand
+von Makro, Zensus, Register), `aemter-recherche` (Ämter mit belegter Quelle).
+Keiner schreibt in eine Datenbank oder fasst Produktion an.
 
 ## Namensräume nie mischen
 

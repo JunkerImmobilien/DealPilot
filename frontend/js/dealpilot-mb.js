@@ -617,31 +617,74 @@ if (!window._wlc) {
       return;
     }
     var ref = objId();
-    _mbSpinner(true);
+    /* ══ v2174 · STREAMING, MODAL MIT ETAPPEN, HINTERGRUND ═══════════════
+       Marcel am 13.10.2026: „wird dem Kunden dann ein Modal angezeigt mit
+       Progressbar ... und wenn man das Modal schliesst, im Hintergrund
+       weiter erstellt ... und irgendwo dann gemeldet".
+       Bis v2173: Dreh-Kreis ohne Balken, EIN blockierender Request an
+       /reports/from-dealpilot. Jetzt derselbe Streaming-Weg wie die
+       Marktbericht-App (/reports/generate-stream nimmt ein DealPilot-Objekt
+       an und bucht erst nach dem Ergebnis ab - auch wenn der Browser die
+       Verbindung verliert). Anzeige und Gedaechtnis: mb-auftrag.js.
+       DAS ERGEBNIS GEHOERT DEM OBJEKT, FUER DAS ES GEHOLT WURDE: wechselt
+       der Nutzer inzwischen das Objekt, landet es NICHT im gerade offenen,
+       sondern wartet in der Meldung, bis er es oeffnet. */
+    var key = global._currentObjKey || null;
+    var label = ([i.str, i.hnr].filter(Boolean).join(' ') + (i.ort ? ', ' + i.ort : '')).trim() || (i.plz || 'Objekt');
+    var M = global.MbAuftrag || null;
+    var job = M ? M.start({ key: key, ref: ref, label: label, stufe: stufe }) : null;
+    if (!M) _mbSpinner(true);
     try {
-      var res = await fetch('/api/v1/marktbericht/reports/from-dealpilot', {
+      var res = await fetch('/api/v1/marktbericht/reports/generate-stream', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok() },
         body: JSON.stringify(stufe >= 2 ? { wert_stufe: stufe, external_ref: ref, object: i }
                                         : { fast: true, external_ref: ref, object: i })
       });
-      var data = await res.json().catch(function () { return {}; });
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
+        var data = await res.json().catch(function () { return {}; });
+        if (M) M.abbrechen(job);
         /* v1187: nannte Liter. Der Server schickt seit v1183 die ART mit
            (mpi | mpi_plus | wev) — sie wird jetzt benannt, damit der Nutzer
-           weiss, WELCHE Bewertung fehlt. Nachkaufen kann er sie im
-           Marktbericht selbst, dort steht der Knopf am Fehler. */
-        if (data && data.needs_credits) {
+           weiss, WELCHE Bewertung fehlt. */
+        if (data && (data.needs_credits || data.error === 'kein_kontingent')) {
           var _artName = { mpi: 'Marktpreisindikation', mpi_plus: 'erweiterte Marktpreisindikation', wev: 'Wertermittlung' };
           toast('⚠ Keine ' + (_artName[data.art] || 'Bewertung') + ' mehr frei — im Marktbericht nachkaufbar');
         }
-        else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (data && (data.error || data.message) ? ': ' + (data.error || data.message) : ''));
+        else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (data && (data.error || data.message) ? ': ' + (data.message || data.error) : ''));
         return;
       }
-      if (data && data.no_data) {
-        toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor — es wurde nichts abgebucht');
+      var reader = res.body.getReader(), dec = new TextDecoder(), buf = '', result = null, fehlerText = null;
+      for (;;) {
+        var r = await reader.read();
+        if (r.done) break;
+        buf += dec.decode(r.value, { stream: true });
+        var nl;
+        while ((nl = buf.indexOf('\n')) >= 0) {
+          var line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+          if (!line) continue;
+          var ev = null; try { ev = JSON.parse(line); } catch (x) { continue; }
+          if (ev.type === 'step' && M) M.schritt(job, ev.msg);
+          else if (ev.type === 'done') result = ev.result;
+          else if (ev.type === 'error') fehlerText = ev.error || 'Fehler';
+        }
+      }
+      if (!result) {
+        if (M) M.fehler(job, fehlerText || 'Keine Antwort vom Marktbericht-Dienst.');
+        else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (fehlerText ? ': ' + fehlerText : ''));
         return;
       }
-      var payload = data.data || data;
+      var payload = result.data || result;
+      var _mv = payload.valuation && payload.valuation.market_value;
+      if (!(_mv && _mv.estimated > 0)) {
+        /* derselbe Massstab wie der Proxy: ohne Marktwert wird nicht abgebucht */
+        if (M) M.fehler(job, 'Für diese Adresse liegen aktuell keine Marktdaten vor — es wurde nichts abgebucht.');
+        else toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor — es wurde nichts abgebucht');
+        return;
+      }
+      if ((global._currentObjKey || null) !== key) {
+        if (M) M.fertig(job, { angewandt: false, payload: result });
+        return;
+      }
       D = mapCard(payload); mode = (_prefSpan() || 'med'); collapsed = false; /* v830-mb-expanded; v969c: Vorwahl-Spanne */
       render();
       /* v1316: die Einstufungen wandern jetzt von selbst ins Formular -
@@ -649,17 +692,22 @@ if (!window._wlc) {
          haengt. Verkehrswert und Marktmiete bleiben beim Knopf. */
       try { autoLage(); } catch (e) {}
       persistFull({
-        object_key: data.object_key || null, cost: (typeof data.cost === 'number' ? data.cost : (data.charged || data.liters || 0)),
+        object_key: result.object_key || null, cost: 0,
         market_value: (payload.valuation && payload.valuation.market_value) || null,
         micro: payload.micro ? payload.micro.score : null,
         macro: payload.macro ? payload.macro.score : null,
         price_trend_pct: payload.price_trend_pct != null ? payload.price_trend_pct : null
       });
-      var _lc = (data._kerosin && typeof data._kerosin.charged === 'number') ? data._kerosin.charged : ((typeof data.cost === 'number') ? data.cost : (data.charged || data.liters || null));
-      toast('✓ DealPilot-Marktbewertung' + (_lc ? ' (−' + _lc + ' L)' : ''));
+      try { global.dispatchEvent(new CustomEvent('dp:mb-ready', { detail: { object_key: result.object_key || null } })); } catch (e) {}
+      /* v2174: hier stand „(−N L)" - die Einheit Liter ist seit v1183 abgeschafft. */
+      if (M) M.fertig(job, { angewandt: true });
+      else toast('✓ DealPilot-Marktbewertung');
       try { if (global.AiCredits && typeof global.AiCredits.refreshAvm === 'function') setTimeout(global.AiCredits.refreshAvm, 400); } catch (e) {}
-    } catch (e) { toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung'); }
-    finally { _mbSpinner(false); }
+    } catch (e) {
+      if (M) M.fehler(job, 'Netzwerkfehler: ' + (e && e.message ? e.message : 'unbekannt'));
+      else toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung');
+    }
+    finally { if (!M) _mbSpinner(false); }
   }
 
   /* v1862 · Ein Ergebnis, das WOANDERS geholt wurde (geführte Eingabe,

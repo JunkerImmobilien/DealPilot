@@ -185,6 +185,17 @@
   }
 
   async function openMarktberichtView() {
+    /* v2174 · ERST SPEICHERN. Gemessen 13.10.2026: der Marktbericht laedt
+       das Objekt per ?ref vom SERVER (mb-objektwahl.js, GET /objects/:id) -
+       was gerade getippt und noch nicht gespeichert war, kam nicht an.
+       Ein geoeffnetes Objekt wird deshalb vorher gesichert (die Sperre der
+       Ankauf-Ansicht greift auch hier: im Soll wird nichts ins Ist
+       geschrieben). */
+    try {
+      if (global._currentObjKey && typeof global.saveObj === 'function') {
+        await Promise.race([global.saveObj(true), new Promise(function (ok) { setTimeout(ok, 4000); })]);
+      }
+    } catch (e) {}
     injectCss();
     if (document.body.classList.contains('dp-dash-fullscreen') && global.DealPilotDashboard && typeof global.DealPilotDashboard.close === 'function') {
       try { global.DealPilotDashboard.close(); } catch (e) {}

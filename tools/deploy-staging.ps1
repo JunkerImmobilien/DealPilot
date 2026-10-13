@@ -179,6 +179,26 @@ if (Test-Path "tools\frontend-konstanten.mjs") {
     Write-Host "   [ok] Frontend-Konstanten aktuell"
 }
 
+# --- 3b) v2176 - Register-Pflichtfelder gegen die Basislinie ----------
+# Marcel am 13.10.2026: "sicherstellen, dass wir immer die notwendigen
+# Felder ausfuellen und auch mit Quellen". Jeder Registersatz (Zins,
+# Sachwertfaktor ...) muss Quelle, Jahrgang, Stichtag, Lizenz, Beleg mit
+# Seite und beim Sachwertfaktor GND und Baupreisindex als Zahl tragen.
+# Der Altbestand steht in tools/saat-basislinie.json - mehr als dort ist
+# ein Abbruch, weniger ein Hinweis zum Senken.
+if (Test-Path "tools\saat-pruefen.mjs") {
+    $null = node tools/saat-pruefen.mjs --basislinie 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        node tools/saat-pruefen.mjs --basislinie | Select-String "NEU|BASISLINIE|DECKUNG|FEHLT|KEINE"
+        Write-Host ""
+        Write-Host "ABBRUCH: ein Registersatz verletzt den Pflichtfeld-Vertrag." -ForegroundColor Red
+        Write-Host "         node tools/saat-pruefen.mjs   (volle Liste je Satz)" -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
+    }
+    Write-Host "   [ok] Register-Pflichtfelder (Basislinie)"
+}
+
 # --- 4) Was geht raus? ------------------------------------------------
 git fetch origin $ZWEIG --quiet
 PruefeExit "git fetch"
