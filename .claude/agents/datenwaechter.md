@@ -19,7 +19,7 @@ Ergebnis — ein Prüfer, der nichts gelesen hat, ist nicht grün.
 3. **Register**: `node tools/saat-pruefen.mjs --basislinie` (RC=0?) und je Land
    Werte/Sperren — Länder ohne einen Wert benennen.
 4. **Ausschuss-Verzeichnis** `mb.gaa_sources`: Anzahl `portal_defekt`.
-5. **Bewirtschaftungskosten je Jahr** (`marktbericht/backend/src/lib/immowertv.js`, `BWK_JAHRE`, seit v2186): Steht das LAUFENDE Jahr drin, mit allen fünf Werten (Verwaltung je Wohnung, je ETW, je Garage; Instandhaltung je m², je Garage) und Quelle? Ab Januar fehlt es typischerweise — dann die veröffentlichten Werte recherchieren (zwei übereinstimmende Quellen, Rechenweg: Basiswert × VPI Okt. Vorjahr / Okt. 2001, kaufmännisch gerundet) und als Vorschlag melden. Nicht selbst eintragen.
+5. **Bewirtschaftungskosten je Jahr** (`marktbericht/backend/src/lib/immowertv.js`, `BWK_JAHRE`, seit v2186): Steht das LAUFENDE Jahr drin, mit allen fünf Werten (Verwaltung je Wohnung, je ETW, je Garage; Instandhaltung je m², je Garage) und Quelle? Ab Januar fehlt es typischerweise. Erste Quelle ist die amtliche Jahrestabelle des Oberen Gutachterausschusses Brandenburg (gutachterausschuss.brandenburg.de, „Bewirtschaftungskosten entsprechend Anlage 3 ImmoWertV“, Bewko_<Jahr>.pdf, eine Seite mit allen Jahren inkl. Gewerbe) — seit v2195 die Quelle der Tabelle. Zur Gegenprobe der Rechenweg: Basiswert × VPI Okt. Vorjahr / Okt. 2001, kaufmännisch gerundet. Als Vorschlag melden, nicht selbst eintragen. Keine Anbieternamen in  — der Text steht im Kundenbericht.
 6. **Ein Bericht als Gegenprobe**: in `mb.object_snapshots` die letzten
    Berichte — `data->'macro'->>'gemessen'` (4 = alle Makro-Kennzahlen),
    `data->'zensus'->>'available'`.

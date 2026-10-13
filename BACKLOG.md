@@ -198,6 +198,8 @@ gegenübergestellt werden sie nirgends.
 
 #### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert nicht fortgeschrieben (Bewertungsfrage an Marcel)
 
+> **✅ v2195 (13.10.2026): Rest erledigt.** 2022/2023 vollständig aus der amtlichen Tabelle des Oberen Gutachterausschusses Brandenburg (2022–2026, eine Seite); Gewerbe: Verwaltung 3 % und getrennter Mietausfall im Ertragswert. Offen nur: Gewerbe-Instandhaltung braucht Nutzfläche und Nutzungsart als Eingabe (heute nur gewerbe_jahr).
+
 **✅ GEBAUT 13.10.2026 · v2186 · e2ec2ed2 (Staging):** Marcel: „das soll schon passen“. Jahrestabelle BWK_JAHRE + bwkAnsaetze(jahr), Ertragswert zum Stichtag je Objektart. Offen: 2022/2023 lückenhaft, Gewerbe-Verwaltung/-Instandhaltung, Prod.
 
 Gemessen 13.10.2026: `marktbericht/backend/src/services/ErtragswertService.js:360–386` nimmt außerhalb des NRW-Modells `BWK_TABELLE` aus `lib/immowertv.js` UNfortgeschrieben — 230 € Verwaltung je Wohnung (275 € ETW), 9,00 €/m² Instandhaltung. Für Stichtage ab 01.01.2026 gelten nach zwei Fachquellen 367 € / 439 € / 14,40 €/m² (Faktor 1,60, siehe v2185). Die Bewirtschaftungskosten liegen damit rund 37 % zu niedrig, der Ertragswert zu hoch; der Bericht warnt selbst „nicht indexiert … vorläufig" (`geprueft: false`).

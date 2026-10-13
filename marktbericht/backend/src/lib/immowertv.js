@@ -89,18 +89,30 @@ export const BWK_TABELLE = {
  * prueft das). Fehlt ein Jahr oder ein Feld, nimmt bwkAnsaetze() das letzte
  * belegte Jahr DAVOR und sagt das - nie ein spaeteres, nie eine Schaetzung.
  * ──────────────────────────────────────────────────────────────────────────── */
+/* v2195 · Die Jahre 2022-2026 aus EINER amtlichen Tabelle: Oberer Gutachterausschuss
+   Brandenburg, „Bewirtschaftungskosten entsprechend Anlage 3 ImmoWertV und Nr. 4.2.3
+   VV EW-SW fuer die Jahre 2022 bis 2026“ (Bewko_2026.pdf, 1 Seite, gelesen 13.10.2026).
+   Vorher: 2022 fehlte, 2023 nur Teilwerte, 2024 ETW 420 aus einer Fachquelle (amtlich 421),
+   und die Quelle 2025 nannte einen Anbieternamen - der Text steht im Kundenbericht.
+   Gewerbe (gew_*): Verwaltung 3 % des marktueblichen gewerblichen Rohertrags,
+   Instandhaltung als Anteil der Wohn-Instandhaltung (Lager/Logistik/Produktion 30 %,
+   SB-Verbrauchermaerkte 50 %, Buero/Praxen/Geschaefte 100 %), Mietausfall Wohnen 2 %,
+   Gewerbe 4 %. Neue Jahre traegt der Agent datenwaechter jaehrlich als Vorschlag ein. */
 export const BWK_JAHRE = {
   2021: { verw_we: 298, verw_etw: 357, verw_garage: 39, inst_qm: 11.70, inst_garage: 88,
           quelle: 'ImmoWertV 2021, Anlage 3 (Verordnungstext, Stand 01.01.2021)' },
-  2023: { verw_we: 339, verw_garage: 44, inst_qm: 13.20,
-          quelle: 'Tabelle Brandenburg ab 01.01.2023 (Teilwerte; ETW und Garagen-Instandhaltung nicht genannt)' },
-  2024: { verw_we: 351, verw_etw: 420, verw_garage: 46, inst_qm: 13.80, inst_garage: 104,
-          quelle: 'Fortschreibung 2024 (immobilien-wertermittlung.de; Rechenweg HVBG Hessen)' },
+  2022: { verw_we: 312, verw_etw: 373, verw_garage: 41, inst_qm: 12.20, inst_garage: 92,
+          gew_verw_pct: 3, gew_inst_qm: { lager: 3.70, sb_markt: 6.10, buero: 12.20 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+  2023: { verw_we: 339, verw_etw: 405, verw_garage: 44, inst_qm: 13.20, inst_garage: 100,
+          gew_verw_pct: 3, gew_inst_qm: { lager: 4.00, sb_markt: 6.60, buero: 13.20 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+  2024: { verw_we: 351, verw_etw: 421, verw_garage: 46, inst_qm: 13.80, inst_garage: 104,
+          gew_verw_pct: 3, gew_inst_qm: { lager: 4.10, sb_markt: 6.90, buero: 13.80 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
   2025: { verw_we: 359, verw_etw: 429, verw_garage: 47, inst_qm: 14.00, inst_garage: 106,
-          quelle: 'Fortschreibung 2025 (immobilien-wertermittlung.de, sprengnetter.de)' },
+          gew_verw_pct: 3, gew_inst_qm: { lager: 4.20, sb_markt: 7.00, buero: 14.00 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
   2026: { verw_we: 367, verw_etw: 439, verw_garage: 48, inst_qm: 14.40, inst_garage: 108,
-          quelle: 'Fortschreibung 2026, VPI Okt. 2024 -> Okt. 2025 +2,33 % (immobilien-wertermittlung.de, abels-immobilienbewertung.com)' },
+          gew_verw_pct: 3, gew_inst_qm: { lager: 4.30, sb_markt: 7.20, buero: 14.40 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
 };
+export const BWK_MIETAUSFALL = { wohnen_pct: 2, gewerbe_pct: 4, quelle: 'Oberer Gutachterausschuss Brandenburg / Anlage 3 ImmoWertV' };
 
 /* Ansaetze zum Stichtagsjahr. Je Feld das Jahr selbst, sonst das letzte
    belegte Jahr davor. `abweichend` nennt jedes Feld, das NICHT aus dem
