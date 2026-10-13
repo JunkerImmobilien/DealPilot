@@ -38725,6 +38725,7 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Nachweis:**
   - `DealPilotGrest.forPlz`: 99084 und 07743 → TH 5, 28195 → HB 5,5, 01067 → SN 5,5, 80331 → BY 3,5, 40210 → NW 6,5.
   - Prod liefert `'HB': 5.5`, `'TH': 5.0`.
+- **Nachtrag N63.9:** Halten zum Sprechen in der Messkabine (390 px) mit künstlichem Tonstrom statt Mikrofon geprüft (getUserMedia im Messrahmen ersetzt, nur Test). Drücken → Aufnahme, Loslassen → 53 KB WebM an /ai/extract-voice, Antwort „Keine Sprache erkannt“, danach Ruhe.
 - **Rest:** Es gibt zwei rechnende Tabellen (Objekt, Quick-Check) mit eigenen Schlüsseln. Bei der nächsten Änderung eines Satzes beide anfassen; besser wäre eine gemeinsame Quelle.
 
 ### v2206 · Prod (16) · Standardwerte als Karten (N63.5, 13.10.2026)

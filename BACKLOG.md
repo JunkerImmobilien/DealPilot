@@ -210,7 +210,7 @@ gegenübergestellt werden sie nirgends.
 - Dazu Eingabe und Lautsprecher.
 
 **N63.9 · Geführte Eingabe: Mikrofon auf kleinen Bildschirmen „halten zum Sprechen“** — Marcel (13.10. abends, präzisiert): gemeint ist das Mikrofon-Symbol der GEFÜHRTEN EINGABE und die Handy-Darstellung (Messkabine, kleine Breiten). Dort: Mikrofon gedrückt halten = zuhören, loslassen = fertig (wie WhatsApp); das Kästchen „Ich höre nichts, du kannst auch tippen“ und der Anhalten-Knopf entfallen dort. Auf großen Bildschirmen bleibt das automatische Zuhören wie heute.
-> ✅ v2204 (Code + Darstellung geprüft) — echtes Sprechen nur am Gerät abnehmbar.
+> ✅ v2204, Prod (15) — Kette in der Messkabine 390 px geprüft (künstlicher Tonstrom statt Mikrofon): Drücken nimmt auf, Loslassen schickt 53 KB WebM an /ai/extract-voice, Antwort „Keine Sprache erkannt“ (erwartet bei Ton), danach Ruhe ohne Selbst-Zuhören. Ungeprüft nur die Erkennung echter Worte (dieselbe Auswertung wie am Desktop).
 
 #### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
 
