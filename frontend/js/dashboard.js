@@ -188,6 +188,9 @@
         // Summary-Felder mit reinmischen, damit ein Objekt alles hat
         d._sum = o; d._key = k; d._name = obj && (obj.name) || o.name; d._kuerzel = (obj && obj.kuerzel)||o.kuerzel;
         d._ort = (obj && obj.ort)||o.ort; d._kaufpreis = num(o.kaufpreis||d.kaufpreis||(obj&&obj.kaufpreis));
+        /* v2170b: die Analyse-SPALTE mitnehmen - die Kopie in data._ai war bei 4 von 8
+           Objekten veraltet (Spalte 13.10., Kopie 09.10.; gemessen auf Staging). */
+        d._ai_spalte = obj && obj.ai_analysis;
         _details[k] = d;
         return d;
       }).catch(function(){ return null; });
@@ -2879,11 +2882,12 @@
      (v2014). Gekuerzt wird hart, und der Stand steht dabei - eine alte
      Analyse darf nicht wie eine neue gelesen werden. */
   function _ppAnalyse(o) {
-    var roh = o && o._ai;
-    if (!roh) return null;
-    var a = roh;
-    if (typeof roh === 'string') { try { a = JSON.parse(roh); } catch (e) { return null; } }
-    if (!a || typeof a !== 'object') return null;
+    function lies(roh) { if (!roh) return null; if (typeof roh === 'string') { try { roh = JSON.parse(roh); } catch (e) { return null; } } return (roh && typeof roh === 'object') ? roh : null; }
+    function stand(x) { return (x && x._fuer && x._fuer.stand) || ''; }
+    var k1 = lies(o && o._ai_spalte), k2 = lies(o && o._ai);
+    /* v2170b: die NEUERE von Spalte und Kopie */
+    var a = (k1 && k2) ? (stand(k1) >= stand(k2) ? k1 : k2) : (k1 || k2);
+    if (!a) return null;
     function k(t, n) { t = (t == null) ? '' : String(t).replace(/\s+/g, ' ').trim(); return t ? (t.length > n ? t.slice(0, n - 1) + '\u2026' : t) : null; }
     function liste(x, m, n) {
       if (!Array.isArray(x)) return null;
@@ -2896,7 +2900,7 @@
     return {
       stand: f.stand ? String(f.stand).slice(0, 10) : null,
       empfehlung: k(a.empfehlung, 40),
-      fazit: k(a.fazit_kurz || a.gesamtbewertung, 320),
+      fazit: k(a.gesamtbewertung || a.fazit_kurz, 420),   /* v2170: fazit_kurz ist nur das Urteilswort */
       risiken: liste(a.risiken, 3, 140),
       staerken: liste(a.staerken, 3, 140),
       steuer: k(a.steuer_zusammenfassung, 260),
@@ -3050,6 +3054,11 @@
   window.DealPilotDashboard = {
     /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
     portfolioPayload: portfolioPayload,
+    /* v2170: die Detailkopien werden sonst nur beim LOESCHEN erneuert - eine
+       Pilot-Analyse aus derselben Sitzung kam beim Portfolio-Piloten nie an
+       (gemessen: Stand 09.10. statt 13.10.). Vor jeder Pilot-Anfrage frisch. */
+    frisch: function () { _details = {}; _detailsLoaded = false;   /* ganze Kette, s. portfolioLaden (v1793b) */
+      return loadSummaries().then(function () { return loadDetails(); }); },
     /* v1793 · GEMESSEN: portfolioPayload() gibt 0 Objekte zurueck, solange
        das Dashboard nicht einmal offen war. Grund ist `_details` - ein
        Cache, den nur `loadDetails()` fuellt, und das lief bisher

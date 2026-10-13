@@ -38614,6 +38614,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### Prod-Rollouts 13.10.2026 · v2145–v2167 und das Modell gpt-4.1
+
+- **Rollout 1** `b62eb9d2` (v2145–v2166): beide DBs gesichert und angesehen (11 MB/71 Tabellen, 1,6 MB/26), Migrationen 087 + mb 016 angewendet, Zensus-Import 894.880 Werte (VACUUM scheiterte am /dev/shm des DB-Containers — harmlos). **Rollout 2** `31bff93e` (v2163a–v2167). Push nach main mit Marcels ausdrücklicher Erlaubnis („du kannst pushen").
+- **v2163a** `4f9245af`: Stand-Leiste exakt so breit wie Portfolio (231 px), 14 px Abstand — gemessen.
+- **v2167** `d0b167fb`: **gpt-4o VERWEIGERTE den vollen Auftrag** („I'm sorry, I can't assist") — reproduzierbar, sofort (2–3 s), und die App meldete trotzdem „abgeschlossen". Eingegrenzt: jeder Teil allein geht, der volle Auftrag mit Marktbericht nicht. **Prod lief auf gpt-4o** (Staging auf gpt-4o-mini). Jetzt Meldung nur bei echter Analyse; Foto-Weg 16000 Tokens (stand auf 8000); Aufgabenliste = Antwortformat.
+- **Modell:** `OPENAI_DEFAULT_MODEL=gpt-4.1` in Staging- und Prod-`.env` (Sicherungen `/root/backups/env-*-vor-modell`). Gemessen 2026-1052: keine Verweigerung, 46 s, 32.420 statt 14.366 Zeichen. Achtung: die Variable gilt für ALLE KI-Funktionen mit Standardmodell, nicht nur die Analyse.
+- Regionaldatenbank: das Passwort in der Staging-`.env` wird abgelehnt („Nutzernamen bzw. Passwort prüfen"); Datei zuletzt 06:12 UTC geändert.
+
 ### v2163–v2166 · Stand-Leiste, Bestand=gewonnen, Makrolage, Steuer-Tiefe (13.10.2026)
 
 - **v2163** `fcf4fdab`: Stand-Leiste (Bestand/Ankauf) auf dunkler Schiene wie der Portfolio-Knopf (Aktenmappe/Kanzlei/Tower gemessen: Schiene rgb(14,13,11)). Im Bild abgenommen.

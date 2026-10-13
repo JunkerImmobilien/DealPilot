@@ -198,7 +198,15 @@
      Rueckfrage. Eine Rueckfrage beantwortet einen Ausschnitt, und ein
      Ausschnitt, der spaeter als "die Analyse" gelesen wird, ist
      schlimmer als keine. */
+  /* v2170: erst die Objekte frisch laden (DealPilotDashboard.frisch), dann
+     senden - sonst rechnet der Pilot mit dem Stand vom Seitenaufruf. */
   function senden(nachricht, sichtbar, istAnalyse) {
+    if (laeuft) return;
+    var D = window.DealPilotDashboard;
+    var p = (D && typeof D.frisch === 'function') ? D.frisch() : null;
+    Promise.resolve(p).catch(function () {}).then(function () { _senden(nachricht, sichtbar, istAnalyse); });
+  }
+  function _senden(nachricht, sichtbar, istAnalyse) {
     if (laeuft) return;
     var ctx = kontext();
 

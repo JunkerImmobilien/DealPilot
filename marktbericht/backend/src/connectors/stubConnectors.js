@@ -2,6 +2,7 @@
 // GeoMap -> connectors/GeoMapConnector.js (echt). BORIS -> BorisConnector.js (echt).
 import { httpJson, httpText } from '../lib/http.js';
 import { cfg, destatisEnabled } from '../lib/config.js';
+import { cacheGet, cacheSet } from '../lib/cache.js';   /* v2169 */
 
 // Destatis / Regionalstatistik (GENESIS-Online, regionalstatistik.de)
 // REST/JSON, POST. Auth: username (= persoenlicher Token 32 Z. ODER Kennung) + password
@@ -119,27 +120,60 @@ export const DestatisConnector = {
     };
     const series = {};
     const _atlas = {};   /* v2165: Zeilen der Atlas-/VGR-Tabellen, je Schluessel */
-    for (const [key, name] of Object.entries(tables)) {
-      if (!name) continue;
+    /* ══ v2169 · PARALLEL UND ZWISCHENGESPEICHERT ═════════════════════════
+       Gemessen am 13.10.2026 nach Marcels neuem Passwort: die Kennzahlen
+       kamen an, aber nicht verlaesslich - je Lauf fehlte eine andere
+       (Abrufe ueber 30 s). Die Zahlen aendern sich einmal im Jahr: jede
+       Antwort wird 30 Tage je Tabelle und Kreis gehalten (die Einkommens-
+       tabelle ohne Filter gilt fuer ALLE Kreise und wird einmal geholt),
+       die vier Abrufe laufen parallel. Nur ERFOLGE werden gehalten - ein
+       Fehlschlag wird beim naechsten Bericht erneut versucht. */
+    const TAGE30 = 30 * 24 * 3600 * 1000;
+    const self = this;
+    /* v2169a · ZEITBUDGET. Ein Bericht wartet hoechstens 20 s auf die
+       Regionaldatenbank (gemessen 13.10.: 44-182 s je Tabelle). Der Abruf
+       laeuft danach WEITER und fuellt den Speicher fuer den naechsten
+       Bericht - er blockiert nur keinen der sechs Berichtsplaetze mehr.
+       Laufende Abrufe je Schluessel werden geteilt, nicht doppelt gestartet. */
+    const BUDGET_MS = 20000;
+    const laufend = (DestatisConnector._laufend = DestatisConnector._laufend || new Map());
+    async function holeText(name, filter) {
+      const ck = 'destatis:' + name + ':' + (filter || 'ALLE');
+      const c = cacheGet(ck);
+      if (c !== undefined && c !== null) return c;
+      let p = laufend.get(ck);
+      if (!p) {
+        p = self._fetchTableFfcsv(name, krs, now, filter)
+          .then((txt) => {
+            if (txt && !/"Code"\s*:\s*[1-9]/.test(String(txt).slice(0, 300))) cacheSet(ck, txt, TAGE30);
+            return txt;
+          })
+          .finally(() => laufend.delete(ck));
+        laufend.set(ck, p);
+      }
+      return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('zeitbudget')), BUDGET_MS))]);
+    }
+    await Promise.all(Object.entries(tables).map(async ([key, name]) => {
+      if (!name) return;
       if (key !== 'bevoelkerung') {
         try {
           /* Einkommen OHNE Kreisfilter: die Antwort traegt dann auch die
              Zeile "DG" (Deutschland) - der Bundeswert fuer den Index kommt
              aus derselben Tabelle und demselben Jahr, nicht aus einer
              Schaetzung. Die beiden Atlas-Tabellen MIT Filter (sonst Code 98). */
-          const txt = await this._fetchTableFfcsv(name, krs, now, key === 'einkommen' ? null : krs);
+          const txt = await holeText(name, key === 'einkommen' ? null : krs);
           _atlas[key] = this._atlasZeilen(this._extractCsv(txt));
         } catch { _atlas[key] = null; }
-        continue;
+        return;
       }
       try {
-        const txt = await this._fetchTableFfcsv(name, krs, now);
+        const txt = await holeText(name, 'BEV:' + krs);
         const csv = this._extractCsv(txt);                 // JSON-Envelope -> Object.Content, sonst Rohtext
         let s = this._parseDatencsvSeries(csv, krs);        // datencsv-Pivot (regionalstatistik-Default)
         if (!s || !s.length) s = this._parseFfcsvSeries(csv, krs); // Fallback: tidy ffcsv
         series[key] = s;
       } catch { series[key] = null; }
-    }
+    }));
 
     // Metriken ableiten (defensiv – fehlende Werte bleiben undefined -> Score ignoriert sie)
     const metrics = {};
@@ -293,7 +327,7 @@ export const DestatisConnector = {
        antworten mit Filter Code 0 und ohne ihn Code 98 (gemessen). */
     if (kreisFilter) { body.regionalvariable = 'KREISE'; body.regionalkey = kreisFilter; }
     const base = await resolveBase(); // genesisws/genesisWS-robust
-    const r = await httpText(`${base}/data/table`, { method: 'POST', headers: authHeaders(), form: body, timeoutMs: 30000, retries: 1 });
+    const r = await httpText(`${base}/data/table`, { method: 'POST', headers: authHeaders(), form: body, timeoutMs: 60000, retries: 2 });   /* v2169: die Regionaldatenbank braucht teils ueber 30 s */
     return r.text || '';
   },
 

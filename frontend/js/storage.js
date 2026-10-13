@@ -475,6 +475,12 @@ function loadData(d) {
   // Beispiel: Objekt A hat san=12000, Objekt B hat keinen san-Wert → ohne diesen Reset
   // bleibt san=12000 im DOM → GI von B = kp_B + nk_B + 12000 (falsch).
   var resetFields = [
+    /* v2168: die gespeicherte Marktbericht- und AVM-Karte. Fehlten sie im
+       geladenen Objekt, blieb die des VORIGEN stehen und wanderte beim
+       naechsten Speichern mit. Gemessen am 13.10.2026: sieben Objekte auf
+       Staging trugen dieselbe Karte (199.000 € fuer 95 m²) - am MFH
+       Gohliser Str. 42 (1,68 Mio.) stand „234 €/m² · -88,2 %". */
+    '_mb_state', '_avm_state',
     /* v1958: ohne diesen Eintrag traegt Objekt B die Lageklasse von
        Objekt A weiter - und an ihr haengt eine Rechnung. */
     'lageklasse',
