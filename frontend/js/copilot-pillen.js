@@ -40,20 +40,20 @@
   window._dpCpPillenInit = true;
 
   var LOKAL = [
-    { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollstaendig ist dieses Objekt?' },
+    { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollständig ist dieses Objekt?' },
     { id: 'fehlt',  text: 'Was fehlt?',        titel: 'Welche Felder sind noch leer?' }
   ];
   var FRAGEN = [
     { id: 'sollist', text: 'Soll/Ist',
       frage: 'Vergleiche den Ankaufstand mit dem heutigen Stand: Wo liegen wir '
-           + 'besser, wo schlechter, und was heisst das fuer die Bank?' },
+           + 'besser, wo schlechter, und was heißt das für die Bank?' },
     { id: 'tiefer', text: 'Mehr Tiefe?',
-      frage: 'Welche zusaetzlichen Angaben wuerden die Analyse dieses Objekts '
+      frage: 'Welche zusätzlichen Angaben würden die Analyse dieses Objekts '
            + 'belastbarer machen — und was bringt jede davon konkret?' },
     { id: 'risiko', text: 'Risiken',
-      frage: 'Was sind die drei groessten Risiken bei diesem Objekt, '
+      frage: 'Was sind die drei größten Risiken bei diesem Objekt, '
            + 'gemessen an den vorliegenden Zahlen?' },
-    { id: 'bank', text: 'Bankgespraech',
+    { id: 'bank', text: 'Bankgespräch',
       frage: 'Worauf wird die Bank bei diesem Objekt zuerst schauen, '
            + 'und welche Zahl sollte ich vorher kennen?' }
   ];
