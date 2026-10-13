@@ -233,7 +233,20 @@
       icon: 'i-settings',
       title: 'Tab 5: Bewirtschaftung',
       body: 'Hier definierst du **die laufenden Kosten** als Eigentümer — Hausgeld, Instandhaltung, Verwaltung.',
-      bodyMore: '**Was hier rein gehört:**\n\n• **Hausgeld (nicht umlagefähig)** — Verwaltung + Rücklagen\n• **Instandhaltung** — typisch 0,8-1,2 % des Gebäudewerts p.a.\n• **Mietausfallwagnis** — Default 2%\n• **Property-Management** — falls Hausverwalter (typ. 4-8% Kaltmiete)\n• **Versicherung** — Wohngebäude, Haftpflicht\n\n**Wichtig:** Diese Kosten reduzieren deinen Cashflow direkt. **Konservativ schätzen, kontrolliert hoch leben.**',
+      bodyMore: '**Was hier rein gehört:**\n\n• **Hausgeld (nicht umlagefähig)** — Verwaltung + Rücklagen\n• **Instandhaltung** — typisch 0,8-1,2 % des Gebäudewerts p.a.\n• **Mietausfallwagnis** — vorbelegt 1 % (Einstellungen → Standardwerte)\n• **Property-Management** — falls Hausverwalter (typ. 4-8% Kaltmiete)\n• **Versicherung** — Wohngebäude, Haftpflicht\n\n**Wichtig:** Diese Kosten reduzieren deinen Cashflow direkt. **Konservativ schätzen, kontrolliert hoch leben.**',
+      placement: 'auto'
+    },
+
+    /* v2205 · N63.8: der Reiter Steuer fehlte in der Tour - sie sprang von
+       „Tab 5: Bewirtschaftung" zu „Tab 6: Pilot-Analyse", obwohl Steuer der
+       sechste Reiter ist (data-target-sec="s3-tax"). */
+    {
+      tab: 's3-tax',
+      selector: '.tab[data-target-sec="s3-tax"]',
+      icon: 'i-receipt',
+      title: 'Tab 6: Steuer',
+      body: 'Hier rechnest du **die Steuerwirkung** deines Objekts: Grenzsteuersatz, AfA und Werbungskosten — Jahr für Jahr.',
+      bodyMore: '**Was du hier findest:**\n\n• **Grenzsteuersatz** — aus deinem zu versteuernden Einkommen\n• **AfA** — Gebäudeanteil (vorbelegt 80 %), 2 %, vor 1925 2,5 %, ab 2023 fertiggestellt 3 %, dazu § 7b\n• **BMF-Rechner** — Kaufpreis in Boden und Gebäude aufteilen\n• **Werbungskosten je Jahr** — mit „Werte aus dem Vorjahr übernehmen“ für wiederkehrende Posten\n• **Finanzamt-PDF** — auf Wunsch mit Anlage V\n\nDealPilot ist eine Rechenhilfe und ersetzt keine Steuerberatung.',
       placement: 'auto'
     },
     
@@ -241,9 +254,9 @@
       tab: 's5',
       selector: '.tab[data-target-sec="s5"]',
       icon: 'i-pin',
-      title: 'Tab 6: Pilot-Analyse',
+      title: 'Tab 7: Pilot-Analyse',
       body: 'Die **KI analysiert Mikrolage, Infrastruktur, Wertentwicklung** und liefert einen ausführlichen Lage-Bericht.',
-      bodyMore: '**Was die Lage-KI prüft:**\n\n• **Mikrolage** — Verkehrsanbindung, Infrastruktur, Nachbarschaft\n• **Mieterstruktur** — Einkommensniveau, Beruf\n• **Wertentwicklung** — historisch + Prognose\n• **Risikofaktoren** — Leerstand, Gentrifizierung\n• **Vergleichsobjekte** im Umkreis\n\nErgebnis: ein **Lage-Score (0-100)** + ausführlicher Text für deine Bank-Präsentation.\n\nKostet KI-Credits — auf Pro-Plan unlimited.',
+      bodyMore: '**Was die Lage-KI prüft:**\n\n• **Mikrolage** — Verkehrsanbindung, Infrastruktur, Nachbarschaft\n• **Mieterstruktur** — Einkommensniveau, Beruf\n• **Wertentwicklung** — historisch + Prognose\n• **Risikofaktoren** — Leerstand, Gentrifizierung\n• **Vergleichsobjekte** im Umkreis\n\nErgebnis: eine ausführliche Einschätzung für deine Bank-Präsentation — mit Empfehlung Kaufen, Prüfen oder Nicht kaufen.\n\nDie Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent.',
       placement: 'auto'
     },
     
@@ -251,9 +264,9 @@
       tab: 's6',
       selector: '.tab[data-target-sec="s6"]',
       icon: 'i-gauge',
-      title: 'Tab 7: Bewertung',
+      title: 'Tab 8: Bewertung',
       body: 'Der **wichtigste Tab** für Banker: DSCR, LTV, Wertpuffer, DealScore, Stress-Test — alles in einem Cockpit.',
-      bodyMore: '**Die Kernbestandteile:**\n\n• **Bewertungs-Cockpit** mit DSCR + LTV im Verlauf (15 Jahre)\n• **DealScore 0-100** als Gesamtbewertung\n• **Investor Deal Score** mit 24 KPIs (Starter+)\n• **Stress-Test** mit 4 Szenarien\n• **Cashflow-Tabelle** über 10 Jahre\n• **Werbungskosten-Anlage** für Finanzamt\n\nHier verbringst du beim Endcheck die meiste Zeit. Alle Zahlen synchronisieren live mit den anderen Tabs.',
+      bodyMore: '**Die Kernbestandteile:**\n\n• **Bewertungs-Cockpit** mit DSCR + LTV im Verlauf (15 Jahre)\n• **DealScore 0-100** als Gesamtbewertung\n• **Investor Deal Score** mit 24 KPIs (Investor und Pro, im Free-Plan als Demo)\n• **Stress-Test** als 5×5-Matrix aus Zins und Miete\n• **Cashflow-Tabelle** über 10 Jahre\n• **Werbungskosten-Anlage** für Finanzamt\n\nHier verbringst du beim Endcheck die meiste Zeit. Alle Zahlen synchronisieren live mit den anderen Tabs.',
       placement: 'auto'
     },
     
@@ -340,7 +353,7 @@
       selector: '.tab[data-target-sec="s8"]',
       icon: 'i-flag',
       id: 'da-intro',
-      title: 'Tab 8: Deal-Aktion — dein Boarding-Cockpit',
+      title: 'Tab 9: Deal-Aktion — dein Boarding-Cockpit',
       body: 'Hier führst du den Deal zum **Abschluss**: Bank-Readiness, Deal-Status, Exporte, Überführung und dein Partnernetzwerk.',
       bodyMore: 'Der Deal-Aktion-Tab ist als **Boarding-Cockpit** aufgebaut:\n\n• **Bereit für die Bank?** — Readiness-Ring + Startbahn zeigen, wie vollständig deine Grundfelder sind\n• **Bereit zum Abflug** — Deal-Status setzen: Offen, Gewonnen, Verloren (mit Boarding-Pass-QR daneben)\n• **Dokumente & Exporte** — Investment-PDF, Finanzamt-PDF, Track Record\n• **In Gesellschaft überführen** — Privat-Objekt in GmbH/UG umziehen\n• **Dein Netzwerk** — geprüften Partnern eine Anfrage schicken, Objektdaten gehen mit\n\nDie nächsten Schritte gehen alles einzeln durch.',
       placement: 'auto'
