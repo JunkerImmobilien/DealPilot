@@ -237,13 +237,25 @@ window.DealPilotWorkflow = (function() {
       });
     } catch (e) {}
 
+    /* v2181 · Marcel: Tooltips muessen dem Kunden helfen. Hier stand die Liste der
+       fehlenden Feld-IDs ("ort, wfl, baujahr, objart", "hg_ul, hg_nul"). Jetzt die
+       Beschriftung, die ueber dem Feld steht; ohne Beschriftung bleibt die ID. */
+    function _wfFeldNamen(ids) {
+      return (ids || []).map(function (id) {
+        var el = document.getElementById(id);
+        var lb = el && (el.closest('.f') || el.parentElement);
+        lb = lb && lb.querySelector('label');
+        var t = lb ? lb.textContent.replace(/s+/g, ' ').replace(/(OPTIONAL|optional|Pflicht)/g, '').replace(/[*?ⓘ]/g, '').trim() : '';
+        return t || id;
+      }).join(', ');
+    }
     // V62.2: Step-Indikatoren in #wf-tab-steps (sichtbar im Header der Tabs)
     var stepsEl = document.getElementById('wf-tab-steps');
     if (stepsEl) {
       stepsEl.innerHTML = status.groups.map(function(g, i) {
         var stateCls = g.complete ? 'wf-tstep-done' : 'wf-tstep-todo';
         return '<button type="button" class="wf-tstep ' + stateCls + '" data-tab="' + g.tabIndex + '" title="' +
-               (g.complete ? 'Vollständig' : 'Noch ausfüllen: ' + (g.missingFields.join(', ') || 'alle')) + '">' +
+               (g.complete ? 'Vollständig' : 'Noch ausfüllen: ' + (_wfFeldNamen(g.missingFields) || 'alle')) + '">' +
                '<span class="wf-tstep-num">' + (i+1) + '</span>' +
                '<span class="wf-tstep-name">' + g.name + '</span>' +
                (g.complete ? '<span class="wf-tstep-check">✓</span>' : '') +
@@ -270,7 +282,7 @@ window.DealPilotWorkflow = (function() {
         status.groups.map(function(g, i) {
           var stateCls = g.complete ? 'wf-step-done' : (i === 0 ? 'wf-step-current' : 'wf-step-todo');
           return '<button type="button" class="wf-step ' + stateCls + '" data-tab="' + g.tabIndex + '" title="' +
-                 (g.complete ? 'Vollständig' : 'Noch ausfüllen: ' + (g.missingFields.join(', ') || 'alle')) + '">' +
+                 (g.complete ? 'Vollständig' : 'Noch ausfüllen: ' + (_wfFeldNamen(g.missingFields) || 'alle')) + '">' +
                  '<span class="wf-step-num">' + (i+1) + '</span>' +
                  '<span class="wf-step-name">' + g.name + '</span>' +
                  (g.complete ? '<span class="wf-step-check">✓</span>' : '') +
