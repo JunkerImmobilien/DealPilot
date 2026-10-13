@@ -151,6 +151,35 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.18 · NÄCHSTES PAKET (Marcel, 13.10.2026: „ja mach das als nächstes Paket") — eigene Datenhaltung, Warteschlange, Laufzeiten
+
+**Marcel:** *„können wir die kritischen Anfragen, die zeitintensiv sind, nicht in
+unsere eigene Datenbank schreiben … und gleichen sie in regelmäßigen Abständen
+ab?"* und: *„wichtig ist immer, dass wir unsere Quellen angeben."*
+
+**Grundsatz:** jeder selbst abgelegte Wert trägt Quelle, Tabelle/Endpunkt,
+Stichtag, Abrufdatum, Lizenz (Muster: `mb.zensus_werte`, v2162).
+
+Bauplan, in dieser Reihenfolge:
+1. **Makro (N62.16):** `mb.makro_werte` + Import wie `ZensusImportService`
+   (12411-01-01-4, 82000-07-01-4 inkl. DG, AI008-1 Sp.3, AI002-1 Sp.9 je Kreis,
+   max. 10 parallel, Protokolltabelle). Monatlicher Lauf. `DestatisConnector.macro`
+   liest zuerst die Tabelle, Live-Abruf nur als Rückfall.
+2. **PLZ → Gemeinde/Kreis:** Tabelle aus OpenPLZ (einmal komplett, monatlich
+   abgleichen); `AgsResolver` liest sie zuerst (heute je Bericht ein Live-Abruf).
+3. **Bodenrichtwerte:** Treffer je Abfragepunkt mit Stichtag speichern,
+   Wiederverwendung im Umkreis nur bei gleicher Zone; nach Stichtag erneuern.
+4. **GeoMap:** nur Kurzzeit-Zwischenspeicher — dauerhaftes Ablegen erst nach
+   Klärung der Lizenz mit GeoMap (Marcel).
+5. **Warteschlange in der DB** für Marktbericht UND Pilot-Analyse (heute nur
+   Marktbericht, im Arbeitsspeicher, MAX 6, beim Neustart weg), mit Status für
+   den Kunden.
+6. **Laufzeiten mitschreiben** (Bericht, Analyse, je externer Dienst) — heute
+   wird keine Dauer gespeichert.
+7. **Lasttest** auf Staging (z. B. 20 Berichte gleichzeitig; kostet GeoMap-Abrufe
+   — vorher mit Marcel).
+OpenAI ist kein Engpass (Stufe „Launch", gpt-4.1 2 Mio. TPM).
+
 #### N62.17 · Warum bleibt data._ai hinter der Spalte ai_analysis zurück?
 
 Gemessen 13.10.2026: bei 4 von 8 gewonnenen Objekten trug `ai_analysis` die
