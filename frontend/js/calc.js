@@ -2004,9 +2004,10 @@ function _calcImmediate(){
   var bi_ltv=document.getElementById('bi-ltv');
   var _ekValEarly = v('ek') || 0;
   if(bi_ltv){
-    var ltv_ok=ltv<=80,ltv_warn=ltv<=90;
+    /* v2202 · gleiche LTV-Skala wie Hilfe, Kennzahlen-Bewertung, Bank-Charts, PDF und Karte (85/100) - hier stand 80/90 */
+    var ltv_ok=ltv<85,ltv_warn=ltv<=100;
     bi_ltv.className='bank-item '+(ltv_ok?'ok':ltv_warn?'warn':'bad');
-    st('bank-ltv-t','LTV: '+fP(ltv,1)+' – '+(ltv_ok?'✓ Sehr gut (≤80%)':ltv_warn?'⚠ Ausreichend (≤90%)':'✗ Hoch (>90%)'));
+    st('bank-ltv-t','LTV: '+fP(ltv,1)+' – '+(ltv_ok?'✓ Solide (unter 85 %)':ltv_warn?'⚠ Erhöht (85–100 %)':'✗ Kritisch (über 100 %)'));
     // V63.37: Detail-Text richtet sich nach LTV-Bezugsgröße
     st('bank-ltv-d','Darlehen '+fE(d_total)+' / '+ltv_basis_label+' '+fE(ltv_basis)+' · Eigenkapital '+fE(_ekValEarly));
   }
@@ -2467,7 +2468,7 @@ function _calcImmediate(){
   st('kpi-cfvst-ezb',fE(cf_op_ezb/12,0,true));
   st('kpi-cfvst-an',fE(cf_op_an/12,0,true));
   st('sc-an',fE(cf_ns_an,0,true));setKpiColor('kpi-cfm',cf_m,0,-200);
-  st('kpi-ltv',fP(ltv,1));setKpiColor('kpi-ltv',100-ltv,20,10);  // V317-ltv-card-aligned: <=80% green, <=90% gold, >90% red (deckt sich mit Bank-Bewertung Z.1215)
+  st('kpi-ltv',fP(ltv,1));setKpiColor('kpi-ltv',100-ltv,15.0001,0);  // v2202: unter 85 % gruen, bis 100 % gold, darueber rot (wie Bankgespraech und Kennzahlen-Bewertung)
   st('kpi-dscr',fN(dscr,2));setKpiColor('kpi-dscr',dscr,1.2,1.0);  // ≥1.2 green, 1.0-1.2 gold, <1.0 red
   st('kpi-fak',fN(fak,1));setKpiColor('kpi-fak',25-fak,5.001,-0.001);  // V318-fak-em-color: <20 gn, 20-25 gold, >25 rd (strikt: fak=20 ist gold)
   // V63.62: Equity Multiple zeigt ∞ wenn kein EK eingesetzt (Vollfinanzierung)

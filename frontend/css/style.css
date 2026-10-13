@@ -41047,3 +41047,21 @@ html:not([data-ui-theme]) body .main-col .bc-matrix-cell-label {
 @media (min-width: 769px) {
   .mh-zurueck { display: none !important; }
 }
+/* v2201a · Einstellungen-Liste: die Regel
+   "html body #settings-modal .settings-modal.set-modal-v2 .settings-tabs.ms-tabs .st-tab .help-sidebar-item-desc"
+   (display:none, 1 ID + 6 Klassen) schlug die v2201-Liste; gemessen: Beschreibung
+   unsichtbar, Eintraege mittig. Gleiche Kette plus [data-mob] = eine Stufe mehr. */
+@media (max-width: 768px) {
+  html body #settings-modal[data-mob="liste"] .settings-modal.set-modal-v2 .settings-tabs.ms-tabs .st-tab.help-sidebar-item {
+    width: 100% !important; min-height: 54px !important; padding: 11px 14px !important; margin: 0 !important;
+    display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important;
+    gap: 3px !important; text-align: left !important; white-space: normal !important; border-radius: 10px !important;
+    border: 1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent) !important;
+  }
+  html body #settings-modal[data-mob="liste"] .settings-modal.set-modal-v2 .settings-tabs.ms-tabs .st-tab.help-sidebar-item .help-sidebar-item-row {
+    justify-content: flex-start !important; width: 100% !important;
+  }
+  html body #settings-modal[data-mob="liste"] .settings-modal.set-modal-v2 .settings-tabs.ms-tabs .st-tab.help-sidebar-item .help-sidebar-item-desc {
+    display: block !important; white-space: normal !important; font-size: 12px !important; opacity: .85 !important; text-align: left !important;
+  }
+}

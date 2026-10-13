@@ -663,7 +663,7 @@ function showSettings(initialTab) {
                 rendite:  'Rendite (Nettomietrendite)',
                 ltv:      'Beleihung (LTV)',
                 risiko:   'Risiko (DSCR)',
-                potenzial:'Potenzial (Bruttofaktor)'
+                potenzial:'Potenzial (Wertpuffer & Mietsteigerung)'   /* v2202: der Kern rechnet Wertpuffer + Mietsteigerung (dealscore.js _scorePotenzial), nicht den Faktor */
               };
               return '<div class="ds-setting-row">' +
                 '<label>' + labels[k] + '</label>' +

@@ -26,7 +26,7 @@
       sections: [
         {
           h: 'Was ist DealPilot?',
-          body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über 10–30 Jahre, vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
+          body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über einen frei wählbaren Zeitraum (5 bis 50 Jahre, vorbelegt 15), vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
         },
         {
           h: 'Schnellstart in 4 Schritten',
@@ -91,7 +91,7 @@
         },
         {
           h: 'Bewertung — Kennzahlen und Score',
-          body: 'Dieser Reiter zeigt das Ergebnis — eingeben musst du hier nichts.\n\n<strong>DealPilot Score</strong> — derselbe Wert wie im Boarding, aus Cashflow, Rendite, LTV, Risiko und Potenzial. Die Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Der <strong>Investor Deal Score</strong> ergänzt Lage, Substanz und Upside-Potenzial; seine Zusatzangaben trägst du in Objekt, Investition und Miete ein.\n\nDie Kennzahlen:\n• <strong>Bruttomietrendite</strong> — Jahres-Nettokaltmiete ÷ Kaufpreis\n• <strong>Nettomietrendite</strong> — Jahresmiete minus nicht umlagefähige Kosten ÷ Gesamtinvestition\n• <strong>Faktor</strong> — Kaufpreis ÷ Jahresmiete\n• <strong>LTV</strong> — Darlehen ÷ Kaufpreis, auf Wunsch strenger gegen die Gesamtinvestition\n• <strong>DSCR</strong> — wie oft die Miete den Kapitaldienst deckt (brutto und netto)\n• <strong>Cashflow vor und nach Steuern</strong> — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung\n\nDer Rechenweg <strong>Cashflow – Korrekte Berechnung</strong> zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern.'
+          body: 'Dieser Reiter zeigt das Ergebnis — eingeben musst du hier nichts.\n\n<strong>DealPilot Score</strong> — derselbe Wert wie im Boarding, aus Cashflow, Rendite, LTV, Risiko und Potenzial. Die Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Der <strong>Investor Deal Score</strong> ergänzt Lage, Substanz und Upside-Potenzial; seine Zusatzangaben trägst du in Objekt, Investition und Miete ein.\n\nDie Kennzahlen:\n• <strong>Bruttomietrendite</strong> — Jahres-Nettokaltmiete ÷ Kaufpreis\n• <strong>Nettomietrendite</strong> — Jahresmiete minus nicht umlagefähige Kosten ÷ Gesamtinvestition\n• <strong>Faktor</strong> — Kaufpreis ÷ Jahresmiete\n• <strong>LTV</strong> — Darlehen ÷ Verkehrswert; ohne Verkehrswert ÷ Bankbewertung (wenn höher als der Kaufpreis), sonst ÷ Kaufpreis. Auf Wunsch strenger gegen die Gesamtinvestition\n• <strong>DSCR</strong> — wie oft die Miete den Kapitaldienst deckt (brutto und netto)\n• <strong>Cashflow vor und nach Steuern</strong> — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung\n\nDer Rechenweg <strong>Cashflow – Korrekte Berechnung</strong> zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern.'
         },
         {
           h: 'Deal-Aktion — Status, PDFs und Bank',
@@ -147,7 +147,7 @@
         },
         {
           h: 'Nettomietrendite — der ehrlichere Renditewert',
-          body: 'Die Nettomietrendite ist die <strong>realistische Variante</strong> der Bruttomietrendite. Hier werden zwei Dinge anders gerechnet:\n\n<strong>1. Bewirtschaftungskosten werden abgezogen.</strong> Das ist der Teil des Hausgelds, den der Vermieter selbst trägt (Verwaltung, nicht-umlagefähige Instandhaltung, eigene Rücklage, kalkulierter Mietausfall).\n\n<strong>2. Statt nur dem Kaufpreis wird die Gesamtinvestition verwendet.</strong> Das heißt: Notar, Grundbuch, Grunderwerbsteuer, Maklerprovision, ggf. Sanierung — alles, was du wirklich aufbringen musst, um die Immobilie betriebsbereit zu haben.\n\nDeshalb liegt die Nettomietrendite immer unter der Bruttomietrendite — meist 1,5 bis 2,5 Prozentpunkte darunter.\n\n<strong>Faustregeln:</strong>\n• Unter 3,0 % — wenig Substanz, fast nur Wertsteigerungs-Spekulation\n• 3,0–4,0 % — schwach, nur in Top-Lage akzeptabel\n• 4,0–5,0 % — solide, klassischer Kapitalanleger-Bereich\n• Über 5,0 % — attraktiv, oft B-Lage oder Sondersituation\n\n<strong>Tipp:</strong> Wenn die Nettomietrendite weniger als zwei Prozentpunkte über deinem Sollzins liegt, arbeitet die Immobilie operativ kaum für dich — dann lebst du fast ausschließlich von Tilgung und Hoffnung auf Wertsteigerung.'
+          body: 'Die Nettomietrendite ist die <strong>realistische Variante</strong> der Bruttomietrendite. Hier werden zwei Dinge anders gerechnet:\n\n<strong>1. Bewirtschaftungskosten werden abgezogen.</strong> Das ist der Teil des Hausgelds, den der Vermieter selbst trägt (Verwaltung, nicht-umlagefähige Instandhaltung, eigene Rücklage, kalkulierter Mietausfall).\n\n<strong>2. Statt nur dem Kaufpreis wird die Gesamtinvestition verwendet.</strong> Das heißt: Notar, Grundbuch, Grunderwerbsteuer, Maklerprovision, ggf. Sanierung — alles, was du wirklich aufbringen musst, um die Immobilie betriebsbereit zu haben.\n\nDeshalb liegt die Nettomietrendite immer unter der Bruttomietrendite — meist 1,5 bis 2,5 Prozentpunkte darunter.\n\n<strong>So bewertet DealPilot sie:</strong>\n• ab 4,5 % — gut\n• 3,5–4,5 % — durchschnittlich\n• 2,5–3,5 % — gering\n• unter 2,5 % — sehr gering, fast nur Wertsteigerungs-Spekulation\n\n<strong>Tipp:</strong> Wenn die Nettomietrendite weniger als zwei Prozentpunkte über deinem Sollzins liegt, arbeitet die Immobilie operativ kaum für dich — dann lebst du fast ausschließlich von Tilgung und Hoffnung auf Wertsteigerung.'
         },
         {
           h: 'DSCR — Schuldendienstdeckung (die Bank-Kennzahl)',
@@ -159,11 +159,11 @@
         },
         {
           h: 'Cashflow — was am Monatsende übrig bleibt',
-          body: 'Der monatliche Cashflow ist das, was nach Abzug aller laufenden Kosten von der Miete übrig bleibt. Es ist die Zahl, die du wirklich auf dem Konto siehst — nicht die theoretische Rendite.\n\nDealPilot rechnet den Cashflow in mehreren Stufen:\n\n<strong>Bruttomiete</strong> (Kaltmiete + umlagefähige Bewirtschaftungs-Erstattung)\n<strong>− Bewirtschaftung umlagefähig</strong> (durchlaufender Posten)\n= Kaltmiete\n<strong>− Bewirtschaftung nicht-umlagefähig</strong> (Hausgeld-Anteil, eigene Rücklage)\n= Net Operating Income (NOI)\n<strong>− Zinsen</strong>\n= CF nach Zinsen, vor Tilgung\n<strong>− Tilgung</strong>\n= CF vor Steuern\n<strong>± Steuern</strong>\n= CF nach Steuern (was wirklich übrig bleibt)\n\n<strong>Wichtig:</strong> In der Frühphase ist der CF nach Steuern oft kleiner als der CF vor Steuern — weil die Steuererstattung aus den V+V-Verlusten den positiven Cashflow ergänzt. Mit zunehmender Tilgung sinkt die AfA-Bedeutung, der zu versteuernde Gewinn steigt, und die Steuerlast verschiebt sich.\n\n<strong>Faustregeln:</strong>\n• Negativer CF nach Steuern: kritisch — du musst monatlich zuschießen\n• 0–50 €/Monat: knapp, kleiner Reparaturfall kippt die Rechnung\n• 50–150 €/Monat: solide für eine Standard-Wohnung\n• Über 150 €/Monat: stark — zeigt entweder gute Lage, hohen Eigenkapital-Einsatz oder geringe Finanzierung'
+          body: 'Der monatliche Cashflow ist das, was nach Abzug aller laufenden Kosten von der Miete übrig bleibt. Es ist die Zahl, die du wirklich auf dem Konto siehst — nicht die theoretische Rendite.\n\nDealPilot rechnet den Cashflow in mehreren Stufen:\n\n<strong>Bruttomiete</strong> (Kaltmiete + umlagefähige Bewirtschaftungs-Erstattung)\n<strong>− Bewirtschaftung umlagefähig</strong> (durchlaufender Posten)\n= Kaltmiete\n<strong>− Bewirtschaftung nicht-umlagefähig</strong> (Hausgeld-Anteil, eigene Rücklage)\n= Net Operating Income (NOI)\n<strong>− Zinsen</strong>\n= CF nach Zinsen, vor Tilgung\n<strong>− Tilgung</strong>\n= CF vor Steuern\n<strong>± Steuern</strong>\n= CF nach Steuern (was wirklich übrig bleibt)\n\n<strong>Wichtig:</strong> In der Frühphase ist der CF nach Steuern oft höher als der CF vor Steuern — weil die Steuererstattung aus den V+V-Verlusten dazukommt. Mit zunehmender Tilgung sinkt die AfA-Bedeutung, der zu versteuernde Gewinn steigt, und die Steuerlast verschiebt sich.\n\n<strong>So bewertet DealPilot den Cashflow nach Steuern:</strong>\n• ab 100 €/Monat — positiv\n• 0–100 €/Monat — neutral, ein kleiner Reparaturfall kippt die Rechnung\n• bis −200 €/Monat — leicht negativ, du schießt zu\n• unter −200 €/Monat — negativ'
         },
         {
           h: 'Equity Multiple — Hebelwirkung deines Kapitals',
-          body: 'Der Equity Multiple zeigt, wie oft sich dein eingesetztes Eigenkapital nach dem Betrachtungszeitraum (typisch 10 Jahre) zurückgespielt hat. Er ist die Antwort auf die Frage: <strong>Was habe ich aus dem Geld gemacht, das ich reingesteckt habe?</strong>\n\nEin Equity Multiple von 2,0x bedeutet: Aus jedem Euro Eigenkapital sind 2 Euro Vermögen geworden — Eigenkapital + Gewinn. Bei 3,0x sind es 3 Euro, bei 4,0x sind es 4 Euro.\n\n<strong>Spezialfall Vollfinanzierung:</strong> Bei einem Eigenkapital von 0 € (oder sehr geringem Eigenkapital) ist der Equity Multiple mathematisch unendlich groß — DealPilot zeigt dann das Symbol ∞ oder „Multiple". Das ist kein Fehler, sondern Ausdruck davon, dass aus „nichts" etwas geworden ist. In dem Fall sind andere Kennzahlen (Vermögenszuwachs absolut, Cashflow) aussagekräftiger.\n\n<strong>Typische Werte über 10 Jahre:</strong>\n• Unter 1,5x — schwach, das Kapital hätte man besser anders investiert\n• 1,5–2,5x — solide, vergleichbar mit konservativen ETF-Renditen\n• 2,5–4,0x — stark, durch Hebel-Effekt der Finanzierung\n• Über 4,0x — sehr stark, oft mit niedrigem EK-Einsatz oder besonders gutem Markt-Timing'
+          body: 'Der Equity Multiple zeigt, wie oft sich dein eingesetztes Eigenkapital nach dem Betrachtungszeitraum (typisch 10 Jahre) zurückgespielt hat. Er ist die Antwort auf die Frage: <strong>Was habe ich aus dem Geld gemacht, das ich reingesteckt habe?</strong>\n\nEin Equity Multiple von 2,0x bedeutet: Aus jedem Euro Eigenkapital sind 2 Euro Vermögen geworden — Eigenkapital + Gewinn. Bei 3,0x sind es 3 Euro, bei 4,0x sind es 4 Euro.\n\n<strong>Spezialfall Vollfinanzierung:</strong> Bei einem Eigenkapital von 0 € (oder sehr geringem Eigenkapital) ist der Equity Multiple mathematisch unendlich groß — DealPilot zeigt dann das Symbol ∞ oder „Multiple". Das ist kein Fehler, sondern Ausdruck davon, dass aus „nichts" etwas geworden ist. In dem Fall sind andere Kennzahlen (Vermögenszuwachs absolut, Cashflow) aussagekräftiger.\n\n<strong>So bewertet DealPilot ihn:</strong>\n• ab 3,0x — stark, meist durch den Hebel der Finanzierung\n• 2,0–3,0x — solide\n• 1,0–2,0x — schwach, das Kapital hätte man womöglich besser anders angelegt\n• unter 1,0x — Verlust'
         },
         {
           h: 'Wertpuffer — Sicherheitsreserve gegen Marktwertverlust',
@@ -179,7 +179,7 @@
         },
         {
           h: 'Zinsrisiko — was die Anschlussfinanzierung kostet',
-          body: 'Das Zinsrisiko ist die Differenz zwischen deiner heutigen monatlichen Rate und der hochgerechneten Rate nach Ablauf der Zinsbindung. Es zeigt dir, <strong>wie stark die monatliche Belastung steigen würde</strong>, wenn die Anschlussfinanzierung zu höheren Zinsen abgeschlossen werden müsste.\n\nDealPilot rechnet standardmäßig mit einem konservativen Anschlusszins-Szenario (typisch 5,0 %), das einen Puffer über dem aktuellen Marktniveau enthält. Das Zinsrisiko zeigt also: <em>„Wenn die Zinsen sich am oberen Ende einpendeln, wie viel mehr zahle ich dann pro Monat?"</em>\n\n<strong>Beispiel:</strong> Heute 750 €/Monat bei 3,5 % Zins, in 10 Jahren bei 5 % Anschlusszins 883 €/Monat → Zinsrisiko = 133 €/Monat. Das ist die Größenordnung, die du für deine Liquiditätsplanung kalkulieren solltest.\n\n<strong>Wie du das Zinsrisiko reduzieren kannst:</strong>\n• <strong>Längere Zinsbindung</strong> (15 oder 20 Jahre) — schiebt das Risiko nach hinten\n• <strong>Höhere Tilgung</strong> — reduziert die Restschuld bei Bindungsende und damit den absoluten Anstieg\n• <strong>Sondertilgungen</strong> — gleicher Effekt, flexibler\n• <strong>Forward-Darlehen</strong> — du sicherst dir die Anschlusskonditionen 3–5 Jahre vorher fest\n\nDas Zinsrisiko ist eines der unterschätztesten Themen bei Kapitalanlage-Immobilien. Eine Finanzierung kann heute solide aussehen und in 10 Jahren bei +2 Prozentpunkten Anschlusszins kippen.'
+          body: 'Das Zinsrisiko ist die Differenz zwischen deiner heutigen monatlichen Rate und der hochgerechneten Rate nach Ablauf der Zinsbindung. Es zeigt dir, <strong>wie stark die monatliche Belastung steigen würde</strong>, wenn die Anschlussfinanzierung zu höheren Zinsen abgeschlossen werden müsste.\n\nDealPilot rechnet das Zinsrisiko mit dem Anschlusszins aus dem Reiter Finanzierung (vorbelegt 5,0 %, bewusst mit Puffer über dem heutigen Niveau). Das Zinsrisiko zeigt also: <em>„Wenn die Zinsen sich am oberen Ende einpendeln, wie viel mehr zahle ich dann pro Monat?"</em>\n\n<strong>Beispiel:</strong> Heute 750 €/Monat bei 3,5 % Zins, in 10 Jahren bei 5 % Anschlusszins 883 €/Monat → Zinsrisiko = 133 €/Monat. Das ist die Größenordnung, die du für deine Liquiditätsplanung kalkulieren solltest.\n\n<strong>Wie du das Zinsrisiko reduzieren kannst:</strong>\n• <strong>Längere Zinsbindung</strong> (15 oder 20 Jahre) — schiebt das Risiko nach hinten\n• <strong>Höhere Tilgung</strong> — reduziert die Restschuld bei Bindungsende und damit den absoluten Anstieg\n• <strong>Sondertilgungen</strong> — gleicher Effekt, flexibler\n• <strong>Forward-Darlehen</strong> — du sicherst dir die Anschlusskonditionen 3–5 Jahre vorher fest\n\nDas Zinsrisiko ist eines der unterschätztesten Themen bei Kapitalanlage-Immobilien. Eine Finanzierung kann heute solide aussehen und in 10 Jahren bei +2 Prozentpunkten Anschlusszins kippen.'
         },
         {
           h: 'AfA — Abschreibung als Steuer-Hebel',
@@ -187,7 +187,7 @@
         },
         {
           h: 'DealScore (0–100) — die Gesamtbewertung',
-          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (ausgewogen, konservativ, optimistisch, lageorientiert, cashflowstark, sicherheitsorientiert), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
+          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden; fehlt eine ganze Kategorie, zählt sie neutral mit 60 Punkten. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus, Sicherheit), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
         }
       ]
     },
@@ -207,7 +207,7 @@
         },
         {
           h: 'Anschlussfinanzierung',
-          body: 'DealPilot rechnet automatisch eine Anschlussphase mit dem in den Annahmen hinterlegten Anschlusszinssatz (Standard 5,0 %, konservativer Puffer über aktuellem Niveau).\n\nDie Anschlussrate erscheint in „Finanzierung", das Zinsänderungsrisiko (Differenz Heute vs. Anschluss) im Tab „Kennzahlen".'
+          body: 'Hakst du im Reiter Finanzierung <strong>„Eigene Anschlussfinanzierung“</strong> an, rechnet DealPilot nach der Zinsbindung mit deinem Anschlusszins (vorbelegt 5,0 %) und deiner Anschluss-Tilgung (vorbelegt 1,0 %). Ohne Haken läuft das Darlehen zu den heutigen Konditionen weiter.\n\nDas <strong>Zinsänderungsrisiko</strong> rechnet DealPilot immer: die Mehrbelastung pro Monat aus dem Zinsunterschied (Anschlusszins minus heutiger Zins) auf die Restschuld. Es steht im Reiter <strong>Bewertung</strong> und im Bankgespräch.'
         }
       ]
     },
@@ -270,8 +270,8 @@
           body: 'Die Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent. Auf das Kontingent zählen die Marktberichte — wie viele noch frei sind, steht im Reiter Objekt direkt an jeder Stufe („N frei“). Fragen an den Piloten (F1 oder ?) haben ein eigenes Tageslimit je Plan.'
         },
         {
-          h: 'Persistenz',
-          body: 'Die Pilot-Analyse wird ab V63.69 automatisch beim Objekt gespeichert. Beim erneuten Öffnen siehst du die Analyse direkt — du musst sie nicht neu berechnen lassen. Wenn du frische Daten/Marktanalyse willst, klicke „Analyse erneut starten".'
+          h: 'Wird die Analyse gespeichert?',
+          body: 'Die Pilot-Analyse wird beim Objekt gespeichert. Beim erneuten Öffnen siehst du sie direkt. Für eine frische Einschätzung klickst du im Reiter Pilot-Analyse auf „Pilot-Analyse starten“.'
         }
       ]
     },
@@ -340,7 +340,7 @@
         },
         {
           h: 'Tipp: Pflichtfelder zuerst',
-          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Objektart und Wohnfläche. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
+          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Straße, Objektart, Wohnfläche und Baujahr. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
         }
       ]
     },
@@ -425,7 +425,7 @@
         },
         {
           h: 'Stress-Test',
-          body: '5×5-Matrix: Zinsänderung (−2 bis +5 pp) gegen Mietänderung (−20 % bis +20 %). Jede Zelle zeigt den DSCR im Szenario. Grün ≥ 1,2, Gold 1,0–1,2, Rot &lt; 1,0. Die Mitte (±0/±0) ist dein Base-Case.\n\nResilienz-Check: Wenn auch bei „−10 % Miete UND +1 pp Zins" der DSCR ≥ 1,0 bleibt, bist du Bank-tauglich.'
+          body: '5×5-Matrix: Zinsänderung (−2 bis +5 pp) gegen Mietänderung (−20 % bis +20 %). Jede Zelle zeigt den DSCR im Szenario. Grün ab 1,2, Hellgrün 1,0–1,2, Gold 0,8–1,0, Rot unter 0,8. Die Zelle ±0/±0 ist dein Base-Case.\n\nResilienz-Check: Wenn auch bei „−10 % Miete UND +1 pp Zins" der DSCR ≥ 1,0 bleibt, bist du Bank-tauglich.'
         }
       ]
     },
@@ -436,16 +436,12 @@
       desc: 'Bank-taugliche PDF-Reports',
       sections: [
         {
-          h: 'PDF-Export (Aktionen → PDF Export)',
-          body: 'Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über 10 Jahre, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Für beste Qualität öffne den Tab „Kennzahlen" einmal kurz vor dem Export — dann sind alle Charts gerendert.'
-        },
-        {
-          h: 'Bank-Präsentations-PDF (Tab Kennzahlen)',
-          body: 'Im Tab „Kennzahlen" gibt es einen separaten Button „Bank-Präsentation als PDF". Dieser erzeugt eine fokussierte 5-Seiten-PDF im Querformat mit nur den Bank-relevanten Charts (Equity-Build, Cockpit DSCR/LTV, Waterfall, Stress-Test) — ideal als Anhang für Finanzierungsgespräche.'
+          h: 'PDF-Export',
+          body: 'Unter <strong>Aktionen → Export → PDF-Report für Objekt</strong> oder im Reiter <strong>Deal-Aktion → Investment-PDF</strong>. Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über 10 Jahre, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Öffne vorher einmal kurz den Reiter <strong>Bewertung</strong> — dann sind alle Grafiken gezeichnet.'
         },
         {
           h: 'Free-Plan-Wasserzeichen',
-          body: 'Im Free-Plan trägt jedes PDF ein „DealPilot Free"-Wasserzeichen. Im Investor-, Pro- oder Business-Plan ist das weg. Das Wasserzeichen ist halbtransparent und überlagert die Inhalte sichtbar — wie eine Demo-Markierung.'
+          body: 'Im Free-Plan trägt jedes PDF das Wasserzeichen „DealPilot Free“, in der Testphase „DealPilot Testphase“. Ab dem Starter-Plan ist es weg. Es ist halbtransparent und liegt sichtbar über den Inhalten.'
         }
       ]
     },
@@ -501,7 +497,7 @@
         },
         {
           h: 'Deal Score: Gewichtung und Bewertungsprofile',
-          body: '<strong>DealPilot Score (Quick-Check)</strong> — fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR) und Potenzial (Bruttofaktor). Jeder geht von 0 bis 60 %, zusammen müssen es 100 % sein. „↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15.\n\n<strong>Investor Deal Score</strong> (Investor/Pro, 24 KPIs) — oben wählst du ein <strong>Bewertungsprofil</strong>: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Darunter passt du Hauptgewichtungen, Untergewichtungen und Grenzwerte an. Grenzwerte trägst du im Format Wert:Punkte ein, z. B. 4:20, 5:50, 7:80, 9:100. Sobald du von Hand änderst, springt das Profil auf <strong>Benutzerdefiniert</strong>.\n\nBeide Scores hängen zusammen: Ist ein Profil gewählt, rechnet auch der DealPilot Score mit dessen Gewichtung. Deine eigenen Regler gelten erst bei „Benutzerdefiniert“.'
+          body: '<strong>DealPilot Score (Quick-Check)</strong> — fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR) und Potenzial (Wertpuffer und Mietsteigerung). Jeder geht von 0 bis 60 %, zusammen müssen es 100 % sein. „↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15.\n\n<strong>Investor Deal Score</strong> (Investor/Pro, 24 KPIs) — oben wählst du ein <strong>Bewertungsprofil</strong>: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Darunter passt du Hauptgewichtungen, Untergewichtungen und Grenzwerte an. Grenzwerte trägst du im Format Wert:Punkte ein, z. B. 4:20, 5:50, 7:80, 9:100. Sobald du von Hand änderst, springt das Profil auf <strong>Benutzerdefiniert</strong>.\n\nBeide Scores hängen zusammen: Speicherst du eigene Regler, gelten sie sofort — bis du wieder ein Bewertungsprofil wählst. Dann rechnet auch der DealPilot Score mit dessen Gewichtung.'
         },
         {
           h: 'Standardwerte: deine Annahmen für neue Objekte',
@@ -553,15 +549,15 @@
         },
         {
           h: 'Wie ändere ich die Score-Gewichtung?',
-          body: '<strong>So geht\'s:</strong>\n1. Öffne <strong>Einstellungen → Deal Score</strong>.\n2. Im Abschnitt „DealPilot Score (Quick-Check)“ stellst du fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR), Potenzial (Bruttofaktor).\n3. Die „Summe der Gewichtungen“ muss 100 % ergeben — sie wird grün. Sonst wird nicht gespeichert.\n4. „Speichern“ klicken.\n\n„↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15 zurück.\n\n<strong>Ab Investor</strong> gibt es darunter den „Investor Deal Score“ mit einem „Bewertungsprofil“: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Passt du die Gewichte dort von Hand an, wechselt das Profil auf „Benutzerdefiniert“.'
+          body: '<strong>So geht\'s:</strong>\n1. Öffne <strong>Einstellungen → Deal Score</strong>.\n2. Im Abschnitt „DealPilot Score (Quick-Check)“ stellst du fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR), Potenzial (Wertpuffer und Mietsteigerung).\n3. Die „Summe der Gewichtungen“ muss 100 % ergeben — sie wird grün. Sonst wird nicht gespeichert.\n4. „Speichern“ klicken.\n\n„↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15 zurück.\n\n<strong>Ab Investor</strong> gibt es darunter den „Investor Deal Score“ mit einem „Bewertungsprofil“: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Passt du die Gewichte dort von Hand an, wechselt das Profil auf „Benutzerdefiniert“.'
         },
         {
           h: 'Warum sehe ich keinen Investor Deal Score?',
-          body: 'Der Investor Deal Score bewertet 24 Kennzahlen und erscheint erst, wenn mindestens <strong>70 %</strong> davon ausgefüllt sind. Bis dahin steht dort „Bitte mindestens 70 % der Kennzahlen ausfüllen“ mit deinem aktuellen Stand.\n\n<strong>So geht\'s:</strong>\n1. Klick auf „📋 Welche KPIs fehlen noch?“ — die Liste zeigt die offenen Kennzahlen.\n2. Trag sie in den Reitern <strong>Objekt</strong> (Lage, Energieklasse, Zustand), <strong>Bewirtschaftung</strong> und <strong>Steuer</strong> nach.\n\nDie Kaufgrenzen (DSCR, Cashflow, LTV) zeigt DealPilot schon vorher — dafür reichen Kaufpreis, Miete und Finanzierung.\n\nDer Investor Deal Score gehört zum Investor- und Pro-Plan; im Free-Plan läuft er als Demo.'
+          body: 'Der Investor Deal Score bewertet 24 Kennzahlen und erscheint erst, wenn mindestens <strong>70 %</strong> davon ausgefüllt sind. Bis dahin steht dort „Bitte mindestens 70 % der Kennzahlen ausfüllen“ mit deinem aktuellen Stand.\n\n<strong>So geht\'s:</strong>\n1. Klick auf „📋 Welche KPIs fehlen noch?“ — die Liste zeigt die offenen Kennzahlen.\n2. Trag sie in den Reitern <strong>Objekt</strong> (Lage, Energieklasse, Zustand), <strong>Bewirtschaftung</strong> und <strong>Steuer</strong> nach.\n\nDie Kaufgrenzen (DSCR, Cashflow, LTV) zeigt DealPilot schon vorher — dafür reichen Kaufpreis, Miete und Finanzierung.\n\nDer Investor Deal Score gehört zum Investor- und Pro-Plan; im Free-Plan läuft er als Demo, im Starter-Plan ist er nicht enthalten.'
         },
         {
           h: 'Warum ist die DSCR im Chart anders als auf der Kennzahlen-Karte?',
-          body: 'Beide nutzen NOI / Kapitaldienst. Bei Tilgungsaussetzung mit Bausparvertrag wird die Sparrate als wirtschaftlicher Tilgungsersatz mitgerechnet — sonst wäre der DSCR künstlich überhöht (Zinsen-only-Vergleich). Seit V63.68 sind beide Stellen konsistent.'
+          body: 'Beide nutzen NOI / Kapitaldienst. Bei Tilgungsaussetzung mit Bausparvertrag wird die Sparrate als wirtschaftlicher Tilgungsersatz mitgerechnet — sonst wäre der DSCR künstlich überhöht (Zinsen-only-Vergleich). Beide Stellen rechnen gleich.'
         },
         {
           h: 'Was ist der „Wert-Anker" in der Wertsteigerung?',
@@ -569,11 +565,11 @@
         },
         {
           h: 'Wie wird die Anschlussfinanzierung simuliert?',
-          body: 'DealPilot nimmt die Restschuld am Ende der Zinsbindung und rechnet damit weiter — mit dem in den Annahmen hinterlegten Anschlusszins (Standard 5,0 %) und der Anschluss-Tilgung (Standard 1,0 %). Die Differenz zur aktuellen Rate ist dein Zinsänderungsrisiko pro Monat.'
+          body: 'Mit Haken bei „Eigene Anschlussfinanzierung“ (Reiter Finanzierung) rechnet DealPilot die Restschuld am Ende der Zinsbindung mit deinem Anschlusszins (vorbelegt 5,0 %) und deiner Anschluss-Tilgung (vorbelegt 1,0 %) weiter. Ohne Haken läuft das Darlehen zu den heutigen Konditionen weiter.\n\nDas Zinsänderungsrisiko ist die Mehrbelastung pro Monat aus dem Zinsunterschied auf die Restschuld — das rechnet DealPilot immer.'
         },
         {
           h: 'Was bedeutet „Anteil eigene Tasche"?',
-          body: 'Summe aller monatlichen Cashflows nach Steuern, die negativ waren — also wo die Mieten und der Steuervorteil zusammen nicht reichten und du nachschießen musstest. Im Vermögenszuwachs wird dieser Betrag von der Brutto-Tilgung abgezogen, weil das Geld ja nicht von „außen" kam.'
+          body: 'Der Betrag, um den die Summe aller Cashflows nach Steuern über den ganzen Zeitraum negativ ist — höchstens bis zur Höhe der Tilgung. So viel hast du unterm Strich nachgeschossen. Im Vermögenszuwachs wird er von der Tilgung abgezogen, weil das Geld nicht von „außen" kam.'
         },
         {
           h: 'Warum steht über der Pilot-Analyse „neu abrufen“?',
@@ -605,7 +601,7 @@
         },
         {
           h: 'Werden meine Daten weitergegeben?',
-          body: 'Nein. DealPilot speichert deine Objekte ausschließlich auf einem deutschen Server (Hetzner). Die Pilot-Analyse läuft über einen Server-Proxy mit minimal nötiger Datenmenge — keine Adressen, keine Personennamen. Stripe verarbeitet nur Zahlungsdaten, sieht keine Objektdaten.'
+          body: 'Deine Objekte liegen auf unseren Servern in Deutschland. Für die KI-Funktionen — Pilot-Analyse, Pilot-Fragen, Diktat, Exposé- und Beleg-Einlesen — gehen die dafür nötigen Objektdaten an OpenAI in den USA: auch die Adresse, der Halter-Name und Fotos oder Dokumente, die du einliest. Deine Login-Daten (Name, E-Mail) gehen nicht dorthin. Stripe sieht nur Zahlungsdaten, keine Objektdaten. Einzelheiten stehen in der Datenschutzerklärung.'
         }
       ]
     },
@@ -633,7 +629,7 @@
         },
         {
           h: 'BMR (Bruttomietrendite)',
-          body: 'Jahres-Kaltmiete / Kaufpreis × 100. <strong>Unbereinigte Rendite</strong> — gut für schnellen Vergleich, aber nicht aussagekräftig für tatsächlichen Ertrag.\n\nTypische Werte (Deutschland): A-Lagen 2,5–3,5 %, B-/C-Lagen 5–7 %, D-Lagen 7–9 %. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Jahres-Kaltmiete / Kaufpreis × 100. <strong>Unbereinigte Rendite</strong> — gut für schnellen Vergleich, aber nicht aussagekräftig für tatsächlichen Ertrag.\n\nTypische Werte (Deutschland): A-Lagen 2,5–3,5 %, B-/C-Lagen 5–7 %, D-Lagen 7–9 %. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'BSV (Bausparvertrag)',
@@ -645,7 +641,7 @@
         },
         {
           h: 'Cashflow',
-          body: 'Was nach Abzug aller laufenden Kosten von der Miete übrig bleibt — pro Monat. Stufen: Bruttomiete → Kaltmiete → NOI → CF nach Zinsen → CF vor Steuern → CF nach Steuern.\n\n<strong>Faustregeln:</strong> Negativ = kritisch (zuzuschießen), 0–50 €/M = knapp, 50–150 €/M = solide, über 150 €/M = stark. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Was nach Abzug aller laufenden Kosten von der Miete übrig bleibt — pro Monat. Stufen: Bruttomiete → Kaltmiete → NOI → CF nach Zinsen → CF vor Steuern → CF nach Steuern.\n\n<strong>Faustregeln:</strong> Negativ = kritisch (zuzuschießen), 0–50 €/M = knapp, 50–150 €/M = solide, über 150 €/M = stark. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'DealScore (0–100)',
@@ -653,7 +649,7 @@
         },
         {
           h: 'DSCR (Debt Service Coverage Ratio)',
-          body: 'Wichtigste Bank-Kennzahl: Verhältnis von operativem Ertrag zu Kapitaldienst (Zins + Tilgung + BSV-Rate). Antwortet die Frage: „Reicht die Miete um Zins und Tilgung zu bezahlen?"\n\n<strong>Skala:</strong> 🟢 ≥ 1,2 solide · 🟡 1,0–1,2 knapp · 🔴 < 1,0 du musst zuzahlen. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Wichtigste Bank-Kennzahl: Verhältnis von operativem Ertrag zu Kapitaldienst (Zins + Tilgung + BSV-Rate). Antwortet die Frage: „Reicht die Miete um Zins und Tilgung zu bezahlen?"\n\n<strong>Skala:</strong> 🟢 ≥ 1,2 solide · 🟡 1,0–1,2 knapp · 🔴 < 1,0 du musst zuzahlen. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'EK-Rendite (p.a.)',
@@ -677,7 +673,7 @@
         },
         {
           h: 'GrESt (Grunderwerbsteuer)',
-          body: 'Bundeslandsabhängige Steuer beim Immobilienkauf. <strong>Sätze 2025:</strong>\n\n• Bayern, Sachsen: 3,5 %\n• Hamburg: 4,5 %\n• Berlin, Hessen, Niedersachsen, Bremen, Rheinland-Pfalz: 5,0 %\n• Mecklenburg-Vorpommern, Saarland, Schleswig-Holstein: 6,5 %\n• NRW, Brandenburg, Thüringen: 6,5 %\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
+          body: 'Vom Bundesland abhängige Steuer beim Immobilienkauf. DealPilot belegt den Satz über die PLZ vor (Stand 05/2026):\n\n• Bayern: 3,5 %\n• Baden-Württemberg, Bremen, Niedersachsen, Rheinland-Pfalz, Sachsen-Anhalt: 5,0 %\n• Hamburg, Sachsen: 5,5 %\n• Berlin, Hessen, Mecklenburg-Vorpommern: 6,0 %\n• Brandenburg, NRW, Saarland, Schleswig-Holstein, Thüringen: 6,5 %\n\nDie Sätze ändern sich gelegentlich — prüf vor dem Kauf den aktuellen Satz deines Landes.\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
         },
         {
           h: 'Hausgeld',
@@ -697,11 +693,11 @@
         },
         {
           h: 'LTV (Loan-to-Value, Beleihungsauslauf)',
-          body: 'Verhältnis von Restschuld zu Immobilienwert. Wichtigste Risikokennzahl der Bank.\n\n<strong>DealPilot-Skala (D-Markt):</strong>\n• 🟢 < 85 % SOLIDE\n• 🟡 85–100 % ERHÖHT\n• 🔴 > 100 % KRITISCH\n\nAusführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Verhältnis von Restschuld zu Immobilienwert. Wichtigste Risikokennzahl der Bank.\n\n<strong>DealPilot-Skala (D-Markt):</strong>\n• 🟢 < 85 % SOLIDE\n• 🟡 85–100 % ERHÖHT\n• 🔴 > 100 % KRITISCH\n\nAusführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'Mietausfallwagnis',
-          body: 'Kalkulatorischer Puffer für unvorhergesehenen Mietausfall: Leerstand bei Mieterwechsel, säumige Zahler, Mietminderungen. <strong>Standard-Ansatz: 2 % der Jahres-Kaltmiete.</strong>\n\nBei einer Wohnung mit 800 € Kaltmiete (= 9.600 €/Jahr) wären das 192 €/Jahr Puffer. Das entspricht etwa <strong>3 Wochen Leerstand</strong> pro Jahr.\n\nIn ländlichen Gegenden oder bei einkommensschwachen Mietern manchmal höher (3–5 %).'
+          body: 'Kalkulatorischer Puffer für unvorhergesehenen Mietausfall: Leerstand bei Mieterwechsel, säumige Zahler, Mietminderungen. <strong>In DealPilot vorbelegt: 1 % der Nettokaltmiete</strong> (Einstellungen → Standardwerte). In der Wertermittlung nach ImmoWertV gilt der Ansatz der Anlage 3.\n\nBei 800 € Kaltmiete (= 9.600 €/Jahr) sind 1 % rund 96 €/Jahr Puffer — etwa dreieinhalb Tage Leerstand.\n\nIn ländlichen Gegenden oder bei einkommensschwachen Mietern manchmal höher (3–5 %).'
         },
         {
           h: 'NKM (Nettokaltmiete)',
@@ -721,7 +717,7 @@
         },
         {
           h: 'Sonder-AfA § 7b EStG (Neubau-Förderung)',
-          body: 'Zusätzliche AfA für förderfähige Neubauten ab 2023. <strong>5 % p.a. über 4 Jahre</strong> = 20 % zusätzlicher Abschreibungs-Effekt OBEN drauf zur regulären 3 %-Neubau-AfA.\n\n<strong>Voraussetzungen (kumulativ):</strong>\n• Wohngebäude (keine Gewerbe-Einheiten)\n• Bauantrag/Bauanzeige zwischen 1.1.2023 und 30.9.2029\n• Effizienzhaus 40 mit Nachhaltigkeits-Klasse (QNG-Siegel)\n• Anschaffungs-/Herstellungskosten ≤ 5.200 €/m² (Wfl-Cap, DealPilot-Default 4.000 €/m²)\n• Erwerb im Jahr der Fertigstellung oder davor\n\n<strong>Steuerwirkung:</strong> Auf 30 Jahre gerechnet einer der stärksten Steuer-Hebel im Immobilienmarkt. Bei einem Neubau für 300k EUR mit Sonder-AfA = ca. 60k EUR steuerliche Werbungskosten zusätzlich verteilt auf 4 Jahre.'
+          body: 'Zusätzliche AfA für förderfähige Neubauten ab 2023. <strong>5 % p.a. über 4 Jahre</strong> = 20 % zusätzlicher Abschreibungs-Effekt OBEN drauf zur regulären 3 %-Neubau-AfA.\n\n<strong>Voraussetzungen (kumulativ):</strong>\n• Wohngebäude (keine Gewerbe-Einheiten)\n• Bauantrag/Bauanzeige zwischen 1.1.2023 und 30.9.2029\n• Effizienzhaus 40 mit Nachhaltigkeits-Klasse (QNG-Siegel)\n• Anschaffungs-/Herstellungskosten höchstens 5.200 €/m² Wohnfläche; abgeschrieben werden höchstens 4.000 €/m²\n• Erwerb im Jahr der Fertigstellung oder davor\n\n<strong>Steuerwirkung:</strong> Auf 30 Jahre gerechnet einer der stärksten Steuer-Hebel im Immobilienmarkt. Bei einem Neubau für 300k EUR mit Sonder-AfA = ca. 60k EUR steuerliche Werbungskosten zusätzlich verteilt auf 4 Jahre.'
         },
         {
           h: 'Tilgung-vom-Mieter',
@@ -729,7 +725,7 @@
         },
         {
           h: 'Tilgungssatz',
-          body: 'Anfänglicher Tilgungsanteil als Prozentsatz der Darlehenssumme p.a. Standard in Deutschland 2025: <strong>2–3 % p.a.</strong>\n\n<strong>Höhere Tilgung = schnellere Schuldenfreiheit, aber höhere monatliche Rate.</strong>\n\nBeispiel 200.000 € Darlehen, 3,5 % Zins:\n• 1 % Tilgung: 750 €/M, schuldenfrei nach ca. 50 Jahren\n• 2 % Tilgung: 917 €/M, schuldenfrei nach ca. 30 Jahren\n• 3 % Tilgung: 1.083 €/M, schuldenfrei nach ca. 22 Jahren\n\nFaustregel: bei Kapitalanlage 2 % als Default, bei Eigennutzung 3 % oder mehr.'
+          body: 'Anfänglicher Tilgungsanteil als Prozentsatz der Darlehenssumme p.a. Standard in Deutschland 2025: <strong>2–3 % p.a.</strong>\n\n<strong>Höhere Tilgung = schnellere Schuldenfreiheit, aber höhere monatliche Rate.</strong>\n\nBeispiel 200.000 € Darlehen, 3,5 % Zins:\n• 1 % Tilgung: 750 €/M, schuldenfrei nach ca. 43 Jahren\n• 2 % Tilgung: 917 €/M, schuldenfrei nach ca. 30 Jahren\n• 3 % Tilgung: 1.083 €/M, schuldenfrei nach ca. 22 Jahren\n\nIn DealPilot ist 1,5 % vorbelegt; du änderst das unter Einstellungen → Standardwerte. Bei Eigennutzung sind 3 % oder mehr üblich.'
         },
         {
           h: 'Verkehrswert (§ 194 BauGB)',
@@ -741,7 +737,7 @@
         },
         {
           h: 'Wertpuffer',
-          body: 'Differenz zwischen Verkehrswert/Bankbewertung und Kaufpreis. Sicherheitsreserve gegen Marktwertverlust.\n\n<strong>Daumenregel:</strong> ≥ 10 % angemessen, ≥ 15 % komfortabel. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Differenz zwischen Verkehrswert/Bankbewertung und Kaufpreis. Sicherheitsreserve gegen Marktwertverlust.\n\n<strong>Daumenregel:</strong> ≥ 10 % angemessen, ≥ 15 % komfortabel. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'ZE (Zusatz-Erträge)',
