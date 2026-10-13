@@ -167,49 +167,57 @@
   }
 
   /* ── Der Hinweis ueber den Reitern ────────────────────────────── */
+  /* ══ v2173 · IST | SOLL IM OBJEKT ══════════════════════════════════════
+     Marcel am 13.10.2026: „Manchmal ist das gesperrt, manchmal ist es nicht
+     gesperrt ... Wir hatten auch oben so ein rotes Kaestchen gesetzt ...
+     das fehlt irgendwie auch."
+
+     GEMESSEN: der Schalter in der Seitenleiste stand auf „Ankauf", die
+     Karten waren gedreht - und die Ansicht im Formular war AUS, die Felder
+     offen, der Freigabe-Haken aber noch sichtbar (ein Ueberbleibsel). Ursache:
+     beim Objektwechsel beendete diese Datei die Ansicht, die Seitenleiste
+     wusste davon nichts. Und das Beenden lud dabei das VORIGE Objekt neu
+     (loadSaved(_key) mit dem alten Schluessel).
+
+     Seit v2173 ist die Seitenleiste ein FILTER nach Phase (doppelkarte.js),
+     und der eingefrorene Stand hat seinen eigenen Umschalter HIER, im
+     Objekt - Marcels Wahl: „Knopf im Objekt". Er steht bei jedem Objekt
+     mit Ankauf-Stand, Ist ist der Ausgangszustand. */
   function banner(a) {
-    /* v2038 - heisst bewusst NICHT felder: so hiesse die Funktion
-       darueber, und eine lokale Variable haette sie hier verdeckt. */
     var felderZahl = a.daten ? Object.keys(a.daten).length : 0;
     var korr = (a.korrekturen || []).length;
-
-    /* ── v2108 · DER ERKLAERKASTEN FAELLT, DIE FUNKTION BLEIBT ─────────
-       Marcel am 11.10.2026: „Wenn wir auf Ankauf gehen, erscheint so ein
-       Feld da drunter. Das bitte weg. Also wenn dann die Aufklaerung nur
-       wenn man mit der Maus drueber faehrt, dass das dann erscheint, aber
-       nicht darunter nochmal ein extra Feld angeben."
-
-       Weg ist der ERKLAERTEXT (`.ank-ansicht-txt`: Ueberschrift plus zwei
-       Zeilen Fliesstext). Er steht jetzt als `title` und erscheint beim
-       Drueberfahren - genau so, wie er es beschrieben hat.
-
-       > DIE CHECKBOX BLEIBT, und zwar ausdruecklich. Sie ist keine
-       > Aufklaerung, sondern der EINZIGE Weg, den eingefrorenen Stand zum
-       > Bearbeiten zu oeffnen - ohne sie waere die Ankauf-Ansicht eine
-       > Sackgasse. Beim Verschlanken einer Ansicht faellt leicht eine
-       > Funktion mit weg; hier nicht.
-
-       Die Zahlen (Felder, Korrekturen, Pilot-Analyse) gehen in den
-       `title` mit: sie waren der einzige Ort, an dem der Umfang des
-       eingefrorenen Standes ueberhaupt stand. */
-    var erklaerung = 'Ankauf abgeschlossen · ' + datum(a.stichtag) + '\n'
-      + 'Eingefroren zum Nutzen-/Lastenwechsel. Du siehst den Stand von damals — '
+    var erklaerung = 'Soll = Ankauf-Stand zum ' + datum(a.stichtag) + ', eingefroren zum Nutzen-/Lastenwechsel — '
       + felderZahl + ' Felder'
       + (a.daten && a.daten._ai ? ', inklusive Pilot-Analyse' : '')
       + (korr ? ' · ' + korr + (korr === 1 ? ' Korrektur' : ' Korrekturen') : '')
-      + '.\nEingaben sind gesperrt, damit niemand Geschichte überschreibt.';
-
-    return '<div class="ank-ansicht-kopf ank-schlank" title="' + esc(erklaerung) + '">'
-      + '<label class="ank-frei"><input type="checkbox" id="ank-freigabe"'
-      + (_frei ? ' checked' : '') + '> Zum nachträglichen Bearbeiten freigeben</label>'
+      + '.\nIst = der laufende Stand von heute, frei zu pflegen.';
+    var wahl = '<div class="ank-wahl" role="group" aria-label="Stand">'
+      + '<button type="button" class="ank-seg' + (_aktiv ? '' : ' aktiv') + '" data-ank-stand="ist">Ist · heute</button>'
+      + '<button type="button" class="ank-seg' + (_aktiv ? ' aktiv' : '') + '" data-ank-stand="soll">Soll · Ankauf-Stand ' + esc(datum(a.stichtag)) + '</button>'
       + '</div>';
+    var frei = _aktiv
+      ? '<label class="ank-frei"><input type="checkbox" id="ank-freigabe"' + (_frei ? ' checked' : '')
+        + '> ' + (_frei ? 'Freigegeben — Speichern überschreibt den Ankauf-Stand (mit Nachweis)'
+                        : 'Gesperrt · zum nachträglichen Bearbeiten freigeben') + '</label>'
+      : '';
+    return '<div class="ank-ansicht-kopf ank-schlank ank-mit-wahl' + (_aktiv ? ' ank-soll' : '') + '" title="' + esc(erklaerung) + '">'
+      + wahl + frei + '</div>';
   }
 
   function bannerZeichnen() {
     var host = el('ank-ansicht-host');
     var A = window.DealPilotAnkauf;
-    if (!host || !_aktiv || !A || !A.vorhanden()) { if (host) host.innerHTML = ''; return; }
+    if (!host) return;
+    if (!A || !A.vorhanden()) { host.innerHTML = ''; return; }
     host.innerHTML = banner(A.stand());
+    if (!host._ankKlick) {
+      host._ankKlick = true;
+      host.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('[data-ank-stand]') : null;
+        if (!b) return;
+        setzen(b.getAttribute('data-ank-stand') === 'soll');
+      });
+    }
     var cb = el('ank-freigabe');
     if (cb) cb.addEventListener('change', function () {
       _frei = !!cb.checked;
@@ -218,6 +226,7 @@
          nur die Abblendung nehmen. */
       if (_frei) { wachen(false); entsperren(); }
       else { sperren(); wachen(true); }
+      bannerZeichnen();
       if (typeof toast === 'function') {
         toast(_frei
           ? '⚠ Der Ankauf-Stand ist zum Bearbeiten frei. Beim Speichern wird er überschrieben — mit Nachweis.'
@@ -291,9 +300,7 @@
     wachen(false);
     entsperren();
     document.body.classList.remove('dp-ankauf-ansicht', 'dp-ankauf-frei');
-    var host = el('ank-ansicht-host');
-    if (host) host.innerHTML = '';
-    function loesen() { _aktiv = false; }
+    function loesen() { _aktiv = false; bannerZeichnen(); }
     if (_key && typeof loadSaved === 'function') {
       try {
         var p = loadSaved(_key);
@@ -306,9 +313,18 @@
   /* Objektwechsel beendet die Ankauf-Ansicht: der neue Stand gehoert
      einem anderen Objekt, und ein stehengebliebener Modus zeigte die
      Vergangenheit des Vorgaengers. */
+  /* v2173: beim Objektwechsel NICHT setzen(false) - das lud mit dem alten
+     Schluessel das VORIGE Objekt neu. Das neue steht schon im Formular;
+     hier wird nur der Zustand geloest. */
+  function abbrechen() {
+    _frei = false; _aktiv = false; _key = null;
+    wachen(false);
+    entsperren();
+    document.body.classList.remove('dp-ankauf-ansicht', 'dp-ankauf-frei');
+  }
   window.addEventListener('dp:object-ready', function () {
-    if (_aktiv && window._currentObjKey !== _key) setzen(false);
-    else if (_aktiv) setTimeout(bannerZeichnen, 200);
+    if (_aktiv && window._currentObjKey !== _key) abbrechen();
+    setTimeout(bannerZeichnen, 200);
   });
 
   window.DealPilotAnkaufAnsicht = {

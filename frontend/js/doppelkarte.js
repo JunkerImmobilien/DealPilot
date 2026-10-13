@@ -57,7 +57,10 @@
 
   var DREHZEIT = 170;                 /* muss zur CSS-Dauer passen */
   var gedreht = Object.create(null);  /* key -> true = zeigt den Ankauf */
-  var alle = false;                   /* Schalter ueber der Liste */
+  var alle = false;                   /* Schalter ueber der Liste: true = Phase Ankauf */
+  /* v2173 · der Schalter ist ein FILTER nach Phase (siehe modusSetzen).
+     Die Wahl wird je Browser gemerkt - eine Bequemlichkeit, kein Zustand. */
+  try { alle = localStorage.getItem('dp_dk_phase') !== 'bestand'; } catch (e) { alle = true; }
 
   function el(id) { return document.getElementById(id); }
 
@@ -257,6 +260,7 @@
         }
       }
     }
+    filtern();
     schalterSetzen();
   }
 
@@ -277,7 +281,7 @@
     var mit = 0, karten = liste.querySelectorAll('.sb-card');
     for (var i = 0; i < karten.length; i++) if (ankaufVon(karten[i].getAttribute('data-key'))) mit++;
     var s = el('dk-schalter');
-    if (!mit) { if (s) s.remove(); return; }
+    if (!karten.length) { if (s) s.remove(); return; }   /* v2173: filtert, braucht keinen Ankauf-Stand */
     if (!s) {
       s = document.createElement('div');
       s.id = 'dk-schalter';
@@ -403,10 +407,10 @@
          sie steht jetzt im Tooltip. Darunter eine Zeile, die beide
          Woerter erklaert - mit Marcels eigener Bruecke Soll/Ist. */
       + '<button type="button" data-dk-modus="bestand" class="dk-seg' + (alle ? '' : ' aktiv') + '"'
-      + ' title="Bestand = der laufende Stand von heute (das Ist).">Bestand</button>'
+      + ' title="Bestand = gewonnene Objekte, mit ihrem laufenden Stand (Ist).\u000aDen eingefrorenen Ankauf-Stand (Soll) zeigt der Umschalter Ist | Soll oben im Objekt.">Bestand</button>'
       + '<button type="button" data-dk-modus="ankauf" class="dk-seg' + (alle ? ' aktiv' : '') + '"'
-      + ' title="Ankauf = der Stand beim Nutzen-/Lastenwechsel, eingefroren (das Soll).'
-      + '\u000a' + mit + ' von ' + karten.length + ' Objekten haben einen Ankauf-Stand.'
+      + ' title="Ankauf = Objekte in der Akquise, noch nicht gewonnen. Verlorene stehen ausgegraut am Ende.'
+      + '\u000a' + mit + ' von ' + karten.length + ' Objekten sind gewonnen und haben einen Ankauf-Stand.'
       /* v2113: dieser Satz stand bisher NUR in der Erklaerzeile darunter.
          Mit ihr faellt er nicht weg - er zieht hierher. Eine Gestaltung
          zu verschlanken darf keine Aussage mitnehmen. */
@@ -482,31 +486,57 @@
      stehen - aber sie werden gekennzeichnet: eine Karte, die im
      Ankauf-Modus ihre HEUTIGEN Zahlen zeigt, ohne das zu sagen, waere
      eine Luege im Nebensatz. Halbe Deckkraft kann nichts verdecken. */
+  /* ══ v2173 · DER SCHALTER FILTERT NACH PHASE ═══════════════════════════
+     Marcel am 13.10.2026: „wenn ich ... auf Ankauf einmal klicke, dann
+     werden alle Objekte angezeigt. Vielleicht sollten wir das so machen,
+     dass dann halt in der Liste nur noch die Objekte angezeigt werden, die
+     tatsaechlich im Ankauf sind ... und wenn wir auf Bestand gehen, nur ...
+     die auch tatsaechlich im Bestand sind, also der Ist-Stand."
+
+     Bis v2172 drehte „Ankauf" die 8 gewonnenen Karten auf ihren
+     eingefrorenen Stand und liess die 25 offenen stehen - „Ankauf" hiess
+     im Code der Stand von damals, fuer Marcel die PHASE. Und es schaltete
+     das Formular mit, das beim naechsten Objektwechsel zurueckfiel,
+     waehrend die Leiste auf „Ankauf" blieb (gemessen).
+
+     Jetzt:  Bestand = gewonnen (Ist) · Ankauf = nicht gewonnen, verlorene
+     ausgegraut am Ende (Marcels Wahl). Das Formular schaltet NICHT mehr
+     mit - den Soll-Stand eines Bestandsobjekts zeigt der Umschalter
+     Ist | Soll im Objekt (ankauf-ansicht.js). */
   function modusSetzen(nachAnkauf) {
     alle = !!nachAnkauf;
-    /* v2037 - der Dreher gilt nicht nur der Liste. Das GEOEFFNETE
-       Objekt wechselt mit: im Ankauf-Modus zeigt es den eingefrorenen
-       Datensatz, gesperrt, mit Hinweis. Marcels Entscheidung vom
-       09.10.: die Sperre gilt NUR dort, im Bestand bleibt alles
-       editierbar - sonst koennte man nichts mehr pflegen. */
-    try {
-      if (window.DealPilotAnkaufAnsicht) DealPilotAnkaufAnsicht.setzen(alle);
-    } catch (e) { console.warn('[v2037] Ankauf-Ansicht:', e.message); }
-    var liste = el('sb-list');
-    if (!liste) return;
-    var ks = liste.querySelectorAll('.sb-card');
-    for (var j = 0; j < ks.length; j++) {
-      var kk = ks[j], kkey = kk.getAttribute('data-key');
-      if (!ankaufVon(kkey)) {
-        kk.classList.toggle('dk-ohne-ankauf', alle);
-        if (alle) kk.setAttribute('data-dk-hinweis', 'Fuer dieses Objekt ist kein Ankauf-Stand festgeschrieben - du siehst die heutigen Zahlen.');
-        else kk.removeAttribute('data-dk-hinweis');
-        continue;
-      }
-      if (!!gedreht[kkey] !== alle) drehen(kk, alle);
-    }
+    try { localStorage.setItem('dp_dk_phase', alle ? 'ankauf' : 'bestand'); } catch (e) {}
+    filtern();
     schalterSetzen();
   }
+
+  function filtern() {
+    var liste = el('sb-list');
+    if (!liste) return;
+    var ks = liste.querySelectorAll('.sb-card'), sichtbar = 0;
+    for (var j = 0; j < ks.length; j++) {
+      var kk = ks[j];
+      /* Gedrehte Karten aus der Zeit vor v2173 zuruecksetzen */
+      var kkey = kk.getAttribute('data-key');
+      if (gedreht[kkey] && !kk._dkLaeuft) drehen(kk, false);
+      kk.classList.remove('dk-ohne-ankauf');
+      kk.removeAttribute('data-dk-hinweis');
+      var won = kk.classList.contains('deal-won');
+      var zeigen = alle ? !won : won;
+      kk.classList.toggle('dk-weg', !zeigen);
+      if (zeigen) sichtbar++;
+    }
+    /* Leere Phase: sagen, warum die Liste leer ist - eine leere Liste
+       saehe aus wie „keine Objekte". */
+    var leer = liste.querySelector('.dk-leer');
+    if (!sichtbar && ks.length) {
+      var txt = alle ? 'Keine Objekte im Ankauf — alle sind gewonnen. Unter „Bestand“ stehen sie.'
+                     : 'Noch keine Objekte im Bestand. Ein Objekt kommt hierher, sobald es auf „gewonnen“ steht.';
+      if (!leer) { leer = document.createElement('div'); leer.className = 'dk-leer'; liste.appendChild(leer); }
+      if (leer.textContent !== txt) leer.textContent = txt;
+    } else if (leer) { leer.parentNode.removeChild(leer); }
+  }
+
   /* `renderSaved` baut die Liste neu. Ein MutationObserver ist hier
      richtig und kein Polling: er feuert genau dann, wenn getauscht
      wurde, und nicht alle 300 ms ins Leere. */
