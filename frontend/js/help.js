@@ -536,6 +536,10 @@
           body: 'Drück <strong>F1</strong> — das geht überall. Oder drück <strong>?</strong>, wenn du gerade nicht in einem Eingabefeld tippst. Du kannst den Piloten auch einfach <strong>anklicken</strong>: ein Klick öffnet den Tower, ein zweiter schließt ihn wieder.\n\nWo der Pilot wartet, stellst du in den Einstellungen unter <strong>Pilot · Hilfe auf F1</strong> ein:\n• <strong>Seitenleiste</strong> — steht im freien Platz über deinem Nutzerfeld (Standard)\n• <strong>Kopfleiste</strong> — nur Kopf und Mütze neben dem Hilfe-Symbol\n• <strong>Hauptbereich</strong> — unten am linken Rand des Inhalts\n• <strong>Nur auf F1</strong> — unsichtbar, bis du ihn rufst\n\nFehlt am gewählten Ort der Platz (Leiste eingeklappt, Handy), weicht er auf den nächsten Ort aus.'
         },
         {
+          h: 'Wo steht der Pilot, und kann ich das ändern?',
+          body: 'Standardmäßig wartet er in der <strong>Seitenleiste</strong> über deinem Nutzerfeld. Unter <strong>Einstellungen → Darstellung → „Pilot · Hilfe auf F1“</strong> wählst du: Seitenleiste, Kopfleiste (nur Kopf und Mütze neben dem Hilfe-Symbol), Hauptbereich (unten links im Inhalt) oder „Nur auf F1“ — dann ist er unsichtbar, bis du ihn rufst.'
+        },
+        {
           h: 'Wann speichert DealPilot mein Objekt?',
           body: 'Es gibt keinen eigenen Speichern-Knopf. DealPilot sichert das geöffnete Objekt automatisch:\n\n• beim <strong>Wechsel des Reiters</strong> (Objekt, Investition, Miete …),\n• beim <strong>Öffnen eines anderen Objekts</strong> und bei „Neues Objekt“,\n• bei Aktionen wie einer Pilot-Analyse oder einem Statuswechsel in der Deal-Aktion.\n\nIm Kopf erscheint dann kurz „Auto-saved · gerade eben“.\n\n<strong>Gut zu wissen:</strong> Gesichert wird erst, wenn ein Kaufpreis oder ein Ort eingetragen ist. Willst du den Tab schließen, während noch Änderungen offen sind, warnt dich der Browser. Wechsle im Zweifel einmal den Reiter — dann ist alles gesichert.'
         },
@@ -546,6 +550,14 @@
         {
           h: 'Wie sichere oder exportiere ich meine Daten?',
           body: 'In der Seitenleiste unter <strong>Aktionen → Export</strong> öffnet sich „Daten exportieren“:\n\n• <strong>PDF-Report für Objekt</strong> — der Investment-Case für Bank und Investoren.\n• <strong>DealPilot-Sicherung</strong> — ein Objekt oder alle als .dpkt-Datei, mit Eingaben, Pilot-Analysen, Bemerkungen und Fotos. Hak „Mit Passwort verschlüsseln“ an, sonst ist die Datei Klartext.\n• <strong>Excel-Export</strong> — eine Zeile je Objekt mit allen Kennzahlen.\n• <strong>Portfolio-CSV</strong> — alle Objekte plus Summenzeile.\n\nZurückspielen kannst du eine Sicherung über <strong>Aktionen → Import</strong>. Plan- und Zahlungsdaten sind nicht enthalten. Die Objekt-Sicherung gehört zum Pro-Plan.'
+        },
+        {
+          h: 'Warum sind die Quellen in der Datenaufnahme ausgegraut?',
+          body: 'Ist ein Objekt schon gefüllt, sperrt DealPilot das erneute Einlesen (Exposé, Sprache, ImmoMetrica) — ein neuer Abruf würde Felder überschreiben, die du schon gepflegt hast. Über den ausgegrauten Quellen steht dann der Knopf <strong>„Freigeben“</strong>. Ein Klick hebt die Sperre auf, danach liest du wie gewohnt ein.'
+        },
+        {
+          h: 'Wie übernehme ich ein Inserat aus ImmoMetrica?',
+          body: 'Zuerst den Zugang hinterlegen: <strong>Einstellungen → Account & Sicherheit → API-Keys externer Anbieter → ImmoMetrica</strong> (du brauchst dort ein Investor-Pro-Abo und den API-Token aus deinem ImmoMetrica-Dashboard).\n\nDanach steht in der Datenaufnahme — im Objekt und im Quick-Check — die Kachel <strong>ImmoMetrica</strong>. Du wählst Favoriten oder einen Suchauftrag, klickst ein Inserat an und hakst ab, welche Felder übernommen werden. Weicht die Adresse vom offenen Objekt ab, fragt DealPilot vorher nach.'
         },
         {
           h: 'Wie ändere ich die Score-Gewichtung?',
@@ -588,12 +600,20 @@
           body: 'Das Kontingent zählt die drei Marktbericht-Stufen getrennt: Marktpreisindikation, Erweiterte Marktpreisindikation und Wertermittlung nach ImmoWertV. Deinen Stand siehst du unter <strong>Einstellungen → Plan</strong> (in bezahlten Plänen „Dein Kontingent“) und je Stufe als „frei“ in der Box „Marktbericht abrufen“.\n\n<strong>So geht\'s weiter:</strong>\n1. Warten: Das Monatskontingent wird zum Monatsanfang neu gesetzt. Nicht Verbrauchtes verfällt am Monatsende.\n2. Nachkaufen: Unter Einstellungen → Plan stehen „Bewertungspakete“ und „Oder einzeln — genau die eine, die gerade fehlt“. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.\n\nNachkaufen geht in jedem bezahlten Plan; im Free-Plan ist dafür ein Upgrade nötig.'
         },
         {
+          h: 'Das Inserat nennt keine Straße — kann ich trotzdem bewerten?',
+          body: 'Ja. Viele Inserate veröffentlichen nur PLZ und Ort. Dann nimmt DealPilot den <strong>Ortskern</strong>: der Marktpreis kommt aus Vergleichsangeboten im Umkreis des Ortsmittelpunkts, der Bodenrichtwert aus der Zone am Ortskern. Das ist eine Einschätzung für den Ort, keine Messung am Haus — Mikrolage und Bodenrichtwert können am echten Standort abweichen.\n\nIm Quick-Check gilt die Straße dann als erfüllt, und am Feld steht der Hinweis. Trägst du die Straße später nach, rechnet alles für die echte Lage neu.'
+        },
+        {
           h: 'Warum steht beim Liegenschaftszins „gesetzlicher Auffangwert“?',
           body: 'DealPilot sucht den Liegenschaftszinssatz in fester Reihenfolge: <strong>amtlich, kreisscharf</strong> (zuständiger Gutachterausschuss) → <strong>amtlich, regional</strong> (Landesebene) → <strong>aus eigener Marktableitung</strong> → <strong>gesetzlicher Auffangwert n. § 256 BewG</strong>. Liegt für deinen Ort kein amtlicher Wert vor, rechnet der Ertragswert mit dem Auffangwert — als <em>indikativ</em> gekennzeichnet, nicht marktabgeleitet.\n\nDarunter nennt der Bericht den zuständigen Ausschuss mit Link zur Quelle, oft auch, warum dort kein verwertbarer Wert steht und ob der Bericht kostenpflichtig ist.\n\n<strong>Eigenen Wert setzen:</strong> In der Wertermittlung „▸ Werte selbst setzen“ aufklappen und „Liegenschaftszinssatz (%)“ eintragen. Er gilt dann als „eigene Angabe“.'
         },
         {
           h: 'Wie lege ich einen Steuerzeitraum an?',
           body: 'Ein Steuerzeitraum hält dein zu versteuerndes Einkommen (zvE) für eine Zeitspanne fest — etwa vor und nach einer Lohnerhöhung.\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Steuer auf „📅 Steuerzeiträume verwalten →“ klicken. Es öffnet sich Einstellungen → Mandanten, dein privater Halter.\n2. Unter „Neuen Zeitraum hinzufügen“: „Gültig von“, „Gültig bis (leer = laufend)“, „zvE / Jahr (€)“, „Grund“ und „Notiz (optional)“ ausfüllen.\n3. „Hinzufügen“ klicken.\n\nÜberschneidet sich der Zeitraum mit einem bestehenden, fragt DealPilot nach. Je Objekt wird der passende Zeitraum über den „Wirtsch. Übergang“ zugeordnet — ein zvE, das du selbst ins Objekt geschrieben hast, bleibt stehen. Ändern mit „Bearb.“, löschen mit „×“.'
+        },
+        {
+          h: 'Kann ich die Steuerwerte aus dem Vorjahr übernehmen?',
+          body: 'Ja. Im Reiter <strong>Steuer</strong>, Detail-Ansicht, steht neben dem Veranlagungsjahr der Knopf <strong>„⧉ Werte aus [Vorjahr] übernehmen“</strong>. Er kopiert nur deine eigenen Werte für <strong>wiederkehrende</strong> Posten — Hausverwaltung, Nebenkosten, Kontoführung, Steuerberater, Fahrten und Ähnliches — und nur in Felder, die im Jahr noch leer sind.\n\nNie kopiert werden Schuldzinsen, AfA, Erhaltungsaufwand, anschaffungsnahe Kosten, Notar, Vermittlung und andere Einmal-Posten — die sind jedes Jahr anders.'
         },
         {
           h: 'Warum ist der Ankauf-Stand nicht eingefroren?',
