@@ -12,7 +12,7 @@
  * Syntaxfehler, sondern ein fehlender Bezeichner. */
 import { bewirtschaftungskosten as nrwBwk } from '../lib/nrw_modell.js';
 import {
-  BWK_TABELLE, GND_TABELLE, MODELL,
+  BWK_TABELLE, bwkAnsaetze, GND_TABELLE, MODELL,
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
   istNeubau, istErstbezugNachSanierung, round0, round2,
 } from '../lib/immowertv.js';
@@ -357,8 +357,16 @@ export const ErtragswertService = {
           hinweis: _nrw.hinweis, beleg: _nrw.beleg };
         out.hinweise.push(_nrw.hinweis);
       } else {
+      /* v2186 · Die Anlage-3-Ansaetze ZUM STICHTAG (bwkAnsaetze), je Objektart:
+         Wohnung/EFH, Eigentumswohnung, Garage. Bis v2185 standen hier die
+         unfortgeschriebenen Basiswerte (230 EUR / 9,00 EUR/m2). */
+      const _A = bwkAnsaetze(ein.stichtag_jahr);
+      const _aw = _A.werte;
+      out.bwk_ansaetze = { stichtag_jahr: _A.stichtag_jahr, jahr_je_feld: _A.jahr_je_feld, quellen: _A.quellen, abweichend: _A.abweichend };
       const vJeWe = num(ein.bwk_verwaltung_je_we)
-        ?? (_istWhg ? BWK_TABELLE.verwaltung_je_etw_eur : BWK_TABELLE.verwaltung_je_we_eur);
+        ?? (_istWhg ? (_aw.verw_etw ?? BWK_TABELLE.verwaltung_je_etw_eur) : (_aw.verw_we ?? BWK_TABELLE.verwaltung_je_we_eur));
+      const vJeStp = _aw.verw_garage ?? BWK_TABELLE.verwaltung_je_stellplatz_eur;
+      const iJeStp = _aw.inst_garage ?? BWK_TABELLE.instandhaltung_je_stellplatz_eur;
 
       /* v1026 · Was im Objekt schon gepflegt ist, wird genutzt: die eigene
        * Instandhaltungsruecklage und die Leerstandsannahme aus der Prognose.
@@ -370,7 +378,7 @@ export const ErtragswertService = {
         iJeQm = round2(pos(ein.instandhaltung_ruecklage_jahr) / pos(ein.wohnflaeche_qm));
         iHerkunft = 'eigene Ruecklage';
       }
-      if (iJeQm == null) iJeQm = BWK_TABELLE.instandhaltung_je_qm_wfl_eur;
+      if (iJeQm == null) iJeQm = _aw.inst_qm ?? BWK_TABELLE.instandhaltung_je_qm_wfl_eur;   /* v2186: zum Stichtag */
       let maPct = num(ein.bwk_mietausfall_pct);
       let maHerkunft = 'Anlage 3';
       if (maPct == null && pos(ein.leerstand_pct)) {
@@ -382,17 +390,17 @@ export const ErtragswertService = {
       }
       out.bwk_herkunft = { instandhaltung: iHerkunft, mietausfall: maHerkunft };
 
-      const verwaltung = round0(we * vJeWe + spAnz * BWK_TABELLE.verwaltung_je_stellplatz_eur);
-      const instand = round0(wfl * iJeQm + spAnz * BWK_TABELLE.instandhaltung_je_stellplatz_eur);
+      const verwaltung = round0(we * vJeWe + spAnz * vJeStp);
+      const instand = round0(wfl * iJeQm + spAnz * iJeStp);
       const mietausfall = round0(rohertrag * maPct / 100);
       const betriebNul = round0(pos(ein.bwk_betrieb_nul_jahr) || 0);
 
       bwkDetail.push({
         pos: `Verwaltungskosten (${we} WE × ${vJeWe} €`
-             + (spAnz ? ` + ${spAnz} Stellpl. × ${BWK_TABELLE.verwaltung_je_stellplatz_eur} €` : '')
+             + (spAnz ? ` + ${spAnz} Stellpl. × ${vJeStp} €` : '')
              + ')',
         wert: verwaltung });
-      bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${iJeQm} €)`,
+      bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €)`,
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
       bwkDetail.push({ pos: `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`,
@@ -401,11 +409,18 @@ export const ErtragswertService = {
       if (betriebNul) bwkDetail.push({ pos: 'Nicht umlagefähige Betriebskosten', wert: betriebNul });
 
       bwk = verwaltung + instand + mietausfall + betriebNul;
+      /* v2186: statt der pauschalen Warnung „nicht indexiert" - was zum
+         Stichtag gilt und was nicht aus dem Stichtagsjahr kommt. */
+      if (!_nrw) {
+        if (!_A.vollstaendig || !Object.keys(_aw).length) {
+          out.warnungen.push('Für das Stichtagsjahr ' + _A.stichtag_jahr + ' liegen keine fortgeschriebenen Bewirtschaftungskosten (Anlage 3 ImmoWertV) vor — angesetzt sind die Basiswerte. Das Ergebnis ist insoweit vorläufig.');
+        } else {
+          out.hinweise.push('Bewirtschaftungskosten nach Anlage 3 ImmoWertV, fortgeschrieben zum Stichtag ' + _A.stichtag_jahr
+            + (_A.abweichend.length ? ' (' + _A.abweichend.join(', ') + ')' : '') + '. Quelle: ' + _A.quellen.join('; ') + '.');
+        }
+      }
       }   /* v1048-WBWK-3 · Ende des Zweigs ohne Modellvorgabe */
 
-      if (!BWK_TABELLE.geprueft) {
-        out.warnungen.push('Die normierten Bewirtschaftungskosten-Ansätze sind noch nicht gegen den Verordnungstext (Anlage 3 ImmoWertV) verifiziert und nicht indexiert. Das Ergebnis ist insoweit vorläufig.');
-      }
       if (!wfl) out.hinweise.push('Ohne Wohnfläche wurden keine Instandhaltungskosten angesetzt — das überschätzt den Ertragswert.');
     }
     bwkDetail.forEach((d) => out.staffel.push(d));
