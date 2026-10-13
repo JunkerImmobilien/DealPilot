@@ -38713,6 +38713,43 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Abnahmen bei sichtbarem Fenster.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
+
+### v2198–v2198c · Kompletter Responsive-Check (13.10.2026, Staging)
+
+- **Was:** Marcels Master-Prompt „vollständiger Responsive-, UI-/UX- und Funktionalitätscheck".
+  - Messkabine (gleich-origin-iframe) über 15 Breiten (320, 360, 375, 390, 430, 667 quer, 768, 820, 932 quer, 1024, 1180, 1280, 1440, 1920, 2560).
+  - Alle 9 Reiter, dazu Cockpit, Alle Objekte, Quick-Check (eigenes Dokument), Marktbericht (eigenes Dokument), Einstellungen, Hilfe, Atlas, Tower.
+  - Gemessen: Überlauf, Herausragen, unerreichbar, verdeckt, Touch-Flächen unter 40 px, Kontrast gegen den effektiven Grund.
+- **Behoben:**
+  1. Kartenknöpfe Duplizieren/Löschen erschienen beim Überfahren auf dem Score-Ring. Jetzt links daneben.
+  2. Auf Touch-Geräten ohne Maus erschienen sie nie. Jetzt dauerhaft sichtbar (`hover:none`).
+  3. Quick-Check bei 320 px: „Bewirtschaftungskosten" schob die Seite 20 px quer. Jetzt Silbentrennung.
+  4. Marktbericht 320–390 px: Kostenhinweis und Umschaltgruppe abgeschnitten (bis 90 px Überlauf). Jetzt mit Umbruch.
+  5. `#dp-sb-toggle` lag unter 900 px außerhalb des Schirms. Jetzt ausgeblendet.
+  6. Tower am Handy: Der Pilot verdeckte den aktiven Reiter. Jetzt als Büste im Kopf.
+  7. Chips im Bankgespräch: 1,66:1. Lesen jetzt ihren Grund.
+  8. Kontrast im hellen Hauptbereich: `--muted`, Gold als Titel, Bank-Cockpit, Matrix.
+- **Commit:** `d8e0e1ee`, `e1be19cc`, `5b105408`, `9ac28f4f`
+- **Nachweis (Abschlussdurchgang, 11 Breiten × 9 Reiter + 8 Ansichten):**
+  - Reiter überall Überlauf, Herausragen und unerreichbar 0.
+  - Unerreichbar in allen Ansichten 0.
+  - Quick-Check 320 px 0, Marktbericht 320 px 0.
+  - Kontrastfunde 525 → 288 (Handy) und 670 → 433 (Desktop).
+  - gold-audit RC=0, buster-ebenen SAUBER.
+- **Als Messartefakt zurückgenommen:**
+  - „Text auf Grün/Gold" bei Kennzahl- und Phasenkacheln: nur ein Randstreifen, der Grund ist weiß.
+  - Je 1 px Überlauf bei 667/768/375: Browserzoom 90 %.
+  - „verdeckt" bei Hover-Knöpfen (Deckkraft 0).
+  - Gewerke-Tabelle unter `/landing/`: der Server liefert dort die App ohne Stylesheet. Im richtigen Pfad scrollt die Karte in sich.
+- **Rest:**
+  - 288 / 433 Kontraststellen, meist Grautöne knapp unter 4,5 und Status-Grün/-Rot (Markenregel: nicht anfassen).
+  - Touch-Flächen unter 40 px (vor allem i-Knöpfe mit eigener 44-px-Trefferfläche und Kartenknöpfe mit 26 px).
+  - Nicht geprüft:
+    - Anmeldung/Registrierung (dafür hätte ich abmelden müssen)
+    - die öffentliche Startseite (andere Domain)
+    - eingeblendete Bildschirmtastatur und echte Touch-Geräte
+    - Rollen außer Pro
+    - leere Konten
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
 - **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).

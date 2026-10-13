@@ -157,6 +157,13 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
+
+Gemessen in der Messkabine (11 Breiten × 9 Reiter + 8 Ansichten). Überlauf, Herausragen und Unerreichbar stehen nach v2198c überall auf 0. Offen, weil Gestaltungsfragen und nicht Fehler:
+1. **Kontrast:** 288 Stellen auf dem Handy, 433 auf Tablet/Desktop. Meist Grautöne knapp unter 4,5:1 (Steuertabelle, Bank-Cockpit, Hilfstexte), dazu Status-Grün/-Rot auf Creme. Grün/Rot sind laut Markenregel unantastbar — Marcel entscheidet, ob für kleine Zahlen eine dunklere Statusvariante erlaubt ist.
+2. **Touch-Flächen unter 40 px:** vor allem die Kartenknöpfe der Objektliste (26 px) und die i-Knöpfe (18 px sichtbar, mit 44-px-Trefferfläche seit v1441 — die zählt die Messung nicht).
+3. **Nicht geprüft:** Anmeldung und Registrierung (Abmelden nötig), öffentliche Startseite (andere Domain), Bildschirmtastatur und echte Touch-Geräte, andere Rollen als Pro, leeres Konto. → Abnahme durch Marcel am Gerät.
+
 #### N62.23 · Frage an Marcel: vw-modul (Junker Gutachten-Modul V4.2)
 
 Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Backlog-Zeile. Inhalt (nur gelesen, README): eigenständige Web-App für Verkehrswert-, RND- und Kaufpreisaufteilungs-Gutachten mit Word-Vorlagen und PDF über LibreOffice/PHP, gedacht für die **Junker-Homepage / das Portal** (/modules/vw/), nicht für DealPilot. Nicht angefasst. **Zu klären:** gehört das in DealPilot (z. B. als Modul neben dem BMF-Rechner und dem RND-Assistenten) oder bleibt es auf der Homepage?
