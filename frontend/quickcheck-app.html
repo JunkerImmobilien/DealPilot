@@ -5186,6 +5186,34 @@ const QcApp = (function() {
       }
     }
 
+    /* v2192 · Die eigenen Tabellen fliessen in die Bewertung ein - aus dem
+       Snapshot der DealPilot-Marktbewertung (#_mb_state, dealpilot-mb-qc.js).
+       Jede Zeile nennt ihre Quelle; ohne Abruf bleibt alles wie vorher. */
+    try {
+      const _ms = document.getElementById('_mb_state');
+      const _c = (_ms && _ms.value) ? (JSON.parse(_ms.value).card || null) : null;
+      if (_c) {
+        const _de = (x, n) => Number(x).toFixed(n).replace('.', ',');
+        const zs = _c.zensus;
+        if (zs && zs.leer != null) {
+          const wo = zs.ebene + (zs.name ? ' ' + zs.name : '');
+          if (zs.leer >= 7)        cons.push(`Leerstand <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — erhöhtes Vermietungsrisiko`);
+          else if (zs.leer <= 2.5) pros.push(`Leerstand nur <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — angespannter Mietmarkt`);
+        }
+        const _nkmQ = QcEngine.num(inputs.nkm), _wflQ = QcEngine.num(inputs.wfl);
+        if (zs && zs.miete && _nkmQ && _wflQ) {
+          const ist = _nkmQ / _wflQ;
+          if (ist > zs.miete * 1.3)       cons.push(`Miete <strong>${_de(ist, 2)} €/m²</strong> liegt deutlich über dem Zensus-Mittel (${_de(zs.miete, 2)} €/m², Bestandsmieten) — Risiko bei Mieterwechsel`);
+          else if (ist < zs.miete * 0.85) pros.push(`Miete <strong>${_de(ist, 2)} €/m²</strong> unter dem Zensus-Mittel (${_de(zs.miete, 2)} €/m²) — Luft nach oben`);
+        }
+        if (_c.macroRaw != null && _c.makroGemessen) {
+          const m10 = _de(_c.macroRaw / 10, 1);
+          if (_c.macroRaw >= 60)      pros.push(`Makrolage <strong>${m10}/10</strong> aus amtlichen Kreisdaten (${_c.makroGemessen} von 4 Kennzahlen)`);
+          else if (_c.macroRaw < 45)  cons.push(`Makrolage <strong>${m10}/10</strong> aus amtlichen Kreisdaten (${_c.makroGemessen} von 4 Kennzahlen) — schwache Region`);
+        }
+      }
+    } catch (e) { /* ohne Snapshot keine Zusatzzeilen */ }
+
     // Verhandlungs-Empfehlung
     const verdict = document.getElementById('ai-verdict');
     const verdictEmoji = document.getElementById('ai-verdict-emoji');
@@ -6685,7 +6713,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
      und holt sein Branding ueber ji_token (same-origin). -->
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
-  <script src="js/dealpilot-mb-qc.js?v=953"></script>
+  <script src="js/dealpilot-mb-qc.js?v=v2192"></script>
   <script src="js/immometrica-qc.js?v=v2149"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">

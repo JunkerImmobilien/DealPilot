@@ -317,11 +317,13 @@ export const ReportOrchestrator = {
 
     // Makro-Kette (Destatis) als eigener paralleler Strang:
     // v784-fast-macro: im Schnell-Modus ueberspringen (Destatis haengt ~5,6s, liefert hier eh keine Daten).
-    const macroP = FAST
-      ? Promise.resolve({ agsInfo: null, macroRaw: { available: false, reason: 'schnell-modus' } })
-      : (async () => {
+    /* v2192 · Seit v2172 liegt die Makrolage in der eigenen Tabelle (mb.makro_werte,
+       Millisekunden). Der Schnell-Modus (Quick-Check) liest sie deshalb mit - nur aus
+       der Tabelle, nie live. Marcel 13.10.2026: die neuen Tabellen nutzen, wo wir
+       direkten Zugriff haben. */
+    const macroP = (async () => {
       const agsInfo = await agsP;
-      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city });
+      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city, nurDb: FAST });
       step(`Makrolage: ${macroRaw.available ? 'ausgewertet' : 'keine Daten'}`);
       return { agsInfo, macroRaw };
     })().catch((e) => { step('macro: fehler ' + e.message); return { agsInfo: null, macroRaw: { available: false, reason: e.message } }; });

@@ -63,10 +63,10 @@
 
   function plaus(faktor) {
     var p = CONFIG.plausibilitaet, key, label, hint = null;
-    if (faktor < p.niedrigUnter)      { key = 'niedrig'; label = 'ungewoehnlich niedrig'; hint = 'Ungewoehnlich niedriges Hausgeld \u2014 bitte prüfen.'; }
+    if (faktor < p.niedrigUnter)      { key = 'niedrig'; label = 'ungewöhnlich niedrig'; hint = 'Ungewöhnlich niedriges Hausgeld \u2014 bitte prüfen.'; }
     else if (faktor <= p.normalBis)   { key = 'normal';  label = 'normaler Bereich'; }
-    else if (faktor <= p.erhoehtBis)  { key = 'erhoeht'; label = 'erhoehter Bereich'; }
-    else                              { key = 'hoch';    label = 'aussergewoehnlich hoch'; hint = 'Aussergewoehnlich hohe Kosten möglich (z. B. hohe Ruecklagenbildung oder besondere Ausstattung).'; }
+    else if (faktor <= p.erhoehtBis)  { key = 'erhoeht'; label = 'erhöhter Bereich'; }
+    else                              { key = 'hoch';    label = 'außergewöhnlich hoch'; hint = 'Außergewöhnlich hohe Kosten möglich (z. B. hohe Rücklagenbildung oder besondere Ausstattung).'; }
     return { key: key, label: label, faktor: round2(faktor), hint: hint };
   }
 

@@ -179,6 +179,21 @@ if (!window._wlc) {
     out.macroRaw = (d.macro && d.macro.score != null) ? d.macro.score : null;
     out.trendRaw = (d.price_trend_pct != null) ? d.price_trend_pct : null;
     out.trend = (d.price_trend_pct != null) ? ((d.price_trend_pct >= 0 ? '+' : '') + deNum(d.price_trend_pct, 1) + '%/J') : '–';
+    /* v2192 · Die eigenen Tabellen in den Quick-Check (Marcel 13.10.2026: „wenn wir
+       koennen, nehmen wir auch die neuen Daten der Tabellen, die wir angelegt haben").
+       Zensus 2022 (mb.zensus_werte: Gemeinde wenn eindeutig, sonst Kreis),
+       Bodenrichtwert (BORIS, mit Quelle und Stichtag) und wie viele der vier
+       Makro-Kennzahlen gemessen sind - ein Makro-Score aus null Kennzahlen ist keiner. */
+    var z = d.zensus || {}, zg = z.gemeinde && z.gemeinde.leerstandsquote != null ? z.gemeinde : null, zk = z.kreis || null;
+    var zz = zg || zk;
+    out.zensus = (zz && zz.leerstandsquote != null) ? {
+      ebene: zg ? 'Gemeinde' : 'Kreis', name: zz.name || '', leer: zz.leerstandsquote,
+      eig: zz.eigentuemerquote != null ? zz.eigentuemerquote : null,
+      miete: (zz.miete_flaeche && zz.miete_flaeche.wert) || (zz.miete_baujahr && zz.miete_baujahr.wert) || zz.nettokaltmiete_qm || null
+    } : null;
+    var lv = d.land_value || {};
+    out.brw = (lv.available && lv.value_sqm != null) ? { wert: lv.value_sqm, quelle: lv.source || 'BORIS', stichtag: lv.stichtag || null } : null;
+    out.makroGemessen = (d.macro && d.macro.gemessen != null) ? d.macro.gemessen : null;
     if (mv.estimated != null) {
       out.mw = { low: mv.low != null ? mv.low : Math.round(mv.estimated * 0.9), med: mv.estimated, high: mv.high != null ? mv.high : Math.round(mv.estimated * 1.1), sqm: (mv.basis_median_sqm != null) ? (deNum(mv.basis_median_sqm, 0) + ' €/m²') : (area ? (deNum(Math.round(mv.estimated / area), 0) + ' €/m²') : '') }; /* v892-sqm */
     }
@@ -240,7 +255,10 @@ if (!window._wlc) {
           '<div class="dpx-headR"><span class="dpx-conf"><span class="cd"></span>Aussagekraft: <b>' + D.conf.label + '</b> · <b>' + D.conf.pct + ' %</b></span>' +
             '<button class="dpx-chev" id="dpx-chev" title="Ein-/Ausklappen"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button></div>' +
         '</div>' +
-        '<div class="dpx-sub"><div class="dpx-it dpx-rating-it">Bewertung <b>' + D.rating + '</b></div><div class="dpx-it">Mikro <b>' + D.mikro + '</b></div><div class="dpx-it">Makro <b>' + D.makro + '</b></div><div class="dpx-it">Wertentw. <span class="dpx-up">' + D.trend + '</span></div></div>' +
+        '<div class="dpx-sub"><div class="dpx-it dpx-rating-it">Bewertung <b>' + D.rating + '</b></div><div class="dpx-it">Mikro <b>' + D.mikro + '</b></div><div class="dpx-it">Makro <b>' + D.makro + '</b></div><div class="dpx-it">Wertentw. <span class="dpx-up">' + D.trend + '</span></div>'
+          + (D.zensus ? '<div class="dpx-it" title="Zensus 2022 · ' + (D.zensus.ebene + ' ' + D.zensus.name).replace(/"/g, '') + '">Leerstand <b>' + deNum(D.zensus.leer, 1) + ' %</b></div>' : '')
+          + (D.brw ? '<div class="dpx-it" title="' + (D.brw.quelle + (D.brw.stichtag ? ' · Stichtag ' + D.brw.stichtag : '')).replace(/"/g, '') + '">Bodenrichtwert <b>' + deNum(D.brw.wert, 0) + ' €/m²</b></div>' : '')
+          + '</div>' +
         '<div class="dpx-body"><div class="dpx-gauges">' +
           (hasMw ? '<div class="dpx-b dpx-mw"><div class="dpx-mg" id="dpx-g-mw">' + tachoSvg() + '</div><div><span class="dpx-lab">Marktwert</span><div class="dpx-val" id="dpx-v-mw">–</div><span class="dpx-sqm">' + D.mw.sqm + '</span><div class="dpx-spn" id="dpx-s-mw"></div></div></div>' : '') +
           (hasMm ? '<div class="dpx-b dpx-mm"><div class="dpx-mg" id="dpx-g-mm">' + tachoSvg() + '</div><div><span class="dpx-lab">Marktmiete (kalt)</span><div class="dpx-val" id="dpx-v-mm">–</div><span class="dpx-sqm">' + D.mm.sqm + '</span><div class="dpx-spn" id="dpx-s-mm"></div></div></div>' : '') +
@@ -337,7 +355,8 @@ if (!window._wlc) {
       render();
       _writeState(); /* v832c-ensure-state: Live-Zweig schrieb bisher KEINEN State */
       var _lc = (data._kerosin && typeof data._kerosin.charged === 'number') ? data._kerosin.charged : ((typeof data.cost === 'number') ? data.cost : (data.charged || data.liters || null));
-      toast('✓ DealPilot-Marktbewertung' + (_lc ? ' (−' + _lc + ' L)' : ''));
+      /* v2192: hier stand „(−2 L)" - Liter gibt es seit v1176 nicht mehr */
+      toast('✓ DealPilot-Marktbewertung' + (_lc ? ' · ' + _lc + ' vom Kontingent' : ''));
     } catch (e) { toast('⚠ Netzwerkfehler bei der DealPilot-Marktbewertung'); }
   }
 
