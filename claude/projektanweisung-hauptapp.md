@@ -38614,6 +38614,27 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2159/v2159a · Standard-Lageklasse, diktierbar (N62.11)
+
+**Was:** Standardklasse im Lage-Profil, Auswahl in Onboarding und
+Investmentprofil, Vorbelegung neuer Quick-Checks (gekennzeichnet), Diktat
+und geführte Eingabe kennen die Lageklasse. Auswahl-Abgleich im Diktat
+repariert (erst exakt, dann ungefähr). **Commit:** `8c7aa666`, `036982eb`.
+**Nachweis:** Browser auf Staging, echte Dateien: Vorbelegung B mit Marke,
+Diktat A/C/„b-lage" richtig, Marke fällt bei Diktat; `setSelectSmart` aus
+der geladenen Datei: A/B/C, schwach/gut/sehr gut exakt; Energie „A" ≠ „A+";
+390 px ohne Überlauf. **Rest:** Onboarding nicht im Bild abgenommen.
+**Falle:** das Quick-Check-Fenster hat einen eigenen Buster in
+`qc-bridge.js` (`IFRAME_SRC`).
+
+### v2158 · Makro-Score nur aus gemessenen Kennzahlen (N62.4a)
+
+**Was:** `ScoringService.macroScore()` ohne Ersatzwerte; Makrolage erst ab
+zwei Kennzahlen. **Commit:** `33bca6d9`. **Nachweis:** im mb-Container.
+**Rest:** alte Berichte behalten den alten Wert bis zur Neuberechnung;
+Zensus braucht ein Konto bei der Zensus-Datenbank (die `.env` hat nur die
+Regionaldatenbank).
+
 ### v2157 · Lage & Markt: die Lage zweimal erhoben, gegenübergestellt (N62.4)
 
 **Was**  Der Marktbericht trägt die Lage **zweimal**: `assessment` (aus

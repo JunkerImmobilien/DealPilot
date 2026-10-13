@@ -140,7 +140,7 @@ gegenübergestellt werden sie nirgends.
 > **Rest:** ob das Modell die Zeilen sinnvoll füllt, zeigt nur ein echter
 > Analyselauf.
 >
-> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.**
+> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
 > `marktbericht/backend/data/zensus2022_kreise.csv` trägt nur die
 > Beispielzeile. **0 von 162 Berichten auf Staging haben Zensus-Werte**
 > (159× `kreis_nicht_in_datei`, 3× `kein_ags`). Der „Zensus-Abruf" lief
@@ -152,6 +152,17 @@ gegenübergestellt werden sie nirgends.
 > Quelle erzeugen statt abtippen.
 
 #### N62.4a · Makro-Score: Ersatzwerte gelten als gemessen
+
+> **✅ Erledigt 13.10.2026 · v2158 · `33bca6d9`** (Marcels Freigabe: „Den
+> Makroscore müssen wir auf jeden Fall anpassen"). `macroScore()` mittelt nur
+> noch gemessene Kennzahlen und nennt `gemessen`/`moeglich`/`fehlend`; ohne
+> jede Kennzahl `score: null` (dealScore vermerkt `makrolage` als geschätzt).
+> Die Bericht-Makrolage entsteht erst ab ZWEI gemessenen Kennzahlen. Im
+> Container nachgemessen: Bevölkerungstrend allein → 65, „aus 1 von 6".
+> **Rest:** bestehende Berichte tragen weiter den alten Score und die alte
+> Makrolage (Bericht 176); sie ändern sich erst bei Neuberechnung. Ein
+> frischer Berichtslauf ist Abnahmepunkt.
+
 
 **Gefunden am 12.10.2026 bei N62.4.** `ScoringService.macroScore()`
 (`marktbericht/backend/src/services/ScoringService.js:17`) setzt für jede
@@ -244,6 +255,24 @@ gehört die Feldliste des Reiters durchgegangen und **je Feld entschieden**,
 ob es wiederkehrt.
 
 #### N62.11 · Eine Standard-Lageklasse, und sie muss sich diktieren lassen
+
+> **✅ Erledigt 13.10.2026 · v2159/v2159a · `8c7aa666`, `036982eb`.**
+> Standardklasse in `lage-profil.js` (`standard()`/`setzeStandard()`),
+> wählbar im Onboarding und im Investmentprofil, mit Begründung. Neuer
+> Quick-Check wird vorbelegt (nur leeres Feld), Marke „Vorgabe aus deinem
+> Profil · überschreibbar"; jede andere Wahl und JEDES Diktat löscht sie.
+> Diktat: `lageklasse` in HINTS/WL/QC_IDS/OBJ2QC, geführte Eingabe fragt
+> sie in Etappe 3 und BIETET den Standard an (`profil: 'lage'`).
+> **Nebenbefund behoben:** beide Auswahl-Schreiber (`setSelectSmart`,
+> iframe `_applyImportData`) nahmen den ersten Teilwort-Treffer — diktiertes
+> „A"/„B" landete auf „keine Angabe", „schwach" auf „Sehr schwach",
+> Energieklasse „A" auf „A+". Jetzt erst exakt, dann ungefähr, leere Option
+> nie. Im Browser am echten Code nachgemessen.
+> **Nebenbefund 2:** `qc-bridge.js` lädt `quickcheck-app.html` mit EIGENEM
+> Buster (`IFRAME_SRC`) — wer das Fenster ändert, zieht ihn mit.
+> **Abnahme offen:** Onboarding-Schritt mit der neuen Auswahl nur per Code
+> geprüft, nicht im Bild.
+
 
 **Marcel am 12.10.2026:** *„Wir haben ja im Quickcheck auch die
 Lageklassen, die man auswählen kann. Da sollten wir zusehen: Wenn wir uns
