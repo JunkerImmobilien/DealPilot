@@ -17,10 +17,14 @@
  * Verwaltung 230 EUR je Wohnung bzw. Wohngebaeude, 30 EUR je Stellplatz,
  * Instandhaltung 9,00 EUR/m2 Wohnflaeche und 68 EUR je Stellplatz.
  * Die Betraege werden mit dem Verbraucherpreisindex fortgeschrieben; der
- * FAKTOR ist eine Einstellung. Vorbelegt mit 1,30 - das ist die
- * Fortschreibung zum Stichtag 2021 (230 -> 298 EUR, im Marktbericht
- * dokumentiert). Fuer spaetere Stichtage liegt er hoeher; der aktuelle
- * Wert gehoert eingetragen, sobald er feststeht.
+ * FAKTOR ist eine Einstellung.
+ * v2185 · Recherchiert am 13.10.2026: fuer Stichtage ab 01.01.2026 nennen
+ * zwei Fachquellen uebereinstimmend 367 EUR Verwaltung je Wohnung/EFH,
+ * 439 EUR je ETW, 48 EUR je Garage, 14,40 EUR/m2 Instandhaltung
+ * (immobilien-wertermittlung.de, abels-immobilienbewertung.com; ein
+ * amtliches Schreiben wurde nicht gefunden). Gegen die Basiswerte hier ist
+ * das jedes Mal Faktor 1,596-1,600 -> 1,60. Vorher stand 1,30 (Stand 2021).
+ * Jaehrlich zum 1. Januar neu eintragen.
  * ETW: Hausgeld je m2 und Monat, automatisch aufgeteilt (30 % nicht
  * umlagefaehig - Marcels Abnahme der Demo), dazu eine eigene Ruecklage
  * fuer das Sondereigentum.
@@ -54,7 +58,7 @@
   var LS = 'dp_bwk_profil';
   var FERN = '/user-settings/bwk_profil';
   var STANDARD = {
-    faktor: 1.30,
+    faktor: 1.60,   /* v2185: Stichtage ab 01.01.2026 - siehe Kopf */
     etw: { hg_qm: 4.00, nul_pct: 30, ruecklage_qm: 0.50 },
     efh: { verw: 230, inst_qm: 9.0, stp_inst: 68, bk_qm: 2.20 },
     mfh: { verw: 230, stp_verw: 30, inst_qm: 9.0, stp_inst: 68, bk_qm: 2.50 }
@@ -214,7 +218,7 @@
       }).join('')
       + '<div class="ip-grid"><div class="ip-field"><label for="bwkp_faktor">Fortschreibungsfaktor (Häuser)</label><div class="ip-field-row">'
       + '<input type="text" inputmode="decimal" id="bwkp_faktor" data-bwkp-k="faktor" value="' + String(p.faktor).replace('.', ',') + '"><span class="ip-unit">× Basiswert</span></div>'
-      + '<div class="ip-hint">Verbraucherpreisindex zum Stichtag. 1,30 entspricht dem Stand 2021 (230 € → 298 €); für spätere Stichtage liegt er höher.</div></div></div>';
+      + '<div class="ip-hint">Verbraucherpreisindex zum Stichtag. 1,60 gilt für Stichtage ab 01.01.2026 (Verwaltung 367 €, Instandhaltung 14,40 €/m²); jährlich zum 1. Januar anpassen.</div></div></div>';
   }
   function verdrahten(root) {
     (root || document).addEventListener('change', function (ev) {
