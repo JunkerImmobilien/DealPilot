@@ -273,6 +273,8 @@ window.DealPilotInvestmentProfile = (function() {
          rechnete. Jetzt ist die Beziehung verdrahtet, und der Hinweis
          zeigt dorthin. */
       lageProfilHtml(),
+      /* v2184 · Bewirtschaftung je Objektart (bwk-profil.js) */
+      (window.DealPilotBwkProfil ? DealPilotBwkProfil.einstellungenHtml() : ''),
 
       '<h3 class="ip-section">Persönliche Mindest-Schwellen</h3>',
       '<p class="hint">Diese Werte erscheinen ab V63.77 als farbliche Marker in den Kennzahlen — „grün" wenn dein persönliches Ziel erreicht ist.</p>',

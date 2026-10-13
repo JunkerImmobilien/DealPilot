@@ -56,7 +56,9 @@ const { query } = require('../db/pool');
 /* v2019 - `eigenes_wissen`: was Marcel dem Projektwissen hinzufuegt.
    Es geht in den Prompt ALLER DREI Piloten, aber als eigener Block
    mit eigener Ueberschrift - siehe services/projektwissen.js. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen'];
+/* v2184 - `bwk_profil`: Bewirtschaftung je Objektart (bwk-profil.js), Marcel
+   am 13.10.2026: die Werte gehoeren ans Konto, nicht nur in den Browser. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil'];
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {
