@@ -78,7 +78,24 @@ function atlasZeilen(csv, kennzahl) {
       merkmal: k[idx] || null, stichtag: null,
     });
   }
-  return out;
+  return kreisSchluessel(out);
+}
+
+/* Gemessen am ersten Lauf (13.10.2026): die Atlas-Tabellen schluesseln fuenf
+   Kreise anders als der AgsResolver, der den Bericht fragt —
+     Hamburg 02 und Berlin 11 (Land = Kreis)        -> 02000, 11000
+     Region Hannover 03241001, StaedteRegion Aachen 05334002,
+     Regionalverband Saarbruecken 10041100 (achtstellig) -> 03241, 05334, 10041
+   Ohne diese Umschluesselung fiele genau dort jeder Bericht auf den
+   langsamen Live-Abruf zurueck. Die Berliner Bezirke (11001001 …) sind
+   keine Kreise und bleiben, wie sie sind. */
+function kreisSchluessel(zeilen) {
+  const fuenf = new Set(zeilen.filter((z) => /^\d{5}$/.test(z.ags)).map((z) => z.ags));
+  for (const z of zeilen) {
+    if (z.ags === '02' || z.ags === '11') z.ags += '000';
+    else if (/^\d{8}$/.test(z.ags) && !z.ags.startsWith('11') && !fuenf.has(z.ags.slice(0, 5))) z.ags = z.ags.slice(0, 5);
+  }
+  return zeilen;
 }
 
 /* Bevoelkerung (datencsv-Pivot): je Kreis die Zeitreihe ueber den
@@ -180,14 +197,20 @@ export async function importiere({ log = console.log, kennzahlen = Object.keys(K
     }
   }
   await Promise.all(Array.from({ length: PARALLEL }, arbeiter));
-  /* Deckung nennen, nicht nur „fertig": Kreise je Kennzahl */
+  /* Deckung nennen, nicht nur „fertig". Gemessen wird gegen die HEUTIGEN
+     Kreise (die der Bevoelkerung im neuesten Jahr): die Atlas-Tabellen
+     fuehren zusaetzlich aufgeloeste Altkreise, und eine Zahl ueber 400
+     sagte nichts darueber, ob jeder heutige Kreis da ist. */
   const deckung = await q(
-    "SELECT kennzahl, count(DISTINCT ags) FILTER (WHERE length(ags) = 5) AS kreise, "
-    + "count(DISTINCT left(ags, 2)) FILTER (WHERE length(ags) = 5) AS laender, max(jahr) AS jahr "
-    + 'FROM mb.makro_werte WHERE wert IS NOT NULL GROUP BY kennzahl ORDER BY kennzahl');
+    'WITH heute AS (SELECT ags FROM mb.makro_werte WHERE kennzahl = $1 AND wert IS NOT NULL '
+    + '  AND jahr = (SELECT max(jahr) FROM mb.makro_werte WHERE kennzahl = $1)) '
+    + 'SELECT w.kennzahl, (SELECT count(*) FROM heute) AS soll, count(DISTINCT w.ags) AS kreise, '
+    + 'count(DISTINCT left(w.ags, 2)) AS laender, max(w.jahr) AS jahr '
+    + 'FROM mb.makro_werte w JOIN heute h ON h.ags = w.ags WHERE w.wert IS NOT NULL '
+    + 'GROUP BY w.kennzahl ORDER BY w.kennzahl', ['bevoelkerung']);
   const fehler = ergebnis.filter((r) => !r.ok);
   const voll = !fehler.length && deckung.length === Object.keys(KENNZAHLEN).length
-    && deckung.every((d) => Number(d.kreise) >= 380 && Number(d.laender) === 16);
+    && deckung.every((d) => Number(d.soll) >= 395 && Number(d.kreise) >= Number(d.soll) - 5 && Number(d.laender) === 16);
   await protokoll('GESAMT', null, ergebnis.reduce((s, r) => s + (r.werte || 0), 0),
     deckung.length ? Math.min(...deckung.map((d) => Number(d.kreise))) : 0, Date.now() - t0, voll ? 'ok' : 'fehler',
     voll ? null : (fehler.length + ' Abrufe gescheitert; Deckung ' + JSON.stringify(deckung)));
