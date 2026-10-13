@@ -201,12 +201,12 @@
   }
 
   function ensureTab() {
-    var tabs = document.querySelector('.settings-tabs');
+    var tabs = document.querySelector('.settings-tabs:not(#help-sidebar)');   /* v2200: die Hilfe-Leiste traegt dieselbe Klasse */
     if (!tabs) return;
     if (tabs.querySelector('.st-tab[data-tab="' + PANE + '"]')) return;
     var src = tabs.querySelector('.st-tab[data-tab="mandanten"]') || tabs.querySelector('.st-tab[data-tab="plan"]');
     if (!src) return;
-    var wrap = document.querySelector('.pane-wrap');
+    var wrap = document.querySelector('.pane-wrap:not(.help-content-wrap)');
     if (!wrap) return;
     injectCss();
     var btn = src.cloneNode(true);

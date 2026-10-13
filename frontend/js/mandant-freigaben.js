@@ -126,12 +126,13 @@
 
   // ── Settings-Eintrag (nur für Mandanten) ───────────────────
   function ensureEntry() {
-    var tabs = document.querySelector('.settings-tabs') || (document.querySelector('.st-tab') && document.querySelector('.st-tab').parentNode);
+    /* v2200 · N63.1: NUR die Einstellungen. Der Rueckfall auf das erste .st-tab der Seite traf bei offener Hilfe deren ersten Eintrag (Ablaeufe & Pilot) und klonte ihn samt help-sidebar-item-active in die Hilfe - zwei goldene Markierungen. */
+    var tabs = document.querySelector('.settings-tabs:not(#help-sidebar)');   /* v2200: die Hilfe-Leiste traegt dieselbe Klasse */
     if (!tabs || tabs.querySelector('.st-tab[data-mf="1"]')) return;
     var src = tabs.querySelector('.st-tab[data-tab="plan"]') || tabs.querySelector('.st-tab');
     if (!src) return;
     var btn = src.cloneNode(true);
-    btn.setAttribute('data-mf', '1'); btn.removeAttribute('data-tab'); btn.removeAttribute('onclick'); btn.classList.remove('active');
+    btn.setAttribute('data-mf', '1'); btn.removeAttribute('data-tab'); btn.removeAttribute('onclick'); btn.classList.remove('active'); btn.classList.remove('help-sidebar-item-active');
     var t = btn.querySelector('.help-sidebar-item-title'); if (t) t.textContent = 'Meine Freigaben'; else btn.textContent = 'Meine Freigaben';
     var d = btn.querySelector('.help-sidebar-item-desc'); if (d) d.textContent = 'Objekte an Betreuer freigeben';
     btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); open(); });

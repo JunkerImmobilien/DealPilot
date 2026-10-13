@@ -162,11 +162,13 @@ gegenübergestellt werden sie nirgends.
 > Erst ins Backlog, dann abarbeiten (Marcel: „für danach noch ein paar Sachen zum Abarbeiten, also erstmal ins Backlog damit"). Optik → **Demos zuerst**, wo Marcel es ausdrücklich sagt (Einstellungen, N63.5).
 
 **N63.1 · Hilfe: Navigation und Einstieg**
+> ✅ v2200 (13.10.2026, Staging) 1a548875 — Klon-Ursache behoben (Partner-Portal/Freigaben klonten den ersten Hilfe-Eintrag), Einstieg integriert, Hilfe öffnet dort, Pilot-Figur im Atlas-Kasten.
 - Beim Öffnen und Klicken sind „Abläufe & Pilot" **und** „Partnerportal" gleichzeitig gold unterstrichen. Es darf nur der aktive Punkt markiert sein. Ursache messen: zwei aktive Marker oder Hover-Rest?
 - „Einstieg" und „Abläufe & Pilot" überschneiden sich → **Einstieg in „Abläufe & Pilot" integrieren**.
 - Beim Öffnen der Hilfe direkt „Abläufe & Pilot" zeigen. Den Piloten-Knopf in den schwarzen Kopf neben „Atlas öffnen" stellen.
 
 **N63.2 · Hilfe: Inhalte gegen den Code abgleichen**
+> ✅ v2200/v2202/v2202a — 17 Themen, FAQ nach Ablauf, Glossar alphabetisch, 33 Korrekturen nach Prüfbericht, 5 neue Fragen, Fuß-KI raus. Offen: GrESt Thüringen im Code (6,5 % vs. vermutlich 5,0 % seit 2024) prüfen.
 - Glossar und häufige Fragen: Stimmen alle Zahlen, die die Hilfe nennt?
   - DSCR-Schwellen, LTV-Stufen, Pilot-Skala, Score-Stufen
   - jede Zahl mit Beleg aus dem Code, so wie `docs/hilfe/hilfe-belege-v2189.md`
@@ -175,33 +177,40 @@ gegenübergestellt werden sie nirgends.
 - Raus: der Eintrag „Frag den DealPilot-Agent" mit Webfenster und Fragen unter „Häufige Fragen". Abläufe laufen über den Piloten.
 
 **N63.3 · Hilfe-Fenster auf dem Handy**
+> ✅ v2201 — Liste → Inhalt mit Zurück-Zeile (js/modal-handy.js), in der Messkabine 390 px geprüft.
 - Marcel findet das Modal am Handy nicht gut dargestellt.
 - Umbauen wie die Einstellungen am Handy. Mit N63.4 zusammen denken.
 
 **N63.4 · Einstellungen: Sortierung und Darstellung am Handy**
+> ✅ Handy v2201/v2201a (wie Hilfe). Sortierung der Inhalte → mit N63.5 (Demo-Wahl).
 - Die Sortierung ist teilweise nicht schön.
 - Am Handy dieselbe Kritik wie bei der Hilfe.
 
 **N63.5 · Einstellungen → Standardwerte: als Karten statt Scrollliste — DEMO ZUERST**
+> ⏳ Demo steht: design/Vorschläge/standardwerte-karten-demo.html (A Karten · B Unter-Reiter · C Set zuerst). Wartet auf Marcels Wahl und die Werte der Sets.
 - Marcel: *„unübersichtlich … mit so Standardkarten arbeiten, dass man nicht so viel runterscrollen muss"*
 - Ein Reiter mit den Lageklassen (A/B/C/D), ein Reiter mit den Standardwerten, je eine kurze Erklärung.
 - **Ein Standardset auswählbar**, also ein vorbelegter Satz.
 - *„Kannst du auch gerne mal mehrere Demos fertig machen … wie das im Modal aussehen könnte."* → mehrere Varianten nach `design/Vorschläge/`, zeigen, dann bauen.
 
 **N63.6 · Handy: Bestand/Ankauf rutscht unter die Einstellungen**
+> ✅ v2203/v2203a — order:-2 hinter dem Portfolio-Knopf, dunkle Fassung; Messkabine v1b 390 px: y=136 direkt unter Portfolio (y=80).
 - Am Handy steht der Umschalter Bestand/Ankauf unter den Einstellungen statt unter „Portfolio".
 - Er ist dort gold umrahmt mit goldener Schrift, das passt nicht.
 - Zurück unter „Portfolio" und in die Formatierung der Desktop-Fassung.
 
 **N63.7 · Geführte Eingabe: Hinweis „Erklär mir das" wegklicken**
+> ✅ v2204 — × (diese Frage) + „Nicht mehr anzeigen" (Konto, user_settings hinweise), Rückweg Einstellungen → Darstellung. Im Browser geprüft.
 - Beim Öffnen steht „auf Wunsch: Erklär mir das".
 - Der Hinweis braucht ein **×** zum Schließen und **„Nicht mehr anzeigen"**, das gemerkt wird (Einstellungsspeicher, nicht nur der Browser).
 
 **N63.8 · Geführte Tour komplett durchgehen**
+> 🟡 v2205/v2205a — Reiter Steuer fehlte (ergänzt, 39 Schritte); Inhalte gegen den Code korrigiert (46 Stellen: Plan-Limits 1/5/25, Score-Skala 85/70/50/35 und Gewichte, 5 Kategorien, Stress-Test 5×5, Fundorte, Logo ab Investor, Anbieternamen raus). Darstellung nur Schritt 1–2 bei 1280 geprüft (verdecktes Fenster drosselt) → Abnahme am Gerät.
 - Prüfen, ob sie überall sauber dargestellt wird: Desktop, Tablet, Handy in der Messkabine.
 - Dazu Eingabe und Lautsprecher.
 
 **N63.9 · Geführte Eingabe: Mikrofon auf kleinen Bildschirmen „halten zum Sprechen“** — Marcel (13.10. abends, präzisiert): gemeint ist das Mikrofon-Symbol der GEFÜHRTEN EINGABE und die Handy-Darstellung (Messkabine, kleine Breiten). Dort: Mikrofon gedrückt halten = zuhören, loslassen = fertig (wie WhatsApp); das Kästchen „Ich höre nichts, du kannst auch tippen“ und der Anhalten-Knopf entfallen dort. Auf großen Bildschirmen bleibt das automatische Zuhören wie heute.
+> ✅ v2204 (Code + Darstellung geprüft) — echtes Sprechen nur am Gerät abnehmbar.
 
 #### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
 

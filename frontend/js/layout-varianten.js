@@ -2011,6 +2011,36 @@
 
     portfolioKnopfHandy();
 
+    /* ── v2203 · N63.6 · DER STAND-SCHALTER AUCH AM HANDY UNTER „PORTFOLIO“ ──
+       Marcel, 13.10.2026: „In der Handy-Ansicht ist mir aufgefallen, dass
+       Bestand und Ankauf nach unten rutschen unter Einstellungen und nicht
+       mehr unter Portfolio stehen … goldener Rahmen und goldene Schrift."
+       GEMESSEN (Messkabine 390 px, Layout v1b): #dk-schalter direktes Kind
+       von #sidebar, als LETZTES - unter dem ganzen Menue bis „Einstellungen";
+       Rahmen Gold 50 %, Schrift #C9A84C (Grundfassung aus style.css). Am
+       Schreibtisch setzt baueEine() ihn hinter .dpl-portfolio (v2154b) -
+       aber nur `if (!handyOben)`; am Handy blieb er, wo er geboren wurde.
+       Jetzt: hinter den Portfolio-Knopf der Schublade. doppelkarte.js haengt
+       ihn bei jedem Neuaufbau der Liste wieder an seinen Platz - deshalb ein
+       Beobachter auf der Seitenleiste, der nur bewegt, wenn er falsch steht. */
+    function standHandy() {
+      if (!nurAktenmappe()) return;
+      var sb = document.getElementById('sidebar');
+      var pb = sb && sb.querySelector('.dpl-portfolio-handy');
+      var st = document.getElementById('dk-schalter');
+      if (!pb || !st) return;
+      if (st.parentNode === pb.parentNode && st.previousElementSibling === pb) return;
+      pb.parentNode.insertBefore(st, pb.nextSibling);
+    }
+    standHandy();
+    try {
+      var _sbH = document.getElementById('sidebar'), _stT = 0;
+      if (_sbH) new MutationObserver(function () {
+        if (_stT) return;
+        _stT = setTimeout(function () { _stT = 0; standHandy(); }, 60);
+      }).observe(_sbH, { childList: true, subtree: true });
+    } catch (e) {}
+
     /* ── v1914 · DAS REGISTER WAR SICHTBAR, ABER TOT ──────────────────────────
 
        Marcel am 06.10.2026: „Unter System kann ich nichts anklicken, also weder
@@ -2100,7 +2130,7 @@
     registerOffenHalten();
     handyTeileAufraeumen();
     try {
-      new MutationObserver(function () { registerOffenHalten(); handyTeileAufraeumen(); markeHandy(); portfolioKnopfHandy(); objektWahlSchliesstMenue(); })
+      new MutationObserver(function () { registerOffenHalten(); handyTeileAufraeumen(); markeHandy(); portfolioKnopfHandy(); standHandy(); objektWahlSchliesstMenue(); })
         .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dp-layout'] });
     } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', registerOffenHalten); } catch (e) {}

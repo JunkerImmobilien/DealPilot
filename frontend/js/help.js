@@ -17,13 +17,21 @@
 
   // ─── Hilfe-Inhalte: Themen-Baum ─────────────────────────────────────────
   var HELP_TOPICS = [
-    /* v2188: Abläufe & Pilot — der Einstieg in den Prozess-Atlas */
+    /* v2200 · N63.1: „Einstieg“ ist hier aufgegangen (Marcel: „Einstieg und Abläufe und Pilot … den Einstieg da mit rein integrieren“) */
     {
       id: 'ablaeufe',
-      title: 'Abläufe & Pilot',
+      title: 'Einstieg, Abläufe & Pilot',
       icon: 'i-route',
-      desc: 'Alle Prozesse als Netzplan, der Pilot auf F1',
+      desc: 'Erste Schritte, alle Abläufe, der Pilot auf F1',
       sections: [
+        {
+          h: 'Was ist DealPilot?',
+          body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über einen frei wählbaren Zeitraum (5 bis 50 Jahre, vorbelegt 15), vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
+        },
+        {
+          h: 'Schnellstart in 4 Schritten',
+          body: '1. <strong>Quick-Check</strong> — ein Inserat in einer Minute einordnen. Lohnt es sich, „Als Objekt speichern“.\n\n2. <strong>Datenaufnahme</strong> — die Reiter Objekt, Investition, Miete, Finanzierung, Bewirtschaftung und Steuer. Vom Groben zum Feinen; was fehlt, nennt DealPilot statt es zu schätzen.\n\n3. <strong>Bewerten</strong> — Pilot-Analyse, Reiter Bewertung, Marktbericht bis zur Wertermittlung nach ImmoWertV.\n\n4. <strong>Deal-Aktion</strong> — bereit für die Bank, Status Offen · Gewonnen · Verloren. Gewonnen friert den Ankauf-Stand zum Nutzen-/Lastenwechsel ein.\n\n<strong>Tipp:</strong> Drück überall <strong>F1</strong> oder <strong>?</strong> — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Alle Abläufe als Netzplan stehen im Thema „Abläufe & Pilot“.'
+        },
         {
           h: 'Der Pilot — Hilfe auf Tastendruck',
           body: 'Drück <strong>F1</strong> — oder <strong>?</strong>, wenn du gerade nicht in einem Feld tippst. Der Pilot fliegt zu dem Feld, auf dem Maus oder Cursor stehen, erklärt es und zeigt, wofür es gebraucht wird.\n\nDarunter fragst du einfach, was du wissen willst. Die Sofort-Antworten kommen ohne KI aus Hilfe, Feld-Erklärungen und Abläufen — mit „Zeig mir das Feld“ springt er an die Stelle. Reicht das nicht, beantwortet „Den Piloten fragen“ die Frage mit KI und kennt dabei dein geöffnetes Objekt.\n\nDer Pilot sitzt unten links. Ein Klick auf ihn öffnet ihn auch ohne Taste — so geht es auch auf dem Handy.'
@@ -39,31 +47,10 @@
         {
           h: 'Tastenkürzel',
           body: '<strong>F1</strong> — Pilot rufen, überall (auch im Quick-Check-Fenster).\n<strong>?</strong> — Pilot rufen, wenn kein Eingabefeld aktiv ist.\n<strong>Pfeiltasten</strong> und <strong>Enter</strong> — im Tower durch die Treffer gehen und öffnen.\n<strong>Esc</strong> — Tower, Atlas oder Hilfe schließen.'
-        }
-      ]
-    },
-    /* v2188: Bestand — Ankauf-Stand, Soll und Ist */
-    {
-      id: 'bestand',
-      title: 'Bestand: Soll und Ist',
-      icon: 'i-history',
-      desc: 'Gewonnen, eingefroren, weitergepflegt',
-      sections: [
-        {
-          h: 'Was beim Status „Gewonnen“ passiert',
-          body: 'Im Reiter Deal-Aktion setzt du den Status auf <strong>Gewonnen</strong>. Steht im Reiter Objekt der <strong>Nutzen-/Lastenwechsel</strong> („Wirtsch. Übergang“), schreibt DealPilot den ganzen Datensatz zu diesem Tag fest — das ist das Soll. Fehlt das Datum, wird nichts eingefroren, und DealPilot sagt dir, was fehlt. Das heutige Datum wird nie stillschweigend eingesetzt.\n\nIn der Zeile darunter kannst du den Stand neu nehmen oder rückgängig machen.'
         },
         {
-          h: 'Ist · heute und Soll · Ankauf-Stand',
-          body: 'Oben im Objekt schaltest du zwischen <strong>Ist · heute</strong> (frei zu pflegen) und <strong>Soll · Ankauf-Stand</strong>. Das Soll ist gesperrt. Musst du es korrigieren, hak „zum nachträglichen Bearbeiten freigeben“ an — gespeichert wird dann mit Nachweis, das Ist bleibt unverändert.\n\nWarum eingefroren? Damit die Abweichung nach zehn Jahren noch etwas bedeutet. Wer den Maßstab mitwachsen lässt, misst am Ende nur noch sich selbst.'
-        },
-        {
-          h: 'Bestand und Ankauf in der Liste',
-          body: 'In der Seitenleiste filterst du unter „Stand“: <strong>Bestand</strong> zeigt die gewonnenen Objekte, <strong>Ankauf</strong> die Akquise. Verlorene Objekte bleiben mit allen Zahlen erhalten — ausgegraut am Ende der Ankauf-Liste.'
-        },
-        {
-          h: 'In eine Gesellschaft überführen',
-          body: 'Deal-Aktion → „In Gesellschaft überführen“. Der Assistent fragt den Stichtag, die Gesellschaft (GmbH/UG), den Verkehrswert als AfA-Basis und den übernommenen Zins. Er weist auf Grunderwerbsteuer und verdeckte Einlage hin und prüft die Zehnjahresfrist nach § 23 EStG. Danach friert das Privatobjekt ein, und ein verlinktes GmbH-Objekt entsteht mit Werten, Fotos und Analyse. Voraussetzung: die Gesellschaft ist unter Einstellungen als Mandant angelegt.'
+          h: 'Wo speichert DealPilot?',
+          body: 'Wenn du angemeldet bist (Account-Modus), werden alle Objekte auf dem Server gespeichert. Im Demo-Modus werden Objekte nur im Browser-Speicher (localStorage) abgelegt — sie gehen beim Browserwechsel verloren. Anmelden lohnt sich.'
         }
       ]
     },
@@ -104,7 +91,7 @@
         },
         {
           h: 'Bewertung — Kennzahlen und Score',
-          body: 'Dieser Reiter zeigt das Ergebnis — eingeben musst du hier nichts.\n\n<strong>DealPilot Score</strong> — derselbe Wert wie im Boarding, aus Cashflow, Rendite, LTV, Risiko und Potenzial. Die Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Der <strong>Investor Deal Score</strong> ergänzt Lage, Substanz und Upside-Potenzial; seine Zusatzangaben trägst du in Objekt, Investition und Miete ein.\n\nDie Kennzahlen:\n• <strong>Bruttomietrendite</strong> — Jahres-Nettokaltmiete ÷ Kaufpreis\n• <strong>Nettomietrendite</strong> — Jahresmiete minus nicht umlagefähige Kosten ÷ Gesamtinvestition\n• <strong>Faktor</strong> — Kaufpreis ÷ Jahresmiete\n• <strong>LTV</strong> — Darlehen ÷ Kaufpreis, auf Wunsch strenger gegen die Gesamtinvestition\n• <strong>DSCR</strong> — wie oft die Miete den Kapitaldienst deckt (brutto und netto)\n• <strong>Cashflow vor und nach Steuern</strong> — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung\n\nDer Rechenweg <strong>Cashflow – Korrekte Berechnung</strong> zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern.'
+          body: 'Dieser Reiter zeigt das Ergebnis — eingeben musst du hier nichts.\n\n<strong>DealPilot Score</strong> — derselbe Wert wie im Boarding, aus Cashflow, Rendite, LTV, Risiko und Potenzial. Die Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch. Der <strong>Investor Deal Score</strong> ergänzt Lage, Substanz und Upside-Potenzial; seine Zusatzangaben trägst du in Objekt, Investition und Miete ein.\n\nDie Kennzahlen:\n• <strong>Bruttomietrendite</strong> — Jahres-Nettokaltmiete ÷ Kaufpreis\n• <strong>Nettomietrendite</strong> — Jahresmiete minus nicht umlagefähige Kosten ÷ Gesamtinvestition\n• <strong>Faktor</strong> — Kaufpreis ÷ Jahresmiete\n• <strong>LTV</strong> — Darlehen ÷ Verkehrswert; ohne Verkehrswert ÷ Bankbewertung (wenn höher als der Kaufpreis), sonst ÷ Kaufpreis. Auf Wunsch strenger gegen die Gesamtinvestition\n• <strong>DSCR</strong> — wie oft die Miete den Kapitaldienst deckt (brutto und netto)\n• <strong>Cashflow vor und nach Steuern</strong> — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung\n\nDer Rechenweg <strong>Cashflow – Korrekte Berechnung</strong> zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern.'
         },
         {
           h: 'Deal-Aktion — Status, PDFs und Bank',
@@ -149,6 +136,146 @@
       ]
     },
     {
+      id: 'kennzahlen',
+      title: 'Kennzahlen verstehen',
+      icon: 'i-bar',
+      desc: 'Die wichtigsten Kennzahlen erklärt',
+      sections: [
+        {
+          h: 'Bruttomietrendite — schnelle Vergleichszahl',
+          body: 'Die Bruttomietrendite zeigt dir auf einen Blick, wie viel Miete eine Immobilie pro Jahr in Relation zum Kaufpreis bringt. Sie ist <strong>unbereinigt</strong>: Bewirtschaftungskosten (Hausgeld, Verwaltung, Rücklagen) und Finanzierungskosten (Zinsen) sind nicht abgezogen. Deshalb ist sie <em>kein</em> Maß für deinen tatsächlichen Ertrag — aber ein gutes Werkzeug, um Objekte schnell miteinander zu vergleichen.\n\n<strong>Wofür du sie nutzt:</strong>\n• Erste Einschätzung beim Inserate-Sichten\n• Vergleich zwischen Lagen (A-Stadt vs. B-Stadt)\n• Bewertung des Kaufpreis-Niveaus relativ zu den Mieten\n\n<strong>Typische Werte in Deutschland (Wohnimmobilien als Kapitalanlage):</strong>\n• A-Lagen wie München, Hamburg, Frankfurt: oft 2,5–3,5 % — Preise sind hoch, Renditen entsprechend niedrig\n• B-/C-Städte wie Herford, Dortmund, Kassel: typisch 5–7 % — der „Sweet Spot" für viele Kapitalanleger\n• D-Lagen, Ostdeutschland (z. B. Chemnitz, Halle): teils 7–9 % — höhere Rendite, aber auch höheres Risiko bei Mieter-Stabilität und Wertentwicklung\n\n<strong>Wichtig:</strong> Eine hohe Bruttomietrendite ist nicht automatisch „besser". Sie spiegelt oft eingepreistes Risiko wider. Vergleiche immer mit Nettomietrendite und Lagebewertung.'
+        },
+        {
+          h: 'Nettomietrendite — der ehrlichere Renditewert',
+          body: 'Die Nettomietrendite ist die <strong>realistische Variante</strong> der Bruttomietrendite. Hier werden zwei Dinge anders gerechnet:\n\n<strong>1. Bewirtschaftungskosten werden abgezogen.</strong> Das ist der Teil des Hausgelds, den der Vermieter selbst trägt (Verwaltung, nicht-umlagefähige Instandhaltung, eigene Rücklage, kalkulierter Mietausfall).\n\n<strong>2. Statt nur dem Kaufpreis wird die Gesamtinvestition verwendet.</strong> Das heißt: Notar, Grundbuch, Grunderwerbsteuer, Maklerprovision, ggf. Sanierung — alles, was du wirklich aufbringen musst, um die Immobilie betriebsbereit zu haben.\n\nDeshalb liegt die Nettomietrendite immer unter der Bruttomietrendite — meist 1,5 bis 2,5 Prozentpunkte darunter.\n\n<strong>So bewertet DealPilot sie:</strong>\n• ab 4,5 % — gut\n• 3,5–4,5 % — durchschnittlich\n• 2,5–3,5 % — gering\n• unter 2,5 % — sehr gering, fast nur Wertsteigerungs-Spekulation\n\n<strong>Tipp:</strong> Wenn die Nettomietrendite weniger als zwei Prozentpunkte über deinem Sollzins liegt, arbeitet die Immobilie operativ kaum für dich — dann lebst du fast ausschließlich von Tilgung und Hoffnung auf Wertsteigerung.'
+        },
+        {
+          h: 'DSCR — Schuldendienstdeckung (die Bank-Kennzahl)',
+          body: 'Die DSCR (Debt Service Coverage Ratio) beantwortet eine einzige, aber zentrale Frage: <strong>Reicht die Miete, um Zins und Tilgung zu bezahlen?</strong>\n\nEin Wert von 1,00 bedeutet: Die Miete deckt den Kapitaldienst exakt. Bei 1,25 deckt die Miete den Kapitaldienst um 25 % über — du hast also einen Puffer von 25 %, falls Mietausfall, Reparaturen oder Zinserhöhungen kommen.\n\nDie Bank schaut bei der Kreditprüfung zuerst auf diese Zahl, weil sie aussagt, ob das Objekt sich „selbst trägt" oder ob du es aus eigener Tasche querfinanzieren musst.\n\n<strong>🔴 KRITISCH — DSCR unter 1,0:</strong>\nDie Miete reicht nicht aus, um den Schuldendienst zu bedienen. Du musst monatlich aus eigenem Einkommen zuschießen. Banken finanzieren das nur mit hohem Eigenkapital oder zusätzlichen Sicherheiten — und meist mit Zinsaufschlag. Strategisch nur sinnvoll, wenn die Wertsteigerungs-Story sehr stark ist oder du das Objekt schnell aufwerten kannst.\n\n<strong>🟡 KNAPP — DSCR zwischen 1,0 und 1,2:</strong>\nDie Bedienung ist gerade so gedeckt, der Puffer ist klein. Bei kleineren Mietausfällen, Reparaturen oder Zinserhöhungen kann die Finanzierung schnell unter Druck geraten. Banken finanzieren das, prüfen aber strenger und fordern oft höhere Tilgungsraten.\n\n<strong>🟢 SOLIDE — DSCR ab 1,2:</strong>\nDer Banken-Standard. Tilgung und Zins sind komfortabel gedeckt, es gibt einen ausreichenden Puffer. Bei DSCR ab 1,5 spricht man von „sehr solide" — hier verhandeln Banken auch bessere Konditionen, weil das Risiko niedrig ist.\n\n<strong>Bei Tilgungsaussetzung mit Bausparvertrag:</strong> Die Bausparrate wird in der DSCR mitgerechnet. Sie ist wirtschaftlich nichts anderes als Tilgung, nur an einen anderen Vertrag gerichtet. Würde sie nicht mitgerechnet, wäre der DSCR künstlich hoch und du würdest die Anschlussfinanzierungs-Lücke nicht sehen.'
+        },
+        {
+          h: 'LTV — Beleihungsauslauf (DealPilot-Bewertungsskala)',
+          body: 'Der LTV (Loan to Value, Beleihungsauslauf) zeigt das Verhältnis zwischen Darlehenssumme und Marktwert (oder Kaufpreis) der Immobilie. Er ist die wichtigste Risiko-Kennzahl aus Sicht der Bank, weil er angibt, wie viel Sicherheitsabstand zwischen Schulden und Immobilienwert liegt.\n\nDer Beleihungswert ist standardmäßig der Kaufpreis. Liegt ein Verkehrswertgutachten vor, wird der Verkehrswert verwendet. Wenn die Bank höher bewertet als der Kaufpreis, kann auch die Bankbewertung als Anker dienen.\n\nDealPilot verwendet eine eigene, an der deutschen Kapitalanleger-Praxis orientierte Bewertungsskala:\n\n<strong>🟢 SOLIDE — LTV unter 85 %:</strong>\nMarktüblicher und bankenseitig meist gut darstellbarer Finanzierungsbereich für Kapitalanleger in Deutschland. Bietet in der Regel eine solide Sicherheitsreserve und gute Finanzierungskonditionen. Ein LTV zwischen 80 % und 85 % gilt ausdrücklich <strong>nicht als „hoch"</strong>, sondern als übliche Investmentfinanzierung. In diesem Bereich finden die meisten Kapitalanleger ihre Standard-Finanzierung — die Bank verlangt keine Aufschläge, prüft aber natürlich Bonität und Cashflow-Tragfähigkeit.\n\n<strong>🟡 ERHÖHT — LTV zwischen 85 % und 100 %:</strong>\nErhöhte Fremdkapitalquote mit geringerer Sicherheitsreserve. Die Finanzierung reagiert sensibler auf Marktveränderungen, Zinsanstiege oder Leerstand. Banken prüfen solche Finanzierungen häufig strenger und Konditionen können sich verschlechtern — typischerweise mit Zinsaufschlägen von 0,2 bis 0,5 Prozentpunkten oder zusätzlichen Tilgungsanforderungen. Bei einem LTV nahe 100 % wird oft eine zweite Sicherheit (zweite Immobilie, Lebensversicherung) verlangt.\n\n<strong>🔴 KRITISCH — LTV über 100 %:</strong>\nSehr hohe bzw. vollständige Fremdfinanzierung mit erhöhter finanzieller Belastung und geringer Absicherung. Bereits kleinere Marktwertverluste oder unerwartete Kosten können die Finanzierung deutlich belasten. Anschlussfinanzierungen und Nachbewertungen können problematisch werden — wenn der Marktwert in zehn Jahren niedriger liegt als erwartet, kann die Bank Nachbesicherung verlangen oder die Anschlussfinanzierung verweigern.\n\n<strong>Hinweis zur DealPilot-Skala:</strong> Diese Schwellen orientieren sich an der Praxis deutscher Privatbanken und Sparkassen für Kapitalanlage-Finanzierungen. Sie sind bewusst etwas großzügiger als typische US-amerikanische Skalen, die oft schon ab 80 % von „erhöht" sprechen — weil im deutschen Markt 80–85 % LTV bei guter Bonität die übliche Finanzierungsstruktur ist.'
+        },
+        {
+          h: 'Cashflow — was am Monatsende übrig bleibt',
+          body: 'Der monatliche Cashflow ist das, was nach Abzug aller laufenden Kosten von der Miete übrig bleibt. Es ist die Zahl, die du wirklich auf dem Konto siehst — nicht die theoretische Rendite.\n\nDealPilot rechnet den Cashflow in mehreren Stufen:\n\n<strong>Bruttomiete</strong> (Kaltmiete + umlagefähige Bewirtschaftungs-Erstattung)\n<strong>− Bewirtschaftung umlagefähig</strong> (durchlaufender Posten)\n= Kaltmiete\n<strong>− Bewirtschaftung nicht-umlagefähig</strong> (Hausgeld-Anteil, eigene Rücklage)\n= Net Operating Income (NOI)\n<strong>− Zinsen</strong>\n= CF nach Zinsen, vor Tilgung\n<strong>− Tilgung</strong>\n= CF vor Steuern\n<strong>± Steuern</strong>\n= CF nach Steuern (was wirklich übrig bleibt)\n\n<strong>Wichtig:</strong> In der Frühphase ist der CF nach Steuern oft höher als der CF vor Steuern — weil die Steuererstattung aus den V+V-Verlusten dazukommt. Mit zunehmender Tilgung sinkt die AfA-Bedeutung, der zu versteuernde Gewinn steigt, und die Steuerlast verschiebt sich.\n\n<strong>So bewertet DealPilot den Cashflow nach Steuern:</strong>\n• ab 100 €/Monat — positiv\n• 0–100 €/Monat — neutral, ein kleiner Reparaturfall kippt die Rechnung\n• bis −200 €/Monat — leicht negativ, du schießt zu\n• unter −200 €/Monat — negativ'
+        },
+        {
+          h: 'Equity Multiple — Hebelwirkung deines Kapitals',
+          body: 'Der Equity Multiple zeigt, wie oft sich dein eingesetztes Eigenkapital nach dem Betrachtungszeitraum (typisch 10 Jahre) zurückgespielt hat. Er ist die Antwort auf die Frage: <strong>Was habe ich aus dem Geld gemacht, das ich reingesteckt habe?</strong>\n\nEin Equity Multiple von 2,0x bedeutet: Aus jedem Euro Eigenkapital sind 2 Euro Vermögen geworden — Eigenkapital + Gewinn. Bei 3,0x sind es 3 Euro, bei 4,0x sind es 4 Euro.\n\n<strong>Spezialfall Vollfinanzierung:</strong> Bei einem Eigenkapital von 0 € (oder sehr geringem Eigenkapital) ist der Equity Multiple mathematisch unendlich groß — DealPilot zeigt dann das Symbol ∞ oder „Multiple". Das ist kein Fehler, sondern Ausdruck davon, dass aus „nichts" etwas geworden ist. In dem Fall sind andere Kennzahlen (Vermögenszuwachs absolut, Cashflow) aussagekräftiger.\n\n<strong>So bewertet DealPilot ihn:</strong>\n• ab 3,0x — stark, meist durch den Hebel der Finanzierung\n• 2,0–3,0x — solide\n• 1,0–2,0x — schwach, das Kapital hätte man womöglich besser anders angelegt\n• unter 1,0x — Verlust'
+        },
+        {
+          h: 'Wertpuffer — Sicherheitsreserve gegen Marktwertverlust',
+          body: 'Der Wertpuffer ist die Differenz zwischen dem ermittelten Marktwert (Verkehrswert oder Bankbewertung) und deinem Kaufpreis. Er ist ein Maß dafür, <strong>wie viel die Immobilie wert verlieren könnte, bevor du in eine kritische Lage gerätst</strong>.\n\nWenn ein Verkehrswertgutachten 250.000 € ergibt und du die Immobilie für 220.000 € kaufst, hast du einen sofortigen Wertpuffer von 30.000 €. Das bedeutet: Selbst wenn der Markt um etwa 12 % einbricht, deckt der Verkehrswert deine Schulden noch.\n\n<strong>Warum das wichtig ist:</strong>\n• Bei Anschlussfinanzierungen schaut die Bank auf den aktuellen Marktwert. Ein Wertpuffer wirkt wie ein Polster.\n• Bei einem Notverkauf entscheidet der Marktwert über deinen Erlös — der Wertpuffer ist deine Sicherheitsmarge.\n• Bei der Finanzierungsstruktur entscheidet er über den effektiven LTV — manche Banken finanzieren bis 100 % vom Kaufpreis, aber nur bis 80 % vom Verkehrswert.\n\n<strong>Daumenregel:</strong> Ein Wertpuffer von mindestens 10 % gilt als angemessen, ab 15 % als komfortabel.'
+        },
+        {
+          h: 'Faktor — die einfache Marktorientierung',
+          body: 'Der Faktor ist eine in der deutschen Immobilienbranche sehr verbreitete Kennzahl, oft auch „Multiplikator" oder „Vervielfältiger" genannt. Er gibt an, wie oft die jährliche Kaltmiete im Kaufpreis enthalten ist.\n\nEin Faktor von 20 bedeutet: Der Kaufpreis entspricht 20 Jahresmieten. Anders gesagt: Du brauchst 20 Jahre Vollvermietung (ohne Kosten), um den Kaufpreis zurückzuverdienen.\n\n<strong>Der Faktor ist das Spiegelbild der Bruttomietrendite:</strong> Faktor 20 entspricht etwa 5 % Bruttomietrendite, Faktor 25 etwa 4 %, Faktor 30 etwa 3,3 %, Faktor 40 etwa 2,5 %.\n\n<strong>Typische Faktoren in Deutschland:</strong>\n• A-Lagen: 30–40 (München teils >40)\n• B-/C-Lagen: 15–22\n• D-Lagen, schwierige Märkte: 12–18\n\n<strong>Wofür Makler und Investoren ihn nutzen:</strong> Schnelle Einordnung beim Inserat-Sichten — „Ist der Faktor angemessen für die Lage?" Wenn ein Objekt in einer B-Stadt für Faktor 28 angeboten wird, lohnt sich der Vergleich mit ähnlichen Objekten genauer.'
+        },
+        {
+          h: 'EK-Rendite — was dein Eigenkapital wirklich erwirtschaftet',
+          body: 'Die Eigenkapital-Rendite (EK-Rendite p.a.) zeigt die jährliche Rendite, die dein <strong>eingesetztes Eigenkapital</strong> über den Betrachtungszeitraum (typisch 10 Jahre) erwirtschaftet. Sie ist die ehrlichste Antwort auf die Frage: <em>„Was bringt mir das Investment, gemessen am Geld, das ich tatsächlich aus eigener Tasche eingebracht habe?"</em>\n\nDie EK-Rendite berücksichtigt:\n• Alle laufenden Cashflows nach Steuern\n• Die Tilgung (Vermögensaufbau durch den Mieter)\n• Die Wertsteigerung der Immobilie\n• Den Steuervorteil aus V+V-Verlusten\n\nGerade bei Immobilien-Investments mit Hebel kann die EK-Rendite deutlich höher liegen als die reine Mietrendite — weil ein Teil der Wertsteigerung und Tilgung auf Eigenkapital wirkt, das nur einen Bruchteil des Gesamtwerts darstellt.\n\n<strong>Spezialfall Vollfinanzierung:</strong> Wie der Equity Multiple wird auch die EK-Rendite bei null oder sehr geringem Eigenkapital sehr hoch oder mathematisch unendlich. In diesen Fällen sind absolute Cashflows und Vermögenszuwachs aussagekräftiger.\n\n<strong>Typische Werte über 10 Jahre (deutsche Wohnimmobilien):</strong>\n• Unter 4 % — schwach\n• 4–8 % — solide\n• 8–15 % — attraktiv\n• Über 15 % — starker Hebel-Effekt, meist niedriger EK-Einsatz'
+        },
+        {
+          h: 'Zinsrisiko — was die Anschlussfinanzierung kostet',
+          body: 'Das Zinsrisiko ist die Differenz zwischen deiner heutigen monatlichen Rate und der hochgerechneten Rate nach Ablauf der Zinsbindung. Es zeigt dir, <strong>wie stark die monatliche Belastung steigen würde</strong>, wenn die Anschlussfinanzierung zu höheren Zinsen abgeschlossen werden müsste.\n\nDealPilot rechnet das Zinsrisiko mit dem Anschlusszins aus dem Reiter Finanzierung (vorbelegt 5,0 %, bewusst mit Puffer über dem heutigen Niveau). Das Zinsrisiko zeigt also: <em>„Wenn die Zinsen sich am oberen Ende einpendeln, wie viel mehr zahle ich dann pro Monat?"</em>\n\n<strong>Beispiel:</strong> Heute 750 €/Monat bei 3,5 % Zins, in 10 Jahren bei 5 % Anschlusszins 883 €/Monat → Zinsrisiko = 133 €/Monat. Das ist die Größenordnung, die du für deine Liquiditätsplanung kalkulieren solltest.\n\n<strong>Wie du das Zinsrisiko reduzieren kannst:</strong>\n• <strong>Längere Zinsbindung</strong> (15 oder 20 Jahre) — schiebt das Risiko nach hinten\n• <strong>Höhere Tilgung</strong> — reduziert die Restschuld bei Bindungsende und damit den absoluten Anstieg\n• <strong>Sondertilgungen</strong> — gleicher Effekt, flexibler\n• <strong>Forward-Darlehen</strong> — du sicherst dir die Anschlusskonditionen 3–5 Jahre vorher fest\n\nDas Zinsrisiko ist eines der unterschätztesten Themen bei Kapitalanlage-Immobilien. Eine Finanzierung kann heute solide aussehen und in 10 Jahren bei +2 Prozentpunkten Anschlusszins kippen.'
+        },
+        {
+          h: 'AfA — Abschreibung als Steuer-Hebel',
+          body: 'Die Absetzung für Abnutzung (AfA) ist die steuerlich anerkannte Wertminderung des Gebäudes über seine Nutzungsdauer. Sie reduziert dein zu versteuerndes Einkommen aus Vermietung und Verpachtung — ohne dass dafür Geld fließt. Sie ist also ein <strong>buchhalterischer Verlust</strong>, der echte Steuerersparnis erzeugt.\n\n<strong>So funktioniert es in der Praxis:</strong>\nDu kaufst ein Objekt für 200.000 € (Kaufpreis). Davon entfallen typischerweise 80 % auf das Gebäude, 20 % auf den Grund und Boden (der nicht abgeschrieben werden kann). Bei Standard-AfA von 2 % p.a. auf den Gebäudeanteil schreibst du jährlich 3.200 € steuerlich ab — Jahr für Jahr, über 50 Jahre Nutzungsdauer.\n\n<strong>Wichtig:</strong> Die AfA ist <em>kein</em> Cashflow. Du bekommst keine 3.200 € überwiesen. Aber dein zu versteuerndes Einkommen aus Vermietung sinkt um diesen Betrag. Bei einem persönlichen Grenzsteuersatz von 42 % entspricht das einer Steuerersparnis von etwa 1.344 € pro Jahr.\n\n<strong>AfA-Sätze:</strong>\n• Bestandsgebäude ab Baujahr 1925: 2 % p.a. (50 Jahre Nutzungsdauer)\n• Bestandsgebäude vor 1925: 2,5 % p.a. (40 Jahre)\n• Neubau ab 2023: 3 % p.a. (33 Jahre) — gilt für Wohngebäude mit Bauantrag/Kaufdatum ab 1.1.2023\n\nDie AfA ist der Hauptgrund, warum Immobilieninvestments in den ersten Jahren steuerlich oft Verluste produzieren — und warum du in der Steuererklärung einen Cashflow-Vorteil daraus ziehst.'
+        },
+        {
+          h: 'DealScore (0–100) — die Gesamtbewertung',
+          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden; fehlt eine ganze Kategorie, zählt sie neutral mit 60 Punkten. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus, Sicherheit), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
+        }
+      ]
+    },
+    {
+      id: 'finanzierung',
+      title: 'Finanzierung',
+      icon: 'i-coins',
+      desc: 'Darlehen, Tilgung und Bausparen',
+      sections: [
+        {
+          h: 'Annuitätendarlehen (Standard)',
+          body: 'Klassische Finanzierung: monatlich konstante Rate aus Zins und Tilgung. Mit der Zeit verschiebt sich das Verhältnis — der Tilgungsanteil wird größer, der Zinsanteil kleiner. Standard-Eingaben: anfängliche Tilgung 1–3 %, Zinsbindung 10–15 Jahre.'
+        },
+        {
+          h: 'Tilgungsaussetzung mit Bausparvertrag',
+          body: 'Bei diesem Konstrukt zahlst du in der Sparphase nur Zinsen aufs Hauptdarlehen plus eine Sparrate in den Bausparvertrag. Wenn die Mindestsparquote erreicht ist (typ. 40–50 %), wird der Vertrag <strong>zuteilungsreif</strong>: Sparguthaben + Bauspardarlehen lösen die Restschuld ab. Danach läuft das Bauspardarlehen mit fester Tilgung weiter.\n\n<strong>Wichtig:</strong> Wenn die Zuteilung erst nach Bindungsende kommt, ist eine Anschlussfinanzierung nötig. Das siehst du in der Card unten als gelben Hinweis.'
+        },
+        {
+          h: 'Anschlussfinanzierung',
+          body: 'Hakst du im Reiter Finanzierung <strong>„Eigene Anschlussfinanzierung“</strong> an, rechnet DealPilot nach der Zinsbindung mit deinem Anschlusszins (vorbelegt 5,0 %) und deiner Anschluss-Tilgung (vorbelegt 1,0 %). Ohne Haken läuft das Darlehen zu den heutigen Konditionen weiter.\n\nDas <strong>Zinsänderungsrisiko</strong> rechnet DealPilot immer: die Mehrbelastung pro Monat aus dem Zinsunterschied (Anschlusszins minus heutiger Zins) auf die Restschuld. Es steht im Reiter <strong>Bewertung</strong> und im Bankgespräch.'
+        }
+      ]
+    },
+    {
+      id: 'steuer_tief',
+      title: 'Steuer',
+      icon: 'i-receipt',
+      desc: 'Grenzsteuersatz, AfA, Kaufpreisaufteilung, Werbungskosten, Finanzamt-PDF',
+      sections: [
+        {
+          h: 'Grenzsteuersatz und Steuerwirkung',
+          body: 'Im Reiter <strong>Steuer</strong>, Karte „Persönliche Steuer“, trägst du dein <strong>Zu versteuerndes Einkommen (zvE) vor Immobilie</strong> ein. Ist „Grenzsteuersatz automatisch aus zvE berechnen“ angehakt, rechnet DealPilot den Satz nach § 32a EStG (Tarif 2026). Nimmst du den Haken heraus, kannst du ihn selbst eintragen. Das zvE wird zentral in deinem Profil gespeichert.\n\n<strong>Wie die Wirkung entsteht:</strong> Das steuerliche Ergebnis des Objekts — Miete minus Kosten und AfA — wird auf dein zvE gerechnet. Die Steuerwirkung ist die Differenz zweier Tarifberechnungen, mit und ohne das Objekt. Daraus entsteht der Cashflow nach Steuer.\n\nGespeicherte Bestandsobjekte rechnen mit, in der Reihenfolge ihres Kaufzeitpunkts: ein Verlust aus einem älteren Objekt senkt die Basis, auf der dieses spart. Verlustverrechnungsgrenzen (§ 15a, § 15b, § 10d EStG) bleiben außen vor.'
+        },
+        {
+          h: 'Steuerzeiträume: zvE im Zeitverlauf',
+          body: 'Dein Einkommen ändert sich — etwa nach einer Lohnerhöhung. Dafür gibt es Steuerzeiträume.\n\nSo geht\'s:\n1. Im Reiter Steuer auf <strong>📅 Steuerzeiträume verwalten →</strong> klicken. Du landest in den Einstellungen unter <strong>Mandanten</strong> bei deinem privaten Halter.\n2. Unter „Neuen Zeitraum hinzufügen“ <strong>Gültig von</strong>, <strong>Gültig bis (leer = laufend)</strong>, <strong>zvE / Jahr (€)</strong>, einen <strong>Grund</strong> und optional eine Notiz eintragen.\n3. <strong>Hinzufügen</strong>.\n\nÜberschneidet sich der neue Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt. Du kannst abbrechen oder „Trotzdem als neuen Zeitraum anlegen“.\n\nFür jedes Steuerjahr nimmt die Rechnung das zvE des Zeitraums, der zur Jahresmitte gilt. Liegt keiner vor, gilt das zvE aus dem Reiter Steuer.'
+        },
+        {
+          h: 'AfA-Satz, Gebäudeanteil und § 7b',
+          body: 'Karte <strong>AfA-Konfiguration</strong>, Feld <strong>AfA-Satz</strong>:\n• 2,0 % linear — Standard ab 1925\n• 2,5 % linear — Baujahr vor 1925\n• 3,0 % linear — Wohnzwecke ab 2023\n• 5,0 % degressiv — ohne Wechsel\n• 5,0 % degressiv mit Wechsel auf 3 % linear (empfohlen)\n\nPasst ein Neubau, weist ein Hinweis auf die degressive AfA nach § 7 Abs. 5a EStG hin — mit dem Knopf <strong>Auf degressiv 5% wechseln</strong>.\n\n<strong>Gebäudeanteil am KP (%)</strong>: der Rest ist Grund und Boden. Darunter steht <strong>AfA / Jahr (berechnet)</strong>, aufgeteilt in Gebäude-AfA und bewegliche Wirtschaftsgüter, plus „AfA-Verlauf erste 10 Jahre ansehen“.\n\n<strong>§ 7b Sonder-AfA</strong> (aufklappen): zusätzlich 5 % in den ersten 4 Jahren. Du bestätigst vier Voraussetzungen — Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietung, Bauantrag/Kaufvertrag 01.01.2023 – 30.09.2029. Die Basis ist auf 4.000 €/m² Wohnfläche gekappt.'
+        },
+        {
+          h: 'Eigener AfA-Satz über die Restnutzungsdauer',
+          body: 'Ist die tatsächliche Nutzungsdauer kürzer, erlaubt § 7 Abs. 4 Satz 2 EStG einen höheren Satz — das Finanzamt verlangt dafür einen Nachweis per Gutachten.\n\nSo geht\'s:\n1. Im Feld <strong>AfA-Satz</strong> „Eigenen Satz / Restnutzungsdauer eingeben …“ wählen.\n2. <strong>Restnutzungsdauer (Jahre)</strong> eintragen — der Satz ergibt sich als 100 ÷ RND. Oder den <strong>AfA-Satz (%)</strong> direkt eingeben.\n3. Unter <strong>Grundlage</strong> den Nachweis nennen, z. B. das Gutachten mit Datum.\n\nPlausibel ist ein Satz zwischen 0,5 und 33,3 %. Der eigene Satz wird von keiner Automatik überschrieben.\n\n<strong>Restnutzungsdauer ermitteln</strong> öffnet einen Assistenten in neun Schritten — von Objekt-Basis über Modernisierungen und Zustand der Gewerke bis „Ergebnis & Empfehlung“. Am Ende steht eine Gutachten-Anfrage. Liegt eine Ermittlung vor, erscheint <strong>Letzte Ermittlung übernehmen</strong>; sie ist als indikativ vermerkt.'
+        },
+        {
+          h: 'BMF-Rechner: Kaufpreis aufteilen',
+          body: 'Der Knopf <strong>BMF-Rechner</strong> in der AfA-Konfiguration öffnet „Anschaffungskosten & BMF-Kaufpreisaufteilung“ nach der BMF-Arbeitshilfe (Juni 2023).\n\n<strong>1 Anschaffungskosten</strong> — übernimmt die Werte aus dem Reiter Investition: Kaufpreis, Grunderwerbsteuer, Notar, Grundbuchamt, Makler. Dazu Erwerbskosten wie Fahrten (mit Fahrtkosten-Helfer), Verpflegung, Unterkunft, Gutachten, Anwalt. Herstellungskosten nach § 255 Abs. 2 HGB zählen zu 100 % zum Gebäude.\n\n<strong>2 BMF-Aufteilung</strong> — Grundstücksart, Baujahr, Flächen, Bodenrichtwert, Miete und Modernisierungen. Alle drei Verfahren werden gerechnet; maßgebend ist bei bekannter Miete der Ertragswert, mit Vergleichsfaktor der Vergleichswert, sonst der Sachwert. <strong>KI-Vorschlag</strong> schlägt Gutachterausschuss-Werte vor; übernommen werden sie erst mit „BRW → BMF“ bzw. „Lzs → BMF“. Liegt ein amtlicher Zinssatz vor, steht darunter die Aufteilung nach Jacoby zum Vergleich.\n\nDie Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind.'
+        },
+        {
+          h: 'Varianten, Bodenabschlag und Ausgabe',
+          body: '<strong>3 AfA-Vorschau</strong> zeigt AfA-Basis und jährliche AfA und vergleicht mit der Pauschale 80/20.\n\n<strong>4 AfA-Hebel</strong>: vier Varianten — <strong>Amtlich</strong> (× 1,00, vorausgewählt), <strong>Konservativ</strong> (Boden −15 %), <strong>Optimiert</strong> (−20 %), <strong>Aggressiv</strong> (−25 %), jeweils mit Risiko-Score. Dazu die 15-%-Grenze mit Status Puffer, Knapp oder Überschritten und die Notarvertrag-Klausel zum <strong>Kopieren</strong>. Bei Abweichungen über 25 % zum BMF-Standard ist ein Sachverständigengutachten sinnvoll.\n\n<strong>Bodenabschlag</strong>: ein Szenario neben der amtlichen Zahl, die unangetastet bleibt — mit Abschlag 0/15/20/25 %, Restnutzungsdauer und einer <strong>Begründung</strong> für den Vertragstext. Ohne Begründung bleibt der Abschlag angreifbar.\n\n<strong>✓ Übernehmen</strong> schreibt Gebäudeanteil und AfA-Satz in den Reiter Steuer. Ausgabe: <strong>Kaufpreisaufteilung als PDF</strong>, <strong>BMF-Arbeitshilfe als PDF</strong>, <strong>BMF-Original als XLSX</strong>.'
+        },
+        {
+          h: 'Werbungskosten je Jahr und Sanierung verteilen',
+          body: 'Karte <strong>Steuerformular pro Jahr · individuelle Werte</strong>: DealPilot schlägt je Jahr Werte aus deinen Eingaben vor, du überschreibst sie, etwa mit den Zahlen aus dem Steuerbescheid.\n• <strong>Quick-Modus</strong> — eine Zeile je Jahr: Einnahmen V+V, Schuldzinsen, AfA, Bewirtschaftung, Sonstige WK, Verlust/Überschuss, Steuer-Effekt. Feld anklicken zum Ändern, ↺ setzt es zurück.\n• <strong>Detail-Modus</strong> — ein Veranlagungsjahr, gegliedert in Finanzierungs-, Betriebs-, Verwaltungs- und sonstige Kosten, AfA Gebäude und bewegliche Wirtschaftsgüter.\n<strong>↺ Vorschläge wiederherstellen</strong> setzt alles zurück. Änderungen fließen in Cashflow und Steuerverlauf.\n\n<strong>Sanierung:</strong> Im Reiter Investition, Karte Sanierung, hakst du „In Steuer-Werbungskosten übernehmen“ an und wählst die Verteilung: Automatisch (15%-Regel), 1 bis 5 Jahre (5 Jahre nach § 82b EStDV) oder über die AfA-Nutzungsdauer. Die 15-%-Grenze rechnet netto; brutto eingetragene Kosten werden um 19 % USt bereinigt.'
+        },
+        {
+          h: 'Finanzamt-PDF und Anlage V',
+          body: 'Das <strong>Finanzamt-PDF</strong> schlüsselt die Werbungskosten für die Anlage V auf.\n\nSo geht\'s:\n1. Reiter Steuer, Karte „Steuerformular pro Jahr“: unter <strong>Steuerjahr</strong> ein Jahr oder <strong>Alle Jahre</strong> wählen.\n2. Optional <strong>Anlage V</strong> anhaken — dann folgt jedem Jahresblatt eine zweite Seite mit denselben Zahlen, sortiert nach den Zeilen der amtlichen Anlage V.\n3. <strong>Finanzamt-PDF</strong> klicken.\n\nBei „Alle Jahre“ kommt eine Seite je Jahr plus eine Zusammenfassung. Dasselbe PDF erreichst du im Reiter Deal-Aktion.\n\nDie Zeilennummern sind aus dem amtlichen Formular 2025 übernommen. Für spätere Jahre nimmt DealPilot das jüngste vorhandene Formular und sagt das in Rot auf der Seite. Gehört das Objekt einer GmbH oder UG, gibt es keine Anlage V — die Einkünfte sind dann gewerblich.\n\nFür alle Objekte auf einmal: im Cockpit <strong>Steuer-Mappe erstellen</strong>, wahlweise mit „Anlage-V-Zuordnung anhängen“.'
+        },
+        {
+          h: 'Disclaimer',
+          body: 'DealPilot ist nach § 6 StBerG keine Steuerberatung. Die Berechnungen sind Hilfsmittel — die finale Beurteilung gehört in die Hände eines Steuerberaters.'
+        }
+      ]
+    },
+    {
+      id: 'ki',
+      title: 'Pilot-Analyse',
+      icon: 'i-cpu',
+      desc: 'KI-gestützte Bewertung',
+      sections: [
+        {
+          h: 'Was macht die KI?',
+          body: 'Sie bekommt deine Objektdaten + Berechnungen + DealScore-Werte und liefert eine strukturierte Analyse: Gesamtbewertung, Stärken, Risiken, Risikoanalyse, Szenarien, Investor-Fit, Empfehlung (Kaufen/Prüfen/Nicht kaufen), Verhandlungsempfehlung mit konkretem Ziel-Kaufpreis, Bank-Argumente und DealPilot-Insight.\n\n<strong>Wichtig:</strong> Die KI recherchiert auch Makro-/Mikrolage und Mietspiegel-Daten zu deiner Stadt — das macht die Analyse ortsspezifisch.'
+        },
+        {
+          h: 'Wie oft kann ich die KI nutzen?',
+          body: 'Die Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent. Auf das Kontingent zählen die Marktberichte — wie viele noch frei sind, steht im Reiter Objekt direkt an jeder Stufe („N frei“). Fragen an den Piloten (F1 oder ?) haben ein eigenes Tageslimit je Plan.'
+        },
+        {
+          h: 'Wird die Analyse gespeichert?',
+          body: 'Die Pilot-Analyse wird beim Objekt gespeichert. Beim erneuten Öffnen siehst du sie direkt. Für eine frische Einschätzung klickst du im Reiter Pilot-Analyse auf „Pilot-Analyse starten“.'
+        }
+      ]
+    },
+    {
       id: 'marktbericht',
       title: 'Marktbericht und Wertermittlung',
       icon: 'i-building',
@@ -185,6 +312,60 @@
         {
           h: 'Herkunft, Quellennachweis und fehlende Werte',
           body: 'Der Liegenschaftszins trägt immer eine Stufe: <strong>A</strong> amtlich für Gebiet und Objektart · <strong>B</strong> amtlich, übergeordnet oder Modellansatz · <strong>C</strong> amtlich aus einer Nachbargemeinde desselben Ausschusses · <strong>D</strong> gesetzlicher Auffangwert (§ 256 BewG, ausdrücklich nicht marktabgeleitet) · <strong>E</strong> eigene Angabe.\n\nUnter Zins und Sachwertfaktor steht, welcher Ausschuss die Werte für das Gebiet führt, ob sein Bericht kostenfrei oder kostenpflichtig ist, und der Link <strong>zur Quelle</strong>: wo eine Zahl steht, belegt er sie — wo keine steht, holst du sie dort. Ohne amtlichen Sachwertfaktor bleibt der Sachwert <em>vorläufig</em> (Faktor 1,0, ohne Marktanpassung) — eine Herstellungskostenrechnung, kein Marktwert. Einen Faktor aus dem Nachbarkreis oder ein Landesmittel setzt der Bericht nie ein.\n\nDer Block <strong>Quellennachweis</strong> nennt nur Ausschüsse, deren Zahlen wirklich im Bericht stecken — mit Kennzahl, Berichtsjahr und Lizenz.\n\nTipp: Die Leiste „Parameter der Verkehrswertermittlung“ im Reiter Objekt zeigt schon vor dem Abruf, was vorliegt.'
+        }
+      ]
+    },
+    /* v727-help-avm: Marktbewertung-Felder */
+    {
+      id: 'marktbewertung_felder',
+      title: 'Marktbewertung — welche Felder zählen',
+      icon: 'i-bar',
+      desc: 'Objektangaben für die Marktbewertung',
+      sections: [
+        {
+          h: 'Warum mehr Angaben = bessere Bewertung',
+          body: 'Je vollständiger ein Objekt erfasst ist, desto genauer die Marktbewertung. Beispiel aus der Praxis: Nur mit Adresse + Wohnfläche ergab eine Bewertung 212.000 € mit hoher Unsicherheit — mit vollständigen Angaben (Zustand, Ausstattung, Baujahr, Grundstück) 251.000 € mit deutlich höherer Treffsicherheit. Es lohnt sich, die Felder im Tab „Objekt“ möglichst komplett auszufüllen.'
+        },
+        {
+          h: 'Woraus die Marktbewertung entsteht',
+          body: 'Der DealPilot-Marktbericht arbeitet in acht Etappen: Standort ermitteln, Vergleichspreise, Vergleichsmieten, Mikrolage, Makrolage, Strukturdaten (Zensus), Bodenrichtwert, Bewertung und Bericht. Makrolage und Zensus kommen aus DealPilots eigener Datenbank und werden regelmäßig aktualisiert. Zurück kommen Marktwert mit Spanne, Marktmiete und die Lage-Einschätzung — als Marktpreisindikation, ausdrücklich kein Gutachten nach § 194 BauGB.'
+        },
+        {
+          h: 'Stufe 1, 2 und 3',
+          body: '<strong>Einfach · Stufe 1</strong> — Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr.\n<strong>Mittel · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Ausstattung (ab Investor).\n<strong>Ausgiebig · Stufe 3</strong> — Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert (ab Pro).\n\nFehlt für eine Stufe eine Angabe, sagt DealPilot welche — der Bericht rechnet nie halb. Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.'
+        },
+        {
+          h: 'Woher die amtlichen Zahlen kommen',
+          body: 'In Stufe 3 rechnet DealPilot mit dem Liegenschaftszinssatz und dem Sachwertfaktor des zuständigen Gutachterausschusses. Jede Zahl trägt ihre Herkunft — Ausschuss, Jahrgang, Lizenz, Stichtag — und steht im Quellennachweis des Berichts. Liegt für eine Region kein amtlicher Wert vor, nennt der Bericht den zuständigen Ausschuss und den Weg zur Quelle, statt eine Zahl zu erfinden. Ein Nachbarkreis oder ein Landesmittel wird nie eingesetzt.'
+        },
+        {
+          h: 'Tipp: Pflichtfelder zuerst',
+          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Straße, Objektart, Wohnfläche und Baujahr. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
+        }
+      ]
+    },
+    /* v2188: Bestand — Ankauf-Stand, Soll und Ist */
+    {
+      id: 'bestand',
+      title: 'Bestand: Soll und Ist',
+      icon: 'i-history',
+      desc: 'Gewonnen, eingefroren, weitergepflegt',
+      sections: [
+        {
+          h: 'Was beim Status „Gewonnen“ passiert',
+          body: 'Im Reiter Deal-Aktion setzt du den Status auf <strong>Gewonnen</strong>. Steht im Reiter Objekt der <strong>Nutzen-/Lastenwechsel</strong> („Wirtsch. Übergang“), schreibt DealPilot den ganzen Datensatz zu diesem Tag fest — das ist das Soll. Fehlt das Datum, wird nichts eingefroren, und DealPilot sagt dir, was fehlt. Das heutige Datum wird nie stillschweigend eingesetzt.\n\nIn der Zeile darunter kannst du den Stand neu nehmen oder rückgängig machen.'
+        },
+        {
+          h: 'Ist · heute und Soll · Ankauf-Stand',
+          body: 'Oben im Objekt schaltest du zwischen <strong>Ist · heute</strong> (frei zu pflegen) und <strong>Soll · Ankauf-Stand</strong>. Das Soll ist gesperrt. Musst du es korrigieren, hak „zum nachträglichen Bearbeiten freigeben“ an — gespeichert wird dann mit Nachweis, das Ist bleibt unverändert.\n\nWarum eingefroren? Damit die Abweichung nach zehn Jahren noch etwas bedeutet. Wer den Maßstab mitwachsen lässt, misst am Ende nur noch sich selbst.'
+        },
+        {
+          h: 'Bestand und Ankauf in der Liste',
+          body: 'In der Seitenleiste filterst du unter „Stand“: <strong>Bestand</strong> zeigt die gewonnenen Objekte, <strong>Ankauf</strong> die Akquise. Verlorene Objekte bleiben mit allen Zahlen erhalten — ausgegraut am Ende der Ankauf-Liste.'
+        },
+        {
+          h: 'In eine Gesellschaft überführen',
+          body: 'Deal-Aktion → „In Gesellschaft überführen“. Der Assistent fragt den Stichtag, die Gesellschaft (GmbH/UG), den Verkehrswert als AfA-Basis und den übernommenen Zins. Er weist auf Grunderwerbsteuer und verdeckte Einlage hin und prüft die Zehnjahresfrist nach § 23 EStG. Danach friert das Privatobjekt ein, und ein verlinktes GmbH-Objekt entsteht mit Werten, Fotos und Analyse. Voraussetzung: die Gesellschaft ist unter Einstellungen als Mandant angelegt.'
         }
       ]
     },
@@ -225,46 +406,42 @@
       ]
     },
     {
-      id: 'einstellungen',
-      title: 'Einstellungen',
-      icon: 'i-settings',
-      desc: 'Die Reiter und was jeder steuert',
+      id: 'charts',
+      title: 'Charts & Visualisierungen',
+      icon: 'i-trending-up',
+      desc: 'Portfolio-Auswertung und Charts',
       sections: [
         {
-          h: 'Die Reiter im Überblick',
-          body: 'Links findest du die Reiter:\n• <strong>Account & Sicherheit</strong> — Login, Passwort, Zwei-Faktor, Account löschen, Telegram-Bot\n• <strong>Kontakt & Logo</strong> — Kontaktdaten und eigenes Logo für PDFs\n• <strong>Co-Pilot (KI)</strong> — Tonalität, Fokus, Instruktionen\n• <strong>Deal Score</strong> — Gewichtung, Schwellenwerte\n• <strong>Standardwerte</strong> — Vorgaben, die in jede Kalkulation einfließen\n• <strong>Darstellung</strong> — was angezeigt wird und wie es aussieht; ändert keine Zahl\n• <strong>Datenraum</strong> — geteilte Objekte und Portfolio-Pässe\n• <strong>Mandanten</strong> — Halter, Steuerregime, Steuerzeiträume\n• <strong>Plan</strong> — Abo, Kontingent, Abrechnung\n• <strong>Rechtliches</strong> und <strong>Hilfe</strong>\n\nUnten steht „Auto-Save aktiv · Änderungen werden direkt übernommen“. Mit <strong>Speichern</strong> sicherst du ausdrücklich, <strong>Abbrechen</strong> oder Esc schließt das Fenster.'
+          h: 'Equity-Build (Vermögensaufbau)',
+          body: 'Zwei Linien: <strong>grün</strong> = Marktwert über die Jahre, <strong>rot</strong> = Restschuld. Die Fläche dazwischen ist dein Eigenkapital im Objekt. Eine wachsende Fläche bedeutet: dein Vermögen steigt entweder durch Wertsteigerung (grüne Linie nach oben) oder Tilgung (rote Linie nach unten).'
         },
         {
-          h: 'Co-Pilot (KI) und Kontakt & Logo',
-          body: 'Unter <strong>Co-Pilot (KI)</strong> legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• <strong>Detailgrad</strong>: kurz, mittel oder ausführlich\n• <strong>Tonalität</strong>: sachlich, beratend oder kritisch (Risiken zuerst)\n• <strong>Fokus-Schwerpunkte</strong> und <strong>Eigene Anweisungen</strong>\n• <strong>Eigenes Wissen für alle Piloten</strong>: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• <strong>Standard-Analyseparameter</strong> wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Pro Objekt im KI-Tab überschreibbar.\n\nUnter <strong>Kontakt & Logo</strong> stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen im PDF-Footer und auf Track-Records. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (empfohlen: PNG, 300×100 px).'
+          h: 'Bank-Cockpit (DSCR & LTV)',
+          body: 'Zeigt die zwei Bank-Hauptkennzahlen über den Betrachtungszeitraum: DSCR (Schuldendeckung) sollte ≥ 1,2 sein, LTV (Beleihung) sollte sinken. Die Track-Bars unter den Headline-Werten zeigen, wo du dich auf der Gesund/Krit-Skala befindest.'
         },
         {
-          h: 'Deal Score: Gewichtung und Bewertungsprofile',
-          body: '<strong>DealPilot Score (Quick-Check)</strong> — fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR) und Potenzial (Bruttofaktor). Jeder geht von 0 bis 60 %, zusammen müssen es 100 % sein. „↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15.\n\n<strong>Investor Deal Score</strong> (Investor/Pro, 24 KPIs) — oben wählst du ein <strong>Bewertungsprofil</strong>: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Darunter passt du Hauptgewichtungen, Untergewichtungen und Grenzwerte an. Grenzwerte trägst du im Format Wert:Punkte ein, z. B. 4:20, 5:50, 7:80, 9:100. Sobald du von Hand änderst, springt das Profil auf <strong>Benutzerdefiniert</strong>.\n\nBeide Scores hängen zusammen: Ist ein Profil gewählt, rechnet auch der DealPilot Score mit dessen Gewichtung. Deine eigenen Regler gelten erst bei „Benutzerdefiniert“.'
+          h: 'Waterfall (Vermögenszuwachs)',
+          body: 'Zerlegt deinen Gesamtgewinn in 5 Quellen:\n• Tilgung + ggf. Bauspar-Guthaben (Schuldenabbau)\n• Cashflow vor Steuern (kumulierter Mietüberschuss)\n• Steuervorteil oder -last\n• Wertsteigerung (Marktwert minus Anker)\n• Gesamt = der gold-farbene End-Bar\n\nDer Multiple unten zeigt: Aus EK X werden EK+Gewinn Y.'
         },
         {
-          h: 'Standardwerte: deine Annahmen für neue Objekte',
-          body: 'Diese Werte werden bei jedem neuen Objekt vorausgefüllt. Am Objekt kannst du sie jederzeit überschreiben.\n• <strong>Finanzierung</strong>: Standard-Tilgung, Standard-Zinsbindung (5, 10, 15 oder 20 Jahre), Eigener Zinssatz (leer = indikativer Pfandbrief-Satz der Bindung), Zins-Stufe (Bonität / LTV), Standard-Eigenkapital in % vom Kaufpreis.\n• <strong>Bewirtschaftung</strong>: umlagefähig und nicht umlagefähig in % der NKM, Kalkulatorischer Mietausfall, Hausgeld-Anteil.\n• <strong>Persönliche Mindest-Schwellen</strong>: Mindest-DSCR, Mindest-Cashflow / Monat, Maximaler LTV. Sie erscheinen als farbige Marker in den Kennzahlen.\n• <strong>Steuer</strong>: Grenzsteuersatz.\n• <strong>Standort & Nebenkosten</strong>: Bundesland (mit Grunderwerbsteuer-Satz), Notar & Grundbuch, Maklergebühr.\n\nUnten sicherst du mit <strong>Profil speichern</strong>. Mit <strong>Auf Defaults zurücksetzen</strong> stellst du die Vorgaben wieder her.'
+          h: 'Stress-Test',
+          body: '5×5-Matrix: Zinsänderung (−2 bis +5 pp) gegen Mietänderung (−20 % bis +20 %). Jede Zelle zeigt den DSCR im Szenario. Grün ab 1,2, Hellgrün 1,0–1,2, Gold 0,8–1,0, Rot unter 0,8. Die Zelle ±0/±0 ist dein Base-Case.\n\nResilienz-Check: Wenn auch bei „−10 % Miete UND +1 pp Zins" der DSCR ≥ 1,0 bleibt, bist du Bank-tauglich.'
+        }
+      ]
+    },
+    {
+      id: 'pdf',
+      title: 'PDF-Export',
+      icon: 'i-file-text',
+      desc: 'Bank-taugliche PDF-Reports',
+      sections: [
+        {
+          h: 'PDF-Export',
+          body: 'Unter <strong>Aktionen → Export → PDF-Report für Objekt</strong> oder im Reiter <strong>Deal-Aktion → Investment-PDF</strong>. Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über deinen Betrachtungszeitraum, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Öffne vorher einmal kurz den Reiter <strong>Bewertung</strong> — dann sind alle Grafiken gezeichnet.'
         },
         {
-          h: 'Lageklassen A · B · C und Bewirtschaftung je Objektart',
-          body: '<strong>Lageklassen</strong>: Für A-, B- und C-Lage hinterlegst du je eine <strong>Zielrendite</strong> (% brutto). Vorbelegt sind 3,5 / 5,0 / 7,0 %. Im Quick-Check wählst du die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du verhandeln müsstest. Mietausfall, nicht umlagefähige Bewirtschaftung und Eigenkapital je Klasse sind freiwillig — leer gelten deine Standardwerte. Unter „Standard für neue Quick-Checks“ legst du fest, welche Klasse vorausgewählt ist. Die Felder speichern sich sofort.\n\n<strong>Bewirtschaftung je Objektart</strong>: Startwerte für Eigentumswohnung (Hausgeld, Anteil nicht umlagefähig, eigene Rücklage), Ein-/Zweifamilienhaus und Mehrfamilienhaus (Verwaltung, Instandhaltung, Garage/Stellplatz, Betriebskosten). Daraus füllt DealPilot im Reiter Bewirtschaftung die leeren Felder, sobald Objektart und Wohnfläche feststehen. Eigene Eingaben am Objekt gehen vor. Der <strong>Fortschreibungsfaktor</strong> (1,60 für Stichtage ab 01.01.2026) passt du jährlich zum 1. Januar an.'
-        },
-        {
-          h: 'Darstellung und Tooltip-Hilfe',
-          body: 'Der Reiter <strong>Darstellung</strong> ändert keine Zahl, nur die Ansicht.\n• <strong>Aussehen</strong>: Seitenaufteilung, Objektkarten und Kartenstil wählen. „Zurücksetzen“ stellt Aufteilung, Darstellung und Marke auf den Auslieferungszustand.\n• <strong>Markt-Daten im Tab Finanzierung</strong>: Markt-Daten-Cards standardmäßig zugeklappt.\n• <strong>Investor Deal Score beim Öffnen</strong>: Score-Leiste standardmäßig minimiert.\n• <strong>Quickboarding — Auto-Übernahme</strong>: Standard-Quelle, z. B. „Konsens (Ø aller aktiven)“. Sie bestimmt, welcher Marktwert automatisch in die Grundmiete übernommen wird.\n• <strong>Bilder in Sicherung & Netzwerk</strong>: Objektfotos einbeziehen.\n• <strong>Marktbericht-Design</strong>: Hell oder Dunkel.\n\n<strong>Tooltip-Hilfe</strong> steuert die i-Symbole: <strong>Aus</strong> (keine Tooltips), <strong>Profi</strong> (nur wichtige — kritische Hinweise wie § 7b bleiben) oder <strong>Anfänger</strong> (alle anzeigen, Standard).'
-        },
-        {
-          h: 'Mandanten und Steuerzeiträume',
-          body: 'Unter <strong>Mandanten</strong> legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den <strong>Halter</strong>. Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum <strong>Pro</strong>-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\n<strong>Steuerzeiträume (Privat)</strong>: Klick bei Privat auf <strong>Bearbeiten</strong>. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\n<strong>Gesellschaft</strong>: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft.'
-        },
-        {
-          h: 'Telegram-Bot verbinden',
-          body: 'Der Telegram-Bot steht im Reiter <strong>Account & Sicherheit</strong>. Damit fragst du Objekte ab, änderst Felder, legst neue Objekte per Sprachnachricht an und rufst Portfolio-Zahlen ab — über deinen eigenen Bot.\n\nSo geht\'s:\n1. In Telegram <strong>@BotFather</strong> öffnen und <strong>/newbot</strong> schicken.\n2. Einen Namen vergeben und einen Benutzernamen, der auf „bot“ endet.\n3. Die Einwilligung lesen und anhaken. Deine Objektdaten gelangen dabei in die Vereinigten Arabischen Emirate, und Bot-Chats sind nicht Ende-zu-Ende-verschlüsselt.\n4. Den Token von BotFather einfügen und auf <strong>Bot verbinden</strong> klicken.\n5. <strong>Verbindungscode erzeugen</strong>, den Bot öffnen, <strong>/start</strong> schicken und den Code eintippen.\n\nDanach kannst du den Chat „Stilllegen“, „Trennen“ (löscht auch den Chatverlauf im Bot) oder den Bot ganz entfernen.'
-        },
-        {
-          h: 'Plan und Kontingent',
-          body: 'Im Reiter <strong>Plan</strong> siehst du oben <strong>Dein Kontingent</strong>, je Art getrennt: <strong>MPI</strong> (Marktpreisindikation), <strong>MPI+</strong> (erweiterte Marktpreisindikation) und <strong>WEV</strong> (Wertermittlung nach ImmoWertV). Dazu kommen zugekaufte Marktwert-Abrufe. Unter jeder Zahl steht, wie viel im Monat enthalten ist und wie viel dauerhaft dazugekauft wurde.\n\nWichtig:\n• Dein Monatskontingent gilt für den laufenden Monat. Was du nicht nutzt, verfällt. Zurückgesetzt wird am 1. des Monats.\n• Zugekaufte Bewertungen verfallen nie. Sie werden erst verbraucht, wenn das Monatskontingent leer ist.\n\nIn bezahlten Plänen legst du unter <strong>Bewertungspakete</strong> nach oder kaufst einzelne Bewertungen („Oder einzeln — genau die eine, die gerade fehlt“). Einzelne Bewertungen kosten mehr als im Kontingent. „Bewertungen nachkaufen“ öffnet die Preisübersicht.'
+          h: 'Free-Plan-Wasserzeichen',
+          body: 'Im Free-Plan trägt jedes PDF das Wasserzeichen „DealPilot Free“, in der Testphase „DealPilot Testphase“. Ab dem Starter-Plan ist es weg. Es ist halbtransparent und liegt sichtbar über den Inhalten.'
         }
       ]
     },
@@ -305,78 +482,62 @@
       ]
     },
     {
-      id: 'steuer_tief',
-      title: 'Steuer im Detail',
-      icon: 'i-receipt',
-      desc: 'Grenzsteuersatz, AfA, Kaufpreisaufteilung, Werbungskosten, Finanzamt-PDF',
+      id: 'einstellungen',
+      title: 'Einstellungen',
+      icon: 'i-settings',
+      desc: 'Die Reiter und was jeder steuert',
       sections: [
         {
-          h: 'Grenzsteuersatz und Steuerwirkung',
-          body: 'Im Reiter <strong>Steuer</strong>, Karte „Persönliche Steuer“, trägst du dein <strong>Zu versteuerndes Einkommen (zvE) vor Immobilie</strong> ein. Ist „Grenzsteuersatz automatisch aus zvE berechnen“ angehakt, rechnet DealPilot den Satz nach § 32a EStG (Tarif 2026). Nimmst du den Haken heraus, kannst du ihn selbst eintragen. Das zvE wird zentral in deinem Profil gespeichert.\n\n<strong>Wie die Wirkung entsteht:</strong> Das steuerliche Ergebnis des Objekts — Miete minus Kosten und AfA — wird auf dein zvE gerechnet. Die Steuerwirkung ist die Differenz zweier Tarifberechnungen, mit und ohne das Objekt. Daraus entsteht der Cashflow nach Steuer.\n\nGespeicherte Bestandsobjekte rechnen mit, in der Reihenfolge ihres Kaufzeitpunkts: ein Verlust aus einem älteren Objekt senkt die Basis, auf der dieses spart. Verlustverrechnungsgrenzen (§ 15a, § 15b, § 10d EStG) bleiben außen vor.'
+          h: 'Die Reiter im Überblick',
+          body: 'Links findest du die Reiter:\n• <strong>Account & Sicherheit</strong> — Login, Passwort, Zwei-Faktor, Account löschen, Telegram-Bot\n• <strong>Kontakt & Logo</strong> — Kontaktdaten und eigenes Logo für PDFs\n• <strong>Co-Pilot (KI)</strong> — Tonalität, Fokus, Instruktionen\n• <strong>Deal Score</strong> — Gewichtung, Schwellenwerte\n• <strong>Standardwerte</strong> — Vorgaben, die in jede Kalkulation einfließen\n• <strong>Darstellung</strong> — was angezeigt wird und wie es aussieht; ändert keine Zahl\n• <strong>Datenraum</strong> — geteilte Objekte und Portfolio-Pässe\n• <strong>Mandanten</strong> — Halter, Steuerregime, Steuerzeiträume\n• <strong>Plan</strong> — Abo, Kontingent, Abrechnung\n• <strong>Rechtliches</strong> und <strong>Hilfe</strong>\n\nUnten steht „Auto-Save aktiv · Änderungen werden direkt übernommen“. Mit <strong>Speichern</strong> sicherst du ausdrücklich, <strong>Abbrechen</strong> oder Esc schließt das Fenster.'
         },
         {
-          h: 'Steuerzeiträume: zvE im Zeitverlauf',
-          body: 'Dein Einkommen ändert sich — etwa nach einer Lohnerhöhung. Dafür gibt es Steuerzeiträume.\n\nSo geht\'s:\n1. Im Reiter Steuer auf <strong>📅 Steuerzeiträume verwalten →</strong> klicken. Du landest in den Einstellungen unter <strong>Mandanten</strong> bei deinem privaten Halter.\n2. Unter „Neuen Zeitraum hinzufügen“ <strong>Gültig von</strong>, <strong>Gültig bis (leer = laufend)</strong>, <strong>zvE / Jahr (€)</strong>, einen <strong>Grund</strong> und optional eine Notiz eintragen.\n3. <strong>Hinzufügen</strong>.\n\nÜberschneidet sich der neue Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt. Du kannst abbrechen oder „Trotzdem als neuen Zeitraum anlegen“.\n\nFür jedes Steuerjahr nimmt die Rechnung das zvE des Zeitraums, der zur Jahresmitte gilt. Liegt keiner vor, gilt das zvE aus dem Reiter Steuer.'
+          h: 'Co-Pilot (KI) und Kontakt & Logo',
+          body: 'Unter <strong>Co-Pilot (KI)</strong> legst du fest, wie die Pilot-Analysen schreiben (KI-Lage, Quick-Check, Investor Deal Score AI):\n• <strong>Detailgrad</strong>: kurz, mittel oder ausführlich\n• <strong>Tonalität</strong>: sachlich, beratend oder kritisch (Risiken zuerst)\n• <strong>Fokus-Schwerpunkte</strong> und <strong>Eigene Anweisungen</strong>\n• <strong>Eigenes Wissen für alle Piloten</strong>: geht an Pilot-Analyse, Portfolio-Pilot und Telegram-Bot. Trag dort keine Zahlen ein, die sich ändern — die holt die KI aus der echten Quelle.\n• <strong>Standard-Analyseparameter</strong> wie Investitionsstrategie, Verkäuferbereitschaft, eigene Risikotoleranz und aktuelle Marktphase. Pro Objekt im KI-Tab überschreibbar.\n\nUnter <strong>Kontakt & Logo</strong> stehen Adresse, Telefon, E-Mail und Webseite. Sie erscheinen im PDF-Footer und auf Track-Records. Über „Logo hochladen“ setzt du dein Logo in den PDF-Header (empfohlen: PNG, 300×100 px).'
         },
         {
-          h: 'AfA-Satz, Gebäudeanteil und § 7b',
-          body: 'Karte <strong>AfA-Konfiguration</strong>, Feld <strong>AfA-Satz</strong>:\n• 2,0 % linear — Standard ab 1925\n• 2,5 % linear — Baujahr vor 1925\n• 3,0 % linear — Wohnzwecke ab 2023\n• 5,0 % degressiv — ohne Wechsel\n• 5,0 % degressiv mit Wechsel auf 3 % linear (empfohlen)\n\nPasst ein Neubau, weist ein Hinweis auf die degressive AfA nach § 7 Abs. 5a EStG hin — mit dem Knopf <strong>Auf degressiv 5% wechseln</strong>.\n\n<strong>Gebäudeanteil am KP (%)</strong>: der Rest ist Grund und Boden. Darunter steht <strong>AfA / Jahr (berechnet)</strong>, aufgeteilt in Gebäude-AfA und bewegliche Wirtschaftsgüter, plus „AfA-Verlauf erste 10 Jahre ansehen“.\n\n<strong>§ 7b Sonder-AfA</strong> (aufklappen): zusätzlich 5 % in den ersten 4 Jahren. Du bestätigst vier Voraussetzungen — Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietung, Bauantrag/Kaufvertrag 01.01.2023 – 30.09.2029. Die Basis ist auf 4.000 €/m² Wohnfläche gekappt.'
+          h: 'Deal Score: Gewichtung und Bewertungsprofile',
+          body: '<strong>DealPilot Score (Quick-Check)</strong> — fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR) und Potenzial (Wertpuffer und Mietsteigerung). Jeder geht von 0 bis 60 %, zusammen müssen es 100 % sein. „↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15.\n\n<strong>Investor Deal Score</strong> (Investor/Pro, 24 KPIs) — oben wählst du ein <strong>Bewertungsprofil</strong>: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Darunter passt du Hauptgewichtungen, Untergewichtungen und Grenzwerte an. Grenzwerte trägst du im Format Wert:Punkte ein, z. B. 4:20, 5:50, 7:80, 9:100. Sobald du von Hand änderst, springt das Profil auf <strong>Benutzerdefiniert</strong>.\n\nBeide Scores hängen zusammen: Speicherst du eigene Regler, gelten sie sofort — bis du wieder ein Bewertungsprofil wählst. Dann rechnet auch der DealPilot Score mit dessen Gewichtung.'
         },
         {
-          h: 'Eigener AfA-Satz über die Restnutzungsdauer',
-          body: 'Ist die tatsächliche Nutzungsdauer kürzer, erlaubt § 7 Abs. 4 Satz 2 EStG einen höheren Satz — das Finanzamt verlangt dafür einen Nachweis per Gutachten.\n\nSo geht\'s:\n1. Im Feld <strong>AfA-Satz</strong> „Eigenen Satz / Restnutzungsdauer eingeben …“ wählen.\n2. <strong>Restnutzungsdauer (Jahre)</strong> eintragen — der Satz ergibt sich als 100 ÷ RND. Oder den <strong>AfA-Satz (%)</strong> direkt eingeben.\n3. Unter <strong>Grundlage</strong> den Nachweis nennen, z. B. das Gutachten mit Datum.\n\nPlausibel ist ein Satz zwischen 0,5 und 33,3 %. Der eigene Satz wird von keiner Automatik überschrieben.\n\n<strong>Restnutzungsdauer ermitteln</strong> öffnet einen Assistenten in neun Schritten — von Objekt-Basis über Modernisierungen und Zustand der Gewerke bis „Ergebnis & Empfehlung“. Am Ende steht eine Gutachten-Anfrage. Liegt eine Ermittlung vor, erscheint <strong>Letzte Ermittlung übernehmen</strong>; sie ist als indikativ vermerkt.'
+          h: 'Standardwerte: deine Annahmen für neue Objekte',
+          body: 'Diese Werte werden bei jedem neuen Objekt vorausgefüllt. Am Objekt kannst du sie jederzeit überschreiben.\n• <strong>Finanzierung</strong>: Standard-Tilgung, Standard-Zinsbindung (5, 10, 15 oder 20 Jahre), Eigener Zinssatz (leer = indikativer Pfandbrief-Satz der Bindung), Zins-Stufe (Bonität / LTV), Standard-Eigenkapital in % vom Kaufpreis.\n• <strong>Bewirtschaftung</strong>: umlagefähig und nicht umlagefähig in % der NKM, Kalkulatorischer Mietausfall, Hausgeld-Anteil.\n• <strong>Persönliche Mindest-Schwellen</strong>: Mindest-DSCR, Mindest-Cashflow / Monat, Maximaler LTV. Sie erscheinen als farbige Marker in den Kennzahlen.\n• <strong>Steuer</strong>: Grenzsteuersatz.\n• <strong>Standort & Nebenkosten</strong>: Bundesland (mit Grunderwerbsteuer-Satz), Notar & Grundbuch, Maklergebühr.\n\nUnten sicherst du mit <strong>Profil speichern</strong>. Mit <strong>Auf Defaults zurücksetzen</strong> stellst du die Vorgaben wieder her.'
         },
         {
-          h: 'BMF-Rechner: Kaufpreis aufteilen',
-          body: 'Der Knopf <strong>BMF-Rechner</strong> in der AfA-Konfiguration öffnet „Anschaffungskosten & BMF-Kaufpreisaufteilung“ nach der BMF-Arbeitshilfe (Juni 2023).\n\n<strong>1 Anschaffungskosten</strong> — übernimmt die Werte aus dem Reiter Investition: Kaufpreis, Grunderwerbsteuer, Notar, Grundbuchamt, Makler. Dazu Erwerbskosten wie Fahrten (mit Fahrtkosten-Helfer), Verpflegung, Unterkunft, Gutachten, Anwalt. Herstellungskosten nach § 255 Abs. 2 HGB zählen zu 100 % zum Gebäude.\n\n<strong>2 BMF-Aufteilung</strong> — Grundstücksart, Baujahr, Flächen, Bodenrichtwert, Miete und Modernisierungen. Alle drei Verfahren werden gerechnet; maßgebend ist bei bekannter Miete der Ertragswert, mit Vergleichsfaktor der Vergleichswert, sonst der Sachwert. <strong>KI-Vorschlag</strong> schlägt Gutachterausschuss-Werte vor; übernommen werden sie erst mit „BRW → BMF“ bzw. „Lzs → BMF“. Liegt ein amtlicher Zinssatz vor, steht darunter die Aufteilung nach Jacoby zum Vergleich.\n\nDie Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind.'
+          h: 'Lageklassen A · B · C und Bewirtschaftung je Objektart',
+          body: '<strong>Lageklassen</strong>: Für A-, B- und C-Lage hinterlegst du je eine <strong>Zielrendite</strong> (% brutto). Vorbelegt sind 3,5 / 5,0 / 7,0 %. Im Quick-Check wählst du die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du verhandeln müsstest. Mietausfall, nicht umlagefähige Bewirtschaftung und Eigenkapital je Klasse sind freiwillig — leer gelten deine Standardwerte. Unter „Standard für neue Quick-Checks“ legst du fest, welche Klasse vorausgewählt ist. Die Felder speichern sich sofort.\n\n<strong>Bewirtschaftung je Objektart</strong>: Startwerte für Eigentumswohnung (Hausgeld, Anteil nicht umlagefähig, eigene Rücklage), Ein-/Zweifamilienhaus und Mehrfamilienhaus (Verwaltung, Instandhaltung, Garage/Stellplatz, Betriebskosten). Daraus füllt DealPilot im Reiter Bewirtschaftung die leeren Felder, sobald Objektart und Wohnfläche feststehen. Eigene Eingaben am Objekt gehen vor. Der <strong>Fortschreibungsfaktor</strong> (1,60 für Stichtage ab 01.01.2026) passt du jährlich zum 1. Januar an.'
         },
         {
-          h: 'Varianten, Bodenabschlag und Ausgabe',
-          body: '<strong>3 AfA-Vorschau</strong> zeigt AfA-Basis und jährliche AfA und vergleicht mit der Pauschale 80/20.\n\n<strong>4 AfA-Hebel</strong>: vier Varianten — <strong>Amtlich</strong> (× 1,00, vorausgewählt), <strong>Konservativ</strong> (Boden −15 %), <strong>Optimiert</strong> (−20 %), <strong>Aggressiv</strong> (−25 %), jeweils mit Risiko-Score. Dazu die 15-%-Grenze mit Status Puffer, Knapp oder Überschritten und die Notarvertrag-Klausel zum <strong>Kopieren</strong>. Bei Abweichungen über 25 % zum BMF-Standard ist ein Sachverständigengutachten sinnvoll.\n\n<strong>Bodenabschlag</strong>: ein Szenario neben der amtlichen Zahl, die unangetastet bleibt — mit Abschlag 0/15/20/25 %, Restnutzungsdauer und einer <strong>Begründung</strong> für den Vertragstext. Ohne Begründung bleibt der Abschlag angreifbar.\n\n<strong>✓ Übernehmen</strong> schreibt Gebäudeanteil und AfA-Satz in den Reiter Steuer. Ausgabe: <strong>Kaufpreisaufteilung als PDF</strong>, <strong>BMF-Arbeitshilfe als PDF</strong>, <strong>BMF-Original als XLSX</strong>.'
+          h: 'Darstellung und Tooltip-Hilfe',
+          body: 'Der Reiter <strong>Darstellung</strong> ändert keine Zahl, nur die Ansicht.\n• <strong>Aussehen</strong>: Seitenaufteilung, Objektkarten und Kartenstil wählen. „Zurücksetzen“ stellt Aufteilung, Darstellung und Marke auf den Auslieferungszustand.\n• <strong>Markt-Daten im Tab Finanzierung</strong>: Markt-Daten-Cards standardmäßig zugeklappt.\n• <strong>Investor Deal Score beim Öffnen</strong>: Score-Leiste standardmäßig minimiert.\n• <strong>Quickboarding — Auto-Übernahme</strong>: Standard-Quelle, z. B. „Konsens (Ø aller aktiven)“. Sie bestimmt, welcher Marktwert automatisch in die Grundmiete übernommen wird.\n• <strong>Bilder in Sicherung & Netzwerk</strong>: Objektfotos einbeziehen.\n• <strong>Marktbericht-Design</strong>: Hell oder Dunkel.\n\n<strong>Tooltip-Hilfe</strong> steuert die i-Symbole: <strong>Aus</strong> (keine Tooltips), <strong>Profi</strong> (nur wichtige — kritische Hinweise wie § 7b bleiben) oder <strong>Anfänger</strong> (alle anzeigen, Standard).'
         },
         {
-          h: 'Werbungskosten je Jahr und Sanierung verteilen',
-          body: 'Karte <strong>Steuerformular pro Jahr · individuelle Werte</strong>: DealPilot schlägt je Jahr Werte aus deinen Eingaben vor, du überschreibst sie, etwa mit den Zahlen aus dem Steuerbescheid.\n• <strong>Quick-Modus</strong> — eine Zeile je Jahr: Einnahmen V+V, Schuldzinsen, AfA, Bewirtschaftung, Sonstige WK, Verlust/Überschuss, Steuer-Effekt. Feld anklicken zum Ändern, ↺ setzt es zurück.\n• <strong>Detail-Modus</strong> — ein Veranlagungsjahr, gegliedert in Finanzierungs-, Betriebs-, Verwaltungs- und sonstige Kosten, AfA Gebäude und bewegliche Wirtschaftsgüter.\n<strong>↺ Vorschläge wiederherstellen</strong> setzt alles zurück. Änderungen fließen in Cashflow und Steuerverlauf.\n\n<strong>Sanierung:</strong> Im Reiter Investition, Karte Sanierung, hakst du „In Steuer-Werbungskosten übernehmen“ an und wählst die Verteilung: Automatisch (15%-Regel), 1 bis 5 Jahre (5 Jahre nach § 82b EStDV) oder über die AfA-Nutzungsdauer. Die 15-%-Grenze rechnet netto; brutto eingetragene Kosten werden um 19 % USt bereinigt.'
+          h: 'Mandanten und Steuerzeiträume',
+          body: 'Unter <strong>Mandanten</strong> legst du fest, wer ein Objekt hält: Privat oder eine Gesellschaft. Am Objekt wählst du den <strong>Halter</strong>. Privat gibt es in allen Plänen; Gesellschaften (GmbH/UG) mit eigenem Steuerregime gehören zum <strong>Pro</strong>-Plan. Jede Karte zeigt, welche Objekte ihr gehören.\n\n<strong>Steuerzeiträume (Privat)</strong>: Klick bei Privat auf <strong>Bearbeiten</strong>. Dort pflegst du dein zu versteuerndes Einkommen über die Zeit:\n1. „Gültig von“ und „Gültig bis (leer = laufend)“ setzen.\n2. „zvE / Jahr (€)“, „Grund“ und optional eine Notiz eintragen.\n3. Hinzufügen. Überschneidet sich der Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt an.\nDer passende Zeitraum wird jedem Objekt nach Kaufdatum bzw. wirtschaftlichem Übergang zugeordnet.\n\n<strong>Gesellschaft</strong>: Identifikation, Körperschaftsteuer + Soli (Vorgabe 15,825 %), Gewerbesteuer-Hebesatz, erweiterte Kürzung, Buchhaltung (Kontenrahmen, Stammkapital …) und Kosten der Gesellschaft je Jahr. Über „Überführung starten“ bringst du ein Privat-Objekt in eine Gesellschaft.'
         },
         {
-          h: 'Finanzamt-PDF und Anlage V',
-          body: 'Das <strong>Finanzamt-PDF</strong> schlüsselt die Werbungskosten für die Anlage V auf.\n\nSo geht\'s:\n1. Reiter Steuer, Karte „Steuerformular pro Jahr“: unter <strong>Steuerjahr</strong> ein Jahr oder <strong>Alle Jahre</strong> wählen.\n2. Optional <strong>Anlage V</strong> anhaken — dann folgt jedem Jahresblatt eine zweite Seite mit denselben Zahlen, sortiert nach den Zeilen der amtlichen Anlage V.\n3. <strong>Finanzamt-PDF</strong> klicken.\n\nBei „Alle Jahre“ kommt eine Seite je Jahr plus eine Zusammenfassung. Dasselbe PDF erreichst du im Reiter Deal-Aktion.\n\nDie Zeilennummern sind aus dem amtlichen Formular 2025 übernommen. Für spätere Jahre nimmt DealPilot das jüngste vorhandene Formular und sagt das in Rot auf der Seite. Gehört das Objekt einer GmbH oder UG, gibt es keine Anlage V — die Einkünfte sind dann gewerblich.\n\nFür alle Objekte auf einmal: im Cockpit <strong>Steuer-Mappe erstellen</strong>, wahlweise mit „Anlage-V-Zuordnung anhängen“.'
+          h: 'Telegram-Bot verbinden',
+          body: 'Der Telegram-Bot steht im Reiter <strong>Account & Sicherheit</strong>. Damit fragst du Objekte ab, änderst Felder, legst neue Objekte per Sprachnachricht an und rufst Portfolio-Zahlen ab — über deinen eigenen Bot.\n\nSo geht\'s:\n1. In Telegram <strong>@BotFather</strong> öffnen und <strong>/newbot</strong> schicken.\n2. Einen Namen vergeben und einen Benutzernamen, der auf „bot“ endet.\n3. Die Einwilligung lesen und anhaken. Deine Objektdaten gelangen dabei in die Vereinigten Arabischen Emirate, und Bot-Chats sind nicht Ende-zu-Ende-verschlüsselt.\n4. Den Token von BotFather einfügen und auf <strong>Bot verbinden</strong> klicken.\n5. <strong>Verbindungscode erzeugen</strong>, den Bot öffnen, <strong>/start</strong> schicken und den Code eintippen.\n\nDanach kannst du den Chat „Stilllegen“, „Trennen“ (löscht auch den Chatverlauf im Bot) oder den Bot ganz entfernen.'
+        },
+        {
+          h: 'Plan und Kontingent',
+          body: 'Im Reiter <strong>Plan</strong> siehst du oben <strong>Dein Kontingent</strong>, je Art getrennt: <strong>MPI</strong> (Marktpreisindikation), <strong>MPI+</strong> (erweiterte Marktpreisindikation) und <strong>WEV</strong> (Wertermittlung nach ImmoWertV). Dazu kommen zugekaufte Marktwert-Abrufe. Unter jeder Zahl steht, wie viel im Monat enthalten ist und wie viel dauerhaft dazugekauft wurde.\n\nWichtig:\n• Dein Monatskontingent gilt für den laufenden Monat. Was du nicht nutzt, verfällt. Zurückgesetzt wird am 1. des Monats.\n• Zugekaufte Bewertungen verfallen nie. Sie werden erst verbraucht, wenn das Monatskontingent leer ist.\n\nIn bezahlten Plänen legst du unter <strong>Bewertungspakete</strong> nach oder kaufst einzelne Bewertungen („Oder einzeln — genau die eine, die gerade fehlt“). Einzelne Bewertungen kosten mehr als im Kontingent. „Bewertungen nachkaufen“ öffnet die Preisübersicht.'
         }
       ]
     },
     {
-      id: 'faq_mehr',
-      title: 'Noch mehr Fragen',
+      id: 'faq',
+      title: 'Häufige Fragen',
       icon: 'i-question',
-      desc: 'Marktbericht, Kontingent, Score, Speichern, Sicherung',
+      desc: 'Antworten, nach Arbeitsablauf geordnet',
       sections: [
         {
-          h: 'Warum steht beim Liegenschaftszins „gesetzlicher Auffangwert“?',
-          body: 'DealPilot sucht den Liegenschaftszinssatz in fester Reihenfolge: <strong>amtlich, kreisscharf</strong> (zuständiger Gutachterausschuss) → <strong>amtlich, regional</strong> (Landesebene) → <strong>aus eigener Marktableitung</strong> → <strong>gesetzlicher Auffangwert n. § 256 BewG</strong>. Liegt für deinen Ort kein amtlicher Wert vor, rechnet der Ertragswert mit dem Auffangwert — als <em>indikativ</em> gekennzeichnet, nicht marktabgeleitet.\n\nDarunter nennt der Bericht den zuständigen Ausschuss mit Link zur Quelle, oft auch, warum dort kein verwertbarer Wert steht und ob der Bericht kostenpflichtig ist.\n\n<strong>Eigenen Wert setzen:</strong> In der Wertermittlung „▸ Werte selbst setzen“ aufklappen und „Liegenschaftszinssatz (%)“ eintragen. Er gilt dann als „eigene Angabe“.'
+          h: 'Wie rufe ich den Piloten?',
+          body: 'Drück <strong>F1</strong> — das geht überall. Oder drück <strong>?</strong>, wenn du gerade nicht in einem Eingabefeld tippst. Du kannst den Piloten auch einfach <strong>anklicken</strong>: ein Klick öffnet den Tower, ein zweiter schließt ihn wieder.\n\nWo der Pilot wartet, stellst du in den Einstellungen unter <strong>Pilot · Hilfe auf F1</strong> ein:\n• <strong>Seitenleiste</strong> — steht im freien Platz über deinem Nutzerfeld (Standard)\n• <strong>Kopfleiste</strong> — nur Kopf und Mütze neben dem Hilfe-Symbol\n• <strong>Hauptbereich</strong> — unten am linken Rand des Inhalts\n• <strong>Nur auf F1</strong> — unsichtbar, bis du ihn rufst\n\nFehlt am gewählten Ort der Platz (Leiste eingeklappt, Handy), weicht er auf den nächsten Ort aus.'
         },
         {
-          h: 'Warum kann ich Stufe 3 nicht abrufen?',
-          body: 'Im Reiter Objekt, Box „Marktbericht abrufen“, gibt es zwei Gründe:\n\n• <strong>Es fehlen Angaben.</strong> Der Knopf heißt dann „was fehlt“. Ein Klick zeigt „Für Stufe 3 fehlt noch:“ — jeder Eintrag springt zum Feld. Stufe 3 braucht zusätzlich zu Stufe 1 und 2 u. a. Nutzungsart, Grundstücksfläche, Bodenrichtwert und Bruttogrundfläche, bei einer ETW den Miteigentumsanteil, bei EFH, ZFH, DHH und RH die Hausform (NHK), Geschosse und Dachausbildung. Der Bericht rechnet nie halb.\n• <strong>Kein Kontingent mehr.</strong> Steht dort „0 frei“, ist der Knopf gesperrt. Die Wertermittlung ist ab Pro im Monatskontingent enthalten.\n\nFelder mit dem Schild „optional“ verfeinern nur — ohne sie gelten die Ansätze der Anlage 3 ImmoWertV.'
-        },
-        {
-          h: 'Mein Kontingent ist aufgebraucht — was jetzt?',
-          body: 'Das Kontingent zählt die drei Marktbericht-Stufen getrennt: Marktpreisindikation, Erweiterte Marktpreisindikation und Wertermittlung nach ImmoWertV. Deinen Stand siehst du unter <strong>Einstellungen → Plan</strong> (in bezahlten Plänen „Dein Kontingent“) und je Stufe als „frei“ in der Box „Marktbericht abrufen“.\n\n<strong>So geht\'s weiter:</strong>\n1. Warten: Das Monatskontingent wird zum Monatsanfang neu gesetzt. Nicht Verbrauchtes verfällt am Monatsende.\n2. Nachkaufen: Unter Einstellungen → Plan stehen „Bewertungspakete“ und „Oder einzeln — genau die eine, die gerade fehlt“. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.\n\nNachkaufen geht in jedem bezahlten Plan; im Free-Plan ist dafür ein Upgrade nötig.'
-        },
-        {
-          h: 'Wo finde ich meine Marktberichte?',
-          body: 'Jeder Bericht hängt an seinem Objekt.\n\n• <strong>Reiter Objekt, Feld Verkehrswert:</strong> Hier steht der letzte Bericht mit Datum und Wert. Gibt es mehrere, wählst du im Aufklappfeld — je Bericht Ertragswert, Sachwert und Marktwert einzeln — und übernimmst ihn mit „als Verkehrswert übernehmen“.\n• <strong>Reiter Pilot-Analyse:</strong> Ab zwei Berichten erscheint der Reiter „Marktbericht-Verlauf“ mit der Entwicklung des Werts.\n\n<strong>Während der Bericht entsteht:</strong> Ein Fenster zeigt acht Etappen. Mit „Im Hintergrund weiter“ arbeitest du weiter; unten zeigt eine Pille „Marktbericht in Arbeit“, danach „Marktbericht fertig — öffnen“. Schließt du die Seite, rechnet der Server trotzdem zu Ende.'
-        },
-        {
-          h: 'Wie ändere ich die Score-Gewichtung?',
-          body: '<strong>So geht\'s:</strong>\n1. Öffne <strong>Einstellungen → Deal Score</strong>.\n2. Im Abschnitt „DealPilot Score (Quick-Check)“ stellst du fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR), Potenzial (Bruttofaktor).\n3. Die „Summe der Gewichtungen“ muss 100 % ergeben — sie wird grün. Sonst wird nicht gespeichert.\n4. „Speichern“ klicken.\n\n„↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15 zurück.\n\n<strong>Ab Investor</strong> gibt es darunter den „Investor Deal Score“ mit einem „Bewertungsprofil“: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Passt du die Gewichte dort von Hand an, wechselt das Profil auf „Benutzerdefiniert“.'
-        },
-        {
-          h: 'Warum sehe ich keinen Investor Deal Score?',
-          body: 'Der Investor Deal Score bewertet 24 Kennzahlen und erscheint erst, wenn mindestens <strong>70 %</strong> davon ausgefüllt sind. Bis dahin steht dort „Bitte mindestens 70 % der Kennzahlen ausfüllen“ mit deinem aktuellen Stand.\n\n<strong>So geht\'s:</strong>\n1. Klick auf „📋 Welche KPIs fehlen noch?“ — die Liste zeigt die offenen Kennzahlen.\n2. Trag sie in den Reitern <strong>Objekt</strong> (Lage, Energieklasse, Zustand), <strong>Bewirtschaftung</strong> und <strong>Steuer</strong> nach.\n\nDie Kaufgrenzen (DSCR, Cashflow, LTV) zeigt DealPilot schon vorher — dafür reichen Kaufpreis, Miete und Finanzierung.\n\nDer Investor Deal Score gehört zum Investor- und Pro-Plan; im Free-Plan läuft er als Demo.'
-        },
-        {
-          h: 'Wie lege ich einen Steuerzeitraum an?',
-          body: 'Ein Steuerzeitraum hält dein zu versteuerndes Einkommen (zvE) für eine Zeitspanne fest — etwa vor und nach einer Lohnerhöhung.\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Steuer auf „📅 Steuerzeiträume verwalten →“ klicken. Es öffnet sich Einstellungen → Mandanten, dein privater Halter.\n2. Unter „Neuen Zeitraum hinzufügen“: „Gültig von“, „Gültig bis (leer = laufend)“, „zvE / Jahr (€)“, „Grund“ und „Notiz (optional)“ ausfüllen.\n3. „Hinzufügen“ klicken.\n\nÜberschneidet sich der Zeitraum mit einem bestehenden, fragt DealPilot nach. Je Objekt wird der passende Zeitraum über den „Wirtsch. Übergang“ zugeordnet — ein zvE, das du selbst ins Objekt geschrieben hast, bleibt stehen. Ändern mit „Bearb.“, löschen mit „×“.'
+          h: 'Wo steht der Pilot, und kann ich das ändern?',
+          body: 'Standardmäßig wartet er in der <strong>Seitenleiste</strong> über deinem Nutzerfeld. Unter <strong>Einstellungen → Darstellung → „Pilot · Hilfe auf F1“</strong> wählst du: Seitenleiste, Kopfleiste (nur Kopf und Mütze neben dem Hilfe-Symbol), Hauptbereich (unten links im Inhalt) oder „Nur auf F1“ — dann ist er unsichtbar, bis du ihn rufst.'
         },
         {
           h: 'Wann speichert DealPilot mein Objekt?',
@@ -391,241 +552,24 @@
           body: 'In der Seitenleiste unter <strong>Aktionen → Export</strong> öffnet sich „Daten exportieren“:\n\n• <strong>PDF-Report für Objekt</strong> — der Investment-Case für Bank und Investoren.\n• <strong>DealPilot-Sicherung</strong> — ein Objekt oder alle als .dpkt-Datei, mit Eingaben, Pilot-Analysen, Bemerkungen und Fotos. Hak „Mit Passwort verschlüsseln“ an, sonst ist die Datei Klartext.\n• <strong>Excel-Export</strong> — eine Zeile je Objekt mit allen Kennzahlen.\n• <strong>Portfolio-CSV</strong> — alle Objekte plus Summenzeile.\n\nZurückspielen kannst du eine Sicherung über <strong>Aktionen → Import</strong>. Plan- und Zahlungsdaten sind nicht enthalten. Die Objekt-Sicherung gehört zum Pro-Plan.'
         },
         {
-          h: 'Warum steht über der Pilot-Analyse „neu abrufen“?',
-          body: 'Jede Pilot-Analyse merkt sich, wann sie erstellt wurde und mit welchen Zahlen. Oben im Reiter Pilot-Analyse steht deshalb der <strong>Stand</strong>:\n\n• „die Zahlen haben sich seitdem nicht geändert“ — die Analyse passt noch.\n• „seitdem hat sich … geändert“ — DealPilot nennt die Felder, z. B. Kaufpreis, Nettokaltmiete, Sollzins, Eigenkapital, Zustand oder Hausgeld. Die Texte können überholt sein.\n• „Diese Analyse gehört zu einem anderen Objekt“ — bitte neu abrufen, bevor du dich darauf stützt.\n\nÄltere Analysen ohne Datum sagen das ausdrücklich, statt Aktualität zu behaupten. Beim nächsten Abruf bekommen sie einen Stand.'
+          h: 'Warum sind die Quellen in der Datenaufnahme ausgegraut?',
+          body: 'Ist ein Objekt schon gefüllt, sperrt DealPilot das erneute Einlesen (Exposé, Sprache, ImmoMetrica) — ein neuer Abruf würde Felder überschreiben, die du schon gepflegt hast. Über den ausgegrauten Quellen steht dann der Knopf <strong>„Freigeben“</strong>. Ein Klick hebt die Sperre auf, danach liest du wie gewohnt ein.'
         },
         {
-          h: 'Wie rufe ich den Piloten?',
-          body: 'Drück <strong>F1</strong> — das geht überall. Oder drück <strong>?</strong>, wenn du gerade nicht in einem Eingabefeld tippst. Du kannst den Piloten auch einfach <strong>anklicken</strong>: ein Klick öffnet den Tower, ein zweiter schließt ihn wieder.\n\nWo der Pilot wartet, stellst du in den Einstellungen unter <strong>Pilot · Hilfe auf F1</strong> ein:\n• <strong>Seitenleiste</strong> — steht im freien Platz über deinem Nutzerfeld (Standard)\n• <strong>Kopfleiste</strong> — nur Kopf und Mütze neben dem Hilfe-Symbol\n• <strong>Hauptbereich</strong> — unten am linken Rand des Inhalts\n• <strong>Nur auf F1</strong> — unsichtbar, bis du ihn rufst\n\nFehlt am gewählten Ort der Platz (Leiste eingeklappt, Handy), weicht er auf den nächsten Ort aus.'
+          h: 'Wie übernehme ich ein Inserat aus ImmoMetrica?',
+          body: 'Zuerst den Zugang hinterlegen: <strong>Einstellungen → Account & Sicherheit → API-Keys externer Anbieter → ImmoMetrica</strong> (du brauchst dort ein Investor-Pro-Abo und den API-Token aus deinem ImmoMetrica-Dashboard).\n\nDanach steht in der Datenaufnahme — im Objekt und im Quick-Check — die Kachel <strong>ImmoMetrica</strong>. Du wählst Favoriten oder einen Suchauftrag, klickst ein Inserat an und hakst ab, welche Felder übernommen werden. Weicht die Adresse vom offenen Objekt ab, fragt DealPilot vorher nach.'
         },
         {
-          h: 'Warum ist der Ankauf-Stand nicht eingefroren?',
-          body: 'Der Ankauf-Stand (das Soll) wird nur festgeschrieben, wenn zwei Dinge zusammenkommen:\n• der Status im Reiter Deal-Aktion steht auf <strong>Gewonnen</strong>, und\n• im Reiter Objekt ist <strong>Wirtsch. Übergang</strong> (Nutzen-/Lastenwechsel) eingetragen.\n\nOhne dieses Datum passiert nichts — ein eingefrorener Stand mit falschem Datum sähe richtig aus und wäre es nicht. Beim Festschreiben-Versuch ohne Datum meldet DealPilot: „Erst den Nutzen-/Lastenwechsel im Reiter Objekt eintragen.“\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Objekt das Datum bei „Wirtsch. Übergang“ setzen.\n2. In Deal-Aktion auf <strong>Gewonnen</strong> stellen — DealPilot schreibt den Stand dann automatisch fest und meldet es mit Datum.\n3. Hattest du „später“ geklickt, steht dort die Frage „Ankauf-Stand festschreiben?“ mit dem Knopf <strong>Festschreiben</strong>.\n\nGeht ein Objekt zurück auf Offen oder Verloren, ruht der Stand nur — er wird nicht gelöscht und ist beim erneuten Gewinnen wieder da.'
-        }
-      ]
-    },
-    {
-      id: 'einstieg',
-      title: 'Einstieg',
-      icon: 'i-rocket',
-      desc: 'Erste Schritte mit DealPilot',
-      sections: [
-        {
-          h: 'Was ist DealPilot?',
-          body: 'DealPilot ist eine professionelle Investmentanalyse-App für Immobilien. Du gibst Kaufpreis, Miete, Finanzierung und Annahmen ein — DealPilot rechnet vollständige Cashflows über 10–30 Jahre, vergleicht 3 Phasen (Heute / Ende Zinsbindung / Anschluss), bewertet das Investment per DealScore (0–100) und erstellt Bank-taugliche PDF-Reports.'
+          h: 'Wie ändere ich die Score-Gewichtung?',
+          body: '<strong>So geht\'s:</strong>\n1. Öffne <strong>Einstellungen → Deal Score</strong>.\n2. Im Abschnitt „DealPilot Score (Quick-Check)“ stellst du fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR), Potenzial (Wertpuffer und Mietsteigerung).\n3. Die „Summe der Gewichtungen“ muss 100 % ergeben — sie wird grün. Sonst wird nicht gespeichert.\n4. „Speichern“ klicken.\n\n„↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15 zurück.\n\n<strong>Ab Investor</strong> gibt es darunter den „Investor Deal Score“ mit einem „Bewertungsprofil“: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Passt du die Gewichte dort von Hand an, wechselt das Profil auf „Benutzerdefiniert“.'
         },
         {
-          h: 'Schnellstart in 4 Schritten',
-          body: '1. <strong>Quick-Check</strong> — ein Inserat in einer Minute einordnen. Lohnt es sich, „Als Objekt speichern“.\n\n2. <strong>Datenaufnahme</strong> — die Reiter Objekt, Investition, Miete, Finanzierung, Bewirtschaftung und Steuer. Vom Groben zum Feinen; was fehlt, nennt DealPilot statt es zu schätzen.\n\n3. <strong>Bewerten</strong> — Pilot-Analyse, Reiter Bewertung, Marktbericht bis zur Wertermittlung nach ImmoWertV.\n\n4. <strong>Deal-Aktion</strong> — bereit für die Bank, Status Offen · Gewonnen · Verloren. Gewonnen friert den Ankauf-Stand zum Nutzen-/Lastenwechsel ein.\n\n<strong>Tipp:</strong> Drück überall <strong>F1</strong> oder <strong>?</strong> — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Alle Abläufe als Netzplan stehen im Thema „Abläufe & Pilot“.'
+          h: 'Warum sehe ich keinen Investor Deal Score?',
+          body: 'Der Investor Deal Score bewertet 24 Kennzahlen und erscheint erst, wenn mindestens <strong>70 %</strong> davon ausgefüllt sind. Bis dahin steht dort „Bitte mindestens 70 % der Kennzahlen ausfüllen“ mit deinem aktuellen Stand.\n\n<strong>So geht\'s:</strong>\n1. Klick auf „📋 Welche KPIs fehlen noch?“ — die Liste zeigt die offenen Kennzahlen.\n2. Trag sie in den Reitern <strong>Objekt</strong> (Lage, Energieklasse, Zustand), <strong>Bewirtschaftung</strong> und <strong>Steuer</strong> nach.\n\nDie Kaufgrenzen (DSCR, Cashflow, LTV) zeigt DealPilot schon vorher — dafür reichen Kaufpreis, Miete und Finanzierung.\n\nDer Investor Deal Score gehört zum Investor- und Pro-Plan; im Free-Plan läuft er als Demo, im Starter-Plan ist er nicht enthalten.'
         },
-        {
-          h: 'Wo speichert DealPilot?',
-          body: 'Wenn du angemeldet bist (Account-Modus), werden alle Objekte auf dem Server gespeichert. Im Demo-Modus werden Objekte nur im Browser-Speicher (localStorage) abgelegt — sie gehen beim Browserwechsel verloren. Anmelden lohnt sich.'
-        }
-      ]
-    },
-    {
-      id: 'kennzahlen',
-      title: 'Kennzahlen verstehen',
-      icon: 'i-bar',
-      desc: 'Die wichtigsten Kennzahlen erklärt',
-      sections: [
-        {
-          h: 'Bruttomietrendite — schnelle Vergleichszahl',
-          body: 'Die Bruttomietrendite zeigt dir auf einen Blick, wie viel Miete eine Immobilie pro Jahr in Relation zum Kaufpreis bringt. Sie ist <strong>unbereinigt</strong>: Bewirtschaftungskosten (Hausgeld, Verwaltung, Rücklagen) und Finanzierungskosten (Zinsen) sind nicht abgezogen. Deshalb ist sie <em>kein</em> Maß für deinen tatsächlichen Ertrag — aber ein gutes Werkzeug, um Objekte schnell miteinander zu vergleichen.\n\n<strong>Wofür du sie nutzt:</strong>\n• Erste Einschätzung beim Inserate-Sichten\n• Vergleich zwischen Lagen (A-Stadt vs. B-Stadt)\n• Bewertung des Kaufpreis-Niveaus relativ zu den Mieten\n\n<strong>Typische Werte in Deutschland (Wohnimmobilien als Kapitalanlage):</strong>\n• A-Lagen wie München, Hamburg, Frankfurt: oft 2,5–3,5 % — Preise sind hoch, Renditen entsprechend niedrig\n• B-/C-Städte wie Herford, Dortmund, Kassel: typisch 5–7 % — der „Sweet Spot" für viele Kapitalanleger\n• D-Lagen, Ostdeutschland (z. B. Chemnitz, Halle): teils 7–9 % — höhere Rendite, aber auch höheres Risiko bei Mieter-Stabilität und Wertentwicklung\n\n<strong>Wichtig:</strong> Eine hohe Bruttomietrendite ist nicht automatisch „besser". Sie spiegelt oft eingepreistes Risiko wider. Vergleiche immer mit Nettomietrendite und Lagebewertung.'
-        },
-        {
-          h: 'Nettomietrendite — der ehrlichere Renditewert',
-          body: 'Die Nettomietrendite ist die <strong>realistische Variante</strong> der Bruttomietrendite. Hier werden zwei Dinge anders gerechnet:\n\n<strong>1. Bewirtschaftungskosten werden abgezogen.</strong> Das ist der Teil des Hausgelds, den der Vermieter selbst trägt (Verwaltung, nicht-umlagefähige Instandhaltung, eigene Rücklage, kalkulierter Mietausfall).\n\n<strong>2. Statt nur dem Kaufpreis wird die Gesamtinvestition verwendet.</strong> Das heißt: Notar, Grundbuch, Grunderwerbsteuer, Maklerprovision, ggf. Sanierung — alles, was du wirklich aufbringen musst, um die Immobilie betriebsbereit zu haben.\n\nDeshalb liegt die Nettomietrendite immer unter der Bruttomietrendite — meist 1,5 bis 2,5 Prozentpunkte darunter.\n\n<strong>Faustregeln:</strong>\n• Unter 3,0 % — wenig Substanz, fast nur Wertsteigerungs-Spekulation\n• 3,0–4,0 % — schwach, nur in Top-Lage akzeptabel\n• 4,0–5,0 % — solide, klassischer Kapitalanleger-Bereich\n• Über 5,0 % — attraktiv, oft B-Lage oder Sondersituation\n\n<strong>Tipp:</strong> Wenn die Nettomietrendite weniger als zwei Prozentpunkte über deinem Sollzins liegt, arbeitet die Immobilie operativ kaum für dich — dann lebst du fast ausschließlich von Tilgung und Hoffnung auf Wertsteigerung.'
-        },
-        {
-          h: 'DSCR — Schuldendienstdeckung (die Bank-Kennzahl)',
-          body: 'Die DSCR (Debt Service Coverage Ratio) beantwortet eine einzige, aber zentrale Frage: <strong>Reicht die Miete, um Zins und Tilgung zu bezahlen?</strong>\n\nEin Wert von 1,00 bedeutet: Die Miete deckt den Kapitaldienst exakt. Bei 1,25 deckt die Miete den Kapitaldienst um 25 % über — du hast also einen Puffer von 25 %, falls Mietausfall, Reparaturen oder Zinserhöhungen kommen.\n\nDie Bank schaut bei der Kreditprüfung zuerst auf diese Zahl, weil sie aussagt, ob das Objekt sich „selbst trägt" oder ob du es aus eigener Tasche querfinanzieren musst.\n\n<strong>🔴 KRITISCH — DSCR unter 1,0:</strong>\nDie Miete reicht nicht aus, um den Schuldendienst zu bedienen. Du musst monatlich aus eigenem Einkommen zuschießen. Banken finanzieren das nur mit hohem Eigenkapital oder zusätzlichen Sicherheiten — und meist mit Zinsaufschlag. Strategisch nur sinnvoll, wenn die Wertsteigerungs-Story sehr stark ist oder du das Objekt schnell aufwerten kannst.\n\n<strong>🟡 KNAPP — DSCR zwischen 1,0 und 1,2:</strong>\nDie Bedienung ist gerade so gedeckt, der Puffer ist klein. Bei kleineren Mietausfällen, Reparaturen oder Zinserhöhungen kann die Finanzierung schnell unter Druck geraten. Banken finanzieren das, prüfen aber strenger und fordern oft höhere Tilgungsraten.\n\n<strong>🟢 SOLIDE — DSCR ab 1,2:</strong>\nDer Banken-Standard. Tilgung und Zins sind komfortabel gedeckt, es gibt einen ausreichenden Puffer. Bei DSCR ab 1,5 spricht man von „sehr solide" — hier verhandeln Banken auch bessere Konditionen, weil das Risiko niedrig ist.\n\n<strong>Bei Tilgungsaussetzung mit Bausparvertrag:</strong> Die Bausparrate wird in der DSCR mitgerechnet. Sie ist wirtschaftlich nichts anderes als Tilgung, nur an einen anderen Vertrag gerichtet. Würde sie nicht mitgerechnet, wäre der DSCR künstlich hoch und du würdest die Anschlussfinanzierungs-Lücke nicht sehen.'
-        },
-        {
-          h: 'LTV — Beleihungsauslauf (DealPilot-Bewertungsskala)',
-          body: 'Der LTV (Loan to Value, Beleihungsauslauf) zeigt das Verhältnis zwischen Darlehenssumme und Marktwert (oder Kaufpreis) der Immobilie. Er ist die wichtigste Risiko-Kennzahl aus Sicht der Bank, weil er angibt, wie viel Sicherheitsabstand zwischen Schulden und Immobilienwert liegt.\n\nDer Beleihungswert ist standardmäßig der Kaufpreis. Liegt ein Verkehrswertgutachten vor, wird der Verkehrswert verwendet. Wenn die Bank höher bewertet als der Kaufpreis, kann auch die Bankbewertung als Anker dienen.\n\nDealPilot verwendet eine eigene, an der deutschen Kapitalanleger-Praxis orientierte Bewertungsskala:\n\n<strong>🟢 SOLIDE — LTV unter 85 %:</strong>\nMarktüblicher und bankenseitig meist gut darstellbarer Finanzierungsbereich für Kapitalanleger in Deutschland. Bietet in der Regel eine solide Sicherheitsreserve und gute Finanzierungskonditionen. Ein LTV zwischen 80 % und 85 % gilt ausdrücklich <strong>nicht als „hoch"</strong>, sondern als übliche Investmentfinanzierung. In diesem Bereich finden die meisten Kapitalanleger ihre Standard-Finanzierung — die Bank verlangt keine Aufschläge, prüft aber natürlich Bonität und Cashflow-Tragfähigkeit.\n\n<strong>🟡 ERHÖHT — LTV zwischen 85 % und 100 %:</strong>\nErhöhte Fremdkapitalquote mit geringerer Sicherheitsreserve. Die Finanzierung reagiert sensibler auf Marktveränderungen, Zinsanstiege oder Leerstand. Banken prüfen solche Finanzierungen häufig strenger und Konditionen können sich verschlechtern — typischerweise mit Zinsaufschlägen von 0,2 bis 0,5 Prozentpunkten oder zusätzlichen Tilgungsanforderungen. Bei einem LTV nahe 100 % wird oft eine zweite Sicherheit (zweite Immobilie, Lebensversicherung) verlangt.\n\n<strong>🔴 KRITISCH — LTV über 100 %:</strong>\nSehr hohe bzw. vollständige Fremdfinanzierung mit erhöhter finanzieller Belastung und geringer Absicherung. Bereits kleinere Marktwertverluste oder unerwartete Kosten können die Finanzierung deutlich belasten. Anschlussfinanzierungen und Nachbewertungen können problematisch werden — wenn der Marktwert in zehn Jahren niedriger liegt als erwartet, kann die Bank Nachbesicherung verlangen oder die Anschlussfinanzierung verweigern.\n\n<strong>Hinweis zur DealPilot-Skala:</strong> Diese Schwellen orientieren sich an der Praxis deutscher Privatbanken und Sparkassen für Kapitalanlage-Finanzierungen. Sie sind bewusst etwas großzügiger als typische US-amerikanische Skalen, die oft schon ab 80 % von „erhöht" sprechen — weil im deutschen Markt 80–85 % LTV bei guter Bonität die übliche Finanzierungsstruktur ist.'
-        },
-        {
-          h: 'Cashflow — was am Monatsende übrig bleibt',
-          body: 'Der monatliche Cashflow ist das, was nach Abzug aller laufenden Kosten von der Miete übrig bleibt. Es ist die Zahl, die du wirklich auf dem Konto siehst — nicht die theoretische Rendite.\n\nDealPilot rechnet den Cashflow in mehreren Stufen:\n\n<strong>Bruttomiete</strong> (Kaltmiete + umlagefähige Bewirtschaftungs-Erstattung)\n<strong>− Bewirtschaftung umlagefähig</strong> (durchlaufender Posten)\n= Kaltmiete\n<strong>− Bewirtschaftung nicht-umlagefähig</strong> (Hausgeld-Anteil, eigene Rücklage)\n= Net Operating Income (NOI)\n<strong>− Zinsen</strong>\n= CF nach Zinsen, vor Tilgung\n<strong>− Tilgung</strong>\n= CF vor Steuern\n<strong>± Steuern</strong>\n= CF nach Steuern (was wirklich übrig bleibt)\n\n<strong>Wichtig:</strong> In der Frühphase ist der CF nach Steuern oft kleiner als der CF vor Steuern — weil die Steuererstattung aus den V+V-Verlusten den positiven Cashflow ergänzt. Mit zunehmender Tilgung sinkt die AfA-Bedeutung, der zu versteuernde Gewinn steigt, und die Steuerlast verschiebt sich.\n\n<strong>Faustregeln:</strong>\n• Negativer CF nach Steuern: kritisch — du musst monatlich zuschießen\n• 0–50 €/Monat: knapp, kleiner Reparaturfall kippt die Rechnung\n• 50–150 €/Monat: solide für eine Standard-Wohnung\n• Über 150 €/Monat: stark — zeigt entweder gute Lage, hohen Eigenkapital-Einsatz oder geringe Finanzierung'
-        },
-        {
-          h: 'Equity Multiple — Hebelwirkung deines Kapitals',
-          body: 'Der Equity Multiple zeigt, wie oft sich dein eingesetztes Eigenkapital nach dem Betrachtungszeitraum (typisch 10 Jahre) zurückgespielt hat. Er ist die Antwort auf die Frage: <strong>Was habe ich aus dem Geld gemacht, das ich reingesteckt habe?</strong>\n\nEin Equity Multiple von 2,0x bedeutet: Aus jedem Euro Eigenkapital sind 2 Euro Vermögen geworden — Eigenkapital + Gewinn. Bei 3,0x sind es 3 Euro, bei 4,0x sind es 4 Euro.\n\n<strong>Spezialfall Vollfinanzierung:</strong> Bei einem Eigenkapital von 0 € (oder sehr geringem Eigenkapital) ist der Equity Multiple mathematisch unendlich groß — DealPilot zeigt dann das Symbol ∞ oder „Multiple". Das ist kein Fehler, sondern Ausdruck davon, dass aus „nichts" etwas geworden ist. In dem Fall sind andere Kennzahlen (Vermögenszuwachs absolut, Cashflow) aussagekräftiger.\n\n<strong>Typische Werte über 10 Jahre:</strong>\n• Unter 1,5x — schwach, das Kapital hätte man besser anders investiert\n• 1,5–2,5x — solide, vergleichbar mit konservativen ETF-Renditen\n• 2,5–4,0x — stark, durch Hebel-Effekt der Finanzierung\n• Über 4,0x — sehr stark, oft mit niedrigem EK-Einsatz oder besonders gutem Markt-Timing'
-        },
-        {
-          h: 'Wertpuffer — Sicherheitsreserve gegen Marktwertverlust',
-          body: 'Der Wertpuffer ist die Differenz zwischen dem ermittelten Marktwert (Verkehrswert oder Bankbewertung) und deinem Kaufpreis. Er ist ein Maß dafür, <strong>wie viel die Immobilie wert verlieren könnte, bevor du in eine kritische Lage gerätst</strong>.\n\nWenn ein Verkehrswertgutachten 250.000 € ergibt und du die Immobilie für 220.000 € kaufst, hast du einen sofortigen Wertpuffer von 30.000 €. Das bedeutet: Selbst wenn der Markt um etwa 12 % einbricht, deckt der Verkehrswert deine Schulden noch.\n\n<strong>Warum das wichtig ist:</strong>\n• Bei Anschlussfinanzierungen schaut die Bank auf den aktuellen Marktwert. Ein Wertpuffer wirkt wie ein Polster.\n• Bei einem Notverkauf entscheidet der Marktwert über deinen Erlös — der Wertpuffer ist deine Sicherheitsmarge.\n• Bei der Finanzierungsstruktur entscheidet er über den effektiven LTV — manche Banken finanzieren bis 100 % vom Kaufpreis, aber nur bis 80 % vom Verkehrswert.\n\n<strong>Daumenregel:</strong> Ein Wertpuffer von mindestens 10 % gilt als angemessen, ab 15 % als komfortabel.'
-        },
-        {
-          h: 'Faktor — die einfache Marktorientierung',
-          body: 'Der Faktor ist eine in der deutschen Immobilienbranche sehr verbreitete Kennzahl, oft auch „Multiplikator" oder „Vervielfältiger" genannt. Er gibt an, wie oft die jährliche Kaltmiete im Kaufpreis enthalten ist.\n\nEin Faktor von 20 bedeutet: Der Kaufpreis entspricht 20 Jahresmieten. Anders gesagt: Du brauchst 20 Jahre Vollvermietung (ohne Kosten), um den Kaufpreis zurückzuverdienen.\n\n<strong>Der Faktor ist das Spiegelbild der Bruttomietrendite:</strong> Faktor 20 entspricht etwa 5 % Bruttomietrendite, Faktor 25 etwa 4 %, Faktor 30 etwa 3,3 %, Faktor 40 etwa 2,5 %.\n\n<strong>Typische Faktoren in Deutschland:</strong>\n• A-Lagen: 30–40 (München teils >40)\n• B-/C-Lagen: 15–22\n• D-Lagen, schwierige Märkte: 12–18\n\n<strong>Wofür Makler und Investoren ihn nutzen:</strong> Schnelle Einordnung beim Inserat-Sichten — „Ist der Faktor angemessen für die Lage?" Wenn ein Objekt in einer B-Stadt für Faktor 28 angeboten wird, lohnt sich der Vergleich mit ähnlichen Objekten genauer.'
-        },
-        {
-          h: 'EK-Rendite — was dein Eigenkapital wirklich erwirtschaftet',
-          body: 'Die Eigenkapital-Rendite (EK-Rendite p.a.) zeigt die jährliche Rendite, die dein <strong>eingesetztes Eigenkapital</strong> über den Betrachtungszeitraum (typisch 10 Jahre) erwirtschaftet. Sie ist die ehrlichste Antwort auf die Frage: <em>„Was bringt mir das Investment, gemessen am Geld, das ich tatsächlich aus eigener Tasche eingebracht habe?"</em>\n\nDie EK-Rendite berücksichtigt:\n• Alle laufenden Cashflows nach Steuern\n• Die Tilgung (Vermögensaufbau durch den Mieter)\n• Die Wertsteigerung der Immobilie\n• Den Steuervorteil aus V+V-Verlusten\n\nGerade bei Immobilien-Investments mit Hebel kann die EK-Rendite deutlich höher liegen als die reine Mietrendite — weil ein Teil der Wertsteigerung und Tilgung auf Eigenkapital wirkt, das nur einen Bruchteil des Gesamtwerts darstellt.\n\n<strong>Spezialfall Vollfinanzierung:</strong> Wie der Equity Multiple wird auch die EK-Rendite bei null oder sehr geringem Eigenkapital sehr hoch oder mathematisch unendlich. In diesen Fällen sind absolute Cashflows und Vermögenszuwachs aussagekräftiger.\n\n<strong>Typische Werte über 10 Jahre (deutsche Wohnimmobilien):</strong>\n• Unter 4 % — schwach\n• 4–8 % — solide\n• 8–15 % — attraktiv\n• Über 15 % — starker Hebel-Effekt, meist niedriger EK-Einsatz'
-        },
-        {
-          h: 'Zinsrisiko — was die Anschlussfinanzierung kostet',
-          body: 'Das Zinsrisiko ist die Differenz zwischen deiner heutigen monatlichen Rate und der hochgerechneten Rate nach Ablauf der Zinsbindung. Es zeigt dir, <strong>wie stark die monatliche Belastung steigen würde</strong>, wenn die Anschlussfinanzierung zu höheren Zinsen abgeschlossen werden müsste.\n\nDealPilot rechnet standardmäßig mit einem konservativen Anschlusszins-Szenario (typisch 5,0 %), das einen Puffer über dem aktuellen Marktniveau enthält. Das Zinsrisiko zeigt also: <em>„Wenn die Zinsen sich am oberen Ende einpendeln, wie viel mehr zahle ich dann pro Monat?"</em>\n\n<strong>Beispiel:</strong> Heute 750 €/Monat bei 3,5 % Zins, in 10 Jahren bei 5 % Anschlusszins 883 €/Monat → Zinsrisiko = 133 €/Monat. Das ist die Größenordnung, die du für deine Liquiditätsplanung kalkulieren solltest.\n\n<strong>Wie du das Zinsrisiko reduzieren kannst:</strong>\n• <strong>Längere Zinsbindung</strong> (15 oder 20 Jahre) — schiebt das Risiko nach hinten\n• <strong>Höhere Tilgung</strong> — reduziert die Restschuld bei Bindungsende und damit den absoluten Anstieg\n• <strong>Sondertilgungen</strong> — gleicher Effekt, flexibler\n• <strong>Forward-Darlehen</strong> — du sicherst dir die Anschlusskonditionen 3–5 Jahre vorher fest\n\nDas Zinsrisiko ist eines der unterschätztesten Themen bei Kapitalanlage-Immobilien. Eine Finanzierung kann heute solide aussehen und in 10 Jahren bei +2 Prozentpunkten Anschlusszins kippen.'
-        },
-        {
-          h: 'AfA — Abschreibung als Steuer-Hebel',
-          body: 'Die Absetzung für Abnutzung (AfA) ist die steuerlich anerkannte Wertminderung des Gebäudes über seine Nutzungsdauer. Sie reduziert dein zu versteuerndes Einkommen aus Vermietung und Verpachtung — ohne dass dafür Geld fließt. Sie ist also ein <strong>buchhalterischer Verlust</strong>, der echte Steuerersparnis erzeugt.\n\n<strong>So funktioniert es in der Praxis:</strong>\nDu kaufst ein Objekt für 200.000 € (Kaufpreis). Davon entfallen typischerweise 80 % auf das Gebäude, 20 % auf den Grund und Boden (der nicht abgeschrieben werden kann). Bei Standard-AfA von 2 % p.a. auf den Gebäudeanteil schreibst du jährlich 3.200 € steuerlich ab — Jahr für Jahr, über 50 Jahre Nutzungsdauer.\n\n<strong>Wichtig:</strong> Die AfA ist <em>kein</em> Cashflow. Du bekommst keine 3.200 € überwiesen. Aber dein zu versteuerndes Einkommen aus Vermietung sinkt um diesen Betrag. Bei einem persönlichen Grenzsteuersatz von 42 % entspricht das einer Steuerersparnis von etwa 1.344 € pro Jahr.\n\n<strong>AfA-Sätze:</strong>\n• Bestandsgebäude ab Baujahr 1925: 2 % p.a. (50 Jahre Nutzungsdauer)\n• Bestandsgebäude vor 1925: 2,5 % p.a. (40 Jahre)\n• Neubau ab 2023: 3 % p.a. (33 Jahre) — gilt für Wohngebäude mit Bauantrag/Kaufdatum ab 1.1.2023\n\nDie AfA ist der Hauptgrund, warum Immobilieninvestments in den ersten Jahren steuerlich oft Verluste produzieren — und warum du in der Steuererklärung einen Cashflow-Vorteil daraus ziehst.'
-        },
-        {
-          h: 'DealScore (0–100) — die Gesamtbewertung',
-          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (ausgewogen, konservativ, optimistisch, lageorientiert, cashflowstark, sicherheitsorientiert), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
-        }
-      ]
-    },
-    {
-      id: 'finanzierung',
-      title: 'Finanzierung',
-      icon: 'i-coins',
-      desc: 'Darlehen, Tilgung und Bausparen',
-      sections: [
-        {
-          h: 'Annuitätendarlehen (Standard)',
-          body: 'Klassische Finanzierung: monatlich konstante Rate aus Zins und Tilgung. Mit der Zeit verschiebt sich das Verhältnis — der Tilgungsanteil wird größer, der Zinsanteil kleiner. Standard-Eingaben: anfängliche Tilgung 1–3 %, Zinsbindung 10–15 Jahre.'
-        },
-        {
-          h: 'Tilgungsaussetzung mit Bausparvertrag',
-          body: 'Bei diesem Konstrukt zahlst du in der Sparphase nur Zinsen aufs Hauptdarlehen plus eine Sparrate in den Bausparvertrag. Wenn die Mindestsparquote erreicht ist (typ. 40–50 %), wird der Vertrag <strong>zuteilungsreif</strong>: Sparguthaben + Bauspardarlehen lösen die Restschuld ab. Danach läuft das Bauspardarlehen mit fester Tilgung weiter.\n\n<strong>Wichtig:</strong> Wenn die Zuteilung erst nach Bindungsende kommt, ist eine Anschlussfinanzierung nötig. Das siehst du in der Card unten als gelben Hinweis.'
-        },
-        {
-          h: 'Anschlussfinanzierung',
-          body: 'DealPilot rechnet automatisch eine Anschlussphase mit dem in den Annahmen hinterlegten Anschlusszinssatz (Standard 5,0 %, konservativer Puffer über aktuellem Niveau).\n\nDie Anschlussrate erscheint in „Finanzierung", das Zinsänderungsrisiko (Differenz Heute vs. Anschluss) im Tab „Kennzahlen".'
-        }
-      ]
-    },
-    {
-      id: 'steuer',
-      title: 'Steuer-Modul',
-      icon: 'i-receipt',
-      desc: 'Steuer, AfA und Werbungskosten',
-      sections: [
-        {
-          h: 'Persönlicher Grenzsteuersatz',
-          body: 'Wird im Tab „Steuer" aus deinem zu versteuernden Einkommen (zvE) per Tarif 2026 berechnet. Der Grenzsteuersatz ist die Steuerrate auf den letzten Euro deines Einkommens — der zählt für die Steuerersparnis aus Werbungskosten.\n\n<strong>Faustregel:</strong> 30–35 % für mittleres Einkommen, 42 % ab ~67.000 € zvE (Spitzensteuer), 45 % ab 277.000 € (Reichensteuer).'
-        },
-        {
-          h: 'Abschreibung (AfA)',
-          body: 'Steuerlich absetzbare Wertminderung des Gebäudes. Standard: 2 % p.a. auf den Gebäudeanteil (=80 % des Kaufpreises), für Bestandsgebäude ab Baujahr 1925 (§ 7 EStG). Neubau ab 2023: 3 % p.a.\n\nDie AfA reduziert das zu versteuernde Einkommen aus Vermietung — sie ist <strong>buchhalterisch</strong>, kein Cashflow.'
-        },
-        {
-          h: 'Finanzamt-PDF (Werbungskosten und Anlage V)',
-          body: 'Der Knopf heißt „Finanzamt-PDF“ und sitzt im Reiter Steuer (Karte „Steuerformular pro Jahr“) und in der Deal-Aktion unter „Dokumente & Exporte“. Das PDF listet die abzugsfähigen Kosten des gewählten Steuerjahres — Zinsen, AfA, Bewirtschaftung. Mit dem Haken „Anlage V“ hängt es eine zweite Seite nach den Zeilen der amtlichen Anlage V an.'
-        },
-        {
-          h: 'Disclaimer',
-          body: 'DealPilot ist nach § 6 StBerG keine Steuerberatung. Die Berechnungen sind Hilfsmittel — die finale Beurteilung gehört in die Hände eines Steuerberaters.'
-        }
-      ]
-    },
-    {
-      id: 'pdf',
-      title: 'PDF-Export',
-      icon: 'i-file-text',
-      desc: 'Bank-taugliche PDF-Reports',
-      sections: [
-        {
-          h: 'PDF-Export (Aktionen → PDF Export)',
-          body: 'Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über 10 Jahre, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Für beste Qualität öffne den Tab „Kennzahlen" einmal kurz vor dem Export — dann sind alle Charts gerendert.'
-        },
-        {
-          h: 'Bank-Präsentations-PDF (Tab Kennzahlen)',
-          body: 'Im Tab „Kennzahlen" gibt es einen separaten Button „Bank-Präsentation als PDF". Dieser erzeugt eine fokussierte 5-Seiten-PDF im Querformat mit nur den Bank-relevanten Charts (Equity-Build, Cockpit DSCR/LTV, Waterfall, Stress-Test) — ideal als Anhang für Finanzierungsgespräche.'
-        },
-        {
-          h: 'Free-Plan-Wasserzeichen',
-          body: 'Im Free-Plan trägt jedes PDF ein „DealPilot Free"-Wasserzeichen. Im Investor-, Pro- oder Business-Plan ist das weg. Das Wasserzeichen ist halbtransparent und überlagert die Inhalte sichtbar — wie eine Demo-Markierung.'
-        }
-      ]
-    },
-    {
-      id: 'charts',
-      title: 'Charts & Visualisierungen',
-      icon: 'i-trending-up',
-      desc: 'Portfolio-Auswertung und Charts',
-      sections: [
-        {
-          h: 'Equity-Build (Vermögensaufbau)',
-          body: 'Zwei Linien: <strong>grün</strong> = Marktwert über die Jahre, <strong>rot</strong> = Restschuld. Die Fläche dazwischen ist dein Eigenkapital im Objekt. Eine wachsende Fläche bedeutet: dein Vermögen steigt entweder durch Wertsteigerung (grüne Linie nach oben) oder Tilgung (rote Linie nach unten).'
-        },
-        {
-          h: 'Bank-Cockpit (DSCR & LTV)',
-          body: 'Zeigt die zwei Bank-Hauptkennzahlen über den Betrachtungszeitraum: DSCR (Schuldendeckung) sollte ≥ 1,2 sein, LTV (Beleihung) sollte sinken. Die Track-Bars unter den Headline-Werten zeigen, wo du dich auf der Gesund/Krit-Skala befindest.'
-        },
-        {
-          h: 'Waterfall (Vermögenszuwachs)',
-          body: 'Zerlegt deinen Gesamtgewinn in 5 Quellen:\n• Tilgung + ggf. Bauspar-Guthaben (Schuldenabbau)\n• Cashflow vor Steuern (kumulierter Mietüberschuss)\n• Steuervorteil oder -last\n• Wertsteigerung (Marktwert minus Anker)\n• Gesamt = der gold-farbene End-Bar\n\nDer Multiple unten zeigt: Aus EK X werden EK+Gewinn Y.'
-        },
-        {
-          h: 'Stress-Test',
-          body: '5×5-Matrix: Zinsänderung (−2 bis +5 pp) gegen Mietänderung (−20 % bis +20 %). Jede Zelle zeigt den DSCR im Szenario. Grün ≥ 1,2, Gold 1,0–1,2, Rot &lt; 1,0. Die Mitte (±0/±0) ist dein Base-Case.\n\nResilienz-Check: Wenn auch bei „−10 % Miete UND +1 pp Zins" der DSCR ≥ 1,0 bleibt, bist du Bank-tauglich.'
-        }
-      ]
-    },
-    {
-      id: 'ki',
-      title: 'Pilot-Analyse',
-      icon: 'i-cpu',
-      desc: 'KI-gestützte Bewertung',
-      sections: [
-        {
-          h: 'Was macht die KI?',
-          body: 'Sie bekommt deine Objektdaten + Berechnungen + DealScore-Werte und liefert eine strukturierte Analyse: Gesamtbewertung, Stärken, Risiken, Risikoanalyse, Szenarien, Investor-Fit, Empfehlung (Kaufen/Prüfen/Nicht kaufen), Verhandlungsempfehlung mit konkretem Ziel-Kaufpreis, Bank-Argumente und DealPilot-Insight.\n\n<strong>Wichtig:</strong> Die KI recherchiert auch Makro-/Mikrolage und Mietspiegel-Daten zu deiner Stadt — das macht die Analyse ortsspezifisch.'
-        },
-        {
-          h: 'Wie oft kann ich die KI nutzen?',
-          body: 'Die Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent. Auf das Kontingent zählen die Marktberichte — wie viele noch frei sind, steht im Reiter Objekt direkt an jeder Stufe („N frei“). Fragen an den Piloten (F1 oder ?) haben ein eigenes Tageslimit je Plan.'
-        },
-        {
-          h: 'Persistenz',
-          body: 'Die Pilot-Analyse wird ab V63.69 automatisch beim Objekt gespeichert. Beim erneuten Öffnen siehst du die Analyse direkt — du musst sie nicht neu berechnen lassen. Wenn du frische Daten/Marktanalyse willst, klicke „Analyse erneut starten".'
-        }
-      ]
-    },
-    /* v727-help-avm: Marktbewertung-Felder */
-    {
-      id: 'marktbewertung_felder',
-      title: 'Marktbewertung — welche Felder zählen',
-      icon: 'i-bar',
-      desc: 'Objektangaben für die Marktbewertung',
-      sections: [
-        {
-          h: 'Warum mehr Angaben = bessere Bewertung',
-          body: 'Je vollständiger ein Objekt erfasst ist, desto genauer die Marktbewertung. Beispiel aus der Praxis: Nur mit Adresse + Wohnfläche ergab eine Bewertung 212.000 € mit hoher Unsicherheit — mit vollständigen Angaben (Zustand, Ausstattung, Baujahr, Grundstück) 251.000 € mit deutlich höherer Treffsicherheit. Es lohnt sich, die Felder im Tab „Objekt“ möglichst komplett auszufüllen.'
-        },
-        {
-          h: 'Woraus die Marktbewertung entsteht',
-          body: 'Der DealPilot-Marktbericht arbeitet in acht Etappen: Standort ermitteln, Vergleichspreise, Vergleichsmieten, Mikrolage, Makrolage, Strukturdaten (Zensus), Bodenrichtwert, Bewertung und Bericht. Makrolage und Zensus kommen aus DealPilots eigener Datenbank und werden regelmäßig aktualisiert. Zurück kommen Marktwert mit Spanne, Marktmiete und die Lage-Einschätzung — als Marktpreisindikation, ausdrücklich kein Gutachten nach § 194 BauGB.'
-        },
-        {
-          h: 'Stufe 1, 2 und 3',
-          body: '<strong>Einfach · Stufe 1</strong> — Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr.\n<strong>Mittel · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Ausstattung (ab Investor).\n<strong>Ausgiebig · Stufe 3</strong> — Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert (ab Pro).\n\nFehlt für eine Stufe eine Angabe, sagt DealPilot welche — der Bericht rechnet nie halb. Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.'
-        },
-        {
-          h: 'Woher die amtlichen Zahlen kommen',
-          body: 'In Stufe 3 rechnet DealPilot mit dem Liegenschaftszinssatz und dem Sachwertfaktor des zuständigen Gutachterausschusses. Jede Zahl trägt ihre Herkunft — Ausschuss, Jahrgang, Lizenz, Stichtag — und steht im Quellennachweis des Berichts. Liegt für eine Region kein amtlicher Wert vor, nennt der Bericht den zuständigen Ausschuss und den Weg zur Quelle, statt eine Zahl zu erfinden. Ein Nachbarkreis oder ein Landesmittel wird nie eingesetzt.'
-        },
-        {
-          h: 'Tipp: Pflichtfelder zuerst',
-          body: 'Pflicht für jede Bewertung sind PLZ, Ort, Objektart und Wohnfläche. Alles darüber hinaus ist optional, verbessert aber die Genauigkeit. Die kleinen Info-Symbole an den Feldern erklären, wofür jede Angabe relevant ist.'
-        }
-      ]
-    },
-    {
-      id: 'faq',
-      title: 'Häufige Fragen',
-      icon: 'i-question',
-      desc: 'FAQ',
-      sections: [
         {
           h: 'Warum ist die DSCR im Chart anders als auf der Kennzahlen-Karte?',
-          body: 'Beide nutzen NOI / Kapitaldienst. Bei Tilgungsaussetzung mit Bausparvertrag wird die Sparrate als wirtschaftlicher Tilgungsersatz mitgerechnet — sonst wäre der DSCR künstlich überhöht (Zinsen-only-Vergleich). Seit V63.68 sind beide Stellen konsistent.'
+          body: 'Beide nutzen NOI / Kapitaldienst. Bei Tilgungsaussetzung mit Bausparvertrag wird die Sparrate als wirtschaftlicher Tilgungsersatz mitgerechnet — sonst wäre der DSCR künstlich überhöht (Zinsen-only-Vergleich). Beide Stellen rechnen gleich.'
         },
         {
           h: 'Was ist der „Wert-Anker" in der Wertsteigerung?',
@@ -633,15 +577,51 @@
         },
         {
           h: 'Wie wird die Anschlussfinanzierung simuliert?',
-          body: 'DealPilot nimmt die Restschuld am Ende der Zinsbindung und rechnet damit weiter — mit dem in den Annahmen hinterlegten Anschlusszins (Standard 5,0 %) und der Anschluss-Tilgung (Standard 1,0 %). Die Differenz zur aktuellen Rate ist dein Zinsänderungsrisiko pro Monat.'
+          body: 'Mit Haken bei „Eigene Anschlussfinanzierung“ (Reiter Finanzierung) rechnet DealPilot die Restschuld am Ende der Zinsbindung mit deinem Anschlusszins (vorbelegt 5,0 %) und deiner Anschluss-Tilgung (vorbelegt 1,0 %) weiter. Ohne Haken läuft das Darlehen zu den heutigen Konditionen weiter.\n\nDas Zinsänderungsrisiko ist die Mehrbelastung pro Monat aus dem Zinsunterschied auf die Restschuld — das rechnet DealPilot immer.'
         },
         {
           h: 'Was bedeutet „Anteil eigene Tasche"?',
-          body: 'Summe aller monatlichen Cashflows nach Steuern, die negativ waren — also wo die Mieten und der Steuervorteil zusammen nicht reichten und du nachschießen musstest. Im Vermögenszuwachs wird dieser Betrag von der Brutto-Tilgung abgezogen, weil das Geld ja nicht von „außen" kam.'
+          body: 'Der Betrag, um den die Summe aller Cashflows nach Steuern über den ganzen Zeitraum negativ ist — höchstens bis zur Höhe der Tilgung. So viel hast du unterm Strich nachgeschossen. Im Vermögenszuwachs wird er von der Tilgung abgezogen, weil das Geld nicht von „außen" kam.'
+        },
+        {
+          h: 'Warum steht über der Pilot-Analyse „neu abrufen“?',
+          body: 'Jede Pilot-Analyse merkt sich, wann sie erstellt wurde und mit welchen Zahlen. Oben im Reiter Pilot-Analyse steht deshalb der <strong>Stand</strong>:\n\n• „die Zahlen haben sich seitdem nicht geändert“ — die Analyse passt noch.\n• „seitdem hat sich … geändert“ — DealPilot nennt die Felder, z. B. Kaufpreis, Nettokaltmiete, Sollzins, Eigenkapital, Zustand oder Hausgeld. Die Texte können überholt sein.\n• „Diese Analyse gehört zu einem anderen Objekt“ — bitte neu abrufen, bevor du dich darauf stützt.\n\nÄltere Analysen ohne Datum sagen das ausdrücklich, statt Aktualität zu behaupten. Beim nächsten Abruf bekommen sie einen Stand.'
+        },
+        {
+          h: 'Wo finde ich meine Marktberichte?',
+          body: 'Jeder Bericht hängt an seinem Objekt.\n\n• <strong>Reiter Objekt, Feld Verkehrswert:</strong> Hier steht der letzte Bericht mit Datum und Wert. Gibt es mehrere, wählst du im Aufklappfeld — je Bericht Ertragswert, Sachwert und Marktwert einzeln — und übernimmst ihn mit „als Verkehrswert übernehmen“.\n• <strong>Reiter Pilot-Analyse:</strong> Ab zwei Berichten erscheint der Reiter „Marktbericht-Verlauf“ mit der Entwicklung des Werts.\n\n<strong>Während der Bericht entsteht:</strong> Ein Fenster zeigt acht Etappen. Mit „Im Hintergrund weiter“ arbeitest du weiter; unten zeigt eine Pille „Marktbericht in Arbeit“, danach „Marktbericht fertig — öffnen“. Schließt du die Seite, rechnet der Server trotzdem zu Ende.'
+        },
+        {
+          h: 'Warum kann ich Stufe 3 nicht abrufen?',
+          body: 'Im Reiter Objekt, Box „Marktbericht abrufen“, gibt es zwei Gründe:\n\n• <strong>Es fehlen Angaben.</strong> Der Knopf heißt dann „was fehlt“. Ein Klick zeigt „Für Stufe 3 fehlt noch:“ — jeder Eintrag springt zum Feld. Stufe 3 braucht zusätzlich zu Stufe 1 und 2 u. a. Nutzungsart, Grundstücksfläche, Bodenrichtwert und Bruttogrundfläche, bei einer ETW den Miteigentumsanteil, bei EFH, ZFH, DHH und RH die Hausform (NHK), Geschosse und Dachausbildung. Der Bericht rechnet nie halb.\n• <strong>Kein Kontingent mehr.</strong> Steht dort „0 frei“, ist der Knopf gesperrt. Die Wertermittlung ist ab Pro im Monatskontingent enthalten.\n\nFelder mit dem Schild „optional“ verfeinern nur — ohne sie gelten die Ansätze der Anlage 3 ImmoWertV.'
+        },
+        {
+          h: 'Mein Kontingent ist aufgebraucht — was jetzt?',
+          body: 'Das Kontingent zählt die drei Marktbericht-Stufen getrennt: Marktpreisindikation, Erweiterte Marktpreisindikation und Wertermittlung nach ImmoWertV. Deinen Stand siehst du unter <strong>Einstellungen → Plan</strong> (in bezahlten Plänen „Dein Kontingent“) und je Stufe als „frei“ in der Box „Marktbericht abrufen“.\n\n<strong>So geht\'s weiter:</strong>\n1. Warten: Das Monatskontingent wird zum Monatsanfang neu gesetzt. Nicht Verbrauchtes verfällt am Monatsende.\n2. Nachkaufen: Unter Einstellungen → Plan stehen „Bewertungspakete“ und „Oder einzeln — genau die eine, die gerade fehlt“. Zugekauftes verfällt nie und wird erst verbraucht, wenn dein Monatskontingent leer ist.\n\nNachkaufen geht in jedem bezahlten Plan; im Free-Plan ist dafür ein Upgrade nötig.'
+        },
+        {
+          h: 'Das Inserat nennt keine Straße — kann ich trotzdem bewerten?',
+          body: 'Ja. Viele Inserate veröffentlichen nur PLZ und Ort. Dann nimmt DealPilot den <strong>Ortskern</strong>: der Marktpreis kommt aus Vergleichsangeboten im Umkreis des Ortsmittelpunkts, der Bodenrichtwert aus der Zone am Ortskern. Das ist eine Einschätzung für den Ort, keine Messung am Haus — Mikrolage und Bodenrichtwert können am echten Standort abweichen.\n\nIm Quick-Check gilt die Straße dann als erfüllt, und am Feld steht der Hinweis. Trägst du die Straße später nach, rechnet alles für die echte Lage neu.'
+        },
+        {
+          h: 'Warum steht beim Liegenschaftszins „gesetzlicher Auffangwert“?',
+          body: 'DealPilot sucht den Liegenschaftszinssatz in fester Reihenfolge: <strong>amtlich, kreisscharf</strong> (zuständiger Gutachterausschuss) → <strong>amtlich, regional</strong> (Landesebene) → <strong>aus eigener Marktableitung</strong> → <strong>gesetzlicher Auffangwert n. § 256 BewG</strong>. Liegt für deinen Ort kein amtlicher Wert vor, rechnet der Ertragswert mit dem Auffangwert — als <em>indikativ</em> gekennzeichnet, nicht marktabgeleitet.\n\nDarunter nennt der Bericht den zuständigen Ausschuss mit Link zur Quelle, oft auch, warum dort kein verwertbarer Wert steht und ob der Bericht kostenpflichtig ist.\n\n<strong>Eigenen Wert setzen:</strong> In der Wertermittlung „▸ Werte selbst setzen“ aufklappen und „Liegenschaftszinssatz (%)“ eintragen. Er gilt dann als „eigene Angabe“.'
+        },
+        {
+          h: 'Wie lege ich einen Steuerzeitraum an?',
+          body: 'Ein Steuerzeitraum hält dein zu versteuerndes Einkommen (zvE) für eine Zeitspanne fest — etwa vor und nach einer Lohnerhöhung.\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Steuer auf „📅 Steuerzeiträume verwalten →“ klicken. Es öffnet sich Einstellungen → Mandanten, dein privater Halter.\n2. Unter „Neuen Zeitraum hinzufügen“: „Gültig von“, „Gültig bis (leer = laufend)“, „zvE / Jahr (€)“, „Grund“ und „Notiz (optional)“ ausfüllen.\n3. „Hinzufügen“ klicken.\n\nÜberschneidet sich der Zeitraum mit einem bestehenden, fragt DealPilot nach. Je Objekt wird der passende Zeitraum über den „Wirtsch. Übergang“ zugeordnet — ein zvE, das du selbst ins Objekt geschrieben hast, bleibt stehen. Ändern mit „Bearb.“, löschen mit „×“.'
+        },
+        {
+          h: 'Kann ich die Steuerwerte aus dem Vorjahr übernehmen?',
+          body: 'Ja. Im Reiter <strong>Steuer</strong>, Detail-Ansicht, steht neben dem Veranlagungsjahr der Knopf <strong>„⧉ Werte aus [Vorjahr] übernehmen“</strong>. Er kopiert nur deine eigenen Werte für <strong>wiederkehrende</strong> Posten — Hausverwaltung, Nebenkosten, Kontoführung, Steuerberater, Fahrten und Ähnliches — und nur in Felder, die im Jahr noch leer sind.\n\nNie kopiert werden Schuldzinsen, AfA, Erhaltungsaufwand, anschaffungsnahe Kosten, Notar, Vermittlung und andere Einmal-Posten — die sind jedes Jahr anders.'
+        },
+        {
+          h: 'Warum ist der Ankauf-Stand nicht eingefroren?',
+          body: 'Der Ankauf-Stand (das Soll) wird nur festgeschrieben, wenn zwei Dinge zusammenkommen:\n• der Status im Reiter Deal-Aktion steht auf <strong>Gewonnen</strong>, und\n• im Reiter Objekt ist <strong>Wirtsch. Übergang</strong> (Nutzen-/Lastenwechsel) eingetragen.\n\nOhne dieses Datum passiert nichts — ein eingefrorener Stand mit falschem Datum sähe richtig aus und wäre es nicht. Beim Festschreiben-Versuch ohne Datum meldet DealPilot: „Erst den Nutzen-/Lastenwechsel im Reiter Objekt eintragen.“\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Objekt das Datum bei „Wirtsch. Übergang“ setzen.\n2. In Deal-Aktion auf <strong>Gewonnen</strong> stellen — DealPilot schreibt den Stand dann automatisch fest und meldet es mit Datum.\n3. Hattest du „später“ geklickt, steht dort die Frage „Ankauf-Stand festschreiben?“ mit dem Knopf <strong>Festschreiben</strong>.\n\nGeht ein Objekt zurück auf Offen oder Verloren, ruht der Stand nur — er wird nicht gelöscht und ist beim erneuten Gewinnen wieder da.'
         },
         {
           h: 'Werden meine Daten weitergegeben?',
-          body: 'Nein. DealPilot speichert deine Objekte ausschließlich auf einem deutschen Server (Hetzner). Die Pilot-Analyse läuft über einen Server-Proxy mit minimal nötiger Datenmenge — keine Adressen, keine Personennamen. Stripe verarbeitet nur Zahlungsdaten, sieht keine Objektdaten.'
+          body: 'Deine Objekte liegen auf unseren Servern in Deutschland. Für die KI-Funktionen — Pilot-Analyse, Pilot-Fragen, Diktat, Exposé- und Beleg-Einlesen — gehen die dafür nötigen Objektdaten an OpenAI in den USA: auch die Adresse, der Halter-Name und Fotos oder Dokumente, die du einliest. Deine Login-Daten (Name, E-Mail) gehen nicht dorthin. Stripe sieht nur Zahlungsdaten, keine Objektdaten. Einzelheiten stehen in der Datenschutzerklärung.'
         }
       ]
     },
@@ -654,46 +634,6 @@
         {
           h: 'AfA (Absetzung für Abnutzung)',
           body: 'Steuerliche Wertminderung des Gebäudes pro Jahr. Standard 2 % auf 80 % des Kaufpreises (Gebäudeanteil).'
-        },
-        {
-          h: 'BWK (Bewirtschaftungskosten)',
-          body: 'Laufende Kosten der Immobilie. Aufgeteilt in <strong>umlagefähig</strong> (auf Mieter abwälzbar — Heizung, Wasser, Müll) und <strong>nicht-umlagefähig</strong> (Hausgeld-Verwaltungsanteil, eigene Rücklage, Mietausfall-Kalkulation).'
-        },
-        {
-          h: 'BSV (Bausparvertrag)',
-          body: 'Spar- und Darlehensvertrag mit der Bausparkasse. In der Sparphase zahlst du eine Rate ein, bei Erreichen der Mindestsparquote wird der Vertrag zuteilungsreif → Sparguthaben + Bauspardarlehen lösen das Hauptdarlehen ab.'
-        },
-        {
-          h: 'EZB (Ende Zinsbindung)',
-          body: 'Datum, an dem die Zinsbindung des Hauptdarlehens ausläuft. Danach beginnt die Anschlussfinanzierung — neuer Zinssatz, neue Konditionen.'
-        },
-        {
-          h: 'GI (Gesamtinvestition)',
-          body: 'Kaufpreis + Kaufnebenkosten (Notar, Grunderwerbsteuer, Makler) + Sanierung + Möblierung. Das ist der echte Geldbetrag, den du brauchst.'
-        },
-        {
-          h: 'KNK (Kaufnebenkosten)',
-          body: 'In NRW typisch: 6,5 % GrESt + 2,2 % Notar + 0–3,57 % Makler ≈ 9–12 % vom Kaufpreis.'
-        },
-        {
-          h: 'NKM (Nettokaltmiete)',
-          body: 'Kaltmiete ohne jegliche Nebenkosten. Basis für Renditerechnungen.'
-        },
-        {
-          h: 'NOI (Net Operating Income)',
-          body: 'Kaltmiete minus nicht-umlagefähige Bewirtschaftung. Der „operative Rohgewinn" vor Finanzierung und Steuern.'
-        },
-        {
-          h: 'NMR (Nettomietrendite)',
-          body: 'NOI / Gesamtinvestition × 100. Realistischere Rendite als die BMR.'
-        },
-        {
-          h: 'Verkehrswert (§ 194 BauGB)',
-          body: 'Marktwert der Immobilie nach Sachverständigem-Gutachten. Höher als Kaufpreis = Wertpuffer / „Schnäppchen-Bonus".'
-        },
-        {
-          h: 'ZE (Zusatz-Erträge)',
-          body: 'Erträge außer Kaltmiete: Stellplätze, Werbeflächen, Antennen-Vermietung etc. Werden zu NKM addiert.'
         },
         {
           h: 'Annuitätendarlehen',
@@ -709,11 +649,19 @@
         },
         {
           h: 'BMR (Bruttomietrendite)',
-          body: 'Jahres-Kaltmiete / Kaufpreis × 100. <strong>Unbereinigte Rendite</strong> — gut für schnellen Vergleich, aber nicht aussagekräftig für tatsächlichen Ertrag.\n\nTypische Werte (Deutschland): A-Lagen 2,5–3,5 %, B-/C-Lagen 5–7 %, D-Lagen 7–9 %. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Jahres-Kaltmiete / Kaufpreis × 100. <strong>Unbereinigte Rendite</strong> — gut für schnellen Vergleich, aber nicht aussagekräftig für tatsächlichen Ertrag.\n\nTypische Werte (Deutschland): A-Lagen 2,5–3,5 %, B-/C-Lagen 5–7 %, D-Lagen 7–9 %. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
+        },
+        {
+          h: 'BSV (Bausparvertrag)',
+          body: 'Spar- und Darlehensvertrag mit der Bausparkasse. In der Sparphase zahlst du eine Rate ein, bei Erreichen der Mindestsparquote wird der Vertrag zuteilungsreif → Sparguthaben + Bauspardarlehen lösen das Hauptdarlehen ab.'
+        },
+        {
+          h: 'BWK (Bewirtschaftungskosten)',
+          body: 'Laufende Kosten der Immobilie. Aufgeteilt in <strong>umlagefähig</strong> (auf Mieter abwälzbar — Heizung, Wasser, Müll) und <strong>nicht-umlagefähig</strong> (Hausgeld-Verwaltungsanteil, eigene Rücklage, Mietausfall-Kalkulation).'
         },
         {
           h: 'Cashflow',
-          body: 'Was nach Abzug aller laufenden Kosten von der Miete übrig bleibt — pro Monat. Stufen: Bruttomiete → Kaltmiete → NOI → CF nach Zinsen → CF vor Steuern → CF nach Steuern.\n\n<strong>Faustregeln:</strong> Negativ = kritisch (zuzuschießen), 0–50 €/M = knapp, 50–150 €/M = solide, über 150 €/M = stark. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Was nach Abzug aller laufenden Kosten von der Miete übrig bleibt — pro Monat. Stufen: Bruttomiete → Kaltmiete → NOI → CF nach Zinsen → CF vor Steuern → CF nach Steuern.\n\n<strong>Faustregeln:</strong> Negativ = kritisch (zuzuschießen), 0–50 €/M = knapp, 50–150 €/M = solide, über 150 €/M = stark. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'DealScore (0–100)',
@@ -721,7 +669,7 @@
         },
         {
           h: 'DSCR (Debt Service Coverage Ratio)',
-          body: 'Wichtigste Bank-Kennzahl: Verhältnis von operativem Ertrag zu Kapitaldienst (Zins + Tilgung + BSV-Rate). Antwortet die Frage: „Reicht die Miete um Zins und Tilgung zu bezahlen?"\n\n<strong>Skala:</strong> 🟢 ≥ 1,2 solide · 🟡 1,0–1,2 knapp · 🔴 < 1,0 du musst zuzahlen. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Wichtigste Bank-Kennzahl: Verhältnis von operativem Ertrag zu Kapitaldienst (Zins + Tilgung + BSV-Rate). Antwortet die Frage: „Reicht die Miete um Zins und Tilgung zu bezahlen?"\n\n<strong>Skala:</strong> 🟢 ≥ 1,2 solide · 🟡 1,0–1,2 knapp · 🔴 < 1,0 du musst zuzahlen. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'EK-Rendite (p.a.)',
@@ -732,12 +680,20 @@
           body: 'Wie oft sich dein Eigenkapital nach 10 Jahren zurückgespielt hat. EM 2,0x = aus 1 € EK sind 2 € geworden (EK + Gewinn).\n\n<strong>Skala:</strong> < 1,5x schwach, 1,5–2,5x solide, 2,5–4,0x stark, > 4,0x sehr stark.'
         },
         {
+          h: 'EZB (Ende Zinsbindung)',
+          body: 'Datum, an dem die Zinsbindung des Hauptdarlehens ausläuft. Danach beginnt die Anschlussfinanzierung — neuer Zinssatz, neue Konditionen.'
+        },
+        {
           h: 'Faktor (Vervielfältiger)',
           body: 'Kaufpreis / Jahres-Kaltmiete. Spiegelbild der BMR.\n\n<strong>Faktor 20 = ca. 5 % BMR, Faktor 25 = 4 %, Faktor 30 = 3,3 %.</strong>\n\nIn Deutschland: A-Lagen 30–40, B-/C-Lagen 15–22, D-Lagen 12–18.'
         },
         {
+          h: 'GI (Gesamtinvestition)',
+          body: 'Kaufpreis + Kaufnebenkosten (Notar, Grunderwerbsteuer, Makler) + Sanierung + Möblierung. Das ist der echte Geldbetrag, den du brauchst.'
+        },
+        {
           h: 'GrESt (Grunderwerbsteuer)',
-          body: 'Bundeslandsabhängige Steuer beim Immobilienkauf. <strong>Sätze 2025:</strong>\n\n• Bayern, Sachsen: 3,5 %\n• Hamburg: 4,5 %\n• Berlin, Hessen, Niedersachsen, Bremen, Rheinland-Pfalz: 5,0 %\n• Mecklenburg-Vorpommern, Saarland, Schleswig-Holstein: 6,5 %\n• NRW, Brandenburg, Thüringen: 6,5 %\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
+          body: 'Vom Bundesland abhängige Steuer beim Immobilienkauf. DealPilot belegt den Satz über die PLZ vor (Stand 05/2026):\n\n• Bayern: 3,5 %\n• Baden-Württemberg, Bremen, Niedersachsen, Rheinland-Pfalz, Sachsen-Anhalt: 5,0 %\n• Hamburg, Sachsen: 5,5 %\n• Berlin, Hessen, Mecklenburg-Vorpommern: 6,0 %\n• Brandenburg, NRW, Saarland, Schleswig-Holstein, Thüringen: 6,5 %\n\nDie Sätze ändern sich gelegentlich — prüf vor dem Kauf den aktuellen Satz deines Landes.\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
         },
         {
           h: 'Hausgeld',
@@ -752,12 +708,28 @@
           body: 'Interner Zinsfuß. Komplexe Kennzahl die berechnet welche jährliche Rendite das Investment <strong>insgesamt</strong> erwirtschaftet, wenn alle Cashflows über die Haltedauer einbezogen werden — inklusive Schlussverkauf.\n\n<strong>Vorteil:</strong> Erlaubt fair Vergleich von Immobilie mit anderen Investments (ETF, Aktien, etc).\n\n<strong>Daumenregel:</strong> Über 8 % p.a. ist bei Wohnimmobilien sehr gut. Unter 4 % p.a. eher schwach — da könnten Tagesgeld + ETF mehr bringen ohne den Aufwand.'
         },
         {
+          h: 'KNK (Kaufnebenkosten)',
+          body: 'In NRW typisch: 6,5 % GrESt + 2,2 % Notar + 0–3,57 % Makler ≈ 9–12 % vom Kaufpreis.'
+        },
+        {
           h: 'LTV (Loan-to-Value, Beleihungsauslauf)',
-          body: 'Verhältnis von Restschuld zu Immobilienwert. Wichtigste Risikokennzahl der Bank.\n\n<strong>DealPilot-Skala (D-Markt):</strong>\n• 🟢 < 85 % SOLIDE\n• 🟡 85–100 % ERHÖHT\n• 🔴 > 100 % KRITISCH\n\nAusführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Verhältnis von Restschuld zu Immobilienwert. Wichtigste Risikokennzahl der Bank.\n\n<strong>DealPilot-Skala (D-Markt):</strong>\n• 🟢 < 85 % SOLIDE\n• 🟡 85–100 % ERHÖHT\n• 🔴 > 100 % KRITISCH\n\nAusführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
         },
         {
           h: 'Mietausfallwagnis',
-          body: 'Kalkulatorischer Puffer für unvorhergesehenen Mietausfall: Leerstand bei Mieterwechsel, säumige Zahler, Mietminderungen. <strong>Standard-Ansatz: 2 % der Jahres-Kaltmiete.</strong>\n\nBei einer Wohnung mit 800 € Kaltmiete (= 9.600 €/Jahr) wären das 192 €/Jahr Puffer. Das entspricht etwa <strong>3 Wochen Leerstand</strong> pro Jahr.\n\nIn ländlichen Gegenden oder bei einkommensschwachen Mietern manchmal höher (3–5 %).'
+          body: 'Kalkulatorischer Puffer für unvorhergesehenen Mietausfall: Leerstand bei Mieterwechsel, säumige Zahler, Mietminderungen. <strong>In DealPilot vorbelegt: 1 % der Nettokaltmiete</strong> (Einstellungen → Standardwerte). In der Wertermittlung nach ImmoWertV gilt der Ansatz der Anlage 3.\n\nBei 800 € Kaltmiete (= 9.600 €/Jahr) sind 1 % rund 96 €/Jahr Puffer — etwa dreieinhalb Tage Leerstand.\n\nIn ländlichen Gegenden oder bei einkommensschwachen Mietern manchmal höher (3–5 %).'
+        },
+        {
+          h: 'NKM (Nettokaltmiete)',
+          body: 'Kaltmiete ohne jegliche Nebenkosten. Basis für Renditerechnungen.'
+        },
+        {
+          h: 'NMR (Nettomietrendite)',
+          body: 'NOI / Gesamtinvestition × 100. Realistischere Rendite als die BMR.'
+        },
+        {
+          h: 'NOI (Net Operating Income)',
+          body: 'Kaltmiete minus nicht-umlagefähige Bewirtschaftung. Der „operative Rohgewinn" vor Finanzierung und Steuern.'
         },
         {
           h: 'Restschuld',
@@ -765,7 +737,7 @@
         },
         {
           h: 'Sonder-AfA § 7b EStG (Neubau-Förderung)',
-          body: 'Zusätzliche AfA für förderfähige Neubauten ab 2023. <strong>5 % p.a. über 4 Jahre</strong> = 20 % zusätzlicher Abschreibungs-Effekt OBEN drauf zur regulären 3 %-Neubau-AfA.\n\n<strong>Voraussetzungen (kumulativ):</strong>\n• Wohngebäude (keine Gewerbe-Einheiten)\n• Bauantrag/Bauanzeige zwischen 1.1.2023 und 30.9.2029\n• Effizienzhaus 40 mit Nachhaltigkeits-Klasse (QNG-Siegel)\n• Anschaffungs-/Herstellungskosten ≤ 5.200 €/m² (Wfl-Cap, DealPilot-Default 4.000 €/m²)\n• Erwerb im Jahr der Fertigstellung oder davor\n\n<strong>Steuerwirkung:</strong> Auf 30 Jahre gerechnet einer der stärksten Steuer-Hebel im Immobilienmarkt. Bei einem Neubau für 300k EUR mit Sonder-AfA = ca. 60k EUR steuerliche Werbungskosten zusätzlich verteilt auf 4 Jahre.'
+          body: 'Zusätzliche AfA für förderfähige Neubauten ab 2023. <strong>5 % p.a. über 4 Jahre</strong> = 20 % zusätzlicher Abschreibungs-Effekt OBEN drauf zur regulären 3 %-Neubau-AfA.\n\n<strong>Voraussetzungen (kumulativ):</strong>\n• Wohngebäude (keine Gewerbe-Einheiten)\n• Bauantrag/Bauanzeige zwischen 1.1.2023 und 30.9.2029\n• Effizienzhaus 40 mit Nachhaltigkeits-Klasse (QNG-Siegel)\n• Anschaffungs-/Herstellungskosten höchstens 5.200 €/m² Wohnfläche; abgeschrieben werden höchstens 4.000 €/m²\n• Erwerb im Jahr der Fertigstellung oder davor\n\n<strong>Steuerwirkung:</strong> Auf 30 Jahre gerechnet einer der stärksten Steuer-Hebel im Immobilienmarkt. Bei einem Neubau für 300k EUR mit Sonder-AfA = ca. 60k EUR steuerliche Werbungskosten zusätzlich verteilt auf 4 Jahre.'
         },
         {
           h: 'Tilgung-vom-Mieter',
@@ -773,7 +745,11 @@
         },
         {
           h: 'Tilgungssatz',
-          body: 'Anfänglicher Tilgungsanteil als Prozentsatz der Darlehenssumme p.a. Standard in Deutschland 2025: <strong>2–3 % p.a.</strong>\n\n<strong>Höhere Tilgung = schnellere Schuldenfreiheit, aber höhere monatliche Rate.</strong>\n\nBeispiel 200.000 € Darlehen, 3,5 % Zins:\n• 1 % Tilgung: 750 €/M, schuldenfrei nach ca. 50 Jahren\n• 2 % Tilgung: 917 €/M, schuldenfrei nach ca. 30 Jahren\n• 3 % Tilgung: 1.083 €/M, schuldenfrei nach ca. 22 Jahren\n\nFaustregel: bei Kapitalanlage 2 % als Default, bei Eigennutzung 3 % oder mehr.'
+          body: 'Anfänglicher Tilgungsanteil als Prozentsatz der Darlehenssumme p.a. Standard in Deutschland 2025: <strong>2–3 % p.a.</strong>\n\n<strong>Höhere Tilgung = schnellere Schuldenfreiheit, aber höhere monatliche Rate.</strong>\n\nBeispiel 200.000 € Darlehen, 3,5 % Zins:\n• 1 % Tilgung: 750 €/M, schuldenfrei nach ca. 43 Jahren\n• 2 % Tilgung: 917 €/M, schuldenfrei nach ca. 30 Jahren\n• 3 % Tilgung: 1.083 €/M, schuldenfrei nach ca. 22 Jahren\n\nIn DealPilot ist 1,5 % vorbelegt; du änderst das unter Einstellungen → Standardwerte. Bei Eigennutzung sind 3 % oder mehr üblich.'
+        },
+        {
+          h: 'Verkehrswert (§ 194 BauGB)',
+          body: 'Marktwert der Immobilie nach Sachverständigem-Gutachten. Höher als Kaufpreis = Wertpuffer / „Schnäppchen-Bonus".'
         },
         {
           h: 'Wertgutachten / Verkehrswertgutachten',
@@ -781,13 +757,16 @@
         },
         {
           h: 'Wertpuffer',
-          body: 'Differenz zwischen Verkehrswert/Bankbewertung und Kaufpreis. Sicherheitsreserve gegen Marktwertverlust.\n\n<strong>Daumenregel:</strong> ≥ 10 % angemessen, ≥ 15 % komfortabel. Ausführliche Erklärung im Tab „Kennzahlen".'
+          body: 'Differenz zwischen Verkehrswert/Bankbewertung und Kaufpreis. Sicherheitsreserve gegen Marktwertverlust.\n\n<strong>Daumenregel:</strong> ≥ 10 % angemessen, ≥ 15 % komfortabel. Ausführliche Erklärung im Hilfethema „Kennzahlen verstehen“.'
+        },
+        {
+          h: 'ZE (Zusatz-Erträge)',
+          body: 'Erträge außer Kaltmiete: Stellplätze, Werbeflächen, Antennen-Vermietung etc. Werden zu NKM addiert.'
         },
         {
           h: 'Zinsrisiko',
           body: 'Differenz zwischen heutiger Rate und hochgerechneter Rate nach Ablauf der Zinsbindung — bei einem konservativen Anschlusszins-Szenario (DealPilot-Default 5,0 %).\n\n<strong>Reduzieren:</strong> Längere Zinsbindung (15–20 Jahre), höhere Tilgung, Sondertilgungen, Forward-Darlehen.'
         }
-
       ]
     }
   ];
@@ -816,7 +795,7 @@
           '</div>' +
           '<div class="help-modal-search" style="position:relative">' + /* v838b-search-icon */
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.55;pointer-events:none" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>' +
-            '<input type="text" id="help-search-input" placeholder="Suchen — DSCR, Tilgung, Steuer, Bausparen…" autocomplete="off" style="padding-left:36px">' +
+            '<input type="text" id="help-search-input" placeholder="Suchen oder den Piloten fragen — Enter fragt" autocomplete="off" style="padding-left:36px">' +
           '</div>' +
           '<div class="settings-tabs ms-tabs help-sidebar-list" id="help-sidebar"></div>' +
         '</aside>' +
@@ -827,15 +806,9 @@
           '<div class="pane-wrap help-content-wrap">' +
             '<main class="help-content" id="help-content"></main>' +
           '</div>' +
-          '<div class="help-modal-foot help-ai-foot">' +            '<div class="help-ai-bar" id="help-ai-bar">' +
-              '<input type="text" id="help-ai-input" placeholder="✦ Frag den DealPilot-Assistenten — z.B. ‚Wann lohnt sich Tilgungsaussetzung?‘">' +
-              '<label class="help-ai-web-toggle" title="Aktuelle Marktdaten aus dem Web einbeziehen (etwas langsamer)">' +
-              '<input type="checkbox" id="help-ai-web"> <span>Web</span>' +
-              '</label>' + /* v790-help-webtoggle */
-              '<button class="help-ai-btn" type="button" id="help-ai-btn" onclick="helpAskAI()">Fragen</button>' +
-            '</div>' +
-            '<div class="help-ai-response" id="help-ai-response"></div>' +
-          '</div>' +
+          /* v2200 · N63.2 · Marcel: „Frage den DealPilot-Agent, Webfenster und Fragen - das können
+             wir rausnehmen … wenn, dann über den Piloten.“ Fragen stellt man oben im Suchfeld
+             (Enter / „Den Piloten fragen“); die Antwort erscheint dort. */
         '</div>' +
       '</div>';
     document.body.appendChild(modal);
@@ -875,9 +848,7 @@
     document.getElementById('help-search-input').addEventListener('input', _onSearch);
     /* v2189: Enter im Suchfeld fragt den Piloten - die Antwort steht oben */
     document.getElementById('help-search-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); helpKiOben(); } });
-    document.getElementById('help-ai-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') helpAskAI();
-    });
+    /* v2200: das Fuss-Eingabefeld gibt es nicht mehr */
 
     // Close bei ESC oder Click auf Backdrop
     /* v793i-no-outside-close: Klick-aussen-schliesst KOMPLETT entfernt. Modal schliesst nur
@@ -909,7 +880,10 @@
     return '<p>' + safe + '</p>';
   }
 
+  /* v2200 · zusammengelegte Themen: alte Namen (Links, Pilot-Treffer) landen im neuen */
+  var _ALIAS = { einstieg: 'ablaeufe', steuer: 'steuer_tief', faq_mehr: 'faq' };
   function _selectTopic(id) {
+    if (_ALIAS[id]) id = _ALIAS[id];
     var topic = HELP_TOPICS.find(function(t) { return t.id === id; });
     if (!topic) return;
     document.querySelectorAll('.help-sidebar-item').forEach(function(b) {
@@ -1002,7 +976,7 @@
   function _atlasBannerHtml() {
     if (!document.getElementById('help-atlas-style')) {
       var st = document.createElement('style'); st.id = 'help-atlas-style';
-      st.textContent = '.hab{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px;overflow:hidden;position:relative}'
+      st.textContent = '.hab{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:16px;align-items:center;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px;overflow:hidden;position:relative}'
         + '.hab svg{width:100%;max-width:360px;height:auto;display:block}'
         + '.hab .t{font:600 16px "Space Grotesk",sans-serif;color:#fdfcfa;margin-top:8px}.hab .s{font-size:12.5px;color:#b9ad8f;margin-top:2px}'
         + '.hab .kn{display:flex;flex-direction:column;gap:8px}'
@@ -1012,7 +986,9 @@
         + '.hab rect{fill:#1f1b16;stroke:var(--wl-c9a84c, #C9A84C);stroke-width:1.2}.hab text{fill:#efe7d4;font:600 10px Inter,sans-serif}'
         + '.hab .fl{fill:var(--wl-e8cc7a, #E8CC7A)}'
         + '@keyframes hab-f{to{stroke-dashoffset:-10}}'
-        + '@media (max-width:640px){.hab{grid-template-columns:1fr}}';
+        + '.hab .fig{width:58px;cursor:pointer;background:none;border:0;padding:0;align-self:end}.hab .fig svg{width:58px;max-width:none}'
+        + '.hab .fig:hover svg .arm-r{transform:rotate(130deg)}'
+        + '@media (max-width:640px){.hab{grid-template-columns:auto minmax(0,1fr)}.hab>div:first-child{grid-column:1 / -1}.hab .fig{width:48px}.hab .fig svg{width:48px}}';
       document.head.appendChild(st);
     }
     var pfad = 'M88 30 C110 30 112 30 136 30 M224 30 C246 30 248 30 272 30';
@@ -1026,6 +1002,8 @@
       + '</svg>'
       + '<div class="t">Prozess-Atlas — alle Abläufe als Netzplan</div>'
       + '<div class="s">Klick eine Station: Schritte klappen auf, Daten fliegen ein. Grün: wo dein Objekt gerade steht.</div></div>'
+      /* v2200 · N63.1 · Marcel: der Pilot „neben Atlas öffnen in dem schwarzen Fenster, neben den Buttons“ */
+      + (window.DealPilotFigur ? (DealPilotFigur.css(), '<span class="fig" role="button" tabindex="0" title="Pilot rufen (F1)" onclick="hideHelp(); window.DealPilotPilot && DealPilotPilot.rufen()">' + DealPilotFigur.svg({ koffer: true }) + '</span>') : '')
       + '<div class="kn"><button type="button" onclick="window.DealPilotAtlas && DealPilotAtlas.oeffne()">✈ Atlas öffnen</button>'
       + '<button type="button" class="z" onclick="hideHelp(); window.DealPilotPilot && DealPilotPilot.rufen()">Pilot rufen · F1</button></div></div>';
   }
@@ -1043,8 +1021,10 @@
       '</div>' +
       '<p class="help-topic-desc">' + _escHtml(topic.desc) + '</p>' +
     '</div>';
+    /* v2188: Prozess-Atlas und Pilot oben im Thema „Abläufe & Pilot“ (v2200: vor der Tour) */
+    if (topic.id === 'ablaeufe') { html += _atlasBannerHtml(); }
     // BlockA3: Tour-Banner OBEN im Einstieg-Topic — direkter innerHTML, kein Filter
-    if (topic.id === 'einstieg') {
+    if (topic.id === 'ablaeufe') {   /* v2200: Einstieg ist in „Abläufe“ aufgegangen */
       html +=
         '<div class="dp-tour-banner">' +
           '<div class="dp-tour-banner-icon">' +
@@ -1065,8 +1045,6 @@
           '</button>' +
         '</div>';
     }
-    /* v2188: Prozess-Atlas und Pilot oben im Thema „Abläufe & Pilot“ */
-    if (topic.id === 'ablaeufe') { html += _atlasBannerHtml(); }
     /* v789-kpi-viz: Visuals oben im Kennzahlen-Topic */
     if (topic.id === 'kennzahlen') { html += _kpiVizHtml(); }
     topic.sections.forEach(function(s) {
@@ -1327,13 +1305,9 @@
     var m = document.getElementById('help-modal');
     if (m) {
       m.classList.add('help-modal-open');
-      // Letztes Thema wiederherstellen
-      var lastId = null;
-      try { lastId = localStorage.getItem('dp_help_last_topic'); } catch(e) {}
-      if (lastId) {
-        var t = HELP_TOPICS.find(function(x) { return x.id === lastId; });
-        if (t) _selectTopic(lastId);
-      }
+      /* v2200 · N63.1 · Marcel: „wenn wir die Hilfe öffnen, dann auch direkt die
+         Abläufe und Pilot anzeigen“ - immer der Einstieg, nicht das letzte Thema. */
+      _selectTopic('ablaeufe');
       // Such-Feld fokussieren
       setTimeout(function() {
         var inp = document.getElementById('help-search-input');

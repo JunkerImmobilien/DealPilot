@@ -313,7 +313,12 @@
         return '<button type="button" style="flex:1 1 140px;min-width:0" class="dp-tt-mode-btn' + (o.id === a ? ' active' : '') + '" data-pilot-ort="' + o.id + '" onclick="DealPilotPilot.setOrt(\'' + o.id + '\')">'
           + esc(o.t) + (o.id === 'seite' ? ' · Standard' : '') + '<span class="dp-tt-mode-btn-label">' + esc(o.d) + '</span></button>';
       }).join('') + '</div>'
-      + '<p class="hint" style="margin-top:8px;color:var(--muted)">Auf dem Handy sitzt er immer als runder Knopf unten links. Die Wahl gilt für dieses Gerät.</p>';
+      + '<p class="hint" style="margin-top:8px;color:var(--muted)">Auf dem Handy sitzt er immer als runder Knopf unten links. Die Wahl gilt für dieses Gerät.</p>'
+      /* v2204 · N63.7: der Rückweg zu „Nicht mehr anzeigen“ in der geführten Eingabe */
+      + '<label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;cursor:pointer;font-size:13px;line-height:1.4">'
+      + '<input type="checkbox" style="margin-top:2px" ' + (window.DpHinweise && DpHinweise.aus('erklaer') ? '' : 'checked ')
+      + 'onchange="window.DpHinweise && DpHinweise.setze(\'erklaer\', !this.checked)">'
+      + '<span><b>Geführte Eingabe: „Erklär mir das“ anbieten</b><br><span class="hint" style="color:var(--muted)">Der Knopf unter jeder Frage. Ausgeschaltet kannst du trotzdem jederzeit „Erklär mir das“ sagen oder tippen. Gilt für dein Konto, auf allen Geräten.</span></span></label>';
   }
   function figur(k, an) { if (window.DealPilotFigur && pilot) DealPilotFigur.zustand(pilot, k, an); }
   function zeigeArm(rect) { var w = pilot && pilot.querySelector('.pf-wrap'); if (w && window.DealPilotFigur) DealPilotFigur.zeigeAuf(w, rect); }

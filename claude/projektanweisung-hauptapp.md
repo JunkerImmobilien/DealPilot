@@ -38714,6 +38714,53 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod (14) v2199–v2199c · und N63 auf Staging: v2200–v2205 (13.10.2026)
+
+- **Prod (14)** `284d7c48`:
+  - Gesichert: `main-20261013-1831` (11 MB, 71) und `mb-20261013-1831` (25 MB, 32, die zwei aus 018).
+  - Backend neu gebaut, `parseAddr("32602, Vlotho")` im Container richtig.
+  - Prod liefert `qc-bridge.js?v=v2199c`.
+- **N63.1 Hilfe-Navigation (v2200):**
+  - Doppelte Gold-Markierung. Ursache: `reseller-portal.js` und `mandant-freigaben.js` klonten „das erste `.st-tab` der Seite" in die Einstellungen. Bei offener Hilfe war das der erste Hilfe-Eintrag, und die Hilfe-Leiste trägt selbst `.settings-tabs`. Jetzt `.settings-tabs:not(#help-sidebar)`, `help-sidebar-item-active` wird am Klon entfernt. `netzwerk-einreichung` ebenso, dort zusätzlich `.pane-wrap` ohne `.help-content-wrap`.
+  - „Einstieg" ist in „Einstieg, Abläufe & Pilot" aufgegangen, die Hilfe öffnet immer dort.
+  - Pilot-Figur mit Koffer im schwarzen Atlas-Kasten.
+  - Fuß „Frag den DealPilot-Assistenten" (Web-Schalter) entfernt.
+- **N63.2 Inhalte (v2200, v2202, v2202a):**
+  - 20 Themen werden 17: Steuer-Modul + Steuer im Detail ergeben „Steuer", die beiden Fragen-Themen ergeben eine Liste nach Arbeitsablauf. Glossar alphabetisch. Alias für alte Namen.
+  - Prüfbericht eines Lese-Agenten gegen den Code. 33 Korrekturen, darunter:
+    - Stress-Test-Farben
+    - Wasserzeichen, kein Business-Plan
+    - Anschlusszins nur mit Haken
+    - „Tab Kennzahlen"
+    - Datenschutz-Antwort nach echtem Datenfluss
+    - GrESt aus `grest-plz-lookup.js`
+    - Mietausfall 1 %, Tilgung 1,5 %
+    - Skalen NMR/Cashflow/EM wie die Kennzahlen-Bewertung
+    - Pflichtfelder Stufe 1
+    - Versionsjargon raus
+  - Fünf neue Fragen, am Code belegt.
+  - Im Code gleichgezogen: `calc.js` LTV im Bankgespräch und auf der Kachel 85/100 statt 80/90 (nur Anzeige); `settings.js` Regler „Potenzial (Wertpuffer & Mietsteigerung)".
+- **N63.3/N63.4 Handy (v2201/v2201a):** `js/modal-handy.js`, Hilfe und Einstellungen unter 769 px als Liste und dann Inhalt mit Zurück-Zeile; die doppelte Titelfläche entfällt.
+- **N63.6 (v2203/v2203a):** Bestand/Ankauf am Handy unter „Portfolio".
+  - Ursache war `order` in der Schublade (Marke −3, Portfolio −2, Aktionen −1, Schalter 0), nicht der DOM-Platz. Meine erste Erklärung (DOM) zurückgenommen.
+  - Dunkle Fassung wie v2163.
+- **N63.7 (v2204):** `js/hinweise.js` (Browser + `user_settings` „hinweise"), × und „Nicht mehr anzeigen" an „Erklär mir das", Rückweg in Einstellungen → Darstellung. Im Browser geprüft: × nur für diese Frage, „Nicht mehr anzeigen" landet auf dem Server (`{erklaer:true}`); danach zurückgesetzt.
+- **N63.9 (v2204):** Unter 769 px Halten zum Sprechen im Mikrofonkasten der geführten Eingabe. Ruhe über die Pause-Mechanik v1381. „Anhalten" und „Ich höre nichts" entfallen dort. Gemessen: Klasse `ptt`, Text „Halte gedrückt und sprich.", Halt-Knopf `display:none`. **Echtes Sprechen nicht testbar (kein Mikrofon) → Abnahme am Gerät.**
+- **N63.8 Tour (v2205):**
+  - Der Reiter Steuer fehlte, die Nummern 6–8 waren dadurch falsch. Steuer-Schritt (`s3-tax`) ergänzt, jetzt 39 Schritte.
+  - Vier veraltete Aussagen korrigiert.
+  - Darstellung geprüft nur für Schritt 1–2 bei 1280 px (Blase im Bild). Ein Volldurchlauf ist im verdeckten, gedrosselten Fenster nicht machbar → Abnahme am Gerät.
+- **N63.5 Demo:** `design/Vorschläge/standardwerte-karten-demo.html`, drei Varianten (Karten / Unter-Reiter / Set zuerst). Wartet auf Marcels Wahl.
+- **Eigene Fehler:**
+  - v2204 und v2204a zweimal ausgerollt, obwohl `buster-ebenen-pruefen` ROT meldete. Der Prüfer gibt RC 0, die `&&`-Kette lief weiter. `pilot-tower.js` steckt in drei Dokumenten. In v2204b nachgezogen, Memory `buster-rot-heisst-halt`.
+  - Den Messfehler „Tour endet nach 0" (zu kurze Wartezeit im gedrosselten Fenster) als Befund zurückgenommen.
+- **Commit:** `1a548875` `ec48f5d1` `772b6dfc` `ea5867ff` `1fc1b417` `aeb8b2ef` `9ed618f1` `e2954be5` `74822c5e` `7ceea26c`
+- **Rest:**
+  - Prod-Freigabe für v2200–v2205 (Backend wegen `userSettings` ERLAUBT).
+  - GrESt Thüringen 6,5 % im Code: nach meinem Wissen gilt seit 2024 5,0 %, zu prüfen.
+  - Demo-Wahl N63.5.
+  - Tour-Inhalte: v2205a 987c2bfc, 42 Ersetzungen nach Prüfbericht (u. a. Plan-Limits 3/15/50 -> 1/5/25, Skala 80/60/40 -> 85/70/50/35, 6 -> 5 Kategorien, Stress-Test, Logo ab Investor). Offen nur die Darstellung am Gerät.
+
 ### v2199–v2199c · ImmoMetrica im Quick-Boarding, Freigeben-Knopf (13.10.2026, Staging)
 
 - **Was (Marcels Befunde):**

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Standardwerte · Demo</title>
+<!-- v2205 · N63.5 · Demo, nicht in der App. Marcel 13.10.2026: „Standardwerte … unübersichtlich.
+     Kann man da nicht mit so Standardkarten arbeiten? … einen Reiter mit den Lageklassen, einen mit
+     den Standardwerten, eine kurze Erklärung … dass man auch ein Standardset nehmen kann.
+     Kannst du gerne mehrere Demos fertig machen, wie das im Modal aussehen könnte."
+     Werte = die heutigen Vorbelegungen auf Staging (gemessen 13.10.2026). Die Sets „Vorsichtig“
+     und „Renditeorientiert“ sind BEISPIELE — welche Werte ein Set trägt, entscheidet Marcel. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--ob:#050505;--gold:#C9A84C;--gh:#E8CC7A;--gd:#b8932f;--creme:#FDFCFA;--karte:#FBF6E9;--ink:#1a1714;--mut:#625c59;--rand:#e6e1d6;--gruen:#3FA56C}
+*{box-sizing:border-box}
+body{margin:0;background:#1b1a18;color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif}
+.kopf{padding:22px 16px 6px;color:#f3ead0;max-width:1400px;margin:0 auto}
+.kopf h1{font:600 24px "Space Grotesk",sans-serif;margin:0 0 4px}
+.kopf p{margin:0;color:#b9ad8f;max-width:860px}
+.wahl{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+.wahl button{border:1px solid var(--gold);background:transparent;color:var(--gh);border-radius:999px;padding:8px 14px;font:600 13px Inter;cursor:pointer}
+.wahl button.an{background:linear-gradient(110deg,var(--gh),var(--gold) 55%,var(--gd));color:#1a1407;border-color:transparent}
+.buehne{max-width:1400px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:24px;align-items:start}
+@media(max-width:1100px){.buehne{grid-template-columns:1fr}}
+.rahmen-t{font:500 11px "JetBrains Mono",monospace;color:#b9ad8f;letter-spacing:.08em;margin:0 0 6px;text-transform:uppercase}
+.modal{background:var(--creme);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.45);display:grid;grid-template-columns:220px minmax(0,1fr);min-height:640px}
+.band{grid-column:1/-1;background:var(--ob);color:#f3ead0;display:flex;align-items:center;padding:12px 16px;gap:10px}
+.band b{font:700 17px "Space Grotesk"}.band b span{color:var(--gold)}.band small{margin-left:auto;font:500 11px "JetBrains Mono";color:var(--gold);letter-spacing:.12em}
+.seite{background:#0e0d0b;padding:12px 10px;display:flex;flex-direction:column;gap:4px}
+.seite div{color:#bfb7a9;padding:9px 10px;border-radius:8px;font-size:13px}
+.seite div.an{background:rgba(233,227,214,.12);color:#fff;box-shadow:inset 3px 0 0 var(--gold)}
+.inhalt{padding:18px 22px 26px;overflow:auto;max-height:720px}
+.handy{width:390px;max-width:100%;background:var(--creme);border-radius:28px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.45);border:8px solid #000}
+.handy .band{border-radius:0}
+.handy .inhalt{padding:14px 14px 22px;max-height:760px}
+.zurueck{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--rand);font-weight:600}
+.zurueck i{font-style:normal;color:#8a6d1f;font-size:22px;line-height:1}.zurueck span{color:var(--mut);font-weight:500}.zurueck em{margin-left:auto;font-style:normal}
+h2{font:600 19px "Space Grotesk";margin:0 0 4px}
+.lead{color:var(--mut);margin:0 0 14px;font-size:13px}
+/* Sets */
+.sets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.handy .sets{grid-template-columns:1fr}
+.set{border:1px solid var(--rand);background:#fff;border-radius:12px;padding:12px;cursor:pointer;position:relative}
+.set.an{border:1.5px solid var(--gold);background:var(--karte)}
+.set.an::after{content:"✓ aktiv";position:absolute;top:10px;right:12px;font:600 11px Inter;color:#8a6d1f}
+.set b{display:block;font:600 14px "Space Grotesk"}.set p{margin:3px 0 8px;color:var(--mut);font-size:12px}
+.set ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px}
+.set li span{color:var(--mut)}
+/* Karten */
+.karten{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.karte{background:#fff;border:1px solid var(--rand);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.karte h3{margin:0;font:600 15px "Space Grotesk";display:flex;align-items:center;gap:8px}
+.karte h3 .ic{width:26px;height:26px;border-radius:7px;background:var(--karte);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.karte p{margin:0;color:var(--mut);font-size:12px}
+.werte{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px;border-top:1px dashed var(--rand);padding-top:8px}
+.werte span{color:var(--mut)}.werte b{font-weight:600;text-align:right}
+.karte button,.knopf{align-self:flex-start;border:1px solid var(--ink);background:#fff;border-radius:8px;padding:7px 12px;font:600 12px Inter;cursor:pointer}
+.geaendert{font:600 10px Inter;color:#1f7a4a;background:#e7f4ec;border-radius:999px;padding:2px 8px;margin-left:auto}
+/* Unterreiter */
+.reiter{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin:0 0 14px;scrollbar-width:none}
+.reiter button{flex:0 0 auto;border:1px solid var(--rand);background:#fff;border-radius:999px;padding:7px 12px;font:600 12.5px Inter;cursor:pointer;color:var(--ink)}
+.reiter button.an{background:var(--ob);color:#fff;border-color:var(--ob)}
+.erkl{background:var(--karte);border-left:3px solid var(--gold);border-radius:8px;padding:10px 12px;font-size:12.5px;color:#4a443b;margin:0 0 12px}
+.felder{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.handy .felder{grid-template-columns:1fr}
+.feld label{display:block;font-size:12px;font-weight:600;margin:0 0 4px}
+.feld input,.feld select{width:100%;border:1px solid var(--rand);border-radius:8px;padding:9px 10px;font:500 14px Inter;background:#fff}
+.feld small{display:block;color:var(--mut);font-size:11.5px;margin-top:3px}
+/* Lageklassen-Kacheln */
+.lagen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.lage{border:1px solid var(--rand);border-radius:12px;padding:12px;background:#fff;text-align:center}
+.lage .bu{font:700 26px "Space Grotesk";color:var(--gd)}.lage .z{font:600 18px "Space Grotesk"}.lage small{display:block;color:var(--mut);font-size:11.5px}
+/* Akkordeon */
+details{background:#fff;border:1px solid var(--rand);border-radius:12px;margin:0 0 10px}
+summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;font:600 14px "Space Grotesk"}
+summary::-webkit-details-marker{display:none}
+summary .kurz{margin-left:auto;font:500 12px Inter;color:var(--mut);text-align:right}
+summary::after{content:"›";font-size:20px;color:#8a6d1f;transition:transform .2s}
+details[open] summary::after{transform:rotate(90deg)}
+details .rein{padding:0 14px 14px}
+.var{display:none}.var.an{display:block}
+.fuss{display:flex;gap:10px;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--rand)}
+.fuss .knopf.gold{background:linear-gradient(110deg,var(--gh),var(--gold) 55%,var(--gd));border:0;color:#1a1407}
+.fuss small{color:var(--mut)}
+.notiz{max-width:1400px;margin:0 auto;padding:0 16px 30px;color:#b9ad8f;font-size:13px}
+.notiz b{color:#f3ead0}
+</style>
+</head>
+<body>
+<div class="kopf">
+  <h1>Einstellungen → Standardwerte · drei Varianten</h1>
+  <p>Heute: sieben Abschnitte untereinander, rund 3.160 px zum Scrollen. Hier drei Wege, das kürzer und verständlicher zu machen — jeweils Desktop-Fenster und Handy. Die Werte sind die heutigen Vorbelegungen. Die Sets „Vorsichtig“ und „Renditeorientiert“ sind nur Beispiele; welche Werte ein Set trägt, entscheidest du.</p>
+  <div class="wahl" id="wahl">
+    <button class="an" data-v="a">A · Karten-Übersicht</button>
+    <button data-v="b">B · Unter-Reiter</button>
+    <button data-v="c">C · Set zuerst, dann anpassen</button>
+  </div>
+</div>
+
+<div class="buehne">
+  <div>
+    <div class="rahmen-t">Desktop · Einstellungen</div>
+    <div class="modal">
+      <div class="band"><b>Deal<span>Pilot</span></b><small>EINSTELLUNGEN</small></div>
+      <div class="seite"><div>Account &amp; Sicherheit</div><div>Kontakt &amp; Logo</div><div>Co-Pilot (KI)</div><div>Deal Score</div><div class="an">Standardwerte</div><div>Darstellung</div><div>Datenraum</div><div>Mandanten</div><div>Plan</div></div>
+      <div class="inhalt" id="desk"></div>
+    </div>
+  </div>
+  <div>
+    <div class="rahmen-t">Handy · 390 px</div>
+    <div class="handy">
+      <div class="band"><b>Deal<span>Pilot</span></b><small>EINSTELLUNGEN</small></div>
+      <div class="zurueck"><i>‹</i><span>Alle Bereiche</span><em>Standardwerte</em></div>
+      <div class="inhalt" id="handy"></div>
+    </div>
+  </div>
+</div>
+<div class="notiz" id="notiz"></div>
+
+<template id="t-sets">
+  <div class="sets">
+    <div class="set an" data-set="dp"><b>DealPilot-Standard</b><p>Die heutigen Vorbelegungen.</p><ul><li><span>Tilgung</span> 1,5 %</li><li><span>Eigenkapital</span> 10 %</li><li><span>Mietausfall</span> 1 %</li><li><span>Min-DSCR</span> 1,2</li></ul></div>
+    <div class="set" data-set="vor"><b>Vorsichtig</b><p>Beispiel: mehr Puffer, strengere Grenzen.</p><ul><li><span>Tilgung</span> 2,0 %</li><li><span>Eigenkapital</span> 20 %</li><li><span>Mietausfall</span> 3 %</li><li><span>Min-DSCR</span> 1,3</li></ul></div>
+    <div class="set" data-set="ren"><b>Renditeorientiert</b><p>Beispiel: mehr Hebel, weniger Puffer.</p><ul><li><span>Tilgung</span> 1,0 %</li><li><span>Eigenkapital</span> 5 %</li><li><span>Mietausfall</span> 1 %</li><li><span>Min-DSCR</span> 1,1</li></ul></div>
+  </div>
+</template>
+
+<template id="t-a">
+  <h2>Standardwerte</h2>
+  <p class="lead">Was in jedes neue Objekt vorbelegt wird. Wähl ein Set oder pass einzelne Karten an.</p>
+  §SETS§
+  <div class="karten">
+    <div class="karte"><h3><span class="ic">🏦</span>Finanzierung</h3><p>Startwerte für Darlehen und Eigenkapital.</p><div class="werte"><span>Tilgung</span><b>1,5 %</b><span>Zinsbindung</span><b>10 Jahre</b><span>Marktzins</span><b>4,24 % live</b><span>Eigenkapital</span><b>10 % vom KP</b></div><button>Anpassen</button></div>
+    <div class="karte"><h3><span class="ic">📍</span>Lageklassen</h3><p>Zielrendite brutto je Lage — der Maßstab der Ampel.</p><div class="werte"><span>A-Lage</span><b>3,75 %</b><span>B-Lage</span><b>5,0 %</b><span>C-Lage</span><b>7,0 %</b></div><button>Anpassen</button></div>
+    <div class="karte"><h3><span class="ic">🧾</span>Bewirtschaftung</h3><p>Kostenanteile, wenn nichts Eigenes eingegeben ist.</p><div class="werte"><span>umlagefähig</span><b>17 %</b><span>nicht umlagefähig</span><b>16 %</b><span>Mietausfall</span><b>1 % NKM</b></div><button>Anpassen</button></div>
+    <div class="karte"><h3><span class="ic">🏠</span>Je Objektart <span class="geaendert">Faktor 1,6</span></h3><p>Verwaltung und Instandhaltung für ETW, EFH, MFH.</p><div class="werte"><span>ETW Instandh.</span><b>4,00 €/m²</b><span>EFH Verwaltung</span><b>230 €</b><span>MFH Instandh.</span><b>2,50 €/m²</b></div><button>Anpassen</button></div>
+    <div class="karte"><h3><span class="ic">🛡️</span>Mindest-Schwellen</h3><p>Deine persönlichen Kaufgrenzen.</p><div class="werte"><span>DSCR</span><b>1,2</b><span>Cashflow</span><b>0 €/Monat</b><span>LTV</span><b>max. 90 %</b></div><button>Anpassen</button></div>
+    <div class="karte"><h3><span class="ic">📑</span>Steuer &amp; Nebenkosten</h3><p>Grenzsteuersatz und Kaufnebenkosten.</p><div class="werte"><span>Grenzsteuersatz</span><b>40,45 %</b><span>Bundesland</span><b>NRW 6,5 %</b><span>Notar/Grundbuch</span><b>2,2 %</b><span>Makler</span><b>3,57 %</b></div><button>Anpassen</button></div>
+  </div>
+  <div class="fuss"><button class="knopf gold">Speichern</button><small>„Anpassen“ klappt die Karte auf — nur die Felder dieses Themas.</small></div>
+</template>
+
+<template id="t-b">
+  <h2>Standardwerte</h2>
+  <p class="lead">Ein Thema auf einmal. Oben das Set, darunter die Reiter.</p>
+  §SETS§
+  <div class="reiter"><button class="an">Finanzierung</button><button>Lageklassen</button><button>Bewirtschaftung</button><button>Je Objektart</button><button>Schwellen</button><button>Steuer &amp; Nebenkosten</button></div>
+  <div class="erkl"><b>Finanzierung</b> — die Startwerte, mit denen jedes neue Objekt rechnet, bis du im Reiter Finanzierung etwas Eigenes einträgst.</div>
+  <div class="felder">
+    <div class="feld"><label>Standard-Tilgung</label><input value="1,5 %"><small>anfänglich, p. a.</small></div>
+    <div class="feld"><label>Zinsbindung</label><select><option>10 Jahre</option></select></div>
+    <div class="feld"><label>Marktzinssatz</label><input value="4,24 %"><small>live, überschreibbar</small></div>
+    <div class="feld"><label>Zins-Stufe</label><select><option>Normal (LTV 60–80 %)</option></select></div>
+    <div class="feld"><label>Eigenkapital</label><input value="10 % vom Kaufpreis"></div>
+  </div>
+  <div class="fuss"><button class="knopf gold">Speichern</button><small>Bei „Lageklassen“ stehen A · B · C als drei Kacheln nebeneinander.</small></div>
+</template>
+
+<template id="t-c">
+  <h2>Standardwerte</h2>
+  <p class="lead">Schritt 1: ein Set wählen. Schritt 2: nur das anpassen, was bei dir anders ist.</p>
+  §SETS§
+  <div class="lagen" style="margin:0 0 14px">
+    <div class="lage"><div class="bu">A</div><div class="z">3,75 %</div><small>Zielrendite brutto</small></div>
+    <div class="lage"><div class="bu">B</div><div class="z">5,0 %</div><small>Zielrendite brutto</small></div>
+    <div class="lage"><div class="bu">C</div><div class="z">7,0 %</div><small>Zielrendite brutto</small></div>
+  </div>
+  <details open><summary>🏦 Finanzierung<span class="kurz">1,5 % · 10 J. · EK 10 %</span></summary><div class="rein"><div class="felder"><div class="feld"><label>Standard-Tilgung</label><input value="1,5 %"></div><div class="feld"><label>Zinsbindung</label><select><option>10 Jahre</option></select></div><div class="feld"><label>Marktzinssatz</label><input value="4,24 %"><small>live</small></div><div class="feld"><label>Eigenkapital</label><input value="10 %"></div></div></div></details>
+  <details><summary>🧾 Bewirtschaftung<span class="kurz">17 % · 16 % · Ausfall 1 %</span></summary><div class="rein">…</div></details>
+  <details><summary>🏠 Je Objektart<span class="kurz">ETW · EFH · MFH · Faktor 1,6</span></summary><div class="rein">…</div></details>
+  <details><summary>🛡️ Mindest-Schwellen<span class="kurz">DSCR 1,2 · LTV 90 %</span></summary><div class="rein">…</div></details>
+  <details><summary>📑 Steuer &amp; Nebenkosten<span class="kurz">40,45 % · NRW</span></summary><div class="rein">…</div></details>
+  <div class="fuss"><button class="knopf gold">Speichern</button><small>Zugeklappt zeigt jede Zeile ihre Werte — man sieht alles, ohne zu scrollen.</small></div>
+</template>
+
+<script>
+(function () {
+  var NOTIZ = {
+    a: '<b>A · Karten-Übersicht.</b> Alle sieben Themen auf einen Blick als Karten mit ihren Werten; „Anpassen“ öffnet nur die Felder einer Karte. Am wenigsten Scrollen, am meisten Überblick. Aufwand: mittel.',
+    b: '<b>B · Unter-Reiter.</b> Ein Thema auf einmal, mit Erklärsatz. Wie du es beschrieben hast („einen Reiter mit den Lageklassen, einen mit den Standardwerten“). Man sieht aber nicht alle Werte gleichzeitig. Aufwand: gering.',
+    c: '<b>C · Set zuerst, dann anpassen.</b> Oben die Sets und die Lageklassen als Kacheln, darunter zugeklappte Zeilen, die ihre Werte zeigen. Führt neue Nutzer am stärksten. Aufwand: mittel.'
+  };
+  var sets = document.getElementById('t-sets').innerHTML;
+  function zeige(v) {
+    var h = document.getElementById('t-' + v).innerHTML.replace('§SETS§', sets);
+    document.getElementById('desk').innerHTML = h;
+    document.getElementById('handy').innerHTML = h;
+    document.getElementById('notiz').innerHTML = NOTIZ[v];
+    document.querySelectorAll('#wahl button').forEach(function (b) { b.classList.toggle('an', b.getAttribute('data-v') === v); });
+    document.querySelectorAll('.set').forEach(function (s) {
+      s.addEventListener('click', function () {
+        var k = s.getAttribute('data-set');
+        document.querySelectorAll('.set').forEach(function (x) { x.classList.toggle('an', x.getAttribute('data-set') === k); });
+      });
+    });
+    document.querySelectorAll('.reiter button').forEach(function (b) {
+      b.addEventListener('click', function () { b.parentNode.querySelectorAll('button').forEach(function (x) { x.classList.toggle('an', x === b); }); });
+    });
+  }
+  document.querySelectorAll('#wahl button').forEach(function (b) { b.addEventListener('click', function () { zeige(b.getAttribute('data-v')); }); });
+  zeige('a');
+})();
+</script>
+</body>
+</html>
