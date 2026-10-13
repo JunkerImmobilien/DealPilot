@@ -86,12 +86,57 @@
         }
         return Promise.resolve(false);
       }
+      /* v2173 · FREIGEGEBEN HEISST: DAS SOLL WIRD GESCHRIEBEN, NICHT DAS IST.
+         Gemessen am 13.10.2026: mit gesetztem Haken lief der normale
+         Speicherweg - er schickt das FORMULAR als Objekt, und im Formular
+         steht der eingefrorene Stand. Das Ist von 2026-999 trug danach die
+         Wohnflaeche des Ankaufs (68 statt 95 m²). Der Hinweis versprach
+         „Speichern ueberschreibt den Ankauf-Stand" - geschrieben wurde der
+         laufende. */
+      if (_aktiv && _frei) return sollSpeichern();
       return echt.apply(this, arguments);
     };
     huelle._dpAnkaufSperre = true;
     huelle._dpEcht = echt;
     window.saveObj = huelle;
   })();
+
+  /* v2173 · Den freigegebenen Soll-Stand speichern: nur `_ankauf` im
+     SERVER-Stand des Objekts ersetzen. Daten, Analyse und Fotos kommen
+     vom Server zurueck, wie sie dort liegen - das Formular (Soll) wird nie
+     als Objekt geschickt. Ein Speichern ohne Aenderung schreibt nichts und
+     erzeugt keinen Nachweis-Eintrag. */
+  var _sollLaeuft = null;
+  function sollSpeichern() {
+    if (_sollLaeuft) return _sollLaeuft;
+    var A = window.DealPilotAnkauf, key = _key || window._currentObjKey;
+    if (!A || !A.vorhanden() || !key || typeof Auth === 'undefined' || !Auth.apiCall) return Promise.resolve(false);
+    var vorher = JSON.stringify(A.stand().daten || {});
+    var a;
+    try { a = A.korrigieren('daten'); } catch (e) { return Promise.resolve(false); }
+    if (JSON.stringify(a.daten || {}) === vorher) {
+      if (a.korrekturen && a.korrekturen.length) a.korrekturen.pop();   /* nichts geaendert */
+      return Promise.resolve(false);
+    }
+    _sollLaeuft = Auth.apiCall('/objects/' + key, { method: 'GET' })
+      .then(function (obj) {
+        var d = (obj && obj.data) || {};
+        d._ankauf = a;
+        return Auth.apiCall('/objects/' + key, { method: 'PUT',
+          body: { data: d, aiAnalysis: obj.ai_analysis || null, photos: obj.photos || [] } });
+      })
+      .then(function () {
+        if (typeof toast === 'function') toast('✓ Ankauf-Stand gespeichert — Korrektur mit Nachweis. Das Ist ist unverändert.');
+        return true;
+      })
+      .catch(function (e) {
+        console.warn('[v2173] Soll speichern:', e && e.message);
+        if (typeof toast === 'function') toast('⚠ Ankauf-Stand konnte nicht gespeichert werden.');
+        return false;
+      })
+      .then(function (r) { _sollLaeuft = null; return r; });
+    return _sollLaeuft;
+  }
 
   /* ── Felder wirklich sperren ──────────────────────────────────────
      v2038 - `pointer-events:none` nimmt ein Feld NICHT aus der
