@@ -38759,7 +38759,7 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod-Freigabe für v2200–v2205 (Backend wegen `userSettings` ERLAUBT).
   - GrESt Thüringen 6,5 % im Code: nach meinem Wissen gilt seit 2024 5,0 %, zu prüfen.
   - Demo-Wahl N63.5.
-  - Tour-Inhalte: Prüfbericht läuft.
+  - Tour-Inhalte: v2205a 987c2bfc, 42 Ersetzungen nach Prüfbericht (u. a. Plan-Limits 3/15/50 -> 1/5/25, Skala 80/60/40 -> 85/70/50/35, 6 -> 5 Kategorien, Stress-Test, Logo ab Investor). Offen nur die Darstellung am Gerät.
 
 ### v2199–v2199c · ImmoMetrica im Quick-Boarding, Freigeben-Knopf (13.10.2026, Staging)
 
