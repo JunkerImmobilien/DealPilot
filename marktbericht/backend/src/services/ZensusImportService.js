@@ -43,10 +43,13 @@ export const TABELLEN = [
 ];
 export const EBENEN = { GEOLK4: 'kreis', GEOGM4: 'gemeinde' };
 
-const DIMENSION = { GEBBJ5: 'baujahr', WHGFL3: 'flaeche' };
+const DIMENSION = { GEBBJ5: 'baujahr', WHGFL3: 'flaeche', WHGLE1: 'leerstandsdauer' };
 
-function kennzahlAus(label) {
+function kennzahlAus(label, einheit) {
   const l = String(label || '').toLowerCase();
+  /* 4000W-1022 liefert jeden Wert ZWEIMAL: als % und als Anzahl (gemessen).
+     Ohne die Einheit im Schluessel kollidieren sie im UPSERT. */
+  if (l.includes('leerstehende wohnungen')) return einheit === '%' ? 'leerstand_anteil_pct' : 'leerstand_anzahl';
   if (l.includes('nettokaltmiete')) return 'nettokaltmiete_qm';
   if (l.includes('marktaktive leerstandsquote')) return 'leerstandsquote_marktaktiv';
   if (l.includes('leerstandsquote')) return 'leerstandsquote';
@@ -102,7 +105,7 @@ export function parseFfcsv(text, tabelle, ebene) {
     const auspraegung = (i2Code >= 0 && s[i2Code]) ? s[i2Code] : 'INSGESAMT';
     out.push({
       ebene, ags, ars, gebiet_name: s[iName] || null, tabelle,
-      kennzahl: kennzahlAus(s[iLab]),
+      kennzahl: kennzahlAus(s[iLab], iEinh >= 0 ? s[iEinh] : ''),
       dimension: dimCode ? (DIMENSION[dimCode] || dimCode.toLowerCase()) : 'gesamt',
       auspraegung,
       auspraegung_text: (i2Text >= 0 && s[i2Text]) ? s[i2Text] : null,
@@ -129,7 +132,13 @@ async function abruf(tabelle, regionalvariable, user, pass) {
 const SPALTEN = ['ebene', 'ags', 'ars', 'gebiet_name', 'tabelle', 'kennzahl', 'dimension',
   'auspraegung', 'auspraegung_text', 'wert', 'wert_roh', 'einheit', 'lizenz', 'quelle_url'];
 
-async function schreiben(zeilen) {
+async function schreiben(alle) {
+  /* Doppelte Schluessel in EINER Lieferung sprengen den UPSERT. Sie werden
+     gezaehlt und gemeldet - nicht still verworfen (Lehre 4000W-1022). */
+  const m = new Map();
+  for (const z of alle) m.set([z.ebene, z.ags, z.tabelle, z.kennzahl, z.dimension, z.auspraegung].join('|'), z);
+  if (m.size !== alle.length) console.warn(`WARNUNG ${alle[0] && alle[0].tabelle}: ${alle.length - m.size} doppelte Schluessel`);
+  const zeilen = [...m.values()];
   const BLOCK = 800;
   for (let a = 0; a < zeilen.length; a += BLOCK) {
     const teil = zeilen.slice(a, a + BLOCK);

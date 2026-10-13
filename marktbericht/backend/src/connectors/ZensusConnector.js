@@ -124,8 +124,9 @@ async function ausDb({ kreisAgs, gemeindeAgs, baujahr, wohnflaeche }) {
     const fl = klasseFuer(zs.filter((z) => z.kennzahl === 'nettokaltmiete_qm'), 'flaeche', 'WFL', wohnflaeche);
     const lbj = klasseFuer(zs.filter((z) => z.kennzahl === 'leerstandsquote'), 'baujahr', 'BAU', baujahr);
     const lfl = klasseFuer(zs.filter((z) => z.kennzahl === 'leerstandsquote'), 'flaeche', 'WFL', wohnflaeche);
-    const dauer = zs.filter((z) => z.dimension !== 'gesamt' && z.kennzahl === 'wohnungen_anzahl')
-      .map((z) => ({ text: z.auspraegung_text || z.auspraegung, anzahl: num(z.wert) }));
+    const dauer = zs.filter((z) => z.dimension === 'leerstandsdauer' && z.kennzahl === 'leerstand_anteil_pct' && z.auspraegung !== 'INSGESAMT')
+      .sort((a, b) => String(a.auspraegung).localeCompare(String(b.auspraegung)))
+      .map((z) => ({ text: z.auspraegung_text || z.auspraegung, anteil_pct: num(z.wert) }));
     return {
       ags: zs[0].ags, name: zs[0].gebiet_name,
       leerstandsquote: ges('leerstandsquote'),
