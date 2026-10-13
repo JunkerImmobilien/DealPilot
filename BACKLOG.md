@@ -471,6 +471,8 @@ BSFZ-Siegel auf der Landing (N14, `v1873`).
 
 #### N62.10 · Tab Steuern: das Vorjahr duplizieren
 
+> **✅ v2194 (13.10.2026):** Detail-Modus, neben dem Veranlagungsjahr: „⧉ Werte aus VORJAHR übernehmen“. Kopiert nur EIGENE Werte wiederkehrender Posten (Hausverwaltung, NK umlagefähig/nicht, Umlagen, Kontoführung, Steuerberater, Telefon, Porto, Fahrten, Verpflegung, Hotel, sonstige Betriebs-/Verwaltungs-/Finanzierungskosten) und nur in leere Felder. Fest, nie kopiert: Schuldzinsen, AfA, bewegliche WG, anschaffungsnah, Erhaltungsaufwand, Notar/Grundschuld, Vermittlung, Bereitstellung, Kaltmiete, Inserat, Gericht. Abnahme: Liste der wiederkehrenden Posten mit Marcel.
+
 **Marcel:** *„bei der im Tab Steuern wäre das gut, wenn wir auch immer so
 das Vorjahr duplizieren können. Manche Sachen wiederholen sich ja. So
 können dann die Sachen übernommen werden. Außer jetzt die, die fest sind.

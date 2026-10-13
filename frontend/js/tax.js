@@ -1489,6 +1489,34 @@ function renderYearlyTaxForm() {
   box.innerHTML = html;
 }
 
+/* v2194 · N62.10 · Marcel: „das Vorjahr duplizieren … ausser die, die fest sind,
+   wie Schuldzinsen oder AfA.“ Je Feld entschieden (Felder aus _computeAutoForYear):
+   FEST, nie kopiert: schuldzinsen (sinken mit der Restschuld), afa, sonst_bewegl_wg
+   (AfA), anschaffungsnah, erhaltungsaufwand (verteilt), notar_grundschuld,
+   vermittlung, bereitstellung (einmalig), einnahmen_km (Miete nach Plan),
+   inserat, gericht (Einzelfall).
+   WIEDERKEHREND, kopiert: die Liste unten. Kopiert werden nur EIGENE Werte des
+   Vorjahres, und nur in Felder, die im Zieljahr noch keinen eigenen Wert haben. */
+var YTF_WIEDERKEHREND = ['hausverwaltung', 'nk_umlf', 'nk_n_umlf', 'einnahmen_nk', 'kontofuehrung',
+  'steuerber', 'telefon', 'porto', 'fahrtkosten', 'verpflegung', 'hotel', 'betr_sonst', 'verw_sonst',
+  'finanz_sonst', 'sonst_kosten'];
+function _ytfVorjahrUebernehmen(year) {
+  var n = 0, schon = 0;
+  YTF_WIEDERKEHREND.forEach(function (f) {
+    var v = _getYearOverride(year - 1, f);
+    if (v === undefined || v === null || v === '') return;
+    if (_getYearOverride(year, f) !== undefined) { schon++; return; }
+    _setYearOverride(year, f, v); n++;
+  });
+  renderYearlyTaxForm();
+  if (typeof renderTaxTimeline === 'function') renderTaxTimeline();
+  if (typeof calc === 'function') setTimeout(calc, 50);
+  var msg = n ? ('✓ ' + n + ' wiederkehrende Werte aus ' + (year - 1) + ' übernommen' + (schon ? ' (' + schon + ' hatten schon eigene Werte)' : '') + ' — Schuldzinsen, AfA und Einmaliges bleiben')
+    : ('In ' + (year - 1) + ' stehen keine eigenen Werte für wiederkehrende Posten' + (schon ? ' (oder sie sind in ' + year + ' schon eingetragen)' : '') + '.');
+  if (typeof toast === 'function') toast(msg);
+}
+window._ytfVorjahrUebernehmen = _ytfVorjahrUebernehmen;
+
 function setTaxFormMode(m) {
   window._taxFormMode = m;
   renderYearlyTaxForm();
@@ -1569,7 +1597,10 @@ function _renderDetailForm(years) {
   years.forEach(function(yy, i) {
     html += '<option value="' + i + '"' + (i === selected ? ' selected' : '') + '>' + yy.year + '</option>';
   });
-  html += '</select></div>';
+  html += '</select>'
+    /* v2194 · N62.10 Vorjahr uebernehmen - nur die WIEDERKEHRENDEN Posten */
+    + (selected > 0 ? '<button type="button" class="btn btn-outline btn-sm ytf-vorjahr" style="margin-left:10px" onclick="_ytfVorjahrUebernehmen(' + y.year + ')" title="Übernimmt deine eigenen Werte aus ' + (y.year - 1) + ' für wiederkehrende Posten (Hausverwaltung, Nebenkosten, Kontoführung, Steuerberater, Telefon, Porto, Fahrten, sonstige Kosten). Nicht übernommen werden feste Werte wie Schuldzinsen, AfA, Erhaltungsaufwand oder Notar.">⧉ Werte aus ' + (y.year - 1) + ' übernehmen</button>' : '')
+    + '</div>';
 
   // Hilfetexte zu jedem Feld (Punkt 8)
   var helpTexts = {
