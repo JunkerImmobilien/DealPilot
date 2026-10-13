@@ -38669,6 +38669,7 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Zehn Fehlerverdachte aus der Hilfe-Erhebung stehen im Backlog (N62.22).
   - Animationen nur bei sichtbarem Fenster abnehmbar.
   - Prod.
+- **Prod (12)** `ce9ad097`: v2187–v2190 ausgerollt (Freigabe Marcel 13.10.2026). Beide DBs vorher gesichert (Haupt 11 MB / 71 Tabellen, mb 25 MB / 30), Backend-Rebuild (openaiService: Hilfe-Auszug, im Container 2 Treffer `hilfeBlock`). `app.dealpilot.immo` liefert pilot-tower/pilot-figur als text/javascript, index lädt help.js v2190. **Entscheidung Marcel:** Auffangwerte (§ 256 BewG, Sachwertfaktor 1,0) bleiben wie sie sind (C) — „es steht ja dran und gibt eine Orientierung“.
 
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
