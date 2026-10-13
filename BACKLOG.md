@@ -153,6 +153,31 @@ gegenübergestellt werden sie nirgends.
 
 #### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet
 
+
+**✅ v2189–v2189f (Staging):**
+- Kapitäns-Figur (`pilot-figur.js`) in Tower und Atlas, der Atlas-Kapitän mit Koffer.
+- Ort des Piloten unter Einstellungen → Darstellung.
+- Sofort-Antwort beim Tippen, Fragen gehen automatisch an die KI.
+- Wortsuche mit Synonymen.
+- Hilfe vertieft (20 Themen, 152 Abschnitte).
+- Handy umgebaut, in der Messkabine gemessen.
+- Quick-Check-Sprung nach offenem Marktbericht behoben.
+- Freigeben liegt über den Quellen.
+
+**Offen, neu:**
+- Straße und Hausnummer im Quick-Check waren NIE Pflicht (`quickcheck-app.html:3803`, `required:false` seit V326). Marcel entscheidet. Achtung: Inserate ohne veröffentlichte Hausnummer gibt es (v1999 ImmoMetrica).
+- Fehlerverdacht aus der Hilfe-Erhebung, nicht nachgemessen:
+  1. Quick-Check-Balken lesen `sub-sicherheit`/`sub-finanzierung`/`sub-effizienz`, die es nicht gibt (`quickcheck-app.html:6901/6972`).
+  2. Eigene Score-Regler wirken nur beim Profil „custom“, Starter erreichen es nicht (`dealscore.js:61-77`).
+  3. Marktbericht aus dem Reiter Objekt ohne `bwk_modus: 'normiert'` nimmt die 23-%-Pauschale (`CrossCheckService.js:971`).
+  4. Der Hinweis nach „als Verkehrswert übernehmen“ zeigt `h.market_value` statt `h.wert` (`objekt-reiter.js:953`).
+  5. Der Export schreibt `.dpkt`, der JSON-Import nimmt nur `.json` an (`storage.js:2580`).
+  6. „TOP“ in `dashboard.js:452`.
+  7. „wird in Stufe 2 aktiv“ in `mandanten.js:705`.
+  8. Kein sichtbarer Speichern-Knopf, die Anzeige sagt englisch „Auto-saved“.
+  9. Der Hinweis nach dem Wechsel in den Hintergrund sagt „unten links“, die Pille sitzt unten mittig (`mb-auftrag.js:247`).
+  10. Liegenschaftszins ohne amtlichen Wert → gesetzlicher Auffangwert § 256 BewG als Stufe D, Sachwertfaktor 1,0 vorläufig (`WertParameterService.js:434-449`). Verträgt sich das mit „kein Treffer heißt kein Wert“? Bewertungsfrage an Marcel.
+
 **✅ GEBAUT 13.10.2026 · v2187 Demo, v2188–v2188b · 49d5e942 / 08c00feb / fe24f5bb (Staging, Prod offen).** Marcel: „etwas total Abgefahrenes … einen kleinen animierten Piloten … über einen Hotkey“, danach „granularer, besser animiert, Wow-Effekt … der Pilot muss ein kleines Pilot-Männchen sein“.
 - `js/pilot-tower.js`: Pilot-Männchen (Kappe, Fliegerbrille, Schal), F1 überall bzw. ? außerhalb von Feldern. Er erklärt das Feld unter dem Cursor mit dem Text der Hover-Hilfe. Sofort-Treffer ohne KI aus 89 Feld-Erklärungen, Hilfe-Themen, 47 Atlas-Stationen und Aktionen. „Den Piloten fragen“ an `/ai/copilot` mit Hilfe-Auszug (`payload.hilfe`). Brücke im Quick-Check- und Marktbericht-iframe.
 - `js/prozess-atlas.js`: 7 Abläufe (Reise, Quick-Check, Netzplan Datenaufnahme, Deal bis gewonnen, Steuerjahr, Marktbericht, Scores). Klick auf eine Station klappt die Schritte auf, Eingaben und Ergebnisse fliegen ein, Gewichte wachsen; dazu „Ablauf abspielen“, „Du bist hier“ und „Hinfliegen“. `tools/prozess-atlas-pruefen.mjs`: 47/47 Belege im Code, Gewichte, Schwellen und Etappen gegen die Kerne, RC=0.

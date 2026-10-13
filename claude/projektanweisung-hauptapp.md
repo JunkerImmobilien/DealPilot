@@ -38637,6 +38637,39 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - gold-audit war seit v2174 rot: `rgba(201,168,76,…)` in Paketen dieser Sitzung. Behoben in v2188a.
 - **Rest:** Sichtabnahme bei sichtbarem Fenster und am Handy. Soll/Ist-Umschalter im Quick-Check nicht gefunden, Marcel muss zeigen, wo. Quick-Check auf die eigenen Tabellen (N62.22). Prod.
 
+### v2189–v2189f · Kapitän als Figur, Ort einstellbar, Hilfe vertieft, Handy (13.10.2026, Staging)
+
+- **Was:**
+  - `pilot-figur.js`: eigene Kapitäns-Figur nach Marcels Vorlage (die Vorlage selbst ist ein iStock-Bild mit Wasserzeichen und wird nicht verwendet). Sie winkt, zeigt mit dem Arm, schiebt beim Erklären die Brille hoch und läuft.
+  - Der Atlas-Kapitän rollt seinen Koffer zur gewählten Station.
+  - Ort des Piloten unter Einstellungen → Darstellung: Seitenleiste (Standard), Kopfleiste, Hauptbereich, nur F1. Auf dem Handy ein runder Knopf.
+  - Sofort-Antwort beim Tippen. Fragen gehen nach einer Tipp-Pause von selbst an die KI, im Tower und im Hilfe-Fenster.
+  - Hilfe-Suche nach Wörtern, mit Stamm und Synonymen.
+  - Acht vertiefte Themen (20 Themen, 152 Abschnitte, Belege in `docs/hilfe/hilfe-belege-v2189.md`).
+  - Hilfe-Fenster, Tower, Atlas und Pilot-Wahl auf 390 px umgebaut.
+  - `ui.js` `enterQuickCheckMode` schließt die Marktbericht-Ansicht.
+  - Datenaufnahme: „Freigeben“ liegt über den ausgegrauten Quellen statt in der Reihe.
+- **Commit:** `31e603c8` (Demo), `dc8bb10f`, `4239081a`, `be1df9ed`, `6af049ca`, `03c4db47`, `9bf08fe8`, `02664089`
+- **Nachweis:**
+  - Ruheplatz Seitenleiste gemessen (frei zwischen y 491 und 832).
+  - Marktbericht → Quick-Check: danach `mb-standalone-active` weg, `#s-quick` block.
+  - Freigeben-Leiste bleibt 78 px hoch, „Abrufen“ in derselben Zeile.
+  - Messkabine 390 px:
+    - Hilfe-Fenster gestapelt (Inhalt 352 px statt 32 px).
+    - Tower als Bodenblatt mit Sofort-Antwort, Pilot-Wahl 2×2 ohne Überlauf.
+    - Atlas-Leiste 52 px statt 8 px, Kapitän bei x 13 statt 363.
+  - Suche: „ankauf einfrieren“ → „Warum ist der Ankauf-Stand nicht eingefroren?“, „steuerzeitraum anlegen“ → passende FAQ.
+  - Automatische KI-Antwort auf „Wie lege ich einen Steuerzeitraum an?“ mit den echten Knopfnamen.
+  - gold-audit RC=0, buster-ebenen SAUBER, prozess-atlas-pruefen sauber.
+- **Zurückgenommen:**
+  - „Die Pilot-Analyse zählt auf dein Kontingent“ (v2188) war falsch. Sie ist im Plan enthalten (`ai.js:254` seit v1183).
+  - „Sprengnetter/PriceHubble im Quick-Check sichtbar“ war falsch: nur Markup, `display:none`.
+- **Rest:**
+  - Straße und Hausnummer im Quick-Check waren nie Pflicht (`required:false` seit V326). Marcel entscheidet.
+  - Zehn Fehlerverdachte aus der Hilfe-Erhebung stehen im Backlog (N62.22).
+  - Animationen nur bei sichtbarem Fenster abnehmbar.
+  - Prod.
+
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
 - **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).
