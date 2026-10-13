@@ -841,18 +841,29 @@
      eine Kachel „Freigeben" IN der Reihe - ohne Checkbox, damit sie nie als
      Quelle mitzaehlt (selectedSources liest nur input:checked). Das Warum
      steht im Tooltip. */
+  /* v2189 · Marcel am 13.10.2026 (Bild datenaufnahme.png): „den Freigabe-
+     Knopf hast du dahinter gesetzt und der Abrufen-Button rutscht nach
+     unten. Ich wollte, dass der Bereich ausgegraut wird und einfach
+     darüber der Button Freigabe abgebildet wird. So wird nichts verzerrt."
+     Die Kachel IN der Reihe (v2178) machte die Reihe breiter, sie brach
+     um und schob „Abrufen" in die nächste Zeile. Jetzt liegt der Knopf
+     absolut ÜBER den ausgegrauten Quellen - er nimmt keinen Platz im Fluss. */
   function _riegelHinweis(bar, zu) {
     var id = 'oab-riegel-hinweis';
     var alt = document.getElementById(id);
-    if (!zu) { if (alt) alt.remove(); return; }
+    if (!zu) {
+      if (alt) { var r0 = alt.parentNode; alt.remove(); if (r0 && r0.classList) r0.classList.remove('dp-pf-riegel-row'); }
+      return;
+    }
     if (alt) return;
     var tile = bar.querySelector('.dp-pf-tile[data-src="import"]');
     var row = tile ? tile.closest('.dp-pf-row') : null;
     if (!row) return;
+    row.classList.add('dp-pf-riegel-row');
     var b = document.createElement('button');
     b.type = 'button';
     b.id = id;
-    b.className = 'dp-pf-tile tool dp-pf-freigeben';
+    b.className = 'dp-pf-freigeben-ueber';
     b.title = 'Die Quellen sind gesperrt, weil dieses Objekt schon gefüllt ist — ein neues Einlesen würde Felder überschreiben. Freigeben, um trotzdem einzulesen.';
     b.innerHTML = '<span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.2"/></svg></span><span class="dp-pf-lbl">Freigeben</span>';
     b.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); riegelFreigeben(); });

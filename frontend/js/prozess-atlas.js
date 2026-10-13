@@ -514,7 +514,7 @@
     if (!pid) { try { pid = localStorage.getItem('dp_atlas_letzt'); } catch (e) {} }
     root.classList.add('an');
     document.documentElement.style.overflow = 'hidden';
-    requestAnimationFrame(function () { zeige(pid || 'reise', station); });
+    setTimeout(function () { zeige(pid || 'reise', station); }, 16);   /* rAF laeuft im Hintergrund-Tab nie */
   }
   function schliessen() { stopp(); if (root) root.classList.remove('an'); document.documentElement.style.overflow = ''; document.querySelectorAll('.atl-chip.flug').forEach(function (x) { x.remove(); }); }
 

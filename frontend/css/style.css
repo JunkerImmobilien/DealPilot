@@ -40841,3 +40841,22 @@ body.dp-ankauf-frei .ank-seg.aktiv{background:#ffffff;color:#8E4A45}
 /* v2178 · Kachel „Freigeben“ in der Reihe „Daten einlesen“ statt eigener Hinweiszeile (object-actions.js _riegelHinweis).
    Ein <button> erbt keine Tile-Schrift; ausgegraut wird sie nie - sie ist der Ausweg. */
 .dp-pfbar .dp-pf-tile.dp-pf-freigeben{font:inherit;cursor:pointer;opacity:1 !important;filter:none !important;pointer-events:auto}
+
+/* v2189 · „Freigeben" liegt ÜBER den ausgegrauten Quellen, nicht in der
+   Reihe (Marcel, Bild datenaufnahme.png: der Knopf in der Reihe brach sie
+   um und schob „Abrufen" nach unten). Absolut positioniert = kein Platz im
+   Fluss, die Karte bleibt so breit und hoch wie ohne Sperre. */
+.dp-pf-row.dp-pf-riegel-row { position: relative; }
+.dp-pf-freigeben-ueber {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 3; display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 10px; white-space: nowrap; cursor: pointer;
+  font: 600 13px/1.2 Inter, system-ui, sans-serif;
+  background: #FDFCFA; color: #1a1714; border: 1px solid #2A2727;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+}
+.dp-pf-freigeben-ueber:hover { background: #fff; box-shadow: 0 8px 22px rgba(0,0,0,.24); }
+.dp-pf-freigeben-ueber .dp-pf-ic { display: inline-flex; }
+body:not(.dp-neue-karte-stil) .dp-pf-freigeben-ueber {
+  background: #141210; color: #f3ead0; border-color: var(--wl-c9a84c, #C9A84C);
+}
