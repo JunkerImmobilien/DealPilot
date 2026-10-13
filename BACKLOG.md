@@ -151,6 +151,14 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.13 · Offen aus dem 13.10.2026 (v2163–v2166)
+
+1. **Regionaldatenbank-Passwort erneuern** (Marcel) — sonst keine Makro-Kennzahlen (v2165 wartet darauf).
+2. **Modell der Pilot-Analyse** — gpt-4o-mini hält Längen nicht; Wechsel kostet (Marcel).
+3. **Neuabruf aller Pilot-Analysen** — 4/33 auf Staging erledigt; Rest nach der Modellfrage.
+4. **Prod-Rollout** — Merge `b62eb9d2` bereit, Push nach main braucht Marcel.
+5. Rumpfjahr: Jahr 1 im Steuerverlauf ist anteilig (2026-1052: 7.930 € Miete gegen 56.800 € Zinsen) — prüfen, ob Zinsen dort auch anteilig sein müssten.
+
 #### N62.4b · Zensus in der Datenbank — ✅ v2162–v2162c, 13.10.2026
 
 **Marcel:** *„nicht in eine Datei schreiben, sondern direkt in eine Datenbank,
