@@ -1334,11 +1334,11 @@ function buildPrompt(payload, opts) {
     '',
     '## AUFGABEN',
     '',
-    '1. Gesamtbewertung (4-6 Sätze) → Ist das ein guter Deal oder nicht? Warum? Mit konkreten Zahlen.',
+    '1. Gesamtbewertung (8-10 Sätze) → Ist das ein guter Deal oder nicht? Warum? Mit konkreten Zahlen.',
     '',
     '2. Stärken & Schwächen Analyse',
-    '   → Nenne die 4-5 wichtigsten Stärken — jede mit konkreter Zahl/Begründung',
-    '   → Nenne die 4-5 größten Risiken — jeweils erläutert',
+    '   → Nenne die 5 wichtigsten Stärken — jede 3-4 Sätze mit konkreter Zahl/Begründung',
+    '   → Nenne die 5 größten Risiken — jedes 3-4 Sätze mit Zahl und Folge',
     '',
     '3. Risikoanalyse (tiefergehend) — Bewerte explizit:',
     '   - Finanzierungsrisiko (LTV + DSCR) — WICHTIG: Wenn LTV < 85 % und DSCR >= 1,2,',
@@ -1357,7 +1357,7 @@ function buildPrompt(payload, opts) {
     '   - Cashflow-Investor?',
     '   - Wertsteigerungs-Investor?',
     '   - Sicherheitsorientiert?',
-    '   → jeweils 2-3 Sätze Begründung mit Bezug auf Zahlen',
+    '   → jeweils 3-5 Sätze Begründung mit Bezug auf Zahlen',
     /* v2140: die Aufgabe nannte bis hierher drei Archetypen und KEINE
        Eingabe - die Schwellen dieses Nutzers erreichten den Prompt
        nicht. Jetzt tun sie es, und die Aufgabe sagt, wo sie stehen. */
@@ -1373,15 +1373,15 @@ function buildPrompt(payload, opts) {
     '',
     '7. DealPilot Insight',
     '   → Professionelle Einschätzung wie von einem Investment-Tool',
-    '   → 4-5 Sätze, fundiert und konkret',
+    '   → 6-8 Sätze, fundiert und konkret',
     '',
-    '8. Investmentbewertung — eine umfassende holistische Bewertung des Deals (8-12 Sätze).',
+    '8. Investmentbewertung — eine umfassende holistische Bewertung des Deals (12-16 Sätze).',
     '   Soll Rendite, Lage, Marktumfeld, Risiko und langfristige Perspektive verbinden.',
     '   Gehe dabei auch auf die Steuererstattung/den Steuervorteil ein: was sie bringt und wie',
     '   sie sich auf das zu versteuernde Einkommen auswirkt (Bezug AfA und Werbungskosten),',
     '   qualitativ und mit Zahlen soweit aus den Eingabedaten ableitbar.',
     '',
-    '9. Verhandlungsempfehlung — konkrete Verhandlungsstrategie (8-12 Sätze).',
+    '9. Verhandlungsempfehlung — konkrete Verhandlungsstrategie (12-16 Sätze).',
     '   Welche Argumente, welche Hebel, welcher Zielpreis, welche Kompromisse?',
     '',
     '10. Kaufpreis-Offerte — empfohlener Kaufpreis mit ausführlicher Begründung (5-7 Sätze)',
@@ -1892,7 +1892,7 @@ async function analyze(payload, opts) {
        Pilot-Analyse schon. Der Textweg nimmt 8000, also muss der
        Bildweg dieselben bekommen; sonst ist die Antwort je nach Weg
        verschieden lang, und das sieht man ihr nicht an. */
-    r = await _callOpenAIVision(teile, Object.assign({}, opts, { maxTokens: 8000 }));
+    r = await _callOpenAIVision(teile, Object.assign({}, opts, { maxTokens: 16000 }));   /* v2167: wie der Textweg (v2166) - mit Fotos galt sonst weiter 8000 */
   } else {
     r = await callOpenAI(prompt, opts);
   }

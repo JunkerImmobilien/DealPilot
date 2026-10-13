@@ -151,6 +151,34 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.14 · Marktbericht in Worten: bewerten, Entwicklung, Ableitung, Prognose
+
+**Marcel am 13.10.2026:** *„wenn wir die Pilot-Analyse anpassen, können wir
+auch den Marktbericht nicht nur grafisch darstellen, sondern vielleicht auch
+die Marktberichte bewerten und die Entwicklung beschreiben und die Ableitung
+sowie Prognose."* Heute: `ReportGenerationService` (gpt-4.1-mini, Chat
+Completions) schreibt einen Text; die Zeitreihen (Miete, Kaufpreis,
+Bevölkerung, Zensus, Makro) stehen nur als Grafik. Zu bauen: ein
+Bewertungsteil mit Entwicklung (aus den Reihen, mit Zahlen), Ableitung
+(Verfahren, Spread, Marktanpassung) und einer als Modellfortschreibung
+gekennzeichneten Prognose — mit Zielfeld je Teil (Lehre v2013b).
+
+#### N62.15 · Datenschutz: KI-Datenfluss gegen die Rechtstexte (gemessen 13.10.2026)
+
+Inventur (nur gelesen): einziger KI-Anbieter OpenAI (USA). Name/E-Mail des
+NUTZERS gehen nicht hinaus. Es gehen hinaus: Objektadresse, Halter-Name,
+Freitexte, bis 4 Fotos, Tonaufnahmen (Diktat), ganze Dokumente (Grundbuch:
+Eigentümer mit Geburtsdatum; Kaufvertrag: Käufer/Verkäufer), Ansprechpartner
+der Ämter. Keine Pseudonymisierung, `store:false` nirgends gesetzt.
+Lücken gegen die Texte: `datenschutz.html` Ziffer 6 sagt „keine
+personenbezogenen Daten Dritter" (stimmt nicht), nennt keine Fotos/Ton,
+nennt „Chat Completions" (es ist Responses/Realtime); `settings.js:2775`
+sagt „OpenAI Ireland, nur Lage-Analyse"; `sicherheit.html` verspricht „keine
+Weitergabe"; Einwilligung nur im Browser geprüft, `/api/v1/consent`
+existiert nicht (Ziffer 12 verspricht Consent-Logs); Verantwortlicher heißt
+„Junker Immobilien" statt Junker Solution. **Rechtliche Bewertung gehört zu
+einem Anwalt — hier steht nur, was der Code tut.**
+
 #### N62.13 · Offen aus dem 13.10.2026 (v2163–v2166)
 
 1. **Regionaldatenbank-Passwort erneuern** (Marcel) — sonst keine Makro-Kennzahlen (v2165 wartet darauf).
