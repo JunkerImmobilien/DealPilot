@@ -183,13 +183,17 @@
        Zinsrisiko vor die richtigen Treffer. */
     var w = nq.split(' ').filter(function (x) { return x.length >= 2 && FUELL.indexOf(' ' + x + ' ') < 0; });
     if (!w.length) return [];
+    /* v2189d: Stamm + Synonyme aus help.js (eine Liste fuer beide Suchen) */
+    var F = null;
+    try { if (window.DealPilotHilfe && DealPilotHilfe.formen) { F = DealPilotHilfe.formen(w.join(' ')); if (F.length !== w.length) F = null; } } catch (e) { F = null; }
     var res = [];
     L.forEach(function (e) {
       var tn = norm(e.t), p = 0, alle = true;
-      w.forEach(function (x) {
-        var stamm = x.length > 5 ? x.slice(0, x.length - 1) : x;
-        if (tn.indexOf(stamm) >= 0) p += 6;
-        else if (e.such.indexOf(stamm) >= 0) p += 2;
+      w.forEach(function (x, j) {
+        var formen = (F && F[j]) || [x.length > 5 ? x.slice(0, x.length - 1) : x];
+        var inT = formen.some(function (f) { return tn.indexOf(f) >= 0; });
+        if (inT) p += 6;
+        else if (formen.some(function (f) { return e.such.indexOf(f) >= 0; })) p += 2;
         else alle = false;
       });
       if (!p) return;

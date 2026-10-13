@@ -1094,10 +1094,33 @@
       .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
       .replace(/[^a-z0-9%§ ]+/g, ' ').replace(/\s+/g, ' ').trim();
   }
-  function _woerter(q) {
-    return _norm(q).split(' ').filter(function (w) { return w.length >= 3 && _FUELL.indexOf(' ' + w + ' ') < 0; })
-      .map(function (w) { return w.length > 5 ? w.slice(0, w.length - 1) : w; });
+  /* v2189d · Stamm und Synonyme. Gemessen: „ankauf einfrieren“ fand nichts
+     (die Texte sagen „eingefroren“, „festgeschrieben“), „steuerzeitraum
+     anlegen“ fand die FAQ „Wie lege ich einen Steuerzeitraum an?“ nicht.
+     Jedes Suchwort wird zu einer LISTE von Formen; getroffen ist es, wenn
+     eine davon im Text steht. Der Pilot (pilot-tower.js) nutzt dieselbe Liste. */
+  var _SYN = {
+    einfrier: ['eingefroren', 'festgeschrieben', 'festschreib', 'einfrier'],
+    anleg: ['anleg', 'lege', 'hinzufueg', 'neuen'],
+    ruf: ['ruf', 'f1'],
+    loesch: ['loesch', 'entfern'],
+    aender: ['aender', 'bearbeit', 'anpass', 'einstell'],
+    finde: ['find', 'wo ', 'steht'],
+    kost: ['kost', 'kontingent', 'preis'],
+    gewonn: ['gewonn', 'gewinn', 'zuschlag'],
+    verlor: ['verlor', 'verlust', 'abgesagt'],
+    exportier: ['export', 'pdf', 'herunterlad']
+  };
+  function _stamm(w) { return w.length > 6 ? w.slice(0, w.length - 2) : (w.length > 4 ? w.slice(0, w.length - 1) : w); }
+  function _formen(w) {
+    var st = _stamm(w), f = [st];
+    Object.keys(_SYN).forEach(function (k) { if (st.indexOf(k) === 0 || k.indexOf(st) === 0) f = f.concat(_SYN[k]); });
+    return f;
   }
+  function _woerter(q) {
+    return _norm(q).split(' ').filter(function (w) { return w.length >= 3 && _FUELL.indexOf(' ' + w + ' ') < 0; }).map(_formen);
+  }
+  function _trifft(text, formen) { for (var i = 0; i < formen.length; i++) if (text.indexOf(formen[i]) >= 0) return true; return false; }
   function _onSearch(e) {
     var roh = (e.target.value || '').trim();
     var q = roh.toLowerCase();
@@ -1108,13 +1131,13 @@
       _selectTopic(lastId);
       return;
     }
-    var w = _woerter(q); if (!w.length) w = [_norm(q)];
+    var w = _woerter(q); if (!w.length) w = [[_norm(q)]];
     var hits = [];
     HELP_TOPICS.forEach(function(t) {
       t.sections.forEach(function(s) {
         var kopf = _norm(s.h), blob = kopf + ' ' + _norm(s.body), p = 0, n = 0;
-        w.forEach(function (x) { if (kopf.indexOf(x) >= 0) { p += 3; n++; } else if (blob.indexOf(x) >= 0) { p += 1; n++; } });
-        if (n && n / w.length >= 0.6) hits.push({ topic: t, section: s, p: p + (n === w.length ? 3 : 0) });
+        w.forEach(function (x) { if (_trifft(kopf, x)) { p += 3; n++; } else if (_trifft(blob, x)) { p += 1; n++; } });
+        if (n && n / w.length >= 0.5) hits.push({ topic: t, section: s, p: p + (n === w.length ? 3 : 0) });
       });
     });
     hits.sort(function (a, b) { return b.p - a.p; });
@@ -1304,6 +1327,7 @@
   /* v2188: der Pilot (pilot-tower.js) liest die Themen und springt hinein */
   window.DealPilotHilfe = {
     themen: function () { return HELP_TOPICS; },
+    formen: function (q) { return _woerter(q); },
     oeffne: function (id, h) {
       showHelp(); _selectTopic(id);
       if (h) setTimeout(function () {
