@@ -151,6 +151,14 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.20 · Offen aus Marcels Liste vom 13.10.2026 (Rest nach v2181b)
+
+1. **Tour messen bei SICHTBAREM Fenster** (Chrome war minimiert, Timer gedrosselt): Ablauf nach Erstanmeldung mit Standardobjekt, Quick-Boarding-Schritt „Als Objekt speichern" (zielt jetzt auf  im iframe — springt der Spot hin?).
+2. **Tour auf dem Handy:**  schaltet die Hervorhebung unter 768 px ab (Blase mittig, kein Rahmen) — gewollt? Seitenleisten-Schritte zielen auf , auf dem Handy heißt der Knopf .
+3. **Bewirtschaftung — Produktfrage an Marcel:** Standardwerte je Haustyp (heute nur ein Profil  17 % /  16 % der NKM, , nur localStorage), Hausgeld als % mit automatischer Aufteilung (gibt es nur im Quick-Check:  22 %), und ob die Sätze je Haustyp in die Einstellungen gehören.
+4. Umlaute: „ungewoehnlich", „aussergewoehnlich", „liess" (hausgeld-*.js).
+5. Prod-Rollout v2177–v2181b nach Freigabe (nur Frontend + nichts im Backend seit 6b).
+
 #### N62.19 · NÄCHSTE PAKETE A → B → C — ✅ GEBAUT 13.10.2026 v2174–v2176 (Staging, Prod offen; Schwellen B von Marcel abzunehmen) (Marcel, 13.10.2026: „Der Reihenfolge nach, aber A, B und C, alles zusammen.")
 
 **A · Marktbericht im Hintergrund, mit Fortschritt und Meldung.** Gemessen 13.10.:
