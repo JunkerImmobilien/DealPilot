@@ -509,7 +509,9 @@ if (!window._wlc) {
 
   /* ── Persistenz (#_mb_state -> JSONB) ── */
   function snapshot(extra) {
-    return Object.assign({ ts: Date.now(), card: D, mode: mode, collapsed: collapsed }, extra || {});
+    /* v2168: die Karte traegt, zu welchem Objekt sie gehoert */
+    return Object.assign({ ts: Date.now(), card: D, mode: mode, collapsed: collapsed,
+      fuer: { key: global._currentObjKey || null, wfl: numDe(vIn('wfl')) || null } }, extra || {});
   }
   /* v969c: Vorwahl-Spanne aus dem Uebernehmen (einmalig konsumiert, ueberlebt .run()) */
   function _prefSpan() { try { var p = localStorage.getItem('dp_mb_pref_span'); if (p === 'low' || p === 'med' || p === 'high') { localStorage.removeItem('dp_mb_pref_span'); return p; } } catch (e) {} return null; }
@@ -528,6 +530,23 @@ if (!window._wlc) {
     lastJson = el.value;
     var s = null; try { s = JSON.parse(el.value); } catch (e) { return; }
     if (!s || !s.card) return;
+    /* v2168 · FREMDE KARTEN VERWERFEN. Bis v2168 wanderte die Karte des
+       vorigen Objekts in jedes geladene ohne eigene (storage.js resetFields).
+       Neue Karten tragen ihr Objekt (fuer.key); alte nur ihre Flaeche -
+       weicht die um mehr als 15 % von der Wohnflaeche ab, ist es nicht
+       DIESE Karte. Kein Treffer heisst kein Wert. */
+    try {
+      var _k = global._currentObjKey || null, _w = numDe(vIn('wfl')) || 0;
+      var _fremd = (s.fuer && s.fuer.key && _k && s.fuer.key !== _k);
+      var _fl = (s.card && (s.card.area || (s.fuer && s.fuer.wfl))) || 0;
+      if (!_fremd && !(s.fuer && s.fuer.key) && _fl > 0 && _w > 0 && Math.abs(_fl - _w) / _w > 0.15) _fremd = true;
+      if (_fremd) {
+        try { console.warn('[v2168] Marktbericht-Karte verworfen: gehoert zu einem anderen Objekt (Flaeche ' + _fl + ' gegen ' + _w + ' m²)'); } catch (x) {}
+        el.value = ''; lastJson = ''; D = null; var _h = $(HOST_ID); if (_h) _h.innerHTML = '';
+        if (global.AvmSection && typeof global.AvmSection.setDealpilot === 'function') global.AvmSection.setDealpilot(null);
+        return;
+      }
+    } catch (e) {}
     var c = s.card;
     if (!c.mw && !c.mm && (c.marktwert || c.miete)) { // v540/v541-Snapshot -> v542-Form migrieren
       c = { rating: c.rating || 'Indikation', conf: c.confidence || { label: '–', pct: 0 },
