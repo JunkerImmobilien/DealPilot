@@ -38614,6 +38614,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### Lasttest Marktbericht · 13.10.2026 (Staging, Freigabe Marcel)
+
+- **Was:** 20 volle Berichte gleichzeitig (alle 16 Länder, ETW/EFH/MFH) direkt gegen `mb-backend /reports/generate`, `external_ref = lasttest-20261013`. GeoMap-Kosten freigegeben.
+- **Ergebnis:** **20/20 ok, 0 Fehler.** Reine Berichtsdauer (`took_ms`) **8–20 s**, Median rund 11 s. Gesamtzeit bis zum letzten Bericht **53 s** — der Rest ist Warteschlange: `REPORT_CONCURRENCY` = 6 Plätze, Bericht 20 wartete 37 s auf seinen Platz.
+- **Daten:** alle 20 mit Makro **4 von 4** aus `mb.makro_werte` (Werte = Tabelle, z. B. HH Trend 0,536), **0 Live-Abrufe** bei der Regionaldatenbank im Log; Zensus 20/20, Bodenwert 20/20.
+- **Rest:** (1) Engpass ist die Platzzahl, nicht ein Dienst — bei 6 Plätzen wartet der 7. Kunde. Anheben braucht vorher: CPU/RAM unter Last messen und die Ratengrenzen von GeoMap/Geoapify kennen (nicht gemessen). (2) Die Herkunft `mb.makro_werte` steht nicht im gespeicherten Bericht (`data.macro` ohne `herkunft`) — für den Quellennachweis nachziehen. (3) Laufzeiten je externem Dienst werden weiter nicht mitgeschrieben (N62.18 Punkt 6).
+
 ### Prod-Rollout 13.10.2026 (4) · v2171–v2172c — und v2173–v2173b Bestand/Ankauf (Staging)
 
 - **Prod-Rollout (4)** `c7a4c482` (Merge auf main, Marcels Auftrag „Ja, den Product Rollout machen wir"): beide DBs gesichert und angesehen (Haupt 11 MB/71 Tabellen, mb 24 MB/28), Pull, Rebuild mb-backend, Migration 017 angewendet. **Prod-Makro-Import vom Takt: vollständig in 627 s, 400/400 Kreise, 16/16 Länder.** Frontend `ui.js?v=v2171` per curl geprüft (text/javascript).
