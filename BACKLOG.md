@@ -303,6 +303,8 @@ GENESIS-Grenze). Der Bericht liest nur noch die Tabelle.
 
 #### N62.14 · Marktbericht in Worten: bewerten, Entwicklung, Ableitung, Prognose
 
+> **✅ v2196 (13.10.2026):** Kapitel „D) Entwicklung, Ableitung & Prognose“ als vierte Gruppe. kapitelD() rechnet die Fakten (Preis-/Miet-/Bevölkerungstrend, Ableitung aus Median × Fläche, Spanne, Abstand Kaufpreis, Ertrags-/Sachwert falls da, Prognose als Modellfortschreibung über 3/5 Jahre). Echter Lauf auf Staging: Kapitel kam mit genau diesen Zahlen und der Kennzeichnung „keine Vorhersage, kein Gutachten“. Kosten: ein vierter paralleler KI-Aufruf je Bericht.
+
 **Marcel am 13.10.2026:** *„wenn wir die Pilot-Analyse anpassen, können wir
 auch den Marktbericht nicht nur grafisch darstellen, sondern vielleicht auch
 die Marktberichte bewerten und die Entwicklung beschreiben und die Ableitung
