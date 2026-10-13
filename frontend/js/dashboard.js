@@ -444,7 +444,8 @@
     host.innerHTML = ag.cats.map(function(c){
       var sc=c.score==null?0:c.score; var t=tierOf(c.score);
       var kn=(catMeta()[c.key]||{}).count||(KPICOUNT[c.key]||0);
-      var tierBadge = c.score==null?'–':(c.score>=85?'TOP':c.score>=70?'GUT':c.score>=50?'SOLIDE':c.score>=35?'SCHWACH':'KRITISCH');
+      /* v2191: die Kette aus score-tiers.js - hier stand noch 'TOP' (seit v1863 heisst die Stufe SEHR GUT) */
+      var tierBadge = c.score==null?'–':((window.ScoreTier&&ScoreTier.stufe)?ScoreTier.stufe(c.score).versal:(c.score>=85?'SEHR GUT':c.score>=70?'GUT':c.score>=50?'SOLIDE':c.score>=35?'SCHWACH':'KRITISCH'));
       var tierCls = c.score==null?'':(c.score>=85?'tier-top':c.score>=70?'tier-gut':c.score>=50?'tier-solide':'');
       // Sparkline neben dem Sub-Text (wie Mockup kpi-sub-row), nicht als Hintergrund
       var sparkHtml = c.score==null?'':sparkSvg(sc, t.col, sc + (c.key?c.key.length:0));

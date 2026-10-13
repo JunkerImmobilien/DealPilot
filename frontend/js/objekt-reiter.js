@@ -950,7 +950,7 @@
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }
-    if (typeof toast === 'function') { try { toast('✓ Verkehrswert ' + deNum(h.market_value, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
+    if (typeof toast === 'function') { try { toast('✓ Verkehrswert ' + deNum(h.wert != null ? h.wert : h.market_value, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
   }
 
   /* ═══ Verdrahtung ════════════════════════════════════════════════════ */

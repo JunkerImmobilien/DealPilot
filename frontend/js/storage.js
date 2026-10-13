@@ -2577,7 +2577,7 @@ window.triggerImportJson = function() {
   }
   var input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.json';
+  input.accept = '.json,.dpkt';   /* v2191: die Sicherung heisst .dpkt (Inhalt JSON) - nur .json liess sie im Dialog nicht auswaehlen */
   input.style.display = 'none';
   input.onchange = function() {
     if (typeof importJSON === 'function' && input.files.length) {
@@ -4242,7 +4242,7 @@ function _showAutoSavedIndicator() {
   var el = document.getElementById('hdr-autosave');
   if (!el) return;
   var textEl = el.querySelector('.hdr-autosave-text');
-  if (textEl) textEl.textContent = 'Auto-saved · gerade eben';
+  if (textEl) textEl.textContent = 'Gespeichert · gerade eben';   /* v2191: war englisch */
   el.style.display = 'inline-flex';
   // Nach 4 Sekunden Text auf "vor X s" updaten + nach 30s ganz ausblenden
   var startTime = Date.now();
@@ -4258,7 +4258,7 @@ function _showAutoSavedIndicator() {
       var t = seconds < 5 ? 'gerade eben' :
               seconds < 60 ? 'vor ' + seconds + ' s' :
               'vor ' + Math.round(seconds/60) + ' min';
-      textEl.textContent = 'Auto-saved · ' + t;
+      textEl.textContent = 'Gespeichert · ' + t;
     }
   }, 1000);
 }

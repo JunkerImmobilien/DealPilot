@@ -169,7 +169,11 @@ export const ReportOrchestrator = {
       gfz_koeff: input.gfz_koeff ? Number(input.gfz_koeff) : null,
       beitrag_abzug_eur: input.beitrag_abzug_eur ? Number(input.beitrag_abzug_eur) : null,
       stellplatz_miete_monat: input.stellplatz_miete_monat ? Number(input.stellplatz_miete_monat) : null,
-      bwk_modus: input.bwk_modus || null,
+      /* v2191 · Stufe 3 rechnet die Bewirtschaftung nach Anlage 3 (normiert, zum Stichtag).
+         Die Marktbericht-App schickte das ausdruecklich (wertermittlung.js:1030), der Abruf
+         aus dem Reiter Objekt (dealpilot-mb.js) nicht - dort fiel der Ertragswert auf die
+         23-%-Pauschale (CrossCheckService BWK_QUOTE). Jetzt gilt es fuer jeden Aufrufer. */
+      bwk_modus: input.bwk_modus || (Number(input.wert_stufe) >= 3 ? 'normiert' : null),
       /* === v1338c - EIN FELDPAAR, BEIDE VERFAHREN ======================
          `bog_eur` und `bog_grund` gibt es hier und im ErtragswertService
          seit jeher - und im Formular gab es dafuer KEIN Feld. Sie waren

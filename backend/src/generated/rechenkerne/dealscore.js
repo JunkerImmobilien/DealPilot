@@ -60,8 +60,16 @@ var DealScore = (function() {
 
   function _getWeights() {
     var preset = _getActivePreset();
+    /* v2191 · Eigene Regler galten nur bei Vorlage „custom“ - und auf „custom“
+       schaltet nur der Investor Deal Score (dealscore2.js saveConfig). Wer nur
+       die fünf DealScore-Regler verschob, speicherte sie, und sie wirkten nie.
+       Jetzt: hat setWeights() eigene Regler gesetzt (Merker), gelten sie, bis
+       wieder eine Vorlage gewählt wird (dealscore2.js setActivePreset löscht ihn).
+       Ohne localStorage (Backend-Spiegel) bleibt alles wie vorher. */
+    var eigen = false;
+    try { eigen = localStorage.getItem('dp_dealscore_eigen') === '1'; } catch (e) {}
     // V108: Wenn ein Preset aktiv ist (nicht "custom"), nutze die Preset-Gewichtungen
-    if (preset !== 'custom' && PRESET_WEIGHTS[preset]) {
+    if (!eigen && preset !== 'custom' && PRESET_WEIGHTS[preset]) {
       return PRESET_WEIGHTS[preset];
     }
     // Sonst: gespeicherte User-Gewichte (oder Default)
@@ -316,7 +324,11 @@ var DealScore = (function() {
     if (Math.abs(sum - 100) > 0.5) {
       throw new Error('Summe muss 100% ergeben (aktuell: ' + sum + '%)');
     }
+    /* v2191: nur wenn sie von dem abweichen, was gerade gilt - die Einstellungen
+       rufen setWeights bei JEDEM Speichern, auch unveraendert. */
+    var jetzt = _getWeights(), anders = ['cashflow','rendite','ltv','risiko','potenzial'].some(function (k) { return Number(jetzt[k]) !== Number(newWeights[k]); });
     _saveWeights(newWeights);
+    if (anders) { try { localStorage.setItem('dp_dealscore_eigen', '1'); } catch (e) {} }
   }
 
   /**

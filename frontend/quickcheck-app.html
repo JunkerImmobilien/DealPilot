@@ -6677,7 +6677,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
   <script src="js/qc-heuristik.js?v=v2148c"></script>
-  <script src="js/dealscore.js?v=v2141"></script>
+  <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
@@ -6899,8 +6899,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 <script id="qb-reskin4-js">
 (function(){
   'use strict';
-  var CATS=['rendite','cashflow','sicherheit','finanzierung','effizienz'];
-  var CATL={rendite:'Rendite',cashflow:'Cashflow',sicherheit:'Sicherheit',finanzierung:'Finanz.',effizienz:'Effizienz'};
+  /* v2191: die Teilnoten heissen sub-rendite/-cashflow/-ltv/-risiko/-potenzial (Z. 3320-3352). Hier standen sicherheit/finanzierung/effizienz - drei Balken zeigten immer einen Strich. */
+  var CATS=['rendite','cashflow','ltv','risiko','potenzial'];
+  var CATL={rendite:'Rendite',cashflow:'Cashflow',ltv:'LTV',risiko:'Risiko',potenzial:'Potenzial'};
   var KPI=[['kpi-bmr','Bruttomietr.','\u22655%'],['kpi-nmr','Nettomietr.','\u22653%'],['kpi-ekr','EK-Rendite','\u22657%'],
            ['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-dscr','DSCR','\u22651,2'],['kpi-ltv','LTV','<90%'],['kpi-bwk','Bewirtsch.','18\u201335%']];
   function tc(s){return s>=70?'#3FA56C':s>=50?window._qcGold('--gold', '#C9A84C'):'#B8625C';}
