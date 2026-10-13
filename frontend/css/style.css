@@ -40861,10 +40861,10 @@ body.dp-ankauf-frei .ank-seg.aktiv{background:#ffffff;color:#8E4A45}
    jede Hover-Regel mit eigenem transform (z. B. translateY(-1px) fuer Knoepfe)
    ERSETZT das und laesst ihn um die halbe Groesse springen. Jetzt mittig ueber
    inset:0 + margin:auto - ohne transform, also nichts, was ueberschrieben wird. */
-html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber,
-html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:hover,
-html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:focus,
-html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:active {
+html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:not(#dp-v2199-kein),
+html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:not(#dp-v2199-kein):hover,
+html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:not(#dp-v2199-kein):focus,
+html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:not(#dp-v2199-kein):active {
   left: 0 !important; right: 0 !important; top: 0 !important; bottom: 0 !important; margin: auto !important;
   /* !important noetig: `.sec button:not(...)` setzt width:auto !important
      (gemessen v2199: Knopf 605 px breit statt Textbreite). */
