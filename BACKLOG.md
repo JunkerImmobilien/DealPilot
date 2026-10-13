@@ -140,7 +140,7 @@ gegenübergestellt werden sie nirgends.
 > **Rest:** ob das Modell die Zeilen sinnvoll füllt, zeigt nur ein echter
 > Analyselauf.
 >
-> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10., später: Marcel hat sich bei GENESIS-Online/Destatis angemeldet — dort gemessen 331 Statistiken, KEIN Zensus 2022, nur Mikrozensus. Der Zensus 2022 liegt NUR auf ergebnisse.zensus2022.de.) (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
+> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10., später: Marcel hat sich bei GENESIS-Online/Destatis angemeldet **✅ ERLEDIGT 13.10.2026 · v2161 · `e8a320a9`:** Marcels Zensus-Konto in beiden `.env`; `tools/zensus-kreise-holen.mjs` erzeugt die Datei, 400/400 Kreise mit allen drei Werten, im mb-Container nachgemessen (Herford 4,2 / 53,8 / 5,54). **Weiter möglich (gemessen):** Nettokaltmiete je Kreis nach Baujahr (4000W-0005, 11 Stufen) und Fläche (4000W-0009), Durchschnittsmiete je GEMEINDE (GEOGM4, z. B. Hiddenhausen 5,31), marktaktive Leerstandsquote (4000W-0002). Achtung fachlich: Zensus-Miete = Bestandsmiete aller Verträge zum 15.05.2022, keine Angebotsmiete. — dort gemessen 331 Statistiken, KEIN Zensus 2022, nur Mikrozensus. Der Zensus 2022 liegt NUR auf ergebnisse.zensus2022.de.) (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
 > `marktbericht/backend/data/zensus2022_kreise.csv` trägt nur die
 > Beispielzeile. **0 von 162 Berichten auf Staging haben Zensus-Werte**
 > (159× `kreis_nicht_in_datei`, 3× `kein_ags`). Der „Zensus-Abruf" lief
@@ -327,6 +327,15 @@ Vorgabe gekennzeichnet bleiben (dieselbe Unterscheidung wie in `v2140b`
 beim Investmentprofil: „selbst gesetzt" gegen „Vorgabe, nicht gesetzt").
 
 #### N62.12 · Die geführte Eingabe durchgehen — Plausibilität und Vollständigkeit
+
+> **Marcel am 13.10.2026:** *„bitte beachten das wir microlage und makrolage
+> auch über die geomap schnittselle bekommen."* Gemessen im Code: der
+> `GeoMapConnector` liefert heute nur Angebote; die Mikrolage kommt aus dem
+> Geoapify-Score (`MarketInsightsService.js:96`), die Makrolage aus dem
+> Makro-Score (seit v2158 nur gemessene Kennzahlen). **Prüfen:** welche
+> Lage-Endpunkte GeoMap anbietet und ob die geführte Eingabe (`abruf: 'lage'`)
+> sie nutzen kann, statt den Nutzer zu fragen.
+
 
 **Marcel:** *„dass wir das auch in der geführten Tour haben. Also die
 nochmal durchgehen: Plausibilität, sind alle Daten drin, sind alle Stufen
