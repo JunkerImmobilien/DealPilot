@@ -97,7 +97,9 @@ export const ZensusConnector = {
       nettokaltmiete_qm: m.nettokaltmiete_qm,
       jung_18_30: m.jung_18_30,
       kreis_name: m.name || null,
-      license: '© Statistische Ämter des Bundes und der Länder, 2024',
+      /* v2161: Tabellen und Lizenz gehoeren zur Herkunft (Datei aus tools/zensus-kreise-holen.mjs). */
+      license: '© Statistische Ämter des Bundes und der Länder, Zensus 2022 (Tabellen 4000W-0001, 4000W-0004), Datenlizenz Deutschland – Namensnennung – 2.0',
+      quelle_url: 'https://ergebnisse.zensus2022.de/datenbank/online/table/4000W-0001',
     };
   },
 
