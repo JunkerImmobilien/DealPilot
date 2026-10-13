@@ -9497,6 +9497,10 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
     border:1px solid rgb(230,225,214) !important;
     border-radius:10px !important;
     width:calc(100% - 16px) !important; margin:8px 8px 10px !important; box-sizing:border-box !important;
+    /* v2203a · die Schublade ordnet per order (Marke -3, Portfolio -2, Aktionen -1, Nutzer 3);
+       ohne eigenes order stand der Schalter mit 0 HINTER dem ganzen Menue, egal wo im DOM.
+       -2 = gleiche Stufe wie der Portfolio-Knopf, im DOM direkt dahinter (standHandy). */
+    order:-2 !important;
   }
   html[data-dp-layout] aside#sidebar.sidebar .dk-schalter:hover{ border-color:var(--wl-c9a84c,#C9A84C) !important; }
   html[data-dp-layout] aside#sidebar.sidebar .dk-seg-titel{ color:rgb(191,183,169) !important; opacity:.75; }
