@@ -1005,8 +1005,30 @@ function buildPrompt(payload, opts) {
         if (_zs.eigentuemerquote != null) _zt.push('Eigentuemerquote ' + String(_zs.eigentuemerquote).replace('.', ',') + ' %');
         if (_zs.nettokaltmiete_qm != null) _zt.push('Nettokaltmiete ' + String(_zs.nettokaltmiete_qm).replace('.', ',') + ' EUR/m2');
         if (_zs.jung_18_30 != null) _zt.push('Anteil 18-30 Jahre ' + String(_zs.jung_18_30).replace('.', ',') + ' %');
-        L.push('- ZENSUS 2022 (amtlich, Stichtag 15.05.2022' + (_zs.kreis_name ? ', ' + _zs.kreis_name : '') + '): '
+        L.push('- ZENSUS 2022 (amtlich, Stichtag 15.05.2022, KREIS' + (_zs.kreis_name ? ' ' + _zs.kreis_name : '') + '): '
           + (_zt.length ? _zt.join(', ') : 'keine Kennzahl'));
+        /* v2162 · Gemeinde und die Werte passend zu Baujahr und Groesse
+           (mb.zensus_werte). Die Miete ist BESTANDSMIETE aller Vertraege -
+           das Modell darf sie nicht als Markt- oder Angebotsmiete ausgeben. */
+        var _zf = function (n, d) { return n == null ? null : Number(n).toFixed(d).replace('.', ','); };
+        var _zg = _zs.gemeinde, _zk = _zs.kreis;
+        if (_zg) {
+          var _gt = [];
+          if (_zg.nettokaltmiete_qm != null) _gt.push('Nettokaltmiete ' + _zf(_zg.nettokaltmiete_qm, 2) + ' EUR/m2');
+          if (_zg.leerstandsquote != null) _gt.push('Leerstandsquote ' + _zf(_zg.leerstandsquote, 1) + ' %');
+          if (_zg.leerstandsquote_marktaktiv != null) _gt.push('marktaktiver Leerstand ' + _zf(_zg.leerstandsquote_marktaktiv, 1) + ' %');
+          if (_gt.length) L.push('  Gemeinde ' + _zg.name + ': ' + _gt.join(', '));
+        }
+        [['miete_baujahr', 'Baujahrsklasse'], ['miete_flaeche', 'Groessenklasse']].forEach(function (p) {
+          var src = (_zg && _zg[p[0]] && _zg[p[0]].wert != null) ? [_zg[p[0]], 'Gemeinde'] : ((_zk && _zk[p[0]] && _zk[p[0]].wert != null) ? [_zk[p[0]], 'Kreis'] : null);
+          if (src) L.push('  Nettokaltmiete ' + p[1] + ' ' + src[0].klasse + ' (' + src[1] + '): ' + _zf(src[0].wert, 2) + ' EUR/m2');
+        });
+        var _zl = (_zg && _zg.leerstandsdauer) || (_zk && _zk.leerstandsdauer);
+        if (_zl && _zl.length) L.push('  Dauer des Leerstands (Anteil der leeren Wohnungen): '
+          + _zl.map(function (x) { return x.text + ' ' + _zf(x.anteil_pct, 1) + ' %'; }).join(', '));
+        if (_zg || (_zk && (_zk.miete_baujahr || _zk.miete_flaeche)))
+          L.push('  Die Zensus-Miete ist die BESTANDSMIETE aller laufenden Vertraege am Stichtag, keine Angebotsmiete;'
+            + ' nenne sie als solche. Der Zensus-Leerstand ist keine Mietausfallannahme (Langzeitleerstand zaehlt mit).');
       } else if (_zs) {
         L.push('- ZENSUS 2022: fuer diesen Kreis liegen KEINE Zensus-Werte vor. Nenne keine Zensus-Zahl'
           + ' und schreibe keine recherchierte Leerstands- oder Eigentuemerquote als Zensuswert.');

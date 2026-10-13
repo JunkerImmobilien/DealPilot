@@ -698,6 +698,27 @@ router.get('/destatis/check', async (req, res) => {
     status: r.status, username: r.username });
 });
 
+// GET /zensus/objekt?plz=32120&ort=Hiddenhausen&baujahr=1964&wfl=233
+// v2162 · Zensus 2022 fuer EIN Objekt: Gemeinde (nur wenn eindeutig) und
+// Kreis, Miete und Leerstand passend zu Baujahr und Flaeche, die Dauer des
+// Leerstands. Fuer die Reiter Miete und Investitionen der Haupt-App.
+// Referenzdaten, kein Nutzerbezug — deshalb ohne user_id.
+router.get('/zensus/objekt', async (req, res) => {
+  try {
+    const plz = String(req.query.plz || '').trim();
+    if (!/^\d{5}$/.test(plz)) return res.status(400).json({ error: 'plz_fehlt' });
+    const zahl = (v) => { const n = Number(String(v == null ? '' : v).replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : null; };
+    const [k, g] = await Promise.all([
+      AgsResolver.fromPostcode(plz).catch(() => null),
+      AgsResolver.gemeindeEindeutig(plz, req.query.ort).catch(() => null)
+    ]);
+    if (!k) return res.json({ available: false, reason: 'plz_unbekannt' });
+    const z = await ZensusConnector.lookupDb({ kreisAgs: k.kreis_ags, gemeindeAgs: g && g.gemeinde_ags,
+      baujahr: zahl(req.query.baujahr), wohnflaeche: zahl(req.query.wfl) });
+    res.json(Object.assign({}, z, { gemeinde_eindeutig: g ? g.eindeutig : null }));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /zensus/check — ist die Zensus-CSV da, wie viele Kreise, welche Spalten erkannt + Beispiel.
 router.get('/zensus/check', async (req, res) => {
   try {
