@@ -157,6 +157,56 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N63 · Marcels Liste vom 13.10.2026 abends (Hilfe, Einstellungen, Handy, geführte Eingabe, Sprache)
+
+> Erst ins Backlog, dann abarbeiten (Marcel: „für danach noch ein paar Sachen zum Abarbeiten, also erstmal ins Backlog damit"). Optik → **Demos zuerst**, wo Marcel es ausdrücklich sagt (Einstellungen, N63.5).
+
+**N63.1 · Hilfe: Navigation und Einstieg**
+- Beim Öffnen und Klicken sind „Abläufe & Pilot" **und** „Partnerportal" gleichzeitig gold unterstrichen. Es darf nur der aktive Punkt markiert sein. Ursache messen: zwei aktive Marker oder Hover-Rest?
+- „Einstieg" und „Abläufe & Pilot" überschneiden sich → **Einstieg in „Abläufe & Pilot" integrieren**.
+- Beim Öffnen der Hilfe direkt „Abläufe & Pilot" zeigen. Den Piloten-Knopf in den schwarzen Kopf neben „Atlas öffnen" stellen.
+
+**N63.2 · Hilfe: Inhalte gegen den Code abgleichen**
+- Glossar und häufige Fragen: Stimmen alle Zahlen, die die Hilfe nennt?
+  - DSCR-Schwellen, LTV-Stufen, Pilot-Skala, Score-Stufen
+  - jede Zahl mit Beleg aus dem Code, so wie `docs/hilfe/hilfe-belege-v2189.md`
+- Mehr Fragen aufnehmen.
+- Alles in eine **vernünftige Reihenfolge** bringen (heute „relativ unsortiert").
+- Raus: der Eintrag „Frag den DealPilot-Agent" mit Webfenster und Fragen unter „Häufige Fragen". Abläufe laufen über den Piloten.
+
+**N63.3 · Hilfe-Fenster auf dem Handy**
+- Marcel findet das Modal am Handy nicht gut dargestellt.
+- Umbauen wie die Einstellungen am Handy. Mit N63.4 zusammen denken.
+
+**N63.4 · Einstellungen: Sortierung und Darstellung am Handy**
+- Die Sortierung ist teilweise nicht schön.
+- Am Handy dieselbe Kritik wie bei der Hilfe.
+
+**N63.5 · Einstellungen → Standardwerte: als Karten statt Scrollliste — DEMO ZUERST**
+- Marcel: *„unübersichtlich … mit so Standardkarten arbeiten, dass man nicht so viel runterscrollen muss"*
+- Ein Reiter mit den Lageklassen (A/B/C/D), ein Reiter mit den Standardwerten, je eine kurze Erklärung.
+- **Ein Standardset auswählbar**, also ein vorbelegter Satz.
+- *„Kannst du auch gerne mal mehrere Demos fertig machen … wie das im Modal aussehen könnte."* → mehrere Varianten nach `design/Vorschläge/`, zeigen, dann bauen.
+
+**N63.6 · Handy: Bestand/Ankauf rutscht unter die Einstellungen**
+- Am Handy steht der Umschalter Bestand/Ankauf unter den Einstellungen statt unter „Portfolio".
+- Er ist dort gold umrahmt mit goldener Schrift, das passt nicht.
+- Zurück unter „Portfolio" und in die Formatierung der Desktop-Fassung.
+
+**N63.7 · Geführte Eingabe: Hinweis „Erklär mir das" wegklicken**
+- Beim Öffnen steht „auf Wunsch: Erklär mir das".
+- Der Hinweis braucht ein **×** zum Schließen und **„Nicht mehr anzeigen"**, das gemerkt wird (Einstellungsspeicher, nicht nur der Browser).
+
+**N63.8 · Geführte Tour komplett durchgehen**
+- Prüfen, ob sie überall sauber dargestellt wird: Desktop, Tablet, Handy in der Messkabine.
+- Dazu Eingabe und Lautsprecher.
+
+**N63.9 · Sprechen wie bei WhatsApp: halten zum Sprechen**
+- Marcel: im Fenster der geführten Eingabe den **Mikrofon-Knopf gedrückt halten**, um zu sprechen, statt dass er von selbst zuhört.
+- Damit entfallen das Kästchen „Ich höre nichts, du kannst auch tippen" und der Anhalten-Knopf.
+- In der App-Fassung darf er wie heute automatisch zuhören. Klären, ob „App-Version" die installierte PWA meint oder den Telegram-Bot.
+- Marcel sagt „Lautsprecher" und meint das Mikrofon. Abgrenzen gegen die Sprachausgabe der Piloten.
+
 #### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
 
 Gemessen in der Messkabine (11 Breiten × 9 Reiter + 8 Ansichten). Überlauf, Herausragen und Unerreichbar stehen nach v2198c überall auf 0. Offen, weil Gestaltungsfragen und nicht Fehler:
