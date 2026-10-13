@@ -38714,6 +38714,25 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod (15) v2200–v2205a · und Tour-Abnahme in der Messkabine (13.10.2026)
+
+- **Prod (15)** `7843709b`:
+  - Gesichert: `main-20261013-1925` (11 MB, 71) und `mb-20261013-1925` (25 MB, 32).
+  - Backend neu gebaut, `hinweise` steht in `userSettings.js` im Container.
+  - Prod liefert `modal-handy.js?v=v2201`, `hinweise.js?v=v2204`, `tour-content.js?v=v2205a`.
+- **Tour (N63.8) vollständig gemessen:**
+  - Alle 39 Schritte bei 1280 px und bei 390 px: keine Sprechblase außerhalb des Bildes.
+  - Bei 1280 hat jeder Schritt einen Spot.
+  - Bei 390 steht die Blase bewusst mittig ohne Spot (`tour.css` @media ≤768: `.dp-tour-spotlight{display:none}`).
+- **Messtechnik, neu:** Das verdeckte Fenster drosselt Timer und Animationsframes (ein Schritt ≈ 1 min). Für den Lauf habe ich `setTimeout`/`setInterval`/`requestAnimationFrame` im Messrahmen durch einen `MessageChannel`-Taktgeber ersetzt (nur im Test, nicht in der App). Damit liefen 39 Schritte in etwa 60 s.
+- **Zurückgenommen:**
+  - „Schritt 45 von 39" war ein Artefakt meines Tests: Neustart, während die vorige Tour noch aufbaute, plus 18 schnelle `next()`.
+  - Gezielt nachgemessen: zwei schnelle Klicks auf Weiter springen sauber von 1 auf 3, der Zähler läuft nie über 39.
+- **Rest:**
+  - N63.5: Marcels Wahl unter den drei Demos und die Werte der Sets.
+  - Halten zum Sprechen mit echtem Mikrofon am Handy abnehmen.
+  - GrESt Thüringen prüfen.
+
 ### Prod (14) v2199–v2199c · und N63 auf Staging: v2200–v2205 (13.10.2026)
 
 - **Prod (14)** `284d7c48`:

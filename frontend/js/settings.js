@@ -1346,6 +1346,8 @@ function _swSet(btn) {
          erst, ob es sein Ziel gibt. */
       try { if (DealPilotInvestmentProfile.wireLageProfil) DealPilotInvestmentProfile.wireLageProfil(); } catch (e) {}
       try { if (window.DealPilotBwkProfil && !window._bwkpVerdrahtet) { window._bwkpVerdrahtet = true; DealPilotBwkProfil.verdrahten(document); } } catch (e) {}   /* v2184 */
+      /* v2206 · N63.5: Karten-Übersicht über das fertig verdrahtete Formular legen */
+      try { if (window.DpStandardKarten) DpStandardKarten.aufbauen(host); } catch (e) {}
     }
     var sel = document.getElementById('set_startup_view');
     if (sel) {
