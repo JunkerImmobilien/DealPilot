@@ -153,6 +153,8 @@ gegenübergestellt werden sie nirgends.
 
 #### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert nicht fortgeschrieben (Bewertungsfrage an Marcel)
 
+**✅ GEBAUT 13.10.2026 · v2186 · e2ec2ed2 (Staging):** Marcel: „das soll schon passen“. Jahrestabelle BWK_JAHRE + bwkAnsaetze(jahr), Ertragswert zum Stichtag je Objektart. Offen: 2022/2023 lückenhaft, Gewerbe-Verwaltung/-Instandhaltung, Prod.
+
 Gemessen 13.10.2026: `marktbericht/backend/src/services/ErtragswertService.js:360–386` nimmt außerhalb des NRW-Modells `BWK_TABELLE` aus `lib/immowertv.js` UNfortgeschrieben — 230 € Verwaltung je Wohnung (275 € ETW), 9,00 €/m² Instandhaltung. Für Stichtage ab 01.01.2026 gelten nach zwei Fachquellen 367 € / 439 € / 14,40 €/m² (Faktor 1,60, siehe v2185). Die Bewirtschaftungskosten liegen damit rund 37 % zu niedrig, der Ertragswert zu hoch; der Bericht warnt selbst „nicht indexiert … vorläufig" (`geprueft: false`).
 **Zu entscheiden (Marcel):** welche BWK-Ansätze gelten — § 10 ImmoWertV verlangt die Ansätze, mit denen der Gutachterausschuss seinen Liegenschaftszins abgeleitet hat (oft die fortgeschriebenen Anlage-3-Werte seines Ableitungsjahres, teils Landesmodelle). Danach: Fortschreibung je Stichtag in `immowertv.js` (Zahl, nicht Konstante) und Abnahme am Anwendungsbeispiel.
 

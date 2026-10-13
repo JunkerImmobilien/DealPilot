@@ -38614,6 +38614,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2186 · Ertragswert mit Bewirtschaftungskosten zum Stichtag, je Objektart (13.10.2026, Staging)
+
+- **Was:** Marcel: *„sollten wir dann im Marktbericht auch anpassen für den Ertragswert, das soll schon passen. Bekommen wir auch immer die aktuellen Werte je nach Objektart?"* `immowertv.js` führt jetzt `BWK_JAHRE` (2021 Verordnung, 2023 Brandenburg-Teilwerte, 2024–2026 Fachveröffentlichungen, je mit Quelle) und `bwkAnsaetze(jahr)` — je Feld das Stichtagsjahr oder das letzte belegte davor, mit Klartext-Hinweis. `ErtragswertService` (Zweig ohne Landesmodell) nimmt Verwaltung je Wohnung bzw. **je ETW**, je Garage, Instandhaltung je m² und je Garage zum Stichtag; statt „nicht indexiert" ein Hinweis mit Quelle, Warnung nur ohne Jahreswerte. NRW-Modell (agvga) unberührt. `GET /bwk/ansaetze` als EINE Quelle für Ertragswert und Haupt-App; `bwk-profil.js` liest den Jahresfaktor daraus (selbst gesetzter Faktor gilt vor). Agent `datenwaechter` prüft jährlich das laufende Jahr.
+- **Commit:** `e2ec2ed2`
+- **Nachweis:** im Container: MFH 420 m²/6 WE/4 Stp., Stichtag 2026 → Verwaltung 6 × 367 + 4 × 48 = 2.394 €, Instandhaltung 420 × 14,40 + 4 × 108 = 6.480 €, BWK 9.738 € (vorher 6.416 €); ETW 2026 Verwaltung 439 €; 2023 meldet „Verwaltung je Eigentumswohnung aus 2021, Instandhaltung je Garage aus 2021"; 2020 warnt. Probelauf Haupt-App 8/8; Endpunkt über die App ok, Faktor 1,60.
+- **Rest:** 2022 fehlt ganz, 2023 teilweise (Rückgriff auf 2021 wird angezeigt). Gewerbe-Verwaltung (Anteil am Rohertrag) und Gewerbe-Instandhaltung je Nutzung sind nicht abgebildet — nur der Gewerbe-Mietausfall. Prod nach Freigabe (Rebuild backend + mb).
+
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
 - **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).
