@@ -1436,6 +1436,12 @@ function buildPrompt(payload, opts) {
     '   Erhaltungsaufwand verteilt wird, die Steuerwirkung im ersten Jahr in EUR und',
     '   was sie fuer den Cashflow nach Steuer heisst. Fehlt eine Angabe (z. B. kein',
     '   Grenzsteuersatz), sage das und rechne NICHT mit einem angenommenen Satz.',
+    /* v2164a - gemessen am ersten echten Lauf (2026-1052): „2 % ueber eine
+       Restnutzungsdauer von 80 Jahren". Eingetragen war nur der Satz; die
+       80 stammt aus der Gesamtnutzungsdauer des Marktberichts. */
+    '   Die AfA-Dauer ergibt sich aus dem Satz (2 % = 50 Jahre, 2,5 % = 40, 3 % = 33). Eine',
+    '   Restnutzungsdauer nennst du NUR, wenn oben "AfA ueber Restnutzungsdauer" steht;',
+    '   die Gesamtnutzungsdauer des Marktberichts ist KEINE AfA-Dauer.',
     '   Keine Steuerberatung: schliesse mit dem Hinweis, dass ein Steuerberater die',
     '   Einordnung bestaetigen sollte. Gehoert nach "steuer_zusammenfassung".',
     (_ak ? '   Liegt oben ein ANKAUF-STAND vor: vergleiche zusaetzlich die steuerliche Lage\n'
