@@ -308,6 +308,9 @@
   function renderDetail() {
     var host = document.getElementById('imo-detail');
     var confirm = document.getElementById('imo-confirm');
+    /* v2199 · eine offene Rueckfrage gehoert zum vorher gewaehlten Inserat */
+    var _altAb = document.getElementById('imo-abgleich'); if (_altAb) _altAb.remove();
+    confirmPick._durch = false;
     if (state.active == null || !state.items[state.active]) {
       host.innerHTML = '<div class="imo-empty">Objekt links w\u00e4hlen.</div>';
       if (confirm) confirm.disabled = true; return;
@@ -357,6 +360,15 @@
      Haus. Ein Vergleich, der an der Schreibweise scheitert, ist so
      teuer wie keiner - man lernt, ihn wegzuklicken. */
   function _formWert(id) {
+    /* v2199 · Marcel 13.10.2026: im Quick-Boarding meldete der Abgleich
+       "Andere Adresse als im Objekt" mit der Adresse des VORHER offenen
+       Objekts (Gohliser Str. 42). Ursache: hier wurde immer das Formular
+       der Haupt-App gelesen - der Quick-Check ist ein eigenes Dokument
+       (iframe) mit eigenen Feldern qc_*. Fuer target 'qc' liefert der
+       Aufrufer die Felder; ohne Lieferant wird nicht verglichen. */
+    if (state.target === 'qc') {
+      try { return state.feld ? String(state.feld(id) || '').trim() : ''; } catch (e) { return ''; }
+    }
     var e = document.getElementById(id);
     return e ? String(e.value || '').trim() : '';
   }
@@ -405,9 +417,9 @@
     var d = document.createElement('div');
     d.id = 'imo-abgleich';
     d.className = 'imo-abgleich';
-    d.innerHTML = '<b>\u26A0 Andere Adresse als im Objekt</b>'
+    d.innerHTML = '<b>\u26A0 Andere Adresse als im ' + esc(targetLabel()) + '</b>'
       + '<span>Unterschied in: ' + esc(erg.worin.join(', ')) + '</span>'
-      + '<div class="imo-ab-paar"><span>Objekt</span><b>' + esc(erg.objekt || '\u2014') + '</b></div>'
+      + '<div class="imo-ab-paar"><span>' + esc(targetLabel()) + '</span><b>' + esc(erg.objekt || '\u2014') + '</b></div>'
       + '<div class="imo-ab-paar"><span>Inserat</span><b>' + esc(erg.inserat || '\u2014') + '</b></div>'
       + '<span class="imo-ab-frage">Geh\u00f6rt das Inserat zu diesem Objekt?</span>'
       + '<div class="imo-ab-knoepfe">'
@@ -452,6 +464,8 @@
       state.onConfirm = onConfirm || function () {};
       state.target = (opts && opts.target) || 'obj';
       state.onClose = (opts && opts.onClose) || null; state.confirmed = false;
+      state.feld = (opts && typeof opts.feld === 'function') ? opts.feld : null;   /* v2199 */
+      confirmPick._durch = false;
       state.source = null; state.active = null; state.items = [];
       ensureOverlay(); loadSources();
     },

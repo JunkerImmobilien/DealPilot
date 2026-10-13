@@ -38714,6 +38714,52 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2199–v2199c · ImmoMetrica im Quick-Boarding, Freigeben-Knopf (13.10.2026, Staging)
+
+- **Was (Marcels Befunde):**
+  1. Quick-Boarding meldete „Andere Adresse als im Objekt" mit der Adresse des VORHER offenen Objekts (Gohliser Str. 42). Ursache: `_abgleich()` in `immometrica-import.js` las immer das Formular der Haupt-App, der Quick-Check ist ein eigenes Dokument. Jetzt liefert `quickcheck-app.html` seine `qc_*`-Felder (`opts.feld`). Die Rückfrage fällt beim Inseratwechsel weg und nennt „Quick-Check" statt „Objekt".
+  2. Favorit „32602, Vlotho" ergab Straße = 32602, Ort leer: Der Komma-Zweig in `parseAddr` nahm links immer eine Straße an. Klammer-Ortsteile wie „Petershagen (Petershagen)" fallen jetzt weg. Neuer Prüfer `tools/immometrica-adresse-pruefen.mjs`: 13 Formen, darunter die echten Favoriten, RC=0.
+  3. Folge von v2190 (Straße Pflicht): Inserate ohne Anschrift (6 von 7 Favoriten) hätten Score und Speichern gesperrt. Der Import leert jetzt Straße/Nr. und markiert „Ortskern" (`data-ortskern`). Damit gilt die Pflicht als erfüllt, ein Hinweis steht am Feld.
+  4. Bütten-Kacheln im Quick-Check: Schrift #2A2418 auf Grund #0A0A0A, der Grund kam aus der ID-Regel, die Schrift aus `datenaufnahme.css`. Jetzt wie im Objekt-Tab (#FFFDF7), Block neben `qc-kartei-angleich`.
+  5. Strichcode neben „Abrufen" lag als 73×67-Kasten hinter dem 85×34-Knopf. Jetzt ein eigener Streifen darüber: 24 px, bis 1100 px 18 px, am Handy 16 px. Der Handy-Ausblender (v636) verlor gegen die Bütten-Regel.
+  6. Freigeben-Knopf sprang beim Überfahren: `.sec button:hover` setzt `transform: translateY(-1px)` und ersetzte das zentrierende `translate(-50%, -50%)`. Jetzt mittig über inset 0 / margin auto, ohne transform. Breite gegen `.sec button … width:auto !important` mit `:not(#id)` angehoben (v2199a/b).
+- **Commit:** `183afa70`, `d9347922`, `fcb18f45`, `251b9de8`
+- **Nachweis:**
+  - Ablauf im Browser: Gohliser offen → Quick-Boarding → Vlotho-Favorit. Keine Rückfrage, PLZ 32602, Ort Vlotho, Straße leer mit Hinweis, Feld nicht rot.
+  - `parseAddr` im Staging-Container ergibt `{plz:32602, ort:Vlotho, str:''}`.
+  - Messkabine 390/820/1024/1440: Strichcode über dem Knopf, Leiste ohne Überlauf (390: 2 px, schon vor v2199c so).
+  - Freigeben: 117×39, Mitte = Reihenmitte. Kaskade: `.sec button:hover` transform verliert gegen `transform:none !important`.
+  - gold-audit RC=0, buster-ebenen SAUBER.
+- **Eigener Fehler:** In v2199 habe ich IFRAME_SRC in `qc-bridge.js` hochgezogen, den Buster von `qc-bridge.js` selbst in `index.html` aber nicht (v2198a). Nachgezogen in v2199c.
+- **Antwort an Marcel (Code gelesen):** Der Marktbericht braucht nur Koordinaten. PLZ + Ort ergeben den Ortsmittelpunkt, die Vergleichsangebote kommen aus dem Umkreis 3–3,5 km und mehr (`MarketAnalysisService`). Bodenrichtwert, Mikrolage und Lärm gelten dann für den Ortskern, nicht für das Haus.
+- **Rest:** Prod-Rollout v2199–v2199c (Backend-Rebuild wegen `immometricaMapping.js`). N63 im Backlog.
+
+### Prod (13) v2191–v2198c · Backlog-Paket + Responsive-Check (13.10.2026)
+
+- **Was:** main ← staging (21 Commits), Backend und mb-Backend neu gebaut.
+- **Commit:** `c5bc8a3f` (main)
+- **Nachweis:**
+  - Gesichert in `/root/backups/`: `main-20261013-1758.sql.gz` (11 MB, 71 CREATE TABLE) und `mb-20261013-1758.sql.gz` (25 MB, 30).
+  - Rebuild RC=0, `dealpilot-backend` healthy.
+  - Log mb-backend: `apply 018_plz_orte_laufzeiten.sql … OK`, listening :4000.
+  - `mb.plz_orte` und `mb.laufzeiten` existieren (je 0 Zeilen, füllen sich mit dem ersten Bericht).
+  - Prod liefert `pilot-tower.js?v=v2198a`.
+- **Entschieden (Marcel):** N62.23 vw-modul wird ignoriert. Die neuere Fassung (V422) ist gegengeprüft und eingebaut, die Homepage zieht Marcel selbst nach.
+- **Nachgemessen für Marcels Frage nach Rot/Grün und Touch:**
+  - Rot `#B8625C` liegt bei 3,8–4,3:1, zum Beispiel:
+    - Datenaufnahme-Status „15 fehlt", „Anlage 2 greift nicht" (10 px)
+    - Finanzierung DSCR-Badge und „DSCR: Kritisch"
+    - Steuer-Hinweis „Keine Steuerberatung"
+  - Grün `#3FA56C` liegt bei 2,6–3,1:1, zum Beispiel:
+    - Bankgespräch-Titel „Erstrangige Grundschuld", „Vollständig vermietet"
+    - Steuer-Beträge „+0 €"
+  - Touch bei 390 px:
+    - Kartenknöpfe `sbc-btn` 26×26 (in der Objektschublade)
+    - Checkboxen 16×16 (`erbpacht`, `inv_tax_active`, `me_inc_ze`, …), meist in einem anklickbaren Label
+    - Pilot-Knopf 38×38
+    - Kontingent-Pille 110×32
+- **Rest:** Grün/Rot-Variante wartet auf Marcels Entscheidung, die Touch-Flächen auf die Abnahme am Gerät.
+
 ### v2198–v2198c · Kompletter Responsive-Check (13.10.2026, Staging)
 
 - **Was:** Marcels Master-Prompt „vollständiger Responsive-, UI-/UX- und Funktionalitätscheck".
