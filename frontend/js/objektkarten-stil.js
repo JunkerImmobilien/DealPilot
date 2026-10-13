@@ -57,12 +57,12 @@
   }
 
   var STILE = {
-    '':          { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer · Standard' },
+    '':          { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer' },
     bordkarte:   { name: 'Bordkarte',   sub: 'Abriss links, Nummer hochkant' },
     kante:       { name: 'Score-Kante', sub: 'Farbiger Strich statt Ring' },
     datenzeile:  { name: 'Datenzeile',  sub: 'Mono, eine Zeile, bündig' },
     ampel:       { name: 'Ampel',       sub: 'Ein Punkt sagt die Stufe' },
-    kennzahlen:  { name: 'Kennzahlen',  sub: 'Preis, Rendite, Cashflow' },
+    kennzahlen:  { name: 'Kennzahlen',  sub: 'Preis, Rendite, Cashflow · Standard' },   /* v2178 */
     minimal:     { name: 'Minimal',     sub: 'Nur Adresse und Ring' }
   };
 
@@ -130,7 +130,9 @@
    * gibt es keine Schiene, dort darf kein Kartenstil hängen (v1949). */
   function effektiv() {
     if (gewaehlt !== null) return gewaehlt;
-    return layoutAktiv() ? 'datenzeile' : '';
+    /* v2178: ohne Layout (DealPilot) ist der Standard die Kennzahlen-Karte -
+       Marcel am 13.10.2026; ihre CSS ohne Layout steht seit v2114. */
+    return layoutAktiv() ? 'datenzeile' : 'kennzahlen';
   }
 
   /* Eine eigene Wahl. Sie wird gemerkt UND angewandt. */
@@ -192,8 +194,8 @@
            genau der Defekt. Ein Hinweis, der einen Fehler beschreibt,
            laesst ihn wie eine Absicht aussehen. */
         '<div class="dp-okw-fuss">Wirkt in allen Ansichten. Ohne eigene ' +
-        'Wahl zeigt die Aktenmappe die Bordkarte, die Ansicht DealPilot ' +
-        'den Aktenreiter.</div>' +
+        'Wahl zeigt die Ansicht DealPilot die Kennzahlen-Karte.' +
+        '</div>' +
       '</div>';
     host.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('.dp-okw') : null;

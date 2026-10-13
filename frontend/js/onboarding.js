@@ -63,7 +63,7 @@ window.DealPilotOnboarding = (function () {
     { id: 'v1b', name: 'Aktenmappe', karte: 'datenzeile', standard: true,
       unter: 'Menü links, Reiter oben im Kopf',
       fuer: 'Wie eine Mappe mit Registern. Ruhig und vertraut.' },
-    { id: '',    name: 'DealPilot',  karte: null,
+    { id: '',    name: 'DealPilot',  karte: 'kennzahlen',   /* v2178: Marcels Standard fuer DealPilot */
       unter: 'Obsidian und Gold, Reiter oben',
       fuer: 'Dunkel und kompakt, alles auf einem Schirm.' },
     { id: 'v2',  name: 'Kanzlei',    karte: 'bordkarte',
@@ -1063,7 +1063,9 @@ window.DealPilotOnboarding = (function () {
       '.dpo-i:hover{border-color:var(--wl-b8932f,#b8932f);color:var(--wl-b8932f,#b8932f)}',
       '.dpo-i.an{background:var(--wl-c9a84c,#C9A84C);border-color:var(--wl-c9a84c,#C9A84C);color:#1b1815}',
       '.dpo-i-text{grid-column:1/-1;margin:-2px 0 2px;padding:9px 11px;border-radius:7px;'
-        + 'background:#F6F3EC;border:1px solid #E6E1D6;font-size:11.5px;line-height:1.6;color:#5E574F}',
+        + 'background:#F6F3EC;border:1px solid #E6E1D6;font-size:11.5px;line-height:1.6;color:#5E574F;'
+        /* v2178: der Text sitzt im <label> und erbte dessen Versalien und Monospace (Marcel: ‚die ganzen Infotexte ... sind gross geschrieben') */
+        + 'text-transform:none;letter-spacing:normal;font-family:Inter,system-ui,sans-serif;font-weight:400}',
 
       '.dpo-haken{display:flex;align-items:center;gap:9px;margin:0 0 12px;padding:10px 12px;'
         + 'border:1px solid #E6E1D6;border-radius:9px;background:#FBF9F4;cursor:pointer;font-size:12.5px}',
@@ -1085,7 +1087,8 @@ window.DealPilotOnboarding = (function () {
       '.dpo-kachel:hover{border-color:var(--wl-c9a84c,#C9A84C);transform:translateY(-1px)}',
       '.dpo-kachel.an{border-color:var(--wl-b8932f,#b8932f);box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 22%,transparent)}',
       '.dpo-k-name{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:14.5px;color:#1b1815}',
-      '.dpo-k-unter{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.4px;color:#8a837a;text-transform:uppercase}',
+      /* v2178: hier standen Versalien in Monospace - in Schritt 5 sind das ganze Saetze (Profilbeschreibungen) */
+      '.dpo-k-unter{font-family:Inter,system-ui,sans-serif;font-size:11.5px;line-height:1.45;color:#7a7368;text-transform:none}',
       '.dpo-k-fuer{font-size:12px;line-height:1.5;color:#55504a;margin-top:2px}',
       /* v1961: die drei Lage-Zeilen. Schmal und ruhig - sie sollen den
          Assistenten nicht dominieren, die Profilkacheln daruaber sind
