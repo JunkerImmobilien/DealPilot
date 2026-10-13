@@ -38620,6 +38620,7 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Commit:** `e2ec2ed2`
 - **Nachweis:** im Container: MFH 420 m²/6 WE/4 Stp., Stichtag 2026 → Verwaltung 6 × 367 + 4 × 48 = 2.394 €, Instandhaltung 420 × 14,40 + 4 × 108 = 6.480 €, BWK 9.738 € (vorher 6.416 €); ETW 2026 Verwaltung 439 €; 2023 meldet „Verwaltung je Eigentumswohnung aus 2021, Instandhaltung je Garage aus 2021"; 2020 warnt. Probelauf Haupt-App 8/8; Endpunkt über die App ok, Faktor 1,60.
 - **Rest:** 2022 fehlt ganz, 2023 teilweise (Rückgriff auf 2021 wird angezeigt). Gewerbe-Verwaltung (Anteil am Rohertrag) und Gewerbe-Instandhaltung je Nutzung sind nicht abgebildet — nur der Gewerbe-Mietausfall. Prod nach Freigabe (Rebuild backend + mb).
+- **Prod (11)** `4d494bef`: v2186 ausgerollt. Beide DBs vorher gesichert (Haupt 11 MB / 71 Tabellen, mb 25 MB / 30), Rebuild backend + mb-backend. Im Container `bwkAnsaetze(2026)` = Verwaltung 367 / ETW 439 / Garage 48, Instandhaltung 14,40 / Garage 108.
 
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
