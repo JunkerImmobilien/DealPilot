@@ -9482,3 +9482,28 @@ html[data-dp-layout][data-dp-objkarte="kennzahlen"] .dpl-schiene .sb-card.is-act
 html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
   right: 84px !important;
 }
+
+/* ══ v2203 · N63.6 · DIE STAND-LEISTE AM HANDY ═══════════════════════════
+   Am Handy steht #dk-schalter in der Schublade (#sidebar) hinter dem
+   Portfolio-Knopf (layout-varianten.js standHandy). Dort griff nur die
+   Grundfassung aus style.css (aside.sidebar .dk-schalter, alles !important):
+   Goldrahmen 50 %, Goldschrift - Marcel: „goldener Rahmen und goldene
+   Schrift. Das passt nicht." Hier dieselben Werte wie v2163 in der
+   Schiene (Nachbar des Portfolio-Knopfs). ID + Attribut schlagen die
+   Grundregel; !important, weil sie selbst eines traegt. */
+@media (max-width: 900px){
+  html[data-dp-layout] aside#sidebar.sidebar .dk-schalter{
+    background:transparent !important;
+    border:1px solid rgb(230,225,214) !important;
+    border-radius:10px !important;
+    width:calc(100% - 16px) !important; margin:8px 8px 10px !important; box-sizing:border-box !important;
+  }
+  html[data-dp-layout] aside#sidebar.sidebar .dk-schalter:hover{ border-color:var(--wl-c9a84c,#C9A84C) !important; }
+  html[data-dp-layout] aside#sidebar.sidebar .dk-seg-titel{ color:rgb(191,183,169) !important; opacity:.75; }
+  html[data-dp-layout] aside#sidebar.sidebar .dk-seg{ color:rgb(191,183,169) !important; min-height:40px; }
+  html[data-dp-layout] aside#sidebar.sidebar .dk-seg:hover{ color:rgb(233,227,214) !important; }
+  html[data-dp-layout] aside#sidebar.sidebar .dk-seg.aktiv{
+    background:rgba(233,227,214,.14) !important; color:#fff !important;
+    box-shadow:inset 0 0 0 1px rgba(233,227,214,.35) !important;
+  }
+}
