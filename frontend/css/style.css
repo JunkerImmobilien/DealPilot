@@ -40865,8 +40865,10 @@ html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber,
 html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:hover,
 html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:focus,
 html body .dp-pf-row.dp-pf-riegel-row .dp-pf-freigeben-ueber:active {
-  left: 0; right: 0; top: 0; bottom: 0; margin: auto;
-  width: max-content; height: max-content;
+  left: 0 !important; right: 0 !important; top: 0 !important; bottom: 0 !important; margin: auto !important;
+  /* !important noetig: `.sec button:not(...)` setzt width:auto !important
+     (gemessen v2199: Knopf 605 px breit statt Textbreite). */
+  width: max-content !important; height: max-content !important;
   transform: none !important; translate: none !important;
 }
 .dp-pf-freigeben-ueber .dp-pf-ic { display: inline-flex; }
