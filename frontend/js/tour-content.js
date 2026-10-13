@@ -3,8 +3,9 @@
  * DealPilot V239 — Tour Steps (2 Varianten)
  *
  * window.DpTourVariants = {
- *   withObjects: [...]  // User hat schon Objekte (24 Steps)
- *   empty: [...]        // User leer (Onboarding, 20 Steps)
+ *   withObjects: [...]  // User hat schon Objekte
+ *   empty: [...]        // User leer (Onboarding) - seit v2178 legt die Engine ein Demo-Objekt an
+ *   (v2205a: keine Schrittzahlen mehr hier - sie stimmten nie: 24/20 statt 39/38)
  * }
  *
  * Engine entscheidet bei Tour.start() welche Variante geladen wird.
@@ -12,7 +13,7 @@
 (function() {
   'use strict';
 
-  // ─── Variante A: User hat schon Objekte (24 Steps) ─────────────────────
+  // ─── Variante A: User hat schon Objekte ─────────────────────
   
   var STEPS_WITH_OBJECTS = [
     
@@ -24,7 +25,7 @@
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'Hier liegen **alle deine Objekte**. In der Ansicht „Heute“ in der Sidebar links — in der Aktenmappe klappst du dafür links die **Portfolio-Schiene** auf, auf dem Handy öffnet der Portfolio-Knopf das Menü. Von hier startet jede Analyse.',
-      bodyMore: 'Was die Sidebar dir zeigt:\n\n• **Jedes Objekt als Card** mit Adresse, Kaufpreis, DealScore-Ampel\n• **Kennzahlen** im Mini-Format: DSCR, Cashflow, Bruttomietrendite\n• **Sortier- und Filter-Funktion** nach Score, Lage, Plan\n• **Demo-Objekte** mit grüner Markierung\n\n**Limits nach Plan:**\n• **Free**: 3 Objekte\n• **Starter**: 15 Objekte\n• **Investor**: 50 Objekte\n• **Pro**: unlimited\n\nKlick einfach auf ein Objekt um es zu öffnen und in die Vollanalyse zu starten.',
+      bodyMore: 'Was die Sidebar dir zeigt:\n\n• **Jedes Objekt als Card** mit Adresse, Kaufpreis, DealScore-Ampel\n• **Kennzahlen** im Mini-Format: DSCR, Cashflow, Bruttomietrendite\n• **Sortieren** nach zuletzt bearbeitet, Objekt-ID, Kaufdatum oder Lage (A/B/C); **filtern** nach Stand (Bestand/Ankauf) und Mandant\n• **Demo-Objekt** zum Ausprobieren\n\n**Limits nach Plan:**\n• **Free**: 1 Objekt\n• **Starter**: 5 Objekte\n• **Investor**: 25 Objekte\n• **Pro**: unbegrenzt\n\nKlick einfach auf ein Objekt, um es zu öffnen und in die Vollanalyse zu starten.',
       placement: 'right'
     },
     
@@ -34,7 +35,7 @@
       icon: 'i-home',
       title: 'Objekt auswählen',
       body: '**Klick auf ein Objekt** in der Liste — sofort siehst du alle Details, Tabs und Kennzahlen. Ganz oben steht **„Neues Objekt hinzufügen"**: damit legst du ein leeres Objekt von Hand an.',
-      bodyMore: 'Was passiert wenn du ein Objekt anklickst:\n\n• **Alle 8 Tabs** werden mit den Objekt-Daten gefüllt\n• **DealScore** wird live berechnet\n• **Bewertungs-Cockpit** zeigt DSCR + LTV im 15-Jahres-Verlauf\n• **Änderungen** werden automatisch gespeichert\n\n**Tipp:** Du kannst zwischen Objekten jederzeit hin- und herwechseln — DealPilot speichert deinen Stand. Auch unfertige Bewertungen bleiben in der Sidebar.\n\nFür die Tour zeigen wir dir jetzt die wichtigsten Funktionen am Beispiel des aktuellen Objekts.',
+      bodyMore: 'Was passiert, wenn du ein Objekt anklickst:\n\n• **Alle 9 Reiter** werden mit den Objekt-Daten gefüllt\n• **DealScore** wird live berechnet\n• **Bewertungs-Cockpit** zeigt DSCR + LTV im Verlauf deines Betrachtungszeitraums (vorbelegt 15 Jahre)\n• **Änderungen** werden automatisch gespeichert\n\n**Tipp:** Du kannst zwischen Objekten jederzeit hin- und herwechseln — DealPilot speichert deinen Stand. Auch unfertige Bewertungen bleiben in der Sidebar.\n\nFür die Tour zeigen wir dir jetzt die wichtigsten Funktionen am Beispiel des aktuellen Objekts.',
       placement: 'right'
     },
     
@@ -46,12 +47,12 @@
       icon: 'i-flame',
       id: 'qb-intro',
       title: 'Neues Objekt? Quick-Boarding!',
-      body: 'Der **goldene Quick-Boarding-Button** in der Sidebar startet das Quick-Boarding — die **30-Sekunden-Erstbewertung** für neue Objekte. Wie willst du weitermachen?',
+      body: 'Der **goldene Quick-Boarding-Button** in der Sidebar startet das Quick-Boarding — die **Erstbewertung in rund einer Minute** für neue Objekte. Wie willst du weitermachen?',
       choices: [
         { label: 'Quick-Boarding Schritt für Schritt ansehen', goto: 'qb-score' },
         { label: 'Überspringen — weiter zur PRE-FLIGHT-Karte', goto: 'preflight' }
       ],
-      bodyMore: 'Wann du den Quick-Check nutzt:\n\n• **Inseraten-Sichten** auf Immo-Plattformen\n• **Mailings vom Makler** schnell einschätzen\n• **Erste Sondierung** ob ein Objekt tiefer-prüfenswert ist\n\n**Was du brauchst:**\n• PLZ + Strasse\n• Wohnfläche\n• Kaufpreis\n• Nettokaltmiete\n\n**Was du sofort bekommst:**\n• Bruttomietrendite\n• Vorläufigen DealScore\n• Erste Lage-Einschätzung\n\nVielversprechende Objekte übernimmst du dann mit einem Klick in die Vollanalyse — alle Daten werden automatisch in die 8 Tabs übertragen.',
+      bodyMore: 'Wann du den Quick-Check nutzt:\n\n• **Inseraten-Sichten** auf Immo-Plattformen\n• **Mailings vom Makler** schnell einschätzen\n• **Erste Sondierung**, ob ein Objekt tiefer prüfenswert ist\n\n**Was du brauchst:**\nAdresse (Straße, PLZ, Ort), Wohnfläche, Kaufpreis, Nettokaltmiete, Hausgeld samt nicht umlagefähigem Anteil, Eigenkapital, Zins und Tilgung. Zins, Tilgung und Hausgeld schlägt DealPilot aus deinen Standardwerten vor.\n\n**Was du sofort bekommst:**\n• DealScore mit Stufe\n• Sieben Kennzahlen (u. a. Bruttomietrendite, Cashflow, DSCR, LTV)\n• Zielkaufpreis und Verhandlungs-Empfehlung\n\nVielversprechende Objekte übernimmst du dann mit einem Klick in die Vollanalyse — alle Daten werden automatisch in die Reiter übertragen.',
       placement: 'right'
     },
     
@@ -63,8 +64,8 @@
       subTargets: ['Quick Boarding'],
       subClimb: 150,
       title: 'Quick-Boarding Score',
-      body: 'Im Quick-Boarding läuft ein **Live-Tacho** mit: während du Daten eingibst, wandert die Bewertung von rot zu grün. Je nach Ansicht steht er oben im Panel oder im dunklen Streifen daneben.',
-      bodyMore: 'Was im Score-Bereich passiert:\n\n• **DealScore-Donut** zeigt Wert 0-100 in Echtzeit\n• **5 Hauptkennzahlen** werden live aktualisiert: Bruttomietrendite, Nettomietrendite, Cashflow, DSCR, LTV\n• **Ampel-Farben**: Grün ab DealScore 70, Gelb 40-69, Rot unter 40\n\nDie Berechnung passiert ohne dass du speichern musst — sofort sichtbar nach jeder Eingabe.\n\n**Tipp:** Spiel mit Kaufpreis, Miete und Eigenkapital — du siehst sofort wie sich die Bewertung ändert. Perfekt für Verhandlungs-Vorbereitung.',
+      body: 'Sobald alle Pflichtfelder gefüllt sind, zeigt ein **Score-Ring** die Bewertung — jede weitere Änderung rechnet sofort neu. Bis dahin steht dort, wie viele Pflichtfelder noch offen sind.',
+      bodyMore: 'Was im Score-Bereich passiert:\n\n• **Score-Ring** mit Wert 0–100 und Stufe\n• **7 Kennzahlen** mit Zielwert: Bruttomietrendite, Nettomietrendite, EK-Rendite, Cashflow, DSCR, LTV, Bewirtschaftung\n• **Stufen**: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch\n\nDie Berechnung passiert, ohne dass du speichern musst.\n\n**Tipp:** Spiel mit Kaufpreis, Miete und Eigenkapital — du siehst sofort, wie sich die Bewertung ändert. Perfekt für die Verhandlungs-Vorbereitung.',
       placement: 'auto'
     },
     
@@ -79,7 +80,7 @@
       icon: 'i-qr',
       title: 'Boarding-Pass — direkt beim Quick-Boarding',
       body: 'Im Quick-Boarding entsteht nebenbei der **Quickboarding-Pass** — dein teilbarer Kurz-Steckbrief mit QR-Code. Du erkennst ihn am **dunklen Streifen** mit dem Code; je nach Ansicht sitzt er seitlich oder unten.',
-      bodyMore: 'Was der Boarding-Pass ist:\n\n• Eine **öffentliche Kurz-Ansicht** deines Objekts: Adresse, Eckdaten, Score — hübsch aufbereitet wie eine echte Bordkarte\n• Erreichbar über **Link oder QR-Code** — ideal für Partner, Mitinvestoren oder die Bank\n• **Zeitlich begrenzt gültig** und jederzeit widerrufbar — du behältst die Kontrolle\n\n**So entsteht er:**\n• Während du das Quick-Boarding befüllst, baut sich der Pass **rechts oben im Panel** automatisch mit auf\n• Beim **Speichern als Objekt** kannst du ihn direkt **mit übernehmen** — inklusive Link + QR-Code\n• Später erstellst/teilst du ihn jederzeit neu über „Quick Boarding teilen“ beim Objekt\n• Der QR-Code erscheint dann auch im **Deal-Aktion-Tab** direkt neben dem Deal-Status',
+      bodyMore: 'Was der Boarding-Pass ist:\n\n• Eine **öffentliche Kurz-Ansicht** deines Objekts: Adresse, Eckdaten, Score — hübsch aufbereitet wie eine echte Bordkarte\n• Erreichbar über **Link oder QR-Code** — ideal für Partner, Mitinvestoren oder die Bank\n• **Zeitlich begrenzt gültig** und jederzeit widerrufbar — du behältst die Kontrolle\n\n**So entsteht er:**\n• Während du das Quick-Boarding befüllst, baut sich der Pass im **dunklen Streifen** automatisch mit auf\n• Beim **Speichern als Objekt** kannst du ihn direkt **mit übernehmen** — inklusive Link + QR-Code\n• Später erstellst/teilst du ihn jederzeit neu über „Quick Boarding teilen“ beim Objekt\n• Der QR-Code erscheint dann auch im **Deal-Aktion-Tab** direkt neben dem Deal-Status',
       placement: 'auto'
     },
 
@@ -91,8 +92,8 @@
       subTargets: ['Als Objekt speichern', 'speichern'],
       icon: 'i-piggy-bank',
       title: 'Als Objekt speichern',
-      body: 'Vielversprechend? Der Knopf **„Als Objekt speichern"** am Ende des Quick-Boardings übernimmt alle Daten in die Vollanalyse mit 8 Tabs — scroll im Panel nach unten, falls du ihn nicht siehst.',
-      bodyMore: 'Was beim Speichern passiert:\n\n• Alle Quick-Check-Daten landen in **Tab Objekt + Investition + Miete**\n• Wohnfläche, Adresse, Baujahr werden vorbefüllt — kein doppeltes Tippen\n• Das Objekt erscheint dauerhaft in deiner **Sidebar links**\n• Du landest direkt in der Vollanalyse\n\nJetzt zeigen wir dir die 8 Tabs einzeln — das ist die eigentliche Bewertungs-Tiefe.',
+      body: 'Vielversprechend? Der Knopf **„Als Objekt speichern“** am Ende des Quick-Boardings übernimmt alle Daten in die Vollanalyse — scroll im Panel nach unten, falls du ihn nicht siehst.',
+      bodyMore: 'Was beim Speichern passiert:\n\n• Alle Quick-Check-Daten landen in **Objekt, Investition, Miete und Finanzierung**\n• Wohnfläche, Adresse, Baujahr werden vorbefüllt — kein doppeltes Tippen\n• Das Objekt erscheint dauerhaft in deiner **Sidebar links**\n• Du landest direkt in der Vollanalyse\n\nJetzt zeigen wir dir die Reiter einzeln — das ist die eigentliche Bewertungs-Tiefe.',
       placement: 'center'   /* v1744 · der Knopf liegt am Ende eines scrollbaren Panels; ohne Treffer wurde der Schritt still uebersprungen */
     },
 
@@ -156,7 +157,7 @@
       icon: 'i-import',
       title: 'ImmoMetrica-Import',
       body: 'Mit hinterlegtem **API-Key** ziehst du Objekte **direkt aus ImmoMetrica** nach DealPilot.',
-      bodyMore: 'So richtest du die ImmoMetrica-Anbindung ein:\n\n• API-Key in den **Einstellungen unter „Externe Anbieter“** hinterlegen (sicher verschlüsselt gespeichert)\n• Danach in der PRE-FLIGHT-Karte den **ImmoMetrica-Import** starten\n• Objekt auswählen — Stammdaten, Flächen und Preise werden **automatisch übernommen**\n\nIdeal, wenn du in ImmoMetrica recherchierst und in DealPilot rechnest — kein doppeltes Erfassen.',
+      bodyMore: 'So richtest du die ImmoMetrica-Anbindung ein:\n\n• API-Key in den **Einstellungen unter „Account & Sicherheit“** hinterlegen (sicher verschlüsselt gespeichert)\n• Danach in der PRE-FLIGHT-Karte den **ImmoMetrica-Import** starten\n• Objekt auswählen — Stammdaten, Flächen und Preise werden **automatisch übernommen**\n\nIdeal, wenn du in ImmoMetrica recherchierst und in DealPilot rechnest — kein doppeltes Erfassen.',
       placement: 'auto'
     },
 
@@ -164,11 +165,11 @@
       id: 'pf-avm',
       tab: 's0',
       selector: '#obj-action-bar, .obj-action-bar',
-      subTargets: ['DealPilot', 'Sprengnetter', 'PriceHubble', 'Abrufen'],
+      subTargets: ['DealPilot', 'Abrufen'],   /* v2205a: Anbieternamen raus (Neutralitaet) */
       icon: 'i-chart',
       title: 'Marktbewertung — Wert & Miete mit Spanne',
       body: 'Hol dir eine professionelle **Marktwert-** und **Mietpreis-Einschätzung** — jeweils mit **oberer und unterer Spanne**.',
-      bodyMore: 'Was die Marktbewertung liefert:\n\n• **Marktpreis-Indikation** für dein Objekt — mit Ober- und Untergrenze statt einer Schein-Genauigkeit\n• **Mietpreis-Einschätzung** — ebenfalls als Spanne\n• Basierend auf professionellen Bewertungsdaten und der genauen Adresse\n\n**Wofür du das nutzt:**\n• Kaufpreis **plausibilisieren** — liegt das Angebot in der Spanne?\n• **Verhandlungsargumente** — mit Daten statt Bauchgefühl\n• Miete nach Modernisierung **realistisch ansetzen**\n\nDie Einschätzung fliesst direkt in deine Bewertung ein. Ein Abruf belastet dein Kontingent — der Preis wird vorher klar angezeigt.',
+      bodyMore: 'Was die Marktbewertung liefert:\n\n• **Marktpreis-Indikation** für dein Objekt — mit Ober- und Untergrenze statt einer Schein-Genauigkeit\n• **Mietpreis-Einschätzung** — ebenfalls als Spanne\n• Basierend auf professionellen Bewertungsdaten und der genauen Adresse\n\n**Wofür du das nutzt:**\n• Kaufpreis **plausibilisieren** — liegt das Angebot in der Spanne?\n• **Verhandlungsargumente** — mit Daten statt Bauchgefühl\n• Miete nach Modernisierung **realistisch ansetzen**\n\nDie Einschätzung fliesst direkt in deine Bewertung ein. Ein Abruf verbraucht eine Bewertung aus deinem Kontingent.',
       placement: 'auto'
     },
 
@@ -185,7 +186,7 @@
       placement: 'auto'
     },
 
-    // ═══ Phase 3: 8 Tabs einzeln ══════════════════════════════════════
+    // ═══ Phase 3: 9 Reiter einzeln ══════════════════════════════════════
     
     {
       tab: 's0',
@@ -193,7 +194,7 @@
       icon: 'i-home',
       title: 'Tab 1: Objekt',
       body: 'Hier trägst du die **Stammdaten** ein: Adresse, Wohnfläche, Baujahr, Etage, Zimmer, Fotos.',
-      bodyMore: '**Wichtigste Felder:**\n\n• **PLZ + Ort + Strasse** — für KI-Lagebewertung\n• **Wohnfläche** — Basis für Euro/m2-Vergleiche\n• **Baujahr** — bestimmt AfA-Satz (vor 1925 / 1925-2000 / nach 2000)\n• **Etage / Zimmer / Balkon / Keller** — Wertfaktoren\n• **Bis zu 8 Fotos** — landen direkt im Business-Case-PDF\n\nFelder mit **rotem Sternchen** sind Pflicht. Tipp: Adresse so genau wie möglich — die KI braucht das für akkurate Bodenrichtwerte.',
+      bodyMore: '**Wichtigste Felder:**\n\n• **Straße + PLZ + Ort** — für Lage, Bodenrichtwert und Marktbewertung\n• **Wohnfläche** — Basis für Euro/m²-Vergleiche\n• **Baujahr** — wichtig für Restnutzungsdauer und Bewertung (den AfA-Satz wählst du im Reiter Steuer)\n• **Etage / Zimmer / Balkon / Keller** — Wertfaktoren\n• **Fotos** — je nach Plan 3 bis 30 pro Objekt; bis zu 6 erscheinen im Investment-PDF\n\nFehlende Pflichtfelder sind **rot umrandet**. Tipp: Adresse so genau wie möglich — davon hängen Bodenrichtwert und Lage ab.',
       placement: 'auto'
     },
     
@@ -203,7 +204,7 @@
       icon: 'i-coins',
       title: 'Tab 2: Investition',
       body: 'Hier definierst du **Kaufpreis + Nebenkosten** — die echten Anschaffungskosten.',
-      bodyMore: '**Was hier rein gehört:**\n\n• **Kaufpreis** — wie verhandelt (Pflichtfeld)\n• **Grunderwerbsteuer** — automatisch nach Bundesland (3,5-6,5%)\n• **Notar + Grundbuch** — typisch 1,5-2%\n• **Maklerprovision** — wenn vorhanden\n• **Sanierungskosten** — geplante Modernisierungen\n• **Aufteilung Boden / Gebäude** — wichtig für AfA\n\nDealPilot rechnet automatisch:\n• Gesamtinvestition\n• AfA-Basis pro Jahr\n• Sonder-AfA-Berechtigung (§7b)',
+      bodyMore: '**Was hier rein gehört:**\n\n• **Kaufpreis** — wie verhandelt (Pflichtfeld)\n• **Grunderwerbsteuer** — automatisch nach Bundesland (3,5–6,5 %)\n• **Notar** (vorbelegt 2,2 %) und **Grundbuchamt** (vorbelegt 0,5 %)\n• **Maklerprovision** — wenn vorhanden\n• **Sanierungskosten** — geplante Modernisierungen\n\nDealPilot rechnet daraus die **Gesamtinvestition**. Die Aufteilung Boden/Gebäude (BMF-Rechner), den AfA-Satz und die Sonder-AfA § 7b stellst du im Reiter **Steuer** ein.',
       placement: 'auto'
     },
     
@@ -213,7 +214,7 @@
       icon: 'i-euro',
       title: 'Tab 3: Miete',
       body: 'Hier trägst du die **Einnahmen-Seite** ein: Nettokaltmiete und Zusatzerträge.',
-      bodyMore: '**Was hier rein gehört:**\n\n• **Nettokaltmiete / Monat** (Pflichtfeld)\n• **Mietsteigerung p.a.** — Default 1,5%\n• **Leerstandsquote** — Default 3%\n• **Hausgeld umlagefähig** — Anteil den Mieter zahlt\n• **Zusatzerträge** — Garage, Stellplatz, möblierte Vermietung\n\n**Wichtig:** Hier IMMER **Netto-Kalt-Miete** — ohne Heizkosten, ohne Nebenkosten.',
+      bodyMore: '**Was hier rein gehört:**\n\n• **Nettokaltmiete / Monat** (Pflichtfeld)\n• **Mietsteigerung p.a.** — Default 1,5%\n• **Leerstand** — Vorgabe 2 % (aus deinen Standardwerten)\n• **Hausgeld umlagefähig** — Anteil den Mieter zahlt\n• **Zusatzerträge** — Garage, Stellplatz, möblierte Vermietung\n\n**Wichtig:** Hier IMMER **Netto-Kalt-Miete** — ohne Heizkosten, ohne Nebenkosten.',
       placement: 'auto'
     },
     
@@ -223,7 +224,7 @@
       icon: 'i-bank',
       title: 'Tab 4: Finanzierung',
       body: 'Hier baust du **dein Darlehen** — auch komplexe Setups mit mehreren Darlehen + BSV.',
-      bodyMore: '**Was DealPilot kann:**\n\n• **Hauptdarlehen** mit Zinsbindung 5/10/15/20/30 Jahre\n• **Zusatzdarlehen** für KfW oder Familiendarlehen\n• **Bausparvertrag (BSV)** als Tilgungsersatz\n• **Tilgungssatz** frei wählbar (1-10 % p.a.)\n• **Anschlusszins-Szenario** für Stress-Test (Default 5,0 %)\n• **Sondertilgungen** möglich\n\nDie DSCR-Berechnung berücksichtigt automatisch alle aktiven Darlehen — sogar BSV-Raten fliessen mit ein. **Single Source of Truth** für alle Bewertungsstellen.',
+      bodyMore: '**Was DealPilot kann:**\n\n• **Hauptdarlehen** mit frei wählbarer Zinsbindung (vorbelegt 10 Jahre)\n• **Darlehen II** als Annuitäten- oder **KfW-Darlehen**\n• **Bausparvertrag (BSV)** als Tilgungsersatz\n• **Tilgung** frei wählbar\n• **Eigene Anschlussfinanzierung** mit Anschlusszins (vorbelegt 5,0 %)\n• Im **Tilgungsplan** lassen sich einzelne Werte überschreiben, etwa für Sondertilgungen\n\nDie DSCR-Berechnung berücksichtigt automatisch alle aktiven Darlehen — auch die BSV-Raten.',
       placement: 'auto'
     },
     
@@ -233,7 +234,7 @@
       icon: 'i-settings',
       title: 'Tab 5: Bewirtschaftung',
       body: 'Hier definierst du **die laufenden Kosten** als Eigentümer — Hausgeld, Instandhaltung, Verwaltung.',
-      bodyMore: '**Was hier rein gehört:**\n\n• **Hausgeld (nicht umlagefähig)** — Verwaltung + Rücklagen\n• **Instandhaltung** — typisch 0,8-1,2 % des Gebäudewerts p.a.\n• **Mietausfallwagnis** — vorbelegt 1 % (Einstellungen → Standardwerte)\n• **Property-Management** — falls Hausverwalter (typ. 4-8% Kaltmiete)\n• **Versicherung** — Wohngebäude, Haftpflicht\n\n**Wichtig:** Diese Kosten reduzieren deinen Cashflow direkt. **Konservativ schätzen, kontrolliert hoch leben.**',
+      bodyMore: '**Was hier rein gehört:**\n\n• **Hausgeld (nicht umlagefähig)** — Verwaltung + Rücklagen\n• **Eigene Instandhaltungsrücklage** — DealPilot schlägt je Objektart einen Wert in €/m² vor (ImmoWertV Anlage 3)\n• **Mietausfallwagnis** — vorbelegt 1 % (Einstellungen → Standardwerte)\n• **Sonderverwaltung** — falls eine Hausverwaltung extra kostet\n• **Weitere Kosten** — zwei freie Kostenpositionen, z. B. Versicherung\n\n**Wichtig:** Diese Kosten reduzieren deinen Cashflow direkt — lieber vorsichtig schätzen.',
       placement: 'auto'
     },
 
@@ -255,8 +256,8 @@
       selector: '.tab[data-target-sec="s5"]',
       icon: 'i-pin',
       title: 'Tab 7: Pilot-Analyse',
-      body: 'Die **KI analysiert Mikrolage, Infrastruktur, Wertentwicklung** und liefert einen ausführlichen Lage-Bericht.',
-      bodyMore: '**Was die Lage-KI prüft:**\n\n• **Mikrolage** — Verkehrsanbindung, Infrastruktur, Nachbarschaft\n• **Mieterstruktur** — Einkommensniveau, Beruf\n• **Wertentwicklung** — historisch + Prognose\n• **Risikofaktoren** — Leerstand, Gentrifizierung\n• **Vergleichsobjekte** im Umkreis\n\nErgebnis: eine ausführliche Einschätzung für deine Bank-Präsentation — mit Empfehlung Kaufen, Prüfen oder Nicht kaufen.\n\nDie Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent.',
+      body: 'Der **Pilot bewertet dein Objekt in Worten** — auf Grundlage aller Eingaben, mit Recherche zu Makro- und Mikrolage.',
+      bodyMore: '**Was die Pilot-Analyse liefert:**\n\n• **Gesamtbewertung** mit Empfehlung Kaufen, Prüfen oder Nicht kaufen\n• **Stärken und Risiken**\n• **Makro- und Mikrolage** aus der Recherche\n• **Verhandlungsempfehlung** mit Zielpreis\n• **Bankargumente** und ein Fazit\n\nDie Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent.',
       placement: 'auto'
     },
     
@@ -266,7 +267,7 @@
       icon: 'i-gauge',
       title: 'Tab 8: Bewertung',
       body: 'Der **wichtigste Tab** für Banker: DSCR, LTV, Wertpuffer, DealScore, Stress-Test — alles in einem Cockpit.',
-      bodyMore: '**Die Kernbestandteile:**\n\n• **Bewertungs-Cockpit** mit DSCR + LTV im Verlauf (15 Jahre)\n• **DealScore 0-100** als Gesamtbewertung\n• **Investor Deal Score** mit 24 KPIs (Investor und Pro, im Free-Plan als Demo)\n• **Stress-Test** als 5×5-Matrix aus Zins und Miete\n• **Cashflow-Tabelle** über 10 Jahre\n• **Werbungskosten-Anlage** für Finanzamt\n\nHier verbringst du beim Endcheck die meiste Zeit. Alle Zahlen synchronisieren live mit den anderen Tabs.',
+      bodyMore: '**Die Kernbestandteile:**\n\n• **Bewertungs-Cockpit** mit DSCR + LTV im Verlauf deines Betrachtungszeitraums (vorbelegt 15 Jahre)\n• **DealScore 0–100** als Gesamtbewertung\n• **Investor Deal Score** mit 24 KPIs (Investor und Pro, im Free-Plan als Demo)\n• **Stress-Test** als 5×5-Matrix aus Zins und Miete\n• **Cashflow-Projektion** über deinen Betrachtungszeitraum\n\nHier verbringst du beim Endcheck die meiste Zeit. Alle Zahlen synchronisieren live mit den anderen Reitern.',
       placement: 'auto'
     },
     
@@ -281,7 +282,7 @@
       icon: 'i-percent',
       title: 'DealScore 0-100',
       body: 'Der **DealPilot Score** bündelt die Bewertung in **5 Hauptfaktoren** zu einer Zahl von 0-100 — dein schnellster Vergleichswert.',
-      bodyMore: 'Die 5 Hauptfaktoren des DealPilot Scores:\n\n• **Rendite** — Brutto-/Nettomietrendite, EK-Rendite\n• **Cashflow** — monatlicher Überschuss nach Steuern\n• **Sicherheit** — Wertpuffer, Reserven\n• **Finanzierung** — DSCR (Schuldendeckung), LTV (Beleihung)\n• **Effizienz** — Bewirtschaftungsquote\n\n**Skala:**\n• **80-100** Ausgezeichnet — klare Kauf-Empfehlung\n• **60-79** Gut — sorgfältig prüfen\n• **40-59** Mittel — Vorsicht\n• **unter 40** Schwach — eher ablehnen\n\nDealScore ist objektspezifisch — derselbe Deal kann für verschiedene Investoren unterschiedlich gut sein.',
+      bodyMore: 'Die 5 Faktoren des DealPilot Scores:\n\n• **Cashflow** (30 %)\n• **Rendite** — Nettomietrendite (25 %)\n• **Beleihung** — LTV (15 %)\n• **Risiko** — DSCR (15 %)\n• **Potenzial** — Wertpuffer und Mietsteigerung (15 %)\n\n**Skala:**\n• **ab 85** Sehr gut\n• **ab 70** Gut\n• **ab 50** Solide\n• **ab 35** Schwach\n• **darunter** Kritisch\n\nDie Gewichte kannst du in den Einstellungen unter Deal Score anpassen.',
       placement: 'auto'
     },
     
@@ -293,8 +294,8 @@
       placement: 'bottom',
       icon: 'i-cpu',
       title: 'Investor Deal Score',
-      body: 'Der **Investor Deal Score** ist die erweiterte Bewertung mit **24 KPIs in 6 Kategorien** — deutlich tiefer als die 5 Hauptfaktoren des Basis-Scores — verfügbar ab **Starter-Plan**.',
-      bodyMore: '**Was der Investor Score zusätzlich prüft:**\n\n• Vermögens-Multiplikator (Equity Multiple)\n• Cash-on-Cash-Return\n• Net Operating Income (NOI)\n• Cap Rate\n• Sensitivitäten (Zins, Miete, Marktwert)\n• 19 weitere Kennzahlen\n\n**Wo finden:**\n• Im Tab Bewertung als eigene Cockpit-Karte (gerade gespotlightet)\n• Im Header oben rechts: Toggle-Button "Investor Deal Score" ein/aus\n\n**Plan-Verfügbarkeit:**\n• **Free**: Nur Basis-DealPilot-Score (5 Hauptfaktoren)\n• **Starter & höher**: Investor Score mit 24 Kennzahlen\n• **Pro**: Plus Custom-Gewichtungen + Profile speichern\n\nFür Banker und ernsthafte Investoren ist der Investor Deal Score Pflicht — er zeigt Aspekte die der Basis-Score nicht abdeckt.',
+      body: 'Der **Investor Deal Score** ist die erweiterte Bewertung mit **24 KPIs in 5 Kategorien** — deutlich tiefer als die 5 Faktoren des Basis-Scores — im **Investor- und Pro-Plan**.',
+      bodyMore: '**Die 5 Kategorien:** Rendite, Finanzierung, Risiko, Lage, Upside\n\n**Was er zusätzlich prüft:**\n• Cash-on-Cash, DSCR, LTV, Zins\n• Leerstand, Instandhaltung, Baujahr, Energie\n• Marktmiete gegen Ist-Miete, Bevölkerung, Mikrolage\n• Mietsteigerung, Kaufpreisfaktor, Wertsteigerung\n\n**Wo finden:**\n• Im Reiter Bewertung als eigene Cockpit-Karte\n• Im Kopf oben rechts: Umschalter „Investor Deal Score“\n\n**Plan-Verfügbarkeit:**\n• **Free**: als Demo\n• **Starter**: nicht enthalten\n• **Investor & Pro**: voll, mit eigenen Gewichtungen und Bewertungsprofilen in den Einstellungen',
       placement: 'center'
     },
     
@@ -307,8 +308,8 @@
          "Bank-Cockpit · Risiko-Kennzahlen". Auch dieser Ersatz ist weg. */
       icon: 'i-gauge',
       title: 'Bewertungs-Cockpit',
-      body: '**DSCR & LTV im 15-Jahres-Verlauf** — was die Bank zürst sieht.',
-      bodyMore: '**DSCR (Schuldendienstdeckung):**\n• über 1,2 = solide\n• 1,0-1,2 = knapp\n• unter 1,0 = kritisch\n\n**LTV (Beleihungsauslauf):**\n• unter 85% = solide, beste Konditionen\n• 85-100% = erhöhter Zins\n• über 100% = Vollfinanzierung, schwierig\n\n**Wertpuffer:** Differenz Verkehrswert vs. Kaufpreis. Je grösser, desto mehr Sicherheit.\n\nDie Bank schaut sich zürst diese Zahlen an, bevor sie überhaupt das Objekt anschaut.',
+      body: '**DSCR & LTV im Verlauf** deines Betrachtungszeitraums — was die Bank zuerst sieht.',
+      bodyMore: '**DSCR (Schuldendienstdeckung):**\n• ab 1,5 = sehr solide\n• 1,2–1,5 = solide\n• 1,0–1,2 = knapp\n• 0,8–1,0 = kritisch\n• unter 0,8 = Stress\n\n**LTV (Beleihungsauslauf):**\n• bis 60 % = sehr sicher\n• unter 85 % = solide\n• 85–100 % = erhöht\n• über 100 % = kritisch\n\n**Wertpuffer:** Differenz Verkehrswert zu Kaufpreis. Je größer, desto mehr Sicherheit.',
       placement: 'auto'   /* v1789 · war 'center' - das galt dem angeblich leeren Ziel. Die Karte ist da und wird gerahmt, also sitzt die Blase wieder daneben. */
     },
     
@@ -342,7 +343,7 @@
       icon: 'i-cpu',
       title: 'Stress-Test',
       body: 'Was passiert wenn **Zinsen steigen** oder **Miete ausfällt**? Der Stress-Test simuliert es.',
-      bodyMore: 'Standard-Szenarien:\n\n• **Anschlusszins +2 Prozentpunkte** — was kostet das Darlehen in 10 Jahren?\n• **Mietausfall 3 Monate** — bleibt der Cashflow stabil?\n• **Leerstand 10 %** dauerhaft — kippt die Finanzierung?\n• **Marktwertverlust 15 %** — wie steht der LTV dann?\n\nFür jedes Szenario zeigt DealPilot den **neuen DSCR** und ob die Finanzierung weiter trägt. **Banken lieben diese Analyse** — sie zeigt dass du das Risiko verstanden hast. Print direkt mit ins Business-Case-PDF.',
+      bodyMore: 'Eine **5×5-Matrix**: Zinsänderung (−2 bis +5 Prozentpunkte) gegen Mietänderung (−20 % bis +20 %). Jede Zelle zeigt den **DSCR** in diesem Szenario:\n\n• **grün** ab 1,2\n• **hellgrün** 1,0–1,2\n• **gold** 0,8–1,0\n• **rot** darunter\n\nDie Zelle ±0/±0 ist dein Base-Case. Hält der DSCR auch bei −10 % Miete und +1 Prozentpunkt Zins mindestens 1,0, bist du bank-tauglich.',
       placement: 'auto'   /* v1789 · war 'center' - das galt dem angeblich leeren Ziel. Die Karte ist da und wird gerahmt, also sitzt die Blase wieder daneben. */
     },
 
@@ -479,8 +480,8 @@
       selector: '.dab-doc-row:has([onclick*="exportDoc(\'invest\')"]), [onclick*="exportDoc(\'invest\')"], .dab-doc-btn.gold',
       icon: 'i-file-text',
       title: 'Investment-PDF',
-      body: 'Im Deal-Aktion-Tab unter **Ausgabe** steht das bank-fertige Investment-PDF (gespotlightet). Ein Klick fragt, welche **Fassung** du brauchst — Bankfassung, hell oder Obsidian.',
-      bodyMore: '**Wo finden:** Deal-Aktion-Tab, Abschnitt "Ausgabe", erste Zeile.\n\n**Wie generieren:** Ein Klick auf "PDF". DealPilot fragt nach der Fassung und baut das Dokument mit allen aktuellen Daten. Dauer 5-30 Sekunden.\n\n**Drei Fassungen:**\n• **Bankfassung** — weisses Papier, Kennzahlen als Tabelle. Für Bank, Finanzierung, Steuerberater.\n• **Hell** — volles Dokument, helles Deckblatt. Für Miteigentümer und Ausdruck.\n• **Obsidian** — volles Dokument, dunkles Deckblatt. Für den eigenen Gebrauch.\n\nÜber den Knopf **"Fassung"** daneben lässt sich die Wahl jederzeit ändern.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsübersicht\n• Cashflow-Tabelle über 10 Jahre\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test-Szenarien\n• KI-Lagebewertung als Volltext\n\nDas Finanzamt-PDF und die Kaufpreisaufteilung stehen als **eigene Zeilen** darunter.\n\n**Tipp vor dem Export:** Alle Pflichtfelder checken (rot markiert).\n\nPro-Plan: **eigenes Logo + Footer + Impressum**.',
+      body: 'Im Deal-Aktion-Tab unter **Dokumente & Exporte** steht das bank-fertige Investment-PDF (gespotlightet). Ein Klick fragt, welche **Fassung** du brauchst — Bankfassung, hell oder Obsidian.',
+      bodyMore: '**Wo finden:** Deal-Aktion-Tab, „Dokumente & Exporte“, erste Zeile.\n\n**Wie generieren:** Ein Klick auf „PDF“. DealPilot fragt nach der Fassung und baut das Dokument mit allen aktuellen Daten.\n\n**Drei Fassungen:**\n• **Bankfassung** — weißes Papier, Kennzahlen als Tabelle. Für Bank, Finanzierung, Steuerberater.\n• **Hell** — volles Dokument, helles Deckblatt. Für Miteigentümer und Ausdruck.\n• **Obsidian** — volles Dokument, dunkles Deckblatt. Für den eigenen Gebrauch.\n\nÜber den Knopf **„Fassung“** daneben lässt sich die Wahl jederzeit ändern.\n\n**Was drin ist:**\n• Deckblatt mit Objektfotos + Eckdaten\n• Investitionsübersicht\n• Cashflow-Projektion über deinen Betrachtungszeitraum\n• DSCR + LTV + Wertpuffer als Cockpit\n• Stress-Test\n• die Pilot-Analyse, sofern erstellt\n\nDas Finanzamt-PDF und die Kaufpreisaufteilung stehen als **eigene Zeilen** darunter.\n\nAb dem **Investor-Plan**: eigenes Logo und Kontaktdaten im PDF.',
       placement: 'auto'
     },
     
@@ -493,7 +494,7 @@
       icon: 'i-menu',
       title: 'Das Aktionen-Menü',
       body: 'Über **Aktionen** in der Sidebar erreichst du alles Zentrale: Neues Objekt, Quick Boarding, Portfolio-Cockpit, Marktbericht, Import & Export.',
-      bodyMore: 'Was du hier findest:\n\n• **Neues Objekt** — leeres Objekt anlegen\n• **Quick Boarding** — die 30-Sekunden-Erstbewertung\n• **Portfolio-Cockpit** — Gesamtübersicht über ALLE Objekte\n• **Marktbericht** — Mikro-/Makrolage für eine Adresse\n• **Track Record & Bankexport** — deine Nachweise\n• **Import / Export** — Datensicherung und Datenübernahme\n• **Einstellungen & Feedback** — App-Konfiguration und direkter Draht zu uns',
+      bodyMore: 'Was du hier findest:\n\n• **Neues Objekt** — leeres Objekt anlegen\n• **Quick Boarding** — die Erstbewertung in rund einer Minute\n• **Portfolio-Cockpit** — Gesamtübersicht über ALLE Objekte\n• **Marktbericht** — Mikro-/Makrolage für eine Adresse\n• **Track Record & Bankexport** — deine Nachweise\n• **Import / Export** — Datensicherung und Datenübernahme\n• **Einstellungen & Feedback** — App-Konfiguration und direkter Draht zu uns',
       placement: 'right'
     },
 
@@ -504,12 +505,12 @@
       subTargets: ['Portfolio-Cockpit'],
       icon: 'i-portfolio',
       title: 'Portfolio-Cockpit — alles auf einen Blick',
-      body: 'Das **Portfolio-Cockpit** zeigt die **Gesamtübersicht über alle Objekte**: Werte, Cashflows, Scores. Kurz reinschauen?',
+      body: 'Das **Portfolio-Cockpit** zeigt die **Gesamtübersicht über alle Objekte**: Portfolio Score, Kennzahlen und das Objekt-Board. Kurz reinschauen?',
       choices: [
         { label: 'Ja — Portfolio-Cockpit kurz zeigen', goto: 'cockpit-live' },
         { label: 'Weiter mit der Tour', goto: 'finish' }
       ],
-      bodyMore: 'Was das Cockpit bündelt:\n\n• **Portfolio-Wert & Fremdkapital** über alle Objekte\n• **Cashflow-Summe** pro Monat\n• **Score-Verteilung** — wo stehen deine Deals?\n• Objekt-Vergleich in einer Tabelle\n\nDu findest es jederzeit hier im Aktionen-Menü.',
+      bodyMore: 'Was das Cockpit bündelt:\n\n• **Portfolio Score** deiner gewonnenen Objekte\n• **Kennzahlen** wie Mieteinnahmen, Investition, Restschuld und Cashflow\n• **Objekt-Board**: In Prüfung · Gewonnen · Verloren\n\nDu findest es jederzeit hier im Aktionen-Menü.',
       placement: 'right'
     },
 
@@ -520,12 +521,12 @@
       customAction: 'open-cockpit',
       icon: 'i-portfolio',
       title: 'Dein Portfolio-Cockpit',
-      body: 'Hier laufen **alle Objekte zusammen**: Gesamtwert, Fremdkapital, Cashflow-Summe und die Score-Verteilung deines Portfolios.',
+      body: 'Hier laufen **alle Objekte zusammen**: der **Portfolio Score** deiner gewonnenen Objekte, Kennzahlen wie Mieteinnahmen, Investition, Restschuld und Cashflow, dazu das **Objekt-Board** (In Prüfung · Gewonnen · Verloren).',
       choices: [
         { label: 'Tour hier abschliessen — viel Erfolg!', goto: '__complete' },
         { label: 'Zurück zur Tour', goto: 'finish' }
       ],
-      bodyMore: 'So arbeitest du mit dem Cockpit:\n\n• **Kacheln oben** — Portfolio-Summen auf einen Blick\n• **Objekt-Tabelle** — alle Deals im Vergleich, sortierbar\n• **Charts** — Entwicklung und Verteilung\n\nIdeal als Start in den Tag: erst Cockpit, dann ins einzelne Objekt.',
+      bodyMore: 'So arbeitest du mit dem Cockpit:\n\n• **Kacheln oben** — Portfolio-Summen auf einen Blick\n• **Objekt-Board** — deine Deals nach Stand\n• **Steuer und Projektion** über alle Objekte\n\nIdeal als Start in den Tag: erst Cockpit, dann ins einzelne Objekt.',
       placement: 'center'
     },
 
@@ -536,7 +537,7 @@
       icon: 'i-help',
       title: 'Tool-Tips: Anfänger, Profi oder Aus?',
       body: 'DealPilot zeigt **Tool-Tips** bei vielen Feldern (kleine ?-Icons). Welcher Modus passt zu dir? **Probier es direkt aus:**',
-      bodyMore: 'Den Schalter findest du jederzeit in den Einstellungen unter "Profil & Anzeige".\n\n**Anfänger** (Standard):\n• ALLE Tooltips eingeblendet\n• Inkl. Erklärungen für DSCR, AfA, BSV, IRR\n• Beispiele und Standardwerte\n• Ideal beim Einarbeiten\n\n**Profi:**\n• Nur kritische Hinweise (z.B. § 7b Sonder-AfA, 15%-Regel)\n• Anfänger-Erklärungen ausgeblendet\n• Kompakter Look\n\n**Aus:**\n• Keine Tooltips\n• Maximal aufgeräumte UI\n• Du kennst alles auswendig\n\nDu kannst jederzeit zwischen den Modi wechseln.',
+      bodyMore: 'Den Schalter findest du jederzeit in den Einstellungen unter „Darstellung“.\n\n**Anfänger** (Standard):\n• ALLE Tooltips eingeblendet\n• Inkl. Erklärungen für DSCR, AfA, BSV, IRR\n• Beispiele und Standardwerte\n• Ideal beim Einarbeiten\n\n**Profi:**\n• Nur kritische Hinweise (z.B. § 7b Sonder-AfA, 15%-Regel)\n• Anfänger-Erklärungen ausgeblendet\n• Kompakter Look\n\n**Aus:**\n• Keine Tooltips\n• Maximal aufgeräumte UI\n• Du kennst alles auswendig\n\nDu kannst jederzeit zwischen den Modi wechseln.',
       placement: 'center',
       customAction: 'tooltip-mode'
     },
@@ -547,12 +548,12 @@
       icon: 'i-bulb',
       title: 'Hilfe immer dabei',
       body: 'Du hast es geschafft! Klick auf das **Hilfe-Icon oben rechts** — dort findest du alles was du brauchst.',
-      bodyMore: '**Tour nochmal starten:**\n• Klicke auf das Hilfe-Icon oben rechts (Fragezeichen in Gold)\n• Im Hilfe-Modal: Button "Einführungs-Tour starten"\n\n**Was du im Hilfe-Modal findest:**\n\n• **Glossar** mit 29 Finanzbegriffen (DSCR, AfA, BSV, IRR, Sonder-§7b ...)\n• **KI-Assistent** für DealPilot-Fragen und Investment-Beratung\n• **Anleitungen** für PDF-Export, Stripe-Setup, Plan-Wechsel\n• **Tipps & Tricks**\n• **Kontakt** zu Junker Immobilien\n\n**Hinweis:** Das gelbe Badge mit Prozent daneben ist der **Workflow-Fortschritt** — zeigt wie viele Tabs du schon ausgefüllt hast.\n\nViel Erfolg mit deinen Investments — denk dran: **ein guter Deal ist halb verhandelt, der Rest ist Bewertung.**',
+      bodyMore: '**Tour nochmal starten:**\n• Im Hilfe-Fenster unter „Einstieg, Abläufe & Pilot“: **„Tour starten“**\n• oder in der Sidebar unter Aktionen → **„Rundgang starten“**\n\n**Was du im Hilfe-Fenster findest:**\n\n• **Themen** von Quick-Check über Steuer und Marktbericht bis Einstellungen\n• **Häufige Fragen** und ein **Glossar** mit 34 Begriffen\n• **Den Piloten**: Frage ins Suchfeld tippen, Enter fragt die KI — oder überall **F1** drücken\n\n**Hinweis:** Das Badge mit Prozent rechts in der **Reiterleiste** ist der Workflow-Fortschritt — es zeigt, wie viele der sechs Eingabe-Reiter ausgefüllt sind.\n\nViel Erfolg mit deinen Investments — denk dran: **ein guter Deal ist halb verhandelt, der Rest ist Bewertung.**',
       placement: 'auto'
     }
   ];
 
-  // ─── Variante B: User ohne Objekte (20 Steps) ──────────────────────────
+  // ─── Variante B: User ohne Objekte ──────────────────────────
   
   var STEPS_EMPTY = [
     
@@ -563,7 +564,7 @@
       icon: 'i-portfolio',
       title: 'Willkommen bei DealPilot',
       body: 'In der **Sidebar links** sammelst du deine Objekte. **Du hast noch keins** — lass uns dein erstes anlegen!',
-      bodyMore: 'Was die Sidebar dir künftig zeigt:\n\n• **Jedes Objekt** mit DealScore-Ampel\n• **Portfolio-Übersicht** mit Gesamt-Cashflow\n• **Such- und Filter-Funktion**\n• **Demo-Objekte** zum Üben (deine ersten Tutorial-Objekte)\n\n**Plan-Limits:**\n• Free: 3 Objekte\n• Starter: 15\n• Investor: 50\n• Pro: unlimited\n\nLass uns mit dem **Quick-Check** starten — dem schnellsten Weg ein Objekt zu bewerten.',
+      bodyMore: 'Was die Sidebar dir künftig zeigt:\n\n• **Jedes Objekt** mit DealScore-Ampel\n• **Sortieren und filtern** nach Stand, Lage und Mandant\n• **Demo-Objekt** zum Üben\n\n**Limits nach Plan:**\n• **Free**: 1 Objekt\n• **Starter**: 5 Objekte\n• **Investor**: 25 Objekte\n• **Pro**: unbegrenzt\n\nLass uns mit dem **Quick-Check** starten — dem schnellsten Weg, ein Objekt zu bewerten.',
       placement: 'right'
     },
     
@@ -572,8 +573,8 @@
       selector: '.sb-act-accent[onclick*="quickcheck"], button[onclick*="sbActionsAction(\'quickcheck\')"]',
       icon: 'i-flame',
       title: 'Starte mit Quick-Boarding',
-      body: '**Klick auf den goldenen Quick-Boarding-Button** in der Sidebar — das Quick-Boarding ist die schnellste Erstbewertung, fertig in **30 Sekunden**.',
-      bodyMore: 'Der Quick-Check ist dein **schnellster Einstieg**:\n\n**Was du brauchst:**\n• PLZ + Strasse\n• Wohnfläche\n• Kaufpreis\n• Nettokaltmiete\n\n**Was du bekommst:**\n• Bruttomietrendite\n• Vorläufigen DealScore (0-100)\n• Erste Lage-Einschätzung\n\n**Ideal für:**\n• Inseraten-Sichten\n• Mailings vom Makler\n• Erste Sondierung\n\nVielversprechende Objekte übernimmst du dann mit einem Klick in die Vollanalyse mit 8 Tabs.',
+      body: '**Klick auf den goldenen Quick-Boarding-Button** in der Sidebar — das Quick-Boarding ist die schnellste Erstbewertung, fertig in **rund einer Minute**.',
+      bodyMore: 'Der Quick-Check ist dein **schnellster Einstieg**.\n\n**Was du brauchst:**\nAdresse (Straße, PLZ, Ort), Wohnfläche, Kaufpreis, Nettokaltmiete, Hausgeld samt nicht umlagefähigem Anteil, Eigenkapital, Zins und Tilgung. Zins, Tilgung und Hausgeld schlägt DealPilot aus deinen Standardwerten vor.\n\n**Was du sofort bekommst:**\n• DealScore mit Stufe\n• Sieben Kennzahlen (u. a. Bruttomietrendite, Cashflow, DSCR, LTV)\n• Zielkaufpreis und Verhandlungs-Empfehlung\n\n**Ideal für:**\n• Inseraten-Sichten\n• Mailings vom Makler\n• Erste Sondierung\n\nVielversprechende Objekte übernimmst du dann mit einem Klick in die Vollanalyse mit 9 Reitern.',
       placement: 'right'
     }
   ];

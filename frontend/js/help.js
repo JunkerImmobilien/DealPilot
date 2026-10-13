@@ -437,7 +437,7 @@
       sections: [
         {
           h: 'PDF-Export',
-          body: 'Unter <strong>Aktionen → Export → PDF-Report für Objekt</strong> oder im Reiter <strong>Deal-Aktion → Investment-PDF</strong>. Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über 10 Jahre, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Öffne vorher einmal kurz den Reiter <strong>Bewertung</strong> — dann sind alle Grafiken gezeichnet.'
+          body: 'Unter <strong>Aktionen → Export → PDF-Report für Objekt</strong> oder im Reiter <strong>Deal-Aktion → Investment-PDF</strong>. Erzeugt einen kompletten Investment-Case mit Cover, Executive Summary, Objekt & Finanzierung, 3-Phasen-Vergleich, Cashflow-Projektion über deinen Betrachtungszeitraum, Equity-Build-Charts, Wasserfall-Diagramm, Stress-Test, Pilot-Analyse (sofern erstellt) und Annahmen-Seite.\n\n<strong>Tipp:</strong> Öffne vorher einmal kurz den Reiter <strong>Bewertung</strong> — dann sind alle Grafiken gezeichnet.'
         },
         {
           h: 'Free-Plan-Wasserzeichen',
