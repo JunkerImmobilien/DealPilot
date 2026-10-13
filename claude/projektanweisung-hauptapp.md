@@ -38614,6 +38614,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### Prod (8) v2182 · v2183 Demo · v2184 Bewirtschaftung je Objektart (13.10.2026, Staging)
+
+- **Prod (8)** `b7c21e8f`: v2182 (Tour scrollt zu Zielen im iframe), nur Frontend.
+- **v2183** `0da8e4aa`: Demo `/bewirtschaftung-demo.html`. Marcel: *„ja das kannst du so umsetzen alles … bei Neuanmeldung nur die Werte gesetzt werden, die wichtig sind … Standard-Set zum Auswählen"*.
+- **v2184** `c4585d64`: `bwk-profil.js` — Standardwerte je Objektart. **Häuser:** Anlage-3-Basiswerte wie im Marktbericht (Verwaltung 230 €/WE bzw. Gebäude, 30 €/Stellplatz; Instandhaltung 9,00 €/m², 68 €/Stellplatz) × Fortschreibungsfaktor **1,30** (= Stand 2021, 230 → 298 €; für spätere Stichtage höher — **abzunehmen**), Betriebskosten-Startwert 2,20/2,50 €/m². **ETW:** Hausgeld 4,00 €/m² · Monat, 30 % nicht umlagefähig (Marcels Abnahme), Rücklage Sondereigentum 0,50 €/m². Ziele im Reiter (Detailmodus): `hg_ul`, `hg_nul`, `eigen_r`; Häuser: Betriebskosten / Verwaltung / Instandhaltung. Füllt nur LEERE oder selbst gefüllte Felder (`data-bwk-auto`), ausgelöst durch echte Eingaben an Objektart/Fläche/Einheiten/Stellplätzen; gespeicherte Objekte werden beim Laden nie angefasst; Knopf „Standardwerte einsetzen" in der Leiste. Mietausfall bleibt 1 % (Entscheidung 01.10.). Speicher: Browser + Konto (`user_settings.bwk_profil`, Backend erlaubt den Schlüssel). Einstellungen → Investment-Profil: Block „Bewirtschaftung je Objektart". Erstanmeldung Schritt 3: Karte **„DealPilot-Standard (empfohlen)"** mit den Werten in einer Zeile, Felder erst bei „Selbst festlegen"; die zwei BWK-Prozentfelder entfallen.
+- **Nachweis:** Probelauf 7/7 (ETW 68 m² 2.285/979/408 wie die Demo, MFH 420 m² 12.600/1.950/5.268, EFH 140 m² 3.696/299/1.815, Gewerbe/ohne Fläche → kein Vorschlag, gespeicherte Werte gelesen); Konto PUT/GET ok; Leiste zeigt für Bismarckstr. (MFH 546 m², 6 WE, 5 Stp.) den Vorschlag, gespeicherte Felder unverändert; Einstellungsblock 13 Felder in 3 Blöcken.
+- **Rest:** (1) Erstanmeldung Schritt 3 nicht im Bild abgenommen — jedes „Weiter" schreibt Marcels Profil; Abnahme mit einem Testkonto. (2) Automatisches Füllen bei echter Eingabe nicht im Browser getestet (synthetische Ereignisse sind absichtlich ausgeschlossen); Rechnung und Feldziele geprüft. (3) Fortschreibungsfaktor für 2026 eintragen. (4) Prod für v2184 nach Freigabe (Backend-Rebuild für `bwk_profil`).
+
 ### Prod-Rollout (7) v2177–v2181b · v2182 Tour im sichtbaren Fenster (13.10.2026)
 
 - **Prod (7)** `01893c88` (Marcel: „1. freigabe"): Haupt-DB gesichert (11 MB, 71 Tabellen), Pull, nur Frontend. `workflow.js?v=v2181b` per curl geprüft.

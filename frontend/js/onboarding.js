@@ -364,6 +364,27 @@ window.DealPilotOnboarding = (function () {
     return ''
       + '<p class="dpo-vor">Mit diesen Werten rechnet jeder neue Quick-Check, '
       + 'bis du am Objekt etwas anderes einträgst.</p>'
+      /* ══ v2184 · EIN STANDARD-SET STATT NEUN FELDERN ═══════════════════
+         Marcel am 13.10.2026: „achte darauf, dass am Anfang bei Neuanmeldung
+         nur die Werte gesetzt werden, die wichtig sind. Hier koennen wir ja
+         dann Standards nehmen. Standard-Set zum Auswaehlen oder so."
+         Bisher standen hier neun Eingaben, darunter zwei Prozentsaetze fuer
+         die Bewirtschaftung, die seit v2184 je Objektart kommen
+         (bwk-profil.js). Jetzt: eine Karte mit dem DealPilot-Standard, die
+         Felder erst auf Wunsch. Die Felder bleiben im Dokument - wer
+         „Standard" waehlt, speichert genau ihre Vorbelegung. */
+      + '<div class="dpo-set" role="radiogroup" aria-label="Rechenwerte">'
+      +   '<label class="dpo-set-k an"><input type="radio" name="dpo_set" value="standard" checked>'
+      +     '<span><b>DealPilot-Standard</b> <span class="dpo-k-std">empfohlen</span>'
+      +     '<span class="dpo-set-t">Indikativer Marktzins · Zinsbindung ' + esc(String(profil('zinsbindung_default', 10))) + ' Jahre · '
+      +     'Tilgung ' + esc(String(profil('tilgung_default', 1.5)).replace('.', ',')) + ' % · Eigenkapital ' + esc(String(profil('ek_quote_default', 10))) + ' % · '
+      +     'Mietausfall ' + esc(String(profil('mietausfall_pct', 1)).replace('.', ',')) + ' % · Mindest-DSCR ' + esc(String(profil('min_dscr', 1.20)).replace('.', ',')) + ' · '
+      +     'Bewirtschaftung je Objektart nach ImmoWertV</span></span></label>'
+      +   '<label class="dpo-set-k"><input type="radio" name="dpo_set" value="eigen">'
+      +     '<span><b>Selbst festlegen</b><span class="dpo-set-t">Zins, Tilgung, Eigenkapital und Grenzen einzeln einstellen. '
+      +     'Alles bleibt später in den Einstellungen änderbar.</span></span></label>'
+      + '</div>'
+      + '<div id="dpo-s3-eigen" hidden>'
       /* v1750 · DER ZINS IST EINE WAHL, KEINE ANSAGE.
          Marcel: „Man sollte eine Checkbox haben, ob er sich den automatisch
          ziehen soll, und wenn nicht, dass man einen angeben kann … den
@@ -401,13 +422,10 @@ window.DealPilotOnboarding = (function () {
           'Wie viel vom Kaufpreis die Bank beleiht. 100 % ist die Vollfinanzierung des Kaufpreises, über 100 % geht nur mit zusätzlicher Sicherheit. Der DealScore warnt, wenn ein Objekt darüber liegt.')
       +   _num('dpo_mietausfall', 'Kalkulatorischer Mietausfall', profil('mietausfall_pct', 1), '% der Nettokaltmiete',
           'Rücklage für Leerstand und Zahlungsausfall. 1 % ist vorsichtig gerechnet und entspricht etwa einer ausgefallenen Monatsmiete in acht Jahren.')
-      +   _num('dpo_bwk_ul', 'Bewirtschaftung umlagefähig', profil('bwk_ul_pct_default', 17), '% der NKM',
-          'Betriebskosten, die du auf den Mieter umlegst — sie laufen durch, belasten dich also nicht.')
-      +   _num('dpo_bwk_nu', 'Bewirtschaftung nicht umlagefähig', profil('bwk_anteil_default', 16), '% der NKM',
-          'Verwaltung, Instandhaltung, Mietausfallwagnis. Das trägst du selbst, und es ist der Posten, den Anfänger am häufigsten vergessen.')
       +   _num('dpo_dscr', 'Mindest-DSCR', profil('min_dscr', 1.20), 'ab hier kaufst du',
           'Debt Service Coverage Ratio: Jahresreinertrag geteilt durch Kapitaldienst. 1,0 heißt, die Miete deckt Zins und Tilgung genau. 1,20 lässt 20 % Luft — darunter wird es bei jeder Mietminderung eng. Banken verlangen meist 1,1 bis 1,3.')
-      + '</div>';
+      + '</div>'
+      + '</div>';   /* v2184: Ende #dpo-s3-eigen */
   }
 
   /* Haken an → das Zinsfeld ist gesperrt und zeigt, was DealPilot gerade
@@ -776,6 +794,15 @@ window.DealPilotOnboarding = (function () {
         return;
       }
       if (ev.target.id === 'dpo_zins_auto') { _zinsFeld(); return; }
+      /* v2184: Standard-Set oder selbst festlegen */
+      if (ev.target.name === 'dpo_set') {
+        var eigen = ev.target.value === 'eigen', box = el('dpo-s3-eigen');
+        if (box) box.hidden = !eigen;
+        [].forEach.call(document.querySelectorAll('.dpo-set-k'), function (k) {
+          k.classList.toggle('an', !!(k.querySelector('input') || {}).checked);
+        });
+        return;
+      }
       /* v1961a: hier stand die Behandlung der Lagefelder. Sie gehoert
          nicht in den KLICK-Faenger - eine Eingabe ist kein Klick. Sie
          sitzt jetzt in einem eigenen 'change'-Listener weiter oben. */
@@ -862,8 +889,6 @@ window.DealPilotOnboarding = (function () {
         tilgung_default: _zahl('dpo_tilgung'),
         ek_quote_default: _zahl('dpo_ek'),
         mietausfall_pct: _zahl('dpo_mietausfall'),
-        bwk_ul_pct_default: _zahl('dpo_bwk_ul'),
-        bwk_anteil_default: _zahl('dpo_bwk_nu'),
         min_dscr: _zahl('dpo_dscr'),
         max_ltv: _zahl('dpo_ltv'),
         /* v1750 · Haken an = null, und genau das liest getZins() als
@@ -1088,6 +1113,11 @@ window.DealPilotOnboarding = (function () {
       '.dpo-kachel.an{border-color:var(--wl-b8932f,#b8932f);box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 22%,transparent)}',
       '.dpo-k-name{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:14.5px;color:#1b1815}',
       /* v2178: hier standen Versalien in Monospace - in Schritt 5 sind das ganze Saetze (Profilbeschreibungen) */
+      '.dpo-set{display:grid;gap:8px;margin:0 0 14px}',
+      '.dpo-set-k{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1.5px solid #E6E1D6;border-radius:12px;cursor:pointer;background:#fff}',
+      '.dpo-set-k.an{border-color:var(--wl-b8932f,#b8932f);box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent)}',
+      '.dpo-set-k input{margin-top:3px;flex:0 0 auto}',
+      '.dpo-set-t{display:block;font-size:12px;line-height:1.5;color:#6b6358;margin-top:3px}',
       '.dpo-k-unter{font-family:Inter,system-ui,sans-serif;font-size:11.5px;line-height:1.45;color:#7a7368;text-transform:none}',
       '.dpo-k-fuer{font-size:12px;line-height:1.5;color:#55504a;margin-top:2px}',
       /* v1961: die drei Lage-Zeilen. Schmal und ruhig - sie sollen den

@@ -1342,6 +1342,7 @@ function _swSet(btn) {
       /* v1957: dieselbe Stelle, dieselbe Vorsicht - jeder Griff prueft
          erst, ob es sein Ziel gibt. */
       try { if (DealPilotInvestmentProfile.wireLageProfil) DealPilotInvestmentProfile.wireLageProfil(); } catch (e) {}
+      try { if (window.DealPilotBwkProfil && !window._bwkpVerdrahtet) { window._bwkpVerdrahtet = true; DealPilotBwkProfil.verdrahten(document); } } catch (e) {}   /* v2184 */
     }
     var sel = document.getElementById('set_startup_view');
     if (sel) {
