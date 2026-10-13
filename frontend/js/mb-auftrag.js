@@ -86,7 +86,8 @@
       '#dp-mba .hi{color:#8b8678;font-size:11.5px;flex:1 1 180px}',
       '#dp-mba button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font:600 13px/1.2 "Space Grotesk",sans-serif}',
       '#dp-mba .b1{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407}',
-      '#dp-mba-pille{position:fixed;left:16px;bottom:16px;z-index:9990;display:flex;flex-direction:column;gap:6px;max-width:calc(100vw - 32px)}',
+      /* v2174b: gemessen lag sie unten links ueber dem Nutzerbereich (sb-user-icons). Unten mittig liegt nur scrollbarer Inhalt; 76 px halten sie ueber dem Toast (bottom 20 px). */
+      '#dp-mba-pille{position:fixed;left:50%;transform:translateX(-50%);bottom:76px;z-index:9990;display:flex;flex-direction:column;align-items:center;gap:6px;max-width:calc(100vw - 32px)}',
       '#dp-mba-pille button{display:flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);background:#141210;color:#F2ECDC;border-radius:999px;padding:8px 14px;cursor:pointer;font:500 12.5px/1.3 Inter,system-ui,sans-serif;box-shadow:0 10px 28px -10px rgba(0,0,0,.6);max-width:100%;text-align:left}',
       '#dp-mba-pille button b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '#dp-mba-pille button.fertig{border-color:#3FA56C}',
