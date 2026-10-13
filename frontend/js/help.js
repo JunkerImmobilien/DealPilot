@@ -505,7 +505,8 @@
     /* v790-help-webtoggle-css */
     if (!document.getElementById('help-webtoggle-style')) {
       var _wt = document.createElement('style'); _wt.id = 'help-webtoggle-style';
-      _wt.textContent = '.help-ai-web-toggle{display:inline-flex;flex:0 0 auto;align-items:center;gap:5px;font-size:11.5px;color:#6f675b;cursor:pointer;user-select:none;margin-right:8px;white-space:nowrap}/*v793-toggle-flex*/.help-ai-web-toggle input{accent-color:#C9A84C;cursor:pointer;margin:0}.help-ai-web-toggle span{font-weight:600}';
+      _wt.textContent = '.help-pilot-leiste{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}.help-pilot-frag{border:0;border-radius:10px;padding:9px 14px;font:600 13px "Space Grotesk",sans-serif;cursor:pointer;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.help-pilot-ab{font-size:12px;color:#6f675b;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.help-pilot-ab button{border:1px dashed var(--wl-c9a84c, #C9A84C);background:transparent;border-radius:8px;padding:4px 9px;font:500 12px Inter,sans-serif;cursor:pointer;color:#5d4a17}#help-ki-oben .help-ai-answer{margin:0 0 14px;border:1px solid var(--wl-c9a84c, #C9A84C)}'
+        + '.help-ai-web-toggle{display:inline-flex;flex:0 0 auto;align-items:center;gap:5px;font-size:11.5px;color:#6f675b;cursor:pointer;user-select:none;margin-right:8px;white-space:nowrap}/*v793-toggle-flex*/.help-ai-web-toggle input{accent-color:#C9A84C;cursor:pointer;margin:0}.help-ai-web-toggle span{font-weight:600}';
       document.head.appendChild(_wt);
     }
 
@@ -535,6 +536,8 @@
 
     // Such-Eingabe
     document.getElementById('help-search-input').addEventListener('input', _onSearch);
+    /* v2189: Enter im Suchfeld fragt den Piloten - die Antwort steht oben */
+    document.getElementById('help-search-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); helpKiOben(); } });
     document.getElementById('help-ai-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') helpAskAI();
     });
@@ -740,8 +743,27 @@
   }
 
   // ─── Suche ──────────────────────────────────────────────────────────
+  /* v2189 · Suche nach WÖRTERN statt nach der ganzen Zeichenkette.
+     Bis hier fand „ankauf einfrieren“ nichts, weil genau diese Folge in
+     keinem Text steht — „eingefroren“ und „Ankauf-Stand“ schon. Umlaute
+     und ß werden gleichgesetzt, Füllwörter zählen nicht.
+     Marcel, 13.10.2026: „die Hilfe muss direkt, wenn ich was eingebe und
+     die KI frage, die Antwort zeigen." Oben steht deshalb der Knopf „Den
+     Piloten fragen“, und die KI-Antwort erscheint AN DIESER STELLE, nicht
+     im Fuß des Fensters. Enter im Suchfeld fragt ebenfalls. */
+  var _FUELL = ' ich du der die das den dem des ein eine einen und oder wie was wo wann warum ist sind kann muss soll mit von zu zum zur im in an am auf fuer bei aus ob wenn dann dass nicht mein meine hier auch noch bitte gibt habe hat ';
+  function _norm(s) {
+    return String(s || '').toLowerCase().replace(/<[^>]+>/g, ' ')
+      .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+      .replace(/[^a-z0-9%§ ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function _woerter(q) {
+    return _norm(q).split(' ').filter(function (w) { return w.length >= 3 && _FUELL.indexOf(' ' + w + ' ') < 0; })
+      .map(function (w) { return w.length > 5 ? w.slice(0, w.length - 1) : w; });
+  }
   function _onSearch(e) {
-    var q = (e.target.value || '').trim().toLowerCase();
+    var roh = (e.target.value || '').trim();
+    var q = roh.toLowerCase();
     if (q.length < 2) {
       // Suche zurücksetzen → letztes Topic wieder anzeigen
       var lastId = HELP_TOPICS[0].id;
@@ -749,27 +771,38 @@
       _selectTopic(lastId);
       return;
     }
-    // Treffer in allen Sections sammeln
+    var w = _woerter(q); if (!w.length) w = [_norm(q)];
     var hits = [];
     HELP_TOPICS.forEach(function(t) {
       t.sections.forEach(function(s) {
-        var blob = (s.h + ' ' + s.body).toLowerCase();
-        if (blob.indexOf(q) >= 0) hits.push({ topic: t, section: s });
+        var kopf = _norm(s.h), blob = kopf + ' ' + _norm(s.body), p = 0, n = 0;
+        w.forEach(function (x) { if (kopf.indexOf(x) >= 0) { p += 3; n++; } else if (blob.indexOf(x) >= 0) { p += 1; n++; } });
+        if (n && n / w.length >= 0.6) hits.push({ topic: t, section: s, p: p + (n === w.length ? 3 : 0) });
       });
     });
+    hits.sort(function (a, b) { return b.p - a.p; });
     var c = document.getElementById('help-content');
     if (!c) return;
+    var ablauf = [];
+    try { if (window.DealPilotPilot) ablauf = DealPilotPilot.suche(roh, 6).filter(function (x) { return x.art === 'ablauf'; }).slice(0, 3); } catch (x) {}
+    var html = '<div class="help-pilot-leiste">'
+      + '<button type="button" class="help-pilot-frag" onclick="helpKiOben()">✦ Den Piloten fragen: „' + _escHtml(roh) + '“</button>'
+      + (ablauf.length ? '<span class="help-pilot-ab">Im Prozess-Atlas: ' + ablauf.map(function (a) {
+          return '<button type="button" onclick="DealPilotAtlas.oeffne(\'' + a.ziel.atlas + '\',\'' + a.ziel.station + '\')">' + _escHtml(a.t) + '</button>';
+        }).join('') + '</span>' : '')
+      + '</div><div id="help-ki-oben"></div>';
     if (!hits.length) {
-      c.innerHTML = '<div class="help-empty">' +
-        '<h2>Keine Treffer für „' + _escHtml(q) + '"</h2>' +
-        '<p>Versuche es mit einem anderen Begriff oder frag unten den KI-Assistenten — der findet auch ohne exaktes Wort eine Antwort.</p>' +
+      c.innerHTML = html + '<div class="help-empty">' +
+        '<h2>Keine Treffer für „' + _escHtml(roh) + '“</h2>' +
+        '<p>In den Hilfetexten steht dazu nichts wörtlich. Drück Enter oder den Knopf oben — dann beantwortet der Pilot die Frage mit KI und kennt dabei dein geöffnetes Objekt.</p>' +
         '</div>';
+      c.scrollTop = 0;
       return;
     }
-    var html = '<div class="help-topic-head">' +
-      '<h2>🔍 ' + hits.length + ' Treffer für „' + _escHtml(q) + '"</h2>' +
+    html += '<div class="help-topic-head">' +
+      '<h2>' + hits.length + ' Treffer für „' + _escHtml(roh) + '“</h2>' +
     '</div>';
-    hits.forEach(function(hit) {
+    hits.slice(0, 25).forEach(function(hit) {
       html += '<div class="help-section help-section-hit">' +
         '<div class="help-hit-topic">' + _escHtml(hit.topic.title) + '</div>' +
         '<h3>' + _escHtml(hit.section.h) + '</h3>' +
@@ -779,6 +812,22 @@
     c.innerHTML = html;
     c.scrollTop = 0;
   }
+  function helpKiOben() {
+    var inp = document.getElementById('help-search-input');
+    var q = (inp && inp.value || '').trim();
+    var box = document.getElementById('help-ki-oben');
+    if (!q) return;
+    if (!box) { _onSearch({ target: inp }); box = document.getElementById('help-ki-oben'); }
+    if (!box) return;
+    box.innerHTML = '<div class="help-ai-loading"><span class="help-ai-dot"></span><span class="help-ai-dot"></span><span class="help-ai-dot"></span><span class="help-ai-loading-text">Der Pilot denkt nach…</span></div>';
+    var c = document.getElementById('help-content'); if (c) c.scrollTop = 0;
+    _callHelpAI(q).then(function (a) {
+      box.innerHTML = '<div class="help-ai-answer help-ki-oben-a"><div class="help-ai-answer-q"><strong>Pilot</strong> · ' + _escHtml(q) + '</div><div class="help-ai-answer-a">' + _renderBody(a) + '</div></div>';
+    }).catch(function (err) {
+      box.innerHTML = '<div class="help-ai-error">⚠ Der Pilot konnte gerade nicht antworten: ' + _escHtml(err.message || 'unbekannter Fehler') + '</div>';
+    });
+  }
+  window.helpKiOben = helpKiOben;
 
   // ─── KI-Assistent ─────────────────────────────────────────────────────
   function helpAskAI() {
@@ -839,6 +888,8 @@
           message: question,
           context: _helpBuildContext(),
           history: _helpHistory.slice(-10),
+          /* v2189: dieselben Hilfe-Auszuege wie der Tower */
+          hilfe: (function () { try { return window.DealPilotPilot ? DealPilotPilot.suche(question, 6).map(function (x) { return { art: x.art, titel: x.t, text: String(x.b || '').slice(0, 900) }; }) : []; } catch (e) { return []; } })(),
           allowWeb: _helpWebAllowed()
         };
         Auth.apiCall('/ai/copilot', { method: 'POST', body: body })

@@ -266,6 +266,8 @@
       '.atl-weiter{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}',
       '.atl-weiter button{border:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);background:transparent;color:#e8dcc0;border-radius:8px;padding:5px 10px;font:500 12px Inter,sans-serif;cursor:pointer}',
       '.atl-hin{margin-top:16px;width:100%;padding:10px;border:0;border-radius:10px;background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');color:#1a1407;font:600 13.5px "Space Grotesk",sans-serif;cursor:pointer}',
+      '.atl-kap{position:absolute;width:46px;height:73px;z-index:3;pointer-events:none;transition:left 1.1s cubic-bezier(.45,0,.3,1),top 1.1s cubic-bezier(.45,0,.3,1)}',
+      '.atl-kap .pf-wrap{display:block;width:100%;height:100%}.atl-kap svg.pf{width:100%;height:100%}',
       '.atl-beleg{margin-top:10px;font:500 10.5px "JetBrains Mono",monospace;color:#7f7663;word-break:break-all}',
       '@media (max-width:900px){.atl-rumpf{grid-template-columns:1fr;grid-template-rows:minmax(260px,1fr) auto;overflow:auto}.atl-panel{max-height:none;overflow:visible}#dp-atlas{overflow:auto}.atl-rumpf{flex:none}}',
       '@media (max-width:640px){.atl-kopf{padding:12px 14px 8px}.atl-wahl{padding:0 14px 8px}.atl-rumpf{padding:0 12px 14px}.atl-kopf h2{font-size:18px}.atl-kopf .s{display:none}}',
@@ -375,6 +377,52 @@
         + (L.vertikal ? '' : '<div class="zz">' + n.slice(0, 2).map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</div>') + '</div>';
     });
     fl.innerHTML = '<svg class="kt" width="' + L.w + '" height="' + L.h + '" viewBox="0 0 ' + L.w + ' ' + L.h + '">' + sv + '</svg>' + html;
+    kapitaen(true);
+    if (auswahl) kapitaenZu(auswahl, fl.querySelector('.atl-k[data-k="' + auswahl + '"]'));
+  }
+
+  /* ── Der Kapitän mit Koffer ─────────────────────────────────────────
+     Marcel, 13.10.2026: „bei den Prozessen auch mit einem Pilotenkoffer".
+     Er rollt den Koffer zur gewählten Station, bleibt links daneben
+     stehen und zeigt auf sie. Die Figur ist dieselbe wie im Tower
+     (pilot-figur.js). */
+  var _kap = null, _kapT = null;
+  function kapitaen(neu) {
+    if (!window.DealPilotFigur) return;
+    var fl = root.querySelector('.atl-flaeche');
+    _kap = document.createElement('div'); _kap.className = 'atl-kap';
+    _kap.appendChild(DealPilotFigur.bauen({ koffer: true }));
+    _kap.style.transition = 'none'; _kap.style.left = '-60px'; _kap.style.top = '0px';
+    fl.appendChild(_kap);
+  }
+  function kapitaenPlatz(id) {
+    var p = _lay && _lay.pos[id]; if (!p) return null;
+    var x = p.x - 50, y = p.y + p.h - 73 + 2;
+    if (x < 0) x = p.x + p.w + 4;
+    return { x: x, y: y };
+  }
+  function kapitaenZu(id, kEl) {
+    if (!_kap) return;
+    var z = kapitaenPlatz(id); if (!z) return;
+    var w = _kap.querySelector('.pf-wrap'), s = w && w.querySelector('svg.pf');
+    var alt = { x: parseFloat(_kap.style.left), y: parseFloat(_kap.style.top) };
+    var erst = alt.x < 0;
+    if (s) s.classList.remove('zeigt');
+    if (erst || ruhig) {
+      _kap.style.transition = 'none'; _kap.style.left = z.x + 'px'; _kap.style.top = z.y + 'px';
+      void _kap.offsetWidth; _kap.style.transition = '';
+      setTimeout(function () { if (kEl) DealPilotFigur.zeigeAuf(w, kEl.getBoundingClientRect()); }, 60);
+      return;
+    }
+    w.classList.toggle('links', z.x < alt.x);
+    if (s) s.classList.add('laeuft');
+    _kap.style.left = z.x + 'px'; _kap.style.top = z.y + 'px';
+    clearTimeout(_kapT);
+    _kapT = setTimeout(function () {
+      if (s) s.classList.remove('laeuft');
+      w.classList.remove('links');
+      if (kEl) DealPilotFigur.zeigeAuf(w, kEl.getBoundingClientRect());
+    }, 1120);
   }
 
   /* ── Auswahl: Schritte klappen auf, Daten fliegen ein ─────────────── */
@@ -405,6 +453,7 @@
     auswahl = id;
     root.querySelectorAll('.atl-k').forEach(function (el) { el.classList.toggle('an', el.getAttribute('data-k') === id); });
     var kEl = root.querySelector('.atl-k[data-k="' + id + '"]');
+    kapitaenZu(id, kEl);
     if (kEl) { kEl.classList.remove('knall'); void kEl.offsetWidth; kEl.classList.add('knall'); try { kEl.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); } catch (e) {} }
     var nr = P.knoten.slice().sort(function (a, b) { return a.s - b.s || a.z - b.z; }).indexOf(k) + 1;
     var weiter = P.kanten.filter(function (e) { return e[0] === id; }).map(function (e) { var n = knoten(P, e[1]); return n ? '<button type="button" data-weiter="' + n.id + '">' + (e[2] === 'loop' ? '↻ ' : e[2] === 'nein' ? '✕ ' : '→ ') + esc(n.t) + '</button>' : ''; }).join('');

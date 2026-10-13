@@ -74,29 +74,16 @@
     if (document.getElementById('dp-pilot-css')) return;
     var st = document.createElement('style'); st.id = 'dp-pilot-css';
     st.textContent = [
-      '#dp-pilot{position:fixed;left:14px;bottom:14px;width:62px;height:76px;z-index:10060;cursor:pointer;transition:left .75s cubic-bezier(.3,1.25,.45,1),top .75s cubic-bezier(.3,1.25,.45,1),bottom .75s,width .3s,height .3s;filter:drop-shadow(0 8px 12px rgba(0,0,0,.35))}',
-      '#dp-pilot.ruht{width:46px;height:56px;opacity:.92}',
-      '#dp-pilot:hover{opacity:1}',
-      '#dp-pilot svg{width:100%;height:100%;overflow:visible}',
-      '#dp-pilot .koerper{animation:dpp-schweben 2.8s ease-in-out infinite;transform-origin:40px 60px}',
-      '#dp-pilot.fliegt .koerper{animation:dpp-fliegen .75s ease-in-out}',
-      '#dp-pilot .schal{animation:dpp-schal .9s ease-in-out infinite alternate;transform-origin:30px 58px}',
-      '#dp-pilot .auge{animation:dpp-blink 4.2s infinite;transform-origin:center;transform-box:fill-box}',
-      '#dp-pilot .arm-r{transform-origin:55px 62px;transition:transform .3s}',
-      '#dp-pilot.winkt .arm-r{animation:dpp-winken .45s ease-in-out 4 alternate}',
-      '#dp-pilot.zeigt .arm-r{transform:rotate(-115deg)}',
-      '#dp-pilot .brille{transition:transform .35s}',
-      '#dp-pilot.denkt .brille{transform:translateY(7px)}',
-      '#dp-pilot .haut{fill:#F1C9A5}#dp-pilot .kappe{fill:#4a3423}#dp-pilot .kappe2{fill:#36261a}',
-      '#dp-pilot .jacke{fill:#2b241f}#dp-pilot .gold{fill:' + G + '}#dp-pilot .goldh{fill:' + GH + '}',
-      '#dp-pilot .glas{fill:#bfe3f0}#dp-pilot .tinte{fill:#1a1714}#dp-pilot .wange{fill:#e9a38b;opacity:.55}',
-      '#dp-pilot .mund{fill:none;stroke:#7a3b2a;stroke-width:1.6;stroke-linecap:round}',
-      '#dp-pilot .gurt{fill:none;stroke:' + GL + ';stroke-width:2}',
-      '@keyframes dpp-schweben{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}',
-      '@keyframes dpp-fliegen{0%{transform:rotate(0)}30%{transform:rotate(-14deg) scale(1.05)}100%{transform:rotate(0)}}',
-      '@keyframes dpp-schal{from{transform:skewY(-6deg) scaleX(1)}to{transform:skewY(6deg) scaleX(1.12)}}',
-      '@keyframes dpp-blink{0%,93%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}',
-      '@keyframes dpp-winken{from{transform:rotate(-100deg)}to{transform:rotate(-150deg)}}',
+      '#dp-pilot{position:fixed;left:14px;top:auto;bottom:14px;width:54px;height:86px;z-index:10060;cursor:pointer;transition:left .9s cubic-bezier(.45,0,.3,1),top .9s cubic-bezier(.45,0,.3,1),width .3s,height .3s;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}',
+      '#dp-pilot .pf-wrap{display:block;width:100%;height:100%}#dp-pilot svg.pf{width:100%;height:100%;display:block}',
+      '#dp-pilot.ruht{width:46px;height:73px}',
+      '#dp-pilot.aus.ruht{display:none}',
+      '#dp-pilot.buste{width:38px;height:38px;border-radius:50%;overflow:hidden;background:#141210;border:2px solid ' + G + ';filter:none;box-shadow:0 4px 12px rgba(0,0,0,.35)}',
+      '#dp-pilot.buste .pf-wrap{width:64px;height:103px;margin:-2px 0 0 -12px}',
+      '#dp-pilot.buste .schatten{display:none}',
+      '#dp-pilot.ruht:hover{transform:translateY(-2px)}',
+      '#dp-pilot.ruht:not(.buste)::after{content:"F1";position:absolute;right:-10px;top:0;font:700 9px "JetBrains Mono",monospace;color:#1a1407;background:' + GH + ';border-radius:5px;padding:1px 4px;opacity:0;transition:opacity .2s}',
+      '#dp-pilot.ruht:hover::after{opacity:1}',
       '.dp-pilot-spur{position:fixed;width:7px;height:7px;border-radius:50%;background:' + GH + ';z-index:10059;pointer-events:none;animation:dpp-spur .8s ease-out forwards}',
       '@keyframes dpp-spur{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(.2)}}',
       '.dp-pilot-spot{box-shadow:0 0 0 3px ' + G + ',0 0 0 10px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent) !important;border-radius:10px;transition:box-shadow .3s}',
@@ -123,6 +110,8 @@
       '#dp-tower .tx b{display:block;font-weight:600;font-size:13px;color:#f3ead0}#dp-tower .tx span{font-size:12px;color:#b9ad8f}',
       '#dp-tower .leer{color:#9a917e;font-size:12.5px;padding:8px 2px}',
       '#dp-tower .antw{margin-top:10px;padding:11px 12px;border-radius:11px;background:#0b0a09;border:1px solid #2c2720;color:#ece5d6}',
+      '#dp-tower .antwbox .antw{margin:10px 0 2px}#dp-tower .antw.sofort{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
+      '#dp-tower .antw .enter{float:right;text-transform:none;letter-spacing:0;color:#7f7663}',
       '#dp-tower .antw .q{font:500 10.5px "JetBrains Mono",monospace;color:#9a917e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}',
       '#dp-tower .knoepfe{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}',
       '#dp-tower .knoepfe button,#dp-tower .fuss button{border:1px solid ' + G + ';background:transparent;color:' + GH + ';border-radius:8px;padding:6px 10px;font:600 12px Inter,sans-serif;cursor:pointer}',
@@ -133,44 +122,13 @@
       '#dp-tower .punkte span{display:inline-block;width:6px;height:6px;border-radius:50%;background:' + G + ';margin-right:4px;animation:dpt-p 1s infinite}',
       '#dp-tower .punkte span:nth-child(2){animation-delay:.15s}#dp-tower .punkte span:nth-child(3){animation-delay:.3s}',
       '@keyframes dpt-p{0%,100%{opacity:.25}50%{opacity:1}}',
-      '@media (max-width:640px){#dp-tower{left:8px !important;right:8px;width:auto;top:auto !important;bottom:8px;max-height:72vh}#dp-pilot.ruht{bottom:72px}}',
-      '@media (prefers-reduced-motion:reduce){#dp-pilot .koerper,#dp-pilot .schal,#dp-pilot .auge{animation:none}#dp-pilot{transition:none}}'
+      '@media (max-width:640px){#dp-tower{left:8px !important;right:8px;width:auto;top:auto !important;bottom:8px;max-height:min(74vh,calc(100vh - 110px))}#dp-tower input.frage{font-size:16px}}',
+      '@media (prefers-reduced-motion:reduce){#dp-pilot{transition:none}}'
     ].join('\n');
     document.head.appendChild(st);
   }
 
-  /* ── Das Pilot-Männchen ───────────────────────────────────────────── */
-  var SVG = '<svg viewBox="0 0 80 100" aria-hidden="true"><g class="koerper">'
-    /* Schal, weht nach hinten */
-    + '<path class="schal goldh" d="M30 57 C18 55 10 60 2 56 C8 63 18 63 29 62 Z"/>'
-    /* Beine + Stiefel */
-    + '<rect class="jacke" x="29" y="80" width="8" height="12" rx="3"/><rect class="jacke" x="43" y="80" width="8" height="12" rx="3"/>'
-    + '<rect class="kappe2" x="27" y="89" width="12" height="6" rx="3"/><rect class="kappe2" x="41" y="89" width="12" height="6" rx="3"/>'
-    /* Jacke */
-    + '<path class="jacke" d="M24 64 Q40 54 56 64 L58 84 Q40 90 22 84 Z"/>'
-    + '<path class="gurt" d="M27 66 L40 82 L53 66"/><rect class="gold" x="39" y="64" width="2.4" height="20" rx="1"/>'
-    + '<circle class="goldh" cx="47" cy="72" r="2.4"/>'
-    /* linker Arm */
-    + '<path class="jacke" d="M25 65 Q17 72 20 80 L25 79 Q24 73 29 69 Z"/><circle class="haut" cx="22" cy="80" r="3.4"/>'
-    /* rechter Arm (winkt / zeigt) */
-    + '<g class="arm-r"><path class="jacke" d="M53 64 Q63 70 61 79 L56 78 Q57 72 51 69 Z"/><circle class="haut" cx="59" cy="79" r="3.4"/></g>'
-    /* Schal-Knoten */
-    + '<path class="gold" d="M30 57 Q40 62 50 57 L50 61 Q40 66 30 61 Z"/>'
-    /* Kopf */
-    + '<circle class="haut" cx="40" cy="38" r="19"/>'
-    + '<circle class="wange" cx="29" cy="44" r="3"/><circle class="wange" cx="51" cy="44" r="3"/>'
-    + '<ellipse class="auge tinte" cx="33.5" cy="39" rx="2.3" ry="2.8"/><ellipse class="auge tinte" cx="46.5" cy="39" rx="2.3" ry="2.8"/>'
-    + '<path class="mund" d="M34 47 Q40 52 46 47"/>'
-    /* Fliegerkappe mit Ohrklappen */
-    + '<path class="kappe" d="M20 37 Q19 16 40 15 Q61 16 60 37 Q56 27 40 26 Q24 27 20 37 Z"/>'
-    + '<path class="kappe" d="M20 34 Q16 44 21 51 L26 49 Q23 42 24 35 Z"/><path class="kappe" d="M60 34 Q64 44 59 51 L54 49 Q57 42 56 35 Z"/>'
-    + '<path class="kappe2" d="M40 15 L40 26" stroke="#2a1d12" stroke-width="1.4"/>'
-    /* Fliegerbrille */
-    + '<g class="brille"><rect class="kappe2" x="22" y="24" width="36" height="3.2" rx="1.6"/>'
-    + '<circle class="gold" cx="32" cy="25.5" r="6.2"/><circle class="glas" cx="32" cy="25.5" r="4.4"/>'
-    + '<circle class="gold" cx="48" cy="25.5" r="6.2"/><circle class="glas" cx="48" cy="25.5" r="4.4"/>'
-    + '<circle cx="30.4" cy="24" r="1.3" fill="#fff" opacity=".8"/><circle cx="46.4" cy="24" r="1.3" fill="#fff" opacity=".8"/></g>'
-    + '</g></svg>';
+  /* ── Das Pilot-Männchen: pilot-figur.js (DealPilotFigur) ───────────── */
 
   /* ── Wissen: vier Quellen, eine Liste ─────────────────────────────── */
   var AKTIONEN = [
@@ -250,13 +208,14 @@
     css();
     pilot = document.createElement('div'); pilot.id = 'dp-pilot'; pilot.className = 'ruht';
     pilot.title = 'Pilot rufen — F1 oder ?'; pilot.setAttribute('role', 'button'); pilot.setAttribute('aria-label', 'Pilot rufen (F1)');
-    pilot.innerHTML = SVG;
+    pilot.innerHTML = '<span class="pf-wrap">' + (window.DealPilotFigur ? DealPilotFigur.svg({}) : '') + '</span>';
+    if (window.DealPilotFigur) DealPilotFigur.css();
     pilot.addEventListener('click', function () { tower && tower.classList.contains('an') ? schliessen() : rufen(); });
     tower = document.createElement('div'); tower.id = 'dp-tower'; tower.setAttribute('role', 'dialog'); tower.setAttribute('aria-label', 'Tower');
     tower.innerHTML = '<div class="k"><span class="u">Tower · Pilot hört</span><kbd>Esc</kbd><button class="zu" type="button" aria-label="Schließen">×</button></div>'
       + '<div class="rumpf"><div class="feldbox"></div>'
       + '<input class="frage" type="text" autocomplete="off" placeholder="Was liegt an? — z. B. „Ankauf einfrieren“, „DSCR“, „Anlage V“">'
-      + '<ul class="tr"></ul><div class="antwbox"></div>'
+      + '<div class="antwbox"></div><ul class="tr"></ul>'
       + '<button class="frag" type="button">Den Piloten fragen (KI)</button></div>'
       + '<div class="fuss"><span class="h">Sofort-Antworten kommen aus Hilfe, Feld-Erklärungen und Abläufen. F1 oder ? ruft mich überall.</span>'
       + '<button type="button" data-f="atlas">Prozess-Atlas</button><button type="button" data-f="hilfe">Ganze Hilfe</button></div>';
@@ -318,51 +277,120 @@
       })(i);
     }
   }
-  function setzePilot(x, y) {
-    var r = pilot.getBoundingClientRect();
-    pilot.style.bottom = 'auto';
-    if (!pilot.style.top) { pilot.style.top = r.top + 'px'; pilot.style.left = r.left + 'px'; void pilot.offsetWidth; }
-    spur(r.left, r.top, x, y);
-    pilot.classList.remove('fliegt'); void pilot.offsetWidth; pilot.classList.add('fliegt');
-    pilot.style.left = Math.max(6, Math.min(innerWidth - 70, x)) + 'px';
-    pilot.style.top = Math.max(6, Math.min(innerHeight - 84, y)) + 'px';
+  /* ── Ort: wo der Pilot ruht (Einstellungen → Hilfe & Pilot) ─────────
+     Marcel, 13.10.2026: „mach es doch so, dass ich das einstellen kann …
+     Standard so wie du denkst." Standard ist die Seitenleiste: gemessen
+     liegen dort zwischen den Reitern (bis y 491) und dem Nutzerfeld (ab
+     y 832) gut 330 px freier, dunkler Grund. Fehlt der Platz (Leiste
+     eingeklappt, Handy), fällt er auf den nächsten Ort zurück. */
+  var ORTE = [
+    { id: 'seite', t: 'Seitenleiste', d: 'steht im freien Platz über deinem Nutzerfeld' },
+    { id: 'kopf', t: 'Kopfleiste', d: 'nur Kopf und Mütze neben dem Hilfe-Symbol' },
+    { id: 'haupt', t: 'Hauptbereich', d: 'unten am linken Rand des Inhalts' },
+    { id: 'aus', t: 'Nur auf F1', d: 'unsichtbar, bis du ihn rufst' }
+  ];
+  function ort() {
+    try { var o = localStorage.getItem('dp_pilot_ort'); if (ORTE.some(function (x) { return x.id === o; })) return o; } catch (e) {}
+    return 'seite';
   }
-  /* Ruheplatz: unten am linken Rand des HAUPTBEREICHS, nicht der Seite.
-     Gemessen am 13.10.2026: links unten auf der Seite lag er über dem
-     Nutzerfeld der Seitenleiste (Name, Abmelden). Rechts unten liegen
-     die Ausgaben (Track Record, Export). Am linken Rand von .main-col ist
-     bei 2133 px Breite 180 px frei. */
-  function heimX() {
-    var mc = document.querySelector('.main-col');
-    var r = mc && mc.getBoundingClientRect();
-    return (r && r.width > 300 && innerWidth > 640) ? Math.round(r.left + 10) : 14;
+  function setOrt(o) {
+    try { localStorage.setItem('dp_pilot_ort', o); } catch (e) {}
+    if (pilot) { pilot.classList.toggle('aus', o === 'aus'); pilot.classList.add('ruht'); heimSetzen(false); }
+    document.querySelectorAll('[data-pilot-ort]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-pilot-ort') === o); });
   }
-  function heimSetzen() {
+  /* Abschnitt für Einstellungen → Allgemein, unter „Tooltip-Hilfe“. Gleiche
+     Knopfform wie dort (.dp-tt-mode-toggle), damit er nicht fremd aussieht. */
+  function einstellungenHtml() {
+    var a = ort();
+    return '<hr class="dvd"><h3 class="set-section-h">Pilot · Hilfe auf F1</h3>'
+      + '<p class="hint" style="margin-bottom:10px">Drück F1 oder ? — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Hier stellst du ein, wo er wartet.</p>'
+      + '<div class="dp-tt-mode-toggle">' + ORTE.map(function (o) {
+        return '<button type="button" class="dp-tt-mode-btn' + (o.id === a ? ' active' : '') + '" data-pilot-ort="' + o.id + '" onclick="DealPilotPilot.setOrt(\'' + o.id + '\')">'
+          + esc(o.t) + (o.id === 'seite' ? ' · Standard' : '') + '<span class="dp-tt-mode-btn-label">' + esc(o.d) + '</span></button>';
+      }).join('') + '</div>'
+      + '<p class="hint" style="margin-top:8px;color:var(--muted)">Auf dem Handy sitzt er immer als runder Knopf unten links. Die Wahl gilt für dieses Gerät.</p>';
+  }
+  function figur(k, an) { if (window.DealPilotFigur && pilot) DealPilotFigur.zustand(pilot, k, an); }
+  function zeigeArm(rect) { var w = pilot && pilot.querySelector('.pf-wrap'); if (w && window.DealPilotFigur) DealPilotFigur.zeigeAuf(w, rect); }
+
+  function ruhePlatz() {
+    var o = ort();
+    if (innerWidth <= 640) return { x: 12, y: innerHeight - 38 - 16, buste: true };
+    if (o === 'kopf') {
+      var h = document.querySelector('.hdr-icon-btn[title="Hilfe"]'), hr = h && h.getBoundingClientRect();
+      if (hr && hr.width) return { x: hr.left - 46, y: hr.top + (hr.height - 38) / 2, buste: true };
+    }
+    if (o === 'seite') {
+      var n = document.querySelector('.dpl-teil-nutzer'), sch = n && n.closest('.dpl-schiene');
+      var nr = n && n.getBoundingClientRect();
+      if (sch && nr && nr.width > 120) {
+        var unten = 0;
+        [].forEach.call(sch.children, function (c) {
+          if (c === n) return;
+          var r = c.getBoundingClientRect();
+          if (r.height >= 12 && r.bottom <= nr.top + 1) unten = Math.max(unten, r.bottom);
+        });
+        if (nr.top - unten >= 100) { var sr = sch.getBoundingClientRect(); return { x: sr.left + sr.width / 2 - 23, y: nr.top - 73 - 10, buste: false }; }
+      }
+    }
+    var mc = document.querySelector('.main-col'), m = mc && mc.getBoundingClientRect();
+    return { x: (m && m.width > 300) ? m.left + 10 : 14, y: innerHeight - 73 - 12, buste: false };
+  }
+  function heimSetzen(sofort) {
     if (!pilot || !pilot.classList.contains('ruht')) return;
-    pilot.style.left = heimX() + 'px'; pilot.style.top = ''; pilot.style.bottom = '';
+    var p = ruhePlatz();
+    var x = Math.round(p.x) + 'px', y = Math.round(p.y) + 'px';
+    if (pilot.style.left === x && pilot.style.top === y && pilot.classList.contains('buste') === p.buste) return;
+    if (sofort) pilot.style.transition = 'none';
+    pilot.classList.toggle('buste', p.buste);
+    pilot.style.bottom = 'auto'; pilot.style.left = x; pilot.style.top = y;
+    if (sofort) { void pilot.offsetWidth; pilot.style.transition = ''; }
   }
   function heim() {
     if (!pilot) return;
-    pilot.classList.add('ruht'); pilot.classList.remove('zeigt', 'denkt');
-    var r = pilot.getBoundingClientRect(), hx = heimX();
-    spur(r.left, r.top, hx, innerHeight - 70);
-    pilot.style.left = hx + 'px'; pilot.style.top = (innerHeight - (innerWidth <= 640 ? 128 : 70)) + 'px';
-    setTimeout(function () { if (pilot.classList.contains('ruht')) { pilot.style.top = ''; pilot.style.bottom = ''; } }, 800);
+    figur('zeigt', false); figur('erklaert', false); figur('winkt', false);
+    var unterwegs = !pilot.classList.contains('ruht');
+    pilot.classList.add('ruht');
+    if (!unterwegs) { heimSetzen(true); return; }
+    var p = ruhePlatz();
+    laufeZu(p.x, p.y, function () { if (pilot.classList.contains('ruht')) pilot.classList.toggle('buste', p.buste); });
   }
+  /* Er LÄUFT hin — über weite Strecken mit Spur. */
+  var _lt = null;
+  function laufeZu(x, y, fertig) {
+    var r = pilot.getBoundingClientRect();
+    pilot.classList.remove('buste');
+    x = Math.round(Math.max(6, Math.min(innerWidth - 60, x)));
+    y = Math.round(Math.max(6, Math.min(innerHeight - 92, y)));
+    var dist = Math.hypot(x - r.left, y - r.top);
+    var w = pilot.querySelector('.pf-wrap');
+    if (dist > 4) {
+      if (w) w.classList.toggle('links', x > r.left);
+      figur('zeigt', false); figur('laeuft');
+      if (dist > 280) spur(r.left, r.top, x, y);
+    }
+    pilot.style.bottom = 'auto'; pilot.style.left = x + 'px'; pilot.style.top = y + 'px';
+    clearTimeout(_lt);
+    _lt = setTimeout(function () { figur('laeuft', false); if (w) w.classList.remove('links'); if (fertig) fertig(); }, dist > 4 ? 920 : 0);
+  }
+  var setzePilot = laufeZu;
   function platziere(zielEl) {
     var mobil = innerWidth <= 640;
     var r = zielEl ? zielEl.getBoundingClientRect() : null;
+    var sichtbar = !!(r && r.width && r.bottom > 0 && r.top < innerHeight);
     var px, py;
-    if (r && r.width && r.bottom > 0 && r.top < innerHeight) { px = r.right + 6; py = r.top - 62; if (px > innerWidth - 80) px = r.left - 70; }
-    else { px = innerWidth - 470; py = 90; }
-    if (mobil) { px = innerWidth - 74; py = Math.max(8, innerHeight * 0.28 - 84); }
-    setzePilot(px, py);
+    if (mobil) { px = innerWidth - 64; py = 8; }
+    else if (sichtbar) { px = r.right + 8; py = r.top - 30; if (px > innerWidth - 70) px = r.left - 62; }
+    else { px = innerWidth - 530; py = 80; }
+    pilot.classList.remove('ruht');
+    laufeZu(px, py, function () { if (sichtbar) zeigeArm(r); });
     if (mobil) return;
     var tw = Math.min(440, innerWidth - 24), th = Math.min(innerHeight * 0.78, 640);
-    var tx = r ? (r.right + 74 + tw < innerWidth ? r.right + 74 : Math.max(12, r.left - tw - 10)) : innerWidth - tw - 24;
-    if (r && tx < 12) tx = Math.max(12, Math.min(innerWidth - tw - 12, r.left));
+    var tx = r ? (r.right + 70 + tw < innerWidth ? r.right + 70 : Math.max(12, r.left - tw - 10)) : innerWidth - tw - 24;
+    var unter = false;
+    if (r && tx < 12) { tx = Math.max(12, Math.min(innerWidth - tw - 12, r.left)); unter = true; }
     var ty = r ? Math.max(12, Math.min(innerHeight - th - 12, r.top - 20)) : 80;
-    if (r && tx === Math.max(12, Math.min(innerWidth - tw - 12, r.left))) ty = Math.min(innerHeight - th - 12, r.bottom + 12);
+    if (unter) ty = Math.min(innerHeight - th - 12, r.bottom + 12);
     tower.style.left = tx + 'px'; tower.style.top = Math.max(12, ty) + 'px';
   }
 
@@ -394,7 +422,7 @@
     var inp = tower.querySelector('.frage'); inp.value = '';
     zeigeTreffer('');
     platziere(f && f.el);
-    pilot.classList.remove('winkt'); void pilot.offsetWidth; pilot.classList.add('winkt');
+    figur('zeigt', false); figur('winkt', false); void pilot.offsetWidth; figur('winkt'); figur('erklaert', !!f);
     setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); } }, 80);
   }
   function schliessen() {
@@ -416,9 +444,26 @@
       if (!_treffer.length) _treffer = index().filter(function (e) { return e.art === 'aktion'; }).slice(0, 5);
     } else _treffer = suche(q, 8);
     _sel = -1;
+    sofort(q);
     ul.innerHTML = _treffer.map(function (e, i) {
       return '<li data-i="' + i + '"><span class="art ' + e.art + '">' + ART[e.art] + '</span><span class="tx"><b>' + esc(e.t) + '</b><span>' + esc(kurz(e.b, 110)) + '</span></span></li>';
     }).join('') || '<li class="leer" style="cursor:default">Nichts Passendes in Hilfe, Feldern und Abläufen — frag den Piloten (KI) unten.</li>';
+  }
+  /* Marcel, 13.10.2026: „die Hilfe muss direkt, wenn ich was eingebe …
+     die Antwort zeigen." Der beste Treffer steht als Antwort OBEN, ohne
+     Klick; die Liste darunter hält die übrigen. Enter fragt die KI —
+     ihre Antwort ersetzt die Sofort-Antwort an derselben Stelle. */
+  var _kiLaeuft = false, _sofortT = null;
+  function sofort(q) {
+    if (_kiLaeuft) return;
+    clearTimeout(_sofortT);
+    var box = tower.querySelector('.antwbox');
+    if (norm(q).length < 3) { box.innerHTML = ''; return; }
+    _sofortT = setTimeout(function () {
+      var e = _treffer.filter(function (x) { return x.art !== 'aktion'; })[0] || _treffer[0];
+      if (!e) { box.innerHTML = '<div class="antw"><div class="q">Keine Sofort-Antwort</div>In Hilfe, Feldern und Abläufen steht dazu nichts. Drück Enter — dann fragt der Pilot die KI.</div>'; return; }
+      antworte(e, true);
+    }, 140);
   }
   function waehle(i) {
     var lis = tower.querySelectorAll('ul.tr li[data-i]'); if (!lis.length) return;
@@ -427,14 +472,14 @@
     lis[_sel].scrollIntoView({ block: 'nearest' });
   }
   function knopf(text, ziel) { return '<button type="button" data-ziel="' + esc(JSON.stringify(ziel)) + '">' + esc(text) + '</button>'; }
-  function antworte(e) {
+  function antworte(e, auto) {
     if (!e) return;
     var k = '';
-    if (e.art === 'aktion') { fliegeNach(e.ziel); return; }
+    if (e.art === 'aktion') { if (!auto) { fliegeNach(e.ziel); return; } k += knopf('Öffnen →', e.ziel); }
     if (e.art === 'feld') k += knopf('Zeig mir das Feld →', e.ziel);
     if (e.art === 'hilfe' || e.art === 'glossar') k += knopf('In der Hilfe öffnen →', e.ziel);
     if (e.art === 'ablauf') { k += knopf('Im Prozess-Atlas zeigen →', e.ziel); if (e.nav) k += knopf('Hinfliegen →', e.nav); }
-    tower.querySelector('.antwbox').innerHTML = '<div class="antw"><div class="q">' + esc(ART[e.art] + (e.thema ? ' · ' + e.thema : '')) + '</div><b>' + esc(e.t) + '</b><div>' + esc(e.b) + '</div>'
+    tower.querySelector('.antwbox').innerHTML = '<div class="antw' + (auto ? ' sofort' : '') + '"><div class="q">' + (auto ? 'Sofort-Antwort · ' : '') + esc(ART[e.art] + (e.thema ? ' · ' + e.thema : '')) + (auto ? '<span class="enter">Enter fragt die KI</span>' : '') + '</div><b>' + esc(e.t) + '</b><div>' + esc(e.b) + '</div>'
       + (k ? '<div class="knoepfe">' + k + '</div>' : '') + '</div>';
   }
 
@@ -456,7 +501,8 @@
     if (!(window.Auth && Auth.apiCall && (!Auth.isApiMode || Auth.isApiMode()))) {
       box.innerHTML = '<div class="antw">Die KI-Antwort braucht eine Anmeldung. Die Treffer oben kommen ohne KI.</div>'; return;
     }
-    btn.disabled = true; pilot.classList.add('denkt');
+    btn.disabled = true; figur('erklaert'); _kiLaeuft = true;
+    tower.querySelector('.rumpf').scrollTop = 0;
     box.innerHTML = '<div class="antw"><div class="q">Pilot denkt nach</div><span class="punkte"><span></span><span></span><span></span></span></div>';
     Auth.apiCall('/ai/copilot', { method: 'POST', body: { message: q, context: kontext(), history: _verlauf.slice(-8), hilfe: auszug, quelle: 'tower' } })
       .then(function (d) {
@@ -473,7 +519,7 @@
           : 'Die KI konnte gerade nicht antworten (' + esc((e && e.message) || 'Fehler') + '). Die Sofort-Antworten oben funktionieren ohne KI.';
         box.innerHTML = '<div class="antw">' + m + '</div>';
       })
-      .then(function () { btn.disabled = false; pilot.classList.remove('denkt'); });
+      .then(function () { btn.disabled = false; _kiLaeuft = false; tower.querySelector('.rumpf').scrollTop = 0; });
   }
 
   /* ── Hinfliegen: Reiter, Aktion, Feld, Hilfe, Atlas ───────────────── */
@@ -495,8 +541,8 @@
         document.querySelectorAll('.dp-pilot-spot').forEach(function (x) { x.classList.remove('dp-pilot-spot'); });
         el.classList.add('dp-pilot-spot');
         var r = el.getBoundingClientRect();
-        pilot.classList.remove('ruht'); pilot.classList.add('zeigt');
-        setzePilot(r.right + 4, r.top - 60);
+        pilot.classList.remove('ruht');
+        laufeZu(r.right + 6, r.top - 40, function () { zeigeArm(r); });
         setTimeout(function () { el.classList.remove('dp-pilot-spot'); if (!tower.classList.contains('an')) heim(); }, 3800);
       }, 450);
     }, tab ? 260 : 0);
@@ -545,11 +591,17 @@
   }, true);
 
   function start() {
-    bauen(); heimSetzen();
-    setTimeout(heimSetzen, 1500);
-    var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(heimSetzen, 200); });
+    bauen();
+    pilot.classList.toggle('aus', ort() === 'aus');
+    heimSetzen(true);
+    setTimeout(function () { heimSetzen(true); }, 1500);
+    /* Die Seitenleiste baut sich nach dem Laden noch um (Objekte, Score) —
+       der Ruheplatz wird deshalb nachgemessen, nicht einmal gesetzt. */
+    setInterval(function () { heimSetzen(false); }, 2500);
+    var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { heimSetzen(true); }, 200); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  window.DealPilotPilot = { rufen: rufen, schliessen: schliessen, suche: suche, fliegeNach: fliegeNach, neuIndex: function () { _index = null; } };
+  window.DealPilotPilot = { rufen: rufen, schliessen: schliessen, suche: suche, fliegeNach: fliegeNach, neuIndex: function () { _index = null; },
+    ort: ort, setOrt: setOrt, ORTE: ORTE, einstellungenHtml: einstellungenHtml };
 })();
