@@ -151,6 +151,17 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.16 · Makro-Kennzahlen vorab holen und speichern (wie der Zensus)
+
+**Gemessen 13.10.2026 nach Marcels neuem Regionaldatenbank-Passwort:** die
+vier Kennzahlen (v2165) kommen an, aber die Regionaldatenbank braucht heute
+44–114 s je Tabelle, einzelne Abrufe brechen nach 180 s ab. Kein Bericht
+kann so lange warten. v2169 haelt Erfolge 30 Tage im Speicher (geht beim
+Neustart verloren) und fragt parallel. **Richtig ist:** eine Tabelle
+`mb.makro_werte` (Kreis, Kennzahl, Jahr, Wert, Quelle) und ein Hintergrundlauf,
+der die 400 Kreise einmal im Monat langsam nachzieht (max. 10 parallel —
+GENESIS-Grenze). Der Bericht liest nur noch die Tabelle.
+
 #### N62.14 · Marktbericht in Worten: bewerten, Entwicklung, Ableitung, Prognose
 
 **Marcel am 13.10.2026:** *„wenn wir die Pilot-Analyse anpassen, können wir
