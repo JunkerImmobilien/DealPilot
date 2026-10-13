@@ -305,8 +305,8 @@
     var a = ort();
     return '<hr class="dvd"><h3 class="set-section-h">Pilot · Hilfe auf F1</h3>'
       + '<p class="hint" style="margin-bottom:10px">Drück F1 oder ? — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Hier stellst du ein, wo er wartet.</p>'
-      + '<div class="dp-tt-mode-toggle">' + ORTE.map(function (o) {
-        return '<button type="button" class="dp-tt-mode-btn' + (o.id === a ? ' active' : '') + '" data-pilot-ort="' + o.id + '" onclick="DealPilotPilot.setOrt(\'' + o.id + '\')">'
+      + '<div class="dp-tt-mode-toggle" style="flex-wrap:wrap">' + ORTE.map(function (o) {
+        return '<button type="button" style="flex:1 1 140px;min-width:0" class="dp-tt-mode-btn' + (o.id === a ? ' active' : '') + '" data-pilot-ort="' + o.id + '" onclick="DealPilotPilot.setOrt(\'' + o.id + '\')">'
           + esc(o.t) + (o.id === 'seite' ? ' · Standard' : '') + '<span class="dp-tt-mode-btn-label">' + esc(o.d) + '</span></button>';
       }).join('') + '</div>'
       + '<p class="hint" style="margin-top:8px;color:var(--muted)">Auf dem Handy sitzt er immer als runder Knopf unten links. Die Wahl gilt für dieses Gerät.</p>';

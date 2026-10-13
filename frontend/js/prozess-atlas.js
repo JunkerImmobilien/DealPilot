@@ -270,6 +270,8 @@
       '.atl-kap .pf-wrap{display:block;width:100%;height:100%}.atl-kap svg.pf{width:100%;height:100%}',
       '.atl-beleg{margin-top:10px;font:500 10.5px "JetBrains Mono",monospace;color:#7f7663;word-break:break-all}',
       '@media (max-width:900px){.atl-rumpf{grid-template-columns:1fr;grid-template-rows:minmax(260px,1fr) auto;overflow:auto}.atl-panel{max-height:none;overflow:visible}#dp-atlas{overflow:auto}.atl-rumpf{flex:none}}',
+      '.atl-kopf,.atl-wahl{flex:0 0 auto}',
+      '@media (max-width:900px){.atl-netz{max-height:56vh}}',
       '@media (max-width:640px){.atl-kopf{padding:12px 14px 8px}.atl-wahl{padding:0 14px 8px}.atl-rumpf{padding:0 12px 14px}.atl-kopf h2{font-size:18px}.atl-kopf .s{display:none}}',
       '@media (prefers-reduced-motion:reduce){.atl-k,.atl-sp,.atl-schritte li{animation:none;opacity:1;transform:none}.kt path.l{animation:none;stroke-dashoffset:0}#dp-atlas::after{animation:none}}'
     ].join('\n');
@@ -398,7 +400,7 @@
   function kapitaenPlatz(id) {
     var p = _lay && _lay.pos[id]; if (!p) return null;
     var x = p.x - 50, y = p.y + p.h - 73 + 2;
-    if (x < 0) x = p.x + p.w + 4;
+    if (x < 0) x = Math.max(0, p.x - 48);   /* einspaltig: links in den Rand, nie rechts aus dem Bild (gemessen 390 px: x 363) */
     return { x: x, y: y };
   }
   function kapitaenZu(id, kEl) {
@@ -472,6 +474,8 @@
     if (k.ziel) h += '<button type="button" class="atl-hin">✈ Hinfliegen — in der App öffnen</button>';
     h += '<div class="atl-beleg">Beleg im Code: ' + esc(k.beleg) + '</div>';
     var pan = root.querySelector('.atl-panel'); pan.innerHTML = h; pan.scrollTop = 0;
+    /* schmal: die Erklaerung steht UNTER dem Netz - nach dem Klick dorthin, sonst fliegen die Daten ins Unsichtbare */
+    if (mitFlug && innerWidth <= 900) { try { pan.scrollIntoView({ behavior: ruhig ? 'auto' : 'smooth', block: 'start' }); } catch (e) {} }
     var vonEl = kEl || pan;
     var schrittZeit = (k.unter ? k.unter.length * 140 : 0);
     if (k.ein && k.ein.length) chipsFliegen(vonEl, pan.querySelector('.atl-chips.ein'), k.ein, '', mitFlug ? 80 : 0);
