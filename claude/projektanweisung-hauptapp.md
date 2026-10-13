@@ -38614,6 +38614,24 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2171–v2172c · Verlaufs-Einordnung von selbst, Quellen-Reiter weg, Makro aus der eigenen Datenbank (13.10.2026, Staging)
+
+- **v2171** `9865794d`, `c17cf41d`: Marcel: *„die KI-Einordnung des Verlaufs … sollte schon neu erstellt werden und auch ausführlich ohne extra button. die Quellen der reiter kann raus."* Auf Rückfrage: nur der **Reiter „Quellen" der Pilot-Analyse** fällt weg (`_quellenHtml`, `_dpQuellenAemter`), die Quellen IN den Reitern bleiben. Die Einordnung entsteht beim Öffnen, sieben Abschnitte, alle Berichtsfelder je Bericht (Spanne, Sach-/Ertragswert, Zins, Wohnfläche/Baujahr je Bericht) und der heutige Kaufpreis; Zwischenspeicher je Objekt und Berichtsstand. **Nachweis:** Bismarckstr. 27 (3 Berichte): kein Knopf, 7 Zwischenüberschriften, 441 Wörter, Reiter „Quellen" fehlt in beiden Analyse-Hüllen. **Rest:** das Modell nannte Score 47 „schwach bis unteres Solide" — die Stufenwörter stehen im Auftrag, gehalten werden sie nicht immer.
+- **Ankauf/Bestand gemessen, nichts geändert:** Ankauf-Ansicht sperrt 223 von 223 Feldern, der Freigabe-Haken öffnet sie (v2037/v2038 wirkt). Im Bestand ist alles bewusst editierbar, der Soll-Stand bleibt unberührt. Marcel: „So lassen".
+- **v2172** `768ae809`: `mb.makro_werte` + `mb.makro_abrufe` (Migration 017), `MakroImportService`, Takt alle 12 h prüfen / alle 30 Tage holen (`MAKRO_IMPORT=0` schaltet ab). `DestatisConnector.macro()` liest zuerst die Tabelle. **Gemessen:** `regionalkey "05*"` liefert ein ganzes Land in EINEM Abruf → 34 Abrufe für Deutschland statt über 800. Abruf aus der DB **2–38 ms** statt bis 20 s; Minden-Lübbecke 6,4 % / 34,3 je 10.000 / Kaufkraft 99,7 — wie in v2165 von Hand gemessen.
+- **v2172a** `77ab441c`: die Atlas-Tabellen schlüsseln Hamburg `02`, Berlin `11`, Region Hannover / StädteRegion Aachen / Regionalverband Saarbrücken achtstellig — der Bericht fragt fünfstellig. Umschlüsselung beim Import; Deckung gegen die HEUTIGEN Kreise statt gezählt (die Atlas-Tabellen führen Altkreise, 472 Fünfsteller).
+- **v2172b** `c35168e4`: **Code 6 — höchstens 10 parallele Abrufe je Konto, und ein von uns abgebrochener Abruf läuft dort bis 15 min weiter.** Unsere eigene 240-s-Grenze hatte das Limit gefüllt. Jetzt 3 parallel, 10 min, `logincheck` vorweg, Pause vor dem zweiten Versuch.
+- **v2172c** `8c6aa0fa`: Bevölkerung für Hamburg und Berlin (Pivot führt sie als Land). **Nachweis:** dritter Lauf (Takt) **vollständig in 691 s — alle vier Kennzahlen 400/400 heutige Kreise, 16/16 Länder** (Bevölkerung/ALQ bis 2025, Wanderung 2024, Einkommen 2023). Stichprobe HH, B, Hannover, Aachen, Saarbrücken: alle aus der Tabelle, 2–40 ms.
+- **Rest:** Prod erst nach Freigabe (Migration 017 + Rebuild mb-backend; der Takt holt beim ersten Start von selbst). Dauer eines Vollaufs mit 3 parallel: rund 20–25 min.
+
+### v2168–v2170b · fremde Marktbericht-Karte, Makro-Budget, Portfolio-Pilot frisch (13.10.2026, Prod-Rollout 3 `104c021d`)
+
+- **v2168** `aa218f2b`: Marcels Bild „frage" („234 €/m² · −88,2 %") — die Karte `_mb_state` (199.000 € für 95 m²) stand auf sieben Objekten, weil `_mb_state`/`_avm_state` in den `resetFields` beim Laden fehlten. Jetzt geleert; die Karte trägt `fuer.key`, fremde (Schlüssel oder Fläche > 15 % daneben) werden verworfen. Browser: Gohliser leer, 001/1056 behalten ihre eigene.
+- **v2169/v2169a** `4fe97bd4`, `2115bd72`: Regionaldatenbank nach neuem Passwort erreichbar, aber 44–182 s je Tabelle. Abrufe parallel, Erfolge 30 Tage im Speicher, ein Bericht wartet höchstens 20 s (vorher bis 180 s — hätte die 6 Berichtsplätze blockiert). Dauerhaft: N62.16.
+- **v2170–v2170b** `3fb90585`, `e32d7522`, `6def3fdf`: Portfolio-Pilot lädt vor jeder Anfrage die ganze Kette frisch und nimmt die NEUERE von `ai_analysis`-Spalte und `data._ai` — bei 4 von 8 Objekten war die Kopie veraltet. Fazit = Gesamtbewertung. Gemessen: 8/8 mit Analyse vom 13.10. inkl. Steuer.
+- Neuabruf Staging: 26 Objekte mit gpt-4.1 neu, 7 ohne Kaufpreis übersprungen, 0 Fehler.
+- OpenAI-Stufe „Launch": gpt-4.1 2 Mio. TPM / 10.000 RPM — kein Engpass.
+
 ### Prod-Rollouts 13.10.2026 · v2145–v2167 und das Modell gpt-4.1
 
 - **Rollout 1** `b62eb9d2` (v2145–v2166): beide DBs gesichert und angesehen (11 MB/71 Tabellen, 1,6 MB/26), Migrationen 087 + mb 016 angewendet, Zensus-Import 894.880 Werte (VACUUM scheiterte am /dev/shm des DB-Containers — harmlos). **Rollout 2** `31bff93e` (v2163a–v2167). Push nach main mit Marcels ausdrücklicher Erlaubnis („du kannst pushen").

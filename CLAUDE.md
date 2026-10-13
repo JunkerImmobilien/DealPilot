@@ -54,11 +54,19 @@ Sachwertfaktor (§ 21 Abs. 3) — und für jeden Ausschuss soll **in der Datenba
 stehen, woher die Zahl kommt**: Link, Jahrgang, Lizenz, Stichtag, Seite. Ohne
 diese Liste fängt die jährliche Nachernte jedes Mal bei der Recherche an.
 
-**Stand 06.10.2026, am Register gemessen (58 Dateien, 4.813 Sätze): alle 16
-Länder sind vertreten.** 2.528 Zinssatz- und 1.257 Sachwertfaktor-Sätze,
-davon rund 2.540 mit Wert und rund 1.250 als Sperre. Ohne einen einzigen
-**Zinssatz**-Wert sind nur noch **BY** (376 Sperren) und **SL** (24). Unter
-drei **Faktor**-Werten liegen BY (2), HH (2), RP (1), SL (0).
+**Stand 13.10.2026, am Register gemessen (62 Dateien, davon 56 Satzdateien,
+4.832 Sätze): alle 16 Länder sind vertreten.** 2.536 Zinssatz- und 1.259
+Sachwertfaktor-Sätze, davon **2.402 mit Wert** (1.783 LZS + 619 SWF) und
+1.393 Sperren (`vollstaendig === false`). Ohne einen einzigen Wert, weder
+Zins noch Faktor: **BY** (376/374 Sperren), **SL** (28/24) und **HB** (5/4).
+Unter drei **Faktor**-Werten: BY 0, HB 0, SL 0, RP 1, HH 2.
+**Kein Satz führt den Baupreisindex als Zahl** — alle rechnen mit der
+Konstanten 1,91. `mb.param_modell` hält 3.562 Sätze, die übrigen 1.270
+(fast nur Sperren) kommen allein über `SAATDATEIEN` aus den Dateien.
+
+> Hier stand bis zum 13.10.2026 „58 Dateien, 4.813 Sätze, rund 2.540 mit
+> Wert, ohne Zinswert nur BY und SL, BY 2 Faktoren". HB fehlte in der
+> Liste, und die zwei BY-Faktoren in `sued-nord.json` sind heute Sperren.
 
 > **Hier stand bis zum 06.10.2026 „6 von 16 Ländern, rund 40 % der
 > Einwohner beim Zins, 25 % beim Faktor".** Das wies Arbeit als offen aus,

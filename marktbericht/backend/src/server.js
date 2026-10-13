@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { cfg } from './lib/config.js';
 /* WADM-4 */
 import { starteHarvestScheduler } from './lib/harvestScheduler.js';
+import { starteMakroTakt } from './services/MakroImportService.js';   /* v2172 */
 import { router } from './routes/api.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,6 +41,7 @@ const server = app.listen(cfg.port, () => {
     /* WADM-3 · Taktgeber der Discovery. Laeuft neben dem Server, nie im
    * Anfragepfad — ein haengendes Landesportal darf keinen Bericht blockieren. */
   try { starteHarvestScheduler(); } catch (e) { console.log('[harvest] Start fehlgeschlagen:', e.message); }
+  try { starteMakroTakt(); } catch (e) { console.log('[makro] Start fehlgeschlagen:', e.message); }
   /* v1083a-WBOOT · Ausschuss-Register aus mb.param_modell nachladen.
    *
    * Das Register laedt seine Saatdatei beim ersten Zugriff selbst
