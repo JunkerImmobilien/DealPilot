@@ -603,12 +603,13 @@ if (!window._pdfGold) {
 
   // ── Settings-Eintrag (Auslöser) ────────────────────────────
   function ensureEntry() {
-    var tabs = document.querySelector('.settings-tabs') || (document.querySelector('.st-tab') && document.querySelector('.st-tab').parentNode);
+    /* v2200 · N63.1: NUR die Einstellungen. Der Rueckfall auf das erste .st-tab der Seite traf bei offener Hilfe deren ersten Eintrag (Ablaeufe & Pilot) und klonte ihn samt help-sidebar-item-active in die Hilfe - zwei goldene Markierungen. */
+    var tabs = document.querySelector('.settings-tabs:not(#help-sidebar)');   /* v2200: die Hilfe-Leiste traegt dieselbe Klasse */
     if (!tabs || tabs.querySelector('.st-tab[data-rp="1"]')) return;
     var src = tabs.querySelector('.st-tab[data-tab="plan"]') || tabs.querySelector('.st-tab');
     if (!src) return;
     var btn = src.cloneNode(true);
-    btn.setAttribute('data-rp', '1'); btn.removeAttribute('data-tab'); btn.removeAttribute('onclick'); btn.classList.remove('active');
+    btn.setAttribute('data-rp', '1'); btn.removeAttribute('data-tab'); btn.removeAttribute('onclick'); btn.classList.remove('active'); btn.classList.remove('help-sidebar-item-active');
     var t = btn.querySelector('.help-sidebar-item-title'); if (t) t.textContent = 'Partner-Portal'; else btn.textContent = 'Partner-Portal';
     var d = btn.querySelector('.help-sidebar-item-desc'); if (d) d.textContent = 'Lizenzen, Mandanten, Freigaben';
     btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); openResellerPortal(); });
